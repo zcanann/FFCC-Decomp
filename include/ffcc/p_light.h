@@ -2,7 +2,7 @@
 #define _FFCC_P_LIGHT_H_
 
 #include "ffcc/memory.h"
-#include "ffcc/system.h"
+#include "ffcc/p_sample.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -10,7 +10,7 @@
 class COctTree;
 struct Vec;
 
-class CLightPcs : public CProcess
+class CLightPcs : public CSamplePcs
 {
 public:
     struct Vec3f

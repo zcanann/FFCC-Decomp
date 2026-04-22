@@ -121,6 +121,7 @@ struct _pppPObject
 };
 
 struct _pppPObjLink;
+struct _pppPDataVal;
 struct _pppCtrlTable;
 
 typedef void (*pppProgAnyCallback)(void);
@@ -272,7 +273,7 @@ struct _pppMngSt
     unsigned char m_pObjList[8];       // 0xC4
     void* m_pDataValList;              // 0xCC
     void* m_controlProgramTable;       // 0xD0
-    void* m_programInfoTable;          // 0xD4
+    _pppPDataVal* m_pppPDataVals;      // 0xD4
     void* m_owner;                     // 0xD8
     void* m_lookTarget;                // 0xDC
     CChara::CNode* m_bindNode;         // 0xE0

@@ -87,93 +87,119 @@ static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
+ * PAL Address: 0x801035dc
+ * PAL Size: 984b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void initTracePolygon(PYmTracer2*, TRACE_POLYGON& poly)
+void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
-    float zero = FLOAT_80331840;
+    TracerWork* work;
+    CMapMesh* mapMesh;
+    u8* colorData;
+    TRACE_POLYGON* poly;
+    CTexture* texture;
+    s32 i;
+    s32 dataOffset;
+    s32 colorOffset;
+    s32 dataValIndex;
+    f32 uTop;
+    f32 uBottom;
+    f32 uvStep;
+    int textureIndex[2];
 
-    poly.pos.x = zero;
-    poly.pos.y = zero;
-    poly.pos.z = zero;
-    poly.targetPos.x = zero;
-    poly.targetPos.y = zero;
-    poly.targetPos.z = zero;
-    poly.active = 0;
-    poly.alpha = 0;
-}
+    dataOffset = *param_3->m_serializedDataOffsets;
+    colorOffset = param_3->m_serializedDataOffsets[1];
+    work = (TracerWork*)((u8*)pppYmTracer2 + 0x80 + dataOffset);
+    colorData = (u8*)pppYmTracer2 + 0x80 + colorOffset;
+    poly = work->entries;
+    dataValIndex = param_2->m_dataValIndex;
+    mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
 
-/*
- * --INFO--
- * PAL Address: 0x80103e68
- * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
-{
-	float fVar1 = FLOAT_80331840;
-	unsigned char* puVar2 = (unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets;
-	
-	*(u32*)(puVar2 + 0x28) = 0;
-	*(u32*)(puVar2 + 0x24) = 0;
-	*(u32*)(puVar2 + 0x20) = 0;
-	*(u16*)(puVar2 + 0x2c) = 0;
-	
-	*(float*)(puVar2 + 0xc) = fVar1;
-	*(float*)(puVar2 + 8) = fVar1;
-	*(float*)(puVar2 + 4) = fVar1;
-	*(float*)puVar2 = fVar1;
-	*(float*)(puVar2 + 0x1c) = fVar1;
-	*(float*)(puVar2 + 0x18) = fVar1;
-	*(float*)(puVar2 + 0x14) = fVar1;
-	*(float*)(puVar2 + 0x10) = fVar1;
-	
-	*(u16*)(puVar2 + 0x2e) = 0;
-	*(u16*)(puVar2 + 0x30) = 0;
-	*(u16*)(puVar2 + 0x32) = 0;
-}
+    if (dataValIndex != 0xFFFF) {
+        pppSetBlendMode(param_2->m_payload[10]);
+        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+            colorData + 8, (void*)&ppvCameraMatrix02, FLOAT_80331840,
+            param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
+        SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-/*
- * --INFO--
- * PAL Address: 0x80103e44
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
-{
-	unsigned char* iVar1 = (unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets;
-	
-	*(short*)(iVar1 + 0x2e) = 0;
-	*(short*)(iVar1 + 0x2c) = 0;
-	*(short*)(iVar1 + 0x32) = 0;
-}
+        textureIndex[0] = 0;
+        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr,
+                                                                     textureIndex[0]);
+        if (texture != 0) {
+            GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
+            GXSetNumChans(1);
+            GXSetNumTexGens(1);
+            GXSetNumTevStages(1);
+            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+            _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+            _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-/*
- * --INFO--
- * PAL Address: 0x80103e0c
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
-{
-	void** memPtr = (void**)((unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets + 0x28);
-	if (*memPtr != 0) {
-		pppHeapUseRate((CMemory::CStage*)*memPtr);
-	}
+            u32 format = (u32)texture->m_format;
+            if ((format == 8) || (format == 9)) {
+                SetUpPaletteEnv(texture);
+            }
+
+            if (param_2->m_payload[0xD] == 0) {
+                _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+            } else {
+                _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+            }
+
+            uvStep = FLOAT_80331844 / (f32)work->visibleCount;
+            GXSetCullMode(GX_CULL_NONE);
+
+            if (work->visibleCount > 1) {
+                f32 alphaScale = (f32)colorData[0x0B] / FLOAT_80331848;
+
+                GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
+
+                for (i = 0; i < (s32)(work->visibleCount - 1); i++) {
+                    uTop = (f32)i * uvStep;
+                    uBottom = (f32)(i + 1) * uvStep;
+
+                    if (alphaScale < FLOAT_80331840) {
+                        alphaScale = FLOAT_80331840;
+                    }
+                    if (FLOAT_80331844 < alphaScale) {
+                        alphaScale = FLOAT_80331844;
+                    }
+
+                    PackedColor colorTop = { 0 };
+                    PackedColor colorBottom = { 0 };
+                    colorTop.bytes[0] = poly->colorR;
+                    colorTop.bytes[1] = poly->colorG;
+                    colorTop.bytes[2] = poly->colorB;
+                    colorTop.bytes[3] = (u8)(alphaScale * (f32)poly->alpha);
+                    colorBottom.bytes[0] = poly[1].colorR;
+                    colorBottom.bytes[1] = poly[1].colorG;
+                    colorBottom.bytes[2] = poly[1].colorB;
+                    colorBottom.bytes[3] = (u8)(alphaScale * (f32)poly[1].alpha);
+
+                    GXPosition3f32(poly->targetPos.x, poly->targetPos.y, poly->targetPos.z);
+                    GXColor1u32(colorTop.value);
+                    GXTexCoord2f32(uTop, FLOAT_80331844);
+
+                    GXPosition3f32(poly->pos.x, poly->pos.y, poly->pos.z);
+                    GXColor1u32(colorTop.value);
+                    GXTexCoord2f32(uTop, FLOAT_80331840);
+
+                    GXPosition3f32(poly[1].targetPos.x, poly[1].targetPos.y, poly[1].targetPos.z);
+                    GXColor1u32(colorBottom.value);
+                    GXTexCoord2f32(uBottom, FLOAT_80331844);
+
+                    poly++;
+                    GXPosition3f32(poly->pos.x, poly->pos.y, poly->pos.z);
+                    GXColor1u32(colorBottom.value);
+                    GXTexCoord2f32(uBottom, FLOAT_80331840);
+                }
+            }
+        }
+    }
 }
 
 /*
@@ -334,119 +360,94 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     work->visibleCount = visibleCount;
 }
 
+
 /*
  * --INFO--
- * PAL Address: 0x801035dc
- * PAL Size: 984b
+ * PAL Address: 0x80103e0c
+ * PAL Size: 56b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
+void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
 {
-    TracerWork* work;
-    CMapMesh* mapMesh;
-    u8* colorData;
-    TRACE_POLYGON* poly;
-    CTexture* texture;
-    s32 i;
-    s32 dataOffset;
-    s32 colorOffset;
-    s32 dataValIndex;
-    f32 uTop;
-    f32 uBottom;
-    f32 uvStep;
-    int textureIndex[2];
+	void** memPtr = (void**)((unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets + 0x28);
+	if (*memPtr != 0) {
+		pppHeapUseRate((CMemory::CStage*)*memPtr);
+	}
+}
 
-    dataOffset = *param_3->m_serializedDataOffsets;
-    colorOffset = param_3->m_serializedDataOffsets[1];
-    work = (TracerWork*)((u8*)pppYmTracer2 + 0x80 + dataOffset);
-    colorData = (u8*)pppYmTracer2 + 0x80 + colorOffset;
-    poly = work->entries;
-    dataValIndex = param_2->m_dataValIndex;
-    mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
+/*
+ * --INFO--
+ * PAL Address: 0x80103e44
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
+{
+	unsigned char* iVar1 = (unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets;
 
-    if (dataValIndex != 0xFFFF) {
-        pppSetBlendMode(param_2->m_payload[10]);
-        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            colorData + 8, (void*)&ppvCameraMatrix02, FLOAT_80331840,
-            param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
-        SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
+	*(short*)(iVar1 + 0x2e) = 0;
+	*(short*)(iVar1 + 0x2c) = 0;
+	*(short*)(iVar1 + 0x32) = 0;
+}
 
-        textureIndex[0] = 0;
-        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr,
-                                                                     textureIndex[0]);
-        if (texture != 0) {
-            GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
-            GXSetNumChans(1);
-            GXSetNumTexGens(1);
-            GXSetNumTevStages(1);
-            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
-            _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-            _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+/*
+ * --INFO--
+ * PAL Address: 0x80103e68
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
+{
+	float fVar1 = FLOAT_80331840;
+	unsigned char* puVar2 = (unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets;
 
-            u32 format = (u32)texture->m_format;
-            if ((format == 8) || (format == 9)) {
-                SetUpPaletteEnv(texture);
-            }
+	*(u32*)(puVar2 + 0x28) = 0;
+	*(u32*)(puVar2 + 0x24) = 0;
+	*(u32*)(puVar2 + 0x20) = 0;
+	*(u16*)(puVar2 + 0x2c) = 0;
 
-            if (param_2->m_payload[0xD] == 0) {
-                _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
-            } else {
-                _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-            }
+	*(float*)(puVar2 + 0xc) = fVar1;
+	*(float*)(puVar2 + 8) = fVar1;
+	*(float*)(puVar2 + 4) = fVar1;
+	*(float*)puVar2 = fVar1;
+	*(float*)(puVar2 + 0x1c) = fVar1;
+	*(float*)(puVar2 + 0x18) = fVar1;
+	*(float*)(puVar2 + 0x14) = fVar1;
+	*(float*)(puVar2 + 0x10) = fVar1;
 
-            uvStep = FLOAT_80331844 / (f32)work->visibleCount;
-            GXSetCullMode(GX_CULL_NONE);
+	*(u16*)(puVar2 + 0x2e) = 0;
+	*(u16*)(puVar2 + 0x30) = 0;
+	*(u16*)(puVar2 + 0x32) = 0;
+}
 
-            if (work->visibleCount > 1) {
-                f32 alphaScale = (f32)colorData[0x0B] / FLOAT_80331848;
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void initTracePolygon(PYmTracer2*, TRACE_POLYGON& poly)
+{
+    float zero = FLOAT_80331840;
 
-                GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
-
-                for (i = 0; i < (s32)(work->visibleCount - 1); i++) {
-                    uTop = (f32)i * uvStep;
-                    uBottom = (f32)(i + 1) * uvStep;
-
-                    if (alphaScale < FLOAT_80331840) {
-                        alphaScale = FLOAT_80331840;
-                    }
-                    if (FLOAT_80331844 < alphaScale) {
-                        alphaScale = FLOAT_80331844;
-                    }
-
-                    PackedColor colorTop = { 0 };
-                    PackedColor colorBottom = { 0 };
-                    colorTop.bytes[0] = poly->colorR;
-                    colorTop.bytes[1] = poly->colorG;
-                    colorTop.bytes[2] = poly->colorB;
-                    colorTop.bytes[3] = (u8)(alphaScale * (f32)poly->alpha);
-                    colorBottom.bytes[0] = poly[1].colorR;
-                    colorBottom.bytes[1] = poly[1].colorG;
-                    colorBottom.bytes[2] = poly[1].colorB;
-                    colorBottom.bytes[3] = (u8)(alphaScale * (f32)poly[1].alpha);
-
-                    GXPosition3f32(poly->targetPos.x, poly->targetPos.y, poly->targetPos.z);
-                    GXColor1u32(colorTop.value);
-                    GXTexCoord2f32(uTop, FLOAT_80331844);
-
-                    GXPosition3f32(poly->pos.x, poly->pos.y, poly->pos.z);
-                    GXColor1u32(colorTop.value);
-                    GXTexCoord2f32(uTop, FLOAT_80331840);
-
-                    GXPosition3f32(poly[1].targetPos.x, poly[1].targetPos.y, poly[1].targetPos.z);
-                    GXColor1u32(colorBottom.value);
-                    GXTexCoord2f32(uBottom, FLOAT_80331844);
-
-                    poly++;
-                    GXPosition3f32(poly->pos.x, poly->pos.y, poly->pos.z);
-                    GXColor1u32(colorBottom.value);
-                    GXTexCoord2f32(uBottom, FLOAT_80331840);
-                }
-            }
-        }
-    }
+    poly.pos.x = zero;
+    poly.pos.y = zero;
+    poly.pos.z = zero;
+    poly.targetPos.x = zero;
+    poly.targetPos.y = zero;
+    poly.targetPos.z = zero;
+    poly.active = 0;
+    poly.alpha = 0;
 }

@@ -313,24 +313,24 @@ void CSystem::ExecScenegraph()
         File.Frame();
         Memory.Frame();
 
-        if (Pad._452_4_ == 0)
+        if (Pad._452_4_ != 0)
+        {
+            stepTrigger = 0;
+        }
+        else
         {
             unsigned int stepPad = (Pad._448_4_ != 4) ? 4 : 0;
             stepTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x36 + stepPad * 0x54);
         }
-        else
-        {
-            stepTrigger = 0;
-        }
 
-        if (Pad._452_4_ == 0)
+        if (Pad._452_4_ != 0)
+        {
+            perfTrigger = 0;
+        }
+        else
         {
             unsigned int perfPad = (Pad._448_4_ != 4) ? 4 : 0;
             perfTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x34 + perfPad * 0x54);
-        }
-        else
-        {
-            perfTrigger = 0;
         }
 
         if ((stepTrigger & 0xC) != 0)

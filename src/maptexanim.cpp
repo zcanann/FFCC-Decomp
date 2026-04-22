@@ -108,8 +108,8 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
     for (int i = 0; i < m_count; i++) {
         void* animPtr = reinterpret_cast<void*>(*reinterpret_cast<int*>(setPtr + 0xC));
         if (S16At(animPtr, 0x12) == targetMaterialId) {
+            int end = frameEnd;
             if (U8At(animPtr, 0x15) != 0) {
-                int end = frameEnd;
                 S32At(animPtr, 0x30) = frameStart;
                 S32At(animPtr, 0x2C) = frameStart;
                 if (frameEnd > S32At(animPtr, 0x38)) {
@@ -119,7 +119,6 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
                 U8At(animPtr, 0x27) = static_cast<unsigned char>(wrapMode);
                 U8At(animPtr, 0x28) = 1;
             } else {
-                int end = frameEnd;
                 S16At(animPtr, 0xE) = static_cast<short>(frameStart);
                 F32At(animPtr, 0x1C) = static_cast<float>(static_cast<short>(frameStart));
                 if (frameEnd > S16At(animPtr, 0xC)) {

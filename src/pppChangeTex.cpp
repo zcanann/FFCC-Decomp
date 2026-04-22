@@ -129,8 +129,8 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
 		*(int*)(MaterialManRaw() + 0x5c) = zero;
 		*(char*)(MaterialManRaw() + 0x208) = zero;
 		*(int*)(MaterialManRaw() + 0x48) = fullTevBits;
-		*(int*)(MaterialManRaw() + 0xd0) = *(int*)((char*)param_2 + 0x1C) + 0x28;
 		*(int*)(MaterialManRaw() + 0x128) = zero;
+		*(int*)(MaterialManRaw() + 0xd0) = *(int*)((char*)param_2 + 0x1C) + 0x28;
 		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
 		*(int*)(MaterialManRaw() + 0x130) = zero;
 		*(int*)(MaterialManRaw() + 0x40) = fullTevBits;

@@ -605,8 +605,8 @@ void CPartPcs::create0()
 void CPartPcs::create()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
-    char* stringBase = const_cast<char*>(DAT_801d8068);
-    void* stage;
+    char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
+    CMemory::CStage* stage;
 
     usb->m_freePtr = 0;
     usb->m_stageExtra = 0;
@@ -614,16 +614,17 @@ void CPartPcs::create()
     usb->m_miruraEventActive = 0;
     usb->m_disableShokiDraw = 0;
 
-    if (Game.m_currentSceneId == 7) {
-        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
+    if ((int)Game.m_currentSceneId == 7) {
+        stage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
         usb->m_stageLoad = stage;
         usb->m_stageDefault = stage;
         usb->m_stageAmem = 0;
     } else {
-        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
+        stage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
         usb->m_stageLoad = stage;
         usb->m_stageDefault = stage;
-        usb->m_stageAmem = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, stringBase + 0x23C, 2);
+        stage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x400000, stringBase + 0x23C, 2);
+        usb->m_stageAmem = stage;
     }
 
     Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(

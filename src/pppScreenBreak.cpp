@@ -88,6 +88,7 @@ struct pppScreenBreakUnkC {
 };
 
 extern float FLOAT_80331cc0;
+extern float FLOAT_80331cc4;
 static const float kPppScreenBreakDoubleScale = 2.0f;
 static const float kPppScreenBreakZero = 0.0f;
 static const float kPppScreenBreakRandRange = 0.3f;
@@ -326,8 +327,8 @@ void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
     float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
-    float f = 0.0f;
-    value[2] = 0.0f;
+    float f = FLOAT_80331cc4;
+    value[2] = FLOAT_80331cc4;
     value[1] = f;
     *value = f;
 }

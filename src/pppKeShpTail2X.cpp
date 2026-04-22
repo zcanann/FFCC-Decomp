@@ -77,98 +77,46 @@ struct KeShpTail2XObject {
 
 /*
  * --INFO--
- * PAL Address: 0x80088e4c
- * PAL Size: 992b
+ * PAL Address: 0x80088698
+ * PAL Size: 88b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2XUnkC* param_3)
+void pppKeShpTail2XDes(void* obj, void* param_2)
 {
-    KeShpTail2XStep* step;
-    KeShpTail2XWork* work;
-    KeShpTail2XObject* tailObj;
-    Vec pos;
-    Vec historyPos ATTRIBUTE_ALIGN(8);
+	u32 serializedOffset = **(u32**)((u8*)param_2 + 0xc);
+	u8* tail = (u8*)obj + serializedOffset + 0x80;
 
-    if (gPppCalcDisabled != 0) {
-        return;
-    }
+	*(u16*)(tail + 2) = 0;
+	*(u16*)(tail + 4) = 0;
+	*(u16*)(tail + 6) = 0;
+	tail[1] = 0;
+	tail[0] = 0x1f;
+	memset(tail + 8, 0, 0x174);
+}
 
-    step = (KeShpTail2XStep*)param_2;
-    tailObj = (KeShpTail2XObject*)obj;
-    work = (KeShpTail2XWork*)((u8*)obj + ((KeShpTail2XOffsets*)param_3)->m_serializedDataOffsets[0] + 0x80);
+/*
+ * --INFO--
+ * PAL Address: 0x800886f0
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppKeShpTail2XCon(void* obj, void* param_2)
+{
+	u32 serializedOffset = **(u32**)((u8*)param_2 + 0xc);
+	u8* tail = (u8*)obj + serializedOffset + 0x80;
 
-    if (tailObj->m_obj.m_graphId == 0) {
-        if (step->m_worldSpaceMode == 0) {
-            pos.x = tailObj->m_obj.m_localMatrix.value[0][3];
-            pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
-            pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
-        } else if (step->m_worldSpaceMode == 1) {
-            pppFMATRIX outMatrix;
-
-            pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, tailObj->m_obj.m_localMatrix);
-            pos.x = outMatrix.value[0][3];
-            pos.y = outMatrix.value[1][3];
-            pos.z = outMatrix.value[2][3];
-        }
-
-        pppCopyVector(historyPos, pos);
-
-        Vec* history = work->m_posHistory;
-        s32 count = work->m_count;
-        for (; count > 0; count--) {
-            pppCopyVector(*history, historyPos);
-            history++;
-        }
-    }
-
-    if (work->m_head == 0) {
-        work->m_head = work->m_count;
-    }
-    work->m_head--;
-
-    if (step->m_worldSpaceMode == 0) {
-        pos.x = tailObj->m_obj.m_localMatrix.value[0][3];
-        pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
-        pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
-    } else if (step->m_worldSpaceMode == 1) {
-        pppFMATRIX outMatrix;
-
-        pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, tailObj->m_obj.m_localMatrix);
-        pos.x = outMatrix.value[0][3];
-        pos.y = outMatrix.value[1][3];
-        pos.z = outMatrix.value[2][3];
-    }
-
-    pppCopyVector(work->m_posHistory[work->m_head], pos);
-
-    {
-        long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
-        u8* shape = (u8*)*shapeTable;
-        KeShpTail2XShapeFrame* frameEntry;
-        u16 shapeFrame;
-
-        shapeFrame = work->m_shapeFrame;
-        work->m_shapePrevFrame = shapeFrame;
-
-        work->m_frameAcc += step->m_frameStep;
-        frameEntry = reinterpret_cast<KeShpTail2XShapeFrame*>(shape + ((u32)shapeFrame << 3) + 0x10);
-        if (work->m_frameAcc >= frameEntry->m_duration) {
-            work->m_frameAcc -= frameEntry->m_duration;
-            work->m_shapeFrame++;
-            if (work->m_shapeFrame >= *(s16*)(shape + 6)) {
-                if ((frameEntry->m_flags & 0x80) != 0) {
-                    work->m_shapeFrame = 0;
-                    work->m_frameAcc = 0;
-                } else {
-                    work->m_frameAcc = 0;
-                    work->m_shapeFrame--;
-                }
-            }
-        }
-    }
+	*(u16*)(tail + 2) = 0;
+	*(u16*)(tail + 4) = 0;
+	*(u16*)(tail + 6) = 0;
+	tail[1] = 0;
+	tail[0] = 0x1f;
+	memset(tail + 8, 0, 0x174);
 }
 
 /*
@@ -393,44 +341,96 @@ move_next_segment:
 
 /*
  * --INFO--
- * PAL Address: 0x800886f0
- * PAL Size: 88b
+ * PAL Address: 0x80088e4c
+ * PAL Size: 992b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail2XCon(void* obj, void* param_2)
+void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2XUnkC* param_3)
 {
-	u32 serializedOffset = **(u32**)((u8*)param_2 + 0xc);
-	u8* tail = (u8*)obj + serializedOffset + 0x80;
+    KeShpTail2XStep* step;
+    KeShpTail2XWork* work;
+    KeShpTail2XObject* tailObj;
+    Vec pos;
+    Vec historyPos ATTRIBUTE_ALIGN(8);
 
-	*(u16*)(tail + 2) = 0;
-	*(u16*)(tail + 4) = 0;
-	*(u16*)(tail + 6) = 0;
-	tail[1] = 0;
-	tail[0] = 0x1f;
-	memset(tail + 8, 0, 0x174);
-}
+    if (gPppCalcDisabled != 0) {
+        return;
+    }
 
-/*
- * --INFO--
- * PAL Address: 0x80088698
- * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppKeShpTail2XDes(void* obj, void* param_2)
-{
-	u32 serializedOffset = **(u32**)((u8*)param_2 + 0xc);
-	u8* tail = (u8*)obj + serializedOffset + 0x80;
+    step = (KeShpTail2XStep*)param_2;
+    tailObj = (KeShpTail2XObject*)obj;
+    work = (KeShpTail2XWork*)((u8*)obj + ((KeShpTail2XOffsets*)param_3)->m_serializedDataOffsets[0] + 0x80);
 
-	*(u16*)(tail + 2) = 0;
-	*(u16*)(tail + 4) = 0;
-	*(u16*)(tail + 6) = 0;
-	tail[1] = 0;
-	tail[0] = 0x1f;
-	memset(tail + 8, 0, 0x174);
+    if (tailObj->m_obj.m_graphId == 0) {
+        if (step->m_worldSpaceMode == 0) {
+            pos.x = tailObj->m_obj.m_localMatrix.value[0][3];
+            pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
+            pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
+        } else if (step->m_worldSpaceMode == 1) {
+            pppFMATRIX outMatrix;
+
+            pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, tailObj->m_obj.m_localMatrix);
+            pos.x = outMatrix.value[0][3];
+            pos.y = outMatrix.value[1][3];
+            pos.z = outMatrix.value[2][3];
+        }
+
+        pppCopyVector(historyPos, pos);
+
+        Vec* history = work->m_posHistory;
+        s32 count = work->m_count;
+        for (; count > 0; count--) {
+            pppCopyVector(*history, historyPos);
+            history++;
+        }
+    }
+
+    if (work->m_head == 0) {
+        work->m_head = work->m_count;
+    }
+    work->m_head--;
+
+    if (step->m_worldSpaceMode == 0) {
+        pos.x = tailObj->m_obj.m_localMatrix.value[0][3];
+        pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
+        pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
+    } else if (step->m_worldSpaceMode == 1) {
+        pppFMATRIX outMatrix;
+
+        pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, tailObj->m_obj.m_localMatrix);
+        pos.x = outMatrix.value[0][3];
+        pos.y = outMatrix.value[1][3];
+        pos.z = outMatrix.value[2][3];
+    }
+
+    pppCopyVector(work->m_posHistory[work->m_head], pos);
+
+    {
+        long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+        u8* shape = (u8*)*shapeTable;
+        KeShpTail2XShapeFrame* frameEntry;
+        u16 shapeFrame;
+
+        shapeFrame = work->m_shapeFrame;
+        work->m_shapePrevFrame = shapeFrame;
+
+        work->m_frameAcc += step->m_frameStep;
+        frameEntry = reinterpret_cast<KeShpTail2XShapeFrame*>(shape + ((u32)shapeFrame << 3) + 0x10);
+        if (work->m_frameAcc >= frameEntry->m_duration) {
+            work->m_frameAcc -= frameEntry->m_duration;
+            work->m_shapeFrame++;
+            if (work->m_shapeFrame >= *(s16*)(shape + 6)) {
+                if ((frameEntry->m_flags & 0x80) != 0) {
+                    work->m_shapeFrame = 0;
+                    work->m_frameAcc = 0;
+                } else {
+                    work->m_frameAcc = 0;
+                    work->m_shapeFrame--;
+                }
+            }
+        }
+    }
 }

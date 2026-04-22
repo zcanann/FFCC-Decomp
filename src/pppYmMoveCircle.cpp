@@ -69,6 +69,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
         work->m_angle += 360.0f;
     }
 
+    nextPos.y = 0.0f;
     {
         f32 tableAngle =
             (32768.0f * (0.017453292f * work->m_angle)) /
@@ -83,7 +84,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     nextPos.y = pppMngSt->m_position.y;
     nextPos.z += work->m_center.z;
 
-    pppCopyVector(pppMngSt->m_previousPosition, pppMngSt->m_position);
+    pppCopyVector(*(Vec*)&pppMngSt->m_userFloat0, pppMngSt->m_position);
     pppCopyVector(pppMngSt->m_position, nextPos);
 
     *(f32*)((u8*)pppMngStPtr + 0x84) = nextPos.x;

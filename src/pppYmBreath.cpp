@@ -264,7 +264,7 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
 
     particle[3].y += particle[3].z;
     if ((*(unsigned char*)(breath + 0xC2) & 0x10) != 0) {
-        particle[3].z = particle[3].z + *(float*)(breath + 0x98) + particle[4].x;
+        particle[3].z += *(float*)(breath + 0x98) + particle[4].x;
     } else {
         particle[3].z += *(float*)(breath + 0x98);
     }
@@ -279,8 +279,8 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
     particle[4].y += particle[5].x;
     particle[4].z += particle[5].y;
     if ((*(unsigned char*)(breath + 0xC1) & 0x10) != 0) {
-        particle[5].x = particle[5].x + *(float*)(breath + 0x70) + particle[5].z;
-        particle[5].y = particle[5].y + *(float*)(breath + 0x74) + particle[6].x;
+        particle[5].x += *(float*)(breath + 0x70) + particle[5].z;
+        particle[5].y += *(float*)(breath + 0x74) + particle[6].x;
     } else {
         particle[5].x += *(float*)(breath + 0x70);
         particle[5].y += *(float*)(breath + 0x74);

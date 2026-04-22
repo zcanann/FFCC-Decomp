@@ -182,7 +182,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             particle->m_frame = work->m_cur;
             randomValue = rand();
             shapeCount = *(s16*)((u8*)shapeTable + 6);
-            shape = randomValue - (randomValue / shapeCount) * shapeCount;
+            shape = randomValue % shapeCount;
             particle->m_shapeB = shape;
             particle->m_shapeA = shape;
 

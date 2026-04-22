@@ -15,11 +15,12 @@ struct RedReverbDATA {
     int kind;
 };
 
-volatile u8 m_RandomIndex;
-int p_ReverbData;
-u32* p_ReverbSize;
+static volatile u8 m_RandomIndex;
+static RedReverbDATA* p_ReverbData;
+static u32* p_ReverbSize;
 u32 m_ChangeStatus;
-int* p_SkipKeyOn;
+u32 m_TerminateNote[1] = { 0 };
+static int* p_SkipKeyOn;
 
 /*
  * --INFO--
@@ -131,8 +132,8 @@ void ReverbAreaFree(void* param_1)
  */
 void InitReverb()
 {
-    p_ReverbData = RedNew(0x18);
-    memset((void*)p_ReverbData, 0, 0x18);
+    p_ReverbData = (RedReverbDATA*)RedNew(0x18);
+    memset(p_ReverbData, 0, 0x18);
     p_ReverbSize = (u32*)RedNew(4);
 }
 
@@ -224,7 +225,7 @@ void _SetReverbData(RedReverbDATA* reverb, int* params)
  */
 void _ClearReverb(int bank)
 {
-    RedReverbDATA* reverb = (RedReverbDATA*)(p_ReverbData + (bank & 1) * 0xC);
+    RedReverbDATA* reverb = p_ReverbData + (bank & 1);
     if (reverb->callback == 0) {
         return;
     }
@@ -283,7 +284,7 @@ int* SetReverb(int bank, int kind, int* params)
         return 0;
     }
 
-    reverb = (RedReverbDATA*)(p_ReverbData + (bank & 1) * 0xC);
+    reverb = p_ReverbData + (bank & 1);
     if ((reverb->callback != nullptr) && (reverb->kind == kind)) {
         _SetReverbData(reverb, params);
         return (int*)p_ReverbSize;
@@ -2200,7 +2201,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x15] -= step;
 		if ((trackData[0x15] == 0) && (trackData[0x16] == 1)) {
-			trackData[0] = (int)&DAT_8032ec30;
+			trackData[0] = (int)m_TerminateNote;
 			trackData[0x42] = 1;
 		}
 		trackData[0x13] += trackData[0x14] * step;

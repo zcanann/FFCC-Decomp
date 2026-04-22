@@ -20,9 +20,9 @@ extern "C" {
 
 // RedSound global linkage that is shared across Red* units.
 CRedDriver c_Driver;
-int m_StandbyStatus[0x40];
+static int m_StandbyStatus[0x40];
 volatile unsigned int m_AutoID;
-volatile int DAT_8032f4c8;
+static void* p_StreamBank;
 static const char s_redSoundMemorySettingErrorFmt[] = "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
 static const char sRedSoundLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
 static const char s_redSoundAMemorySettingErrorFmt[] = "%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
@@ -183,10 +183,10 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
  */
 void CRedSound::Start()
 {
-#define redSoundReverbSize (*(u32* volatile*)&p_ReverbSize)
-	redSoundReverbSize = (u32*)RedNew__Fi(0x100);
-	memset((void*)redSoundReverbSize, 0, 0x100);
-#undef redSoundReverbSize
+#define redSoundStreamBank (*(void* volatile*)&p_StreamBank)
+	redSoundStreamBank = RedNew__Fi(0x100);
+	memset((void*)redSoundStreamBank, 0, 0x100);
+#undef redSoundStreamBank
 }
 
 /*

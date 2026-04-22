@@ -68,6 +68,42 @@ struct RedDriverSyncState {
     OSSemaphore m_musicSemaphore;
 };
 
+struct RedSemaphoreThreadBlock {
+    OSSemaphore m_semaphore;
+    u32 m_padC;
+    u8 m_thread[0x318];
+
+    OSThread* Thread()
+    {
+        return reinterpret_cast<OSThread*>(m_thread);
+    }
+};
+
+struct RedWaveSettingThreadContext {
+    int slot;
+    int waveID;
+    void* waveData;
+    int waveSize;
+    u32 m_pad10;
+    u8 m_thread[0x318];
+
+    OSThread* Thread()
+    {
+        return reinterpret_cast<OSThread*>(m_thread);
+    }
+};
+
+struct RedDmaRequestThreadContext {
+    ARQRequest m_request;
+    u32 m_pad20;
+    u8 m_thread[0x318];
+
+    OSThread* Thread()
+    {
+        return reinterpret_cast<OSThread*>(m_thread);
+    }
+};
+
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 int DAT_8032f3c4;
 int DAT_8032f3c0;
@@ -119,14 +155,11 @@ int DAT_8032f3b8;
 void* DAT_8032f3e0[2];
 void* DAT_8032f3e8[2];
 u8 gRedDriverSyncBuffer[0x1F18];
-OSSemaphore DAT_8032d778;
-OSThread DAT_8032d788;
+RedSemaphoreThreadBlock DAT_8032d778;
 OSSemaphore DAT_8032daa0;
-RedWaveSettingState DAT_8032daac;
-OSThread DAT_8032dac0;
+RedWaveSettingThreadContext DAT_8032daac;
 OSSemaphore DAT_8032ddd8;
-ARQRequest DAT_8032dde4;
-OSThread DAT_8032de08;
+RedDmaRequestThreadContext DAT_8032dde4;
 OSSemaphore DAT_8032e120;
 void* DAT_8032e12c[4];
 CRedMemory DAT_8032f468;
@@ -821,7 +854,7 @@ int _MainThread(void*)
 
     DAT_8032f3c4 = DAT_8032f3c4 | 1;
     while (DAT_8032f3c0 != 0) {
-        OSWaitSemaphore(&DAT_8032d778);
+        OSWaitSemaphore(&DAT_8032d778.m_semaphore);
         if (DAT_8032f3c0 != 0) {
             iVar2 = OSGetTick();
             iVar1 = (int)DAT_8032f3f0;
@@ -843,7 +876,7 @@ int _MainThread(void*)
                 DAT_8032f424 = 0;
             }
             do {
-                iVar3 = OSTryWaitSemaphore(&DAT_8032d778);
+                iVar3 = OSTryWaitSemaphore(&DAT_8032d778.m_semaphore);
             } while (0 < iVar3);
             memmove((int*)DAT_8032f3cc + 1, DAT_8032f3cc, 0x18c);
             iVar3 = OSGetTick();
@@ -1098,7 +1131,7 @@ void _DmaExecute()
                 }
                 DAT_8032f488[0] = 3;
                 ARQSetChunkSize((u32)piVar7[4]);
-                ARQPostRequest(&DAT_8032dde4, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
+                ARQPostRequest(&DAT_8032dde4.m_request, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
                                (u32)piVar7[4], _DmaCallback);
                 piVar6 = piVar7;
             }
@@ -1189,7 +1222,7 @@ void _RedAXCallback()
 {
     DAT_8032f3b8 = DAT_8032f3b8 + 1;
     EnvelopeKeyExecute();
-    OSSignalSemaphore(&DAT_8032d778);
+    OSSignalSemaphore(&DAT_8032d778.m_semaphore);
 }
 
 /*
@@ -1341,20 +1374,20 @@ void CRedDriver::Init()
     InitReverb();
     OSInitSemaphore(&DAT_8032ddd8, 0);
     DAT_8032f464 = RedNew__Fi(0x1000);
-    OSCreateThread(&DAT_8032dac0, (void* (*)(void*))_DmaExecuteThread, 0, (char*)DAT_8032f464 + 0x1000, 0x1000,
+    OSCreateThread(DAT_8032dde4.Thread(), (void* (*)(void*))_DmaExecuteThread, 0, (char*)DAT_8032f464 + 0x1000, 0x1000,
                    3, 1);
-    OSResumeThread(&DAT_8032dac0);
+    OSResumeThread(DAT_8032dde4.Thread());
     OSInitSemaphore(&DAT_8032daa0, 0);
     DAT_8032f45c = RedNew__Fi(0x1000);
-    OSCreateThread(&DAT_8032d788, (void* (*)(void*))_WaveSettingThread, &DAT_8032daac,
+    OSCreateThread(DAT_8032d778.Thread(), (void* (*)(void*))_WaveSettingThread, &DAT_8032daac,
                    (char*)DAT_8032f45c + 0x1000, 0x1000, 4, 1);
-    OSResumeThread(&DAT_8032d788);
+    OSResumeThread(DAT_8032d778.Thread());
     OSInitSemaphore(&DAT_8032e120, 0);
     DAT_8032f46c = RedNew__Fi(0x1000);
-    OSCreateThread(&DAT_8032de08, (void* (*)(void*))_MusicSkipThread, 0, (char*)DAT_8032f46c + 0x1000, 0x1000,
+    OSCreateThread(DAT_8032daac.Thread(), (void* (*)(void*))_MusicSkipThread, 0, (char*)DAT_8032f46c + 0x1000, 0x1000,
                    4, 1);
-    OSResumeThread(&DAT_8032de08);
-    OSInitSemaphore(&DAT_8032d778, 0);
+    OSResumeThread(DAT_8032daac.Thread());
+    OSInitSemaphore(&DAT_8032d778.m_semaphore, 0);
     DAT_8032f458 = 0;
     DAT_8032f454 = RedNew__Fi(0x1000);
     OSCreateThread(&RedDriverMainThread(), (void* (*)(void*))_MainThread, 0, (char*)DAT_8032f454 + 0x1000, 0x1000,

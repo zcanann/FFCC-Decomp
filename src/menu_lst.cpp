@@ -60,69 +60,134 @@ STATIC_ASSERT(offsetof(MenuLstState, cursor) == 0x26);
 
 /*
  * --INFO--
- * PAL Address: 0x80175210
- * PAL Size: 720b
+ * PAL Address: 0x8017474c
+ * PAL Size: 1436b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::MLstDraw()
+{
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+
+	MenuLstState* state = this->lstState;
+	MenuLstList* list = this->lstData;
+	short menuMode = state->mode;
+	MenuLstEntry* item = list->entries;
+
+	for (int i = 0; i < list->count; i++) {
+		int tex = item->tex;
+		if (tex >= 0) {
+			float x = (float)item->x;
+			float y = (float)item->y;
+			float w = (float)item->width;
+			float h = (float)item->height;
+			float alpha = item->alpha;
+			float z = item->z;
+
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+			GXColor color = {0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * alpha)};
+			GXSetChanMatColor(GX_COLOR0A0, color);
+
+			float v = FLOAT_803333D0;
+			if ((menuMode == 1) && (i == state->cursor)) {
+				x = (float)(x + DOUBLE_803333D8);
+				v += (float)((double)item->height);
+			}
+
+			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, FLOAT_803333D0, v, z, z, FLOAT_803333D0);
+
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x5c);
+			v = FLOAT_803333D0;
+			if ((menuMode == 1) && (i == state->cursor)) {
+				v += (float)((double)item->height);
+			}
+			DrawRect__8CMenuPcsFUlfffffffff(
+				&MenuPcs,
+				0,
+				(float)-(FLOAT_803333E0 * DOUBLE_803333E8 - x),
+				y - FLOAT_803333F4,
+				FLOAT_803333E0,
+				FLOAT_803333E0,
+				FLOAT_803333D0,
+				v,
+				z,
+				z,
+				FLOAT_803333D0);
+		}
+		item++;
+	}
+
+	CFont* font = this->listFont;
+	font->SetMargin(FLOAT_803333F0);
+	font->SetShadow(0);
+	font->SetScale(FLOAT_803333F0);
+	font->DrawInit();
+
+	item = list->entries;
+	for (int i = 0; i < list->count; i++) {
+		CColor color(0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * item->alpha));
+		font->SetColor(color.color);
+
+		const char* text = GetMenuStr__8CMenuPcsFi(this, i + 0x2e);
+		font->GetWidth(text);
+
+		float textX = (float)(item->x + 0x28);
+		float textY = (float)(item->y + 3) - FLOAT_803333F4;
+		if ((menuMode == 1) && (i == state->cursor)) {
+			textX = (float)(textX + DOUBLE_803333D8);
+		}
+
+		font->SetPosX(textX);
+		font->SetPosY(textY);
+		font->Draw(text);
+
+		item++;
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+	if (menuMode == 1) {
+		MenuLstEntry* curItem = &list->entries[state->cursor];
+		float cursorYOffset =
+			(float)(((double)(float)(curItem->height - 0x20) * DOUBLE_803333E8) + (double)(float)curItem->height);
+		int cursorY = (int)((float)curItem->y + cursorYOffset);
+		int cursorX = (int)((float)curItem->x - 56.0f + (float)(System.m_frameCounter & 7));
+		DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, FLOAT_803333F0);
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+	CColor helpColor(0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * list->entries[0].alpha));
+	DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
+		this,
+		state->cursor + 0x25c,
+		font,
+		0,
+		-(int)FLOAT_80333400,
+		helpColor.color,
+		0,
+		FLOAT_803333F0,
+		(float)-((FLOAT_803333E0 * (double)FLOAT_803333FC) - (double)FLOAT_803333F8));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80174ce8
+ * PAL Size: 428b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO  
  * JP Size: TODO
  */
-int CMenuPcs::MLstOpen()
+int CMenuPcs::MLstClose()
 {
-	float one;
 	float zero;
 	int completedItems;
 	MenuLstEntry* entry;
 	unsigned int itemCount;
 	int currentFrame;
 	unsigned int count;
-
-	if (this->lstState->initialized == '\0') {
-		int i;
-		short initializedCount;
-		short yPos;
-
-		memset(this->lstData, 0, sizeof(MenuLstList));
-		one = FLOAT_803333F0;
-		entry = this->lstData->entries;
-		i = 8;
-		do {
-			entry[0].z = one;
-			entry[1].z = one;
-			entry[2].z = one;
-			entry[3].z = one;
-			entry[4].z = one;
-			entry[5].z = one;
-			entry[6].z = one;
-			entry[7].z = one;
-			entry += 8;
-			i--;
-		} while (i != 0);
-
-		zero = FLOAT_803333D0;
-		initializedCount = 0;
-		entry = this->lstData->entries;
-		i = 0;
-		yPos = 0x18;
-		do {
-			entry->unk_2C = 2;
-			initializedCount++;
-			entry->tex = 0x5B;
-			entry->width = 0xE0;
-			entry->height = 0x28;
-			entry->x = (short)(int)-(((double)entry->width * DOUBLE_803333E8) - DOUBLE_80333420);
-			entry->y = yPos;
-			yPos += 0x20;
-			entry->s = zero;
-			entry->t = zero;
-			entry->startFrame = i;
-			i++;
-			entry->duration = 4;
-			entry++;
-		} while (i < 9);
-		this->lstData->count = initializedCount;
-		this->lstState->initialized = 1;
-	}
 
 	completedItems = 0;
 	this->lstState->frame = this->lstState->frame + 1;
@@ -135,18 +200,21 @@ int CMenuPcs::MLstOpen()
 			if (entry->startFrame <= currentFrame) {
 				if (currentFrame < entry->startFrame + entry->duration) {
 					entry->timer = entry->timer + 1;
-					entry->alpha = (float)((DOUBLE_80333410 / (double)entry->duration) * (double)entry->timer);
+					entry->alpha =
+						(float)-((DOUBLE_80333410 / (double)entry->duration) * (double)entry->timer - DOUBLE_80333410);
+					if ((double)entry->alpha < DOUBLE_80333418) {
+						entry->alpha = FLOAT_803333D0;
+					}
 				} else {
 					completedItems++;
-					entry->alpha = FLOAT_803333F0;
+					entry->alpha = FLOAT_803333D0;
 				}
 			}
 			entry++;
 			count--;
 		} while (count != 0);
 	}
-
-	one = FLOAT_803333F0;
+	zero = FLOAT_803333D0;
 	if (this->lstData->count == completedItems) {
 		entry = this->lstData->entries;
 		if ((int)itemCount > 0) {
@@ -155,28 +223,28 @@ int CMenuPcs::MLstOpen()
 				do {
 					entry[0].startFrame = 0;
 					entry[0].duration = 1;
-					entry[0].alpha = one;
+					entry[0].alpha = zero;
 					entry[1].startFrame = 0;
 					entry[1].duration = 1;
-					entry[1].alpha = one;
+					entry[1].alpha = zero;
 					entry[2].startFrame = 0;
 					entry[2].duration = 1;
-					entry[2].alpha = one;
+					entry[2].alpha = zero;
 					entry[3].startFrame = 0;
 					entry[3].duration = 1;
-					entry[3].alpha = one;
+					entry[3].alpha = zero;
 					entry[4].startFrame = 0;
 					entry[4].duration = 1;
-					entry[4].alpha = one;
+					entry[4].alpha = zero;
 					entry[5].startFrame = 0;
 					entry[5].duration = 1;
-					entry[5].alpha = one;
+					entry[5].alpha = zero;
 					entry[6].startFrame = 0;
 					entry[6].duration = 1;
-					entry[6].alpha = one;
+					entry[6].alpha = zero;
 					entry[7].startFrame = 0;
 					entry[7].duration = 1;
-					entry[7].alpha = one;
+					entry[7].alpha = zero;
 					entry += 8;
 					count--;
 				} while (count != 0);
@@ -189,13 +257,14 @@ int CMenuPcs::MLstOpen()
 			do {
 				entry->startFrame = 0;
 				entry->duration = 1;
-				entry->alpha = one;
+				entry->alpha = zero;
 				entry++;
 				itemCount--;
 			} while (itemCount != 0);
 		}
 		return 1;
 	}
+
 	return 0;
 }
 
@@ -355,21 +424,69 @@ void CMenuPcs::MLstCtrl()
 
 /*
  * --INFO--
- * PAL Address: 0x80174ce8
- * PAL Size: 428b
+ * PAL Address: 0x80175210
+ * PAL Size: 720b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO  
  * JP Size: TODO
  */
-int CMenuPcs::MLstClose()
+int CMenuPcs::MLstOpen()
 {
+	float one;
 	float zero;
 	int completedItems;
 	MenuLstEntry* entry;
 	unsigned int itemCount;
 	int currentFrame;
 	unsigned int count;
+
+	if (this->lstState->initialized == '\0') {
+		int i;
+		short initializedCount;
+		short yPos;
+
+		memset(this->lstData, 0, sizeof(MenuLstList));
+		one = FLOAT_803333F0;
+		entry = this->lstData->entries;
+		i = 8;
+		do {
+			entry[0].z = one;
+			entry[1].z = one;
+			entry[2].z = one;
+			entry[3].z = one;
+			entry[4].z = one;
+			entry[5].z = one;
+			entry[6].z = one;
+			entry[7].z = one;
+			entry += 8;
+			i--;
+		} while (i != 0);
+
+		zero = FLOAT_803333D0;
+		initializedCount = 0;
+		entry = this->lstData->entries;
+		i = 0;
+		yPos = 0x18;
+		do {
+			entry->unk_2C = 2;
+			initializedCount++;
+			entry->tex = 0x5B;
+			entry->width = 0xE0;
+			entry->height = 0x28;
+			entry->x = (short)(int)-(((double)entry->width * DOUBLE_803333E8) - DOUBLE_80333420);
+			entry->y = yPos;
+			yPos += 0x20;
+			entry->s = zero;
+			entry->t = zero;
+			entry->startFrame = i;
+			i++;
+			entry->duration = 4;
+			entry++;
+		} while (i < 9);
+		this->lstData->count = initializedCount;
+		this->lstState->initialized = 1;
+	}
 
 	completedItems = 0;
 	this->lstState->frame = this->lstState->frame + 1;
@@ -382,21 +499,18 @@ int CMenuPcs::MLstClose()
 			if (entry->startFrame <= currentFrame) {
 				if (currentFrame < entry->startFrame + entry->duration) {
 					entry->timer = entry->timer + 1;
-					entry->alpha =
-						(float)-((DOUBLE_80333410 / (double)entry->duration) * (double)entry->timer - DOUBLE_80333410);
-					if ((double)entry->alpha < DOUBLE_80333418) {
-						entry->alpha = FLOAT_803333D0;
-					}
+					entry->alpha = (float)((DOUBLE_80333410 / (double)entry->duration) * (double)entry->timer);
 				} else {
 					completedItems++;
-					entry->alpha = FLOAT_803333D0;
+					entry->alpha = FLOAT_803333F0;
 				}
 			}
 			entry++;
 			count--;
 		} while (count != 0);
 	}
-	zero = FLOAT_803333D0;
+
+	one = FLOAT_803333F0;
 	if (this->lstData->count == completedItems) {
 		entry = this->lstData->entries;
 		if ((int)itemCount > 0) {
@@ -405,28 +519,28 @@ int CMenuPcs::MLstClose()
 				do {
 					entry[0].startFrame = 0;
 					entry[0].duration = 1;
-					entry[0].alpha = zero;
+					entry[0].alpha = one;
 					entry[1].startFrame = 0;
 					entry[1].duration = 1;
-					entry[1].alpha = zero;
+					entry[1].alpha = one;
 					entry[2].startFrame = 0;
 					entry[2].duration = 1;
-					entry[2].alpha = zero;
+					entry[2].alpha = one;
 					entry[3].startFrame = 0;
 					entry[3].duration = 1;
-					entry[3].alpha = zero;
+					entry[3].alpha = one;
 					entry[4].startFrame = 0;
 					entry[4].duration = 1;
-					entry[4].alpha = zero;
+					entry[4].alpha = one;
 					entry[5].startFrame = 0;
 					entry[5].duration = 1;
-					entry[5].alpha = zero;
+					entry[5].alpha = one;
 					entry[6].startFrame = 0;
 					entry[6].duration = 1;
-					entry[6].alpha = zero;
+					entry[6].alpha = one;
 					entry[7].startFrame = 0;
 					entry[7].duration = 1;
-					entry[7].alpha = zero;
+					entry[7].alpha = one;
 					entry += 8;
 					count--;
 				} while (count != 0);
@@ -439,126 +553,12 @@ int CMenuPcs::MLstClose()
 			do {
 				entry->startFrame = 0;
 				entry->duration = 1;
-				entry->alpha = zero;
+				entry->alpha = one;
 				entry++;
 				itemCount--;
 			} while (itemCount != 0);
 		}
 		return 1;
 	}
-
 	return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8017474c
- * PAL Size: 1436b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::MLstDraw()
-{
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
-
-	MenuLstState* state = this->lstState;
-	MenuLstList* list = this->lstData;
-	short menuMode = state->mode;
-	MenuLstEntry* item = list->entries;
-
-	for (int i = 0; i < list->count; i++) {
-		int tex = item->tex;
-		if (tex >= 0) {
-			float x = (float)item->x;
-			float y = (float)item->y;
-			float w = (float)item->width;
-			float h = (float)item->height;
-			float alpha = item->alpha;
-			float z = item->z;
-
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
-			GXColor color = {0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * alpha)};
-			GXSetChanMatColor(GX_COLOR0A0, color);
-
-			float v = FLOAT_803333D0;
-			if ((menuMode == 1) && (i == state->cursor)) {
-				x = (float)(x + DOUBLE_803333D8);
-				v += (float)((double)item->height);
-			}
-
-			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, FLOAT_803333D0, v, z, z, FLOAT_803333D0);
-
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x5c);
-			v = FLOAT_803333D0;
-			if ((menuMode == 1) && (i == state->cursor)) {
-				v += (float)((double)item->height);
-			}
-			DrawRect__8CMenuPcsFUlfffffffff(
-				&MenuPcs,
-				0,
-				(float)-(FLOAT_803333E0 * DOUBLE_803333E8 - x),
-				y - FLOAT_803333F4,
-				FLOAT_803333E0,
-				FLOAT_803333E0,
-				FLOAT_803333D0,
-				v,
-				z,
-				z,
-				FLOAT_803333D0);
-		}
-		item++;
-	}
-
-	CFont* font = this->listFont;
-	font->SetMargin(FLOAT_803333F0);
-	font->SetShadow(0);
-	font->SetScale(FLOAT_803333F0);
-	font->DrawInit();
-
-	item = list->entries;
-	for (int i = 0; i < list->count; i++) {
-		CColor color(0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * item->alpha));
-		font->SetColor(color.color);
-
-		const char* text = GetMenuStr__8CMenuPcsFi(this, i + 0x2e);
-		font->GetWidth(text);
-
-		float textX = (float)(item->x + 0x28);
-		float textY = (float)(item->y + 3) - FLOAT_803333F4;
-		if ((menuMode == 1) && (i == state->cursor)) {
-			textX = (float)(textX + DOUBLE_803333D8);
-		}
-
-		font->SetPosX(textX);
-		font->SetPosY(textY);
-		font->Draw(text);
-
-		item++;
-	}
-
-	DrawInit__8CMenuPcsFv(this);
-	if (menuMode == 1) {
-		MenuLstEntry* curItem = &list->entries[state->cursor];
-		float cursorYOffset =
-			(float)(((double)(float)(curItem->height - 0x20) * DOUBLE_803333E8) + (double)(float)curItem->height);
-		int cursorY = (int)((float)curItem->y + cursorYOffset);
-		int cursorX = (int)((float)curItem->x - 56.0f + (float)(System.m_frameCounter & 7));
-		DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, FLOAT_803333F0);
-	}
-
-	DrawInit__8CMenuPcsFv(this);
-	CColor helpColor(0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * list->entries[0].alpha));
-	DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
-		this,
-		state->cursor + 0x25c,
-		font,
-		0,
-		-(int)FLOAT_80333400,
-		helpColor.color,
-		0,
-		FLOAT_803333F0,
-		(float)-((FLOAT_803333E0 * (double)FLOAT_803333FC) - (double)FLOAT_803333F8));
 }

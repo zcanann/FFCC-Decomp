@@ -36,6 +36,11 @@ void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 
 }
 
+struct ConformBGNormalState {
+    Vec m_normal;
+    u8 m_initialized;
+};
+
 struct CMapCylinderRaw {
     Vec m_bottom;
     u8 m_pad0C[0x0C];
@@ -64,9 +69,10 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     f32 ownerX;
     f32 ownerZ;
     f32 cylinderY;
+    ConformBGNormalState* state;
     _pppMngSt* pppMngSt;
-    s32 hitFound;
     CGObject* owner;
+    s32 hitFound;
     f64 trigValue;
     Mtx basisMtx;
     Mtx scaleMtx;
@@ -76,7 +82,6 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     Vec local_14c;
     Vec local_158;
     Vec local_164;
-    Vec* stateNormal;
     Vec local_170;
     Vec firstRayDirection;
     Quaternion local_18c;
@@ -84,7 +89,6 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     Quaternion local_1ac;
     Vec secondRayDirection;
     s32 dataOffset;
-    u8* stateInitialized;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -97,8 +101,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     matrixY = pppMngSt->m_matrix.value[1][3];
     matrixZ = pppMngSt->m_matrix.value[2][3];
     dataOffset = *param3->m_serializedDataOffsets;
-    stateNormal = (Vec*)((u8*)pppConformBGNormal + 0x80 + dataOffset);
-    stateInitialized = (u8*)&stateNormal[1].x;
+    state = (ConformBGNormalState*)((u8*)pppConformBGNormal + 0x80 + dataOffset);
 
     if (((s32)Game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
             mode = param2->m_stepValue;
@@ -154,27 +157,27 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 }
             }
 
-            if (*stateInitialized == 0) {
-                *stateInitialized = 1;
-                stateNormal->x = local_164.x;
-                stateNormal->y = local_164.y;
-                stateNormal->z = local_164.z;
+            if (state->m_initialized == 0) {
+                state->m_initialized = 1;
+                state->m_normal.x = local_164.x;
+                state->m_normal.y = local_164.y;
+                state->m_normal.z = local_164.z;
             }
 
-            local_18c.x = stateNormal->x;
-            local_18c.y = stateNormal->y;
-            local_18c.z = stateNormal->z;
+            local_18c.x = state->m_normal.x;
+            local_18c.y = state->m_normal.y;
+            local_18c.z = state->m_normal.z;
             local_18c.w = kPppConformBgNormalOne;
             local_19c.x = local_164.x;
             local_19c.y = local_164.y;
             local_19c.z = local_164.z;
             local_19c.w = kPppConformBgNormalOne;
             C_QUATSlerp(&local_18c, &local_19c, &local_1ac, param2->m_initWOrk);
-            stateNormal->x = local_1ac.x;
-            stateNormal->y = local_1ac.y;
-            stateNormal->z = local_1ac.z;
+            state->m_normal.x = local_1ac.x;
+            state->m_normal.y = local_1ac.y;
+            state->m_normal.z = local_1ac.z;
 
-            PSVECNormalize(stateNormal, &local_158);
+            PSVECNormalize(&state->m_normal, &local_158);
 
             if ((param2->m_stepValue == 0) && (owner != NULL)) {
                 trigValue = sin((f64)owner->m_rotBaseY);

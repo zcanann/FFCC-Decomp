@@ -199,8 +199,6 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     TRACE_POLYGON* entries;
     TRACE_POLYGON* entry;
     TracerWork* work;
-    Vec local_a8;
-    Vec local_9c;
     Vec local_90;
     Vec local_84;
     Mtx MStack_78;
@@ -211,8 +209,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     }
 
     useFallback = false;
-    colorData = (u8*)pppYmTracer2 + 0x80 + param_3->m_serializedDataOffsets[1];
     work = (TracerWork*)((u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets);
+    colorData = (u8*)pppYmTracer2 + 0x80 + param_3->m_serializedDataOffsets[1];
 
     if (param_2->m_initWOrk == 0xffffffff) {
         pfVar6 = reinterpret_cast<float*>(gPppDefaultValueBuffer);
@@ -347,8 +345,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 {
     TracerWork* work;
     CMapMesh* mapMesh;
-    u8* colorData;
     TRACE_POLYGON* poly;
+    u8* colorData;
     CTexture* texture;
     s32 i;
     s32 dataOffset;

@@ -1426,14 +1426,13 @@ CGPartyObj* CGame::GetPartyObj(int index)
  */
 char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
 {
-    char* name;
-
     if (count > 1) {
-        char** itemTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings;
+        char* name;
+
         if (count > 1) {
-            name = itemTable[itemIndex * 5 + 3];
+            name = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 3];
         } else {
-            name = itemTable[itemIndex * 5 + 1];
+            name = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 1];
         }
 
         sprintf(out, s_numNameFmt, count, name);
@@ -1441,7 +1440,7 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
         char** itemTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings;
         unsigned char hasSeparator = 0;
         char* prefix = itemTable[itemIndex * 5];
-        name = itemTable[itemIndex * 5 + 1];
+        char* name = itemTable[itemIndex * 5 + 1];
 
         if (strlen(prefix) != 0) {
             unsigned char languageId = m_gameWork.m_languageId;
@@ -1527,14 +1526,13 @@ char* CGame::MakeNumItemName(char* out, int itemIndex, int count)
  */
 char* CGame::MakeArtMonName(char* out, int monIndex, int count)
 {
-    char* name;
-
     if (count > 1) {
-        char** monTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings;
+        char* name;
+
         if (count > 1) {
-            name = monTable[monIndex * 5 + 3];
+            name = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 3];
         } else {
-            name = monTable[monIndex * 5 + 1];
+            name = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 1];
         }
 
         sprintf(out, s_numNameFmt, count, name);
@@ -1542,7 +1540,7 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
         char** monTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings;
         unsigned char hasSeparator = 0;
         char* prefix = monTable[monIndex * 5];
-        name = monTable[monIndex * 5 + 1];
+        char* name = monTable[monIndex * 5 + 1];
 
         if (strlen(prefix) != 0) {
             unsigned char languageId = m_gameWork.m_languageId;

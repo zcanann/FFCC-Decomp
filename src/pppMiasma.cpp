@@ -246,17 +246,16 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
 
     inFarZone = (FLOAT_80331938 + maxRadius) <= PSVECDistance(&cameraPos, &managerPos);
 
-    drawColor.rgba[0] = inFarZone ? 0 : 0xFF;
-    drawColor.rgba[1] = drawColor.rgba[0];
-    drawColor.rgba[2] = drawColor.rgba[0];
-    drawColor.rgba[3] = 0xFF;
-
     for (slice = 0; slice < 2; slice++) {
         yOffset = (int)((float)slice * FLOAT_8033192c);
 
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backI4Tex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR, GX_TF_I4, 0);
         GXSetScissor(0, yOffset, (u32)FLOAT_80331928, (u32)FLOAT_8033192c);
 
+        drawColor.rgba[0] = inFarZone ? 0 : 0xFF;
+        drawColor.rgba[1] = drawColor.rgba[0];
+        drawColor.rgba[2] = drawColor.rgba[0];
+        drawColor.rgba[3] = 0xFF;
         gUtil.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
 
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -331,6 +330,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize, GX_LINEAR,
                                    GX_TF_RGBA8, 0);
         if (payload[0x1D] != 0) {
+            drawColor.rgba[0] = inFarZone ? 0 : 0xFF;
+            drawColor.rgba[1] = drawColor.rgba[0];
+            drawColor.rgba[2] = drawColor.rgba[0];
+            drawColor.rgba[3] = 0xFF;
             gUtil.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
             GXClearVtxDesc();
             GXSetVtxDesc((GXAttr)9, GX_INDEX8);

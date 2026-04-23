@@ -37,6 +37,18 @@ static inline u8* u8_at(void* base, s32 off)
     return (u8*)base + off;
 }
 
+static inline unsigned char clamp_u8(float value)
+{
+    int ivalue = (int)value;
+    if (ivalue < 0) {
+        return 0;
+    }
+    if (ivalue > 0xFF) {
+        return 0xFF;
+    }
+    return (unsigned char)ivalue;
+}
+
 /*
  * --INFO--
  * Address: TODO
@@ -419,10 +431,66 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
  */
 void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
 {
-    (void)obj;
-    (void)stepData;
-    (void)ctrlTable;
-    // Keep the original file-scope matrix scratch live until the draw path is restored.
+    PRyjMegaBirthModel* params = (PRyjMegaBirthModel*)stepData;
+    VRyjMegaBirthModel* work =
+        (VRyjMegaBirthModel*)((u8*)obj + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
+    int modelIndex = *(int*)((u8*)params + 4);
+
+    if (modelIndex == 0xFFFF || work->m_particleBlock == NULL) {
+        return;
+    }
+
+    if ((*(u8*)((u8*)params + 0x136) != 0) && (work->m_worldMatrixBlock == NULL)) {
+        return;
+    }
+
+    if ((*(u8*)((u8*)params + 0x131) != 0) && (work->m_colorBlock == NULL)) {
+        return;
+    }
+
+    pppModelSt* model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[modelIndex];
+    if (model == NULL) {
+        return;
+    }
+
+    pppFMATRIX emitterMatrix;
+    pppFMATRIX scratchMatrix;
+
+    init_matrix(obj, emitterMatrix, params, work);
+    pppUnitMatrix(scratchMatrix);
+    pppInitBlendMode();
+    pppSetBlendMode(0);
+
+    for (int i = 0; i < work->m_numParticles; i++) {
+        _PARTICLE_DATA* particle = (_PARTICLE_DATA*)((u8*)work->m_particleBlock + i * 0xA0);
+        _PARTICLE_WMAT* particleWorldMatrix = 0;
+        _PARTICLE_COLOR* particleColor = 0;
+
+        if (*s16_at(particle, 0x22) == 0) {
+            continue;
+        }
+
+        if (work->m_worldMatrixBlock != NULL) {
+            particleWorldMatrix = (_PARTICLE_WMAT*)(work->m_worldMatrixBlock + i);
+        }
+        if (work->m_colorBlock != NULL) {
+            particleColor = work->m_colorBlock + i;
+        }
+
+        pppFMATRIX drawMatrix;
+        pppCVECTOR drawColor = {{0xFF, 0xFF, 0xFF, clamp_u8(*f32_at(particle, 0x98))}};
+
+        if (particleColor != NULL) {
+            drawColor.rgba[0] = clamp_u8(particleColor->m_color[0]);
+            drawColor.rgba[1] = clamp_u8(particleColor->m_color[1]);
+            drawColor.rgba[2] = clamp_u8(particleColor->m_color[2]);
+        }
+
+        set_matrix(obj, emitterMatrix, scratchMatrix, params, particle, particleWorldMatrix, drawMatrix, 0);
+        pppSetDrawEnv(&drawColor, &drawMatrix, 0.0f, 0, 0, 0, 0, 1, 1, 0);
+        pppDrawMesh(model, 0, 1);
+    }
+
     PSMTXCopy(g_matKeep, g_matTmp);
 }
 

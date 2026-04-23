@@ -19,6 +19,7 @@ class CFlatRuntime2
 	void loadLayerASync(int, char*);
 	void drawLayer(int, char*, int, int, int, int, int, int, float, float, _GXColor*, int);
 	void loadLayer(int, char*);
+	void PutParticle(int, Vec&, float);
 	void PutParticleWork();
 	void ResetParticleWork(int, int);
 	void SetParticleWorkPos(Vec&, float);

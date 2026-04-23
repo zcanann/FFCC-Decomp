@@ -1,5 +1,11 @@
 #include "ffcc/chara.h"
+#include "ffcc/chunkfile.h"
 #include "ffcc/cflat_runtime.h"
+#include "ffcc/linkage.h"
+#include "ffcc/materialman.h"
+#include "ffcc/p_camera.h"
+#include "ffcc/p_light.h"
+#include "ffcc/texanim.h"
 
 #include <math.h>
 #include <string.h>
@@ -8,9 +14,229 @@ extern "C" void CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(void*, void*);
 extern "C" void freeFurTex__6CCharaFv();
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
 extern "C" void Calc__Q26CChara5CMeshFPQ26CChara6CModel(void*, void*);
+extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5CNode4TYPEPQ27CMemory6CStage(
+    void*, CChunkFile&, void*, int, CMemory::CStage*);
+extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(
+    void*, void*, CChunkFile&, CMemory::CStage*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __ct__7CVectorFv(void*);
 extern "C" void SetTextureSet__12CMaterialSetFP11CTextureSet(CMaterialSet*, CTextureSet*);
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+extern "C" float FLOAT_803301b0;
+extern "C" float FLOAT_803301bc;
+extern "C" float FLOAT_803301c8;
+extern "C" float FLOAT_803301cc;
+extern "C" CLightPcs::CBumpLight* DAT_8032edc0;
+
+namespace {
+
+struct CCharaDisplayListRaw
+{
+	void* m_data;
+	s32 m_size;
+	u16 m_material;
+	u16 _padA;
+};
+
+struct CCharaMeshRefRaw
+{
+	char m_name[0x10];
+	u8 m_flags;
+	u8 _pad11[3];
+	u32 m_vertexCount;
+	S16Vec* m_vertices;
+	u32 m_normalCount;
+	S16Vec* m_normals;
+	u32 m_colorCount;
+	void* m_colors;
+	u32 m_uvCount;
+	void* m_uvs;
+	u32 m_oneWeightCountOrSize;
+	void* m_oneWeightData;
+	u32 m_twoWeightCountOrSize;
+	void* m_twoWeightData;
+	u32 m_threeWeightCountOrSize;
+	void* m_threeWeightData;
+	u32 m_displayListCount;
+	CCharaDisplayListRaw* m_displayLists;
+	u32 m_skinCount;
+	CLightPcs::CBumpLight* m_skins;
+	u32 m_infoWord1;
+	u32 m_nodeIndex;
+};
+
+struct CCharaMeshRaw
+{
+	CCharaMeshRefRaw* m_data;
+	S16Vec* m_workPositions;
+	S16Vec* m_workNormals;
+	u8 _padC[8];
+};
+
+typedef void (*BeforeDrawModelCallback)(CChara::CModel*, void*, void*, float (*)[4], unsigned int);
+typedef void (*AfterDrawModelCallback)(CChara::CModel*, void*, void*);
+typedef void (*BeforeMeshCallback)(CChara::CModel*, void*, void*, unsigned int);
+typedef void (*AfterMeshDrawCallback)(CChara::CModel*, void*, void*, unsigned int, unsigned int, float (*)[4]);
+typedef void (*AfterMeshEnvCallback)(CChara::CModel*, void*, void*, unsigned int, float (*)[4]);
+typedef void (*CustomMeshDrawCallback)(CChara::CModel*, void*, void*, unsigned int);
+
+static inline u8* ModelRaw(CChara::CModel* model)
+{
+	return reinterpret_cast<u8*>(model);
+}
+
+static inline void* ModelRef(CChara::CModel* model)
+{
+	return *reinterpret_cast<void**>(ModelRaw(model) + 0xA4);
+}
+
+static inline u16 ModelMeshCount(CChara::CModel* model)
+{
+	return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x0A);
+}
+
+static inline CMaterialSet* ModelMaterialSet(CChara::CModel* model)
+{
+	return *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(ModelRef(model)) + 0x20);
+}
+
+static inline int ModelPosQuant(CChara::CModel* model)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x2C);
+}
+
+static inline int ModelNormQuant(CChara::CModel* model)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x30);
+}
+
+static inline CCharaMeshRaw* ModelMeshes(CChara::CModel* model)
+{
+	return *reinterpret_cast<CCharaMeshRaw**>(ModelRaw(model) + 0xAC);
+}
+
+static inline CChara::CNode* ModelNodes(CChara::CModel* model)
+{
+	return *reinterpret_cast<CChara::CNode**>(ModelRaw(model) + 0xA8);
+}
+
+static inline float (*ModelDrawMtx(CChara::CModel* model))[4]
+{
+	return reinterpret_cast<float(*)[4]>(ModelRaw(model) + 0x08);
+}
+
+static inline float ModelLightAlpha(CChara::CModel* model)
+{
+	return *reinterpret_cast<float*>(ModelRaw(model) + 0x9C);
+}
+
+static inline u32 ModelMeshVisibleMask(CChara::CModel* model)
+{
+	return *reinterpret_cast<u32*>(ModelRaw(model) + 0x98);
+}
+
+static inline u8 ModelFlagsA0(CChara::CModel* model)
+{
+	return *(ModelRaw(model) + 0xA0);
+}
+
+static inline CTexAnimSet* ModelTexAnimSet(CChara::CModel* model)
+{
+	return *reinterpret_cast<CTexAnimSet**>(ModelRaw(model) + 0xD4);
+}
+
+static inline BeforeDrawModelCallback ModelBeforeDrawCallback(CChara::CModel* model)
+{
+	return *reinterpret_cast<BeforeDrawModelCallback*>(ModelRaw(model) + 0xE4);
+}
+
+static inline AfterDrawModelCallback ModelAfterDrawCallback(CChara::CModel* model)
+{
+	return *reinterpret_cast<AfterDrawModelCallback*>(ModelRaw(model) + 0xE8);
+}
+
+static inline BeforeMeshCallback ModelBeforeMeshCallback(CChara::CModel* model)
+{
+	return *reinterpret_cast<BeforeMeshCallback*>(ModelRaw(model) + 0xEC);
+}
+
+static inline AfterMeshDrawCallback ModelAfterMeshDrawCallback(CChara::CModel* model)
+{
+	return *reinterpret_cast<AfterMeshDrawCallback*>(ModelRaw(model) + 0xF0);
+}
+
+static inline AfterMeshEnvCallback ModelAfterMeshEnvCallback(CChara::CModel* model)
+{
+	return *reinterpret_cast<AfterMeshEnvCallback*>(ModelRaw(model) + 0xF4);
+}
+
+static inline CustomMeshDrawCallback ModelCustomMeshDrawCallback(CChara::CModel* model)
+{
+	return *reinterpret_cast<CustomMeshDrawCallback*>(ModelRaw(model) + 0xFC);
+}
+
+static inline AfterMeshDrawCallback ModelShadowDisplayListCallback(CChara::CModel* model)
+{
+	return *reinterpret_cast<AfterMeshDrawCallback*>(ModelRaw(model) + 0x100);
+}
+
+static inline void* ModelCbUser0(CChara::CModel* model)
+{
+	return *reinterpret_cast<void**>(ModelRaw(model) + 0x104);
+}
+
+static inline void* ModelCbUser1(CChara::CModel* model)
+{
+	return *reinterpret_cast<void**>(ModelRaw(model) + 0x108);
+}
+
+static inline u8* MaterialManRaw()
+{
+	return reinterpret_cast<u8*>(&MaterialMan);
+}
+
+static inline void InitCharaMaterialState()
+{
+	u8* raw = MaterialManRaw();
+
+	*reinterpret_cast<u32*>(raw + 72) = 0x000ACE0F;
+	*reinterpret_cast<u32*>(raw + 68) = 0xFFFFFFFF;
+	raw[76] = 0xFF;
+	*reinterpret_cast<u32*>(raw + 296) = 0;
+	*reinterpret_cast<u32*>(raw + 284) = 0;
+	*reinterpret_cast<u32*>(raw + 300) = 0x1E;
+	*reinterpret_cast<u32*>(raw + 288) = 0x1E;
+	*reinterpret_cast<u32*>(raw + 304) = 0;
+	*reinterpret_cast<u32*>(raw + 292) = 0;
+	raw[517] = 0xFF;
+	raw[518] = 0xFF;
+	*reinterpret_cast<u32*>(raw + 88) = 0;
+	*reinterpret_cast<u32*>(raw + 92) = 0;
+	raw[520] = 0;
+}
+
+static inline void CopyCharaMaterialEnv()
+{
+	u8* raw = MaterialManRaw();
+
+	*reinterpret_cast<u32*>(raw + 296) = *reinterpret_cast<u32*>(raw + 284);
+	*reinterpret_cast<u32*>(raw + 300) = *reinterpret_cast<u32*>(raw + 288);
+	*reinterpret_cast<u32*>(raw + 304) = *reinterpret_cast<u32*>(raw + 292);
+	*reinterpret_cast<u32*>(raw + 64) = *reinterpret_cast<u32*>(raw + 72);
+}
+
+static inline void SetMaterialManNormalArray(void* normals)
+{
+	*reinterpret_cast<void**>(MaterialManRaw() + 4) = normals;
+}
+
+static inline u32 CharaFourCC(char a, char b, char c, char d)
+{
+	return (static_cast<u32>(a) << 24) | (static_cast<u32>(b) << 16) | (static_cast<u32>(c) << 8) | static_cast<u32>(d);
+}
+
+} // namespace
 
 /*
  * --INFO--
@@ -292,8 +518,6 @@ void CChara::CModel::Init()
  */
 void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 {
-	(void)fileData;
-	(void)stage;
 	void* ref = new u8[0x44];
 	memset(ref, 0, 0x44);
 	*(u16*)((u8*)ref + 0x16) = 0xFFFF;
@@ -308,7 +532,122 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 	*(void**)((u8*)this + 0xAC) = 0;
 	*(void**)((u8*)this + 0xB0) = 0;
 	*(void**)((u8*)this + 0xB4) = 0;
+
+	CChunkFile chunkFile(fileData);
+	CChunkFile::CChunk chunk;
+
+	while (chunkFile.GetNextChunk(chunk)) {
+		if (chunk.m_id != CharaFourCC('C', 'H', 'M', ' ')) {
+			continue;
+		}
+		if (chunk.m_version < 5) {
+			break;
+		}
+
+		chunkFile.PushChunk();
+		while (chunkFile.GetNextChunk(chunk)) {
+			switch (chunk.m_id) {
+			case 0x494E464F:
+				*(float*)((u8*)ref + 0x28) = chunkFile.GetF4();
+				*(float*)((u8*)this + 0x110) = chunkFile.GetF4();
+				*(float*)((u8*)this + 0x114) = chunkFile.GetF4();
+				break;
+
+			case 0x5155414E:
+				*(u32*)((u8*)ref + 0x2C) = chunkFile.Get4();
+				*(u32*)((u8*)ref + 0x30) = chunkFile.Get4();
+				break;
+
+			case 0x4D534554: {
+				CMaterialSet* materialSet =
+				    new(stage, const_cast<char*>("src/chara.cpp"), 0x132) CMaterialSet();
+				*(CMaterialSet**)((u8*)ref + 0x20) = materialSet;
+				if (materialSet != 0) {
+					materialSet->Create(chunkFile, 0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0), DAT_8032edc0);
+				}
+				break;
+			}
+
+			case 0x54415354:
+				if (chunk.m_arg0 != 0) {
+					CTexAnimSet* texAnimSet = new CTexAnimSet();
+					*reinterpret_cast<CTexAnimSet**>((u8*)this + 0xD4) = texAnimSet;
+					if (texAnimSet != 0) {
+						texAnimSet->Create(chunkFile, stage);
+					}
+				}
+				break;
+
+			case 0x4E534554: {
+				const u32 nodeCapacity = chunk.m_arg0;
+				*(u16*)((u8*)ref + 0x08) = 0;
+				if (nodeCapacity != 0) {
+					void* nodeRefs = new u8[nodeCapacity * 0x94];
+					void* nodes = new u8[nodeCapacity * 0xC0];
+					memset(nodeRefs, 0, nodeCapacity * 0x94);
+					memset(nodes, 0, nodeCapacity * 0xC0);
+					*(void**)((u8*)ref + 0x0C) = nodeRefs;
+					*(void**)((u8*)this + 0xA8) = nodes;
+				}
+
+				chunkFile.PushChunk();
+				while (chunkFile.GetNextChunk(chunk)) {
+					if (chunk.m_id == 0x4E4F4445 && *(void**)((u8*)this + 0xA8) != 0) {
+						u16 nodeCount = *(u16*)((u8*)ref + 0x08);
+						CNode* node = reinterpret_cast<CNode*>((u8*)*(void**)((u8*)this + 0xA8) + (nodeCount * 0xC0));
+						Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5CNode4TYPEPQ27CMemory6CStage(
+						    node, chunkFile, this, chunk.m_arg0, stage);
+						*(u16*)((u8*)ref + 0x08) = nodeCount + 1;
+					}
+				}
+				chunkFile.PopChunk();
+				break;
+			}
+
+			case 0x4D535354: {
+				const u32 meshCapacity = chunk.m_arg0;
+				*(u16*)((u8*)ref + 0x0A) = 0;
+				if (meshCapacity != 0) {
+					void* meshRefs = new u8[meshCapacity * 0x64];
+					void* meshes = new u8[meshCapacity * 0x14];
+					memset(meshRefs, 0, meshCapacity * 0x64);
+					memset(meshes, 0, meshCapacity * 0x14);
+					*(void**)((u8*)ref + 0x10) = meshRefs;
+					*(void**)((u8*)this + 0xAC) = meshes;
+				}
+
+				chunkFile.PushChunk();
+				while (chunkFile.GetNextChunk(chunk)) {
+					if (chunk.m_id == 0x4D455348 && *(void**)((u8*)this + 0xAC) != 0) {
+						u16 meshCount = *(u16*)((u8*)ref + 0x0A);
+						CMesh* mesh = reinterpret_cast<CMesh*>((u8*)*(void**)((u8*)this + 0xAC) + (meshCount * 0x14));
+						Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(mesh, this, chunkFile, stage);
+						*(u16*)((u8*)ref + 0x0A) = meshCount + 1;
+					}
+				}
+				chunkFile.PopChunk();
+				break;
+			}
+
+			case 0x42414E4B:
+				if (chunk.m_size != 0) {
+					void* bank = new u8[chunk.m_size];
+					*(void**)((u8*)ref + 0x14) = bank;
+					chunkFile.Get(bank, chunk.m_size);
+				}
+				break;
+			}
+		}
+		chunkFile.PopChunk();
+		break;
+	}
+
 	setup();
+	CTexAnimSet* texAnimSet = *reinterpret_cast<CTexAnimSet**>((u8*)this + 0xD4);
+	CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>((u8*)ref + 0x20);
+	if (texAnimSet != 0 && materialSet != 0) {
+		texAnimSet->AttachMaterialSet(materialSet);
+	}
 }
 
 /*
@@ -710,10 +1049,122 @@ int CChara::CModel::SearchNodeSk(char* name)
  */
 void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 {
-	(void)view;
-	(void)flags;
-	(void)pass;
 	calcSkin();
+
+	if (ModelLightAlpha(this) == FLOAT_803301b0) {
+		return;
+	}
+
+	const unsigned int cullFlag = static_cast<unsigned int>(flags) & 1;
+	BeforeDrawModelCallback beforeDrawModel = ModelBeforeDrawCallback(this);
+	if (beforeDrawModel != 0 && pass == 0) {
+		beforeDrawModel(this, ModelCbUser0(this), ModelCbUser1(this), view, cullFlag);
+	}
+
+	CMaterialSet* materialSet = ModelMaterialSet(this);
+	if (materialSet == 0) {
+		return;
+	}
+
+	SetTextureSet__12CMaterialSetFP11CTextureSet(materialSet, m_texSet);
+	CTexAnimSet* texAnimSet = ModelTexAnimSet(this);
+	if (texAnimSet != 0) {
+		texAnimSet->SetTexGen();
+	}
+
+	MaterialMan.InitVtxFmt(-1, (_GXCompType)3, ModelPosQuant(this), (_GXCompType)3, ModelNormQuant(this), (_GXCompType)3, 0xC);
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	GXSetZCompLoc((u8)0);
+	_GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+	GXSetZMode((u8)1, (GXCompare)3, (u8)1);
+	GXSetCullMode(static_cast<GXCullMode>(cullFlag != 0 ? 2 : 1));
+	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
+
+	CCharaMeshRaw* mesh = ModelMeshes(this);
+	CNode* nodes = ModelNodes(this);
+	const u16 meshCount = ModelMeshCount(this);
+	int lastLightEnable = -1;
+	int lastZWrite = -1;
+	BeforeMeshCallback beforeMesh = ModelBeforeMeshCallback(this);
+	AfterMeshDrawCallback afterMeshDraw = ModelAfterMeshDrawCallback(this);
+	AfterMeshEnvCallback afterMeshEnv = ModelAfterMeshEnvCallback(this);
+
+	for (u32 meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
+		if (mesh->m_workPositions == 0 || mesh->m_data == 0) {
+			continue;
+		}
+		if (meshIndex <= 0x1F && ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
+			continue;
+		}
+
+		InitCharaMaterialState();
+
+		Mtx meshMtx;
+		if (mesh->m_data->m_skinCount == 0) {
+			PSMTXConcat(ModelDrawMtx(this), reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(nodes + mesh->m_data->m_nodeIndex) + 0x44), meshMtx);
+		} else {
+			PSMTXCopy(ModelDrawMtx(this), meshMtx);
+		}
+
+		if (((cullFlag == 0) && (((flags >> 1) & 1) == 0)) || ((cullFlag != 0) && (((flags >> 3) & 1) != 0))) {
+			CameraPcs.SetFullScreenShadow(meshMtx, 0);
+		}
+
+		if (((flags >> 4) & 1) == 0) {
+			Vec position;
+			position.x = ModelDrawMtx(this)[0][3];
+			position.y = ModelDrawMtx(this)[1][3];
+			position.z = ModelDrawMtx(this)[2][3];
+			MaterialMan.SetPosition(static_cast<CMapShadow::TARGET>(0), &position, FLOAT_803301c8, FLOAT_803301cc, meshMtx,
+			                        (ModelFlagsA0(this) & 0x80) != 0);
+		}
+
+		const int lightEnable = (mesh->m_data->m_flags & 0x80) == 0;
+		if (lightEnable != lastLightEnable) {
+			LightPcs.EnableLight(lightEnable, 0);
+			lastLightEnable = lightEnable;
+		}
+
+		const int zWriteEnable = (mesh->m_data->m_flags & 0x40) == 0;
+		if (zWriteEnable != lastZWrite) {
+			GXSetZMode((u8)1, (GXCompare)3, (u8)zWriteEnable);
+			lastZWrite = zWriteEnable;
+		}
+
+		if (beforeMesh != 0) {
+			beforeMesh(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
+		}
+
+		CopyCharaMaterialEnv();
+		if (mesh->m_data->m_infoWord1 != 0) {
+			LightPcs.SetBumpTexMatirx(meshMtx, DAT_8032edc0, 0, 0);
+		}
+		MaterialMan.SetObjMatrix(view, meshMtx);
+		GXSetArray((GXAttr)9, mesh->m_workPositions, 6);
+		SetMaterialManNormalArray(mesh->m_workNormals);
+		GXSetArray((GXAttr)0xB, mesh->m_data->m_colors, 4);
+		GXSetArray((GXAttr)0xD, mesh->m_data->m_uvs, 4);
+		GXSetArray((GXAttr)0xE, mesh->m_data->m_uvs, 4);
+
+		CCharaDisplayListRaw* displayList = mesh->m_data->m_displayLists;
+		for (int displayListIndex = static_cast<int>(mesh->m_data->m_displayListCount) - 1; displayListIndex >= 0; displayListIndex--, displayList++) {
+			if (afterMeshDraw == 0) {
+				MaterialMan.SetMaterial(materialSet, displayList->m_material, (flags >> 2) & 1, (_GXTevScale)0);
+				GXCallDisplayList(displayList->m_data, displayList->m_size);
+			} else {
+				afterMeshDraw(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
+			}
+		}
+
+		if (afterMeshEnv != 0) {
+			afterMeshEnv(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, meshMtx);
+		}
+	}
+
+	AfterDrawModelCallback afterDrawModel = ModelAfterDrawCallback(this);
+	if (afterDrawModel != 0) {
+		afterDrawModel(this, ModelCbUser0(this), ModelCbUser1(this));
+	}
 }
 
 /*
@@ -727,9 +1178,71 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
  */
 void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 {
-	(void)view;
-	(void)zMode;
 	calcSkin();
+
+	if (ModelLightAlpha(this) != FLOAT_803301bc) {
+		return;
+	}
+
+	CMaterialSet* materialSet = ModelMaterialSet(this);
+	if (materialSet == 0) {
+		return;
+	}
+
+	SetTextureSet__12CMaterialSetFP11CTextureSet(materialSet, m_texSet);
+	LightPcs.SetAmbientAlpha(FLOAT_803301bc);
+	MaterialMan.InitVtxFmt(-1, (_GXCompType)3, ModelPosQuant(this), (_GXCompType)3, ModelNormQuant(this), (_GXCompType)3, 0xC);
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	GXSetZCompLoc((u8)0);
+	_GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+	GXSetZMode((u8)zMode, (GXCompare)3, (u8)zMode);
+	GXSetCullMode((GXCullMode)1);
+
+	CCharaMeshRaw* mesh = ModelMeshes(this);
+	CNode* nodes = ModelNodes(this);
+	const u16 meshCount = ModelMeshCount(this);
+	CustomMeshDrawCallback customMeshDraw = ModelCustomMeshDrawCallback(this);
+	AfterMeshDrawCallback shadowDisplayList = ModelShadowDisplayListCallback(this);
+
+	for (u32 meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
+		if (mesh->m_workPositions == 0 || mesh->m_data == 0) {
+			continue;
+		}
+		if (((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
+			continue;
+		}
+
+		InitCharaMaterialState();
+
+		Mtx meshMtx;
+		if (mesh->m_data->m_skinCount == 0) {
+			PSMTXConcat(ModelDrawMtx(this), reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(nodes + mesh->m_data->m_nodeIndex) + 0x44), meshMtx);
+		} else {
+			PSMTXCopy(ModelDrawMtx(this), meshMtx);
+		}
+
+		if (customMeshDraw != 0) {
+			customMeshDraw(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
+		}
+
+		CopyCharaMaterialEnv();
+		MaterialMan.SetObjMatrix(view, meshMtx);
+		GXSetArray((GXAttr)9, mesh->m_workPositions, 6);
+		SetMaterialManNormalArray(mesh->m_workNormals);
+		GXSetArray((GXAttr)0xB, mesh->m_data->m_colors, 4);
+		GXSetArray((GXAttr)0xD, mesh->m_data->m_uvs, 4);
+		GXSetArray((GXAttr)0xE, mesh->m_data->m_uvs, 4);
+
+		CCharaDisplayListRaw* displayList = mesh->m_data->m_displayLists;
+		for (int displayListIndex = static_cast<int>(mesh->m_data->m_displayListCount) - 1; displayListIndex >= 0; displayListIndex--, displayList++) {
+			if (shadowDisplayList == 0) {
+				MaterialMan.SetMaterial(materialSet, displayList->m_material, 1, (_GXTevScale)0);
+				GXCallDisplayList(displayList->m_data, displayList->m_size);
+			} else {
+				shadowDisplayList(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
+			}
+		}
+	}
 }
 
 /*

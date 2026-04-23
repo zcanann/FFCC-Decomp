@@ -2824,6 +2824,143 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400));
         outResult = 0;
         return;
+    case -0x31:
+        CGItemObj::DeleteAllFieldItem();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x30:
+        runtime->push(object, GraphicsPcs.GetScreenFadeExecutingBit());
+        outResult = 0;
+        return;
+    case -0x2F:
+        MapMng.SetIdGrpMask(*object->m_localBase, object->m_localBase[1]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x2E:
+        IsHitDrawMode__7CMapPcsFc(&MapPcs, static_cast<unsigned char>(*object->m_localBase));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x2D:
+        CameraPcs.SetFullScreenShadowRot(
+            static_cast<float>(*object->m_localBase), static_cast<float>(object->m_localBase[1]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x2C: {
+        Vec position = {
+            static_cast<float>(object->m_localBase[0]),
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+        };
+        CameraPcs.SetFullScreenShadowPos(&position, static_cast<float>(object->m_localBase[3]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x2B:
+        CameraPcs.SetFullScreenShadowEnable(static_cast<unsigned char>(*object->m_localBase));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x2A: {
+        _GXColor color = {
+            static_cast<u8>(object->m_localBase[0]),
+            static_cast<u8>(object->m_localBase[1]),
+            static_cast<u8>(object->m_localBase[2]),
+            0xFF,
+        };
+        Graphic.SetFogColor(color);
+        Graphic.SetFogParam(static_cast<float>(object->m_localBase[3]), static_cast<float>(object->m_localBase[4]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x29: {
+        _GXColor color = {
+            static_cast<u8>(object->m_localBase[0]),
+            static_cast<u8>(object->m_localBase[1]),
+            static_cast<u8>(object->m_localBase[2]),
+            0xFF,
+        };
+        Graphic.SetCopyClear(color, 0);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x1B: {
+        Vec position = {
+            static_cast<float>(object->m_localBase[2]),
+            static_cast<float>(object->m_localBase[3]),
+            static_cast<float>(object->m_localBase[4]),
+        };
+        this->PutParticle((*object->m_localBase << 8) | object->m_localBase[1], position,
+            static_cast<float>(object->m_localBase[5]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x18:
+        CameraPcs.SetFov(static_cast<float>(*object->m_localBase));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x17:
+        CameraPcs.SetZRotate(static_cast<float>(*object->m_localBase));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x16: {
+        CGame::CNextScript nextScript;
+        nextScript.m_flags = 0;
+        strcpy(nextScript.m_name, strBlob + strOffs[*object->m_localBase]);
+        Game.SetNextScript(&nextScript);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x14: {
+        const int value = *object->m_localBase;
+        runtime->push(object, value < 0 ? -value : value);
+        outResult = 0;
+        return;
+    }
+    case -0x13:
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) == 0) {
+            *reinterpret_cast<float*>(object->m_localBase[1]) =
+                static_cast<float>(GetRightStickX__4CPadFl(&Pad, *object->m_localBase));
+            *reinterpret_cast<float*>(object->m_localBase[2]) =
+                static_cast<float>(GetRightStickY__4CPadFl(&Pad, *object->m_localBase));
+        } else {
+            *reinterpret_cast<float*>(object->m_localBase[1]) = 0.0f;
+            *reinterpret_cast<float*>(object->m_localBase[2]) = 0.0f;
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x12:
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) == 0) {
+            *reinterpret_cast<float*>(object->m_localBase[1]) =
+                static_cast<float>(GetLeftStickX__4CPadFl(&Pad, *object->m_localBase));
+            *reinterpret_cast<float*>(object->m_localBase[2]) =
+                static_cast<float>(GetLeftStickY__4CPadFl(&Pad, *object->m_localBase));
+        } else {
+            *reinterpret_cast<float*>(object->m_localBase[1]) = 0.0f;
+            *reinterpret_cast<float*>(object->m_localBase[2]) = 0.0f;
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x10:
+        runtime->push(object, Math.RandPM(*object->m_localBase));
+        outResult = 0;
+        return;
+    case -0x0E:
+        runtime->push(object, Math.Rand(*object->m_localBase));
+        outResult = 0;
+        return;
     default:
         return;
     }

@@ -1827,12 +1827,50 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CE3F8
+ * PAL Size: 372b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetMapObjInfo(int, unsigned char*)
+int GbaQueue::GetMapObjInfo(int channel, unsigned char* outData)
 {
-	return 0;
+	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
+
+	OSWaitSemaphore(accessSemaphores + channel);
+
+	unsigned char* mapObj = obj + 0xB35;
+	int count = 4;
+	do {
+		unsigned char* out = outData;
+		out[0] = mapObj[0x000];
+		out[1] = mapObj[0x014];
+		out[2] = mapObj[0x028];
+		out[3] = mapObj[0x03C];
+		out[4] = mapObj[0x050];
+		out[5] = mapObj[0x064];
+		out[6] = mapObj[0x078];
+		out[7] = mapObj[0x08C];
+		out[8] = mapObj[0x0A0];
+		out[9] = mapObj[0x0B4];
+		out[10] = mapObj[0x0C8];
+		out[11] = mapObj[0x0DC];
+		out[12] = mapObj[0x0F0];
+		out[13] = mapObj[0x104];
+		out[14] = mapObj[0x118];
+		out[15] = mapObj[0x12C];
+		mapObj += 0x140;
+		count--;
+		outData += 0x10;
+	} while (count != 0);
+
+	for (int i = 0; i < 0x10; i++) {
+		outData[i] = obj[0x2435 + i * 0x14];
+	}
+
+	OSSignalSemaphore(accessSemaphores + channel);
+	return 0x50;
 }
 
 /*
@@ -1958,12 +1996,54 @@ unsigned int GbaQueue::GetScrFlg()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CDDEC
+ * PAL Size: 332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetPlayerHP(int, unsigned char*)
+int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 {
-	return 0;
+	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
+	char hpFlags = 0;
+	char prevHpFlags = 0;
+	char hp;
+	char prevHp;
+
+	for (int i = 0; i < 4; i++) {
+		OSWaitSemaphore(accessSemaphores + i);
+
+		unsigned char* playerData = obj + i * 0xDC;
+		if (i == channel) {
+			hp = static_cast<char>(playerData[0x46B]);
+			prevHp = static_cast<char>(playerData[0x7DB]);
+		}
+		if (playerData[0x46B] != 0) {
+			hpFlags = static_cast<char>(hpFlags | (1 << i));
+		}
+		if (playerData[0x7DB] != 0) {
+			prevHpFlags = static_cast<char>(prevHpFlags | (1 << i));
+		}
+
+		OSSignalSemaphore(accessSemaphores + i);
+	}
+
+	unsigned char channelMask = static_cast<unsigned char>(1 << channel);
+	unsigned int changed = (prevHpFlags != hpFlags);
+	if (hp != prevHp) {
+		changed = 1;
+	}
+	if ((obj[0x2D5A] & channelMask) != (obj[0x2D59] & channelMask)) {
+		changed = 1;
+	}
+
+	outData[0] = 0x13;
+	outData[1] = static_cast<unsigned char>(hpFlags);
+	outData[2] = static_cast<unsigned char>(hp);
+	outData[3] = ((obj[0x2D5A] & channelMask) != 0);
+
+	return changed;
 }
 
 /*
@@ -2342,12 +2422,42 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CD1CC
+ * PAL Size: 272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ReplyLetter(int)
+void GbaQueue::ReplyLetter(int channel)
 {
-	// TODO
+	unsigned char recvBuffer[0x400];
+
+	Joybus.GetRecvBuffer(channel, recvBuffer);
+
+	unsigned int value =
+		(static_cast<unsigned int>(recvBuffer[3]) << 24) |
+		(static_cast<unsigned int>(recvBuffer[4]) << 16) |
+		(static_cast<unsigned int>(recvBuffer[5]) << 8) |
+		recvBuffer[6];
+	unsigned int itemId = 0;
+	unsigned int gil = value;
+
+	if (recvBuffer[2] == 0) {
+		itemId = (static_cast<unsigned int>(recvBuffer[5]) << 8) | recvBuffer[6];
+		gil = 0;
+	}
+
+	unsigned int* scriptFoodBase = Game.m_scriptFoodBase + channel;
+	reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->FGLetterReply(recvBuffer[0], recvBuffer[1], itemId, gil);
+	Joybus.ClrRecvBuffer(channel);
+	Joybus.SendResult(channel, 0, 0x15, 0);
+
+	if (recvBuffer[2] != 0) {
+		reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(-static_cast<int>(gil));
+	} else if (itemId != 0) {
+		reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->DeleteItemIdx(static_cast<int>(value) >> 16, 1);
+	}
 }
 
 /*

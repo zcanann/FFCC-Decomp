@@ -19,7 +19,7 @@
 #include "dolphin/gx/GXPerf.h"
 #include "dolphin/os.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_minigame.h"
 #include <string.h>
 

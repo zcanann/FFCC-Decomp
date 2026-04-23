@@ -72,6 +72,7 @@ extern int DAT_8032f480;
 extern int DAT_8032f484;
 extern int DAT_8032f488[2];
 extern CRedMemory DAT_8032f468;
+extern u32 m_AChangeStatus;
 extern volatile u8 m_RandomIndex;
 extern int p_ReverbData;
 extern u32* p_ReverbSize;

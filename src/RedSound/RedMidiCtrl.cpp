@@ -2475,16 +2475,15 @@ void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     if (value == 2) {
         trackData[0x3f] |= 0x1000;
         trackData[0x3f] |= 0x400;
-    } else if ((value < 2) && (value != 0)) {
-        trackData[0x3f] |= 0x1000;
-    } else {
+    } else if ((value > 1) || (value == 0)) {
         trackData[0x3f] |= 0x400;
+    } else {
+        trackData[0x3f] |= 0x1000;
     }
 
     value = *(unsigned char*)(trackData[0] + 1);
     if (value == 2) {
         trackData[0x3f] |= 0x2000;
-        trackData[0x3f] |= 0x800;
     } else if ((value < 2) && (value != 0)) {
         trackData[0x3f] |= 0x2000;
     } else {

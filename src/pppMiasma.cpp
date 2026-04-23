@@ -247,7 +247,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         yOffset = (int)yPos;
 
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backI4Tex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR, GX_TF_I4, 0);
-        GXSetScissor(0, yOffset, (u32)FLOAT_80331928, (u32)FLOAT_8033192c);
+        GXSetScissor(0, yOffset, texWidth, texHeight);
 
         drawColor.rgba[0] = inFarZone ? 0 : 0xFF;
         drawColor.rgba[1] = drawColor.rgba[0];

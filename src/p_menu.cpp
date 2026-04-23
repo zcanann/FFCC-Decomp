@@ -941,7 +941,10 @@ void CMenuPcs::SetAttrFmt(CMenuPcs::FMT fmt)
  */
 void CMenuPcs::DrawQuit()
 {
-	// TODO
+	Mtx44 screenMtx;
+
+	PSMTX44Copy(reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94), screenMtx);
+	GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 
 /*

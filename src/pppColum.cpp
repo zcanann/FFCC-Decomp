@@ -180,7 +180,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                     float dist = PSVECMag(&offset);
                     float fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
 
-                    if (dist < *(float*)(param_2->m_payload + 0x10) && 0.0f < fadeAmount) {
+                    if (dist < *(float*)(param_2->m_payload + 0x10) && fadeAmount > 0.0f) {
                         alpha = (u8)((float)alpha * fadeAmount);
                     }
                 }

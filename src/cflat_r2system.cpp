@@ -10,10 +10,13 @@
 #include "ffcc/math.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "ffcc/memorycard.h"
 #include "ffcc/mes.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/p_gba.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_graphic.h"
 #include "ffcc/p_map.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_minigame.h"
@@ -25,6 +28,8 @@
 #include "ffcc/USBStreamData.h"
 #include "ffcc/util.h"
 #include "ffcc/vector.h"
+#include "ffcc/wind.h"
+#include <dolphin/os.h>
 #include <math.h>
 #include <string.h>
 
@@ -53,6 +58,8 @@ int GetPadType__6JoyBusFi(void*, int);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned char gMapHitDrawMode;
 }
+extern unsigned char CFlat[0x10440];
+extern int gWmMenuWorkA;
 
 static const char s_setMiniGameParamFmt[] = "SetMiniGameParam no 0x%04x data[%d]\n";
 
@@ -2046,6 +2053,775 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -0xD1:
         Sound.CrossPlayBgm(*object->m_localBase, object->m_localBase[1]);
         runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xD0: {
+        enum
+        {
+            kMaxCcClass2DResults = 64,
+        };
+
+        Vec center = {
+            static_cast<float>(object->m_localBase[2]),
+            static_cast<float>(object->m_localBase[3]),
+            static_cast<float>(object->m_localBase[4]),
+        };
+        CGObject* foundObjects[kMaxCcClass2DResults];
+        int maxCount = object->m_localBase[7];
+        if (maxCount > kMaxCcClass2DResults) {
+            maxCount = kMaxCcClass2DResults;
+        }
+        if (maxCount < 0) {
+            maxCount = 0;
+        }
+
+        int foundCount = this->CcClass2D(
+            *object->m_localBase, object->m_localBase[1], &center, static_cast<float>(object->m_localBase[5]),
+            static_cast<float>(object->m_localBase[6]), maxCount, foundObjects);
+        int* outIds = reinterpret_cast<int*>(object->m_localBase[8]);
+        for (int i = 0; i < foundCount; i++) {
+            outIds[i] = reinterpret_cast<CFlatRuntime::CObject*>(foundObjects[i])->m_particleId;
+        }
+
+        runtime->push(object, foundCount);
+        outResult = 0;
+        return;
+    }
+    case -0xCF:
+        Game.m_caravanWorkArr[*object->m_localBase].ClearEvtWork();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xCE:
+        Game.m_gameWork.ClearEvtWork();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xCD:
+        reinterpret_cast<CFlatRuntime*>(CFlat)->ClearParmanent();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xCC:
+        MenuPcs.LoadExtraFont(*object->m_localBase, strBlob + strOffs[object->m_localBase[1]]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xCB:
+        CameraPcs.SetShadowAuto(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xCA: {
+        Vec position = {
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+            static_cast<float>(object->m_localBase[3]),
+        };
+        runtime->push(
+            object,
+            Sound.PlaySe3D(
+                *object->m_localBase, &position, static_cast<float>(object->m_localBase[4]),
+                static_cast<float>(object->m_localBase[5]), object->m_localBase[6]));
+        outResult = 0;
+        return;
+    }
+    case -0xC9: {
+        int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
+        MapMng.SetMapObjTransRate(
+            mapObjIndex, static_cast<float>(object->m_localBase[1]), static_cast<float>(object->m_localBase[2]),
+            static_cast<float>(object->m_localBase[3]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0xC5: {
+        Vec position = {
+            static_cast<float>(object->m_localBase[4]),
+            static_cast<float>(object->m_localBase[5]),
+            static_cast<float>(object->m_localBase[6]),
+        };
+        _GXColor color = {
+            static_cast<u8>(object->m_localBase[1]),
+            static_cast<u8>(object->m_localBase[2]),
+            static_cast<u8>(object->m_localBase[3]),
+            0xFF,
+        };
+        MapMng.SetMapObjWorldMapLightID(*object->m_localBase, color, position);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0xC4:
+        GXSetDispCopyGamma(static_cast<_GXGamma>(object->m_localBase[0]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xC3:
+        runtime->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_progressValue);
+        outResult = 0;
+        return;
+    case -0xC2:
+        Game.m_caravanWorkArr[*object->m_localBase].m_progressValue =
+            static_cast<unsigned short>(object->m_localBase[1]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xC1:
+        runtime->push(object, Game.m_caravanWorkArr[*object->m_localBase].GetFoodRank(object->m_localBase[1]));
+        outResult = 0;
+        return;
+    case -0xC0: {
+        Vec position = {
+            static_cast<float>(object->m_localBase[0]),
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+        };
+        _GXColor color = {
+            static_cast<u8>(object->m_localBase[3]),
+            static_cast<u8>(object->m_localBase[4]),
+            static_cast<u8>(object->m_localBase[5]),
+            static_cast<u8>(object->m_localBase[6]),
+        };
+        SetTexShadowPos__9CCharaPcsFP3Vec(&CharaPcs, &position);
+        SetTexShadowColor__9CCharaPcsF8_GXColor(&CharaPcs, reinterpret_cast<const unsigned char*>(&color));
+        SetTexShadowRadius__9CCharaPcsFf(&CharaPcs, static_cast<float>(object->m_localBase[7]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0xBF:
+        if (object->m_localBase[2] == 0) {
+            MapMng.ShowMapObjID(*object->m_localBase, object->m_localBase[1]);
+        } else {
+            MapMng.ShowMapObjChildID(*object->m_localBase, object->m_localBase[1]);
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xBE: {
+        CRomLetterWork* romLetterWork[8];
+        Game.m_caravanWorkArr[*object->m_localBase].SearchRomLetterWork(romLetterWork, 8);
+
+        for (int i = 0; i < 8; i++) {
+            u16* letter = reinterpret_cast<u16*>(romLetterWork[i]);
+            int dstOffs = i * 4;
+            *reinterpret_cast<int*>(object->m_localBase[1] + dstOffs) = letter != 0 ? letter[0] : -1;
+            *reinterpret_cast<int*>(object->m_localBase[2] + dstOffs) = letter != 0 ? letter[1] : -1;
+            *reinterpret_cast<int*>(object->m_localBase[3] + dstOffs) = letter != 0 ? letter[2] : -1;
+            *reinterpret_cast<int*>(object->m_localBase[4] + dstOffs) = letter != 0 ? letter[3] : -1;
+            if (letter == 0) {
+                *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = -1;
+            } else {
+                int letterIndex =
+                    (reinterpret_cast<int>(letter) - static_cast<int>(Game.unkCFlatData0[3])) / 0x3E;
+                *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = letterIndex;
+            }
+        }
+
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0xBD:
+    case -0xBC:
+        PartMng.pppFieldEndFpNo(static_cast<short>(*object->m_localBase));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xBB: {
+        PPPCREATEPARAM createParam;
+        __ct__14PPPCREATEPARAMFv2(&createParam);
+        PartMng.pppCreate(0, *object->m_localBase, &createParam, 1);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0xB8: {
+        Vec position = {
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+            static_cast<float>(object->m_localBase[3]),
+        };
+        Sound.ChangeSe3DPos(*object->m_localBase, &position);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0xB7:
+        runtime->push(object, Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ac);
+        outResult = 0;
+        return;
+    case -0xB6:
+        Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ac = object->m_localBase[1];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xB5:
+        PartMng.pppSetDeltaIdx(
+            static_cast<short>(*object->m_localBase), static_cast<long>(0.25f * static_cast<float>(object->m_localBase[1])));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xB4:
+        PartMng.pppSetDeltaSlot(
+            *object->m_localBase, static_cast<long>(0.25f * static_cast<float>(object->m_localBase[1])));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xB3:
+        runtime->push(
+            object,
+            reinterpret_cast<CGItemObj*>(object->m_engineObject)
+                ->DeleteOld(*object->m_localBase, object->m_localBase[1], object,
+                    reinterpret_cast<CFlatRuntime::CObject*>(object->m_engineObject)));
+        outResult = 0;
+        return;
+    case -0xB1:
+        runtime->push(object, static_cast<int>(Game.m_gameWork.m_townName[*object->m_localBase]));
+        outResult = 0;
+        return;
+    case -0xAF:
+        runtime->push(
+            object, static_cast<int>(Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ca_0x3dd[object->m_localBase[1]]));
+        outResult = 0;
+        return;
+    case -0xAD:
+        runtime->push(object, Game.m_caravanWorkArr[*object->m_localBase].unk_0x3a8);
+        outResult = 0;
+        return;
+    case -0xAC:
+        Game.m_caravanWorkArr[*object->m_localBase].unk_0x3a8 = object->m_localBase[1];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xAB:
+        runtime->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_letterMeta[object->m_localBase[1]]);
+        outResult = 0;
+        return;
+    case -0xAA:
+        Game.m_caravanWorkArr[*object->m_localBase].m_letterMeta[object->m_localBase[1]] =
+            static_cast<unsigned short>(object->m_localBase[2]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xA7:
+        SetEvtWord__12CCaravanWorkFis(
+            &Game.m_caravanWorkArr[*object->m_localBase], object->m_localBase[1], static_cast<short>(object->m_localBase[2]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xA6:
+        runtime->push(
+            object, GetEvtWord__12CCaravanWorkFi(&Game.m_caravanWorkArr[*object->m_localBase], object->m_localBase[1]));
+        outResult = 0;
+        return;
+    case -0xA5:
+        SetEvtFlag__12CCaravanWorkFii(
+            &Game.m_caravanWorkArr[*object->m_localBase], object->m_localBase[1], object->m_localBase[2]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xA4:
+        runtime->push(
+            object, GetEvtFlag__12CCaravanWorkFi(&Game.m_caravanWorkArr[*object->m_localBase], object->m_localBase[1]));
+        outResult = 0;
+        return;
+    case -0xA3:
+        GbaPcs.SetFirstZone();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xA2:
+        runtime->push(object, static_cast<int>(OSTicksToMilliseconds(OSGetTick())));
+        outResult = 0;
+        return;
+    case -0xA1:
+        CGItemObj::DispAllFieldItem(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xA0:
+        Sound.SetStreamVolume(*object->m_localBase, object->m_localBase[1]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x9F:
+        if (object->m_localBase[1] < 0) {
+            Game.m_caravanWorkArr[*object->m_localBase].m_shopState = 0;
+        } else {
+            Game.m_caravanWorkArr[*object->m_localBase].Init(
+                object->m_localBase[1],
+                reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + object->m_localBase[1] * 0x1D0),
+                object->m_localBase[2]);
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x9E:
+        runtime->push(object, (static_cast<unsigned int>(__cntlzw(MemoryCardMan.DummySave())) >> 5) & 0xFF);
+        outResult = 0;
+        return;
+    case -0x9D:
+        runtime->push(object, (static_cast<unsigned int>(__cntlzw(MemoryCardMan.DummyLoad())) >> 5) & 0xFF);
+        outResult = 0;
+        return;
+    case -0x9B:
+        CharaPcs.LoadCam(*object->m_localBase, strBlob + strOffs[object->m_localBase[1]]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x9A: {
+        int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
+        MapMng.SetMapObjMime(mapObjIndex, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x99: {
+        int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
+        MapMng.SetMapObjAnim(
+            mapObjIndex, object->m_localBase[1], object->m_localBase[2], static_cast<char>(object->m_localBase[3]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x95: {
+        unsigned int result = 1;
+        switch (*object->m_localBase) {
+        case 0:
+            Sound.Realloc(1);
+            break;
+        case 1:
+            Game.ChangeMap(object->m_localBase[1], object->m_localBase[2], 1, 0);
+            break;
+        case 2:
+            PartMng.pppDestroyAll();
+            Game.ChangeMap(object->m_localBase[1], object->m_localBase[2], 1, 1);
+            break;
+        case 3:
+            Sound.Realloc(0);
+            break;
+        case 4:
+            Game.ChangeMap(object->m_localBase[1], object->m_localBase[2], 2, 0);
+            break;
+        case 5:
+            PartMng.pppDestroyAll();
+            Game.ChangeMap(object->m_localBase[1], object->m_localBase[2], 2, 1);
+            break;
+        case 6:
+            result = static_cast<unsigned int>(MapPcs.IsLoadMapCompleted()) & PartPcs.IsLoadPartCompleted();
+            break;
+        }
+        runtime->push(object, result);
+        outResult = 0;
+        return;
+    }
+    case -0x93:
+        Sound.AddNoFreeWave(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x92:
+        MapMng.SetMapTexAnim(
+            *object->m_localBase, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x91:
+        runtime->push(object, PartMng.pppGetNumFreePppMngSt());
+        outResult = 0;
+        return;
+    case -0x90:
+        Sound.PlayNextBgm(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x8F:
+        Sound.FadeOutSe3D(*object->m_localBase, object->m_localBase[1]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x8E:
+        Sound.FadeOutBgm(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x8D:
+        Sound.StopBgm();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x8C:
+        Sound.FreeWave(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x8B:
+        Sound.StopStream();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x8A:
+        Sound.PlayStreamASync();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x89:
+        Sound.LoadStream(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xA9:
+        MenuPcs.SetWorldParam(*object->m_localBase, object->m_localBase[1]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xA8:
+        MenuPcs.GetWorldParam(*object->m_localBase);
+        runtime->push(object, gWmMenuWorkA);
+        outResult = 0;
+        return;
+    case -0x88:
+        Wind.ChangePower(*object->m_localBase, static_cast<float>(object->m_localBase[1]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x87: {
+        Vec position = {
+            static_cast<float>(object->m_localBase[0]),
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+        };
+        runtime->push(
+            object,
+            Wind.AddSphere(&position, static_cast<float>(object->m_localBase[3]),
+                static_cast<float>(object->m_localBase[4]), object->m_localBase[5]));
+        outResult = 0;
+        return;
+    }
+    case -0x86: {
+        Vec position = {
+            static_cast<float>(object->m_localBase[0]),
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+        };
+        runtime->push(
+            object,
+            Wind.AddDiffuse(&position, static_cast<float>(object->m_localBase[3]),
+                static_cast<float>(object->m_localBase[4]), static_cast<float>(object->m_localBase[5])));
+        outResult = 0;
+        return;
+    }
+    case -0x85:
+        runtime->push(
+            object, Wind.AddAmbient(static_cast<float>(*object->m_localBase), static_cast<float>(object->m_localBase[1])));
+        outResult = 0;
+        return;
+    case -0x84:
+        Graphic.ChangeProgressive(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x83:
+        runtime->push(object, Graphic.GetProgressive());
+        outResult = 0;
+        return;
+    case -0x7F:
+        Sound.SetReverb(*object->m_localBase, object->m_localBase[1]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x7E:
+        PartMng.pppDeleteSlot(*object->m_localBase, 0);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x7D:
+        PartMng.pppDeletePart(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x7C:
+        Sound.StopSe3D(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x7B:
+        runtime->push(
+            object, Sound.PlaySe3DLine(*object->m_localBase, static_cast<char>(object->m_localBase[1]),
+                        static_cast<float>(object->m_localBase[2]), static_cast<float>(object->m_localBase[3]), 0));
+        outResult = 0;
+        return;
+    case -0x7A: {
+        Vec position = {
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+            static_cast<float>(object->m_localBase[3]),
+        };
+        runtime->push(
+            object,
+            Sound.PlaySe3D(
+                *object->m_localBase, &position, static_cast<float>(object->m_localBase[4]),
+                static_cast<float>(object->m_localBase[5]), 0));
+        outResult = 0;
+        return;
+    }
+    case -0x79: {
+        Vec position = {
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+            static_cast<float>(object->m_localBase[3]),
+        };
+        Sound.Add3DLine(*object->m_localBase, &position);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x78:
+        Sound.Clear3DLine(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x77:
+        Sound.LoadWave(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x75:
+        SetTempValue__4CMesFii(*object->m_localBase, object->m_localBase[1]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x74: {
+        unsigned short buttonDown = GetGbaButtonDown__4CPadFl(&Pad, *object->m_localBase);
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
+            buttonDown &= 0xF3FF;
+        }
+        runtime->push(object, static_cast<int>(static_cast<short>(buttonDown)));
+        outResult = 0;
+        return;
+    }
+    case -0x73:
+        Game.m_gameWork.m_unkStageTable[*object->m_localBase] = object->m_localBase[1];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x72:
+        Game.m_gameWork.m_bossArtifactStageTable[*object->m_localBase] = object->m_localBase[1];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x71:
+        Game.m_gameWork.m_scriptGlobalTime = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x70:
+        Game.m_gameWork.m_timerA = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x6E:
+        runtime->push(
+            object, Game.m_gameWork.m_linkTable[object->m_localBase[0]][object->m_localBase[1]][object->m_localBase[2]]
+                                          [object->m_localBase[3]]);
+        outResult = 0;
+        return;
+    case -0x6D:
+        Game.m_gameWork.m_linkTable[object->m_localBase[2]][object->m_localBase[3]][object->m_localBase[0]]
+                                   [object->m_localBase[1]] = static_cast<unsigned char>(object->m_localBase[4]);
+        Game.m_gameWork.m_linkTable[object->m_localBase[0]][object->m_localBase[1]][object->m_localBase[2]]
+                                   [object->m_localBase[3]] = static_cast<unsigned char>(object->m_localBase[4]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x6C:
+        runtime->push(object, Sound.PlaySe(*object->m_localBase, 0x40, 0x7F, 0));
+        outResult = 0;
+        return;
+    case -0x6B:
+        Sound.LoadSe(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x6A:
+        Sound.PlayBgm(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x69:
+        Sound.LoadBgm(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x68:
+        runtime->push(object, Sound.IsLoadWaveASyncCompleted());
+        outResult = 0;
+        return;
+    case -0x67:
+        Sound.LoadWaveASync(*object->m_localBase, -1, 0);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x66:
+        runtime->push(object, 2);
+        outResult = 0;
+        return;
+    case -0x65: {
+        _GXColor color = {
+            static_cast<u8>(object->m_localBase[1]),
+            static_cast<u8>(object->m_localBase[2]),
+            static_cast<u8>(object->m_localBase[3]),
+            0xFF,
+        };
+        SetMapShadeColor__9CCharaPcsFi6CColor(&CharaPcs, *object->m_localBase,
+            reinterpret_cast<const unsigned char*>(&color));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x5F:
+        runtime->push(object, static_cast<int>(Math.DstRot(
+                                  static_cast<float>(*object->m_localBase),
+                                  static_cast<float>(object->m_localBase[1]))));
+        outResult = 0;
+        return;
+    case -0x5E:
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x5D:
+        runtime->push(object, System.IsGdev());
+        outResult = 0;
+        return;
+    case -0x53:
+        SetCharaAllocStage__9CCharaPcsFi(&CharaPcs, *object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x52: {
+        const int enabled = (((-*object->m_localBase) | *object->m_localBase) >> 31);
+        SetUseDOF__11CGraphicPcsFi(&GraphicsPcs, enabled);
+        GraphicsPcs.SetDOFParameter(
+            static_cast<signed char>(static_cast<char>(*object->m_localBase) - 1),
+            static_cast<signed char>(object->m_localBase[1]), static_cast<float>(object->m_localBase[2]),
+            static_cast<float>(object->m_localBase[3]), static_cast<float>(object->m_localBase[4]),
+            static_cast<float>(object->m_localBase[5]), static_cast<float>(object->m_localBase[6]),
+            object->m_localBase[7]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x4F:
+        MapMng.SetMeshCameraSemiTransRange(
+            static_cast<unsigned short>(*object->m_localBase), static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]), static_cast<float>(object->m_localBase[3]),
+            static_cast<float>(object->m_localBase[4]),
+            (60.0f * 1000.0f * static_cast<float>(object->m_localBase[5])) / 180.0f);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x4C: {
+        _GXColor color = {
+            static_cast<u8>(object->m_localBase[2]),
+            static_cast<u8>(object->m_localBase[3]),
+            static_cast<u8>(object->m_localBase[4]),
+            0x80,
+        };
+        MapMng.SetIdGrpColor(*object->m_localBase, object->m_localBase[1], color);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x4B:
+        PartMng.pppFieldShowFpNo(static_cast<short>(*object->m_localBase), static_cast<unsigned char>(object->m_localBase[1]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x49:
+        this->SetParticleWorkSpeed(static_cast<float>(*object->m_localBase));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x44:
+        PartMng.pppShowSlot(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x43:
+        PartMng.pppShowIdx(static_cast<short>(*object->m_localBase), static_cast<unsigned char>(object->m_localBase[1]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x42: {
+        const int padType = GetPadType__6JoyBusFi(&Joybus, *object->m_localBase);
+        runtime->push(object, (0x40U - padType | padType - 0x40U) >> 31);
+        outResult = 0;
+        return;
+    }
+    case -0x3E:
+        PartMng.pppEndPart(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x3D:
+        this->PutParticleWork();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x3C:
+        this->SetParticleWorkCol(
+            *object->m_localBase, object->m_localBase[1], static_cast<float>(object->m_localBase[2]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x3B:
+        this->SetParticleWorkScale(static_cast<float>(*object->m_localBase));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x3A:
+        this->SetParticleWorkVector(
+            static_cast<float>(*object->m_localBase), static_cast<float>(object->m_localBase[1]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x39: {
+        Vec target = {
+            static_cast<float>(object->m_localBase[0]),
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+        };
+        this->SetParticleWorkTarget(target);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x38: {
+        Vec position = {
+            static_cast<float>(object->m_localBase[0]),
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+        };
+        this->SetParticleWorkPos(position, static_cast<float>(object->m_localBase[3]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x37:
+        this->ResetParticleWork((*object->m_localBase << 8) | object->m_localBase[2], object->m_localBase[1]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x36:
+        this->EndParticleSlot(*object->m_localBase, object->m_localBase[1]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x35:
+        this->GetFreeParticleSlot();
+        runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400));
         outResult = 0;
         return;
     default:

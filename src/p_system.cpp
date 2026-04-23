@@ -10,15 +10,19 @@ extern char __RTTI__8CProcess[];
 static const char s_CSystemPcs_801D7C48[] = "CSystemPcs";
 
 CSystemPcs SystemPcs;
-unsigned int m_table_desc0__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSystemPcsFv)};
-unsigned int m_table_desc1__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSystemPcsFv)};
-unsigned int m_table_desc2__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CSystemPcsFv)};
-
-CSystemPcsTable m_table__10CSystemPcs = {
-    const_cast<char*>(s_CSystemPcs_801D7C48),
-    {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0x16, 0x8
-    }
+unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CSystemPcs_801D7C48)),
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0x16,
+    0x8
 };
 unsigned int CSystemPcs_RTTI_base__10CSystemPcs[3] = {reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, 0};
 unsigned int CSystemPcs_RTTI__10CSystemPcs[5] = {
@@ -98,7 +102,7 @@ void CSystemPcs::create()
  */
 int CSystemPcs::GetTable(unsigned long index)
 {
-	unsigned char* table = reinterpret_cast<unsigned char*>(&m_table__10CSystemPcs);
+	unsigned char* table = reinterpret_cast<unsigned char*>(m_table__10CSystemPcs);
 	unsigned long offset = index * 0x15c;
 	return (int)(table + offset);
 }

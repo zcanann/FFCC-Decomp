@@ -7,6 +7,7 @@
 #include "ffcc/p_chara_viewer.h"
 #include "ffcc/ref.h"
 #include "ffcc/system.h"
+#include "ffcc/textureman.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -35,11 +36,11 @@ public:
 
         void ChangeTexture(int, unsigned long, unsigned long, int, int);
         void LoadModel(int, unsigned long, unsigned long, unsigned long, int, int, int);
-        void LoadAnim(char*, int, int, int, int, int, int);
+        int LoadAnim(char*, int, int, int, int, int, int);
         bool IsModelLoaded(int checkModelField);
         void FreeModel();
         void FreeAnim(int);
-        void SetAnim(int, int, int, int, int);
+        int SetAnim(int, int, int, int, int);
         void Calc();
         void Draw(int);
         void draw(int, int);
@@ -164,7 +165,7 @@ public:
     void calcAfter();
     void ReleaseAllAnimBank();
     void ReleaseUnusedAnimBank();
-    void TryReleaseAnimBank(int);
+    int TryReleaseAnimBank(int);
     void SetSpecularAlpha(int);
     void InitEnv(int);
     int GetNumTexShadow();
@@ -173,8 +174,8 @@ public:
     void drawBefore();
     void drawMakeTexShadow();
     void drawShadow();
-    void createTextureSet(void*, int);
-    void releaseUnuseLoadModel(int);
+    CTextureSet* createTextureSet(void*, int);
+    int releaseUnuseLoadModel(int);
     void releaseUnuseLoadAnim(CCharaPcs::CLoadAnim*, int);
     void DumpLoad();
     void searchModel(int, int);
@@ -189,7 +190,7 @@ public:
     void loadTexture(void*, int, int, int, int, int, int, int);
     void loadAnimBuffer(void*, char*, int, int, int, int);
     void drawOverlap();
-    void LoadAnim(int, int, char*, int, int, int);
+    int LoadAnim(int, int, char*, int, int, int);
     void GetAnimStage();
 
     u8 _pad_0x4_to_0x71B[0x71C - sizeof(CProcess)];

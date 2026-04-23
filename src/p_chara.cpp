@@ -8,6 +8,7 @@
 #include "ffcc/p_tina.h"
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/textureman.h"
+#include "ffcc/util.h"
 extern "C" {
 extern u8* gCharaPartWorkPtr;
 }
@@ -50,6 +51,7 @@ extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
 extern "C" void* __ct__Q26CChara6CModelFv(void*);
 extern "C" void Create__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
+extern "C" void AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(void*, void*, int, int, int);
 extern "C" void AttachTextureSet__Q26CChara6CModelFP11CTextureSet(void*, void*);
 extern "C" void Init__Q26CChara6CModelFv(void*);
 extern "C" void* Duplicate__Q26CChara6CModelFPQ27CMemory6CStage(void*, void*);
@@ -82,11 +84,15 @@ static const char s_charaMergeDupFmt[] = "CCharaPcs duplicate merge %d\n";
 static const char s_charaMergeOpenFmt[] = "CCharaPcs missing merge %d\n";
 static const char s_charaMergeDoneFmt[] = "CCharaPcs LoadMergeFile %d 0x%x\n";
 static const char s_charaBasePathFmt[] = "dvd/char/k%02d/chara%03d/chara%03d";
+static const char s_charaAnimPathFmt[] = "dvd/char/k%02d/chara%03d/%s.cha";
 static const char s_charaModelSuffix[] = ".mdl";
 static const char s_charaDynamicsSuffix[] = ".dyn";
 static const char s_charaTextureSuffix[] = ".tex";
 static const char s_charaTextureVariantFmt[] = "%s_%c";
 static const char s_mogFurTextureName[] = "mog_hair";
+static const char s_charaSetAnimMissingFmt[] = "CCharaPcs missing anim %d %d %d\n";
+static const char s_charaLoadAnimLogFmt[] = "CCharaPcs LoadAnim %s %d %d\n";
+static const char s_charaReleaseAnimBankFmt[] = "bank release %d %s\n";
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
 
@@ -397,6 +403,89 @@ static inline void AddSharedRef(T* ptr)
 {
     if (ptr != 0) {
         reinterpret_cast<int*>(ptr)[1]++;
+    }
+}
+
+static inline CCharaPcs::CLoadAnim* FindLoadedAnim(CCharaPcs* self, int charaKind, int charaNo, const char* animName)
+{
+    for (int i = 0; i < LoadAnimArray(self)->GetSize(); i++) {
+        CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
+        if (loadAnim == 0 || loadAnim->m_keyTag != reinterpret_cast<void*>(charaKind) || loadAnim->m_keyId != charaNo) {
+            continue;
+        }
+
+        if (strcmp(loadAnim->m_name, animName) == 0) {
+            return loadAnim;
+        }
+    }
+
+    return 0;
+}
+
+static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
+    CCharaPcs* self, int charaKind, int charaNo, const char* animName, int mergeFileId, int mergeFlags)
+{
+    char path[0x100];
+    sprintf(path, s_charaAnimPathFmt, charaKind, charaNo, animName);
+
+    CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+    if (fileHandle == 0) {
+        return 0;
+    }
+
+    File.Read(fileHandle);
+    File.SyncCompleted(fileHandle);
+
+    CChara::CAnim* anim = reinterpret_cast<CChara::CAnim*>(
+        __nw__FUlPQ27CMemory6CStagePci(0x30, StageAt(self, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A));
+    if (anim != 0) {
+        anim = reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(anim));
+        Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(anim, File.m_readBuffer, StageAt(self, 0xD4));
+    }
+
+    CCharaPcs::CLoadAnim* loadAnim = new (StageAt(self, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62D) CCharaPcs::CLoadAnim;
+    if (loadAnim != 0) {
+        loadAnim->m_keyTag = reinterpret_cast<void*>(charaKind);
+        loadAnim->m_keyId = charaNo;
+        loadAnim->m_mergeFileId = mergeFileId;
+        loadAnim->m_mergeFlags = mergeFlags;
+        strcpy(loadAnim->m_name, animName);
+        loadAnim->m_anim = anim;
+        LoadAnimArray(self)->Add(loadAnim);
+    }
+
+    File.Close(fileHandle);
+
+    if (loadAnim != 0 && System.m_execParam != 0) {
+        Printf__7CSystemFPce(&System, s_charaLoadAnimLogFmt, animName, charaKind, charaNo);
+    }
+
+    return loadAnim;
+}
+
+static inline void ReleaseHandleAnimSlot(CCharaPcs::CHandle* handle, int slot)
+{
+    CRef* animRef = handle->m_animSlot[slot];
+    if (animRef != 0) {
+        ReleaseShared(animRef);
+        handle->m_animSlot[slot] = 0;
+    }
+}
+
+static inline void PruneUnsharedAnimRefs(CCharaPcs* self, CCharaPcs::CLoadAnim* target)
+{
+    for (int i = LoadAnimArray(self)->GetSize() - 1; i >= 0; i--) {
+        CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
+        if (loadAnim == 0 || loadAnim->m_mergeFileId >= 0 || reinterpret_cast<int*>(loadAnim)[1] != 1) {
+            continue;
+        }
+        if (target != 0 && loadAnim != target) {
+            continue;
+        }
+
+        CCharaPcs::CLoadAnim* releasedAnim = loadAnim;
+        ReleaseShared(releasedAnim);
+        LoadAnimArray(self)->RemoveAt(static_cast<unsigned long>(i));
     }
 }
 
@@ -1058,9 +1147,44 @@ void CCharaPcs::ReleaseUnusedAnimBank()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::TryReleaseAnimBank(int)
+int CCharaPcs::TryReleaseAnimBank(int requiredSize)
 {
-	// TODO
+    (void)requiredSize;
+
+    CLoadAnim* releaseAnim = 0;
+    int releaseSize = -1;
+
+    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
+        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+        if (loadAnim == 0 || loadAnim->m_anim == 0) {
+            continue;
+        }
+
+        const unsigned int bankPtr = *reinterpret_cast<unsigned int*>(Ptr(loadAnim->m_anim, 0x20));
+        const int bankSize = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 0x24));
+        if (bankPtr == 0 || bankSize <= releaseSize) {
+            continue;
+        }
+
+        releaseAnim = loadAnim;
+        releaseSize = bankSize;
+    }
+
+    if (releaseAnim == 0 || releaseAnim->m_anim == 0) {
+        return 0;
+    }
+
+    void* bankPtr = *reinterpret_cast<void**>(Ptr(releaseAnim->m_anim, 0x20));
+    if (bankPtr != 0) {
+        __dl__FPv(bankPtr);
+        *reinterpret_cast<void**>(Ptr(releaseAnim->m_anim, 0x20)) = 0;
+    }
+
+    if (System.m_execParam > 2) {
+        Printf__7CSystemFPce(&System, s_charaReleaseAnimBankFmt, releaseSize, releaseAnim->m_name);
+    }
+
+    return 1;
 }
 
 /*
@@ -1082,9 +1206,27 @@ void CCharaPcs::SetSpecularAlpha(int alpha)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::InitEnv(int)
+void CCharaPcs::InitEnv(int envMode)
 {
-	// TODO
+    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+        0, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+        1, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+        2, 0, 1, 2, 3);
+
+    if (envMode == 1 || envMode == 2) {
+        _GXColor black = {0x00, 0x00, 0x00, 0xFF};
+        SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &black);
+        SetNumDiffuse__9CLightPcsFUl(&LightPcs, 0);
+        SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+    } else {
+        SetupBaseCharaLights(this);
+    }
+
+    if (envMode == 4) {
+        GXSetProjection(reinterpret_cast<Mtx44Ptr>(Ptr(&Graphic, 0x73A4)), GX_ORTHOGRAPHIC);
+    }
 }
 
 /*
@@ -1117,9 +1259,39 @@ int CCharaPcs::GetNumTexShadow()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::GetTexShadow(int, int, _GXTexObj*, Vec*, float (*) [3][4])
+void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, Vec* worldPositions, float (*shadowMatrices)[3][4])
 {
-	// TODO
+    int shadowIndex = 0;
+    CHandle* handle = HandleListHead(this)->m_next;
+
+    while (handle != HandleListHead(this)) {
+        if ((handle->m_flags & 0x200) != 0 && handle->m_shadowTexturePtr != 0) {
+            if (startIndex <= shadowIndex) {
+                const int outIndex = shadowIndex - startIndex;
+                PSMTXConcat(
+                    reinterpret_cast<MtxPtr>(Ptr(this, 0x14C)), handle->m_shadowViewMtx,
+                    reinterpret_cast<MtxPtr>(shadowMatrices[outIndex]));
+
+                const unsigned short texSize = static_cast<unsigned short>(*reinterpret_cast<int*>(Ptr(this, 0x44)));
+                GXInitTexObj(
+                    &texObjs[outIndex], handle->m_shadowTexturePtr, texSize, texSize, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP,
+                    GX_FALSE);
+
+                Mtx modelMtx;
+                PSMTXCopy(*ModelLocalMtx(handle->m_model), modelMtx);
+                worldPositions[outIndex].x = modelMtx[0][3];
+                worldPositions[outIndex].y = modelMtx[1][3];
+                worldPositions[outIndex].z = modelMtx[2][3];
+            }
+
+            shadowIndex++;
+            if (shadowIndex >= startIndex + maxCount) {
+                return;
+            }
+        }
+
+        handle = handle->m_next;
+    }
 }
 
 /*
@@ -1174,7 +1346,55 @@ void CCharaPcs::drawBefore()
  */
 void CCharaPcs::drawMakeTexShadow()
 {
-	// TODO
+    if (GetNumTexShadow() == 0) {
+        return;
+    }
+
+    const int texSize = *reinterpret_cast<int*>(Ptr(this, 0x44));
+    _GXTexObj backBufferTexObj;
+    _GXColor clearColor = {0x00, 0x00, 0x00, 0x00};
+    _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
+
+    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTexObj, 0, 0, texSize, texSize, 0, GX_NEAR, GX_TF_RGBA8, 0);
+
+    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+        0, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+        1, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+        2, 0, 1, 2, 3);
+    SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &shadowColor);
+    SetNumDiffuse__9CLightPcsFUl(&LightPcs, 0);
+    SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+
+    GXSetPixelFmt((GXPixelFmt)1, GX_ZC_LINEAR);
+    GXSetAlphaUpdate(GX_TRUE);
+    GXSetViewport(0.0f, 0.0f, static_cast<float>(texSize), static_cast<float>(texSize), 0.0f, 1.0f);
+    GXSetScissor(0, 0, static_cast<unsigned int>(texSize), static_cast<unsigned int>(texSize));
+    Graphic.SetCopyClear(clearColor, 0);
+
+    *reinterpret_cast<void**>(Ptr(this, 0x140)) = Graphic.m_scratchTextureBuffer;
+    *reinterpret_cast<int*>(Ptr(this, 0x144)) = 0xD2000;
+    *reinterpret_cast<int*>(Ptr(this, 0x148)) = texSize * texSize * 4;
+    C_MTXLightPerspective(
+        *reinterpret_cast<Mtx*>(Ptr(this, 0x14C)), *reinterpret_cast<float*>(Ptr(&CameraPcs, 0xFC)), 1.0f, 0.5f,
+        -0.5f, 0.5f, 0.5f);
+
+    CHandle* handle = HandleListHead(this)->m_next;
+    while (handle != HandleListHead(this)) {
+        if ((*reinterpret_cast<unsigned int*>(MiniGamePcs + 0x25732) & 0x8000) != 0) {
+            handle->draw(2, 1);
+        }
+        handle = handle->m_next;
+    }
+
+    Graphic.SetViewport();
+    Graphic.SetStdPixelFmt();
+    Graphic.SetCopyClear(clearColor, 0);
+    gUtil.RenderTextureQuad(
+        0.0f, 0.0f, static_cast<float>(texSize), static_cast<float>(texSize), &backBufferTexObj, 0, 0, 0,
+        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
 
 /*
@@ -1218,9 +1438,18 @@ void CCharaPcs::drawShadow()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::createTextureSet(void*, int)
+CTextureSet* CCharaPcs::createTextureSet(void* textureData, int useWeaponStage)
 {
-	// TODO
+    CTextureSet* textureSet = new (StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+    if (textureSet != 0) {
+        textureSet = textureSet;
+    }
+
+    if (textureSet != 0) {
+        textureSet->Create(textureData, SelectLoadStage(this, StageAt(this, useWeaponStage != 0 ? 0xD8 : 0xD0)), 0, 0, 0, 0);
+    }
+
+    return textureSet;
 }
 
 /*
@@ -1228,9 +1457,69 @@ void CCharaPcs::createTextureSet(void*, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::releaseUnuseLoadModel(int)
+int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
 {
-	// TODO
+    int activeCount = 0;
+
+    for (int i = LoadModelArray(this)->GetSize() - 1; i >= 0; i--) {
+        CLoadModel* loadModel = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
+        const bool shouldRelease =
+            (((loadModel->m_mergeFileId < 0) || (loadModel->m_streamMode != 0)) && reinterpret_cast<int*>(loadModel)[1] == 1) ||
+            (loadModel->m_mergeFileId >= 0 && (releaseMask & loadModel->m_mergeFlags) != 0);
+
+        if (!shouldRelease) {
+            activeCount++;
+            continue;
+        }
+
+        if (loadModel->m_streamMode != 0 && reinterpret_cast<int*>(loadModel)[1] == 1) {
+            ReleaseShared(loadModel->m_model);
+            continue;
+        }
+
+        CLoadModel* releasedModel = loadModel;
+        ReleaseShared(releasedModel);
+        LoadModelArray(this)->RemoveAt(static_cast<unsigned long>(i));
+    }
+
+    for (int i = LoadTextureArray(this)->GetSize() - 1; i >= 0; i--) {
+        CLoadTexture* loadTexture = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
+        const bool shouldRelease =
+            (((loadTexture->m_mergeFileId < 0) || (loadTexture->m_streamMode != 0)) && reinterpret_cast<int*>(loadTexture)[1] == 1) ||
+            (loadTexture->m_mergeFileId >= 0 && (releaseMask & loadTexture->m_mergeFlags) != 0);
+
+        if (!shouldRelease) {
+            activeCount++;
+            continue;
+        }
+
+        if (loadTexture->m_streamMode != 0 && reinterpret_cast<int*>(loadTexture)[1] == 1) {
+            ReleaseShared(loadTexture->m_textureSet);
+            continue;
+        }
+
+        CLoadTexture* releasedTexture = loadTexture;
+        ReleaseShared(releasedTexture);
+        LoadTextureArray(this)->RemoveAt(static_cast<unsigned long>(i));
+    }
+
+    for (int i = LoadPdtArray(this)->GetSize() - 1; i >= 0; i--) {
+        CLoadPdt* loadPdt = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
+        const bool shouldRelease =
+            (loadPdt->m_mergeFileId < 0 && reinterpret_cast<int*>(loadPdt)[1] == 1) ||
+            (loadPdt->m_mergeFileId >= 0 && (releaseMask & loadPdt->m_mergeFlags) != 0);
+
+        if (!shouldRelease) {
+            activeCount++;
+            continue;
+        }
+
+        CLoadPdt* releasedPdt = loadPdt;
+        ReleaseShared(releasedPdt);
+        LoadPdtArray(this)->RemoveAt(static_cast<unsigned long>(i));
+    }
+
+    return activeCount;
 }
 
 /*
@@ -1987,9 +2276,45 @@ void CCharaPcs::CHandle::LoadModel(
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CHandle::LoadAnim(char*, int, int, int, int, int, int)
+int CCharaPcs::CHandle::LoadAnim(
+    char* animName, int animIndex, int animFlags, int charaKind, int charaNo, int mergeFileId, int mergeFlags)
 {
-	// TODO
+    if (animIndex == -1) {
+        for (int i = 0; i < 64; i++) {
+            ReleaseHandleAnimSlot(this, i);
+        }
+        PruneUnsharedAnimRefs(&CharaPcs, 0);
+    } else {
+        CLoadAnim* previousAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
+        if (previousAnim != 0) {
+            ReleaseShared(m_animSlot[animIndex]);
+            PruneUnsharedAnimRefs(&CharaPcs, previousAnim);
+            m_animSlot[animIndex] = 0;
+        }
+    }
+
+    const int resolvedKind = charaKind == -1 ? m_charaKind : charaKind;
+    const int resolvedNo = charaNo == -1 ? m_charaNo : charaNo;
+
+    CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, resolvedKind, resolvedNo, animName);
+    if (loadAnim == 0) {
+        loadAnim = LoadAnimFromDisk(&CharaPcs, resolvedKind, resolvedNo, animName, mergeFileId, mergeFlags);
+    }
+    if (loadAnim == 0) {
+        return 0;
+    }
+
+    m_animSlot[animIndex] = loadAnim;
+    AddSharedRef(m_animSlot[animIndex]);
+
+    *reinterpret_cast<unsigned int*>(Ptr(loadAnim, 0x70)) = static_cast<unsigned int>(animFlags);
+    if (loadAnim->m_anim != 0) {
+        unsigned char& flags = *reinterpret_cast<unsigned char*>(Ptr(loadAnim->m_anim, 8));
+        flags = static_cast<unsigned char>((flags & 0x7F) | ((animFlags << 7) & 0x80));
+        flags = static_cast<unsigned char>((flags & 0xBF) | ((animFlags << 5) & 0x40));
+    }
+
+    return 1;
 }
 
 bool CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
@@ -2010,9 +2335,16 @@ bool CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::LoadAnim(int, int, char*, int, int, int)
+int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int unusedArg, int mergeFileId, int mergeFlags)
 {
-	// TODO
+    (void)unusedArg;
+
+    CLoadAnim* loadAnim = FindLoadedAnim(this, charaKind, charaNo, animName);
+    if (loadAnim == 0) {
+        loadAnim = LoadAnimFromDisk(this, charaKind, charaNo, animName, mergeFileId, mergeFlags);
+    }
+
+    return loadAnim != 0;
 }
 
 /*
@@ -2030,9 +2362,24 @@ void CCharaPcs::CHandle::FreeModel()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CHandle::FreeAnim(int)
+void CCharaPcs::CHandle::FreeAnim(int animIndex)
 {
-	// TODO
+    if (animIndex == -1) {
+        for (int i = 0; i < 64; i++) {
+            ReleaseHandleAnimSlot(this, i);
+        }
+        PruneUnsharedAnimRefs(&CharaPcs, 0);
+        return;
+    }
+
+    CLoadAnim* previousAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
+    if (previousAnim == 0) {
+        return;
+    }
+
+    ReleaseShared(m_animSlot[animIndex]);
+    PruneUnsharedAnimRefs(&CharaPcs, previousAnim);
+    m_animSlot[animIndex] = 0;
 }
 
 /*
@@ -2040,9 +2387,30 @@ void CCharaPcs::CHandle::FreeAnim(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CHandle::SetAnim(int, int, int, int, int)
+int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int blendMode, int forceSet)
 {
-	// TODO
+    if (m_model == 0) {
+        return 0;
+    }
+    if (m_currentAnimIndex == animIndex && forceSet == 0) {
+        return 0;
+    }
+
+    CChara::CAnim* anim = 0;
+    if (animIndex >= 0 && m_animSlot[animIndex] != 0) {
+        anim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim;
+    }
+
+    if (anim == 0) {
+        if (m_charaKind != 3 && System.m_execParam > 1) {
+            Printf__7CSystemFPce(&System, s_charaSetAnimMissingFmt, m_charaKind, m_charaNo, animIndex);
+        }
+        return 0;
+    }
+
+    AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(m_model, anim, startFrame, endFrame, blendMode);
+    m_currentAnimIndex = animIndex;
+    return 1;
 }
 
 /*
@@ -2512,7 +2880,8 @@ CCharaPcs::CLoadModel::~CLoadModel()
  */
 CCharaPcs::CLoadAnim::CLoadAnim()
 {
-	// TODO
+    m_anim = 0;
+    *reinterpret_cast<unsigned short*>(Ptr(this, 0x2C)) = 0;
 }
 
 /*

@@ -180,6 +180,7 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 				drawTevBits = 0xACE0F;
 				fullTevBits = 0xADE0F;
 				allOnes = -1;
+				u8 fullByte = 0xFF;
 				tevScale = 0x1e;
 				displayListIdx = meshData->m_displayListCount - 1;
 				dlOffset = displayListIdx * 4;
@@ -190,12 +191,12 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 					*(int*)(MaterialManRaw() + 0x12c) = tevScale;
 					*(int*)(MaterialManRaw() + 0x130) = 0;
 					*(int*)(MaterialManRaw() + 0x44) = allOnes;
-					*(char*)(MaterialManRaw() + 0x4c) = allOnes;
+					*(u8*)(MaterialManRaw() + 0x4c) = fullByte;
 					*(int*)(MaterialManRaw() + 0x11c) = 0;
 					*(int*)(MaterialManRaw() + 0x120) = tevScale;
 					*(int*)(MaterialManRaw() + 0x124) = 0;
-					*(char*)(MaterialManRaw() + 0x205) = allOnes;
-					*(char*)(MaterialManRaw() + 0x206) = allOnes;
+					*(u8*)(MaterialManRaw() + 0x205) = fullByte;
+					*(u8*)(MaterialManRaw() + 0x206) = fullByte;
 					*(int*)(MaterialManRaw() + 0x58) = 0;
 					*(int*)(MaterialManRaw() + 0x5c) = 0;
 					*(char*)(MaterialManRaw() + 0x208) = 0;

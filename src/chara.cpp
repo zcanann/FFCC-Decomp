@@ -23,6 +23,8 @@ extern "C" void __dla__FPv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __ct__7CVectorFv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
+extern "C" void InitQuantize__Q26CChara5CAnimFv(void*);
+extern "C" void Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(void*, void*, void*, float);
 extern "C" void SetTextureSet__12CMaterialSetFP11CTextureSet(CMaterialSet*, CTextureSet*);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
@@ -40,6 +42,13 @@ struct CCharaDisplayListRaw
 	s32 m_size;
 	u16 m_material;
 	u16 _padA;
+};
+
+struct SRTView
+{
+	Vec m_position;
+	Vec m_rotation;
+	Vec m_scale;
 };
 
 struct CCharaMeshRefRaw
@@ -329,6 +338,11 @@ static inline MtxPtr NodeRefLocalMtx(CChara::CNode* node)
 	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x0C);
 }
 
+static inline float ModelBaseScale(CChara::CModel* model)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x18);
+}
+
 static inline Quaternion& NodePreviousQuat(CChara::CNode* node)
 {
 	return *reinterpret_cast<Quaternion*>(reinterpret_cast<u8*>(node) + 0x74);
@@ -387,6 +401,11 @@ static inline void* AnimBank(CChara::CAnim* anim)
 static inline char* AnimNodeName(CChara::CAnimNode* node)
 {
 	return reinterpret_cast<char*>(node);
+}
+
+static inline bool AnimNodeUsesScale(CChara::CAnimNode* node)
+{
+	return *reinterpret_cast<s8*>(reinterpret_cast<u8*>(node) + 0x14) < 0;
 }
 
 static inline u8 ModelAttachMode(CChara::CModel* model)
@@ -1162,17 +1181,112 @@ void CChara::CModel::calcMatrix()
  */
 void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*out)[4])
 {
-	(void)frame;
+	if (m_anim != 0) {
+		InitQuantize__Q26CChara5CAnimFv(m_anim);
+	}
+
 	PSMTXIdentity(out);
+
+	CNode* nodes = ModelNodes(this);
 	CNode* cur = node;
 	while (cur != 0) {
-		PSMTXConcat((float(*)[4])((u8*)cur + 0x44), out, out);
-		s16 parent = *(s16*)((u8*)*(void**)cur + 0x68);
+		CNode* parentNode = 0;
+		s16 parent = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(cur)) + 0x68);
 		if (parent < 0) {
+			parentNode = 0;
+		} else {
+			parentNode = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(nodes) + parent * 0xC0);
+		}
+
+		Mtx localMtx;
+		CChara::CAnimNode* animNode0 = NodeAnimNode0(cur);
+		CChara::CAnimNode* animNode1 = NodeAnimNode1(cur);
+
+		if (animNode0 == 0 && animNode1 == 0) {
+			PSMTXCopy(NodeRefLocalMtx(cur), localMtx);
+		} else {
+			PSMTXIdentity(localMtx);
+			if (parentNode == 0) {
+				float baseScale = ModelBaseScale(this);
+				if (baseScale != FLOAT_803301bc) {
+					PSMTXScale(localMtx, baseScale, baseScale, baseScale);
+				}
+			}
+
+			if (animNode1 != 0 && m_anim != 0) {
+				SRTView srt1;
+				Mtx animMtx;
+				Mtx invScaleMtx;
+
+				Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(animNode1, m_anim,
+				                                                   reinterpret_cast<SRT*>(&srt1), frame);
+				if (AnimNodeUsesScale(animNode1)) {
+					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt1));
+				} else {
+					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt1));
+				}
+				PSMTXConcat(localMtx, animMtx, localMtx);
+
+				float invX = (srt1.m_scale.x != 0.0f) ? (FLOAT_803301bc / srt1.m_scale.x) : FLOAT_803301bc;
+				float invY = (srt1.m_scale.y != 0.0f) ? (FLOAT_803301bc / srt1.m_scale.y) : FLOAT_803301bc;
+				float invZ = (srt1.m_scale.z != 0.0f) ? (FLOAT_803301bc / srt1.m_scale.z) : FLOAT_803301bc;
+				PSMTXScale(invScaleMtx, invX, invY, invZ);
+				PSMTXConcat(localMtx, invScaleMtx, localMtx);
+			}
+
+			if (animNode0 != 0 && m_anim != 0) {
+				SRTView srt0;
+				Mtx animMtx;
+
+				Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(animNode0, m_anim,
+				                                                   reinterpret_cast<SRT*>(&srt0), frame);
+				if (AnimNodeUsesScale(animNode0)) {
+					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt0));
+				} else {
+					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt0));
+				}
+				PSMTXConcat(localMtx, animMtx, localMtx);
+			}
+		}
+
+		u16 blendCur = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(this) + 0xD8);
+		u16 blendMax = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(this) + 0xDA);
+		if (blendCur != 0 && blendMax != 0) {
+			float alpha = FLOAT_803301bc - (static_cast<float>(blendCur) / static_cast<float>(blendMax));
+
+			Vec targetPos = {localMtx[0][3], localMtx[1][3], localMtx[2][3]};
+			Vec targetScale;
+			Quaternion targetQuat;
+			Vec blendedPos;
+			Vec blendedScale;
+			Quaternion blendedQuat;
+			Mtx quatMtx;
+			Mtx scaleMtx;
+
+			Math.MTXGetScale(localMtx, &targetScale);
+			C_QUATMtx(&targetQuat, localMtx);
+
+			VECLerp(&NodePreviousPosition(cur), &targetPos, &blendedPos, alpha);
+			VECLerp(&NodePreviousScale(cur), &targetScale, &blendedScale, alpha);
+			C_QUATSlerp(&NodePreviousQuat(cur), &targetQuat, &blendedQuat, alpha);
+
+			PSMTXQuat(quatMtx, &blendedQuat);
+			PSMTXScale(scaleMtx, blendedScale.x, blendedScale.y, blendedScale.z);
+			PSMTXConcat(quatMtx, scaleMtx, localMtx);
+			localMtx[0][3] = blendedPos.x;
+			localMtx[1][3] = blendedPos.y;
+			localMtx[2][3] = blendedPos.z;
+		}
+
+		PSMTXConcat(localMtx, out, out);
+
+		if (parentNode == 0) {
 			break;
 		}
-		cur = (CNode*)((u8*)*(void**)((u8*)this + 0xA8) + (parent * 0xC0));
+		cur = parentNode;
 	}
+
+	PSMTXConcat(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(this) + 0x08), out, out);
 }
 
 /*

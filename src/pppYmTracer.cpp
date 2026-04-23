@@ -214,19 +214,17 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     entries = work->entries;
 
     if (entries == 0) {
-        alpha = param_2->m_payload[8];
-        decay = (u8)((u16)alpha / *(u16*)(param_2->m_payload + 6));
         entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)*(u16*)(param_2->m_payload + 4) * sizeof(TRACE_POLYGON), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmTracer_cpp_801d9ce0), 0xEB);
         work->entries = entries;
         fVar3 = FLOAT_803306e8;
 
-        entry = entries;
+        entry = work->entries;
         for (i = 0; i < (s32)(u32)*(u16*)(param_2->m_payload + 4); i++) {
             entry->life = -1;
-            entry->alpha = alpha;
-            entry->decay = decay;
+            entry->alpha = param_2->m_payload[8];
+            entry->decay = (u8)((u16)param_2->m_payload[8] / *(u16*)(param_2->m_payload + 6));
             entry->from.z = fVar3;
             entry->from.y = fVar3;
             entry->from.x = fVar3;
@@ -235,6 +233,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             entry->to.x = fVar3;
             entry++;
         }
+        entries = work->entries;
     }
 
     if (param_2->m_graphId == baseObj->m_graphId) {

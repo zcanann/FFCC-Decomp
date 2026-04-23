@@ -294,6 +294,11 @@ static inline char* NodeRefName(CChara::CNode* node)
 	return reinterpret_cast<char*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x74);
 }
 
+static inline char* NodeRefAltName(CChara::CNode* node)
+{
+	return reinterpret_cast<char*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x84);
+}
+
 static inline u8& NodeDynParamIndex(CChara::CNode* node)
 {
 	return *(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x64);
@@ -317,6 +322,97 @@ static inline Vec& NodeDynPosition(CChara::CNode* node)
 static inline Vec& NodeDynVelocity(CChara::CNode* node)
 {
 	return *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(node) + 0xB0);
+}
+
+static inline MtxPtr NodeRefLocalMtx(CChara::CNode* node)
+{
+	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x0C);
+}
+
+static inline Quaternion& NodePreviousQuat(CChara::CNode* node)
+{
+	return *reinterpret_cast<Quaternion*>(reinterpret_cast<u8*>(node) + 0x74);
+}
+
+static inline Vec& NodePreviousPosition(CChara::CNode* node)
+{
+	return *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(node) + 0x84);
+}
+
+static inline Vec& NodePreviousScale(CChara::CNode* node)
+{
+	return *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(node) + 0x90);
+}
+
+static inline CChara::CAnimNode*& NodeAnimNode0(CChara::CNode* node)
+{
+	return *reinterpret_cast<CChara::CAnimNode**>(reinterpret_cast<u8*>(node) + 0x9C);
+}
+
+static inline CChara::CAnimNode*& NodeAnimNode1(CChara::CNode* node)
+{
+	return *reinterpret_cast<CChara::CAnimNode**>(reinterpret_cast<u8*>(node) + 0xA0);
+}
+
+static inline u8 AnimFlags(CChara::CAnim* anim)
+{
+	return *(reinterpret_cast<u8*>(anim) + 0x08);
+}
+
+static inline u8 AnimInterpCount(CChara::CAnim* anim)
+{
+	return *(reinterpret_cast<u8*>(anim) + 0x09);
+}
+
+static inline u16 AnimFrameCount(CChara::CAnim* anim)
+{
+	return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(anim) + 0x10);
+}
+
+static inline CChara::CAnimNode* AnimNodes(CChara::CAnim* anim)
+{
+	return *reinterpret_cast<CChara::CAnimNode**>(reinterpret_cast<u8*>(anim) + 0x14);
+}
+
+static inline u32 AnimInterpOffset(CChara::CAnim* anim)
+{
+	return *reinterpret_cast<u32*>(reinterpret_cast<u8*>(anim) + 0x18);
+}
+
+static inline void* AnimBank(CChara::CAnim* anim)
+{
+	return *reinterpret_cast<void**>(reinterpret_cast<u8*>(anim) + 0x20);
+}
+
+static inline char* AnimNodeName(CChara::CAnimNode* node)
+{
+	return reinterpret_cast<char*>(node);
+}
+
+static inline u8 ModelAttachMode(CChara::CModel* model)
+{
+	return *(reinterpret_cast<u8*>(model) + 0xA1);
+}
+
+static inline void ReleaseRefCounted(void* refObject)
+{
+	if (refObject == 0) {
+		return;
+	}
+
+	int* refData = reinterpret_cast<int*>(refObject);
+	int refCount = refData[1] - 1;
+	refData[1] = refCount;
+	if (refCount == 0) {
+		(*(void (**)(void*, int))(*refData + 8))(refObject, 1);
+	}
+}
+
+static inline void RetainRefCounted(void* refObject)
+{
+	if (refObject != 0) {
+		reinterpret_cast<int*>(refObject)[1]++;
+	}
 }
 
 static const char s_chara_cpp_801d90c8[] = "chara.cpp";
@@ -1566,17 +1662,105 @@ void CChara::CModel::CalcSafeNodeWorldMatrix(float (*outMtx) [4], CChara::CNode*
  */
 void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFrame, int blendMode)
 {
-	m_anim = anim;
-	m_animStart = static_cast<float>(startFrame < 0 ? 0 : startFrame);
-	if (anim == 0) {
-		m_animEnd = m_animStart;
-	} else {
-		m_animEnd = static_cast<float>(endFrame < 0 ? startFrame : endFrame);
+	if (blendMode < 0) {
+		CAnim* currentAnim = m_anim;
+		if (currentAnim == 0) {
+			blendMode = 0;
+		} else if (AnimInterpCount(currentAnim) == 0 || AnimBank(currentAnim) == 0) {
+			blendMode = 4;
+		} else {
+			blendMode = 4;
+
+			u8 interpCount = AnimInterpCount(currentAnim);
+			u16* interpTable = reinterpret_cast<u16*>(reinterpret_cast<u8*>(AnimBank(currentAnim)) + AnimInterpOffset(currentAnim));
+			int frame = static_cast<int>(m_curFrame);
+
+			for (u32 i = 0; i < interpCount; i++) {
+				int start = (i == 0) ? 0 : interpTable[i * 2];
+				int end = (i + 1 < interpCount) ? interpTable[i * 2 + 2] : 10000000;
+				if (start <= frame && frame < end) {
+					blendMode = interpTable[i * 2 + 1];
+					break;
+				}
+			}
+		}
 	}
-	*(u8*)((u8*)this + 0xA1) = static_cast<u8>(blendMode);
-	m_time = m_animStart;
+
+	if (anim != m_anim) {
+		ReleaseRefCounted(m_anim);
+		m_anim = anim;
+		RetainRefCounted(m_anim);
+	}
+
+	CNode* nodes = ModelNodes(this);
+	u16 nodeCount = ModelNodeCount(this);
+	for (u32 i = 0; i < nodeCount; i++) {
+		CNode* node = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(nodes) + i * 0xC0);
+
+		NodeAnimNode0(node) = 0;
+		NodeAnimNode1(node) = 0;
+
+		MtxPtr localMtx = NodeRefLocalMtx(node);
+		C_QUATMtx(&NodePreviousQuat(node), localMtx);
+		NodePreviousPosition(node).x = localMtx[0][3];
+		NodePreviousPosition(node).y = localMtx[1][3];
+		NodePreviousPosition(node).z = localMtx[2][3];
+		Math.MTXGetScale(localMtx, &NodePreviousScale(node));
+
+		if (m_anim == 0) {
+			continue;
+		}
+
+		CAnimNode* animNodes = AnimNodes(m_anim);
+		u16 animNodeCount = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(m_anim) + 0x0E);
+		char* primaryName = NodeRefName(node);
+		char* secondaryName = NodeRefAltName(node);
+
+		for (u32 animIndex = 0; animIndex < animNodeCount; animIndex++) {
+			CAnimNode* animNode = reinterpret_cast<CAnimNode*>(reinterpret_cast<u8*>(animNodes) + animIndex * 0x18);
+			char* animName = AnimNodeName(animNode);
+
+			if (NodeAnimNode0(node) == 0 && primaryName[0] != '\0' && strcmp(primaryName, animName) == 0) {
+				NodeAnimNode0(node) = animNode;
+			} else if (NodeAnimNode1(node) == 0 && secondaryName[0] != '\0' && strcmp(secondaryName, animName) == 0) {
+				NodeAnimNode1(node) = animNode;
+			}
+
+			if (NodeAnimNode0(node) != 0 && NodeAnimNode1(node) != 0) {
+				break;
+			}
+		}
+	}
+
+	if (m_anim == 0) {
+		m_curFrame = 0.0f;
+		m_time = 0.0f;
+		m_animEnd = 0.0f;
+		m_animStart = 0.0f;
+		return;
+	}
+
+	u16 blendFrames = 0;
+	if (ModelAttachMode(this) == 0) {
+		blendFrames = (AnimFlags(m_anim) & 0x80) != 0 ? static_cast<u16>(blendMode) : 0;
+	} else if (ModelAttachMode(this) == 1) {
+		blendFrames = static_cast<u16>(blendMode);
+	}
+
+	*reinterpret_cast<u16*>(reinterpret_cast<u8*>(this) + 0xD8) = blendFrames;
+	*reinterpret_cast<u16*>(reinterpret_cast<u8*>(this) + 0xDA) = blendFrames;
+
+	if (startFrame < 0) {
+		startFrame = 0;
+	}
+	if (endFrame < 0) {
+		endFrame = static_cast<int>(AnimFrameCount(m_anim)) - 1;
+	}
+
+	m_animStart = static_cast<float>(startFrame);
 	m_curFrame = m_animStart;
-	*(u16*)((u8*)this + 0xDA) = *(u16*)((u8*)this + 0xD8);
+	m_time = m_animStart;
+	m_animEnd = static_cast<float>(endFrame);
 }
 
 /*

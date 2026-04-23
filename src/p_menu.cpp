@@ -1319,9 +1319,35 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawBar(float, float, float, CMenuPcs::TEX, float)
+void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBase, float alpha)
 {
-	// TODO
+    if (width <= 0.0f) {
+        return;
+    }
+
+    const float capW = 8.0f;
+    const float barH = 8.0f;
+    float midW = width - (capW * 2.0f);
+    if (midW < 0.0f) {
+        midW = 0.0f;
+    }
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    SetAttrFmt(FMT(0));
+
+    const u8 alphaU8 = static_cast<u8>(255.0f * alpha);
+    const CColor color(0xFF, 0xFF, 0xFF, alphaU8);
+    GXSetChanMatColor(GX_COLOR0A0, color.color);
+
+    const int tex = static_cast<int>(texBase);
+    SetTexture(static_cast<TEX>(tex));
+    DrawRect(0, x, y, capW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+    SetTexture(static_cast<TEX>(tex + 1));
+    DrawRect(0, x + capW, y, midW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+    SetTexture(static_cast<TEX>(tex + 2));
+    DrawRect(8, x + width - capW, y, capW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*

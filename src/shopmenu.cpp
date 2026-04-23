@@ -232,9 +232,45 @@ void _drawShadowFont(CFont* font, char* text, float x, float y, int tlut, int fl
  * Address:	TODO
  * Size:	TODO
  */
-void getButtonRepeat(int, unsigned short)
+unsigned short getButtonRepeat(int, unsigned short noRepeatMask)
 {
-	// TODO
+    unsigned short buttons;
+
+    if (gShopMenuInputLatch == 0) {
+        bool hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+        if (hasInput) {
+            buttons = 0;
+        } else {
+            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            buttons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20);
+        }
+    } else {
+        bool hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+        if (hasInput) {
+            buttons = 0;
+        } else {
+            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            buttons = Pad._4_2_;
+        }
+
+        if ((buttons & gShopMenuInputLatch) == 0) {
+            gShopMenuInputLatch = 0;
+        }
+
+        hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+        if (hasInput) {
+            buttons = 0;
+        } else {
+            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            buttons = Pad._8_2_;
+        }
+    }
+
+    if ((buttons & noRepeatMask) != 0) {
+        gShopMenuInputLatch = noRepeatMask;
+    }
+
+    return buttons;
 }
 
 /*
@@ -242,9 +278,9 @@ void getButtonRepeat(int, unsigned short)
  * Address:	TODO
  * Size:	TODO
  */
-void bButtonNoRepeat(unsigned short)
+void bButtonNoRepeat(unsigned short button)
 {
-	// TODO
+    gShopMenuInputLatch = button;
 }
 
 /*
@@ -544,9 +580,10 @@ void drawGrouadQuad(int, int, int, int, _GXColor, _GXColor, _GXColor, _GXColor)
  * Address:	TODO
  * Size:	TODO
  */
-void CShopMenu::Init(int)
+void CShopMenu::Init(int mode)
 {
-	// TODO
+    gShopMenuInputLatch = 0;
+    SetMode__9CShopMenuFi(this, mode);
 }
 
 /*
@@ -556,7 +593,10 @@ void CShopMenu::Init(int)
  */
 void CShopMenu::Destroy()
 {
-	// TODO
+    ReleasePdt__8CPartPcsFi(PartPcsVoid(), ShopMenuInt(this, 0x18));
+    if (*reinterpret_cast<void**>(MenuPcsRaw() + 0x878) == this) {
+        *reinterpret_cast<void**>(MenuPcsRaw() + 0x878) = nullptr;
+    }
 }
 
 /*

@@ -11,7 +11,7 @@ struct tagOAN3_SHAPE;
 
 void _drawNoShadowFont(CFont*, char*, float, float, int, int);
 void _drawShadowFont(CFont*, char*, float, float, int, int);
-void getButtonRepeat(int, unsigned short);
+unsigned short getButtonRepeat(int, unsigned short);
 void bButtonNoRepeat(unsigned short);
 void setOrtho(int, int, float, float, float);
 void drawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char);

@@ -38,7 +38,7 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 	octTree.ClearShadow();
 	if (*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) != 0) {
 		mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>((char*)&MapMng + 0x21434);
-		boundOffset = (u32)mapShadow * 0x18;
+		boundOffset = (u32)mapShadow * sizeof(CBound);
 		for (i = 0; i < mapShadowArray->GetSize(); i++) {
 			octTreeMask = *(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c);
 			if ((octTreeMask & (1U << i)) == 0) {

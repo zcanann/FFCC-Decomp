@@ -41,6 +41,10 @@ class CBound
 public:
 	CBound();
 	void operator=(const CBound&);
+	static void SetFrustum(Vec&, float(*)[4]);
+	int CheckFrustum0(CBound&);
+	int CheckFrustum0(float);
+	int CheckFrustum(Vec&, float(*)[4], float);
 	void SetMinMax(Vec*, Vec*);
 	int CheckCross(CBound&);
 

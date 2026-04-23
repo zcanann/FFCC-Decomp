@@ -5,7 +5,7 @@
 #include "types.h"
 #include "dolphin/mtx.h"
 
-double acos(double);
+extern "C" double acos(double);
 
 struct pppYmMoveCircleWork {
     f32 m_angle;

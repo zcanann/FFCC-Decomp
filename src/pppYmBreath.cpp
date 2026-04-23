@@ -45,6 +45,7 @@ struct YmBreathParticleGroup {
     Vec position;
     Vec direction;
     float speed;
+    float scale;
     Mtx matrix;
 };
 

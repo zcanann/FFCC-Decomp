@@ -1130,30 +1130,7 @@ void CShopMenu::Calc()
         }
         break;
     case 16:
-        if ((buttons & 0xC) != 0) {
-            ShopMenuInt(this, 0x3C) ^= 1;
-            Sound.PlaySe(1, 0x40, 0x7F, 0);
-        } else if ((buttons & 0x100) != 0) {
-            ShopMenuInt(this, 0x8) = 9;
-            this->SetMode(0x11);
-
-            if (ShopMenuInt(this, 0x3C) == 1) {
-                Sound.PlaySe(4, 0x40, 0x7F, 0);
-            } else if (ShopMenuInt(this, 0x3C) == 0) {
-                int equipType = GetEquipType__8CMenuPcsFi(MenuPcsVoid(), ShopMenuInt(this, 0x150));
-                ChgEquipPos__12CCaravanWorkFii(
-                    reinterpret_cast<void*>(ShopMenuCaravan(this)),
-                    equipType,
-                    static_cast<short>(ShopMenuInt(this, 0x154)));
-                Sound.PlaySe(0x51, 0x40, 0x7F, 0);
-            }
-        }
-
-        if ((buttons & 0x200) != 0) {
-            ShopMenuInt(this, 0x8) = 9;
-            Sound.PlaySe(3, 0x40, 0x7F, 0);
-            this->SetMode(0x11);
-        }
+        this->SelectSOUBI();
         break;
     case 17:
         ShopMenuFloat(this, 0x1C) = static_cast<float>(8 - timer) * 0.125f;
@@ -2264,7 +2241,7 @@ void CShopMenu::SelectSOUBI()
     if ((buttons & 0x200) != 0) {
         Sound.PlaySe(3, 0x40, 0x7F, 0);
         ShopMenuInt(this, 0x8) = 9;
-        SetMode__9CShopMenuFi(this, 0xE);
+        SetMode__9CShopMenuFi(this, 0x11);
         return;
     }
 
@@ -2273,20 +2250,21 @@ void CShopMenu::SelectSOUBI()
     }
 
     if (ShopMenuInt(this, 0x3C) != 0) {
-        Sound.PlaySe(3, 0x40, 0x7F, 0);
         ShopMenuInt(this, 0x8) = 9;
-        SetMode__9CShopMenuFi(this, 0xE);
+        SetMode__9CShopMenuFi(this, 0x11);
+        Sound.PlaySe(4, 0x40, 0x7F, 0);
         return;
     }
 
-    if (ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), ShopMenuInt(this, 0x150)) != 0) {
-        Sound.PlaySe(0x52, 0x40, 0x7F, 0);
-        ShopMenuInt(this, 0x8) = 0xF;
-        SetMode__9CShopMenuFi(this, 0xE);
-    } else {
-        Sound.PlaySe(4, 0x40, 0x7F, 0);
-        ShopMenuInt(this, 0x3C) = 1;
-    }
+    ShopMenuInt(this, 0x8) = 9;
+    SetMode__9CShopMenuFi(this, 0x11);
+
+    int equipType = GetEquipType__8CMenuPcsFi(MenuPcsVoid(), ShopMenuInt(this, 0x150));
+    ChgEquipPos__12CCaravanWorkFii(
+        reinterpret_cast<void*>(ShopMenuCaravan(this)),
+        equipType,
+        static_cast<short>(ShopMenuInt(this, 0x154)));
+    Sound.PlaySe(0x51, 0x40, 0x7F, 0);
 }
 
 /*

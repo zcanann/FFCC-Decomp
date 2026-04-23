@@ -163,7 +163,53 @@ struct TmpArtiFlatData {
  */
 void CMenuPcs::TmpArtiInit()
 {
-	// TODO
+	TmpArtiState* state = GetTmpArtiStateStruct(this);
+	TmpArtiList* list = GetTmpArtiListStruct(this);
+
+	memset(list, 0, sizeof(TmpArtiList));
+	TmpArtiEntry* entry = list->entries;
+	for (int i = 0; i < 8; i++) {
+		entry[0].z = FLOAT_80332f30;
+		entry[1].z = FLOAT_80332f30;
+		entry[2].z = FLOAT_80332f30;
+		entry[3].z = FLOAT_80332f30;
+		entry[4].z = FLOAT_80332f30;
+		entry[5].z = FLOAT_80332f30;
+		entry[6].z = FLOAT_80332f30;
+		entry[7].z = FLOAT_80332f30;
+		entry += 8;
+	}
+
+	int row = 0;
+	entry = list->entries;
+	for (int i = 0; i < 2; i++) {
+		entry[0].tex = 0x37;
+		entry[0].width = 200;
+		entry[0].height = 0x28;
+		entry[0].x = static_cast<short>(-(((double)entry[0].width - DOUBLE_80332f40) * DOUBLE_80332f20 - DOUBLE_80332f58));
+		entry[0].y = static_cast<short>(row * (entry[0].height - 8) + 0x60);
+		entry[0].s = FLOAT_80332f2c;
+		entry[0].t = FLOAT_80332f2c;
+		entry[0].startFrame = row;
+		entry[0].duration = 3;
+
+		entry[1].tex = 0x37;
+		entry[1].width = 200;
+		entry[1].height = 0x28;
+		entry[1].x = static_cast<short>(-(((double)entry[1].width - DOUBLE_80332f40) * DOUBLE_80332f20 - DOUBLE_80332f58));
+		entry[1].y = static_cast<short>((row + 1) * (entry[1].height - 8) + 0x60);
+		entry[1].s = FLOAT_80332f2c;
+		entry[1].t = FLOAT_80332f2c;
+		entry[1].startFrame = row + 1;
+		entry[1].duration = 3;
+
+		row += 2;
+		entry += 2;
+	}
+
+	list->count = 4;
+	state->unk_26 = 0;
+	state->initialized = 1;
 }
 
 /*
@@ -173,7 +219,67 @@ void CMenuPcs::TmpArtiInit()
  */
 void CMenuPcs::TmpArtiInit0()
 {
-	// TODO
+	float alpha = FLOAT_80332f30;
+	unsigned int scriptFood = Game.m_scriptFoodBase[0];
+	int entryBase = GetTmpArtiListBase(this) + 8;
+
+	for (int i = 0; i < *GetTmpArtiList(this); i++) {
+		*reinterpret_cast<float*>(entryBase + 0x10) = alpha;
+		*reinterpret_cast<float*>(entryBase + 0x14) = alpha;
+		entryBase += 0x40;
+	}
+
+	unsigned int itemCount = static_cast<unsigned int>(*reinterpret_cast<short*>(scriptFood + 0xBAA));
+	int frame = 0;
+	int offset = (itemCount - 1) * 0x40;
+	if (-1 < static_cast<int>(itemCount - 1)) {
+		unsigned int blocks = itemCount >> 3;
+		if (blocks != 0) {
+			do {
+				int item = GetTmpArtiListBase(this) + offset + 8;
+				*reinterpret_cast<int*>(item + 0x24) = frame;
+				*reinterpret_cast<unsigned int*>(item + 0x28) = 3;
+				item = GetTmpArtiListBase(this) + offset - 0x38;
+				*reinterpret_cast<int*>(item + 0x24) = frame + 1;
+				*reinterpret_cast<unsigned int*>(item + 0x28) = 3;
+				item = GetTmpArtiListBase(this) + offset - 0x78;
+				*reinterpret_cast<int*>(item + 0x24) = frame + 2;
+				*reinterpret_cast<unsigned int*>(item + 0x28) = 3;
+				item = GetTmpArtiListBase(this) + offset - 0xB8;
+				*reinterpret_cast<int*>(item + 0x24) = frame + 3;
+				*reinterpret_cast<unsigned int*>(item + 0x28) = 3;
+				item = GetTmpArtiListBase(this) + offset - 0xF8;
+				*reinterpret_cast<int*>(item + 0x24) = frame + 4;
+				*reinterpret_cast<unsigned int*>(item + 0x28) = 3;
+				item = GetTmpArtiListBase(this) + offset - 0x138;
+				*reinterpret_cast<int*>(item + 0x24) = frame + 5;
+				*reinterpret_cast<unsigned int*>(item + 0x28) = 3;
+				item = GetTmpArtiListBase(this) + offset - 0x178;
+				*reinterpret_cast<int*>(item + 0x24) = frame + 6;
+				*reinterpret_cast<unsigned int*>(item + 0x28) = 3;
+				item = GetTmpArtiListBase(this) + offset - 0x1B8;
+				*reinterpret_cast<int*>(item + 0x24) = frame + 7;
+				*reinterpret_cast<unsigned int*>(item + 0x28) = 3;
+				frame += 8;
+				offset -= 0x200;
+				blocks--;
+			} while (blocks != 0);
+
+			itemCount &= 7;
+			if (itemCount == 0) {
+				return;
+			}
+		}
+
+		do {
+			int item = GetTmpArtiListBase(this) + offset + 8;
+			*reinterpret_cast<int*>(item + 0x24) = frame;
+			*reinterpret_cast<unsigned int*>(item + 0x28) = 3;
+			frame++;
+			offset -= 0x40;
+			itemCount--;
+		} while (itemCount != 0);
+	}
 }
 
 /*

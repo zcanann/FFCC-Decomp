@@ -194,7 +194,30 @@ void CMenuPcs::CompaInit()
  */
 void CMenuPcs::CompaInit0()
 {
-	// TODO
+	CompaOpenAnimList* compaList = reinterpret_cast<CompaOpenAnimList*>(this->compaList);
+
+	compaList->entries[0].startFrame = 2;
+	compaList->entries[0].duration = 5;
+	compaList->entries[1].startFrame = 2;
+	compaList->entries[1].duration = 5;
+	compaList->entries[2].startFrame = 2;
+	compaList->entries[2].duration = 5;
+	compaList->entries[3].startFrame = 7;
+	compaList->entries[3].duration = 5;
+	compaList->entries[4].startFrame = 7;
+	compaList->entries[4].duration = 5;
+	compaList->entries[5].flags = 2;
+	compaList->entries[5].startFrame = 7;
+	compaList->entries[5].duration = 5;
+
+	unsigned int entryCount = static_cast<unsigned short>(compaList->count);
+	CompaOpenAnim* entry = compaList->entries;
+	while (entryCount != 0) {
+		entry->frame = 0;
+		entry->alpha = 1.0f;
+		entry++;
+		entryCount--;
+	}
 }
 
 /*

@@ -80,6 +80,7 @@ extern "C" double DOUBLE_80333298;
 extern "C" double DOUBLE_803333a0;
 extern "C" double DOUBLE_803333b8;
 extern "C" double DOUBLE_803333c0;
+extern "C" int DAT_8032ef10;
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
@@ -669,80 +670,148 @@ void CMenuPcs::DrawSingCMake()
 {
     int state = MenuS32(this, 0x82C);
     short step = *reinterpret_cast<short*>(state + 0x16);
-    float alpha = 1.0f;
-
-    DrawDiaryBase(step, alpha);
-    DrawCmakePageMark(alpha);
+    short& mode = *reinterpret_cast<short*>(state + 0x10);
+    short& resultFlag = *reinterpret_cast<short*>(state + 0x2E);
+    short& frame = *reinterpret_cast<short*>(state + 0x22);
 
     switch (step) {
+    case 0: {
+        float alpha = CalcCmakeFadeAlpha(this);
+        DrawWMFrame0__8CMenuPcsFif(this, 1, alpha);
+
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
+
+        int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * static_cast<double>(alpha));
+        if (a < 0) {
+            a = 0;
+        } else if (a > 0xFF) {
+            a = 0xFF;
+        }
+        GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+        GXSetChanMatColor(GX_COLOR0A0, col);
+
+        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x3F);
+        DrawRect__8CMenuPcsFUlfffffffff(
+            MenuPcsVoid(), 0,
+            FLOAT_80333254, FLOAT_803332d8, FLOAT_803332dc, FLOAT_803332e0,
+            FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+        DrawRect__8CMenuPcsFUlfffffffff(
+            MenuPcsVoid(), 8,
+            FLOAT_803332e4, FLOAT_803332d8, FLOAT_803332dc, FLOAT_803332e0,
+            FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+
+        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x40);
+        for (int x = 0x20; x < 0x260;) {
+            int span = 0x20;
+            if ((0x260 - x) < span) {
+                span = 0x260 - x;
+            }
+
+            DrawRect__8CMenuPcsFUlfffffffff(
+                MenuPcsVoid(), 0,
+                static_cast<float>(x), FLOAT_803332d8, static_cast<float>(span), FLOAT_803332e0,
+                FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+            x += span;
+        }
+
+        if (resultFlag != 0) {
+            if (mode == 0) {
+                *reinterpret_cast<short*>(state + 0x16) = step + 1;
+                frame = 0;
+                resultFlag = 0;
+                *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
+            } else if (mode == 2) {
+                MenuS16(this, 0x86A) = 999;
+                *reinterpret_cast<short*>(state + 0x20) = -1;
+            }
+        }
+        break;
+    }
     case 1:
+        DrawDiaryBase(step, FLOAT_80333258);
+        DrawCmakePageMark(FLOAT_80333258);
         CmakeNameDraw();
         break;
     case 2:
+        DrawDiaryBase(step, FLOAT_80333258);
+        DrawCmakePageMark(FLOAT_80333258);
         CmakeSexDraw();
         break;
     case 3:
+        DrawDiaryBase(step, FLOAT_80333258);
+        DrawCmakePageMark(FLOAT_80333258);
         CmakeTribeDraw();
         break;
     case 4:
+        DrawDiaryBase(step, FLOAT_80333258);
+        DrawCmakePageMark(FLOAT_80333258);
         CmakeJobDraw();
         break;
     case 5:
+        DrawDiaryBase(step, FLOAT_80333258);
+        DrawCmakePageMark(FLOAT_80333258);
         CmakeResultDraw();
         break;
     case 6:
+        DrawDiaryBase(step, FLOAT_80333258);
+        DrawCmakePageMark(FLOAT_80333258);
         CmakeResultDraw1();
         break;
     default:
-        CmakeResultDraw();
         break;
     }
 
-    if (*reinterpret_cast<short*>(state + 0x2E) != 0) {
-        short& mode = *reinterpret_cast<short*>(state + 0x10);
-        short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
-        short& frame = *reinterpret_cast<short*>(state + 0x22);
+    if (resultFlag == 0) {
+        return;
+    }
 
-        if (mode < 2) {
-            mode = mode + 1;
+    if (mode < 2) {
+        mode = mode + 1;
+        frame = 0;
+        *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
+        return;
+    }
+
+    DAT_8032ef10 = static_cast<int>(step);
+
+    short resultDir = *reinterpret_cast<short*>(state + 0x1E);
+    if (step == 6) {
+        *reinterpret_cast<short*>(state + 0x16) = *reinterpret_cast<short*>(state + 0x26) + 1;
+        if (*reinterpret_cast<short*>(state + 0x16) == 0) {
+            mode = 2;
         } else {
-            if (step == 6) {
-                *reinterpret_cast<short*>(state + 0x16) = *reinterpret_cast<short*>(state + 0x26) + 1;
-                if (*reinterpret_cast<short*>(state + 0x16) == 0) {
-                    mode = 2;
-                } else {
-                    mode = 0;
-                }
-            } else if (resultDir < 0) {
-                if (step == 5) {
-                    *reinterpret_cast<short*>(state + 0x16) = 6;
-                } else if (step > 0) {
-                    *reinterpret_cast<short*>(state + 0x16) = step - 1;
-                }
-                if (*reinterpret_cast<short*>(state + 0x16) == 0) {
-                    mode = 2;
-                } else {
-                    mode = 0;
-                }
-            } else if (step != 5) {
-                *reinterpret_cast<short*>(state + 0x16) = step + 1;
-                if (*reinterpret_cast<short*>(state + 0x16) == 0) {
-                    mode = 2;
-                } else {
-                    mode = 0;
-                }
+            mode = 0;
+        }
+    } else if (resultDir < 0) {
+        if (step != 0) {
+            if (step == 5) {
+                *reinterpret_cast<short*>(state + 0x16) = 6;
             } else {
-                *reinterpret_cast<short*>(state + 0x16) = 0;
-                mode = 2;
+                *reinterpret_cast<short*>(state + 0x16) = step - 1;
             }
-
-            *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
-            frame = 0;
-            *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
         }
 
-        *reinterpret_cast<short*>(state + 0x2E) = 0;
+        if (*reinterpret_cast<short*>(state + 0x16) == 0) {
+            mode = 2;
+        } else {
+            mode = 0;
+        }
+    } else if (step != 5) {
+        *reinterpret_cast<short*>(state + 0x16) = step + 1;
+        if (*reinterpret_cast<short*>(state + 0x16) == 0) {
+            mode = 2;
+        } else {
+            mode = 0;
+        }
+    } else {
+        *reinterpret_cast<short*>(state + 0x16) = 0;
+        mode = 2;
     }
+
+    *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
+    frame = 0;
+    *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
 }
 
 /*

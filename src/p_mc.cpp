@@ -12,8 +12,8 @@ extern const float FLOAT_80331b1c = 10.0f;
 unsigned int m_table__6CMcPcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(lbl_80331B10), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1B
 };
-unsigned int lbl_80211F08[3] = {reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, 0};
-unsigned int lbl_80211F14[5] = {
+unsigned int CMcPcs_RTTI_base__6CMcPcs[3] = {reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, 0};
+unsigned int CMcPcs_RTTI__6CMcPcs[5] = {
     reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, reinterpret_cast<unsigned int>(__RTTI__8CProcess), 0, 0
 };
 

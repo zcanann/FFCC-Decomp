@@ -494,10 +494,13 @@ void CMenuPcs::CalcSingCMake()
     short& frame = *reinterpret_cast<short*>(state + 0x22);
     short& openMode = *reinterpret_cast<short*>(state + 0x10);
     short& step = *reinterpret_cast<short*>(state + 0x16);
+    short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
+    short& resultFlag = *reinterpret_cast<short*>(state + 0x2E);
+    unsigned short result = 0;
 
     switch (step) {
     case 0:
-        if (openMode == 0 || openMode == 2) {
+        if (openMode == 0) {
             if (frame < 10) {
                 frame = frame + 1;
             } else {
@@ -506,17 +509,33 @@ void CMenuPcs::CalcSingCMake()
                 *reinterpret_cast<short*>(state + 0x2A) = 0;
                 *reinterpret_cast<short*>(state + 0x2C) = 0;
             }
+            result = (frame >= 10) ? 1 : 0;
+        } else if (openMode == 1) {
+            result = 0;
+        } else {
+            if (frame < 10) {
+                frame = frame + 1;
+            }
+            result = (frame >= 10) ? 1 : 0;
         }
         break;
     case 1:
-        if (openMode == 0 || openMode == 2) {
+        if (openMode == 0) {
             if (frame < 10) {
                 frame = frame + 1;
-            } else if (openMode == 2 && *reinterpret_cast<short*>(state + 0x1E) < 0) {
+            }
+            result = (frame >= 10) ? 1 : 0;
+        } else if (openMode == 1) {
+            resultFlag = 0;
+            CmakeNameCtrl();
+            result = static_cast<unsigned short>(resultFlag);
+        } else if (frame < 10) {
+            frame = frame + 1;
+        } else {
+            if (resultDir < 0) {
                 ChgModel__8CMenuPcsFiiii(this, static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
             }
-        } else {
-            CmakeNameCtrl();
+            result = 1;
         }
         break;
     case 2:
@@ -528,10 +547,17 @@ void CMenuPcs::CalcSingCMake()
             if (frame < 10) {
                 frame = frame + 1;
             }
+            result = (frame >= 10) ? 1 : 0;
         } else if (openMode == 1) {
+            resultFlag = 0;
             CmakeSexCtrl();
+            if (resultFlag != 0 || (*reinterpret_cast<short*>(state + 0x10) == 2 && frame == 0)) {
+                result = 1;
+            }
         } else if (frame < 10) {
             frame = frame + 1;
+        } else {
+            result = 1;
         }
         break;
     case 3:
@@ -545,10 +571,15 @@ void CMenuPcs::CalcSingCMake()
             if (frame < 10) {
                 frame = frame + 1;
             }
+            result = (frame >= 10) ? 1 : 0;
         } else if (openMode == 1) {
+            resultFlag = 0;
             CmakeTribeCtrl();
+            result = static_cast<unsigned short>(resultFlag);
         } else if (frame < 10) {
             frame = frame + 1;
+        } else {
+            result = 1;
         }
         break;
     case 4:
@@ -560,15 +591,69 @@ void CMenuPcs::CalcSingCMake()
             if (frame < 10) {
                 frame = frame + 1;
             }
+            result = (frame >= 10) ? 1 : 0;
         } else if (openMode == 1) {
+            resultFlag = 0;
             CmakeJobCtrl();
+            result = static_cast<unsigned short>(resultFlag);
         } else if (frame < 10) {
             frame = frame + 1;
+        } else {
+            result = 1;
+        }
+        break;
+    case 5:
+        if (openMode == 0) {
+            if (*reinterpret_cast<unsigned char*>(state + 0x0C) == 0) {
+                *reinterpret_cast<short*>(state + 0x26) = 0;
+                *reinterpret_cast<unsigned char*>(state + 0x0C) = 1;
+            }
+            if (frame < 10) {
+                frame = frame + 1;
+            }
+            result = (frame >= 10) ? 1 : 0;
+        } else if (openMode == 1) {
+            resultFlag = 0;
+            CmakeResultCtrl();
+            if (resultFlag != 0 || (*reinterpret_cast<short*>(state + 0x10) == 2 && frame == 0)) {
+                result = 1;
+            }
+        } else if (*reinterpret_cast<short*>(state + 0x18) != 0) {
+            *reinterpret_cast<short*>(state + 0x18) = *reinterpret_cast<short*>(state + 0x18) - 1;
+        } else if (frame < 10) {
+            frame = frame + 1;
+        } else {
+            result = 1;
+        }
+        break;
+    case 6:
+        if (openMode == 0) {
+            if (*reinterpret_cast<unsigned char*>(state + 0x0C) == 0) {
+                *reinterpret_cast<short*>(state + 0x26) = 0;
+                *reinterpret_cast<unsigned char*>(state + 0x0C) = 1;
+            }
+            if (frame < 10) {
+                frame = frame + 1;
+            }
+            result = (frame >= 10) ? 1 : 0;
+        } else if (openMode == 1) {
+            resultFlag = 0;
+            CmakeResultCtrl1();
+            if (resultFlag != 0 || (*reinterpret_cast<short*>(state + 0x10) == 2 && frame == 0)) {
+                result = 1;
+            }
+        } else if (frame < 10) {
+            frame = frame + 1;
+        } else {
+            result = 1;
         }
         break;
     default:
         break;
     }
+
+    CalcSingleCMakeChara();
+    resultFlag = static_cast<short>(result);
 }
 
 /*

@@ -86,37 +86,33 @@ GXBlendModeReg s_GXSetBlendMode_Reg;
 void _InitGxFunc()
 {
 	int iVar1 = 0;
-	int iVar8 = 0;
+	int iVar8 = iVar1;
 	int iVar10 = 0;
 	int iVar9 = 0;
-	int* puVar2 = (int*)s_GXSetTevOrder_Reg;
-	int* colorIn = (int*)s_GXSetTevColorIn_Reg;
-	int* alphaIn = (int*)s_GXSetTevAlphaIn_Reg;
-	int* colorOp = (int*)s_GXSetTevColorOp_Reg;
-	int* alphaOp = (int*)s_GXSetTevAlphaOp_Reg;
-	int* swapMode = (int*)s_GXSetTevSwapMode_Reg;
+	int* base = (int*)s_GXSetTevColorIn_Reg;
+	int* puVar2 = (int*)((char*)base + 0x480);
+	int* const colorIn = base;
+	int* const alphaIn = (int*)((char*)base + 0x100);
+	int* const colorOp = (int*)((char*)base + 0x200);
+	int* const alphaOp = (int*)((char*)base + 0x340);
+	int* const swapMode = (int*)((char*)base + 0x540);
 
 	for (int iVar13 = 2; iVar13 != 0; iVar13--) {
 		int iVar3 = iVar1 + 1;
 		int iVar4 = iVar1 + 2;
-
 		colorOp[iVar9 / 4] = -1;
 
 		int iVar6 = iVar1 + 4;
-
 		alphaOp[iVar9 / 4] = -1;
 
 		int iVar5 = iVar1 + 3;
-
 		swapMode[iVar10 / 4] = -1;
 
 		int iVar7 = iVar1 + 5;
-
 		colorIn[iVar8 / 4] = -1;
 		alphaIn[iVar8 / 4] = -1;
 
 		int iVar12 = iVar1 + 6;
-
 		puVar2[0] = -1;
 
 		int iVar11 = iVar1 + 7;

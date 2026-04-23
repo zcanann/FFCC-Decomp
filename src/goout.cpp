@@ -474,9 +474,20 @@ int CGoOutMenu::SetMemCardError()
  * Address:	TODO
  * Size:	TODO
  */
-void CGoOutMenu::SetMenu(short, long)
+void CGoOutMenu::SetMenu(short message, long timer)
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (field_0x36 >= 0) {
+        MenuMcWinState(menuPcsLayout).m_mode = 2;
+        MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+    }
+
+    field_0x44 = 1;
+    field_0x45 = 0;
+    field_0x34 = message;
+    field_0x48 = 0;
+    field_0x3c = static_cast<int>(timer);
 }
 
 /*
@@ -527,7 +538,35 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
  */
 void CGoOutMenu::CalcMenu()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+        field_0x44 = 1;
+        field_0x45 = 1;
+    }
+
+    if (field_0x44 != 0 && MenuMcWinState(menuPcsLayout).m_mode == 3) {
+        short x;
+        short y;
+
+        field_0x36 = field_0x34;
+        if (field_0x34 != -1) {
+            MenuPcs.GetWinSize(static_cast<unsigned short>(field_0x36), &x, &y,
+                               (field_0x36 >= 0x1E) ? 2 : 0);
+            MenuPcs.SetMcWinInfo(x, y);
+            MenuMcWinState(menuPcsLayout).m_mode = 0;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+            field_0x40 = field_0x3c;
+            field_0x44 = 0;
+        }
+    }
+
+    if (field_0x40 != 0) {
+        field_0x40--;
+        if (field_0x40 == 0) {
+            SetMenuForceClose();
+        }
+    }
 }
 
 /*
@@ -537,7 +576,15 @@ void CGoOutMenu::CalcMenu()
  */
 void CGoOutMenu::DrawMenu()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (ReadGoOutS16(*this, 0x36) != -1) {
+        MenuPcs.DrawMcWin(-1, 0);
+        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+            const int message = static_cast<int>(ReadGoOutS16(*this, 0x36));
+            MenuPcs.DrawMcWinMess(message, (message >= 0x1E) ? 2 : 0);
+        }
+    }
 }
 
 /*
@@ -547,7 +594,17 @@ void CGoOutMenu::DrawMenu()
  */
 void CGoOutMenu::SetMenuForceClose()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (field_0x36 >= 0) {
+        MenuMcWinState(menuPcsLayout).m_mode = 2;
+        MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+    }
+
+    field_0x45 = 0;
+    field_0x34 = -1;
+    field_0x48 = 0;
+    field_0x3c = 0;
 }
 
 /*
@@ -557,7 +614,7 @@ void CGoOutMenu::SetMenuForceClose()
  */
 void CGoOutMenu::CalcLoadMenu()
 {
-	// TODO
+    CalcMenu();
 }
 
 /*
@@ -699,7 +756,13 @@ void CGoOutMenu::HitCanncel()
  */
 void CGoOutMenu::Init()
 {
-	// TODO
+    memset(this, 0, sizeof(*this));
+    field_0x4 = -1;
+    field_0x19 = -1;
+    field_0x34 = -1;
+    field_0x36 = -1;
+    field_0x38 = 0;
+    field_0x44 = 1;
 }
 
 /*
@@ -709,7 +772,25 @@ void CGoOutMenu::Init()
  */
 void CGoOutMenu::Destroy()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (menuPcsLayout.m_transferSaveData != 0) {
+        __dl__FPv(menuPcsLayout.m_transferSaveData);
+        menuPcsLayout.m_transferSaveData = 0;
+    }
+    if (menuPcsLayout.m_transferWork != 0) {
+        __dl__FPv(menuPcsLayout.m_transferWork);
+        menuPcsLayout.m_transferWork = 0;
+    }
+
+    menuPcsLayout.m_transferWorkActive = 0;
+    menuPcsLayout.m_unknown_888 = 0;
+    menuPcsLayout.m_saveLoadMode = 0;
+    menuPcsLayout.m_unknown_88A = 0;
+
+    if (field_0x2c == 2) {
+        MemoryCardMan.McEnd();
+    }
 }
 
 /*
@@ -1138,7 +1219,22 @@ void CGoOutMenu::CalcGoOut()
  */
 void CGoOutMenu::DrawGoOut()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (ReadGoOutU8(*this, 0x29) != 0) {
+        MenuPcs.DrawInit();
+        MenuPcs.DrawCMakeMenu();
+    }
+
+    if (ReadGoOutS8(*this, 0x24) > 0xD && ReadGoOutS8(*this, 0x24) < 0xF) {
+        MenuPcs.DrawLoadMenu();
+    }
+
+    if (ReadGoOutS8(*this, 0x24) == 1 && MenuGoOutState(menuPcsLayout).m_resultSelect != 0) {
+        MenuGoOutState(menuPcsLayout).m_closeMode = 8;
+        SetMainMode(1);
+        MenuGoOutState(menuPcsLayout).m_resultSelect = 0;
+    }
 }
 
 /*
@@ -1478,7 +1574,15 @@ void CGoOutMenu::CalcDel()
  */
 void CGoOutMenu::DrawDel()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    MenuPcs.DrawInit();
+    MenuPcs.DrawCMakeMenu();
+    if (ReadGoOutS16(*this, 0x36) == 1 && MenuGoOutState(menuPcsLayout).m_resultSelect != 0) {
+        MenuGoOutState(menuPcsLayout).m_closeMode = 8;
+        SetMainMode(1);
+        MenuGoOutState(menuPcsLayout).m_resultSelect = 0;
+    }
 }
 
 /*
@@ -1631,7 +1735,21 @@ void CalcGoOutMenu()
  */
 void CGoOutMenu::DrawSelectYesNo()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (MenuMcWinState(menuPcsLayout).m_mode == 1 && ReadGoOutU8(*this, 0x47) != 0) {
+        const int cursorY = MenuMcWinState(menuPcsLayout).m_y + MenuMcWinState(menuPcsLayout).m_height - 0x3E;
+
+        if (ReadGoOutU8(*this, 0x49) == 0) {
+            const int cursorX = GetYesNoXPos__8CMenuPcsFi(&MenuPcs, ReadGoOutU8(*this, 0x46));
+            MenuPcs.DrawCursor(cursorX, cursorY, 1.0f);
+        } else {
+            const int cursorX = MenuMcWinState(menuPcsLayout).m_x + 0x20;
+            const int localY =
+                ReadGoOutS16(*this, 0x4A) + ReadGoOutU8(*this, 0x46) * 0x1E;
+            MenuPcs.DrawCursor(cursorX, localY, 1.0f);
+        }
+    }
 }
 
 /*
@@ -1641,7 +1759,14 @@ void CGoOutMenu::DrawSelectYesNo()
  */
 void CGoOutMenu::Draw()
 {
-	// TODO
+    if (ReadGoOutU8(*this, 0x44) == 3) {
+        DrawDel();
+    } else if (ReadGoOutU8(*this, 0x44) == 2) {
+        DrawGoOut();
+    }
+
+    DrawMenu();
+    DrawSelectYesNo();
 }
 
 /*
@@ -1651,7 +1776,17 @@ void CGoOutMenu::Draw()
  */
 void CGoOutMenu::InitMemCardProc()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+    McCtrl& mcCtrl = menuPcsLayout.m_mcCtrl;
+
+    mcCtrl.m_saveIndex = static_cast<unsigned char>(field_0x3);
+    mcCtrl.m_cardChannel = static_cast<unsigned char>(field_0x2);
+    mcCtrl.m_previousState = 0;
+    mcCtrl.m_state = 0;
+    mcCtrl.m_lastResult = 0;
+    mcCtrl.m_iteration = 0;
+    mcCtrl.m_userBuffer = reinterpret_cast<void*>(field_0x8);
+    mcCtrl.m_createFlag = 0;
 }
 
 /*
@@ -1661,5 +1796,7 @@ void CGoOutMenu::InitMemCardProc()
  */
 void CGoOutMenu::EndMemCardProc()
 {
-	// TODO
+    field_0x1 = 0;
+    field_0x4 = -1;
+    MemoryCardMan.McEnd();
 }

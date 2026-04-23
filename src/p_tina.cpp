@@ -1286,10 +1286,8 @@ void CPartPcs::drawAfterViewer()
  */
 unsigned int CPartPcs::IsLoadPartCompleted()
 {
-    CPartMngState* state = GetPartMngState();
-
     for (int i = 0; i < 16; i++) {
-        if (state->m_partAsyncBusy[i] != 0) {
+        if (PartMng.m_partAsyncBusy[i] != 0) {
             return 0;
         }
     }

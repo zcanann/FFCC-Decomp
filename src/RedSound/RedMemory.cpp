@@ -11,8 +11,8 @@ int* m_MemoryBank;
 int* m_AMemoryBank;
 extern int DAT_8032f490;
 extern int DAT_8032f494;
-extern int* DAT_8032f4a0;
-extern int* DAT_8032f4a4;
+extern int* volatile DAT_8032f4a0;
+extern int* volatile DAT_8032f4a4;
 
 #define redMainDataBuffer DAT_8032f490
 #define redADataBuffer DAT_8032f494
@@ -139,33 +139,27 @@ int RedNew(int param_1)
  */
 void RedDelete(int address)
 {
-	if (address == 0) {
-		return;
-	}
+	if (address != 0) {
+		unsigned int interrupts = OSDisableInterrupts();
+		if (redMainMemoryBank != 0) {
+			int* blockPtr = redMainMemoryBank;
 
-	unsigned int interrupts = OSDisableInterrupts();
-	int* blockList = redMainMemoryBank;
+			while ((blockPtr[1] != 0) && (blockPtr < redMainMemoryBank + 0x800)) {
+				if (*blockPtr == address) {
+					int entryCount = ((int)(redMainMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
 
-	if (blockList != 0) {
-		int* blockEnd = blockList + 0x800;
-		int* blockPtr = blockList;
-
-		while ((blockPtr[1] != 0) && (blockPtr < blockEnd)) {
-			if (*blockPtr == address) {
-				int entryCount = ((int)(blockList + 0x800) - (int)(blockPtr + 2)) / 8;
-
-				if (entryCount > 0) {
-					memcpy(blockPtr, blockPtr + 2, entryCount * 8);
-					memset(blockList + 0x7FE, 0, 8);
+					if (entryCount > 0) {
+						memcpy(blockPtr, blockPtr + 2, entryCount * 8);
+						memset(redMainMemoryBank + 0x7FE, 0, 8);
+					}
+					break;
 				}
-				break;
+				blockPtr += 2;
 			}
-
-			blockPtr += 2;
 		}
-	}
 
-	OSRestoreInterrupts(interrupts);
+		OSRestoreInterrupts(interrupts);
+	}
 }
 
 /*
@@ -291,33 +285,27 @@ int RedNewA(int size, int offset, int maxSize)
  */
 void RedDeleteA(int address)
 {
-	if (address == 0) {
-		return;
-	}
+	if (address != 0) {
+		unsigned int interrupts = OSDisableInterrupts();
+		if (redAMemoryBank != 0) {
+			int* blockPtr = redAMemoryBank;
 
-	unsigned int interrupts = OSDisableInterrupts();
-	int* blockList = redAMemoryBank;
+			while ((blockPtr[1] != 0) && (blockPtr < redAMemoryBank + 0x800)) {
+				if (*blockPtr == address) {
+					int entryCount = ((int)(redAMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
 
-	if (blockList != 0) {
-		int* blockEnd = blockList + 0x800;
-		int* blockPtr = blockList;
-
-		while ((blockPtr[1] != 0) && (blockPtr < blockEnd)) {
-			if (*blockPtr == address) {
-				int entryCount = ((int)(blockList + 0x800) - (int)(blockPtr + 2)) / 8;
-
-				if (entryCount > 0) {
-					memcpy(blockPtr, blockPtr + 2, entryCount * 8);
-					memset(blockList + 0x7FE, 0, 8);
+					if (entryCount > 0) {
+						memcpy(blockPtr, blockPtr + 2, entryCount * 8);
+						memset(redAMemoryBank + 0x7FE, 0, 8);
+					}
+					break;
 				}
-				break;
+				blockPtr += 2;
 			}
-
-			blockPtr += 2;
 		}
-	}
 
-	OSRestoreInterrupts(interrupts);
+		OSRestoreInterrupts(interrupts);
+	}
 }
 
 /*

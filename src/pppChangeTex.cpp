@@ -103,39 +103,30 @@ extern "C" {
  */
 extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
 {
-	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
-	ChangeTexMeshData* meshData = meshes[param_4].m_data;
-	ChangeTexDisplayList* displayList = meshData->m_displayLists + param_5;
-	int textureInfo = *(int*)((char*)param_2 + 0x1C);
+	ChangeTexDisplayList* displayList =
+	    (*(ChangeTexMeshRef**)((char*)model + 0xAC))[param_4].m_data->m_displayLists + param_5;
 
 	if (*(u8*)((char*)param_3 + 0x14) == 0) {
-		int drawTevBits = 0xACE0F;
-		int zero = 0;
-		int allOnes = -1;
-		int tevScale = 0x1E;
-		u8 fullByte = 0xFF;
-
-		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
-		*(int*)(MaterialManRaw() + 0x128) = zero;
-		drawTevBits |= 0x1000;
-		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
-		*(int*)(MaterialManRaw() + 0x130) = zero;
-		*(int*)(MaterialManRaw() + 0x44) = allOnes;
-		*(u8*)(MaterialManRaw() + 0x4c) = fullByte;
-		*(int*)(MaterialManRaw() + 0x11c) = zero;
-		*(int*)(MaterialManRaw() + 0x120) = tevScale;
-		*(int*)(MaterialManRaw() + 0x124) = zero;
-		*(u8*)(MaterialManRaw() + 0x205) = fullByte;
-		*(u8*)(MaterialManRaw() + 0x206) = fullByte;
-		*(int*)(MaterialManRaw() + 0x58) = zero;
-		*(int*)(MaterialManRaw() + 0x5c) = zero;
-		*(char*)(MaterialManRaw() + 0x208) = zero;
-		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
-		*(int*)(MaterialManRaw() + 0x128) = zero;
-		*(int*)(MaterialManRaw() + 0xd0) = textureInfo + 0x28;
-		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
-		*(int*)(MaterialManRaw() + 0x130) = zero;
-		*(int*)(MaterialManRaw() + 0x40) = drawTevBits;
+		*(int*)(MaterialManRaw() + 0x128) = 0;
+		*(int*)(MaterialManRaw() + 0x48) = 0xACE0F;
+		*(int*)(MaterialManRaw() + 0x12c) = 0x1E;
+		*(int*)(MaterialManRaw() + 0x130) = 0;
+		*(int*)(MaterialManRaw() + 0x44) = -1;
+		*(u8*)(MaterialManRaw() + 0x4c) = 0xFF;
+		*(int*)(MaterialManRaw() + 0x11c) = 0;
+		*(int*)(MaterialManRaw() + 0x120) = 0x1E;
+		*(int*)(MaterialManRaw() + 0x124) = 0;
+		*(u8*)(MaterialManRaw() + 0x205) = 0xFF;
+		*(u8*)(MaterialManRaw() + 0x206) = 0xFF;
+		*(int*)(MaterialManRaw() + 0x58) = 0;
+		*(int*)(MaterialManRaw() + 0x5c) = 0;
+		*(u8*)(MaterialManRaw() + 0x208) = 0;
+		*(int*)(MaterialManRaw() + 0x48) = 0xADE0F;
+		*(int*)(MaterialManRaw() + 0xd0) = *(int*)((char*)param_2 + 0x1C) + 0x28;
+		*(int*)(MaterialManRaw() + 0x128) = 0;
+		*(int*)(MaterialManRaw() + 0x12c) = 0x1E;
+		*(int*)(MaterialManRaw() + 0x130) = 0;
+		*(int*)(MaterialManRaw() + 0x40) = 0xADE0F;
 	}
 
 	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(

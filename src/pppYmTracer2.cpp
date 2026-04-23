@@ -102,22 +102,18 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 {
     TracerWork* work;
     CMapMesh* mapMesh;
-    u8* colorData;
     TRACE_POLYGON* poly;
+    u8* colorData;
     CTexture* texture;
     s32 i;
-    s32 dataOffset;
-    s32 colorOffset;
     s32 dataValIndex;
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
     int textureIndex[2];
 
-    dataOffset = *param_3->m_serializedDataOffsets;
-    colorOffset = param_3->m_serializedDataOffsets[1];
-    work = (TracerWork*)(pppYmTracer2->m_serializedData + dataOffset);
-    colorData = pppYmTracer2->m_serializedData + colorOffset;
+    work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_3->m_serializedDataOffsets);
+    colorData = pppYmTracer2->m_serializedData + param_3->m_serializedDataOffsets[1];
     poly = work->entries;
     dataValIndex = param_2->m_dataValIndex;
     mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];

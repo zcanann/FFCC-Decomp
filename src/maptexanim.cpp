@@ -102,12 +102,12 @@ static inline void SetMaterialTextureSlot(void* material, unsigned long slotInde
 void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
     int found = 0;
+    int i = 0;
     int setPtr = reinterpret_cast<int>(this);
-    short targetMaterialId = static_cast<short>(materialId);
 
-    for (int i = 0; i < m_count; i++) {
+    while (i < m_count) {
         void* animPtr = reinterpret_cast<void*>(*reinterpret_cast<int*>(setPtr + 0xC));
-        if (S16At(animPtr, 0x12) == targetMaterialId) {
+        if (S16At(animPtr, 0x12) == static_cast<short>(materialId)) {
             int end = frameEnd;
             if (U8At(animPtr, 0x15) != 0) {
                 S32At(animPtr, 0x30) = frameStart;
@@ -130,6 +130,7 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
             found = 1;
         }
         setPtr += 4;
+        i += 1;
     }
 
     if ((found == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {

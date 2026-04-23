@@ -15,7 +15,7 @@ extern CMenuPcs MenuPcs;
 extern CGoOutMenu g_GoOutMenu;
 extern CGoOutMenu* g_pGoOutMenu;
 
-void getFreeCaravanIdx(Mc::SaveDat*);
+int getFreeCaravanIdx(Mc::SaveDat*);
 void CalcGoOutMenu();
 void DrawGoOutMenu();
 

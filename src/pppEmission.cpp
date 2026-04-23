@@ -223,7 +223,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
             life--;
             particle->m_fieldA = life;
 
-            if (particle->m_fieldA <= 0) {
+            if (remaining <= 0) {
                 int jitter = 0;
                 if (payload[0xD] != 0) {
                     jitter = rand() % payload[0xD];

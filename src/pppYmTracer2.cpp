@@ -169,7 +169,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                     if (alphaScale < FLOAT_80331840) {
                         alphaScale = FLOAT_80331840;
                     }
-                    if (FLOAT_80331844 < alphaScale) {
+                    if (alphaScale > FLOAT_80331844) {
                         alphaScale = FLOAT_80331844;
                     }
 
@@ -313,7 +313,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         entry->colorB = colorData[10];
 
         if (i == 0) {
-            PSMTXConcat(pppMngStPtr->m_matrix.value, pppYmTracer2->m_object.m_localMatrix.value, MStack_78);
+            PSMTXConcat(pppMngStPtr->m_matrix.value, pppYmTracer2->m_localMatrix.value, MStack_78);
             PSMTXMultVec(MStack_78, &entries[0].pos, &entries[0].pos);
             PSMTXMultVec(MStack_78, &entries[0].targetPos, &entries[0].targetPos);
         } else if (!useFallback) {
@@ -321,7 +321,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             if (GetCharaNodeFrameMatrix(pppMngStPtr, frameT, MStack_78) == 0) {
                 useFallback = true;
             } else {
-                PSMTXConcat(MStack_78, pppYmTracer2->m_object.m_localMatrix.value, MStack_78);
+                PSMTXConcat(MStack_78, pppYmTracer2->m_localMatrix.value, MStack_78);
                 PSMTXMultVec(MStack_78, &entry->pos, &entry->pos);
                 PSMTXMultVec(MStack_78, &entry->targetPos, &entry->targetPos);
             }

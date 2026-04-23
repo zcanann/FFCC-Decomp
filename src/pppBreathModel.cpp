@@ -10,10 +10,10 @@ extern int gPppCalcDisabled;
 #include "ffcc/pppPart.h"
 #include <string.h>
 
-const float FLOAT_80330F80 = -1.0f;
-const float FLOAT_80330F84 = 6.2831855f;
-const float FLOAT_80330F88 = 6.2831855f;
-const float FLOAT_80330F8C = 0.0f;
+extern const float FLOAT_80330F80;
+extern const float FLOAT_80330F84;
+extern const float FLOAT_80330F88 = 6.2831855f;
+extern const float FLOAT_80330F8C = 0.0f;
 
 struct pppModelSt;
 

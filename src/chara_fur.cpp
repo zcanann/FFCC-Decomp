@@ -692,6 +692,103 @@ static inline unsigned short PackFurTexel(int r, int g, int b, int a)
 	return static_cast<unsigned short>((b & 0xF) | ((g & 0xF) << 4) | ((r & 0xF) << 8) | ((a & 7) << 12));
 }
 
+static float FurRand01(unsigned int& rng)
+{
+	rng = rng * 0x41C64E6D + 0x3039;
+	return static_cast<float>((rng >> 16) & 0x7FFF) / 32767.0f;
+}
+
+static int FurBlendNibble(int base, int add, float t)
+{
+	int value = static_cast<int>(base + (add - base) * t);
+	if (value < 0) {
+		return 0;
+	}
+	if (value > 0xF) {
+		return 0xF;
+	}
+	return value;
+}
+
+static void FurWriteTexel(unsigned short* tex, int x, int y, int r, int g, int b, int a)
+{
+	if (x < 0 || x >= 0x80 || y < 0 || y >= 0x80) {
+		return;
+	}
+
+	unsigned short* texel = tex + y * 0x80 + x;
+	unsigned short oldPacked = *texel;
+	int oldB = oldPacked & 0x0F;
+	int oldG = (oldPacked >> 4) & 0x0F;
+	int oldR = (oldPacked >> 8) & 0x0F;
+	int oldA = (oldPacked >> 12) & 0x07;
+
+	if (a < oldA) {
+		a = oldA;
+	}
+	if (r < oldR) {
+		r = oldR;
+	}
+	if (g < oldG) {
+		g = oldG;
+	}
+	if (b < oldB) {
+		b = oldB;
+	}
+
+	*texel = PackFurTexel(r, g, b, a);
+}
+
+static void FurInitHairSet(CHairSet& hair, unsigned int& rng)
+{
+	hair.m_vec0.x = 64.0f + (FurRand01(rng) - 0.5f) * 56.0f;
+	hair.m_vec0.y = 72.0f + FurRand01(rng) * 40.0f;
+	hair.m_vec0.z = 0.0f;
+	hair.m_vec1.x = (FurRand01(rng) - 0.5f) * 2.0f;
+	hair.m_vec1.y = -(0.6f + FurRand01(rng) * 1.4f);
+	hair.m_vec1.z = 0.0f;
+	hair.m_colors[0].color = CColor(
+	    static_cast<unsigned char>(6 + static_cast<int>(FurRand01(rng) * 5.0f)),
+	    static_cast<unsigned char>(6 + static_cast<int>(FurRand01(rng) * 5.0f)),
+	    static_cast<unsigned char>(6 + static_cast<int>(FurRand01(rng) * 5.0f)),
+	    0).color;
+	hair.m_colors[1].color = CColor(
+	    static_cast<unsigned char>(0xB + static_cast<int>(FurRand01(rng) * 4.0f)),
+	    static_cast<unsigned char>(0xB + static_cast<int>(FurRand01(rng) * 4.0f)),
+	    static_cast<unsigned char>(0xB + static_cast<int>(FurRand01(rng) * 4.0f)),
+	    0).color;
+}
+
+static void FurPlotHair(unsigned short* tex, const CHairSet& hair, int layer, unsigned int& rng)
+{
+	CVector pos = hair.m_vec0;
+	CVector vel = hair.m_vec1;
+	const float layerT = static_cast<float>(layer) / 7.0f;
+	const int steps = 10 + layer * 2;
+
+	for (int step = 0; step < steps; step++) {
+		float t = (steps > 1) ? static_cast<float>(step) / static_cast<float>(steps - 1) : 0.0f;
+		int radius = (step < 2) ? 2 : 1;
+		int alpha = 1 + ((layer + step) >> 2);
+		int r = FurBlendNibble(hair.m_colors[0].color.r, hair.m_colors[1].color.r, t);
+		int g = FurBlendNibble(hair.m_colors[0].color.g, hair.m_colors[1].color.g, t);
+		int b = FurBlendNibble(hair.m_colors[0].color.b, hair.m_colors[1].color.b, t);
+
+		for (int oy = -radius; oy <= radius; oy++) {
+			for (int ox = -radius; ox <= radius; ox++) {
+				int falloff = (ox < 0 ? -ox : ox) + (oy < 0 ? -oy : oy);
+				FurWriteTexel(tex, static_cast<int>(pos.x) + ox, static_cast<int>(pos.y) + oy,
+				              r - falloff, g - falloff, b - falloff, alpha - (falloff >> 1));
+			}
+		}
+
+		vel.x += (FurRand01(rng) - 0.5f) * (0.18f + layerT * 0.15f);
+		vel.y += 0.08f + layerT * 0.06f;
+		pos.x += vel.x;
+		pos.y += vel.y;
+	}
+}
+
 extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3Vec(
     void*, Mtx, _GXColor, int, int, _GXColor*, _GXColor*, Vec*);
 void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*);
@@ -1570,9 +1667,16 @@ extern "C" void makeFurTex__6CCharaFv()
 	}
 
 	unsigned short* tex = reinterpret_cast<unsigned short*>(gMogFurTexBuffer);
+	CHairSet hairSet[0x20];
 	unsigned int rng = 0x1234ABCD;
+
+	for (int i = 0; i < 0x20; i++) {
+		FurInitHairSet(hairSet[i], rng);
+	}
+
 	for (int layer = 0; layer < 8; layer++) {
 		unsigned short* layerTex = tex + (layer * 0x4000 / 2);
+		float layerT = static_cast<float>(layer) / 7.0f;
 		for (int y = 0; y < 0x80; y++) {
 			for (int x = 0; x < 0x80; x++) {
 				int dx = x - 0x40;
@@ -1584,10 +1688,14 @@ extern "C" void makeFurTex__6CCharaFv()
 				}
 				rng = rng * 0x41C64E6D + 0x3039;
 				int noise = static_cast<int>((rng >> 16) & 0x1F) - 0x10;
-				int tone = (layer * 2) + (edge >> 2) + (noise >> 2);
-				int a = (edge + layer) >> 4;
+				int tone = 2 + layer + (edge >> 3) + (noise >> 3);
+				int a = static_cast<int>((edge >> 4) + layerT * 2.0f);
 				layerTex[(y * 0x80) + x] = PackFurTexel(tone, tone, tone, a);
 			}
+		}
+
+		for (int i = 0; i < 0x20; i++) {
+			FurPlotHair(layerTex, hairSet[i], layer, rng);
 		}
 	}
 

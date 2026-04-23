@@ -93,6 +93,20 @@ static const char s_mogFurTextureName[] = "mog_hair";
 static const char s_charaSetAnimMissingFmt[] = "CCharaPcs missing anim %d %d %d\n";
 static const char s_charaLoadAnimLogFmt[] = "CCharaPcs LoadAnim %s %d %d\n";
 static const char s_charaReleaseAnimBankFmt[] = "bank release %d %s\n";
+static const char s_charaAsyncCloseFmt[] = "CCharaPcs cancel async file\n";
+static const char s_charaDumpModelHdr1[] = "MODEL\n";
+static const char s_charaDumpModelHdr2[] = " no t num lv mask addr a? a_addr a_size\n";
+static const char s_charaDumpLineSep[] = "----------------------------------------\n";
+static const char s_charaDumpModelFmt[] = "%3d %1d %3d %3d %08x %08x %d %08x %08x\n";
+static const char s_charaDumpTextureHdr1[] = "TEXTURE\n";
+static const char s_charaDumpTextureHdr2[] = " no t num t lv mask addr a? a_addr a_size\n";
+static const char s_charaDumpTextureFmt[] = "%3d %1d %3d %1d %3d %08x %08x %d %08x %08x\n";
+static const char s_charaDumpPdtHdr1[] = "PDT\n";
+static const char s_charaDumpPdtHdr2[] = " no t num t pdt hdl lv mask\n";
+static const char s_charaDumpPdtFmt[] = "%3d %1d %3d %1d %8d %3d %08x\n";
+static const char s_charaDumpAnimHdr1[] = "ANIM\n";
+static const char s_charaDumpAnimHdr2[] = " no t num name lv mask addr banksz sum bankaddr\n";
+static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %-14s %3d %08x %08x %d %08x\n";
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
 
@@ -1539,7 +1553,77 @@ void CCharaPcs::releaseUnuseLoadAnim(CCharaPcs::CLoadAnim*, int)
  */
 void CCharaPcs::DumpLoad()
 {
-	// TODO
+    if (System.m_execParam <= 2) {
+        return;
+    }
+
+    Printf__7CSystemFPce(&System, s_charaDumpModelHdr1);
+    Printf__7CSystemFPce(&System, s_charaDumpModelHdr2);
+    Printf__7CSystemFPce(&System, s_charaDumpLineSep);
+    for (int i = 0; i < LoadModelArray(this)->GetSize(); i++) {
+        CLoadModel* loadModel = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
+        unsigned int streamAddr = 0;
+        unsigned int streamSize = 0;
+        if (loadModel->m_streamMode != 0) {
+            streamAddr = reinterpret_cast<unsigned int>(loadModel->m_streamOffset);
+            streamSize = static_cast<unsigned int>(loadModel->m_streamSize);
+        }
+
+        Printf__7CSystemFPce(
+            &System, s_charaDumpModelFmt, i, reinterpret_cast<int>(loadModel->m_keyTag), loadModel->m_keyId,
+            loadModel->m_mergeFileId, loadModel->m_mergeFlags, reinterpret_cast<unsigned int>(loadModel->m_model),
+            loadModel->m_streamMode, streamAddr, streamSize);
+    }
+
+    Printf__7CSystemFPce(&System, s_charaDumpTextureHdr1);
+    Printf__7CSystemFPce(&System, s_charaDumpTextureHdr2);
+    Printf__7CSystemFPce(&System, s_charaDumpLineSep);
+    for (int i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
+        CLoadTexture* loadTexture = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
+        unsigned int streamAddr = 0;
+        unsigned int streamSize = 0;
+        if (loadTexture->m_streamMode != 0) {
+            streamAddr = reinterpret_cast<unsigned int>(loadTexture->m_streamOffset);
+            streamSize = static_cast<unsigned int>(loadTexture->m_streamSize);
+        }
+
+        Printf__7CSystemFPce(
+            &System, s_charaDumpTextureFmt, i, reinterpret_cast<int>(loadTexture->m_keyTag), loadTexture->m_keyId,
+            reinterpret_cast<int>(loadTexture->m_variantTag), loadTexture->m_mergeFileId, loadTexture->m_mergeFlags,
+            reinterpret_cast<unsigned int>(loadTexture->m_textureSet), loadTexture->m_streamMode, streamAddr, streamSize);
+    }
+
+    Printf__7CSystemFPce(&System, s_charaDumpPdtHdr1);
+    Printf__7CSystemFPce(&System, s_charaDumpPdtHdr2);
+    Printf__7CSystemFPce(&System, s_charaDumpLineSep);
+    for (int i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
+        CLoadPdt* loadPdt = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
+        Printf__7CSystemFPce(
+            &System, s_charaDumpPdtFmt, i, reinterpret_cast<int>(loadPdt->m_keyTag), loadPdt->m_keyId,
+            reinterpret_cast<int>(loadPdt->m_variantTag), loadPdt->m_pdtSlot, loadPdt->m_mergeFileId,
+            loadPdt->m_mergeFlags);
+    }
+
+    Printf__7CSystemFPce(&System, s_charaDumpAnimHdr1);
+    Printf__7CSystemFPce(&System, s_charaDumpAnimHdr2);
+    Printf__7CSystemFPce(&System, s_charaDumpLineSep);
+    int totalBankSize = 0;
+    for (int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
+        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+        unsigned int animAddr = 0;
+        int bankSize = 0;
+        unsigned int bankAddr = 0;
+        if (loadAnim->m_anim != 0) {
+            animAddr = reinterpret_cast<unsigned int>(loadAnim->m_anim);
+            bankSize = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 0x1C));
+            bankAddr = *reinterpret_cast<unsigned int*>(Ptr(loadAnim->m_anim, 0x24));
+        }
+
+        Printf__7CSystemFPce(
+            &System, s_charaDumpAnimFmt, i, reinterpret_cast<int>(loadAnim->m_keyTag), loadAnim->m_keyId,
+            loadAnim->m_name, loadAnim->m_mergeFileId, loadAnim->m_mergeFlags, animAddr, bankSize, totalBankSize, bankAddr);
+        totalBankSize += bankSize;
+    }
 }
 
 /*
@@ -1995,7 +2079,39 @@ CCharaPcs::CHandle::CHandle()
  */
 CCharaPcs::CHandle::~CHandle()
 {
-	// TODO
+    if (m_asyncFileHandle != 0) {
+        if (System.m_execParam > 1) {
+            Printf__7CSystemFPce(&System, s_charaAsyncCloseFmt);
+        }
+        File.Close(m_asyncFileHandle);
+        m_asyncFileHandle = 0;
+    }
+
+    m_asyncState = 0;
+    PartMng.pppDeleteCHandle(this);
+
+    if (m_next != 0 && m_previous != 0) {
+        m_previous->m_next = m_next;
+        m_next->m_previous = m_previous;
+        m_previous = 0;
+        m_next = 0;
+    }
+
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_chara_cpp), 0x717);
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_chara_cpp), 0x8C9);
+    PartMng.pppDeleteCHandle(this);
+
+    ReleaseShared(m_model);
+    ReleaseShared(m_textureSet);
+    ReleaseShared(m_modelLoadRef);
+    ReleaseShared(m_texLoadRef);
+    ReleaseShared(m_pdtLoadRef);
+
+    CharaPcs.releaseUnuseLoadModel(0);
+    for (int i = 0; i < 64; i++) {
+        ReleaseHandleAnimSlot(this, i);
+    }
+    PruneUnsharedAnimRefs(&CharaPcs, 0);
 }
 
 /*

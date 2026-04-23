@@ -85,91 +85,84 @@ GXBlendModeReg s_GXSetBlendMode_Reg;
  */
 void _InitGxFunc()
 {
-	int iVar1 = 0;
-	int iVar8 = 0;
-	int iVar10 = 0;
-	int iVar9 = 0;
-	int* puVar2 = (int*)s_GXSetTevOrder_Reg;
-	int* colorIn = (int*)s_GXSetTevColorIn_Reg;
-	int* alphaIn = (int*)s_GXSetTevAlphaIn_Reg;
-	int* colorOp = (int*)s_GXSetTevColorOp_Reg;
-	int* alphaOp = (int*)s_GXSetTevAlphaOp_Reg;
-	int* swapMode = (int*)s_GXSetTevSwapMode_Reg;
+	int i = 0;
+	int* base = (int*)s_GXSetTevColorIn_Reg;
+	int* colorIn = base;
+	int* alphaIn = base + 0x40;
+	int* colorOp = base + 0x80;
+	int* alphaOp = base + 0xD0;
+	int* tevOrder = base + 0x120;
+	int* swapMode = base + 0x150;
 
-	for (int iVar13 = 2; iVar13 != 0; iVar13--) {
-		int iVar3 = iVar1 + 1;
-		int iVar4 = iVar1 + 2;
+	for (int count = 2; count != 0; count--) {
+		int i1 = i + 1;
+		int i2 = i + 2;
+		int i4 = i + 4;
+		int value = -1;
+		int i3 = i + 3;
+		int i5 = i + 5;
+		int i6 = i + 6;
+		int i7 = i + 7;
 
-		colorOp[iVar9 / 4] = -1;
+		colorOp[0] = value;
+		alphaOp[0] = value;
+		swapMode[0] = value;
+		colorIn[0] = value;
+		alphaIn[0] = value;
+		tevOrder[0] = value;
 
-		int iVar6 = iVar1 + 4;
+		swapMode[i1 * 2] = value;
+		colorIn[i1 * 4] = value;
+		alphaIn[i1 * 4] = value;
+		colorOp[i1 * 5] = value;
+		alphaOp[i1 * 5] = value;
 
-		alphaOp[iVar9 / 4] = -1;
+		i += 8;
+		tevOrder[3] = value;
 
-		int iVar5 = iVar1 + 3;
+		colorIn[i2 * 4] = value;
+		alphaIn[i2 * 4] = value;
+		colorOp[i2 * 5] = value;
+		alphaOp[i2 * 5] = value;
+		swapMode[i2 * 2] = value;
+		tevOrder[6] = value;
+		colorIn[i3 * 4] = value;
+		alphaIn[i3 * 4] = value;
+		colorOp[i3 * 5] = value;
+		alphaOp[i3 * 5] = value;
+		swapMode[i3 * 2] = value;
+		tevOrder[9] = value;
+		colorIn[i4 * 4] = value;
+		alphaIn[i4 * 4] = value;
+		colorOp[i4 * 5] = value;
+		alphaOp[i4 * 5] = value;
+		swapMode[i4 * 2] = value;
+		tevOrder[12] = value;
+		colorIn[i5 * 4] = value;
+		alphaIn[i5 * 4] = value;
+		colorOp[i5 * 5] = value;
+		alphaOp[i5 * 5] = value;
+		swapMode[i5 * 2] = value;
+		tevOrder[15] = value;
+		colorIn[i6 * 4] = value;
+		alphaIn[i6 * 4] = value;
+		colorOp[i6 * 5] = value;
+		alphaOp[i6 * 5] = value;
+		swapMode[i6 * 2] = value;
+		tevOrder[18] = value;
+		tevOrder[21] = value;
+		colorIn[i7 * 4] = value;
+		alphaIn[i7 * 4] = value;
+		colorOp[i7 * 5] = value;
+		alphaOp[i7 * 5] = value;
+		swapMode[i7 * 2] = value;
 
-		swapMode[iVar10 / 4] = -1;
-
-		int iVar7 = iVar1 + 5;
-
-		colorIn[iVar8 / 4] = -1;
-		alphaIn[iVar8 / 4] = -1;
-
-		int iVar12 = iVar1 + 6;
-
-		puVar2[0] = -1;
-
-		int iVar11 = iVar1 + 7;
-
-		swapMode[iVar3 * 2] = -1;
-		colorIn[iVar3 * 4] = -1;
-		alphaIn[iVar3 * 4] = -1;
-		colorOp[iVar3 * 5] = -1;
-		alphaOp[iVar3 * 5] = -1;
-
-		iVar1 += 8;
-		puVar2[3] = -1;
-		iVar10 += 0x40;
-
-		colorIn[iVar4 * 4] = -1;
-		iVar9 += 0xA0;
-		iVar8 += 0x80;
-		alphaIn[iVar4 * 4] = -1;
-		colorOp[iVar4 * 5] = -1;
-		alphaOp[iVar4 * 5] = -1;
-		swapMode[iVar4 * 2] = -1;
-		puVar2[6] = -1;
-		colorIn[iVar5 * 4] = -1;
-		alphaIn[iVar5 * 4] = -1;
-		colorOp[iVar5 * 5] = -1;
-		alphaOp[iVar5 * 5] = -1;
-		swapMode[iVar5 * 2] = -1;
-		puVar2[9] = -1;
-		colorIn[iVar6 * 4] = -1;
-		alphaIn[iVar6 * 4] = -1;
-		colorOp[iVar6 * 5] = -1;
-		alphaOp[iVar6 * 5] = -1;
-		swapMode[iVar6 * 2] = -1;
-		puVar2[12] = -1;
-		colorIn[iVar7 * 4] = -1;
-		alphaIn[iVar7 * 4] = -1;
-		colorOp[iVar7 * 5] = -1;
-		alphaOp[iVar7 * 5] = -1;
-		swapMode[iVar7 * 2] = -1;
-		puVar2[15] = -1;
-		colorIn[iVar12 * 4] = -1;
-		alphaIn[iVar12 * 4] = -1;
-		colorOp[iVar12 * 5] = -1;
-		alphaOp[iVar12 * 5] = -1;
-		swapMode[iVar12 * 2] = -1;
-		puVar2[18] = -1;
-		puVar2[21] = -1;
-		puVar2 = (int*)((char*)puVar2 + 0x60);
-		colorIn[iVar11 * 4] = -1;
-		alphaIn[iVar11 * 4] = -1;
-		colorOp[iVar11 * 5] = -1;
-		alphaOp[iVar11 * 5] = -1;
-		swapMode[iVar11 * 2] = -1;
+		colorIn += 0x20;
+		alphaIn += 0x20;
+		colorOp += 0x28;
+		alphaOp += 0x28;
+		tevOrder += 0x18;
+		swapMode += 0x10;
 	}
 
 	*(int*)&s_GXSetTevSwapModeTable_Reg[0] = -1;

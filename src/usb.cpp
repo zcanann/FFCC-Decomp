@@ -2,6 +2,9 @@
 
 #include "ffcc/system.h"
 
+extern "C" void* __vt__8CManager[];
+extern "C" char __RTTI__8CManager[];
+
 CUSB USB;
 
 static const char s_usbCallbackMissingFmt[] = "CUSB.AddMessageCallback: イベント関数は登録されていません。\n";

@@ -220,15 +220,15 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     bool useFallback;
     float fVar2;
     s16 alpha;
-    u8* colorData;
     s32 iVar4;
     float* pfVar6;
     s32 iVar8;
     s16 visibleCount;
-    s32 i;
+    TracerWork* work;
     TRACE_POLYGON* entries;
     TRACE_POLYGON* entry;
-    TracerWork* work;
+    u8* colorData;
+    s32 i;
     Mtx MStack_78;
     float frameT;
 

@@ -1290,10 +1290,35 @@ void CPartPcs::drawAfterViewer()
  */
 unsigned int CPartPcs::IsLoadPartCompleted()
 {
-    for (int i = 0; i < 16; i++) {
-        if (PartMng.m_partAsyncBusy[i] != 0) {
+    unsigned int* busy = PartMng.m_partAsyncBusy;
+
+    for (int i = 0; i < 2; i++) {
+        if (busy[0] != 0) {
             return 0;
         }
+        if (busy[1] != 0) {
+            return 0;
+        }
+        if (busy[2] != 0) {
+            return 0;
+        }
+        if (busy[3] != 0) {
+            return 0;
+        }
+        if (busy[4] != 0) {
+            return 0;
+        }
+        if (busy[5] != 0) {
+            return 0;
+        }
+        if (busy[6] != 0) {
+            return 0;
+        }
+        if (busy[7] != 0) {
+            return 0;
+        }
+
+        busy += 8;
     }
 
     return 1;

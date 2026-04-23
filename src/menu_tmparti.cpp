@@ -758,5 +758,41 @@ void CMenuPcs::TmpArtiDraw()
  */
 void CMenuPcs::TmpArtiCtrlCur()
 {
-	// TODO
+	*(short*)(GetTmpArtiStateBase(this) + 0x32) = *(short*)(GetTmpArtiStateBase(this) + 0x30);
+
+	bool hasInput = false;
+	unsigned short press;
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		hasInput = true;
+	}
+
+	if (hasInput) {
+		press = 0;
+	} else {
+		u8* padPtr = reinterpret_cast<u8*>(&Pad);
+		if ((__cntlzw((unsigned int)Pad._448_4_) & 0x20) == 0) {
+			padPtr += 0x54;
+		}
+		press = *(u16*)(padPtr + 8);
+	}
+
+	if (press == 0) {
+		return;
+	}
+
+	if ((press & 0x20) != 0) {
+		*(short*)(GetTmpArtiStateBase(this) + 0x1e) = 1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		TmpArtiInit0();
+	} else if ((press & 0x40) != 0) {
+		*(short*)(GetTmpArtiStateBase(this) + 0x1e) = -1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		TmpArtiInit0();
+	} else if ((press & 0x100) != 0) {
+		Sound.PlaySe(4, 0x40, 0x7f, 0);
+	} else if ((press & 0x200) != 0) {
+		*(unsigned char*)(GetTmpArtiStateBase(this) + 0xd) = 1;
+		Sound.PlaySe(3, 0x40, 0x7f, 0);
+		TmpArtiInit0();
+	}
 }

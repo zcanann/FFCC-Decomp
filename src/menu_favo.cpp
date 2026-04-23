@@ -752,5 +752,49 @@ void CMenuPcs::FavoDraw()
  */
 void CMenuPcs::FavoCtrlCur()
 {
-	// TODO
+	bool activeInput = false;
+	unsigned short press;
+	int doReset;
+
+	if (Pad._452_4_ == 0) {
+		if (Pad._448_4_ != -1) {
+			activeInput = true;
+		}
+	} else {
+		activeInput = true;
+	}
+
+	if (activeInput) {
+		press = 0;
+	} else {
+		unsigned int port = 0;
+		__cntlzw((unsigned int)Pad._448_4_);
+		port &= ~((int)~(Pad._448_4_ - (int)port | (int)port - Pad._448_4_) >> 0x1f);
+		press = *(unsigned short*)((unsigned char*)&Pad + port * 0x54 + 8);
+	}
+
+	if (press == 0) {
+		doReset = 0;
+	} else if ((press & 0x20) != 0) {
+		singMenuState->cursorMove = 1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		doReset = 1;
+	} else if ((press & 0x40) != 0) {
+		singMenuState->cursorMove = -1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		doReset = 1;
+	} else if ((press & 0x100) != 0) {
+		Sound.PlaySe(4, 0x40, 0x7f, 0);
+		doReset = 0;
+	} else if ((press & 0x200) != 0) {
+		singMenuState->closeRequested = 1;
+		Sound.PlaySe(3, 0x40, 0x7f, 0);
+		doReset = 1;
+	} else {
+		doReset = 0;
+	}
+
+	if (doReset != 0) {
+		FavoInit0();
+	}
 }

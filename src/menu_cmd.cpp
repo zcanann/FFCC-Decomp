@@ -295,7 +295,24 @@ void CMenuPcs::CmdInit()
  */
 void CMenuPcs::CmdInit0()
 {
-	// TODO
+	s16* list = GetCmdList(this);
+
+	for (s32 i = 0; i < list[0]; i++) {
+		*reinterpret_cast<float*>(list + i * 0x20 + 0x0c) = FLOAT_80332a70;
+		*reinterpret_cast<float*>(list + i * 0x20 + 0x0e) = FLOAT_80332a70;
+	}
+
+	const u32 count = static_cast<u32>(*reinterpret_cast<s16*>(Game.m_scriptFoodBase[0] + 0xBAA));
+	if (count == 0) {
+		return;
+	}
+
+	for (s32 i = static_cast<s32>(count) - 1, idx = 0; i >= 0; i--, idx++) {
+		*reinterpret_cast<s32*>(list + i * 0x20 + 0x14) = idx;
+		*reinterpret_cast<s32*>(list + i * 0x20 + 0x16) = 3;
+	}
+
+	*reinterpret_cast<u8*>(GetCmdStateBase(this) + 8) = 0;
 }
 
 /*

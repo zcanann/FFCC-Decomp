@@ -1,7 +1,9 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/fontman.h"
 #include "ffcc/linkage.h"
+#include "ffcc/math.h"
 #include "ffcc/monobj.h"
+#include "ffcc/partyobj.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_minigame.h"
@@ -15,6 +17,19 @@ extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFla
 extern "C" void DeleteParticleSlot__13CFlatRuntime2Fii(void*, int);
 extern "C" int GetFreeParticleSlot__13CFlatRuntime2Fv(void*);
 extern "C" void EndParticleSlot__13CFlatRuntime2Fii(void*, int, int);
+extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
+extern "C" void SetParticleWorkScale__13CFlatRuntime2Ff(void*, float);
+extern "C" void SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
+extern "C" void SetParticleWorkSpeed__13CFlatRuntime2Ff(void*, float);
+extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
+extern "C" void SetParticleWorkCol__13CFlatRuntime2Fiif(void*, int, int, float);
+extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
+extern "C" void SetParticleWorkVector__13CFlatRuntime2Fff(void*, float, float);
+extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void SetParticleWorkTarget__13CFlatRuntime2FR3Vec(void*, Vec&);
+extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void SetParticleWorkNo__13CFlatRuntime2Fi(void*, int);
+extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern "C" int intToClass__13CFlatRuntime2Fi(void*, int);
 extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
 extern "C" void pppEndPart__8CPartMngFi(void*, int);
@@ -56,6 +71,126 @@ static float CharaObjGetMonsterScale(unsigned char* script9, bool isMon)
 static void CharaObjPutMonsterScaledParticle(CGCharaObj* charaObj, int particleNo, int slot, float scale)
 {
 	charaObj->putParticle(particleNo, slot, static_cast<CGObject*>(charaObj), 20.0f * charaObj->m_attackColRadius * scale, 0);
+}
+
+static Vec& CharaObjComboCenter(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(charaObj) + 0x66C);
+}
+
+static Vec& CharaObjComboTarget(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(charaObj) + 0x678);
+}
+
+static int& CharaObjComboItemState(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(charaObj) + 0x684);
+}
+
+static int& CharaObjComboScriptArg(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(charaObj) + 0x698);
+}
+
+static unsigned int& CharaObjComboScriptMode(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(charaObj) + 0x69C);
+}
+
+static float& CharaObjComboLinkCount(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(charaObj) + 0x6A8);
+}
+
+static CGPrgObj** CharaObjComboLinks(CGCharaObj* charaObj)
+{
+	return reinterpret_cast<CGPrgObj**>(reinterpret_cast<unsigned char*>(charaObj) + 0x6AC);
+}
+
+static unsigned char& CharaObjComboFlags(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(charaObj) + 0x6B8);
+}
+
+static bool CharaObjSkipComboScript(CGPrgObj* obj)
+{
+	if (obj == 0) {
+		return true;
+	}
+
+	if (Game.m_gameWork.m_menuStageMode == 0 || Game.m_gameWork.m_bossArtifactStageIndex >= 0xF) {
+		return false;
+	}
+
+	return ((obj->GetCID() & 0x6D) == 0x6D) &&
+	       (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(obj->m_scriptHandle) + 0x3B4) != 0);
+}
+
+static bool CharaObjIsPlayerCid(unsigned int cid)
+{
+	return (cid & 0x6D) == 0x6D;
+}
+
+static bool CharaObjIsElementalStatus(unsigned int staType)
+{
+	return staType == 0 || staType == 1 || staType == 3 || staType == 4 ||
+	       staType == 6 || staType == 8 || staType == 9 || staType == 0x1C;
+}
+
+static bool CharaObjIsBreakStatus(unsigned int staType)
+{
+	return staType == 0x24 || staType == 0x25 || staType == 0x69 || staType == 0x6A;
+}
+
+static bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
+{
+	Vec delta;
+	Vec facing;
+	float magSq;
+	float invMag;
+	float dot;
+
+	if (sourceObj == 0) {
+		return false;
+	}
+
+	delta.x = sourceObj->m_worldPosition.x - self->m_worldPosition.x;
+	delta.y = 0.0f;
+	delta.z = sourceObj->m_worldPosition.z - self->m_worldPosition.z;
+	magSq = delta.x * delta.x + delta.z * delta.z;
+	if (magSq <= 0.0f) {
+		return false;
+	}
+
+	invMag = 1.0f / sqrtf(magSq);
+	delta.x *= invMag;
+	delta.z *= invMag;
+	facing.x = sinf(self->m_rotBaseY);
+	facing.y = 0.0f;
+	facing.z = cosf(self->m_rotBaseY);
+	dot = delta.x * facing.x + delta.z * facing.z;
+	return dot > 0.0f;
+}
+
+static int CharaObjDecodeSe(unsigned short encodedSe)
+{
+	if (encodedSe == 0 || encodedSe == 0xFFFF) {
+		return 0;
+	}
+	return (encodedSe & 0xFF) + ((encodedSe >> 8) * 1000);
+}
+
+static int CharaObjResolveParticleBank(CGCharaObj* charaObj, unsigned short particleClass)
+{
+	if (particleClass == 0xFE) {
+		int pdtNo = CharaObjGetModelPdtNo(charaObj);
+		return (pdtNo >= 0) ? pdtNo : -1;
+	}
+	if (particleClass >= 0xFD && particleClass <= 0xFF) {
+		return -1;
+	}
+	return particleClass;
 }
 
 /*
@@ -1260,56 +1395,113 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::onDamage(CGPrgObj*, int, int, int, Vec*)
+void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int, int, Vec* hitPos)
 {
-	typedef unsigned int (*VCall0C)(void*);
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	unsigned int cid = GetCID();
+	int resolvedItemId = itemId;
+	unsigned int staType;
+	int resistType = 0;
+	int allowEffect = 0;
+	int severity = 0;
+	int effectResult = 0;
 
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (m_scriptHandle == 0) {
 		damageDelete();
 		changeStat(6, 0, 0);
 		return;
 	}
 
-	int itemId = m_itemId;
-	int itemOffset = itemId * 0x48;
-	unsigned short staType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemOffset + 8);
-
-	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(self + 0x48) + 0x0C);
-	unsigned int cid = cidFn(this);
-	if ((cid & 0x6D) == 0x6D && *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x12) != 0) {
+	if (resolvedItemId < 0) {
+		resolvedItemId = m_itemId;
+	}
+	if (resolvedItemId < 0) {
 		return;
 	}
 
+	if (CharaObjIsPlayerCid(cid) && *reinterpret_cast<short*>(script + 0x12) != 0) {
+		return;
+	}
+	if (CharaObjIsPlayerCid(cid) && static_cast<unsigned short>((m_lastMapIdExtra << 8) | m_lastMapIdHit) != 1) {
+		return;
+	}
 	if ((m_weaponNodeFlags & 0x80) == 0) {
 		return;
 	}
 
-	int regist = 0;
-	int blocked = 0;
-	int special = 0;
-	calcRegist(staType, itemId, regist, blocked, special, 0);
+	staType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 8);
+	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, severity, 0);
 
-	if (regist == 3) {
-		if (staType == 0 || staType == 1 || staType == 3 || staType == 4 || staType == 6 || staType == 8 ||
-			staType == 9 || staType == 0x1C) {
-			putParticle(0x201, 0, static_cast<Vec*>(0), m_attackColRadius, 0x65);
-		} else if (staType == 0x24 || staType == 0x25 || staType == 0x69 || staType == 0x6A) {
-			putParticle(0x200, 0, static_cast<Vec*>(0), m_attackColRadius, 0x1D);
+	if (resistType == 3) {
+		if (CharaObjIsElementalStatus(staType)) {
+			putParticle(0x201, 0, hitPos, m_attackColRadius, 0x65);
+		} else if (CharaObjIsBreakStatus(staType)) {
+			putParticle(0x200, 0, hitPos, m_attackColRadius, 0x1D);
 		}
+	} else if ((resistType > 1 || (resistType == 1 &&
+	           ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x32) & 1) == 0))) &&
+	           CharaObjIsElementalStatus(staType)) {
+		putParticle(0x201, 0, hitPos, m_attackColRadius, 0x65);
 	}
 
-	int outValue = 0;
-	effective(static_cast<int>(staType), itemId, this, outValue);
+	if (m_lastStateId == 8 && m_subState == 1 &&
+	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x2C) & 8) == 0) &&
+	    CharaObjCanFrontGuard(this, sourceObj)) {
+		playSe3D(0x1D, 0x32, 0x96, 0, 0);
+		putParticle(0x200, 0, hitPos, m_attackColRadius, 0);
+		if (sourceObj != 0 && CharaObjIsPlayerCid(sourceObj->GetCID())) {
+			sourceObj->changeStat(0x13, 0, 0);
+		}
+		if (CharaObjIsPlayerCid(cid)) {
+			changeSubStat(2);
+		}
+		allowEffect = 0;
+		effectResult = 0;
+	}
 
-	if (blocked != 0) {
+	if (*reinterpret_cast<short*>(script + 0x1D) != 0) {
+		allowEffect = 0;
+		effectResult = 0;
+	}
+	if (*reinterpret_cast<short*>(script + 0x11) != 0) {
+		allowEffect = 0;
+	}
+	if (*reinterpret_cast<short*>(script + 0x14) != 0 && (staType == 7 || staType == 8)) {
+		allowEffect = 0;
+		effectResult = 0;
+	}
+	if (*reinterpret_cast<short*>(script + 7) == 0) {
+		if (staType == 0x65) {
+			allowEffect = 1;
+			effectResult = 0;
+		} else {
+			allowEffect = 0;
+			effectResult = 0;
+		}
+	} else if (staType == 0x65) {
+		allowEffect = 0;
+		effectResult = 0;
+	} else if (staType == 0x66 || staType == 0x67 || staType == 7) {
+		allowEffect = 1;
+		effectResult = 0;
+	}
+
+	if (allowEffect != 0) {
+		effective(static_cast<int>(staType), resolvedItemId, sourceObj, effectResult);
+	}
+
+	if (effectResult == 0) {
+		damageDelete();
 		changeStat(6, 0, 0);
 		return;
 	}
 
-	if (outValue == 0) {
-		damageDelete();
+	if (staType == 0x1C || staType == 4 || staType < 2) {
 		changeStat(6, 0, 0);
+	} else if (staType == 0x25 || staType == 0x68 || staType == 0x6A) {
+		changeStat(0x19, 0, 0);
+	} else if (staType == 0x6B) {
+		changeStat(0x1A, 0, 0);
 	}
 }
 
@@ -1362,10 +1554,175 @@ void CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0,
  */
 void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg1, Vec* pos)
 {
-	if (pos == 0) {
-		pos = &m_worldPosition;
+	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
+	unsigned short particleClass = *reinterpret_cast<unsigned short*>(itemData + 0x12);
+	int particleBank = CharaObjResolveParticleBank(this, particleClass);
+	unsigned short particleEntry = 0xFFFF;
+	unsigned short particleFlags = 0;
+	int particleNo = -1;
+	int seNo = 0;
+	bool emittedCustom = false;
+
+	if (particleBank >= 0) {
+		particleEntry = *reinterpret_cast<unsigned short*>(itemData + 0x14 + effectArg0 * 2);
+		if (particleEntry != 0xFFFF) {
+			particleFlags = particleEntry;
+			particleNo = particleEntry & 0xFF;
+
+			if ((particleFlags & 0x1000) != 0) {
+				particleBank = 1;
+			} else if ((particleFlags & 0x2000) != 0) {
+				particleBank = 2;
+			} else if ((particleFlags & 0x4000) != 0) {
+				particleBank = 3;
+			} else if (particleBank == 1 && particleNo < 8 && m_scriptHandle != 0) {
+				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xF8);
+			}
+
+			if ((particleFlags & 0x800) != 0 && m_scriptHandle != 0) {
+				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
+			}
+		}
 	}
-	putParticle(effectId, effectArg0, pos, 1.0f, effectArg1);
+
+	if (particleNo >= 0) {
+		ResetParticleWork__13CFlatRuntime2Fii(CFlat, (particleBank << 8) | particleNo, effectArg1);
+		SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, *reinterpret_cast<unsigned short*>(itemData + 0x10) * 0.01f);
+		SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, effectId, this);
+		SetParticleWorkSpeed__13CFlatRuntime2Ff(CFlat, *reinterpret_cast<unsigned short*>(itemData + 0x26) * 0.01f);
+
+		if (effectId > 500) {
+			unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
+			int colType = -1;
+			if (itemType == 1 || itemType == 4 || itemType == 8 || itemType == 9) {
+				colType = itemType;
+			}
+			if (colType >= 0) {
+				SetParticleWorkCol__13CFlatRuntime2Fiif(CFlat, colType, -1, *reinterpret_cast<unsigned short*>(itemData + 4) * 0.01f);
+			}
+		}
+
+		switch (effectArg0) {
+		case 0:
+			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x38));
+			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x3A) & 0x8000) != 0) {
+				SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3A) & 0xFF);
+				seNo = 0;
+			}
+			break;
+		case 1:
+			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x3C));
+			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x3E) & 0x8000) != 0) {
+				SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3E) & 0xFF);
+				seNo = 0;
+			}
+			break;
+		case 2:
+			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x40));
+			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x400) != 0) {
+				SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+				seNo = 0;
+			}
+			break;
+		default:
+			break;
+		}
+
+		if ((particleFlags & 0x100) != 0) {
+			SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+		} else if ((particleFlags & 0x200) != 0) {
+			float distance = *reinterpret_cast<unsigned short*>(itemData + 0x2A) * 1.0f;
+			Vec offsetPos;
+			offsetPos.x = m_worldPosition.x + sinf(m_rotTargetY) * distance;
+			offsetPos.y = m_worldPosition.y;
+			offsetPos.z = m_worldPosition.z + cosf(m_rotTargetY) * distance;
+			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, offsetPos, m_rotTargetY);
+			SetParticleWorkVector__13CFlatRuntime2Fff(CFlat, m_rotTargetY, 0.0f);
+			if ((*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x4000) != 0) {
+				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, m_worldPosition, m_rotTargetY);
+				SetParticleWorkTarget__13CFlatRuntime2FR3Vec(CFlat, m_jumpOffset);
+				SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+			}
+		} else if (pos != 0) {
+			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, m_rotTargetY);
+		} else if ((particleFlags & 0x400) != 0) {
+			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, m_jumpOffset, 0.0f);
+		} else {
+			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, m_worldPosition, m_rotTargetY);
+		}
+
+		if (effectId == 0x3B4 && effectArg0 == 3 && pos != 0) {
+			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, m_rotTargetY);
+			PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			emittedCustom = true;
+		} else if (effectId == 0x409 && effectArg0 == 3) {
+			for (int i = 3; i < 9; i++) {
+				SetParticleWorkNo__13CFlatRuntime2Fi(CFlat, (particleBank << 8) | i);
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			}
+			emittedCustom = true;
+		} else if (effectId > 0x46C && effectId < 0x46F) {
+			if (effectArg0 == 2 && m_stateFrame > 0xF) {
+				Vec randomPos;
+				randomPos.x = m_worldPosition.x + Math.RandFPM(20.0f);
+				randomPos.y = m_worldPosition.y + 1.0f;
+				randomPos.z = m_worldPosition.z + Math.RandFPM(20.0f);
+				SetParticleWorkNo__13CFlatRuntime2Fi(CFlat, (particleBank << 8) | 0x1D);
+				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, randomPos, m_rotTargetY);
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				emittedCustom = true;
+			} else if (effectArg0 == 3) {
+				for (int i = 0x0D; i < 0x1D; i++) {
+					SetParticleWorkNo__13CFlatRuntime2Fi(CFlat, (particleBank << 8) | i);
+					PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				}
+				emittedCustom = true;
+			}
+		} else if (effectId > 0x472 && effectId < 0x479 && effectArg0 == 3) {
+			for (int i = 7; i < 0x0C; i++) {
+				SetParticleWorkNo__13CFlatRuntime2Fi(CFlat, (particleBank << 8) | i);
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			}
+			emittedCustom = true;
+		} else if (effectId > 0x49C && effectId < 0x4A0 && effectArg0 == 2) {
+			for (int i = 0; i < 2; i++) {
+				float side = (i == 0) ? 76.0f : -76.0f;
+				Vec sidePos;
+				sidePos.x = m_worldPosition.x + cosf(m_rotTargetY) * side;
+				sidePos.y = m_worldPosition.y;
+				sidePos.z = m_worldPosition.z - sinf(m_rotTargetY) * side;
+				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, sidePos, m_rotTargetY);
+				SetParticleWorkVector__13CFlatRuntime2Fff(CFlat, m_rotTargetY, 0.0f);
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			}
+			emittedCustom = true;
+		}
+
+		if (seNo != 0) {
+			Vec* sePos = (effectArg0 == 2) ? pos : 0;
+			int seHandle = playSe3D(seNo, 0x32, 0x96, 0, sePos);
+			Sound.SetSe3DGroup(seHandle, m_particleId);
+		}
+
+		if (!emittedCustom) {
+			unsigned short fanCount = *reinterpret_cast<unsigned short*>(itemData + 0x24);
+			if (effectArg0 == 3 && fanCount > 1) {
+				for (int i = 0; i < fanCount; i++) {
+					float t = (fanCount > 1) ? ((float)i / (float)(fanCount - 1)) : 0.0f;
+					SetParticleWorkVector__13CFlatRuntime2Fff(CFlat, t * 0.75f, 0.0f);
+					PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				}
+			} else {
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			}
+		}
+	} else if (effectArg0 == 2) {
+		seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x40));
+		if (seNo != 0) {
+			int seHandle = playSe3D(seNo, 0x32, 0x96, 0, pos);
+			Sound.SetSe3DGroup(seHandle, m_particleId);
+		}
+	}
 }
 
 /*
@@ -1695,16 +2052,16 @@ void CGCharaObj::StaticFrame()
  */
 void CGCharaObj::combi2()
 {
-	CGPartyObj* candidates[4];
+	CGPartyObj* candidates[5];
 	int candidateCount = 0;
+
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];
 		if (party == 0) {
 			continue;
 		}
-		int state = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party) + 0x520);
-		int subState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party) + 0x52C);
-		if ((state == 6 || state == 2) && subState == 1) {
+
+		if ((party->m_lastStateId == 6 || party->m_lastStateId == 2) && party->m_subState == 1) {
 			candidates[candidateCount++] = party;
 		}
 	}
@@ -1713,18 +2070,159 @@ void CGCharaObj::combi2()
 		return;
 	}
 
+	for (int i = 0; i < candidateCount; i++) {
+		CGPartyObj* party = candidates[i];
+		if (party == 0 || party->m_comboState == 0) {
+			continue;
+		}
+
+		bool hasNearbyPartner = false;
+		for (int j = 0; j < candidateCount; j++) {
+			if (i == j) {
+				continue;
+			}
+
+			CGPartyObj* other = candidates[j];
+			if (other == 0 || other->m_comboState == 0) {
+				continue;
+			}
+
+			if (PSVECDistance(&CharaObjComboCenter(party), &CharaObjComboCenter(other)) < 20.0f) {
+				hasNearbyPartner = true;
+				break;
+			}
+		}
+
+		unsigned char& comboFlags = CharaObjComboFlags(party);
+		const bool hadNearbyPartner = (comboFlags & 0x40) != 0;
+		if (hasNearbyPartner != hadNearbyPartner) {
+			comboFlags = (comboFlags & ~0x40) | (hasNearbyPartner ? 0x40 : 0);
+			comboFlags = (comboFlags & ~0x10) | 0x10;
+			party->playSe3D(hasNearbyPartner ? 0x3E : 0x3D, 0x32, 0x96, 0, 0);
+		}
+	}
+
+	for (int i = 0; i < candidateCount - 1; i++) {
+		for (int j = i + 1; j < candidateCount; j++) {
+			if (candidates[i]->m_comboFrame < candidates[j]->m_comboFrame) {
+				CGPartyObj* swap = candidates[i];
+				candidates[i] = candidates[j];
+				candidates[j] = swap;
+			}
+		}
+	}
+
+	for (int i = 1; i < candidateCount; ) {
+		if (PSVECDistance(&CharaObjComboCenter(candidates[0]), &CharaObjComboCenter(candidates[i])) > 20.0f) {
+			for (int j = i; j < candidateCount - 1; j++) {
+				candidates[j] = candidates[j + 1];
+			}
+			candidateCount--;
+			continue;
+		}
+		i++;
+	}
+
+	if (candidates[0]->m_comboFrame == 0) {
+		return;
+	}
+
 	int fallback = 0;
 	int comboIndex = searchCombi(candidateCount, candidates, fallback);
 	if (comboIndex < 0) {
-		for (int i = 0; i < candidateCount; i++) {
-			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(candidates[i]) + 0x118) = 0.0f;
-			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(candidates[i]) + 0x110) = 0.0f;
-			reinterpret_cast<CGPrgObj*>(candidates[i])->addSubStat();
+		if (fallback == 0 || candidates[0]->m_comboFrame > 0x41) {
+			candidates[0]->m_comboState = 0;
+			candidates[0]->m_comboFrame = 0;
+			candidates[0]->addSubStat();
+			combi2();
 		}
 		return;
 	}
 
-	sendCombiToScript(this, comboIndex, fallback);
+	if (fallback != 0 && candidates[0]->m_comboFrame <= 0x41) {
+		return;
+	}
+
+	unsigned short* comboData = reinterpret_cast<unsigned short*>(Game.unk_flat3_field_1C_0xc7d8) + comboIndex * 0xD;
+	int participantCount = 0;
+	if (comboData[0] != 0) {
+		participantCount = 1;
+		if (comboData[3] != 0) {
+			participantCount = 2;
+			if (comboData[6] != 0) {
+				participantCount = 3;
+				if (comboData[9] != 0) {
+					participantCount = 4;
+				}
+			}
+		}
+	}
+
+	const unsigned short comboCmd = comboData[0xC];
+	const bool isSharedResult = comboData[participantCount * 3 - 3] != 0x1F8;
+	Vec comboCenter = {0.0f, 0.0f, 0.0f};
+	if (isSharedResult) {
+		for (int i = 0; i < participantCount; i++) {
+			PSVECAdd(&comboCenter, &CharaObjComboCenter(candidates[i]), &comboCenter);
+		}
+		PSVECScale(&comboCenter, &comboCenter, 1.0f / static_cast<float>(participantCount));
+	}
+
+	CGPartyObj* leadParty = candidates[participantCount - 1];
+	bool playedComboSe = false;
+	for (int i = 0; i < participantCount; i++) {
+		CGPartyObj* party = candidates[i];
+		unsigned int comboMode = 0xFFFFFFFF;
+
+		if (isSharedResult) {
+			CharaObjComboCenter(party) = comboCenter;
+			if (playedComboSe || CharaObjSkipComboScript(party)) {
+				CharaObjComboScriptArg(party) = 0;
+			} else {
+				CharaObjComboScriptArg(party) = comboCmd;
+				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
+				playedComboSe = true;
+			}
+		} else {
+			if (comboCmd == 0x207) {
+				comboMode = 0;
+			} else if (comboCmd == 0x20B) {
+				comboMode = 1;
+			} else if (comboCmd == 0x20F) {
+				comboMode = 2;
+			}
+
+			if (party == leadParty) {
+				CharaObjComboItemState(party) = static_cast<int>(comboMode);
+				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
+			} else {
+				CharaObjComboCenter(party) = leadParty->m_worldPosition;
+				CharaObjComboScriptArg(party) = 0;
+			}
+		}
+
+		party->m_comboState = 0;
+		party->m_comboFrame = 0;
+		party->addSubStat();
+		party->putComboParticle();
+
+		CharaObjComboScriptArg(party) = comboCmd;
+		CharaObjComboScriptMode(party) = comboMode;
+		CharaObjComboLinkCount(party) = 0.0f;
+
+		int linkCount = 0;
+		CGPrgObj** comboLinks = CharaObjComboLinks(party);
+		for (int j = 0; j < participantCount; j++) {
+			CGPartyObj* other = candidates[j];
+			if (party == other) {
+				continue;
+			}
+			comboLinks[linkCount++] = other;
+		}
+		CharaObjComboLinkCount(party) = static_cast<float>(linkCount);
+	}
+
+	combi2();
 }
 
 /*

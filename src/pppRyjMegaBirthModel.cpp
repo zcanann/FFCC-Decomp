@@ -37,6 +37,56 @@ static inline u8* u8_at(void* base, s32 off)
     return (u8*)base + off;
 }
 
+static inline unsigned char clamp_u8(float value)
+{
+    int ivalue = (int)value;
+    if (ivalue < 0) {
+        return 0;
+    }
+    if (ivalue > 0xFF) {
+        return 0xFF;
+    }
+    return (unsigned char)ivalue;
+}
+
+static float calc_spawn_speed(float speedMag, u8 speedMode)
+{
+    switch (speedMode) {
+    case 1:
+        (void)Math.RandF();
+        return Math.RandF() * speedMag;
+    case 2:
+        return Math.RandF() * Math.RandF() * speedMag;
+    case 3:
+        return -(Math.RandF() * Math.RandF() * speedMag - speedMag);
+    case 4:
+        return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speedMag;
+    case 5:
+        return -(Math.RandF() * Math.RandF() * Math.RandF() * speedMag - speedMag);
+    default:
+        return Math.RandF() * speedMag;
+    }
+}
+
+static void orthonormalize_particle_matrix(_PARTICLE_DATA* particleData)
+{
+    pppFMATRIX model;
+    Vec rowX;
+    Vec rowY;
+    Vec rowZ;
+    Vec rowPos;
+
+    PSMTXCopy(particleData->m_matrix, model.value);
+    pppGetRowVector(model, rowX, rowY, rowZ, rowPos);
+    pppNormalize(rowY, rowY);
+    pppOuterProduct(rowZ, rowY, rowX);
+    pppNormalize(rowZ, rowZ);
+    pppOuterProduct(rowX, rowZ, rowY);
+    pppNormalize(rowX, rowX);
+    pppSetRowVector(model, rowX, rowY, rowZ, rowPos);
+    PSMTXCopy(model.value, particleData->m_matrix);
+}
+
 /*
  * --INFO--
  * Address: TODO
@@ -233,14 +283,13 @@ void birth(
     _pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirthModel* params, VColor* color,
     _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, _PARTICLE_COLOR* particleColor)
 {
-    (void)work;
-
     u8* payload = (u8*)params;
     u8 mode = payload[0x2A];
     float spread = (float)payload[0x2B];
     float halfSpread = spread;
     float randomRange = FLOAT_803304c0 * spread;
     float speedMag = *(float*)(payload + 0x130);
+    u8 speedMode = payload[0x130];
     Vec pos;
 
     memset(particleData, 0, 0xA0);
@@ -276,6 +325,64 @@ void birth(
         particleData->m_colorDeltaAdd[0] = randX;
         particleData->m_colorDeltaAdd[1] = randY;
         particleData->m_colorDeltaAdd[2] = randZ;
+
+        pppFMATRIX baseMatrix;
+        pppFMATRIX rotatedMatrix;
+        Vec rot;
+        Vec forward;
+
+        pppUnitMatrix(baseMatrix);
+        rot.x = randX;
+        rot.y = randY;
+        rot.z = randZ;
+        pppRotMatrix(rotatedMatrix, baseMatrix, rot);
+
+        forward.x = baseDirectionX;
+        forward.y = baseDirectionY;
+        forward.z = baseDirectionZ;
+        pppApplyMatrix(forward, rotatedMatrix, forward);
+        forward.x *= *(float*)(payload + 0x54);
+        forward.y *= *(float*)(payload + 0x58);
+        forward.z *= *(float*)(payload + 0x5C);
+        particleData->m_matrix[0][1] = forward.x;
+        particleData->m_matrix[1][1] = forward.y;
+        particleData->m_matrix[2][1] = forward.z;
+        orthonormalize_particle_matrix(particleData);
+    } else if (mode == 8 || mode == 9) {
+        Vec spawnPoint;
+
+        spawnPoint.x = work->m_currentPosition.x;
+        spawnPoint.y = work->m_currentPosition.y;
+        spawnPoint.z = work->m_currentPosition.z;
+
+        if (mode == 8) {
+            float t = (float)(work->m_unused1E & 0xFF) / 255.0f;
+            spawnPoint.x = work->m_previousPosition.x +
+                           (work->m_currentPosition.x - work->m_previousPosition.x) * t;
+            spawnPoint.y = work->m_previousPosition.y +
+                           (work->m_currentPosition.y - work->m_previousPosition.y) * t;
+            spawnPoint.z = work->m_previousPosition.z +
+                           (work->m_currentPosition.z - work->m_previousPosition.z) * t;
+            work->m_unused1E = (u16)(work->m_unused1E + 0x21);
+        } else {
+            Vec delta;
+            delta.x = work->m_currentPosition.x - work->m_previousPosition.x;
+            delta.y = work->m_currentPosition.y - work->m_previousPosition.y;
+            delta.z = work->m_currentPosition.z - work->m_previousPosition.z;
+            spawnPoint.x += delta.x * Math.RandF();
+            spawnPoint.y += delta.y * Math.RandF();
+            spawnPoint.z += delta.z * Math.RandF();
+        }
+
+        spawnPoint.x *= *(float*)(payload + 0x54);
+        spawnPoint.y *= *(float*)(payload + 0x58);
+        spawnPoint.z *= *(float*)(payload + 0x5C);
+        pos = spawnPoint;
+
+        particleData->m_matrix[0][1] = work->m_accelerationAxis.x;
+        particleData->m_matrix[1][1] = work->m_accelerationAxis.y;
+        particleData->m_matrix[2][1] = work->m_accelerationAxis.z;
+        orthonormalize_particle_matrix(particleData);
     }
 
     particleData->m_matrix[0][3] = pos.x;
@@ -283,10 +390,20 @@ void birth(
     particleData->m_matrix[2][3] = pos.z;
 
     if (speedMag != FLOAT_80330498) {
+        float speedX = calc_spawn_speed(speedMag, speedMode);
+        float speedY = calc_spawn_speed(speedMag, speedMode);
+        float speedZ = calc_spawn_speed(speedMag, speedMode);
         float halfSpeed = speedMag * 0.5f;
-        particleData->m_velocity.x = Math.RandF() * speedMag - halfSpeed;
-        particleData->m_velocity.y = Math.RandF() * speedMag - halfSpeed;
-        particleData->m_velocity.z = Math.RandF() * speedMag - halfSpeed;
+
+        if (mode < 6) {
+            particleData->m_matrix[0][3] = (speedX - halfSpeed) * *(float*)(payload + 0x54);
+            particleData->m_matrix[1][3] = (speedY - halfSpeed) * *(float*)(payload + 0x58);
+            particleData->m_matrix[2][3] = (speedZ - halfSpeed) * *(float*)(payload + 0x5C);
+        } else {
+            particleData->m_velocity.x = speedX - halfSpeed;
+            particleData->m_velocity.y = speedY - halfSpeed;
+            particleData->m_velocity.z = speedZ - halfSpeed;
+        }
     }
 
     particleData->m_sizeStart = *(float*)(payload + 0x84);
@@ -419,10 +536,66 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
  */
 void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
 {
-    (void)obj;
-    (void)stepData;
-    (void)ctrlTable;
-    // Keep the original file-scope matrix scratch live until the draw path is restored.
+    PRyjMegaBirthModel* params = (PRyjMegaBirthModel*)stepData;
+    VRyjMegaBirthModel* work =
+        (VRyjMegaBirthModel*)((u8*)obj + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
+    int modelIndex = *(int*)((u8*)params + 4);
+
+    if (modelIndex == 0xFFFF || work->m_particleBlock == NULL) {
+        return;
+    }
+
+    if ((*(u8*)((u8*)params + 0x136) != 0) && (work->m_worldMatrixBlock == NULL)) {
+        return;
+    }
+
+    if ((*(u8*)((u8*)params + 0x131) != 0) && (work->m_colorBlock == NULL)) {
+        return;
+    }
+
+    pppModelSt* model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[modelIndex];
+    if (model == NULL) {
+        return;
+    }
+
+    pppFMATRIX emitterMatrix;
+    pppFMATRIX scratchMatrix;
+
+    init_matrix(obj, emitterMatrix, params, work);
+    pppUnitMatrix(scratchMatrix);
+    pppInitBlendMode();
+    pppSetBlendMode(0);
+
+    for (int i = 0; i < work->m_numParticles; i++) {
+        _PARTICLE_DATA* particle = (_PARTICLE_DATA*)((u8*)work->m_particleBlock + i * 0xA0);
+        _PARTICLE_WMAT* particleWorldMatrix = 0;
+        _PARTICLE_COLOR* particleColor = 0;
+
+        if (*s16_at(particle, 0x22) == 0) {
+            continue;
+        }
+
+        if (work->m_worldMatrixBlock != NULL) {
+            particleWorldMatrix = (_PARTICLE_WMAT*)(work->m_worldMatrixBlock + i);
+        }
+        if (work->m_colorBlock != NULL) {
+            particleColor = work->m_colorBlock + i;
+        }
+
+        pppFMATRIX drawMatrix;
+        pppCVECTOR drawColor = {{0xFF, 0xFF, 0xFF, clamp_u8(*f32_at(particle, 0x98))}};
+
+        if (particleColor != NULL) {
+            drawColor.rgba[0] = clamp_u8(particleColor->m_color[0]);
+            drawColor.rgba[1] = clamp_u8(particleColor->m_color[1]);
+            drawColor.rgba[2] = clamp_u8(particleColor->m_color[2]);
+        }
+
+        set_matrix(obj, emitterMatrix, scratchMatrix, params, particle, particleWorldMatrix, drawMatrix, 0);
+        pppSetDrawEnv(&drawColor, &drawMatrix, 0.0f, 0, 0, 0, 0, 1, 1, 0);
+        pppDrawMesh(model, 0, 1);
+    }
+
     PSMTXCopy(g_matKeep, g_matTmp);
 }
 

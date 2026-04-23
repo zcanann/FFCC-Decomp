@@ -830,10 +830,11 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMath::CrossCheckEllipseCapsule(Vec* outCoeffs, float* outCoeffScalar, Vec* p0, Vec* p1, float radius, Vec* p2,
-                                     float scaleA, float scaleB)
+extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
+    float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outCoeffScalar, Vec* p0,
+    Vec* p1, Vec* p2, Vec* p3)
 {
-    const float r2 = radius * radius;
+    float r2 = radius * radius;
     Vec4d coeffs;
     coeffs.w = radius * r2;
     coeffs.z = (2.0f * coeffs.w) - (3.0f * r2);
@@ -852,8 +853,8 @@ void CMath::CrossCheckEllipseCapsule(Vec* outCoeffs, float* outCoeffScalar, Vec*
     control[3][2] = 1.0f;
 
     float t0 = 0.0f;
-    if (scaleA + radius != 0.0f) {
-        t0 = scaleA / (scaleA + radius);
+    if (scaleA + scaleB != 0.0f) {
+        t0 = scaleA / (scaleA + scaleB);
     }
 
     Vec tangent;
@@ -861,27 +862,27 @@ void CMath::CrossCheckEllipseCapsule(Vec* outCoeffs, float* outCoeffScalar, Vec*
     PSVECSubtract(p2, p1, &tangent);
     PSVECSubtract(p1, p0, &tmp);
     PSVECAdd(&tangent, &tmp, &tangent);
-    PSVECScale(&tangent, &tangent, t0 * scaleA);
+    PSVECScale(&tangent, &tangent, t0 * scale);
     control[0][1] = tangent.x;
     control[1][1] = tangent.y;
     control[2][1] = tangent.z;
     control[3][1] = 1.0f;
 
     float t1 = 0.0f;
-    if (scaleA + scaleB != 0.0f) {
-        t1 = scaleA / (scaleA + scaleB);
+    if (scaleB + scaleC != 0.0f) {
+        t1 = scaleB / (scaleB + scaleC);
     }
 
-    PSVECSubtract(outCoeffs, p2, &tangent);
+    PSVECSubtract(p3, p2, &tangent);
     PSVECSubtract(p2, p1, &tmp);
     PSVECAdd(&tangent, &tmp, &tangent);
-    PSVECScale(&tangent, &tangent, t1 * scaleA);
+    PSVECScale(&tangent, &tangent, t1 * scale);
     control[0][3] = tangent.x;
     control[1][3] = tangent.y;
     control[2][3] = tangent.z;
     control[3][3] = 1.0f;
 
-    MTX44MultVec4(control, &coeffs, &coeffs);
+    MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(math, control, &coeffs, &coeffs);
     outCoeffScalar[0] = coeffs.x;
     outCoeffScalar[1] = coeffs.y;
     outCoeffScalar[2] = coeffs.z;

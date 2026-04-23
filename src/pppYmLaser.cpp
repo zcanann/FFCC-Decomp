@@ -191,10 +191,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	Mtx tempMtx;
 	bool emptyHistory;
 
-	if ((gPppCalcDisabled != 0) || (step->m_stepValue == 0xFFFF)) {
-		return;
-	}
-
+	if ((gPppCalcDisabled == 0) && (step->m_stepValue != 0xFFFF)) {
 	work = (pppYmLaserWork*)((u8*)laser + 0x80 + data->m_serializedDataOffsets[2]);
 	emptyHistory = false;
 
@@ -317,6 +314,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
 			pppCopyVector(points[i], points[0]);
 		}
+	}
 	}
 }
 

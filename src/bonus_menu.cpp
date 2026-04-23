@@ -171,6 +171,66 @@ static void TickAnimSprites(int statePtr, int animPtr, int fadeDir)
 	}
 }
 
+static int GetActiveBonusPartyCount()
+{
+	unsigned int* scriptFoodBase = Game.m_scriptFoodBase;
+	int activePartyCount = 0;
+
+	for (int i = 0; i < 4; i++) {
+		if (scriptFoodBase[i] != 0) {
+			activePartyCount++;
+		}
+	}
+
+	return (activePartyCount > 0) ? activePartyCount : 1;
+}
+
+static float ClampBonusUnit(float value)
+{
+	if (value < 0.0f) {
+		return 0.0f;
+	}
+	if (value > 1.0f) {
+		return 1.0f;
+	}
+	return value;
+}
+
+static float CalcBonusSpriteProgress(const BonusAnimSprite* sprite, int frame)
+{
+	if (frame < sprite->startFrame) {
+		return -1.0f;
+	}
+	if (sprite->duration <= 0) {
+		return 1.0f;
+	}
+
+	return ClampBonusUnit((float)(frame - sprite->startFrame + 1) / (float)sprite->duration);
+}
+
+static void BuildDefaultResultSprites(BonusAnimSprite* sprites, int activePartyCount)
+{
+	InitAnimSprite(&sprites[0], 0x16, 0, 0, 0x280, 0x1c0, 0, 8);
+	sprites[0].depth = 0.0f;
+	sprites[0].scale = 3.0f;
+	sprites[0].alpha = 1.0f;
+
+	for (int i = 0; i < activePartyCount; i++) {
+		int frameIdx = i + 1;
+		int iconIdx = 1 + activePartyCount + i;
+		int digitIdx = 1 + activePartyCount + activePartyCount + i;
+
+		InitAnimSprite(&sprites[frameIdx], 0x17, 0x80, (short)(0x38 + i * 0x60), 0x1a0, 0x40, 0x16 + i * 3, 8);
+		sprites[frameIdx].alpha = 1.0f;
+
+		InitAnimSprite(&sprites[iconIdx], 0x18, 0x48, (short)(0x28 + i * 0x60), 0x60, 0x58, 0x40 + i * 3, 8);
+		sprites[iconIdx].alpha = 1.0f;
+
+		InitAnimSprite(&sprites[digitIdx], -2, (short)(0x1b8 + i * 8), (short)(0x4c + i * 0x60), 0x18, 0x18, 0x58 + i * 2, 8);
+		sprites[digitIdx].alpha = 1.0f;
+	}
+}
+
 } // namespace
 
 /*
@@ -676,20 +736,170 @@ void CMenuPcs::CalcResultCloseAnim()
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+	const int activePartyCount = GetActiveBonusPartyCount();
+	const int baseCount = 1 + activePartyCount * 3;
+	const int frameBase = 1;
+	const int iconBase = frameBase + activePartyCount;
+	const int digitBase = iconBase + activePartyCount;
+	const int frameEchoBase = digitBase + activePartyCount;
+	const int iconEchoBase = frameEchoBase + activePartyCount;
+	const int digitEchoBase = iconEchoBase + activePartyCount;
+	const int closeCount = digitEchoBase + activePartyCount;
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+		BonusAnimSprite originals[0x20];
+		int originalCount = header->count;
+
+		memset(originals, 0, sizeof(originals));
+		if (originalCount <= 0 || originalCount > (int)(sizeof(originals) / sizeof(originals[0]))) {
+			originalCount = baseCount;
+		}
+		for (int i = 0; i < originalCount; i++) {
+			originals[i] = sprites[i];
+		}
+		if (originalCount == baseCount && originals[0].w == 0) {
+			BuildDefaultResultSprites(originals, activePartyCount);
+		}
+
 		*(short*)(statePtr + 0x22) = 0;
 		header->finished = 0;
-		for (int i = 0; i < (int)header->count; i++) {
-			sprites[i].timer = 0;
-			sprites[i].duration = 8;
-			sprites[i].startFrame = i;
+		memset((void*)sprites, 0, sizeof(BonusAnimSprite) * closeCount);
+		header->count = (short)closeCount;
+		header->unk02 = 0;
+		header->unk04 = 0;
+
+		sprites[0] = originals[0];
+		sprites[0].timer = 0;
+		sprites[0].startFrame = 0;
+		sprites[0].duration = 14;
+		sprites[0].alpha = 1.0f;
+		sprites[0].scale = (sprites[0].scale > 0.0f) ? sprites[0].scale : 3.0f;
+
+		for (int i = 0; i < activePartyCount; i++) {
+			int srcFrameIdx = (frameBase + i < originalCount) ? frameBase + i : 0;
+			int srcIconIdx = (iconBase + i < originalCount) ? iconBase + i : 0;
+			int srcDigitIdx = (digitBase + i < originalCount) ? digitBase + i : 0;
+
+			sprites[frameBase + i] = originals[srcFrameIdx];
+			sprites[frameBase + i].timer = 0;
+			sprites[frameBase + i].startFrame = i * 2;
+			sprites[frameBase + i].duration = 12;
+			sprites[frameBase + i].alpha = 1.0f;
+			sprites[frameBase + i].kind = 0x17;
+			sprites[frameBase + i].tex = 0x17;
+
+			sprites[iconBase + i] = originals[srcIconIdx];
+			sprites[iconBase + i].timer = 0;
+			sprites[iconBase + i].startFrame = 2 + i * 2;
+			sprites[iconBase + i].duration = 10;
+			sprites[iconBase + i].alpha = 1.0f;
+			sprites[iconBase + i].kind = 0x18;
+			sprites[iconBase + i].tex = 0x18;
+
+			sprites[digitBase + i] = originals[srcDigitIdx];
+			sprites[digitBase + i].timer = 0;
+			sprites[digitBase + i].startFrame = 4 + i * 2;
+			sprites[digitBase + i].duration = 12;
+			sprites[digitBase + i].alpha = 1.0f;
+			sprites[digitBase + i].kind = -2;
+			sprites[digitBase + i].tex = -2;
+			if (sprites[digitBase + i].w == 0) {
+				sprites[digitBase + i].w = 0x18;
+			}
+			if (sprites[digitBase + i].h == 0) {
+				sprites[digitBase + i].h = 0x18;
+			}
+
+			sprites[frameEchoBase + i] = sprites[frameBase + i];
+			sprites[frameEchoBase + i].timer = 0;
+			sprites[frameEchoBase + i].startFrame = 6 + i * 2;
+			sprites[frameEchoBase + i].duration = 8;
+			sprites[frameEchoBase + i].alpha = 0.9f;
+
+			sprites[iconEchoBase + i] = sprites[iconBase + i];
+			sprites[iconEchoBase + i].timer = 0;
+			sprites[iconEchoBase + i].startFrame = 7 + i * 2;
+			sprites[iconEchoBase + i].duration = 8;
+			sprites[iconEchoBase + i].alpha = 0.8f;
+
+			sprites[digitEchoBase + i] = sprites[digitBase + i];
+			sprites[digitEchoBase + i].timer = 0;
+			sprites[digitEchoBase + i].startFrame = 8 + i * 2;
+			sprites[digitEchoBase + i].duration = 10;
+			sprites[digitEchoBase + i].alpha = 0.75f;
 		}
+
+		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
 		*(unsigned char*)(statePtr + 0xb) = 1;
 		return;
 	}
 
-	TickAnimSprites(statePtr, animPtr, -1);
+	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
+	int frame = (int)*(short*)(statePtr + 0x22);
+	int doneCount = 0;
+
+	for (int i = 0; i < (int)header->count; i++) {
+		BonusAnimSprite* sprite = &sprites[i];
+		float progress = CalcBonusSpriteProgress(sprite, frame);
+		float fade;
+
+		if (progress < 0.0f) {
+			continue;
+		}
+
+		sprite->timer = frame - sprite->startFrame + 1;
+		fade = 1.0f - progress;
+		if (i >= frameEchoBase) {
+			fade *= 0.8f;
+		}
+		sprite->alpha = ClampBonusUnit(fade);
+
+		if (i == 0) {
+			sprite->mulX = 0.0f;
+			sprite->mulY = 0.0f;
+			sprite->scale = 3.0f - progress * 1.5f;
+		} else if (i >= frameBase && i < iconBase) {
+			float dir = (i & 1) ? 1.0f : -1.0f;
+			sprite->mulX = (-36.0f - i * 2.0f) * progress;
+			sprite->mulY = dir * 6.0f * progress;
+			sprite->scale = 1.0f - progress * 0.08f;
+		} else if (i >= iconBase && i < digitBase) {
+			float dir = (i & 1) ? -1.0f : 1.0f;
+			sprite->mulX = (42.0f + i * 3.0f) * dir * progress;
+			sprite->mulY = -24.0f * progress;
+			sprite->scale = 1.0f - progress * 0.12f;
+		} else if (i >= digitBase && i < frameEchoBase) {
+			sprite->mulX = 10.0f * progress;
+			sprite->mulY = -38.0f * progress;
+			sprite->scale = 1.0f - progress * 0.2f;
+		} else if (i >= frameEchoBase && i < iconEchoBase) {
+			sprite->mulX = -64.0f * progress;
+			sprite->mulY = 18.0f * progress;
+			sprite->scale = 0.96f - progress * 0.18f;
+		} else if (i >= iconEchoBase && i < digitEchoBase) {
+			sprite->mulX = 64.0f * progress;
+			sprite->mulY = 10.0f * progress;
+			sprite->scale = 0.92f - progress * 0.15f;
+		} else {
+			sprite->mulX = 18.0f * progress;
+			sprite->mulY = -52.0f * progress;
+			sprite->scale = 0.9f - progress * 0.2f;
+		}
+
+		if (sprite->scale < 0.0f) {
+			sprite->scale = 0.0f;
+		}
+		if (progress >= 1.0f) {
+			doneCount++;
+		}
+		if (sprite->timer == 1 && (i == frameBase || i == frameEchoBase)) {
+			Sound.PlaySe(0x49, 0x40, 0x7f, 0);
+		}
+	}
+
+	if (doneCount == (int)header->count) {
+		header->finished = 1;
+	}
 	if (header->finished != 0) {
 		*(short*)(animPtr + 6) = 1;
 	}
@@ -708,6 +918,7 @@ void CMenuPcs::DrawResultCloseAnim()
 {
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int digitIndex = 0;
 
 	if (animPtr == 0 || statePtr == 0) {
 		return;
@@ -716,6 +927,9 @@ void CMenuPcs::DrawResultCloseAnim()
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	float strongest = 0.0f;
+
+	DrawInit__8CMenuPcsFv(this);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
@@ -731,7 +945,15 @@ void CMenuPcs::DrawResultCloseAnim()
 		} else if (sprite->kind == -4) {
 			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
 		} else if (sprite->kind == -2) {
-			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, i);
+			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, digitIndex++);
+		} else {
+			GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+			GXSetChanMatColor(GX_COLOR0A0, color);
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, sprite->tex);
+			DrawRect__8CMenuPcsFUlfffffffff(this, 0,
+			    (float)sprite->x + sprite->mulX, (float)sprite->y + sprite->mulY,
+			    (float)sprite->w, (float)sprite->h,
+			    sprite->depth, sprite->depth, sprite->scale, sprite->scale, 0.0f);
 		}
 
 		if (strongest < alpha) {

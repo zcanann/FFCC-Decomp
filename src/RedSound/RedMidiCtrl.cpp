@@ -945,10 +945,12 @@ void __MidiCtrl_KeyOnVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrac
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_KeyOffSame(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     KeyOffSet(control, keyOnData, track);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

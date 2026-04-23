@@ -1,6 +1,7 @@
 #ifndef _FFCC_CMATH_H_
 #define _FFCC_CMATH_H_
 
+#include "ffcc/mapocttree.h"
 #include "ffcc/manager.h"
 
 struct Vec;
@@ -8,16 +9,6 @@ struct Vec4d;
 struct SRT;
 
 void VECMultAdd(Vec*, Vec*, Vec*, float);
-
-class CBound
-{
-public:
-    CBound();
-    static void SetFrustum(Vec&, float(*)[4]);
-    int CheckFrustum0(CBound&);
-    int CheckFrustum0(float);
-    int CheckFrustum(Vec&, float(*)[4], float);
-};
 
 class SRT
 {

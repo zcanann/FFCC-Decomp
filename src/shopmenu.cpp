@@ -12,18 +12,25 @@
 extern "C" {
 void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void _WaitDrawDone__8CGraphicFPci(void*, char*, int);
+void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
+void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 void SetMode__9CShopMenuFi(void*, int);
 void DrawSingleBase__8CMenuPcsFf(void*, float);
 void ReleasePdt__8CPartPcsFi(void*, int);
 int LoadMenuPdt__8CPartPcsFPc(void*, char*);
 int GetItemType__8CMenuPcsFii(void*, int, int);
 const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
+void GetRaceStr__8CMenuPcsFiPc(void*, int, char*);
 int GetData__13CAmemCacheSetFsPci(void*, short, char*, int);
 int ChkEquipPossible__8CMenuPcsFi(void*, int);
 void GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(void*, int, short*);
 int CanAddGil__12CCaravanWorkFi(void*, int);
 void AddItem__12CCaravanWorkFiPi(void*, int, int*);
 void AddGil__12CCaravanWorkFi(void*, int);
+void DeleteItem__12CCaravanWorkFii(void*, int, int);
 void DeleteItemIdx__12CCaravanWorkFii(void*, int, int);
 char EquipChk__8CMenuPcsFi(void*, int);
 int GetSmithItem__8CMenuPcsFi(void*, int);
@@ -31,6 +38,7 @@ int __cntlzw(unsigned int);
 void __dl__FPv(void*);
 void pppCacheLoadShape__FPsP12_pppDataHead(short*, _pppDataHead*);
 int GetEquipType__8CMenuPcsFi(void*, int);
+void ChgEquipPos__12CCaravanWorkFii(void*, int, int);
 char* GetAttrStr__8CMenuPcsFi(void*, int);
 void SetScale__5CFontFf(float, CFont*);
 void SetScaleX__5CFontFf(float, CFont*);
@@ -72,7 +80,10 @@ extern float FLOAT_80332d6c;
 extern float FLOAT_80332d70;
 extern float FLOAT_80332d74;
 extern float FLOAT_80332d78;
+extern float FLOAT_80332dc8;
+extern float FLOAT_80332dcc;
 extern float FLOAT_80332dd0;
+extern float FLOAT_80332de0;
 extern float FLOAT_80332e48;
 extern float FLOAT_80332e4c;
 extern float FLOAT_80332d7c;
@@ -157,9 +168,60 @@ static inline unsigned short GetPadButtons()
     return static_cast<unsigned short>(Pad._8_2_);
 }
 
+static unsigned short GetShopMenuListButtons()
+{
+    if (gShopMenuInputLatch == 0) {
+        if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+            return 0;
+        }
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20);
+    }
+
+    unsigned short buttons;
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        buttons = 0;
+    } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        buttons = Pad._4_2_;
+    }
+
+    if ((buttons & gShopMenuInputLatch) == 0) {
+        gShopMenuInputLatch = 0;
+    }
+
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        return 0;
+    }
+    __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+    return static_cast<unsigned short>(Pad._8_2_);
+}
+
 static inline int ShopMenuCaravan(CShopMenu* shopMenu)
 {
     return ShopMenuInt(shopMenu, 0x20);
+}
+
+static unsigned char s_shopMenuTabCacheLanguage = 0xFF;
+static const char* s_shopMenuTabLabels[3];
+static const int s_shopMenuTabLayout[3][2] = {
+    {0x88, 0x92},
+    {0x88, 0xB6},
+    {0x88, 0xDA},
+};
+
+static void RefreshShopMenuTabLabels()
+{
+    unsigned char languageId = Game.m_gameWork.m_languageId;
+    if (s_shopMenuTabCacheLanguage == languageId) {
+        return;
+    }
+
+    int languageIndex = static_cast<int>(languageId) - 1;
+    s_shopMenuTabLabels[0] = PTR_DAT_80214d90[languageIndex];
+    s_shopMenuTabLabels[1] = PTR_DAT_80214d94[languageIndex];
+    s_shopMenuTabLabels[2] = PTR_s_Cancel_80214d98[languageIndex];
+    s_shopMenuTabCacheLanguage = languageId;
 }
 
 static float CalcCenteredShopMenuX(CFont* font, const char* text)
@@ -168,6 +230,56 @@ static float CalcCenteredShopMenuX(CFont* font, const char* text)
         return 0.0f;
     }
     return (464.0f - GetWidth__5CFontFPc(font, text)) * 0.5f;
+}
+
+static void DrawShopMenuFadeOverlay(float fade)
+{
+    if (fade == FLOAT_80332d28) {
+        return;
+    }
+
+    int fadeStep = static_cast<int>(FLOAT_80332de0 * fade);
+    unsigned char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
+
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x32);
+
+    Mtx screenMtx;
+    Mtx44 projectionMtx;
+    PSMTXIdentity(screenMtx);
+    screenMtx[1][1] = -1.0f;
+    screenMtx[1][3] = 480.0f;
+    GXLoadPosMtxImm(screenMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(projectionMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
+
+    _GXColor fadeColor = {0, 0, 0, alpha};
+    GXSetChanAmbColor(GX_COLOR0A0, fadeColor);
+    GXSetChanMatColor(GX_COLOR0A0, fadeColor);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXClearVtxDesc();
+    GXSetVtxAttrFmt(GX_VTXFMT6, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT6, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+
+    Vec topLeft = {0.0f, 0.0f, 0.0f};
+    Vec bottomRight = {640.0f, 480.0f, 0.0f};
+    Graphic.RenderNoTexQuadGrouad(topLeft, bottomRight, fadeColor, fadeColor, fadeColor, fadeColor);
+
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x33);
 }
 
 static int ResolveShopMenuItemCount(CShopMenu* shopMenu)
@@ -208,6 +320,41 @@ static int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
     }
 }
 
+static int ResolveShopMenuSelectedItemId(CShopMenu* shopMenu)
+{
+    int selected = ShopMenuInt(shopMenu, 0x28);
+    int caravan = ShopMenuCaravan(shopMenu);
+
+    switch (ShopMenuInt(shopMenu, 0x14)) {
+    case 0:
+        return *reinterpret_cast<short*>(caravan + selected * 2 + 0xBE6);
+    case 1:
+        return *reinterpret_cast<short*>(caravan + selected * 2 + 0xB6);
+    case 2: {
+        int mapped = ShopMenuInt(shopMenu, 0x50 + selected * 4);
+        if (mapped == -1) {
+            return -1;
+        }
+        return *reinterpret_cast<short*>(caravan + mapped * 2 + 0xB6);
+    }
+    default:
+        return -1;
+    }
+}
+
+static int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)
+{
+    if (itemId < 1) {
+        return 0;
+    }
+
+    int caravan = ShopMenuCaravan(shopMenu);
+    int gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                   *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x24);
+    gilValue = gilValue / 100 + (gilValue >> 0x1F);
+    return gilValue - (gilValue >> 0x1F);
+}
+
 static int CalcShopMenuGilRatio(CShopMenu* shopMenu, int baseGil)
 {
     if (baseGil <= 0) {
@@ -226,6 +373,18 @@ static int GetShopMenuItemBaseGil(int itemNo, int offset)
     }
 
     return *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + offset);
+}
+
+static int CalcShopMenuTradeGil(CShopMenu* shopMenu, int itemNo)
+{
+    int gilValue = CalcShopMenuGilRatio(shopMenu, GetShopMenuItemBaseGil(itemNo, 0x20));
+    if (ShopMenuInt(shopMenu, 0x14) == 1) {
+        return static_cast<int>(FLOAT_80332d60 * static_cast<float>(gilValue));
+    }
+    if ((ShopMenuInt(shopMenu, 0x14) != 0) && (ShopMenuInt(shopMenu, 0x14) != 1)) {
+        return -1;
+    }
+    return gilValue;
 }
 
 static int CountShopMenuOwnedItems(int caravan, int itemNo)
@@ -265,6 +424,109 @@ static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
     }
 
     return itemNo >= 0x9F;
+}
+
+static bool CanShopMenuBuyQuantity(CShopMenu* shopMenu, int quantity)
+{
+    int caravan = ShopMenuCaravan(shopMenu);
+    if (quantity > (0x40 - *reinterpret_cast<unsigned short*>(caravan + 0x94))) {
+        return false;
+    }
+
+    int itemNo = ResolveShopMenuSelectedItemId(shopMenu);
+    int gilValue = quantity * CalcShopMenuTradeGil(shopMenu, itemNo);
+    return CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -gilValue) != 0;
+}
+
+static void UpdateShopMenuListWindow(CShopMenu* shopMenu)
+{
+    if (ShopMenuInt(shopMenu, 0x28) < ShopMenuInt(shopMenu, 0x24)) {
+        ShopMenuInt(shopMenu, 0x24) = ShopMenuInt(shopMenu, 0x28);
+    }
+    if ((ShopMenuInt(shopMenu, 0x24) + ShopMenuInt(shopMenu, 0x2C)) <= ShopMenuInt(shopMenu, 0x28)) {
+        ShopMenuInt(shopMenu, 0x24) = (ShopMenuInt(shopMenu, 0x28) - ShopMenuInt(shopMenu, 0x2C)) + 1;
+    }
+
+    ShopMenuInt(shopMenu, 0x30) = (ShopMenuInt(shopMenu, 0x24) < 1) ? 0 : 1;
+
+    int itemCount = ResolveShopMenuItemCount(shopMenu);
+    ShopMenuInt(shopMenu, 0x34) = ((ShopMenuInt(shopMenu, 0x24) + ShopMenuInt(shopMenu, 0x2C)) < itemCount) ? 1 : 0;
+}
+
+static void ExecuteShopMenuBuyConfirm(CShopMenu* shopMenu)
+{
+    int caravan = ShopMenuCaravan(shopMenu);
+    int itemId = ResolveShopMenuSelectedItemId(shopMenu);
+    int quantity = 0;
+
+    while ((quantity < ShopMenuInt(shopMenu, 0x44)) && ((unsigned short)(*reinterpret_cast<unsigned short*>(caravan + 0x94) + 1) < 0x41)) {
+        int gilValue = CalcShopMenuTradeGil(shopMenu, itemId);
+        if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -gilValue) == 0) {
+            return;
+        }
+
+        AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravan), static_cast<short>(itemId), 0);
+        AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -CalcShopMenuTradeGil(shopMenu, itemId));
+        ++quantity;
+    }
+}
+
+static void ExecuteShopMenuSellConfirm(CShopMenu* shopMenu)
+{
+    int caravan = ShopMenuCaravan(shopMenu);
+    int itemId = ResolveShopMenuSelectedItemId(shopMenu);
+    int gilValue = CalcShopMenuTradeGil(shopMenu, itemId);
+
+    if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), gilValue) == 0) {
+        return;
+    }
+
+    DeleteItemIdx__12CCaravanWorkFii(reinterpret_cast<void*>(caravan), ShopMenuInt(shopMenu, 0x28), 0);
+    AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), CalcShopMenuTradeGil(shopMenu, itemId));
+}
+
+static unsigned int CanShopMenuSelectMake(CShopMenu* shopMenu)
+{
+    unsigned int canSelect = ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), ShopMenuInt(shopMenu, 0x150)) != 0;
+    if (canSelect != 0) {
+        int selected = shopMenu->getItemNo(ShopMenuInt(shopMenu, 0x28));
+        unsigned int money = *reinterpret_cast<unsigned int*>(ShopMenuCaravan(shopMenu) + 0x200);
+        unsigned int craftGil = static_cast<unsigned int>(shopMenu->getMakeGil(selected));
+        canSelect = (craftGil <= money) ? 1U : 0U;
+    }
+
+    int selected = shopMenu->getItemNo(ShopMenuInt(shopMenu, 0x28));
+    short recipeMaterial[8];
+    GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), selected, recipeMaterial);
+
+    short* material = recipeMaterial;
+    for (int i = 0; i < 3; i++, material++) {
+        short itemNo = *material;
+        if (itemNo < 1) {
+            break;
+        }
+
+        canSelect = static_cast<unsigned int>(-static_cast<int>(-canSelect) >> 0x1F);
+        if (canSelect != 0) {
+            unsigned int total = static_cast<unsigned int>(CountShopMenuOwnedItems(ShopMenuCaravan(shopMenu), itemNo));
+            canSelect = (total >= static_cast<unsigned int>(material[3])) ? 1U : 0U;
+        }
+    }
+
+    return canSelect & 0xFF;
+}
+
+static bool TryOpenShopMenuMakeConfirm(CShopMenu* shopMenu)
+{
+    int makeGil = shopMenu->getMakeGil(shopMenu->getItemNo(ShopMenuInt(shopMenu, 0x28)));
+    if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(ShopMenuCaravan(shopMenu)), -makeGil) == 0) {
+        return false;
+    }
+
+    Sound.PlaySe(0x52, 0x40, 0x7F, 0);
+    ShopMenuInt(shopMenu, 0x8) = 0xF;
+    SetMode__9CShopMenuFi(shopMenu, 0xE);
+    return true;
 }
 
 /*
@@ -926,16 +1188,99 @@ void CShopMenu::Calc()
         }
         break;
     case 9:
-        this->SelectSOUBI();
+        if (timer == 1) {
+            Sound.PlaySe(5, 0x40, 0x7F, 0);
+        }
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
+        if (timer == 8) {
+            this->SetMode(10);
+        }
         break;
     case 10:
-        this->SelectMake();
+        this->SelectItemIdx();
+        if ((buttons & 0x200) != 0) {
+            ShopMenuInt(this, 0x8) = -1;
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
+            this->SetMode(0xB);
+        }
         break;
     case 11:
-        this->SelectFigure();
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(8 - timer) * 0.125f;
+        if (timer == 8) {
+            if (ShopMenuInt(this, 0x8) == -1) {
+                ReleasePdt__8CPartPcsFi(PartPcsVoid(), ShopMenuInt(this, 0x18));
+                reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
+                *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
+                __dl__FPv(*reinterpret_cast<void**>(MenuPcsRaw() + 0x878));
+                *reinterpret_cast<void**>(MenuPcsRaw() + 0x878) = nullptr;
+                return;
+            }
+            this->SetMode(ShopMenuInt(this, 0x8));
+        }
         break;
     case 12:
-        this->SelectYesNo();
+        if (timer == 1) {
+            Sound.PlaySe(5, 0x40, 0x7F, 0);
+        }
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
+        if (timer == 8) {
+            this->SetMode(0xD);
+        }
+        break;
+    case 13:
+        this->SelectMake();
+        if ((buttons & 0x200) != 0) {
+            ShopMenuInt(this, 0x8) = 9;
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
+            this->SetMode(0xE);
+        }
+        break;
+    case 14:
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(8 - timer) * 0.125f;
+        if (timer == 8) {
+            this->SetMode(ShopMenuInt(this, 0x8));
+        }
+        break;
+    case 15:
+        if (timer == 1) {
+            Sound.PlaySe(5, 0x40, 0x7F, 0);
+        }
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
+        if (timer == 8) {
+            short recipeMaterial[8];
+            int itemId = ResolveShopMenuSelectedItemId(this);
+
+            GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), itemId, recipeMaterial);
+            AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(ShopMenuCaravan(this)), -CalcShopMenuMakeGil(this, itemId));
+            DeleteItem__12CCaravanWorkFii(reinterpret_cast<void*>(ShopMenuCaravan(this)), itemId, 0);
+
+            for (int i = 0; i < 3; i++) {
+                if (recipeMaterial[i] < 1) {
+                    break;
+                }
+                for (int count = 0; count < recipeMaterial[i + 3]; count++) {
+                    DeleteItem__12CCaravanWorkFii(
+                        reinterpret_cast<void*>(ShopMenuCaravan(this)),
+                        recipeMaterial[i],
+                        0);
+                }
+            }
+
+            AddItem__12CCaravanWorkFiPi(
+                reinterpret_cast<void*>(ShopMenuCaravan(this)),
+                static_cast<short>(ShopMenuInt(this, 0x150)),
+                &ShopMenuInt(this, 0x154));
+            this->SetMode(0x10);
+        }
+        break;
+    case 16:
+        this->SelectSOUBI();
+        break;
+    case 17:
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(8 - timer) * 0.125f;
+        if (timer == 8) {
+            this->SetMode(ShopMenuInt(this, 0x8));
+        }
         break;
     }
 
@@ -960,325 +1305,74 @@ void CShopMenu::Calc()
  */
 void CShopMenu::SelectItemIdx()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    bool hasInput = false;
-    unsigned short buttons;
+    ShopMenuInt(this, 0x44) = 1;
 
-    *reinterpret_cast<int*>(self + 0x44) = 1;
-    int listType = *reinterpret_cast<int*>(self + 0x14);
-    int itemCount;
-    if (listType == 0) {
-        itemCount = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + 0xBE4);
-    } else if (listType == 1) {
-        itemCount = 0x40;
-    } else if (listType == 2) {
-        itemCount = *reinterpret_cast<int*>(self + 0x4C);
-    } else {
-        itemCount = -1;
+    int itemCount = ResolveShopMenuItemCount(this);
+    if (itemCount <= ShopMenuInt(this, 0x28)) {
+        ShopMenuInt(this, 0x28) = itemCount - 1;
     }
 
-    if (itemCount <= *reinterpret_cast<int*>(self + 0x28)) {
-        if (listType == 0) {
-            listType = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + 0xBE4);
-        } else if (listType == 1) {
-            listType = 0x40;
-        } else if (listType == 2) {
-            listType = *reinterpret_cast<int*>(self + 0x4C);
-        } else {
-            listType = -1;
-        }
-        *reinterpret_cast<int*>(self + 0x28) = listType - 1;
-    }
-
-    if (gShopMenuInputLatch == 0) {
-        if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-            hasInput = true;
-        }
-        if (hasInput) {
-            buttons = 0;
-        } else {
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-            buttons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20);
-        }
-    } else {
-        if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-            hasInput = true;
-        }
-        if (hasInput) {
-            buttons = 0;
-        } else {
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-            buttons = Pad._4_2_;
-        }
-        if ((buttons & gShopMenuInputLatch) == 0) {
-            gShopMenuInputLatch = 0;
-        }
-        hasInput = false;
-        if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-            hasInput = true;
-        }
-        if (hasInput) {
-            buttons = 0;
-        } else {
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-            buttons = Pad._8_2_;
-        }
-    }
-
-    if ((buttons & 8) == 0) {
-        if (gShopMenuInputLatch == 0) {
-            hasInput = false;
-            if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-                hasInput = true;
-            }
-            if (hasInput) {
-                buttons = 0;
-            } else {
-                __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-                buttons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20);
-            }
-        } else {
-            hasInput = false;
-            if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-                hasInput = true;
-            }
-            if (hasInput) {
-                buttons = 0;
-            } else {
-                __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-                buttons = Pad._4_2_;
-            }
-            if ((buttons & gShopMenuInputLatch) == 0) {
-                gShopMenuInputLatch = 0;
-            }
-            hasInput = false;
-            if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-                hasInput = true;
-            }
-            if (hasInput) {
-                buttons = 0;
-            } else {
-                __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-                buttons = Pad._8_2_;
-            }
-        }
-
-        if ((buttons & 4) == 0) {
-            hasInput = false;
-            if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-                hasInput = true;
-            }
-            if (hasInput) {
-                buttons = 0;
-            } else {
-                __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-                buttons = Pad._8_2_;
-            }
-
-            if ((buttons & 0x100) != 0) {
-                bool canSelect = false;
-                *reinterpret_cast<int*>(self + 0x38) = 0;
-                *reinterpret_cast<int*>(self + 0x3C) = 0;
-
-                listType = *reinterpret_cast<int*>(self + 0x14);
-                if (listType == 0) {
-                    if (*reinterpret_cast<int*>(self + 0x28) != -1) {
-                        canSelect = *reinterpret_cast<short*>(
-                                        *reinterpret_cast<int*>(self + 0x20) + *reinterpret_cast<int*>(self + 0x28) * 2 + 0xBE6) >=
-                                    1;
-                    }
-                    if (canSelect) {
-                        int caravan = *reinterpret_cast<int*>(self + 0x20);
-                        if (*reinterpret_cast<int*>(self + 0x44) <= 0x40 - *reinterpret_cast<unsigned short*>(caravan + 0x94)) {
-                            int itemNo = *reinterpret_cast<int*>(self + 0x28);
-                            if (itemNo == -1) {
-                                itemNo = 0;
-                            } else {
-                                int mode = *reinterpret_cast<int*>(self + 0x14);
-                                if (mode == 0) {
-                                    itemNo = *reinterpret_cast<short*>(caravan + itemNo * 2 + 0xBE6);
-                                } else if (mode == 1) {
-                                    itemNo = *reinterpret_cast<short*>(caravan + itemNo * 2 + 0xB6);
-                                } else if (mode == 2) {
-                                    int mapped = *reinterpret_cast<int*>(self + 0x50 + itemNo * 4);
-                                    if (mapped == -1) {
-                                        itemNo = -1;
-                                    } else {
-                                        itemNo = *reinterpret_cast<short*>(caravan + mapped * 2 + 0xB6);
-                                    }
-                                } else {
-                                    itemNo = -1;
-                                }
-
-                                if (mode == 0) {
-                                    if (itemNo < 1) {
-                                        itemNo = 0;
-                                    } else {
-                                        itemNo = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                                                 *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
-                                        itemNo = itemNo / 100 + (itemNo >> 0x1F);
-                                        itemNo = itemNo - (itemNo >> 0x1F);
-                                    }
-                                } else if (mode == 1) {
-                                    if (itemNo < 1) {
-                                        itemNo = 0;
-                                    } else {
-                                        itemNo = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                                                 *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
-                                        itemNo = itemNo / 100 + (itemNo >> 0x1F);
-                                        itemNo = itemNo - (itemNo >> 0x1F);
-                                        itemNo = (itemNo * 3) / 4;
-                                    }
-                                } else {
-                                    itemNo = -1;
-                                }
-                                itemNo = *reinterpret_cast<int*>(self + 0x44) * itemNo;
-                            }
-
-                            int canAdd = CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -itemNo);
-                            if (canAdd != 0) {
-                                *reinterpret_cast<int*>(self + 0x10) = 1;
-                                Sound.PlaySe(2, 0x40, 0x7F, 0);
-                                goto update_window;
-                            }
-                        }
-                    }
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
-                } else if (listType == 1) {
-                    int itemIdx = *reinterpret_cast<int*>(self + 0x28);
-                    if (itemIdx != -1) {
-                        short itemNo = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + itemIdx * 2 + 0xB6);
-                        if (itemNo >= 1) {
-                            canSelect = false;
-                            if (EquipChk__8CMenuPcsFi(MenuPcsVoid(), itemIdx) == 0) {
-                                canSelect = itemNo >= 0x9F;
-                            }
-                        }
-                    }
-
-                    if (canSelect) {
-                        *reinterpret_cast<int*>(self + 0x10) = 2;
-                        Sound.PlaySe(2, 0x40, 0x7F, 0);
-                    } else {
-                        Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    }
-                } else if (listType == 2) {
-                    int itemNo = -1;
-                    if (*reinterpret_cast<int*>(self + 0x28) != -1) {
-                        int mapped = *reinterpret_cast<int*>(self + 0x50 + *reinterpret_cast<int*>(self + 0x28) * 4);
-                        if (mapped != -1) {
-                            itemNo = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + mapped * 2 + 0xB6);
-                        }
-                        canSelect = itemNo >= 1;
-                        if (canSelect) {
-                            unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
-                            int caravan = *reinterpret_cast<int*>(self + 0x20);
-                            if ((*reinterpret_cast<unsigned int*>(caravan + ((itemNo - 0x191) >> 5) * 4 + 0xC08) & (1U << (bit & 0x1F))) ==
-                                0) {
-                                canSelect = false;
-                            }
-                        }
-                    }
-
-                    if (canSelect) {
-                        *reinterpret_cast<int*>(self + 0x8) = 0xC;
-                        int mode = *reinterpret_cast<int*>(self + 0x14);
-                        int itemIdx = *reinterpret_cast<int*>(self + 0x28);
-                        int smithItem;
-                        if (mode == 0) {
-                            smithItem = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + itemIdx * 2 + 0xBE6);
-                        } else if (mode == 1) {
-                            smithItem = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + itemIdx * 2 + 0xB6);
-                        } else if (mode == 2) {
-                            int mapped = *reinterpret_cast<int*>(self + 0x50 + itemIdx * 4);
-                            if (mapped == -1) {
-                                smithItem = -1;
-                            } else {
-                                smithItem = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + mapped * 2 + 0xB6);
-                            }
-                        } else {
-                            smithItem = -1;
-                        }
-
-                        *reinterpret_cast<int*>(self + 0x150) = GetSmithItem__8CMenuPcsFi(MenuPcsVoid(), smithItem);
-                        SetMode__9CShopMenuFi(self, 0xB);
-                        Sound.PlaySe(2, 0x40, 0x7F, 0);
-                    } else {
-                        Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    }
-                }
-            }
-        } else {
-            *reinterpret_cast<int*>(self + 0x28) = *reinterpret_cast<int*>(self + 0x28) + 1;
-            int mode = *reinterpret_cast<int*>(self + 0x14);
-            if (mode == 0) {
-                mode = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + 0xBE4);
-            } else if (mode == 1) {
-                mode = 0x40;
-            } else if (mode == 2) {
-                mode = *reinterpret_cast<int*>(self + 0x4C);
-            } else {
-                mode = -1;
-            }
-
-            if (*reinterpret_cast<int*>(self + 0x28) < mode) {
-                Sound.PlaySe(1, 0x40, 0x7F, 0);
-            } else {
-                gShopMenuInputLatch = 4;
-                mode = *reinterpret_cast<int*>(self + 0x14);
-                if (mode == 0) {
-                    mode = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + 0xBE4);
-                } else if (mode == 1) {
-                    mode = 0x40;
-                } else if (mode == 2) {
-                    mode = *reinterpret_cast<int*>(self + 0x4C);
-                } else {
-                    mode = -1;
-                }
-                *reinterpret_cast<int*>(self + 0x28) = mode - 1;
-                Sound.PlaySe(4, 0x40, 0x7F, 0);
-            }
-        }
-    } else {
-        *reinterpret_cast<int*>(self + 0x28) = *reinterpret_cast<int*>(self + 0x28) - 1;
-        if (*reinterpret_cast<int*>(self + 0x28) < 0) {
+    unsigned short buttons = GetShopMenuListButtons();
+    if ((buttons & 8) != 0) {
+        --ShopMenuInt(this, 0x28);
+        if (ShopMenuInt(this, 0x28) < 0) {
             gShopMenuInputLatch = 8;
-            *reinterpret_cast<int*>(self + 0x28) = 0;
+            ShopMenuInt(this, 0x28) = 0;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
+    } else {
+        buttons = GetShopMenuListButtons();
+        if ((buttons & 4) != 0) {
+            ++ShopMenuInt(this, 0x28);
+            if (ShopMenuInt(this, 0x28) < itemCount) {
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
+            } else {
+                gShopMenuInputLatch = 4;
+                ShopMenuInt(this, 0x28) = itemCount - 1;
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
+            }
+        } else if ((GetPadButtons() & 0x100) != 0) {
+            int listType = ShopMenuInt(this, 0x14);
+            int itemIndex = ShopMenuInt(this, 0x28);
+            int itemNo = ResolveShopMenuSelectedItemId(this);
+            bool canSelect = false;
+
+            ShopMenuInt(this, 0x38) = 0;
+            ShopMenuInt(this, 0x3C) = 0;
+
+            if (listType == 0) {
+                canSelect = (itemIndex != -1) && (itemNo >= 1) && CanShopMenuBuyQuantity(this, ShopMenuInt(this, 0x44));
+                if (canSelect) {
+                    ShopMenuInt(this, 0x10) = 1;
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                } else {
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
+                }
+            } else if (listType == 1) {
+                canSelect = CanTradeShopMenuItem(this, itemIndex, itemNo);
+                if (canSelect) {
+                    ShopMenuInt(this, 0x10) = 2;
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                } else {
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
+                }
+            } else if (listType == 2) {
+                canSelect = CanTradeShopMenuItem(this, itemIndex, itemNo);
+                if (canSelect) {
+                    ShopMenuInt(this, 0x8) = 0xC;
+                    ShopMenuInt(this, 0x150) = GetSmithItem__8CMenuPcsFi(MenuPcsVoid(), itemNo);
+                    SetMode__9CShopMenuFi(this, 0xB);
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                } else {
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
+                }
+            }
+        }
     }
 
-update_window:
-    if (*reinterpret_cast<int*>(self + 0x28) < *reinterpret_cast<int*>(self + 0x24)) {
-        *reinterpret_cast<int*>(self + 0x24) = *reinterpret_cast<int*>(self + 0x28);
-    }
-    if (*reinterpret_cast<int*>(self + 0x24) + *reinterpret_cast<int*>(self + 0x2C) <= *reinterpret_cast<int*>(self + 0x28)) {
-        *reinterpret_cast<int*>(self + 0x24) = (*reinterpret_cast<int*>(self + 0x28) - *reinterpret_cast<int*>(self + 0x2C)) + 1;
-    }
-    if (*reinterpret_cast<int*>(self + 0x24) < 1) {
-        *reinterpret_cast<int*>(self + 0x30) = 0;
-    } else {
-        *reinterpret_cast<int*>(self + 0x30) = 1;
-    }
-
-    listType = *reinterpret_cast<int*>(self + 0x14);
-    if (listType == 0) {
-        listType = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + 0xBE4);
-    } else if (listType == 1) {
-        listType = 0x40;
-    } else if (listType == 2) {
-        listType = *reinterpret_cast<int*>(self + 0x4C);
-    } else {
-        listType = -1;
-    }
-
-    if (*reinterpret_cast<int*>(self + 0x24) + *reinterpret_cast<int*>(self + 0x2C) < listType) {
-        *reinterpret_cast<int*>(self + 0x34) = 1;
-    } else {
-        *reinterpret_cast<int*>(self + 0x34) = 0;
-    }
+    UpdateShopMenuListWindow(this);
 }
 
 /*
@@ -1580,236 +1674,39 @@ void CShopMenu::SelectFigure()
  */
 void CShopMenu::SelectYesNo()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    unsigned short buttons;
-    int listType;
-    int itemIndex;
-    int itemId;
-    int gilValue;
-    int i;
-    int count;
-    int itemBits;
-    bool canExecute = false;
-    int caravan = *reinterpret_cast<int*>(self + 0x20);
-
-    buttons = GetPadButtons();
+    unsigned short buttons = GetPadButtons();
     if ((buttons & 0xC) != 0) {
-        *reinterpret_cast<unsigned int*>(self + 0x3C) ^= 1;
+        ShopMenuInt(this, 0x3C) ^= 1;
         Sound.PlaySe(1, 0x40, 0x7F, 0);
         return;
     }
 
-    buttons = GetPadButtons();
     if ((buttons & 0x100) == 0) {
         return;
     }
 
-    if (*reinterpret_cast<int*>(self + 0x3C) == 1) {
+    if (ShopMenuInt(this, 0x3C) == 1) {
         Sound.PlaySe(3, 0x40, 0x7F, 0);
-        if (*reinterpret_cast<int*>(self + 0x14) == 0) {
-            *reinterpret_cast<int*>(self + 0x10) = 1;
-        } else {
-            *reinterpret_cast<int*>(self + 0x10) = 0;
-        }
+        ShopMenuInt(this, 0x10) = (ShopMenuInt(this, 0x14) == 0) ? 1 : 0;
         return;
     }
 
-    *reinterpret_cast<int*>(self + 0x10) = 0;
-    listType = *reinterpret_cast<int*>(self + 0x14);
-
-    if (listType == 0) {
+    ShopMenuInt(this, 0x10) = 0;
+    if (ShopMenuInt(this, 0x14) == 0) {
         Sound.PlaySe(0x50, 0x40, 0x7F, 0);
-        itemIndex = *reinterpret_cast<int*>(self + 0x28);
-        if (listType == 0) {
-            itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xBE6);
-        } else if (listType == 1) {
-            itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xB6);
-        } else if (listType == 2) {
-            itemIndex = *reinterpret_cast<int*>(self + 0x50 + itemIndex * 4);
-            if (itemIndex == -1) {
-                itemId = -1;
-            } else {
-                itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xB6);
-            }
-        } else {
-            itemId = -1;
-        }
-
-        i = 0;
-        itemBits = itemId * 0x48;
-        while ((i < *reinterpret_cast<int*>(self + 0x44)) &&
-               ((unsigned short)(*reinterpret_cast<unsigned short*>(caravan + 0x94) + 1) < 0x41)) {
-            if (*reinterpret_cast<int*>(self + 0x14) == 0) {
-                if (itemId < 1) {
-                    gilValue = 0;
-                } else {
-                    gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                               *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemBits + 0x20);
-                    gilValue = gilValue / 100 + (gilValue >> 0x1F);
-                    gilValue = gilValue - (gilValue >> 0x1F);
-                }
-            } else if (*reinterpret_cast<int*>(self + 0x14) == 1) {
-                if (itemId < 1) {
-                    gilValue = 0;
-                } else {
-                    gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                               *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemBits + 0x20);
-                    gilValue = gilValue / 100 + (gilValue >> 0x1F);
-                    gilValue = gilValue - (gilValue >> 0x1F);
-                    gilValue = (gilValue * 3) / 4;
-                }
-            } else {
-                gilValue = -1;
-            }
-
-            if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -gilValue) == 0) {
-                return;
-            }
-
-            AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravan), static_cast<short>(itemId), 0);
-
-            if (*reinterpret_cast<int*>(self + 0x14) == 0) {
-                if (itemId < 1) {
-                    gilValue = 0;
-                } else {
-                    gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                               *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemBits + 0x20);
-                    gilValue = gilValue / 100 + (gilValue >> 0x1F);
-                    gilValue = gilValue - (gilValue >> 0x1F);
-                }
-            } else if (*reinterpret_cast<int*>(self + 0x14) == 1) {
-                if (itemId < 1) {
-                    gilValue = 0;
-                } else {
-                    gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                               *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemBits + 0x20);
-                    gilValue = gilValue / 100 + (gilValue >> 0x1F);
-                    gilValue = gilValue - (gilValue >> 0x1F);
-                    gilValue = (gilValue * 3) / 4;
-                }
-            } else {
-                gilValue = -1;
-            }
-
-            AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -gilValue);
-            i = i + 1;
-        }
+        ExecuteShopMenuBuyConfirm(this);
         return;
     }
 
-    itemIndex = *reinterpret_cast<int*>(self + 0x28);
-    if (itemIndex != -1) {
-        if (listType == 0) {
-            itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xBE6);
-        } else if (listType == 1) {
-            itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xB6);
-        } else if (listType == 2) {
-            count = *reinterpret_cast<int*>(self + 0x50 + itemIndex * 4);
-            if (count == -1) {
-                itemId = -1;
-            } else {
-                itemId = *reinterpret_cast<short*>(caravan + count * 2 + 0xB6);
-            }
-        } else {
-            itemId = -1;
-        }
-
-        if (itemId < 1) {
-            canExecute = false;
-        } else if (listType == 0) {
-            canExecute = true;
-        } else if (listType == 2) {
-            canExecute = true;
-            count = (itemId - 0x191U) & 0x1F;
-            itemBits = (itemId - 0x191U) >> 5;
-            if (((*reinterpret_cast<unsigned int*>(caravan + itemBits * 4 + 0xC08) & (1U << count))) == 0) {
-                canExecute = false;
-            }
-        } else {
-            if (EquipChk__8CMenuPcsFi(&MenuPcs, itemIndex) == 0) {
-                canExecute = (itemId >= 0x9F);
-            } else {
-                canExecute = false;
-            }
-        }
-    }
-
-    if (!canExecute) {
+    int itemIndex = ShopMenuInt(this, 0x28);
+    int itemId = ResolveShopMenuSelectedItemId(this);
+    if (!CanTradeShopMenuItem(this, itemIndex, itemId)) {
         Sound.PlaySe(4, 0x40, 0x7F, 0);
         return;
     }
 
     Sound.PlaySe(0x50, 0x40, 0x7F, 0);
-    listType = *reinterpret_cast<int*>(self + 0x14);
-    itemIndex = *reinterpret_cast<int*>(self + 0x28);
-    if (listType == 0) {
-        itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xBE6);
-    } else if (listType == 1) {
-        itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xB6);
-    } else if (listType == 2) {
-        count = *reinterpret_cast<int*>(self + 0x50 + itemIndex * 4);
-        if (count == -1) {
-            itemId = -1;
-        } else {
-            itemId = *reinterpret_cast<short*>(caravan + count * 2 + 0xB6);
-        }
-    } else {
-        itemId = -1;
-    }
-
-    if (listType == 0) {
-        if (itemId < 1) {
-            gilValue = 0;
-        } else {
-            gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                       *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
-            gilValue = gilValue / 100 + (gilValue >> 0x1F);
-            gilValue = gilValue - (gilValue >> 0x1F);
-        }
-    } else if (listType == 1) {
-        if (itemId < 1) {
-            gilValue = 0;
-        } else {
-            gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                       *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
-            gilValue = gilValue / 100 + (gilValue >> 0x1F);
-            gilValue = gilValue - (gilValue >> 0x1F);
-            gilValue = (gilValue * 3) / 4;
-        }
-    } else {
-        gilValue = -1;
-    }
-
-    if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), gilValue) == 0) {
-        return;
-    }
-
-    DeleteItemIdx__12CCaravanWorkFii(reinterpret_cast<void*>(caravan), *reinterpret_cast<int*>(self + 0x28), 0);
-
-    if (*reinterpret_cast<int*>(self + 0x14) == 0) {
-        if (itemId < 1) {
-            itemId = 0;
-        } else {
-            itemId = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                     *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
-            itemId = itemId / 100 + (itemId >> 0x1F);
-            itemId = itemId - (itemId >> 0x1F);
-        }
-    } else if (*reinterpret_cast<int*>(self + 0x14) == 1) {
-        if (itemId < 1) {
-            itemId = 0;
-        } else {
-            itemId = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                     *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
-            itemId = itemId / 100 + (itemId >> 0x1F);
-            itemId = itemId - (itemId >> 0x1F);
-            itemId = (itemId * 3) / 4;
-        }
-    } else {
-        itemId = -1;
-    }
-
-    AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), itemId);
+    ExecuteShopMenuSellConfirm(this);
 }
 
 /*
@@ -1823,148 +1720,15 @@ void CShopMenu::SelectYesNo()
  */
 void CShopMenu::SelectMake()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    unsigned int canSelect;
-
-    canSelect = ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), *reinterpret_cast<int*>(self + 0x150)) != 0;
-    if (canSelect != 0) {
-        int listType = *reinterpret_cast<int*>(self + 0x14);
-        int selected = *reinterpret_cast<int*>(self + 0x28);
-
-        if (listType == 0) {
-            selected = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + selected * 2 + 0xBE6);
-        } else if (listType == 1) {
-            selected = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + selected * 2 + 0xB6);
-        } else if (listType == 2) {
-            int index = *reinterpret_cast<int*>(self + 0x50 + selected * 4);
-            if (index == -1) {
-                selected = -1;
-            } else {
-                selected = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + index * 2 + 0xB6);
-            }
-        } else {
-            selected = -1;
-        }
-
-        unsigned int money = *reinterpret_cast<unsigned int*>(*reinterpret_cast<int*>(self + 0x20) + 0x200);
-        unsigned int craftGil;
-        if (selected < 1) {
-            craftGil = 0;
-        } else {
-            int gil = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + 0xBE2) *
-                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + selected * 0x48 + 0x24);
-            gil = gil / 100 + (gil >> 0x1F);
-            craftGil = gil - (gil >> 0x1F);
-        }
-
-        canSelect = static_cast<unsigned int>(
-            static_cast<int>(money >> 0x1F) + (static_cast<unsigned int>(craftGil <= money) - static_cast<int>(craftGil >> 0x1F)));
-    }
-
-    int listType = *reinterpret_cast<int*>(self + 0x14);
-    canSelect &= 0xFF;
-    int selected = *reinterpret_cast<int*>(self + 0x28);
-    if (listType == 0) {
-        selected = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + selected * 2 + 0xBE6);
-    } else if (listType == 1) {
-        selected = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + selected * 2 + 0xB6);
-    } else if (listType == 2) {
-        int index = *reinterpret_cast<int*>(self + 0x50 + selected * 4);
-        if (index == -1) {
-            selected = -1;
-        } else {
-            selected = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + index * 2 + 0xB6);
-        }
-    } else {
-        selected = -1;
-    }
-
-    short recipeMaterial[8];
-    GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), selected, recipeMaterial);
-    int i = 0;
-    short* material = recipeMaterial;
-    do {
-        short itemNo = *material;
-        if (itemNo < 1) {
-            break;
-        }
-
-        canSelect = static_cast<unsigned int>(-static_cast<int>(-canSelect) >> 0x1F);
-        if (canSelect != 0) {
-            int checkOffset = 0;
-            unsigned int total = 0;
-            int checkCount = 8;
-            do {
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xB6) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xB8) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xBA) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xBC) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xBE) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xC0) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xC2) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xC4) == itemNo) {
-                    total++;
-                }
-                checkOffset += 0x10;
-                checkCount--;
-            } while (checkCount != 0);
-
-            canSelect = static_cast<unsigned int>(
-                static_cast<int>(total >> 0x1F) +
-                (static_cast<unsigned int>(static_cast<unsigned int>(material[3]) <= total) - static_cast<int>(material[3] >> 0x1F)));
-        }
-
-        i++;
-        canSelect &= 0xFF;
-        material++;
-    } while (i < 3);
-
+    unsigned int canSelect = CanShopMenuSelectMake(this);
     if (canSelect == 0) {
-        *reinterpret_cast<int*>(self + 0x3C) = 1;
+        ShopMenuInt(this, 0x3C) = 1;
     }
 
-    bool hasInput = false;
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-        hasInput = true;
-    }
-
-    unsigned short press;
-    if (hasInput) {
-        press = 0;
-    } else {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        press = Pad._8_2_;
-    }
-
+    unsigned short press = GetPadButtons();
     if ((press & 0xC) == 0) {
-        hasInput = false;
-        if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-            hasInput = true;
-        }
-
-        if (hasInput) {
-            press = 0;
-        } else {
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-            press = Pad._8_2_;
-        }
-
         if ((press & 0x100) != 0) {
-            int yesNo = *reinterpret_cast<int*>(self + 0x3C);
+            int yesNo = ShopMenuInt(this, 0x3C);
             if (yesNo != 1) {
                 if (yesNo > 0) {
                     return;
@@ -1973,51 +1737,21 @@ void CShopMenu::SelectMake()
                     return;
                 }
 
-                int mode = *reinterpret_cast<int*>(self + 0x14);
-                int itemIdx = *reinterpret_cast<int*>(self + 0x28);
-                if (mode == 0) {
-                    itemIdx = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + itemIdx * 2 + 0xBE6);
-                } else if (mode == 1) {
-                    itemIdx = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + itemIdx * 2 + 0xB6);
-                } else if (mode == 2) {
-                    int index = *reinterpret_cast<int*>(self + 0x50 + itemIdx * 4);
-                    if (index == -1) {
-                        itemIdx = -1;
-                    } else {
-                        itemIdx = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + index * 2 + 0xB6);
-                    }
-                } else {
-                    itemIdx = -1;
-                }
-
-                if (itemIdx < 1) {
-                    itemIdx = 0;
-                } else {
-                    int gil = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + 0xBE2) *
-                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemIdx * 0x48 + 0x24);
-                    gil = gil / 100 + (gil >> 0x1F);
-                    itemIdx = gil - (gil >> 0x1F);
-                }
-
-                int canAdd = CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(*reinterpret_cast<int*>(self + 0x20)), -itemIdx);
-                if (canAdd != 0) {
-                    Sound.PlaySe(0x52, 0x40, 0x7F, 0);
-                    *reinterpret_cast<int*>(self + 0x8) = 0xF;
-                    SetMode__9CShopMenuFi(self, 0xE);
+                if (TryOpenShopMenuMakeConfirm(this)) {
                     return;
                 }
             }
 
             Sound.PlaySe(4, 0x40, 0x7F, 0);
-            *reinterpret_cast<int*>(self + 0x8) = 9;
-            SetMode__9CShopMenuFi(self, 0xE);
+            ShopMenuInt(this, 0x8) = 9;
+            SetMode__9CShopMenuFi(this, 0xE);
         }
     } else {
-        *reinterpret_cast<unsigned int*>(self + 0x3C) ^= 1;
+        ShopMenuInt(this, 0x3C) ^= 1;
         if (canSelect == 1) {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else {
-            *reinterpret_cast<int*>(self + 0x3C) = 1;
+            ShopMenuInt(this, 0x3C) = 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         }
     }
@@ -2040,7 +1774,7 @@ void CShopMenu::SelectSOUBI()
     if ((buttons & 0x200) != 0) {
         Sound.PlaySe(3, 0x40, 0x7F, 0);
         ShopMenuInt(this, 0x8) = 9;
-        SetMode__9CShopMenuFi(this, 0xE);
+        SetMode__9CShopMenuFi(this, 0x11);
         return;
     }
 
@@ -2049,20 +1783,21 @@ void CShopMenu::SelectSOUBI()
     }
 
     if (ShopMenuInt(this, 0x3C) != 0) {
-        Sound.PlaySe(3, 0x40, 0x7F, 0);
         ShopMenuInt(this, 0x8) = 9;
-        SetMode__9CShopMenuFi(this, 0xE);
+        SetMode__9CShopMenuFi(this, 0x11);
+        Sound.PlaySe(4, 0x40, 0x7F, 0);
         return;
     }
 
-    if (ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), ShopMenuInt(this, 0x150)) != 0) {
-        Sound.PlaySe(0x52, 0x40, 0x7F, 0);
-        ShopMenuInt(this, 0x8) = 0xF;
-        SetMode__9CShopMenuFi(this, 0xE);
-    } else {
-        Sound.PlaySe(4, 0x40, 0x7F, 0);
-        ShopMenuInt(this, 0x3C) = 1;
-    }
+    ShopMenuInt(this, 0x8) = 9;
+    SetMode__9CShopMenuFi(this, 0x11);
+
+    int equipType = GetEquipType__8CMenuPcsFi(MenuPcsVoid(), ShopMenuInt(this, 0x150));
+    ChgEquipPos__12CCaravanWorkFii(
+        reinterpret_cast<void*>(ShopMenuCaravan(this)),
+        equipType,
+        static_cast<short>(ShopMenuInt(this, 0x154)));
+    Sound.PlaySe(0x51, 0x40, 0x7F, 0);
 }
 
 /*
@@ -2075,11 +1810,7 @@ void CShopMenu::DrawShop0()
     DrawShopBase();
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    char* labels[3] = {
-        PTR_DAT_80214d90[languageId],
-        PTR_DAT_80214d94[languageId],
-        PTR_s_Cancel_80214d98[languageId],
-    };
+    RefreshShopMenuTabLabels();
     int selected = ShopMenuInt(this, 0x48);
 
     CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
@@ -2091,20 +1822,30 @@ void CShopMenu::DrawShop0()
     SetColor__5CFontF8_GXColor(font, &white);
 
     for (int i = 0; i < 3; i++) {
-        int x = 0x88;
-        int y = 0x92 + i * 0x24;
-        drawShapeSeq((i == selected) ? 8 : 0, (i == selected) ? 1 : 0, x + 0x20, y + 0x10, 0xFF, 0, 0, 0.0f, 0);
+        int x = s_shopMenuTabLayout[i][0];
+        int y = s_shopMenuTabLayout[i][1];
+        int highlight = (i == selected) ? 1 : 0;
+
+        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, static_cast<signed char>(0x1E + i));
+        drawShapeSeq(0, highlight, x, y, 0xFF, 0, 0, 0.0f, 0);
+        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, static_cast<signed char>(0x21 + i));
+        drawShapeSeq(8, highlight, x - 0x30, y, 0xFF, 0, 0, 0.0f, 0);
+
         DrawInit__5CFontFv(font);
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-            MenuPcsVoid(), font, labels[i], static_cast<float>(x + 0x48), static_cast<float>(y), (i == selected) ? 0x18 : 9, 0x12);
+            MenuPcsVoid(), font, const_cast<char*>(s_shopMenuTabLabels[i]),
+            static_cast<float>(x + 0x48), static_cast<float>(y - 0x0B),
+            highlight != 0 ? 0x18 : 9, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
     }
 
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x24);
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
         MenuPcsVoid(), font, PTR_DAT_80214d9c[languageId], FLOAT_80332d54, 88.0f, 9, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x28);
     DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0xA8, 0x9C + selected * 0x24, 1.0f);
 }
 
@@ -2165,9 +1906,11 @@ void CShopMenu::DrawSmith0()
     if (*reinterpret_cast<char*>(caravan + 0xBE1) != '\0') {
         title = GetJobStr__8CMenuPcsFi(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), 1);
     }
+    if (title == 0) {
+        title = "";
+    }
 
-    float textWidth = GetWidth__5CFontFPc(font, title);
-    float textX = 264.0f - textWidth;
+    float textX = 264.0f - GetWidth__5CFontFPc(font, title);
 
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
@@ -2202,28 +1945,43 @@ void CShopMenu::DrawMake()
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     SetColor__5CFontF8_GXColor(font, &white);
 
+    const char* itemName = GetItemName(resultItem);
     DrawInit__5CFontFv(font);
-    DrawShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, GetItemName(resultItem), FLOAT_80332d54, 108.0f, 0x18, 0x12);
+    DrawShadowFont__8CMenuPcsFP5CFontPcffii(
+        MenuPcsVoid(), font, const_cast<char*>(itemName), FLOAT_80332d54, 108.0f, 0x18, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
+
+    char raceBuffer[64];
+    GetRaceStr__8CMenuPcsFiPc(MenuPcsVoid(), resultItem, raceBuffer);
+    const int raceColor = (ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), resultItem) != 0) ? 0x18 : 2;
 
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
         MenuPcsVoid(), font, PTR_DAT_80214da8[languageId], 176.0f, 120.0f, 0x18, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
+    float raceX = 176.0f + FLOAT_80332d5c + GetWidth__5CFontFPc(font, PTR_DAT_80214da8[languageId]);
+    DrawInit__5CFontFv(font);
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, raceBuffer, raceX, 120.0f, raceColor, 0x12);
+    DrawInit__8CMenuPcsFv(MenuPcsVoid());
+
     char buffer[64];
     sprintf(buffer, DAT_80332d14, makeGil);
+    float valueRightX = 308.0f;
+    float makeGilX = valueRightX - GetWidth__5CFontFPc(font, buffer);
     DrawInit__5CFontFv(font);
-    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, buffer, 188.0f, 132.0f, 0x13, 0x12);
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, buffer, makeGilX, 132.0f, 0x13, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     sprintf(buffer, DAT_80332d14, currentMoney);
+    float moneyX = valueRightX - GetWidth__5CFontFPc(font, buffer);
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
         MenuPcsVoid(), font, PTR_s_Money_80214db0[languageId], 176.0f, 148.0f, 0x18, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
     DrawInit__5CFontFv(font);
-    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, buffer, 188.0f, 160.0f, (makeGil <= currentMoney) ? 0x14 : 2, 0x12);
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+        MenuPcsVoid(), font, buffer, moneyX, 160.0f, (makeGil <= currentMoney) ? 0x14 : 2, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     DrawItemInfo(resultItem, 0x98, 0x7E, 0, 0x9C, 0, 0, 0);
@@ -2300,15 +2058,27 @@ void CShopMenu::DrawSoubi()
  */
 void CShopMenu::Draw()
 {
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x46);
+    int pdtSlot = ShopMenuInt(this, 0x18);
+    if ((pdtSlot >= 0) && (pdtSlot < static_cast<int>(sizeof(PartMng.m_pdtSlots) / sizeof(PartMng.m_pdtSlots[0])))) {
+        pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(PartMng.m_pdtSlots[pdtSlot].m_envFields);
+    }
+
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     int mode = ShopMenuInt(this, 0x0);
-    if (mode < 3) {
+    if ((mode >= 0) && (mode < 3)) {
         DrawShop0();
     } else if (mode < 6) {
-        DrawBuy();
+        DrawShopBase();
+        DrawItemList();
+        DrawItemInfo0();
+        DrawBuySellInfo();
     } else if (mode < 9) {
-        DrawSell();
+        DrawShopBase();
+        DrawItemList();
+        DrawItemInfo0();
+        DrawBuySellInfo();
     } else if (mode < 0xC) {
         DrawSmith0();
     } else if (mode < 0xF) {
@@ -2316,6 +2086,9 @@ void CShopMenu::Draw()
     } else if (mode < 0x12) {
         DrawSoubi();
     }
+
+    DrawShopMenuFadeOverlay(ShopMenuFloat(this, 0x1C));
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x3C);
 }
 
 /*
@@ -2483,27 +2256,37 @@ void CShopMenu::DrawSoubiBase()
     DrawSingleBase__8CMenuPcsFf(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), 1.0f);
     pppInitDrawEnv(0);
 
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)11, (GXCompCnt)1, (GXCompType)5, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)13, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetNumChans(1);
+    GXSetChanCtrl((GXChannelID)0, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl((GXChannelID)2, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GXSetColorUpdate(GX_TRUE);
+
     _GXColor fadeA = {0xFF, 0xFF, 0xFF, 0x00};
     _GXColor fadeB = {0xFF, 0xFF, 0xFF, 0xFF};
     _GXColor fadeC = {0xFF, 0xFF, 0xFF, 0x00};
     _GXColor fadeD = {0xFF, 0xFF, 0xFF, 0xFF};
-    drawShapeSeqGrouad(9, 0, 0x1C, 0x10C, 0.5f, 0.7f, fadeA, fadeB, fadeC, fadeD);
+    drawShapeSeqGrouad(9, 0, 0x1C, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, fadeA, fadeB, fadeC, fadeD);
 
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     int x = 0x3C;
     while (x < 0x25C) {
-        drawShapeSeqGrouad(9, 0, x, 0x10C, 0.5f, 0.7f, white, white, white, white);
+        drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, white, white, white, white);
         x += 0x20;
     }
-    drawShapeSeqGrouad(9, 0, x, 0x10C, 0.5f, 0.7f, white, fadeA, white, fadeC);
+    drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, white, fadeA, white, fadeC);
 
-    drawShapeSeqScale(3, 0, 0x106, 0xA4, FLOAT_80332d78, 0.7f, 0xFF);
+    drawShapeSeqScale(3, 0, 0x106, 0xA4, FLOAT_80332d78, FLOAT_80332dcc, 0xFF);
     x = 0x106;
     while (x < 0x17A) {
-        drawShapeSeqScale(4, 0, x, 0xA4, FLOAT_80332d78, 0.7f, 0xFF);
+        drawShapeSeqScale(4, 0, x, 0xA4, FLOAT_80332d78, FLOAT_80332dcc, 0xFF);
         x += 0x20;
     }
-    drawShapeSeqScale(3, 0, x, 0xA4, FLOAT_80332dd0, 0.7f, 0xFF);
+    drawShapeSeqScale(3, 0, x, 0xA4, FLOAT_80332dd0, FLOAT_80332dcc, 0xFF);
 }
 
 /*

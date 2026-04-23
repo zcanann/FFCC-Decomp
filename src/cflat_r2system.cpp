@@ -3023,10 +3023,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             break;
         }
         case -0x78:
-            result = *reinterpret_cast<u32*>(gameWork + 0x8);
+            result = Game.m_gameWork.m_gameOverFlag;
             break;
         case -0x76:
-            result = gameWork[0x13D2];
+            result = Game.m_gameWork.m_menuStageMode;
             break;
         case -0x73:
         case -0x72:
@@ -3053,7 +3053,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             result = *reinterpret_cast<u32*>(gameWork + 0x18 + (systemValue + 0x47) * 4);
             break;
         case -0x66:
-            result = gameWork[0];
+            result = Game.m_gameWork.m_chaliceElement;
             break;
         case -0x65:
         case -100:
@@ -3096,13 +3096,16 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             result = *reinterpret_cast<u32*>(gameWork + 0xC8 + (systemValue + 0x65) * 4);
             break;
         case -0x43:
-            result = *reinterpret_cast<u32*>(gameWork + 0x10B4);
+            result = Game.m_gameWork.m_frameCounter;
             break;
         case -0x42:
-            result = *reinterpret_cast<u32*>(gameWork + 0x10B8 + (systemValue + 0x6B) * 4);
+            result = Game.m_gameWork.m_scriptGlobalTime;
             break;
         case -0x41:
-            result = *reinterpret_cast<u32*>(gameWork + 0x10BC);
+            result = Game.m_gameWork.m_timerA;
+            break;
+        case -0x40:
+            result = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&Game.m_gameWork) + 0x8);
             break;
         }
     }
@@ -3175,7 +3178,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 } else if (setMode == -1) {
                     newValue -= stack->m_word;
                 }
-                MenuPcs.ChgPlayModeFromScript(static_cast<bool>((newValue & 0xFF) >> 7));
+                MenuPcs.ChgPlayModeFromScript(static_cast<bool>(newValue & 0xFF));
                 break;
             }
             case -0x75:
@@ -3190,7 +3193,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                     stack, setMode, reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&gameWork) + 0x18 + (systemValue + 0x47) * 4));
                 break;
             case -0x66:
-                StoreSetU8(stack, setMode, &gameWork.m_menuStageMode);
+                StoreSetU32(stack, setMode, reinterpret_cast<unsigned int*>(&gameWork.m_chaliceElement));
                 break;
             case -0x65:
             case -100:
@@ -3236,11 +3239,10 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                     stack, setMode, reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&gameWork) + 0xC8 + (systemValue + 0x65) * 4));
                 break;
             case -0x43:
-                StoreSetU32(stack, setMode, reinterpret_cast<unsigned int*>(&gameWork.m_chaliceElement));
+                StoreSetU32(stack, setMode, reinterpret_cast<unsigned int*>(&gameWork.m_frameCounter));
                 break;
             case -0x42:
-                StoreSetU32(
-                    stack, setMode, reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&gameWork) + 0x10B8 + (systemValue + 0x6B) * 4));
+                StoreSetU32(stack, setMode, reinterpret_cast<unsigned int*>(&gameWork.m_scriptGlobalTime));
                 break;
             case -0x41:
                 StoreSetU32(stack, setMode, reinterpret_cast<unsigned int*>(&gameWork.m_timerA));

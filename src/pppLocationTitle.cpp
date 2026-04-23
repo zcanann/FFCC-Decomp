@@ -69,11 +69,11 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         return;
     }
 
-    graphFrame = pppLocationTitle->m_graphId / 0x1000;
     fadeDivisor = -1;
     particles = (LocationTitleParticle*)work->m_particles;
     shapeTable =
         *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (param_2->m_dataValIndex * 4));
+    graphFrame = pppLocationTitle->m_graphId / 0x1000;
 
     if ((int)param_2->m_fadeStartFrame <= graphFrame) {
         fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);

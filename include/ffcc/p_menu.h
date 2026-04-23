@@ -253,7 +253,7 @@ public:
     CFont* GetFont22();
     void CopyNowCaravanDat(Mc::SaveDat*);
     void SetCaravanWork(Mc::SaveDat*);
-    void GetSameCharaData(Mc::SaveDat*, Mc::SaveDat*, int, int);
+    int GetSameCharaData(Mc::SaveDat*, Mc::SaveDat*, int, int);
     int CheckSameMcFormatID(Mc::SaveDat*, Mc::SaveDat*);
     void IsAsyncCharaLoadFinish();
     void AlphaNormal();

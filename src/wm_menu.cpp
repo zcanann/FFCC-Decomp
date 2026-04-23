@@ -8370,47 +8370,74 @@ void CMenuPcs::SetCaravanWork(Mc::SaveDat* saveDat)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int memberIndex, int strictMode)
+int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int memberIndex, int strictMode)
 {
-	unsigned char* const src = reinterpret_cast<unsigned char*>(source);
+	unsigned char* src = reinterpret_cast<unsigned char*>(source);
 	unsigned char* const dst = reinterpret_cast<unsigned char*>(target);
-	unsigned int result = 0xFFFFFFFF;
 
 	if (strictMode == 0) {
-		const unsigned char* const targetHeader = dst + memberIndex * 0x9C0;
-		if (*reinterpret_cast<unsigned int*>(src + 0x13D4) != *reinterpret_cast<const unsigned int*>(targetHeader + 0x13D4) ||
-		    *reinterpret_cast<unsigned int*>(src + 0x13D0) != *reinterpret_cast<const unsigned int*>(targetHeader + 0x13D0) ||
-		    *reinterpret_cast<unsigned int*>(src + 0x13D8) != *reinterpret_cast<const unsigned int*>(targetHeader + 0x13D8)) {
-			gWmMenuWorkB = -2;
-			return;
+		unsigned char* const targetHeader = dst + memberIndex * 0x9C0;
+		if (*reinterpret_cast<unsigned int*>(src + 0x13D4) != *reinterpret_cast<unsigned int*>(targetHeader + 0x1D9C) ||
+		    *reinterpret_cast<unsigned int*>(src + 0x13D0) != *reinterpret_cast<unsigned int*>(targetHeader + 0x1D98) ||
+		    *reinterpret_cast<unsigned int*>(src + 0x13D8) != *reinterpret_cast<unsigned int*>(targetHeader + 0x1DA0)) {
+			return -2;
 		}
 	}
 
-	for (unsigned int i = 0; i < 8; i++) {
-		const unsigned char* const cmpBase = dst + (memberIndex * 0x9C0 + 0x1D94) + ((i / 2) * 0x1380);
-		const unsigned char* const srcBase = src + ((i % 2) ? 0x2750 : 0x1D90);
-
-		if (srcBase[-0xC] != 0) {
-			const unsigned int srcId = *reinterpret_cast<const unsigned int*>(srcBase + 4);
-			const unsigned int dstId = *reinterpret_cast<const unsigned int*>(cmpBase);
-			if (srcId == dstId) {
-				if (strictMode == 0) {
-					if (srcBase[0] != 0) {
-						result = i;
-						break;
-					}
-				} else if (srcBase[1] != 0 &&
-				           *reinterpret_cast<const unsigned int*>(srcBase + 0xC) == *reinterpret_cast<const unsigned int*>(dst + 0x13D4) &&
-				           *reinterpret_cast<const unsigned int*>(srcBase + 8) == *reinterpret_cast<const unsigned int*>(dst + 0x13D0) &&
-				           *reinterpret_cast<const unsigned int*>(srcBase + 0x10) == *reinterpret_cast<const unsigned int*>(dst + 0x13D8)) {
-					result = i;
+	unsigned int result;
+	unsigned int index = 0;
+	const int cmpOffset = memberIndex * 0x9C0 + 0x1D94;
+	int count = 4;
+	do {
+		if (*reinterpret_cast<int*>(src + 0x1A84) != 0) {
+			result = index;
+			if (strictMode == 0) {
+				if (src[0x1D90] != 0 &&
+				    *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
 					break;
 				}
+			} else if (src[0x1D91] != 0 &&
+			           *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset) &&
+			           *reinterpret_cast<unsigned int*>(src + 0x1D9C) == *reinterpret_cast<unsigned int*>(dst + 0x13D4) &&
+			           *reinterpret_cast<unsigned int*>(src + 0x1D98) == *reinterpret_cast<unsigned int*>(dst + 0x13D0) &&
+			           *reinterpret_cast<unsigned int*>(src + 0x1DA0) == *reinterpret_cast<unsigned int*>(dst + 0x13D8)) {
+				break;
 			}
 		}
+
+		if (*reinterpret_cast<int*>(src + 0x2444) != 0) {
+			result = index + 1;
+			if (strictMode == 0) {
+				if (src[0x2750] != 0 &&
+				    *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
+					break;
+				}
+			} else if (src[0x2751] != 0 &&
+			           *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset) &&
+			           *reinterpret_cast<unsigned int*>(src + 0x275C) == *reinterpret_cast<unsigned int*>(dst + 0x13D4) &&
+			           *reinterpret_cast<unsigned int*>(src + 0x2758) == *reinterpret_cast<unsigned int*>(dst + 0x13D0) &&
+			           *reinterpret_cast<unsigned int*>(src + 0x2760) == *reinterpret_cast<unsigned int*>(dst + 0x13D8)) {
+				break;
+			}
+		}
+
+		src += 0x1380;
+		index += 2;
+		count--;
+		result = index;
+	} while (count != 0);
+
+	if (strictMode != 0) {
+		if (result < 8) {
+			return -3;
+		}
+		return -4;
 	}
 
-	gWmMenuWorkB = static_cast<int>(result);
+	if (static_cast<int>(result) < 8) {
+		return result;
+	}
+	return -1;
 }
 
 /*

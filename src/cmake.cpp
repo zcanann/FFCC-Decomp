@@ -2233,33 +2233,22 @@ void CMenuPcs::CmakeResultDraw()
     short resultDir = *reinterpret_cast<short*>(state + 0x1E);
     float alpha = CalcCmakeFadeAlpha(this);
     float popupAlpha = ((mode == 2) && (resultDir < 0)) ? FLOAT_80333258 : alpha;
-    float crestAlpha = ((mode == 2) && (resultDir < 0)) ? FLOAT_80333258 : alpha;
-    float titleX = ((mode == 2) && (resultDir > 0)) ? FLOAT_80333258 : 0.0f;
+    float textAlpha = ((mode == 2) && (resultDir < 0)) ? FLOAT_80333258 : alpha;
 
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
-    DrawCmakeWin(0.0f, 0.0f, FLOAT_80333258);
+    DrawCmakeSelectionBackdrop(this);
     DrawCmakePreviewChara(this);
+    DrawCmakePopupPanel(this, popupAlpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
+        FLOAT_80333258, FLOAT_80333258);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
-
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * popupAlpha);
-    if (a < 0) {
-        a = 0;
-    } else if (a > 0xFF) {
-        a = 0xFF;
+    if ((mode == 2) && (resultDir > 0)) {
+        DrawCmakeTitle(6, FLOAT_80333258, alpha);
+    } else {
+        DrawCmakeTitle(6, alpha, FLOAT_80333258);
     }
 
-    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
-    GXSetChanMatColor(GX_COLOR0A0, col);
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), (MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A);
-    DrawRect__8CMenuPcsFUlfffffffff(
-        MenuPcsVoid(), 0, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
-        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
-
-    DrawCmakeTitle(6, titleX, alpha);
-    DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, crestAlpha);
-    DrawCmakeCharaText(6, crestAlpha);
+    DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, textAlpha);
+    DrawCmakeCharaText(6, textAlpha);
 
     if (mode == 1) {
         DrawCmakeYesNo(*reinterpret_cast<short*>(state + 0x26) + 1, alpha);
@@ -2349,27 +2338,11 @@ void CMenuPcs::CmakeResultDraw1()
     float textAlpha = (mode == 0) ? FLOAT_80333258 : alpha;
 
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
-    DrawCmakeWin(0.0f, 0.0f, FLOAT_80333258);
+    DrawCmakeSelectionBackdrop(this);
     DrawCmakePreviewChara(this);
-
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
-
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * popupAlpha);
-    if (a < 0) {
-        a = 0;
-    } else if (a > 0xFF) {
-        a = 0xFF;
-    }
-
-    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
-    GXSetChanMatColor(GX_COLOR0A0, col);
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), (MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A);
-    DrawRect__8CMenuPcsFUlfffffffff(
-        MenuPcsVoid(), 0, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
-        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
-
-    DrawCmakeTitle(7, 0.0f, alpha);
+    DrawCmakePopupPanel(this, popupAlpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
+        FLOAT_80333258, FLOAT_80333258);
+    DrawCmakeTitle(7, alpha, FLOAT_80333258);
     DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, textAlpha);
     DrawCmakeCharaText(7, textAlpha);
 }

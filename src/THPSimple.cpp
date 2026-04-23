@@ -875,7 +875,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                 volume = gTHPSimpleVolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
 
                 mixedSample = static_cast<s32>(*input) +
-                              static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
+                              ((static_cast<s32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
                 if (mixedSample < -0x8000) {
                     mixedSample = -0x8000;
                 }
@@ -885,7 +885,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                 *output = static_cast<s16>(mixedSample);
 
                 mixedSample = static_cast<s32>(input[1]) +
-                              static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(audioPtr[1])) >> 15);
+                              ((static_cast<s32>(volume) * static_cast<s32>(audioPtr[1])) >> 15);
                 if (mixedSample < -0x8000) {
                     mixedSample = -0x8000;
                 }
@@ -933,7 +933,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                 }
                 volume = gTHPSimpleVolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
 
-                mixedSample = static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
+                mixedSample = (static_cast<s32>(volume) * static_cast<s32>(*audioPtr)) >> 15;
                 if (mixedSample < -0x8000) {
                     mixedSample = -0x8000;
                 }
@@ -942,7 +942,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                 }
                 *output = static_cast<s16>(mixedSample);
 
-                mixedSample = static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(audioPtr[1])) >> 15);
+                mixedSample = (static_cast<s32>(volume) * static_cast<s32>(audioPtr[1])) >> 15;
                 if (mixedSample < -0x8000) {
                     mixedSample = -0x8000;
                 }

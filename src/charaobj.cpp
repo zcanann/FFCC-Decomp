@@ -251,6 +251,15 @@ static int CharaObjResolveParticleBank(CGCharaObj* charaObj, unsigned short part
 	return particleClass;
 }
 
+static void CharaObjCallStateCallback(CGCharaObj* charaObj, int vtableOffset)
+{
+	typedef void (*VCall)(void*);
+
+	unsigned char* self = reinterpret_cast<unsigned char*>(charaObj);
+	VCall fn = *reinterpret_cast<VCall*>(*reinterpret_cast<int*>(self + 0x48) + vtableOffset);
+	fn(charaObj);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8010b67c
@@ -720,36 +729,155 @@ void CGCharaObj::deletePSlotBit(int slotMask)
  */
 void CGCharaObj::onFrameStat()
 {
+	if (m_stateFrameGate != 0) {
+		return;
+	}
+
 	switch (m_lastStateId) {
-		case 0:
-			break;
 		case 1:
-		case 3:
-		case 4:
-		case 5:
-		case 7:
-		case 8:
-		case 0xA:
+		case 0x12:
 			statAttack();
 			break;
+
 		case 2:
-			statButtobi();
+			if (m_subState == 1) {
+				if (m_subFrame == 0) {
+					reqAnim(m_unk554, 1, 0);
+				}
+			} else if (m_subState == 0) {
+				if (m_subFrame == 0) {
+					reqAnim(m_attackAnimId, 0, 0);
+				}
+
+				if (isLoopAnim() != 0) {
+					changeSubStat(m_itemId == 0x103 ? 2 : 1);
+					return;
+				}
+			} else if (m_subState < 3) {
+				if (m_subFrame == 0) {
+					endPSlotBit(8);
+					reqAnim(m_unk558, 0, 0);
+				}
+
+				if (m_itemId != 0 && m_subFrame == 10) {
+					endPSlotBit(2);
+					putParticleFromItem(m_itemId, 2, m_particleSlots[1], &CharaObjComboCenter(this));
+					putParticleFromItem(m_itemId, 3, m_particleSlots[1], &CharaObjComboCenter(this));
+				}
+			}
+
+			CharaObjCallStateCallback(this, 0x84);
 			break;
-		case 6:
-			statDamage();
+
+		case 4:
+			if (m_stateFrame == 0) {
+				Sound.StopSe3DGroup(m_particleId);
+				deletePSlotBit(0x3B);
+				reqAnim(4, 0, 0);
+			}
+
+			if (isLoopAnim() != 0) {
+				changeStat(0, 0, 0);
+			}
 			break;
+
+		case 8:
+			if (m_subState == 2) {
+				if (m_subFrame == 0) {
+					reqAnim(m_unk558, 0, 0);
+				}
+
+				if (isLoopAnim() != 0) {
+					changeSubStat(1);
+					return;
+				}
+			} else if (m_subState == 0) {
+				if (m_subFrame == 0) {
+					reqAnim(m_attackAnimId, 0, 0);
+				}
+
+				if (isLoopAnim() != 0) {
+					changeSubStat(1);
+					return;
+				}
+			} else if (m_subState == 1) {
+				if (m_subFrame == 0) {
+					reqAnim(m_unk554, 1, 0);
+				}
+			} else if (m_subState < 4) {
+				if (m_subFrame == 0) {
+					reqAnim(CharaObjIsPlayerCid(GetCID()) ? m_unk558 : m_unk55C, 0, 0);
+				}
+
+				if (isLoopAnim() != 0) {
+					changeStat(0, 0, 0);
+					return;
+				}
+			}
+
+			CharaObjCallStateCallback(this, 0x8C);
+			break;
+
 		case 9:
-			statDie();
+			if (m_subState == 0 && m_subFrame == 0) {
+				Sound.StopSe3DGroup(m_particleId);
+				deletePSlotBit(0x3B);
+				reqAnim(6, 1, 0);
+
+				if (CharaObjIsPlayerCid(GetCID()) && m_scriptHandle != 0) {
+					playSe3D(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xF8) + 0x10,
+					         0x32, 0x96, 0, 0);
+				}
+			}
+
+			CharaObjCallStateCallback(this, 0x7C);
 			break;
-		case 0xC:
-		case 0xD:
-			statMagic();
+
+		case 0xA:
+			if (m_subState == 1) {
+				if (m_subFrame == 0) {
+					reqAnim(0x1B, 1, 0);
+				}
+
+				if (m_scriptHandle != 0 &&
+				    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) == 0) {
+					changeSubStat(2);
+				}
+			} else if (m_subState == 0) {
+				if (m_subFrame == 0) {
+					Sound.StopSe3DGroup(m_particleId);
+					deletePSlotBit(0x3B);
+					reqAnim(0x1A, 0, 0);
+				}
+
+				if (isLoopAnim() != 0) {
+					changeSubStat(1);
+				}
+			} else if (m_subState < 3) {
+				if (m_subFrame == 0) {
+					reqAnim(0x1C, 0, 0);
+				}
+
+				if (isLoopAnim() != 0) {
+					changeStat(0, 0, 0);
+				}
+			}
 			break;
-		case 0xE:
-			statShield();
-			break;
-		default:
-			statKizetsu();
+
+		case 0x19:
+			if (m_stateFrame == 0) {
+				if (CharaObjIsPlayerCid(GetCID())) {
+					static_cast<CGPartyObj*>(this)->carry(1, 0, 1);
+				}
+
+				Sound.StopSe3DGroup(m_particleId);
+				deletePSlotBit(0x3B);
+				reqAnim(0x1D, 0, 0);
+			}
+
+			if (isLoopAnim() != 0) {
+				changeStat(0, 0, 0);
+			}
 			break;
 	}
 }

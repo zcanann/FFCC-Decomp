@@ -113,6 +113,52 @@ static bool CharaObjSkipComboScript(CGPrgObj* obj)
 	       (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(obj->m_scriptHandle) + 0x3B4) != 0);
 }
 
+static bool CharaObjIsPlayerCid(unsigned int cid)
+{
+	return (cid & 0x6D) == 0x6D;
+}
+
+static bool CharaObjIsElementalStatus(unsigned int staType)
+{
+	return staType == 0 || staType == 1 || staType == 3 || staType == 4 ||
+	       staType == 6 || staType == 8 || staType == 9 || staType == 0x1C;
+}
+
+static bool CharaObjIsBreakStatus(unsigned int staType)
+{
+	return staType == 0x24 || staType == 0x25 || staType == 0x69 || staType == 0x6A;
+}
+
+static bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
+{
+	Vec delta;
+	Vec facing;
+	float magSq;
+	float invMag;
+	float dot;
+
+	if (sourceObj == 0) {
+		return false;
+	}
+
+	delta.x = sourceObj->m_worldPosition.x - self->m_worldPosition.x;
+	delta.y = 0.0f;
+	delta.z = sourceObj->m_worldPosition.z - self->m_worldPosition.z;
+	magSq = delta.x * delta.x + delta.z * delta.z;
+	if (magSq <= 0.0f) {
+		return false;
+	}
+
+	invMag = 1.0f / sqrtf(magSq);
+	delta.x *= invMag;
+	delta.z *= invMag;
+	facing.x = sinf(self->m_rotBaseY);
+	facing.y = 0.0f;
+	facing.z = cosf(self->m_rotBaseY);
+	dot = delta.x * facing.x + delta.z * facing.z;
+	return dot > 0.0f;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8010b67c
@@ -1315,56 +1361,113 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::onDamage(CGPrgObj*, int, int, int, Vec*)
+void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int, int, Vec* hitPos)
 {
-	typedef unsigned int (*VCall0C)(void*);
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	unsigned int cid = GetCID();
+	int resolvedItemId = itemId;
+	unsigned int staType;
+	int resistType = 0;
+	int allowEffect = 0;
+	int severity = 0;
+	int effectResult = 0;
 
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (m_scriptHandle == 0) {
 		damageDelete();
 		changeStat(6, 0, 0);
 		return;
 	}
 
-	int itemId = m_itemId;
-	int itemOffset = itemId * 0x48;
-	unsigned short staType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemOffset + 8);
-
-	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(self + 0x48) + 0x0C);
-	unsigned int cid = cidFn(this);
-	if ((cid & 0x6D) == 0x6D && *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x12) != 0) {
+	if (resolvedItemId < 0) {
+		resolvedItemId = m_itemId;
+	}
+	if (resolvedItemId < 0) {
 		return;
 	}
 
+	if (CharaObjIsPlayerCid(cid) && *reinterpret_cast<short*>(script + 0x12) != 0) {
+		return;
+	}
+	if (CharaObjIsPlayerCid(cid) && static_cast<unsigned short>((m_lastMapIdExtra << 8) | m_lastMapIdHit) != 1) {
+		return;
+	}
 	if ((m_weaponNodeFlags & 0x80) == 0) {
 		return;
 	}
 
-	int regist = 0;
-	int blocked = 0;
-	int special = 0;
-	calcRegist(staType, itemId, regist, blocked, special, 0);
+	staType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 8);
+	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, severity, 0);
 
-	if (regist == 3) {
-		if (staType == 0 || staType == 1 || staType == 3 || staType == 4 || staType == 6 || staType == 8 ||
-			staType == 9 || staType == 0x1C) {
-			putParticle(0x201, 0, static_cast<Vec*>(0), m_attackColRadius, 0x65);
-		} else if (staType == 0x24 || staType == 0x25 || staType == 0x69 || staType == 0x6A) {
-			putParticle(0x200, 0, static_cast<Vec*>(0), m_attackColRadius, 0x1D);
+	if (resistType == 3) {
+		if (CharaObjIsElementalStatus(staType)) {
+			putParticle(0x201, 0, hitPos, m_attackColRadius, 0x65);
+		} else if (CharaObjIsBreakStatus(staType)) {
+			putParticle(0x200, 0, hitPos, m_attackColRadius, 0x1D);
 		}
+	} else if ((resistType > 1 || (resistType == 1 &&
+	           ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x32) & 1) == 0))) &&
+	           CharaObjIsElementalStatus(staType)) {
+		putParticle(0x201, 0, hitPos, m_attackColRadius, 0x65);
 	}
 
-	int outValue = 0;
-	effective(static_cast<int>(staType), itemId, this, outValue);
+	if (m_lastStateId == 8 && m_subState == 1 &&
+	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x2C) & 8) == 0) &&
+	    CharaObjCanFrontGuard(this, sourceObj)) {
+		playSe3D(0x1D, 0x32, 0x96, 0, 0);
+		putParticle(0x200, 0, hitPos, m_attackColRadius, 0);
+		if (sourceObj != 0 && CharaObjIsPlayerCid(sourceObj->GetCID())) {
+			sourceObj->changeStat(0x13, 0, 0);
+		}
+		if (CharaObjIsPlayerCid(cid)) {
+			changeSubStat(2);
+		}
+		allowEffect = 0;
+		effectResult = 0;
+	}
 
-	if (blocked != 0) {
+	if (*reinterpret_cast<short*>(script + 0x1D) != 0) {
+		allowEffect = 0;
+		effectResult = 0;
+	}
+	if (*reinterpret_cast<short*>(script + 0x11) != 0) {
+		allowEffect = 0;
+	}
+	if (*reinterpret_cast<short*>(script + 0x14) != 0 && (staType == 7 || staType == 8)) {
+		allowEffect = 0;
+		effectResult = 0;
+	}
+	if (*reinterpret_cast<short*>(script + 7) == 0) {
+		if (staType == 0x65) {
+			allowEffect = 1;
+			effectResult = 0;
+		} else {
+			allowEffect = 0;
+			effectResult = 0;
+		}
+	} else if (staType == 0x65) {
+		allowEffect = 0;
+		effectResult = 0;
+	} else if (staType == 0x66 || staType == 0x67 || staType == 7) {
+		allowEffect = 1;
+		effectResult = 0;
+	}
+
+	if (allowEffect != 0) {
+		effective(static_cast<int>(staType), resolvedItemId, sourceObj, effectResult);
+	}
+
+	if (effectResult == 0) {
+		damageDelete();
 		changeStat(6, 0, 0);
 		return;
 	}
 
-	if (outValue == 0) {
-		damageDelete();
+	if (staType == 0x1C || staType == 4 || staType < 2) {
 		changeStat(6, 0, 0);
+	} else if (staType == 0x25 || staType == 0x68 || staType == 0x6A) {
+		changeStat(0x19, 0, 0);
+	} else if (staType == 0x6B) {
+		changeStat(0x1A, 0, 0);
 	}
 }
 

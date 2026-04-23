@@ -762,9 +762,10 @@ void CMapPcs::draw()
 void CMapPcs::drawBeforeViewer()
 {
     if ((m_drawEnabled != 0) &&
-        (m_mapCalcReady == 0)) {
-        Mtx cameraMtx;
+        (m_mapCalcReady == 0) &&
+        (m_drawEnabled != 0)) {
         Mtx44 screenMtx;
+        Mtx cameraMtx;
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x298);
@@ -818,9 +819,10 @@ void CMapPcs::drawBeforeViewer()
 void CMapPcs::drawViewer()
 {
     if ((m_drawEnabled != 0) &&
-        (m_mapCalcReady == 0)) {
-        Mtx cameraMtx;
+        (m_mapCalcReady == 0) &&
+        (m_drawEnabled != 0)) {
         Mtx44 screenMtx;
+        Mtx cameraMtx;
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2C4);

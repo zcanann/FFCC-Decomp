@@ -20,7 +20,7 @@ extern float FLOAT_80330664;
 extern float FLOAT_80330668;
 extern float FLOAT_80330658;
 extern double DOUBLE_80330648;
-extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
+extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(

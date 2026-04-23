@@ -58,7 +58,7 @@ mw_comment_version: 11
 # (optional) When enabled, function boundary analysis will be skipped.
 # Only valid _after_ initial analysis has been performed and
 # the symbols and splits files have been generated. 
-quick_analysis: false
+quick_analysis: true
 
 # (optional) When enabled, the analyzer will attempt to detect sizes
 # and data types of objects based on code usage and alignment.

@@ -2824,14 +2824,14 @@ void GbaQueue::ClrScrInitEnd()
  */
 void GbaQueue::InitCmakeInfo(int channel, int value)
 {
-	char* obj = reinterpret_cast<char*>(this);
+	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	memset(&cmakeInfo[channel], 0, 0x20);
 	cmakeInfo[channel][0] = 1;
-	obj[channel + 0x2CCA] = static_cast<char>(0xFF);
-	obj[channel + 0x2CD1] = static_cast<char>(0xFF);
-	obj[channel + 0x2CB8] = static_cast<char>(value);
+	obj[channel * 0x20 + 0x2CCA] = 0xFF;
+	obj[channel * 0x20 + 0x2CD1] = 0xFF;
+	obj[channel * 0x20 + 0x2CB8] = static_cast<unsigned char>(value);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	Joybus.SetMType(channel, 1);

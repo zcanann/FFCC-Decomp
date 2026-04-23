@@ -89,6 +89,9 @@ struct pppScreenBreakUnkC {
 
 extern float FLOAT_80331cc0;
 extern float FLOAT_80331cc4;
+extern float FLOAT_80331cd0;
+extern float FLOAT_80331cec;
+extern float FLOAT_80331cf0;
 static const float kPppScreenBreakDoubleScale = 2.0f;
 static const float kPppScreenBreakZero = 0.0f;
 static const float kPppScreenBreakRandRange = 0.3f;
@@ -635,15 +638,14 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     GXLightObj lightObj;
     u8* camera = reinterpret_cast<u8*>(&CameraPcs);
     const float cameraOffset = kPppScreenBreakCameraOffset;
-    const float zero = 0.0f;
 
     lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
     lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));
     lightDir.z = *(float*)(camera + 0xF4) - (cameraOffset + *(float*)(camera + 0xE8));
     PSVECNormalize(&lightDir, &lightDir);
 
-    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, kPppScreenBreakOne, zero);
-    GXInitLightAttn(&lightObj, zero, zero, kPppScreenBreakOne, kPppScreenBreakLightAttn, zero, kPppScreenBreakLightBias);
+    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cc4);
+    GXInitLightAttn(&lightObj, FLOAT_80331cc4, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cec, FLOAT_80331cc4, FLOAT_80331cf0);
 
     GXInitLightColor(&lightObj,
                      *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(&colorStorage, 0xFF, 0xFF, 0xFF, 0xFF)));

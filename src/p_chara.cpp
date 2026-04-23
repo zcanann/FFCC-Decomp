@@ -704,7 +704,10 @@ CCharaPcs::CCharaPcs()
  */
 CCharaPcs::~CCharaPcs()
 {
-	// TODO
+    dtor_8007B904(LoadPdtArray(this), static_cast<short>(-1));
+    dtor_8007B9B4(LoadTextureArray(this), static_cast<short>(-1));
+    dtor_8007BA64(LoadAnimArray(this), static_cast<short>(-1));
+    dtor_8007BB14(LoadModelArray(this), static_cast<short>(-1));
 }
 
 /*
@@ -1101,7 +1104,19 @@ int CCharaPcs::correctLoadAnimAmem()
  */
 void CCharaPcs::onScriptChanging(char*)
 {
-	// TODO
+    for (int i = 0; i < 5; i++) {
+        const unsigned char shade = static_cast<unsigned char>((i * 0xFF) / 4);
+        _GXColor& fadeColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0x12C + i * 4));
+        fadeColor.r = shade;
+        fadeColor.g = shade;
+        fadeColor.b = shade;
+        fadeColor.a = 0xFF;
+    }
+
+    *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 0xE4)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 0x44)) = 0x80;
+    *reinterpret_cast<int*>(Ptr(this, 0x48)) = 100;
 }
 
 /*
@@ -1133,7 +1148,33 @@ void CCharaPcs::calc()
  */
 void CCharaPcs::calcAfter()
 {
-	// TODO
+    Chara.FlipDBuffer();
+
+    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
+        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+        if (loadAnim == 0 || loadAnim->m_anim == 0) {
+            continue;
+        }
+
+        void*& bankPtr = *reinterpret_cast<void**>(Ptr(loadAnim->m_anim, 0x20));
+        const int bankRefCount = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 4));
+        if (bankRefCount == 1 && bankPtr != 0) {
+            __dl__FPv(bankPtr);
+            bankPtr = 0;
+        }
+    }
+
+    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
+        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+        if (loadAnim == 0 || loadAnim->m_anim == 0) {
+            continue;
+        }
+
+        const int bankRefCount = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 4));
+        if (bankRefCount == 1) {
+            (*reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 0x24)))++;
+        }
+    }
 }
 
 /*
@@ -1143,7 +1184,18 @@ void CCharaPcs::calcAfter()
  */
 void CCharaPcs::ReleaseAllAnimBank()
 {
-	// TODO
+    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
+        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+        if (loadAnim == 0 || loadAnim->m_anim == 0) {
+            continue;
+        }
+
+        void*& bankPtr = *reinterpret_cast<void**>(Ptr(loadAnim->m_anim, 0x20));
+        if (bankPtr != 0) {
+            __dl__FPv(bankPtr);
+            bankPtr = 0;
+        }
+    }
 }
 
 /*
@@ -1153,7 +1205,19 @@ void CCharaPcs::ReleaseAllAnimBank()
  */
 void CCharaPcs::ReleaseUnusedAnimBank()
 {
-	// TODO
+    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
+        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+        if (loadAnim == 0 || loadAnim->m_anim == 0) {
+            continue;
+        }
+
+        void*& bankPtr = *reinterpret_cast<void**>(Ptr(loadAnim->m_anim, 0x20));
+        const int bankRefCount = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 4));
+        if (bankRefCount == 1 && bankPtr != 0) {
+            __dl__FPv(bankPtr);
+            bankPtr = 0;
+        }
+    }
 }
 
 /*
@@ -2955,7 +3019,12 @@ bool CCharaPcs::CHandle::IsLoadModelASyncCompleted()
  */
 void CCharaPcs::CHandle::CancelLoadModelASync()
 {
-	// TODO
+    if (m_asyncFileHandle != 0) {
+        File.Close(m_asyncFileHandle);
+        m_asyncFileHandle = 0;
+    }
+
+    m_asyncState = 0;
 }
 
 /*
@@ -2965,7 +3034,14 @@ void CCharaPcs::CHandle::CancelLoadModelASync()
  */
 CCharaPcs::CLoadModel::CLoadModel()
 {
-	// TODO
+    m_keyTag = 0;
+    m_keyId = -1;
+    m_mergeFileId = -1;
+    m_mergeFlags = 0;
+    m_model = 0;
+    m_streamMode = 0;
+    m_streamOffset = 0;
+    m_streamSize = 0;
 }
 
 /*
@@ -3028,7 +3104,15 @@ CCharaPcs::CLoadAnim::~CLoadAnim()
  */
 CCharaPcs::CLoadTexture::CLoadTexture()
 {
-	// TODO
+    m_keyTag = 0;
+    m_keyId = -1;
+    m_mergeFileId = -1;
+    m_mergeFlags = 0;
+    m_variantTag = 0;
+    m_textureSet = 0;
+    m_streamMode = 0;
+    m_streamOffset = 0;
+    m_streamSize = 0;
 }
 
 /*
@@ -3059,7 +3143,12 @@ CCharaPcs::CLoadTexture::~CLoadTexture()
  */
 CCharaPcs::CLoadPdt::CLoadPdt()
 {
-	// TODO
+    m_keyTag = 0;
+    m_keyId = -1;
+    m_variantTag = 0;
+    m_pdtSlot = -1;
+    m_mergeFileId = -1;
+    m_mergeFlags = 0;
 }
 
 /*

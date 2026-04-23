@@ -106,34 +106,36 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
 	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
 	ChangeTexMeshData* meshData = meshes[param_4].m_data;
 	ChangeTexDisplayList* displayList = meshData->m_displayLists + param_5;
+	int textureInfo = *(int*)((char*)param_2 + 0x1C);
 
 	if (*(u8*)((char*)param_3 + 0x14) == 0) {
 		int drawTevBits = 0xACE0F;
 		int zero = 0;
 		int allOnes = -1;
 		int tevScale = 0x1E;
+		u8 fullByte = 0xFF;
 
 		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
-		int fullTevBits = 0xADE0F;
 		*(int*)(MaterialManRaw() + 0x128) = zero;
+		drawTevBits |= 0x1000;
 		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
 		*(int*)(MaterialManRaw() + 0x130) = zero;
 		*(int*)(MaterialManRaw() + 0x44) = allOnes;
-		*(char*)(MaterialManRaw() + 0x4c) = allOnes;
+		*(u8*)(MaterialManRaw() + 0x4c) = fullByte;
 		*(int*)(MaterialManRaw() + 0x11c) = zero;
 		*(int*)(MaterialManRaw() + 0x120) = tevScale;
 		*(int*)(MaterialManRaw() + 0x124) = zero;
-		*(char*)(MaterialManRaw() + 0x205) = allOnes;
-		*(char*)(MaterialManRaw() + 0x206) = allOnes;
+		*(u8*)(MaterialManRaw() + 0x205) = fullByte;
+		*(u8*)(MaterialManRaw() + 0x206) = fullByte;
 		*(int*)(MaterialManRaw() + 0x58) = zero;
 		*(int*)(MaterialManRaw() + 0x5c) = zero;
 		*(char*)(MaterialManRaw() + 0x208) = zero;
-		*(int*)(MaterialManRaw() + 0x48) = fullTevBits;
+		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
 		*(int*)(MaterialManRaw() + 0x128) = zero;
-		*(int*)(MaterialManRaw() + 0xd0) = *(int*)((char*)param_2 + 0x1C) + 0x28;
+		*(int*)(MaterialManRaw() + 0xd0) = textureInfo + 0x28;
 		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
 		*(int*)(MaterialManRaw() + 0x130) = zero;
-		*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
+		*(int*)(MaterialManRaw() + 0x40) = drawTevBits;
 	}
 
 	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
@@ -178,7 +180,8 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
 				*(int*)(MaterialManRaw() + 0xd0) = dlOffset + 0x28;
 				drawTevBits = 0xACE0F;
-				fullTevBits = 0xADE0F;
+				fullTevBits = drawTevBits;
+				fullTevBits |= 0x1000;
 				allOnes = -1;
 				u8 fullByte = 0xFF;
 				tevScale = 0x1e;

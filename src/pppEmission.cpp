@@ -218,8 +218,10 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
                 }
             }
 
+            s16 life = particle->m_fieldA;
             int alpha = (int)((float)particle->m_alpha * alphaScale);
-            particle->m_fieldA = particle->m_fieldA - 1;
+            life--;
+            particle->m_fieldA = life;
 
             if (particle->m_fieldA <= 0) {
                 int jitter = 0;

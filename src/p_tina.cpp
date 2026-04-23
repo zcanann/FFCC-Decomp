@@ -191,9 +191,8 @@ char DAT_801ead4c[0x38] =
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x0A";
-unsigned int lbl_801EAD84[4] = {
-    reinterpret_cast<unsigned int>(lbl_8032E69C), 0x00000000, 0x00000000, reinterpret_cast<unsigned int>(lbl_8032E69C)
-};
+unsigned int lbl_801EAD84[3] = {reinterpret_cast<unsigned int>(lbl_8032E69C), 0x00000000, 0x00000000};
+unsigned int lbl_801EAD90 = reinterpret_cast<unsigned int>(lbl_8032E69C);
 int DAT_8032ed38;
 int DAT_8032ed3c;
 CPartPcs PartPcs;

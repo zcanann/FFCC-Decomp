@@ -2,6 +2,7 @@
 #include "ffcc/chara.h"
 #include "ffcc/fontman.h"
 #include "ffcc/p_game.h"
+#include "ffcc/sound.h"
 #include "ffcc/linkage.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -1994,9 +1995,117 @@ void CMenuPcs::CmakeVillageOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CmakeVillageCtrl()
+unsigned short CMenuPcs::CmakeVillageCtrl()
 {
-    calcVillageMenu();
+    int villageWork = MenuS32(this, 0x830);
+    short& select = *reinterpret_cast<short*>(villageWork + 0x26);
+    short& row = *reinterpret_cast<short*>(villageWork + 0x28);
+    short& table = *reinterpret_cast<short*>(villageWork + 0x2A);
+    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
+    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    char picked[2] = {'\0', '\0'};
+    size_t len = strlen(s_CmakeInfo.m_name);
+
+    int maxRow = (select < 10) ? 4 : 5;
+    if ((repeat & 0x4) != 0) {
+        row = (row < maxRow) ? static_cast<short>(row + 1) : 0;
+        Sound.PlaySe(1, 0x40, 0x7f, 0);
+    } else if ((repeat & 0x8) != 0) {
+        row = (row > 0) ? static_cast<short>(row - 1) : static_cast<short>(maxRow);
+        Sound.PlaySe(1, 0x40, 0x7f, 0);
+    }
+
+    if ((repeat & 0x1) != 0) {
+        if (row < 5) {
+            select = (select > 0) ? static_cast<short>(select - 1) : 0xB;
+            Sound.PlaySe(1, 0x40, 0x7f, 0);
+        } else {
+            Sound.PlaySe(4, 0x40, 0x7f, 0);
+        }
+    } else if ((repeat & 0x2) != 0) {
+        if (row < 5) {
+            select = (select < 0xB) ? static_cast<short>(select + 1) : 0;
+            Sound.PlaySe(1, 0x40, 0x7f, 0);
+        } else {
+            Sound.PlaySe(4, 0x40, 0x7f, 0);
+        }
+    }
+
+    if ((down & 0x40) != 0) {
+        table = (table > 0) ? static_cast<short>(table - 1) : 2;
+        Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+    } else if ((down & 0x20) != 0) {
+        table = (table < 2) ? static_cast<short>(table + 1) : 0;
+        Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+    }
+
+    if ((down & 0x1000) != 0) {
+        select = 0xB;
+        row = 5;
+        Sound.PlaySe(2, 0x40, 0x7f, 0);
+        return 0;
+    }
+
+    if ((down & 0x200) != 0) {
+        if (len == 0) {
+            Sound.PlaySe(4, 0x40, 0x7f, 0);
+        } else {
+            s_CmakeInfo.m_name[len - 1] = '\0';
+            Sound.PlaySe(3, 0x40, 0x7f, 0);
+        }
+        return 0;
+    }
+
+    if ((down & 0x100) == 0) {
+        return 0;
+    }
+
+    if (row > 4) {
+        bool hasNonSpace = false;
+        for (size_t i = 0; i < len; i++) {
+            if (s_CmakeInfo.m_name[i] != ' ') {
+                hasNonSpace = true;
+                break;
+            }
+        }
+
+        if (!hasNonSpace) {
+            Sound.PlaySe(4, 0x40, 0x7f, 0);
+            return 0;
+        }
+
+        Sound.PlaySe(2, 0x40, 0x7f, 0);
+        *reinterpret_cast<short*>(villageWork + 0x1E) = 1;
+        return 1;
+    }
+
+    if (len >= 7) {
+        Sound.PlaySe(4, 0x40, 0x7f, 0);
+        return 0;
+    }
+
+    const char* rowText = s_cmakeNameRows[table * 5 + row];
+    size_t rowLen = strlen(rowText);
+    if (select < 0 || static_cast<size_t>(select) >= rowLen) {
+        Sound.PlaySe(4, 0x40, 0x7f, 0);
+        return 0;
+    }
+
+    picked[0] = rowText[select];
+    if (picked[0] == '\0') {
+        Sound.PlaySe(4, 0x40, 0x7f, 0);
+        return 0;
+    }
+
+    s_CmakeInfo.m_name[len] = picked[0];
+    s_CmakeInfo.m_name[len + 1] = '\0';
+    if (strlen(s_CmakeInfo.m_name) > 6) {
+        select = 0xB;
+        row = 5;
+    }
+
+    Sound.PlaySe(2, 0x40, 0x7f, 0);
+    return 0;
 }
 
 /*
@@ -2025,7 +2134,94 @@ void CMenuPcs::CmakeVillageClose()
  */
 void CMenuPcs::CmakeVillageDraw()
 {
-    drawVillageMenu();
+    int villageWork = MenuS32(this, 0x830);
+    short mode = *reinterpret_cast<short*>(villageWork + 0x10);
+    short frame = *reinterpret_cast<short*>(villageWork + 0x22);
+    short select = *reinterpret_cast<short*>(villageWork + 0x26);
+    short row = *reinterpret_cast<short*>(villageWork + 0x28);
+    short table = *reinterpret_cast<short*>(villageWork + 0x2A);
+    float alpha;
+
+    if (frame > 0) {
+        frame = static_cast<short>(frame - 1);
+    } else {
+        frame = 0;
+    }
+
+    if (mode == 0) {
+        alpha = static_cast<float>(DOUBLE_80333268 * static_cast<double>(frame));
+    } else if (mode == 1) {
+        alpha = FLOAT_80333258;
+    } else {
+        alpha = static_cast<float>(DOUBLE_80333270 - DOUBLE_80333268 * static_cast<double>(frame));
+    }
+
+    DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
+    DrawCmakeWin(0.0f, 0.0f, FLOAT_80333258);
+    DrawCmakeTitle(0, 0.0f, alpha);
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
+
+    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    if (a < 0) {
+        a = 0;
+    } else if (a > 0xFF) {
+        a = 0xFF;
+    }
+
+    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXSetChanMatColor(GX_COLOR0A0, col);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), (MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcsVoid(), 0, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
+        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcsVoid(), 0, 32.0f, 160.0f, FLOAT_803332a4, FLOAT_8033327c,
+        FLOAT_80333254, FLOAT_803332a4, FLOAT_80333258, FLOAT_80333258, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), (MenuS16(this, 0x86C) != 0) ? 0x68 : 0x41);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcsVoid(), 0, 168.0f, 172.0f, FLOAT_803332b0, FLOAT_803332b0,
+        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcsVoid(), 0, 232.0f, 172.0f, FLOAT_803332b0, FLOAT_803332b0,
+        FLOAT_803332b0, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+
+    if (mode == 1 && row < 5) {
+        GXColor cursorColor = {0xFF, 0xFF, 0xFF, 0xFF};
+        GXSetChanMatColor(GX_COLOR0A0, cursorColor);
+        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), (MenuS16(this, 0x86C) != 0) ? 100 : 0x3D);
+        DrawRect__8CMenuPcsFUlfffffffff(
+            MenuPcsVoid(), 0,
+            0xE5 + select * 20.0f, 99.0f + row * 32.0f, FLOAT_803332b0, FLOAT_803332b0,
+            FLOAT_8033324c, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+    }
+
+    CFont* font = GetCmakeKeyboardFont(this);
+    font->SetShadow(0);
+    font->SetScale(FLOAT_80333258);
+    font->DrawInit();
+    font->SetMargin(FLOAT_80333258);
+    font->SetColor(col);
+
+    for (int i = 0; i < 5; i++) {
+        const char* rowText = s_cmakeNameRows[table * 5 + i];
+        font->SetPosX(200.0f);
+        font->SetPosY(108.0f + i * 32.0f);
+        font->Draw(rowText);
+    }
+
+    DrawInit__8CMenuPcsFv(this);
+    if (mode == 1 && row < 5) {
+        DrawCursor__8CMenuPcsFiif(this,
+            200 + select * 20 + (System.m_frameCounter & 7),
+            112 + row * 32, alpha);
+    }
+
+    int showNameCursor = (mode == 1 && row < 5 && strlen(s_CmakeInfo.m_name) <= 6) ? 1 : 0;
+    DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);
+    DrawCmakeDecision((row > 4) ? 1 : 0, alpha);
 }
 
 /*

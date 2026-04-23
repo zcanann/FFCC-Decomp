@@ -10,36 +10,26 @@ extern char __RTTI__8CManager[];
 extern char __RTTI__8CProcess[];
 
 const char s_CSoundPcs_801DB4E8[] = "CSoundPcs";
-unsigned int m_table_desc0__9CSoundPcs[3] = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CSoundPcsFv)
-};
-unsigned int m_table_desc1__9CSoundPcs[3] = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CSoundPcsFv)
-};
-unsigned int m_table_desc2__9CSoundPcs[3] = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CSoundPcsFv)
-};
-unsigned int m_table_desc3__9CSoundPcs[3] = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CSoundPcsFv)
-};
-unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CSoundPcs_801DB4E8)),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0x25,
-    0,
-    0,
-    0,
-    0,
-    0x44,
-    1
+CSoundPcsTable m_table__9CSoundPcs = {
+    const_cast<char*>(s_CSoundPcs_801DB4E8),
+    {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0x25,
+        0,
+        0,
+        0,
+        0,
+        0x44,
+        1,
+    }
 };
 unsigned int CSoundPcs_RTTI_base__9CSoundPcs[3] = {reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, 0};
 unsigned int CSoundPcs_RTTI__9CSoundPcs[5] = {
@@ -133,7 +123,7 @@ void CSoundPcs::create()
  */
 int CSoundPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table__9CSoundPcs) + (index * 0x15C));
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(&m_table__9CSoundPcs) + (index * 0x15C));
 }
 
 /*
@@ -160,4 +150,26 @@ void CSoundPcs::Quit()
  */
 void CSoundPcs::Init()
 {
+}
+
+inline CSoundPcs::CSoundPcs()
+{
+    static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CSoundPcsFv)};
+    static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CSoundPcsFv)};
+    static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CSoundPcsFv)};
+    static unsigned int desc3[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CSoundPcsFv)};
+    unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__9CSoundPcs);
+
+    table[1] = desc0[0];
+    table[2] = desc0[1];
+    table[3] = desc0[2];
+    table[4] = desc1[0];
+    table[5] = desc1[1];
+    table[6] = desc1[2];
+    table[7] = desc2[0];
+    table[8] = desc2[1];
+    table[9] = desc2[2];
+    table[12] = desc3[0];
+    table[13] = desc3[1];
+    table[14] = desc3[2];
 }

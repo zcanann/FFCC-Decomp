@@ -6,7 +6,7 @@
 int m_DataBuffer;
 int m_ADataBuffer;
 int m_DataBufferSize;
-int m_ADataBufferSize;
+u32 m_AChangeStatus;
 int* m_MemoryBank;
 int* m_AMemoryBank;
 extern int DAT_8032f490;

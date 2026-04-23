@@ -2844,6 +2844,10 @@ void CMenuPcs::CalcSingleCMakeChara()
  */
 void CMenuPcs::DrawSingleCMakeChara(float alpha)
 {
-    (void)alpha;
     CalcSingleCMakeChara();
+    if (alpha <= 0.0f) {
+        return;
+    }
+
+    DrawCmakePreviewCharaAlpha(this, alpha);
 }

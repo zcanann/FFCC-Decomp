@@ -12,8 +12,8 @@ class CFont;
 class CFontMan : public CManager
 {
 public:
-	CFontMan();
-	virtual ~CFontMan();
+	CFontMan() {}
+	~CFontMan();
 
 	void Init();
 	void Quit();

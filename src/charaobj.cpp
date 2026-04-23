@@ -1,6 +1,7 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/fontman.h"
 #include "ffcc/linkage.h"
+#include "ffcc/math.h"
 #include "ffcc/monobj.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/partMng.h"
@@ -16,6 +17,19 @@ extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFla
 extern "C" void DeleteParticleSlot__13CFlatRuntime2Fii(void*, int);
 extern "C" int GetFreeParticleSlot__13CFlatRuntime2Fv(void*);
 extern "C" void EndParticleSlot__13CFlatRuntime2Fii(void*, int, int);
+extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
+extern "C" void SetParticleWorkScale__13CFlatRuntime2Ff(void*, float);
+extern "C" void SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
+extern "C" void SetParticleWorkSpeed__13CFlatRuntime2Ff(void*, float);
+extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
+extern "C" void SetParticleWorkCol__13CFlatRuntime2Fiif(void*, int, int, float);
+extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
+extern "C" void SetParticleWorkVector__13CFlatRuntime2Fff(void*, float, float);
+extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void SetParticleWorkTarget__13CFlatRuntime2FR3Vec(void*, Vec&);
+extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void SetParticleWorkNo__13CFlatRuntime2Fi(void*, int);
+extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern "C" int intToClass__13CFlatRuntime2Fi(void*, int);
 extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
 extern "C" void pppEndPart__8CPartMngFi(void*, int);
@@ -157,6 +171,26 @@ static bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
 	facing.z = cosf(self->m_rotBaseY);
 	dot = delta.x * facing.x + delta.z * facing.z;
 	return dot > 0.0f;
+}
+
+static int CharaObjDecodeSe(unsigned short encodedSe)
+{
+	if (encodedSe == 0 || encodedSe == 0xFFFF) {
+		return 0;
+	}
+	return (encodedSe & 0xFF) + ((encodedSe >> 8) * 1000);
+}
+
+static int CharaObjResolveParticleBank(CGCharaObj* charaObj, unsigned short particleClass)
+{
+	if (particleClass == 0xFE) {
+		int pdtNo = CharaObjGetModelPdtNo(charaObj);
+		return (pdtNo >= 0) ? pdtNo : -1;
+	}
+	if (particleClass >= 0xFD && particleClass <= 0xFF) {
+		return -1;
+	}
+	return particleClass;
 }
 
 /*
@@ -1520,10 +1554,175 @@ void CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0,
  */
 void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg1, Vec* pos)
 {
-	if (pos == 0) {
-		pos = &m_worldPosition;
+	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
+	unsigned short particleClass = *reinterpret_cast<unsigned short*>(itemData + 0x12);
+	int particleBank = CharaObjResolveParticleBank(this, particleClass);
+	unsigned short particleEntry = 0xFFFF;
+	unsigned short particleFlags = 0;
+	int particleNo = -1;
+	int seNo = 0;
+	bool emittedCustom = false;
+
+	if (particleBank >= 0) {
+		particleEntry = *reinterpret_cast<unsigned short*>(itemData + 0x14 + effectArg0 * 2);
+		if (particleEntry != 0xFFFF) {
+			particleFlags = particleEntry;
+			particleNo = particleEntry & 0xFF;
+
+			if ((particleFlags & 0x1000) != 0) {
+				particleBank = 1;
+			} else if ((particleFlags & 0x2000) != 0) {
+				particleBank = 2;
+			} else if ((particleFlags & 0x4000) != 0) {
+				particleBank = 3;
+			} else if (particleBank == 1 && particleNo < 8 && m_scriptHandle != 0) {
+				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xF8);
+			}
+
+			if ((particleFlags & 0x800) != 0 && m_scriptHandle != 0) {
+				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
+			}
+		}
 	}
-	putParticle(effectId, effectArg0, pos, 1.0f, effectArg1);
+
+	if (particleNo >= 0) {
+		ResetParticleWork__13CFlatRuntime2Fii(CFlat, (particleBank << 8) | particleNo, effectArg1);
+		SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, *reinterpret_cast<unsigned short*>(itemData + 0x10) * 0.01f);
+		SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, effectId, this);
+		SetParticleWorkSpeed__13CFlatRuntime2Ff(CFlat, *reinterpret_cast<unsigned short*>(itemData + 0x26) * 0.01f);
+
+		if (effectId > 500) {
+			unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
+			int colType = -1;
+			if (itemType == 1 || itemType == 4 || itemType == 8 || itemType == 9) {
+				colType = itemType;
+			}
+			if (colType >= 0) {
+				SetParticleWorkCol__13CFlatRuntime2Fiif(CFlat, colType, -1, *reinterpret_cast<unsigned short*>(itemData + 4) * 0.01f);
+			}
+		}
+
+		switch (effectArg0) {
+		case 0:
+			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x38));
+			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x3A) & 0x8000) != 0) {
+				SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3A) & 0xFF);
+				seNo = 0;
+			}
+			break;
+		case 1:
+			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x3C));
+			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x3E) & 0x8000) != 0) {
+				SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3E) & 0xFF);
+				seNo = 0;
+			}
+			break;
+		case 2:
+			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x40));
+			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x400) != 0) {
+				SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+				seNo = 0;
+			}
+			break;
+		default:
+			break;
+		}
+
+		if ((particleFlags & 0x100) != 0) {
+			SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+		} else if ((particleFlags & 0x200) != 0) {
+			float distance = *reinterpret_cast<unsigned short*>(itemData + 0x2A) * 1.0f;
+			Vec offsetPos;
+			offsetPos.x = m_worldPosition.x + sinf(m_rotTargetY) * distance;
+			offsetPos.y = m_worldPosition.y;
+			offsetPos.z = m_worldPosition.z + cosf(m_rotTargetY) * distance;
+			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, offsetPos, m_rotTargetY);
+			SetParticleWorkVector__13CFlatRuntime2Fff(CFlat, m_rotTargetY, 0.0f);
+			if ((*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x4000) != 0) {
+				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, m_worldPosition, m_rotTargetY);
+				SetParticleWorkTarget__13CFlatRuntime2FR3Vec(CFlat, m_jumpOffset);
+				SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+			}
+		} else if (pos != 0) {
+			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, m_rotTargetY);
+		} else if ((particleFlags & 0x400) != 0) {
+			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, m_jumpOffset, 0.0f);
+		} else {
+			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, m_worldPosition, m_rotTargetY);
+		}
+
+		if (effectId == 0x3B4 && effectArg0 == 3 && pos != 0) {
+			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, m_rotTargetY);
+			PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			emittedCustom = true;
+		} else if (effectId == 0x409 && effectArg0 == 3) {
+			for (int i = 3; i < 9; i++) {
+				SetParticleWorkNo__13CFlatRuntime2Fi(CFlat, (particleBank << 8) | i);
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			}
+			emittedCustom = true;
+		} else if (effectId > 0x46C && effectId < 0x46F) {
+			if (effectArg0 == 2 && m_stateFrame > 0xF) {
+				Vec randomPos;
+				randomPos.x = m_worldPosition.x + Math.RandFPM(20.0f);
+				randomPos.y = m_worldPosition.y + 1.0f;
+				randomPos.z = m_worldPosition.z + Math.RandFPM(20.0f);
+				SetParticleWorkNo__13CFlatRuntime2Fi(CFlat, (particleBank << 8) | 0x1D);
+				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, randomPos, m_rotTargetY);
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				emittedCustom = true;
+			} else if (effectArg0 == 3) {
+				for (int i = 0x0D; i < 0x1D; i++) {
+					SetParticleWorkNo__13CFlatRuntime2Fi(CFlat, (particleBank << 8) | i);
+					PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				}
+				emittedCustom = true;
+			}
+		} else if (effectId > 0x472 && effectId < 0x479 && effectArg0 == 3) {
+			for (int i = 7; i < 0x0C; i++) {
+				SetParticleWorkNo__13CFlatRuntime2Fi(CFlat, (particleBank << 8) | i);
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			}
+			emittedCustom = true;
+		} else if (effectId > 0x49C && effectId < 0x4A0 && effectArg0 == 2) {
+			for (int i = 0; i < 2; i++) {
+				float side = (i == 0) ? 76.0f : -76.0f;
+				Vec sidePos;
+				sidePos.x = m_worldPosition.x + cosf(m_rotTargetY) * side;
+				sidePos.y = m_worldPosition.y;
+				sidePos.z = m_worldPosition.z - sinf(m_rotTargetY) * side;
+				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, sidePos, m_rotTargetY);
+				SetParticleWorkVector__13CFlatRuntime2Fff(CFlat, m_rotTargetY, 0.0f);
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			}
+			emittedCustom = true;
+		}
+
+		if (seNo != 0) {
+			Vec* sePos = (effectArg0 == 2) ? pos : 0;
+			int seHandle = playSe3D(seNo, 0x32, 0x96, 0, sePos);
+			Sound.SetSe3DGroup(seHandle, m_particleId);
+		}
+
+		if (!emittedCustom) {
+			unsigned short fanCount = *reinterpret_cast<unsigned short*>(itemData + 0x24);
+			if (effectArg0 == 3 && fanCount > 1) {
+				for (int i = 0; i < fanCount; i++) {
+					float t = (fanCount > 1) ? ((float)i / (float)(fanCount - 1)) : 0.0f;
+					SetParticleWorkVector__13CFlatRuntime2Fff(CFlat, t * 0.75f, 0.0f);
+					PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				}
+			} else {
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			}
+		}
+	} else if (effectArg0 == 2) {
+		seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x40));
+		if (seNo != 0) {
+			int seHandle = playSe3D(seNo, 0x32, 0x96, 0, pos);
+			Sound.SetSe3DGroup(seHandle, m_particleId);
+		}
+	}
 }
 
 /*

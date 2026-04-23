@@ -175,6 +175,9 @@ public:
     void InitFurTexBuffer();
     void SaveFurTexBuffer(unsigned short* outTexels);
     void LoadFurTexBuffer(unsigned short* inTexels);
+
+private:
+    u8 m_work[0x2074];
 };
 
 extern CChara Chara;

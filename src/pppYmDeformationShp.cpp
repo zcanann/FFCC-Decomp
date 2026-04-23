@@ -148,7 +148,8 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 
 		if (param_2->m_splitMode == 0) {
-			float quadSize = (float)param_2->m_size;
+			short size = param_2->m_size;
+			float quadSize = (float)size;
 			if (param_2->m_orientation == 0) {
 				vertices[0].x = -quadSize;
 				vertices[0].y = quadSize;
@@ -187,8 +188,8 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			uvs[3].y = FLOAT_803305f8;
 			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, vertices, uvs);
 		} else {
-			int size = param_2->m_size;
-			int split = param_2->m_splitSize;
+			short size = param_2->m_size;
+			short split = param_2->m_splitSize;
 			float uvSplit = (FLOAT_803305f8 / (float)(size + size)) * (float)(size - split);
 			float uvRemainder = FLOAT_803305f8 - uvSplit;
 

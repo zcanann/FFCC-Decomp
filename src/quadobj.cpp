@@ -16,9 +16,9 @@ extern const float kOneF32;
  * Address:	TODO
  * Size:	TODO
  */
-void CGQuadObj::onCreate()
-{ 
-	m_vertexCount = 0;
+int CGQuadObj::GetCID()
+{
+	return 3;
 }
 
 /*
@@ -26,9 +26,74 @@ void CGQuadObj::onCreate()
  * Address:	TODO
  * Size:	TODO
  */
-void CGQuadObj::onDestroy()
+void CGQuadObj::Add(float x, float z)
 {
+    m_vertices[m_vertexCount].x = x;
+    m_vertices[m_vertexCount].z = z;
+
+    m_bboxMinX = (m_bboxMinX < m_vertices[m_vertexCount].x) ? m_bboxMinX : m_vertices[m_vertexCount].x;
+    m_bboxMinZ = (m_bboxMinZ < m_vertices[m_vertexCount].z) ? m_bboxMinZ : m_vertices[m_vertexCount].z;
+    m_bboxMaxX = (m_bboxMaxX < m_vertices[m_vertexCount].x) ? m_vertices[m_vertexCount].x : m_bboxMaxX;
+    m_bboxMaxZ = (m_bboxMaxZ < m_vertices[m_vertexCount].z) ? m_vertices[m_vertexCount].z : m_bboxMaxZ;
+
+    m_vertexCount++;
 }
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGQuadObj::Reset(float base, float height)
+{
+	m_vertexCount = 0;
+	m_yBase = base;
+	m_yHeight = height;
+	m_bboxMinZ = kQuadObjMaxBounds;
+	m_bboxMinX = kQuadObjMaxBounds;
+	m_bboxMaxZ = kQuadObjMinBounds;
+	m_bboxMaxX = kQuadObjMinBounds;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8010b3a8
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+bool CGQuadObj::isInner(Vec* vec)
+{
+	CGQuadObj* self;
+	u32 count = m_vertexCount;
+	if ((((count != 0) && (m_bboxMinX <= vec->x)) && (m_bboxMinZ <= vec->z)) && ((m_bboxMaxX >= vec->x) && (m_bboxMaxZ >= vec->z))) {
+		if ((m_yBase <= vec->y) && ((m_yBase + m_yHeight) >= vec->y)) {
+			self = this;
+			int i = 0;
+			for (; i < (int)count; i++) {
+				float z0 = self->m_vertices[0].z;
+				float x0 = self->m_vertices[0].x;
+				int quotient = (i + 1) / (int)count;
+				int next = (i + 1) - quotient * (int)count;
+				if (((m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0)) < 0.0f) {
+					break;
+				}
+				self = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(self) + sizeof(QuadVertex));
+			}
+
+			if (i == (int)count) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+extern const float FLOAT_80331960 = 20.0f;
+extern const float kOneF32 = 1.0f;
 
 /*
  * --INFO--
@@ -78,81 +143,16 @@ void CGQuadObj::onDraw()
  * Address:	TODO
  * Size:	TODO
  */
-int CGQuadObj::GetCID()
-{ 
-	return 3;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8010b3a8
- * PAL Size: 256b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-bool CGQuadObj::isInner(Vec* vec)
+void CGQuadObj::onDestroy()
 {
-	CGQuadObj* self;
-	u32 count = m_vertexCount;
-	if ((((count != 0) && (m_bboxMinX <= vec->x)) && (m_bboxMinZ <= vec->z)) && ((m_bboxMaxX >= vec->x) && (m_bboxMaxZ >= vec->z))) {
-		if ((m_yBase <= vec->y) && ((m_yBase + m_yHeight) >= vec->y)) {
-			self = this;
-			int i = 0;
-			for (; i < (int)count; i++) {
-				float z0 = self->m_vertices[0].z;
-				float x0 = self->m_vertices[0].x;
-				int quotient = (i + 1) / (int)count;
-				int next = (i + 1) - quotient * (int)count;
-				if (((m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0)) < 0.0f) {
-					break;
-				}
-				self = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(self) + sizeof(QuadVertex));
-			}
-
-			if (i == (int)count) {
-				return true;
-			}
-		}
-	}
-
-	return false;
 }
-
-extern const float FLOAT_80331960 = 20.0f;
-extern const float kOneF32 = 1.0f;
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void CGQuadObj::Reset(float base, float height)
-{ 
+void CGQuadObj::onCreate()
+{
 	m_vertexCount = 0;
-	m_yBase = base;
-	m_yHeight = height;
-	m_bboxMinZ = kQuadObjMaxBounds;
-	m_bboxMinX = kQuadObjMaxBounds;
-	m_bboxMaxZ = kQuadObjMinBounds;
-	m_bboxMaxX = kQuadObjMinBounds;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGQuadObj::Add(float x, float z)
-{
-    m_vertices[m_vertexCount].x = x;
-    m_vertices[m_vertexCount].z = z;
-
-    m_bboxMinX = (m_bboxMinX < m_vertices[m_vertexCount].x) ? m_bboxMinX : m_vertices[m_vertexCount].x;
-    m_bboxMinZ = (m_bboxMinZ < m_vertices[m_vertexCount].z) ? m_bboxMinZ : m_vertices[m_vertexCount].z;
-    m_bboxMaxX = (m_bboxMaxX < m_vertices[m_vertexCount].x) ? m_vertices[m_vertexCount].x : m_bboxMaxX;
-    m_bboxMaxZ = (m_bboxMaxZ < m_vertices[m_vertexCount].z) ? m_vertices[m_vertexCount].z : m_bboxMaxZ;
-
-    m_vertexCount++;
 }

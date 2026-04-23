@@ -13,7 +13,7 @@ extern "C" void __dl__FPv(void*);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* const* GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" const char* lbl_80214FE0[];
+extern "C" const char* g_strGooutMes[];
 
 struct CMenuPcsGoOutLayout
 {
@@ -58,6 +58,20 @@ struct CMenuMcWinState
     signed short m_mode;
 };
 
+struct CGoOutSaveCaravan
+{
+    int m_dataPresent;
+    unsigned char unk4[0x309];
+    char m_odekakeReturnFlag;
+    unsigned char unk30E[0x6B2];
+};
+
+struct CGoOutSaveDatLayout
+{
+    unsigned char unk0[0x1A84];
+    CGoOutSaveCaravan m_caravan[8];
+};
+
 static inline unsigned char ReadGoOutU8(CGoOutMenu& menu, int offset) { return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&menu) + offset); }
 static inline signed short ReadGoOutS16(CGoOutMenu& menu, int offset) { return *reinterpret_cast<signed short*>(reinterpret_cast<unsigned char*>(&menu) + offset); }
 static inline signed char ReadGoOutS8(CGoOutMenu& menu, int offset) { return *reinterpret_cast<signed char*>(reinterpret_cast<unsigned char*>(&menu) + offset); }
@@ -88,7 +102,7 @@ static unsigned short GetGoOutInputMask()
 
 static inline const char* GetGoOutMessageLine(int languageId, int line)
 {
-    return lbl_80214FE0[(languageId * 0x6E) + line];
+    return g_strGooutMes[(languageId * 0x6E) + line];
 }
 
 static const char sSlotAErrorText1[] = "The Memory Card in Slot A contains";
@@ -153,7 +167,8 @@ static const char sReturnConfirmLine3[] = "current game's";
 static const char sReturnConfirmLine4[] = "guest data will be deleted.";
 static const char sYesNoLine[] = "  Yes   No";
 static const char sSavingLine1[] = "Saving data to the Memory";
-static const char sSavingLine2[] = "Card in Slot B. Please do";
+static const char sSavingSlotALine2[] = "Card in Slot A. Please do";
+static const char sSavingSlotBLine2[] = "Card in Slot B. Please do";
 static const char sSavingLine3[] = "not touch the Memory Card";
 static const char sSavingLine4[] = "or the POWER Button.";
 static const char sCardRemovedLine1[] = "A Memory Card has been removed.";
@@ -196,6 +211,22 @@ static void InitGoOutWinMessage(int message, short startIndex)
     for (int i = 0; i < 8; i++) {
         winMessage[i + 2] = startIndex + i;
     }
+}
+
+static inline CGoOutSaveDatLayout& GoOutSaveDat(Mc::SaveDat* saveData)
+{
+    return *reinterpret_cast<CGoOutSaveDatLayout*>(saveData);
+}
+
+static int FindFreeCaravanIdx(Mc::SaveDat* saveData)
+{
+    for (int i = 0; i < 8; i++) {
+        if (GoOutSaveDat(saveData).m_caravan[i].m_dataPresent == 0) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 /*
@@ -259,12 +290,16 @@ void DrawGoOutMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void getFreeCaravanIdx(Mc::SaveDat*)
+int getFreeCaravanIdx(Mc::SaveDat* saveData)
 {
-	// TODO
+    return FindFreeCaravanIdx(saveData);
 }
 
 
@@ -968,6 +1003,39 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         field_0x3c = 0;
         field_0x46 = 1;
         break;
+    case 0x12: {
+        field_0x1c = 0;
+        Mc::SaveDat* const transferWork = static_cast<Mc::SaveDat*>(menuPcsLayout.m_transferWork);
+        Mc::SaveDat* const transferSaveData = menuPcsLayout.m_transferSaveData;
+        int freeCaravanIdx;
+
+        if (GoOutSaveDat(transferWork).m_caravan[field_0x20].m_odekakeReturnFlag == 0) {
+            freeCaravanIdx = FindFreeCaravanIdx(transferSaveData);
+            MemoryCardMan.Odekake(1, *transferWork, field_0x20, *transferSaveData, freeCaravanIdx);
+        } else {
+            freeCaravanIdx = MenuPcs.GetSameCharaData(transferSaveData, transferWork, field_0x20, 0);
+            MemoryCardMan.Odekake(0, *transferWork, field_0x20, *transferSaveData, freeCaravanIdx);
+        }
+
+        mcCtrl.m_cardChannel = field_0xc;
+        field_0x2 = static_cast<char>(mcCtrl.m_cardChannel);
+        field_0x3 = static_cast<char>(field_0x10);
+        field_0x8 = reinterpret_cast<int>(transferSaveData);
+        field_0x4 = mcCtrl.ChkConnect(static_cast<unsigned char>(field_0x2));
+        if (field_0x4 == 1) {
+            mcCtrl.m_saveIndex = static_cast<unsigned char>(field_0x3);
+            mcCtrl.m_cardChannel = static_cast<unsigned char>(field_0x2);
+            mcCtrl.m_previousState = 0;
+            mcCtrl.m_state = 0;
+            mcCtrl.m_lastResult = 0;
+            mcCtrl.m_iteration = 0;
+            mcCtrl.m_userBuffer = 0;
+            mcCtrl.m_createFlag = 0;
+            field_0x1 = 2;
+        }
+        SetMenuStr(0, 4, sSavingLine1, sSavingSlotALine2, sSavingLine3, sSavingLine4);
+        break;
+    }
     case 0x13:
         mcCtrl.m_cardChannel = static_cast<unsigned char>(field_0x1a);
         field_0x2 = field_0x1a;
@@ -985,7 +1053,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             mcCtrl.m_createFlag = 0;
             field_0x1 = 2;
         }
-        SetMenuStr(0, 4, sSavingLine1, sSavingLine2, sSavingLine3, sSavingLine4);
+        SetMenuStr(0, 4, sSavingLine1, sSavingSlotBLine2, sSavingLine3, sSavingLine4);
         break;
     case 0x14:
         if (field_0x36 >= 0) {

@@ -370,22 +370,14 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         }
 
         if (step->m_payload[0x3c] == 0) {
-            int createHitObject = 0;
-            if (step->m_arg3 != -1) {
-                createHitObject = 1;
-            }
-            if (!hit) {
-                createHitObject = 0;
-            }
-
-            if (work->m_hitFrame < step->m_payload[0x1d]) {
-                work->m_hitFrame++;
-                createHitObject = 0;
-            } else {
+            bool createHitObject = (step->m_payload[0x1d] <= work->m_hitFrame);
+            if (createHitObject) {
                 work->m_hitFrame = 0;
+            } else {
+                work->m_hitFrame++;
             }
 
-            if (createHitObject != 0) {
+            if (createHitObject && hit && (step->m_arg3 != -1)) {
                 _pppPDataVal* dataVal = pppMngStPtr->m_pppPDataVals + step->m_arg3;
                 _pppPObject* created;
                 if (dataVal == 0) {

@@ -79,6 +79,7 @@ unsigned int m_table__9CLightPcs[0x15C / sizeof(unsigned int)] = {
 };
 
 CLightPcs LightPcs;
+_GXColor s_ambientAlphaColor;
 static const char s_p_light_cpp[] = "p_light.cpp";
 
 static inline double U32ToDouble(unsigned int value)
@@ -660,12 +661,9 @@ void CLightPcs::SetAmbient(_GXColor color)
  */
 void CLightPcs::SetAmbientAlpha(float alpha)
 {
-    _GXColor color;
-    color.r = 0;
-    color.g = 0;
-    color.b = 0;
-    color.a = (u8)(int)((double)FLOAT_8032fc7c * (double)alpha);
-    GXSetChanAmbColor((GXChannelID)2, color);
+    float scaled = FLOAT_8032fc7c * alpha;
+    s_ambientAlphaColor.a = (u8)(int)scaled;
+    GXSetChanAmbColor((GXChannelID)2, s_ambientAlphaColor);
 }
 
 /*

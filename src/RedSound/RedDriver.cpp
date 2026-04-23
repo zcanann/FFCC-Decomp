@@ -241,21 +241,20 @@ void _SetReverbDepth(int* param_1)
     if (reverbDepth != 0) {
         reverbDepth = (((reverbDepth + 1) * 0x100) - 1) * 0x1000;
     }
-    *(unsigned int*)((char*)DAT_8032f474 + (reverbIndex & 1) * 0xc) = reverbDepth;
+    *(unsigned int*)((char*)DAT_8032f45c + (reverbIndex & 1) * 0xc) = reverbDepth;
     if ((reverbIndex & 1) != 0) {
-        fadeStep = (int)(fadeFrame * 0x60) / 0x3c + ((int)(fadeFrame * 0x60) >> 0x1f);
-        fadeStep = fadeStep - (fadeStep >> 0x1f);
+        fadeStep = (int)(fadeFrame * 0x60) / 0x3c;
         if (fadeStep == 0) {
-            fadeStep = 1;
+            fadeStep++;
         }
-        seInfo = *(int**)((char*)DAT_8032f3f0 + 0xdbc);
+        seInfo = *(int**)((char*)DAT_8032f3d8 + 0xdbc);
         do {
             if (*seInfo != 0) {
                 seInfo[0x1b] = (int)((reverbDepth | 0x800) - (seInfo[0x1a] & 0xfffff000U)) / fadeStep;
                 seInfo[0x1c] = fadeStep;
             }
             seInfo += 0x55;
-        } while (seInfo < (int*)(*(int*)((char*)DAT_8032f3f0 + 0xdbc) + 0x2a80));
+        } while (seInfo < (int*)(*(int*)((char*)DAT_8032f3d8 + 0xdbc) + 0x2a80));
     }
 }
 

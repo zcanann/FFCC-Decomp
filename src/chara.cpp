@@ -19,6 +19,7 @@ extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5
 extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(
     void*, void*, CChunkFile&, CMemory::CStage*);
 extern "C" void __dla__FPv(void*);
+extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __ct__7CVectorFv(void*);
 extern "C" void SetTextureSet__12CMaterialSetFP11CTextureSet(CMaterialSet*, CTextureSet*);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -235,6 +236,8 @@ static inline u32 CharaFourCC(char a, char b, char c, char d)
 {
 	return (static_cast<u32>(a) << 24) | (static_cast<u32>(b) << 16) | (static_cast<u32>(c) << 8) | static_cast<u32>(d);
 }
+
+static const char s_chara_cpp_801d90c8[] = "chara.cpp";
 
 } // namespace
 
@@ -1468,17 +1471,51 @@ CChara::CNode::~CNode()
  */
 void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNode::TYPE type, CMemory::CStage* stage)
 {
-	(void)chunk;
-	(void)type;
 	(void)stage;
 	void* modelRef = *(void**)((u8*)model + 0xA4);
 	u16 idx = *(u16*)((u8*)modelRef + 8);
 	void* nodeRefBase = *(void**)((u8*)modelRef + 0xC);
-	void* nodeRef = (u8*)nodeRefBase + (idx * 0x94);
+	u8* nodeRef = reinterpret_cast<u8*>((u8*)nodeRefBase + (idx * 0x94));
 	*(void**)this = nodeRef;
-	*(u16*)((u8*)nodeRef + 0) = idx;
-	*(u8*)((u8*)nodeRef + 4) = 0xFF;
-	*(u8*)((u8*)nodeRef + 0x64) = 0xFF;
+	*reinterpret_cast<u16*>(nodeRef + 0x0) = idx;
+	*(nodeRef + 0x2) = static_cast<u8>(type);
+	*(nodeRef + 0x4) = 0xFF;
+	*(nodeRef + 0x64) = 0;
+
+	CChunkFile::CChunk chunkInfo;
+	chunk.PushChunk();
+	while (chunk.GetNextChunk(chunkInfo)) {
+		switch (chunkInfo.m_id) {
+		case 0x494E464F:
+			*reinterpret_cast<u16*>(nodeRef + 0x68) = static_cast<u16>(chunk.Get4());
+			*(nodeRef + 0x6A) = static_cast<u8>(chunk.Get4());
+			*reinterpret_cast<u16*>(nodeRef + 0x6C) = static_cast<u16>(chunk.Get4());
+			*(nodeRef + 0x6E) = static_cast<u8>(chunk.Get4());
+			break;
+		case 0x42494E46:
+			*(nodeRef + 0x64) = static_cast<u8>(chunk.Get4());
+			*reinterpret_cast<float*>(nodeRef + 0x70) = chunk.GetF4();
+			break;
+		case 0x4E414D45:
+			strcpy(reinterpret_cast<char*>(nodeRef + 0x74), chunk.GetString());
+			break;
+		case 0x4E414D32:
+			strcpy(reinterpret_cast<char*>(nodeRef + 0x84), chunk.GetString());
+			break;
+		case 0x5446524D:
+			chunk.Get(nodeRef + 0xC, 0x30);
+			if (*reinterpret_cast<u16*>(nodeRef + 0x68) == 0xFFFF) {
+				float baseScale = *reinterpret_cast<float*>(reinterpret_cast<u8*>(modelRef) + 0x18);
+				PSMTXScaleApply(reinterpret_cast<float(*)[4]>(nodeRef + 0xC), reinterpret_cast<float(*)[4]>(nodeRef + 0xC),
+				               baseScale, baseScale, baseScale);
+			}
+			break;
+		case 0x4D494458:
+			*(nodeRef + 0x90) = static_cast<u8>(chunk.Get4());
+			break;
+		}
+	}
+	chunk.PopChunk();
 }
 
 /*
@@ -1589,14 +1626,159 @@ CChara::CMesh::~CMesh()
  */
 void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CStage* stage)
 {
-	(void)chunk;
-	(void)stage;
 	void* modelRef = *(void**)((u8*)model + 0xA4);
 	u16 idx = *(u16*)((u8*)modelRef + 0xA);
 	void* meshRefBase = *(void**)((u8*)modelRef + 0x10);
-	*(void**)this = (u8*)meshRefBase + (idx * 0x64);
+	CCharaMeshRefRaw* meshRef = reinterpret_cast<CCharaMeshRefRaw*>((u8*)meshRefBase + (idx * 0x64));
+	*(void**)this = meshRef;
 	*(void**)((u8*)this + 4) = 0;
 	*(void**)((u8*)this + 8) = 0;
+
+	CChunkFile::CChunk chunkInfo;
+	chunk.PushChunk();
+	while (chunk.GetNextChunk(chunkInfo)) {
+		switch (chunkInfo.m_id) {
+		case 0x56455254:
+			meshRef->m_vertexCount = chunkInfo.m_size / 6;
+			meshRef->m_vertices = static_cast<S16Vec*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+			    &Memory, chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x7D6, 0));
+			if (meshRef->m_vertices != 0) {
+				memcpy(meshRef->m_vertices, chunk.GetAddress(), chunkInfo.m_size);
+				DCFlushRange(meshRef->m_vertices, meshRef->m_vertexCount * 6);
+			}
+			break;
+		case 0x4E4F524D:
+			meshRef->m_normalCount = chunkInfo.m_size / 6;
+			meshRef->m_normals = static_cast<S16Vec*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+			    &Memory, chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x7DE, 0));
+			if (meshRef->m_normals != 0) {
+				memcpy(meshRef->m_normals, chunk.GetAddress(), chunkInfo.m_size);
+				DCFlushRange(meshRef->m_normals, meshRef->m_normalCount * 6);
+			}
+			break;
+		case 0x434F4C52:
+			meshRef->m_colorCount = chunkInfo.m_size >> 2;
+			meshRef->m_colors = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+			    &Memory, chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x7E6, 0);
+			if (meshRef->m_colors != 0) {
+				memcpy(meshRef->m_colors, chunk.GetAddress(), chunkInfo.m_size);
+				DCFlushRange(meshRef->m_colors, meshRef->m_colorCount << 2);
+			}
+			break;
+		case 0x55562020:
+			meshRef->m_uvCount = chunkInfo.m_size >> 2;
+			meshRef->m_uvs = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+			    &Memory, chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x7EE, 0);
+			if (meshRef->m_uvs != 0) {
+				memcpy(meshRef->m_uvs, chunk.GetAddress(), chunkInfo.m_size);
+				DCFlushRange(meshRef->m_uvs, meshRef->m_uvCount << 2);
+			}
+			break;
+		case 0x494E464F:
+			meshRef->m_infoWord1 = chunk.Get4();
+			meshRef->m_nodeIndex = chunk.Get4();
+			meshRef->m_flags = static_cast<u8>((meshRef->m_flags & 0x7F) | ((chunk.Get4() != 0) ? 0x80 : 0));
+			meshRef->m_flags = static_cast<u8>((meshRef->m_flags & 0xBF) | ((chunk.Get4() != 0) ? 0x40 : 0));
+			chunk.Get4();
+			chunk.Get4();
+			chunk.Get4();
+			chunk.Get4();
+			break;
+		case 0x534B494E: {
+			meshRef->m_skinCount = chunkInfo.m_arg0;
+			if (meshRef->m_skinCount != 0) {
+				meshRef->m_skins = static_cast<CLightPcs::CBumpLight*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+				    &Memory, meshRef->m_skinCount * 0x64, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x7F8, 0));
+				if (meshRef->m_skins != 0) {
+					memset(meshRef->m_skins, 0, meshRef->m_skinCount * 0x64);
+				}
+			}
+
+			unsigned int skinIndex = 0;
+			chunk.PushChunk();
+			while (chunk.GetNextChunk(chunkInfo)) {
+				switch (chunkInfo.m_id) {
+				case 0x4E4F4445:
+					if (meshRef->m_skins != 0 && skinIndex < meshRef->m_skinCount) {
+						*reinterpret_cast<u32*>(reinterpret_cast<u8*>(meshRef->m_skins) + skinIndex * 0x64 + 0x60) = chunk.Get4();
+					}
+					skinIndex++;
+					break;
+				case 0x4F4E4520:
+					meshRef->m_oneWeightCountOrSize = chunkInfo.m_size;
+					meshRef->m_oneWeightData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+					    &Memory, chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x808, 0);
+					if (meshRef->m_oneWeightData != 0) {
+						memcpy(meshRef->m_oneWeightData, chunk.GetAddress(), chunkInfo.m_size);
+					}
+					break;
+				case 0x54574F20:
+					meshRef->m_twoWeightCountOrSize = chunkInfo.m_size;
+					meshRef->m_twoWeightData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+					    &Memory, chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x80E, 0);
+					if (meshRef->m_twoWeightData != 0) {
+						memcpy(meshRef->m_twoWeightData, chunk.GetAddress(), chunkInfo.m_size);
+					}
+					break;
+				case 0x524D494E:
+					meshRef->m_threeWeightCountOrSize = chunkInfo.m_size;
+					meshRef->m_threeWeightData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+					    &Memory, chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x814, 0);
+					if (meshRef->m_threeWeightData != 0) {
+						memcpy(meshRef->m_threeWeightData, chunk.GetAddress(), chunkInfo.m_size);
+					}
+					break;
+				}
+			}
+			chunk.PopChunk();
+			break;
+		}
+		case 0x444C4844: {
+			meshRef->m_displayListCount = chunkInfo.m_arg0 & 0xFFFF;
+			if (meshRef->m_displayListCount != 0) {
+				meshRef->m_displayLists = static_cast<CCharaDisplayListRaw*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+				    &Memory, meshRef->m_displayListCount * sizeof(CCharaDisplayListRaw), stage,
+				    const_cast<char*>(s_chara_cpp_801d90c8), 0x820, 0));
+				if (meshRef->m_displayLists != 0) {
+					memset(meshRef->m_displayLists, 0, meshRef->m_displayListCount * sizeof(CCharaDisplayListRaw));
+					for (u32 i = 0; i < meshRef->m_displayListCount; i++) {
+						meshRef->m_displayLists[i].m_material = 0xFFFF;
+					}
+				}
+			}
+
+			u32 displayIndex = 0;
+			chunk.PushChunk();
+			while (chunk.GetNextChunk(chunkInfo)) {
+				if (chunkInfo.m_id != 0x444C5354 || meshRef->m_displayLists == 0 ||
+				    displayIndex >= meshRef->m_displayListCount) {
+					continue;
+				}
+
+				CCharaDisplayListRaw& displayList = meshRef->m_displayLists[displayIndex++];
+				displayList.m_material = chunk.Get2();
+				displayList.m_size = static_cast<s32>(chunkInfo.m_arg0);
+				chunk.Align(0x20);
+				if (displayList.m_size > 0) {
+					const unsigned int allocSize = (displayList.m_size + 0x1F) & ~0x1FU;
+					displayList.m_data = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+					    &Memory, allocSize, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x830, 0);
+					if (displayList.m_data != 0) {
+						chunk.Get(displayList.m_data, displayList.m_size);
+						DCFlushRange(displayList.m_data, displayList.m_size);
+					}
+				}
+				chunk.Align(0x20);
+			}
+			chunk.PopChunk();
+			break;
+		}
+		case 0x4D4E414D:
+			strcpy(meshRef->m_name, chunk.GetString());
+			break;
+		}
+	}
+	chunk.PopChunk();
 }
 
 /*

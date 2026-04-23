@@ -10,6 +10,7 @@
 class CColor;
 class CFontMan;
 class CFont;
+class CTexture;
 class CPad;
 class CRingMenu;
 class CMesMenu;
@@ -149,7 +150,7 @@ public:
 
     void ChgPlayModeFromScript(bool);
 
-    void GetTexture(TEX);
+    CTexture* GetTexture(TEX);
 
     void WmInit();
     void createWorld();

@@ -1481,7 +1481,29 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
  */
 void CMenuPcs::drawPause()
 {
-	// TODO
+    if (((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
+        return;
+    }
+
+    CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x190);
+    TextureMan.SetTexture(GX_TEXMAP0, texture);
+
+    if (texture != nullptr) {
+        Mtx texMtx;
+        float width = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x64));
+        float height = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x68));
+        PSMTXScale(texMtx, 1.0f / width, 1.0f / height, 1.0f);
+        GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    }
+
+    TextureMan.SetTextureTev(texture);
+
+    int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * 0.1f)));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
+    GXSetChanMatColor(GX_COLOR0A0, color.color);
+    DrawRect(3, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -1582,7 +1604,33 @@ void CMenuPcs::createBattle()
  */
 void CMenuPcs::destroyBattle()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    void** slot = reinterpret_cast<void**>(self + 0x1E4);
+    for (int i = 0; i < 10; i++, slot++) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    slot = reinterpret_cast<void**>(self + 0x154);
+    for (int i = 0; i < 2; i++, slot++) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    slot = reinterpret_cast<void**>(self + 0x13C);
+    for (int i = 0; i < 4; i++, slot++) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    slot = reinterpret_cast<void**>(self + 0x10C);
+    for (int i = 0; i < 12; i++, slot++) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    destroySingleMenu__8CMenuPcsFv(this);
+    destroyVillageMenu__8CMenuPcsFv(this);
 }
 
 /*
@@ -1592,7 +1640,33 @@ void CMenuPcs::destroyBattle()
  */
 void CMenuPcs::calcBattle()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    for (int i = 0; i < 4; i++) {
+        Calc__5CMenuFv(*reinterpret_cast<CMenu**>(self + 0x13C + i * 4));
+    }
+
+    for (int i = 0; i < 0xC; i++) {
+        Calc__5CMenuFv(*reinterpret_cast<CMenu**>(self + 0x10C + i * 4));
+    }
+
+    int limit = *reinterpret_cast<int*>(self + 0x68);
+    int value = *reinterpret_cast<int*>(self + 0x6C) - 1;
+    if (value <= limit) {
+        int alt = *reinterpret_cast<int*>(self + 0x6C) + 1;
+        value = limit;
+        if (alt < limit) {
+            value = alt;
+        }
+    }
+    *reinterpret_cast<int*>(self + 0x6C) = value;
+
+    u32 counter = *reinterpret_cast<u32*>(self + 0x58) - 1;
+    *reinterpret_cast<u32*>(self + 0x58) = counter & ~((int)counter >> 31);
+    counter = *reinterpret_cast<u32*>(self + 0x5C) - 1;
+    *reinterpret_cast<u32*>(self + 0x5C) = counter & ~((int)counter >> 31);
+
+    calcVillageMenu__8CMenuPcsFv(this);
 }
 
 /*
@@ -1757,7 +1831,7 @@ void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetTexture(CMenuPcs::TEX)
+CTexture* CMenuPcs::GetTexture(CMenuPcs::TEX tex)
 {
-	// TODO
+    return reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x18C)[static_cast<int>(tex)];
 }

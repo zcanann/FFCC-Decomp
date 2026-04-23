@@ -1379,9 +1379,31 @@ post_texture_load:
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SingCalcChara(float)
+void CMenuPcs::SingCalcChara(float frameStep)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+
+    if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
+        *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
+        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+    } else {
+        AddFrame__Q26CChara6CModelFf(frameStep, model);
+    }
+
+    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
+    float modelScale = DAT_801dd708[modelScaleIndex];
+    Mtx scaleMtx;
+    PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+    scaleMtx[1][3] = DAT_801dd6f8[modelScaleIndex];
+    scaleMtx[0][3] = FLOAT_8033294c;
+    scaleMtx[2][3] = FLOAT_8033294c;
+
+    int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+    *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
+    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
+    CalcMatrix__Q26CChara6CModelFv(model);
+    CalcSkin__Q26CChara6CModelFv(model);
 }
 
 /*
@@ -3101,7 +3123,13 @@ int CMenuPcs::SingGetLetterAttachflg()
  */
 void CMenuPcs::CalcSingLife()
 {
-	// TODO
+    int* lifeTimer = reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x874);
+    if (*lifeTimer >= 0) {
+        ++(*lifeTimer);
+        if (*lifeTimer > 0x31) {
+            *lifeTimer = -1;
+        }
+    }
 }
 
 /*
@@ -3172,7 +3200,7 @@ void CMenuPcs::SingLifeInit(int timer)
  */
 void CMenuPcs::SingLifeResetWait()
 {
-	// TODO
+    SingLifeInit(0);
 }
 
 static inline char* GetLanguageTableString(int index, char** englishTable, char** germanTable, char** italianTable,

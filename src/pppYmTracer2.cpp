@@ -225,7 +225,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     float* pfVar6;
     s32 iVar8;
     s16 visibleCount;
-    u32 i;
+    s32 i;
     TRACE_POLYGON* entries;
     TRACE_POLYGON* entry;
     TracerWork* work;
@@ -237,8 +237,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     }
 
     useFallback = false;
-    colorData = pppYmTracer2->m_serializedData + param_3->m_serializedDataOffsets[1];
     work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_3->m_serializedDataOffsets);
+    colorData = pppYmTracer2->m_serializedData + param_3->m_serializedDataOffsets[1];
 
     if (param_2->m_initWOrk == 0xffffffff) {
         pfVar6 = reinterpret_cast<float*>(gPppDefaultValueBuffer);
@@ -284,7 +284,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     entries[0].active = 1;
     entry = entries;
 
-    for (i = 0; (s32)i < (s32)(param_2->m_payload[9] + 1); i++) {
+    for (i = 0; i < (s32)(param_2->m_payload[9] + 1); i++) {
         iVar8 = *(u16*)(param_2->m_payload + 4) - 2;
         for (; (s32)i <= iVar8; iVar8--) {
             copyPolygonData(entries + (iVar8 + 1), entries + iVar8);

@@ -625,19 +625,22 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 			alpha = 0xFF;
 		}
 
-		u32 highlightColor = (alpha << 24) | (alpha << 16) | (alpha << 8) | 0xFF;
+		GXColor highlightColor = {0, 0, 0, 0xFF};
+		highlightColor.r = alpha;
+		highlightColor.g = alpha;
+		highlightColor.b = alpha;
 
 		GXBegin(GX_QUADS, GX_VTXFMT1, 5);
 		GXPosition3f32((float)(x + width + 1), (float)(y - 1), 0.0f);
-		GXColor1u32(highlightColor);
+		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
 		GXPosition3f32((float)(x - 1), (float)(y - 1), 0.0f);
-		GXColor1u32(highlightColor);
+		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
 		GXPosition3f32((float)(x - 1), (float)(y + height + 1), 0.0f);
-		GXColor1u32(highlightColor);
+		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
 		GXPosition3f32((float)(x + width + 1), (float)(y + height + 1), 0.0f);
-		GXColor1u32(highlightColor);
+		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
 		GXPosition3f32((float)(x + width + 1), (float)(y - 1), 0.0f);
-		GXColor1u32(highlightColor);
+		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
 	}
 
 	if (text != NULL) {

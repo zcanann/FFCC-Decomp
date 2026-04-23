@@ -106,8 +106,8 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
 
     dataOffset = *param_3->m_serializedDataOffsets;
     colorOffset = param_3->m_serializedDataOffsets[1];
-    work = (TracerWork*)((u8*)pppYmTracer + 0x80 + dataOffset);
-    colorData = (u8*)pppYmTracer + 0x80 + colorOffset;
+    work = (TracerWork*)(pppYmTracer->m_serializedData + dataOffset);
+    colorData = pppYmTracer->m_serializedData + colorOffset;
     poly = work->entries;
     dataValIndex = param_2->m_dataValIndex;
     mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
@@ -191,7 +191,6 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
  */
 void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmTracerUnkC* param_3)
 {
-    _pppPObject* baseObj;
     TracerMngRaw* mng;
     TracerWork* work;
     TRACE_POLYGON* entries;
@@ -209,8 +208,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         return;
     }
 
-    baseObj = (_pppPObject*)pppYmTracer;
-    work = (TracerWork*)((u8*)pppYmTracer + 0x80 + *param_3->m_serializedDataOffsets);
+    work = (TracerWork*)(pppYmTracer->m_serializedData + *param_3->m_serializedDataOffsets);
     entries = work->entries;
 
     if (entries == 0) {
@@ -236,7 +234,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         entries = work->entries;
     }
 
-    if (param_2->m_graphId == baseObj->m_graphId) {
+    if (param_2->m_graphId == pppYmTracer->m_graphId) {
         if (param_2->m_initWOrk == -1) {
             valuePtr = reinterpret_cast<float*>(gPppDefaultValueBuffer);
         } else {
@@ -284,7 +282,6 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         entries[0].to.z = fVar3;
         entries[0].to.y = fVar3;
         entries[0].to.x = fVar3;
-        entries[0].life = *(s16*)(param_2->m_payload + 6);
 
         {
             f32* from = work->initWork;
@@ -305,10 +302,13 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             entries[0].to.z = to[2];
         }
 
+        entries[0].life = *(u16*)(param_2->m_payload + 6);
+        entries[0].alpha = param_2->m_payload[8];
+
         {
             pppFMATRIX result;
 
-            pppMulMatrix(result, pppMngStPtr->m_matrix, baseObj->m_localMatrix);
+            pppMulMatrix(result, pppMngStPtr->m_matrix, pppYmTracer->m_localMatrix);
             PSMTXMultVec(result.value, &entries[0].from, &entries[0].from);
             PSMTXMultVec(result.value, &entries[0].to, &entries[0].to);
         }
@@ -396,7 +396,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
  */
 void pppDestructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
 {
-    TracerWork* work = (TracerWork*)((u8*)pppYmTracer + 0x80 + *param_2->m_serializedDataOffsets);
+    TracerWork* work = (TracerWork*)(pppYmTracer->m_serializedData + *param_2->m_serializedDataOffsets);
     if (work->entries != 0) {
         pppHeapUseRate((CMemory::CStage*)work->entries);
     }
@@ -415,7 +415,7 @@ void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
 {
     TracerWork* work;
 
-    work = (TracerWork*)((u8*)pppYmTracer + 0x80 + *param_2->m_serializedDataOffsets);
+    work = (TracerWork*)(pppYmTracer->m_serializedData + *param_2->m_serializedDataOffsets);
     work->_pad2e = 0;
     work->count = 0;
 }
@@ -435,7 +435,7 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
     TracerWork* work;
 
     fVar1 = FLOAT_803306e8;
-    work = (TracerWork*)((u8*)pppYmTracer + 0x80 + *param_2->m_serializedDataOffsets);
+    work = (TracerWork*)(pppYmTracer->m_serializedData + *param_2->m_serializedDataOffsets);
 
     work->entries = 0;
     work->arg3Work = 0;

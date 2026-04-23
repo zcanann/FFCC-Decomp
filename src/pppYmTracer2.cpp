@@ -112,8 +112,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 
     dataOffset = *param_3->m_serializedDataOffsets;
     colorOffset = param_3->m_serializedDataOffsets[1];
-    work = (TracerWork*)((u8*)pppYmTracer2 + 0x80 + dataOffset);
-    colorData = (u8*)pppYmTracer2 + 0x80 + colorOffset;
+    work = (TracerWork*)(pppYmTracer2->m_serializedData + dataOffset);
+    colorData = pppYmTracer2->m_serializedData + colorOffset;
     poly = work->entries;
     dataValIndex = param_2->m_dataValIndex;
     mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
@@ -233,8 +233,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     }
 
     useFallback = false;
-    colorData = (u8*)pppYmTracer2 + 0x80 + param_3->m_serializedDataOffsets[1];
-    work = (TracerWork*)((u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets);
+    colorData = pppYmTracer2->m_serializedData + param_3->m_serializedDataOffsets[1];
+    work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_3->m_serializedDataOffsets);
 
     if (param_2->m_initWOrk == 0xffffffff) {
         pfVar6 = reinterpret_cast<float*>(gPppDefaultValueBuffer);
@@ -309,7 +309,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         entry->colorB = colorData[10];
 
         if (i == 0) {
-            PSMTXConcat(pppMngStPtr->m_matrix.value, ((_pppPObject*)pppYmTracer2)->m_localMatrix.value, MStack_78);
+            PSMTXConcat(pppMngStPtr->m_matrix.value, pppYmTracer2->m_object.m_localMatrix.value, MStack_78);
             PSMTXMultVec(MStack_78, &entries[0].pos, &entries[0].pos);
             PSMTXMultVec(MStack_78, &entries[0].targetPos, &entries[0].targetPos);
         } else if (!useFallback) {
@@ -317,7 +317,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             if (GetCharaNodeFrameMatrix(pppMngStPtr, frameT, MStack_78) == 0) {
                 useFallback = true;
             } else {
-                PSMTXConcat(MStack_78, ((_pppPObject*)pppYmTracer2)->m_localMatrix.value, MStack_78);
+                PSMTXConcat(MStack_78, pppYmTracer2->m_object.m_localMatrix.value, MStack_78);
                 PSMTXMultVec(MStack_78, &entry->pos, &entry->pos);
                 PSMTXMultVec(MStack_78, &entry->targetPos, &entry->targetPos);
             }
@@ -362,10 +362,11 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
  */
 void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
 {
-	void** memPtr = (void**)((unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets + 0x28);
-	if (*memPtr != 0) {
-		pppHeapUseRate((CMemory::CStage*)*memPtr);
-	}
+    TracerWork* work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_2->m_serializedDataOffsets);
+    void** memPtr = (void**)&work->entries;
+    if (*memPtr != 0) {
+        pppHeapUseRate((CMemory::CStage*)*memPtr);
+    }
 }
 
 /*
@@ -379,11 +380,11 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
  */
 void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
 {
-	unsigned char* iVar1 = (unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets;
+    TracerWork* work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_2->m_serializedDataOffsets);
 
-	*(short*)(iVar1 + 0x2e) = 0;
-	*(short*)(iVar1 + 0x2c) = 0;
-	*(short*)(iVar1 + 0x32) = 0;
+    work->pad2e = 0;
+    work->visibleCount = 0;
+    work->pad32 = 0;
 }
 
 /*
@@ -397,24 +398,24 @@ void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_
  */
 void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
 {
-	float fVar1 = FLOAT_80331840;
-	unsigned char* puVar2 = (unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets;
+    float fVar1 = FLOAT_80331840;
+    TracerWork* work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_2->m_serializedDataOffsets);
 
-	*(u32*)(puVar2 + 0x28) = 0;
-	*(u32*)(puVar2 + 0x24) = 0;
-	*(u32*)(puVar2 + 0x20) = 0;
-	*(u16*)(puVar2 + 0x2c) = 0;
+    work->entries = 0;
+    work->arg3Work = 0;
+    work->initWork = 0;
+    work->visibleCount = 0;
 
-	*(float*)(puVar2 + 0xc) = fVar1;
-	*(float*)(puVar2 + 8) = fVar1;
-	*(float*)(puVar2 + 4) = fVar1;
-	*(float*)puVar2 = fVar1;
-	*(float*)(puVar2 + 0x1c) = fVar1;
-	*(float*)(puVar2 + 0x18) = fVar1;
-	*(float*)(puVar2 + 0x14) = fVar1;
-	*(float*)(puVar2 + 0x10) = fVar1;
+    work->pad0 = fVar1;
+    work->pos.z = fVar1;
+    work->pos.y = fVar1;
+    work->pos.x = fVar1;
+    work->pad1c = fVar1;
+    work->targetPos.z = fVar1;
+    work->targetPos.y = fVar1;
+    work->targetPos.x = fVar1;
 
-	*(u16*)(puVar2 + 0x2e) = 0;
-	*(u16*)(puVar2 + 0x30) = 0;
-	*(u16*)(puVar2 + 0x32) = 0;
+    work->pad2e = 0;
+    work->alphaStep = 0;
+    work->pad32 = 0;
 }

@@ -9,7 +9,13 @@ struct CSoundPcsTable
     unsigned int m_words[0x56];
 };
 
-extern CSoundPcsTable m_table__9CSoundPcs;
+class CSoundPcs;
+
+extern "C" void create__9CSoundPcsFv(CSoundPcs*);
+extern "C" void destroy__9CSoundPcsFv(CSoundPcs*);
+extern "C" void calc__9CSoundPcsFv(CSoundPcs*);
+extern "C" void draw__9CSoundPcsFv(CSoundPcs*);
+extern unsigned int m_table__9CSoundPcs[];
 
 class CSoundPcs : public CProcess
 {

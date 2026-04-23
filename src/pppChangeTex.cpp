@@ -63,11 +63,11 @@ struct ChangeTexWork {
 	float m_cachedValue;
 };
 
-extern float FLOAT_80332020;
-extern float FLOAT_80332028;
-extern double DOUBLE_80332030;
-extern double DOUBLE_80332038;
-extern char DAT_80332024;
+extern const float FLOAT_80332020 = -10000.0f;
+extern const char DAT_80332024[] = "obj";
+extern const float FLOAT_80332028 = 255.0f;
+extern const double DOUBLE_80332030 = 4503601774854144.0;
+extern const double DOUBLE_80332038 = 4503599627370496.0;
 static const char s_pppChangeTex_cpp_801dd660[] = "pppChangeTex.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
@@ -426,7 +426,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		int arrayOffset = 0;
 		for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)((char*)model0 + 0xA4) + 0xC); meshIdx++) {
 			int meshHdr = *(int*)(meshList + 8);
-			if (strcmp((char*)meshHdr, &DAT_80332024) == 0) {
+			if (strcmp((char*)meshHdr, DAT_80332024) == 0) {
 				CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
 				    &gUtil, &work->m_bboxMin, &work->m_bboxMax, *(void**)(meshList + 0xC), *(unsigned long*)(meshHdr + 0x14),
 				    *(unsigned long*)(*(int*)((char*)model0 + 0xA4) + 0x34));

@@ -23,6 +23,7 @@ void ReleasePdt__8CPartPcsFi(void*, int);
 int LoadMenuPdt__8CPartPcsFPc(void*, char*);
 int GetItemType__8CMenuPcsFii(void*, int, int);
 const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
+void GetRaceStr__8CMenuPcsFiPc(void*, int, char*);
 int GetData__13CAmemCacheSetFsPci(void*, short, char*, int);
 int ChkEquipPossible__8CMenuPcsFi(void*, int);
 void GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(void*, int, short*);
@@ -2288,28 +2289,43 @@ void CShopMenu::DrawMake()
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     SetColor__5CFontF8_GXColor(font, &white);
 
+    const char* itemName = GetItemName(resultItem);
     DrawInit__5CFontFv(font);
-    DrawShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, GetItemName(resultItem), FLOAT_80332d54, 108.0f, 0x18, 0x12);
+    DrawShadowFont__8CMenuPcsFP5CFontPcffii(
+        MenuPcsVoid(), font, const_cast<char*>(itemName), FLOAT_80332d54, 108.0f, 0x18, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
+
+    char raceBuffer[64];
+    GetRaceStr__8CMenuPcsFiPc(MenuPcsVoid(), resultItem, raceBuffer);
+    const int raceColor = (ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), resultItem) != 0) ? 0x18 : 2;
 
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
         MenuPcsVoid(), font, PTR_DAT_80214da8[languageId], 176.0f, 120.0f, 0x18, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
+    float raceX = 176.0f + FLOAT_80332d5c + GetWidth__5CFontFPc(font, PTR_DAT_80214da8[languageId]);
+    DrawInit__5CFontFv(font);
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, raceBuffer, raceX, 120.0f, raceColor, 0x12);
+    DrawInit__8CMenuPcsFv(MenuPcsVoid());
+
     char buffer[64];
     sprintf(buffer, DAT_80332d14, makeGil);
+    float valueRightX = 308.0f;
+    float makeGilX = valueRightX - GetWidth__5CFontFPc(font, buffer);
     DrawInit__5CFontFv(font);
-    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, buffer, 188.0f, 132.0f, 0x13, 0x12);
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, buffer, makeGilX, 132.0f, 0x13, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     sprintf(buffer, DAT_80332d14, currentMoney);
+    float moneyX = valueRightX - GetWidth__5CFontFPc(font, buffer);
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
         MenuPcsVoid(), font, PTR_s_Money_80214db0[languageId], 176.0f, 148.0f, 0x18, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
     DrawInit__5CFontFv(font);
-    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, buffer, 188.0f, 160.0f, (makeGil <= currentMoney) ? 0x14 : 2, 0x12);
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+        MenuPcsVoid(), font, buffer, moneyX, 160.0f, (makeGil <= currentMoney) ? 0x14 : 2, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     DrawItemInfo(resultItem, 0x98, 0x7E, 0, 0x9C, 0, 0, 0);

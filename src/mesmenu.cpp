@@ -934,7 +934,7 @@ void CMesMenu::SetPos(float x, float y)
  * Address:	TODO
  * Size:	TODO
  */
-void CMesMenu::close(int)
+void CMesMenu::close(int closeReason)
 {
-	// TODO
+    CloseRequest(closeReason);
 }

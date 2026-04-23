@@ -1889,7 +1889,7 @@ CFlatRuntime::CClass::CClass()
  */
 void CFlatRuntime::reqFinished(int, CFlatRuntime::CObject*)
 {
-	// TODO
+    return;
 }
 
 /*
@@ -1899,7 +1899,7 @@ void CFlatRuntime::reqFinished(int, CFlatRuntime::CObject*)
  */
 void CFlatRuntime::onDeleteObject(CFlatRuntime::CObject*)
 {
-	// TODO
+    return;
 }
 
 /*
@@ -1909,7 +1909,7 @@ void CFlatRuntime::onDeleteObject(CFlatRuntime::CObject*)
  */
 void CFlatRuntime::onNewObject(CFlatRuntime::CObject*)
 {
-	// TODO
+    return;
 }
 
 /*
@@ -1919,7 +1919,7 @@ void CFlatRuntime::onNewObject(CFlatRuntime::CObject*)
  */
 CFlatRuntime::CObject* CFlatRuntime::getFreeObject(int)
 {
-	return 0;
+    return 0;
 }
 
 /*
@@ -1929,7 +1929,7 @@ CFlatRuntime::CObject* CFlatRuntime::getFreeObject(int)
  */
 CFlatRuntime::CClass* CFlatRuntime::intToClass(int)
 {
-	return 0;
+    return 0;
 }
 
 /*
@@ -1959,7 +1959,7 @@ CFlatRuntime::CVal* CFlatRuntime::onClassSystemVal(CFlatRuntime::CObject*, int)
  */
 void CFlatRuntime::onSetSystemVal(int, CFlatRuntime::CStack*, int)
 {
-	// TODO
+    return;
 }
 
 /*
@@ -1969,7 +1969,7 @@ void CFlatRuntime::onSetSystemVal(int, CFlatRuntime::CStack*, int)
  */
 void CFlatRuntime::onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int)
 {
-	// TODO
+    return;
 }
 
 /*
@@ -1979,7 +1979,7 @@ void CFlatRuntime::onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime
  */
 int CFlatRuntime::onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&)
 {
-	return 0;
+    return 0;
 }
 
 /*
@@ -1989,5 +1989,5 @@ int CFlatRuntime::onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&)
  */
 int CFlatRuntime::onSystemFunc(CFlatRuntime::CObject*, int, int, int&)
 {
-	return 0;
+    return 0;
 }

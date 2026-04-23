@@ -17,6 +17,7 @@
 #include "ffcc/sound.h"
 #include "ffcc/texanim.h"
 #include "ffcc/vector.h"
+#include "ffcc/wind.h"
 
 #include <dolphin/gx.h>
 #include <math.h>
@@ -49,6 +50,12 @@ extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int, int, int, CGObject*, float, void*);
+extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
+extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
+extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
+extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
+extern "C" void CalcFurColor__Q26CChara6CModelFv(CChara::CModel*);
+extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(CChara::CModel*, CGObject*);
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
 
@@ -98,6 +105,100 @@ static inline void CallOnTalk(CGBaseObj* self, CGBaseObj* other, int arg)
     void** vtable = *reinterpret_cast<void***>(self);
     Fn fn = reinterpret_cast<Fn>(vtable[6]);
     fn(self, other, arg);
+}
+
+static inline bool HasLoadedModel(CCharaPcs::CHandle* handle)
+{
+    return handle != 0 && handle->m_model != 0;
+}
+
+static inline unsigned char* ModelBytes(CChara::CModel* model)
+{
+    return reinterpret_cast<unsigned char*>(model);
+}
+
+static inline unsigned char* ModelNodes(CChara::CModel* model)
+{
+    return *reinterpret_cast<unsigned char**>(ModelBytes(model) + 0xA8);
+}
+
+static inline MtxPtr ModelNodeMtx(CChara::CModel* model, int nodeIndex)
+{
+    return reinterpret_cast<MtxPtr>(ModelNodes(model) + nodeIndex * 0xC0 + 0xC);
+}
+
+static inline float& ModelLightAlpha(CChara::CModel* model)
+{
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0x9C);
+}
+
+static inline CChara::CAnim*& ModelAnim(CChara::CModel* model)
+{
+    return *reinterpret_cast<CChara::CAnim**>(ModelBytes(model) + 0xD0);
+}
+
+static inline float& ModelTime(CChara::CModel* model)
+{
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0xD4);
+}
+
+static inline float& ModelAnimStart(CChara::CModel* model)
+{
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0xD8);
+}
+
+static inline float& ModelAnimEnd(CChara::CModel* model)
+{
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0xDC);
+}
+
+static inline unsigned char& ModelFlagsA0(CChara::CModel* model)
+{
+    return *reinterpret_cast<unsigned char*>(ModelBytes(model) + 0xA0);
+}
+
+static inline float& ModelChestAmp(CChara::CModel* model)
+{
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0xB4);
+}
+
+static inline float& ModelChestTilt(CChara::CModel* model)
+{
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0xB8);
+}
+
+static inline float& ModelTwistAngle(CChara::CModel* model)
+{
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0xBC);
+}
+
+static inline Vec& ModelWindVector(CChara::CModel* model)
+{
+    return *reinterpret_cast<Vec*>(ModelBytes(model) + 0xC4);
+}
+
+static inline float ClampFloat(float value, float minValue, float maxValue)
+{
+    if (value < minValue) {
+        return minValue;
+    }
+    if (value > maxValue) {
+        return maxValue;
+    }
+    return value;
+}
+
+static inline float WrapAnimFrame(float value, float span)
+{
+    if (span <= 0.0f) {
+        return 0.0f;
+    }
+
+    float wrapped = fmodf(value, span);
+    if (wrapped < 0.0f) {
+        wrapped += span;
+    }
+    return wrapped;
 }
 
 static const float sBgDefaultGravityY = 0.0;
@@ -1276,12 +1377,466 @@ void CGObject::hit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007e698
+ * PAL Size: 6216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::update()
 {
-	// TODO
+    const unsigned int miniGameFlags = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484);
+    const bool miniGameModelPass = (miniGameFlags & 0x8000) != 0;
+    unsigned char& weaponFlagsLo = *reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
+    unsigned char& weaponFlagsHi = *(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1);
+    unsigned char& shieldFlagsLo = *reinterpret_cast<unsigned char*>(&m_shieldNodeFlags);
+    unsigned char& shieldFlagsHi = *(reinterpret_cast<unsigned char*>(&m_shieldNodeFlags) + 1);
+    const float lastBgAttr = *reinterpret_cast<float*>(m_lastBgAttr);
+
+    if (m_dispItemTimer != 0) {
+        m_dispItemTimer--;
+    }
+
+    if (HasLoadedModel(m_charaModelHandle)) {
+        for (int i = 0; i < 8; i++) {
+            AttackCol* attack = &m_attackColliders[i];
+            attack->m_localEnd.y = attack->m_worldPosition.y;
+            attack->m_localEnd.z = attack->m_worldPosition.z;
+            attack->m_worldPosition.x = attack->m_radius;
+        }
+    }
+
+    if (HasLoadedModel(m_charaModelHandle) && (m_displayFlags & 2) != 0) {
+        int animIndex = m_currentAnimSlot;
+        int startFrame = m_animExtraIndex;
+        int endFrame = m_collisionPushTimer;
+        if (animIndex == -1) {
+            animIndex = m_animSlotSel;
+            startFrame = -1;
+            endFrame = -1;
+        }
+
+        const int blendMode = (shieldFlagsLo & 0x2) != 0 ? -1 : 0;
+        const int forceSet = (shieldFlagsLo & 0x8) != 0 ? 1 : 0;
+        if (m_charaModelHandle->SetAnim(animIndex, startFrame, endFrame, blendMode, forceSet) != 0 &&
+            m_currentAnimSlot != -1) {
+            float frame = sZeroFloat;
+            if (lastBgAttr < sZeroFloat) {
+                frame = ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model);
+            }
+            m_turnSpeed = frame;
+            SetFrame__Q26CChara6CModelFf(m_turnSpeed, m_charaModelHandle->m_model);
+        }
+
+        shieldFlagsLo &= ~0x8;
+    }
+
+    PSVECAdd(&m_worldPosition, &m_groundHitOffset, &m_worldPosition);
+
+    float turnDelta = Math.DstRot(m_rotTargetY, m_rotBaseY);
+    if (m_animSlotSel == -1 || (shieldFlagsLo & 0x80) == 0) {
+        m_rotBaseY += turnDelta * m_hitNormal.x;
+    } else {
+        const float turnLimit = fabsf(m_turnBaseSpeed);
+        turnDelta = ClampFloat(turnDelta, -turnLimit, turnLimit);
+        m_rotBaseY += turnDelta;
+    }
+
+    Mtx modelMtx;
+    if (Game.m_currentMapId == 0x21) {
+        Mtx yawMtx;
+        Mtx pitchMtx;
+        Mtx rotMtx;
+        Vec mapUp = {0.0f, 1.0f, 0.0f};
+        Vec worldNorm = m_worldPosition;
+
+        PSMTXRotRad(yawMtx, 'y', atan2f(m_worldPosition.x, m_worldPosition.z));
+        if (PSVECMag(&worldNorm) > sZeroFloat) {
+            PSVECNormalize(&worldNorm, &worldNorm);
+            float upDot = ClampFloat(PSVECDotProduct(&mapUp, &worldNorm), sNegativeOne, sAnimFrameOffset);
+            PSMTXRotRad(pitchMtx, 'x', acosf(upDot));
+            PSMTXConcat(yawMtx, pitchMtx, modelMtx);
+        } else {
+            PSMTXCopy(yawMtx, modelMtx);
+        }
+
+        PSMTXRotRad(rotMtx, 'y', m_rotBaseY);
+        PSMTXConcat(modelMtx, rotMtx, modelMtx);
+        PSMTXScaleApply(modelMtx, modelMtx, m_rotationX, m_rotationY, m_rotationZ);
+        modelMtx[0][3] = m_worldPosition.x;
+        modelMtx[1][3] = m_worldPosition.y;
+        modelMtx[2][3] = m_worldPosition.z;
+    } else {
+        Vec modelPos = m_worldPosition;
+        PSVECAdd(&modelPos, &m_extraMoveVec, &modelPos);
+
+        float rotX = m_rotBaseX;
+        float rotY = m_rotBaseY;
+        float rotZ = m_rotBaseZ;
+        float scaleX = m_rotationX;
+        float scaleY = m_rotationY;
+        float scaleZ = m_rotationZ;
+
+        if (m_worldParamA == 0x20 || m_worldParamA == 0x13 || m_worldParamA == 0x14 ||
+            m_worldParamA == 0x15 || m_worldParamA == 0x16 || m_worldParamA == 0x17) {
+            const float wobbleBias = m_worldParamA == 0x20 ? -0.125f : -0.0625f;
+            m_radiusCtrl.z += (-0.5f * m_radiusCtrl.y) + wobbleBias;
+            m_radiusCtrl.y *= 0.8f;
+            rotY += m_radiusCtrl.z;
+        } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
+            const float cameraYaw = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF8);
+            rotY = sQuarterTurn - cameraYaw;
+            rotY += cosf(sBgAttrNormal * m_radiusCtrl.y);
+            modelPos.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);
+            m_radiusCtrl.y += 0.125f;
+        }
+
+        Mtx rotXMat;
+        Mtx rotYMat;
+        Mtx rotZMat;
+        PSMTXRotRad(rotXMat, 'x', rotX);
+        PSMTXRotRad(rotYMat, 'y', rotY);
+        PSMTXRotRad(rotZMat, 'z', rotZ);
+        PSMTXConcat(rotYMat, rotXMat, modelMtx);
+        PSMTXConcat(modelMtx, rotZMat, modelMtx);
+        PSMTXScaleApply(modelMtx, modelMtx, scaleX, scaleY, scaleZ);
+        modelMtx[0][3] = modelPos.x;
+        modelMtx[1][3] = modelPos.y;
+        modelMtx[2][3] = modelPos.z;
+
+        if ((m_stateFlags0 & 0x10) != 0) {
+            Mtx tiltMtx;
+            if (m_groundHitOffset.x == sZeroFloat && m_groundHitOffset.z == sZeroFloat) {
+                PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
+            } else {
+                Vec worldUp = {0.0f, 1.0f, 0.0f};
+                Vec axis;
+                const float slideMagSq =
+                    m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z;
+                const float slideMag = slideMagSq > sZeroFloat ? sqrtf(slideMagSq) : sZeroFloat;
+                PSVECCrossProduct(&m_groundHitOffset, &worldUp, &axis);
+                PSMTXRotAxisRad(tiltMtx, &axis, slideMag * -0.125f);
+                Mtx quatMtx;
+                PSMTXQuat(quatMtx, &m_bgCollisionQtrn);
+                PSMTXConcat(tiltMtx, quatMtx, tiltMtx);
+                C_QUATMtx(&m_bgCollisionQtrn, tiltMtx);
+            }
+
+            const float tx = modelMtx[0][3];
+            const float ty = modelMtx[1][3];
+            const float tz = modelMtx[2][3];
+            modelMtx[0][3] = sZeroFloat;
+            modelMtx[1][3] = sZeroFloat;
+            modelMtx[2][3] = sZeroFloat;
+            PSMTXConcat(tiltMtx, modelMtx, modelMtx);
+            modelMtx[0][3] = tx;
+            modelMtx[1][3] = ty;
+            modelMtx[2][3] = tz;
+        } else if ((m_objectFlags & 0x90) != 0 && (m_stateFlags0 & 0x80) != 0) {
+            if (m_groundHitOffset.x != sZeroFloat || m_groundHitOffset.z != sZeroFloat) {
+                m_radiusCtrl.y += -0.2f * m_groundHitOffset.x;
+                m_radiusCtrlVel.x += -0.2f * m_groundHitOffset.z;
+            }
+
+            m_radiusCtrlVel.y += sBgAttrNormal * (m_radiusCtrl.y - m_radiusCtrlVel.y);
+            m_groundFriction += sBgAttrNormal * (m_radiusCtrlVel.x - m_groundFriction);
+        }
+    }
+
+    if ((weaponFlagsLo & 0x1) != 0 && m_attachOwner != 0 && HasLoadedModel(m_attachOwner->m_charaModelHandle)) {
+        CChara::CModel* ownerModel = m_attachOwner->m_charaModelHandle->m_model;
+        PSMTXCopy(ModelNodeMtx(ownerModel, m_attachNode), modelMtx);
+
+        if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
+            Mtx rotMtx;
+            PSMTXRotRad(rotMtx, 'y', -m_attachOwner->m_rotBaseY);
+            PSMTXConcat(modelMtx, rotMtx, modelMtx);
+        }
+        if (m_worldParamA != 0x24 || m_worldParamB == 0x125) {
+            Mtx rotMtx;
+            PSMTXRotRad(rotMtx, 'y', m_rotBaseY);
+            PSMTXConcat(modelMtx, rotMtx, modelMtx);
+        }
+
+        Vec ownerPos = m_attachOwner->m_worldPosition;
+        PSVECAdd(&ownerPos, &m_attachOwner->m_extraMoveVec, &ownerPos);
+        PSMTXTransApply(modelMtx, modelMtx, ownerPos.x, ownerPos.y, ownerPos.z);
+
+        Vec attachPos;
+        attachPos.x = modelMtx[0][3];
+        attachPos.y = modelMtx[1][3];
+        attachPos.z = modelMtx[2][3];
+
+        if (m_moveMode == 0 || m_moveModePrevious == 0) {
+            m_worldPosition = attachPos;
+        } else {
+            float interp = static_cast<float>(m_moveMode) / static_cast<float>(m_moveModePrevious);
+            interp = ClampFloat(interp, sZeroFloat, sAnimFrameOffset);
+            Vec fromOwner;
+            Vec fromSelf;
+            PSVECScale(&attachPos, &fromOwner, sAnimFrameOffset - interp);
+            PSVECScale(&m_worldPosition, &fromSelf, interp);
+            PSVECAdd(&fromOwner, &fromSelf, &m_worldPosition);
+            m_moveMode--;
+        }
+
+        modelMtx[0][3] = m_worldPosition.x;
+        modelMtx[1][3] = m_worldPosition.y;
+        modelMtx[2][3] = m_worldPosition.z;
+    }
+
+    if (HasLoadedModel(m_charaModelHandle)) {
+        CChara::CModel* model = m_charaModelHandle->m_model;
+
+        m_animBlend += ClampFloat(m_bgAttrValue - m_animBlend, -0.25f, 0.25f);
+
+        float lookYaw = m_lookAtAccumYaw;
+        float lookPitch = m_lookAtAccumPitch;
+        if (m_lookAtTarget != 0) {
+            Vec lookDelta;
+            PSVECSubtract(&m_worldPosition, &m_lookAtTarget->m_worldPosition, &lookDelta);
+
+            float targetNodeY = m_lookAtTarget->unk_0x184;
+            if (m_lookAtTargetNodeIndex != -1 && HasLoadedModel(m_lookAtTarget->m_charaModelHandle)) {
+                targetNodeY = ModelNodeMtx(m_lookAtTarget->m_charaModelHandle->m_model, m_lookAtTargetNodeIndex)[1][3];
+            }
+            lookDelta.y += unk_0x184 - targetNodeY;
+
+            const float lookDistance = PSVECMag(&lookDelta);
+            if (lookDistance > sZeroFloat) {
+                const float targetYaw = atan2f(-lookDelta.x, -lookDelta.z);
+                const float yawDelta = Math.DstRot(targetYaw, m_rotBaseY);
+                if (fabs(yawDelta) < 0.75f) {
+                    const float pitchDelta = atan2f(lookDelta.y, lookDistance);
+                    if (fabs(pitchDelta) < 0.5f) {
+                        lookYaw += yawDelta;
+                        lookPitch += pitchDelta;
+                    }
+                }
+            }
+        }
+
+        const unsigned char lookBlendByte = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x56);
+        float lookBlend = 0.015625f * static_cast<float>(lookBlendByte);
+        if (lookBlend == sZeroFloat) {
+            lookBlend = sBgAttrFast;
+        }
+        ModelChestAmp(model) += lookBlend * (lookYaw - ModelChestAmp(model));
+        ModelChestTilt(model) += lookBlend * (lookPitch - ModelChestTilt(model));
+        ModelTwistAngle(model) += sBgAttrFast * (*reinterpret_cast<float*>(m_worldMode) - ModelTwistAngle(model));
+
+        SetMatrix__Q26CChara6CModelFPA4_f(model, modelMtx);
+
+        Vec windVec;
+        Wind.Calc(&windVec, &m_worldPosition, 0);
+        windVec.x = -(m_groundHitOffset.x * Math.RandF() - windVec.x);
+        windVec.z = -(m_groundHitOffset.z * Math.RandF() - windVec.z);
+        ModelWindVector(model) = windVec;
+
+        boundCheck();
+
+        float visibleScale = sAnimFrameOffset;
+        if (Game.m_currentMapId == 0x21) {
+            visibleScale = m_screenDepth <= 60.0f ? sAnimFrameOffset : sZeroFloat;
+        } else {
+            visibleScale = m_screenDepth <= 30.0f ? sAnimFrameOffset : sZeroFloat;
+        }
+
+        const float alphaTarget = m_stepSlopeLimit * onAlphaUpdate() * visibleScale;
+        const float alphaStep = ClampFloat(alphaTarget - m_lookAtTimer, -m_bgDownDist, m_bgDownDist);
+        m_lookAtTimer = ClampFloat(m_lookAtTimer + alphaStep, sZeroFloat, sAnimFrameOffset);
+        m_worldParam = m_worldParam > 0.25f ? m_worldParam - 0.25f : sZeroFloat;
+        if ((m_displayFlags & 0x1000) != 0) {
+            m_lookAtTimer = alphaTarget;
+        }
+
+        if (m_lookAtTimer == sZeroFloat) {
+            weaponFlagsLo &= ~0x20;
+        }
+        if ((weaponFlagsLo & 0x60) != 0) {
+            weaponFlagsLo |= 0x40;
+        } else {
+            weaponFlagsLo &= ~0x40;
+        }
+
+        if ((m_displayFlags & 1) != 0) {
+            CalcMatrix__Q26CChara6CModelFv(model);
+            if ((weaponFlagsLo & 0x40) != 0 && miniGameModelPass) {
+                CalcSkin__Q26CChara6CModelFv(model);
+            }
+
+            ModelLightAlpha(model) = m_lookAtTimer;
+            ModelFlagsA0(model) =
+                static_cast<unsigned char>((ModelFlagsA0(model) & 0x5F) |
+                                           ((weaponFlagsLo & 0x40) != 0 ? 0x20 : 0) |
+                                           ((m_displayFlags & 0x20) != 0 ? 0x80 : 0));
+        }
+
+        CalcFurColor__Q26CChara6CModelFv(model);
+
+        if ((m_displayFlags & 2) != 0) {
+            float frameStep = m_turnSpeed;
+            if (m_animSlotSel == -1 || (shieldFlagsLo & 0x80) == 0) {
+                float frameDelta = lastBgAttr;
+                const int activeAnimIndex = m_charaModelHandle->m_currentAnimIndex;
+                if (activeAnimIndex >= 0 && m_charaModelHandle->m_animSlot[activeAnimIndex] != 0) {
+                    CRef* animRef = m_charaModelHandle->m_animSlot[activeAnimIndex];
+                    if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(animRef) + 0x70) & 0x4) != 0 &&
+                        frameDelta < sZeroFloat) {
+                        frameDelta = sNegativeOne;
+                    }
+                }
+                frameStep += frameDelta;
+            } else {
+                unsigned short frameCount = 1;
+                if (ModelAnim(model) != 0) {
+                    frameCount = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(ModelAnim(model)) + 0x10);
+                }
+                float denom = m_attackColliders[0].m_localStart.x;
+                if (denom <= sZeroFloat) {
+                    denom = sAnimFrameOffset;
+                }
+                frameStep += static_cast<float>(frameCount) / denom;
+            }
+
+            const float prevTime = ModelTime(model);
+            SetFrame__Q26CChara6CModelFf(frameStep, model);
+
+            const int activeAnimIndex = m_charaModelHandle->m_currentAnimIndex;
+            if (activeAnimIndex >= 0 && m_charaModelHandle->m_animSlot[activeAnimIndex] != 0) {
+                unsigned char* animRefBytes =
+                    reinterpret_cast<unsigned char*>(m_charaModelHandle->m_animSlot[activeAnimIndex]);
+                const short pointCount = *reinterpret_cast<short*>(animRefBytes + 0x2C);
+                if (pointCount > 0) {
+                    const float animSpan = sAnimFrameOffset + (ModelAnimEnd(model) - ModelAnimStart(model));
+                    const float prevWrapped = WrapAnimFrame(prevTime, animSpan);
+                    const float nextWrapped = WrapAnimFrame(ModelTime(model), animSpan);
+                    const bool wrapped = nextWrapped < prevWrapped && frameStep >= prevTime;
+
+                    for (int i = 0; i < pointCount; i++) {
+                        const unsigned short pointFrame = *reinterpret_cast<unsigned short*>(animRefBytes + 0x30 + i * 4);
+                        const unsigned short pointValue = *reinterpret_cast<unsigned short*>(animRefBytes + 0x32 + i * 4);
+                        const float eventFrame = WrapAnimFrame(static_cast<float>(pointFrame) + ModelAnimStart(model), animSpan);
+                        if ((!wrapped && prevWrapped < eventFrame && eventFrame <= nextWrapped) ||
+                            (wrapped && (eventFrame > prevWrapped || eventFrame <= nextWrapped))) {
+                            CFlatRuntime::CStack stackIn[2];
+                            stackIn[0].m_word = static_cast<unsigned int>(m_animSlotSel);
+                            stackIn[1].m_word = static_cast<unsigned int>(pointValue);
+                            SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+                                CFlat, this, 2, 9, 2, stackIn, 0);
+                            onAnimPoint(m_animSlotSel, pointValue);
+                        }
+                    }
+                }
+            }
+
+            m_turnSpeed = frameStep;
+        }
+
+        if (m_currentAnimSlot != -1 && (weaponFlagsHi & 0x1) == 0) {
+            bool animFinished = true;
+            if (ModelAnim(model) != 0) {
+                const float animSpan = sAnimFrameOffset + (ModelAnimEnd(model) - ModelAnimStart(model));
+                if (animSpan != sAnimFrameOffset) {
+                    animFinished = lastBgAttr >= sZeroFloat ? (ModelTime(model) >= animSpan - sAnimFrameOffset)
+                                                            : (ModelTime(model) <= sZeroFloat);
+                }
+            }
+
+            if (animFinished) {
+                if ((shieldFlagsLo & 0x80) != 0) {
+                    const unsigned char queuePos = m_animQueuePos++;
+                    const char queuedAnim = m_animQueue[queuePos];
+                    if (queuedAnim == -1) {
+                        m_currentAnimSlot = -1;
+                        shieldFlagsLo &= ~0x40;
+                        m_turnSpeed = sZeroFloat;
+                        m_rotTargetY = m_rotBaseY;
+                        shieldFlagsLo &= ~0x8;
+                        shieldFlagsLo &= ~0x80;
+                        SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+                            CFlat, this, 2, 10, 0, 0, 0);
+                    } else {
+                        m_currentAnimSlot =
+                            (queuedAnim >= 'A' && queuedAnim < 'A' + 4) ? m_animQueue[queuedAnim - 'A'] : queuedAnim;
+                        weaponFlagsHi &= ~0x1;
+                        m_animExtraIndex = -1;
+                        m_collisionPushTimer = -1;
+                        shieldFlagsLo &= ~0x2;
+                        shieldFlagsLo &= ~0x80;
+                        shieldFlagsLo |= 0x8;
+                        m_turnSpeed = sZeroFloat;
+                    }
+                } else {
+                    m_currentAnimSlot = -1;
+                    shieldFlagsLo &= ~0x40;
+                    m_turnSpeed = sZeroFloat;
+                    m_rotTargetY = m_rotBaseY;
+                    shieldFlagsLo &= ~0x8;
+                    shieldFlagsLo &= ~0x80;
+                    SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+                        CFlat, this, 2, 10, 0, 0, 0);
+                }
+            }
+        }
+
+        if (HasLoadedModel(m_weaponModelHandle) && (m_displayFlags & 1) != 0 && m_weaponAttachNode >= 0) {
+            Mtx attachMtx;
+            PSMTXCopy(ModelNodeMtx(model, m_weaponAttachNode), attachMtx);
+            PSMTXTransApply(attachMtx, attachMtx, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
+            SetMatrix__Q26CChara6CModelFPA4_f(m_weaponModelHandle->m_model, attachMtx);
+            CalcMatrix__Q26CChara6CModelFv(m_weaponModelHandle->m_model);
+            if ((weaponFlagsLo & 0x40) != 0) {
+                CalcSkin__Q26CChara6CModelFv(m_weaponModelHandle->m_model);
+            }
+
+            ModelLightAlpha(m_weaponModelHandle->m_model) = m_lookAtTimer;
+            ModelFlagsA0(m_weaponModelHandle->m_model) =
+                static_cast<unsigned char>((ModelFlagsA0(m_weaponModelHandle->m_model) & 0x5F) |
+                                           ((weaponFlagsLo & 0x40) != 0 ? 0x20 : 0) |
+                                           ((m_displayFlags & 0x20) != 0 ? 0x80 : 0));
+        }
+
+        if (HasLoadedModel(m_shieldModelHandle) && (m_displayFlags & 1) != 0 && m_shieldAttachNodeIndex >= 0) {
+            Mtx attachMtx;
+            PSMTXCopy(ModelNodeMtx(model, m_shieldAttachNodeIndex), attachMtx);
+            PSMTXTransApply(attachMtx, attachMtx, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
+            SetMatrix__Q26CChara6CModelFPA4_f(m_shieldModelHandle->m_model, attachMtx);
+            CalcMatrix__Q26CChara6CModelFv(m_shieldModelHandle->m_model);
+            if ((weaponFlagsLo & 0x40) != 0) {
+                CalcSkin__Q26CChara6CModelFv(m_shieldModelHandle->m_model);
+            }
+
+            ModelLightAlpha(m_shieldModelHandle->m_model) = m_lookAtTimer;
+            ModelFlagsA0(m_shieldModelHandle->m_model) =
+                static_cast<unsigned char>((ModelFlagsA0(m_shieldModelHandle->m_model) & 0x5F) |
+                                           ((weaponFlagsLo & 0x40) != 0 ? 0x20 : 0) |
+                                           ((m_displayFlags & 0x20) != 0 ? 0x80 : 0));
+        }
+    }
+
+    m_groundHitOffset.x *= m_moveOffset.x;
+    m_groundHitOffset.y *= m_moveOffset.y;
+    m_groundHitOffset.z *= m_moveOffset.z;
+    if (fabs(m_groundHitOffset.x) < DOUBLE_80330400) {
+        m_groundHitOffset.x = sZeroFloat;
+    }
+    if (fabs(m_groundHitOffset.y) < DOUBLE_80330400) {
+        m_groundHitOffset.y = sZeroFloat;
+    }
+    if (fabs(m_groundHitOffset.z) < DOUBLE_80330400) {
+        m_groundHitOffset.z = sZeroFloat;
+    }
+
+    if ((m_stateFlags0 & 0x80) != 0) {
+        m_groundHitOffset.x *= m_bounceFactor;
+        m_groundHitOffset.z *= m_bounceFactor;
+    }
+
+    if (HasLoadedModel(m_charaModelHandle) && (ModelFlagsA0(m_charaModelHandle->m_model) & 0x40) != 0) {
+        MogFurFrame__Q26CChara6CModelFP8CGObject(m_charaModelHandle->m_model, this);
+    }
 }
 
 /*
@@ -2946,12 +3501,16 @@ void CGObject::onHit(int, CGObject*, int, Vec*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007be50
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::onAnimPoint(int, int)
 {
-	// TODO
+    return;
 }
 
 /*
@@ -2966,22 +3525,30 @@ float CGObject::onAlphaUpdate()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007be5c
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*)
 {
-	// TODO
+    return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007be60
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::onDrawDebug(CFont*, float, float&, float)
 {
-	// TODO
+    return;
 }
 
 /*

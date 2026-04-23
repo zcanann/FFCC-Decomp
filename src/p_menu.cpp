@@ -360,12 +360,16 @@ void CMenuPcs::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800974a4
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::Quit()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -937,7 +941,10 @@ void CMenuPcs::SetAttrFmt(CMenuPcs::FMT fmt)
  */
 void CMenuPcs::DrawQuit()
 {
-	// TODO
+	Mtx44 screenMtx;
+
+	PSMTX44Copy(reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94), screenMtx);
+	GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 
 /*
@@ -1312,9 +1319,35 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawBar(float, float, float, CMenuPcs::TEX, float)
+void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBase, float alpha)
 {
-	// TODO
+    if (width <= 0.0f) {
+        return;
+    }
+
+    const float capW = 8.0f;
+    const float barH = 8.0f;
+    float midW = width - (capW * 2.0f);
+    if (midW < 0.0f) {
+        midW = 0.0f;
+    }
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    SetAttrFmt(FMT(0));
+
+    const u8 alphaU8 = static_cast<u8>(255.0f * alpha);
+    const CColor color(0xFF, 0xFF, 0xFF, alphaU8);
+    GXSetChanMatColor(GX_COLOR0A0, color.color);
+
+    const int tex = static_cast<int>(texBase);
+    SetTexture(static_cast<TEX>(tex));
+    DrawRect(0, x, y, capW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+    SetTexture(static_cast<TEX>(tex + 1));
+    DrawRect(0, x + capW, y, midW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+    SetTexture(static_cast<TEX>(tex + 2));
+    DrawRect(8, x + width - capW, y, capW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -1474,7 +1507,29 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
  */
 void CMenuPcs::drawPause()
 {
-	// TODO
+    if (((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
+        return;
+    }
+
+    CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x190);
+    TextureMan.SetTexture(GX_TEXMAP0, texture);
+
+    if (texture != nullptr) {
+        Mtx texMtx;
+        float width = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x64));
+        float height = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x68));
+        PSMTXScale(texMtx, 1.0f / width, 1.0f / height, 1.0f);
+        GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    }
+
+    TextureMan.SetTextureTev(texture);
+
+    int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * 0.1f)));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
+    GXSetChanMatColor(GX_COLOR0A0, color.color);
+    DrawRect(3, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -1575,7 +1630,33 @@ void CMenuPcs::createBattle()
  */
 void CMenuPcs::destroyBattle()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    void** slot = reinterpret_cast<void**>(self + 0x1E4);
+    for (int i = 0; i < 10; i++, slot++) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    slot = reinterpret_cast<void**>(self + 0x154);
+    for (int i = 0; i < 2; i++, slot++) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    slot = reinterpret_cast<void**>(self + 0x13C);
+    for (int i = 0; i < 4; i++, slot++) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    slot = reinterpret_cast<void**>(self + 0x10C);
+    for (int i = 0; i < 12; i++, slot++) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    destroySingleMenu__8CMenuPcsFv(this);
+    destroyVillageMenu__8CMenuPcsFv(this);
 }
 
 /*
@@ -1585,7 +1666,33 @@ void CMenuPcs::destroyBattle()
  */
 void CMenuPcs::calcBattle()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    for (int i = 0; i < 4; i++) {
+        Calc__5CMenuFv(*reinterpret_cast<CMenu**>(self + 0x13C + i * 4));
+    }
+
+    for (int i = 0; i < 0xC; i++) {
+        Calc__5CMenuFv(*reinterpret_cast<CMenu**>(self + 0x10C + i * 4));
+    }
+
+    int limit = *reinterpret_cast<int*>(self + 0x68);
+    int value = *reinterpret_cast<int*>(self + 0x6C) - 1;
+    if (value <= limit) {
+        int alt = *reinterpret_cast<int*>(self + 0x6C) + 1;
+        value = limit;
+        if (alt < limit) {
+            value = alt;
+        }
+    }
+    *reinterpret_cast<int*>(self + 0x6C) = value;
+
+    u32 counter = *reinterpret_cast<u32*>(self + 0x58) - 1;
+    *reinterpret_cast<u32*>(self + 0x58) = counter & ~((int)counter >> 31);
+    counter = *reinterpret_cast<u32*>(self + 0x5C) - 1;
+    *reinterpret_cast<u32*>(self + 0x5C) = counter & ~((int)counter >> 31);
+
+    calcVillageMenu__8CMenuPcsFv(this);
 }
 
 /*
@@ -1750,7 +1857,7 @@ void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetTexture(CMenuPcs::TEX)
+CTexture* CMenuPcs::GetTexture(CMenuPcs::TEX tex)
 {
-	// TODO
+    return reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x18C)[static_cast<int>(tex)];
 }

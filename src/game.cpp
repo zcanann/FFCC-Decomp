@@ -723,7 +723,12 @@ void CGame::clearWork()
  */
 void CGame::clearWorkMap()
 {
-	// TODO
+    MapMng.DestroyMap();
+    CharaPcs.Reset(static_cast<CCharaPcs::RESET>(0));
+    Sound.StopAndFreeAllSe(0);
+    Wind.ClearAll();
+
+    *((u8*)&Sound + 0x8892) = 0x7F;
 }
 
 /*
@@ -733,7 +738,24 @@ void CGame::clearWorkMap()
  */
 void CGame::clearWorkScript()
 {
-	// TODO
+    for (int i = 0; i < 4; i++) {
+        m_partyObjArr[i] = 0;
+        m_scriptFoodBase[i] = 0;
+    }
+
+    unk_flat3_0xc7d0 = 0;
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 8; j++) {
+            m_scriptWork[i][j][0] = 0;
+            m_scriptWork[i][j + 8][0] = 0;
+            m_scriptWork[i][j][1] = 0;
+            m_scriptWork[i][j + 8][1] = 0;
+        }
+    }
+
+    m_gameWork.m_soundOptionFlag = 0;
+    m_gameWork.m_gameOverFlag = 0;
 }
 
 /*
@@ -914,7 +936,7 @@ void CGame::ScriptChanged(char*, int)
  */
 void CGame::MapChanging(int, int)
 {
-	// TODO
+    return;
 }
 
 /*
@@ -924,7 +946,7 @@ void CGame::MapChanging(int, int)
  */
 void CGame::MapChanged(int, int, int)
 {
-	// TODO
+    return;
 }
 
 /*
@@ -1660,7 +1682,13 @@ void CGame::CGameWork::ClearEvtWork()
  */
 void CGame::CGameWork::Init()
 {
-	// TODO
+    memset(&m_gameDataStartMarker, 0, 0x13E1);
+    memset(m_wmBackupParams, 0xFF, sizeof(m_wmBackupParams));
+
+    *reinterpret_cast<unsigned int*>(&m_scriptSysVal0) = 1;
+    m_chaliceElement = 1;
+    strcpy(m_townName, m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
+    m_gameInitFlag = 1;
 }
 
 /*
@@ -1670,7 +1698,33 @@ void CGame::CGameWork::Init()
  */
 void CGame::CGameWork::InitNewGame()
 {
-	// TODO
+    const unsigned short optionValue = m_optionValue;
+    const unsigned char radarType = m_radarType;
+    const unsigned char mogScoreRadarType = m_mogScoreRadarType;
+    const unsigned char mcHasSerial = m_mcHasSerial;
+    const unsigned char unk13D7 = unk_0x13D7;
+    const unsigned int mcRandom = m_mcRandom;
+    const unsigned char mcId = m_mcId;
+    const unsigned char bgmVolume = m_bgmVolume;
+    const unsigned char seVolume = m_seVolume;
+    const unsigned char stereoFlag = m_stereoFlag;
+    const unsigned int mcSerial0 = m_mcSerial0;
+    const unsigned int mcSerial1 = m_mcSerial1;
+
+    Init();
+
+    m_optionValue = optionValue;
+    m_radarType = radarType;
+    m_mogScoreRadarType = mogScoreRadarType;
+    m_mcHasSerial = mcHasSerial;
+    unk_0x13D7 = unk13D7;
+    m_mcRandom = mcRandom;
+    m_mcId = mcId;
+    m_bgmVolume = bgmVolume;
+    m_seVolume = seVolume;
+    m_stereoFlag = stereoFlag;
+    m_mcSerial0 = mcSerial0;
+    m_mcSerial1 = mcSerial1;
 }
 
 /*
@@ -1680,7 +1734,7 @@ void CGame::CGameWork::InitNewGame()
  */
 void CGame::CGameWork::ClearScriptChange()
 {
-	// TODO
+    *reinterpret_cast<unsigned int*>(&m_scriptSysVal0) = 1;
 }
 
 /*
@@ -1688,9 +1742,9 @@ void CGame::CGameWork::ClearScriptChange()
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::IsWorldMap()
+int CGame::IsWorldMap()
 {
-	// TODO
+    return m_currentMapId == 0x21;
 }
 
 /*
@@ -1698,9 +1752,9 @@ void CGame::IsWorldMap()
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::IsPartyExist(int)
+int CGame::IsPartyExist(int index)
 {
-	// TODO
+    return index >= 0 && index < 4 && GetPartyObj(index) != 0;
 }
 
 /*
@@ -1708,9 +1762,9 @@ void CGame::IsPartyExist(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetItemName(int)
+char* CGame::GetItemName(int itemIndex)
 {
-	// TODO
+    return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 1];
 }
 
 /*
@@ -1718,9 +1772,9 @@ void CGame::GetItemName(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetItemArt(int)
+char* CGame::GetItemArt(int itemIndex)
 {
-	// TODO
+    return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5];
 }
 
 /*
@@ -1728,9 +1782,9 @@ void CGame::GetItemArt(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetItemNames(int)
+char* CGame::GetItemNames(int itemIndex)
 {
-	// TODO
+    return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 3];
 }
 
 /*
@@ -1738,9 +1792,9 @@ void CGame::GetItemNames(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetItemArts(int)
+char* CGame::GetItemArts(int itemIndex)
 {
-	// TODO
+    return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 2];
 }
 
 /*
@@ -1748,9 +1802,9 @@ void CGame::GetItemArts(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetItemName(int, int)
+char* CGame::GetItemName(int itemIndex, int count)
 {
-	// TODO
+    return count > 1 ? GetItemNames(itemIndex) : GetItemName(itemIndex);
 }
 
 /*
@@ -1758,9 +1812,9 @@ void CGame::GetItemName(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetMonName(int)
+char* CGame::GetMonName(int monIndex)
 {
-	// TODO
+    return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 1];
 }
 
 /*
@@ -1768,9 +1822,9 @@ void CGame::GetMonName(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetMonArt(int)
+char* CGame::GetMonArt(int monIndex)
 {
-	// TODO
+    return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5];
 }
 
 /*
@@ -1778,9 +1832,9 @@ void CGame::GetMonArt(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetMonNames(int)
+char* CGame::GetMonNames(int monIndex)
 {
-	// TODO
+    return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 3];
 }
 
 /*
@@ -1788,9 +1842,9 @@ void CGame::GetMonNames(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetMonArts(int)
+char* CGame::GetMonArts(int monIndex)
 {
-	// TODO
+    return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 2];
 }
 
 /*
@@ -1798,9 +1852,9 @@ void CGame::GetMonArts(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetMonName(int, int)
+char* CGame::GetMonName(int monIndex, int count)
 {
-	// TODO
+    return count > 1 ? GetMonNames(monIndex) : GetMonName(monIndex);
 }
 
 /*

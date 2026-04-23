@@ -218,7 +218,7 @@ int CGamePcs::GetTable(unsigned long param)
  */
 void CGamePcs::Quit()
 {
-	// TODO
+    return;
 }
 
 /*
@@ -228,5 +228,5 @@ void CGamePcs::Quit()
  */
 void CGamePcs::Init()
 {
-	// TODO
+    return;
 }

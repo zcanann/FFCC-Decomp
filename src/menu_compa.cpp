@@ -194,7 +194,30 @@ void CMenuPcs::CompaInit()
  */
 void CMenuPcs::CompaInit0()
 {
-	// TODO
+	CompaOpenAnimList* compaList = reinterpret_cast<CompaOpenAnimList*>(this->compaList);
+
+	compaList->entries[0].startFrame = 2;
+	compaList->entries[0].duration = 5;
+	compaList->entries[1].startFrame = 2;
+	compaList->entries[1].duration = 5;
+	compaList->entries[2].startFrame = 2;
+	compaList->entries[2].duration = 5;
+	compaList->entries[3].startFrame = 7;
+	compaList->entries[3].duration = 5;
+	compaList->entries[4].startFrame = 7;
+	compaList->entries[4].duration = 5;
+	compaList->entries[5].flags = 2;
+	compaList->entries[5].startFrame = 7;
+	compaList->entries[5].duration = 5;
+
+	unsigned int entryCount = static_cast<unsigned short>(compaList->count);
+	CompaOpenAnim* entry = compaList->entries;
+	while (entryCount != 0) {
+		entry->frame = 0;
+		entry->alpha = 1.0f;
+		entry++;
+		entryCount--;
+	}
 }
 
 /*
@@ -633,5 +656,54 @@ void CMenuPcs::CompaDraw()
  */
 void CMenuPcs::CompaCtrlCur()
 {
-	// TODO
+	bool activeInput = false;
+	unsigned short press;
+	short hold;
+	bool doReset = false;
+	CompaMenuState* compaState = this->compaMenuState;
+
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		activeInput = true;
+	}
+
+	if (activeInput) {
+		press = 0;
+	} else {
+		press = Pad._8_2_;
+	}
+
+	activeInput = false;
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		activeInput = true;
+	}
+
+	if (activeInput) {
+		hold = 0;
+	} else {
+		hold = *reinterpret_cast<short*>(reinterpret_cast<char*>(&Pad) + 0x20);
+	}
+
+	if (hold == 0) {
+		return;
+	}
+
+	if ((press & 0x20) != 0) {
+		compaState->cursorMove = 1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		doReset = true;
+	} else if ((press & 0x40) != 0) {
+		compaState->cursorMove = -1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		doReset = true;
+	} else if ((press & 0x100) != 0) {
+		Sound.PlaySe(4, 0x40, 0x7f, 0);
+	} else if ((press & 0x200) != 0) {
+		compaState->closeRequested = 1;
+		Sound.PlaySe(3, 0x40, 0x7f, 0);
+		doReset = true;
+	}
+
+	if (doReset) {
+		CompaInit0();
+	}
 }

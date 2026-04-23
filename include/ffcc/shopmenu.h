@@ -11,7 +11,7 @@ struct tagOAN3_SHAPE;
 
 void _drawNoShadowFont(CFont*, char*, float, float, int, int);
 void _drawShadowFont(CFont*, char*, float, float, int, int);
-void getButtonRepeat(int, unsigned short);
+unsigned short getButtonRepeat(int, unsigned short);
 void bButtonNoRepeat(unsigned short);
 void setOrtho(int, int, float, float, float);
 void drawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char);
@@ -32,19 +32,19 @@ class CShopMenu
 {
 public:
     void SetMode(int);
-    void getItemCnt();
-    void calcGilRatio(int);
-    void getItemNo(int);
-    void getBuyGil(int);
-    void getSellGil(int);
-    void getMakeGil(int);
-    void getBuySellGil(int);
-    void GetItemName(int);
-    void GetMaxExchange();
-    void GetTotalGil();
-    void CanAddGil();
-    void CheckSell(int);
-    void getItemHaveCnt(int);
+    int getItemCnt();
+    int calcGilRatio(int);
+    int getItemNo(int);
+    int getBuyGil(int);
+    int getSellGil(int);
+    int getMakeGil(int);
+    int getBuySellGil(int);
+    char* GetItemName(int);
+    int GetMaxExchange();
+    int GetTotalGil();
+    int CanAddGil();
+    int CheckSell(int);
+    int getItemHaveCnt(int);
     void Init(int);
     void Destroy();
     void Calc();

@@ -109,7 +109,55 @@ static inline void* GetEquipFont(CMenuPcs* menu)
  */
 void CMenuPcs::EquipInit()
 {
-	// TODO
+	float alpha = FLOAT_80332ee0;
+	int listBase = GetEquipListBase(this);
+	int entryBase = listBase + 8;
+
+	memset((void*)GetEquipList(this), 0, 0x1008);
+	for (int i = 0; i < 8; i++) {
+		*reinterpret_cast<float*>(entryBase + 0x14) = alpha;
+		*reinterpret_cast<float*>(entryBase + 0x54) = alpha;
+		*reinterpret_cast<float*>(entryBase + 0x94) = alpha;
+		*reinterpret_cast<float*>(entryBase + 0xD4) = alpha;
+		*reinterpret_cast<float*>(entryBase + 0x114) = alpha;
+		*reinterpret_cast<float*>(entryBase + 0x154) = alpha;
+		*reinterpret_cast<float*>(entryBase + 0x194) = alpha;
+		*reinterpret_cast<float*>(entryBase + 0x1D4) = alpha;
+		entryBase += 0x200;
+	}
+
+	int itemIndex = 0;
+	s16* entry = reinterpret_cast<s16*>(listBase + 8);
+	for (int row = 0; row < 2; row++) {
+		*reinterpret_cast<int*>(entry + 0xE) = 0x34;
+		entry[2] = 200;
+		entry[3] = 0x28;
+		entry[0] = static_cast<s16>(-((static_cast<double>(entry[2]) - DOUBLE_80332ed8) * DOUBLE_80332ed0 - DOUBLE_80332ec8));
+		entry[1] = static_cast<s16>(itemIndex * (entry[3] - 8) + 0x60);
+		*reinterpret_cast<float*>(entry + 4) = FLOAT_80332eb8;
+		*reinterpret_cast<float*>(entry + 6) = FLOAT_80332eb8;
+		*reinterpret_cast<int*>(entry + 0x12) = itemIndex;
+		*reinterpret_cast<int*>(entry + 0x14) = 3;
+
+		*reinterpret_cast<int*>(entry + 0x2E) = 0x34;
+		entry[0x22] = 200;
+		entry[0x23] = 0x28;
+		entry[0x20] = static_cast<s16>(-((static_cast<double>(entry[0x22]) - DOUBLE_80332ed8) * DOUBLE_80332ed0 - DOUBLE_80332ec8));
+		entry[0x21] = static_cast<s16>((itemIndex + 1) * (entry[0x23] - 8) + 0x60);
+		*reinterpret_cast<float*>(entry + 0x24) = FLOAT_80332eb8;
+		*reinterpret_cast<float*>(entry + 0x26) = FLOAT_80332eb8;
+		*reinterpret_cast<int*>(entry + 0x32) = itemIndex + 1;
+		*reinterpret_cast<int*>(entry + 0x34) = 3;
+
+		itemIndex += 2;
+		entry += 0x40;
+	}
+
+	*GetEquipList(this) = 4;
+	EquipInit1();
+	GetEquipItem();
+	*reinterpret_cast<s16*>(GetEquipStateBase(this) + 0x26) = 0;
+	*reinterpret_cast<u8*>(GetEquipStateBase(this) + 0xB) = 1;
 }
 
 /*
@@ -119,7 +167,25 @@ void CMenuPcs::EquipInit()
  */
 void CMenuPcs::EquipInit0()
 {
-	// TODO
+	int item = GetEquipListBase(this) + 8;
+	for (int index = 0; index < *GetEquipList(this); index++) {
+		*reinterpret_cast<float*>(item + 0x10) = FLOAT_80332ee0;
+		*reinterpret_cast<float*>(item + 0x14) = FLOAT_80332ee0;
+		item += 0x40;
+	}
+
+	u32 equipCount = static_cast<u32>(*reinterpret_cast<s16*>(Game.m_scriptFoodBase[0] + 0xBAA));
+	int index = 0;
+	int offset = (equipCount - 1) * 0x40;
+	if (-1 < static_cast<int>(equipCount - 1)) {
+		do {
+			item = GetEquipListBase(this) + offset + 8;
+			*reinterpret_cast<int*>(item + 0x24) = index;
+			*reinterpret_cast<int*>(item + 0x28) = 3;
+			index++;
+			offset -= 0x40;
+		} while (index < static_cast<int>(equipCount));
+	}
 }
 
 /*
@@ -1065,7 +1131,17 @@ bool CMenuPcs::EquipClose0()
  */
 void CMenuPcs::GetEquipItem()
 {
-	// TODO
+	s16* letterBuffer = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+	s16 count = 0;
+
+	for (int item = 0; item < 0x40; item++) {
+		if (GetItemType__8CMenuPcsFii(this, item, 0) == 1) {
+			letterBuffer[count + 1] = static_cast<s16>(item);
+			count++;
+		}
+	}
+
+	letterBuffer[0] = count + 1;
 }
 
 /*

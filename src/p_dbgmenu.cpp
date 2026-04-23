@@ -181,7 +181,19 @@ CDbgMenuPcs::CDbgMenuPcs()
  */
 void CDbgMenuPcs::selectNext()
 {
-	// TODO
+	if (m_currentMenu == 0) {
+		return;
+	}
+
+	CDM* start = m_currentMenu;
+	m_currentMenu->m_status &= 0xBF;
+	do {
+		m_currentMenu = m_currentMenu->m_next;
+		if ((m_currentMenu->m_flags & 1) != 0) {
+			break;
+		}
+	} while (m_currentMenu != start);
+	m_currentMenu->m_status = (m_currentMenu->m_status & 0xBF) | 0x40;
 }
 
 /*
@@ -191,7 +203,19 @@ void CDbgMenuPcs::selectNext()
  */
 void CDbgMenuPcs::selectPrev()
 {
-	// TODO
+	if (m_currentMenu == 0) {
+		return;
+	}
+
+	CDM* start = m_currentMenu;
+	m_currentMenu->m_status &= 0xBF;
+	do {
+		m_currentMenu = m_currentMenu->m_prev;
+		if ((m_currentMenu->m_flags & 1) != 0) {
+			break;
+		}
+	} while (m_currentMenu != start);
+	m_currentMenu->m_status = (m_currentMenu->m_status & 0xBF) | 0x40;
 }
 
 /*
@@ -312,16 +336,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	}
 	if ((padInput & 4) != 0) {
-		menuPtr = (int)m_currentMenu;
-		m_currentMenu->m_status &= 0xBF;
-		do {
-			m_currentMenu = m_currentMenu->m_next;
-			cursorPtr = (int)m_currentMenu;
-			if ((*(unsigned int*)(cursorPtr + 4) & 1) != 0) {
-				break;
-			}
-		} while (menuPtr != cursorPtr);
-		m_currentMenu->m_status = (m_currentMenu->m_status & 0xBF) | 0x40;
+		selectNext();
 	}
 
 	if (Pad._452_4_ == 0) {
@@ -332,16 +347,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	}
 	if ((padInput & 8) != 0) {
-		menuPtr = (int)m_currentMenu;
-		m_currentMenu->m_status &= 0xBF;
-		do {
-			m_currentMenu = m_currentMenu->m_prev;
-			cursorPtr = (int)m_currentMenu;
-			if ((*(unsigned int*)(cursorPtr + 4) & 1) != 0) {
-				break;
-			}
-		} while (menuPtr != cursorPtr);
-		m_currentMenu->m_status = (m_currentMenu->m_status & 0xBF) | 0x40;
+		selectPrev();
 	}
 
 	if (m_rootMenuNode.m_firstChild != 0) {
@@ -694,9 +700,15 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::searchFreeCDM()
+CDbgMenuPcs::CDM* CDbgMenuPcs::searchFreeCDM()
 {
-	// TODO
+	for (int i = 0; i < 0x80; i++) {
+		if ((m_menuPool[i].m_status & 0x80) == 0) {
+			return &m_menuPool[i];
+		}
+	}
+
+	return 0;
 }
 
 /*
@@ -857,13 +869,7 @@ void CDbgMenuPcs::Add()
 void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 {
 	CDM* parentMenu = reinterpret_cast<CDM*>(searchID(parentID, m_rootMenuNode));
-	CDM* menu = 0;
-	for (int i = 0; i < 0x80; i++) {
-		if ((m_menuPool[i].m_status & 0x80) == 0) {
-			menu = &m_menuPool[i];
-			break;
-		}
-	}
+	CDM* menu = searchFreeCDM();
 
 	memset(&menu->m_status, 0, 0x20);
 	menu->m_status |= 0x80;
@@ -920,9 +926,28 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::Delete(int)
+void CDbgMenuPcs::Delete(int id)
 {
-	// TODO
+	CDM* menu = reinterpret_cast<CDM*>(searchID(id, m_rootMenuNode));
+	if (menu == 0) {
+		return;
+	}
+
+	if (m_selectedMenu == menu) {
+		m_selectedMenu = 0;
+	}
+	if (m_defaultMenu == menu) {
+		m_defaultMenu = 0;
+	}
+
+	CDM* parent = menu->m_parent;
+	if (parent != 0 && parent->m_firstChild == menu) {
+		parent->m_firstChild = (menu->m_next != menu) ? menu->m_next : 0;
+	}
+
+	menu->m_prev->m_next = menu->m_next;
+	menu->m_next->m_prev = menu->m_prev;
+	memset(&menu->m_status, 0, 0x20);
 }
 
 /*

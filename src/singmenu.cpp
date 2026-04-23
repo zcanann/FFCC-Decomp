@@ -1184,7 +1184,10 @@ void CMenuPcs::SingMenuInit()
  */
 void CMenuPcs::SingMenuEnd()
 {
-	// TODO
+    Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
+    gSingMenuHasScriptFoodBase = 0;
+    gSingMenuAsyncLoadCompleted = 0;
+    destroySingleMenu();
 }
 
 /*
@@ -1194,7 +1197,7 @@ void CMenuPcs::SingMenuEnd()
  */
 void CMenuPcs::calcSingleMenu()
 {
-	// TODO
+    loadTextureAsync(0, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1232,63 +1235,10 @@ void CMenuPcs::drawSingleMenu()
             return;
         }
 
-        if ((mode == 0) || (mode == 2)) {
-            s16* menuData = *reinterpret_cast<s16**>(self + 0x850);
-            if (menuData == 0) {
-                return;
-            }
-
-            s16 count = menuData[0];
-            s16* entry = menuData + 4;
-
-            for (s16 i = 0; i < count; i++) {
-                if ((i == 0) || (*reinterpret_cast<s16*>(self + 0x864) != 8)) {
-                    float alpha = *reinterpret_cast<float*>(entry + 8);
-
-                    if (i == 0) {
-                        DrawInit__8CMenuPcsFv(this);
-                        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
-                        SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
-                        u8 a = static_cast<u8>(FLOAT_80332940 * alpha);
-                        _GXColor color = {0xFF, 0xFF, 0xFF, a};
-                        GXSetChanMatColor(GX_COLOR0A0, color);
-
-                        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x20);
-                        DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_80332928,
-                                                         FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
-                        DrawRect__8CMenuPcsFUlfffffffff(this, 4, FLOAT_8033294c, FLOAT_803329a8, FLOAT_803329a4, FLOAT_80332928,
-                                                         FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
-
-                        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x28);
-                        unsigned int step = 0x20;
-                        for (unsigned int y = 0x40; y < 0x180; y += step) {
-                            if ((0x180 - y) < step) {
-                                step = 0x180 - y;
-                            }
-                            DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033294c, static_cast<float>(y), FLOAT_803329a4,
-                                                             static_cast<float>(step), FLOAT_8033294c, FLOAT_8033294c,
-                                                             FLOAT_80332934, FLOAT_80332934, 0.0f);
-                        }
-                    } else if (i == 1) {
-                        DrawInit__8CMenuPcsFv(this);
-                        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
-                        SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
-                        _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-                        GXSetChanMatColor(GX_COLOR0A0, white);
-                        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x21);
-                        DrawRect__8CMenuPcsFUlfffffffff(this, 0, -(FLOAT_803329ac * alpha - FLOAT_803329bc), FLOAT_80332948,
-                                                         FLOAT_803329ac, FLOAT_803329b0, FLOAT_8033294c, FLOAT_8033294c,
-                                                         alpha, FLOAT_80332934, 0.0f);
-                        DrawRect__8CMenuPcsFUlfffffffff(this, 8, FLOAT_803329b4, FLOAT_80332948, FLOAT_803329ac, FLOAT_803329b0,
-                                                         FLOAT_8033294c, FLOAT_8033294c, alpha, FLOAT_80332934, 0.0f);
-                    } else if (i == 2) {
-                        DrawSingleStat(alpha);
-                    } else {
-                        DrawSingleHelpWim(alpha);
-                    }
-                }
-                entry += 0x20;
-            }
+        if (mode == 0) {
+            SingleDrawFadeIn();
+        } else if (mode == 2) {
+            SingleDrawFadeOut();
         }
     }
 }
@@ -1432,9 +1382,31 @@ post_texture_load:
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SingCalcChara(float)
+void CMenuPcs::SingCalcChara(float frameStep)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+
+    if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
+        *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
+        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+    } else {
+        AddFrame__Q26CChara6CModelFf(frameStep, model);
+    }
+
+    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
+    float modelScale = DAT_801dd708[modelScaleIndex];
+    Mtx scaleMtx;
+    PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+    scaleMtx[1][3] = DAT_801dd6f8[modelScaleIndex];
+    scaleMtx[0][3] = FLOAT_8033294c;
+    scaleMtx[2][3] = FLOAT_8033294c;
+
+    int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+    *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
+    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
+    CalcMatrix__Q26CChara6CModelFv(model);
+    CalcSkin__Q26CChara6CModelFv(model);
 }
 
 /*
@@ -1804,7 +1776,19 @@ void CMenuPcs::SingleCalcFadeIn()
  */
 void CMenuPcs::SingleDrawFadeIn()
 {
-	// TODO
+    SingleFadeState* fadeState = *reinterpret_cast<SingleFadeState**>(reinterpret_cast<u8*>(this) + 0x850);
+    if (fadeState == 0) {
+        return;
+    }
+
+    DrawSingleBase(fadeState->entries[0].alpha);
+    if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x864) == 8) {
+        return;
+    }
+
+    DrawSingleCrescent(fadeState->entries[1].alpha, fadeState->entries[1].alpha);
+    DrawSingleStat(fadeState->entries[2].alpha);
+    DrawSingleHelpWim(fadeState->entries[3].alpha);
 }
 
 /*
@@ -1898,7 +1882,19 @@ void CMenuPcs::SingleCalcFadeOut()
  */
 void CMenuPcs::SingleDrawFadeOut()
 {
-	// TODO
+    SingleFadeState* fadeState = *reinterpret_cast<SingleFadeState**>(reinterpret_cast<u8*>(this) + 0x850);
+    if (fadeState == 0) {
+        return;
+    }
+
+    DrawSingleBase(fadeState->entries[0].alpha);
+    if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x864) == 8) {
+        return;
+    }
+
+    DrawSingleCrescent(fadeState->entries[1].alpha, fadeState->entries[1].alpha);
+    DrawSingleStat(fadeState->entries[2].alpha);
+    DrawSingleHelpWim(fadeState->entries[3].alpha);
 }
 
 /*
@@ -3130,7 +3126,13 @@ int CMenuPcs::SingGetLetterAttachflg()
  */
 void CMenuPcs::CalcSingLife()
 {
-	// TODO
+    int* lifeTimer = reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x874);
+    if (*lifeTimer >= 0) {
+        ++(*lifeTimer);
+        if (*lifeTimer > 0x31) {
+            *lifeTimer = -1;
+        }
+    }
 }
 
 /*
@@ -3201,7 +3203,7 @@ void CMenuPcs::SingLifeInit(int timer)
  */
 void CMenuPcs::SingLifeResetWait()
 {
-	// TODO
+    SingLifeInit(0);
 }
 
 static inline char* GetLanguageTableString(int index, char** englishTable, char** germanTable, char** italianTable,

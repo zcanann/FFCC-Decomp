@@ -522,6 +522,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
 {
     int colorOffset;
     int* dataOffsets;
+    _pppMngSt* mngSt;
     unsigned char* work;
     VColor* color;
     int* groupData;
@@ -549,6 +550,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     }
 
     dataOffsets = offsets->m_serializedDataOffsets;
+    mngSt = pppMngStPtr;
     colorOffset = dataOffsets[1];
     work = reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[0];
     color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
@@ -614,7 +616,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         PSVECNormalize((Vec*)(work + 0x48), (Vec*)(work + 0x48));
     }
 
-    PSMTXCopy(pppMngStPtr->m_matrix.value, *(Mtx*)work);
+    PSMTXCopy(mngSt->m_matrix.value, *(Mtx*)work);
     UpdateAllParticle(reinterpret_cast<_pppPObject*>(ymBreath), (VYmBreath*)work, pYmBreath, color);
 
     particleWMat = *(Mtx**)(work + 0x34);
@@ -634,7 +636,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
 group_ready:
         if (ready) {
             firstParticle = -1;
-            scaledOwner = pppMngStPtr->m_ownerScale * *(float*)((unsigned char*)pYmBreath + 8);
+            scaledOwner = mngSt->m_ownerScale * *(float*)((unsigned char*)pYmBreath + 8);
             for (slotIndex = 0; slotCount != 0; slotCount--) {
                 if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
                     firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
@@ -661,7 +663,7 @@ group_ready:
             PSVECScale(&dirNorm, &target, *(float*)(groupTable + 0x24));
             pppAddVector(target, origin, target);
             pppSubVector(hitVector, target, origin);
-            pppHitCylinderSendSystem(pppMngStPtr, &origin, &hitVector, scaledOwner,
+            pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner,
                                                                 *(float*)((unsigned char*)pYmBreath + 4));
         }
 

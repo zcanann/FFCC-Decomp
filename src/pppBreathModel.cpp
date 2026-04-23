@@ -95,6 +95,8 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
 {
     unsigned char* breath = (unsigned char*)pBreathModel;
     unsigned char* particle = (unsigned char*)particleData;
+    signed char alphaMode;
+    signed char lifeMode;
     unsigned char flags;
     float f0;
     float f1;
@@ -116,12 +118,14 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     Math.RandF();
     Math.RandF();
 
-    if (*(char*)(breath + 0x22) != '\0') {
+    alphaMode = *(signed char*)(breath + 0x22);
+    if (alphaMode != 0) {
         *(float*)(particle + 0x88) = (float)(unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
-        *(unsigned char*)(particle + 0x54) = *(unsigned char*)(breath + 0x22);
+        *(unsigned char*)(particle + 0x54) = (unsigned char)alphaMode;
     }
-    if (*(char*)(breath + 0x23) != '\0') {
-        *(unsigned char*)(particle + 0x55) = *(unsigned char*)(breath + 0x23);
+    lifeMode = *(signed char*)(breath + 0x23);
+    if (lifeMode != 0) {
+        *(unsigned char*)(particle + 0x55) = (unsigned char)lifeMode;
     }
 
     *(float*)(particle + 0x58) = *(float*)(breath + 0x90);

@@ -240,6 +240,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 				(float)((double)(int)i - DOUBLE_80330dd8);
 			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(pppMngStPtr, (float)t, charaMtx) == 0) {
 				emptyHistory = true;
+				continue;
 			} else {
 				PSMTXConcat(charaMtx, laser->m_localMatrix.value, charaMtx);
 				PSMTXMultVec(charaMtx, &localB, &points[i]);

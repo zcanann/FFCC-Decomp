@@ -30,6 +30,7 @@ void GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(void*, int, short*
 int CanAddGil__12CCaravanWorkFi(void*, int);
 void AddItem__12CCaravanWorkFiPi(void*, int, int*);
 void AddGil__12CCaravanWorkFi(void*, int);
+void DeleteItem__12CCaravanWorkFii(void*, int, int);
 void DeleteItemIdx__12CCaravanWorkFii(void*, int, int);
 char EquipChk__8CMenuPcsFi(void*, int);
 int GetSmithItem__8CMenuPcsFi(void*, int);
@@ -37,6 +38,7 @@ int __cntlzw(unsigned int);
 void __dl__FPv(void*);
 void pppCacheLoadShape__FPsP12_pppDataHead(short*, _pppDataHead*);
 int GetEquipType__8CMenuPcsFi(void*, int);
+void ChgEquipPos__12CCaravanWorkFii(void*, int, int);
 char* GetAttrStr__8CMenuPcsFi(void*, int);
 void SetScale__5CFontFf(float, CFont*);
 void SetScaleX__5CFontFf(float, CFont*);
@@ -285,6 +287,41 @@ static int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
     default:
         return -1;
     }
+}
+
+static int ResolveShopMenuSelectedItemId(CShopMenu* shopMenu)
+{
+    int selected = ShopMenuInt(shopMenu, 0x28);
+    int caravan = ShopMenuCaravan(shopMenu);
+
+    switch (ShopMenuInt(shopMenu, 0x14)) {
+    case 0:
+        return *reinterpret_cast<short*>(caravan + selected * 2 + 0xBE6);
+    case 1:
+        return *reinterpret_cast<short*>(caravan + selected * 2 + 0xB6);
+    case 2: {
+        int mapped = ShopMenuInt(shopMenu, 0x50 + selected * 4);
+        if (mapped == -1) {
+            return -1;
+        }
+        return *reinterpret_cast<short*>(caravan + mapped * 2 + 0xB6);
+    }
+    default:
+        return -1;
+    }
+}
+
+static int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)
+{
+    if (itemId < 1) {
+        return 0;
+    }
+
+    int caravan = ShopMenuCaravan(shopMenu);
+    int gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                   *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x24);
+    gilValue = gilValue / 100 + (gilValue >> 0x1F);
+    return gilValue - (gilValue >> 0x1F);
 }
 
 static int CalcShopMenuGilRatio(CShopMenu* shopMenu, int baseGil)
@@ -1005,16 +1042,122 @@ void CShopMenu::Calc()
         }
         break;
     case 9:
-        this->SelectSOUBI();
+        if (timer == 1) {
+            Sound.PlaySe(5, 0x40, 0x7F, 0);
+        }
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
+        if (timer == 8) {
+            this->SetMode(10);
+        }
         break;
     case 10:
-        this->SelectMake();
+        this->SelectItemIdx();
+        if ((buttons & 0x200) != 0) {
+            ShopMenuInt(this, 0x8) = -1;
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
+            this->SetMode(0xB);
+        }
         break;
     case 11:
-        this->SelectFigure();
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(8 - timer) * 0.125f;
+        if (timer == 8) {
+            if (ShopMenuInt(this, 0x8) == -1) {
+                ReleasePdt__8CPartPcsFi(PartPcsVoid(), ShopMenuInt(this, 0x18));
+                reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
+                *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
+                __dl__FPv(*reinterpret_cast<void**>(MenuPcsRaw() + 0x878));
+                *reinterpret_cast<void**>(MenuPcsRaw() + 0x878) = nullptr;
+                return;
+            }
+            this->SetMode(ShopMenuInt(this, 0x8));
+        }
         break;
     case 12:
-        this->SelectYesNo();
+        if (timer == 1) {
+            Sound.PlaySe(5, 0x40, 0x7F, 0);
+        }
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
+        if (timer == 8) {
+            this->SetMode(0xD);
+        }
+        break;
+    case 13:
+        this->SelectMake();
+        if ((buttons & 0x200) != 0) {
+            ShopMenuInt(this, 0x8) = 9;
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
+            this->SetMode(0xE);
+        }
+        break;
+    case 14:
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(8 - timer) * 0.125f;
+        if (timer == 8) {
+            this->SetMode(ShopMenuInt(this, 0x8));
+        }
+        break;
+    case 15:
+        if (timer == 1) {
+            Sound.PlaySe(5, 0x40, 0x7F, 0);
+        }
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
+        if (timer == 8) {
+            short recipeMaterial[8];
+            int itemId = ResolveShopMenuSelectedItemId(this);
+
+            GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), itemId, recipeMaterial);
+            AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(ShopMenuCaravan(this)), -CalcShopMenuMakeGil(this, itemId));
+            DeleteItem__12CCaravanWorkFii(reinterpret_cast<void*>(ShopMenuCaravan(this)), itemId, 0);
+
+            for (int i = 0; i < 3; i++) {
+                if (recipeMaterial[i] < 1) {
+                    break;
+                }
+                for (int count = 0; count < recipeMaterial[i + 3]; count++) {
+                    DeleteItem__12CCaravanWorkFii(
+                        reinterpret_cast<void*>(ShopMenuCaravan(this)),
+                        recipeMaterial[i],
+                        0);
+                }
+            }
+
+            AddItem__12CCaravanWorkFiPi(
+                reinterpret_cast<void*>(ShopMenuCaravan(this)),
+                static_cast<short>(ShopMenuInt(this, 0x150)),
+                &ShopMenuInt(this, 0x154));
+            this->SetMode(0x10);
+        }
+        break;
+    case 16:
+        if ((buttons & 0xC) != 0) {
+            ShopMenuInt(this, 0x3C) ^= 1;
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        } else if ((buttons & 0x100) != 0) {
+            ShopMenuInt(this, 0x8) = 9;
+            this->SetMode(0x11);
+
+            if (ShopMenuInt(this, 0x3C) == 1) {
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
+            } else if (ShopMenuInt(this, 0x3C) == 0) {
+                int equipType = GetEquipType__8CMenuPcsFi(MenuPcsVoid(), ShopMenuInt(this, 0x150));
+                ChgEquipPos__12CCaravanWorkFii(
+                    reinterpret_cast<void*>(ShopMenuCaravan(this)),
+                    equipType,
+                    static_cast<short>(ShopMenuInt(this, 0x154)));
+                Sound.PlaySe(0x51, 0x40, 0x7F, 0);
+            }
+        }
+
+        if ((buttons & 0x200) != 0) {
+            ShopMenuInt(this, 0x8) = 9;
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
+            this->SetMode(0x11);
+        }
+        break;
+    case 17:
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(8 - timer) * 0.125f;
+        if (timer == 8) {
+            this->SetMode(ShopMenuInt(this, 0x8));
+        }
         break;
     }
 

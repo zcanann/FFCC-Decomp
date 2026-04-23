@@ -720,24 +720,23 @@ void CGItemObj::onFrameStat()
  */
 int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObject*, CFlatRuntime::CObject*)
 {
-	unsigned char* bestItemObj;
 	int deletedCount = 0;
 
-	while (deletedCount < maxDeleteCount) {
-		void* bestScriptObject = (void*)0x00989680;
-		bestItemObj = 0;
+	while (true) {
+		if (maxDeleteCount <= deletedCount) {
+			return deletedCount;
+		}
+
+		int bestScriptObjectPos = 0x00989680;
+		unsigned char* bestItemObj = 0;
 
 		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
 			 itemObj != 0;
 			 itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-			unsigned char flags = itemObj[0x50];
-			unsigned char priorityMask = itemObj[0x53];
-			int isActive = (int)(((unsigned int)flags << 28) | ((unsigned int)flags >> 4)) < 0;
-			int scriptObjectPos = *(int*)(itemObj + 0x48);
-
-			if (*(int*)(itemObj + 0x44) == 0 && isActive != 0 && (priorityMask & deleteMask) != 0 &&
-				scriptObjectPos < (int)bestScriptObject) {
-				bestScriptObject = (void*)scriptObjectPos;
+			if (*(int*)(itemObj + 0x44) == 0 &&
+				(int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0 &&
+				(((int)(char)itemObj[0x53] & deleteMask) != 0) && *(int*)(itemObj + 0x48) < bestScriptObjectPos) {
+				bestScriptObjectPos = *(int*)(itemObj + 0x48);
 				bestItemObj = itemObj;
 			}
 		}
@@ -750,10 +749,11 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		deletedCount++;
 	}
 
-	if ((unsigned int)System.m_execParam > 2U && deletedCount < maxDeleteCount) {
-		Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
+	if ((unsigned int)System.m_execParam < 3) {
+		return deletedCount;
 	}
 
+	Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
 	return deletedCount;
 }
 

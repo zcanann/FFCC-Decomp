@@ -88,6 +88,7 @@ struct CCharaMeshRaw
 
 typedef void (*BeforeDrawModelCallback)(CChara::CModel*, void*, void*, float (*)[4], unsigned int);
 typedef void (*AfterDrawModelCallback)(CChara::CModel*, void*, void*);
+typedef int (*BeforeCalcMatrixCallback)(CChara::CModel*, void*, void*);
 typedef void (*BeforeMeshCallback)(CChara::CModel*, void*, void*, unsigned int);
 typedef void (*AfterMeshDrawCallback)(CChara::CModel*, void*, void*, unsigned int, unsigned int, float (*)[4]);
 typedef void (*AfterMeshEnvCallback)(CChara::CModel*, void*, void*, unsigned int, float (*)[4]);
@@ -181,6 +182,26 @@ static inline Vec& ModelDynJitter(CChara::CModel* model)
 static inline CTexAnimSet* ModelTexAnimSet(CChara::CModel* model)
 {
 	return *reinterpret_cast<CTexAnimSet**>(ModelRaw(model) + 0xD4);
+}
+
+static inline u16& ModelBlendCur(CChara::CModel* model)
+{
+	return *reinterpret_cast<u16*>(ModelRaw(model) + 0xD8);
+}
+
+static inline void* ModelCalcCbUser0(CChara::CModel* model)
+{
+	return *reinterpret_cast<void**>(ModelRaw(model) + 0xE4);
+}
+
+static inline void* ModelCalcCbUser1(CChara::CModel* model)
+{
+	return *reinterpret_cast<void**>(ModelRaw(model) + 0xE8);
+}
+
+static inline BeforeCalcMatrixCallback ModelBeforeCalcMatrixCallback(CChara::CModel* model)
+{
+	return *reinterpret_cast<BeforeCalcMatrixCallback*>(ModelRaw(model) + 0xEC);
 }
 
 static inline BeforeDrawModelCallback ModelBeforeDrawCallback(CChara::CModel* model)
@@ -1049,6 +1070,8 @@ void CChara::CModel::CalcMatrix()
 	float(*localMtx)[4] = (float(*)[4])((u8*)this + 0x14);
 	float(*worldBaseMtx)[4] = (float(*)[4])((u8*)this + 0x44);
 	float(*drawMtx)[4] = (float(*)[4])((u8*)this + 0x74);
+	const float zero = FLOAT_803301b0;
+	const float one = FLOAT_803301bc;
 
 	worldBaseMtx[0][0] = localMtx[0][0];
 	worldBaseMtx[1][0] = localMtx[1][0];
@@ -1059,16 +1082,37 @@ void CChara::CModel::CalcMatrix()
 	worldBaseMtx[0][2] = localMtx[0][2];
 	worldBaseMtx[1][2] = localMtx[1][2];
 	worldBaseMtx[2][2] = localMtx[2][2];
-	worldBaseMtx[0][3] = 0.0f;
-	worldBaseMtx[1][3] = 0.0f;
-	worldBaseMtx[2][3] = 0.0f;
+	worldBaseMtx[0][3] = zero;
+	worldBaseMtx[1][3] = zero;
+	worldBaseMtx[2][3] = zero;
 
-	PSMTXIdentity(drawMtx);
+	drawMtx[0][0] = one;
+	drawMtx[1][0] = zero;
+	drawMtx[2][0] = zero;
+	drawMtx[0][1] = zero;
+	drawMtx[1][1] = one;
+	drawMtx[2][1] = zero;
+	drawMtx[0][2] = zero;
+	drawMtx[1][2] = zero;
+	drawMtx[2][2] = one;
 	drawMtx[0][3] = localMtx[0][3];
 	drawMtx[1][3] = localMtx[1][3];
 	drawMtx[2][3] = localMtx[2][3];
 
-	calcMatrix();
+	u16& blendCur = ModelBlendCur(this);
+	if (blendCur != 0) {
+		blendCur--;
+	}
+
+	BeforeCalcMatrixCallback beforeCalcMatrix = ModelBeforeCalcMatrixCallback(this);
+	if (beforeCalcMatrix == 0 || beforeCalcMatrix(this, ModelCalcCbUser0(this), ModelCalcCbUser1(this)) != 0) {
+		calcMatrix();
+
+		CTexAnimSet* texAnimSet = ModelTexAnimSet(this);
+		if (texAnimSet != 0) {
+			texAnimSet->AddFrame();
+		}
+	}
 }
 
 /*

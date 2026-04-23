@@ -2505,30 +2505,31 @@ doneSecondMix:
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     char value;
     short step;
     char* command;
-    int* trackData = (int*)track;
 
-    command = (char*)trackData[0];
-    trackData[0] = (int)(command + 1);
+    command = *(char**)track;
+    *(char**)track = command + 1;
     value = *command;
     if (value == 0) {
         step = 0;
     } else {
-        step = *(short*)(trackData + 0x4e) + (short)value;
+        step = *(short*)((int*)track + 0x4e) + (short)value;
     }
-    *(short*)(trackData + 0x4e) = step;
-    *(short*)((char*)trackData + 0x13a) = 0;
+    *(short*)((int*)track + 0x4e) = step;
+    *(short*)((char*)track + 0x13a) = 0;
 
-    if (*(short*)(trackData + 0x4e) < -9999) {
-        *(short*)(trackData + 0x4e) = -9999;
-    } else if (*(short*)(trackData + 0x4e) > 9999) {
-        *(short*)(trackData + 0x4e) = 9999;
+    if (*(short*)((int*)track + 0x4e) < -9999) {
+        *(short*)((int*)track + 0x4e) = -9999;
+    } else if (*(short*)((int*)track + 0x4e) > 9999) {
+        *(short*)((int*)track + 0x4e) = 9999;
     }
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2539,29 +2540,30 @@ void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-    unsigned char* command = (unsigned char*)trackData[0];
+    unsigned char* command = *(unsigned char**)track;
     unsigned char value;
-    int step;
+    short step;
 
-    trackData[0] = (int)(command + 1);
+    *(unsigned char**)track = command + 1;
     value = *command;
-    *(short*)(trackData + 0x4e) = 0;
+    *(short*)((int*)track + 0x4e) = 0;
 
     step = 0;
     if (value != 0) {
-        step = *(short*)((char*)trackData + 0x13a) + (unsigned short)value;
+        step = *(short*)((char*)track + 0x13a) + (unsigned short)value;
     }
-    *(short*)((char*)trackData + 0x13a) = step;
+    *(short*)((char*)track + 0x13a) = step;
 
-    if (*(short*)((char*)trackData + 0x13a) < -9999) {
-        *(short*)((char*)trackData + 0x13a) = -9999;
-    } else if (*(short*)((char*)trackData + 0x13a) > 9999) {
-        *(short*)((char*)trackData + 0x13a) = 9999;
+    if (*(short*)((char*)track + 0x13a) < -9999) {
+        *(short*)((char*)track + 0x13a) = -9999;
+    } else if (*(short*)((char*)track + 0x13a) > 9999) {
+        *(short*)((char*)track + 0x13a) = 9999;
     }
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

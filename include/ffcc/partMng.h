@@ -436,8 +436,7 @@ public:
     void pppDestroyAll();
 
     unsigned char m_unk0[0x2A18];
-    _pppMngSt m_pppMng[0x60];
-    unsigned char m_unkAB18[0x18300];
+    _pppMngSt m_pppMng[0x180];           // 0x2A18
 
     struct PppPdtSlot
     {

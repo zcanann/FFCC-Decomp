@@ -21,6 +21,7 @@ extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemor
 extern "C" void __dla__FPv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __ct__7CVectorFv(void*);
+extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void SetTextureSet__12CMaterialSetFP11CTextureSet(CMaterialSet*, CTextureSet*);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
@@ -197,6 +198,31 @@ static inline u8* MaterialManRaw()
 	return reinterpret_cast<u8*>(&MaterialMan);
 }
 
+static inline u8* CharaRaw()
+{
+	return reinterpret_cast<u8*>(&gChara);
+}
+
+static inline int CharaDrawBufferIndex()
+{
+	return *reinterpret_cast<int*>(CharaRaw() + 0x2060);
+}
+
+static inline u32& CharaDrawBufferCursor(int bufferIndex)
+{
+	return *reinterpret_cast<u32*>(CharaRaw() + 0x2064 + bufferIndex * 8);
+}
+
+static inline u8* CharaDrawBufferBase(int bufferIndex)
+{
+	return *reinterpret_cast<u8**>(CharaRaw() + 0x2068 + bufferIndex * 8);
+}
+
+static inline u32 AlignCharaWorkBytes(u32 size)
+{
+	return (size + 0x1F) & ~0x1Fu;
+}
+
 static inline void InitCharaMaterialState()
 {
 	u8* raw = MaterialManRaw();
@@ -238,6 +264,9 @@ static inline u32 CharaFourCC(char a, char b, char c, char d)
 }
 
 static const char s_chara_cpp_801d90c8[] = "chara.cpp";
+static const char s_charaMeshWorkOverflow[] = "chara mesh work buffer overflow\n";
+static int s_charaMeshWorkWarnArmed = 1;
+static bool s_charaMeshWorkOverflowSeen = false;
 
 } // namespace
 
@@ -1955,16 +1984,76 @@ void CChara::CMesh::skin(int meshIndex, int start, int count, CChara::CSkin* ski
  */
 void CChara::CMesh::Calc(CChara::CModel* model)
 {
-	(void)model;
-	void* ref = *(void**)this;
-	u16 skinCount = *(u16*)((u8*)ref + 0x0A);
-	if (skinCount == 0) {
-		*(void**)((u8*)this + 4) = *(void**)((u8*)ref + 0x10);
-		*(void**)((u8*)this + 8) = *(void**)((u8*)ref + 0x20);
-	} else {
-		*(void**)((u8*)this + 4) = 0;
-		*(void**)((u8*)this + 8) = 0;
+	CCharaMeshRaw* mesh = reinterpret_cast<CCharaMeshRaw*>(this);
+	CCharaMeshRefRaw* meshRef = mesh->m_data;
+
+	if (meshRef->m_skinCount == 0) {
+		mesh->m_workPositions = meshRef->m_vertices;
+		mesh->m_workNormals = meshRef->m_normals;
+		return;
 	}
+
+	int bufferIndex = CharaDrawBufferIndex();
+	u32& cursor = CharaDrawBufferCursor(bufferIndex);
+	u32 needed = (meshRef->m_vertexCount + meshRef->m_normalCount) * 6 + 0x40;
+	if (0x58000u - cursor < needed) {
+		mesh->m_workPositions = 0;
+		mesh->m_workNormals = 0;
+
+		if (!s_charaMeshWorkOverflowSeen) {
+			s_charaMeshWorkWarnArmed = 1;
+			s_charaMeshWorkOverflowSeen = true;
+		}
+
+		if ((s_charaMeshWorkWarnArmed != 0) && (System.m_execParam > 1)) {
+			s_charaMeshWorkWarnArmed = 0;
+			Printf__7CSystemFPce(&System, s_charaMeshWorkOverflow);
+		}
+		return;
+	}
+
+	u8* workBase = CharaDrawBufferBase(bufferIndex);
+	mesh->m_workPositions = reinterpret_cast<S16Vec*>(workBase + cursor);
+	cursor += AlignCharaWorkBytes(meshRef->m_vertexCount * 6);
+	mesh->m_workNormals = reinterpret_cast<S16Vec*>(workBase + cursor);
+	cursor += AlignCharaWorkBytes(meshRef->m_normalCount * 6);
+
+	float* skinData = reinterpret_cast<float*>(meshRef->m_skins);
+	for (u32 i = 0; i < meshRef->m_skinCount; i++) {
+		int nodeIndex = static_cast<int>(reinterpret_cast<float(*)[4]>(skinData + 0x18)[0][0]);
+		PSMTXConcat(
+		    reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(&ModelNodes(model)[nodeIndex]) + 0x44),
+		    reinterpret_cast<float(*)[4]>(skinData + 0x0C),
+		    reinterpret_cast<float(*)[4]>(skinData));
+		skinData += 0x19;
+	}
+
+	if (meshRef->m_infoWord1 != 0) {
+		S16Vec* srcNormals = meshRef->m_normals;
+		S16Vec* dstNormals = mesh->m_workNormals;
+		for (u32 i = 0; i < meshRef->m_infoWord1; i++) {
+			dstNormals[1] = srcNormals[1];
+			dstNormals[2] = srcNormals[2];
+			srcNormals += 3;
+			dstNormals += 3;
+		}
+	}
+
+	skin(
+	    meshRef->m_oneWeightCountOrSize,
+	    meshRef->m_twoWeightCountOrSize,
+	    meshRef->m_threeWeightCountOrSize,
+	    reinterpret_cast<CChara::CSkin*>(meshRef->m_skins),
+	    meshRef->m_oneWeightData,
+	    meshRef->m_twoWeightData,
+	    meshRef->m_threeWeightData,
+	    meshRef->m_vertices,
+	    mesh->m_workPositions,
+	    meshRef->m_normals,
+	    mesh->m_workNormals);
+
+	DCFlushRange(mesh->m_workPositions, meshRef->m_vertexCount * 6);
+	DCFlushRange(mesh->m_workNormals, meshRef->m_normalCount * 6);
 }
 
 /*

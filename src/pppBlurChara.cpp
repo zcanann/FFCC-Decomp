@@ -172,19 +172,19 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     Mtx cameraMtx;
     Mtx44 projection;
     Mtx44 screenMtx;
+    Vec quadB;
+    Vec quadA;
     Vec cameraPos;
     Vec cameraDir;
     Vec objPos;
     Vec cameraTarget;
-    Vec4d inVec;
     Vec4d outVec;
+    Vec4d inVec;
     float gxProjection[7];
     float viewport[6];
     float projX;
     float projY;
     float projZ;
-    Vec quadA;
-    Vec quadB;
 
     if (param_2->m_textureMode == 1) {
         textureIndex = 0;

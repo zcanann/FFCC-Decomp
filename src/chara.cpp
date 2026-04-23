@@ -20,6 +20,7 @@ extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5
 extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(
     void*, void*, CChunkFile&, CMemory::CStage*);
 extern "C" void __dla__FPv(void*);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __ct__7CVectorFv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
@@ -1013,24 +1014,71 @@ void CChara::CModel::setup()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CModel::Duplicate(CMemory::CStage* stage)
+CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 {
-	(void)stage;
-	void* ref = *(void**)((u8*)this + 0xA4);
-	if (ref == 0) {
-		return;
+	if (ModelRef(this) == 0) {
+		return 0;
 	}
-	u16 nodeCount = *(u16*)((u8*)ref + 8);
-	u16 meshCount = *(u16*)((u8*)ref + 0xA);
-	if (nodeCount != 0 && *(void**)((u8*)this + 0xA8) == 0) {
-		*(void**)((u8*)this + 0xA8) = new u8[nodeCount * 0xC0];
-		memset(*(void**)((u8*)this + 0xA8), 0, nodeCount * 0xC0);
+
+	CModel* clone = new (stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x25A) CModel();
+	if (clone == 0) {
+		return 0;
 	}
-	if (meshCount != 0 && *(void**)((u8*)this + 0xAC) == 0) {
-		*(void**)((u8*)this + 0xAC) = new u8[meshCount * 0x14];
-		memset(*(void**)((u8*)this + 0xAC), 0, meshCount * 0x14);
+
+	clone->Init();
+	*reinterpret_cast<void**>(ModelRaw(clone) + 0xA4) = ModelRef(this);
+	RetainRefCounted(ModelRef(clone));
+
+	const u16 nodeCount = ModelNodeCount(this);
+	if (nodeCount != 0) {
+		void* nodeMem = __nwa__FUlPQ27CMemory6CStagePci(
+		    static_cast<unsigned long>(nodeCount) * 0xC0, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x263);
+		if (nodeMem != 0) {
+			memset(nodeMem, 0, static_cast<unsigned long>(nodeCount) * 0xC0);
+			*reinterpret_cast<void**>(ModelRaw(clone) + 0xA8) = nodeMem;
+
+			u8* srcNode = reinterpret_cast<u8*>(ModelNodes(this));
+			u8* dstNode = reinterpret_cast<u8*>(ModelNodes(clone));
+			for (u32 i = 0; i < nodeCount; i++) {
+				*reinterpret_cast<void**>(dstNode) = *reinterpret_cast<void**>(srcNode);
+				PSMTXCopy(reinterpret_cast<float(*)[4]>(srcNode + 8), reinterpret_cast<float(*)[4]>(dstNode + 8));
+				PSMTXCopy(reinterpret_cast<float(*)[4]>(srcNode + 0x44), reinterpret_cast<float(*)[4]>(dstNode + 0x44));
+				srcNode += 0xC0;
+				dstNode += 0xC0;
+			}
+		}
 	}
-	setup();
+
+	const u16 meshCount = ModelMeshCount(this);
+	if (meshCount != 0) {
+		void* meshMem = __nwa__FUlPQ27CMemory6CStagePci(
+		    static_cast<unsigned long>(meshCount) * 0x14, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x26C);
+		if (meshMem != 0) {
+			memset(meshMem, 0, static_cast<unsigned long>(meshCount) * 0x14);
+			*reinterpret_cast<void**>(ModelRaw(clone) + 0xAC) = meshMem;
+
+			u8* srcMesh = reinterpret_cast<u8*>(ModelMeshes(this));
+			u8* dstMesh = reinterpret_cast<u8*>(ModelMeshes(clone));
+			for (u32 i = 0; i < meshCount; i++) {
+				*reinterpret_cast<void**>(dstMesh) = *reinterpret_cast<void**>(srcMesh);
+				*reinterpret_cast<void**>(dstMesh + 4) = 0;
+				*reinterpret_cast<void**>(dstMesh + 8) = 0;
+				srcMesh += 0x14;
+				dstMesh += 0x14;
+			}
+		}
+	}
+
+	if (m_texSet != 0) {
+		clone->AttachTextureSet(m_texSet);
+	}
+	*reinterpret_cast<CTexAnimSet**>(ModelRaw(clone) + 0xD4) =
+	    (ModelTexAnimSet(this) != 0) ? ModelTexAnimSet(this)->Duplicate(stage) : 0;
+
+	if ((nodeCount == 0 || ModelNodes(clone) != 0) && (meshCount == 0 || ModelMeshes(clone) != 0)) {
+		clone->setup();
+	}
+	return clone;
 }
 
 /*

@@ -12,6 +12,7 @@
 extern "C" {
 void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void _WaitDrawDone__8CGraphicFPci(void*, char*, int);
+void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
 void SetMode__9CShopMenuFi(void*, int);
 void DrawSingleBase__8CMenuPcsFf(void*, float);
 void ReleasePdt__8CPartPcsFi(void*, int);
@@ -160,6 +161,28 @@ static inline unsigned short GetPadButtons()
 static inline int ShopMenuCaravan(CShopMenu* shopMenu)
 {
     return ShopMenuInt(shopMenu, 0x20);
+}
+
+static unsigned char s_shopMenuTabCacheLanguage = 0xFF;
+static const char* s_shopMenuTabLabels[3];
+static const int s_shopMenuTabLayout[3][2] = {
+    {0x88, 0x92},
+    {0x88, 0xB6},
+    {0x88, 0xDA},
+};
+
+static void RefreshShopMenuTabLabels()
+{
+    unsigned char languageId = Game.m_gameWork.m_languageId;
+    if (s_shopMenuTabCacheLanguage == languageId) {
+        return;
+    }
+
+    int languageIndex = static_cast<int>(languageId) - 1;
+    s_shopMenuTabLabels[0] = PTR_DAT_80214d90[languageIndex];
+    s_shopMenuTabLabels[1] = PTR_DAT_80214d94[languageIndex];
+    s_shopMenuTabLabels[2] = PTR_s_Cancel_80214d98[languageIndex];
+    s_shopMenuTabCacheLanguage = languageId;
 }
 
 static float CalcCenteredShopMenuX(CFont* font, const char* text)
@@ -2075,11 +2098,7 @@ void CShopMenu::DrawShop0()
     DrawShopBase();
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    char* labels[3] = {
-        PTR_DAT_80214d90[languageId],
-        PTR_DAT_80214d94[languageId],
-        PTR_s_Cancel_80214d98[languageId],
-    };
+    RefreshShopMenuTabLabels();
     int selected = ShopMenuInt(this, 0x48);
 
     CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
@@ -2091,20 +2110,30 @@ void CShopMenu::DrawShop0()
     SetColor__5CFontF8_GXColor(font, &white);
 
     for (int i = 0; i < 3; i++) {
-        int x = 0x88;
-        int y = 0x92 + i * 0x24;
-        drawShapeSeq((i == selected) ? 8 : 0, (i == selected) ? 1 : 0, x + 0x20, y + 0x10, 0xFF, 0, 0, 0.0f, 0);
+        int x = s_shopMenuTabLayout[i][0];
+        int y = s_shopMenuTabLayout[i][1];
+        int highlight = (i == selected) ? 1 : 0;
+
+        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, static_cast<signed char>(0x1E + i));
+        drawShapeSeq(0, highlight, x, y, 0xFF, 0, 0, 0.0f, 0);
+        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, static_cast<signed char>(0x21 + i));
+        drawShapeSeq(8, highlight, x - 0x30, y, 0xFF, 0, 0, 0.0f, 0);
+
         DrawInit__5CFontFv(font);
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-            MenuPcsVoid(), font, labels[i], static_cast<float>(x + 0x48), static_cast<float>(y), (i == selected) ? 0x18 : 9, 0x12);
+            MenuPcsVoid(), font, const_cast<char*>(s_shopMenuTabLabels[i]),
+            static_cast<float>(x + 0x48), static_cast<float>(y - 0x0B),
+            highlight != 0 ? 0x18 : 9, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
     }
 
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x24);
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
         MenuPcsVoid(), font, PTR_DAT_80214d9c[languageId], FLOAT_80332d54, 88.0f, 9, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x28);
     DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0xA8, 0x9C + selected * 0x24, 1.0f);
 }
 
@@ -2165,9 +2194,11 @@ void CShopMenu::DrawSmith0()
     if (*reinterpret_cast<char*>(caravan + 0xBE1) != '\0') {
         title = GetJobStr__8CMenuPcsFi(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), 1);
     }
+    if (title == 0) {
+        title = "";
+    }
 
-    float textWidth = GetWidth__5CFontFPc(font, title);
-    float textX = 264.0f - textWidth;
+    float textX = 264.0f - GetWidth__5CFontFPc(font, title);
 
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(

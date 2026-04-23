@@ -1184,7 +1184,10 @@ void CMenuPcs::SingMenuInit()
  */
 void CMenuPcs::SingMenuEnd()
 {
-	// TODO
+    Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
+    gSingMenuHasScriptFoodBase = 0;
+    gSingMenuAsyncLoadCompleted = 0;
+    destroySingleMenu();
 }
 
 /*
@@ -1194,7 +1197,7 @@ void CMenuPcs::SingMenuEnd()
  */
 void CMenuPcs::calcSingleMenu()
 {
-	// TODO
+    loadTextureAsync(0, 0, 0, 0, 0, 0, 0);
 }
 
 /*

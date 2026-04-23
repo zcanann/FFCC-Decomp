@@ -6,6 +6,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/p_light.h"
 #include "ffcc/p_tina.h"
+#include "ffcc/textureman.h"
 extern "C" {
 extern u8* gCharaPartWorkPtr;
 }
@@ -21,27 +22,59 @@ u8* gCharaPartWorkPtr = 0;
 
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
+extern "C" int __cntlzw(unsigned int);
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, const char*, int);
+extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
+extern "C" void CopyToAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
+extern "C" void SetStdProjectionMatrix__10CCameraPcsFv(void*);
+extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+    int, int, int, int, int);
+extern "C" void SetFog__8CGraphicFii(void*, int, int);
+extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
+extern "C" void SetNumDiffuse__9CLightPcsFUl(void*, unsigned long);
+extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
+extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
+extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
+extern "C" int AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
+    void*, void*, int, void*, int);
+extern "C" void Create__6CCharaFv(void*);
 extern "C" void Destroy__6CCharaFv(void*);
+extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
+extern "C" void* __ct__Q26CChara6CModelFv(void*);
+extern "C" void Create__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
+extern "C" void CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
+extern "C" void* __ct__Q26CChara5CAnimFv(void*);
+extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
+extern "C" void LoadSe__6CSoundFPv(void*, void*);
+extern "C" void LoadWave__6CSoundFPv(void*, void*);
 extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void loadModelASyncFrame__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*);
 extern "C" unsigned char MiniGamePcs[];
 extern unsigned char PTR_s_CCharaPcs_GAME__801fce10[];
 
+static const char s_p_chara_cpp[] = "p_chara.cpp";
+static const char s_CCharaPcs_stage[] = "CCharaPcs";
+static const char s_CCharaPcs_amem[] = "CCharaPcs amem";
+static const char s_CCharaPcs_amemw[] = "CCharaPcs amemw";
+static const char s_CCharaPcs_loadModel[] = "CCharaPcs LoadModel";
+static const char s_CCharaPcs_loadTex[] = "CCharaPcs LoadTex";
+static const char s_CCharaPcs_loadWepTex[] = "CCharaPcs LoadWepTex";
+static const char s_CCharaPcs_loadWepModel[] = "CCharaPcs LoadWepModel";
+static const char s_CCharaPcs_loadFaModel[] = "CCharaPcs LoadFaModel";
+static const char s_CCharaPcs_loadAnim[] = "CCharaPcs LoadAnim";
+static const char s_charaMergePathFmt[] = "dvd/mrg/m%04d_%02d.mrg";
+static const char s_charaMergeDupFmt[] = "CCharaPcs duplicate merge %d\n";
+static const char s_charaMergeOpenFmt[] = "CCharaPcs missing merge %d\n";
+static const char s_charaMergeDoneFmt[] = "CCharaPcs LoadMergeFile %d 0x%x\n";
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
-
-namespace {
-static inline unsigned char* Ptr(void* p, unsigned int offset)
-{
-    return reinterpret_cast<unsigned char*>(p) + offset;
-}
-}
 
 template <class T>
 class CPtrArray
@@ -227,6 +260,145 @@ template class CPtrArray<CCharaPcs::CLoadTexture*>;
 template class CPtrArray<CCharaPcs::CLoadAnim*>;
 template class CPtrArray<CCharaPcs::CLoadModel*>;
 
+namespace {
+static inline unsigned char* Ptr(void* p, unsigned int offset)
+{
+    return reinterpret_cast<unsigned char*>(p) + offset;
+}
+
+static inline CPtrArray<CCharaPcs::CLoadModel*>* LoadModelArray(CCharaPcs* self)
+{
+    return reinterpret_cast<CPtrArray<CCharaPcs::CLoadModel*>*>(Ptr(self, 0x50));
+}
+
+static inline CPtrArray<CCharaPcs::CLoadAnim*>* LoadAnimArray(CCharaPcs* self)
+{
+    return reinterpret_cast<CPtrArray<CCharaPcs::CLoadAnim*>*>(Ptr(self, 0x6C));
+}
+
+static inline CPtrArray<CCharaPcs::CLoadTexture*>* LoadTextureArray(CCharaPcs* self)
+{
+    return reinterpret_cast<CPtrArray<CCharaPcs::CLoadTexture*>*>(Ptr(self, 0x88));
+}
+
+static inline CPtrArray<CCharaPcs::CLoadPdt*>* LoadPdtArray(CCharaPcs* self)
+{
+    return reinterpret_cast<CPtrArray<CCharaPcs::CLoadPdt*>*>(Ptr(self, 0xA4));
+}
+
+static inline CMemory::CStage*& StageAt(CCharaPcs* self, unsigned int offset)
+{
+    return *reinterpret_cast<CMemory::CStage**>(Ptr(self, offset));
+}
+
+static inline int& CameraCountAt(CCharaPcs* self, int index)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x04 + index * 4));
+}
+
+static inline void*& CameraDataAt(CCharaPcs* self, int index)
+{
+    return *reinterpret_cast<void**>(Ptr(self, 0x14 + index * 4));
+}
+
+static inline CCharaPcs::CHandle*& HandleListHead(CCharaPcs* self)
+{
+    return *reinterpret_cast<CCharaPcs::CHandle**>(Ptr(self, 0x4C));
+}
+
+static inline unsigned int& FreeMergeMask(CCharaPcs* self)
+{
+    return *reinterpret_cast<unsigned int*>(Ptr(self, 0x718));
+}
+
+static inline int& LoadStageMode(CCharaPcs* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0xE4));
+}
+
+static inline unsigned int& LoadStreamCursor(CCharaPcs* self)
+{
+    return *reinterpret_cast<unsigned int*>(Ptr(self, 0x714));
+}
+
+static inline unsigned int& CurrentSceneId()
+{
+    return *reinterpret_cast<unsigned int*>(Ptr(&Game, 0xC7F0));
+}
+
+static inline unsigned int& CharaAmemSize()
+{
+    return *reinterpret_cast<unsigned int*>(Ptr(&Chara, 0x205C));
+}
+
+static inline CMemory::CStage*& CharaAmemStage()
+{
+    return *reinterpret_cast<CMemory::CStage**>(Ptr(&Chara, 0x2058));
+}
+
+static inline void SetupBaseCharaLights(CCharaPcs* self)
+{
+    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+        0, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+        1, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+        2, 0, 1, 2, 3);
+    SetFog__8CGraphicFii(&Graphic, 1, 0);
+    SetAmbient__9CLightPcsF8_GXColor(&LightPcs, Ptr(self, 0xE8));
+    SetNumDiffuse__9CLightPcsFUl(&LightPcs, 3);
+
+    for (unsigned long lightIndex = 0; lightIndex < 3; lightIndex++) {
+        SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(
+            &LightPcs, lightIndex, Ptr(self, 0xF0 + static_cast<unsigned int>(lightIndex) * 4),
+            Ptr(self, 0x108 + static_cast<unsigned int>(lightIndex) * 12), static_cast<int>(lightIndex == 2));
+    }
+}
+
+static inline void* StageBase(CMemory::CStage* stage)
+{
+    return *reinterpret_cast<void**>(Ptr(stage, 8));
+}
+
+static inline CMemory::CStage* SelectLoadStage(CCharaPcs* self, CMemory::CStage* fallback)
+{
+    return GET_CHARA_ALLOC_STAGE_S(LoadStageMode(self), fallback);
+}
+
+static inline bool HasLoadedMergeFile(CCharaPcs* self, int mergeFileId)
+{
+    for (int i = 0; i < LoadModelArray(self)->GetSize(); i++) {
+        CCharaPcs::CLoadModel* loadModel = (*LoadModelArray(self))[static_cast<unsigned long>(i)];
+        if (loadModel != 0 && loadModel->m_mergeFileId == mergeFileId) {
+            return true;
+        }
+    }
+
+    for (int i = 0; i < LoadTextureArray(self)->GetSize(); i++) {
+        CCharaPcs::CLoadTexture* loadTexture = (*LoadTextureArray(self))[static_cast<unsigned long>(i)];
+        if (loadTexture != 0 && loadTexture->m_mergeFileId == mergeFileId) {
+            return true;
+        }
+    }
+
+    for (int i = 0; i < LoadPdtArray(self)->GetSize(); i++) {
+        CCharaPcs::CLoadPdt* loadPdt = (*LoadPdtArray(self))[static_cast<unsigned long>(i)];
+        if (loadPdt != 0 && loadPdt->m_mergeFileId == mergeFileId) {
+            return true;
+        }
+    }
+
+    for (int i = 0; i < LoadAnimArray(self)->GetSize(); i++) {
+        CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
+        if (loadAnim != 0 && loadAnim->m_mergeFileId == mergeFileId) {
+            return true;
+        }
+    }
+
+    return false;
+}
+}
+
 /*
  * --INFO--
  * PAL Address: 8007b904
@@ -363,7 +535,75 @@ CCharaPcs::~CCharaPcs()
  */
 void CCharaPcs::Init()
 {
-	// TODO
+    StageAt(this, 0xC0) = CreateStage__7CMemoryFUlPci(&Memory, 0x38000, s_CCharaPcs_stage, 0);
+    StageAt(this, 0xC4) = CreateStage__7CMemoryFUlPci(&Memory, 0x380000, s_CCharaPcs_amem, 2);
+    StageAt(this, 0xC8) = CreateStage__7CMemoryFUlPci(&Memory, 0x70000, s_CCharaPcs_amemw, 2);
+    CharaAmemStage() = StageAt(this, 0xC4);
+
+    LoadModelArray(this)->SetStage(StageAt(this, 0xC0));
+    LoadModelArray(this)->SetDefaultSize(0x80);
+    LoadModelArray(this)->SetGrow(0);
+
+    LoadAnimArray(this)->SetStage(StageAt(this, 0xC0));
+    LoadAnimArray(this)->SetDefaultSize(0x200);
+    LoadAnimArray(this)->SetGrow(0);
+
+    LoadTextureArray(this)->SetStage(StageAt(this, 0xC0));
+    LoadTextureArray(this)->SetDefaultSize(0x100);
+    LoadTextureArray(this)->SetGrow(0);
+
+    LoadPdtArray(this)->SetStage(StageAt(this, 0xC0));
+    LoadPdtArray(this)->SetDefaultSize(0x80);
+    LoadPdtArray(this)->SetGrow(0);
+
+    for (int i = 0; i < 2; i++) {
+        _GXColor& ambientColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0xE8 + i * 4));
+        ambientColor.r = 0x3F;
+        ambientColor.g = 0x3F;
+        ambientColor.b = 0x3F;
+        ambientColor.a = 0xFF;
+
+        for (int lightIndex = 0; lightIndex < 3; lightIndex++) {
+            _GXColor& lightColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0xF0 + i * 0x0C + lightIndex * 4));
+            const unsigned char intensity = static_cast<unsigned char>(lightIndex == 0 ? 0x3F : 0x00);
+            lightColor.r = intensity;
+            lightColor.g = intensity;
+            lightColor.b = intensity;
+            lightColor.a = 0xFF;
+        }
+    }
+
+    reinterpret_cast<Vec*>(Ptr(this, 0x108))->x = 0.0f;
+    reinterpret_cast<Vec*>(Ptr(this, 0x108))->y = 0.0f;
+    reinterpret_cast<Vec*>(Ptr(this, 0x108))->z = 1.0f;
+    reinterpret_cast<Vec*>(Ptr(this, 0x114))->x = 0.0f;
+    reinterpret_cast<Vec*>(Ptr(this, 0x114))->y = 0.0f;
+    reinterpret_cast<Vec*>(Ptr(this, 0x114))->z = 1.0f;
+    reinterpret_cast<Vec*>(Ptr(this, 0x120))->x = 0.0f;
+    reinterpret_cast<Vec*>(Ptr(this, 0x120))->y = 0.0f;
+    reinterpret_cast<Vec*>(Ptr(this, 0x120))->z = 1.0f;
+
+    for (int i = 0; i < 5; i++) {
+        const unsigned char shade = static_cast<unsigned char>((i * 0xFF) / 4);
+        _GXColor& fadeColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0x12C + i * 4));
+        fadeColor.r = shade;
+        fadeColor.g = shade;
+        fadeColor.b = shade;
+        fadeColor.a = 0xFF;
+    }
+
+    *reinterpret_cast<int*>(Ptr(this, 0xE4)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
+    reinterpret_cast<_GXColor*>(Ptr(this, 0x18C))->r = 0x00;
+    reinterpret_cast<_GXColor*>(Ptr(this, 0x18C))->g = 0x00;
+    reinterpret_cast<_GXColor*>(Ptr(this, 0x18C))->b = 0x40;
+    reinterpret_cast<_GXColor*>(Ptr(this, 0x18C))->a = 0x40;
+    reinterpret_cast<Vec*>(Ptr(this, 0x17C))->x = 0.0f;
+    reinterpret_cast<Vec*>(Ptr(this, 0x17C))->y = 10.0f;
+    reinterpret_cast<Vec*>(Ptr(this, 0x17C))->z = 0.0f;
+    *reinterpret_cast<float*>(Ptr(this, 0x188)) = 120.0f;
+    *reinterpret_cast<int*>(Ptr(this, 0x44)) = 0x80;
+    *reinterpret_cast<int*>(Ptr(this, 0x48)) = 100;
 }
 
 /*
@@ -398,7 +638,65 @@ int CCharaPcs::GetTable(unsigned long index)
  */
 void CCharaPcs::create()
 {
-	// TODO
+    FreeMergeMask(this) = 0;
+
+    StageAt(this, 0xCC) = CreateStage__7CMemoryFUlPci(&Memory, 0x177000, s_CCharaPcs_loadModel, 0);
+    StageAt(this, 0xD0) = CreateStage__7CMemoryFUlPci(&Memory, 0x130000, s_CCharaPcs_loadTex, 0);
+    StageAt(this, 0xD8) = CreateStage__7CMemoryFUlPci(&Memory, 0x8400, s_CCharaPcs_loadWepTex, 0);
+    StageAt(this, 0xDC) = CreateStage__7CMemoryFUlPci(&Memory, 0x18000, s_CCharaPcs_loadWepModel, 0);
+    StageAt(this, 0xE0) = CreateStage__7CMemoryFUlPci(&Memory, 0x10000, s_CCharaPcs_loadFaModel, 0);
+    StageAt(this, 0xD4) = CreateStage__7CMemoryFUlPci(
+        &Memory, CurrentSceneId() == 4 ? 0x190000UL : 0x1E0000UL, s_CCharaPcs_loadAnim, 0);
+
+    unsigned char* sentinel = reinterpret_cast<unsigned char*>(
+        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, 0x194, StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0xDB, 0));
+    if (sentinel != 0) {
+        memset(sentinel, 0, 0x194);
+        *reinterpret_cast<int*>(sentinel + 0x110) = -1;
+        *reinterpret_cast<float*>(sentinel + 0x11C) = 1.0f;
+        *reinterpret_cast<float*>(sentinel + 0x154) = 0.0f;
+        sentinel[0x190] = static_cast<unsigned char>(sentinel[0x190] | 0x80);
+    }
+
+    HandleListHead(this) = reinterpret_cast<CHandle*>(sentinel);
+    if (HandleListHead(this) != 0) {
+        HandleListHead(this)->m_previous = HandleListHead(this);
+        HandleListHead(this)->m_next = HandleListHead(this);
+    }
+
+    for (int i = 0; i < 4; i++) {
+        CameraCountAt(this, i) = 0;
+        CameraDataAt(this, i) = 0;
+    }
+
+    CLightPcs::CBumpLight bumpLight;
+    Vec lightPos = {0.0f, 40.0f, 60.0f};
+    Vec lightTarget = {0.0f, 0.0f, 0.0f};
+    Vec lightDir;
+
+    PSVECSubtract(&lightTarget, &lightPos, &lightDir);
+    PSVECNormalize(&lightDir, &lightDir);
+
+    bumpLight.m_type = 1;
+    bumpLight.m_bumpShade[0] = 0x80;
+    bumpLight.m_bumpShade[1] = 0x80;
+    bumpLight.m_bumpShade[2] = 0x00;
+    bumpLight.m_bumpShade[3] = 0xFF;
+    bumpLight.m_position.x = lightPos.x;
+    bumpLight.m_position.y = lightPos.y;
+    bumpLight.m_position.z = lightPos.z;
+    bumpLight.m_targetPosition.x = lightTarget.x;
+    bumpLight.m_targetPosition.y = lightTarget.y;
+    bumpLight.m_targetPosition.z = lightTarget.z;
+    bumpLight.m_direction.x = lightDir.x;
+    bumpLight.m_direction.y = lightDir.y;
+    bumpLight.m_direction.z = lightDir.z;
+    bumpLight.m_offsetX = 0.0f;
+    bumpLight.m_offsetZ = 0.0f;
+
+    gCharaPartWorkPtr = reinterpret_cast<u8*>(AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
+        &LightPcs, &bumpLight, 0, *reinterpret_cast<void**>(Ptr(&Chara, 0x2058)), 4));
+    Create__6CCharaFv(&Chara);
 }
 
 /*
@@ -452,9 +750,87 @@ void CCharaPcs::destroy()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::Reset(CCharaPcs::RESET)
+void CCharaPcs::Reset(CCharaPcs::RESET mode)
 {
-	// TODO
+    const int resetMode = static_cast<int>(mode);
+
+    for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
+        unsigned char* loadAnim = reinterpret_cast<unsigned char*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
+        if (loadAnim == 0) {
+            continue;
+        }
+
+        unsigned char* anim = *reinterpret_cast<unsigned char**>(loadAnim + 0x28);
+        if (anim != 0 && *reinterpret_cast<void**>(anim + 0x20) != 0) {
+            __dl__FPv(*reinterpret_cast<void**>(anim + 0x20));
+            *reinterpret_cast<void**>(anim + 0x20) = 0;
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        CameraCountAt(this, i) = 0;
+        if (CameraDataAt(this, i) != 0) {
+            __dla__FPv(CameraDataAt(this, i));
+            CameraDataAt(this, i) = 0;
+        }
+    }
+
+    if (HandleListHead(this) != 0) {
+        CHandle* handle = HandleListHead(this)->m_next;
+        while (handle != HandleListHead(this)) {
+            CHandle* next = handle->m_next;
+            __dt__Q29CCharaPcs7CHandleFv(handle, 1);
+            handle = next;
+        }
+    }
+
+    int charaAmemSize = static_cast<int>(CharaAmemSize());
+    if (resetMode != 1) {
+        if (resetMode == 0) {
+            const unsigned int releaseMask = ~(FreeMergeMask(this) | 0x10000000U);
+            releaseUnuseLoadModel(static_cast<int>(releaseMask));
+
+            for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
+                int* loadAnim = reinterpret_cast<int*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
+                if (loadAnim == 0) {
+                    continue;
+                }
+
+                const bool releaseByKind = loadAnim[4] < 0 && loadAnim[1] == 1;
+                const bool releaseByMask = loadAnim[4] >= 0 && ((releaseMask & static_cast<unsigned int>(loadAnim[5])) != 0);
+                if (!releaseByKind && !releaseByMask) {
+                    continue;
+                }
+
+                loadAnim[1]--;
+                if (loadAnim[1] == 0) {
+                    (*(void (**)(void*, int))(*loadAnim + 8))(loadAnim, 1);
+                }
+                LoadAnimArray(this)->RemoveAt(static_cast<unsigned long>(i));
+            }
+
+            LoadPdtArray(this)->ReleaseAndRemoveAll();
+            charaAmemSize = correctLoadAnimAmem();
+        } else {
+            LoadModelArray(this)->ReleaseAndRemoveAll();
+            LoadAnimArray(this)->ReleaseAndRemoveAll();
+            LoadTextureArray(this)->ReleaseAndRemoveAll();
+            LoadPdtArray(this)->ReleaseAndRemoveAll();
+            charaAmemSize = 0;
+        }
+    } else {
+        LoadModelArray(this)->ReleaseAndRemoveAll();
+        LoadAnimArray(this)->ReleaseAndRemoveAll();
+        LoadTextureArray(this)->ReleaseAndRemoveAll();
+        LoadPdtArray(this)->ReleaseAndRemoveAll();
+        charaAmemSize = 0;
+    }
+
+    CharaAmemSize() = static_cast<unsigned int>(charaAmemSize < 0 ? 0 : charaAmemSize);
+    if (gCharaPartWorkPtr != 0) {
+        gCharaPartWorkPtr[0x6B] = 0xFF;
+    }
+    FreeMergeMask(this) = 0;
 }
 
 /*
@@ -462,9 +838,81 @@ void CCharaPcs::Reset(CCharaPcs::RESET)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::correctLoadAnimAmem()
+int CCharaPcs::correctLoadAnimAmem()
 {
-	// TODO
+    unsigned char* tempBuffer = reinterpret_cast<unsigned char*>(
+        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, 0x80000, StageAt(this, 0xD4), const_cast<char*>(s_p_chara_cpp), 0x162, 1));
+    if (tempBuffer == 0) {
+        return -1;
+    }
+
+    int maxEnd = 0;
+    for (int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
+        unsigned char* loadAnim = reinterpret_cast<unsigned char*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
+        if (loadAnim == 0) {
+            continue;
+        }
+
+        unsigned char* anim = *reinterpret_cast<unsigned char**>(loadAnim + 0x28);
+        if (anim == 0) {
+            continue;
+        }
+
+        const int animEnd = *reinterpret_cast<int*>(anim + 0x28) + *reinterpret_cast<int*>(anim + 0x1C);
+        if (maxEnd < animEnd) {
+            maxEnd = animEnd;
+        }
+    }
+
+    int compactedSize = 0;
+    int scanOffset = 0;
+    while (scanOffset < maxEnd) {
+        int chunkSize = 0;
+        int nextOffset = scanOffset;
+
+        for (int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
+            unsigned char* loadAnim = reinterpret_cast<unsigned char*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
+            if (loadAnim == 0) {
+                continue;
+            }
+
+            unsigned char* anim = *reinterpret_cast<unsigned char**>(loadAnim + 0x28);
+            if (anim == 0) {
+                continue;
+            }
+
+            const unsigned int animOffset = *reinterpret_cast<unsigned int*>(anim + 0x28);
+            const int animSize = *reinterpret_cast<int*>(anim + 0x1C);
+            const unsigned int animEnd = animOffset + static_cast<unsigned int>(animSize);
+            if (animOffset < static_cast<unsigned int>(scanOffset) || animEnd >= static_cast<unsigned int>(scanOffset + 0x80000)) {
+                continue;
+            }
+
+            if (nextOffset < static_cast<int>(animEnd)) {
+                nextOffset = static_cast<int>(animEnd);
+            }
+
+            CopyFromAMemorySync__7CMemoryFPvPvUl(
+                &Memory, tempBuffer + chunkSize,
+                reinterpret_cast<void*>(*reinterpret_cast<int*>(Ptr(StageAt(this, 0xC4), 8)) + static_cast<int>(animOffset)),
+                static_cast<unsigned long>(animSize));
+
+            *reinterpret_cast<int*>(anim + 0x28) = compactedSize + chunkSize;
+            chunkSize += animSize;
+        }
+
+        if (chunkSize != 0) {
+            CopyToAMemorySync__7CMemoryFPvPvUl(
+                &Memory, tempBuffer, reinterpret_cast<void*>(*reinterpret_cast<int*>(Ptr(StageAt(this, 0xC4), 8)) + compactedSize),
+                static_cast<unsigned long>(chunkSize));
+        }
+
+        compactedSize += chunkSize;
+        scanOffset = nextOffset;
+    }
+
+    __dl__FPv(tempBuffer);
+    return compactedSize;
 }
 
 /*
@@ -605,7 +1053,19 @@ void CCharaPcs::GetTexShadow(int, int, _GXTexObj*, Vec*, float (*) [3][4])
  */
 void CCharaPcs::draw()
 {
-	// TODO
+    SetupBaseCharaLights(this);
+
+    if (HandleListHead(this) == 0) {
+        return;
+    }
+
+    CHandle* handle = HandleListHead(this)->m_next;
+    while (handle != HandleListHead(this)) {
+        if ((*reinterpret_cast<unsigned int*>(MiniGamePcs + 0x25732) & 0x8000) != 0) {
+            handle->draw(0, 1);
+        }
+        handle = handle->m_next;
+    }
 }
 
 /*
@@ -615,7 +1075,20 @@ void CCharaPcs::draw()
  */
 void CCharaPcs::drawBefore()
 {
-	// TODO
+    SetStdProjectionMatrix__10CCameraPcsFv(&CameraPcs);
+    SetupBaseCharaLights(this);
+
+    if (HandleListHead(this) == 0) {
+        return;
+    }
+
+    CHandle* handle = HandleListHead(this)->m_next;
+    while (handle != HandleListHead(this)) {
+        if ((*reinterpret_cast<unsigned int*>(MiniGamePcs + 0x25732) & 0x8000) != 0) {
+            handle->draw(3, 1);
+        }
+        handle = handle->m_next;
+    }
 }
 
 /*
@@ -635,7 +1108,33 @@ void CCharaPcs::drawMakeTexShadow()
  */
 void CCharaPcs::drawShadow()
 {
-	// TODO
+    if (*reinterpret_cast<unsigned char*>(Ptr(&CameraPcs, 0x404)) == 0) {
+        return;
+    }
+
+    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+        0, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+        1, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+        2, 0, 1, 2, 3);
+
+    _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
+    SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &shadowColor);
+    SetNumDiffuse__9CLightPcsFUl(&LightPcs, 0);
+    SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+
+    if (HandleListHead(this) == 0) {
+        return;
+    }
+
+    CHandle* handle = HandleListHead(this)->m_next;
+    while (handle != HandleListHead(this)) {
+        if ((*reinterpret_cast<unsigned int*>(MiniGamePcs + 0x25732) & 0x8000) != 0) {
+            handle->draw(1, 1);
+        }
+        handle = handle->m_next;
+    }
 }
 
 /*
@@ -777,9 +1276,235 @@ void CCharaPcs::LoadCam(int index, char* fileName)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::LoadMergeFile(int, int, int)
+void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 {
-	// TODO
+    if (HasLoadedMergeFile(this, mergeFileId)) {
+        Printf__7CSystemFPce(&System, s_charaMergeDupFmt, mergeFileId);
+        return;
+    }
+
+    int mergePartCount = 1;
+    for (int mergePartIndex = 0; mergePartIndex < mergePartCount; mergePartIndex++) {
+        char path[0x100];
+        sprintf(path, s_charaMergePathFmt, mergeFileId, mergePartIndex);
+
+        CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+        if (fileHandle == 0) {
+            Printf__7CSystemFPce(&System, s_charaMergeOpenFmt, mergeFileId);
+            break;
+        }
+
+        File.Read(fileHandle);
+        File.SyncCompleted(fileHandle);
+
+        CChunkFile chunkFile(File.m_readBuffer);
+        CChunkFile::CChunk chunk;
+        while (chunkFile.GetNextChunk(chunk)) {
+            if (chunk.m_id != 'MRG ') {
+                continue;
+            }
+
+            chunkFile.PushChunk();
+            while (chunkFile.GetNextChunk(chunk)) {
+                if (chunk.m_id == 'INFO') {
+                    mergePartCount = static_cast<int>(chunkFile.Get4());
+                    continue;
+                }
+                if (chunk.m_id != 'DATA') {
+                    continue;
+                }
+
+                int dataType = -1;
+                void* keyTag = reinterpret_cast<void*>(-1);
+                int keyId = -1;
+                void* variantTag = reinterpret_cast<void*>(-1);
+                int hasDynamics = 0;
+                char* animName = 0;
+
+                chunkFile.PushChunk();
+                while (chunkFile.GetNextChunk(chunk)) {
+                    if (chunk.m_id == 'NAME') {
+                        animName = chunkFile.GetString();
+                        continue;
+                    }
+                    if (chunk.m_id == 'INFO') {
+                        dataType = static_cast<int>(chunkFile.Get4());
+                        keyTag = reinterpret_cast<void*>(chunkFile.Get4());
+                        keyId = static_cast<int>(chunkFile.Get4());
+                        variantTag = reinterpret_cast<void*>(chunkFile.Get4());
+                        hasDynamics = static_cast<int>(chunkFile.Get4());
+                        continue;
+                    }
+                    if (chunk.m_id != 'RAW ') {
+                        continue;
+                    }
+
+                    void* rawData = chunkFile.GetAddress();
+                    const int rawSize = static_cast<int>(chunk.m_size);
+
+                    if (dataType == 0) {
+                        CLoadModel* loadModel = 0;
+                        for (int i = 0; i < LoadModelArray(this)->GetSize(); i++) {
+                            CLoadModel* it = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
+                            if (it != 0 && it->m_keyTag == keyTag && it->m_keyId == keyId) {
+                                loadModel = it;
+                                break;
+                            }
+                        }
+
+                        if (loadModel == 0) {
+                            loadModel = new (StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
+                            if (loadModel != 0) {
+                                loadModel->m_keyTag = keyTag;
+                                loadModel->m_keyId = keyId;
+                                loadModel->m_mergeFileId = mergeFileId;
+                                loadModel->m_mergeFlags = mergeFlags;
+                                loadModel->m_model = 0;
+                                loadModel->m_streamMode = 0;
+                                loadModel->m_streamOffset = 0;
+                                loadModel->m_streamSize = 0;
+                                LoadModelArray(this)->Add(loadModel);
+
+                                if (streamToAmem == 0) {
+                                    loadModel->m_model = reinterpret_cast<CChara::CModel*>(
+                                        __nw__FUlPQ27CMemory6CStagePci(0x124, StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1));
+                                    if (loadModel->m_model != 0) {
+                                        loadModel->m_model = reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(loadModel->m_model));
+                                        Create__Q26CChara6CModelFPvPQ27CMemory6CStage(
+                                            loadModel->m_model, rawData, SelectLoadStage(this, StageAt(this, 0xCC)));
+                                    }
+                                } else {
+                                    loadModel->m_streamMode = 1;
+                                    loadModel->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
+                                    loadModel->m_streamSize = rawSize;
+                                    CopyToAMemorySync__7CMemoryFPvPvUl(
+                                        &Memory, rawData,
+                                        reinterpret_cast<unsigned char*>(StageBase(StageAt(this, 0xC8))) + LoadStreamCursor(this),
+                                        static_cast<unsigned long>(rawSize));
+                                    LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
+                                }
+                            }
+                        }
+
+                        if (hasDynamics != 0 && loadModel != 0 && loadModel->m_model != 0 && chunkFile.GetNextChunk(chunk)) {
+                            CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(
+                                loadModel->m_model, chunkFile.GetAddress(), SelectLoadStage(this, StageAt(this, 0xCC)));
+                        }
+                    } else if (dataType == 1) {
+                        CLoadTexture* loadTexture = 0;
+                        for (int i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
+                            CLoadTexture* it = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
+                            if (it != 0 && it->m_keyTag == keyTag && it->m_keyId == keyId && it->m_variantTag == variantTag) {
+                                loadTexture = it;
+                                break;
+                            }
+                        }
+
+                        if (loadTexture == 0) {
+                            loadTexture = new (StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
+                            if (loadTexture != 0) {
+                                loadTexture->m_keyTag = keyTag;
+                                loadTexture->m_keyId = keyId;
+                                loadTexture->m_mergeFileId = mergeFileId;
+                                loadTexture->m_mergeFlags = mergeFlags;
+                                loadTexture->m_variantTag = variantTag;
+                                loadTexture->m_textureSet = 0;
+                                loadTexture->m_streamMode = 0;
+                                loadTexture->m_streamOffset = 0;
+                                loadTexture->m_streamSize = 0;
+                                LoadTextureArray(this)->Add(loadTexture);
+
+                                if (streamToAmem == 0) {
+                                    loadTexture->m_textureSet =
+                                        new (StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+                                    if (loadTexture->m_textureSet != 0) {
+                                        loadTexture->m_textureSet->Create(
+                                            rawData,
+                                            SelectLoadStage(
+                                                this, StageAt(this, variantTag == reinterpret_cast<void*>(4) ? 0xD8 : 0xD0)),
+                                            0, 0, 0, 0);
+                                    }
+                                } else {
+                                    loadTexture->m_streamMode = 1;
+                                    loadTexture->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
+                                    loadTexture->m_streamSize = rawSize;
+                                    CopyToAMemorySync__7CMemoryFPvPvUl(
+                                        &Memory, rawData,
+                                        reinterpret_cast<unsigned char*>(StageBase(StageAt(this, 0xC8))) + LoadStreamCursor(this),
+                                        static_cast<unsigned long>(rawSize));
+                                    LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
+                                }
+                            }
+                        }
+                    } else if (dataType == 2) {
+                        CLoadAnim* loadAnim = 0;
+                        for (int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
+                            CLoadAnim* it = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+                            if (it != 0 && it->m_keyTag == keyTag && it->m_keyId == keyId &&
+                                animName != 0 && strcmp(it->m_name, animName) == 0) {
+                                loadAnim = it;
+                                break;
+                            }
+                        }
+
+                        if (loadAnim == 0) {
+                            CChara::CAnim* anim = reinterpret_cast<CChara::CAnim*>(
+                                __nw__FUlPQ27CMemory6CStagePci(0x30, StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A));
+                            if (anim != 0) {
+                                anim = reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(anim));
+                                Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(anim, rawData, StageAt(this, 0xD4));
+                            }
+
+                            loadAnim = new (StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62D) CLoadAnim;
+                            if (loadAnim != 0) {
+                                loadAnim->m_keyTag = keyTag;
+                                loadAnim->m_keyId = keyId;
+                                loadAnim->m_mergeFileId = mergeFileId;
+                                loadAnim->m_mergeFlags = mergeFlags;
+                                strcpy(loadAnim->m_name, animName != 0 ? animName : "");
+                                loadAnim->m_anim = anim;
+                                LoadAnimArray(this)->Add(loadAnim);
+                            }
+                        }
+                    } else if (dataType == 3) {
+                        LoadSe__6CSoundFPv(&Sound, rawData);
+                    } else if (dataType == 4) {
+                        LoadWave__6CSoundFPv(&Sound, rawData);
+                    } else if (dataType == 5) {
+                        CLoadPdt* loadPdt = 0;
+                        for (int i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
+                            CLoadPdt* it = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
+                            if (it != 0 && it->m_keyTag == keyTag && it->m_keyId == keyId && it->m_variantTag == variantTag) {
+                                loadPdt = it;
+                                break;
+                            }
+                        }
+
+                        if (loadPdt == 0 && chunkFile.GetNextChunk(chunk)) {
+                            loadPdt = new (StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x572) CLoadPdt;
+                            if (loadPdt != 0) {
+                                loadPdt->m_keyTag = keyTag;
+                                loadPdt->m_keyId = keyId;
+                                loadPdt->m_variantTag = variantTag;
+                                loadPdt->m_pdtSlot = PartPcs.LoadMonsterPdt(
+                                    keyId, reinterpret_cast<int>(variantTag), rawData, rawSize, chunkFile.GetAddress(),
+                                    static_cast<int>(chunk.m_size));
+                                loadPdt->m_mergeFileId = mergeFileId;
+                                loadPdt->m_mergeFlags = mergeFlags;
+                                LoadPdtArray(this)->Add(loadPdt);
+                            }
+                        }
+                    }
+                }
+                chunkFile.PopChunk();
+            }
+            chunkFile.PopChunk();
+        }
+
+        File.Close(fileHandle);
+    }
+
+    Printf__7CSystemFPce(&System, s_charaMergeDoneFmt, mergeFileId, mergeFlags);
 }
 
 /*

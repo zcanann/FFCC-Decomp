@@ -79,31 +79,68 @@ public:
     };
 
     class CLoadModel
+        : public CRef
     {
     public:
         CLoadModel();
         ~CLoadModel();
+
+        void* m_keyTag;                 // 0x08
+        int m_keyId;                    // 0x0C
+        int m_mergeFileId;              // 0x10
+        int m_mergeFlags;               // 0x14
+        CChara::CModel* m_model;        // 0x18
+        int m_streamMode;               // 0x1C
+        void* m_streamOffset;           // 0x20
+        int m_streamSize;               // 0x24
     };
 
     class CLoadAnim
+        : public CRef
     {
     public:
         CLoadAnim();
         ~CLoadAnim();
+
+        void* m_keyTag;                 // 0x08
+        int m_keyId;                    // 0x0C
+        int m_mergeFileId;              // 0x10
+        int m_mergeFlags;               // 0x14
+        char m_name[16];                // 0x18
+        CChara::CAnim* m_anim;          // 0x28
     };
 
     class CLoadTexture
+        : public CRef
     {
     public:
         CLoadTexture();
         ~CLoadTexture();
+
+        void* m_keyTag;                 // 0x08
+        int m_keyId;                    // 0x0C
+        int m_mergeFileId;              // 0x10
+        int m_mergeFlags;               // 0x14
+        void* m_variantTag;             // 0x18
+        CTextureSet* m_textureSet;      // 0x1C
+        int m_streamMode;               // 0x20
+        void* m_streamOffset;           // 0x24
+        int m_streamSize;               // 0x28
     };
 
     class CLoadPdt
+        : public CRef
     {
     public:
         CLoadPdt();
         ~CLoadPdt();
+
+        void* m_keyTag;                 // 0x08
+        int m_keyId;                    // 0x0C
+        void* m_variantTag;             // 0x10
+        int m_pdtSlot;                  // 0x14
+        int m_mergeFileId;              // 0x18
+        int m_mergeFlags;               // 0x1C
     };
 	
     enum RESET
@@ -121,7 +158,7 @@ public:
     void createLoad();
     void destroy();
     void Reset(RESET);
-    void correctLoadAnimAmem();
+    int correctLoadAnimAmem();
     void onScriptChanging(char*);
     void calc();
     void calcAfter();

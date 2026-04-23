@@ -485,6 +485,50 @@ static void ExecuteShopMenuSellConfirm(CShopMenu* shopMenu)
     AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), CalcShopMenuTradeGil(shopMenu, itemId));
 }
 
+static unsigned int CanShopMenuSelectMake(CShopMenu* shopMenu)
+{
+    unsigned int canSelect = ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), ShopMenuInt(shopMenu, 0x150)) != 0;
+    if (canSelect != 0) {
+        int selected = shopMenu->getItemNo(ShopMenuInt(shopMenu, 0x28));
+        unsigned int money = *reinterpret_cast<unsigned int*>(ShopMenuCaravan(shopMenu) + 0x200);
+        unsigned int craftGil = static_cast<unsigned int>(shopMenu->getMakeGil(selected));
+        canSelect = (craftGil <= money) ? 1U : 0U;
+    }
+
+    int selected = shopMenu->getItemNo(ShopMenuInt(shopMenu, 0x28));
+    short recipeMaterial[8];
+    GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), selected, recipeMaterial);
+
+    short* material = recipeMaterial;
+    for (int i = 0; i < 3; i++, material++) {
+        short itemNo = *material;
+        if (itemNo < 1) {
+            break;
+        }
+
+        canSelect = static_cast<unsigned int>(-static_cast<int>(-canSelect) >> 0x1F);
+        if (canSelect != 0) {
+            unsigned int total = static_cast<unsigned int>(CountShopMenuOwnedItems(ShopMenuCaravan(shopMenu), itemNo));
+            canSelect = (total >= static_cast<unsigned int>(material[3])) ? 1U : 0U;
+        }
+    }
+
+    return canSelect & 0xFF;
+}
+
+static bool TryOpenShopMenuMakeConfirm(CShopMenu* shopMenu)
+{
+    int makeGil = shopMenu->getMakeGil(shopMenu->getItemNo(ShopMenuInt(shopMenu, 0x28)));
+    if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(ShopMenuCaravan(shopMenu)), -makeGil) == 0) {
+        return false;
+    }
+
+    Sound.PlaySe(0x52, 0x40, 0x7F, 0);
+    ShopMenuInt(shopMenu, 0x8) = 0xF;
+    SetMode__9CShopMenuFi(shopMenu, 0xE);
+    return true;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x801589d0
@@ -1676,148 +1720,15 @@ void CShopMenu::SelectYesNo()
  */
 void CShopMenu::SelectMake()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    unsigned int canSelect;
-
-    canSelect = ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), *reinterpret_cast<int*>(self + 0x150)) != 0;
-    if (canSelect != 0) {
-        int listType = *reinterpret_cast<int*>(self + 0x14);
-        int selected = *reinterpret_cast<int*>(self + 0x28);
-
-        if (listType == 0) {
-            selected = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + selected * 2 + 0xBE6);
-        } else if (listType == 1) {
-            selected = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + selected * 2 + 0xB6);
-        } else if (listType == 2) {
-            int index = *reinterpret_cast<int*>(self + 0x50 + selected * 4);
-            if (index == -1) {
-                selected = -1;
-            } else {
-                selected = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + index * 2 + 0xB6);
-            }
-        } else {
-            selected = -1;
-        }
-
-        unsigned int money = *reinterpret_cast<unsigned int*>(*reinterpret_cast<int*>(self + 0x20) + 0x200);
-        unsigned int craftGil;
-        if (selected < 1) {
-            craftGil = 0;
-        } else {
-            int gil = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + 0xBE2) *
-                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + selected * 0x48 + 0x24);
-            gil = gil / 100 + (gil >> 0x1F);
-            craftGil = gil - (gil >> 0x1F);
-        }
-
-        canSelect = static_cast<unsigned int>(
-            static_cast<int>(money >> 0x1F) + (static_cast<unsigned int>(craftGil <= money) - static_cast<int>(craftGil >> 0x1F)));
-    }
-
-    int listType = *reinterpret_cast<int*>(self + 0x14);
-    canSelect &= 0xFF;
-    int selected = *reinterpret_cast<int*>(self + 0x28);
-    if (listType == 0) {
-        selected = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + selected * 2 + 0xBE6);
-    } else if (listType == 1) {
-        selected = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + selected * 2 + 0xB6);
-    } else if (listType == 2) {
-        int index = *reinterpret_cast<int*>(self + 0x50 + selected * 4);
-        if (index == -1) {
-            selected = -1;
-        } else {
-            selected = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + index * 2 + 0xB6);
-        }
-    } else {
-        selected = -1;
-    }
-
-    short recipeMaterial[8];
-    GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), selected, recipeMaterial);
-    int i = 0;
-    short* material = recipeMaterial;
-    do {
-        short itemNo = *material;
-        if (itemNo < 1) {
-            break;
-        }
-
-        canSelect = static_cast<unsigned int>(-static_cast<int>(-canSelect) >> 0x1F);
-        if (canSelect != 0) {
-            int checkOffset = 0;
-            unsigned int total = 0;
-            int checkCount = 8;
-            do {
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xB6) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xB8) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xBA) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xBC) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xBE) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xC0) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xC2) == itemNo) {
-                    total++;
-                }
-                if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + checkOffset + 0xC4) == itemNo) {
-                    total++;
-                }
-                checkOffset += 0x10;
-                checkCount--;
-            } while (checkCount != 0);
-
-            canSelect = static_cast<unsigned int>(
-                static_cast<int>(total >> 0x1F) +
-                (static_cast<unsigned int>(static_cast<unsigned int>(material[3]) <= total) - static_cast<int>(material[3] >> 0x1F)));
-        }
-
-        i++;
-        canSelect &= 0xFF;
-        material++;
-    } while (i < 3);
-
+    unsigned int canSelect = CanShopMenuSelectMake(this);
     if (canSelect == 0) {
-        *reinterpret_cast<int*>(self + 0x3C) = 1;
+        ShopMenuInt(this, 0x3C) = 1;
     }
 
-    bool hasInput = false;
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-        hasInput = true;
-    }
-
-    unsigned short press;
-    if (hasInput) {
-        press = 0;
-    } else {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        press = Pad._8_2_;
-    }
-
+    unsigned short press = GetPadButtons();
     if ((press & 0xC) == 0) {
-        hasInput = false;
-        if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-            hasInput = true;
-        }
-
-        if (hasInput) {
-            press = 0;
-        } else {
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-            press = Pad._8_2_;
-        }
-
         if ((press & 0x100) != 0) {
-            int yesNo = *reinterpret_cast<int*>(self + 0x3C);
+            int yesNo = ShopMenuInt(this, 0x3C);
             if (yesNo != 1) {
                 if (yesNo > 0) {
                     return;
@@ -1826,51 +1737,21 @@ void CShopMenu::SelectMake()
                     return;
                 }
 
-                int mode = *reinterpret_cast<int*>(self + 0x14);
-                int itemIdx = *reinterpret_cast<int*>(self + 0x28);
-                if (mode == 0) {
-                    itemIdx = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + itemIdx * 2 + 0xBE6);
-                } else if (mode == 1) {
-                    itemIdx = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + itemIdx * 2 + 0xB6);
-                } else if (mode == 2) {
-                    int index = *reinterpret_cast<int*>(self + 0x50 + itemIdx * 4);
-                    if (index == -1) {
-                        itemIdx = -1;
-                    } else {
-                        itemIdx = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + index * 2 + 0xB6);
-                    }
-                } else {
-                    itemIdx = -1;
-                }
-
-                if (itemIdx < 1) {
-                    itemIdx = 0;
-                } else {
-                    int gil = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + 0xBE2) *
-                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemIdx * 0x48 + 0x24);
-                    gil = gil / 100 + (gil >> 0x1F);
-                    itemIdx = gil - (gil >> 0x1F);
-                }
-
-                int canAdd = CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(*reinterpret_cast<int*>(self + 0x20)), -itemIdx);
-                if (canAdd != 0) {
-                    Sound.PlaySe(0x52, 0x40, 0x7F, 0);
-                    *reinterpret_cast<int*>(self + 0x8) = 0xF;
-                    SetMode__9CShopMenuFi(self, 0xE);
+                if (TryOpenShopMenuMakeConfirm(this)) {
                     return;
                 }
             }
 
             Sound.PlaySe(4, 0x40, 0x7F, 0);
-            *reinterpret_cast<int*>(self + 0x8) = 9;
-            SetMode__9CShopMenuFi(self, 0xE);
+            ShopMenuInt(this, 0x8) = 9;
+            SetMode__9CShopMenuFi(this, 0xE);
         }
     } else {
-        *reinterpret_cast<unsigned int*>(self + 0x3C) ^= 1;
+        ShopMenuInt(this, 0x3C) ^= 1;
         if (canSelect == 1) {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else {
-            *reinterpret_cast<int*>(self + 0x3C) = 1;
+            ShopMenuInt(this, 0x3C) = 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         }
     }

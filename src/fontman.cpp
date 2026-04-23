@@ -814,16 +814,3 @@ void CFontMan::Init()
 CFontMan::~CFontMan()
 {
 }
-
-/*
- * --INFO--
- * PAL Address: 0x80092f14
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CFontMan::CFontMan()
-{
-}

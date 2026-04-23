@@ -533,7 +533,25 @@ void GbaQueue::ClrShopMode()
  */
 void GbaQueue::LoadMask()
 {
-	// TODO
+	int* scriptFoodBase = reinterpret_cast<int*>(Game.m_scriptFoodBase);
+	char* obj = reinterpret_cast<char*>(this);
+
+	for (int i = 0; i < 4; i++) {
+		if (scriptFoodBase[i] == 0) {
+			obj[0x2C96 + i] = static_cast<char>(0xFF);
+			continue;
+		}
+
+		OSWaitSemaphore(accessSemaphores + i);
+		{
+			unsigned short maskValue = *reinterpret_cast<unsigned short*>(scriptFoodBase[i] + 0x89C);
+			if ((maskValue != *reinterpret_cast<unsigned short*>(obj + 0x2C8E)) && (Joybus.SendMask(i, maskValue) == 0)) {
+				*reinterpret_cast<unsigned short*>(obj + 0x2C8E) = maskValue;
+				obj[0x2C96 + i] = 6;
+			}
+		}
+		OSSignalSemaphore(accessSemaphores + i);
+	}
 }
 
 /*
@@ -574,7 +592,15 @@ int GbaQueue::SetQueue(int channel, unsigned int value)
  */
 void GbaQueue::ResetQueue()
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+
+	for (int channel = 0; channel < 4; channel++) {
+		OSWaitSemaphore(accessSemaphores + channel);
+		memset(obj + 0x30 + channel * 0x100, 0, 0x100);
+		*reinterpret_cast<int*>(obj + 0x430 + channel * 4) = 0;
+		obj[0x440 + channel] = 0;
+		OSSignalSemaphore(accessSemaphores + channel);
+	}
 }
 
 /*
@@ -1248,7 +1274,9 @@ void GbaQueue::GetMBasePos(int channel, short* outX, short* outY)
  */
 void GbaQueue::LoadAllStat()
 {
-	// TODO
+	LoadPlayerStat();
+	LoadEnemyStat();
+	LoadMapItemStat();
 }
 
 /*
@@ -3484,9 +3512,21 @@ void GbaQueue::SetShopFlg(int channel)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ClrShopFlg(int)
+void GbaQueue::ClrShopFlg(int channel)
 {
-	// TODO
+	const unsigned char playerMask = static_cast<unsigned char>(1 << channel);
+	unsigned char* flags = reinterpret_cast<unsigned char*>(this) + 0x2D38;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	flags[0] = static_cast<unsigned char>(flags[0] & ~playerMask);
+	flags[1] = static_cast<unsigned char>(flags[1] & ~playerMask);
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	for (int retry = 0; retry < 10; retry++) {
+		if (Joybus.SetMType(channel, 0) == 0) {
+			break;
+		}
+	}
 }
 
 /*
@@ -3520,9 +3560,21 @@ void GbaQueue::SetSmithFlg(int channel)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ClrSmithFlg(int)
+void GbaQueue::ClrSmithFlg(int channel)
 {
-	// TODO
+	const unsigned char shopMask = static_cast<unsigned char>(0x10 << channel);
+	unsigned char* flags = reinterpret_cast<unsigned char*>(this) + 0x2D38;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	flags[0] = static_cast<unsigned char>(flags[0] & ~shopMask);
+	flags[1] = static_cast<unsigned char>(flags[1] & ~shopMask);
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	for (int retry = 0; retry < 10; retry++) {
+		if (Joybus.SetMType(channel, 0) == 0) {
+			break;
+		}
+	}
 }
 
 /*
@@ -3530,9 +3582,14 @@ void GbaQueue::ClrSmithFlg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ShopEnd(int)
+void GbaQueue::ShopEnd(int channel)
 {
-	// TODO
+	ClrShopFlg(channel);
+
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+	if (caravanWork != 0) {
+		caravanWork->CallShop(0, 0, 0, 0, 0);
+	}
 }
 
 /*
@@ -3540,9 +3597,14 @@ void GbaQueue::ShopEnd(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::SmithEnd(int)
+void GbaQueue::SmithEnd(int channel)
 {
-	// TODO
+	ClrSmithFlg(channel);
+
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+	if (caravanWork != 0) {
+		caravanWork->CallShop(1, 0, 0, 0, 0);
+	}
 }
 
 /*

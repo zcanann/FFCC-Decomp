@@ -4749,8 +4749,8 @@ extern "C" void __sinit_partMng_cpp(void)
     g_dcp.m_lookTargetPtr = 0;
     g_dcp.m_objectHitMask = 0;
     g_dcp.m_cylinderAttribute = 0;
-    g_dcp.m_paramC = 1.0f;
-    g_dcp.m_paramD = 1.0f;
+    g_dcp.m_paramC = FLOAT_8032fe18;
+    g_dcp.m_paramD = FLOAT_8032fe18;
     *reinterpret_cast<unsigned char*>(&g_dcp.m_owner) = 0;
 }
 

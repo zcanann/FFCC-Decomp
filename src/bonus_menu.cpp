@@ -231,6 +231,39 @@ static void BuildDefaultResultSprites(BonusAnimSprite* sprites, int activePartyC
 	}
 }
 
+static int GetBonusPartySlotByActiveIndex(int activeIndex)
+{
+	unsigned int* scriptFoodBase = Game.m_scriptFoodBase;
+	int activeCount = 0;
+
+	for (int i = 0; i < 4; i++) {
+		if (scriptFoodBase[i] == 0) {
+			continue;
+		}
+		if (activeCount == activeIndex) {
+			return i;
+		}
+		activeCount++;
+	}
+
+	return -1;
+}
+
+static const char* GetBonusPartyNameByActiveIndex(int activeIndex)
+{
+	int slot = GetBonusPartySlotByActiveIndex(activeIndex);
+	if (slot < 0) {
+		return 0;
+	}
+
+	unsigned int partyPtr = Game.m_scriptFoodBase[slot];
+	if (partyPtr == 0) {
+		return 0;
+	}
+
+	return reinterpret_cast<const char*>(partyPtr + 0x3CA);
+}
+
 } // namespace
 
 /*
@@ -482,7 +515,6 @@ void CMenuPcs::drawBonus()
  */
 void CMenuPcs::CalcResultOpenAnim()
 {
-	unsigned int* scriptFoodBase = Game.m_scriptFoodBase;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 
@@ -492,23 +524,19 @@ void CMenuPcs::CalcResultOpenAnim()
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+	const int activePartyCount = GetActiveBonusPartyCount();
+	const int frameBase = 1;
+	const int iconBase = frameBase + activePartyCount;
+	const int modelBase = iconBase + activePartyCount;
+	const int nameBase = modelBase + activePartyCount;
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
-		int activePartyCount = 0;
 		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
 		GetBonusMenuMembers(this).m_bonusAlpha = 0;
+		GetBonusMenuMembers(this).m_bonusCursorFlag = 0;
 		memset((void*)animPtr, 0, 0x1008);
 
-		for (int i = 0; i < 4; i++) {
-			if (scriptFoodBase[i] != 0) {
-				activePartyCount++;
-			}
-		}
-		if (activePartyCount <= 0) {
-			activePartyCount = 1;
-		}
-
-		header->count = (short)(1 + activePartyCount + activePartyCount + activePartyCount);
+		header->count = (short)(1 + activePartyCount * 4);
 		header->unk02 = 0;
 		header->unk04 = 0;
 		header->finished = 0;
@@ -517,23 +545,40 @@ void CMenuPcs::CalcResultOpenAnim()
 		InitAnimSprite(&sprites[0], 0x16, 0, 0, 0x280, 0x1c0, 0, 8);
 		sprites[0].depth = 0.0f;
 		sprites[0].scale = 0.0f;
+		sprites[0].alpha = 0.0f;
 
 		for (int i = 0; i < activePartyCount; i++) {
-			int idx = i + 1;
+			int idx = frameBase + i;
 			InitAnimSprite(&sprites[idx], 0x17, 0x80, (short)(0x38 + i * 0x60), 0x1a0, 0x40, 0x16 + i * 3, 8);
 			sprites[idx].depth = 0.0f;
+			sprites[idx].alpha = 0.0f;
+			sprites[idx].mulX = -24.0f;
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			int idx = 1 + activePartyCount + i;
+			int idx = iconBase + i;
 			InitAnimSprite(&sprites[idx], 0x18, 0x48, (short)(0x28 + i * 0x60), 0x60, 0x58, 0x40 + i * 3, 8);
 			sprites[idx].depth = 0.0f;
+			sprites[idx].alpha = 0.0f;
+			sprites[idx].mulX = -48.0f;
+			sprites[idx].mulY = 12.0f;
+			sprites[idx].scale = 0.8f;
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			int idx = 1 + activePartyCount + activePartyCount + i;
-			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, 0x58 + i * 2, 8);
+			int idx = modelBase + i;
+			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, 0x28 + i * 4, 0x18);
 			sprites[idx].depth = 0.0f;
+			sprites[idx].alpha = 0.0f;
+			sprites[idx].scale = 1.0f;
+		}
+
+		for (int i = 0; i < activePartyCount; i++) {
+			int idx = nameBase + i;
+			InitAnimSprite(&sprites[idx], -1, 0x108, (short)(0x6C + i * 0x60), 0, 0, 0x2E + i * 4, 0x18);
+			sprites[idx].depth = 0.0f;
+			sprites[idx].alpha = 0.0f;
+			sprites[idx].mulX = 18.0f;
 		}
 
 		*(unsigned char*)(statePtr + 0xb) = 1;
@@ -560,8 +605,29 @@ void CMenuPcs::CalcResultOpenAnim()
 			doneCount++;
 		}
 
+		if (i == 0) {
+			sprite->scale = sprite->alpha * 3.0f;
+		} else if (i >= frameBase && i < iconBase) {
+			sprite->mulX = (1.0f - sprite->alpha) * -24.0f;
+		} else if (i >= iconBase && i < modelBase) {
+			sprite->mulX = (1.0f - sprite->alpha) * -48.0f;
+			sprite->mulY = (1.0f - sprite->alpha) * 12.0f;
+			sprite->scale = 0.8f + sprite->alpha * 0.2f;
+		} else if (i >= modelBase && i < nameBase) {
+			sprite->scale = 0.85f + sprite->alpha * 0.15f;
+		} else if (i >= nameBase) {
+			sprite->mulX = (1.0f - sprite->alpha) * 18.0f;
+		}
+
 		if (sprite->kind == 0x17 && sprite->timer == 1) {
 			Sound.PlaySe(0x49, 0x40, 0x7f, 0);
+		}
+		if (sprite->kind == -2 && sprite->timer == 1) {
+			Sound.PlaySe(0x47, 0x40, 0x7f, 0);
+		}
+		if (sprite->kind == -1 && sprite->timer == 1 && GetBonusMenuMembers(this).m_bonusCursorFlag == 0) {
+			Sound.PlaySe(0x48, 0x40, 0x7f, 0);
+			GetBonusMenuMembers(this).m_bonusCursorFlag = 1;
 		}
 	}
 
@@ -585,6 +651,8 @@ void CMenuPcs::DrawResultOpenAnim()
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	float strongest = 0.0f;
 	float frameAlpha = 0.0f;
+	int modelIndex = 0;
+	int nameIndex = 0;
 
 	if (animPtr == 0 || statePtr == 0) {
 		return;
@@ -592,6 +660,10 @@ void CMenuPcs::DrawResultOpenAnim()
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+	CFont* font = GetBonusMenuMembers(this).m_font;
+
+	DrawInit__8CMenuPcsFv(this);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
@@ -603,12 +675,50 @@ void CMenuPcs::DrawResultOpenAnim()
 			alpha = 1.0f;
 		}
 
-		if (sprite->kind == -3) {
-			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
-		} else if (sprite->kind == -4) {
-			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
-		} else if (sprite->kind == -2) {
-			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, i);
+		if (sprite->kind == -2) {
+			int basePtr = GetBonusMenuMembers(this).m_bonusListPtr;
+			if (basePtr != 0) {
+				int slotPtr = basePtr + (modelIndex * 0x524);
+				void* handle = *(void**)slotPtr;
+				if (handle != 0) {
+					SetProjection__8CMenuPcsFi(this, modelIndex);
+					SetLight__8CMenuPcsFi(this, 1);
+					unsigned int oldFlags = *(unsigned int*)((char*)handle + 8);
+					*(unsigned int*)((char*)handle + 8) = 0x300543;
+					if (*(int*)((char*)handle + 0x168) != 0) {
+						*(float*)(*(int*)((char*)handle + 0x168) + 0x9C) = alpha;
+					}
+					Draw__Q29CCharaPcs7CHandleFi(handle, 5);
+					DrawMenuIdx__8CPartPcsFi(&PartPcs, *(int*)(slotPtr + 4));
+					*(unsigned int*)((char*)handle + 8) = oldFlags;
+					RestoreProjection__8CMenuPcsFv(this);
+				}
+			}
+			modelIndex++;
+		} else if (sprite->kind == -1) {
+			if (font != 0) {
+				const char* partyName = GetBonusPartyNameByActiveIndex(nameIndex++);
+				if (partyName != 0 && *partyName != '\0') {
+					_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+					font->SetMargin(1.0f);
+					font->SetShadow(1);
+					font->SetScale(0.9f);
+					font->SetTlut(7);
+					font->SetColor(color);
+					font->DrawInit();
+					font->SetPosX((float)sprite->x + sprite->mulX);
+					font->SetPosY((float)sprite->y + sprite->mulY);
+					font->Draw(partyName);
+				}
+			}
+		} else {
+			GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+			GXSetChanMatColor(GX_COLOR0A0, color);
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, sprite->tex);
+			DrawRect__8CMenuPcsFUlfffffffff(this, 0,
+			    (float)sprite->x + sprite->mulX, (float)sprite->y + sprite->mulY,
+			    (float)sprite->w, (float)sprite->h,
+			    sprite->depth, sprite->depth, sprite->scale, sprite->scale, 0.0f);
 		}
 
 		if (alpha > strongest) {

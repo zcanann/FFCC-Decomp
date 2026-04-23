@@ -170,6 +170,7 @@ static const char DAT_801dcfec[] = {
     (char)0x81, 0x42, (char)0x0A, (char)0x00,
 };
 static const char s_f051_root_801dceb4[] = "f051_root";
+static const char s_stand_801dd018[] = "stand";
 extern "C" char m_aiWork__8CGMonObj[];
 
 struct ItemObjFlatTableEntry {
@@ -222,7 +223,7 @@ void CGItemObj::onCreate()
 	unsigned char* self = (unsigned char*)this;
 
 	onCreate__8CGPrgObjFv(self);
-	self[0x54d] &= 0x7f;
+	self[0x54c] &= 0x7f;
 	*(int*)(self + 0x550) = 0;
 	*(int*)(self + 0x558) = 0;
 	*(unsigned short*)(self + 0x560) = 0;
@@ -346,7 +347,8 @@ void CGItemObj::onFrame()
 		*(void**)(self + 0x564) = 0;
 
 		if (*(int*)(self + 0x500) == 0xCB) {
-			LoadAnim__8CGObjectFPciiiUl(this, 0, 0, 0, 0, 0);
+			LoadAnim__8CGObjectFPciiiUl(
+			    this, *(char**)(self + 0x578), 0, 0, 2, *(unsigned long*)(self + 0x574));
 			SetAnimSlot__8CGObjectFii(this, 0, 0);
 			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
 
@@ -1210,6 +1212,7 @@ void CGItemObj::loadModel()
 	int modelNo = -1;
 	int modelVariant = 0;
 	int modelFlag = 0;
+	unsigned long animFlags = (unsigned long)-1;
 	int useParticleTable = 1;
 	int worldParamA = *(int*)(self + 0x500);
 	int worldParamB = *(int*)(self + 0x504);
@@ -1244,12 +1247,13 @@ void CGItemObj::loadModel()
 		self[0x95] = 0;
 		self[0x96] = 0x11;
 		self[0x97] = 0x94;
+		animFlags = 0x12;
 		modelFlag = 1;
 	}
 
 	if (modelNo >= 0) {
 		LoadModel__8CGObjectFiUlUli(this, 3, modelNo, modelVariant, modelFlag);
-		LoadAnim__8CGObjectFPciiiUl(this, 0, 0, 0, 0, 0);
+		LoadAnim__8CGObjectFPciiiUl(this, const_cast<char*>(s_stand_801dd018), 0, 0, 3, animFlags);
 		SetAnimSlot__8CGObjectFii(this, 0, 0);
 		PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
 	}
@@ -1280,7 +1284,7 @@ void CGItemObj::loadModel()
 		*(unsigned char*)(self + 0x9A) &= 0xFB;
 	}
 
-	self[0x54D] = (self[0x54D] & 0x7F) | 0x80;
+	self[0x54C] = (self[0x54C] & 0x7F) | 0x80;
 }
 
 /*

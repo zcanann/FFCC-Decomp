@@ -109,6 +109,8 @@ static inline BonusMenuMembers& GetBonusMenuMembers(CMenuPcs* menu)
 	return *reinterpret_cast<BonusMenuMembers*>(menu);
 }
 
+static float CalcBonusSpriteProgress(const BonusAnimSprite* sprite, int frame);
+
 static void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, short w, short h, int startFrame, int duration)
 {
 	sprite->x = x;
@@ -125,6 +127,77 @@ static void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, 
 	sprite->startFrame = startFrame;
 	sprite->duration = duration;
 	sprite->scale = 1.0f;
+}
+
+static void ResetAnimSpriteMotion(BonusAnimSprite* sprite)
+{
+	sprite->mulX = 0.0f;
+	sprite->mulY = 0.0f;
+	sprite->alpha = 0.0f;
+	sprite->depth = 0.0f;
+	sprite->scale = 1.0f;
+}
+
+static void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, short y)
+{
+	short x = ((0 < slotIndex) && (slotIndex < 3)) ? 0x30 : 0x48;
+
+	InitAnimSprite(sprite, 0, x, y, 0x60, 0x58, 0, 8);
+	ResetAnimSpriteMotion(sprite);
+	sprite->mulX = (float)sprite->w;
+	sprite->mulY = (float)sprite->h;
+}
+
+static void InitSelectOpenPartyName(BonusAnimSprite* sprite, const BonusAnimSprite* iconSprite, short xOffset, short yOffset, int startFrame)
+{
+	InitAnimSprite(sprite, -1, (short)(iconSprite->x + xOffset), (short)(iconSprite->y + yOffset), 0, 0, startFrame, 8);
+	ResetAnimSpriteMotion(sprite);
+	sprite->mulX = 24.0f;
+}
+
+static void ApplySelectOpenSpriteMotion(BonusAnimSprite* sprite, int frame)
+{
+	float progress = CalcBonusSpriteProgress(sprite, frame);
+
+	if (progress < 0.0f) {
+		sprite->alpha = 0.0f;
+		return;
+	}
+
+	sprite->alpha = progress;
+	switch (sprite->kind) {
+	case 0x16:
+		sprite->scale = 3.0f;
+		break;
+	case -3:
+		sprite->mulY = (1.0f - progress) * 24.0f;
+		break;
+	case 0x1f:
+		sprite->mulX = -150.0f * (1.0f - progress);
+		sprite->mulY = -150.0f * (1.0f - progress);
+		sprite->scale = 1.0f + (1.0f - progress);
+		break;
+	case -4:
+		sprite->mulY = (1.0f - progress) * 20.0f;
+		break;
+	case 0:
+		sprite->mulX = (1.0f - progress) * sprite->w;
+		sprite->mulY = (1.0f - progress) * sprite->h;
+		break;
+	case 0x19:
+		sprite->mulX = (1.0f - progress) * 20.0f;
+		sprite->scale = 0.85f + progress * 0.15f;
+		break;
+	case -1:
+		sprite->mulX = (1.0f - progress) * 24.0f;
+		sprite->mulY = (1.0f - progress) * 6.0f;
+		break;
+	case -2:
+		sprite->scale = 0.75f + progress * 0.25f;
+		break;
+	default:
+		break;
+	}
 }
 
 static void TickAnimSprites(int statePtr, int animPtr, int fadeDir)
@@ -1088,7 +1161,6 @@ void CMenuPcs::DrawResultCloseAnim()
  */
 void CMenuPcs::CalcSelectOpenAnim()
 {
-	unsigned int* scriptFoodBase = Game.m_scriptFoodBase;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 
@@ -1100,23 +1172,17 @@ void CMenuPcs::CalcSelectOpenAnim()
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
-		int activePartyCount = 0;
+		int activePartyCount = GetActiveBonusPartyCount();
 		int idx;
+		int iconBase;
+		int detailBase;
 
 		GetBonusMenuMembers(this).m_bonusCursorFlag = 0;
 		Sound.PlaySe(0x4c, 0x40, 0x7f, 0);
 		memset((void*)animPtr, 0, 0x1008);
+		*(short*)(statePtr + 0x22) = 0;
 
-		for (int i = 0; i < 4; i++) {
-			if (scriptFoodBase[i] != 0) {
-				activePartyCount++;
-			}
-		}
-		if (activePartyCount <= 0) {
-			activePartyCount = 1;
-		}
-
-		header->count = (short)(12 + activePartyCount * 3);
+		header->count = (short)(12 + activePartyCount * 5);
 		header->unk02 = 0;
 		header->unk04 = 0;
 		header->finished = 0;
@@ -1124,44 +1190,66 @@ void CMenuPcs::CalcSelectOpenAnim()
 		idx = 0;
 		InitAnimSprite(&sprites[idx++], 0x16, 0, 0, 0x280, 0x1c0, 0, 0);
 		sprites[0].scale = 3.0f;
+		sprites[0].alpha = 0.0f;
 
 		InitAnimSprite(&sprites[idx++], -3, 0xf0, 0x38, 0x168, 0x148, 0, 8);
+		ResetAnimSpriteMotion(&sprites[1]);
 		InitAnimSprite(&sprites[idx++], 0x1f, 0, 0, 0x80, 0x78, 9999, 8);
 		sprites[2].mulX = -150.0f;
 		sprites[2].mulY = -150.0f;
 		sprites[2].scale = 2.0f;
+		sprites[2].alpha = 0.0f;
 		InitAnimSprite(&sprites[idx++], -4, 0, 0, 0x70, 0x68, 0, 8);
+		ResetAnimSpriteMotion(&sprites[3]);
 
+		iconBase = idx;
 		short y = 0x28;
 		for (int i = 0; i < activePartyCount; i++) {
-			short x = ((0 < i) && (i < 3)) ? 0x30 : 0x48;
-			InitAnimSprite(&sprites[idx], 0, x, y, 0x60, 0x58, 0, 0x18);
-			sprites[idx].mulX = 96.0f;
-			sprites[idx].mulY = 88.0f;
-			sprites[idx].timer = 0;
+			InitSelectOpenPartyIcon(&sprites[idx], i, y);
 			idx++;
 			y += 0x60;
 		}
 
-		const int iconBase = idx - activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			InitAnimSprite(&sprites[idx], -1, 0, 0, 0, 0, sprites[iconBase + i].timer, 8);
-			sprites[idx].timer = 0;
+			InitSelectOpenPartyName(&sprites[idx], &sprites[iconBase + i], 0x50, 0x18, sprites[iconBase + i].startFrame + 2);
 			idx++;
 		}
 
 		for (int i = 0; i < 8; i++) {
 			int start = (int)((float)(10 + i * 5) * 0.6f);
 			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, start, 0x21);
+			sprites[idx].alpha = 0.0f;
+			sprites[idx].scale = 0.75f;
+			idx++;
+		}
+
+		detailBase = idx;
+		for (int i = 0; i < activePartyCount; i++) {
+			sprites[idx] = sprites[iconBase + i];
+			sprites[idx].y = (short)(sprites[idx].y + 0x20);
+			sprites[idx].w = 0xA8;
+			sprites[idx].h = 0x38;
+			sprites[idx].startFrame = sprites[iconBase + i].startFrame + 6;
+			sprites[idx].duration = 8;
+			sprites[idx].alpha = 0.0f;
+			sprites[idx].mulX = 0.0f;
+			sprites[idx].mulY = 56.0f;
 			sprites[idx].scale = 1.0f;
 			idx++;
 		}
 
-		const int copyBase = iconBase;
+		y = 0x28;
 		for (int i = 0; i < activePartyCount; i++) {
-			sprites[idx] = sprites[copyBase + i];
-			sprites[idx].timer = 0;
-			sprites[idx].startFrame = 1;
+			short x = ((0 < i) && (i < 3)) ? 8 : 0x20;
+			InitAnimSprite(&sprites[idx], 0x19, x, y, 0x38, 0x28, i * 2, 8);
+			ResetAnimSpriteMotion(&sprites[idx]);
+			sprites[idx].mulX = (float)(i * sprites[idx].w);
+			idx++;
+			y += 0x60;
+		}
+
+		for (int i = 0; i < activePartyCount; i++) {
+			InitSelectOpenPartyName(&sprites[idx], &sprites[iconBase + i], 0x50, 0x48, sprites[detailBase + i].startFrame + 2);
 			idx++;
 		}
 
@@ -1181,13 +1269,11 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		if (frame < sprite->startFrame + sprite->duration) {
 			sprite->timer++;
-			if (sprite->duration > 0) {
-				sprite->alpha = (float)sprite->timer / (float)sprite->duration;
-			}
 		} else {
-			sprite->alpha = 1.0f;
 			doneCount++;
 		}
+
+		ApplySelectOpenSpriteMotion(sprite, frame);
 	}
 
 	if (doneCount == (int)header->count) {
@@ -1340,11 +1426,11 @@ void CMenuPcs::DrawSelectOpenAnim()
 
 			GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
 			font->SetColor(color);
-			if (scriptFoodBase[nameIndex] != 0) {
-				char* name = (char*)(scriptFoodBase[nameIndex] + 0x3ca);
+			const char* name = GetBonusPartyNameByActiveIndex(nameIndex);
+			if (name != 0) {
 				font->SetPosX((float)sprite->x + sprite->mulX);
 				font->SetPosY((float)sprite->y + sprite->mulY - 12.0f);
-				font->Draw(name);
+				font->Draw(const_cast<char*>(name));
 			}
 			nameIndex++;
 		}

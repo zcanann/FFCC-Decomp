@@ -275,12 +275,15 @@ void CPtrArray<CTexAnimSeq*>::ReleaseAndRemoveAll()
     int offset = 0;
 
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        int* item = *(int**)((int)m_items + offset);
+        CRef* item = *reinterpret_cast<CRef**>((int)m_items + offset);
         if (item != 0) {
-            int refCount = item[1];
-            item[1] = refCount - 1;
-            if ((refCount - 1 == 0) && (item != 0)) {
-                (*(void (**)(int*, int))(*item + 8))(item, 1);
+            int* itemWords = reinterpret_cast<int*>(item);
+            int refCount = itemWords[1];
+            int nextRefCount = refCount - 1;
+
+            itemWords[1] = nextRefCount;
+            if (nextRefCount == 0) {
+                delete item;
             }
             *(unsigned int*)((int)m_items + offset) = 0;
         }
@@ -489,12 +492,15 @@ void CPtrArray<CTexAnim*>::ReleaseAndRemoveAll()
     int offset = 0;
 
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        int* item = *(int**)((int)m_items + offset);
+        CRef* item = *reinterpret_cast<CRef**>((int)m_items + offset);
         if (item != 0) {
-            int refCount = item[1];
-            item[1] = refCount - 1;
-            if ((refCount - 1 == 0) && (item != 0)) {
-                (*(void (**)(int*, int))(*item + 8))(item, 1);
+            int* itemWords = reinterpret_cast<int*>(item);
+            int refCount = itemWords[1];
+            int nextRefCount = refCount - 1;
+
+            itemWords[1] = nextRefCount;
+            if (nextRefCount == 0) {
+                delete item;
             }
             *(unsigned int*)((int)m_items + offset) = 0;
         }
@@ -1441,14 +1447,15 @@ CTexAnim::CRefData::~CRefData()
     CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(this);
 
     refData->vtable = __vt__Q28CTexAnim8CRefData;
-    int* material = reinterpret_cast<int*>(refData->material);
+    CRef* material = reinterpret_cast<CRef*>(refData->material);
     if (material != 0) {
-        int refCount = material[1];
+        int* materialWords = reinterpret_cast<int*>(material);
+        int refCount = materialWords[1];
         int nextRefCount = refCount - 1;
 
-        material[1] = nextRefCount;
-        if ((nextRefCount == 0) && (material != 0)) {
-            (*(void (**)(int*, int))(*material + 8))(material, 1);
+        materialWords[1] = nextRefCount;
+        if (nextRefCount == 0) {
+            delete material;
         }
         refData->material = 0;
     }

@@ -1193,25 +1193,28 @@ void CChara::CModel::calcNowFrame()
 void CChara::CModel::calcMatrix()
 {
 	calcNowFrame();
-	CNode* nodes = *(CNode**)((u8*)this + 0xA8);
-	void* ref = *(void**)((u8*)this + 0xA4);
-	u16 nodeCount = ref ? *(u16*)((u8*)ref + 8) : 0;
+	if (m_anim != 0) {
+		InitQuantize__Q26CChara5CAnimFv(m_anim);
+	}
+
+	CNode* nodes = ModelNodes(this);
+	u16 nodeCount = ModelNodeCount(this);
 	for (u32 i = 0; i < nodeCount; i++) {
 		CNode* node = (CNode*)((u8*)nodes + (i * 0xC0));
-		void* nodeRef = *(void**)node;
-		s16 parent = *(s16*)((u8*)nodeRef + 0x68);
-		if (parent < 0) {
-			PSMTXConcat((float(*)[4])((u8*)this + 0x44), (float(*)[4])((u8*)nodeRef + 0xC),
-			            (float(*)[4])((u8*)node + 0x44));
-		} else {
-			CNode* parentNode = (CNode*)((u8*)nodes + (parent * 0xC0));
-			PSMTXConcat((float(*)[4])((u8*)parentNode + 0x44), (float(*)[4])((u8*)nodeRef + 0xC),
-			            (float(*)[4])((u8*)node + 0x44));
+		void* nodeRef = *reinterpret_cast<void**>(node);
+		s16 parentIndex = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(nodeRef) + 0x68);
+		CNode* parentNode = 0;
+		if (parentIndex >= 0) {
+			parentNode = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(nodes) + parentIndex * 0xC0);
 		}
-		if (*(s8*)((u8*)nodeRef + 0x64) >= 0) {
-			dynamics(node, 0);
+
+		CalcFrameMatrix(m_curFrame, node, NodeWorldMtx(node));
+		if (NodeDynParamIndex(node) != 0xFF) {
+			dynamics(node, parentNode);
 		}
 	}
+
+	ModelFlags10C(this) &= 0x7F;
 }
 
 /*

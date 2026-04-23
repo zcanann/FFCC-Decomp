@@ -341,6 +341,75 @@ static const char* const s_cmakeNameRows[] = {
     " .,:;'\"()[] "
 };
 
+struct CmakeFlatTableEntry {
+    int count;
+    char** strings;
+    char* stringBuf;
+};
+
+struct CmakeFlatDataOverlay {
+    int dataCount;
+    unsigned char data[0x64];
+    int tableCount;
+    CmakeFlatTableEntry table[8];
+};
+
+static inline char* GetCmakeNameBuffer()
+{
+    return s_CmakeInfo.m_name;
+}
+
+static bool IsCmakeNameBlank(const char* name)
+{
+    if (name == nullptr || name[0] == '\0') {
+        return true;
+    }
+
+    for (const char* it = name; *it != '\0'; ++it) {
+        if (*it != ' ') {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
+{
+    if (name == nullptr || name[0] == '\0') {
+        return false;
+    }
+
+    int activeSlot = static_cast<int>(MenuS16(menu, 0x86A));
+    for (int slot = 0; slot < 8; ++slot) {
+        if (slot == activeSlot) {
+            continue;
+        }
+
+        unsigned char* entry = GetCmakeRosterEntry(menu, slot);
+        if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
+            continue;
+        }
+        if (*(entry + 0x1F96) == 1) {
+            continue;
+        }
+        if (strcmp(name, reinterpret_cast<char*>(entry + 0x17BA)) == 0) {
+            return true;
+        }
+    }
+
+    CmakeFlatDataOverlay* textData = reinterpret_cast<CmakeFlatDataOverlay*>(&Game.m_cFlatDataArr[1]);
+    char** nameTable = textData->table[2].strings;
+    int nameCount = textData->table[2].count;
+    for (int i = 0; i < nameCount; ++i) {
+        if (nameTable[i] != nullptr && strcmp(nameTable[i], name) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /*
  * --INFO--
  * PAL Address: TODO
@@ -412,13 +481,13 @@ void GetCharaCnt(char* dst)
  */
 void CMenuPcs::CalcSingCMake()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     int state = MenuS32(this, 0x82C);
 
     if (*reinterpret_cast<unsigned char*>(state + 0x0B) == 0) {
-        memset(self + 0x85C, 0, 0x16);
+        memset(&s_CmakeInfo, 0, sizeof(s_CmakeInfo));
         *reinterpret_cast<unsigned char*>(state + 0x0B) = 1;
         *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
+        *reinterpret_cast<short*>(state + 0x2E) = 0;
         *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
     }
 
@@ -1208,81 +1277,133 @@ void CMenuPcs::CmakeNameOpen()
 void CMenuPcs::CmakeNameCtrl()
 {
     int state = MenuS32(this, 0x82C);
+    int mcWork = MenuS32(this, 0x848);
     short& mode = *reinterpret_cast<short*>(state + 0x10);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
+    short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
+    short& resultFlag = *reinterpret_cast<short*>(state + 0x2E);
     short& select = *reinterpret_cast<short*>(state + 0x26);
     short& row = *reinterpret_cast<short*>(state + 0x28);
     short& table = *reinterpret_cast<short*>(state + 0x2A);
-
     unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
     unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
-
-    if (mode == 1) {
-        if (frame < 30) {
-            frame = frame + 1;
-        } else if ((down & 0x200) != 0) {
-            mode = 2;
-            frame = 0;
-            *reinterpret_cast<short*>(state + 0x1E) = -1;
-        }
-    } else if (mode == 0 && frame < 10) {
-        frame = frame + 1;
-    }
+    short& mcState = *reinterpret_cast<short*>(mcWork + 10);
+    char* name = GetCmakeNameBuffer();
 
     if (mode != 1) {
         return;
     }
 
-    if ((repeat & 0x4) != 0) {
+    if (repeat == 0 && down == 0) {
+        return;
+    }
+
+    if (mcState == 3) {
         int maxRow = (select < 10) ? 4 : 5;
-        row = (row < maxRow) ? static_cast<short>(row + 1) : 0;
-    } else if ((repeat & 0x8) != 0) {
-        int maxRow = (select < 10) ? 4 : 5;
-        row = (row > 0) ? static_cast<short>(row - 1) : static_cast<short>(maxRow);
-    }
+        if ((repeat & 0x4) != 0) {
+            row = (row < maxRow) ? static_cast<short>(row + 1) : 0;
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        } else if ((repeat & 0x8) != 0) {
+            row = (row > 0) ? static_cast<short>(row - 1) : static_cast<short>(maxRow);
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        }
 
-    if ((repeat & 0x2) != 0 && row < 5) {
-        select = (select < 0xB) ? static_cast<short>(select + 1) : 0;
-    } else if ((repeat & 0x1) != 0 && row < 5) {
-        select = (select > 0) ? static_cast<short>(select - 1) : 0xB;
-    }
-
-    if ((down & 0x20) != 0) {
-        table = (table < 2) ? static_cast<short>(table + 1) : 0;
-    } else if ((down & 0x40) != 0) {
-        table = (table > 0) ? static_cast<short>(table - 1) : 2;
-    }
-
-    if ((down & 0x100) != 0) {
-        char* name = reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x85C);
-        size_t len = strlen(name);
-        if (row < 5) {
-            if (len < 7) {
-                int charIdx = (table * 5 + row + select) % 26;
-                AddNameChara(static_cast<int>('A' + charIdx), static_cast<int>(len), 0, 0);
-                name[len + 1] = '\0';
+        if ((repeat & 0x1) != 0) {
+            if (row < 5) {
+                select = (select > 0) ? static_cast<short>(select - 1) : 0xB;
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
+            } else {
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
             }
-        } else if (len > 0) {
-            mode = 2;
-            frame = 0;
-            *reinterpret_cast<short*>(state + 0x1E) = 1;
+        } else if ((repeat & 0x2) != 0) {
+            if (row < 5) {
+                select = (select < 0xB) ? static_cast<short>(select + 1) : 0;
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
+            } else {
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
+            }
         }
-    } else if ((down & 0x200) != 0) {
-        char* name = reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x85C);
-        size_t len = strlen(name);
-        if (len > 0) {
-            name[len - 1] = '\0';
-        } else {
-            mode = 2;
-            frame = 0;
-            *reinterpret_cast<short*>(state + 0x1E) = -1;
-        }
-    }
 
-    if (select < 0) {
-        select = 0;
-    } else if (select > 0xB) {
-        select = 0xB;
+        if ((down & 0x40) != 0) {
+            table = (table > 0) ? static_cast<short>(table - 1) : 2;
+            Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+        } else if ((down & 0x20) != 0) {
+            table = (table < 2) ? static_cast<short>(table + 1) : 0;
+            Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+        }
+
+        if ((down & 0x1000) != 0) {
+            select = 0xB;
+            row = 5;
+            Sound.PlaySe(2, 0x40, 0x7F, 0);
+            return;
+        }
+
+        if ((down & 0x200) != 0) {
+            size_t len = strlen(name);
+            if (len == 0) {
+                resultDir = -1;
+                resultFlag = 1;
+                mode = 2;
+                frame = 0;
+                ChgModel__8CMenuPcsFiiii(this, static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
+                Sound.PlaySe(0x34, 0x40, 0x7F, 0);
+            } else {
+                name[len - 1] = '\0';
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+            }
+            return;
+        }
+
+        if ((down & 0x100) != 0) {
+            size_t len = strlen(name);
+            if (row < 5) {
+                if (len >= 7) {
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
+                    return;
+                }
+
+                const char* rowText = s_cmakeNameRows[table * 5 + row];
+                size_t rowLen = strlen(rowText);
+                if (select < 0 || static_cast<size_t>(select) >= rowLen || rowText[select] == '\0') {
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
+                    return;
+                }
+
+                name[len] = rowText[select];
+                name[len + 1] = '\0';
+                if (strlen(name) > 6) {
+                    select = 0xB;
+                    row = 5;
+                }
+                Sound.PlaySe(2, 0x40, 0x7F, 0);
+                return;
+            }
+
+            if (IsCmakeNameBlank(name)) {
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
+                return;
+            }
+
+            if (IsDuplicateCmakeName(this, name)) {
+                short winX = 0;
+                short winY = 0;
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
+                GetWinSize__8CMenuPcsFiPsPsi(this, 0x14, &winX, &winY, 0);
+                SetMcWinInfo__8CMenuPcsFii(this, (int)winX, (int)winY);
+                mcState = 0;
+                return;
+            }
+
+            resultDir = 1;
+            resultFlag = 1;
+            mode = 2;
+            frame = 0;
+            Sound.PlaySe(2, 0x40, 0x7F, 0);
+        }
+    } else if (mcState == 1 && (down & 0x300) != 0) {
+        Sound.PlaySe(2, 0x40, 0x7F, 0);
+        mcState = 2;
     }
 }
 
@@ -1319,7 +1440,7 @@ void CMenuPcs::CmakeNameDraw()
     short select = *reinterpret_cast<short*>(state + 0x26);
     short row = *reinterpret_cast<short*>(state + 0x28);
     short table = *reinterpret_cast<short*>(state + 0x2A);
-    char* name = reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x85C);
+    char* name = GetCmakeNameBuffer();
     float alpha = CalcCmakeFadeAlpha(this);
     float previewAlpha = ((mode == 2) && (resultDir < 0)) ? FLOAT_80333258 : alpha;
     float titleX = ((mode == 2) && (resultDir > 0)) ? FLOAT_80333258 : 0.0f;

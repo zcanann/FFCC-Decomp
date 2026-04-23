@@ -3,6 +3,8 @@
 
 #include "ffcc/cflat_runtime.h"
 
+#include <dolphin/gx.h>
+
 class CFlatRuntime;
 
 class CFlatRuntime2
@@ -10,6 +12,11 @@ class CFlatRuntime2
 	void onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 	CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
 	void onSetSystemVal(int, CFlatRuntime::CStack*, int);
+	unsigned int isLoadLayerASyncCompleted(int);
+	void loadLayerASync(int, char*);
+	void drawLayer(int, char*, int, int, int, int, int, int, float, float, _GXColor*, int);
+	void loadLayer(int, char*);
+	void SysControl(int, int);
 	int GetSysControl(int);
 	void resetSpawnBit(int);
 };

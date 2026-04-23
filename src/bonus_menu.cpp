@@ -1,7 +1,9 @@
 #include "ffcc/bonus_menu.h"
 #include "ffcc/fontman.h"
+#include "ffcc/gbaque.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/p_game.h"
+#include "ffcc/pad.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
@@ -22,6 +24,17 @@ extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Draw__Q29CCharaPcs7CHandleFi(void*, int);
 extern "C" void DrawMenuIdx__8CPartPcsFi(CPartPcs*, int);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
+extern "C" void OpenMenu__8GbaQueueFiii(void*, int, int, int);
+extern "C" void SetRadarMode__8GbaQueueFii(void*, int, int);
+extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
+extern "C" char* GetLangString__5CGameFv(void*);
+extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
+extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern "C" void changeMode__8CMenuPcsFQ28CMenuPcs8MENUMODE(CMenuPcs*, int);
+extern "C" int sprintf(char*, const char*, ...);
+extern char* PTR_s_bonus_802128c0[];
+extern char DAT_802128e4[];
+extern char s_dvd__smenu_subfont_fnt_801e3020[];
 #pragma force_active on
 extern "C" {
 int gBonusMenuWork0 = 0;
@@ -33,6 +46,7 @@ float* gBonusCheckMarkPosBuffer[2];
 }
 #pragma force_active reset
 static const char s_drawBonusFmt[] = "draw Bonus[%d]\n";
+static const char s_bonusMenuSourceFile[] = "bonus_menu.cpp";
 
 namespace {
 
@@ -186,25 +200,40 @@ void CMenuPcs::BonusInit()
  */
 void CMenuPcs::createBonus()
 {
+	char fontPath[128];
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
+	int listPtr = GetBonusMenuMembers(this).m_bonusListPtr;
 	int auxPtr = GetBonusMenuMembers(this).m_bonusAuxPtr;
 	int boardPtr = GetBonusMenuMembers(this).m_bonusBoardPtr;
 
+	for (int i = 0; i < 4; i++) {
+		OpenMenu__8GbaQueueFiii(&GbaQue, i, 0, 0);
+		SetRadarMode__8GbaQueueFii(&GbaQue, i, 0);
+	}
+
+	loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(this, PTR_s_bonus_802128c0, 2, 1, &DAT_802128e4, 0x16, 0x12, 0);
+	sprintf(fontPath, s_dvd__smenu_subfont_fnt_801e3020, GetLangString__5CGameFv(&Game));
+	loadFont__8CMenuPcsFiPcii(this, 0, fontPath, 1, -1);
+
 	if (statePtr == 0) {
-		statePtr = (int)(new unsigned char[0x48]);
+		statePtr = reinterpret_cast<int>(new unsigned char[0x48]);
 		GetBonusMenuMembers(this).m_bonusStatePtr = statePtr;
 	}
 	if (animPtr == 0) {
-		animPtr = (int)(new unsigned char[0x1008]);
+		animPtr = reinterpret_cast<int>(new unsigned char[0x1008]);
 		GetBonusMenuMembers(this).m_bonusAnimPtr = animPtr;
 	}
+	if (listPtr == 0) {
+		listPtr = reinterpret_cast<int>(new unsigned char[0xCDB0]);
+		GetBonusMenuMembers(this).m_bonusListPtr = listPtr;
+	}
 	if (auxPtr == 0) {
-		auxPtr = (int)(new unsigned char[0xc]);
+		auxPtr = reinterpret_cast<int>(new unsigned char[0xC]);
 		GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
 	}
 	if (boardPtr == 0) {
-		boardPtr = (int)(new unsigned char[0x780]);
+		boardPtr = reinterpret_cast<int>(new unsigned char[0x780]);
 		GetBonusMenuMembers(this).m_bonusBoardPtr = boardPtr;
 	}
 
@@ -217,8 +246,18 @@ void CMenuPcs::createBonus()
 	if (animPtr != 0) {
 		memset((void*)animPtr, 0, 0x1008);
 	}
+	if (listPtr != 0) {
+		memset((void*)listPtr, 0, 0xCDB0);
+		for (int i = 0; i < 0x28; i++) {
+			int slot = listPtr + i * 0x524;
+			*(int*)(slot + 0x0) = -1;
+			*(int*)(slot + 0x4) = -1;
+			*(int*)(slot + 0x8) = -1;
+		}
+	}
 	if (auxPtr != 0) {
-		memset((void*)auxPtr, 0, 0xc);
+		memset((void*)auxPtr, 0, 0xC);
+		*(short*)(auxPtr + 10) = 3;
 	}
 	if (boardPtr != 0) {
 		memset((void*)boardPtr, 0, 0x780);
@@ -226,6 +265,9 @@ void CMenuPcs::createBonus()
 
 	GetBonusMenuMembers(this).m_bonusAlpha = 0;
 	GetBonusMenuMembers(this).m_bonusCursorFlag = 0;
+	gBonusCheckMarkPosBuffer[0] = 0;
+	gBonusCheckMarkPosBuffer[1] = 0;
+	GetAllPadOn();
 }
 
 /*
@@ -316,10 +358,13 @@ void CMenuPcs::calcBonus()
 		break;
 	case 5:
 		CalcSelectCloseAnim();
+		if (*(short*)(animPtr + 6) != 0) {
+			CallWorldParam__8CMenuPcsFiii(this, 8, 0, 0);
+		}
 		break;
 	case 6:
 		ClrBattleItem();
-		*(short*)(statePtr + 0x1c) = 0;
+		changeMode__8CMenuPcsFQ28CMenuPcs8MENUMODE(this, 0);
 		break;
 	default:
 		break;

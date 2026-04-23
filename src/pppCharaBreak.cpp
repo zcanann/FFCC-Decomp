@@ -4,6 +4,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/util.h"
 
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
@@ -20,7 +21,6 @@ extern _pppMngStCharaBreak* pppMngStPtr;
 extern struct _pppEnvSt {
     CMemory::CStage* m_stagePtr;
 } *pppEnvStPtr;
-extern char gUtil[];
 class CMaterialMan;
 static const char s_pppCharaBreak_cpp_801dd690[] = "pppCharaBreak.cpp";
 extern float FLOAT_80332048;
@@ -55,18 +55,18 @@ void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(void*, void*, void*, void*, unsigned long, unsigned long);
-void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
-int GetNumPolygonFromDL__5CUtilFPvUl(void*, void*);
-int IsHasDrawFmtDL__5CUtilFUc(void*, unsigned char);
+void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(CUtil*, Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
+void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
+int GetNumPolygonFromDL__5CUtilFPvUl(CUtil*, void*, unsigned long);
+int IsHasDrawFmtDL__5CUtilFUc(CUtil*, unsigned char);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
-void ConvI2FVector__5CUtilFR3Vec6S16Vecl(void*, Vec*, S16Vec*, unsigned long);
-void ConvF2IVector__5CUtilFR6S16Vec3Vecl(void*, S16Vec*, Vec*, unsigned long);
+void ConvI2FVector__5CUtilFR3Vec6S16Vecl(CUtil*, Vec*, S16Vec, unsigned long);
+void ConvF2IVector__5CUtilFR6S16Vec3Vecl(CUtil*, S16Vec*, Vec, unsigned long);
 }
 
 struct POLYGON_DATA {
@@ -326,7 +326,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
         u16* stripRestart;
 
         stream = (u16*)((u8*)stream + 3);
-        if (IsHasDrawFmtDL__5CUtilFUc((void*)gUtil, drawCmd) == 0) {
+        if (IsHasDrawFmtDL__5CUtilFUc(&gUtil, drawCmd) == 0) {
             break;
         }
 
@@ -364,10 +364,10 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                 posQuantized.x = sourcePos->x;
                 posQuantized.y = sourcePos->y;
                 posQuantized.z = sourcePos->z;
-                ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &posFloat, &posQuantized,
+                ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &posFloat, posQuantized,
                                                     *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
                 PSMTXMultVec(meshMtx, &posFloat, &posFloat);
-                ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)gUtil, (S16Vec*)(polygonBytes + (outVertex * 6) + 0x10), &posFloat,
+                ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, (S16Vec*)(polygonBytes + (outVertex * 6) + 0x10), posFloat,
                                                     *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
             }
 
@@ -448,10 +448,10 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             normal.y *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
             normal.z *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
             PSVECNormalize(&normal, &normal);
-            ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)gUtil, &polygonData->m_normalA, &normal, normQuant);
+            ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygonData->m_normalA, normal, normQuant);
         } else {
             polygonData->m_normalA = workNormals[polygonData->m_nrmIndices[0]];
-            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &normal, &polygonData->m_normalA, normQuant);
+            ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &normal, polygonData->m_normalA, normQuant);
         }
 
         PSVECCrossProduct(&up, &normal, &tangent);
@@ -476,7 +476,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             polygonData->m_normalA.z = 0;
         }
 
-        ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)gUtil, &polygonData->m_normalB, &tangent, normQuant);
+        ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygonData->m_normalB, tangent, normQuant);
         polygonData++;
     }
 }
@@ -540,10 +540,10 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             worldPos.x = srcPos->x;
                             worldPos.y = srcPos->y;
                             worldPos.z = srcPos->z;
-                            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &transformedPos, &worldPos,
+                            ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &transformedPos, worldPos,
                                                                  posQuant);
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
-                            ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)gUtil, dst, &transformedPos,
+                            ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, dst, transformedPos,
                                                                  posQuant);
                         } else {
                             *dst = *srcPos;
@@ -613,7 +613,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             pos.x = *(short*)(polygon + 0x10 + (i * 6));
                             pos.y = *(short*)(polygon + 0x12 + (i * 6));
                             pos.z = *(short*)(polygon + 0x14 + (i * 6));
-                            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &verts[i], &pos, posQuant);
+                            ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &verts[i], pos, posQuant);
                             PSVECAdd(&center, &verts[i], &center);
                         }
 
@@ -622,12 +622,12 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         normalB.x = *(short*)(polygon + 0xA);
                         normalB.y = *(short*)(polygon + 0xC);
                         normalB.z = *(short*)(polygon + 0xE);
-                        ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &axis, &normalB, normQuant);
+                        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &axis, normalB, normQuant);
 
                         normalA.x = *(short*)(polygon + 4);
                         normalA.y = *(short*)(polygon + 6);
                         normalA.z = *(short*)(polygon + 8);
-                        ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &velocity, &normalA, normQuant);
+                        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &velocity, normalA, normQuant);
                         PSVECScale(&velocity, &velocity, *(float*)(stepData + 0x38) + Math.RandF(*(float*)(stepData + 0x3C)));
 
                         C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon[1]);
@@ -678,7 +678,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             verts[i].y += *(float*)(stepData + 0x1C) * *(float*)(workData + 0x10);
                             verts[i].z += *(float*)(stepData + 0x20) * *(float*)(workData + 0x10);
 
-                            ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)gUtil, (S16Vec*)(polygon + 0x10 + (i * 6)), &verts[i],
+                            ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, (S16Vec*)(polygon + 0x10 + (i * 6)), verts[i],
                                                                  posQuant);
                         }
                         *(short*)(polygon + 2) = *(short*)(polygon + 2) + 1;
@@ -897,10 +897,10 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
 
             if (strcmp(meshData->m_name, "") == 0) {
                 CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
-                    gUtil,
+                    &gUtil,
                     &work->m_bboxMin,
                     &work->m_bboxMax,
-                    *(void**)mesh,
+                    *(S16Vec**)mesh,
                     meshData->m_vertexCount,
                     *(u32*)(*(u32*)(model + 0xA4) + 0x34));
             }
@@ -944,9 +944,10 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     }
 
                     memcpy(dlPair->m_rewrittenDisplayList, displayList->m_data, dlPair->m_displayListSize);
-                    ReWriteDisplayList__5CUtilFPvUlUl(gUtil, dlPair->m_rewrittenDisplayList, dlPair->m_displayListSize, 1);
+                    ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, dlPair->m_rewrittenDisplayList, dlPair->m_displayListSize, 1);
 
-                    dlPair->m_polygonCount = (u16)GetNumPolygonFromDL__5CUtilFPvUl(gUtil, dlPair->m_rewrittenDisplayList);
+                    dlPair->m_polygonCount =
+                        (u16)GetNumPolygonFromDL__5CUtilFPvUl(&gUtil, dlPair->m_rewrittenDisplayList, dlPair->m_displayListSize);
                     dlPair->m_polygonData = (POLYGON_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                         dlPair->m_polygonCount * 0x34, pppEnvStPtr->m_stagePtr,
                         const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x423);

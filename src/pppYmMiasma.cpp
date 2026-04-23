@@ -1,6 +1,6 @@
 #include "ffcc/pppYmMiasma.h"
+#include "ffcc/game.h"
 #include "ffcc/math.h"
-#include "ffcc/p_game.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
@@ -20,6 +20,7 @@ extern float FLOAT_80330664;
 extern float FLOAT_80330668;
 extern float FLOAT_80330658;
 extern double DOUBLE_80330648;
+extern CGame Game;
 extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);

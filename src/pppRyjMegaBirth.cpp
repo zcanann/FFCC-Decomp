@@ -299,34 +299,27 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 	_PARTICLE_COLOR* colorData;
 	PARTICLE_WMAT* worldMats;
 	_PARTICLE_DATA* particle;
-	u16* emitTimer;
 	u8* paramPayload;
-	u16 emitRate;
-	u16 emitPerFrame;
 
 	emitCount = 0;
 	particle = (_PARTICLE_DATA*)work->m_particleBlock;
 	worldMats = work->m_worldMatrixBlock;
 	colorData = work->m_colorBlock;
-	maxParticles = *(s32*)((u8*)work + 0x48);
-	emitTimer = (u16*)((u8*)work + 0x4C);
+	maxParticles = work->m_numParticles;
 	paramPayload = (u8*)param;
-	emitRate = *(u16*)(paramPayload + 0x24);
-	emitPerFrame = *(u16*)(paramPayload + 0x22);
 
-	if ((gPppCalcDisabled == 0) && (*(u32*)(paramPayload + 4) != 0xFFFFFFFF))
+	if ((gPppCalcDisabled == 0) && (*(s32*)(paramPayload + 4) != 0xFFFF))
 	{
-		*emitTimer = *emitTimer + 1;
+		work->m_emitTimer = work->m_emitTimer + 1;
 
 		for (i = 0; i < maxParticles; i = i + 1)
 		{
-			if (*(s16*)((u8*)particle + 0x22) != 0)
+			if (*(u16*)((u8*)particle + 0x22) != 0)
 			{
 				calc(work, param, particle, color, colorData);
 
 				frame = *(u16*)((u8*)particle + 0x1E);
-				colorSet = **(s32**)(*(s32*)&pppEnvStPtr->m_particleColors[0] +
-				                     (s32)paramPayload[0x05] * 4);
+				colorSet = (s32)**(s32***)(*(s32*)&pppEnvStPtr->m_particleColors[0] + *(s32*)(paramPayload + 4) * 4);
 				*(u16*)((u8*)particle + 0x20) = frame;
 				frameData = colorSet + (u32)frame * 8 + 0x10;
 
@@ -354,7 +347,8 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 					}
 				}
 			}
-			else if ((emitRate <= *emitTimer) && (emitCount < (s32)emitPerFrame))
+			else if ((*(u16*)(paramPayload + 0x24) <= work->m_emitTimer) &&
+			         (emitCount < (s32)*(u16*)(paramPayload + 0x22)))
 			{
 				birth(pObject, work, param, color, particle, (_PARTICLE_WMAT*)worldMats, colorData);
 				emitCount = emitCount + 1;
@@ -375,7 +369,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 
 		if (emitCount > 0)
 		{
-			*emitTimer = 0;
+			work->m_emitTimer = 0;
 		}
 	}
 }

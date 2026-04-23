@@ -566,17 +566,18 @@ void GbaQueue::LoadMask()
 int GbaQueue::SetQueue(int channel, unsigned int value)
 {
 	int ret;
-	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
+	char* playerData = reinterpret_cast<char*>(this) + 0x458 + channel;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	if (compatibilityStr[channel - 0x18] == 0) {
-		if (*(int*)(compatibilityStr + channel * 4 - 0x28) < 0x40) {
+	if (playerData[-0x18] == 0) {
+		int* queueCount = reinterpret_cast<int*>(playerData + channel * 3 - 0x28);
+		if (*queueCount < 0x40) {
 			ret = 0;
-			*(unsigned int*)(reinterpret_cast<char*>(accessSemaphores) + *(int*)(compatibilityStr + channel * 4 - 0x28) * 4 + channel * 0x100 + 0x30) = value;
-			*(int*)(compatibilityStr + channel * 4 - 0x28) = *(int*)(compatibilityStr + channel * 4 - 0x28) + 1;
+			reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + channel * 0x100 + 0x30)[*queueCount] = value;
+			*queueCount = *queueCount + 1;
 		} else {
 			ret = -1;
-			compatibilityStr[channel - 0x18] = 1;
+			playerData[-0x18] = 1;
 		}
 	} else {
 		ret = -1;

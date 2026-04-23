@@ -1,7 +1,6 @@
 #include "ffcc/pppVertexApMtx.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
-#include "ffcc/pppPart.h"
 
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
@@ -57,6 +56,12 @@ struct VertexApMtxObject
 	u8 unk0[0x10];
 	Mtx localMatrix;
 };
+
+struct _pppPDataVal;
+
+_pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
+
+extern "C" const f64 DOUBLE_80330DD0 = 4503599627370496.0;
 
 /*
  * --INFO--

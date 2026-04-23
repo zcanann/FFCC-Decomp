@@ -38,10 +38,14 @@ extern "C" float FLOAT_803332a4;
 extern "C" float FLOAT_80333280;
 extern "C" float FLOAT_80333284;
 extern "C" float FLOAT_80333288;
+extern "C" float FLOAT_80333290;
 extern "C" float FLOAT_80333298;
+extern "C" float FLOAT_803332a0;
 extern "C" float FLOAT_80333278;
 extern "C" float FLOAT_8033327c;
 extern "C" float FLOAT_8033324c;
+extern "C" float FLOAT_803332a8;
+extern "C" float FLOAT_803332ac;
 extern "C" float FLOAT_803332d8;
 extern "C" float FLOAT_803332e8;
 extern "C" float FLOAT_803332ec;
@@ -73,9 +77,14 @@ extern "C" float FLOAT_803333a8;
 extern "C" float FLOAT_803333ac;
 extern "C" float FLOAT_803333b0;
 extern "C" float FLOAT_803333c8;
+extern "C" float FLOAT_80333304;
+extern "C" float FLOAT_803332c0;
+extern "C" float FLOAT_803332c4;
+extern "C" float FLOAT_803332c8;
 extern "C" double DOUBLE_803332d0;
 extern "C" double DOUBLE_80333270;
 extern "C" double DOUBLE_80333268;
+extern "C" double DOUBLE_80333288;
 extern "C" double DOUBLE_80333298;
 extern "C" double DOUBLE_803333a0;
 extern "C" double DOUBLE_803333b8;
@@ -2530,15 +2539,13 @@ void CMenuPcs::CmakeVillageDraw()
 {
     int villageWork = MenuS32(this, 0x830);
     short mode = *reinterpret_cast<short*>(villageWork + 0x10);
-    short frame = *reinterpret_cast<short*>(villageWork + 0x22);
+    int frame = static_cast<int>(*reinterpret_cast<short*>(villageWork + 0x22)) - 1;
     short select = *reinterpret_cast<short*>(villageWork + 0x26);
     short row = *reinterpret_cast<short*>(villageWork + 0x28);
     short table = *reinterpret_cast<short*>(villageWork + 0x2A);
     float alpha;
 
-    if (frame > 0) {
-        frame = static_cast<short>(frame - 1);
-    } else {
+    if (frame < 0) {
         frame = 0;
     }
 
@@ -2549,10 +2556,6 @@ void CMenuPcs::CmakeVillageDraw()
     } else {
         alpha = static_cast<float>(DOUBLE_80333270 - DOUBLE_80333268 * static_cast<double>(frame));
     }
-
-    DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
-    DrawCmakeWin(0.0f, 0.0f, FLOAT_80333258);
-    DrawCmakeTitle(0, 0.0f, alpha);
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
@@ -2570,16 +2573,27 @@ void CMenuPcs::CmakeVillageDraw()
     DrawRect__8CMenuPcsFUlfffffffff(
         MenuPcsVoid(), 0, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+
+    DrawCmakeTitle(0, alpha, FLOAT_80333258);
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
+    GXSetChanMatColor(GX_COLOR0A0, col);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), (MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A);
+    float panelX = -(FLOAT_80333290 * static_cast<float>(DOUBLE_80333298) - static_cast<float>(DOUBLE_80333288));
     DrawRect__8CMenuPcsFUlfffffffff(
-        MenuPcsVoid(), 0, 32.0f, 160.0f, FLOAT_803332a4, FLOAT_8033327c,
+        MenuPcsVoid(), 0, panelX, FLOAT_803332a0, FLOAT_80333290, FLOAT_8033327c,
         FLOAT_80333254, FLOAT_803332a4, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
+    GXSetChanMatColor(GX_COLOR0A0, col);
     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), (MenuS16(this, 0x86C) != 0) ? 0x68 : 0x41);
     DrawRect__8CMenuPcsFUlfffffffff(
-        MenuPcsVoid(), 0, 168.0f, 172.0f, FLOAT_803332b0, FLOAT_803332b0,
+        MenuPcsVoid(), 0, FLOAT_803332a8, FLOAT_803332ac, FLOAT_803332b0, FLOAT_803332b0,
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
     DrawRect__8CMenuPcsFUlfffffffff(
-        MenuPcsVoid(), 0, 232.0f, 172.0f, FLOAT_803332b0, FLOAT_803332b0,
+        MenuPcsVoid(), 0, static_cast<float>(DOUBLE_803333b8), FLOAT_803332ac, FLOAT_803332b0, FLOAT_803332b0,
         FLOAT_803332b0, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
     if (mode == 1 && row < 5) {
@@ -2596,21 +2610,24 @@ void CMenuPcs::CmakeVillageDraw()
     font->SetShadow(0);
     font->SetScale(FLOAT_80333258);
     font->DrawInit();
-    font->SetMargin(FLOAT_80333258);
+    font->SetMargin(FLOAT_803332c4);
     font->SetColor(col);
 
     for (int i = 0; i < 5; i++) {
         const char* rowText = s_cmakeNameRows[table * 5 + i];
-        font->SetPosX(200.0f);
-        font->SetPosY(108.0f + i * 32.0f);
+        font->SetPosX(FLOAT_803332c8);
+        font->SetPosY(static_cast<float>(0x6C + i * 0x20));
         font->Draw(rowText);
     }
 
+    reinterpret_cast<unsigned char*>(font)[0x24] &= 0xEF;
+
     DrawInit__8CMenuPcsFv(this);
     if (mode == 1 && row < 5) {
+        int wobble = System.m_frameCounter & 7;
         DrawCursor__8CMenuPcsFiif(this,
-            200 + select * 20 + (System.m_frameCounter & 7),
-            112 + row * 32, alpha);
+            static_cast<int>(FLOAT_803332c8 + select * FLOAT_803332c0) + wobble,
+            row * 0x20 + 0x70, alpha);
     }
 
     int showNameCursor = (mode == 1 && row < 5 && strlen(s_CmakeInfo.m_name) <= 6) ? 1 : 0;

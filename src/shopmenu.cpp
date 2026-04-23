@@ -212,9 +212,9 @@ void CMenuPcs::CreateSmithMenu()
  * Address:	TODO
  * Size:	TODO
  */
-void _drawNoShadowFont(CFont*, char*, float, float, int, int)
+void _drawNoShadowFont(CFont* font, char* text, float x, float y, int tlut, int flags)
 {
-	// TODO
+	DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, text, x, y, tlut, flags);
 }
 
 /*
@@ -222,9 +222,9 @@ void _drawNoShadowFont(CFont*, char*, float, float, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void _drawShadowFont(CFont*, char*, float, float, int, int)
+void _drawShadowFont(CFont* font, char* text, float x, float y, int tlut, int flags)
 {
-	// TODO
+	DrawShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, text, x, y, tlut, flags);
 }
 
 /*

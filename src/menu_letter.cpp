@@ -1226,40 +1226,9 @@ void CMenuPcs::LetterListDraw()
 		pageMark = static_cast<unsigned char>(pageMark | 2);
 	}
 
-	if (pageMark != 0) {
-		const int frame = static_cast<int>(System.m_frameCounter);
-		const int cycle = ((frame / 0x14) + (frame >> 31));
-		const int phase = (frame + (cycle - (cycle >> 31)) * -0x14) - 10;
-		const unsigned int absPhase = static_cast<unsigned int>(phase < 0 ? -phase : phase);
-		const double markScale = static_cast<double>(static_cast<float>(DOUBLE_80333098 * static_cast<double>(absPhase) + DOUBLE_80333090));
-
-		SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
-
-		const int alpha = static_cast<int>(FLOAT_803330a0 *
-		                                   static_cast<float>(DOUBLE_803330b0 * static_cast<double>(absPhase) + DOUBLE_803330a8));
-		GXColor markColor = {0xFF, 0xFF, 0xFF, static_cast<u8>(alpha)};
-		GXSetChanMatColor(GX_COLOR0A0, markColor);
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x43);
-
-		const double iconSize = static_cast<double>(FLOAT_803330b8);
-		const double iconOffset = -static_cast<double>(static_cast<float>((iconSize * markScale - iconSize) * DOUBLE_803330a8));
-		const double markX = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80333088) + iconOffset));
-		const double markY = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_8033308c) + iconOffset));
-
-		if ((pageMark & 1) != 0) {
-			DrawRect__8CMenuPcsFUlfffffffff(
-			    markX, markY, iconSize, iconSize,
-			    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
-			    markScale, markScale, this, 4);
-		}
-		if ((pageMark & 2) != 0) {
-			DrawRect__8CMenuPcsFUlfffffffff(
-			    markX, static_cast<double>(static_cast<float>(markY + static_cast<double>(FLOAT_803330c0))),
-			    iconSize, iconSize,
-			    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
-			    markScale, markScale, this, 0);
-		}
-	}
+    if (pageMark != 0) {
+        LetterDrawPageMark(pageMark);
+    }
 
 	unsigned int iconY = 0x5B;
 	const int iconX = static_cast<int>(FLOAT_80333168);
@@ -2001,9 +1970,41 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LetterDrawPageMark(int)
+void CMenuPcs::LetterDrawPageMark(int pageMark)
 {
-	// TODO
+	const int frame = static_cast<int>(System.m_frameCounter);
+	const int cycle = ((frame / 0x14) + (frame >> 31));
+	const int phase = (frame + (cycle - (cycle >> 31)) * -0x14) - 10;
+	const unsigned int absPhase = static_cast<unsigned int>(phase < 0 ? -phase : phase);
+	const double markScale = static_cast<double>(static_cast<float>(DOUBLE_80333098 * static_cast<double>(absPhase) + DOUBLE_80333090));
+
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+	const int alpha = static_cast<int>(FLOAT_803330a0 *
+	                                   static_cast<float>(DOUBLE_803330b0 * static_cast<double>(absPhase) + DOUBLE_803330a8));
+	GXColor markColor = {0xFF, 0xFF, 0xFF, static_cast<u8>(alpha)};
+	GXSetChanMatColor(GX_COLOR0A0, markColor);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x43);
+
+	const double iconSize = static_cast<double>(FLOAT_803330b8);
+	const double iconOffset = -static_cast<double>(static_cast<float>((iconSize * markScale - iconSize) * DOUBLE_803330a8));
+	const double markX = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80333088) + iconOffset));
+	const double markY = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_8033308c) + iconOffset));
+
+	if ((pageMark & 1) != 0) {
+		DrawRect__8CMenuPcsFUlfffffffff(
+		    markX, markY, iconSize, iconSize,
+		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
+		    markScale, markScale, this, 4);
+	}
+
+	if ((pageMark & 2) != 0) {
+		DrawRect__8CMenuPcsFUlfffffffff(
+		    markX, static_cast<double>(static_cast<float>(markY + static_cast<double>(FLOAT_803330c0))),
+		    iconSize, iconSize,
+		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
+		    markScale, markScale, this, 0);
+	}
 }
 
 /*

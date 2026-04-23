@@ -360,12 +360,16 @@ void CMenuPcs::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800974a4
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::Quit()
 {
-	// TODO
+	return;
 }
 
 /*

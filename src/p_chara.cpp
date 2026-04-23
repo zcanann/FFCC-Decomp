@@ -6,6 +6,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/p_light.h"
 #include "ffcc/p_tina.h"
+#include "ffcc/pppDrawMng.h"
 #include "ffcc/textureman.h"
 extern "C" {
 extern u8* gCharaPartWorkPtr;
@@ -53,6 +54,9 @@ extern "C" void AttachTextureSet__Q26CChara6CModelFP11CTextureSet(void*, void*);
 extern "C" void Init__Q26CChara6CModelFv(void*);
 extern "C" void* Duplicate__Q26CChara6CModelFPQ27CMemory6CStage(void*, void*);
 extern "C" void InitMogFurTex__Q26CChara6CModelFv(void*);
+extern "C" void Draw__Q26CChara6CModelFPA4_fii(void*, Mtx, int, int);
+extern "C" void DrawShadow__Q26CChara6CModelFPA4_fi(void*, Mtx, int);
+extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void*, Mtx, int);
 extern "C" void* __ct__Q26CChara5CAnimFv(void*);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void LoadSe__6CSoundFPv(void*, void*);
@@ -410,6 +414,31 @@ static inline CMemory::CStage* HandleModelStage(int charaKind, int specialModelS
 static inline CMemory::CStage* HandleTextureStage(int charaKind)
 {
     return SelectLoadStage(&CharaPcs, StageAt(&CharaPcs, charaKind == 4 ? 0xD8U : 0xD0U));
+}
+
+static inline Mtx* ModelLocalMtx(CChara::CModel* model)
+{
+    return reinterpret_cast<Mtx*>(Ptr(model, 8));
+}
+
+static inline _GXColor BlendColor(const _GXColor& a, const _GXColor& b, float t)
+{
+    _GXColor out;
+    out.r = static_cast<unsigned char>(a.r + static_cast<int>((b.r - a.r) * t));
+    out.g = static_cast<unsigned char>(a.g + static_cast<int>((b.g - a.g) * t));
+    out.b = static_cast<unsigned char>(a.b + static_cast<int>((b.b - a.b) * t));
+    out.a = static_cast<unsigned char>(a.a + static_cast<int>((b.a - a.a) * t));
+    return out;
+}
+
+static inline _GXColor ModulateColor(const _GXColor& src, const _GXColor& shade)
+{
+    _GXColor out;
+    out.r = static_cast<unsigned char>((static_cast<unsigned int>(src.r) * shade.r) / 255);
+    out.g = static_cast<unsigned char>((static_cast<unsigned int>(src.g) * shade.g) / 255);
+    out.b = static_cast<unsigned char>((static_cast<unsigned int>(src.b) * shade.b) / 255);
+    out.a = src.a;
+    return out;
 }
 
 static inline bool HasLoadedMergeFile(CCharaPcs* self, int mergeFileId)
@@ -2047,9 +2076,178 @@ void CCharaPcs::CHandle::Draw(int drawPass)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CHandle::draw(int, int)
+void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 {
-	// TODO
+    if (m_model == 0) {
+        return;
+    }
+
+    const unsigned int flags = m_flags;
+    if ((flags & 1) == 0 || (flags & 0x400000) != 0) {
+        return;
+    }
+    if (drawPass == 1 && (flags & 0x40) != 0) {
+        return;
+    }
+    if (drawPass == 2 && (flags & 0x200) == 0) {
+        return;
+    }
+    if (drawPass == 0 && (flags & 0x4000) != 0) {
+        return;
+    }
+    if (drawPass == 3 && (flags & 0x81C) == 0) {
+        return;
+    }
+    if ((drawPass == 0 || drawPass == 4) && (flags & 0x10) != 0) {
+        return;
+    }
+
+    if (immediatePass == 0 && drawPass == 0 && (flags & 0x40000) == 0) {
+        ppvDrawMng.AddPrim(-m_sortZ, this);
+        return;
+    }
+
+    Mtx viewMtx;
+    PSMTXCopy(*reinterpret_cast<Mtx*>(Ptr(&CameraPcs, 4)), viewMtx);
+
+    if (drawPass != 1 && drawPass != 2 && (flags & 0x200000) == 0) {
+        const unsigned int lightBank = (flags >> 19) & 1;
+        const float phase = m_colorPhase * 4.0f;
+        int phaseIndex = static_cast<int>(phase);
+        if (phaseIndex < 0) {
+            phaseIndex = 0;
+        }
+        if (phaseIndex > 3) {
+            phaseIndex = 3;
+        }
+        const float blendT = phase - static_cast<float>(phaseIndex);
+        _GXColor* phaseColors = reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0x12C));
+        const _GXColor shade = BlendColor(phaseColors[phaseIndex], phaseColors[phaseIndex + 1], blendT);
+        const _GXColor ambientBase = *reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0xE8 + lightBank * 4));
+        const _GXColor ambientColor = ModulateColor(ambientBase, shade);
+        LightPcs.SetAmbient(ambientColor);
+
+        for (unsigned long i = 0; i < 3; i++) {
+            const _GXColor diffuseBase =
+                *reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0xF0 + lightBank * 0x0C + static_cast<unsigned int>(i) * 4));
+            LightPcs.SetDiffuseColor(i, ModulateColor(diffuseBase, shade));
+        }
+
+        Vec lightPos;
+        Mtx* modelMtx = ModelLocalMtx(m_model);
+        lightPos.x = (*modelMtx)[0][3];
+        lightPos.y = (*modelMtx)[1][3];
+        lightPos.z = (*modelMtx)[2][3];
+        LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), &lightPos, 0xFFFFFFFF);
+    }
+
+    if (drawPass == 3) {
+        if ((flags & 4) != 0) {
+            const float offsetY = 0.25f * (m_worldPosY - m_bgCharmPlaneY);
+            viewMtx[0][3] += viewMtx[0][1] * offsetY;
+            viewMtx[1][3] += viewMtx[1][1] * offsetY;
+            viewMtx[2][3] += viewMtx[2][1] * offsetY;
+            viewMtx[0][1] *= 0.5f;
+            viewMtx[1][1] *= 0.5f;
+            viewMtx[2][1] *= 0.5f;
+        } else if ((flags & 8) != 0) {
+            PSMTXConcat(viewMtx, reinterpret_cast<MtxPtr>(Ptr(&CFlat, 0x12B4)), viewMtx);
+        }
+    } else if (drawPass == 2) {
+        Mtx* modelMtx = ModelLocalMtx(m_model);
+        Vec modelPos;
+        modelPos.x = (*modelMtx)[0][3];
+        modelPos.y = (*modelMtx)[1][3];
+        modelPos.z = (*modelMtx)[2][3];
+
+        Vec focusPos = *reinterpret_cast<Vec*>(Ptr(&CharaPcs, 0x17C));
+        Vec delta;
+        PSVECSubtract(&focusPos, &modelPos, &delta);
+        if (delta.x == 0.0f && delta.z == 0.0f) {
+            return;
+        }
+
+        const float distance = PSVECMag(&delta);
+        const float shadowRange = *reinterpret_cast<float*>(Ptr(&CharaPcs, 0x188));
+        if (distance > shadowRange) {
+            return;
+        }
+
+        PSVECNormalize(&delta, &delta);
+
+        Vec up = {0.0f, 1.0f, 0.0f};
+        Vec eye = modelPos;
+        eye.y += 1.0f;
+
+        Vec shadowPos;
+        PSVECScale(&delta, &shadowPos, static_cast<float>(*reinterpret_cast<int*>(Ptr(&CharaPcs, 0x48))));
+        PSVECAdd(&modelPos, &shadowPos, &shadowPos);
+        shadowPos.y += 1.0f;
+
+        C_MTXLookAt(m_shadowViewMtx, reinterpret_cast<Point3d*>(&shadowPos), &up, reinterpret_cast<Point3d*>(&eye));
+        PSMTXCopy(m_shadowViewMtx, viewMtx);
+
+        _GXColor shadowFog = *reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0x18C));
+        GXSetFog(GX_FOG_ORTHO_LIN, 0.0f, shadowRange, 0.0f, 512.0f, shadowFog);
+    }
+
+    bool restoreFog = false;
+    if ((drawPass == 0 || drawPass == 4) && m_fogBlend > 0.0f) {
+        _GXColor fogColor = *reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0x18C));
+        GXSetFog(GX_FOG_PERSP_LIN, m_fogBlend, m_fogBlend + 2.0f, 0.0f, 1024.0f, fogColor);
+        restoreFog = true;
+    }
+
+    if (drawPass == 1 || drawPass == 2) {
+        if (drawPass == 2) {
+            const unsigned short shadowSize = static_cast<unsigned short>(*reinterpret_cast<int*>(Ptr(&CharaPcs, 0x44)));
+            GXSetTexCopySrc(0, 0, shadowSize, shadowSize);
+            GXSetTexCopyDst(shadowSize, shadowSize, GX_TF_I8, GX_FALSE);
+            m_shadowTexturePtr = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(Ptr(&CharaPcs, 0x140))) +
+                                 *reinterpret_cast<unsigned int*>(Ptr(&CharaPcs, 0x148));
+            DCInvalidateRange(m_shadowTexturePtr, (shadowSize * shadowSize) / 2);
+            GXCopyTex(m_shadowTexturePtr, GX_TRUE);
+        }
+
+        const int shadowMode = __cntlzw(static_cast<unsigned int>(1 - drawPass)) >> 5;
+        DrawShadow__Q26CChara6CModelFPA4_fi(m_model, viewMtx, shadowMode);
+
+        if (drawPass == 2) {
+            const unsigned int shadowBytes =
+                (static_cast<unsigned int>(*reinterpret_cast<int*>(Ptr(&CharaPcs, 0x44))) *
+                 static_cast<unsigned int>(*reinterpret_cast<int*>(Ptr(&CharaPcs, 0x44)))) /
+                2;
+            GXCopyTex(m_shadowTexturePtr, GX_TRUE);
+            *reinterpret_cast<unsigned int*>(Ptr(&CharaPcs, 0x148)) += shadowBytes;
+            GXPixModeSync();
+        }
+    } else {
+        int modelDrawFlags = 0;
+        if (drawPass == 3 && (flags & 0x0C) != 0) {
+            modelDrawFlags |= 1;
+        }
+        if ((flags & 0x400) != 0) {
+            modelDrawFlags |= 2;
+        }
+        if ((flags & 0x2000) != 0) {
+            modelDrawFlags |= 4;
+        }
+        if (drawPass == 3 && (flags & 0x8000) != 0) {
+            modelDrawFlags |= 8;
+        }
+        if ((flags & 0x100000) != 0) {
+            modelDrawFlags |= 0x10;
+        }
+        Draw__Q26CChara6CModelFPA4_fii(m_model, viewMtx, modelDrawFlags, 0);
+    }
+
+    if (drawPass == 0 || drawPass == 4) {
+        DrawFur__Q26CChara6CModelFPA4_fi(m_model, viewMtx, static_cast<int>((flags >> 23) & 1));
+    }
+
+    if (restoreFog) {
+        SetFog__8CGraphicFii(&Graphic, 1, 0);
+    }
 }
 
 /*

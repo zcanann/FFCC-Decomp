@@ -201,7 +201,7 @@ int CMenuPcs::MLstClose()
 				if (currentFrame < entry->startFrame + entry->duration) {
 					entry->timer = entry->timer + 1;
 					entry->alpha =
-						(float)-((DOUBLE_80333410 / (double)entry->duration) * (double)entry->timer - DOUBLE_80333410);
+						(float)(DOUBLE_80333410 - (DOUBLE_80333410 / (double)entry->duration) * (double)entry->timer);
 					if ((double)entry->alpha < DOUBLE_80333418) {
 						entry->alpha = FLOAT_803333D0;
 					}

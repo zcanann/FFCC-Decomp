@@ -28,9 +28,15 @@ extern "C" {
 
 void Init__7CSystemFv(CSystem*);
 void Quit__7CSystemFv(CSystem*);
-extern void* __RTTI__7CSystem[];
-void* g_CSystemRttiBase[] = {0, 0, __RTTI__7CSystem};
-void* __vt__7CSystem[] = {0, (void*)Init__7CSystemFv, (void*)Quit__7CSystemFv, 0};
+extern void* __RTTI__8CManager[];
+}
+
+static const char s_cSystem[] = "CSystem";
+
+extern "C" {
+void* g_CSystemRttiBase[] = {__RTTI__8CManager, 0, 0};
+void* __RTTI__7CSystem[] = {(void*)s_cSystem, g_CSystemRttiBase};
+void* __vt__7CSystem[] = {__RTTI__7CSystem, 0, (void*)Init__7CSystemFv, (void*)Quit__7CSystemFv, 0};
 }
 
 CSystem System;
@@ -57,7 +63,6 @@ struct CScenegraphDesc {
     CScenegraphEntry m_entries[1];
 };
 
-static const char s_cSystem[] = "CSystem";
 static const char s_system_cpp[] = "system.cpp";
 static const char s_gamePalM_map[] = "gamePalM.map";
 static const char s_compilerMapLoaded[] =

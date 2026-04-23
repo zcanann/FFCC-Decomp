@@ -218,13 +218,12 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
                 }
             }
 
-            s16 particleAlpha = particle->m_alpha;
-            float scaledAlpha = (float)particleAlpha * alphaScale;
-            int alpha = (int)scaledAlpha;
-            s16 remaining = particle->m_fieldA - 1;
-            particle->m_fieldA = remaining;
+            s16 life = particle->m_fieldA;
+            int alpha = (int)((float)particle->m_alpha * alphaScale);
+            life--;
+            particle->m_fieldA = life;
 
-            if (remaining <= 0) {
+            if (life <= 0) {
                 int jitter = 0;
                 if (payload[0xD] != 0) {
                     jitter = rand() % payload[0xD];

@@ -39,9 +39,8 @@ CGbaPcsTable CGbaPcs::m_table = {
     },
 };
 unsigned int CGbaPcs_RTTI_base__7CGbaPcs[3] = {reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, 0};
-unsigned int CGbaPcs_RTTI_pad__7CGbaPcs = 0;
-unsigned int CGbaPcs_RTTI__7CGbaPcs[4] = {
-    reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, reinterpret_cast<unsigned int>(__RTTI__8CProcess), 0
+unsigned int CGbaPcs_RTTI__7CGbaPcs[5] = {
+    reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, reinterpret_cast<unsigned int>(__RTTI__8CProcess), 0, 0
 };
 
 CGbaPcs GbaPcs;

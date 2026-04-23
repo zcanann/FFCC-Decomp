@@ -98,6 +98,11 @@ static inline u16 ModelMeshCount(CChara::CModel* model)
 	return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x0A);
 }
 
+static inline u16 ModelNodeCount(CChara::CModel* model)
+{
+	return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x08);
+}
+
 static inline CMaterialSet* ModelMaterialSet(CChara::CModel* model)
 {
 	return *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(ModelRef(model)) + 0x20);
@@ -136,6 +141,16 @@ static inline float ModelLightAlpha(CChara::CModel* model)
 static inline u32 ModelMeshVisibleMask(CChara::CModel* model)
 {
 	return *reinterpret_cast<u32*>(ModelRaw(model) + 0x98);
+}
+
+static inline void*& ModelDynParams(CChara::CModel* model)
+{
+	return *reinterpret_cast<void**>(reinterpret_cast<u8*>(ModelRef(model)) + 0x34);
+}
+
+static inline u32& ModelDynCount(CChara::CModel* model)
+{
+	return *reinterpret_cast<u32*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x38);
 }
 
 static inline u8 ModelFlagsA0(CChara::CModel* model)
@@ -261,6 +276,16 @@ static inline void SetMaterialManNormalArray(void* normals)
 static inline u32 CharaFourCC(char a, char b, char c, char d)
 {
 	return (static_cast<u32>(a) << 24) | (static_cast<u32>(b) << 16) | (static_cast<u32>(c) << 8) | static_cast<u32>(d);
+}
+
+static inline char* NodeRefName(CChara::CNode* node)
+{
+	return reinterpret_cast<char*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x74);
+}
+
+static inline u8& NodeDynParamIndex(CChara::CNode* node)
+{
+	return *(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x64);
 }
 
 static const char s_chara_cpp_801d90c8[] = "chara.cpp";
@@ -693,18 +718,96 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
  */
 void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 {
-	(void)dynData;
-	(void)stage;
-	void* ref = *(void**)((u8*)this + 0xA4);
-	if (ref == 0) {
+	if (ModelRef(this) == 0 || dynData == 0) {
 		return;
 	}
-	void** dynParams = (void**)((u8*)ref + 0x34);
-	if (*dynParams != 0) {
-		__dla__FPv(*dynParams);
-		*dynParams = 0;
+
+	CChunkFile chunkFile(dynData);
+	CChunkFile::CChunk chunk;
+	while (chunkFile.GetNextChunk(chunk)) {
+		if (chunk.m_id != CharaFourCC('C', 'H', 'D', ' ')) {
+			continue;
+		}
+
+		if (ModelDynParams(this) != 0) {
+			__dla__FPv(ModelDynParams(this));
+			ModelDynParams(this) = 0;
+		}
+		ModelDynCount(this) = 0;
+
+		CNode* nodes = ModelNodes(this);
+		for (u32 i = 0; i < ModelNodeCount(this); i++) {
+			NodeDynParamIndex(&nodes[i]) = 0xFF;
+		}
+
+		chunkFile.PushChunk();
+		while (chunkFile.GetNextChunk(chunk)) {
+			if (chunk.m_id == CharaFourCC('D', 'G', 'R', 'P')) {
+				if (chunk.m_size == 0) {
+					continue;
+				}
+
+				ModelDynCount(this) = 0;
+				ModelDynParams(this) = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+				    &Memory, chunk.m_size * 0x24, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x1E7, 0);
+				if (ModelDynParams(this) == 0) {
+					continue;
+				}
+
+				chunkFile.PushChunk();
+				while (chunkFile.GetNextChunk(chunk)) {
+					if (chunk.m_id != CharaFourCC('D', 'Y', 'N', ' ')) {
+						continue;
+					}
+
+					float* dynParam = reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + ModelDynCount(this) * 0x24);
+					chunkFile.PushChunk();
+					while (chunkFile.GetNextChunk(chunk)) {
+						if (chunk.m_id == CharaFourCC('P', 'A', 'R', 'M')) {
+							dynParam[0] = chunkFile.GetF4();
+							dynParam[1] = chunkFile.GetF4();
+							dynParam[2] = chunkFile.GetF4();
+							*reinterpret_cast<u32*>(dynParam + 3) = chunkFile.Get4();
+							*reinterpret_cast<u32*>(dynParam + 4) = chunkFile.Get4();
+							dynParam[5] = chunkFile.GetF4();
+							dynParam[7] = chunkFile.GetF4();
+							dynParam[6] = chunkFile.GetF4();
+							dynParam[8] = chunkFile.GetF4();
+						}
+					}
+					chunkFile.PopChunk();
+					ModelDynCount(this)++;
+				}
+				chunkFile.PopChunk();
+			} else if (chunk.m_id == CharaFourCC('N', 'S', 'E', 'T')) {
+				int currentNode = -1;
+				chunkFile.PushChunk();
+				while (chunkFile.GetNextChunk(chunk)) {
+					if (chunk.m_id == CharaFourCC('N', 'A', 'M', 'E')) {
+						currentNode = -1;
+						char* name = chunkFile.GetString();
+						for (u32 i = 0; i < ModelNodeCount(this); i++) {
+							if (strcmp(NodeRefName(&nodes[i]), name) == 0) {
+								currentNode = static_cast<int>(i);
+								break;
+							}
+						}
+					} else if (chunk.m_id == CharaFourCC('D', 'Y', 'N', ' ')) {
+						chunkFile.PushChunk();
+						while (chunkFile.GetNextChunk(chunk)) {
+							if (chunk.m_id == CharaFourCC('P', 'A', 'R', 'M') && currentNode >= 0) {
+								NodeDynParamIndex(&nodes[currentNode]) = static_cast<u8>(chunkFile.Get4());
+							}
+						}
+						chunkFile.PopChunk();
+					}
+				}
+				chunkFile.PopChunk();
+			}
+		}
+		chunkFile.PopChunk();
+		break;
 	}
-	*(u32*)((u8*)ref + 0x38) = 0;
 }
 
 /*

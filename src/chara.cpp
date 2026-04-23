@@ -2,6 +2,7 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/cflat_runtime.h"
 #include "ffcc/linkage.h"
+#include "ffcc/math.h"
 #include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_light.h"
@@ -158,6 +159,16 @@ static inline u8 ModelFlagsA0(CChara::CModel* model)
 	return *(ModelRaw(model) + 0xA0);
 }
 
+static inline u8& ModelFlags10C(CChara::CModel* model)
+{
+	return *(ModelRaw(model) + 0x10C);
+}
+
+static inline Vec& ModelDynJitter(CChara::CModel* model)
+{
+	return *reinterpret_cast<Vec*>(ModelRaw(model) + 0xC4);
+}
+
 static inline CTexAnimSet* ModelTexAnimSet(CChara::CModel* model)
 {
 	return *reinterpret_cast<CTexAnimSet**>(ModelRaw(model) + 0xD4);
@@ -286,6 +297,26 @@ static inline char* NodeRefName(CChara::CNode* node)
 static inline u8& NodeDynParamIndex(CChara::CNode* node)
 {
 	return *(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x64);
+}
+
+static inline float NodeBoneLen(CChara::CNode* node)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x70);
+}
+
+static inline MtxPtr NodeWorldMtx(CChara::CNode* node)
+{
+	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(node) + 0x44);
+}
+
+static inline Vec& NodeDynPosition(CChara::CNode* node)
+{
+	return *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(node) + 0xA4);
+}
+
+static inline Vec& NodeDynVelocity(CChara::CNode* node)
+{
+	return *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(node) + 0xB0);
 }
 
 static const char s_chara_cpp_801d90c8[] = "chara.cpp";
@@ -1060,14 +1091,118 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 {
 	(void)parent;
-	if (node == 0) {
+	if (node == 0 || ModelDynParams(this) == 0) {
 		return;
 	}
-	float* dynPos = (float*)((u8*)node + 0x84);
-	float* worldPos = (float*)((u8*)node + 0x50);
-	dynPos[0] += (worldPos[0] - dynPos[0]) * 0.5f;
-	dynPos[1] += (worldPos[1] - dynPos[1]) * 0.5f;
-	dynPos[2] += (worldPos[2] - dynPos[2]) * 0.5f;
+
+	u8 dynIndex = NodeDynParamIndex(node);
+	if (dynIndex == 0xFF || dynIndex >= ModelDynCount(this)) {
+		return;
+	}
+
+	float* dynParam = reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + dynIndex * 0x24);
+	MtxPtr nodeMtx = NodeWorldMtx(node);
+	Vec forward = {nodeMtx[0][0], nodeMtx[1][0], nodeMtx[2][0]};
+	Vec right = {nodeMtx[0][1], nodeMtx[1][1], nodeMtx[2][1]};
+	Vec up = {nodeMtx[0][2], nodeMtx[1][2], nodeMtx[2][2]};
+	Vec origin = {nodeMtx[0][3], nodeMtx[1][3], nodeMtx[2][3]};
+	float boneLen = NodeBoneLen(node);
+
+	PSVECNormalize(&forward, &forward);
+	Vec target;
+	PSVECScale(&forward, &target, boneLen);
+	PSVECAdd(&origin, &target, &target);
+
+	if ((ModelFlags10C(this) & 0x80) != 0) {
+		NodeDynPosition(node) = target;
+		NodeDynVelocity(node).x = 0.0f;
+		NodeDynVelocity(node).y = 0.0f;
+		NodeDynVelocity(node).z = 0.0f;
+		return;
+	}
+
+	float randomScale = Math.RandF() * 0.5f + 0.5f;
+	Vec windImpulse;
+	PSVECScale(&ModelDynJitter(this), &windImpulse, randomScale * dynParam[2]);
+
+	Vec targetDelta;
+	PSVECSubtract(&target, &NodeDynPosition(node), &targetDelta);
+	Vec accel;
+	PSVECAdd(&targetDelta, &windImpulse, &accel);
+	PSVECAdd(&NodeDynVelocity(node), &accel, &NodeDynVelocity(node));
+
+	Vec step;
+	PSVECScale(&NodeDynVelocity(node), &step, dynParam[0]);
+	Vec predicted;
+	PSVECAdd(&NodeDynPosition(node), &step, &predicted);
+	PSVECScale(&NodeDynVelocity(node), &NodeDynVelocity(node), dynParam[1]);
+
+	Vec direction;
+	PSVECSubtract(&predicted, &origin, &direction);
+	if (dynParam[3] != 0.0f) {
+		const float kDegToRad = 0.01745329252f;
+		for (int axis = 0; axis < 2; axis++) {
+			float dotForward = PSVECDotProduct(&forward, &direction);
+			float dotSide = PSVECDotProduct(axis == 0 ? &up : &right, &direction);
+			float angle = axis == 0 ? -atan2f(dotSide, dotForward) : atan2f(dotSide, dotForward);
+			float minAngle = dynParam[5] * kDegToRad;
+			float maxAngle = dynParam[7] * kDegToRad;
+			if (angle > minAngle && angle < maxAngle) {
+				continue;
+			}
+
+			float clamped = angle < minAngle ? minAngle : maxAngle;
+			Mtx rotate;
+			PSMTXRotAxisRad(rotate, axis == 0 ? &right : &up, clamped - angle);
+			PSMTXMultVecSR(rotate, &direction, &direction);
+			dynParam++;
+		}
+		dynParam -= 2;
+	}
+
+	float directionMag = PSVECMag(&direction);
+	if (directionMag > 0.0f) {
+		PSVECScale(&direction, &direction, 1.0f / directionMag);
+	}
+
+	float align = PSVECDotProduct(&forward, &direction);
+	if (align < 0.9999f) {
+		float clampedAlign = align;
+		if (clampedAlign < -1.0f) {
+			clampedAlign = -1.0f;
+		} else if (clampedAlign > 1.0f) {
+			clampedAlign = 1.0f;
+		}
+
+		Vec axis;
+		PSVECCrossProduct(&forward, &direction, &axis);
+		float axisMag = PSVECMag(&axis);
+		if (axisMag > 0.0f) {
+			PSVECScale(&axis, &axis, 1.0f / axisMag);
+			Mtx rotate;
+			Mtx base;
+			Mtx combined;
+			PSMTXCopy(nodeMtx, base);
+			base[0][3] = 0.0f;
+			base[1][3] = 0.0f;
+			base[2][3] = 0.0f;
+			PSMTXRotAxisRad(rotate, &axis, acosf(clampedAlign));
+			PSMTXConcat(rotate, base, combined);
+			nodeMtx[0][0] = combined[0][0];
+			nodeMtx[1][0] = combined[1][0];
+			nodeMtx[2][0] = combined[2][0];
+			nodeMtx[0][1] = combined[0][1];
+			nodeMtx[1][1] = combined[1][1];
+			nodeMtx[2][1] = combined[2][1];
+			nodeMtx[0][2] = combined[0][2];
+			nodeMtx[1][2] = combined[1][2];
+			nodeMtx[2][2] = combined[2][2];
+		}
+	}
+
+	Vec dynOffset;
+	PSVECScale(&direction, &dynOffset, boneLen);
+	PSVECAdd(&origin, &dynOffset, &NodeDynPosition(node));
 }
 
 /*

@@ -32,19 +32,19 @@ class CShopMenu
 {
 public:
     void SetMode(int);
-    void getItemCnt();
-    void calcGilRatio(int);
-    void getItemNo(int);
-    void getBuyGil(int);
-    void getSellGil(int);
-    void getMakeGil(int);
-    void getBuySellGil(int);
-    void GetItemName(int);
-    void GetMaxExchange();
-    void GetTotalGil();
-    void CanAddGil();
-    void CheckSell(int);
-    void getItemHaveCnt(int);
+    int getItemCnt();
+    int calcGilRatio(int);
+    int getItemNo(int);
+    int getBuyGil(int);
+    int getSellGil(int);
+    int getMakeGil(int);
+    int getBuySellGil(int);
+    char* GetItemName(int);
+    int GetMaxExchange();
+    int GetTotalGil();
+    int CanAddGil();
+    int CheckSell(int);
+    int getItemHaveCnt(int);
     void Init(int);
     void Destroy();
     void Calc();

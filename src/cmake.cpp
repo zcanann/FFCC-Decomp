@@ -130,6 +130,7 @@ struct CmakeInfo {
 };
 
 static CmakeInfo s_CmakeInfo;
+static char s_CmakeVillageName[0x12];
 
 static inline void* MenuPcsVoid()
 {
@@ -367,6 +368,18 @@ struct CmakeFlatDataOverlay {
 static inline char* GetCmakeNameBuffer()
 {
     return s_CmakeInfo.m_name;
+}
+
+static void LoadCmakeVillageName()
+{
+    memset(s_CmakeInfo.m_name, 0, sizeof(s_CmakeInfo.m_name));
+    strcpy(s_CmakeInfo.m_name, s_CmakeVillageName);
+}
+
+static void StoreCmakeVillageName()
+{
+    memset(s_CmakeVillageName, 0, sizeof(s_CmakeVillageName));
+    strcpy(s_CmakeVillageName, s_CmakeInfo.m_name);
 }
 
 static bool IsCmakeNameBlank(const char* name)
@@ -2437,19 +2450,12 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     if (row > 4) {
-        bool hasNonSpace = false;
-        for (size_t i = 0; i < len; i++) {
-            if (s_CmakeInfo.m_name[i] != ' ') {
-                hasNonSpace = true;
-                break;
-            }
-        }
-
-        if (!hasNonSpace) {
+        if (IsCmakeNameBlank(s_CmakeInfo.m_name)) {
             Sound.PlaySe(4, 0x40, 0x7f, 0);
             return 0;
         }
 
+        StoreCmakeVillageName();
         Sound.PlaySe(2, 0x40, 0x7f, 0);
         *reinterpret_cast<short*>(villageWork + 0x1E) = 1;
         return 1;
@@ -2698,6 +2704,7 @@ void CMenuPcs::calcVillageMenu()
         villageWork =
             reinterpret_cast<int>(__nw__FUlPQ27CMemory6CStagePci(0x48, stage, const_cast<char*>(s_cmake_cpp_801e3038), 0xCB3));
         memset(reinterpret_cast<void*>(villageWork), 0, 0x48);
+        LoadCmakeVillageName();
         MenuS16(this, 0x86C) = 1;
     }
 

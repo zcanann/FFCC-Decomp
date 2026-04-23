@@ -11,17 +11,16 @@ int* m_MemoryBank;
 int* m_AMemoryBank;
 extern int DAT_8032f490;
 extern int DAT_8032f494;
-extern int DAT_8032f498;
-extern int DAT_8032f49c;
 extern int* DAT_8032f4a0;
 extern int* DAT_8032f4a4;
 
 #define redMainDataBuffer DAT_8032f490
 #define redADataBuffer DAT_8032f494
-#define redMainDataBufferSize DAT_8032f498
-#define redADataBufferSize DAT_8032f49c
+#define redMainDataBufferSize DAT_8032f480
+#define redADataBufferSize DAT_8032f484
 #define redMainMemoryBank DAT_8032f4a0
 #define redAMemoryBank DAT_8032f4a4
+#define redSoundWork DAT_8032f3f0
 
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
 const char sRedMemoryLogSuffixB[8] = "\x1b[0m";
@@ -82,48 +81,49 @@ int RedNew(int param_1)
 	unsigned int interrupts;
 	int address;
 	int entryCount;
-	int moveCount;
 	int* slot;
 
-	if (((0 < param_1) && (redMainMemoryBank != 0)) && (redMainDataBuffer != 0)) {
-		interrupts = OSDisableInterrupts();
-		param_1 = (param_1 + 0x1F) & 0xFFFFFFE0;
-		slot = redMainMemoryBank;
-		address = redMainDataBuffer;
-
-		do {
-			if ((slot[1] == 0) || ((int)(address + param_1) <= *slot)) {
-				if (redMainMemoryBank[0x7FF] > 0) {
-					if (gRedMemoryDebugEnabled != 0) {
-						OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
-						fflush(__files + 1);
-					}
-				} else {
-					if ((unsigned int)(address + param_1) <=
-					    (unsigned int)(redMainDataBuffer + redMainDataBufferSize)) {
-						if (0 < slot[1]) {
-							moveCount = (int)redMainMemoryBank + (0x2000 - (int)(slot + 2));
-							entryCount = moveCount / 8;
-							if (0 < entryCount) {
-								memmove(slot + 2, slot, entryCount * 8);
-							}
-						}
-
-						*slot = address;
-						slot[1] = param_1;
-						OSRestoreInterrupts(interrupts);
-						return address;
-					}
-				}
-				break;
-			}
-
-			address = *slot + slot[1];
-			slot += 2;
-		} while (slot < redMainMemoryBank + 0x800);
-
-		OSRestoreInterrupts(interrupts);
+	if ((param_1 < 1) || (redMainMemoryBank == 0) || ((unsigned int)redMainDataBuffer == 0)) {
+		return 0;
 	}
+
+	interrupts = OSDisableInterrupts();
+	param_1 += 0x1F;
+	slot = redMainMemoryBank;
+	address = redMainDataBuffer;
+	param_1 &= 0xFFFFFFE0;
+
+	do {
+		if ((slot[1] == 0) || ((int)(address + param_1) <= *slot)) {
+			if (redMainMemoryBank[0x7FF] > 0) {
+				if ((int)redSoundWork != 0) {
+					OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
+					fflush(__files + 1);
+				}
+			} else {
+				if ((unsigned int)(address + param_1) <=
+				    (unsigned int)(redMainDataBuffer + redMainDataBufferSize)) {
+					if (0 < slot[1]) {
+						entryCount = ((int)(redMainMemoryBank + 0x800) - (int)(slot + 2)) / 8;
+						if (0 < entryCount) {
+							memmove(slot + 2, slot, entryCount * 8);
+						}
+					}
+
+					*slot = address;
+					slot[1] = param_1;
+					OSRestoreInterrupts(interrupts);
+					return address;
+				}
+			}
+			break;
+		}
+
+		address = *slot + slot[1];
+		slot += 2;
+	} while (slot < redMainMemoryBank + 0x800);
+
+	OSRestoreInterrupts(interrupts);
 	return 0;
 }
 #pragma optimization_level 4
@@ -198,7 +198,6 @@ void RedDelete(void* param_1)
 #pragma optimization_level 0
 int RedNewA(int size, int offset, int maxSize)
 {
-	unsigned int moveCount;
 	unsigned int interrupts;
 	int result;
 	int rangeStart;
@@ -208,11 +207,11 @@ int RedNewA(int size, int offset, int maxSize)
 	int* bestBlock;
 	int* blockPtr;
 
-	if ((size < 1) || (redAMemoryBank == 0) || (redADataBuffer == 0)) {
+	if ((size < 1) || (redAMemoryBank == 0) || ((unsigned int)redADataBuffer == 0)) {
 		return 0;
 	}
 	if (redAMemoryBank[0x7FF] > 0) {
-		if (gRedMemoryDebugEnabled != 0) {
+		if ((int)redSoundWork != 0) {
 			OSReport(s_redMemoryAuxBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
 			fflush(__files + 1);
 		}
@@ -225,9 +224,10 @@ int RedNewA(int size, int offset, int maxSize)
 		maxSize = redADataBufferSize;
 	}
 	maxSize -= offset;
-	size = (size + 0x1F) & 0xFFFFFFE0;
+	size += 0x1F;
 	result = rangeStart;
 	maxGap = maxSize;
+	size &= 0xFFFFFFE0;
 	bestBlock = 0;
 
 	for (blockPtr = redAMemoryBank; (blockPtr[1] != 0) && (*blockPtr < rangeStart); blockPtr += 2) {
@@ -268,9 +268,9 @@ int RedNewA(int size, int offset, int maxSize)
 
 	blockPtr = bestBlock;
 	if (blockPtr[1] > 0) {
-		moveCount = ((int)(redAMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
-		if ((int)moveCount > 0) {
-			memmove(blockPtr + 2, blockPtr, moveCount * 8);
+		int entryCount = ((int)(redAMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
+		if (entryCount > 0) {
+			memmove(blockPtr + 2, blockPtr, entryCount * 8);
 		}
 	}
 	*blockPtr = result;

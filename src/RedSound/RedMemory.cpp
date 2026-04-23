@@ -78,10 +78,10 @@ extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldD
 #pragma optimization_level 0
 int RedNew(int param_1)
 {
-	unsigned int interrupts;
 	int address;
 	int entryCount;
 	int* slot;
+	unsigned int interrupts;
 
 	if ((param_1 < 1) || (redMainMemoryBank == 0) || ((unsigned int)redMainDataBuffer == 0)) {
 		return 0;

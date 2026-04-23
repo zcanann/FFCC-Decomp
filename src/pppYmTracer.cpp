@@ -17,7 +17,6 @@ extern f32 FLOAT_803306ec;
 extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
 extern const f64 DOUBLE_803306F0 = 4503601774854144.0;
-static const f64 DOUBLE_803306f8 = 4503601774854144.0;
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -76,6 +75,18 @@ union PackedColor {
     u32 value;
     u8 bytes[4];
 };
+
+static inline void copyPolygonData(TRACE_POLYGON* dst, const TRACE_POLYGON* src)
+{
+    pppCopyVector(dst->from, src->from);
+    pppCopyVector(dst->to, src->to);
+    dst->life = src->life;
+    dst->decay = src->decay;
+    dst->colorR = src->colorR;
+    dst->colorG = src->colorG;
+    dst->colorB = src->colorB;
+    dst->alpha = src->alpha;
+}
 
 /*
  * --INFO--
@@ -257,18 +268,8 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     if (work->count + 1 < *(u16*)(param_2->m_payload + 4)) {
         source = entries + (*(u16*)(param_2->m_payload + 4) - 2);
         for (i = *(u16*)(param_2->m_payload + 4) - 2; i >= 0; i--) {
-            Vec from = source->from;
-            Vec to = source->to;
-
             dest = source + 1;
-            pppCopyVector(dest->from, from);
-            pppCopyVector(dest->to, to);
-            dest->life = source->life;
-            dest->decay = source->decay;
-            dest->colorR = source->colorR;
-            dest->colorG = source->colorG;
-            dest->colorB = source->colorB;
-            dest->alpha = source->alpha;
+            copyPolygonData(dest, source);
             source--;
         }
 
@@ -319,7 +320,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             Vec splineFrom[4];
             Vec splineTo[4];
             s16 splineCount = 0;
-            f64 stepScale = FLOAT_803306ec / (f32)((f64)(param_2->m_payload[9] + 1) - DOUBLE_803306f8);
+            f64 stepScale = FLOAT_803306ec / (f32)((f64)(param_2->m_payload[9] + 1) - DOUBLE_803306F0);
 
             for (i = 0; i < (s32)(u32)param_2->m_payload[9]; i++) {
                 f32 t = (f32)(stepScale * (f64)(i + 1));
@@ -339,18 +340,8 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             for (i = 0; i < splineCount; i++) {
                 source = entries + (*(u16*)(param_2->m_payload + 4) - 2);
                 for (s32 j = *(u16*)(param_2->m_payload + 4) - 2; j > 1; j--) {
-                    Vec from = source->from;
-                    Vec to = source->to;
-
                     dest = source + 1;
-                    pppCopyVector(dest->from, from);
-                    pppCopyVector(dest->to, to);
-                    dest->life = source->life;
-                    dest->decay = source->decay;
-                    dest->colorR = source->colorR;
-                    dest->colorG = source->colorG;
-                    dest->colorB = source->colorB;
-                    dest->alpha = source->alpha;
+                    copyPolygonData(dest, source);
                     source--;
                 }
             }

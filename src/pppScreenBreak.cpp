@@ -666,27 +666,27 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
     float* pieceData = *(float**)((u8*)param_2 + 0xC);
     float zero = 0.0f;
-    Quaternion meshQuat;
-    Quaternion resultQuat;
-    Quaternion axisQuat;
-    Vec axis;
-    Vec gravityAdd;
-    Vec basis = { 0.0f, 1.0f, 0.0f };
-    Vec cameraOffset;
-    Vec screenOffset;
-    Vec invTransOffset;
-    Vec4d clipOutput;
-    Vec4d clipInput;
-    Vec cameraPos;
-    Vec cameraForward;
     Vec translation;
-    Mtx invTransMtx;
-    Mtx transMtx;
-    Mtx quatMtx;
-    Mtx meshMtx;
-    Mtx44 screenMtx;
-    Mtx invCameraMtx;
+    Vec cameraForward;
+    Vec cameraPos;
+    Vec4d clipInput;
+    Vec4d clipOutput;
+    Vec screenOffset;
+    Vec cameraOffset;
+    Vec basis = { 0.0f, 1.0f, 0.0f };
+    Vec gravityAdd;
+    Vec axis;
+    Quaternion meshQuat;
+    Quaternion axisQuat;
+    Quaternion resultQuat;
+    Vec invTransOffset;
     Mtx cameraMtx;
+    Mtx invCameraMtx;
+    Mtx44 screenMtx;
+    Mtx meshMtx;
+    Mtx quatMtx;
+    Mtx transMtx;
+    Mtx invTransMtx;
     ScreenBreakMeshRef* mesh;
 
     cameraForward.x = CameraPcs._236_4_;
@@ -727,8 +727,9 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     }
 
     for (u32 i = 0; i < modelView->m_data->m_meshCount; i++) {
-        if (*((char*)pieceData + 0x38) != '\0') {
-            u8* nodeMtx = modelView->m_nodes + (mesh->m_data->m_nodeIndex * 0xC0) + 0x14;
+        ScreenBreakMeshData* meshData = mesh->m_data;
+        if (*(u8*)((u8*)pieceData + 0x38) != 0) {
+            u8* nodeMtx = modelView->m_nodes + (meshData->m_nodeIndex * 0xC0) + 0x14;
 
             *(float*)(nodeMtx + 0xC) = zero;
             *(float*)(nodeMtx + 0x1C) = zero;

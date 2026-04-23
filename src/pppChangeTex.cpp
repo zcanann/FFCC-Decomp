@@ -63,11 +63,11 @@ struct ChangeTexWork {
 	float m_cachedValue;
 };
 
-extern float FLOAT_80332020;
-extern float FLOAT_80332028;
-extern double DOUBLE_80332030;
-extern double DOUBLE_80332038;
-extern char DAT_80332024;
+extern const float FLOAT_80332020 = -10000.0f;
+extern const char DAT_80332024[] = "obj";
+extern const float FLOAT_80332028 = 255.0f;
+extern const double DOUBLE_80332030 = 4503601774854144.0;
+extern const double DOUBLE_80332038 = 4503599627370496.0;
 static const char s_pppChangeTex_cpp_801dd660[] = "pppChangeTex.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
@@ -106,34 +106,36 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
 	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
 	ChangeTexMeshData* meshData = meshes[param_4].m_data;
 	ChangeTexDisplayList* displayList = meshData->m_displayLists + param_5;
+	int textureInfo = *(int*)((char*)param_2 + 0x1C);
 
 	if (*(u8*)((char*)param_3 + 0x14) == 0) {
 		int drawTevBits = 0xACE0F;
 		int zero = 0;
 		int allOnes = -1;
 		int tevScale = 0x1E;
+		u8 fullByte = 0xFF;
 
 		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
-		int fullTevBits = 0xADE0F;
 		*(int*)(MaterialManRaw() + 0x128) = zero;
+		drawTevBits |= 0x1000;
 		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
 		*(int*)(MaterialManRaw() + 0x130) = zero;
 		*(int*)(MaterialManRaw() + 0x44) = allOnes;
-		*(char*)(MaterialManRaw() + 0x4c) = allOnes;
+		*(u8*)(MaterialManRaw() + 0x4c) = fullByte;
 		*(int*)(MaterialManRaw() + 0x11c) = zero;
 		*(int*)(MaterialManRaw() + 0x120) = tevScale;
 		*(int*)(MaterialManRaw() + 0x124) = zero;
-		*(char*)(MaterialManRaw() + 0x205) = allOnes;
-		*(char*)(MaterialManRaw() + 0x206) = allOnes;
+		*(u8*)(MaterialManRaw() + 0x205) = fullByte;
+		*(u8*)(MaterialManRaw() + 0x206) = fullByte;
 		*(int*)(MaterialManRaw() + 0x58) = zero;
 		*(int*)(MaterialManRaw() + 0x5c) = zero;
 		*(char*)(MaterialManRaw() + 0x208) = zero;
-		*(int*)(MaterialManRaw() + 0x48) = fullTevBits;
+		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
 		*(int*)(MaterialManRaw() + 0x128) = zero;
-		*(int*)(MaterialManRaw() + 0xd0) = *(int*)((char*)param_2 + 0x1C) + 0x28;
+		*(int*)(MaterialManRaw() + 0xd0) = textureInfo + 0x28;
 		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
 		*(int*)(MaterialManRaw() + 0x130) = zero;
-		*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
+		*(int*)(MaterialManRaw() + 0x40) = drawTevBits;
 	}
 
 	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
@@ -178,8 +180,10 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
 				*(int*)(MaterialManRaw() + 0xd0) = dlOffset + 0x28;
 				drawTevBits = 0xACE0F;
-				fullTevBits = 0xADE0F;
+				fullTevBits = drawTevBits;
+				fullTevBits |= 0x1000;
 				allOnes = -1;
+				u8 fullByte = 0xFF;
 				tevScale = 0x1e;
 				displayListIdx = meshData->m_displayListCount - 1;
 				dlOffset = displayListIdx * 4;
@@ -190,12 +194,12 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 					*(int*)(MaterialManRaw() + 0x12c) = tevScale;
 					*(int*)(MaterialManRaw() + 0x130) = 0;
 					*(int*)(MaterialManRaw() + 0x44) = allOnes;
-					*(char*)(MaterialManRaw() + 0x4c) = allOnes;
+					*(u8*)(MaterialManRaw() + 0x4c) = fullByte;
 					*(int*)(MaterialManRaw() + 0x11c) = 0;
 					*(int*)(MaterialManRaw() + 0x120) = tevScale;
 					*(int*)(MaterialManRaw() + 0x124) = 0;
-					*(char*)(MaterialManRaw() + 0x205) = allOnes;
-					*(char*)(MaterialManRaw() + 0x206) = allOnes;
+					*(u8*)(MaterialManRaw() + 0x205) = fullByte;
+					*(u8*)(MaterialManRaw() + 0x206) = fullByte;
 					*(int*)(MaterialManRaw() + 0x58) = 0;
 					*(int*)(MaterialManRaw() + 0x5c) = 0;
 					*(char*)(MaterialManRaw() + 0x208) = 0;
@@ -425,7 +429,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		int arrayOffset = 0;
 		for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)((char*)model0 + 0xA4) + 0xC); meshIdx++) {
 			int meshHdr = *(int*)(meshList + 8);
-			if (strcmp((char*)meshHdr, &DAT_80332024) == 0) {
+			if (strcmp((char*)meshHdr, DAT_80332024) == 0) {
 				CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
 				    &gUtil, &work->m_bboxMin, &work->m_bboxMax, *(void**)(meshList + 0xC), *(unsigned long*)(meshHdr + 0x14),
 				    *(unsigned long*)(*(int*)((char*)model0 + 0xA4) + 0x34));

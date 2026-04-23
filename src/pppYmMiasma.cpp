@@ -20,7 +20,7 @@ extern float FLOAT_80330664;
 extern float FLOAT_80330668;
 extern float FLOAT_80330658;
 extern double DOUBLE_80330648;
-extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
+extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -152,8 +152,8 @@ struct YmMiasmaFrameStep : PYmMiasma {
  */
 void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
 {
-    u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2];
-    PARTICLE_DATA* particleData = (PARTICLE_DATA*)(u32) * (u32*)workBytes;
+    VYmMiasma* work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+    PARTICLE_DATA* particleData = work->m_particles;
     YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)param_2;
     int i;
 
@@ -336,12 +336,12 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
  */
 void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
-    u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
+    VYmMiasma* work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2]);
     float fVar1 = FLOAT_80330644;
 
-    *(float*)(workBytes + 0x1c) = FLOAT_80330644;
-    *(float*)(workBytes + 0x20) = fVar1;
-    *(float*)(workBytes + 0x24) = fVar1;
+    work->m_radius = FLOAT_80330644;
+    work->m_radiusVelocity = fVar1;
+    work->m_radiusAcceleration = fVar1;
 }
 
 /*
@@ -355,25 +355,24 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
  */
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
-    u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
+    VYmMiasma* work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2]);
     float fVar1;
     float fVar2 = FLOAT_80330644;
-    float* work = (float*)workBytes;
 
     fVar1 = FLOAT_80330658;
 
-    *(u32*)workBytes = 0;
-    work[7] = fVar2;
-    work[8] = fVar2;
-    work[9] = fVar2;
-    workBytes[8] = 0;
-    work[4] = fVar1;
-    work[5] = fVar2;
-    work[6] = fVar2;
-    work[0xc] = fVar2;
-    work[0xb] = fVar2;
-    work[10] = fVar2;
-    workBytes[0x34] = 0;
+    work->m_particles = 0;
+    work->m_radius = fVar2;
+    work->m_radiusVelocity = fVar2;
+    work->m_radiusAcceleration = fVar2;
+    work->m_emitTimer = 0;
+    work->m_impulse.x = fVar1;
+    work->m_impulse.y = fVar2;
+    work->m_impulse.z = fVar2;
+    work->m_prevPosition.z = fVar2;
+    work->m_prevPosition.y = fVar2;
+    work->m_prevPosition.x = fVar2;
+    work->m_prevPositionChanged = 0;
 }
 
 /*

@@ -1,6 +1,7 @@
 #include "ffcc/pppVertexApMtx.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
@@ -56,10 +57,6 @@ struct VertexApMtxObject
 	u8 unk0[0x10];
 	Mtx localMatrix;
 };
-
-struct _pppPDataVal;
-
-_pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
@@ -201,11 +198,9 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 				}
 			}
 			break;
-		default:
-			break;
 		}
 		state->countdown = data->spawnDelay;
-	}
+		}
 
 	state->countdown--;
 }

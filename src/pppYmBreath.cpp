@@ -244,6 +244,7 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
     Vec* particle = reinterpret_cast<Vec*>(particleData);
     char frameCount;
     Vec step;
+    float angleRange;
 
     (void)vYmBreath;
 
@@ -269,11 +270,12 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
         particle[3].z += *(float*)(breath + 0x98);
     }
 
-    while (6.2831855f <= particle[3].y) {
-        particle[3].y -= 6.2831855f;
+    angleRange = 6.2831855f;
+    while (angleRange <= particle[3].y) {
+        particle[3].y -= angleRange;
     }
     while (particle[3].y < 0.0f) {
-        particle[3].y += 6.2831855f;
+        particle[3].y += angleRange;
     }
 
     particle[4].y += particle[5].x;
@@ -289,12 +291,13 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
     particle[6].z += *(float*)(breath + 0xA4);
     if (*(unsigned char*)(breath + 0xC8) == 0) {
         float start = *(float*)(breath + 0xA0);
-        if ((0.0f < start) && (*(float*)(breath + 0xA4) < 0.0f)) {
-            if (particle[6].z < 0.0f) {
-                particle[6].z = 0.0f;
+        float zero = 0.0f;
+        if ((start > zero) && (*(float*)(breath + 0xA4) < zero)) {
+            if (particle[6].z < zero) {
+                particle[6].z = zero;
             }
-        } else if ((start < 0.0f) && (0.0f < *(float*)(breath + 0xA4)) && (0.0f < particle[6].z)) {
-            particle[6].z = 0.0f;
+        } else if ((start < zero) && (zero < *(float*)(breath + 0xA4)) && (zero < particle[6].z)) {
+            particle[6].z = zero;
         }
     }
 
@@ -308,7 +311,7 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
 
     frameCount = *(char*)&particle[3].x;
     if ((frameCount != '\0') && ((int)(unsigned int)*(unsigned char*)&particle[7].x <= (int)frameCount)) {
-        *(float*)&particle[6].y -= (float)alpha / (float)(unsigned int)(unsigned char)frameCount;
+        *(float*)&particle[6].y -= (float)alpha / (float)(int)frameCount;
     }
 
     frameCount = *(char*)((unsigned char*)&particle[3].x + 1);

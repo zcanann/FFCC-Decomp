@@ -405,6 +405,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     short foundGroup;
     Vec stepVelocity;
     Vec unitVelocity;
+    unsigned short* emitFrameCounter;
 
     spawnCount = 0;
     particleData = (unsigned char*)*(void**)((unsigned char*)vBreathModel + 0x30);
@@ -412,9 +413,10 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     particleColor = (unsigned char*)*(void**)((unsigned char*)vBreathModel + 0x38);
     groupTable = *(BreathParticleGroup**)((unsigned char*)vBreathModel + 0x3C);
     maxParticleCount = *(int*)((unsigned char*)vBreathModel + 0x40);
+    emitFrameCounter = (unsigned short*)((unsigned char*)vBreathModel + 0x44);
 
     if ((gPppCalcDisabled == 0) && (*(int*)((unsigned char*)pBreathModel + 0xC) != 0xFFFF)) {
-        *(short*)((unsigned char*)vBreathModel + 0x44) = *(short*)((unsigned char*)vBreathModel + 0x44) + 1;
+        *emitFrameCounter = *emitFrameCounter + 1;
 
         for (i = 0; i < maxParticleCount; i++) {
             if (*(short*)(particleData + 0x50) >= 1) {
@@ -481,8 +483,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                     }
                 }
 
-                if ((*(unsigned short*)((unsigned char*)pBreathModel + 0x1E) <=
-                     *(unsigned short*)((unsigned char*)vBreathModel + 0x44)) &&
+                if ((*(unsigned short*)((unsigned char*)pBreathModel + 0x1E) <= *emitFrameCounter) &&
                     (spawnCount < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x1C))) {
                     BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VColorP13PARTICLE_DATAP13PARTICLE_WMATP14PARTICLE_COLOR(
                         pppObject, vBreathModel, pBreathModel, vColor, (PARTICLE_DATA*)particleData,
@@ -519,7 +520,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
         }
 
         if (spawnCount > 0) {
-            *(short*)((unsigned char*)vBreathModel + 0x44) = 0;
+            *emitFrameCounter = 0;
         }
 
         groupData = groupTable;

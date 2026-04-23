@@ -25,27 +25,6 @@ void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 }
 
-struct RainDrop;
-
-struct RainWork {
-    RainDrop* drops;
-    float moveY;
-    float accelY;
-    float accelZ;
-};
-
-struct RainDrop {
-    float posX;
-    float posY;
-    float posZ;
-    float dirX;
-    float dirY;
-    float dirZ;
-    float length;
-    s16 life;
-    s16 pad;
-};
-
 struct RainColorData {
     u8 pad[8];
     pppCVECTOR color;
@@ -300,12 +279,12 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
  */
 void pppDestructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
 {
-    int iVar1;
+    RainWork* work;
 
-    iVar1 = param_2->m_serializedDataOffsets[2];
-    if (*(void**)((u8*)pppRain + 0x80 + iVar1) != 0) {
-        pppHeapUseRate((CMemory::CStage*)*(void**)((u8*)pppRain + 0x80 + iVar1));
-        *(u32*)((u8*)pppRain + 0x80 + iVar1) = 0;
+    work = (RainWork*)((u8*)pppRain + 0x80 + param_2->m_serializedDataOffsets[2]);
+    if (work->drops != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->drops);
+        work->drops = 0;
     }
 }
 
@@ -321,16 +300,16 @@ void pppDestructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
 void pppConstructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
 {
     float fVar1;
-    float* puVar2;
+    RainWork* work;
 
     fVar1 = kPppRainTexCoordBase;
-    puVar2 = (float*)((u8*)pppRain + 0x80 + param_2->m_serializedDataOffsets[2]);
-    *(u32*)puVar2 = 0;
-    puVar2[3] = fVar1;
-    puVar2[2] = fVar1;
-    puVar2[1] = fVar1;
+    work = (RainWork*)((u8*)pppRain + 0x80 + param_2->m_serializedDataOffsets[2]);
+    work->drops = 0;
+    work->accelZ = fVar1;
+    work->accelY = fVar1;
+    work->moveY = fVar1;
 }
 
-extern const float kPppRainTexCoordBase = 0.0f;
-extern const float FLOAT_8033101c = 1.0f;
-extern const float FLOAT_80331020 = 3.0518509e-05f;
+extern const float FLOAT_80330FD4 = -1.0f;
+extern const float FLOAT_80330FD8 = 0.0f;
+extern const double DOUBLE_80330FE0 = 0.5;

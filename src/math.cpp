@@ -967,7 +967,7 @@ float CMath::Spline1D(int lastIndex, float t, float* x, float* y, float* secondD
 {
     float period = x[lastIndex] - x[0];
 
-    while (x[lastIndex] < t) {
+    while (t > x[lastIndex]) {
         t -= period;
     }
 

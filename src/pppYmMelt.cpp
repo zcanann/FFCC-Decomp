@@ -8,6 +8,7 @@
 #include "ffcc/maphit.h"
 extern "C" {
 extern const float kPppYmMeltZero;
+extern u32 g_ymMelt;
 extern int gPppCalcDisabled;
 }
 #include "dolphin/mtx.h"
@@ -106,7 +107,8 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     float uStep;
     float vStep;
     float phaseLerp;
-    _GXColor drawColor;
+    u32 drawColor;
+    u8* drawColorBytes;
     float worldX;
     float worldY;
     float worldZ;
@@ -155,10 +157,12 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     }
 
     phaseLerp = FLOAT_80330af4 - work->m_phase;
-    drawColor.r = colorWork->m_color.rgba[0];
-    drawColor.g = colorWork->m_color.rgba[1];
-    drawColor.b = colorWork->m_color.rgba[2];
-    drawColor.a = colorWork->m_color.rgba[3];
+    drawColor = g_ymMelt;
+    drawColorBytes = reinterpret_cast<u8*>(&drawColor);
+    drawColorBytes[0] = colorWork->m_color.rgba[0];
+    drawColorBytes[1] = colorWork->m_color.rgba[1];
+    drawColorBytes[2] = colorWork->m_color.rgba[2];
+    drawColorBytes[3] = colorWork->m_color.rgba[3];
     worldX = pppMngStPtr->m_matrix.value[0][3];
     worldY = pppMngStPtr->m_matrix.value[1][3];
     worldZ = pppMngStPtr->m_matrix.value[2][3];
@@ -214,7 +218,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
             GXPosition3f32(vtx0.x, vtx0.y, vtx0.z);
             if (p0Data->m_color.m_bytes[3] != 0) {
-                colorValue = *(u32*)&drawColor;
+                colorValue = drawColor;
             } else {
                 colorValue = p0Data->m_color.m_rawColor;
             }
@@ -223,7 +227,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
             GXPosition3f32(vtx1.x, vtx1.y, vtx1.z);
             if (p1Data->m_color.m_bytes[3] != 0) {
-                colorValue = *(u32*)&drawColor;
+                colorValue = drawColor;
             } else {
                 colorValue = p1Data->m_color.m_rawColor;
             }
@@ -232,7 +236,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
             GXPosition3f32(vtx2.x, vtx2.y, vtx2.z);
             if (p2Data->m_color.m_bytes[3] != 0) {
-                colorValue = *(u32*)&drawColor;
+                colorValue = drawColor;
             } else {
                 colorValue = p2Data->m_color.m_rawColor;
             }
@@ -241,7 +245,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
             GXPosition3f32(vtx3.x, vtx3.y, vtx3.z);
             if (p3Data->m_color.m_bytes[3] != 0) {
-                colorValue = *(u32*)&drawColor;
+                colorValue = drawColor;
             } else {
                 colorValue = p3Data->m_color.m_rawColor;
             }

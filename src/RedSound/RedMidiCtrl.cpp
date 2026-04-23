@@ -230,25 +230,24 @@ int SineSwing(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 4
+#pragma optimization_level 0
 int TriangleSwing(int phase)
 {
-    u32 low = (u32)phase & 0xFF;
-    int result = low << 8;
+    int result = ((u32)phase & 0xFF) << 8;
 
     switch (((u32)phase >> 8) & 3) {
-    case 1:
-        result = 0x10000 - result;
+    case 3:
+        result -= 0x10000;
         break;
     case 2:
         result = -result;
         break;
-    case 3:
-        result -= 0x10000;
+    case 1:
+        result = 0x10000 - result;
         break;
     }
 
-    return (low | result);
+    return result;
 }
 #pragma optimization_level 0
 
@@ -335,27 +334,24 @@ int SineSwingR(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 4
+#pragma optimization_level 0
 int TriangleSwingR(int phase)
 {
-    int mode;
-    int result;
-
     phase ^= 0x200;
-    mode = (phase >> 8) & 3;
-    result = (phase & 0xFF) << 8;
-    if (mode != 2) {
-        if (mode >= 2) {
-            if (mode < 4) {
-                result -= 0x10000;
-            }
-        } else if (mode != 0) {
-            result = 0x10000 - result;
-        }
-    } else {
+    int result = ((u32)phase & 0xFF) << 8;
+
+    switch (((u32)phase >> 8) & 3) {
+    case 3:
+        result -= 0x10000;
+        break;
+    case 2:
         result = -result;
+        break;
+    case 1:
+        result = 0x10000 - result;
+        break;
     }
-    return (phase & 0xFF) | result;
+    return result;
 }
 #pragma optimization_level 0
 
@@ -773,7 +769,7 @@ void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
     char* command = (char*)((int*)track)[0];
     int* trackData = (int*)track;
     int value;
-    char targetDepth;
+    int targetDepth;
 
     if (*command == '\0') {
         stepCount[0] = 0x100;
@@ -782,12 +778,14 @@ void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
     }
 
     trackData[0] = (int)(command + 1);
-    targetDepth = *command;
-    if (targetDepth != '\0') {
-        targetDepth = -1;
+    targetDepth = (unsigned char)*command;
+    if (targetDepth != 0) {
+        targetDepth += 1;
+        targetDepth <<= 8;
+        targetDepth -= 1;
     }
 
-    value = DataAddCompute(trackData + 0x1a, (int)targetDepth, (int*)stepCount);
+    value = DataAddCompute(trackData + 0x1a, (char)targetDepth, (int*)stepCount);
     trackData[0x1b] = value;
     trackData[0x1c] = stepCount[0];
     trackData[0] += 2;

@@ -63,13 +63,11 @@ static const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
 
 struct CMapCylinderRaw {
 	Vec m_bottom;
+	u8 m_pad0C[0x0C];
 	Vec m_direction;
 	float m_radius;
-	float m_height;
 	Vec m_top;
 	Vec m_direction2;
-	float m_radius2;
-	float m_height2;
 };
 
 struct pppYmLaserWork {
@@ -188,7 +186,6 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	pppYmLaserWork* work;
 	Vec localA;
 	Vec localB;
-	Vec localPos;
 	CMapCylinderRaw cyl;
 	Mtx charaMtx;
 	Mtx tempMtx;
@@ -249,19 +246,20 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 			}
 		}
 
-		localPos = work->m_origin;
-		pppSubVector(localA, points[i], localPos);
+		pppSubVector(localA, points[i], work->m_origin);
 		PSVECScale(&localA, &localA, FLOAT_80330de4);
 
-		cyl.m_bottom = localPos;
+		cyl.m_bottom = work->m_origin;
 		cyl.m_direction = localA;
 		cyl.m_radius = FLOAT_80330de8;
-		cyl.m_height = FLOAT_80330dec;
-		cyl.m_radius2 = FLOAT_80330dec;
-		cyl.m_height2 = FLOAT_80330dec;
+		cyl.m_top.x = FLOAT_80330de8;
+		cyl.m_top.y = FLOAT_80330de8;
+		cyl.m_top.z = FLOAT_80330de8;
+		cyl.m_direction2.x = FLOAT_80330dec;
+		cyl.m_direction2.y = FLOAT_80330dec;
+		cyl.m_direction2.z = FLOAT_80330dec;
 
-		bool hit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-					   &MapMng, &cyl, &cyl.m_direction, 0xffffffff) != 0;
+		bool hit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &localA, 0xffffffff) != 0;
 		if (hit) {
 			CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &points[i]);
 			work->m_length = PSVECDistance(&points[i], &work->m_origin);

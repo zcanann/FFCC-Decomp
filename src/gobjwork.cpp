@@ -1516,7 +1516,25 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(lbl_801D9F64));
 	}
 
-	for (int i = 0; i < 50; i++) {
+	for (int i = 0; i < 25; i++) {
+		if (artifactIndex < 96 && (short)m_artifacts[artifactIndex] > 0) {
+			unsigned short* artifactData =
+				(unsigned short*)(Game.unkCFlatData0[2] + (short)m_artifacts[artifactIndex] * 0x48);
+			if (artifactData[0] == 0xDB) {
+				totalSlots += artifactData[3];
+			}
+		}
+
+		if ((artifactIndex + 1) < 96 && (short)m_artifacts[artifactIndex + 1] > 0) {
+			unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
+															 (short)m_artifacts[artifactIndex + 1] * 0x48);
+			if (artifactData[0] == 0xDB) {
+				totalSlots += artifactData[3];
+			}
+		}
+
+		artifactIndex += 2;
+
 		if (artifactIndex < 96 && (short)m_artifacts[artifactIndex] > 0) {
 			unsigned short* artifactData =
 				(unsigned short*)(Game.unkCFlatData0[2] + (short)m_artifacts[artifactIndex] * 0x48);
@@ -2083,13 +2101,13 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 {
 	int weaponType = GetCmdListItem(cmdListIdx);
-	if (weaponType < 0 || weaponType > 2) {
-		int itemId = DelCmdListAndItem(cmdListIdx, 0);
-		const GobjworkFlatData* flatData = reinterpret_cast<const GobjworkFlatData*>(&Game.m_cFlatDataArr[1]);
-		return reinterpret_cast<int>(flatData->table[0].index[itemId * 5 + 4]);
+	if (weaponType >= 0 && weaponType <= 2) {
+		return GetSkillStr__8CMenuPcsFi(&MenuPcs, weaponType);
 	}
 
-	return GetSkillStr__8CMenuPcsFi(&MenuPcs, weaponType);
+	int itemId = DelCmdListAndItem(cmdListIdx, 0);
+	const GobjworkFlatData* flatData = reinterpret_cast<const GobjworkFlatData*>(&Game.m_cFlatDataArr[1]);
+	return reinterpret_cast<int>(flatData->table[0].index[itemId * 5 + 4]);
 }
 
 /*

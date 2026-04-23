@@ -2416,10 +2416,10 @@ void CSound::IsDebugPrint(int)
 void CSound::PauseAllSe(int pause)
 {
     u8* self = reinterpret_cast<u8*>(this);
-    int pauseFlag = (-pause | pause) >> 31;
 
-    SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1, pauseFlag);
-    StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1, pauseFlag);
+    SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1, static_cast<u32>(-pause | pause) >> 31);
+    StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1,
+                               (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
     reinterpret_cast<CSoundLayout*>(self)->m_pauseAllSe = pause;
 }
 

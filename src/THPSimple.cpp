@@ -405,11 +405,9 @@ s32 THPSimpleSetBuffer(u8* buffer)
         SimpleControl.readBuffer[5].mIsValid = 0;
         SimpleControl.readBuffer[6].mIsValid = 0;
         SimpleControl.readBuffer[7].mIsValid = 0;
-        SimpleControl.unk_9C = reinterpret_cast<u32>(cursor);
-        SimpleControl.curFrame = -1;
 
         if (SimpleControl.hasAudio != 0) {
-            u32 audioBufferSize = ((SimpleControl.audioInfo.mSndNumSamples * 4) + 0x1F) & ~0x1F;
+            u32 audioBufferSize = ((SimpleControl.header.mAudioMaxSamples * 4) + 0x1F) & ~0x1F;
 
             SimpleControl.audioBuffer[0].mBuffer = reinterpret_cast<s16*>(cursor);
             SimpleControl.audioBuffer[0].mCurPtr = SimpleControl.audioBuffer[0].mBuffer;
@@ -425,9 +423,9 @@ s32 THPSimpleSetBuffer(u8* buffer)
             SimpleControl.audioBuffer[2].mCurPtr = SimpleControl.audioBuffer[2].mBuffer;
             SimpleControl.audioBuffer[2].mValidSample = 0;
             cursor += audioBufferSize;
-
-            SimpleControl.unk_9C = reinterpret_cast<u32>(cursor);
         }
+
+        SimpleControl.unk_9C = reinterpret_cast<u32>(cursor);
     }
 
     return 1;
@@ -877,7 +875,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                 volume = gTHPSimpleVolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
 
                 mixedSample = static_cast<s32>(*input) +
-                              static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
+                              ((static_cast<s32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
                 if (mixedSample < -0x8000) {
                     mixedSample = -0x8000;
                 }
@@ -887,7 +885,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                 *output = static_cast<s16>(mixedSample);
 
                 mixedSample = static_cast<s32>(input[1]) +
-                              static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(audioPtr[1])) >> 15);
+                              ((static_cast<s32>(volume) * static_cast<s32>(audioPtr[1])) >> 15);
                 if (mixedSample < -0x8000) {
                     mixedSample = -0x8000;
                 }
@@ -935,7 +933,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                 }
                 volume = gTHPSimpleVolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
 
-                mixedSample = static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
+                mixedSample = (static_cast<s32>(volume) * static_cast<s32>(*audioPtr)) >> 15;
                 if (mixedSample < -0x8000) {
                     mixedSample = -0x8000;
                 }
@@ -944,7 +942,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                 }
                 *output = static_cast<s16>(mixedSample);
 
-                mixedSample = static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(audioPtr[1])) >> 15);
+                mixedSample = (static_cast<s32>(volume) * static_cast<s32>(audioPtr[1])) >> 15;
                 if (mixedSample < -0x8000) {
                     mixedSample = -0x8000;
                 }

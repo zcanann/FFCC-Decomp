@@ -435,7 +435,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
 
     i = 0;
     do {
-        if ((s8)obj->flags < 0) {
+        if (GetWindActiveFlag(obj) != 0) {
             if (obj->type == 0) {
                 if (randomize == 0) {
                     PSVECAdd(out, &obj->force, out);
@@ -444,7 +444,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                     PSVECAdd(out, &tmp, out);
                 }
             } else {
-                if ((obj->minX < pos->x) && (obj->minZ < pos->z) && (pos->x < obj->maxX) && (pos->z < obj->maxZ)) {
+                if ((obj->minX < pos->x) && (obj->minZ < pos->z) && (obj->maxX > pos->x) && (obj->maxZ > pos->z)) {
                     nz = (double)(pos->z - obj->centerZ);
                     nx = (double)(pos->x - obj->centerX);
                     d = (double)(float)(nx * nx + (double)(float)(nz * nz));
@@ -511,7 +511,7 @@ void CWind::Draw()
         i = 0;
         obj = m_objects;
         do {
-            if ((int)((u32)obj->flags << 0x18) < 0) {
+            if (GetWindActiveFlag(obj) != 0) {
                 if (obj->type == 1) {
                     CColor color(0xff, 0xff, 0, 0xff);
                     CVector pos(obj->centerX, FLOAT_80330ef0, obj->centerZ);
@@ -543,7 +543,7 @@ void CWind::Frame()
 {
     WindObject* obj;
     int i;
-    int rnd;
+    u32 rnd;
     float f0;
     float f1;
     float f2;
@@ -553,20 +553,24 @@ void CWind::Frame()
     i = 0;
 
     while (true) {
-        if ((obj->flags & 0x80) != 0) {
+        if (GetWindActiveFlag(obj) != 0) {
             rnd = Math.Rand(10);
             if (rnd == 0) {
                 rnd = Math.Rand(3);
-                f1 = FLOAT_80330ef0;
-                f0 = FLOAT_80330f24;
                 if (rnd == 0) {
-                    f0 = FLOAT_80330f20;
+                    f2 = FLOAT_80330f20;
+                } else {
+                    f2 = FLOAT_80330f24;
                 }
 
-                obj->targetPower = obj->basePower * f0 + obj->targetPower;
+                obj->targetPower = obj->basePower * f2 + obj->targetPower;
                 f0 = obj->targetPower;
-                if ((f1 <= f0) && ((f1 = f0), (obj->basePower < f0))) {
+                f1 = FLOAT_80330ef0;
+                if (!(f0 < f1)) {
                     f1 = obj->basePower;
+                    if (!(f1 < f0)) {
+                        f1 = f0;
+                    }
                 }
                 obj->targetPower = f1;
             }
@@ -574,29 +578,33 @@ void CWind::Frame()
             if ((((obj->type == 0) || (obj->type == 1)) && ((rnd = Math.Rand(0x1E)), rnd == 0)) &&
                 (obj->curPower < FLOAT_80330f28 * obj->basePower)) {
                 rnd = Math.Rand(3);
-                f0 = FLOAT_80330f30;
                 if (rnd == 0) {
-                    f0 = FLOAT_80330f2c;
+                    f2 = FLOAT_80330f2c;
+                } else {
+                    f2 = FLOAT_80330f30;
                 }
 
-                obj->targetDir = obj->baseDir * f0 + obj->targetDir;
+                obj->targetDir = obj->baseDir * f2 + obj->targetDir;
                 f0 = obj->targetDir;
                 f1 = obj->baseDir;
-                if ((f1 <= f0) && ((f2 = FLOAT_80330f34 + f1), (f1 = f0), (f2 < f0))) {
-                    f1 = f2;
+                if (!(f0 < f1)) {
+                    f2 = FLOAT_80330f34 + f1;
+                    f1 = f0;
+                    if (f2 < f0) {
+                        f1 = f2;
+                    }
                 }
                 obj->targetDir = f1;
             }
 
             if (obj->type == 2) {
                 obj->lifeTimer = obj->lifeTimer + 1;
-                if ((u32)obj->life <= (u32)obj->lifeTimer) {
-                    obj->flags = obj->flags & 0x7F;
+                if (obj->life <= obj->lifeTimer) {
+                    obj->flags = static_cast<u8>(__rlwimi(obj->flags, 0, 7, 24, 24));
                     goto next;
                 }
 
-                obj->lifeRatio = (float)(((double)obj->lifeTimer - DOUBLE_80330f40) /
-                                         ((double)obj->life - DOUBLE_80330f40));
+                obj->lifeRatio = (float)obj->lifeTimer / (float)obj->life;
                 obj->radius = obj->baseRadius * obj->lifeRatio;
                 obj->radiusSq = obj->radius * obj->radius;
                 obj->minX = obj->centerX - obj->radius;
@@ -624,7 +632,7 @@ void CWind::Frame()
     next:
         i = i + 1;
         obj++;
-        if (0x1F < i) {
+        if (i >= 0x20) {
             return;
         }
     }

@@ -41,25 +41,18 @@ float CFont::GetWidth(unsigned short ch)
 	unsigned short* glyph = glyphBucket + 1;
 	int count = static_cast<int>(*glyphBucket);
 
-	for (; count != 0; count--) {
-		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == ((ch >> 8) & 0xFF)) {
+	for (; count > 0; count--) {
+		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
+			glyph += 4;
+		} else {
 			goto found_glyph;
 		}
-		glyph += 4;
 	}
 	glyph = 0;
 
 found_glyph:
 	if (glyph == 0) {
-		glyphBucket = m_glyphBuckets[63];
-		glyph = glyphBucket + 1;
-		for (count = static_cast<int>(*glyphBucket); count != 0; count--) {
-			if (*reinterpret_cast<char*>(glyph + 1) == '\0') {
-				goto found_fallback;
-			}
-			glyph += 4;
-		}
-		return 0.0f;
+		goto find_fallback;
 	}
 
 found_fallback:
@@ -81,6 +74,25 @@ found_fallback:
 	}
 
 	return static_cast<float>(width);
+
+find_fallback:
+	glyphBucket = m_glyphBuckets[63];
+	unsigned short* fallbackGlyph = glyphBucket + 1;
+	for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
+		if (*reinterpret_cast<char*>(fallbackGlyph + 1) != '\0') {
+			fallbackGlyph += 4;
+		} else {
+			break;
+		}
+	}
+	if (count == 0) {
+		fallbackGlyph = 0;
+	}
+	glyph = fallbackGlyph;
+	if (glyph != 0) {
+		goto found_fallback;
+	}
+	return 0.0f;
 }
 
 /*
@@ -95,36 +107,26 @@ found_fallback:
 float CFont::GetWidth(char* text)
 {
 	float width = 0.0f;
-	unsigned char ch = static_cast<unsigned char>(*text);
+	unsigned short ch;
 
-	while (ch != '\0') {
+	while (true) {
+		ch = static_cast<unsigned char>(*text);
+		if (ch == '\0') {
+			break;
+		}
 		unsigned short* glyph = m_glyphBuckets[ch] + 1;
-		unsigned int count = static_cast<unsigned int>(m_glyphBuckets[ch][0]);
+		int count = static_cast<int>(m_glyphBuckets[ch][0]);
 		text++;
 
-		for (; count != 0; count--) {
-			if (*reinterpret_cast<char*>(glyph + 1) == '\0') {
+		for (; count > 0; count--) {
+			if (*reinterpret_cast<char*>(glyph + 1) != '\0') {
+				glyph += 4;
+			} else {
 				goto use_glyph;
 			}
-			glyph += 4;
 		}
 
-		glyph = m_glyphBuckets[63] + 1;
-		count = static_cast<unsigned int>(m_glyphBuckets[63][0]);
-		if (count == 0) {
-			ch = static_cast<unsigned char>(*text);
-			continue;
-		}
-
-		for (; count != 0; count--) {
-			if (*reinterpret_cast<char*>(glyph + 1) == '\0') {
-				goto use_glyph;
-			}
-			glyph += 4;
-		}
-
-		ch = static_cast<unsigned char>(*text);
-		continue;
+		goto find_fallback;
 
 use_glyph:
 		unsigned char flags = renderFlags;
@@ -146,7 +148,25 @@ use_glyph:
 		}
 
 		width += charWidth;
-		ch = static_cast<unsigned char>(*text);
+		continue;
+
+find_fallback:
+		unsigned short* glyphBucket = m_glyphBuckets[63];
+		unsigned short* fallbackGlyph = glyphBucket + 1;
+		for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
+			if (*reinterpret_cast<char*>(fallbackGlyph + 1) != '\0') {
+				fallbackGlyph += 4;
+			} else {
+				break;
+			}
+		}
+		if (count == 0) {
+			fallbackGlyph = 0;
+		}
+		glyph = fallbackGlyph;
+		if (glyph != 0) {
+			goto use_glyph;
+		}
 	}
 
 	return width;

@@ -2467,13 +2467,16 @@ void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int* trackData = (int*)track;
-    unsigned char value;
+    char value;
 
     trackData[0x3f] &= 0xFFFFC3FF;
-    value = *(unsigned char*)trackData[0];
+    value = *(char*)trackData[0];
 
     if (value == 2) {
         trackData[0x3f] |= 0x1000;
+        goto setFirstMix;
+    } else if ((value > 1) || (value == 0)) {
+setFirstMix:
         trackData[0x3f] |= 0x400;
     } else if ((value > 1) || (value == 0)) {
         trackData[0x3f] |= 0x400;
@@ -2481,14 +2484,15 @@ void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
         trackData[0x3f] |= 0x1000;
     }
 
-    value = *(unsigned char*)(trackData[0] + 1);
+    value = *(char*)(trackData[0] + 1);
     if (value == 2) {
         trackData[0x3f] |= 0x2000;
     } else if ((value < 2) && (value != 0)) {
         trackData[0x3f] |= 0x2000;
-    } else {
-        trackData[0x3f] |= 0x800;
+        goto doneSecondMix;
     }
+    trackData[0x3f] |= 0x800;
+doneSecondMix:
     trackData[0] += 2;
     SetVoiceSwitch(track, trackData[0x3f]);
     m_ADataBufferSize |= 2;

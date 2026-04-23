@@ -411,10 +411,10 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 			menu->m_state = *(u32*)(CFlat + 0x12A4) != 0;
 			break;
 		case 0x65:
-			menu->m_state = (s8)((s32)((u32)(u8)CFlat[0x12E4] << 0x18) >> 0x1F) != 0;
+			menu->m_state = (s8)((s32)(((u32)(u8)CFlat[0x12E4] << 0x18) & 0xC0000000) >> 0x1F) != 0;
 			break;
 		case 0x66:
-			menu->m_state = (s8)((s32)((u32)(u8)CFlat[0x12E4] << 0x1D) >> 0x1F) != 0;
+			menu->m_state = (s8)((s32)(((u32)(u8)CFlat[0x12E4] << 0x1C) & 0xC0000000) >> 0x1F) != 0;
 			break;
 		case 0x67:
 			menu->m_state = (m_dbgFlags >> 0) & 1;

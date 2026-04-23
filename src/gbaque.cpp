@@ -565,24 +565,25 @@ void GbaQueue::LoadMask()
  */
 int GbaQueue::SetQueue(int channel, unsigned int value)
 {
+	char* obj = reinterpret_cast<char*>(this);
+	OSSemaphore* semaphore = accessSemaphores + channel;
 	int ret;
-	char* playerData = reinterpret_cast<char*>(this) + 0x458 + channel;
 
-	OSWaitSemaphore(accessSemaphores + channel);
-	if (playerData[-0x18] == 0) {
-		int* queueCount = reinterpret_cast<int*>(playerData + channel * 3 - 0x28);
+	OSWaitSemaphore(semaphore);
+	if (obj[0x440 + channel] == 0) {
+		int* queueCount = reinterpret_cast<int*>(obj + 0x430 + channel * 4);
 		if (*queueCount < 0x40) {
 			ret = 0;
-			reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + channel * 0x100 + 0x30)[*queueCount] = value;
+			reinterpret_cast<unsigned int*>(obj + 0x30 + channel * 0x100)[*queueCount] = value;
 			*queueCount = *queueCount + 1;
 		} else {
 			ret = -1;
-			playerData[-0x18] = 1;
+			obj[0x440 + channel] = 1;
 		}
 	} else {
 		ret = -1;
 	}
-	OSSignalSemaphore(accessSemaphores + channel);
+	OSSignalSemaphore(semaphore);
 	return ret;
 }
 

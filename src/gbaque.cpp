@@ -64,9 +64,43 @@ struct GbaQueueFlagView
 	unsigned char m_mkSmithFlg;
 };
 
+struct GbaQueuePlayerDataView
+{
+	unsigned char _pad00;
+	unsigned char _pad01;
+	unsigned char _pad02;
+	unsigned char _pad03;
+	unsigned int _pad04[4];
+	unsigned short _pad14;
+	unsigned char _pad16;
+	unsigned char _pad17;
+	unsigned int _pad18[2];
+	unsigned char m_strength[3];
+	unsigned char _pad23;
+	unsigned int m_artifacts[3];
+	unsigned short _pad30;
+	unsigned char _pad32[8];
+	unsigned short m_items[0x40];
+	unsigned short m_tmpArtifacts[4];
+	unsigned short m_artifactList[8];
+	unsigned char _padD2;
+	unsigned char m_artifactCount;
+	unsigned char _padD4;
+	unsigned char _padD5;
+	unsigned char _padD6;
+	unsigned char m_commandData[4];
+	unsigned char _padDB;
+};
+STATIC_ASSERT(sizeof(GbaQueuePlayerDataView) == 0xDC);
+
 static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
 {
 	return reinterpret_cast<GbaQueueFlagView*>(gbaQueue);
+}
+
+static inline GbaQueuePlayerDataView* GetPlayerDataView(GbaQueue* gbaQueue, int channel)
+{
+	return reinterpret_cast<GbaQueuePlayerDataView*>(reinterpret_cast<unsigned char*>(gbaQueue) + channel * 0xDC + 0x454);
 }
 
 static inline unsigned short SwapU16(unsigned short value)
@@ -1922,39 +1956,39 @@ void GbaQueue::GetCaravanName(char* outName)
  */
 int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 {
-	unsigned char localPlayerData[0xDC];
+	GbaQueuePlayerDataView localPlayerData;
 	unsigned short itemList[0x40];
 	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x454, sizeof(localPlayerData));
+	localPlayerData = *GetPlayerDataView(this, channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	for (i = 0; i < 0x40; i++) {
-		itemList[i] = SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0x3A + i * 2));
+		itemList[i] = SwapU16(localPlayerData.m_items[i]);
 	}
 	memcpy(outData, itemList, sizeof(itemList));
 
-	*reinterpret_cast<unsigned int*>(outData + 0x80) = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x24));
-	*reinterpret_cast<unsigned int*>(outData + 0x84) = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x28));
-	*reinterpret_cast<unsigned int*>(outData + 0x88) = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x2C));
+	*reinterpret_cast<unsigned int*>(outData + 0x80) = SwapU32(localPlayerData.m_artifacts[0]);
+	*reinterpret_cast<unsigned int*>(outData + 0x84) = SwapU32(localPlayerData.m_artifacts[1]);
+	*reinterpret_cast<unsigned int*>(outData + 0x88) = SwapU32(localPlayerData.m_artifacts[2]);
 
 	for (i = 0; i < 4; i++) {
 		*reinterpret_cast<unsigned short*>(outData + 0x8C + i * 2) =
-			SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0xBA + i * 2));
+			SwapU16(localPlayerData.m_tmpArtifacts[i]);
 	}
 
-	outData[0x94] = localPlayerData[0xD7];
-	outData[0x95] = localPlayerData[0xD8];
-	outData[0x96] = localPlayerData[0xD9];
-	outData[0x97] = localPlayerData[0xDA];
+	outData[0x94] = localPlayerData.m_commandData[0];
+	outData[0x95] = localPlayerData.m_commandData[1];
+	outData[0x96] = localPlayerData.m_commandData[2];
+	outData[0x97] = localPlayerData.m_commandData[3];
 
 	for (i = 0; i < 8; i++) {
 		*reinterpret_cast<unsigned short*>(outData + 0x98 + i * 2) =
-			SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0xC2 + i * 2));
+			SwapU16(localPlayerData.m_artifactList[i]);
 	}
 
-	outData[0xA8] = localPlayerData[0xD3];
+	outData[0xA8] = localPlayerData.m_artifactCount;
 	return 0xA9;
 }
 
@@ -4064,17 +4098,16 @@ void GbaQueue::ClrArtifactFlg(int channel)
  */
 int GbaQueue::GetArtifactData(int channel, unsigned char* outData)
 {
-	unsigned char localPlayerData[0xDC];
+	GbaQueuePlayerDataView localPlayerData;
 	unsigned int artifactData[3];
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x454,
-	       sizeof(localPlayerData));
+	localPlayerData = *GetPlayerDataView(this, channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	artifactData[0] = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x24));
-	artifactData[1] = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x28));
-	artifactData[2] = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x2C));
+	artifactData[0] = SwapU32(localPlayerData.m_artifacts[0]);
+	artifactData[1] = SwapU32(localPlayerData.m_artifacts[1]);
+	artifactData[2] = SwapU32(localPlayerData.m_artifacts[2]);
 	memcpy(outData, artifactData, sizeof(artifactData));
 	return 0xC;
 }
@@ -4275,21 +4308,20 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
  */
 int GbaQueue::GetTmpArtifactData(int channel, unsigned char* outData)
 {
-	unsigned char localPlayerData[0xDC];
+	GbaQueuePlayerDataView localPlayerData;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x454,
-	       sizeof(localPlayerData));
+	localPlayerData = *GetPlayerDataView(this, channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	*reinterpret_cast<unsigned short*>(outData + 0) =
-		SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0xBA));
+		SwapU16(localPlayerData.m_tmpArtifacts[0]);
 	*reinterpret_cast<unsigned short*>(outData + 2) =
-		SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0xBC));
+		SwapU16(localPlayerData.m_tmpArtifacts[1]);
 	*reinterpret_cast<unsigned short*>(outData + 4) =
-		SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0xBE));
+		SwapU16(localPlayerData.m_tmpArtifacts[2]);
 	*reinterpret_cast<unsigned short*>(outData + 6) =
-		SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0xC0));
+		SwapU16(localPlayerData.m_tmpArtifacts[3]);
 
 	return 8;
 }

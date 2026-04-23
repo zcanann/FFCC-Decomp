@@ -1,6 +1,7 @@
 #include "ffcc/pppVertexApLc.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 
 struct VertexApLcEntry
 {
@@ -47,10 +48,6 @@ struct VertexApLcSource
     u8 unk0[0x2C];
     Vec* points;
 };
-
-struct _pppPDataVal;
-
-_pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--

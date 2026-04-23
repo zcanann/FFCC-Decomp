@@ -105,6 +105,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 	int textureIndex = 0;
 	pppYmDeformationShpLayout* obj = (pppYmDeformationShpLayout*)pppYmDeformationShp_;
 	Vec vertices[4];
+	Mtx drawMtx;
 	Mtx rotMtx;
 	Vec2d uvs[4];
 	float indMtx[2][3];
@@ -116,7 +117,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
 			env->m_mapMeshPtr[param_2->m_dataValIndex], env->m_materialSetPtr, textureIndex);
 
-		PSMTXIdentity(rotMtx);
+		PSMTXIdentity(drawMtx);
 		pppSetBlendMode(1);
 		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 		pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(

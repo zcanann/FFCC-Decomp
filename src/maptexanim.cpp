@@ -102,8 +102,8 @@ static inline void SetMaterialTextureSlot(void* material, unsigned long slotInde
 void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
     int found = 0;
-    int setPtr = reinterpret_cast<int>(this);
     short targetMaterialId = static_cast<short>(materialId);
+    int setPtr = reinterpret_cast<int>(this);
 
     for (int i = 0; i < m_count; i++) {
         void* animPtr = reinterpret_cast<void*>(*reinterpret_cast<int*>(setPtr + 0xC));

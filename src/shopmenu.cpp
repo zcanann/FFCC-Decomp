@@ -80,6 +80,8 @@ extern float FLOAT_80332d6c;
 extern float FLOAT_80332d70;
 extern float FLOAT_80332d74;
 extern float FLOAT_80332d78;
+extern float FLOAT_80332dc8;
+extern float FLOAT_80332dcc;
 extern float FLOAT_80332dd0;
 extern float FLOAT_80332de0;
 extern float FLOAT_80332e48;
@@ -2743,27 +2745,37 @@ void CShopMenu::DrawSoubiBase()
     DrawSingleBase__8CMenuPcsFf(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), 1.0f);
     pppInitDrawEnv(0);
 
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)11, (GXCompCnt)1, (GXCompType)5, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)13, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetNumChans(1);
+    GXSetChanCtrl((GXChannelID)0, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl((GXChannelID)2, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GXSetColorUpdate(GX_TRUE);
+
     _GXColor fadeA = {0xFF, 0xFF, 0xFF, 0x00};
     _GXColor fadeB = {0xFF, 0xFF, 0xFF, 0xFF};
     _GXColor fadeC = {0xFF, 0xFF, 0xFF, 0x00};
     _GXColor fadeD = {0xFF, 0xFF, 0xFF, 0xFF};
-    drawShapeSeqGrouad(9, 0, 0x1C, 0x10C, 0.5f, 0.7f, fadeA, fadeB, fadeC, fadeD);
+    drawShapeSeqGrouad(9, 0, 0x1C, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, fadeA, fadeB, fadeC, fadeD);
 
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     int x = 0x3C;
     while (x < 0x25C) {
-        drawShapeSeqGrouad(9, 0, x, 0x10C, 0.5f, 0.7f, white, white, white, white);
+        drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, white, white, white, white);
         x += 0x20;
     }
-    drawShapeSeqGrouad(9, 0, x, 0x10C, 0.5f, 0.7f, white, fadeA, white, fadeC);
+    drawShapeSeqGrouad(9, 0, x, 0x10C, FLOAT_80332d78, FLOAT_80332dc8, white, fadeA, white, fadeC);
 
-    drawShapeSeqScale(3, 0, 0x106, 0xA4, FLOAT_80332d78, 0.7f, 0xFF);
+    drawShapeSeqScale(3, 0, 0x106, 0xA4, FLOAT_80332d78, FLOAT_80332dcc, 0xFF);
     x = 0x106;
     while (x < 0x17A) {
-        drawShapeSeqScale(4, 0, x, 0xA4, FLOAT_80332d78, 0.7f, 0xFF);
+        drawShapeSeqScale(4, 0, x, 0xA4, FLOAT_80332d78, FLOAT_80332dcc, 0xFF);
         x += 0x20;
     }
-    drawShapeSeqScale(3, 0, x, 0xA4, FLOAT_80332dd0, 0.7f, 0xFF);
+    drawShapeSeqScale(3, 0, x, 0xA4, FLOAT_80332dd0, FLOAT_80332dcc, 0xFF);
 }
 
 /*

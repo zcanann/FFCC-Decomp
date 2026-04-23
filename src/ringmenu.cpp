@@ -291,8 +291,7 @@ void CRingMenu::Destroy()
  */
 double CRingMenu::GetDispCounter()
 {
-	const int displayCounter = RingMenuInt(this, 0x500);
-	return static_cast<double>(FLOAT_803309cc - static_cast<float>(displayCounter) * FLOAT_80330a08);
+	return static_cast<double>(FLOAT_803309cc - static_cast<float>(m_displayCounter) * FLOAT_80330a08);
 }
 
 /*
@@ -306,39 +305,39 @@ double CRingMenu::GetDispCounter()
  */
 void CRingMenu::onCalc()
 {
-	const int menuIndex = RingMenuInt(this, 0x0C);
+	const int menuIndex = m_menuIndex;
 	if ((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
-		const int animDirection = RingMenuInt(this, 0x10);
+		const int animDirection = m_displayDirection;
 		const unsigned int targetAnimDirection =
 			((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4)) >> 2) & 1;
 		if (animDirection != static_cast<int>(targetAnimDirection)) {
 			System.Printf(const_cast<char*>(DAT_801da01c), menuIndex);
-			RingMenuInt(this, 0x10) = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(animDirection))) >> 5) & 0xFF;
-			RingMenuInt(this, 0x500) = 0x10 - RingMenuInt(this, 0x500);
+			m_displayDirection = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(animDirection))) >> 5) & 0xFF;
+			m_displayCounter = 0x10 - m_displayCounter;
 		}
 
-		RingMenuInt(this, 0x500) = clampDecToZero(RingMenuInt(this, 0x500));
-		RingMenuInt(this, 0x4EC) = clampDecToZero(RingMenuInt(this, 0x4EC));
-		RingMenuInt(this, 0x4F0) = RingMenuInt(this, 0x4F0) + 1;
-		RingMenuInt(this, 0x4F4) = clampDecToZero(RingMenuInt(this, 0x4F4));
-
-		for (int i = 0; i < 8; i++) {
-			RingMenuInt(this, 0x38 + i * 4) = clampDecToZero(RingMenuInt(this, 0x38 + i * 4));
-		}
-		RingMenuInt(this, 0x4F8) = clampDecToZero(RingMenuInt(this, 0x4F8));
+		m_displayCounter = clampDecToZero(m_displayCounter);
+		m_transitionCounter = clampDecToZero(m_transitionCounter);
+		m_commonFrameCounter = m_commonFrameCounter + 1;
+		m_timerB = clampDecToZero(m_timerB);
 
 		for (int i = 0; i < 9; i++) {
-			float* animFloat = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x64 + i * 0x4C);
+			m_buttonTimers[i] = clampDecToZero(m_buttonTimers[i]);
+		}
+
+		const float animStep = FLOAT_80330a54;
+		const float animMin = FLOAT_803309c0;
+		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 3; j++) {
-				animFloat[j] = animFloat[j] - FLOAT_80330a54;
-				if (animFloat[j] < FLOAT_803309c0) {
-					animFloat[j] = FLOAT_803309c0;
+				m_animFloat[i][j] = m_animFloat[i][j] - animStep;
+				if (m_animFloat[i][j] < animMin) {
+					m_animFloat[i][j] = animMin;
 				}
 			}
 		}
 
-		fmod(static_cast<double>(RingMenuFloat(this, 0x50C)), DOUBLE_80330a98);
-		volatile int i = 0x1B;
+		fmod(static_cast<double>(m_spinPhase), DOUBLE_80330a98);
+		int i = 0x1B;
 		do {
 			i--;
 		} while (i != 0);
@@ -354,23 +353,23 @@ void CRingMenu::onCalc()
 			gbaConnected = 0;
 		}
 
-		if (RingMenuInt(this, 0x4FC) != static_cast<int>(gbaConnected)) {
-			RingMenuInt(this, 0x4FC) = static_cast<int>(gbaConnected);
-			RingMenuInt(this, 0x508) = 0x0C - RingMenuInt(this, 0x508);
+		if (m_gbaConnectedFlag != static_cast<int>(gbaConnected)) {
+			m_gbaConnectedFlag = static_cast<int>(gbaConnected);
+			m_gbaAnimCounter = 0x0C - m_gbaAnimCounter;
 		}
-		RingMenuInt(this, 0x508) = clampDecToZero(RingMenuInt(this, 0x508));
+		m_gbaAnimCounter = clampDecToZero(m_gbaAnimCounter);
 
 		CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 		if (partyObj != 0) {
-			(void)partyObj;
-			CCaravanWork* caravanWork = &Game.m_caravanWorkArr[menuIndex];
+			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(
+				reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(partyObj) + 0x58)[0]);
 			int currentCmd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
 
 			if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
 				currentCmd = _GetIdxCmdList__12CCaravanWorkFv(caravanWork);
 			}
 
-			int* trackedCmd = &RingMenuInt(this, 0x504);
+			int* trackedCmd = &m_currentCommandIndex;
 			if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 				trackedCmd = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2008);
 			}
@@ -422,8 +421,7 @@ void CRingMenu::onCalc()
 			}
 
 			*trackedCmd = currentCmd;
-			RingMenuFloat(this, 0x50C) =
-				(RingMenuFloat(this, 0x50C) + static_cast<float>(scrollDelta)) * FLOAT_80330ae8;
+			m_spinAccumulator = (m_spinAccumulator + static_cast<float>(scrollDelta)) * FLOAT_80330ae8;
 		}
 	}
 }
@@ -538,7 +536,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
  */
 void CRingMenu::onDraw()
 {
-	const int menuIndex = RingMenuInt(this, 0x0C);
+	const int menuIndex = m_menuIndex;
 	const RingMenuFlatData* flatData = reinterpret_cast<const RingMenuFlatData*>(&Game.m_cFlatDataArr[1]);
 	if (!((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
 		return;
@@ -550,20 +548,21 @@ void CRingMenu::onDraw()
 	}
 
 	double showScale = static_cast<double>(static_cast<float>(RingMenuInt(this, 0x500)) * FLOAT_80330a08);
-	if (RingMenuInt(this, 0x10) != 0) {
+	if (m_displayDirection != 0) {
 		showScale = static_cast<double>(FLOAT_803309cc) - showScale;
 	}
 	if (showScale == static_cast<double>(FLOAT_803309c0)) {
 		return;
 	}
 
-	double transitionScale = static_cast<double>(static_cast<float>(RingMenuInt(this, 0x4EC)) * FLOAT_80330a08);
-	if (RingMenuInt(this, 0x10) != 0) {
+	double transitionScale = static_cast<double>(static_cast<float>(m_transitionCounter) * FLOAT_80330a08);
+	if (m_displayDirection != 0) {
 		transitionScale = -static_cast<double>(static_cast<float>(
-			static_cast<double>(static_cast<float>(RingMenuInt(this, 0x4EC)) * FLOAT_80330a08) - FLOAT_803309cc));
+			static_cast<double>(static_cast<float>(m_transitionCounter) * FLOAT_80330a08) - FLOAT_803309cc));
 	}
 
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x16);
+	sin(static_cast<double>(FLOAT_80330a0c * static_cast<float>(m_gbaAnimCounter)) / static_cast<double>(FLOAT_80330a10));
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
 	float cycle = static_cast<float>(
@@ -858,7 +857,7 @@ void CRingMenu::onDraw()
  */
 void CRingMenu::drawGBA()
 {
-	const int menuIndex = RingMenuInt(this, 0x0C);
+	const int menuIndex = m_menuIndex;
 	if (!((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
 		return;
 	}
@@ -869,7 +868,7 @@ void CRingMenu::drawGBA()
 	}
 
 	double showScale = static_cast<double>(static_cast<float>(static_cast<float>(RingMenuInt(this, 0x500)) * FLOAT_80330a08));
-	if (RingMenuInt(this, 0x10) != 0) {
+	if (m_displayDirection != 0) {
 		showScale = static_cast<double>(FLOAT_803309cc) - showScale;
 	}
 	if (showScale == static_cast<double>(FLOAT_803309c0)) {
@@ -879,8 +878,8 @@ void CRingMenu::drawGBA()
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x16);
 
 	double gbaAnim = static_cast<double>(
-	    sin(static_cast<double>(FLOAT_80330a0c * static_cast<float>(RingMenuInt(this, 0x4F0))) / static_cast<double>(FLOAT_80330a10)));
-	if (RingMenuInt(this, 0x4F8) == 1) {
+	    sin(static_cast<double>(FLOAT_80330a0c * static_cast<float>(m_gbaAnimCounter)) / static_cast<double>(FLOAT_80330a10)));
+	if (m_gbaConnectedFlag == 1) {
 		gbaAnim = static_cast<double>(FLOAT_803309cc) - gbaAnim;
 	}
 
@@ -1003,14 +1002,13 @@ void CRingMenu::SetFade(int)
  */
 void CRingMenu::SetBattleButton(int buttonIndex, int newValue)
 {
-	int* battleButtons = reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x18);
-	int current = battleButtons[buttonIndex];
+	int current = m_battleButtons[buttonIndex];
 
 	if (current == newValue) {
 		return;
 	}
 
-	battleButtons[buttonIndex] = newValue;
+	m_battleButtons[buttonIndex] = newValue;
 }
 
 /*
@@ -1028,27 +1026,27 @@ void CRingMenu::SetBattleCommand(int buttonGroupIndex, int newCommandId, int new
 		newCommandId = -1;
 	}
 
-	const int currentCommand = RingMenuInt(this, 0x20 + buttonGroupIndex * 8);
+	const int currentCommand = m_battleButtons[buttonGroupIndex * 2 + 2];
 
 	if (currentCommand == newCommandId) {
 		return;
 	}
 
 	if (((currentCommand >= 0) && (newCommandId < 0)) || ((currentCommand < 0) && (newCommandId >= 0))) {
-		RingMenuInt(this, 0x40 + buttonGroupIndex * 12) = 8 - RingMenuInt(this, 0x40 + buttonGroupIndex * 12);
+		m_buttonTimers[buttonGroupIndex * 3 + 2] = 8 - m_buttonTimers[buttonGroupIndex * 3 + 2];
 	}
 
-	RingMenuInt(this, 0x24 + buttonGroupIndex * 8) = RingMenuInt(this, 0x20 + buttonGroupIndex * 8);
-	RingMenuInt(this, 0x20 + buttonGroupIndex * 8) = newCommandId;
-	RingMenuInt(this, 0x3C + buttonGroupIndex * 12) = 8 - RingMenuInt(this, 0x38 + buttonGroupIndex * 12);
-	RingMenuInt(this, 0x38 + buttonGroupIndex * 12) = 8 - RingMenuInt(this, 0x38 + buttonGroupIndex * 12);
+	m_battleButtons[buttonGroupIndex * 2 + 3] = m_battleButtons[buttonGroupIndex * 2 + 2];
+	m_battleButtons[buttonGroupIndex * 2 + 2] = newCommandId;
+	m_buttonTimers[buttonGroupIndex * 3 + 1] = 8 - m_buttonTimers[buttonGroupIndex * 3];
+	m_buttonTimers[buttonGroupIndex * 3] = 8 - m_buttonTimers[buttonGroupIndex * 3];
 
 	if (buttonGroupIndex != 2) {
 		return;
 	}
 
-	RingMenuInt(this, 0x60) = RingMenuInt(this, 0x5C);
-	RingMenuInt(this, 0x5C) = newRotation;
+	m_rotationPhase = m_ringRotation;
+	m_ringRotation = newRotation;
 }
 
 /*
@@ -1060,7 +1058,7 @@ void CRingMenu::DrawIcon()
 {
 	drawGBA();
 
-	if (!((Game.m_gameWork.m_menuStageMode == 0) || (RingMenuInt(this, 0x0C) < 2))) {
+	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 2))) {
 		return;
 	}
 
@@ -1070,7 +1068,7 @@ void CRingMenu::DrawIcon()
 		return;
 	}
 
-	int menuIndex = RingMenuInt(this, 0x0C);
+	int menuIndex = m_menuIndex;
 	CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 	if (partyObj == 0 || static_cast<signed char>(*reinterpret_cast<unsigned char*>(&partyObj->m_weaponNodeFlags + 1)) >= 0) {
 		return;

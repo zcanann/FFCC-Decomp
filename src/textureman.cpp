@@ -621,7 +621,7 @@ CTextureSet::~CTextureSet()
  */
 void CTexture::InitTexObj()
 {
-    const unsigned int format = m_format;
+    const int format = m_format;
     if ((format == 9) || (format == 8)) {
         GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height), static_cast<GXCITexFmt>(format),
                        static_cast<GXTexWrapMode>(m_wrapMode), static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
@@ -644,10 +644,12 @@ void CTexture::InitTexObj()
             offsetEntries = 0x100;
         }
 
-        GXInitTlutObj(&m_tlutObj1, Ptr(tlutData, offsetEntries * 2), GX_TL_IA8, static_cast<u16>(numEntries1));
+        GXInitTlutObj(&m_tlutObj1, reinterpret_cast<void*>(reinterpret_cast<unsigned int>(tlutData) + offsetEntries * 2),
+                      GX_TL_IA8, static_cast<u16>(numEntries1));
     } else {
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height), static_cast<GXTexFmt>(format),
-                     static_cast<GXTexWrapMode>(m_wrapMode), static_cast<GXTexWrapMode>(m_wrapMode), (1 - m_maxLod) >> 31);
+                     static_cast<GXTexWrapMode>(m_wrapMode), static_cast<GXTexWrapMode>(m_wrapMode),
+                     (1 - static_cast<int>(m_maxLod)) >> 31);
     }
 
     const unsigned char maxLod = m_maxLod;
@@ -870,11 +872,12 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
                 if (m_format == 9) {
                     offset = 0x100;
                 }
-                GXInitTlutObj(&m_tlutObj1, Ptr(m_tlutData, offset * 2), GX_TL_IA8, static_cast<u16>(numEntries));
+                GXInitTlutObj(&m_tlutObj1, reinterpret_cast<void*>(reinterpret_cast<unsigned int>(m_tlutData) + offset * 2),
+                              GX_TL_IA8, static_cast<u16>(numEntries));
             } else {
                 GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                              static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                             static_cast<GXTexWrapMode>(m_wrapMode), 1 - (m_maxLod >> 31));
+                             static_cast<GXTexWrapMode>(m_wrapMode), (1 - static_cast<int>(m_maxLod)) >> 31);
             }
 
             const unsigned char maxLod = m_maxLod;

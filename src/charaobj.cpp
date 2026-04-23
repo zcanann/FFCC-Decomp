@@ -2,6 +2,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/linkage.h"
 #include "ffcc/monobj.h"
+#include "ffcc/partyobj.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_minigame.h"
@@ -56,6 +57,60 @@ static float CharaObjGetMonsterScale(unsigned char* script9, bool isMon)
 static void CharaObjPutMonsterScaledParticle(CGCharaObj* charaObj, int particleNo, int slot, float scale)
 {
 	charaObj->putParticle(particleNo, slot, static_cast<CGObject*>(charaObj), 20.0f * charaObj->m_attackColRadius * scale, 0);
+}
+
+static Vec& CharaObjComboCenter(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(charaObj) + 0x66C);
+}
+
+static Vec& CharaObjComboTarget(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(charaObj) + 0x678);
+}
+
+static int& CharaObjComboItemState(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(charaObj) + 0x684);
+}
+
+static int& CharaObjComboScriptArg(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(charaObj) + 0x698);
+}
+
+static unsigned int& CharaObjComboScriptMode(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(charaObj) + 0x69C);
+}
+
+static float& CharaObjComboLinkCount(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(charaObj) + 0x6A8);
+}
+
+static CGPrgObj** CharaObjComboLinks(CGCharaObj* charaObj)
+{
+	return reinterpret_cast<CGPrgObj**>(reinterpret_cast<unsigned char*>(charaObj) + 0x6AC);
+}
+
+static unsigned char& CharaObjComboFlags(CGCharaObj* charaObj)
+{
+	return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(charaObj) + 0x6B8);
+}
+
+static bool CharaObjSkipComboScript(CGPrgObj* obj)
+{
+	if (obj == 0) {
+		return true;
+	}
+
+	if (Game.m_gameWork.m_menuStageMode == 0 || Game.m_gameWork.m_bossArtifactStageIndex >= 0xF) {
+		return false;
+	}
+
+	return ((obj->GetCID() & 0x6D) == 0x6D) &&
+	       (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(obj->m_scriptHandle) + 0x3B4) != 0);
 }
 
 /*
@@ -1695,16 +1750,16 @@ void CGCharaObj::StaticFrame()
  */
 void CGCharaObj::combi2()
 {
-	CGPartyObj* candidates[4];
+	CGPartyObj* candidates[5];
 	int candidateCount = 0;
+
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];
 		if (party == 0) {
 			continue;
 		}
-		int state = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party) + 0x520);
-		int subState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party) + 0x52C);
-		if ((state == 6 || state == 2) && subState == 1) {
+
+		if ((party->m_lastStateId == 6 || party->m_lastStateId == 2) && party->m_subState == 1) {
 			candidates[candidateCount++] = party;
 		}
 	}
@@ -1713,18 +1768,159 @@ void CGCharaObj::combi2()
 		return;
 	}
 
+	for (int i = 0; i < candidateCount; i++) {
+		CGPartyObj* party = candidates[i];
+		if (party == 0 || party->m_comboState == 0) {
+			continue;
+		}
+
+		bool hasNearbyPartner = false;
+		for (int j = 0; j < candidateCount; j++) {
+			if (i == j) {
+				continue;
+			}
+
+			CGPartyObj* other = candidates[j];
+			if (other == 0 || other->m_comboState == 0) {
+				continue;
+			}
+
+			if (PSVECDistance(&CharaObjComboCenter(party), &CharaObjComboCenter(other)) < 20.0f) {
+				hasNearbyPartner = true;
+				break;
+			}
+		}
+
+		unsigned char& comboFlags = CharaObjComboFlags(party);
+		const bool hadNearbyPartner = (comboFlags & 0x40) != 0;
+		if (hasNearbyPartner != hadNearbyPartner) {
+			comboFlags = (comboFlags & ~0x40) | (hasNearbyPartner ? 0x40 : 0);
+			comboFlags = (comboFlags & ~0x10) | 0x10;
+			party->playSe3D(hasNearbyPartner ? 0x3E : 0x3D, 0x32, 0x96, 0, 0);
+		}
+	}
+
+	for (int i = 0; i < candidateCount - 1; i++) {
+		for (int j = i + 1; j < candidateCount; j++) {
+			if (candidates[i]->m_comboFrame < candidates[j]->m_comboFrame) {
+				CGPartyObj* swap = candidates[i];
+				candidates[i] = candidates[j];
+				candidates[j] = swap;
+			}
+		}
+	}
+
+	for (int i = 1; i < candidateCount; ) {
+		if (PSVECDistance(&CharaObjComboCenter(candidates[0]), &CharaObjComboCenter(candidates[i])) > 20.0f) {
+			for (int j = i; j < candidateCount - 1; j++) {
+				candidates[j] = candidates[j + 1];
+			}
+			candidateCount--;
+			continue;
+		}
+		i++;
+	}
+
+	if (candidates[0]->m_comboFrame == 0) {
+		return;
+	}
+
 	int fallback = 0;
 	int comboIndex = searchCombi(candidateCount, candidates, fallback);
 	if (comboIndex < 0) {
-		for (int i = 0; i < candidateCount; i++) {
-			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(candidates[i]) + 0x118) = 0.0f;
-			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(candidates[i]) + 0x110) = 0.0f;
-			reinterpret_cast<CGPrgObj*>(candidates[i])->addSubStat();
+		if (fallback == 0 || candidates[0]->m_comboFrame > 0x41) {
+			candidates[0]->m_comboState = 0;
+			candidates[0]->m_comboFrame = 0;
+			candidates[0]->addSubStat();
+			combi2();
 		}
 		return;
 	}
 
-	sendCombiToScript(this, comboIndex, fallback);
+	if (fallback != 0 && candidates[0]->m_comboFrame <= 0x41) {
+		return;
+	}
+
+	unsigned short* comboData = reinterpret_cast<unsigned short*>(Game.unk_flat3_field_1C_0xc7d8) + comboIndex * 0xD;
+	int participantCount = 0;
+	if (comboData[0] != 0) {
+		participantCount = 1;
+		if (comboData[3] != 0) {
+			participantCount = 2;
+			if (comboData[6] != 0) {
+				participantCount = 3;
+				if (comboData[9] != 0) {
+					participantCount = 4;
+				}
+			}
+		}
+	}
+
+	const unsigned short comboCmd = comboData[0xC];
+	const bool isSharedResult = comboData[participantCount * 3 - 3] != 0x1F8;
+	Vec comboCenter = {0.0f, 0.0f, 0.0f};
+	if (isSharedResult) {
+		for (int i = 0; i < participantCount; i++) {
+			PSVECAdd(&comboCenter, &CharaObjComboCenter(candidates[i]), &comboCenter);
+		}
+		PSVECScale(&comboCenter, &comboCenter, 1.0f / static_cast<float>(participantCount));
+	}
+
+	CGPartyObj* leadParty = candidates[participantCount - 1];
+	bool playedComboSe = false;
+	for (int i = 0; i < participantCount; i++) {
+		CGPartyObj* party = candidates[i];
+		unsigned int comboMode = 0xFFFFFFFF;
+
+		if (isSharedResult) {
+			CharaObjComboCenter(party) = comboCenter;
+			if (playedComboSe || CharaObjSkipComboScript(party)) {
+				CharaObjComboScriptArg(party) = 0;
+			} else {
+				CharaObjComboScriptArg(party) = comboCmd;
+				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
+				playedComboSe = true;
+			}
+		} else {
+			if (comboCmd == 0x207) {
+				comboMode = 0;
+			} else if (comboCmd == 0x20B) {
+				comboMode = 1;
+			} else if (comboCmd == 0x20F) {
+				comboMode = 2;
+			}
+
+			if (party == leadParty) {
+				CharaObjComboItemState(party) = static_cast<int>(comboMode);
+				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
+			} else {
+				CharaObjComboCenter(party) = leadParty->m_worldPosition;
+				CharaObjComboScriptArg(party) = 0;
+			}
+		}
+
+		party->m_comboState = 0;
+		party->m_comboFrame = 0;
+		party->addSubStat();
+		party->putComboParticle();
+
+		CharaObjComboScriptArg(party) = comboCmd;
+		CharaObjComboScriptMode(party) = comboMode;
+		CharaObjComboLinkCount(party) = 0.0f;
+
+		int linkCount = 0;
+		CGPrgObj** comboLinks = CharaObjComboLinks(party);
+		for (int j = 0; j < participantCount; j++) {
+			CGPartyObj* other = candidates[j];
+			if (party == other) {
+				continue;
+			}
+			comboLinks[linkCount++] = other;
+		}
+		CharaObjComboLinkCount(party) = static_cast<float>(linkCount);
+	}
+
+	combi2();
 }
 
 /*

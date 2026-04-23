@@ -23,8 +23,10 @@ struct pppYmTracer2UnkC {
 };
 
 struct pppYmTracer2 {
-    _pppPObject m_object;
-    u8 m_pad34[0x4C];
+    u8 m_header[0x10];
+    pppFMATRIX m_localMatrix;
+    pppFMATRIX m_drawMatrix;
+    u8 m_pad70[0x10];
     u8 m_serializedData[1];
 };
 

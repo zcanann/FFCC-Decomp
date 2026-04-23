@@ -13,6 +13,10 @@ extern "C" {
 void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void _WaitDrawDone__8CGraphicFPci(void*, char*, int);
 void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
+void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 void SetMode__9CShopMenuFi(void*, int);
 void DrawSingleBase__8CMenuPcsFf(void*, float);
 void ReleasePdt__8CPartPcsFi(void*, int);
@@ -74,6 +78,7 @@ extern float FLOAT_80332d70;
 extern float FLOAT_80332d74;
 extern float FLOAT_80332d78;
 extern float FLOAT_80332dd0;
+extern float FLOAT_80332de0;
 extern float FLOAT_80332e48;
 extern float FLOAT_80332e4c;
 extern float FLOAT_80332d7c;
@@ -191,6 +196,56 @@ static float CalcCenteredShopMenuX(CFont* font, const char* text)
         return 0.0f;
     }
     return (464.0f - GetWidth__5CFontFPc(font, text)) * 0.5f;
+}
+
+static void DrawShopMenuFadeOverlay(float fade)
+{
+    if (fade == FLOAT_80332d28) {
+        return;
+    }
+
+    int fadeStep = static_cast<int>(FLOAT_80332de0 * fade);
+    unsigned char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
+
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x32);
+
+    Mtx screenMtx;
+    Mtx44 projectionMtx;
+    PSMTXIdentity(screenMtx);
+    screenMtx[1][1] = -1.0f;
+    screenMtx[1][3] = 480.0f;
+    GXLoadPosMtxImm(screenMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(projectionMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
+
+    _GXColor fadeColor = {0, 0, 0, alpha};
+    GXSetChanAmbColor(GX_COLOR0A0, fadeColor);
+    GXSetChanMatColor(GX_COLOR0A0, fadeColor);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXClearVtxDesc();
+    GXSetVtxAttrFmt(GX_VTXFMT6, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT6, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+
+    Vec topLeft = {0.0f, 0.0f, 0.0f};
+    Vec bottomRight = {640.0f, 480.0f, 0.0f};
+    Graphic.RenderNoTexQuadGrouad(topLeft, bottomRight, fadeColor, fadeColor, fadeColor, fadeColor);
+
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x33);
 }
 
 static int ResolveShopMenuItemCount(CShopMenu* shopMenu)
@@ -2331,15 +2386,27 @@ void CShopMenu::DrawSoubi()
  */
 void CShopMenu::Draw()
 {
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x46);
+    int pdtSlot = ShopMenuInt(this, 0x18);
+    if ((pdtSlot >= 0) && (pdtSlot < static_cast<int>(sizeof(PartMng.m_pdtSlots) / sizeof(PartMng.m_pdtSlots[0])))) {
+        pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(PartMng.m_pdtSlots[pdtSlot].m_envFields);
+    }
+
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     int mode = ShopMenuInt(this, 0x0);
-    if (mode < 3) {
+    if ((mode >= 0) && (mode < 3)) {
         DrawShop0();
     } else if (mode < 6) {
-        DrawBuy();
+        DrawShopBase();
+        DrawItemList();
+        DrawItemInfo0();
+        DrawBuySellInfo();
     } else if (mode < 9) {
-        DrawSell();
+        DrawShopBase();
+        DrawItemList();
+        DrawItemInfo0();
+        DrawBuySellInfo();
     } else if (mode < 0xC) {
         DrawSmith0();
     } else if (mode < 0xF) {
@@ -2347,6 +2414,9 @@ void CShopMenu::Draw()
     } else if (mode < 0x12) {
         DrawSoubi();
     }
+
+    DrawShopMenuFadeOverlay(ShopMenuFloat(this, 0x1C));
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x3C);
 }
 
 /*

@@ -25,10 +25,13 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 
 extern const float FLOAT_80331840;
-extern float FLOAT_80331844;
+extern const float FLOAT_80331844;
 extern const float FLOAT_80331848 = 255.0f;
-extern const float FLOAT_80331840 = 0.0f;
-extern float FLOAT_80331860;
+extern const double DOUBLE_80331850 = 4503599627370496.0;
+extern const double DOUBLE_80331858 = 4503601774854144.0;
+extern const float FLOAT_80331860 = -1.0f;
+extern const char lbl_80331868[4] = "THP";
+extern const float FLOAT_8033186C = 127.0f;
 
 static const char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";
 

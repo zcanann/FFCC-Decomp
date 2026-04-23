@@ -118,6 +118,11 @@ struct LaserBaseObject {
     pppFMATRIX m_drawMatrix;
 };
 
+union LaserDoubleBits {
+    double d;
+    u32 u[2];
+};
+
 /*
  * --INFO--
  * PAL Address: 801766ec
@@ -298,8 +303,16 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             if (emptyHistory) {
                 continue;
             }
-            double t = (FLOAT_80333448 / (float)((double)(int)(step->m_payload[0x3a] + 1) - DOUBLE_80333440)) *
-                (float)((double)(int)i - DOUBLE_80333440);
+            LaserDoubleBits countDouble;
+            LaserDoubleBits indexDouble;
+
+            countDouble.u[0] = 0x43300000;
+            countDouble.u[1] = (u32)(int)(step->m_payload[0x3a] + 1) ^ 0x80000000;
+            indexDouble.u[0] = 0x43300000;
+            indexDouble.u[1] = (u32)(int)i ^ 0x80000000;
+
+            double t = (FLOAT_80333448 / (float)(countDouble.d - DOUBLE_80333440)) *
+                (float)(indexDouble.d - DOUBLE_80333440);
             if (GetCharaNodeFrameMatrix(pppMngStPtr, (float)t, charaMtx) == 0) {
                 emptyHistory = true;
                 continue;
@@ -519,7 +532,11 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         pppDrawShp__FPlsP12CMaterialSetUc(shape, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
 
         count = (u32)step->m_payload[0x1e];
-        uvStep = FLOAT_8033342c / ((float)(double)count - (float)DOUBLE_80333438);
+        LaserDoubleBits countDouble;
+
+        countDouble.u[0] = 0x43300000;
+        countDouble.u[1] = count;
+        uvStep = FLOAT_8033342c / (float)(countDouble.d - DOUBLE_80333438);
         if (step->m_initWOrk == 0xFFFF) {
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
             _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);

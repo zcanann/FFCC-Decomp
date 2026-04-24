@@ -26,8 +26,8 @@ static const double DOUBLE_80331FF8 = 3.0;
 static const double DOUBLE_80332000 = 0.0;
 static const float FLOAT_80332008 = 1.0f;
 static const float FLOAT_8033200C = 128.0f;
-extern const float FLOAT_80332010;
-extern const double DOUBLE_80332018;
+static const float FLOAT_80332010 = 127.0f;
+static const double DOUBLE_80332018 = 4503599627370496.0;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 

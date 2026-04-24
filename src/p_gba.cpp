@@ -9,6 +9,8 @@ extern "C" void create__7CGbaPcsFv(CGbaPcs*);
 extern "C" void destroy__7CGbaPcsFv(CGbaPcs*);
 extern "C" void calc__7CGbaPcsFv(CGbaPcs*);
 extern "C" void draw__7CGbaPcsFv(CGbaPcs*);
+extern char __RTTI__8CManager[];
+extern char __RTTI__8CProcess[];
 extern const char s_CGbaPcs_80330870[];
 extern const char s_JoyBus__LoadBin___error_801d9de0[];
 
@@ -35,6 +37,10 @@ CGbaPcsTable CGbaPcs::m_table = {
         0x00000045,
         0x00000001,
     },
+};
+unsigned int CGbaPcs_RTTI_base__7CGbaPcs[3] = {reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, 0};
+unsigned int CGbaPcs_RTTI__7CGbaPcs[5] = {
+    reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, reinterpret_cast<unsigned int>(__RTTI__8CProcess), 0, 0
 };
 
 CGbaPcs GbaPcs;

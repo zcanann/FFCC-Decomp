@@ -775,8 +775,6 @@ void CDbgMenuPcs::Add()
     rootParam.m_unk28 = 0;
     rootParam.m_unk2C = 0;
     rootParam.m_unk30 = 0;
-    rootParam.m_text = const_cast<char*>(s_Debug_80331c90);
-
     param.m_type = rootParam.m_type;
     param.m_flags = rootParam.m_flags;
     param.m_x = rootParam.m_x;
@@ -786,7 +784,7 @@ void CDbgMenuPcs::Add()
     param.m_unk18 = rootParam.m_unk18;
     param.m_unk1C = rootParam.m_unk1C;
     param.m_unk20 = rootParam.m_unk20;
-    param.m_text = rootParam.m_text;
+    param.m_text = const_cast<char*>(s_Debug_80331c90);
     param.m_unk28 = rootParam.m_unk28;
     param.m_unk2C = rootParam.m_unk2C;
     param.m_unk30 = rootParam.m_unk30;
@@ -807,8 +805,6 @@ void CDbgMenuPcs::Add()
         nodeParam.m_unk28 = 0;
         nodeParam.m_unk2C = 0;
         nodeParam.m_unk30 = 0;
-        nodeParam.m_text = const_cast<char*>(menuDefs->text);
-
         param.m_type = nodeParam.m_type;
         param.m_flags = nodeParam.m_flags;
         param.m_x = nodeParam.m_x;
@@ -818,7 +814,7 @@ void CDbgMenuPcs::Add()
         param.m_unk18 = nodeParam.m_unk18;
         param.m_unk1C = nodeParam.m_unk1C;
         param.m_unk20 = nodeParam.m_unk20;
-        param.m_text = nodeParam.m_text;
+        param.m_text = const_cast<char*>(menuDefs->text);
         param.m_unk28 = nodeParam.m_unk28;
         param.m_unk2C = nodeParam.m_unk2C;
         param.m_unk30 = nodeParam.m_unk30;

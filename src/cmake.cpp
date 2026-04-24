@@ -2362,14 +2362,18 @@ void CMenuPcs::CmakeResultDraw()
     short mode = *reinterpret_cast<short*>(state + 0x10);
     short resultDir = *reinterpret_cast<short*>(state + 0x1E);
     float alpha = CalcCmakeFadeAlpha(this);
-    float popupAlpha = ((mode == 2) && (resultDir < 0)) ? FLOAT_80333258 : alpha;
-    float textAlpha = ((mode == 2) && (resultDir < 0)) ? FLOAT_80333258 : alpha;
 
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
     DrawCmakeSelectionBackdrop(this);
     DrawCmakePreviewChara(this);
-    DrawCmakePopupPanel(this, popupAlpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
-        FLOAT_80333258, FLOAT_80333258);
+
+    if ((mode == 2) && (resultDir < 0)) {
+        DrawCmakePopupPanel(this, FLOAT_80333258, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
+            FLOAT_80333258, FLOAT_80333258);
+    } else {
+        DrawCmakePopupPanel(this, alpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
+            FLOAT_80333258, FLOAT_80333258);
+    }
 
     if ((mode == 2) && (resultDir > 0)) {
         DrawCmakeTitle(6, FLOAT_80333258, alpha);
@@ -2377,14 +2381,110 @@ void CMenuPcs::CmakeResultDraw()
         DrawCmakeTitle(6, alpha, FLOAT_80333258);
     }
 
-    DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, textAlpha);
-    DrawCmakeCharaText(6, textAlpha);
+    float textAlpha = alpha;
+    if ((mode == 2) && (resultDir < 0)) {
+        textAlpha = FLOAT_80333258;
+    }
+
+    DrawCmakeCrest(static_cast<int>(s_CmakeInfo.m_tribe), 0, 0, textAlpha);
 
     if (mode == 1) {
         DrawCmakeYesNo(*reinterpret_cast<short*>(state + 0x26) + 1, alpha);
     } else {
         DrawCmakeYesNo(0, alpha);
     }
+
+    CFont* labelFont = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
+    labelFont->SetMargin(FLOAT_80333258);
+    labelFont->SetShadow(0);
+    labelFont->SetScale(FLOAT_80333258);
+    labelFont->DrawInit();
+
+    int textColor = static_cast<int>(static_cast<double>(FLOAT_80333240) * textAlpha);
+    if (textColor < 0) {
+        textColor = 0;
+    } else if (textColor > 0xFF) {
+        textColor = 0xFF;
+    }
+
+    GXColor color;
+    __ct__6CColorFUcUcUcUc(&color, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
+    labelFont->SetColor(color);
+
+    float labelWidths[4];
+    for (int i = 0; i < 4; i++) {
+        const char* label = GetMenuStr__8CMenuPcsFi(this, i + 0x2A);
+        if (label == 0) {
+            label = "";
+        }
+
+        labelWidths[i] = FLOAT_803332f0 + labelFont->GetWidth(label);
+        labelFont->SetPosX(FLOAT_803332f0);
+        labelFont->SetPosY(static_cast<float>(0x70 + i * 0x28) - FLOAT_803332f4);
+        labelFont->Draw(label);
+    }
+
+    CFont* valueFont = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xF8);
+    valueFont->SetMargin(FLOAT_80333258);
+    valueFont->SetShadow(1);
+    valueFont->SetScale(FLOAT_80333258);
+    valueFont->DrawInit();
+    valueFont->SetColor(color);
+    valueFont->SetTlut(6);
+
+    char tribeWithSlash[0x40];
+    for (int i = 0; i < 4; i++) {
+        const char* value = "";
+        if (i == 0) {
+            value = s_CmakeInfo.m_name;
+        } else if (i == 1) {
+            value = GetMenuStr__8CMenuPcsFi(this, static_cast<int>(s_CmakeInfo.m_unknown14) + 0x11);
+        } else if (i == 2) {
+            value = GetTribeStr__8CMenuPcsFi(this, static_cast<int>(s_CmakeInfo.m_tribe));
+            if (value == 0) {
+                value = "";
+            }
+
+            strcpy(tribeWithSlash, value);
+            size_t tribeLen = strlen(tribeWithSlash);
+            if (tribeLen + 1 < sizeof(tribeWithSlash)) {
+                tribeWithSlash[tribeLen] = '/';
+                tribeWithSlash[tribeLen + 1] = '\0';
+            }
+            value = tribeWithSlash;
+        } else {
+            value = GetJobStr__8CMenuPcsFi(this, static_cast<int>(s_CmakeInfo.m_job));
+        }
+
+        if (value == 0) {
+            value = "";
+        }
+
+        float x = FLOAT_803332fc + labelWidths[i];
+        float y = static_cast<float>(0x70 + i * 0x28) - FLOAT_803332f4;
+        float valueWidth = valueFont->GetWidth(value);
+        valueFont->SetPosX(x);
+        valueFont->SetPosY(y);
+        valueFont->Draw(value);
+
+        if (i == 2) {
+            int hairIndex = static_cast<int>(s_CmakeInfo.m_tribe) * 8;
+            if (s_CmakeInfo.m_unknown14 != 0) {
+                hairIndex += 4;
+            }
+
+            const char* hair = GetHairStr__8CMenuPcsFi(this, hairIndex + static_cast<int>(s_CmakeInfo.m_hair));
+            if (hair == 0) {
+                hair = "";
+            }
+
+            valueFont->SetPosX(FLOAT_80333300 + x + valueWidth);
+            valueFont->SetPosY(y);
+            valueFont->Draw(hair);
+        }
+    }
+
+    DrawInit__8CMenuPcsFv(this);
 
     if (mode == 2 && resultDir < 0) {
         DrawCmakeDecision(-1, 1.0f);

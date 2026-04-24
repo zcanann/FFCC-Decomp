@@ -1954,9 +1954,33 @@ void CShopMenu::DrawMake()
     DrawMakeBase();
 
     int resultItem = ShopMenuInt(this, 0x150);
-    int selectedItem = getItemNo(ShopMenuInt(this, 0x28));
-    int makeGil = CalcShopMenuMakeGil(this, selectedItem);
-    int currentMoney = *reinterpret_cast<int*>(ShopMenuCaravan(this) + 0x200);
+    int listType = ShopMenuInt(this, 0x14);
+    int selectedIndex = ShopMenuInt(this, 0x28);
+    int caravan = ShopMenuCaravan(this);
+    int selectedItem;
+    if (listType == 0) {
+        selectedItem = *reinterpret_cast<short*>(caravan + selectedIndex * 2 + 0xBE6);
+    } else if (listType == 1) {
+        selectedItem = *reinterpret_cast<short*>(caravan + selectedIndex * 2 + 0xB6);
+    } else if (listType == 2) {
+        int mappedIndex = ShopMenuInt(this, 0x50 + selectedIndex * 4);
+        if (mappedIndex == -1) {
+            selectedItem = -1;
+        } else {
+            selectedItem = *reinterpret_cast<short*>(caravan + mappedIndex * 2 + 0xB6);
+        }
+    } else {
+        selectedItem = -1;
+    }
+
+    int makeGil = 0;
+    if (selectedItem > 0) {
+        makeGil = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                  *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + selectedItem * 0x48 + 0x24);
+        makeGil = makeGil / 100 + (makeGil >> 0x1F);
+        makeGil = makeGil - (makeGil >> 0x1F);
+    }
+    int currentMoney = *reinterpret_cast<int*>(caravan + 0x200);
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
 
     drawShapeSeq(0xF, 0, 0xA8, 0x4A, 0xFF, 0, 0, 0.0f, 0);
@@ -2034,8 +2058,15 @@ void CShopMenu::DrawMake()
     SetScale__5CFontFf(FLOAT_80332d28, font);
     SetColor__5CFontF8_GXColor(font, &white);
     DrawInit__5CFontFv(font);
-    DrawShopMenuCenteredText(font, PTR_s_Materials_80214db4[languageId], FLOAT_80332e30, FLOAT_80332e34);
-    DrawShopMenuCenteredText(font, PTR_s_Stock_80214db8[languageId], FLOAT_80332e38, FLOAT_80332e34);
+    const char* materialsText = PTR_s_Materials_80214db4[languageId];
+    float materialsX = FLOAT_80332e30 - GetWidth__5CFontFPc(font, materialsText) * FLOAT_80332d78;
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+        MenuPcsVoid(), font, const_cast<char*>(materialsText), materialsX, FLOAT_80332e34, 4, 0x12);
+    DrawInit__8CMenuPcsFv(MenuPcsVoid());
+    const char* stockText = PTR_s_Stock_80214db8[languageId];
+    float stockX = FLOAT_80332e38 - GetWidth__5CFontFPc(font, stockText) * FLOAT_80332d78;
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+        MenuPcsVoid(), font, const_cast<char*>(stockText), stockX, FLOAT_80332e34, 9, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     short recipeMaterial[8];
@@ -2049,8 +2080,40 @@ void CShopMenu::DrawMake()
         }
 
         int neededCount = recipeMaterial[i + 3];
-        int ownedCount = CountShopMenuOwnedItems(ShopMenuCaravan(this), materialItem);
+        int ownedCount = 0;
+        for (int slotGroup = 0; slotGroup < 8; slotGroup++) {
+            int slotBase = caravan + slotGroup * 0x10;
+            if (*reinterpret_cast<short*>(slotBase + 0xB6) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xB8) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xBA) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xBC) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xBE) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xC0) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xC2) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xC4) == materialItem) {
+                ++ownedCount;
+            }
+        }
         float rowY = rowYBase + rowYStep * static_cast<float>(i);
+        const char* materialName = GetItemName(materialItem);
+        char neededBuffer[64];
+        char ownedBuffer[64];
+        sprintf(neededBuffer, DAT_80332d14, neededCount);
+        sprintf(ownedBuffer, DAT_80332d18, ownedCount);
 
         SetMargin__5CFontFf(FLOAT_80332d28, font);
         SetShadow__5CFontFi(font, 1);
@@ -2062,23 +2125,30 @@ void CShopMenu::DrawMake()
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
         SetupShopMenuAmountFont(font, &white);
-        DrawShopMenuAmount(font, neededCount, 244.0f, rowY, 0x1B);
+        float neededX = 244.0f - GetWidth__5CFontFPc(font, neededBuffer);
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, neededBuffer, neededX, rowY, 0x1B, 0x12);
+        DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-        DrawInit__5CFontFv(font);
         SetMargin__5CFontFf(FLOAT_80332d28, font);
         SetShadow__5CFontFi(font, 1);
         SetScale__5CFontFf(FLOAT_80332d28, font);
         SetColor__5CFontF8_GXColor(font, &white);
-        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, const_cast<char*>("/"), 222.0f, rowY, 0x1B, 0x12);
+        float slashX = neededX - FLOAT_80332d28 - GetWidth__5CFontFPc(font, "/");
+        DrawInit__5CFontFv(font);
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, const_cast<char*>("/"), slashX, rowY, 0x1B, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
+        float nameX = slashX - FLOAT_80332d28 - GetWidth__5CFontFPc(font, materialName);
         DrawInit__5CFontFv(font);
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-            MenuPcsVoid(), font, const_cast<char*>(GetItemName(materialItem)), 92.0f, rowY, 0x1B, 0x12);
+            MenuPcsVoid(), font, const_cast<char*>(materialName), nameX, rowY, 0x1B, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
         SetupShopMenuAmountFont(font, &white);
-        DrawShopMenuAmount(font, ownedCount, 356.0f, rowY, (ownedCount >= neededCount) ? 0x1B : 2);
+        float ownedX = 356.0f - GetWidth__5CFontFPc(font, ownedBuffer);
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+            MenuPcsVoid(), font, ownedBuffer, ownedX, rowY, (ownedCount >= neededCount) ? 0x1B : 2, 0x12);
+        DrawInit__8CMenuPcsFv(MenuPcsVoid());
     }
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 

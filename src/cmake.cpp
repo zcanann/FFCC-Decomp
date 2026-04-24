@@ -2373,6 +2373,12 @@ void CMenuPcs::CmakeResultDraw1()
     DrawCmakeTitle(7, alpha, FLOAT_80333258);
     DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, textAlpha);
     DrawCmakeCharaText(7, textAlpha);
+
+    if (mode == 1) {
+        DrawCmakeYesNo(*reinterpret_cast<short*>(state + 0x26) + 1, alpha);
+    } else {
+        DrawCmakeYesNo(0, alpha);
+    }
 }
 
 /*

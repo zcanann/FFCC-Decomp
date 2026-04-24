@@ -814,6 +814,7 @@ s32 THPSimpleClose(void)
 s32 THPSimpleOpen(const char* path)
 {
     u32 componentIdx;
+    s32 status;
     s32 componentOffset;
     u8* frameComp;
 
@@ -833,10 +834,16 @@ s32 THPSimpleOpen(const char* path)
     }
 
     while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x40, 0, (DVDCallback)0, 2)) {
-        checkError();
+        status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+        if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
+            File.DrawError(SimpleControl.fileInfo, status);
+        }
     }
-    while (DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb) != DVD_STATE_END) {
-        checkError();
+    while ((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb)) != DVD_STATE_END) {
+        status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+        if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
+            File.DrawError(SimpleControl.fileInfo, status);
+        }
     }
     memcpy(&SimpleControl.header, sReadBuffer, sizeof(THPHeader));
 
@@ -852,10 +859,16 @@ s32 THPSimpleOpen(const char* path)
 
     while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x20, SimpleControl.header.mCompInfoDataOffsets,
                              (DVDCallback)0, 2)) {
-        checkError();
+        status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+        if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
+            File.DrawError(SimpleControl.fileInfo, status);
+        }
     }
-    while (DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb) != DVD_STATE_END) {
-        checkError();
+    while ((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb)) != DVD_STATE_END) {
+        status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+        if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
+            File.DrawError(SimpleControl.fileInfo, status);
+        }
     }
     memcpy(&SimpleControl.compInfo, sReadBuffer, sizeof(THPFrameCompInfo));
 
@@ -866,10 +879,16 @@ s32 THPSimpleOpen(const char* path)
     for (componentIdx = 0; componentIdx < SimpleControl.compInfo.mNumComponents; componentIdx++) {
         if (*frameComp == 1) {
             while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
-                checkError();
+                status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+                if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
+                    File.DrawError(SimpleControl.fileInfo, status);
+                }
             }
-            while (DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb) != DVD_STATE_END) {
-                checkError();
+            while ((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb)) != DVD_STATE_END) {
+                status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+                if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
+                    File.DrawError(SimpleControl.fileInfo, status);
+                }
             }
 
             memcpy(&SimpleControl.audioInfo, sReadBuffer, sizeof(THPAudioInfo));
@@ -877,10 +896,16 @@ s32 THPSimpleOpen(const char* path)
             SimpleControl.hasAudio = 1;
         } else if (*frameComp == 0) {
             while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
-                checkError();
+                status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+                if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
+                    File.DrawError(SimpleControl.fileInfo, status);
+                }
             }
-            while (DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb) != DVD_STATE_END) {
-                checkError();
+            while ((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb)) != DVD_STATE_END) {
+                status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+                if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
+                    File.DrawError(SimpleControl.fileInfo, status);
+                }
             }
 
             memcpy(&SimpleControl.videoInfo, sReadBuffer, sizeof(THPVideoInfo));

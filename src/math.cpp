@@ -288,10 +288,10 @@ int CBound::CheckFrustum0(CBound& outBound)
     int xIndex;
     double viewZ;
     double zero;
-    float* inBound = reinterpret_cast<float*>(this);
     float* clipBound = reinterpret_cast<float*>(&outBound);
-    Vec transformed;
+    float* inBound = reinterpret_cast<float*>(this);
     Vec vertex;
+    Vec transformed;
 
     maxInit = 3.40282347e38f;
     minInit = -3.40282347e38f;
@@ -327,41 +327,12 @@ int CBound::CheckFrustum0(CBound& outBound)
                     }
                     PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
-                    maxInit = transformed.x;
-                    if (clipBound[0] < transformed.x) {
-                        maxInit = clipBound[0];
-                    }
-                    clipBound[0] = maxInit;
-
-                    maxInit = transformed.y;
-                    if (clipBound[1] < transformed.y) {
-                        maxInit = clipBound[1];
-                    }
-                    clipBound[1] = maxInit;
-
-                    maxInit = transformed.z;
-                    if (clipBound[2] < transformed.z) {
-                        maxInit = clipBound[2];
-                    }
-                    clipBound[2] = maxInit;
-
-                    maxInit = transformed.x;
-                    if (transformed.x < clipBound[3]) {
-                        maxInit = clipBound[3];
-                    }
-                    clipBound[3] = maxInit;
-
-                    maxInit = transformed.y;
-                    if (transformed.y < clipBound[4]) {
-                        maxInit = clipBound[4];
-                    }
-                    clipBound[4] = maxInit;
-
-                    maxInit = transformed.z;
-                    if (transformed.z < clipBound[5]) {
-                        maxInit = clipBound[5];
-                    }
-                    clipBound[5] = maxInit;
+                    clipBound[0] = transformed.x < clipBound[0] ? transformed.x : clipBound[0];
+                    clipBound[1] = transformed.y < clipBound[1] ? transformed.y : clipBound[1];
+                    clipBound[2] = transformed.z < clipBound[2] ? transformed.z : clipBound[2];
+                    clipBound[3] = clipBound[3] < transformed.x ? transformed.x : clipBound[3];
+                    clipBound[4] = clipBound[4] < transformed.y ? transformed.y : clipBound[4];
+                    clipBound[5] = clipBound[5] < transformed.z ? transformed.z : clipBound[5];
                     zIndex = zIndex + 1;
                 } while (zIndex < 2);
                 yIndex = yIndex + 1;
@@ -397,41 +368,12 @@ int CBound::CheckFrustum0(CBound& outBound)
                 }
                 PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
-                maxInit = transformed.x;
-                if (clipBound[0] < transformed.x) {
-                    maxInit = clipBound[0];
-                }
-                clipBound[0] = maxInit;
-
-                maxInit = transformed.y;
-                if (clipBound[1] < transformed.y) {
-                    maxInit = clipBound[1];
-                }
-                clipBound[1] = maxInit;
-
-                maxInit = transformed.z;
-                if (clipBound[2] < transformed.z) {
-                    maxInit = clipBound[2];
-                }
-                clipBound[2] = maxInit;
-
-                maxInit = transformed.x;
-                if (transformed.x < clipBound[3]) {
-                    maxInit = clipBound[3];
-                }
-                clipBound[3] = maxInit;
-
-                maxInit = transformed.y;
-                if (transformed.y < clipBound[4]) {
-                    maxInit = clipBound[4];
-                }
-                clipBound[4] = maxInit;
-
-                maxInit = transformed.z;
-                if (transformed.z < clipBound[5]) {
-                    maxInit = clipBound[5];
-                }
-                clipBound[5] = maxInit;
+                clipBound[0] = transformed.x < clipBound[0] ? transformed.x : clipBound[0];
+                clipBound[1] = transformed.y < clipBound[1] ? transformed.y : clipBound[1];
+                clipBound[2] = transformed.z < clipBound[2] ? transformed.z : clipBound[2];
+                clipBound[3] = clipBound[3] < transformed.x ? transformed.x : clipBound[3];
+                clipBound[4] = clipBound[4] < transformed.y ? transformed.y : clipBound[4];
+                clipBound[5] = clipBound[5] < transformed.z ? transformed.z : clipBound[5];
 
                 viewZ = (double)transformed.z;
                 if (viewZ <= zero) {

@@ -75,40 +75,6 @@ void get_noise(unsigned char count)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void alloc_check(VRyjMegaBirth* work, PRyjMegaBirth* params)
-{
-	u8* payload = (u8*)params;
-
-	if (work->m_particleBlock == NULL) {
-		work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-			work->m_numParticles * 0x60, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x262);
-		if (work->m_particleBlock != NULL) {
-			memset(work->m_particleBlock, 0, work->m_numParticles * 0x60);
-		}
-	}
-
-	if (((payload[0xEC] == 1) || (payload[0xEC] == 2)) && (work->m_worldMatrixBlock == NULL)) {
-		work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-			work->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x269);
-		if (work->m_worldMatrixBlock != NULL) {
-			memset(work->m_worldMatrixBlock, 0, work->m_numParticles * 0x30);
-		}
-	}
-
-	if ((payload[0xE9] != 0) && (work->m_colorBlock == NULL)) {
-		work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-			work->m_numParticles << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x271);
-		if (work->m_colorBlock != NULL) {
-			memset(work->m_colorBlock, 0, work->m_numParticles << 5);
-		}
-	}
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80083070
  * PAL Size: 4468b
  * EN Address: TODO
@@ -426,13 +392,13 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
  */
 void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMegaBirthOffsets* offsets)
 {
-	s8 hasRequiredMemory;
-	VColor* objectColor;
+	bool hasRequiredMemory;
 	u8* particleDataBytes;
+	s32 colorOffset;
 	VRyjMegaBirth* work;
 
 	particleDataBytes = (u8*)particleData;
-	objectColor = (VColor*)((u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[1]);
+	colorOffset = offsets->m_serializedDataOffsets[1];
 	work = (VRyjMegaBirth*)((u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2]);
 
 	if (work->m_particleBlock == NULL)
@@ -511,7 +477,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 			break;
 		}
 
-		calc_particle(pObject, work, particleData, objectColor);
+		calc_particle(pObject, work, particleData, (VColor*)((u8*)pObject + 0x80 + colorOffset));
 	}
 }
 

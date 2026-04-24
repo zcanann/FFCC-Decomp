@@ -1759,7 +1759,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 					break;
 				}
 
-				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_bound))) != 0) {
+				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(Ptr(&s_cyl, 0x28)))) != 0) {
 					if ((*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0) &&
 					    ((*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
 					         ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
@@ -1988,7 +1988,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 					break;
 				}
 
-				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_bound))) != 0) {
+				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(Ptr(&s_cyl, 0x28)))) != 0) {
 					if (*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0) {
 						(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
 						    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,

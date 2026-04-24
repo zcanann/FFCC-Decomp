@@ -630,6 +630,42 @@ static int FindFirstBonusActiveSlot(unsigned char activeMask)
 	return -1;
 }
 
+static unsigned char GetBonusUnavailableMask(int statePtr, BonusPartySummary* summary)
+{
+	unsigned char mask = 0;
+	if (statePtr != 0) {
+		mask = *(unsigned char*)(statePtr + 9);
+	}
+	if (summary != 0) {
+		mask = (unsigned char)(mask | (unsigned char)summary->m_ownedArtifactMask);
+	}
+	return mask;
+}
+
+static int FindNextBonusSelectableSlot(unsigned char unavailableMask, int startSlot, int direction)
+{
+	int slot = startSlot & 7;
+	for (int i = 0; i < 8; i++) {
+		slot = (slot + direction) & 7;
+		if ((unavailableMask & (1 << slot)) == 0) {
+			return slot;
+		}
+	}
+	return startSlot & 7;
+}
+
+static int GetBonusSelectedArtifactId(int slot)
+{
+	if (s_bonusSummaryData == 0 || slot < 0 || slot >= 8) {
+		return -1;
+	}
+
+	if (slot < 4) {
+		return s_bonusSummaryData->m_tempArtifacts[slot];
+	}
+	return s_bonusSummaryData->m_bossArtifacts[slot - 4];
+}
+
 static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAnimSprite* sprites)
 {
 	CFont* font = GetBonusMenuMembers(menu).m_font;
@@ -2550,6 +2586,8 @@ void CMenuPcs::CalcSelectWait()
 		*(short*)(statePtr + 0x1a) = 0;
 		*(short*)(statePtr + 0x26) = 4;
 		*(short*)(statePtr + 0x28) = 1;
+		*(unsigned char*)(statePtr + 8) = 0;
+		*(unsigned char*)(statePtr + 9) = (s_bonusSummaryData != 0) ? s_bonusSummaryData->m_missingArtifactMask : 0;
 		*(short*)(auxPtr + 10) = 3;
 		header->finished = 0;
 		for (int i = 0; i < (int)header->count; i++) {
@@ -2564,6 +2602,9 @@ void CMenuPcs::CalcSelectWait()
 			sprites[header->count].depth = 1.0f;
 			header->count = (short)(header->count + 1);
 		}
+		BonusPartySummary* summary = GetBonusPartySummary(0);
+		*(short*)(statePtr + 0x26) =
+		    (short)FindNextBonusSelectableSlot(GetBonusUnavailableMask(statePtr, summary), 3, 1);
 		UpdateSelectCursorSprite(statePtr, header, sprites, 0);
 		*(unsigned char*)(statePtr + 0xb) = 1;
 		return;
@@ -2571,32 +2612,60 @@ void CMenuPcs::CalcSelectWait()
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
 	int frame = (int)*(short*)(statePtr + 0x22);
-	unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
 	short& promptMode = *(short*)(auxPtr + 10);
+	short& currentPartyIndex = *(short*)(statePtr + 0xe);
 	short& selection = *(short*)(statePtr + 0x26);
 	short& confirmSel = *(short*)(statePtr + 0x28);
 	short& delay = *(short*)(statePtr + 0x1a);
+	int activePartyCount = GetActiveBonusPartyCount();
+	BonusPartySummary* currentParty = GetBonusPartySummary(currentPartyIndex);
+	int padSlot = (currentParty != 0) ? currentParty->m_partySlot : 0;
+	unsigned short down = GetButtonDown__8CMenuPcsFi(this, padSlot);
+	unsigned char unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
 
 	switch (promptMode) {
 	case 3:
 		if (delay > 0) {
 			delay = (short)(delay - 1);
+			if (delay == 0 && *(unsigned char*)(statePtr + 8) != 0) {
+				unsigned char bit = (unsigned char)(1 << (selection & 7));
+				int itemId = GetBonusSelectedArtifactId(selection & 7);
+				*(unsigned char*)(statePtr + 9) = (unsigned char)(*(unsigned char*)(statePtr + 9) | bit);
+				*(unsigned char*)(statePtr + 8) = 0;
+				if (currentParty != 0) {
+					currentParty->m_itemHandle0 = selection & 7;
+					currentParty->m_itemHandle1 = itemId;
+				}
+				currentPartyIndex = (short)(currentPartyIndex + 1);
+				currentParty = GetBonusPartySummary(currentPartyIndex);
+				if (currentPartyIndex >= activePartyCount || currentParty == 0) {
+					promptMode = 2;
+					delay = 10;
+				} else {
+					selection = (short)FindNextBonusSelectableSlot(
+					    GetBonusUnavailableMask(statePtr, currentParty), selection & 7, 1);
+				}
+			}
+			break;
+		}
+
+		if (currentPartyIndex >= activePartyCount || currentParty == 0) {
+			promptMode = 2;
+			delay = 10;
 			break;
 		}
 
 		if ((down & 9) != 0) {
-			selection = (short)((selection + 1) & 7);
+			selection = (short)FindNextBonusSelectableSlot(unavailableMask, selection, 1);
 			Sound.PlaySe(0x4e, 0x40, 0x7f, 0);
 		} else if ((down & 6) != 0) {
-			selection = (short)((selection + 7) & 7);
+			selection = (short)FindNextBonusSelectableSlot(unavailableMask, selection, -1);
 			Sound.PlaySe(0x4e, 0x40, 0x7f, 0);
 		}
 
 		if ((down & 0x100) != 0) {
-			unsigned char activeMask = *(unsigned char*)(statePtr + 9);
 			unsigned char bit = (unsigned char)(1 << (selection & 7));
-			if ((activeMask & bit) == 0) {
-				*(unsigned char*)(statePtr + 9) = (unsigned char)(activeMask | bit);
+			if ((unavailableMask & bit) == 0) {
 				*(unsigned char*)(statePtr + 8) = 1;
 				delay = 10;
 				Sound.PlaySe(0x4f, 0x40, 0x7f, 0);
@@ -3121,7 +3190,7 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 void CMenuPcs::GetAllPadOn()
 {
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	unsigned char activeMask = 0;
+	unsigned char connectedMask = 0;
 	int activePartyCount = 0;
 	int anyReady = 0;
 	int allReady = 1;
@@ -3132,7 +3201,7 @@ void CMenuPcs::GetAllPadOn()
 
 	for (int i = 0; i < 4; i++) {
 		if (Game.m_scriptFoodBase[i] != 0) {
-			activeMask = (unsigned char)(activeMask | (1 << i));
+			connectedMask = (unsigned char)(connectedMask | (1 << i));
 			activePartyCount++;
 			anyReady = 1;
 		} else {
@@ -3140,9 +3209,12 @@ void CMenuPcs::GetAllPadOn()
 		}
 	}
 
-	*(unsigned char*)(statePtr + 8) = (unsigned char)((anyReady != 0) ? 1 : 0);
-	*(unsigned char*)(statePtr + 9) = activeMask;
+	*(unsigned char*)(statePtr + 8) = 0;
+	*(unsigned char*)(statePtr + 9) = (s_bonusSummaryData != 0) ? s_bonusSummaryData->m_missingArtifactMask : 0;
 	*(unsigned char*)(statePtr + 0xa) = (unsigned char)((allReady != 0 && activePartyCount >= 4) ? 1 : 0);
+	if (anyReady == 0) {
+		*(unsigned char*)(statePtr + 9) = connectedMask;
+	}
 }
 
 /*

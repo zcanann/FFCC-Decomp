@@ -601,7 +601,8 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 		CFlat, Game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
 
-	letter[0] = (letter[0] & 0xDF) | 0x20;
+	int replied = 1;
+	letter[0] = (unsigned char)((letter[0] & 0xDF) | ((replied << 5) & 0x20));
 }
 
 /*

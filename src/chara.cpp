@@ -367,7 +367,7 @@ static inline MtxPtr NodeRefLocalMtx(CChara::CNode* node)
 
 static inline float ModelBaseScale(CChara::CModel* model)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x18);
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x28);
 }
 
 static inline Quaternion& NodePreviousQuat(CChara::CNode* node)
@@ -1216,11 +1216,10 @@ void CChara::CModel::CalcMatrix()
  */
 void CChara::CModel::CalcSkin()
 {
-	void* refData = *(void**)((u8*)this + 0xA4);
 	void* mesh = *(void**)((u8*)this + 0xAC);
-	u32 posQuant = *(u32*)((u8*)refData + 0x28);
-	u32 normQuant = *(u32*)((u8*)refData + 0x2C);
-	u16 meshCount = *(u16*)((u8*)refData + 0xA);
+	u32 posQuant = ModelPosQuant(this);
+	u32 normQuant = ModelNormQuant(this);
+	u16 meshCount = ModelMeshCount(this);
 	u32 i = 0;
 
 	gqrInit__6CCharaFUlUlUl(&gChara, (posQuant << 24) | 0x70000 | (posQuant << 8) | 7,
@@ -2207,7 +2206,7 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 		case 0x5446524D:
 			chunk.Get(nodeRef + 0xC, 0x30);
 			if (*reinterpret_cast<u16*>(nodeRef + 0x68) == 0xFFFF) {
-				float baseScale = *reinterpret_cast<float*>(reinterpret_cast<u8*>(modelRef) + 0x18);
+				float baseScale = *reinterpret_cast<float*>(reinterpret_cast<u8*>(modelRef) + 0x28);
 				PSMTXScaleApply(reinterpret_cast<float(*)[4]>(nodeRef + 0xC), reinterpret_cast<float(*)[4]>(nodeRef + 0xC),
 				               baseScale, baseScale, baseScale);
 			}

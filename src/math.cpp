@@ -994,56 +994,49 @@ float CMath::Line1D(int lastIndex, float x, float* x_arr, float* y_arr)
  */
 unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
 {
-    int satScaled = saturation * 0xFF;
-    int sat = satScaled / 100;
-    sat -= sat >> 31;
-
-    int valScaled = brightness * 0xFF;
-    int val = valScaled / 100;
-    val -= val >> 31;
+    int sat = (saturation * 0xFF) / 100;
+    int val = (brightness * 0xFF) / 100;
+    unsigned char valByte = (unsigned char)val;
 
     unsigned char rgba[4];
     if ((float)sat == 0.0f) {
-        rgba[0] = (unsigned char)val;
-        rgba[1] = (unsigned char)val;
-        rgba[2] = (unsigned char)val;
+        rgba[0] = valByte;
+        rgba[1] = valByte;
+        rgba[2] = valByte;
     } else {
-        int low = (0xFF - sat) * val;
+        unsigned char lowByte;
         int sector = hue / 0x3C;
-        int delta;
+        unsigned char deltaByte;
+        int low = ((0xFF - sat) * val) / 0xFF;
+        int delta = ((hue - sector * 0x3C) * (val - low)) / 0x3C;
 
-        low = low / 0xFF;
-
-        low -= low >> 31;
-        sector -= sector >> 31;
-        delta = (hue - sector * 0x3C) * (val - low);
-        delta = delta / 0x3C;
-        delta -= delta >> 31;
+        lowByte = (unsigned char)low;
+        deltaByte = (unsigned char)delta;
 
         if (hue < 60) {
-            rgba[0] = (unsigned char)val;
-            rgba[1] = (unsigned char)(low + delta);
-            rgba[2] = (unsigned char)low;
+            rgba[0] = valByte;
+            rgba[1] = (unsigned char)(lowByte + deltaByte);
+            rgba[2] = lowByte;
         } else if (hue < 120) {
-            rgba[0] = (unsigned char)(val - delta);
-            rgba[1] = (unsigned char)val;
-            rgba[2] = (unsigned char)low;
+            rgba[0] = (unsigned char)(valByte - deltaByte);
+            rgba[1] = valByte;
+            rgba[2] = lowByte;
         } else if (hue < 180) {
-            rgba[0] = (unsigned char)low;
-            rgba[1] = (unsigned char)val;
-            rgba[2] = (unsigned char)(low + delta);
+            rgba[0] = lowByte;
+            rgba[1] = valByte;
+            rgba[2] = (unsigned char)(lowByte + deltaByte);
         } else if (hue < 240) {
-            rgba[0] = (unsigned char)low;
-            rgba[1] = (unsigned char)(val - delta);
-            rgba[2] = (unsigned char)val;
+            rgba[0] = lowByte;
+            rgba[1] = (unsigned char)(valByte - deltaByte);
+            rgba[2] = valByte;
         } else if (hue < 300) {
-            rgba[0] = (unsigned char)(low + delta);
-            rgba[1] = (unsigned char)low;
-            rgba[2] = (unsigned char)val;
+            rgba[0] = (unsigned char)(lowByte + deltaByte);
+            rgba[1] = lowByte;
+            rgba[2] = valByte;
         } else if (hue < 360) {
-            rgba[0] = (unsigned char)val;
-            rgba[1] = (unsigned char)low;
-            rgba[2] = (unsigned char)(val - delta);
+            rgba[0] = valByte;
+            rgba[1] = lowByte;
+            rgba[2] = (unsigned char)(valByte - deltaByte);
         } else {
             rgba[0] = 0;
             rgba[1] = 0;

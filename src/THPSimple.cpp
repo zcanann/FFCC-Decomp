@@ -264,15 +264,15 @@ s32 THPSimpleOpen(const char* path)
     SimpleControl.readError = 0;
     SimpleControl.curFrame = -1;
     SimpleControl.readFrame = 0;
-    SimpleControl.unk_D0 = 0;
+    SimpleControl.audioDecodeIndex = 0;
+    SimpleControl.audioPlayIndex = 0;
     SimpleControl.isPreLoaded = 0;
     SimpleControl.isBufferSet = 0;
     SimpleControl.isLooping = 0;
     SimpleControl.isOpen = 1;
     SimpleControl.unk_C4 = 0.0f;
     SimpleControl.unk_C8 = 0.0f;
-    SimpleControl.audioDecodeIndex = 0;
-    SimpleControl.audioPlayIndex = 0;
+    SimpleControl.unk_D0 = 0;
 
     return 1;
 }
@@ -750,7 +750,10 @@ restore_interrupts_1:
     }
 
     SimpleControl.readBuffer[SimpleControl.readFrame].mIsValid = 0;
-    SimpleControl.readFrame = (SimpleControl.readFrame + 1) % 8;
+    SimpleControl.readFrame++;
+    if (SimpleControl.readFrame >= 8) {
+        SimpleControl.readFrame = 0;
+    }
 
     interruptState = OSDisableInterrupts();
     if ((SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) && (SimpleControl.isReadFrameAsync == 0U) &&

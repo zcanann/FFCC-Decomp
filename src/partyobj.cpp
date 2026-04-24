@@ -3,9 +3,11 @@
 #include "ffcc/pad.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "ffcc/joybus.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/p_game.h"
+#include "ffcc/sound.h"
 #include "ffcc/itemobj.h"
 
 #include <math.h>
@@ -127,6 +129,16 @@ static unsigned short getPadTrigForSlot(int slot)
 
 	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
 	return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x8 + idx * 0x54);
+}
+
+static int getPadConnectedForSlot(int slot)
+{
+	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
+		return 0;
+	}
+
+	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x54 + idx * 0x54);
 }
 
 /*
@@ -321,22 +333,76 @@ void CGPartyObj::onCancelStat(int state)
 void CGPartyObj::menu()
 {
 	PartyObjOverlay& party = PartyData(this);
-	if (Game.m_gameWork.m_gamePaused != 0) {
-		return;
-	}
+	const unsigned char slot = static_cast<unsigned char>(m_animStateMisc);
+	void* portIndex = m_scriptHandle != nullptr ? m_scriptHandle[0xED] : nullptr;
 
-	// Ghidra indicates this gates menu by controller role and stage mode.
 	if ((party.partyFlags & 0x10) == 0) {
-		if (Game.m_gameWork.m_menuStageMode == 0) {
-			command();
+		if (Game.m_gameWork.m_menuStageMode != 0) {
+			return;
+		}
+
+		if (getPadConnectedForSlot(slot) == 0) {
+			return;
+		}
+
+		if (System.m_execParam > 2) {
+			Printf__7CSystemFPce(&System, "port:%d mode:%d", portIndex, Joybus.GetCtrlMode(slot));
+		}
+
+		Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
+		if ((CFlat[0x12A0] & 8) != 0) {
+			Sound.PlaySe(8, 0x40, 0x7F, 0);
 		}
 		return;
 	}
 
-	// Local player can always force command handling in menu stage.
-	if (m_animStateMisc == 0 || Game.m_gameWork.m_menuStageMode != 0) {
-		command();
+	if (Game.m_gameWork.m_menuStageMode == 0 && Joybus.GetPadType(slot) == 0x40000) {
+		unsigned short trig = getPadTrigForSlot(slot);
+		if ((trig & 0x10) == 0) {
+			return;
+		}
+	} else {
+		if (Game.m_gameWork.m_menuStageMode == 0) {
+			return;
+		}
+		if (Game.m_gameWork.m_gamePaused != 0) {
+			return;
+		}
+		if (slot != 0) {
+			return;
+		}
+		if ((getPadTrigForSlot(slot) & 0x800) == 0) {
+			return;
+		}
 	}
+
+	if (Game.m_gameWork.m_menuStageMode != 0) {
+		const bool canOpenStageMenu =
+		    ((static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 0x18) < 0) &&
+		     ((static_cast<int>(static_cast<unsigned int>(static_cast<unsigned char>(m_shieldAttachNodeIndex)) << 0x18) < 0) ||
+		      ((party.commandMode & 2) != 0) ||
+		      ((party.commandMode & 4) != 0)) &&
+		     (static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 0x18) < 0) &&
+		     (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0));
+
+		if (canOpenStageMenu) {
+			Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
+			Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
+		} else {
+			Sound.PlaySe(4, 0x40, 0x7F, 0);
+		}
+		return;
+	}
+
+	if (getPadConnectedForSlot(slot) == 0) {
+		if ((CFlat[0x12A0] & 8) != 0) {
+			Sound.PlaySe(7, 0x40, 0x7F, 0);
+		}
+	} else if ((CFlat[0x12A0] & 8) != 0) {
+		Sound.PlaySe(8, 0x40, 0x7F, 0);
+	}
+
+	Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
 }
 
 /*

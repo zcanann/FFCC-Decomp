@@ -326,6 +326,38 @@ static int FindDuplicateCmakeJob(CMenuPcs* menu, int selectedJob)
     return -1;
 }
 
+static bool IsDuplicateCmakeTribeHair(CMenuPcs* menu, int tribe, int hair, int sex)
+{
+    int activeSlot = static_cast<int>(MenuS16(menu, 0x86A));
+
+    for (int slot = 0; slot < 8; ++slot) {
+        if (slot == activeSlot) {
+            continue;
+        }
+
+        unsigned char* entry = GetCmakeRosterEntry(menu, slot);
+        if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
+            continue;
+        }
+        if (*(entry + 0x1F96) == 1) {
+            continue;
+        }
+        if (*reinterpret_cast<unsigned short*>(entry + 0x17D0) != tribe) {
+            continue;
+        }
+        if (*reinterpret_cast<unsigned short*>(entry + 0x17D4) != hair) {
+            continue;
+        }
+        if (*reinterpret_cast<unsigned short*>(entry + 0x17D2) != sex) {
+            continue;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
 static inline CFont* GetCmakeKeyboardFont(CMenuPcs* menu)
 {
     if (MenuS16(menu, 0x86C) == 0) {
@@ -1865,38 +1897,81 @@ void CMenuPcs::CmakeTribeOpen()
 void CMenuPcs::CmakeTribeCtrl()
 {
     int state = MenuS32(this, 0x82C);
-    short& mode = *reinterpret_cast<short*>(state + 0x10);
-    short& frame = *reinterpret_cast<short*>(state + 0x22);
+    int mcWork = MenuS32(this, 0x848);
+    short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
+    short& resultFlag = *reinterpret_cast<short*>(state + 0x2E);
     short& tribe = *reinterpret_cast<short*>(state + 0x26);
     short& crest = *reinterpret_cast<short*>(state + 0x28);
+    short& selectField = *reinterpret_cast<short*>(state + 0x30);
+    short& mcState = *reinterpret_cast<short*>(mcWork + 10);
     unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
     unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
 
-    if (mode == 1) {
-        if ((repeat & 0x4) != 0) {
-            tribe = (tribe < 3) ? static_cast<short>(tribe + 1) : 0;
-        } else if ((repeat & 0x8) != 0) {
-            tribe = (tribe > 0) ? static_cast<short>(tribe - 1) : 3;
+    if (repeat == 0 && down == 0) {
+        return;
+    }
+
+    if (mcState == 3) {
+        short& currentValue = *reinterpret_cast<short*>(state + 0x26 + selectField * 2);
+
+        if ((repeat & 0x8) != 0) {
+            currentValue = (currentValue == 0) ? 3 : static_cast<short>(currentValue - 1);
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        } else if ((repeat & 0x4) != 0) {
+            currentValue = (currentValue < 3) ? static_cast<short>(currentValue + 1) : 0;
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
-        if ((repeat & 0x3) != 0) {
-            crest = (crest < 3) ? static_cast<short>(crest + 1) : 0;
+        if ((repeat & 0xC) != 0) {
+            return;
+        }
+
+        if ((down & 0x200) != 0) {
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
+            if (selectField == 0) {
+                resultDir = -1;
+                resultFlag = 1;
+                return;
+            }
+
+            selectField = static_cast<short>(selectField - 1);
+            return;
         }
 
         if ((down & 0x100) != 0) {
-            MenuS16(this, 0x862) = tribe;
-            ChgModel__8CMenuPcsFiiii(this, static_cast<int>(MenuS16(this, 0x86A)),
-                static_cast<int>(MenuS16(this, 0x860)), static_cast<int>(tribe), static_cast<int>(MenuS16(this, 0x864)));
-            mode = 2;
-            frame = 0;
-            *reinterpret_cast<short*>(state + 0x1E) = 1;
-        } else if ((down & 0x200) != 0) {
-            mode = 2;
-            frame = 0;
-            *reinterpret_cast<short*>(state + 0x1E) = -1;
-        } else if (frame < 30) {
-            frame = frame + 1;
+            Sound.PlaySe(2, 0x40, 0x7F, 0);
+            if (selectField == 0) {
+                selectField = static_cast<short>(selectField + 1);
+                return;
+            }
+
+            if (!IsDuplicateCmakeTribeHair(this, tribe, crest, s_CmakeInfo.m_unknown14)) {
+                s_CmakeInfo.m_tribe = static_cast<signed char>(tribe);
+                s_CmakeInfo.m_hair = static_cast<signed char>(crest);
+                ChgModel__8CMenuPcsFiiii(this,
+                    static_cast<int>(MenuS16(this, 0x86A)),
+                    static_cast<int>(s_CmakeInfo.m_tribe),
+                    static_cast<int>(s_CmakeInfo.m_hair),
+                    static_cast<int>(s_CmakeInfo.m_unknown14));
+                resultDir = 1;
+                resultFlag = 1;
+                return;
+            }
+
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
+            short winX = 0;
+            short winY = 0;
+            GetWinSize__8CMenuPcsFiPsPsi(this, 0x15, &winX, &winY, 0);
+            SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winX), static_cast<int>(winY));
+            mcState = 0;
         }
+
+        return;
+    }
+
+    if (mcState == 1 && (down & 0x300) != 0) {
+        Sound.PlaySe(2, 0x40, 0x7F, 0);
+        mcState = 2;
     }
 }
 

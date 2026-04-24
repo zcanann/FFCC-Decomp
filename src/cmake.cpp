@@ -2375,9 +2375,9 @@ void CMenuPcs::CmakeResultDraw1()
     DrawCmakeCharaText(7, textAlpha);
 
     if (mode == 1) {
-        DrawCmakeYesNo(*reinterpret_cast<short*>(state + 0x26) + 1, alpha);
-    } else {
-        DrawCmakeYesNo(0, alpha);
+        int cursorX = static_cast<int>(FLOAT_80333304) + (System.m_frameCounter & 7);
+        int cursorY = 0x70 + *reinterpret_cast<short*>(state + 0x26) * 0x28;
+        DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, alpha);
     }
 }
 

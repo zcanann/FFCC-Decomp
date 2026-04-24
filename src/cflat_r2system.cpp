@@ -60,6 +60,7 @@ unsigned char gMapHitDrawMode;
 }
 extern unsigned char CFlat[0x10440];
 extern int gWmMenuWorkA;
+extern float FLOAT_80330b74;
 extern float FLOAT_80330b54;
 extern float FLOAT_80330b64;
 
@@ -2931,6 +2932,38 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         };
         SetMapShadeColor__9CCharaPcsFi6CColor(&CharaPcs, *object->m_localBase,
             reinterpret_cast<const unsigned char*>(&color));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -100:
+        this->initAllFinished();
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(this) + 0x10404) = 1;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x62:
+        SetNoFreeMergeMask__9CCharaPcsFi(&CharaPcs, *object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x61: {
+        const int group = (~(object->m_localBase[1] - 1 | 1 - object->m_localBase[1]) >> 31) & 3;
+        Memory.SetDefaultGroup(group);
+        CharaPcs.LoadMergeFile(*object->m_localBase, object->m_localBase[1], 0);
+        Memory.ResetDefaultGroup();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x60: {
+        const int alpha = static_cast<int>(FLOAT_80330b74 * static_cast<float>(object->m_localBase[3])) & 0xFF;
+        const unsigned int blurA = (static_cast<unsigned int>(__cntlzw(object->m_localBase[4])) >> 5) & 0xFF;
+        const unsigned int blurB = (static_cast<unsigned int>(__cntlzw(object->m_localBase[5])) >> 5) & 0xFF;
+        GraphicsPcs.SetBlurParameter(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]),
+            static_cast<unsigned char>(object->m_localBase[2]), static_cast<unsigned char>(alpha),
+            static_cast<unsigned char>(blurA), static_cast<unsigned char>(blurB),
+            static_cast<short>(object->m_localBase[6]));
         runtime->push(object, 0);
         outResult = 0;
         return;

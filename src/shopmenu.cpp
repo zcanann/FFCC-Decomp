@@ -86,6 +86,20 @@ extern float FLOAT_80332dc8;
 extern float FLOAT_80332dcc;
 extern float FLOAT_80332dd0;
 extern float FLOAT_80332de0;
+extern float FLOAT_80332e0c;
+extern float FLOAT_80332e10;
+extern float FLOAT_80332e14;
+extern float FLOAT_80332e18;
+extern float FLOAT_80332e1c;
+extern float FLOAT_80332e20;
+extern float FLOAT_80332e24;
+extern float FLOAT_80332e28;
+extern float FLOAT_80332e2c;
+extern float FLOAT_80332e30;
+extern float FLOAT_80332e34;
+extern float FLOAT_80332e38;
+extern float FLOAT_80332e3c;
+extern float FLOAT_80332e44;
 extern float FLOAT_80332e48;
 extern float FLOAT_80332e4c;
 extern float FLOAT_80332d7c;
@@ -1959,7 +1973,7 @@ void CShopMenu::DrawMake()
     const char* itemName = GetItemName(resultItem);
     DrawInit__5CFontFv(font);
     DrawShadowFont__8CMenuPcsFP5CFontPcffii(
-        MenuPcsVoid(), font, const_cast<char*>(itemName), FLOAT_80332d54, 108.0f, 0x18, 0x12);
+        MenuPcsVoid(), font, const_cast<char*>(itemName), FLOAT_80332d54, FLOAT_80332e0c, 0x18, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     char raceBuffer[64];
@@ -1977,32 +1991,52 @@ void CShopMenu::DrawMake()
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, raceBuffer, raceX, 120.0f, raceColor, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-    char buffer[64];
-    sprintf(buffer, DAT_80332d14, makeGil);
-    float valueRightX = 308.0f;
-    float makeGilX = valueRightX - GetWidth__5CFontFPc(font, buffer);
+    const char* gilUnitText = PTR_DAT_80214da8[languageId];
+    SetupShopMenuUnitFont(font);
+    float gilUnitWidth = GetWidth__5CFontFPc(font, gilUnitText);
+
     DrawInit__5CFontFv(font);
-    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, buffer, makeGilX, 132.0f, 0x13, 0x12);
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+        MenuPcsVoid(), font, DAT_80332d84, FLOAT_80332e14, FLOAT_80332e20, 0x1B, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-    sprintf(buffer, DAT_80332d14, currentMoney);
-    float moneyX = valueRightX - GetWidth__5CFontFPc(font, buffer);
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-        MenuPcsVoid(), font, PTR_s_Money_80214db0[languageId], 176.0f, 148.0f, 0x18, 0x12);
+        MenuPcsVoid(),
+        font,
+        const_cast<char*>(gilUnitText),
+        FLOAT_80332e14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c,
+        FLOAT_80332e20,
+        0x19,
+        0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
+
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-        MenuPcsVoid(), font, buffer, moneyX, 160.0f, (makeGil <= currentMoney) ? 0x14 : 2, 0x12);
+        MenuPcsVoid(), font, const_cast<char*>(gilUnitText), FLOAT_80332e1c - gilUnitWidth, FLOAT_80332e20, 0x19, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
+
+    SetupShopMenuAmountFont(font, &white);
+    DrawShopMenuAmount(font, makeGil, FLOAT_80332e14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c, FLOAT_80332e18, 0x13);
+    DrawShopMenuAmount(
+        font, currentMoney, FLOAT_80332e1c - gilUnitWidth - FLOAT_80332d5c, FLOAT_80332e18, (makeGil <= currentMoney) ? 0x14 : 2);
 
     CFont* labelFont = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
     SetupShopMenuLabelFont(labelFont, &white);
-    DrawShopMenuCenteredText(labelFont, PTR_s_Materials_80214db4[languageId], 112.0f, 244.0f);
-    DrawShopMenuCenteredText(labelFont, PTR_s_Stock_80214db8[languageId], 304.0f, 244.0f);
+    DrawShopMenuCenteredText(labelFont, PTR_s_Price_80214dc4[languageId], FLOAT_80332e28, FLOAT_80332e24);
+    DrawShopMenuCenteredText(labelFont, PTR_s_Money_80214db0[languageId], FLOAT_80332d68, FLOAT_80332e2c);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     DrawObi(0);
+
+    SetMargin__5CFontFf(FLOAT_80332d28, font);
+    SetShadow__5CFontFi(font, 1);
+    SetScale__5CFontFf(FLOAT_80332d28, font);
+    SetColor__5CFontF8_GXColor(font, &white);
+    DrawInit__5CFontFv(font);
+    DrawShopMenuCenteredText(font, PTR_s_Materials_80214db4[languageId], FLOAT_80332e30, FLOAT_80332e34);
+    DrawShopMenuCenteredText(font, PTR_s_Stock_80214db8[languageId], FLOAT_80332e38, FLOAT_80332e34);
+    DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     short recipeMaterial[8];
     GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), selectedItem, recipeMaterial);
@@ -2056,7 +2090,7 @@ void CShopMenu::DrawMake()
 
     SetupShopMenuLabelFont(labelFont, &white);
     DrawShopMenuCenteredText(labelFont, PTR_s_Craft_80214dbc[languageId], 148.0f, 332.0f);
-    DrawShopMenuCenteredText(labelFont, PTR_s_Cancel_80214d98[languageId], 148.0f, 356.0f);
+    DrawShopMenuCenteredText(labelFont, PTR_s_Cancel_80214d98[languageId], 148.0f, FLOAT_80332e44);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     DrawItemInfo(resultItem, 0x98, 0x7E, 0, 0x9C, 0, 0, 0);

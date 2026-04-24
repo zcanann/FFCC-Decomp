@@ -446,6 +446,17 @@ static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 	}
 }
 
+static int FindFirstBonusActiveSlot(unsigned char activeMask)
+{
+	for (int i = 0; i < 8; i++) {
+		if ((activeMask & (1 << i)) != 0) {
+			return i;
+		}
+	}
+
+	return -1;
+}
+
 static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAnimSprite* sprites)
 {
 	CFont* font = GetBonusMenuMembers(menu).m_font;
@@ -2476,9 +2487,15 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
 {
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	float* currentPos = gBonusCheckMarkPosBuffer[0];
+	float* previousPos = gBonusCheckMarkPosBuffer[1];
 	float a = alpha;
 	float strongest = a;
-	float pulse;
+	float pulse = 0.0f;
+	float slotAlpha;
+	float slotScale;
+	unsigned char activeMask;
+	int slot;
 
 	if (a < 0.0f) {
 		a = 0.0f;
@@ -2497,6 +2514,22 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
 		}
 	}
 
+	if (statePtr == 0) {
+		GetBonusMenuMembers(this).m_bonusCursorFlag = (unsigned char)(strongest > 0.5f ? 1 : 0);
+		return;
+	}
+
+	activeMask = *(unsigned char*)(statePtr + 9);
+	slot = (*(short*)(statePtr + 0x26)) & 7;
+	if ((activeMask & (1 << slot)) == 0) {
+		slot = FindFirstBonusActiveSlot(activeMask);
+	}
+
+	if (slot < 0 || currentPos == 0) {
+		GetBonusMenuMembers(this).m_bonusCursorFlag = (unsigned char)(strongest > 0.5f ? 1 : 0);
+		return;
+	}
+
 	if (statePtr != 0) {
 		pulse = (float)((*(short*)(statePtr + 0x22)) & 0x1f) / 31.0f;
 		strongest = strongest * (0.85f + pulse * 0.15f);
@@ -2505,6 +2538,28 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
 	if (strongest > 1.0f) {
 		strongest = 1.0f;
 	}
+
+	slotAlpha = ClampBonusUnit(strongest * (0.7f + pulse * 0.3f));
+	slotScale = 0.95f + pulse * 0.15f;
+
+	float currentX = currentPos[slot * 2 + 0] + 2.0f;
+	float currentY = currentPos[slot * 2 + 1] + 2.0f;
+	float drawX = currentX;
+	float drawY = currentY;
+
+	if (previousPos != 0) {
+		float prevX = previousPos[slot * 2 + 0] + 2.0f;
+		float prevY = previousPos[slot * 2 + 1] + 2.0f;
+		drawX = prevX + (currentX - prevX) * a;
+		drawY = prevY + (currentY - prevY) * a;
+	}
+
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x23);
+	_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(slotAlpha * 255.0f)};
+	GXSetChanMatColor(GX_COLOR0A0, color);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, drawX, drawY, 24.0f, 24.0f, 0.0f, 0.0f, slotScale, slotScale, 0.0f);
+
 	GetBonusMenuMembers(this).m_bonusCursorFlag = (unsigned char)(strongest > 0.5f ? 1 : 0);
 }
 

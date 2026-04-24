@@ -2449,6 +2449,13 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
             object, static_cast<int>(Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ca_0x3dd[object->m_localBase[1]]));
         outResult = 0;
         return;
+    case -0xAE:
+        strcpy(
+            reinterpret_cast<char*>(Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ca_0x3dd),
+            strBlob + strOffs[object->m_localBase[1]]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0xAD:
         runtime->push(object, Game.m_caravanWorkArr[*object->m_localBase].unk_0x3a8);
         outResult = 0;

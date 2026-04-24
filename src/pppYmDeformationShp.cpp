@@ -48,7 +48,7 @@ struct YmDeformationShpColorInfo {
 	pppCVECTOR m_color;
 };
 
-struct YmDeformationShpState {
+struct VYmDeformationShp {
 	int m_backBuffer;
 	int m_pad0;
 	int m_pad1;
@@ -61,7 +61,7 @@ struct YmDeformationShpState {
 
 struct pppYmDeformationShpLayout {
 	u8 m_pad0[0x40];
-	Mtx m_modelMatrix;
+	pppFMATRIX m_modelMatrix;
 	u8 m_pad70[0x10];
 };
 
@@ -77,7 +77,7 @@ extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-	void* color, void* matrix, float z, unsigned char a3, unsigned char a4, unsigned char a5, unsigned char a6,
+	pppCVECTOR* color, pppFMATRIX* matrix, float z, unsigned char a3, unsigned char a4, unsigned char a5, unsigned char a6,
 	unsigned char a7, unsigned char a8, unsigned char a9);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage, int rasSel, int texSel);
 void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int comp0, int ref0, int op, int comp1, int ref1);
@@ -100,14 +100,14 @@ void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void* math, Mtx44 mtx, Vec4d* src
  */
 void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, pppYmDeformationShpUnkC* param_3)
 {
-	YmDeformationShpState* work =
-		(YmDeformationShpState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+	VYmDeformationShp* work =
+		(VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
-	Vec vertices[4];
-	Mtx drawMtx;
+	float indMtx[2][3];
 	Mtx rotMtx;
 	Vec2d uvs[4];
-	float indMtx[2][3];
+	Vec vertices[4];
+	Mtx drawMtx;
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
 		YmDeformationShpColorInfo* colorInfo =
@@ -187,7 +187,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			uvs[2].y = FLOAT_803305f8;
 			uvs[3].x = kPppYmDeformationShpZero;
 			uvs[3].y = FLOAT_803305f8;
-			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, vertices, uvs);
+			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
 		} else {
 			short size = param_2->m_size;
 			short split = param_2->m_splitSize;
@@ -230,7 +230,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			uvs[2].y = uvRemainder;
 			uvs[3].x = kPppYmDeformationShpZero;
 			uvs[3].y = uvRemainder;
-			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, vertices, uvs);
+			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
 
 			if (param_2->m_orientation == 0) {
 				vertices[0].x = split;
@@ -268,7 +268,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			uvs[2].y = uvRemainder;
 			uvs[3].x = FLOAT_803305f8;
 			uvs[3].y = uvRemainder;
-			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, vertices, uvs);
+			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
 
 			if (param_2->m_splitMode == 1) {
 				if (param_2->m_orientation == 0) {
@@ -307,7 +307,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				uvs[2].y = uvSplit;
 				uvs[3].x = kPppYmDeformationShpZero;
 				uvs[3].y = uvSplit;
-				RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, vertices, uvs);
+				RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
 
 				if (param_2->m_orientation == 0) {
 					vertices[0].x = split;
@@ -345,7 +345,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				uvs[2].y = FLOAT_803305f8;
 				uvs[3].x = kPppYmDeformationShpZero;
 				uvs[3].y = FLOAT_803305f8;
-				RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, vertices, uvs);
+				RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
 			}
 		}
 	}
@@ -363,7 +363,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
  */
 int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vertices, Vec2d* uvs)
 {
-	const f32 (*objMtx)[4] = ((pppYmDeformationShpLayout*)obj)->m_modelMatrix;
+	const Mtx& objMtx = ((pppYmDeformationShpLayout*)obj)->m_modelMatrix.value;
 	Vec4d projected[4];
 	Vec worldPos;
 	Vec4d clipPos;
@@ -440,8 +440,8 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	height = (int)maxY - top;
 
 	pppSetBlendMode(3);
-	*(int*)work = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0);
-	if (*(int*)work == 0) {
+	work->m_backBuffer = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0);
+	if (work->m_backBuffer == 0) {
 		return 0;
 	}
 
@@ -528,7 +528,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_POS, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
 	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
 	GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
-	GXLoadTexObj((GXTexObj*)*(int*)work, GX_TEXMAP0);
+	GXLoadTexObj((GXTexObj*)work->m_backBuffer, GX_TEXMAP0);
 
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
 	for (i = 0; i < 4; i++) {
@@ -551,13 +551,13 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
  */
 void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, pppYmDeformationShpUnkC* param_3)
 {
-	YmDeformationShpState* state;
+	VYmDeformationShp* state;
 
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
-	state = (YmDeformationShpState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+	state = (VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 
 	CalcGraphValue(
 		(_pppPObject*)pppYmDeformationShp_, param_2->m_graphId, state->m_scale, state->m_values[0], state->m_values[1],
@@ -613,8 +613,8 @@ void pppDestructYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*)
 void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
 	float value = kPppYmDeformationShpZero;
-	YmDeformationShpState* state =
-		(YmDeformationShpState*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+	VYmDeformationShp* state =
+		(VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
 	state->m_values[1] = kPppYmDeformationShpZero;
 	state->m_values[0] = value;
@@ -636,8 +636,8 @@ void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pp
 void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
 	float value = kPppYmDeformationShpZero;
-	YmDeformationShpState* state =
-		(YmDeformationShpState*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+	VYmDeformationShp* state =
+		(VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
 	state->m_backBuffer = 0;
 	state->m_pad0 = 0;

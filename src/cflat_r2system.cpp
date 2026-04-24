@@ -135,6 +135,67 @@ static inline const unsigned int* GetGameWorkScriptSysVals(const CGame::CGameWor
     return reinterpret_cast<const unsigned int*>(&gameWork.m_scriptSysVal0);
 }
 
+static inline const unsigned short* GetGameCFlatSystemRows()
+{
+    return reinterpret_cast<const unsigned short*>(Game.unkCFlatData0[2]);
+}
+
+static inline unsigned int ReadGameCFlatSystemValue(int systemValue)
+{
+    if (systemValue >= -0xFFF) {
+        return 0;
+    }
+
+    int valueIndex = -0x1000 - systemValue;
+    int valueGroup = valueIndex / 0x600;
+    int rowIndex = 0x5FF - (valueIndex - valueGroup * 0x600);
+    const unsigned short* rows = GetGameCFlatSystemRows();
+    if (rows == 0 || static_cast<unsigned int>(valueGroup) > 0x23) {
+        return 0;
+    }
+
+    return rows[rowIndex * 0x24 + valueGroup];
+}
+
+static inline unsigned int GetGameWorkEventFlagBitIndex(int systemValue)
+{
+    return static_cast<unsigned int>(systemValue + 0x9F3);
+}
+
+static inline int GetGameWorkEventFlagByteIndex(unsigned int bitIndex)
+{
+    return (static_cast<int>(bitIndex) >> 3) +
+           static_cast<int>((static_cast<int>(bitIndex) < 0) && ((bitIndex & 7) != 0)) + 8;
+}
+
+static inline unsigned int GetGameWorkEventFlagMask(unsigned int bitIndex)
+{
+    int sign = static_cast<int>(bitIndex) >> 31;
+    return 1U << ((sign * 8 | static_cast<int>(bitIndex * 0x20000000U + (sign >> 29))) - sign);
+}
+
+static inline unsigned int ReadGameWorkEventFlag(const CGame::CGameWork& gameWork, int systemValue)
+{
+    unsigned int bitIndex = GetGameWorkEventFlagBitIndex(systemValue);
+    const unsigned char* eventFlags = reinterpret_cast<const unsigned char*>(gameWork.m_eventFlags);
+    unsigned int mask = GetGameWorkEventFlagMask(bitIndex);
+    return ((eventFlags[GetGameWorkEventFlagByteIndex(bitIndex)] & mask) != 0);
+}
+
+static inline void WriteGameWorkEventFlag(CGame::CGameWork& gameWork, int systemValue, unsigned int value)
+{
+    unsigned int bitIndex = GetGameWorkEventFlagBitIndex(systemValue);
+    unsigned char* eventFlags = reinterpret_cast<unsigned char*>(gameWork.m_eventFlags);
+    unsigned char& flagByte = eventFlags[GetGameWorkEventFlagByteIndex(bitIndex)];
+    unsigned int mask = GetGameWorkEventFlagMask(bitIndex);
+
+    if (value == 0) {
+        flagByte &= static_cast<unsigned char>(~mask);
+    } else {
+        flagByte |= static_cast<unsigned char>(mask);
+    }
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800B8F80
@@ -3002,24 +3063,9 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
     int result = 0;
 
     if (systemValue < -0xFFF) {
-        int valueIndex = -0x1000 - systemValue;
-        int valueGroup = valueIndex / 0x600;
-        int rowIndex = 0x5FF - (valueIndex - valueGroup * 0x600);
-        u16* row = reinterpret_cast<u16*>(*reinterpret_cast<u8**>(game + 0xC5A8) + rowIndex * 0x48);
-        if ((unsigned int)valueGroup <= 0x23) {
-            result = row[valueGroup];
-        }
+        result = static_cast<int>(ReadGameCFlatSystemValue(systemValue));
     } else if (systemValue < -499) {
-        unsigned int bitIndex = static_cast<unsigned int>(systemValue + 0x9F3);
-        int sign = static_cast<int>(bitIndex) >> 31;
-        u8* flagByte =
-            game +
-            ((static_cast<int>(bitIndex) >> 3) +
-                static_cast<int>((static_cast<int>(bitIndex) < 0) && ((bitIndex & 7) != 0)) +
-                0x10D4);
-        unsigned int bit =
-            1U << ((sign * 8 | static_cast<int>(bitIndex * 0x20000000U + (sign >> 29))) - sign);
-        result = ((*flagByte & bit) != 0);
+        result = static_cast<int>(ReadGameWorkEventFlag(gameWorkRef, systemValue));
     } else if (systemValue < -199) {
         result = *reinterpret_cast<s16*>(game + 0x111CC + (systemValue + 0x1C7) * 2);
     } else {
@@ -3159,17 +3205,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
 
     if (systemValue > -0x1000) {
         if (systemValue < -499) {
-            const unsigned int bitIndex = static_cast<unsigned int>(systemValue + 0x9F3);
-            const int sign = static_cast<int>(bitIndex) >> 31;
-            u8* const flagByte =
-                game +
-                ((static_cast<int>(bitIndex) >> 3) +
-                    static_cast<int>((static_cast<int>(bitIndex) < 0) && ((bitIndex & 7) != 0)) +
-                    0x10D4);
-            const unsigned int mask =
-                1U << ((sign * 8 | static_cast<int>(bitIndex * 0x20000000U + (sign >> 29))) - sign);
-
-            const unsigned int oldValue = ((*flagByte & static_cast<u8>(mask)) != 0);
+            const unsigned int oldValue = ReadGameWorkEventFlag(gameWork, systemValue);
             stack[-1].m_word = oldValue;
 
             unsigned int newValue = oldValue;
@@ -3181,11 +3217,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 newValue -= stack->m_word;
             }
 
-            if (newValue == 0) {
-                *flagByte &= static_cast<u8>(~mask);
-            } else {
-                *flagByte |= static_cast<u8>(mask);
-            }
+            WriteGameWorkEventFlag(gameWork, systemValue, newValue);
         } else if (systemValue < -199) {
             StoreSetU16(stack, setMode, reinterpret_cast<unsigned short*>(game + 0x111CC + (systemValue + 0x1C7) * 2));
         } else {

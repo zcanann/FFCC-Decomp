@@ -2492,8 +2492,6 @@ void CShopMenu::DrawBuySellInfo()
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     int selected = ShopMenuInt(this, 0x28);
     int listType = ShopMenuInt(this, 0x14);
-    int itemNo = ResolveShopMenuSelectedItemId(this);
-    bool canTrade = CanTradeShopMenuItem(this, selected, itemNo);
 
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     SetupShopMenuInfoFont(font, &white);
@@ -2521,9 +2519,33 @@ void CShopMenu::DrawBuySellInfo()
     char* unitText = PTR_DAT_80214da8[languageId];
     float unitWidth = GetWidth__5CFontFPc(font, unitText);
 
+    int itemNo = -1;
+    bool canTrade = false;
+    if (selected != -1) {
+        itemNo = ResolveShopMenuSelectedItemId(this);
+        if (itemNo > 0) {
+            if (listType == 0) {
+                canTrade = true;
+            } else if (listType == 2) {
+                unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
+                int caravan = ShopMenuCaravan(this);
+                canTrade = (*reinterpret_cast<unsigned int*>(caravan + ((itemNo - 0x191) >> 5) * 4 + 0xC08) &
+                            (1U << (bit & 0x1F))) != 0;
+            } else if ((listType == 1) && EquipChk__8CMenuPcsFi(MenuPcsVoid(), selected) == 0 && itemNo >= 0x9F) {
+                canTrade = true;
+            }
+        }
+    }
+
     int totalGil = 0;
-    if (canTrade && ((listType == 0) || (listType == 1))) {
-        totalGil = ShopMenuInt(this, 0x44) * CalcShopMenuTradeGil(this, itemNo);
+    if (canTrade) {
+        if (listType == 0) {
+            totalGil = ShopMenuInt(this, 0x44) * CalcShopMenuGilRatio(this, GetShopMenuItemBaseGil(itemNo, 0x20));
+        } else if (listType == 1) {
+            int sellGil = CalcShopMenuGilRatio(this, GetShopMenuItemBaseGil(itemNo, 0x20));
+            sellGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(sellGil));
+            totalGil = ShopMenuInt(this, 0x44) * sellGil;
+        }
     }
 
     float rightPrice = FLOAT_80332d88 - unitWidth;

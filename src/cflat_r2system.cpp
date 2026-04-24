@@ -2238,6 +2238,18 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0xC6:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 72) = *object->m_localBase;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 88) = 0x40;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 96) = object->m_localBase[1];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 100) = object->m_localBase[2];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 104) =
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 100);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 108) =
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 100);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0xC5: {
         Vec position = {
             static_cast<float>(object->m_localBase[4]),
@@ -2340,6 +2352,17 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0xBA:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xB9:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 36) = *object->m_localBase;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 40) = object->m_localBase[1];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0xB8: {
         Vec position = {
             static_cast<float>(object->m_localBase[1]),
@@ -2378,6 +2401,22 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
             reinterpret_cast<CGItemObj*>(object->m_engineObject)
                 ->DeleteOld(*object->m_localBase, object->m_localBase[1], object,
                     reinterpret_cast<CFlatRuntime::CObject*>(object->m_engineObject)));
+        outResult = 0;
+        return;
+    case -0xB2:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicsPcs) + 64) = 0;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicsPcs) + 48) = 1;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicsPcs) + 52) = 1;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicsPcs) + 68) = *object->m_localBase;
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 56) = static_cast<u8>(object->m_localBase[1]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 57) = static_cast<u8>(object->m_localBase[2]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 58) = static_cast<u8>(object->m_localBase[3]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 59) = static_cast<u8>(object->m_localBase[4]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 60) = static_cast<u8>(object->m_localBase[5]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 61) = static_cast<u8>(object->m_localBase[6]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 62) = static_cast<u8>(object->m_localBase[7]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 63) = static_cast<u8>(object->m_localBase[8]);
+        runtime->push(object, 0);
         outResult = 0;
         return;
     case -0xB1:

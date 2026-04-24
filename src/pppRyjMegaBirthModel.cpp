@@ -52,20 +52,24 @@ static inline unsigned char clamp_u8(float value)
 
 static float calc_spawn_speed(float speedMag, u8 speedMode)
 {
+    const float halfSpeed = speedMag * 0.5f;
+
     switch (speedMode) {
+    case 0:
+        return Math.RandF() * speedMag - halfSpeed;
     case 1:
         (void)Math.RandF();
-        return Math.RandF() * speedMag;
+        return Math.RandF() * speedMag - halfSpeed;
     case 2:
-        return Math.RandF() * Math.RandF() * speedMag;
+        return Math.RandF() * Math.RandF() * speedMag - halfSpeed;
     case 3:
-        return -(Math.RandF() * Math.RandF() * speedMag - speedMag);
+        return -(0.5f * (Math.RandF() * Math.RandF() * speedMag - speedMag)) - halfSpeed;
     case 4:
-        return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speedMag;
+        return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speedMag - halfSpeed;
     case 5:
-        return -(Math.RandF() * Math.RandF() * Math.RandF() * speedMag - speedMag);
+        return -(0.5f * (Math.RandF() * Math.RandF() * Math.RandF() * speedMag - speedMag)) - halfSpeed;
     default:
-        return Math.RandF() * speedMag;
+        return Math.RandF() * speedMag - halfSpeed;
     }
 }
 
@@ -400,16 +404,15 @@ void birth(
         float speedX = calc_spawn_speed(speedMag, speedMode);
         float speedY = calc_spawn_speed(speedMag, speedMode);
         float speedZ = calc_spawn_speed(speedMag, speedMode);
-        float halfSpeed = speedMag * 0.5f;
 
         if (mode < 6) {
-            particleData->m_matrix[0][3] = (speedX - halfSpeed) * *(float*)(payload + 0x54);
-            particleData->m_matrix[1][3] = (speedY - halfSpeed) * *(float*)(payload + 0x58);
-            particleData->m_matrix[2][3] = (speedZ - halfSpeed) * *(float*)(payload + 0x5C);
+            particleData->m_matrix[0][3] = speedX * *(float*)(payload + 0x54);
+            particleData->m_matrix[1][3] = speedY * *(float*)(payload + 0x58);
+            particleData->m_matrix[2][3] = speedZ * *(float*)(payload + 0x5C);
         } else {
-            particleData->m_velocity.x = speedX - halfSpeed;
-            particleData->m_velocity.y = speedY - halfSpeed;
-            particleData->m_velocity.z = speedZ - halfSpeed;
+            particleData->m_velocity.x = speedX;
+            particleData->m_velocity.y = speedY;
+            particleData->m_velocity.z = speedZ;
         }
     }
 

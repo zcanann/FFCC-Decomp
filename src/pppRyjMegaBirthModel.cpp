@@ -11,6 +11,7 @@ extern float FLOAT_80330498;
 extern float FLOAT_8033049c;
 extern float FLOAT_803304a0;
 extern float FLOAT_803304a4;
+extern float FLOAT_803304a8;
 extern float FLOAT_803304b4;
 extern float FLOAT_803304bc;
 extern float FLOAT_803304c0;
@@ -685,6 +686,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
 {
     u8* payload = (u8*)params;
     const u8 matrixMode = payload[0x2A];
+    const u8 flagsEnd = payload[0x137];
     pppFMATRIX local;
     pppFMATRIX world;
     pppFMATRIX tmp;
@@ -751,6 +753,39 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
 
     if (copyOut != 0) {
         pppCopyMatrix(mtxB, out);
+    }
+
+    if (flagsEnd != 0) {
+        Vec objectPos;
+        Vec endPos;
+        pppFMATRIX* endMatrix = (pppFMATRIX*)(pObject + 1);
+
+        objectPos.x = pObject->m_localMatrix.value[0][3];
+        objectPos.y = pObject->m_localMatrix.value[1][3];
+        objectPos.z = pObject->m_localMatrix.value[2][3];
+
+        endPos.x = world.value[0][3];
+        endPos.y = world.value[1][3];
+        endPos.z = world.value[2][3];
+        pppAddVector(endPos, endPos, objectPos);
+
+        pppUnitMatrix(*endMatrix);
+        PSMTXScaleApply(endMatrix->value, endMatrix->value, particleData->m_sizeStart * pppMngStPtr->m_scale.x,
+                        particleData->m_sizeEnd * pppMngStPtr->m_scale.y,
+                        particleData->m_sizeVal * pppMngStPtr->m_scale.z);
+
+        if (particleData->m_colorDeltaAdd[1] != FLOAT_80330498) {
+            pppFMATRIX rot;
+
+            PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * -particleData->m_colorDeltaAdd[1]);
+            pppCopyMatrix(tmp, *endMatrix);
+            pppMulMatrix(*endMatrix, rot, tmp);
+        }
+
+        PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
+        endMatrix->value[0][3] = endPos.x;
+        endMatrix->value[1][3] = endPos.y;
+        endMatrix->value[2][3] = endPos.z;
     }
 }
 

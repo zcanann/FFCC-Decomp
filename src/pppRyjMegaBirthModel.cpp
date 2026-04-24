@@ -717,20 +717,32 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     pppCopyMatrix(tmp, local);
     pppMulMatrix(local, tmp, *(pppFMATRIX*)&scale);
 
-    if (particleWMat != NULL) {
-        pppCopyMatrix(world, *(pppFMATRIX*)particleWMat);
-    } else if (matrixMode == 0) {
-        pppCopyMatrix(world, *(pppFMATRIX*)&pObject->m_localMatrix);
-    } else {
+    switch (matrixMode) {
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 9:
         pppCopyMatrix(world, mtxA);
-    }
-
-    pppCopyMatrix(tmp, world);
-    pppMulMatrix(world, tmp, local);
-
-    if (payload[0x136] != 0) {
         pppCopyMatrix(tmp, world);
-        pppMulMatrix(world, pppMngStPtr->m_matrix, tmp);
+        pppMulMatrix(world, tmp, local);
+        break;
+    default:
+        if (particleWMat != NULL) {
+            pppCopyMatrix(world, *(pppFMATRIX*)particleWMat);
+            pppCopyMatrix(tmp, world);
+            pppMulMatrix(world, tmp, local);
+        } else {
+            pppCopyMatrix(world, *(pppFMATRIX*)&pObject->m_localMatrix);
+            pppCopyMatrix(tmp, world);
+            pppMulMatrix(world, tmp, local);
+
+            if (payload[0x136] != 0) {
+                pppCopyMatrix(tmp, world);
+                pppMulMatrix(world, pppMngStPtr->m_matrix, tmp);
+            }
+        }
+        break;
     }
 
     pppCopyMatrix(*(pppFMATRIX*)&g_matKeep, world);

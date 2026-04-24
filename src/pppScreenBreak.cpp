@@ -102,9 +102,7 @@ static const float kPppScreenBreakDegreesToRadians = 0.017453292f;
 static const float kPppScreenBreakCameraOffset = 30.0f;
 static const float kPppScreenBreakLightAttn = 4.0f;
 static const float kPppScreenBreakLightBias = -3.0f;
-static const float DAT_801dd4b0 = 0.0f;
-static const float DAT_801dd4b4 = 1.0f;
-static const float DAT_801dd4b8 = 0.0f;
+static const Vec DAT_801dd4b0 = { 0.0f, 1.0f, 0.0f };
 static const char s_f999_root_801dd4c8[] = "f999_root";
 static const char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
@@ -534,9 +532,9 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec->y = dVar20;
         inVec->z = dVar21;
         PSVECNormalize(inVec, inVec);
-        local_c8.x = DAT_801dd4b0;
-        local_c8.y = DAT_801dd4b4;
-        local_c8.z = DAT_801dd4b8;
+        local_c8.x = DAT_801dd4b0.x;
+        local_c8.y = DAT_801dd4b0.y;
+        local_c8.z = DAT_801dd4b0.z;
         PSVECCrossProduct(inVec, &local_c8, inVec + 2);
 
         dVar17 = Math.RandF(*(float*)((u8*)step + 0x3C));
@@ -675,7 +673,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     Vec4d clipOutput;
     Vec screenOffset;
     Vec cameraOffset;
-    Vec basis = { 0.0f, 1.0f, 0.0f };
+    Vec basis = DAT_801dd4b0;
     Vec gravityAdd;
     Vec axis;
     Quaternion meshQuat;

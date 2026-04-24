@@ -1194,7 +1194,27 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
  */
 void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
 {
-    DrawCrystal(tribe, x + y, alpha);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
+
+    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    if (a < 0) {
+        a = 0;
+    } else if (a > 0xFF) {
+        a = 0xFF;
+    }
+
+    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXSetChanMatColor(GX_COLOR0A0, col);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x31);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcsVoid(), 0,
+        FLOAT_803332e8 + static_cast<float>(x),
+        FLOAT_803332ec + static_cast<float>(y),
+        FLOAT_803332a8, FLOAT_803332a8,
+        static_cast<float>((tribe & 1) * 0xB8),
+        static_cast<float>((tribe / 2) * 0xB8),
+        FLOAT_80333258, FLOAT_80333258, 0.0f);
 }
 
 /*
@@ -1850,9 +1870,14 @@ void CMenuPcs::CmakeSexDraw()
     __ct__6CColorFUcUcUcUc(rgba, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
     font->SetColor(*reinterpret_cast<GXColor*>(rgba));
 
+    float maxWidth = 0.0f;
     for (int i = 0; i < 2; ++i) {
         const char* txt = GetMenuStr__8CMenuPcsFi(this, 0x11 + i);
-        float x = FLOAT_80333288 - static_cast<float>(font->GetWidth(txt)) * FLOAT_80333298;
+        float width = static_cast<float>(font->GetWidth(txt));
+        if (maxWidth < width) {
+            maxWidth = width;
+        }
+        float x = FLOAT_80333288 - width * FLOAT_80333298;
         font->SetPosX(x);
         font->SetPosY(0x9C + i * 0x28 - FLOAT_803332f4);
         font->Draw(txt);
@@ -1862,7 +1887,9 @@ void CMenuPcs::CmakeSexDraw()
     if (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) == 1) {
         int sel = *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x26);
         int frame = System.m_frameCounter & 7;
-        DrawCursor__8CMenuPcsFiif(this, 0xA4 + frame, 0x9C + sel * 0x28, alpha);
+        int cursorX = static_cast<int>(FLOAT_80333288 - maxWidth * (FLOAT_80333298 + FLOAT_80333298)) + frame;
+        int cursorY = 0xA4 + sel * 0x28;
+        DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, alpha);
     }
 
     DrawCmakeMcOverlay(this, 0x15);

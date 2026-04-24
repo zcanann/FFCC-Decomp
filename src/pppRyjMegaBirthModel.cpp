@@ -88,6 +88,19 @@ static void orthonormalize_particle_matrix(_PARTICLE_DATA* particleData)
     PSMTXCopy(model.value, particleData->m_matrix);
 }
 
+static void wrap_particle_rotation_triplet(u8* particleBytes, s32 offset)
+{
+    for (int i = 0; i < 3; i++) {
+        float* value = f32_at(particleBytes, offset + i * 4);
+        while ((s32)*value > 0x7FFF) {
+            *value = (float)((s32)*value - 0x10000);
+        }
+        while ((s32)*value < -0x8000) {
+            *value = (float)((s32)*value + 0x10000);
+        }
+    }
+}
+
 /*
  * --INFO--
  * Address: TODO
@@ -483,12 +496,7 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
         particleData->m_sizeStart = (float)((s32)*(float*)(payload + 0xA0) + (s32)*(float*)(p + 0x68) + (s32)particleData->m_sizeStart);
     }
 
-    while ((s32)particleData->m_directionTail.z > 0x7FFF) {
-        particleData->m_directionTail.z = (float)((s32)particleData->m_directionTail.z - 0x10000);
-    }
-    while ((s32)particleData->m_directionTail.z < -0x8000) {
-        particleData->m_directionTail.z = (float)((s32)particleData->m_directionTail.z + 0x10000);
-    }
+    wrap_particle_rotation_triplet(p, 0x58);
 
     *f32_at(p, 0x40) = *f32_at(p, 0x40) + *f32_at(p, 0x48);
     *f32_at(p, 0x44) = *f32_at(p, 0x44) + *f32_at(p, 0x4C);

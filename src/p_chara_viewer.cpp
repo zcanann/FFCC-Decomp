@@ -525,6 +525,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     unsigned int i;
     unsigned int x;
     unsigned char colorTmp[4];
+    unsigned char colorCopy[4];
     unsigned char white[4];
     char pathBuf[256];
     CFile::CHandle* fileHandle;
@@ -568,7 +569,11 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
                                         ((float)((double)x - kCharaViewerColorCenterBias) * kCharaViewerLerpScale));
             colorTmp[c] = (unsigned char)(int)v;
         }
-        __ct__6CColorFR6CColor(p + 0x12C + i * 4, colorTmp);
+        __ct__6CColorFR6CColor(colorCopy, colorTmp);
+        p[0x12C + i * 4 + 0] = colorCopy[0];
+        p[0x12C + i * 4 + 1] = colorCopy[1];
+        p[0x12C + i * 4 + 2] = colorCopy[2];
+        p[0x12C + i * 4 + 3] = colorCopy[3];
     }
 
     unsigned int clearColor = 0x404040FF;

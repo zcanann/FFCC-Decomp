@@ -231,6 +231,35 @@ static bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
 	return dot > 0.0f;
 }
 
+static unsigned int CharaObjResolveHitParticleBank(CGPrgObj* sourceObj, unsigned int particleBank)
+{
+	if (particleBank == 0xFE) {
+		if (sourceObj == 0) {
+			return 0xFFFFFFFF;
+		}
+
+		int sourceData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0xF8);
+		if (sourceData == 0) {
+			return 0xFFFFFFFF;
+		}
+
+		int effectData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceData) + 0x178);
+		return effectData != 0 ? *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(effectData) + 0x14)
+		                       : 0xFFFFFFFF;
+	}
+
+	if (particleBank == 0xFD) {
+		return 0xFFFFFFFF;
+	}
+
+	return particleBank;
+}
+
+static int CharaObjDecodeHitParticleSe(unsigned short seData)
+{
+	return (seData == 0xFFFF) ? 0 : (seData & 0xFF) + static_cast<int>(seData >> 8) * 1000;
+}
+
 static int CharaObjDecodeSe(unsigned short encodedSe)
 {
 	if (encodedSe == 0 || encodedSe == 0xFFFF) {
@@ -1092,13 +1121,55 @@ int CGCharaObj::getReplaceStat(int state)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::putHitParticleFromItem(CGPrgObj*, int)
+void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 {
-	int item = 0;
-	int p0 = 0;
-	int p1 = 0;
-	getItemPdt(0, 0, item, p0, p1);
-	putParticleFromItem(item, p0, p1, &m_worldPosition);
+	int particleOffset = 0;
+	int itemData;
+	unsigned int particleBank;
+	unsigned short particleSpec;
+	unsigned short particleFlags;
+	unsigned short seSpec;
+
+	if (itemId == 0x1FA || itemId == 0x237) {
+		particleOffset = 0;
+	}
+
+	itemData = Game.unkCFlatData0[2] + itemId * 0x48;
+	particleBank = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(itemData + 0x12));
+	if (particleBank != 0xFFFF && particleBank != 0xFF) {
+		particleBank = CharaObjResolveHitParticleBank(sourceObj, particleBank);
+		particleSpec = *reinterpret_cast<unsigned short*>(itemData + 0x1C);
+		if (particleSpec != 0xFFFF) {
+			if ((particleSpec & 0x1000) != 0) {
+				particleBank = 1;
+			} else if ((particleSpec & 0x2000) != 0) {
+				particleBank = 2;
+			} else if ((particleSpec & 0x4000) != 0) {
+				particleBank = 3;
+			}
+
+			ResetParticleWork__13CFlatRuntime2Fii(CFlat, (particleBank << 8) | ((particleSpec & 0xFF) + particleOffset), 0);
+			particleFlags = *reinterpret_cast<unsigned short*>(itemData + 0x0C);
+			if ((particleFlags & 0x200) == 0) {
+				Vec origin;
+				origin.x = 0.0f;
+				origin.y = 0.0f;
+				origin.z = 0.0f;
+				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, origin, 1.0f);
+			} else if (sourceObj != 0) {
+				SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, sourceObj);
+			}
+			PutParticleWork__13CFlatRuntime2Fv(CFlat);
+		}
+	}
+
+	seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x42);
+	if (sourceObj != 0) {
+		int seNo = CharaObjDecodeHitParticleSe(seSpec);
+		if (seNo != 0) {
+			sourceObj->playSe3D(seNo + particleOffset, 0x32, 0x96, 0, 0);
+		}
+	}
 }
 
 /*

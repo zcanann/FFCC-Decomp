@@ -1453,12 +1453,18 @@ void CMenuPcs::DrawResultCountAnim()
 	if (animPtr == 0 || statePtr == 0) {
 		return;
 	}
+	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+		return;
+	}
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	float strongest = 0.0f;
 	CFont* font = GetBonusMenuMembers(this).m_font;
 	CFont* fontWide = GetBonusMenuMembers(this).m_fontWide;
+
+	DrawInit__8CMenuPcsFv(this);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];

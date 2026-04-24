@@ -28,8 +28,6 @@ extern const float FLOAT_8032fd80;
 extern float FLOAT_8032fd90;
 extern float FLOAT_8032fd94;
 extern float FLOAT_8032fd98;
-static const float FLOAT_8032fd9c = 320.0f;
-static const float FLOAT_8032fda0 = 224.0f;
 extern const float FLOAT_8032fda4;
 extern const float FLOAT_8032fda8;
 
@@ -447,19 +445,16 @@ void CFunnyShape::Render()
         count = 1;
     }
 
-    const float baseX = FLOAT_8032fd9c;
-    const float baseY = FLOAT_8032fda0;
     CFunnyShape* work = this;
 
     for (s32 i = 0; i < count; i++) {
         Vec2d pos;
-        pos.x = baseX + *reinterpret_cast<float*>(Ptr(work, 8));
-        pos.y = baseY + *reinterpret_cast<float*>(Ptr(work, 0xC));
+        pos.x = 320.0f + *reinterpret_cast<float*>(Ptr(work, 8));
+        pos.y = 224.0f + *reinterpret_cast<float*>(Ptr(work, 0xC));
 
         u8* animData = reinterpret_cast<u8*>(AnimData(this));
-        const s16* shapeOffsets = reinterpret_cast<s16*>(animData + 0x10);
         const s16 frame = *reinterpret_cast<s16*>(Ptr(work, 0x14));
-        const s16 shapeOffset = shapeOffsets[frame * 4];
+        const s16 shapeOffset = reinterpret_cast<s16*>(animData)[frame * 4 + 8];
         RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + shapeOffset), pos, *reinterpret_cast<float*>(Ptr(work, 0x28)));
         work = reinterpret_cast<CFunnyShape*>(Ptr(work, 0x30));
     }
@@ -516,10 +511,10 @@ void CFunnyShape::RenderTexture()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
     GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);
+    const u32 colorWord = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = FLOAT_8032fd80;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd6c;
-    const u32 colorWord = *reinterpret_cast<u32*>(&color);
     GXWGFifo.u32 = colorWord;
     GXWGFifo.f32 = FLOAT_8032fd6c;
     GXWGFifo.f32 = FLOAT_8032fd74;

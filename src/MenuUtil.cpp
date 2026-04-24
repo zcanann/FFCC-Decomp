@@ -7,6 +7,7 @@
 #include "ffcc/fontman.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+extern CMenuPcs MenuPcs;
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" short BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(void*);
@@ -18,6 +19,7 @@ extern "C" int drawTagString__4CMesFP5CFontPciii(CFont*, int, int, int, int);
 extern "C" const char* GetSkillStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* GetAttrStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" char ChkEquipActive__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" int toupper(int);
 extern "C" void MakeArtItemName__5CGameFPcii(void*, char*, int, int);
 extern "C" char s_MenuUtil_cpp_801e37fc[];
 extern u32 DAT_801e36d0;
@@ -188,187 +190,267 @@ void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* tex
  */
 void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor color, int tlut, float margin, float scale)
 {
-    u32 lineBaseY[4];
-    lineBaseY[0] = DAT_801e36d0;
-    lineBaseY[1] = DAT_801e36d4;
-    lineBaseY[2] = DAT_801e36d8;
-    lineBaseY[3] = DAT_801e36dc;
+	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const menuPcsGlobal = reinterpret_cast<unsigned char*>(&MenuPcs);
+	u32 lineBaseY[4];
+	lineBaseY[0] = DAT_801e36d0;
+	lineBaseY[1] = DAT_801e36d4;
+	lineBaseY[2] = DAT_801e36d8;
+	lineBaseY[3] = DAT_801e36dc;
 
-    int languageIndex = Game.m_gameWork.m_languageId - 1;
-    int lineCount = 3;
-    int firstLine = 500;
-    int maxWidth = -1;
-    int drawPrefix = 1;
-    float lineStep = FLOAT_80333654;
-    const char* suffix = DAT_80333658;
-    char itemName[260];
-    char scratch[0x200];
-    itemName[0] = '\0';
+	int languageIndex = Game.m_gameWork.m_languageId - 1;
+	int drawPrefix = 1;
+	int firstLine = 500;
+	int maxWidth = -1;
+	float lineStep = FLOAT_80333654;
+	const char* suffix = 0;
+	char itemName[260];
+	char scratch[0x100];
+	itemName[0] = '\0';
 
-    font->SetMargin(margin);
-    font->SetShadow(1);
-    font->SetScale(scale);
-    font->DrawInit();
-    font->SetTlut(tlut);
-    font->SetColor(color);
-    font->SetScale(kOptionAnimMax);
+	font->SetMargin(margin);
+	font->SetShadow(1);
+	font->SetScale(scale);
+	font->DrawInit();
+	font->SetTlut(tlut);
+	font->SetColor(color);
+	font->SetScale(kOptionAnimMax);
 
-    if ((0 <= msgNo) && (msgNo < 0x269)) {
-        firstLine = msgNo * 3 + 0x1F5;
-    }
+	if ((0 <= msgNo) && (msgNo < 0x269)) {
+		firstLine = msgNo * 3 + 0x1F5;
+	}
 
-    for (int i = 0; i < 3; i++) {
-        int msgId = GetMenuHelpMsgTable()[firstLine + i];
-        memset(scratch, 0, sizeof(scratch));
-        MakeAgbString__4CMesFPcPcii(scratch, reinterpret_cast<char*>(msgId), 0, 1);
-        if (strlen(scratch) != 0) {
-            int width = drawTagString__4CMesFP5CFontPciii(font, msgId, 0, 0, 0);
-            if (maxWidth < width) {
-                maxWidth = width;
-            }
-        }
-    }
+	void* stage = *reinterpret_cast<void**>(menuPcsGlobal + 0xEC);
+	if (Game.m_gameWork.m_menuStageMode != 0) {
+		stage = *reinterpret_cast<void**>(menuPcsGlobal + 0xF4);
+	}
 
-    if ((msgNo < 0x259) || (0x268 < msgNo)) {
-        if (msgNo == 0x209) {
-            suffix = GetSkillStr__8CMenuPcsFi(this, 0);
-            itemName[0] = '\0';
-        } else if (msgNo == 0x20D) {
-            suffix = GetSkillStr__8CMenuPcsFi(this, 1);
-            itemName[0] = '\0';
-        } else if (msgNo == 0x211) {
-            suffix = GetSkillStr__8CMenuPcsFi(this, 2);
-            itemName[0] = '\0';
-        } else {
-            MakeArtItemName__5CGameFPcii(&Game, itemName, msgNo, 1);
-            if ((itemName[0] != '\0') && (strlen(itemName) != 0) &&
-                (itemName[0] >= 'a') && (itemName[0] <= 'z')) {
-                itemName[0] = static_cast<char>(itemName[0] - ('a' - 'A'));
-            }
-        }
-        lineStep = FLOAT_80333620;
-    } else {
-        drawPrefix = 0;
-    }
+	char* temp = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x200, stage, s_MenuUtil_cpp_801e37fc, 0x8C));
+	if (temp != nullptr) {
+		for (int i = 0; i < 3; i++) {
+			int msgId = GetMenuHelpMsgTable()[firstLine + i];
+			memset(temp, 0, 0x200);
+			MakeAgbString__4CMesFPcPcii(temp, reinterpret_cast<char*>(msgId), 0, 1);
+			if (strlen(temp) != 0) {
+				int width = drawTagString__4CMesFP5CFontPciii(font, msgId, 0, 0, 0);
+				if (width > maxWidth) {
+					maxWidth = width;
+				}
+			}
+		}
+		__dla__FPv(temp);
+	}
 
-    int rangeKind = 0;
-    if ((1 <= msgNo) && (msgNo <= 0x44)) {
-        rangeKind = 1;
-    } else if ((0x45 <= msgNo) && (msgNo <= 0x7E)) {
-        rangeKind = 0x45;
-    } else if ((0x7F <= msgNo) && (msgNo <= 0x9E)) {
-        rangeKind = 0x7F;
-    }
+	if ((msgNo < 0x259) || (0x268 < msgNo)) {
+		if (msgNo == 0x209) {
+			suffix = GetSkillStr__8CMenuPcsFi(this, 0);
+		} else if (msgNo == 0x20D) {
+			suffix = GetSkillStr__8CMenuPcsFi(this, 1);
+		} else if (msgNo == 0x211) {
+			suffix = GetSkillStr__8CMenuPcsFi(this, 2);
+		} else {
+			suffix = DAT_80333658;
+		}
 
-    if (rangeKind == 0) {
-        for (int i = 0; i < 3; i++) {
-            int msgId = GetMenuHelpMsgTable()[firstLine + i];
-            memset(scratch, 0, sizeof(scratch));
-            MakeAgbString__4CMesFPcPcii(scratch, reinterpret_cast<char*>(msgId), 0, 1);
-            if (strlen(scratch) == 0) {
-                lineCount--;
-                if (firstLine == firstLine + i) {
-                    firstLine++;
-                }
-            }
-        }
+		if ((msgNo == 0x209) || (msgNo == 0x20D) || (msgNo == 0x211)) {
+			itemName[0] = '\0';
+		} else {
+			MakeArtItemName__5CGameFPcii(&Game, itemName, msgNo, 1);
+			if ((strlen(itemName) != 0) && (itemName[0] != '\0')) {
+				itemName[0] = static_cast<char>(toupper(static_cast<unsigned char>(itemName[0])));
+			}
+		}
+		lineStep = FLOAT_80333620;
+	} else {
+		drawPrefix = 0;
+	}
 
-        u32 y = lineBaseY[lineCount + drawPrefix - 1];
-        if (drawPrefix != 0) {
-            font->SetPosX(FLOAT_8033357c);
-            font->SetPosY(static_cast<float>(y));
-            font->Draw(itemName);
-            font->Draw(suffix);
-            y = static_cast<u32>(static_cast<float>(y) + lineStep);
-        }
+	int rangeKind = 0;
+	if ((1 <= msgNo) && (msgNo <= 0x44)) {
+		rangeKind = 1;
+	} else if ((0x45 <= msgNo) && (msgNo <= 0x7E)) {
+		rangeKind = 0x45;
+	} else if ((0x7F <= msgNo) && (msgNo <= 0x9E)) {
+		rangeKind = 0x7F;
+	}
 
-        for (int i = 0; i < lineCount; i++) {
-            int x = 0x140 - maxWidth / 2;
-            int msgId = GetMenuHelpMsgTable()[firstLine + i];
-            font->SetPosX(static_cast<float>(x));
-            font->SetPosY(static_cast<float>(y));
-            drawTagString__4CMesFP5CFontPciii(font, msgId, 1, 0, 0);
-            y = static_cast<u32>(static_cast<float>(y) + lineStep);
-        }
-        return;
-    }
+	if (rangeKind == 0) {
+		int lineCount = 3;
+		int firstNonEmptyLine = firstLine;
+		stage = *reinterpret_cast<void**>(menuPcsGlobal + 0xEC);
+		if (Game.m_gameWork.m_menuStageMode != 0) {
+			stage = *reinterpret_cast<void**>(menuPcsGlobal + 0xF4);
+		}
 
-    u32 y = lineBaseY[drawPrefix + 2];
-    if (drawPrefix != 0) {
-        font->SetPosX(FLOAT_8033357c);
-        font->SetPosY(static_cast<float>(y));
-        font->Draw(itemName);
-        font->Draw(suffix);
-        y = static_cast<u32>(static_cast<float>(y) + lineStep);
-    }
+		temp = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x200, stage, s_MenuUtil_cpp_801e37fc, 0x23D));
+		if (temp != nullptr) {
+			for (int i = 0; i < 3; i++) {
+				int msgId = GetMenuHelpMsgTable()[firstLine + i];
+				memset(temp, 0, 0x200);
+				MakeAgbString__4CMesFPcPcii(temp, reinterpret_cast<char*>(msgId), 0, 1);
+				if (strlen(temp) == 0) {
+					lineCount--;
+					if (firstNonEmptyLine == firstLine + i) {
+						firstNonEmptyLine++;
+					}
+				}
+			}
+			__dla__FPv(temp);
+		}
 
-    for (int i = 0; i < 3; i++) {
-        int x = 0x140 - maxWidth / 2;
-        int msgId = GetMenuHelpMsgTable()[firstLine + i];
-        font->SetPosX(static_cast<float>(x));
-        font->SetPosY(static_cast<float>(y));
-        drawTagString__4CMesFP5CFontPciii(font, msgId, 1, 0, 0);
-        y = static_cast<u32>(static_cast<float>(y) + lineStep);
-    }
+		u32 y = lineBaseY[lineCount + drawPrefix - 1];
+		if (drawPrefix != 0) {
+			font->SetPosX(FLOAT_8033357c);
+			font->SetPosY(static_cast<float>(y));
+			font->Draw(itemName);
+			font->Draw(suffix);
+			y = static_cast<u32>(static_cast<float>(y) + lineStep);
+		}
 
-    int itemBase = Game.unkCFlatData0[2] + msgNo * 0x48;
-    u16 flags = *reinterpret_cast<u16*>(itemBase + 4);
-    const char* bonusLabel = DAT_80333658;
-    if ((flags & 0x100) != 0) {
-        bonusLabel = PTR_s_Strength__80215a48[languageIndex];
-    } else if ((flags & 0xE00) != 0) {
-        bonusLabel = PTR_s_Defence__80215a4c[languageIndex];
-    }
+		for (int i = 0; i < lineCount; i++) {
+			int msgId = GetMenuHelpMsgTable()[firstNonEmptyLine + i];
+			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
+			font->SetPosY(static_cast<float>(y));
+			drawTagString__4CMesFP5CFontPciii(font, msgId, 1, 0, 0);
+			y = static_cast<u32>(static_cast<float>(y) + lineStep);
+		}
+		return;
+	}
 
-    font->SetPosX(FLOAT_8033357c);
-    font->SetPosY(static_cast<float>(y));
+	u32 y = lineBaseY[drawPrefix + 2];
+	if (drawPrefix != 0) {
+		font->SetPosX(FLOAT_8033357c);
+		font->SetPosY(static_cast<float>(y));
+		font->Draw(itemName);
+		font->Draw(suffix);
+		y = static_cast<u32>(static_cast<float>(y) + lineStep);
+	}
 
-    if ((flags & 0x1000) == 0) {
-        strcpy(scratch, bonusLabel);
-        strcat(scratch, DAT_8033366c);
-        font->Draw(scratch);
+	for (int i = 0; i < 3; i++) {
+		int msgId = GetMenuHelpMsgTable()[firstLine + i];
+		font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
+		font->SetPosY(static_cast<float>(y));
+		drawTagString__4CMesFP5CFontPciii(font, msgId, 1, 0, 0);
+		y = static_cast<u32>(static_cast<float>(y) + lineStep);
+	}
 
-        float x = FLOAT_8033357c + font->GetWidth(scratch) + FLOAT_803335a0;
-        font->SetTlut(1);
-        font->SetPosX(x);
-        sprintf(scratch, DAT_80333670, *reinterpret_cast<u16*>(itemBase + 6));
-        font->Draw(scratch);
+	int itemBase = Game.unkCFlatData0[2] + msgNo * 0x48;
+	u16 flags = *reinterpret_cast<u16*>(itemBase + 4);
+	if ((flags & 0x100) != 0) {
+		strcpy(scratch, PTR_s_Strength__80215a48[languageIndex]);
+	} else if ((flags & 0x200) != 0) {
+		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex]);
+	} else if ((flags & 0x400) != 0) {
+		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex]);
+	} else if ((flags & 0x800) != 0) {
+		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex]);
+	} else if ((flags & 0x1000) != 0) {
+		strcpy(scratch, DAT_80333658);
+	} else if ((flags & 0x2000) != 0) {
+		strcpy(scratch, DAT_80333658);
+	}
 
-        float markerX = FLOAT_8033357c + font->GetWidth(DAT_8033366c);
-        font->SetPosX(markerX);
-        u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
-        if ((attr != 0) && (attr < 0x14)) {
-            font->SetTlut(4);
-            strcpy(scratch, GetAttrStr__8CMenuPcsFi(this, attr));
-            font->Draw(scratch);
-            font->SetTlut(9);
-            if (attr < 9) {
-                sprintf(scratch, DAT_8033367c, DAT_80333660);
-                font->Draw(scratch);
-            }
-        }
-    } else {
-        u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
-        if ((attr != 0) && (attr < 0x14)) {
-            font->SetTlut(4);
-            strcpy(scratch, GetAttrStr__8CMenuPcsFi(this, attr));
-            font->Draw(scratch);
-            float x = FLOAT_8033357c + font->GetWidth(scratch) + FLOAT_803335a0;
-            font->SetPosX(x);
-            font->SetTlut(9);
-            if (attr < 9) {
-                sprintf(scratch, DAT_8033365c, DAT_80333660);
-            } else if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
-                sprintf(scratch, DAT_80333664, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
-            } else if (((9 <= attr) && (attr <= 0xA)) || (attr == 0xC)) {
-                sprintf(scratch, DAT_80333664, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
-                font->SetTlut(3);
-            } else {
-                return;
-            }
-            font->Draw(scratch);
-        }
-    }
+	font->SetPosX(FLOAT_8033357c);
+	font->SetPosY(static_cast<float>(y));
+
+	if ((flags & 0x1000) == 0) {
+		strcat(scratch, DAT_8033366c);
+		font->Draw(scratch);
+
+		float valueX = FLOAT_8033357c + font->GetWidth(scratch) + FLOAT_803335a0;
+		font->SetTlut(1);
+		font->SetPosX(valueX);
+		sprintf(scratch, DAT_80333670, *reinterpret_cast<u16*>(itemBase + 6));
+		font->Draw(scratch);
+
+		if ((*reinterpret_cast<short*>(self + 0x864) == 2) &&
+		    (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x82C) + 0x30) == 1)) {
+			int currentItem = -1;
+			int menuState = *reinterpret_cast<int*>(self + 0x82C);
+			u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
+
+			if ((effectFlags & 0x100) != 0) {
+				currentItem = 0;
+			} else if ((effectFlags & 0x400) != 0) {
+				currentItem = 1;
+			} else if ((effectFlags & 0x800) != 0) {
+				currentItem = 2;
+			} else if ((effectFlags & 0x200) != 0) {
+				currentItem = 2;
+			} else if ((effectFlags & 0x1000) != 0) {
+				currentItem = 3;
+			} else if ((effectFlags & 0x2000) != 0) {
+				currentItem = 3;
+			}
+
+			currentItem = static_cast<int>(*reinterpret_cast<short*>(
+			    Game.m_scriptFoodBase[0] +
+			    static_cast<int>(*reinterpret_cast<short*>(Game.m_scriptFoodBase[0] + currentItem * 2 + 0xAC)) * 2 +
+			    0xB6));
+
+			if (ChkEquipActive__8CMenuPcsFi(this,
+			                                static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
+			                                    static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34))) != 0) {
+				u16 currentValue = 0;
+				if (currentItem != -1) {
+					currentValue = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + currentItem * 0x48 + 6);
+				}
+
+				int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
+				float deltaX = valueX + font->GetWidth(scratch) + FLOAT_803335a0;
+				font->SetPosX(deltaX);
+				if (delta < 0) {
+					font->SetTlut(3);
+				} else {
+					font->SetTlut(9);
+				}
+				sprintf(scratch, DAT_80333674, delta);
+				if (delta != 0) {
+					font->Draw(scratch);
+				}
+			}
+		}
+
+		float attrX = font->posX + font->GetWidth(DAT_8033366c);
+		font->SetPosX(attrX);
+
+		u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
+		if (((flags & 0x1000) == 0) && (attr != 0) && (attr < 0x14)) {
+			font->SetTlut(4);
+			strcpy(scratch, GetAttrStr__8CMenuPcsFi(this, attr));
+			font->Draw(scratch);
+			font->SetTlut(9);
+			if ((attr != 0) && (attr < 9)) {
+				sprintf(scratch, DAT_8033367c, DAT_80333660);
+				font->Draw(scratch);
+			}
+		}
+	} else {
+		u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
+		if ((attr != 0) && (attr < 0x14)) {
+			strcpy(scratch, GetAttrStr__8CMenuPcsFi(this, attr));
+			font->SetTlut(4);
+			font->Draw(scratch);
+			font->SetPosX(FLOAT_803335a0 + font->GetWidth(scratch));
+			font->SetTlut(9);
+
+			if ((attr == 0) || (8 < attr)) {
+				if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
+					sprintf(scratch, DAT_80333664, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
+				} else {
+					if (((attr - 9) > 1) && (attr != 0xC)) {
+						return;
+					}
+					sprintf(scratch, DAT_80333664, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
+					font->SetTlut(3);
+				}
+			} else {
+				sprintf(scratch, DAT_8033365c, DAT_80333660);
+			}
+
+			font->Draw(scratch);
+		}
+	}
 }
 
 /*

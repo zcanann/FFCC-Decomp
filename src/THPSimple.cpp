@@ -80,23 +80,13 @@ s16 WorkBuffer_32_[0x280] ATTRIBUTE_ALIGN(32);
  * Address:	TODO
  * Size:	TODO
  */
-void checkError()
+static inline void checkError()
 {
     s32 status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
 
     if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
         File.DrawError(SimpleControl.fileInfo, status);
     }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void _kami_DVDREAD(DVDFileInfo*, void*, long, long)
-{
-	// TODO
 }
 
 /*

@@ -1639,67 +1639,112 @@ void CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 
 	unsigned int base = 0;
 	unsigned char* gameFlat = reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc);
-	switch (staIndex) {
-		case 0: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x10); break;
-		case 1: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x0E); break;
-		case 3: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x12); break;
-		case 4: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x22); break;
-		case 5: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x20); break;
-		case 6: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x1E); break;
-		case 7: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x18); break;
-		case 8: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x14); break;
-		case 9: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x16); break;
-		case 0x0A: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x1A); break;
-		case 0x1C: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x1C); break;
-		case 0x6A: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x24); break;
-		default: break;
+	if (staIndex == 7) {
+		base = *reinterpret_cast<unsigned short*>(gameFlat + 0x18);
+	} else if (staIndex < 7) {
+		if (staIndex == 3) {
+			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x22);
+		} else if (staIndex < 3) {
+			if (staIndex == 1) {
+				base = *reinterpret_cast<unsigned short*>(gameFlat + 0x0E);
+			} else if (staIndex < 1) {
+				if (staIndex >= 0) {
+					base = *reinterpret_cast<unsigned short*>(gameFlat + 0x10);
+				}
+			} else {
+				base = *reinterpret_cast<unsigned short*>(gameFlat + 0x1E);
+			}
+		} else if (staIndex != 5) {
+			if (staIndex < 5) {
+				base = *reinterpret_cast<unsigned short*>(gameFlat + 0x12);
+			} else {
+				base = *reinterpret_cast<unsigned short*>(gameFlat + 0x20);
+			}
+		}
+	} else if (staIndex == 0x1C) {
+		base = *reinterpret_cast<unsigned short*>(gameFlat + 0x1C);
+	} else if (staIndex < 0x1C) {
+		if (staIndex == 10) {
+			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x1A);
+		} else if (staIndex < 10) {
+			if (staIndex < 9) {
+				base = *reinterpret_cast<unsigned short*>(gameFlat + 0x14);
+			} else {
+				base = *reinterpret_cast<unsigned short*>(gameFlat + 0x16);
+			}
+		}
+	} else if (staIndex == 0x6A) {
+		base = *reinterpret_cast<unsigned short*>(gameFlat + 0x24);
 	}
 
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (amount * 0x48);
-	short itemType = (amount < 0x1F5) ? 1 : *reinterpret_cast<short*>(itemData + 2);
-
-	unsigned int sourceCid = source->GetCID();
-	unsigned int power = 0;
-	if ((sourceCid & 0x2D) == 0x2D) {
-		CGObject* statSource = source;
-		if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-			(sourceCid & 0x6D) == 0x6D &&
-			source->m_scriptHandle != 0 && source->m_scriptHandle[0xED] != 0) {
-			statSource = reinterpret_cast<CGObject*>(Game.m_partyObjArr[0]);
-		}
-		if (statSource != 0 && statSource->m_scriptHandle != 0 && statSource->m_scriptHandle[9] != 0) {
-			power = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(statSource->m_scriptHandle[9]) + 0x198);
-		}
-	} else {
-		power = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
+	short itemType = 1;
+	if (amount >= 0x1F5) {
+		itemType = *reinterpret_cast<short*>(itemData + 2);
 	}
 
+	CGPrgObj* sourceObj = reinterpret_cast<CGPrgObj*>(source);
+	unsigned int sourceCid = static_cast<unsigned int>(source->GetCID());
+	unsigned short powerValue;
+	if ((((static_cast<unsigned int>(__cntlzw(0x2D - static_cast<int>(sourceCid & 0x2D)))) >> 5) & 0xFFU) == 0) {
+		powerValue = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
+	} else {
+		bool stageModeActive = false;
+		bool usePartySource = false;
+		bool usePartyLeader = false;
+
+		if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+			stageModeActive = true;
+		}
+		if (stageModeActive) {
+			sourceCid = static_cast<unsigned int>(source->GetCID());
+			if ((((static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(sourceCid & 0x6D)))) >> 5) & 0xFFU) != 0) {
+				usePartySource = true;
+			}
+		}
+		if (usePartySource && sourceObj->m_scriptHandle != 0 && sourceObj->m_scriptHandle[0xED] != 0) {
+			usePartyLeader = true;
+		}
+
+		CGPrgObj* powerSource = sourceObj;
+		if (usePartyLeader) {
+			powerSource = Game.m_partyObjArr[0];
+		}
+		powerValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle[9]) + 0x198);
+	}
+
+	unsigned int power = powerValue;
+	sourceCid = static_cast<unsigned int>(source->GetCID());
 	if ((sourceCid & 0xAD) == 0xAD) {
-		int stageLevel = 0;
+		int stageLevel;
 		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 			stageLevel = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
 			if (stageLevel > 2) {
 				stageLevel = 2;
 			}
+		} else {
+			stageLevel = 0;
 		}
+
 		if (stageLevel > 0) {
-			power += *reinterpret_cast<unsigned short*>(gameFlat + 0x5C + (stageLevel * 2));
+			power += *reinterpret_cast<unsigned short*>(gameFlat + (stageLevel * 2) + 0x5C);
 		}
 	}
 
-	int affinity = 0;
-	if ((sourceCid & 0x6D) == 0x6D && (itemType == 1 || itemType == 9) && source->m_scriptHandle != 0) {
-		affinity += static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(source->m_scriptHandle) + 0xBDA));
-	}
-	if ((GetCID() & 0x6D) == 0x6D && (itemType == 8 || itemType == 9)) {
-		affinity -= static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBDB));
+	unsigned int affinity = 0;
+	sourceCid = static_cast<unsigned int>(source->GetCID());
+	if ((sourceCid & 0x6D) == 0x6D && (itemType == 1 || itemType == 9)) {
+		affinity = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDA));
 	}
 
-	int next = affinity + static_cast<int>(base * power);
-	if (next < 0) {
-		next = 0;
+	unsigned int selfCid = static_cast<unsigned int>(GetCID());
+	if ((selfCid & 0x6D) == 0x6D && (itemType == 8 || itemType == 9)) {
+		affinity -= *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBDB);
 	}
-	setSta(staIndex, next);
+
+	unsigned int next = affinity + (base * power);
+	next &= ~((static_cast<int>(next)) >> 31);
+	setSta(staIndex, static_cast<int>(next));
 }
 
 /*

@@ -1488,6 +1488,13 @@ def generate_build_ninja(
     # Split DOL
     ###
     build_config_path = build_path / "config.json"
+    split_outputs: List[Union[str, Path]] = [build_config_path]
+    if build_config is not None:
+        split_outputs.extend(
+            build_obj["object"]
+            for build_obj in build_config["units"]
+            if build_obj["object"] is not None
+        )
     n.comment("Split DOL into relocatable objects")
     n.rule(
         name="split",
@@ -1498,7 +1505,7 @@ def generate_build_ninja(
     )
     n.build(
         inputs=config.config_path,
-        outputs=build_config_path,
+        outputs=split_outputs,
         rule="split",
         implicit=dtk,
         variables={"out_dir": build_path},
@@ -1519,12 +1526,13 @@ def generate_build_ninja(
         outputs=["build.ninja", "objdiff.json"],
         rule="configure",
         implicit=[
-            build_config_path,
+            config.config_path,
             configure_script,
             python_lib,
             python_lib_dir / "ninja_syntax.py",
             *(config.reconfig_deps or []),
         ],
+        order_only=[build_config_path],
     )
     n.newline()
 

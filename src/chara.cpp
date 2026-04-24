@@ -1612,9 +1612,11 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		return;
 	}
 
-	float randomScale = Math.RandF() * 0.5f + 0.5f;
+	float randomScale = FLOAT_803301d0 * Math.RandF() + FLOAT_803301d0;
+	Vec windForce;
+	PSVECScale(&ModelDynJitter(this), &windForce, randomScale);
 	Vec windImpulse;
-	PSVECScale(&ModelDynJitter(this), &windImpulse, randomScale * dynParam[2]);
+	PSVECScale(&windForce, &windImpulse, dynParam[2]);
 
 	Vec targetDelta;
 	PSVECSubtract(&target, &NodeDynPosition(node), &targetDelta);
@@ -1630,65 +1632,57 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 
 	Vec direction;
 	PSVECSubtract(&predicted, &origin, &direction);
-	if (dynParam[3] != 0.0f) {
-		const float kDegToRad = 0.01745329252f;
-		for (int axis = 0; axis < 2; axis++) {
+	for (int axis = 0; axis < 2; axis++, dynParam++) {
+		if (dynParam[3] != 0.0f) {
 			float dotForward = PSVECDotProduct(&forward, &direction);
 			float dotSide = PSVECDotProduct(axis == 0 ? &up : &right, &direction);
 			float angle = axis == 0 ? -atan2f(dotSide, dotForward) : atan2f(dotSide, dotForward);
-			float minAngle = dynParam[5] * kDegToRad;
-			float maxAngle = dynParam[7] * kDegToRad;
-			if (angle > minAngle && angle < maxAngle) {
-				continue;
+			float limit = 0.01745329252f * dynParam[5];
+			if (angle <= limit || 0.01745329252f * dynParam[7] <= angle) {
+				if (limit < angle) {
+					limit = 0.01745329252f * dynParam[7];
+				}
+
+				Mtx rotate;
+				PSMTXRotAxisRad(rotate, axis == 0 ? &right : &up, limit - angle);
+				PSMTXMultVecSR(rotate, &direction, &direction);
 			}
-
-			float clamped = angle < minAngle ? minAngle : maxAngle;
-			Mtx rotate;
-			PSMTXRotAxisRad(rotate, axis == 0 ? &right : &up, clamped - angle);
-			PSMTXMultVecSR(rotate, &direction, &direction);
-			dynParam++;
 		}
-		dynParam -= 2;
 	}
 
-	float directionMag = PSVECMag(&direction);
-	if (directionMag > 0.0f) {
-		PSVECScale(&direction, &direction, 1.0f / directionMag);
-	}
-
+	PSVECNormalize(&direction, &direction);
 	float align = PSVECDotProduct(&forward, &direction);
-	if (align < 0.9999f) {
-		float clampedAlign = align;
-		if (clampedAlign < -1.0f) {
-			clampedAlign = -1.0f;
-		} else if (clampedAlign > 1.0f) {
-			clampedAlign = 1.0f;
+	if (align <= 0.9999f) {
+		float rotateAngle = 3.14159274f;
+		if (-1.0f <= align) {
+			rotateAngle = acosf(align);
 		}
 
 		Vec axis;
 		PSVECCrossProduct(&forward, &direction, &axis);
-		float axisMag = PSVECMag(&axis);
-		if (axisMag > 0.0f) {
-			PSVECScale(&axis, &axis, 1.0f / axisMag);
-			Mtx rotate;
-			Mtx base;
-			Mtx combined;
-			PSMTXCopy(nodeMtx, base);
-			base[0][3] = 0.0f;
-			base[1][3] = 0.0f;
-			base[2][3] = 0.0f;
-			PSMTXRotAxisRad(rotate, &axis, acosf(clampedAlign));
-			PSMTXConcat(rotate, base, combined);
-			nodeMtx[0][0] = combined[0][0];
-			nodeMtx[1][0] = combined[1][0];
-			nodeMtx[2][0] = combined[2][0];
-			nodeMtx[0][1] = combined[0][1];
-			nodeMtx[1][1] = combined[1][1];
-			nodeMtx[2][1] = combined[2][1];
-			nodeMtx[0][2] = combined[0][2];
-			nodeMtx[1][2] = combined[1][2];
-			nodeMtx[2][2] = combined[2][2];
-		}
+		Mtx rotate;
+		Mtx base;
+		Mtx axisBase;
+		Mtx combined;
+		PSMTXRotAxisRad(rotate, &axis, rotateAngle);
+		PSMTXCopy(nodeMtx, base);
+		PSMTXCopy(rotate, axisBase);
+		base[0][3] = FLOAT_803301b0;
+		base[1][3] = FLOAT_803301b0;
+		base[2][3] = FLOAT_803301b0;
+		axisBase[0][3] = FLOAT_803301b0;
+		axisBase[1][3] = FLOAT_803301b0;
+		axisBase[2][3] = FLOAT_803301b0;
+		PSMTXConcat(axisBase, base, combined);
+		nodeMtx[0][0] = combined[0][0];
+		nodeMtx[1][0] = combined[1][0];
+		nodeMtx[2][0] = combined[2][0];
+		nodeMtx[0][1] = combined[0][1];
+		nodeMtx[1][1] = combined[1][1];
+		nodeMtx[2][1] = combined[2][1];
+		nodeMtx[0][2] = combined[0][2];
+		nodeMtx[1][2] = combined[1][2];
+		nodeMtx[2][2] = combined[2][2];
 	}
 
 	Vec dynOffset;

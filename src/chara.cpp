@@ -39,6 +39,8 @@ extern "C" float FLOAT_803301bc;
 extern "C" float FLOAT_803301c8;
 extern "C" float FLOAT_803301cc;
 extern "C" float FLOAT_803301d0;
+extern "C" float FLOAT_803301e4;
+extern "C" float FLOAT_803301e8;
 extern "C" float FLOAT_803301f8;
 extern "C" CLightPcs::CBumpLight* DAT_8032edc0;
 
@@ -1419,6 +1421,8 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 	CNode* nodes = ModelNodes(this);
 	CNode* cur = node;
+	bool reuseAnimNode0Srt = false;
+	SRTView parentScaleSrt;
 	while (cur != 0) {
 		CNode* parentNode = 0;
 		s16 parent = NodeParentIndex(cur);
@@ -1431,35 +1435,39 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 		Mtx localMtx;
 		CChara::CAnimNode* animNode0 = NodeAnimNode0(cur);
 		CChara::CAnimNode* animNode1 = NodeAnimNode1(cur);
+		SRTView cachedParentScaleSrt = parentScaleSrt;
+		bool nextReuseAnimNode0Srt = false;
 
 		if (animNode0 == 0 && animNode1 == 0) {
 			PSMTXCopy(NodeRefLocalMtx(cur), localMtx);
 		} else {
-			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 && !AnimNodeUsesScale(NodeAnimNode0(parentNode)) &&
-			    m_anim != 0) {
-				SRTView parentSrt;
-				Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(NodeAnimNode0(parentNode), m_anim,
-				                                                   reinterpret_cast<SRT*>(&parentSrt), frame);
-				float invX = (parentSrt.m_scale.x != 0.0f) ? (FLOAT_803301bc / parentSrt.m_scale.x) : FLOAT_803301bc;
-				float invY = (parentSrt.m_scale.y != 0.0f) ? (FLOAT_803301bc / parentSrt.m_scale.y) : FLOAT_803301bc;
-				float invZ = (parentSrt.m_scale.z != 0.0f) ? (FLOAT_803301bc / parentSrt.m_scale.z) : FLOAT_803301bc;
-				PSMTXScale(localMtx, invX, invY, invZ);
-			} else {
-				PSMTXIdentity(localMtx);
-			}
-
-			if (parentNode == 0) {
-				float baseScale = ModelBaseScale(this);
-				if (baseScale != FLOAT_803301bc) {
-					PSMTXScale(localMtx, baseScale, baseScale, baseScale);
+			CChara::CAnimNode* parentAnimNode0 = parentNode != 0 ? NodeAnimNode0(parentNode) : 0;
+			if (parentNode == 0 || parentAnimNode0 == 0 || !AnimNodeUsesScale(parentAnimNode0)) {
+				if (parentNode == 0) {
+					float baseScale = ModelBaseScale(this);
+					if (baseScale != FLOAT_803301bc) {
+						PSMTXScale(localMtx, baseScale, baseScale, baseScale);
+					} else {
+						PSMTXIdentity(localMtx);
+					}
+				} else {
+					PSMTXIdentity(localMtx);
 				}
+			} else {
+				Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(parentAnimNode0, m_anim,
+				                                                   reinterpret_cast<SRT*>(&parentScaleSrt), frame);
+				nextReuseAnimNode0Srt = true;
+				PSMTXScale(localMtx,
+				           FLOAT_803301bc / parentScaleSrt.m_scale.x,
+				           FLOAT_803301bc / parentScaleSrt.m_scale.y,
+				           FLOAT_803301bc / parentScaleSrt.m_scale.z);
 			}
 
-			if (NodeUsesParentLenX(cur) != 0 && parentNode != 0) {
+			if (NodeUsesParentLenX(cur) != 0) {
 				localMtx[0][3] = NodeBoneLen(parentNode);
 			}
 
-			if (animNode1 != 0 && m_anim != 0) {
+			if (animNode1 != 0) {
 				SRTView srt1;
 				Mtx animMtx;
 				Mtx invScaleMtx;
@@ -1480,13 +1488,17 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				PSMTXConcat(localMtx, invScaleMtx, localMtx);
 			}
 
-			if (animNode0 != 0 && m_anim != 0) {
+			if (animNode0 != 0) {
 				SRTView srt0;
 				Mtx animMtx;
 				u16 nodeIndex;
 
-				Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(animNode0, m_anim,
-				                                                   reinterpret_cast<SRT*>(&srt0), frame);
+				if (reuseAnimNode0Srt) {
+					srt0 = cachedParentScaleSrt;
+				} else {
+					Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(animNode0, m_anim,
+					                                                   reinterpret_cast<SRT*>(&srt0), frame);
+				}
 				nodeIndex = NodeRefIndex(cur);
 				if (nodeIndex == ModelChest1Index(this) || nodeIndex == ModelChest2Index(this) ||
 				    nodeIndex == ModelChest3Index(this)) {
@@ -1510,30 +1522,37 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				PSMTXConcat(localMtx, animMtx, localMtx);
 			}
 		}
+		reuseAnimNode0Srt = nextReuseAnimNode0Srt;
 
 		u16 blendCur = ModelBlendCur(this);
-		u16 blendMax = ModelBlendMax(this);
-		if (blendCur != 0 && blendMax != 0) {
-			float alpha = FLOAT_803301bc - (static_cast<float>(blendCur) / static_cast<float>(blendMax));
-
+		if (blendCur != 0) {
+			u16 blendMax = ModelBlendMax(this);
+			float alpha = FLOAT_803301bc - (static_cast<float>(blendCur) * (FLOAT_803301bc / static_cast<float>(blendMax)));
 			Vec targetPos = {localMtx[0][3], localMtx[1][3], localMtx[2][3]};
 			Vec targetScale;
 			Quaternion targetQuat;
+			Vec positionScaleA;
+			Vec positionScaleB;
 			Vec blendedPos;
-			Vec blendedScale;
-			Quaternion blendedQuat;
 			Mtx quatMtx;
 			Mtx scaleMtx;
 
 			Math.MTXGetScale(localMtx, &targetScale);
+			if (FLOAT_803301e4 <= targetScale.x) {
+				PSVECScale(&NodePreviousScale(cur), &positionScaleA, FLOAT_803301bc - alpha);
+				PSVECScale(&targetScale, &positionScaleB, alpha);
+				PSVECAdd(&positionScaleA, &positionScaleB, &targetScale);
+			} else {
+				targetScale.y = FLOAT_803301e8;
+				targetScale.z = FLOAT_803301e8;
+			}
+			PSVECScale(&NodePreviousPosition(cur), &positionScaleA, FLOAT_803301bc - alpha);
+			PSVECScale(&targetPos, &positionScaleB, alpha);
+			PSVECAdd(&positionScaleA, &positionScaleB, &blendedPos);
 			C_QUATMtx(&targetQuat, localMtx);
-
-			VECLerp(&NodePreviousPosition(cur), &targetPos, &blendedPos, alpha);
-			VECLerp(&NodePreviousScale(cur), &targetScale, &blendedScale, alpha);
-			C_QUATSlerp(&NodePreviousQuat(cur), &targetQuat, &blendedQuat, alpha);
-
-			PSMTXQuat(quatMtx, &blendedQuat);
-			PSMTXScale(scaleMtx, blendedScale.x, blendedScale.y, blendedScale.z);
+			C_QUATSlerp(&NodePreviousQuat(cur), &targetQuat, &targetQuat, alpha);
+			PSMTXScale(scaleMtx, targetScale.x, targetScale.y, targetScale.z);
+			PSMTXQuat(quatMtx, &targetQuat);
 			PSMTXConcat(quatMtx, scaleMtx, localMtx);
 			localMtx[0][3] = blendedPos.x;
 			localMtx[1][3] = blendedPos.y;

@@ -872,7 +872,7 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 	CDM* menu = searchFreeCDM();
 
 	memset(&menu->m_status, 0, 0x20);
-	menu->m_status |= 0x80;
+	menu->m_status = (menu->m_status & 0x7F) | 0x80;
 
 	menu->m_type = param.m_type;
 	menu->m_flags = param.m_flags;

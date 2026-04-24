@@ -162,31 +162,55 @@ static void ResetAnimSpriteMotion(BonusAnimSprite* sprite)
 	sprite->scale = 1.0f;
 }
 
-static float s_bonusArtiBasePosStorage0[16];
-static float s_bonusArtiBasePosStorage1[16];
+static float s_bonusArtiBasePosStorage0[18];
+static float s_bonusArtiBasePosStorage1[18];
 
-static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* sprite)
+static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* boardSprite, const BonusAnimSprite* itemSprite)
 {
-	if (out == 0 || sprite == 0) {
+	if (out == 0 || boardSprite == 0) {
 		return;
 	}
 
-	float baseX = (float)sprite->x + sprite->mulX + 28.0f;
-	float baseY = (float)sprite->y + sprite->mulY + 36.0f;
-	const float stepX = 72.0f;
-	const float stepY = 104.0f;
+	const float x = (float)boardSprite->x + boardSprite->mulX;
+	const float y = (float)boardSprite->y + boardSprite->mulY;
+	const float w = (boardSprite->w > 0) ? (float)boardSprite->w : 288.0f;
+	const float h = (boardSprite->h > 0) ? (float)boardSprite->h : 208.0f;
+	const float itemW = (itemSprite != 0 && itemSprite->w > 0) ? (float)itemSprite->w : 112.0f;
+	const float itemH = (itemSprite != 0 && itemSprite->h > 0) ? (float)itemSprite->h : 104.0f;
+	const float quarterW = w * 0.25f;
+	const float quarterH = h * 0.25f;
+	const float halfW = w * 0.5f;
+	const float halfH = h * 0.5f;
+	const float itemQuarterW = itemW * 0.25f;
+	const float itemQuarterH = itemH * 0.25f;
 
-	for (int i = 0; i < 8; i++) {
-		out[i * 2 + 0] = baseX + (float)(i & 3) * stepX;
-		out[i * 2 + 1] = baseY + (float)((i >> 2) & 1) * stepY;
-	}
+	memset(out, 0, sizeof(float) * 18);
+
+	out[0] = x + quarterW;
+	out[1] = y + quarterH;
+	out[2] = x + w - itemW;
+	out[3] = y + quarterH - itemQuarterH;
+	out[4] = x + quarterW * 3.0f - itemQuarterW;
+	out[5] = y + quarterH * 3.0f - itemQuarterH;
+	out[6] = x + quarterW - itemQuarterW;
+	out[7] = y + h - itemH;
+	out[8] = x + halfW - itemQuarterW;
+	out[9] = y + quarterH * 3.0f - itemQuarterH;
+	out[10] = x;
+	out[11] = y + quarterH - itemQuarterH;
+	out[12] = x + halfW - itemQuarterW;
+	out[13] = y + halfH - itemQuarterH;
+	out[14] = x + quarterW - itemQuarterW;
+	out[15] = y;
+	out[16] = x + quarterW * 3.0f - itemQuarterW;
+	out[17] = y + halfH - itemQuarterH;
 }
 
 static float* GetBonusArtiBasePositions(const BonusAnimSprite* sprite)
 {
 	gBonusCheckMarkPosBuffer[0] = s_bonusArtiBasePosStorage0;
 	gBonusCheckMarkPosBuffer[1] = s_bonusArtiBasePosStorage1;
-	FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[0], sprite);
+	FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[0], sprite, sprite);
 	memcpy(gBonusCheckMarkPosBuffer[1], gBonusCheckMarkPosBuffer[0], sizeof(s_bonusArtiBasePosStorage1));
 	return gBonusCheckMarkPosBuffer[0];
 }
@@ -2562,16 +2586,19 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
  */
 void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 {
+	BonusAnimSprite* currentSprite = reinterpret_cast<BonusAnimSprite*>(a);
+	BonusAnimSprite* layoutSprite = reinterpret_cast<BonusAnimSprite*>(b);
+
 	gBonusCheckMarkPosBuffer[0] = s_bonusArtiBasePosStorage0;
 	gBonusCheckMarkPosBuffer[1] = s_bonusArtiBasePosStorage1;
 	memset(gBonusCheckMarkPosBuffer[0], 0, sizeof(s_bonusArtiBasePosStorage0));
 	memset(gBonusCheckMarkPosBuffer[1], 0, sizeof(s_bonusArtiBasePosStorage1));
 
 	if (a != 0) {
-		FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[0], reinterpret_cast<BonusAnimSprite*>(a));
+		FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[0], currentSprite, (layoutSprite != 0) ? layoutSprite : currentSprite);
 	}
 	if (b != 0) {
-		FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[1], reinterpret_cast<BonusAnimSprite*>(b));
+		FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[1], layoutSprite, layoutSprite);
 	} else if (a != 0) {
 		memcpy(gBonusCheckMarkPosBuffer[1], gBonusCheckMarkPosBuffer[0], sizeof(s_bonusArtiBasePosStorage1));
 	}

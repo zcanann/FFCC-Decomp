@@ -739,16 +739,16 @@ void CFile::Init()
         __nwa__FUlPQ27CMemory6CStagePci(
             sizeof(CHandle) * 0x80 + 0x10, (CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2e),
         0, 0, sizeof(CHandle), 0x80);
+    CHandle* nextHandle;
+    unsigned int handleIndex = 0;
+    int byteOffset = 0;
+
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
     m_freeList = (CHandle*)m_handlePoolHead.m_currentOffset;
 
-    unsigned int handleIndex = 0;
-    int byteOffset = 0;
     for (int blockCount = 0x20; blockCount != 0; blockCount--) {
-        CHandle* nextHandle;
-
         if (handleIndex == 0x7F) {
             nextHandle = (CHandle*)&m_freeListSentinelDummy;
         } else {

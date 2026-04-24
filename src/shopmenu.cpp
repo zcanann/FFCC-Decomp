@@ -2592,7 +2592,22 @@ void CShopMenu::DrawItemInfo0()
 
     int listType = ShopMenuInt(this, 0x14);
     int caravan = ShopMenuCaravan(this);
-    int itemNo = ResolveShopMenuSelectedItemId(this);
+    int itemNo;
+    if (listType == 0) {
+        itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xBE6));
+    } else if (listType == 1) {
+        itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xB6));
+    } else if (listType == 2) {
+        int smithIndex = ShopMenuInt(this, 0x50 + itemIndex * 4);
+        if (smithIndex == -1) {
+            itemNo = -1;
+        } else {
+            itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + smithIndex * 2 + 0xB6));
+        }
+    } else {
+        itemNo = -1;
+    }
+
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
     if (itemNo > 0) {
@@ -2617,7 +2632,22 @@ void CShopMenu::DrawItemInfo0()
         SetMargin__5CFontFf(FLOAT_80332d28, font);
     }
 
-    bool canTrade = CanTradeShopMenuItem(this, itemIndex, itemNo);
+    bool canTrade = false;
+    if (itemNo > 0) {
+        if (listType == 0) {
+            canTrade = true;
+        } else if (listType == 2) {
+            canTrade = true;
+            if ((*reinterpret_cast<unsigned int*>(caravan + ((itemNo - 0x191U) >> 5) * 4 + 0xC08) &
+                (1U << ((itemNo - 0x191U) & 0x1F))) == 0) {
+                canTrade = false;
+            }
+        } else if (listType == 1) {
+            if (EquipChk__8CMenuPcsFi(MenuPcsVoid(), itemIndex) == 0) {
+                canTrade = itemNo >= 0x9F;
+            }
+        }
+    }
 
     if (canTrade) {
         SetupShopMenuUnitFont(font);
@@ -2625,7 +2655,29 @@ void CShopMenu::DrawItemInfo0()
         float unitWidth = GetWidth__5CFontFPc(font, unitText);
         float rightX = FLOAT_80332d3c - unitWidth;
         float amountRightX = rightX - FLOAT_80332d5c;
-        int totalGil = ShopMenuInt(this, 0x44) * CalcShopMenuTradeGil(this, itemNo);
+        int totalGil;
+
+        if (listType == 0) {
+            if (itemNo < 1) {
+                totalGil = 0;
+            } else {
+                totalGil = static_cast<int>(*reinterpret_cast<short*>(caravan + 0xBE2)) *
+                           static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20));
+                totalGil = totalGil / 100 + (totalGil >> 31);
+                totalGil = totalGil - (totalGil >> 31);
+            }
+        } else if (listType == 1) {
+            if (itemNo < 1) {
+                totalGil = 0;
+            } else {
+                int gil = static_cast<int>(*reinterpret_cast<short*>(caravan + 0xBE2)) *
+                          static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20));
+                gil = gil / 100 + (gil >> 31);
+                totalGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 31)));
+            }
+        } else {
+            totalGil = -1;
+        }
 
         SetupShopMenuAmountFont(font, &white);
         DrawShopMenuAmount(font, totalGil, amountRightX, FLOAT_80332d68, 0x1B);

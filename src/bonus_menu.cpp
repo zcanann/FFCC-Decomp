@@ -133,6 +133,7 @@ static const char* GetBonusPartyNameByActiveIndex(int activeIndex);
 static CCaravanWork* GetBonusActiveCaravanByActiveIndex(int activeIndex);
 static int GetBonusResultValueByActiveIndex(int activeIndex);
 static const char* GetBonusResultLabelByActiveIndex(int activeIndex);
+static void SetBonusPartyModelAlpha(CMenuPcs* menu, int modelIndex, float alpha);
 
 static void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, short w, short h, int startFrame, int duration)
 {
@@ -361,7 +362,7 @@ static void DrawBonusSweepSprite(CMenuPcs* menu, const BonusAnimSprite* sprite, 
 	}
 }
 
-static void DrawBonusPartyModel(CMenuPcs* menu, int modelIndex)
+static void DrawBonusPartyModel(CMenuPcs* menu, int modelIndex, float alpha)
 {
 	int activePartyCount = GetActiveBonusPartyCount();
 
@@ -380,6 +381,7 @@ static void DrawBonusPartyModel(CMenuPcs* menu, int modelIndex)
 		return;
 	}
 
+	SetBonusPartyModelAlpha(menu, modelIndex, ClampBonusUnit(alpha));
 	SetProjection__8CMenuPcsFi(menu, modelIndex);
 	SetLight__8CMenuPcsFi(menu, 1);
 	unsigned int oldFlags = *(unsigned int*)((char*)handle + 8);
@@ -1449,7 +1451,7 @@ void CMenuPcs::DrawResultCountAnim()
 		} else if (sprite->kind == -4) {
 			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
 		} else if (sprite->kind == -2) {
-			DrawBonusPartyModel(this, modelIndex++);
+			DrawBonusPartyModel(this, modelIndex++, alpha);
 		} else if (sprite->kind == -5) {
 			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, GetBonusDisplayValueForFrame(statePtr, valueIndex++));
 		} else if (sprite->kind == -1) {
@@ -1946,21 +1948,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 			break;
 		case -2:
 			if (modelIndex < activePartyCount) {
-				int basePtr = GetBonusMenuMembers(this).m_bonusListPtr;
-				if (basePtr != 0) {
-					int slotPtr = basePtr + (modelIndex * 0x524);
-					void* handle = *(void**)slotPtr;
-					if (handle != 0) {
-						SetProjection__8CMenuPcsFi(this, modelIndex);
-						SetLight__8CMenuPcsFi(this, 1);
-						unsigned int oldFlags = *(unsigned int*)((char*)handle + 8);
-						*(unsigned int*)((char*)handle + 8) = 0x300543;
-						Draw__Q29CCharaPcs7CHandleFi(handle, 5);
-						*(unsigned int*)((char*)handle + 8) = oldFlags;
-						DrawMenuIdx__8CPartPcsFi(&PartPcs, *(int*)(slotPtr + 4));
-						RestoreProjection__8CMenuPcsFv(this);
-					}
-				}
+				DrawBonusPartyModel(this, modelIndex, alpha);
 			}
 			modelIndex++;
 			break;
@@ -2170,7 +2158,7 @@ void CMenuPcs::DrawSelectWait()
 			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
 			break;
 		case -2:
-			DrawBonusPartyModel(this, modelIndex);
+			DrawBonusPartyModel(this, modelIndex, alpha);
 			modelIndex++;
 			break;
 		default:
@@ -2301,7 +2289,7 @@ void CMenuPcs::DrawSelectCloseAnim()
 			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
 			break;
 		case -2:
-			DrawBonusPartyModel(this, modelIndex);
+			DrawBonusPartyModel(this, modelIndex, alpha);
 			modelIndex++;
 			break;
 		default:

@@ -469,6 +469,10 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
     u32 alpha = vColor->m_alpha;
     u8* payload = (u8*)pRyjMegaBirthModel;
     u8* p = (u8*)particleData;
+    float* wrappedValue = &particleData->m_directionTail.z;
+    Vec direction;
+    Vec position;
+    Vec step;
 
     if (particleColor != NULL) {
         particleColor->m_color[0] = particleColor->m_color[0] + particleColor->m_colorFrameDeltas[0];
@@ -499,7 +503,14 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
         particleData->m_sizeStart = (float)((s32)*(float*)(payload + 0xA0) + (s32)*(float*)(p + 0x68) + (s32)particleData->m_sizeStart);
     }
 
-    wrap_particle_rotation_triplet(p, 0x58);
+    for (int i = 0; i < 3; i++, wrappedValue++) {
+        while ((s32)*wrappedValue > 0x7FFF) {
+            *wrappedValue = (float)((s32)*wrappedValue - 0x10000);
+        }
+        while ((s32)*wrappedValue < -0x8000) {
+            *wrappedValue = (float)((s32)*wrappedValue + 0x10000);
+        }
+    }
 
     *f32_at(p, 0x40) = *f32_at(p, 0x40) + *f32_at(p, 0x48);
     *f32_at(p, 0x44) = *f32_at(p, 0x44) + *f32_at(p, 0x4C);
@@ -543,15 +554,16 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
     }
 
     *f32_at(p, 0x90) = *f32_at(p, 0x90) + *(float*)(payload + 0xC4);
-    Vec direction = {particleData->m_matrix[0][1], particleData->m_matrix[1][1], particleData->m_matrix[2][1]};
-    Vec position = {particleData->m_matrix[0][3], particleData->m_matrix[1][3], particleData->m_matrix[2][3]};
-    Vec step;
-
+    direction.x = particleData->m_matrix[0][1];
+    direction.y = particleData->m_matrix[1][1];
+    direction.z = particleData->m_matrix[2][1];
+    position.x = particleData->m_matrix[0][3];
+    position.y = particleData->m_matrix[1][3];
+    position.z = particleData->m_matrix[2][3];
     pppScaleVectorXYZ(step, direction, *f32_at(p, 0x8C));
     pppAddVector(position, position, step);
     pppScaleVectorXYZ(step, vRyjMegaBirthModel->m_accelerationAxis, *f32_at(p, 0x90));
     pppAddVector(position, position, step);
-
     particleData->m_matrix[0][3] = position.x;
     particleData->m_matrix[1][3] = position.y;
     particleData->m_matrix[2][3] = position.z;

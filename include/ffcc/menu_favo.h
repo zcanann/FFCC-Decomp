@@ -51,7 +51,6 @@ public:
     unsigned int FavoCtrl();
     bool FavoClose();
     void FavoDraw();
-    void FavoCtrlCur();
 
     char pad_00[0xF8];
     CFont* font22;

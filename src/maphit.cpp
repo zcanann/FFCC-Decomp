@@ -629,16 +629,16 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
 
-    CMapHitFace* face = m_faces;
-    int i = 0;
-    while (i < m_faceCount) {
-        gMapHitFace = face;
+    int faceIndex = 0;
+    int faceOffset = 0;
+    while (faceIndex < static_cast<int>(m_faceCount)) {
+        gMapHitFace = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
         g_hit_t_min = s_large_pos;
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;
         }
-        face = reinterpret_cast<CMapHitFace*>(Ptr(face, 0x50));
-        i++;
+        faceOffset += 0x50;
+        faceIndex++;
     }
 
     return 0;

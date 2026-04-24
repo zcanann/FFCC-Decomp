@@ -2232,9 +2232,7 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 void CChara::CNode::Duplicate(CChara::CNode* src, CMemory::CStage* stage)
 {
 	(void)stage;
-	*(void**)this = *(void**)src;
-	PSMTXCopy((float(*)[4])((u8*)src + 8), (float(*)[4])((u8*)this + 8));
-	PSMTXCopy((float(*)[4])((u8*)src + 0x44), (float(*)[4])((u8*)this + 0x44));
+	CopyDuplicatedNodeState(this, src);
 }
 
 /*
@@ -2495,9 +2493,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 void CChara::CMesh::Duplicate(CChara::CMesh* src, CMemory::CStage* stage)
 {
 	(void)stage;
-	*(void**)this = *(void**)src;
-	*(void**)((u8*)this + 4) = 0;
-	*(void**)((u8*)this + 8) = 0;
+	CopyDuplicatedMeshState(this, src);
 }
 
 /*

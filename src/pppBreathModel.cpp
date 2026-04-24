@@ -95,14 +95,9 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
 {
     unsigned char* breath = (unsigned char*)pBreathModel;
     unsigned char* particle = (unsigned char*)particleData;
-    unsigned char flags;
-    float f0;
-    float f1;
-    float f2;
     Mtx workMtx;
     Vec jitter;
     Vec pos;
-    Vec* dir;
 
     memset(particleData, 0, 0x98);
     if (particleWmat != NULL) {
@@ -116,19 +111,20 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     Math.RandF();
     Math.RandF();
 
-    if (*(char*)(breath + 0x22) != '\0') {
+    if (*(unsigned char*)(breath + 0x22) != 0) {
         *(float*)(particle + 0x88) = (float)(unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
         *(unsigned char*)(particle + 0x54) = *(unsigned char*)(breath + 0x22);
     }
-    if (*(char*)(breath + 0x23) != '\0') {
+    if (*(unsigned char*)(breath + 0x23) != 0) {
         *(unsigned char*)(particle + 0x55) = *(unsigned char*)(breath + 0x23);
     }
 
     *(float*)(particle + 0x58) = *(float*)(breath + 0x90);
     *(float*)(particle + 0x5C) = *(float*)(breath + 0x94);
     if (*(unsigned char*)(breath + 0xC1) != 0) {
+        unsigned char flags = *(unsigned char*)(breath + 0xC1);
+
         *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * Math.RandF();
-        flags = *(unsigned char*)(breath + 0xC1);
         if ((flags & 1) && (flags & 2)) {
             if (Math.RandF() > 0.5f) {
                 *(float*)(particle + 0x60) *= FLOAT_80330F80;
@@ -138,19 +134,18 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
         }
     }
 
-    flags = *(unsigned char*)(breath + 0xC1);
-    if (flags & 4) {
+    if ((*(unsigned char*)(breath + 0xC1) & 4) != 0) {
         *(float*)(particle + 0x58) += *(float*)(particle + 0x60);
     }
-    if (flags & 8) {
+    if ((*(unsigned char*)(breath + 0xC1) & 8) != 0) {
         *(float*)(particle + 0x5C) += *(float*)(particle + 0x60);
     }
 
-    while (*(float*)(particle + 0x58) >= 6.2831855f) {
-        *(float*)(particle + 0x58) -= 6.2831855f;
+    while (*(float*)(particle + 0x58) >= FLOAT_80330F88) {
+        *(float*)(particle + 0x58) -= FLOAT_80330F84;
     }
-    while (*(float*)(particle + 0x58) < 0.0f) {
-        *(float*)(particle + 0x58) += 6.2831855f;
+    while (*(float*)(particle + 0x58) < FLOAT_80330F8C) {
+        *(float*)(particle + 0x58) += FLOAT_80330F84;
     }
 
     *(float*)(particle + 0x64) = *(float*)(breath + 0x50);
@@ -160,8 +155,9 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     *(float*)(particle + 0x74) = *(float*)(breath + 0x64);
     *(float*)(particle + 0x78) = *(float*)(breath + 0x68);
 
-    flags = *(unsigned char*)(breath + 0xC0);
-    if (flags != 0) {
+    if (*(unsigned char*)(breath + 0xC0) != 0) {
+        unsigned char flags = *(unsigned char*)(breath + 0xC0);
+
         if ((flags & 0x20) == 0) {
             *(float*)(particle + 0x7C) = *(float*)(breath + 0x80) * Math.RandF();
             *(float*)(particle + 0x80) = *(float*)(breath + 0x84) * Math.RandF();
@@ -182,10 +178,11 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
                 *(float*)(particle + 0x84) *= FLOAT_80330F80;
             }
         } else {
-            f0 = *(float*)(breath + 0x80) * Math.RandF();
-            *(float*)(particle + 0x7C) = f0;
-            *(float*)(particle + 0x80) = f0;
-            *(float*)(particle + 0x84) = f0;
+            float value = *(float*)(breath + 0x80) * Math.RandF();
+
+            *(float*)(particle + 0x7C) = value;
+            *(float*)(particle + 0x80) = value;
+            *(float*)(particle + 0x84) = value;
             if ((flags & 1) && (flags & 2)) {
                 if (Math.RandF() > 0.5f) {
                     *(float*)(particle + 0x7C) *= FLOAT_80330F80;
@@ -200,12 +197,12 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
         }
     }
 
-    if (flags & 4) {
+    if ((*(unsigned char*)(breath + 0xC0) & 4) != 0) {
         *(float*)(particle + 0x64) += *(float*)(particle + 0x7C);
         *(float*)(particle + 0x68) += *(float*)(particle + 0x80);
         *(float*)(particle + 0x6C) += *(float*)(particle + 0x84);
     }
-    if (flags & 8) {
+    if ((*(unsigned char*)(breath + 0xC0) & 8) != 0) {
         *(float*)(particle + 0x70) += *(float*)(particle + 0x7C);
         *(float*)(particle + 0x74) += *(float*)(particle + 0x80);
         *(float*)(particle + 0x78) += *(float*)(particle + 0x84);
@@ -239,16 +236,12 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     *(float*)(particle + 0x3C) = kPppBreathModelZero;
     *(float*)(particle + 0x40) = kPppBreathModelZero;
     *(float*)(particle + 0x44) = FLOAT_80330F80;
-    dir = (Vec*)(particle + 0x3C);
-    PSMTXMultVec(workMtx, dir, dir);
-    PSVECNormalize(dir, dir);
+    PSMTXMultVec(workMtx, (Vec*)(particle + 0x3C), (Vec*)(particle + 0x3C));
+    PSVECNormalize((Vec*)(particle + 0x3C), (Vec*)(particle + 0x3C));
 
-    f0 = *(float*)(breath + 0xB0);
-    f1 = *(float*)(breath + 0xB4);
-    f2 = *(float*)(breath + 0xB8);
-    jitter.x = -(f0 * 0.5f - Math.RandF(f0));
-    jitter.y = -(f1 * 0.5f - Math.RandF(f1));
-    jitter.z = -(f2 * 0.5f - Math.RandF(f2));
+    jitter.x = -(*(float*)(breath + 0xB0) * 0.5f - Math.RandF(*(float*)(breath + 0xB0)));
+    jitter.y = -(*(float*)(breath + 0xB4) * 0.5f - Math.RandF(*(float*)(breath + 0xB4)));
+    jitter.z = -(*(float*)(breath + 0xB8) * 0.5f - Math.RandF(*(float*)(breath + 0xB8)));
 
     pos.x = (*(Mtx*)particleWmat)[0][3];
     pos.y = (*(Mtx*)particleWmat)[1][3];

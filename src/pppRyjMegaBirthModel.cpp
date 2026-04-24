@@ -446,13 +446,21 @@ void birth(
     *s16_at(particleData, 0x1C) = 0;
     *s16_at(particleData, 0x1E) = 0;
     *u8_at(particleData, 0x9c) = 0;
-    *u8_at(particleData, 0x9d) = payload[0x9d];
-    *u8_at(particleData, 0x9e) = payload[0x9e];
+    *u8_at(particleData, 0x9d) = 0;
+    *u8_at(particleData, 0x9e) = 0;
 
     if (payload[0x131] != 0) {
         *f32_at(particleData, 0x98) = (float)color->m_alpha;
     } else {
         *f32_at(particleData, 0x98) = *(float*)(payload + 0x98);
+    }
+
+    if (payload[0x22] != 0) {
+        *f32_at(particleData, 0x98) = static_cast<float>(color->m_alpha);
+        *u8_at(particleData, 0x9D) = payload[0x22];
+    }
+    if (payload[0x29] != 0) {
+        *u8_at(particleData, 0x9E) = payload[0x29];
     }
 
     if (particleWMat != NULL) {

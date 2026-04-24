@@ -252,56 +252,6 @@ static float CalcCenteredShopMenuX(CFont* font, const char* text)
     return (464.0f - GetWidth__5CFontFPc(font, text)) * 0.5f;
 }
 
-static void DrawShopMenuFadeOverlay(float fade)
-{
-    if (fade == FLOAT_80332d28) {
-        return;
-    }
-
-    int fadeStep = static_cast<int>(FLOAT_80332de0 * fade);
-    unsigned char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
-
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x32);
-
-    Mtx screenMtx;
-    Mtx44 projectionMtx;
-    PSMTXIdentity(screenMtx);
-    screenMtx[1][1] = -1.0f;
-    screenMtx[1][3] = 480.0f;
-    GXLoadPosMtxImm(screenMtx, 0);
-    GXSetCurrentMtx(0);
-
-    C_MTXOrtho(projectionMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
-    GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
-
-    _GXColor fadeColor = {0, 0, 0, alpha};
-    GXSetChanAmbColor(GX_COLOR0A0, fadeColor);
-    GXSetChanMatColor(GX_COLOR0A0, fadeColor);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
-    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
-    GXSetZCompLoc(GX_TRUE);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetNumTexGens(0);
-    GXSetNumTevStages(1);
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
-    GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXClearVtxDesc();
-    GXSetVtxAttrFmt(GX_VTXFMT6, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT6, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-
-    Vec topLeft = {0.0f, 0.0f, 0.0f};
-    Vec bottomRight = {640.0f, 480.0f, 0.0f};
-    Graphic.RenderNoTexQuadGrouad(topLeft, bottomRight, fadeColor, fadeColor, fadeColor, fadeColor);
-
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x33);
-}
-
 static int ResolveShopMenuItemCount(CShopMenu* shopMenu)
 {
     switch (ShopMenuInt(shopMenu, 0x14)) {
@@ -2238,10 +2188,7 @@ void CShopMenu::DrawSoubi()
 void CShopMenu::Draw()
 {
     SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x46);
-    int pdtSlot = ShopMenuInt(this, 0x18);
-    if ((pdtSlot >= 0) && (pdtSlot < static_cast<int>(sizeof(PartMng.m_pdtSlots) / sizeof(PartMng.m_pdtSlots[0])))) {
-        pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(PartMng.m_pdtSlots[pdtSlot].m_envFields);
-    }
+    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(PartMng.m_pdtSlots[ShopMenuInt(this, 0x18)].m_envFields);
 
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
@@ -2266,7 +2213,53 @@ void CShopMenu::Draw()
         DrawSoubi();
     }
 
-    DrawShopMenuFadeOverlay(ShopMenuFloat(this, 0x1C));
+    float fade = ShopMenuFloat(this, 0x1C);
+    if (fade != FLOAT_80332d28) {
+        int fadeStep = static_cast<int>(FLOAT_80332de0 * fade);
+        unsigned char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
+
+        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x32);
+
+        Mtx screenMtx;
+        Mtx44 projectionMtx;
+        PSMTXIdentity(screenMtx);
+        screenMtx[0][0] = FLOAT_80332d78;
+        screenMtx[1][1] = FLOAT_80332dd0;
+        screenMtx[2][2] = FLOAT_80332d78;
+        screenMtx[0][3] = 0.0f;
+        screenMtx[1][3] = 480.0f;
+        GXLoadPosMtxImm(screenMtx, 0);
+        GXSetCurrentMtx(0);
+
+        C_MTXOrtho(projectionMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, FLOAT_80332d28);
+        projectionMtx[2][3] += 0.0f;
+        GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
+
+        _GXColor fadeColor = {0, 0, 0, alpha};
+        GXSetChanAmbColor(GX_COLOR0A0, fadeColor);
+        GXSetChanMatColor(GX_COLOR0A0, fadeColor);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+        GXSetZCompLoc(GX_TRUE);
+        GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+        GXSetCullMode(GX_CULL_NONE);
+        GXSetNumTexGens(0);
+        GXSetNumTevStages(1);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+        GXSetNumChans(1);
+        GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXClearVtxDesc();
+        GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+        GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+
+        Vec topLeft = {0.0f, 0.0f, 0.0f};
+        Vec bottomRight = {640.0f, 480.0f, 0.0f};
+        Graphic.RenderNoTexQuadGrouad(topLeft, bottomRight, fadeColor, fadeColor, fadeColor, fadeColor);
+
+        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x33);
+    }
     SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x3C);
 }
 
@@ -2491,27 +2484,85 @@ void CShopMenu::DrawObi(int)
  */
 void CShopMenu::DrawItemList()
 {
-    int itemIndex = ShopMenuInt(this, 0x24);
     int y = 0x4C;
-    int visibleCount = ShopMenuInt(this, 0x2C);
-    int selectableFrame = (ShopMenuInt(this, 0x14) == 2) ? 0xF : 0xA;
+    int itemIndex = ShopMenuInt(this, 0x24);
+    int itemOffset = itemIndex << 1;
+    int selectableFrame = 10;
+    if (ShopMenuInt(this, 0x14) == 2) {
+        selectableFrame = 0xF;
+    }
 
-    CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetShadow__5CFontFi(font, 0);
-    SetScale__5CFontFf(FLOAT_80332d28, font);
+    for (int row = 0; row < ShopMenuInt(this, 0x2C); ++row) {
+        int listType = ShopMenuInt(this, 0x14);
+        int itemCount;
+        if (listType == 0) {
+            itemCount = *reinterpret_cast<short*>(ShopMenuCaravan(this) + 0xBE4);
+        } else if (listType == 1) {
+            itemCount = 0x40;
+        } else if (listType == 2) {
+            itemCount = ShopMenuInt(this, 0x4C);
+        } else {
+            itemCount = -1;
+        }
 
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    SetColor__5CFontF8_GXColor(font, &white);
-
-    for (int row = 0; row < visibleCount; row++, itemIndex++, y += 0x1C) {
-        if (itemIndex >= ResolveShopMenuItemCount(this)) {
+        if (itemCount <= itemIndex) {
             break;
         }
 
-        int itemNo = ResolveShopMenuItemNo(this, itemIndex);
-        bool canTrade = CanTradeShopMenuItem(this, itemIndex, itemNo);
-        int frame = canTrade ? selectableFrame : 0xE;
+        int itemNo;
+        if (listType == 0) {
+            itemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + itemOffset + 0xBE6);
+        } else if (listType == 1) {
+            itemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + itemOffset + 0xB6);
+        } else if (listType == 2) {
+            int mapped = ShopMenuInt(this, 0x50 + itemIndex * 4);
+            if (mapped == -1) {
+                itemNo = -1;
+            } else {
+                itemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + mapped * 2 + 0xB6);
+            }
+        } else {
+            itemNo = -1;
+        }
+
+        bool canTrade = false;
+        if (itemIndex != -1) {
+            int tradeItemNo;
+            if (listType == 0) {
+                tradeItemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + itemOffset + 0xBE6);
+            } else if (listType == 1) {
+                tradeItemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + itemOffset + 0xB6);
+            } else if (listType == 2) {
+                int mapped = ShopMenuInt(this, 0x50 + itemIndex * 4);
+                if (mapped == -1) {
+                    tradeItemNo = -1;
+                } else {
+                    tradeItemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + mapped * 2 + 0xB6);
+                }
+            } else {
+                tradeItemNo = -1;
+            }
+
+            if (tradeItemNo > 0) {
+                if (listType == 0) {
+                    canTrade = true;
+                } else if (listType == 2) {
+                    unsigned int bit = static_cast<unsigned int>(tradeItemNo - 0x191);
+                    if ((*reinterpret_cast<unsigned int*>(ShopMenuCaravan(this) + ((tradeItemNo - 0x191) >> 5) * 4 + 0xC08) &
+                         (1U << (bit & 0x1F))) != 0) {
+                        canTrade = true;
+                    }
+                } else if (EquipChk__8CMenuPcsFi(MenuPcsVoid(), itemIndex) == 0 && tradeItemNo >= 0x9F) {
+                    canTrade = true;
+                }
+            }
+        }
+
+        int frame = 0xE;
+        if (canTrade) {
+            frame = selectableFrame;
+        }
+
         int frameX;
         if (ShopMenuInt(this, 0x28) == itemIndex) {
             frameX = 0x198;
@@ -2528,14 +2579,25 @@ void CShopMenu::DrawItemList()
         }
 
         if (itemNo > 0) {
+            CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
+            SetMargin__5CFontFf(FLOAT_80332d28, font);
+            SetShadow__5CFontFi(font, 0);
+            SetScale__5CFontFf(FLOAT_80332d28, font);
+
+            _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+            SetColor__5CFontF8_GXColor(font, &white);
             DrawInit__5CFontFv(font);
             SetPosX__5CFontFf(static_cast<float>(frameX - 0x54), font);
             SetPosY__5CFontFf(static_cast<float>(y - 0x14), font);
-            Draw__5CFontFPc(font, GetItemName(itemNo));
+            Draw__5CFontFPc(font, reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[itemNo * 5 + 4]));
             DrawInit__8CMenuPcsFv(MenuPcsVoid());
             DrawSingleIcon__8CMenuPcsFiiifif(
                 MenuPcsVoid(), itemNo, frameX + 0x54, y - 0x18, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
         }
+
+        itemOffset += 2;
+        ++itemIndex;
+        y += 0x1C;
     }
 
     int alpha = 0xC0 + (System.m_frameCounter & 0x3F);

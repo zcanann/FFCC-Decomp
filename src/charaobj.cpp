@@ -784,24 +784,39 @@ void CGCharaObj::onFrameStat()
 				}
 			} else if (m_subState < 3) {
 				if (m_subFrame == 0) {
-					endPSlotBit(8);
+					for (int i = 0; i < 0x16; i++) {
+						if ((8U & (1U << i)) != 0) {
+							EndParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+						}
+					}
 					reqAnim(m_unk558, 0, 0);
 				}
 
 				if (m_itemId != 0 && m_subFrame == 10) {
-					endPSlotBit(2);
+					for (int i = 0; i < 0x16; i++) {
+						if ((2U & (1U << i)) != 0) {
+							EndParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+						}
+					}
 					putParticleFromItem(m_itemId, 2, m_particleSlots[1], &CharaObjComboCenter(this));
 					putParticleFromItem(m_itemId, 3, m_particleSlots[1], &CharaObjComboCenter(this));
 				}
 			}
 
-			CharaObjCallStateCallback(this, 0x84);
+			typedef void (*StateCallback)(void*);
+			StateCallback stateCallback84 =
+			    *reinterpret_cast<StateCallback*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x48) + 0x84);
+			stateCallback84(this);
 			break;
 
 		case 4:
 			if (m_stateFrame == 0) {
 				Sound.StopSe3DGroup(m_particleId);
-				deletePSlotBit(0x3B);
+				for (int i = 0; i < 0x16; i++) {
+					if ((0x3BU & (1U << i)) != 0) {
+						DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i]);
+					}
+				}
 				reqAnim(4, 0, 0);
 			}
 
@@ -835,7 +850,7 @@ void CGCharaObj::onFrameStat()
 				}
 			} else if (m_subState < 4) {
 				if (m_subFrame == 0) {
-					reqAnim(CharaObjIsPlayerCid(GetCID()) ? m_unk558 : m_unk55C, 0, 0);
+					reqAnim(((GetCID() & 0x6D) == 0x6D) ? m_unk558 : m_unk55C, 0, 0);
 				}
 
 				if (isLoopAnim() != 0) {
@@ -844,22 +859,30 @@ void CGCharaObj::onFrameStat()
 				}
 			}
 
-			CharaObjCallStateCallback(this, 0x8C);
+			StateCallback stateCallback8C =
+			    *reinterpret_cast<StateCallback*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x48) + 0x8C);
+			stateCallback8C(this);
 			break;
 
 		case 9:
 			if (m_subState == 0 && m_subFrame == 0) {
 				Sound.StopSe3DGroup(m_particleId);
-				deletePSlotBit(0x3B);
+				for (int i = 0; i < 0x16; i++) {
+					if ((0x3BU & (1U << i)) != 0) {
+						DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i]);
+					}
+				}
 				reqAnim(6, 1, 0);
 
-				if (CharaObjIsPlayerCid(GetCID()) && m_scriptHandle != 0) {
+				if (((GetCID() & 0x6D) == 0x6D) && m_scriptHandle != 0) {
 					playSe3D(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xF8) + 0x10,
 					         0x32, 0x96, 0, 0);
 				}
 			}
 
-			CharaObjCallStateCallback(this, 0x7C);
+			StateCallback stateCallback7C =
+			    *reinterpret_cast<StateCallback*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x48) + 0x7C);
+			stateCallback7C(this);
 			break;
 
 		case 0xA:
@@ -875,7 +898,11 @@ void CGCharaObj::onFrameStat()
 			} else if (m_subState == 0) {
 				if (m_subFrame == 0) {
 					Sound.StopSe3DGroup(m_particleId);
-					deletePSlotBit(0x3B);
+					for (int i = 0; i < 0x16; i++) {
+						if ((0x3BU & (1U << i)) != 0) {
+							DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i]);
+						}
+					}
 					reqAnim(0x1A, 0, 0);
 				}
 
@@ -895,12 +922,16 @@ void CGCharaObj::onFrameStat()
 
 		case 0x19:
 			if (m_stateFrame == 0) {
-				if (CharaObjIsPlayerCid(GetCID())) {
+				if ((GetCID() & 0x6D) == 0x6D) {
 					static_cast<CGPartyObj*>(this)->carry(1, 0, 1);
 				}
 
 				Sound.StopSe3DGroup(m_particleId);
-				deletePSlotBit(0x3B);
+				for (int i = 0; i < 0x16; i++) {
+					if ((0x3BU & (1U << i)) != 0) {
+						DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i]);
+					}
+				}
 				reqAnim(0x1D, 0, 0);
 			}
 

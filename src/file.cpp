@@ -159,7 +159,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
     _GXTexObj backupTexObj;
     m_isDiskError = 1;
 
-    do
+    while (true)
     {
         if ((unsigned int)System.m_execParam >= 1)
         {
@@ -317,8 +317,15 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             VIWaitForRetrace();
             status = DVDGetCommandBlockStatus(&info.cb);
         }
-        errorCode = status;
-    } while (errorCode == 0x0B || (errorCode >= 4 && errorCode <= 6) || errorCode == -1);
+
+        if (status == 0x0B || ((u32)(status - 4) <= 2U) || status == -1)
+        {
+            errorCode = status;
+            continue;
+        }
+
+        break;
+    }
 
     Sound.PauseDiscError(0);
     m_isDiskError = 0;
@@ -739,16 +746,16 @@ void CFile::Init()
         __nwa__FUlPQ27CMemory6CStagePci(
             sizeof(CHandle) * 0x80 + 0x10, (CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2e),
         0, 0, sizeof(CHandle), 0x80);
+    CHandle* nextHandle;
+    unsigned int handleIndex = 0;
+    int byteOffset = 0;
+
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
     m_freeList = (CHandle*)m_handlePoolHead.m_currentOffset;
 
-    unsigned int handleIndex = 0;
-    int byteOffset = 0;
     for (int blockCount = 0x20; blockCount != 0; blockCount--) {
-        CHandle* nextHandle;
-
         if (handleIndex == 0x7F) {
             nextHandle = (CHandle*)&m_freeListSentinelDummy;
         } else {

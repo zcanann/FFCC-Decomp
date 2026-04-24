@@ -57,7 +57,11 @@ extern float FLOAT_80331084;
 extern double DOUBLE_80331088;
 extern double DOUBLE_80331090;
 extern double DOUBLE_80331098;
+extern float FLOAT_803310A0;
+extern float FLOAT_803310A4;
 extern float FLOAT_803310A8;
+extern double DOUBLE_803310B0;
+extern double DOUBLE_803310B8;
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -171,21 +175,22 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                     }
                 }
             }
-            if (lengthXY > 0.0f) {
-                PSVECScale(&cameraDelta, &cameraDelta, 1.0f / lengthXY);
+            if (FLOAT_803310A0 < lengthXY) {
+                PSVECScale(&cameraDelta, &cameraDelta, FLOAT_803310A4 / lengthXY);
             }
 
             pppInitBlendMode();
             values = frameWork->m_values;
-            segmentStep = (FLOAT_803310A8 * lengthXY) / ((float)param_2->m_count - 1.0f);
-            drawScale = 0.0f;
+            segmentStep =
+                (FLOAT_803310A8 * lengthXY) / (float)((double)param_2->m_count - DOUBLE_803310B0);
+            drawScale = (float)DOUBLE_803310B8;
 
             for (int i = 0; i < param_2->m_count; i++) {
                 float positionScale = segmentStep * values->m_positionScale;
                 float index = (float)(i + 1);
                 u8 alpha = positionWork->m_alpha;
 
-                center.z = 0.0f;
+                center.z = FLOAT_80331084;
                 center.x = baseX + positionScale * (cameraDelta.x * index);
                 center.y = baseY + positionScale * (cameraDelta.y * index);
 
@@ -194,7 +199,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                     float dist = PSVECMag(&offset);
                     float fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
 
-                    if (dist < *(float*)(param_2->m_payload + 0x10) && fadeAmount > 0.0f) {
+                    if (dist < *(float*)(param_2->m_payload + 0x10) && fadeAmount > FLOAT_80331084) {
                         alpha = (u8)((float)alpha * fadeAmount);
                     }
                 }

@@ -11,6 +11,7 @@ extern float FLOAT_80330498;
 extern float FLOAT_8033049c;
 extern float FLOAT_803304a0;
 extern float FLOAT_803304a4;
+extern float FLOAT_803304a8;
 extern float FLOAT_803304b4;
 extern float FLOAT_803304bc;
 extern float FLOAT_803304c0;
@@ -51,20 +52,24 @@ static inline unsigned char clamp_u8(float value)
 
 static float calc_spawn_speed(float speedMag, u8 speedMode)
 {
+    const float halfSpeed = speedMag * 0.5f;
+
     switch (speedMode) {
+    case 0:
+        return Math.RandF() * speedMag - halfSpeed;
     case 1:
         (void)Math.RandF();
-        return Math.RandF() * speedMag;
+        return Math.RandF() * speedMag - halfSpeed;
     case 2:
-        return Math.RandF() * Math.RandF() * speedMag;
+        return Math.RandF() * Math.RandF() * speedMag - halfSpeed;
     case 3:
-        return -(Math.RandF() * Math.RandF() * speedMag - speedMag);
+        return -(0.5f * (Math.RandF() * Math.RandF() * speedMag - speedMag)) - halfSpeed;
     case 4:
-        return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speedMag;
+        return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speedMag - halfSpeed;
     case 5:
-        return -(Math.RandF() * Math.RandF() * Math.RandF() * speedMag - speedMag);
+        return -(0.5f * (Math.RandF() * Math.RandF() * Math.RandF() * speedMag - speedMag)) - halfSpeed;
     default:
-        return Math.RandF() * speedMag;
+        return Math.RandF() * speedMag - halfSpeed;
     }
 }
 
@@ -85,6 +90,19 @@ static void orthonormalize_particle_matrix(_PARTICLE_DATA* particleData)
     pppNormalize(rowX, rowX);
     pppSetRowVector(model, rowX, rowY, rowZ, rowPos);
     PSMTXCopy(model.value, particleData->m_matrix);
+}
+
+static void wrap_particle_rotation_triplet(u8* particleBytes, s32 offset)
+{
+    for (int i = 0; i < 3; i++) {
+        float* value = f32_at(particleBytes, offset + i * 4);
+        while ((s32)*value > 0x7FFF) {
+            *value = (float)((s32)*value - 0x10000);
+        }
+        while ((s32)*value < -0x8000) {
+            *value = (float)((s32)*value + 0x10000);
+        }
+    }
 }
 
 /*
@@ -386,22 +404,27 @@ void birth(
         float speedX = calc_spawn_speed(speedMag, speedMode);
         float speedY = calc_spawn_speed(speedMag, speedMode);
         float speedZ = calc_spawn_speed(speedMag, speedMode);
-        float halfSpeed = speedMag * 0.5f;
 
         if (mode < 6) {
-            particleData->m_matrix[0][3] = (speedX - halfSpeed) * *(float*)(payload + 0x54);
-            particleData->m_matrix[1][3] = (speedY - halfSpeed) * *(float*)(payload + 0x58);
-            particleData->m_matrix[2][3] = (speedZ - halfSpeed) * *(float*)(payload + 0x5C);
+            particleData->m_matrix[0][3] = speedX * *(float*)(payload + 0x54);
+            particleData->m_matrix[1][3] = speedY * *(float*)(payload + 0x58);
+            particleData->m_matrix[2][3] = speedZ * *(float*)(payload + 0x5C);
         } else {
-            particleData->m_velocity.x = speedX - halfSpeed;
-            particleData->m_velocity.y = speedY - halfSpeed;
-            particleData->m_velocity.z = speedZ - halfSpeed;
+            particleData->m_velocity.x = speedX;
+            particleData->m_velocity.y = speedY;
+            particleData->m_velocity.z = speedZ;
         }
     }
 
     particleData->m_sizeStart = *(float*)(payload + 0x84);
     particleData->m_sizeEnd = *(float*)(payload + 0x88);
     particleData->m_sizeVal = *(float*)(payload + 0x8C);
+    particleData->m_directionTail.z = *(float*)(payload + 0x8C);
+    particleData->m_colorDeltaAdd[0] = *(float*)(payload + 0x90);
+    particleData->m_colorDeltaAdd[1] = *(float*)(payload + 0x94);
+    particleData->m_colorDeltaAdd[2] = *(float*)(payload + 0x98);
+    particleData->m_colorDeltaAdd[3] = *(float*)(payload + 0x9C);
+    particleData->m_sizeStart = *(float*)(payload + 0xA0);
 
     *s16_at(particleData, 0x22) = (*(s16*)(payload + 0x26) == 0) ? -1 : *(s16*)(payload + 0x26);
     *s16_at(particleData, 0x1C) = 0;
@@ -416,8 +439,8 @@ void birth(
         *f32_at(particleData, 0x98) = *(float*)(payload + 0x98);
     }
 
-    if ((particleWMat != NULL) && (payload[0x136] != 0)) {
-        PSMTXCopy(pObject->m_localMatrix.value, *(Mtx*)particleWMat);
+    if (particleWMat != NULL) {
+        PSMTXCopy(pppMngStPtr->m_matrix.value, *(Mtx*)particleWMat);
     }
 
     if (particleColor != NULL) {
@@ -476,12 +499,7 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
         particleData->m_sizeStart = (float)((s32)*(float*)(payload + 0xA0) + (s32)*(float*)(p + 0x68) + (s32)particleData->m_sizeStart);
     }
 
-    while ((s32)particleData->m_directionTail.z > 0x7FFF) {
-        particleData->m_directionTail.z = (float)((s32)particleData->m_directionTail.z - 0x10000);
-    }
-    while ((s32)particleData->m_directionTail.z < -0x8000) {
-        particleData->m_directionTail.z = (float)((s32)particleData->m_directionTail.z + 0x10000);
-    }
+    wrap_particle_rotation_triplet(p, 0x58);
 
     *f32_at(p, 0x40) = *f32_at(p, 0x40) + *f32_at(p, 0x48);
     *f32_at(p, 0x44) = *f32_at(p, 0x44) + *f32_at(p, 0x4C);
@@ -497,6 +515,50 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
             particleData->m_sizeVal = FLOAT_80330498;
         }
     }
+
+    *f32_at(p, 0x6C) = *f32_at(p, 0x6C) + *f32_at(p, 0x78);
+    *f32_at(p, 0x70) = *f32_at(p, 0x70) + *f32_at(p, 0x7C);
+    *f32_at(p, 0x74) = *f32_at(p, 0x74) + *f32_at(p, 0x80);
+
+    if ((payload[0x8A] & 0x10) == 0) {
+        *f32_at(p, 0x78) = *f32_at(p, 0x78) + *(float*)(payload + 0xB0);
+        *f32_at(p, 0x7C) = *f32_at(p, 0x7C) + *(float*)(payload + 0xB4);
+        *f32_at(p, 0x80) = *f32_at(p, 0x80) + *(float*)(payload + 0xB8);
+    } else {
+        *f32_at(p, 0x78) = *f32_at(p, 0x78) + *(float*)(payload + 0xB0) + *f32_at(p, 0x84);
+        *f32_at(p, 0x7C) = *f32_at(p, 0x7C) + *(float*)(payload + 0xB4) + *f32_at(p, 0x88);
+        *f32_at(p, 0x80) = *f32_at(p, 0x80) + *(float*)(payload + 0xB8) + *f32_at(p, 0x8C);
+    }
+
+    *f32_at(p, 0x8C) = *f32_at(p, 0x8C) + *(float*)(payload + 0xBC);
+    if (payload[0x8F] == 0) {
+        if (((*(float*)(payload + 0xC0) <= FLOAT_80330498) && (FLOAT_80330498 <= *(float*)(payload + 0xBC))) ||
+            ((*(float*)(payload + 0xC0) < FLOAT_80330498) && (FLOAT_80330498 < *(float*)(payload + 0xBC) &&
+                                                              FLOAT_80330498 < *f32_at(p, 0x8C)))) {
+            *f32_at(p, 0x8C) = FLOAT_80330498;
+        } else if ((*(float*)(payload + 0xC0) > FLOAT_80330498) && (FLOAT_80330498 > *(float*)(payload + 0xBC)) &&
+                   (*f32_at(p, 0x8C) < FLOAT_80330498)) {
+            *f32_at(p, 0x8C) = FLOAT_80330498;
+        }
+    }
+
+    *f32_at(p, 0x90) = *f32_at(p, 0x90) + *(float*)(payload + 0xC4);
+    Vec direction = {particleData->m_matrix[0][1], particleData->m_matrix[1][1], particleData->m_matrix[2][1]};
+    Vec position = {particleData->m_matrix[0][3], particleData->m_matrix[1][3], particleData->m_matrix[2][3]};
+    Vec step;
+
+    pppScaleVectorXYZ(step, direction, *f32_at(p, 0x8C));
+    pppAddVector(position, position, step);
+    pppScaleVectorXYZ(step, vRyjMegaBirthModel->m_accelerationAxis, *f32_at(p, 0x90));
+    pppAddVector(position, position, step);
+
+    particleData->m_matrix[0][3] = position.x;
+    particleData->m_matrix[1][3] = position.y;
+    particleData->m_matrix[2][3] = position.z;
+
+    *f32_at(p, 0x8C) = *f32_at(p, 0x8C) + *f32_at(p, 0x90);
+    *f32_at(p, 0x90) = *f32_at(p, 0x90) + *(float*)(payload + 0xE0);
+    *f32_at(p, 0x94) = *f32_at(p, 0x94) + *(float*)(payload + 0xE4);
 
     particleData->m_lifeTime = particleData->m_lifeTime + 1;
     if (*(s16*)(payload + 0x26) != 0) {
@@ -641,6 +703,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
 {
     u8* payload = (u8*)params;
     const u8 matrixMode = payload[0x2A];
+    const u8 flagsEnd = payload[0x137];
     pppFMATRIX local;
     pppFMATRIX world;
     pppFMATRIX tmp;
@@ -673,20 +736,32 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     pppCopyMatrix(tmp, local);
     pppMulMatrix(local, tmp, *(pppFMATRIX*)&scale);
 
-    if (particleWMat != NULL) {
-        pppCopyMatrix(world, *(pppFMATRIX*)particleWMat);
-    } else if (matrixMode == 0) {
-        pppCopyMatrix(world, *(pppFMATRIX*)&pObject->m_localMatrix);
-    } else {
+    switch (matrixMode) {
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 9:
         pppCopyMatrix(world, mtxA);
-    }
-
-    pppCopyMatrix(tmp, world);
-    pppMulMatrix(world, tmp, local);
-
-    if (payload[0x136] != 0) {
         pppCopyMatrix(tmp, world);
-        pppMulMatrix(world, pppMngStPtr->m_matrix, tmp);
+        pppMulMatrix(world, tmp, local);
+        break;
+    default:
+        if (particleWMat != NULL) {
+            pppCopyMatrix(world, *(pppFMATRIX*)particleWMat);
+            pppCopyMatrix(tmp, world);
+            pppMulMatrix(world, tmp, local);
+        } else {
+            pppCopyMatrix(world, *(pppFMATRIX*)&pObject->m_localMatrix);
+            pppCopyMatrix(tmp, world);
+            pppMulMatrix(world, tmp, local);
+
+            if (payload[0x136] != 0) {
+                pppCopyMatrix(tmp, world);
+                pppMulMatrix(world, pppMngStPtr->m_matrix, tmp);
+            }
+        }
+        break;
     }
 
     pppCopyMatrix(*(pppFMATRIX*)&g_matKeep, world);
@@ -695,6 +770,39 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
 
     if (copyOut != 0) {
         pppCopyMatrix(mtxB, out);
+    }
+
+    if (flagsEnd != 0) {
+        Vec objectPos;
+        Vec endPos;
+        pppFMATRIX* endMatrix = (pppFMATRIX*)(pObject + 1);
+
+        objectPos.x = pObject->m_localMatrix.value[0][3];
+        objectPos.y = pObject->m_localMatrix.value[1][3];
+        objectPos.z = pObject->m_localMatrix.value[2][3];
+
+        endPos.x = world.value[0][3];
+        endPos.y = world.value[1][3];
+        endPos.z = world.value[2][3];
+        pppAddVector(endPos, endPos, objectPos);
+
+        pppUnitMatrix(*endMatrix);
+        PSMTXScaleApply(endMatrix->value, endMatrix->value, particleData->m_sizeStart * pppMngStPtr->m_scale.x,
+                        particleData->m_sizeEnd * pppMngStPtr->m_scale.y,
+                        particleData->m_sizeVal * pppMngStPtr->m_scale.z);
+
+        if (particleData->m_colorDeltaAdd[1] != FLOAT_80330498) {
+            pppFMATRIX rot;
+
+            PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * -particleData->m_colorDeltaAdd[1]);
+            pppCopyMatrix(tmp, *endMatrix);
+            pppMulMatrix(*endMatrix, rot, tmp);
+        }
+
+        PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
+        endMatrix->value[0][3] = endPos.x;
+        endMatrix->value[1][3] = endPos.y;
+        endMatrix->value[2][3] = endPos.z;
     }
 }
 

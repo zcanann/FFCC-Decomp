@@ -56,12 +56,17 @@ void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
 int GetPadType__6JoyBusFi(void*, int);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
+int sprintf(char*, const char*, ...);
 unsigned char gMapHitDrawMode;
 }
 extern unsigned char CFlat[0x10440];
 extern int gWmMenuWorkA;
+extern float FLOAT_80330b74;
+extern float FLOAT_80330b54;
+extern float FLOAT_80330b64;
 
 static const char s_setMiniGameParamFmt[] = "SetMiniGameParam no 0x%04x data[%d]\n";
+static const char s_cflatDebugFileFmt[] = "cflat_d%d.bin";
 
 static inline void StoreSetU32(CFlatRuntime::CStack* stack, int setMode, unsigned int* value)
 {
@@ -133,6 +138,83 @@ static inline unsigned int* GetGameWorkScriptSysVals(CGame::CGameWork& gameWork)
 static inline const unsigned int* GetGameWorkScriptSysVals(const CGame::CGameWork& gameWork)
 {
     return reinterpret_cast<const unsigned int*>(&gameWork.m_scriptSysVal0);
+}
+
+static inline const unsigned short* GetGameCFlatSystemRows()
+{
+    return reinterpret_cast<const unsigned short*>(Game.unkCFlatData0[2]);
+}
+
+static inline unsigned int ReadGameCFlatSystemValue(int systemValue)
+{
+    if (systemValue >= -0xFFF) {
+        return 0;
+    }
+
+    int valueIndex = -0x1000 - systemValue;
+    int valueGroup = valueIndex / 0x600;
+    int rowIndex = 0x5FF - (valueIndex - valueGroup * 0x600);
+    const unsigned short* rows = GetGameCFlatSystemRows();
+    if (rows == 0 || static_cast<unsigned int>(valueGroup) > 0x23) {
+        return 0;
+    }
+
+    return rows[rowIndex * 0x24 + valueGroup];
+}
+
+static inline unsigned int GetGameWorkEventFlagBitIndex(int systemValue)
+{
+    return static_cast<unsigned int>(systemValue + 0x9F3);
+}
+
+static inline int GetGameWorkEventFlagByteIndex(unsigned int bitIndex)
+{
+    return (static_cast<int>(bitIndex) >> 3) +
+           static_cast<int>((static_cast<int>(bitIndex) < 0) && ((bitIndex & 7) != 0)) + 8;
+}
+
+static inline unsigned int GetGameWorkEventFlagMask(unsigned int bitIndex)
+{
+    int sign = static_cast<int>(bitIndex) >> 31;
+    return 1U << ((sign * 8 | static_cast<int>(bitIndex * 0x20000000U + (sign >> 29))) - sign);
+}
+
+static inline unsigned int ReadGameWorkEventFlag(const CGame::CGameWork& gameWork, int systemValue)
+{
+    unsigned int bitIndex = GetGameWorkEventFlagBitIndex(systemValue);
+    const unsigned char* eventFlags = reinterpret_cast<const unsigned char*>(gameWork.m_eventFlags);
+    unsigned int mask = GetGameWorkEventFlagMask(bitIndex);
+    return ((eventFlags[GetGameWorkEventFlagByteIndex(bitIndex)] & mask) != 0);
+}
+
+static inline CFlatRuntime::CObject* ResolveRuntimeObjectById(CFlatRuntime2* runtime, int objectId)
+{
+    CFlatRuntime::CObject* const root =
+        reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(runtime) + 0x1204);
+    CFlatRuntime::CObject* object = root->m_next;
+
+    while (object != root) {
+        if (static_cast<int>(object->m_id) == objectId) {
+            return object;
+        }
+        object = object->m_next;
+    }
+
+    return 0;
+}
+
+static inline void WriteGameWorkEventFlag(CGame::CGameWork& gameWork, int systemValue, unsigned int value)
+{
+    unsigned int bitIndex = GetGameWorkEventFlagBitIndex(systemValue);
+    unsigned char* eventFlags = reinterpret_cast<unsigned char*>(gameWork.m_eventFlags);
+    unsigned char& flagByte = eventFlags[GetGameWorkEventFlagByteIndex(bitIndex)];
+    unsigned int mask = GetGameWorkEventFlagMask(bitIndex);
+
+    if (value == 0) {
+        flagByte &= static_cast<unsigned char>(~mask);
+    } else {
+        flagByte |= static_cast<unsigned char>(mask);
+    }
 }
 
 /*
@@ -1854,6 +1936,21 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0xF0: {
+        unsigned int flags = 0;
+        int spawnGroup = *object->m_localBase;
+        int spawnBit = object->m_localBase[1];
+
+        if (spawnGroup >= 0 && spawnGroup <= 8 && spawnBit >= 0 && spawnBit < 32) {
+            flags =
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12F4 + spawnGroup * 8) &
+                (1u << spawnBit);
+        }
+
+        runtime->push(object, flags);
+        outResult = 0;
+        return;
+    }
     case -0xEF:
         AStar.calcAStar();
         runtime->push(object, 0);
@@ -1893,6 +1990,13 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0xEB:
+        CGPartyObj::SetBonusCondition(
+            *object->m_localBase, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3],
+            object->m_localBase[4]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0xEA:
         CharaPcs.SetSpecularAlpha(*object->m_localBase);
         runtime->push(object, 0);
@@ -2155,6 +2259,34 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0xC8:
+        Sound.CancelLoadWaveASync();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xC7:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 76) = *object->m_localBase;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 80) = object->m_localBase[1];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 84) = object->m_localBase[2];
+        if (object->m_localBase[3] < *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 104)) {
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 92) = 0x10;
+        }
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 104) = object->m_localBase[3];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xC6:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 72) = *object->m_localBase;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 88) = 0x40;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 96) = object->m_localBase[1];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 100) = object->m_localBase[2];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 104) =
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 100);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 108) =
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 100);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0xC5: {
         Vec position = {
             static_cast<float>(object->m_localBase[4]),
@@ -2257,6 +2389,17 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0xBA:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xB9:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 36) = *object->m_localBase;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 40) = object->m_localBase[1];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0xB8: {
         Vec position = {
             static_cast<float>(object->m_localBase[1]),
@@ -2297,13 +2440,41 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
                     reinterpret_cast<CFlatRuntime::CObject*>(object->m_engineObject)));
         outResult = 0;
         return;
+    case -0xB2:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicsPcs) + 64) = 0;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicsPcs) + 48) = 1;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicsPcs) + 52) = 1;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicsPcs) + 68) = *object->m_localBase;
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 56) = static_cast<u8>(object->m_localBase[1]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 57) = static_cast<u8>(object->m_localBase[2]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 58) = static_cast<u8>(object->m_localBase[3]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 59) = static_cast<u8>(object->m_localBase[4]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 60) = static_cast<u8>(object->m_localBase[5]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 61) = static_cast<u8>(object->m_localBase[6]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 62) = static_cast<u8>(object->m_localBase[7]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 63) = static_cast<u8>(object->m_localBase[8]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0xB1:
         runtime->push(object, static_cast<int>(Game.m_gameWork.m_townName[*object->m_localBase]));
+        outResult = 0;
+        return;
+    case -0xB0:
+        strcpy(Game.m_startScriptName, strBlob + strOffs[*object->m_localBase]);
+        runtime->push(object, 0);
         outResult = 0;
         return;
     case -0xAF:
         runtime->push(
             object, static_cast<int>(Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ca_0x3dd[object->m_localBase[1]]));
+        outResult = 0;
+        return;
+    case -0xAE:
+        strcpy(
+            reinterpret_cast<char*>(Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ca_0x3dd),
+            strBlob + strOffs[object->m_localBase[1]]);
+        runtime->push(object, 0);
         outResult = 0;
         return;
     case -0xAD:
@@ -2386,6 +2557,31 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, (static_cast<unsigned int>(__cntlzw(MemoryCardMan.DummyLoad())) >> 5) & 0xFF);
         outResult = 0;
         return;
+    case -0x9C: {
+        int cameraSlot = *object->m_localBase;
+        int cameraFrame = object->m_localBase[1];
+        int* cameraFrameCount = reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 4 + cameraSlot * 4);
+        int* cameraTablePtr = reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0x14 + cameraSlot * 4);
+        if ((*cameraTablePtr == 0) || (cameraFrame < 0) || (*cameraFrameCount <= cameraFrame)) {
+            runtime->push(object, 0);
+            outResult = 0;
+            return;
+        }
+
+        int cameraData = *cameraTablePtr + cameraFrame * 0x20;
+        *reinterpret_cast<int*>(object->m_localBase[2]) = *reinterpret_cast<int*>(cameraData + 0x0);
+        *reinterpret_cast<float*>(object->m_localBase[3]) = -*reinterpret_cast<float*>(cameraData + 0x4);
+        *reinterpret_cast<float*>(object->m_localBase[4]) = -*reinterpret_cast<float*>(cameraData + 0x8);
+        *reinterpret_cast<int*>(object->m_localBase[5]) = *reinterpret_cast<int*>(cameraData + 0xC);
+        *reinterpret_cast<float*>(object->m_localBase[6]) = -*reinterpret_cast<float*>(cameraData + 0x10);
+        *reinterpret_cast<float*>(object->m_localBase[7]) = -*reinterpret_cast<float*>(cameraData + 0x14);
+        *reinterpret_cast<int*>(object->m_localBase[8]) = *reinterpret_cast<int*>(cameraData + 0x18);
+        *reinterpret_cast<float*>(object->m_localBase[9]) =
+            -(FLOAT_80330b54 * *reinterpret_cast<float*>(cameraData + 0x1C)) / FLOAT_80330b64;
+        runtime->push(object, 1);
+        outResult = 0;
+        return;
+    }
     case -0x9B:
         CharaPcs.LoadCam(*object->m_localBase, strBlob + strOffs[object->m_localBase[1]]);
         runtime->push(object, 0);
@@ -2406,6 +2602,30 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0x98:
+        *reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + 0x134D + (*object->m_localBase * 0x14)) =
+            static_cast<char>(object->m_localBase[1]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x97: {
+        unsigned int slot = static_cast<unsigned int>(*object->m_localBase);
+        *reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + 0x134C + (slot * 0x14)) =
+            static_cast<char>(object->m_localBase[1]);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1350 + (slot * 0x14)) = object->m_localBase[2];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1354 + (slot * 0x14)) = object->m_localBase[3];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1358 + (slot * 0x14)) = object->m_localBase[4];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x135C + (slot * 0x14)) = object->m_localBase[5];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x96:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x12AC) = *object->m_localBase;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x12B0) = object->m_localBase[1];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0x95: {
         unsigned int result = 1;
         switch (*object->m_localBase) {
@@ -2434,6 +2654,18 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
             break;
         }
         runtime->push(object, result);
+        outResult = 0;
+        return;
+    }
+    case -0x94: {
+        float* bounds = reinterpret_cast<float*>(object->m_localBase);
+        pppEnvStPtr->m_boxMinX = bounds[0];
+        pppEnvStPtr->m_boxMaxX = bounds[1];
+        pppEnvStPtr->m_boxMinY = bounds[2];
+        pppEnvStPtr->m_boxMaxY = bounds[3];
+        pppEnvStPtr->m_boxMinZ = bounds[4];
+        pppEnvStPtr->m_boxMaxZ = bounds[5];
+        runtime->push(object, 0);
         outResult = 0;
         return;
     }
@@ -2545,6 +2777,27 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0x83:
         runtime->push(object, Graphic.GetProgressive());
+        outResult = 0;
+        return;
+    case -0x82:
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x10408) =
+            static_cast<unsigned int>(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x81: {
+        float angle = static_cast<float>(object->m_localBase[2]);
+        Vec normal = {sinf(angle), 0.0f, cosf(angle)};
+        Vec point = {static_cast<float>(*object->m_localBase), 0.0f, static_cast<float>(object->m_localBase[1])};
+        Mtx& reflectMtx = *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(this) + 0x12b4);
+        PSMTXReflect(reflectMtx, &point, &normal);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x80:
+        this->SetParticleWorkSe(*object->m_localBase, static_cast<char>(object->m_localBase[1]), object->m_localBase[2]);
+        runtime->push(object, 0);
         outResult = 0;
         return;
     case -0x7F:
@@ -2701,6 +2954,45 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -100:
+        this->initAllFinished();
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(this) + 0x10404) = 1;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -99: {
+        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
+        this->SetParticleWorkTrace(targetObject);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x62:
+        SetNoFreeMergeMask__9CCharaPcsFi(&CharaPcs, *object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x61: {
+        const int group = (~(object->m_localBase[1] - 1 | 1 - object->m_localBase[1]) >> 31) & 3;
+        Memory.SetDefaultGroup(group);
+        CharaPcs.LoadMergeFile(*object->m_localBase, object->m_localBase[1], 0);
+        Memory.ResetDefaultGroup();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x60: {
+        const int alpha = static_cast<int>(FLOAT_80330b74 * static_cast<float>(object->m_localBase[3])) & 0xFF;
+        const unsigned int blurA = (static_cast<unsigned int>(__cntlzw(object->m_localBase[4])) >> 5) & 0xFF;
+        const unsigned int blurB = (static_cast<unsigned int>(__cntlzw(object->m_localBase[5])) >> 5) & 0xFF;
+        GraphicsPcs.SetBlurParameter(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]),
+            static_cast<unsigned char>(object->m_localBase[2]), static_cast<unsigned char>(alpha),
+            static_cast<unsigned char>(blurA), static_cast<unsigned char>(blurB),
+            static_cast<short>(object->m_localBase[6]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x5F:
         runtime->push(object, static_cast<int>(Math.DstRot(
                                   static_cast<float>(*object->m_localBase),
@@ -2715,6 +3007,71 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, System.IsGdev());
         outResult = 0;
         return;
+    case -0x5C: {
+        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
+        this->IgnoreParticle(static_cast<short>(*object->m_localBase), targetObject);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x5B: {
+        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
+        this->SetParticleWorkParam(*object->m_localBase, targetObject);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x5A:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = 0;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x59: {
+        char filename[0x80];
+        sprintf(filename, s_cflatDebugFileFmt, *object->m_localBase);
+        MemoryCardMan.DebugReadWrite(0, filename, reinterpret_cast<u8*>(this) + 0xE400, 0x2000);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x58: {
+        char filename[0x80];
+        sprintf(filename, s_cflatDebugFileFmt, *object->m_localBase);
+        MemoryCardMan.DebugReadWrite(1, filename, reinterpret_cast<u8*>(this) + 0xE400, 0x2000);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x57: {
+        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4) = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x56: {
+        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4) = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x55: {
+        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
+        runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4));
+        outResult = 0;
+        return;
+    }
+    case -0x54: {
+        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
+        runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4));
+        outResult = 0;
+        return;
+    }
     case -0x53:
         SetCharaAllocStage__9CCharaPcsFi(&CharaPcs, *object->m_localBase);
         runtime->push(object, 0);
@@ -2733,6 +3090,24 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0x50: {
+        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicsPcs);
+        *reinterpret_cast<int*>(graphicsPcs + 0x24) = 2;
+        graphicsPcs[0x12] = 0xFF;
+        graphicsPcs[0x13] = 0xFF;
+        graphicsPcs[0x14] = 0xFF;
+        graphicsPcs[0x15] = 0xFF;
+        *reinterpret_cast<int*>(graphicsPcs + 0x20) = 0;
+        *reinterpret_cast<int*>(graphicsPcs + 0x4) = object->m_localBase[0];
+        *reinterpret_cast<int*>(graphicsPcs + 0x44) = object->m_localBase[1];
+        *reinterpret_cast<int*>(graphicsPcs + 0x36) = object->m_localBase[2];
+        *reinterpret_cast<int*>(graphicsPcs + 0x40) = object->m_localBase[3];
+        *reinterpret_cast<int*>(graphicsPcs + 0x8) = *reinterpret_cast<int*>(graphicsPcs + 0x4);
+        ReqScreenCapture__11CGraphicPcsFv(&GraphicsPcs);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x4F:
         MapMng.SetMeshCameraSemiTransRange(
             static_cast<unsigned short>(*object->m_localBase), static_cast<float>(object->m_localBase[1]),
@@ -2742,6 +3117,13 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0x4E: {
+        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
+        this->SetParticleWorkBind(targetObject);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x4C: {
         _GXColor color = {
             static_cast<u8>(object->m_localBase[2]),
@@ -2756,6 +3138,12 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     }
     case -0x4B:
         PartMng.pppFieldShowFpNo(static_cast<short>(*object->m_localBase), static_cast<unsigned char>(object->m_localBase[1]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x4A:
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A0) =
+            static_cast<unsigned int>(*object->m_localBase);
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -3002,24 +3390,9 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
     int result = 0;
 
     if (systemValue < -0xFFF) {
-        int valueIndex = -0x1000 - systemValue;
-        int valueGroup = valueIndex / 0x600;
-        int rowIndex = 0x5FF - (valueIndex - valueGroup * 0x600);
-        u16* row = reinterpret_cast<u16*>(*reinterpret_cast<u8**>(game + 0xC5A8) + rowIndex * 0x48);
-        if ((unsigned int)valueGroup <= 0x23) {
-            result = row[valueGroup];
-        }
+        result = static_cast<int>(ReadGameCFlatSystemValue(systemValue));
     } else if (systemValue < -499) {
-        unsigned int bitIndex = static_cast<unsigned int>(systemValue + 0x9F3);
-        int sign = static_cast<int>(bitIndex) >> 31;
-        u8* flagByte =
-            game +
-            ((static_cast<int>(bitIndex) >> 3) +
-                static_cast<int>((static_cast<int>(bitIndex) < 0) && ((bitIndex & 7) != 0)) +
-                0x10D4);
-        unsigned int bit =
-            1U << ((sign * 8 | static_cast<int>(bitIndex * 0x20000000U + (sign >> 29))) - sign);
-        result = ((*flagByte & bit) != 0);
+        result = static_cast<int>(ReadGameWorkEventFlag(gameWorkRef, systemValue));
     } else if (systemValue < -199) {
         result = *reinterpret_cast<s16*>(game + 0x111CC + (systemValue + 0x1C7) * 2);
     } else {
@@ -3159,17 +3532,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
 
     if (systemValue > -0x1000) {
         if (systemValue < -499) {
-            const unsigned int bitIndex = static_cast<unsigned int>(systemValue + 0x9F3);
-            const int sign = static_cast<int>(bitIndex) >> 31;
-            u8* const flagByte =
-                game +
-                ((static_cast<int>(bitIndex) >> 3) +
-                    static_cast<int>((static_cast<int>(bitIndex) < 0) && ((bitIndex & 7) != 0)) +
-                    0x10D4);
-            const unsigned int mask =
-                1U << ((sign * 8 | static_cast<int>(bitIndex * 0x20000000U + (sign >> 29))) - sign);
-
-            const unsigned int oldValue = ((*flagByte & static_cast<u8>(mask)) != 0);
+            const unsigned int oldValue = ReadGameWorkEventFlag(gameWork, systemValue);
             stack[-1].m_word = oldValue;
 
             unsigned int newValue = oldValue;
@@ -3181,11 +3544,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 newValue -= stack->m_word;
             }
 
-            if (newValue == 0) {
-                *flagByte &= static_cast<u8>(~mask);
-            } else {
-                *flagByte |= static_cast<u8>(mask);
-            }
+            WriteGameWorkEventFlag(gameWork, systemValue, newValue);
         } else if (systemValue < -199) {
             StoreSetU16(stack, setMode, reinterpret_cast<unsigned short*>(game + 0x111CC + (systemValue + 0x1C7) * 2));
         } else {

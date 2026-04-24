@@ -4,6 +4,7 @@
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/linkage.h"
+#include "ffcc/math.h"
 #include "ffcc/p_game.h"
 #include "ffcc/itemobj.h"
 
@@ -15,6 +16,7 @@ extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, C
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int CanCreateFromScript__9CGItemObjFv();
+extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
@@ -22,6 +24,9 @@ extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, void* cfs);
 
 static const char s_partyObjStateFmt[] = "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d";
+static const char s_partyBonusCountFmt[] = "SetBonusCondition num:%d";
+static const char s_partyBonusRandomFmt[] = "SetBonusCondition slot:%d idx:%d bonus:%d";
+static const char s_partyBonusFixedFmt[] = "SetBonusCondition slot:%d bonus:%d";
 
 extern float FLOAT_80331a78;
 extern float FLOAT_80331a54;
@@ -1871,24 +1876,73 @@ void CGPartyObj::CheckGameOver()
  */
 void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bonus2, int bonus3)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if (useRandom == 0) {
-		switch ((reinterpret_cast<unsigned int>(this) >> 2) & 3) {
-		case 0:
-			*reinterpret_cast<int*>(self + 0x6F8) = bonus0;
-			break;
-		case 1:
-			*reinterpret_cast<int*>(self + 0x6F8) = bonus1;
-			break;
-		case 2:
-			*reinterpret_cast<int*>(self + 0x6F8) = bonus2;
-			break;
-		default:
-			*reinterpret_cast<int*>(self + 0x6F8) = bonus3;
-			break;
+	int bonusCount = 0x10;
+	if (Game.m_gameWork.m_radarType != 0) {
+		bonusCount = 4;
+	}
+
+	Printf__7CSystemFPce(&System, s_partyBonusCountFmt, bonusCount);
+
+	int chosenBonus[5] = {};
+	int chosenCount = 0;
+	int stageBase = Game.m_bossArtifactBase + Game.m_gameWork.m_bossArtifactStageIndex * 0x168;
+
+	for (int slot = 0; slot < 4; slot++) {
+		CGPartyObj* party = Game.m_partyObjArr[slot];
+		if (party == nullptr) {
+			continue;
 		}
-	} else {
-		*reinterpret_cast<int*>(self + 0x6F8) = (bonus0 + bonus1 + bonus2 + bonus3) & 0xFF;
+
+		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(party->m_scriptHandle);
+		if (useRandom == 0) {
+			int bonus = bonus0;
+			switch (slot) {
+			case 1:
+				bonus = bonus1;
+				break;
+			case 2:
+				bonus = bonus2;
+				break;
+			case 3:
+				bonus = bonus3;
+				break;
+			default:
+				break;
+			}
+
+			caravanWork->SetBonusCondition(bonus);
+			if ((unsigned int)System.m_execParam > 2) {
+				Printf__7CSystemFPce(&System, s_partyBonusFixedFmt, slot, bonus);
+			}
+		} else {
+			int bonusIndex;
+			for (;;) {
+				bonusIndex = Math.Rand(bonusCount);
+
+				int duplicateIndex = 0;
+				while (duplicateIndex < chosenCount) {
+					if (chosenBonus[duplicateIndex] == bonusIndex) {
+						break;
+					}
+					duplicateIndex++;
+				}
+
+				if (duplicateIndex == chosenCount) {
+					break;
+				}
+			}
+
+			chosenBonus[chosenCount] = bonusIndex;
+			chosenCount++;
+
+			int bonus = *reinterpret_cast<unsigned short*>(stageBase + bonusIndex * 2);
+			caravanWork->SetBonusCondition(bonus);
+			if ((unsigned int)System.m_execParam > 2) {
+				Printf__7CSystemFPce(&System, s_partyBonusRandomFmt, slot, bonusIndex, bonus);
+			}
+		}
+
+		caravanWork->CalcStatus();
 	}
 }
 

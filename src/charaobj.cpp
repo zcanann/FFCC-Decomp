@@ -2261,37 +2261,81 @@ void CGCharaObj::onChangePrg(int arg)
  */
 void CGCharaObj::calcCastTime(int)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	m_castTimeTick += 1;
 
 	if (m_scriptHandle == 0) {
 		return;
 	}
 
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	unsigned char* script9 = (m_scriptHandle[9] != 0) ? reinterpret_cast<unsigned char*>(m_scriptHandle[9]) : 0;
+	unsigned int cid = GetCID();
+
+	if (CharaObjIsPlayerCid(cid) &&
+		Game.m_gameWork.m_menuStageMode != 0 &&
+		Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+		(cid & 0x6D) == 0x6D &&
+		*reinterpret_cast<int*>(script + 0x3B4) != 0) {
+		m_castFrameStart = 0;
+		m_castFrameEnd = 1;
+		m_castFrameCurrent = 1;
+		return;
+	}
+
 	int itemId = m_itemId;
 	int itemOffset = itemId * 0x48;
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemOffset;
-
-	unsigned int baseCast = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
+	unsigned short itemNo = *reinterpret_cast<unsigned short*>(itemData + 0x0);
 	unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 0xE);
+	unsigned int baseCast = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
 	unsigned int cast = baseCast;
 
-	if (itemType == 2) {
-		unsigned int cid = GetCID();
-		if ((cid & 0xAD) == 0xAD && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			int stage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
-			if (stage > 2) {
-				stage = 2;
+	if (itemType == 2 || itemNo == 0x1F8) {
+		float castScale = 1.0f;
+		unsigned int castBonus = 0;
+		unsigned int castReduction = 0;
+
+		if (*reinterpret_cast<short*>(script + 0x4E) != 0) {
+			castScale = CharaObjGetStatusMultiplier(0x0);
+		} else if (*reinterpret_cast<short*>(script + 0x4C) != 0) {
+			castScale = CharaObjGetStatusMultiplier(0x2);
+		}
+
+		if (itemType == 2) {
+			if (script9 != 0) {
+				castBonus = *reinterpret_cast<unsigned short*>(script9 + 0x194);
 			}
-			if (stage > 0) {
-				unsigned short bonus = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x58 + (stage * 2));
-				if (cast > bonus) {
-					cast -= bonus;
-				} else {
-					cast = 0;
+
+			if ((cid & 0xAD) == 0xAD && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+				int stage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
+				if (stage > 2) {
+					stage = 2;
+				}
+				if (stage > 0) {
+					castBonus -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x58 + (stage * 2));
+					castBonus &= ~((int)castBonus >> 31);
 				}
 			}
+
+			if (CharaObjIsPlayerCid(cid)) {
+				castReduction = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD8));
+			}
+		} else if (itemNo == 0x1F8) {
+			if (script9 != 0) {
+				castBonus = *reinterpret_cast<unsigned short*>(script9 + 0x196);
+			}
+
+			if (CharaObjIsPlayerCid(cid)) {
+				castReduction = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD9));
+			}
 		}
+
+		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
+		if (totalCast < 0) {
+			totalCast = 0;
+		}
+
+		cast = static_cast<unsigned int>(castScale * static_cast<float>(totalCast));
 	}
 
 	m_castFrameStart = static_cast<int>(cast);

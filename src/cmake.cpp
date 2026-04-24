@@ -786,8 +786,36 @@ void CMenuPcs::DrawSingCMake()
  */
 void CMenuPcs::DrawDiaryBase(int page, float alpha)
 {
-    DrawCmakeWin(0.0f, 0.0f, alpha);
-    DrawCmakeTitle(page, 0.0f, alpha);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
+
+    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXSetChanMatColor(GX_COLOR0A0, col);
+
+    const bool widePage = (page == 0);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), widePage ? 0x35 : 0x3F);
+
+    int frameH = widePage ? 0x180 : 0x150;
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcsVoid(), 0, FLOAT_80333254, FLOAT_803332dc, FLOAT_803332dc, static_cast<float>(frameH),
+        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcsVoid(), 8, FLOAT_803332e4, FLOAT_803332dc, FLOAT_803332dc, static_cast<float>(frameH),
+        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), widePage ? 0x36 : 0x40);
+    for (int x = 0x20; x < 0x260;) {
+        int span = 0x20;
+        if ((0x260 - x) < span) {
+            span = 0x260 - x;
+        }
+
+        DrawRect__8CMenuPcsFUlfffffffff(
+            MenuPcsVoid(), 0, static_cast<float>(x), FLOAT_803332dc, static_cast<float>(span), static_cast<float>(frameH),
+            FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+        x += span;
+    }
 }
 
 /*
@@ -2345,6 +2373,12 @@ void CMenuPcs::CmakeResultDraw1()
     DrawCmakeTitle(7, alpha, FLOAT_80333258);
     DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, textAlpha);
     DrawCmakeCharaText(7, textAlpha);
+
+    if (mode == 1) {
+        DrawCmakeYesNo(*reinterpret_cast<short*>(state + 0x26) + 1, alpha);
+    } else {
+        DrawCmakeYesNo(0, alpha);
+    }
 }
 
 /*

@@ -404,7 +404,6 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 	if (work->m_particleBlock == NULL)
 	{
 		work->m_numParticles = *(u16*)(particleDataBytes + 0x20);
-
 		work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 			work->m_numParticles * 0x60, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x262);
 		if (work->m_particleBlock != NULL)
@@ -460,9 +459,6 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 	{
 		switch (particleDataBytes[0x2A])
 		{
-		default:
-			PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_worldMatrix);
-			break;
 		case 1:
 		case 3:
 		case 5:
@@ -475,6 +471,9 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 			work->m_worldMatrix[0][3] = pppMngStPtr->m_position.x;
 			work->m_worldMatrix[1][3] = pppMngStPtr->m_position.y;
 			work->m_worldMatrix[2][3] = pppMngStPtr->m_position.z;
+			break;
+		default:
+			PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_worldMatrix);
 			break;
 		}
 

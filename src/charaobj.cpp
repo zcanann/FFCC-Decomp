@@ -1355,7 +1355,7 @@ void CGCharaObj::setSta(int staIndex, int value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
+void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& outValue)
 {
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	if (script == 0) {
@@ -1363,7 +1363,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 		return;
 	}
 
-	CGObject* source = reinterpret_cast<CGObject*>(this);
+	CGObject* source = sourceObj != 0 ? reinterpret_cast<CGObject*>(sourceObj) : reinterpret_cast<CGObject*>(this);
 	int next = 0;
 
 	switch (staIndex) {
@@ -1401,7 +1401,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 			setSta(7, 0);
 			setSta(8, 0);
 			calcSta(3, amount, source);
-			putHitParticleFromItem(0, amount);
+			putHitParticleFromItem(sourceObj, amount);
 			Sound.StopSe3DGroup(m_particleId);
 			damageDelete();
 			changeStat(0, 0, 0);
@@ -1415,13 +1415,13 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 			break;
 		case 6:
 			calcSta(6, amount, source);
-			putHitParticleFromItem(0, amount);
+			putHitParticleFromItem(sourceObj, amount);
 			next = 0;
 			break;
 		case 7:
 			if (*reinterpret_cast<short*>(script + 0x4E) == 0) {
 				calcSta(7, amount, source);
-				putHitParticleFromItem(0, amount);
+				putHitParticleFromItem(sourceObj, amount);
 			} else {
 				setSta(7, 0);
 				setSta(8, 0);
@@ -1431,7 +1431,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 		case 8:
 			if (*reinterpret_cast<short*>(script + 0x13) == 0) {
 				calcSta(8, amount, source);
-				putHitParticleFromItem(0, amount);
+				putHitParticleFromItem(sourceObj, amount);
 			} else {
 				setSta(7, 0);
 				setSta(8, 0);
@@ -1442,7 +1442,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 			setSta(7, 0);
 			setSta(8, 0);
 			calcSta(9, amount, source);
-			putHitParticleFromItem(0, amount);
+			putHitParticleFromItem(sourceObj, amount);
 			Sound.StopSe3DGroup(m_particleId);
 			damageDelete();
 			changeStat(0, 0, 0);
@@ -1455,7 +1455,18 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
 				setSta(0, 0);
 			}
-			changeStat(0x19, 0, 0);
+			if ((GetCID() & 0xAD) != 0xAD || m_scriptHandle[9] == 0 ||
+				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 8) == 0) {
+				if (sourceObj != 0) {
+					Vec delta;
+					delta.x = sourceObj->m_worldPosition.x - m_worldPosition.x;
+					delta.y = sourceObj->m_worldPosition.y - m_worldPosition.y;
+					delta.z = sourceObj->m_worldPosition.z - m_worldPosition.z;
+					moveVectorH(&delta, 8.0f, 8);
+					m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
+				}
+				changeStat(0x19, 0, 0);
+			}
 			break;
 		case 100:
 			if (Game.m_gameWork.m_gameOverFlag == 0) {
@@ -1465,14 +1476,19 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 					addHp(8, 0);
 				}
 				changeStat(0x22, 0, 0);
-				putHitParticleFromItem(0, amount);
+				putHitParticleFromItem(sourceObj, amount);
 			}
 			next = 0;
 			break;
 		case 0x66:
 			addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), 0);
-			putHitParticleFromItem(0, amount);
+			putHitParticleFromItem(sourceObj, amount);
 			next = 0;
+			break;
+		case 0x24:
+			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
+				setSta(0, 0);
+			}
 			break;
 		case 0x68:
 			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
@@ -1485,7 +1501,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 				setSta(i, 0);
 			}
 			m_displayFlags |= 2;
-			putHitParticleFromItem(0, amount);
+			putHitParticleFromItem(sourceObj, amount);
 			break;
 		case 0x6A:
 			calcSta(4, amount, source);

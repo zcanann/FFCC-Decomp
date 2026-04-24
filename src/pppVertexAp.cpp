@@ -60,6 +60,51 @@ struct VertexApObject
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void apea(_pppPObject* parent, PVertexAp* dataRaw, Vec* position)
+{
+    VertexApData* data = (VertexApData*)dataRaw;
+    VertexApObject* parentObj = (VertexApObject*)parent;
+
+    if ((data->childId + 0x10000) != 0xFFFF) {
+        s32 childId = data->childId;
+        _pppPDataVal* childData =
+            (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
+        Vec pos;
+        Vec* outPos;
+        _pppPObject* child;
+
+        if (childData == 0) {
+            child = 0;
+        } else {
+            child = pppCreatePObject((_pppMngSt*)pppMngStPtr, childData);
+            *(void**)((u8*)child + 0x4) = parent;
+        }
+
+        pos.x = position->x;
+        pos.y = position->y;
+        pos.z = position->z;
+        PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
+        outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+
+        if (data->useWorldMtx == 0) {
+            outPos->x = pos.x;
+            outPos->y = pos.y;
+            outPos->z = pos.z;
+        } else {
+            PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, outPos);
+        }
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800647e0
  * PAL Size: 776b
  * EN Address: TODO

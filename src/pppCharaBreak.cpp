@@ -758,9 +758,9 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
     _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x319);
 
-    int dataOffset = data->m_serializedDataOffsets[2];
-    u8* model = *(u8**)((u8*)charaBreak + 0xC0 + dataOffset);
-    void** perMeshBuffers = *(void***)((u8*)charaBreak + 0x9C + dataOffset);
+    CharaBreakWork* work = (CharaBreakWork*)((u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2]);
+    u8* model = work->m_model;
+    void** perMeshBuffers = (void**)work->m_meshBuffers;
     u8* mesh = *(u8**)(model + 0xAC);
 
     *(u32*)(model + 0xE4) = 0;
@@ -771,35 +771,35 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
     *(u32*)(model + 0xEC) = 0;
 
     if (perMeshBuffers != NULL) {
-        u32 meshCount = *(u32*)(*(u8**)(model + 0xA4) + 0xC);
-        for (u32 meshIndex = 0; meshIndex < meshCount; meshIndex++) {
-            int* dlEntries = (int*)perMeshBuffers[meshIndex];
-            u32 dlCount = *(u32*)(*(u8**)(mesh + 8) + 0x4C);
-
+        void** meshBufferSlot = perMeshBuffers;
+        for (u32 meshIndex = 0; meshIndex < *(u32*)(*(u8**)(model + 0xA4) + 0xC); meshIndex++) {
+            int* dlEntries = (int*)*meshBufferSlot;
+            int meshData = *(int*)(mesh + 8);
             if (dlEntries != NULL) {
-                for (u32 dlIndex = 0; dlIndex < dlCount; dlIndex++) {
-                    int dlInfo = dlEntries[dlIndex];
-                    if (dlInfo != 0) {
-                        if (*(void**)dlInfo != NULL) {
-                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)dlInfo);
-                            *(u32*)dlInfo = 0;
+                for (u32 dlIndex = 0; dlIndex < *(u32*)(meshData + 0x4C); dlIndex++) {
+                    if ((void*)*dlEntries != NULL) {
+                        if (*(void**)*dlEntries != NULL) {
+                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
+                            *(u32*)*dlEntries = 0;
                         }
-                        if (*(void**)(dlInfo + 0xC) != NULL) {
-                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(dlInfo + 0xC));
-                            *(u32*)(dlInfo + 0xC) = 0;
+                        if (*(void**)(*dlEntries + 0xC) != NULL) {
+                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(*dlEntries + 0xC));
+                            *(u32*)(*dlEntries + 0xC) = 0;
                         }
                     }
-                    if (dlInfo != 0) {
-                        pppHeapUseRate__FPQ27CMemory6CStage((void*)dlInfo);
-                        dlEntries[dlIndex] = 0;
+                    if ((void*)*dlEntries != NULL) {
+                        pppHeapUseRate__FPQ27CMemory6CStage((void*)*dlEntries);
+                        *dlEntries = 0;
                     }
+                    dlEntries++;
                 }
             }
 
-            if (perMeshBuffers[meshIndex] != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(perMeshBuffers[meshIndex]);
-                perMeshBuffers[meshIndex] = NULL;
+            if (*meshBufferSlot != NULL) {
+                pppHeapUseRate__FPQ27CMemory6CStage(*meshBufferSlot);
+                *meshBufferSlot = NULL;
             }
+            meshBufferSlot++;
             mesh += 0x14;
         }
     }

@@ -58,6 +58,42 @@ struct VertexApObject
     Mtx localMatrix;
 };
 
+void apea(_pppPObject* parent, PVertexAp* dataRaw, Vec* src)
+{
+    VertexApData* data = (VertexApData*)dataRaw;
+
+    if ((data->childId + 0x10000) != 0xFFFF) {
+        VertexApObject* parentObj = (VertexApObject*)parent;
+        s32 childId = data->childId;
+        _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
+        _pppPObject* child;
+
+        if (childData == 0) {
+            child = 0;
+        } else {
+            child = pppCreatePObject((_pppMngSt*)pppMngStPtr, childData);
+            *(void**)((u8*)child + 0x4) = parent;
+        }
+
+        Vec pos;
+        Vec* outPos;
+
+        pos.x = src->x;
+        pos.y = src->y;
+        pos.z = src->z;
+        PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
+        outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+
+        if (data->useWorldMtx == 0) {
+            outPos->x = pos.x;
+            outPos->y = pos.y;
+            outPos->z = pos.z;
+        } else {
+            PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, outPos);
+        }
+    }
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800647e0

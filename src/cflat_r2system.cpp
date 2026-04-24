@@ -185,6 +185,22 @@ static inline unsigned int ReadGameWorkEventFlag(const CGame::CGameWork& gameWor
     return ((eventFlags[GetGameWorkEventFlagByteIndex(bitIndex)] & mask) != 0);
 }
 
+static inline CFlatRuntime::CObject* ResolveRuntimeObjectById(CFlatRuntime2* runtime, int objectId)
+{
+    CFlatRuntime::CObject* const root =
+        reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(runtime) + 0x1204);
+    CFlatRuntime::CObject* object = root->m_next;
+
+    while (object != root) {
+        if (static_cast<int>(object->m_id) == objectId) {
+            return object;
+        }
+        object = object->m_next;
+    }
+
+    return 0;
+}
+
 static inline void WriteGameWorkEventFlag(CGame::CGameWork& gameWork, int systemValue, unsigned int value)
 {
     unsigned int bitIndex = GetGameWorkEventFlagBitIndex(systemValue);
@@ -2942,6 +2958,13 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -99: {
+        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
+        this->SetParticleWorkTrace(targetObject);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x62:
         SetNoFreeMergeMask__9CCharaPcsFi(&CharaPcs, *object->m_localBase);
         runtime->push(object, 0);
@@ -2980,6 +3003,25 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0x5D:
         runtime->push(object, System.IsGdev());
+        outResult = 0;
+        return;
+    case -0x5C: {
+        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
+        this->IgnoreParticle(static_cast<short>(*object->m_localBase), targetObject);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x5B: {
+        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
+        this->SetParticleWorkParam(*object->m_localBase, targetObject);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x5A:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = 0;
+        runtime->push(object, 0);
         outResult = 0;
         return;
     case -0x53:

@@ -78,6 +78,9 @@ union PackedColor {
     u8 bytes[4];
 };
 
+static PackedColor g_pppYmTracer2_1;
+static PackedColor g_pppYmTracer2_2;
+
 static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 {
     dst->active = src->active;
@@ -169,8 +172,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                         alphaScale = FLOAT_80331844;
                     }
 
-                    PackedColor colorTop = { 0 };
-                    PackedColor colorBottom = { 0 };
+                    PackedColor colorTop = g_pppYmTracer2_1;
+                    PackedColor colorBottom = g_pppYmTracer2_2;
                     colorTop.bytes[0] = poly->colorR;
                     colorTop.bytes[1] = poly->colorG;
                     colorTop.bytes[2] = poly->colorB;

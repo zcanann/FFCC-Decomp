@@ -5,8 +5,6 @@
 #include "ffcc/util.h"
 #include "ffcc/pppShape.h"
 
-#include <math.h>
-
 struct Vec2d {
     float x;
     float y;
@@ -51,9 +49,14 @@ union ColumFloatBits {
 
 static const char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 
+extern int __float_nan[];
 extern float FLOAT_80331078;
 extern float FLOAT_8033107C;
 extern float FLOAT_80331080;
+extern float FLOAT_80331084;
+extern double DOUBLE_80331088;
+extern double DOUBLE_80331090;
+extern double DOUBLE_80331098;
 extern float FLOAT_803310A8;
 
 extern "C" {
@@ -71,6 +74,17 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void pppGetShapePos__FPlsR3VecR3Veci(long*, short, Vec&, Vec&, int);
 void pppGetShapeUV__FPlsR5Vec2dR5Vec2di(long*, short, Vec2d&, Vec2d&, int);
 void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec, Vec, GXColor, Vec2d*, Vec2d*);
+}
+
+static inline float ColumSqrtPositive(float value)
+{
+    double guess = __frsqrte((double)value);
+
+    guess = DOUBLE_80331088 * guess * (DOUBLE_80331090 - guess * guess * value);
+    guess = DOUBLE_80331088 * guess * (DOUBLE_80331090 - guess * guess * value);
+    guess = DOUBLE_80331088 * guess * (DOUBLE_80331090 - guess * guess * value);
+
+    return (float)(value * guess);
 }
 
 /*
@@ -122,11 +136,11 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             cameraDelta.z = FLOAT_80331080 + positionWork->m_position.z;
 
             lengthXY = cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y;
-            if (lengthXY > 0.0f) {
-                lengthXY = sqrtf(lengthXY);
+            if (lengthXY > FLOAT_80331084) {
+                lengthXY = ColumSqrtPositive(lengthXY);
             } else {
-                if (lengthXY < 0.0f) {
-                    lengthXY = NAN;
+                if ((double)lengthXY < DOUBLE_80331098) {
+                    lengthXY = *(float*)__float_nan;
                 } else {
                     ColumFloatBits bits;
                     int floatClass;
@@ -153,7 +167,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                     }
 
                     if (floatClass == ColumFloatQNaN) {
-                        lengthXY = NAN;
+                        lengthXY = *(float*)__float_nan;
                     }
                 }
             }

@@ -13,6 +13,7 @@
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
+extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawMcWin__8CMenuPcsFss(CMenuPcs*, short, short);
 extern "C" void DrawMcWinMess__8CMenuPcsFii(CMenuPcs*, int, int);
@@ -314,6 +315,49 @@ static void DrawBonusTexturedSprite(CMenuPcs* menu, const BonusAnimSprite* sprit
 	    sprite->depth, sprite->depth, sprite->scale, sprite->scale, 0.0f);
 	if (sprite->tex == 0x20) {
 		GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+	}
+}
+
+static void DrawBonusSweepSprite(CMenuPcs* menu, const BonusAnimSprite* sprite, float alpha, bool opening)
+{
+	if (menu == 0 || sprite == 0 || alpha <= 0.0f) {
+		return;
+	}
+
+	float width = (float)sprite->w;
+	float height = (float)sprite->h;
+	int duration = (sprite->duration > 0) ? sprite->duration : 1;
+	float timer = (sprite->timer > 0) ? (float)(sprite->timer - 1) : 0.0f;
+	float progress = ClampBonusUnit(timer / (float)duration);
+	float fillWidth = (opening ? progress : (1.0f - progress)) * width;
+	float fadeWidth = width / (float)duration;
+	float x = (float)sprite->x + sprite->mulX;
+	float y = (float)sprite->y + sprite->mulY;
+	GXColor solidColors[4] = {
+		{0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)},
+		{0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)},
+		{0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)},
+		{0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)},
+	};
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(menu, sprite->tex);
+	GXSetChanMatColor(GX_COLOR0A0, solidColors[0]);
+
+	if (fillWidth > 0.0f) {
+		DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(menu, 0, x, y, fillWidth, height,
+		    sprite->depth, sprite->depth, solidColors, 1.0f, 1.0f, 0.0f);
+		x += fillWidth;
+	}
+
+	if (fillWidth > 0.0f && fillWidth < width) {
+		GXColor fadeColors[4] = {
+			{0xFF, 0xFF, 0xFF, 0x00},
+			{0xFF, 0xFF, 0xFF, 0x00},
+			{0xFF, 0xFF, 0xFF, 0x00},
+			{0xFF, 0xFF, 0xFF, 0x00},
+		};
+		DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(menu, 0, x, y, fadeWidth, height,
+		    sprite->depth, sprite->depth, fadeColors, 1.0f, 1.0f, 0.0f);
 	}
 }
 
@@ -1149,6 +1193,8 @@ void CMenuPcs::DrawResultOpenAnim()
 					font->Draw(partyName);
 				}
 			}
+		} else if (sprite->kind == 0x17) {
+			DrawBonusSweepSprite(this, sprite, alpha, true);
 		} else {
 			GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 			GXSetChanMatColor(GX_COLOR0A0, color);
@@ -1676,7 +1722,9 @@ void CMenuPcs::DrawResultCloseAnim()
 		} else if (sprite->kind == -4) {
 			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
 		} else if (sprite->kind == -2) {
-			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, digitIndex++);
+			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, GetBonusResultValueByActiveIndex(digitIndex++));
+		} else if (sprite->kind == 0x17) {
+			DrawBonusSweepSprite(this, sprite, alpha, false);
 		} else {
 			GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 			GXSetChanMatColor(GX_COLOR0A0, color);

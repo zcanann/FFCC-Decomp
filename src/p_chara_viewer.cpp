@@ -571,8 +571,10 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
         __ct__6CColorFR6CColor(p + 0x12C + i * 4, colorTmp);
     }
 
+    unsigned int clearColor[1];
+    __ct__6CColorFUcUcUcUc(clearColor, 0x40, 0x40, 0x40, 0xFF);
     *(unsigned int*)(p + 0x0C) = 0x404040FF;
-    SetCopyClear__8CGraphicF8_GXColori(&Graphic, p + 0x0C, 0xFFFF);
+    SetCopyClear__8CGraphicF8_GXColori(&Graphic, clearColor, 0xFFFF);
 
     *(int*)(p + 0x190) = 0;
     *(int*)(p + 0x194) = 0;

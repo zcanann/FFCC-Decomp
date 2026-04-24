@@ -3090,6 +3090,24 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0x50: {
+        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicsPcs);
+        *reinterpret_cast<int*>(graphicsPcs + 0x24) = 2;
+        graphicsPcs[0x12] = 0xFF;
+        graphicsPcs[0x13] = 0xFF;
+        graphicsPcs[0x14] = 0xFF;
+        graphicsPcs[0x15] = 0xFF;
+        *reinterpret_cast<int*>(graphicsPcs + 0x20) = 0;
+        *reinterpret_cast<int*>(graphicsPcs + 0x4) = object->m_localBase[0];
+        *reinterpret_cast<int*>(graphicsPcs + 0x44) = object->m_localBase[1];
+        *reinterpret_cast<int*>(graphicsPcs + 0x36) = object->m_localBase[2];
+        *reinterpret_cast<int*>(graphicsPcs + 0x40) = object->m_localBase[3];
+        *reinterpret_cast<int*>(graphicsPcs + 0x8) = *reinterpret_cast<int*>(graphicsPcs + 0x4);
+        ReqScreenCapture__11CGraphicPcsFv(&GraphicsPcs);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x4F:
         MapMng.SetMeshCameraSemiTransRange(
             static_cast<unsigned short>(*object->m_localBase), static_cast<float>(object->m_localBase[1]),
@@ -3099,6 +3117,13 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0x4E: {
+        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
+        this->SetParticleWorkBind(targetObject);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x4C: {
         _GXColor color = {
             static_cast<u8>(object->m_localBase[2]),
@@ -3113,6 +3138,12 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     }
     case -0x4B:
         PartMng.pppFieldShowFpNo(static_cast<short>(*object->m_localBase), static_cast<unsigned char>(object->m_localBase[1]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x4A:
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A0) =
+            static_cast<unsigned int>(*object->m_localBase);
         runtime->push(object, 0);
         outResult = 0;
         return;

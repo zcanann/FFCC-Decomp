@@ -570,6 +570,18 @@ static void DrawShopMenuAmount(CFont* font, int value, float rightEdge, float y,
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 }
 
+static void DrawShopMenuRightAlignedText(CFont* font, const char* text, float rightEdge, float y, int tlut)
+{
+    if (text == 0) {
+        return;
+    }
+
+    float textWidth = GetWidth__5CFontFPc(font, text);
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+        MenuPcsVoid(), font, const_cast<char*>(text), rightEdge - textWidth, y, tlut, 0x12);
+    DrawInit__8CMenuPcsFv(MenuPcsVoid());
+}
+
 static void SetupShopMenuLabelFont(CFont* font, _GXColor* color)
 {
     DrawInit__5CFontFv(font);
@@ -2389,7 +2401,6 @@ void CShopMenu::DrawBuySellInfo()
  */
 void CShopMenu::DrawItemInfo0()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     int itemIndex = ShopMenuInt(this, 0x28);
     if (itemIndex == -1) {
         return;
@@ -2415,12 +2426,9 @@ void CShopMenu::DrawItemInfo0()
 
     if (itemNo > 0) {
         SetMargin__5CFontFf(FLOAT_80332d28, font);
-        char* itemName = (char*)0;
-        if (itemNo >= 1) {
-            itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[itemNo * 5 + 4]);
-        }
         DrawInit__5CFontFv(font);
-        DrawShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, itemName, FLOAT_80332d54, FLOAT_80332d58, 0x18, 0x12);
+        DrawShadowFont__8CMenuPcsFP5CFontPcffii(
+            MenuPcsVoid(), font, const_cast<char*>(GetItemName(itemNo)), FLOAT_80332d54, FLOAT_80332d58, 0x18, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
         SetMargin__5CFontFf(FLOAT_80332d28, font);
     }
@@ -2428,38 +2436,25 @@ void CShopMenu::DrawItemInfo0()
     bool canTrade = CanTradeShopMenuItem(this, itemIndex, itemNo);
 
     if (canTrade) {
-        SetMargin__5CFontFf(FLOAT_80332d28, font);
+        SetupShopMenuUnitFont(font);
         char* unitText = PTR_DAT_80214da8[languageId];
         float unitWidth = GetWidth__5CFontFPc(font, unitText);
         float rightX = FLOAT_80332d3c - unitWidth;
         float amountRightX = rightX - FLOAT_80332d5c;
         int totalGil = ShopMenuInt(this, 0x44) * CalcShopMenuTradeGil(this, itemNo);
-        SetShadow__5CFontFi(font, 1);
-        SetScale__5CFontFf(FLOAT_80332d28, font);
-        SetColor__5CFontF8_GXColor(font, &white);
-        DrawInit__5CFontFv(font);
-        reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
-        SetMargin__5CFontFf(FLOAT_80332d64, font);
-        char amountBuffer[64];
-        sprintf(amountBuffer, DAT_80332d14, totalGil);
-        float amountWidth = GetWidth__5CFontFPc(font, amountBuffer);
-        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-            MenuPcsVoid(), font, amountBuffer, amountRightX - amountWidth, FLOAT_80332d68, 0x1B, 0x12);
-        DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-        SetMargin__5CFontFf(FLOAT_80332d28, font);
+        SetupShopMenuAmountFont(font, &white);
+        DrawShopMenuAmount(font, totalGil, amountRightX, FLOAT_80332d68, 0x1B);
+
+        SetupShopMenuUnitFont(font);
         DrawInit__5CFontFv(font);
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, unitText, rightX, FLOAT_80332d68, 0x19, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
     } else {
-        SetMargin__5CFontFf(FLOAT_80332d28, font);
-        char* message = (listType == 0) ? PTR_s_Cannot_buy_80214dc8[languageId] : PTR_s_Cannot_sell_80214dcc[languageId];
-        float width = GetWidth__5CFontFPc(font, message);
+        SetupShopMenuUnitFont(font);
+        const char* message = (listType == 0) ? PTR_s_Cannot_buy_80214dc8[languageId] : PTR_s_Cannot_sell_80214dcc[languageId];
         DrawInit__5CFontFv(font);
-        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-            MenuPcsVoid(), font, message, FLOAT_80332d3c - width, FLOAT_80332d68, 0x19, 0x12);
-        DrawInit__8CMenuPcsFv(MenuPcsVoid());
-        SetMargin__5CFontFf(FLOAT_80332d28, font);
+        DrawShopMenuRightAlignedText(font, message, FLOAT_80332d3c, FLOAT_80332d68, 0x19);
     }
 
     if (ShopMenuInt(this, 0x10) == 0) {
@@ -2468,29 +2463,18 @@ void CShopMenu::DrawItemInfo0()
 
     if ((ShopMenuInt(this, 0x10) == 1) && (listType == 0)) {
         int amount = ShopMenuInt(this, 0x44);
-        SetShadow__5CFontFi(font, 1);
-        SetScale__5CFontFf(FLOAT_80332d28, font);
-        SetColor__5CFontF8_GXColor(font, &white);
-        DrawInit__5CFontFv(font);
-        reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+        SetupShopMenuAmountFont(font, &white);
         SetMargin__5CFontFf(FLOAT_80332d34, font);
-
         char countBuffer[64];
         sprintf(countBuffer, DAT_80332d18, amount);
-        float countWidth = GetWidth__5CFontFPc(font, countBuffer);
-        float countRightX = FLOAT_80332d70 - countWidth;
+        float countRightX = FLOAT_80332d70 - GetWidth__5CFontFPc(font, countBuffer);
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, countBuffer, countRightX, FLOAT_80332d6c, 4, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
+        SetupShopMenuInfoFont(font, &white);
+        const char* quantityText = PTR_s_Quantity_80214dd0[languageId];
         DrawInit__5CFontFv(font);
-        SetScale__5CFontFf(FLOAT_80332d28, font);
-        SetMargin__5CFontFf(FLOAT_80332d28, font);
-        char* quantityText = PTR_s_Quantity_80214dd0[languageId];
-        float quantityWidth = GetWidth__5CFontFPc(font, quantityText);
-        DrawInit__5CFontFv(font);
-        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-            MenuPcsVoid(), font, quantityText, countRightX - quantityWidth - FLOAT_80332d5c, FLOAT_80332d6c, 0x18, 0x12);
-        DrawInit__8CMenuPcsFv(MenuPcsVoid());
+        DrawShopMenuRightAlignedText(font, quantityText, countRightX - FLOAT_80332d5c, FLOAT_80332d6c, 0x18);
 
         int x = static_cast<int>(-(static_cast<float>(ShopMenuInt(this, 0x38)) * FLOAT_80332d74 - FLOAT_80332d70));
         drawShapeSeqScale(0x12, 0, x, 0xD4, FLOAT_80332d78, FLOAT_80332d78, 0xFF);

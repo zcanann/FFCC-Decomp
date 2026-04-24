@@ -933,6 +933,34 @@ static void BuildDefaultResultSprites(BonusAnimSprite* sprites, int activePartyC
 	}
 }
 
+static const BonusAnimSprite* GetResultCloseSourceSprite(
+    const BonusAnimSprite* originals, int originalCount, int primaryIndex, int secondaryIndex, const BonusAnimSprite* fallback)
+{
+	if (primaryIndex >= 0 && primaryIndex < originalCount) {
+		return &originals[primaryIndex];
+	}
+	if (secondaryIndex >= 0 && secondaryIndex < originalCount) {
+		return &originals[secondaryIndex];
+	}
+	return fallback;
+}
+
+static void InitResultCloseSprite(BonusAnimSprite* sprite, const BonusAnimSprite* source, int startFrame, int duration, float alpha)
+{
+	if (source != 0) {
+		*sprite = *source;
+	}
+	sprite->timer = 0;
+	sprite->startFrame = startFrame;
+	sprite->duration = duration;
+	sprite->alpha = alpha;
+	sprite->mulX = 0.0f;
+	sprite->mulY = 0.0f;
+	if (sprite->scale <= 0.0f) {
+		sprite->scale = 1.0f;
+	}
+}
+
 static int GetBonusPartySlotByActiveIndex(int activeIndex)
 {
 	unsigned int* scriptFoodBase = Game.m_scriptFoodBase;
@@ -2136,9 +2164,14 @@ void CMenuPcs::CalcResultCloseAnim()
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		BonusAnimSprite originals[0x20];
+		BonusAnimSprite defaults[0x20];
 		int originalCount = header->count;
+		const int resultCountNameBase = 1 + activePartyCount * 3;
+		const int resultCountDigitBase = 1 + activePartyCount * 5;
 
 		memset(originals, 0, sizeof(originals));
+		memset(defaults, 0, sizeof(defaults));
+		BuildDefaultResultSprites(defaults, activePartyCount);
 		if (originalCount <= 0 || originalCount > (int)(sizeof(originals) / sizeof(originals[0]))) {
 			originalCount = baseCount;
 		}
@@ -2156,39 +2189,28 @@ void CMenuPcs::CalcResultCloseAnim()
 		header->unk02 = 0;
 		header->unk04 = 0;
 
-		sprites[0] = originals[0];
-		sprites[0].timer = 0;
-		sprites[0].startFrame = 0;
-		sprites[0].duration = 14;
-		sprites[0].alpha = 1.0f;
-		sprites[0].scale = (sprites[0].scale > 0.0f) ? sprites[0].scale : 3.0f;
+		InitResultCloseSprite(&sprites[0], &originals[0], 0, 14, 1.0f);
+		if (sprites[0].scale < 3.0f) {
+			sprites[0].scale = 3.0f;
+		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			int srcFrameIdx = (frameBase + i < originalCount) ? frameBase + i : 0;
-			int srcIconIdx = (iconBase + i < originalCount) ? iconBase + i : 0;
-			int srcDigitIdx = (digitBase + i < originalCount) ? digitBase + i : 0;
+			const BonusAnimSprite* frameSource = GetResultCloseSourceSprite(originals, originalCount, frameBase + i, -1, &defaults[frameBase + i]);
+			const BonusAnimSprite* iconSource = GetResultCloseSourceSprite(originals, originalCount, iconBase + i, -1, &defaults[iconBase + i]);
+			const BonusAnimSprite* digitSource = GetResultCloseSourceSprite(
+			    originals, originalCount, resultCountDigitBase + i, digitBase + i, &defaults[digitBase + i]);
+			const BonusAnimSprite* nameSource = GetResultCloseSourceSprite(
+			    originals, originalCount, resultCountNameBase + i, -1, 0);
 
-			sprites[frameBase + i] = originals[srcFrameIdx];
-			sprites[frameBase + i].timer = 0;
-			sprites[frameBase + i].startFrame = i * 2;
-			sprites[frameBase + i].duration = 12;
-			sprites[frameBase + i].alpha = 1.0f;
+			InitResultCloseSprite(&sprites[frameBase + i], frameSource, i * 2, 12, 1.0f);
 			sprites[frameBase + i].kind = 0x17;
 			sprites[frameBase + i].tex = 0x17;
 
-			sprites[iconBase + i] = originals[srcIconIdx];
-			sprites[iconBase + i].timer = 0;
-			sprites[iconBase + i].startFrame = 2 + i * 2;
-			sprites[iconBase + i].duration = 10;
-			sprites[iconBase + i].alpha = 1.0f;
+			InitResultCloseSprite(&sprites[iconBase + i], iconSource, sprites[frameBase + i].startFrame + 2, 10, 1.0f);
 			sprites[iconBase + i].kind = 0x18;
 			sprites[iconBase + i].tex = 0x18;
 
-			sprites[digitBase + i] = originals[srcDigitIdx];
-			sprites[digitBase + i].timer = 0;
-			sprites[digitBase + i].startFrame = 4 + i * 2;
-			sprites[digitBase + i].duration = 12;
-			sprites[digitBase + i].alpha = 1.0f;
+			InitResultCloseSprite(&sprites[digitBase + i], digitSource, sprites[iconBase + i].startFrame + 2, 12, 1.0f);
 			sprites[digitBase + i].kind = -2;
 			sprites[digitBase + i].tex = -2;
 			if (sprites[digitBase + i].w == 0) {
@@ -2198,31 +2220,34 @@ void CMenuPcs::CalcResultCloseAnim()
 				sprites[digitBase + i].h = 0x18;
 			}
 
-			sprites[frameEchoBase + i] = sprites[frameBase + i];
-			sprites[frameEchoBase + i].timer = 0;
-			sprites[frameEchoBase + i].startFrame = 6 + i * 2;
-			sprites[frameEchoBase + i].duration = 8;
-			sprites[frameEchoBase + i].alpha = 0.9f;
+			InitResultCloseSprite(
+			    &sprites[frameEchoBase + i], &sprites[frameBase + i],
+			    sprites[frameBase + i].startFrame + sprites[frameBase + i].duration, 8, 0.9f);
 
-			sprites[iconEchoBase + i] = sprites[iconBase + i];
-			sprites[iconEchoBase + i].timer = 0;
-			sprites[iconEchoBase + i].startFrame = 7 + i * 2;
-			sprites[iconEchoBase + i].duration = 8;
-			sprites[iconEchoBase + i].alpha = 0.8f;
+			InitResultCloseSprite(
+			    &sprites[iconEchoBase + i], &sprites[iconBase + i],
+			    sprites[iconBase + i].startFrame + sprites[iconBase + i].duration, 8, 0.8f);
 
-			sprites[digitEchoBase + i] = sprites[digitBase + i];
-			sprites[digitEchoBase + i].timer = 0;
-			sprites[digitEchoBase + i].startFrame = 8 + i * 2;
-			sprites[digitEchoBase + i].duration = 10;
-			sprites[digitEchoBase + i].alpha = 0.75f;
+			InitResultCloseSprite(
+			    &sprites[digitEchoBase + i], &sprites[digitBase + i],
+			    sprites[digitBase + i].startFrame + sprites[digitBase + i].duration, 10, 0.75f);
 
-			InitAnimSprite(&sprites[nameBase + i], -1, 0x108, (short)(0x6c + i * 0x60), 0, 0, 5 + i * 2, 12);
-			sprites[nameBase + i].timer = 0;
-			sprites[nameBase + i].depth = 0.0f;
-			sprites[nameBase + i].alpha = 1.0f;
-			sprites[nameBase + i].scale = 1.0f;
-			sprites[nameBase + i].mulX = 0.0f;
-			sprites[nameBase + i].mulY = 0.0f;
+			if (nameSource != 0) {
+				InitResultCloseSprite(
+				    &sprites[nameBase + i], nameSource,
+				    sprites[digitEchoBase + i].startFrame + sprites[digitEchoBase + i].duration, 12, 1.0f);
+			} else {
+				InitAnimSprite(
+				    &sprites[nameBase + i], -1, 0x108, (short)(0x6c + i * 0x60), 0, 0,
+				    sprites[digitEchoBase + i].startFrame + sprites[digitEchoBase + i].duration, 12);
+				sprites[nameBase + i].timer = 0;
+				sprites[nameBase + i].depth = 0.0f;
+				sprites[nameBase + i].alpha = 1.0f;
+				sprites[nameBase + i].scale = 1.0f;
+				sprites[nameBase + i].mulX = 0.0f;
+				sprites[nameBase + i].mulY = 0.0f;
+			}
+			sprites[nameBase + i].kind = -1;
 		}
 
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);

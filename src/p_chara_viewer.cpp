@@ -207,11 +207,7 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
         GXLoadPosMtxImm(cameraMtx, 0);
 
         for (int i = -10; i < 11; i++) {
-            GXColor color;
-            color.r = 0x80;
-            color.g = 0x80;
-            color.b = 0x80;
-            color.a = (i == 0) ? 0x60 : 0x20;
+            GXColor color = {0x80, 0x80, 0x80, static_cast<u8>((i == 0) ? 0x60 : 0x20)};
             GXSetChanMatColor(GX_COLOR0A0, color);
             float x = (float)i * kCharaViewerGridSpacing;
             GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 4);

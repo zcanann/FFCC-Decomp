@@ -2321,13 +2321,14 @@ void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprt, int value)
 {
 	BonusAnimSprite* sprite = (BonusAnimSprite*)sprt;
 	int digitValue;
-	int ones;
-	int tens;
-	float fade;
+	int digits[3];
+	int digitCount;
+	float alpha;
 	float baseX;
 	float baseY;
 	float digitW;
 	float digitH;
+	float scale;
 
 	if (sprite == 0) {
 		return;
@@ -2337,35 +2338,39 @@ void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprt, int value)
 	if (digitValue < 0) {
 		digitValue = -digitValue;
 	}
-	digitValue = digitValue % 100;
+	digitValue = digitValue % 1000;
 
-	fade = sprite->alpha;
-	if (fade < 0.0f) {
-		fade = 0.0f;
-	}
-	if (fade > 1.0f) {
-		fade = 1.0f;
-	}
-
-	ones = digitValue % 10;
-	tens = (digitValue / 10) % 10;
+	alpha = ClampBonusUnit(sprite->alpha);
 	baseX = (float)sprite->x + sprite->mulX;
 	baseY = (float)sprite->y + sprite->mulY;
 	digitW = (sprite->w > 0) ? (float)sprite->w : 24.0f;
 	digitH = (sprite->h > 0) ? (float)sprite->h : 24.0f;
+	scale = (sprite->scale > 0.0f) ? sprite->scale : 1.0f;
 
-	sprite->mulX = (float)tens * 0.1f;
-	sprite->mulY = (float)ones * 0.1f;
-	sprite->depth = fade;
-	sprite->scale = 0.95f + (fade * 0.2f);
-
-	if (tens > 0) {
-		DrawBonusFrame(baseX, baseY, digitW, digitH, fade);
+	if (digitValue >= 100) {
+		digitCount = 3;
+		digits[0] = digitValue / 100;
+		digits[1] = (digitValue / 10) % 10;
+		digits[2] = digitValue % 10;
+	} else if (digitValue >= 10) {
+		digitCount = 2;
+		digits[0] = digitValue / 10;
+		digits[1] = digitValue % 10;
+	} else {
+		digitCount = 1;
+		digits[0] = digitValue;
 	}
-	DrawBonusFrame(baseX + digitW * 0.7f, baseY, digitW, digitH, fade);
 
-	if (fade > 0.99f) {
-		DrawBonusChkMark(fade);
+	baseX += ((3.0f * digitW) - ((float)digitCount * digitW)) * 0.5f;
+
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x19);
+	_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+	GXSetChanMatColor(GX_COLOR0A0, color);
+
+	for (int i = 0; i < digitCount; i++) {
+		DrawRect__8CMenuPcsFUlfffffffff(this, 0, baseX + digitW * (float)i, baseY, digitW, digitH,
+		    digitW * (float)digits[i], 0.0f, scale, scale, 0.0f);
 	}
 }
 

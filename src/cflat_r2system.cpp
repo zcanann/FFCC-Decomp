@@ -2439,6 +2439,11 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, static_cast<int>(Game.m_gameWork.m_townName[*object->m_localBase]));
         outResult = 0;
         return;
+    case -0xB0:
+        strcpy(Game.m_startScriptName, strBlob + strOffs[*object->m_localBase]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0xAF:
         runtime->push(
             object, static_cast<int>(Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ca_0x3dd[object->m_localBase[1]]));

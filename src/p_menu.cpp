@@ -498,36 +498,32 @@ void CMenuPcs::destroy()
 void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 {
     CMemory::CStage* stage = 0;
-    CMemory::CStage* menuStage = m_menuStage;
-    CFont** fontSlot = &m_fonts[slot];
 
     if (type == 1) {
         stage = m_stageF0;
     } else if (type < 1) {
         if (type >= 0) {
-            stage = menuStage;
+            stage = m_menuStage;
         }
     } else if (type < 3) {
         stage = pppEnvStPtr->m_stagePtr;
     }
 
     if ((slot == 0) && (FontMan.m_font != 0)) {
-        *fontSlot = FontMan.m_font;
-        reinterpret_cast<u32*>(*fontSlot)[1] = reinterpret_cast<u32*>(*fontSlot)[1] + 1;
+        m_fonts[slot] = FontMan.m_font;
+        reinterpret_cast<u32*>(m_fonts[slot])[1] = reinterpret_cast<u32*>(m_fonts[slot])[1] + 1;
     } else {
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
-        CFont* font = new (menuStage, const_cast<char*>(kPMenuSourceFile), 0xF8) CFont;
-        *fontSlot = font;
-        font->Create(File.m_readBuffer, stage);
+        m_fonts[slot] = new (MenuPcs.m_menuStage, const_cast<char*>(kPMenuSourceFile), 0xF8) CFont;
+        m_fonts[slot]->Create(File.m_readBuffer, stage);
 
         File.Close(fileHandle);
     }
 
     if (tlutMode < 2) {
-        CFont* font = *fontSlot;
         MenuFontTlutPalette* palette = &sMenuFontTlutPaletteTable[tlutMode * 0x1C];
 
         for (int colorIndex = 0; colorIndex < 0x10; colorIndex++) {
@@ -555,14 +551,14 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
                                               static_cast<float>(palette[tlutIndex].highlight.b) * blend);
                 }
 
-                font->SetTlutColor(tlutIndex, colorIndex, color);
+                m_fonts[slot]->SetTlutColor(tlutIndex, colorIndex, color);
 
                 color.a = sMenuFontSecondaryAlphaTable[colorIndex];
-                font->SetTlutColor(tlutIndex + 0x1C, colorIndex, color);
+                m_fonts[slot]->SetTlutColor(tlutIndex + 0x1C, colorIndex, color);
             }
         }
 
-        font->FlushTlutColor();
+        m_fonts[slot]->FlushTlutColor();
     }
 }
 

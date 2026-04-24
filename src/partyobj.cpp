@@ -27,6 +27,12 @@ static const char s_partyObjStateFmt[] = "mode:%d stat:%d sub:%d frame:%d alive:
 static const char s_partyBonusCountFmt[] = "SetBonusCondition num:%d";
 static const char s_partyBonusRandomFmt[] = "SetBonusCondition slot:%d idx:%d bonus:%d";
 static const char s_partyBonusFixedFmt[] = "SetBonusCondition slot:%d bonus:%d";
+static const char s_partyBonusKind0Fmt[] = "bonus kind0:%d";
+static const char s_partyBonusKind1Fmt[] = "bonus kind1:%d";
+static const char s_partyBonusKind4Fmt[] = "bonus kind4:%d";
+static const char s_partyBonusAddFmt[] = "bonus slot:%d add:%d";
+static const char s_partyBonusSubFmt[] = "bonus slot:%d sub:%d";
+static const char s_partyBonusUnknownFmt[] = "bonus unknown";
 
 extern float FLOAT_80331a78;
 extern float FLOAT_80331a54;
@@ -1518,14 +1524,204 @@ void CGPartyObj::statPickup()
  */
 void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 {
-	(void)source;
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if (kind == 0) {
-		*reinterpret_cast<int*>(self + 0x6F8) = value;
-	} else if (kind == 1) {
-		addHp(value, (CGPrgObj*)0);
+	if (source != nullptr && (source->GetCID() & 0x2D) != 0x2D) {
+		return;
 	}
-	commandFinished();
+
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	if (script == nullptr) {
+		return;
+	}
+
+	unsigned int bonusSlot = script[0xBA4];
+	unsigned int addValue = 0;
+	unsigned int subValue = 0;
+	unsigned short currentAdd = *reinterpret_cast<unsigned short*>(script + 0xBCA);
+	unsigned short currentSub = *reinterpret_cast<unsigned short*>(script + 0xBCC);
+	int stageEntry = Game.m_bossArtifactBase + Game.m_gameWork.m_bossArtifactStageIndex * 0x168 + bonusSlot * 8;
+	unsigned int stageAdd = *reinterpret_cast<unsigned short*>(stageEntry + 0x66);
+	unsigned int stageSub = *reinterpret_cast<unsigned short*>(stageEntry + 0x68);
+
+	if (kind == 0) {
+		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC8);
+		Printf__7CSystemFPce(&System, s_partyBonusKind0Fmt, count + 1);
+		*reinterpret_cast<unsigned short*>(script + 0xBC8) = count + 1;
+	}
+	if (kind == 1) {
+		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC4);
+		Printf__7CSystemFPce(&System, s_partyBonusKind1Fmt, count + 1);
+		*reinterpret_cast<unsigned short*>(script + 0xBC4) = count + 1;
+	}
+	if (kind == 4) {
+		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC6);
+		Printf__7CSystemFPce(&System, s_partyBonusKind4Fmt, count + 1);
+		*reinterpret_cast<unsigned short*>(script + 0xBC6) = count + 1;
+	}
+
+	switch (bonusSlot) {
+	default:
+		break;
+	case 0:
+		if (kind == 2 && (System.m_frameCounter % 30) == 0) {
+			addValue = stageAdd;
+		}
+		break;
+	case 1:
+		if (kind == 3) {
+			addValue = stageAdd;
+		}
+		break;
+	case 2:
+	case 4:
+	case 6:
+		if (kind == 4) {
+			unsigned short item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48);
+			if ((bonusSlot == 4 && item == 0x100) || (bonusSlot == 6 && item == 400)) {
+				addValue = stageAdd;
+			} else if (bonusSlot == 2) {
+				switch (item) {
+				case 0x9F:
+				case 0xB6:
+				case 0xCC:
+				case 0xDB:
+				case 0xDF:
+				case 0xE4:
+				case 0x100:
+				case 0x125:
+				case 0x126:
+				case 0x127:
+				case 0x12A:
+				case 0x17D:
+				case 0x186:
+				case 0x191:
+					addValue = stageAdd;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		break;
+	case 3:
+	case 0xE:
+		if (kind == 5) {
+			short item = *reinterpret_cast<short*>(Game.unkCFlatData0[2] + value * 0x48);
+			if ((bonusSlot == 0xE && (item == 0x17D || item == 0x186)) ||
+			    (bonusSlot == 3 && item != 0x17D && item != 0x186)) {
+				addValue = stageAdd;
+			}
+		}
+		break;
+	case 7:
+		if (kind == 10) {
+			addValue = stageAdd;
+		}
+		break;
+	case 8:
+		if (kind == 0x0B) {
+			addValue = stageAdd;
+		}
+		break;
+	case 9:
+		if (kind == 0x0C) {
+			addValue = stageAdd;
+		}
+		break;
+	case 10:
+		if ((unsigned int)(kind - 0x12) < 3 || kind == 0x15) {
+			subValue = stageSub;
+		}
+		if (kind == 0x17) {
+			addValue = stageAdd;
+		}
+		break;
+	case 0x0B:
+		if ((unsigned int)(kind - 0x0E) < 3 || kind == 0x11) {
+			addValue = stageAdd;
+		}
+		break;
+	case 0x0C:
+		if ((unsigned int)(kind - 0x12) < 3 || kind == 0x15) {
+			subValue = stageSub;
+		}
+		break;
+	case 0x0D:
+		if (kind == 0x12) {
+			unsigned short item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48 + 8);
+			if (item == 0x24 || item == 0x25 || item == 0x69 || item == 0x6A) {
+				addValue = stageAdd;
+			}
+		}
+		break;
+	case 0x0F:
+		if (kind == 9) {
+			subValue = stageSub;
+		}
+		break;
+	case 0x10:
+		if (kind == 0x18) {
+			subValue = stageSub;
+		}
+		break;
+	case 0x11:
+		if (kind == 0x19) {
+			subValue = stageSub;
+		}
+		break;
+	case 0x12:
+	case 0x13:
+		if (kind == 0x16 &&
+		    ((bonusSlot == 0x12 && source == this) || (bonusSlot == 0x13 && source != this))) {
+			subValue = stageSub;
+		}
+		break;
+	case 0x14:
+		if (kind == 4) {
+			subValue = stageSub;
+		}
+		break;
+	case 0x15:
+		Printf__7CSystemFPce(&System, s_partyBonusUnknownFmt);
+		break;
+	case 0x16:
+		if (kind == 0x14) {
+			addValue = stageAdd;
+		}
+		break;
+	case 0x17:
+		if (kind == 1 && source != nullptr && source->m_scriptHandle != nullptr && source->m_scriptHandle[9] != nullptr &&
+		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(source->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
+			addValue = stageAdd;
+		}
+		break;
+	case 0x18:
+		if (kind == 1) {
+			subValue = stageSub;
+		}
+		break;
+	}
+
+	if (addValue != 0) {
+		unsigned int total = currentAdd + addValue;
+		if (total > 100) {
+			total = 100;
+		}
+		if (bonusSlot != 0) {
+			Printf__7CSystemFPce(&System, s_partyBonusAddFmt, bonusSlot, total);
+		}
+		*reinterpret_cast<unsigned short*>(script + 0xBCA) = static_cast<unsigned short>(total);
+	}
+
+	if (subValue != 0) {
+		int total = static_cast<int>(currentSub) - static_cast<int>(subValue);
+		if (total < 0) {
+			total = 0;
+		} else if (total > 100) {
+			total = 100;
+		}
+		Printf__7CSystemFPce(&System, s_partyBonusSubFmt, bonusSlot, total);
+		*reinterpret_cast<unsigned short*>(script + 0xBCC) = static_cast<unsigned short>(total);
+	}
 }
 
 /*

@@ -221,14 +221,11 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
 
     work = (TracerWork*)(pppYmTracer->m_serializedData + *param_3->m_serializedDataOffsets);
     entries = work->entries;
-
     if (entries == 0) {
-        entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)*(u16*)(param_2->m_payload + 4) * sizeof(TRACE_POLYGON), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmTracer_cpp_801d9ce0), 0xEB);
-        work->entries = entries;
         fVar3 = FLOAT_803306e8;
-
         entry = work->entries;
         for (i = 0; i < (s32)(u32)*(u16*)(param_2->m_payload + 4); i++) {
             entry->life = -1;
@@ -242,7 +239,6 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             entry->to.x = fVar3;
             entry++;
         }
-        entries = work->entries;
     }
 
     if (param_2->m_graphId == pppYmTracer->m_graphId) {
@@ -265,6 +261,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         work->arg3Work = valuePtr;
     }
 
+    entries = work->entries;
     if (work->count + 1 < *(u16*)(param_2->m_payload + 4)) {
         source = entries + (*(u16*)(param_2->m_payload + 4) - 2);
         for (i = *(u16*)(param_2->m_payload + 4) - 2; i >= 0; i--) {
@@ -284,24 +281,24 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         entries[0].to.y = fVar3;
         entries[0].to.x = fVar3;
 
-        {
-            f32* from = work->initWork;
-            f32* to = work->arg3Work;
-
-            work->from.x = from[0];
-            work->from.y = from[1];
-            work->from.z = from[2];
-            entries[0].from.x = from[0];
-            entries[0].from.y = from[1];
-            entries[0].from.z = from[2];
-
-            work->to.x = to[0];
-            work->to.y = to[1];
-            work->to.z = to[2];
-            entries[0].to.x = to[0];
-            entries[0].to.y = to[1];
-            entries[0].to.z = to[2];
-        }
+        fVar3 = work->initWork[0];
+        work->from.x = fVar3;
+        entries[0].from.x = fVar3;
+        fVar3 = work->initWork[1];
+        work->from.y = fVar3;
+        entries[0].from.y = fVar3;
+        fVar3 = work->initWork[2];
+        work->from.z = fVar3;
+        entries[0].from.z = fVar3;
+        fVar3 = work->arg3Work[0];
+        work->to.x = fVar3;
+        entries[0].to.x = fVar3;
+        fVar3 = work->arg3Work[1];
+        work->to.y = fVar3;
+        entries[0].to.y = fVar3;
+        fVar3 = work->arg3Work[2];
+        work->to.z = fVar3;
+        entries[0].to.z = fVar3;
 
         entries[0].life = *(u16*)(param_2->m_payload + 6);
         entries[0].alpha = param_2->m_payload[8];

@@ -403,6 +403,12 @@ void birth(
     particleData->m_sizeStart = *(float*)(payload + 0x84);
     particleData->m_sizeEnd = *(float*)(payload + 0x88);
     particleData->m_sizeVal = *(float*)(payload + 0x8C);
+    particleData->m_directionTail.z = *(float*)(payload + 0x8C);
+    particleData->m_colorDeltaAdd[0] = *(float*)(payload + 0x90);
+    particleData->m_colorDeltaAdd[1] = *(float*)(payload + 0x94);
+    particleData->m_colorDeltaAdd[2] = *(float*)(payload + 0x98);
+    particleData->m_colorDeltaAdd[3] = *(float*)(payload + 0x9C);
+    particleData->m_sizeStart = *(float*)(payload + 0xA0);
 
     *s16_at(particleData, 0x22) = (*(s16*)(payload + 0x26) == 0) ? -1 : *(s16*)(payload + 0x26);
     *s16_at(particleData, 0x1C) = 0;
@@ -417,8 +423,8 @@ void birth(
         *f32_at(particleData, 0x98) = *(float*)(payload + 0x98);
     }
 
-    if ((particleWMat != NULL) && (payload[0x136] != 0)) {
-        PSMTXCopy(pObject->m_localMatrix.value, *(Mtx*)particleWMat);
+    if (particleWMat != NULL) {
+        PSMTXCopy(pppMngStPtr->m_matrix.value, *(Mtx*)particleWMat);
     }
 
     if (particleColor != NULL) {

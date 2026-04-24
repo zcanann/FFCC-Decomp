@@ -558,9 +558,9 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     if (*(void**)(work + 0x30) == NULL) {
         int* groupTable;
 
+        *(int*)(work + 0x40) = (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x1E);
         *(short*)(work + 0x56) = *(short*)((unsigned char*)pYmBreath + 0x12);
         *(short*)(work + 0x54) = *(short*)((unsigned char*)pYmBreath + 0x14);
-        *(int*)(work + 0x40) = (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x1E);
 
         *(void**)(work + 0x30) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) * 0x60), pppEnvStPtr->m_stagePtr,

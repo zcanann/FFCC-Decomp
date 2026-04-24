@@ -1915,6 +1915,21 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0xF0: {
+        unsigned int flags = 0;
+        int spawnGroup = *object->m_localBase;
+        int spawnBit = object->m_localBase[1];
+
+        if (spawnGroup >= 0 && spawnGroup <= 8 && spawnBit >= 0 && spawnBit < 32) {
+            flags =
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12F4 + spawnGroup * 8) &
+                (1u << spawnBit);
+        }
+
+        runtime->push(object, flags);
+        outResult = 0;
+        return;
+    }
     case -0xEF:
         AStar.calcAStar();
         runtime->push(object, 0);
@@ -1954,6 +1969,13 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0xEB:
+        CGPartyObj::SetBonusCondition(
+            *object->m_localBase, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3],
+            object->m_localBase[4]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0xEA:
         CharaPcs.SetSpecularAlpha(*object->m_localBase);
         runtime->push(object, 0);

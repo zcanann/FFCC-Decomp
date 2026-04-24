@@ -96,7 +96,7 @@ public:
     void changeWeapon(int, int, int);
 
     void CheckGameOver();
-    void SetBonusCondition(int, int, int, int, int);
+    static void SetBonusCondition(int, int, int, int, int);
 
     void InitFinished();
     bool IsDispRader();

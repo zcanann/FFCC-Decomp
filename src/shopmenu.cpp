@@ -594,6 +594,11 @@ static void SetupShopMenuLabelFont(CFont* font, _GXColor* color)
     SetColor__5CFontF8_GXColor(font, color);
 }
 
+static inline CFont* GetShopMenuInfoPanelFont()
+{
+    return *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
+}
+
 static void DrawShopMenuCenteredText(CFont* font, const char* text, float centerX, float y)
 {
     if (text == 0) {
@@ -2538,7 +2543,7 @@ void CShopMenu::DrawItemInfo0()
         DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), itemNo, 0x40, 100, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
     }
 
-    CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
+    CFont* font = GetShopMenuInfoPanelFont();
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScaleX__5CFontFf(FLOAT_80332d2c, font);
@@ -2586,7 +2591,11 @@ void CShopMenu::DrawItemInfo0()
 
     if ((ShopMenuInt(this, 0x10) == 1) && (listType == 0)) {
         int amount = ShopMenuInt(this, 0x44);
-        SetupShopMenuAmountFont(font, &white);
+        SetShadow__5CFontFi(font, 1);
+        SetScale__5CFontFf(FLOAT_80332d28, font);
+        SetColor__5CFontF8_GXColor(font, &white);
+        DrawInit__5CFontFv(font);
+        reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
         SetMargin__5CFontFf(FLOAT_80332d34, font);
         char countBuffer[64];
         sprintf(countBuffer, DAT_80332d18, amount);
@@ -2624,7 +2633,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         return;
     }
 
-    CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0xF8);
+    CFont* font = GetShopMenuInfoPanelFont();
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScaleX__5CFontFf(FLOAT_80332d2c, font);

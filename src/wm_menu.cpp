@@ -14,6 +14,7 @@
 #include "ffcc/p_light.h"
 #include "ffcc/partMng.h"
 #include "ffcc/THPSimple.h"
+#include "ffcc/joybus.h"
 
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
@@ -211,6 +212,70 @@ struct Vec4d
 	float z;
 	float w;
 };
+
+struct WmCharaSelectEntry
+{
+	int m_padType;                   // 0x00
+	short m_currentSlot;             // 0x04
+	short m_displaySlot;             // 0x06
+	unsigned short m_disconnectTime; // 0x08
+	unsigned char m_confirmed;       // 0x0A
+	unsigned char m_cmakePending;    // 0x0B
+	unsigned char m_cmakeReady;      // 0x0C
+	unsigned char m_connected;       // 0x0D
+	unsigned short _pad0E;           // 0x0E
+};
+
+STATIC_ASSERT(sizeof(WmCharaSelectEntry) == 0x10);
+
+struct GbaCMakeInfoRaw
+{
+	unsigned char m_active;        // 0x00
+	unsigned char m_commandType;   // 0x01
+	unsigned short m_packetCount;  // 0x02
+	short m_crc;                   // 0x04
+	unsigned char m_channelSlot;   // 0x06
+	char m_name[17];               // 0x07
+	unsigned char m_charaType;     // 0x18
+	unsigned char m_birthMonth;    // 0x19
+	unsigned char m_birthDay;      // 0x1A
+	unsigned char m_favoriteBits[4]; // 0x1B
+	unsigned char m_jobType;       // 0x1F
+};
+
+STATIC_ASSERT(sizeof(GbaCMakeInfoRaw) == 0x20);
+
+static inline WmCharaSelectEntry* GetWmCharaSelectEntries(CMenuPcs* menu)
+{
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menu);
+	return reinterpret_cast<WmCharaSelectEntry*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+}
+
+static inline unsigned char* GetWmCharaModelData(CMenuPcs* menu)
+{
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menu);
+	return reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+}
+
+static inline int* GetWmCharaAnimState(CMenuPcs* menu)
+{
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menu);
+	return reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]);
+}
+
+static inline short* GetWmWorldState(CMenuPcs* menu)
+{
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menu);
+	return reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+}
+
+static inline void QueueWmCharaAnimState(CMenuPcs* menu, int slot, int state)
+{
+	if (slot < 0 || slot >= 8) {
+		return;
+	}
+	GetWmCharaAnimState(menu)[slot * 5 + 1] = state;
+}
 
 static void releaseRefCounted(void** refObj)
 {
@@ -6047,126 +6112,378 @@ int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
 void CMenuPcs::CalcCharaSelect()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	*reinterpret_cast<short*>(bytes + 0x74) = *reinterpret_cast<short*>(bytes + 0x74) + 1;
+	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
+	unsigned char* const modelData = GetWmCharaModelData(this);
+	int* const animState = GetWmCharaAnimState(this);
+	short* const worldState = GetWmWorldState(this);
 
-	unsigned int clz = __cntlzw((unsigned int)Game.m_gameWork.m_menuStageMode);
-	if ((int)(((clz >> 5) + 2) * 0x4B) <= (int)*reinterpret_cast<short*>(bytes + 0x74)) {
+	unsigned short padTrig[4];
+	unsigned short padRepeat[4];
+
+	*reinterpret_cast<short*>(bytes + 0x74) = static_cast<short>(*reinterpret_cast<short*>(bytes + 0x74) + 1);
+	const unsigned int clz = __cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_menuStageMode));
+	if (static_cast<int>(((clz >> 5) + 2) * 0x4B) <= static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74))) {
 		*reinterpret_cast<short*>(bytes + 0x74) = 0;
 	}
 
-	// Read pad states for each port
-	unsigned short padTrig[4];
-	unsigned short padHeld[4];
 	for (int i = 0; i < 4; i++) {
-		int padState = *reinterpret_cast<int*>(bytes + 0x828) + i * 0x10;
+		WmCharaSelectEntry& entry = selectEntries[i];
 		padTrig[i] = 0;
-		padHeld[i] = 0;
-		if (i == 0 || Game.m_gameWork.m_menuStageMode == 0) {
-			int padType = GetPadType__7CJoybusFi(&Joybus, i);
-			*reinterpret_cast<int*>(padState) = padType;
-			if (padType == 0x9000000 || padType == -0x74F00000 || padType == -0x78000000) {
-				if (Game.m_gameWork.m_menuStageMode == 0) {
-					*reinterpret_cast<char*>(padState + 0x0D) = 0;
-				} else {
-					*reinterpret_cast<char*>(padState + 0x0D) = 1;
-				}
+		padRepeat[i] = 0;
+
+		if ((i == 0) || (Game.m_gameWork.m_menuStageMode == 0)) {
+			entry.m_padType = Joybus.GetPadType(i);
+			if ((entry.m_padType == 0x09000000) || (entry.m_padType == -0x74F00000) ||
+			    (entry.m_padType == -0x78000000)) {
+				entry.m_connected = static_cast<unsigned char>(Game.m_gameWork.m_menuStageMode != 0);
 			} else {
-				*reinterpret_cast<char*>(padState + 0x0D) = GetGBAConnect__7CJoybusFi(&Joybus, i);
+				entry.m_connected = static_cast<unsigned char>(Joybus.GetGBAConnect(i));
+			}
+
+			if (entry.m_connected != 0 && entry.m_cmakePending == 0) {
+				padTrig[i] = GetButtonDown(i);
+				padRepeat[i] = GetButtonRepeat(i);
 			}
 		} else {
-			*reinterpret_cast<char*>(padState + 0x0D) = 0;
+			entry.m_connected = 0;
 		}
 	}
 
-	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-	if (*reinterpret_cast<short*>(worldState + 0x10) == 2 &&
-	    *reinterpret_cast<short*>(worldState + 0x1E) == 0) {
-		short winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
-		if (winState == 3) {
-			// Character slot assignment and model loading
-			unsigned int charMask = 0;
-			int padBase = *reinterpret_cast<int*>(bytes + 0x828);
-			if (Game.m_gameWork.m_menuStageMode == 0) {
-				for (int j = 0; j < 4; j++) {
-					int ps = padBase + j * 0x10;
-					if (*reinterpret_cast<char*>(ps + 0x0B) != 0) {
-						charMask |= 1 << (int)*reinterpret_cast<short*>(ps + 4);
+	if (worldState[8] != 2 || worldState[0x0F] != 0) {
+		return;
+	}
+
+	const short winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+	if (winState == 3) {
+		unsigned int pendingMask = 0;
+		if (Game.m_gameWork.m_menuStageMode == 0) {
+			for (int i = 0; i < 4; i++) {
+				if (selectEntries[i].m_cmakePending != 0 && selectEntries[i].m_currentSlot >= 0) {
+					pendingMask |= 1u << static_cast<unsigned int>(selectEntries[i].m_currentSlot);
+				}
+			}
+		}
+
+		for (int i = 0; i < 4; i++) {
+			WmCharaSelectEntry& entry = selectEntries[i];
+			if (Game.m_gameWork.m_menuStageMode != 0) {
+				break;
+			}
+
+			if (entry.m_connected == 0) {
+				GbaQue.ClrCmakeInfo(i);
+				if (entry.m_cmakeReady != 0) {
+					entry.m_cmakeReady = 0;
+				} else if ((entry.m_currentSlot >= 0) &&
+				           ((pendingMask & (1u << static_cast<unsigned int>(entry.m_currentSlot))) != 0)) {
+					continue;
+				}
+
+				if (entry.m_currentSlot >= 0 &&
+				    Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState == 0 &&
+				    IsModelLoaded__Q29CCharaPcs7CHandleFi(reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[entry.m_currentSlot]), 1) != 0 &&
+				    reinterpret_cast<int*>(reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[entry.m_currentSlot]))[0] != 3 &&
+				    entry.m_cmakeReady == 0) {
+					if (static_cast<unsigned int>(System.m_execParam) > 2) {
+						Printf__7CSystemFPce(&System, s_SetCMakeEnd___chan____d_cur____d_801dc3b4, i,
+						                     static_cast<int>(entry.m_currentSlot));
 					}
+					modelData[entry.m_currentSlot * 0x34 + 0x0C] = 0;
+					LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
+					    reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[entry.m_currentSlot]),
+					    3, 0x43, 0);
+				}
+			} else if (entry.m_cmakePending == 0 && Joybus.GetMType(i) == 1) {
+				Joybus.SetMType(i, 4);
+			}
+		}
+
+		unsigned int confirmedSlotMask = 0;
+		for (int i = 0; i < 4; i++) {
+			if (selectEntries[i].m_confirmed != 0 && selectEntries[i].m_currentSlot >= 0) {
+				confirmedSlotMask |= 1u << static_cast<unsigned int>(selectEntries[i].m_currentSlot);
+			}
+		}
+
+		int connectedCount = 0;
+		int locallyConfirmedCount = 0;
+		for (int i = 0; i < 4; i++) {
+			WmCharaSelectEntry& entry = selectEntries[i];
+			if (entry.m_connected != 0) {
+				connectedCount++;
+				if (entry.m_confirmed != 0 &&
+				    Game.m_caravanWorkArr[entry.m_currentSlot].m_caravanLocalFlags != 0) {
+					locallyConfirmedCount++;
 				}
 			}
+		}
 
-			// Process pad disconnect/reconnect
-			for (int j = 0; j < 4; j++) {
-				if (Game.m_gameWork.m_menuStageMode != 0) break;
-				int ps = padBase + j * 0x10;
-				if (*reinterpret_cast<char*>(ps + 0x0D) == 0) {
-					ClrCmakeInfo__8GbaQueueFi(&GbaQue, j);
-					if (*reinterpret_cast<char*>(ps + 0x0C) == 1) {
-						*reinterpret_cast<char*>(ps + 0x0C) = 0;
+		bool requestCancel = false;
+		bool requestFinalize = false;
+		for (int i = 3; i >= 0; i--) {
+			WmCharaSelectEntry& entry = selectEntries[i];
+			if (entry.m_cmakeReady != 0) {
+				GbaCMakeInfoRaw info;
+				entry.m_confirmed = 1;
+				entry.m_cmakePending = 0;
+				entry.m_cmakeReady = 0;
+				GbaQue.GetCMakeInfo(i, reinterpret_cast<GbaCMakeInfo*>(&info));
+
+				const int caravanSlot = static_cast<int>(info.m_channelSlot);
+				const int appearance = static_cast<int>((info.m_charaType >> 2) & 3);
+				int modelNo = static_cast<int>(info.m_charaType & 3) * 200 + 100;
+				if ((info.m_charaType >> 7) != 0) {
+					modelNo += 100;
+				}
+				modelNo += appearance;
+
+				modelData[caravanSlot * 0x34 + 8] = static_cast<unsigned char>(modelNo);
+				modelData[caravanSlot * 0x34 + 9] = static_cast<unsigned char>(modelNo >> 8);
+				modelData[caravanSlot * 0x34 + 10] = static_cast<unsigned char>(modelNo >> 16);
+				modelData[caravanSlot * 0x34 + 11] = static_cast<unsigned char>(modelNo >> 24);
+
+				CCaravanWork& caravanWork = Game.m_caravanWorkArr[caravanSlot];
+				caravanWork.LoadInit();
+				caravanWork.m_shopState = 1;
+				caravanWork.unk_0x3a8 =
+				    (static_cast<unsigned int>(info.m_birthMonth) << 8) | static_cast<unsigned int>(info.m_birthDay);
+				caravanWork.unk_0x3ac = static_cast<int>(info.m_jobType);
+				memset(caravanWork.unk_0x3ca_0x3dd, 0, 0x11);
+				strcpy(reinterpret_cast<char*>(caravanWork.unk_0x3ca_0x3dd), info.m_name);
+				caravanWork.m_tribeId = static_cast<unsigned short>(info.m_charaType & 3);
+				caravanWork.m_appearanceVariant = static_cast<unsigned short>(appearance);
+				caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
+				caravanWork.m_id = static_cast<unsigned short>(modelNo);
+				for (int favorite = 0; favorite < 8; favorite += 4) {
+					const unsigned char v0 = static_cast<unsigned char>(info.m_favoriteBits[favorite >> 1] & 0x0F);
+					unsigned char v1 = info.m_favoriteBits[(favorite + 1) >> 1];
+					if (((favorite + 1) & 1) != 0) {
+						v1 >>= 4;
 					}
+					const unsigned char v2 =
+					    static_cast<unsigned char>(info.m_favoriteBits[(favorite + 2) >> 1] & 0x0F);
+					unsigned char v3 = info.m_favoriteBits[(favorite + 3) >> 1];
+					if (((favorite + 3) & 1) != 0) {
+						v3 >>= 4;
+					}
+
+					caravanWork.m_letterMeta[favorite + 0] =
+					    static_cast<unsigned short>((10 - static_cast<int>(v0)) * 10 - 5);
+					caravanWork.m_letterMeta[favorite + 1] =
+					    static_cast<unsigned short>((10 - static_cast<int>(v1 & 0x0F)) * 10 - 5);
+					caravanWork.m_letterMeta[favorite + 2] =
+					    static_cast<unsigned short>((10 - static_cast<int>(v2)) * 10 - 5);
+					caravanWork.m_letterMeta[favorite + 3] =
+					    static_cast<unsigned short>((10 - static_cast<int>(v3 & 0x0F)) * 10 - 5);
 				}
+
+				const int baseDataIndex =
+				    static_cast<int>(caravanWork.m_genderFlag) + static_cast<int>(caravanWork.m_tribeId) * 2;
+				caravanWork.Init(baseDataIndex,
+				                 reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + baseDataIndex * 0x1D0),
+				                 static_cast<int>(caravanWork.m_appearanceVariant));
+				caravanWork.LoadFinished();
+
+				int stackArgs[2] = {0, caravanSlot};
+				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+				    &CFlat, 0, 1, 4, 3, stackArgs, 0);
+				Sound.PlaySe(0x33, 0x40, 0x7F, 0);
+				QueueWmCharaAnimState(this, caravanSlot, 3);
 			}
 
-			// Count confirmed players
-			unsigned int confirmedMask = 0;
-			for (int j = 0; j < 4; j++) {
-				int ps = padBase + j * 0x10;
-				if (*reinterpret_cast<char*>(ps + 0x0A) != 0) {
-					confirmedMask |= 1 << (int)*reinterpret_cast<short*>(ps + 4);
+			if (entry.m_connected == 0) {
+				if (entry.m_confirmed != 0) {
+					QueueWmCharaAnimState(this, entry.m_currentSlot, 0);
 				}
+				entry.m_confirmed = 0;
+				entry.m_cmakePending = 0;
+				entry.m_cmakeReady = 0;
+				if (entry.m_disconnectTime < 0x3C) {
+					entry.m_disconnectTime++;
+				}
+				padRepeat[i] = 0;
+				padTrig[i] = 0;
+				continue;
 			}
 
-			// Check ready state
-			int padIdx = 0;
-			int readyCount = 0;
-			for (int j = 0; j < 4; j++) {
-				int ps = padBase + j * 0x10;
-				if (*reinterpret_cast<char*>(ps + 0x0B) != 0) {
-					readyCount++;
+			entry.m_disconnectTime = 0;
+			int currentSlot = static_cast<int>(entry.m_currentSlot);
+			if ((padRepeat[i] & 0x000C) != 0) {
+				if (entry.m_confirmed == 0) {
+					currentSlot = (currentSlot < 4) ? currentSlot + 4 : currentSlot - 4;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				}
 			}
+			if ((padRepeat[i] & 0x0002) != 0) {
+				if (entry.m_confirmed == 0) {
+					const int maxSlot = (currentSlot >> 2) == 0 ? 3 : 7;
+					currentSlot = (currentSlot < maxSlot) ? currentSlot + 1 : currentSlot - 3;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				}
+			}
+			if ((padRepeat[i] & 0x0001) != 0) {
+				if (entry.m_confirmed == 0) {
+					currentSlot = (currentSlot > ((currentSlot >> 2) != 0 ? 4 : 0)) ? currentSlot - 1
+					                                                             : currentSlot + 3;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				}
+			}
+			entry.m_currentSlot = static_cast<short>(currentSlot);
 
-			// Handle start button
-			if (readyCount > 0) {
-				for (int j = 0; j < 4; j++) {
-					int ps = padBase + j * 0x10;
-					if (*reinterpret_cast<char*>(ps + 0x0B) != 0) {
-						if ((padTrig[j] & 0x1000) != 0) {
-							// Start pressed - confirm selection
-							if (*reinterpret_cast<char*>(ps + 0x0A) == 0) {
-								*reinterpret_cast<char*>(ps + 0x0A) = 1;
-								Sound.PlaySe(0x42, 0x40, 0x7F, 0);
+			if ((padRepeat[i] & 0x006F) == 0) {
+				if ((padTrig[i] & 0x0100) != 0) {
+					if (Game.m_caravanWorkArr[currentSlot].m_shopBusyFlag != 0) {
+						Sound.PlaySe(4, 0x40, 0x7F, 0);
+					} else if (entry.m_confirmed == 0) {
+						const int charaId = *reinterpret_cast<int*>(modelData + currentSlot * 0x34 + 8);
+						if (charaId < 0) {
+							bool duplicatePending = false;
+							for (int other = 0; other < 4; other++) {
+								if (other != i && selectEntries[other].m_cmakePending != 0 &&
+								    selectEntries[other].m_currentSlot == currentSlot) {
+									duplicatePending = true;
+									break;
+								}
+							}
+							if (!duplicatePending) {
+								if (Game.m_gameWork.m_menuStageMode == 0) {
+									GbaQue.InitCmakeInfo(i, currentSlot);
+									entry.m_cmakePending = 1;
+								} else {
+									*reinterpret_cast<short*>(bytes + 0x86A) = static_cast<short>(currentSlot);
+								}
+								Sound.PlaySe(2, 0x40, 0x7F, 0);
+							} else {
+								Sound.PlaySe(4, 0x40, 0x7F, 0);
+							}
+						} else {
+							bool duplicateConfirmed = false;
+							for (int other = 0; other < 4; other++) {
+								if (other != i && selectEntries[other].m_confirmed != 0 &&
+								    selectEntries[other].m_currentSlot == currentSlot) {
+									duplicateConfirmed = true;
+									break;
+								}
+							}
+							if (!duplicateConfirmed) {
+								if (Game.m_caravanWorkArr[currentSlot].m_caravanLocalFlags == 0) {
+									entry.m_confirmed = 1;
+									Sound.PlaySe(0x33, 0x40, 0x7F, 0);
+									QueueWmCharaAnimState(this, currentSlot, 3);
+								} else if (Game.m_gameWork.m_menuStageMode == 0 && connectedCount > locallyConfirmedCount + 1) {
+									entry.m_confirmed = 1;
+									locallyConfirmedCount++;
+									Sound.PlaySe(0x33, 0x40, 0x7F, 0);
+									QueueWmCharaAnimState(this, currentSlot, 3);
+								} else {
+									Sound.PlaySe(4, 0x40, 0x7F, 0);
+								}
+							} else {
+								Sound.PlaySe(4, 0x40, 0x7F, 0);
 							}
 						}
-						if ((padTrig[j] & 0x2000) != 0) {
-							// B pressed - cancel
-							if (*reinterpret_cast<char*>(ps + 0x0A) != 0) {
-								*reinterpret_cast<char*>(ps + 0x0A) = 0;
-								Sound.PlaySe(0x43, 0x40, 0x7F, 0);
-							}
-						}
+					} else {
+						Sound.PlaySe(4, 0x40, 0x7F, 0);
 					}
+				} else if ((padTrig[i] & 0x0200) != 0) {
+					if (entry.m_confirmed == 0) {
+						requestCancel = true;
+					} else {
+						entry.m_confirmed = 0;
+						QueueWmCharaAnimState(this, currentSlot, 0);
+						Sound.PlaySe(0x34, 0x40, 0x7F, 0);
+					}
+				} else if ((padTrig[i] & 0x1000) != 0) {
+					requestFinalize = true;
 				}
 			}
+		}
 
-			// Check all confirmed
-			int confirmedCount = 0;
-			int totalJoined = 0;
-			for (int j = 0; j < 4; j++) {
-				int ps = padBase + j * 0x10;
-				if (*reinterpret_cast<char*>(ps + 0x0B) != 0) {
-					totalJoined++;
-					if (*reinterpret_cast<char*>(ps + 0x0A) != 0) {
-						confirmedCount++;
-					}
+		if (requestCancel) {
+			bool anySelected = false;
+			for (int i = 0; i < 4; i++) {
+				if ((selectEntries[i].m_confirmed != 0) || (selectEntries[i].m_cmakePending != 0)) {
+					anySelected = true;
+					break;
 				}
 			}
-			if (confirmedCount > 0 && confirmedCount == totalJoined) {
-				// All players confirmed - advance state
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1E) = 1;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x18) = 1;
-				*reinterpret_cast<short*>(bytes + 0x870) = 3;
+			if (anySelected) {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
+			} else {
+				worldState[0x0F] = -1;
+				worldState[0x0C] = 10;
+				Sound.PlaySe(3, 0x40, 0x7F, 0);
 			}
+		}
+
+		if (requestFinalize) {
+			unsigned int activeMask = 0;
+			for (int i = 0; i < 4; i++) {
+				if (selectEntries[i].m_confirmed != 0) {
+					activeMask++;
+				}
+			}
+			if (activeMask <= static_cast<unsigned int>(locallyConfirmedCount)) {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
+			} else {
+				Sound.PlaySe(2, 0x40, 0x7F, 0);
+				worldState[0x0F] = 1;
+				worldState[0x0C] = 10;
+			}
+		}
+
+		unsigned int finishedMask = 0;
+		unsigned int readyMask = 0;
+		for (int i = 0; i < 4; i++) {
+			if (selectEntries[i].m_confirmed != 0) {
+				finishedMask |= 1u << i;
+			}
+			if (selectEntries[i].m_connected == 0 && selectEntries[i].m_disconnectTime < 0x1E) {
+				readyMask |= 1u << i;
+			}
+		}
+		if ((Game.m_gameWork.m_menuStageMode == 0 || *reinterpret_cast<short*>(bytes + 0x86A) < 0) &&
+		    finishedMask != 0 && finishedMask == readyMask) {
+			worldState[0x0F] = 1;
+			worldState[0x0C] = static_cast<short>(FLOAT_8032ee18);
+		} else if (Game.m_gameWork.m_menuStageMode != 0 && *reinterpret_cast<short*>(bytes + 0x86A) >= 0) {
+			worldState[0x0F] = 1;
+			worldState[0x0C] = 10;
+		}
+
+		if (worldState[0x0F] != 0) {
+			GbaQue.SetControllerMode(1);
+			for (int i = 0; i < 4; i++) {
+				if (selectEntries[i].m_cmakePending != 0) {
+					selectEntries[i].m_confirmed = 0;
+					selectEntries[i].m_cmakePending = 0;
+					selectEntries[i].m_cmakeReady = 0;
+				}
+			}
+		}
+	} else {
+		unsigned short anyTrig = 0;
+		for (int i = 0; i < 4; i++) {
+			anyTrig = static_cast<unsigned short>(anyTrig | padTrig[i]);
+		}
+		if (winState == 1 && (anyTrig & 0x0300) != 0) {
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+			for (int i = 0; i < 4; i++) {
+				WmCharaSelectEntry& entry = selectEntries[i];
+				if (entry.m_confirmed != 0) {
+					QueueWmCharaAnimState(this, entry.m_currentSlot, 0);
+				}
+				entry.m_confirmed = 0;
+				entry.m_cmakePending = 0;
+				entry.m_cmakeReady = 0;
+			}
+			Sound.PlaySe(2, 0x40, 0x7F, 0);
 		}
 	}
 }

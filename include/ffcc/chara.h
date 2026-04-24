@@ -95,7 +95,7 @@ public:
 		void Create(void*, CMemory::CStage*);
 		void CreateDynamics(void*, CMemory::CStage*);
 		void setup();
-		void Duplicate(CMemory::CStage*);
+		CChara::CModel* Duplicate(CMemory::CStage*);
 		void calcBindMatrix();
 		void CalcMatrix();
 		void CalcSkin();

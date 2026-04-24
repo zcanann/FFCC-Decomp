@@ -13,6 +13,7 @@
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
+extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawMcWin__8CMenuPcsFss(CMenuPcs*, short, short);
 extern "C" void DrawMcWinMess__8CMenuPcsFii(CMenuPcs*, int, int);
@@ -132,6 +133,7 @@ static const char* GetBonusPartyNameByActiveIndex(int activeIndex);
 static CCaravanWork* GetBonusActiveCaravanByActiveIndex(int activeIndex);
 static int GetBonusResultValueByActiveIndex(int activeIndex);
 static const char* GetBonusResultLabelByActiveIndex(int activeIndex);
+static void SetBonusPartyModelAlpha(CMenuPcs* menu, int modelIndex, float alpha);
 
 static void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, short w, short h, int startFrame, int duration)
 {
@@ -158,6 +160,35 @@ static void ResetAnimSpriteMotion(BonusAnimSprite* sprite)
 	sprite->alpha = 0.0f;
 	sprite->depth = 0.0f;
 	sprite->scale = 1.0f;
+}
+
+static float s_bonusArtiBasePosStorage0[16];
+static float s_bonusArtiBasePosStorage1[16];
+
+static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* sprite)
+{
+	if (out == 0 || sprite == 0) {
+		return;
+	}
+
+	float baseX = (float)sprite->x + sprite->mulX + 28.0f;
+	float baseY = (float)sprite->y + sprite->mulY + 36.0f;
+	const float stepX = 72.0f;
+	const float stepY = 104.0f;
+
+	for (int i = 0; i < 8; i++) {
+		out[i * 2 + 0] = baseX + (float)(i & 3) * stepX;
+		out[i * 2 + 1] = baseY + (float)((i >> 2) & 1) * stepY;
+	}
+}
+
+static float* GetBonusArtiBasePositions(const BonusAnimSprite* sprite)
+{
+	gBonusCheckMarkPosBuffer[0] = s_bonusArtiBasePosStorage0;
+	gBonusCheckMarkPosBuffer[1] = s_bonusArtiBasePosStorage1;
+	FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[0], sprite);
+	memcpy(gBonusCheckMarkPosBuffer[1], gBonusCheckMarkPosBuffer[0], sizeof(s_bonusArtiBasePosStorage1));
+	return gBonusCheckMarkPosBuffer[0];
 }
 
 static void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, short y)
@@ -288,7 +319,50 @@ static void DrawBonusTexturedSprite(CMenuPcs* menu, const BonusAnimSprite* sprit
 	}
 }
 
-static void DrawBonusPartyModel(CMenuPcs* menu, int modelIndex)
+static void DrawBonusSweepSprite(CMenuPcs* menu, const BonusAnimSprite* sprite, float alpha, bool opening)
+{
+	if (menu == 0 || sprite == 0 || alpha <= 0.0f) {
+		return;
+	}
+
+	float width = (float)sprite->w;
+	float height = (float)sprite->h;
+	int duration = (sprite->duration > 0) ? sprite->duration : 1;
+	float timer = (sprite->timer > 0) ? (float)(sprite->timer - 1) : 0.0f;
+	float progress = ClampBonusUnit(timer / (float)duration);
+	float fillWidth = (opening ? progress : (1.0f - progress)) * width;
+	float fadeWidth = width / (float)duration;
+	float x = (float)sprite->x + sprite->mulX;
+	float y = (float)sprite->y + sprite->mulY;
+	GXColor solidColors[4] = {
+		{0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)},
+		{0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)},
+		{0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)},
+		{0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)},
+	};
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(menu, sprite->tex);
+	GXSetChanMatColor(GX_COLOR0A0, solidColors[0]);
+
+	if (fillWidth > 0.0f) {
+		DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(menu, 0, x, y, fillWidth, height,
+		    sprite->depth, sprite->depth, solidColors, 1.0f, 1.0f, 0.0f);
+		x += fillWidth;
+	}
+
+	if (fillWidth > 0.0f && fillWidth < width) {
+		GXColor fadeColors[4] = {
+			{0xFF, 0xFF, 0xFF, 0x00},
+			{0xFF, 0xFF, 0xFF, 0x00},
+			{0xFF, 0xFF, 0xFF, 0x00},
+			{0xFF, 0xFF, 0xFF, 0x00},
+		};
+		DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(menu, 0, x, y, fadeWidth, height,
+		    sprite->depth, sprite->depth, fadeColors, 1.0f, 1.0f, 0.0f);
+	}
+}
+
+static void DrawBonusPartyModel(CMenuPcs* menu, int modelIndex, float alpha)
 {
 	int activePartyCount = GetActiveBonusPartyCount();
 
@@ -307,6 +381,7 @@ static void DrawBonusPartyModel(CMenuPcs* menu, int modelIndex)
 		return;
 	}
 
+	SetBonusPartyModelAlpha(menu, modelIndex, ClampBonusUnit(alpha));
 	SetProjection__8CMenuPcsFi(menu, modelIndex);
 	SetLight__8CMenuPcsFi(menu, 1);
 	unsigned int oldFlags = *(unsigned int*)((char*)handle + 8);
@@ -371,6 +446,17 @@ static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 		float y = markPos[i * 2 + 1] + 4.0f;
 		DrawRect__8CMenuPcsFUlfffffffff(menu, 0, x, y, 24.0f, 24.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
+}
+
+static int FindFirstBonusActiveSlot(unsigned char activeMask)
+{
+	for (int i = 0; i < 8; i++) {
+		if ((activeMask & (1 << i)) != 0) {
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAnimSprite* sprites)
@@ -1120,6 +1206,8 @@ void CMenuPcs::DrawResultOpenAnim()
 					font->Draw(partyName);
 				}
 			}
+		} else if (sprite->kind == 0x17) {
+			DrawBonusSweepSprite(this, sprite, alpha, true);
 		} else {
 			GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 			GXSetChanMatColor(GX_COLOR0A0, color);
@@ -1363,7 +1451,7 @@ void CMenuPcs::DrawResultCountAnim()
 		} else if (sprite->kind == -4) {
 			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
 		} else if (sprite->kind == -2) {
-			DrawBonusPartyModel(this, modelIndex++);
+			DrawBonusPartyModel(this, modelIndex++, alpha);
 		} else if (sprite->kind == -5) {
 			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, GetBonusDisplayValueForFrame(statePtr, valueIndex++));
 		} else if (sprite->kind == -1) {
@@ -1647,7 +1735,9 @@ void CMenuPcs::DrawResultCloseAnim()
 		} else if (sprite->kind == -4) {
 			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
 		} else if (sprite->kind == -2) {
-			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, digitIndex++);
+			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, GetBonusResultValueByActiveIndex(digitIndex++));
+		} else if (sprite->kind == 0x17) {
+			DrawBonusSweepSprite(this, sprite, alpha, false);
 		} else {
 			GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 			GXSetChanMatColor(GX_COLOR0A0, color);
@@ -1858,21 +1948,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 			break;
 		case -2:
 			if (modelIndex < activePartyCount) {
-				int basePtr = GetBonusMenuMembers(this).m_bonusListPtr;
-				if (basePtr != 0) {
-					int slotPtr = basePtr + (modelIndex * 0x524);
-					void* handle = *(void**)slotPtr;
-					if (handle != 0) {
-						SetProjection__8CMenuPcsFi(this, modelIndex);
-						SetLight__8CMenuPcsFi(this, 1);
-						unsigned int oldFlags = *(unsigned int*)((char*)handle + 8);
-						*(unsigned int*)((char*)handle + 8) = 0x300543;
-						Draw__Q29CCharaPcs7CHandleFi(handle, 5);
-						*(unsigned int*)((char*)handle + 8) = oldFlags;
-						DrawMenuIdx__8CPartPcsFi(&PartPcs, *(int*)(slotPtr + 4));
-						RestoreProjection__8CMenuPcsFv(this);
-					}
-				}
+				DrawBonusPartyModel(this, modelIndex, alpha);
 			}
 			modelIndex++;
 			break;
@@ -2082,7 +2158,7 @@ void CMenuPcs::DrawSelectWait()
 			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
 			break;
 		case -2:
-			DrawBonusPartyModel(this, modelIndex);
+			DrawBonusPartyModel(this, modelIndex, alpha);
 			modelIndex++;
 			break;
 		default:
@@ -2213,7 +2289,7 @@ void CMenuPcs::DrawSelectCloseAnim()
 			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
 			break;
 		case -2:
-			DrawBonusPartyModel(this, modelIndex);
+			DrawBonusPartyModel(this, modelIndex, alpha);
 			modelIndex++;
 			break;
 		default:
@@ -2244,13 +2320,14 @@ void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprt, int value)
 {
 	BonusAnimSprite* sprite = (BonusAnimSprite*)sprt;
 	int digitValue;
-	int ones;
-	int tens;
-	float fade;
+	int digits[3];
+	int digitCount;
+	float alpha;
 	float baseX;
 	float baseY;
 	float digitW;
 	float digitH;
+	float scale;
 
 	if (sprite == 0) {
 		return;
@@ -2260,35 +2337,39 @@ void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprt, int value)
 	if (digitValue < 0) {
 		digitValue = -digitValue;
 	}
-	digitValue = digitValue % 100;
+	digitValue = digitValue % 1000;
 
-	fade = sprite->alpha;
-	if (fade < 0.0f) {
-		fade = 0.0f;
-	}
-	if (fade > 1.0f) {
-		fade = 1.0f;
-	}
-
-	ones = digitValue % 10;
-	tens = (digitValue / 10) % 10;
+	alpha = ClampBonusUnit(sprite->alpha);
 	baseX = (float)sprite->x + sprite->mulX;
 	baseY = (float)sprite->y + sprite->mulY;
 	digitW = (sprite->w > 0) ? (float)sprite->w : 24.0f;
 	digitH = (sprite->h > 0) ? (float)sprite->h : 24.0f;
+	scale = (sprite->scale > 0.0f) ? sprite->scale : 1.0f;
 
-	sprite->mulX = (float)tens * 0.1f;
-	sprite->mulY = (float)ones * 0.1f;
-	sprite->depth = fade;
-	sprite->scale = 0.95f + (fade * 0.2f);
-
-	if (tens > 0) {
-		DrawBonusFrame(baseX, baseY, digitW, digitH, fade);
+	if (digitValue >= 100) {
+		digitCount = 3;
+		digits[0] = digitValue / 100;
+		digits[1] = (digitValue / 10) % 10;
+		digits[2] = digitValue % 10;
+	} else if (digitValue >= 10) {
+		digitCount = 2;
+		digits[0] = digitValue / 10;
+		digits[1] = digitValue % 10;
+	} else {
+		digitCount = 1;
+		digits[0] = digitValue;
 	}
-	DrawBonusFrame(baseX + digitW * 0.7f, baseY, digitW, digitH, fade);
 
-	if (fade > 0.99f) {
-		DrawBonusChkMark(fade);
+	baseX += ((3.0f * digitW) - ((float)digitCount * digitW)) * 0.5f;
+
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x19);
+	_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+	GXSetChanMatColor(GX_COLOR0A0, color);
+
+	for (int i = 0; i < digitCount; i++) {
+		DrawRect__8CMenuPcsFUlfffffffff(this, 0, baseX + digitW * (float)i, baseY, digitW, digitH,
+		    digitW * (float)digits[i], 0.0f, scale, scale, 0.0f);
 	}
 }
 
@@ -2346,12 +2427,43 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
  */
 void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 {
-	if (sprt == 0) {
+	if (sprt == 0 || alpha <= 0.0f) {
 		return;
 	}
 
-	unsigned int* out = (unsigned int*)sprt;
-	out[0] = (unsigned int)(alpha * 255.0f);
+	BonusAnimSprite* sprite = reinterpret_cast<BonusAnimSprite*>(sprt);
+	float* pos = GetBonusArtiBasePositions(sprite);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int selectedSlot = -1;
+	unsigned char activeMask = 0;
+	float width = (sprite->w > 0) ? (float)sprite->w : 0x70;
+	float height = (sprite->h > 0) ? (float)sprite->h : 0x68;
+
+	if (statePtr != 0) {
+		selectedSlot = (*(short*)(statePtr + 0x26)) & 7;
+		activeMask = *(unsigned char*)(statePtr + 9);
+	}
+
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1A);
+
+	for (int i = 0; i < 8; i++) {
+		float slotAlpha = ClampBonusUnit(alpha);
+
+		if ((activeMask & (1 << i)) != 0) {
+			slotAlpha = ClampBonusUnit(slotAlpha * 0.85f + 0.15f);
+		} else {
+			slotAlpha *= 0.65f;
+		}
+		if (i == selectedSlot) {
+			slotAlpha = ClampBonusUnit(alpha * 1.2f);
+		}
+
+		_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(slotAlpha * 255.0f)};
+		GXSetChanMatColor(GX_COLOR0A0, color);
+		DrawRect__8CMenuPcsFUlfffffffff(this, 0, pos[i * 2 + 0], pos[i * 2 + 1], width, height,
+		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	}
 }
 
 /*
@@ -2363,9 +2475,15 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
 {
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	float* currentPos = gBonusCheckMarkPosBuffer[0];
+	float* previousPos = gBonusCheckMarkPosBuffer[1];
 	float a = alpha;
 	float strongest = a;
-	float pulse;
+	float pulse = 0.0f;
+	float slotAlpha;
+	float slotScale;
+	unsigned char activeMask;
+	int slot;
 
 	if (a < 0.0f) {
 		a = 0.0f;
@@ -2384,6 +2502,22 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
 		}
 	}
 
+	if (statePtr == 0) {
+		GetBonusMenuMembers(this).m_bonusCursorFlag = (unsigned char)(strongest > 0.5f ? 1 : 0);
+		return;
+	}
+
+	activeMask = *(unsigned char*)(statePtr + 9);
+	slot = (*(short*)(statePtr + 0x26)) & 7;
+	if ((activeMask & (1 << slot)) == 0) {
+		slot = FindFirstBonusActiveSlot(activeMask);
+	}
+
+	if (slot < 0 || currentPos == 0) {
+		GetBonusMenuMembers(this).m_bonusCursorFlag = (unsigned char)(strongest > 0.5f ? 1 : 0);
+		return;
+	}
+
 	if (statePtr != 0) {
 		pulse = (float)((*(short*)(statePtr + 0x22)) & 0x1f) / 31.0f;
 		strongest = strongest * (0.85f + pulse * 0.15f);
@@ -2392,6 +2526,28 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
 	if (strongest > 1.0f) {
 		strongest = 1.0f;
 	}
+
+	slotAlpha = ClampBonusUnit(strongest * (0.7f + pulse * 0.3f));
+	slotScale = 0.95f + pulse * 0.15f;
+
+	float currentX = currentPos[slot * 2 + 0] + 2.0f;
+	float currentY = currentPos[slot * 2 + 1] + 2.0f;
+	float drawX = currentX;
+	float drawY = currentY;
+
+	if (previousPos != 0) {
+		float prevX = previousPos[slot * 2 + 0] + 2.0f;
+		float prevY = previousPos[slot * 2 + 1] + 2.0f;
+		drawX = prevX + (currentX - prevX) * a;
+		drawY = prevY + (currentY - prevY) * a;
+	}
+
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x23);
+	_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(slotAlpha * 255.0f)};
+	GXSetChanMatColor(GX_COLOR0A0, color);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, drawX, drawY, 24.0f, 24.0f, 0.0f, 0.0f, slotScale, slotScale, 0.0f);
+
 	GetBonusMenuMembers(this).m_bonusCursorFlag = (unsigned char)(strongest > 0.5f ? 1 : 0);
 }
 
@@ -2406,11 +2562,18 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
  */
 void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 {
+	gBonusCheckMarkPosBuffer[0] = s_bonusArtiBasePosStorage0;
+	gBonusCheckMarkPosBuffer[1] = s_bonusArtiBasePosStorage1;
+	memset(gBonusCheckMarkPosBuffer[0], 0, sizeof(s_bonusArtiBasePosStorage0));
+	memset(gBonusCheckMarkPosBuffer[1], 0, sizeof(s_bonusArtiBasePosStorage1));
+
 	if (a != 0) {
-		memset(a, 0, 0x40);
+		FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[0], reinterpret_cast<BonusAnimSprite*>(a));
 	}
 	if (b != 0) {
-		memset(b, 0, 0x40);
+		FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[1], reinterpret_cast<BonusAnimSprite*>(b));
+	} else if (a != 0) {
+		memcpy(gBonusCheckMarkPosBuffer[1], gBonusCheckMarkPosBuffer[0], sizeof(s_bonusArtiBasePosStorage1));
 	}
 }
 

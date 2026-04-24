@@ -8,6 +8,7 @@
 #include "ffcc/p_light.h"
 #include "ffcc/texanim.h"
 
+#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <math.h>
 #include <string.h>
 
@@ -20,6 +21,11 @@ extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5
 extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(
     void*, void*, CChunkFile&, CMemory::CStage*);
 extern "C" void __dla__FPv(void*);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void __ct__Q26CChara5CNodeFv(void*);
+extern "C" void __dt__Q26CChara5CNodeFv(void*, int);
+extern "C" void __ct__Q26CChara5CMeshFv(void*);
+extern "C" void __dt__Q26CChara5CMeshFv(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __ct__7CVectorFv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
@@ -389,6 +395,11 @@ static inline CChara::CAnimNode*& NodeAnimNode1(CChara::CNode* node)
 	return *reinterpret_cast<CChara::CAnimNode**>(reinterpret_cast<u8*>(node) + 0xA0);
 }
 
+static inline u8& NodeRuntimeFlags(CChara::CNode* node)
+{
+	return *(reinterpret_cast<u8*>(node) + 0xBC);
+}
+
 static inline u8 AnimFlags(CChara::CAnim* anim)
 {
 	return *(reinterpret_cast<u8*>(anim) + 0x08);
@@ -453,6 +464,56 @@ static inline void RetainRefCounted(void* refObject)
 	if (refObject != 0) {
 		reinterpret_cast<int*>(refObject)[1]++;
 	}
+}
+
+static CChara::CNode* AllocateCharaNodeArray(u16 nodeCount, CMemory::CStage* stage)
+{
+	void* block = __nwa__FUlPQ27CMemory6CStagePci(
+	    static_cast<unsigned long>(nodeCount) * 0xC0 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x263);
+	if (block == 0) {
+		return 0;
+	}
+
+	return reinterpret_cast<CChara::CNode*>(__construct_new_array(
+	    block, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CNodeFv),
+	    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CNodeFv), 0xC0, nodeCount));
+}
+
+static CChara::CMesh* AllocateCharaMeshArray(u16 meshCount, CMemory::CStage* stage)
+{
+	void* block = __nwa__FUlPQ27CMemory6CStagePci(
+	    static_cast<unsigned long>(meshCount) * 0x14 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x26C);
+	if (block == 0) {
+		return 0;
+	}
+
+	return reinterpret_cast<CChara::CMesh*>(__construct_new_array(
+	    block, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CMeshFv),
+	    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CMeshFv), 0x14, meshCount));
+}
+
+static void CopyDuplicatedNodeState(CChara::CNode* dst, CChara::CNode* src)
+{
+	*reinterpret_cast<void**>(dst) = *reinterpret_cast<void**>(src);
+	PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(src) + 8),
+	          reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(dst) + 8));
+	PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
+	NodePreviousQuat(dst) = NodePreviousQuat(src);
+	NodePreviousPosition(dst) = NodePreviousPosition(src);
+	NodePreviousScale(dst) = NodePreviousScale(src);
+	NodeAnimNode0(dst) = 0;
+	NodeAnimNode1(dst) = 0;
+	NodeRuntimeFlags(dst) = (NodeRuntimeFlags(dst) & 0x7F) | (NodeRuntimeFlags(src) & 0x80);
+}
+
+static void CopyDuplicatedMeshState(CChara::CMesh* dst, CChara::CMesh* src)
+{
+	u8* srcRaw = reinterpret_cast<u8*>(src);
+	u8* dstRaw = reinterpret_cast<u8*>(dst);
+
+	*reinterpret_cast<void**>(dstRaw) = *reinterpret_cast<void**>(srcRaw);
+	*reinterpret_cast<void**>(dstRaw + 4) = 0;
+	*reinterpret_cast<void**>(dstRaw + 8) = 0;
 }
 
 static const char s_chara_cpp_801d90c8[] = "chara.cpp";
@@ -1013,24 +1074,53 @@ void CChara::CModel::setup()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CModel::Duplicate(CMemory::CStage* stage)
+CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 {
-	(void)stage;
-	void* ref = *(void**)((u8*)this + 0xA4);
-	if (ref == 0) {
-		return;
+	if (ModelRef(this) == 0) {
+		return 0;
 	}
-	u16 nodeCount = *(u16*)((u8*)ref + 8);
-	u16 meshCount = *(u16*)((u8*)ref + 0xA);
-	if (nodeCount != 0 && *(void**)((u8*)this + 0xA8) == 0) {
-		*(void**)((u8*)this + 0xA8) = new u8[nodeCount * 0xC0];
-		memset(*(void**)((u8*)this + 0xA8), 0, nodeCount * 0xC0);
+
+	CModel* clone = new (stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x25A) CModel();
+	if (clone == 0) {
+		return 0;
 	}
-	if (meshCount != 0 && *(void**)((u8*)this + 0xAC) == 0) {
-		*(void**)((u8*)this + 0xAC) = new u8[meshCount * 0x14];
-		memset(*(void**)((u8*)this + 0xAC), 0, meshCount * 0x14);
+
+	clone->Init();
+	*reinterpret_cast<void**>(ModelRaw(clone) + 0xA4) = ModelRef(this);
+	RetainRefCounted(ModelRef(clone));
+
+	const u16 nodeCount = ModelNodeCount(this);
+	if (nodeCount != 0) {
+		CChara::CNode* cloneNodes = AllocateCharaNodeArray(nodeCount, stage);
+		if (cloneNodes != 0) {
+			*reinterpret_cast<CChara::CNode**>(ModelRaw(clone) + 0xA8) = cloneNodes;
+			for (u32 i = 0; i < nodeCount; i++) {
+				CopyDuplicatedNodeState(&cloneNodes[i], &ModelNodes(this)[i]);
+			}
+		}
 	}
-	setup();
+
+	const u16 meshCount = ModelMeshCount(this);
+	if (meshCount != 0) {
+		CChara::CMesh* cloneMeshes = AllocateCharaMeshArray(meshCount, stage);
+		if (cloneMeshes != 0) {
+			*reinterpret_cast<CChara::CMesh**>(ModelRaw(clone) + 0xAC) = cloneMeshes;
+			for (u32 i = 0; i < meshCount; i++) {
+				CopyDuplicatedMeshState(&cloneMeshes[i], &reinterpret_cast<CChara::CMesh*>(ModelMeshes(this))[i]);
+			}
+		}
+	}
+
+	if (m_texSet != 0) {
+		clone->AttachTextureSet(m_texSet);
+	}
+	*reinterpret_cast<CTexAnimSet**>(ModelRaw(clone) + 0xD4) =
+	    (ModelTexAnimSet(this) != 0) ? ModelTexAnimSet(this)->Duplicate(stage) : 0;
+
+	if ((nodeCount == 0 || ModelNodes(clone) != 0) && (meshCount == 0 || ModelMeshes(clone) != 0)) {
+		clone->setup();
+	}
+	return clone;
 }
 
 /*
@@ -2142,9 +2232,7 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 void CChara::CNode::Duplicate(CChara::CNode* src, CMemory::CStage* stage)
 {
 	(void)stage;
-	*(void**)this = *(void**)src;
-	PSMTXCopy((float(*)[4])((u8*)src + 8), (float(*)[4])((u8*)this + 8));
-	PSMTXCopy((float(*)[4])((u8*)src + 0x44), (float(*)[4])((u8*)this + 0x44));
+	CopyDuplicatedNodeState(this, src);
 }
 
 /*
@@ -2405,9 +2493,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 void CChara::CMesh::Duplicate(CChara::CMesh* src, CMemory::CStage* stage)
 {
 	(void)stage;
-	*(void**)this = *(void**)src;
-	*(void**)((u8*)this + 4) = 0;
-	*(void**)((u8*)this + 8) = 0;
+	CopyDuplicatedMeshState(this, src);
 }
 
 /*

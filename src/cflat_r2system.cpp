@@ -115,6 +115,26 @@ static inline void StoreSetU8(CFlatRuntime::CStack* stack, int setMode, unsigned
     }
 }
 
+static inline unsigned int* GetGameWorkLinkTableWords(CGame::CGameWork& gameWork)
+{
+    return reinterpret_cast<unsigned int*>(&gameWork.m_linkTable[0][0][0][0]);
+}
+
+static inline const unsigned int* GetGameWorkLinkTableWords(const CGame::CGameWork& gameWork)
+{
+    return reinterpret_cast<const unsigned int*>(&gameWork.m_linkTable[0][0][0][0]);
+}
+
+static inline unsigned int* GetGameWorkScriptSysVals(CGame::CGameWork& gameWork)
+{
+    return reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0);
+}
+
+static inline const unsigned int* GetGameWorkScriptSysVals(const CGame::CGameWork& gameWork)
+{
+    return reinterpret_cast<const unsigned int*>(&gameWork.m_scriptSysVal0);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800B8F80
@@ -2978,6 +2998,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
 CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int systemValue)
 {
     u8* game = reinterpret_cast<u8*>(&Game);
+    const CGame::CGameWork& gameWorkRef = Game.m_gameWork;
     int result = 0;
 
     if (systemValue < -0xFFF) {
@@ -3002,7 +3023,6 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
     } else if (systemValue < -199) {
         result = *reinterpret_cast<s16*>(game + 0x111CC + (systemValue + 0x1C7) * 2);
     } else {
-        u8* gameWork = game + 0x10000;
         switch (systemValue) {
         case -0x7A: {
             int language = game[0xE];
@@ -3022,11 +3042,20 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             }
             break;
         }
+        case -0x79:
+            result = gameWorkRef.m_optionValue;
+            break;
         case -0x78:
-            result = Game.m_gameWork.m_gameOverFlag;
+            result = gameWorkRef.m_gameOverFlag;
+            break;
+        case -0x77:
+            result = gameWorkRef.m_soundOptionFlag;
             break;
         case -0x76:
-            result = Game.m_gameWork.m_menuStageMode;
+            result = gameWorkRef.m_menuStageMode;
+            break;
+        case -0x75:
+            result = gameWorkRef.m_bossArtifactStageIndex;
             break;
         case -0x73:
         case -0x72:
@@ -3050,10 +3079,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x69:
         case -0x68:
         case -0x67:
-            result = *reinterpret_cast<u32*>(gameWork + 0x18 + (systemValue + 0x47) * 4);
+            result = gameWorkRef.m_wmBackupParams[systemValue + 0x47];
             break;
         case -0x66:
-            result = Game.m_gameWork.m_chaliceElement;
+            result = gameWorkRef.m_chaliceElement;
             break;
         case -0x65:
         case -100:
@@ -3070,7 +3099,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x59:
         case -0x58:
         case -0x57:
-            result = *reinterpret_cast<u32*>(gameWork + 0x28 + (systemValue + 0x56) * 4);
+            result = gameWorkRef.m_bossArtifactStageTable[systemValue + 0x56];
             break;
         case -0x56:
         case -0x55:
@@ -3087,25 +3116,25 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x4A:
         case -0x49:
         case -0x48:
-            result = *reinterpret_cast<u32*>(gameWork + 0x64 + (systemValue + 0x65) * 4);
+            result = gameWorkRef.m_unkStageTable[systemValue + 0x65];
             break;
         case -0x47:
         case -0x46:
         case -0x45:
         case -0x44:
-            result = *reinterpret_cast<u32*>(gameWork + 0xC8 + (systemValue + 0x65) * 4);
+            result = GetGameWorkLinkTableWords(gameWorkRef)[systemValue + 0x65];
             break;
         case -0x43:
-            result = Game.m_gameWork.m_frameCounter;
+            result = gameWorkRef.m_frameCounter;
             break;
         case -0x42:
-            result = Game.m_gameWork.m_scriptGlobalTime;
+            result = gameWorkRef.m_scriptGlobalTime;
             break;
         case -0x41:
-            result = Game.m_gameWork.m_timerA;
+            result = gameWorkRef.m_timerA;
             break;
         case -0x40:
-            result = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&Game.m_gameWork) + 0x8);
+            result = *GetGameWorkScriptSysVals(gameWorkRef);
             break;
         }
     }
@@ -3190,7 +3219,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x68:
             case -0x67:
                 StoreSetU32(
-                    stack, setMode, reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&gameWork) + 0x18 + (systemValue + 0x47) * 4));
+                    stack, setMode, reinterpret_cast<unsigned int*>(&gameWork.m_wmBackupParams[systemValue + 0x47]));
                 break;
             case -0x66:
                 StoreSetU32(stack, setMode, reinterpret_cast<unsigned int*>(&gameWork.m_chaliceElement));
@@ -3211,7 +3240,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x58:
             case -0x57:
                 StoreSetU32(
-                    stack, setMode, reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&gameWork) + 0x28 + (systemValue + 0x56) * 4));
+                    stack, setMode, reinterpret_cast<unsigned int*>(&gameWork.m_bossArtifactStageTable[systemValue + 0x56]));
                 break;
             case -0x56:
             case -0x55:
@@ -3229,14 +3258,13 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             case -0x49:
             case -0x48:
                 StoreSetU32(
-                    stack, setMode, reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&gameWork) + 0x64 + (systemValue + 0x65) * 4));
+                    stack, setMode, reinterpret_cast<unsigned int*>(&gameWork.m_unkStageTable[systemValue + 0x65]));
                 break;
             case -0x47:
             case -0x46:
             case -0x45:
             case -0x44:
-                StoreSetU32(
-                    stack, setMode, reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&gameWork) + 0xC8 + (systemValue + 0x65) * 4));
+                StoreSetU32(stack, setMode, &GetGameWorkLinkTableWords(gameWork)[systemValue + 0x65]);
                 break;
             case -0x43:
                 StoreSetU32(stack, setMode, reinterpret_cast<unsigned int*>(&gameWork.m_frameCounter));
@@ -3248,7 +3276,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 StoreSetU32(stack, setMode, reinterpret_cast<unsigned int*>(&gameWork.m_timerA));
                 break;
             case -0x40:
-                StoreSetU32(stack, setMode, reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&gameWork) + 0x8));
+                StoreSetU32(stack, setMode, GetGameWorkScriptSysVals(gameWork));
                 break;
             default:
                 break;

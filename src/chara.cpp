@@ -38,6 +38,8 @@ extern "C" float FLOAT_803301b0;
 extern "C" float FLOAT_803301bc;
 extern "C" float FLOAT_803301c8;
 extern "C" float FLOAT_803301cc;
+extern "C" float FLOAT_803301d0;
+extern "C" float FLOAT_803301f8;
 extern "C" CLightPcs::CBumpLight* DAT_8032edc0;
 
 namespace {
@@ -150,6 +152,11 @@ static inline float (*ModelDrawMtx(CChara::CModel* model))[4]
 	return reinterpret_cast<float(*)[4]>(ModelRaw(model) + 0x08);
 }
 
+static inline float (*ModelWorldBaseMtx(CChara::CModel* model))[4]
+{
+	return reinterpret_cast<float(*)[4]>(ModelRaw(model) + 0x44);
+}
+
 static inline float ModelLightAlpha(CChara::CModel* model)
 {
 	return *reinterpret_cast<float*>(ModelRaw(model) + 0x9C);
@@ -193,6 +200,21 @@ static inline CTexAnimSet* ModelTexAnimSet(CChara::CModel* model)
 static inline u16& ModelBlendCur(CChara::CModel* model)
 {
 	return *reinterpret_cast<u16*>(ModelRaw(model) + 0xD8);
+}
+
+static inline u16& ModelBlendMax(CChara::CModel* model)
+{
+	return *reinterpret_cast<u16*>(ModelRaw(model) + 0xDA);
+}
+
+static inline float& ModelChestTilt(CChara::CModel* model)
+{
+	return *reinterpret_cast<float*>(ModelRaw(model) + 0xDC);
+}
+
+static inline float& ModelChestAmp(CChara::CModel* model)
+{
+	return *reinterpret_cast<float*>(ModelRaw(model) + 0xE0);
 }
 
 static inline void* ModelCalcCbUser0(CChara::CModel* model)
@@ -253,6 +275,11 @@ static inline void* ModelCbUser0(CChara::CModel* model)
 static inline void* ModelCbUser1(CChara::CModel* model)
 {
 	return *reinterpret_cast<void**>(ModelRaw(model) + 0x108);
+}
+
+static inline float& ModelTwistAngle(CChara::CModel* model)
+{
+	return *reinterpret_cast<float*>(ModelRaw(model) + 0x120);
 }
 
 static inline u8* MaterialManRaw()
@@ -340,6 +367,21 @@ static inline u8& NodeDynParamIndex(CChara::CNode* node)
 	return *(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x64);
 }
 
+static inline u16 NodeRefIndex(CChara::CNode* node)
+{
+	return *reinterpret_cast<u16*>(*reinterpret_cast<void**>(node));
+}
+
+static inline s16 NodeParentIndex(CChara::CNode* node)
+{
+	return *reinterpret_cast<s16*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x68);
+}
+
+static inline u8 NodeUsesParentLenX(CChara::CNode* node)
+{
+	return *(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x6E);
+}
+
 static inline float NodeBoneLen(CChara::CNode* node)
 {
 	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x70);
@@ -368,6 +410,31 @@ static inline MtxPtr NodeRefLocalMtx(CChara::CNode* node)
 static inline float ModelBaseScale(CChara::CModel* model)
 {
 	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x28);
+}
+
+static inline u16& ModelHeadIndex(CChara::CModel* model)
+{
+	return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x16);
+}
+
+static inline u16& ModelChest3Index(CChara::CModel* model)
+{
+	return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x18);
+}
+
+static inline u16& ModelChest2Index(CChara::CModel* model)
+{
+	return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x1A);
+}
+
+static inline u16& ModelChest1Index(CChara::CModel* model)
+{
+	return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x1C);
+}
+
+static inline float TexAnimSetChin(CTexAnimSet* texAnimSet)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(texAnimSet) + 0x24);
 }
 
 static inline Quaternion& NodePreviousQuat(CChara::CNode* node)
@@ -1288,10 +1355,10 @@ void CChara::CModel::calcMatrix()
 
 	CNode* nodes = ModelNodes(this);
 	u16 nodeCount = ModelNodeCount(this);
+	Vec twistAxisBase = {FLOAT_803301b0, FLOAT_803301bc, FLOAT_803301b0};
 	for (u32 i = 0; i < nodeCount; i++) {
 		CNode* node = (CNode*)((u8*)nodes + (i * 0xC0));
-		void* nodeRef = *reinterpret_cast<void**>(node);
-		s16 parentIndex = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(nodeRef) + 0x68);
+		s16 parentIndex = NodeParentIndex(node);
 		CNode* parentNode = 0;
 		if (parentIndex >= 0) {
 			parentNode = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(nodes) + parentIndex * 0xC0);
@@ -1300,6 +1367,33 @@ void CChara::CModel::calcMatrix()
 		CalcFrameMatrix(m_curFrame, node, NodeWorldMtx(node));
 		if (NodeDynParamIndex(node) != 0xFF) {
 			dynamics(node, parentNode);
+		}
+
+		if (NodeRefIndex(node) == ModelChest1Index(this) && ModelTwistAngle(this) != FLOAT_803301b0) {
+			Vec twistAxis = twistAxisBase;
+			Mtx twistRotate;
+			Mtx nodeBase;
+			Mtx axisBase;
+			PSMTXMultVecSR(ModelWorldBaseMtx(this), &twistAxis, &twistAxis);
+			PSMTXRotAxisRad(twistRotate, &twistAxis, ModelTwistAngle(this));
+			PSMTXCopy(NodeWorldMtx(node), nodeBase);
+			PSMTXCopy(twistRotate, axisBase);
+			nodeBase[0][3] = FLOAT_803301b0;
+			nodeBase[1][3] = FLOAT_803301b0;
+			nodeBase[2][3] = FLOAT_803301b0;
+			axisBase[0][3] = FLOAT_803301b0;
+			axisBase[1][3] = FLOAT_803301b0;
+			axisBase[2][3] = FLOAT_803301b0;
+			PSMTXConcat(axisBase, nodeBase, twistRotate);
+			NodeWorldMtx(node)[0][0] = twistRotate[0][0];
+			NodeWorldMtx(node)[1][0] = twistRotate[1][0];
+			NodeWorldMtx(node)[2][0] = twistRotate[2][0];
+			NodeWorldMtx(node)[0][1] = twistRotate[0][1];
+			NodeWorldMtx(node)[1][1] = twistRotate[1][1];
+			NodeWorldMtx(node)[2][1] = twistRotate[2][1];
+			NodeWorldMtx(node)[0][2] = twistRotate[0][2];
+			NodeWorldMtx(node)[1][2] = twistRotate[1][2];
+			NodeWorldMtx(node)[2][2] = twistRotate[2][2];
 		}
 	}
 
@@ -1327,7 +1421,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 	CNode* cur = node;
 	while (cur != 0) {
 		CNode* parentNode = 0;
-		s16 parent = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(cur)) + 0x68);
+		s16 parent = NodeParentIndex(cur);
 		if (parent < 0) {
 			parentNode = 0;
 		} else {
@@ -1341,12 +1435,28 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 		if (animNode0 == 0 && animNode1 == 0) {
 			PSMTXCopy(NodeRefLocalMtx(cur), localMtx);
 		} else {
-			PSMTXIdentity(localMtx);
+			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 && !AnimNodeUsesScale(NodeAnimNode0(parentNode)) &&
+			    m_anim != 0) {
+				SRTView parentSrt;
+				Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(NodeAnimNode0(parentNode), m_anim,
+				                                                   reinterpret_cast<SRT*>(&parentSrt), frame);
+				float invX = (parentSrt.m_scale.x != 0.0f) ? (FLOAT_803301bc / parentSrt.m_scale.x) : FLOAT_803301bc;
+				float invY = (parentSrt.m_scale.y != 0.0f) ? (FLOAT_803301bc / parentSrt.m_scale.y) : FLOAT_803301bc;
+				float invZ = (parentSrt.m_scale.z != 0.0f) ? (FLOAT_803301bc / parentSrt.m_scale.z) : FLOAT_803301bc;
+				PSMTXScale(localMtx, invX, invY, invZ);
+			} else {
+				PSMTXIdentity(localMtx);
+			}
+
 			if (parentNode == 0) {
 				float baseScale = ModelBaseScale(this);
 				if (baseScale != FLOAT_803301bc) {
 					PSMTXScale(localMtx, baseScale, baseScale, baseScale);
 				}
+			}
+
+			if (NodeUsesParentLenX(cur) != 0 && parentNode != 0) {
+				localMtx[0][3] = NodeBoneLen(parentNode);
 			}
 
 			if (animNode1 != 0 && m_anim != 0) {
@@ -1373,9 +1483,25 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			if (animNode0 != 0 && m_anim != 0) {
 				SRTView srt0;
 				Mtx animMtx;
+				u16 nodeIndex;
 
 				Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(animNode0, m_anim,
 				                                                   reinterpret_cast<SRT*>(&srt0), frame);
+				nodeIndex = NodeRefIndex(cur);
+				if (nodeIndex == ModelChest1Index(this) || nodeIndex == ModelChest2Index(this) ||
+				    nodeIndex == ModelChest3Index(this)) {
+					float tiltScale;
+					if (nodeIndex == ModelChest3Index(this)) {
+						srt0.m_rotation.y = -(ModelChestAmp(this) * FLOAT_803301d0 - srt0.m_rotation.y);
+						tiltScale = FLOAT_803301d0;
+					} else {
+						srt0.m_rotation.x = ModelChestAmp(this) * FLOAT_803301f8 + srt0.m_rotation.x;
+						tiltScale = FLOAT_803301f8;
+					}
+					srt0.m_rotation.z = ModelChestTilt(this) * tiltScale + srt0.m_rotation.z;
+				} else if (nodeIndex == ModelHeadIndex(this) && ModelTexAnimSet(this) != 0) {
+					srt0.m_rotation.z += TexAnimSetChin(ModelTexAnimSet(this));
+				}
 				if (AnimNodeUsesScale(animNode0)) {
 					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt0));
 				} else {
@@ -1385,8 +1511,8 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			}
 		}
 
-		u16 blendCur = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(this) + 0xD8);
-		u16 blendMax = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(this) + 0xDA);
+		u16 blendCur = ModelBlendCur(this);
+		u16 blendMax = ModelBlendMax(this);
 		if (blendCur != 0 && blendMax != 0) {
 			float alpha = FLOAT_803301bc - (static_cast<float>(blendCur) / static_cast<float>(blendMax));
 

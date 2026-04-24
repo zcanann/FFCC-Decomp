@@ -9,10 +9,15 @@ class CMaterial;
 extern "C" void Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(CMapTexAnim*, CMaterialSet*, CTextureSet*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
+extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim*, short);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
-extern "C" void* PTR_PTR_s_CMapTexAnim[];
+extern "C" void* PTR_PTR_s_CMapTexAnim[] = {
+    reinterpret_cast<void*>(Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet),
+    0,
+    reinterpret_cast<void*>(__dt__11CMapTexAnimFv),
+};
 extern "C" {
 static const char s_maptexanim_cpp_801d7ec4[] = "maptexanim.cpp";
 char s_SetMapTexAnim_MaterialIdNotFound[];

@@ -704,18 +704,17 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     u8* payload = (u8*)params;
     const u8 matrixMode = payload[0x2A];
     const u8 flagsEnd = payload[0x137];
-    pppFMATRIX local;
-    pppFMATRIX world;
     pppFMATRIX tmp;
     Mtx scale;
+    pppFMATRIX* objectMatrix = (pppFMATRIX*)(pObject + 1);
 
     if (matrixMode == 0) {
-        pppUnitMatrix(local);
-        local.value[0][3] = particleData->m_matrix[0][3];
-        local.value[1][3] = particleData->m_matrix[1][3];
-        local.value[2][3] = particleData->m_matrix[2][3];
+        pppUnitMatrix(mtxB);
+        mtxB.value[0][3] = particleData->m_matrix[0][3];
+        mtxB.value[1][3] = particleData->m_matrix[1][3];
+        mtxB.value[2][3] = particleData->m_matrix[2][3];
     } else {
-        pppCopyMatrix(local, *(pppFMATRIX*)&particleData->m_matrix);
+        pppCopyMatrix(mtxB, *(pppFMATRIX*)&particleData->m_matrix);
     }
 
     if (particleData->m_directionTail.z != FLOAT_80330498 ||
@@ -728,81 +727,91 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         pppFMATRIX r;
         pppUnitMatrix(r);
         pppRotMatrix(r, r, rot);
-        pppCopyMatrix(tmp, local);
-        pppMulMatrix(local, tmp, r);
+        pppCopyMatrix(tmp, mtxB);
+        pppMulMatrix(mtxB, tmp, r);
     }
 
     PSMTXScale(scale, particleData->m_sizeStart, particleData->m_sizeEnd, particleData->m_sizeVal);
-    pppCopyMatrix(tmp, local);
-    pppMulMatrix(local, tmp, *(pppFMATRIX*)&scale);
+    pppCopyMatrix(tmp, mtxB);
+    pppMulMatrix(mtxB, tmp, *(pppFMATRIX*)&scale);
+    pppCopyMatrix(*(pppFMATRIX*)&g_matKeep, mtxB);
 
     switch (matrixMode) {
     case 1:
     case 3:
     case 5:
     case 7:
-    case 9:
-        pppCopyMatrix(world, mtxA);
-        pppCopyMatrix(tmp, world);
-        pppMulMatrix(world, tmp, local);
-        break;
-    default:
-        if (particleWMat != NULL) {
-            pppCopyMatrix(world, *(pppFMATRIX*)particleWMat);
-            pppCopyMatrix(tmp, world);
-            pppMulMatrix(world, tmp, local);
-        } else {
-            pppCopyMatrix(world, *(pppFMATRIX*)&pObject->m_localMatrix);
-            pppCopyMatrix(tmp, world);
-            pppMulMatrix(world, tmp, local);
+    case 9: {
+        Vec localPos;
+        Vec transformedPos;
 
-            if (payload[0x136] != 0) {
-                pppCopyMatrix(tmp, world);
-                pppMulMatrix(world, pppMngStPtr->m_matrix, tmp);
-            }
+        localPos.x = mtxB.value[0][3];
+        localPos.y = mtxB.value[1][3];
+        localPos.z = mtxB.value[2][3];
+        pppApplyMatrix(transformedPos, mtxA, localPos);
+
+        pppCopyMatrix(tmp, mtxB);
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvWorldMatrixWood, tmp);
+        mtxB.value[0][3] = transformedPos.x;
+        mtxB.value[1][3] = transformedPos.y;
+        mtxB.value[2][3] = transformedPos.z;
+        break;
+    }
+    default:
+        pppCopyMatrix(tmp, mtxB);
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&pObject->m_localMatrix, tmp);
+
+        if (particleWMat != NULL) {
+            pppCopyMatrix(tmp, mtxB);
+            pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, tmp);
+        } else if (payload[0x136] != 0) {
+            pppCopyMatrix(tmp, mtxB);
+            pppMulMatrix(mtxB, pppMngStPtr->m_matrix, tmp);
         }
         break;
     }
 
-    pppCopyMatrix(*(pppFMATRIX*)&g_matKeep, world);
-    PSMTXConcat(ppvCameraMatrix0, world.value, g_matTmp);
-    PSMTXCopy(g_matTmp, out.value);
+    if (matrixMode != 1 && matrixMode != 3 && matrixMode != 5 && matrixMode != 7 && matrixMode != 9) {
+        pppCopyMatrix(tmp, mtxB);
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix0, tmp);
+        pppCopyMatrix(*objectMatrix, mtxB);
+    }
 
     if (copyOut != 0) {
-        pppCopyMatrix(mtxB, out);
+        pppCopyMatrix(out, mtxB);
+    } else {
+        pppCopyMatrix(out, mtxB);
     }
 
     if (flagsEnd != 0) {
         Vec objectPos;
         Vec endPos;
-        pppFMATRIX* endMatrix = (pppFMATRIX*)(pObject + 1);
 
         objectPos.x = pObject->m_localMatrix.value[0][3];
         objectPos.y = pObject->m_localMatrix.value[1][3];
         objectPos.z = pObject->m_localMatrix.value[2][3];
 
-        endPos.x = world.value[0][3];
-        endPos.y = world.value[1][3];
-        endPos.z = world.value[2][3];
+        endPos.x = mtxB.value[0][3];
+        endPos.y = mtxB.value[1][3];
+        endPos.z = mtxB.value[2][3];
         pppAddVector(endPos, endPos, objectPos);
 
-        pppUnitMatrix(*endMatrix);
-        PSMTXScaleApply(endMatrix->value, endMatrix->value, particleData->m_sizeStart * pppMngStPtr->m_scale.x,
-                        particleData->m_sizeEnd * pppMngStPtr->m_scale.y,
-                        particleData->m_sizeVal * pppMngStPtr->m_scale.z);
+        pppUnitMatrix(mtxB);
+        PSMTXScaleApply(mtxB.value, objectMatrix->value, particleData->m_sizeStart * pppMngStPtr->m_scale.x,
+                        particleData->m_sizeEnd * pppMngStPtr->m_scale.y, particleData->m_sizeVal * pppMngStPtr->m_scale.z);
 
         if (particleData->m_colorDeltaAdd[1] != FLOAT_80330498) {
             pppFMATRIX rot;
 
             PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * -particleData->m_colorDeltaAdd[1]);
-            pppCopyMatrix(tmp, *endMatrix);
-            pppMulMatrix(*endMatrix, rot, tmp);
+            pppCopyMatrix(tmp, *objectMatrix);
+            pppMulMatrix(*objectMatrix, rot, tmp);
         }
 
         PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
-        endMatrix->value[0][3] = endPos.x;
-        endMatrix->value[1][3] = endPos.y;
-        endMatrix->value[2][3] = endPos.z;
+        objectMatrix->value[0][3] = endPos.x;
+        objectMatrix->value[1][3] = endPos.y;
+        objectMatrix->value[2][3] = endPos.z;
     }
 }
 

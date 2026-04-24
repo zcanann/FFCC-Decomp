@@ -56,6 +56,7 @@ void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
 int GetPadType__6JoyBusFi(void*, int);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
+int sprintf(char*, const char*, ...);
 unsigned char gMapHitDrawMode;
 }
 extern unsigned char CFlat[0x10440];
@@ -65,6 +66,7 @@ extern float FLOAT_80330b54;
 extern float FLOAT_80330b64;
 
 static const char s_setMiniGameParamFmt[] = "SetMiniGameParam no 0x%04x data[%d]\n";
+static const char s_cflatDebugFileFmt[] = "cflat_d%d.bin";
 
 static inline void StoreSetU32(CFlatRuntime::CStack* stack, int setMode, unsigned int* value)
 {
@@ -3024,6 +3026,52 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0x59: {
+        char filename[0x80];
+        sprintf(filename, s_cflatDebugFileFmt, *object->m_localBase);
+        MemoryCardMan.DebugReadWrite(0, filename, reinterpret_cast<u8*>(this) + 0xE400, 0x2000);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x58: {
+        char filename[0x80];
+        sprintf(filename, s_cflatDebugFileFmt, *object->m_localBase);
+        MemoryCardMan.DebugReadWrite(1, filename, reinterpret_cast<u8*>(this) + 0xE400, 0x2000);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x57: {
+        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4) = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x56: {
+        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4) = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x55: {
+        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
+        runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4));
+        outResult = 0;
+        return;
+    }
+    case -0x54: {
+        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
+        runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4));
+        outResult = 0;
+        return;
+    }
     case -0x53:
         SetCharaAllocStage__9CCharaPcsFi(&CharaPcs, *object->m_localBase);
         runtime->push(object, 0);

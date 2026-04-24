@@ -700,9 +700,9 @@ void CChara::FlipDBuffer()
 	s32* dbufferIndex = (s32*)((u8*)this + 0x2060);
 	*dbufferIndex = 1 - *dbufferIndex;
 
-	u8* bufferPtr = (u8*)this + (*dbufferIndex << 3);
-	u32 zero = 0;
-	*(u32*)(bufferPtr + 0x2064) = zero;
+	u8* self = (u8*)this;
+	self += *dbufferIndex << 3;
+	*(u32*)(self + 0x2064) = 0;
 }
 
 /*

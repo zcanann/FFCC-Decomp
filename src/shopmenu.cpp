@@ -2484,27 +2484,85 @@ void CShopMenu::DrawObi(int)
  */
 void CShopMenu::DrawItemList()
 {
-    int itemIndex = ShopMenuInt(this, 0x24);
     int y = 0x4C;
-    int visibleCount = ShopMenuInt(this, 0x2C);
-    int selectableFrame = (ShopMenuInt(this, 0x14) == 2) ? 0xF : 0xA;
+    int itemIndex = ShopMenuInt(this, 0x24);
+    int itemOffset = itemIndex << 1;
+    int selectableFrame = 10;
+    if (ShopMenuInt(this, 0x14) == 2) {
+        selectableFrame = 0xF;
+    }
 
-    CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetShadow__5CFontFi(font, 0);
-    SetScale__5CFontFf(FLOAT_80332d28, font);
+    for (int row = 0; row < ShopMenuInt(this, 0x2C); ++row) {
+        int listType = ShopMenuInt(this, 0x14);
+        int itemCount;
+        if (listType == 0) {
+            itemCount = *reinterpret_cast<short*>(ShopMenuCaravan(this) + 0xBE4);
+        } else if (listType == 1) {
+            itemCount = 0x40;
+        } else if (listType == 2) {
+            itemCount = ShopMenuInt(this, 0x4C);
+        } else {
+            itemCount = -1;
+        }
 
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    SetColor__5CFontF8_GXColor(font, &white);
-
-    for (int row = 0; row < visibleCount; row++, itemIndex++, y += 0x1C) {
-        if (itemIndex >= ResolveShopMenuItemCount(this)) {
+        if (itemCount <= itemIndex) {
             break;
         }
 
-        int itemNo = ResolveShopMenuItemNo(this, itemIndex);
-        bool canTrade = CanTradeShopMenuItem(this, itemIndex, itemNo);
-        int frame = canTrade ? selectableFrame : 0xE;
+        int itemNo;
+        if (listType == 0) {
+            itemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + itemOffset + 0xBE6);
+        } else if (listType == 1) {
+            itemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + itemOffset + 0xB6);
+        } else if (listType == 2) {
+            int mapped = ShopMenuInt(this, 0x50 + itemIndex * 4);
+            if (mapped == -1) {
+                itemNo = -1;
+            } else {
+                itemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + mapped * 2 + 0xB6);
+            }
+        } else {
+            itemNo = -1;
+        }
+
+        bool canTrade = false;
+        if (itemIndex != -1) {
+            int tradeItemNo;
+            if (listType == 0) {
+                tradeItemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + itemOffset + 0xBE6);
+            } else if (listType == 1) {
+                tradeItemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + itemOffset + 0xB6);
+            } else if (listType == 2) {
+                int mapped = ShopMenuInt(this, 0x50 + itemIndex * 4);
+                if (mapped == -1) {
+                    tradeItemNo = -1;
+                } else {
+                    tradeItemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + mapped * 2 + 0xB6);
+                }
+            } else {
+                tradeItemNo = -1;
+            }
+
+            if (tradeItemNo > 0) {
+                if (listType == 0) {
+                    canTrade = true;
+                } else if (listType == 2) {
+                    unsigned int bit = static_cast<unsigned int>(tradeItemNo - 0x191);
+                    if ((*reinterpret_cast<unsigned int*>(ShopMenuCaravan(this) + ((tradeItemNo - 0x191) >> 5) * 4 + 0xC08) &
+                         (1U << (bit & 0x1F))) != 0) {
+                        canTrade = true;
+                    }
+                } else if (EquipChk__8CMenuPcsFi(MenuPcsVoid(), itemIndex) == 0 && tradeItemNo >= 0x9F) {
+                    canTrade = true;
+                }
+            }
+        }
+
+        int frame = 0xE;
+        if (canTrade) {
+            frame = selectableFrame;
+        }
+
         int frameX;
         if (ShopMenuInt(this, 0x28) == itemIndex) {
             frameX = 0x198;
@@ -2521,14 +2579,25 @@ void CShopMenu::DrawItemList()
         }
 
         if (itemNo > 0) {
+            CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
+            SetMargin__5CFontFf(FLOAT_80332d28, font);
+            SetShadow__5CFontFi(font, 0);
+            SetScale__5CFontFf(FLOAT_80332d28, font);
+
+            _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+            SetColor__5CFontF8_GXColor(font, &white);
             DrawInit__5CFontFv(font);
             SetPosX__5CFontFf(static_cast<float>(frameX - 0x54), font);
             SetPosY__5CFontFf(static_cast<float>(y - 0x14), font);
-            Draw__5CFontFPc(font, GetItemName(itemNo));
+            Draw__5CFontFPc(font, reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[itemNo * 5 + 4]));
             DrawInit__8CMenuPcsFv(MenuPcsVoid());
             DrawSingleIcon__8CMenuPcsFiiifif(
                 MenuPcsVoid(), itemNo, frameX + 0x54, y - 0x18, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
         }
+
+        itemOffset += 2;
+        ++itemIndex;
+        y += 0x1C;
     }
 
     int alpha = 0xC0 + (System.m_frameCounter & 0x3F);

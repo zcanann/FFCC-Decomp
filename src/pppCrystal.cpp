@@ -22,13 +22,13 @@ extern const float FLOAT_80330FD0 = 2.0f;
 extern const float FLOAT_80330FD4;
 extern const float FLOAT_80330FD8;
 extern const double DOUBLE_80330FE0;
-extern const double DOUBLE_80330FE8;
-extern const double DOUBLE_80330FF0;
-extern const float FLOAT_80330FF8;
-extern const double DOUBLE_80331000;
-extern const float FLOAT_80331008;
-extern const float FLOAT_8033100C;
-extern const float FLOAT_80331010;
+extern const double DOUBLE_80330FE8 = 3.0;
+extern const double DOUBLE_80330FF0 = 0.0;
+extern const float FLOAT_80330FF8 = 1.0f;
+extern const double DOUBLE_80331000 = 1.0;
+extern const float FLOAT_80331008 = 1.0f;
+extern const float FLOAT_8033100C = 128.0f;
+extern const float FLOAT_80331010 = 127.0f;
 
 #define CRYSTAL_REFRACTION_SIZE 32.0f
 #define CRYSTAL_HALF_NEGATIVE -0.5f

@@ -17,6 +17,8 @@ extern float FLOAT_803304bc;
 extern float FLOAT_803304c0;
 extern float FLOAT_803304c4;
 extern float FLOAT_803304c8;
+extern double DOUBLE_803304e0;
+extern float FLOAT_803304e8;
 
 PARTICLE_WMAT g_matKeep;
 PARTICLE_WMAT g_matTmp;
@@ -448,6 +450,54 @@ void birth(
         particleColor->m_colorFrameDeltas[1] = *(float*)(payload + 0xC0);
         particleColor->m_colorFrameDeltas[2] = *(float*)(payload + 0xC4);
         particleColor->m_colorFrameDeltas[3] = *(float*)(payload + 0xC8);
+    }
+
+    if (payload[0x132] != 0) {
+        if ((payload[0x132] & 0x20) == 0) {
+            *f32_at(particleData, 0x74) = *(float*)(payload + 0xC0) * Math.RandF();
+            *f32_at(particleData, 0x78) = *(float*)(payload + 0xC4) * Math.RandF();
+            *f32_at(particleData, 0x7C) = *(float*)(payload + 0xC8) * Math.RandF();
+
+            if ((payload[0x132] & 1) != 0 && (payload[0x132] & 2) != 0) {
+                if (DOUBLE_803304e0 < (double)Math.RandF()) {
+                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304e8;
+                }
+                if (DOUBLE_803304e0 < (double)Math.RandF()) {
+                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304e8;
+                }
+                if (DOUBLE_803304e0 < (double)Math.RandF()) {
+                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304e8;
+                }
+            } else if ((payload[0x132] & 2) != 0) {
+                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304e8;
+                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304e8;
+                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304e8;
+            }
+        } else {
+            float randomVelocity = *(float*)(payload + 0xC0) * Math.RandF();
+
+            *f32_at(particleData, 0x74) = randomVelocity;
+            *f32_at(particleData, 0x78) = randomVelocity;
+            *f32_at(particleData, 0x7C) = randomVelocity;
+
+            if ((payload[0x132] & 1) != 0 && (payload[0x132] & 2) != 0) {
+                if (DOUBLE_803304e0 < (double)Math.RandF()) {
+                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304e8;
+                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304e8;
+                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304e8;
+                }
+            } else if ((payload[0x132] & 2) != 0) {
+                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304e8;
+                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304e8;
+                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304e8;
+            }
+        }
+
+        if ((payload[0x132] & 4) != 0) {
+            *f32_at(particleData, 0x5C) = *f32_at(particleData, 0x5C) + *f32_at(particleData, 0x74);
+            *f32_at(particleData, 0x60) = *f32_at(particleData, 0x60) + *f32_at(particleData, 0x78);
+            *f32_at(particleData, 0x64) = *f32_at(particleData, 0x64) + *f32_at(particleData, 0x7C);
+        }
     }
 }
 

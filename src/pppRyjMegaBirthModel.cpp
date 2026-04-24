@@ -107,6 +107,23 @@ static void wrap_particle_rotation_triplet(u8* particleBytes, s32 offset)
     }
 }
 
+static void apply_signed_randomization(u8* particleBytes, s32 offset, u8 flags)
+{
+    if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+        for (int i = 0; i < 3; i++) {
+            float* value = f32_at(particleBytes, offset + i * 4);
+            if (DOUBLE_803304e0 < (double)Math.RandF()) {
+                *value = *value * FLOAT_803304e8;
+            }
+        }
+    } else if ((flags & 2) != 0) {
+        for (int i = 0; i < 3; i++) {
+            float* value = f32_at(particleBytes, offset + i * 4);
+            *value = *value * FLOAT_803304e8;
+        }
+    }
+}
+
 /*
  * --INFO--
  * Address: TODO
@@ -418,15 +435,12 @@ void birth(
         }
     }
 
-    particleData->m_sizeStart = *(float*)(payload + 0x84);
-    particleData->m_sizeEnd = *(float*)(payload + 0x88);
-    particleData->m_sizeVal = *(float*)(payload + 0x8C);
-    particleData->m_directionTail.z = *(float*)(payload + 0x8C);
-    particleData->m_colorDeltaAdd[0] = *(float*)(payload + 0x90);
-    particleData->m_colorDeltaAdd[1] = *(float*)(payload + 0x94);
-    particleData->m_colorDeltaAdd[2] = *(float*)(payload + 0x98);
-    particleData->m_colorDeltaAdd[3] = *(float*)(payload + 0x9C);
-    particleData->m_sizeStart = *(float*)(payload + 0xA0);
+    *f32_at(particleData, 0x44) = *(float*)(payload + 0x8C);
+    *f32_at(particleData, 0x48) = *(float*)(payload + 0x90);
+    *f32_at(particleData, 0x4C) = *(float*)(payload + 0x94);
+    *f32_at(particleData, 0x50) = *(float*)(payload + 0x98);
+    *f32_at(particleData, 0x54) = *(float*)(payload + 0x9C);
+    *f32_at(particleData, 0x58) = *(float*)(payload + 0xA0);
 
     *s16_at(particleData, 0x22) = (*(s16*)(payload + 0x26) == 0) ? -1 : *(s16*)(payload + 0x26);
     *s16_at(particleData, 0x1C) = 0;
@@ -494,9 +508,51 @@ void birth(
         }
 
         if ((payload[0x132] & 4) != 0) {
-            *f32_at(particleData, 0x5C) = *f32_at(particleData, 0x5C) + *f32_at(particleData, 0x74);
-            *f32_at(particleData, 0x60) = *f32_at(particleData, 0x60) + *f32_at(particleData, 0x78);
-            *f32_at(particleData, 0x64) = *f32_at(particleData, 0x64) + *f32_at(particleData, 0x7C);
+            *f32_at(particleData, 0x44) = *f32_at(particleData, 0x44) + *f32_at(particleData, 0x74);
+            *f32_at(particleData, 0x48) = *f32_at(particleData, 0x48) + *f32_at(particleData, 0x78);
+            *f32_at(particleData, 0x4C) = *f32_at(particleData, 0x4C) + *f32_at(particleData, 0x7C);
+        }
+
+        if ((payload[0x132] & 8) != 0) {
+            *f32_at(particleData, 0x50) = *f32_at(particleData, 0x50) + *f32_at(particleData, 0x74);
+            *f32_at(particleData, 0x54) = *f32_at(particleData, 0x54) + *f32_at(particleData, 0x78);
+            *f32_at(particleData, 0x58) = *f32_at(particleData, 0x58) + *f32_at(particleData, 0x7C);
+        }
+    }
+
+    wrap_particle_rotation_triplet((u8*)particleData, 0x44);
+
+    *f32_at(particleData, 0x6C) = *(float*)(payload + 0x90);
+    *f32_at(particleData, 0x70) = *(float*)(payload + 0x94);
+    *f32_at(particleData, 0x74) = *(float*)(payload + 0x98);
+    *f32_at(particleData, 0x78) = *(float*)(payload + 0x9C);
+    *f32_at(particleData, 0x7C) = *(float*)(payload + 0xA0);
+    *f32_at(particleData, 0x80) = *(float*)(payload + 0xA4);
+
+    if (payload[0x133] != 0) {
+        if ((payload[0x133] & 0x20) == 0) {
+            *f32_at(particleData, 0x84) = *(float*)(payload + 0xB0) * Math.RandF();
+            *f32_at(particleData, 0x88) = *(float*)(payload + 0xB4) * Math.RandF();
+            *f32_at(particleData, 0x8C) = *(float*)(payload + 0xB8) * Math.RandF();
+        } else {
+            float randomizedStep = *(float*)(payload + 0xB0) * Math.RandF();
+            *f32_at(particleData, 0x84) = randomizedStep;
+            *f32_at(particleData, 0x88) = randomizedStep;
+            *f32_at(particleData, 0x8C) = randomizedStep;
+        }
+
+        apply_signed_randomization((u8*)particleData, 0x84, payload[0x133]);
+
+        if ((payload[0x133] & 4) != 0) {
+            *f32_at(particleData, 0x6C) = *f32_at(particleData, 0x6C) + *f32_at(particleData, 0x84);
+            *f32_at(particleData, 0x70) = *f32_at(particleData, 0x70) + *f32_at(particleData, 0x88);
+            *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) + *f32_at(particleData, 0x8C);
+        }
+
+        if ((payload[0x133] & 8) != 0) {
+            *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) + *f32_at(particleData, 0x84);
+            *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) + *f32_at(particleData, 0x88);
+            *f32_at(particleData, 0x80) = *f32_at(particleData, 0x80) + *f32_at(particleData, 0x8C);
         }
     }
 }

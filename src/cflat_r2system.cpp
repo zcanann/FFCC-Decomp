@@ -60,6 +60,8 @@ unsigned char gMapHitDrawMode;
 }
 extern unsigned char CFlat[0x10440];
 extern int gWmMenuWorkA;
+extern float FLOAT_80330b54;
+extern float FLOAT_80330b64;
 
 static const char s_setMiniGameParamFmt[] = "SetMiniGameParam no 0x%04x data[%d]\n";
 
@@ -2536,6 +2538,31 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, (static_cast<unsigned int>(__cntlzw(MemoryCardMan.DummyLoad())) >> 5) & 0xFF);
         outResult = 0;
         return;
+    case -0x9C: {
+        int cameraSlot = *object->m_localBase;
+        int cameraFrame = object->m_localBase[1];
+        int* cameraFrameCount = reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 4 + cameraSlot * 4);
+        int* cameraTablePtr = reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0x14 + cameraSlot * 4);
+        if ((*cameraTablePtr == 0) || (cameraFrame < 0) || (*cameraFrameCount <= cameraFrame)) {
+            runtime->push(object, 0);
+            outResult = 0;
+            return;
+        }
+
+        int cameraData = *cameraTablePtr + cameraFrame * 0x20;
+        *reinterpret_cast<int*>(object->m_localBase[2]) = *reinterpret_cast<int*>(cameraData + 0x0);
+        *reinterpret_cast<float*>(object->m_localBase[3]) = -*reinterpret_cast<float*>(cameraData + 0x4);
+        *reinterpret_cast<float*>(object->m_localBase[4]) = -*reinterpret_cast<float*>(cameraData + 0x8);
+        *reinterpret_cast<int*>(object->m_localBase[5]) = *reinterpret_cast<int*>(cameraData + 0xC);
+        *reinterpret_cast<float*>(object->m_localBase[6]) = -*reinterpret_cast<float*>(cameraData + 0x10);
+        *reinterpret_cast<float*>(object->m_localBase[7]) = -*reinterpret_cast<float*>(cameraData + 0x14);
+        *reinterpret_cast<int*>(object->m_localBase[8]) = *reinterpret_cast<int*>(cameraData + 0x18);
+        *reinterpret_cast<float*>(object->m_localBase[9]) =
+            -(FLOAT_80330b54 * *reinterpret_cast<float*>(cameraData + 0x1C)) / FLOAT_80330b64;
+        runtime->push(object, 1);
+        outResult = 0;
+        return;
+    }
     case -0x9B:
         CharaPcs.LoadCam(*object->m_localBase, strBlob + strOffs[object->m_localBase[1]]);
         runtime->push(object, 0);
@@ -2556,6 +2583,30 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0x98:
+        *reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + 0x134D + (*object->m_localBase * 0x14)) =
+            static_cast<char>(object->m_localBase[1]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x97: {
+        unsigned int slot = static_cast<unsigned int>(*object->m_localBase);
+        *reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + 0x134C + (slot * 0x14)) =
+            static_cast<char>(object->m_localBase[1]);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1350 + (slot * 0x14)) = object->m_localBase[2];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1354 + (slot * 0x14)) = object->m_localBase[3];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1358 + (slot * 0x14)) = object->m_localBase[4];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x135C + (slot * 0x14)) = object->m_localBase[5];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x96:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x12AC) = *object->m_localBase;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x12B0) = object->m_localBase[1];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0x95: {
         unsigned int result = 1;
         switch (*object->m_localBase) {

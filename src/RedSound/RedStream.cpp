@@ -555,8 +555,9 @@ void StreamControl()
 					}
 				}
 
-				int changed = *(int*)(streamData + 0x108) != 0;
-				if (changed) {
+				int changed = 0;
+				if (*(int*)(streamData + 0x108) != 0) {
+					changed = 1;
 					*(int*)(streamData + 0x108) -= 1;
 					*(int*)(streamData + 0x100) += *(int*)(streamData + 0x104);
 				}

@@ -269,21 +269,20 @@ int SeStopID(int seId)
  */
 int SeStopMG(int bank, int sep, int group, int kind)
 {
-	int soundBase;
-	int* trackBasePtr;
+	int soundBase = (int)DAT_8032f3f0;
+	int* trackBasePtr = (int*)(soundBase + 0xdbc);
 	int* track;
 
-	soundBase = (int)DAT_8032f3f0;
-	trackBasePtr = (int*)(soundBase + 0xdbc);
 	*(unsigned int*)(soundBase + 0x1244) = 0;
 	track = *(int**)(soundBase + 0xdbc);
 	do {
 		if ((*track != 0) && ((track[0x3d] & 0x80000000U) == 0)) {
 			int id = track[0x3d] / 1000 + (track[0x3d] >> 0x1f);
 			id = id - (id >> 0x1f);
-				if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
-					int trackNo;
-					int seTrackOffset;
+			if ((bank != id) && (((sep != id) && (group != id)) && (kind != id))) {
+				int trackNo;
+				int voiceFlagsOffset;
+				int voiceStateOffset;
 
 				KeyOnReserveClear((RedKeyOnDATA*)DAT_8032f3fc, (RedTrackDATA*)track);
 				track[0x3e] = 0;
@@ -291,14 +290,15 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				*track = 0;
 				track[0x16] = 0;
 
-					trackNo = *(char*)((char*)track + 0x14e);
-					seTrackOffset = trackNo * 0xc0;
-					((unsigned char*)DAT_8032f444)[seTrackOffset + 0x1a] &= (unsigned char)0xfa;
-					*(unsigned int*)((unsigned char*)DAT_8032f444 + seTrackOffset + 0x94) &= 0xfffffff7;
-					*(unsigned int*)((unsigned char*)DAT_8032f444 + seTrackOffset + 0x90) &= 0xfffffffe;
-					*(unsigned int*)((unsigned char*)DAT_8032f444 + seTrackOffset + 0x90) |= 2;
-					*(unsigned int*)((unsigned char*)DAT_8032f444 + seTrackOffset) = 0;
-					*(unsigned int*)((unsigned char*)DAT_8032f444 + seTrackOffset + 0x8c) = 0;
+				trackNo = *(char*)((char*)track + 0x14e);
+				voiceFlagsOffset = trackNo * 0xc0 + 0x94;
+				voiceStateOffset = trackNo * 0xc0 + 0x90;
+				((unsigned char*)DAT_8032f444)[trackNo * 0xc0 + 0x1a] &= (unsigned char)0xfa;
+				*(unsigned int*)((unsigned char*)DAT_8032f444 + voiceFlagsOffset) &= 0xfffffff7;
+				*(unsigned int*)((unsigned char*)DAT_8032f444 + voiceStateOffset) &= 0xfffffffe;
+				*(unsigned int*)((unsigned char*)DAT_8032f444 + voiceStateOffset) |= 2;
+				*(unsigned int*)((unsigned char*)DAT_8032f444 + trackNo * 0xc0) = 0;
+				*(unsigned int*)((unsigned char*)DAT_8032f444 + trackNo * 0xc0 + 0x8c) = 0;
 
 				if (track[6] != 0) {
 					DAT_8032e154.WaveHistoryManager(0, *(short*)(track[6] + 2));

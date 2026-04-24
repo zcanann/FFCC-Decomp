@@ -230,7 +230,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		*(float*)(step->m_payload + 8), *(float*)(step->m_payload + 0xc));
 
 	pppCalcFrameShape(
-		*(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeArg1,
+		**(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeArg1,
 		work->m_shapeArg2, work->m_shapeArg0, *(short*)(step->m_payload + 0x2c));
 
 	for (u32 i = 0; i < (u32)step->m_payload[0x3a] + 1; i++) {
@@ -451,7 +451,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	GXTexCoord2f32(FLOAT_80330DC4, work->m_length);
 
 	if (step->m_stepValue != 0xFFFF) {
-		long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
+		long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
 		PSMTXIdentity(shapeMtx.value);
 		shapeMtx.value[0][0] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.x;
 		shapeMtx.value[1][1] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.y;
@@ -465,7 +465,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		shapeMtx.value[1][3] = shapePos.y;
 		shapeMtx.value[2][3] = shapePos.z;
 		GXLoadPosMtxImm(shapeMtx.value, GX_PNMTX0);
-		pppDrawShp__FPlsP12CMaterialSetUc(shape, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
+		pppDrawShp__FPlsP12CMaterialSetUc(*shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
 
 		count = (u32)step->m_payload[0x1e];
 		pppYmLaserDoubleBits countDouble;

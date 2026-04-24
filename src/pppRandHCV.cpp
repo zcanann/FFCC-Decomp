@@ -5,7 +5,7 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-const float kPppRandHCVSingleSampleScale = 2.0f;
+static const float kPppRandHCVSingleSampleScale = 2.0f;
 typedef struct RandHCVParams {
     s32 field0;
     s32 field4;
@@ -72,18 +72,4 @@ void pppRandHCV(void* p1, void* p2, void* p3)
     }
 }
 
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static short randshort(short value, float scale)
-{
-    return (short)(((f32)value * scale) - (f32)value);
 }

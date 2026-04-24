@@ -5,7 +5,7 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-const float kPppRandDownIVDualSampleScale = 0.5f;
+static const float kPppRandDownIVDualSampleScale = 0.5f;
 struct PppRandDownIVParam2 {
     s32 field0;
     s32 field4;
@@ -65,18 +65,4 @@ extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
     target[0] += (s32)((f32)in->field8 * scale);
     target[1] += (s32)((f32)in->fieldC * scale);
     target[2] += (s32)((f32)in->field10 * scale);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static int randint(int value, float scale)
-{
-    return (int)((float)value * scale);
 }

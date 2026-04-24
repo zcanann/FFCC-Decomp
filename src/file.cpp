@@ -776,7 +776,6 @@ void CFile::Init()
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x208) = nextHandle;
-        handleIndex++;
 
         byteOffset += 0x2B0;
         handleIndex++;

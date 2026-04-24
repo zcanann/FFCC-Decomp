@@ -9,12 +9,18 @@ extern "C" void calc2__8CGamePcsFv(CGamePcs*);
 extern "C" void draw0__8CGamePcsFv(CGamePcs*);
 extern "C" void draw1__8CGamePcsFv(CGamePcs*);
 extern "C" void draw2__8CGamePcsFv(CGamePcs*);
+extern char __RTTI__8CManager[];
+extern char __RTTI__8CProcess[];
 
 const char s_CGamePcs_801D7C20[] = "CGamePcs";
 
 unsigned int m_table__8CGamePcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CGamePcs_801D7C20)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,
     0, 0x19, 0, 0, 0, 0, 0x3A, 1, 0, 0, 0, 0x3C, 1, 0, 0, 0, 0x47, 1, 0, 0, 0, 0x4C
+};
+unsigned int CGamePcs_RTTI_base__8CGamePcs[3] = {reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, 0};
+unsigned int CGamePcs_RTTI__8CGamePcs[5] = {
+    reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, reinterpret_cast<unsigned int>(__RTTI__8CProcess), 0, 0
 };
 
 CGamePcs GamePcs;

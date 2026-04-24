@@ -103,7 +103,6 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 	YmDeformationShpState* work =
 		(YmDeformationShpState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
-	pppYmDeformationShpLayout* obj = (pppYmDeformationShpLayout*)pppYmDeformationShp_;
 	Vec vertices[4];
 	Mtx drawMtx;
 	Mtx rotMtx;
@@ -121,7 +120,8 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		pppSetBlendMode(1);
 		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 		pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-			&colorInfo->m_color, &obj->m_modelMatrix, param_2->m_drawZ, param_2->m_alpha, 0, 0, 0, 1, 1, 0);
+			&colorInfo->m_color, &((pppYmDeformationShpLayout*)pppYmDeformationShp_)->m_modelMatrix, param_2->m_drawZ,
+			param_2->m_alpha, 0, 0, 0, 1, 1, 0);
 
 		GXSetNumTevStages(1);
 		GXSetNumTexGens(2);

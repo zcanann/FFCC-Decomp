@@ -1,9 +1,11 @@
 #include "ffcc/shopmenu.h"
 #include "ffcc/graphic.h"
+#include "ffcc/materialman.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppShape.h"
 #include "ffcc/sound.h"
 #include "ffcc/linkage.h"
 #include "ffcc/p_tina.h"
@@ -1058,13 +1060,74 @@ int CShopMenu::getItemHaveCnt(int itemNo)
     return CountShopMenuOwnedItems(ShopMenuCaravan(this), itemNo);
 }
 
+static long* GetShopMenuShapeAnimData(int shapeNo)
+{
+    int shapeTableBase = *reinterpret_cast<int*>(&pppEnvStPtr->m_particleColors[0]);
+    if (shapeTableBase == 0) {
+        return 0;
+    }
+
+    pppShapeSt* shape = *reinterpret_cast<pppShapeSt**>(shapeTableBase + shapeNo * 4);
+    if ((shape == 0) || (shape->m_animData == 0)) {
+        return 0;
+    }
+
+    return reinterpret_cast<long*>(shape->m_animData);
+}
+
+static tagOAN3_SHAPE* GetShopMenuFrameShape(long* animData, int groupNo)
+{
+    if ((animData == 0) || (groupNo < 0)) {
+        return 0;
+    }
+
+    unsigned char* animBytes = reinterpret_cast<unsigned char*>(animData);
+    int frameCount = *reinterpret_cast<short*>(animBytes + 6);
+    if (groupNo >= frameCount) {
+        return 0;
+    }
+
+    int shapeOffset = *reinterpret_cast<short*>(animBytes + groupNo * 8 + 0x10);
+    return reinterpret_cast<tagOAN3_SHAPE*>(animBytes + shapeOffset);
+}
+
+static void SetupShopMenuShapeDrawColor(unsigned char alpha)
+{
+    _GXColor drawColor = {0xFF, 0xFF, 0xFF, alpha};
+    GXSetChanAmbColor(GX_COLOR0A0, drawColor);
+    GXSetChanMatColor(GX_COLOR0A0, drawColor);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+}
+
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void setOrtho(int, int, float, float, float)
+void setOrtho(int x, int y, float scaleX, float scaleY, float zOffset)
 {
+    Mtx screenMtx;
+    Mtx44 projectionMtx;
+
+    PSMTXIdentity(screenMtx);
+    screenMtx[0][0] = scaleX;
+    screenMtx[1][1] = -scaleY;
+    screenMtx[0][3] = static_cast<float>(x);
+    screenMtx[1][3] = static_cast<float>(y);
+    screenMtx[2][2] = FLOAT_80332d78;
+
+    GXLoadPosMtxImm(screenMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(projectionMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, FLOAT_80332d28);
+    projectionMtx[2][3] += zOffset;
+    GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
+
     GXSetCullMode(GX_CULL_NONE);
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
     GXSetColorUpdate(GX_TRUE);
@@ -1075,10 +1138,27 @@ void setOrtho(int, int, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void drawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char)
+void drawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char alpha)
 {
+    if ((shape == 0) || (materialSet == 0)) {
+        return;
+    }
+
+    SetupShopMenuShapeDrawColor(alpha);
     GXSetCullMode(GX_CULL_NONE);
     GXSetColorUpdate(GX_TRUE);
+    MaterialMan.SetMaterialMenu(
+        materialSet, static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+
+    unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
+    int shapeCount = *reinterpret_cast<short*>(shapeBytes + 2);
+    for (int i = 0; i < shapeCount; i++) {
+        GXCallDisplayList(*reinterpret_cast<void**>(shapeBytes + 0xC + i * 8), 0x60);
+    }
 }
 
 /*
@@ -1086,9 +1166,9 @@ void drawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void drawShapeSeq0(int, int, unsigned char, unsigned char)
+void drawShapeSeq0(int shapeNo, int groupNo, unsigned char alpha, unsigned char tlut)
 {
-    drawShapeSeq(0, 0, 0, 0, 0xFF, 0, 0, 0.0f, 0);
+    drawShapeSeq(shapeNo, groupNo, 0, 0, alpha, 0, 0, 0.0f, tlut);
 }
 
 /*
@@ -1096,9 +1176,21 @@ void drawShapeSeq0(int, int, unsigned char, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void drawShapeSeq(int, int, int, int, unsigned char, unsigned char, unsigned char, float, unsigned char)
+void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, unsigned char flipX, unsigned char flipY,
+                  float zOffset, unsigned char tlut)
 {
-    drawShapeSeqScale(0, 0, 0, 0, 1.0f, 1.0f, 0xFF);
+    (void)tlut;
+
+    long* animData = GetShopMenuShapeAnimData(shapeNo);
+    tagOAN3_SHAPE* shape = GetShopMenuFrameShape(animData, groupNo);
+    if (shape == 0) {
+        return;
+    }
+
+    float scaleX = (flipX != 0) ? FLOAT_80332dd0 : FLOAT_80332d78;
+    float scaleY = (flipY != 0) ? FLOAT_80332dd0 : FLOAT_80332d78;
+    setOrtho(x, y, scaleX, scaleY, zOffset);
+    drawShp(shape, pppEnvStPtr->m_materialSetPtr, alpha);
 }
 
 /*
@@ -1106,10 +1198,16 @@ void drawShapeSeq(int, int, int, int, unsigned char, unsigned char, unsigned cha
  * Address:	TODO
  * Size:	TODO
  */
-void drawShapeSeqScale(int, int, int, int, float, float, unsigned char)
+void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, unsigned char alpha)
 {
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    drawShapeSeqGrouad(0, 0, 0, 0, 1.0f, 1.0f, white, white, white, white);
+    long* animData = GetShopMenuShapeAnimData(shapeNo);
+    tagOAN3_SHAPE* shape = GetShopMenuFrameShape(animData, groupNo);
+    if (shape == 0) {
+        return;
+    }
+
+    setOrtho(x, y, scaleX, scaleY, 0.0f);
+    drawShp(shape, pppEnvStPtr->m_materialSetPtr, alpha);
 }
 
 /*
@@ -1117,10 +1215,29 @@ void drawShapeSeqScale(int, int, int, int, float, float, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void drawShapeSeqGrouad(int, int, int, int, float, float, _GXColor, _GXColor, _GXColor, _GXColor)
+void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, _GXColor colorA,
+                        _GXColor colorB, _GXColor colorC, _GXColor colorD)
 {
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    drawGrouadQuad(0, 0, 0x20, 0x20, white, white, white, white);
+    long* animData = GetShopMenuShapeAnimData(shapeNo);
+    tagOAN3_SHAPE* shape = GetShopMenuFrameShape(animData, groupNo);
+    if (shape == 0) {
+        return;
+    }
+
+    setOrtho(x, y, scaleX, scaleY, 0.0f);
+    SetupShopMenuShapeDrawColor(0xFF);
+    MaterialMan.SetMaterialMenu(
+        pppEnvStPtr->m_materialSetPtr,
+        static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+
+    Vec minPos;
+    Vec maxPos;
+    pppGetShapePos(animData, static_cast<short>(groupNo), minPos, maxPos, 0);
+    Graphic.RenderTexQuadGrouad(minPos, maxPos, colorA, colorB, colorC, colorD);
 }
 
 /*
@@ -1128,10 +1245,16 @@ void drawShapeSeqGrouad(int, int, int, int, float, float, _GXColor, _GXColor, _G
  * Address:	TODO
  * Size:	TODO
  */
-void drawGrouadQuad(int, int, int, int, _GXColor, _GXColor, _GXColor, _GXColor)
+void drawGrouadQuad(int x, int y, int width, int height, _GXColor colorA, _GXColor colorB, _GXColor colorC, _GXColor colorD)
 {
+    setOrtho(x, y, FLOAT_80332d78, FLOAT_80332d78, 0.0f);
+    SetupShopMenuShapeDrawColor(0xFF);
     GXSetCullMode(GX_CULL_NONE);
     GXSetColorUpdate(GX_TRUE);
+
+    Vec minPos = {0.0f, 0.0f, 0.0f};
+    Vec maxPos = {static_cast<float>(width), static_cast<float>(height), 0.0f};
+    Graphic.RenderNoTexQuadGrouad(minPos, maxPos, colorA, colorB, colorC, colorD);
 }
 
 /*

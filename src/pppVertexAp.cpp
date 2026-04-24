@@ -98,8 +98,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
         count = data->spawnCount;
 
-        switch (data->mode) {
-        case 0:
+        if (data->mode == 0) {
             while (count-- != 0) {
                 if (state->index >= entry->maxValue) {
                     state->index = 0;
@@ -144,8 +143,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     }
                 }
             }
-            break;
-        case 1:
+        } else if (data->mode == 1) {
             while (count-- != 0) {
                 f32 randValue = Math.RandF();
                 f32 maxValue = (f32)entry->maxValue;
@@ -187,7 +185,6 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     }
                 }
             }
-            break;
         }
 
         state->countdown = data->spawnDelay;

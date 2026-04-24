@@ -583,30 +583,72 @@ int CFlatRuntime::Frame(int unused, int mode)
 	while (object != root) {
 		CObject* const next = object->m_next;
 
-		if ((static_cast<s8>(object->m_flags) >= 0) && (mode != 0)) {
+		if (((static_cast<int>(object->m_flags) << 24) >= 0) && (mode != 0)) {
 			object->m_flags &= 0xBF;
 			if (objectFrame(object) != 0) {
-				int scriptIndex = -1;
-				if (object->m_0x34 != 0) {
-					do {
-						object->m_sp--;
+				int scriptIndex;
 
-						if (object->m_0x34 != 0) {
-							scriptIndex = 31 - __cntlzw(static_cast<unsigned int>(static_cast<u16>(object->m_0x34)));
-						} else {
-							scriptIndex = -1;
+				if (object->m_0x34 != 0) {
+					int bitBase = 0x1F;
+					unsigned int scriptMask;
+					int scanCount;
+
+					object->m_sp--;
+					scriptMask = static_cast<unsigned int>(static_cast<unsigned short>(object->m_0x34));
+					scanCount = 4;
+
+					do {
+						scriptIndex = bitBase;
+						if ((((((scriptMask & 0x80000000) != 0)
+						       || ((scriptIndex = bitBase - 1), (scriptMask & 0x40000000) != 0))
+						      || ((scriptIndex = bitBase - 2), (scriptMask & 0x20000000) != 0))
+						     || (((scriptIndex = bitBase - 3), (scriptMask & 0x10000000) != 0)
+						         || ((scriptIndex = bitBase - 4), (scriptMask & 0x08000000) != 0)))
+						    || (((scriptIndex = bitBase - 5), (scriptMask & 0x04000000) != 0)
+						        || (((scriptIndex = bitBase - 6), (scriptMask & 0x02000000) != 0)
+						            || ((scriptIndex = bitBase - 7), (scriptMask & 0x01000000) != 0)))) {
+							break;
 						}
 
+						scriptMask <<= 8;
+						bitBase -= 8;
+						scanCount--;
+					} while (scanCount != 0);
+
+					if (scanCount == 0) {
+						scriptIndex = -1;
+					}
+
+					do {
 						typedef void (*ReqFinishedFn)(CFlatRuntime*, int, CObject*);
 						reinterpret_cast<ReqFinishedFn>((*reinterpret_cast<void***>(this))[0x10])(this, scriptIndex, object);
 
-						if (scriptIndex >= 0) {
-							object->m_0x34 = static_cast<s16>(object->m_0x34 & ~(1U << scriptIndex));
-							if (object->m_0x34 != 0) {
-								scriptIndex = 31 - __cntlzw(static_cast<unsigned int>(static_cast<u16>(object->m_0x34)));
-							} else {
-								scriptIndex = -1;
+						object->m_0x34 = static_cast<s16>(object->m_0x34 & ~(1U << scriptIndex));
+
+						bitBase = 0x1F;
+						scriptMask = static_cast<unsigned int>(static_cast<unsigned short>(object->m_0x34));
+						scanCount = 4;
+
+						do {
+							scriptIndex = bitBase;
+							if ((((((scriptMask & 0x80000000) != 0)
+							       || ((scriptIndex = bitBase - 1), (scriptMask & 0x40000000) != 0))
+							      || ((scriptIndex = bitBase - 2), (scriptMask & 0x20000000) != 0))
+							     || (((scriptIndex = bitBase - 3), (scriptMask & 0x10000000) != 0)
+							         || ((scriptIndex = bitBase - 4), (scriptMask & 0x08000000) != 0)))
+							    || (((scriptIndex = bitBase - 5), (scriptMask & 0x04000000) != 0)
+							        || (((scriptIndex = bitBase - 6), (scriptMask & 0x02000000) != 0)
+							            || ((scriptIndex = bitBase - 7), (scriptMask & 0x01000000) != 0)))) {
+								break;
 							}
+
+							scriptMask <<= 8;
+							bitBase -= 8;
+							scanCount--;
+						} while (scanCount != 0);
+
+						if (scanCount == 0) {
+							scriptIndex = -1;
 						}
 					} while (scriptIndex >= 0);
 				}
@@ -618,7 +660,7 @@ int CFlatRuntime::Frame(int unused, int mode)
 			}
 		}
 
-		if (static_cast<s8>(object->m_flags) < 0) {
+		if ((static_cast<int>(object->m_flags) << 24) < 0) {
 			object->m_previous->m_next = object->m_next;
 			object->m_next->m_previous = object->m_previous;
 
@@ -839,9 +881,29 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::getTopBit(unsigned int)
+int CFlatRuntime::getTopBit(unsigned int value)
 {
-	// TODO
+	int bitBase = 0x1F;
+	int scanCount = 4;
+
+	do {
+		int bit = bitBase;
+		if ((((((value & 0x80000000) != 0) || ((bit = bitBase - 1), (value & 0x40000000) != 0))
+		      || ((bit = bitBase - 2), (value & 0x20000000) != 0))
+		     || (((bit = bitBase - 3), (value & 0x10000000) != 0)
+		         || ((bit = bitBase - 4), (value & 0x08000000) != 0)))
+		    || (((bit = bitBase - 5), (value & 0x04000000) != 0)
+		        || (((bit = bitBase - 6), (value & 0x02000000) != 0)
+		            || ((bit = bitBase - 7), (value & 0x01000000) != 0)))) {
+			return bit;
+		}
+
+		value <<= 8;
+		bitBase -= 8;
+		scanCount--;
+	} while (scanCount != 0);
+
+	return -1;
 }
 
 /*

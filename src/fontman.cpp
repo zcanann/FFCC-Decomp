@@ -384,7 +384,7 @@ void CFont::DrawInit()
     TextureMan.SetTextureTev(texturePtr);
 
     renderFlags &= static_cast<unsigned char>(~0x10);
-    renderFlags &= static_cast<unsigned char>(~0x08);
+    renderFlags &= 0xF7;
 }
 
 /*
@@ -457,8 +457,15 @@ void CFont::SetTlut(int index)
  */
 void CFont::SetColor(_GXColor color)
 {
-	m_color = color;
-	GXSetChanMatColor(GX_COLOR0A0, m_color);
+	unsigned char green = color.g;
+	m_color.r = color.r;
+	unsigned char blue = color.b;
+	m_color.g = green;
+	green = color.a;
+	m_color.b = blue;
+	m_color.a = green;
+	_GXColor localColor = m_color;
+	GXSetChanMatColor(GX_COLOR0A0, localColor);
 }
 
 /*
@@ -472,7 +479,7 @@ void CFont::SetColor(_GXColor color)
  */
 void CFont::SetShadow(int enabled)
 {
-	renderFlags = (static_cast<unsigned int>(enabled) << 7) | (renderFlags & 0x7F);
+	renderFlags = (renderFlags & 0x7F) | (enabled << 7);
 }
 
 /*
@@ -543,8 +550,8 @@ void CFont::SetMargin(float value)
  */
 void CFont::SetZMode(int compareEnable, int updateEnable)
 {
-	renderFlags = (static_cast<unsigned char>(compareEnable) << 6 & 0x40) | (renderFlags & 0xBF);
-	renderFlags = (static_cast<unsigned char>(updateEnable) << 5 & 0x20) | (renderFlags & 0xDF);
+	renderFlags = (compareEnable << 6 & 0x40) | (renderFlags & 0xBF);
+	renderFlags = (updateEnable << 5 & 0x20) | (renderFlags & 0xDF);
 }
 
 /*
@@ -699,16 +706,16 @@ CFont::CFont()
 	posZ = 0.0f;
 	posY = 0.0f;
 	posX = 0.0f;
-	renderFlags &= static_cast<unsigned char>(~0x80);
+	renderFlags &= 0x7F;
 	scaleY = 1.0f;
 	scaleX = 1.0f;
-	renderFlags &= static_cast<unsigned char>(~0x08);
+	renderFlags &= 0xF7;
 	m_color.r = 0xFF;
 	m_color.g = 0xFF;
 	m_color.b = 0xFF;
 	m_color.a = 0xFF;
-	renderFlags &= static_cast<unsigned char>(~0x40);
-	renderFlags &= static_cast<unsigned char>(~0x20);
+	renderFlags &= 0xBF;
+	renderFlags &= 0xDF;
 	m_usesEmbeddedData = 0;
 }
 
@@ -785,16 +792,16 @@ void CFontMan::Init()
 		font->posZ = 0.0f;
 		font->posY = 0.0f;
 		font->posX = 0.0f;
-		font->renderFlags &= static_cast<unsigned char>(~0x80);
+		font->renderFlags &= 0x7F;
 		font->scaleY = 1.0f;
 		font->scaleX = 1.0f;
-		font->renderFlags &= static_cast<unsigned char>(~0x08);
+		font->renderFlags &= 0xF7;
 		font->m_color.r = 0xFF;
 		font->m_color.g = 0xFF;
 		font->m_color.b = 0xFF;
 		font->m_color.a = 0xFF;
-		font->renderFlags &= static_cast<unsigned char>(~0x40);
-		font->renderFlags &= static_cast<unsigned char>(~0x20);
+		font->renderFlags &= 0xBF;
+		font->renderFlags &= 0xDF;
 		font->m_usesEmbeddedData = 0;
 	}
 

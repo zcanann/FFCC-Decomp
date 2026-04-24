@@ -37,6 +37,7 @@ extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
 extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void changeMode__8CMenuPcsFQ28CMenuPcs8MENUMODE(CMenuPcs*, int);
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
+extern "C" unsigned int BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int rand(void);
 extern char* PTR_s_bonus_802128c0[];
@@ -182,6 +183,16 @@ static inline BonusPartySummary* GetBonusPartySummary(int activeIndex)
 	}
 
 	return &s_bonusSummaryData->m_party[activeIndex];
+}
+
+static inline CMemory::CStage* GetBonusAllocStage(CMenuPcs* menu)
+{
+	return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(menu) + 0xEC);
+}
+
+static inline CCharaPcs::CHandle** GetBonusDisplayHandleSlots(CMenuPcs* menu)
+{
+	return reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(menu) + 0x774);
 }
 
 static void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, short w, short h, int startFrame, int duration)
@@ -1090,6 +1101,91 @@ void CMenuPcs::createBonus()
 			ranked.m_rank = i;
 			if (i == 0) {
 				s_bonusSummaryData->m_winnerTotalValue = ranked.m_totalValue;
+			}
+		}
+
+		if (listPtr != 0) {
+			CMemory::CStage* stage = GetBonusAllocStage(this);
+			CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
+
+			for (int i = 0; i < activeCount; i++) {
+				BonusPartySummary& entry = s_bonusSummaryData->m_party[i];
+				unsigned long modelCode = entry.m_tribeId + 0x87;
+				CCharaPcs::CHandle* handle =
+				    new (stage, const_cast<char*>(s_bonusMenuSourceFile), 0x183) CCharaPcs::CHandle;
+				if (handle != 0) {
+					handle->Add();
+					handle->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
+					handle->m_flags = 0x300543;
+					entry.m_partyHandle = handle;
+					int slotPtr = listPtr + i * 0x524;
+					*reinterpret_cast<CCharaPcs::CHandle**>(slotPtr) = handle;
+					*reinterpret_cast<int*>(slotPtr + 4) = -1;
+				}
+
+				if (displaySlots != 0) {
+					unsigned long displayModelCode = entry.m_tribeId + 0x83;
+					CCharaPcs::CHandle* displayHandle =
+					    new (stage, const_cast<char*>(s_bonusMenuSourceFile), 0x187) CCharaPcs::CHandle;
+					if (displayHandle != 0) {
+						displayHandle->Add();
+						displayHandle->LoadModel(3, displayModelCode & 0xFFF, (displayModelCode >> 12) & 0xF, 0, -1, 0, 0);
+						displayHandle->m_flags = 0x300543;
+						displaySlots[activeCount + i] = displayHandle;
+					}
+				}
+			}
+
+			int handleIndex = activeCount * 2;
+			for (int artifactIndex = 0; artifactIndex < 8 && handleIndex < 0x18; artifactIndex++) {
+				short itemId = (artifactIndex < 4)
+				                   ? s_bonusSummaryData->m_tempArtifacts[artifactIndex]
+				                   : s_bonusSummaryData->m_bossArtifacts[artifactIndex - 4];
+				if (itemId <= 0) {
+					continue;
+				}
+
+				unsigned short itemModelCode =
+				    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2);
+				unsigned short modelNo = itemModelCode & 0x0FFF;
+				CCharaPcs::CHandle* itemHandle =
+				    new (stage, const_cast<char*>(s_bonusMenuSourceFile), 0x19C) CCharaPcs::CHandle;
+				if (itemHandle == 0) {
+					handleIndex++;
+					continue;
+				}
+
+				itemHandle->Add();
+				itemHandle->LoadModel(3, modelNo, itemModelCode >> 12, 0, -1, 0, 0);
+				itemHandle->m_flags = 0x300543;
+				displaySlots[handleIndex] = itemHandle;
+
+				int effectNo = -1;
+				switch (itemId) {
+				case 0xDF:
+					effectNo = 0x75;
+					break;
+				case 0xE0:
+					effectNo = 0x76;
+					break;
+				case 0xE1:
+					effectNo = 0x77;
+					break;
+				case 0xE2:
+					effectNo = 0x78;
+					break;
+				case 0xE3:
+					effectNo = 0x79;
+					break;
+				default:
+					break;
+				}
+
+				if (modelNo == 0x79 && effectNo >= 0) {
+					BindEffect__8CMenuPcsFiii(this, handleIndex, effectNo, -1);
+				}
+
+				handleIndex++;
 			}
 		}
 	}

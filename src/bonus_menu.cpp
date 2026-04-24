@@ -1564,7 +1564,8 @@ void CMenuPcs::CalcResultCloseAnim()
 	const int frameEchoBase = digitBase + activePartyCount;
 	const int iconEchoBase = frameEchoBase + activePartyCount;
 	const int digitEchoBase = iconEchoBase + activePartyCount;
-	const int closeCount = digitEchoBase + activePartyCount;
+	const int nameBase = digitEchoBase + activePartyCount;
+	const int closeCount = nameBase + activePartyCount;
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		BonusAnimSprite originals[0x20];
@@ -1647,6 +1648,14 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprites[digitEchoBase + i].startFrame = 8 + i * 2;
 			sprites[digitEchoBase + i].duration = 10;
 			sprites[digitEchoBase + i].alpha = 0.75f;
+
+			InitAnimSprite(&sprites[nameBase + i], -1, 0x108, (short)(0x6c + i * 0x60), 0, 0, 5 + i * 2, 12);
+			sprites[nameBase + i].timer = 0;
+			sprites[nameBase + i].depth = 0.0f;
+			sprites[nameBase + i].alpha = 1.0f;
+			sprites[nameBase + i].scale = 1.0f;
+			sprites[nameBase + i].mulX = 0.0f;
+			sprites[nameBase + i].mulY = 0.0f;
 		}
 
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
@@ -1700,10 +1709,14 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->mulX = 64.0f * progress;
 			sprite->mulY = 10.0f * progress;
 			sprite->scale = 0.92f - progress * 0.15f;
-		} else {
+		} else if (i >= digitEchoBase && i < nameBase) {
 			sprite->mulX = 18.0f * progress;
 			sprite->mulY = -52.0f * progress;
 			sprite->scale = 0.9f - progress * 0.2f;
+		} else {
+			sprite->mulX = 18.0f * progress;
+			sprite->mulY = 4.0f * progress;
+			sprite->scale = 1.0f;
 		}
 
 		if (sprite->scale < 0.0f) {
@@ -1739,14 +1752,20 @@ void CMenuPcs::DrawResultCloseAnim()
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int digitIndex = 0;
+	int nameIndex = 0;
+	int lastTexturedKind = -1;
 
 	if (animPtr == 0 || statePtr == 0) {
+		return;
+	}
+	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		return;
 	}
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	float strongest = 0.0f;
+	CFont* font = GetBonusMenuMembers(this).m_font;
 
 	DrawInit__8CMenuPcsFv(this);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
@@ -1760,27 +1779,47 @@ void CMenuPcs::DrawResultCloseAnim()
 			alpha = 1.0f;
 		}
 
+		if (sprite->kind == 0x17 && lastTexturedKind != 0x17) {
+			SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 1);
+		} else if (sprite->kind != 0x17 && lastTexturedKind == 0x17) {
+			SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+		}
+		lastTexturedKind = sprite->kind;
+
 		if (sprite->kind == -3) {
 			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
 		} else if (sprite->kind == -4) {
 			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
 		} else if (sprite->kind == -2) {
 			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, GetBonusResultValueByActiveIndex(digitIndex++));
+		} else if (sprite->kind == -1) {
+			if (font != 0) {
+				const char* partyName = GetBonusPartyNameByActiveIndex(nameIndex++);
+				if (partyName != 0 && *partyName != '\0') {
+					_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+					font->SetMargin(1.0f);
+					font->SetShadow(1);
+					font->SetScale(0.9f);
+					font->SetTlut(7);
+					font->SetColor(color);
+					font->DrawInit();
+					font->SetPosX((float)sprite->x + sprite->mulX);
+					font->SetPosY((float)sprite->y + sprite->mulY);
+					font->Draw(const_cast<char*>(partyName));
+				}
+			}
 		} else if (sprite->kind == 0x17) {
 			DrawBonusSweepSprite(this, sprite, alpha, false);
 		} else {
-			GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
-			GXSetChanMatColor(GX_COLOR0A0, color);
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, sprite->tex);
-			DrawRect__8CMenuPcsFUlfffffffff(this, 0,
-			    (float)sprite->x + sprite->mulX, (float)sprite->y + sprite->mulY,
-			    (float)sprite->w, (float)sprite->h,
-			    sprite->depth, sprite->depth, sprite->scale, sprite->scale, 0.0f);
+			DrawBonusTexturedSprite(this, sprite, alpha);
 		}
 
 		if (strongest < alpha) {
 			strongest = alpha;
 		}
+	}
+	if (lastTexturedKind == 0x17) {
+		SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 	}
 
 	if (*(unsigned char*)(statePtr + 8) != 0 && strongest > 0.0f) {

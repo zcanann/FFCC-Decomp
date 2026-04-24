@@ -2760,6 +2760,27 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, Graphic.GetProgressive());
         outResult = 0;
         return;
+    case -0x82:
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x10408) =
+            static_cast<unsigned int>(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x81: {
+        float angle = static_cast<float>(object->m_localBase[2]);
+        Vec normal = {sinf(angle), 0.0f, cosf(angle)};
+        Vec point = {static_cast<float>(*object->m_localBase), 0.0f, static_cast<float>(object->m_localBase[1])};
+        Mtx& reflectMtx = *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(this) + 0x12b4);
+        PSMTXReflect(reflectMtx, &point, &normal);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x80:
+        this->SetParticleWorkSe(*object->m_localBase, static_cast<char>(object->m_localBase[1]), object->m_localBase[2]);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0x7F:
         Sound.SetReverb(*object->m_localBase, object->m_localBase[1]);
         runtime->push(object, 0);

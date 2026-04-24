@@ -28,6 +28,7 @@ class CFlatRuntime2
 	void SetParticleWorkScale(float);
 	void SetParticleWorkCol(int, int, float);
 	void SetParticleWorkSpeed(float);
+	void SetParticleWorkSe(int, int, int);
 	void GetFreeParticleSlot();
 	void EndParticleSlot(int, int);
 	void initAllFinished();

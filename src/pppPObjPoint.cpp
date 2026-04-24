@@ -31,15 +31,18 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
     PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + objOffset + 0x80);
 
     if (objData->id == pointData->id) {
+        u32 vecIndex = objData->field_4;
         u8* vecPtr;
+        u8* data;
+        PObjPointEntry* table;
 
-        if ((objData->field_4 + 0x10000) == 0xFFFF) {
-            vecPtr = (u8*)gPppDefaultValueBuffer;
+        if (vecIndex == -1) {
+            vecPtr = gPppDefaultValueBuffer;
         } else {
-            PObjPointEntry* table = *(PObjPointEntry**)((u8*)pppMngStPtr + 0xD4);
-            u8* data = (u8*)objData->data;
-            u32 vecOffset = table[objData->field_4].vecOffset;
-            vecPtr = data + 0x80;
+            table = *(PObjPointEntry**)((u8*)pppMngStPtr + 0xD4);
+            data = (u8*)objData->data + 0x80;
+            u32 vecOffset = table[vecIndex].vecOffset;
+            vecPtr = data;
             vecPtr += vecOffset;
         }
 

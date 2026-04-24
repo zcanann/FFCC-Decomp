@@ -5,7 +5,7 @@
 
 struct PppObjData {
     int id;          // 0x0
-    unsigned int field_4;     // 0x4
+    int field_4;     // 0x4
     void* data;      // 0x8
     unsigned int objId;       // 0xc
 };

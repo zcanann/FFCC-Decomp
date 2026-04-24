@@ -599,10 +599,14 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* c
  */
 void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* params, VRyjMegaBirthModel* work)
 {
+    (void)pObject;
     u8* payload = (u8*)params;
-    if (payload[0x2A] == 0) {
-        PSMTXCopy(pObject->m_localMatrix.value, out.value);
-    } else if (payload[0x2A] == 1 || payload[0x2A] == 3 || payload[0x2A] == 5 || payload[0x2A] == 7) {
+    switch (payload[0x2A]) {
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 9:
         PSMTXIdentity(out.value);
         out.value[0][0] = pppMngStPtr->m_scale.x;
         out.value[1][1] = pppMngStPtr->m_scale.y;
@@ -610,11 +614,16 @@ void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* para
         out.value[0][3] = pppMngStPtr->m_position.x;
         out.value[1][3] = pppMngStPtr->m_position.y;
         out.value[2][3] = pppMngStPtr->m_position.z;
-    } else {
+        break;
+    case 8:
         PSMTXIdentity(out.value);
         out.value[0][3] = *f32_at((u8*)work, 0x2C);
         out.value[1][3] = *f32_at((u8*)work, 0x30);
         out.value[2][3] = *f32_at((u8*)work, 0x34);
+        break;
+    default:
+        PSMTXCopy(pppMngStPtr->m_matrix.value, out.value);
+        break;
     }
 }
 

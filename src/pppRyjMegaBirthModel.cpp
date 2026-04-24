@@ -498,6 +498,50 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
         }
     }
 
+    *f32_at(p, 0x6C) = *f32_at(p, 0x6C) + *f32_at(p, 0x78);
+    *f32_at(p, 0x70) = *f32_at(p, 0x70) + *f32_at(p, 0x7C);
+    *f32_at(p, 0x74) = *f32_at(p, 0x74) + *f32_at(p, 0x80);
+
+    if ((payload[0x8A] & 0x10) == 0) {
+        *f32_at(p, 0x78) = *f32_at(p, 0x78) + *(float*)(payload + 0xB0);
+        *f32_at(p, 0x7C) = *f32_at(p, 0x7C) + *(float*)(payload + 0xB4);
+        *f32_at(p, 0x80) = *f32_at(p, 0x80) + *(float*)(payload + 0xB8);
+    } else {
+        *f32_at(p, 0x78) = *f32_at(p, 0x78) + *(float*)(payload + 0xB0) + *f32_at(p, 0x84);
+        *f32_at(p, 0x7C) = *f32_at(p, 0x7C) + *(float*)(payload + 0xB4) + *f32_at(p, 0x88);
+        *f32_at(p, 0x80) = *f32_at(p, 0x80) + *(float*)(payload + 0xB8) + *f32_at(p, 0x8C);
+    }
+
+    *f32_at(p, 0x8C) = *f32_at(p, 0x8C) + *(float*)(payload + 0xBC);
+    if (payload[0x8F] == 0) {
+        if (((*(float*)(payload + 0xC0) <= FLOAT_80330498) && (FLOAT_80330498 <= *(float*)(payload + 0xBC))) ||
+            ((*(float*)(payload + 0xC0) < FLOAT_80330498) && (FLOAT_80330498 < *(float*)(payload + 0xBC) &&
+                                                              FLOAT_80330498 < *f32_at(p, 0x8C)))) {
+            *f32_at(p, 0x8C) = FLOAT_80330498;
+        } else if ((*(float*)(payload + 0xC0) > FLOAT_80330498) && (FLOAT_80330498 > *(float*)(payload + 0xBC)) &&
+                   (*f32_at(p, 0x8C) < FLOAT_80330498)) {
+            *f32_at(p, 0x8C) = FLOAT_80330498;
+        }
+    }
+
+    *f32_at(p, 0x90) = *f32_at(p, 0x90) + *(float*)(payload + 0xC4);
+    Vec direction = {particleData->m_matrix[0][1], particleData->m_matrix[1][1], particleData->m_matrix[2][1]};
+    Vec position = {particleData->m_matrix[0][3], particleData->m_matrix[1][3], particleData->m_matrix[2][3]};
+    Vec step;
+
+    pppScaleVectorXYZ(step, direction, *f32_at(p, 0x8C));
+    pppAddVector(position, position, step);
+    pppScaleVectorXYZ(step, vRyjMegaBirthModel->m_accelerationAxis, *f32_at(p, 0x90));
+    pppAddVector(position, position, step);
+
+    particleData->m_matrix[0][3] = position.x;
+    particleData->m_matrix[1][3] = position.y;
+    particleData->m_matrix[2][3] = position.z;
+
+    *f32_at(p, 0x8C) = *f32_at(p, 0x8C) + *f32_at(p, 0x90);
+    *f32_at(p, 0x90) = *f32_at(p, 0x90) + *(float*)(payload + 0xE0);
+    *f32_at(p, 0x94) = *f32_at(p, 0x94) + *(float*)(payload + 0xE4);
+
     particleData->m_lifeTime = particleData->m_lifeTime + 1;
     if (*(s16*)(payload + 0x26) != 0) {
         *s16_at(p, 0x22) = *s16_at(p, 0x22) - 1;

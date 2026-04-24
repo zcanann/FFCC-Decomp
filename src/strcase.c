@@ -11,20 +11,14 @@ void tolower_name_conflict(char* str)
 {
     unsigned char c;
 
-    goto test;
+    while (*str != '\0') {
+        c = *str;
+        if (((c >= 'A') && (c <= 'Z')) || ((c >= 0xC0) && (c <= 0xD6)) || ((c >= 0xD8) && (c <= 0xDC))) {
+            c += 0x20;
+        }
 
-loop:
-    if (((c >= 'A') && (c <= 'Z')) || ((c >= 0xC0) && (c <= 0xD6)) || ((c >= 0xD8) && (c <= 0xDC))) {
-        c += 0x20;
-    }
-
-    *str = c;
-    str++;
-
-test:
-    c = *str;
-    if (c != '\0') {
-        goto loop;
+        *str = c;
+        str++;
     }
 }
 
@@ -41,20 +35,14 @@ void toupper(char* str)
 {
     unsigned char c;
 
-    goto test;
+    while (*str != '\0') {
+        c = *str;
+        if (((c >= 'a') && (c <= 'z')) || ((c >= 0xE0) && (c <= 0xF6)) || ((c >= 0xF8) && (c <= 0xFC))) {
+            c -= 0x20;
+        }
 
-loop:
-    if (((c >= 'a') && (c <= 'z')) || ((c >= 0xE0) && (c <= 0xF6)) || ((c >= 0xF8) && (c <= 0xFC))) {
-        c -= 0x20;
-    }
-
-    *str = c;
-    str++;
-
-test:
-    c = *str;
-    if (c != '\0') {
-        goto loop;
+        *str = c;
+        str++;
     }
 }
 

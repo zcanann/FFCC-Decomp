@@ -488,6 +488,73 @@ static void ApplySelectCloseSpriteMotion(BonusAnimSprite* sprite, int frame)
 	}
 }
 
+static void InitSelectCloseGroup(BonusAnimSprite* sprites, int start, int count, int duration)
+{
+	for (int i = 0; i < count; i++) {
+		BonusAnimSprite* sprite = &sprites[start + i];
+		sprite->timer = 0;
+		sprite->startFrame = 0;
+		sprite->duration = duration;
+	}
+}
+
+static void PrepareSelectCloseSprites(BonusAnimHeader* header, BonusAnimSprite* sprites)
+{
+	int activePartyCount = GetActiveBonusPartyCount();
+	int iconBase = 4;
+	int nameBase = iconBase + activePartyCount;
+	int slotBase = nameBase + activePartyCount;
+	int detailBase = slotBase + 8;
+	int markBase = detailBase + activePartyCount;
+	int lowerNameBase = markBase + activePartyCount;
+
+	for (int i = 0; i < (int)header->count; i++) {
+		BonusAnimSprite* sprite = &sprites[i];
+		sprite->x = (short)((float)sprite->x + sprite->mulX);
+		sprite->y = (short)((float)sprite->y + sprite->mulY);
+		sprite->mulX = 0.0f;
+		sprite->mulY = 0.0f;
+		sprite->alpha = 1.0f;
+		sprite->timer = 0;
+		sprite->startFrame = 0;
+		sprite->duration = 8;
+		if (sprite->scale <= 0.0f) {
+			sprite->scale = 1.0f;
+		}
+	}
+
+	if (header->count > 0) {
+		sprites[0].duration = 8;
+	}
+	if (header->count > 1) {
+		sprites[1].duration = 8;
+	}
+	if (header->count > 2) {
+		sprites[2].duration = 2;
+	}
+	if (header->count > 3) {
+		sprites[3].duration = 8;
+		GetBonusArtiBasePositions(&sprites[3]);
+	}
+
+	if (activePartyCount > 0) {
+		InitSelectCloseGroup(sprites, iconBase, activePartyCount, 8);
+		InitSelectCloseGroup(sprites, nameBase, activePartyCount, 8);
+		InitSelectCloseGroup(sprites, detailBase, activePartyCount, 8);
+		InitSelectCloseGroup(sprites, markBase, activePartyCount, 8);
+		InitSelectCloseGroup(sprites, lowerNameBase, activePartyCount, 8);
+
+		for (int i = 0; i < activePartyCount; i++) {
+			BonusAnimSprite* iconSprite = &sprites[iconBase + i];
+			BonusAnimSprite* nameSprite = &sprites[lowerNameBase + i];
+			nameSprite->x = (short)(iconSprite->x + 0x50);
+			nameSprite->y = (short)(iconSprite->y + 0x48);
+		}
+	}
+
+	InitSelectCloseGroup(sprites, slotBase, 8, 8);
+}
+
 static void DrawBonusTexturedSprite(CMenuPcs* menu, const BonusAnimSprite* sprite, float alpha)
 {
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
@@ -2809,22 +2876,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		if (header->count > 0 && sprites[header->count - 1].kind == 0x20) {
 			header->count = (short)(header->count - 1);
 		}
-		for (int i = 0; i < (int)header->count; i++) {
-			sprites[i].x = (short)((float)sprites[i].x + sprites[i].mulX);
-			sprites[i].y = (short)((float)sprites[i].y + sprites[i].mulY);
-			sprites[i].mulX = 0.0f;
-			sprites[i].mulY = 0.0f;
-			sprites[i].alpha = 1.0f;
-			sprites[i].timer = 0;
-			sprites[i].duration = 8;
-			if (sprites[i].kind == 0x16 || sprites[i].kind == -3 || sprites[i].kind == 0x1f || sprites[i].kind == -4) {
-				sprites[i].startFrame = 0;
-			} else if (sprites[i].kind == -2) {
-				sprites[i].startFrame = 2 + (i & 3);
-			} else {
-				sprites[i].startFrame = 1 + (i & 3);
-			}
-		}
+		PrepareSelectCloseSprites(header, sprites);
 		*(unsigned char*)(statePtr + 0xb) = 1;
 		return;
 	}

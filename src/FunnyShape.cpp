@@ -28,6 +28,8 @@ extern const float FLOAT_8032fd80;
 extern float FLOAT_8032fd90;
 extern float FLOAT_8032fd94;
 extern float FLOAT_8032fd98;
+static const float FLOAT_8032fd9c = 320.0f;
+static const float FLOAT_8032fda0 = 224.0f;
 extern const float FLOAT_8032fda4;
 extern const float FLOAT_8032fda8;
 
@@ -305,13 +307,13 @@ void CFunnyShape::InitAnmWork()
         work->angle = static_cast<float>(r % 0x168);
         work->angle = (angleMul * work->angle) / angleDiv;
 
-        r = rand();
-        if ((r % 2) != 0) {
+        u32 u = static_cast<u32>(rand());
+        if ((u >> 0x1F) != ((u & 1) ^ (u >> 0x1F))) {
             work->x *= FLOAT_8032fd80;
         }
 
-        r = rand();
-        if ((r % 2) != 0) {
+        u = static_cast<u32>(rand());
+        if ((u >> 0x1F) != ((u & 1) ^ (u >> 0x1F))) {
             work->y *= FLOAT_8032fd80;
         }
 
@@ -342,7 +344,7 @@ void CFunnyShape::Update()
 
     CFunnyShapeAnmWork* work = AnmWork(this);
     const float zero = 0.0f;
-    const bool noSpread = ((ShapeFlags(this) & 0x80) == 0);
+    const u8 noSpread = static_cast<u8>(((ShapeFlags(this) >> 7) & 1) ^ 1);
     for (s32 i = 0; i < ShapeCount(this); i++) {
         work->delay = static_cast<s16>(work->delay - 0x200);
         if (work->delay <= 0) {
@@ -351,10 +353,11 @@ void CFunnyShape::Update()
                 work->frame = 0;
 
                 s32 r = rand();
-                work->x = static_cast<float>(r % ShapeRange(this));
+                const s16 range = ShapeRange(this);
+                work->x = static_cast<float>(r % range);
 
                 r = rand();
-                work->y = static_cast<float>(r % ShapeRange(this));
+                work->y = static_cast<float>(r % range);
                 work->z = zero;
                 work->delay = 0x200;
                 work->viewportY = zero;
@@ -445,18 +448,19 @@ void CFunnyShape::Render()
         count = 1;
     }
 
-    CFunnyShape* work = this;
+    const f32 baseX = FLOAT_8032fd9c;
+    CFunnyShapeAnmWork* work = AnmWork(this);
+    const f32 baseY = FLOAT_8032fda0;
 
     for (s32 i = 0; i < count; i++) {
         Vec2d pos;
-        pos.x = 320.0f + *reinterpret_cast<float*>(Ptr(work, 8));
-        pos.y = 224.0f + *reinterpret_cast<float*>(Ptr(work, 0xC));
+        pos.x = baseX + work->x;
+        pos.y = baseY + work->y;
 
         u8* animData = reinterpret_cast<u8*>(AnimData(this));
-        const s16 frame = *reinterpret_cast<s16*>(Ptr(work, 0x14));
-        const s16 shapeOffset = reinterpret_cast<s16*>(animData)[frame * 4 + 8];
-        RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + shapeOffset), pos, *reinterpret_cast<float*>(Ptr(work, 0x28)));
-        work = reinterpret_cast<CFunnyShape*>(Ptr(work, 0x30));
+        const s16 shapeOffset = *reinterpret_cast<s16*>(animData + (work->frame * 8) + 0x10);
+        RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + shapeOffset), pos, work->angle);
+        work++;
     }
 }
 
@@ -511,10 +515,10 @@ void CFunnyShape::RenderTexture()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
     GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);
-    const u32 colorWord = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = FLOAT_8032fd80;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd6c;
+    const u32 colorWord = *reinterpret_cast<u32*>(&color);
     GXWGFifo.u32 = colorWord;
     GXWGFifo.f32 = FLOAT_8032fd6c;
     GXWGFifo.f32 = FLOAT_8032fd74;

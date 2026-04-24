@@ -118,15 +118,28 @@ void get_noise(unsigned char count)
 void alloc_check(VRyjMegaBirthModel* work, PRyjMegaBirthModel* params)
 {
     u8* payload = (u8*)params;
-    bool ok = (*(void**)((u8*)work + 0xC) != NULL);
-    if ((payload[0x136] != 0) && (*(void**)((u8*)work + 0x10) == NULL)) {
-        ok = false;
+    if (work->m_particleBlock == NULL) {
+        work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            work->m_numParticles * 0xA0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x8D);
+        if (work->m_particleBlock != NULL) {
+            memset(work->m_particleBlock, 0, work->m_numParticles * 0xA0);
+        }
     }
-    if ((payload[0x131] != 0) && (*(void**)((u8*)work + 0x14) == NULL)) {
-        ok = false;
+
+    if ((payload[0x136] != 0) && (work->m_worldMatrixBlock == NULL)) {
+        work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            work->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x97);
+        if (work->m_worldMatrixBlock != NULL) {
+            memset(work->m_worldMatrixBlock, 0, work->m_numParticles * 0x30);
+        }
     }
-    if (!ok) {
-        pppRyjMegaBirthModelDes((_pppPObject*)((u8*)work - 0x80), (PRyjMegaBirthModelOffsets*)payload);
+
+    if ((payload[0x131] != 0) && (work->m_colorBlock == NULL)) {
+        work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            work->m_numParticles << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0xA2);
+        if (work->m_colorBlock != NULL) {
+            memset(work->m_colorBlock, 0, work->m_numParticles << 5);
+        }
     }
 }
 
@@ -150,28 +163,8 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
     u8* payload = (u8*)params;
 
     if (*(void**)(work + 0xC) == 0) {
-        *(u32*)(work + 0x18) = *(u16*)(payload + 0x20);
-        *(void**)(work + 0xC) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            *(u32*)(work + 0x18) * 0xA0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x8D);
-        if (*(void**)(work + 0xC) != 0) {
-            memset(*(void**)(work + 0xC), 0, *(u32*)(work + 0x18) * 0xA0);
-        }
-
-        if (*(u8*)(payload + 0x136) != 0) {
-            *(void**)(work + 0x10) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                *(u32*)(work + 0x18) * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x97);
-            if (*(void**)(work + 0x10) != 0) {
-                memset(*(void**)(work + 0x10), 0, *(u32*)(work + 0x18) * 0x30);
-            }
-        }
-
-        if (*(u8*)(payload + 0x131) != 0) {
-            *(void**)(work + 0x14) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                *(u32*)(work + 0x18) << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0xA2);
-            if (*(void**)(work + 0x14) != 0) {
-                memset(*(void**)(work + 0x14), 0, *(u32*)(work + 0x18) << 5);
-            }
-        }
+        ((VRyjMegaBirthModel*)work)->m_numParticles = *(u16*)(payload + 0x20);
+        alloc_check((VRyjMegaBirthModel*)work, params);
 
         *(float*)(work + 0x0) = *(float*)(payload + 0xF8);
         *(float*)(work + 0x4) = *(float*)(payload + 0xFC);

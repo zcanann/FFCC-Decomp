@@ -2236,11 +2236,42 @@ void CMenuPcs::CmakeJobClose()
  */
 void CMenuPcs::CmakeJobDraw()
 {
-    float alpha = CalcCmakeFadeAlpha(this);
+    int state = MenuS32(this, 0x82C);
+    int frame = static_cast<int>(*reinterpret_cast<short*>(state + 0x22)) - 1;
+    if (frame < 0) {
+        frame = 0;
+    }
+
+    short mode = *reinterpret_cast<short*>(state + 0x10);
+    float alpha = FLOAT_80333258;
+    if (mode == 0) {
+        alpha = static_cast<float>(DOUBLE_80333268 * static_cast<double>(frame));
+    } else if (mode == 2) {
+        alpha = static_cast<float>(DOUBLE_80333270 - DOUBLE_80333268 * static_cast<double>(frame));
+    }
+
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
     DrawCmakeSelectionBackdrop(this);
     DrawCmakePreviewCharaAlpha(this, alpha);
-    DrawCmakePopupPanel(this, alpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284, FLOAT_80333258, FLOAT_80333258);
+
+    int panelAlpha = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    if (panelAlpha < 0) {
+        panelAlpha = 0;
+    } else if (panelAlpha > 0xFF) {
+        panelAlpha = 0xFF;
+    }
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
+
+    GXColor panelColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(panelAlpha)};
+    GXSetChanMatColor(GX_COLOR0A0, panelColor);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), (MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcsVoid(), 0,
+        FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
+        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+
     DrawCmakeTitle(5, 0.0f, alpha);
 
     CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
@@ -2249,28 +2280,34 @@ void CMenuPcs::CmakeJobDraw()
     font->SetScale(FLOAT_80333258);
     font->DrawInit();
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
-    unsigned char rgba[8];
-    __ct__6CColorFUcUcUcUc(rgba, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
-    font->SetColor(*reinterpret_cast<GXColor*>(rgba));
+    GXColor textColor;
+    __ct__6CColorFUcUcUcUc(&textColor, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(panelAlpha));
+    font->SetColor(textColor);
 
     for (int i = 0; i < 8; ++i) {
         const char* txt = GetJobStr__8CMenuPcsFi(this, i);
-        float x = (i < 4) ? 272.0f : 424.0f;
+        int x = (i < 4) ? 0x110 : 0x1A8;
         int row = (i < 4) ? i : (i - 4);
         font->SetPosX(x);
-        font->SetPosY(0x70 + row * 0x28 - FLOAT_803332f4);
+        font->SetPosY(static_cast<float>(0x70 + row * 0x28) - FLOAT_803332f4);
         font->Draw(txt);
     }
 
-    if (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) == 1) {
-        int sel = *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x26);
+    if (mode == 1) {
+        int sel = *reinterpret_cast<short*>(state + 0x26);
         int cursorX = (sel < 4) ? 0x110 : 0x1A8;
-        int cursorY = 0x70 + (sel & 3) * 0x28;
-        DrawCursor__8CMenuPcsFiif(this, cursorX - 0x18 + (System.m_frameCounter & 7), cursorY, alpha);
+        int cursorY = 0x70 + ((sel < 4) ? sel : (sel - 4)) * 0x28;
+        int cursorFrame = System.m_frameCounter & 7;
+        DrawCursor__8CMenuPcsFiif(this, cursorX - 0x18 + cursorFrame, cursorY, alpha);
     }
 
-    DrawCmakeMcOverlay(this, 0x16);
+    short mcState = *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10);
+    if (mcState != 3) {
+        DrawMcWin__8CMenuPcsFss(this, -1, 0);
+        if (mcState == 1) {
+            DrawMcWinMess__8CMenuPcsFii(this, 0x16, 0);
+        }
+    }
 }
 
 /*

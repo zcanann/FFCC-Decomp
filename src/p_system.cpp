@@ -5,8 +5,6 @@
 extern "C" void create__10CSystemPcsFv(CSystemPcs*);
 extern "C" void destroy__10CSystemPcsFv(CSystemPcs*);
 extern "C" void calc__10CSystemPcsFv(CSystemPcs*);
-extern char __RTTI__8CManager[];
-extern char __RTTI__8CProcess[];
 static const char s_CSystemPcs_801D7C48[] = "CSystemPcs";
 
 CSystemPcs SystemPcs;
@@ -23,10 +21,6 @@ unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
     0,
     0x16,
     0x8
-};
-unsigned int CSystemPcs_RTTI_base__10CSystemPcs[3] = {reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, 0};
-unsigned int CSystemPcs_RTTI__10CSystemPcs[5] = {
-    reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, reinterpret_cast<unsigned int>(__RTTI__8CProcess), 0, 0
 };
 
 /*

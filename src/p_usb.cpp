@@ -11,8 +11,6 @@ int s_usbReadPollFrameCounter;
 extern "C" void create__7CUSBPcsFv(CUSBPcs*);
 extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
 extern "C" void func__7CUSBPcsFv(CUSBPcs*);
-extern char __RTTI__8CManager[];
-extern char __RTTI__8CProcess[];
 
 u32 m_table_desc0__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__7CUSBPcsFv)};
 u32 m_table_desc1__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__7CUSBPcsFv)};
@@ -20,10 +18,6 @@ u32 m_table_desc2__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(func__7CU
 const char s_CUSBPcs_8032f810[] = "CUSBPcs";
 u32 m_table__7CUSBPcs[0x11C / sizeof(u32)] = {
     reinterpret_cast<u32>(const_cast<char*>(s_CUSBPcs_8032f810)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x12
-};
-u32 CUSBPcs_RTTI_base__7CUSBPcs[3] = {reinterpret_cast<u32>(__RTTI__8CManager), 0, 0};
-u32 CUSBPcs_RTTI__7CUSBPcs[5] = {
-    reinterpret_cast<u32>(__RTTI__8CManager), 0, reinterpret_cast<u32>(__RTTI__8CProcess), 0, 0
 };
 static const char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
 static const char s_usbRootPath[] = "plot/kmitsuru/";

@@ -6,8 +6,6 @@ extern "C" void create__9CSoundPcsFv(CSoundPcs*);
 extern "C" void destroy__9CSoundPcsFv(CSoundPcs*);
 extern "C" void calc__9CSoundPcsFv(CSoundPcs*);
 extern "C" void draw__9CSoundPcsFv(CSoundPcs*);
-extern char __RTTI__8CManager[];
-extern char __RTTI__8CProcess[];
 
 const char s_CSoundPcs_801DB4E8[] = "CSoundPcs";
 unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
@@ -28,10 +26,6 @@ unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
     0,
     0x44,
     1
-};
-unsigned int CSoundPcs_RTTI_base__9CSoundPcs[3] = {reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, 0};
-unsigned int CSoundPcs_RTTI__9CSoundPcs[5] = {
-    reinterpret_cast<unsigned int>(__RTTI__8CManager), 0, reinterpret_cast<unsigned int>(__RTTI__8CProcess), 0, 0
 };
 
 CSoundPcs SoundPcs;

@@ -561,6 +561,40 @@ CPtrArray<CMapAnimNode*>::~CPtrArray()
     RemoveAll();
 }
 
+extern "C" CPtrArray<CMapAnimNode*>* __ct__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>* ptrArray)
+{
+    if (ptrArray != 0) {
+        ptrArray->m_size = 0;
+        ptrArray->m_numItems = 0;
+        ptrArray->m_defaultSize = 0x10;
+        ptrArray->m_items = 0;
+        ptrArray->m_stage = 0;
+        ptrArray->m_growCapacity = 1;
+    }
+    return ptrArray;
+}
+
+extern "C" CPtrArray<CMapAnimNode*>* __dt__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>* ptrArray, short param_2)
+{
+    if (ptrArray != 0) {
+        ptrArray->~CPtrArray<CMapAnimNode*>();
+        if (0 < param_2) {
+            __dl__FPv(ptrArray);
+        }
+    }
+    return ptrArray;
+}
+
+extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void* ptrArray)
+{
+    return reinterpret_cast<CPtrArray<CMapAnimNode*>*>(ptrArray)->GetSize();
+}
+
+extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void* ptrArray, unsigned long index)
+{
+    return (*reinterpret_cast<CPtrArray<CMapAnimNode*>*>(ptrArray))[index];
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8004aebc

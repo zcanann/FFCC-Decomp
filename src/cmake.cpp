@@ -737,17 +737,6 @@ void CMenuPcs::DrawSingCMake()
             x += span;
         }
 
-        if (resultFlag != 0) {
-            if (mode == 0) {
-                *reinterpret_cast<short*>(state + 0x16) = step + 1;
-                frame = 0;
-                resultFlag = 0;
-                *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
-            } else if (mode == 2) {
-                MenuS16(this, 0x86A) = 999;
-                *reinterpret_cast<short*>(state + 0x20) = -1;
-            }
-        }
         break;
     }
     case 1:
@@ -784,56 +773,6 @@ void CMenuPcs::DrawSingCMake()
         break;
     }
 
-    if (resultFlag == 0) {
-        return;
-    }
-
-    if (mode < 2) {
-        mode = mode + 1;
-        frame = 0;
-        *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
-        return;
-    }
-
-    DAT_8032ef10 = static_cast<int>(step);
-
-    short resultDir = *reinterpret_cast<short*>(state + 0x1E);
-    if (step == 6) {
-        *reinterpret_cast<short*>(state + 0x16) = *reinterpret_cast<short*>(state + 0x26) + 1;
-        if (*reinterpret_cast<short*>(state + 0x16) == 0) {
-            mode = 2;
-        } else {
-            mode = 0;
-        }
-    } else if (resultDir < 0) {
-        if (step != 0) {
-            if (step == 5) {
-                *reinterpret_cast<short*>(state + 0x16) = 6;
-            } else {
-                *reinterpret_cast<short*>(state + 0x16) = step - 1;
-            }
-        }
-
-        if (*reinterpret_cast<short*>(state + 0x16) == 0) {
-            mode = 2;
-        } else {
-            mode = 0;
-        }
-    } else if (step != 5) {
-        *reinterpret_cast<short*>(state + 0x16) = step + 1;
-        if (*reinterpret_cast<short*>(state + 0x16) == 0) {
-            mode = 2;
-        } else {
-            mode = 0;
-        }
-    } else {
-        *reinterpret_cast<short*>(state + 0x16) = 0;
-        mode = 2;
-    }
-
-    *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
-    frame = 0;
-    *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
 }
 
 /*
@@ -1357,11 +1296,12 @@ void CMenuPcs::CmakeOpen()
 {
     int state = MenuS32(this, 0x82C);
     *reinterpret_cast<short*>(state + 0x10) = 0;
-    *reinterpret_cast<short*>(state + 0x16) = 1;
+    *reinterpret_cast<short*>(state + 0x16) = 0;
     *reinterpret_cast<short*>(state + 0x22) = 0;
     *reinterpret_cast<short*>(state + 0x1E) = 0;
     *reinterpret_cast<unsigned char*>(state + 0x0B) = 0;
     *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
+    *reinterpret_cast<short*>(state + 0x2E) = 0;
 }
 
 /*
@@ -1379,19 +1319,62 @@ void CMenuPcs::CmakeCtrl()
     short& mode = *reinterpret_cast<short*>(state + 0x10);
     short& step = *reinterpret_cast<short*>(state + 0x16);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
+    short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
+    short& resultFlag = *reinterpret_cast<short*>(state + 0x2E);
 
     CalcSingCMake();
 
-    if (mode == 0 && frame >= 10) {
-        mode = 1;
-        frame = 0;
-    } else if (mode == 2 && frame >= 10) {
-        mode = 0;
-        frame = 0;
-        if (step < 5) {
-            step = step + 1;
-        }
+    if (resultFlag == 0) {
+        return;
     }
+
+    if (step == 0) {
+        if (mode == 0) {
+            step = 1;
+            frame = 0;
+            resultFlag = 0;
+            *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
+            *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
+        } else if (mode == 2) {
+            MenuS16(this, 0x86A) = 999;
+            *reinterpret_cast<short*>(state + 0x20) = -1;
+            resultFlag = 0;
+        }
+        return;
+    }
+
+    if (mode < 2) {
+        mode = static_cast<short>(mode + 1);
+        frame = 0;
+        resultFlag = 0;
+        *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
+        return;
+    }
+
+    DAT_8032ef10 = static_cast<int>(step);
+
+    if (step == 6) {
+        step = static_cast<short>(*reinterpret_cast<short*>(state + 0x26) + 1);
+        mode = (step == 0) ? 2 : 0;
+    } else if (resultDir < 0) {
+        if (step == 5) {
+            step = 6;
+        } else {
+            step = static_cast<short>(step - 1);
+        }
+        mode = (step == 0) ? 2 : 0;
+    } else if (step != 5) {
+        step = static_cast<short>(step + 1);
+        mode = (step == 0) ? 2 : 0;
+    } else {
+        step = 0;
+        mode = 2;
+    }
+
+    *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
+    frame = 0;
+    resultFlag = 0;
+    *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
 }
 
 /*
@@ -1406,8 +1389,12 @@ void CMenuPcs::CmakeCtrl()
 void CMenuPcs::CmakeClose()
 {
     int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x16) = 0;
     *reinterpret_cast<short*>(state + 0x10) = 2;
     *reinterpret_cast<short*>(state + 0x22) = 0;
+    *reinterpret_cast<short*>(state + 0x1E) = -1;
+    *reinterpret_cast<short*>(state + 0x2E) = 0;
+    *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
 }
 
 /*

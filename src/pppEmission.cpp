@@ -29,7 +29,7 @@ extern "C" int rand(void);
 extern const char DAT_803311fc;
 static const float FLOAT_803311e0 = 15.0f;
 static const float FLOAT_803311e4 = 7.0f;
-extern const float FLOAT_803311f8;
+static const float FLOAT_803311f8 = 10000000.0f;
 static const char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
@@ -223,7 +223,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
             life--;
             particle->m_fieldA = life;
 
-            if (life <= 0) {
+            if (particle->m_fieldA <= 0) {
                 int jitter = 0;
                 if (payload[0xD] != 0) {
                     jitter = rand() % payload[0xD];

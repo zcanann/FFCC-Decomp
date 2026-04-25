@@ -46,6 +46,7 @@ inline void SetPtrArrayDtorVtable(CPtrArray<T>*)
 
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
+extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void CreateBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void DeleteBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void createViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
@@ -54,8 +55,10 @@ extern "C" void calcViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void drawViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
+extern "C" void* __vt__8CManager[];
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
+extern "C" void* __vt__14CFunnyShapePcs[];
 static const char lbl_801D7DD0[] = "CFunnyShapePcs(VIEWER)";
 extern char lbl_8032E660[];
 
@@ -65,27 +68,13 @@ unsigned int m_table_desc2__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_ca
 unsigned int m_table_desc3__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
 CFunnyShapePcs FunnyShapePcs;
 unsigned int m_table__14CFunnyShapePcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(lbl_801D7DD0)),
-    m_table_desc0__14CFunnyShapePcs[0],
-    m_table_desc0__14CFunnyShapePcs[1],
-    m_table_desc0__14CFunnyShapePcs[2],
-    m_table_desc1__14CFunnyShapePcs[0],
-    m_table_desc1__14CFunnyShapePcs[1],
-    m_table_desc1__14CFunnyShapePcs[2],
-    m_table_desc2__14CFunnyShapePcs[0],
-    m_table_desc2__14CFunnyShapePcs[1],
-    m_table_desc2__14CFunnyShapePcs[2],
-    0x21,
-    0,
-    m_table_desc3__14CFunnyShapePcs[0],
-    m_table_desc3__14CFunnyShapePcs[1],
-    m_table_desc3__14CFunnyShapePcs[2],
-    0x42,
-    1
+    reinterpret_cast<unsigned int>(const_cast<char*>(lbl_801D7DD0)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0,
+    0x42, 1
 };
 unsigned int lbl_801EA904[4] = {
     reinterpret_cast<unsigned int>(lbl_8032E660), 0, 0, reinterpret_cast<unsigned int>(lbl_8032E660)
 };
+u8 ARRAY_8026D728[0xC];
 
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 extern const char s_CFunnyShapePcs[];
@@ -95,6 +84,24 @@ namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
 {
     return reinterpret_cast<u8*>(self) + offset;
+}
+
+void CopyFunnyShapePcsTable()
+{
+    unsigned int* dst = m_table__14CFunnyShapePcs;
+
+    dst[1] = m_table_desc0__14CFunnyShapePcs[0];
+    dst[2] = m_table_desc0__14CFunnyShapePcs[1];
+    dst[3] = m_table_desc0__14CFunnyShapePcs[2];
+    dst[4] = m_table_desc1__14CFunnyShapePcs[0];
+    dst[5] = m_table_desc1__14CFunnyShapePcs[1];
+    dst[6] = m_table_desc1__14CFunnyShapePcs[2];
+    dst[7] = m_table_desc2__14CFunnyShapePcs[0];
+    dst[8] = m_table_desc2__14CFunnyShapePcs[1];
+    dst[9] = m_table_desc2__14CFunnyShapePcs[2];
+    dst[12] = m_table_desc3__14CFunnyShapePcs[0];
+    dst[13] = m_table_desc3__14CFunnyShapePcs[1];
+    dst[14] = m_table_desc3__14CFunnyShapePcs[2];
 }
 
 static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self)
@@ -107,6 +114,32 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
     return reinterpret_cast<CFunnyShape*>(Ptr(self, 0x50));
 }
 } // namespace
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004e844
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_FunnyShape_cpp(void)
+{
+    u8* self = reinterpret_cast<u8*>(&FunnyShapePcs);
+
+    *reinterpret_cast<void**>(self) = __vt__8CManager;
+    *reinterpret_cast<void**>(self) = &__vt__8CProcess;
+    *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
+
+    __ct__14CUSBStreamDataFv(self + 0x3C);
+    __ct__11CFunnyShapeFv(self + 0x50);
+    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
+    __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
+    __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
+
+    CopyFunnyShapePcsTable();
+}
 
 template <class T>
 CPtrArray<T>::CPtrArray()

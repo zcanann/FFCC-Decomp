@@ -56,6 +56,7 @@ int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
 int GetPadType__6JoyBusFi(void*, int);
+unsigned int getNumFreeObject__13CFlatRuntime2Fi(void*, int);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 int sprintf(char*, const char*, ...);
 unsigned char gMapHitDrawMode;
@@ -3585,6 +3586,34 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0x0E:
         runtime->push(object, Math.Rand(*object->m_localBase));
+        outResult = 0;
+        return;
+    case -7: {
+        float value = cosf(static_cast<float>(*object->m_localBase));
+        runtime->push(object, *reinterpret_cast<int*>(&value));
+        outResult = 0;
+        return;
+    }
+    case -6: {
+        float value = sinf(static_cast<float>(*object->m_localBase));
+        runtime->push(object, *reinterpret_cast<int*>(&value));
+        outResult = 0;
+        return;
+    }
+    case -5: {
+        unsigned short buttons = 0;
+        if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
+            buttons = GetButton__4CPadFl(&Pad, *object->m_localBase);
+        }
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
+            buttons &= 0xF3FF;
+        }
+        runtime->push(object, static_cast<short>(buttons));
+        outResult = 0;
+        return;
+    }
+    case -3:
+        runtime->push(object, getNumFreeObject__13CFlatRuntime2Fi(this, 5));
         outResult = 0;
         return;
     default:

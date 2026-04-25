@@ -1209,6 +1209,8 @@ void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
  */
 void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 {
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+
     int baseY = 300;
     unsigned int nameX = static_cast<unsigned int>(
         -((static_cast<double>(FLOAT_80333364) * 0.5) - 0x80000000) + 0x43300000);
@@ -1221,6 +1223,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     font->SetShadow(1);
     font->SetScale(FLOAT_80333258);
     font->DrawInit();
+    font->renderFlags = (font->renderFlags & 0xEF) | 0x10;
     font->SetMargin(FLOAT_80333258);
 
     unsigned char rgba[8];
@@ -1233,6 +1236,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     font->SetPosX(static_cast<float>(static_cast<int>(nameX)));
     font->SetPosY(static_cast<float>(baseY - 4));
     font->Draw(text);
+    font->renderFlags &= 0xEF;
     DrawInit__8CMenuPcsFv(this);
 
     if (y != 0) {

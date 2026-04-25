@@ -137,6 +137,7 @@ int RedNew(int param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void RedDelete(int address)
 {
 	if (address != 0) {
@@ -161,6 +162,7 @@ void RedDelete(int address)
 		OSRestoreInterrupts(interrupts);
 	}
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -283,6 +285,7 @@ int RedNewA(int size, int offset, int maxSize)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void RedDeleteA(int address)
 {
 	if (address != 0) {
@@ -307,6 +310,7 @@ void RedDeleteA(int address)
 		OSRestoreInterrupts(interrupts);
 	}
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -343,9 +347,9 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
 	bankSize &= 0xFFFFFFE0;
 
 	redMainMemoryBank = (int*)param1;
-	redMainDataBufferSize = param2 - (bankSize * 2);
 	redAMemoryBank = (int*)((int)redMainMemoryBank + bankSize);
 	redMainDataBuffer = (int)redAMemoryBank + bankSize;
+	redMainDataBufferSize = param2 - (bankSize * 2);
 	memset(redMainMemoryBank, 0, bankSize);
 	memset(redAMemoryBank, 0, bankSize);
 	redADataBuffer = param3;

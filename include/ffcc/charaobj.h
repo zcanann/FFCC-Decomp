@@ -112,13 +112,14 @@ public:
 	unsigned char m_unk66C[0x18];
 	int m_damageParticle;
 	int m_unk688;
+	int m_unk68C;
 	float m_pushScale;
 	float m_alpha;
 	int m_stateResetCounter;
 	int m_stateResetLimit;
 	int m_stateTick;
-	short m_lastBgGroupCopy;
 	short m_aStarGroupId;
+	short m_unk6A6;
 	int m_castTimeTick;
 	unsigned char m_unk6AC[0xC];
 };

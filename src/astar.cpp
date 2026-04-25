@@ -698,11 +698,6 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		}
 	}
 
-	if (portalIndex >= 64)
-	{
-		return;
-	}
-
 	CAPos& portal = m_portals[portalIndex];
 
 	portal.m_position.x = m_lastGroupPos.x;

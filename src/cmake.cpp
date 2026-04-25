@@ -1744,23 +1744,24 @@ void CMenuPcs::CmakeNameDraw()
     font->SetShadow(0);
     font->SetScale(FLOAT_80333258);
     font->DrawInit();
-    font->SetMargin(FLOAT_80333258);
+    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+    font->SetMargin(FLOAT_803332c4);
     font->SetColor(col);
 
     for (int i = 0; i < 5; i++) {
         const char* rowText = s_cmakeNameRows[table * 5 + i];
-        font->SetPosX(200.0f);
+        font->SetPosX(FLOAT_803332c8);
         font->SetPosY((108.0f + i * 32.0f) - FLOAT_803332f4);
         font->Draw(rowText);
     }
 
+    reinterpret_cast<unsigned char*>(font)[0x24] &= 0xEF;
     DrawInit__8CMenuPcsFv(this);
 
     if (mode == 1 && row < 5) {
-        int cursorX = 200 + select * 20;
+        int cursorX = static_cast<int>(FLOAT_803332c8 + FLOAT_803332c0 * static_cast<float>(select));
         int cursorY = 112 + row * 32;
-        DrawCursor__8CMenuPcsFiif(this, cursorX - 24 + ((System.m_frameCounter & 7) - (System.m_frameCounter & 1)),
-            cursorY, alpha);
+        DrawCursor__8CMenuPcsFiif(this, cursorX + (System.m_frameCounter & 7), cursorY, FLOAT_80333258);
     }
 
     int showNameCursor = ((mode == 1) && (row < 5) && (strlen(name) <= 6)) ? 1 : 0;

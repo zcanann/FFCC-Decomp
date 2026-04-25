@@ -128,6 +128,40 @@ static inline void StoreSetU8(CFlatRuntime::CStack* stack, int setMode, unsigned
     }
 }
 
+static inline int ClampIndex(int index, int maxIndex)
+{
+    if (index < 0) {
+        return 0;
+    }
+    if (index > maxIndex) {
+        return maxIndex;
+    }
+    return index;
+}
+
+static inline void LerpVec(Vec& out, const Vec& a, const Vec& b, float t)
+{
+    out.x = a.x + (b.x - a.x) * t;
+    out.y = a.y + (b.y - a.y) * t;
+    out.z = a.z + (b.z - a.z) * t;
+}
+
+static inline void CatmullRomVec(Vec& out, const Vec& p0, const Vec& p1, const Vec& p2, const Vec& p3, float t)
+{
+    const float t2 = t * t;
+    const float t3 = t2 * t;
+
+    out.x = 0.5f * ((2.0f * p1.x) + (-p0.x + p2.x) * t +
+                    (2.0f * p0.x - 5.0f * p1.x + 4.0f * p2.x - p3.x) * t2 +
+                    (-p0.x + 3.0f * p1.x - 3.0f * p2.x + p3.x) * t3);
+    out.y = 0.5f * ((2.0f * p1.y) + (-p0.y + p2.y) * t +
+                    (2.0f * p0.y - 5.0f * p1.y + 4.0f * p2.y - p3.y) * t2 +
+                    (-p0.y + 3.0f * p1.y - 3.0f * p2.y + p3.y) * t3);
+    out.z = 0.5f * ((2.0f * p1.z) + (-p0.z + p2.z) * t +
+                    (2.0f * p0.z - 5.0f * p1.z + 4.0f * p2.z - p3.z) * t2 +
+                    (-p0.z + 3.0f * p1.z - 3.0f * p2.z + p3.z) * t3);
+}
+
 static inline unsigned int* GetGameWorkLinkTableWords(CGame::CGameWork& gameWork)
 {
     return reinterpret_cast<unsigned int*>(&gameWork.m_linkTable[0][0][0][0]);
@@ -3729,6 +3763,82 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         };
         this->PutParticle((*object->m_localBase << 8) | object->m_localBase[1], position,
             static_cast<float>(object->m_localBase[5]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x1A: {
+        const unsigned int mode = *object->m_localBase;
+        const int pointCount = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x17D4);
+        Vec result = {0.0f, 0.0f, 0.0f};
+
+        if (pointCount > 0 && object->m_localBase[2] != 0) {
+            float t = static_cast<float>(static_cast<int>(object->m_localBase[1])) /
+                      static_cast<float>(static_cast<int>(object->m_localBase[2]));
+
+            switch (mode & 3) {
+            case 3:
+                t = -((FLOAT_80330B3C * (FLOAT_80330B34 + sinf(FLOAT_80330B54 * t + FLOAT_80330B50))) -
+                      FLOAT_80330B34);
+                break;
+            case 1:
+                t = FLOAT_80330B34 + sinf(FLOAT_80330B50 * t + FLOAT_80330B58);
+                break;
+            case 2:
+                t = sinf(FLOAT_80330B50 * t);
+                break;
+            default:
+                break;
+            }
+
+            if ((mode & 4) == 0) {
+                const float totalDistance = *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17D8);
+                const float pathDistance = totalDistance * t;
+
+                result = *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0);
+                for (int i = 0; i + 1 < pointCount; i++) {
+                    const float startDistance =
+                        *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17DC + i * 0x10);
+                    const float endDistance =
+                        *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17DC + (i + 1) * 0x10);
+                    if (startDistance <= pathDistance && pathDistance <= endDistance) {
+                        float segmentT = 0.0f;
+                        if (endDistance != startDistance) {
+                            segmentT = (pathDistance - startDistance) / (endDistance - startDistance);
+                        }
+                        const Vec& startPoint = *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + i * 0x10);
+                        const Vec& endPoint =
+                            *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + (i + 1) * 0x10);
+                        LerpVec(result, startPoint, endPoint, segmentT);
+                        break;
+                    }
+                }
+            } else {
+                const int maxIndex = pointCount - 1;
+                float scaled = t * static_cast<float>(pointCount - 1);
+                int baseIndex = static_cast<int>(scaled);
+                float segmentT = scaled - static_cast<float>(baseIndex);
+
+                if (baseIndex >= maxIndex) {
+                    baseIndex = maxIndex;
+                    segmentT = 0.0f;
+                }
+
+                const Vec& p0 =
+                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex - 1, maxIndex) * 0x10);
+                const Vec& p1 =
+                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex, maxIndex) * 0x10);
+                const Vec& p2 =
+                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex + 1, maxIndex) * 0x10);
+                const Vec& p3 =
+                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex + 2, maxIndex) * 0x10);
+                CatmullRomVec(result, p0, p1, p2, p3, segmentT);
+            }
+        }
+
+        *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
+        *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
+        *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
         runtime->push(object, 0);
         outResult = 0;
         return;

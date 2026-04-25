@@ -20,7 +20,7 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern float FLOAT_80330c80;
 extern float FLOAT_80330c84;
-extern float FLOAT_80330c90;
+extern float FLOAT_80330C90;
 extern double DOUBLE_80330c88;
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 
@@ -689,7 +689,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             if ((groupData->active != 1) && (*groupData->particleIndices != -1) && (*groupData->particleStates == 1)) {
                 unitVelocity.x = FLOAT_80330c80;
                 unitVelocity.y = FLOAT_80330c80;
-                unitVelocity.z = FLOAT_80330c90;
+                unitVelocity.z = FLOAT_80330C90;
                 groupData->speed = *(float*)((unsigned char*)pYmBreath + 0x18);
                 pppCopyVector(groupData->direction, unitVelocity);
                 groupData->position.x = 0.0f;

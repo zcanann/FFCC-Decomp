@@ -88,12 +88,22 @@ struct CharaBreakStep {
     f32 m_dataValIndex;
     f32 m_graphInit;
     f32 m_graphStep;
-    u8 _pad10[0x8];
+    f32 m_gravity;
+    f32 _pad14;
     Vec m_direction;
     u8 _pad24[0x4];
     f32 m_payloadGraphInit;
     f32 m_payloadGraphStep;
     f32 m_payloadGraphStepStep;
+    u8 m_alphaBase;
+    u8 m_alphaRange;
+    u8 _pad36[0x2];
+    f32 m_velocityBase;
+    f32 m_velocityRange;
+    u8 m_spinMode;
+    u8 m_clipMode;
+    u8 m_worldSpaceMode;
+    u8 _pad43;
 };
 
 struct CharaBreakWork {
@@ -106,6 +116,7 @@ struct CharaBreakWork {
     f32 m_value5;
     void* m_meshBuffers;
     Vec m_bboxMin;
+    u8 _pad2C[0x4];
     Vec m_bboxMax;
     f32 m_miscValue;
     u8* m_model;
@@ -158,7 +169,7 @@ struct CharaBreakModelData {
 struct CharaBreakModelView {
     u8 _pad0[0x38];
     Mtx m_localMtx;
-    u8 _pad78[0x2C];
+    u8 _pad68[0x3C];
     CharaBreakModelData* m_data;
     void* m_nodes;
     CharaBreakMeshRef* m_meshes;
@@ -421,9 +432,9 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* polygonData, unsigned long polygonCount,
                           CChara::CModel* model, CChara::CMesh* mesh)
 {
+    CharaBreakStep* stepData = (CharaBreakStep*)charaBreak;
     CharaBreakModelView* modelView = (CharaBreakModelView*)model;
     CharaBreakMeshRef* meshRef = (CharaBreakMeshRef*)mesh;
-    u8* breakData = (u8*)charaBreak;
     S16Vec* workNormals = meshRef->m_workNormals;
     u32 normQuant = modelView->m_data->m_normQuant;
 
@@ -432,7 +443,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
         Vec tangent;
         Vec up = kPppCharaBreakUpVector;
 
-        int alpha = (int)breakData[0x34] + rand() % breakData[0x35];
+        int alpha = (int)stepData->m_alphaBase + rand() % stepData->m_alphaRange;
         if (alpha > 0xFF) {
             alpha = 0xFF;
         }
@@ -441,7 +452,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
         polygonData->m_enabled = 0;
         polygonData->_pad2 = 0;
 
-        if (breakData[0x41] == 2) {
+        if (stepData->m_clipMode == 2) {
             polygonData->m_enabled = 1;
         }
 
@@ -475,10 +486,10 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             tangent.z = FLOAT_80332048;
         }
 
-        if (breakData[0x40] == 1) {
+        if (stepData->m_spinMode == 1) {
             polygonData->m_normalA.x = 0;
-            polygonData->m_normalA.y = rand() % 2;
             polygonData->m_normalA.z = 0;
+            polygonData->m_normalA.y = rand() % 2;
         }
 
         ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygonData->m_normalB, tangent, normQuant);
@@ -497,8 +508,8 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
  */
 void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* model)
 {
-    u8* stepData = (u8*)step;
-    u8* workData = (u8*)work;
+    CharaBreakStep* stepData = (CharaBreakStep*)step;
+    CharaBreakWork* workData = (CharaBreakWork*)work;
     CChara::CMesh* mesh = (CChara::CMesh*)*(u8**)((u8*)model + 0xAC);
     u32 meshCount = *(u32*)(*(u8**)((u8*)model + 0xA4) + 0xC);
     u32 posQuant = *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34);
@@ -506,7 +517,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
     u32 meshIndex;
     short threshold;
 
-    threshold = (short)((*(float*)(workData + 4) * (*(float*)(workData + 0x34) - *(float*)(workData + 0x24))) *
+    threshold = (short)((workData->m_value0 * (workData->m_bboxMax.y - workData->m_bboxMin.y)) *
                         (float)((double)(1 << posQuant)));
 
     for (meshIndex = 0; meshIndex < meshCount; meshIndex++) {
@@ -515,14 +526,14 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
         CharaBreakMeshData* meshData = *(CharaBreakMeshData**)((u8*)mesh + 8);
         S16Vec* workPositions = *(S16Vec**)mesh;
 
-        if (meshData->m_skinCount == 0 && stepData[0x42] == 1) {
+        if (meshData->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
             needsMtxUpdate = true;
             PSMTXConcat(*(Mtx*)((u8*)model + 0x38), *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (meshData->m_nodeIndex * 0xC0) + 0xC),
                         meshToWorld);
         }
 
         for (int dl = meshData->m_displayListCount - 1; dl >= 0; dl--) {
-            int meshBuffers = *(int*)(*(int*)(workData + 0x1C) + (meshIndex * 4));
+            int meshBuffers = *(int*)((int)workData->m_meshBuffers + (meshIndex * 4));
             u8* polygon = *(u8**)(*(int*)(meshBuffers + (dl * 4)) + 0xC);
             u16 polygonCount = *(u16*)(*(int*)(meshBuffers + (dl * 4)) + 8);
 
@@ -554,16 +565,16 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             *dst = *srcPos;
                         }
 
-                        if (stepData[0x41] == 0) {
-                            if (stepData[0x42] == 1) {
+                        if (stepData->m_clipMode == 0) {
+                            if (stepData->m_worldSpaceMode == 1) {
                                 if (dst->y < threshold) {
                                     flags[i] = 1;
                                 }
                             } else if (*(short*)(polygon + 0x12 + (i * 6)) < threshold) {
                                 flags[i] = 1;
                             }
-                        } else if (stepData[0x41] == 1) {
-                            if (stepData[0x42] == 1) {
+                        } else if (stepData->m_clipMode == 1) {
+                            if (stepData->m_worldSpaceMode == 1) {
                                 if (threshold < dst->y) {
                                     flags[i] = 1;
                                 }
@@ -575,7 +586,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                     polygon[0] = (flags[0] != 0 && flags[1] != 0 && flags[2] != 0) ? 1 : 0;
 
-                    if (stepData[0x42] == 1 && polygon[0] != 0) {
+                    if (stepData->m_worldSpaceMode == 1 && polygon[0] != 0) {
                         *(S16Vec*)(polygon + 0x10) = transformed[0];
                         *(S16Vec*)(polygon + 0x16) = transformed[1];
                         *(S16Vec*)(polygon + 0x1C) = transformed[2];
@@ -583,7 +594,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                 }
 
                 if (polygon[0] == 0) {
-                    if (stepData[0x42] == 1) {
+                    if (stepData->m_worldSpaceMode == 1) {
                         *(S16Vec*)(polygon + 0x10) = transformed[0];
                         *(S16Vec*)(polygon + 0x16) = transformed[1];
                         *(S16Vec*)(polygon + 0x1C) = transformed[2];
@@ -633,12 +644,12 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         normalA.y = *(short*)(polygon + 6);
                         normalA.z = *(short*)(polygon + 8);
                         ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &velocity, normalA, normQuant);
-                        PSVECScale(&velocity, &velocity, *(float*)(stepData + 0x38) + Math.RandF(*(float*)(stepData + 0x3C)));
+                        PSVECScale(&velocity, &velocity, stepData->m_velocityBase + Math.RandF(stepData->m_velocityRange));
 
                         C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon[1]);
                         PSMTXQuat(rotMtx, &rotQuat);
 
-                        if (stepData[0x40] == 1) {
+                        if (stepData->m_spinMode == 1) {
                             int rand10 = (rand() % 10) + 10;
                             short* angleState = (short*)(polygon + 4);
                             if (*(short*)(polygon + 6) == 0) {
@@ -667,21 +678,21 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             PSMTXMultVec(rotMtx, &translated, &translated);
                             PSVECAdd(&translated, &center, &verts[i]);
 
-                            if (stepData[0x40] == 0) {
+                            if (stepData->m_spinMode == 0) {
                                 verts[i].x += velocity.x;
-                                verts[i].y += -(*(float*)(stepData + 0x10) * (float)*(u16*)(polygon + 2) - velocity.y);
+                                verts[i].y += -(stepData->m_gravity * (float)*(u16*)(polygon + 2) - velocity.y);
                                 verts[i].z += velocity.z;
-                            } else if (stepData[0x40] == 1) {
+                            } else if (stepData->m_spinMode == 1) {
                                 wobbleScale = FLOAT_8033204c + Math.RandF(FLOAT_80332064);
                                 verts[i].x += cosValue * wobbleScale;
-                                verts[i].y += -(*(float*)(stepData + 0x10) * (float)*(u16*)(polygon + 2) - velocity.y);
+                                verts[i].y += -(stepData->m_gravity * (float)*(u16*)(polygon + 2) - velocity.y);
                                 wobbleScale = FLOAT_8033204c + Math.RandF(FLOAT_80332064);
                                 verts[i].z += sinValue * wobbleScale;
                             }
 
-                            verts[i].x += *(float*)(stepData + 0x18) * *(float*)(workData + 0x10);
-                            verts[i].y += *(float*)(stepData + 0x1C) * *(float*)(workData + 0x10);
-                            verts[i].z += *(float*)(stepData + 0x20) * *(float*)(workData + 0x10);
+                            verts[i].x += stepData->m_direction.x * workData->m_value3;
+                            verts[i].y += stepData->m_direction.y * workData->m_value3;
+                            verts[i].z += stepData->m_direction.z * workData->m_value3;
 
                             ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, (S16Vec*)(polygon + 0x10 + (i * 6)), verts[i],
                                                                  posQuant);

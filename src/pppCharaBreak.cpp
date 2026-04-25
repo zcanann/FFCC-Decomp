@@ -421,10 +421,11 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* polygonData, unsigned long polygonCount,
                           CChara::CModel* model, CChara::CMesh* mesh)
 {
+    CharaBreakModelView* modelView = (CharaBreakModelView*)model;
+    CharaBreakMeshRef* meshRef = (CharaBreakMeshRef*)mesh;
     u8* breakData = (u8*)charaBreak;
-    S16Vec* workNormals = *(S16Vec**)((u8*)mesh + 4);
-    u8* modelData = *(u8**)((u8*)model + 0xA4);
-    u32 normQuant = *(u32*)(modelData + 0x38);
+    S16Vec* workNormals = meshRef->m_workNormals;
+    u32 normQuant = modelView->m_data->m_normQuant;
 
     for (u32 i = 0; i < polygonCount; i++) {
         Vec normal;
@@ -444,7 +445,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             polygonData->m_enabled = 1;
         }
 
-        if (*(u32*)(*(u8**)((u8*)mesh + 8) + 0x54) == 0) {
+        if (meshRef->m_data->m_skinCount == 0) {
             normal.x = Math.RandF(FLOAT_8033204c);
             normal.y = Math.RandF(FLOAT_8033204c);
             normal.z = Math.RandF(FLOAT_8033204c);

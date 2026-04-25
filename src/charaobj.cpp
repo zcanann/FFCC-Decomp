@@ -883,7 +883,7 @@ void CGCharaObj::onFrameStat()
 				}
 			} else if (m_subState < 4) {
 				if (m_subFrame == 0) {
-					reqAnim(((GetCID() & 0x6D) == 0x6D) ? m_unk558 : m_unk55C, 0, 0);
+					reqAnim(((GetCID() & 0xAD) == 0xAD) ? m_unk558 : m_unk55C, 0, 0);
 				}
 
 				if (isLoopAnim() != 0) {

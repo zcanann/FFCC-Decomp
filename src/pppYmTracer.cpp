@@ -12,10 +12,11 @@ extern u8 gPppDefaultValueBuffer[];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-static const f32 FLOAT_803306e8 = 0.0f;
-static const f32 FLOAT_803306ec = 1.0f;
+extern const f32 FLOAT_803306e8;
+extern const f32 FLOAT_803306ec;
 extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
+static const f64 DOUBLE_803306F0 = 4503601774854144.0;
 static const f64 DOUBLE_803306f8 = 4503599627370496.0;
 
 extern "C" {
@@ -115,12 +116,12 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     f32 uvStep;
     int textureIndex[2];
 
-    dataValIndex = param_2->m_dataValIndex;
     dataOffset = *param_3->m_serializedDataOffsets;
     colorOffset = param_3->m_serializedDataOffsets[1];
     work = (TracerWork*)(pppYmTracer->m_serializedData + dataOffset);
     colorData = pppYmTracer->m_serializedData + colorOffset;
     poly = work->entries;
+    dataValIndex = param_2->m_dataValIndex;
     mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
 
     if (dataValIndex != 0xFFFF) {
@@ -313,7 +314,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
 
         work->count++;
 
-        if (work->count > 3) {
+        if (work->count >= 4) {
             Vec splineFrom[4];
             Vec splineTo[4];
             s16 splineCount = 0;

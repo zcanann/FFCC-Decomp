@@ -319,9 +319,11 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         rot = FLOAT_80330b0c * (f32)phaseWork;
         vertex = vertexBase;
 
-        for (z = -halfWidth; z <= halfWidth; z += step) {
+        const float start = -halfWidth;
+
+        for (z = start; z <= halfWidth; z += step) {
             rowVertex = vertex;
-            for (x = -halfWidth; x <= halfWidth; x += step) {
+            for (x = start; x <= halfWidth; x += step) {
                 rowVertex->m_position.x = x;
                 rowVertex->m_position.y = kPppYmMeltZero;
                 rowVertex->m_position.z = z;

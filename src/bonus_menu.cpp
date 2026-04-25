@@ -2345,6 +2345,7 @@ void CMenuPcs::DrawResultCloseAnim()
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int digitIndex = 0;
 	int nameIndex = 0;
+	int modelIndex = 0;
 	int lastTexturedKind = -1;
 
 	if (animPtr == 0 || statePtr == 0) {
@@ -2383,7 +2384,22 @@ void CMenuPcs::DrawResultCloseAnim()
 		} else if (sprite->kind == -4) {
 			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
 		} else if (sprite->kind == -2) {
-			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, GetBonusResultValueByActiveIndex(digitIndex++));
+			CCharaPcs::CHandle* handle = GetBonusResultOpenHandle(this, modelIndex);
+			if (handle != 0) {
+				SetProjection__8CMenuPcsFi(this, modelIndex);
+				SetLight__8CMenuPcsFi(this, 1);
+				unsigned int oldFlags = handle->m_flags;
+				handle->m_flags = 0x300543;
+				if (handle->m_model != 0) {
+					*(float*)((char*)handle->m_model + 0x9C) = alpha;
+				}
+				handle->Draw(5);
+				handle->m_flags = oldFlags;
+				RestoreProjection__8CMenuPcsFv(this);
+			} else {
+				DrawBonusCnt((CMenuPcs::Sprt2*)sprite, GetBonusResultValueByActiveIndex(digitIndex++));
+			}
+			modelIndex++;
 		} else if (sprite->kind == -1) {
 			if (font != 0) {
 				const char* partyName = GetBonusPartyNameByActiveIndex(nameIndex++);

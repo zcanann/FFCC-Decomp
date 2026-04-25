@@ -1861,9 +1861,9 @@ void CMenuPcs::CmakeSexDraw()
     float alpha = CalcCmakeFadeAlpha(this);
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
     DrawCmakeSelectionBackdrop(this);
-    DrawCmakePreviewCharaAlpha(this, alpha);
+    DrawCmakePreviewCharaAlpha(this, FLOAT_80333258);
     DrawCmakePopupPanel(this, alpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284, 0.85f, 0.85f);
-    DrawCmakeTitle(2, 0.0f, alpha);
+    DrawCmakeTitle(2, FLOAT_80333258, alpha);
 
     CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
     font->SetMargin(FLOAT_80333258);

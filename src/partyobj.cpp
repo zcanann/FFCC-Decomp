@@ -7,6 +7,8 @@
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_camera.h"
+#include "ffcc/p_minigame.h"
 #include "ffcc/sound.h"
 #include "ffcc/itemobj.h"
 
@@ -17,6 +19,7 @@
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
+extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern "C" int CanCreateFromScript__9CGItemObjFv();
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
@@ -139,6 +142,40 @@ static int getPadConnectedForSlot(int slot)
 
 	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
 	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x54 + idx * 0x54);
+}
+
+static float getPadAxisForSlot(int slot, int offset)
+{
+	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
+		return 0.0f;
+	}
+
+	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
+	return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + offset + idx * 0x54);
+}
+
+static bool isBossArtifactStage()
+{
+	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F;
+}
+
+static bool isGhostPartyTargetMode(CGPartyObj* self)
+{
+	if (!isBossArtifactStage()) {
+		return false;
+	}
+	if ((self->GetCID() & 0x6D) != 0x6D) {
+		return false;
+	}
+	if (self->m_scriptHandle == nullptr) {
+		return false;
+	}
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(self->m_scriptHandle) + 0x3B4) != 0;
+}
+
+static void* getMapHitObject()
+{
+	return *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
 }
 
 /*
@@ -1230,12 +1267,160 @@ void CGPartyObj::checkTargetParticle()
 		self[0x6B8] &= 0xEF;
 	}
 
-	Vec delta;
-	PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C), &m_worldPosition, &delta);
-	if (delta.x == FLOAT_80331a78 && delta.z == FLOAT_80331a78) {
+	Vec input;
+	input.x = 0.0f;
+	input.y = 0.0f;
+	input.z = 0.0f;
+
+	if (!isGhostPartyTargetMode(this)) {
+		if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484) & 0x100) != 0) {
+			input.x -= getPadAxisForSlot(static_cast<unsigned char>(m_animStateMisc), 0x24);
+			input.z += getPadAxisForSlot(static_cast<unsigned char>(m_animStateMisc), 0x28);
+		}
+
+		if (input.x == 0.0f && input.z == 0.0f) {
+			unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+			if ((held & 1) != 0) {
+				input.x += FLOAT_80331a54;
+			}
+			if ((held & 2) != 0) {
+				input.x -= FLOAT_80331a54;
+			}
+			if ((held & 8) != 0) {
+				input.z += FLOAT_80331a54;
+			}
+			if ((held & 4) != 0) {
+				input.z -= FLOAT_80331a54;
+			}
+		}
+	} else {
+		CGPartyObj* leader = Game.m_partyObjArr[0];
+		if (leader != nullptr &&
+		    (leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
+		    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) != 0) {
+			Vec toLeaderTarget;
+			PSVECSubtract(reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(leader) + 0x66C),
+			              reinterpret_cast<Vec*>(self + 0x66C), &toLeaderTarget);
+			toLeaderTarget.y = 0.0f;
+			if (PSVECMag(&toLeaderTarget) > 0.001f) {
+				input.x = toLeaderTarget.x;
+				input.z = toLeaderTarget.z;
+			}
+		}
+	}
+
+	if (input.x == 0.0f && input.z == 0.0f) {
 		self[0x6B8] &= 0xDF;
 	} else {
+		Vec* targetPos = reinterpret_cast<Vec*>(self + 0x66C);
+		Vec* centerPos = reinterpret_cast<Vec*>(self + 0x678);
+		Vec move;
+		Vec fromCenter;
+		float maxRange;
+
 		self[0x6B8] |= 0x20;
+		PSVECNormalize(&input, &input);
+		PSVECScale(&input, &input, FLOAT_80331ad4);
+
+		float angle = CameraPcs._248_4_;
+		if (isGhostPartyTargetMode(this)) {
+			angle = 0.0f;
+		}
+
+		float s = sin(angle);
+		float c = cos(angle);
+		targetPos->x += input.x * c - input.z * s;
+		targetPos->z += input.x * s + input.z * c;
+
+		maxRange = 0.0f;
+		if (Game.unkCFlatData0[2] != 0) {
+			int itemId = *reinterpret_cast<int*>(self + 0x560);
+			maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x30));
+		}
+		if (m_scriptHandle != nullptr) {
+			unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
+			if (*reinterpret_cast<int*>(self + 0x520) == 2) {
+				maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(work + 0x19A));
+				if ((*reinterpret_cast<unsigned int*>(work + 0x3B0) & 0x4000) != 0 && Game.unk_flat3_field_8_0xc7dc != 0) {
+					maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0A));
+				}
+			} else {
+				maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(work + 0x19C));
+				if ((*reinterpret_cast<unsigned int*>(work + 0x3B0) & 0x8000) != 0 && Game.unk_flat3_field_8_0xc7dc != 0) {
+					maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0C));
+				}
+			}
+		}
+		maxRange = FLOAT_80331a78 + maxRange;
+
+		PSVECSubtract(targetPos, &m_worldPosition, &fromCenter);
+		float dist = PSVECMag(&fromCenter);
+		if (dist > maxRange && dist > 0.001f) {
+			PSVECScale(&fromCenter, &fromCenter, maxRange / dist);
+			PSVECAdd(&m_worldPosition, &fromCenter, targetPos);
+		}
+
+		PSVECSubtract(targetPos, centerPos, &move);
+		for (int i = 0; i < 4; i++) {
+			Vec bottom;
+			Vec up = {0.0f, FLOAT_80331ad0, 0.0f};
+			CMapCylinder hitCylinder;
+
+			PSVECAdd(centerPos, &up, &bottom);
+			hitCylinder.m_bottom = bottom;
+			hitCylinder.m_direction = move;
+			hitCylinder.m_radius = FLOAT_80331a9c;
+			hitCylinder.m_height = FLOAT_80331aa0;
+			hitCylinder.m_top.x = FLOAT_80331a9c;
+			hitCylinder.m_top.y = FLOAT_80331a9c;
+			hitCylinder.m_top.z = FLOAT_80331a9c;
+			hitCylinder.m_direction2.x = FLOAT_80331aa0;
+			hitCylinder.m_direction2.y = FLOAT_80331aa0;
+			hitCylinder.m_direction2.z = FLOAT_80331aa0;
+
+			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &move, 0x30) == 0) {
+				break;
+			}
+			if (i == 3) {
+				move.x = 0.0f;
+				move.y = 0.0f;
+				move.z = 0.0f;
+			} else {
+				CalcHitSlide__7CMapObjFP3Vecf(getMapHitObject(), &move);
+			}
+		}
+
+		PSVECAdd(centerPos, &move, targetPos);
+
+		Vec down = {0.0f, FLOAT_80331acc, 0.0f};
+		CMapCylinder floorCylinder;
+		floorCylinder.m_bottom = *targetPos;
+		floorCylinder.m_direction = down;
+		floorCylinder.m_radius = FLOAT_80331a78;
+		floorCylinder.m_height = FLOAT_80331aa0;
+		floorCylinder.m_top.x = FLOAT_80331a9c;
+		floorCylinder.m_top.y = FLOAT_80331a9c;
+		floorCylinder.m_top.z = FLOAT_80331a9c;
+		floorCylinder.m_direction2.x = FLOAT_80331aa0;
+		floorCylinder.m_direction2.y = FLOAT_80331aa0;
+		floorCylinder.m_direction2.z = FLOAT_80331aa0;
+
+		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &floorCylinder, &down, 0x30) != 0) {
+			CalcHitPosition__7CMapObjFP3Vec(getMapHitObject(), targetPos);
+			if (m_scriptHandle != nullptr) {
+				unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
+				*reinterpret_cast<Vec*>(work + 0xBAC) = *targetPos;
+				GetHitFaceNormal__7CMapObjFP3Vec(getMapHitObject(), reinterpret_cast<Vec*>(work + 0xBB8));
+			}
+		}
+
+		*centerPos = *targetPos;
+	}
+
+	Vec delta;
+	PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C), &m_worldPosition, &delta);
+	if (PSVECMag(&delta) > 0.0f) {
+		m_rotationY = atan2(delta.x, delta.z);
 	}
 }
 

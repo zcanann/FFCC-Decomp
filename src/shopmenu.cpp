@@ -2385,7 +2385,7 @@ void CShopMenu::DrawShopBase()
 
         if (ShopMenuInt(this, 0x10) == 2) {
             SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x14);
-            DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0x2C, ShopMenuInt(this, 0x3C) * 0x18 + 0x134, 1.0f);
+            DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0x2C, ShopMenuInt(this, 0x3C) * 0x18 + 0x134, FLOAT_80332d28);
             SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x15);
         }
     }
@@ -2402,7 +2402,7 @@ void CShopMenu::DrawShopBase()
  */
 void CShopMenu::DrawMakeBase()
 {
-    DrawSingleBase__8CMenuPcsFf(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), 1.0f);
+    DrawSingleBase__8CMenuPcsFf(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), FLOAT_80332d28);
     pppInitDrawEnv(0);
 
     GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
@@ -2454,7 +2454,7 @@ void CShopMenu::DrawMakeBase()
  */
 void CShopMenu::DrawSoubiBase()
 {
-    DrawSingleBase__8CMenuPcsFf(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), 1.0f);
+    DrawSingleBase__8CMenuPcsFf(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), FLOAT_80332d28);
     pppInitDrawEnv(0);
 
     GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);

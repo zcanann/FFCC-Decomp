@@ -19,7 +19,7 @@ extern "C" void SetGroup__7CMemoryFPvi(CMemory*, void*, int);
 extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 class CCharaPcs;
-extern unsigned char DAT_802E78E0[];
+extern unsigned char Chara[];
 extern CCharaPcs CharaPcs;
 
 namespace {
@@ -88,6 +88,11 @@ static inline unsigned int FourCC(char a, char b, char c, char d)
 {
 	return (static_cast<unsigned int>(a) << 24) | (static_cast<unsigned int>(b) << 16) |
 	       (static_cast<unsigned int>(c) << 8) | static_cast<unsigned int>(d);
+}
+
+static inline int& CharaS32(unsigned int offset)
+{
+	return S32At(Chara, offset);
 }
 
 static inline void i2f_5(float* out, register const unsigned short* in)
@@ -234,7 +239,8 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 	m_stage = stage;
 
 	while (chunkFile.GetNextChunk(chunk)) {
-		if (chunk.m_id != 0x43484120) {
+		int chunkId = static_cast<int>(chunk.m_id);
+		if (chunkId != 0x43484120) {
 			continue;
 		}
 		if (chunk.m_arg0 < 2) {
@@ -246,7 +252,8 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 
 		chunkFile.PushChunk();
 		while (chunkFile.GetNextChunk(chunk)) {
-			if (chunk.m_id != 0x414E494D) {
+			chunkId = static_cast<int>(chunk.m_id);
+			if (chunkId != 0x414E494D) {
 				continue;
 			}
 
@@ -263,42 +270,34 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 			int nodeOffset = 0;
 			chunkFile.PushChunk();
 			while (chunkFile.GetNextChunk(chunk)) {
-				if (chunk.m_id == 0x494E464F) {
+				chunkId = static_cast<int>(chunk.m_id);
+				switch (chunkId) {
+				case 0x494E5450:
+					m_interp = static_cast<char>(chunk.m_arg0);
+					m_interpOffset = chunkFile.Get4();
+					break;
+				case 0x4652414D:
+					m_frameCount = static_cast<unsigned short>(chunkFile.Get4());
+					break;
+				case 0x494E464F:
 					m_quantizeX = static_cast<unsigned char>(chunkFile.Get4());
 					m_quantizeY = static_cast<unsigned char>(chunkFile.Get4());
 					m_quantizeZ = static_cast<unsigned char>(chunkFile.Get4());
-				} else if ((int)chunk.m_id < 0x494E464F) {
-					if (chunk.m_id == 0x4652414D) {
-						m_frameCount = static_cast<unsigned short>(chunkFile.Get4());
-					} else if (((int)chunk.m_id < 0x4652414D) && (chunk.m_id == 0x42414E4B)) {
-						m_bankSize = (chunk.m_size + 0x1F) & 0xFFFFFFE0;
-						m_bank = __nwa__FUlPQ27CMemory6CStagePci(chunk.m_size, stage, s_charaAnimSourceFile, 0x7C);
-						chunkFile.Get(m_bank, chunk.m_size);
-
-						Memory.CopyToAMemorySync(
-						    m_bank,
-						    reinterpret_cast<void*>(
-						        S32At(DAT_802E78E0, 8308) + S32At(reinterpret_cast<void*>(S32At(DAT_802E78E0, 8284)), 8)),
-						    m_bankSize);
-
-						m_bankAddress = S32At(DAT_802E78E0, 8308);
-						S32At(DAT_802E78E0, 8308) = m_bankAddress + m_bankSize;
-						if (m_bank != 0) {
-							__dl__FPv(m_bank);
-							m_bank = 0;
-						}
-					}
-				} else if (chunk.m_id == 0x4E4F4445) {
+					break;
+				case 0x4E4F4445: {
 					CAnimNode* node = reinterpret_cast<CAnimNode*>(reinterpret_cast<unsigned char*>(m_nodes) + nodeOffset);
 					nodeOffset += 0x18;
 
 					chunkFile.PushChunk();
 					while (chunkFile.GetNextChunk(nodeChunk)) {
-						if (nodeChunk.m_id == 0x4E414D45) {
+						int nodeChunkId = static_cast<int>(nodeChunk.m_id);
+						switch (nodeChunkId) {
+						case 0x4E414D45:
 							strcpy(node->m_name, chunkFile.GetString());
-						} else if (((int)nodeChunk.m_id < 0x4E414D45) && (nodeChunk.m_id == 0x44415441)) {
+							break;
+						case 0x44415441: {
 							int i = 0;
-							int shift = 0;
+							int shift = i;
 							do {
 								int type = chunkFile.Get4();
 								int mode;
@@ -316,24 +315,42 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 									node->m_dataOffset = dataOffset;
 								}
 
-								node->m_flags =
-								    ((((node->m_flags >> 0xD) & 0x3FFFF) | ((static_cast<unsigned int>(mode) << shift) & 0x3FFFF))
-								      << 0xD) |
-								    (node->m_flags & 0x80001FFF);
+								unsigned int flags = ((node->m_flags >> 0xD) & 0x3FFFF) | (static_cast<unsigned int>(mode) << shift);
+								node->m_flags = __rlwimi(node->m_flags, flags, 13, 1, 18);
 
-								if ((5 < i) && (type != 0)) {
-									*reinterpret_cast<unsigned char*>(&node->m_flags) |= 0x80;
+								if ((i >= 6) && (type != 0)) {
+									unsigned char* flagsByte = reinterpret_cast<unsigned char*>(&node->m_flags);
+									*flagsByte = static_cast<unsigned char>(__rlwimi(*flagsByte, 1, 7, 24, 24));
 								}
 
 								i++;
 								shift += 2;
 							} while (i < 9);
+							break;
+						}
 						}
 					}
 					chunkFile.PopChunk();
-				} else if (((int)chunk.m_id < 0x4E4F4445) && (chunk.m_id == 0x494E5450)) {
-					m_interp = static_cast<char>(chunk.m_arg0);
-					m_interpOffset = chunkFile.Get4();
+					break;
+				}
+				case 0x42414E4B:
+					m_bankSize = (chunk.m_size + 0x1F) & 0xFFFFFFE0;
+					m_bank = __nwa__FUlPQ27CMemory6CStagePci(chunk.m_size, stage, s_charaAnimSourceFile, 0x7C);
+					chunkFile.Get(m_bank, chunk.m_size);
+
+					Memory.CopyToAMemorySync(
+					    m_bank,
+					    reinterpret_cast<void*>(
+					        CharaS32(8308) + S32At(reinterpret_cast<void*>(CharaS32(8284)), 8)),
+					    m_bankSize);
+
+					m_bankAddress = CharaS32(8308);
+					CharaS32(8308) += m_bankSize;
+					if (m_bank != 0) {
+						__dl__FPv(m_bank);
+						m_bank = 0;
+					}
+					break;
 				}
 			}
 			chunkFile.PopChunk();
@@ -358,7 +375,7 @@ void CChara::CAnim::InitQuantize()
 	unsigned long qy = ((unsigned long)anim.m_quantizeY << 0x18) | 0x70000 | ((unsigned long)anim.m_quantizeY << 8) | 7;
 	unsigned long qz = ((unsigned long)anim.m_quantizeZ << 0x18) | 0x70000 | ((unsigned long)anim.m_quantizeZ << 8) | 7;
 
-	gqrInit__6CCharaFUlUlUl(DAT_802E78E0, qx, qy, qz);
+	gqrInit__6CCharaFUlUlUl(Chara, qx, qy, qz);
 }
 
 /*
@@ -426,7 +443,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 		CopyFromAMemorySync__7CMemoryFPvPvUl(
 		    &Memory, animFields.m_bank,
 		    reinterpret_cast<void*>(
-		        animFields.m_bankAddress + S32At(reinterpret_cast<void*>(S32At(DAT_802E78E0, 8284)), 8)),
+		        animFields.m_bankAddress + S32At(reinterpret_cast<void*>(CharaS32(8284)), 8)),
 		    animFields.m_bankSize);
 	}
 

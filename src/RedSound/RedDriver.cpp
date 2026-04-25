@@ -24,8 +24,6 @@ struct RedWaveHEAD {
 
 extern "C" {
     void __dl__FPv(void*);
-    void* RedNew__Fi(int);
-    void RedDelete__FPv(void*);
     void* memcpy(void*, const void*, unsigned long);
     void* memmove(void*, const void*, unsigned long);
     void* memset(void*, int, unsigned long);
@@ -338,11 +336,11 @@ void _MusicCrossPlaySequence(int* param_1)
             *(int*)((int)p_SoundControlBuffer + 0x8ec) =
                  (0x1ff800 - *(int*)((int)p_SoundControlBuffer + 0x8e8)) / param_1[2];
             *(int*)((int)pvVar2 + 0x8f0) = param_1[2];
-            pvVar2 = RedNew__Fi(0x494);
+            pvVar2 = (void*)RedNew(0x494);
             memcpy(pvVar2, (void*)((int)p_SoundControlBuffer + 0x494), 0x494);
             memcpy((void*)((int)p_SoundControlBuffer + 0x494), p_SoundControlBuffer, 0x494);
             memcpy(p_SoundControlBuffer, pvVar2, 0x494);
-            RedDelete__FPv(pvVar2);
+            RedDelete(pvVar2);
         }
         else {
             iVar1 = SearchMusicSequence__9CRedEntryFi(&c_RedEntry, *param_1);
@@ -442,7 +440,7 @@ void _SetSeBlockData(int* param_1)
     char* seBlockData;
 
     if (p_SeBlockData[index] != 0) {
-        RedDelete__FPv(p_SeBlockData[index]);
+        RedDelete(p_SeBlockData[index]);
         p_SeBlockData[index] = 0;
     }
 
@@ -453,7 +451,7 @@ void _SetSeBlockData(int* param_1)
             (seBlockData[6] = 'k')) {
             p_SeBlockData[index] = seBlockData;
         } else {
-            RedDelete__FPv(seBlockData);
+            RedDelete(seBlockData);
         }
     }
 }
@@ -1253,7 +1251,7 @@ void CRedDriver::Init()
     } else {
         AXSetMode(0);
     }
-    p_Tick = (int*)RedNew__Fi(400);
+    p_Tick = (int*)RedNew(400);
     memset(p_Tick, 0, 400);
     AXSetCompressor(0);
     m_MusicKeySignature = 0;
@@ -1270,19 +1268,19 @@ void CRedDriver::Init()
         p_SeBlockData[iVar6] = 0;
         iVar6 = iVar5;
     } while (iVar5 < 4);
-    p_ZeroData = RedNew__Fi(0x1000);
+    p_ZeroData = (void*)RedNew(0x1000);
     memset(p_ZeroData, 0, 0x1000);
-    p_MusicReplayPoint = RedNew__Fi(0x400);
+    p_MusicReplayPoint = (void*)RedNew(0x400);
     memset(p_MusicReplayPoint, 0, 0x400);
-    p_MusicTempoControl = (int*)RedNew__Fi(0xc);
+    p_MusicTempoControl = (int*)RedNew(0xc);
     memset(p_MusicTempoControl, 0, 0xc);
-    p_MusicPitchControl = (int*)RedNew__Fi(0xc);
+    p_MusicPitchControl = (int*)RedNew(0xc);
     memset(p_MusicPitchControl, 0, 0xc);
-    p_ExecCommand = RedNew__Fi(0x2000);
+    p_ExecCommand = (void*)RedNew(0x2000);
     p_ExecCommandNow = p_ExecCommand;
     p_ExecCommandOld = p_ExecCommand;
     memset(p_ExecCommand, 0, 0x2000);
-    p_SoundControlBuffer = RedNew__Fi(0x1250);
+    p_SoundControlBuffer = (void*)RedNew(0x1250);
     p_SoundControl = p_SoundControlBuffer;
     memset(p_SoundControlBuffer, 0, 0x1250);
     *(int*)((char*)p_SoundControl + 0xdd8) = 0x1ff000;
@@ -1296,9 +1294,9 @@ void CRedDriver::Init()
     *(int*)((char*)p_SoundControl + 0xd98) = -1;
     *(int*)((char*)p_SoundControl + 0x904) = -1;
     *(int*)((char*)p_SoundControl + 0x470) = -1;
-    p_KeyOnData = RedNew__Fi(0x600);
+    p_KeyOnData = (void*)RedNew(0x600);
     memset(p_KeyOnData, 0, 0x600);
-    p_VoiceData = (unsigned int*)RedNew__Fi(0x3000);
+    p_VoiceData = (unsigned int*)RedNew(0x3000);
     memset(p_VoiceData, 0, 0x3000);
     iVar6 = 0;
     do {
@@ -1311,7 +1309,7 @@ void CRedDriver::Init()
     } while (iVar6 < 0x40);
     p_EditorVoice[1] = 0;
     p_EditorVoice[0] = 0;
-    uVar3 = RedNew__Fi(0x2a80);
+    uVar3 = (void*)RedNew(0x2a80);
     *(void**)((char*)p_SoundControlBuffer + 0xdbc) = uVar3;
     memset(*(void**)((char*)p_SoundControlBuffer + 0xdbc), 0, 0x2a80);
     iVar5 = 0;
@@ -1322,16 +1320,16 @@ void CRedDriver::Init()
         iVar5 = iVar5 + 1;
         *(char*)(iVar6 + iVar4 + 0x14e) = (char)(cVar1 + ' ');
     } while (iVar5 < 0x20);
-    p_EditorTrack = RedNew__Fi(0x154);
+    p_EditorTrack = (void*)RedNew(0x154);
     memset(p_EditorTrack, 0, 0x154);
-    p_ReverbDepth = RedNew__Fi(0x18);
+    p_ReverbDepth = (void*)RedNew(0x18);
     memset(p_ReverbDepth, 0, 0x18);
     m_Mute[1] = 0;
     m_Mute[0] = 0;
-    p_MusicNextPlay = (int*)RedNew__Fi(0x10);
+    p_MusicNextPlay = (int*)RedNew(0x10);
     p_MusicNextPlay[0] = -1;
     m_MusicPhraseStop = 0;
-    p_Stream = (RedStreamDATA*)RedNew__Fi(0x4c0);
+    p_Stream = (RedStreamDATA*)RedNew(0x4c0);
     memset(p_Stream, 0, 0x4c0);
     m_DMAMode = 0;
     memset(&gRedDriverSyncBuffer, 0, 0x1c00);
@@ -1344,23 +1342,23 @@ void CRedDriver::Init()
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);
     InitReverb();
     OSInitSemaphore(&m_DmaExecuteSemaphore, 0);
-    p_DmaExecuteThreadStack = RedNew__Fi(0x1000);
+    p_DmaExecuteThreadStack = (void*)RedNew(0x1000);
     OSCreateThread(&m_DmaExecuteThread, (void* (*)(void*))_DmaExecuteThread, 0, (char*)p_DmaExecuteThreadStack + 0x1000, 0x1000,
                    3, 1);
     OSResumeThread(&m_DmaExecuteThread);
     OSInitSemaphore(&m_WaveSettingSemaphore, 0);
-    p_WaveSettingThreadStack = RedNew__Fi(0x1000);
+    p_WaveSettingThreadStack = (void*)RedNew(0x1000);
     OSCreateThread(&m_WaveSettingThread, (void* (*)(void*))_WaveSettingThread, &m_WaveSettingData,
                    (char*)p_WaveSettingThreadStack + 0x1000, 0x1000, 4, 1);
     OSResumeThread(&m_WaveSettingThread);
     OSInitSemaphore(&m_MusicSkipSemaphore, 0);
-    p_MusicSkipThreadStack = RedNew__Fi(0x1000);
+    p_MusicSkipThreadStack = (void*)RedNew(0x1000);
     OSCreateThread(&m_MusicSkipThread, (void* (*)(void*))_MusicSkipThread, 0, (char*)p_MusicSkipThreadStack + 0x1000, 0x1000,
                    4, 1);
     OSResumeThread(&m_MusicSkipThread);
     OSInitSemaphore(&m_MainSemaphore, 0);
     m_MainThreadTime = 0;
-    p_MainThreadStack = RedNew__Fi(0x1000);
+    p_MainThreadStack = (void*)RedNew(0x1000);
     OSCreateThread(&RedDriverMainThread(), (void* (*)(void*))_MainThread, 0, (char*)p_MainThreadStack + 0x1000, 0x1000,
                    4, 1);
     OSResumeThread(&RedDriverMainThread());
@@ -1468,7 +1466,7 @@ int CRedDriver::SetMusicData(void* param_1)
     if (((musicHeader[0] == 'B') && (musicHeader[1] == 'G')) && (musicHeader[2] == 'M')) {
         memcpy(localHeader, musicHeader, sizeof(localHeader));
         headerSize = *(int*)(localHeader + 0x10);
-        copiedHeader = RedNew__Fi(headerSize);
+        copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
             memcpy(copiedHeader, musicHeader, headerSize);
             _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
@@ -1633,7 +1631,7 @@ void CRedDriver::SetSeBlockData(int param_1, void* param_2)
         copySize = *(int*)((char*)param_2 + 0xc);
         if (copySize < 1) {
         } else {
-            copiedBuffer = RedNew__Fi(copySize);
+            copiedBuffer = (void*)RedNew(copySize);
             if (copiedBuffer != 0) {
                 memcpy(copiedBuffer, param_2, copySize);
             }
@@ -1662,7 +1660,7 @@ int CRedDriver::SetSeSepData(void* param_1)
     if ((((pcVar4[0] == 'S') && (pcVar4[1] == 'e')) && (pcVar4[2] == 'S')) &&
         ((pcVar4[3] == 'e' && (pcVar4[4] == 'p')))) {
         iVar1 = *(int*)(pcVar4 + 0xc) & 0x7fffffff;
-        pvVar3 = RedNew__Fi(iVar1);
+        pvVar3 = (void*)RedNew(iVar1);
         if (pvVar3 != 0) {
             memcpy(pvVar3, param_1, iVar1);
             iVar2 = *(int*)((int)pvVar3 + 8);

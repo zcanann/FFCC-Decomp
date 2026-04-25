@@ -1808,162 +1808,274 @@ void pppCacheDumpShape(short*, _pppDataHead*)
  */
 void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 {
+	struct pppSubProgEntryRaw
+	{
+		pppProg* m_prog;
+		u32 m_initWork;
+		u32 m_unk8;
+		u32 m_unkC;
+	};
+
 	struct pppProgramSetDefRaw
 	{
 		pppProgramSetDefRaw* m_next;
-		int m_unk4;
-		int m_unk8;
-		int m_unkC;
-		int m_startFrame;
+		u32 m_unk4;
+		u32 m_unk8;
+		u32 m_startFrame;
+		pppSubProgEntryRaw m_subProgEntries[1];
+		u8 m_flags;
+		u8 m_unk21;
+		s16 m_sortKey;
+		u16 m_objBaseSize;
+		s16 m_numStages;
 	};
 
 	struct pppPDataValRaw
 	{
 		pppProgramSetDefRaw* m_programSetDef;
-		int m_nextSpawnTime;
-		_pppPObjLink* m_objHead;
-		short m_activeCount;
-		unsigned char m_index;
-		unsigned char m_pad;
+		s32 m_nextSpawnTime;
+		_pppPObjLink* m_pppPObjLink;
+		s16 m_activeCount;
+		u8 m_index;
+		u8 m_pad;
 	};
 
-	struct pppMngStStartRaw
+	struct pppMngStHeadRaw
 	{
-		void* m_pppResSet;
-		int m_partIndex;
-		Vec m_position;
-		int m_baseTime;
-		pppIVECTOR4 m_rotation;
-		int m_rotationSpeed;
-		int m_lifeEnd;
-		Vec m_scale;
-		int m_currentFrame;
-		int m_previousFrame;
-		int m_numControlPrograms;
-		float m_scaleFactor;
-		float m_ownerScale;
-		float m_userFloat0;
-		float m_userFloat1;
-		Vec m_savedPosition;
-		Vec m_previousPosition;
-		Vec m_paramVec0;
-		short m_kind;
-		short m_nodeIndex;
-		pppFMATRIX m_matrix;
-		unsigned char m_envColorR;
-		unsigned char m_envColorG;
-		unsigned char m_envColorB;
-		unsigned char m_envColorA;
-		int m_spawnedCount;
-		int m_previousFrame2;
-		int m_numPrograms;
-		int m_reservedB8;
-		unsigned int m_objHitMask;
-		unsigned int m_cylinderAttribute;
-		_pppPObjLink* m_objHead;
-		pppProgramSetDefRaw* m_programSetHead;
-		pppPDataValRaw* m_pDataVals;
-		void** m_controlTable;
+		u8 m_pad0[0xC4];
+		_pppPObjLink m_pppPObjLinkHead;
 		void* m_programTable;
-		void* m_owner;
-		void* m_lookTarget;
-		CChara::CNode* m_bindNode;
-		unsigned char m_mode;
-		unsigned char m_stopRequested;
-		unsigned char m_isFinished;
-		unsigned char m_matrixMode;
-		unsigned char m_hitBgFlag;
-		unsigned char m_slotVisible;
-		unsigned char m_ownerFacing;
-		unsigned char m_drawVariant;
-		unsigned char m_rotationOrder;
-		unsigned char m_drawPass;
-		signed char m_drawSubType;
-		unsigned char m_useOwnerScaleSign;
-		unsigned char m_ownerFlagsInitialized;
-		unsigned char m_nodeScaleInitialized;
-		unsigned char m_fieldF2;
-		unsigned char m_mapTexLoaded;
-		unsigned char m_hasMapRef;
-		unsigned char m_fpBillboard;
-		unsigned char m_prio;
-		short m_frameCounter;
+		pppPDataValRaw* m_pppPDataVals;
 	};
 
-	pppMngStPtr = pppMngSt;
-	pppMngStStartRaw* mng = (pppMngStStartRaw*)pppMngSt;
+	struct pppMngStFreeRaw
+	{
+		u8 m_pad0[0x14];
+		s32 m_baseTime;
+		u8 m_pad1[0x74 - 0x18];
+		s16 m_kind;
+		u8 m_pad2[0xC4 - 0x76];
+		_pppPObjLink m_pppPObjLinkHead;
+		u8 m_pad3[0xF8 - 0xD0];
+		u8 m_prio;
+		s16 m_prioTime;
+	};
 
-	mng->m_lifeEnd = (int)pdt[0];
-	mng->m_mode = (unsigned char)pdt[1];
-
-	short* modelList = (short*)((unsigned char*)pdt + pdt[4]);
-	short* shapeList = (short*)((unsigned char*)pdt + pdt[5]);
-
-	if (Game.m_currentSceneId != 7) {
-		pppCacheLoadModel(modelList, (_pppDataHead*)pdt);
-		pppCacheLoadShape(shapeList, (_pppDataHead*)pdt);
-		mng->m_mapTexLoaded = 1;
-	}
-	mng->m_isFinished = 0;
-
+	pppProgramSetDefRaw* programSet = (pppProgramSetDefRaw*)(pdt + 6);
+	pppMngStHeadRaw* mngRaw = (pppMngStHeadRaw*)pppMngSt;
 	int controlOffset = (int)pdt[2];
 	int programOffset = (int)pdt[3];
-	int controlCount = *(int*)((unsigned char*)pdt + controlOffset);
-	int programCount = *(int*)((unsigned char*)pdt + programOffset);
-	pppProgramSetDefRaw* programSet = (pppProgramSetDefRaw*)(pdt + 6);
+	short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
+	short* modelIndices = (short*)((u8*)pdt + pdt[4]);
 
-	mng->m_numControlPrograms = controlCount;
-	mng->m_numPrograms = programCount;
-	mng->m_controlTable = (void**)(((int*)((unsigned char*)pdt + controlOffset)) + 1);
-	mng->m_programTable = (void*)(((int*)((unsigned char*)pdt + programOffset)) + 1);
+	pppMngStPtr = pppMngSt;
+	pppMngSt->m_lifeEnd = (int)pdt[0];
+	pppMngSt->m_mode = (u8)pdt[1];
 
-	pppPDataValRaw* pDataVals = 0;
-	if (programCount > 0) {
-		pDataVals = (pppPDataValRaw*)pppMemAlloc(programCount * 0x10, pppEnvStPtr->m_stagePtr,
-		                                        const_cast<char*>(s_pppPart_cpp), 0x585);
+	if (Game.m_currentSceneId != 7)
+	{
+		short modelCount = *modelIndices;
+		short* modelList = modelIndices + 1;
+		u32 pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
+
+		for (short i = 0; i < modelCount; i++, modelList++)
+		{
+			CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *modelList * 4);
+			short cacheIndex = *reinterpret_cast<short*>(reinterpret_cast<u8*>(mapMesh) + 0x46);
+
+			if (IsEnable__13CAmemCacheSetFs(&ppvAmemCacheSet, cacheIndex) == 0)
+			{
+				mapMesh->Ptr2Off();
+				*reinterpret_cast<int*>(reinterpret_cast<u8*>(mapMesh) + 0x24) =
+				    GetData__13CAmemCacheSetFsPci(&ppvAmemCacheSet, cacheIndex, (char*)s_pppPart_cpp, 0x4E5);
+				mapMesh->Off2Ptr();
+			}
+
+			AddRef__13CAmemCacheSetFs(&ppvAmemCacheSet, cacheIndex);
+			mapMesh->pppCacheLoadModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
+		}
+
+		short shapeCount = *shapeIndices;
+		short* shapeList = shapeIndices + 1;
+		u32 shapeNames = *(u32*)(pppResSet + 0x18);
+		CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4);
+
+		for (short i = 0; i < shapeCount; i++, shapeList++)
+		{
+			pppCacheLoadShapeTexture(*(pppShapeSt**)(shapeNames + *shapeList * 4), materialSet);
+		}
+
+		pppMngSt->m_mapTexLoaded = 1;
 	}
-	mng->m_pDataVals = pDataVals;
 
-	if (programSet->m_next != 0) {
-		mng->m_programSetHead = 0;
+	pppMngSt->m_isFinished = 0;
+	pppMngSt->m_numControlPrograms = *(int*)((u8*)pdt + controlOffset);
+	mngRaw->m_pppPObjLinkHead.m_owner = (_pppPDataVal*)(((int*)((u8*)pdt + controlOffset)) + 1);
+	pppMngSt->m_numPrograms = *(int*)((u8*)pdt + programOffset);
+	mngRaw->m_programTable = ((int*)((u8*)pdt + programOffset)) + 1;
+
+	if (pppMngSt->m_numPrograms == 0)
+	{
+		mngRaw->m_pppPDataVals = 0;
+	}
+	else
+	{
+		CMemory::CStage* stage = pppEnvStPtr->m_stagePtr;
+		bool firstAllocFailure = true;
+		bool canRetry = true;
+		u8 denied[0x180];
+
+		DAT_8032ED64 = 0;
+		do
+		{
+			pppPDataValRaw* pDataVals = (pppPDataValRaw*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+			    &Memory, pppMngSt->m_numPrograms << 4, stage, (char*)s_pppPart_cpp, 0x585, 1);
+			if (pDataVals != 0)
+			{
+				mngRaw->m_pppPDataVals = pDataVals;
+				goto DataValsAllocated;
+			}
+
+			if (firstAllocFailure)
+			{
+				firstAllocFailure = false;
+				memset(denied, 0, sizeof(denied));
+				int currentIdx = ((s32)((u8*)pppMngStPtr - ((u8*)&PartMng + 0x1D4))) / 0x158;
+				denied[currentIdx] = 1;
+			}
+
+			pppMngStFreeRaw* selectedMngSt = 0;
+			u8 selectedPrio = 1;
+			u32 selectedPrioTime = 0;
+
+			for (int i = 0; i < 0x180; i += 2)
+			{
+				pppMngStFreeRaw* candidateA = (pppMngStFreeRaw*)(((u8*)&PartMng + 0x1D4) + (i * 0x158));
+				if (denied[i] == 0 && candidateA->m_baseTime != -0x1000 && candidateA->m_kind != 0)
+				{
+					u8 prioA = candidateA->m_prio;
+					if (prioA > 1 && (selectedPrio < prioA || (selectedPrio == prioA && selectedPrioTime < (u32)candidateA->m_prioTime)))
+					{
+						selectedMngSt = candidateA;
+						selectedPrio = prioA;
+						selectedPrioTime = (u32)candidateA->m_prioTime;
+					}
+				}
+
+				pppMngStFreeRaw* candidateB = candidateA + 1;
+				if (denied[i + 1] == 0 && candidateB->m_baseTime != -0x1000 && candidateB->m_kind != 0)
+				{
+					u8 prioB = candidateB->m_prio;
+					if (prioB > 1 && (selectedPrio < prioB || (selectedPrio == prioB && selectedPrioTime < (u32)candidateB->m_prioTime)))
+					{
+						selectedMngSt = candidateB;
+						selectedPrio = prioB;
+						selectedPrioTime = (u32)candidateB->m_prioTime;
+					}
+				}
+			}
+
+			if (selectedMngSt == 0)
+			{
+				canRetry = false;
+			}
+			else
+			{
+				int deniedIdx = ((s32)((u8*)selectedMngSt - ((u8*)&PartMng + 0x1D4))) / 0x158;
+				denied[deniedIdx] = 1;
+
+				_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
+				_pppPObjLink* obj = prev->m_next;
+				while (obj != 0)
+				{
+					_pppPObjLink* next = obj->m_next;
+					pppPDataValRaw* owner = (pppPDataValRaw*)obj->m_owner;
+					if ((int)(((u32)owner->m_programSetDef->m_flags << 30) | ((u32)owner->m_programSetDef->m_flags >> 2)) >= 0)
+					{
+						prev->m_next = next;
+
+						pppProgramSetDefRaw* ownerSet = owner->m_programSetDef;
+						for (int stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
+						{
+							pppSubProgEntryRaw* entry = &ownerSet->m_subProgEntries[stageIndex];
+							if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
+							{
+								((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
+							}
+						}
+
+						owner->m_activeCount--;
+						if (owner->m_activeCount == 0)
+						{
+							owner->m_pppPObjLink = 0;
+						}
+						else if (owner->m_pppPObjLink == obj)
+						{
+							owner->m_pppPObjLink = next;
+						}
+
+						Memory.Free(obj);
+					}
+					else
+					{
+						prev = obj;
+					}
+					obj = next;
+				}
+			}
+		}
+		while (canRetry);
+
+		pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
+		PartMng.pppDumpMngSt();
+		DAT_8032ED64 = 1;
+DataValsAllocated:
+		;
 	}
 
-	mng->m_currentFrame = 0;
-	if (programCount == 0) {
-		mng->m_programSetHead = 0;
-	} else {
-		mng->m_programSetHead = programSet;
+	if (programSet->m_next != 0)
+	{
+		mngRaw->m_pppPObjLinkHead.m_previous = 0;
 	}
 
-	mng->m_objHead = 0;
-	mng->m_spawnedCount = 0;
+	pppMngSt->m_currentFrame = 0;
+	if (pppMngSt->m_numPrograms == 0)
+	{
+		mngRaw->m_pppPObjLinkHead.m_previous = 0;
+	}
+	else
+	{
+		mngRaw->m_pppPObjLinkHead.m_previous = (_pppPObjLink*)programSet;
+	}
 
-	if (pDataVals != 0) {
-		unsigned char index = 0;
-		pppProgramSetDefRaw* programSetIt = programSet;
-		while (programSetIt != 0) {
+	mngRaw->m_pppPObjLinkHead.m_next = 0;
+	pppMngSt->m_spawnedCount = 0;
+
+	if (mngRaw->m_pppPDataVals != 0)
+	{
+		u8 index = 0;
+		pppPDataValRaw* pDataVals = mngRaw->m_pppPDataVals;
+		for (pppProgramSetDefRaw* programSetIt = programSet; programSetIt != 0; programSetIt = programSetIt->m_next)
+		{
 			pDataVals->m_programSetDef = programSetIt;
 			pDataVals->m_nextSpawnTime = programSetIt->m_startFrame;
-			pDataVals->m_objHead = 0;
+			pDataVals->m_pppPObjLink = 0;
 			pDataVals->m_activeCount = 0;
 			pDataVals->m_index = index;
-			pDataVals->m_pad = 0;
-			programSetIt = programSetIt->m_next;
 			index++;
 			pDataVals++;
 		}
 	}
 
-	if (runControlPrograms != 0) {
+	if (runControlPrograms != 0)
+	{
 		int entryOffset = 0;
-		unsigned char* controlTable = (unsigned char*)mng->m_controlTable;
-		for (int i = 0; i < controlCount; i++) {
-			unsigned char* controlEntry = *(unsigned char**)(controlTable + entryOffset);
-			if (controlEntry != 0) {
-				void (*fn)(_pppMngSt*) = *(void (**)(_pppMngSt*))(controlEntry + 0x10);
-				if (fn != 0) {
-					fn(pppMngSt);
-				}
+		for (int i = 0; i < pppMngSt->m_numControlPrograms; i++)
+		{
+			void (*fn)(_pppMngSt*) = *(void (**)(_pppMngSt*))(*(int*)(reinterpret_cast<u8*>(mngRaw->m_pppPObjLinkHead.m_owner) + entryOffset) + 0x10);
+			if (fn != 0)
+			{
+				fn(pppMngSt);
 			}
 			entryOffset += 4;
 		}

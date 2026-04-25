@@ -18,21 +18,19 @@ extern "C" {
 	void* RedNew__Fi(int);
 }
 
-// RedSound global linkage that is shared across Red* units.
+extern const char s_pctspcts_Memory_Setting_Error_0xpct8_8X_0xpct8_8X_pcts_801E7FE8[];
+extern const char sRedSoundLogPrefix[];
+extern const char s_redSoundInvalidStreamDataFmt[];
+
+// RedSound global linkage and small-data blobs shared across Red* units.
 CRedDriver gRedDriver;
 int DAT_8032e17c[0x41];
+RedSoundNullData DAT_8032ec30 = {{0, 0}};
 volatile unsigned int DAT_8032f4c4;
 volatile int DAT_8032f4c8;
-static const char s_redSoundMemorySettingErrorFmt[] = "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
-static const char sRedSoundLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
-static const char s_redSoundAMemorySettingErrorFmt[] = "%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
-static const char sRedSoundLogErrorColor[] = "\x1B[7;31m";
-static const char sRedSoundLogReset[] = "\x1B[0m";
-static const char sRedSoundLogInfoColor[] = "\x1B[4;34m";
-static const char s_redSoundArNotInitializedFmt[] = "%s\"AR\" was not initialized.%s\n";
-static const char s_redSoundInitOkFmt[] = "%s%sSound Driver Initialize OK.%s\n";
-static const char s_redSoundInitErrorFmt[] = "%s%sSound Driver Initialize ERROR !!%s\n";
-static const char s_redSoundInvalidStreamDataFmt[] = "%s%sSTREAM : This data was not 'STREAM-DATA'.%s\n";
+const char sRedSoundLogErrorColor[] = "\x1B[7;31m";
+const char sRedSoundLogReset[] = "\x1B[0m";
+const char lbl_80333DA5[] = "\x1B[4;34m";
 
 #define redSoundDebugEnabled (*reinterpret_cast<int*>(&DAT_8032f3f0))
 
@@ -125,13 +123,14 @@ int* CRedSound::EntryStandbyID(int id)
 #pragma optimization_level 0
 int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 {
+	const char* redSoundFmtBase = s_pctspcts_Memory_Setting_Error_0xpct8_8X_0xpct8_8X_pcts_801E7FE8;
+
 	memset(DAT_8032e17c, 0, 0x100);
 
 	if (param_3 > 0 && param_5 > 0) {
 		if ((((u32)param_2 & 0x1F) != 0) || (((u32)param_3 & 0x1F) != 0)) {
 			if (redSoundDebugEnabled != 0) {
-				OSReport("%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n", "\x1B[7;34mSound\x1B[0m:",
-				         sRedSoundLogErrorColor, (u32)param_2,
+				OSReport(redSoundFmtBase, redSoundFmtBase + 0x33, sRedSoundLogErrorColor, (u32)param_2,
 				         param_3, sRedSoundLogReset);
 				fflush(__files + 1);
 			}
@@ -140,8 +139,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 
 		if ((((u32)param_4 & 0x1F) != 0) || (((u32)param_5 & 0x1F) != 0)) {
 			if (redSoundDebugEnabled != 0) {
-				OSReport("%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n", "\x1B[7;34mSound\x1B[0m:",
-				         sRedSoundLogErrorColor, param_4, param_5,
+				OSReport(redSoundFmtBase + 0x45, redSoundFmtBase + 0x33, sRedSoundLogErrorColor, param_4, param_5,
 				         sRedSoundLogReset);
 				fflush(__files + 1);
 			}
@@ -150,7 +148,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 
 		if (ARCheckInit() == 0) {
 			if (redSoundDebugEnabled != 0) {
-				OSReport("%s\"AR\" was not initialized.%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogErrorColor,
+				OSReport(redSoundFmtBase + 0x78, redSoundFmtBase + 0x33, sRedSoundLogErrorColor,
 				         sRedSoundLogReset);
 				fflush(__files + 1);
 			}
@@ -167,7 +165,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		gRedDriver.Init();
 
 		if (redSoundDebugEnabled != 0) {
-			OSReport("%s%sSound Driver Initialize OK.%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogInfoColor,
+			OSReport(redSoundFmtBase + 0x97, redSoundFmtBase + 0x33, lbl_80333DA5,
 			         sRedSoundLogReset);
 			fflush(__files + 1);
 		}
@@ -175,7 +173,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		param_3 = 0;
 
 		if (redSoundDebugEnabled != 0) {
-			OSReport("%s%sSound Driver Initialize ERROR !!%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogErrorColor,
+			OSReport(redSoundFmtBase + 0xBA, redSoundFmtBase + 0x33, sRedSoundLogErrorColor,
 			         sRedSoundLogReset);
 			fflush(__files + 1);
 		}

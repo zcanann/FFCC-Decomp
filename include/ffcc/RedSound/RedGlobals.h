@@ -9,6 +9,9 @@
 class CRedDriver;
 class CRedEntry;
 class CRedMemory;
+struct RedSoundNullData {
+	u32 words[2];
+};
 
 extern int gRedCommandHandlerTable[];
 extern FILE DAT_8021d1a8;
@@ -25,7 +28,7 @@ extern CRedEntry DAT_8032e154;
 extern OSSemaphore DAT_8032e120;
 extern void* DAT_8032e12c[];
 extern int DAT_8032e17c[];
-extern unsigned int DAT_8032ec30;
+extern RedSoundNullData DAT_8032ec30;
 extern int DAT_8032f3c0;
 extern int DAT_8032f3c4;
 extern int DAT_8032f3c8;

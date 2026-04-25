@@ -1990,6 +1990,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int, int, Vec* hitPos
 	if (CharaObjIsPlayerCid(cid) && *reinterpret_cast<short*>(script + 0x12) != 0) {
 		return;
 	}
+	if (CharaObjIsPlayerCid(cid) &&
+	    (*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484) & 4) != 0) {
+		return;
+	}
 	if (CharaObjIsPlayerCid(cid) && static_cast<unsigned short>((m_lastMapIdExtra << 8) | m_lastMapIdHit) != 1) {
 		return;
 	}
@@ -1997,7 +2001,13 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int, int, Vec* hitPos
 		return;
 	}
 
-	staType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 8);
+	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + resolvedItemId * 0x48;
+	unsigned short itemEffect = *reinterpret_cast<unsigned short*>(itemData);
+	staType = *reinterpret_cast<unsigned short*>(itemData + 8);
+	if (staType != 0x65 && staType != 0x66 && staType != 0x67 && (CFlat[0x12E4] & 0x20) != 0) {
+		return;
+	}
+
 	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, severity, 0);
 
 	if (resistType == 3) {
@@ -2025,6 +2035,36 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int, int, Vec* hitPos
 		}
 		allowEffect = 0;
 		effectResult = 0;
+	}
+
+	if (sourceObj != 0 && m_lastStateId == 6 && (m_weaponNodeFlags & 0x20) != 0) {
+		unsigned int currentKind =
+			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF;
+		if (currentKind == 2) {
+			if (staType != 0x66 && staType != 0x67 && staType != 7) {
+				Vec delta;
+				delta.x = m_worldPosition.x - sourceObj->m_worldPosition.x;
+				delta.y = m_worldPosition.y - sourceObj->m_worldPosition.y;
+				delta.z = m_worldPosition.z - sourceObj->m_worldPosition.z;
+				moveVectorH(&delta, 10.0f, 10);
+				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
+				changeStat(0x1A, 0, 0);
+			}
+		} else if (currentKind == 3) {
+			allowEffect = 0;
+			effectResult = 0;
+		}
+	}
+
+	if (sourceObj != 0 && itemEffect == 0x1F8 && (sourceObj->m_weaponNodeFlags & 0x20) != 0 &&
+	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF) == 3)) {
+		Vec delta;
+		delta.x = m_worldPosition.x - sourceObj->m_worldPosition.x;
+		delta.y = m_worldPosition.y - sourceObj->m_worldPosition.y;
+		delta.z = m_worldPosition.z - sourceObj->m_worldPosition.z;
+		moveVectorH(&delta, 10.0f, 10);
+		m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
+		changeStat(0x19, 0, 0);
 	}
 
 	if (*reinterpret_cast<short*>(script + 0x1D) != 0) {

@@ -44,6 +44,7 @@ extern "C" int rand(void);
 extern char* PTR_s_bonus_802128c0[];
 extern char DAT_802128e4[];
 extern char s_dvd__smenu_subfont_fnt_801e3020[];
+extern const double DOUBLE_80331FC0;
 #pragma force_active on
 extern "C" {
 int gBonusMenuWork0 = 0;
@@ -1459,6 +1460,9 @@ void CMenuPcs::calcBonus()
 	if (statePtr == 0 || animPtr == 0) {
 		return;
 	}
+
+	*reinterpret_cast<float*>(statePtr) =
+	    static_cast<float>((double)*reinterpret_cast<float*>(statePtr) - DOUBLE_80331FC0);
 
 	if (*(short*)(animPtr + 6) != 0) {
 		*(short*)(statePtr + 0x1c) = *(short*)(statePtr + 0x1c) + 1;

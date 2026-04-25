@@ -65,6 +65,11 @@ extern int gWmMenuWorkA;
 extern float FLOAT_80330b74;
 extern float FLOAT_80330b54;
 extern float FLOAT_80330b64;
+extern float FLOAT_80330B34;
+extern float FLOAT_80330B3C;
+extern float FLOAT_80330B50;
+extern float FLOAT_80330B54;
+extern float FLOAT_80330B58;
 
 static const char s_setMiniGameParamFmt[] = "SetMiniGameParam no 0x%04x data[%d]\n";
 static const char s_cflatDebugFileFmt[] = "cflat_d%d.bin";
@@ -3267,6 +3272,40 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -0x42: {
         const int padType = GetPadType__6JoyBusFi(&Joybus, *object->m_localBase);
         runtime->push(object, (0x40U - padType | padType - 0x40U) >> 31);
+        outResult = 0;
+        return;
+    }
+    case -0x41: {
+        const unsigned int* localBase = object->m_localBase;
+        float alpha = static_cast<float>(static_cast<int>(localBase[1])) /
+                      static_cast<float>(static_cast<int>(localBase[2]));
+        Quaternion start = {static_cast<float>(localBase[3]), static_cast<float>(localBase[4]),
+                            static_cast<float>(localBase[5]), static_cast<float>(localBase[6])};
+        Quaternion end = {static_cast<float>(localBase[7]), static_cast<float>(localBase[8]),
+                          static_cast<float>(localBase[9]), static_cast<float>(localBase[10])};
+        Quaternion rotation;
+
+        switch (*localBase & 3) {
+        case 3:
+            alpha = -((FLOAT_80330B3C * (FLOAT_80330B34 + sinf(FLOAT_80330B54 * alpha + FLOAT_80330B50))) -
+                      FLOAT_80330B34);
+            break;
+        case 1:
+            alpha = FLOAT_80330B34 + sinf(FLOAT_80330B50 * alpha + FLOAT_80330B58);
+            break;
+        case 2:
+            alpha = sinf(FLOAT_80330B50 * alpha);
+            break;
+        default:
+            break;
+        }
+
+        C_QUATSlerp(&start, &end, &rotation, alpha);
+        *reinterpret_cast<float*>(localBase[11]) = rotation.x;
+        *reinterpret_cast<float*>(localBase[12]) = rotation.y;
+        *reinterpret_cast<float*>(localBase[13]) = rotation.z;
+        *reinterpret_cast<float*>(localBase[14]) = rotation.w;
+        runtime->push(object, 0);
         outResult = 0;
         return;
     }

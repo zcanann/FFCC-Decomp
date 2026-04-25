@@ -3098,6 +3098,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 
 	_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * alpha)};
 	const float corner = 8.0f;
+	const float texScale = 0.125f;
 	const float right = (x + w) - corner;
 	const float bottom = (y + h) - corner;
 	const float innerW = w - (corner * 2.0f);
@@ -3107,21 +3108,21 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1B);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, corner, corner, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, y, corner, corner, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, bottom, corner, corner, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, bottom, corner, corner, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, corner, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, y, corner, corner, corner, 0.0f, texScale, texScale, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, bottom, corner, corner, 0.0f, corner, texScale, texScale, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, bottom, corner, corner, corner, corner, texScale, texScale, 0.0f);
 
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1C);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, y, innerW, corner, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, y, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x22);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, bottom, innerW, corner, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, bottom, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1D);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y + corner, corner, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y + corner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x21);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, y + corner, corner, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, y + corner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1E);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, y + corner, innerW, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, y + corner, innerW, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 }
 
 /*

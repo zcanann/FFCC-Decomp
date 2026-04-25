@@ -3518,6 +3518,31 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0x26:
+        runtime->push(
+            object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x26EC + *object->m_localBase * 0xB14));
+        outResult = 0;
+        return;
+    case -0x25: {
+        Vec target = {
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+            static_cast<float>(object->m_localBase[3]),
+        };
+        CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
+        unsigned long segment = 0;
+        float segmentRatio = 0.0f;
+        float distance = 0.0f;
+
+        if (line->Calc((Vec*)0, (float*)0, &segment, &segmentRatio, &target, 0.0f) != 0) {
+            distance = line->m_segments[segment].length * segmentRatio + line->m_segments[segment].startLength;
+        }
+
+        *reinterpret_cast<float*>(object->m_localBase[4]) = distance;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x1F:
         if (*object->m_localBase < 0x10) {
             const int lineOffset = *object->m_localBase * 0xB14;

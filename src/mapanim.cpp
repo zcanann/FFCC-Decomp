@@ -264,18 +264,17 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
 CMapAnim::~CMapAnim()
 {
     unsigned int i = 0;
-    CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
 
-    while (static_cast<unsigned int>(nodeArray->GetSize()) > i) {
-        CMapAnimNode* node = (*nodeArray)[i];
-        if (node != 0 && (node = (*nodeArray)[i], node != 0)) {
+    while (static_cast<unsigned int>(mapAnimNodes.GetSize()) > i) {
+        CMapAnimNode* node = mapAnimNodes[i];
+        if (node != 0 && (node = mapAnimNodes[i], node != 0)) {
             reinterpret_cast<int*>(node)[1] = 0;
             __dl__FPv(node);
         }
         i++;
     }
 
-    nodeArray->RemoveAll();
+    mapAnimNodes.RemoveAll();
 }
 
 /*

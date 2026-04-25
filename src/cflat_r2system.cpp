@@ -57,6 +57,7 @@ void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
 int GetPadType__6JoyBusFi(void*, int);
 unsigned int getNumFreeObject__13CFlatRuntime2Fi(void*, int);
+unsigned short GetButtonDown__4CPadFl(void*, long);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 int sprintf(char*, const char*, ...);
 unsigned char gMapHitDrawMode;
@@ -3580,12 +3581,69 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0x11: {
+        float value = Math.RandFPM(static_cast<float>(*object->m_localBase));
+        runtime->push(object, *reinterpret_cast<int*>(&value));
+        outResult = 0;
+        return;
+    }
     case -0x10:
         runtime->push(object, Math.RandPM(*object->m_localBase));
         outResult = 0;
         return;
+    case -0x0F: {
+        float value = Math.RandF(static_cast<float>(*object->m_localBase));
+        runtime->push(object, *reinterpret_cast<int*>(&value));
+        outResult = 0;
+        return;
+    }
     case -0x0E:
         runtime->push(object, Math.Rand(*object->m_localBase));
+        outResult = 0;
+        return;
+    case -0x0D: {
+        float* values = reinterpret_cast<float*>(object->m_localBase);
+        Vec a = {values[0], values[1], values[2]};
+        Vec b = {values[3], values[4], values[5]};
+        float value = PSVECDistance(&a, &b);
+        runtime->push(object, *reinterpret_cast<int*>(&value));
+        outResult = 0;
+        return;
+    }
+    case -0x0C: {
+        unsigned short buttons = 0;
+        if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
+            buttons = GetButtonRepeat__4CPadFl(&Pad, *object->m_localBase);
+        }
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
+            buttons &= 0xF3FF;
+        }
+        runtime->push(object, static_cast<short>(buttons));
+        outResult = 0;
+        return;
+    }
+    case -0x0B: {
+        unsigned short buttons = 0;
+        if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
+            buttons = GetButtonDown__4CPadFl(&Pad, *object->m_localBase);
+        }
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
+            buttons &= 0xF3FF;
+        }
+        runtime->push(object, static_cast<short>(buttons));
+        outResult = 0;
+        return;
+    }
+    case -10: {
+        float value = atan2__3stdFff(static_cast<float>(*object->m_localBase),
+                                     static_cast<float>(object->m_localBase[1]));
+        runtime->push(object, *reinterpret_cast<int*>(&value));
+        outResult = 0;
+        return;
+    }
+    case -9:
+        Game.ChangeMap(*object->m_localBase, object->m_localBase[1], 0, 1);
+        runtime->push(object, 0);
         outResult = 0;
         return;
     case -7: {

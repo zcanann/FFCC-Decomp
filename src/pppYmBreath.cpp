@@ -291,14 +291,19 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
 
     particle[6].z += *(float*)(breath + 0xA4);
     if (*(unsigned char*)(breath + 0xC8) == 0) {
-        float start = *(float*)(breath + 0xA0);
         float zero = 0.0f;
-        if ((start > zero) && (*(float*)(breath + 0xA4) < zero)) {
-            if (particle[6].z < zero) {
+        float start = *(float*)(breath + 0xA0);
+
+        if (zero < start) {
+            if (*(float*)(breath + 0xA4) < zero) {
+                if (particle[6].z < zero) {
+                    particle[6].z = zero;
+                }
+            }
+        } else if (start < zero) {
+            if ((zero < *(float*)(breath + 0xA4)) && (zero < particle[6].z)) {
                 particle[6].z = zero;
             }
-        } else if ((start < zero) && (zero < *(float*)(breath + 0xA4)) && (zero < particle[6].z)) {
-            particle[6].z = zero;
         }
     }
 

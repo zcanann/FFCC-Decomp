@@ -15,6 +15,8 @@ extern "C" void __ct__4CRefFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+extern "C" float FLOAT_803306B8;
+extern "C" float FLOAT_803306C8;
 extern "C" void* __vt__5CFont[];
 
 static const char s_fontman_cpp[] = "fontman.cpp";
@@ -719,22 +721,24 @@ CFont::~CFont()
  */
 CFont::CFont()
 {
+	CFontRenderFlagBits& bits = GetRenderFlagBits(renderFlags);
+
 	m_glyphData = 0;
 	texturePtr = 0;
-	margin = 0.0f;
-	posZ = 0.0f;
-	posY = 0.0f;
-	posX = 0.0f;
-	renderFlags &= 0x7F;
-	scaleY = 1.0f;
-	scaleX = 1.0f;
-	renderFlags &= 0xF7;
+	margin = FLOAT_803306B8;
+	posZ = FLOAT_803306B8;
+	posY = FLOAT_803306B8;
+	posX = FLOAT_803306B8;
+	bits.shadow = 0;
+	scaleY = FLOAT_803306C8;
+	scaleX = FLOAT_803306C8;
+	bits.snapPosition = 0;
 	m_color.r = 0xFF;
 	m_color.g = 0xFF;
 	m_color.b = 0xFF;
 	m_color.a = 0xFF;
-	renderFlags &= 0xBF;
-	renderFlags &= 0xDF;
+	bits.zCompare = 0;
+	bits.zUpdate = 0;
 	m_usesEmbeddedData = 0;
 }
 
@@ -803,24 +807,26 @@ void CFontMan::Init()
 	        0));
 
 	if (font != 0) {
+		CFontRenderFlagBits& bits = GetRenderFlagBits(font->renderFlags);
+
 		__ct__4CRefFv(font);
 		*reinterpret_cast<void**>(font) = __vt__5CFont;
 		font->m_glyphData = 0;
 		font->texturePtr = 0;
-		font->margin = 0.0f;
-		font->posZ = 0.0f;
-		font->posY = 0.0f;
-		font->posX = 0.0f;
-		font->renderFlags &= 0x7F;
-		font->scaleY = 1.0f;
-		font->scaleX = 1.0f;
-		font->renderFlags &= 0xF7;
+		font->margin = FLOAT_803306B8;
+		font->posZ = FLOAT_803306B8;
+		font->posY = FLOAT_803306B8;
+		font->posX = FLOAT_803306B8;
+		bits.shadow = 0;
+		font->scaleY = FLOAT_803306C8;
+		font->scaleX = FLOAT_803306C8;
+		bits.snapPosition = 0;
 		font->m_color.r = 0xFF;
 		font->m_color.g = 0xFF;
 		font->m_color.b = 0xFF;
 		font->m_color.a = 0xFF;
-		font->renderFlags &= 0xBF;
-		font->renderFlags &= 0xDF;
+		bits.zCompare = 0;
+		bits.zUpdate = 0;
 		font->m_usesEmbeddedData = 0;
 	}
 

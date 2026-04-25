@@ -1533,6 +1533,18 @@ extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx viewMtx, int s
 		return;
 	}
 
+	bool hasFurMaterial = false;
+	for (unsigned int i = 0; i < materialSetRaw->m_materials.m_numItems; i++) {
+		FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>(materialSetRaw->m_materials.m_items[i]);
+		if (material != 0 && material->m_furEnable != 0) {
+			hasFurMaterial = true;
+			break;
+		}
+	}
+	if (!hasFurMaterial) {
+		return;
+	}
+
 	if (gMogFurTexBuffer == 0) {
 		makeFurTex__6CCharaFv();
 	}

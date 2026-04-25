@@ -1154,11 +1154,10 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
     if ((int)tex == -1) {
         texture = 0;
     } else {
-        CTexture** textures = (CTexture**)((u8*)this + 0x18C);
         u32 width;
         u32 height;
 
-        texture = textures[(int)tex];
+        texture = m_textures[(int)tex];
         TextureMan.SetTexture(GX_TEXMAP0, texture);
 
         width = *(u32*)((u8*)texture + 0x64);
@@ -1644,7 +1643,7 @@ void CMenuPcs::createBattle()
     sprintf(fontPath, const_cast<char*>(s_dvd__smenu_gc23_fnt_801d9d8c), Game.GetLangString());
     loadFont(0, fontPath, 1, 1);
 
-    CTexture* fontTexture = *reinterpret_cast<CTexture**>(self + 0x1EC);
+    CTexture* fontTexture = m_textures[0x18];
     for (int i = 0; i < 0x100; i++) {
         _GXColor color = fontTexture->GetTlutColor(i);
         const int avg2 = (((int)color.r + (int)color.g + (int)color.b) / 3) * 2;
@@ -1662,10 +1661,10 @@ void CMenuPcs::createBattle()
             tlutOffset = 0x10;
         }
 
-        fontTexture->SetExternalTlutColor(self + 0x340, tlutOffset, i, outColor);
+        fontTexture->SetExternalTlutColor(m_externalFontTlut, tlutOffset, i, outColor);
     }
 
-    fontTexture->FlushExternalTlut(self + 0x340);
+    fontTexture->FlushExternalTlut(m_externalFontTlut);
     *reinterpret_cast<u16*>(self + 0x864) = 0;
 }
 
@@ -1905,5 +1904,5 @@ void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
  */
 CTexture* CMenuPcs::GetTexture(CMenuPcs::TEX tex)
 {
-    return reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x18C)[static_cast<int>(tex)];
+    return m_textures[static_cast<int>(tex)];
 }

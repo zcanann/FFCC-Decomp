@@ -11,6 +11,7 @@ class CColor;
 class CFontMan;
 class CFont;
 class CTexture;
+class CTextureSet;
 class CPad;
 class CRingMenu;
 class CMesMenu;
@@ -265,7 +266,12 @@ public:
     CMemory::CStage* m_stageF0;
     CMemory::CStage* m_stageF4;
     CFont* m_fonts[5];
-    unsigned char m_pad10C[0x8A0 - 0x10C];
+    unsigned char m_pad10C[0x14C - 0x10C];
+    CTextureSet* m_textureSets[16];
+    CTexture* m_textures[105];
+    unsigned char m_pad330[0x340 - 0x330];
+    unsigned char m_externalFontTlut[0x740 - 0x340];
+    unsigned char m_pad740[0x8A0 - 0x740];
 };
 
 extern CMenuPcs MenuPcs;

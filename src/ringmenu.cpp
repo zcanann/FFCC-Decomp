@@ -1168,11 +1168,11 @@ void CRingMenu::DrawIcon()
 	    0.0f);
 
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x18);
-	void* tlut = reinterpret_cast<void*>(0x802EA500);
+	void* tlut = MenuPcs.m_externalFontTlut;
 	if (*reinterpret_cast<short*>(scriptFood + 0x1C) != 0) {
 		tlut = 0;
 	}
-	SetExternalTlut__8CTextureFPvi(*reinterpret_cast<void**>(MenuPcsRaw() + 0x1EC), tlut, 1);
+	SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], tlut, 1);
 	GXSetTevDirect(GX_TEVSTAGE2);
 	_GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(2, 0xF, 0, 0xC, 0xB);
 	_GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 0, 6, 7);

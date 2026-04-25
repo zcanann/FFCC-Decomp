@@ -339,33 +339,46 @@ static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* boardS
 	const float h = (boardSprite->h > 0) ? (float)boardSprite->h : 208.0f;
 	const float itemW = (itemSprite != 0 && itemSprite->w > 0) ? (float)itemSprite->w : 112.0f;
 	const float itemH = (itemSprite != 0 && itemSprite->h > 0) ? (float)itemSprite->h : 104.0f;
-	const float quarterW = w * 0.25f;
-	const float quarterH = h * 0.25f;
 	const float halfW = w * 0.5f;
 	const float halfH = h * 0.5f;
-	const float itemQuarterW = itemW * 0.25f;
-	const float itemQuarterH = itemH * 0.25f;
+	const float itemHalfW = itemW * 0.5f;
+	const float itemHalfH = itemH * 0.5f;
+	const float insetW = w * 0.25f;
+	const float insetH = h * 0.25f;
 
 	memset(out, 0, sizeof(float) * 18);
 
-	out[0] = x + quarterW;
-	out[1] = y + quarterH;
+	out[0] = x + halfW;
+	out[1] = y + halfH;
+
 	out[2] = x + w - itemW;
-	out[3] = y + quarterH - itemQuarterH;
-	out[4] = x + quarterW * 3.0f - itemQuarterW;
-	out[5] = y + quarterH * 3.0f - itemQuarterH;
-	out[6] = x + quarterW - itemQuarterW;
+	out[3] = y + halfH - itemHalfH;
+
+	out[6] = x + halfW - itemHalfW;
 	out[7] = y + h - itemH;
-	out[8] = x + halfW - itemQuarterW;
-	out[9] = y + quarterH * 3.0f - itemQuarterH;
+
 	out[10] = x;
-	out[11] = y + quarterH - itemQuarterH;
-	out[12] = x + halfW - itemQuarterW;
-	out[13] = y + halfH - itemQuarterH;
-	out[14] = x + quarterW - itemQuarterW;
+	out[11] = y + halfH - itemHalfH;
+
+	out[14] = x + halfW - itemHalfW;
 	out[15] = y;
-	out[16] = x + quarterW * 3.0f - itemQuarterW;
-	out[17] = y + halfH - itemQuarterH;
+
+	float baseX = x + insetW - itemHalfW;
+	float baseY = y + insetH - itemHalfH;
+	for (int row = 0; row < 2; row++) {
+		if (row == 0) {
+			out[12] = baseX;
+			out[13] = baseY;
+			out[16] = baseX + halfW;
+			out[17] = baseY;
+		} else {
+			out[8] = baseX;
+			out[9] = baseY;
+			out[4] = baseX + halfW;
+			out[5] = baseY;
+		}
+		baseY += halfH;
+	}
 }
 
 static float* GetBonusArtiBasePositions(const BonusAnimSprite* sprite)

@@ -31,6 +31,11 @@ extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, void* cfs);
+extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
+extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
+extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 
 static const char s_partyObjStateFmt[] = "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d";
 static const char s_partyBonusCountFmt[] = "SetBonusCondition num:%d";
@@ -192,6 +197,11 @@ static float getPadAxisForSlot(int slot, int offset)
 static bool isBossArtifactStage()
 {
 	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F;
+}
+
+static bool isFrameInterval(unsigned int frame, unsigned int interval)
+{
+	return interval != 0 && frame == (frame / interval) * interval;
 }
 
 static bool isGhostPartyTargetMode(CGPartyObj* self)
@@ -1041,38 +1051,78 @@ void CGPartyObj::shouki()
 		return;
 	}
 
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	int* shoukiMode = reinterpret_cast<int*>(self + 0x688);
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	const unsigned char cflatFlags = CFlat[0x12E4];
+	const bool cflatBit7 = static_cast<signed char>(cflatFlags) < 0;
+	const bool cflatBit4 = (cflatFlags & 0x10) != 0;
+	const bool cflatBit5 = (cflatFlags & 0x20) != 0;
+	const bool weaponFlag = static_cast<signed char>(m_weaponNodeFlags >> 8) < 0;
 
-	bool canShouki = (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
-	                 ((self[0x6B8] & 0x20) == 0) &&
-	                 ((static_cast<unsigned char>(m_weaponNodeFlags >> 8) & 0x40) == 0);
-
-	if (!canShouki || Game.unk_flat3_0xc7d0 == 0) {
-		if (*shoukiMode != 0) {
+	if (*reinterpret_cast<short*>(script + 0x1C) == 0 || ((!cflatBit7 && !cflatBit4) || !weaponFlag) ||
+	    Game.unk_flat3_0xc7d0 == 0) {
+		if (m_unk688 != 0) {
 			deletePSlotBit(0x200);
-			*shoukiMode = 0;
+			m_unk688 = 0;
 		}
 		return;
 	}
 
 	const Vec* chalicePos = reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C);
 	float chaliceDist = PSVECDistance(&m_worldPosition, chalicePos);
-	if (chaliceDist > FLOAT_80331b00 * Game.unkFloat_0xca10) {
-		*shoukiMode = 2;
-	} else if (chaliceDist < FLOAT_80331a74 * Game.unkFloat_0xca10) {
-		*shoukiMode = 0;
+	if (chaliceDist > FLOAT_80331b00 * Game.unkFloat_0xca10 || !cflatBit4) {
+		if (m_unk688 != 2) {
+			deletePSlotBit(0x200);
+			ResetParticleWork__13CFlatRuntime2Fii(CFlat, 1, m_particleSlots[9]);
+			SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
+			    CFlat, reinterpret_cast<void*>(Game.unk_flat3_0xc7d0));
+			SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+			PutParticleWork__13CFlatRuntime2Fv(CFlat);
+		}
+		m_unk688 = 2;
 	} else {
-		*shoukiMode = 1;
+		deletePSlotBit(0x200);
+		if (chaliceDist < FLOAT_80331a74 * Game.unkFloat_0xca10) {
+			m_unk688 = 0;
+		} else {
+			if ((static_cast<unsigned char>(m_flags) & 3) == 0) {
+				playSe3D(0x1E, 0x32, 0x96, 0, 0);
+				ResetParticleWork__13CFlatRuntime2Fii(CFlat, 2, 0);
+				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, m_worldPosition, m_rotBaseY);
+				SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
+				    CFlat, reinterpret_cast<void*>(Game.unk_flat3_0xc7d0));
+				SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			}
+			m_unk688 = 1;
+		}
 	}
 
-	if (*shoukiMode == 0) {
-		if ((Game.m_gameWork.m_frameCounter % 30) == 0) {
-			addHp(1, static_cast<CGPrgObj*>(0));
+	const unsigned int frame = static_cast<unsigned char>(m_flags);
+	if (m_unk688 == 0 && !cflatBit4) {
+		unsigned int healCount = 0;
+		if (PartyData(this).carryObject == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
+			healCount = isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4));
+		} else {
+			healCount = isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 6));
 		}
-	} else if (*shoukiMode == 2) {
-		if ((Game.m_gameWork.m_frameCounter % 30) == 0) {
-			addHp(-1, static_cast<CGPrgObj*>(0));
+		const unsigned char periodicHeal = script[0xBDC];
+		if (periodicHeal != 0 && isFrameInterval(frame, periodicHeal)) {
+			healCount += 1;
+		}
+		if (healCount != 0) {
+			addHp(healCount, static_cast<CGPrgObj*>(0));
+		}
+	} else if (m_unk688 == 2) {
+		unsigned char* script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
+		unsigned int damageInterval = *reinterpret_cast<unsigned short*>(script9 + 0xF4);
+		if ((*reinterpret_cast<unsigned int*>(script + 0x3B0) & 0x2000) != 0) {
+			damageInterval += *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 8);
+		}
+		if (isFrameInterval(frame, damageInterval)) {
+			playSe3D(0x19, 0x32, 0x96, 0, 0);
+			if (!cflatBit5) {
+				addHp(-1, static_cast<CGPrgObj*>(0));
+			}
 		}
 	}
 }

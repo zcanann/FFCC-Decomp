@@ -38,12 +38,13 @@ public:
         int end = frameEnd;
 
         if (m_usesKeyFrame != 0) {
+            int keyEnd = frameEnd;
             m_keyFrame.m_startFrame = frameStart;
             m_keyFrame.m_currentFrame = frameStart;
-            if (frameEnd > m_keyFrame.m_frameCount) {
-                end = m_keyFrame.m_frameCount;
+            if (keyEnd > m_keyFrame.m_frameCount) {
+                keyEnd = m_keyFrame.m_frameCount;
             }
-            m_keyFrame.m_endFrame = end;
+            m_keyFrame.m_endFrame = keyEnd;
             m_keyFrame.m_loop = static_cast<unsigned char>(wrapMode);
             m_keyFrame.m_isRun = 1;
         } else {

@@ -449,37 +449,6 @@ static void ExecuteShopMenuSellConfirm(CShopMenu* shopMenu)
     AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), CalcShopMenuTradeGil(shopMenu, itemId));
 }
 
-static unsigned int CanShopMenuSelectMake(CShopMenu* shopMenu)
-{
-    unsigned int canSelect = ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), ShopMenuInt(shopMenu, 0x150)) != 0;
-    if (canSelect != 0) {
-        int selected = shopMenu->getItemNo(ShopMenuInt(shopMenu, 0x28));
-        unsigned int money = *reinterpret_cast<unsigned int*>(ShopMenuCaravan(shopMenu) + 0x200);
-        unsigned int craftGil = static_cast<unsigned int>(shopMenu->getMakeGil(selected));
-        canSelect = (craftGil <= money) ? 1U : 0U;
-    }
-
-    int selected = shopMenu->getItemNo(ShopMenuInt(shopMenu, 0x28));
-    short recipeMaterial[8];
-    GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), selected, recipeMaterial);
-
-    short* material = recipeMaterial;
-    for (int i = 0; i < 3; i++, material++) {
-        short itemNo = *material;
-        if (itemNo < 1) {
-            break;
-        }
-
-        canSelect = static_cast<unsigned int>(-static_cast<int>(-canSelect) >> 0x1F);
-        if (canSelect != 0) {
-            unsigned int total = static_cast<unsigned int>(CountShopMenuOwnedItems(ShopMenuCaravan(shopMenu), itemNo));
-            canSelect = (total >= static_cast<unsigned int>(material[3])) ? 1U : 0U;
-        }
-    }
-
-    return canSelect & 0xFF;
-}
-
 static void SetupShopMenuInfoFont(CFont* font, _GXColor* color)
 {
     DrawInit__5CFontFv(font);
@@ -1755,7 +1724,33 @@ void CShopMenu::SelectYesNo()
  */
 void CShopMenu::SelectMake()
 {
-    unsigned int canSelect = CanShopMenuSelectMake(this);
+    unsigned int canSelect = ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), ShopMenuInt(this, 0x150)) != 0;
+    if (canSelect != 0) {
+        int selected = this->getItemNo(ShopMenuInt(this, 0x28));
+        unsigned int money = *reinterpret_cast<unsigned int*>(ShopMenuCaravan(this) + 0x200);
+        unsigned int craftGil = static_cast<unsigned int>(this->getMakeGil(selected));
+        canSelect = (craftGil <= money) ? 1U : 0U;
+    }
+
+    int selected = this->getItemNo(ShopMenuInt(this, 0x28));
+    short recipeMaterial[8];
+    GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), selected, recipeMaterial);
+
+    short* material = recipeMaterial;
+    for (int i = 0; i < 3; i++, material++) {
+        short itemNo = *material;
+        if (itemNo < 1) {
+            break;
+        }
+
+        canSelect = static_cast<unsigned int>(-static_cast<int>(-canSelect) >> 0x1F);
+        if (canSelect != 0) {
+            unsigned int total = static_cast<unsigned int>(CountShopMenuOwnedItems(ShopMenuCaravan(this), itemNo));
+            canSelect = (total >= static_cast<unsigned int>(material[3])) ? 1U : 0U;
+        }
+    }
+
+    canSelect &= 0xFF;
     if (canSelect == 0) {
         ShopMenuInt(this, 0x3C) = 1;
     }

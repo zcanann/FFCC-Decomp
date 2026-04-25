@@ -235,7 +235,7 @@ int RedNewA(int size, int offset, int maxSize)
 			if (currentAddress < rangeStart + maxSize) {
 				if ((int)(currentAddress + size) <= *blockPtr) {
 					gap = *blockPtr - currentAddress;
-					if (gap < maxGap) {
+					if (maxGap > gap) {
 						maxGap = gap;
 					}
 					result = currentAddress;
@@ -249,7 +249,7 @@ int RedNewA(int size, int offset, int maxSize)
 
 		if (((blockPtr[1] == 0) && (blockPtr < redAMemoryBank + 0x800)) &&
 		    (gap = (rangeStart + maxSize) - currentAddress, size <= gap) &&
-		    (gap < maxGap)) {
+		    (maxGap > gap)) {
 			result = currentAddress;
 			bestBlock = blockPtr;
 		}
@@ -257,22 +257,21 @@ int RedNewA(int size, int offset, int maxSize)
 		bestBlock = blockPtr;
 	}
 
-	if ((bestBlock == 0) || ((unsigned int)(rangeStart + maxSize) < result + size)) {
+	if ((bestBlock != 0) && ((unsigned int)(result + size) <= rangeStart + maxSize)) {
+		if (bestBlock[1] > 0) {
+			int entryCount = ((int)(redAMemoryBank + 0x800) - (int)(bestBlock + 2)) / 8;
+			if (entryCount > 0) {
+				memmove(bestBlock + 2, bestBlock, entryCount * 8);
+			}
+		}
+		*bestBlock = result;
+		bestBlock[1] = size;
 		OSRestoreInterrupts(interrupts);
-		return 0;
+		return result;
 	}
 
-	blockPtr = bestBlock;
-	if (blockPtr[1] > 0) {
-		int entryCount = ((int)(redAMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
-		if (entryCount > 0) {
-			memmove(blockPtr + 2, blockPtr, entryCount * 8);
-		}
-	}
-	*blockPtr = result;
-	blockPtr[1] = size;
 	OSRestoreInterrupts(interrupts);
-	return result;
+	return 0;
 }
 #pragma optimization_level 4
 

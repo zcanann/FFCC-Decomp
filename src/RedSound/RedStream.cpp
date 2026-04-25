@@ -104,14 +104,14 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
 
 		memcpy(dstBuffer, (void*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120)), 0x1000);
 		*(int*)((int)param_1 + 0x120) += 0x1000;
-		if (*(int*)((int)param_1 + 0x118) <= *(int*)((int)param_1 + 0x120)) {
+		if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
 			*(int*)((int)param_1 + 0x120) = 0;
 		}
 
 		if (*(short*)((int)param_1 + 0x2a) == 2) {
 			memcpy(dstBuffer + 0x2000, (void*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120)), 0x1000);
 			*(int*)((int)param_1 + 0x120) += 0x1000;
-			if (*(int*)((int)param_1 + 0x118) <= *(int*)((int)param_1 + 0x120)) {
+			if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
 				*(int*)((int)param_1 + 0x120) = 0;
 			}
 		}
@@ -119,20 +119,25 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
 		dmaDstOffset = *(int*)((int)param_1 + 0x12c) + param_2 * 0x1000;
 		dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
 
-		if ((param_2 == 0) && (*(int*)(streamStruct + 0x14) != 0)) {
+		if ((param_2 == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
+			int zero = 0;
 			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ec) = (unsigned short)*dstBuffer;
-			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = 0;
-			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) = 0;
+			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = zero;
+			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) = zero;
 			*(unsigned int*)(*(int*)(streamStruct + 0x14) + 0x1c) |= 0x100000;
 		}
 
 		if (*(short*)((int)param_1 + 0x2a) == 2) {
-			dmaID = RedDmaEntry(0x8001, 0, (int)(dstBuffer + 0x2000), dmaDstOffset + 0x2000, 0x1000, 0, 0);
-			if ((param_2 == 0) && (*(int*)(streamStruct + 0xd4) != 0)) {
-				*(unsigned short*)(*(int*)(streamStruct + 0xd4) + 0x1ec) = (unsigned short)dstBuffer[0x2000];
-				*(unsigned short*)(*(int*)(streamStruct + 0xd4) + 0x1f0) = 0;
-				*(unsigned short*)(*(int*)(streamStruct + 0xd4) + 0x1ee) = 0;
-				*(unsigned int*)(*(int*)(streamStruct + 0xd4) + 0x1c) |= 0x100000;
+			dstBuffer += 0x2000;
+			dmaDstOffset += 0x2000;
+			dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
+			streamStruct += 0xc0;
+			if ((param_2 == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
+				int zero = 0;
+				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ec) = (unsigned short)*dstBuffer;
+				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = zero;
+				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) = zero;
+				*(unsigned int*)(*(int*)(streamStruct + 0x14) + 0x1c) |= 0x100000;
 			}
 		}
 
@@ -151,7 +156,6 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
  */
 int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 {
-	unsigned int* puVar1;
 	unsigned int* puVar3;
 	unsigned char* pbVar4;
 	unsigned char* pbVar5;
@@ -176,14 +180,13 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 				*(unsigned int*)(pbVar5 + 4) = puVar7[1];
 				pbVar5 = pbVar5 + 8;
 				*(unsigned int*)pbVar4 = puVar7[2];
-				puVar1 = puVar7 + 3;
+				*(unsigned int*)(pbVar4 + 4) = puVar7[3];
 				puVar7 = puVar7 + 4;
-				*(unsigned int*)(pbVar4 + 4) = *puVar1;
 				pbVar4 = pbVar4 + 8;
 			} while (puVar7 < puVar3);
 			
 			*(int*)((int)param_1 + 0x120) = *(int*)((int)param_1 + 0x120) + 0x1000;
-			if (*(int*)((int)param_1 + 0x118) <= *(int*)((int)param_1 + 0x120)) {
+			if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
 				*(int*)((int)param_1 + 0x120) = 0;
 			}
 			
@@ -195,28 +198,28 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 				*(unsigned int*)(pbVar5 + 4) = puVar7[1];
 				pbVar5 = pbVar5 + 8;
 				*(unsigned int*)pbVar4 = puVar7[2];
-				puVar1 = puVar7 + 3;
+				*(unsigned int*)(pbVar4 + 4) = puVar7[3];
 				puVar7 = puVar7 + 4;
-				*(unsigned int*)(pbVar4 + 4) = *puVar1;
 				pbVar4 = pbVar4 + 8;
 			} while (puVar7 < puVar3);
 			
 			*(int*)((int)param_1 + 0x120) = *(int*)((int)param_1 + 0x120) + 0x1000;
-			if (*(int*)((int)param_1 + 0x118) <= *(int*)((int)param_1 + 0x120)) {
+			if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
 				*(int*)((int)param_1 + 0x120) = 0;
 			}
 			
 			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar6, *(int*)((int)param_1 + 300) + param_2 * 0x1000, 0x1000, 0, 0);
 			dmaID = RedDmaEntry(0x8001, 0, (int)(pbVar6 + 0x2000), *(int*)((int)param_1 + 300) + (param_2 + 2) * 0x1000, 0x1000, 0, 0);
 			
-			if ((param_2 == 0) && (*(int*)(iVar8 + 0x14) != 0)) {
+			if ((param_2 == 0) && (*(void**)(iVar8 + 0x14) != 0)) {
+				int zero = 0;
 				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ec) = (unsigned short)*pbVar6;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1f0) = 0;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ee) = 0;
+				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1f0) = zero;
+				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ee) = zero;
 				*(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) = *(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) | 0x100000;
 				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1ec) = (unsigned short)pbVar6[0x2000];
-				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1f0) = 0;
-				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1ee) = 0;
+				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1f0) = zero;
+				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1ee) = zero;
 				*(unsigned int*)(*(int*)(iVar8 + 0xd4) + 0x1c) = *(unsigned int*)(*(int*)(iVar8 + 0xd4) + 0x1c) | 0x100000;
 			}
 			
@@ -224,7 +227,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 			param_3 = param_3 + -0x1000;
 			*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) + 0x200;
 			
-			if (*(int*)((int)param_1 + 0x1c) <= *(int*)((int)param_1 + 0x124)) {
+			if (*(int*)((int)param_1 + 0x124) >= *(int*)((int)param_1 + 0x1c)) {
 				*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) - *(int*)((int)param_1 + 0x1c);
 				*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) + *(int*)((int)param_1 + 0x20);
 			}
@@ -236,16 +239,17 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 			memcpy(pbVar5, (void*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120)), 0x1000);
 			*(int*)((int)param_1 + 0x120) = *(int*)((int)param_1 + 0x120) + 0x1000;
 			
-			if (*(int*)((int)param_1 + 0x118) <= *(int*)((int)param_1 + 0x120)) {
+			if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
 				*(int*)((int)param_1 + 0x120) = 0;
 			}
 			
 			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar5, *(int*)((int)param_1 + 300) + param_2 * 0x1000, 0x1000, 0, 0);
 			
-			if ((param_2 == 0) && (*(int*)(iVar8 + 0x14) != 0)) {
+			if ((param_2 == 0) && (*(void**)(iVar8 + 0x14) != 0)) {
+				int zero = 0;
 				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ec) = (unsigned short)*pbVar5;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1f0) = 0;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ee) = 0;
+				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1f0) = zero;
+				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ee) = zero;
 				*(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) = *(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) | 0x100000;
 			}
 			
@@ -253,7 +257,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 			param_3 = param_3 + -0x1000;
 			*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) + 0x200;
 			
-			if (*(int*)((int)param_1 + 0x1c) <= *(int*)((int)param_1 + 0x124)) {
+			if (*(int*)((int)param_1 + 0x124) >= *(int*)((int)param_1 + 0x1c)) {
 				*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) - *(int*)((int)param_1 + 0x1c);
 				*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) + *(int*)((int)param_1 + 0x20);
 			}

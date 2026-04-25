@@ -239,12 +239,10 @@ void CUtil::ConvF2IVector(S16Vec& out, Vec in, long shift)
     int scaleInt = 1 << shift;
     float y = in.y;
     float z = in.z;
-    double scaleY = (double)scaleInt;
-    double scaleZ = (double)scaleInt;
 
-    out.x = (short)(int)(in.x * (float)((double)scaleInt));
-    out.y = (short)(int)(y * (float)scaleY);
-    out.z = (short)(int)(z * (float)scaleZ);
+    out.x = (short)(int)(in.x * (float)scaleInt);
+    out.y = (short)(int)(y * (float)scaleInt);
+    out.z = (short)(int)(z * (float)scaleInt);
 }
 
 /*
@@ -260,10 +258,9 @@ void CUtil::ConvF2IVector2d(S16Vec2d& out, Vec2d in, long shift)
 {
     int scaleInt = 1 << shift;
     float y = in.y;
-    double scaleY = (double)scaleInt;
 
-    out.x = (short)(int)(in.x * (float)((double)scaleInt));
-    out.y = (short)(int)(y * (float)scaleY);
+    out.x = (short)(int)(in.x * (float)scaleInt);
+    out.y = (short)(int)(y * (float)scaleInt);
 }
 
 /*

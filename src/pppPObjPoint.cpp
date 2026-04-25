@@ -33,7 +33,7 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
     if (objData->id == pointData->id) {
         u8* vecPtr;
 
-        if (objData->field_4 == -1) {
+        if ((objData->field_4 + 0x10000) == 0xFFFF) {
             vecPtr = (u8*)gPppDefaultValueBuffer;
         } else {
             PObjPointEntry* table = *(PObjPointEntry**)((u8*)pppMngStPtr + 0xD4);

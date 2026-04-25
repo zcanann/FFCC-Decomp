@@ -51,7 +51,7 @@ unsigned char gBonusMenuFlag0 = 0;
 unsigned char gBonusMenuFlag1 = 0;
 unsigned char gBonusMenuFlag2 = 0;
 unsigned char gBonusMenuFlagPad = 0;
-float* gBonusCheckMarkPosBuffer[2];
+float* gBonusCheckMarkPosBuffer = 0;
 }
 #pragma force_active reset
 static const char s_drawBonusFmt[] = "draw Bonus[%d]\n";
@@ -325,9 +325,6 @@ static void ResetAnimSpriteMotion(BonusAnimSprite* sprite)
 	sprite->scale = 1.0f;
 }
 
-static float s_bonusArtiBasePosStorage0[18];
-static float s_bonusArtiBasePosStorage1[18];
-
 static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* boardSprite, const BonusAnimSprite* itemSprite)
 {
 	if (out == 0 || boardSprite == 0) {
@@ -336,10 +333,10 @@ static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* boardS
 
 	const float x = (float)boardSprite->x + boardSprite->mulX;
 	const float y = (float)boardSprite->y + boardSprite->mulY;
-	const float w = (boardSprite->w > 0) ? (float)boardSprite->w : 288.0f;
-	const float h = (boardSprite->h > 0) ? (float)boardSprite->h : 208.0f;
-	const float itemW = (itemSprite != 0 && itemSprite->w > 0) ? (float)itemSprite->w : 112.0f;
-	const float itemH = (itemSprite != 0 && itemSprite->h > 0) ? (float)itemSprite->h : 104.0f;
+	const float w = (float)boardSprite->w;
+	const float h = (float)boardSprite->h;
+	const float itemW = (itemSprite != 0) ? (float)itemSprite->w : w;
+	const float itemH = (itemSprite != 0) ? (float)itemSprite->h : h;
 	const float halfW = w * 0.5f;
 	const float halfH = h * 0.5f;
 	const float itemHalfW = itemW * 0.5f;
@@ -384,11 +381,8 @@ static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* boardS
 
 static float* GetBonusArtiBasePositions(const BonusAnimSprite* sprite)
 {
-	gBonusCheckMarkPosBuffer[0] = s_bonusArtiBasePosStorage0;
-	gBonusCheckMarkPosBuffer[1] = s_bonusArtiBasePosStorage1;
-	FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[0], sprite, sprite);
-	memcpy(gBonusCheckMarkPosBuffer[1], gBonusCheckMarkPosBuffer[0], sizeof(s_bonusArtiBasePosStorage1));
-	return gBonusCheckMarkPosBuffer[0];
+	FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer, sprite, sprite);
+	return gBonusCheckMarkPosBuffer;
 }
 
 static void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, short y)
@@ -685,7 +679,7 @@ static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
-	float* markPos = gBonusCheckMarkPosBuffer[0];
+	float* markPos = gBonusCheckMarkPosBuffer;
 	if (markPos == 0) {
 		return;
 	}
@@ -820,7 +814,7 @@ static void UpdateSelectCursorSprite(int statePtr, BonusAnimHeader* header, Bonu
 
 	int slot = (*(short*)(statePtr + 0x26)) & 7;
 	float pulse = (float)(frame & 0x1f) / 31.0f;
-	float* markPos = gBonusCheckMarkPosBuffer[0];
+	float* markPos = gBonusCheckMarkPosBuffer;
 
 	if (markPos != 0) {
 		cursor->x = (short)(markPos[slot * 2 + 0] - 4.0f);
@@ -1118,7 +1112,7 @@ void CMenuPcs::BonusInit()
 	GetBonusMenuMembers(this).m_bonusAnimPtr = 0;
 	s_bonusSummaryData = 0;
 	s_bonusBoardState = 0;
-	gBonusCheckMarkPosBuffer[0] = 0;
+	gBonusCheckMarkPosBuffer = 0;
 }
 
 /*
@@ -1153,6 +1147,9 @@ void CMenuPcs::createBonus()
 	}
 	if (s_bonusBoardState == 0) {
 		s_bonusBoardState = new unsigned char[0x48];
+	}
+	if (gBonusCheckMarkPosBuffer == 0) {
+		gBonusCheckMarkPosBuffer = new float[18];
 	}
 
 	if (statePtr == 0) {
@@ -1213,6 +1210,9 @@ void CMenuPcs::createBonus()
 	}
 	if (s_bonusBoardState != 0) {
 		memset(s_bonusBoardState, 0, 0x48);
+	}
+	if (gBonusCheckMarkPosBuffer != 0) {
+		memset(gBonusCheckMarkPosBuffer, 0, sizeof(float) * 18);
 	}
 
 	memset(reinterpret_cast<unsigned char*>(this) + 0x774, 0, 0x60);
@@ -1439,8 +1439,6 @@ void CMenuPcs::createBonus()
 
 	GetBonusMenuMembers(this).m_bonusAlpha = 0;
 	GetBonusMenuMembers(this).m_bonusCursorFlag = 0;
-	gBonusCheckMarkPosBuffer[0] = 0;
-	gBonusCheckMarkPosBuffer[1] = 0;
 	GbaQue.SetStartBonusFlg();
 	ClrBattleItem();
 	GetAllPadOn();
@@ -1503,6 +1501,10 @@ void CMenuPcs::destroyBonus()
 	if (s_bonusBoardState != 0) {
 		delete[] s_bonusBoardState;
 		s_bonusBoardState = 0;
+	}
+	if (gBonusCheckMarkPosBuffer != 0) {
+		delete[] gBonusCheckMarkPosBuffer;
+		gBonusCheckMarkPosBuffer = 0;
 	}
 }
 
@@ -3176,8 +3178,7 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
 {
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	float* currentPos = gBonusCheckMarkPosBuffer[0];
-	float* previousPos = gBonusCheckMarkPosBuffer[1];
+	float* currentPos = gBonusCheckMarkPosBuffer;
 	float a = alpha;
 	float strongest = a;
 	float pulse = 0.0f;
@@ -3236,13 +3237,6 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
 	float drawX = currentX;
 	float drawY = currentY;
 
-	if (previousPos != 0) {
-		float prevX = previousPos[slot * 2 + 0] + 2.0f;
-		float prevY = previousPos[slot * 2 + 1] + 2.0f;
-		drawX = prevX + (currentX - prevX) * a;
-		drawY = prevY + (currentY - prevY) * a;
-	}
-
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x23);
 	_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(slotAlpha * 255.0f)};
@@ -3266,19 +3260,12 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 	BonusAnimSprite* currentSprite = reinterpret_cast<BonusAnimSprite*>(a);
 	BonusAnimSprite* layoutSprite = reinterpret_cast<BonusAnimSprite*>(b);
 
-	gBonusCheckMarkPosBuffer[0] = s_bonusArtiBasePosStorage0;
-	gBonusCheckMarkPosBuffer[1] = s_bonusArtiBasePosStorage1;
-	memset(gBonusCheckMarkPosBuffer[0], 0, sizeof(s_bonusArtiBasePosStorage0));
-	memset(gBonusCheckMarkPosBuffer[1], 0, sizeof(s_bonusArtiBasePosStorage1));
+	if (gBonusCheckMarkPosBuffer == 0) {
+		return;
+	}
 
-	if (a != 0) {
-		FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[0], currentSprite, (layoutSprite != 0) ? layoutSprite : currentSprite);
-	}
-	if (b != 0) {
-		FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[1], layoutSprite, layoutSprite);
-	} else if (a != 0) {
-		memcpy(gBonusCheckMarkPosBuffer[1], gBonusCheckMarkPosBuffer[0], sizeof(s_bonusArtiBasePosStorage1));
-	}
+	memset(gBonusCheckMarkPosBuffer, 0, sizeof(float) * 18);
+	FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer, currentSprite, layoutSprite);
 }
 
 /*

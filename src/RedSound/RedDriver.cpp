@@ -1101,45 +1101,43 @@ void _DmaExecute()
     int* piVar7;
     int* piVar8;
 
-    do {
-        do {
-            if ((DAT_8032f3e0[0] == DAT_8032f3e8[0]) && (DAT_8032f3e0[1] == DAT_8032f3e8[1])) {
-                DAT_8032f488[0] = 0;
-                return;
-            }
-            if (DAT_8032f3e0[0] == DAT_8032f3e8[0]) {
-                ppiVar5 = (int**)&DAT_8032f3e8[1];
-                piVar4 = RedDriverStreamDmaQueue();
+    while ((DAT_8032f3e0[0] != DAT_8032f3e8[0]) || (DAT_8032f3e0[1] != DAT_8032f3e8[1])) {
+        DAT_8032f488[0] = 1;
+        if (DAT_8032f3e0[0] == DAT_8032f3e8[0]) {
+            ppiVar5 = (int**)&DAT_8032f3e8[1];
+            piVar4 = RedDriverStreamDmaQueue();
+        } else {
+            ppiVar5 = (int**)&DAT_8032f3e8[0];
+            piVar4 = RedDriverMainDmaQueue();
+        }
+        piVar7 = *ppiVar5;
+        DAT_8032f488[0] = 2;
+        piVar6 = 0;
+        if (*piVar7 != 0) {
+            gRedDriverStatus = 1;
+            if (piVar7[1] == 0) {
+                DCFlushRange((void*)piVar7[2], (u32)piVar7[4]);
+                iVar3 = piVar7[2];
+                iVar2 = piVar7[3];
             } else {
-                ppiVar5 = (int**)&DAT_8032f3e8[0];
-                piVar4 = RedDriverMainDmaQueue();
+                DCInvalidateRange((void*)piVar7[2], (u32)piVar7[4]);
+                iVar3 = piVar7[3];
+                iVar2 = piVar7[2];
             }
-            piVar7 = *ppiVar5;
-            DAT_8032f488[0] = 2;
-            piVar6 = 0;
-            if (*piVar7 != 0) {
-                gRedDriverStatus = 1;
-                if (piVar7[1] == 0) {
-                    DCFlushRange((void*)piVar7[2], (u32)piVar7[4]);
-                    iVar3 = piVar7[2];
-                    iVar2 = piVar7[3];
-                } else {
-                    DCInvalidateRange((void*)piVar7[2], (u32)piVar7[4]);
-                    iVar3 = piVar7[3];
-                    iVar2 = piVar7[2];
-                }
-                DAT_8032f488[0] = 3;
-                ARQSetChunkSize((u32)piVar7[4]);
-                ARQPostRequest(&DAT_8032dde4.m_request, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
-                               (u32)piVar7[4], _DmaCallback);
-                piVar6 = piVar7;
-            }
-            piVar8 = piVar7 + 7;
-            if (piVar4 + 0x380 <= piVar7 + 7) {
-                piVar8 = piVar4;
-            }
-            *ppiVar5 = piVar8;
-        } while (piVar6 == 0);
+            DAT_8032f488[0] = 3;
+            ARQSetChunkSize((u32)piVar7[4]);
+            ARQPostRequest(&DAT_8032dde4.m_request, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
+                           (u32)piVar7[4], _DmaCallback);
+            piVar6 = piVar7;
+            DAT_8032f488[0] = 4;
+        }
+        piVar8 = piVar7 + 7;
+        DAT_8032f488[0] = 5;
+        if (piVar4 + 0x380 <= piVar7 + 7) {
+            piVar8 = piVar4;
+        }
+        *ppiVar5 = piVar8;
+        DAT_8032f488[0] = 6;
         while (piVar6 != 0) {
             DAT_8032f488[0] = 7;
             if (gRedDriverStatus == 0) {
@@ -1158,7 +1156,8 @@ void _DmaExecute()
             }
             RedSleep(0);
         }
-    } while (true);
+    }
+    DAT_8032f488[0] = 0;
 }
 
 /*

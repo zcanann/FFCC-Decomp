@@ -2102,7 +2102,7 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 {
 	int weaponType = GetCmdListItem(cmdListIdx);
-	if (weaponType >= 0 && weaponType <= 2) {
+	if (weaponType < 3) {
 		return GetSkillStr__8CMenuPcsFi(&MenuPcs, weaponType);
 	}
 

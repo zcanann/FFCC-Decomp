@@ -3135,12 +3135,16 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	}
 
 	BonusAnimSprite* sprite = reinterpret_cast<BonusAnimSprite*>(sprt);
-	float* pos = GetBonusArtiBasePositions(sprite);
+	float* pos = gBonusCheckMarkPosBuffer;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int selectedSlot = -1;
 	unsigned char activeMask = 0;
-	float width = (sprite->w > 0) ? (float)sprite->w : 0x70;
-	float height = (sprite->h > 0) ? (float)sprite->h : 0x68;
+	float width = (float)sprite->w;
+	float height = (float)sprite->h;
+
+	if (pos == 0) {
+		return;
+	}
 
 	if (statePtr != 0) {
 		selectedSlot = (*(short*)(statePtr + 0x26)) & 7;

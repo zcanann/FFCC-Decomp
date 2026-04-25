@@ -2073,7 +2073,21 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 			continue;
 		}
 
-		InitCharaMaterialState();
+		u8* materialRaw = MaterialManRaw();
+		*reinterpret_cast<u32*>(materialRaw + 72) = 0x000ACE0F;
+		*reinterpret_cast<u32*>(materialRaw + 68) = 0xFFFFFFFF;
+		materialRaw[76] = 0xFF;
+		*reinterpret_cast<u32*>(materialRaw + 296) = 0;
+		*reinterpret_cast<u32*>(materialRaw + 284) = 0;
+		*reinterpret_cast<u32*>(materialRaw + 300) = 0x1E;
+		*reinterpret_cast<u32*>(materialRaw + 288) = 0x1E;
+		*reinterpret_cast<u32*>(materialRaw + 304) = 0;
+		*reinterpret_cast<u32*>(materialRaw + 292) = 0;
+		materialRaw[517] = 0xFF;
+		materialRaw[518] = 0xFF;
+		*reinterpret_cast<u32*>(materialRaw + 88) = 0;
+		*reinterpret_cast<u32*>(materialRaw + 92) = 0;
+		materialRaw[520] = 0;
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount == 0) {
@@ -2086,10 +2100,13 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 			customMeshDraw(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
 		}
 
-		CopyCharaMaterialEnv();
+		*reinterpret_cast<u32*>(materialRaw + 296) = *reinterpret_cast<u32*>(materialRaw + 284);
+		*reinterpret_cast<u32*>(materialRaw + 300) = *reinterpret_cast<u32*>(materialRaw + 288);
+		*reinterpret_cast<u32*>(materialRaw + 304) = *reinterpret_cast<u32*>(materialRaw + 292);
+		*reinterpret_cast<u32*>(materialRaw + 64) = *reinterpret_cast<u32*>(materialRaw + 72);
 		MaterialMan.SetObjMatrix(view, meshMtx);
 		GXSetArray((GXAttr)9, mesh->m_workPositions, 6);
-		SetMaterialManNormalArray(mesh->m_workNormals);
+		*reinterpret_cast<void**>(materialRaw + 4) = mesh->m_workNormals;
 		GXSetArray((GXAttr)0xB, mesh->m_data->m_colors, 4);
 		GXSetArray((GXAttr)0xD, mesh->m_data->m_uvs, 4);
 		GXSetArray((GXAttr)0xE, mesh->m_data->m_uvs, 4);

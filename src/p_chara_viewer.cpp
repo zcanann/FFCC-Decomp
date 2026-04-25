@@ -78,6 +78,12 @@ extern "C" float FLOAT_80330BF4;
 extern "C" float FLOAT_80330BF8;
 extern "C" double fmod(double, double);
 
+static inline void destroyRef(int* ref)
+{
+    void (**vtable)(void*, int) = *reinterpret_cast<void (***)(void*, int)>(ref);
+    vtable[2](ref, 1);
+}
+
 static void releaseRef(unsigned char* p, int offset)
 {
     int* ref = *(int**)(p + offset);
@@ -85,7 +91,7 @@ static void releaseRef(unsigned char* p, int offset)
         int count = ref[1];
         ref[1] = count - 1;
         if ((count - 1 == 0) && (ref != 0)) {
-            (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+            destroyRef(ref);
         }
         *(void**)(p + offset) = 0;
     }
@@ -657,7 +663,7 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
     ref = *(int**)(p + 0x1A0);
     if (ref != 0) {
         if ((--ref[1] == 0) && (ref != 0)) {
-            (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+            destroyRef(ref);
         }
         *(void**)(p + 0x1A0) = 0;
     }
@@ -667,21 +673,21 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
         ref = *(int**)(p + 0x190 + i * 4);
         if (ref != 0) {
             if ((--ref[1] == 0) && (ref != 0)) {
-                (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+                destroyRef(ref);
             }
             *(void**)(p + 0x190 + i * 4) = 0;
         }
         ref = *(int**)(p + 0x198 + i * 4);
         if (ref != 0) {
             if ((--ref[1] == 0) && (ref != 0)) {
-                (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+                destroyRef(ref);
             }
             *(void**)(p + 0x198 + i * 4) = 0;
         }
         ref = *(int**)(p + 0x2B0 + i * 4);
         if (ref != 0) {
             if ((--ref[1] == 0) && (ref != 0)) {
-                (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+                destroyRef(ref);
             }
             *(void**)(p + 0x2B0 + i * 4) = 0;
         }
@@ -691,7 +697,7 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
     ref = *(int**)(p + 0x2B8);
     if (ref != 0) {
         if ((--ref[1] == 0) && (ref != 0)) {
-            (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+            destroyRef(ref);
         }
         *(void**)(p + 0x2B8) = 0;
     }
@@ -701,7 +707,7 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
         ref = *(int**)(p + 0x1B0 + i * 4);
         if (ref != 0) {
             if ((--ref[1] == 0) && (ref != 0)) {
-                (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+                destroyRef(ref);
             }
             *(void**)(p + 0x1B0 + i * 4) = 0;
         }

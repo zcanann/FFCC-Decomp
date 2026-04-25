@@ -492,19 +492,6 @@ static unsigned int CanShopMenuSelectMake(CShopMenu* shopMenu)
     return canSelect & 0xFF;
 }
 
-static bool TryOpenShopMenuMakeConfirm(CShopMenu* shopMenu)
-{
-    int makeGil = shopMenu->getMakeGil(shopMenu->getItemNo(ShopMenuInt(shopMenu, 0x28)));
-    if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(ShopMenuCaravan(shopMenu)), -makeGil) == 0) {
-        return false;
-    }
-
-    Sound.PlaySe(0x52, 0x40, 0x7F, 0);
-    ShopMenuInt(shopMenu, 0x8) = 0xF;
-    SetMode__9CShopMenuFi(shopMenu, 0xE);
-    return true;
-}
-
 static void SetupShopMenuInfoFont(CFont* font, _GXColor* color)
 {
     DrawInit__5CFontFv(font);
@@ -1764,7 +1751,12 @@ void CShopMenu::SelectMake()
                     return;
                 }
 
-                if (TryOpenShopMenuMakeConfirm(this)) {
+                int itemId = ResolveShopMenuSelectedItemId(this);
+                int makeGil = CalcShopMenuMakeGil(this, itemId);
+                if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(ShopMenuCaravan(this)), -makeGil) != 0) {
+                    Sound.PlaySe(0x52, 0x40, 0x7F, 0);
+                    ShopMenuInt(this, 0x8) = 0xF;
+                    SetMode__9CShopMenuFi(this, 0xE);
                     return;
                 }
             }

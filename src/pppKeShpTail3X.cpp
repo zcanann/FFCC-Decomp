@@ -13,8 +13,9 @@ extern "C" int rand(void);
 
 static const float kPppKeShpTail3XZero = 0.0f;
 static const float kPppKeShpTail3XAlphaScale = 16384.0f;
-static const float kPppKeShpTail3XOne = 1.0f;
+static const float kPppKeShpTail3XHalf = 0.5f;
 static const float kPppKeShpTail3XRandomMax = 65535.0f;
+static const float kPppKeShpTail3XOne = 1.0f;
 static const float kPppKeShpTail3XDegToRad = 0.017453292f;
 
 extern "C" {
@@ -211,10 +212,10 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
         colorStepB = (colorB - (float)(work->m_values[6] >> 7)) / invCountMinusOne;
         colorStepA = (colorA - ((float)(work->m_values[7] >> 7) * alphaMul)) / invCountMinusOne;
     } else {
-        colorStepR = kPppKeShpTail3XZero;
-        colorStepG = kPppKeShpTail3XZero;
-        colorStepB = kPppKeShpTail3XZero;
-        colorStepA = kPppKeShpTail3XZero;
+        colorStepR = kPppKeShpTail3XHalf;
+        colorStepG = kPppKeShpTail3XHalf;
+        colorStepB = kPppKeShpTail3XHalf;
+        colorStepA = kPppKeShpTail3XHalf;
     }
 
     mng = (_pppMngSt*)pppMngStPtr;
@@ -269,7 +270,7 @@ draw_loop:
         if (step->m_useRandomShape != 0) {
             u32 lcg = (u32)rng * 0x80du + 7u;
             rng = (u16)lcg;
-            drawScale *= -((((float)rng / kPppKeShpTail3XRandomMax) * step->m_randomScale) - kPppKeShpTail3XOne);
+            drawScale *= kPppKeShpTail3XOne - (((float)rng / kPppKeShpTail3XRandomMax) * step->m_randomScale);
             {
                 u32 shapeIdx = (u32)(life + rng) / shapeSetCount;
                 shapeEntry = (long*)(shapeData + *(s16*)(shapeData + (shapeIdx % (u32)shapeCount) * 8 + 0x10));

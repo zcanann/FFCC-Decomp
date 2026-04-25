@@ -61,8 +61,6 @@ struct _pppPDataVal;
 
 _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
-extern const f64 kPppYmSharedDoubleBias;
-
 /*
  * --INFO--
  * PAL Address: 0x800de360
@@ -157,7 +155,9 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 			break;
 		case 1:
 			while (count-- != 0) {
-				int outValue = (int)(Math.RandF() * entry->maxValue);
+				f32 randValue = Math.RandF();
+				f32 maxValue = (f32)entry->maxValue;
+				int outValue = (int)(randValue * maxValue);
 				u16* vertexIndices = entry->vertexIndices;
 				u16 vertexIndex = vertexIndices[outValue];
 				Vec* vertex = &points[vertexIndex];
@@ -201,9 +201,11 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 				}
 			}
 			break;
+		default:
+			break;
 		}
 		state->countdown = data->spawnDelay;
-		}
+	}
 
 	state->countdown--;
 }

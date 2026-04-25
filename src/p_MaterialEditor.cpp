@@ -30,11 +30,6 @@ extern "C" char lbl_8032E648[];
 extern "C" const char s_CMaterialEditorPcs_VIEWER_801D7D18[];
 extern "C" const char s_CMaterialEditorPcs_801D7D34[];
 extern "C" const char s_MaterialEditor_pctc_801D7D60[];
-extern "C" const char* gDebugSpinnerText_addr;
-extern "C" char gDebugSpinnerTextInitialized_addr;
-extern "C" int gDebugSpinnerFrame_addr;
-extern "C" char gDebugSpinnerFrameInitialized_addr;
-
 unsigned int m_table_desc0__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
 unsigned int m_table_desc1__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
 unsigned int m_table_desc2__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
@@ -519,20 +514,24 @@ struct MaterialEditorPolygon {
 void CMaterialEditorPcs::drawViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    static const char* pFan;
+    static char init;
+    static int alive;
+    static char init_0;
 
-    if (gDebugSpinnerTextInitialized_addr == 0) {
-        gDebugSpinnerText_addr = sMaterialEditorSpinnerText;
-        gDebugSpinnerTextInitialized_addr = 1;
+    if (init == 0) {
+        pFan = sMaterialEditorSpinnerText;
+        init = 1;
     }
-    if (gDebugSpinnerFrameInitialized_addr == 0) {
-        gDebugSpinnerFrame_addr = 0;
-        gDebugSpinnerFrameInitialized_addr = 1;
+    if (init_0 == 0) {
+        alive = 0;
+        init_0 = 1;
     }
 
-    gDebugSpinnerFrame_addr = gDebugSpinnerFrame_addr + 1;
-    int sign = gDebugSpinnerFrame_addr >> 31;
-    int idx = (sign * 4 | (unsigned int)(((gDebugSpinnerFrame_addr >> 4) * 0x40000000) + sign) >> 30) - sign;
-    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)(char)gDebugSpinnerText_addr[idx]);
+    alive = alive + 1;
+    int sign = alive >> 31;
+    int idx = (sign * 4 | (unsigned int)(((alive >> 4) * 0x40000000) + sign) >> 30) - sign;
+    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)(char)pFan[idx]);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
         return;

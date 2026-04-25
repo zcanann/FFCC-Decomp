@@ -46,7 +46,10 @@ public:
         unsigned int _1c4_4_;
         int _452_4_;
     };
-    int _1c8_4_;
+    union {
+        int _1c8_4_;
+        int _456_4_;
+    };
 };
 
 extern CPad Pad;

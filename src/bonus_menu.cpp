@@ -1068,6 +1068,7 @@ void CMenuPcs::createBonus()
 	int auxPtr = GetBonusMenuMembers(this).m_bonusAuxPtr;
 	int boardPtr = GetBonusMenuMembers(this).m_bonusBoardPtr;
 
+	Pad._456_4_ = 0x28;
 	for (int i = 0; i < 4; i++) {
 		OpenMenu__8GbaQueueFiii(&GbaQue, i, 0, 0);
 		SetRadarMode__8GbaQueueFii(&GbaQue, i, 0);
@@ -1390,6 +1391,7 @@ void CMenuPcs::createBonus()
  */
 void CMenuPcs::destroyBonus()
 {
+	Pad._456_4_ = 1;
 	for (int i = 0; i < 0x18; i++) {
 		void** handleSlot = reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x774 + i * 4);
 		if (*handleSlot != 0) {

@@ -80,10 +80,6 @@ static const char DAT_80333d4f[] = "%s\n";
 
 extern "C" {
 	void __dl__FPv(void*);
-	int WaveDelete__9CRedEntryFP14RedHistoryBANK(CRedEntry*, RedHistoryBANK*);
-	void WaveHistoryAdd__9CRedEntryFi(CRedEntry*, int);
-	void WaveHistoryDelete__9CRedEntryFi(CRedEntry*, int);
-	int SearchWaveSequence__9CRedEntryFi(CRedEntry*, int);
 }
 
 /*
@@ -373,7 +369,7 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 	} while (history < (unsigned int)entry[0] + 0x400);
 
 	if (maxBankSize != 0) {
-		WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)selected);
+		WaveDelete((RedHistoryBANK*)selected);
 	}
 
 	return maxBankSize;
@@ -596,26 +592,26 @@ void CRedEntry::ClearWaveData(int waveNo)
 		if (waveNo == -1) {
 			for (historyBank = (int*)entry[0]; historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
 				if (-1 < historyBank[0]) {
-					WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)historyBank);
+					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveNo == -2) {
 			for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
 				if (-1 < historyBank[0]) {
-					WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)historyBank);
+					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveNo == -3) {
 			for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
 				if ((-1 < historyBank[0]) && (0 < historyBank[1])) {
-					WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)historyBank);
+					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		}
 	} else {
-		historyNo = SearchWaveSequence__9CRedEntryFi(this, waveNo);
+		historyNo = SearchWaveSequence(waveNo);
 		if (-1 < historyNo) {
-			WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)(entry[0] + historyNo * 0x10));
+			WaveDelete((RedHistoryBANK*)(entry[0] + historyNo * 0x10));
 		}
 	}
 }
@@ -629,10 +625,9 @@ void CRedEntry::ClearWaveData(int waveNo)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void ClearWaveDataM__9CRedEntryFiiii(CRedEntry* self, int waveNo0, int waveNo1, int waveNo2,
-                                                  int waveNo3)
+void CRedEntry::ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo3)
 {
-	int* entry = (int*)self;
+	int* entry = (int*)this;
 	int* historyBank;
 
 	if (((waveNo0 == -1) && (waveNo1 == -1) && (waveNo2 == -1)) && (waveNo3 == -1)) {
@@ -643,7 +638,7 @@ extern "C" void ClearWaveDataM__9CRedEntryFiiii(CRedEntry* self, int waveNo0, in
 		if (((-1 < historyBank[0]) && (0 < historyBank[1])) &&
 		    (historyBank[0] != waveNo0) && (historyBank[0] != waveNo1) &&
 		    (historyBank[0] != waveNo2) && (historyBank[0] != waveNo3)) {
-			WaveDelete__9CRedEntryFP14RedHistoryBANK(self, (RedHistoryBANK*)historyBank);
+			WaveDelete((RedHistoryBANK*)historyBank);
 		}
 	}
 }
@@ -665,24 +660,24 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
 		if (waveBankNo == -1) {
 			for (int* historyBank = (int*)entry[0]; historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
 				if (-1 < historyBank[0]) {
-					WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)historyBank);
+					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveBankNo == -2) {
 			for (int* historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
 				if (-1 < historyBank[0]) {
-					WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)historyBank);
+					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveBankNo == -3) {
 			for (int* historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
 				if ((-1 < historyBank[0]) && (0 < historyBank[1])) {
-					WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)historyBank);
+					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		}
 	} else if (waveBankNo < 0x10) {
-		WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)(entry[0] + waveBankNo * 0x10));
+		WaveDelete((RedHistoryBANK*)(entry[0] + waveBankNo * 0x10));
 	}
 }
 
@@ -782,15 +777,15 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 				track += 0x55;
 			} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
 		}
-		if (((!used) && (seq = SearchWaveSequence__9CRedEntryFi(this, waveNo), 0xf < seq)) &&
+		if (((!used) && (seq = SearchWaveSequence(waveNo), 0xf < seq)) &&
 		    (*(int*)(*entry + seq * 0x10 + 4) == 0)) {
-			WaveHistoryAdd__9CRedEntryFi(this, 0x14);
+			WaveHistoryAdd(0x14);
 			*(int*)(*entry + seq * 0x10 + 4) = 0x14;
 		}
 	} else {
-		seq = SearchWaveSequence__9CRedEntryFi(this, waveNo);
+		seq = SearchWaveSequence(waveNo);
 		if ((0xf < seq) && (*(int*)(*entry + seq * 0x10 + 4) != 0)) {
-			WaveHistoryDelete__9CRedEntryFi(this, *(int*)(*entry + seq * 0x10 + 4));
+			WaveHistoryDelete(*(int*)(*entry + seq * 0x10 + 4));
 			*(int*)(*entry + seq * 0x10 + 4) = 0;
 		}
 	}

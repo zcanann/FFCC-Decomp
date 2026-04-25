@@ -35,13 +35,6 @@ enum {
     RED_COMMAND_MUSIC_NEED_MEMORY_FMT_OFFSET = 0x9A,
 };
 
-extern "C" {
-int SearchMusicBank__9CRedEntryFi(CRedEntry*, int);
-int SearchWaveBase__9CRedEntryFi(void*, int);
-int SearchSeSepBank__9CRedEntryFi(CRedEntry*, int);
-void SeSepHistoryManager__9CRedEntryFii(CRedEntry*, int, int);
-void WaveHistoryManager__9CRedEntryFii(void*, int, int);
-}
 int* SetReverb(int, int, int*);
 
 int t_ReverbModeData[] = {
@@ -352,7 +345,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 
 	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
 	deltaTime = (unsigned int)((unsigned char*)info)[2] * 0x100 + (unsigned int)((unsigned char*)info)[1];
-	waveBase = SearchWaveBase__9CRedEntryFi(&c_RedEntry, deltaTime);
+	waveBase = c_RedEntry.SearchWaveBase(deltaTime);
 	if (waveBase == 0) {
 		if (m_ReportPrint != 0) {
 			OSReport(s_redCommandLogBlob, s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogWarnColor,
@@ -360,7 +353,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			fflush(__files + 1);
 		}
 	} else {
-		WaveHistoryManager__9CRedEntryFii(&c_RedEntry, 1, *(short*)(waveBase + 2));
+		c_RedEntry.WaveHistoryManager(1, *(short*)(waveBase + 2));
 	}
 
 	flag = ((unsigned char*)info)[0];
@@ -537,17 +530,17 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
  */
 int SeSepPlay(int seId, int sepId, int pan, int volume)
 {
-	int sepBank;
+	int* sepBank;
 	unsigned char* sepInfo;
 
-	sepBank = SearchSeSepBank__9CRedEntryFi(&c_RedEntry, sepId);
+	sepBank = c_RedEntry.SearchSeSepBank(sepId);
 	if (sepBank != 0) {
-		sepInfo = (unsigned char*)(*(int*)(sepBank + 8) + 0x10);
-		if ((*(unsigned int*)(*(int*)(sepBank + 8) + 0xc) & 0x80000000) != 0) {
+		sepInfo = (unsigned char*)(sepBank[2] + 0x10);
+		if ((*(unsigned int*)(sepBank[2] + 0xc) & 0x80000000) != 0) {
 			*sepInfo |= 0x80;
 		}
 		if (_SePlayStart((RedSeINFO*)sepInfo, seId, sepId, pan, volume) != 0) {
-			SeSepHistoryManager__9CRedEntryFii(&c_RedEntry, 1, sepId);
+			c_RedEntry.SeSepHistoryManager(1, sepId);
 			return sepId;
 		}
 	}
@@ -708,7 +701,7 @@ void SePause(int seId, int pause)
  */
 void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume, int mode)
 {
-	int waveBase = SearchWaveBase__9CRedEntryFi(&c_RedEntry, (int)*(short*)((char*)musicHead + 6));
+	int waveBase = c_RedEntry.SearchWaveBase((int)*(short*)((char*)musicHead + 6));
 	if (waveBase == 0) {
 		return;
 	}
@@ -939,12 +932,12 @@ void MusicStop(int seId)
  */
 int MusicPlay(int musicId, int volume, int mode)
 {
-	int musicBank = SearchMusicBank__9CRedEntryFi(&c_RedEntry, musicId);
+	int musicBank = (int)c_RedEntry.SearchMusicBank(musicId);
 
 	if (musicBank != 0) {
 		RedMusicHEAD* musicHead = *(RedMusicHEAD**)(musicBank + 8);
 		RedWaveHeadWD* waveHead =
-		    (RedWaveHeadWD*)SearchWaveBase__9CRedEntryFi(&c_RedEntry, *(short*)((char*)musicHead + 6));
+		    (RedWaveHeadWD*)c_RedEntry.SearchWaveBase(*(short*)((char*)musicHead + 6));
 
 		if (waveHead == 0) {
 			return -1;

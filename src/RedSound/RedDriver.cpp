@@ -27,17 +27,7 @@ extern "C" {
     void* memcpy(void*, const void*, unsigned long);
     void* memmove(void*, const void*, unsigned long);
     void* memset(void*, int, unsigned long);
-    void SetMusicData__9CRedEntryFP12RedMusicHEAD(CRedEntry*, RedMusicHEAD*);
-    int SetSeSepData__9CRedEntryFP12RedSeSepHEAD(CRedEntry*, RedSeSepHEAD*);
-    void ClearSeSepData__9CRedEntryFi(CRedEntry*, int);
-    void ClearSeSepDataMG__9CRedEntryFiiii(void*, int, int, int, int);
-    int ReentrySeSepData__9CRedEntryFi(void*, int);
     int ReentryMusicData__9CRedEntryFi(void*, int);
-    int SearchMusicSequence__9CRedEntryFi(void*, int);
-    int SearchSeSepSequence__9CRedEntryFi(void*, int);
-    int ReentryWaveData__9CRedEntryFi(void*, int);
-    void ClearWaveData__9CRedEntryFi(void*, int);
-    void ClearWaveDataM__9CRedEntryFiiii(void*, int, int, int, int);
     void ClearWaveBank__9CRedEntryFi(void*, int);
     void MusicStop__Fi(int);
     void MusicPlay__Fiii(int, int, int);
@@ -246,7 +236,7 @@ void _SetReverbDepth(int* param_1)
  */
 void _SetMusicData(int* param_1)
 {
-    SetMusicData__9CRedEntryFP12RedMusicHEAD(&c_RedEntry, (RedMusicHEAD*)*param_1);
+    c_RedEntry.SetMusicData((RedMusicHEAD*)*param_1);
 }
 
 /*
@@ -283,7 +273,7 @@ void _MusicPlaySequence(int* param_1)
     if ((((*param_1 != *(int*)(srcBuffer + 0x470)) &&
           (*param_1 != *(int*)(srcBuffer + 0x904))) &&
          (*param_1 != *(int*)(srcBuffer + 0xd98))) &&
-        ((iVar1 = SearchMusicSequence__9CRedEntryFi(&c_RedEntry, *param_1)), -1 < iVar1)) {
+        ((iVar1 = c_RedEntry.SearchMusicSequence(*param_1)), -1 < iVar1)) {
         iVar1 = param_1[2];
         if (*(int*)(srcBuffer + 0x470) != -1) {
             if (*(int*)(srcBuffer + 0x904) != -1) {
@@ -339,7 +329,7 @@ void _MusicCrossPlaySequence(int* param_1)
             RedDelete(pvVar2);
         }
         else {
-            iVar1 = SearchMusicSequence__9CRedEntryFi(&c_RedEntry, *param_1);
+            iVar1 = c_RedEntry.SearchMusicSequence(*param_1);
             if (-1 < iVar1) {
                 m_CrossTime = param_1[2];
                 iVar1 = 0;
@@ -374,7 +364,7 @@ void _MusicNextPlaySequence(int* param_1)
     if ((((*param_1 != *(int*)((int)p_SoundControlBuffer + 0x470)) &&
           (*param_1 != *(int*)((int)p_SoundControlBuffer + 0x904))) &&
          (*param_1 != *(int*)((int)p_SoundControlBuffer + 0xd98))) &&
-        ((iVar1 = SearchMusicSequence__9CRedEntryFi(&c_RedEntry, *param_1)), -1 < iVar1)) {
+        ((iVar1 = c_RedEntry.SearchMusicSequence(*param_1)), -1 < iVar1)) {
         p_MusicNextPlay[0] = *param_1;
         p_MusicNextPlay[1] = param_1[1];
         p_MusicNextPlay[2] = param_1[2];
@@ -459,7 +449,7 @@ void _SetSeBlockData(int* param_1)
  */
 void _SetSeSepData(int* param_1)
 {
-    SetSeSepData__9CRedEntryFP12RedSeSepHEAD(&c_RedEntry, (RedSeSepHEAD*)*param_1);
+    c_RedEntry.SetSeSepData((RedSeSepHEAD*)*param_1);
 }
 
 /*
@@ -469,7 +459,7 @@ void _SetSeSepData(int* param_1)
  */
 void _ClearSeSepData(int* param_1)
 {
-    ClearSeSepData__9CRedEntryFi(&c_RedEntry, *param_1);
+    c_RedEntry.ClearSeSepData(*param_1);
 }
 
 /*
@@ -479,7 +469,7 @@ void _ClearSeSepData(int* param_1)
  */
 void _ClearSeSepDataMG(int* param_1)
 {
-    ClearSeSepDataMG__9CRedEntryFiiii(&c_RedEntry, param_1[0], param_1[1], param_1[2], param_1[3]);
+    c_RedEntry.ClearSeSepDataMG(param_1[0], param_1[1], param_1[2], param_1[3]);
 }
 
 /*
@@ -522,7 +512,7 @@ void _SeSepPlay(int* param_1)
 {
     int iVar1;
 
-    iVar1 = SetSeSepData__9CRedEntryFP12RedSeSepHEAD(&c_RedEntry, (RedSeSepHEAD*)param_1[1]);
+    iVar1 = c_RedEntry.SetSeSepData((RedSeSepHEAD*)param_1[1]);
     if (iVar1 != 0) {
         m_SeSkipStep = param_1[4];
         SeSepPlay(param_1[0], *(int*)(iVar1 + 8), param_1[2], param_1[3]);
@@ -538,7 +528,7 @@ void _SeSepPlaySequence(int* param_1)
 {
     int iVar1;
 
-    iVar1 = SearchSeSepSequence__9CRedEntryFi(&c_RedEntry, param_1[1]);
+    iVar1 = c_RedEntry.SearchSeSepSequence(param_1[1]);
     if (iVar1 >= 0) {
         m_SeSkipStep = param_1[4];
         SeSepPlay(param_1[0], param_1[1], param_1[2], param_1[3]);
@@ -1712,7 +1702,7 @@ int CRedDriver::ReentrySeSepData(int id)
     int result;
 
     interrupts = OSDisableInterrupts();
-    result = ReentrySeSepData__9CRedEntryFi(&c_RedEntry, id);
+    result = c_RedEntry.ReentrySeSepData(id);
     OSRestoreInterrupts(interrupts);
     return result;
 }
@@ -2115,7 +2105,7 @@ void CRedDriver::StreamPause(int param_1, int param_2)
  */
 void CRedDriver::ClearWaveData(int param_1)
 {
-    ClearWaveData__9CRedEntryFi(&c_RedEntry, param_1);
+    c_RedEntry.ClearWaveData(param_1);
 }
 
 /*
@@ -2129,7 +2119,7 @@ void CRedDriver::ClearWaveData(int param_1)
  */
 void CRedDriver::ClearWaveDataM(int param_1, int param_2, int param_3, int param_4)
 {
-    ClearWaveDataM__9CRedEntryFiiii(&c_RedEntry, param_1, param_2, param_3, param_4);
+    c_RedEntry.ClearWaveDataM(param_1, param_2, param_3, param_4);
 }
 
 /*
@@ -2195,7 +2185,7 @@ int CRedDriver::ReentryWaveData(int id)
     int result;
 
     interrupts = OSDisableInterrupts();
-    result = ReentryWaveData__9CRedEntryFi(&c_RedEntry, id);
+    result = c_RedEntry.ReentryWaveData(id);
     OSRestoreInterrupts(interrupts);
     return result;
 }

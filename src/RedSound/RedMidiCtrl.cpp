@@ -9,7 +9,6 @@ extern "C" {
 void* memcpy(void*, const void*, unsigned long);
 void* memmove(void*, const void*, unsigned long);
 void* memset(void*, int, unsigned long);
-int GetWaveBank__9CRedEntryFi(CRedEntry*, int);
 }
 int SwingEntryFunction[] = {
     (int)SineSwing, (int)TriangleSwing, (int)SawSwing, (int)DutySwing,
@@ -1037,7 +1036,7 @@ void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 	waveNo = *command;
 	trackData[7] = 0;
 	trackData[0x47] = 0;
-	waveBank = GetWaveBank__9CRedEntryFi(&c_RedEntry, bankNo);
+	waveBank = c_RedEntry.GetWaveBank(bankNo);
 	if (waveBank != 0) {
 		waveBank = *(int*)(waveBank + 8);
 		trackData[7] = waveBank + *(int*)(waveBank + 0x20 + waveNo * 4);

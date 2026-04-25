@@ -998,47 +998,41 @@ unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
 {
     int sat = (saturation * 0xFF) / 100;
     int val = (brightness * 0xFF) / 100;
-    unsigned char valByte = (unsigned char)val;
 
     unsigned char rgba[4];
     if ((float)sat == 0.0f) {
-        rgba[0] = valByte;
-        rgba[1] = valByte;
-        rgba[2] = valByte;
+        rgba[0] = val;
+        rgba[1] = val;
+        rgba[2] = val;
     } else {
-        unsigned char lowByte;
         int sector = hue / 0x3C;
-        unsigned char deltaByte;
         int low = ((0xFF - sat) * val) / 0xFF;
         int delta = ((hue - sector * 0x3C) * (val - low)) / 0x3C;
 
-        lowByte = (unsigned char)low;
-        deltaByte = (unsigned char)delta;
-
         if (hue < 60) {
-            rgba[0] = valByte;
-            rgba[1] = (unsigned char)(lowByte + deltaByte);
-            rgba[2] = lowByte;
+            rgba[0] = val;
+            rgba[1] = low + delta;
+            rgba[2] = low;
         } else if (hue < 120) {
-            rgba[0] = (unsigned char)(valByte - deltaByte);
-            rgba[1] = valByte;
-            rgba[2] = lowByte;
+            rgba[0] = val - delta;
+            rgba[1] = val;
+            rgba[2] = low;
         } else if (hue < 180) {
-            rgba[0] = lowByte;
-            rgba[1] = valByte;
-            rgba[2] = (unsigned char)(lowByte + deltaByte);
+            rgba[0] = low;
+            rgba[1] = val;
+            rgba[2] = low + delta;
         } else if (hue < 240) {
-            rgba[0] = lowByte;
-            rgba[1] = (unsigned char)(valByte - deltaByte);
-            rgba[2] = valByte;
+            rgba[0] = low;
+            rgba[1] = val - delta;
+            rgba[2] = val;
         } else if (hue < 300) {
-            rgba[0] = (unsigned char)(lowByte + deltaByte);
-            rgba[1] = lowByte;
-            rgba[2] = valByte;
+            rgba[0] = low + delta;
+            rgba[1] = low;
+            rgba[2] = val;
         } else if (hue < 360) {
-            rgba[0] = valByte;
-            rgba[1] = lowByte;
-            rgba[2] = (unsigned char)(valByte - deltaByte);
+            rgba[0] = val;
+            rgba[1] = low;
+            rgba[2] = val - delta;
         } else {
             rgba[0] = 0;
             rgba[1] = 0;

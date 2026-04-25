@@ -176,28 +176,23 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     for (int z = 0; z < *(u16*)((u8*)&ctrl->m_initWOrk + 2); z++) {
         float v0 = (f32)z * vStep;
         float v1 = (f32)(z + 1) * vStep;
-        int x = 0;
-
-        while (true) {
+        for (int x = 0; x < *(u16*)((u8*)&ctrl->m_initWOrk + 2); x++) {
             int gridWork = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
-            if (x >= gridWork) {
-                break;
-            }
             int idx0 = x + z * (gridWork + 1);
             int idx1 = x + (z + 1) * (gridWork + 1);
             YmMeltVertex* p0Data = &work->m_vertexData[idx1];
-            YmMeltVertex* p1Data = &work->m_vertexData[idx0];
-            YmMeltVertex* p3Data = &work->m_vertexData[idx1 + 1];
-            YmMeltVertex* p2Data = &work->m_vertexData[idx0 + 1];
             Vec vtx0;
-            Vec vtx1;
-            Vec vtx3;
-            Vec vtx2;
             u32 colorValue;
 
             pppCopyVector(vtx0, p0Data->m_position);
+            YmMeltVertex* p1Data = &work->m_vertexData[idx0];
+            Vec vtx1;
             pppCopyVector(vtx1, p1Data->m_position);
+            YmMeltVertex* p3Data = &work->m_vertexData[idx1 + 1];
+            Vec vtx3;
             pppCopyVector(vtx3, p3Data->m_position);
+            YmMeltVertex* p2Data = &work->m_vertexData[idx0 + 1];
+            Vec vtx2;
             pppCopyVector(vtx2, p2Data->m_position);
 
             vtx0.y += worldY;
@@ -251,7 +246,6 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             }
             GXColor1u32(colorValue);
             GXTexCoord2f32(uvMin.x + (f32)(x + 1) * uStep, uvMin.y + v1);
-            x++;
         }
     }
 

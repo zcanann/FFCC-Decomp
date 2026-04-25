@@ -125,9 +125,9 @@ static const char s_cmake_cpp_801e3038[] = "cmake.cpp";
 
 struct CmakeInfo {
     char m_name[0x12];
+    signed char m_gender;
     signed char m_tribe;
     signed char m_hair;
-    signed char m_unknown14;
     signed char m_job;
 };
 
@@ -1141,7 +1141,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
             txt = s_CmakeInfo.m_name;
             break;
         case 1:
-            txt = GetMenuStr__8CMenuPcsFi(this, s_CmakeInfo.m_unknown14 + 0x11);
+            txt = GetMenuStr__8CMenuPcsFi(this, s_CmakeInfo.m_gender + 0x11);
             break;
         case 2:
             txt = GetTribeStr__8CMenuPcsFi(this, s_CmakeInfo.m_tribe);
@@ -1161,7 +1161,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
 
         if (i == 2) {
             int hairIndex = s_CmakeInfo.m_tribe * 8;
-            if (s_CmakeInfo.m_unknown14 != 0) {
+            if (s_CmakeInfo.m_gender != 0) {
                 hairIndex += 4;
             }
 
@@ -1814,17 +1814,21 @@ void CMenuPcs::CmakeSexCtrl()
     if (mode == 1) {
         if ((repeat & 0x3) != 0) {
             sel = (sel == 0) ? 1 : 0;
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
-        if ((down & 0x100) != 0) {
+        if (((repeat & 0x3) == 0) && ((down & 0x100) != 0)) {
+            s_CmakeInfo.m_gender = static_cast<signed char>(sel);
             MenuS16(this, 0x860) = sel;
             mode = 2;
             frame = 0;
             *reinterpret_cast<short*>(state + 0x1E) = 1;
-        } else if ((down & 0x200) != 0) {
+            Sound.PlaySe(2, 0x40, 0x7F, 0);
+        } else if (((repeat & 0x3) == 0) && ((down & 0x200) != 0)) {
             mode = 2;
             frame = 0;
             *reinterpret_cast<short*>(state + 0x1E) = -1;
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
         } else if (frame < 30) {
             frame = frame + 1;
         }
@@ -1978,14 +1982,14 @@ void CMenuPcs::CmakeTribeCtrl()
                 return;
             }
 
-            if (!IsDuplicateCmakeTribeHair(this, tribe, crest, s_CmakeInfo.m_unknown14)) {
+            if (!IsDuplicateCmakeTribeHair(this, tribe, crest, s_CmakeInfo.m_gender)) {
                 s_CmakeInfo.m_tribe = static_cast<signed char>(tribe);
                 s_CmakeInfo.m_hair = static_cast<signed char>(crest);
                 ChgModel__8CMenuPcsFiiii(this,
                     static_cast<int>(MenuS16(this, 0x86A)),
                     static_cast<int>(s_CmakeInfo.m_tribe),
                     static_cast<int>(s_CmakeInfo.m_hair),
-                    static_cast<int>(s_CmakeInfo.m_unknown14));
+                    static_cast<int>(s_CmakeInfo.m_gender));
                 resultDir = 1;
                 resultFlag = 1;
                 return;
@@ -2090,7 +2094,7 @@ void CMenuPcs::CmakeTribeDraw()
     hairFont->SetTlut(6);
 
     int hairBase = MenuS16(this, 0x862) * 8;
-    if (s_CmakeInfo.m_unknown14 != 0) {
+    if (s_CmakeInfo.m_gender != 0) {
         hairBase += 4;
     }
 
@@ -2481,7 +2485,7 @@ void CMenuPcs::CmakeResultDraw()
         if (i == 0) {
             value = s_CmakeInfo.m_name;
         } else if (i == 1) {
-            value = GetMenuStr__8CMenuPcsFi(this, static_cast<int>(s_CmakeInfo.m_unknown14) + 0x11);
+            value = GetMenuStr__8CMenuPcsFi(this, static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
         } else if (i == 2) {
             value = GetTribeStr__8CMenuPcsFi(this, static_cast<int>(s_CmakeInfo.m_tribe));
             if (value == 0) {
@@ -2512,7 +2516,7 @@ void CMenuPcs::CmakeResultDraw()
 
         if (i == 2) {
             int hairIndex = static_cast<int>(s_CmakeInfo.m_tribe) * 8;
-            if (s_CmakeInfo.m_unknown14 != 0) {
+            if (s_CmakeInfo.m_gender != 0) {
                 hairIndex += 4;
             }
 
@@ -2664,7 +2668,7 @@ void CMenuPcs::CmakeResultDraw1()
             txt = s_CmakeInfo.m_name;
             break;
         case 1:
-            txt = GetMenuStr__8CMenuPcsFi(this, s_CmakeInfo.m_unknown14 + 0x11);
+            txt = GetMenuStr__8CMenuPcsFi(this, s_CmakeInfo.m_gender + 0x11);
             break;
         case 2:
             txt = GetTribeStr__8CMenuPcsFi(this, s_CmakeInfo.m_tribe);
@@ -2684,7 +2688,7 @@ void CMenuPcs::CmakeResultDraw1()
 
         if (i == 2) {
             int hairIndex = s_CmakeInfo.m_tribe * 8;
-            if (s_CmakeInfo.m_unknown14 != 0) {
+            if (s_CmakeInfo.m_gender != 0) {
                 hairIndex += 4;
             }
 

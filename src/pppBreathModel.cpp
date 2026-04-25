@@ -107,297 +107,445 @@ void get_rand()
 }
 #endif
 
-/*
- * --INFO--
- * PAL Address: 0x800dc380
- * PAL Size: 1568b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
 extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VColorP13PARTICLE_DATAP13PARTICLE_WMATP14PARTICLE_COLOR(
     _pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor,
-    PARTICLE_DATA* particleData, PARTICLE_WMAT* particleWmat, PARTICLE_COLOR* particleColor)
-{
-    unsigned char* breath = (unsigned char*)pBreathModel;
-    unsigned char* particle = (unsigned char*)particleData;
-    Mtx workMtx;
-    Vec jitter;
-    Vec pos;
-
-    memset(particleData, 0, 0x98);
-    if (particleWmat != NULL) {
-        memset(particleWmat, 0, 0x30);
-    }
-    if (particleColor != NULL) {
-        memset(particleColor, 0, 0x20);
-    }
-
-    Math.RandF();
-    Math.RandF();
-    Math.RandF();
-
-    if (*(unsigned char*)(breath + 0x22) != 0) {
-        *(float*)(particle + 0x88) = (float)(unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
-        *(unsigned char*)(particle + 0x54) = *(unsigned char*)(breath + 0x22);
-    }
-    if (*(unsigned char*)(breath + 0x23) != 0) {
-        *(unsigned char*)(particle + 0x55) = *(unsigned char*)(breath + 0x23);
-    }
-
-    *(float*)(particle + 0x58) = *(float*)(breath + 0x90);
-    *(float*)(particle + 0x5C) = *(float*)(breath + 0x94);
-    if (*(unsigned char*)(breath + 0xC1) != 0) {
-        unsigned char flags = *(unsigned char*)(breath + 0xC1);
-
-        *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * Math.RandF();
-        if ((flags & 1) && (flags & 2)) {
-            if (Math.RandF() > 0.5f) {
-                *(float*)(particle + 0x60) *= FLOAT_80330F80;
-            }
-        } else if (flags & 2) {
-            *(float*)(particle + 0x60) *= FLOAT_80330F80;
-        }
-    }
-
-    if ((*(unsigned char*)(breath + 0xC1) & 4) != 0) {
-        *(float*)(particle + 0x58) += *(float*)(particle + 0x60);
-    }
-    if ((*(unsigned char*)(breath + 0xC1) & 8) != 0) {
-        *(float*)(particle + 0x5C) += *(float*)(particle + 0x60);
-    }
-
-    while (*(float*)(particle + 0x58) >= FLOAT_80330F88) {
-        *(float*)(particle + 0x58) -= FLOAT_80330F84;
-    }
-    while (*(float*)(particle + 0x58) < FLOAT_80330F8C) {
-        *(float*)(particle + 0x58) += FLOAT_80330F84;
-    }
-
-    *(float*)(particle + 0x64) = *(float*)(breath + 0x50);
-    *(float*)(particle + 0x68) = *(float*)(breath + 0x54);
-    *(float*)(particle + 0x6C) = *(float*)(breath + 0x58);
-    *(float*)(particle + 0x70) = *(float*)(breath + 0x60);
-    *(float*)(particle + 0x74) = *(float*)(breath + 0x64);
-    *(float*)(particle + 0x78) = *(float*)(breath + 0x68);
-
-    if (*(unsigned char*)(breath + 0xC0) != 0) {
-        unsigned char flags = *(unsigned char*)(breath + 0xC0);
-
-        if ((flags & 0x20) == 0) {
-            *(float*)(particle + 0x7C) = *(float*)(breath + 0x80) * Math.RandF();
-            *(float*)(particle + 0x80) = *(float*)(breath + 0x84) * Math.RandF();
-            *(float*)(particle + 0x84) = *(float*)(breath + 0x88) * Math.RandF();
-            if ((flags & 1) && (flags & 2)) {
-                if (Math.RandF() > 0.5f) {
-                    *(float*)(particle + 0x7C) *= FLOAT_80330F80;
-                }
-                if (Math.RandF() > 0.5f) {
-                    *(float*)(particle + 0x80) *= FLOAT_80330F80;
-                }
-                if (Math.RandF() > 0.5f) {
-                    *(float*)(particle + 0x84) *= FLOAT_80330F80;
-                }
-            } else if (flags & 2) {
-                *(float*)(particle + 0x7C) *= FLOAT_80330F80;
-                *(float*)(particle + 0x80) *= FLOAT_80330F80;
-                *(float*)(particle + 0x84) *= FLOAT_80330F80;
-            }
-        } else {
-            float value = *(float*)(breath + 0x80) * Math.RandF();
-
-            *(float*)(particle + 0x7C) = value;
-            *(float*)(particle + 0x80) = value;
-            *(float*)(particle + 0x84) = value;
-            if ((flags & 1) && (flags & 2)) {
-                if (Math.RandF() > 0.5f) {
-                    *(float*)(particle + 0x7C) *= FLOAT_80330F80;
-                    *(float*)(particle + 0x80) *= FLOAT_80330F80;
-                    *(float*)(particle + 0x84) *= FLOAT_80330F80;
-                }
-            } else if (flags & 2) {
-                *(float*)(particle + 0x7C) *= FLOAT_80330F80;
-                *(float*)(particle + 0x80) *= FLOAT_80330F80;
-                *(float*)(particle + 0x84) *= FLOAT_80330F80;
-            }
-        }
-    }
-
-    if ((*(unsigned char*)(breath + 0xC0) & 4) != 0) {
-        *(float*)(particle + 0x64) += *(float*)(particle + 0x7C);
-        *(float*)(particle + 0x68) += *(float*)(particle + 0x80);
-        *(float*)(particle + 0x6C) += *(float*)(particle + 0x84);
-    }
-    if ((*(unsigned char*)(breath + 0xC0) & 8) != 0) {
-        *(float*)(particle + 0x70) += *(float*)(particle + 0x7C);
-        *(float*)(particle + 0x74) += *(float*)(particle + 0x80);
-        *(float*)(particle + 0x78) += *(float*)(particle + 0x84);
-    }
-
-    *(float*)(particle + 0x8C) = *(float*)(breath + 0x14);
-    if (*(float*)(breath + 0xA8) != kPppBreathModelZero) {
-        *(float*)(particle + 0x8C) += (2.0f * *(float*)(breath + 0xA8)) * Math.RandF() - *(float*)(breath + 0xA8);
-    }
-
-    if (*(short*)(breath + 0x20) == 0) {
-        *(short*)(particle + 0x30) = -1;
-    } else {
-        *(short*)(particle + 0x30) = *(short*)(breath + 0x20);
-    }
-    *(unsigned char*)(particle + 0x90) = 0;
-
-    PSMTXCopy(*(Mtx*)vBreathModel, *(Mtx*)particleWmat);
-    if (particleColor != NULL) {
-        *(u32*)((unsigned char*)particleColor + 0x10) = *(u32*)(breath + 0x28);
-        *(u32*)((unsigned char*)particleColor + 0x14) = *(u32*)(breath + 0x2C);
-        *(u32*)((unsigned char*)particleColor + 0x18) = *(u32*)(breath + 0x30);
-        *(u32*)((unsigned char*)particleColor + 0x1C) = *(u32*)(breath + 0x34);
-    }
-
-    PSMTXCopy(*(Mtx*)particleWmat, workMtx);
-    workMtx[0][3] = kPppBreathModelZero;
-    workMtx[1][3] = kPppBreathModelZero;
-    workMtx[2][3] = kPppBreathModelZero;
-
-    *(float*)(particle + 0x3C) = kPppBreathModelZero;
-    *(float*)(particle + 0x40) = kPppBreathModelZero;
-    *(float*)(particle + 0x44) = FLOAT_80330F80;
-    PSMTXMultVec(workMtx, (Vec*)(particle + 0x3C), (Vec*)(particle + 0x3C));
-    PSVECNormalize((Vec*)(particle + 0x3C), (Vec*)(particle + 0x3C));
-
-    jitter.x = -(*(float*)(breath + 0xB0) * 0.5f - Math.RandF(*(float*)(breath + 0xB0)));
-    jitter.y = -(*(float*)(breath + 0xB4) * 0.5f - Math.RandF(*(float*)(breath + 0xB4)));
-    jitter.z = -(*(float*)(breath + 0xB8) * 0.5f - Math.RandF(*(float*)(breath + 0xB8)));
-
-    pos.x = (*(Mtx*)particleWmat)[0][3];
-    pos.y = (*(Mtx*)particleWmat)[1][3];
-    pos.z = (*(Mtx*)particleWmat)[2][3];
-    PSVECAdd(&jitter, &pos, &pos);
-    (*(Mtx*)particleWmat)[0][3] = pos.x;
-    (*(Mtx*)particleWmat)[1][3] = pos.y;
-    (*(Mtx*)particleWmat)[2][3] = pos.z;
-
-    PSMTXConcat(*(Mtx*)particleWmat, *(Mtx*)((unsigned char*)pppObject + 4), *(Mtx*)particleData);
-    PSMTXConcat(ppvCameraMatrix0, *(Mtx*)particleData, workMtx);
-
-    *(float*)(particle + 0x3C) = kPppBreathModelZero;
-    *(float*)(particle + 0x40) = kPppBreathModelZero;
-    *(float*)(particle + 0x44) = FLOAT_80330F80;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 196b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#ifndef VERSION_GCCP01
-void SetParticleMatrix(_pppPObject*, VBreathModel*, PARTICLE_DATA*, PARTICLE_WMAT*, _pppMngSt*)
-{
-	// TODO
-}
-#endif
-
-/*
- * --INFO--
- * PAL Address: 0x800DBFD4
- * PAL Size: 940b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
+    PARTICLE_DATA* particleData, PARTICLE_WMAT* particleWmat, PARTICLE_COLOR* particleColor);
 extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP6VColorP14PARTICLE_COLOR(
-    VBreathModel*, PBreathModel* pBreathModel, PARTICLE_DATA* particleData, VColor* vColor, PARTICLE_COLOR* particleColor)
+    VBreathModel*, PBreathModel* pBreathModel, PARTICLE_DATA* particleData, VColor* vColor, PARTICLE_COLOR* particleColor);
+void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor);
+
+/*
+ * --INFO--
+ * PAL Address: 0x800db094
+ * PAL Size: 248b
+ */
+extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
 {
-    unsigned char* breath = (unsigned char*)pBreathModel;
-    Vec* particle = reinterpret_cast<Vec*>(particleData);
-    int alpha = vColor->m_alpha;
-    char frameCount;
-    Vec step;
+    BreathParticleGroup* group;
+    VBreathModel* state = (VBreathModel*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
 
-    if (particleColor != NULL) {
-        particleColor->m_color[0] += particleColor->m_colorFrameDeltas[0];
-        particleColor->m_color[1] += particleColor->m_colorFrameDeltas[1];
-        particleColor->m_color[2] += particleColor->m_colorFrameDeltas[2];
-        particleColor->m_color[3] += particleColor->m_colorFrameDeltas[3];
-        particleColor->m_colorFrameDeltas[0] += *(float*)(breath + 0x38);
-        particleColor->m_colorFrameDeltas[1] += *(float*)(breath + 0x3C);
-        particleColor->m_colorFrameDeltas[2] += *(float*)(breath + 0x40);
-        particleColor->m_colorFrameDeltas[3] += *(float*)(breath + 0x44);
-        alpha = (int)vColor->m_alpha + (int)particleColor->m_color[3];
-        if (alpha > 0xFF) {
-            alpha = 0xFF;
+    if (state->m_particleData != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleData);
+        state->m_particleData = 0;
+    }
+
+    if (state->m_particleWmats != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleWmats);
+        state->m_particleWmats = 0;
+    }
+
+    if (state->m_particleColors != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleColors);
+        state->m_particleColors = 0;
+    }
+
+    group = state->m_groups;
+    if (group != NULL) {
+        int i;
+
+        for (i = 0; i < state->m_groupCount; i++) {
+            if (group->particleIndices != NULL) {
+                pppHeapUseRate__FPQ27CMemory6CStage(group->particleIndices);
+                group->particleIndices = 0;
+            }
+
+            if (group->particleStates != NULL) {
+                pppHeapUseRate__FPQ27CMemory6CStage(group->particleStates);
+                group->particleStates = 0;
+            }
+
+            group = (BreathParticleGroup*)((unsigned char*)group + 0x5C);
         }
+
+        pppHeapUseRate__FPQ27CMemory6CStage(state->m_groups);
+        state->m_groups = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800db18c
+ * PAL Size: 120b
+ */
+extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
+{
+    VBreathModel* state = (VBreathModel*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
+    float fVar1;
+
+    PSMTXIdentity(state->m_matrix);
+    fVar1 = kPppBreathModelZero;
+
+    state->m_direction.z = kPppBreathModelZero;
+    state->m_direction.y = fVar1;
+    state->m_direction.x = fVar1;
+
+    state->m_particleData = 0;
+    state->m_particleWmats = 0;
+    state->m_particleColors = 0;
+    state->m_groups = 0;
+    state->m_particleCount = 0;
+
+    state->m_emitFrameCounter = 10000;
+    state->m_groupCount = 0;
+    state->m_slotCount = 0;
+    state->m_flags = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800db204
+ * PAL Size: 1244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
+{
+    _pppPObject* object;
+    BreathModelRenderStep* step;
+    int workOffset;
+    int colorOffset;
+    unsigned char* work;
+    VColor* color;
+    unsigned char colorR;
+    unsigned char colorG;
+    unsigned char colorB;
+    unsigned char colorA;
+    int i;
+    float* particleData;
+    Mtx* matrixList;
+    float* particleColor;
+    int* groupData;
+    int groupCount;
+    pppModelSt* model;
+
+    object = reinterpret_cast<_pppPObject*>(breathModel);
+    step = (BreathModelRenderStep*)pBreathModel;
+    workOffset = offsets->m_serializedDataOffsets[0];
+    colorOffset = offsets->m_serializedDataOffsets[1];
+    work = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset;
+    color = reinterpret_cast<VColor*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
+    particleData = (float*)*(void**)(work + 0x30);
+    matrixList = *(Mtx**)(work + 0x34);
+    particleColor = (float*)*(void**)(work + 0x38);
+    groupData = *(int**)(work + 0x3C);
+    groupCount = *(int*)(work + 0x40);
+
+    if (step->m_stepValue == 0xFFFF) {
+        return;
     }
 
-    particle[7].y += particle[7].z;
-    if (*(unsigned char*)(breath + 0xC1) & 0x10) {
-        particle[7].z = *(float*)(breath + 0x98) + particle[8].x + particle[7].z;
-    } else {
-        particle[7].z += *(float*)(breath + 0x98);
+    model = (pppModelSt*)(*(void***)((u8*)pppEnvStPtr + 8))[step->m_stepValue];
+    pppInitBlendMode();
+    pppSetBlendMode(step->m_payload[4]);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(NULL, NULL, *(float*)(step->m_payload + 0xB0), step->m_payload[0xB6],
+                                                               step->m_payload[0xB5], step->m_payload[4], step->m_payload[0xB7],
+                                                               step->m_payload[0xB8], 1, step->m_payload[0xB9]);
+
+    colorR = color->m_red;
+    colorG = color->m_green;
+    colorB = color->m_blue;
+    colorA = color->m_alpha;
+
+    for (i = 0; i < groupCount; i++) {
+        if (0 < *(short*)((unsigned char*)particleData + 0x50)) {
+            _GXColor drawColor;
+            Mtx drawMtx;
+            Mtx tempMtx;
+            Vec pos;
+            int r;
+            int g;
+            int b;
+            int a;
+
+            PSMTXScale(drawMtx, *(float*)((u8*)pppMngStPtr + 0x28) * particleData[0x19],
+                       *(float*)((u8*)pppMngStPtr + 0x2C) * particleData[0x1A],
+                       *(float*)((u8*)pppMngStPtr + 0x30) * particleData[0x1B]);
+            PSMTXConcat(*(Mtx*)particleData, drawMtx, tempMtx);
+            PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
+            PSMTXConcat(ppvCameraMatrix0, *(Mtx*)particleData, drawMtx);
+            PSMTXMultVec(drawMtx, (Vec*)(particleData + 0xC), &pos);
+            tempMtx[0][3] = pos.x;
+            tempMtx[1][3] = pos.y;
+            tempMtx[2][3] = pos.z;
+            GXLoadPosMtxImm(tempMtx, 0);
+
+            r = colorR;
+            g = colorG;
+            b = colorB;
+            a = (int)((float)(int)colorA - particleData[0x22]);
+
+            if (particleColor != NULL) {
+                r += (int)particleColor[0];
+                g += (int)particleColor[1];
+                b += (int)particleColor[2];
+                a += (int)particleColor[3];
+            }
+
+            if (r < 0) {
+                r = 0;
+            } else if (r > 255) {
+                r = 255;
+            }
+            if (g < 0) {
+                g = 0;
+            } else if (g > 255) {
+                g = 255;
+            }
+            if (b < 0) {
+                b = 0;
+            } else if (b > 255) {
+                b = 255;
+            }
+            if (a < 0) {
+                a = 0;
+            } else if (a > 127) {
+                a = 127;
+            }
+
+            drawColor.r = (u8)r;
+            drawColor.g = (u8)g;
+            drawColor.b = (u8)b;
+            drawColor.a = (u8)a;
+            GXSetChanAmbColor(GX_COLOR0A0, drawColor);
+            pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((unsigned char*)breathModel + 0x70), 1);
+        }
+
+        if (matrixList != NULL) {
+            matrixList++;
+        }
+        if (particleColor != NULL) {
+            particleColor += 8;
+        }
+        particleData += 0x26;
     }
 
-    while (FLOAT_80330F88 <= particle[7].y) {
-        particle[7].y -= FLOAT_80330F84;
-    }
-    while (particle[7].y < FLOAT_80330F8C) {
-        particle[7].y += FLOAT_80330F84;
-    }
+    if ((CFlatFlags & 0x200000) != 0) {
+        int slotCount;
 
-    particle[8].y += particle[9].y;
-    particle[8].z += particle[9].z;
-    particle[9].x += particle[10].x;
+        groupCount = (int)step->m_groupInfo.m_groupCount;
+        slotCount = (int)step->m_groupInfo.m_slotCount;
 
-    if (*(unsigned char*)(breath + 0xC0) & 0x10) {
-        particle[9].y = *(float*)(breath + 0x70) + particle[10].y + particle[9].y;
-        particle[9].z = *(float*)(breath + 0x74) + particle[10].z + particle[9].z;
-        particle[10].x = *(float*)(breath + 0x78) + particle[11].x + particle[10].x;
-    } else {
-        particle[9].y += *(float*)(breath + 0x70);
-        particle[9].z += *(float*)(breath + 0x74);
-        particle[10].x += *(float*)(breath + 0x78);
-    }
+        for (i = 0; i < groupCount; i++) {
+            if (groupData[0] == 1) {
+                _GXColor debugColor;
+                int firstParticle;
+                int j;
+                float groupScale;
+                Mtx sphereMtx;
+                Mtx tempMtx;
+                Vec pos;
 
-    particle[11].z += *(float*)(breath + 0xA4);
-    unsigned char clampScale = *(unsigned char*)(breath + 0xC8);
-    if (clampScale == 0) {
-        float zero = kPppBreathModelZero;
-        float start = *(float*)(breath + 0xA0);
-        if (zero < start) {
-            if (*(float*)(breath + 0xA4) < zero) {
-                if (particle[11].z < zero) {
-                    particle[11].z = zero;
+                if ((i == 0) || (i == 2)) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x00;
+                    debugColor.b = 0x00;
+                    debugColor.a = 0xFF;
+                } else if (i == 1) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x80;
+                    debugColor.b = 0xFF;
+                    debugColor.a = 0xFF;
+                } else if (i == 3) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x80;
+                    debugColor.b = 0x80;
+                    debugColor.a = 0xFF;
+                } else {
+                    debugColor.r = 0x00;
+                    debugColor.g = 0x60;
+                    debugColor.b = 0x80;
+                    debugColor.a = 0xFF;
                 }
+
+                firstParticle = -1;
+                for (j = 0; j < slotCount; j++) {
+                    if (*(signed char*)(groupData[2] + j) != -1) {
+                        firstParticle = (int)*(signed char*)(groupData[1] + j);
+                        break;
+                    }
+                }
+
+                PSMTXIdentity(sphereMtx);
+                groupScale = *(float*)(groupData + 10);
+                sphereMtx[0][0] = groupScale;
+                sphereMtx[1][1] = groupScale;
+                sphereMtx[2][2] = groupScale;
+                PSMTXConcat(*(Mtx*)(*(int*)(work + 0x34) + firstParticle * 0x30), object->m_localMatrix.value, tempMtx);
+                PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
+                PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &pos);
+                sphereMtx[0][3] = pos.x;
+                sphereMtx[1][3] = pos.y;
+                sphereMtx[2][3] = pos.z;
+
+                pppSetBlendMode(1);
+                DrawSphere__8CGraphicFPA4_f8_GXColor(&Graphic, sphereMtx, debugColor);
             }
-        } else if (start < zero) {
-            if ((zero < *(float*)(breath + 0xA4)) && (zero < particle[11].z)) {
-                particle[11].z = zero;
+            groupData += 0x17;
+        }
+
+        pppInitBlendMode();
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 2);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800db6e0
+ * PAL Size: 1264b
+ */
+extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
+{
+    int colorOffset;
+    int* dataOffsets;
+    unsigned char* work;
+    VColor* color;
+    int* groupData;
+    Mtx* particleWMat;
+    Mtx* particleMtx;
+    int i;
+    int groupIndex;
+    int firstParticle;
+    int groupTable;
+    int slotIndex;
+    unsigned int slotCount;
+    bool ready;
+    float scaledOwner;
+    Mtx scaleMtx;
+    Mtx worldMtx;
+    pppFMATRIX rotMtx;
+    Vec origin;
+    Vec dir;
+    Vec dirNorm;
+    Vec target;
+    Vec hitVector;
+
+    if (gPppCalcDisabled != 0) {
+        return;
+    }
+
+    dataOffsets = offsets->m_serializedDataOffsets;
+    _pppMngSt* mngSt = pppMngStPtr;
+    colorOffset = dataOffsets[1];
+    work = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + dataOffsets[0];
+    color = (VColor*)(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
+
+    if (*(void**)(work + 0x30) == NULL) {
+        int* groupTable;
+
+        *(int*)(work + 0x40) = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x1A);
+        *(short*)(work + 0x56) = *(unsigned short*)((unsigned char*)pBreathModel + 0x10);
+        *(short*)(work + 0x54) = *(unsigned short*)((unsigned char*)pBreathModel + 0x12);
+
+        *(void**)(work + 0x30) =
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) * 0x98), pppEnvStPtr->m_stagePtr,
+                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x257);
+        if (*(void**)(work + 0x30) != NULL) {
+            memset(*(void**)(work + 0x30), 0, (unsigned long)(*(int*)(work + 0x40) * 0x98));
+        }
+
+        *(void**)(work + 0x34) =
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) * 0x30), pppEnvStPtr->m_stagePtr,
+                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x25d);
+        if (*(void**)(work + 0x34) != NULL) {
+            memset(*(void**)(work + 0x34), 0, (unsigned long)(*(int*)(work + 0x40) * 0x30));
+        }
+
+        *(void**)(work + 0x38) =
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) << 5), pppEnvStPtr->m_stagePtr,
+                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x263);
+        if (*(void**)(work + 0x38) != NULL) {
+            memset(*(void**)(work + 0x38), 0, (unsigned long)(*(int*)(work + 0x40) << 5));
+        }
+
+        *(void**)(work + 0x3C) =
+            pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12) * 0x5C),
+                pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x269);
+        if (*(void**)(work + 0x3C) != NULL) {
+            memset(*(void**)(work + 0x3C), 0,
+                   (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12) * 0x5C));
+
+            groupTable = (int*)*(void**)(work + 0x3C);
+            for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); i++) {
+                groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                    (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10),
+                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x274);
+                void* particleIndices = (void*)groupTable[1];
+                memset(particleIndices, -1,
+                       (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10));
+
+                groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                    (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10),
+                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x277);
+                void* particleStates = (void*)groupTable[2];
+                memset(particleStates, -1,
+                       (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10));
+                groupTable[0] = 0;
+                groupTable += 0x17;
             }
         }
+
+        *(float*)(work + 0x48) = kPppBreathModelZero;
+        *(float*)(work + 0x4C) = kPppBreathModelZero;
+        *(float*)(work + 0x50) = FLOAT_80330F80;
+        PSVECNormalize((Vec*)(work + 0x48), (Vec*)(work + 0x48));
     }
 
-    PSVECScale(&particle[5], &step, particle[11].z);
-    PSVECAdd(&step, &particle[4], &particle[4]);
+    PSMTXCopy(pppMngStPtr->m_matrix.value, *(Mtx*)work);
+    UpdateAllParticle(reinterpret_cast<_pppPObject*>(breathModel), (VBreathModel*)work, pBreathModel, color);
 
-    unsigned short life = *(unsigned short*)(breath + 0x20);
-    if (life != 0) {
-        *(short*)&particle[6].z = *(short*)&particle[6].z - 1;
-    }
-    *(char*)&particle[12].x = *(char*)&particle[12].x + 1;
+    particleWMat = *(Mtx**)(work + 0x34);
+    groupData = *(int**)(work + 0x3C);
+    for (groupIndex = 0; groupIndex < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
+         groupIndex++) {
+        slotCount = (unsigned int)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
+        groupTable = (int)groupData;
+        for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
+            if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
+                (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {
+                ready = false;
+                goto group_ready;
+            }
+        }
+        ready = true;
+group_ready:
+        if (ready) {
+            firstParticle = -1;
+            scaledOwner = mngSt->m_previousPositionFields.m_paramD * *(float*)((unsigned char*)pBreathModel + 8);
+            for (slotIndex = 0; slotCount != 0; slotCount--) {
+                if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
+                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
+                    break;
+                }
+                slotIndex++;
+            }
 
-    frameCount = *(char*)&particle[7].x;
-    if ((frameCount != '\0') && ((int)(unsigned int)*(unsigned char*)&particle[12].x <= (int)frameCount)) {
-        *(float*)&particle[11].y -= (float)alpha / (float)(int)frameCount;
-    }
+            PSMTXIdentity(scaleMtx);
+            scaleMtx[0][0] = scaledOwner;
+            scaleMtx[1][1] = scaledOwner;
+            scaleMtx[2][2] = scaledOwner;
+            particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
+            PSMTXConcat(*particleMtx, reinterpret_cast<_pppPObject*>(breathModel)->m_localMatrix.value, worldMtx);
+            PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
+            pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
+            rotMtx.value[0][3] = kPppBreathModelZero;
+            rotMtx.value[1][3] = kPppBreathModelZero;
+            rotMtx.value[2][3] = kPppBreathModelZero;
+            *(float*)(groupTable + 0x28) = scaledOwner;
+            pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
+            PSMTXMultVec(rotMtx.value, &dir, &dir);
+            pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
+            PSVECScale(&dirNorm, &target, *(float*)(groupTable + 0x24));
+            pppAddVector(target, origin, target);
+            pppSubVector(hitVector, target, origin);
+            pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner,
+                                     *(float*)((unsigned char*)pBreathModel + 4));
+        }
 
-    frameCount = *(char*)((unsigned char*)&particle[7].x + 1);
-    if ((frameCount != '\0') && ((int)*(short*)&particle[6].z <= (int)frameCount)) {
-        *(float*)&particle[11].y += (float)alpha / (float)(unsigned int)*(unsigned char*)(breath + 0x23);
+        groupData += 0x17;
     }
 }
 
@@ -572,438 +720,297 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
 
 /*
  * --INFO--
- * PAL Address: 0x800db6e0
- * PAL Size: 1264b
- */
-extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
-{
-    int colorOffset;
-    int* dataOffsets;
-    unsigned char* work;
-    VColor* color;
-    int* groupData;
-    Mtx* particleWMat;
-    Mtx* particleMtx;
-    int i;
-    int groupIndex;
-    int firstParticle;
-    int groupTable;
-    int slotIndex;
-    unsigned int slotCount;
-    bool ready;
-    float scaledOwner;
-    Mtx scaleMtx;
-    Mtx worldMtx;
-    pppFMATRIX rotMtx;
-    Vec origin;
-    Vec dir;
-    Vec dirNorm;
-    Vec target;
-    Vec hitVector;
-
-    if (gPppCalcDisabled != 0) {
-        return;
-    }
-
-    dataOffsets = offsets->m_serializedDataOffsets;
-    _pppMngSt* mngSt = pppMngStPtr;
-    colorOffset = dataOffsets[1];
-    work = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + dataOffsets[0];
-    color = (VColor*)(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
-
-    if (*(void**)(work + 0x30) == NULL) {
-        int* groupTable;
-
-        *(int*)(work + 0x40) = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x1A);
-        *(short*)(work + 0x56) = *(unsigned short*)((unsigned char*)pBreathModel + 0x10);
-        *(short*)(work + 0x54) = *(unsigned short*)((unsigned char*)pBreathModel + 0x12);
-
-        *(void**)(work + 0x30) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) * 0x98), pppEnvStPtr->m_stagePtr,
-                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x257);
-        if (*(void**)(work + 0x30) != NULL) {
-            memset(*(void**)(work + 0x30), 0, (unsigned long)(*(int*)(work + 0x40) * 0x98));
-        }
-
-        *(void**)(work + 0x34) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) * 0x30), pppEnvStPtr->m_stagePtr,
-                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x25d);
-        if (*(void**)(work + 0x34) != NULL) {
-            memset(*(void**)(work + 0x34), 0, (unsigned long)(*(int*)(work + 0x40) * 0x30));
-        }
-
-        *(void**)(work + 0x38) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) << 5), pppEnvStPtr->m_stagePtr,
-                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x263);
-        if (*(void**)(work + 0x38) != NULL) {
-            memset(*(void**)(work + 0x38), 0, (unsigned long)(*(int*)(work + 0x40) << 5));
-        }
-
-        *(void**)(work + 0x3C) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12) * 0x5C),
-                pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x269);
-        if (*(void**)(work + 0x3C) != NULL) {
-            memset(*(void**)(work + 0x3C), 0,
-                   (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12) * 0x5C));
-
-            groupTable = (int*)*(void**)(work + 0x3C);
-            for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); i++) {
-                groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10),
-                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x274);
-                void* particleIndices = (void*)groupTable[1];
-                memset(particleIndices, -1,
-                       (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10));
-
-                groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10),
-                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x277);
-                void* particleStates = (void*)groupTable[2];
-                memset(particleStates, -1,
-                       (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10));
-                groupTable[0] = 0;
-                groupTable += 0x17;
-            }
-        }
-
-        *(float*)(work + 0x48) = kPppBreathModelZero;
-        *(float*)(work + 0x4C) = kPppBreathModelZero;
-        *(float*)(work + 0x50) = FLOAT_80330F80;
-        PSVECNormalize((Vec*)(work + 0x48), (Vec*)(work + 0x48));
-    }
-
-    PSMTXCopy(pppMngStPtr->m_matrix.value, *(Mtx*)work);
-    UpdateAllParticle(reinterpret_cast<_pppPObject*>(breathModel), (VBreathModel*)work, pBreathModel, color);
-
-    particleWMat = *(Mtx**)(work + 0x34);
-    groupData = *(int**)(work + 0x3C);
-    for (groupIndex = 0; groupIndex < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
-         groupIndex++) {
-        slotCount = (unsigned int)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
-        groupTable = (int)groupData;
-        for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
-            if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
-                (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {
-                ready = false;
-                goto group_ready;
-            }
-        }
-        ready = true;
-group_ready:
-        if (ready) {
-            firstParticle = -1;
-            scaledOwner = mngSt->m_ownerScale * *(float*)((unsigned char*)pBreathModel + 8);
-            for (slotIndex = 0; slotCount != 0; slotCount--) {
-                if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
-                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
-                    break;
-                }
-                slotIndex++;
-            }
-
-            PSMTXIdentity(scaleMtx);
-            scaleMtx[0][0] = scaledOwner;
-            scaleMtx[1][1] = scaledOwner;
-            scaleMtx[2][2] = scaledOwner;
-            particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
-            PSMTXConcat(*particleMtx, reinterpret_cast<_pppPObject*>(breathModel)->m_localMatrix.value, worldMtx);
-            PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
-            pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
-            rotMtx.value[0][3] = kPppBreathModelZero;
-            rotMtx.value[1][3] = kPppBreathModelZero;
-            rotMtx.value[2][3] = kPppBreathModelZero;
-            *(float*)(groupTable + 0x28) = scaledOwner;
-            pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
-            PSMTXMultVec(rotMtx.value, &dir, &dir);
-            pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
-            PSVECScale(&dirNorm, &target, *(float*)(groupTable + 0x24));
-            pppAddVector(target, origin, target);
-            pppSubVector(hitVector, target, origin);
-            pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner,
-                                     *(float*)((unsigned char*)pBreathModel + 4));
-        }
-
-        groupData += 0x17;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800db204
- * PAL Size: 1244b
+ * PAL Address: 0x800DBFD4
+ * PAL Size: 940b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
+extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP6VColorP14PARTICLE_COLOR(
+    VBreathModel*, PBreathModel* pBreathModel, PARTICLE_DATA* particleData, VColor* vColor, PARTICLE_COLOR* particleColor)
 {
-    _pppPObject* object;
-    BreathModelRenderStep* step;
-    int workOffset;
-    int colorOffset;
-    unsigned char* work;
-    VColor* color;
-    unsigned char colorR;
-    unsigned char colorG;
-    unsigned char colorB;
-    unsigned char colorA;
-    int i;
-    float* particleData;
-    Mtx* matrixList;
-    float* particleColor;
-    int* groupData;
-    int groupCount;
-    pppModelSt* model;
+    unsigned char* breath = (unsigned char*)pBreathModel;
+    Vec* particle = reinterpret_cast<Vec*>(particleData);
+    int alpha = vColor->m_alpha;
+    char frameCount;
+    Vec step;
 
-    object = reinterpret_cast<_pppPObject*>(breathModel);
-    step = (BreathModelRenderStep*)pBreathModel;
-    workOffset = offsets->m_serializedDataOffsets[0];
-    colorOffset = offsets->m_serializedDataOffsets[1];
-    work = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset;
-    color = reinterpret_cast<VColor*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
-    particleData = (float*)*(void**)(work + 0x30);
-    matrixList = *(Mtx**)(work + 0x34);
-    particleColor = (float*)*(void**)(work + 0x38);
-    groupData = *(int**)(work + 0x3C);
-    groupCount = *(int*)(work + 0x40);
-
-    if (step->m_stepValue == 0xFFFF) {
-        return;
+    if (particleColor != NULL) {
+        particleColor->m_color[0] += particleColor->m_colorFrameDeltas[0];
+        particleColor->m_color[1] += particleColor->m_colorFrameDeltas[1];
+        particleColor->m_color[2] += particleColor->m_colorFrameDeltas[2];
+        particleColor->m_color[3] += particleColor->m_colorFrameDeltas[3];
+        particleColor->m_colorFrameDeltas[0] += *(float*)(breath + 0x38);
+        particleColor->m_colorFrameDeltas[1] += *(float*)(breath + 0x3C);
+        particleColor->m_colorFrameDeltas[2] += *(float*)(breath + 0x40);
+        particleColor->m_colorFrameDeltas[3] += *(float*)(breath + 0x44);
+        alpha = (int)vColor->m_alpha + (int)particleColor->m_color[3];
+        if (alpha > 0xFF) {
+            alpha = 0xFF;
+        }
     }
 
-    model = (pppModelSt*)(*(void***)((u8*)pppEnvStPtr + 8))[step->m_stepValue];
-    pppInitBlendMode();
-    pppSetBlendMode(step->m_payload[4]);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(NULL, NULL, *(float*)(step->m_payload + 0xB0), step->m_payload[0xB6],
-                                                               step->m_payload[0xB5], step->m_payload[4], step->m_payload[0xB7],
-                                                               step->m_payload[0xB8], 1, step->m_payload[0xB9]);
-
-    colorR = color->m_red;
-    colorG = color->m_green;
-    colorB = color->m_blue;
-    colorA = color->m_alpha;
-
-    for (i = 0; i < groupCount; i++) {
-        if (0 < *(short*)particleData) {
-            _GXColor drawColor;
-            Mtx drawMtx;
-            Mtx tempMtx;
-            Vec pos;
-            int r;
-            int g;
-            int b;
-            int a;
-
-            PSMTXScale(drawMtx, *(float*)((u8*)pppMngStPtr + 0x28) * particleData[0x19],
-                       *(float*)((u8*)pppMngStPtr + 0x2C) * particleData[0x1A],
-                       *(float*)((u8*)pppMngStPtr + 0x30) * particleData[0x1B]);
-            PSMTXConcat(*(Mtx*)particleData, drawMtx, tempMtx);
-            PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
-            PSMTXConcat(ppvCameraMatrix0, *(Mtx*)particleData, drawMtx);
-            PSMTXMultVec(drawMtx, (Vec*)(particleData + 0xC), &pos);
-            tempMtx[0][3] = pos.x;
-            tempMtx[1][3] = pos.y;
-            tempMtx[2][3] = pos.z;
-            GXLoadPosMtxImm(tempMtx, 0);
-
-            r = colorR;
-            g = colorG;
-            b = colorB;
-            a = (int)((float)(int)colorA - particleData[0x22]);
-
-            if (particleColor != NULL) {
-                r += (int)particleColor[0];
-                g += (int)particleColor[1];
-                b += (int)particleColor[2];
-                a += (int)particleColor[3];
-            }
-
-            if (r < 0) {
-                r = 0;
-            } else if (r > 255) {
-                r = 255;
-            }
-            if (g < 0) {
-                g = 0;
-            } else if (g > 255) {
-                g = 255;
-            }
-            if (b < 0) {
-                b = 0;
-            } else if (b > 255) {
-                b = 255;
-            }
-            if (a < 0) {
-                a = 0;
-            } else if (a > 127) {
-                a = 127;
-            }
-
-            drawColor.r = (u8)r;
-            drawColor.g = (u8)g;
-            drawColor.b = (u8)b;
-            drawColor.a = (u8)a;
-            GXSetChanAmbColor(GX_COLOR0A0, drawColor);
-            pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((unsigned char*)breathModel + 0x70), 1);
-        }
-
-        if (matrixList != NULL) {
-            matrixList++;
-        }
-        if (particleColor != NULL) {
-            particleColor += 8;
-        }
-        particleData += 0x26;
+    particle[7].y += particle[7].z;
+    if (*(unsigned char*)(breath + 0xC1) & 0x10) {
+        particle[7].z = *(float*)(breath + 0x98) + particle[8].x + particle[7].z;
+    } else {
+        particle[7].z += *(float*)(breath + 0x98);
     }
 
-    if ((CFlatFlags & 0x200000) != 0) {
-        int slotCount;
+    while (FLOAT_80330F88 <= particle[7].y) {
+        particle[7].y -= FLOAT_80330F84;
+    }
+    while (particle[7].y < FLOAT_80330F8C) {
+        particle[7].y += FLOAT_80330F84;
+    }
 
-        groupCount = (int)step->m_groupInfo.m_groupCount;
-        slotCount = (int)step->m_groupInfo.m_slotCount;
+    particle[8].y += particle[9].y;
+    particle[8].z += particle[9].z;
+    particle[9].x += particle[10].x;
 
-        for (i = 0; i < groupCount; i++) {
-            if (groupData[0] == 1) {
-                _GXColor debugColor;
-                int firstParticle;
-                int j;
-                float groupScale;
-                Mtx sphereMtx;
-                Mtx tempMtx;
-                Vec pos;
+    if (*(unsigned char*)(breath + 0xC0) & 0x10) {
+        particle[9].y = *(float*)(breath + 0x70) + particle[10].y + particle[9].y;
+        particle[9].z = *(float*)(breath + 0x74) + particle[10].z + particle[9].z;
+        particle[10].x = *(float*)(breath + 0x78) + particle[11].x + particle[10].x;
+    } else {
+        particle[9].y += *(float*)(breath + 0x70);
+        particle[9].z += *(float*)(breath + 0x74);
+        particle[10].x += *(float*)(breath + 0x78);
+    }
 
-                if ((i == 0) || (i == 2)) {
-                    debugColor.r = 0x80;
-                    debugColor.g = 0x00;
-                    debugColor.b = 0x00;
-                    debugColor.a = 0xFF;
-                } else if (i == 1) {
-                    debugColor.r = 0x80;
-                    debugColor.g = 0x80;
-                    debugColor.b = 0xFF;
-                    debugColor.a = 0xFF;
-                } else if (i == 3) {
-                    debugColor.r = 0x80;
-                    debugColor.g = 0x80;
-                    debugColor.b = 0x80;
-                    debugColor.a = 0xFF;
-                } else {
-                    debugColor.r = 0x00;
-                    debugColor.g = 0x60;
-                    debugColor.b = 0x80;
-                    debugColor.a = 0xFF;
+    particle[11].z += *(float*)(breath + 0xA4);
+    unsigned char clampScale = *(unsigned char*)(breath + 0xC8);
+    if (clampScale == 0) {
+        float zero = kPppBreathModelZero;
+        float start = *(float*)(breath + 0xA0);
+        if (zero < start) {
+            if (*(float*)(breath + 0xA4) < zero) {
+                if (particle[11].z < zero) {
+                    particle[11].z = zero;
                 }
-
-                firstParticle = -1;
-                for (j = 0; j < slotCount; j++) {
-                    if (*(signed char*)(groupData[2] + j) != -1) {
-                        firstParticle = (int)*(signed char*)(groupData[1] + j);
-                        break;
-                    }
-                }
-
-                PSMTXIdentity(sphereMtx);
-                groupScale = *(float*)(groupData + 10);
-                sphereMtx[0][0] = groupScale;
-                sphereMtx[1][1] = groupScale;
-                sphereMtx[2][2] = groupScale;
-                PSMTXConcat(*(Mtx*)(*(int*)(work + 0x34) + firstParticle * 0x30), object->m_localMatrix.value, tempMtx);
-                PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
-                PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &pos);
-                sphereMtx[0][3] = pos.x;
-                sphereMtx[1][3] = pos.y;
-                sphereMtx[2][3] = pos.z;
-
-                pppSetBlendMode(1);
-                DrawSphere__8CGraphicFPA4_f8_GXColor(&Graphic, sphereMtx, debugColor);
             }
-            groupData += 0x17;
+        } else if (start < zero) {
+            if ((zero < *(float*)(breath + 0xA4)) && (zero < particle[11].z)) {
+                particle[11].z = zero;
+            }
         }
+    }
 
-        pppInitBlendMode();
-        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 2);
+    PSVECScale(&particle[5], &step, particle[11].z);
+    PSVECAdd(&step, &particle[4], &particle[4]);
+
+    unsigned short life = *(unsigned short*)(breath + 0x20);
+    if (life != 0) {
+        *(short*)&particle[6].z = *(short*)&particle[6].z - 1;
+    }
+    *(char*)&particle[12].x = *(char*)&particle[12].x + 1;
+
+    frameCount = *(char*)&particle[7].x;
+    if ((frameCount != '\0') && ((int)(unsigned int)*(unsigned char*)&particle[12].x <= (int)frameCount)) {
+        *(float*)&particle[11].y -= (float)alpha / (float)(int)frameCount;
+    }
+
+    frameCount = *(char*)((unsigned char*)&particle[7].x + 1);
+    if ((frameCount != '\0') && ((int)*(short*)&particle[6].z <= (int)frameCount)) {
+        *(float*)&particle[11].y += (float)alpha / (float)(unsigned int)*(unsigned char*)(breath + 0x23);
     }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800db18c
- * PAL Size: 120b
+ * PAL Address: 0x800dc380
+ * PAL Size: 1568b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
+extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VColorP13PARTICLE_DATAP13PARTICLE_WMATP14PARTICLE_COLOR(
+    _pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor,
+    PARTICLE_DATA* particleData, PARTICLE_WMAT* particleWmat, PARTICLE_COLOR* particleColor)
 {
-    VBreathModel* state = (VBreathModel*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
-    float fVar1;
+    unsigned char* breath = (unsigned char*)pBreathModel;
+    unsigned char* particle = (unsigned char*)particleData;
+    Mtx workMtx;
+    Vec jitter;
+    Vec pos;
 
-    PSMTXIdentity(state->m_matrix);
-    fVar1 = kPppBreathModelZero;
+    memset(particleData, 0, 0x98);
+    if (particleWmat != NULL) {
+        memset(particleWmat, 0, 0x30);
+    }
+    if (particleColor != NULL) {
+        memset(particleColor, 0, 0x20);
+    }
 
-    state->m_direction.z = kPppBreathModelZero;
-    state->m_direction.y = fVar1;
-    state->m_direction.x = fVar1;
+    Math.RandF();
+    Math.RandF();
+    Math.RandF();
 
-    state->m_particleData = 0;
-    state->m_particleWmats = 0;
-    state->m_particleColors = 0;
-    state->m_groups = 0;
-    state->m_particleCount = 0;
+    if (*(unsigned char*)(breath + 0x22) != 0) {
+        *(float*)(particle + 0x88) = (float)(unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
+        *(unsigned char*)(particle + 0x54) = *(unsigned char*)(breath + 0x22);
+    }
+    if (*(unsigned char*)(breath + 0x23) != 0) {
+        *(unsigned char*)(particle + 0x55) = *(unsigned char*)(breath + 0x23);
+    }
 
-    state->m_emitFrameCounter = 10000;
-    state->m_groupCount = 0;
-    state->m_slotCount = 0;
-    state->m_flags = 0;
+    *(float*)(particle + 0x58) = *(float*)(breath + 0x90);
+    *(float*)(particle + 0x5C) = *(float*)(breath + 0x94);
+    if (*(unsigned char*)(breath + 0xC1) != 0) {
+        unsigned char flags = *(unsigned char*)(breath + 0xC1);
+
+        *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * Math.RandF();
+        if ((flags & 1) && (flags & 2)) {
+            if (Math.RandF() > 0.5f) {
+                *(float*)(particle + 0x60) *= FLOAT_80330F80;
+            }
+        } else if (flags & 2) {
+            *(float*)(particle + 0x60) *= FLOAT_80330F80;
+        }
+    }
+
+    if ((*(unsigned char*)(breath + 0xC1) & 4) != 0) {
+        *(float*)(particle + 0x58) += *(float*)(particle + 0x60);
+    }
+    if ((*(unsigned char*)(breath + 0xC1) & 8) != 0) {
+        *(float*)(particle + 0x5C) += *(float*)(particle + 0x60);
+    }
+
+    while (*(float*)(particle + 0x58) >= FLOAT_80330F88) {
+        *(float*)(particle + 0x58) -= FLOAT_80330F84;
+    }
+    while (*(float*)(particle + 0x58) < FLOAT_80330F8C) {
+        *(float*)(particle + 0x58) += FLOAT_80330F84;
+    }
+
+    *(float*)(particle + 0x64) = *(float*)(breath + 0x50);
+    *(float*)(particle + 0x68) = *(float*)(breath + 0x54);
+    *(float*)(particle + 0x6C) = *(float*)(breath + 0x58);
+    *(float*)(particle + 0x70) = *(float*)(breath + 0x60);
+    *(float*)(particle + 0x74) = *(float*)(breath + 0x64);
+    *(float*)(particle + 0x78) = *(float*)(breath + 0x68);
+
+    if (*(unsigned char*)(breath + 0xC0) != 0) {
+        unsigned char flags = *(unsigned char*)(breath + 0xC0);
+
+        if ((flags & 0x20) == 0) {
+            *(float*)(particle + 0x7C) = *(float*)(breath + 0x80) * Math.RandF();
+            *(float*)(particle + 0x80) = *(float*)(breath + 0x84) * Math.RandF();
+            *(float*)(particle + 0x84) = *(float*)(breath + 0x88) * Math.RandF();
+            if ((flags & 1) && (flags & 2)) {
+                if (Math.RandF() > 0.5f) {
+                    *(float*)(particle + 0x7C) *= FLOAT_80330F80;
+                }
+                if (Math.RandF() > 0.5f) {
+                    *(float*)(particle + 0x80) *= FLOAT_80330F80;
+                }
+                if (Math.RandF() > 0.5f) {
+                    *(float*)(particle + 0x84) *= FLOAT_80330F80;
+                }
+            } else if (flags & 2) {
+                *(float*)(particle + 0x7C) *= FLOAT_80330F80;
+                *(float*)(particle + 0x80) *= FLOAT_80330F80;
+                *(float*)(particle + 0x84) *= FLOAT_80330F80;
+            }
+        } else {
+            float value = *(float*)(breath + 0x80) * Math.RandF();
+
+            *(float*)(particle + 0x7C) = value;
+            *(float*)(particle + 0x80) = value;
+            *(float*)(particle + 0x84) = value;
+            if ((flags & 1) && (flags & 2)) {
+                if (Math.RandF() > 0.5f) {
+                    *(float*)(particle + 0x7C) *= FLOAT_80330F80;
+                    *(float*)(particle + 0x80) *= FLOAT_80330F80;
+                    *(float*)(particle + 0x84) *= FLOAT_80330F80;
+                }
+            } else if (flags & 2) {
+                *(float*)(particle + 0x7C) *= FLOAT_80330F80;
+                *(float*)(particle + 0x80) *= FLOAT_80330F80;
+                *(float*)(particle + 0x84) *= FLOAT_80330F80;
+            }
+        }
+    }
+
+    if ((*(unsigned char*)(breath + 0xC0) & 4) != 0) {
+        *(float*)(particle + 0x64) += *(float*)(particle + 0x7C);
+        *(float*)(particle + 0x68) += *(float*)(particle + 0x80);
+        *(float*)(particle + 0x6C) += *(float*)(particle + 0x84);
+    }
+    if ((*(unsigned char*)(breath + 0xC0) & 8) != 0) {
+        *(float*)(particle + 0x70) += *(float*)(particle + 0x7C);
+        *(float*)(particle + 0x74) += *(float*)(particle + 0x80);
+        *(float*)(particle + 0x78) += *(float*)(particle + 0x84);
+    }
+
+    *(float*)(particle + 0x8C) = *(float*)(breath + 0x14);
+    if (*(float*)(breath + 0xA8) != kPppBreathModelZero) {
+        *(float*)(particle + 0x8C) += (2.0f * *(float*)(breath + 0xA8)) * Math.RandF() - *(float*)(breath + 0xA8);
+    }
+
+    if (*(short*)(breath + 0x20) == 0) {
+        *(short*)(particle + 0x50) = -1;
+    } else {
+        *(short*)(particle + 0x50) = *(short*)(breath + 0x20);
+    }
+    *(unsigned char*)(particle + 0x90) = 0;
+
+    PSMTXCopy(*(Mtx*)vBreathModel, *(Mtx*)particleWmat);
+    if (particleColor != NULL) {
+        *(u32*)((unsigned char*)particleColor + 0x10) = *(u32*)(breath + 0x28);
+        *(u32*)((unsigned char*)particleColor + 0x14) = *(u32*)(breath + 0x2C);
+        *(u32*)((unsigned char*)particleColor + 0x18) = *(u32*)(breath + 0x30);
+        *(u32*)((unsigned char*)particleColor + 0x1C) = *(u32*)(breath + 0x34);
+    }
+
+    PSMTXCopy(*(Mtx*)particleWmat, workMtx);
+    workMtx[0][3] = kPppBreathModelZero;
+    workMtx[1][3] = kPppBreathModelZero;
+    workMtx[2][3] = kPppBreathModelZero;
+
+    *(float*)(particle + 0x3C) = kPppBreathModelZero;
+    *(float*)(particle + 0x40) = kPppBreathModelZero;
+    *(float*)(particle + 0x44) = FLOAT_80330F80;
+    PSMTXMultVec(workMtx, (Vec*)(particle + 0x3C), (Vec*)(particle + 0x3C));
+    PSVECNormalize((Vec*)(particle + 0x3C), (Vec*)(particle + 0x3C));
+
+    jitter.x = -(*(float*)(breath + 0xB0) * 0.5f - Math.RandF(*(float*)(breath + 0xB0)));
+    jitter.y = -(*(float*)(breath + 0xB4) * 0.5f - Math.RandF(*(float*)(breath + 0xB4)));
+    jitter.z = -(*(float*)(breath + 0xB8) * 0.5f - Math.RandF(*(float*)(breath + 0xB8)));
+
+    pos.x = (*(Mtx*)particleWmat)[0][3];
+    pos.y = (*(Mtx*)particleWmat)[1][3];
+    pos.z = (*(Mtx*)particleWmat)[2][3];
+    PSVECAdd(&jitter, &pos, &pos);
+    (*(Mtx*)particleWmat)[0][3] = pos.x;
+    (*(Mtx*)particleWmat)[1][3] = pos.y;
+    (*(Mtx*)particleWmat)[2][3] = pos.z;
+
+    PSMTXConcat(*(Mtx*)particleWmat, *(Mtx*)((unsigned char*)pppObject + 4), *(Mtx*)particleData);
+    PSMTXConcat(ppvCameraMatrix0, *(Mtx*)particleData, workMtx);
+
+    *(float*)(particle + 0x3C) = kPppBreathModelZero;
+    *(float*)(particle + 0x40) = kPppBreathModelZero;
+    *(float*)(particle + 0x44) = FLOAT_80330F80;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800db094
- * PAL Size: 248b
+ * PAL Address: UNUSED
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
+#ifndef VERSION_GCCP01
+void SetParticleMatrix(_pppPObject*, VBreathModel*, PARTICLE_DATA*, PARTICLE_WMAT*, _pppMngSt*)
 {
-    BreathParticleGroup* group;
-    VBreathModel* state = (VBreathModel*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
-
-    if (state->m_particleData != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleData);
-        state->m_particleData = 0;
-    }
-
-    if (state->m_particleWmats != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleWmats);
-        state->m_particleWmats = 0;
-    }
-
-    if (state->m_particleColors != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleColors);
-        state->m_particleColors = 0;
-    }
-
-    group = state->m_groups;
-    if (group != NULL) {
-        int i;
-
-        for (i = 0; i < state->m_groupCount; i++) {
-            if (group->particleIndices != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(group->particleIndices);
-                group->particleIndices = 0;
-            }
-
-            if (group->particleStates != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(group->particleStates);
-                group->particleStates = 0;
-            }
-
-            group = (BreathParticleGroup*)((unsigned char*)group + 0x5C);
-        }
-
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_groups);
-        state->m_groups = 0;
-    }
+	// TODO
 }
+#endif
 
 /*
  * --INFO--

@@ -2753,13 +2753,25 @@ void CShopMenu::DrawBuySellInfo()
     int itemNo = -1;
     bool canTrade = false;
     if (selected != -1) {
-        itemNo = ResolveShopMenuSelectedItemId(this);
+        int caravan = ShopMenuCaravan(this);
+        if (listType == 0) {
+            itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + selected * 2 + 0xBE6));
+        } else if (listType == 1) {
+            itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + selected * 2 + 0xB6));
+        } else if (listType == 2) {
+            int smithIndex = ShopMenuInt(this, 0x50 + selected * 4);
+            if (smithIndex == -1) {
+                itemNo = -1;
+            } else {
+                itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + smithIndex * 2 + 0xB6));
+            }
+        }
+
         if (itemNo > 0) {
             if (listType == 0) {
                 canTrade = true;
             } else if (listType == 2) {
                 unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
-                int caravan = ShopMenuCaravan(this);
                 canTrade = (*reinterpret_cast<unsigned int*>(caravan + ((itemNo - 0x191) >> 5) * 4 + 0xC08) &
                             (1U << (bit & 0x1F))) != 0;
             } else if ((listType == 1) && EquipChk__8CMenuPcsFi(MenuPcsVoid(), selected) == 0 && itemNo >= 0x9F) {
@@ -2771,9 +2783,24 @@ void CShopMenu::DrawBuySellInfo()
     int totalGil = 0;
     if (canTrade) {
         if (listType == 0) {
-            totalGil = ShopMenuInt(this, 0x44) * CalcShopMenuGilRatio(this, GetShopMenuItemBaseGil(itemNo, 0x20));
+            int gil = 0;
+            if (itemNo >= 1) {
+                int caravan = ShopMenuCaravan(this);
+                gil = static_cast<int>(*reinterpret_cast<short*>(caravan + 0xBE2)) *
+                      static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20));
+                gil = gil / 100 + (gil >> 0x1F);
+                gil = gil - (gil >> 0x1F);
+            }
+            totalGil = ShopMenuInt(this, 0x44) * gil;
         } else if (listType == 1) {
-            int sellGil = CalcShopMenuGilRatio(this, GetShopMenuItemBaseGil(itemNo, 0x20));
+            int sellGil = 0;
+            if (itemNo >= 1) {
+                int caravan = ShopMenuCaravan(this);
+                sellGil = static_cast<int>(*reinterpret_cast<short*>(caravan + 0xBE2)) *
+                          static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20));
+                sellGil = sellGil / 100 + (sellGil >> 0x1F);
+                sellGil = sellGil - (sellGil >> 0x1F);
+            }
             sellGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(sellGil));
             totalGil = ShopMenuInt(this, 0x44) * sellGil;
         }

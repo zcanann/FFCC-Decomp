@@ -51,8 +51,6 @@ extern int m_MusicSkipComplete;
 extern void* p_ReverbDepth;
 extern int m_Mute[2];
 extern CRedMemory c_RedMemory;
-extern int m_DMAExecute;
-extern int m_DMAInThread;
 extern int m_DataBuffer;
 extern int m_ADataBuffer;
 extern int m_DataBufferSize;

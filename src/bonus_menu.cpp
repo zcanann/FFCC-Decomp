@@ -39,6 +39,7 @@ extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void changeMode__8CMenuPcsFQ28CMenuPcs8MENUMODE(CMenuPcs*, int);
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" unsigned int BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int rand(void);
 extern char* PTR_s_bonus_802128c0[];
@@ -1440,6 +1441,8 @@ void CMenuPcs::destroyBonus()
 		delete[] gBonusCheckMarkPosBuffer;
 		gBonusCheckMarkPosBuffer = 0;
 	}
+
+	freeTexture__8CMenuPcsFiiii(this, 2, 1, 0x16, 0x12);
 }
 
 /*

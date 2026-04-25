@@ -23,12 +23,6 @@ extern "C" const char s_no_name_8032fdcc[];
 extern "C" {
 const char s_no_name_8032fdcc[] = "no name";
 }
-static const char s_p_tina_cpp_801d8008[] = "p_tina.cpp";
-static const char s_tina_title_fmt_801d8014[] = "Tina [%c]";
-static const char s_tina_calc_fmt_801d8020[] = "clc=%.3f%%  max=%.3f%%";
-static const char s_tina_draw_fmt_801d8038[] = "drw=%.3f%%  max=%.3f%%";
-static const char s_tina_heap_fmt_801d8050[] = "hpm=%.3f%%  max=%.3f%%";
-static const char s_tina_prio_time_fmt_801d81a0[] = "  prioTime=%d  prio=%d  pdtID=%2d  fpno=%3d   %s\n";
 
 extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
 extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
@@ -98,21 +92,22 @@ static const char s_p_tina_rodata_801d7ee0[] = {
     (char)0x68, (char)0x72, (char)0x6F, (char)0x6E, (char)0x69, (char)0x63, (char)0x6C, (char)0x65,
     (char)0x73, (char)0x00, (char)0x00, (char)0x00,
 };
-static const char DAT_801d81d4[] = {
-    (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
-    (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
-    (char)0x82, (char)0xF0, (char)0x8D, (char)0xED, (char)0x8F, (char)0x9C, (char)0x82, (char)0xB5,
-    (char)0x82, (char)0xDC, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
-    (char)0x00, (char)0x00, (char)0x00, (char)0x00,
-};
 static const char s_CPartPcs_GAME_801D7F2C[] = "CPartPcs_GAME";
 static const char s_CPartPcs_PART_VIEWER_801D7F3C[] = "CPartPcs_PART_VIEWER";
-static const char s_dvd_tina_chobit_801d812c[] = "dvd/tina/chobit";
-static const char s_dvd_tina_chobit_0_801d813c[] = "dvd/tina/chobit_0";
-static const char s_dvd_tina_chobit_1_801d8150[] = "dvd/tina/chobit_1";
-static const char s_dvd_tina_chobit_2_801d8164[] = "dvd/tina/chobit_2";
-static const char s_dvd_tina_chobit_3_801d8178[] = "dvd/tina/chobit_3";
-static const char s_dvd_tina_chobit_4_801d818c[] = "dvd/tina/chobit_4";
+static const char s_CPartPcs_801d7f54[] = "CPartPcs";
+static const char s_CManager_801D7F60[] = "CManager";
+static const char s_CProcess_801D7F6C[] = "CProcess";
+static const char s_dvd_tina_stage_03d_mirura_801d7f78[] = "dvd/tina/stage%03d/mirura";
+static const char s_dvd_tina_stage_03d_title_801d7f94[] = "dvd/tina/stage%03d/title";
+static const char s_dvd__smenu__s_801d7fb0[] = "dvd/%smenu/%s";
+static const char s_dvd_tina_mon_m_03d_801d7fc0[] = "dvd/tina/mon/m%03d";
+static const char s_dvd_tina_mon_m_03d__c_801d7fd4[] = "dvd/tina/mon/m%03d_%c";
+static const char s_dvd_tina_stage_03d_fp_03d_801d7fec[] = "dvd/tina/stage%03d/fp%03d";
+static const char s_p_tina_cpp_801d8008[] = "p_tina.cpp";
+static const char s_tina_title_fmt_801d8014[] = "Tina [%c]";
+static const char s_tina_calc_fmt_801d8020[] = "clc=%.3f%%  max=%.3f%%";
+static const char s_tina_draw_fmt_801d8038[] = "drw=%.3f%%  max=%.3f%%";
+static const char s_tina_heap_fmt_801d8050[] = "hpm=%.3f%%  max=%.3f%%";
 static const char DAT_801d8068[] = {
     (char)0x0A, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
     (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
@@ -136,12 +131,22 @@ static const char DAT_801d8068[] = {
     (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
     (char)0x3D, (char)0x0A, (char)0x0A, (char)0x00,
 };
-static const char s_dvd_tina_stage_03d_mirura_801d7f78[] = "dvd/tina/stage%03d/mirura";
-static const char s_dvd_tina_stage_03d_title_801d7f94[] = "dvd/tina/stage%03d/title";
-static const char s_dvd_tina_stage_03d_fp_03d_801d7fec[] = "dvd/tina/stage%03d/fp%03d";
-static const char s_dvd__smenu__s_801d7fb0[] = "dvd/%smenu/%s";
-static const char s_dvd_tina_mon_m_03d_801d7fc0[] = "dvd/tina/mon/m%03d";
-static const char s_dvd_tina_mon_m_03d__c_801d7fd4[] = "dvd/tina/mon/m%03d_%c";
+static const char s_CPartPcs_dat_801d810c[] = "CPartPcs.dat";
+static const char s_CPartPcs_amem_801d811c[] = "CPartPcs.amem";
+static const char s_dvd_tina_chobit_801d812c[] = "dvd/tina/chobit";
+static const char s_dvd_tina_chobit_0_801d813c[] = "dvd/tina/chobit_0";
+static const char s_dvd_tina_chobit_1_801d8150[] = "dvd/tina/chobit_1";
+static const char s_dvd_tina_chobit_2_801d8164[] = "dvd/tina/chobit_2";
+static const char s_dvd_tina_chobit_3_801d8178[] = "dvd/tina/chobit_3";
+static const char s_dvd_tina_chobit_4_801d818c[] = "dvd/tina/chobit_4";
+static const char s_tina_prio_time_fmt_801d81a0[] = "  prioTime=%d  prio=%d  pdtID=%2d  fpno=%3d   %s\n";
+static const char DAT_801d81d4[] = {
+    (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
+    (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
+    (char)0x82, (char)0xF0, (char)0x8D, (char)0xED, (char)0x8F, (char)0x9C, (char)0x82, (char)0xB5,
+    (char)0x82, (char)0xDC, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
+    (char)0x00, (char)0x00, (char)0x00, (char)0x00,
+};
 extern char lbl_8032E69C[];
 unsigned int m_table_desc0__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
 unsigned int m_table_desc1__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
@@ -516,6 +521,7 @@ unsigned int pppFreeMngStPrioForData()
 		}
 
 		pppMngStPrioData* candidateB = reinterpret_cast<pppMngStPrioData*>(partMngBase + 0x2B70);
+		partMngBase += 0x158;
 		if (reinterpret_cast<_pppMngSt*>(candidateB) != currentMngSt && candidateB->m_baseTime != -0x1000 &&
 		    candidateB->m_kind != 0) {
 			unsigned char prioB = candidateB->m_prio;
@@ -534,7 +540,7 @@ unsigned int pppFreeMngStPrioForData()
 			}
 		}
 
-		partMngBase += 0x2B0;
+		partMngBase += 0x158;
 		index++;
 	}
 

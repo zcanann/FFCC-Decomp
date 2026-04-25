@@ -304,6 +304,14 @@ static inline int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
 char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info);
 void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info);
 void ExPPC_ThrowHandler(ThrowContext* context);
+extern "C" void __dt__Q23std13bad_exceptionFv(std::bad_exception*, s16);
+
+struct BadExceptionStorage {
+	void* vtable;
+};
+
+extern "C" void* __vt__Q23std9exception[];
+extern "C" void* __vt__Q23std13bad_exception[];
 
 /**
  * @note Address: N/A
@@ -692,18 +700,6 @@ void ExPPC_ThrowHandler(ThrowContext* context)
 
 /**
  * @note Address: N/A
- * @note Size: 0x144
- */
-struct BadExceptionStorage {
-	void* vtable;
-};
-
-extern "C" void __dt__Q23std13bad_exceptionFv(std::bad_exception*, s16);
-extern "C" void* __vt__Q23std9exception[];
-extern "C" void* __vt__Q23std13bad_exception[];
-
-/**
- * @note Address: N/A
  * @note Size: 0x1B4
  */
 extern void __unexpected(CatchInfo* catchinfo)
@@ -747,6 +743,12 @@ extern void __unexpected(CatchInfo* catchinfo)
 		}
 	}
 	terminate();
+}
+
+static void ExPPC_EmitBadException()
+{
+	std::bad_exception badException;
+	badException.what();
 }
 
 /**

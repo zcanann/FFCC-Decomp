@@ -1,5 +1,6 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/fontman.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/monobj.h"
@@ -36,6 +37,7 @@ extern "C" int intToClass__13CFlatRuntime2Fi(void*, int);
 extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
 extern "C" void pppEndPart__8CPartMngFi(void*, int);
 extern "C" unsigned char calcSpecialPolygonGroup__6CAStarFP3Vec(void*, Vec*);
+extern "C" unsigned char m_boss__8CGMonObj[];
 
 extern "C" char sCharaObjDebugStatFormat[];
 
@@ -1787,41 +1789,92 @@ void CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::addHp(int delta, CGPrgObj*)
+void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 {
+	unsigned int cid = GetCID();
+	if ((cid & 0x6D) == 0x6D &&
+	    (*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484) & 4) != 0) {
+		return;
+	}
+
 	if (m_scriptHandle == 0) {
 		return;
 	}
 
-	short* hp = reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x42);
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	unsigned short* hp = reinterpret_cast<unsigned short*>(script + 0x1C);
 	unsigned short maxHp = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A);
-	int next = static_cast<int>(*hp);
+	unsigned int hpValue = *hp;
+	unsigned int next = hpValue;
 
 	if (delta > 0) {
-		next += delta;
-		if (next > static_cast<int>(maxHp)) {
-			next = static_cast<int>(maxHp);
+		next = hpValue + delta;
+		if (static_cast<int>(next) > static_cast<int>(maxHp)) {
+			next = maxHp;
 		}
-	} else {
-		next += delta;
-		if ((GetCID() & 0x6D) == 0x6D && next < 1) {
-			next = 1;
+		*hp = static_cast<unsigned short>(next);
+	} else if (hpValue != 0) {
+		if ((cid & 0x6D) == 0x6D && (CFlat[0x12E4] & 1) != 0 &&
+		    static_cast<int>(hpValue + delta) < 1) {
+			delta = -(static_cast<int>(hpValue) - 1);
+		}
+
+		if ((cid & 0xAD) == 0xAD) {
+			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x9A) &&
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0) == 0) {
+				*reinterpret_cast<int*>(m_boss__8CGMonObj + 4) -= delta;
+				delta = 0;
+			}
+			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x88)) {
+				*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x68) -= delta;
+			}
+			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x70) &&
+			    static_cast<int>(hpValue + delta) < 1) {
+				delta = -(static_cast<int>(hpValue) - 1);
+			}
+		}
+
+		next = hpValue + delta;
+		next &= ~(static_cast<int>(next) >> 31);
+		*hp = static_cast<unsigned short>(next);
+		m_worldParam = 1.0f;
+
+		if ((cid & 0x6D) == 0x6D) {
+			if (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x6B8)) < 0) {
+				int stackArgs[2];
+				stackArgs[0] = -1;
+				stackArgs[1] = 0;
+				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+					CFlat, reinterpret_cast<int>(this), 2, 0x14, 2, stackArgs, 0);
+			}
+			static_cast<CGPartyObj*>(this)->carry(1, 0, 1);
+		}
+
+		if (sourceObj != 0) {
+			onDamaged(sourceObj);
 		}
 	}
 
-	if (next < 0) {
-		next = 0;
+	if (next != 0) {
+		return;
 	}
 
-	*hp = static_cast<short>(next);
-	m_worldParam = 1.0f;
+	for (int i = 0; i < 0x27; i++) {
+		setSta(i, 0);
+	}
+	m_displayFlags |= 2;
+	changeStat(9, 0, 0);
 
-	if (next == 0) {
-		for (int i = 0; i < 0x27; i++) {
-			setSta(i, 0);
+	if ((cid & 0x6D) == 0x6D) {
+		CCaravanWork* caravan = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+		for (int i = 2; i < *reinterpret_cast<short*>(script + 0xBAA); i++) {
+			if (caravan->DelCmdListAndItem(i, 0) == 0x125) {
+				caravan->GetNumCombi(i, 1);
+				unsigned char& flags = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x6B8);
+				flags = (flags & 0xFB) | 4;
+				return;
+			}
 		}
-		m_displayFlags |= 2;
-		changeStat(9, 0, 0);
 	}
 }
 
@@ -2313,6 +2366,31 @@ void CGCharaObj::statAttack()
 	if (m_stateFrame == static_cast<unsigned int>(m_castFrameEnd)) {
 		vcall90(this, 0, 0, 0);
 	}
+
+	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + m_itemId * 0x48;
+	unsigned short seFrame = *reinterpret_cast<unsigned short*>(itemData + 0x3A);
+	if ((seFrame & 0x8000) == 0 && m_stateFrame == seFrame) {
+		unsigned short seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x38);
+		if (seSpec != 0) {
+			int seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));
+			playSe3D(seNo, 0x32, 0x96, 0, 0);
+		}
+	}
+
+	seFrame = *reinterpret_cast<unsigned short*>(itemData + 0x3E);
+	if ((seFrame & 0x8000) == 0 && m_stateFrame == seFrame) {
+		unsigned short seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x3C);
+		if (seSpec != 0) {
+			if ((GetCID() & 0xAD) == 0xAD) {
+				int seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));
+				playSe3D(seNo + Math.Rand(3), 0x32, 0x96, 0, 0);
+			} else {
+				playSe3D(seSpec, 0x32, 0x96, 0, 0);
+			}
+		}
+	}
+
+	vcall88(this, 1);
 }
 
 /*

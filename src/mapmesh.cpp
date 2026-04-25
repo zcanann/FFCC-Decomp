@@ -479,10 +479,10 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             reader.PopChunk();
 
             DCFlushRange(m_vertices, static_cast<unsigned int>(m_vertexCount) * 0xC);
-            DCFlushRange(m_normals, static_cast<unsigned int>(m_normalCount) * 6);
+            DCFlushRange(m_normals, static_cast<unsigned int>(m_normalCount) * 0xC);
             DCFlushRange(m_nbt, static_cast<unsigned int>(m_nbtCount) * 0x12);
-            DCFlushRange(m_colors, static_cast<unsigned int>(m_colorCount) * 4);
-            DCFlushRange(m_uvPairs, static_cast<unsigned int>(m_uvCount) * 4);
+            DCFlushRange(m_colors, static_cast<unsigned int>(m_colorCount) * 0xC);
+            DCFlushRange(m_uvPairs, static_cast<unsigned int>(m_uvCount) * 0xC);
             break;
         case 0x424F4646: {
             float x = reader.GetF4();

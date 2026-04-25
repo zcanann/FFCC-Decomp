@@ -32,11 +32,6 @@ enum {
     RED_STREAM_PAUSE_OFF_FMT_OFFSET = 0xAC,
 };
 
-extern "C" {
-int PitchCompute__Fiiii(int, int, int, int);
-int SearchSeEmptyTrack__Fiii(int, int, int);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801cb93c
@@ -332,7 +327,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 	}
 
 	memcpy(streamData + 4, param_2, 0x20);
-	*streamData = SearchSeEmptyTrack__Fiii(*(short*)((int)streamData + 0x2a), 0xff, 0);
+	*streamData = (int)SearchSeEmptyTrack(*(short*)((int)streamData + 0x2a), 0xff, 0);
 	streamData[3] = RedNew(0x4000);
 	amemSize = *(short*)((int)streamData + 0x2a) << 0xd;
 	if (c_RedMemory.GetABufferSize() < 0x800000) {
@@ -401,7 +396,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 	}
 	streamData[0x3c] = param_5;
 	streamData[0x3e] = 0;
-	pitch = PitchCompute__Fiiii(0x3c00000, 0, streamData[9], 0);
+	pitch = PitchCompute(0x3c00000, 0, streamData[9], 0);
 	iVar2 = 0;
 	do {
 		voice = (int*)(streamData[1] + iVar2 * 0xc0);
@@ -537,7 +532,7 @@ void StreamPause(int param_1, int param_2)
 					}
 				}
 			} else if (*(void**)(voiceData + 0x14) != 0) {
-				unsigned int pitch = PitchCompute__Fiiii(0x3c00000, 0, *(int*)((u8*)streamData + 0x24), 0);
+				unsigned int pitch = PitchCompute(0x3c00000, 0, *(int*)((u8*)streamData + 0x24), 0);
 				if (streamData->m_channelCount == 2) {
 					*(int*)(voiceData + 0x9c) = pitch;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;

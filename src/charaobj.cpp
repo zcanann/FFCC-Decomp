@@ -1634,6 +1634,12 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			break;
 		case 0x66:
 			addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), 0);
+			if (sourceObj != 0) {
+				typedef void (*VCall4C)(void*, int, int, void*);
+				VCall4C fn = *reinterpret_cast<VCall4C*>(
+				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x4C);
+				fn(sourceObj, 0x16, amount, this);
+			}
 			putHitParticleFromItem(sourceObj, amount);
 			next = 0;
 			break;

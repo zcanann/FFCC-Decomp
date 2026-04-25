@@ -12,10 +12,6 @@ double sin(double);
 double cos(double);
 }
 
-static const f32 kPppConformBgNormalDownRayY = -2000.0f;
-static const f32 kPppConformBgNormalCylinderRadius = 10000000000.0f;
-static const f32 kPppConformBgNormalCylinderHeight = -10000000000.0f;
-static const f32 kPppConformBgNormalGroundSnapLimit = 10.0f;
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 
@@ -121,21 +117,21 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 Game.GetTargetCursor(*(s32*)((u8*)pppMngStPtr + 0x130), local_170, local_164);
             } else if (mode == 2) {
                 firstRayDirection.x = kPppConformBgNormalZero;
-                firstRayDirection.y = kPppConformBgNormalDownRayY;
+                firstRayDirection.y = -2000.0f;
                 firstRayDirection.z = kPppConformBgNormalZero;
 
                 cylinderY = matrixY + param2->m_arg3;
-                firstCylinder.m_top.z = kPppConformBgNormalCylinderRadius;
-                firstCylinder.m_top.y = kPppConformBgNormalCylinderRadius;
-                firstCylinder.m_top.x = kPppConformBgNormalCylinderRadius;
-                firstCylinder.m_direction2.z = kPppConformBgNormalCylinderHeight;
-                firstCylinder.m_direction2.y = kPppConformBgNormalCylinderHeight;
-                firstCylinder.m_direction2.x = kPppConformBgNormalCylinderHeight;
+                firstCylinder.m_top.z = 10000000000.0f;
+                firstCylinder.m_top.y = 10000000000.0f;
+                firstCylinder.m_top.x = 10000000000.0f;
+                firstCylinder.m_direction2.z = -10000000000.0f;
+                firstCylinder.m_direction2.y = -10000000000.0f;
+                firstCylinder.m_direction2.x = -10000000000.0f;
                 firstCylinder.m_bottom.x = matrixX;
                 firstCylinder.m_bottom.y = cylinderY;
                 firstCylinder.m_bottom.z = matrixZ;
                 firstCylinder.m_direction.x = kPppConformBgNormalZero;
-                firstCylinder.m_direction.y = kPppConformBgNormalDownRayY;
+                firstCylinder.m_direction.y = -2000.0f;
                 firstCylinder.m_direction.z = kPppConformBgNormalZero;
                 firstCylinder.m_radius = kPppConformBgNormalZero;
 
@@ -145,7 +141,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 if (checkResult != 0) {
                     CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_170);
                     GetHitFaceNormal__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_164);
-                    if ((matrixY - kPppConformBgNormalGroundSnapLimit) > local_170.y) {
+                    if ((matrixY - 10.0f) > local_170.y) {
                         local_170.y = matrixY;
                     }
                 } else {
@@ -234,20 +230,20 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     ownerZ = owner->m_worldPosition.z;
                     ownerX = owner->m_worldPosition.x;
                     secondRayDirection.x = kPppConformBgNormalZero;
-                    secondRayDirection.y = kPppConformBgNormalDownRayY;
+                    secondRayDirection.y = -2000.0f;
                     secondRayDirection.z = kPppConformBgNormalZero;
 
-                    secondCylinder.m_top.z = kPppConformBgNormalCylinderRadius;
-                    secondCylinder.m_top.y = kPppConformBgNormalCylinderRadius;
-                    secondCylinder.m_top.x = kPppConformBgNormalCylinderRadius;
-                    secondCylinder.m_direction2.z = kPppConformBgNormalCylinderHeight;
-                    secondCylinder.m_direction2.y = kPppConformBgNormalCylinderHeight;
-                    secondCylinder.m_direction2.x = kPppConformBgNormalCylinderHeight;
+                    secondCylinder.m_top.z = 10000000000.0f;
+                    secondCylinder.m_top.y = 10000000000.0f;
+                    secondCylinder.m_top.x = 10000000000.0f;
+                    secondCylinder.m_direction2.z = -10000000000.0f;
+                    secondCylinder.m_direction2.y = -10000000000.0f;
+                    secondCylinder.m_direction2.x = -10000000000.0f;
                     secondCylinder.m_bottom.x = ownerX;
                     secondCylinder.m_bottom.y = ownerY;
                     secondCylinder.m_bottom.z = ownerZ;
                     secondCylinder.m_direction.x = kPppConformBgNormalZero;
-                    secondCylinder.m_direction.y = kPppConformBgNormalDownRayY;
+                    secondCylinder.m_direction.y = -2000.0f;
                     secondCylinder.m_direction.z = kPppConformBgNormalZero;
                     secondCylinder.m_radius = kPppConformBgNormalZero;
 

@@ -1638,8 +1638,16 @@ void CMenuPcs::CmakeNameDraw()
     short table = *reinterpret_cast<short*>(state + 0x2A);
     char* name = GetCmakeNameBuffer();
     float alpha = CalcCmakeFadeAlpha(this);
-    float previewAlpha = ((mode == 2) && (resultDir < 0)) ? FLOAT_80333258 : alpha;
-    float titleX = ((mode == 2) && (resultDir > 0)) ? FLOAT_80333258 : 0.0f;
+    float previewAlpha = alpha;
+    float titleX = FLOAT_80333258;
+    float titleAlpha = alpha;
+    if (((DAT_8032ef10 == 2) && (mode == 0)) || ((mode == 2) && (resultDir > 0))) {
+        previewAlpha = FLOAT_80333258;
+    }
+    if ((mode == 2) && (resultDir > 0)) {
+        titleX = alpha;
+        titleAlpha = FLOAT_80333258;
+    }
 
     if (table < 0) {
         table = 0;
@@ -1711,7 +1719,7 @@ void CMenuPcs::CmakeNameDraw()
         DrawInit__8CMenuPcsFv(this);
     }
 
-    DrawCmakeTitle(1, titleX, alpha);
+    DrawCmakeTitle(1, titleX, titleAlpha);
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);

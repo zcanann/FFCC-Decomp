@@ -178,16 +178,17 @@ void calc(
 	VRyjMegaBirth* work, PRyjMegaBirth* param, _PARTICLE_DATA* particle, VColor* vColor,
 	_PARTICLE_COLOR* colorData)
 {
-	u32 alpha;
+	int alpha;
 	u8* paramPayload;
 	u8* particlePayload;
+	u8 frameCount;
 	Vec step;
 
 	alpha = vColor->m_alpha;
 	paramPayload = (u8*)param;
 	particlePayload = (u8*)particle;
 
-	if (colorData != 0)
+	if (colorData != NULL)
 	{
 		colorData->m_color[0] = colorData->m_color[0] + colorData->m_colorFrameDeltas[0];
 		colorData->m_color[1] = colorData->m_color[1] + colorData->m_colorFrameDeltas[1];
@@ -197,7 +198,7 @@ void calc(
 		colorData->m_colorFrameDeltas[1] = colorData->m_colorFrameDeltas[1] + *f32_at(paramPayload, 0x40);
 		colorData->m_colorFrameDeltas[2] = colorData->m_colorFrameDeltas[2] + *f32_at(paramPayload, 0x44);
 		colorData->m_colorFrameDeltas[3] = colorData->m_colorFrameDeltas[3] + *f32_at(paramPayload, 0x48);
-		alpha = alpha + (u32)(s32)colorData->m_color[3];
+		alpha = (int)vColor->m_alpha + (int)colorData->m_color[3];
 		if (alpha > 0xFF)
 		{
 			alpha = 0xFF;
@@ -270,18 +271,17 @@ void calc(
 	}
 
 	*u8_at(particlePayload, 0x58) = *u8_at(particlePayload, 0x58) + 1;
-	if ((*u8_at(particlePayload, 0x59) != 0) &&
-	    (*u8_at(particlePayload, 0x58) <= *u8_at(particlePayload, 0x59)))
+	frameCount = *u8_at(particlePayload, 0x59);
+	if ((frameCount != '\0') && ((int)(unsigned int)*u8_at(particlePayload, 0x58) <= (int)frameCount))
 	{
-		*f32_at(particlePayload, 0x54) =
-			*f32_at(particlePayload, 0x54) - ((float)alpha / (float)*u8_at(particlePayload, 0x59));
+		*f32_at(particlePayload, 0x54) = *f32_at(particlePayload, 0x54) - (float)alpha / (float)(int)frameCount;
 	}
 
-	if ((*u8_at(particlePayload, 0x5A) != 0) &&
-	    (*u16_at(particlePayload, 0x22) <= *u8_at(particlePayload, 0x5A)))
+	frameCount = *u8_at(particlePayload, 0x5A);
+	if ((frameCount != '\0') && ((int)*s16_at(particlePayload, 0x22) <= (int)frameCount))
 	{
 		*f32_at(particlePayload, 0x54) =
-			*f32_at(particlePayload, 0x54) + ((float)alpha / (float)paramPayload[0x29]);
+			*f32_at(particlePayload, 0x54) + (float)alpha / (float)(unsigned int)paramPayload[0x29];
 	}
 }
 

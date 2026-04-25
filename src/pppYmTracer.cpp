@@ -320,7 +320,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             f64 stepScale = FLOAT_803306ec / (f32)(param_2->m_payload[9] + 1);
 
             for (i = 0; i < (s32)(u32)param_2->m_payload[9]; i++) {
-                f32 t = (f32)(stepScale * (f64)(i + 1));
+                f32 t = stepScale * (f32)(i + 1);
 
                 gUtil.GetSplinePos(splineFrom[(param_2->m_payload[9] - 1) - i], entries[3].to, entries[2].to,
                                           entries[1].to, entries[0].from, t, FLOAT_803306ec);

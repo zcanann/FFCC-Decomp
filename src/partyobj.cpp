@@ -7,8 +7,10 @@
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_menu.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_minigame.h"
+#include "ffcc/ringmenu.h"
 #include "ffcc/sound.h"
 #include "ffcc/itemobj.h"
 
@@ -20,6 +22,8 @@ extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, C
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	void*, void*, int, int, int, void*, void*);
 extern "C" int CanCreateFromScript__9CGItemObjFv();
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
@@ -142,6 +146,30 @@ static int getPadConnectedForSlot(int slot)
 
 	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
 	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x54 + idx * 0x54);
+}
+
+static bool isMenuPcsCommandBusy()
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x740) != 0;
+}
+
+static CRingMenu* getBattleRingMenuForPort(int port)
+{
+	return *reinterpret_cast<CRingMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x13C + port * 4);
+}
+
+static int getPartyJoybusPort(CGPartyObj* self)
+{
+	return static_cast<int>(reinterpret_cast<unsigned char*>(self->m_scriptHandle)[0xED]);
+}
+
+static unsigned short getItemKindFromCfd(int itemId)
+{
+	if (itemId <= 0 || Game.unkCFlatData0[2] == 0) {
+		return 0;
+	}
+
+	return *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
 }
 
 static float getPadAxisForSlot(int slot, int offset)
@@ -629,47 +657,319 @@ void CGPartyObj::command()
 	if (m_scriptHandle == nullptr) {
 		return;
 	}
+	if (isMenuPcsCommandBusy()) {
+		return;
+	}
 
-	canPlayerGoMenu();
-	shouki();
+	PartyObjOverlay& party = PartyData(this);
+	CCaravanWork* caravan = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+	const int padSlot = static_cast<unsigned char>(m_animStateMisc);
+	const unsigned short trig = getPadTrigForSlot(padSlot);
+	const unsigned short held = getPadHeldForSlot(padSlot);
+	bool primaryAvailable = false;
+	bool secondaryAvailable = false;
+	int primaryCommand = -1;
+	int secondaryCommand = -1;
+	int ringCommand = -1;
+	int ringCommandArg = -1;
 
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	int mode = *reinterpret_cast<short*>(self + 0x6F4);
-	CGObject* target = *reinterpret_cast<CGObject**>(self + 0x6E4);
-	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
-	unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+	if ((reinterpret_cast<short*>(m_scriptHandle)[7] != 0) &&
+	    ((party.commandFlags & 1) != 0) &&
+	    Joybus.GetCtrlMode(padSlot) != 1) {
+		int cmdDir = 0;
 
-	if ((trig & 0x20) != 0) {
-		mode--;
-		if (mode < 0) {
-			mode = 5;
+		if ((held & 0x60) == 0x60) {
+			caravan->IsUseCmdList(0);
+		} else if ((trig & 0x20) != 0) {
+			cmdDir = 1;
+		} else if ((trig & 0x40) != 0) {
+			cmdDir = -1;
+		}
+
+		if (cmdDir != 0) {
+			Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
+			const int curCmd = caravan->GetIdxCmdList();
+			caravan->IsUseCmdList(caravan->GetNextCmdListIdx(curCmd, cmdDir));
+		}
+
+		const int cmdIdx = caravan->GetIdxCmdList();
+		if (cmdIdx == 0) {
+			ringCommand = 1;
+		} else if (cmdIdx == 1) {
+			ringCommand = 9;
+		} else {
+			const int itemId = caravan->DelCmdListAndItem(cmdIdx, 0);
+			const unsigned short itemKind = getItemKindFromCfd(itemId);
+			if (itemKind == 1 || itemKind == 0xDF || itemKind == 0x100 ||
+			    itemKind == 0x125 || itemKind == 0x17D || itemKind == 0x186 ||
+			    itemKind == 0x1F5) {
+				ringCommand = itemId | 0x8000;
+			}
+		}
+		ringCommandArg = caravan->GetIdxCmdList();
+	}
+
+	if (((static_cast<signed char>(m_weaponNodeFlags) < 0) &&
+	     (static_cast<signed char>(m_shieldAttachNodeIndex) < 0) &&
+	     (static_cast<signed char>(m_weaponNodeFlags >> 8) < 0)) &&
+	    Joybus.GetCtrlMode(padSlot) != 1) {
+		if (caravan->m_hp == 0) {
+			primaryAvailable = true;
+			primaryCommand = 0x1B;
+		} else if (party.secondaryTarget != nullptr) {
+			primaryAvailable = true;
+			primaryCommand = 0x0C;
+		}
+
+		CGObject* target = party.target;
+		if (target != nullptr) {
+			const int targetState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(target) + 0x500);
+			const bool alreadyCarried =
+				*reinterpret_cast<CGPartyObj**>(reinterpret_cast<unsigned char*>(target) + 0x550) != nullptr;
+
+			if (!alreadyCarried) {
+				if (targetState == 0x0B || targetState == 0x0C || targetState == 0x0D ||
+				    targetState == 0x0E || targetState == 0x12 || targetState == 0x13 ||
+				    targetState == 0x14 || targetState == 0x15 || targetState == 0x16 ||
+				    targetState == 0x17 || targetState == 0x18 || targetState == 0x1C ||
+				    targetState == 0x1D || targetState == 0x1E || targetState == 0x1F ||
+				    targetState == 0x20 || targetState == 0x21 || targetState == 0x24) {
+					secondaryAvailable = true;
+					secondaryCommand = 0x17;
+				} else if (targetState == 0xC8) {
+					if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&CFlat) + 0x12AC) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 0x0B;
+					} else {
+						primaryAvailable = true;
+						primaryCommand = 0x0B;
+					}
+				} else if (targetState == 0xC9) {
+					if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&CFlat) + 0x12AC) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 0x0A;
+					} else {
+						primaryAvailable = true;
+						primaryCommand = 0x0A;
+					}
+				} else if (targetState == 0xCA) {
+					if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&CFlat) + 0x12AC) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 0x1C;
+					} else {
+						primaryAvailable = true;
+						primaryCommand = 0x1C;
+					}
+				} else if (targetState == 0xCC) {
+					secondaryAvailable = true;
+					secondaryCommand = 6;
+				} else {
+					secondaryAvailable = true;
+					secondaryCommand = 4;
+				}
+			}
+		}
+
+		if (party.carryObject != nullptr) {
+			const int carryState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.carryObject) + 0x500);
+			secondaryAvailable = true;
+			primaryAvailable = true;
+			primaryCommand = -1;
+			if (carryState == 0x0D) {
+				secondaryCommand = 7;
+			} else if (carryState == 0x0E) {
+				secondaryCommand = 8;
+			} else {
+				secondaryCommand = 5;
+			}
+		}
+
+		if ((party.commandFlags & 2) != 0) {
+			secondaryAvailable = false;
+			primaryAvailable = true;
+			primaryCommand = 0x1A;
+		}
+		if ((party.commandFlags & 4) != 0) {
+			secondaryAvailable = false;
+			primaryAvailable = true;
+			primaryCommand = 0x1D;
+		}
+		if ((party.commandFlags & 8) != 0) {
+			secondaryAvailable = true;
+			secondaryCommand = 0x1A;
+			primaryAvailable = false;
+			int cmdDir = 0;
+			if ((trig & 0x20) != 0) {
+				cmdDir = 1;
+			} else if ((trig & 0x40) != 0) {
+				cmdDir = -1;
+			}
+			if (cmdDir != 0) {
+				Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
+				int& charaCommand = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
+				charaCommand += cmdDir;
+				if (charaCommand < 0) {
+					charaCommand += 5;
+				} else if (charaCommand > 4) {
+					charaCommand -= 5;
+				}
+			}
+			const int charaCommand = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
+			ringCommand = charaCommand + 0x1E;
+			ringCommandArg = charaCommand;
 		}
 	}
-	if ((trig & 0x40) != 0) {
-		mode++;
-		if (mode > 5) {
-			mode = 0;
+
+	CRingMenu* ring = getBattleRingMenuForPort(getPartyJoybusPort(this));
+	if (ring != nullptr) {
+		ring->SetBattleCommand(0, primaryCommand, -1);
+		ring->SetBattleCommand(1, secondaryCommand, -1);
+		ring->SetBattleCommand(2, ringCommand, ringCommandArg);
+	}
+
+	if (Game.m_gameWork.m_menuStageMode != 0 &&
+	    Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0) {
+		return;
+	}
+
+	if ((trig & 0x100) != 0) {
+		if (primaryAvailable) {
+			if (primaryCommand == 0x1B) {
+				changeStat(0x20, 0, 0);
+			}
+
+			CGObject* scriptTarget = party.secondaryTarget != nullptr ?
+				reinterpret_cast<CGObject*>(party.secondaryTarget) : party.target;
+			party.commandFlags |= 0x80;
+
+			int stack[2];
+			stack[0] = primaryCommand;
+			stack[1] = scriptTarget != nullptr ?
+				*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptTarget) + 0x30) : 0;
+			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+				&CFlat, this, 2, 0x14, 2, stack, static_cast<void*>(0));
+			return;
+		}
+
+		if ((static_cast<signed char>(m_weaponNodeFlags >> 8) >= 0) ||
+		    (static_cast<signed char>(m_shieldAttachNodeIndex) >= 0) ||
+		    caravan->m_hp == 0 ||
+		    ringCommand == -1 ||
+		    ((party.commandFlags & 8) != 0)) {
+			return;
+		}
+
+		const int cmdIdx = caravan->GetIdxCmdList();
+		party.unk6EC = cmdIdx;
+		if (cmdIdx == 0) {
+			int weaponItem = 0;
+			int weaponRef = 0;
+			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
+			if (weaponItem == cmdIdx) {
+				const int equippedWeapon =
+					caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
+				if (weaponRef == equippedWeapon) {
+					m_itemId = weaponRef;
+					changeStat(7, 0, 0);
+					return;
+				}
+			}
+
+			party.pendingWeaponItem = cmdIdx;
+			party.weaponItem = caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
+			party.commandFlags = (party.commandFlags & 0xDF) | 0x20;
+			changeStat(0x0F, 0, 0);
+			return;
+		}
+
+		if (cmdIdx == 1) {
+			const unsigned short element = reinterpret_cast<unsigned short*>(m_scriptHandle)[0xF8];
+			if (element == 2) {
+				changeStat(0x14, 0, 0);
+			} else if (element < 2) {
+				changeStat(8, 0, 0);
+			} else if (element < 4) {
+				changeStat(0x15, 0, 0);
+			}
+			return;
+		}
+
+		const int itemId = caravan->DelCmdListAndItem(cmdIdx, 0);
+		const unsigned short itemKind = getItemKindFromCfd(itemId);
+		if (itemKind == 1) {
+			int weaponItem = 0;
+			int weaponRef = 0;
+			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
+			if (weaponItem == cmdIdx && weaponRef == itemId) {
+				m_itemId = itemId;
+				changeStat(7, 0, 0);
+				return;
+			}
+			party.pendingWeaponItem = cmdIdx;
+			party.weaponItem = itemId;
+			party.commandFlags = (party.commandFlags & 0xDF) | 0x20;
+			changeStat(0x0F, 0, 0);
+			return;
+		}
+
+		if (itemKind == 0x125) {
+			m_itemId = 0x220;
+			changeStat(2, 0, 2);
+			return;
+		}
+		if (itemKind == 0xDF || itemKind == 0x100) {
+			m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 10);
+			changeStat(2, 0, 0);
+			return;
+		}
+		if (itemKind == 0x17D || itemKind == 0x186) {
+			if (useItem(itemId), canPlayerUseItem() != 0) {
+				caravan->GetNumCombi(party.unk6EC, 1);
+			}
+			return;
+		}
+		if (itemKind == 0x1F5) {
+			m_itemId = itemId;
+			changeStat(2, 0, 0);
+			return;
 		}
 	}
 
-	if ((trig & 0x100) != 0 && m_lastStateId == 0) {
-		mode = 1;
-	}
-	if ((trig & 0x80) != 0 && m_lastStateId == 0) {
-		mode = 4;
+	if ((trig & 0x200) == 0 || !secondaryAvailable) {
+		return;
 	}
 
-	if ((held & 0x200) != 0 && m_lastStateId == 0) {
-		mode = 0;
+	if ((static_cast<signed char>(m_weaponNodeFlags >> 8) < 0) &&
+	    (static_cast<signed char>(m_shieldAttachNodeIndex) < 0) &&
+	    caravan->m_hp != 0 &&
+	    ringCommand != -1 &&
+	    secondaryCommand == 6) {
+		int weaponItem = 0;
+		int weaponRef = 0;
+		caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
+		m_itemId = weaponRef;
+		changeStat(1, 0, 0);
+		commandFinished();
+		return;
 	}
 
-	if (*reinterpret_cast<CGObject**>(self + 0x6E8) != nullptr) {
-		target = *reinterpret_cast<CGObject**>(self + 0x6E8);
-		mode = 0;
+	if (secondaryCommand == 4) {
+		carry(0, party.target, 0);
+		commandFinished();
+		return;
 	}
 
-	*reinterpret_cast<short*>(self + 0x6F4) = static_cast<short>(mode);
-	callCommandScript(mode, target);
+	if ((secondaryCommand >= 2 && secondaryCommand <= 3) || secondaryCommand == 0x17) {
+		rotTarget(reinterpret_cast<CGPrgObj*>(party.target));
+		changeStat(0x0E, 0, 0);
+		*reinterpret_cast<CGPartyObj**>(reinterpret_cast<unsigned char*>(party.target) + 0x550) = this;
+		reinterpret_cast<CGPrgObj*>(party.target)->changeStat(0x0E, 0, 0);
+		commandFinished();
+		return;
+	}
+
+	callCommandScript(secondaryCommand, party.target);
+	commandFinished();
 }
 
 /*

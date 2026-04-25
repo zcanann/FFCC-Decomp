@@ -2,10 +2,11 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_constants.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "types.h"
 #include "dolphin/mtx.h"
 
+extern CGame Game;
 extern double DOUBLE_80330E30;
 
 struct pppYmMoveParabolaWork {

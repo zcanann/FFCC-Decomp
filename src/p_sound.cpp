@@ -28,6 +28,18 @@ unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
     1
 };
 
+extern "C" void* CSoundPcs_RTTI_parent__8CManager[];
+extern "C" void* CSoundPcs_RTTI_parent__8CProcess[];
+extern "C" void* __RTTI__9CSoundPcs[];
+extern "C" void* CSoundPcs_RTTI_base__9CSoundPcs[] = {CSoundPcs_RTTI_parent__8CManager, 0, 0};
+extern "C" void* CSoundPcs_RTTI__9CSoundPcs[] = {
+    CSoundPcs_RTTI_parent__8CManager,
+    0,
+    CSoundPcs_RTTI_parent__8CProcess,
+    0,
+    0,
+};
+
 CSoundPcs SoundPcs;
 
 /*

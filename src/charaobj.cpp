@@ -2549,7 +2549,7 @@ void CGCharaObj::onChangePrg(int arg)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::calcCastTime(int)
+void CGCharaObj::calcCastTime(int itemId)
 {
 	m_castTimeTick += 1;
 
@@ -2572,7 +2572,6 @@ void CGCharaObj::calcCastTime(int)
 		return;
 	}
 
-	int itemId = m_itemId;
 	int itemOffset = itemId * 0x48;
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemOffset;
 	unsigned short itemNo = *reinterpret_cast<unsigned short*>(itemData + 0x0);

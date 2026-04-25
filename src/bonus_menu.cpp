@@ -22,6 +22,7 @@ extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" unsigned short GetButtonDown__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, short, short*, short*, int);
+extern "C" void GetWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, short*, short*, int);
 extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
@@ -2794,9 +2795,9 @@ void CMenuPcs::CalcSelectWait()
 		} else if ((down & 0x200) != 0) {
 			short winW = 0;
 			short winH = 0;
-			GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
+			GetWinSize__8CMenuPcsFiPsPsi(this, 0x18, &winW, &winH, 1);
 			SetMcWinInfo__8CMenuPcsFii(this, (int)winW, (int)winH);
-			promptMode = 1;
+			promptMode = 0;
 			confirmSel = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
 		}
@@ -2806,16 +2807,10 @@ void CMenuPcs::CalcSelectWait()
 			confirmSel = (short)(confirmSel ^ 1);
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else if ((down & 0x100) != 0) {
-			if (confirmSel == 0) {
-				promptMode = 2;
-				delay = 10;
-				Sound.PlaySe(2, 0x40, 0x7f, 0);
-			} else {
-				promptMode = 3;
-				Sound.PlaySe(3, 0x40, 0x7f, 0);
-			}
+			promptMode = 2;
+			Sound.PlaySe(2, 0x40, 0x7f, 0);
 		} else if ((down & 0x200) != 0) {
-			promptMode = 3;
+			promptMode = 2;
 			confirmSel = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
 		}

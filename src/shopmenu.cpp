@@ -2889,9 +2889,13 @@ void CShopMenu::DrawItemInfo0()
 
     if (itemNo > 0) {
         SetMargin__5CFontFf(FLOAT_80332d28, font);
+        char* itemName = 0;
+        if (itemNo >= 1) {
+            itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[itemNo * 5 + 4]);
+        }
         DrawInit__5CFontFv(font);
         DrawShadowFont__8CMenuPcsFP5CFontPcffii(
-            MenuPcsVoid(), font, const_cast<char*>(GetItemName(itemNo)), FLOAT_80332d54, FLOAT_80332d58, 0x18, 0x12);
+            MenuPcsVoid(), font, itemName, FLOAT_80332d54, FLOAT_80332d58, 0x18, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
         SetMargin__5CFontFf(FLOAT_80332d28, font);
     }

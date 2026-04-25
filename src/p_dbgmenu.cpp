@@ -587,7 +587,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 		const u32* borderColors = gDbgMenuWindowBorderColors;
 		u32 vertexIndex = 0;
 
-		GXBegin(GX_QUADS, GX_VTXFMT1, 4);
+		GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT1, 4);
 
 		for (int i = 0; i < 2; i++) {
 			u32 row = vertexIndex >> 1;
@@ -608,7 +608,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 
 	u32 fillColorIndex = (flags >> 1) & 1;
 
-	GXBegin(GX_TRIANGLES, GX_VTXFMT1, 3);
+	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
 	GXPosition3f32((float)(x + width), (float)y, 0.0f);
 	GXColor1u32(gDbgMenuWindowFillColors[fillColorIndex]);
 	GXPosition3f32((float)x, (float)y, 0.0f);
@@ -616,7 +616,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 	GXPosition3f32((float)x, (float)(y + height), 0.0f);
 	GXColor1u32(gDbgMenuWindowFillColors[fillColorIndex]);
 
-	GXBegin(GX_TRIANGLES, GX_VTXFMT1, 3);
+	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
 	GXPosition3f32((float)(x + width), (float)y, 0.0f);
 	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
 	GXPosition3f32((float)(x + width), (float)(y + height), 0.0f);
@@ -636,7 +636,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 		highlightColor.g = alpha;
 		highlightColor.b = alpha;
 
-		GXBegin(GX_QUADS, GX_VTXFMT1, 5);
+		GXBegin(GX_LINESTRIP, GX_VTXFMT1, 5);
 		GXPosition3f32((float)(x + width + 1), (float)(y - 1), 0.0f);
 		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
 		GXPosition3f32((float)(x - 1), (float)(y - 1), 0.0f);

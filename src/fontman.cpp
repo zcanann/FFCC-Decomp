@@ -24,6 +24,21 @@ CFontMan FontMan;
 
 namespace {
 typedef void (*VirtualDtorFn)(void*, int);
+
+struct CFontRenderFlagBits
+{
+	unsigned char shadow : 1;
+	unsigned char zCompare : 1;
+	unsigned char zUpdate : 1;
+	unsigned char snapPosition : 1;
+	unsigned char fixedWidth : 1;
+	unsigned char pad : 3;
+};
+
+static CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
+{
+	return reinterpret_cast<CFontRenderFlagBits&>(flags);
+}
 }
 
 /*
@@ -479,7 +494,8 @@ void CFont::SetColor(_GXColor color)
  */
 void CFont::SetShadow(int enabled)
 {
-	renderFlags = (renderFlags & 0x7F) | (enabled << 7);
+	signed char shadow = static_cast<signed char>(enabled);
+	GetRenderFlagBits(renderFlags).shadow = shadow;
 }
 
 /*
@@ -550,8 +566,11 @@ void CFont::SetMargin(float value)
  */
 void CFont::SetZMode(int compareEnable, int updateEnable)
 {
-	renderFlags = (compareEnable << 6 & 0x40) | (renderFlags & 0xBF);
-	renderFlags = (updateEnable << 5 & 0x20) | (renderFlags & 0xDF);
+	signed char compare = static_cast<signed char>(compareEnable);
+	signed char update = static_cast<signed char>(updateEnable);
+	CFontRenderFlagBits& bits = GetRenderFlagBits(renderFlags);
+	bits.zCompare = compare;
+	bits.zUpdate = update;
 }
 
 /*

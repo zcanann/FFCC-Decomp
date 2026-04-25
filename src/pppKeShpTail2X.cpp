@@ -5,6 +5,7 @@
 extern "C" {
 extern const float kPppKeShpTail2XZero;
 extern const float kPppKeShpTail2XAlphaScale;
+extern const float FLOAT_80330508;
 extern int gPppCalcDisabled;
 }
 #include <dolphin/gx.h>
@@ -190,10 +191,10 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
         colorStepB = (colorB - (float)step->m_colorEndB) / invCountMinusOne;
         colorStepA = (colorA - colorEndA) / invCountMinusOne;
     } else {
-        colorStepR = zero;
-        colorStepG = zero;
-        colorStepB = zero;
-        colorStepA = zero;
+        colorStepR = FLOAT_80330508;
+        colorStepG = FLOAT_80330508;
+        colorStepB = FLOAT_80330508;
+        colorStepA = FLOAT_80330508;
     }
 
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);

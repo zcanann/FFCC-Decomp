@@ -23,9 +23,6 @@ extern const float FLOAT_80330FD4;
 extern const float FLOAT_80330FD8;
 extern const double DOUBLE_80330FE0;
 extern const double DOUBLE_80330FE8;
-extern const double DOUBLE_80330FF0;
-extern const float FLOAT_80330FF8;
-extern const double DOUBLE_80331000;
 extern const float FLOAT_80331008;
 extern const float FLOAT_8033100C;
 extern const float FLOAT_80331010;
@@ -37,6 +34,9 @@ extern const float FLOAT_80331010;
 #define CRYSTAL_SCENE_FOVY 33.3f
 #define CRYSTAL_ASPECT 1.3333334f
 #define CRYSTAL_HALF 0.5f
+static const double s_crystalMagnitudeMin = 0.0;
+static const float s_crystalMagnitudeMax = 1.0f;
+static const double s_crystalMagnitudeMod = 0.2;
 extern int __float_nan[];
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" double fmod(double, double);
@@ -312,17 +312,17 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 						float magnitude = xCoord * xCoord + ySq;
 						if (magnitude > FLOAT_80330FD8) {
 							magnitude = CrystalSqrtPositive(magnitude);
-						} else if ((double)magnitude < DOUBLE_80330FF0) {
+						} else if ((double)magnitude < s_crystalMagnitudeMin) {
 							magnitude = *(float*)__float_nan;
 						} else if (CrystalFpClassify(magnitude) == 1) {
 							magnitude = *(float*)__float_nan;
 						}
 
-						if (magnitude > FLOAT_80330FF8) {
-							magnitude = FLOAT_80330FF8;
+						if (magnitude > s_crystalMagnitudeMax) {
+							magnitude = s_crystalMagnitudeMax;
 						}
 
-						double modulation = fmod(magnitude, DOUBLE_80331000);
+						double modulation = fmod(magnitude, s_crystalMagnitudeMod);
 						magnitude = FLOAT_80331008 * (magnitude * (float)modulation);
 						u32 xFine = x & 3;
 						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80331010 + FLOAT_8033100C));

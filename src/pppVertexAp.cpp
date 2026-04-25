@@ -153,7 +153,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
             }
             goto setCountdown;
         case 1:
-            goto mode1Init;
+            goto mode1Dispatch;
         mode1Init:
             goto mode1Test;
         mode1Body: {
@@ -214,10 +214,8 @@ exitStub:
     goto functionEnd;
 mode0Dispatch:
     goto mode0Test;
-keepMode1Dispatch:
-    goto mode1Dispatch;
 mode1Dispatch:
-    goto mode1Init;
+    goto mode1Test;
 functionEnd:
     ;
 }

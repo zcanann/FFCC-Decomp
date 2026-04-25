@@ -2927,7 +2927,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		*(short*)(statePtr + 0x22) = 0;
 		header->finished = 0;
-		if (header->count > 0 && sprites[header->count - 1].kind == 0x20) {
+		if (header->count > 0) {
 			header->count = (short)(header->count - 1);
 		}
 		PrepareSelectCloseSprites(header, sprites);

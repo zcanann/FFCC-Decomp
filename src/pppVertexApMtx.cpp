@@ -180,8 +180,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 				maxValueBits.u[1] = (u32)(int)entry->maxValue ^ 0x80000000;
 				f32 maxValue = (f32)(maxValueBits.d - kPppYmSharedDoubleBias);
 				int outValue = (int)(randValue * maxValue);
-				u16* vertexIndices = entry->vertexIndices;
-				u16 vertexIndex = vertexIndices[outValue];
+				u16 vertexIndex = entry->vertexIndices[outValue];
 				Vec* vertex = &points[vertexIndex];
 				f32 x = vertex->x;
 				f32 y = vertex->y;

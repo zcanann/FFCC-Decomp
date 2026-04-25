@@ -79,16 +79,21 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
                    Mtx* particleWmat, _PARTICLE_COLOR* particleColor)
 {
     unsigned char* breath = (unsigned char*)pYmBreath;
-    unsigned char* particle = (unsigned char*)particleData;
+    Vec* particle = reinterpret_cast<Vec*>(particleData);
     pppIVECTOR4 angle;
     pppFMATRIX rotMtx;
     Vec baseDir;
-    Vec normDir;
+    float normX;
+    float normY;
+    float normZ;
     float spread;
+    float range;
     unsigned char flags;
 
     spread = (float)(unsigned int)*(unsigned char*)(breath + 0x28);
-    memset(particle + 0x30, 0, 0x60);
+    range = spread + spread;
+
+    memset(particleData, 0, 0x60);
     if (particleWmat != NULL) {
         memset(particleWmat, 0, 0x30);
     }
@@ -100,131 +105,128 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     baseDir.y = 0.0f;
     baseDir.z = -1.0f;
 
-    angle.x = (short)((spread + spread) * Math.RandF() - spread);
-    angle.y = (short)((spread + spread) * Math.RandF() - spread);
-    angle.z = (short)((spread + spread) * Math.RandF() - spread);
+    angle.x = (short)(range * Math.RandF() - spread);
+    angle.y = (short)(range * Math.RandF() - spread);
+    angle.z = (short)(range * Math.RandF() - spread);
     angle.w = 0;
 
     pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
-    PSMTXMultVecSR(rotMtx.value, &baseDir, (Vec*)(particle + 0x3C));
+    PSMTXMultVecSR(rotMtx.value, &baseDir, &particle[1]);
 
-    *(float*)(particle + 0x3C) *= *(float*)(breath + 0xB0);
-    *(float*)(particle + 0x40) *= *(float*)(breath + 0xB4);
-    *(float*)(particle + 0x44) *= *(float*)(breath + 0xB8);
+    particle[1].x *= *(float*)(breath + 0xB0);
+    particle[1].y *= *(float*)(breath + 0xB4);
+    particle[1].z *= *(float*)(breath + 0xB8);
 
-    normDir.x = *(float*)(particle + 0x3C);
-    normDir.y = *(float*)(particle + 0x40);
-    normDir.z = *(float*)(particle + 0x44);
-    pppNormalize__FR3Vec3Vec((float*)(particle + 0x3C), &normDir);
+    normX = particle[1].x;
+    normY = particle[1].y;
+    normZ = particle[1].z;
+    pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&particle[1]), reinterpret_cast<Vec*>(&normX));
 
     if (*(float*)(breath + 0xAC) != 0.0f) {
-        PSVECScale((Vec*)(particle + 0x3C), (Vec*)(particle + 0x30), *(float*)(breath + 0xAC));
+        PSVECScale(&particle[1], &particle[0], *(float*)(breath + 0xAC));
     }
 
-    if (*(char*)(breath + 0x26) != 0) {
-        *(float*)(particle + 0x7C) = (float)(unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
-        *(char*)(particle + 0x54) = *(char*)(breath + 0x26);
+    if (*(char*)(breath + 0x26) != '\0') {
+        particle[6].y = (float)(unsigned int)vColor->m_alpha;
+        *(char*)&particle[3].x = *(char*)(breath + 0x26);
     }
-    if (*(char*)(breath + 0x27) != 0) {
-        *(char*)(particle + 0x55) = *(char*)(breath + 0x27);
+    if (*(char*)(breath + 0x27) != '\0') {
+        *(char*)((unsigned char*)&particle[3].x + 1) = *(char*)(breath + 0x27);
     }
 
-    *(float*)(particle + 0x58) = *(float*)(breath + 0x90);
-    *(float*)(particle + 0x5C) = *(float*)(breath + 0x94);
+    particle[3].y = *(float*)(breath + 0x90);
+    particle[3].z = *(float*)(breath + 0x94);
 
-    if (*(char*)(breath + 0xC2) != 0) {
-        *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * Math.RandF();
+    if (*(char*)(breath + 0xC2) != '\0') {
+        particle[4].x = *(float*)(breath + 0x9C) * Math.RandF();
         flags = *(unsigned char*)(breath + 0xC2);
-
         if (((flags & 1) != 0) && ((flags & 2) != 0)) {
             if (Math.RandF() > 0.5f) {
-                *(float*)(particle + 0x60) = -*(float*)(particle + 0x60);
+                particle[4].x *= -1.0f;
             }
         } else if ((flags & 2) != 0) {
-            *(float*)(particle + 0x60) = -*(float*)(particle + 0x60);
+            particle[4].x *= -1.0f;
         }
     }
 
     if ((*(unsigned char*)(breath + 0xC2) & 4) != 0) {
-        *(float*)(particle + 0x58) += *(float*)(particle + 0x60);
+        particle[3].y += particle[4].x;
     }
     if ((*(unsigned char*)(breath + 0xC2) & 8) != 0) {
-        *(float*)(particle + 0x5C) += *(float*)(particle + 0x60);
+        particle[3].z += particle[4].x;
     }
 
-    while (*(float*)(particle + 0x58) >= 6.2831855f) {
-        *(float*)(particle + 0x58) -= 6.2831855f;
+    while (particle[3].y >= 6.2831855f) {
+        particle[3].y -= 6.2831855f;
     }
-    while (*(float*)(particle + 0x58) < 0.0f) {
-        *(float*)(particle + 0x58) += 6.2831855f;
+    while (particle[3].y < 0.0f) {
+        particle[3].y += 6.2831855f;
     }
 
-    *(float*)(particle + 0x64) = *(float*)(breath + 0x50);
-    *(float*)(particle + 0x68) = *(float*)(breath + 0x54);
-    *(float*)(particle + 0x6C) = *(float*)(breath + 0x60);
-    *(float*)(particle + 0x70) = *(float*)(breath + 0x64);
+    particle[4].y = *(float*)(breath + 0x50);
+    particle[4].z = *(float*)(breath + 0x54);
+    particle[5].x = *(float*)(breath + 0x60);
+    particle[5].y = *(float*)(breath + 0x64);
 
     if (*(unsigned char*)(breath + 0xC1) != 0) {
         flags = *(unsigned char*)(breath + 0xC1);
         if ((flags & 0x20) == 0) {
-            *(float*)(particle + 0x74) = *(float*)(breath + 0x80) * Math.RandF();
-            *(float*)(particle + 0x78) = *(float*)(breath + 0x84) * Math.RandF();
-
+            particle[5].z = *(float*)(breath + 0x80) * Math.RandF();
+            particle[6].x = *(float*)(breath + 0x84) * Math.RandF();
             if (((flags & 1) != 0) && ((flags & 2) != 0)) {
                 if (Math.RandF() > 0.5f) {
-                    *(float*)(particle + 0x74) = -*(float*)(particle + 0x74);
+                    particle[5].z *= -1.0f;
                 }
                 if (Math.RandF() > 0.5f) {
-                    *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
+                    particle[6].x *= -1.0f;
                 }
             } else if ((flags & 2) != 0) {
-                *(float*)(particle + 0x74) = -*(float*)(particle + 0x74);
-                *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
+                particle[5].z *= -1.0f;
+                particle[6].x *= -1.0f;
             }
         } else {
-            *(float*)(particle + 0x74) = *(float*)(breath + 0x80) * Math.RandF();
-            *(float*)(particle + 0x78) = *(float*)(particle + 0x74);
-
+            particle[5].z = *(float*)(breath + 0x80) * Math.RandF();
+            particle[6].x = particle[5].z;
             if (((flags & 1) != 0) && ((flags & 2) != 0)) {
                 if (Math.RandF() > 0.5f) {
-                    *(float*)(particle + 0x74) = -*(float*)(particle + 0x74);
-                    *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
+                    particle[5].z *= -1.0f;
+                    particle[6].x *= -1.0f;
                 }
             } else if ((flags & 2) != 0) {
-                *(float*)(particle + 0x74) = -*(float*)(particle + 0x74);
-                *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
+                particle[5].z *= -1.0f;
+                particle[6].x *= -1.0f;
             }
         }
     }
 
     if ((*(unsigned char*)(breath + 0xC1) & 4) != 0) {
-        *(float*)(particle + 0x64) += *(float*)(particle + 0x74);
-        *(float*)(particle + 0x68) += *(float*)(particle + 0x78);
+        particle[4].y += particle[5].z;
+        particle[4].z += particle[6].x;
     }
     if ((*(unsigned char*)(breath + 0xC1) & 8) != 0) {
-        *(float*)(particle + 0x6C) += *(float*)(particle + 0x74);
-        *(float*)(particle + 0x70) += *(float*)(particle + 0x78);
+        particle[5].x += particle[5].z;
+        particle[5].y += particle[6].x;
     }
 
-    *(float*)(particle + 0x80) = *(float*)(breath + 0x18);
+    particle[6].z = *(float*)(breath + 0x18);
     if (*(float*)(breath + 0xA8) != 0.0f) {
         spread = *(float*)(breath + 0xA8);
-        *(float*)(particle + 0x80) += (spread + spread) * Math.RandF() - spread;
+        particle[6].z += (spread + spread) * Math.RandF() - spread;
     }
 
     if (*(short*)(breath + 0x24) == 0) {
-        *(short*)(particle + 0x50) = -1;
+        *(short*)&particle[2].z = -1;
     } else {
-        *(short*)(particle + 0x50) = *(short*)(breath + 0x24);
+        *(short*)&particle[2].z = *(short*)(breath + 0x24);
     }
-    *(unsigned char*)(particle + 0x84) = 0;
+    *(unsigned char*)&particle[7].x = 0;
 
     PSMTXCopy(*(Mtx*)vYmBreath, *(Mtx*)particleWmat);
     if (particleColor != NULL) {
-        *(float*)((unsigned char*)particleColor + 0x10) = *(float*)(breath + 0x2C);
-        *(float*)((unsigned char*)particleColor + 0x14) = *(float*)(breath + 0x30);
-        *(float*)((unsigned char*)particleColor + 0x18) = *(float*)(breath + 0x34);
-        *(float*)((unsigned char*)particleColor + 0x1C) = *(float*)(breath + 0x38);
+        particleColor->m_colorFrameDeltas[0] = *(float*)(breath + 0x2C);
+        particleColor->m_colorFrameDeltas[1] = *(float*)(breath + 0x30);
+        particleColor->m_colorFrameDeltas[2] = *(float*)(breath + 0x34);
+        particleColor->m_colorFrameDeltas[3] = *(float*)(breath + 0x38);
     }
 }
 

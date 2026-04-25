@@ -2,7 +2,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/render_buffers.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 #include "ffcc/util.h"
@@ -11,6 +11,7 @@
 
 extern float FLOAT_80331928;
 extern float FLOAT_8033192c;
+extern CGame Game;
 static const float FLOAT_80331930 = -1000.0f;
 static const float FLOAT_80331934 = 1200.0f;
 static const float FLOAT_80331938 = 10.0f;

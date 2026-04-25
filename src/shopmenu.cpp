@@ -1609,18 +1609,27 @@ void CShopMenu::SelectFigure()
 
     buttons = GetShopMenuListButtons();
     if ((buttons & 8) != 0) {
-        int step = GetShopMenuFigureStep(this);
-        ShopMenuInt(this, 0x44) += step;
-        if (CanShopMenuIncreaseFigureQuantity(this, ShopMenuInt(this, 0x44))) {
-            Sound.PlaySe(1, 0x40, 0x7F, 0);
-            return;
-        }
+        int figureMode = ShopMenuInt(this, 0x38);
+        if (figureMode == 1) {
+            ShopMenuInt(this, 0x44) += 10;
+            if (CanShopMenuIncreaseFigureQuantity(this, ShopMenuInt(this, 0x44))) {
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
+                return;
+            }
 
-        if (step == 1) {
+            ShopMenuInt(this, 0x44) -= 10;
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
+        } else if ((figureMode < 1) && (figureMode >= 0)) {
+            ++ShopMenuInt(this, 0x44);
+            if (CanShopMenuIncreaseFigureQuantity(this, ShopMenuInt(this, 0x44))) {
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
+                return;
+            }
+
             gShopMenuInputLatch = 8;
+            --ShopMenuInt(this, 0x44);
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
         }
-        ShopMenuInt(this, 0x44) -= step;
-        Sound.PlaySe(4, 0x40, 0x7F, 0);
         return;
     }
 
@@ -1628,20 +1637,25 @@ void CShopMenu::SelectFigure()
         return;
     }
 
-    int step = GetShopMenuFigureStep(this);
-    ShopMenuInt(this, 0x44) -= step;
-    if (ShopMenuInt(this, 0x44) >= 1) {
-        Sound.PlaySe(1, 0x40, 0x7F, 0);
-        return;
+    int figureMode = ShopMenuInt(this, 0x38);
+    if (figureMode == 1) {
+        ShopMenuInt(this, 0x44) -= 10;
+        if (ShopMenuInt(this, 0x44) < 1) {
+            ShopMenuInt(this, 0x44) += 10;
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
+        } else {
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        }
+    } else if ((figureMode < 1) && (figureMode >= 0)) {
+        --ShopMenuInt(this, 0x44);
+        if (ShopMenuInt(this, 0x44) < 1) {
+            gShopMenuInputLatch = 4;
+            ShopMenuInt(this, 0x44) = 1;
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
+        } else {
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        }
     }
-
-    if (step == 1) {
-        gShopMenuInputLatch = 4;
-        ShopMenuInt(this, 0x44) = 1;
-    } else {
-        ShopMenuInt(this, 0x44) += step;
-    }
-    Sound.PlaySe(4, 0x40, 0x7F, 0);
 }
 
 /*

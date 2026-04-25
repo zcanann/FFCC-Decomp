@@ -744,7 +744,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     int workOffset;
     int colorOffset;
     unsigned char* work;
-    unsigned char* color;
+    VColor* color;
     unsigned char colorR;
     unsigned char colorG;
     unsigned char colorB;
@@ -762,7 +762,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset;
-    color = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset;
+    color = reinterpret_cast<VColor*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
     particleData = (float*)*(void**)(work + 0x30);
     matrixList = *(Mtx**)(work + 0x34);
     particleColor = (float*)*(void**)(work + 0x38);
@@ -781,10 +781,10 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                                                                step->m_payload[0xB5], step->m_payload[4], step->m_payload[0xB7],
                                                                step->m_payload[0xB8], 1, step->m_payload[0xB9]);
 
-    colorR = color[0];
-    colorG = color[1];
-    colorB = color[2];
-    colorA = color[3];
+    colorR = color->m_red;
+    colorG = color->m_green;
+    colorB = color->m_blue;
+    colorA = color->m_alpha;
 
     for (i = 0; i < groupCount; i++) {
         if (0 < *(short*)particleData) {

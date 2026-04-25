@@ -1621,6 +1621,11 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			}
 			break;
 		case 100:
+			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
+				setSta(0, 0);
+			}
+			break;
+		case 0x65:
 			if (Game.m_gameWork.m_gameOverFlag == 0) {
 				if (amount == 0x225) {
 					addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), 0);

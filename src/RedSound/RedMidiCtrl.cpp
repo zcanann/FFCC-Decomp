@@ -687,6 +687,7 @@ void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 4
 void __MidiCtrl_TempoDirect(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
     u8* command = (u8*)*(u32*)track;
@@ -696,6 +697,7 @@ void __MidiCtrl_TempoDirect(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDAT
     *(u32*)((u8*)control + 0x44C) = 0;
     *(u32*)((u8*)control + 0x450) = 0;
 }
+#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -1143,17 +1145,18 @@ void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command = (unsigned char*)*(int*)track;
-    int* trackData = (int*)track;
+    char* command = (char*)*(int*)track;
 
-    *trackData = (int)(command + 1);
-    trackData[0xd] = ((int)(char)*command) << 0xc;
-    trackData[0xe] = 0;
-    trackData[0xf] = 0;
+    *(int*)track = (int)(command + 1);
+    ((int*)track)[0xd] = ((int)*command) << 0xc;
+    ((int*)track)[0xe] = 0;
+    ((int*)track)[0xf] = 0;
     m_AChangeStatus |= 2;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

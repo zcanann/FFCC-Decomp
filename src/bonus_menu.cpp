@@ -1551,7 +1551,13 @@ void CMenuPcs::calcBonus()
 		}
 		break;
 	case 6:
-		ClrBattleItem();
+		for (int i = 0; i < 4; i++) {
+			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i]);
+			if (caravanWork != 0) {
+				caravanWork->SafeDeleteTempItem();
+				caravanWork->SortBeforeReturnWorldMap();
+			}
+		}
 		changeMode__8CMenuPcsFQ28CMenuPcs8MENUMODE(this, 0);
 		break;
 	default:

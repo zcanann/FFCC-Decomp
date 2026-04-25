@@ -1564,6 +1564,13 @@ def generate_objdiff_config(
             existing_config = json.load(r)
             existing_units = {unit["name"]: unit for unit in existing_config["units"]}
 
+    tracked_symbol_mappings: Dict[str, Dict[str, str]] = {}
+    if config.version is not None:
+        mappings_path = Path("config") / config.version / "objdiff_mappings.json"
+        if mappings_path.is_file():
+            with open(mappings_path, "r", encoding="utf-8") as r:
+                tracked_symbol_mappings = json.load(r)
+
     if config.ninja_path:
         ninja = str(config.ninja_path.absolute())
     else:
@@ -1655,8 +1662,13 @@ def generate_objdiff_config(
 
         # Preserve existing symbol mappings
         existing_unit = existing_units.get(name)
-        if existing_unit is not None:
-            unit_config["symbol_mappings"] = existing_unit.get("symbol_mappings")
+        merged_symbol_mappings: Dict[str, str] = {}
+        if existing_unit is not None and existing_unit.get("symbol_mappings"):
+            merged_symbol_mappings.update(existing_unit["symbol_mappings"])
+        if name in tracked_symbol_mappings:
+            merged_symbol_mappings.update(tracked_symbol_mappings[name])
+        if merged_symbol_mappings:
+            unit_config["symbol_mappings"] = merged_symbol_mappings
 
         obj = objects.get(obj_name)
         if obj is None:

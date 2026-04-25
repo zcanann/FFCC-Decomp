@@ -7,16 +7,16 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-char DAT_801e7e3e[] = "\x1B[7;34mSound\x1B[0m:";
+static const char sRedCommandLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
 extern char DAT_8021dcab;
-extern char DAT_80333d68;
-extern char DAT_80333d75;
-extern char DAT_80333d70;
-char s__sPause___SE___ON__d_801e7e50[] = "%sPause : SE     : ON  %d\n";
-char s__sPause___SE___OFF__d_801e7e6b[] = "%sPause : SE     : OFF %d\n";
-char s__s_sWave_is_not_Entry___wave_4_4_801e7e18[] = "%s%sWave is not Entry. (wave%4.4u)%s\n";
-char s__s_sMusic_Start___Couldn_t_Creat_801e7e86[] = "%s%sMusic Start : Couldn't Create Track.%s\n";
-char s__s_s___music_3_3u_bgm___need_0x__801e7eb2[] = "%s%s            : music%3.3u.bgm : need 0x%6.6X%s\n";
+extern const char DAT_80333d68;
+extern const char DAT_80333d75;
+extern const char DAT_80333d70;
+static const char s_redCommandSePauseOnFmt[] = "%sPause : SE     : ON  %d\n";
+static const char s_redCommandSePauseOffFmt[] = "%sPause : SE     : OFF %d\n";
+static const char s_redCommandWaveNotEntryFmt[] = "%s%sWave is not Entry. (wave%4.4u)%s\n";
+static const char s_redCommandMusicTrackCreateErrorFmt[] = "%s%sMusic Start : Couldn't Create Track.%s\n";
+static const char s_redCommandMusicNeedMemoryFmt[] = "%s%s            : music%3.3u.bgm : need 0x%6.6X%s\n";
 
 extern "C" {
 int SearchMusicBank__9CRedEntryFi(CRedEntry*, int);
@@ -338,7 +338,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	waveBase = SearchWaveBase__9CRedEntryFi(&c_RedEntry, deltaTime);
 	if (waveBase == 0) {
 		if (m_ReportPrint != 0) {
-			OSReport(s__s_sWave_is_not_Entry___wave_4_4_801e7e18, &DAT_801e7e3e, &DAT_80333d68,
+			OSReport(s_redCommandWaveNotEntryFmt, sRedCommandLogPrefix, &DAT_80333d68,
 			         deltaTime, &DAT_80333d70);
 			fflush(&DAT_8021d1a8);
 		}
@@ -648,9 +648,9 @@ void SePause(int seId, int pause)
 
 	if (m_ReportPrint != 0) {
 		if (pause == 1) {
-			OSReport(s__sPause___SE___ON__d_801e7e50, &DAT_801e7e3e, seId);
+			OSReport(s_redCommandSePauseOnFmt, sRedCommandLogPrefix, seId);
 		} else {
-			OSReport(s__sPause___SE___OFF__d_801e7e6b, &DAT_801e7e3e, seId);
+			OSReport(s_redCommandSePauseOffFmt, sRedCommandLogPrefix, seId);
 		}
 		fflush(&DAT_8021d1a8);
 	}
@@ -718,10 +718,10 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	int trackBase = RedNew(*(char*)((char*)musicHead + 8) * 0x154);
 	if (trackBase == 0) {
 		if (m_ReportPrint != 0) {
-			OSReport(s__s_sMusic_Start___Couldn_t_Creat_801e7e86, &DAT_801e7e3e, &DAT_80333d75,
+			OSReport(s_redCommandMusicTrackCreateErrorFmt, sRedCommandLogPrefix, &DAT_80333d75,
 			         &DAT_80333d70);
 			fflush(&DAT_8021d1a8);
-			OSReport(s__s_s___music_3_3u_bgm___need_0x__801e7eb2, &DAT_801e7e3e, &DAT_80333d75,
+			OSReport(s_redCommandMusicNeedMemoryFmt, sRedCommandLogPrefix, &DAT_80333d75,
 			         (int)*(short*)((char*)musicHead + 4), *(char*)((char*)musicHead + 8) * 0x154,
 			         &DAT_80333d70);
 			fflush(&DAT_8021d1a8);

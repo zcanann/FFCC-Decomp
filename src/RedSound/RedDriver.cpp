@@ -160,6 +160,13 @@ extern void ReverbAreaAlloc(unsigned long);
 extern void ReverbAreaFree(void*);
 extern void InitReverb();
 
+static const char sRedDriverReportName[] = "RedDriver";
+static const char s_redDriverDmaCheckHeaderFmt[] = "[%s]------DMA_CHECK_PROCESS------\n";
+static const char s_redDriverDmaCheckStatusFmt[] = "[%s]Status = %d Semaphore = %d Entry = %d/%d\n";
+static const char s_redDriverDmaCheckEntryFmt[] = "[%s]ID = %d MMem = %8.8X AMem = %8.8X Size = %d %d\n";
+static const char s_redDriverMusicHeaderBrokenFmt[] = "Music Header was broken.\n";
+static const char s_redDriverSeSepHeaderBrokenFmt[] = "SE Sep Header was broken.\n";
+
 /*
  * --INFO--
  * PAL Address: 0x801bcf0c
@@ -889,11 +896,11 @@ void _DMACheckProcess()
     int* dmaInfo;
 
     if (m_ReportPrint != 0) {
-        OSReport("[%s]------DMA_CHECK_PROCESS------\n", "RedDriver");
+        OSReport(s_redDriverDmaCheckHeaderFmt, sRedDriverReportName);
         fflush(&DAT_8021d1a8);
 
         semCount = OSGetSemaphoreCount(&m_DmaExecuteSemaphore);
-        OSReport("[%s]Status = %d Semaphore = %d Entry = %d/%d\n", "RedDriver", m_DMAStatus, semCount, m_DMAExecute,
+        OSReport(s_redDriverDmaCheckStatusFmt, sRedDriverReportName, m_DMAStatus, semCount, m_DMAExecute,
                  m_DMAInThread);
         fflush(&DAT_8021d1a8);
     }
@@ -901,7 +908,7 @@ void _DMACheckProcess()
     dmaInfo = RedDriverMainDmaQueue();
     do {
         if ((*dmaInfo != 0) && (m_ReportPrint != 0)) {
-            OSReport("[%s]ID = %d MMem = %8.8X AMem = %8.8X Size = %d %d\n", "RedDriver", dmaInfo[0], dmaInfo[2], dmaInfo[3], dmaInfo[4], dmaInfo[5]);
+            OSReport(s_redDriverDmaCheckEntryFmt, sRedDriverReportName, dmaInfo[0], dmaInfo[2], dmaInfo[3], dmaInfo[4], dmaInfo[5]);
             fflush(&DAT_8021d1a8);
         }
         dmaInfo += 7;
@@ -1457,7 +1464,7 @@ int CRedDriver::SetMusicData(void* param_1)
         return -1;
     }
     if (m_ReportPrint != 0) {
-        OSReport("Music Header was broken.\n");
+        OSReport(s_redDriverMusicHeaderBrokenFmt);
         fflush(&DAT_8021d1a8);
     }
     return -1;
@@ -1651,7 +1658,7 @@ int CRedDriver::SetSeSepData(void* param_1)
         return -1;
     }
     if (m_ReportPrint != 0) {
-        OSReport("SE Sep Header was broken.\n");
+        OSReport(s_redDriverSeSepHeaderBrokenFmt);
         fflush(&DAT_8021d1a8);
     }
     return -1;

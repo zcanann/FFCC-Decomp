@@ -64,12 +64,12 @@ void CPad::Frame()
 	u16* puVar18;
 	int iVar19;
 	CPad::Gba local_98[4];
-	u16 local_88[24];
+	PADStatus local_88[4];
 	u8* self = reinterpret_cast<u8*>(this);
 
-	PADRead(reinterpret_cast<PADStatus*>(local_88));
-	PADClamp(reinterpret_cast<PADStatus*>(local_88));
-	memcpy(g_pad, local_88, 0x30);
+	PADRead(local_88);
+	PADClamp(local_88);
+	memcpy(g_pad, local_88, sizeof(local_88));
 	*reinterpret_cast<u32*>(self + 0x1C4) = 0;
 	uVar17 = 0;
 	CPad::Gba* gba = local_98;
@@ -77,7 +77,7 @@ void CPad::Frame()
 	do
 	{
 		iVar6 = SIProbe(uVar17);
-		gba->connected = iVar6 == 0x40000;
+		gba->connected = __cntlzw(0x40000 - iVar6);
 		gba->ctrlMode = Joybus.GetCtrlMode(uVar17);
 		gba->noController = gba->connected && (gba->ctrlMode == 0);
 		gba->button = 0;
@@ -97,7 +97,7 @@ void CPad::Frame()
 			{
 				iVar6 = 0;
 				iVar14 = 0;
-				puVar7 = local_88;
+				puVar7 = reinterpret_cast<u16*>(local_88);
 				puVar13 = reinterpret_cast<u16*>(local_98);
 				for (iVar19 = 0; iVar19 < 4; iVar19++)
 				{
@@ -138,7 +138,7 @@ void CPad::Frame()
 		{
 			iVar6 = 0;
 			iVar19 = 0;
-			puVar7 = local_88;
+			puVar7 = reinterpret_cast<u16*>(local_88);
 			puVar13 = reinterpret_cast<u16*>(local_98);
 			for (iVar11 = 0; iVar11 < 4; iVar11++)
 			{
@@ -174,7 +174,7 @@ void CPad::Frame()
 		}
 	}
 
-	puVar13 = local_88;
+	puVar13 = reinterpret_cast<u16*>(local_88);
 	puVar10 = reinterpret_cast<u16*>(self + 0x154);
 	uVar16 = 0;
 	uVar17 = 0;

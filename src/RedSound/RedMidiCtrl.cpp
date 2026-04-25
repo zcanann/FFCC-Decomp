@@ -11,14 +11,14 @@ void* memmove(void*, const void*, unsigned long);
 void* memset(void*, int, unsigned long);
 int GetWaveBank__9CRedEntryFi(CRedEntry*, int);
 }
-int PTR_SineSwing__Fi[] = {
+int SwingEntryFunction[] = {
     (int)SineSwing, (int)TriangleSwing, (int)SawSwing, (int)DutySwing,
     (int)RandomSwing, (int)DutySwing,     (int)DutySwing, (int)DutySwing,
     (int)SineSwingR, (int)TriangleSwingR, (int)SawSwingR, (int)DutySwingR,
     (int)RandomSwingR, (int)DutySwingR,   (int)DutySwingR, (int)DutySwingR,
 };
 
-int gRedCommandHandlerTable[] = {
+int p_MidiControl_Function[] = {
     (int)__MidiCtrl_Stop,             (int)__MidiCtrl_Sleep,           (int)__MidiCtrl_WholeLoopStart,
     (int)__MidiCtrl_WholeLoopEnd,     (int)__MidiCtrl_LoopStart,       (int)__MidiCtrl_LoopEnd,
     (int)__MidiCtrl_LoopRepeat,       (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_TempoDirect,
@@ -200,7 +200,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
 int SineSwing(int phase)
 {
     u32 index = (u32)phase & 0x1FF;
-    int value = DAT_8021e1d0[index];
+    int value = m_SignDataTable[index];
 
     if (((u32)phase & 0x200) != 0) {
         value = -value;
@@ -287,7 +287,7 @@ int DutySwing(int phase)
  */
 int RandomSwing(int phase)
 {
-    int result = (int)DAT_8021dcce[(phase >> 8) & 0xFF] << 8;
+    int result = (int)t_RandomData[(phase >> 8) & 0xFF] << 8;
 
     return result;
 }
@@ -301,7 +301,7 @@ int SineSwingR(int phase)
 {
     phase ^= 0x200;
     int value = phase & 0x1FF;
-    value = DAT_8021e1d0[value];
+    value = m_SignDataTable[value];
     if ((phase & 0x200) != 0) {
         value = -value;
     }
@@ -383,7 +383,7 @@ int SawSwingR(int phase)
  */
 int RandomSwingR(int phase)
 {
-    int result = (int)DAT_8021dcce[((phase >> 8) & 0xFF) ^ 0x40] << 8;
+    int result = (int)t_RandomData[((phase >> 8) & 0xFF) ^ 0x40] << 8;
 
     return result;
 }
@@ -538,7 +538,7 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
                 while ((currentDelta < 1) && (*nextTrack != 0)) {
                     unsigned char* cmd = (unsigned char*)*nextTrack;
                     *nextTrack = (int)(cmd + 1);
-                    ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))gRedCommandHandlerTable[*cmd])(
+                    ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))p_MidiControl_Function[*cmd])(
                         control, keyOnData, (RedTrackDATA*)nextTrack);
 
                     if (*nextTrack != 0) {
@@ -807,7 +807,7 @@ void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDA
     ((int*)track)[0] = (int)(command + 1);
     scale = command[0] & 0x1f;
     controlData[0x120] = scale;
-    controlData[2] = DAT_8021dc20[scale] + (int)DAT_8021dc20;
+    controlData[2] = t_KeySignatureIndex[scale] + (int)t_KeySignatureData;
 
     if (m_MusicKeySignature != 0) {
         voice = (unsigned int)controlData[0];
@@ -1716,7 +1716,7 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
     }
 
     trackData[0x1e] = 0x100000 / depth;
-    trackData[0x1d] = PTR_SineSwing__Fi[*(unsigned char*)(trackData[0] + 2) & 0xf];
+    trackData[0x1d] = SwingEntryFunction[*(unsigned char*)(trackData[0] + 2) & 0xf];
     *(short*)((int)trackData + 0x8e) = 0;
     *(short*)(trackData + 0x23) = 0;
     trackData[0] = trackData[0] + 3;
@@ -1862,7 +1862,7 @@ void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
 {
 	u32 type = *(u8*)(((u32*)track)[0]++);
 
-	((u32*)track)[0x1d] = PTR_SineSwing__Fi[type & 0xf];
+	((u32*)track)[0x1d] = SwingEntryFunction[type & 0xf];
 }
 
 /*
@@ -1907,7 +1907,7 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 		rateDivisor = (unsigned int)(*(unsigned char*)(trackData[0] + 1));
 	}
 	trackData[0x26] = 0x100000 / rateDivisor;
-	trackData[0x25] = PTR_SineSwing__Fi[*(unsigned char*)(trackData[0] + 2) & 0xf];
+	trackData[0x25] = SwingEntryFunction[*(unsigned char*)(trackData[0] + 2) & 0xf];
 	*(short*)((int)trackData + 0xae) = 0;
 	*(short*)(trackData + 0x2b) = 0;
 	trackData[0] += 3;
@@ -2055,7 +2055,7 @@ void __MidiCtrl_TremoloType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
 {
 	u32 type = *(u8*)(((u32*)track)[0]++);
 
-	((u32*)track)[0x25] = PTR_SineSwing__Fi[type & 0xf];
+	((u32*)track)[0x25] = SwingEntryFunction[type & 0xf];
 }
 
 /*
@@ -2097,7 +2097,7 @@ void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 		rate = *(u8*)(trackData[0] + 1);
 	}
 	trackData[0x2e] = 0x100000 / rate;
-	trackData[0x2d] = PTR_SineSwing__Fi[*(u8*)(trackData[0] + 2) & 0xf];
+	trackData[0x2d] = SwingEntryFunction[*(u8*)(trackData[0] + 2) & 0xf];
 	*(u16*)((u8*)trackData + 0xd2) = 0;
 	*(u16*)(trackData + 0x34) = 0;
 	trackData[0x32] = 0;
@@ -2221,7 +2221,7 @@ void __MidiCtrl_ShakeType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	u32 type = *(u8*)(((u32*)track)[0]++);
 
-	((u32*)track)[0x2d] = PTR_SineSwing__Fi[type & 0xf];
+	((u32*)track)[0x2d] = SwingEntryFunction[type & 0xf];
 }
 
 /*

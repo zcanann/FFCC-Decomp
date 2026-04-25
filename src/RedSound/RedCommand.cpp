@@ -7,7 +7,6 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-extern char DAT_8021dcab;
 static const char sRedCommandLogWarnColor[] = "\x1B[4;31m";
 static const char sRedCommandLogReset[] = "\x1B[0m";
 static const char sRedCommandLogErrorColor[] = "\x1B[7;31m";
@@ -45,7 +44,7 @@ void WaveHistoryManager__9CRedEntryFii(void*, int, int);
 }
 int* SetReverb(int, int, int*);
 
-int DAT_8021ec10[] = {
+int t_ReverbModeData[] = {
     0x2, 0xA, 0x578, 0x1E, 0x46, 0x64, 0x0,
     0x2, 0x14, 0x708, 0x1E, 0x50, 0x64, 0x0,
     0x2, 0x1E, 0x960, 0x1E, 0x50, 0x64, 0x0,
@@ -756,8 +755,8 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 
 	if (*(char*)((char*)musicHead + 9) != 0) {
 		unsigned int reverbKind = ((int)*(char*)((char*)musicHead + 9) - 1U) & 7;
-		SetReverb(0, *(int*)((char*)DAT_8021ec10 + reverbKind * 0x1c),
-		          (int*)((char*)DAT_8021ec10 + reverbKind * 0x1c + 4));
+		SetReverb(0, *(int*)((char*)t_ReverbModeData + reverbKind * 0x1c),
+		          (int*)((char*)t_ReverbModeData + reverbKind * 0x1c + 4));
 	}
 
 	*(int*)p_ReverbDepth = (int)*(short*)((char*)musicHead + 10);
@@ -782,7 +781,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		current = current + 4 + blockSize;
 		track[0x42] = DeltaTimeSumup((unsigned char**)track) + 1;
 		track[0x3d] = 0;
-		track[8] = (m_MusicKeySignature == 0) ? 0 : (int)&DAT_8021dcab;
+		track[8] = (m_MusicKeySignature == 0) ? 0 : (int)(t_KeySignatureData + 0xb);
 		track[0x13] = 0x7f000;
 		track[0x15] = 0;
 		track[10] = 0x7fff000;
@@ -834,7 +833,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	music[0x11d] = 1;
 	*(unsigned char*)((char*)music + 0x490) = 0;
 	music[0x120] = 0;
-	music[2] = (int)&DAT_8021dcab;
+	music[2] = (int)(t_KeySignatureData + 0xb);
 	*(unsigned char*)((char*)music + 0x491) = *(unsigned char*)((char*)musicHead + 8);
 	*(short*)((char*)music + 0x48e) = (short)*(char*)((char*)musicHead + 8);
 	*(unsigned char*)((char*)music + 0x492) = (unsigned char)(*(unsigned short*)((char*)musicHead + 0xc) & 0x7f);

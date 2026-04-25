@@ -35,7 +35,7 @@ static const float s_ReverbEffectScale = 100.0f;
  */
 u8 GetRandomData()
 {
-    u8 value = (u8)DAT_8021dcce[m_RandomIndex];
+    u8 value = (u8)t_RandomData[m_RandomIndex];
     m_RandomIndex = m_RandomIndex + 1;
     return value;
 }
@@ -67,7 +67,7 @@ int PitchCompute(int param_1, int param_2, int param_3, int param_4)
 
     noteBand = (pitch >> 8) & 0x7F;
     octaveAdjust += noteBand / 12;
-    value = (int)((DAT_8021d7f0[noteBand % 12] >> (10 - octaveAdjust)) * DAT_8021d820[pitch & 0xFF]) >> 12;
+    value = (int)((t_TonePitch[noteBand % 12] >> (10 - octaveAdjust)) * t_FinePitch[pitch & 0xFF]) >> 12;
 
     if (param_4 != 0) {
         if (param_4 > 0) {
@@ -497,10 +497,10 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
     memset(mixData, 0, 0x24);
 
     if (m_SoundPlayMode == 2) {
-        *mixData = (u16)((u32)(volume * DAT_8021ddce[pan]) >> 8);
-        *(s16*)(voiceData + 0x1e) = (s16)((u32)(volume * DAT_8021dfce[pan]) >> 8);
-        *(s16*)(voiceData + 0x1b) = (s16)((u32)(volume * DAT_8021ddce[pan ^ 0x7f]) >> 8);
-        *(s16*)(voiceData + 0x1f) = (s16)((u32)(volume * DAT_8021dfce[pan ^ 0x7f]) >> 8);
+        *mixData = (u16)((u32)(volume * t_PanningData[pan]) >> 8);
+        *(s16*)(voiceData + 0x1e) = (s16)((u32)(volume * t_PanningDataR[pan]) >> 8);
+        *(s16*)(voiceData + 0x1b) = (s16)((u32)(volume * t_PanningData[pan ^ 0x7f]) >> 8);
+        *(s16*)(voiceData + 0x1f) = (s16)((u32)(volume * t_PanningDataR[pan ^ 0x7f]) >> 8);
 
         if ((voiceData[0x25] & 0x1000U) != 0) {
             *(s16*)(voiceData + 0x1c) = (s16)((int)((u32)*mixData * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
@@ -512,7 +512,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
             *(s16*)(voiceData + 0x20) = (s16)((int)((u32)*(u16*)(voiceData + 0x1f) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
         }
     } else if ((m_SoundPlayMode < 2) && (0 < m_SoundPlayMode)) {
-        volFactor = (int)DAT_8021de4e;
+        volFactor = (int)t_PanningData[0x40];
 
         if ((voiceData[0x25] & 0xc00U) != 0) {
             uVar3 = (u16)((u32)(volume * volFactor) >> 8);
@@ -535,8 +535,8 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
             pan = 0x100 - pan;
         }
 
-        leftPan = DAT_8021ddce[pan];
-        rightPan = DAT_8021ddce[pan ^ 0x7f];
+        leftPan = t_PanningData[pan];
+        rightPan = t_PanningData[pan ^ 0x7f];
 
         if ((voiceData[0x25] & 0x400U) != 0) {
             *mixData = (u16)((u32)(volume * leftPan) >> 8);
@@ -1812,7 +1812,7 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
                 unsigned char* cmd = (unsigned char*)*track;
                 int delta;
                 *track = (int)(cmd + 1);
-                ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))gRedCommandHandlerTable[*cmd])(
+                ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))p_MidiControl_Function[*cmd])(
                     control, keyOnData, (RedTrackDATA*)track);
                 if (*track != 0) {
                     if (track[0x42] < 1) {
@@ -2348,7 +2348,7 @@ void _SeMidiNoteExecute(
                     *(s16*)(track + 0x51) += 1;
                     cmd = (unsigned char*)*track;
                     *track = (int)(cmd + 1);
-                    ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))gRedCommandHandlerTable[*cmd])(
+                    ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))p_MidiControl_Function[*cmd])(
                         control, keyOnData, (RedTrackDATA*)track);
                     if (*track != 0) {
                         delta = DeltaTimeSumup((unsigned char**)track);

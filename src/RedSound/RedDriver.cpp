@@ -2225,7 +2225,8 @@ void CRedDriver::DisplayWaveInfo()
  */
 void CRedDriver::SetReverb(int bank, int kind)
 {
-    ::SetReverb(bank, *(int*)((char*)DAT_8021ec10 + kind * 0x1c), (int*)((char*)DAT_8021ec10 + kind * 0x1c + 4));
+    ::SetReverb(bank, *(int*)((char*)t_ReverbModeData + kind * 0x1c),
+                (int*)((char*)t_ReverbModeData + kind * 0x1c + 4));
 }
 
 /*

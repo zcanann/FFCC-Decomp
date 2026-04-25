@@ -233,7 +233,7 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     s32 uvByteOffsetV;
     CMapMesh* mapMesh;
     s32 i;
-    s32 frameU;
+    u32 frameU;
 
     ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
     work = GetYmDrawMdlTexAnmWork(ymDrawMdlTexAnm, ctrl);

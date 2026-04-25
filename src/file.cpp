@@ -220,13 +220,13 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
         {
         case 4:
         case 6:
-            msgIndex = 0;
+            msgIndex = 2;
             break;
         case 5:
             msgIndex = 1;
             break;
         case 0x0B:
-            msgIndex = 2;
+            msgIndex = 0;
             break;
         case -1:
             msgIndex = 3;

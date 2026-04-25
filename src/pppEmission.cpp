@@ -27,9 +27,10 @@ extern _pppEnvStEmission* pppEnvStPtr;
 
 extern "C" int rand(void);
 extern const char DAT_803311fc;
-static const float FLOAT_803311e0 = 15.0f;
-static const float FLOAT_803311e4 = 7.0f;
-static const float FLOAT_803311f8 = 10000000.0f;
+extern const float FLOAT_8033111C = 15.0f;
+extern const float FLOAT_80331120 = 7.0f;
+extern const double DOUBLE_80331128 = 4503599627370496.0;
+extern const float FLOAT_80331130 = 10000000.0f;
 static const char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
@@ -149,7 +150,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
     *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
 
-    float alphaScale = (float)dataSet[0xB] / FLOAT_803311e0;
+    float alphaScale = (float)dataSet[0xB] / FLOAT_8033111C;
     state->m_colorR = dataSet[8];
     state->m_colorG = dataSet[9];
     state->m_colorB = dataSet[0xA];
@@ -185,9 +186,9 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
                 0x16F);
 
             EmissionParticle* particle = (EmissionParticle*)state->m_particles;
-            float scaleBase = FLOAT_803311e4;
+            float scaleBase = FLOAT_80331120;
             for (int i = 0; i < param_2->m_initWOrk; i++) {
-                Math.RandF(FLOAT_803311e4);
+                Math.RandF(FLOAT_80331120);
 
                 s16 lifeJitter = (s16)(rand() % payload[0xD]);
                 s16 safeJitter = (lifeJitter >= 1) ? lifeJitter : 1;
@@ -231,7 +232,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
 
                 particle->m_fieldC = payload[0xF];
                 particle->m_fieldA = payload[0xF] + payload[0xE] + jitter + payload[0xC];
-                particle->m_scale = FLOAT_803311e4 + Math.RandF(*(float*)(payload + 4));
+                particle->m_scale = FLOAT_80331120 + Math.RandF(*(float*)(payload + 4));
                 particle->m_alpha = 0;
                 particle->m_fieldE = payload[0xB] / payload[0xC];
             }
@@ -274,8 +275,8 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
         state[0] = 0;
     }
 
-    baseScale = FLOAT_803311f8;
-    *(float*)(state + 5) = FLOAT_803311f8;
+    baseScale = FLOAT_80331130;
+    *(float*)(state + 5) = FLOAT_80331130;
     *(float*)(state + 4) = baseScale;
     *(float*)(state + 3) = baseScale;
 }
@@ -290,7 +291,7 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
  * JP Size: TODO
  */
 void pppConstruct2Emission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
-    float baseScale = FLOAT_803311f8;
+    float baseScale = FLOAT_80331130;
     int offset = param_2->m_serializedDataOffsets[2];
     float* state = (float*)((u8*)pppEmission_ + 0x80 + offset);
     state[5] = baseScale;
@@ -322,7 +323,7 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
         u8 field1C;
     };
 
-    float baseScale = FLOAT_803311f8;
+    float baseScale = FLOAT_80331130;
     s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
     int offset = serializedDataOffsets[2];
     EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + offset);
@@ -371,7 +372,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
 
         if (step->m_payload[9] == 0) {
             for (int i = 0; i < step->m_initWOrk; i++) {
-                float scale = FLOAT_803311e4;
+                float scale = FLOAT_80331120;
                 scale += (float)i * state->m_scale0;
                 Mtx viewMtx;
                 Mtx objMtx;

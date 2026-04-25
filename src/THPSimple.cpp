@@ -623,39 +623,35 @@ void __THPSimpleDVDCallback(long result, DVDFileInfo*)
 
     if (result == -1) {
         SimpleControl.readError = 1;
-        return;
-    }
-    if (result == -3) {
-        return;
-    }
+    } else if (result != -3) {
+        SimpleControl.isReadFrameAsync = 0;
+        SimpleControl.readBuffer[SimpleControl.readIndex].mFrameNumber = SimpleControl.curAudioTrack;
+        SimpleControl.curAudioTrack++;
+        SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid = 1;
+        SimpleControl.readOffset += SimpleControl.readSize;
 
-    SimpleControl.isReadFrameAsync = 0;
-    SimpleControl.readBuffer[SimpleControl.readIndex].mFrameNumber = SimpleControl.curAudioTrack;
-    SimpleControl.curAudioTrack++;
-    SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid = 1;
-    SimpleControl.readOffset += SimpleControl.readSize;
+        oldReadIndex = SimpleControl.readIndex;
+        SimpleControl.readIndex = (SimpleControl.readIndex + 1) & 7;
+        SimpleControl.readSize = *reinterpret_cast<s32*>(SimpleControl.readBuffer[oldReadIndex].mPtr);
 
-    oldReadIndex = SimpleControl.readIndex;
-    SimpleControl.readIndex = (SimpleControl.readIndex + 1) & 7;
-    SimpleControl.readSize = *reinterpret_cast<s32*>(SimpleControl.readBuffer[oldReadIndex].mPtr);
-
-    if ((SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) && (SimpleControl.readError == 0) &&
-        (SimpleControl.isPreLoaded == 1)) {
-        if ((SimpleControl.header.mNumFrames - 1) < static_cast<u32>(SimpleControl.curAudioTrack)) {
-            if (SimpleControl.isLooping != 1) {
-                return;
+        if ((SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) && (SimpleControl.readError == 0) &&
+            (SimpleControl.isPreLoaded == 1)) {
+            if ((SimpleControl.header.mNumFrames - 1) < static_cast<u32>(SimpleControl.curAudioTrack)) {
+                if (SimpleControl.isLooping != 1) {
+                    return;
+                }
+                SimpleControl.curAudioTrack = 0;
+                SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);
+                SimpleControl.readSize = static_cast<s32>(SimpleControl.header.mFirstFrameSize);
             }
-            SimpleControl.curAudioTrack = 0;
-            SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);
-            SimpleControl.readSize = static_cast<s32>(SimpleControl.header.mFirstFrameSize);
-        }
 
-        SimpleControl.isReadFrameAsync = 1;
-        if (!DVDReadAsyncPrio(&SimpleControl.fileInfo, SimpleControl.readBuffer[SimpleControl.readIndex].mPtr,
-                              SimpleControl.readSize, SimpleControl.readOffset,
-                              static_cast<DVDCallback>(__THPSimpleDVDCallback), 2)) {
-            SimpleControl.isReadFrameAsync = 0;
-            SimpleControl.readError = 1;
+            SimpleControl.isReadFrameAsync = 1;
+            if (DVDReadAsyncPrio(&SimpleControl.fileInfo, SimpleControl.readBuffer[SimpleControl.readIndex].mPtr,
+                                 SimpleControl.readSize, SimpleControl.readOffset,
+                                 static_cast<DVDCallback>(__THPSimpleDVDCallback), 2) != 1) {
+                SimpleControl.isReadFrameAsync = 0;
+                SimpleControl.readError = 1;
+            }
         }
     }
 }

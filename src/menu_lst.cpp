@@ -296,11 +296,11 @@ void CMenuPcs::MLstCtrl()
 	if (blocked) {
 		press = 0;
 	} else {
-		unsigned char* padPtr = reinterpret_cast<unsigned char*>(&Pad);
 		if ((__cntlzw((unsigned int)Pad._448_4_) & 0x20) == 0) {
-			padPtr += 0x54;
+			press = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x5c);
+		} else {
+			press = Pad._8_2_;
 		}
-		press = *(unsigned short*)(padPtr + 8);
 	}
 
 	blocked = false;
@@ -310,11 +310,11 @@ void CMenuPcs::MLstCtrl()
 	if (blocked) {
 		hold = 0;
 	} else {
-		unsigned char* padPtr = reinterpret_cast<unsigned char*>(&Pad);
 		if ((__cntlzw((unsigned int)Pad._448_4_) & 0x20) == 0) {
-			padPtr += 0x54;
+			hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x68);
+		} else {
+			hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x14);
 		}
-		hold = *(unsigned short*)(padPtr + 0x14);
 	}
 
 	if (hold == 0) {

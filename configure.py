@@ -478,7 +478,7 @@ config.libs = [
             Object(NonMatching, "p_sound.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "p_system.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "p_tina.cpp", extra_cflags=["-RTTI on"]),
-            Object(NonMatching, "p_usb.cpp", extra_cflags=["-RTTI on"]),
+            Object(NonMatching, "p_usb.cpp"),
             Object(NonMatching, "pad.cpp"),
             Object(NonMatching, "partMng.cpp"),
             Object(NonMatching, "partyobj.cpp"),

@@ -3543,6 +3543,71 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0x24: {
+        const float distance = static_cast<float>(object->m_localBase[1]);
+        CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
+        Vec direction = {0.0f, 0.0f, 0.0f};
+
+        if (line->m_numPoints > 1) {
+            if (distance < 0.0f) {
+                direction = line->m_segments[0].normal;
+            } else if (distance >= line->m_totalLength) {
+                direction = line->m_segments[line->m_numPoints - 2].normal;
+            } else {
+                for (unsigned int i = 0; i + 1 < line->m_numPoints; i++) {
+                    CLineSegment64& segment = line->m_segments[i];
+                    if (segment.startLength <= distance && distance < segment.startLength + segment.length) {
+                        direction = segment.normal;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (object->m_localBase[2] == 0) {
+            direction.x = -direction.x;
+            direction.y = -direction.y;
+            direction.z = -direction.z;
+        }
+
+        *reinterpret_cast<float*>(object->m_localBase[3]) = direction.x;
+        *reinterpret_cast<float*>(object->m_localBase[4]) = direction.y;
+        *reinterpret_cast<float*>(object->m_localBase[5]) = direction.z;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x23: {
+        const float distance = static_cast<float>(object->m_localBase[1]);
+        CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
+        Vec position = {0.0f, 0.0f, 0.0f};
+
+        if (line->m_numPoints > 0) {
+            if (distance < 0.0f || line->m_numPoints == 1) {
+                position = line->m_points[0];
+            } else if (distance >= line->m_totalLength) {
+                position = line->m_points[line->m_numPoints - 1];
+            } else {
+                for (unsigned int i = 0; i + 1 < line->m_numPoints; i++) {
+                    CLineSegment64& segment = line->m_segments[i];
+                    if (segment.startLength <= distance && distance < segment.startLength + segment.length) {
+                        const float t = (distance - segment.startLength) / segment.length;
+                        position.x = line->m_points[i].x + (line->m_points[i + 1].x - line->m_points[i].x) * t;
+                        position.y = line->m_points[i].y + (line->m_points[i + 1].y - line->m_points[i].y) * t;
+                        position.z = line->m_points[i].z + (line->m_points[i + 1].z - line->m_points[i].z) * t;
+                        break;
+                    }
+                }
+            }
+        }
+
+        *reinterpret_cast<float*>(object->m_localBase[2]) = position.x;
+        *reinterpret_cast<float*>(object->m_localBase[3]) = position.y;
+        *reinterpret_cast<float*>(object->m_localBase[4]) = position.z;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x1F:
         if (*object->m_localBase < 0x10) {
             const int lineOffset = *object->m_localBase * 0xB14;

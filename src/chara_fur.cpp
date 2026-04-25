@@ -43,6 +43,10 @@ void* gMogFurTexBuffer;
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+extern float FLOAT_8033110C;
+extern float FLOAT_80331138;
+extern float FLOAT_8033114C;
+extern float FLOAT_80331150;
 static inline unsigned char* GameRaw() { return reinterpret_cast<unsigned char*>(&Game); }
 
 namespace {
@@ -1556,11 +1560,23 @@ extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx viewMtx, int s
 	if (furStep == 0.0f) {
 		furStep = 1.0f;
 	}
-	float furLength = ModelFurLenScale(model);
+	float furDepth = FLOAT_8033110C;
+	Vec modelPos = {ModelDrawMtx(model)[0][3], ModelDrawMtx(model)[1][3], ModelDrawMtx(model)[2][3]};
+	Vec viewPos;
+	PSMTXMultVec(viewMtx, &modelPos, &viewPos);
+	if (viewPos.z < FLOAT_8033114C) {
+		Vec4d clipPos;
+		Math.MTX44MultVec4(CameraPcs.m_screenMatrix, &viewPos, &clipPos);
+		if (clipPos.w != 0.0f) {
+			furDepth = -clipPos.z / clipPos.w;
+		}
+	}
+
+	float furLength = ModelFurLenScale(model) * (FLOAT_80331138 - furDepth) + ModelFurLenScale(model);
 	if (furLength <= 0.0f) {
 		furLength = 1.0f;
 	}
-	const int furShade = static_cast<int>(255.0f * ModelFurCur(model));
+	const int furShade = static_cast<int>(FLOAT_80331150 * ModelFurCur(model));
 	const GXColor furColor = CColor(static_cast<unsigned char>(furShade), static_cast<unsigned char>(furShade),
 	                                static_cast<unsigned char>(furShade), 0xFF)
 	                             .color;

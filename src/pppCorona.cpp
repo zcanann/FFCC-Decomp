@@ -13,6 +13,7 @@ extern const float kPppCoronaScreenWidth;
 extern const float kPppCoronaScreenHeight;
 extern const float kPppCoronaScreenCenterX;
 extern const float kPppCoronaScreenCenterY;
+extern const double DOUBLE_803310D0;
 
 struct CoronaWork {
     s16 m_shapeX;
@@ -181,3 +182,4 @@ extern const float kPppCoronaScreenWidth = 640.0f;
 extern const float kPppCoronaScreenHeight = 448.0f;
 extern const float kPppCoronaScreenCenterX = 320.0f;
 extern const float kPppCoronaScreenCenterY = 224.0f;
+extern const double DOUBLE_803310D0 = 4503601774854144.0;

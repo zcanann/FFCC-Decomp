@@ -13,21 +13,21 @@
 
 extern int __float_nan[];
 extern const double DOUBLE_80331FC0 = 2.4;
-extern const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
-extern const float FLOAT_80331fd0 = -0.5f;
-extern const float FLOAT_80331fd4 = 25.0f;
-extern const float FLOAT_80331fd8 = 1.3333334f;
-extern const float FLOAT_80331fdc = 0.5f;
-extern const float FLOAT_80331FE0 = 2.0f;
-extern const float FLOAT_80331FE4 = -1.0f;
-extern const float FLOAT_80331FE8 = 0.0f;
-extern const double DOUBLE_80331FF0 = 0.5;
-extern const double DOUBLE_80331FF8 = 3.0;
-extern const double DOUBLE_80332000 = 0.0;
-extern const float FLOAT_80332008 = 1.0f;
-extern const float FLOAT_8033200C = 128.0f;
-extern const float FLOAT_80332010;
-extern const double DOUBLE_80332018;
+static const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
+static const float FLOAT_80331fd0 = -0.5f;
+static const float FLOAT_80331fd4 = 25.0f;
+static const float FLOAT_80331fd8 = 1.3333334f;
+static const float FLOAT_80331fdc = 0.5f;
+static const float FLOAT_80331FE0 = 2.0f;
+static const float FLOAT_80331FE4 = -1.0f;
+static const float FLOAT_80331FE8 = 0.0f;
+static const double DOUBLE_80331FF0 = 0.5;
+static const double DOUBLE_80331FF8 = 3.0;
+static const double DOUBLE_80332000 = 0.0;
+static const float FLOAT_80332008 = 1.0f;
+static const float FLOAT_8033200C = 128.0f;
+static const float FLOAT_80332010 = 127.0f;
+static const double DOUBLE_80332018 = 4503599627370496.0;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
@@ -251,9 +251,12 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         u32 x;
         Crystal2RefractionMap* textureInfo;
         u32 textureSize;
-        float yCoord;
+        float magnitude;
+        float xCoord;
+        float ySq;
         float stepX;
         float stepY;
+        float yCoord;
 
         work->m_refractionMap = (Crystal2RefractionMap*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             sizeof(Crystal2RefractionMap), pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xA8);
@@ -275,11 +278,11 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         for (y = 0; y < (u32)textureInfo->m_height; y++) {
             u32 yTile = y >> 2;
             u32 yFine = (y & 3) * 4;
-            float ySq = yCoord * yCoord;
-            float xCoord = FLOAT_80331FE4;
+            ySq = yCoord * yCoord;
+            xCoord = FLOAT_80331FE4;
 
             for (x = 0; x < (u32)textureInfo->m_width; x++) {
-                float magnitude = xCoord * xCoord + ySq;
+                magnitude = xCoord * xCoord + ySq;
 
                 if (magnitude > FLOAT_80331FE8) {
                     magnitude = Crystal2SqrtPositive(magnitude);

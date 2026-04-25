@@ -2191,27 +2191,29 @@ void CMenuPcs::CmakeJobCtrl()
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
-        if ((down & 0x100) != 0) {
-            if (FindDuplicateCmakeJob(this, static_cast<int>(job)) < 0) {
-                s_CmakeInfo.m_job = static_cast<signed char>(job);
-                MenuS16(this, 0x864) = job;
-                SetSingMakeChara();
-                resultDir = 1;
+        if ((repeat & 0xF) == 0) {
+            if ((down & 0x100) != 0) {
+                if (FindDuplicateCmakeJob(this, static_cast<int>(job)) < 0) {
+                    s_CmakeInfo.m_job = static_cast<signed char>(job);
+                    MenuS16(this, 0x864) = job;
+                    SetSingMakeChara();
+                    resultDir = 1;
+                    resultFlag = 1;
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                } else {
+                    short winX = 0;
+                    short winY = 0;
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
+                    GetWinSize__8CMenuPcsFiPsPsi(this, 0x16, &winX, &winY, 0);
+                    SetMcWinInfo__8CMenuPcsFii(this, (int)winX, (int)winY);
+                    mcState = 0;
+                }
+            } else if ((down & 0x200) != 0) {
+                resultDir = -1;
                 resultFlag = 1;
-                Sound.PlaySe(2, 0x40, 0x7F, 0);
-            } else {
-                short winX = 0;
-                short winY = 0;
-                Sound.PlaySe(4, 0x40, 0x7F, 0);
-                GetWinSize__8CMenuPcsFiPsPsi(this, 0x16, &winX, &winY, 0);
-                SetMcWinInfo__8CMenuPcsFii(this, (int)winX, (int)winY);
-                mcState = 0;
+                ChgModel__8CMenuPcsFiiii(this, static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
             }
-        } else if ((down & 0x200) != 0) {
-            resultDir = -1;
-            resultFlag = 1;
-            ChgModel__8CMenuPcsFiiii(this, static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
-            Sound.PlaySe(3, 0x40, 0x7F, 0);
         }
     } else if (mcState == 1 && (down & 0x300) != 0) {
         Sound.PlaySe(2, 0x40, 0x7F, 0);

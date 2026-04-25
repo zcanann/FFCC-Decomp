@@ -4,7 +4,7 @@
 #include "dolphin/gx.h"
 #include "ffcc/math.h"
 extern "C" {
-extern float kPppBreathModelZero = 0.0f;
+extern const float kPppBreathModelZero = 0.0f;
 extern int gPppCalcDisabled;
 }
 #include "ffcc/pppPart.h"

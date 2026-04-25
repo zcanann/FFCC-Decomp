@@ -29,6 +29,10 @@ struct LensFlareWork {
 
 extern "C" unsigned int __cvt_fp2unsigned(double);
 
+extern const double DOUBLE_80330FF0 = 0.0;
+extern const float FLOAT_80330FF8 = 1.0f;
+extern const double DOUBLE_80331000 = 0.20000000298023224;
+
 /*
  * --INFO--
  * PAL Address: 0x800de718

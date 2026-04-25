@@ -12,8 +12,8 @@ extern int gPppCalcDisabled;
 
 extern const float FLOAT_80330F80;
 extern const float FLOAT_80330F84;
-extern const float FLOAT_80330F88 = 6.2831855f;
-extern const float FLOAT_80330F8C = 0.0f;
+extern const float FLOAT_80330F88;
+extern const float FLOAT_80330F8C;
 
 struct pppModelSt;
 

@@ -66,10 +66,10 @@ struct MaterialEditorTableInit {
 
 static MaterialEditorTableInit sMaterialEditorTableInit;
 extern "C" {
-const char* gDebugSpinnerText_addr;
-char gDebugSpinnerTextInitialized_addr;
-int gDebugSpinnerFrame_addr;
-char gDebugSpinnerFrameInitialized_addr;
+extern const char* gDebugSpinnerText_addr;
+extern char gDebugSpinnerTextInitialized_addr;
+extern int gDebugSpinnerFrame_addr;
+extern char gDebugSpinnerFrameInitialized_addr;
 const char s_MaterialEditor_pctc_801D7D60[] = "MaterialEditor=%c";
 }
 

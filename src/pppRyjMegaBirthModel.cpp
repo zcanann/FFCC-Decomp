@@ -344,7 +344,7 @@ void birth(
     float spread = (float)payload[0x2B];
     float halfSpread = spread;
     float randomRange = FLOAT_803304c0 * spread;
-    float speedMag = *(float*)(payload + 0x130);
+    float speedMag = *(float*)(payload + 0x12C);
     u8 speedMode = payload[0x130];
     Vec pos;
 

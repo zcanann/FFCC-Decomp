@@ -150,8 +150,7 @@ void CMenuPcs::MLstDraw()
 	DrawInit__8CMenuPcsFv(this);
 	if (menuMode == 1) {
 		MenuLstEntry* curItem = &list->entries[state->cursor];
-		float cursorYOffset =
-			(float)(((double)(float)(curItem->height - 0x20) * DOUBLE_803333E8) + (double)(float)curItem->height);
+		float cursorYOffset = (float)((double)(float)(curItem->height - 0x20) * DOUBLE_803333E8);
 		int cursorY = (int)((float)curItem->y + cursorYOffset);
 		int cursorX = (int)((float)curItem->x - 56.0f + (float)(System.m_frameCounter & 7));
 		DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, FLOAT_803333F0);

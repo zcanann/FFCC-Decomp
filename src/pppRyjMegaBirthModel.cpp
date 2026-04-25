@@ -1003,8 +1003,6 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
 
     if (copyOut != 0) {
         pppCopyMatrix(out, mtxB);
-    } else {
-        pppCopyMatrix(out, mtxB);
     }
 
     if (flagsEnd != 0) {

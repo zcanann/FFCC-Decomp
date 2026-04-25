@@ -1961,7 +1961,6 @@ void CMenuPcs::CalcResultCountAnim()
 			sprites[labelBase + i].mulX = 18.0f;
 		}
 		*(unsigned char*)(statePtr + 0xb) = 1;
-		return;
 	}
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
@@ -2025,6 +2024,7 @@ void CMenuPcs::CalcResultCountAnim()
 	if (*(short*)(statePtr + 0x10) == 0 && frame >= maxValue + 10) {
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
 		*(short*)(statePtr + 0x10) = 1;
+		return;
 	}
 
 	if (*(short*)(statePtr + 0x10) != 0) {

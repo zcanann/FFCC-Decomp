@@ -11,12 +11,30 @@ extern char DAT_8021dcab;
 static const char sRedCommandLogWarnColor[] = "\x1B[4;31m";
 static const char sRedCommandLogReset[] = "\x1B[0m";
 static const char sRedCommandLogErrorColor[] = "\x1B[7;31m";
-static const char s_redCommandWaveNotEntryFmt[] = "%s%sWave is not Entry. (wave%4.4u)%s\n";
-static const char sRedCommandLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
-static const char s_redCommandSePauseOnFmt[] = "%sPause : SE     : ON  %d\n";
-static const char s_redCommandSePauseOffFmt[] = "%sPause : SE     : OFF %d\n";
-static const char s_redCommandMusicTrackCreateErrorFmt[] = "%s%sMusic Start : Couldn't Create Track.%s\n";
-static const char s_redCommandMusicNeedMemoryFmt[] = "%s%s            : music%3.3u.bgm : need 0x%6.6X%s\n";
+static const char s_redCommandLogBlob[0x108] =
+    "%s%sWave is not Entry. (wave%4.4u)%s\n"
+    "\0"
+    "\x1B[7;34mSound\x1B[0m:"
+    "\0"
+    "%sPause : SE     : ON  %d\n"
+    "\0"
+    "%sPause : SE     : OFF %d\n"
+    "\0"
+    "%s%sMusic Start : Couldn't Create Track.%s\n"
+    "\0"
+    "%s%s            : music%3.3u.bgm : need 0x%6.6X%s\n"
+    "\0"
+    "%sPause : Music  : ON  %d\n"
+    "\0"
+    "%sPause : Music  : OFF %d\n";
+
+enum {
+    RED_COMMAND_LOG_PREFIX_OFFSET = 0x26,
+    RED_COMMAND_SE_PAUSE_ON_FMT_OFFSET = 0x38,
+    RED_COMMAND_SE_PAUSE_OFF_FMT_OFFSET = 0x53,
+    RED_COMMAND_MUSIC_TRACK_CREATE_ERROR_FMT_OFFSET = 0x6E,
+    RED_COMMAND_MUSIC_NEED_MEMORY_FMT_OFFSET = 0x9A,
+};
 
 extern "C" {
 int SearchMusicBank__9CRedEntryFi(CRedEntry*, int);
@@ -338,7 +356,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	waveBase = SearchWaveBase__9CRedEntryFi(&c_RedEntry, deltaTime);
 	if (waveBase == 0) {
 		if (m_ReportPrint != 0) {
-			OSReport(s_redCommandWaveNotEntryFmt, sRedCommandLogPrefix, sRedCommandLogWarnColor,
+			OSReport(s_redCommandLogBlob, s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogWarnColor,
 			         deltaTime, sRedCommandLogReset);
 			fflush(&DAT_8021d1a8);
 		}
@@ -648,9 +666,11 @@ void SePause(int seId, int pause)
 
 	if (m_ReportPrint != 0) {
 		if (pause == 1) {
-			OSReport(s_redCommandSePauseOnFmt, sRedCommandLogPrefix, seId);
+			OSReport(s_redCommandLogBlob + RED_COMMAND_SE_PAUSE_ON_FMT_OFFSET,
+			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
 		} else {
-			OSReport(s_redCommandSePauseOffFmt, sRedCommandLogPrefix, seId);
+			OSReport(s_redCommandLogBlob + RED_COMMAND_SE_PAUSE_OFF_FMT_OFFSET,
+			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
 		}
 		fflush(&DAT_8021d1a8);
 	}
@@ -718,10 +738,12 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	int trackBase = RedNew(*(char*)((char*)musicHead + 8) * 0x154);
 	if (trackBase == 0) {
 		if (m_ReportPrint != 0) {
-			OSReport(s_redCommandMusicTrackCreateErrorFmt, sRedCommandLogPrefix, sRedCommandLogErrorColor,
+			OSReport(s_redCommandLogBlob + RED_COMMAND_MUSIC_TRACK_CREATE_ERROR_FMT_OFFSET,
+			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogErrorColor,
 			         sRedCommandLogReset);
 			fflush(&DAT_8021d1a8);
-			OSReport(s_redCommandMusicNeedMemoryFmt, sRedCommandLogPrefix, sRedCommandLogErrorColor,
+			OSReport(s_redCommandLogBlob + RED_COMMAND_MUSIC_NEED_MEMORY_FMT_OFFSET,
+			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogErrorColor,
 			         (int)*(short*)((char*)musicHead + 4), *(char*)((char*)musicHead + 8) * 0x154,
 			         sRedCommandLogReset);
 			fflush(&DAT_8021d1a8);

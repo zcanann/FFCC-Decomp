@@ -102,12 +102,13 @@ void _ReverbNullCallback(AXFX_BUFFERUPDATE* param_1, void*)
  * Address:	TODO
  * Size:	TODO
  */
-void ReverbAreaAlloc(unsigned long size)
+void* ReverbAreaAlloc(unsigned long size)
 {
-    unsigned long alignedSize = ((u32)size + 0x1F) & ~0x1F;
-    p_ReverbSize[0] += (u32)size;
+    unsigned long requestedSize = size;
+    unsigned long alignedSize = ((u32)requestedSize + 0x1F) & ~0x1F;
+    p_ReverbSize[0] += (u32)requestedSize;
     p_ReverbSize[1] += (u32)alignedSize;
-    RedNew((int)size);
+    return (void*)RedNew((int)requestedSize);
 }
 
 /*

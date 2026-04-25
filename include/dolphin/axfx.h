@@ -192,6 +192,8 @@ int AXFXReverbStdShutdown(AXFX_REVERBSTD* rev);
 int AXFXReverbStdSettings(AXFX_REVERBSTD* rev);
 void AXFXReverbStdCallback(AXFX_BUFFERUPDATE* bufferUpdate, AXFX_REVERBSTD* reverb);
 
+void AXFXSetHooks(void* (*alloc)(u32), void (*free)(void*));
+
 #ifdef __cplusplus
 }
 #endif

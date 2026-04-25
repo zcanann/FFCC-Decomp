@@ -6,8 +6,10 @@
 #include "ffcc/RedSound/RedExecute.h"
 #include "ffcc/RedSound/RedGlobals.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include "dolphin/ar.h"
 #include "dolphin/ax.h"
+#include "dolphin/axfx.h"
 #include "dolphin/os.h"
 
 // Global objects that need initialization
@@ -24,15 +26,6 @@ struct RedWaveHEAD {
 
 extern "C" {
     void __dl__FPv(void*);
-    void* memcpy(void*, const void*, unsigned long);
-    void* memmove(void*, const void*, unsigned long);
-    void* memset(void*, int, unsigned long);
-    int ReentryMusicData__9CRedEntryFi(void*, int);
-    void ClearWaveBank__9CRedEntryFi(void*, int);
-    void MusicStop__Fi(int);
-    void MusicPlay__Fiii(int, int, int);
-    void AXSetCompressor(int);
-    void AXFXSetHooks(void (*)(unsigned long), void (*)(void*));
     int __OSReadROM();
 }
 
@@ -246,7 +239,7 @@ void _SetMusicData(int* param_1)
  */
 void _MusicStop(int* param_1)
 {
-    MusicStop__Fi(*param_1);
+    MusicStop(*param_1);
     if ((*param_1 == -1) || (p_MusicNextPlay[0] == *param_1)) {
         p_MusicNextPlay[0] = -1;
     }
@@ -277,7 +270,7 @@ void _MusicPlaySequence(int* param_1)
         iVar1 = param_1[2];
         if (*(int*)(srcBuffer + 0x470) != -1) {
             if (*(int*)(srcBuffer + 0x904) != -1) {
-                MusicStop__Fi(*(int*)(srcBuffer + 0x904));
+                MusicStop(*(int*)(srcBuffer + 0x904));
             }
             if (iVar1 == 0) {
                 iVar1 = *(int*)((int)p_MusicReplayPoint + *param_1 * 4);
@@ -288,7 +281,7 @@ void _MusicPlaySequence(int* param_1)
                 *(int*)(srcBuffer + 0x470) = -1;
             }
         }
-        MusicPlay__Fiii(*param_1, param_1[1], iVar1);
+        MusicPlay(*param_1, param_1[1], iVar1);
     }
 }
 
@@ -335,7 +328,7 @@ void _MusicCrossPlaySequence(int* param_1)
                 iVar1 = 0;
                 if (*(int*)((int)pvVar2 + 0x470) != -1) {
                     if (*(int*)((int)pvVar2 + 0x904) != -1) {
-                        MusicStop__Fi(*(int*)((int)pvVar2 + 0x904));
+                        MusicStop(*(int*)((int)pvVar2 + 0x904));
                     }
                     *(int*)((int)pvVar2 + 0x458) = -*(int*)((int)pvVar2 + 0x454) / param_1[2];
                     *(int*)((int)pvVar2 + 0x45c) = param_1[2];
@@ -346,7 +339,7 @@ void _MusicCrossPlaySequence(int* param_1)
                         *(int*)((int)pvVar2 + 0x470) = 0xffffffff;
                     }
                 }
-                MusicPlay__Fiii(*param_1, param_1[1], iVar1);
+                MusicPlay(*param_1, param_1[1], iVar1);
             }
         }
     }
@@ -1483,7 +1476,7 @@ int CRedDriver::ReentryMusicData(int musicID)
     int result;
 
     interrupt = OSDisableInterrupts();
-    result = ReentryMusicData__9CRedEntryFi(&c_RedEntry, musicID);
+    result = c_RedEntry.ReentryMusicData(musicID);
     OSRestoreInterrupts(interrupt);
     return result;
 }
@@ -2133,7 +2126,7 @@ void CRedDriver::ClearWaveDataM(int param_1, int param_2, int param_3, int param
  */
 void CRedDriver::ClearWaveBank(int param_1)
 {
-    ClearWaveBank__9CRedEntryFi(&c_RedEntry, param_1);
+    c_RedEntry.ClearWaveBank(param_1);
 }
 
 /*

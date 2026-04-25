@@ -232,52 +232,53 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 {
     ZLIST* list;
     _ZLISTITEM* it[1];
-    RSDITEM* rsdItem;
+    int* listItem;
+    int rsdItem;
     int i;
-    ZCANMGRP* colAnmData;
+    int* colAnmData;
     int colAnmCount;
-    RSDLISTITEM* listItem;
 
     list = zlist;
     it[0] = list->m_root.m_previous;
     while (it[0] != (_ZLISTITEM*)0) {
-        listItem = (RSDLISTITEM*)list->GetDataNext(it);
-        rsdItem = listItem->rsdItem;
-        if (rsdItem != (RSDITEM*)0) {
-            if (rsdItem->ptrC != (void*)0) {
-                __dla__FPv(rsdItem->ptrC);
-                rsdItem->ptrC = 0;
+        listItem = reinterpret_cast<int*>(list->GetDataNext(it));
+        rsdItem = *listItem;
+        if (rsdItem != 0) {
+            if (*reinterpret_cast<void**>(rsdItem + 0xC) != 0) {
+                __dla__FPv(*reinterpret_cast<void**>(rsdItem + 0xC));
+                *reinterpret_cast<int*>(rsdItem + 0xC) = 0;
             }
-            if (rsdItem->ptr10 != (void*)0) {
-                __dla__FPv(rsdItem->ptr10);
-                rsdItem->ptr10 = 0;
+            if (*reinterpret_cast<void**>(rsdItem + 0x10) != 0) {
+                __dla__FPv(*reinterpret_cast<void**>(rsdItem + 0x10));
+                *reinterpret_cast<int*>(rsdItem + 0x10) = 0;
             }
-            if (rsdItem->ptr14 != (void*)0) {
-                __dla__FPv(rsdItem->ptr14);
-                rsdItem->ptr14 = 0;
+            if (*reinterpret_cast<void**>(rsdItem + 0x14) != 0) {
+                __dla__FPv(*reinterpret_cast<void**>(rsdItem + 0x14));
+                *reinterpret_cast<int*>(rsdItem + 0x14) = 0;
             }
-            if (rsdItem->ptr18 != (void*)0) {
-                __dla__FPv(rsdItem->ptr18);
-                rsdItem->ptr18 = 0;
+            if (*reinterpret_cast<void**>(rsdItem + 0x18) != 0) {
+                __dla__FPv(*reinterpret_cast<void**>(rsdItem + 0x18));
+                *reinterpret_cast<int*>(rsdItem + 0x18) = 0;
             }
-            if (rsdItem != (RSDITEM*)0) {
-                __dl__FPv(rsdItem);
+            if (rsdItem != 0) {
+                __dl__FPv(reinterpret_cast<void*>(rsdItem));
             }
         }
-        colAnmCount = listItem->colAnmCount;
-        colAnmData = listItem->colAnmData;
-        if (colAnmData != (ZCANMGRP*)0) {
-            for (i = 0; i < colAnmCount; colAnmData++, i++) {
-                if (colAnmData->ptr != (void*)0) {
-                    __dla__FPv(colAnmData->ptr);
-                    colAnmData->ptr = (void*)0;
+        colAnmData = reinterpret_cast<int*>(listItem[1]);
+        colAnmCount = listItem[2];
+        if (colAnmData != 0) {
+            for (i = 0; i < colAnmCount; i++) {
+                if (reinterpret_cast<void*>(colAnmData[0]) != 0) {
+                    __dla__FPv(reinterpret_cast<void*>(colAnmData[0]));
+                    colAnmData[0] = 0;
                 }
+                colAnmData += 5;
             }
-            if (listItem->colAnmData != (ZCANMGRP*)0) {
-                __dla__FPv(listItem->colAnmData);
-                listItem->colAnmData = (ZCANMGRP*)0;
+            if (reinterpret_cast<void*>(listItem[1]) != 0) {
+                __dla__FPv(reinterpret_cast<void*>(listItem[1]));
+                listItem[1] = 0;
             }
-            listItem->colAnmData = (ZCANMGRP*)0;
+            listItem[1] = 0;
         }
         __dl__FPv(listItem);
     }

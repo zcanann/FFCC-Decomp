@@ -357,51 +357,53 @@ void CMenuPcs::ItemInit1()
  */
 bool CMenuPcs::ItemOpen()
 {
-    float ratio;
+    float fVar1;
     double dVar2;
-    short* entry;
-    int finished;
-    unsigned int count;
-    int frame;
-    unsigned int remaining;
+    double dVar3;
+    short* psVar4;
+    int iVar5;
+    int iVar6;
+    int iVar7;
+    int iVar8;
 
     if (*(char*)((int)this->itemMenuState + 0xB) == '\0') {
         SingLifeInit(-1);
         ItemInit();
     }
 
+    iVar5 = 0;
     *(short*)((int)this->itemMenuState + 0x22) = *(short*)((int)this->itemMenuState + 0x22) + 1;
-    finished = 0;
-    count = (unsigned int)this->itemList->count;
-    entry = (short*)this->itemList + 4;
-    frame = (int)*(short*)((int)this->itemMenuState + 0x22);
-    remaining = count;
-    if (0 < (int)count) {
+    iVar6 = (int)this->itemList->count;
+    psVar4 = (short*)this->itemList + 4;
+    iVar7 = (int)*(short*)((int)this->itemMenuState + 0x22);
+    iVar8 = iVar6;
+    if (0 < iVar6) {
         do {
-            ratio = FLOAT_80332e60;
-            if (*(int*)(entry + 0x12) <= frame) {
-                if (frame < *(int*)(entry + 0x12) + *(int*)(entry + 0x14)) {
+            dVar3 = DOUBLE_80332ea0;
+            fVar1 = FLOAT_80332e60;
+            if (*(int*)(psVar4 + 0x12) <= iVar7) {
+                if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
+                    *(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
                     dVar2 = DOUBLE_80332e68;
-                    *(int*)(entry + 0x10) = *(int*)(entry + 0x10) + 1;
-                    *(float*)(entry + 8) =
-                        (float)((DOUBLE_80332e68 / (double)*(int*)(entry + 0x14)) * (double)*(int*)(entry + 0x10));
-                    if ((*(unsigned int*)(entry + 0x16) & 2) == 0) {
-                        ratio = (float)((dVar2 / (double)*(int*)(entry + 0x14)) * (double)*(int*)(entry + 0x10));
-                        *(float*)(entry + 0x18) = (*(float*)(entry + 0x1C) - (float)*entry) * ratio;
-                        *(float*)(entry + 0x1A) = (*(float*)(entry + 0x1E) - (float)entry[1]) * ratio;
+                    *(float*)(psVar4 + 8) =
+                        (float)((DOUBLE_80332e68 / ((double)*(int*)(psVar4 + 0x14))) * (double)*(int*)(psVar4 + 0x10));
+                    if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
+                        fVar1 = (float)((dVar2 / ((double)*(int*)(psVar4 + 0x14))) * (double)*(int*)(psVar4 + 0x10));
+                        *(float*)(psVar4 + 0x18) = (*(float*)(psVar4 + 0x1C) - (float)*psVar4) * fVar1;
+                        *(float*)(psVar4 + 0x1A) = (*(float*)(psVar4 + 0x1E) - (float)psVar4[1]) * fVar1;
                     }
                 } else {
-                    finished = finished + 1;
-                    *(float*)(entry + 8) = FLOAT_80332e64;
-                    *(float*)(entry + 0x18) = ratio;
-                    *(float*)(entry + 0x1A) = ratio;
+                    iVar5 = iVar5 + 1;
+                    *(float*)(psVar4 + 8) = FLOAT_80332e64;
+                    *(float*)(psVar4 + 0x18) = fVar1;
+                    *(float*)(psVar4 + 0x1A) = fVar1;
                 }
             }
-            entry = entry + 0x20;
-            remaining = remaining - 1;
-        } while (remaining != 0);
+            psVar4 = psVar4 + 0x20;
+            iVar8 = iVar8 + -1;
+        } while (iVar8 != 0);
     }
-    return count == (unsigned int)finished;
+    return iVar6 == iVar5;
 }
 
 /*

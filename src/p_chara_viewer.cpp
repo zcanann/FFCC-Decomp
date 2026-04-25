@@ -99,16 +99,6 @@ static void addRef(unsigned char* p, int offset)
     }
 }
 
-static inline MtxPtr GetCameraMatrix()
-{
-    return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
-}
-
-static inline Mtx44Ptr GetScreenMatrix()
-{
-    return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
-}
-
 static const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
 static const char s_gpu_profile_fmt[] = "GPU = %f.5%%(C = %.5f%% G = %.5f%%)";
 static const char s_no_texture[] = "no texture...";
@@ -135,58 +125,57 @@ static const char s_back_tex_fmt[] = "%sback.tex";
 extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
 {
     unsigned char* p = (unsigned char*)param_1;
-    CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(p + 0x2B8);
     Mtx cameraMtx;
     Mtx scratchMtx;
     Mtx44 projMtx;
     Mtx texMtx;
 
-    if (textureSet != 0) {
-        CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(textureSet) + 8);
+    if ((*(int*)(p + 0x2B8) != 0) &&
+        (reinterpret_cast<CPtrArray<CTexture*>*>(*(unsigned char**)(p + 0x2B8) + 8)->GetSize() != 0)) {
+        CTexture* texture =
+            (*reinterpret_cast<CPtrArray<CTexture*>*>(*(unsigned char**)(p + 0x2B8) + 8))[0];
 
-        if (textureArray->GetSize() != 0) {
-            CTexture* texture = (*textureArray)[0];
-
-            C_MTXOrtho(projMtx, kCharaViewerZero, FLOAT_80330BEC, kCharaViewerZero, FLOAT_80330BF0, kCharaViewerZero,
-                       FLOAT_80330BF4);
-            GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
-            PSMTXIdentity(cameraMtx);
-            GXLoadPosMtxImm(cameraMtx, 0);
-            GXSetCurrentMtx(0);
-            _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 0, 0);
-            GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-            GXSetNumChans(0);
-            GXSetNumTevStages(1);
-            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
-            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
-            PSMTXIdentity(cameraMtx);
-            GXLoadPosMtxImm(cameraMtx, 0);
-            GXSetCullMode(GX_CULL_NONE);
-            TextureMan.SetTexture(GX_TEXMAP0, texture);
-            PSMTXScale(texMtx, FLOAT_80330BF8 / static_cast<float>(texture->m_width),
-                       FLOAT_80330BF8 / static_cast<float>(texture->m_height), FLOAT_80330BF8);
-            GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
-            GXSetNumTexGens(1);
-            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-            GXClearVtxDesc();
-            GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-            GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
-            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 1);
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3s16(0, 0, 0);
-            GXTexCoord2s16(0, 0);
-            GXPosition3s16(static_cast<short>(texture->m_width), 0, 0);
-            GXTexCoord2s16(static_cast<short>(texture->m_width * 2), 0);
-            GXPosition3s16(static_cast<short>(texture->m_width), static_cast<short>(texture->m_height), 0);
-            GXTexCoord2s16(static_cast<short>(texture->m_width * 2), static_cast<short>(texture->m_height * 2));
-            GXPosition3s16(0, static_cast<short>(texture->m_height), 0);
-            GXTexCoord2s16(0, static_cast<short>(texture->m_height * 2));
-        }
+        C_MTXOrtho(projMtx, kCharaViewerZero, FLOAT_80330BEC, kCharaViewerZero, FLOAT_80330BF0, kCharaViewerZero,
+                   FLOAT_80330BF4);
+        GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
+        PSMTXIdentity(cameraMtx);
+        GXLoadPosMtxImm(cameraMtx, 0);
+        GXSetCurrentMtx(0);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 0, 0);
+        GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+        GXSetNumChans(0);
+        GXSetNumTevStages(1);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
+        PSMTXIdentity(cameraMtx);
+        GXLoadPosMtxImm(cameraMtx, 0);
+        GXSetCullMode(GX_CULL_NONE);
+        TextureMan.SetTexture(GX_TEXMAP0, texture);
+        PSMTXScale(texMtx, FLOAT_80330BF8 / static_cast<float>(texture->m_width),
+                   FLOAT_80330BF8 / static_cast<float>(texture->m_height), FLOAT_80330BF8);
+        GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+        GXClearVtxDesc();
+        GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+        GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 1);
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        GXPosition3s16(0, 0, 0);
+        GXTexCoord2s16(0, 0);
+        GXPosition3s16(static_cast<short>(texture->m_width), 0, 0);
+        GXTexCoord2s16(static_cast<short>(texture->m_width * 2), 0);
+        GXPosition3s16(static_cast<short>(texture->m_width), static_cast<short>(texture->m_height), 0);
+        GXTexCoord2s16(static_cast<short>(texture->m_width * 2), static_cast<short>(texture->m_height * 2));
+        GXPosition3s16(0, static_cast<short>(texture->m_height), 0);
+        GXTexCoord2s16(0, static_cast<short>(texture->m_height * 2));
+        PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx);
+        GXSetProjection(projMtx, GX_PERSPECTIVE);
     }
 
-    PSMTXCopy(GetCameraMatrix(), cameraMtx);
-    PSMTX44Copy(GetScreenMatrix(), projMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx);
     GXSetProjection(projMtx, GX_PERSPECTIVE);
 
     if (*(int*)(p + 0x6F8) != 0) {

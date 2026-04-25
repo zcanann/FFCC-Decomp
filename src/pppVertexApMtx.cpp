@@ -158,8 +158,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 				f32 randValue = Math.RandF();
 				f32 maxValue = (f32)entry->maxValue;
 				int outValue = (int)(randValue * maxValue);
-				u16* vertexIndices = entry->vertexIndices;
-				u16 vertexIndex = vertexIndices[outValue];
+				u16 vertexIndex = entry->vertexIndices[outValue];
 				Vec* vertex = &points[vertexIndex];
 				f32 x = vertex->x;
 				f32 y = vertex->y;

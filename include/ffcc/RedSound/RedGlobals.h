@@ -11,7 +11,6 @@ class CRedEntry;
 class CRedMemory;
 
 extern int p_MidiControl_Function[];
-extern FILE DAT_8021d1a8;
 extern u32 t_TonePitch[];
 extern int t_FinePitch[];
 extern int t_KeySignatureIndex[];

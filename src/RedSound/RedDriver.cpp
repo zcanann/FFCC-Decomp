@@ -904,12 +904,12 @@ void _DMACheckProcess()
 
     if (m_ReportPrint != 0) {
         OSReport(s_redDriverDmaCheckHeaderFmt, s_redDriverDmaCheckLogBlob);
-        fflush(&DAT_8021d1a8);
+        fflush(__files + 1);
 
         semCount = OSGetSemaphoreCount(&m_DmaExecuteSemaphore);
         OSReport(s_redDriverDmaCheckLogBlob + RED_DRIVER_STATUS_FMT_OFFSET, s_redDriverDmaCheckLogBlob, m_DMAStatus,
                  semCount, m_DMAExecute, m_DMAInThread);
-        fflush(&DAT_8021d1a8);
+        fflush(__files + 1);
     }
 
     dmaInfo = RedDriverMainDmaQueue();
@@ -917,12 +917,12 @@ void _DMACheckProcess()
         if ((*dmaInfo != 0) && (m_ReportPrint != 0)) {
             OSReport(s_redDriverDmaCheckLogBlob + RED_DRIVER_DMA_ENTRY_FMT_OFFSET, s_redDriverDmaCheckLogBlob,
                      dmaInfo[0], dmaInfo[2], dmaInfo[3], dmaInfo[4], dmaInfo[5]);
-            fflush(&DAT_8021d1a8);
+            fflush(__files + 1);
         }
         dmaInfo += 7;
     } while (dmaInfo < RedDriverStreamDmaQueueEnd());
 
-    fflush(&DAT_8021d1a8);
+    fflush(__files + 1);
 }
 
 /*
@@ -1473,7 +1473,7 @@ int CRedDriver::SetMusicData(void* param_1)
     }
     if (m_ReportPrint != 0) {
         OSReport(s_redDriverHeaderErrorBlob, s_redDriverDmaCheckLogBlob, sRedDriverLogWarnColor, sRedDriverLogReset);
-        fflush(&DAT_8021d1a8);
+        fflush(__files + 1);
     }
     return -1;
 }
@@ -1668,7 +1668,7 @@ int CRedDriver::SetSeSepData(void* param_1)
     if (m_ReportPrint != 0) {
         OSReport(s_redDriverHeaderErrorBlob + RED_DRIVER_SE_HEADER_ERROR_FMT_OFFSET, s_redDriverDmaCheckLogBlob,
                  sRedDriverLogWarnColor, sRedDriverLogReset);
-        fflush(&DAT_8021d1a8);
+        fflush(__files + 1);
     }
     return -1;
 }

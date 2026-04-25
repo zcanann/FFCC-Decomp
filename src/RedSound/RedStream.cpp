@@ -333,14 +333,14 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 			if (m_ReportPrint != 0) {
 				OSReport(s_redStreamLogBlob, s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogErrorColor,
 				         sRedStreamLogReset);
-				fflush(&DAT_8021d1a8);
+				fflush(__files + 1);
 			}
 			if (streamData[3] == 0) {
 				if (m_ReportPrint != 0) {
 					OSReport(s_redStreamLogBlob + RED_STREAM_MAIN_MEMORY_CREATE_ERROR_FMT_OFFSET,
 					         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogWarnColor, 0x4000,
 					         sRedStreamLogReset);
-					fflush(&DAT_8021d1a8);
+					fflush(__files + 1);
 				}
 			} else {
 				RedDelete((void*)streamData[3]);
@@ -350,7 +350,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 					OSReport(s_redStreamLogBlob + RED_STREAM_AUX_MEMORY_CREATE_ERROR_FMT_OFFSET,
 					         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogWarnColor, amemSize,
 					         sRedStreamLogReset);
-					fflush(&DAT_8021d1a8);
+					fflush(__files + 1);
 				}
 			} else {
 				RedDeleteA(streamData[0x4b]);

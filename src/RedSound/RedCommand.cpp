@@ -357,7 +357,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 		if (m_ReportPrint != 0) {
 			OSReport(s_redCommandLogBlob, s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogWarnColor,
 			         deltaTime, sRedCommandLogReset);
-			fflush(&DAT_8021d1a8);
+			fflush(__files + 1);
 		}
 	} else {
 		WaveHistoryManager__9CRedEntryFii(&c_RedEntry, 1, *(short*)(waveBase + 2));
@@ -671,7 +671,7 @@ void SePause(int seId, int pause)
 			OSReport(s_redCommandLogBlob + RED_COMMAND_SE_PAUSE_OFF_FMT_OFFSET,
 			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
 		}
-		fflush(&DAT_8021d1a8);
+		fflush(__files + 1);
 	}
 
 	trackBasePtr = (unsigned int*)((char*)p_SoundControlBuffer + 0xdbc);
@@ -740,12 +740,12 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 			OSReport(s_redCommandLogBlob + RED_COMMAND_MUSIC_TRACK_CREATE_ERROR_FMT_OFFSET,
 			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogErrorColor,
 			         sRedCommandLogReset);
-			fflush(&DAT_8021d1a8);
+			fflush(__files + 1);
 			OSReport(s_redCommandLogBlob + RED_COMMAND_MUSIC_NEED_MEMORY_FMT_OFFSET,
 			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogErrorColor,
 			         (int)*(short*)((char*)musicHead + 4), *(char*)((char*)musicHead + 8) * 0x154,
 			         sRedCommandLogReset);
-			fflush(&DAT_8021d1a8);
+			fflush(__files + 1);
 		}
 		c_RedEntry.DisplayMMemoryInfo();
 		return;

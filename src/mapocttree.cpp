@@ -1438,32 +1438,28 @@ void InsertShadow_r(COctNode* node)
  */
 void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 {
-	Mtx inverseMtx;
 	Vec localPosition;
-	unsigned char* thisBytes = (unsigned char*)this;
-	float* srcBound = (float*)&bound;
-	float* dstBound = (float*)&s_bound;
+	Mtx inverseMtx;
+	float* srcBound = reinterpret_cast<float*>(&bound);
 
-	if (*thisBytes != 0) {
-		return;
+	if (m_type == 0) {
+		s_insertShadowBitIndex = bitIndex;
+		PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
+		PSMTXMultVec(inverseMtx, &position, &localPosition);
+
+		s_bound.m_min.x = srcBound[0];
+		s_bound.m_min.y = srcBound[1];
+		s_bound.m_min.z = srcBound[2];
+		s_bound.m_max.x = srcBound[3];
+		s_bound.m_max.y = srcBound[4];
+		s_bound.m_max.z = srcBound[5];
+
+		PSVECAdd(&s_bound.m_min, &localPosition, &s_bound.m_min);
+		PSVECAdd(&s_bound.m_max, &localPosition, &s_bound.m_max);
+
+		s_insertShadowDepth = 0;
+		InsertShadow_r(m_nodePool);
 	}
-
-	s_insertShadowBitIndex = bitIndex;
-	PSMTXInverse((MtxPtr)(*(unsigned char**)(thisBytes + 0x8) + 0xb8), inverseMtx);
-	PSMTXMultVec(inverseMtx, &position, &localPosition);
-
-	dstBound[0] = srcBound[0];
-	dstBound[1] = srcBound[1];
-	dstBound[2] = srcBound[2];
-	dstBound[3] = srcBound[3];
-	dstBound[4] = srcBound[4];
-	dstBound[5] = srcBound[5];
-
-	PSVECAdd((Vec*)&s_bound, &localPosition, (Vec*)&s_bound);
-	PSVECAdd((Vec*)((unsigned char*)&s_bound + 0xc), &localPosition, (Vec*)((unsigned char*)&s_bound + 0xc));
-
-	s_insertShadowDepth = 0;
-	InsertShadow_r(*(COctNode**)(thisBytes + 0x4));
 }
 
 /*

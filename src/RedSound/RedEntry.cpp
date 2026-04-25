@@ -49,7 +49,6 @@ static const char s__s____________0x_8_8X___0x_8_8X___801e7dd2[] = "%s -------- 
 static const char s__s_Entry_Items____d_801e7dfd[] = "%s   Entry Items = %d\n";
 
 extern "C" {
-	void* RedNew__Fi(int);
 	void __dl__FPv(void*);
 	int WaveDelete__9CRedEntryFP14RedHistoryBANK(CRedEntry*, RedHistoryBANK*);
 	void WaveHistoryAdd__9CRedEntryFi(CRedEntry*, int);
@@ -97,11 +96,11 @@ void CRedEntry::Init()
 	int iVar2;
 	int* entry = (int*)this;
 
-	iVar2 = (int)RedNew__Fi(0x400);
+	iVar2 = RedNew(0x400);
 	entry[0] = iVar2;
-	iVar2 = (int)RedNew__Fi(0x1000);
+	iVar2 = RedNew(0x1000);
 	entry[1] = iVar2;
-	iVar2 = (int)RedNew__Fi(0x40);
+	iVar2 = RedNew(0x40);
 	entry[2] = iVar2;
 
 	memset((void*)entry[0], 0, 0x400);
@@ -423,7 +422,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 			    ((arAddress = RedNewA(*(int*)(head + 0x14), minOffset, maxOffset)) != 0)) {
 				int copySize = (((*(int*)(head + 8) * 4) + 0x1F) & 0xFFFFFFE0) + *(int*)(head + 0xC) * 0x60 +
 				               0x20;
-				void* copied = RedNew__Fi(copySize);
+				void* copied = (void*)RedNew(copySize);
 				if (copied != 0) {
 					historyBank[2] = (int)copied;
 					historyBank[3] = copySize;

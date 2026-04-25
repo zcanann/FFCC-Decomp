@@ -15,7 +15,6 @@
 
 extern "C" {
 	void __dl__FPv(void*);
-	void* RedNew__Fi(int);
 }
 
 // RedSound global linkage that is shared across Red* units.
@@ -209,7 +208,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 void CRedSound::Start()
 {
 #define redSoundStreamBank (*(void* volatile*)&p_StreamBank)
-	redSoundStreamBank = RedNew__Fi(0x100);
+	redSoundStreamBank = (void*)RedNew(0x100);
 	memset((void*)redSoundStreamBank, 0, 0x100);
 #undef redSoundStreamBank
 }

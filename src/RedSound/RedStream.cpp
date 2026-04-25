@@ -33,8 +33,6 @@ enum {
 };
 
 extern "C" {
-void RedDelete__FPv(void*);
-void RedDeleteA__Fi(int);
 int PitchCompute__Fiiii(int, int, int, int);
 int SearchSeEmptyTrack__Fiii(int, int, int);
 }
@@ -86,11 +84,11 @@ void _StreamStop(RedStreamDATA* streamData)
 		*(int*)((int)streamData + 0x10c) = 0;
 		*(int*)((int)streamData + 0x110) = 0;
 		if (*(int*)((int)streamData + 0xc) != 0) {
-			RedDelete__FPv((void*)*(int*)((int)streamData + 0xc));
+			RedDelete((void*)*(int*)((int)streamData + 0xc));
 			*(int*)((int)streamData + 0xc) = 0;
 		}
 		if (*(int*)((int)streamData + 0x12c) != 0) {
-			RedDeleteA__Fi(*(int*)((int)streamData + 0x12c));
+			RedDeleteA(*(int*)((int)streamData + 0x12c));
 			*(int*)((int)streamData + 0x12c) = 0;
 		}
 		*(unsigned int*)(*(int*)((int)streamData + 4) + 0x90) |= 2;
@@ -345,7 +343,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 					fflush(&DAT_8021d1a8);
 				}
 			} else {
-				RedDelete__FPv((void*)streamData[3]);
+				RedDelete((void*)streamData[3]);
 			}
 			if (streamData[0x4b] == 0) {
 				if (m_ReportPrint != 0) {

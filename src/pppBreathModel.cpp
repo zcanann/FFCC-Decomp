@@ -4,16 +4,21 @@
 #include "dolphin/gx.h"
 #include "ffcc/math.h"
 extern "C" {
-extern const float kPppBreathModelZero;
+const float kPppBreathModelZero = 0.0f;
+const double DOUBLE_80330F78 = 4503601774854144.0;
+const float FLOAT_80330F80 = -1.0f;
+const float FLOAT_80330F84 = 360.0f;
+const float FLOAT_80330F88 = 180.0f;
+const float FLOAT_80330F8C = -180.0f;
+const double DOUBLE_80330F90 = 4503599627370496.0;
+const double DOUBLE_80330F98 = 0.5;
+const float FLOAT_80330FA0 = 2.0f;
+const float FLOAT_80330FA4 = 0.5f;
+
 extern int gPppCalcDisabled;
 }
 #include "ffcc/pppPart.h"
 #include <string.h>
-
-extern const float FLOAT_80330F80;
-extern const float FLOAT_80330F84;
-extern const float FLOAT_80330F88 = 6.2831855f;
-extern const float FLOAT_80330F8C = 0.0f;
 
 struct pppModelSt;
 

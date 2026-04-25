@@ -109,6 +109,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     float phaseLerp;
     u32 drawColor;
     u8* drawColorBytes;
+    YmMeltVertex* vertexData;
     float worldX;
     float worldY;
     float worldZ;
@@ -163,6 +164,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     drawColorBytes[1] = colorWork->m_color.rgba[1];
     drawColorBytes[2] = colorWork->m_color.rgba[2];
     drawColorBytes[3] = colorWork->m_color.rgba[3];
+    vertexData = work->m_vertexData;
     worldX = pppMngStPtr->m_matrix.value[0][3];
     worldY = pppMngStPtr->m_matrix.value[1][3];
     worldZ = pppMngStPtr->m_matrix.value[2][3];
@@ -180,18 +182,18 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             int gridWork = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
             int idx0 = x + z * (gridWork + 1);
             int idx1 = x + (z + 1) * (gridWork + 1);
-            YmMeltVertex* p0Data = &work->m_vertexData[idx1];
+            YmMeltVertex* p0Data = &vertexData[idx1];
             Vec vtx0;
             u32 colorValue;
 
             pppCopyVector(vtx0, p0Data->m_position);
-            YmMeltVertex* p1Data = &work->m_vertexData[idx0];
+            YmMeltVertex* p1Data = &vertexData[idx0];
             Vec vtx1;
             pppCopyVector(vtx1, p1Data->m_position);
-            YmMeltVertex* p3Data = &work->m_vertexData[idx1 + 1];
+            YmMeltVertex* p3Data = &vertexData[idx1 + 1];
             Vec vtx3;
             pppCopyVector(vtx3, p3Data->m_position);
-            YmMeltVertex* p2Data = &work->m_vertexData[idx0 + 1];
+            YmMeltVertex* p2Data = &vertexData[idx0 + 1];
             Vec vtx2;
             pppCopyVector(vtx2, p2Data->m_position);
 

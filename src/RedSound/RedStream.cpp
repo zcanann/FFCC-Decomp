@@ -8,15 +8,29 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-static const char s_redStreamBufferSecureErrorFmt[] = "%s%sStream Buffer didn't secure.%s\n";
-static const char sRedStreamLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
-static const char s_redStreamMainMemoryCreateErrorFmt[] = "%s%sM-Memory didn't create.(need:0x%6.6X)%s\n";
-static const char s_redStreamAuxMemoryCreateErrorFmt[] = "%s%sA-Memory didn't create.(need:0x%6.6X)%s\n";
-static const char s_redStreamPauseOnFmt[] = "%sPause : Stream : ON  %d\n";
-static const char s_redStreamPauseOffFmt[] = "%sPause : Stream : OFF %d\n";
+static const char s_redStreamLogBlob[0xC8] =
+    "%s%sStream Buffer didn't secure.%s\n"
+    "\0"
+    "\x1B[7;34mSound\x1B[0m:"
+    "\0"
+    "%s%sM-Memory didn't create.(need:0x%6.6X)%s\n"
+    "\0"
+    "%s%sA-Memory didn't create.(need:0x%6.6X)%s\n"
+    "\0"
+    "%sPause : Stream : ON  %d\n"
+    "\0"
+    "%sPause : Stream : OFF %d\n";
 static const char sRedStreamLogErrorColor[] = "\x1B[7;31m";
 static const char sRedStreamLogReset[] = "\x1B[0m";
 static const char sRedStreamLogWarnColor[] = "\x1B[4;31m";
+
+enum {
+    RED_STREAM_LOG_PREFIX_OFFSET = 0x23,
+    RED_STREAM_MAIN_MEMORY_CREATE_ERROR_FMT_OFFSET = 0x35,
+    RED_STREAM_AUX_MEMORY_CREATE_ERROR_FMT_OFFSET = 0x64,
+    RED_STREAM_PAUSE_ON_FMT_OFFSET = 0x90,
+    RED_STREAM_PAUSE_OFF_FMT_OFFSET = 0xAC,
+};
 
 extern "C" {
 void RedDelete__FPv(void*);
@@ -319,14 +333,15 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 
 		if ((*streamData == 0) || (streamData[3] == 0) || (streamData[0x4b] == 0)) {
 			if (m_ReportPrint != 0) {
-				OSReport(s_redStreamBufferSecureErrorFmt, sRedStreamLogPrefix, sRedStreamLogErrorColor,
+				OSReport(s_redStreamLogBlob, s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogErrorColor,
 				         sRedStreamLogReset);
 				fflush(&DAT_8021d1a8);
 			}
 			if (streamData[3] == 0) {
 				if (m_ReportPrint != 0) {
-					OSReport(s_redStreamMainMemoryCreateErrorFmt, sRedStreamLogPrefix, sRedStreamLogWarnColor,
-					         0x4000, sRedStreamLogReset);
+					OSReport(s_redStreamLogBlob + RED_STREAM_MAIN_MEMORY_CREATE_ERROR_FMT_OFFSET,
+					         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogWarnColor, 0x4000,
+					         sRedStreamLogReset);
 					fflush(&DAT_8021d1a8);
 				}
 			} else {
@@ -334,8 +349,9 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 			}
 			if (streamData[0x4b] == 0) {
 				if (m_ReportPrint != 0) {
-					OSReport(s_redStreamAuxMemoryCreateErrorFmt, sRedStreamLogPrefix, sRedStreamLogWarnColor,
-					         amemSize, sRedStreamLogReset);
+					OSReport(s_redStreamLogBlob + RED_STREAM_AUX_MEMORY_CREATE_ERROR_FMT_OFFSET,
+					         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogWarnColor, amemSize,
+					         sRedStreamLogReset);
 					fflush(&DAT_8021d1a8);
 				}
 			} else {
@@ -492,9 +508,11 @@ void StreamPause(int param_1, int param_2)
 	streamData = p_Stream;
 	if (m_ReportPrint != 0) {
 		if (param_2 == 1) {
-			OSReport(s_redStreamPauseOnFmt, sRedStreamLogPrefix, param_1);
+			OSReport(s_redStreamLogBlob + RED_STREAM_PAUSE_ON_FMT_OFFSET,
+			         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, param_1);
 		} else {
-			OSReport(s_redStreamPauseOffFmt, sRedStreamLogPrefix, param_1);
+			OSReport(s_redStreamLogBlob + RED_STREAM_PAUSE_OFF_FMT_OFFSET,
+			         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, param_1);
 		}
 		fflush(__files + 1);
 		streamData = p_Stream;

@@ -1,3 +1,19 @@
+extern "C" const float kZeroF = 0.0f;
+extern "C" const float kNegOneF = -1.0f;
+extern "C" const float FLOAT_8032F748 = 1.0f;
+extern "C" const double DOUBLE_8032F750 = 4503601774854144.0;
+extern "C" const float FLOAT_8032F758 = 3.0f;
+extern "C" const float FLOAT_8032F75C = 2.0f;
+extern "C" const float FLOAT_8032F760 = -2.0f;
+extern "C" const double DOUBLE_8032F768 = 0.5;
+extern "C" const double DOUBLE_8032F770 = 3.0;
+extern "C" const double DOUBLE_8032F778 = 0.0;
+extern "C" const float FLOAT_8032F780 = -999999995904.0f;
+extern "C" const float FLOAT_8032F784 = 10000000000.0f;
+extern "C" const float FLOAT_8032F788 = -10000000000.0f;
+extern "C" const float kRandSignedScaleF = 6.103701889514923e-05f;
+extern "C" const float kRandScaleF = 3.0518509447574615e-05f;
+
 #include "ffcc/math.h"
 
 #include "dolphin/mtx.h"
@@ -8,16 +24,6 @@ extern "C" double acos(double);
 #include "string.h"
 
 extern "C" int rand(void);
-extern "C" float kZeroF;
-extern "C" float kNegOneF;
-extern "C" double DOUBLE_8032F778;
-extern "C" float FLOAT_8032F780;
-extern "C" float FLOAT_8032F788;
-extern "C" float FLOAT_8032F758;
-extern "C" float FLOAT_8032F75C;
-extern "C" float kRandSignedScaleF;
-extern "C" float kRandScaleF;
-
 CMath Math;
 static Vec s_f_vpos;
 static Mtx s_f_lvmtx;

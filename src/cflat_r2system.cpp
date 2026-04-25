@@ -3518,6 +3518,43 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0x1F:
+        if (*object->m_localBase < 0x10) {
+            const int lineOffset = *object->m_localBase * 0xB14;
+            unsigned int* pointCount = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1BF4 + lineOffset);
+            if (*pointCount < 0x40) {
+                const unsigned int pointOffset = *pointCount * 0xC + lineOffset;
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C0C + pointOffset) =
+                    object->m_localBase[1];
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C10 + pointOffset) =
+                    object->m_localBase[2];
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C14 + pointOffset) =
+                    object->m_localBase[3];
+                *pointCount = *pointCount + 1;
+                CalcBound__9CLine(reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + lineOffset));
+            }
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x1E:
+        if (*object->m_localBase < 0x10) {
+            const int lineOffset = *object->m_localBase * 0xB14;
+            *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1BF4 + lineOffset) = 0;
+            *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C08 + lineOffset) = object->m_localBase[1];
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x1D:
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x1C:
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x129C) = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0x1B: {
         Vec position = {
             static_cast<float>(object->m_localBase[2]),
@@ -3526,6 +3563,32 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         };
         this->PutParticle((*object->m_localBase << 8) | object->m_localBase[1], position,
             static_cast<float>(object->m_localBase[5]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x19: {
+        int* pointCount = reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x17D4);
+        float* totalDistance = reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17D8);
+        if (*pointCount < 0x40) {
+            if (*object->m_localBase != 0) {
+                *pointCount = 0;
+                *totalDistance = 0.0f;
+            }
+
+            Vec* point = reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + *pointCount * 0x10);
+            point->x = static_cast<float>(object->m_localBase[1]);
+            point->y = static_cast<float>(object->m_localBase[2]);
+            point->z = static_cast<float>(object->m_localBase[3]);
+
+            if (*pointCount != 0) {
+                Vec* previous = reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + (*pointCount - 1) * 0x10);
+                *totalDistance += PSVECDistance(point, previous);
+            }
+
+            *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17DC + *pointCount * 0x10) = *totalDistance;
+            *pointCount = *pointCount + 1;
+        }
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -3546,6 +3609,15 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         strcpy(nextScript.m_name, strBlob + strOffs[*object->m_localBase]);
         Game.SetNextScript(&nextScript);
         runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x15: {
+        float value = static_cast<float>(*object->m_localBase);
+        if (value < 0.0f) {
+            value = -value;
+        }
+        runtime->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
         return;
     }

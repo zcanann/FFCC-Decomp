@@ -346,24 +346,22 @@ CFile::CHandle* CFile::CheckQueue()
         int completionStatus = handle->m_completionStatus;
         if (completionStatus == 2)
         {
-            int dvdStatus = DVDGetCommandBlockStatus(&handle->m_dvdFileInfo.cb);
+            completionStatus = DVDGetCommandBlockStatus(&handle->m_dvdFileInfo.cb);
 
-            if (dvdStatus == 0x0B || ((u32)(dvdStatus - 4) <= 2U) || dvdStatus == -1)
+            if (completionStatus == 0x0B || ((u32)(completionStatus - 4) <= 2U) || completionStatus == -1)
             {
-                DrawError(handle->m_dvdFileInfo, dvdStatus);
+                DrawError(handle->m_dvdFileInfo, completionStatus);
                 continue;
             }
-            else if (dvdStatus == 0)
+            else if (completionStatus == 0)
             {
-                completionStatus = 3;
-                handle->m_completionStatus = completionStatus;
+                handle->m_completionStatus = completionStatus = 3;
                 result = CheckQueue();
                 break;
             }
-            else if (dvdStatus < 0)
+            else if (completionStatus < 0)
             {
-                completionStatus = 4;
-                handle->m_completionStatus = completionStatus;
+                handle->m_completionStatus = completionStatus = 4;
             }
             else
             {

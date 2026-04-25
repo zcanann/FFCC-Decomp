@@ -67,26 +67,6 @@ extern float FLOAT_80330688;
 extern float FLOAT_8033068C;
 extern float FLOAT_80330690;
 
-static inline Mtx44& CameraScreenMatrix()
-{
-    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
-}
-
-static inline float CameraLookAtX()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xD4);
-}
-
-static inline float CameraLookAtY()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xD8);
-}
-
-static inline float CameraLookAtZ()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xDC);
-}
-
 void pppSetFpMatrix(_pppMngSt*);
 
 extern "C" {
@@ -304,7 +284,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 			}
 
 			if (*(s32*)((u8*)param1 + 0xC) == 0) {
-				PSMTX44Copy(CameraScreenMatrix(), screenMtx);
+				PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 				inVec.x = FLOAT_80330670;
 				inVec.y = FLOAT_80330670;
 				inVec.z = -*(float*)&step->m_payloadBytes[2];
@@ -324,9 +304,9 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				cameraY = ppvCameraMatrix02[1][3];
 				cameraZ = ppvCameraMatrix02[2][3];
 			} else {
-				cameraX = CameraLookAtX();
-				cameraY = CameraLookAtY();
-				cameraZ = CameraLookAtZ();
+				cameraX = CameraPcs._212_4_;
+				cameraY = CameraPcs._216_4_;
+				cameraZ = CameraPcs._220_4_;
 			}
 			pppMngStPtr->m_matrix.value[0][3] = cameraX;
 			pppMngStPtr->m_matrix.value[1][3] = cameraY;

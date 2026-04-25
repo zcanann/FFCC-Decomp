@@ -259,14 +259,13 @@ CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index)
  * Size:	TODO
  */
 CGame::CGame()
-    : m_partyMinX(FLOAT_8032f688)
-    , m_partyMinY(FLOAT_8032f688)
-    , m_partyMinZ(FLOAT_8032f688)
-    , m_partyMaxX(FLOAT_8032f68c)
-    , m_partyMaxY(FLOAT_8032f68c)
-    , m_partyMaxZ(FLOAT_8032f68c)
 {
-	// TODO
+    m_partyMinZ = FLOAT_8032f688;
+    m_partyMinY = FLOAT_8032f688;
+    m_partyMinX = FLOAT_8032f688;
+    m_partyMaxZ = FLOAT_8032f68c;
+    m_partyMaxY = FLOAT_8032f68c;
+    m_partyMaxX = FLOAT_8032f68c;
 }
 
 /*

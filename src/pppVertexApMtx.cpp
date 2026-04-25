@@ -57,9 +57,16 @@ struct VertexApMtxObject
 	Mtx localMatrix;
 };
 
+union VertexApMtxDoubleBits
+{
+	double d;
+	u32 u[2];
+};
+
 struct _pppPDataVal;
 
 _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
+extern const double kPppYmSharedDoubleBias;
 
 /*
  * --INFO--
@@ -79,11 +86,11 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 	VertexApMtxState* state = (VertexApMtxState*)((u8*)parent + stateOffset + 0x80);
 
 	if (gPppCalcDisabled != 0) {
-		return;
+		goto exitStub;
 	}
 
 	if (data->entryIndex < 0) {
-		return;
+		goto exitStub;
 	}
 
 	if (state->countdown == 0) {
@@ -102,8 +109,12 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		count = data->spawnCount;
 
 		switch (data->mode) {
+		default:
+			goto setCountdown;
 		case 0:
-			while (count-- != 0) {
+			goto mode0Dispatch;
+		mode0Body:
+			{
 				if (state->index >= entry->maxValue) {
 					state->index = 0;
 				}
@@ -152,11 +163,22 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					}
 				}
 			}
-			break;
+		mode0Test:
+			if (count-- != 0) {
+				goto mode0Body;
+			}
+			goto setCountdown;
 		case 1:
-			while (count-- != 0) {
+			goto mode1Init;
+		mode1Init:
+			goto mode1Test;
+		mode1Body:
+			{
 				f32 randValue = Math.RandF();
-				f32 maxValue = (f32)entry->maxValue;
+				VertexApMtxDoubleBits maxValueBits;
+				maxValueBits.u[0] = 0x43300000;
+				maxValueBits.u[1] = (u32)(int)entry->maxValue ^ 0x80000000;
+				f32 maxValue = (f32)(maxValueBits.d - kPppYmSharedDoubleBias);
 				int outValue = (int)(randValue * maxValue);
 				u16* vertexIndices = entry->vertexIndices;
 				u16 vertexIndex = vertexIndices[outValue];
@@ -200,14 +222,27 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					}
 				}
 			}
-			break;
-		default:
-			break;
+		mode1Test:
+			if (count-- != 0) {
+				goto mode1Body;
+			}
+			goto setCountdown;
 		}
+
+	setCountdown:
 		state->countdown = data->spawnDelay;
 	}
 
 	state->countdown--;
+
+exitStub:
+	goto functionEnd;
+mode0Dispatch:
+	goto mode0Test;
+mode1Dispatch:
+	goto mode1Init;
+functionEnd:
+	;
 }
 
 /*

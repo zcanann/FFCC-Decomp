@@ -250,7 +250,11 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 			work->m_origin.y = tempMtx[1][3];
 			work->m_origin.z = tempMtx[2][3];
 			PSMTXMultVec(tempMtx, &localB, work->m_points);
-		} else if (!emptyHistory) {
+		} else {
+			if (emptyHistory) {
+				continue;
+			}
+
 			pppYmLaserDoubleBits countDouble;
 			pppYmLaserDoubleBits indexDouble;
 
@@ -294,6 +298,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		}
 
 		if (i == 0) {
+			localB.x = kPppYmLaserOne;
+			localB.y = kPppYmLaserOne;
 			localB.z = work->m_length;
 			PSMTXMultVec(tempMtx, &localB, work->m_points);
 		}
@@ -339,12 +345,12 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		}
 	}
 
-	if (emptyHistory) {
-		Vec* points = work->m_points;
-		for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
-			pppCopyVector(points[i], points[0]);
+		if (emptyHistory) {
+			Vec* points = work->m_points;
+			for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
+				pppCopyVector(points[i], points[0]);
+			}
 		}
-	}
 	}
 }
 

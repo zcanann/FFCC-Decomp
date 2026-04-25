@@ -109,6 +109,7 @@ extern float FLOAT_80332d8c;
 extern float FLOAT_80332d90;
 extern float FLOAT_80332d94;
 extern float FLOAT_80332d98;
+extern float FLOAT_80332d9c;
 extern char DAT_80332d84[];
 extern char DAT_80332d14[];
 extern char DAT_80332d18[];
@@ -2021,49 +2022,18 @@ void CShopMenu::DrawMake()
 
     short recipeMaterial[8];
     GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), selectedItem, recipeMaterial);
-    const float rowYBase = 300.0f;
-    const float rowYStep = 30.0f;
-    for (int i = 0; i < 3; i++) {
+    int rowY = 300;
+    for (int i = 0; i < 3; i++, rowY += 0x1E) {
         int materialItem = recipeMaterial[i];
         if (materialItem < 1) {
             break;
         }
 
         int neededCount = recipeMaterial[i + 3];
-        int ownedCount = 0;
-        for (int slotGroup = 0; slotGroup < 8; slotGroup++) {
-            int slotBase = caravan + slotGroup * 0x10;
-            if (*reinterpret_cast<short*>(slotBase + 0xB6) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xB8) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xBA) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xBC) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xBE) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xC0) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xC2) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xC4) == materialItem) {
-                ++ownedCount;
-            }
-        }
-        float rowY = rowYBase + rowYStep * static_cast<float>(i);
         const char* materialName = GetItemName(materialItem);
         char neededBuffer[64];
         char ownedBuffer[64];
         sprintf(neededBuffer, DAT_80332d14, neededCount);
-        sprintf(ownedBuffer, DAT_80332d18, ownedCount);
 
         SetMargin__5CFontFf(FLOAT_80332d28, font);
         SetShadow__5CFontFi(font, 1);
@@ -2093,6 +2063,36 @@ void CShopMenu::DrawMake()
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
             MenuPcsVoid(), font, const_cast<char*>(materialName), nameX, rowY, 0x1B, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
+
+        int ownedCount = 0;
+        for (int slotGroup = 0; slotGroup < 8; slotGroup++) {
+            int slotBase = caravan + slotGroup * 0x10;
+            if (*reinterpret_cast<short*>(slotBase + 0xB6) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xB8) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xBA) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xBC) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xBE) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xC0) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xC2) == materialItem) {
+                ++ownedCount;
+            }
+            if (*reinterpret_cast<short*>(slotBase + 0xC4) == materialItem) {
+                ++ownedCount;
+            }
+        }
+        sprintf(ownedBuffer, DAT_80332d18, ownedCount);
 
         SetupShopMenuAmountFont(font, &white);
         float ownedX = 356.0f - GetWidth__5CFontFPc(font, ownedBuffer);
@@ -2394,12 +2394,12 @@ void CShopMenu::DrawMakeBase()
     _GXColor colorB = {0xFF, 0xFF, 0xFF, 0xFF};
     _GXColor colorC = {0xFF, 0xFF, 0xFF, 0x00};
     _GXColor colorD = {0xFF, 0xFF, 0xFF, 0xFF};
-    drawShapeSeqGrouad(9, 0, 0x1C, 0xB8, 0.5f, 0.7f, colorA, colorB, colorC, colorD);
+    drawShapeSeqGrouad(9, 0, 0x1C, 0xB8, FLOAT_80332d78, FLOAT_80332dc8, colorA, colorB, colorC, colorD);
 
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     int x = 0x3C;
     while (x < 0x25C) {
-        drawShapeSeqGrouad(9, 0, x, 0xB8, 0.5f, 0.7f, white, white, white, white);
+        drawShapeSeqGrouad(9, 0, x, 0xB8, FLOAT_80332d78, FLOAT_80332dc8, white, white, white, white);
         x += 0x20;
     }
 
@@ -2407,15 +2407,15 @@ void CShopMenu::DrawMakeBase()
     _GXColor endB = {0xFF, 0xFF, 0xFF, 0x00};
     _GXColor endC = {0xFF, 0xFF, 0xFF, 0xFF};
     _GXColor endD = {0xFF, 0xFF, 0xFF, 0x00};
-    drawShapeSeqGrouad(9, 0, x, 0xB8, 0.5f, 0.7f, endA, endB, endC, endD);
+    drawShapeSeqGrouad(9, 0, x, 0xB8, FLOAT_80332d78, FLOAT_80332dc8, endA, endB, endC, endD);
 
-    drawShapeSeq(3, 0, 0xB4, 0x8C, 0xFF, 0, 0, 0.0f, 0);
+    drawShapeSeq(3, 0, 0xB4, 0x8C, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     x = 0xB4;
     while (x < 0x1CC) {
-        drawShapeSeq(4, 0, x, 0x8C, 0xFF, 0, 0, 0.0f, 0);
+        drawShapeSeq(4, 0, x, 0x8C, 0xFF, 0, 0, FLOAT_80332d9c, 0);
         x += 0x20;
     }
-    drawShapeSeq(3, 0, x, 0x8C, 0xFF, 1, 0, 0.0f, 0);
+    drawShapeSeq(3, 0, x, 0x8C, 0xFF, 1, 0, FLOAT_80332d9c, 0);
 }
 
 /*

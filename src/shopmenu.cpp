@@ -1711,10 +1711,21 @@ void CShopMenu::SelectYesNo()
     }
 
     int itemIndex = ShopMenuInt(this, 0x28);
+    int itemId = -1;
     bool canTrade = false;
     if (itemIndex != -1) {
-        int itemId = ResolveShopMenuSelectedItemId(this);
-        canTrade = CanTradeShopMenuItem(this, itemIndex, itemId);
+        itemId = ResolveShopMenuSelectedItemId(this);
+        if (itemId >= 1) {
+            if (listType == 0) {
+                canTrade = true;
+            } else if (listType == 2) {
+                unsigned int bit = static_cast<unsigned int>(itemId - 0x191);
+                int caravan = ShopMenuCaravan(this);
+                canTrade = (*reinterpret_cast<unsigned int*>(caravan + ((itemId - 0x191) >> 5) * 4 + 0xC08) & (1U << (bit & 0x1F))) != 0;
+            } else if (EquipChk__8CMenuPcsFi(MenuPcsVoid(), itemIndex) == 0) {
+                canTrade = itemId >= 0x9F;
+            }
+        }
     }
 
     if (!canTrade) {
@@ -1724,7 +1735,6 @@ void CShopMenu::SelectYesNo()
 
     Sound.PlaySe(0x50, 0x40, 0x7F, 0);
     int caravan = ShopMenuCaravan(this);
-    int itemId = ResolveShopMenuSelectedItemId(this);
     int gilValue = CalcShopMenuTradeGil(this, itemId);
     if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), gilValue) == 0) {
         return;

@@ -1700,7 +1700,6 @@ pppLaser.cpp:
 	extabindex  start:0x800116BC end:0x800116EC
 	.text       start:0x801754E0 end:0x8017683C
 	.rodata     start:0x801E3048 end:0x801E3058
-	.sdata2     start:0x80333674 end:0x80333690
 
 MenuUtil.cpp:
 	extab       start:0x8000A16C end:0x8000A1CC

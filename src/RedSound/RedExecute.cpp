@@ -121,7 +121,6 @@ void ReverbAreaAlloc(unsigned long size)
  */
 void ReverbAreaFree(void* param_1)
 {
-    extern void RedDelete(void*);
     RedDelete(param_1);
 }
 

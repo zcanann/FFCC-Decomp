@@ -1635,7 +1635,6 @@ void CMenuPcs::CalcResultOpenAnim()
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
 		GetBonusMenuMembers(this).m_bonusAlpha = 0;
-		GetBonusMenuMembers(this).m_bonusCursorFlag = 0;
 		memset((void*)animPtr, 0, 0x1008);
 
 		header->count = (short)(1 + activePartyCount * 6);
@@ -1749,9 +1748,9 @@ void CMenuPcs::CalcResultOpenAnim()
 		if (sprite->kind == -2 && sprite->timer == 1) {
 			Sound.PlaySe(0x47, 0x40, 0x7f, 0);
 		}
-		if (sprite->kind == -1 && sprite->timer == 1 && GetBonusMenuMembers(this).m_bonusCursorFlag == 0) {
+		if (sprite->kind == -1 && sprite->timer == 1 && GetBonusMenuMembers(this).m_bonusAlpha == 0) {
 			Sound.PlaySe(0x48, 0x40, 0x7f, 0);
-			GetBonusMenuMembers(this).m_bonusCursorFlag = 1;
+			GetBonusMenuMembers(this).m_bonusAlpha = 1;
 		}
 	}
 

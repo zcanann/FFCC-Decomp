@@ -242,7 +242,7 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
                 if (i == 0) {
                     float totalTime = watch.Get();
                     float gpuTime = totalTime - cpuTime;
-                    Printf__8CGraphicFPce(&Graphic, s_gpu_profile_fmt, cpuTime, gpuTime, totalTime);
+                    Printf__8CGraphicFPce(&Graphic, s_gpu_profile_fmt, totalTime, cpuTime, gpuTime);
                 }
             }
         }

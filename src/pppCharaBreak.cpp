@@ -772,8 +772,6 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 
     CharaBreakWork* work = (CharaBreakWork*)((u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2]);
     u8* model = work->m_model;
-    void** perMeshBuffers = (void**)work->m_meshBuffers;
-    u8* mesh = *(u8**)(model + 0xAC);
 
     *(u32*)(model + 0xE4) = 0;
     *(u32*)(model + 0xE8) = 0;
@@ -782,12 +780,16 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
     *(u32*)(model + 0x104) = 0;
     *(u32*)(model + 0xEC) = 0;
 
+    void** perMeshBuffers = (void**)work->m_meshBuffers;
+    u8* mesh = *(u8**)(model + 0xAC);
+    void** meshBufferSlot = perMeshBuffers;
+
     if (perMeshBuffers != NULL) {
-        void** meshBufferSlot = perMeshBuffers;
         for (u32 meshIndex = 0; meshIndex < *(u32*)(*(u8**)(model + 0xA4) + 0xC); meshIndex++) {
-            int* dlEntries = (int*)*meshBufferSlot;
+            u32 dlEntryBase = (u32)*meshBufferSlot;
             int meshData = *(int*)(mesh + 8);
-            if (dlEntries != NULL) {
+            if (dlEntryBase != 0) {
+                int* dlEntries = (int*)dlEntryBase;
                 for (u32 dlIndex = 0; dlIndex < *(u32*)(meshData + 0x4C); dlIndex++) {
                     if ((void*)*dlEntries != NULL) {
                         if (*(void**)*dlEntries != NULL) {

@@ -1200,12 +1200,11 @@ void InsertLight_r(COctNode* node)
  */
 void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned long mask)
 {
-	unsigned char* thisBytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* mapObj = *reinterpret_cast<unsigned char**>(Ptr(this, 8));
 	Mtx inverseMtx;
 	Vec localPosition;
+	unsigned char* mapObj = reinterpret_cast<unsigned char*>(m_mapObject);
 
-	if ((*thisBytes != 0) || ((*reinterpret_cast<unsigned long*>(mapObj + 0x38) & mask) == 0)) {
+	if ((m_type != 0) || ((*reinterpret_cast<unsigned long*>(mapObj + 0x38) & mask) == 0)) {
 		return;
 	}
 
@@ -1213,15 +1212,14 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
 	PSMTXInverse(reinterpret_cast<MtxPtr>(mapObj + 0xB8), inverseMtx);
 	PSMTXMultVec(inverseMtx, &position, &localPosition);
 
-	float* bound = reinterpret_cast<float*>(&s_bound);
-	bound[0] = localPosition.x - radius;
-	bound[3] = localPosition.x + radius;
-	bound[1] = localPosition.y - radius;
-	bound[2] = localPosition.z - radius;
-	bound[4] = localPosition.y + radius;
-	bound[5] = localPosition.z + radius;
+	s_bound.m_min.x = localPosition.x - radius;
+	s_bound.m_max.x = localPosition.x + radius;
+	s_bound.m_min.y = localPosition.y - radius;
+	s_bound.m_min.z = localPosition.z - radius;
+	s_bound.m_max.y = localPosition.y + radius;
+	s_bound.m_max.z = localPosition.z + radius;
 
-	InsertLight_r(*reinterpret_cast<COctNode**>(Ptr(this, 4)));
+	InsertLight_r(m_nodePool);
 }
 
 /*
@@ -1440,30 +1438,23 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 {
 	Mtx inverseMtx;
 	Vec localPosition;
-	unsigned char* thisBytes = (unsigned char*)this;
-	float* srcBound = (float*)&bound;
-	float* dstBound = (float*)&s_bound;
 
-	if (*thisBytes != 0) {
+	if (m_type != 0) {
 		return;
 	}
 
 	s_insertShadowBitIndex = bitIndex;
-	PSMTXInverse((MtxPtr)(*(unsigned char**)(thisBytes + 0x8) + 0xb8), inverseMtx);
+	PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
 	PSMTXMultVec(inverseMtx, &position, &localPosition);
 
-	dstBound[0] = srcBound[0];
-	dstBound[1] = srcBound[1];
-	dstBound[2] = srcBound[2];
-	dstBound[3] = srcBound[3];
-	dstBound[4] = srcBound[4];
-	dstBound[5] = srcBound[5];
+	s_bound.m_min = bound.m_min;
+	s_bound.m_max = bound.m_max;
 
-	PSVECAdd((Vec*)&s_bound, &localPosition, (Vec*)&s_bound);
-	PSVECAdd((Vec*)((unsigned char*)&s_bound + 0xc), &localPosition, (Vec*)((unsigned char*)&s_bound + 0xc));
+	PSVECAdd(&s_bound.m_min, &localPosition, &s_bound.m_min);
+	PSVECAdd(&s_bound.m_max, &localPosition, &s_bound.m_max);
 
 	s_insertShadowDepth = 0;
-	InsertShadow_r(*(COctNode**)(thisBytes + 0x4));
+	InsertShadow_r(m_nodePool);
 }
 
 /*

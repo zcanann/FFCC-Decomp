@@ -50,7 +50,7 @@ public:
     void statCharge();
     void statAttackSel();
 
-    void getBestAngleObject(float, float);
+    CGPrgObj* getBestAngleObject(float, float);
 
     void onStatAttack(int);
     void onStatShield();

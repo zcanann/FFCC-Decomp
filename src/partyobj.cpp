@@ -54,6 +54,7 @@ extern float FLOAT_80331acc;
 extern float FLOAT_80331ad0;
 extern float FLOAT_80331ad4;
 extern float FLOAT_80331ad8;
+extern float FLOAT_80331ADC;
 extern float FLOAT_80331b00;
 extern float FLOAT_80331b04;
 extern float FLOAT_80331b08;
@@ -1322,7 +1323,7 @@ void CGPartyObj::statAttackSel()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::getBestAngleObject(float, float)
+CGPrgObj* CGPartyObj::getBestAngleObject(float, float)
 {
 	CGPrgObj* best = 0;
 	float bestAbsAngle = 0.0f;
@@ -1364,6 +1365,8 @@ void CGPartyObj::getBestAngleObject(float, float)
 	if (best != 0) {
 		dstTargetRot(best);
 	}
+
+	return best;
 }
 
 /*
@@ -1377,25 +1380,65 @@ void CGPartyObj::getBestAngleObject(float, float)
  */
 void CGPartyObj::onStatAttack(int chargeType)
 {
-	if (m_stateFrame == 0) {
-		m_rotationZ = m_rotationY;
-		m_rotationY = 0.0f;
-		unsigned char* flags = &PartyData(this).partyFlags;
-		*flags &= 0x7F;
-		*flags &= 0xBF;
-		getBestAngleObject(FLOAT_80331ad4 * m_bodyEllipsoidRadius, FLOAT_80331ad8);
+	PartyObjOverlay& party = PartyData(this);
+
+	if (chargeType == 0) {
+		if (m_stateFrame != 0) {
+			return;
+		}
+
+		party.unk6CC = party.attackSel;
+		party.attackSel = 0;
+		party.commandFlags &= 0x7F;
+		party.commandFlags &= 0xBF;
+
+		CGPrgObj* target = getBestAngleObject(FLOAT_80331ad4 * m_bodyEllipsoidRadius, FLOAT_80331ad8);
+		if (target != 0) {
+			m_rotTargetY = atan2(target->m_worldPosition.x - m_worldPosition.x,
+			                     target->m_worldPosition.z - m_worldPosition.z);
+		}
 		return;
 	}
 
-	if ((chargeType != 0) && (m_stateFrame > 0)) {
-		unsigned char* self = reinterpret_cast<unsigned char*>(this);
-		if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1) && ((Pad._8_2_ & 0x100) != 0)) {
-			if ((self[0x6C4] & 0x80) != 0) {
-				self[0x6C4] |= 0x40;
-			} else {
-				self[0x6C4] |= 0x80;
-			}
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	const int chain = party.unk6CC;
+	unsigned char* attackEntry = reinterpret_cast<unsigned char*>(
+	    Game.unk_flat3_field_30_0xc7e0 +
+	    ((*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+	      *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) *
+	         0x1CA) +
+	    chain * 0x12);
+
+	const unsigned short stepStart = *reinterpret_cast<unsigned short*>(attackEntry + 4);
+	const unsigned short stepEnd = *reinterpret_cast<unsigned short*>(attackEntry + 6);
+	if (chain > 0 && m_stateFrame == stepStart && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+		const float stepSpeed = FLOAT_80331ADC * static_cast<float>(*reinterpret_cast<unsigned short*>(attackEntry + 8));
+		moveVectorRot(m_rotTargetY, FLOAT_80331a78, stepSpeed, (stepEnd - stepStart) + 1);
+	}
+
+	const unsigned short comboStart = *reinterpret_cast<unsigned short*>(attackEntry + 0x0C);
+	const unsigned short comboEnd = *reinterpret_cast<unsigned short*>(attackEntry + 0x0E);
+	if (m_stateFrame < comboStart || comboEnd < m_stateFrame) {
+		if ((getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x100) != 0) {
+			party.commandFlags = (party.commandFlags & 0xBF) | 0x40;
 		}
+	} else {
+		if ((getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x100) != 0) {
+			party.commandFlags = (party.commandFlags & 0x7F) | 0x80;
+		}
+	}
+
+	if (m_stateFrame == *reinterpret_cast<unsigned short*>(attackEntry + 0x10)) {
+		if ((party.commandFlags & 0x80) != 0 && (party.commandFlags & 0x40) == 0 && chain < 2) {
+			party.attackSel = chain + 1;
+			changeStat(1, 0, 0);
+			return;
+		}
+	}
+
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if (m_stateFrame == *reinterpret_cast<int*>(self + 0x638)) {
+		self[0x63C] = (self[0x63C] & 0x7F) | 0x80;
 	}
 
 	if (isLoopAnim() != 0) {

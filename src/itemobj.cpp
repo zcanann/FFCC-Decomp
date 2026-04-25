@@ -170,6 +170,7 @@ static const char DAT_801dcfec[] = {
     (char)0x81, 0x42, (char)0x0A, (char)0x00,
 };
 static const char s_f051_root_801dceb4[] = "f051_root";
+static const char s_stand_801dd018[] = "stand";
 extern "C" char m_aiWork__8CGMonObj[];
 
 struct ItemObjFlatTableEntry {
@@ -222,7 +223,7 @@ void CGItemObj::onCreate()
 	unsigned char* self = (unsigned char*)this;
 
 	onCreate__8CGPrgObjFv(self);
-	self[0x54d] &= 0x7f;
+	self[0x54c] &= 0x7f;
 	*(int*)(self + 0x550) = 0;
 	*(int*)(self + 0x558) = 0;
 	*(unsigned short*)(self + 0x560) = 0;
@@ -313,14 +314,13 @@ void CGItemObj::onChangeStat(int state)
  */
 void CGItemObj::onCancelStat(int)
 {
-	extern float FLOAT_80331b18;
 	unsigned char* self = (unsigned char*)this;
 
 	if (*(int*)(self + 0x520) == 0x1b) {
 		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) | 2;
-		*(float*)(self + 0x17c) = FLOAT_80331b18;
-		*(float*)(self + 0x178) = FLOAT_80331b18;
-		*(float*)(self + 0x174) = FLOAT_80331b18;
+		*(float*)(self + 0x17c) = 1.0f;
+		*(float*)(self + 0x178) = 1.0f;
+		*(float*)(self + 0x174) = 1.0f;
 	}
 }
 
@@ -347,7 +347,8 @@ void CGItemObj::onFrame()
 		*(void**)(self + 0x564) = 0;
 
 		if (*(int*)(self + 0x500) == 0xCB) {
-			LoadAnim__8CGObjectFPciiiUl(this, 0, 0, 0, 0, 0);
+			LoadAnim__8CGObjectFPciiiUl(
+			    this, *(char**)(self + 0x578), 0, 0, 2, *(unsigned long*)(self + 0x574));
 			SetAnimSlot__8CGObjectFii(this, 0, 0);
 			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
 
@@ -721,24 +722,23 @@ void CGItemObj::onFrameStat()
  */
 int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObject*, CFlatRuntime::CObject*)
 {
-	unsigned char* bestItemObj;
 	int deletedCount = 0;
 
-	while (deletedCount < maxDeleteCount) {
-		void* bestScriptObject = (void*)0x00989680;
-		bestItemObj = 0;
+	while (true) {
+		if (maxDeleteCount <= deletedCount) {
+			return deletedCount;
+		}
+
+		int bestScriptObjectPos = 0x00989680;
+		unsigned char* bestItemObj = 0;
 
 		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
 			 itemObj != 0;
 			 itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-			unsigned char flags = itemObj[0x50];
-			unsigned char priorityMask = itemObj[0x53];
-			int isActive = (int)(((unsigned int)flags << 28) | ((unsigned int)flags >> 4)) < 0;
-			int scriptObjectPos = *(int*)(itemObj + 0x48);
-
-			if (*(int*)(itemObj + 0x44) == 0 && isActive != 0 && (priorityMask & deleteMask) != 0 &&
-				scriptObjectPos < (int)bestScriptObject) {
-				bestScriptObject = (void*)scriptObjectPos;
+			if (*(int*)(itemObj + 0x44) == 0 &&
+				(int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0 &&
+				(((int)(char)itemObj[0x53] & deleteMask) != 0) && *(int*)(itemObj + 0x48) < bestScriptObjectPos) {
+				bestScriptObjectPos = *(int*)(itemObj + 0x48);
 				bestItemObj = itemObj;
 			}
 		}
@@ -751,10 +751,11 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		deletedCount++;
 	}
 
-	if ((unsigned int)System.m_execParam > 2U && deletedCount < maxDeleteCount) {
-		Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
+	if ((unsigned int)System.m_execParam < 3) {
+		return deletedCount;
 	}
 
+	Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
 	return deletedCount;
 }
 
@@ -1211,6 +1212,7 @@ void CGItemObj::loadModel()
 	int modelNo = -1;
 	int modelVariant = 0;
 	int modelFlag = 0;
+	unsigned long animFlags = (unsigned long)-1;
 	int useParticleTable = 1;
 	int worldParamA = *(int*)(self + 0x500);
 	int worldParamB = *(int*)(self + 0x504);
@@ -1245,12 +1247,13 @@ void CGItemObj::loadModel()
 		self[0x95] = 0;
 		self[0x96] = 0x11;
 		self[0x97] = 0x94;
+		animFlags = 0x12;
 		modelFlag = 1;
 	}
 
 	if (modelNo >= 0) {
 		LoadModel__8CGObjectFiUlUli(this, 3, modelNo, modelVariant, modelFlag);
-		LoadAnim__8CGObjectFPciiiUl(this, 0, 0, 0, 0, 0);
+		LoadAnim__8CGObjectFPciiiUl(this, const_cast<char*>(s_stand_801dd018), 0, 0, 3, animFlags);
 		SetAnimSlot__8CGObjectFii(this, 0, 0);
 		PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
 	}
@@ -1281,7 +1284,7 @@ void CGItemObj::loadModel()
 		*(unsigned char*)(self + 0x9A) &= 0xFB;
 	}
 
-	self[0x54D] = (self[0x54D] & 0x7F) | 0x80;
+	self[0x54C] = (self[0x54C] & 0x7F) | 0x80;
 }
 
 /*
@@ -1295,7 +1298,7 @@ void CGItemObj::loadModel()
  */
 void CGItemObj::onNewFinished()
 {
-	*(u32*)((u8*)this + 0x568) = *(u32*)((u8*)this + 0x144);
+	*(float*)((u8*)this + 0x568) = *(float*)((u8*)this + 0x144);
 	*(u16*)((u8*)this + 0x560) = (u16)((gItemObjCreateFlags >> 3) & 1);
 	loadModel();
 }

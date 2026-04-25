@@ -1,3 +1,19 @@
+extern "C" const float kZeroF = 0.0f;
+extern "C" const float kNegOneF = -1.0f;
+extern "C" const float FLOAT_8032F748 = 1.0f;
+extern "C" const double DOUBLE_8032F750 = 4503601774854144.0;
+extern "C" const float FLOAT_8032F758 = 3.0f;
+extern "C" const float FLOAT_8032F75C = 2.0f;
+extern "C" const float FLOAT_8032F760 = -2.0f;
+extern "C" const double DOUBLE_8032F768 = 0.5;
+extern "C" const double DOUBLE_8032F770 = 3.0;
+extern "C" const double DOUBLE_8032F778 = 0.0;
+extern "C" const float FLOAT_8032F780 = -999999995904.0f;
+extern "C" const float FLOAT_8032F784 = 10000000000.0f;
+extern "C" const float FLOAT_8032F788 = -10000000000.0f;
+extern "C" const float kRandSignedScaleF = 6.103701889514923e-05f;
+extern "C" const float kRandScaleF = 3.0518509447574615e-05f;
+
 #include "ffcc/math.h"
 
 #include "dolphin/mtx.h"
@@ -8,22 +24,12 @@ extern "C" double acos(double);
 #include "string.h"
 
 extern "C" int rand(void);
-extern "C" float kZeroF;
-extern "C" float kNegOneF;
-extern "C" double DOUBLE_8032F778;
-extern "C" float FLOAT_8032F780;
-extern "C" float FLOAT_8032F788;
-extern "C" float FLOAT_8032F758;
-extern "C" float FLOAT_8032F75C;
-extern "C" float kRandSignedScaleF;
-extern "C" float kRandScaleF;
-
 CMath Math;
 static Vec s_f_vpos;
 static Mtx s_f_lvmtx;
 static float s_hSpline[65];
-static float s_wSpline[65];
 static float s_dSpline[65];
+static float s_wSpline[65];
 
 struct Vec4d {
     float x;
@@ -288,10 +294,10 @@ int CBound::CheckFrustum0(CBound& outBound)
     int xIndex;
     double viewZ;
     double zero;
-    float* inBound = reinterpret_cast<float*>(this);
     float* clipBound = reinterpret_cast<float*>(&outBound);
-    Vec transformed;
+    float* inBound = reinterpret_cast<float*>(this);
     Vec vertex;
+    Vec transformed;
 
     maxInit = 3.40282347e38f;
     minInit = -3.40282347e38f;
@@ -303,7 +309,7 @@ int CBound::CheckFrustum0(CBound& outBound)
     clipBound[3] = minInit;
 
     if ((s_f_vpos.x <= inBound[3]) && (s_f_vpos.y <= inBound[4]) && (s_f_vpos.z <= inBound[5]) &&
-        (inBound[0] <= s_f_vpos.x) && (inBound[1] <= s_f_vpos.y) && (inBound[2] <= s_f_vpos.z)) {
+        (s_f_vpos.x >= inBound[0]) && (s_f_vpos.y >= inBound[1]) && (s_f_vpos.z >= inBound[2])) {
         xIndex = 0;
         do {
             if (xIndex == 0) {
@@ -327,41 +333,12 @@ int CBound::CheckFrustum0(CBound& outBound)
                     }
                     PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
-                    maxInit = transformed.x;
-                    if (clipBound[0] < transformed.x) {
-                        maxInit = clipBound[0];
-                    }
-                    clipBound[0] = maxInit;
-
-                    maxInit = transformed.y;
-                    if (clipBound[1] < transformed.y) {
-                        maxInit = clipBound[1];
-                    }
-                    clipBound[1] = maxInit;
-
-                    maxInit = transformed.z;
-                    if (clipBound[2] < transformed.z) {
-                        maxInit = clipBound[2];
-                    }
-                    clipBound[2] = maxInit;
-
-                    maxInit = transformed.x;
-                    if (transformed.x < clipBound[3]) {
-                        maxInit = clipBound[3];
-                    }
-                    clipBound[3] = maxInit;
-
-                    maxInit = transformed.y;
-                    if (transformed.y < clipBound[4]) {
-                        maxInit = clipBound[4];
-                    }
-                    clipBound[4] = maxInit;
-
-                    maxInit = transformed.z;
-                    if (transformed.z < clipBound[5]) {
-                        maxInit = clipBound[5];
-                    }
-                    clipBound[5] = maxInit;
+                    clipBound[0] = transformed.x < clipBound[0] ? transformed.x : clipBound[0];
+                    clipBound[1] = transformed.y < clipBound[1] ? transformed.y : clipBound[1];
+                    clipBound[2] = transformed.z < clipBound[2] ? transformed.z : clipBound[2];
+                    clipBound[3] = clipBound[3] < transformed.x ? transformed.x : clipBound[3];
+                    clipBound[4] = clipBound[4] < transformed.y ? transformed.y : clipBound[4];
+                    clipBound[5] = clipBound[5] < transformed.z ? transformed.z : clipBound[5];
                     zIndex = zIndex + 1;
                 } while (zIndex < 2);
                 yIndex = yIndex + 1;
@@ -397,41 +374,12 @@ int CBound::CheckFrustum0(CBound& outBound)
                 }
                 PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
-                maxInit = transformed.x;
-                if (clipBound[0] < transformed.x) {
-                    maxInit = clipBound[0];
-                }
-                clipBound[0] = maxInit;
-
-                maxInit = transformed.y;
-                if (clipBound[1] < transformed.y) {
-                    maxInit = clipBound[1];
-                }
-                clipBound[1] = maxInit;
-
-                maxInit = transformed.z;
-                if (clipBound[2] < transformed.z) {
-                    maxInit = clipBound[2];
-                }
-                clipBound[2] = maxInit;
-
-                maxInit = transformed.x;
-                if (transformed.x < clipBound[3]) {
-                    maxInit = clipBound[3];
-                }
-                clipBound[3] = maxInit;
-
-                maxInit = transformed.y;
-                if (transformed.y < clipBound[4]) {
-                    maxInit = clipBound[4];
-                }
-                clipBound[4] = maxInit;
-
-                maxInit = transformed.z;
-                if (transformed.z < clipBound[5]) {
-                    maxInit = clipBound[5];
-                }
-                clipBound[5] = maxInit;
+                clipBound[0] = transformed.x < clipBound[0] ? transformed.x : clipBound[0];
+                clipBound[1] = transformed.y < clipBound[1] ? transformed.y : clipBound[1];
+                clipBound[2] = transformed.z < clipBound[2] ? transformed.z : clipBound[2];
+                clipBound[3] = clipBound[3] < transformed.x ? transformed.x : clipBound[3];
+                clipBound[4] = clipBound[4] < transformed.y ? transformed.y : clipBound[4];
+                clipBound[5] = clipBound[5] < transformed.z ? transformed.z : clipBound[5];
 
                 viewZ = (double)transformed.z;
                 if (viewZ <= zero) {
@@ -509,85 +457,85 @@ int CBound::CheckFrustum0(float farPlane)
     Vec vertex;
     Vec transformed;
 
-    if ((inBound[3] < s_f_vpos.x) || (inBound[4] < s_f_vpos.y) || (inBound[5] < s_f_vpos.z) ||
-        (s_f_vpos.x < inBound[0]) || (s_f_vpos.y < inBound[1]) || (s_f_vpos.z < inBound[2])) {
-        farthestZ = FLOAT_8032F780;
-        zero = kZeroF;
-        insideMask = 0xF;
-        outsideMask = 0;
-        xIndex = 0;
-        do {
-            if (xIndex == 0) {
-                vertex.x = inBound[0];
-            } else {
-                vertex.x = inBound[3];
-            }
-            yIndex = 0;
-            do {
-                if (yIndex == 0) {
-                    vertex.y = inBound[1];
-                } else {
-                    vertex.y = inBound[4];
-                }
-                zIndex = 0;
-                do {
-                    if (zIndex == 0) {
-                        vertex.z = inBound[2];
-                    } else {
-                        vertex.z = inBound[5];
-                    }
-                    PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
-                    if (farthestZ < transformed.z) {
-                        farthestZ = transformed.z;
-                    }
-                    if (zero < transformed.z) {
-                        if (-transformed.z < transformed.x) {
-                            clipMask = 0x11;
-                        } else if (transformed.x < transformed.z) {
-                            clipMask = 0x12;
-                        } else {
-                            clipMask = 0x10;
-                        }
-                        if (-transformed.z < transformed.y) {
-                            clipMask = clipMask | 0x14;
-                        } else if (transformed.y < transformed.z) {
-                            clipMask = clipMask | 0x18;
-                        }
-                    } else {
-                        if (-transformed.z < transformed.x) {
-                            clipMask = 1;
-                        } else if (transformed.x < transformed.z) {
-                            clipMask = 2;
-                        } else {
-                            clipMask = 0;
-                        }
-                        if (-transformed.z < transformed.y) {
-                            clipMask = clipMask | 4;
-                        } else if (transformed.y < transformed.z) {
-                            clipMask = clipMask | 8;
-                        }
-                    }
-                    zIndex = zIndex + 1;
-                    insideMask = insideMask & clipMask;
-                    outsideMask = outsideMask | clipMask;
-                } while (zIndex < 2);
-                yIndex = yIndex + 1;
-            } while (yIndex < 2);
-            xIndex = xIndex + 1;
-        } while (xIndex < 2);
-
-        if (farthestZ < farPlane) {
-            return 0;
-        }
-        if (insideMask != 0) {
-            return 0;
-        }
-
-        insideMask = (unsigned int)__cntlzw(outsideMask);
-        return (int)(insideMask >> 5) + 1;
+    if ((s_f_vpos.x <= inBound[3]) && (s_f_vpos.y <= inBound[4]) && (s_f_vpos.z <= inBound[5]) &&
+        (inBound[0] <= s_f_vpos.x) && (inBound[1] <= s_f_vpos.y) && (inBound[2] <= s_f_vpos.z)) {
+        return 1;
     }
 
-    return 1;
+    farthestZ = FLOAT_8032F780;
+    zero = kZeroF;
+    insideMask = 0xF;
+    outsideMask = 0;
+    xIndex = 0;
+    do {
+        if (xIndex == 0) {
+            vertex.x = inBound[0];
+        } else {
+            vertex.x = inBound[3];
+        }
+        yIndex = 0;
+        do {
+            if (yIndex == 0) {
+                vertex.y = inBound[1];
+            } else {
+                vertex.y = inBound[4];
+            }
+            zIndex = 0;
+            do {
+                if (zIndex == 0) {
+                    vertex.z = inBound[2];
+                } else {
+                    vertex.z = inBound[5];
+                }
+                PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
+                if (farthestZ < transformed.z) {
+                    farthestZ = transformed.z;
+                }
+                if (zero < transformed.z) {
+                    if (-transformed.z < transformed.x) {
+                        clipMask = 0x11;
+                    } else if (transformed.x < transformed.z) {
+                        clipMask = 0x12;
+                    } else {
+                        clipMask = 0x10;
+                    }
+                    if (-transformed.z < transformed.y) {
+                        clipMask = clipMask | 0x14;
+                    } else if (transformed.y < transformed.z) {
+                        clipMask = clipMask | 0x18;
+                    }
+                } else {
+                    if (-transformed.z < transformed.x) {
+                        clipMask = 1;
+                    } else if (transformed.x < transformed.z) {
+                        clipMask = 2;
+                    } else {
+                        clipMask = 0;
+                    }
+                    if (-transformed.z < transformed.y) {
+                        clipMask = clipMask | 4;
+                    } else if (transformed.y < transformed.z) {
+                        clipMask = clipMask | 8;
+                    }
+                }
+                zIndex = zIndex + 1;
+                insideMask = insideMask & clipMask;
+                outsideMask = outsideMask | clipMask;
+            } while (zIndex < 2);
+            yIndex = yIndex + 1;
+        } while (yIndex < 2);
+        xIndex = xIndex + 1;
+    } while (xIndex < 2);
+
+    if (farthestZ < farPlane) {
+        return 0;
+    }
+    if (insideMask != 0) {
+        return 0;
+    }
+
+    insideMask = (unsigned int)__cntlzw(outsideMask);
+    return (int)(insideMask >> 5) + 1;
 }
 
 /*
@@ -830,16 +778,17 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMath::CrossCheckEllipseCapsule(Vec* outCoeffs, float* outCoeffScalar, Vec* p0, Vec* p1, float radius, Vec* p2,
-                                     float scaleA, float scaleB)
+extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
+    float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outCoeffScalar, Vec* p0,
+    Vec* p1, Vec* p2, Vec* p3)
 {
-    const float r2 = radius * radius;
+    float radiusSquared = radius * radius;
+    float radiusCubed = radius * radiusSquared;
     Vec4d coeffs;
-    coeffs.w = radius * r2;
-    coeffs.z = (2.0f * coeffs.w) - (3.0f * r2);
-    coeffs.x = 1.0f + ((3.0f * coeffs.w) - (3.0f * r2));
-    coeffs.y = radius - ((3.0f * r2) - coeffs.w);
-    coeffs.w = coeffs.w - r2;
+    coeffs.x = 1.0f + ((3.0f * radiusCubed) - (3.0f * radiusSquared));
+    coeffs.y = radius - ((3.0f * radiusSquared) - radiusCubed);
+    coeffs.z = (2.0f * radiusCubed) - (3.0f * radiusSquared);
+    coeffs.w = radiusCubed - radiusSquared;
 
     Mtx44 control;
     control[0][0] = p1->x;
@@ -851,9 +800,10 @@ void CMath::CrossCheckEllipseCapsule(Vec* outCoeffs, float* outCoeffScalar, Vec*
     control[2][2] = p2->z;
     control[3][2] = 1.0f;
 
+    float scaleAB = scaleA + scaleB;
     float t0 = 0.0f;
-    if (scaleA + radius != 0.0f) {
-        t0 = scaleA / (scaleA + radius);
+    if (scaleAB != 0.0f) {
+        t0 = scaleA / scaleAB;
     }
 
     Vec tangent;
@@ -861,27 +811,28 @@ void CMath::CrossCheckEllipseCapsule(Vec* outCoeffs, float* outCoeffScalar, Vec*
     PSVECSubtract(p2, p1, &tangent);
     PSVECSubtract(p1, p0, &tmp);
     PSVECAdd(&tangent, &tmp, &tangent);
-    PSVECScale(&tangent, &tangent, t0 * scaleA);
+    PSVECScale(&tangent, &tangent, t0 * scale);
     control[0][1] = tangent.x;
     control[1][1] = tangent.y;
     control[2][1] = tangent.z;
     control[3][1] = 1.0f;
 
+    float scaleBC = scaleB + scaleC;
     float t1 = 0.0f;
-    if (scaleA + scaleB != 0.0f) {
-        t1 = scaleA / (scaleA + scaleB);
+    if (scaleBC != 0.0f) {
+        t1 = scaleB / scaleBC;
     }
 
-    PSVECSubtract(outCoeffs, p2, &tangent);
+    PSVECSubtract(p3, p2, &tangent);
     PSVECSubtract(p2, p1, &tmp);
     PSVECAdd(&tangent, &tmp, &tangent);
-    PSVECScale(&tangent, &tangent, t1 * scaleA);
+    PSVECScale(&tangent, &tangent, t1 * scale);
     control[0][3] = tangent.x;
     control[1][3] = tangent.y;
     control[2][3] = tangent.z;
     control[3][3] = 1.0f;
 
-    MTX44MultVec4(control, &coeffs, &coeffs);
+    MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(math, control, &coeffs, &coeffs);
     outCoeffScalar[0] = coeffs.x;
     outCoeffScalar[1] = coeffs.y;
     outCoeffScalar[2] = coeffs.z;
@@ -908,9 +859,6 @@ void CMath::CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float,
  */
 void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDerivatives)
 {
-    if (count <= 0) {
-        return;
-    }
     int i;
     for (i = 0; i < count; ++i) {
         s_hSpline[i] = x[i + 1] - x[i];
@@ -919,18 +867,19 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
     s_wSpline[count] = s_wSpline[0];
 
     for (i = 1; i < count; ++i) {
-        s_dSpline[i] = 2.0f * (x[i + 1] - x[i - 1]);
+        s_dSpline[i] = FLOAT_8032F75C * (x[i + 1] - x[i - 1]);
     }
-    s_dSpline[count] = 2.0f * (s_hSpline[count - 1] + s_hSpline[0]);
+    s_dSpline[count] = FLOAT_8032F75C * (s_hSpline[count - 1] + s_hSpline[0]);
 
     for (i = 1; i <= count; ++i) {
         outSecondDerivatives[i] = s_wSpline[i] - s_wSpline[i - 1];
     }
 
-    s_wSpline[0] = s_hSpline[0];
+    s_wSpline[1] = s_hSpline[0];
+    s_wSpline[count - 1] = s_hSpline[count - 1];
     s_wSpline[count] = s_dSpline[count];
-    for (i = 1; i < count; ++i) {
-        s_wSpline[i] = 0.0f;
+    for (i = 2; i < count - 1; ++i) {
+        s_wSpline[i] = kZeroF;
     }
 
     for (i = 1; i < count; ++i) {
@@ -942,17 +891,17 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
 
     s_wSpline[0] = s_wSpline[count];
     outSecondDerivatives[0] = outSecondDerivatives[count];
-    for (i = count - 1; i >= 1; --i) {
-        float r = s_wSpline[i + 1] / s_dSpline[i + 1];
+    for (i = count - 2; i >= 0; --i) {
+        float r = s_hSpline[i] / s_dSpline[i + 1];
         outSecondDerivatives[i] = -(r * outSecondDerivatives[i + 1] - outSecondDerivatives[i]);
-        s_dSpline[i] = -(r * s_dSpline[i + 1] - s_dSpline[i]);
+        s_wSpline[i] = -(r * s_wSpline[i + 1] - s_wSpline[i]);
     }
 
-    outSecondDerivatives[0] /= s_wSpline[0];
-    outSecondDerivatives[count] = outSecondDerivatives[0];
+    float firstDerivative = outSecondDerivatives[0] / s_wSpline[0];
+    outSecondDerivatives[0] = firstDerivative;
+    outSecondDerivatives[count] = firstDerivative;
     for (i = 1; i < count; ++i) {
-        outSecondDerivatives[i] =
-            -(outSecondDerivatives[0] * s_wSpline[i] - outSecondDerivatives[i]) / s_dSpline[i];
+        outSecondDerivatives[i] = -(firstDerivative * s_wSpline[i] - outSecondDerivatives[i]) / s_dSpline[i];
     }
 }
 
@@ -969,7 +918,7 @@ float CMath::Spline1D(int lastIndex, float t, float* x, float* y, float* secondD
 {
     float period = x[lastIndex] - x[0];
 
-    while (x[lastIndex] < t) {
+    while (t > x[lastIndex]) {
         t -= period;
     }
 
@@ -1053,56 +1002,43 @@ float CMath::Line1D(int lastIndex, float x, float* x_arr, float* y_arr)
  */
 unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
 {
-    int satScaled = saturation * 0xFF;
-    int sat = satScaled / 100;
-    sat -= sat >> 31;
-
-    int valScaled = brightness * 0xFF;
-    int val = valScaled / 100;
-    val -= val >> 31;
+    int sat = (saturation * 0xFF) / 100;
+    int val = (brightness * 0xFF) / 100;
 
     unsigned char rgba[4];
     if ((float)sat == 0.0f) {
-        rgba[0] = (unsigned char)val;
-        rgba[1] = (unsigned char)val;
-        rgba[2] = (unsigned char)val;
+        rgba[0] = val;
+        rgba[1] = val;
+        rgba[2] = val;
     } else {
-        int low = (0xFF - sat) * val;
         int sector = hue / 0x3C;
-        int delta;
-
-        low = low / 0xFF;
-
-        low -= low >> 31;
-        sector -= sector >> 31;
-        delta = (hue - sector * 0x3C) * (val - low);
-        delta = delta / 0x3C;
-        delta -= delta >> 31;
+        int low = ((0xFF - sat) * val) / 0xFF;
+        int delta = ((hue - sector * 0x3C) * (val - low)) / 0x3C;
 
         if (hue < 60) {
-            rgba[0] = (unsigned char)val;
-            rgba[1] = (unsigned char)(low + delta);
-            rgba[2] = (unsigned char)low;
+            rgba[0] = val;
+            rgba[1] = low + delta;
+            rgba[2] = low;
         } else if (hue < 120) {
-            rgba[0] = (unsigned char)(val - delta);
-            rgba[1] = (unsigned char)val;
-            rgba[2] = (unsigned char)low;
+            rgba[0] = val - delta;
+            rgba[1] = val;
+            rgba[2] = low;
         } else if (hue < 180) {
-            rgba[0] = (unsigned char)low;
-            rgba[1] = (unsigned char)val;
-            rgba[2] = (unsigned char)(low + delta);
+            rgba[0] = low;
+            rgba[1] = val;
+            rgba[2] = low + delta;
         } else if (hue < 240) {
-            rgba[0] = (unsigned char)low;
-            rgba[1] = (unsigned char)(val - delta);
-            rgba[2] = (unsigned char)val;
+            rgba[0] = low;
+            rgba[1] = val - delta;
+            rgba[2] = val;
         } else if (hue < 300) {
-            rgba[0] = (unsigned char)(low + delta);
-            rgba[1] = (unsigned char)low;
-            rgba[2] = (unsigned char)val;
+            rgba[0] = low + delta;
+            rgba[1] = low;
+            rgba[2] = val;
         } else if (hue < 360) {
-            rgba[0] = (unsigned char)val;
-            rgba[1] = (unsigned char)low;
-            rgba[2] = (unsigned char)(val - delta);
+            rgba[0] = val;
+            rgba[1] = low;
+            rgba[2] = val - delta;
         } else {
             rgba[0] = 0;
             rgba[1] = 0;

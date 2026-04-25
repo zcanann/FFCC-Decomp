@@ -3,8 +3,15 @@
 #include "ffcc/pad.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "ffcc/joybus.h"
 #include "ffcc/linkage.h"
+#include "ffcc/math.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_menu.h"
+#include "ffcc/p_camera.h"
+#include "ffcc/p_minigame.h"
+#include "ffcc/ringmenu.h"
+#include "ffcc/sound.h"
 #include "ffcc/itemobj.h"
 
 #include <math.h>
@@ -14,29 +21,54 @@
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
+extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	void*, void*, int, int, int, void*, void*);
 extern "C" int CanCreateFromScript__9CGItemObjFv();
+extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, void* cfs);
+extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
+extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
+extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 
 static const char s_partyObjStateFmt[] = "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d";
+static const char s_partyBonusCountFmt[] = "SetBonusCondition num:%d";
+static const char s_partyBonusRandomFmt[] = "SetBonusCondition slot:%d idx:%d bonus:%d";
+static const char s_partyBonusFixedFmt[] = "SetBonusCondition slot:%d bonus:%d";
+static const char s_partyBonusKind0Fmt[] = "bonus kind0:%d";
+static const char s_partyBonusKind1Fmt[] = "bonus kind1:%d";
+static const char s_partyBonusKind4Fmt[] = "bonus kind4:%d";
+static const char s_partyBonusAddFmt[] = "bonus slot:%d add:%d";
+static const char s_partyBonusSubFmt[] = "bonus slot:%d sub:%d";
+static const char s_partyBonusUnknownFmt[] = "bonus unknown";
 
 extern float FLOAT_80331a78;
 extern float FLOAT_80331a54;
 extern float FLOAT_80331a74;
 extern float FLOAT_80331a9c;
 extern float FLOAT_80331aa0;
+extern float FLOAT_80331A98;
+extern float FLOAT_80331AB0;
+extern float FLOAT_80331AB8;
+extern float FLOAT_80331AC0;
 extern float FLOAT_80331ac4;
 extern float FLOAT_80331ac8;
 extern float FLOAT_80331acc;
 extern float FLOAT_80331ad0;
 extern float FLOAT_80331ad4;
 extern float FLOAT_80331ad8;
+extern float FLOAT_80331ADC;
 extern float FLOAT_80331b00;
 extern float FLOAT_80331b04;
 extern float FLOAT_80331b08;
+extern float FLOAT_8032EE80;
+extern float FLOAT_8032EE84;
 
 struct GhostPartyWork {
 	int mood;
@@ -116,6 +148,79 @@ static unsigned short getPadTrigForSlot(int slot)
 
 	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
 	return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x8 + idx * 0x54);
+}
+
+static int getPadConnectedForSlot(int slot)
+{
+	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
+		return 0;
+	}
+
+	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x54 + idx * 0x54);
+}
+
+static bool isMenuPcsCommandBusy()
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x740) != 0;
+}
+
+static CRingMenu* getBattleRingMenuForPort(int port)
+{
+	return *reinterpret_cast<CRingMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x13C + port * 4);
+}
+
+static int getPartyJoybusPort(CGPartyObj* self)
+{
+	return static_cast<int>(reinterpret_cast<unsigned char*>(self->m_scriptHandle)[0xED]);
+}
+
+static unsigned short getItemKindFromCfd(int itemId)
+{
+	if (itemId <= 0 || Game.unkCFlatData0[2] == 0) {
+		return 0;
+	}
+
+	return *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
+}
+
+static float getPadAxisForSlot(int slot, int offset)
+{
+	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
+		return 0.0f;
+	}
+
+	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
+	return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + offset + idx * 0x54);
+}
+
+static bool isBossArtifactStage()
+{
+	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F;
+}
+
+static bool isFrameInterval(unsigned int frame, unsigned int interval)
+{
+	return interval != 0 && frame == (frame / interval) * interval;
+}
+
+static bool isGhostPartyTargetMode(CGPartyObj* self)
+{
+	if (!isBossArtifactStage()) {
+		return false;
+	}
+	if ((self->GetCID() & 0x6D) != 0x6D) {
+		return false;
+	}
+	if (self->m_scriptHandle == nullptr) {
+		return false;
+	}
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(self->m_scriptHandle) + 0x3B4) != 0;
+}
+
+static void* getMapHitObject()
+{
+	return *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
 }
 
 /*
@@ -218,14 +323,15 @@ void CGPartyObj::onChangeStat(int state)
 		*reinterpret_cast<int*>(self + 0x550) = 0x0F;
 		*reinterpret_cast<int*>(self + 0x554) = 0x10;
 		*reinterpret_cast<int*>(self + 0x558) = 0x11;
+		*reinterpret_cast<int*>(self + 0x68C) = 0;
 		if (*reinterpret_cast<int*>(self + 0x560) != 0x103) {
-			calcCastTime(*reinterpret_cast<int*>(self + 0x560));
+			*reinterpret_cast<int*>(self + 0x68C) = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		}
 		break;
 	case 6:
 		*reinterpret_cast<int*>(self + 0x550) = 0x12;
 		*reinterpret_cast<int*>(self + 0x554) = 0x13;
-		calcCastTime(*reinterpret_cast<int*>(self + 0x560));
+		*reinterpret_cast<int*>(self + 0x68C) = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		break;
 	case 8:
 		*reinterpret_cast<int*>(self + 0x550) = 0x15;
@@ -310,22 +416,76 @@ void CGPartyObj::onCancelStat(int state)
 void CGPartyObj::menu()
 {
 	PartyObjOverlay& party = PartyData(this);
-	if (Game.m_gameWork.m_gamePaused != 0) {
-		return;
-	}
+	const unsigned char slot = static_cast<unsigned char>(m_animStateMisc);
+	void* portIndex = m_scriptHandle != nullptr ? m_scriptHandle[0xED] : nullptr;
 
-	// Ghidra indicates this gates menu by controller role and stage mode.
 	if ((party.partyFlags & 0x10) == 0) {
-		if (Game.m_gameWork.m_menuStageMode == 0) {
-			command();
+		if (Game.m_gameWork.m_menuStageMode != 0) {
+			return;
+		}
+
+		if (getPadConnectedForSlot(slot) == 0) {
+			return;
+		}
+
+		if (System.m_execParam > 2) {
+			Printf__7CSystemFPce(&System, "port:%d mode:%d", portIndex, Joybus.GetCtrlMode(slot));
+		}
+
+		Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
+		if ((CFlat[0x12A0] & 8) != 0) {
+			Sound.PlaySe(8, 0x40, 0x7F, 0);
 		}
 		return;
 	}
 
-	// Local player can always force command handling in menu stage.
-	if (m_animStateMisc == 0 || Game.m_gameWork.m_menuStageMode != 0) {
-		command();
+	if (Game.m_gameWork.m_menuStageMode == 0 && Joybus.GetPadType(slot) == 0x40000) {
+		unsigned short trig = getPadTrigForSlot(slot);
+		if ((trig & 0x10) == 0) {
+			return;
+		}
+	} else {
+		if (Game.m_gameWork.m_menuStageMode == 0) {
+			return;
+		}
+		if (Game.m_gameWork.m_gamePaused != 0) {
+			return;
+		}
+		if (slot != 0) {
+			return;
+		}
+		if ((getPadTrigForSlot(slot) & 0x800) == 0) {
+			return;
+		}
 	}
+
+	if (Game.m_gameWork.m_menuStageMode != 0) {
+		const bool canOpenStageMenu =
+		    ((static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 0x18) < 0) &&
+		     ((static_cast<int>(static_cast<unsigned int>(static_cast<unsigned char>(m_shieldAttachNodeIndex)) << 0x18) < 0) ||
+		      ((party.commandMode & 2) != 0) ||
+		      ((party.commandMode & 4) != 0)) &&
+		     (static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 0x18) < 0) &&
+		     (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0));
+
+		if (canOpenStageMenu) {
+			Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
+			Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
+		} else {
+			Sound.PlaySe(4, 0x40, 0x7F, 0);
+		}
+		return;
+	}
+
+	if (getPadConnectedForSlot(slot) == 0) {
+		if ((CFlat[0x12A0] & 8) != 0) {
+			Sound.PlaySe(7, 0x40, 0x7F, 0);
+		}
+	} else if ((CFlat[0x12A0] & 8) != 0) {
+		Sound.PlaySe(8, 0x40, 0x7F, 0);
+	}
+
+	Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
 }
 
 /*
@@ -515,47 +675,319 @@ void CGPartyObj::command()
 	if (m_scriptHandle == nullptr) {
 		return;
 	}
+	if (isMenuPcsCommandBusy()) {
+		return;
+	}
 
-	canPlayerGoMenu();
-	shouki();
+	PartyObjOverlay& party = PartyData(this);
+	CCaravanWork* caravan = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+	const int padSlot = static_cast<unsigned char>(m_animStateMisc);
+	const unsigned short trig = getPadTrigForSlot(padSlot);
+	const unsigned short held = getPadHeldForSlot(padSlot);
+	bool primaryAvailable = false;
+	bool secondaryAvailable = false;
+	int primaryCommand = -1;
+	int secondaryCommand = -1;
+	int ringCommand = -1;
+	int ringCommandArg = -1;
 
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	int mode = *reinterpret_cast<short*>(self + 0x6F4);
-	CGObject* target = *reinterpret_cast<CGObject**>(self + 0x6E4);
-	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
-	unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+	if ((reinterpret_cast<short*>(m_scriptHandle)[7] != 0) &&
+	    ((party.commandFlags & 1) != 0) &&
+	    Joybus.GetCtrlMode(padSlot) != 1) {
+		int cmdDir = 0;
 
-	if ((trig & 0x20) != 0) {
-		mode--;
-		if (mode < 0) {
-			mode = 5;
+		if ((held & 0x60) == 0x60) {
+			caravan->IsUseCmdList(0);
+		} else if ((trig & 0x20) != 0) {
+			cmdDir = 1;
+		} else if ((trig & 0x40) != 0) {
+			cmdDir = -1;
+		}
+
+		if (cmdDir != 0) {
+			Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
+			const int curCmd = caravan->GetIdxCmdList();
+			caravan->IsUseCmdList(caravan->GetNextCmdListIdx(curCmd, cmdDir));
+		}
+
+		const int cmdIdx = caravan->GetIdxCmdList();
+		if (cmdIdx == 0) {
+			ringCommand = 1;
+		} else if (cmdIdx == 1) {
+			ringCommand = 9;
+		} else {
+			const int itemId = caravan->DelCmdListAndItem(cmdIdx, 0);
+			const unsigned short itemKind = getItemKindFromCfd(itemId);
+			if (itemKind == 1 || itemKind == 0xDF || itemKind == 0x100 ||
+			    itemKind == 0x125 || itemKind == 0x17D || itemKind == 0x186 ||
+			    itemKind == 0x1F5) {
+				ringCommand = itemId | 0x8000;
+			}
+		}
+		ringCommandArg = caravan->GetIdxCmdList();
+	}
+
+	if (((static_cast<signed char>(m_weaponNodeFlags) < 0) &&
+	     (static_cast<signed char>(m_shieldAttachNodeIndex) < 0) &&
+	     (static_cast<signed char>(m_weaponNodeFlags >> 8) < 0)) &&
+	    Joybus.GetCtrlMode(padSlot) != 1) {
+		if (caravan->m_hp == 0) {
+			primaryAvailable = true;
+			primaryCommand = 0x1B;
+		} else if (party.secondaryTarget != nullptr) {
+			primaryAvailable = true;
+			primaryCommand = 0x0C;
+		}
+
+		CGObject* target = party.target;
+		if (target != nullptr) {
+			const int targetState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(target) + 0x500);
+			const bool alreadyCarried =
+				*reinterpret_cast<CGPartyObj**>(reinterpret_cast<unsigned char*>(target) + 0x550) != nullptr;
+
+			if (!alreadyCarried) {
+				if (targetState == 0x0B || targetState == 0x0C || targetState == 0x0D ||
+				    targetState == 0x0E || targetState == 0x12 || targetState == 0x13 ||
+				    targetState == 0x14 || targetState == 0x15 || targetState == 0x16 ||
+				    targetState == 0x17 || targetState == 0x18 || targetState == 0x1C ||
+				    targetState == 0x1D || targetState == 0x1E || targetState == 0x1F ||
+				    targetState == 0x20 || targetState == 0x21 || targetState == 0x24) {
+					secondaryAvailable = true;
+					secondaryCommand = 0x17;
+				} else if (targetState == 0xC8) {
+					if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&CFlat) + 0x12AC) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 0x0B;
+					} else {
+						primaryAvailable = true;
+						primaryCommand = 0x0B;
+					}
+				} else if (targetState == 0xC9) {
+					if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&CFlat) + 0x12AC) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 0x0A;
+					} else {
+						primaryAvailable = true;
+						primaryCommand = 0x0A;
+					}
+				} else if (targetState == 0xCA) {
+					if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&CFlat) + 0x12AC) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 0x1C;
+					} else {
+						primaryAvailable = true;
+						primaryCommand = 0x1C;
+					}
+				} else if (targetState == 0xCC) {
+					secondaryAvailable = true;
+					secondaryCommand = 6;
+				} else {
+					secondaryAvailable = true;
+					secondaryCommand = 4;
+				}
+			}
+		}
+
+		if (party.carryObject != nullptr) {
+			const int carryState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.carryObject) + 0x500);
+			secondaryAvailable = true;
+			primaryAvailable = true;
+			primaryCommand = -1;
+			if (carryState == 0x0D) {
+				secondaryCommand = 7;
+			} else if (carryState == 0x0E) {
+				secondaryCommand = 8;
+			} else {
+				secondaryCommand = 5;
+			}
+		}
+
+		if ((party.commandFlags & 2) != 0) {
+			secondaryAvailable = false;
+			primaryAvailable = true;
+			primaryCommand = 0x1A;
+		}
+		if ((party.commandFlags & 4) != 0) {
+			secondaryAvailable = false;
+			primaryAvailable = true;
+			primaryCommand = 0x1D;
+		}
+		if ((party.commandFlags & 8) != 0) {
+			secondaryAvailable = true;
+			secondaryCommand = 0x1A;
+			primaryAvailable = false;
+			int cmdDir = 0;
+			if ((trig & 0x20) != 0) {
+				cmdDir = 1;
+			} else if ((trig & 0x40) != 0) {
+				cmdDir = -1;
+			}
+			if (cmdDir != 0) {
+				Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
+				int& charaCommand = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
+				charaCommand += cmdDir;
+				if (charaCommand < 0) {
+					charaCommand += 5;
+				} else if (charaCommand > 4) {
+					charaCommand -= 5;
+				}
+			}
+			const int charaCommand = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
+			ringCommand = charaCommand + 0x1E;
+			ringCommandArg = charaCommand;
 		}
 	}
-	if ((trig & 0x40) != 0) {
-		mode++;
-		if (mode > 5) {
-			mode = 0;
+
+	CRingMenu* ring = getBattleRingMenuForPort(getPartyJoybusPort(this));
+	if (ring != nullptr) {
+		ring->SetBattleCommand(0, primaryCommand, -1);
+		ring->SetBattleCommand(1, secondaryCommand, -1);
+		ring->SetBattleCommand(2, ringCommand, ringCommandArg);
+	}
+
+	if (Game.m_gameWork.m_menuStageMode != 0 &&
+	    Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0) {
+		return;
+	}
+
+	if ((trig & 0x100) != 0) {
+		if (primaryAvailable) {
+			if (primaryCommand == 0x1B) {
+				changeStat(0x20, 0, 0);
+			}
+
+			CGObject* scriptTarget = party.secondaryTarget != nullptr ?
+				reinterpret_cast<CGObject*>(party.secondaryTarget) : party.target;
+			party.commandFlags |= 0x80;
+
+			int stack[2];
+			stack[0] = primaryCommand;
+			stack[1] = scriptTarget != nullptr ?
+				*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptTarget) + 0x30) : 0;
+			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+				&CFlat, this, 2, 0x14, 2, stack, static_cast<void*>(0));
+			return;
+		}
+
+		if ((static_cast<signed char>(m_weaponNodeFlags >> 8) >= 0) ||
+		    (static_cast<signed char>(m_shieldAttachNodeIndex) >= 0) ||
+		    caravan->m_hp == 0 ||
+		    ringCommand == -1 ||
+		    ((party.commandFlags & 8) != 0)) {
+			return;
+		}
+
+		const int cmdIdx = caravan->GetIdxCmdList();
+		party.unk6EC = cmdIdx;
+		if (cmdIdx == 0) {
+			int weaponItem = 0;
+			int weaponRef = 0;
+			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
+			if (weaponItem == cmdIdx) {
+				const int equippedWeapon =
+					caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
+				if (weaponRef == equippedWeapon) {
+					m_itemId = weaponRef;
+					changeStat(7, 0, 0);
+					return;
+				}
+			}
+
+			party.pendingWeaponItem = cmdIdx;
+			party.weaponItem = caravan->m_equipment[0] < 0 ? 0 : caravan->m_inventoryItems[caravan->m_equipment[0]];
+			party.commandFlags = (party.commandFlags & 0xDF) | 0x20;
+			changeStat(0x0F, 0, 0);
+			return;
+		}
+
+		if (cmdIdx == 1) {
+			const unsigned short element = reinterpret_cast<unsigned short*>(m_scriptHandle)[0xF8];
+			if (element == 2) {
+				changeStat(0x14, 0, 0);
+			} else if (element < 2) {
+				changeStat(8, 0, 0);
+			} else if (element < 4) {
+				changeStat(0x15, 0, 0);
+			}
+			return;
+		}
+
+		const int itemId = caravan->DelCmdListAndItem(cmdIdx, 0);
+		const unsigned short itemKind = getItemKindFromCfd(itemId);
+		if (itemKind == 1) {
+			int weaponItem = 0;
+			int weaponRef = 0;
+			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
+			if (weaponItem == cmdIdx && weaponRef == itemId) {
+				m_itemId = itemId;
+				changeStat(7, 0, 0);
+				return;
+			}
+			party.pendingWeaponItem = cmdIdx;
+			party.weaponItem = itemId;
+			party.commandFlags = (party.commandFlags & 0xDF) | 0x20;
+			changeStat(0x0F, 0, 0);
+			return;
+		}
+
+		if (itemKind == 0x125) {
+			m_itemId = 0x220;
+			changeStat(2, 0, 2);
+			return;
+		}
+		if (itemKind == 0xDF || itemKind == 0x100) {
+			m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 10);
+			changeStat(2, 0, 0);
+			return;
+		}
+		if (itemKind == 0x17D || itemKind == 0x186) {
+			if (useItem(itemId), canPlayerUseItem() != 0) {
+				caravan->GetNumCombi(party.unk6EC, 1);
+			}
+			return;
+		}
+		if (itemKind == 0x1F5) {
+			m_itemId = itemId;
+			changeStat(2, 0, 0);
+			return;
 		}
 	}
 
-	if ((trig & 0x100) != 0 && m_lastStateId == 0) {
-		mode = 1;
-	}
-	if ((trig & 0x80) != 0 && m_lastStateId == 0) {
-		mode = 4;
+	if ((trig & 0x200) == 0 || !secondaryAvailable) {
+		return;
 	}
 
-	if ((held & 0x200) != 0 && m_lastStateId == 0) {
-		mode = 0;
+	if ((static_cast<signed char>(m_weaponNodeFlags >> 8) < 0) &&
+	    (static_cast<signed char>(m_shieldAttachNodeIndex) < 0) &&
+	    caravan->m_hp != 0 &&
+	    ringCommand != -1 &&
+	    secondaryCommand == 6) {
+		int weaponItem = 0;
+		int weaponRef = 0;
+		caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
+		m_itemId = weaponRef;
+		changeStat(1, 0, 0);
+		commandFinished();
+		return;
 	}
 
-	if (*reinterpret_cast<CGObject**>(self + 0x6E8) != nullptr) {
-		target = *reinterpret_cast<CGObject**>(self + 0x6E8);
-		mode = 0;
+	if (secondaryCommand == 4) {
+		carry(0, party.target, 0);
+		commandFinished();
+		return;
 	}
 
-	*reinterpret_cast<short*>(self + 0x6F4) = static_cast<short>(mode);
-	callCommandScript(mode, target);
+	if ((secondaryCommand >= 2 && secondaryCommand <= 3) || secondaryCommand == 0x17) {
+		rotTarget(reinterpret_cast<CGPrgObj*>(party.target));
+		changeStat(0x0E, 0, 0);
+		*reinterpret_cast<CGPartyObj**>(reinterpret_cast<unsigned char*>(party.target) + 0x550) = this;
+		reinterpret_cast<CGPrgObj*>(party.target)->changeStat(0x0E, 0, 0);
+		commandFinished();
+		return;
+	}
+
+	callCommandScript(secondaryCommand, party.target);
+	commandFinished();
 }
 
 /*
@@ -619,38 +1051,78 @@ void CGPartyObj::shouki()
 		return;
 	}
 
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	int* shoukiMode = reinterpret_cast<int*>(self + 0x688);
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	const unsigned char cflatFlags = CFlat[0x12E4];
+	const bool cflatBit7 = static_cast<signed char>(cflatFlags) < 0;
+	const bool cflatBit4 = (cflatFlags & 0x10) != 0;
+	const bool cflatBit5 = (cflatFlags & 0x20) != 0;
+	const bool weaponFlag = static_cast<signed char>(m_weaponNodeFlags >> 8) < 0;
 
-	bool canShouki = (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
-	                 ((self[0x6B8] & 0x20) == 0) &&
-	                 ((static_cast<unsigned char>(m_weaponNodeFlags >> 8) & 0x40) == 0);
-
-	if (!canShouki || Game.unk_flat3_0xc7d0 == 0) {
-		if (*shoukiMode != 0) {
+	if (*reinterpret_cast<short*>(script + 0x1C) == 0 || ((!cflatBit7 && !cflatBit4) || !weaponFlag) ||
+	    Game.unk_flat3_0xc7d0 == 0) {
+		if (m_unk688 != 0) {
 			deletePSlotBit(0x200);
-			*shoukiMode = 0;
+			m_unk688 = 0;
 		}
 		return;
 	}
 
 	const Vec* chalicePos = reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C);
 	float chaliceDist = PSVECDistance(&m_worldPosition, chalicePos);
-	if (chaliceDist > FLOAT_80331b00 * Game.unkFloat_0xca10) {
-		*shoukiMode = 2;
-	} else if (chaliceDist < FLOAT_80331a74 * Game.unkFloat_0xca10) {
-		*shoukiMode = 0;
+	if (chaliceDist > FLOAT_80331b00 * Game.unkFloat_0xca10 || !cflatBit4) {
+		if (m_unk688 != 2) {
+			deletePSlotBit(0x200);
+			ResetParticleWork__13CFlatRuntime2Fii(CFlat, 1, m_particleSlots[9]);
+			SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
+			    CFlat, reinterpret_cast<void*>(Game.unk_flat3_0xc7d0));
+			SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+			PutParticleWork__13CFlatRuntime2Fv(CFlat);
+		}
+		m_unk688 = 2;
 	} else {
-		*shoukiMode = 1;
+		deletePSlotBit(0x200);
+		if (chaliceDist < FLOAT_80331a74 * Game.unkFloat_0xca10) {
+			m_unk688 = 0;
+		} else {
+			if ((static_cast<unsigned char>(m_flags) & 3) == 0) {
+				playSe3D(0x1E, 0x32, 0x96, 0, 0);
+				ResetParticleWork__13CFlatRuntime2Fii(CFlat, 2, 0);
+				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, m_worldPosition, m_rotBaseY);
+				SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
+				    CFlat, reinterpret_cast<void*>(Game.unk_flat3_0xc7d0));
+				SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			}
+			m_unk688 = 1;
+		}
 	}
 
-	if (*shoukiMode == 0) {
-		if ((Game.m_gameWork.m_frameCounter % 30) == 0) {
-			addHp(1, static_cast<CGPrgObj*>(0));
+	const unsigned int frame = static_cast<unsigned char>(m_flags);
+	if (m_unk688 == 0 && !cflatBit4) {
+		unsigned int healCount = 0;
+		if (PartyData(this).carryObject == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
+			healCount = isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4));
+		} else {
+			healCount = isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 6));
 		}
-	} else if (*shoukiMode == 2) {
-		if ((Game.m_gameWork.m_frameCounter % 30) == 0) {
-			addHp(-1, static_cast<CGPrgObj*>(0));
+		const unsigned char periodicHeal = script[0xBDC];
+		if (periodicHeal != 0 && isFrameInterval(frame, periodicHeal)) {
+			healCount += 1;
+		}
+		if (healCount != 0) {
+			addHp(healCount, static_cast<CGPrgObj*>(0));
+		}
+	} else if (m_unk688 == 2) {
+		unsigned char* script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
+		unsigned int damageInterval = *reinterpret_cast<unsigned short*>(script9 + 0xF4);
+		if ((*reinterpret_cast<unsigned int*>(script + 0x3B0) & 0x2000) != 0) {
+			damageInterval += *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 8);
+		}
+		if (isFrameInterval(frame, damageInterval)) {
+			playSe3D(0x19, 0x32, 0x96, 0, 0);
+			if (!cflatBit5) {
+				addHp(-1, static_cast<CGPrgObj*>(0));
+			}
 		}
 	}
 }
@@ -907,7 +1379,7 @@ void CGPartyObj::statAttackSel()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::getBestAngleObject(float, float)
+CGPrgObj* CGPartyObj::getBestAngleObject(float, float)
 {
 	CGPrgObj* best = 0;
 	float bestAbsAngle = 0.0f;
@@ -949,6 +1421,8 @@ void CGPartyObj::getBestAngleObject(float, float)
 	if (best != 0) {
 		dstTargetRot(best);
 	}
+
+	return best;
 }
 
 /*
@@ -962,25 +1436,65 @@ void CGPartyObj::getBestAngleObject(float, float)
  */
 void CGPartyObj::onStatAttack(int chargeType)
 {
-	if (m_stateFrame == 0) {
-		m_rotationZ = m_rotationY;
-		m_rotationY = 0.0f;
-		unsigned char* flags = &PartyData(this).partyFlags;
-		*flags &= 0x7F;
-		*flags &= 0xBF;
-		getBestAngleObject(FLOAT_80331ad4 * m_bodyEllipsoidRadius, FLOAT_80331ad8);
+	PartyObjOverlay& party = PartyData(this);
+
+	if (chargeType == 0) {
+		if (m_stateFrame != 0) {
+			return;
+		}
+
+		party.unk6CC = party.attackSel;
+		party.attackSel = 0;
+		party.commandFlags &= 0x7F;
+		party.commandFlags &= 0xBF;
+
+		CGPrgObj* target = getBestAngleObject(FLOAT_80331ad4 * m_bodyEllipsoidRadius, FLOAT_80331ad8);
+		if (target != 0) {
+			m_rotTargetY = atan2(target->m_worldPosition.x - m_worldPosition.x,
+			                     target->m_worldPosition.z - m_worldPosition.z);
+		}
 		return;
 	}
 
-	if ((chargeType != 0) && (m_stateFrame > 0)) {
-		unsigned char* self = reinterpret_cast<unsigned char*>(this);
-		if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1) && ((Pad._8_2_ & 0x100) != 0)) {
-			if ((self[0x6C4] & 0x80) != 0) {
-				self[0x6C4] |= 0x40;
-			} else {
-				self[0x6C4] |= 0x80;
-			}
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	const int chain = party.unk6CC;
+	unsigned char* attackEntry = reinterpret_cast<unsigned char*>(
+	    Game.unk_flat3_field_30_0xc7e0 +
+	    ((*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+	      *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) *
+	         0x1CA) +
+	    chain * 0x12);
+
+	const unsigned short stepStart = *reinterpret_cast<unsigned short*>(attackEntry + 4);
+	const unsigned short stepEnd = *reinterpret_cast<unsigned short*>(attackEntry + 6);
+	if (chain > 0 && m_stateFrame == stepStart && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+		const float stepSpeed = FLOAT_80331ADC * static_cast<float>(*reinterpret_cast<unsigned short*>(attackEntry + 8));
+		moveVectorRot(m_rotTargetY, FLOAT_80331a78, stepSpeed, (stepEnd - stepStart) + 1);
+	}
+
+	const unsigned short comboStart = *reinterpret_cast<unsigned short*>(attackEntry + 0x0C);
+	const unsigned short comboEnd = *reinterpret_cast<unsigned short*>(attackEntry + 0x0E);
+	if (m_stateFrame < comboStart || comboEnd < m_stateFrame) {
+		if ((getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x100) != 0) {
+			party.commandFlags = (party.commandFlags & 0xBF) | 0x40;
 		}
+	} else {
+		if ((getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x100) != 0) {
+			party.commandFlags = (party.commandFlags & 0x7F) | 0x80;
+		}
+	}
+
+	if (m_stateFrame == *reinterpret_cast<unsigned short*>(attackEntry + 0x10)) {
+		if ((party.commandFlags & 0x80) != 0 && (party.commandFlags & 0x40) == 0 && chain < 2) {
+			party.attackSel = chain + 1;
+			changeStat(1, 0, 0);
+			return;
+		}
+	}
+
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if (m_stateFrame == *reinterpret_cast<int*>(self + 0x638)) {
+		self[0x63C] = (self[0x63C] & 0x7F) | 0x80;
 	}
 
 	if (isLoopAnim() != 0) {
@@ -1153,12 +1667,160 @@ void CGPartyObj::checkTargetParticle()
 		self[0x6B8] &= 0xEF;
 	}
 
-	Vec delta;
-	PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C), &m_worldPosition, &delta);
-	if (delta.x == FLOAT_80331a78 && delta.z == FLOAT_80331a78) {
+	Vec input;
+	input.x = 0.0f;
+	input.y = 0.0f;
+	input.z = 0.0f;
+
+	if (!isGhostPartyTargetMode(this)) {
+		if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484) & 0x100) != 0) {
+			input.x -= getPadAxisForSlot(static_cast<unsigned char>(m_animStateMisc), 0x24);
+			input.z += getPadAxisForSlot(static_cast<unsigned char>(m_animStateMisc), 0x28);
+		}
+
+		if (input.x == 0.0f && input.z == 0.0f) {
+			unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+			if ((held & 1) != 0) {
+				input.x += FLOAT_80331a54;
+			}
+			if ((held & 2) != 0) {
+				input.x -= FLOAT_80331a54;
+			}
+			if ((held & 8) != 0) {
+				input.z += FLOAT_80331a54;
+			}
+			if ((held & 4) != 0) {
+				input.z -= FLOAT_80331a54;
+			}
+		}
+	} else {
+		CGPartyObj* leader = Game.m_partyObjArr[0];
+		if (leader != nullptr &&
+		    (leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
+		    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) != 0) {
+			Vec toLeaderTarget;
+			PSVECSubtract(reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(leader) + 0x66C),
+			              reinterpret_cast<Vec*>(self + 0x66C), &toLeaderTarget);
+			toLeaderTarget.y = 0.0f;
+			if (PSVECMag(&toLeaderTarget) > 0.001f) {
+				input.x = toLeaderTarget.x;
+				input.z = toLeaderTarget.z;
+			}
+		}
+	}
+
+	if (input.x == 0.0f && input.z == 0.0f) {
 		self[0x6B8] &= 0xDF;
 	} else {
+		Vec* targetPos = reinterpret_cast<Vec*>(self + 0x66C);
+		Vec* centerPos = reinterpret_cast<Vec*>(self + 0x678);
+		Vec move;
+		Vec fromCenter;
+		float maxRange;
+
 		self[0x6B8] |= 0x20;
+		PSVECNormalize(&input, &input);
+		PSVECScale(&input, &input, FLOAT_80331ad4);
+
+		float angle = CameraPcs._248_4_;
+		if (isGhostPartyTargetMode(this)) {
+			angle = 0.0f;
+		}
+
+		float s = sin(angle);
+		float c = cos(angle);
+		targetPos->x += input.x * c - input.z * s;
+		targetPos->z += input.x * s + input.z * c;
+
+		maxRange = 0.0f;
+		if (Game.unkCFlatData0[2] != 0) {
+			int itemId = *reinterpret_cast<int*>(self + 0x560);
+			maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x30));
+		}
+		if (m_scriptHandle != nullptr) {
+			unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
+			if (*reinterpret_cast<int*>(self + 0x520) == 2) {
+				maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(work + 0x19A));
+				if ((*reinterpret_cast<unsigned int*>(work + 0x3B0) & 0x4000) != 0 && Game.unk_flat3_field_8_0xc7dc != 0) {
+					maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0A));
+				}
+			} else {
+				maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(work + 0x19C));
+				if ((*reinterpret_cast<unsigned int*>(work + 0x3B0) & 0x8000) != 0 && Game.unk_flat3_field_8_0xc7dc != 0) {
+					maxRange += static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0C));
+				}
+			}
+		}
+		maxRange = FLOAT_80331a78 + maxRange;
+
+		PSVECSubtract(targetPos, &m_worldPosition, &fromCenter);
+		float dist = PSVECMag(&fromCenter);
+		if (dist > maxRange && dist > 0.001f) {
+			PSVECScale(&fromCenter, &fromCenter, maxRange / dist);
+			PSVECAdd(&m_worldPosition, &fromCenter, targetPos);
+		}
+
+		PSVECSubtract(targetPos, centerPos, &move);
+		for (int i = 0; i < 4; i++) {
+			Vec bottom;
+			Vec up = {0.0f, FLOAT_80331ad0, 0.0f};
+			CMapCylinder hitCylinder;
+
+			PSVECAdd(centerPos, &up, &bottom);
+			hitCylinder.m_bottom = bottom;
+			hitCylinder.m_direction = move;
+			hitCylinder.m_radius = FLOAT_80331a9c;
+			hitCylinder.m_height = FLOAT_80331aa0;
+			hitCylinder.m_top.x = FLOAT_80331a9c;
+			hitCylinder.m_top.y = FLOAT_80331a9c;
+			hitCylinder.m_top.z = FLOAT_80331a9c;
+			hitCylinder.m_direction2.x = FLOAT_80331aa0;
+			hitCylinder.m_direction2.y = FLOAT_80331aa0;
+			hitCylinder.m_direction2.z = FLOAT_80331aa0;
+
+			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &move, 0x30) == 0) {
+				break;
+			}
+			if (i == 3) {
+				move.x = 0.0f;
+				move.y = 0.0f;
+				move.z = 0.0f;
+			} else {
+				CalcHitSlide__7CMapObjFP3Vecf(getMapHitObject(), &move);
+			}
+		}
+
+		PSVECAdd(centerPos, &move, targetPos);
+
+		Vec down = {0.0f, FLOAT_80331acc, 0.0f};
+		CMapCylinder floorCylinder;
+		floorCylinder.m_bottom = *targetPos;
+		floorCylinder.m_direction = down;
+		floorCylinder.m_radius = FLOAT_80331a78;
+		floorCylinder.m_height = FLOAT_80331aa0;
+		floorCylinder.m_top.x = FLOAT_80331a9c;
+		floorCylinder.m_top.y = FLOAT_80331a9c;
+		floorCylinder.m_top.z = FLOAT_80331a9c;
+		floorCylinder.m_direction2.x = FLOAT_80331aa0;
+		floorCylinder.m_direction2.y = FLOAT_80331aa0;
+		floorCylinder.m_direction2.z = FLOAT_80331aa0;
+
+		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &floorCylinder, &down, 0x30) != 0) {
+			CalcHitPosition__7CMapObjFP3Vec(getMapHitObject(), targetPos);
+			if (m_scriptHandle != nullptr) {
+				unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
+				*reinterpret_cast<Vec*>(work + 0xBAC) = *targetPos;
+				GetHitFaceNormal__7CMapObjFP3Vec(getMapHitObject(), reinterpret_cast<Vec*>(work + 0xBB8));
+			}
+		}
+
+		*centerPos = *targetPos;
+	}
+
+	Vec delta;
+	PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C), &m_worldPosition, &delta);
+	if (PSVECMag(&delta) > 0.0f) {
+		m_rotationY = atan2(delta.x, delta.z);
 	}
 }
 
@@ -1462,19 +2124,67 @@ void CGPartyObj::statCarry()
  */
 void CGPartyObj::statPut()
 {
+	if (Game.m_gameWork.m_menuStageMode != 0 &&
+	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    (GetCID() & 0x6D) == 0x6D &&
+	    m_scriptHandle[0xED] != 0) {
+		if (m_stateFrame == 0) {
+			CancelMove(1);
+			FLOAT_8032EE80 = FLOAT_80331AB0;
+			FLOAT_8032EE84 = *reinterpret_cast<float*>(Game.unk_flat3_0xc7d0 + 0x160) - m_worldPosition.y;
+		}
+
+		if (m_stateFrame < 0x0C) {
+			const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
+			m_extraMoveVec.x = FLOAT_8032EE80 * phase * sinf(m_rotBaseY);
+			m_extraMoveVec.z = FLOAT_8032EE80 * phase * cosf(m_rotBaseY);
+			m_extraMoveVec.y = FLOAT_8032EE84 * phase + FLOAT_80331A98;
+		}
+	}
+
 	if (m_stateFrame == 0) {
 		int anim = 0x0E;
+		int seNo = 0x23;
 		if (m_lastStateId == 0x0D) {
 			anim = 0x19;
+			seNo = 0x24;
 		} else if (m_lastStateId == 0x1B) {
 			anim = 9;
+			if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
+				anim = 0x28;
+			}
+			seNo = 0x24;
 		}
 		reqAnim(anim, 0, 0);
+		playSe3D(seNo, 0x32, 0x96, 0, 0);
 	}
 
 	if (isLoopAnim() != 0) {
-		carry(2, (CGObject*)0, 1);
-		setIdleMotion();
+		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+		PartyObjOverlay& party = PartyData(this);
+		if (party.carryObject == 0) {
+			if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x24, 1);
+			} else if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
+				SetAnimSlot(0, 0);
+				SetAnimSlot(1, 1);
+			} else {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x30, 1);
+			}
+		} else if (*reinterpret_cast<int*>(CFlat + 0x12AC) == 0) {
+			if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
+				SetAnimSlot(0x0B, 0);
+				SetAnimSlot(0x0C, 1);
+			} else {
+				SetAnimSlot(0x0B, 0);
+				SetAnimSlot(2, 1);
+			}
+		} else {
+			SetAnimSlot(0x0B, 0);
+			SetAnimSlot(0x0C, 1);
+		}
 		changeStat(0, 0, 0);
 	}
 }
@@ -1513,14 +2223,204 @@ void CGPartyObj::statPickup()
  */
 void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 {
-	(void)source;
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if (kind == 0) {
-		*reinterpret_cast<int*>(self + 0x6F8) = value;
-	} else if (kind == 1) {
-		addHp(value, (CGPrgObj*)0);
+	if (source != nullptr && (source->GetCID() & 0x2D) != 0x2D) {
+		return;
 	}
-	commandFinished();
+
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	if (script == nullptr) {
+		return;
+	}
+
+	unsigned int bonusSlot = script[0xBA4];
+	unsigned int addValue = 0;
+	unsigned int subValue = 0;
+	unsigned short currentAdd = *reinterpret_cast<unsigned short*>(script + 0xBCA);
+	unsigned short currentSub = *reinterpret_cast<unsigned short*>(script + 0xBCC);
+	int stageEntry = Game.m_bossArtifactBase + Game.m_gameWork.m_bossArtifactStageIndex * 0x168 + bonusSlot * 8;
+	unsigned int stageAdd = *reinterpret_cast<unsigned short*>(stageEntry + 0x66);
+	unsigned int stageSub = *reinterpret_cast<unsigned short*>(stageEntry + 0x68);
+
+	if (kind == 0) {
+		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC8);
+		Printf__7CSystemFPce(&System, s_partyBonusKind0Fmt, count + 1);
+		*reinterpret_cast<unsigned short*>(script + 0xBC8) = count + 1;
+	}
+	if (kind == 1) {
+		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC4);
+		Printf__7CSystemFPce(&System, s_partyBonusKind1Fmt, count + 1);
+		*reinterpret_cast<unsigned short*>(script + 0xBC4) = count + 1;
+	}
+	if (kind == 4) {
+		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC6);
+		Printf__7CSystemFPce(&System, s_partyBonusKind4Fmt, count + 1);
+		*reinterpret_cast<unsigned short*>(script + 0xBC6) = count + 1;
+	}
+
+	switch (bonusSlot) {
+	default:
+		break;
+	case 0:
+		if (kind == 2 && (System.m_frameCounter % 30) == 0) {
+			addValue = stageAdd;
+		}
+		break;
+	case 1:
+		if (kind == 3) {
+			addValue = stageAdd;
+		}
+		break;
+	case 2:
+	case 4:
+	case 6:
+		if (kind == 4) {
+			unsigned short item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48);
+			if ((bonusSlot == 4 && item == 0x100) || (bonusSlot == 6 && item == 400)) {
+				addValue = stageAdd;
+			} else if (bonusSlot == 2) {
+				switch (item) {
+				case 0x9F:
+				case 0xB6:
+				case 0xCC:
+				case 0xDB:
+				case 0xDF:
+				case 0xE4:
+				case 0x100:
+				case 0x125:
+				case 0x126:
+				case 0x127:
+				case 0x12A:
+				case 0x17D:
+				case 0x186:
+				case 0x191:
+					addValue = stageAdd;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		break;
+	case 3:
+	case 0xE:
+		if (kind == 5) {
+			short item = *reinterpret_cast<short*>(Game.unkCFlatData0[2] + value * 0x48);
+			if ((bonusSlot == 0xE && (item == 0x17D || item == 0x186)) ||
+			    (bonusSlot == 3 && item != 0x17D && item != 0x186)) {
+				addValue = stageAdd;
+			}
+		}
+		break;
+	case 7:
+		if (kind == 10) {
+			addValue = stageAdd;
+		}
+		break;
+	case 8:
+		if (kind == 0x0B) {
+			addValue = stageAdd;
+		}
+		break;
+	case 9:
+		if (kind == 0x0C) {
+			addValue = stageAdd;
+		}
+		break;
+	case 10:
+		if ((unsigned int)(kind - 0x12) < 3 || kind == 0x15) {
+			subValue = stageSub;
+		}
+		if (kind == 0x17) {
+			addValue = stageAdd;
+		}
+		break;
+	case 0x0B:
+		if ((unsigned int)(kind - 0x0E) < 3 || kind == 0x11) {
+			addValue = stageAdd;
+		}
+		break;
+	case 0x0C:
+		if ((unsigned int)(kind - 0x12) < 3 || kind == 0x15) {
+			subValue = stageSub;
+		}
+		break;
+	case 0x0D:
+		if (kind == 0x12) {
+			unsigned short item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48 + 8);
+			if (item == 0x24 || item == 0x25 || item == 0x69 || item == 0x6A) {
+				addValue = stageAdd;
+			}
+		}
+		break;
+	case 0x0F:
+		if (kind == 9) {
+			subValue = stageSub;
+		}
+		break;
+	case 0x10:
+		if (kind == 0x18) {
+			subValue = stageSub;
+		}
+		break;
+	case 0x11:
+		if (kind == 0x19) {
+			subValue = stageSub;
+		}
+		break;
+	case 0x12:
+	case 0x13:
+		if (kind == 0x16 &&
+		    ((bonusSlot == 0x12 && source == this) || (bonusSlot == 0x13 && source != this))) {
+			subValue = stageSub;
+		}
+		break;
+	case 0x14:
+		if (kind == 4) {
+			subValue = stageSub;
+		}
+		break;
+	case 0x15:
+		Printf__7CSystemFPce(&System, s_partyBonusUnknownFmt);
+		break;
+	case 0x16:
+		if (kind == 0x14) {
+			addValue = stageAdd;
+		}
+		break;
+	case 0x17:
+		if (kind == 1 && source != nullptr && source->m_scriptHandle != nullptr && source->m_scriptHandle[9] != nullptr &&
+		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(source->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
+			addValue = stageAdd;
+		}
+		break;
+	case 0x18:
+		if (kind == 1) {
+			subValue = stageSub;
+		}
+		break;
+	}
+
+	if (addValue != 0) {
+		unsigned int total = currentAdd + addValue;
+		if (total > 100) {
+			total = 100;
+		}
+		if (bonusSlot != 0) {
+			Printf__7CSystemFPce(&System, s_partyBonusAddFmt, bonusSlot, total);
+		}
+		*reinterpret_cast<unsigned short*>(script + 0xBCA) = static_cast<unsigned short>(total);
+	}
+
+	if (subValue != 0) {
+		int total = static_cast<int>(currentSub) - static_cast<int>(subValue);
+		if (total < 0) {
+			total = 0;
+		} else if (total > 100) {
+			total = 100;
+		}
+		Printf__7CSystemFPce(&System, s_partyBonusSubFmt, bonusSlot, total);
+		*reinterpret_cast<unsigned short*>(script + 0xBCC) = static_cast<unsigned short>(total);
+	}
 }
 
 /*
@@ -1871,24 +2771,73 @@ void CGPartyObj::CheckGameOver()
  */
 void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bonus2, int bonus3)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if (useRandom == 0) {
-		switch ((reinterpret_cast<unsigned int>(this) >> 2) & 3) {
-		case 0:
-			*reinterpret_cast<int*>(self + 0x6F8) = bonus0;
-			break;
-		case 1:
-			*reinterpret_cast<int*>(self + 0x6F8) = bonus1;
-			break;
-		case 2:
-			*reinterpret_cast<int*>(self + 0x6F8) = bonus2;
-			break;
-		default:
-			*reinterpret_cast<int*>(self + 0x6F8) = bonus3;
-			break;
+	int bonusCount = 0x10;
+	if (Game.m_gameWork.m_radarType != 0) {
+		bonusCount = 4;
+	}
+
+	Printf__7CSystemFPce(&System, s_partyBonusCountFmt, bonusCount);
+
+	int chosenBonus[5] = {};
+	int chosenCount = 0;
+	int stageBase = Game.m_bossArtifactBase + Game.m_gameWork.m_bossArtifactStageIndex * 0x168;
+
+	for (int slot = 0; slot < 4; slot++) {
+		CGPartyObj* party = Game.m_partyObjArr[slot];
+		if (party == nullptr) {
+			continue;
 		}
-	} else {
-		*reinterpret_cast<int*>(self + 0x6F8) = (bonus0 + bonus1 + bonus2 + bonus3) & 0xFF;
+
+		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(party->m_scriptHandle);
+		if (useRandom == 0) {
+			int bonus = bonus0;
+			switch (slot) {
+			case 1:
+				bonus = bonus1;
+				break;
+			case 2:
+				bonus = bonus2;
+				break;
+			case 3:
+				bonus = bonus3;
+				break;
+			default:
+				break;
+			}
+
+			caravanWork->SetBonusCondition(bonus);
+			if ((unsigned int)System.m_execParam > 2) {
+				Printf__7CSystemFPce(&System, s_partyBonusFixedFmt, slot, bonus);
+			}
+		} else {
+			int bonusIndex;
+			for (;;) {
+				bonusIndex = Math.Rand(bonusCount);
+
+				int duplicateIndex = 0;
+				while (duplicateIndex < chosenCount) {
+					if (chosenBonus[duplicateIndex] == bonusIndex) {
+						break;
+					}
+					duplicateIndex++;
+				}
+
+				if (duplicateIndex == chosenCount) {
+					break;
+				}
+			}
+
+			chosenBonus[chosenCount] = bonusIndex;
+			chosenCount++;
+
+			int bonus = *reinterpret_cast<unsigned short*>(stageBase + bonusIndex * 2);
+			caravanWork->SetBonusCondition(bonus);
+			if ((unsigned int)System.m_execParam > 2) {
+				Printf__7CSystemFPce(&System, s_partyBonusRandomFmt, slot, bonusIndex, bonus);
+			}
+		}
+
+		caravanWork->CalcStatus();
 	}
 }
 
@@ -2500,13 +3449,14 @@ void CGPartyObj::gpmMove()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	CGPartyObj* leader = Game.m_partyObjArr[0];
+	CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
 	if (leader == nullptr || leader == this || m_scriptHandle == nullptr) {
 		return;
 	}
 
 	if (leader->m_lastStateId == 0 &&
 	    leader->m_animSlotSel == 0x0C &&
-	    *reinterpret_cast<CGObject**>(reinterpret_cast<unsigned char*>(leader) + 0x6F0) == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
+	    *reinterpret_cast<CGObject**>(reinterpret_cast<unsigned char*>(leader) + 0x6F0) == chalice) {
 		sGhostPartyWork.settleTimer++;
 	} else {
 		sGhostPartyWork.settleTimer = 0;
@@ -2517,6 +3467,59 @@ void CGPartyObj::gpmMove()
 	}
 	sGhostPartyWork.carrySpeed *= 0.85f;
 
+	int stageMode;
+	switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+	case 4:
+	case 8:
+	case 9:
+	case 0x0B:
+	case 0x0C:
+	case 0x0D:
+		stageMode = 2;
+		break;
+	case 6:
+	case 10:
+		stageMode = 1;
+		break;
+	default:
+		stageMode = 0;
+		break;
+	}
+
+	float frameScale = static_cast<float>(Game.m_gameWork.m_frameCounter % 100) / 100.0f;
+	float pressureScale = 1.0f;
+	if (stageMode == 2) {
+		pressureScale = 0.5f + frameScale * 0.5f;
+	} else if (stageMode == 1) {
+		pressureScale = 0.5f + (1.0f - frameScale) * 0.5f;
+	}
+
+	int pressureLimit = static_cast<int>(100.0f * pressureScale);
+	if (sGhostPartyWork.carrySpeed <= 0.5f) {
+		if (*reinterpret_cast<float*>(self + 0x6F0) == 0.0f) {
+			sGhostPartyWork.pressure -= 4;
+		} else {
+			sGhostPartyWork.pressure -= 3;
+		}
+	} else if (*reinterpret_cast<float*>(self + 0x6F0) != 0.0f) {
+		sGhostPartyWork.pressure += 2;
+	} else {
+		sGhostPartyWork.pressure -= 2;
+	}
+
+	if (sGhostPartyWork.pressure < 0) {
+		sGhostPartyWork.pressure = 0;
+	} else if (sGhostPartyWork.pressure > pressureLimit + 100) {
+		sGhostPartyWork.pressure = pressureLimit + 100;
+	}
+
+	if (sGhostPartyWork.pressure < pressureLimit / 3) {
+		PartyData(this).partyFlags &= 0xFB;
+	}
+	if (sGhostPartyWork.activeTrailCount > 0) {
+		sGhostPartyWork.activeTrailCount--;
+	}
+
 	Vec pathVec;
 	float pathDist = 0.0f;
 	gpmCalcDist(&pathVec, pathDist);
@@ -2526,26 +3529,169 @@ void CGPartyObj::gpmMove()
 	toLeader.y = 0.0f;
 	float dist = PSVECMag(&toLeader);
 	float nearDist = m_nearColRadius + leader->m_nearColRadius;
+	float clampedDist = (*reinterpret_cast<float*>(self + 0x5C4) < dist) ? *reinterpret_cast<float*>(self + 0x5C4) : dist;
 
-	if (dist > nearDist * 1.25f || pathDist > Game.unkFloat_0xca10 * 0.75f) {
-		dstTargetRot(reinterpret_cast<CGPrgObj*>(leader));
-		moveVector(&toLeader, m_moveBaseSpeed * 0.9f, 1);
-		*reinterpret_cast<float*>(self + 0x5D0) = dist;
-		sGhostPartyWork.carryDir = toLeader;
-		sGhostPartyWork.carrySpeed = m_moveBaseSpeed * 0.35f;
-	} else if ((m_lastStateId == 2) && (dist < nearDist * 0.75f)) {
-		changeStat(0, 0, 0);
+	if (m_lastStateId != 0 || (static_cast<signed char>(m_shieldAttachNodeIndex) >= 0)) {
+		if (m_lastStateId != 2) {
+			return;
+		}
+		if (static_cast<signed char>(PartyData(this).partyFlags) >= 0) {
+			changeStat(0, 0, 0);
+			return;
+		}
+
+		if (leader->m_lastStateId == 2 || leader->m_lastStateId == 6) {
+			if (m_subState != 1) {
+				return;
+			}
+			if (*reinterpret_cast<int*>(self + 0x668) == 0) {
+				return;
+			}
+			if ((PartyData(leader).partyFlags & 0x40) != 0) {
+				sGhostPartyWork.trailIndex = 0;
+			}
+			if ((PartyData(this).partyFlags & 0x80) == 0) {
+				return;
+			}
+
+			PartyData(this).partyFlags |= 0x20;
+			sGhostPartyWork.trailIndex++;
+			if (sGhostPartyWork.trailIndex < 0x10) {
+				return;
+			}
+			if ((PartyData(this).partyFlags & 0x40) != 0) {
+				return;
+			}
+		} else if ((PartyData(this).partyFlags & 0x40) == 0) {
+			changeStat(0, 0, 0);
+			return;
+		}
+
+		sGhostPartyWork.thresholdA = (sGhostPartyWork.slotSel == 0) ? 0 : sGhostPartyWork.thresholdA / 2;
+		sGhostPartyWork.thresholdB = (sGhostPartyWork.slotSel == 1) ? 0 : sGhostPartyWork.thresholdB / 2;
+		sGhostPartyWork.thresholdC = (sGhostPartyWork.slotSel == 2) ? 0 : sGhostPartyWork.thresholdC / 2;
+		PartyData(this).partyFlags = (PartyData(this).partyFlags & 0xAF) | 0x40;
+		return;
 	}
 
-	if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
-	    (leader->m_subState == 1) &&
-	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) != 0) &&
-	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x660) == 0) &&
-	    (dist < nearDist * 0.6f)) {
-		CancelMove(1);
-		rotTarget(reinterpret_cast<CGPrgObj*>(leader));
-		carry(0, reinterpret_cast<CGObject*>(leader), 0);
-		sGhostPartyWork.carrySpeed = 0.0f;
+	int moveKind = 0;
+	if (static_cast<signed char>(PartyData(this).partyFlags) >= 0) {
+		if (chalice != nullptr &&
+		    *reinterpret_cast<float*>(self + 0x6F0) == 0.0f &&
+		    (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) < 0) &&
+		    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
+			float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * 1.25f;
+			if (dist < pickupRadius) {
+				CancelMove(1);
+				rotTarget(reinterpret_cast<CGPrgObj*>(chalice));
+				sGhostPartyWork.carrySpeed = 0.0f;
+				carry(0, chalice, 0);
+				return;
+			}
+			moveKind = 1;
+		}
+
+		if (moveKind == 0) {
+			float limit = (sGhostPartyWork.activeTrailCount != 0) ? 0.75f : 0.5f;
+			if (pathDist < Game.unkFloat_0xca10 * limit) {
+				return;
+			}
+		}
+		if (moveKind == 1 && chalice != nullptr) {
+			float keepDist = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * 0.5f;
+			if (clampedDist < keepDist) {
+				return;
+			}
+		}
+	} else {
+		if (*reinterpret_cast<float*>(self + 0x6F0) != 0.0f) {
+			sGhostPartyWork.carrySpeed = 0.0f;
+			carry(1, static_cast<CGObject*>(0), 0);
+			return;
+		}
+
+		float limit = (sGhostPartyWork.activeTrailCount != 0) ? 0.75f : 0.8f;
+		if (Game.unkFloat_0xca10 * limit > pathDist) {
+			if ((leader->m_lastStateId != 2 && leader->m_lastStateId != 6) ||
+			    leader->m_subState != 1 ||
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x660) != 0) {
+				return;
+			}
+
+			int threshold0 = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2048);
+			int threshold1 = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x204C);
+			int threshold2 = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2050);
+			if (sGhostPartyWork.thresholdA < threshold0 &&
+			    sGhostPartyWork.thresholdB < threshold1 &&
+			    sGhostPartyWork.thresholdC < threshold2) {
+				return;
+			}
+
+			int choices = 0;
+			if (sGhostPartyWork.thresholdA >= threshold0) {
+				choices++;
+			}
+			if (sGhostPartyWork.thresholdB >= threshold1) {
+				choices++;
+			}
+			if (sGhostPartyWork.thresholdC >= threshold2) {
+				choices++;
+			}
+
+			int pick = Math.Rand(choices);
+			int cursor = 0;
+			if (sGhostPartyWork.thresholdA >= threshold0) {
+				if (cursor == pick) {
+					sGhostPartyWork.slotSel = 0;
+				}
+				cursor++;
+			}
+			if (cursor <= pick && sGhostPartyWork.thresholdB >= threshold1) {
+				if (cursor == pick) {
+					sGhostPartyWork.slotSel = 1;
+				}
+				cursor++;
+			}
+			if (cursor <= pick && sGhostPartyWork.thresholdC >= threshold2) {
+				sGhostPartyWork.slotSel = 2;
+			}
+
+			if (sGhostPartyWork.slotSel == 1) {
+				*reinterpret_cast<int*>(self + 0x550) = 0x20F;
+			} else if (sGhostPartyWork.slotSel == 0) {
+				*reinterpret_cast<int*>(self + 0x550) = 0x207;
+			} else if (sGhostPartyWork.slotSel < 3) {
+				*reinterpret_cast<int*>(self + 0x550) = 0x20B;
+			}
+			changeStat(2, 0, 0);
+			sGhostPartyWork.trailIndex = 0;
+			PartyData(this).partyFlags &= 0x9F;
+			return;
+		}
+	}
+
+	if (PartyData(this).unk6BC != moveKind) {
+		PartyData(this).unk6C0 = 0;
+		PartyData(this).unk6BC = moveKind;
+	}
+
+	Vec moveDir;
+	if (moveKind == 0) {
+		moveDir = pathVec;
+	} else {
+		moveDir = toLeader;
+	}
+
+	float nextSpeed = sGhostPartyWork.carrySpeed + 0.05f;
+	float speedScale = (pressureLimit <= sGhostPartyWork.pressure) ? 1.0f : 0.9f;
+	float speedLimit = speedScale * m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(leader) + 0x690);
+	sGhostPartyWork.carrySpeed = (nextSpeed >= 0.0f && speedLimit < nextSpeed) ? speedLimit : nextSpeed;
+
+	PartyData(this).unk6C0++;
+	sGhostPartyWork.carryDir = moveDir;
+	if (PartyData(this).unk6C0 >= 4) {
+		PartyData(this).unk6C0 = 0;
 	}
 }
 

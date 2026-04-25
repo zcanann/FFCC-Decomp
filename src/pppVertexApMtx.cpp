@@ -79,11 +79,11 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 	VertexApMtxState* state = (VertexApMtxState*)((u8*)parent + stateOffset + 0x80);
 
 	if (gPppCalcDisabled != 0) {
-		return;
+		goto exitStub;
 	}
 
 	if (data->entryIndex < 0) {
-		return;
+		goto exitStub;
 	}
 
 	if (state->countdown == 0) {
@@ -102,8 +102,12 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		count = data->spawnCount;
 
 		switch (data->mode) {
+		default:
+			goto setCountdown;
 		case 0:
-			while (count-- != 0) {
+			goto mode0Test;
+		mode0Body:
+			{
 				if (state->index >= entry->maxValue) {
 					state->index = 0;
 				}
@@ -152,9 +156,17 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					}
 				}
 			}
-			break;
+		mode0Test:
+			if (count-- != 0) {
+				goto mode0Body;
+			}
+			goto setCountdown;
 		case 1:
-			while (count-- != 0) {
+			goto mode1Init;
+		mode1Init:
+			goto mode1Test;
+		mode1Body:
+			{
 				f32 randValue = Math.RandF();
 				f32 maxValue = (f32)entry->maxValue;
 				int outValue = (int)(randValue * maxValue);
@@ -200,14 +212,23 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					}
 				}
 			}
-			break;
-		default:
-			break;
+		mode1Test:
+			if (count-- != 0) {
+				goto mode1Body;
+			}
+			goto setCountdown;
 		}
+
+	setCountdown:
 		state->countdown = data->spawnDelay;
 	}
 
 	state->countdown--;
+
+exitStub:
+	goto functionEnd;
+functionEnd:
+	;
 }
 
 /*

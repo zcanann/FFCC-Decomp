@@ -1,6 +1,18 @@
 #include "ffcc/cflat_r2class.h"
+#include "ffcc/charaobj.h"
+#include "ffcc/gbaque.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/gobject.h"
+#include "ffcc/joybus.h"
+#include "ffcc/p_game.h"
+#include "ffcc/p_menu.h"
+#include "ffcc/pad.h"
+#include "ffcc/partMng.h"
+#include "ffcc/partyobj.h"
+#include "ffcc/ringmenu.h"
 #include "ffcc/system.h"
+
+#include <math.h>
 
 extern "C" int IsAnimFinished__8CGObjectFi(CGObject*, int);
 extern "C" void push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(CFlatRuntime2*, CFlatRuntime::CObject*, int);
@@ -28,6 +40,54 @@ static inline unsigned int CallEngineFunc48Arg(void* engineObject, unsigned int 
 	void** vtable = *reinterpret_cast<void***>(reinterpret_cast<u8*>(engineObject) + 0x48);
 	EngineFn fn = reinterpret_cast<EngineFn>(vtable[2]);
 	return fn(engineObject, arg0);
+}
+
+static inline CGObject* FindRuntimeObject(CFlatRuntime2* runtime, unsigned int objectId)
+{
+	typedef CGObject* (*RuntimeFn)(CFlatRuntime2*, unsigned int);
+	void** vtable = *reinterpret_cast<void***>(runtime);
+	RuntimeFn fn = reinterpret_cast<RuntimeFn>(vtable[15]);
+	return fn(runtime, objectId);
+}
+
+static inline unsigned int& RuntimeWorkAssignIndex(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(runtime) + 0x1040C);
+}
+
+static inline unsigned int& RuntimePartyAssignIndex(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(runtime) + 0x10410);
+}
+
+static inline CCaravanWork* ScriptCaravan(CGObject* engineObject)
+{
+	return reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle);
+}
+
+static inline CGObjWork* ScriptWork(CGObject* engineObject)
+{
+	return reinterpret_cast<CGObjWork*>(engineObject->m_scriptHandle);
+}
+
+static inline CMonWork* ScriptMonWork(CGObject* engineObject)
+{
+	return reinterpret_cast<CMonWork*>(engineObject->m_scriptHandle);
+}
+
+static inline int ScriptPlayerIndex(CGObject* engineObject)
+{
+	return ScriptCaravan(engineObject)->m_joybusCaravanId;
+}
+
+static inline CRingMenu* BattleRingMenu(int playerIndex)
+{
+	return *reinterpret_cast<CRingMenu**>(reinterpret_cast<u8*>(&MenuPcs) + 0x13C + playerIndex * 4);
+}
+
+static inline void PushF32(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, float value)
+{
+	push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(runtime, object, *reinterpret_cast<int*>(&value));
 }
 
 static inline void StoreU16(CFlatRuntime::CStack* stack, unsigned short* value, int setMode)
@@ -114,6 +174,8 @@ void SAFE_CAST_MON_WORK(CGObjWork*)
 void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int command, int& outResult)
 {
 	CGObject* engineObject = reinterpret_cast<CGObject*>(object->m_engineObject);
+	CGCharaObj* charaObject = reinterpret_cast<CGCharaObj*>(object->m_engineObject);
+	CGPartyObj* partyObject = reinterpret_cast<CGPartyObj*>(object->m_engineObject);
 	unsigned int* localBase = object->m_localBase;
 
 	switch (command) {
@@ -251,6 +313,318 @@ void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int co
 		case -0x99:
 			engineObject->PlayAnim(
 			    static_cast<int>(localBase[0]), 0, 1, static_cast<short>(localBase[1]), static_cast<short>(localBase[2]), 0);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x97:
+			GbaQue.OpenMenu(ScriptPlayerIndex(engineObject), static_cast<int>(localBase[0]), 1);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x96:
+			charaObject->addHp(static_cast<int>(localBase[0]), 0);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x94:
+			ScriptCaravan(engineObject)->SetArtifact(static_cast<int>(localBase[0]), static_cast<int>(localBase[1]));
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x8E:
+			partyObject->carry(static_cast<int>(localBase[0]), FindRuntimeObject(this, localBase[1]), static_cast<int>(localBase[2]));
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x8D:
+			partyObject->commandFinished();
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x85:
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(
+			    this,
+			    object,
+			    ScriptCaravan(engineObject)->ShopRequest(
+			        static_cast<int>(localBase[0]),
+			        static_cast<int>(localBase[1]),
+			        static_cast<int>(localBase[2]),
+			        static_cast<int>(localBase[3]),
+			        static_cast<int>(localBase[4]),
+			        static_cast<int>(localBase[5]),
+			        static_cast<int>(static_cast<signed char>(localBase[6]))));
+			outResult = 0;
+			break;
+		case -0x7F: {
+			unsigned int partyIndex = RuntimePartyAssignIndex(this);
+			RuntimePartyAssignIndex(this) = partyIndex + 1;
+			if (Game.m_gameWork.m_wmBackupParams[partyIndex] >= 0) {
+				engineObject->SetClassWork(0, static_cast<int>(partyIndex));
+				ScriptCaravan(engineObject)->m_joybusCaravanId = static_cast<int>(partyIndex);
+				Game.m_partyObjArr[partyIndex] = partyObject;
+				Joybus.SendAllStat(static_cast<int>(partyIndex));
+			}
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x7E: {
+			unsigned int workIndex = RuntimeWorkAssignIndex(this);
+			RuntimeWorkAssignIndex(this) = workIndex + 1;
+			engineObject->SetClassWork(1, static_cast<int>(workIndex));
+			engineObject->InitWork(static_cast<int>(localBase[0]));
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x7C:
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(
+			    this, object, ScriptCaravan(engineObject)->GetFoodRank(static_cast<int>(localBase[0])));
+			outResult = 0;
+			break;
+		case -0x79: {
+			signed char animList[8];
+			int animCount = 0;
+			int argCount = object->m_argCount - 1;
+			if (argCount > 0) {
+				animList[0] = static_cast<signed char>(localBase[1]);
+				animCount = 1;
+				if (argCount > 1) {
+					animList[1] = static_cast<signed char>(localBase[2]);
+					animCount = 2;
+					if (argCount > 2) {
+						animList[2] = static_cast<signed char>(localBase[3]);
+						animCount = 3;
+						if (argCount > 3) {
+							animList[3] = static_cast<signed char>(localBase[4]);
+							animCount = 4;
+						}
+					}
+				}
+			}
+			animList[animCount] = static_cast<signed char>(0xFF);
+			engineObject->PlayAnim(static_cast<int>(localBase[0]), 0, 0, -1, -1, animList);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x77: {
+			CCaravanWork* caravanWork = ScriptCaravan(engineObject);
+			unsigned int mode = localBase[0];
+			int index = static_cast<int>(localBase[1]);
+			if (mode != 2) {
+				if (static_cast<int>(mode) < 2) {
+					if (static_cast<int>(mode) > 0) {
+						caravanWork->DeleteItemIdx(index, 1);
+					}
+				} else if (static_cast<int>(mode) < 4) {
+					caravanWork->DeleteCmdList(index, 1);
+				}
+			}
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x76:
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, static_cast<int>(ScriptCaravan(engineObject)->m_evtState1));
+			outResult = 0;
+			break;
+		case -0x75: {
+			CCaravanWork* caravanWork = ScriptCaravan(engineObject);
+			if (caravanWork->m_evtState0 != localBase[0]) {
+				caravanWork->m_evtState0 = localBase[0];
+				caravanWork->m_evtState1 = 0;
+			}
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x74: {
+			Vec moveVector;
+			moveVector.x = static_cast<float>(localBase[0]);
+			moveVector.y = static_cast<float>(localBase[1]);
+			moveVector.z = static_cast<float>(localBase[2]);
+			float magnitude = PSVECMag(&moveVector);
+			if (magnitude == 0.0f) {
+				moveVector.x = 0.0f;
+				moveVector.y = 0.0f;
+				moveVector.z = 0.0f;
+			} else {
+				PSVECScale(&moveVector, &moveVector, 0.5f / magnitude);
+			}
+			engineObject->MoveVector(&moveVector, static_cast<float>(localBase[3]), static_cast<int>(localBase[4]), 1, 1, 1);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x73: {
+			unsigned int buttons = 0;
+			int playerIndex = ScriptPlayerIndex(engineObject);
+			bool useDebugPad = (Pad._452_4_ != 0) || ((playerIndex == 0) && (Pad._448_4_ != -1));
+			if (!useDebugPad) {
+				unsigned int slot = static_cast<unsigned int>(playerIndex)
+				    & ~((static_cast<int>(~(Pad._448_4_ - playerIndex | playerIndex - Pad._448_4_)) >> 31));
+				buttons = *reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(&Pad) + 4 + slot * 0x54);
+			}
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, static_cast<int>(buttons));
+			outResult = 0;
+			break;
+		}
+		case -0x69:
+			BattleRingMenu(ScriptPlayerIndex(engineObject))
+			    ->SetBattleCommand(static_cast<int>(localBase[0]), static_cast<int>(localBase[1]), -1);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x68:
+			BattleRingMenu(ScriptPlayerIndex(engineObject))
+			    ->SetBattleButton(static_cast<int>(localBase[0]), static_cast<int>(localBase[1]));
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x64:
+			ScriptCaravan(engineObject)->unk_0x3e6 = static_cast<unsigned short>(localBase[0]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x62: {
+			unsigned int changed = static_cast<unsigned int>(Joybus.ChgCtrlMode(ScriptPlayerIndex(engineObject)));
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, (__cntlzw(changed) >> 5) & 0xFF);
+			outResult = 0;
+			break;
+		}
+		case -0x61:
+			ScriptCaravan(engineObject)->AddLetter(
+			    static_cast<int>(localBase[0]),
+			    static_cast<int>(localBase[1]),
+			    static_cast<int>(localBase[2]),
+			    static_cast<int>(localBase[3]),
+			    static_cast<int>(localBase[4]),
+			    static_cast<short>(localBase[5]),
+			    static_cast<short>(localBase[6]),
+			    static_cast<short>(localBase[7]),
+			    static_cast<short>(localBase[8]));
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x60: {
+			Vec safePos;
+			float safeDist = engineObject->CalcSafePos(static_cast<int>(localBase[0]), FindRuntimeObject(this, localBase[1]), &safePos);
+			*reinterpret_cast<unsigned int*>(localBase[2]) = *reinterpret_cast<unsigned int*>(&safePos.x);
+			*reinterpret_cast<unsigned int*>(localBase[3]) = *reinterpret_cast<unsigned int*>(&safePos.y);
+			*reinterpret_cast<unsigned int*>(localBase[4]) = *reinterpret_cast<unsigned int*>(&safePos.z);
+			PushF32(this, object, safeDist);
+			outResult = 0;
+			break;
+		}
+		case -0x5D:
+			ScriptMonWork(engineObject)->unk_0xf0[localBase[0]] = static_cast<unsigned short>(localBase[1]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x5C:
+			ScriptMonWork(engineObject)->unk_0xd0[localBase[0]] = static_cast<unsigned short>(localBase[1]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x5A:
+			ScriptWork(engineObject)->m_statusValues[localBase[0]] = static_cast<unsigned short>(localBase[1]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x56:
+			ScriptWork(engineObject)->m_maxHp = static_cast<unsigned short>(localBase[1]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x55:
+			ScriptWork(engineObject)->m_hp = static_cast<unsigned short>(localBase[1]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x54: {
+			Vec moveVector;
+			float rotX = static_cast<float>(localBase[0]);
+			float rotY = static_cast<float>(localBase[1]);
+			moveVector.x = static_cast<float>(sin(rotX) * cos(rotY));
+			moveVector.y = static_cast<float>(sin(rotY));
+			moveVector.z = static_cast<float>(cos(rotX) * cos(rotY));
+			engineObject->MoveVector(&moveVector, static_cast<float>(localBase[2]), static_cast<int>(localBase[3]), 0, 0, 1);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x53:
+			ScriptCaravan(engineObject)->m_gil = static_cast<int>(localBase[0]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x52: {
+			unsigned int result = 0;
+			if ((localBase[0] & 2) != 0 && ScriptCaravan(engineObject)->FindItem(static_cast<int>(localBase[1])) >= 0) {
+				result = 2;
+			}
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, static_cast<int>(result));
+			outResult = 0;
+			break;
+		}
+		case -0x4F: {
+			CCaravanWork* caravanWork = ScriptCaravan(engineObject);
+			unsigned int mode = localBase[0];
+			int slot = -1;
+			if (mode != 2) {
+				int itemId = static_cast<unsigned short>(localBase[1]);
+				if (static_cast<int>(mode) < 2) {
+					if (static_cast<int>(mode) > 0) {
+						caravanWork->AddItem(itemId, &slot);
+					}
+				} else if (static_cast<int>(mode) < 4) {
+					caravanWork->AddComList(itemId, &slot);
+				}
+			}
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, slot);
+			outResult = 0;
+			break;
+		}
+		case -0x4B:
+			engineObject->ResetDynamics();
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x4A:
+			engineObject->m_hitNormal.x = static_cast<float>(localBase[0]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x48:
+			engineObject->m_stepSlopeLimit = static_cast<float>(localBase[1]);
+			if (localBase[0] != 0) {
+				engineObject->m_lookAtTimer = engineObject->m_stepSlopeLimit;
+			}
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x46:
+			engineObject->LookAt(localBase[0] != 0 ? FindRuntimeObject(this, localBase[0]) : 0, 0);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x44: {
+			float* params = reinterpret_cast<float*>(localBase);
+			engineObject->moveVectorHRot(params[0], params[1], params[2], static_cast<int>(params[3]));
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x43: {
+			float* params = reinterpret_cast<float*>(localBase);
+			engineObject->moveVectorRot(params[0], params[1], params[2], static_cast<int>(params[3]));
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x41:
+			engineObject->m_bgDownDist = 0.5f / static_cast<float>(localBase[0]);
 			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
 			outResult = 0;
 			break;

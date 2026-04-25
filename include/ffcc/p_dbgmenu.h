@@ -73,7 +73,7 @@ public:
     void changeVtxFmt(int);
     void drawWindow(int, int, int, int, int, char*);
     void drawFont(int, int, int, char*);
-    void searchFreeCDM();
+    CDM* searchFreeCDM();
     int searchID(int, CDM&);
     void Add();
     void Add(int, int, CDMParam&);

@@ -4,6 +4,7 @@
 #include "dolphin/dvd/__dvd.h"
 
 static void (*FatalFunc)();
+u32 MotorState_8032F0D0 = 0;
 
 const char* Japanese =
     "\n\n\nエラーが発生しました。\n\n"

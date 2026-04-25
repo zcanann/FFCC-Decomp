@@ -40,6 +40,46 @@ extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 
 
 namespace {
+struct ArtiState {
+	unsigned char pad_0000[0xB];
+	char initialized;
+	unsigned char pad_000C;
+	unsigned char closeRequested;
+	unsigned char pad_000E[2];
+	short state;
+	unsigned char pad_0012[0x0C];
+	short moveDirection;
+	unsigned char pad_0020[2];
+	short frame;
+	unsigned char pad_0024[2];
+	short selection;
+	unsigned char pad_0028[8];
+	short prevSelection;
+	short currentSelection;
+	short scrollOffset;
+};
+
+struct ArtiOpenAnim {
+	short x;
+	short y;
+	short w;
+	short h;
+	float u;
+	float v;
+	float alpha;
+	float scale;
+	int unk;
+	int tex;
+	int step;
+	int startFrame;
+	int duration;
+	unsigned int flags;
+	float dx;
+	float dy;
+	float targetX;
+	float targetY;
+};
+
 struct MenuArtiMembers {
 	unsigned char pad_0000[0xF8];
 	CFont* m_helpFont;
@@ -55,10 +95,37 @@ STATIC_ASSERT(offsetof(MenuArtiMembers, m_helpFont) == 0xF8);
 STATIC_ASSERT(offsetof(MenuArtiMembers, m_listFont) == 0x108);
 STATIC_ASSERT(offsetof(MenuArtiMembers, m_artiState) == 0x82C);
 STATIC_ASSERT(offsetof(MenuArtiMembers, m_artiList) == 0x850);
+STATIC_ASSERT(offsetof(ArtiState, initialized) == 0xB);
+STATIC_ASSERT(offsetof(ArtiState, closeRequested) == 0xD);
+STATIC_ASSERT(offsetof(ArtiState, state) == 0x10);
+STATIC_ASSERT(offsetof(ArtiState, moveDirection) == 0x1E);
+STATIC_ASSERT(offsetof(ArtiState, frame) == 0x22);
+STATIC_ASSERT(offsetof(ArtiState, selection) == 0x26);
+STATIC_ASSERT(offsetof(ArtiState, prevSelection) == 0x30);
+STATIC_ASSERT(offsetof(ArtiState, currentSelection) == 0x32);
+STATIC_ASSERT(offsetof(ArtiState, scrollOffset) == 0x34);
+STATIC_ASSERT(offsetof(ArtiOpenAnim, alpha) == 0x10);
+STATIC_ASSERT(offsetof(ArtiOpenAnim, scale) == 0x14);
+STATIC_ASSERT(offsetof(ArtiOpenAnim, unk) == 0x18);
+STATIC_ASSERT(offsetof(ArtiOpenAnim, tex) == 0x1C);
+STATIC_ASSERT(offsetof(ArtiOpenAnim, step) == 0x20);
+STATIC_ASSERT(offsetof(ArtiOpenAnim, startFrame) == 0x24);
+STATIC_ASSERT(offsetof(ArtiOpenAnim, duration) == 0x28);
+STATIC_ASSERT(offsetof(ArtiOpenAnim, flags) == 0x2C);
+STATIC_ASSERT(offsetof(ArtiOpenAnim, dx) == 0x30);
+STATIC_ASSERT(offsetof(ArtiOpenAnim, dy) == 0x34);
+STATIC_ASSERT(offsetof(ArtiOpenAnim, targetX) == 0x38);
+STATIC_ASSERT(offsetof(ArtiOpenAnim, targetY) == 0x3C);
+STATIC_ASSERT(sizeof(ArtiOpenAnim) == 0x40);
 
 static inline MenuArtiMembers& GetMenuArtiMembers(CMenuPcs* menu)
 {
 	return *reinterpret_cast<MenuArtiMembers*>(menu);
+}
+
+static inline ArtiState* GetArtiStateStruct(CMenuPcs* menu)
+{
+	return reinterpret_cast<ArtiState*>(GetMenuArtiMembers(menu).m_artiState);
 }
 
 static inline s16* GetArtiState(CMenuPcs* menu)
@@ -104,28 +171,6 @@ struct ArtiFlatData
 	char pad0[0x6C];
 	ArtiFlatTableEntry table[8];
 };
-
-struct ArtiOpenAnim {
-	s16 x;
-	s16 y;
-	s16 w;
-	s16 h;
-	float u;
-	float v;
-	float alpha;
-	float scale;
-	int unk;
-	int tex;
-	int step;
-	int startFrame;
-	int duration;
-	unsigned int flags;
-	float dx;
-	float dy;
-	float targetX;
-	float targetY;
-};
-
 static inline double IntToF64(unsigned int value)
 {
 	unsigned long long bits = ((unsigned long long)0x43300000 << 32) | (unsigned long long)(value ^ 0x80000000);
@@ -457,9 +502,10 @@ unsigned int CMenuPcs::ArtiOpen()
  */
 int CMenuPcs::ArtiCtrl()
 {
+	ArtiState* state = GetArtiStateStruct(this);
 	int result;
 
-	*(short*)(GetArtiStateBase(this) + 0x32) = *(short*)(GetArtiStateBase(this) + 0x30);
+	state->currentSelection = state->prevSelection;
 	result = ArtiCtrlCur();
 	if (result != 0) {
 		ArtiInit1();
@@ -613,9 +659,10 @@ void CMenuPcs::ArtiDraw()
 		listStart += 0x20;
 	}
 
+	short* textEntry = listStart;
 	const ArtiFlatData* flatData = reinterpret_cast<const ArtiFlatData*>(&Game.m_cFlatDataArr[1]);
 	for (int i = 0; i < 8; i++) {
-		u8 alpha = (u8)(255.0f * *(float*)(listStart + 8));
+		u8 alpha = (u8)(255.0f * *(float*)(textEntry + 8));
 		GXColor color = {0xFF, 0xFF, 0xFF, alpha};
 		listFont->SetColor(color);
 
@@ -633,31 +680,23 @@ void CMenuPcs::ArtiDraw()
 		}
 
 		listFont->GetWidth(text);
-		listFont->SetPosX((float)(listStart[0] + 0x1c));
-		listFont->SetPosY((float)(listStart[1] + 0xb) - 5.0f);
+		listFont->SetPosX((float)(textEntry[0] + 0x1c));
+		listFont->SetPosY((float)(textEntry[1] + 0xb) - 5.0f);
 		listFont->Draw(text);
-		listStart += 0x20;
+		textEntry += 0x20;
 	}
 
 	DrawInit__8CMenuPcsFv(this);
 
-	listStart = (short*)(GetArtiListBase(this) + 8);
-	listCount = *GetArtiList(this);
-	for (int i = 0; i < listCount; i++) {
-		if (*(int*)(listStart + 0xe) == 0x37) {
-			break;
-		}
-		listStart += 0x20;
-	}
-
+	short* iconEntry = listStart;
 	for (int i = 0; i < 8; i++) {
 		short itemCount = *(short*)(scriptFood + (i + *(short*)(GetArtiStateBase(this) + 0x34)) * 2 + 0x136);
 		if (itemCount > 0) {
-			int iconY = (int)((float)listStart[1] + 6.0f - 1.0f);
-			int iconX = (int)((float)(listStart[0] + listStart[2] - 0x10));
-			DrawSingleIcon__8CMenuPcsFiiifif(this, itemCount, iconX, iconY, *(float*)(listStart + 8), 0, 0.0f);
+			int iconY = (int)((float)iconEntry[1] + 6.0f - 1.0f);
+			int iconX = (int)((float)(iconEntry[0] + iconEntry[2] - 0x10));
+			DrawSingleIcon__8CMenuPcsFiiifif(this, itemCount, iconX, iconY, *(float*)(iconEntry + 8), 0, 0.0f);
 		}
-		listStart += 0x20;
+		iconEntry += 0x20;
 	}
 
 	if (state == 1) {

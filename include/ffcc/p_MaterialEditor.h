@@ -110,7 +110,7 @@ public:
     void* m_tlutData[16]; // 0x2FC
     GXTlutObj* m_tlutObj0[16]; // 0x33C
     GXTlutObj* m_tlutObj1[16]; // 0x37C
-    u8 m_loadedTextureCount; // 0x3BC
+    s8 m_loadedTextureCount; // 0x3BC
     unsigned char _pad3BD[0x3E0 - 0x3BD];
 };
 

@@ -121,6 +121,7 @@ struct _pppPObject
 };
 
 struct _pppPObjLink;
+struct _pppPDataVal;
 struct _pppCtrlTable;
 
 typedef void (*pppProgAnyCallback)(void);
@@ -139,8 +140,11 @@ struct pppFVECTOR4
 
 struct VColor
 {
-    unsigned char m_unknown[11]; // 0x0
-    unsigned char m_alpha;       // 0xb
+    unsigned char m_unknown[8]; // 0x0
+    unsigned char m_red;        // 0x8
+    unsigned char m_green;      // 0x9
+    unsigned char m_blue;       // 0xa
+    unsigned char m_alpha;      // 0xb
 }; // Size 0xC
 
 struct PPPIFPARAM
@@ -251,7 +255,14 @@ struct _pppMngSt
     float m_userFloat0;                // 0x48
     float m_userFloat1;                // 0x4C
     Vec m_savedPosition;               // 0x50
-    Vec m_previousPosition;            // 0x5C
+    union {
+        Vec m_previousPosition;        // 0x5C
+        struct {
+            float m_previousPositionX; // 0x5C
+            float m_previousPositionY; // 0x60
+            float m_paramD;            // 0x64
+        } m_previousPositionFields;
+    };
     Vec m_paramVec0;                   // 0x68
     short m_kind;                      // 0x74
     short m_nodeIndex;                 // 0x76
@@ -272,7 +283,7 @@ struct _pppMngSt
     unsigned char m_pObjList[8];       // 0xC4
     void* m_pDataValList;              // 0xCC
     void* m_controlProgramTable;       // 0xD0
-    void* m_programInfoTable;          // 0xD4
+    _pppPDataVal* m_pppPDataVals;      // 0xD4
     void* m_owner;                     // 0xD8
     void* m_lookTarget;                // 0xDC
     CChara::CNode* m_bindNode;         // 0xE0
@@ -428,8 +439,7 @@ public:
     void pppDestroyAll();
 
     unsigned char m_unk0[0x2A18];
-    _pppMngSt m_pppMng[0x60];
-    unsigned char m_unkAB18[0x18300];
+    _pppMngSt m_pppMng[0x180];           // 0x2A18
 
     struct PppPdtSlot
     {

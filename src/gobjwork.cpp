@@ -537,37 +537,43 @@ void CCaravanWork::CLetterWork::operator= (const CCaravanWork::CLetterWork&)
  */
 void CCaravanWork::FGLetterOpen(int letterIdx)
 {
+	CCaravanWork* self = this;
 	unsigned int stack[2];
-	unsigned char* letter = m_letter0 + (letterIdx * 0xC);
-	unsigned short* words16 = reinterpret_cast<unsigned short*>(letter);
-	unsigned int* words32 = reinterpret_cast<unsigned int*>(letter);
+	int letterOffset = letterIdx * 0xC;
 
-	stack[0] = (words16[0] >> 2) & 0x1FF;
-	stack[1] = (words32[0] >> 9) & 0x1FF;
+	stack[0] = (*reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset]) >> 2) & 0x1FF;
+	stack[1] = (*reinterpret_cast<unsigned int*>(&self->m_letter0[letterOffset]) >> 9) & 0x1FF;
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-		CFlat, Game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
+		CFlat, Game.m_partyObjArr[self->m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
-	CMes::m_tempVar[0] = words16[2];
-	CMes::m_tempVar[1] = words16[3];
-	CMes::m_tempVar[2] = words16[4];
-	CMes::m_tempVar[3] = words16[5];
-	CMes::m_tempVar[4] = (words16[0] >> 2) & 0x1FF;
-	CMes::m_tempVar[5] = (words32[0] >> 9) & 0x1FF;
+	CMes::m_tempVar[0] = *reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset + 4]);
+	CMes::m_tempVar[1] = *reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset + 6]);
+	CMes::m_tempVar[2] = *reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset + 8]);
+	CMes::m_tempVar[3] = *reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset + 10]);
+	CMes::m_tempVar[4] = (*reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset]) >> 2) & 0x1FF;
+	CMes::m_tempVar[5] = (*reinterpret_cast<unsigned int*>(&self->m_letter0[letterOffset]) >> 9) & 0x1FF;
 
-	if (((letter[0] >> 3) & 1) == 0) {
-		CMes::m_tempVar[6] = words16[1] & 0x1FF;
+	int money;
+	if (((self->m_letter0[letterOffset] >> 3) & 1) != 0) {
+		money = 0;
 	} else {
-		CMes::m_tempVar[6] = 0;
+		money = *reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset + 2]) & 0x1FF;
 	}
+	CMes::m_tempVar[6] = money;
 
-	if (((letter[0] >> 3) & 1) == 0) {
-		CMes::m_tempVar[7] = 0;
+	int gil;
+	if (((self->m_letter0[letterOffset] >> 3) & 1) != 0) {
+		gil = (*reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset + 2]) & 0x1FF) * 100;
 	} else {
-		CMes::m_tempVar[7] = (words16[1] & 0x1FF) * 100;
+		gil = 0;
 	}
+	CMes::m_tempVar[7] = gil;
 
-	CMes::m_tempVar[8] = *reinterpret_cast<int*>(&m_saveSlot);
-	letter[0] = (letter[0] & 0x7F) | 0x80;
+	CMes::m_tempVar[8] = *reinterpret_cast<int*>(&self->m_saveSlot);
+
+	int isOpened = 1;
+	self->m_letter0[letterOffset] =
+		(unsigned char)((self->m_letter0[letterOffset] & 0x7F) | ((isOpened << 7) & 0x80));
 }
 
 /*
@@ -595,7 +601,8 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 		CFlat, Game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
 
-	letter[0] = (letter[0] & 0xDF) | 0x20;
+	int replied = 1;
+	letter[0] = (unsigned char)((letter[0] & 0xDF) | ((replied << 5) & 0x20));
 }
 
 /*
@@ -1510,7 +1517,25 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(lbl_801D9F64));
 	}
 
-	for (int i = 0; i < 50; i++) {
+	for (int i = 0; i < 25; i++) {
+		if (artifactIndex < 96 && (short)m_artifacts[artifactIndex] > 0) {
+			unsigned short* artifactData =
+				(unsigned short*)(Game.unkCFlatData0[2] + (short)m_artifacts[artifactIndex] * 0x48);
+			if (artifactData[0] == 0xDB) {
+				totalSlots += artifactData[3];
+			}
+		}
+
+		if ((artifactIndex + 1) < 96 && (short)m_artifacts[artifactIndex + 1] > 0) {
+			unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
+															 (short)m_artifacts[artifactIndex + 1] * 0x48);
+			if (artifactData[0] == 0xDB) {
+				totalSlots += artifactData[3];
+			}
+		}
+
+		artifactIndex += 2;
+
 		if (artifactIndex < 96 && (short)m_artifacts[artifactIndex] > 0) {
 			unsigned short* artifactData =
 				(unsigned short*)(Game.unkCFlatData0[2] + (short)m_artifacts[artifactIndex] * 0x48);
@@ -2077,13 +2102,13 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 {
 	int weaponType = GetCmdListItem(cmdListIdx);
-	if (weaponType < 0 || weaponType > 2) {
-		int itemId = DelCmdListAndItem(cmdListIdx, 0);
-		const GobjworkFlatData* flatData = reinterpret_cast<const GobjworkFlatData*>(&Game.m_cFlatDataArr[1]);
-		return reinterpret_cast<int>(flatData->table[0].index[itemId * 5 + 4]);
+	if (weaponType >= 0 && weaponType <= 2) {
+		return GetSkillStr__8CMenuPcsFi(&MenuPcs, weaponType);
 	}
 
-	return GetSkillStr__8CMenuPcsFi(&MenuPcs, weaponType);
+	int itemId = DelCmdListAndItem(cmdListIdx, 0);
+	const GobjworkFlatData* flatData = reinterpret_cast<const GobjworkFlatData*>(&Game.m_cFlatDataArr[1]);
+	return reinterpret_cast<int>(flatData->table[0].index[itemId * 5 + 4]);
 }
 
 /*

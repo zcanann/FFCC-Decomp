@@ -7,6 +7,7 @@
 #include "ffcc/p_chara_viewer.h"
 #include "ffcc/ref.h"
 #include "ffcc/system.h"
+#include "ffcc/textureman.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -35,11 +36,11 @@ public:
 
         void ChangeTexture(int, unsigned long, unsigned long, int, int);
         void LoadModel(int, unsigned long, unsigned long, unsigned long, int, int, int);
-        void LoadAnim(char*, int, int, int, int, int, int);
+        int LoadAnim(char*, int, int, int, int, int, int);
         bool IsModelLoaded(int checkModelField);
         void FreeModel();
         void FreeAnim(int);
-        void SetAnim(int, int, int, int, int);
+        int SetAnim(int, int, int, int, int);
         void Calc();
         void Draw(int);
         void draw(int, int);
@@ -79,31 +80,68 @@ public:
     };
 
     class CLoadModel
+        : public CRef
     {
     public:
         CLoadModel();
         ~CLoadModel();
+
+        void* m_keyTag;                 // 0x08
+        int m_keyId;                    // 0x0C
+        int m_mergeFileId;              // 0x10
+        int m_mergeFlags;               // 0x14
+        CChara::CModel* m_model;        // 0x18
+        int m_streamMode;               // 0x1C
+        void* m_streamOffset;           // 0x20
+        int m_streamSize;               // 0x24
     };
 
     class CLoadAnim
+        : public CRef
     {
     public:
         CLoadAnim();
         ~CLoadAnim();
+
+        void* m_keyTag;                 // 0x08
+        int m_keyId;                    // 0x0C
+        int m_mergeFileId;              // 0x10
+        int m_mergeFlags;               // 0x14
+        char m_name[16];                // 0x18
+        CChara::CAnim* m_anim;          // 0x28
     };
 
     class CLoadTexture
+        : public CRef
     {
     public:
         CLoadTexture();
         ~CLoadTexture();
+
+        void* m_keyTag;                 // 0x08
+        int m_keyId;                    // 0x0C
+        int m_mergeFileId;              // 0x10
+        int m_mergeFlags;               // 0x14
+        void* m_variantTag;             // 0x18
+        CTextureSet* m_textureSet;      // 0x1C
+        int m_streamMode;               // 0x20
+        void* m_streamOffset;           // 0x24
+        int m_streamSize;               // 0x28
     };
 
     class CLoadPdt
+        : public CRef
     {
     public:
         CLoadPdt();
         ~CLoadPdt();
+
+        void* m_keyTag;                 // 0x08
+        int m_keyId;                    // 0x0C
+        void* m_variantTag;             // 0x10
+        int m_pdtSlot;                  // 0x14
+        int m_mergeFileId;              // 0x18
+        int m_mergeFlags;               // 0x1C
     };
 	
     enum RESET
@@ -121,13 +159,13 @@ public:
     void createLoad();
     void destroy();
     void Reset(RESET);
-    void correctLoadAnimAmem();
+    int correctLoadAnimAmem();
     void onScriptChanging(char*);
     void calc();
     void calcAfter();
     void ReleaseAllAnimBank();
     void ReleaseUnusedAnimBank();
-    void TryReleaseAnimBank(int);
+    int TryReleaseAnimBank(int);
     void SetSpecularAlpha(int);
     void InitEnv(int);
     int GetNumTexShadow();
@@ -136,8 +174,8 @@ public:
     void drawBefore();
     void drawMakeTexShadow();
     void drawShadow();
-    void createTextureSet(void*, int);
-    void releaseUnuseLoadModel(int);
+    CTextureSet* createTextureSet(void*, int);
+    int releaseUnuseLoadModel(int);
     void releaseUnuseLoadAnim(CCharaPcs::CLoadAnim*, int);
     void DumpLoad();
     void searchModel(int, int);
@@ -152,7 +190,7 @@ public:
     void loadTexture(void*, int, int, int, int, int, int, int);
     void loadAnimBuffer(void*, char*, int, int, int, int);
     void drawOverlap();
-    void LoadAnim(int, int, char*, int, int, int);
+    int LoadAnim(int, int, char*, int, int, int);
     void GetAnimStage();
 
     u8 _pad_0x4_to_0x71B[0x71C - sizeof(CProcess)];

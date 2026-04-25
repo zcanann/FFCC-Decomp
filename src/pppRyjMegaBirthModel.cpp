@@ -11,11 +11,14 @@ extern float FLOAT_80330498;
 extern float FLOAT_8033049c;
 extern float FLOAT_803304a0;
 extern float FLOAT_803304a4;
+extern float FLOAT_803304a8;
 extern float FLOAT_803304b4;
 extern float FLOAT_803304bc;
 extern float FLOAT_803304c0;
 extern float FLOAT_803304c4;
 extern float FLOAT_803304c8;
+extern double DOUBLE_803304e0;
+extern float FLOAT_803304e8;
 
 PARTICLE_WMAT g_matKeep;
 PARTICLE_WMAT g_matTmp;
@@ -35,6 +38,116 @@ static inline s16* s16_at(void* base, s32 off)
 static inline u8* u8_at(void* base, s32 off)
 {
     return (u8*)base + off;
+}
+
+static inline unsigned char clamp_u8(float value)
+{
+    int ivalue = (int)value;
+    if (ivalue < 0) {
+        return 0;
+    }
+    if (ivalue > 0xFF) {
+        return 0xFF;
+    }
+    return (unsigned char)ivalue;
+}
+
+static float calc_spawn_speed(float speedMag, u8 speedMode)
+{
+    const float halfSpeed = speedMag * 0.5f;
+
+    switch (speedMode) {
+    case 0:
+        return Math.RandF() * speedMag - halfSpeed;
+    case 1:
+        (void)Math.RandF();
+        return Math.RandF() * speedMag - halfSpeed;
+    case 2:
+        return Math.RandF() * Math.RandF() * speedMag - halfSpeed;
+    case 3:
+        return -(0.5f * (Math.RandF() * Math.RandF() * speedMag - speedMag)) - halfSpeed;
+    case 4:
+        return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speedMag - halfSpeed;
+    case 5:
+        return -(0.5f * (Math.RandF() * Math.RandF() * Math.RandF() * speedMag - speedMag)) - halfSpeed;
+    default:
+        return Math.RandF() * speedMag - halfSpeed;
+    }
+}
+
+static void orthonormalize_particle_matrix(_PARTICLE_DATA* particleData)
+{
+    pppFMATRIX model;
+    Vec rowX;
+    Vec rowY;
+    Vec rowZ;
+    Vec rowPos;
+
+    PSMTXCopy(particleData->m_matrix, model.value);
+    pppGetRowVector(model, rowX, rowY, rowZ, rowPos);
+    pppNormalize(rowY, rowY);
+    pppOuterProduct(rowZ, rowY, rowX);
+    pppNormalize(rowZ, rowZ);
+    pppOuterProduct(rowX, rowZ, rowY);
+    pppNormalize(rowX, rowX);
+    pppSetRowVector(model, rowX, rowY, rowZ, rowPos);
+    PSMTXCopy(model.value, particleData->m_matrix);
+}
+
+static void wrap_particle_rotation_triplet(u8* particleBytes, s32 offset)
+{
+    for (int i = 0; i < 3; i++) {
+        float* value = f32_at(particleBytes, offset + i * 4);
+        while ((s32)*value > 0x7FFF) {
+            *value = (float)((s32)*value - 0x10000);
+        }
+        while ((s32)*value < -0x8000) {
+            *value = (float)((s32)*value + 0x10000);
+        }
+    }
+}
+
+static void apply_signed_randomization(u8* particleBytes, s32 offset, u8 flags)
+{
+    if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+        for (int i = 0; i < 3; i++) {
+            float* value = f32_at(particleBytes, offset + i * 4);
+            if (DOUBLE_803304e0 < (double)Math.RandF()) {
+                *value = *value * FLOAT_803304e8;
+            }
+        }
+    } else if ((flags & 2) != 0) {
+        for (int i = 0; i < 3; i++) {
+            float* value = f32_at(particleBytes, offset + i * 4);
+            *value = *value * FLOAT_803304e8;
+        }
+    }
+}
+
+static signed char random_signed_byte_span(u8 span)
+{
+    (void)Math.RandF();
+    return (signed char)((s32)((float)(span << 1) * Math.RandF() - (float)(span >> 1)));
+}
+
+static void randomize_particle_triplet(u8* particleBytes, s32 offset, u8 flags, float rangeX, float rangeY, float rangeZ)
+{
+    if (flags == 0) {
+        return;
+    }
+
+    if ((flags & 0x20) == 0) {
+        *f32_at(particleBytes, offset + 0) = rangeX * Math.RandF();
+        *f32_at(particleBytes, offset + 4) = rangeY * Math.RandF();
+        *f32_at(particleBytes, offset + 8) = rangeZ * Math.RandF();
+    } else {
+        float shared = rangeX * Math.RandF();
+        *f32_at(particleBytes, offset + 0) = shared;
+        *f32_at(particleBytes, offset + 4) = shared;
+        *f32_at(particleBytes, offset + 8) = shared;
+    }
+
+    apply_signed_randomization(particleBytes, offset, flags);
 }
 
 /*
@@ -68,15 +181,28 @@ void get_noise(unsigned char count)
 void alloc_check(VRyjMegaBirthModel* work, PRyjMegaBirthModel* params)
 {
     u8* payload = (u8*)params;
-    bool ok = (*(void**)((u8*)work + 0xC) != NULL);
-    if ((payload[0x136] != 0) && (*(void**)((u8*)work + 0x10) == NULL)) {
-        ok = false;
+    if (work->m_particleBlock == NULL) {
+        work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            work->m_numParticles * 0xA0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x8D);
+        if (work->m_particleBlock != NULL) {
+            memset(work->m_particleBlock, 0, work->m_numParticles * 0xA0);
+        }
     }
-    if ((payload[0x131] != 0) && (*(void**)((u8*)work + 0x14) == NULL)) {
-        ok = false;
+
+    if ((payload[0x136] != 0) && (work->m_worldMatrixBlock == NULL)) {
+        work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            work->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x97);
+        if (work->m_worldMatrixBlock != NULL) {
+            memset(work->m_worldMatrixBlock, 0, work->m_numParticles * 0x30);
+        }
     }
-    if (!ok) {
-        pppRyjMegaBirthModelDes((_pppPObject*)((u8*)work - 0x80), (PRyjMegaBirthModelOffsets*)payload);
+
+    if ((payload[0x131] != 0) && (work->m_colorBlock == NULL)) {
+        work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            work->m_numParticles << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0xA2);
+        if (work->m_colorBlock != NULL) {
+            memset(work->m_colorBlock, 0, work->m_numParticles << 5);
+        }
     }
 }
 
@@ -100,28 +226,8 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
     u8* payload = (u8*)params;
 
     if (*(void**)(work + 0xC) == 0) {
-        *(u32*)(work + 0x18) = *(u16*)(payload + 0x20);
-        *(void**)(work + 0xC) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            *(u32*)(work + 0x18) * 0xA0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x8D);
-        if (*(void**)(work + 0xC) != 0) {
-            memset(*(void**)(work + 0xC), 0, *(u32*)(work + 0x18) * 0xA0);
-        }
-
-        if (*(u8*)(payload + 0x136) != 0) {
-            *(void**)(work + 0x10) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                *(u32*)(work + 0x18) * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x97);
-            if (*(void**)(work + 0x10) != 0) {
-                memset(*(void**)(work + 0x10), 0, *(u32*)(work + 0x18) * 0x30);
-            }
-        }
-
-        if (*(u8*)(payload + 0x131) != 0) {
-            *(void**)(work + 0x14) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                *(u32*)(work + 0x18) << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0xA2);
-            if (*(void**)(work + 0x14) != 0) {
-                memset(*(void**)(work + 0x14), 0, *(u32*)(work + 0x18) << 5);
-            }
-        }
+        ((VRyjMegaBirthModel*)work)->m_numParticles = *(u16*)(payload + 0x20);
+        alloc_check((VRyjMegaBirthModel*)work, params);
 
         *(float*)(work + 0x0) = *(float*)(payload + 0xF8);
         *(float*)(work + 0x4) = *(float*)(payload + 0xFC);
@@ -233,14 +339,13 @@ void birth(
     _pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirthModel* params, VColor* color,
     _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, _PARTICLE_COLOR* particleColor)
 {
-    (void)work;
-
     u8* payload = (u8*)params;
     u8 mode = payload[0x2A];
     float spread = (float)payload[0x2B];
     float halfSpread = spread;
     float randomRange = FLOAT_803304c0 * spread;
-    float speedMag = *(float*)(payload + 0x130);
+    float speedMag = *(float*)(payload + 0x12C);
+    u8 speedMode = payload[0x130];
     Vec pos;
 
     memset(particleData, 0, 0xA0);
@@ -276,6 +381,64 @@ void birth(
         particleData->m_colorDeltaAdd[0] = randX;
         particleData->m_colorDeltaAdd[1] = randY;
         particleData->m_colorDeltaAdd[2] = randZ;
+
+        pppFMATRIX baseMatrix;
+        pppFMATRIX rotatedMatrix;
+        Vec rot;
+        Vec forward;
+
+        pppUnitMatrix(baseMatrix);
+        rot.x = randX;
+        rot.y = randY;
+        rot.z = randZ;
+        pppRotMatrix(rotatedMatrix, baseMatrix, rot);
+
+        forward.x = baseDirectionX;
+        forward.y = baseDirectionY;
+        forward.z = baseDirectionZ;
+        pppApplyMatrix(forward, rotatedMatrix, forward);
+        forward.x *= *(float*)(payload + 0x54);
+        forward.y *= *(float*)(payload + 0x58);
+        forward.z *= *(float*)(payload + 0x5C);
+        particleData->m_matrix[0][1] = forward.x;
+        particleData->m_matrix[1][1] = forward.y;
+        particleData->m_matrix[2][1] = forward.z;
+        orthonormalize_particle_matrix(particleData);
+    } else if (mode == 8 || mode == 9) {
+        Vec spawnPoint;
+
+        spawnPoint.x = work->m_currentPosition.x;
+        spawnPoint.y = work->m_currentPosition.y;
+        spawnPoint.z = work->m_currentPosition.z;
+
+        if (mode == 8) {
+            float t = (float)(work->m_unused1E & 0xFF) / 255.0f;
+            spawnPoint.x = work->m_previousPosition.x +
+                           (work->m_currentPosition.x - work->m_previousPosition.x) * t;
+            spawnPoint.y = work->m_previousPosition.y +
+                           (work->m_currentPosition.y - work->m_previousPosition.y) * t;
+            spawnPoint.z = work->m_previousPosition.z +
+                           (work->m_currentPosition.z - work->m_previousPosition.z) * t;
+            work->m_unused1E = (u16)(work->m_unused1E + 0x21);
+        } else {
+            Vec delta;
+            delta.x = work->m_currentPosition.x - work->m_previousPosition.x;
+            delta.y = work->m_currentPosition.y - work->m_previousPosition.y;
+            delta.z = work->m_currentPosition.z - work->m_previousPosition.z;
+            spawnPoint.x += delta.x * Math.RandF();
+            spawnPoint.y += delta.y * Math.RandF();
+            spawnPoint.z += delta.z * Math.RandF();
+        }
+
+        spawnPoint.x *= *(float*)(payload + 0x54);
+        spawnPoint.y *= *(float*)(payload + 0x58);
+        spawnPoint.z *= *(float*)(payload + 0x5C);
+        pos = spawnPoint;
+
+        particleData->m_matrix[0][1] = work->m_accelerationAxis.x;
+        particleData->m_matrix[1][1] = work->m_accelerationAxis.y;
+        particleData->m_matrix[2][1] = work->m_accelerationAxis.z;
+        orthonormalize_particle_matrix(particleData);
     }
 
     particleData->m_matrix[0][3] = pos.x;
@@ -283,22 +446,34 @@ void birth(
     particleData->m_matrix[2][3] = pos.z;
 
     if (speedMag != FLOAT_80330498) {
-        float halfSpeed = speedMag * 0.5f;
-        particleData->m_velocity.x = Math.RandF() * speedMag - halfSpeed;
-        particleData->m_velocity.y = Math.RandF() * speedMag - halfSpeed;
-        particleData->m_velocity.z = Math.RandF() * speedMag - halfSpeed;
+        float speedX = calc_spawn_speed(speedMag, speedMode);
+        float speedY = calc_spawn_speed(speedMag, speedMode);
+        float speedZ = calc_spawn_speed(speedMag, speedMode);
+
+        if (mode < 6) {
+            particleData->m_matrix[0][3] = speedX * *(float*)(payload + 0x54);
+            particleData->m_matrix[1][3] = speedY * *(float*)(payload + 0x58);
+            particleData->m_matrix[2][3] = speedZ * *(float*)(payload + 0x5C);
+        } else {
+            particleData->m_velocity.x = speedX;
+            particleData->m_velocity.y = speedY;
+            particleData->m_velocity.z = speedZ;
+        }
     }
 
-    particleData->m_sizeStart = *(float*)(payload + 0x84);
-    particleData->m_sizeEnd = *(float*)(payload + 0x88);
-    particleData->m_sizeVal = *(float*)(payload + 0x8C);
+    *f32_at(particleData, 0x44) = *(float*)(payload + 0x8C);
+    *f32_at(particleData, 0x48) = *(float*)(payload + 0x90);
+    *f32_at(particleData, 0x4C) = *(float*)(payload + 0x94);
+    *f32_at(particleData, 0x50) = *(float*)(payload + 0x98);
+    *f32_at(particleData, 0x54) = *(float*)(payload + 0x9C);
+    *f32_at(particleData, 0x58) = *(float*)(payload + 0xA0);
 
     *s16_at(particleData, 0x22) = (*(s16*)(payload + 0x26) == 0) ? -1 : *(s16*)(payload + 0x26);
     *s16_at(particleData, 0x1C) = 0;
     *s16_at(particleData, 0x1E) = 0;
     *u8_at(particleData, 0x9c) = 0;
-    *u8_at(particleData, 0x9d) = payload[0x9d];
-    *u8_at(particleData, 0x9e) = payload[0x9e];
+    *u8_at(particleData, 0x9d) = 0;
+    *u8_at(particleData, 0x9e) = 0;
 
     if (payload[0x131] != 0) {
         *f32_at(particleData, 0x98) = (float)color->m_alpha;
@@ -306,8 +481,16 @@ void birth(
         *f32_at(particleData, 0x98) = *(float*)(payload + 0x98);
     }
 
-    if ((particleWMat != NULL) && (payload[0x136] != 0)) {
-        PSMTXCopy(pObject->m_localMatrix.value, *(Mtx*)particleWMat);
+    if (payload[0x22] != 0) {
+        *f32_at(particleData, 0x98) = static_cast<float>(color->m_alpha);
+        *u8_at(particleData, 0x9D) = payload[0x22];
+    }
+    if (payload[0x29] != 0) {
+        *u8_at(particleData, 0x9E) = payload[0x29];
+    }
+
+    if (particleWMat != NULL) {
+        PSMTXCopy(pppMngStPtr->m_matrix.value, *(Mtx*)particleWMat);
     }
 
     if (particleColor != NULL) {
@@ -315,6 +498,172 @@ void birth(
         particleColor->m_colorFrameDeltas[1] = *(float*)(payload + 0xC0);
         particleColor->m_colorFrameDeltas[2] = *(float*)(payload + 0xC4);
         particleColor->m_colorFrameDeltas[3] = *(float*)(payload + 0xC8);
+    }
+
+    if (payload[0x132] != 0) {
+        if ((payload[0x132] & 0x20) == 0) {
+            *f32_at(particleData, 0x74) = *(float*)(payload + 0xC0) * Math.RandF();
+            *f32_at(particleData, 0x78) = *(float*)(payload + 0xC4) * Math.RandF();
+            *f32_at(particleData, 0x7C) = *(float*)(payload + 0xC8) * Math.RandF();
+
+            if ((payload[0x132] & 1) != 0 && (payload[0x132] & 2) != 0) {
+                if (DOUBLE_803304e0 < (double)Math.RandF()) {
+                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304e8;
+                }
+                if (DOUBLE_803304e0 < (double)Math.RandF()) {
+                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304e8;
+                }
+                if (DOUBLE_803304e0 < (double)Math.RandF()) {
+                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304e8;
+                }
+            } else if ((payload[0x132] & 2) != 0) {
+                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304e8;
+                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304e8;
+                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304e8;
+            }
+        } else {
+            float randomVelocity = *(float*)(payload + 0xC0) * Math.RandF();
+
+            *f32_at(particleData, 0x74) = randomVelocity;
+            *f32_at(particleData, 0x78) = randomVelocity;
+            *f32_at(particleData, 0x7C) = randomVelocity;
+
+            if ((payload[0x132] & 1) != 0 && (payload[0x132] & 2) != 0) {
+                if (DOUBLE_803304e0 < (double)Math.RandF()) {
+                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304e8;
+                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304e8;
+                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304e8;
+                }
+            } else if ((payload[0x132] & 2) != 0) {
+                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304e8;
+                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304e8;
+                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304e8;
+            }
+        }
+
+        if ((payload[0x132] & 4) != 0) {
+            *f32_at(particleData, 0x44) = *f32_at(particleData, 0x44) + *f32_at(particleData, 0x74);
+            *f32_at(particleData, 0x48) = *f32_at(particleData, 0x48) + *f32_at(particleData, 0x78);
+            *f32_at(particleData, 0x4C) = *f32_at(particleData, 0x4C) + *f32_at(particleData, 0x7C);
+        }
+
+        if ((payload[0x132] & 8) != 0) {
+            *f32_at(particleData, 0x50) = *f32_at(particleData, 0x50) + *f32_at(particleData, 0x74);
+            *f32_at(particleData, 0x54) = *f32_at(particleData, 0x54) + *f32_at(particleData, 0x78);
+            *f32_at(particleData, 0x58) = *f32_at(particleData, 0x58) + *f32_at(particleData, 0x7C);
+        }
+    }
+
+    wrap_particle_rotation_triplet((u8*)particleData, 0x44);
+
+    *f32_at(particleData, 0x6C) = *(float*)(payload + 0x90);
+    *f32_at(particleData, 0x70) = *(float*)(payload + 0x94);
+    *f32_at(particleData, 0x74) = *(float*)(payload + 0x98);
+    *f32_at(particleData, 0x78) = *(float*)(payload + 0x9C);
+    *f32_at(particleData, 0x7C) = *(float*)(payload + 0xA0);
+    *f32_at(particleData, 0x80) = *(float*)(payload + 0xA4);
+
+    if (payload[0x133] != 0) {
+        if ((payload[0x133] & 0x20) == 0) {
+            *f32_at(particleData, 0x84) = *(float*)(payload + 0xB0) * Math.RandF();
+            *f32_at(particleData, 0x88) = *(float*)(payload + 0xB4) * Math.RandF();
+            *f32_at(particleData, 0x8C) = *(float*)(payload + 0xB8) * Math.RandF();
+        } else {
+            float randomizedStep = *(float*)(payload + 0xB0) * Math.RandF();
+            *f32_at(particleData, 0x84) = randomizedStep;
+            *f32_at(particleData, 0x88) = randomizedStep;
+            *f32_at(particleData, 0x8C) = randomizedStep;
+        }
+
+        apply_signed_randomization((u8*)particleData, 0x84, payload[0x133]);
+
+        if ((payload[0x133] & 4) != 0) {
+            *f32_at(particleData, 0x6C) = *f32_at(particleData, 0x6C) + *f32_at(particleData, 0x84);
+            *f32_at(particleData, 0x70) = *f32_at(particleData, 0x70) + *f32_at(particleData, 0x88);
+            *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) + *f32_at(particleData, 0x8C);
+        }
+
+        if ((payload[0x133] & 8) != 0) {
+            *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) + *f32_at(particleData, 0x84);
+            *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) + *f32_at(particleData, 0x88);
+            *f32_at(particleData, 0x80) = *f32_at(particleData, 0x80) + *f32_at(particleData, 0x8C);
+        }
+    }
+
+    u8* particleBytes = (u8*)particleData;
+
+    particleBytes[0x32] = random_signed_byte_span(payload[0x2C]);
+    particleBytes[0x33] = random_signed_byte_span(payload[0x2D]);
+    particleBytes[0x34] = random_signed_byte_span(payload[0x2E]);
+    particleBytes[0x35] = random_signed_byte_span(payload[0x2F]);
+
+    randomize_particle_triplet(particleBytes, 0x5C, payload[0x132],
+                               (float)*(s32*)(payload + 0xC8),
+                               (float)*(s32*)(payload + 0xCC),
+                               (float)*(s32*)(payload + 0xD0));
+    if ((payload[0x132] & 4) != 0) {
+        *f32_at(particleBytes, 0x44) = (float)((s32)*f32_at(particleBytes, 0x44) + (s32)*f32_at(particleBytes, 0x5C));
+        *f32_at(particleBytes, 0x48) = (float)((s32)*f32_at(particleBytes, 0x48) + (s32)*f32_at(particleBytes, 0x60));
+        *f32_at(particleBytes, 0x4C) = (float)((s32)*f32_at(particleBytes, 0x4C) + (s32)*f32_at(particleBytes, 0x64));
+    }
+    if ((payload[0x132] & 8) != 0) {
+        *f32_at(particleBytes, 0x50) = (float)((s32)*f32_at(particleBytes, 0x50) + (s32)*f32_at(particleBytes, 0x5C));
+        *f32_at(particleBytes, 0x54) = (float)((s32)*f32_at(particleBytes, 0x54) + (s32)*f32_at(particleBytes, 0x60));
+        *f32_at(particleBytes, 0x58) = (float)((s32)*f32_at(particleBytes, 0x58) + (s32)*f32_at(particleBytes, 0x64));
+    }
+
+    wrap_particle_rotation_triplet(particleBytes, 0x38);
+
+    *f32_at(particleBytes, 0x6C) = *(float*)(payload + 0x90);
+    *f32_at(particleBytes, 0x70) = *(float*)(payload + 0x94);
+    *f32_at(particleBytes, 0x74) = *(float*)(payload + 0x98);
+    *f32_at(particleBytes, 0x78) = *(float*)(payload + 0xA0);
+    *f32_at(particleBytes, 0x7C) = *(float*)(payload + 0xA4);
+    *f32_at(particleBytes, 0x80) = *(float*)(payload + 0xA8);
+
+    randomize_particle_triplet(particleBytes, 0x84, payload[0x133],
+                               *(float*)(payload + 0xB0),
+                               *(float*)(payload + 0xB4),
+                               *(float*)(payload + 0xB8));
+    if ((payload[0x133] & 4) != 0) {
+        *f32_at(particleBytes, 0x6C) += *f32_at(particleBytes, 0x84);
+        *f32_at(particleBytes, 0x70) += *f32_at(particleBytes, 0x88);
+        *f32_at(particleBytes, 0x74) += *f32_at(particleBytes, 0x8C);
+    }
+    if ((payload[0x133] & 8) != 0) {
+        *f32_at(particleBytes, 0x78) += *f32_at(particleBytes, 0x84);
+        *f32_at(particleBytes, 0x7C) += *f32_at(particleBytes, 0x88);
+        *f32_at(particleBytes, 0x80) += *f32_at(particleBytes, 0x8C);
+    }
+
+    *f32_at(particleBytes, 0x84) = *(float*)(payload + 0x10C);
+    *f32_at(particleBytes, 0x88) = *(float*)(payload + 0x114);
+    if (*(float*)(payload + 0x110) != FLOAT_80330498) {
+        *f32_at(particleBytes, 0x84) += FLOAT_803304c0 * *(float*)(payload + 0x110) * Math.RandF() - *(float*)(payload + 0x110);
+    }
+    *f32_at(particleBytes, 0x8C) = *(float*)(payload + 0xDC);
+    *f32_at(particleBytes, 0x90) = *(float*)(payload + 0xE0);
+    *f32_at(particleBytes, 0x94) = *(float*)(payload + 0xE4);
+
+    switch (payload[0x134]) {
+    case 1:
+        *f32_at(particleBytes, 0x8C) *= Math.RandF();
+        break;
+    case 2:
+        *f32_at(particleBytes, 0x90) *= Math.RandF();
+        break;
+    case 3: {
+        float r = Math.RandF();
+        *f32_at(particleBytes, 0x8C) *= r;
+        *f32_at(particleBytes, 0x90) *= r;
+        break;
+    }
+    case 4:
+        *f32_at(particleBytes, 0x8C) *= Math.RandF();
+        *f32_at(particleBytes, 0x90) *= Math.RandF();
+        break;
+    default:
+        break;
     }
 }
 
@@ -336,6 +685,10 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
     u32 alpha = vColor->m_alpha;
     u8* payload = (u8*)pRyjMegaBirthModel;
     u8* p = (u8*)particleData;
+    float* wrappedValue = &particleData->m_directionTail.z;
+    Vec direction;
+    Vec position;
+    Vec step;
 
     if (particleColor != NULL) {
         particleColor->m_color[0] = particleColor->m_color[0] + particleColor->m_colorFrameDeltas[0];
@@ -366,11 +719,13 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
         particleData->m_sizeStart = (float)((s32)*(float*)(payload + 0xA0) + (s32)*(float*)(p + 0x68) + (s32)particleData->m_sizeStart);
     }
 
-    while ((s32)particleData->m_directionTail.z > 0x7FFF) {
-        particleData->m_directionTail.z = (float)((s32)particleData->m_directionTail.z - 0x10000);
-    }
-    while ((s32)particleData->m_directionTail.z < -0x8000) {
-        particleData->m_directionTail.z = (float)((s32)particleData->m_directionTail.z + 0x10000);
+    for (int i = 0; i < 3; i++, wrappedValue++) {
+        while ((s32)*wrappedValue > 0x7FFF) {
+            *wrappedValue = (float)((s32)*wrappedValue - 0x10000);
+        }
+        while ((s32)*wrappedValue < -0x8000) {
+            *wrappedValue = (float)((s32)*wrappedValue + 0x10000);
+        }
     }
 
     *f32_at(p, 0x40) = *f32_at(p, 0x40) + *f32_at(p, 0x48);
@@ -388,6 +743,51 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
         }
     }
 
+    *f32_at(p, 0x6C) = *f32_at(p, 0x6C) + *f32_at(p, 0x78);
+    *f32_at(p, 0x70) = *f32_at(p, 0x70) + *f32_at(p, 0x7C);
+    *f32_at(p, 0x74) = *f32_at(p, 0x74) + *f32_at(p, 0x80);
+
+    if ((payload[0x8A] & 0x10) == 0) {
+        *f32_at(p, 0x78) = *f32_at(p, 0x78) + *(float*)(payload + 0xB0);
+        *f32_at(p, 0x7C) = *f32_at(p, 0x7C) + *(float*)(payload + 0xB4);
+        *f32_at(p, 0x80) = *f32_at(p, 0x80) + *(float*)(payload + 0xB8);
+    } else {
+        *f32_at(p, 0x78) = *f32_at(p, 0x78) + *(float*)(payload + 0xB0) + *f32_at(p, 0x84);
+        *f32_at(p, 0x7C) = *f32_at(p, 0x7C) + *(float*)(payload + 0xB4) + *f32_at(p, 0x88);
+        *f32_at(p, 0x80) = *f32_at(p, 0x80) + *(float*)(payload + 0xB8) + *f32_at(p, 0x8C);
+    }
+
+    *f32_at(p, 0x8C) = *f32_at(p, 0x8C) + *(float*)(payload + 0xBC);
+    if (payload[0x8F] == 0) {
+        if (((*(float*)(payload + 0xC0) <= FLOAT_80330498) && (FLOAT_80330498 <= *(float*)(payload + 0xBC))) ||
+            ((*(float*)(payload + 0xC0) < FLOAT_80330498) && (FLOAT_80330498 < *(float*)(payload + 0xBC) &&
+                                                              FLOAT_80330498 < *f32_at(p, 0x8C)))) {
+            *f32_at(p, 0x8C) = FLOAT_80330498;
+        } else if ((*(float*)(payload + 0xC0) > FLOAT_80330498) && (FLOAT_80330498 > *(float*)(payload + 0xBC)) &&
+                   (*f32_at(p, 0x8C) < FLOAT_80330498)) {
+            *f32_at(p, 0x8C) = FLOAT_80330498;
+        }
+    }
+
+    *f32_at(p, 0x90) = *f32_at(p, 0x90) + *(float*)(payload + 0xC4);
+    direction.x = particleData->m_matrix[0][1];
+    direction.y = particleData->m_matrix[1][1];
+    direction.z = particleData->m_matrix[2][1];
+    position.x = particleData->m_matrix[0][3];
+    position.y = particleData->m_matrix[1][3];
+    position.z = particleData->m_matrix[2][3];
+    pppScaleVectorXYZ(step, direction, *f32_at(p, 0x8C));
+    pppAddVector(position, position, step);
+    pppScaleVectorXYZ(step, vRyjMegaBirthModel->m_accelerationAxis, *f32_at(p, 0x90));
+    pppAddVector(position, position, step);
+    particleData->m_matrix[0][3] = position.x;
+    particleData->m_matrix[1][3] = position.y;
+    particleData->m_matrix[2][3] = position.z;
+
+    *f32_at(p, 0x8C) = *f32_at(p, 0x8C) + *f32_at(p, 0x90);
+    *f32_at(p, 0x90) = *f32_at(p, 0x90) + *(float*)(payload + 0xE0);
+    *f32_at(p, 0x94) = *f32_at(p, 0x94) + *(float*)(payload + 0xE4);
+
     particleData->m_lifeTime = particleData->m_lifeTime + 1;
     if (*(s16*)(payload + 0x26) != 0) {
         *s16_at(p, 0x22) = *s16_at(p, 0x22) - 1;
@@ -400,12 +800,8 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
     }
 
     if ((*u8_at(p, 0x9e) != 0) && ((u16)*s16_at(p, 0x22) <= *u8_at(p, 0x9e))) {
-        *f32_at(p, 0x98) += (float)alpha / (float)payload[0x9E];
+        *f32_at(p, 0x98) += (float)alpha / (float)*u8_at(p, 0x9e);
     }
-
-    *f32_at((u8*)vRyjMegaBirthModel, 0x20) = *f32_at((u8*)vRyjMegaBirthModel, 0x2C);
-    *f32_at((u8*)vRyjMegaBirthModel, 0x24) = *f32_at((u8*)vRyjMegaBirthModel, 0x30);
-    *f32_at((u8*)vRyjMegaBirthModel, 0x28) = *f32_at((u8*)vRyjMegaBirthModel, 0x34);
 }
 
 /*
@@ -419,10 +815,66 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
  */
 void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
 {
-    (void)obj;
-    (void)stepData;
-    (void)ctrlTable;
-    // Keep the original file-scope matrix scratch live until the draw path is restored.
+    PRyjMegaBirthModel* params = (PRyjMegaBirthModel*)stepData;
+    VRyjMegaBirthModel* work =
+        (VRyjMegaBirthModel*)((u8*)obj + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
+    int modelIndex = *(int*)((u8*)params + 4);
+
+    if (modelIndex == 0xFFFF || work->m_particleBlock == NULL) {
+        return;
+    }
+
+    if ((*(u8*)((u8*)params + 0x136) != 0) && (work->m_worldMatrixBlock == NULL)) {
+        return;
+    }
+
+    if ((*(u8*)((u8*)params + 0x131) != 0) && (work->m_colorBlock == NULL)) {
+        return;
+    }
+
+    pppModelSt* model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[modelIndex];
+    if (model == NULL) {
+        return;
+    }
+
+    pppFMATRIX emitterMatrix;
+    pppFMATRIX scratchMatrix;
+
+    init_matrix(obj, emitterMatrix, params, work);
+    pppUnitMatrix(scratchMatrix);
+    pppInitBlendMode();
+    pppSetBlendMode(0);
+
+    for (int i = 0; i < work->m_numParticles; i++) {
+        _PARTICLE_DATA* particle = (_PARTICLE_DATA*)((u8*)work->m_particleBlock + i * 0xA0);
+        _PARTICLE_WMAT* particleWorldMatrix = 0;
+        _PARTICLE_COLOR* particleColor = 0;
+
+        if (*s16_at(particle, 0x22) == 0) {
+            continue;
+        }
+
+        if (work->m_worldMatrixBlock != NULL) {
+            particleWorldMatrix = (_PARTICLE_WMAT*)(work->m_worldMatrixBlock + i);
+        }
+        if (work->m_colorBlock != NULL) {
+            particleColor = work->m_colorBlock + i;
+        }
+
+        pppFMATRIX drawMatrix;
+        pppCVECTOR drawColor = {{0xFF, 0xFF, 0xFF, clamp_u8(*f32_at(particle, 0x98))}};
+
+        if (particleColor != NULL) {
+            drawColor.rgba[0] = clamp_u8(particleColor->m_color[0]);
+            drawColor.rgba[1] = clamp_u8(particleColor->m_color[1]);
+            drawColor.rgba[2] = clamp_u8(particleColor->m_color[2]);
+        }
+
+        set_matrix(obj, emitterMatrix, scratchMatrix, params, particle, particleWorldMatrix, drawMatrix, 0);
+        pppSetDrawEnv(&drawColor, &drawMatrix, 0.0f, 0, 0, 0, 0, 1, 1, 0);
+        pppDrawMesh(model, 0, 1);
+    }
+
     PSMTXCopy(g_matKeep, g_matTmp);
 }
 
@@ -433,10 +885,14 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* c
  */
 void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* params, VRyjMegaBirthModel* work)
 {
+    (void)pObject;
     u8* payload = (u8*)params;
-    if (payload[0x2A] == 0) {
-        PSMTXCopy(pObject->m_localMatrix.value, out.value);
-    } else if (payload[0x2A] == 1 || payload[0x2A] == 3 || payload[0x2A] == 5 || payload[0x2A] == 7) {
+    switch (payload[0x2A]) {
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 9:
         PSMTXIdentity(out.value);
         out.value[0][0] = pppMngStPtr->m_scale.x;
         out.value[1][1] = pppMngStPtr->m_scale.y;
@@ -444,11 +900,16 @@ void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* para
         out.value[0][3] = pppMngStPtr->m_position.x;
         out.value[1][3] = pppMngStPtr->m_position.y;
         out.value[2][3] = pppMngStPtr->m_position.z;
-    } else {
+        break;
+    case 8:
         PSMTXIdentity(out.value);
         out.value[0][3] = *f32_at((u8*)work, 0x2C);
         out.value[1][3] = *f32_at((u8*)work, 0x30);
         out.value[2][3] = *f32_at((u8*)work, 0x34);
+        break;
+    default:
+        PSMTXCopy(pppMngStPtr->m_matrix.value, out.value);
+        break;
     }
 }
 
@@ -464,19 +925,20 @@ void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* para
 void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMegaBirthModel* params,
                 _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, pppFMATRIX& out, unsigned char copyOut)
 {
-    (void)mtxA;
-
     u8* payload = (u8*)params;
-    pppFMATRIX model;
+    const u8 matrixMode = payload[0x2A];
+    const u8 flagsEnd = payload[0x137];
+    pppFMATRIX tmp;
     Mtx scale;
+    pppFMATRIX* objectMatrix = (pppFMATRIX*)(pObject + 1);
 
-    if (payload[0x2A] == 0) {
-        pppUnitMatrix(model);
-        model.value[0][3] = particleData->m_matrix[0][3];
-        model.value[1][3] = particleData->m_matrix[1][3];
-        model.value[2][3] = particleData->m_matrix[2][3];
+    if (matrixMode == 0) {
+        pppUnitMatrix(mtxB);
+        mtxB.value[0][3] = particleData->m_matrix[0][3];
+        mtxB.value[1][3] = particleData->m_matrix[1][3];
+        mtxB.value[2][3] = particleData->m_matrix[2][3];
     } else {
-        PSMTXCopy(particleData->m_matrix, model.value);
+        pppCopyMatrix(mtxB, *(pppFMATRIX*)&particleData->m_matrix);
     }
 
     if (particleData->m_directionTail.z != FLOAT_80330498 ||
@@ -487,33 +949,91 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         rot.y = -particleData->m_colorDeltaAdd[0] * (FLOAT_803304a0 / FLOAT_803304a4);
         rot.z = -particleData->m_colorDeltaAdd[1] * (FLOAT_803304a0 / FLOAT_803304a4);
         pppFMATRIX r;
-        pppFMATRIX src;
         pppUnitMatrix(r);
-        pppUnitMatrix(src);
-        PSMTXCopy(model.value, src.value);
-        pppRotMatrix(r, src, rot);
-        PSMTXCopy(r.value, model.value);
+        pppRotMatrix(r, r, rot);
+        pppCopyMatrix(tmp, mtxB);
+        pppMulMatrix(mtxB, tmp, r);
     }
 
     PSMTXScale(scale, particleData->m_sizeStart, particleData->m_sizeEnd, particleData->m_sizeVal);
-    PSMTXConcat(model.value, scale, model.value);
+    pppCopyMatrix(tmp, mtxB);
+    pppMulMatrix(mtxB, tmp, *(pppFMATRIX*)&scale);
+    pppCopyMatrix(*(pppFMATRIX*)&g_matKeep, mtxB);
 
-    if (particleWMat != NULL) {
-        PSMTXConcat(*(Mtx*)particleWMat, model.value, model.value);
-    } else {
-        PSMTXConcat(pObject->m_localMatrix.value, model.value, model.value);
+    switch (matrixMode) {
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 9: {
+        Vec localPos;
+        Vec transformedPos;
+
+        localPos.x = mtxB.value[0][3];
+        localPos.y = mtxB.value[1][3];
+        localPos.z = mtxB.value[2][3];
+        pppApplyMatrix(transformedPos, mtxA, localPos);
+
+        pppCopyMatrix(tmp, mtxB);
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvWorldMatrixWood, tmp);
+        mtxB.value[0][3] = transformedPos.x;
+        mtxB.value[1][3] = transformedPos.y;
+        mtxB.value[2][3] = transformedPos.z;
+        break;
+    }
+    default:
+        pppCopyMatrix(tmp, mtxB);
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&pObject->m_localMatrix, tmp);
+
+        if (particleWMat != NULL) {
+            pppCopyMatrix(tmp, mtxB);
+            pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, tmp);
+        } else if (payload[0x136] != 0) {
+            pppCopyMatrix(tmp, mtxB);
+            pppMulMatrix(mtxB, pppMngStPtr->m_matrix, tmp);
+        }
+        break;
     }
 
-    if (payload[0x136] != 0) {
-        PSMTXConcat(pppMngStPtr->m_matrix.value, model.value, model.value);
+    if (matrixMode != 1 && matrixMode != 3 && matrixMode != 5 && matrixMode != 7 && matrixMode != 9) {
+        pppCopyMatrix(tmp, mtxB);
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix0, tmp);
+        pppCopyMatrix(*objectMatrix, mtxB);
     }
-
-    PSMTXCopy(model.value, g_matKeep);
-    PSMTXConcat(ppvCameraMatrix0, model.value, g_matTmp);
-    PSMTXCopy(g_matTmp, out.value);
 
     if (copyOut != 0) {
-        PSMTXCopy(out.value, mtxB.value);
+        pppCopyMatrix(out, mtxB);
+    }
+
+    if (flagsEnd != 0) {
+        Vec objectPos;
+        Vec endPos;
+
+        objectPos.x = pObject->m_localMatrix.value[0][3];
+        objectPos.y = pObject->m_localMatrix.value[1][3];
+        objectPos.z = pObject->m_localMatrix.value[2][3];
+
+        endPos.x = mtxB.value[0][3];
+        endPos.y = mtxB.value[1][3];
+        endPos.z = mtxB.value[2][3];
+        pppAddVector(endPos, endPos, objectPos);
+
+        pppUnitMatrix(mtxB);
+        PSMTXScaleApply(mtxB.value, objectMatrix->value, particleData->m_sizeStart * pppMngStPtr->m_scale.x,
+                        particleData->m_sizeEnd * pppMngStPtr->m_scale.y, particleData->m_sizeVal * pppMngStPtr->m_scale.z);
+
+        if (particleData->m_colorDeltaAdd[1] != FLOAT_80330498) {
+            pppFMATRIX rot;
+
+            PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * -particleData->m_colorDeltaAdd[1]);
+            pppCopyMatrix(tmp, *objectMatrix);
+            pppMulMatrix(*objectMatrix, rot, tmp);
+        }
+
+        PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
+        objectMatrix->value[0][3] = endPos.x;
+        objectMatrix->value[1][3] = endPos.y;
+        objectMatrix->value[2][3] = endPos.z;
     }
 }
 

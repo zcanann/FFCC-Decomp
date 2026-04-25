@@ -97,80 +97,6 @@ Mtx ppvUnitMatrix;
 Vec ppvZeroVector;
 CAmemCacheSet ppvAmemCacheSet;
 
-struct PppMngStPartView {
-    void* m_pppResSet;
-    int m_partIndex;
-    Vec m_position;
-    int m_baseTime;
-    pppIVECTOR4 m_rotation;
-    int m_rotationSpeed;
-    int m_lifeEnd;
-    Vec m_scale;
-    int m_currentFrame;
-    int m_previousFrame;
-    int m_numControlPrograms;
-    float m_scaleFactor;
-    float m_ownerScale;
-    float m_userFloat0;
-    float m_userFloat1;
-    Vec m_savedPosition;
-    Vec m_previousPosition;
-    Vec m_paramVec0;
-    short m_kind;
-    short m_nodeIndex;
-    pppFMATRIX m_matrix;
-    unsigned char m_envColorR;
-    unsigned char m_envColorG;
-    unsigned char m_envColorB;
-    unsigned char m_envColorA;
-    int m_prioTime;
-    int m_previousFrame2;
-    int m_numPrograms;
-    int m_reservedB8;
-    unsigned int m_objHitMask;
-    unsigned int m_cylinderAttribute;
-    unsigned char m_pppPObjLinkHead[8];
-    void* m_pDataValList;
-    void* m_unknownD0;
-    void* m_unknownD4;
-    void* m_owner;
-    void* m_lookTarget;
-    CChara::CNode* m_bindNode;
-    unsigned char m_endRequested;
-    unsigned char m_stopRequested;
-    unsigned char m_isFinished;
-    unsigned char m_matrixMode;
-    unsigned char m_hitBgFlag;
-    unsigned char m_slotVisible;
-    unsigned char m_ownerFacing;
-    unsigned char m_drawVariant;
-    unsigned char m_rotationOrder;
-    unsigned char m_drawPass;
-    signed char m_drawSubType;
-    unsigned char m_useOwnerScaleSign;
-    unsigned char m_ownerFlagsInitialized;
-    unsigned char m_nodeScaleInitialized;
-    unsigned char m_fieldF2;
-    unsigned char m_padF3[2];
-    unsigned char m_mapTexLoaded;
-    unsigned char m_hasMapRef;
-    unsigned char m_fpBillboard;
-    unsigned char m_prio;
-    short m_frameCounter;
-    unsigned char m_padFB[3];
-    unsigned int m_paramA;
-    unsigned int m_paramB;
-    float m_cullRadiusSq;
-    float m_cullRadius;
-    float m_cullYOffset;
-    float m_sortDepth;
-    unsigned short m_field118;
-    short m_mapObjIndex;
-    PPPSEST m_soundEffectData;
-    PPPIFPARAM m_hitParams;
-    short m_hitObjectIds[0x10];
-};
-
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline unsigned char* PartPcsRaw() { return reinterpret_cast<unsigned char*>(&PartPcs); }
 
@@ -1281,399 +1207,322 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
  */
 void pppSetMatrix(_pppMngSt* pppMngSt)
 {
-	PppMngStPartView* pppMngStView = reinterpret_cast<PppMngStPartView*>(pppMngSt);
-	// 1) Build local rotation matrix into pppMngStPtr->m_matrix
-	switch (pppMngStView->m_rotationOrder) {
+	Mtx nodeMtx;
+	Vec tmpPos;
+	Vec axis0;
+	Vec axis1;
+	Vec axis2;
+
+	switch (pppMngSt->m_rotationOrder) {
 	case 0:
-		pppGetRotMatrixXYZ(pppMngStPtr->m_matrix, &pppMngStView->m_rotation);
+		pppGetRotMatrixXYZ(pppMngStPtr->m_matrix, &pppMngSt->m_rotation);
 		break;
 	case 1:
-		pppGetRotMatrixXZY(pppMngStPtr->m_matrix, &pppMngStView->m_rotation);
+		pppGetRotMatrixXZY(pppMngStPtr->m_matrix, &pppMngSt->m_rotation);
 		break;
 	case 2:
-		pppGetRotMatrixYXZ(pppMngStPtr->m_matrix, &pppMngStView->m_rotation);
+		pppGetRotMatrixYXZ(pppMngStPtr->m_matrix, &pppMngSt->m_rotation);
 		break;
 	case 3:
-		pppGetRotMatrixYZX(pppMngStPtr->m_matrix, &pppMngStView->m_rotation);
+		pppGetRotMatrixYZX(pppMngStPtr->m_matrix, &pppMngSt->m_rotation);
 		break;
 	case 4:
-		pppGetRotMatrixZXY(pppMngStPtr->m_matrix, &pppMngStView->m_rotation);
+		pppGetRotMatrixZXY(pppMngStPtr->m_matrix, &pppMngSt->m_rotation);
 		break;
 	case 5:
-		pppGetRotMatrixZYX(pppMngStPtr->m_matrix, &pppMngStView->m_rotation);
+		pppGetRotMatrixZYX(pppMngStPtr->m_matrix, &pppMngSt->m_rotation);
 		break;
 	default:
 		break;
 	}
 
-	u8 mode = pppMngStView->m_matrixMode;
-
-	Mtx nodeMtx;
-	Vec tmpPos;
-	bool attached = false;
-
-	if (mode == 5)
-	{
-		if (!pppMngStView->m_bindNode)
-		{
+	if (pppMngSt->m_matrixMode == 5) {
+		if (pppMngSt->m_bindNode == 0) {
 			goto LocalOnly;
 		}
 
-		{
-			u8* ownerBytes = (u8*)pppMngStView->m_owner;
-			if (!pppMngStView->m_ownerFacing) {
-				u8 facing = ownerBytes[0x9A];
-				pppMngStView->m_ownerFacing = (u8)(((u32)facing << 25) >> 31);
+		if (pppMngSt->m_ownerFacing == 0) {
+			u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+			pppMngSt->m_ownerFacing = static_cast<u8>(static_cast<int>(static_cast<u32>(ownerBytes[0x9A]) << 25) >> 31);
+		}
+
+		if (pppMngSt->m_ownerFlagsInitialized == 0) {
+			u8 visible = 0;
+			u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
+			if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
+				visible = 1;
 			}
-			if (!pppMngStView->m_ownerFlagsInitialized) {
-				u8 visible = 0;
-				u32 flags = *(u32*)(ownerBytes + 0x60);
-				if ((flags & 0x00000001) != 0 && (flags & 0x00400000) == 0) {
-					visible = 1;
-				}
-				pppMngStView->m_slotVisible = visible;
+			pppMngSt->m_slotVisible = visible;
+		}
+
+		if (pppMngSt->m_nodeScaleInitialized == 0) {
+			u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+			int ownerData = *reinterpret_cast<int*>(ownerBytes + 0xF8);
+			int hasModelScale = 0;
+			if (ownerData != 0 && *reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168) != 0) {
+				hasModelScale = 1;
 			}
-			if (!pppMngStView->m_nodeScaleInitialized) {
-				bool useModelScale = false;
-				int ownerData = *(int*)(ownerBytes + 0xF8);
-				if (ownerData != 0 && *(int*)(ownerData + 0x168) != 0) {
-					useModelScale = true;
-				}
-				float scale;
-				if (useModelScale) {
-					int modelPtr = *(int*)(ownerData + 0x168);
-					scale = *(float*)(modelPtr + 0x9C);
-				} else {
-					scale = *(float*)(ownerBytes + 0x4B0);
-				}
-				pppMngStView->m_ownerScale = scale;
-				if (kScaleConstA == (double)pppMngStView->m_ownerScale) {
-					pppMngStView->m_useOwnerScaleSign = 1;
-				} else if (DOUBLE_8032fe00 == (double)pppMngStView->m_ownerScale) {
-					pppMngStView->m_useOwnerScaleSign = 0;
-				} else {
-					pppMngStView->m_useOwnerScaleSign = 1;
-				}
+			if (hasModelScale != 0) {
+				pppMngSt->m_ownerScale = *reinterpret_cast<float*>(
+				    reinterpret_cast<u8*>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168)) + 0x9C);
+			} else {
+				pppMngSt->m_ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+			}
+			if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
+				pppMngSt->m_useOwnerScaleSign = 1;
+			} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
+				pppMngSt->m_useOwnerScaleSign = 0;
+			} else {
+				pppMngSt->m_useOwnerScaleSign = 1;
 			}
 		}
 
-		u8* ownerBytes = (u8*)pppMngStView->m_owner;
 		CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
-			*(void**)(*(int*)(ownerBytes + 0xF8) + 0x168), nodeMtx, pppMngStView->m_bindNode);
+		    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
+		    nodeMtx, pppMngSt->m_bindNode);
 
 		nodeMtx[0][3] += pppMngStPtr->m_position.x;
 		nodeMtx[1][3] += pppMngStPtr->m_position.y;
 		nodeMtx[2][3] += pppMngStPtr->m_position.z;
-
 		PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
-		attached = true;
-	}
-	else if (mode < 5)
-	{
-		if (mode == 3)
-		{
-			// Attach to character node (like 5) but slightly different flow
-			if (!pppMngStView->m_bindNode) {
+	} else if (pppMngSt->m_matrixMode < 5) {
+		if (pppMngSt->m_matrixMode == 3) {
+			if (pppMngSt->m_bindNode == 0) {
 				goto LocalOnly;
 			}
 
-			{
-				u8* ownerBytes = (u8*)pppMngStView->m_owner;
-				if (!pppMngStView->m_ownerFacing) {
-					u8 facing = ownerBytes[0x9A];
-					pppMngStView->m_ownerFacing = (u8)(((u32)facing << 25) >> 31);
+			if (pppMngSt->m_ownerFacing == 0) {
+				u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+				pppMngSt->m_ownerFacing = static_cast<u8>(static_cast<int>(static_cast<u32>(ownerBytes[0x9A]) << 25) >> 31);
+			}
+
+			if (pppMngSt->m_ownerFlagsInitialized == 0) {
+				u8 visible = 0;
+				u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
+				if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
+					visible = 1;
 				}
-				if (!pppMngStView->m_ownerFlagsInitialized) {
-					u8 visible = 0;
-					u32 flags = *(u32*)(ownerBytes + 0x60);
-					if ((flags & 0x00000001) != 0 && (flags & 0x00400000) == 0) {
-						visible = 1;
-					}
-					pppMngStView->m_slotVisible = visible;
+				pppMngSt->m_slotVisible = visible;
+			}
+
+			if (pppMngSt->m_nodeScaleInitialized == 0) {
+				u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+				int ownerData = *reinterpret_cast<int*>(ownerBytes + 0xF8);
+				int hasModelScale = 0;
+				if (ownerData != 0 && *reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168) != 0) {
+					hasModelScale = 1;
 				}
-				if (!pppMngStView->m_nodeScaleInitialized) {
-					bool useModelScale = false;
-					int ownerData = *(int*)(ownerBytes + 0xF8);
-					if (ownerData != 0 && *(int*)(ownerData + 0x168) != 0) {
-						useModelScale = true;
-					}
-					float scale;
-					if (useModelScale) {
-						int modelPtr = *(int*)(ownerData + 0x168);
-						scale = *(float*)(modelPtr + 0x9C);
-					} else {
-						scale = *(float*)(ownerBytes + 0x4B0);
-					}
-					pppMngStView->m_ownerScale = scale;
-					if (kScaleConstA == (double)pppMngStView->m_ownerScale) {
-						pppMngStView->m_useOwnerScaleSign = 1;
-					} else if (DOUBLE_8032fe00 == (double)pppMngStView->m_ownerScale) {
-						pppMngStView->m_useOwnerScaleSign = 0;
-					} else {
-						pppMngStView->m_useOwnerScaleSign = 1;
-					}
+				if (hasModelScale != 0) {
+					pppMngSt->m_ownerScale = *reinterpret_cast<float*>(
+					    reinterpret_cast<u8*>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168)) + 0x9C);
+				} else {
+					pppMngSt->m_ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+				}
+				if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
+					pppMngSt->m_useOwnerScaleSign = 1;
+				} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
+					pppMngSt->m_useOwnerScaleSign = 0;
+				} else {
+					pppMngSt->m_useOwnerScaleSign = 1;
 				}
 			}
 
-			u8* ownerBytes = (u8*)pppMngStView->m_owner;
 			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
-				*(void**)(*(int*)(ownerBytes + 0xF8) + 0x168), nodeMtx, pppMngStView->m_bindNode);
-
-			nodeMtx[0][3] += pppMngStPtr->m_position.x;
-			nodeMtx[1][3] += pppMngStPtr->m_position.y;
-			nodeMtx[2][3] += pppMngStPtr->m_position.z;
-
-			PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
-			attached = true;
-		}
-		else
-		{
-			// mode == 2 or 4 (map object world matrix)
-			if (mode > 2)
-			{
-				// mode == 4
-				// GetMapObjWMtx(&MapMng, pppMngSt->m_mapObjIndex, nodeMtx);
-				MapMng.GetMapObjWMtx(pppMngStView->m_mapObjIndex, nodeMtx);
-
-				nodeMtx[0][3] += pppMngStPtr->m_position.x;
-				nodeMtx[1][3] += pppMngStPtr->m_position.y;
-				nodeMtx[2][3] += pppMngStPtr->m_position.z;
-
-				PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
-				attached = true;
-			}
-			else
-			{
-				// mode == 2
-				if (pppMngStView->m_mapObjIndex == -1)
-				{
-					goto LocalOnly;
-				}
-
-				// GetMapObjWMtx(&MapMng, pppMngSt->m_mapObjIndex, nodeMtx);
-				MapMng.GetMapObjWMtx(pppMngStView->m_mapObjIndex, nodeMtx);
-
-				nodeMtx[0][3] += pppMngStPtr->m_position.x;
-				nodeMtx[1][3] += pppMngStPtr->m_position.y;
-				nodeMtx[2][3] += pppMngStPtr->m_position.z;
-
-				PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
-				attached = true;
-			}
-		}
-	}
-	else {
-		if (mode == 7)
-		{
-			if (!pppMngStView->m_bindNode)
-			{
-				goto LocalOnly;
-			}
-
-			{
-				u8* ownerBytes = (u8*)pppMngStView->m_owner;
-				if (!pppMngStView->m_ownerFacing) {
-					u8 facing = ownerBytes[0x9A];
-					pppMngStView->m_ownerFacing = (u8)(((u32)facing << 25) >> 31);
-				}
-				if (!pppMngStView->m_ownerFlagsInitialized) {
-					u8 visible = 0;
-					u32 flags = *(u32*)(ownerBytes + 0x60);
-					if ((flags & 0x00000001) != 0 && (flags & 0x00400000) == 0) {
-						visible = 1;
-					}
-					pppMngStView->m_slotVisible = visible;
-				}
-				if (!pppMngStView->m_nodeScaleInitialized) {
-					bool useModelScale = false;
-					int ownerData = *(int*)(ownerBytes + 0xF8);
-					if (ownerData != 0 && *(int*)(ownerData + 0x168) != 0) {
-						useModelScale = true;
-					}
-					float scale;
-					if (useModelScale) {
-						int modelPtr = *(int*)(ownerData + 0x168);
-						scale = *(float*)(modelPtr + 0x9C);
-					} else {
-						scale = *(float*)(ownerBytes + 0x4B0);
-					}
-					pppMngStView->m_ownerScale = scale;
-					if (kScaleConstA == (double)pppMngStView->m_ownerScale) {
-						pppMngStView->m_useOwnerScaleSign = 1;
-					} else if (DOUBLE_8032fe00 == (double)pppMngStView->m_ownerScale) {
-						pppMngStView->m_useOwnerScaleSign = 0;
-					} else {
-						pppMngStView->m_useOwnerScaleSign = 1;
-					}
-				}
-			}
-
-			u8* ownerBytes = (u8*)pppMngStView->m_owner;
-			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
-				*(void**)(*(int*)(ownerBytes + 0xF8) + 0x168), nodeMtx, pppMngStView->m_bindNode);
+			    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
+			    nodeMtx, pppMngSt->m_bindNode);
 
 			PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
-
-			pppMngStPtr->m_matrix.value[0][3] = nodeMtx[0][3] + tmpPos.x;
-			pppMngStPtr->m_matrix.value[1][3] = nodeMtx[1][3] + tmpPos.y;
-			pppMngStPtr->m_matrix.value[2][3] = nodeMtx[2][3] + tmpPos.z;
-
-			attached = true;
-		}
-		else
-		{
-			if (mode > 6 || !pppMngStView->m_bindNode)
-			{
-				goto LocalOnly;
-			}
-
-			{
-				u8* ownerBytes = (u8*)pppMngStView->m_owner;
-				if (!pppMngStView->m_ownerFacing) {
-					u8 facing = ownerBytes[0x9A];
-					pppMngStView->m_ownerFacing = (u8)(((u32)facing << 25) >> 31);
-				}
-				if (!pppMngStView->m_ownerFlagsInitialized) {
-					u8 visible = 0;
-					u32 flags = *(u32*)(ownerBytes + 0x60);
-					if ((flags & 0x00000001) != 0 && (flags & 0x00400000) == 0) {
-						visible = 1;
-					}
-					pppMngStView->m_slotVisible = visible;
-				}
-				if (!pppMngStView->m_nodeScaleInitialized) {
-					bool useModelScale = false;
-					int ownerData = *(int*)(ownerBytes + 0xF8);
-					if (ownerData != 0 && *(int*)(ownerData + 0x168) != 0) {
-						useModelScale = true;
-					}
-					float scale;
-					if (useModelScale) {
-						int modelPtr = *(int*)(ownerData + 0x168);
-						scale = *(float*)(modelPtr + 0x9C);
-					} else {
-						scale = *(float*)(ownerBytes + 0x4B0);
-					}
-					pppMngStView->m_ownerScale = scale;
-					if (kScaleConstA == (double)pppMngStView->m_ownerScale) {
-						pppMngStView->m_useOwnerScaleSign = 1;
-					} else if (DOUBLE_8032fe00 == (double)pppMngStView->m_ownerScale) {
-						pppMngStView->m_useOwnerScaleSign = 0;
-					} else {
-						pppMngStView->m_useOwnerScaleSign = 1;
-					}
-				}
-			}
-
-			u8* ownerBytes = (u8*)pppMngStView->m_owner;
-			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
-				*(void**)(*(int*)(ownerBytes + 0xF8) + 0x168), nodeMtx, pppMngStView->m_bindNode);
-
-			Vec col0;
-			Vec col1;
-			Vec col2;
-
-			col0.x = nodeMtx[0][0];
-			col0.y = nodeMtx[1][0];
-			col0.z = nodeMtx[2][0];
-
-			col1.x = nodeMtx[0][1];
-			col1.y = nodeMtx[1][1];
-			col1.z = nodeMtx[2][1];
-
-			col2.x = nodeMtx[0][2];
-			col2.y = nodeMtx[1][2];
-			col2.z = nodeMtx[2][2];
-
-			PSVECNormalize(&col0, &col0);
-			PSVECNormalize(&col1, &col1);
-			PSVECNormalize(&col2, &col2);
-
-			nodeMtx[0][0] = col0.x; nodeMtx[1][0] = col0.y; nodeMtx[2][0] = col0.z;
-			nodeMtx[0][1] = col1.x; nodeMtx[1][1] = col1.y; nodeMtx[2][1] = col1.z;
-			nodeMtx[0][2] = col2.x; nodeMtx[1][2] = col2.y; nodeMtx[2][2] = col2.z;
-
-			PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
-
 			nodeMtx[0][3] += tmpPos.x;
 			nodeMtx[1][3] += tmpPos.y;
 			nodeMtx[2][3] += tmpPos.z;
-
 			PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
-			attached = true;
+		} else {
+			if (pppMngSt->m_matrixMode > 2) {
+				MapMng.GetMapObjWMtx(pppMngSt->m_mapObjIndex, nodeMtx);
+				nodeMtx[0][3] += pppMngStPtr->m_position.x;
+				nodeMtx[1][3] += pppMngStPtr->m_position.y;
+				nodeMtx[2][3] += pppMngStPtr->m_position.z;
+				PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+			} else {
+				if (pppMngSt->m_mapObjIndex == -1) {
+					goto LocalOnly;
+				}
+				MapMng.GetMapObjWMtx(pppMngSt->m_mapObjIndex, nodeMtx);
+				nodeMtx[0][3] += pppMngStPtr->m_position.x;
+				nodeMtx[1][3] += pppMngStPtr->m_position.y;
+				nodeMtx[2][3] += pppMngStPtr->m_position.z;
+				PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+			}
 		}
+	} else {
+		if (pppMngSt->m_matrixMode == 7) {
+			if (pppMngSt->m_bindNode == 0) {
+				goto LocalOnly;
+			}
+
+			if (pppMngSt->m_ownerFacing == 0) {
+				u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+				pppMngSt->m_ownerFacing = static_cast<u8>(static_cast<int>(static_cast<u32>(ownerBytes[0x9A]) << 25) >> 31);
+			}
+
+			if (pppMngSt->m_ownerFlagsInitialized == 0) {
+				u8 visible = 0;
+				u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
+				if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
+					visible = 1;
+				}
+				pppMngSt->m_slotVisible = visible;
+			}
+
+			if (pppMngSt->m_nodeScaleInitialized == 0) {
+				u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+				int ownerData = *reinterpret_cast<int*>(ownerBytes + 0xF8);
+				int hasModelScale = 0;
+				if (ownerData != 0 && *reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168) != 0) {
+					hasModelScale = 1;
+				}
+				if (hasModelScale != 0) {
+					pppMngSt->m_ownerScale = *reinterpret_cast<float*>(
+					    reinterpret_cast<u8*>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168)) + 0x9C);
+				} else {
+					pppMngSt->m_ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+				}
+				if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
+					pppMngSt->m_useOwnerScaleSign = 1;
+				} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
+					pppMngSt->m_useOwnerScaleSign = 0;
+				} else {
+					pppMngSt->m_useOwnerScaleSign = 1;
+				}
+			}
+
+			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
+			    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
+			    nodeMtx, pppMngSt->m_bindNode);
+
+			PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
+			pppMngStPtr->m_matrix.value[0][3] = nodeMtx[0][3] + tmpPos.x;
+			pppMngStPtr->m_matrix.value[1][3] = nodeMtx[1][3] + tmpPos.y;
+			pppMngStPtr->m_matrix.value[2][3] = nodeMtx[2][3] + tmpPos.z;
+			goto ScaleOnly;
+		}
+
+		if (pppMngSt->m_matrixMode > 6 || pppMngSt->m_bindNode == 0) {
+			goto LocalOnly;
+		}
+
+		if (pppMngSt->m_ownerFacing == 0) {
+			u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+			pppMngSt->m_ownerFacing = static_cast<u8>(static_cast<int>(static_cast<u32>(ownerBytes[0x9A]) << 25) >> 31);
+		}
+
+		if (pppMngSt->m_ownerFlagsInitialized == 0) {
+			u8 visible = 0;
+			u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
+			if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
+				visible = 1;
+			}
+			pppMngSt->m_slotVisible = visible;
+		}
+
+		if (pppMngSt->m_nodeScaleInitialized == 0) {
+			u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+			int ownerData = *reinterpret_cast<int*>(ownerBytes + 0xF8);
+			int hasModelScale = 0;
+			if (ownerData != 0 && *reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168) != 0) {
+				hasModelScale = 1;
+			}
+			if (hasModelScale != 0) {
+				pppMngSt->m_ownerScale = *reinterpret_cast<float*>(
+				    reinterpret_cast<u8*>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168)) + 0x9C);
+			} else {
+				pppMngSt->m_ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+			}
+			if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
+				pppMngSt->m_useOwnerScaleSign = 1;
+			} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
+				pppMngSt->m_useOwnerScaleSign = 0;
+			} else {
+				pppMngSt->m_useOwnerScaleSign = 1;
+			}
+		}
+
+		CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
+		    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
+		    nodeMtx, pppMngSt->m_bindNode);
+
+		PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[0]), reinterpret_cast<Vec*>(nodeMtx[0]));
+		PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[1]), reinterpret_cast<Vec*>(nodeMtx[1]));
+		PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[2]), reinterpret_cast<Vec*>(nodeMtx[2]));
+		PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
+		nodeMtx[0][3] += tmpPos.x;
+		nodeMtx[1][3] += tmpPos.y;
+		nodeMtx[2][3] += tmpPos.z;
+		PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 	}
 
-	if (!attached)
-	{
-	LocalOnly:
-		Vec col;
+ScaleOnly:
+	if (pppMngSt->m_scale.x != kPppOne) {
+		axis0.x = pppMngStPtr->m_matrix.value[0][0];
+		axis0.y = pppMngStPtr->m_matrix.value[1][0];
+		axis0.z = pppMngStPtr->m_matrix.value[2][0];
+		PSVECScale(&axis0, &axis0, pppMngSt->m_scale.x);
+		pppMngStPtr->m_matrix.value[0][0] = axis0.x;
+		pppMngStPtr->m_matrix.value[1][0] = axis0.y;
+		pppMngStPtr->m_matrix.value[2][0] = axis0.z;
+	}
 
-		col.x = pppMngStPtr->m_matrix.value[0][0];
-		col.y = pppMngStPtr->m_matrix.value[1][0];
-		col.z = pppMngStPtr->m_matrix.value[2][0];
-		PSVECScale(&col, &col, pppMngStView->m_scale.x);
-		pppMngStPtr->m_matrix.value[0][0] = col.x;
-		pppMngStPtr->m_matrix.value[1][0] = col.y;
-		pppMngStPtr->m_matrix.value[2][0] = col.z;
+	if (pppMngSt->m_scale.y != kPppOne) {
+		axis1.x = pppMngStPtr->m_matrix.value[0][1];
+		axis1.y = pppMngStPtr->m_matrix.value[1][1];
+		axis1.z = pppMngStPtr->m_matrix.value[2][1];
+		PSVECScale(&axis1, &axis1, pppMngSt->m_scale.y);
+		pppMngStPtr->m_matrix.value[0][1] = axis1.x;
+		pppMngStPtr->m_matrix.value[1][1] = axis1.y;
+		pppMngStPtr->m_matrix.value[2][1] = axis1.z;
+	}
 
-		col.x = pppMngStPtr->m_matrix.value[0][1];
-		col.y = pppMngStPtr->m_matrix.value[1][1];
-		col.z = pppMngStPtr->m_matrix.value[2][1];
-		PSVECScale(&col, &col, pppMngStView->m_scale.y);
-		pppMngStPtr->m_matrix.value[0][1] = col.x;
-		pppMngStPtr->m_matrix.value[1][1] = col.y;
-		pppMngStPtr->m_matrix.value[2][1] = col.z;
-
-		col.x = pppMngStPtr->m_matrix.value[0][2];
-		col.y = pppMngStPtr->m_matrix.value[1][2];
-		col.z = pppMngStPtr->m_matrix.value[2][2];
-		PSVECScale(&col, &col, pppMngStView->m_scale.z);
-		pppMngStPtr->m_matrix.value[0][2] = col.x;
-		pppMngStPtr->m_matrix.value[1][2] = col.y;
-		pppMngStPtr->m_matrix.value[2][2] = col.z;
-
-		pppMngStPtr->m_matrix.value[0][3] = pppMngStView->m_position.x;
-		pppMngStPtr->m_matrix.value[1][3] = pppMngStView->m_position.y;
-		pppMngStPtr->m_matrix.value[2][3] = pppMngStView->m_position.z;
+	if (pppMngSt->m_scale.z == kPppOne) {
 		return;
 	}
 
-	if (pppMngStView->m_scale.x != kPppOne)
-	{
-		Vec col;
-		col.x = pppMngStPtr->m_matrix.value[0][0];
-		col.y = pppMngStPtr->m_matrix.value[1][0];
-		col.z = pppMngStPtr->m_matrix.value[2][0];
-		PSVECScale(&col, &col, pppMngStView->m_scale.x);
-		pppMngStPtr->m_matrix.value[0][0] = col.x;
-		pppMngStPtr->m_matrix.value[1][0] = col.y;
-		pppMngStPtr->m_matrix.value[2][0] = col.z;
-	}
+	axis2.x = pppMngStPtr->m_matrix.value[0][2];
+	axis2.y = pppMngStPtr->m_matrix.value[1][2];
+	axis2.z = pppMngStPtr->m_matrix.value[2][2];
+	PSVECScale(&axis2, &axis2, pppMngSt->m_scale.z);
+	pppMngStPtr->m_matrix.value[0][2] = axis2.x;
+	pppMngStPtr->m_matrix.value[1][2] = axis2.y;
+	pppMngStPtr->m_matrix.value[2][2] = axis2.z;
+	return;
 
-	if (pppMngStView->m_scale.y != kPppOne)
-	{
-		Vec col;
-		col.x = pppMngStPtr->m_matrix.value[0][1];
-		col.y = pppMngStPtr->m_matrix.value[1][1];
-		col.z = pppMngStPtr->m_matrix.value[2][1];
-		PSVECScale(&col, &col, pppMngStView->m_scale.y);
-		pppMngStPtr->m_matrix.value[0][1] = col.x;
-		pppMngStPtr->m_matrix.value[1][1] = col.y;
-		pppMngStPtr->m_matrix.value[2][1] = col.z;
-	}
+LocalOnly:
+	axis0.x = pppMngStPtr->m_matrix.value[0][0];
+	axis0.y = pppMngStPtr->m_matrix.value[1][0];
+	axis0.z = pppMngStPtr->m_matrix.value[2][0];
+	PSVECScale(&axis0, &axis0, pppMngSt->m_scale.x);
+	pppMngStPtr->m_matrix.value[0][0] = axis0.x;
+	pppMngStPtr->m_matrix.value[1][0] = axis0.y;
+	pppMngStPtr->m_matrix.value[2][0] = axis0.z;
 
-	if (pppMngStView->m_scale.z != kPppOne)
-	{
-		Vec col;
-		col.x = pppMngStPtr->m_matrix.value[0][2];
-		col.y = pppMngStPtr->m_matrix.value[1][2];
-		col.z = pppMngStPtr->m_matrix.value[2][2];
-		PSVECScale(&col, &col, pppMngStView->m_scale.z);
-		pppMngStPtr->m_matrix.value[0][2] = col.x;
-		pppMngStPtr->m_matrix.value[1][2] = col.y;
-		pppMngStPtr->m_matrix.value[2][2] = col.z;
-	}
+	axis1.x = pppMngStPtr->m_matrix.value[0][1];
+	axis1.y = pppMngStPtr->m_matrix.value[1][1];
+	axis1.z = pppMngStPtr->m_matrix.value[2][1];
+	PSVECScale(&axis1, &axis1, pppMngSt->m_scale.y);
+	pppMngStPtr->m_matrix.value[0][1] = axis1.x;
+	pppMngStPtr->m_matrix.value[1][1] = axis1.y;
+	pppMngStPtr->m_matrix.value[2][1] = axis1.z;
+
+	axis2.x = pppMngStPtr->m_matrix.value[0][2];
+	axis2.y = pppMngStPtr->m_matrix.value[1][2];
+	axis2.z = pppMngStPtr->m_matrix.value[2][2];
+	PSVECScale(&axis2, &axis2, pppMngSt->m_scale.z);
+	pppMngStPtr->m_matrix.value[0][2] = axis2.x;
+	pppMngStPtr->m_matrix.value[1][2] = axis2.y;
+	pppMngStPtr->m_matrix.value[2][2] = axis2.z;
+
+	pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
+	pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;
+	pppMngStPtr->m_matrix.value[2][3] = pppMngSt->m_position.z;
 }
 
 /*
@@ -1687,7 +1536,6 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
  */
 void pppSetFpMatrix(_pppMngSt* pppMngSt)
 {
-	PppMngStPartView* pppMngStView = reinterpret_cast<PppMngStPartView*>(pppMngSt);
 	Vec local_a8;
 	Vec local_9c;
 	Vec local_90;
@@ -1698,19 +1546,19 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	Mtx local_44;
 
 	PSMTXCopy(pppMngStPtr->m_matrix.value, local_44);
-	if (pppMngStView->m_fpBillboard == 0) {
-		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix.value, ppvWorldMatrix);
-		local_50.x = local_44[0][3];
-		local_50.y = local_44[1][3];
-		local_50.z = local_44[2][3];
-		PSMTXMultVec(ppvCameraMatrix0, &local_50, &local_50);
-	} else {
+	if (pppMngSt->m_fpBillboard != 0) {
 		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix.value, ppvWorldMatrix);
 		local_50.x = local_44[0][3];
 		local_50.y = local_44[1][3];
 		local_50.z = local_44[2][3];
 		PSMTXMultVecSR(ppvCameraMatrix0, &local_50, &local_50);
 		local_50.y += CameraPcs._228_4_;
+	} else {
+		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix.value, ppvWorldMatrix);
+		local_50.x = local_44[0][3];
+		local_50.y = local_44[1][3];
+		local_50.z = local_44[2][3];
+		PSMTXMultVec(ppvCameraMatrix0, &local_50, &local_50);
 	}
 
 	local_70.x = ppvWorldMatrix[0][1];
@@ -1885,162 +1733,274 @@ void pppCacheDumpShape(short*, _pppDataHead*)
  */
 void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 {
+	struct pppSubProgEntryRaw
+	{
+		pppProg* m_prog;
+		u32 m_initWork;
+		u32 m_unk8;
+		u32 m_unkC;
+	};
+
 	struct pppProgramSetDefRaw
 	{
 		pppProgramSetDefRaw* m_next;
-		int m_unk4;
-		int m_unk8;
-		int m_unkC;
-		int m_startFrame;
+		u32 m_unk4;
+		u32 m_unk8;
+		u32 m_startFrame;
+		pppSubProgEntryRaw m_subProgEntries[1];
+		u8 m_flags;
+		u8 m_unk21;
+		s16 m_sortKey;
+		u16 m_objBaseSize;
+		s16 m_numStages;
 	};
 
 	struct pppPDataValRaw
 	{
 		pppProgramSetDefRaw* m_programSetDef;
-		int m_nextSpawnTime;
-		_pppPObjLink* m_objHead;
-		short m_activeCount;
-		unsigned char m_index;
-		unsigned char m_pad;
+		s32 m_nextSpawnTime;
+		_pppPObjLink* m_pppPObjLink;
+		s16 m_activeCount;
+		u8 m_index;
+		u8 m_pad;
 	};
 
-	struct pppMngStStartRaw
+	struct pppMngStHeadRaw
 	{
-		void* m_pppResSet;
-		int m_partIndex;
-		Vec m_position;
-		int m_baseTime;
-		pppIVECTOR4 m_rotation;
-		int m_rotationSpeed;
-		int m_lifeEnd;
-		Vec m_scale;
-		int m_currentFrame;
-		int m_previousFrame;
-		int m_numControlPrograms;
-		float m_scaleFactor;
-		float m_ownerScale;
-		float m_userFloat0;
-		float m_userFloat1;
-		Vec m_savedPosition;
-		Vec m_previousPosition;
-		Vec m_paramVec0;
-		short m_kind;
-		short m_nodeIndex;
-		pppFMATRIX m_matrix;
-		unsigned char m_envColorR;
-		unsigned char m_envColorG;
-		unsigned char m_envColorB;
-		unsigned char m_envColorA;
-		int m_spawnedCount;
-		int m_previousFrame2;
-		int m_numPrograms;
-		int m_reservedB8;
-		unsigned int m_objHitMask;
-		unsigned int m_cylinderAttribute;
-		_pppPObjLink* m_objHead;
-		pppProgramSetDefRaw* m_programSetHead;
-		pppPDataValRaw* m_pDataVals;
-		void** m_controlTable;
+		u8 m_pad0[0xC4];
+		_pppPObjLink m_pppPObjLinkHead;
 		void* m_programTable;
-		void* m_owner;
-		void* m_lookTarget;
-		CChara::CNode* m_bindNode;
-		unsigned char m_mode;
-		unsigned char m_stopRequested;
-		unsigned char m_isFinished;
-		unsigned char m_matrixMode;
-		unsigned char m_hitBgFlag;
-		unsigned char m_slotVisible;
-		unsigned char m_ownerFacing;
-		unsigned char m_drawVariant;
-		unsigned char m_rotationOrder;
-		unsigned char m_drawPass;
-		signed char m_drawSubType;
-		unsigned char m_useOwnerScaleSign;
-		unsigned char m_ownerFlagsInitialized;
-		unsigned char m_nodeScaleInitialized;
-		unsigned char m_fieldF2;
-		unsigned char m_mapTexLoaded;
-		unsigned char m_hasMapRef;
-		unsigned char m_fpBillboard;
-		unsigned char m_prio;
-		short m_frameCounter;
+		pppPDataValRaw* m_pppPDataVals;
 	};
 
-	pppMngStPtr = pppMngSt;
-	pppMngStStartRaw* mng = (pppMngStStartRaw*)pppMngSt;
+	struct pppMngStFreeRaw
+	{
+		u8 m_pad0[0x14];
+		s32 m_baseTime;
+		u8 m_pad1[0x74 - 0x18];
+		s16 m_kind;
+		u8 m_pad2[0xC4 - 0x76];
+		_pppPObjLink m_pppPObjLinkHead;
+		u8 m_pad3[0xF8 - 0xD0];
+		u8 m_prio;
+		s16 m_prioTime;
+	};
 
-	mng->m_lifeEnd = (int)pdt[0];
-	mng->m_mode = (unsigned char)pdt[1];
-
-	short* modelList = (short*)((unsigned char*)pdt + pdt[4]);
-	short* shapeList = (short*)((unsigned char*)pdt + pdt[5]);
-
-	if (Game.m_currentSceneId != 7) {
-		pppCacheLoadModel(modelList, (_pppDataHead*)pdt);
-		pppCacheLoadShape(shapeList, (_pppDataHead*)pdt);
-		mng->m_mapTexLoaded = 1;
-	}
-	mng->m_isFinished = 0;
-
+	pppProgramSetDefRaw* programSet = (pppProgramSetDefRaw*)(pdt + 6);
+	pppMngStHeadRaw* mngRaw = (pppMngStHeadRaw*)pppMngSt;
 	int controlOffset = (int)pdt[2];
 	int programOffset = (int)pdt[3];
-	int controlCount = *(int*)((unsigned char*)pdt + controlOffset);
-	int programCount = *(int*)((unsigned char*)pdt + programOffset);
-	pppProgramSetDefRaw* programSet = (pppProgramSetDefRaw*)(pdt + 6);
+	short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
+	short* modelIndices = (short*)((u8*)pdt + pdt[4]);
 
-	mng->m_numControlPrograms = controlCount;
-	mng->m_numPrograms = programCount;
-	mng->m_controlTable = (void**)(((int*)((unsigned char*)pdt + controlOffset)) + 1);
-	mng->m_programTable = (void*)(((int*)((unsigned char*)pdt + programOffset)) + 1);
+	pppMngStPtr = pppMngSt;
+	pppMngSt->m_lifeEnd = (int)pdt[0];
+	pppMngSt->m_mode = (u8)pdt[1];
 
-	pppPDataValRaw* pDataVals = 0;
-	if (programCount > 0) {
-		pDataVals = (pppPDataValRaw*)pppMemAlloc(programCount * 0x10, pppEnvStPtr->m_stagePtr,
-		                                        const_cast<char*>(s_pppPart_cpp), 0x585);
+	if (Game.m_currentSceneId != 7)
+	{
+		short modelCount = *modelIndices;
+		short* modelList = modelIndices + 1;
+		u32 pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
+
+		for (short i = 0; i < modelCount; i++, modelList++)
+		{
+			CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *modelList * 4);
+			short cacheIndex = *reinterpret_cast<short*>(reinterpret_cast<u8*>(mapMesh) + 0x46);
+
+			if (IsEnable__13CAmemCacheSetFs(&ppvAmemCacheSet, cacheIndex) == 0)
+			{
+				mapMesh->Ptr2Off();
+				*reinterpret_cast<int*>(reinterpret_cast<u8*>(mapMesh) + 0x24) =
+				    GetData__13CAmemCacheSetFsPci(&ppvAmemCacheSet, cacheIndex, (char*)s_pppPart_cpp, 0x4E5);
+				mapMesh->Off2Ptr();
+			}
+
+			AddRef__13CAmemCacheSetFs(&ppvAmemCacheSet, cacheIndex);
+			mapMesh->pppCacheLoadModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
+		}
+
+		short shapeCount = *shapeIndices;
+		short* shapeList = shapeIndices + 1;
+		u32 shapeNames = *(u32*)(pppResSet + 0x18);
+		CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4);
+
+		for (short i = 0; i < shapeCount; i++, shapeList++)
+		{
+			pppCacheLoadShapeTexture(*(pppShapeSt**)(shapeNames + *shapeList * 4), materialSet);
+		}
+
+		pppMngSt->m_mapTexLoaded = 1;
 	}
-	mng->m_pDataVals = pDataVals;
 
-	if (programSet->m_next != 0) {
-		mng->m_programSetHead = 0;
+	pppMngSt->m_isFinished = 0;
+	pppMngSt->m_numControlPrograms = *(int*)((u8*)pdt + controlOffset);
+	mngRaw->m_pppPObjLinkHead.m_owner = (_pppPDataVal*)(((int*)((u8*)pdt + controlOffset)) + 1);
+	pppMngSt->m_numPrograms = *(int*)((u8*)pdt + programOffset);
+	mngRaw->m_programTable = ((int*)((u8*)pdt + programOffset)) + 1;
+
+	if (pppMngSt->m_numPrograms == 0)
+	{
+		mngRaw->m_pppPDataVals = 0;
+	}
+	else
+	{
+		CMemory::CStage* stage = pppEnvStPtr->m_stagePtr;
+		bool firstAllocFailure = true;
+		bool canRetry = true;
+		u8 denied[0x180];
+
+		DAT_8032ED64 = 0;
+		do
+		{
+			pppPDataValRaw* pDataVals = (pppPDataValRaw*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+			    &Memory, pppMngSt->m_numPrograms << 4, stage, (char*)s_pppPart_cpp, 0x585, 1);
+			if (pDataVals != 0)
+			{
+				mngRaw->m_pppPDataVals = pDataVals;
+				goto DataValsAllocated;
+			}
+
+			if (firstAllocFailure)
+			{
+				firstAllocFailure = false;
+				memset(denied, 0, sizeof(denied));
+				int currentIdx = ((s32)((u8*)pppMngStPtr - ((u8*)&PartMng + 0x1D4))) / 0x158;
+				denied[currentIdx] = 1;
+			}
+
+			pppMngStFreeRaw* selectedMngSt = 0;
+			u8 selectedPrio = 1;
+			u32 selectedPrioTime = 0;
+
+			for (int i = 0; i < 0x180; i += 2)
+			{
+				pppMngStFreeRaw* candidateA = (pppMngStFreeRaw*)(((u8*)&PartMng + 0x1D4) + (i * 0x158));
+				if (denied[i] == 0 && candidateA->m_baseTime != -0x1000 && candidateA->m_kind != 0)
+				{
+					u8 prioA = candidateA->m_prio;
+					if (prioA > 1 && (selectedPrio < prioA || (selectedPrio == prioA && selectedPrioTime < (u32)candidateA->m_prioTime)))
+					{
+						selectedMngSt = candidateA;
+						selectedPrio = prioA;
+						selectedPrioTime = (u32)candidateA->m_prioTime;
+					}
+				}
+
+				pppMngStFreeRaw* candidateB = candidateA + 1;
+				if (denied[i + 1] == 0 && candidateB->m_baseTime != -0x1000 && candidateB->m_kind != 0)
+				{
+					u8 prioB = candidateB->m_prio;
+					if (prioB > 1 && (selectedPrio < prioB || (selectedPrio == prioB && selectedPrioTime < (u32)candidateB->m_prioTime)))
+					{
+						selectedMngSt = candidateB;
+						selectedPrio = prioB;
+						selectedPrioTime = (u32)candidateB->m_prioTime;
+					}
+				}
+			}
+
+			if (selectedMngSt == 0)
+			{
+				canRetry = false;
+			}
+			else
+			{
+				int deniedIdx = ((s32)((u8*)selectedMngSt - ((u8*)&PartMng + 0x1D4))) / 0x158;
+				denied[deniedIdx] = 1;
+
+				_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
+				_pppPObjLink* obj = prev->m_next;
+				while (obj != 0)
+				{
+					_pppPObjLink* next = obj->m_next;
+					pppPDataValRaw* owner = (pppPDataValRaw*)obj->m_owner;
+					if ((int)(((u32)owner->m_programSetDef->m_flags << 30) | ((u32)owner->m_programSetDef->m_flags >> 2)) >= 0)
+					{
+						prev->m_next = next;
+
+						pppProgramSetDefRaw* ownerSet = owner->m_programSetDef;
+						for (int stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
+						{
+							pppSubProgEntryRaw* entry = &ownerSet->m_subProgEntries[stageIndex];
+							if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
+							{
+								((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
+							}
+						}
+
+						owner->m_activeCount--;
+						if (owner->m_activeCount == 0)
+						{
+							owner->m_pppPObjLink = 0;
+						}
+						else if (owner->m_pppPObjLink == obj)
+						{
+							owner->m_pppPObjLink = next;
+						}
+
+						Memory.Free(obj);
+					}
+					else
+					{
+						prev = obj;
+					}
+					obj = next;
+				}
+			}
+		}
+		while (canRetry);
+
+		pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
+		PartMng.pppDumpMngSt();
+		DAT_8032ED64 = 1;
+DataValsAllocated:
+		;
 	}
 
-	mng->m_currentFrame = 0;
-	if (programCount == 0) {
-		mng->m_programSetHead = 0;
-	} else {
-		mng->m_programSetHead = programSet;
+	if (programSet->m_next != 0)
+	{
+		mngRaw->m_pppPObjLinkHead.m_previous = 0;
 	}
 
-	mng->m_objHead = 0;
-	mng->m_spawnedCount = 0;
+	pppMngSt->m_currentFrame = 0;
+	if (pppMngSt->m_numPrograms == 0)
+	{
+		mngRaw->m_pppPObjLinkHead.m_previous = 0;
+	}
+	else
+	{
+		mngRaw->m_pppPObjLinkHead.m_previous = (_pppPObjLink*)programSet;
+	}
 
-	if (pDataVals != 0) {
-		unsigned char index = 0;
-		pppProgramSetDefRaw* programSetIt = programSet;
-		while (programSetIt != 0) {
+	mngRaw->m_pppPObjLinkHead.m_next = 0;
+	pppMngSt->m_spawnedCount = 0;
+
+	if (mngRaw->m_pppPDataVals != 0)
+	{
+		u8 index = 0;
+		pppPDataValRaw* pDataVals = mngRaw->m_pppPDataVals;
+		for (pppProgramSetDefRaw* programSetIt = programSet; programSetIt != 0; programSetIt = programSetIt->m_next)
+		{
 			pDataVals->m_programSetDef = programSetIt;
 			pDataVals->m_nextSpawnTime = programSetIt->m_startFrame;
-			pDataVals->m_objHead = 0;
+			pDataVals->m_pppPObjLink = 0;
 			pDataVals->m_activeCount = 0;
 			pDataVals->m_index = index;
-			pDataVals->m_pad = 0;
-			programSetIt = programSetIt->m_next;
 			index++;
 			pDataVals++;
 		}
 	}
 
-	if (runControlPrograms != 0) {
+	if (runControlPrograms != 0)
+	{
 		int entryOffset = 0;
-		unsigned char* controlTable = (unsigned char*)mng->m_controlTable;
-		for (int i = 0; i < controlCount; i++) {
-			unsigned char* controlEntry = *(unsigned char**)(controlTable + entryOffset);
-			if (controlEntry != 0) {
-				void (*fn)(_pppMngSt*) = *(void (**)(_pppMngSt*))(controlEntry + 0x10);
-				if (fn != 0) {
-					fn(pppMngSt);
-				}
+		for (int i = 0; i < pppMngSt->m_numControlPrograms; i++)
+		{
+			void (*fn)(_pppMngSt*) = *(void (**)(_pppMngSt*))(*(int*)(reinterpret_cast<u8*>(mngRaw->m_pppPObjLinkHead.m_owner) + entryOffset) + 0x10);
+			if (fn != 0)
+			{
+				fn(pppMngSt);
 			}
 			entryOffset += 4;
 		}

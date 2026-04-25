@@ -310,18 +310,18 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 	COctNode* pCVar4;
 	int iVar5;
 
-	if ((*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)) != 0) &&
+	if ((*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)) != 0) &&
 	    ((*reinterpret_cast<unsigned long*>(Ptr(octNode, 0x40)) & 1) != 0)) {
 		MaterialMan.InitEnv();
 		if (*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x22)) != 0) {
 			CameraPcs.SetFullScreenShadow(reinterpret_cast<float(*)[4]>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xB8)), 0);
 		}
 		if (*reinterpret_cast<unsigned long*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x3C)) != 0) {
-			MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(octNode, 0x44)),
+			MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(octNode, 0x48)),
 			                           reinterpret_cast<float(*)[4]>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xB8)));
 		}
 		MaterialMan.LockEnv();
-		LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(octNode, 0x40)));
+		LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(octNode, 0x44)));
 		(*reinterpret_cast<CMapObj**>(Ptr(this, 0x8)))->SetDrawEnv();
 		(*reinterpret_cast<CMapMesh**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
 			->DrawMesh(*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)),
@@ -333,18 +333,18 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 		if (pCVar4 == 0) {
 			return;
 		}
-		if ((*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3E)) != 0) &&
+		if ((*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3C)) != 0) &&
 		    ((*reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x40)) & 1) != 0)) {
 			MaterialMan.InitEnv();
 			if (*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x22)) != 0) {
 				CameraPcs.SetFullScreenShadow(reinterpret_cast<float(*)[4]>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xB8)), 0);
 			}
 			if (*reinterpret_cast<unsigned long*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x3C)) != 0) {
-				MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x44)),
+				MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x48)),
 				                           reinterpret_cast<float(*)[4]>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xB8)));
 			}
 			MaterialMan.LockEnv();
-			LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x40)));
+			LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x44)));
 			(*reinterpret_cast<CMapObj**>(Ptr(this, 0x8)))->SetDrawEnv();
 			(*reinterpret_cast<CMapMesh**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
 				->DrawMesh(*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3C)),
@@ -356,18 +356,18 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			if (pCVar3 == 0) {
 				break;
 			}
-			if ((*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3E)) != 0) &&
+			if ((*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3C)) != 0) &&
 			    ((*reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x40)) & 1) != 0)) {
 				MaterialMan.InitEnv();
 				if (*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x22)) != 0) {
 					CameraPcs.SetFullScreenShadow(reinterpret_cast<float(*)[4]>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xB8)), 0);
 				}
 				if (*reinterpret_cast<unsigned long*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x3C)) != 0) {
-					MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x44)),
+					MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x48)),
 					                           reinterpret_cast<float(*)[4]>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xB8)));
 				}
 				MaterialMan.LockEnv();
-				LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x40)));
+				LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x44)));
 				(*reinterpret_cast<CMapObj**>(Ptr(this, 0x8)))->SetDrawEnv();
 				(*reinterpret_cast<CMapMesh**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
 					->DrawMesh(*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3C)),
@@ -944,8 +944,8 @@ void ClearLight_r(COctNode* octNode)
 	int iVar12;
 	int iVar13;
 
-	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)) != 0) {
-		*reinterpret_cast<unsigned long*>(Ptr(octNode, 0x40)) = 0;
+	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)) != 0) {
+		*reinterpret_cast<unsigned long*>(Ptr(octNode, 0x44)) = 0;
 	}
 	iVar1 = 0;
 	do {
@@ -953,43 +953,43 @@ void ClearLight_r(COctNode* octNode)
 		if (pCVar8 == 0) {
 			return;
 		}
-		if (*reinterpret_cast<unsigned short*>(Ptr(pCVar8, 0x3E)) != 0) {
-			*reinterpret_cast<unsigned long*>(Ptr(pCVar8, 0x40)) = 0;
+		if (*reinterpret_cast<unsigned short*>(Ptr(pCVar8, 0x3C)) != 0) {
+			*reinterpret_cast<unsigned long*>(Ptr(pCVar8, 0x44)) = 0;
 		}
 		iVar2 = 0;
 		do {
 			pCVar7 = *reinterpret_cast<COctNode**>(Ptr(pCVar8, 0x1C));
 			if (pCVar7 == 0) break;
-			if (*reinterpret_cast<unsigned short*>(Ptr(pCVar7, 0x3E)) != 0) {
-				*reinterpret_cast<unsigned long*>(Ptr(pCVar7, 0x40)) = 0;
+			if (*reinterpret_cast<unsigned short*>(Ptr(pCVar7, 0x3C)) != 0) {
+				*reinterpret_cast<unsigned long*>(Ptr(pCVar7, 0x44)) = 0;
 			}
 			iVar13 = 0;
 			do {
 				pCVar6 = *reinterpret_cast<COctNode**>(Ptr(pCVar7, 0x1C));
 				if (pCVar6 == 0) break;
-				if (*reinterpret_cast<unsigned short*>(Ptr(pCVar6, 0x3E)) != 0) {
-					*reinterpret_cast<unsigned long*>(Ptr(pCVar6, 0x40)) = 0;
+				if (*reinterpret_cast<unsigned short*>(Ptr(pCVar6, 0x3C)) != 0) {
+					*reinterpret_cast<unsigned long*>(Ptr(pCVar6, 0x44)) = 0;
 				}
 				iVar12 = 0;
 				do {
 					pCVar5 = *reinterpret_cast<COctNode**>(Ptr(pCVar6, 0x1C));
 					if (pCVar5 == 0) break;
-					if (*reinterpret_cast<unsigned short*>(Ptr(pCVar5, 0x3E)) != 0) {
-						*reinterpret_cast<unsigned long*>(Ptr(pCVar5, 0x40)) = 0;
+					if (*reinterpret_cast<unsigned short*>(Ptr(pCVar5, 0x3C)) != 0) {
+						*reinterpret_cast<unsigned long*>(Ptr(pCVar5, 0x44)) = 0;
 					}
 					iVar11 = 0;
 					do {
 						pCVar4 = *reinterpret_cast<COctNode**>(Ptr(pCVar5, 0x1C));
 						if (pCVar4 == 0) break;
-						if (*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3E)) != 0) {
-							*reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x40)) = 0;
+						if (*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3C)) != 0) {
+							*reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x44)) = 0;
 						}
 						iVar10 = 0;
 						do {
 							pCVar3 = *reinterpret_cast<COctNode**>(Ptr(pCVar4, 0x1C));
 							if (pCVar3 == 0) break;
-							if (*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3E)) != 0) {
-								*reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x40)) = 0;
+							if (*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3C)) != 0) {
+								*reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x44)) = 0;
 							}
 							iVar9 = 0;
 							do {
@@ -1097,9 +1097,9 @@ void InsertLight_r(COctNode* node)
 		return;
 	}
 
-	if (*reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)) != 0) {
+	if (node->m_meshStart != 0) {
 		unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
-		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(node, 0x48 + byteOffset));
+		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(node, 0x44 + byteOffset));
 		*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
 	}
 
@@ -1156,9 +1156,9 @@ void InsertLight_r(COctNode* node)
 		}
 
 		if (childOverlap) {
-			if (*reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)) != 0) {
+			if (child->m_meshStart != 0) {
 				unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
-				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, 0x48 + byteOffset));
+				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, 0x44 + byteOffset));
 				*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
 			}
 
@@ -1169,8 +1169,8 @@ void InsertLight_r(COctNode* node)
 				}
 
 				if ((reinterpret_cast<CBound*>(&s_bound)->CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
-					if (*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0) {
-						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x48)), s_insertShadowBitIndex);
+					if (grandChild->m_meshStart != 0) {
+						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x44)), s_insertShadowBitIndex);
 					}
 
 					for (int k = 0; k < 8; k++) {
@@ -1200,12 +1200,11 @@ void InsertLight_r(COctNode* node)
  */
 void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned long mask)
 {
-	unsigned char* thisBytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* mapObj = *reinterpret_cast<unsigned char**>(Ptr(this, 8));
 	Mtx inverseMtx;
 	Vec localPosition;
+	unsigned char* mapObj = reinterpret_cast<unsigned char*>(m_mapObject);
 
-	if ((*thisBytes != 0) || ((*reinterpret_cast<unsigned long*>(mapObj + 0x38) & mask) == 0)) {
+	if ((m_type != 0) || ((*reinterpret_cast<unsigned long*>(mapObj + 0x38) & mask) == 0)) {
 		return;
 	}
 
@@ -1213,15 +1212,14 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
 	PSMTXInverse(reinterpret_cast<MtxPtr>(mapObj + 0xB8), inverseMtx);
 	PSMTXMultVec(inverseMtx, &position, &localPosition);
 
-	float* bound = reinterpret_cast<float*>(&s_bound);
-	bound[0] = localPosition.x - radius;
-	bound[3] = localPosition.x + radius;
-	bound[1] = localPosition.y - radius;
-	bound[2] = localPosition.z - radius;
-	bound[4] = localPosition.y + radius;
-	bound[5] = localPosition.z + radius;
+	s_bound.m_min.x = localPosition.x - radius;
+	s_bound.m_max.x = localPosition.x + radius;
+	s_bound.m_min.y = localPosition.y - radius;
+	s_bound.m_min.z = localPosition.z - radius;
+	s_bound.m_max.y = localPosition.y + radius;
+	s_bound.m_max.z = localPosition.z + radius;
 
-	InsertLight_r(*reinterpret_cast<COctNode**>(Ptr(this, 4)));
+	InsertLight_r(m_nodePool);
 }
 
 /*
@@ -1237,8 +1235,8 @@ void ClearShadow_r(COctNode* node)
 {
 	unsigned char* nodeBytes = (unsigned char*)node;
 
-	if (*(unsigned short*)(nodeBytes + 0x3e) != 0) {
-		*(void**)(nodeBytes + 0x44) = 0;
+	if (*(unsigned short*)(nodeBytes + 0x3c) != 0) {
+		*(void**)(nodeBytes + 0x48) = 0;
 	}
 
 	COctNode** children = (COctNode**)(nodeBytes + 0x1c);
@@ -1327,7 +1325,7 @@ void InsertShadow_r(COctNode* node)
 		return;
 	}
 
-	if ((s_insertShadowDepth > 2) && (*reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)) != 0)) {
+	if ((s_insertShadowDepth > 2) && (node->m_meshStart != 0)) {
 		unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
 		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(node, 0x48 + byteOffset));
 		*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
@@ -1388,7 +1386,7 @@ void InsertShadow_r(COctNode* node)
 		}
 
 		if (childOverlap) {
-			if ((s_insertShadowDepth > 2) && (*reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)) != 0)) {
+			if ((s_insertShadowDepth > 2) && (child->m_meshStart != 0)) {
 				unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
 				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, 0x48 + byteOffset));
 				*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
@@ -1403,7 +1401,7 @@ void InsertShadow_r(COctNode* node)
 				s_insertShadowDepth++;
 
 				if ((reinterpret_cast<CBound*>(&s_bound)->CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
-					if ((s_insertShadowDepth > 2) && (*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0)) {
+					if ((s_insertShadowDepth > 2) && (grandChild->m_meshStart != 0)) {
 						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x48)), s_insertShadowBitIndex);
 					}
 
@@ -1438,32 +1436,28 @@ void InsertShadow_r(COctNode* node)
  */
 void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 {
-	Mtx inverseMtx;
 	Vec localPosition;
-	unsigned char* thisBytes = (unsigned char*)this;
-	float* srcBound = (float*)&bound;
-	float* dstBound = (float*)&s_bound;
+	Mtx inverseMtx;
+	float* srcBound = reinterpret_cast<float*>(&bound);
 
-	if (*thisBytes != 0) {
-		return;
+	if (m_type == 0) {
+		s_insertShadowBitIndex = bitIndex;
+		PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
+		PSMTXMultVec(inverseMtx, &position, &localPosition);
+
+		s_bound.m_min.x = srcBound[0];
+		s_bound.m_min.y = srcBound[1];
+		s_bound.m_min.z = srcBound[2];
+		s_bound.m_max.x = srcBound[3];
+		s_bound.m_max.y = srcBound[4];
+		s_bound.m_max.z = srcBound[5];
+
+		PSVECAdd(&s_bound.m_min, &localPosition, &s_bound.m_min);
+		PSVECAdd(&s_bound.m_max, &localPosition, &s_bound.m_max);
+
+		s_insertShadowDepth = 0;
+		InsertShadow_r(m_nodePool);
 	}
-
-	s_insertShadowBitIndex = bitIndex;
-	PSMTXInverse((MtxPtr)(*(unsigned char**)(thisBytes + 0x8) + 0xb8), inverseMtx);
-	PSMTXMultVec(inverseMtx, &position, &localPosition);
-
-	dstBound[0] = srcBound[0];
-	dstBound[1] = srcBound[1];
-	dstBound[2] = srcBound[2];
-	dstBound[3] = srcBound[3];
-	dstBound[4] = srcBound[4];
-	dstBound[5] = srcBound[5];
-
-	PSVECAdd((Vec*)&s_bound, &localPosition, (Vec*)&s_bound);
-	PSVECAdd((Vec*)((unsigned char*)&s_bound + 0xc), &localPosition, (Vec*)((unsigned char*)&s_bound + 0xc));
-
-	s_insertShadowDepth = 0;
-	InsertShadow_r(*(COctNode**)(thisBytes + 0x4));
 }
 
 /*
@@ -1631,158 +1625,160 @@ void COctTree::ClearFlag(unsigned long flag)
  */
 int COctTree::CheckHitCylinder_r(COctNode* node)
 {
-	bool hit = false;
-	bool axisYOk = false;
-	bool axisXOk = false;
-	float minValue;
-	CMapHit* mapHit = *reinterpret_cast<CMapHit**>(reinterpret_cast<u8*>(m_mapObject) + 0xC);
-	unsigned short meshStart;
-	unsigned short meshEnd;
-	COctNode* child1;
-	COctNode* child2;
-	COctNode* child3;
+	float boundMinX = *reinterpret_cast<float*>(Ptr(node, 0x0));
+	bool xOverlap = false;
+	bool xyOverlap = false;
+	bool overlap = false;
 
-	minValue = node->m_boundMinX;
-	if (s_cyl.m_top.z <= minValue) {
-		if (minValue <= s_cyl.m_top.z) {
-			axisXOk = true;
+	if (*reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= boundMinX) {
+		if (boundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
+			xOverlap = true;
 		} else {
-			axisXOk = minValue <= s_cyl.m_direction2.z;
+			xOverlap = boundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x34));
 		}
 	} else {
-		axisXOk = s_cyl.m_top.z <= node->m_boundMaxX;
+		xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= *reinterpret_cast<float*>(Ptr(node, 0xC));
 	}
 
-	if (axisXOk) {
-		minValue = node->m_boundMinY;
-		if (s_cyl.m_direction2.x <= minValue) {
-			if (minValue <= s_cyl.m_direction2.x) {
-				axisXOk = true;
+	if (xOverlap) {
+		float boundMinY = *reinterpret_cast<float*>(Ptr(node, 0x4));
+		if (*reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= boundMinY) {
+			if (boundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
+				xOverlap = true;
 			} else {
-				axisXOk = minValue <= s_cyl.m_radius2;
+				xOverlap = boundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x38));
 			}
 		} else {
-			axisXOk = s_cyl.m_direction2.x <= node->m_boundMaxY;
+			xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= *reinterpret_cast<float*>(Ptr(node, 0x10));
 		}
-		if (axisXOk) {
-			axisYOk = true;
+		if (xOverlap) {
+			xyOverlap = true;
 		}
 	}
 
-	if (axisYOk) {
-		minValue = node->m_boundMinZ;
-		if (s_cyl.m_direction2.y <= minValue) {
-			if (minValue <= s_cyl.m_direction2.y) {
-				axisYOk = true;
+	if (xyOverlap) {
+		float boundMinZ = *reinterpret_cast<float*>(Ptr(node, 0x8));
+		if (*reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= boundMinZ) {
+			if (boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
+				xyOverlap = true;
 			} else {
-				axisYOk = minValue <= s_cyl.m_height2;
+				xyOverlap = boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
 			}
 		} else {
-			axisYOk = s_cyl.m_direction2.y <= node->m_boundMaxZ;
+			xyOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= *reinterpret_cast<float*>(Ptr(node, 0x14));
 		}
-		if (axisYOk) {
-			hit = true;
+		if (xyOverlap) {
+			overlap = true;
 		}
 	}
 
-	if (!hit) {
+	if (!overlap) {
 		return 0;
 	}
 
-	meshStart = node->m_meshStart;
-	meshEnd = node->m_meshCount;
-	if ((meshEnd != 0) &&
-		(mapHit->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec, meshStart, meshEnd, s_checkHitCylinderMask) != 0)) {
+	if ((*reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)) != 0) &&
+	    ((*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
+	         ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
+	                            *reinterpret_cast<unsigned short*>(Ptr(node, 0x3C)),
+	                            *reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)),
+	                            s_checkHitCylinderMask) != 0)) {
 		return 1;
 	}
 
 	for (int i = 0; i < 8; i++) {
-		child1 = node->m_children[i];
-		if (child1 == 0) {
+		COctNode* child = *reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
+		if (child == 0) {
 			return 0;
 		}
 
-		minValue = child1->m_boundMinX;
-		hit = false;
-		axisYOk = false;
-		if (s_cyl.m_top.z <= minValue) {
-			if (minValue <= s_cyl.m_top.z) {
-				axisXOk = true;
+		float childBoundMinX = *reinterpret_cast<float*>(Ptr(child, 0x0));
+		bool childXOverlap = false;
+		bool childXYOverlap = false;
+		bool childOverlap = false;
+		if (*reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= childBoundMinX) {
+			if (childBoundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
+				childXOverlap = true;
 			} else {
-				axisXOk = minValue <= s_cyl.m_direction2.z;
+				childXOverlap = childBoundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x34));
 			}
 		} else {
-			axisXOk = s_cyl.m_top.z <= child1->m_boundMaxX;
+			childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= *reinterpret_cast<float*>(Ptr(child, 0xC));
 		}
 
-		if (axisXOk) {
-			minValue = child1->m_boundMinY;
-			if (s_cyl.m_direction2.x <= minValue) {
-				if (minValue <= s_cyl.m_direction2.x) {
-					axisXOk = true;
+		if (childXOverlap) {
+			float childBoundMinY = *reinterpret_cast<float*>(Ptr(child, 0x4));
+			if (*reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= childBoundMinY) {
+				if (childBoundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
+					childXOverlap = true;
 				} else {
-					axisXOk = minValue <= s_cyl.m_radius2;
+					childXOverlap = childBoundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x38));
 				}
 			} else {
-				axisXOk = s_cyl.m_direction2.x <= child1->m_boundMaxY;
+				childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= *reinterpret_cast<float*>(Ptr(child, 0x10));
 			}
-			if (axisXOk) {
-				axisYOk = true;
+			if (childXOverlap) {
+				childXYOverlap = true;
 			}
 		}
 
-		if (axisYOk) {
-			minValue = child1->m_boundMinZ;
-			if (s_cyl.m_direction2.y <= minValue) {
-				if (minValue <= s_cyl.m_direction2.y) {
-					axisYOk = true;
+		if (childXYOverlap) {
+			float childBoundMinZ = *reinterpret_cast<float*>(Ptr(child, 0x8));
+			if (*reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= childBoundMinZ) {
+				if (childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
+					childXYOverlap = true;
 				} else {
-					axisYOk = minValue <= s_cyl.m_height2;
+					childXYOverlap = childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
 				}
 			} else {
-				axisYOk = s_cyl.m_direction2.y <= child1->m_boundMaxZ;
+				childXYOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= *reinterpret_cast<float*>(Ptr(child, 0x14));
 			}
-			if (axisYOk) {
-				hit = true;
+			if (childXYOverlap) {
+				childOverlap = true;
 			}
 		}
 
-		if (hit) {
-			meshStart = child1->m_meshStart;
-			meshEnd = child1->m_meshCount;
-			if ((meshEnd != 0) &&
-				(mapHit->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec, meshStart, meshEnd, s_checkHitCylinderMask) != 0)) {
+		if (childOverlap) {
+			if ((*reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)) != 0) &&
+			    ((*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
+			         ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
+			                            *reinterpret_cast<unsigned short*>(Ptr(child, 0x3C)),
+			                            *reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)),
+			                            s_checkHitCylinderMask) != 0)) {
 				return 1;
 			}
 
 			for (int j = 0; j < 8; j++) {
-				child2 = child1->m_children[j];
-				if (child2 == 0) {
+				COctNode* grandChild = *reinterpret_cast<COctNode**>(Ptr(child, 0x1C));
+				if (grandChild == 0) {
 					break;
 				}
 
-				if (reinterpret_cast<CBound*>(child2)->CheckCross(*(CBound*)&s_bound) != 0) {
-					meshStart = child2->m_meshStart;
-					meshEnd = child2->m_meshCount;
-					if ((meshEnd != 0) &&
-						(mapHit->CheckHitCylinder(
-							 (CMapCylinder*)&s_cyl, &s_mvec, meshStart, meshEnd, s_checkHitCylinderMask) != 0)) {
+				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(Ptr(&s_cyl, 0x28)))) != 0) {
+					if ((*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0) &&
+					    ((*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
+					         ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
+					                            *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3C)),
+					                            *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)),
+					                            s_checkHitCylinderMask) != 0)) {
 						return 1;
 					}
 
 					for (int k = 0; k < 8; k++) {
-						child3 = child2->m_children[k];
-						if (child3 == 0) {
+						COctNode* greatGrandChild = *reinterpret_cast<COctNode**>(Ptr(grandChild, 0x1C));
+						if (greatGrandChild == 0) {
 							break;
 						}
 
-						if (CheckHitCylinder_r(child3) != 0) {
+						if (CheckHitCylinder_r(greatGrandChild) != 0) {
 							return 1;
 						}
+						grandChild = reinterpret_cast<COctNode*>(Ptr(grandChild, 4));
 					}
 				}
+				child = reinterpret_cast<COctNode*>(Ptr(child, 4));
 			}
 		}
+		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
 	}
 
 	return 0;
@@ -1799,61 +1795,51 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
  */
 int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long flag)
 {
-	float fVar1;
-	float fVar2;
 	float radiusPad;
 	Mtx inverseMtx;
 	CMapHit* mapHit;
-	int hit;
 
-	if (m_type != 2) {
-		return 0;
-	}
+	if (m_type == 2) {
+		mapHit = *reinterpret_cast<CMapHit**>(reinterpret_cast<u8*>(m_mapObject) + 0xC);
+		if (mapHit != 0) {
+			PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(m_mapObject) + 0xB8), inverseMtx);
+			PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
+			PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
+			PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&s_cyl.m_radius));
+			PSMTXMultVecSR(inverseMtx, move, &s_mvec);
 
-	mapHit = *reinterpret_cast<CMapHit**>(reinterpret_cast<u8*>(m_mapObject) + 0xC);
-	if (mapHit == 0) {
-		return 0;
-	}
+			s_cyl.m_top.y = cylinder->m_top.y;
+			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
+			if (s_cyl.m_bottom.x < s_cyl.m_direction.x) {
+				s_cyl.m_top.z = s_cyl.m_bottom.x - radiusPad;
+				s_cyl.m_direction2.z = s_cyl.m_direction.x + radiusPad;
+			} else {
+				s_cyl.m_top.z = s_cyl.m_direction.x - radiusPad;
+				s_cyl.m_direction2.z = s_cyl.m_bottom.x + radiusPad;
+			}
 
-	PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(m_mapObject) + 0xB8), inverseMtx);
-	PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
-	PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
-	PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&s_cyl.m_radius));
-	PSMTXMultVecSR(inverseMtx, move, &s_mvec);
+			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
+			if (s_cyl.m_bottom.y < s_cyl.m_direction.y) {
+				s_cyl.m_direction2.x = s_cyl.m_bottom.y - radiusPad;
+				s_cyl.m_radius2 = s_cyl.m_direction.y + radiusPad;
+			} else {
+				s_cyl.m_direction2.x = s_cyl.m_direction.y - radiusPad;
+				s_cyl.m_radius2 = s_cyl.m_bottom.y + radiusPad;
+			}
 
-	s_cyl.m_top.y = cylinder->m_top.y;
-	radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
-
-	fVar1 = s_cyl.m_direction.x;
-	fVar2 = s_cyl.m_bottom.x;
-	if (s_cyl.m_bottom.x < s_cyl.m_direction.x) {
-		fVar1 = s_cyl.m_bottom.x;
-		fVar2 = s_cyl.m_direction.x;
-	}
-	s_cyl.m_direction2.z = fVar2 + radiusPad;
-	s_cyl.m_top.z = fVar1 - radiusPad;
-
-	fVar1 = s_cyl.m_direction.y;
-	fVar2 = s_cyl.m_bottom.y;
-	if (s_cyl.m_bottom.y < s_cyl.m_direction.y) {
-		fVar1 = s_cyl.m_bottom.y;
-		fVar2 = s_cyl.m_direction.y;
-	}
-	s_cyl.m_radius2 = fVar2 + radiusPad;
-	s_cyl.m_direction2.x = fVar1 - radiusPad;
-
-	fVar1 = s_cyl.m_direction.z;
-	fVar2 = s_cyl.m_bottom.z;
-	if (s_cyl.m_bottom.z < s_cyl.m_direction.z) {
-		fVar1 = s_cyl.m_bottom.z;
-		fVar2 = s_cyl.m_direction.z;
-	}
-	s_cyl.m_height2 = fVar2 + radiusPad;
-	s_cyl.m_direction2.y = fVar1 - radiusPad;
-	s_checkHitCylinderMask = flag;
-	hit = CheckHitCylinder_r(m_nodePool);
-	if (hit != 0) {
-		return 1;
+			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
+			if (s_cyl.m_bottom.z < s_cyl.m_direction.z) {
+				s_cyl.m_direction2.y = s_cyl.m_bottom.z - radiusPad;
+				s_cyl.m_height2 = s_cyl.m_direction.z + radiusPad;
+			} else {
+				s_cyl.m_direction2.y = s_cyl.m_direction.z - radiusPad;
+				s_cyl.m_height2 = s_cyl.m_bottom.z + radiusPad;
+			}
+			s_checkHitCylinderMask = flag;
+			if (CheckHitCylinder_r(m_nodePool) != 0) {
+				return 1;
+			}
+		}
 	}
 
 	return 0;
@@ -1870,156 +1856,155 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
  */
 void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 {
-	bool hit = false;
-	bool axisYOk = false;
-	bool axisXOk = false;
-	float minValue;
+	float boundMinX = *reinterpret_cast<float*>(Ptr(octNode, 0x0));
+	bool xOverlap = false;
+	bool xyOverlap = false;
+	bool overlap = false;
 
-	minValue = octNode->m_boundMinX;
-	if (s_cyl.m_top.z <= minValue) {
-		if (minValue <= s_cyl.m_top.z) {
-			axisXOk = true;
+	if (*reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= boundMinX) {
+		if (boundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
+			xOverlap = true;
 		} else {
-			axisXOk = minValue <= s_cyl.m_direction2.z;
+			xOverlap = boundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x34));
 		}
 	} else {
-		axisXOk = s_cyl.m_top.z <= octNode->m_boundMaxX;
+		xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= *reinterpret_cast<float*>(Ptr(octNode, 0xC));
 	}
 
-	if (axisXOk) {
-		minValue = octNode->m_boundMinY;
-		if (s_cyl.m_direction2.x <= minValue) {
-			if (minValue <= s_cyl.m_direction2.x) {
-				axisXOk = true;
+	if (xOverlap) {
+		float boundMinY = *reinterpret_cast<float*>(Ptr(octNode, 0x4));
+		if (*reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= boundMinY) {
+			if (boundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
+				xOverlap = true;
 			} else {
-				axisXOk = minValue <= s_cyl.m_radius2;
+				xOverlap = boundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x38));
 			}
 		} else {
-			axisXOk = s_cyl.m_direction2.x <= octNode->m_boundMaxY;
+			xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= *reinterpret_cast<float*>(Ptr(octNode, 0x10));
 		}
-		if (axisXOk) {
-			axisYOk = true;
+		if (xOverlap) {
+			xyOverlap = true;
 		}
 	}
 
-	if (axisYOk) {
-		minValue = octNode->m_boundMinZ;
-		if (s_cyl.m_direction2.y <= minValue) {
-			if (minValue <= s_cyl.m_direction2.y) {
-				axisYOk = true;
+	if (xyOverlap) {
+		float boundMinZ = *reinterpret_cast<float*>(Ptr(octNode, 0x8));
+		if (*reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= boundMinZ) {
+			if (boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
+				xyOverlap = true;
 			} else {
-				axisYOk = minValue <= s_cyl.m_height2;
+				xyOverlap = boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
 			}
 		} else {
-			axisYOk = s_cyl.m_direction2.y <= octNode->m_boundMaxZ;
+			xyOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= *reinterpret_cast<float*>(Ptr(octNode, 0x14));
 		}
-		if (axisYOk) {
-			hit = true;
+		if (xyOverlap) {
+			overlap = true;
 		}
 	}
 
-	if (!hit) {
+	if (!overlap) {
 		return;
 	}
 
-	if (octNode->m_meshCount != 0) {
+	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)) != 0) {
 		(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
 		    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
-		                           octNode->m_meshStart,
-		                           octNode->m_meshCount,
+		                           *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)),
+		                           *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)),
 		                           s_checkHitCylinderMask);
 	}
 
 	for (int i = 0; i < 8; i++) {
-		COctNode* child = octNode->m_children[i];
+		COctNode* child = *reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C));
 		if (child == 0) {
 			return;
 		}
 
-		hit = false;
-		axisYOk = false;
-		minValue = child->m_boundMinX;
-		if (s_cyl.m_top.z <= minValue) {
-			if (minValue <= s_cyl.m_top.z) {
-				axisXOk = true;
+		float childBoundMinX = *reinterpret_cast<float*>(Ptr(child, 0x0));
+		bool childXOverlap = false;
+		bool childXYOverlap = false;
+		bool childOverlap = false;
+		if (*reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= childBoundMinX) {
+			if (childBoundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
+				childXOverlap = true;
 			} else {
-				axisXOk = minValue <= s_cyl.m_direction2.z;
+				childXOverlap = childBoundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x34));
 			}
 		} else {
-			axisXOk = s_cyl.m_top.z <= child->m_boundMaxX;
+			childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= *reinterpret_cast<float*>(Ptr(child, 0xC));
 		}
 
-		if (axisXOk) {
-			minValue = child->m_boundMinY;
-			if (s_cyl.m_direction2.x <= minValue) {
-				if (minValue <= s_cyl.m_direction2.x) {
-					axisXOk = true;
+		if (childXOverlap) {
+			float childBoundMinY = *reinterpret_cast<float*>(Ptr(child, 0x4));
+			if (*reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= childBoundMinY) {
+				if (childBoundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
+					childXOverlap = true;
 				} else {
-					axisXOk = minValue <= s_cyl.m_radius2;
+					childXOverlap = childBoundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x38));
 				}
 			} else {
-				axisXOk = s_cyl.m_direction2.x <= child->m_boundMaxY;
+				childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= *reinterpret_cast<float*>(Ptr(child, 0x10));
 			}
-			if (axisXOk) {
-				axisYOk = true;
+			if (childXOverlap) {
+				childXYOverlap = true;
 			}
 		}
 
-		if (axisYOk) {
-			minValue = child->m_boundMinZ;
-			if (s_cyl.m_direction2.y <= minValue) {
-				if (minValue <= s_cyl.m_direction2.y) {
-					axisYOk = true;
+		if (childXYOverlap) {
+			float childBoundMinZ = *reinterpret_cast<float*>(Ptr(child, 0x8));
+			if (*reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= childBoundMinZ) {
+				if (childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
+					childXYOverlap = true;
 				} else {
-					axisYOk = minValue <= s_cyl.m_height2;
+					childXYOverlap = childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
 				}
 			} else {
-				axisYOk = s_cyl.m_direction2.y <= child->m_boundMaxZ;
+				childXYOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= *reinterpret_cast<float*>(Ptr(child, 0x14));
 			}
-			if (axisYOk) {
-				hit = true;
+			if (childXYOverlap) {
+				childOverlap = true;
 			}
 		}
 
-		if (!hit) {
-			continue;
-		}
-
-		if (child->m_meshCount != 0) {
-			(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
-			    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
-			                           child->m_meshStart,
-			                           child->m_meshCount,
-			                           s_checkHitCylinderMask);
-		}
-
-		for (int j = 0; j < 8; j++) {
-			COctNode* grandChild = child->m_children[j];
-			if (grandChild == 0) {
-				break;
+		if (childOverlap) {
+			if (*reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)) != 0) {
+				(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
+				    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
+				                           *reinterpret_cast<unsigned short*>(Ptr(child, 0x3C)),
+				                           *reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)),
+				                           s_checkHitCylinderMask);
 			}
 
-			if (reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_bound)) != 0) {
-				if (grandChild->m_meshCount != 0) {
-					(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
-					    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
-					                           grandChild->m_meshStart,
-					                           grandChild->m_meshCount,
-					                           s_checkHitCylinderMask);
+			for (int j = 0; j < 8; j++) {
+				COctNode* grandChild = *reinterpret_cast<COctNode**>(Ptr(child, 0x1C));
+				if (grandChild == 0) {
+					break;
 				}
 
-				for (int k = 0; k < 8; k++) {
-					COctNode* greatGrandChild = grandChild->m_children[k];
-					if (greatGrandChild == 0) {
-						break;
+				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(Ptr(&s_cyl, 0x28)))) != 0) {
+					if (*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0) {
+						(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
+						    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
+						                           *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3C)),
+						                           *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)),
+						                           s_checkHitCylinderMask);
 					}
-					CheckHitCylinderNear_r(greatGrandChild);
+
+					for (int k = 0; k < 8; k++) {
+						COctNode* greatGrandChild = *reinterpret_cast<COctNode**>(Ptr(grandChild, 0x1C));
+						if (greatGrandChild == 0) {
+							break;
+						}
+						CheckHitCylinderNear_r(greatGrandChild);
+						grandChild = reinterpret_cast<COctNode*>(Ptr(grandChild, 4));
+					}
 				}
+				child = reinterpret_cast<COctNode*>(Ptr(child, 4));
 			}
 		}
+		octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
 	}
-
-	return;
 }
 
 /*
@@ -2033,52 +2018,50 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
  */
 void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long flag)
 {
-	float minValue;
-	float maxValue;
 	float radiusPad;
 	Mtx inverseMtx;
+	CMapHit* mapHit;
 
-	if ((m_type != 2) || (*reinterpret_cast<CMapHit**>(reinterpret_cast<u8*>(m_mapObject) + 0xC) == 0)) {
-		return;
+	if (m_type == 2) {
+		mapHit = *reinterpret_cast<CMapHit**>(reinterpret_cast<u8*>(m_mapObject) + 0xC);
+		if (mapHit != 0) {
+			PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(m_mapObject) + 0xB8), inverseMtx);
+			PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
+			PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
+			PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&s_cyl.m_radius));
+			PSMTXMultVecSR(inverseMtx, move, &s_mvec);
+
+			s_cyl.m_top.y = cylinder->m_top.y;
+			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
+			if (s_cyl.m_bottom.x < s_cyl.m_direction.x) {
+				s_cyl.m_top.z = s_cyl.m_bottom.x - radiusPad;
+				s_cyl.m_direction2.z = s_cyl.m_direction.x + radiusPad;
+			} else {
+				s_cyl.m_top.z = s_cyl.m_direction.x - radiusPad;
+				s_cyl.m_direction2.z = s_cyl.m_bottom.x + radiusPad;
+			}
+
+			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
+			if (s_cyl.m_bottom.y < s_cyl.m_direction.y) {
+				s_cyl.m_direction2.x = s_cyl.m_bottom.y - radiusPad;
+				s_cyl.m_radius2 = s_cyl.m_direction.y + radiusPad;
+			} else {
+				s_cyl.m_direction2.x = s_cyl.m_direction.y - radiusPad;
+				s_cyl.m_radius2 = s_cyl.m_bottom.y + radiusPad;
+			}
+
+			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
+			if (s_cyl.m_bottom.z < s_cyl.m_direction.z) {
+				s_cyl.m_direction2.y = s_cyl.m_bottom.z - radiusPad;
+				s_cyl.m_height2 = s_cyl.m_direction.z + radiusPad;
+			} else {
+				s_cyl.m_direction2.y = s_cyl.m_direction.z - radiusPad;
+				s_cyl.m_height2 = s_cyl.m_bottom.z + radiusPad;
+			}
+			s_checkHitCylinderMask = flag;
+			CheckHitCylinderNear_r(m_nodePool);
+		}
 	}
-
-	PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(m_mapObject) + 0xB8), inverseMtx);
-	PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
-	PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
-	PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&s_cyl.m_radius));
-	PSMTXMultVecSR(inverseMtx, move, &s_mvec);
-
-	s_cyl.m_top.y = cylinder->m_top.y;
-	radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
-
-	minValue = s_cyl.m_direction.x;
-	maxValue = s_cyl.m_bottom.x;
-	if (maxValue < minValue) {
-		minValue = s_cyl.m_bottom.x;
-		maxValue = s_cyl.m_direction.x;
-	}
-	s_cyl.m_direction2.z = maxValue + radiusPad;
-	s_cyl.m_top.z = minValue - radiusPad;
-
-	minValue = s_cyl.m_direction.y;
-	maxValue = s_cyl.m_bottom.y;
-	if (maxValue < minValue) {
-		minValue = s_cyl.m_bottom.y;
-		maxValue = s_cyl.m_direction.y;
-	}
-	s_cyl.m_radius2 = maxValue + radiusPad;
-	s_cyl.m_direction2.x = minValue - radiusPad;
-
-	minValue = s_cyl.m_direction.z;
-	maxValue = s_cyl.m_bottom.z;
-	if (maxValue < minValue) {
-		minValue = s_cyl.m_bottom.z;
-		maxValue = s_cyl.m_direction.z;
-	}
-	s_cyl.m_height2 = maxValue + radiusPad;
-	s_cyl.m_direction2.y = minValue - radiusPad;
-	s_checkHitCylinderMask = flag;
-	CheckHitCylinderNear_r(m_nodePool);
 }
 
 /*
@@ -2128,30 +2111,28 @@ void CMaterialMan::InitEnv()
  */
 int CBound::CheckCross(CBound& other)
 {
-	float* self = reinterpret_cast<float*>(this);
-	float* rhs = reinterpret_cast<float*>(&other);
 	bool bVar3;
 	bool bVar4;
 
 	bVar4 = false;
-	if (self[0] < rhs[0]) {
-		bVar3 = rhs[0] <= self[3];
+	if (m_min.x < other.m_min.x) {
+		bVar3 = other.m_min.x <= m_max.x;
 	} else {
-		if (self[0] <= rhs[0]) {
+		if (m_min.x <= other.m_min.x) {
 			bVar3 = true;
 		} else {
-			bVar3 = self[0] <= rhs[3];
+			bVar3 = m_min.x <= other.m_max.x;
 		}
 	}
 
 	if (bVar3) {
-		if (self[1] < rhs[1]) {
-			bVar3 = rhs[1] <= self[4];
+		if (m_min.y < other.m_min.y) {
+			bVar3 = other.m_min.y <= m_max.y;
 		} else {
-			if (self[1] <= rhs[1]) {
+			if (m_min.y <= other.m_min.y) {
 				bVar3 = true;
 			} else {
-				bVar3 = self[1] <= rhs[4];
+				bVar3 = m_min.y <= other.m_max.y;
 			}
 		}
 
@@ -2161,13 +2142,13 @@ int CBound::CheckCross(CBound& other)
 	}
 
 	if (bVar4) {
-		if (self[2] < rhs[2]) {
-			bVar4 = rhs[2] <= self[5];
+		if (m_min.z < other.m_min.z) {
+			bVar4 = other.m_min.z <= m_max.z;
 		} else {
-			if (self[2] <= rhs[2]) {
+			if (m_min.z <= other.m_min.z) {
 				bVar4 = true;
 			} else {
-				bVar4 = self[2] <= rhs[5];
+				bVar4 = m_min.z <= other.m_max.z;
 			}
 		}
 
@@ -2196,6 +2177,6 @@ COctNode::COctNode()
 	bounds[5] = max;
 	bounds[4] = max;
 	bounds[3] = max;
-	m_unk44 = 0;
-	m_unk48 = 0;
+	m_lightFlags = 0;
+	m_shadowFlags = 0;
 }

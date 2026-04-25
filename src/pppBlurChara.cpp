@@ -172,19 +172,19 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     Mtx cameraMtx;
     Mtx44 projection;
     Mtx44 screenMtx;
-    Vec cameraTarget;
+    Vec quadA;
+    Vec quadB;
     Vec cameraPos;
-    Vec objPos;
     Vec cameraDir;
-    Vec4d inVec;
+    Vec objPos;
+    Vec cameraTarget;
     Vec4d outVec;
+    Vec4d inVec;
     float gxProjection[7];
     float viewport[6];
     float projX;
     float projY;
     float projZ;
-    Vec quadA;
-    Vec quadB;
 
     if (param_2->m_textureMode == 1) {
         textureIndex = 0;
@@ -199,8 +199,9 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     }
 
     pppInitBlendMode();
+    const float drawDepth = FLOAT_80331030;
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, (pppFMATRIX*)0, FLOAT_80331030,
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, (pppFMATRIX*)0, drawDepth,
                                                                param_2->m_alpha, 0, 0, 0, 1, 1, 0);
     objPosBase = texData->m_objPosBase;
 
@@ -300,10 +301,10 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         outVec.z = outVec.z / outVec.w;
     }
 
-    quadB.x = -param_2->m_arg3;
     quadA.x = -(FLOAT_80331044 * param_2->m_arg3);
-    quadA.y = FLOAT_80331048 + (FLOAT_80331044 * param_2->m_arg3);
+    quadA.y = -param_2->m_arg3;
     quadA.z = outVec.z;
+    quadB.x = FLOAT_80331048 + (FLOAT_80331044 * param_2->m_arg3);
     quadB.y = FLOAT_8033104c + param_2->m_arg3;
     quadB.z = outVec.z;
 

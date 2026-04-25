@@ -10,7 +10,7 @@ extern "C" void draw0__8CGamePcsFv(CGamePcs*);
 extern "C" void draw1__8CGamePcsFv(CGamePcs*);
 extern "C" void draw2__8CGamePcsFv(CGamePcs*);
 
-extern const char s_CGamePcs_801D7C20[];
+const char s_CGamePcs_801D7C20[] = "CGamePcs";
 
 unsigned int m_table__8CGamePcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CGamePcs_801D7C20)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,
@@ -218,7 +218,7 @@ int CGamePcs::GetTable(unsigned long param)
  */
 void CGamePcs::Quit()
 {
-	// TODO
+    return;
 }
 
 /*
@@ -228,5 +228,5 @@ void CGamePcs::Quit()
  */
 void CGamePcs::Init()
 {
-	// TODO
+    return;
 }

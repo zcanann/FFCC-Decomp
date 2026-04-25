@@ -51,7 +51,7 @@ extern float FLOAT_8032fc90;
 extern float FLOAT_8032fc88;
 extern float FLOAT_8032fc8c;
 extern float FLOAT_8032fc94;
-extern float FLOAT_8032ed10;
+float FLOAT_8032ed10;
 extern double DOUBLE_8032fc68;
 extern float DAT_801ea430;
 extern unsigned int DAT_8032e620;
@@ -79,6 +79,7 @@ unsigned int m_table__9CLightPcs[0x15C / sizeof(unsigned int)] = {
 };
 
 CLightPcs LightPcs;
+_GXColor s_ambientAlphaColor;
 static const char s_p_light_cpp[] = "p_light.cpp";
 
 static inline double U32ToDouble(unsigned int value)
@@ -579,60 +580,59 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
 void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambColor, unsigned char enable, float atten,
                                  float dist, float spot, unsigned char alpha)
 {
-    char* self = (char*)this;
     GXSetChanMatColor((GXChannelID)4, mapColor);
     GXSetChanAmbColor((GXChannelID)4, ambColor);
 
-    if ((enable == 0) || (alpha == 0) || (FLOAT_8032fc80 <= atten)) {
+    if ((enable != 0) && (alpha != 0) && (atten < FLOAT_8032fc80)) {
+        Mtx cam;
+        Vec eyePos;
+        Vec eyeDir;
+        Vec transformedPos;
+        Vec transformedDir;
+
+        PSMTXCopy(CameraMatrix(), cam);
+
+        eyePos.x = CameraPosX();
+        eyePos.y = CameraPosY();
+        eyePos.z = CameraPosZ();
+        eyeDir.x = CameraDirX();
+        eyeDir.y = CameraDirY();
+        eyeDir.z = CameraDirZ();
+
+        PSMTXMultVec(cam, &eyePos, &transformedPos);
+        GXInitLightPos(&m_mapLightObj, transformedPos.x, transformedPos.y, transformedPos.z);
+
+        PSMTXMultVecSR(cam, &eyeDir, &transformedDir);
+        GXInitLightDir(&m_mapLightObj, transformedDir.x, transformedDir.y, transformedDir.z);
+        GXInitLightSpot(&m_mapLightObj, spot, (GXSpotFn)4);
+        GXInitLightAttnK(&m_mapLightObj, FLOAT_8032fc84 / dist, FLOAT_8032fc88 / atten, FLOAT_8032fc8c / atten);
+
+        reinterpret_cast<unsigned char*>(&DAT_8032e620)[3] = alpha;
+        _GXColor lightColor;
+        *(u32*)&lightColor = DAT_8032e620;
+        GXInitLightColor(&m_mapLightObj, lightColor);
+
+        if (m_loadedLightCount > 7) {
+            m_loadedLightCount = 7;
+        }
+
+        int lightIdMask = 1 << m_loadedLightCount;
+        GXLoadLightObjImm(&m_mapLightObj, (GXLightID)lightIdMask);
+        reinterpret_cast<unsigned char*>(&MaterialMan)[519] = 0;
+        GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)1, (GXColorSrc)0, m_loadedLightMask, (GXDiffuseFn)2,
+                      (GXAttnFn)1);
+        GXSetChanCtrl((GXChannelID)2, (u8)1, (GXColorSrc)0, (GXColorSrc)1, lightIdMask, (GXDiffuseFn)0, (GXAttnFn)1);
+        m_loadedLightCount += 1;
+    } else {
         reinterpret_cast<unsigned char*>(&MaterialMan)[519] = ambColor.a;
-        GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)1, (GXColorSrc)0, *(u32*)(self + 0xb4), (GXDiffuseFn)2,
+        GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)1, (GXColorSrc)0, m_loadedLightMask, (GXDiffuseFn)2,
                       (GXAttnFn)1);
         if (ambColor.a == 0xFF) {
             GXSetChanCtrl((GXChannelID)2, (u8)0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
         } else {
             GXSetChanCtrl((GXChannelID)2, (u8)1, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
         }
-        return;
     }
-
-    Mtx cam;
-    Vec eyePos;
-    Vec eyeDir;
-    Vec transformedPos;
-    Vec transformedDir;
-    PSMTXCopy(CameraMatrix(), cam);
-
-    eyePos.x = CameraPosX();
-    eyePos.y = CameraPosY();
-    eyePos.z = CameraPosZ();
-    eyeDir.x = CameraDirX();
-    eyeDir.y = CameraDirY();
-    eyeDir.z = CameraDirZ();
-
-    PSMTXMultVec(cam, &eyePos, &transformedPos);
-    GXInitLightPos((GXLightObj*)(self + 0x4370), transformedPos.x, transformedPos.y, transformedPos.z);
-
-    PSMTXMultVecSR(cam, &eyeDir, &transformedDir);
-    GXInitLightDir((GXLightObj*)(self + 0x4370), transformedDir.x, transformedDir.y, transformedDir.z);
-    GXInitLightSpot((GXLightObj*)(self + 0x4370), spot, (GXSpotFn)4);
-    GXInitLightAttnK((GXLightObj*)(self + 0x4370), FLOAT_8032fc84 / dist, FLOAT_8032fc88 / atten, FLOAT_8032fc8c / atten);
-
-    DAT_8032e620 = (DAT_8032e620 & 0xFFFFFF00) | alpha;
-    _GXColor lightColor;
-    *(u32*)&lightColor = DAT_8032e620;
-    GXInitLightColor((GXLightObj*)(self + 0x4370), lightColor);
-
-    if (*(u32*)(self + 0xb0) > 7) {
-        *(u32*)(self + 0xb0) = 7;
-    }
-
-    int lightIdMask = 1 << *(u32*)(self + 0xb0);
-    GXLoadLightObjImm((GXLightObj*)(self + 0x4370), (GXLightID)lightIdMask);
-    reinterpret_cast<unsigned char*>(&MaterialMan)[519] = 0;
-    GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)1, (GXColorSrc)0, *(u32*)(self + 0xb4), (GXDiffuseFn)2,
-                  (GXAttnFn)1);
-    GXSetChanCtrl((GXChannelID)2, (u8)1, (GXColorSrc)0, (GXColorSrc)1, lightIdMask, (GXDiffuseFn)0, (GXAttnFn)1);
-    *(u32*)(self + 0xb0) += 1;
 }
 
 /*
@@ -660,12 +660,9 @@ void CLightPcs::SetAmbient(_GXColor color)
  */
 void CLightPcs::SetAmbientAlpha(float alpha)
 {
-    _GXColor color;
-    color.r = 0;
-    color.g = 0;
-    color.b = 0;
-    color.a = (u8)(int)((double)FLOAT_8032fc7c * (double)alpha);
-    GXSetChanAmbColor((GXChannelID)2, color);
+    float scaled = FLOAT_8032fc7c * alpha;
+    s_ambientAlphaColor.a = (u8)(int)scaled;
+    GXSetChanAmbColor((GXChannelID)2, s_ambientAlphaColor);
 }
 
 /*

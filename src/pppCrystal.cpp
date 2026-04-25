@@ -7,19 +7,19 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-#include <math.h>
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-extern const float FLOAT_80330fa8 = 32.0f;
-extern const float FLOAT_80330fac = -0.5f;
-extern const float FLOAT_80330fb0 = 640.0f;
-extern const float FLOAT_80330fb4 = 448.0f;
-extern const float FLOAT_80330fb8 = 33.3f;
-extern const float FLOAT_80330fbc = 1.3333334f;
-extern const float FLOAT_80330fc0 = 0.5f;
-extern const double DOUBLE_80330FC8 = 4503599627370496.0;
-extern const float FLOAT_80330FD0 = 2.0f;
+extern const float FLOAT_80330FD4;
+extern const float FLOAT_80330FD8;
+extern const double DOUBLE_80330FE0;
+extern const double DOUBLE_80330FE8;
+extern const double DOUBLE_80330FF0;
+extern const float FLOAT_80330FF8;
+extern const double DOUBLE_80331000;
+extern const float FLOAT_80331008;
+extern const float FLOAT_8033100C;
+extern const float FLOAT_80331010;
 
 #define CRYSTAL_REFRACTION_SIZE 32.0f
 #define CRYSTAL_HALF_NEGATIVE -0.5f
@@ -28,15 +28,9 @@ extern const float FLOAT_80330FD0 = 2.0f;
 #define CRYSTAL_SCENE_FOVY 33.3f
 #define CRYSTAL_ASPECT 1.3333334f
 #define CRYSTAL_HALF 0.5f
-#define CRYSTAL_COORD_RANGE 2.0f
-#define CRYSTAL_COORD_MIN -1.0f
-#define CRYSTAL_MAGNITUDE_UNIT 1.0f
-#define CRYSTAL_MAGNITUDE_CAP 0.8f
-#define CRYSTAL_FMOD_PERIOD 1.0
-#define CRYSTAL_MODULATION_SCALE 4.0f
-#define CRYSTAL_NORMAL_OFFSET 128.0f
-#define CRYSTAL_NORMAL_SCALE 127.0f
+extern int __float_nan[];
 extern "C" unsigned int __cvt_fp2unsigned(double);
+extern "C" double fmod(double, double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
 extern "C" {
@@ -112,13 +106,11 @@ static inline int CrystalFpClassify(float value)
 
 static inline float CrystalSqrtPositive(float value)
 {
-    const double half = 0.5;
-    const double three = 3.0;
     double guess = __frsqrte((double)value);
 
-    guess = half * guess * (three - guess * guess * value);
-    guess = half * guess * (three - guess * guess * value);
-    guess = half * guess * (three - guess * guess * value);
+    guess = DOUBLE_80330FE0 * guess * (DOUBLE_80330FE8 - guess * guess * value);
+    guess = DOUBLE_80330FE0 * guess * (DOUBLE_80330FE8 - guess * guess * value);
+    guess = DOUBLE_80330FE0 * guess * (DOUBLE_80330FE8 - guess * guess * value);
 
     return (float)(value * guess);
 }
@@ -276,13 +268,13 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 			}
 
 			if ((param_2->m_payload[0] == 1) && (work->m_refractionMap == 0)) {
+				u32 y;
+				u32 x;
 				CrystalRefractionMap* textureInfo;
 				u32 textureSize;
 				float stepX;
 				float stepY;
 				float yCoord;
-				u32 y;
-				u32 x;
 
 				work->m_refractionMap = (CrystalRefractionMap*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 					sizeof(CrystalRefractionMap), pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xA7);
@@ -297,40 +289,40 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 				textureInfo->m_imageCount = 0x100;
 				textureInfo->m_bufferSize = textureSize;
 
-				stepX = CRYSTAL_COORD_RANGE / (float)(textureInfo->m_width - 1);
-				stepY = CRYSTAL_COORD_RANGE / (float)(textureInfo->m_height - 1);
-				yCoord = CRYSTAL_COORD_MIN;
+				stepX = 2.0f / (float)(textureInfo->m_width - 1);
+				stepY = 2.0f / (float)(textureInfo->m_height - 1);
+				yCoord = FLOAT_80330FD4;
 
 				for (y = 0; y < (u32)textureInfo->m_height; y++) {
 					u32 yTile = y >> 2;
 					u32 yFine = (y & 3) * 4;
 					float ySq = yCoord * yCoord;
-					float xCoord = CRYSTAL_COORD_MIN;
+					float xCoord = FLOAT_80330FD4;
 
 					for (x = 0; x < (u32)textureInfo->m_width; x++) {
 						float magnitude = xCoord * xCoord + ySq;
-						if (magnitude > CRYSTAL_MAGNITUDE_UNIT) {
+						if (magnitude > FLOAT_80330FD8) {
 							magnitude = CrystalSqrtPositive(magnitude);
-						} else if ((double)magnitude < 0.0) {
-							magnitude = NAN;
+						} else if ((double)magnitude < DOUBLE_80330FF0) {
+							magnitude = *(float*)__float_nan;
 						} else if (CrystalFpClassify(magnitude) == 1) {
-							magnitude = NAN;
+							magnitude = *(float*)__float_nan;
 						}
 
-						if (magnitude > CRYSTAL_MAGNITUDE_CAP) {
-							magnitude = CRYSTAL_MAGNITUDE_CAP;
+						if (magnitude > FLOAT_80330FF8) {
+							magnitude = FLOAT_80330FF8;
 						}
 
-						double modulation = fmod(magnitude, CRYSTAL_FMOD_PERIOD);
-						magnitude = CRYSTAL_MODULATION_SCALE * (magnitude * (float)modulation);
+						double modulation = fmod(magnitude, DOUBLE_80331000);
+						magnitude = FLOAT_80331008 * (magnitude * (float)modulation);
 						u32 xFine = x & 3;
-						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * CRYSTAL_NORMAL_SCALE + CRYSTAL_NORMAL_OFFSET));
+						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80331010 + FLOAT_8033100C));
 						u8* pixel = textureInfo->m_imageData +
 							yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +
 							(x & 0x1FFFFFFC) * 8 +
 							(xFine + yFine) * 2;
 						pixel[0] = nx;
-						u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * CRYSTAL_NORMAL_SCALE + CRYSTAL_NORMAL_OFFSET));
+						u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * FLOAT_80331010 + FLOAT_8033100C));
 						xCoord += stepX;
 						pixel[1] = ny;
 					}

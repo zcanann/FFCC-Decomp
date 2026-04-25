@@ -1,6 +1,8 @@
 #ifndef _FFCC_PPP_YMTRACER2_H_
 #define _FFCC_PPP_YMTRACER2_H_
 
+#include "ffcc/partMng.h"
+
 #include <dolphin/types.h>
 
 struct PYmTracer2;
@@ -21,7 +23,11 @@ struct pppYmTracer2UnkC {
 };
 
 struct pppYmTracer2 {
-    u8 _pad[0x80];
+    u8 m_header[0x10];
+    pppFMATRIX m_localMatrix;
+    pppFMATRIX m_drawMatrix;
+    u8 m_pad70[0x10];
+    u8 m_serializedData[1];
 };
 
 #ifdef __cplusplus

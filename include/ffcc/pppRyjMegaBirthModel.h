@@ -7,7 +7,15 @@ struct PRyjMegaBirthModel : _PARTICLE_DATA {}; // Size 0x140
 
 struct VRyjMegaBirthModel
 {
-
+    Vec m_accelerationAxis;
+    _PARTICLE_DATA* m_particleBlock;
+    PARTICLE_WMAT* m_worldMatrixBlock;
+    _PARTICLE_COLOR* m_colorBlock;
+    s32 m_numParticles;
+    u16 m_emitTimer;
+    u16 m_unused1E;
+    Vec m_previousPosition;
+    Vec m_currentPosition;
 };
 
 struct PRyjMegaBirthModelOffsets

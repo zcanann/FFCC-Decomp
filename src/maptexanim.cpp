@@ -9,12 +9,15 @@ class CMaterial;
 extern "C" void Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(CMapTexAnim*, CMaterialSet*, CTextureSet*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
+extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim*, short);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
-extern "C" CTexture* __vc__21CPtrArray_P8CTexture_FUl(void*, unsigned long);
-extern "C" CMaterial* __vc__22CPtrArray_P9CMaterial_FUl(void*, unsigned long);
-extern "C" void* PTR_PTR_s_CMapTexAnim[];
+extern "C" void* PTR_PTR_s_CMapTexAnim[] = {
+    reinterpret_cast<void*>(Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet),
+    0,
+    reinterpret_cast<void*>(__dt__11CMapTexAnimFv),
+};
 extern "C" {
 static const char s_maptexanim_cpp_801d7ec4[] = "maptexanim.cpp";
 char s_SetMapTexAnim_MaterialIdNotFound[];
@@ -56,12 +59,12 @@ static inline unsigned char& U8At(void* p, unsigned int offset)
 
 static inline void* MaterialAt(CMaterialSet* materialSet, unsigned long index)
 {
-    return __vc__22CPtrArray_P9CMaterial_FUl(Ptr(materialSet, 8), index);
+    return (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8)))[index];
 }
 
 static inline void* TextureAt(CTextureSet* textureSet, unsigned long index)
 {
-    return __vc__21CPtrArray_P8CTexture_FUl(Ptr(textureSet, 8), index);
+    return (*reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8)))[index];
 }
 
 static inline void ReplaceRef(void** slot, void* ref)
@@ -86,10 +89,139 @@ static inline void SetMaterialTextureSlot(void* material, unsigned long slotInde
     ReplaceRef(slot, texture);
 
     unsigned short& numTexture = *reinterpret_cast<unsigned short*>(Ptr(material, 0x18));
-    if (numTexture <= slotIndex) {
+    if (slotIndex >= numTexture) {
         numTexture = static_cast<unsigned short>(slotIndex + 1);
     }
 }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004f910
+ * PAL Size: 276b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
+{
+    int found = 0;
+
+    for (int i = 0; i < m_count; i++) {
+        if (m_anims[i]->m_materialId == static_cast<short>(materialId)) {
+            m_anims[i]->SetMapTexAnim(frameStart, frameEnd, wrapMode);
+            found = 1;
+        }
+    }
+
+    if ((found == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+        System.Printf(s_SetMapTexAnim_MaterialIdNotFound, materialId);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004fa24
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapTexAnimSet::Calc()
+{
+    for (int i = 0; i < m_count; i++) {
+        Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(m_anims[i], m_materialSet, m_textureSet);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004fa8c
+ * PAL Size: 1496b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
+{
+    float frame;
+
+    if (m_usesKeyFrame != 0) {
+        if (m_keyFrame.IsRun() != 0) {
+            int keyFrameIndex;
+            int keyFrameIndexNext;
+            int reachedFrame = m_keyFrame.Get(keyFrameIndex, keyFrameIndexNext, frame);
+
+            if (reachedFrame != 0) {
+                const unsigned short textureIndex = m_frameTable[keyFrameIndex];
+                void* texture = TextureAt(textureSet, textureIndex);
+                SetMaterialTextureSlot(MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex)),
+                    static_cast<unsigned long>(m_textureSlot), texture);
+
+                if (m_usesBlendTexture != 0) {
+                    const unsigned short nextTextureIndex = m_frameTable[keyFrameIndexNext];
+                    void* nextTexture = TextureAt(textureSet, nextTextureIndex);
+                    SetMaterialTextureSlot(MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex)),
+                        static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
+                    void* material = MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex));
+                    *reinterpret_cast<char*>(Ptr(material, 0xA4)) = static_cast<char>(FLOAT_8032fd38 * frame);
+                    *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
+                }
+            } else {
+                const unsigned short textureIndex = m_frameTable[keyFrameIndex];
+                void* texture = TextureAt(textureSet, textureIndex);
+                SetMaterialTextureSlot(MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex)),
+                    static_cast<unsigned long>(m_textureSlot), texture);
+
+                if (m_usesBlendTexture != 0) {
+                    const unsigned short nextTextureIndex = m_frameTable[keyFrameIndexNext];
+                    void* nextTexture = TextureAt(textureSet, nextTextureIndex);
+                    SetMaterialTextureSlot(MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex)),
+                        static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
+                    void* material = MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex));
+                    *reinterpret_cast<char*>(Ptr(material, 0xA4)) = 0;
+                    *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
+                }
+            }
+
+            m_keyFrame.Calc();
+        }
+        return;
+    }
+
+    frame = m_currentFrame;
+    const int frameIndex = static_cast<int>(frame);
+    const unsigned short textureIndex = m_frameTable[frameIndex & 0xFFFF];
+    SetMaterialTextureSlot(MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex)),
+        static_cast<unsigned long>(m_textureSlot), TextureAt(textureSet, textureIndex));
+
+    m_currentFrame = m_currentFrame + m_frameStep;
+    const float endFrame = static_cast<float>(m_endFrame);
+    if (endFrame <= m_currentFrame) {
+        if (m_wrapMode == 0) {
+            m_currentFrame = endFrame;
+        } else {
+            m_currentFrame = m_currentFrame - static_cast<float>(m_endFrame - m_startFrame);
+        }
+    }
+
+    if (m_usesBlendTexture != 0) {
+        int nextFrame = (frameIndex + 1) & 0xFFFF;
+        if (static_cast<float>(m_frameCount) <= static_cast<float>(frameIndex + 1)) {
+            nextFrame = 0;
+        }
+
+        const unsigned short nextTextureIndex = m_frameTable[nextFrame];
+        SetMaterialTextureSlot(MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex)),
+            static_cast<unsigned long>(m_textureSlot + 1), TextureAt(textureSet, nextTextureIndex));
+        void* material = MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex));
+        *reinterpret_cast<char*>(Ptr(material, 0xA4)) =
+            static_cast<char>(FLOAT_8032fd38 * (frame - static_cast<float>(frameIndex & 0xFFFF)));
+        *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
+    }
 }
 
 /*
@@ -118,9 +250,10 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             if (ref != 0) {
                 __ct__4CRefFv(ref);
                 *reinterpret_cast<void**>(ref) = PTR_PTR_s_CMapTexAnim;
+                float currentFrame;
                 float frameStep = FLOAT_8032fd48;
                 ref->m_keyFrame.m_junTable = 0;
-                float currentFrame = FLOAT_8032fd4c;
+                currentFrame = FLOAT_8032fd4c;
                 ref->m_keyFrame.m_keyFrame = 0;
                 ref->m_keyFrame.m_keyValue = 0;
                 ref->m_keyFrame.m_splineTable = 0;
@@ -184,152 +317,6 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
         }
     }
     chunkFile.PopChunk();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004fa8c
- * PAL Size: 1496b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
-{
-    float frame;
-
-    if (m_usesKeyFrame != 0) {
-        if (m_keyFrame.IsRun() != 0) {
-            int keyFrameIndex;
-            int keyFrameIndexNext;
-            int reachedFrame = m_keyFrame.Get(keyFrameIndex, keyFrameIndexNext, frame);
-
-            if (reachedFrame != 0) {
-                const unsigned short textureIndex = m_frameTable[keyFrameIndex];
-                void* texture = TextureAt(textureSet, textureIndex);
-                void* material = MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex));
-                SetMaterialTextureSlot(material, static_cast<unsigned long>(m_textureSlot), texture);
-
-                if (m_usesBlendTexture != 0) {
-                    const unsigned short nextTextureIndex = m_frameTable[keyFrameIndexNext];
-                    void* nextTexture = TextureAt(textureSet, nextTextureIndex);
-                    SetMaterialTextureSlot(material, static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
-                    *reinterpret_cast<char*>(Ptr(material, 0xA4)) = static_cast<char>(FLOAT_8032fd38 * frame);
-                    *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
-                }
-            } else {
-                const unsigned short textureIndex = m_frameTable[keyFrameIndex];
-                void* texture = TextureAt(textureSet, textureIndex);
-                void* material = MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex));
-                SetMaterialTextureSlot(material, static_cast<unsigned long>(m_textureSlot), texture);
-
-                if (m_usesBlendTexture != 0) {
-                    const unsigned short nextTextureIndex = m_frameTable[keyFrameIndexNext];
-                    void* nextTexture = TextureAt(textureSet, nextTextureIndex);
-                    SetMaterialTextureSlot(material, static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
-                    *reinterpret_cast<char*>(Ptr(material, 0xA4)) = 0;
-                    *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
-                }
-            }
-
-            m_keyFrame.Calc();
-        }
-        return;
-    }
-
-    frame = m_currentFrame;
-    const int frameIndex = static_cast<int>(frame);
-    const unsigned short textureIndex = m_frameTable[frameIndex & 0xFFFF];
-    void* material = MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex));
-    SetMaterialTextureSlot(material, static_cast<unsigned long>(m_textureSlot), TextureAt(textureSet, textureIndex));
-
-    m_currentFrame = m_currentFrame + m_frameStep;
-    const float endFrame = static_cast<float>(m_endFrame);
-    if (endFrame <= m_currentFrame) {
-        if (m_wrapMode == 0) {
-            m_currentFrame = endFrame;
-        } else {
-            m_currentFrame = m_currentFrame - static_cast<float>(m_endFrame - m_startFrame);
-        }
-    }
-
-    if (m_usesBlendTexture != 0) {
-        int nextFrame = (frameIndex + 1) & 0xFFFF;
-        if (static_cast<float>(m_frameCount) <= static_cast<float>(frameIndex + 1)) {
-            nextFrame = 0;
-        }
-
-        const unsigned short nextTextureIndex = m_frameTable[nextFrame];
-        SetMaterialTextureSlot(material, static_cast<unsigned long>(m_textureSlot + 1), TextureAt(textureSet, nextTextureIndex));
-        *reinterpret_cast<char*>(Ptr(material, 0xA4)) =
-            static_cast<char>(FLOAT_8032fd38 * (frame - static_cast<float>(frameIndex & 0xFFFF)));
-        *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004fa24
- * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapTexAnimSet::Calc()
-{
-    for (int i = 0; i < m_count; i++) {
-        Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(m_anims[i], m_materialSet, m_textureSet);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004f910
- * PAL Size: 276b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
-{
-    int found = 0;
-    int i = 0;
-    int setPtr = reinterpret_cast<int>(this);
-
-    while (i < m_count) {
-        void* animPtr = reinterpret_cast<void*>(*reinterpret_cast<int*>(setPtr + 0xC));
-        if (static_cast<short>(materialId) == S16At(animPtr, 0x12)) {
-            int end = frameEnd;
-            if (U8At(animPtr, 0x15) != 0) {
-                S32At(animPtr, 0x30) = frameStart;
-                S32At(animPtr, 0x2C) = frameStart;
-                if (frameEnd > S32At(animPtr, 0x38)) {
-                    end = S32At(animPtr, 0x38);
-                }
-                S32At(animPtr, 0x34) = end;
-                U8At(animPtr, 0x27) = static_cast<unsigned char>(wrapMode);
-                U8At(animPtr, 0x28) = 1;
-            } else {
-                S16At(animPtr, 0xE) = static_cast<short>(frameStart);
-                F32At(animPtr, 0x1C) = static_cast<float>(static_cast<short>(frameStart));
-                if (frameEnd > S16At(animPtr, 0xC)) {
-                    end = S16At(animPtr, 0xC);
-                }
-                S16At(animPtr, 0x10) = static_cast<short>(end);
-                U8At(animPtr, 0x16) = static_cast<unsigned char>(wrapMode);
-            }
-            found = 1;
-        }
-        setPtr += 4;
-        i += 1;
-    }
-
-    if ((found == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-        System.Printf(s_SetMapTexAnim_MaterialIdNotFound, materialId);
-    }
 }
 
 /*

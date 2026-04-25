@@ -95,7 +95,7 @@ public:
 		void Create(void*, CMemory::CStage*);
 		void CreateDynamics(void*, CMemory::CStage*);
 		void setup();
-		void Duplicate(CMemory::CStage*);
+		CChara::CModel* Duplicate(CMemory::CStage*);
 		void calcBindMatrix();
 		void CalcMatrix();
 		void CalcSkin();
@@ -175,6 +175,9 @@ public:
     void InitFurTexBuffer();
     void SaveFurTexBuffer(unsigned short* outTexels);
     void LoadFurTexBuffer(unsigned short* inTexels);
+
+private:
+    u8 m_work[0x2074];
 };
 
 extern CChara Chara;

@@ -69,11 +69,11 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         return;
     }
 
-    graphFrame = pppLocationTitle->m_graphId / 0x1000;
     fadeDivisor = -1;
     particles = (LocationTitleParticle*)work->m_particles;
     shapeTable =
         *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (param_2->m_dataValIndex * 4));
+    graphFrame = pppLocationTitle->m_graphId / 0x1000;
 
     if ((int)param_2->m_fadeStartFrame <= graphFrame) {
         fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);
@@ -182,7 +182,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             particle->m_frame = work->m_cur;
             randomValue = rand();
             shapeCount = *(s16*)((u8*)shapeTable + 6);
-            shape = randomValue - (randomValue / shapeCount) * shapeCount;
+            shape = randomValue % shapeCount;
             particle->m_shapeB = shape;
             particle->m_shapeA = shape;
 
@@ -220,14 +220,16 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                 int inserted;
                 float stepScale;
                 Vec* startPos;
-                Vec* interpIt;
+                Vec* interpRead;
+                Vec* interpWrite;
 
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startPos = &particles[startIndex].m_pos;
                 stepScale = 1.0f / (float)(param_2->m_stepCount + 1);
-                interpIt = interp;
                 PSVECSubtract(&particles[startIndex + 1].m_pos, startPos, &subVec);
+                interpRead = interp;
+                interpWrite = interpRead;
 
                 for (int i = 0; i < param_2->m_stepCount; i++) {
                     Vec scaled;
@@ -235,32 +237,33 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 
                     t = stepScale * (float)(i + 1);
                     PSVECScale(&subVec, &scaled, t);
-                    PSVECAdd(startPos, &scaled, interpIt);
+                    PSVECAdd(startPos, &scaled, interpWrite);
                     inserted++;
                     work->m_count++;
 
                     {
-                        u16 nextCount = work->m_count + 1;
+                        int nextCount = work->m_count + 1;
 
-                        if (param_2->m_maxCount <= nextCount) {
+                        if (nextCount >= param_2->m_maxCount) {
                             break;
                         }
                     }
 
-                    interpIt++;
+                    interpWrite++;
                 }
 
-                pppCopyVector(particles[startIndex + inserted + 1].m_pos,
+                pppCopyVector(particles[startIndex + (inserted + 1)].m_pos,
                               particles[startIndex + 1].m_pos);
 
-                interpIt = interp;
                 for (int i = 0; i < inserted; i++) {
-                    LocationTitleParticle* dst = &particles[startIndex + i + 1];
+                    LocationTitleParticle* dst;
 
-                    pppCopyVector(dst->m_pos, *interpIt);
+                    dst = &particles[startIndex + (i + 1)];
+
+                    pppCopyVector(dst->m_pos, *interpRead);
                     memcpy(&dst->m_color, &colorData->m_color, 4);
                     dst->m_frame = work->m_cur;
-                    interpIt++;
+                    interpRead++;
                 }
             }
         }

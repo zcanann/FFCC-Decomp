@@ -10,8 +10,6 @@ struct DVDFileInfo;
 extern "C" {
 #endif
 
-void checkError();
-void _kami_DVDREAD(DVDFileInfo*, void*, long, long);
 s32 THPSimpleInit(s32);
 void THPSimpleQuit(void);
 s32 THPSimpleOpen(const char*);

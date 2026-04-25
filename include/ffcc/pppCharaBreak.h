@@ -24,13 +24,15 @@ struct pppCharaBreak {
 
 struct CharaBreakUnkB {
     int m_graphId;
-    int m_dataValIndex;
-    unsigned short m_initWOrk;
-    unsigned char _pad0[2];
-    float m_stepValue;
-    unsigned char m_arg3;
-    unsigned char m_payload[6];
-    unsigned char _pad1[1];
+    float m_dataValIndex;
+    float m_graphInit;
+    float m_graphStep;
+    unsigned char _pad10[0x8];
+    Vec m_direction;
+    unsigned char _pad24[0x4];
+    float m_payloadGraphInit;
+    float m_payloadGraphStep;
+    float m_payloadGraphStepStep;
 };
 
 struct CharaBreakUnkC {

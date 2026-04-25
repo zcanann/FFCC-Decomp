@@ -89,6 +89,9 @@ struct pppScreenBreakUnkC {
 
 extern float FLOAT_80331cc0;
 extern float FLOAT_80331cc4;
+extern float FLOAT_80331cd0;
+extern float FLOAT_80331cec;
+extern float FLOAT_80331cf0;
 static const float kPppScreenBreakDoubleScale = 2.0f;
 static const float kPppScreenBreakZero = 0.0f;
 static const float kPppScreenBreakRandRange = 0.3f;
@@ -99,9 +102,7 @@ static const float kPppScreenBreakDegreesToRadians = 0.017453292f;
 static const float kPppScreenBreakCameraOffset = 30.0f;
 static const float kPppScreenBreakLightAttn = 4.0f;
 static const float kPppScreenBreakLightBias = -3.0f;
-static const float DAT_801dd4b0 = 0.0f;
-static const float DAT_801dd4b4 = 1.0f;
-static const float DAT_801dd4b8 = 0.0f;
+static const Vec DAT_801dd4b0 = { 0.0f, 1.0f, 0.0f };
 static const char s_f999_root_801dd4c8[] = "f999_root";
 static const char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
@@ -140,7 +141,7 @@ void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, fl
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 void SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
-void ConvI2FVector__5CUtilFR3Vec6S16Vecl(CUtil*, Vec*, S16Vec*, unsigned long);
+void ConvI2FVector__5CUtilFR3Vec6S16Vecl(CUtil*, Vec*, S16Vec, unsigned long);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
 }
 
@@ -328,7 +329,7 @@ void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
     float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
     float f = FLOAT_80331cc4;
-    value[2] = FLOAT_80331cc4;
+    value[2] = f;
     value[1] = f;
     *value = f;
 }
@@ -409,20 +410,17 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     u32 uVar15;
     Vec* inVec;
     s32 iVar16;
-    double dVar17;
-    const double dVar18 = -(double)kPppScreenBreakRandRange;
-    const double dVar19 = (double)kPppScreenBreakRandRange;
-    const double dVar20 = (double)kPppScreenBreakOne;
-    const double dVar21 = (double)kPppScreenBreakNegOne;
-    const double dVar22 = (double)kPppScreenBreakZero;
-    const double dVar24 = (double)kPppScreenBreakDoubleScale;
-    const double dVar25 = (double)kPppScreenBreakDegreesToRadians;
+    float dVar17;
+    const float dVar18 = -kPppScreenBreakRandRange;
+    const float dVar19 = kPppScreenBreakRandRange;
+    const float dVar20 = kPppScreenBreakOne;
+    const float dVar21 = kPppScreenBreakNegOne;
+    const float dVar22 = kPppScreenBreakZero;
+    const float dVar24 = kPppScreenBreakDoubleScale;
+    const float dVar25 = kPppScreenBreakDegreesToRadians;
     S16Vec local_e8;
     S16Vec local_e0;
     S16Vec local_d8;
-    s16 local_d0;
-    s16 sStack_ce;
-    s16 local_cc;
     Vec local_c8;
     u32 uStack_b4;
     s16 sVar8;
@@ -433,9 +431,9 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     memset(*(void**)((u8*)work + 0xC), 0, *(s32*)(modelData + 0xC) * 0x3C);
     iVar16 = *(s32*)((u8*)model + 0xAC);
     inVec = *(Vec**)((u8*)work + 0xC);
-    local_d0 = -0x7FFF;
-    sStack_ce = -0x7FFF;
-    local_cc = -0x7FFF;
+    local_e8.x = -0x7FFF;
+    local_e8.y = -0x7FFF;
+    local_e8.z = -0x7FFF;
 
     for (uVar15 = 0; uVar15 < *(u32*)(modelData + 0xC); uVar15++) {
         iVar14 = *(s32*)(iVar16 + 8);
@@ -457,16 +455,16 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 
         for (; iVar5 != 0; iVar5--) {
             s16 sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
-            if (local_d0 < sVar1) {
-                local_d0 = sVar1;
+            if (local_e8.x < sVar1) {
+                local_e8.x = sVar1;
             }
             sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 2);
-            if (sStack_ce < sVar1) {
-                sStack_ce = sVar1;
+            if (local_e8.y < sVar1) {
+                local_e8.y = sVar1;
             }
             sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 4);
-            if (local_cc < sVar1) {
-                local_cc = sVar1;
+            if (local_e8.z < sVar1) {
+                local_e8.z = sVar1;
             }
 
             psVar11 = (s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
@@ -519,46 +517,43 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         local_e0.x = local_d8.x;
         local_e0.y = local_d8.y;
         local_d8.z = local_e0.z;
-        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, &local_e0, *(u32*)(modelData + 0x34));
+        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, local_e0, *(u32*)(modelData + 0x34));
         PSVECScale(inVec + 3, inVec + 3, kPppScreenBreakVelocityScale);
 
-        dVar17 = (double)inVec[3].x;
+        dVar17 = inVec[3].x;
         if (dVar19 < dVar17) {
-            dVar17 = (double)Math.RandF(kPppScreenBreakRandRange);
+            dVar17 = Math.RandF(kPppScreenBreakRandRange);
         }
-        if ((double)inVec[3].x < dVar18) {
-            dVar17 = -(double)Math.RandF(kPppScreenBreakRandRange);
+        if (inVec[3].x < dVar18) {
+            dVar17 = -Math.RandF(kPppScreenBreakRandRange);
         }
 
-        inVec->x = (float)dVar17;
-        inVec->y = (float)dVar20;
-        inVec->z = (float)dVar21;
+        inVec->x = dVar17;
+        inVec->y = dVar20;
+        inVec->z = dVar21;
         PSVECNormalize(inVec, inVec);
-        local_c8.x = DAT_801dd4b0;
-        local_c8.y = DAT_801dd4b4;
-        local_c8.z = DAT_801dd4b8;
+        local_c8.x = DAT_801dd4b0.x;
+        local_c8.y = DAT_801dd4b0.y;
+        local_c8.z = DAT_801dd4b0.z;
         PSVECCrossProduct(inVec, &local_c8, inVec + 2);
 
-        dVar17 = (double)Math.RandF(*(float*)((u8*)step + 0x3C));
-        PSVECScale(inVec, inVec, (float)((double)*(float*)((u8*)step + 0x38) + dVar17));
+        dVar17 = Math.RandF(*(float*)((u8*)step + 0x3C));
+        PSVECScale(inVec, inVec, *(float*)((u8*)step + 0x38) + dVar17);
 
-        inVec[1].x = (float)dVar22;
-        inVec[1].y = (float)dVar22;
-        inVec[1].z = (float)dVar22;
-        inVec[4].x = (float)dVar22;
+        inVec[1].x = dVar22;
+        inVec[1].y = dVar22;
+        inVec[1].z = dVar22;
+        inVec[4].x = dVar22;
 
         uStack_b4 = (u32)*(u8*)((u8*)step + 0x34);
-        dVar17 = (double)Math.RandF((float)uStack_b4);
+        dVar17 = Math.RandF((float)uStack_b4);
         iVar16 += 0x14;
-        inVec[4].y = (float)(dVar25 * (double)(float)(dVar24 + dVar17));
+        inVec[4].y = dVar25 * (dVar24 + dVar17);
         *(u8*)&inVec[4].z = 0;
         inVec += 5;
     }
 
-    local_e8.x = local_d0;
-    local_e8.y = sStack_ce;
-    local_e8.z = local_cc;
-    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, (Vec*)((u8*)work + 0x18), &local_e8, *(u32*)(modelData + 0x34));
+    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, (Vec*)((u8*)work + 0x18), local_e8, *(u32*)(modelData + 0x34));
 }
 
 /*
@@ -581,8 +576,8 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
 
     if (work[0x24] != 0) {
         CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)modelView->m_data->m_materialSet + 8))[displayList->m_material];
-        unsigned char colorStorage0[4];
         unsigned char colorStorage1[4];
+        unsigned char colorStorage0[4];
 
         MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 1, (_GXTevScale)0);
         GXSetArray((GXAttr)0xB, work + 0x28, 4);
@@ -641,15 +636,14 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     GXLightObj lightObj;
     u8* camera = reinterpret_cast<u8*>(&CameraPcs);
     const float cameraOffset = kPppScreenBreakCameraOffset;
-    const float zero = 0.0f;
 
     lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
     lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));
     lightDir.z = *(float*)(camera + 0xF4) - (cameraOffset + *(float*)(camera + 0xE8));
     PSVECNormalize(&lightDir, &lightDir);
 
-    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, kPppScreenBreakOne, zero);
-    GXInitLightAttn(&lightObj, zero, zero, kPppScreenBreakOne, kPppScreenBreakLightAttn, zero, kPppScreenBreakLightBias);
+    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cc4);
+    GXInitLightAttn(&lightObj, FLOAT_80331cc4, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cec, FLOAT_80331cc4, FLOAT_80331cf0);
 
     GXInitLightColor(&lightObj,
                      *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(&colorStorage, 0xFF, 0xFF, 0xFF, 0xFF)));
@@ -672,27 +666,27 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
     float* pieceData = *(float**)((u8*)param_2 + 0xC);
     float zero = 0.0f;
-    Quaternion meshQuat;
-    Quaternion resultQuat;
-    Quaternion axisQuat;
-    Vec axis;
-    Vec gravityAdd;
-    Vec basis = { 0.0f, 1.0f, 0.0f };
-    Vec cameraOffset;
-    Vec screenOffset;
-    Vec invTransOffset;
-    Vec4d clipOutput;
-    Vec4d clipInput;
-    Vec cameraPos;
-    Vec cameraForward;
     Vec translation;
-    Mtx invTransMtx;
-    Mtx transMtx;
-    Mtx quatMtx;
-    Mtx meshMtx;
-    Mtx44 screenMtx;
-    Mtx invCameraMtx;
+    Vec cameraForward;
+    Vec cameraPos;
+    Vec4d clipInput;
+    Vec4d clipOutput;
+    Vec screenOffset;
+    Vec cameraOffset;
+    Vec basis = DAT_801dd4b0;
+    Vec gravityAdd;
+    Vec axis;
+    Quaternion meshQuat;
+    Quaternion axisQuat;
+    Quaternion resultQuat;
+    Vec invTransOffset;
     Mtx cameraMtx;
+    Mtx invCameraMtx;
+    Mtx44 screenMtx;
+    Mtx meshMtx;
+    Mtx quatMtx;
+    Mtx transMtx;
+    Mtx invTransMtx;
     ScreenBreakMeshRef* mesh;
 
     cameraForward.x = CameraPcs._236_4_;
@@ -733,8 +727,9 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     }
 
     for (u32 i = 0; i < modelView->m_data->m_meshCount; i++) {
-        if (*((char*)pieceData + 0x38) != '\0') {
-            u8* nodeMtx = modelView->m_nodes + (mesh->m_data->m_nodeIndex * 0xC0) + 0x14;
+        ScreenBreakMeshData* meshData = mesh->m_data;
+        if (*(u8*)((u8*)pieceData + 0x38) != 0) {
+            u8* nodeMtx = modelView->m_nodes + (meshData->m_nodeIndex * 0xC0) + 0x14;
 
             *(float*)(nodeMtx + 0xC) = zero;
             *(float*)(nodeMtx + 0x1C) = zero;

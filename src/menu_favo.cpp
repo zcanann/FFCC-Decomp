@@ -744,13 +744,3 @@ void CMenuPcs::FavoDraw()
 
 	DrawInit();
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::FavoCtrlCur()
-{
-	// TODO
-}

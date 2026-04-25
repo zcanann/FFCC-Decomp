@@ -130,18 +130,18 @@ public:
     const char* GetLangString();
     void SetNextScript(CGame::CNextScript* nextScript);
     void SetNextScriptNewGame();
-    void IsWorldMap();
-    void IsPartyExist(int);
-    void GetItemName(int);
-    void GetItemArt(int);
-    void GetItemNames(int);
-    void GetItemArts(int);
-    void GetItemName(int, int);
-    void GetMonName(int);
-    void GetMonArt(int);
-    void GetMonNames(int);
-    void GetMonArts(int);
-    void GetMonName(int, int);
+    int IsWorldMap();
+    int IsPartyExist(int);
+    char* GetItemName(int);
+    char* GetItemArt(int);
+    char* GetItemNames(int);
+    char* GetItemArts(int);
+    char* GetItemName(int, int);
+    char* GetMonName(int);
+    char* GetMonArt(int);
+    char* GetMonNames(int);
+    char* GetMonArts(int);
+    char* GetMonName(int, int);
 
     // void* vtable;                        // 0x00
     int unk_0x4;                            // 0x04

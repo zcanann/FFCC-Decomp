@@ -1,14 +1,16 @@
 #ifndef _FFCC_PPP_YMTRACER_H_
 #define _FFCC_PPP_YMTRACER_H_
 
+#include "ffcc/partMng.h"
+
 #include <dolphin/types.h>
 
 struct pppYmTracerUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
-    s32 m_initWOrk;
+    u32 m_initWOrk;
     s32 m_stepValue;
-    s32 m_arg3;
+    u32 m_arg3;
     u8 m_payload[0x20];
 };
 
@@ -20,7 +22,12 @@ struct pppYmTracerUnkC {
 struct TRACE_POLYGON;
 
 struct pppYmTracer {
-    u8 _pad[0x80];
+    u8 m_header[0xC];
+    s32 m_graphId;
+    pppFMATRIX m_localMatrix;
+    pppFMATRIX m_drawMatrix;
+    u8 m_pad70[0x10];
+    u8 m_serializedData[1];
 };
 
 #ifdef __cplusplus

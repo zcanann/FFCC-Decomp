@@ -366,6 +366,20 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                 offset += 6;
             }
             break;
+        case 0x4E425420:
+            m_nbtCount = static_cast<unsigned short>(chunk.m_size / 0x12);
+            cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+            m_nbt = cursor;
+            cursor += chunk.m_size;
+
+            offset = 0;
+            for (int i = 0; i < static_cast<int>(m_nbtCount); i++) {
+                for (int j = 0; j < 9; j++) {
+                    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_nbt) + offset) = reader.Get2();
+                    offset += 2;
+                }
+            }
+            break;
         case 0x434F4C52:
             m_colorCount = static_cast<unsigned short>(chunk.m_size >> 2);
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
@@ -413,16 +427,15 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             break;
         case 0x444C4844:
             m_displayListCount = static_cast<unsigned short>(chunk.m_arg0);
-            unsigned int drawEntriesBase;
             if (usePreallocated != 0) {
                 m_displayListData = __nwa__FUlPQ27CMemory6CStagePci(workSize, DAT_8032EC98, s_mapmesh_cpp_801D70B0, 0x1D5);
-                drawEntriesBase = reinterpret_cast<unsigned int>(m_displayListData);
+                cursor = reinterpret_cast<unsigned char*>(m_displayListData);
             } else {
-                drawEntriesBase = Align32(reinterpret_cast<unsigned int>(cursor));
+                cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
             }
-            m_drawEntries = reinterpret_cast<void*>(drawEntriesBase);
+            m_drawEntries = cursor;
 
-            cursor = reinterpret_cast<unsigned char*>(drawEntriesBase + (static_cast<unsigned int>(m_displayListCount) * 0x10U));
+            cursor += static_cast<unsigned int>(m_displayListCount) * 0x10U;
             offset = 0;
             for (int i = 0; i < static_cast<int>(m_displayListCount); i++) {
                 *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned int>(m_drawEntries) + offset) = 0;
@@ -443,7 +456,8 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                     reader.Align(0x20);
                     entry->displayList = 0;
                     if (entry->size != 0) {
-                        entry->displayList = reinterpret_cast<void*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+                        cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+                        entry->displayList = cursor;
                         if (usePreallocated != 0) {
                             entry->displayListOffset = reinterpret_cast<unsigned int>(entry->displayList) -
                                                        reinterpret_cast<unsigned int>(m_displayListData);
@@ -452,8 +466,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                                                        reinterpret_cast<unsigned int>(m_meshData);
                         }
 
-                        cursor = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(entry->displayList) +
-                                                                 Align32(chunk.m_arg0));
+                        cursor += Align32(chunk.m_arg0);
                         memset(entry->displayList, 0, Align32(entry->size));
                         reader.Get(entry->displayList, entry->size);
                         DCFlushRange(entry->displayList, Align32(entry->size));
@@ -466,10 +479,10 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             reader.PopChunk();
 
             DCFlushRange(m_vertices, static_cast<unsigned int>(m_vertexCount) * 0xC);
-            DCFlushRange(m_normals, static_cast<unsigned int>(m_normalCount) * 0xC);
+            DCFlushRange(m_normals, static_cast<unsigned int>(m_normalCount) * 6);
             DCFlushRange(m_nbt, static_cast<unsigned int>(m_nbtCount) * 0x12);
-            DCFlushRange(m_colors, static_cast<unsigned int>(m_colorCount) * 0xC);
-            DCFlushRange(m_uvPairs, static_cast<unsigned int>(m_uvCount) * 0xC);
+            DCFlushRange(m_colors, static_cast<unsigned int>(m_colorCount) * 4);
+            DCFlushRange(m_uvPairs, static_cast<unsigned int>(m_uvCount) * 4);
             break;
         case 0x424F4646: {
             float x = reader.GetF4();
@@ -726,26 +739,6 @@ void CMapMesh::pppCacheLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet
         }
         entry++;
     }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMesh::pppCacheUnLoadModelTexture(CMaterialSet*, CAmemCacheSet*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet*, CAmemCacheSet*)
-{
-	// TODO
 }
 
 /*

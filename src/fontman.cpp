@@ -24,6 +24,21 @@ CFontMan FontMan;
 
 namespace {
 typedef void (*VirtualDtorFn)(void*, int);
+
+struct CFontRenderFlagBits
+{
+	unsigned char shadow : 1;
+	unsigned char zCompare : 1;
+	unsigned char zUpdate : 1;
+	unsigned char snapPosition : 1;
+	unsigned char fixedWidth : 1;
+	unsigned char pad : 3;
+};
+
+static CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
+{
+	return reinterpret_cast<CFontRenderFlagBits&>(flags);
+}
 }
 
 /*
@@ -41,25 +56,18 @@ float CFont::GetWidth(unsigned short ch)
 	unsigned short* glyph = glyphBucket + 1;
 	int count = static_cast<int>(*glyphBucket);
 
-	for (; count != 0; count--) {
-		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == ((ch >> 8) & 0xFF)) {
+	for (; count > 0; count--) {
+		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
+			glyph += 4;
+		} else {
 			goto found_glyph;
 		}
-		glyph += 4;
 	}
 	glyph = 0;
 
 found_glyph:
 	if (glyph == 0) {
-		glyphBucket = m_glyphBuckets[63];
-		glyph = glyphBucket + 1;
-		for (count = static_cast<int>(*glyphBucket); count != 0; count--) {
-			if (*reinterpret_cast<char*>(glyph + 1) == '\0') {
-				goto found_fallback;
-			}
-			glyph += 4;
-		}
-		return 0.0f;
+		goto find_fallback;
 	}
 
 found_fallback:
@@ -81,6 +89,25 @@ found_fallback:
 	}
 
 	return static_cast<float>(width);
+
+find_fallback:
+	glyphBucket = m_glyphBuckets[63];
+	unsigned short* fallbackGlyph = glyphBucket + 1;
+	for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
+		if (*reinterpret_cast<char*>(fallbackGlyph + 1) != '\0') {
+			fallbackGlyph += 4;
+		} else {
+			break;
+		}
+	}
+	if (count == 0) {
+		fallbackGlyph = 0;
+	}
+	glyph = fallbackGlyph;
+	if (glyph != 0) {
+		goto found_fallback;
+	}
+	return 0.0f;
 }
 
 /*
@@ -95,52 +122,66 @@ found_fallback:
 float CFont::GetWidth(char* text)
 {
 	float width = 0.0f;
-	unsigned char* cursor = reinterpret_cast<unsigned char*>(text);
+	unsigned short ch;
 
-	while (*cursor != '\0') {
-		unsigned char ch = *cursor++;
-		unsigned short* glyphBucket = m_glyphBuckets[ch];
-		unsigned short* glyph = glyphBucket + 1;
-		int count = static_cast<int>(glyphBucket[0]);
+	while (true) {
+		ch = static_cast<unsigned char>(*text);
+		if (ch == '\0') {
+			break;
+		}
+		unsigned short* glyph = m_glyphBuckets[ch] + 1;
+		int count = static_cast<int>(m_glyphBuckets[ch][0]);
+		text++;
 
 		for (; count > 0; count--) {
-			if (*reinterpret_cast<char*>(glyph + 1) == '\0') {
-				goto found_glyph;
-			}
-			glyph += 4;
-		}
-		glyph = 0;
-
-found_glyph:
-		if (glyph == 0) {
-			glyph = m_glyphBuckets[63] + 1;
-			for (count = static_cast<int>(m_glyphBuckets[63][0]); count > 0; count--) {
-				if (*reinterpret_cast<char*>(glyph + 1) == '\0') {
-					goto found_fallback;
-				}
+			if (*reinterpret_cast<char*>(glyph + 1) != '\0') {
 				glyph += 4;
-			}
-			glyph = 0;
-
-found_fallback:
-			if (glyph == 0) {
-				continue;
+			} else {
+				goto use_glyph;
 			}
 		}
 
-		int drawWidth;
-		if ((renderFlags & 0x10) != 0) {
-			drawWidth = static_cast<int>(m_glyphWidth);
+		goto find_fallback;
+
+use_glyph:
+		unsigned char flags = renderFlags;
+		unsigned int drawWidth;
+
+		if (static_cast<int>((static_cast<unsigned int>(flags) << 27) | static_cast<unsigned int>(flags >> 5)) < 0) {
+			drawWidth = static_cast<unsigned int>(m_glyphWidth);
 		} else {
-			drawWidth = static_cast<int>(*(reinterpret_cast<unsigned char*>(glyph) + 4 +
-			                               ((static_cast<signed char>(renderFlags) >> 7) & 2)));
+			signed char sign = static_cast<signed char>(flags);
+			sign >>= 7;
+			drawWidth = static_cast<unsigned int>(
+			    *(reinterpret_cast<unsigned char*>(glyph) +
+			      ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 4)));
 		}
 
 		float charWidth = scaleX * (margin + static_cast<float>(drawWidth));
-		if ((renderFlags & 0x08) != 0) {
-			charWidth = floorf(charWidth);
+		if (static_cast<int>((static_cast<unsigned int>(flags) << 28) | static_cast<unsigned int>(flags >> 4)) < 0) {
+			charWidth = static_cast<float>(floor(charWidth));
 		}
+
 		width += charWidth;
+		continue;
+
+find_fallback:
+		unsigned short* glyphBucket = m_glyphBuckets[63];
+		unsigned short* fallbackGlyph = glyphBucket + 1;
+		for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
+			if (*reinterpret_cast<char*>(fallbackGlyph + 1) != '\0') {
+				fallbackGlyph += 4;
+			} else {
+				break;
+			}
+		}
+		if (count == 0) {
+			fallbackGlyph = 0;
+		}
+		glyph = fallbackGlyph;
+		if (glyph != 0) {
+			goto use_glyph;
+		}
 	}
 
 	return width;
@@ -358,7 +399,7 @@ void CFont::DrawInit()
     TextureMan.SetTextureTev(texturePtr);
 
     renderFlags &= static_cast<unsigned char>(~0x10);
-    renderFlags &= static_cast<unsigned char>(~0x08);
+    renderFlags &= 0xF7;
 }
 
 /*
@@ -431,8 +472,15 @@ void CFont::SetTlut(int index)
  */
 void CFont::SetColor(_GXColor color)
 {
-	m_color = color;
-	GXSetChanMatColor(GX_COLOR0A0, m_color);
+	unsigned char green = color.g;
+	m_color.r = color.r;
+	unsigned char blue = color.b;
+	m_color.g = green;
+	green = color.a;
+	m_color.b = blue;
+	m_color.a = green;
+	_GXColor localColor = m_color;
+	GXSetChanMatColor(GX_COLOR0A0, localColor);
 }
 
 /*
@@ -446,7 +494,8 @@ void CFont::SetColor(_GXColor color)
  */
 void CFont::SetShadow(int enabled)
 {
-	renderFlags = (static_cast<unsigned int>(enabled) << 7) | (renderFlags & 0x7F);
+	signed char shadow = static_cast<signed char>(enabled);
+	GetRenderFlagBits(renderFlags).shadow = shadow;
 }
 
 /*
@@ -517,8 +566,11 @@ void CFont::SetMargin(float value)
  */
 void CFont::SetZMode(int compareEnable, int updateEnable)
 {
-	renderFlags = (static_cast<unsigned char>(compareEnable) << 6 & 0x40) | (renderFlags & 0xBF);
-	renderFlags = (static_cast<unsigned char>(updateEnable) << 5 & 0x20) | (renderFlags & 0xDF);
+	signed char compare = static_cast<signed char>(compareEnable);
+	signed char update = static_cast<signed char>(updateEnable);
+	CFontRenderFlagBits& bits = GetRenderFlagBits(renderFlags);
+	bits.zCompare = compare;
+	bits.zUpdate = update;
 }
 
 /*
@@ -673,16 +725,16 @@ CFont::CFont()
 	posZ = 0.0f;
 	posY = 0.0f;
 	posX = 0.0f;
-	renderFlags &= static_cast<unsigned char>(~0x80);
+	renderFlags &= 0x7F;
 	scaleY = 1.0f;
 	scaleX = 1.0f;
-	renderFlags &= static_cast<unsigned char>(~0x08);
+	renderFlags &= 0xF7;
 	m_color.r = 0xFF;
 	m_color.g = 0xFF;
 	m_color.b = 0xFF;
 	m_color.a = 0xFF;
-	renderFlags &= static_cast<unsigned char>(~0x40);
-	renderFlags &= static_cast<unsigned char>(~0x20);
+	renderFlags &= 0xBF;
+	renderFlags &= 0xDF;
 	m_usesEmbeddedData = 0;
 }
 
@@ -755,20 +807,20 @@ void CFontMan::Init()
 		*reinterpret_cast<void**>(font) = __vt__5CFont;
 		font->m_glyphData = 0;
 		font->texturePtr = 0;
-		font->posX = 0.0f;
-		font->posY = 0.0f;
-		font->posZ = 0.0f;
 		font->margin = 0.0f;
-		font->scaleX = 1.0f;
+		font->posZ = 0.0f;
+		font->posY = 0.0f;
+		font->posX = 0.0f;
+		font->renderFlags &= 0x7F;
 		font->scaleY = 1.0f;
-		font->renderFlags &= static_cast<unsigned char>(~0x80);
-		font->renderFlags &= static_cast<unsigned char>(~0x08);
+		font->scaleX = 1.0f;
+		font->renderFlags &= 0xF7;
 		font->m_color.r = 0xFF;
 		font->m_color.g = 0xFF;
 		font->m_color.b = 0xFF;
 		font->m_color.a = 0xFF;
-		font->renderFlags &= static_cast<unsigned char>(~0x40);
-		font->renderFlags &= static_cast<unsigned char>(~0x20);
+		font->renderFlags &= 0xBF;
+		font->renderFlags &= 0xDF;
 		font->m_usesEmbeddedData = 0;
 	}
 
@@ -786,18 +838,5 @@ void CFontMan::Init()
  * JP Size: TODO
  */
 CFontMan::~CFontMan()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80092f14
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CFontMan::CFontMan()
 {
 }

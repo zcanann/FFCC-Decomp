@@ -29,6 +29,10 @@ struct LensFlareWork {
 
 extern "C" unsigned int __cvt_fp2unsigned(double);
 
+extern const double DOUBLE_80330FF0 = 0.0;
+extern const float FLOAT_80330FF8 = 1.0f;
+extern const double DOUBLE_80331000 = 0.2f;
+
 /*
  * --INFO--
  * PAL Address: 0x800de718
@@ -155,14 +159,14 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		projectedYInt = (int)work->m_projectedY;
 		zAtPixel = 0;
 		u8 flareWidth = unkB->m_arg3;
-		u32 halfWidth = (u32)(flareWidth >> 1);
+		int halfWidth = flareWidth >> 1;
 		u32 z0 = __cvt_fp2unsigned((double)(16777215.0f * work->m_projectedZ));
-		u32 x0 = (u32)(projectedXInt & 0xFFFF);
-		u32 y0 = (u32)(projectedYInt & 0xFFFF);
+		int x0 = (u16)projectedXInt;
+		int y0 = (u16)projectedYInt;
 		s16 stepSize = (s16)((u16)flareWidth / (u16)unkB->m_count);
 
-		for (u32 y = y0 - halfWidth; (int)y <= (int)(y0 + halfWidth); y += stepSize) {
-			for (u32 x = x0 - halfWidth; (int)x <= (int)(x0 + halfWidth); x += stepSize) {
+		for (int y = y0 - halfWidth; y <= (y0 + halfWidth); y += stepSize) {
+			for (int x = x0 - halfWidth; x <= (x0 + halfWidth); x += stepSize) {
 				s16 xShort = (s16)x;
 				s16 yShort = (s16)y;
 
@@ -175,8 +179,8 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 			}
 		}
 
-		u8 alpha = work->m_alpha;
-		int sampleCount = (int)unkB->m_count + 1;
+		int alpha = work->m_alpha;
+		int sampleCount = unkB->m_count + 1;
 		sampleCount *= sampleCount;
 		if (alpha == sampleCount) {
 			work->m_alpha = 0xff;

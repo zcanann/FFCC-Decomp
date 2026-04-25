@@ -10,9 +10,10 @@ extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
 extern "C" void Calc__10CGoOutMenuFv(CGoOutMenu*);
 extern "C" void __dl__FPv(void*);
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* const* GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" const char* lbl_80214FE0[];
+extern "C" const char* g_strGooutMes[];
 
 struct CMenuPcsGoOutLayout
 {
@@ -57,6 +58,20 @@ struct CMenuMcWinState
     signed short m_mode;
 };
 
+struct CGoOutSaveCaravan
+{
+    int m_dataPresent;
+    unsigned char unk4[0x309];
+    char m_odekakeReturnFlag;
+    unsigned char unk30E[0x6B2];
+};
+
+struct CGoOutSaveDatLayout
+{
+    unsigned char unk0[0x1A84];
+    CGoOutSaveCaravan m_caravan[8];
+};
+
 static inline unsigned char ReadGoOutU8(CGoOutMenu& menu, int offset) { return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&menu) + offset); }
 static inline signed short ReadGoOutS16(CGoOutMenu& menu, int offset) { return *reinterpret_cast<signed short*>(reinterpret_cast<unsigned char*>(&menu) + offset); }
 static inline signed char ReadGoOutS8(CGoOutMenu& menu, int offset) { return *reinterpret_cast<signed char*>(reinterpret_cast<unsigned char*>(&menu) + offset); }
@@ -87,7 +102,7 @@ static unsigned short GetGoOutInputMask()
 
 static inline const char* GetGoOutMessageLine(int languageId, int line)
 {
-    return lbl_80214FE0[(languageId * 0x6E) + line];
+    return g_strGooutMes[(languageId * 0x6E) + line];
 }
 
 static const char sSlotAErrorText1[] = "The Memory Card in Slot A contains";
@@ -152,7 +167,8 @@ static const char sReturnConfirmLine3[] = "current game's";
 static const char sReturnConfirmLine4[] = "guest data will be deleted.";
 static const char sYesNoLine[] = "  Yes   No";
 static const char sSavingLine1[] = "Saving data to the Memory";
-static const char sSavingLine2[] = "Card in Slot B. Please do";
+static const char sSavingSlotALine2[] = "Card in Slot A. Please do";
+static const char sSavingSlotBLine2[] = "Card in Slot B. Please do";
 static const char sSavingLine3[] = "not touch the Memory Card";
 static const char sSavingLine4[] = "or the POWER Button.";
 static const char sCardRemovedLine1[] = "A Memory Card has been removed.";
@@ -184,6 +200,34 @@ static const char sRestorePromptLine2[] = "to the state it was in before transfe
 static const char sRestorePromptLine3[] = "It will also prevent the transferred data";
 static const char sRestorePromptLine4[] = "from returning to this save location.";
 static const char sRestoredLine1[] = "The character has been restored.";
+static const char s_gooutCpp[] = "goout.cpp";
+
+static void InitGoOutWinMessage(int message, short startIndex)
+{
+    short* winMessage = reinterpret_cast<short*>(GetWinMess__8CMenuPcsFi(&MenuPcs, message));
+
+    winMessage[0] = 0;
+    winMessage[1] = 0;
+    for (int i = 0; i < 8; i++) {
+        winMessage[i + 2] = startIndex + i;
+    }
+}
+
+static inline CGoOutSaveDatLayout& GoOutSaveDat(Mc::SaveDat* saveData)
+{
+    return *reinterpret_cast<CGoOutSaveDatLayout*>(saveData);
+}
+
+static int FindFreeCaravanIdx(Mc::SaveDat* saveData)
+{
+    for (int i = 0; i < 8; i++) {
+        if (GoOutSaveDat(saveData).m_caravan[i].m_dataPresent == 0) {
+            return i;
+        }
+    }
+
+    return -1;
+}
 
 /*
  * --INFO--
@@ -246,12 +290,16 @@ void DrawGoOutMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void getFreeCaravanIdx(Mc::SaveDat*)
+int getFreeCaravanIdx(Mc::SaveDat* saveData)
 {
-	// TODO
+    return FindFreeCaravanIdx(saveData);
 }
 
 
@@ -461,9 +509,20 @@ int CGoOutMenu::SetMemCardError()
  * Address:	TODO
  * Size:	TODO
  */
-void CGoOutMenu::SetMenu(short, long)
+void CGoOutMenu::SetMenu(short message, long timer)
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (field_0x36 >= 0) {
+        MenuMcWinState(menuPcsLayout).m_mode = 2;
+        MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+    }
+
+    field_0x44 = 1;
+    field_0x45 = 0;
+    field_0x34 = message;
+    field_0x48 = 0;
+    field_0x3c = static_cast<int>(timer);
 }
 
 /*
@@ -514,7 +573,35 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
  */
 void CGoOutMenu::CalcMenu()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+        field_0x44 = 1;
+        field_0x45 = 1;
+    }
+
+    if (field_0x44 != 0 && MenuMcWinState(menuPcsLayout).m_mode == 3) {
+        short x;
+        short y;
+
+        field_0x36 = field_0x34;
+        if (field_0x34 != -1) {
+            MenuPcs.GetWinSize(static_cast<unsigned short>(field_0x36), &x, &y,
+                               (field_0x36 >= 0x1E) ? 2 : 0);
+            MenuPcs.SetMcWinInfo(x, y);
+            MenuMcWinState(menuPcsLayout).m_mode = 0;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+            field_0x40 = field_0x3c;
+            field_0x44 = 0;
+        }
+    }
+
+    if (field_0x40 != 0) {
+        field_0x40--;
+        if (field_0x40 == 0) {
+            SetMenuForceClose();
+        }
+    }
 }
 
 /*
@@ -524,7 +611,15 @@ void CGoOutMenu::CalcMenu()
  */
 void CGoOutMenu::DrawMenu()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (ReadGoOutS16(*this, 0x36) != -1) {
+        MenuPcs.DrawMcWin(-1, 0);
+        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+            const int message = static_cast<int>(ReadGoOutS16(*this, 0x36));
+            MenuPcs.DrawMcWinMess(message, (message >= 0x1E) ? 2 : 0);
+        }
+    }
 }
 
 /*
@@ -534,7 +629,17 @@ void CGoOutMenu::DrawMenu()
  */
 void CGoOutMenu::SetMenuForceClose()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (field_0x36 >= 0) {
+        MenuMcWinState(menuPcsLayout).m_mode = 2;
+        MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+    }
+
+    field_0x45 = 0;
+    field_0x34 = -1;
+    field_0x48 = 0;
+    field_0x3c = 0;
 }
 
 /*
@@ -544,7 +649,7 @@ void CGoOutMenu::SetMenuForceClose()
  */
 void CGoOutMenu::CalcLoadMenu()
 {
-	// TODO
+    CalcMenu();
 }
 
 /*
@@ -686,7 +791,13 @@ void CGoOutMenu::HitCanncel()
  */
 void CGoOutMenu::Init()
 {
-	// TODO
+    memset(this, 0, sizeof(*this));
+    field_0x4 = -1;
+    field_0x19 = -1;
+    field_0x34 = -1;
+    field_0x36 = -1;
+    field_0x38 = 0;
+    field_0x44 = 1;
 }
 
 /*
@@ -696,7 +807,25 @@ void CGoOutMenu::Init()
  */
 void CGoOutMenu::Destroy()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (menuPcsLayout.m_transferSaveData != 0) {
+        __dl__FPv(menuPcsLayout.m_transferSaveData);
+        menuPcsLayout.m_transferSaveData = 0;
+    }
+    if (menuPcsLayout.m_transferWork != 0) {
+        __dl__FPv(menuPcsLayout.m_transferWork);
+        menuPcsLayout.m_transferWork = 0;
+    }
+
+    menuPcsLayout.m_transferWorkActive = 0;
+    menuPcsLayout.m_unknown_888 = 0;
+    menuPcsLayout.m_saveLoadMode = 0;
+    menuPcsLayout.m_unknown_88A = 0;
+
+    if (field_0x2c == 2) {
+        MemoryCardMan.McEnd();
+    }
 }
 
 /*
@@ -874,6 +1003,39 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         field_0x3c = 0;
         field_0x46 = 1;
         break;
+    case 0x12: {
+        field_0x1c = 0;
+        Mc::SaveDat* const transferWork = static_cast<Mc::SaveDat*>(menuPcsLayout.m_transferWork);
+        Mc::SaveDat* const transferSaveData = menuPcsLayout.m_transferSaveData;
+        int freeCaravanIdx;
+
+        if (GoOutSaveDat(transferWork).m_caravan[field_0x20].m_odekakeReturnFlag == 0) {
+            freeCaravanIdx = FindFreeCaravanIdx(transferSaveData);
+            MemoryCardMan.Odekake(1, *transferWork, field_0x20, *transferSaveData, freeCaravanIdx);
+        } else {
+            freeCaravanIdx = MenuPcs.GetSameCharaData(transferSaveData, transferWork, field_0x20, 0);
+            MemoryCardMan.Odekake(0, *transferWork, field_0x20, *transferSaveData, freeCaravanIdx);
+        }
+
+        mcCtrl.m_cardChannel = field_0xc;
+        field_0x2 = static_cast<char>(mcCtrl.m_cardChannel);
+        field_0x3 = static_cast<char>(field_0x10);
+        field_0x8 = reinterpret_cast<int>(transferSaveData);
+        field_0x4 = mcCtrl.ChkConnect(static_cast<unsigned char>(field_0x2));
+        if (field_0x4 == 1) {
+            mcCtrl.m_saveIndex = static_cast<unsigned char>(field_0x3);
+            mcCtrl.m_cardChannel = static_cast<unsigned char>(field_0x2);
+            mcCtrl.m_previousState = 0;
+            mcCtrl.m_state = 0;
+            mcCtrl.m_lastResult = 0;
+            mcCtrl.m_iteration = 0;
+            mcCtrl.m_userBuffer = 0;
+            mcCtrl.m_createFlag = 0;
+            field_0x1 = 2;
+        }
+        SetMenuStr(0, 4, sSavingLine1, sSavingSlotALine2, sSavingLine3, sSavingLine4);
+        break;
+    }
     case 0x13:
         mcCtrl.m_cardChannel = static_cast<unsigned char>(field_0x1a);
         field_0x2 = field_0x1a;
@@ -891,7 +1053,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             mcCtrl.m_createFlag = 0;
             field_0x1 = 2;
         }
-        SetMenuStr(0, 4, sSavingLine1, sSavingLine2, sSavingLine3, sSavingLine4);
+        SetMenuStr(0, 4, sSavingLine1, sSavingSlotBLine2, sSavingLine3, sSavingLine4);
         break;
     case 0x14:
         if (field_0x36 >= 0) {
@@ -1125,7 +1287,22 @@ void CGoOutMenu::CalcGoOut()
  */
 void CGoOutMenu::DrawGoOut()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (ReadGoOutU8(*this, 0x29) != 0) {
+        MenuPcs.DrawInit();
+        MenuPcs.DrawCMakeMenu();
+    }
+
+    if (ReadGoOutS8(*this, 0x24) > 0xD && ReadGoOutS8(*this, 0x24) < 0xF) {
+        MenuPcs.DrawLoadMenu();
+    }
+
+    if (ReadGoOutS8(*this, 0x24) == 1 && MenuGoOutState(menuPcsLayout).m_resultSelect != 0) {
+        MenuGoOutState(menuPcsLayout).m_closeMode = 8;
+        SetMainMode(1);
+        MenuGoOutState(menuPcsLayout).m_resultSelect = 0;
+    }
 }
 
 /*
@@ -1465,7 +1642,15 @@ void CGoOutMenu::CalcDel()
  */
 void CGoOutMenu::DrawDel()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    MenuPcs.DrawInit();
+    MenuPcs.DrawCMakeMenu();
+    if (ReadGoOutS16(*this, 0x36) == 1 && MenuGoOutState(menuPcsLayout).m_resultSelect != 0) {
+        MenuGoOutState(menuPcsLayout).m_closeMode = 8;
+        SetMainMode(1);
+        MenuGoOutState(menuPcsLayout).m_resultSelect = 0;
+    }
 }
 
 /*
@@ -1492,6 +1677,17 @@ void CGoOutMenu::Calc()
         field_0x34 = -1;
         field_0x38 = 0;
         SetMainMode(1);
+        menuPcsLayout.m_transferSaveData = static_cast<Mc::SaveDat*>(
+            __nw__FUlPQ27CMemory6CStagePci(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32B));
+        menuPcsLayout.m_transferWork =
+            __nw__FUlPQ27CMemory6CStagePci(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32D);
+        menuPcsLayout.m_transferWorkActive = 0;
+        menuPcsLayout.m_unknown_888 = 0;
+        menuPcsLayout.m_saveLoadMode = 0;
+        menuPcsLayout.m_unknown_88A = 0;
+        InitGoOutWinMessage(0x22, 0);
+        InitGoOutWinMessage(0x23, 10);
+        MenuMcWinState(menuPcsLayout).m_mode = 3;
         field_0x44 = 1;
     }
 
@@ -1569,6 +1765,20 @@ void CGoOutMenu::Calc()
             field_0x44 = 0;
         }
     }
+
+    if (field_0x40 != 0) {
+        field_0x40--;
+        if (field_0x40 == 0) {
+            if (field_0x36 >= 0) {
+                MenuMcWinState(menuPcsLayout).m_mode = 2;
+                MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+            }
+            field_0x45 = 0;
+            field_0x34 = -1;
+            field_0x48 = 0;
+            field_0x3c = 0;
+        }
+    }
 }
 
 /*
@@ -1593,7 +1803,21 @@ void CalcGoOutMenu()
  */
 void CGoOutMenu::DrawSelectYesNo()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    if (MenuMcWinState(menuPcsLayout).m_mode == 1 && ReadGoOutU8(*this, 0x47) != 0) {
+        const int cursorY = MenuMcWinState(menuPcsLayout).m_y + MenuMcWinState(menuPcsLayout).m_height - 0x3E;
+
+        if (ReadGoOutU8(*this, 0x49) == 0) {
+            const int cursorX = GetYesNoXPos__8CMenuPcsFi(&MenuPcs, ReadGoOutU8(*this, 0x46));
+            MenuPcs.DrawCursor(cursorX, cursorY, 1.0f);
+        } else {
+            const int cursorX = MenuMcWinState(menuPcsLayout).m_x + 0x20;
+            const int localY =
+                ReadGoOutS16(*this, 0x4A) + ReadGoOutU8(*this, 0x46) * 0x1E;
+            MenuPcs.DrawCursor(cursorX, localY, 1.0f);
+        }
+    }
 }
 
 /*
@@ -1603,7 +1827,14 @@ void CGoOutMenu::DrawSelectYesNo()
  */
 void CGoOutMenu::Draw()
 {
-	// TODO
+    if (ReadGoOutU8(*this, 0x44) == 3) {
+        DrawDel();
+    } else if (ReadGoOutU8(*this, 0x44) == 2) {
+        DrawGoOut();
+    }
+
+    DrawMenu();
+    DrawSelectYesNo();
 }
 
 /*
@@ -1613,7 +1844,17 @@ void CGoOutMenu::Draw()
  */
 void CGoOutMenu::InitMemCardProc()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+    McCtrl& mcCtrl = menuPcsLayout.m_mcCtrl;
+
+    mcCtrl.m_saveIndex = static_cast<unsigned char>(field_0x3);
+    mcCtrl.m_cardChannel = static_cast<unsigned char>(field_0x2);
+    mcCtrl.m_previousState = 0;
+    mcCtrl.m_state = 0;
+    mcCtrl.m_lastResult = 0;
+    mcCtrl.m_iteration = 0;
+    mcCtrl.m_userBuffer = reinterpret_cast<void*>(field_0x8);
+    mcCtrl.m_createFlag = 0;
 }
 
 /*
@@ -1623,5 +1864,7 @@ void CGoOutMenu::InitMemCardProc()
  */
 void CGoOutMenu::EndMemCardProc()
 {
-	// TODO
+    field_0x1 = 0;
+    field_0x4 = -1;
+    MemoryCardMan.McEnd();
 }

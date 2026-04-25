@@ -142,271 +142,245 @@ void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
  */
 void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 {
-	int start = startGroup;
+	temp.m_visited[startGroup] = 1;
 
-	temp.m_visited[start] = 1;
-
-	if (start == goalGroup)
+	if (startGroup == goalGroup)
 	{
 		if (temp.m_cost < m_bestPath.m_cost)
 		{
-			unsigned int* dstV = reinterpret_cast<unsigned int*>(m_bestPath.m_visited);
-			unsigned int* srcV = reinterpret_cast<unsigned int*>(temp.m_visited);
-			unsigned int* dstP = reinterpret_cast<unsigned int*>(m_bestPath.m_path);
-			unsigned int* srcP = reinterpret_cast<unsigned int*>(temp.m_path);
+			unsigned int* dstVisited = reinterpret_cast<unsigned int*>(m_bestPath.m_visited);
+			unsigned int* srcVisited = reinterpret_cast<unsigned int*>(temp.m_visited);
+			unsigned int* dstPath = reinterpret_cast<unsigned int*>(m_bestPath.m_path);
+			unsigned int* srcPath = reinterpret_cast<unsigned int*>(temp.m_path);
 
-			dstV[0]  = srcV[0];
-			dstV[1]  = srcV[1];
-			dstV[2]  = srcV[2];
-			dstV[3]  = srcV[3];
-			dstV[4]  = srcV[4];
-			dstV[5]  = srcV[5];
-			dstV[6]  = srcV[6];
-			dstV[7]  = srcV[7];
-			dstV[8]  = srcV[8];
-			dstV[9]  = srcV[9];
-			dstV[10] = srcV[10];
-			dstV[11] = srcV[11];
-			dstV[12] = srcV[12];
-			dstV[13] = srcV[13];
-			dstV[14] = srcV[14];
-			dstV[15] = srcV[15];
+			dstVisited[0] = srcVisited[0];
+			dstVisited[1] = srcVisited[1];
+			dstVisited[2] = srcVisited[2];
+			dstVisited[3] = srcVisited[3];
+			dstVisited[4] = srcVisited[4];
+			dstVisited[5] = srcVisited[5];
+			dstVisited[6] = srcVisited[6];
+			dstVisited[7] = srcVisited[7];
+			dstVisited[8] = srcVisited[8];
+			dstVisited[9] = srcVisited[9];
+			dstVisited[10] = srcVisited[10];
+			dstVisited[11] = srcVisited[11];
+			dstVisited[12] = srcVisited[12];
+			dstVisited[13] = srcVisited[13];
+			dstVisited[14] = srcVisited[14];
+			dstVisited[15] = srcVisited[15];
 
-			dstP[0]  = srcP[0];
-			dstP[1]  = srcP[1];
-			dstP[2]  = srcP[2];
-			dstP[3]  = srcP[3];
-			dstP[4]  = srcP[4];
-			dstP[5]  = srcP[5];
-			dstP[6]  = srcP[6];
-			dstP[7]  = srcP[7];
-			dstP[8]  = srcP[8];
-			dstP[9]  = srcP[9];
-			dstP[10] = srcP[10];
-			dstP[11] = srcP[11];
-			dstP[12] = srcP[12];
-			dstP[13] = srcP[13];
-			dstP[14] = srcP[14];
-			dstP[15] = srcP[15];
-
+			dstPath[0] = srcPath[0];
+			dstPath[1] = srcPath[1];
+			dstPath[2] = srcPath[2];
+			dstPath[3] = srcPath[3];
+			dstPath[4] = srcPath[4];
+			dstPath[5] = srcPath[5];
+			dstPath[6] = srcPath[6];
+			dstPath[7] = srcPath[7];
+			dstPath[8] = srcPath[8];
+			dstPath[9] = srcPath[9];
+			dstPath[10] = srcPath[10];
+			dstPath[11] = srcPath[11];
+			dstPath[12] = srcPath[12];
+			dstPath[13] = srcPath[13];
+			dstPath[14] = srcPath[14];
+			dstPath[15] = srcPath[15];
 			m_bestPath.m_pathLength = temp.m_pathLength;
-			m_bestPath.m_cost	   = temp.m_cost;
+			m_bestPath.m_cost = temp.m_cost;
 		}
 
 		return;
 	}
 
 	int idx0 = 0;
-	CAPos* pos0 = &m_portals[0];
-
-	while (idx0 < 64)
+	CAPos* pos0 = m_portals;
+	do
 	{
-		unsigned char groupA0 = pos0->m_groupA;
-		unsigned char groupB0 = pos0->m_groupB;
-		bool		  connected0 = false;
+		unsigned char other0 = pos0->m_groupA;
+		bool connected0 = false;
 
-		if (groupA0 == start || groupB0 == start)
+		if (other0 == startGroup)
+		{
+			connected0 = true;
+		}
+		else if (pos0->m_groupB == startGroup)
 		{
 			connected0 = true;
 		}
 
 		if (connected0)
 		{
-			unsigned char other0 = groupA0;
-
-			if (groupA0 == start)
+			if (other0 == startGroup)
 			{
-				other0 = groupB0;
+				other0 = pos0->m_groupB;
 			}
 
 			if (temp.m_visited[other0] == 0)
 			{
-				unsigned int v1[16];
-				unsigned int p1[16];
-				int		  pathLen1;
-				float		cost1;
+				unsigned int visited1[16];
+				unsigned int path1[16];
+				int pathLen1 = temp.m_pathLength;
+				float cost1 = temp.m_cost;
+				unsigned char* visited1Bytes = reinterpret_cast<unsigned char*>(visited1);
+				unsigned char* path1Bytes = reinterpret_cast<unsigned char*>(path1);
 
-				{
-					unsigned int* srcV = reinterpret_cast<unsigned int*>(temp.m_visited);
-					v1[0]  = srcV[0];  v1[1]  = srcV[1];
-					v1[2]  = srcV[2];  v1[3]  = srcV[3];
-					v1[4]  = srcV[4];  v1[5]  = srcV[5];
-					v1[6]  = srcV[6];  v1[7]  = srcV[7];
-					v1[8]  = srcV[8];  v1[9]  = srcV[9];
-					v1[10] = srcV[10]; v1[11] = srcV[11];
-					v1[12] = srcV[12]; v1[13] = srcV[13];
-					v1[14] = srcV[14]; v1[15] = srcV[15];
-				}
+				visited1[0] = reinterpret_cast<unsigned int*>(temp.m_visited)[0];
+				visited1[1] = reinterpret_cast<unsigned int*>(temp.m_visited)[1];
+				visited1[2] = reinterpret_cast<unsigned int*>(temp.m_visited)[2];
+				visited1[3] = reinterpret_cast<unsigned int*>(temp.m_visited)[3];
+				visited1[4] = reinterpret_cast<unsigned int*>(temp.m_visited)[4];
+				visited1[5] = reinterpret_cast<unsigned int*>(temp.m_visited)[5];
+				visited1[6] = reinterpret_cast<unsigned int*>(temp.m_visited)[6];
+				visited1[7] = reinterpret_cast<unsigned int*>(temp.m_visited)[7];
+				visited1[8] = reinterpret_cast<unsigned int*>(temp.m_visited)[8];
+				visited1[9] = reinterpret_cast<unsigned int*>(temp.m_visited)[9];
+				visited1[10] = reinterpret_cast<unsigned int*>(temp.m_visited)[10];
+				visited1[11] = reinterpret_cast<unsigned int*>(temp.m_visited)[11];
+				visited1[12] = reinterpret_cast<unsigned int*>(temp.m_visited)[12];
+				visited1[13] = reinterpret_cast<unsigned int*>(temp.m_visited)[13];
+				visited1[14] = reinterpret_cast<unsigned int*>(temp.m_visited)[14];
+				visited1[15] = reinterpret_cast<unsigned int*>(temp.m_visited)[15];
 
-				{
-					unsigned int* srcP = reinterpret_cast<unsigned int*>(temp.m_path);
-					p1[0]  = srcP[0];  p1[1]  = srcP[1];
-					p1[2]  = srcP[2];  p1[3]  = srcP[3];
-					p1[4]  = srcP[4];  p1[5]  = srcP[5];
-					p1[6]  = srcP[6];  p1[7]  = srcP[7];
-					p1[8]  = srcP[8];  p1[9]  = srcP[9];
-					p1[10] = srcP[10]; p1[11] = srcP[11];
-					p1[12] = srcP[12]; p1[13] = srcP[13];
-					p1[14] = srcP[14]; p1[15] = srcP[15];
-				}
+				path1[0] = reinterpret_cast<unsigned int*>(temp.m_path)[0];
+				path1[1] = reinterpret_cast<unsigned int*>(temp.m_path)[1];
+				path1[2] = reinterpret_cast<unsigned int*>(temp.m_path)[2];
+				path1[3] = reinterpret_cast<unsigned int*>(temp.m_path)[3];
+				path1[4] = reinterpret_cast<unsigned int*>(temp.m_path)[4];
+				path1[5] = reinterpret_cast<unsigned int*>(temp.m_path)[5];
+				path1[6] = reinterpret_cast<unsigned int*>(temp.m_path)[6];
+				path1[7] = reinterpret_cast<unsigned int*>(temp.m_path)[7];
+				path1[8] = reinterpret_cast<unsigned int*>(temp.m_path)[8];
+				path1[9] = reinterpret_cast<unsigned int*>(temp.m_path)[9];
+				path1[10] = reinterpret_cast<unsigned int*>(temp.m_path)[10];
+				path1[11] = reinterpret_cast<unsigned int*>(temp.m_path)[11];
+				path1[12] = reinterpret_cast<unsigned int*>(temp.m_path)[12];
+				path1[13] = reinterpret_cast<unsigned int*>(temp.m_path)[13];
+				path1[14] = reinterpret_cast<unsigned int*>(temp.m_path)[14];
+				path1[15] = reinterpret_cast<unsigned int*>(temp.m_path)[15];
 
-				pathLen1 = temp.m_pathLength;
-				cost1	= temp.m_cost;
-				cost1   += PSVECDistance(&pos0->m_position,
-										 &m_portals[other0].m_position);
-
-				reinterpret_cast<unsigned char*>(p1)[pathLen1] =
-					static_cast<unsigned char>(idx0);
+				cost1 += PSVECDistance(&pos0->m_position, &m_portals[other0].m_position);
+				path1Bytes[pathLen1] = static_cast<unsigned char>(idx0);
 				++pathLen1;
-				reinterpret_cast<unsigned char*>(v1)[other0] = 1;
+				visited1Bytes[other0] = 1;
 
 				if (other0 == static_cast<unsigned char>(goalGroup))
 				{
 					if (cost1 < m_bestPath.m_cost)
 					{
-						unsigned int* dstVBest =
-							reinterpret_cast<unsigned int*>(m_bestPath.m_visited);
-						unsigned int* dstPBest =
-							reinterpret_cast<unsigned int*>(m_bestPath.m_path);
+						unsigned int* dstVisited = reinterpret_cast<unsigned int*>(m_bestPath.m_visited);
+						unsigned int* dstPath = reinterpret_cast<unsigned int*>(m_bestPath.m_path);
 
-						dstVBest[0]  = v1[0];
-						dstVBest[1]  = v1[1];
-						dstVBest[2]  = v1[2];
-						dstVBest[3]  = v1[3];
-						dstVBest[4]  = v1[4];
-						dstVBest[5]  = v1[5];
-						dstVBest[6]  = v1[6];
-						dstVBest[7]  = v1[7];
-						dstVBest[8]  = v1[8];
-						dstVBest[9]  = v1[9];
-						dstVBest[10] = v1[10];
-						dstVBest[11] = v1[11];
-						dstVBest[12] = v1[12];
-						dstVBest[13] = v1[13];
-						dstVBest[14] = v1[14];
-						dstVBest[15] = v1[15];
+						dstVisited[0] = visited1[0];
+						dstVisited[1] = visited1[1];
+						dstVisited[2] = visited1[2];
+						dstVisited[3] = visited1[3];
+						dstVisited[4] = visited1[4];
+						dstVisited[5] = visited1[5];
+						dstVisited[6] = visited1[6];
+						dstVisited[7] = visited1[7];
+						dstVisited[8] = visited1[8];
+						dstVisited[9] = visited1[9];
+						dstVisited[10] = visited1[10];
+						dstVisited[11] = visited1[11];
+						dstVisited[12] = visited1[12];
+						dstVisited[13] = visited1[13];
+						dstVisited[14] = visited1[14];
+						dstVisited[15] = visited1[15];
 
-						dstPBest[0]  = p1[0];
-						dstPBest[1]  = p1[1];
-						dstPBest[2]  = p1[2];
-						dstPBest[3]  = p1[3];
-						dstPBest[4]  = p1[4];
-						dstPBest[5]  = p1[5];
-						dstPBest[6]  = p1[6];
-						dstPBest[7]  = p1[7];
-						dstPBest[8]  = p1[8];
-						dstPBest[9]  = p1[9];
-						dstPBest[10] = p1[10];
-						dstPBest[11] = p1[11];
-						dstPBest[12] = p1[12];
-						dstPBest[13] = p1[13];
-						dstPBest[14] = p1[14];
-						dstPBest[15] = p1[15];
-
+						dstPath[0] = path1[0];
+						dstPath[1] = path1[1];
+						dstPath[2] = path1[2];
+						dstPath[3] = path1[3];
+						dstPath[4] = path1[4];
+						dstPath[5] = path1[5];
+						dstPath[6] = path1[6];
+						dstPath[7] = path1[7];
+						dstPath[8] = path1[8];
+						dstPath[9] = path1[9];
+						dstPath[10] = path1[10];
+						dstPath[11] = path1[11];
+						dstPath[12] = path1[12];
+						dstPath[13] = path1[13];
+						dstPath[14] = path1[14];
+						dstPath[15] = path1[15];
 						m_bestPath.m_pathLength = pathLen1;
-						m_bestPath.m_cost	   = cost1;
+						m_bestPath.m_cost = cost1;
 					}
 				}
 				else
 				{
-					unsigned char* visited1 =
-						reinterpret_cast<unsigned char*>(v1);
-					unsigned char* path1 =
-						reinterpret_cast<unsigned char*>(p1);
-					unsigned char other0U8 = other0;
-					int		   idx1	 = 0;
+					int idx1 = 0;
+					CAPos* pos1 = m_portals;
 
-					CAPos* pos1 = &m_portals[0];
-
-					while (idx1 < 64)
+					do
 					{
-						unsigned char gA1 = pos1->m_groupA;
-						unsigned char gB1 = pos1->m_groupB;
-						bool		  connected1 = false;
+						unsigned char other1 = pos1->m_groupA;
+						bool connected1 = false;
 
-						if (gA1 == other0U8 || gB1 == other0U8)
+						if (other1 == other0)
+						{
+							connected1 = true;
+						}
+						else if (pos1->m_groupB == other0)
 						{
 							connected1 = true;
 						}
 
 						if (connected1)
 						{
-							unsigned char other1 = gA1;
-
-							if (gA1 == other0U8)
+							if (other1 == other0)
 							{
-								other1 = gB1;
+								other1 = pos1->m_groupB;
 							}
 
-							if (visited1[other1] == 0)
+							if (visited1Bytes[other1] == 0)
 							{
-								unsigned int v2[16];
-								unsigned int p2[16];
-
-								p2[0]  = p1[0];
-								p2[1]  = p1[1];
-								p2[2]  = p1[2];
-								p2[3]  = p1[3];
-								p2[4]  = p1[4];
-								p2[5]  = p1[5];
-								p2[6]  = p1[6];
-								p2[7]  = p1[7];
-								p2[8]  = p1[8];
-								p2[9]  = p1[9];
-								p2[10] = p1[10];
-								p2[11] = p1[11];
-								p2[12] = p1[12];
-								p2[13] = p1[13];
-								p2[14] = p1[14];
-								p2[15] = p1[15];
-
-								v2[0]  = v1[0];
-								v2[1]  = v1[1];
-								v2[2]  = v1[2];
-								v2[3]  = v1[3];
-								v2[4]  = v1[4];
-								v2[5]  = v1[5];
-								v2[6]  = v1[6];
-								v2[7]  = v1[7];
-								v2[8]  = v1[8];
-								v2[9]  = v1[9];
-								v2[10] = v1[10];
-								v2[11] = v1[11];
-								v2[12] = v1[12];
-								v2[13] = v1[13];
-								v2[14] = v1[14];
-								v2[15] = v1[15];
-
-								int   pathLen2 = pathLen1;
-								float cost2	= cost1;
-
-								cost2 += PSVECDistance(
-									&pos1->m_position,
-									&m_portals[other1].m_position);
-
-								unsigned char* visited2 =
-									reinterpret_cast<unsigned char*>(v2);
-								unsigned char* path2 =
-									reinterpret_cast<unsigned char*>(p2);
-
-								visited2[other1] = 1;
-								path2[pathLen2]  =
-									static_cast<unsigned char>(idx1);
-								++pathLen2;
-
 								CATemp level2;
+								unsigned int* level2Visited = reinterpret_cast<unsigned int*>(level2.m_visited);
+								unsigned int* level2Path = reinterpret_cast<unsigned int*>(level2.m_path);
 
-								for (int w = 0; w < 64; ++w)
-								{
-									level2.m_visited[w] = visited2[w];
-									level2.m_path[w]	= path2[w];
-								}
+								level2Visited[0] = visited1[0];
+								level2Visited[1] = visited1[1];
+								level2Visited[2] = visited1[2];
+								level2Visited[3] = visited1[3];
+								level2Visited[4] = visited1[4];
+								level2Visited[5] = visited1[5];
+								level2Visited[6] = visited1[6];
+								level2Visited[7] = visited1[7];
+								level2Visited[8] = visited1[8];
+								level2Visited[9] = visited1[9];
+								level2Visited[10] = visited1[10];
+								level2Visited[11] = visited1[11];
+								level2Visited[12] = visited1[12];
+								level2Visited[13] = visited1[13];
+								level2Visited[14] = visited1[14];
+								level2Visited[15] = visited1[15];
 
-								level2.m_pathLength = pathLen2;
-								level2.m_cost	   = cost2;
+								level2Path[0] = path1[0];
+								level2Path[1] = path1[1];
+								level2Path[2] = path1[2];
+								level2Path[3] = path1[3];
+								level2Path[4] = path1[4];
+								level2Path[5] = path1[5];
+								level2Path[6] = path1[6];
+								level2Path[7] = path1[7];
+								level2Path[8] = path1[8];
+								level2Path[9] = path1[9];
+								level2Path[10] = path1[10];
+								level2Path[11] = path1[11];
+								level2Path[12] = path1[12];
+								level2Path[13] = path1[13];
+								level2Path[14] = path1[14];
+								level2Path[15] = path1[15];
+								level2.m_pathLength = pathLen1;
+								level2.m_cost = cost1;
+								level2.m_cost += PSVECDistance(&pos1->m_position, &m_portals[other1].m_position);
+								level2.m_path[level2.m_pathLength] = static_cast<unsigned char>(idx1);
+								++level2.m_pathLength;
+								level2.m_visited[other1] = 1;
 
-								if (other1 ==
-									static_cast<unsigned char>(goalGroup))
+								if (other1 == static_cast<unsigned char>(goalGroup))
 								{
 									if (level2.m_cost < m_bestPath.m_cost)
 									{
@@ -417,27 +391,21 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 								{
 									for (int idx2 = 0; idx2 < 64; ++idx2)
 									{
-										CAPos& edge = m_portals[idx2];
+										CAPos* edge = &m_portals[idx2];
 
-										if (!edge.IsExist(
-												static_cast<int>(other1)))
-											continue;
+										if (edge->IsExist(other1) != 0)
+										{
+											int nextGroup = edge->GetOthers(other1);
 
-										int nextGroup =
-											edge.GetOthers(
-												static_cast<int>(other1));
-
-										if (level2.m_visited[nextGroup] != 0)
-											continue;
-
-										CATemp deeper(level2);
-										deeper.m_cost += edge.CalcLength(
-											m_portals[nextGroup]);
-										deeper.m_path[deeper.m_pathLength] =
-											static_cast<unsigned char>(idx2);
-										++deeper.m_pathLength;
-
-										check(nextGroup, goalGroup, deeper);
+											if (level2.m_visited[nextGroup] == 0)
+											{
+												CATemp deeper(level2);
+												deeper.m_cost += edge->CalcLength(m_portals[nextGroup]);
+												deeper.m_path[deeper.m_pathLength] = static_cast<unsigned char>(idx2);
+												++deeper.m_pathLength;
+												check(nextGroup, goalGroup, deeper);
+											}
+										}
 									}
 								}
 							}
@@ -445,14 +413,14 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 
 						++idx1;
 						++pos1;
-					}
+					} while (idx1 < 64);
 				}
 			}
 		}
 
-		idx0++;
-		pos0++;
-	}
+		++idx0;
+		++pos0;
+	} while (idx0 < 64);
 }
 
 /*
@@ -497,22 +465,22 @@ void CAStar::calcAStar()
 
 				for (int i = 0; i < m_bestPath.m_pathLength; ++i)
 				{
-					unsigned char portalIndex = m_bestPath.m_path[i];
+					int portalIndex = m_bestPath.m_path[i];
 
 					m_routeTable[current][to][1] = portalIndex;
 
-					unsigned int next = m_portals[portalIndex].m_groupA;
+					int next = m_portals[portalIndex].m_groupA;
 
-					if (next == static_cast<unsigned int>(current))
+					if (next == current)
 					{
 						next = m_portals[portalIndex].m_groupB;
 					}
 
 					m_routeTable[current][to][0] = static_cast<unsigned char>(next);
 
-					System.Printf(const_cast<char*>(kAStarStepDebugFormat), static_cast<int>(next));
+					current = static_cast<unsigned char>(next);
 
-					current = static_cast<int>(next);
+					System.Printf(const_cast<char*>(kAStarStepDebugFormat), current);
 				}
 
 				System.Printf(const_cast<char*>(kAStarNewLine));
@@ -918,12 +886,12 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
 	CMapCylinderRaw cyl;
 
-	cyl.m_top.x = kPolyGroupAabbMax;
-	cyl.m_top.y = kPolyGroupAabbMax;
 	cyl.m_top.z = kPolyGroupAabbMax;
-	cyl.m_direction2.x = kPolyGroupAabbMin;
-	cyl.m_direction2.y = kPolyGroupAabbMin;
+	cyl.m_top.y = kPolyGroupAabbMax;
+	cyl.m_top.x = kPolyGroupAabbMax;
 	cyl.m_direction2.z = kPolyGroupAabbMin;
+	cyl.m_direction2.y = kPolyGroupAabbMin;
+	cyl.m_direction2.x = kPolyGroupAabbMin;
 	cyl.m_bottom.x = top.x;
 	cyl.m_bottom.y = top.y;
 	cyl.m_bottom.z = top.z;
@@ -952,18 +920,18 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
  */
 unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
-	if ((AStar.m_flags & 1) != 0)
+	if ((m_flags & 1) != 0)
 	{
 		CVector base(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
 		CMapCylinderRaw cyl;
 
-		cyl.m_top.x = kPolyGroupAabbMax;
-		cyl.m_top.y = kPolyGroupAabbMax;
 		cyl.m_top.z = kPolyGroupAabbMax;
-		cyl.m_direction2.x = kPolyGroupAabbMin;
-		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_top.y = kPolyGroupAabbMax;
+		cyl.m_top.x = kPolyGroupAabbMax;
 		cyl.m_direction2.z = kPolyGroupAabbMin;
+		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_direction2.x = kPolyGroupAabbMin;
 		cyl.m_bottom.x = top.x;
 		cyl.m_bottom.y = top.y;
 		cyl.m_bottom.z = top.z;
@@ -984,12 +952,12 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
 		CMapCylinderRaw cyl;
 
-		cyl.m_top.x = kPolyGroupAabbMax;
-		cyl.m_top.y = kPolyGroupAabbMax;
 		cyl.m_top.z = kPolyGroupAabbMax;
-		cyl.m_direction2.x = kPolyGroupAabbMin;
-		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_top.y = kPolyGroupAabbMax;
+		cyl.m_top.x = kPolyGroupAabbMax;
 		cyl.m_direction2.z = kPolyGroupAabbMin;
+		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_direction2.x = kPolyGroupAabbMin;
 		cyl.m_bottom.x = top.x;
 		cyl.m_bottom.y = top.y;
 		cyl.m_bottom.z = top.z;

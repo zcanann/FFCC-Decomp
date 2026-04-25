@@ -39,7 +39,6 @@ void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, cha
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
-int pppCreatePObject__FP9_pppMngStP12_pppPDataVal(_pppMngSt*, void*);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
@@ -76,13 +75,11 @@ struct LaserStep {
 
 struct CMapCylinderRaw {
     Vec m_bottom;
+    u8 m_pad0C[0x0C];
     Vec m_direction;
-    float m_radius;
-    float m_height;
+    f32 m_radius;
     Vec m_top;
     Vec m_direction2;
-    float m_radius2;
-    float m_height2;
 };
 
 struct LaserWork {
@@ -112,6 +109,18 @@ struct LaserWork {
 struct LaserColorData {
     u8 m_pad0[8];
     pppCVECTOR m_color;
+};
+
+struct LaserBaseObject {
+    s32 m_graphId;
+    u8 m_pad4[0x0C];
+    pppFMATRIX m_localMatrix;
+    pppFMATRIX m_drawMatrix;
+};
+
+union LaserDoubleBits {
+    double d;
+    u32 u[2];
 };
 
 /*
@@ -233,8 +242,8 @@ void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
+    LaserBaseObject* baseObj = (LaserBaseObject*)pppLaser;
     LaserWork* work;
-    _pppPObject* baseObj = (_pppPObject*)pppLaser;
     Vec localA;
     Vec localB;
     Vec localPos;
@@ -244,7 +253,10 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 
     bool emptyHistory;
 
-    if ((gPppCalcDisabled != 0) || (step->m_stepValue == 0xFFFF)) {
+    if (gPppCalcDisabled != 0) {
+        return;
+    }
+    if (step->m_stepValue == 0xFFFF) {
         return;
     }
 
@@ -261,22 +273,20 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         emptyHistory = true;
     }
 
-    CalcGraphValue(baseObj, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
+    CalcGraphValue((_pppPObject*)baseObj, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
         *(float*)(step->m_payload + 0x10), *(float*)(step->m_payload + 0x14), *(float*)(step->m_payload + 0x18));
-    CalcGraphValue(baseObj, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
+    CalcGraphValue((_pppPObject*)baseObj, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
         *(float*)(step->m_payload + 4), *(float*)(step->m_payload + 8), *(float*)(step->m_payload + 0xc));
 
     pppCalcFrameShape(
-        *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeArg1,
+        **(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeArg1,
         work->m_shapeArg2, work->m_shapeArg0, *(short*)(step->m_payload + 0x2c));
 
     for (u32 i = 0; i < (u32)step->m_payload[0x3a] + 1; i++) {
-        Vec* points = work->m_points;
         int max = (int)step->m_payload[0x1e] - 2;
 
         for (int j = max; (int)i <= j; j--) {
-            localA = points[j];
-            pppCopyVector(points[j + 1], localA);
+            pppCopyVector(work->m_points[j + 1], work->m_points[j]);
         }
 
         localB.x = kPppLaserZero;
@@ -288,45 +298,56 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             work->m_origin.x = tempMtx[0][3];
             work->m_origin.y = tempMtx[1][3];
             work->m_origin.z = tempMtx[2][3];
-            PSMTXMultVec(tempMtx, &localB, points);
-        } else if (!emptyHistory) {
-            double t = (FLOAT_80333448 / (float)((double)(int)(step->m_payload[0x3a] + 1) - DOUBLE_80333440)) *
-                (float)((double)(int)i - DOUBLE_80333440);
+            PSMTXMultVec(tempMtx, &localB, work->m_points);
+        } else {
+            if (emptyHistory) {
+                continue;
+            }
+            LaserDoubleBits countDouble;
+            LaserDoubleBits indexDouble;
+
+            countDouble.u[0] = 0x43300000;
+            countDouble.u[1] = (u32)(int)(step->m_payload[0x3a] + 1) ^ 0x80000000;
+            indexDouble.u[0] = 0x43300000;
+            indexDouble.u[1] = (u32)(int)i ^ 0x80000000;
+
+            double t = (FLOAT_80333448 / (float)(countDouble.d - DOUBLE_80333440)) *
+                (float)(indexDouble.d - DOUBLE_80333440);
             if (GetCharaNodeFrameMatrix(pppMngStPtr, (float)t, charaMtx) == 0) {
                 emptyHistory = true;
+                continue;
             } else {
                 PSMTXConcat(charaMtx, baseObj->m_localMatrix.value, charaMtx);
-                PSMTXMultVec(charaMtx, &localB, &points[i]);
+                PSMTXMultVec(charaMtx, &localB, &work->m_points[i]);
             }
         }
 
-        if ((i != 0) && emptyHistory) {
-            continue;
-        }
-
         localPos = work->m_origin;
-        pppSubVector(localA, points[i], localPos);
+        pppSubVector(localA, work->m_points[i], localPos);
         PSVECScale(&localA, &localA, FLOAT_8033344c);
 
-        cyl.m_bottom = localPos;
+        cyl.m_bottom = work->m_origin;
         cyl.m_direction = localA;
         cyl.m_radius = kPppLaserZero;
-        cyl.m_height = FLOAT_80333450;
-        cyl.m_radius2 = FLOAT_80333454;
-        cyl.m_height2 = FLOAT_80333454;
+        cyl.m_top.x = FLOAT_80333450;
+        cyl.m_top.y = FLOAT_80333450;
+        cyl.m_top.z = FLOAT_80333450;
+        cyl.m_direction2.x = FLOAT_80333454;
+        cyl.m_direction2.y = FLOAT_80333454;
+        cyl.m_direction2.z = FLOAT_80333454;
 
-        bool hit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                       &MapMng, &cyl, &cyl.m_direction, 0xffffffff) != 0;
-        if (hit) {
-            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &points[i]);
-            work->m_length = PSVECDistance(&points[i], &work->m_origin);
+        int hit = 0;
+        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &localA, 0xffffffff) != 0) {
+            hit = 1;
+            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &work->m_points[i]);
+            work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
         } else if (i == 0 && work->m_spawnEnabled != 0) {
             if (work->m_maxLength - FLOAT_80333458 < work->m_length) {
                 s32 partIndex = ((s32)((u8*)pppMngStPtr - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
                 work->m_length = work->m_maxLength - FLOAT_80333458;
                 ParticleFrameCallback__5CGameFiiiiiP3Vec(
                     &Game, partIndex, (int)pppMngStPtr->m_kind, (int)pppMngStPtr->m_nodeIndex, 3,
-                    (int)((u32)baseObj->m_graphId >> 12), &points[i]);
+                    baseObj->m_graphId / 0x1000, &work->m_points[i]);
                 work->m_spawnEnabled = 0;
             }
             if (work->m_spawnEnabled != 0) {
@@ -335,34 +356,49 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         }
 
         if (i == 0) {
+            localB.x = kPppLaserZero;
+            localB.y = kPppLaserZero;
             localB.z = work->m_length;
-            PSMTXMultVec(tempMtx, &localB, &points[0]);
+            PSMTXMultVec(tempMtx, &localB, work->m_points);
         }
 
         if (step->m_payload[0x3b] == 0) {
             pppHitCylinderSendSystem(
-                pppMngStPtr, &work->m_origin, &localA, pppMngStPtr->m_ownerScale * *(float*)(step->m_payload + 0x24),
+                pppMngStPtr, &work->m_origin, &localA,
+                pppMngStPtr->m_previousPositionFields.m_paramD * *(float*)(step->m_payload + 0x24),
                 *(float*)(step->m_payload + 0x20));
         }
 
         if (step->m_payload[0x3c] == 0) {
-            u8* hitFrame = &work->m_hitFrame;
-            if (*hitFrame >= step->m_payload[0x1d]) {
-                *hitFrame = 0;
-                if (hit && step->m_arg3 != -1) {
-                    u8* dataVals = *(u8**)((u8*)pppMngStPtr + 0xc8);
-                    if (dataVals != 0) {
-                        int created =
-                            pppCreatePObject__FP9_pppMngStP12_pppPDataVal(pppMngStPtr, dataVals + step->m_arg3 * 0x10);
-                        *(struct pppLaser**)(created + 4) = pppLaser;
-                        Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
-                        createdPos->x = points[i].x;
-                        createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
-                        createdPos->z = points[i].z;
-                    }
-                }
+            int createHitObject = 0;
+            if (step->m_arg3 != -1) {
+                createHitObject = 1;
+            }
+            if (!hit) {
+                createHitObject = 0;
+            }
+
+            if (work->m_hitFrame < step->m_payload[0x1d]) {
+                work->m_hitFrame++;
+                createHitObject = 0;
             } else {
-                (*hitFrame)++;
+                work->m_hitFrame = 0;
+            }
+
+            if (createHitObject != 0) {
+                _pppPDataVal* dataVal = pppMngStPtr->m_pppPDataVals + step->m_arg3;
+                _pppPObject* created;
+                if (dataVal == 0) {
+                    created = 0;
+                } else {
+                    created = pppCreatePObject(pppMngStPtr, dataVal);
+                    *(_pppPObject**)((u8*)created + 4) = (_pppPObject*)baseObj;
+                }
+
+                Vec* createdPos = (Vec*)((u8*)created + *(int*)step->m_payload + 0x80);
+                createdPos->x = work->m_points[i].x;
+                createdPos->y = work->m_points[i].y + *(float*)(step->m_payload + 0x34);
+                createdPos->z = work->m_points[i].z;
             }
         }
     }
@@ -387,7 +423,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
-    _pppPObject* baseObj = (_pppPObject*)pppLaser;
+    LaserBaseObject* baseObj = (LaserBaseObject*)pppLaser;
     Vec* points;
     int colorOffset = param_3->m_serializedDataOffsets[1];
     LaserColorData* colorData = (LaserColorData*)((u8*)pppLaser + 0x80 + colorOffset);
@@ -479,7 +515,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     GXTexCoord2f32(FLOAT_8033342c, work->m_length);
 
     if (step->m_stepValue != 0xFFFF) {
-        long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
+        long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
         PSMTXIdentity(shapeMtx.value);
         shapeMtx.value[0][0] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.x;
         shapeMtx.value[1][1] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.y;
@@ -493,10 +529,15 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         shapeMtx.value[1][3] = shapePos.y;
         shapeMtx.value[2][3] = shapePos.z;
         GXLoadPosMtxImm(shapeMtx.value, GX_PNMTX0);
-        pppDrawShp__FPlsP12CMaterialSetUc(shape, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
+        pppDrawShp__FPlsP12CMaterialSetUc(
+            *shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
 
         count = (u32)step->m_payload[0x1e];
-        uvStep = FLOAT_8033342c / ((float)(double)count - (float)DOUBLE_80333438);
+        LaserDoubleBits countDouble;
+
+        countDouble.u[0] = 0x43300000;
+        countDouble.u[1] = count;
+        uvStep = FLOAT_8033342c / (float)(countDouble.d - DOUBLE_80333438);
         if (step->m_initWOrk == 0xFFFF) {
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
             _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
@@ -508,12 +549,12 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
 
         GXLoadPosMtxImm(ppvCameraMatrix0, GX_PNMTX0);
         alphaMax = step->m_payload[0x2b];
-        alphaStep = (u8)((u32)alphaMax / count);
+        alphaStep = (u8)((u32)alphaMax / step->m_payload[0x1e]);
         colorBase = *(u32*)(step->m_payload + 0x28) & 0xFFFFFF00;
         points = work->m_points;
 
-        GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((count - 1) * 3));
-        for (i = 0; i < count - 1; i++) {
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 3));
+        for (i = 0; (int)i < (int)(step->m_payload[0x1e] - 1); i++) {
             alpha0 = (u8)(alphaMax - (u8)(alphaStep * i));
             color0 = colorBase | alpha0;
             color1 = colorBase | (u8)(alphaMax - (u8)(alphaStep * (i + 1)));
@@ -546,9 +587,9 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             debugColor.a = 0xFF;
             GXSetChanAmbColor(GX_COLOR0A0, debugColor);
             GXSetPointSize(0x28, GX_TO_ZERO);
-            GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(count - 1));
-            for (i = 0; i < count - 1; i++) {
-                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+            GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(step->m_payload[0x1e] - 1));
+            for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
+                GXPosition3f32(points[j].x, points[j].y, points[j].z);
                 GXColor1u32(*(u32*)&debugColor);
             }
 
@@ -558,13 +599,13 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             debugColor.a = 0xFF;
             GXSetChanAmbColor(GX_COLOR0A0, debugColor);
             GXSetLineWidth(0x14, GX_TO_ZERO);
-            GXBegin(GX_LINES, GX_VTXFMT7, (u16)((count - 1) * 4));
-            for (i = 0; i < count - 1; i++) {
-                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+            GXBegin(GX_LINES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 4));
+            for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
+                GXPosition3f32(points[j].x, points[j].y, points[j].z);
                 GXColor1u32(*(u32*)&debugColor);
-                GXPosition3f32(points[i + 1].x, points[i + 1].y, points[i + 1].z);
+                GXPosition3f32(points[j + 1].x, points[j + 1].y, points[j + 1].z);
                 GXColor1u32(*(u32*)&debugColor);
-                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+                GXPosition3f32(points[j].x, points[j].y, points[j].z);
                 GXColor1u32(*(u32*)&debugColor);
                 GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
                 GXColor1u32(*(u32*)&debugColor);
@@ -575,9 +616,9 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             GXSetZMode(1, GX_LEQUAL, 0);
 
             PSMTXIdentity(tempMtx);
-            tempMtx[0][0] = *(float*)((u8*)pppMngStPtr + 0x64) * *(float*)(step->m_payload + 0x24);
+            tempMtx[0][0] = pppMngStPtr->m_previousPositionFields.m_paramD * *(float*)(step->m_payload + 0x24);
             tempMtx[1][1] = tempMtx[0][0];
-	            tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
+            tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
             PSMTXConcat(baseObj->m_localMatrix.value, tempMtx, tempMtx);
             PSMTXConcat(pppMngStPtr->m_matrix.value, tempMtx, tempMtx);
             PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
@@ -595,7 +636,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             Graphic.DrawSphere(tempMtx, debugColor);
 
             GXLoadPosMtxImm(pppLaser->m_drawMatrix.value, GX_PNMTX0);
-            for (i = 0; i < count; i++) {
+            for (i = 0; (int)i < (int)(u32)step->m_payload[0x1e]; i++) {
                 if ((points[i].x == kPppLaserZero) && (points[i].y == kPppLaserZero) && (points[i].z == kPppLaserZero)) {
                     continue;
                 }

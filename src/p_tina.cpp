@@ -10,7 +10,7 @@
 #include "ffcc/stopwatch.h"
 extern "C" {
 extern int gPppHeapUseRateWords[3];
-extern char sDebugSpinnerText[];
+extern const char sDebugSpinnerText[5];
 extern const float kPppHeapUseRateDivisor;
 extern const float kPartColorIdentityOne;
 }
@@ -162,34 +162,37 @@ unsigned int m_table_desc15__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<uns
 unsigned int m_table_desc16__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowViewer__8CPartPcsFv)};
 unsigned int m_table_desc17__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__8CPartPcsFv)};
 unsigned int m_table_desc18__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__8CPartPcsFv)};
-unsigned int m_table__8CPartPcs[0x2B8 / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CPartPcs_GAME_801D7F2C)), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000028, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000002C,
-    0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000031, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000038,
-    0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x0000003E, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000040,
-    0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CPartPcs_PART_VIEWER_801D7F3C)), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000028, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000002C,
-    0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000031, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x0000003E,
-    0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000040, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000
+unsigned int m_table__8CPartPcs[2][0x15C / sizeof(unsigned int)] = {
+    {
+        reinterpret_cast<unsigned int>(const_cast<char*>(s_CPartPcs_GAME_801D7F2C)), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000028, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000002C,
+        0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000031, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000038,
+        0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x0000003E, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000040,
+        0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    },
+    {
+        reinterpret_cast<unsigned int>(const_cast<char*>(s_CPartPcs_PART_VIEWER_801D7F3C)), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000028, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000002C,
+        0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000031, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x0000003E,
+        0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000040, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    },
 };
 char DAT_801ead4c[0x38] =
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x0A";
-unsigned int lbl_801EAD84[4] = {
-    reinterpret_cast<unsigned int>(lbl_8032E69C), 0x00000000, 0x00000000, reinterpret_cast<unsigned int>(lbl_8032E69C)
-};
+unsigned int lbl_801EAD84[3] = {reinterpret_cast<unsigned int>(lbl_8032E69C), 0x00000000, 0x00000000};
+unsigned int lbl_801EAD90 = reinterpret_cast<unsigned int>(lbl_8032E69C);
 int DAT_8032ed38;
 int DAT_8032ed3c;
 CPartPcs PartPcs;
@@ -448,7 +451,7 @@ void CPartPcs::onScriptChanging(char*)
  */
 int CPartPcs::GetTable(unsigned long index)
 {
-	return (int)&m_table__8CPartPcs[index * 0x57];
+	return reinterpret_cast<int>(m_table__8CPartPcs[index]);
 }
 
 /*
@@ -604,33 +607,34 @@ void CPartPcs::create0()
  */
 void CPartPcs::create()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
-    char* stringBase = const_cast<char*>(DAT_801d8068);
+    CPartPcsViewerState* viewer = reinterpret_cast<CPartPcsViewerState*>(this);
+    char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
     void* stage;
 
-    usb->m_freePtr = 0;
-    usb->m_stageExtra = 0;
-    usb->m_blockOnFrame = 0;
-    usb->m_miruraEventActive = 0;
-    usb->m_disableShokiDraw = 0;
+    viewer->m_freePtr = 0;
+    viewer->m_stageExtra = 0;
+    viewer->m_blockOnFrame = 0;
+    viewer->m_miruraEventActive = 0;
+    viewer->m_disableShokiDraw = 0;
 
-    if (Game.m_currentSceneId == 7) {
+    if ((int)Game.m_currentSceneId == 7) {
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        usb->m_stageAmem = 0;
+        viewer->m_stageLoad = stage;
+        viewer->m_stageDefault = stage;
+        viewer->m_stageAmem = 0;
     } else {
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        usb->m_stageAmem = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, stringBase + 0x23C, 2);
+        viewer->m_stageLoad = stage;
+        viewer->m_stageDefault = stage;
+        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, stringBase + 0x23C, 2);
+        viewer->m_stageAmem = stage;
     }
 
     Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
         &ppvAmemCacheSet,
         stringBase + 0x74,
-        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 4)->m_stageLoad,
-        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 4)->m_stageAmem,
+        reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageLoad,
+        reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageAmem,
         0x400,
         reinterpret_cast<void*>(pppNotAllocAmemCacheRmem),
         0,
@@ -639,7 +643,7 @@ void CPartPcs::create()
         reinterpret_cast<void*>(pppAmemRefCntError),
         0);
 
-    memset(&PartMng, 0, 0x23FD8);
+    ::memset(&PartMng, 0, 0x23FD8);
     PartMng.Create();
 }
 
@@ -975,14 +979,14 @@ void CPartPcs::draw()
 void CPartPcs::drawShadowViewer()
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x308);
-    OSStartStopwatch(&g_par_draw_prof);
-    OSStartStopwatch(&g_par_calc_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDrawShadow();
-    OSStopStopwatch(&g_par_calc_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
     Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x30f);
-    OSStopStopwatch(&g_par_draw_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
     pppClearDrawEnv();
 }
 
@@ -1229,8 +1233,7 @@ void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
  */
 void CPartPcs::drawAfterViewer()
 {
-	int frameSign;
-	static char* pFan;
+	static const char* pFan;
 	static char init;
 	static int alive;
 	static char init_0;
@@ -1257,12 +1260,7 @@ void CPartPcs::drawAfterViewer()
 	}
 
 	alive++;
-	frameSign = alive >> 0x1f;
-	Graphic.Printf(
-		const_cast<char*>(s_tina_title_fmt_801d8014),
-		(int)(char)pFan[(frameSign * 4 |
-								 (unsigned int)((alive >> 4) * 0x40000000 + frameSign) >> 0x1e) -
-								frameSign]);
+	Graphic.Printf(const_cast<char*>(s_tina_title_fmt_801d8014), pFan[(alive >> 4) % 4]);
 
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();
@@ -1291,10 +1289,8 @@ void CPartPcs::drawAfterViewer()
  */
 unsigned int CPartPcs::IsLoadPartCompleted()
 {
-    CPartMngState* state = GetPartMngState();
-
     for (int i = 0; i < 16; i++) {
-        if (state->m_partAsyncBusy[i] != 0) {
+        if (PartMng.m_partAsyncBusy[i] != 0) {
             return 0;
         }
     }

@@ -67,26 +67,6 @@ extern float FLOAT_80330688;
 extern float FLOAT_8033068C;
 extern float FLOAT_80330690;
 
-static inline Mtx44& CameraScreenMatrix()
-{
-    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
-}
-
-static inline float CameraLookAtX()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xD4);
-}
-
-static inline float CameraLookAtY()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xD8);
-}
-
-static inline float CameraLookAtZ()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xDC);
-}
-
 void pppSetFpMatrix(_pppMngSt*);
 
 extern "C" {
@@ -109,137 +89,12 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 
 /*
  * --INFO--
- * PAL Address: 0x80098a94
- * PAL Size: 64b
- */
-void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
-{
-	int offset = ((YmDeformationScreenParam*)param2)->offsetData->offset;
-	char* basePtr = (char*)obj + offset + 0x80;
-	float zero = 0.0f;
-
-	*(short*)(basePtr + 0x4) = 0;
-	*(char*)(basePtr + 0x6) = 1;
-	*(float*)(basePtr + 0x10) = zero;
-	*(float*)(basePtr + 0xc) = zero;
-	*(float*)(basePtr + 0x8) = zero;
-	*(float*)(basePtr + 0x1c) = zero;
-	*(float*)(basePtr + 0x18) = zero;
-	*(float*)(basePtr + 0x14) = zero;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80098a64
- * PAL Size: 48b
- */
-void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
-{
-	float zero = FLOAT_80330670;
-	int offset = ((YmDeformationScreenParam*)param2)->offsetData->offset;
-	char* basePtr = (char*)obj + offset + 0x80;
-
-	*(float*)(basePtr + 0x10) = zero;
-	*(float*)(basePtr + 0xc) = zero;
-	*(float*)(basePtr + 0x8) = zero;
-	*(float*)(basePtr + 0x1c) = zero;
-	*(float*)(basePtr + 0x18) = zero;
-	*(float*)(basePtr + 0x14) = zero;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80098a60
- * PAL Size: 4b
- */
-void pppDestructYmDeformationScreen(pppYmDeformationScreen*, void*)
-{
-	return;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8009885c
- * PAL Size: 516b
+ * PAL Address: 0x800981a8
+ * PAL Size: 1716b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
- */
-void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, void* param3)
-{
-	Vec4d outVec;
-	Vec4d inVec;
-	Mtx44 screenMtx;
-	float* work;
-	u8* workBytes;
-	int* serializedDataOffsets;
-	float cameraX;
-	float cameraY;
-	float cameraZ;
-	YmDeformationScreenStep* step;
-
-	if (gPppCalcDisabled == 0) {
-		step = (YmDeformationScreenStep*)param2;
-		serializedDataOffsets = ((YmDeformationScreenData*)param3)->m_serializedDataOffsets;
-		work = (float*)((char*)param1 + 0x80 + serializedDataOffsets[2]);
-		workBytes = (u8*)work;
-
-		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-			param1, step->m_graphId, work + 2, work + 3, work + 4, step->m_initWOrk, &step->m_stepValue, &step->m_arg3);
-		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-			param1, step->m_graphId, work + 5, work + 6, work + 7, step->m_payload0, &step->m_payload1, &step->m_payload2);
-
-		if (gPppInConstructor == 0) {
-			if (workBytes[6] != 0) {
-				*(s16*)(workBytes + 4) += (int)work[5];
-				if (*(s16*)(workBytes + 4) > step->m_payload3) {
-					workBytes[6] = 0;
-				}
-			} else {
-				*(s16*)(workBytes + 4) -= (int)work[5];
-				if (*(s16*)(workBytes + 4) < -step->m_payload3) {
-					workBytes[6] = 1;
-				}
-			}
-
-			if (*(s32*)((u8*)param1 + 0xC) == 0) {
-				PSMTX44Copy(CameraScreenMatrix(), screenMtx);
-				inVec.x = FLOAT_80330670;
-				inVec.y = FLOAT_80330670;
-				inVec.z = -*(float*)&step->m_payloadBytes[2];
-				inVec.w = FLOAT_8033067C;
-				MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &inVec, &outVec);
-				{
-					float outW = outVec.w;
-					if (outW != FLOAT_80330670) {
-						outVec.z /= outW;
-					}
-				}
-				work[0] = outVec.z;
-			}
-
-			if ((s32)Game.m_currentSceneId == 7) {
-				cameraX = ppvCameraMatrix02[0][3];
-				cameraY = ppvCameraMatrix02[1][3];
-				cameraZ = ppvCameraMatrix02[2][3];
-			} else {
-				cameraX = CameraLookAtX();
-				cameraY = CameraLookAtY();
-				cameraZ = CameraLookAtZ();
-			}
-			pppMngStPtr->m_matrix.value[0][3] = cameraX;
-			pppMngStPtr->m_matrix.value[1][3] = cameraY;
-			pppMngStPtr->m_matrix.value[2][3] = cameraZ;
-			pppSetFpMatrix(pppMngStPtr);
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800981a8
- * PAL Size: 1716b
  */
 void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, void* param3)
 {
@@ -380,6 +235,147 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);
 	GXSetProjection(screenMtx, GX_PERSPECTIVE);
 	pppInitBlendMode();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8009885c
+ * PAL Size: 516b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, void* param3)
+{
+	Vec4d outVec;
+	Vec4d inVec;
+	Mtx44 screenMtx;
+	float* work;
+	u8* workBytes;
+	int* serializedDataOffsets;
+	float cameraX;
+	float cameraY;
+	float cameraZ;
+	YmDeformationScreenStep* step;
+
+	if (gPppCalcDisabled == 0) {
+		step = (YmDeformationScreenStep*)param2;
+		serializedDataOffsets = ((YmDeformationScreenData*)param3)->m_serializedDataOffsets;
+		work = (float*)((char*)param1 + 0x80 + serializedDataOffsets[2]);
+		workBytes = (u8*)work;
+
+		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
+			param1, step->m_graphId, work + 2, work + 3, work + 4, step->m_initWOrk, &step->m_stepValue, &step->m_arg3);
+		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
+			param1, step->m_graphId, work + 5, work + 6, work + 7, step->m_payload0, &step->m_payload1, &step->m_payload2);
+
+		if (gPppInConstructor == 0) {
+			if (workBytes[6] != 0) {
+				*(s16*)(workBytes + 4) += (int)work[5];
+				if (*(s16*)(workBytes + 4) > step->m_payload3) {
+					workBytes[6] = 0;
+				}
+			} else {
+				*(s16*)(workBytes + 4) -= (int)work[5];
+				if (*(s16*)(workBytes + 4) < -step->m_payload3) {
+					workBytes[6] = 1;
+				}
+			}
+
+			if (*(s32*)((u8*)param1 + 0xC) == 0) {
+				PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+				inVec.x = FLOAT_80330670;
+				inVec.y = FLOAT_80330670;
+				inVec.z = -*(float*)&step->m_payloadBytes[2];
+				inVec.w = FLOAT_8033067C;
+				MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &inVec, &outVec);
+				{
+					float outW = outVec.w;
+					if (outW != FLOAT_80330670) {
+						outVec.z /= outW;
+					}
+				}
+				work[0] = outVec.z;
+			}
+
+			if ((s32)Game.m_currentSceneId == 7) {
+				cameraX = ppvCameraMatrix02[0][3];
+				cameraY = ppvCameraMatrix02[1][3];
+				cameraZ = ppvCameraMatrix02[2][3];
+			} else {
+				cameraX = CameraPcs._212_4_;
+				cameraY = CameraPcs._216_4_;
+				cameraZ = CameraPcs._220_4_;
+			}
+			pppMngStPtr->m_matrix.value[0][3] = cameraX;
+			pppMngStPtr->m_matrix.value[1][3] = cameraY;
+			pppMngStPtr->m_matrix.value[2][3] = cameraZ;
+			pppSetFpMatrix(pppMngStPtr);
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80098a60
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructYmDeformationScreen(pppYmDeformationScreen*, void*)
+{
+	return;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80098a64
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
+{
+	float zero = FLOAT_80330670;
+	int offset = ((YmDeformationScreenParam*)param2)->offsetData->offset;
+	char* basePtr = (char*)obj + offset + 0x80;
+
+	*(float*)(basePtr + 0x10) = zero;
+	*(float*)(basePtr + 0xc) = zero;
+	*(float*)(basePtr + 0x8) = zero;
+	*(float*)(basePtr + 0x1c) = zero;
+	*(float*)(basePtr + 0x18) = zero;
+	*(float*)(basePtr + 0x14) = zero;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80098a94
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
+{
+	int offset = ((YmDeformationScreenParam*)param2)->offsetData->offset;
+	char* basePtr = (char*)obj + offset + 0x80;
+	float zero = 0.0f;
+
+	*(short*)(basePtr + 0x4) = 0;
+	*(char*)(basePtr + 0x6) = 1;
+	*(float*)(basePtr + 0x10) = zero;
+	*(float*)(basePtr + 0xc) = zero;
+	*(float*)(basePtr + 0x8) = zero;
+	*(float*)(basePtr + 0x1c) = zero;
+	*(float*)(basePtr + 0x18) = zero;
+	*(float*)(basePtr + 0x14) = zero;
 }
 
 /*

@@ -64,7 +64,7 @@ class CMenuPcs
 	void CmakeResultDraw1();
 
 	void CmakeVillageOpen();
-	void CmakeVillageCtrl();
+	unsigned short CmakeVillageCtrl();
 	void CmakeVillageClose();
 	void CmakeVillageDraw();
 

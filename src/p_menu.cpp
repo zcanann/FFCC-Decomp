@@ -360,12 +360,16 @@ void CMenuPcs::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800974a4
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::Quit()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -494,36 +498,32 @@ void CMenuPcs::destroy()
 void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 {
     CMemory::CStage* stage = 0;
-    CMemory::CStage* menuStage = m_menuStage;
-    CFont** fontSlot = &m_fonts[slot];
 
     if (type == 1) {
         stage = m_stageF0;
     } else if (type < 1) {
         if (type >= 0) {
-            stage = menuStage;
+            stage = m_menuStage;
         }
     } else if (type < 3) {
         stage = pppEnvStPtr->m_stagePtr;
     }
 
     if ((slot == 0) && (FontMan.m_font != 0)) {
-        *fontSlot = FontMan.m_font;
-        reinterpret_cast<u32*>(*fontSlot)[1] = reinterpret_cast<u32*>(*fontSlot)[1] + 1;
+        m_fonts[slot] = FontMan.m_font;
+        reinterpret_cast<u32*>(m_fonts[slot])[1] = reinterpret_cast<u32*>(m_fonts[slot])[1] + 1;
     } else {
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
-        CFont* font = new (menuStage, const_cast<char*>(kPMenuSourceFile), 0xF8) CFont;
-        *fontSlot = font;
-        font->Create(File.m_readBuffer, stage);
+        m_fonts[slot] = new (MenuPcs.m_menuStage, const_cast<char*>(kPMenuSourceFile), 0xF8) CFont;
+        m_fonts[slot]->Create(File.m_readBuffer, stage);
 
         File.Close(fileHandle);
     }
 
     if (tlutMode < 2) {
-        CFont* font = *fontSlot;
         MenuFontTlutPalette* palette = &sMenuFontTlutPaletteTable[tlutMode * 0x1C];
 
         for (int colorIndex = 0; colorIndex < 0x10; colorIndex++) {
@@ -551,14 +551,14 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
                                               static_cast<float>(palette[tlutIndex].highlight.b) * blend);
                 }
 
-                font->SetTlutColor(tlutIndex, colorIndex, color);
+                m_fonts[slot]->SetTlutColor(tlutIndex, colorIndex, color);
 
                 color.a = sMenuFontSecondaryAlphaTable[colorIndex];
-                font->SetTlutColor(tlutIndex + 0x1C, colorIndex, color);
+                m_fonts[slot]->SetTlutColor(tlutIndex + 0x1C, colorIndex, color);
             }
         }
 
-        font->FlushTlutColor();
+        m_fonts[slot]->FlushTlutColor();
     }
 }
 
@@ -658,62 +658,112 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
  */
 void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    int currentMode = *reinterpret_cast<int*>(self + 0x740);
-    int nextMode = static_cast<int>(mode);
+    int currentMode;
+    int refCount;
+    int* refObject;
+    int i;
+    CMenuPcs* slotMenu;
 
-    if (currentMode == nextMode) {
-        return;
-    }
+    if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740) != static_cast<int>(mode)) {
+        _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(kPMenuSourceFile), 0x1B0);
+        currentMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
+        if (currentMode == 1) {
+            destroyWorld();
+        } else if (currentMode < 1) {
+            if ((currentMode != -1) && (-2 < currentMode)) {
+                refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(this) + 0xFC);
+                if (refObject != nullptr) {
+                    refCount = refObject[1];
+                    refObject[1] = refCount - 1;
+                    if ((refCount - 1 == 0) && (refObject != nullptr)) {
+                        reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(refObject[0] + 8))(refObject, 1);
+                    }
+                    *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0xFC) = nullptr;
+                }
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(kPMenuSourceFile), 0x1B0);
+                i = 0;
+                slotMenu = this;
+                do {
+                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x1E4);
+                    if (refObject != nullptr) {
+                        refCount = refObject[1];
+                        refObject[1] = refCount - 1;
+                        if ((refCount - 1 == 0) && (refObject != nullptr)) {
+                            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(refObject[0] + 8))(refObject, 1);
+                        }
+                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x1E4) = nullptr;
+                    }
+                    i++;
+                    slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                } while (i < 10);
 
-    if (currentMode == 1) {
-        destroyWorld();
-    } else if (currentMode == 0) {
-        ReleaseRefObject(*reinterpret_cast<void**>(self + 0xFC));
-        *reinterpret_cast<void**>(self + 0xFC) = nullptr;
+                i = 0;
+                slotMenu = this;
+                do {
+                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x154);
+                    if (refObject != nullptr) {
+                        refCount = refObject[1];
+                        refObject[1] = refCount - 1;
+                        if ((refCount - 1 == 0) && (refObject != nullptr)) {
+                            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(refObject[0] + 8))(refObject, 1);
+                        }
+                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x154) = nullptr;
+                    }
+                    i++;
+                    slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                } while (i < 2);
 
-        void** slot = reinterpret_cast<void**>(self + 0x1E4);
-        for (int i = 0; i < 10; i++, slot++) {
-            ReleaseRefObject(*slot);
-            *slot = nullptr;
+                i = 0;
+                slotMenu = this;
+                do {
+                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x13C);
+                    if (refObject != nullptr) {
+                        refCount = refObject[1];
+                        refObject[1] = refCount - 1;
+                        if ((refCount - 1 == 0) && (refObject != nullptr)) {
+                            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(refObject[0] + 8))(refObject, 1);
+                        }
+                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x13C) = nullptr;
+                    }
+                    i++;
+                    slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                } while (i < 4);
+
+                i = 0;
+                slotMenu = this;
+                do {
+                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x10C);
+                    if (refObject != nullptr) {
+                        refCount = refObject[1];
+                        refObject[1] = refCount - 1;
+                        if ((refCount - 1 == 0) && (refObject != nullptr)) {
+                            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(refObject[0] + 8))(refObject, 1);
+                        }
+                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x10C) = nullptr;
+                    }
+                    i++;
+                    slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                } while (i < 12);
+
+                destroySingleMenu__8CMenuPcsFv(this);
+                destroyVillageMenu__8CMenuPcsFv(this);
+            }
+        } else if (currentMode < 3) {
+            destroyBonus__8CMenuPcsFv(this);
         }
 
-        slot = reinterpret_cast<void**>(self + 0x154);
-        for (int i = 0; i < 2; i++, slot++) {
-            ReleaseRefObject(*slot);
-            *slot = nullptr;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740) = static_cast<int>(mode);
+        currentMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
+        if (currentMode == 1) {
+            createWorld();
+        } else if (currentMode < 1) {
+            if ((currentMode != -1) && (-2 < currentMode)) {
+                createBattle();
+                createSingleMenu__8CMenuPcsFv(this);
+            }
+        } else if (currentMode < 3) {
+            createBonus__8CMenuPcsFv(this);
         }
-
-        slot = reinterpret_cast<void**>(self + 0x13C);
-        for (int i = 0; i < 4; i++, slot++) {
-            ReleaseRefObject(*slot);
-            *slot = nullptr;
-        }
-
-        slot = reinterpret_cast<void**>(self + 0x10C);
-        for (int i = 0; i < 12; i++, slot++) {
-            ReleaseRefObject(*slot);
-            *slot = nullptr;
-        }
-
-        destroySingleMenu__8CMenuPcsFv(this);
-        destroyVillageMenu__8CMenuPcsFv(this);
-    } else if (currentMode < 3) {
-        destroyBonus__8CMenuPcsFv(this);
-    }
-
-    *reinterpret_cast<int*>(self + 0x740) = nextMode;
-    currentMode = *reinterpret_cast<int*>(self + 0x740);
-
-    if (currentMode == 1) {
-        createWorld();
-    } else if (currentMode == 0) {
-        createBattle();
-        createSingleMenu__8CMenuPcsFv(this);
-    } else if (currentMode < 3) {
-        createBonus__8CMenuPcsFv(this);
     }
 }
 
@@ -937,7 +987,10 @@ void CMenuPcs::SetAttrFmt(CMenuPcs::FMT fmt)
  */
 void CMenuPcs::DrawQuit()
 {
-	// TODO
+	Mtx44 screenMtx;
+
+	PSMTX44Copy(reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94), screenMtx);
+	GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 
 /*
@@ -1312,9 +1365,35 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawBar(float, float, float, CMenuPcs::TEX, float)
+void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBase, float alpha)
 {
-	// TODO
+    if (width <= 0.0f) {
+        return;
+    }
+
+    const float capW = 8.0f;
+    const float barH = 8.0f;
+    float midW = width - (capW * 2.0f);
+    if (midW < 0.0f) {
+        midW = 0.0f;
+    }
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    SetAttrFmt(FMT(0));
+
+    const u8 alphaU8 = static_cast<u8>(255.0f * alpha);
+    const CColor color(0xFF, 0xFF, 0xFF, alphaU8);
+    GXSetChanMatColor(GX_COLOR0A0, color.color);
+
+    const int tex = static_cast<int>(texBase);
+    SetTexture(static_cast<TEX>(tex));
+    DrawRect(0, x, y, capW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+    SetTexture(static_cast<TEX>(tex + 1));
+    DrawRect(0, x + capW, y, midW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+    SetTexture(static_cast<TEX>(tex + 2));
+    DrawRect(8, x + width - capW, y, capW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -1474,7 +1553,29 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
  */
 void CMenuPcs::drawPause()
 {
-	// TODO
+    if (((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
+        return;
+    }
+
+    CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x190);
+    TextureMan.SetTexture(GX_TEXMAP0, texture);
+
+    if (texture != nullptr) {
+        Mtx texMtx;
+        float width = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x64));
+        float height = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x68));
+        PSMTXScale(texMtx, 1.0f / width, 1.0f / height, 1.0f);
+        GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    }
+
+    TextureMan.SetTextureTev(texture);
+
+    int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * 0.1f)));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
+    GXSetChanMatColor(GX_COLOR0A0, color.color);
+    DrawRect(3, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -1575,7 +1676,33 @@ void CMenuPcs::createBattle()
  */
 void CMenuPcs::destroyBattle()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    void** slot = reinterpret_cast<void**>(self + 0x1E4);
+    for (int i = 0; i < 10; i++, slot++) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    slot = reinterpret_cast<void**>(self + 0x154);
+    for (int i = 0; i < 2; i++, slot++) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    slot = reinterpret_cast<void**>(self + 0x13C);
+    for (int i = 0; i < 4; i++, slot++) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    slot = reinterpret_cast<void**>(self + 0x10C);
+    for (int i = 0; i < 12; i++, slot++) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    destroySingleMenu__8CMenuPcsFv(this);
+    destroyVillageMenu__8CMenuPcsFv(this);
 }
 
 /*
@@ -1585,7 +1712,33 @@ void CMenuPcs::destroyBattle()
  */
 void CMenuPcs::calcBattle()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    for (int i = 0; i < 4; i++) {
+        Calc__5CMenuFv(*reinterpret_cast<CMenu**>(self + 0x13C + i * 4));
+    }
+
+    for (int i = 0; i < 0xC; i++) {
+        Calc__5CMenuFv(*reinterpret_cast<CMenu**>(self + 0x10C + i * 4));
+    }
+
+    int limit = *reinterpret_cast<int*>(self + 0x68);
+    int value = *reinterpret_cast<int*>(self + 0x6C) - 1;
+    if (value <= limit) {
+        int alt = *reinterpret_cast<int*>(self + 0x6C) + 1;
+        value = limit;
+        if (alt < limit) {
+            value = alt;
+        }
+    }
+    *reinterpret_cast<int*>(self + 0x6C) = value;
+
+    u32 counter = *reinterpret_cast<u32*>(self + 0x58) - 1;
+    *reinterpret_cast<u32*>(self + 0x58) = counter & ~((int)counter >> 31);
+    counter = *reinterpret_cast<u32*>(self + 0x5C) - 1;
+    *reinterpret_cast<u32*>(self + 0x5C) = counter & ~((int)counter >> 31);
+
+    calcVillageMenu__8CMenuPcsFv(this);
 }
 
 /*
@@ -1750,7 +1903,7 @@ void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetTexture(CMenuPcs::TEX)
+CTexture* CMenuPcs::GetTexture(CMenuPcs::TEX tex)
 {
-	// TODO
+    return reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x18C)[static_cast<int>(tex)];
 }

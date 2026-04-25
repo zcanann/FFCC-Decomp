@@ -8,72 +8,20 @@ extern "C" void calc__10CSystemPcsFv(CSystemPcs*);
 static const char s_CSystemPcs_801D7C48[] = "CSystemPcs";
 
 CSystemPcs SystemPcs;
-unsigned int m_table_desc0__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSystemPcsFv)};
-unsigned int m_table_desc1__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSystemPcsFv)};
-unsigned int m_table_desc2__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CSystemPcsFv)};
-
-CSystemPcsTable m_table__10CSystemPcs = {
-    const_cast<char*>(s_CSystemPcs_801D7C48),
-    {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0x16, 0x8
-    }
+unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CSystemPcs_801D7C48)),
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0x16,
+    0x8
 };
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSystemPcs::Init()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSystemPcs::Quit()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80047d60
- * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CSystemPcs::GetTable(unsigned long index)
-{
-	unsigned char* table = reinterpret_cast<unsigned char*>(&m_table__10CSystemPcs);
-	unsigned long offset = index * 0x15c;
-	return (int)(table + offset);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSystemPcs::create()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSystemPcs::destroy()
-{
-	// TODO
-}
 
 /*
  * --INFO--
@@ -115,4 +63,60 @@ void CSystemPcs::calc()
         }
         Pad._1c0_4_ = (unsigned int)nextPad;
     }
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CSystemPcs::destroy()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CSystemPcs::create()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80047d60
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CSystemPcs::GetTable(unsigned long index)
+{
+	unsigned char* table = reinterpret_cast<unsigned char*>(m_table__10CSystemPcs);
+	unsigned long offset = index * 0x15c;
+	return (int)(table + offset);
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CSystemPcs::Quit()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CSystemPcs::Init()
+{
+	// TODO
 }

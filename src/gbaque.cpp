@@ -8,6 +8,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/mes.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_gba.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/system.h"
@@ -27,6 +28,7 @@ extern "C" int memcmp(const void*, const void*, unsigned long);
 extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 extern "C" int AddItem__12CCaravanWorkFiPi(void*, int, int*);
 extern "C" int AddGil__12CCaravanWorkFi(void*, int);
+extern "C" int CanAddGil__12CCaravanWorkFi(void*, int);
 extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
@@ -62,9 +64,43 @@ struct GbaQueueFlagView
 	unsigned char m_mkSmithFlg;
 };
 
+struct GbaQueuePlayerDataView
+{
+	unsigned char _pad00;
+	unsigned char _pad01;
+	unsigned char _pad02;
+	unsigned char _pad03;
+	unsigned int _pad04[4];
+	unsigned short _pad14;
+	unsigned char _pad16;
+	unsigned char _pad17;
+	unsigned int _pad18[2];
+	unsigned char m_strength[3];
+	unsigned char _pad23;
+	unsigned int m_artifacts[3];
+	unsigned short _pad30;
+	unsigned char _pad32[8];
+	unsigned short m_items[0x40];
+	unsigned short m_tmpArtifacts[4];
+	unsigned short m_artifactList[8];
+	unsigned char _padD2;
+	unsigned char m_artifactCount;
+	unsigned char _padD4;
+	unsigned char _padD5;
+	unsigned char _padD6;
+	unsigned char m_commandData[4];
+	unsigned char _padDB;
+};
+STATIC_ASSERT(sizeof(GbaQueuePlayerDataView) == 0xDC);
+
 static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
 {
 	return reinterpret_cast<GbaQueueFlagView*>(gbaQueue);
+}
+
+static inline GbaQueuePlayerDataView* GetPlayerDataView(GbaQueue* gbaQueue, int channel)
+{
+	return reinterpret_cast<GbaQueuePlayerDataView*>(reinterpret_cast<unsigned char*>(gbaQueue) + channel * 0xDC + 0x454);
 }
 
 static inline unsigned short SwapU16(unsigned short value)
@@ -77,8 +113,8 @@ static inline unsigned int SwapU32(unsigned int value)
 	return (value << 24) | ((value >> 8 & 0xFF) << 16) | ((value >> 16 & 0xFF) << 8) | (value >> 24);
 }
 
-static const char s_gbaque_cpp[] = "gbaque.cpp";
-static const char s_mem_alloc_error[] = "%s(%d): Error: memory allocation error\n";
+static const char s_gbaque_cpp_801DB370[] = "gbaque.cpp";
+static const char s_pcts_pctd_Error_memory_allocation_error_801DB37C[] = "%s(%d): Error: memory allocation error\n";
 static const char s_compatibility_data_error[] = "compatibility data error!!\n";
 static const char s_cmake_favorite_crc_error[] = "%s(%d): Error:CMakeFavorite() crc error!!\n";
 static const char s_cmake_name_crc_error[] = "%s(%d): Error:ChkCMakeName() crc error!!\n";
@@ -497,7 +533,25 @@ void GbaQueue::ClrShopMode()
  */
 void GbaQueue::LoadMask()
 {
-	// TODO
+	int* scriptFoodBase = reinterpret_cast<int*>(Game.m_scriptFoodBase);
+	char* obj = reinterpret_cast<char*>(this);
+
+	for (int i = 0; i < 4; i++) {
+		if (scriptFoodBase[i] == 0) {
+			obj[0x2C96 + i] = static_cast<char>(0xFF);
+			continue;
+		}
+
+		OSWaitSemaphore(accessSemaphores + i);
+		{
+			unsigned short maskValue = *reinterpret_cast<unsigned short*>(scriptFoodBase[i] + 0x89C);
+			if ((maskValue != *reinterpret_cast<unsigned short*>(obj + 0x2C8E)) && (Joybus.SendMask(i, maskValue) == 0)) {
+				*reinterpret_cast<unsigned short*>(obj + 0x2C8E) = maskValue;
+				obj[0x2C96 + i] = 6;
+			}
+		}
+		OSSignalSemaphore(accessSemaphores + i);
+	}
 }
 
 /*
@@ -511,23 +565,25 @@ void GbaQueue::LoadMask()
  */
 int GbaQueue::SetQueue(int channel, unsigned int value)
 {
+	char* obj = reinterpret_cast<char*>(this);
+	OSSemaphore* semaphore = accessSemaphores + channel;
 	int ret;
-	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 
-	OSWaitSemaphore(accessSemaphores + channel);
-	if (compatibilityStr[channel - 0x18] == 0) {
-		if (*(int*)(compatibilityStr + channel * 4 - 0x28) < 0x40) {
+	OSWaitSemaphore(semaphore);
+	if (obj[0x440 + channel] == 0) {
+		int* queueCount = reinterpret_cast<int*>(obj + 0x430 + channel * 4);
+		if (*queueCount < 0x40) {
 			ret = 0;
-			*(unsigned int*)(reinterpret_cast<char*>(accessSemaphores) + *(int*)(compatibilityStr + channel * 4 - 0x28) * 4 + channel * 0x100 + 0x30) = value;
-			*(int*)(compatibilityStr + channel * 4 - 0x28) = *(int*)(compatibilityStr + channel * 4 - 0x28) + 1;
+			reinterpret_cast<unsigned int*>(obj + 0x30 + channel * 0x100)[*queueCount] = value;
+			*queueCount = *queueCount + 1;
 		} else {
 			ret = -1;
-			compatibilityStr[channel - 0x18] = 1;
+			obj[0x440 + channel] = 1;
 		}
 	} else {
 		ret = -1;
 	}
-	OSSignalSemaphore(accessSemaphores + channel);
+	OSSignalSemaphore(semaphore);
 	return ret;
 }
 
@@ -538,7 +594,15 @@ int GbaQueue::SetQueue(int channel, unsigned int value)
  */
 void GbaQueue::ResetQueue()
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+
+	for (int channel = 0; channel < 4; channel++) {
+		OSWaitSemaphore(accessSemaphores + channel);
+		memset(obj + 0x30 + channel * 0x100, 0, 0x100);
+		*reinterpret_cast<int*>(obj + 0x430 + channel * 4) = 0;
+		obj[0x440 + channel] = 0;
+		OSSignalSemaphore(accessSemaphores + channel);
+	}
 }
 
 /*
@@ -1212,7 +1276,9 @@ void GbaQueue::GetMBasePos(int channel, short* outX, short* outY)
  */
 void GbaQueue::LoadAllStat()
 {
-	// TODO
+	LoadPlayerStat();
+	LoadEnemyStat();
+	LoadMapItemStat();
 }
 
 /*
@@ -1825,12 +1891,50 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CE3F8
+ * PAL Size: 372b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetMapObjInfo(int, unsigned char*)
+int GbaQueue::GetMapObjInfo(int channel, unsigned char* outData)
 {
-	return 0;
+	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
+
+	OSWaitSemaphore(accessSemaphores + channel);
+
+	unsigned char* mapObj = obj + 0xB35;
+	int count = 4;
+	do {
+		unsigned char* out = outData;
+		out[0] = mapObj[0x000];
+		out[1] = mapObj[0x014];
+		out[2] = mapObj[0x028];
+		out[3] = mapObj[0x03C];
+		out[4] = mapObj[0x050];
+		out[5] = mapObj[0x064];
+		out[6] = mapObj[0x078];
+		out[7] = mapObj[0x08C];
+		out[8] = mapObj[0x0A0];
+		out[9] = mapObj[0x0B4];
+		out[10] = mapObj[0x0C8];
+		out[11] = mapObj[0x0DC];
+		out[12] = mapObj[0x0F0];
+		out[13] = mapObj[0x104];
+		out[14] = mapObj[0x118];
+		out[15] = mapObj[0x12C];
+		mapObj += 0x140;
+		count--;
+		outData += 0x10;
+	} while (count != 0);
+
+	for (int i = 0; i < 0x10; i++) {
+		outData[i] = obj[0x2435 + i * 0x14];
+	}
+
+	OSSignalSemaphore(accessSemaphores + channel);
+	return 0x50;
 }
 
 /*
@@ -1882,39 +1986,39 @@ void GbaQueue::GetCaravanName(char* outName)
  */
 int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 {
-	unsigned char localPlayerData[0xDC];
+	GbaQueuePlayerDataView localPlayerData;
 	unsigned short itemList[0x40];
 	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x454, sizeof(localPlayerData));
+	localPlayerData = *GetPlayerDataView(this, channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	for (i = 0; i < 0x40; i++) {
-		itemList[i] = SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0x3A + i * 2));
+		itemList[i] = SwapU16(localPlayerData.m_items[i]);
 	}
 	memcpy(outData, itemList, sizeof(itemList));
 
-	*reinterpret_cast<unsigned int*>(outData + 0x80) = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x24));
-	*reinterpret_cast<unsigned int*>(outData + 0x84) = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x28));
-	*reinterpret_cast<unsigned int*>(outData + 0x88) = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x2C));
+	*reinterpret_cast<unsigned int*>(outData + 0x80) = SwapU32(localPlayerData.m_artifacts[0]);
+	*reinterpret_cast<unsigned int*>(outData + 0x84) = SwapU32(localPlayerData.m_artifacts[1]);
+	*reinterpret_cast<unsigned int*>(outData + 0x88) = SwapU32(localPlayerData.m_artifacts[2]);
 
 	for (i = 0; i < 4; i++) {
 		*reinterpret_cast<unsigned short*>(outData + 0x8C + i * 2) =
-			SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0xBA + i * 2));
+			SwapU16(localPlayerData.m_tmpArtifacts[i]);
 	}
 
-	outData[0x94] = localPlayerData[0xD7];
-	outData[0x95] = localPlayerData[0xD8];
-	outData[0x96] = localPlayerData[0xD9];
-	outData[0x97] = localPlayerData[0xDA];
+	outData[0x94] = localPlayerData.m_commandData[0];
+	outData[0x95] = localPlayerData.m_commandData[1];
+	outData[0x96] = localPlayerData.m_commandData[2];
+	outData[0x97] = localPlayerData.m_commandData[3];
 
 	for (i = 0; i < 8; i++) {
 		*reinterpret_cast<unsigned short*>(outData + 0x98 + i * 2) =
-			SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0xC2 + i * 2));
+			SwapU16(localPlayerData.m_artifactList[i]);
 	}
 
-	outData[0xA8] = localPlayerData[0xD3];
+	outData[0xA8] = localPlayerData.m_artifactCount;
 	return 0xA9;
 }
 
@@ -1956,12 +2060,54 @@ unsigned int GbaQueue::GetScrFlg()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CDDEC
+ * PAL Size: 332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetPlayerHP(int, unsigned char*)
+int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 {
-	return 0;
+	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
+	char hpFlags = 0;
+	char prevHpFlags = 0;
+	char hp;
+	char prevHp;
+
+	for (int i = 0; i < 4; i++) {
+		OSWaitSemaphore(accessSemaphores + i);
+
+		unsigned char* playerData = obj + i * 0xDC;
+		if (i == channel) {
+			hp = static_cast<char>(playerData[0x46B]);
+			prevHp = static_cast<char>(playerData[0x7DB]);
+		}
+		if (playerData[0x46B] != 0) {
+			hpFlags = static_cast<char>(hpFlags | (1 << i));
+		}
+		if (playerData[0x7DB] != 0) {
+			prevHpFlags = static_cast<char>(prevHpFlags | (1 << i));
+		}
+
+		OSSignalSemaphore(accessSemaphores + i);
+	}
+
+	unsigned char channelMask = static_cast<unsigned char>(1 << channel);
+	unsigned int changed = (prevHpFlags != hpFlags);
+	if (hp != prevHp) {
+		changed = 1;
+	}
+	if ((obj[0x2D5A] & channelMask) != (obj[0x2D59] & channelMask)) {
+		changed = 1;
+	}
+
+	outData[0] = 0x13;
+	outData[1] = static_cast<unsigned char>(hpFlags);
+	outData[2] = static_cast<unsigned char>(hp);
+	outData[3] = ((obj[0x2D5A] & channelMask) != 0);
+
+	return changed;
 }
 
 /*
@@ -1983,20 +2129,20 @@ void GbaQueue::MakeLetterList(int channel, char* outData)
 	}
 
 char* npcNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x800, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0x7A7));
+0x800, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7A7));
 	if (npcNameBuf == 0) {
 		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0x7A9);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7A9);
 		}
 		return;
 	}
 	memset(npcNameBuf, 0, 0x800);
 
 char* subjectNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x1800, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0x7B1));
+0x1800, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B1));
 	if (subjectNameBuf == 0) {
 		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0x7B3);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B3);
 		}
 		__dla__FPv(npcNameBuf);
 		return;
@@ -2004,10 +2150,10 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<c
 	memset(subjectNameBuf, 0, 0x1800);
 
 unsigned int* letterEntryBuf = static_cast<unsigned int*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x4000, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0x7BB));
+0x4000, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7BB));
 	if (letterEntryBuf == 0) {
 		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0x7BD);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7BD);
 		}
 		__dla__FPv(subjectNameBuf);
 		__dla__FPv(npcNameBuf);
@@ -2051,7 +2197,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<c
 
 		if (matchedNpc == -1) {
 			if (npcCount > 0x7F && System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp), 0x7DC);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7DC);
 			}
 
 			char tempName[0x20];
@@ -2068,7 +2214,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_npc_max_over), const_cast<char
 
 		if (matchedSubject == -1) {
 			if (subjectCount > 0xFF && System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp), 0x7F0);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7F0);
 			}
 
 			char tempSubject[0x20];
@@ -2104,7 +2250,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<
 					flags |= 0x10;
 					entryWrite[0] = (value << 24) | ((value >> 8) << 16);
 				} else if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp), 0x810, channel, i);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0x810, channel, i);
 				}
 			}
 		} else if (value != 0) {
@@ -2154,20 +2300,20 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast
 int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 {
 char* srcText = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0x859));
+0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x859));
     if (srcText == 0) {
         if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0x85B);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x85B);
         }
         return -1;
     }
     memset(srcText, 0, 0x400);
 
 char* workText = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0x862));
+0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x862));
     if (workText == 0) {
         if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0x864);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x864);
         }
         __dla__FPv(srcText);
         return -1;
@@ -2278,22 +2424,104 @@ void GbaQueue::ClrLetterDatFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CD2DC
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::MoveLetterItem(int, unsigned int)
+void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 {
-	// TODO
+	unsigned int stackValue = value;
+	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
+	unsigned int* scriptFoodBase = Game.m_scriptFoodBase + channel;
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
+	int letterIndex = valueBytes[2];
+	int letterOffset = letterIndex * 0xC;
+	unsigned char* letter = reinterpret_cast<unsigned char*>(caravanWork) + letterOffset;
+	int hasGil = (letter[0x3EC] >> 3) & 1;
+	int result;
+
+	if (hasGil == 0) {
+		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
+		if (item != 0) {
+			if ((item < 1) || (item > 0x9E)) {
+				if (AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), item, 0) == 0) {
+					result = 1;
+				} else {
+					result = 0;
+				}
+			}
+		}
+	}
+	if (hasGil != 0) {
+		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
+		if (item != 0) {
+			int gil = item * 100;
+			if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), gil) == 0) {
+				result = 1;
+			} else {
+				AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(*scriptFoodBase), gil);
+				result = 0;
+			}
+		}
+	}
+
+	int i = 0;
+	do {
+		if (Joybus.SendResult(channel, result, valueBytes[0], valueBytes[1]) == 0) {
+			break;
+		}
+		i++;
+	} while (i < 10);
+
+	if ((result == 0) && (i < 10)) {
+		unsigned char* letterBase = reinterpret_cast<unsigned char*>(*scriptFoodBase);
+		int readFlag = 1;
+		letterBase[letterOffset + 0x3EC] =
+			static_cast<unsigned char>((letterBase[letterOffset + 0x3EC] & 0xBF) | ((readFlag << 6) & 0x40));
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CD1CC
+ * PAL Size: 272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ReplyLetter(int)
+void GbaQueue::ReplyLetter(int channel)
 {
-	// TODO
+	unsigned char recvBuffer[0x400];
+
+	Joybus.GetRecvBuffer(channel, recvBuffer);
+
+	unsigned int value =
+		(static_cast<unsigned int>(recvBuffer[3]) << 24) |
+		(static_cast<unsigned int>(recvBuffer[4]) << 16) |
+		(static_cast<unsigned int>(recvBuffer[5]) << 8) |
+		recvBuffer[6];
+	unsigned int itemId = 0;
+	unsigned int gil = value;
+
+	if (recvBuffer[2] == 0) {
+		itemId = (static_cast<unsigned int>(recvBuffer[5]) << 8) | recvBuffer[6];
+		gil = 0;
+	}
+
+	unsigned int* scriptFoodBase = Game.m_scriptFoodBase + channel;
+	reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->FGLetterReply(recvBuffer[0], recvBuffer[1], itemId, gil);
+	Joybus.ClrRecvBuffer(channel);
+	Joybus.SendResult(channel, 0, 0x15, 0);
+
+	if (recvBuffer[2] != 0) {
+		reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(-static_cast<int>(gil));
+	} else if (itemId != 0) {
+		reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->DeleteItemIdx(static_cast<int>(value) >> 16, 1);
+	}
 }
 
 /*
@@ -2626,14 +2854,14 @@ void GbaQueue::ClrScrInitEnd()
  */
 void GbaQueue::InitCmakeInfo(int channel, int value)
 {
-	char* obj = reinterpret_cast<char*>(this);
+	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	memset(&cmakeInfo[channel], 0, 0x20);
 	cmakeInfo[channel][0] = 1;
-	obj[channel + 0x2CCA] = static_cast<char>(0xFF);
-	obj[channel + 0x2CD1] = static_cast<char>(0xFF);
-	obj[channel + 0x2CB8] = static_cast<char>(value);
+	obj[channel * 0x20 + 0x2CCA] = 0xFF;
+	obj[channel * 0x20 + 0x2CD1] = 0xFF;
+	obj[channel * 0x20 + 0x2CB8] = static_cast<unsigned char>(value);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	Joybus.SetMType(channel, 1);
@@ -2770,7 +2998,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		OSSignalSemaphore(semaphore);
 	} else {
 		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_name_crc_error), const_cast<char*>(s_gbaque_cpp), 0xAD3);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_name_crc_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0xAD3);
 		}
 		Joybus.SendResult(channel, 1, resultCode, 0);
 	}
@@ -3001,7 +3229,7 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 		OSSignalSemaphore(semaphore);
 	} else {
 		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_favorite_crc_error), const_cast<char*>(s_gbaque_cpp), 0xBDC);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_favorite_crc_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0xBDC);
 		}
 		Joybus.SendResult(channel, 1, resultCode, 0);
 	}
@@ -3196,8 +3424,14 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	unsigned char localPlayerData[0xDC];
 	unsigned char equipIndices[0x40];
 	unsigned int indexBytes;
-	unsigned char equipCount;
+	int equipCount;
 	unsigned char* writePtr;
+	unsigned short equipData[4];
+	int dataSize;
+	unsigned char* itemPtr;
+	unsigned char* indexPtr;
+	char itemIndex;
+	int remaining;
 	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -3207,13 +3441,21 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 
 	memset(equipIndices, 0xFF, sizeof(equipIndices));
 	equipCount = 0;
-	for (i = 0; i < 0x40; i++) {
-		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + i * 2);
+	itemPtr = localPlayerData;
+	indexPtr = equipIndices;
+	itemIndex = 0;
+	remaining = 0x40;
+	do {
+		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
 		if (itemId >= 0 && itemId < 0x9F) {
-			equipIndices[equipCount] = static_cast<unsigned char>(i);
+			*indexPtr = static_cast<unsigned char>(itemIndex);
 			equipCount++;
+			indexPtr++;
 		}
-	}
+		itemPtr += 2;
+		itemIndex++;
+		remaining--;
+	} while (remaining != 0);
 
 	indexBytes = static_cast<unsigned int>(equipCount) + 1;
 	if ((indexBytes & 3) != 0) {
@@ -3223,22 +3465,22 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	outData[4] = equipCount;
 	memcpy(outData + 5, equipIndices, indexBytes - 1);
 
+	dataSize = indexBytes + 4;
 	writePtr = outData + 4 + indexBytes;
 	for (i = 0; i < equipCount; i++) {
 		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + equipIndices[i] * 2);
 		int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 
-		*reinterpret_cast<unsigned short*>(writePtr + 0) =
-			SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 4));
-		*reinterpret_cast<unsigned short*>(writePtr + 2) =
-			SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 6));
-		*reinterpret_cast<unsigned short*>(writePtr + 4) =
-			SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 8));
-		*reinterpret_cast<unsigned short*>(writePtr + 6) = 0;
+		equipData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
+		equipData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
+		equipData[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
+		equipData[3] = 0;
+		memcpy(writePtr, equipData, sizeof(equipData));
 		writePtr += 8;
+		dataSize += 8;
 	}
 
-	return static_cast<int>((writePtr - outData));
+	return dataSize;
 }
 
 /*
@@ -3272,9 +3514,21 @@ void GbaQueue::SetShopFlg(int channel)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ClrShopFlg(int)
+void GbaQueue::ClrShopFlg(int channel)
 {
-	// TODO
+	const unsigned char playerMask = static_cast<unsigned char>(1 << channel);
+	unsigned char* flags = reinterpret_cast<unsigned char*>(this) + 0x2D38;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	flags[0] = static_cast<unsigned char>(flags[0] & ~playerMask);
+	flags[1] = static_cast<unsigned char>(flags[1] & ~playerMask);
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	for (int retry = 0; retry < 10; retry++) {
+		if (Joybus.SetMType(channel, 0) == 0) {
+			break;
+		}
+	}
 }
 
 /*
@@ -3308,9 +3562,21 @@ void GbaQueue::SetSmithFlg(int channel)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ClrSmithFlg(int)
+void GbaQueue::ClrSmithFlg(int channel)
 {
-	// TODO
+	const unsigned char shopMask = static_cast<unsigned char>(0x10 << channel);
+	unsigned char* flags = reinterpret_cast<unsigned char*>(this) + 0x2D38;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	flags[0] = static_cast<unsigned char>(flags[0] & ~shopMask);
+	flags[1] = static_cast<unsigned char>(flags[1] & ~shopMask);
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	for (int retry = 0; retry < 10; retry++) {
+		if (Joybus.SetMType(channel, 0) == 0) {
+			break;
+		}
+	}
 }
 
 /*
@@ -3318,9 +3584,14 @@ void GbaQueue::ClrSmithFlg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ShopEnd(int)
+void GbaQueue::ShopEnd(int channel)
 {
-	// TODO
+	ClrShopFlg(channel);
+
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+	if (caravanWork != 0) {
+		caravanWork->CallShop(0, 0, 0, 0, 0);
+	}
 }
 
 /*
@@ -3328,9 +3599,14 @@ void GbaQueue::ShopEnd(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::SmithEnd(int)
+void GbaQueue::SmithEnd(int channel)
 {
-	// TODO
+	ClrSmithFlg(channel);
+
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+	if (caravanWork != 0) {
+		caravanWork->CallShop(1, 0, 0, 0, 0);
+	}
 }
 
 /*
@@ -3345,20 +3621,20 @@ void GbaQueue::SmithEnd(int)
 void GbaQueue::MakeBuyData(int channel, char* outData)
 {
 char* itemNameScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0xD79));
+0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xD79));
 	if (itemNameScratch == 0) {
 		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0xD7B);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xD7B);
 		}
 		return;
 	}
 	memset(itemNameScratch, 0, 0x400);
 
 char* agbStringScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0xD82));
+0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xD82));
 	if (agbStringScratch == 0) {
 		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0xD84);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xD84);
 		}
 		__dla__FPv(itemNameScratch);
 		return;
@@ -3448,20 +3724,20 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<c
 void GbaQueue::MakeSellData(int channel, char* outData)
 {
 char* itemNameScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0xDD5));
+0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xDD5));
 	if (itemNameScratch == 0) {
 		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0xDD7);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xDD7);
 		}
 		return;
 	}
 	memset(itemNameScratch, 0, 0x400);
 
 char* agbStringScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0xDDE));
+0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xDDE));
 	if (agbStringScratch == 0) {
 		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0xDE0);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xDE0);
 		}
 		__dla__FPv(itemNameScratch);
 		return;
@@ -3557,10 +3833,10 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<c
 void GbaQueue::MakeSmithData(int channel, char* outData)
 {
 	unsigned char* smithIndices = static_cast<unsigned char*>(
-__nwa__FUlPQ27CMemory6CStagePci(0x40, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0xE41));
+__nwa__FUlPQ27CMemory6CStagePci(0x40, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xE41));
 	if (smithIndices == 0) {
 		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0xE43);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xE43);
 		}
 		return;
 	}
@@ -3877,12 +4153,27 @@ void GbaQueue::ClrArtifactFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CA5D4
+ * PAL Size: 468b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetArtifactData(int, unsigned char*)
+int GbaQueue::GetArtifactData(int channel, unsigned char* outData)
 {
-	return 0;
+	GbaQueuePlayerDataView localPlayerData;
+	unsigned int artifactData[3];
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	localPlayerData = *GetPlayerDataView(this, channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	artifactData[0] = SwapU32(localPlayerData.m_artifacts[0]);
+	artifactData[1] = SwapU32(localPlayerData.m_artifacts[1]);
+	artifactData[2] = SwapU32(localPlayerData.m_artifacts[2]);
+	memcpy(outData, artifactData, sizeof(artifactData));
+	return 0xC;
 }
 
 /*
@@ -4020,22 +4311,83 @@ void GbaQueue::ClrArtiDatFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CA030
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::MakeArtiData(int, char*)
+int GbaQueue::MakeArtiData(int channel, char* outData)
 {
-	// TODO
+	char* itemNameScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+		0x400, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x100F));
+	if (itemNameScratch == 0) {
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370),
+			                     0x1011);
+		}
+		return -1;
+	}
+	memset(itemNameScratch, 0, 0x400);
+
+	char* agbStringScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+		0x400, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x1017));
+	if (agbStringScratch == 0) {
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370),
+			                     0x1019);
+		}
+		return -1;
+	}
+	memset(agbStringScratch, 0, 0x400);
+
+	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
+	unsigned int artifactData[3];
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	artifactData[0] = SwapU32(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x24));
+	artifactData[1] = SwapU32(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x28));
+	artifactData[2] = SwapU32(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x2C));
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	memcpy(outData, artifactData, sizeof(artifactData));
+	__dla__FPv(agbStringScratch);
+	__dla__FPv(itemNameScratch);
+
+	reinterpret_cast<char*>(this)[0x2D3F] =
+		static_cast<char>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D3F]) | (1 << channel));
+	Joybus.SetLetterSize(channel, 0xC);
+	return 0xC;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C9E50
+ * PAL Size: 480b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetTmpArtifactData(int, unsigned char*)
+int GbaQueue::GetTmpArtifactData(int channel, unsigned char* outData)
 {
-	return 0;
+	GbaQueuePlayerDataView localPlayerData;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	localPlayerData = *GetPlayerDataView(this, channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	*reinterpret_cast<unsigned short*>(outData + 0) =
+		SwapU16(localPlayerData.m_tmpArtifacts[0]);
+	*reinterpret_cast<unsigned short*>(outData + 2) =
+		SwapU16(localPlayerData.m_tmpArtifacts[1]);
+	*reinterpret_cast<unsigned short*>(outData + 4) =
+		SwapU16(localPlayerData.m_tmpArtifacts[2]);
+	*reinterpret_cast<unsigned short*>(outData + 6) =
+		SwapU16(localPlayerData.m_tmpArtifacts[3]);
+
+	return 8;
 }
 
 /*

@@ -239,12 +239,10 @@ void CUtil::ConvF2IVector(S16Vec& out, Vec in, long shift)
     int scaleInt = 1 << shift;
     float y = in.y;
     float z = in.z;
-    double scaleY = (double)scaleInt;
-    double scaleZ = (double)scaleInt;
 
-    out.x = (short)(int)(in.x * (float)((double)scaleInt));
-    out.y = (short)(int)(y * (float)scaleY);
-    out.z = (short)(int)(z * (float)scaleZ);
+    out.x = (short)(int)(in.x * (float)scaleInt);
+    out.y = (short)(int)(y * (float)scaleInt);
+    out.z = (short)(int)(z * (float)scaleInt);
 }
 
 /*
@@ -260,10 +258,9 @@ void CUtil::ConvF2IVector2d(S16Vec2d& out, Vec2d in, long shift)
 {
     int scaleInt = 1 << shift;
     float y = in.y;
-    double scaleY = (double)scaleInt;
 
-    out.x = (short)(int)(in.x * (float)((double)scaleInt));
-    out.y = (short)(int)(y * (float)scaleY);
+    out.x = (short)(int)(in.x * (float)scaleInt);
+    out.y = (short)(int)(y * (float)scaleInt);
 }
 
 /*
@@ -701,8 +698,8 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
     Mtx44 screenMtx;
     float indMtx[2][3];
     GXColor white;
-    float x2 = x + width;
-    float y2 = y + height;
+    float x2;
+    float y2;
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
@@ -750,6 +747,9 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
     }
+
+    x2 = x + width;
+    y2 = y + height;
 
     if (color == 0) {
         float u1 = kUtilZero;
@@ -840,8 +840,8 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
     Mtx44 screenMtx;
     float indMtx[2][3];
     GXColor white;
-    float x2 = x + width;
-    float y2 = y + height;
+    float x2;
+    float y2;
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
@@ -892,6 +892,9 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
     } else if (textureFormat == 9 || textureFormat == 8) {
         SetPaletteEnv(texture);
     }
+
+    x2 = x + width;
+    y2 = y + height;
 
     if (color == 0) {
         float u1 = kUtilZero;
@@ -1095,12 +1098,14 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 	u8* data = (u8*)dlData;
 	u8* current = data;
 	u8* end = data + dlSize;
+	unsigned long copyPos = copyFlags & 1;
+	unsigned long copyNrm = copyFlags & 2;
 
 	while (current < end) {
 		u8 cmd = *current;
 		u32 count = *(u16*)(current + 1);
 		u8 primitive = cmd & 0xF8;
-		bool isPrimitive = false;
+		u8 indexFormat = cmd & 7;
 		current += 3;
 
 		switch (primitive) {
@@ -1111,37 +1116,36 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 			case 0xA8:
 			case 0xB0:
 			case 0xB8:
-				isPrimitive = true;
 				break;
-		}
-
-		if (!isPrimitive) {
-			break;
+			default:
+				goto flush;
 		}
 
 		while (count != 0) {
 			u16 value = *(u16*)current;
 
-			if ((copyFlags & 1) != 0) {
+			if (copyPos != 0) {
 				*(u16*)(current + 4) = value;
 			}
-			if ((copyFlags & 2) != 0) {
-				*(u16*)(current + 6) = value;
-			}
+			current += 6;
 
-			if ((cmd & 7) == 2) {
-				if ((copyFlags & 2) != 0) {
-					*(u16*)(current + 8) = value;
+			if (copyNrm != 0) {
+				*(u16*)current = value;
+			}
+			current += 2;
+
+			if (indexFormat == 2) {
+				if (copyNrm != 0) {
+					*(u16*)current = value;
 				}
-				current += 10;
-			} else {
-				current += 8;
+				current += 2;
 			}
 
 			count--;
 		}
 	}
 
+flush:
 	DCFlushRange(dlData, dlSize);
 }
 
@@ -1156,38 +1160,27 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
  */
 void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, unsigned long count, unsigned long shift)
 {
-    S16Vec max = {-0x7FFF, -0x7FFF, -0x7FFF};
-    S16Vec min = {0x7FFF, 0x7FFF, 0x7FFF};
+    S16Vec min;
+    S16Vec max;
+
+    min.z = 0x7FFF;
+    min.y = 0x7FFF;
+    min.x = 0x7FFF;
+    max.z = -0x7FFF;
+    max.y = -0x7FFF;
+    max.x = -0x7FFF;
 
     for (unsigned long i = 0; i < count; i++, vecs++) {
-        if (vecs->x < min.x) {
-            min.x = vecs->x;
-        }
-        if (vecs->y < min.y) {
-            min.y = vecs->y;
-        }
-        if (vecs->z < min.z) {
-            min.z = vecs->z;
-        }
-        if (max.x < vecs->x) {
-            max.x = vecs->x;
-        }
-        if (max.y < vecs->y) {
-            max.y = vecs->y;
-        }
-        if (max.z < vecs->z) {
-            max.z = vecs->z;
-        }
+        min.x = min.x < vecs->x ? min.x : vecs->x;
+        min.y = min.y < vecs->y ? min.y : vecs->y;
+        min.z = min.z < vecs->z ? min.z : vecs->z;
+        max.x = max.x < vecs->x ? vecs->x : max.x;
+        max.y = max.y < vecs->y ? vecs->y : max.y;
+        max.z = max.z < vecs->z ? vecs->z : max.z;
     }
 
-    int scale = 1 << shift;
-
-    minOut->x = (float)min.x / (float)scale;
-    minOut->y = (float)min.y / (float)scale;
-    minOut->z = (float)min.z / (float)scale;
-    maxOut->x = (float)max.x / (float)scale;
-    maxOut->y = (float)max.y / (float)scale;
-    maxOut->z = (float)max.z / (float)scale;
+    ConvI2FVector(*minOut, min, shift);
+    ConvI2FVector(*maxOut, max, shift);
 }
 
 /*

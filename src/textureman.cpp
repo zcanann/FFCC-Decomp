@@ -621,27 +621,43 @@ CTextureSet::~CTextureSet()
  */
 void CTexture::InitTexObj()
 {
-    const int format = m_format;
-    if ((format == 9) || (format == 8)) {
-        GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height), static_cast<GXCITexFmt>(format),
-                       static_cast<GXTexWrapMode>(m_wrapMode), static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
+    int format;
+    int tlutBase;
+    unsigned int numEntries;
+    int offset;
 
-        int numEntries = 0x10;
+    format = m_format;
+    if ((format == 9) || (format == 8)) {
+        GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
+                       static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
+                       static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
+
+        tlutBase = reinterpret_cast<int>(m_tlutData);
+        numEntries = 0x10;
+        if (m_format == 9) {
+            numEntries = 0x100;
+        }
+        GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutBase), GX_TL_IA8, static_cast<u16>(numEntries));
+
+        numEntries = 0x10;
         if (m_format == 9) {
             numEntries = 0x100;
         }
 
-        GXInitTlutObj(&m_tlutObj0, m_tlutData, GX_TL_IA8, static_cast<u16>(numEntries));
-        GXInitTlutObj(&m_tlutObj1, Ptr(m_tlutData, numEntries * 2), GX_TL_IA8, static_cast<u16>(numEntries));
+        offset = 0x10;
+        if (m_format == 9) {
+            offset = 0x100;
+        }
+        GXInitTlutObj(&m_tlutObj1, reinterpret_cast<void*>(tlutBase + offset * 2), GX_TL_IA8, static_cast<u16>(numEntries));
     } else {
-        GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height), static_cast<GXTexFmt>(format),
-                     static_cast<GXTexWrapMode>(m_wrapMode), static_cast<GXTexWrapMode>(m_wrapMode), 1 - (m_maxLod >> 31));
+        GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
+                     static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
+                     static_cast<GXTexWrapMode>(m_wrapMode), (1 - m_maxLod) >> 31);
     }
 
-    const unsigned char maxLod = m_maxLod;
-    if (maxLod >= 2) {
-        GXInitTexObjLOD(&m_texObj, GX_LINEAR, GX_LINEAR, 0.0f, static_cast<float>(maxLod - 1), 0.0f, GX_FALSE, GX_FALSE,
-                        GX_ANISO_1);
+    if (1 < m_maxLod) {
+        GXInitTexObjLOD(&m_texObj, GX_LIN_MIP_LIN, GX_LINEAR, 0.0f, static_cast<float>(m_maxLod) - 1.0f, 0.0f, GX_FALSE,
+                        GX_FALSE, GX_ANISO_1);
     }
 }
 
@@ -835,16 +851,20 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
 {
     if (m_cacheId != -1) {
         if (IsEnable__13CAmemCacheSetFs(amemCacheSet, m_cacheId) == 0) {
+            int format;
+            unsigned int numEntries;
+            int offset;
+
             m_imageData = reinterpret_cast<void*>(
                 GetData__13CAmemCacheSetFsPci(amemCacheSet, m_cacheId, const_cast<char*>(s_textureman_cpp), 0x1DD));
 
-            const int format = m_format;
+            format = m_format;
             if ((format == 9) || (format == 8)) {
                 GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                                static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                                static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
 
-                unsigned int numEntries = 0x10;
+                numEntries = 0x10;
                 if (m_format == 9) {
                     numEntries = 0x100;
                 }
@@ -854,20 +874,20 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
                 if (m_format == 9) {
                     numEntries = 0x100;
                 }
-                int offset = 0x10;
+                offset = 0x10;
                 if (m_format == 9) {
                     offset = 0x100;
                 }
-                GXInitTlutObj(&m_tlutObj1, Ptr(m_tlutData, offset * 2), GX_TL_IA8, static_cast<u16>(numEntries));
+                GXInitTlutObj(&m_tlutObj1, reinterpret_cast<void*>(reinterpret_cast<unsigned int>(m_tlutData) + offset * 2),
+                              GX_TL_IA8, static_cast<u16>(numEntries));
             } else {
                 GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                              static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                             static_cast<GXTexWrapMode>(m_wrapMode), 1 - (m_maxLod >> 31));
+                             static_cast<GXTexWrapMode>(m_wrapMode), (1 - m_maxLod) >> 31);
             }
 
-            const unsigned char maxLod = m_maxLod;
-            if (maxLod >= 2) {
-                GXInitTexObjLOD(&m_texObj, GX_LINEAR, GX_LINEAR, 0.0f, static_cast<float>(maxLod - 1), 0.0f, GX_FALSE,
+            if (1 < m_maxLod) {
+                GXInitTexObjLOD(&m_texObj, GX_LINEAR, GX_LINEAR, 0.0f, static_cast<float>(m_maxLod - 1), 0.0f, GX_FALSE,
                                 GX_FALSE, GX_ANISO_1);
             }
         }
@@ -1332,8 +1352,8 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
  */
 int CTextureSet::Find(char* name)
 {
-    for (unsigned long i = 0; i < static_cast<unsigned long>(Textures(this)->GetSize()); i++) {
-        CTexture* texture = (*Textures(this))[i];
+    for (unsigned long i = 0; i < static_cast<unsigned long>(GetSize__21CPtrArray_P8CTexture_Fv(Textures(this))); i++) {
+        CTexture* texture = __vc__21CPtrArray_P8CTexture_FUl(Textures(this), i);
         if ((texture != 0) && (strcmp(reinterpret_cast<char*>(Ptr(texture, 8)), name) == 0)) {
             return static_cast<int>(i);
         }

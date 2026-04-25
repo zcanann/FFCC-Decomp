@@ -676,45 +676,59 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     (void)z;
 
     unsigned int scriptFood = Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
-    if (scriptFood == 0 || alpha <= FLOAT_803308d8) {
+    if ((scriptFood == 0) || (alpha <= FLOAT_803308d8)) {
         return;
     }
 
     unsigned char colorStorage[8];
-    int colorAlpha = (int)(FLOAT_80330908 * alpha);
-    __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)colorAlpha);
+    __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (int)(FLOAT_80330908 * alpha));
     SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x17);
 
-    float baseX = x + (float)((*(unsigned int*)((char*)this + 0x18) & 1) != 0 ? 0x30 : 0x4C);
-    float baseY = y + FLOAT_8033090c;
+    unsigned int menuIndex = *(unsigned int*)((char*)this + 0x18);
+    unsigned int offset = 0x4C;
+    if ((menuIndex & 1) != 0) {
+        offset = 0x30;
+    }
+
+    double baseY = (double)(FLOAT_8033090c + y);
+    double stepScale = (double)FLOAT_80330910;
     int valueOffset = 0;
-    int timerOffset = 0;
+    double baseX = x + (double)(float)offset;
+    double timerScale = (double)FLOAT_80330918;
+    double one = (double)FLOAT_80330914;
+    double pulseScale = (double)FLOAT_8033091c;
+    double pulseMul = (double)FLOAT_80330920;
+    double zero = (double)FLOAT_803308d8;
+    int timerOffset = (int)this;
+    double intBias = DOUBLE_80330900;
 
-    int heartCount = (int)((unsigned short)*(unsigned short*)(scriptFood + 0x1A) >> 1);
-    for (int i = 0; i < heartCount; i++) {
-        unsigned int addTimer = *(unsigned int*)((char*)this + 0x3DB0 + timerOffset);
+    for (int i = 0; i < (int)(unsigned int)(*(unsigned short*)(scriptFood + 0x1A) >> 1); i++) {
         int heartValue = *(int*)((char*)this + 0x3DA8) - valueOffset;
+        double timer = (double)(float)*(unsigned int*)(timerOffset + 0x3DB0);
+        double pulse = (double)(float)((double)(float)(pulseScale *
+                                                        (double)(float)sin((double)(float)(stepScale *
+                                                                                           -(double)(float)((double)(float)(timer * timerScale) - one))) +
+                                                        one) *
+                                       pulseMul);
 
-        float pulse = (FLOAT_8033091c *
-                       (float)sin(FLOAT_80330910 * -(((float)addTimer * FLOAT_80330918) - FLOAT_80330914)) +
-                       FLOAT_80330914) *
-                      FLOAT_80330920;
-
-        unsigned int subTimer = *(unsigned int*)((char*)this + 0x3DD0 + timerOffset);
+        unsigned int subTimer = *(unsigned int*)(timerOffset + 0x3DD0);
         int shakeX = 0;
+        if (subTimer != 0) {
+            shakeX = ((int)subTimer >> 2) * DAT_8020f998[((subTimer + 1) * 4 & 0xC) / 4];
+        }
+
         int shakeY = 0;
         if (subTimer != 0) {
-            shakeX = ((int)subTimer >> 2) * DAT_8020f998[(subTimer + 1) & 3];
             shakeY = ((int)subTimer >> 2) * DAT_8020f998[subTimer & 3];
         }
 
-        float drawX = baseX + (float)shakeX;
-        float drawY = baseY + (float)shakeY;
+        double drawX = (double)(float)(baseX + (double)(float)shakeX);
+        double drawY = (double)(float)(baseY + (double)(float)shakeY);
 
         DrawRect__8CMenuPcsFUlfffffffff(
-            &MenuPcs, 3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, FLOAT_803308d8, FLOAT_803308d8, pulse, pulse,
-            FLOAT_803308d8);
+            &MenuPcs, 3, (float)drawX, (float)drawY, FLOAT_803308dc, FLOAT_803308dc, (float)zero, (float)zero, (float)pulse,
+            (float)pulse, FLOAT_803308d8);
 
         if (heartValue > 0) {
             int fillAmount = heartValue;
@@ -725,10 +739,11 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
             float u = *(unsigned short*)(scriptFood + 0x42) != 0 ? 24.0f : 0.0f;
             float v = (float)((0x0C - fillAmount) * 0x18);
             DrawRect__8CMenuPcsFUlfffffffff(
-                &MenuPcs, 3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, u, v, pulse, pulse, FLOAT_803308d8);
+                &MenuPcs, 3, (float)drawX, (float)drawY, FLOAT_803308dc, FLOAT_803308dc, u, v, (float)pulse, (float)pulse,
+                FLOAT_803308d8);
         }
 
-        baseX += ((*(unsigned int*)((char*)this + 0x18) & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
+        baseX = (double)(float)(baseX + (double)(((menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928));
         valueOffset += 0x0C;
         timerOffset += 4;
     }
@@ -795,22 +810,21 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     *(int*)((char*)this + 0x3DA4) = 0;
     *(unsigned int*)((char*)this + 0x3D8C) = (unsigned int)flags;
 
-    dVar4 = DOUBLE_80330900;
-    fVar1 = FLOAT_803308dc;
-    if (*(int*)((char*)this + 0x18) < 4) {
-        SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 0);
-        *(float*)((char*)this + 0x3D9C) = FLOAT_803308e0;
-        fVar1 = FLOAT_803308e4;
-        *(float*)((char*)this + 0x3DA0) = fVar1;
-    } else {
+    if (*(int*)((char*)this + 0x18) >= 4) {
         *(float*)((char*)this + 0x3D6C) = (float)x;
         *(float*)((char*)this + 0x3D70) = (float)y;
         *(int*)((char*)this + 0x3D88) = 1;
         uVar2 = ((unsigned int)__cntlzw((unsigned int)(flags & 2))) >> 5;
+        fVar1 = FLOAT_803308dc;
         *(float*)((char*)this + 0x3D9C) = fVar1;
         *(float*)((char*)this + 0x3DA0) = fVar1;
         *(unsigned int*)((char*)this + 0x3D50) = (unsigned int)(-(flags >> 1 & 1) & 0x1C);
         *(unsigned int*)((char*)this + 0x3D54) = uVar2;
+    } else {
+        SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 0);
+        *(float*)((char*)this + 0x3D9C) = FLOAT_803308e0;
+        fVar1 = FLOAT_803308e4;
+        *(float*)((char*)this + 0x3DA0) = fVar1;
     }
 
     *(int*)((char*)this + 0x3D90) = unk1;
@@ -823,32 +837,30 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     *(float*)((char*)this + 0x3D80) = fVar1 * *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3CC4);
 
     fVar1 = FLOAT_803308ec;
-    if (*(int*)((char*)this + 0x18) < 4) {
-        if ((flags & 0x100) == 0) {
-            fVar1 = *(float*)((char*)this + 0x3D7C);
-            if (fVar1 < FLOAT_803308f0) {
-                fVar1 = FLOAT_803308f0;
-            }
-            *(float*)((char*)this + 0x3D7C) = fVar1;
-        }
-    } else if ((flags & 8) == 0) {
-        if ((flags & 0x8000) != 0) {
+    if (*(int*)((char*)this + 0x18) >= 4) {
+        if ((flags & 8) != 0) {
+            *(float*)((char*)this + 0x3D6C) = -(FLOAT_803308ec * *(float*)((char*)this + 0x3D7C) - *(float*)((char*)this + 0x3D6C));
+            *(float*)((char*)this + 0x3D70) = -(fVar1 * *(float*)((char*)this + 0x3D80) - *(float*)((char*)this + 0x3D70));
+        } else if ((flags & 0x8000) != 0) {
             *(float*)((char*)this + 0x3D6C) -= *(float*)((char*)this + 0x3D7C);
         }
-    } else {
-        *(float*)((char*)this + 0x3D6C) = -(FLOAT_803308ec * *(float*)((char*)this + 0x3D7C) - *(float*)((char*)this + 0x3D6C));
-        *(float*)((char*)this + 0x3D70) = -(fVar1 * *(float*)((char*)this + 0x3D80) - *(float*)((char*)this + 0x3D70));
+    } else if ((flags & 0x100) == 0) {
+        fVar1 = *(float*)((char*)this + 0x3D7C);
+        if (fVar1 < FLOAT_803308f0) {
+            fVar1 = FLOAT_803308f0;
+        }
+        *(float*)((char*)this + 0x3D7C) = fVar1;
     }
 
     uVar2 = (unsigned int)*(int*)((char*)this + 0x18);
     if ((int)uVar2 < 4) {
-        if ((uVar2 & 2) == 0) {
-            dVar4 = (double)(FLOAT_803308f8 + *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) +
-                             *(float*)((char*)this + 0x3D78));
-        } else {
+        if ((uVar2 & 2) != 0) {
             dVar4 = (double)((*(float*)((char*)this + 0x3DA0) + (*(float*)((char*)this + 0x3D70) - FLOAT_803308f4) +
                               *(float*)((char*)this + 0x3D78)) -
                              *(float*)((char*)this + 0x3D80));
+        } else {
+            dVar4 = (double)(FLOAT_803308f8 + *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) +
+                             *(float*)((char*)this + 0x3D78));
         }
     } else {
         dVar4 = (double)(*(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78));
@@ -934,7 +946,7 @@ void CMesMenu::SetPos(float x, float y)
  * Address:	TODO
  * Size:	TODO
  */
-void CMesMenu::close(int)
+void CMesMenu::close(int closeReason)
 {
-	// TODO
+    CloseRequest(closeReason);
 }

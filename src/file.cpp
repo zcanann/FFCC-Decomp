@@ -100,34 +100,39 @@ static const char s_openWarnFmt[] = {0x43, 0x46, 0x69, 0x6C, 0x65, 0x3A, 0x3A, 0
 
 static const char s_emptyErrorText[] = "";
 
-static const char* l_tError[72] = {
-    s_diskReadErrorJp0, s_diskReadErrorJp1, s_emptyErrorText,
-    s_diskReadErrorEn0, s_diskReadErrorEn1, s_diskReadErrorEn2,
-    s_diskReadErrorDe0, s_diskReadErrorDe1, s_diskReadErrorDe2,
-    s_diskReadErrorIt0, s_diskReadErrorIt1, s_diskReadErrorIt2,
-    s_diskReadErrorFr0, s_diskReadErrorFr1, s_diskReadErrorFr2,
-    s_diskReadErrorEs0, s_diskReadErrorEs1, s_diskReadErrorEs2,
-
-    s_discCoverOpenJp0, s_discCoverOpenJp1, s_emptyErrorText,
-    s_discCoverOpenEn0, s_discCoverOpenEn1, s_discCoverOpenEn2,
-    s_discCoverOpenDe0, s_discCoverOpenDe1, s_discCoverOpenDe2,
-    s_discCoverOpenIt0, s_discCoverOpenIt1, s_discCoverOpenIt2,
-    s_discCoverOpenFr0, s_discCoverOpenFr1, s_discCoverOpenFr2,
-    s_discCoverOpenEs0, s_discCoverOpenEs1, s_discCoverOpenEs2,
-
-    s_wrongDiscJp0, s_wrongDiscJp1, s_emptyErrorText,
-    s_wrongDiscEn0, s_wrongDiscEn1, s_emptyErrorText,
-    s_wrongDiscDe0, s_wrongDiscDe1, s_emptyErrorText,
-    s_wrongDiscIt0, s_wrongDiscIt1, s_emptyErrorText,
-    s_wrongDiscFr0, s_emptyErrorText, s_emptyErrorText,
-    s_wrongDiscEs0, s_emptyErrorText, s_emptyErrorText,
-
-    s_fatalErrorJp0, s_fatalErrorJp1, s_fatalErrorJp2,
-    s_fatalErrorEn0, s_fatalErrorEn1, s_fatalErrorEn2,
-    s_fatalErrorDe0, s_fatalErrorDe1, s_fatalErrorDe2,
-    s_fatalErrorIt0, s_fatalErrorIt1, s_fatalErrorIt2,
-    s_fatalErrorFr0, s_fatalErrorFr1, s_emptyErrorText,
-    s_fatalErrorEs0, s_fatalErrorEs1, s_fatalErrorEs2,
+static const char* l_tError[4][6][3] = {
+    {
+        {s_diskReadErrorJp0, s_diskReadErrorJp1, s_emptyErrorText},
+        {s_diskReadErrorEn0, s_diskReadErrorEn1, s_diskReadErrorEn2},
+        {s_diskReadErrorDe0, s_diskReadErrorDe1, s_diskReadErrorDe2},
+        {s_diskReadErrorIt0, s_diskReadErrorIt1, s_diskReadErrorIt2},
+        {s_diskReadErrorFr0, s_diskReadErrorFr1, s_diskReadErrorFr2},
+        {s_diskReadErrorEs0, s_diskReadErrorEs1, s_diskReadErrorEs2},
+    },
+    {
+        {s_discCoverOpenJp0, s_discCoverOpenJp1, s_emptyErrorText},
+        {s_discCoverOpenEn0, s_discCoverOpenEn1, s_discCoverOpenEn2},
+        {s_discCoverOpenDe0, s_discCoverOpenDe1, s_discCoverOpenDe2},
+        {s_discCoverOpenIt0, s_discCoverOpenIt1, s_discCoverOpenIt2},
+        {s_discCoverOpenFr0, s_discCoverOpenFr1, s_discCoverOpenFr2},
+        {s_discCoverOpenEs0, s_discCoverOpenEs1, s_discCoverOpenEs2},
+    },
+    {
+        {s_wrongDiscJp0, s_wrongDiscJp1, s_emptyErrorText},
+        {s_wrongDiscEn0, s_wrongDiscEn1, s_emptyErrorText},
+        {s_wrongDiscDe0, s_wrongDiscDe1, s_emptyErrorText},
+        {s_wrongDiscIt0, s_wrongDiscIt1, s_emptyErrorText},
+        {s_wrongDiscFr0, s_emptyErrorText, s_emptyErrorText},
+        {s_wrongDiscEs0, s_emptyErrorText, s_emptyErrorText},
+    },
+    {
+        {s_fatalErrorJp0, s_fatalErrorJp1, s_fatalErrorJp2},
+        {s_fatalErrorEn0, s_fatalErrorEn1, s_fatalErrorEn2},
+        {s_fatalErrorDe0, s_fatalErrorDe1, s_fatalErrorDe2},
+        {s_fatalErrorIt0, s_fatalErrorIt1, s_fatalErrorIt2},
+        {s_fatalErrorFr0, s_fatalErrorFr1, s_emptyErrorText},
+        {s_fatalErrorEs0, s_fatalErrorEs1, s_fatalErrorEs2},
+    },
 };
 
 /*
@@ -154,17 +159,18 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
     _GXTexObj backupTexObj;
     m_isDiskError = 1;
 
-    do
+    while (true)
     {
         if ((unsigned int)System.m_execParam >= 1)
         {
             System.Printf(const_cast<char*>(s_drawErrorFmt), errorCode);
         }
 
-        bool usingFallbackFont = MenuPcs.m_fonts[0] == 0;
+        int usingFallbackFont = 0;
         CFont* font = MenuPcs.m_fonts[0];
-        if (usingFallbackFont)
+        if (font == 0)
         {
+            usingFallbackFont = 1;
             font = FontMan.m_font;
         }
 
@@ -176,10 +182,10 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
         Graphic._WaitDrawDone(const_cast<char*>(s_fileCpp), 0x2CC);
 
-        bool compactLayout = false;
+        int compactLayout = 0;
         if (Graphic.m_scratchTextureBuffer != 0 && !usingFallbackFont)
         {
-            compactLayout = true;
+            compactLayout = 1;
         }
 
         if (compactLayout)
@@ -217,10 +223,10 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             msgIndex = 0;
             break;
         case 5:
-            msgIndex = 2;
+            msgIndex = 1;
             break;
         case 0x0B:
-            msgIndex = 1;
+            msgIndex = 2;
             break;
         case -1:
             msgIndex = 3;
@@ -231,7 +237,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
         }
 
         unsigned int language = Game.m_gameWork.m_languageId;
-        const char* const* lines = &l_tError[msgIndex * 18 + language * 3];
+        const char* const* lines = l_tError[msgIndex][language];
 
         if (strlen(lines[2]) == 0)
         {
@@ -311,8 +317,15 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             VIWaitForRetrace();
             status = DVDGetCommandBlockStatus(&info.cb);
         }
-        errorCode = status;
-    } while (errorCode == 0x0B || (errorCode >= 4 && errorCode <= 6) || errorCode == -1);
+
+        if (status == 0x0B || ((u32)(status - 4) <= 2U) || status == -1)
+        {
+            errorCode = status;
+            continue;
+        }
+
+        break;
+    }
 
     Sound.PauseDiscError(0);
     m_isDiskError = 0;
@@ -733,16 +746,16 @@ void CFile::Init()
         __nwa__FUlPQ27CMemory6CStagePci(
             sizeof(CHandle) * 0x80 + 0x10, (CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2e),
         0, 0, sizeof(CHandle), 0x80);
+    CHandle* nextHandle;
+    unsigned int handleIndex = 0;
+    int byteOffset = 0;
+
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
     m_freeList = (CHandle*)m_handlePoolHead.m_currentOffset;
 
-    unsigned int handleIndex = 0;
-    int byteOffset = 0;
     for (int blockCount = 0x20; blockCount != 0; blockCount--) {
-        CHandle* nextHandle;
-
         if (handleIndex == 0x7F) {
             nextHandle = (CHandle*)&m_freeListSentinelDummy;
         } else {
@@ -770,7 +783,6 @@ void CFile::Init()
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x208) = nextHandle;
-        handleIndex++;
 
         byteOffset += 0x2B0;
         handleIndex++;

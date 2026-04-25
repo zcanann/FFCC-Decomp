@@ -28,6 +28,9 @@ file.cpp:
 	.bss        start:0x8021ED40 end:0x8021EEB0
 	.sdata2     start:0x8032F600 end:0x8032F638
 
+strcase.c:
+	.text       start:0x80013D70 end:0x80013E70
+
 game.cpp:
 	extab       start:0x80005688 end:0x800057E0
 	extabindex  start:0x8000AE4C end:0x8000AFFC
@@ -124,7 +127,7 @@ usb.cpp:
 	.text       start:0x8002244C end:0x80022724
 	.ctors      start:0x801D53C8 end:0x801D53CC
 	.rodata     start:0x801D6F9C end:0x801D7058
-	.data       start:0x801E88A4 end:0x801E88C4
+	.data       start:0x801E8898 end:0x801E88B8
 	.bss        start:0x802455C0 end:0x80245640
 
 util.cpp:
@@ -132,7 +135,7 @@ util.cpp:
 	extabindex  start:0x8000B5FC end:0x8000B734
 	.text       start:0x80022724 end:0x80024E60
 	.ctors      start:0x801D53CC end:0x801D53D0
-	.data       start:0x801E88C4 end:0x801E88D4
+	.data       start:0x801E88B8 end:0x801E88D4
 	.sbss       start:0x8032EC70 end:0x8032EC74
 
 maphit.cpp:
@@ -261,6 +264,7 @@ p_light.cpp:
 	.data       start:0x801EA298 end:0x801EA430
 	.data       start:0x801EA430 end:0x801EA484
 	.bss        start:0x80268F88 end:0x8026D338
+	.sbss       start:0x8032ED10 end:0x8032ED18
 
 mapanim.cpp:
 	extab       start:0x800069C8 end:0x80006A44
@@ -281,6 +285,7 @@ p_MaterialEditor.cpp:
 	.data       start:0x801EA498 end:0x801EA634
 	.data       start:0x801EA634 end:0x801EA668
 	.bss        start:0x8026D338 end:0x8026D724
+	.sbss       start:0x8032ED18 end:0x8032ED28
 
 mapshadow.cpp:
 	extab       start:0x80006AAC end:0x80006AC4
@@ -1235,19 +1240,21 @@ pppLight.cpp:
 	extab       start:0x80008C3C end:0x80008C44
 	extabindex  start:0x8000F724 end:0x8000F730
 	.text       start:0x800DAB00 end:0x800DB094
+	.sdata2     start:0x80330F60 end:0x80330F70
 
 pppBreathModel.cpp:
 	extab       start:0x80008C44 end:0x80008C7C
 	extabindex  start:0x8000F730 end:0x8000F784
 	.text       start:0x800DB094 end:0x800DC9A0
 	.rodata     start:0x801DB5A0 end:0x801DB5B8
+	.sdata2     start:0x80330F70 end:0x80330FA8
 
 pppCrystal.cpp:
 	extab       start:0x80008C7C end:0x80008C94
 	extabindex  start:0x8000F784 end:0x8000F7A8
 	.text       start:0x800DC9A0 end:0x800DD424
 	.rodata     start:0x801DB5B8 end:0x801DB610
-	.sdata2     start:0x80330F60 end:0x80330FD4
+	.sdata2     start:0x80330FA8 end:0x80330FD4
 
 pppRain.cpp:
 	extab       start:0x80008C94 end:0x80008CAC
@@ -1514,7 +1521,7 @@ pppCrystal2.cpp:
 	extabindex  start:0x80010D5C end:0x80010D80
 	.text       start:0x8013E694 end:0x8013EF94
 	.rodata     start:0x801DD608 end:0x801DD660
-	.sdata2     start:0x80331FC0 end:0x80332010
+	.sdata2     start:0x80331FC0 end:0x80332020
 
 pppChangeTex.cpp:
 	extab       start:0x80009B24 end:0x80009B4C
@@ -1693,7 +1700,6 @@ pppLaser.cpp:
 	extabindex  start:0x800116BC end:0x800116EC
 	.text       start:0x801754E0 end:0x8017683C
 	.rodata     start:0x801E3048 end:0x801E3058
-	.sdata2     start:0x80333674 end:0x80333690
 
 MenuUtil.cpp:
 	extab       start:0x8000A16C end:0x8000A1CC

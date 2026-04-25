@@ -16,8 +16,11 @@ extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
 extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
+extern const f64 DOUBLE_80331BE0 = 4503601774854144.0;
+extern "C" float FLOAT_80331BD0;
 extern "C" float FLOAT_80331BD4;
 extern "C" float FLOAT_80331BD8;
+extern "C" float FLOAT_80331BE8;
 
 /*
  * --INFO--
@@ -74,7 +77,7 @@ void CGPrgObj::onFrame()
 			return;
 		}
 
-		m_animFlagBits.m_animFlags &= 0x7f;
+		m_animFlagBits.bits.m_animRequested = 0;
 		onFramePreCalc();
 
 		if (m_stateFrameGate != 0) {
@@ -95,19 +98,19 @@ void CGPrgObj::onFrame()
 		animFlags = m_animFlagBits.m_animFlags;
 		if ((animFlags & 0x80) != 0) {
 			if (m_reqAnimId == -1) {
-				if (m_currentAnimSlot > -1) {
-					*reinterpret_cast<float*>(m_lastBgAttr) = 0.0f;
+				if (static_cast<int>(m_currentAnimSlot) >= 0) {
+					*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BD0;
 					CancelAnim(0);
 				}
-			} else if ((animFlags & 0x20) != 0) {
-				*reinterpret_cast<float*>(m_lastBgAttr) = 1.0f;
+			} else if (m_animFlagBits.bits.m_animDirect != 0) {
+				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BE8;
 				PlayAnim(m_reqAnimId, (m_animFlagBits.m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
 			} else {
-				*reinterpret_cast<float*>(m_lastBgAttr) = 0.0f;
+				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BD0;
 				PlayAnim(m_reqAnimId, (m_animFlagBits.m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
 			}
 
-			m_animFlagBits.m_animFlags &= 0x7f;
+			m_animFlagBits.bits.m_animRequested = 0;
 		}
 	}
 

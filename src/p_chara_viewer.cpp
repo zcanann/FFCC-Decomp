@@ -78,6 +78,12 @@ extern "C" float FLOAT_80330BF4;
 extern "C" float FLOAT_80330BF8;
 extern "C" double fmod(double, double);
 
+static inline void destroyRef(int* ref)
+{
+    void (**vtable)(void*, int) = *reinterpret_cast<void (***)(void*, int)>(ref);
+    vtable[2](ref, 1);
+}
+
 static void releaseRef(unsigned char* p, int offset)
 {
     int* ref = *(int**)(p + offset);
@@ -85,7 +91,7 @@ static void releaseRef(unsigned char* p, int offset)
         int count = ref[1];
         ref[1] = count - 1;
         if ((count - 1 == 0) && (ref != 0)) {
-            (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+            destroyRef(ref);
         }
         *(void**)(p + offset) = 0;
     }
@@ -97,16 +103,6 @@ static void addRef(unsigned char* p, int offset)
     if (ref != 0) {
         ref[1] = ref[1] + 1;
     }
-}
-
-static inline MtxPtr GetCameraMatrix()
-{
-    return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
-}
-
-static inline Mtx44Ptr GetScreenMatrix()
-{
-    return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
 }
 
 static const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
@@ -135,58 +131,57 @@ static const char s_back_tex_fmt[] = "%sback.tex";
 extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
 {
     unsigned char* p = (unsigned char*)param_1;
-    CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(p + 0x2B8);
     Mtx cameraMtx;
     Mtx scratchMtx;
     Mtx44 projMtx;
     Mtx texMtx;
 
-    if (textureSet != 0) {
-        CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(textureSet) + 8);
+    if ((*(int*)(p + 0x2B8) != 0) &&
+        (reinterpret_cast<CPtrArray<CTexture*>*>(*(unsigned char**)(p + 0x2B8) + 8)->GetSize() != 0)) {
+        CTexture* texture =
+            (*reinterpret_cast<CPtrArray<CTexture*>*>(*(unsigned char**)(p + 0x2B8) + 8))[0];
 
-        if (textureArray->GetSize() != 0) {
-            CTexture* texture = (*textureArray)[0];
-
-            C_MTXOrtho(projMtx, kCharaViewerZero, FLOAT_80330BEC, kCharaViewerZero, FLOAT_80330BF0, kCharaViewerZero,
-                       FLOAT_80330BF4);
-            GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
-            PSMTXIdentity(cameraMtx);
-            GXLoadPosMtxImm(cameraMtx, 0);
-            GXSetCurrentMtx(0);
-            _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 0, 0);
-            GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-            GXSetNumChans(0);
-            GXSetNumTevStages(1);
-            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
-            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
-            PSMTXIdentity(cameraMtx);
-            GXLoadPosMtxImm(cameraMtx, 0);
-            GXSetCullMode(GX_CULL_NONE);
-            TextureMan.SetTexture(GX_TEXMAP0, texture);
-            PSMTXScale(texMtx, FLOAT_80330BF8 / static_cast<float>(texture->m_width),
-                       FLOAT_80330BF8 / static_cast<float>(texture->m_height), FLOAT_80330BF8);
-            GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
-            GXSetNumTexGens(1);
-            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-            GXClearVtxDesc();
-            GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-            GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
-            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 1);
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3s16(0, 0, 0);
-            GXTexCoord2s16(0, 0);
-            GXPosition3s16(static_cast<short>(texture->m_width), 0, 0);
-            GXTexCoord2s16(static_cast<short>(texture->m_width * 2), 0);
-            GXPosition3s16(static_cast<short>(texture->m_width), static_cast<short>(texture->m_height), 0);
-            GXTexCoord2s16(static_cast<short>(texture->m_width * 2), static_cast<short>(texture->m_height * 2));
-            GXPosition3s16(0, static_cast<short>(texture->m_height), 0);
-            GXTexCoord2s16(0, static_cast<short>(texture->m_height * 2));
-        }
+        C_MTXOrtho(projMtx, kCharaViewerZero, FLOAT_80330BEC, kCharaViewerZero, FLOAT_80330BF0, kCharaViewerZero,
+                   FLOAT_80330BF4);
+        GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
+        PSMTXIdentity(cameraMtx);
+        GXLoadPosMtxImm(cameraMtx, 0);
+        GXSetCurrentMtx(0);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 0, 0);
+        GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+        GXSetNumChans(0);
+        GXSetNumTevStages(1);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
+        PSMTXIdentity(cameraMtx);
+        GXLoadPosMtxImm(cameraMtx, 0);
+        GXSetCullMode(GX_CULL_NONE);
+        TextureMan.SetTexture(GX_TEXMAP0, texture);
+        PSMTXScale(texMtx, FLOAT_80330BF8 / static_cast<float>(texture->m_width),
+                   FLOAT_80330BF8 / static_cast<float>(texture->m_height), FLOAT_80330BF8);
+        GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+        GXClearVtxDesc();
+        GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+        GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 1);
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        GXPosition3s16(0, 0, 0);
+        GXTexCoord2s16(0, 0);
+        GXPosition3s16(static_cast<short>(texture->m_width), 0, 0);
+        GXTexCoord2s16(static_cast<short>(texture->m_width * 2), 0);
+        GXPosition3s16(static_cast<short>(texture->m_width), static_cast<short>(texture->m_height), 0);
+        GXTexCoord2s16(static_cast<short>(texture->m_width * 2), static_cast<short>(texture->m_height * 2));
+        GXPosition3s16(0, static_cast<short>(texture->m_height), 0);
+        GXTexCoord2s16(0, static_cast<short>(texture->m_height * 2));
+        PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx);
+        GXSetProjection(projMtx, GX_PERSPECTIVE);
     }
 
-    PSMTXCopy(GetCameraMatrix(), cameraMtx);
-    PSMTX44Copy(GetScreenMatrix(), projMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx);
     GXSetProjection(projMtx, GX_PERSPECTIVE);
 
     if (*(int*)(p + 0x6F8) != 0) {
@@ -207,11 +202,7 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
         GXLoadPosMtxImm(cameraMtx, 0);
 
         for (int i = -10; i < 11; i++) {
-            GXColor color;
-            color.r = 0x80;
-            color.g = 0x80;
-            color.b = 0x80;
-            color.a = (i == 0) ? 0x60 : 0x20;
+            GXColor color = {0x80, 0x80, 0x80, static_cast<u8>((i == 0) ? 0x60 : 0x20)};
             GXSetChanMatColor(GX_COLOR0A0, color);
             float x = (float)i * kCharaViewerGridSpacing;
             GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 4);
@@ -257,7 +248,7 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
                 if (i == 0) {
                     float totalTime = watch.Get();
                     float gpuTime = totalTime - cpuTime;
-                    Printf__8CGraphicFPce(&Graphic, s_gpu_profile_fmt, cpuTime, gpuTime, totalTime);
+                    Printf__8CGraphicFPce(&Graphic, s_gpu_profile_fmt, totalTime, cpuTime, gpuTime);
                 }
             }
         }
@@ -525,6 +516,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     unsigned int i;
     unsigned int x;
     unsigned char colorTmp[4];
+    unsigned char colorCopy[4];
     unsigned char white[4];
     char pathBuf[256];
     CFile::CHandle* fileHandle;
@@ -568,11 +560,16 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
                                         ((float)((double)x - kCharaViewerColorCenterBias) * kCharaViewerLerpScale));
             colorTmp[c] = (unsigned char)(int)v;
         }
-        __ct__6CColorFR6CColor(p + 0x12C + i * 4, colorTmp);
+        __ct__6CColorFR6CColor(colorCopy, colorTmp);
+        p[0x12C + i * 4 + 0] = colorCopy[0];
+        p[0x12C + i * 4 + 1] = colorCopy[1];
+        p[0x12C + i * 4 + 2] = colorCopy[2];
+        p[0x12C + i * 4 + 3] = colorCopy[3];
     }
 
+    unsigned int clearColor = 0x404040FF;
     *(unsigned int*)(p + 0x0C) = 0x404040FF;
-    SetCopyClear__8CGraphicF8_GXColori(&Graphic, p + 0x0C, 0xFFFF);
+    SetCopyClear__8CGraphicF8_GXColori(&Graphic, &clearColor, 0xFFFF);
 
     *(int*)(p + 0x190) = 0;
     *(int*)(p + 0x194) = 0;
@@ -666,7 +663,7 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
     ref = *(int**)(p + 0x1A0);
     if (ref != 0) {
         if ((--ref[1] == 0) && (ref != 0)) {
-            (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+            destroyRef(ref);
         }
         *(void**)(p + 0x1A0) = 0;
     }
@@ -676,21 +673,21 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
         ref = *(int**)(p + 0x190 + i * 4);
         if (ref != 0) {
             if ((--ref[1] == 0) && (ref != 0)) {
-                (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+                destroyRef(ref);
             }
             *(void**)(p + 0x190 + i * 4) = 0;
         }
         ref = *(int**)(p + 0x198 + i * 4);
         if (ref != 0) {
             if ((--ref[1] == 0) && (ref != 0)) {
-                (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+                destroyRef(ref);
             }
             *(void**)(p + 0x198 + i * 4) = 0;
         }
         ref = *(int**)(p + 0x2B0 + i * 4);
         if (ref != 0) {
             if ((--ref[1] == 0) && (ref != 0)) {
-                (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+                destroyRef(ref);
             }
             *(void**)(p + 0x2B0 + i * 4) = 0;
         }
@@ -700,7 +697,7 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
     ref = *(int**)(p + 0x2B8);
     if (ref != 0) {
         if ((--ref[1] == 0) && (ref != 0)) {
-            (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+            destroyRef(ref);
         }
         *(void**)(p + 0x2B8) = 0;
     }
@@ -710,7 +707,7 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
         ref = *(int**)(p + 0x1B0 + i * 4);
         if (ref != 0) {
             if ((--ref[1] == 0) && (ref != 0)) {
-                (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+                destroyRef(ref);
             }
             *(void**)(p + 0x1B0 + i * 4) = 0;
         }

@@ -1,13 +1,13 @@
 #ifndef _FFCC_MAPOCTTREE_H_
 #define _FFCC_MAPOCTTREE_H_
 
+#include <Dolphin/mtx.h>
 #include <Dolphin/types.h>
 
 class CChunkFile;
 class CMapCylinder;
 class COctNode;
 class CBound;
-struct Vec;
 
 void ClearLight_r(COctNode*);
 void InsertLight_r(COctNode*);
@@ -31,9 +31,9 @@ public:
 	COctNode* m_children[8]; // 0x1C
 	u16 m_meshStart;        // 0x3C
 	u16 m_meshCount;        // 0x3E
-	u32 m_unk40;            // 0x40
-	u32 m_unk44;            // 0x44
-	u32 m_unk48;            // 0x48
+	u32 m_drawFlags;        // 0x40
+	u32 m_lightFlags;       // 0x44
+	u32 m_shadowFlags;      // 0x48
 };
 
 class CBound
@@ -41,8 +41,15 @@ class CBound
 public:
 	CBound();
 	void operator=(const CBound&);
+	static void SetFrustum(Vec&, float(*)[4]);
+	int CheckFrustum0(CBound&);
+	int CheckFrustum0(float);
+	int CheckFrustum(Vec&, float(*)[4], float);
 	void SetMinMax(Vec*, Vec*);
 	int CheckCross(CBound&);
+
+	Vec m_min;              // 0x00
+	Vec m_max;              // 0x0C
 };
 
 class COctTree

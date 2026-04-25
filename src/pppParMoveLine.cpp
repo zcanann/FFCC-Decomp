@@ -4,6 +4,8 @@
 
 #include <dolphin/mtx.h>
 
+extern const float FLOAT_80330638;
+
 /*
  * --INFO--
  * PAL Address: 0x800906dc
@@ -19,12 +21,14 @@ void pppParMoveLine(_pppPObject* param_1, int param_2)
     Vec local_1c;
     Vec VStack_28;
     float fVar1;
+    float x;
 
     pppMngSt = pppMngStPtr;
     PSVECSubtract((Vec*)((char*)pppMngStPtr + 0x68), (Vec*)((char*)pppMngStPtr + 0x58), &local_1c);
 
-    fVar1 = 0.0f;
-    *(float*)((char*)pppMngSt + 0x48) = pppMngSt->m_position.x;
+    x = pppMngSt->m_position.x;
+    fVar1 = FLOAT_80330638;
+    *(float*)((char*)pppMngSt + 0x48) = x;
     *(float*)((char*)pppMngSt + 0x4C) = pppMngSt->m_position.y;
     *(float*)((char*)pppMngSt + 0x50) = pppMngSt->m_position.z;
 

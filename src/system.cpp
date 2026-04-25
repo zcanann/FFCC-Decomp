@@ -19,18 +19,12 @@
 #include "dolphin/gx/GXPerf.h"
 #include "dolphin/os.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_minigame.h"
 #include <string.h>
 
 extern "C" {
 #include "PowerPC_EABI_Support/Runtime/ptmf.h"
-
-void Init__7CSystemFv(CSystem*);
-void Quit__7CSystemFv(CSystem*);
-extern void* __RTTI__7CSystem[];
-void* g_CSystemRttiBase[] = {0, 0, __RTTI__7CSystem};
-void* __vt__7CSystem[] = {0, (void*)Init__7CSystemFv, (void*)Quit__7CSystemFv, 0};
 }
 
 CSystem System;
@@ -313,24 +307,24 @@ void CSystem::ExecScenegraph()
         File.Frame();
         Memory.Frame();
 
-        if (Pad._452_4_ == 0)
-        {
-            unsigned int stepPad = (Pad._448_4_ != 4) ? 4 : 0;
-            stepTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x36 + stepPad * 0x54);
-        }
-        else
+        if (Pad._452_4_ != 0)
         {
             stepTrigger = 0;
         }
-
-        if (Pad._452_4_ == 0)
+        else
         {
-            unsigned int perfPad = (Pad._448_4_ != 4) ? 4 : 0;
-            perfTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x34 + perfPad * 0x54);
+            unsigned int stepPad = (Pad._448_4_ == 4) ? 0 : 4;
+            stepTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x36 + stepPad * 0x54);
+        }
+
+        if (Pad._452_4_ != 0)
+        {
+            perfTrigger = 0;
         }
         else
         {
-            perfTrigger = 0;
+            unsigned int perfPad = (Pad._448_4_ == 4) ? 0 : 4;
+            perfTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x34 + perfPad * 0x54);
         }
 
         if ((stepTrigger & 0xC) != 0)
@@ -366,13 +360,8 @@ void CSystem::ExecScenegraph()
             {
                 unsigned short trigger;
                 unsigned short held;
-                bool forceOff = false;
 
                 if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
-                {
-                    forceOff = true;
-                }
-                if (forceOff)
                 {
                     trigger = 0;
                 }
@@ -382,12 +371,7 @@ void CSystem::ExecScenegraph()
                     trigger = *(unsigned short*)((unsigned char*)&Pad + 0xA + padIndex * 0x54);
                 }
 
-                forceOff = false;
                 if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
-                {
-                    forceOff = true;
-                }
-                if (forceOff)
                 {
                     held = 0;
                 }
@@ -433,7 +417,7 @@ void CSystem::ExecScenegraph()
         unsigned int stepGate = 0;
         if (scenegraphStepMode == 4)
         {
-            stepGate = ((-(int)(m_frameCounter & 3)) >> 31);
+            stepGate = (m_frameCounter & 3) != 0;
         }
         else if (scenegraphStepMode >= 4)
         {
@@ -450,12 +434,12 @@ void CSystem::ExecScenegraph()
             }
             else if (scenegraphStepMode > 2)
             {
-                stepGate = ((-(int)(m_frameCounter & 7)) >> 31);
+                stepGate = (m_frameCounter & 7) != 0;
             }
         }
 
         float totalTime = 0.0f;
-        CStopWatch watch(0);
+        CStopWatch watch((char*)"no name");
 
         int index = 0;
         for (COrder* order = m_orderSentinel.m_next;

@@ -40,6 +40,7 @@ extern "C" void changeMode__8CMenuPcsFQ28CMenuPcs8MENUMODE(CMenuPcs*, int);
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" unsigned int BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
+extern "C" int AddItem__12CCaravanWorkFiPi(void*, int, int*);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int rand(void);
 extern char* PTR_s_bonus_802128c0[];
@@ -688,6 +689,35 @@ static int GetBonusSelectedArtifactId(int slot)
 		return s_bonusSummaryData->m_tempArtifacts[slot];
 	}
 	return s_bonusSummaryData->m_bossArtifacts[slot - 4];
+}
+
+static void GrantSelectedBonusArtifacts()
+{
+	if (s_bonusSummaryData == 0) {
+		return;
+	}
+
+	for (int i = 0; i < s_bonusSummaryData->m_partyCount; i++) {
+		BonusPartySummary& summary = s_bonusSummaryData->m_party[i];
+		int itemId = summary.m_itemHandle1;
+		if (itemId <= 0 || summary.m_partySlot < 0) {
+			continue;
+		}
+
+		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[summary.m_partySlot]);
+		if (caravanWork == 0) {
+			continue;
+		}
+
+		if (itemId < 0xFF) {
+			int artifactSlot = itemId - 0x9F;
+			if (artifactSlot >= 0 && artifactSlot < 96) {
+				caravanWork->m_artifacts[artifactSlot] = static_cast<unsigned short>(itemId);
+			}
+		} else {
+			AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), itemId, 0);
+		}
+	}
 }
 
 static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAnimSprite* sprites)
@@ -2783,6 +2813,7 @@ void CMenuPcs::CalcSelectWait()
 		if (delay > 0) {
 			delay = (short)(delay - 1);
 			if (delay == 0) {
+				GrantSelectedBonusArtifacts();
 				header->finished = 1;
 				*(short*)(animPtr + 6) = 1;
 			}

@@ -681,12 +681,14 @@ void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 4
 void __MidiCtrl_TempoDirect(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
     *(u32*)((u8*)control + 0x448) = ((u32)*(*(u8**)track)++) << 0xc;
     *(u32*)((u8*)control + 0x44C) = 0;
     *(u32*)((u8*)control + 0x450) = 0;
 }
+#pragma optimization_level 0
 
 /*
  * --INFO--

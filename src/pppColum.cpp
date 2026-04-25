@@ -149,7 +149,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             } else if (ColumFpClassify(lengthXY) == 1) {
                 lengthXY = *(float*)__float_nan;
             }
-            if (FLOAT_803310A0 < lengthXY) {
+            if (lengthXY > FLOAT_803310A0) {
                 PSVECScale(&cameraDelta, &cameraDelta, FLOAT_803310A4 / lengthXY);
             }
 

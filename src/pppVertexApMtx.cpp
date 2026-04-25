@@ -157,9 +157,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 			break;
 		case 1:
 			while (count-- != 0) {
-				f32 randValue = Math.RandF();
-				f64 maxValue = (f64)entry->maxValue - kPppYmSharedDoubleBias;
-				int outValue = (int)(randValue * (f32)(maxValue + kPppYmSharedDoubleBias));
+				int outValue = (int)(Math.RandF() * entry->maxValue);
 				u16* vertexIndices = entry->vertexIndices;
 				u16 vertexIndex = vertexIndices[outValue];
 				Vec* vertex = &points[vertexIndex];

@@ -61,20 +61,7 @@ extern "C" void* gVtable_CPtrArray_GXTexObj[];
 extern "C" void* __vt__14CFunnyShapePcs[];
 static const char lbl_801D7DD0[] = "CFunnyShapePcs(VIEWER)";
 extern char lbl_8032E660[];
-
-unsigned int m_table_desc0__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
-unsigned int m_table_desc1__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
-unsigned int m_table_desc2__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
-unsigned int m_table_desc3__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
-CFunnyShapePcs FunnyShapePcs;
-unsigned int m_table__14CFunnyShapePcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(lbl_801D7DD0)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0,
-    0x42, 1
-};
-unsigned int lbl_801EA904[4] = {
-    reinterpret_cast<unsigned int>(lbl_8032E660), 0, 0, reinterpret_cast<unsigned int>(lbl_8032E660)
-};
-u8 ARRAY_8026D728[0xC];
+extern u8 ARRAY_8026D728[];
 
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 extern const char s_CFunnyShapePcs[];
@@ -137,6 +124,21 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     dst[13] = desc3[1];
     dst[14] = desc3[2];
 }
+
+unsigned int m_table_desc0__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
+unsigned int m_table_desc1__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
+unsigned int m_table_desc2__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
+unsigned int m_table_desc3__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
+CFunnyShapePcs FunnyShapePcs;
+unsigned int m_table__14CFunnyShapePcs[0x15C / sizeof(unsigned int)] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(lbl_801D7DD0)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0,
+    0x42, 1
+};
+unsigned int lbl_801EA904[4] = {
+    reinterpret_cast<unsigned int>(lbl_8032E660), 0, 0, reinterpret_cast<unsigned int>(lbl_8032E660)
+};
+u8 ARRAY_8026D728[0xC];
+
 template <class T>
 CPtrArray<T>::CPtrArray()
 {

@@ -2264,7 +2264,6 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
 		*(unsigned char*)(statePtr + 0xb) = 1;
-		return;
 	}
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
@@ -2931,7 +2930,6 @@ void CMenuPcs::CalcSelectCloseAnim()
 		}
 		PrepareSelectCloseSprites(header, sprites);
 		*(unsigned char*)(statePtr + 0xb) = 1;
-		return;
 	}
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;

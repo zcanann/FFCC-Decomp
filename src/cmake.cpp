@@ -304,38 +304,6 @@ static inline unsigned char* GetCmakeRosterEntry(CMenuPcs* menu, int slot)
     return reinterpret_cast<unsigned char*>(MenuS32(menu, 0x814) + 0x7930 + slot * 0xC30);
 }
 
-static bool IsDuplicateCmakeTribeHair(CMenuPcs* menu, int tribe, int hair, int sex)
-{
-    int activeSlot = static_cast<int>(MenuS16(menu, 0x86A));
-
-    for (int slot = 0; slot < 8; ++slot) {
-        if (slot == activeSlot) {
-            continue;
-        }
-
-        unsigned char* entry = GetCmakeRosterEntry(menu, slot);
-        if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
-            continue;
-        }
-        if (*(entry + 0x1F96) == 1) {
-            continue;
-        }
-        if (*reinterpret_cast<unsigned short*>(entry + 0x17D0) != tribe) {
-            continue;
-        }
-        if (*reinterpret_cast<unsigned short*>(entry + 0x17D4) != hair) {
-            continue;
-        }
-        if (*reinterpret_cast<unsigned short*>(entry + 0x17D2) != sex) {
-            continue;
-        }
-
-        return true;
-    }
-
-    return false;
-}
-
 static inline CFont* GetCmakeKeyboardFont(CMenuPcs* menu)
 {
     if (MenuS16(menu, 0x86C) == 0) {
@@ -2011,7 +1979,36 @@ void CMenuPcs::CmakeTribeCtrl()
                 return;
             }
 
-            if (!IsDuplicateCmakeTribeHair(this, tribe, crest, s_CmakeInfo.m_gender)) {
+            bool duplicate = false;
+            int activeSlot = static_cast<int>(MenuS16(this, 0x86A));
+
+            for (int slot = 0; slot < 8; ++slot) {
+                if (slot == activeSlot) {
+                    continue;
+                }
+
+                unsigned char* entry = GetCmakeRosterEntry(this, slot);
+                if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
+                    continue;
+                }
+                if (*(entry + 0x1F96) == 1) {
+                    continue;
+                }
+                if (*reinterpret_cast<unsigned short*>(entry + 0x17D0) != static_cast<unsigned short>(tribe)) {
+                    continue;
+                }
+                if (*reinterpret_cast<unsigned short*>(entry + 0x17D4) != static_cast<unsigned short>(crest)) {
+                    continue;
+                }
+                if (*reinterpret_cast<unsigned short*>(entry + 0x17D2) != static_cast<unsigned short>(s_CmakeInfo.m_gender)) {
+                    continue;
+                }
+
+                duplicate = true;
+                break;
+            }
+
+            if (!duplicate) {
                 s_CmakeInfo.m_tribe = static_cast<signed char>(tribe);
                 s_CmakeInfo.m_hair = static_cast<signed char>(crest);
                 ChgModel__8CMenuPcsFiiii(this,

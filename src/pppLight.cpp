@@ -5,10 +5,10 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 extern "C" {
-extern const float kPppLightZero;
-extern const float kPppLightOne;
-extern const float kPppLightDefaultCosAtten;
-extern const float kPppLightSpotScale;
+extern const float kPppLightZero = 0.0f;
+extern const float kPppLightOne = 1.0f;
+extern const float kPppLightDefaultCosAtten = 1.0f;
+extern const float kPppLightSpotScale = 1.0f;
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 extern u8 gPppDefaultValueBuffer[];

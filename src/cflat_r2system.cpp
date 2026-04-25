@@ -2861,6 +2861,11 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0x76:
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1298) = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0x75:
         SetTempValue__4CMesFii(*object->m_localBase, object->m_localBase[1]);
         runtime->push(object, 0);
@@ -2892,6 +2897,11 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0x70:
         Game.m_gameWork.m_timerA = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x6F:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Game.m_gameWork) + 8) = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -3232,6 +3242,29 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400));
         outResult = 0;
         return;
+    case -0x33: {
+        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicsPcs);
+        *reinterpret_cast<int*>(graphicsPcs + 0x6C) = *object->m_localBase;
+        *reinterpret_cast<int*>(graphicsPcs + 0x70) = 0;
+        graphicsPcs[0x64] = static_cast<u8>(object->m_localBase[1]);
+        graphicsPcs[0x65] = static_cast<u8>(object->m_localBase[2]);
+        graphicsPcs[0x66] = static_cast<u8>(object->m_localBase[3]);
+        graphicsPcs[0x67] = 0xFF;
+        *reinterpret_cast<int*>(graphicsPcs + 0x5C) = object->m_localBase[4];
+        *reinterpret_cast<int*>(graphicsPcs + 0x60) = *reinterpret_cast<int*>(graphicsPcs + 0x5C);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x32: {
+        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicsPcs);
+        *reinterpret_cast<int*>(graphicsPcs + 0x98) = *object->m_localBase;
+        *reinterpret_cast<int*>(graphicsPcs + 0x88) = object->m_localBase[1];
+        *reinterpret_cast<int*>(graphicsPcs + 0x8C) = *reinterpret_cast<int*>(graphicsPcs + 0x88);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x31:
         CGItemObj::DeleteAllFieldItem();
         runtime->push(object, 0);
@@ -3298,6 +3331,12 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0x28:
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C08 + *object->m_localBase * 0xB14) =
+            *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0x1B: {
         Vec position = {
             static_cast<float>(object->m_localBase[2]),

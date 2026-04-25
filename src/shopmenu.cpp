@@ -1471,9 +1471,6 @@ void CShopMenu::Calc()
     }
 
     ++timer;
-    if (timer > 8) {
-        timer = 8;
-    }
 
     if ((shopMode == 0) || (shopMode == 1)) {
         gShopMenuInputLatch = 0;

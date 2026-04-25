@@ -124,14 +124,14 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
 
 		memcpy(dstBuffer, (void*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120)), 0x1000);
 		*(int*)((int)param_1 + 0x120) += 0x1000;
-		if (*(int*)((int)param_1 + 0x118) <= *(int*)((int)param_1 + 0x120)) {
+		if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
 			*(int*)((int)param_1 + 0x120) = 0;
 		}
 
 		if (*(short*)((int)param_1 + 0x2a) == 2) {
 			memcpy(dstBuffer + 0x2000, (void*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120)), 0x1000);
 			*(int*)((int)param_1 + 0x120) += 0x1000;
-			if (*(int*)((int)param_1 + 0x118) <= *(int*)((int)param_1 + 0x120)) {
+			if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
 				*(int*)((int)param_1 + 0x120) = 0;
 			}
 		}
@@ -139,20 +139,25 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
 		dmaDstOffset = *(int*)((int)param_1 + 0x12c) + param_2 * 0x1000;
 		dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
 
-		if ((param_2 == 0) && (*(int*)(streamStruct + 0x14) != 0)) {
+		if ((param_2 == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
+			int zero = 0;
 			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ec) = (unsigned short)*dstBuffer;
-			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = 0;
-			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) = 0;
+			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = zero;
+			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) = zero;
 			*(unsigned int*)(*(int*)(streamStruct + 0x14) + 0x1c) |= 0x100000;
 		}
 
 		if (*(short*)((int)param_1 + 0x2a) == 2) {
-			dmaID = RedDmaEntry(0x8001, 0, (int)(dstBuffer + 0x2000), dmaDstOffset + 0x2000, 0x1000, 0, 0);
-			if ((param_2 == 0) && (*(int*)(streamStruct + 0xd4) != 0)) {
-				*(unsigned short*)(*(int*)(streamStruct + 0xd4) + 0x1ec) = (unsigned short)dstBuffer[0x2000];
-				*(unsigned short*)(*(int*)(streamStruct + 0xd4) + 0x1f0) = 0;
-				*(unsigned short*)(*(int*)(streamStruct + 0xd4) + 0x1ee) = 0;
-				*(unsigned int*)(*(int*)(streamStruct + 0xd4) + 0x1c) |= 0x100000;
+			dstBuffer += 0x2000;
+			dmaDstOffset += 0x2000;
+			dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
+			streamStruct += 0xc0;
+			if ((param_2 == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
+				int zero = 0;
+				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ec) = (unsigned short)*dstBuffer;
+				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = zero;
+				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) = zero;
+				*(unsigned int*)(*(int*)(streamStruct + 0x14) + 0x1c) |= 0x100000;
 			}
 		}
 
@@ -171,7 +176,6 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
  */
 int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 {
-	unsigned int* puVar1;
 	unsigned int* puVar3;
 	unsigned char* pbVar4;
 	unsigned char* pbVar5;
@@ -196,14 +200,13 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 				*(unsigned int*)(pbVar5 + 4) = puVar7[1];
 				pbVar5 = pbVar5 + 8;
 				*(unsigned int*)pbVar4 = puVar7[2];
-				puVar1 = puVar7 + 3;
+				*(unsigned int*)(pbVar4 + 4) = puVar7[3];
 				puVar7 = puVar7 + 4;
-				*(unsigned int*)(pbVar4 + 4) = *puVar1;
 				pbVar4 = pbVar4 + 8;
 			} while (puVar7 < puVar3);
 			
 			*(int*)((int)param_1 + 0x120) = *(int*)((int)param_1 + 0x120) + 0x1000;
-			if (*(int*)((int)param_1 + 0x118) <= *(int*)((int)param_1 + 0x120)) {
+			if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
 				*(int*)((int)param_1 + 0x120) = 0;
 			}
 			
@@ -215,28 +218,28 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 				*(unsigned int*)(pbVar5 + 4) = puVar7[1];
 				pbVar5 = pbVar5 + 8;
 				*(unsigned int*)pbVar4 = puVar7[2];
-				puVar1 = puVar7 + 3;
+				*(unsigned int*)(pbVar4 + 4) = puVar7[3];
 				puVar7 = puVar7 + 4;
-				*(unsigned int*)(pbVar4 + 4) = *puVar1;
 				pbVar4 = pbVar4 + 8;
 			} while (puVar7 < puVar3);
 			
 			*(int*)((int)param_1 + 0x120) = *(int*)((int)param_1 + 0x120) + 0x1000;
-			if (*(int*)((int)param_1 + 0x118) <= *(int*)((int)param_1 + 0x120)) {
+			if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
 				*(int*)((int)param_1 + 0x120) = 0;
 			}
 			
 			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar6, *(int*)((int)param_1 + 300) + param_2 * 0x1000, 0x1000, 0, 0);
 			dmaID = RedDmaEntry(0x8001, 0, (int)(pbVar6 + 0x2000), *(int*)((int)param_1 + 300) + (param_2 + 2) * 0x1000, 0x1000, 0, 0);
 			
-			if ((param_2 == 0) && (*(int*)(iVar8 + 0x14) != 0)) {
+			if ((param_2 == 0) && (*(void**)(iVar8 + 0x14) != 0)) {
+				int zero = 0;
 				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ec) = (unsigned short)*pbVar6;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1f0) = 0;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ee) = 0;
+				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1f0) = zero;
+				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ee) = zero;
 				*(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) = *(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) | 0x100000;
 				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1ec) = (unsigned short)pbVar6[0x2000];
-				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1f0) = 0;
-				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1ee) = 0;
+				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1f0) = zero;
+				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1ee) = zero;
 				*(unsigned int*)(*(int*)(iVar8 + 0xd4) + 0x1c) = *(unsigned int*)(*(int*)(iVar8 + 0xd4) + 0x1c) | 0x100000;
 			}
 			
@@ -244,7 +247,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 			param_3 = param_3 + -0x1000;
 			*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) + 0x200;
 			
-			if (*(int*)((int)param_1 + 0x1c) <= *(int*)((int)param_1 + 0x124)) {
+			if (*(int*)((int)param_1 + 0x124) >= *(int*)((int)param_1 + 0x1c)) {
 				*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) - *(int*)((int)param_1 + 0x1c);
 				*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) + *(int*)((int)param_1 + 0x20);
 			}
@@ -256,16 +259,17 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 			memcpy(pbVar5, (void*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120)), 0x1000);
 			*(int*)((int)param_1 + 0x120) = *(int*)((int)param_1 + 0x120) + 0x1000;
 			
-			if (*(int*)((int)param_1 + 0x118) <= *(int*)((int)param_1 + 0x120)) {
+			if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
 				*(int*)((int)param_1 + 0x120) = 0;
 			}
 			
 			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar5, *(int*)((int)param_1 + 300) + param_2 * 0x1000, 0x1000, 0, 0);
 			
-			if ((param_2 == 0) && (*(int*)(iVar8 + 0x14) != 0)) {
+			if ((param_2 == 0) && (*(void**)(iVar8 + 0x14) != 0)) {
+				int zero = 0;
 				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ec) = (unsigned short)*pbVar5;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1f0) = 0;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ee) = 0;
+				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1f0) = zero;
+				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ee) = zero;
 				*(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) = *(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) | 0x100000;
 			}
 			
@@ -273,7 +277,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 			param_3 = param_3 + -0x1000;
 			*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) + 0x200;
 			
-			if (*(int*)((int)param_1 + 0x1c) <= *(int*)((int)param_1 + 0x124)) {
+			if (*(int*)((int)param_1 + 0x124) >= *(int*)((int)param_1 + 0x1c)) {
 				*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) - *(int*)((int)param_1 + 0x1c);
 				*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) + *(int*)((int)param_1 + 0x20);
 			}
@@ -315,138 +319,142 @@ void StreamStop(int param_1)
  */
 int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5)
 {
-	int* streamData = (int*)_SearchEmptyStreamData();
-	if (streamData != (int*)0) {
-		memcpy(streamData + 4, param_2, 0x20);
-		*streamData = SearchSeEmptyTrack__Fiii(*(short*)((int)streamData + 0x2a), 0xff, 0);
-		streamData[3] = RedNew(0x4000);
+	int amemSize;
+	int arOffset;
+	int pitch;
+	int iVar2;
+	int* streamData;
+	int* voice;
 
-		int amemSize = *(short*)((int)streamData + 0x2a) << 0xd;
-		int arOffset = c_RedMemory.GetABufferSize() < 0x800000 ? 0 : 0x300000;
+	streamData = (int*)_SearchEmptyStreamData();
+	if (streamData == (int*)0) {
+		return param_1;
+	}
+
+	memcpy(streamData + 4, param_2, 0x20);
+	*streamData = SearchSeEmptyTrack__Fiii(*(short*)((int)streamData + 0x2a), 0xff, 0);
+	streamData[3] = RedNew(0x4000);
+	amemSize = *(short*)((int)streamData + 0x2a) << 0xd;
+	if (c_RedMemory.GetABufferSize() < 0x800000) {
+		arOffset = 0;
+	} else {
+		arOffset = 0x300000;
+	}
+	streamData[0x4b] = RedNewA(amemSize, 0, arOffset);
+	if (streamData[0x4b] == 0) {
+		c_RedEntry.WaveOldClear(0, arOffset);
 		streamData[0x4b] = RedNewA(amemSize, 0, arOffset);
-		if (streamData[0x4b] == 0) {
-			c_RedEntry.WaveOldClear(0, arOffset);
-			streamData[0x4b] = RedNewA(amemSize, 0, arOffset);
-		}
+	}
 
-		if ((*streamData == 0) || (streamData[3] == 0) || (streamData[0x4b] == 0)) {
+	if ((*streamData == 0) || (streamData[3] == 0) || (streamData[0x4b] == 0)) {
+		if (m_ReportPrint != 0) {
+			OSReport(s_redStreamLogBlob, s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogErrorColor,
+			         sRedStreamLogReset);
+			fflush(__files + 1);
+		}
+		if (streamData[3] == 0) {
 			if (m_ReportPrint != 0) {
-				OSReport(s_redStreamLogBlob, s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogErrorColor,
+				OSReport(s_redStreamLogBlob + RED_STREAM_MAIN_MEMORY_CREATE_ERROR_FMT_OFFSET,
+				         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogWarnColor, 0x4000,
 				         sRedStreamLogReset);
 				fflush(__files + 1);
 			}
-			if (streamData[3] == 0) {
-				if (m_ReportPrint != 0) {
-					OSReport(s_redStreamLogBlob + RED_STREAM_MAIN_MEMORY_CREATE_ERROR_FMT_OFFSET,
-					         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogWarnColor, 0x4000,
-					         sRedStreamLogReset);
-					fflush(__files + 1);
-				}
-			} else {
-				RedDelete((void*)streamData[3]);
-			}
-			if (streamData[0x4b] == 0) {
-				if (m_ReportPrint != 0) {
-					OSReport(s_redStreamLogBlob + RED_STREAM_AUX_MEMORY_CREATE_ERROR_FMT_OFFSET,
-					         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogWarnColor, amemSize,
-					         sRedStreamLogReset);
-					fflush(__files + 1);
-				}
-			} else {
-				RedDeleteA(streamData[0x4b]);
-			}
-			return param_1;
+		} else {
+			RedDelete((void*)streamData[3]);
 		}
+		if (streamData[0x4b] == 0) {
+			if (m_ReportPrint != 0) {
+				OSReport(s_redStreamLogBlob + RED_STREAM_AUX_MEMORY_CREATE_ERROR_FMT_OFFSET,
+				         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogWarnColor, amemSize,
+				         sRedStreamLogReset);
+				fflush(__files + 1);
+			}
+		} else {
+			RedDeleteA(streamData[0x4b]);
+		}
+		return param_1;
+	}
 
-		*(short*)((int)param_2 + 0x42) = (short)*(char*)((int)param_2 + 0x1000);
-		*(unsigned short*)((int)param_2 + 0x46) = 0;
-		*(unsigned short*)((int)param_2 + 0x44) = 0;
+	*(short*)((int)param_2 + 0x42) = (short)*(char*)((int)param_2 + 0x1000);
+	*(unsigned short*)((int)param_2 + 0x46) = 0;
+	*(unsigned short*)((int)param_2 + 0x44) = 0;
+	if (*(short*)((int)streamData + 0x2a) == 2) {
+		if (streamData[8] < 0) {
+			iVar2 = 0x2000;
+		} else {
+			iVar2 = 0x1008;
+		}
+		*(short*)((int)param_2 + 0x70) = (short)*(char*)((int)param_2 + iVar2);
+		*(unsigned short*)((int)param_2 + 0x74) = 0;
+		*(unsigned short*)((int)param_2 + 0x72) = 0;
+	}
 
+	streamData[0x43] = param_1;
+	streamData[0x47] = 0;
+	streamData[0x48] = 0x1000;
+	streamData[0x49] = 0;
+	streamData[1] = (int)p_VoiceData + *(char*)(*streamData + 0x14e) * 0xc0;
+	streamData[2] = (int)param_2;
+	streamData[0x46] = param_3;
+	if (param_5 != 0) {
+		param_5 = ((param_5 + 1) * 0x100 - 1) * 0x1000;
+	}
+	streamData[0x3c] = param_5;
+	streamData[0x3e] = 0;
+	pitch = PitchCompute__Fiiii(0x3c00000, 0, streamData[9], 0);
+	iVar2 = 0;
+	do {
+		voice = (int*)(streamData[1] + iVar2 * 0xc0);
+		*voice = *streamData + iVar2 * 0x154;
+		*(unsigned char*)(*voice + 0x26) |= 2;
+		*(unsigned char*)((int)voice + 0x1a) |= 2;
+		voice[0x25] = 0xc01;
+		if (*(short*)(streamData + 0xb) != 0) {
+			voice[0x25] |= 0x3000;
+		}
+		*(int*)(*voice + 0xfc) = 1;
+		voice[0x2c] = 0x8000;
+		voice[1] = (int)(streamData + iVar2 * 0x18 + 0xc);
+		voice[0x27] = pitch;
+		*(int*)(*voice + 0x68) = *(int*)((int)p_ReverbDepth + 0xc);
+		*(int*)(*voice + 0x70) = 0;
 		if (*(short*)((int)streamData + 0x2a) == 2) {
-			int iVar2;
-			if (streamData[8] < 0) {
-				iVar2 = 0x2000;
+			if (iVar2 == 0) {
+				streamData[0x40] = 0;
+				streamData[0x42] = 0;
 			} else {
-				iVar2 = 0x1008;
-			}
-			*(short*)((int)param_2 + 0x70) = (short)*(char*)((int)param_2 + iVar2);
-			*(unsigned short*)((int)param_2 + 0x74) = 0;
-			*(unsigned short*)((int)param_2 + 0x72) = 0;
-		}
-
-		streamData[0x43] = param_1;
-		streamData[0x47] = 0;
-		streamData[0x48] = 0x1000;
-		streamData[0x49] = 0;
-		streamData[1] = (int)p_VoiceData + *(char*)(*streamData + 0x14e) * 0xc0;
-		streamData[2] = (int)param_2;
-		streamData[0x46] = param_3;
-
-		if (param_5 != 0) {
-			param_5 = ((param_5 + 1) * 0x100 - 1) * 0x1000;
-		}
-		streamData[0x3c] = param_5;
-		streamData[0x3e] = 0;
-
-		int pitch = PitchCompute__Fiiii(0x3c00000, 0, streamData[9], 0);
-		int iVar2 = 0;
-		do {
-			int* voice = (int*)(streamData[1] + iVar2 * 0xc0);
-			*voice = *streamData + iVar2 * 0x154;
-			*(unsigned char*)(*voice + 0x26) |= 2;
-			*(unsigned char*)((int)voice + 0x1a) |= 2;
-			voice[0x25] = 0xc01;
-			if (*(short*)(streamData + 0xb) != 0) {
-				voice[0x25] |= 0x3000;
-			}
-			*(int*)(*voice + 0xfc) = 1;
-			voice[0x2c] = 0x8000;
-			voice[1] = (int)(streamData + iVar2 * 0x18 + 0xc);
-			voice[0x27] = pitch;
-			*(int*)(*voice + 0x68) = *(int*)((int)p_ReverbDepth + 0xc);
-			*(int*)(*voice + 0x70) = 0;
-
-			if (*(short*)((int)streamData + 0x2a) == 2) {
-				if (iVar2 == 0) {
-					streamData[0x40] = 0;
-					streamData[0x42] = 0;
-				} else {
-					streamData[0x40] = 0x7f000;
-					streamData[0x42] = 0;
-				}
-			} else {
-				streamData[0x40] = param_4 << 0xc;
+				streamData[0x40] = 0x7f000;
 				streamData[0x42] = 0;
 			}
-
-			SetVoiceVolumeMix((RedVoiceDATA*)(streamData[1] + iVar2 * 0xc0), streamData[0x40] >> 0xc,
-				streamData[0x3c] >> 0xc);
-			*(int*)(*streamData + iVar2 * 0x154 + 0x11c) = streamData[0x4b] + iVar2 * 0x2000;
-			memset(streamData + iVar2 * 0x18 + 0xc, 0, 0x60);
-			memcpy((void*)((int)streamData + iVar2 * 0x60 + 0x52), (void*)((int)param_2 + 0x20 + iVar2 * 0x2e), 0x2e);
-			*(unsigned char*)((int)voice + 0x5a) = 0;
-			*(unsigned char*)((int)voice + 0x59) = 0;
-			*(unsigned char*)(voice + 0x16) = 0;
-			*(unsigned char*)((int)voice + 0x5b) = 0x7f;
-			*(unsigned short*)(voice + 0x15) = 0;
-			*(unsigned short*)((int)voice + 0x52) = 0;
-			*(unsigned short*)(voice + 0x14) = 0;
-			*(unsigned short*)((int)voice + 0x56) = 10;
-			streamData[iVar2 * 0x18 + 0xd] = 0;
-			streamData[iVar2 * 0x18 + 0xf] = 0x3fff;
-			streamData[iVar2 * 0x18 + 0xe] = 2;
-			iVar2 += 1;
-		} while (iVar2 < *(short*)((int)streamData + 0x2a));
-
-		if (streamData[8] < 0) {
-			streamData[0x45] = _ArrangeStreamDataNoLoop((RedStreamDATA*)streamData, 0, 0x2000);
 		} else {
-			streamData[0x45] = _ArrangeStreamDataLoop((RedStreamDATA*)streamData, 0, 0x2000);
+			streamData[0x40] = param_4 << 0xc;
+			streamData[0x42] = 0;
 		}
+		SetVoiceVolumeMix((RedVoiceDATA*)(streamData[1] + iVar2 * 0xc0), streamData[0x40] >> 0xc, streamData[0x3c] >> 0xc);
+		*(int*)(*streamData + iVar2 * 0x154 + 0x11c) = streamData[0x4b] + iVar2 * 0x2000;
+		memset(streamData + iVar2 * 0x18 + 0xc, 0, 0x60);
+		memcpy((void*)((int)streamData + iVar2 * 0x60 + 0x52), (void*)((int)param_2 + 0x20 + iVar2 * 0x2e), 0x2e);
+		*(unsigned char*)((int)voice + 0x5a) = 0;
+		*(unsigned char*)((int)voice + 0x59) = 0;
+		*(unsigned char*)(voice + 0x16) = 0;
+		*(unsigned char*)((int)voice + 0x5b) = 0x7f;
+		*(unsigned short*)(voice + 0x15) = 0;
+		*(unsigned short*)((int)voice + 0x52) = 0;
+		*(unsigned short*)(voice + 0x14) = 0;
+		*(unsigned short*)((int)voice + 0x56) = 10;
+		streamData[iVar2 * 0x18 + 0xd] = 0;
+		streamData[iVar2 * 0x18 + 0xf] = 0x3fff;
+		streamData[iVar2 * 0x18 + 0xe] = 2;
+		iVar2 += 1;
+	} while (iVar2 < *(short*)((int)streamData + 0x2a));
 
-		streamData[0x4a] = 0x1000;
-		streamData[0x44] = 3;
+	if (streamData[8] < 0) {
+		streamData[0x45] = _ArrangeStreamDataNoLoop((RedStreamDATA*)streamData, 0, 0x2000);
+	} else {
+		streamData[0x45] = _ArrangeStreamDataLoop((RedStreamDATA*)streamData, 0, 0x2000);
 	}
+	streamData[0x4a] = 0x1000;
+	streamData[0x44] = 3;
 	return param_1;
 }
 

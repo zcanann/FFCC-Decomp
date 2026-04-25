@@ -3,7 +3,11 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 extern "C" {
-extern const float kPppYmMegaBirthShpTail2Zero;
+extern const float kPppYmMegaBirthShpTail2Zero = 0.0f;
+extern const float FLOAT_80330564 = 16384.0f;
+extern const float FLOAT_80330568 = 0.5f;
+extern const float FLOAT_8033056C = 0.00787f;
+extern const float FLOAT_80330570 = 127.0f;
 extern int gPppCalcDisabled;
 }
 #include <dolphin/mtx.h>
@@ -130,7 +134,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
     u8* particleBytes = (u8*)particleData;
     u8 mode = paramBytes[0x12];
     float speedRandRange = *(float*)(paramBytes + 0x5c);
-    float speedRandHalf = 0.5f * speedRandRange;
+    float speedRandHalf = FLOAT_80330568 * speedRandRange;
 
     memset(particleData, 0, 0x1b8);
     if (particleWMat != 0) {
@@ -184,11 +188,11 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
             particleData->m_matrix[0][2] = -(2.0f * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
         } else if (randType == 5) {
             particleData->m_matrix[0][0] =
-                -(0.5f * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
+                -(FLOAT_80330568 * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
             particleData->m_matrix[0][1] =
-                -(0.5f * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
+                -(FLOAT_80330568 * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
             particleData->m_matrix[0][2] =
-                -(0.5f * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
+                -(FLOAT_80330568 * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
         } else {
             particleData->m_matrix[0][0] = Math.RandF() * (speedRandRange * Math.RandF()) - speedRandHalf;
             particleData->m_matrix[0][1] = Math.RandF() * (speedRandRange * Math.RandF()) - speedRandHalf;
@@ -212,7 +216,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         } else if (randType == 4) {
             scale = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF()));
         } else if (randType == 5) {
-            scale = -(0.5f * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange);
+            scale = -(FLOAT_80330568 * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange);
         }
 
         Vec velocity = particleData->m_velocity;

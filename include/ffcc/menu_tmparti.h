@@ -6,13 +6,10 @@ class CFont;
 class CMenuPcs
 {
 public:
-    void TmpArtiInit();
-    void TmpArtiInit0();
     unsigned int TmpArtiOpen();
     void TmpArtiCtrl();
     unsigned int TmpArtiClose();
     void TmpArtiDraw();
-    void TmpArtiCtrlCur();
 
     char pad_0000[0x108];
     CFont* m_tmpArtiFont;

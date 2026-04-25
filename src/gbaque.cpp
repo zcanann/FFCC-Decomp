@@ -4812,6 +4812,8 @@ unsigned int GbaQueue::GetControllerMode()
 	} while (i < 4);
 
 	mode = m_controllerMode;
+	unsigned int result =
+	    static_cast<unsigned int>(-static_cast<int>(mode) | static_cast<int>(mode)) >> 31;
 
 	i = 0;
 	semaphoreIter = accessSemaphores;
@@ -4821,7 +4823,7 @@ unsigned int GbaQueue::GetControllerMode()
 		semaphoreIter++;
 	} while (i < 4);
 
-	return static_cast<unsigned int>((-static_cast<int>(mode) | static_cast<int>(mode)) >> 31);
+	return result;
 }
 
 /*
@@ -4978,6 +4980,8 @@ unsigned int GbaQueue::GetPauseMode()
 	} while (i < 4);
 
 	mode = m_pauseMode;
+	unsigned int result =
+	    static_cast<unsigned int>(-static_cast<int>(mode) | static_cast<int>(mode)) >> 31;
 
 	i = 0;
 	semaphoreIter = accessSemaphores;
@@ -4987,7 +4991,7 @@ unsigned int GbaQueue::GetPauseMode()
 		semaphoreIter++;
 	} while (i < 4);
 
-	return static_cast<unsigned int>((-static_cast<int>(mode) | static_cast<int>(mode)) >> 31);
+	return result;
 }
 
 /*
@@ -5142,7 +5146,7 @@ unsigned int GbaQueue::GetCmdNumFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = *reinterpret_cast<signed char*>(obj + 0x2D5F);
 	OSSignalSemaphore(semaphore);
-	return (static_cast<unsigned int>(value) >> ((channel & 0x1F) << 1)) & 3;
+	return (value >> (channel << 1)) & 3;
 }
 
 /*

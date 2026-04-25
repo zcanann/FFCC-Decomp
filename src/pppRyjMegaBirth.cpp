@@ -394,12 +394,18 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 {
 	bool hasRequiredMemory;
 	u8* particleDataBytes;
+	s32* serializedDataOffsets;
+	s32 workOffset;
 	s32 colorOffset;
+	VColor* color;
 	VRyjMegaBirth* work;
 
 	particleDataBytes = (u8*)particleData;
-	colorOffset = offsets->m_serializedDataOffsets[1];
-	work = (VRyjMegaBirth*)((u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2]);
+	serializedDataOffsets = offsets->m_serializedDataOffsets;
+	workOffset = serializedDataOffsets[2];
+	colorOffset = serializedDataOffsets[1];
+	work = (VRyjMegaBirth*)((u8*)pObject + 0x80 + workOffset);
+	color = (VColor*)((u8*)pObject + 0x80 + colorOffset);
 
 	if (work->m_particleBlock == NULL)
 	{
@@ -477,7 +483,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 			break;
 		}
 
-		calc_particle(pObject, work, particleData, (VColor*)((u8*)pObject + 0x80 + colorOffset));
+		calc_particle(pObject, work, particleData, color);
 	}
 }
 

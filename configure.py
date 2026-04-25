@@ -529,7 +529,7 @@ config.libs = [
             Object(NonMatching, "p_menu.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "p_minigame.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "p_sample.cpp", extra_cflags=["-RTTI on"]),
-            Object(NonMatching, "p_sound.cpp", extra_cflags=["-RTTI on"]),
+            Object(NonMatching, "p_sound.cpp"),
             Object(NonMatching, "p_system.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "p_tina.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "p_usb.cpp"),

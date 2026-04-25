@@ -29,6 +29,11 @@ struct pppYmBreathUnkC {
     int* m_serializedDataOffsets;
 };
 
+struct pppYmBreath {
+    unsigned char _pad[0x10];
+    pppFMATRIX m_localMatrix;
+};
+
 struct YmBreathRenderStep {
     int m_graphId;
     int m_dataValIndex;
@@ -69,273 +74,465 @@ static const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 40b
+ * PAL Address: 0x800bfe78
+ * PAL Size: 248b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
-void get_rand()
+extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dataOffsets)
 {
+    YmBreathParticleGroup* group;
+    VYmBreath* state = (VYmBreath*)((unsigned char*)ymBreath + 0x80 + *dataOffsets->m_serializedDataOffsets);
+
+    if (state->m_particleData != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleData);
+        state->m_particleData = 0;
+    }
+
+    if (state->m_particleWmats != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleWmats);
+        state->m_particleWmats = 0;
+    }
+
+    if (state->m_particleColors != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleColors);
+        state->m_particleColors = 0;
+    }
+
+    group = state->m_groups;
+    if (group != NULL) {
+        int i;
+
+        for (i = 0; i < state->m_groupCount; i++) {
+            if (group->particleIndices != NULL) {
+                pppHeapUseRate__FPQ27CMemory6CStage(group->particleIndices);
+                group->particleIndices = 0;
+            }
+
+            if (group->particleStates != NULL) {
+                pppHeapUseRate__FPQ27CMemory6CStage(group->particleStates);
+                group->particleStates = 0;
+            }
+
+            group = (YmBreathParticleGroup*)((unsigned char*)group + 0x5C);
+        }
+
+        pppHeapUseRate__FPQ27CMemory6CStage(state->m_groups);
+        state->m_groups = 0;
+    }
 }
-#endif
 
 /*
  * --INFO--
- * PAL Address: 0x800c118c
- * PAL Size: 1580b
+ * PAL Address: 0x800bff70
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VColor* vColor, _PARTICLE_DATA* particleData,
-                   Mtx* particleWmat, _PARTICLE_COLOR* particleColor)
+void pppConstruct2YmBreath(_pppPObject* obj)
 {
-    unsigned char* breath = (unsigned char*)pYmBreath;
-    Vec* particle = reinterpret_cast<Vec*>(particleData);
-    pppIVECTOR4 angle;
+    (void)obj;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800bff74
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dataOffsets)
+{
+    VYmBreath* state = (VYmBreath*)((unsigned char*)ymBreath + 0x80 + *dataOffsets->m_serializedDataOffsets);
+    float zero;
+
+    PSMTXIdentity(state->m_matrix);
+    zero = FLOAT_80330c80;
+
+    state->m_direction.z = FLOAT_80330c80;
+    state->m_direction.y = zero;
+    state->m_direction.x = zero;
+
+    state->m_particleData = 0;
+    state->m_particleWmats = 0;
+    state->m_particleColors = 0;
+    state->m_groups = 0;
+    state->m_particleCount = 0;
+
+    state->m_emitFrameCounter = 10000;
+    state->m_groupCount = 0;
+    state->m_slotCount = 0;
+    state->m_flags = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800bffec
+ * PAL Size: 1292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
+{
+    YmBreathRenderStep* step;
+    int workOffset;
+    int colorOffset;
+    VYmBreath* work;
+    VColor* color;
+    Vec* source;
+    Mtx* matrixList;
+    float* colorDelta;
+    int* groupData;
+    int groupCount;
+    long* shape;
+    unsigned char colorR;
+    unsigned char colorG;
+    unsigned char colorB;
+    unsigned char colorA;
+    int i;
+
+    step = (YmBreathRenderStep*)pYmBreath;
+    workOffset = offsets->m_serializedDataOffsets[0];
+    colorOffset = offsets->m_serializedDataOffsets[1];
+    work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + workOffset);
+    color = reinterpret_cast<VColor*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
+    source = reinterpret_cast<Vec*>(work->m_particleData);
+    matrixList = work->m_particleWmats;
+    colorDelta = reinterpret_cast<float*>(work->m_particleColors);
+    groupData = (int*)work->m_groups;
+    groupCount = work->m_particleCount;
+
+    if (step->m_stepValue == 0xFFFF) {
+        return;
+    }
+
+    shape = *(long**)(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pppEnvStPtr) + 0xC) + step->m_stepValue * 4);
+    pppSetBlendMode(step->m_payload[8]);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+        0, 0, *reinterpret_cast<float*>(step->m_payload + 0xB0), step->m_payload[0xB6], step->m_payload[0xB5],
+        step->m_payload[8], 0, 1, 1, 0);
+
+    colorR = color->m_red;
+    colorG = color->m_green;
+    colorB = color->m_blue;
+    colorA = color->m_alpha;
+
+    for (i = 0; i < groupCount; i++) {
+        if (*(short*)&source[2].z > 0) {
+            _GXColor amb;
+            Mtx drawMtx;
+            Mtx rotMtx;
+            Vec pos;
+            pppFMATRIX viewMtx;
+            int r;
+            int g;
+            int b;
+            int a;
+
+            PSMTXIdentity(drawMtx);
+            drawMtx[0][0] = source[4].y * pppMngStPtr->m_scale.x;
+            drawMtx[1][1] = source[4].z * pppMngStPtr->m_scale.y;
+            drawMtx[2][2] = drawMtx[0][0];
+            if (FLOAT_80330c80 != source[3].y) {
+                PSMTXRotRad(rotMtx, 'z', FLOAT_80330c84 * source[3].y);
+                PSMTXConcat(drawMtx, rotMtx, drawMtx);
+            }
+
+            pppUnitMatrix(viewMtx);
+            PSMTXConcat(*matrixList, ymBreath->m_localMatrix.value, viewMtx.value);
+            PSMTXConcat(ppvCameraMatrix0, viewMtx.value, viewMtx.value);
+            PSMTXMultVec(viewMtx.value, source, &pos);
+            drawMtx[0][3] = pos.x;
+            drawMtx[1][3] = pos.y;
+            drawMtx[2][3] = pos.z;
+            GXLoadPosMtxImm(drawMtx, 0);
+
+            r = colorR;
+            g = colorG;
+            b = colorB;
+            a = (int)((double)(int)colorA - DOUBLE_80330c88 - source[6].y);
+            if (colorDelta != 0) {
+                r += (int)colorDelta[0];
+                g += (int)colorDelta[1];
+                b += (int)colorDelta[2];
+                a += (int)colorDelta[3];
+            }
+
+            if (r < 0) {
+                r = 0;
+            } else if (r > 0xFF) {
+                r = 0xFF;
+            }
+            if (g < 0) {
+                g = 0;
+            } else if (g > 0xFF) {
+                g = 0xFF;
+            }
+            if (b < 0) {
+                b = 0;
+            } else if (b > 0xFF) {
+                b = 0xFF;
+            }
+            if (a < 0) {
+                a = 0;
+            } else if (a > 0x7F) {
+                a = 0x7F;
+            }
+
+            amb.r = (unsigned char)r;
+            amb.g = (unsigned char)g;
+            amb.b = (unsigned char)b;
+            amb.a = (unsigned char)a;
+            GXSetChanAmbColor(GX_COLOR0A0, amb);
+            pppDrawShp__FPlsP12CMaterialSetUc(shape, *(short*)((unsigned char*)&source[7].y + 2),
+                                              pppEnvStPtr->m_materialSetPtr,
+                                              step->m_payload[8]);
+        }
+
+        if (matrixList != 0) {
+            matrixList++;
+        }
+        if (colorDelta != 0) {
+            colorDelta += 8;
+        }
+        source += 8;
+    }
+
+    if ((CFlatFlags & 0x200000) != 0) {
+        for (i = 0; i < (int)*(unsigned short*)step->m_payload; i++) {
+            if (groupData[0] == 1) {
+                _GXColor debugColor;
+                int firstParticle;
+                int j;
+                float scale;
+                Mtx sphereMtx;
+                Mtx tempMtx;
+                Vec debugPos;
+
+                if ((i == 0) || (i == 2)) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x00;
+                    debugColor.b = 0x00;
+                    debugColor.a = 0xFF;
+                } else if (i == 1) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x80;
+                    debugColor.b = 0xFF;
+                    debugColor.a = 0xFF;
+                } else if (i == 3) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x80;
+                    debugColor.b = 0x80;
+                    debugColor.a = 0xFF;
+                } else {
+                    debugColor.r = 0x00;
+                    debugColor.g = 0x60;
+                    debugColor.b = 0x80;
+                    debugColor.a = 0xFF;
+                }
+
+                firstParticle = -1;
+                for (j = 0; j < (int)*(unsigned short*)((unsigned char*)&step->m_arg3 + 2); j++) {
+                    if (*(signed char*)(groupData[2] + j) != -1) {
+                        firstParticle = (int)*(signed char*)(groupData[1] + j);
+                        break;
+                    }
+                }
+
+                scale = (float)groupData[10];
+                PSMTXIdentity(sphereMtx);
+                sphereMtx[0][0] = scale;
+                sphereMtx[1][1] = scale;
+                sphereMtx[2][2] = scale;
+
+                PSMTXConcat(work->m_particleWmats[firstParticle], ymBreath->m_localMatrix.value, tempMtx);
+                PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
+                PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &debugPos);
+                sphereMtx[0][3] = debugPos.x;
+                sphereMtx[1][3] = debugPos.y;
+                sphereMtx[2][3] = debugPos.z;
+                Graphic.DrawSphere(sphereMtx, debugColor);
+            }
+            groupData += 0x17;
+        }
+
+        pppSetBlendMode(1);
+        pppSetBlendMode(0);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 2);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800c04f8
+ * PAL Size: 1264b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
+{
+    int colorOffset;
+    int* dataOffsets;
+    _pppMngSt* mngSt;
+    VYmBreath* work;
+    VColor* color;
+    int* groupData;
+    Mtx* particleWMat;
+    Mtx* particleMtx;
+    int i;
+    int groupIndex;
+    int firstParticle;
+    int groupTable;
+    int slotIndex;
+    unsigned int slotCount;
+    bool ready;
+    float scaledOwner;
+    Mtx scaleMtx;
+    Mtx worldMtx;
     pppFMATRIX rotMtx;
-    Vec baseDir;
-    float normX;
-    float normY;
-    float normZ;
-    float spread;
-    float range;
-    unsigned char flags;
+    Vec origin;
+    Vec dir;
+    Vec dirNorm;
+    Vec target;
+    Vec hitVector;
 
-    spread = (float)(unsigned int)*(unsigned char*)(breath + 0x28);
-    range = spread + spread;
-
-    memset(particleData, 0, 0x60);
-    if (particleWmat != NULL) {
-        memset(particleWmat, 0, 0x30);
-    }
-    if (particleColor != NULL) {
-        memset(particleColor, 0, 0x20);
+    if (gPppCalcDisabled != 0) {
+        return;
     }
 
-    baseDir.x = 0.0f;
-    baseDir.y = 0.0f;
-    baseDir.z = -1.0f;
+    dataOffsets = offsets->m_serializedDataOffsets;
+    mngSt = pppMngStPtr;
+    colorOffset = dataOffsets[1];
+    work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[0]);
+    color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
 
-    angle.x = (short)(range * Math.RandF() - spread);
-    angle.y = (short)(range * Math.RandF() - spread);
-    angle.z = (short)(range * Math.RandF() - spread);
-    angle.w = 0;
+    if (work->m_particleData == NULL) {
+        int* groupTable;
 
-    pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
-    PSMTXMultVecSR(rotMtx.value, &baseDir, &particle[1]);
+        work->m_particleCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x1E);
+        work->m_slotCount = *(short*)((unsigned char*)pYmBreath + 0x12);
+        work->m_groupCount = *(short*)((unsigned char*)pYmBreath + 0x14);
 
-    particle[1].x *= *(float*)(breath + 0xB0);
-    particle[1].y *= *(float*)(breath + 0xB4);
-    particle[1].z *= *(float*)(breath + 0xB8);
-
-    normX = particle[1].x;
-    normY = particle[1].y;
-    normZ = particle[1].z;
-    pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&particle[1]), reinterpret_cast<Vec*>(&normX));
-
-    if (*(float*)(breath + 0xAC) != 0.0f) {
-        PSVECScale(&particle[1], &particle[0], *(float*)(breath + 0xAC));
-    }
-
-    if (*(char*)(breath + 0x26) != '\0') {
-        particle[6].y = (float)(unsigned int)vColor->m_alpha;
-        *(char*)&particle[3].x = *(char*)(breath + 0x26);
-    }
-    if (*(char*)(breath + 0x27) != '\0') {
-        *(char*)((unsigned char*)&particle[3].x + 1) = *(char*)(breath + 0x27);
-    }
-
-    particle[3].y = *(float*)(breath + 0x90);
-    particle[3].z = *(float*)(breath + 0x94);
-
-    if (*(char*)(breath + 0xC2) != '\0') {
-        particle[4].x = *(float*)(breath + 0x9C) * Math.RandF();
-        flags = *(unsigned char*)(breath + 0xC2);
-        if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-            if (Math.RandF() > 0.5f) {
-                particle[4].x *= -1.0f;
-            }
-        } else if ((flags & 2) != 0) {
-            particle[4].x *= -1.0f;
+        work->m_particleData =
+            (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x60),
+                                                                  pppEnvStPtr->m_stagePtr,
+                                                                  const_cast<char*>(s_pppYmBreath_cpp), 0x243);
+        if (work->m_particleData != NULL) {
+            memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * 0x60));
         }
+
+        work->m_particleWmats =
+            (Mtx*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x30),
+                                                       pppEnvStPtr->m_stagePtr,
+                                                       const_cast<char*>(s_pppYmBreath_cpp), 0x249);
+        if (work->m_particleWmats != NULL) {
+            memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * 0x30));
+        }
+
+        work->m_particleColors =
+            (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount << 5),
+                                                                   pppEnvStPtr->m_stagePtr,
+                                                                   const_cast<char*>(s_pppYmBreath_cpp), 0x24F);
+        if (work->m_particleColors != NULL) {
+            memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount << 5));
+        }
+
+        work->m_groups =
+            (YmBreathParticleGroup*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14) * 0x5C),
+                pppEnvStPtr->m_stagePtr,
+                const_cast<char*>(s_pppYmBreath_cpp), 0x255);
+        if (work->m_groups != NULL) {
+            memset(work->m_groups, 0,
+                   (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14) * 0x5C));
+
+            groupTable = (int*)work->m_groups;
+            for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14); i++) {
+                groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                    (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12),
+                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmBreath_cpp), 0x260);
+                memset((void*)groupTable[1], 0xFF,
+                       (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12));
+
+                groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                    (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12),
+                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmBreath_cpp), 0x263);
+                memset((void*)groupTable[2], 0xFF,
+                       (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12));
+                groupTable[0] = 0;
+                groupTable += 0x17;
+            }
+        }
+
+        work->m_direction.x = 0.0f;
+        work->m_direction.y = 0.0f;
+        work->m_direction.z = 1.0f;
+        PSVECNormalize(&work->m_direction, &work->m_direction);
     }
 
-    if ((*(unsigned char*)(breath + 0xC2) & 4) != 0) {
-        particle[3].y += particle[4].x;
-    }
-    if ((*(unsigned char*)(breath + 0xC2) & 8) != 0) {
-        particle[3].z += particle[4].x;
-    }
+    PSMTXCopy(mngSt->m_matrix.value, work->m_matrix);
+    UpdateAllParticle(reinterpret_cast<_pppPObject*>(ymBreath), work, pYmBreath, color);
 
-    while (particle[3].y >= 6.2831855f) {
-        particle[3].y -= 6.2831855f;
-    }
-    while (particle[3].y < 0.0f) {
-        particle[3].y += 6.2831855f;
-    }
-
-    particle[4].y = *(float*)(breath + 0x50);
-    particle[4].z = *(float*)(breath + 0x54);
-    particle[5].x = *(float*)(breath + 0x60);
-    particle[5].y = *(float*)(breath + 0x64);
-
-    if (*(unsigned char*)(breath + 0xC1) != 0) {
-        flags = *(unsigned char*)(breath + 0xC1);
-        if ((flags & 0x20) == 0) {
-            particle[5].z = *(float*)(breath + 0x80) * Math.RandF();
-            particle[6].x = *(float*)(breath + 0x84) * Math.RandF();
-            if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-                if (Math.RandF() > 0.5f) {
-                    particle[5].z *= -1.0f;
+    particleWMat = work->m_particleWmats;
+    groupData = (int*)work->m_groups;
+    for (groupIndex = 0; groupIndex < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14);
+         groupIndex++) {
+        slotCount = (unsigned int)*(unsigned short*)((unsigned char*)pYmBreath + 0x12);
+        groupTable = (int)groupData;
+        for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
+            if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
+                (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {
+                ready = false;
+                goto group_ready;
+            }
+        }
+        ready = true;
+group_ready:
+        if (ready) {
+            firstParticle = -1;
+            scaledOwner = mngSt->m_ownerScale * *(float*)((unsigned char*)pYmBreath + 8);
+            for (slotIndex = 0; slotCount != 0; slotCount--) {
+                if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
+                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
+                    break;
                 }
-                if (Math.RandF() > 0.5f) {
-                    particle[6].x *= -1.0f;
-                }
-            } else if ((flags & 2) != 0) {
-                particle[5].z *= -1.0f;
-                particle[6].x *= -1.0f;
+                slotIndex++;
             }
-        } else {
-            particle[5].z = *(float*)(breath + 0x80) * Math.RandF();
-            particle[6].x = particle[5].z;
-            if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-                if (Math.RandF() > 0.5f) {
-                    particle[5].z *= -1.0f;
-                    particle[6].x *= -1.0f;
-                }
-            } else if ((flags & 2) != 0) {
-                particle[5].z *= -1.0f;
-                particle[6].x *= -1.0f;
-            }
+
+            PSMTXIdentity(scaleMtx);
+            scaleMtx[0][0] = scaledOwner;
+            scaleMtx[1][1] = scaledOwner;
+            scaleMtx[2][2] = scaledOwner;
+            particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
+            PSMTXConcat(*particleMtx, ymBreath->m_localMatrix.value, worldMtx);
+            PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
+            pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
+            rotMtx.value[0][3] = FLOAT_80330c80;
+            rotMtx.value[1][3] = FLOAT_80330c80;
+            rotMtx.value[2][3] = FLOAT_80330c80;
+            *(float*)(groupTable + 0x28) = scaledOwner;
+            pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
+            PSMTXMultVec(rotMtx.value, &dir, &dir);
+            pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
+            PSVECScale(&dirNorm, &target, *(float*)(groupTable + 0x24));
+            pppAddVector(target, origin, target);
+            pppSubVector(hitVector, target, origin);
+            pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner,
+                                                                *(float*)((unsigned char*)pYmBreath + 4));
         }
-    }
 
-    if ((*(unsigned char*)(breath + 0xC1) & 4) != 0) {
-        particle[4].y += particle[5].z;
-        particle[4].z += particle[6].x;
-    }
-    if ((*(unsigned char*)(breath + 0xC1) & 8) != 0) {
-        particle[5].x += particle[5].z;
-        particle[5].y += particle[6].x;
-    }
-
-    particle[6].z = *(float*)(breath + 0x18);
-    if (*(float*)(breath + 0xA8) != 0.0f) {
-        spread = *(float*)(breath + 0xA8);
-        particle[6].z += (spread + spread) * Math.RandF() - spread;
-    }
-
-    if (*(short*)(breath + 0x24) == 0) {
-        *(short*)&particle[2].z = -1;
-    } else {
-        *(short*)&particle[2].z = *(short*)(breath + 0x24);
-    }
-    *(unsigned char*)&particle[7].x = 0;
-
-    PSMTXCopy(*(Mtx*)vYmBreath, *(Mtx*)particleWmat);
-    if (particleColor != NULL) {
-        particleColor->m_colorFrameDeltas[0] = *(float*)(breath + 0x2C);
-        particleColor->m_colorFrameDeltas[1] = *(float*)(breath + 0x30);
-        particleColor->m_colorFrameDeltas[2] = *(float*)(breath + 0x34);
-        particleColor->m_colorFrameDeltas[3] = *(float*)(breath + 0x38);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800c0e18
- * PAL Size: 884b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* particleData, VColor* vColor,
-                    _PARTICLE_COLOR* particleColor)
-{
-    unsigned char* breath = (unsigned char*)pYmBreath;
-    int alpha = vColor->m_alpha;
-    Vec* particle = reinterpret_cast<Vec*>(particleData);
-    char frameCount;
-    Vec step;
-    float angleRange;
-
-    (void)vYmBreath;
-
-    if (particleColor != NULL) {
-        particleColor->m_color[0] += particleColor->m_colorFrameDeltas[0];
-        particleColor->m_color[1] += particleColor->m_colorFrameDeltas[1];
-        particleColor->m_color[2] += particleColor->m_colorFrameDeltas[2];
-        particleColor->m_color[3] += particleColor->m_colorFrameDeltas[3];
-        particleColor->m_colorFrameDeltas[0] += *(float*)(breath + 0x3C);
-        particleColor->m_colorFrameDeltas[1] += *(float*)(breath + 0x40);
-        particleColor->m_colorFrameDeltas[2] += *(float*)(breath + 0x44);
-        particleColor->m_colorFrameDeltas[3] += *(float*)(breath + 0x48);
-        alpha = (unsigned int)vColor->m_alpha + (int)particleColor->m_color[3];
-        if (alpha > 0xFF) {
-            alpha = 0xFF;
-        }
-    }
-
-    particle[3].y += particle[3].z;
-    if ((*(unsigned char*)(breath + 0xC2) & 0x10) != 0) {
-        particle[3].z += *(float*)(breath + 0x98) + particle[4].x;
-    } else {
-        particle[3].z += *(float*)(breath + 0x98);
-    }
-
-    angleRange = 6.2831855f;
-    while (angleRange <= particle[3].y) {
-        particle[3].y -= angleRange;
-    }
-    while (particle[3].y < 0.0f) {
-        particle[3].y += angleRange;
-    }
-
-    particle[4].y += particle[5].x;
-    particle[4].z += particle[5].y;
-    if ((*(unsigned char*)(breath + 0xC1) & 0x10) != 0) {
-        particle[5].x += *(float*)(breath + 0x70) + particle[5].z;
-        particle[5].y += *(float*)(breath + 0x74) + particle[6].x;
-    } else {
-        particle[5].x += *(float*)(breath + 0x70);
-        particle[5].y += *(float*)(breath + 0x74);
-    }
-
-    particle[6].z += *(float*)(breath + 0xA4);
-    if (*(unsigned char*)(breath + 0xC8) == 0) {
-        float start = *(float*)(breath + 0xA0);
-        float zero = 0.0f;
-        if ((start > zero) && (*(float*)(breath + 0xA4) < zero)) {
-            if (particle[6].z < zero) {
-                particle[6].z = zero;
-            }
-        } else if ((start < zero) && (zero < *(float*)(breath + 0xA4)) && (zero < particle[6].z)) {
-            particle[6].z = zero;
-        }
-    }
-
-    PSVECScale(&particle[1], &step, particle[6].z);
-    PSVECAdd(&step, &particle[0], &particle[0]);
-
-    if (*(unsigned short*)(breath + 0x24) != 0) {
-        *(short*)&particle[2].z = *(short*)&particle[2].z - 1;
-    }
-    *(char*)&particle[7].x = *(char*)&particle[7].x + 1;
-
-    frameCount = *(char*)&particle[3].x;
-    if ((frameCount != '\0') && ((int)(unsigned int)*(unsigned char*)&particle[7].x <= (int)frameCount)) {
-        *(float*)&particle[6].y -= (float)alpha / (float)(int)frameCount;
-    }
-
-    frameCount = *(char*)((unsigned char*)&particle[3].x + 1);
-    if ((frameCount != '\0') && ((int)*(short*)&particle[2].z <= (int)frameCount)) {
-        *(float*)&particle[6].y += (float)alpha / (float)(unsigned int)*(unsigned char*)(breath + 0x27);
+        groupData += 0x17;
     }
 }
 
@@ -516,6 +713,278 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
 
 /*
  * --INFO--
+ * PAL Address: 0x800c0e18
+ * PAL Size: 884b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* particleData, VColor* vColor,
+                    _PARTICLE_COLOR* particleColor)
+{
+    unsigned char* breath = (unsigned char*)pYmBreath;
+    int alpha = vColor->m_alpha;
+    Vec* particle = reinterpret_cast<Vec*>(particleData);
+    char frameCount;
+    Vec step;
+    float angleRange;
+
+    (void)vYmBreath;
+
+    if (particleColor != NULL) {
+        particleColor->m_color[0] += particleColor->m_colorFrameDeltas[0];
+        particleColor->m_color[1] += particleColor->m_colorFrameDeltas[1];
+        particleColor->m_color[2] += particleColor->m_colorFrameDeltas[2];
+        particleColor->m_color[3] += particleColor->m_colorFrameDeltas[3];
+        particleColor->m_colorFrameDeltas[0] += *(float*)(breath + 0x3C);
+        particleColor->m_colorFrameDeltas[1] += *(float*)(breath + 0x40);
+        particleColor->m_colorFrameDeltas[2] += *(float*)(breath + 0x44);
+        particleColor->m_colorFrameDeltas[3] += *(float*)(breath + 0x48);
+        alpha = (unsigned int)vColor->m_alpha + (int)particleColor->m_color[3];
+        if (alpha > 0xFF) {
+            alpha = 0xFF;
+        }
+    }
+
+    particle[3].y += particle[3].z;
+    if ((*(unsigned char*)(breath + 0xC2) & 0x10) != 0) {
+        particle[3].z += *(float*)(breath + 0x98) + particle[4].x;
+    } else {
+        particle[3].z += *(float*)(breath + 0x98);
+    }
+
+    angleRange = 6.2831855f;
+    while (angleRange <= particle[3].y) {
+        particle[3].y -= angleRange;
+    }
+    while (particle[3].y < 0.0f) {
+        particle[3].y += angleRange;
+    }
+
+    particle[4].y += particle[5].x;
+    particle[4].z += particle[5].y;
+    if ((*(unsigned char*)(breath + 0xC1) & 0x10) != 0) {
+        particle[5].x += *(float*)(breath + 0x70) + particle[5].z;
+        particle[5].y += *(float*)(breath + 0x74) + particle[6].x;
+    } else {
+        particle[5].x += *(float*)(breath + 0x70);
+        particle[5].y += *(float*)(breath + 0x74);
+    }
+
+    particle[6].z += *(float*)(breath + 0xA4);
+    if (*(unsigned char*)(breath + 0xC8) == 0) {
+        float start = *(float*)(breath + 0xA0);
+        float zero = 0.0f;
+        if ((start > zero) && (*(float*)(breath + 0xA4) < zero)) {
+            if (particle[6].z < zero) {
+                particle[6].z = zero;
+            }
+        } else if ((start < zero) && (zero < *(float*)(breath + 0xA4)) && (zero < particle[6].z)) {
+            particle[6].z = zero;
+        }
+    }
+
+    PSVECScale(&particle[1], &step, particle[6].z);
+    PSVECAdd(&step, &particle[0], &particle[0]);
+
+    if (*(unsigned short*)(breath + 0x24) != 0) {
+        *(short*)&particle[2].z = *(short*)&particle[2].z - 1;
+    }
+    *(char*)&particle[7].x = *(char*)&particle[7].x + 1;
+
+    frameCount = *(char*)&particle[3].x;
+    if ((frameCount != '\0') && ((int)(unsigned int)*(unsigned char*)&particle[7].x <= (int)frameCount)) {
+        *(float*)&particle[6].y -= (float)alpha / (float)(int)frameCount;
+    }
+
+    frameCount = *(char*)((unsigned char*)&particle[3].x + 1);
+    if ((frameCount != '\0') && ((int)*(short*)&particle[2].z <= (int)frameCount)) {
+        *(float*)&particle[6].y += (float)alpha / (float)(unsigned int)*(unsigned char*)(breath + 0x27);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800c118c
+ * PAL Size: 1580b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VColor* vColor, _PARTICLE_DATA* particleData,
+                   Mtx* particleWmat, _PARTICLE_COLOR* particleColor)
+{
+    unsigned char* breath = (unsigned char*)pYmBreath;
+    Vec* particle = reinterpret_cast<Vec*>(particleData);
+    pppIVECTOR4 angle;
+    pppFMATRIX rotMtx;
+    Vec baseDir;
+    float normX;
+    float normY;
+    float normZ;
+    float spread;
+    float range;
+    unsigned char flags;
+
+    spread = (float)(unsigned int)*(unsigned char*)(breath + 0x28);
+    range = spread + spread;
+
+    memset(particleData, 0, 0x60);
+    if (particleWmat != NULL) {
+        memset(particleWmat, 0, 0x30);
+    }
+    if (particleColor != NULL) {
+        memset(particleColor, 0, 0x20);
+    }
+
+    baseDir.x = 0.0f;
+    baseDir.y = 0.0f;
+    baseDir.z = -1.0f;
+
+    angle.x = (short)(range * Math.RandF() - spread);
+    angle.y = (short)(range * Math.RandF() - spread);
+    angle.z = (short)(range * Math.RandF() - spread);
+    angle.w = 0;
+
+    pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
+    PSMTXMultVecSR(rotMtx.value, &baseDir, &particle[1]);
+
+    particle[1].x *= *(float*)(breath + 0xB0);
+    particle[1].y *= *(float*)(breath + 0xB4);
+    particle[1].z *= *(float*)(breath + 0xB8);
+
+    normX = particle[1].x;
+    normY = particle[1].y;
+    normZ = particle[1].z;
+    pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&particle[1]), reinterpret_cast<Vec*>(&normX));
+
+    if (*(float*)(breath + 0xAC) != 0.0f) {
+        PSVECScale(&particle[1], &particle[0], *(float*)(breath + 0xAC));
+    }
+
+    if (*(char*)(breath + 0x26) != '\0') {
+        particle[6].y = (float)(unsigned int)vColor->m_alpha;
+        *(char*)&particle[3].x = *(char*)(breath + 0x26);
+    }
+    if (*(char*)(breath + 0x27) != '\0') {
+        *(char*)((unsigned char*)&particle[3].x + 1) = *(char*)(breath + 0x27);
+    }
+
+    particle[3].y = *(float*)(breath + 0x90);
+    particle[3].z = *(float*)(breath + 0x94);
+
+    if (*(char*)(breath + 0xC2) != '\0') {
+        particle[4].x = *(float*)(breath + 0x9C) * Math.RandF();
+        flags = *(unsigned char*)(breath + 0xC2);
+        if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+            if (Math.RandF() > 0.5f) {
+                particle[4].x *= -1.0f;
+            }
+        } else if ((flags & 2) != 0) {
+            particle[4].x *= -1.0f;
+        }
+    }
+
+    if ((*(unsigned char*)(breath + 0xC2) & 4) != 0) {
+        particle[3].y += particle[4].x;
+    }
+    if ((*(unsigned char*)(breath + 0xC2) & 8) != 0) {
+        particle[3].z += particle[4].x;
+    }
+
+    while (particle[3].y >= 6.2831855f) {
+        particle[3].y -= 6.2831855f;
+    }
+    while (particle[3].y < 0.0f) {
+        particle[3].y += 6.2831855f;
+    }
+
+    particle[4].y = *(float*)(breath + 0x50);
+    particle[4].z = *(float*)(breath + 0x54);
+    particle[5].x = *(float*)(breath + 0x60);
+    particle[5].y = *(float*)(breath + 0x64);
+
+    if (*(unsigned char*)(breath + 0xC1) != 0) {
+        flags = *(unsigned char*)(breath + 0xC1);
+        if ((flags & 0x20) == 0) {
+            particle[5].z = *(float*)(breath + 0x80) * Math.RandF();
+            particle[6].x = *(float*)(breath + 0x84) * Math.RandF();
+            if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+                if (Math.RandF() > 0.5f) {
+                    particle[5].z *= -1.0f;
+                }
+                if (Math.RandF() > 0.5f) {
+                    particle[6].x *= -1.0f;
+                }
+            } else if ((flags & 2) != 0) {
+                particle[5].z *= -1.0f;
+                particle[6].x *= -1.0f;
+            }
+        } else {
+            particle[5].z = *(float*)(breath + 0x80) * Math.RandF();
+            particle[6].x = particle[5].z;
+            if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+                if (Math.RandF() > 0.5f) {
+                    particle[5].z *= -1.0f;
+                    particle[6].x *= -1.0f;
+                }
+            } else if ((flags & 2) != 0) {
+                particle[5].z *= -1.0f;
+                particle[6].x *= -1.0f;
+            }
+        }
+    }
+
+    if ((*(unsigned char*)(breath + 0xC1) & 4) != 0) {
+        particle[4].y += particle[5].z;
+        particle[4].z += particle[6].x;
+    }
+    if ((*(unsigned char*)(breath + 0xC1) & 8) != 0) {
+        particle[5].x += particle[5].z;
+        particle[5].y += particle[6].x;
+    }
+
+    particle[6].z = *(float*)(breath + 0x18);
+    if (*(float*)(breath + 0xA8) != 0.0f) {
+        spread = *(float*)(breath + 0xA8);
+        particle[6].z += (spread + spread) * Math.RandF() - spread;
+    }
+
+    if (*(short*)(breath + 0x24) == 0) {
+        *(short*)&particle[2].z = -1;
+    } else {
+        *(short*)&particle[2].z = *(short*)(breath + 0x24);
+    }
+    *(unsigned char*)&particle[7].x = 0;
+
+    PSMTXCopy(*(Mtx*)vYmBreath, *(Mtx*)particleWmat);
+    if (particleColor != NULL) {
+        particleColor->m_colorFrameDeltas[0] = *(float*)(breath + 0x2C);
+        particleColor->m_colorFrameDeltas[1] = *(float*)(breath + 0x30);
+        particleColor->m_colorFrameDeltas[2] = *(float*)(breath + 0x34);
+        particleColor->m_colorFrameDeltas[3] = *(float*)(breath + 0x38);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#ifndef VERSION_GCCP01
+void get_rand()
+{
+}
+#endif
+
+/*
+ * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 260b
  * EN Address: TODO
@@ -529,460 +998,6 @@ void SetParticleMatrix(_pppPObject*, VYmBreath*, _PARTICLE_DATA*, Mtx*)
 	// TODO
 }
 #endif
-
-/*
- * --INFO--
- * Address:	800c04f8
- * Size:	1264
- */
-extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
-{
-    int colorOffset;
-    int* dataOffsets;
-    _pppMngSt* mngSt;
-    VYmBreath* work;
-    VColor* color;
-    int* groupData;
-    Mtx* particleWMat;
-    Mtx* particleMtx;
-    int i;
-    int groupIndex;
-    int firstParticle;
-    int groupTable;
-    int slotIndex;
-    unsigned int slotCount;
-    bool ready;
-    float scaledOwner;
-    Mtx scaleMtx;
-    Mtx worldMtx;
-    pppFMATRIX rotMtx;
-    Vec origin;
-    Vec dir;
-    Vec dirNorm;
-    Vec target;
-    Vec hitVector;
-
-    if (gPppCalcDisabled != 0) {
-        return;
-    }
-
-    dataOffsets = offsets->m_serializedDataOffsets;
-    mngSt = pppMngStPtr;
-    colorOffset = dataOffsets[1];
-    work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[0]);
-    color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
-
-    if (work->m_particleData == NULL) {
-        int* groupTable;
-
-        work->m_particleCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x1E);
-        work->m_slotCount = *(short*)((unsigned char*)pYmBreath + 0x12);
-        work->m_groupCount = *(short*)((unsigned char*)pYmBreath + 0x14);
-
-        work->m_particleData =
-            (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x60),
-                                                                  pppEnvStPtr->m_stagePtr,
-                                                                  const_cast<char*>(s_pppYmBreath_cpp), 0x243);
-        if (work->m_particleData != NULL) {
-            memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * 0x60));
-        }
-
-        work->m_particleWmats =
-            (Mtx*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x30),
-                                                       pppEnvStPtr->m_stagePtr,
-                                                       const_cast<char*>(s_pppYmBreath_cpp), 0x249);
-        if (work->m_particleWmats != NULL) {
-            memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * 0x30));
-        }
-
-        work->m_particleColors =
-            (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount << 5),
-                                                                   pppEnvStPtr->m_stagePtr,
-                                                                   const_cast<char*>(s_pppYmBreath_cpp), 0x24F);
-        if (work->m_particleColors != NULL) {
-            memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount << 5));
-        }
-
-        work->m_groups =
-            (YmBreathParticleGroup*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14) * 0x5C),
-                pppEnvStPtr->m_stagePtr,
-                const_cast<char*>(s_pppYmBreath_cpp), 0x255);
-        if (work->m_groups != NULL) {
-            memset(work->m_groups, 0,
-                   (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14) * 0x5C));
-
-            groupTable = (int*)work->m_groups;
-            for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14); i++) {
-                groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12),
-                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmBreath_cpp), 0x260);
-                memset((void*)groupTable[1], 0xFF,
-                       (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12));
-
-                groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12),
-                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmBreath_cpp), 0x263);
-                memset((void*)groupTable[2], 0xFF,
-                       (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12));
-                groupTable[0] = 0;
-                groupTable += 0x17;
-            }
-        }
-
-        work->m_direction.x = 0.0f;
-        work->m_direction.y = 0.0f;
-        work->m_direction.z = 1.0f;
-        PSVECNormalize(&work->m_direction, &work->m_direction);
-    }
-
-    PSMTXCopy(mngSt->m_matrix.value, work->m_matrix);
-    UpdateAllParticle(reinterpret_cast<_pppPObject*>(ymBreath), work, pYmBreath, color);
-
-    particleWMat = work->m_particleWmats;
-    groupData = (int*)work->m_groups;
-    for (groupIndex = 0; groupIndex < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14);
-         groupIndex++) {
-        slotCount = (unsigned int)*(unsigned short*)((unsigned char*)pYmBreath + 0x12);
-        groupTable = (int)groupData;
-        for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
-            if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
-                (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {
-                ready = false;
-                goto group_ready;
-            }
-        }
-        ready = true;
-group_ready:
-        if (ready) {
-            firstParticle = -1;
-            scaledOwner = mngSt->m_ownerScale * *(float*)((unsigned char*)pYmBreath + 8);
-            for (slotIndex = 0; slotCount != 0; slotCount--) {
-                if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
-                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
-                    break;
-                }
-                slotIndex++;
-            }
-
-            PSMTXIdentity(scaleMtx);
-            scaleMtx[0][0] = scaledOwner;
-            scaleMtx[1][1] = scaledOwner;
-            scaleMtx[2][2] = scaledOwner;
-            particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
-            PSMTXConcat(*particleMtx, reinterpret_cast<_pppPObject*>(ymBreath)->m_localMatrix.value, worldMtx);
-            PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
-            pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
-            rotMtx.value[0][3] = FLOAT_80330c80;
-            rotMtx.value[1][3] = FLOAT_80330c80;
-            rotMtx.value[2][3] = FLOAT_80330c80;
-            *(float*)(groupTable + 0x28) = scaledOwner;
-            pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
-            PSMTXMultVec(rotMtx.value, &dir, &dir);
-            pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
-            PSVECScale(&dirNorm, &target, *(float*)(groupTable + 0x24));
-            pppAddVector(target, origin, target);
-            pppSubVector(hitVector, target, origin);
-            pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner,
-                                                                *(float*)((unsigned char*)pYmBreath + 4));
-        }
-
-        groupData += 0x17;
-    }
-}
-
-/*
- * --INFO--
- * Address:	800bffec
- * Size:	1292
- */
-extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
-{
-    _pppPObject* object;
-    YmBreathRenderStep* step;
-    int workOffset;
-    int colorOffset;
-    VYmBreath* work;
-    VColor* color;
-    Vec* source;
-    Mtx* matrixList;
-    float* colorDelta;
-    int* groupData;
-    int groupCount;
-    long* shape;
-    unsigned char colorR;
-    unsigned char colorG;
-    unsigned char colorB;
-    unsigned char colorA;
-    int i;
-
-    object = reinterpret_cast<_pppPObject*>(ymBreath);
-    step = (YmBreathRenderStep*)pYmBreath;
-    workOffset = offsets->m_serializedDataOffsets[0];
-    colorOffset = offsets->m_serializedDataOffsets[1];
-    work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + workOffset);
-    color = reinterpret_cast<VColor*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
-    source = reinterpret_cast<Vec*>(work->m_particleData);
-    matrixList = work->m_particleWmats;
-    colorDelta = reinterpret_cast<float*>(work->m_particleColors);
-    groupData = (int*)work->m_groups;
-    groupCount = work->m_particleCount;
-
-    if (step->m_stepValue == 0xFFFF) {
-        return;
-    }
-
-    shape = *(long**)(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pppEnvStPtr) + 0xC) + step->m_stepValue * 4);
-    pppSetBlendMode(step->m_payload[8]);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        0, 0, *reinterpret_cast<float*>(step->m_payload + 0xB0), step->m_payload[0xB6], step->m_payload[0xB5],
-        step->m_payload[8], 0, 1, 1, 0);
-
-    colorR = color->m_red;
-    colorG = color->m_green;
-    colorB = color->m_blue;
-    colorA = color->m_alpha;
-
-    for (i = 0; i < groupCount; i++) {
-        if (*(short*)&source[2].z > 0) {
-            _GXColor amb;
-            Mtx drawMtx;
-            Mtx rotMtx;
-            Vec pos;
-            pppFMATRIX viewMtx;
-            int r;
-            int g;
-            int b;
-            int a;
-
-            PSMTXIdentity(drawMtx);
-            drawMtx[0][0] = source[4].y * pppMngStPtr->m_scale.x;
-            drawMtx[1][1] = source[4].z * pppMngStPtr->m_scale.y;
-            drawMtx[2][2] = drawMtx[0][0];
-            if (FLOAT_80330c80 != source[3].y) {
-                PSMTXRotRad(rotMtx, 'z', FLOAT_80330c84 * source[3].y);
-                PSMTXConcat(drawMtx, rotMtx, drawMtx);
-            }
-
-            pppUnitMatrix(viewMtx);
-            PSMTXConcat(*matrixList, object->m_localMatrix.value, viewMtx.value);
-            PSMTXConcat(ppvCameraMatrix0, viewMtx.value, viewMtx.value);
-            PSMTXMultVec(viewMtx.value, source, &pos);
-            drawMtx[0][3] = pos.x;
-            drawMtx[1][3] = pos.y;
-            drawMtx[2][3] = pos.z;
-            GXLoadPosMtxImm(drawMtx, 0);
-
-            r = colorR;
-            g = colorG;
-            b = colorB;
-            a = (int)((double)(int)colorA - DOUBLE_80330c88 - source[6].y);
-            if (colorDelta != 0) {
-                r += (int)colorDelta[0];
-                g += (int)colorDelta[1];
-                b += (int)colorDelta[2];
-                a += (int)colorDelta[3];
-            }
-
-            if (r < 0) {
-                r = 0;
-            } else if (r > 0xFF) {
-                r = 0xFF;
-            }
-            if (g < 0) {
-                g = 0;
-            } else if (g > 0xFF) {
-                g = 0xFF;
-            }
-            if (b < 0) {
-                b = 0;
-            } else if (b > 0xFF) {
-                b = 0xFF;
-            }
-            if (a < 0) {
-                a = 0;
-            } else if (a > 0x7F) {
-                a = 0x7F;
-            }
-
-            amb.r = (unsigned char)r;
-            amb.g = (unsigned char)g;
-            amb.b = (unsigned char)b;
-            amb.a = (unsigned char)a;
-            GXSetChanAmbColor(GX_COLOR0A0, amb);
-            pppDrawShp__FPlsP12CMaterialSetUc(shape, *(short*)((unsigned char*)&source[7].y + 2),
-                                              pppEnvStPtr->m_materialSetPtr,
-                                              step->m_payload[8]);
-        }
-
-        if (matrixList != 0) {
-            matrixList++;
-        }
-        if (colorDelta != 0) {
-            colorDelta += 8;
-        }
-        source += 8;
-    }
-
-    if ((CFlatFlags & 0x200000) != 0) {
-        for (i = 0; i < (int)*(unsigned short*)step->m_payload; i++) {
-            if (groupData[0] == 1) {
-                _GXColor debugColor;
-                int firstParticle;
-                int j;
-                float scale;
-                Mtx sphereMtx;
-                Mtx tempMtx;
-                Vec debugPos;
-
-                if ((i == 0) || (i == 2)) {
-                    debugColor.r = 0x80;
-                    debugColor.g = 0x00;
-                    debugColor.b = 0x00;
-                    debugColor.a = 0xFF;
-                } else if (i == 1) {
-                    debugColor.r = 0x80;
-                    debugColor.g = 0x80;
-                    debugColor.b = 0xFF;
-                    debugColor.a = 0xFF;
-                } else if (i == 3) {
-                    debugColor.r = 0x80;
-                    debugColor.g = 0x80;
-                    debugColor.b = 0x80;
-                    debugColor.a = 0xFF;
-                } else {
-                    debugColor.r = 0x00;
-                    debugColor.g = 0x60;
-                    debugColor.b = 0x80;
-                    debugColor.a = 0xFF;
-                }
-
-                firstParticle = -1;
-                for (j = 0; j < (int)*(unsigned short*)((unsigned char*)&step->m_arg3 + 2); j++) {
-                    if (*(signed char*)(groupData[2] + j) != -1) {
-                        firstParticle = (int)*(signed char*)(groupData[1] + j);
-                        break;
-                    }
-                }
-
-                scale = (float)groupData[10];
-                PSMTXIdentity(sphereMtx);
-                sphereMtx[0][0] = scale;
-                sphereMtx[1][1] = scale;
-                sphereMtx[2][2] = scale;
-
-                PSMTXConcat(work->m_particleWmats[firstParticle], object->m_localMatrix.value, tempMtx);
-                PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
-                PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &debugPos);
-                sphereMtx[0][3] = debugPos.x;
-                sphereMtx[1][3] = debugPos.y;
-                sphereMtx[2][3] = debugPos.z;
-                Graphic.DrawSphere(sphereMtx, debugColor);
-            }
-            groupData += 0x17;
-        }
-
-        pppSetBlendMode(1);
-        pppSetBlendMode(0);
-        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 2);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800bff74
- * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dataOffsets)
-{
-    VYmBreath* state = (VYmBreath*)((unsigned char*)ymBreath + 0x80 + *dataOffsets->m_serializedDataOffsets);
-    float zero;
-
-    PSMTXIdentity(state->m_matrix);
-    zero = FLOAT_80330c80;
-
-    state->m_direction.z = FLOAT_80330c80;
-    state->m_direction.y = zero;
-    state->m_direction.x = zero;
-
-    state->m_particleData = 0;
-    state->m_particleWmats = 0;
-    state->m_particleColors = 0;
-    state->m_groups = 0;
-    state->m_particleCount = 0;
-
-    state->m_emitFrameCounter = 10000;
-    state->m_groupCount = 0;
-    state->m_slotCount = 0;
-    state->m_flags = 0;
-}
-
-/*
- * --INFO--
- * Address:	800bff70
- * Size:	4
- */
-void pppConstruct2YmBreath(_pppPObject* obj)
-{
-    (void)obj;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800bfe78
- * PAL Size: 248b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dataOffsets)
-{
-    YmBreathParticleGroup* group;
-    VYmBreath* state = (VYmBreath*)((unsigned char*)ymBreath + 0x80 + *dataOffsets->m_serializedDataOffsets);
-
-    if (state->m_particleData != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleData);
-        state->m_particleData = 0;
-    }
-
-    if (state->m_particleWmats != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleWmats);
-        state->m_particleWmats = 0;
-    }
-
-    if (state->m_particleColors != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleColors);
-        state->m_particleColors = 0;
-    }
-
-    group = state->m_groups;
-    if (group != NULL) {
-        int i;
-
-        for (i = 0; i < state->m_groupCount; i++) {
-            if (group->particleIndices != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(group->particleIndices);
-                group->particleIndices = 0;
-            }
-
-            if (group->particleStates != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(group->particleStates);
-                group->particleStates = 0;
-            }
-
-            group = (YmBreathParticleGroup*)((unsigned char*)group + 0x5C);
-        }
-
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_groups);
-        state->m_groups = 0;
-    }
-}
 
 /*
  * --INFO--

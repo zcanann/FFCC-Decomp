@@ -366,16 +366,17 @@ void CMenuPcs::MoneyCtrl()
 	int iVar2 = 0;
 	int iVar3;
 	int sVar1;
+	int sVar2;
 
 	*reinterpret_cast<short*>(GetMoneyStateBase(this) + 0x32) = *reinterpret_cast<short*>(GetMoneyStateBase(this) + 0x30);
 	iVar3 = GetMoneyStateBase(this);
 	sVar1 = *reinterpret_cast<short*>(iVar3 + 0x30);
 	if ((sVar1 == 0) || ((sVar1 != 0 && (*reinterpret_cast<short*>(iVar3 + 0x12) == 1)))) {
 		iVar2 = MoneyCtrlCur();
-	} else if ((sVar1 == 1) && (*reinterpret_cast<short*>(iVar3 + 0x12) == 0)) {
+	} else if ((sVar1 == 1) && ((sVar2 = *reinterpret_cast<short*>(iVar3 + 0x12)) == 0)) {
 		if (*reinterpret_cast<short*>(reinterpret_cast<int>(GetSingWindow(this)) + 10) == 1) {
 			iVar2 = 0;
-			*reinterpret_cast<short*>(iVar3 + 0x12) = *reinterpret_cast<short*>(iVar3 + 0x12) + 1;
+			*reinterpret_cast<short*>(iVar3 + 0x12) = sVar2 + 1;
 		}
 	} else if (((sVar1 == 1) && (*reinterpret_cast<short*>(iVar3 + 0x12) == 2)) &&
 		       (*reinterpret_cast<short*>(reinterpret_cast<int>(GetSingWindow(this)) + 10) == 3)) {

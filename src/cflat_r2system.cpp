@@ -12,6 +12,7 @@
 #include "ffcc/maphit.h"
 #include "ffcc/memorycard.h"
 #include "ffcc/mes.h"
+#include "ffcc/mesmenu.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_gba.h"
@@ -1045,6 +1046,20 @@ extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
     }
 
     return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9528
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void* _GetMesMenu__8CMenuPcsFi(void* menuPcs, int index)
+{
+    return *reinterpret_cast<void**>(reinterpret_cast<char*>(menuPcs) + 0x10C + index * 4);
 }
 
 /*
@@ -3134,6 +3149,23 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0x4D: {
+        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, *object->m_localBase);
+        if (mesMenu == 0) {
+            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+            }
+            runtime->push(object, 0);
+            outResult = 0;
+            return;
+        }
+        if (IsUse__8CMesMenuFv(mesMenu) == 0) {
+            runtime->push(object, 0);
+            outResult = 0;
+            return;
+        }
+        return;
+    }
     case -0x4C: {
         _GXColor color = {
             static_cast<u8>(object->m_localBase[2]),
@@ -3162,6 +3194,66 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0x48: {
+        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, *object->m_localBase);
+        if (mesMenu == 0) {
+            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+            }
+            runtime->push(object, 0);
+        } else {
+            runtime->push(object, GetErrorLevel__7CSystemFv(mesMenu, object->m_localBase[1]));
+        }
+        outResult = 0;
+        return;
+    }
+    case -0x47: {
+        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, *object->m_localBase);
+        if (mesMenu == 0) {
+            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+            }
+        } else {
+            GetMes__9CFlatDataFi(mesMenu, object->m_localBase[1], object->m_localBase[2]);
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x46: {
+        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, *object->m_localBase);
+        if (mesMenu == 0) {
+            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+            }
+        } else {
+            reinterpret_cast<CMesMenu*>(mesMenu)->CloseRequest(1);
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x45: {
+        unsigned int* localBase = object->m_localBase;
+        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, localBase[0]);
+        if (mesMenu == 0) {
+            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", localBase[0]);
+            }
+        } else {
+            char* message;
+            if ((localBase[3] & 0x80) == 0) {
+                message = reinterpret_cast<char*>(GetSysMes__5CGameFi(reinterpret_cast<u8*>(this) + 0xCF20, localBase[7]));
+            } else {
+                message = GetNumSysMes__5CGameFv(&Game, localBase[7]);
+            }
+            reinterpret_cast<CMesMenu*>(mesMenu)->Open(
+                message, localBase[1], localBase[2], localBase[3], localBase[4], localBase[5], localBase[6]);
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x44:
         PartMng.pppShowSlot(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]));
         runtime->push(object, 0);

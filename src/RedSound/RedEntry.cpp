@@ -6,6 +6,7 @@
 #include <dolphin/os.h>
 #include <string.h>
 
+static const char sRedEntryColoredBlankLineFmt[] = "%s%s                                    %s\n";
 static const char DAT_801e7905[] = "\x1B[7;34mSound\x1B[0m:";
 static const char DAT_80333d30[] = "\x1B[7;31m";
 static const char DAT_80333d38[] = "\x1B[0m";
@@ -18,7 +19,6 @@ static const char s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991[] =
 static const char s__s_sWave_Header_was_broken__s_801e7972[] = "%s%sWave-Header was broken.%s\n";
 static const char s__s_sSE_Sep_Header_was_broken__s_801e7b50[] = "%s%sSE-Sep-Header was broken.%s\n";
 static const char s__s_sMusic_Header_was_broken__s_801e7c1d[] = "%s%sMusic-Header was broken.%s\n";
-static const char s__s_s__s_801e78d8[] = "%s%s%s\n";
 static const char s__s_s__________ERROR___________s_801e7917[] = "%s%s----------ERROR-----------%s\n";
 static const char s__s_s_Erase_Using_Wave_Data_____W_801e7944[] = "%s%s Erase Using Wave Data.  (WAVE%4.4u)%s\n";
 static const char s__s_____SE_Play_Information______801e7b71[] = "%s==== SE Play Information ====\n";
@@ -291,14 +291,14 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 		if (sequenceNo < 0) {
 			iVar1 = SearchUseWave(iVar2);
 			if ((iVar1 != 0) && (m_ReportPrint != 0)) {
-				OSReport(s__s_s__s_801e78d8, DAT_801e7905, DAT_80333d30, DAT_80333d38);
+				OSReport(sRedEntryColoredBlankLineFmt, DAT_801e7905, DAT_80333d30, DAT_80333d38);
 				fflush(&DAT_8021d1a8);
 				OSReport(s__s_s__________ERROR___________s_801e7917, DAT_801e7905, DAT_80333d30, DAT_80333d38);
 				fflush(&DAT_8021d1a8);
 				OSReport(s__s_s_Erase_Using_Wave_Data_____W_801e7944, DAT_801e7905, DAT_80333d30, iVar2,
 				         DAT_80333d38);
 				fflush(&DAT_8021d1a8);
-				OSReport(s__s_s__s_801e78d8, DAT_801e7905, DAT_80333d30, DAT_80333d38);
+				OSReport(sRedEntryColoredBlankLineFmt, DAT_801e7905, DAT_80333d30, DAT_80333d38);
 				fflush(&DAT_8021d1a8);
 			}
 			RedDeleteA(*reinterpret_cast<int*>(bankEntry[2] + 0x10));

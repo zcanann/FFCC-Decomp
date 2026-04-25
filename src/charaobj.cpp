@@ -2549,12 +2549,12 @@ void CGCharaObj::onChangePrg(int arg)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::calcCastTime(int itemId)
+int CGCharaObj::calcCastTime(int itemId)
 {
 	m_castTimeTick += 1;
 
 	if (m_scriptHandle == 0) {
-		return;
+		return 0;
 	}
 
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
@@ -2569,7 +2569,7 @@ void CGCharaObj::calcCastTime(int itemId)
 		m_castFrameStart = 0;
 		m_castFrameEnd = 1;
 		m_castFrameCurrent = 1;
-		return;
+		return 0;
 	}
 
 	int itemOffset = itemId * 0x48;
@@ -2630,6 +2630,7 @@ void CGCharaObj::calcCastTime(int itemId)
 	m_castFrameStart = static_cast<int>(cast);
 	m_castFrameEnd = static_cast<int>(cast) + 1;
 	m_castFrameCurrent = m_castFrameEnd;
+	return static_cast<int>(cast);
 }
 
 /*

@@ -432,42 +432,42 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
  */
 unsigned long long CMapPcs::IsLoadMapCompleted()
 {
-    char* mapMng = reinterpret_cast<char*>(&MapMng);
+    CMapMng* mapMng = &MapMng;
     unsigned int value = 0;
 
     for (int count = 2; count != 0; count--) {
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
+        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
+        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
+        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
+        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
+        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
+        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
+        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
+        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
         value += 7;
     }
 

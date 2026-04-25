@@ -57,16 +57,9 @@ struct VertexApMtxObject
 	Mtx localMatrix;
 };
 
-union VertexApMtxDoubleBits
-{
-	double d;
-	u32 u[2];
-};
-
 struct _pppPDataVal;
 
 _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
-extern const double kPppYmSharedDoubleBias;
 
 /*
  * --INFO--
@@ -112,7 +105,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		default:
 			goto setCountdown;
 		case 0:
-			goto mode0Dispatch;
+			goto mode0Test;
 		mode0Body:
 			{
 				if (state->index >= entry->maxValue) {
@@ -175,12 +168,10 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		mode1Body:
 			{
 				f32 randValue = Math.RandF();
-				VertexApMtxDoubleBits maxValueBits;
-				maxValueBits.u[0] = 0x43300000;
-				maxValueBits.u[1] = (u32)(int)entry->maxValue ^ 0x80000000;
-				f32 maxValue = (f32)(maxValueBits.d - kPppYmSharedDoubleBias);
+				f32 maxValue = (f32)entry->maxValue;
 				int outValue = (int)(randValue * maxValue);
-				u16 vertexIndex = entry->vertexIndices[outValue];
+				u16* vertexIndices = entry->vertexIndices;
+				u16 vertexIndex = vertexIndices[outValue];
 				Vec* vertex = &points[vertexIndex];
 				f32 x = vertex->x;
 				f32 y = vertex->y;
@@ -236,10 +227,6 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 
 exitStub:
 	goto functionEnd;
-mode0Dispatch:
-	goto mode0Test;
-mode1Dispatch:
-	goto mode1Init;
 functionEnd:
 	;
 }

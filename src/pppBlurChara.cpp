@@ -199,9 +199,9 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     }
 
     pppInitBlendMode();
-    const float drawDepth = FLOAT_80331030;
+    const float zero = FLOAT_80331030;
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, (pppFMATRIX*)0, drawDepth,
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, (pppFMATRIX*)0, zero,
                                                                param_2->m_alpha, 0, 0, 0, 1, 1, 0);
     objPosBase = texData->m_objPosBase;
 
@@ -213,10 +213,10 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     cameraTarget.x = CameraPcs._212_4_;
     cameraTarget.y = CameraPcs._216_4_;
     cameraTarget.z = CameraPcs._220_4_;
-    cameraPos.y = FLOAT_80331030;
-    cameraTarget.y = FLOAT_80331030;
+    cameraPos.y = zero;
+    cameraTarget.y = zero;
     PSVECSubtract(&cameraTarget, &cameraPos, &cameraDir);
-    cameraDir.y = FLOAT_80331030;
+    cameraDir.y = zero;
 
     GXGetProjectionv(gxProjection);
     GXGetViewportv(viewport);
@@ -227,7 +227,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     objPos.y = *(float*)(objPosBase + 0x160);
     objPos.z = *(float*)(objPosBase + 0x164);
 
-    GXProject(cameraPos.x + objPos.x, FLOAT_80331030, cameraPos.z + objPos.z, cameraMtx, gxProjection, viewport,
+    GXProject(cameraPos.x + objPos.x, zero, cameraPos.z + objPos.z, cameraMtx, gxProjection, viewport,
               &projX, &projY, &projZ);
 
     gUtil.BeginQuadEnv();
@@ -283,7 +283,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     projection[2][2] = FLOAT_8033103c;
     projection[0][3] = FLOAT_80331040;
     projection[1][3] = FLOAT_8033103c;
-    projection[2][3] = FLOAT_80331030;
+    projection[2][3] = zero;
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
@@ -291,13 +291,13 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     depth -= param_2->m_stepValue;
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-    inVec.x = FLOAT_80331030;
-    inVec.y = FLOAT_80331030;
+    inVec.x = zero;
+    inVec.y = zero;
     inVec.z = -depth;
     inVec.w = FLOAT_8033103c;
     MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &inVec, &outVec);
 
-    if (outVec.w != FLOAT_80331030) {
+    if (outVec.w != zero) {
         outVec.z = outVec.z / outVec.w;
     }
 

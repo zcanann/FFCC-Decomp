@@ -1,7 +1,15 @@
 #ifndef _PPP_KESHPTAIL2X_H_
 #define _PPP_KESHPTAIL2X_H_
 
-struct _pppPObject;
+#include "ffcc/partMng.h"
+
+struct pppKeShpTail2X
+{
+    u8 _pad0[0xc];
+    _pppPObject pppPObject;
+    pppFMATRIX field_0x40;
+};
+
 struct pppKeShpTail2XUnkB;
 struct pppKeShpTail2XUnkC;
 
@@ -9,8 +17,8 @@ struct pppKeShpTail2XUnkC;
 extern "C" {
 #endif
 
-void pppKeShpTail2X(struct _pppPObject*, struct pppKeShpTail2XUnkB*, struct pppKeShpTail2XUnkC*);
-void pppKeShpTail2XDraw(struct _pppPObject*, struct pppKeShpTail2XUnkB*, struct pppKeShpTail2XUnkC*);
+void pppKeShpTail2X(struct pppKeShpTail2X*, struct pppKeShpTail2XUnkB*, struct pppKeShpTail2XUnkC*);
+void pppKeShpTail2XDraw(struct pppKeShpTail2X*, struct pppKeShpTail2XUnkB*, struct pppKeShpTail2XUnkC*);
 void pppKeShpTail2XCon(void*, void*);
 void pppKeShpTail2XDes(void*, void*);
 

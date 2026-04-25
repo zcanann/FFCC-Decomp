@@ -225,6 +225,20 @@ static inline BonusMenuMembers& GetBonusMenuMembers(CMenuPcs* menu)
 	return *reinterpret_cast<BonusMenuMembers*>(menu);
 }
 
+static inline void ReleaseBonusRefObject(void* object)
+{
+	if (object == 0) {
+		return;
+	}
+
+	int* raw = reinterpret_cast<int*>(object);
+	int refCount = raw[1] - 1;
+	raw[1] = refCount;
+	if (refCount == 0) {
+		(*(void (**)(void*, int))(*raw + 8))(object, 1);
+	}
+}
+
 static BonusSummaryData* s_bonusSummaryData = 0;
 static unsigned char* s_bonusBoardState = 0;
 
@@ -1392,6 +1406,12 @@ void CMenuPcs::createBonus()
 void CMenuPcs::destroyBonus()
 {
 	Pad._456_4_ = 1;
+
+	if (GetBonusMenuMembers(this).m_fontWide != 0) {
+		ReleaseBonusRefObject(GetBonusMenuMembers(this).m_fontWide);
+		GetBonusMenuMembers(this).m_fontWide = 0;
+	}
+
 	for (int i = 0; i < 0x18; i++) {
 		void** handleSlot = reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x774 + i * 4);
 		if (*handleSlot != 0) {

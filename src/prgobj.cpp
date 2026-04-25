@@ -16,6 +16,7 @@ extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
 extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
+extern const f64 DOUBLE_80331BE0 = 4503601774854144.0;
 extern "C" float FLOAT_80331BD4;
 extern "C" float FLOAT_80331BD8;
 

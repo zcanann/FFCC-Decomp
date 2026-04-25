@@ -496,73 +496,6 @@ static void ApplySelectCloseSpriteMotion(BonusAnimSprite* sprite, int frame)
 	}
 }
 
-static void InitSelectCloseGroup(BonusAnimSprite* sprites, int start, int count, int duration)
-{
-	for (int i = 0; i < count; i++) {
-		BonusAnimSprite* sprite = &sprites[start + i];
-		sprite->timer = 0;
-		sprite->startFrame = 0;
-		sprite->duration = duration;
-	}
-}
-
-static void PrepareSelectCloseSprites(BonusAnimHeader* header, BonusAnimSprite* sprites)
-{
-	int activePartyCount = GetActiveBonusPartyCount();
-	int iconBase = 4;
-	int nameBase = iconBase + activePartyCount;
-	int slotBase = nameBase + activePartyCount;
-	int detailBase = slotBase + 8;
-	int markBase = detailBase + activePartyCount;
-	int lowerNameBase = markBase + activePartyCount;
-
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
-		sprite->x = (short)((float)sprite->x + sprite->mulX);
-		sprite->y = (short)((float)sprite->y + sprite->mulY);
-		sprite->mulX = 0.0f;
-		sprite->mulY = 0.0f;
-		sprite->alpha = 1.0f;
-		sprite->timer = 0;
-		sprite->startFrame = 0;
-		sprite->duration = 8;
-		if (sprite->scale <= 0.0f) {
-			sprite->scale = 1.0f;
-		}
-	}
-
-	if (header->count > 0) {
-		sprites[0].duration = 8;
-	}
-	if (header->count > 1) {
-		sprites[1].duration = 8;
-	}
-	if (header->count > 2) {
-		sprites[2].duration = 2;
-	}
-	if (header->count > 3) {
-		sprites[3].duration = 8;
-		GetBonusArtiBasePositions(&sprites[3]);
-	}
-
-	if (activePartyCount > 0) {
-		InitSelectCloseGroup(sprites, iconBase, activePartyCount, 8);
-		InitSelectCloseGroup(sprites, nameBase, activePartyCount, 8);
-		InitSelectCloseGroup(sprites, detailBase, activePartyCount, 8);
-		InitSelectCloseGroup(sprites, markBase, activePartyCount, 8);
-		InitSelectCloseGroup(sprites, lowerNameBase, activePartyCount, 8);
-
-		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* iconSprite = &sprites[iconBase + i];
-			BonusAnimSprite* nameSprite = &sprites[lowerNameBase + i];
-			nameSprite->x = (short)(iconSprite->x + 0x50);
-			nameSprite->y = (short)(iconSprite->y + 0x48);
-		}
-	}
-
-	InitSelectCloseGroup(sprites, slotBase, 8, 8);
-}
-
 static void DrawBonusTexturedSprite(CMenuPcs* menu, const BonusAnimSprite* sprite, float alpha)
 {
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
@@ -2920,12 +2853,82 @@ void CMenuPcs::CalcSelectCloseAnim()
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+		int activePartyCount = GetActiveBonusPartyCount();
+		int iconBase = 4;
+		int nameBase = iconBase + activePartyCount;
+		int slotBase = nameBase + activePartyCount;
+		int detailBase = slotBase + 8;
+		int markBase = detailBase + activePartyCount;
+		int lowerNameBase = markBase + activePartyCount;
+
 		*(short*)(statePtr + 0x22) = 0;
 		header->finished = 0;
 		if (header->count > 0) {
 			header->count = (short)(header->count - 1);
 		}
-		PrepareSelectCloseSprites(header, sprites);
+
+		for (int i = 0; i < (int)header->count; i++) {
+			BonusAnimSprite* sprite = &sprites[i];
+			sprite->x = (short)((float)sprite->x + sprite->mulX);
+			sprite->y = (short)((float)sprite->y + sprite->mulY);
+			sprite->mulX = 0.0f;
+			sprite->mulY = 0.0f;
+			sprite->alpha = 1.0f;
+			sprite->timer = 0;
+			sprite->startFrame = 0;
+			sprite->duration = 8;
+			if (sprite->scale <= 0.0f) {
+				sprite->scale = 1.0f;
+			}
+		}
+
+		if (header->count > 0) {
+			sprites[0].duration = 8;
+		}
+		if (header->count > 1) {
+			sprites[1].duration = 8;
+		}
+		if (header->count > 2) {
+			sprites[2].duration = 2;
+		}
+		if (header->count > 3) {
+			sprites[3].duration = 8;
+			GetBonusArtiBasePositions(&sprites[3]);
+		}
+
+		if (activePartyCount > 0) {
+			for (int i = 0; i < activePartyCount; i++) {
+				sprites[iconBase + i].timer = 0;
+				sprites[iconBase + i].startFrame = 0;
+				sprites[iconBase + i].duration = 8;
+				sprites[nameBase + i].timer = 0;
+				sprites[nameBase + i].startFrame = 0;
+				sprites[nameBase + i].duration = 8;
+				sprites[detailBase + i].timer = 0;
+				sprites[detailBase + i].startFrame = 0;
+				sprites[detailBase + i].duration = 8;
+				sprites[markBase + i].timer = 0;
+				sprites[markBase + i].startFrame = 0;
+				sprites[markBase + i].duration = 8;
+				sprites[lowerNameBase + i].timer = 0;
+				sprites[lowerNameBase + i].startFrame = 0;
+				sprites[lowerNameBase + i].duration = 8;
+			}
+
+			for (int i = 0; i < activePartyCount; i++) {
+				BonusAnimSprite* iconSprite = &sprites[iconBase + i];
+				BonusAnimSprite* nameSprite = &sprites[lowerNameBase + i];
+				nameSprite->x = (short)(iconSprite->x + 0x50);
+				nameSprite->y = (short)(iconSprite->y + 0x48);
+			}
+		}
+
+		for (int i = 0; i < 8; i++) {
+			sprites[slotBase + i].timer = 0;
+			sprites[slotBase + i].startFrame = 0;
+			sprites[slotBase + i].duration = 8;
+		}
+
 		*(unsigned char*)(statePtr + 0xb) = 1;
 	}
 

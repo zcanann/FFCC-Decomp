@@ -2231,6 +2231,20 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0xD2: {
+        char* savedNextScript = reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + 0x15CC);
+        if (*object->m_localBase == 0) {
+            CGame::CNextScript nextScript;
+            nextScript.m_flags = 0;
+            strcpy(nextScript.m_name, savedNextScript);
+            Game.SetNextScript(&nextScript);
+        } else {
+            memset(savedNextScript, 0, 0x100);
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0xD1:
         Sound.CrossPlayBgm(*object->m_localBase, object->m_localBase[1]);
         runtime->push(object, 0);

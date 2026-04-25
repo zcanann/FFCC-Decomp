@@ -4273,8 +4273,9 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             1U << ((sign * 8 | static_cast<int>(bitIndex * 0x20000000U + static_cast<unsigned int>(sign >> 0x1D))) -
                    sign);
         *lastResult =
-            -((static_cast<unsigned int>(static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[byteIndex])) & mask) >>
-              0x1F);
+            ((static_cast<unsigned int>(static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[byteIndex])) & mask) != 0)
+                ? 1U
+                : 0U;
     } else if (systemValue < -199) {
         *lastResult = static_cast<unsigned int>(
             static_cast<int>(static_cast<short>(Game.m_caravanWorkArr[0].m_artifacts[systemValue + 0x1E])));

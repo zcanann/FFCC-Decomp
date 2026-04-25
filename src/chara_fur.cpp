@@ -43,6 +43,10 @@ void* gMogFurTexBuffer;
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+extern float FLOAT_8033110C;
+extern float FLOAT_80331138;
+extern float FLOAT_8033114C;
+extern float FLOAT_80331150;
 static inline unsigned char* GameRaw() { return reinterpret_cast<unsigned char*>(&Game); }
 
 namespace {
@@ -667,6 +671,23 @@ extern "C" void Open__8CMesMenuFPciiiiii(void*, char*, int, int, int, int, int, 
 static const char s_chara_fur_cpp_801db72c[] = "chara_fur.cpp";
 extern "C" void makeFurTex__6CCharaFv();
 
+static bool s_mogFurBaseColorsInit;
+static bool s_mogFurNoiseColorsInit;
+static bool s_mogFurVelocityInit;
+static bool s_mogFurVelocityRandInit;
+static bool s_mogFurAccelInit;
+static bool s_mogFurAccelRandInit;
+static GXColor s_mogFurBaseColor;
+static GXColor s_mogFurTipColor;
+static GXColor s_mogFurNoiseBaseColor;
+static GXColor s_mogFurNoiseRangeColor;
+static Vec s_mogFurVelocity;
+static Vec s_mogFurVelocityRand;
+static Vec s_mogFurAccel;
+static Vec s_mogFurAccelRand;
+static unsigned int s_mogFurRand;
+static float s_mogFurMaxY;
+
 static inline unsigned short PackFurTexel(int r, int g, int b, int a)
 {
 	if (r < 0) {
@@ -696,6 +717,11 @@ static float FurRand01(unsigned int& rng)
 {
 	rng = rng * 0x41C64E6D + 0x3039;
 	return static_cast<float>((rng >> 16) & 0x7FFF) / 32767.0f;
+}
+
+static float FurRandSigned(unsigned int& rng)
+{
+	return FurRand01(rng) * 2.0f - 1.0f;
 }
 
 static int FurBlendNibble(int base, int add, float t)
@@ -739,24 +765,116 @@ static void FurWriteTexel(unsigned short* tex, int x, int y, int r, int g, int b
 	*texel = PackFurTexel(r, g, b, a);
 }
 
+static void FurInitTextureDefaults()
+{
+	if (!s_mogFurBaseColorsInit) {
+		s_mogFurBaseColor.r = 0x80;
+		s_mogFurBaseColor.g = 0x80;
+		s_mogFurBaseColor.b = 0x80;
+		s_mogFurBaseColor.a = 0xFF;
+		s_mogFurTipColor.r = 0xF0;
+		s_mogFurTipColor.g = 0xF0;
+		s_mogFurTipColor.b = 0xF0;
+		s_mogFurTipColor.a = 0;
+		s_mogFurBaseColorsInit = true;
+	}
+
+	if (!s_mogFurNoiseColorsInit) {
+		s_mogFurNoiseBaseColor.r = 0;
+		s_mogFurNoiseBaseColor.g = 0;
+		s_mogFurNoiseBaseColor.b = 0;
+		s_mogFurNoiseBaseColor.a = 0;
+		s_mogFurNoiseRangeColor.r = 8;
+		s_mogFurNoiseRangeColor.g = 8;
+		s_mogFurNoiseRangeColor.b = 8;
+		s_mogFurNoiseRangeColor.a = 0;
+		s_mogFurNoiseColorsInit = true;
+	}
+
+	if (!s_mogFurVelocityInit) {
+		s_mogFurVelocity.x = 0.0f;
+		s_mogFurVelocity.y = 1.0f;
+		s_mogFurVelocity.z = 0.0f;
+		s_mogFurVelocityInit = true;
+	}
+
+	if (!s_mogFurVelocityRandInit) {
+		s_mogFurVelocityRand.x = 0.0f;
+		s_mogFurVelocityRand.y = 0.5f;
+		s_mogFurVelocityRand.z = 0.0f;
+		s_mogFurVelocityRandInit = true;
+	}
+
+	if (!s_mogFurAccelInit) {
+		s_mogFurAccel.x = 0.0f;
+		s_mogFurAccel.y = 0.0f;
+		s_mogFurAccel.z = 0.0f;
+		s_mogFurAccelInit = true;
+	}
+
+	if (!s_mogFurAccelRandInit) {
+		s_mogFurAccelRand.x = 0.0f;
+		s_mogFurAccelRand.y = 0.0f;
+		s_mogFurAccelRand.z = 0.0f;
+		s_mogFurAccelRandInit = true;
+	}
+}
+
+static void FurSetupTextureCopyEnv()
+{
+	GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
+	GXSetAlphaUpdate(GX_TRUE);
+	GXSetViewport(0.0f, 0.0f, 128.0f, 128.0f, 0.0f, 1.0f);
+	GXSetScissor(0, 0, 0x80, 0x80);
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	GXSetZCompLoc(GX_FALSE);
+	_GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+	GXSetCullMode(GX_CULL_NONE);
+	GXSetNumTevStages(1);
+	GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+	GXSetNumChans(1);
+	GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+	GXSetTexCopySrc(0, 0, 0x80, 0x80);
+	GXSetTexCopyDst(0x80, 0x80, GX_TF_IA4, GX_FALSE);
+
+	Mtx44 projection;
+	PSMTX44Identity(projection);
+	GXSetProjection(projection, GX_ORTHOGRAPHIC);
+}
+
 static void FurInitHairSet(CHairSet& hair, unsigned int& rng)
 {
 	hair.m_vec0.x = 64.0f + (FurRand01(rng) - 0.5f) * 56.0f;
 	hair.m_vec0.y = 72.0f + FurRand01(rng) * 40.0f;
 	hair.m_vec0.z = 0.0f;
-	hair.m_vec1.x = (FurRand01(rng) - 0.5f) * 2.0f;
-	hair.m_vec1.y = -(0.6f + FurRand01(rng) * 1.4f);
-	hair.m_vec1.z = 0.0f;
+	hair.m_vec1.x = s_mogFurVelocity.x + s_mogFurVelocityRand.x * FurRandSigned(rng);
+	hair.m_vec1.y = -(0.6f + s_mogFurVelocity.y + s_mogFurVelocityRand.y * FurRand01(rng));
+	hair.m_vec1.z = s_mogFurVelocity.z + s_mogFurVelocityRand.z * FurRandSigned(rng);
 	hair.m_colors[0].color = CColor(
-	    static_cast<unsigned char>(6 + static_cast<int>(FurRand01(rng) * 5.0f)),
-	    static_cast<unsigned char>(6 + static_cast<int>(FurRand01(rng) * 5.0f)),
-	    static_cast<unsigned char>(6 + static_cast<int>(FurRand01(rng) * 5.0f)),
-	    0).color;
+	    static_cast<unsigned char>((s_mogFurBaseColor.r >> 4) + s_mogFurNoiseBaseColor.r +
+	                               static_cast<int>(FurRand01(rng) * s_mogFurNoiseRangeColor.r)),
+	    static_cast<unsigned char>((s_mogFurBaseColor.g >> 4) + s_mogFurNoiseBaseColor.g +
+	                               static_cast<int>(FurRand01(rng) * s_mogFurNoiseRangeColor.g)),
+	    static_cast<unsigned char>((s_mogFurBaseColor.b >> 4) + s_mogFurNoiseBaseColor.b +
+	                               static_cast<int>(FurRand01(rng) * s_mogFurNoiseRangeColor.b)),
+	    s_mogFurBaseColor.a).color;
 	hair.m_colors[1].color = CColor(
-	    static_cast<unsigned char>(0xB + static_cast<int>(FurRand01(rng) * 4.0f)),
-	    static_cast<unsigned char>(0xB + static_cast<int>(FurRand01(rng) * 4.0f)),
-	    static_cast<unsigned char>(0xB + static_cast<int>(FurRand01(rng) * 4.0f)),
-	    0).color;
+	    static_cast<unsigned char>((s_mogFurTipColor.r >> 4) + static_cast<int>(FurRand01(rng) * 2.0f)),
+	    static_cast<unsigned char>((s_mogFurTipColor.g >> 4) + static_cast<int>(FurRand01(rng) * 2.0f)),
+	    static_cast<unsigned char>((s_mogFurTipColor.b >> 4) + static_cast<int>(FurRand01(rng) * 2.0f)),
+	    s_mogFurTipColor.a).color;
+
+	float endY = hair.m_vec0.y + hair.m_vec1.y;
+	if (s_mogFurMaxY < endY) {
+		s_mogFurMaxY = endY;
+	}
 }
 
 static void FurPlotHair(unsigned short* tex, const CHairSet& hair, int layer, unsigned int& rng)
@@ -782,8 +900,10 @@ static void FurPlotHair(unsigned short* tex, const CHairSet& hair, int layer, un
 			}
 		}
 
-		vel.x += (FurRand01(rng) - 0.5f) * (0.18f + layerT * 0.15f);
-		vel.y += 0.08f + layerT * 0.06f;
+		vel.x += s_mogFurAccel.x + s_mogFurAccelRand.x * FurRandSigned(rng) +
+		         (FurRand01(rng) - 0.5f) * (0.18f + layerT * 0.15f);
+		vel.y += s_mogFurAccel.y + s_mogFurAccelRand.y * FurRand01(rng) + 0.08f + layerT * 0.06f;
+		vel.z += s_mogFurAccel.z + s_mogFurAccelRand.z * FurRandSigned(rng);
 		pos.x += vel.x;
 		pos.y += vel.y;
 	}
@@ -1533,6 +1653,18 @@ extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx viewMtx, int s
 		return;
 	}
 
+	bool hasFurMaterial = false;
+	for (unsigned int i = 0; i < materialSetRaw->m_materials.m_numItems; i++) {
+		FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>(materialSetRaw->m_materials.m_items[i]);
+		if (material != 0 && material->m_furEnable != 0) {
+			hasFurMaterial = true;
+			break;
+		}
+	}
+	if (!hasFurMaterial) {
+		return;
+	}
+
 	if (gMogFurTexBuffer == 0) {
 		makeFurTex__6CCharaFv();
 	}
@@ -1544,11 +1676,23 @@ extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx viewMtx, int s
 	if (furStep == 0.0f) {
 		furStep = 1.0f;
 	}
-	float furLength = ModelFurLenScale(model);
+	float furDepth = FLOAT_8033110C;
+	Vec modelPos = {ModelDrawMtx(model)[0][3], ModelDrawMtx(model)[1][3], ModelDrawMtx(model)[2][3]};
+	Vec viewPos;
+	PSMTXMultVec(viewMtx, &modelPos, &viewPos);
+	if (viewPos.z < FLOAT_8033114C) {
+		Vec4d clipPos;
+		Math.MTX44MultVec4(CameraPcs.m_screenMatrix, &viewPos, &clipPos);
+		if (clipPos.w != 0.0f) {
+			furDepth = -clipPos.z / clipPos.w;
+		}
+	}
+
+	float furLength = ModelFurLenScale(model) * (FLOAT_80331138 - furDepth) + ModelFurLenScale(model);
 	if (furLength <= 0.0f) {
 		furLength = 1.0f;
 	}
-	const int furShade = static_cast<int>(255.0f * ModelFurCur(model));
+	const int furShade = static_cast<int>(FLOAT_80331150 * ModelFurCur(model));
 	const GXColor furColor = CColor(static_cast<unsigned char>(furShade), static_cast<unsigned char>(furShade),
 	                                static_cast<unsigned char>(furShade), 0xFF)
 	                             .color;
@@ -1669,6 +1813,10 @@ extern "C" void freeFurTex__6CCharaFv()
  */
 extern "C" void makeFurTex__6CCharaFv()
 {
+	FurInitTextureDefaults();
+	s_mogFurRand = 0;
+	s_mogFurMaxY = 0.0f;
+
 	if (gMogFurTexBuffer == 0) {
 		gMogFurTexBuffer = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
 			&Memory, 0x20000, 0, const_cast<char*>(s_chara_fur_cpp_801db72c), 0xE9, 0);
@@ -1679,11 +1827,13 @@ extern "C" void makeFurTex__6CCharaFv()
 
 	unsigned short* tex = reinterpret_cast<unsigned short*>(gMogFurTexBuffer);
 	CHairSet hairSet[0x20];
-	unsigned int rng = 0x1234ABCD;
+	unsigned int rng = s_mogFurRand;
 
 	for (int i = 0; i < 0x20; i++) {
 		FurInitHairSet(hairSet[i], rng);
 	}
+
+	FurSetupTextureCopyEnv();
 
 	for (int layer = 0; layer < 8; layer++) {
 		unsigned short* layerTex = tex + (layer * 0x4000 / 2);
@@ -1710,6 +1860,7 @@ extern "C" void makeFurTex__6CCharaFv()
 		}
 	}
 
+	s_mogFurRand = rng;
 	DCFlushRange(gMogFurTexBuffer, 0x20000);
 	GXInvalidateTexAll();
 }

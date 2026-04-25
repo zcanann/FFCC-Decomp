@@ -344,7 +344,7 @@ void birth(
     float spread = (float)payload[0x2B];
     float halfSpread = spread;
     float randomRange = FLOAT_803304c0 * spread;
-    float speedMag = *(float*)(payload + 0x130);
+    float speedMag = *(float*)(payload + 0x12C);
     u8 speedMode = payload[0x130];
     Vec pos;
 
@@ -800,7 +800,7 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
     }
 
     if ((*u8_at(p, 0x9e) != 0) && ((u16)*s16_at(p, 0x22) <= *u8_at(p, 0x9e))) {
-        *f32_at(p, 0x98) += (float)alpha / (float)payload[0x9E];
+        *f32_at(p, 0x98) += (float)alpha / (float)*u8_at(p, 0x9e);
     }
 }
 
@@ -1002,8 +1002,6 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     }
 
     if (copyOut != 0) {
-        pppCopyMatrix(out, mtxB);
-    } else {
         pppCopyMatrix(out, mtxB);
     }
 

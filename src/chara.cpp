@@ -409,6 +409,11 @@ static inline MtxPtr NodeWorldMtx(CChara::CNode* node)
 	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(node) + 0x44);
 }
 
+static inline MtxPtr NodeLocalRuntimeMtx(CChara::CNode* node)
+{
+	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(node) + 0x14);
+}
+
 static inline Vec& NodeDynPosition(CChara::CNode* node)
 {
 	return *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(node) + 0xA4);
@@ -548,32 +553,6 @@ static inline void RetainRefCounted(void* refObject)
 	if (refObject != 0) {
 		reinterpret_cast<int*>(refObject)[1]++;
 	}
-}
-
-static CChara::CNode* AllocateCharaNodeArray(u16 nodeCount, CMemory::CStage* stage)
-{
-	void* block = __nwa__FUlPQ27CMemory6CStagePci(
-	    static_cast<unsigned long>(nodeCount) * 0xC0 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x263);
-	if (block == 0) {
-		return 0;
-	}
-
-	return reinterpret_cast<CChara::CNode*>(__construct_new_array(
-	    block, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CNodeFv),
-	    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CNodeFv), 0xC0, nodeCount));
-}
-
-static CChara::CMesh* AllocateCharaMeshArray(u16 meshCount, CMemory::CStage* stage)
-{
-	void* block = __nwa__FUlPQ27CMemory6CStagePci(
-	    static_cast<unsigned long>(meshCount) * 0x14 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x26C);
-	if (block == 0) {
-		return 0;
-	}
-
-	return reinterpret_cast<CChara::CMesh*>(__construct_new_array(
-	    block, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CMeshFv),
-	    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CMeshFv), 0x14, meshCount));
 }
 
 static void CopyDuplicatedNodeState(CChara::CNode* dst, CChara::CNode* src)
@@ -839,18 +818,40 @@ CChara::CModel::CModel()
  */
 CChara::CModel::~CModel()
 {
-	void** data = (void**)((u8*)this + 0xA4);
-	if (data[0] != 0) {
-		__dla__FPv(data[0]);
-		data[0] = 0;
+	void*& texSet = *reinterpret_cast<void**>((u8*)this + 0xB4);
+	if (texSet != 0) {
+		ReleaseRefCounted(texSet);
+		texSet = 0;
 	}
-	if (data[1] != 0) {
-		__dla__FPv(data[1]);
-		data[1] = 0;
+
+	void*& anim = *reinterpret_cast<void**>((u8*)this + 0xD0);
+	if (anim != 0) {
+		ReleaseRefCounted(anim);
+		anim = 0;
 	}
-	if (data[2] != 0) {
-		__dla__FPv(data[2]);
-		data[2] = 0;
+
+	void*& texAnimSet = *reinterpret_cast<void**>((u8*)this + 0xD4);
+	if (texAnimSet != 0) {
+		ReleaseRefCounted(texAnimSet);
+		texAnimSet = 0;
+	}
+
+	void*& refData = *reinterpret_cast<void**>((u8*)this + 0xA4);
+	if (refData != 0) {
+		ReleaseRefCounted(refData);
+		refData = 0;
+	}
+
+	void*& nodes = *reinterpret_cast<void**>((u8*)this + 0xA8);
+	if (nodes != 0) {
+		__destroy_new_array(nodes, reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CNodeFv));
+		nodes = 0;
+	}
+
+	void*& meshes = *reinterpret_cast<void**>((u8*)this + 0xAC);
+	if (meshes != 0) {
+		__destroy_new_array(meshes, reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CMeshFv));
+		meshes = 0;
 	}
 }
 
@@ -1156,20 +1157,44 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
  */
 void CChara::CModel::setup()
 {
-	void* ref = *(void**)((u8*)this + 0xA4);
-	CNode* node = *(CNode**)((u8*)this + 0xA8);
-	CMesh* mesh = *(CMesh**)((u8*)this + 0xAC);
-	u32 nodeCount = *(u16*)((u8*)ref + 8);
-	u32 meshCount = *(u16*)((u8*)ref + 0xA);
+	CNode* node = ModelNodes(this);
+	CMesh* mesh = reinterpret_cast<CMesh*>(ModelMeshes(this));
+	u32 nodeCount = ModelNodeCount(this);
+	u32 meshCount = ModelMeshCount(this);
 	for (u32 i = 0; i < nodeCount; i++) {
+		PSMTXCopy(NodeRefLocalMtx(node), NodeLocalRuntimeMtx(node));
 		s8 disp = *(s8*)((u8*)*(void**)node + 4);
 		if (disp >= 0 && static_cast<u32>(disp) < meshCount) {
 			*(void**)((u8*)node + 4) = (u8*)mesh + (disp * 0x14);
 		}
 		node = (CNode*)((u8*)node + 0xC0);
 	}
+
 	calcBindMatrix();
+
+	CCharaMeshRaw* meshRaw = ModelMeshes(this);
+	for (u32 i = 0; i < meshCount; i++) {
+		CCharaMeshRefRaw* meshData = meshRaw->m_data;
+		u8* skin = reinterpret_cast<u8*>(meshData->m_skins);
+		for (u32 j = 0; j < meshData->m_skinCount; j++) {
+			u32 skinNodeIndex = *reinterpret_cast<u32*>(skin + 0x60);
+			MtxPtr skinInvBind = reinterpret_cast<MtxPtr>(skin + 0x30);
+			PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(&ModelNodes(this)[skinNodeIndex])) + 0x3C),
+			             skinInvBind);
+			PSMTXConcat(skinInvBind,
+			            reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(&ModelNodes(this)[meshData->m_nodeIndex])) + 0x3C),
+			            skinInvBind);
+			skin += 0x64;
+		}
+		meshRaw++;
+	}
+
 	AttachAnim(*(CAnim**)((u8*)this + 0xD0), -1, -1, 0);
+
+	CMaterialSet* materialSet = ModelMaterialSet(this);
+	if (materialSet != 0) {
+		SetTextureSet__12CMaterialSetFP11CTextureSet(materialSet, *reinterpret_cast<CTextureSet**>((u8*)this + 0xB4));
+	}
 }
 
 /*
@@ -1198,22 +1223,53 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 
 	const u16 nodeCount = ModelNodeCount(this);
 	if (nodeCount != 0) {
-		CChara::CNode* cloneNodes = AllocateCharaNodeArray(nodeCount, stage);
+		void* nodeBlock = __nwa__FUlPQ27CMemory6CStagePci(
+		    static_cast<unsigned long>(nodeCount) * 0xC0 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x263);
+		CChara::CNode* cloneNodes = 0;
+		if (nodeBlock != 0) {
+			cloneNodes = reinterpret_cast<CChara::CNode*>(__construct_new_array(
+			    nodeBlock, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CNodeFv),
+			    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CNodeFv), 0xC0, nodeCount));
+		}
 		if (cloneNodes != 0) {
 			*reinterpret_cast<CChara::CNode**>(ModelRaw(clone) + 0xA8) = cloneNodes;
 			for (u32 i = 0; i < nodeCount; i++) {
-				CopyDuplicatedNodeState(&cloneNodes[i], &ModelNodes(this)[i]);
+				CChara::CNode* dst = &cloneNodes[i];
+				CChara::CNode* src = &ModelNodes(this)[i];
+				*reinterpret_cast<void**>(dst) = *reinterpret_cast<void**>(src);
+				PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(src) + 8),
+				          reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(dst) + 8));
+				PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
+				NodePreviousQuat(dst) = NodePreviousQuat(src);
+				NodePreviousPosition(dst) = NodePreviousPosition(src);
+				NodePreviousScale(dst) = NodePreviousScale(src);
+				NodeAnimNode0(dst) = 0;
+				NodeAnimNode1(dst) = 0;
+				NodeRuntimeFlags(dst) = (NodeRuntimeFlags(dst) & 0x7F) | (NodeRuntimeFlags(src) & 0x80);
 			}
 		}
 	}
 
 	const u16 meshCount = ModelMeshCount(this);
 	if (meshCount != 0) {
-		CChara::CMesh* cloneMeshes = AllocateCharaMeshArray(meshCount, stage);
+		void* meshBlock = __nwa__FUlPQ27CMemory6CStagePci(
+		    static_cast<unsigned long>(meshCount) * 0x14 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x26C);
+		CChara::CMesh* cloneMeshes = 0;
+		if (meshBlock != 0) {
+			cloneMeshes = reinterpret_cast<CChara::CMesh*>(__construct_new_array(
+			    meshBlock, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CMeshFv),
+			    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CMeshFv), 0x14, meshCount));
+		}
 		if (cloneMeshes != 0) {
 			*reinterpret_cast<CChara::CMesh**>(ModelRaw(clone) + 0xAC) = cloneMeshes;
 			for (u32 i = 0; i < meshCount; i++) {
-				CopyDuplicatedMeshState(&cloneMeshes[i], &reinterpret_cast<CChara::CMesh*>(ModelMeshes(this))[i]);
+				CChara::CMesh* dst = &cloneMeshes[i];
+				CChara::CMesh* src = &reinterpret_cast<CChara::CMesh*>(ModelMeshes(this))[i];
+				u8* dstRaw = reinterpret_cast<u8*>(dst);
+				u8* srcRaw = reinterpret_cast<u8*>(src);
+				*reinterpret_cast<void**>(dstRaw) = *reinterpret_cast<void**>(srcRaw);
+				*reinterpret_cast<void**>(dstRaw + 4) = 0;
+				*reinterpret_cast<void**>(dstRaw + 8) = 0;
 			}
 		}
 	}
@@ -2005,7 +2061,21 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 			continue;
 		}
 
-		InitCharaMaterialState();
+		u8* materialRaw = MaterialManRaw();
+		*reinterpret_cast<u32*>(materialRaw + 72) = 0x000ACE0F;
+		*reinterpret_cast<u32*>(materialRaw + 68) = 0xFFFFFFFF;
+		materialRaw[76] = 0xFF;
+		*reinterpret_cast<u32*>(materialRaw + 296) = 0;
+		*reinterpret_cast<u32*>(materialRaw + 284) = 0;
+		*reinterpret_cast<u32*>(materialRaw + 300) = 0x1E;
+		*reinterpret_cast<u32*>(materialRaw + 288) = 0x1E;
+		*reinterpret_cast<u32*>(materialRaw + 304) = 0;
+		*reinterpret_cast<u32*>(materialRaw + 292) = 0;
+		materialRaw[517] = 0xFF;
+		materialRaw[518] = 0xFF;
+		*reinterpret_cast<u32*>(materialRaw + 88) = 0;
+		*reinterpret_cast<u32*>(materialRaw + 92) = 0;
+		materialRaw[520] = 0;
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount == 0) {
@@ -2018,10 +2088,13 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 			customMeshDraw(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
 		}
 
-		CopyCharaMaterialEnv();
+		*reinterpret_cast<u32*>(materialRaw + 296) = *reinterpret_cast<u32*>(materialRaw + 284);
+		*reinterpret_cast<u32*>(materialRaw + 300) = *reinterpret_cast<u32*>(materialRaw + 288);
+		*reinterpret_cast<u32*>(materialRaw + 304) = *reinterpret_cast<u32*>(materialRaw + 292);
+		*reinterpret_cast<u32*>(materialRaw + 64) = *reinterpret_cast<u32*>(materialRaw + 72);
 		MaterialMan.SetObjMatrix(view, meshMtx);
 		GXSetArray((GXAttr)9, mesh->m_workPositions, 6);
-		SetMaterialManNormalArray(mesh->m_workNormals);
+		*reinterpret_cast<void**>(materialRaw + 4) = mesh->m_workNormals;
 		GXSetArray((GXAttr)0xB, mesh->m_data->m_colors, 4);
 		GXSetArray((GXAttr)0xD, mesh->m_data->m_uvs, 4);
 		GXSetArray((GXAttr)0xE, mesh->m_data->m_uvs, 4);
@@ -2426,7 +2499,25 @@ void CChara::CNode::CalcBind(CChara::CModel* model)
 
 	u8 childCount = NodeChildCount(this);
 	for (int i = 0; i < childCount; i++) {
-		GetBindChildNode(model, this, i)->CalcBind(model);
+		CNode* child = GetBindChildNode(model, this, i);
+		CalcOneBindNode(child, model);
+
+		u8 grandChildCount = NodeChildCount(child);
+		for (int j = 0; j < grandChildCount; j++) {
+			CNode* grandChild = GetBindChildNode(model, child, j);
+			CalcOneBindNode(grandChild, model);
+
+			u8 greatGrandChildCount = NodeChildCount(grandChild);
+			for (int k = 0; k < greatGrandChildCount; k++) {
+				CNode* greatGrandChild = GetBindChildNode(model, grandChild, k);
+				CalcOneBindNode(greatGrandChild, model);
+
+				u8 recursiveChildCount = NodeChildCount(greatGrandChild);
+				for (int l = 0; l < recursiveChildCount; l++) {
+					GetBindChildNode(model, greatGrandChild, l)->CalcBind(model);
+				}
+			}
+		}
 	}
 }
 

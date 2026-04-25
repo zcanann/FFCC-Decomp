@@ -883,7 +883,7 @@ void CGCharaObj::onFrameStat()
 				}
 			} else if (m_subState < 4) {
 				if (m_subFrame == 0) {
-					reqAnim(((GetCID() & 0x6D) == 0x6D) ? m_unk558 : m_unk55C, 0, 0);
+					reqAnim(((GetCID() & 0xAD) == 0xAD) ? m_unk558 : m_unk55C, 0, 0);
 				}
 
 				if (isLoopAnim() != 0) {
@@ -1621,6 +1621,11 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			}
 			break;
 		case 100:
+			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
+				setSta(0, 0);
+			}
+			break;
+		case 0x65:
 			if (Game.m_gameWork.m_gameOverFlag == 0) {
 				if (amount == 0x225) {
 					addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), 0);
@@ -1634,6 +1639,12 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			break;
 		case 0x66:
 			addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), 0);
+			if (sourceObj != 0) {
+				typedef void (*VCall4C)(void*, int, int, void*);
+				VCall4C fn = *reinterpret_cast<VCall4C*>(
+				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x4C);
+				fn(sourceObj, 0x16, amount, this);
+			}
 			putHitParticleFromItem(sourceObj, amount);
 			next = 0;
 			break;

@@ -703,7 +703,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     int workOffset;
     int colorOffset;
     VYmBreath* work;
-    unsigned char* color;
+    VColor* color;
     Vec* source;
     Mtx* matrixList;
     float* colorDelta;
@@ -721,7 +721,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + workOffset);
-    color = reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset;
+    color = reinterpret_cast<VColor*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
     source = reinterpret_cast<Vec*>(work->m_particleData);
     matrixList = work->m_particleWmats;
     colorDelta = reinterpret_cast<float*>(work->m_particleColors);
@@ -739,10 +739,10 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
         0, 0, *reinterpret_cast<float*>(step->m_payload + 0xB0), step->m_payload[0xB6], step->m_payload[0xB5],
         step->m_payload[8], 0, 1, 1, 0);
 
-    colorR = color[0];
-    colorG = color[1];
-    colorB = color[2];
-    colorA = color[3];
+    colorR = color->m_red;
+    colorG = color->m_green;
+    colorB = color->m_blue;
+    colorA = color->m_alpha;
 
     for (i = 0; i < groupCount; i++) {
         if (*(short*)&source[2].z > 0) {

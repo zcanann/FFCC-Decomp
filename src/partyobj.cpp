@@ -3001,13 +3001,14 @@ void CGPartyObj::gpmMove()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	CGPartyObj* leader = Game.m_partyObjArr[0];
+	CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
 	if (leader == nullptr || leader == this || m_scriptHandle == nullptr) {
 		return;
 	}
 
 	if (leader->m_lastStateId == 0 &&
 	    leader->m_animSlotSel == 0x0C &&
-	    *reinterpret_cast<CGObject**>(reinterpret_cast<unsigned char*>(leader) + 0x6F0) == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
+	    *reinterpret_cast<CGObject**>(reinterpret_cast<unsigned char*>(leader) + 0x6F0) == chalice) {
 		sGhostPartyWork.settleTimer++;
 	} else {
 		sGhostPartyWork.settleTimer = 0;
@@ -3018,6 +3019,59 @@ void CGPartyObj::gpmMove()
 	}
 	sGhostPartyWork.carrySpeed *= 0.85f;
 
+	int stageMode;
+	switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+	case 4:
+	case 8:
+	case 9:
+	case 0x0B:
+	case 0x0C:
+	case 0x0D:
+		stageMode = 2;
+		break;
+	case 6:
+	case 10:
+		stageMode = 1;
+		break;
+	default:
+		stageMode = 0;
+		break;
+	}
+
+	float frameScale = static_cast<float>(Game.m_gameWork.m_frameCounter % 100) / 100.0f;
+	float pressureScale = 1.0f;
+	if (stageMode == 2) {
+		pressureScale = 0.5f + frameScale * 0.5f;
+	} else if (stageMode == 1) {
+		pressureScale = 0.5f + (1.0f - frameScale) * 0.5f;
+	}
+
+	int pressureLimit = static_cast<int>(100.0f * pressureScale);
+	if (sGhostPartyWork.carrySpeed <= 0.5f) {
+		if (*reinterpret_cast<float*>(self + 0x6F0) == 0.0f) {
+			sGhostPartyWork.pressure -= 4;
+		} else {
+			sGhostPartyWork.pressure -= 3;
+		}
+	} else if (*reinterpret_cast<float*>(self + 0x6F0) != 0.0f) {
+		sGhostPartyWork.pressure += 2;
+	} else {
+		sGhostPartyWork.pressure -= 2;
+	}
+
+	if (sGhostPartyWork.pressure < 0) {
+		sGhostPartyWork.pressure = 0;
+	} else if (sGhostPartyWork.pressure > pressureLimit + 100) {
+		sGhostPartyWork.pressure = pressureLimit + 100;
+	}
+
+	if (sGhostPartyWork.pressure < pressureLimit / 3) {
+		PartyData(this).partyFlags &= 0xFB;
+	}
+	if (sGhostPartyWork.activeTrailCount > 0) {
+		sGhostPartyWork.activeTrailCount--;
+	}
+
 	Vec pathVec;
 	float pathDist = 0.0f;
 	gpmCalcDist(&pathVec, pathDist);
@@ -3027,26 +3081,169 @@ void CGPartyObj::gpmMove()
 	toLeader.y = 0.0f;
 	float dist = PSVECMag(&toLeader);
 	float nearDist = m_nearColRadius + leader->m_nearColRadius;
+	float clampedDist = (*reinterpret_cast<float*>(self + 0x5C4) < dist) ? *reinterpret_cast<float*>(self + 0x5C4) : dist;
 
-	if (dist > nearDist * 1.25f || pathDist > Game.unkFloat_0xca10 * 0.75f) {
-		dstTargetRot(reinterpret_cast<CGPrgObj*>(leader));
-		moveVector(&toLeader, m_moveBaseSpeed * 0.9f, 1);
-		*reinterpret_cast<float*>(self + 0x5D0) = dist;
-		sGhostPartyWork.carryDir = toLeader;
-		sGhostPartyWork.carrySpeed = m_moveBaseSpeed * 0.35f;
-	} else if ((m_lastStateId == 2) && (dist < nearDist * 0.75f)) {
-		changeStat(0, 0, 0);
+	if (m_lastStateId != 0 || (static_cast<signed char>(m_shieldAttachNodeIndex) >= 0)) {
+		if (m_lastStateId != 2) {
+			return;
+		}
+		if (static_cast<signed char>(PartyData(this).partyFlags) >= 0) {
+			changeStat(0, 0, 0);
+			return;
+		}
+
+		if (leader->m_lastStateId == 2 || leader->m_lastStateId == 6) {
+			if (m_subState != 1) {
+				return;
+			}
+			if (*reinterpret_cast<int*>(self + 0x668) == 0) {
+				return;
+			}
+			if ((PartyData(leader).partyFlags & 0x40) != 0) {
+				sGhostPartyWork.trailIndex = 0;
+			}
+			if ((PartyData(this).partyFlags & 0x80) == 0) {
+				return;
+			}
+
+			PartyData(this).partyFlags |= 0x20;
+			sGhostPartyWork.trailIndex++;
+			if (sGhostPartyWork.trailIndex < 0x10) {
+				return;
+			}
+			if ((PartyData(this).partyFlags & 0x40) != 0) {
+				return;
+			}
+		} else if ((PartyData(this).partyFlags & 0x40) == 0) {
+			changeStat(0, 0, 0);
+			return;
+		}
+
+		sGhostPartyWork.thresholdA = (sGhostPartyWork.slotSel == 0) ? 0 : sGhostPartyWork.thresholdA / 2;
+		sGhostPartyWork.thresholdB = (sGhostPartyWork.slotSel == 1) ? 0 : sGhostPartyWork.thresholdB / 2;
+		sGhostPartyWork.thresholdC = (sGhostPartyWork.slotSel == 2) ? 0 : sGhostPartyWork.thresholdC / 2;
+		PartyData(this).partyFlags = (PartyData(this).partyFlags & 0xAF) | 0x40;
+		return;
 	}
 
-	if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
-	    (leader->m_subState == 1) &&
-	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) != 0) &&
-	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x660) == 0) &&
-	    (dist < nearDist * 0.6f)) {
-		CancelMove(1);
-		rotTarget(reinterpret_cast<CGPrgObj*>(leader));
-		carry(0, reinterpret_cast<CGObject*>(leader), 0);
-		sGhostPartyWork.carrySpeed = 0.0f;
+	int moveKind = 0;
+	if (static_cast<signed char>(PartyData(this).partyFlags) >= 0) {
+		if (chalice != nullptr &&
+		    *reinterpret_cast<float*>(self + 0x6F0) == 0.0f &&
+		    (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) < 0) &&
+		    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
+			float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * 1.25f;
+			if (dist < pickupRadius) {
+				CancelMove(1);
+				rotTarget(reinterpret_cast<CGPrgObj*>(chalice));
+				sGhostPartyWork.carrySpeed = 0.0f;
+				carry(0, chalice, 0);
+				return;
+			}
+			moveKind = 1;
+		}
+
+		if (moveKind == 0) {
+			float limit = (sGhostPartyWork.activeTrailCount != 0) ? 0.75f : 0.5f;
+			if (pathDist < Game.unkFloat_0xca10 * limit) {
+				return;
+			}
+		}
+		if (moveKind == 1 && chalice != nullptr) {
+			float keepDist = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * 0.5f;
+			if (clampedDist < keepDist) {
+				return;
+			}
+		}
+	} else {
+		if (*reinterpret_cast<float*>(self + 0x6F0) != 0.0f) {
+			sGhostPartyWork.carrySpeed = 0.0f;
+			carry(1, static_cast<CGObject*>(0), 0);
+			return;
+		}
+
+		float limit = (sGhostPartyWork.activeTrailCount != 0) ? 0.75f : 0.8f;
+		if (Game.unkFloat_0xca10 * limit > pathDist) {
+			if ((leader->m_lastStateId != 2 && leader->m_lastStateId != 6) ||
+			    leader->m_subState != 1 ||
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x660) != 0) {
+				return;
+			}
+
+			int threshold0 = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2048);
+			int threshold1 = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x204C);
+			int threshold2 = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2050);
+			if (sGhostPartyWork.thresholdA < threshold0 &&
+			    sGhostPartyWork.thresholdB < threshold1 &&
+			    sGhostPartyWork.thresholdC < threshold2) {
+				return;
+			}
+
+			int choices = 0;
+			if (sGhostPartyWork.thresholdA >= threshold0) {
+				choices++;
+			}
+			if (sGhostPartyWork.thresholdB >= threshold1) {
+				choices++;
+			}
+			if (sGhostPartyWork.thresholdC >= threshold2) {
+				choices++;
+			}
+
+			int pick = Math.Rand(choices);
+			int cursor = 0;
+			if (sGhostPartyWork.thresholdA >= threshold0) {
+				if (cursor == pick) {
+					sGhostPartyWork.slotSel = 0;
+				}
+				cursor++;
+			}
+			if (cursor <= pick && sGhostPartyWork.thresholdB >= threshold1) {
+				if (cursor == pick) {
+					sGhostPartyWork.slotSel = 1;
+				}
+				cursor++;
+			}
+			if (cursor <= pick && sGhostPartyWork.thresholdC >= threshold2) {
+				sGhostPartyWork.slotSel = 2;
+			}
+
+			if (sGhostPartyWork.slotSel == 1) {
+				*reinterpret_cast<int*>(self + 0x550) = 0x20F;
+			} else if (sGhostPartyWork.slotSel == 0) {
+				*reinterpret_cast<int*>(self + 0x550) = 0x207;
+			} else if (sGhostPartyWork.slotSel < 3) {
+				*reinterpret_cast<int*>(self + 0x550) = 0x20B;
+			}
+			changeStat(2, 0, 0);
+			sGhostPartyWork.trailIndex = 0;
+			PartyData(this).partyFlags &= 0x9F;
+			return;
+		}
+	}
+
+	if (PartyData(this).unk6BC != moveKind) {
+		PartyData(this).unk6C0 = 0;
+		PartyData(this).unk6BC = moveKind;
+	}
+
+	Vec moveDir;
+	if (moveKind == 0) {
+		moveDir = pathVec;
+	} else {
+		moveDir = toLeader;
+	}
+
+	float nextSpeed = sGhostPartyWork.carrySpeed + 0.05f;
+	float speedScale = (pressureLimit <= sGhostPartyWork.pressure) ? 1.0f : 0.9f;
+	float speedLimit = speedScale * m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(leader) + 0x690);
+	sGhostPartyWork.carrySpeed = (nextSpeed >= 0.0f && speedLimit < nextSpeed) ? speedLimit : nextSpeed;
+
+	PartyData(this).unk6C0++;
+	sGhostPartyWork.carryDir = moveDir;
+	if (PartyData(this).unk6C0 >= 4) {
+		PartyData(this).unk6C0 = 0;
 	}
 }
 

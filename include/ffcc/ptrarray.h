@@ -12,7 +12,11 @@ public:
     virtual ~CPtrArray();
     
     int GetSize();
+#ifdef FFCC_PTRARRAY_INT_RETURN
+    int Add(T item);
+#else
     bool Add(T item);
+#endif
     void RemoveAll();
     T GetAt(unsigned long index);
     T operator[](unsigned long index);
@@ -21,7 +25,11 @@ public:
     void SetGrow(int growCapacity);
     
 private:
+#ifdef FFCC_PTRARRAY_INT_RETURN
+    int setSize(unsigned long newSize);
+#else
     bool setSize(unsigned long newSize);
+#endif
 
     unsigned long m_numItems;
     unsigned long m_size;
@@ -30,6 +38,8 @@ private:
     CMemory::CStage* m_stage;
     int m_growCapacity;
 };
+
+#ifndef FFCC_PTRARRAY_DECL_ONLY
 
 template <class T>
 CPtrArray<T>::CPtrArray()
@@ -145,5 +155,7 @@ bool CPtrArray<T>::setSize(unsigned long newSize)
 
     return true;
 }
+
+#endif // FFCC_PTRARRAY_DECL_ONLY
 
 #endif // _FFCC_PTRARRAY_H_

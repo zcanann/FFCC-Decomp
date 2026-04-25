@@ -1,4 +1,8 @@
+#define FFCC_PTRARRAY_DECL_ONLY
+#define FFCC_PTRARRAY_INT_RETURN
 #include "ffcc/mapanim.h"
+#undef FFCC_PTRARRAY_INT_RETURN
+#undef FFCC_PTRARRAY_DECL_ONLY
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"
@@ -7,44 +11,12 @@
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
-// TODO: This should be using CPtrArray.h surely?
-template <class T>
-class CPtrArray
-{
-public:
-    virtual ~CPtrArray();
-
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-
-    CPtrArray();
-
-    int Add(T item);
-    int GetSize();
-    T GetAt(unsigned long index);
-    void RemoveAll();
-    T operator[](unsigned long index);
-    void SetStage(CMemory::CStage* stage);
-    int setSize(unsigned long newSize);
-};
-
-template <>
-CMapAnim* CPtrArray<CMapAnim*>::operator[](unsigned long index);
-
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" CPtrArray<CMapAnimNode*>* __ct__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>*);
 extern "C" void Calc__8CMapAnimFl(CMapAnim*, long);
-extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
-extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void*, unsigned long);
-extern "C" CPtrArray<CMapAnimNode*>* __dt__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>*, short);
 
 static const char s_mapanim_cpp[] = "mapanim.cpp";
 static const char s_ptrarray_grow_error[] =
@@ -292,18 +264,18 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
 CMapAnim::~CMapAnim()
 {
     unsigned int i = 0;
+    CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
 
-    while (static_cast<unsigned int>(GetSize__26CPtrArray_P12CMapAnimNode_Fv(this)) > i) {
-        CMapAnimNode* node = __vc__26CPtrArray_P12CMapAnimNode_FUl(this, i);
-        if (node != 0 && (node = __vc__26CPtrArray_P12CMapAnimNode_FUl(this, i), node != 0)) {
+    while (static_cast<unsigned int>(nodeArray->GetSize()) > i) {
+        CMapAnimNode* node = (*nodeArray)[i];
+        if (node != 0 && (node = (*nodeArray)[i], node != 0)) {
             reinterpret_cast<int*>(node)[1] = 0;
             __dl__FPv(node);
         }
         i++;
     }
 
-    reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->RemoveAll();
-    __dt__26CPtrArray_P12CMapAnimNode_Fv(reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this), -1);
+    nodeArray->RemoveAll();
 }
 
 /*
@@ -319,7 +291,6 @@ CMapAnim::CMapAnim()
 {
     CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
 
-    __ct__26CPtrArray_P12CMapAnimNode_Fv(nodeArray);
     nodeArray->SetStage(*reinterpret_cast<CMemory::CStage**>(&MapMng));
 }
 
@@ -559,40 +530,6 @@ template <>
 CPtrArray<CMapAnimNode*>::~CPtrArray()
 {
     RemoveAll();
-}
-
-extern "C" CPtrArray<CMapAnimNode*>* __ct__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>* ptrArray)
-{
-    if (ptrArray != 0) {
-        ptrArray->m_size = 0;
-        ptrArray->m_numItems = 0;
-        ptrArray->m_defaultSize = 0x10;
-        ptrArray->m_items = 0;
-        ptrArray->m_stage = 0;
-        ptrArray->m_growCapacity = 1;
-    }
-    return ptrArray;
-}
-
-extern "C" CPtrArray<CMapAnimNode*>* __dt__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        ptrArray->~CPtrArray<CMapAnimNode*>();
-        if (0 < param_2) {
-            __dl__FPv(ptrArray);
-        }
-    }
-    return ptrArray;
-}
-
-extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void* ptrArray)
-{
-    return reinterpret_cast<CPtrArray<CMapAnimNode*>*>(ptrArray)->GetSize();
-}
-
-extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void* ptrArray, unsigned long index)
-{
-    return (*reinterpret_cast<CPtrArray<CMapAnimNode*>*>(ptrArray))[index];
 }
 
 /*

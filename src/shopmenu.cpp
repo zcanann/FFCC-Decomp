@@ -402,18 +402,6 @@ static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
     return itemNo >= 0x9F;
 }
 
-static bool CanShopMenuBuyQuantity(CShopMenu* shopMenu, int quantity)
-{
-    int caravan = ShopMenuCaravan(shopMenu);
-    if (quantity > (0x40 - *reinterpret_cast<unsigned short*>(caravan + 0x94))) {
-        return false;
-    }
-
-    int itemNo = ResolveShopMenuSelectedItemId(shopMenu);
-    int gilValue = quantity * CalcShopMenuTradeGil(shopMenu, itemNo);
-    return CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -gilValue) != 0;
-}
-
 static void UpdateShopMenuListWindow(CShopMenu* shopMenu)
 {
     if (ShopMenuInt(shopMenu, 0x28) < ShopMenuInt(shopMenu, 0x24)) {
@@ -1526,7 +1514,14 @@ void CShopMenu::SelectItemIdx()
             ShopMenuInt(this, 0x3C) = 0;
 
             if (listType == 0) {
-                canSelect = (itemIndex != -1) && (itemNo >= 1) && CanShopMenuBuyQuantity(this, ShopMenuInt(this, 0x44));
+                if ((itemIndex != -1) && (itemNo >= 1)) {
+                    int caravan = ShopMenuCaravan(this);
+                    int quantity = ShopMenuInt(this, 0x44);
+                    if (quantity <= (0x40 - *reinterpret_cast<unsigned short*>(caravan + 0x94))) {
+                        int totalGil = quantity * CalcShopMenuTradeGil(this, itemNo);
+                        canSelect = CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -totalGil) != 0;
+                    }
+                }
                 if (canSelect) {
                     ShopMenuInt(this, 0x10) = 1;
                     Sound.PlaySe(2, 0x40, 0x7F, 0);

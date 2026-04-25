@@ -267,7 +267,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         node = modelRaw->m_nodes + nodeIndex * 0xC0;
         zOffset = 1.0f;
 
-        for (u32 frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
+        for (int frameIndex = 0; (u32)frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
             Mtx nodeMtx;
 
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, model);
@@ -283,18 +283,14 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             particles[work->m_count].m_pad0 = 0;
             particles[work->m_count].m_shape = 0;
             particles[work->m_count].m_pad1 = 0;
-            particles[work->m_count].m_frame = (s16)frameIndex;
+            particles[work->m_count].m_frame = frameIndex;
             particles[work->m_count].m_scaleX = locationTitle->m_localMatrix.value[0][0];
             particles[work->m_count].m_scaleY = locationTitle->m_localMatrix.value[1][1];
             particles[work->m_count].m_scaleZ = locationTitle->m_localMatrix.value[2][2];
             work->m_count++;
 
-            {
-                u32 nextCount = (u32)work->m_count + 1;
-
-                if ((u32)unkB->m_maxCount <= nextCount) {
-                    return;
-                }
+            if ((int)work->m_count + 1 >= (int)unkB->m_maxCount) {
+                return;
             }
 
             if (work->m_count > 1) {
@@ -325,12 +321,8 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     inserted++;
                     work->m_count++;
 
-                    {
-                        u32 nextCount = (u32)work->m_count + 1;
-
-                        if ((u32)unkB->m_maxCount <= nextCount) {
-                            break;
-                        }
+                    if ((int)work->m_count + 1 >= (int)unkB->m_maxCount) {
+                        break;
                     }
 
                     interpWrite++;
@@ -352,7 +344,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     dst->m_scaleX = locationTitle->m_localMatrix.value[0][0];
                     dst->m_scaleY = locationTitle->m_localMatrix.value[1][1];
                     dst->m_scaleZ = locationTitle->m_localMatrix.value[2][2];
-                    dst->m_frame = (s16)frameIndex;
+                    dst->m_frame = frameIndex;
                     interpRead++;
                 }
             }

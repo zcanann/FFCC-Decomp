@@ -167,7 +167,6 @@ if not config.non_matching:
 config.binutils_tag = "2.42-1"
 config.compilers_tag = "20250812"
 config.dtk_tag = "v1.8.3"
-config.objdiff_path = Path("build/tools/objdiff-cli.exe")
 config.objdiff_tag = "v3.6.1"
 config.sjiswrap_tag = "v1.2.2"
 config.wibo_tag = "1.0.0-beta.5"

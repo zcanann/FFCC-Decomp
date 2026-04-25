@@ -94,261 +94,25 @@ extern "C" {
 
 /*
  * --INFO--
- * PAL Address: 0x800d4164
- * PAL Size: 276b
+ * PAL Address: 0x8013ef94
+ * PAL Size: 100b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
+void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*)
 {
-	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
-	ChangeTexMeshData* meshData = meshes[param_4].m_data;
-	ChangeTexDisplayList* displayList = meshData->m_displayLists + param_5;
-	int textureInfo = *(int*)((char*)param_2 + 0x1C);
+	int textureIndex;
 
-	if (*(u8*)((char*)param_3 + 0x14) == 0) {
-		int drawTevBits = 0xACE0F;
-		int zero = 0;
-		int allOnes = -1;
-		int tevScale = 0x1E;
-		u8 fullByte = 0xFF;
-
-		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
-		*(int*)(MaterialManRaw() + 0x128) = zero;
-		drawTevBits |= 0x1000;
-		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
-		*(int*)(MaterialManRaw() + 0x130) = zero;
-		*(int*)(MaterialManRaw() + 0x44) = allOnes;
-		*(u8*)(MaterialManRaw() + 0x4c) = fullByte;
-		*(int*)(MaterialManRaw() + 0x11c) = zero;
-		*(int*)(MaterialManRaw() + 0x120) = tevScale;
-		*(int*)(MaterialManRaw() + 0x124) = zero;
-		*(u8*)(MaterialManRaw() + 0x205) = fullByte;
-		*(u8*)(MaterialManRaw() + 0x206) = fullByte;
-		*(int*)(MaterialManRaw() + 0x58) = zero;
-		*(int*)(MaterialManRaw() + 0x5c) = zero;
-		*(char*)(MaterialManRaw() + 0x208) = zero;
-		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
-		*(int*)(MaterialManRaw() + 0x128) = zero;
-		*(int*)(MaterialManRaw() + 0xd0) = textureInfo + 0x28;
-		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
-		*(int*)(MaterialManRaw() + 0x130) = zero;
-		*(int*)(MaterialManRaw() + 0x40) = drawTevBits;
-	}
-
-	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-	    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
-	GXCallDisplayList(displayList->m_data, displayList->m_size);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800d3fd8
- * PAL Size: 396b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
-{
-	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
-	int displayListIdx;
-	int* displayListPtr;
-	int dlArrayBase;
-	int dlOffset;
-	int drawTevBits;
-	int fullTevBits;
-	int allOnes;
-	int tevScale;
-	void* meshColorArrays;
-	void* meshColorArray;
-	ChangeTexMeshData* meshData;
-	ChangeTexDisplayList* displayList;
-
-	if (*(u8*)((char*)param_3 + 0x14) != 0) {
-		meshColorArrays = *(void**)((char*)param_2 + 0xC);
-		dlOffset = *(int*)((char*)param_2 + 0x1c);
-		meshData = meshes[meshIdx].m_data;
-		displayList = meshData->m_displayLists;
-		if (meshColorArrays != 0) {
-			meshColorArray = *(void**)((u8*)meshColorArrays + meshIdx * 4);
-			if (meshColorArray != 0) {
-				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
-				GXSetArray((GXAttr)0xb, meshColorArray, 4);
-				*(int*)(MaterialManRaw() + 0xd0) = dlOffset + 0x28;
-				drawTevBits = 0xACE0F;
-				fullTevBits = drawTevBits;
-				fullTevBits |= 0x1000;
-				allOnes = -1;
-				u8 fullByte = 0xFF;
-				tevScale = 0x1e;
-				displayListIdx = meshData->m_displayListCount - 1;
-				dlOffset = displayListIdx * 4;
-				while (displayListIdx >= 0) {
-					dlArrayBase = *(int*)(meshIdx * 4 + *(int*)((char*)param_2 + 0x10));
-					*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
-					*(int*)(MaterialManRaw() + 0x128) = 0;
-					*(int*)(MaterialManRaw() + 0x12c) = tevScale;
-					*(int*)(MaterialManRaw() + 0x130) = 0;
-					*(int*)(MaterialManRaw() + 0x44) = allOnes;
-					*(u8*)(MaterialManRaw() + 0x4c) = fullByte;
-					*(int*)(MaterialManRaw() + 0x11c) = 0;
-					*(int*)(MaterialManRaw() + 0x120) = tevScale;
-					*(int*)(MaterialManRaw() + 0x124) = 0;
-					*(u8*)(MaterialManRaw() + 0x205) = fullByte;
-					*(u8*)(MaterialManRaw() + 0x206) = fullByte;
-					*(int*)(MaterialManRaw() + 0x58) = 0;
-					*(int*)(MaterialManRaw() + 0x5c) = 0;
-					*(char*)(MaterialManRaw() + 0x208) = 0;
-					*(int*)(MaterialManRaw() + 0x48) = fullTevBits;
-					*(int*)(MaterialManRaw() + 0x128) = 0;
-					*(int*)(MaterialManRaw() + 0x12c) = tevScale;
-					*(int*)(MaterialManRaw() + 0x130) = 0;
-					*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
-					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-					    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
-					displayListPtr = *(int**)(dlArrayBase + dlOffset);
-					GXCallDisplayList((void*)displayListPtr[0], (unsigned int)displayListPtr[1]);
-					dlOffset -= 4;
-					displayListIdx -= 1;
-					displayList += 1;
-				}
-			}
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013f744
- * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
-{
-	float init = kPppChangeTexInit;
-	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
-
-	work->m_value0 = init;
-	work->m_value2 = init;
-	work->m_value1 = init;
-	work->m_charaObj = 0;
-	work->m_context = pppMngStPtr;
-	work->m_texture = 0;
-	work->m_meshColorArrays = 0;
-	work->m_displayListArrays = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013f720
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstruct2ChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
-{
-	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
-	float init = kPppChangeTexInit;
-
-	work->m_value0 = init;
-	work->m_value2 = init;
-	work->m_value1 = init;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013f504
- * PAL Size: 540b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
-{
-	_WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x9d);
-	int dataOffset = data->m_serializedDataOffsets[2];
-	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + dataOffset + 0x80);
-	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 0);
-	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 1);
-	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 2);
-	u32 model = 0;
-
-	if (handle0 != 0) {
-		model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
-		*(void**)(model + 0xe4) = 0;
-		*(void**)(model + 0xe8) = 0;
-		*(void**)(model + 0xf4) = 0;
-		*(void**)(model + 0xfc) = 0;
-		*(void**)(model + 0x104) = 0;
-	}
-	u32 model1;
-	if ((handle1 != 0) && ((model1 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1)), model1 != 0)) {
-		*(void**)(model1 + 0xe4) = 0;
-		*(void**)(model1 + 0xe8) = 0;
-		*(void**)(model1 + 0xf4) = 0;
-		*(void**)(model1 + 0xfc) = 0;
-		*(void**)(model1 + 0x104) = 0;
-	}
-	u32 model2;
-	if ((handle2 != 0) && ((model2 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2)), model2 != 0)) {
-		*(void**)(model2 + 0xe4) = 0;
-		*(void**)(model2 + 0xe8) = 0;
-		*(void**)(model2 + 0xf4) = 0;
-		*(void**)(model2 + 0xfc) = 0;
-		*(void**)(model2 + 0x104) = 0;
-	}
-
-	void** stageArray = (void**)work->m_displayListArrays;
-	void** meshArray;
-	if ((stageArray != 0) && ((meshArray = (void**)work->m_meshColorArrays), meshArray != 0)) {
-		int meshList = *(int*)(model + 0xac);
-		void** curStageArray = stageArray;
-		void** curMeshArray = meshArray;
-		for (unsigned int i = 0; i < *(unsigned int*)(*(int*)(model + 0xA4) + 0xC); i++) {
-			int meshData = *(int*)(meshList + 8);
-			void** dlEntries = (void**)*curStageArray;
-			for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {
-				if (*(void**)*dlEntries != 0) {
-					pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
-					*(void**)*dlEntries = 0;
-				}
-				if (*dlEntries != 0) {
-					pppHeapUseRate__FPQ27CMemory6CStage(*dlEntries);
-					*dlEntries = 0;
-				}
-				dlEntries++;
-			}
-
-			if (*curStageArray != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(*curStageArray);
-				*curStageArray = 0;
-			}
-			if (*curMeshArray != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(*curMeshArray);
-				*curMeshArray = 0;
-			}
-
-			curStageArray++;
-			curMeshArray++;
-			meshList += 0x14;
-		}
-
-		if (stageArray != 0) {
-			pppHeapUseRate__FPQ27CMemory6CStage(stageArray);
-		}
-		if (meshArray != 0) {
-			pppHeapUseRate__FPQ27CMemory6CStage(meshArray);
-		}
+	if (step->m_dataValIndex != 0xffff) {
+		_pppEnvStChangeTex* env = pppEnvStPtr;
+		CMapMesh* mapMesh = env->m_mapMeshPtr[step->m_dataValIndex];
+		textureIndex = 0;
+		GetTexture__8CMapMeshFP12CMaterialSetRi(
+		    mapMesh, env->m_materialSetPtr, textureIndex);
+		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+		pppInitBlendMode();
 	}
 }
 
@@ -522,24 +286,260 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 /*
  * --INFO--
- * PAL Address: 0x8013ef94
- * PAL Size: 100b
+ * PAL Address: 0x8013f504
+ * PAL Size: 540b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*)
+void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 {
-	int textureIndex;
+	_WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x9d);
+	int dataOffset = data->m_serializedDataOffsets[2];
+	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + dataOffset + 0x80);
+	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 0);
+	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 1);
+	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 2);
+	u32 model = 0;
 
-	if (step->m_dataValIndex != 0xffff) {
-		_pppEnvStChangeTex* env = pppEnvStPtr;
-		CMapMesh* mapMesh = env->m_mapMeshPtr[step->m_dataValIndex];
-		textureIndex = 0;
-		GetTexture__8CMapMeshFP12CMaterialSetRi(
-		    mapMesh, env->m_materialSetPtr, textureIndex);
-		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-		pppInitBlendMode();
+	if (handle0 != 0) {
+		model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
+		*(void**)(model + 0xe4) = 0;
+		*(void**)(model + 0xe8) = 0;
+		*(void**)(model + 0xf4) = 0;
+		*(void**)(model + 0xfc) = 0;
+		*(void**)(model + 0x104) = 0;
 	}
+	u32 model1;
+	if ((handle1 != 0) && ((model1 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1)), model1 != 0)) {
+		*(void**)(model1 + 0xe4) = 0;
+		*(void**)(model1 + 0xe8) = 0;
+		*(void**)(model1 + 0xf4) = 0;
+		*(void**)(model1 + 0xfc) = 0;
+		*(void**)(model1 + 0x104) = 0;
+	}
+	u32 model2;
+	if ((handle2 != 0) && ((model2 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2)), model2 != 0)) {
+		*(void**)(model2 + 0xe4) = 0;
+		*(void**)(model2 + 0xe8) = 0;
+		*(void**)(model2 + 0xf4) = 0;
+		*(void**)(model2 + 0xfc) = 0;
+		*(void**)(model2 + 0x104) = 0;
+	}
+
+	void** stageArray = (void**)work->m_displayListArrays;
+	void** meshArray;
+	if ((stageArray != 0) && ((meshArray = (void**)work->m_meshColorArrays), meshArray != 0)) {
+		int meshList = *(int*)(model + 0xac);
+		void** curStageArray = stageArray;
+		void** curMeshArray = meshArray;
+		for (unsigned int i = 0; i < *(unsigned int*)(*(int*)(model + 0xA4) + 0xC); i++) {
+			int meshData = *(int*)(meshList + 8);
+			void** dlEntries = (void**)*curStageArray;
+			for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {
+				if (*(void**)*dlEntries != 0) {
+					pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
+					*(void**)*dlEntries = 0;
+				}
+				if (*dlEntries != 0) {
+					pppHeapUseRate__FPQ27CMemory6CStage(*dlEntries);
+					*dlEntries = 0;
+				}
+				dlEntries++;
+			}
+
+			if (*curStageArray != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(*curStageArray);
+				*curStageArray = 0;
+			}
+			if (*curMeshArray != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(*curMeshArray);
+				*curMeshArray = 0;
+			}
+
+			curStageArray++;
+			curMeshArray++;
+			meshList += 0x14;
+		}
+
+		if (stageArray != 0) {
+			pppHeapUseRate__FPQ27CMemory6CStage(stageArray);
+		}
+		if (meshArray != 0) {
+			pppHeapUseRate__FPQ27CMemory6CStage(meshArray);
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013f720
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct2ChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
+{
+	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
+	float init = kPppChangeTexInit;
+
+	work->m_value0 = init;
+	work->m_value2 = init;
+	work->m_value1 = init;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013f744
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
+{
+	float init = kPppChangeTexInit;
+	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
+
+	work->m_value0 = init;
+	work->m_value2 = init;
+	work->m_value1 = init;
+	work->m_charaObj = 0;
+	work->m_context = pppMngStPtr;
+	work->m_texture = 0;
+	work->m_meshColorArrays = 0;
+	work->m_displayListArrays = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d3fd8
+ * PAL Size: 396b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
+{
+	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
+	int displayListIdx;
+	int* displayListPtr;
+	int dlArrayBase;
+	int dlOffset;
+	int drawTevBits;
+	int fullTevBits;
+	int allOnes;
+	int tevScale;
+	void* meshColorArrays;
+	void* meshColorArray;
+	ChangeTexMeshData* meshData;
+	ChangeTexDisplayList* displayList;
+
+	if (*(u8*)((char*)param_3 + 0x14) != 0) {
+		meshColorArrays = *(void**)((char*)param_2 + 0xC);
+		dlOffset = *(int*)((char*)param_2 + 0x1c);
+		meshData = meshes[meshIdx].m_data;
+		displayList = meshData->m_displayLists;
+		if (meshColorArrays != 0) {
+			meshColorArray = *(void**)((u8*)meshColorArrays + meshIdx * 4);
+			if (meshColorArray != 0) {
+				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
+				GXSetArray((GXAttr)0xb, meshColorArray, 4);
+				*(int*)(MaterialManRaw() + 0xd0) = dlOffset + 0x28;
+				drawTevBits = 0xACE0F;
+				fullTevBits = drawTevBits;
+				fullTevBits |= 0x1000;
+				allOnes = -1;
+				u8 fullByte = 0xFF;
+				tevScale = 0x1e;
+				displayListIdx = meshData->m_displayListCount - 1;
+				dlOffset = displayListIdx * 4;
+				while (displayListIdx >= 0) {
+					dlArrayBase = *(int*)(meshIdx * 4 + *(int*)((char*)param_2 + 0x10));
+					*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
+					*(int*)(MaterialManRaw() + 0x128) = 0;
+					*(int*)(MaterialManRaw() + 0x12c) = tevScale;
+					*(int*)(MaterialManRaw() + 0x130) = 0;
+					*(int*)(MaterialManRaw() + 0x44) = allOnes;
+					*(u8*)(MaterialManRaw() + 0x4c) = fullByte;
+					*(int*)(MaterialManRaw() + 0x11c) = 0;
+					*(int*)(MaterialManRaw() + 0x120) = tevScale;
+					*(int*)(MaterialManRaw() + 0x124) = 0;
+					*(u8*)(MaterialManRaw() + 0x205) = fullByte;
+					*(u8*)(MaterialManRaw() + 0x206) = fullByte;
+					*(int*)(MaterialManRaw() + 0x58) = 0;
+					*(int*)(MaterialManRaw() + 0x5c) = 0;
+					*(char*)(MaterialManRaw() + 0x208) = 0;
+					*(int*)(MaterialManRaw() + 0x48) = fullTevBits;
+					*(int*)(MaterialManRaw() + 0x128) = 0;
+					*(int*)(MaterialManRaw() + 0x12c) = tevScale;
+					*(int*)(MaterialManRaw() + 0x130) = 0;
+					*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
+					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+					    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
+					displayListPtr = *(int**)(dlArrayBase + dlOffset);
+					GXCallDisplayList((void*)displayListPtr[0], (unsigned int)displayListPtr[1]);
+					dlOffset -= 4;
+					displayListIdx -= 1;
+					displayList += 1;
+				}
+			}
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d4164
+ * PAL Size: 276b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
+{
+	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
+	ChangeTexMeshData* meshData = meshes[param_4].m_data;
+	ChangeTexDisplayList* displayList = meshData->m_displayLists + param_5;
+	int textureInfo = *(int*)((char*)param_2 + 0x1C);
+
+	if (*(u8*)((char*)param_3 + 0x14) == 0) {
+		int drawTevBits = 0xACE0F;
+		int zero = 0;
+		int allOnes = -1;
+		int tevScale = 0x1E;
+		u8 fullByte = 0xFF;
+
+		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
+		*(int*)(MaterialManRaw() + 0x128) = zero;
+		drawTevBits |= 0x1000;
+		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
+		*(int*)(MaterialManRaw() + 0x130) = zero;
+		*(int*)(MaterialManRaw() + 0x44) = allOnes;
+		*(u8*)(MaterialManRaw() + 0x4c) = fullByte;
+		*(int*)(MaterialManRaw() + 0x11c) = zero;
+		*(int*)(MaterialManRaw() + 0x120) = tevScale;
+		*(int*)(MaterialManRaw() + 0x124) = zero;
+		*(u8*)(MaterialManRaw() + 0x205) = fullByte;
+		*(u8*)(MaterialManRaw() + 0x206) = fullByte;
+		*(int*)(MaterialManRaw() + 0x58) = zero;
+		*(int*)(MaterialManRaw() + 0x5c) = zero;
+		*(char*)(MaterialManRaw() + 0x208) = zero;
+		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
+		*(int*)(MaterialManRaw() + 0x128) = zero;
+		*(int*)(MaterialManRaw() + 0xd0) = textureInfo + 0x28;
+		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
+		*(int*)(MaterialManRaw() + 0x130) = zero;
+		*(int*)(MaterialManRaw() + 0x40) = drawTevBits;
+	}
+
+	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+	    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
+	GXCallDisplayList(displayList->m_data, displayList->m_size);
 }

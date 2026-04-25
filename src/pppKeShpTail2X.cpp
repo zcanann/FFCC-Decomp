@@ -151,10 +151,10 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     float invCountMinusOne;
     pppFMATRIX localBase;
     pppFMATRIX drawMtx;
-    Vec zeroVec;
-    Vec pos;
-    Vec nextPos;
-    Vec seg;
+    Vec zeroVec ATTRIBUTE_ALIGN(8);
+    Vec pos ATTRIBUTE_ALIGN(8);
+    Vec nextPos ATTRIBUTE_ALIGN(8);
+    Vec seg ATTRIBUTE_ALIGN(8);
     float trailLen;
     float segLen;
     float segCursor;

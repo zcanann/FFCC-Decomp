@@ -109,16 +109,22 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     u8* colorData;
     CTexture* texture;
     s32 i;
+    s32 dataOffset;
+    s32 colorOffset;
     s32 dataValIndex;
+    PackedColor colorTop;
+    PackedColor colorBottom;
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
     int textureIndex[2];
 
-    work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_3->m_serializedDataOffsets);
-    colorData = pppYmTracer2->m_serializedData + param_3->m_serializedDataOffsets[1];
-    poly = work->entries;
     dataValIndex = param_2->m_dataValIndex;
+    dataOffset = *param_3->m_serializedDataOffsets;
+    colorOffset = param_3->m_serializedDataOffsets[1];
+    work = (TracerWork*)(pppYmTracer2->m_serializedData + dataOffset);
+    colorData = pppYmTracer2->m_serializedData + colorOffset;
+    poly = work->entries;
     mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
 
     if (dataValIndex != 0xFFFF) {
@@ -162,6 +168,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                 GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
 
                 for (i = 0; i < (s32)(work->visibleCount - 1); i++) {
+                    TRACE_POLYGON* next = poly + 1;
+
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
 
@@ -172,16 +180,16 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                         alphaScale = FLOAT_80331844;
                     }
 
-                    PackedColor colorTop = g_pppYmTracer2_1;
-                    PackedColor colorBottom = g_pppYmTracer2_2;
+                    colorTop = g_pppYmTracer2_1;
+                    colorBottom = g_pppYmTracer2_2;
                     colorTop.bytes[0] = poly->colorR;
                     colorTop.bytes[1] = poly->colorG;
                     colorTop.bytes[2] = poly->colorB;
                     colorTop.bytes[3] = (u8)(alphaScale * (f32)poly->alpha);
-                    colorBottom.bytes[0] = poly[1].colorR;
-                    colorBottom.bytes[1] = poly[1].colorG;
-                    colorBottom.bytes[2] = poly[1].colorB;
-                    colorBottom.bytes[3] = (u8)(alphaScale * (f32)poly[1].alpha);
+                    colorBottom.bytes[0] = next->colorR;
+                    colorBottom.bytes[1] = next->colorG;
+                    colorBottom.bytes[2] = next->colorB;
+                    colorBottom.bytes[3] = (u8)(alphaScale * (f32)next->alpha);
 
                     GXPosition3f32(poly->targetPos.x, poly->targetPos.y, poly->targetPos.z);
                     GXColor1u32(colorTop.value);
@@ -191,14 +199,14 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                     GXColor1u32(colorTop.value);
                     GXTexCoord2f32(uTop, FLOAT_80331840);
 
-                    GXPosition3f32(poly[1].targetPos.x, poly[1].targetPos.y, poly[1].targetPos.z);
+                    GXPosition3f32(next->targetPos.x, next->targetPos.y, next->targetPos.z);
                     GXColor1u32(colorBottom.value);
                     GXTexCoord2f32(uBottom, FLOAT_80331844);
 
-                    poly++;
-                    GXPosition3f32(poly->pos.x, poly->pos.y, poly->pos.z);
+                    GXPosition3f32(next->pos.x, next->pos.y, next->pos.z);
                     GXColor1u32(colorBottom.value);
                     GXTexCoord2f32(uBottom, FLOAT_80331840);
+                    poly++;
                 }
             }
         }

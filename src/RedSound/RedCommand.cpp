@@ -7,14 +7,14 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-static const char sRedCommandLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
 extern char DAT_8021dcab;
 extern const char DAT_80333d68;
 extern const char DAT_80333d75;
 extern const char DAT_80333d70;
+static const char s_redCommandWaveNotEntryFmt[] = "%s%sWave is not Entry. (wave%4.4u)%s\n";
+static const char sRedCommandLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
 static const char s_redCommandSePauseOnFmt[] = "%sPause : SE     : ON  %d\n";
 static const char s_redCommandSePauseOffFmt[] = "%sPause : SE     : OFF %d\n";
-static const char s_redCommandWaveNotEntryFmt[] = "%s%sWave is not Entry. (wave%4.4u)%s\n";
 static const char s_redCommandMusicTrackCreateErrorFmt[] = "%s%sMusic Start : Couldn't Create Track.%s\n";
 static const char s_redCommandMusicNeedMemoryFmt[] = "%s%s            : music%3.3u.bgm : need 0x%6.6X%s\n";
 

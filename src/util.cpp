@@ -1101,12 +1101,14 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 	u8* data = (u8*)dlData;
 	u8* current = data;
 	u8* end = data + dlSize;
+	unsigned long copyPos = copyFlags & 1;
+	unsigned long copyNrm = copyFlags & 2;
 
 	while (current < end) {
 		u8 cmd = *current;
 		u32 count = *(u16*)(current + 1);
 		u8 primitive = cmd & 0xF8;
-		bool isPrimitive = false;
+		u8 indexFormat = cmd & 7;
 		current += 3;
 
 		switch (primitive) {
@@ -1117,37 +1119,36 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 			case 0xA8:
 			case 0xB0:
 			case 0xB8:
-				isPrimitive = true;
 				break;
-		}
-
-		if (!isPrimitive) {
-			break;
+			default:
+				goto flush;
 		}
 
 		while (count != 0) {
 			u16 value = *(u16*)current;
 
-			if ((copyFlags & 1) != 0) {
+			if (copyPos != 0) {
 				*(u16*)(current + 4) = value;
 			}
-			if ((copyFlags & 2) != 0) {
-				*(u16*)(current + 6) = value;
-			}
+			current += 6;
 
-			if ((cmd & 7) == 2) {
-				if ((copyFlags & 2) != 0) {
-					*(u16*)(current + 8) = value;
+			if (copyNrm != 0) {
+				*(u16*)current = value;
+			}
+			current += 2;
+
+			if (indexFormat == 2) {
+				if (copyNrm != 0) {
+					*(u16*)current = value;
 				}
-				current += 10;
-			} else {
-				current += 8;
+				current += 2;
 			}
 
 			count--;
 		}
 	}
 
+flush:
 	DCFlushRange(dlData, dlSize);
 }
 

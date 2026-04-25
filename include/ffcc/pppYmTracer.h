@@ -22,10 +22,11 @@ struct pppYmTracerUnkC {
 struct TRACE_POLYGON;
 
 struct pppYmTracer {
+    u8 m_header[0xC];
     s32 m_graphId;
     pppFMATRIX m_localMatrix;
     pppFMATRIX m_drawMatrix;
-    u8 m_pad64[0x1C];
+    u8 m_pad70[0x10];
     u8 m_serializedData[1];
 };
 

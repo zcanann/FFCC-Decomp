@@ -17,6 +17,8 @@ extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void ChgModel__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" void SetAnim__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void PCAnimCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" void InitFrame0Info__8CMenuPcsFv(CMenuPcs*);
+extern "C" void CalcWMFrame0__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" unsigned short GetButtonRepeat__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" unsigned short GetButtonDown__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
@@ -539,10 +541,11 @@ void CMenuPcs::CalcSingCMake()
     int state = MenuS32(this, 0x82C);
 
     if (*reinterpret_cast<unsigned char*>(state + 0x0B) == 0) {
+        InitFrame0Info__8CMenuPcsFv(this);
         memset(&s_CmakeInfo, 0, sizeof(s_CmakeInfo));
         *reinterpret_cast<unsigned char*>(state + 0x0B) = 1;
         *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
-        *reinterpret_cast<short*>(state + 0x2E) = 0;
+        DAT_8032ef10 = -1;
         *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
     }
 
@@ -556,6 +559,7 @@ void CMenuPcs::CalcSingCMake()
     switch (step) {
     case 0:
         if (openMode == 0) {
+            CalcWMFrame0__8CMenuPcsFi(this, frame - 10);
             if (frame < 10) {
                 frame = frame + 1;
             } else {
@@ -568,6 +572,7 @@ void CMenuPcs::CalcSingCMake()
         } else if (openMode == 1) {
             result = 0;
         } else {
+            CalcWMFrame0__8CMenuPcsFi(this, -frame);
             if (frame < 10) {
                 frame = frame + 1;
             }

@@ -154,10 +154,6 @@ static inline OSThread& RedDriverMainThread()
     return RedDriverSync().m_mainThread;
 }
 
-extern void ReverbAreaAlloc(unsigned long);
-extern void ReverbAreaFree(void*);
-extern void InitReverb();
-
 static const char s_redDriverDmaCheckHeaderFmt[] = "%s **** DMA CHECK PROCESS ****\n";
 static const char s_redDriverDmaCheckLogBlob[] =
     "\x1B[7;34mSound\x1B[0m:"

@@ -5,6 +5,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/itemobj.h"
 #include "ffcc/joybus.h"
 #include "ffcc/math.h"
@@ -3552,6 +3553,49 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0x27: {
+        if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x129C) & 0x100000) != 0) {
+            Mtx viewMtx;
+            Mtx drawMtx;
+            CameraPcs.GetViewMatrix(viewMtx);
+
+            _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+            GXSetZCompLoc(GX_FALSE);
+            _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
+            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+            GXSetCullMode(GX_CULL_FRONT);
+            GXSetNumTevStages(1);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+            GXSetNumChans(1);
+            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+            GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+            GXClearVtxDesc();
+            GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+
+            const float radius = static_cast<float>(object->m_localBase[3]);
+            PSMTXScale(drawMtx, radius, radius, radius);
+            const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+            drawMtx[0][3] = localFloats[0];
+            drawMtx[1][3] = localFloats[1];
+            drawMtx[2][3] = localFloats[2];
+            PSMTXConcat(viewMtx, drawMtx, drawMtx);
+            GXLoadPosMtxImm(drawMtx, GX_PNMTX0);
+
+            GXColor color = {
+                static_cast<u8>(object->m_localBase[4]),
+                static_cast<u8>(object->m_localBase[5]),
+                static_cast<u8>(object->m_localBase[6]),
+                0xFF,
+            };
+            GXSetChanMatColor(GX_COLOR0A0, color);
+            Graphic.DrawSphere();
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x26:
         runtime->push(
             object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x26EC + *object->m_localBase * 0xB14));

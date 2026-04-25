@@ -3357,6 +3357,31 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400));
         outResult = 0;
         return;
+    case -0x34: {
+        Vec axis = {cosf(static_cast<float>(object->m_localBase[1])), 0.0f,
+                    sinf(static_cast<float>(object->m_localBase[1]))};
+        Mtx matrix;
+        Mtx rotation;
+
+        CameraPcs.GetWorldMapMatrix(matrix);
+        if (*object->m_localBase != 0) {
+            PSMTXIdentity(matrix);
+        }
+
+        PSMTXRotAxisRad(rotation, &axis, static_cast<float>(object->m_localBase[2]));
+        PSMTXConcat(rotation, matrix, matrix);
+
+        axis.x = 0.0f;
+        axis.y = 1.0f;
+        axis.z = 0.0f;
+        PSMTXRotAxisRad(rotation, &axis, static_cast<float>(object->m_localBase[3]));
+        PSMTXConcat(rotation, matrix, matrix);
+        CameraPcs.SetWorldMapMatrix(matrix);
+
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x33: {
         u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicsPcs);
         *reinterpret_cast<int*>(graphicsPcs + 0x6C) = *object->m_localBase;

@@ -2059,7 +2059,7 @@ void CMenuPcs::CmakeTribeDraw()
         MenuPcsVoid(), 0, FLOAT_80333278, FLOAT_8033327c, FLOAT_803332a4, FLOAT_80333284,
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333318, 0.0f);
 
-    DrawCmakeTitle(3, 0.0f, alpha);
+    DrawCmakeTitle(3, FLOAT_80333258, alpha);
     DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, alpha);
 
     CFont* tribeFont = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
@@ -2258,7 +2258,7 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
     DrawCmakeSelectionBackdrop(this);
-    DrawCmakePreviewCharaAlpha(this, alpha);
+    DrawCmakePreviewCharaAlpha(this, FLOAT_80333258);
 
     int panelAlpha = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
     if (panelAlpha < 0) {
@@ -2278,7 +2278,7 @@ void CMenuPcs::CmakeJobDraw()
         FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
-    DrawCmakeTitle(5, 0.0f, alpha);
+    DrawCmakeTitle(5, FLOAT_80333258, alpha);
 
     CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
     font->SetMargin(FLOAT_80333258);

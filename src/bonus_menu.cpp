@@ -22,6 +22,7 @@ extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" unsigned short GetButtonDown__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, short, short*, short*, int);
+extern "C" void GetWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, short*, short*, int);
 extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
@@ -339,33 +340,46 @@ static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* boardS
 	const float h = (boardSprite->h > 0) ? (float)boardSprite->h : 208.0f;
 	const float itemW = (itemSprite != 0 && itemSprite->w > 0) ? (float)itemSprite->w : 112.0f;
 	const float itemH = (itemSprite != 0 && itemSprite->h > 0) ? (float)itemSprite->h : 104.0f;
-	const float quarterW = w * 0.25f;
-	const float quarterH = h * 0.25f;
 	const float halfW = w * 0.5f;
 	const float halfH = h * 0.5f;
-	const float itemQuarterW = itemW * 0.25f;
-	const float itemQuarterH = itemH * 0.25f;
+	const float itemHalfW = itemW * 0.5f;
+	const float itemHalfH = itemH * 0.5f;
+	const float insetW = w * 0.25f;
+	const float insetH = h * 0.25f;
 
 	memset(out, 0, sizeof(float) * 18);
 
-	out[0] = x + quarterW;
-	out[1] = y + quarterH;
+	out[0] = x + halfW;
+	out[1] = y + halfH;
+
 	out[2] = x + w - itemW;
-	out[3] = y + quarterH - itemQuarterH;
-	out[4] = x + quarterW * 3.0f - itemQuarterW;
-	out[5] = y + quarterH * 3.0f - itemQuarterH;
-	out[6] = x + quarterW - itemQuarterW;
+	out[3] = y + halfH - itemHalfH;
+
+	out[6] = x + halfW - itemHalfW;
 	out[7] = y + h - itemH;
-	out[8] = x + halfW - itemQuarterW;
-	out[9] = y + quarterH * 3.0f - itemQuarterH;
+
 	out[10] = x;
-	out[11] = y + quarterH - itemQuarterH;
-	out[12] = x + halfW - itemQuarterW;
-	out[13] = y + halfH - itemQuarterH;
-	out[14] = x + quarterW - itemQuarterW;
+	out[11] = y + halfH - itemHalfH;
+
+	out[14] = x + halfW - itemHalfW;
 	out[15] = y;
-	out[16] = x + quarterW * 3.0f - itemQuarterW;
-	out[17] = y + halfH - itemQuarterH;
+
+	float baseX = x + insetW - itemHalfW;
+	float baseY = y + insetH - itemHalfH;
+	for (int row = 0; row < 2; row++) {
+		if (row == 0) {
+			out[12] = baseX;
+			out[13] = baseY;
+			out[16] = baseX + halfW;
+			out[17] = baseY;
+		} else {
+			out[8] = baseX;
+			out[9] = baseY;
+			out[4] = baseX + halfW;
+			out[5] = baseY;
+		}
+		baseY += halfH;
+	}
 }
 
 static float* GetBonusArtiBasePositions(const BonusAnimSprite* sprite)
@@ -1622,7 +1636,6 @@ void CMenuPcs::CalcResultOpenAnim()
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
 		GetBonusMenuMembers(this).m_bonusAlpha = 0;
-		GetBonusMenuMembers(this).m_bonusCursorFlag = 0;
 		memset((void*)animPtr, 0, 0x1008);
 
 		header->count = (short)(1 + activePartyCount * 6);
@@ -1736,9 +1749,9 @@ void CMenuPcs::CalcResultOpenAnim()
 		if (sprite->kind == -2 && sprite->timer == 1) {
 			Sound.PlaySe(0x47, 0x40, 0x7f, 0);
 		}
-		if (sprite->kind == -1 && sprite->timer == 1 && GetBonusMenuMembers(this).m_bonusCursorFlag == 0) {
+		if (sprite->kind == -1 && sprite->timer == 1 && GetBonusMenuMembers(this).m_bonusAlpha == 0) {
 			Sound.PlaySe(0x48, 0x40, 0x7f, 0);
-			GetBonusMenuMembers(this).m_bonusCursorFlag = 1;
+			GetBonusMenuMembers(this).m_bonusAlpha = 1;
 		}
 	}
 
@@ -1948,7 +1961,6 @@ void CMenuPcs::CalcResultCountAnim()
 			sprites[labelBase + i].mulX = 18.0f;
 		}
 		*(unsigned char*)(statePtr + 0xb) = 1;
-		return;
 	}
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
@@ -2012,6 +2024,7 @@ void CMenuPcs::CalcResultCountAnim()
 	if (*(short*)(statePtr + 0x10) == 0 && frame >= maxValue + 10) {
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
 		*(short*)(statePtr + 0x10) = 1;
+		return;
 	}
 
 	if (*(short*)(statePtr + 0x10) != 0) {
@@ -2252,7 +2265,6 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
 		*(unsigned char*)(statePtr + 0xb) = 1;
-		return;
 	}
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
@@ -2345,6 +2357,7 @@ void CMenuPcs::DrawResultCloseAnim()
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int digitIndex = 0;
 	int nameIndex = 0;
+	int modelIndex = 0;
 	int lastTexturedKind = -1;
 
 	if (animPtr == 0 || statePtr == 0) {
@@ -2383,7 +2396,22 @@ void CMenuPcs::DrawResultCloseAnim()
 		} else if (sprite->kind == -4) {
 			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
 		} else if (sprite->kind == -2) {
-			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, GetBonusResultValueByActiveIndex(digitIndex++));
+			CCharaPcs::CHandle* handle = GetBonusResultOpenHandle(this, modelIndex);
+			if (handle != 0) {
+				SetProjection__8CMenuPcsFi(this, modelIndex);
+				SetLight__8CMenuPcsFi(this, 1);
+				unsigned int oldFlags = handle->m_flags;
+				handle->m_flags = 0x300543;
+				if (handle->m_model != 0) {
+					*(float*)((char*)handle->m_model + 0x9C) = alpha;
+				}
+				handle->Draw(5);
+				handle->m_flags = oldFlags;
+				RestoreProjection__8CMenuPcsFv(this);
+			} else {
+				DrawBonusCnt((CMenuPcs::Sprt2*)sprite, GetBonusResultValueByActiveIndex(digitIndex++));
+			}
+			modelIndex++;
 		} else if (sprite->kind == -1) {
 			if (font != 0) {
 				const char* partyName = GetBonusPartyNameByActiveIndex(nameIndex++);
@@ -2767,9 +2795,9 @@ void CMenuPcs::CalcSelectWait()
 		} else if ((down & 0x200) != 0) {
 			short winW = 0;
 			short winH = 0;
-			GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
+			GetWinSize__8CMenuPcsFiPsPsi(this, 0x18, &winW, &winH, 1);
 			SetMcWinInfo__8CMenuPcsFii(this, (int)winW, (int)winH);
-			promptMode = 1;
+			promptMode = 0;
 			confirmSel = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
 		}
@@ -2779,16 +2807,10 @@ void CMenuPcs::CalcSelectWait()
 			confirmSel = (short)(confirmSel ^ 1);
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else if ((down & 0x100) != 0) {
-			if (confirmSel == 0) {
-				promptMode = 2;
-				delay = 10;
-				Sound.PlaySe(2, 0x40, 0x7f, 0);
-			} else {
-				promptMode = 3;
-				Sound.PlaySe(3, 0x40, 0x7f, 0);
-			}
+			promptMode = 2;
+			Sound.PlaySe(2, 0x40, 0x7f, 0);
 		} else if ((down & 0x200) != 0) {
-			promptMode = 3;
+			promptMode = 2;
 			confirmSel = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
 		}
@@ -2898,12 +2920,11 @@ void CMenuPcs::CalcSelectCloseAnim()
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		*(short*)(statePtr + 0x22) = 0;
 		header->finished = 0;
-		if (header->count > 0 && sprites[header->count - 1].kind == 0x20) {
+		if (header->count > 0) {
 			header->count = (short)(header->count - 1);
 		}
 		PrepareSelectCloseSprites(header, sprites);
 		*(unsigned char*)(statePtr + 0xb) = 1;
-		return;
 	}
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
@@ -3069,6 +3090,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 
 	_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * alpha)};
 	const float corner = 8.0f;
+	const float texScale = 0.125f;
 	const float right = (x + w) - corner;
 	const float bottom = (y + h) - corner;
 	const float innerW = w - (corner * 2.0f);
@@ -3078,21 +3100,21 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1B);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, corner, corner, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, y, corner, corner, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, bottom, corner, corner, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, bottom, corner, corner, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, corner, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, y, corner, corner, corner, 0.0f, texScale, texScale, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, bottom, corner, corner, 0.0f, corner, texScale, texScale, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, bottom, corner, corner, corner, corner, texScale, texScale, 0.0f);
 
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1C);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, y, innerW, corner, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, y, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x22);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, bottom, innerW, corner, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, bottom, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1D);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y + corner, corner, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y + corner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x21);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, y + corner, corner, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, y + corner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1E);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, y + corner, innerW, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, y + corner, innerW, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 }
 
 /*

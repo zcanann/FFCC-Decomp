@@ -5,6 +5,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/itemobj.h"
 #include "ffcc/joybus.h"
 #include "ffcc/math.h"
@@ -12,6 +13,7 @@
 #include "ffcc/maphit.h"
 #include "ffcc/memorycard.h"
 #include "ffcc/mes.h"
+#include "ffcc/mesmenu.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_gba.h"
@@ -55,6 +57,8 @@ int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
 int GetPadType__6JoyBusFi(void*, int);
+unsigned int getNumFreeObject__13CFlatRuntime2Fi(void*, int);
+unsigned short GetButtonDown__4CPadFl(void*, long);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 int sprintf(char*, const char*, ...);
 unsigned char gMapHitDrawMode;
@@ -64,6 +68,11 @@ extern int gWmMenuWorkA;
 extern float FLOAT_80330b74;
 extern float FLOAT_80330b54;
 extern float FLOAT_80330b64;
+extern float FLOAT_80330B34;
+extern float FLOAT_80330B3C;
+extern float FLOAT_80330B50;
+extern float FLOAT_80330B54;
+extern float FLOAT_80330B58;
 
 static const char s_setMiniGameParamFmt[] = "SetMiniGameParam no 0x%04x data[%d]\n";
 static const char s_cflatDebugFileFmt[] = "cflat_d%d.bin";
@@ -118,6 +127,40 @@ static inline void StoreSetU8(CFlatRuntime::CStack* stack, int setMode, unsigned
     } else if (setMode == -1) {
         *value = static_cast<unsigned char>(*value - static_cast<unsigned char>(stack->m_word));
     }
+}
+
+static inline int ClampIndex(int index, int maxIndex)
+{
+    if (index < 0) {
+        return 0;
+    }
+    if (index > maxIndex) {
+        return maxIndex;
+    }
+    return index;
+}
+
+static inline void LerpVec(Vec& out, const Vec& a, const Vec& b, float t)
+{
+    out.x = a.x + (b.x - a.x) * t;
+    out.y = a.y + (b.y - a.y) * t;
+    out.z = a.z + (b.z - a.z) * t;
+}
+
+static inline void CatmullRomVec(Vec& out, const Vec& p0, const Vec& p1, const Vec& p2, const Vec& p3, float t)
+{
+    const float t2 = t * t;
+    const float t3 = t2 * t;
+
+    out.x = 0.5f * ((2.0f * p1.x) + (-p0.x + p2.x) * t +
+                    (2.0f * p0.x - 5.0f * p1.x + 4.0f * p2.x - p3.x) * t2 +
+                    (-p0.x + 3.0f * p1.x - 3.0f * p2.x + p3.x) * t3);
+    out.y = 0.5f * ((2.0f * p1.y) + (-p0.y + p2.y) * t +
+                    (2.0f * p0.y - 5.0f * p1.y + 4.0f * p2.y - p3.y) * t2 +
+                    (-p0.y + 3.0f * p1.y - 3.0f * p2.y + p3.y) * t3);
+    out.z = 0.5f * ((2.0f * p1.z) + (-p0.z + p2.z) * t +
+                    (2.0f * p0.z - 5.0f * p1.z + 4.0f * p2.z - p3.z) * t2 +
+                    (-p0.z + 3.0f * p1.z - 3.0f * p2.z + p3.z) * t3);
 }
 
 static inline unsigned int* GetGameWorkLinkTableWords(CGame::CGameWork& gameWork)
@@ -1045,6 +1088,20 @@ extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
     }
 
     return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9528
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void* _GetMesMenu__8CMenuPcsFi(void* menuPcs, int index)
+{
+    return *reinterpret_cast<void**>(reinterpret_cast<char*>(menuPcs) + 0x10C + index * 4);
 }
 
 /*
@@ -2174,6 +2231,20 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0xD2: {
+        char* savedNextScript = reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + 0x15CC);
+        if (*object->m_localBase == 0) {
+            CGame::CNextScript nextScript;
+            nextScript.m_flags = 0;
+            strcpy(nextScript.m_name, savedNextScript);
+            Game.SetNextScript(&nextScript);
+        } else {
+            memset(savedNextScript, 0, 0x100);
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0xD1:
         Sound.CrossPlayBgm(*object->m_localBase, object->m_localBase[1]);
         runtime->push(object, 0);
@@ -2861,6 +2932,11 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0x76:
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1298) = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0x75:
         SetTempValue__4CMesFii(*object->m_localBase, object->m_localBase[1]);
         runtime->push(object, 0);
@@ -2892,6 +2968,11 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0x70:
         Game.m_gameWork.m_timerA = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x6F:
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Game.m_gameWork) + 8) = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -3124,6 +3205,23 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0x4D: {
+        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, *object->m_localBase);
+        if (mesMenu == 0) {
+            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+            }
+            runtime->push(object, 0);
+            outResult = 0;
+            return;
+        }
+        if (IsUse__8CMesMenuFv(mesMenu) == 0) {
+            runtime->push(object, 0);
+            outResult = 0;
+            return;
+        }
+        return;
+    }
     case -0x4C: {
         _GXColor color = {
             static_cast<u8>(object->m_localBase[2]),
@@ -3152,6 +3250,66 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0x48: {
+        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, *object->m_localBase);
+        if (mesMenu == 0) {
+            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+            }
+            runtime->push(object, 0);
+        } else {
+            runtime->push(object, GetErrorLevel__7CSystemFv(mesMenu, object->m_localBase[1]));
+        }
+        outResult = 0;
+        return;
+    }
+    case -0x47: {
+        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, *object->m_localBase);
+        if (mesMenu == 0) {
+            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+            }
+        } else {
+            GetMes__9CFlatDataFi(mesMenu, object->m_localBase[1], object->m_localBase[2]);
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x46: {
+        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, *object->m_localBase);
+        if (mesMenu == 0) {
+            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+            }
+        } else {
+            reinterpret_cast<CMesMenu*>(mesMenu)->CloseRequest(1);
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x45: {
+        unsigned int* localBase = object->m_localBase;
+        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, localBase[0]);
+        if (mesMenu == 0) {
+            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", localBase[0]);
+            }
+        } else {
+            char* message;
+            if ((localBase[3] & 0x80) == 0) {
+                message = reinterpret_cast<char*>(GetSysMes__5CGameFi(reinterpret_cast<u8*>(this) + 0xCF20, localBase[7]));
+            } else {
+                message = GetNumSysMes__5CGameFv(&Game, localBase[7]);
+            }
+            reinterpret_cast<CMesMenu*>(mesMenu)->Open(
+                message, localBase[1], localBase[2], localBase[3], localBase[4], localBase[5], localBase[6]);
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x44:
         PartMng.pppShowSlot(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]));
         runtime->push(object, 0);
@@ -3165,6 +3323,63 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -0x42: {
         const int padType = GetPadType__6JoyBusFi(&Joybus, *object->m_localBase);
         runtime->push(object, (0x40U - padType | padType - 0x40U) >> 31);
+        outResult = 0;
+        return;
+    }
+    case -0x41: {
+        const unsigned int* localBase = object->m_localBase;
+        float alpha = static_cast<float>(static_cast<int>(localBase[1])) /
+                      static_cast<float>(static_cast<int>(localBase[2]));
+        Quaternion start = {static_cast<float>(localBase[3]), static_cast<float>(localBase[4]),
+                            static_cast<float>(localBase[5]), static_cast<float>(localBase[6])};
+        Quaternion end = {static_cast<float>(localBase[7]), static_cast<float>(localBase[8]),
+                          static_cast<float>(localBase[9]), static_cast<float>(localBase[10])};
+        Quaternion rotation;
+
+        switch (*localBase & 3) {
+        case 3:
+            alpha = -((FLOAT_80330B3C * (FLOAT_80330B34 + sinf(FLOAT_80330B54 * alpha + FLOAT_80330B50))) -
+                      FLOAT_80330B34);
+            break;
+        case 1:
+            alpha = FLOAT_80330B34 + sinf(FLOAT_80330B50 * alpha + FLOAT_80330B58);
+            break;
+        case 2:
+            alpha = sinf(FLOAT_80330B50 * alpha);
+            break;
+        default:
+            break;
+        }
+
+        C_QUATSlerp(&start, &end, &rotation, alpha);
+        *reinterpret_cast<float*>(localBase[11]) = rotation.x;
+        *reinterpret_cast<float*>(localBase[12]) = rotation.y;
+        *reinterpret_cast<float*>(localBase[13]) = rotation.z;
+        *reinterpret_cast<float*>(localBase[14]) = rotation.w;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x40: {
+        float* values = reinterpret_cast<float*>(object->m_localBase);
+        Quaternion rotation = {values[0], values[1], values[2], values[3]};
+        Mtx matrix;
+        PSMTXQuat(matrix, &rotation);
+        CameraPcs.SetWorldMapMatrix(matrix);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x3F: {
+        Mtx matrix;
+        Quaternion rotation;
+        CameraPcs.GetWorldMapMatrix(matrix);
+        C_QUATMtx(&rotation, matrix);
+        *reinterpret_cast<float*>(object->m_localBase[0]) = rotation.x;
+        *reinterpret_cast<float*>(object->m_localBase[1]) = rotation.y;
+        *reinterpret_cast<float*>(object->m_localBase[2]) = rotation.z;
+        *reinterpret_cast<float*>(object->m_localBase[3]) = rotation.w;
+        runtime->push(object, 0);
         outResult = 0;
         return;
     }
@@ -3232,6 +3447,54 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400));
         outResult = 0;
         return;
+    case -0x34: {
+        Vec axis = {cosf(static_cast<float>(object->m_localBase[1])), 0.0f,
+                    sinf(static_cast<float>(object->m_localBase[1]))};
+        Mtx matrix;
+        Mtx rotation;
+
+        CameraPcs.GetWorldMapMatrix(matrix);
+        if (*object->m_localBase != 0) {
+            PSMTXIdentity(matrix);
+        }
+
+        PSMTXRotAxisRad(rotation, &axis, static_cast<float>(object->m_localBase[2]));
+        PSMTXConcat(rotation, matrix, matrix);
+
+        axis.x = 0.0f;
+        axis.y = 1.0f;
+        axis.z = 0.0f;
+        PSMTXRotAxisRad(rotation, &axis, static_cast<float>(object->m_localBase[3]));
+        PSMTXConcat(rotation, matrix, matrix);
+        CameraPcs.SetWorldMapMatrix(matrix);
+
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x33: {
+        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicsPcs);
+        *reinterpret_cast<int*>(graphicsPcs + 0x6C) = *object->m_localBase;
+        *reinterpret_cast<int*>(graphicsPcs + 0x70) = 0;
+        graphicsPcs[0x64] = static_cast<u8>(object->m_localBase[1]);
+        graphicsPcs[0x65] = static_cast<u8>(object->m_localBase[2]);
+        graphicsPcs[0x66] = static_cast<u8>(object->m_localBase[3]);
+        graphicsPcs[0x67] = 0xFF;
+        *reinterpret_cast<int*>(graphicsPcs + 0x5C) = object->m_localBase[4];
+        *reinterpret_cast<int*>(graphicsPcs + 0x60) = *reinterpret_cast<int*>(graphicsPcs + 0x5C);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x32: {
+        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicsPcs);
+        *reinterpret_cast<int*>(graphicsPcs + 0x98) = *object->m_localBase;
+        *reinterpret_cast<int*>(graphicsPcs + 0x88) = object->m_localBase[1];
+        *reinterpret_cast<int*>(graphicsPcs + 0x8C) = *reinterpret_cast<int*>(graphicsPcs + 0x88);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x31:
         CGItemObj::DeleteAllFieldItem();
         runtime->push(object, 0);
@@ -3298,6 +3561,258 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0x28:
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C08 + *object->m_localBase * 0xB14) =
+            *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x27: {
+        if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x129C) & 0x100000) != 0) {
+            Mtx viewMtx;
+            Mtx drawMtx;
+            CameraPcs.GetViewMatrix(viewMtx);
+
+            _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+            GXSetZCompLoc(GX_FALSE);
+            _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
+            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+            GXSetCullMode(GX_CULL_FRONT);
+            GXSetNumTevStages(1);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+            GXSetNumChans(1);
+            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+            GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+            GXClearVtxDesc();
+            GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+
+            const float radius = static_cast<float>(object->m_localBase[3]);
+            PSMTXScale(drawMtx, radius, radius, radius);
+            const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+            drawMtx[0][3] = localFloats[0];
+            drawMtx[1][3] = localFloats[1];
+            drawMtx[2][3] = localFloats[2];
+            PSMTXConcat(viewMtx, drawMtx, drawMtx);
+            GXLoadPosMtxImm(drawMtx, GX_PNMTX0);
+
+            GXColor color = {
+                static_cast<u8>(object->m_localBase[4]),
+                static_cast<u8>(object->m_localBase[5]),
+                static_cast<u8>(object->m_localBase[6]),
+                0xFF,
+            };
+            GXSetChanMatColor(GX_COLOR0A0, color);
+            Graphic.DrawSphere();
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x26:
+        runtime->push(
+            object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x26EC + *object->m_localBase * 0xB14));
+        outResult = 0;
+        return;
+    case -0x25: {
+        Vec target = {
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+            static_cast<float>(object->m_localBase[3]),
+        };
+        CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
+        unsigned long segment = 0;
+        float segmentRatio = 0.0f;
+        float distance = 0.0f;
+
+        if (line->Calc((Vec*)0, (float*)0, &segment, &segmentRatio, &target, 0.0f) != 0) {
+            distance = line->m_segments[segment].length * segmentRatio + line->m_segments[segment].startLength;
+        }
+
+        *reinterpret_cast<float*>(object->m_localBase[4]) = distance;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x24: {
+        const float distance = static_cast<float>(object->m_localBase[1]);
+        CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
+        Vec direction = {0.0f, 0.0f, 0.0f};
+
+        if (line->m_numPoints > 1) {
+            if (distance < 0.0f) {
+                direction = line->m_segments[0].normal;
+            } else if (distance >= line->m_totalLength) {
+                direction = line->m_segments[line->m_numPoints - 2].normal;
+            } else {
+                for (unsigned int i = 0; i + 1 < line->m_numPoints; i++) {
+                    CLineSegment64& segment = line->m_segments[i];
+                    if (segment.startLength <= distance && distance < segment.startLength + segment.length) {
+                        direction = segment.normal;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (object->m_localBase[2] == 0) {
+            direction.x = -direction.x;
+            direction.y = -direction.y;
+            direction.z = -direction.z;
+        }
+
+        *reinterpret_cast<float*>(object->m_localBase[3]) = direction.x;
+        *reinterpret_cast<float*>(object->m_localBase[4]) = direction.y;
+        *reinterpret_cast<float*>(object->m_localBase[5]) = direction.z;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x23: {
+        const float distance = static_cast<float>(object->m_localBase[1]);
+        CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
+        Vec position = {0.0f, 0.0f, 0.0f};
+
+        if (line->m_numPoints > 0) {
+            if (distance < 0.0f || line->m_numPoints == 1) {
+                position = line->m_points[0];
+            } else if (distance >= line->m_totalLength) {
+                position = line->m_points[line->m_numPoints - 1];
+            } else {
+                for (unsigned int i = 0; i + 1 < line->m_numPoints; i++) {
+                    CLineSegment64& segment = line->m_segments[i];
+                    if (segment.startLength <= distance && distance < segment.startLength + segment.length) {
+                        const float t = (distance - segment.startLength) / segment.length;
+                        position.x = line->m_points[i].x + (line->m_points[i + 1].x - line->m_points[i].x) * t;
+                        position.y = line->m_points[i].y + (line->m_points[i + 1].y - line->m_points[i].y) * t;
+                        position.z = line->m_points[i].z + (line->m_points[i + 1].z - line->m_points[i].z) * t;
+                        break;
+                    }
+                }
+            }
+        }
+
+        *reinterpret_cast<float*>(object->m_localBase[2]) = position.x;
+        *reinterpret_cast<float*>(object->m_localBase[3]) = position.y;
+        *reinterpret_cast<float*>(object->m_localBase[4]) = position.z;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x22: {
+        const unsigned int mask = *object->m_localBase;
+        Vec target = {
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+            static_cast<float>(object->m_localBase[3]),
+        };
+        const float margin = static_cast<float>(object->m_localBase[4]);
+        int found = 0;
+        unsigned int bestLine = 0;
+        float bestDistance = kLineBoundsInitMin;
+        float bestLineDistance = 0.0f;
+
+        for (unsigned int i = 0; i < 0x10; i++) {
+            CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + i * 0xB14);
+            const unsigned int lineMask = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(line) + 0x2C);
+            if (line->m_numPoints == 0 || (lineMask & mask) == 0 || line->IsInner(&target, margin) == 0) {
+                continue;
+            }
+
+            unsigned long segment = 0;
+            float segmentRatio = 0.0f;
+            float nearestDistance = 0.0f;
+            if (line->Calc((Vec*)0, &nearestDistance, &segment, &segmentRatio, &target, margin) != 0 &&
+                nearestDistance < bestDistance) {
+                found = 1;
+                bestLine = i;
+                bestDistance = nearestDistance;
+                bestLineDistance = line->m_segments[segment].length * segmentRatio + line->m_segments[segment].startLength;
+            }
+        }
+
+        if (found != 0) {
+            *reinterpret_cast<unsigned int*>(object->m_localBase[5]) = bestLine;
+            *reinterpret_cast<float*>(object->m_localBase[6]) = bestLineDistance;
+            *reinterpret_cast<unsigned int*>(object->m_localBase[7]) =
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x26EC + bestLine * 0xB14);
+        }
+
+        runtime->push(object, found);
+        outResult = 0;
+        return;
+    }
+    case -0x21: {
+        const float yaw = static_cast<float>(object->m_localBase[5]);
+        const float pitch = static_cast<float>(object->m_localBase[6]);
+        const float sinYaw = sinf(yaw);
+        const float cosYaw = cosf(yaw);
+        const float sinPitch = sinf(pitch);
+        const float cosPitch = cosf(pitch);
+        Vec direction = {-sinYaw * cosPitch, -sinPitch, -cosYaw * cosPitch};
+        _GXColor color = {
+            static_cast<u8>(object->m_localBase[2]),
+            static_cast<u8>(object->m_localBase[3]),
+            static_cast<u8>(object->m_localBase[4]),
+            0xFF,
+        };
+
+        SetDiffuse__9CCharaPcsFiUlP8_GXColorP3Vec(
+            &CharaPcs, *object->m_localBase, object->m_localBase[1], &color, &direction);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x20: {
+        _GXColor color = {
+            static_cast<u8>(object->m_localBase[1]),
+            static_cast<u8>(object->m_localBase[2]),
+            static_cast<u8>(object->m_localBase[3]),
+            0xFF,
+        };
+        SetAmbient__9CCharaPcsFiP8_GXColor(&CharaPcs, *object->m_localBase, &color);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x1F:
+        if (*object->m_localBase < 0x10) {
+            const int lineOffset = *object->m_localBase * 0xB14;
+            unsigned int* pointCount = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1BF4 + lineOffset);
+            if (*pointCount < 0x40) {
+                const unsigned int pointOffset = *pointCount * 0xC + lineOffset;
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C0C + pointOffset) =
+                    object->m_localBase[1];
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C10 + pointOffset) =
+                    object->m_localBase[2];
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C14 + pointOffset) =
+                    object->m_localBase[3];
+                *pointCount = *pointCount + 1;
+                CalcBound__9CLine(reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + lineOffset));
+            }
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x1E:
+        if (*object->m_localBase < 0x10) {
+            const int lineOffset = *object->m_localBase * 0xB14;
+            *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1BF4 + lineOffset) = 0;
+            *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C08 + lineOffset) = object->m_localBase[1];
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x1D:
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0x1C:
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x129C) = *object->m_localBase;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -0x1B: {
         Vec position = {
             static_cast<float>(object->m_localBase[2]),
@@ -3306,6 +3821,108 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         };
         this->PutParticle((*object->m_localBase << 8) | object->m_localBase[1], position,
             static_cast<float>(object->m_localBase[5]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x1A: {
+        const unsigned int mode = *object->m_localBase;
+        const int pointCount = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x17D4);
+        Vec result = {0.0f, 0.0f, 0.0f};
+
+        if (pointCount > 0 && object->m_localBase[2] != 0) {
+            float t = static_cast<float>(static_cast<int>(object->m_localBase[1])) /
+                      static_cast<float>(static_cast<int>(object->m_localBase[2]));
+
+            switch (mode & 3) {
+            case 3:
+                t = -((FLOAT_80330B3C * (FLOAT_80330B34 + sinf(FLOAT_80330B54 * t + FLOAT_80330B50))) -
+                      FLOAT_80330B34);
+                break;
+            case 1:
+                t = FLOAT_80330B34 + sinf(FLOAT_80330B50 * t + FLOAT_80330B58);
+                break;
+            case 2:
+                t = sinf(FLOAT_80330B50 * t);
+                break;
+            default:
+                break;
+            }
+
+            if ((mode & 4) == 0) {
+                const float totalDistance = *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17D8);
+                const float pathDistance = totalDistance * t;
+
+                result = *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0);
+                for (int i = 0; i + 1 < pointCount; i++) {
+                    const float startDistance =
+                        *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17DC + i * 0x10);
+                    const float endDistance =
+                        *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17DC + (i + 1) * 0x10);
+                    if (startDistance <= pathDistance && pathDistance <= endDistance) {
+                        float segmentT = 0.0f;
+                        if (endDistance != startDistance) {
+                            segmentT = (pathDistance - startDistance) / (endDistance - startDistance);
+                        }
+                        const Vec& startPoint = *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + i * 0x10);
+                        const Vec& endPoint =
+                            *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + (i + 1) * 0x10);
+                        LerpVec(result, startPoint, endPoint, segmentT);
+                        break;
+                    }
+                }
+            } else {
+                const int maxIndex = pointCount - 1;
+                float scaled = t * static_cast<float>(pointCount - 1);
+                int baseIndex = static_cast<int>(scaled);
+                float segmentT = scaled - static_cast<float>(baseIndex);
+
+                if (baseIndex >= maxIndex) {
+                    baseIndex = maxIndex;
+                    segmentT = 0.0f;
+                }
+
+                const Vec& p0 =
+                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex - 1, maxIndex) * 0x10);
+                const Vec& p1 =
+                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex, maxIndex) * 0x10);
+                const Vec& p2 =
+                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex + 1, maxIndex) * 0x10);
+                const Vec& p3 =
+                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex + 2, maxIndex) * 0x10);
+                CatmullRomVec(result, p0, p1, p2, p3, segmentT);
+            }
+        }
+
+        *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
+        *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
+        *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x19: {
+        int* pointCount = reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x17D4);
+        float* totalDistance = reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17D8);
+        if (*pointCount < 0x40) {
+            if (*object->m_localBase != 0) {
+                *pointCount = 0;
+                *totalDistance = 0.0f;
+            }
+
+            Vec* point = reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + *pointCount * 0x10);
+            point->x = static_cast<float>(object->m_localBase[1]);
+            point->y = static_cast<float>(object->m_localBase[2]);
+            point->z = static_cast<float>(object->m_localBase[3]);
+
+            if (*pointCount != 0) {
+                Vec* previous = reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + (*pointCount - 1) * 0x10);
+                *totalDistance += PSVECDistance(point, previous);
+            }
+
+            *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17DC + *pointCount * 0x10) = *totalDistance;
+            *pointCount = *pointCount + 1;
+        }
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -3326,6 +3943,15 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         strcpy(nextScript.m_name, strBlob + strOffs[*object->m_localBase]);
         Game.SetNextScript(&nextScript);
         runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x15: {
+        float value = static_cast<float>(*object->m_localBase);
+        if (value < 0.0f) {
+            value = -value;
+        }
+        runtime->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
         return;
     }
@@ -3361,12 +3987,212 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -0x11: {
+        float value = Math.RandFPM(static_cast<float>(*object->m_localBase));
+        runtime->push(object, *reinterpret_cast<int*>(&value));
+        outResult = 0;
+        return;
+    }
     case -0x10:
         runtime->push(object, Math.RandPM(*object->m_localBase));
         outResult = 0;
         return;
+    case -0x0F: {
+        float value = Math.RandF(static_cast<float>(*object->m_localBase));
+        runtime->push(object, *reinterpret_cast<int*>(&value));
+        outResult = 0;
+        return;
+    }
     case -0x0E:
         runtime->push(object, Math.Rand(*object->m_localBase));
+        outResult = 0;
+        return;
+    case -0x0D: {
+        float* values = reinterpret_cast<float*>(object->m_localBase);
+        Vec a = {values[0], values[1], values[2]};
+        Vec b = {values[3], values[4], values[5]};
+        float value = PSVECDistance(&a, &b);
+        runtime->push(object, *reinterpret_cast<int*>(&value));
+        outResult = 0;
+        return;
+    }
+    case -0x0C: {
+        unsigned short buttons = 0;
+        if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
+            buttons = GetButtonRepeat__4CPadFl(&Pad, *object->m_localBase);
+        }
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
+            buttons &= 0xF3FF;
+        }
+        runtime->push(object, static_cast<short>(buttons));
+        outResult = 0;
+        return;
+    }
+    case -0x0B: {
+        unsigned short buttons = 0;
+        if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
+            buttons = GetButtonDown__4CPadFl(&Pad, *object->m_localBase);
+        }
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
+            buttons &= 0xF3FF;
+        }
+        runtime->push(object, static_cast<short>(buttons));
+        outResult = 0;
+        return;
+    }
+    case -10: {
+        float value = atan2__3stdFff(static_cast<float>(*object->m_localBase),
+                                     static_cast<float>(object->m_localBase[1]));
+        runtime->push(object, *reinterpret_cast<int*>(&value));
+        outResult = 0;
+        return;
+    }
+    case -9:
+        Game.ChangeMap(*object->m_localBase, object->m_localBase[1], 0, 1);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -8: {
+        const unsigned int x = object->m_localBase[0];
+        const unsigned int y = object->m_localBase[1];
+        char* format = strBlob + strOffs[object->m_localBase[2]];
+
+        if (object->m_argCount == 3) {
+            Graphic.Printf(x, y, format);
+        } else {
+            char spec[256];
+            char rendered[256];
+            char line[264];
+            line[0] = '\0';
+
+            for (int i = 0; i < object->m_argCount - 3; i++) {
+                while (true) {
+                    int specLen = 0;
+                    while ((format[specLen] != '\0') && ((specLen == 0) || (format[specLen] != '%'))) {
+                        spec[specLen] = format[specLen];
+                        specLen++;
+                    }
+                    spec[specLen] = '\0';
+                    format += specLen;
+
+                    if (spec[0] == '%') {
+                        break;
+                    }
+                    strcat(line, spec, sizeof(line));
+                }
+
+                rendered[0] = '\0';
+                const int argIndex = i + 3;
+                char* scan = spec + 1;
+                if (spec[0] == '%') {
+                    int fmtIndex = 1;
+                    int width = 0;
+                    int started = spec[1] == '0';
+                    for (; (*scan >= '0') && (*scan <= '9'); scan++) {
+                        fmtIndex++;
+                        width = width * 10 + (*scan - '0');
+                    }
+
+                    if (spec[fmtIndex] == 'b') {
+                        char* out = rendered;
+                        unsigned int value = object->m_localBase[argIndex];
+                        int outLen = 0;
+                        for (int bit = 0; bit < width; bit++) {
+                            const unsigned int cur = (value >> ((width - bit) - 1U)) & 1U;
+                            if (started == 0 && cur != 0) {
+                                started = 1;
+                            }
+                            if (started != 0) {
+                                *out++ = static_cast<char>(cur + '0');
+                                outLen++;
+                            }
+                        }
+                        rendered[outLen] = '\0';
+                        strcat(rendered, spec + fmtIndex + 1, sizeof(rendered));
+                    } else {
+                        while (*scan != '\0') {
+                            switch (*scan) {
+                            case 'd':
+                            case 'x':
+                                sprintf(rendered, spec, object->m_localBase[argIndex]);
+                                scan = const_cast<char*>("");
+                                break;
+                            case 'f': {
+                                union {
+                                    unsigned int word;
+                                    float value;
+                                } arg;
+                                arg.word = object->m_localBase[argIndex];
+                                sprintf(rendered, spec, static_cast<double>(arg.value));
+                                scan = const_cast<char*>("");
+                                break;
+                            }
+                            case 's':
+                                sprintf(rendered, spec, strBlob + strOffs[object->m_localBase[argIndex]]);
+                                scan = const_cast<char*>("");
+                                break;
+                            default:
+                                scan++;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                strcat(line, rendered, sizeof(line));
+            }
+
+            Graphic.Printf(x, y, line);
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -7: {
+        float value = cosf(static_cast<float>(*object->m_localBase));
+        runtime->push(object, *reinterpret_cast<int*>(&value));
+        outResult = 0;
+        return;
+    }
+    case -6: {
+        float value = sinf(static_cast<float>(*object->m_localBase));
+        runtime->push(object, *reinterpret_cast<int*>(&value));
+        outResult = 0;
+        return;
+    }
+    case -5: {
+        unsigned short buttons = 0;
+        if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
+            buttons = GetButton__4CPadFl(&Pad, *object->m_localBase);
+        }
+        if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
+            buttons &= 0xF3FF;
+        }
+        runtime->push(object, static_cast<short>(buttons));
+        outResult = 0;
+        return;
+    }
+    case -4:
+        if (CameraPcs.IsAbsolute() != 0) {
+            Vec refPosition = {
+                static_cast<float>(object->m_localBase[0]),
+                static_cast<float>(object->m_localBase[1]),
+                static_cast<float>(object->m_localBase[2]),
+            };
+            Vec position = {
+                static_cast<float>(object->m_localBase[3]),
+                static_cast<float>(object->m_localBase[4]),
+                static_cast<float>(object->m_localBase[5]),
+            };
+            CameraPcs.SetRefPosition(&refPosition);
+            CameraPcs.SetPosition(&position);
+            CameraPcs.SetFromScript();
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -3:
+        runtime->push(object, getNumFreeObject__13CFlatRuntime2Fi(this, 5));
         outResult = 0;
         return;
     default:

@@ -149,6 +149,11 @@ static inline CChara::CNode* ModelNodes(CChara::CModel* model)
 	return *reinterpret_cast<CChara::CNode**>(ModelRaw(model) + 0xA8);
 }
 
+static inline void* ModelBank(CChara::CModel* model)
+{
+	return *reinterpret_cast<void**>(reinterpret_cast<u8*>(ModelRef(model)) + 0x14);
+}
+
 static inline float (*ModelDrawMtx(CChara::CModel* model))[4]
 {
 	return reinterpret_cast<float(*)[4]>(ModelRaw(model) + 0x08);
@@ -379,6 +384,16 @@ static inline s16 NodeParentIndex(CChara::CNode* node)
 	return *reinterpret_cast<s16*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x68);
 }
 
+static inline u8 NodeChildCount(CChara::CNode* node)
+{
+	return *(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x6A);
+}
+
+static inline u16 NodeChildBankOffset(CChara::CNode* node)
+{
+	return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x6C);
+}
+
 static inline u8 NodeUsesParentLenX(CChara::CNode* node)
 {
 	return *(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x6E);
@@ -573,6 +588,29 @@ static void CopyDuplicatedNodeState(CChara::CNode* dst, CChara::CNode* src)
 	NodeAnimNode0(dst) = 0;
 	NodeAnimNode1(dst) = 0;
 	NodeRuntimeFlags(dst) = (NodeRuntimeFlags(dst) & 0x7F) | (NodeRuntimeFlags(src) & 0x80);
+}
+
+static void CalcOneBindNode(CChara::CNode* node, CChara::CModel* model)
+{
+	void* ref = *reinterpret_cast<void**>(node);
+	s16 parent = NodeParentIndex(node);
+	if (parent < 0) {
+		PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(ref) + 0xC),
+		          reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(ref) + 0x3C));
+	} else {
+		CChara::CNode* parentNode = ModelNodes(model) + parent;
+		PSMTXConcat(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(parentNode)) + 0x3C),
+		            reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(ref) + 0xC),
+		            reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(ref) + 0x3C));
+	}
+	PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(ref) + 0x3C), NodeWorldMtx(node));
+}
+
+static CChara::CNode* GetBindChildNode(CChara::CModel* model, CChara::CNode* node, int childIndex)
+{
+	u8* bank = reinterpret_cast<u8*>(ModelBank(model));
+	u16 nodeIndex = *reinterpret_cast<u16*>(bank + NodeChildBankOffset(node) + childIndex * 2);
+	return ModelNodes(model) + nodeIndex;
 }
 
 static void CopyDuplicatedMeshState(CChara::CMesh* dst, CChara::CMesh* src)
@@ -2384,17 +2422,12 @@ void CChara::CNode::Duplicate(CChara::CNode* src, CMemory::CStage* stage)
  */
 void CChara::CNode::CalcBind(CChara::CModel* model)
 {
-	void* ref = *(void**)this;
-	s16 parent = *(s16*)((u8*)ref + 0x68);
-	if (parent < 0) {
-		PSMTXCopy((float(*)[4])((u8*)ref + 0xC), (float(*)[4])((u8*)ref + 0x3C));
-	} else {
-		CNode* nodes = *(CNode**)((u8*)model + 0xA8);
-		CNode* parentNode = (CNode*)((u8*)nodes + (parent * 0xC0));
-		PSMTXConcat((float(*)[4])((u8*)*(void**)parentNode + 0x3C), (float(*)[4])((u8*)ref + 0xC),
-		            (float(*)[4])((u8*)ref + 0x3C));
+	CalcOneBindNode(this, model);
+
+	u8 childCount = NodeChildCount(this);
+	for (int i = 0; i < childCount; i++) {
+		GetBindChildNode(model, this, i)->CalcBind(model);
 	}
-	PSMTXCopy((float(*)[4])((u8*)ref + 0x3C), (float(*)[4])((u8*)this + 0x44));
 }
 
 /*

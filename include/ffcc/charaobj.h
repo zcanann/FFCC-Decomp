@@ -74,7 +74,7 @@ public:
 	void statDamage();
 	void statButtobi();
 	void onChangePrg(int);
-	void calcCastTime(int);
+	int calcCastTime(int);
 	void onDrawDebug(CFont*, float, float&, float);
 	void addSe(int);
 	void seDamageDelete();

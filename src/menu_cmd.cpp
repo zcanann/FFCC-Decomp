@@ -62,12 +62,16 @@ static const float FLOAT_80332b3c = 0.75f;
 static const float FLOAT_80332acc = 255.0f;
 static const float FLOAT_80332ad8 = 0.8999999761581421f;
 static const float FLOAT_80332ae8 = 4.0f;
+static const float FLOAT_80332aec = 96.0f;
+static const float FLOAT_80332af0 = 8.0f;
 static const float FLOAT_80332b08 = 320.0f;
 static const float FLOAT_80332b10 = 72.0f;
 static const float FLOAT_80332b14 = 12.0f;
 static const float FLOAT_80332b18 = 24.0f;
 static const float FLOAT_80332b28 = 352.0f;
+static const double DOUBLE_80332ae0 = 0.125;
 static const double DOUBLE_80332af8 = 19.8;
+static const double DOUBLE_80332b00 = 16.0;
 static const double DOUBLE_80332b20 = 16.0;
 s32 DAT_8032eec8;
 s32 s_UniteTop[3];
@@ -150,6 +154,58 @@ static const char* const s_SpanishStrikeNames[] = {
     "",
     0,
 };
+
+static const char* GetLocalizedStrikeName(int itemId)
+{
+	int idx = -1;
+	if (itemId == 0x207) {
+		idx = 0;
+	} else if (itemId == 0x20B) {
+		idx = 1;
+	} else if (itemId == 0x20F) {
+		idx = 2;
+	} else if (itemId == 0x222) {
+		idx = 3;
+	} else if (itemId == 0x227) {
+		idx = 4;
+	}
+
+	if (idx < 0) {
+		return 0;
+	}
+
+	const char* const* names = s_FlameStrikeNames;
+	switch (Game.m_gameWork.m_languageId) {
+	case 2:
+		names = s_GermanStrikeNames;
+		break;
+	case 3:
+		names = s_ItalianStrikeNames;
+		break;
+	case 4:
+		names = s_FrenchStrikeNames;
+		break;
+	case 5:
+		names = s_SpanishStrikeNames;
+		break;
+	default:
+		break;
+	}
+
+	return names[idx];
+}
+
+static const char* GetUniteListName(int itemId)
+{
+	const char* localized = GetLocalizedStrikeName(itemId);
+	if (localized != 0 && localized[0] != '\0') {
+		return localized;
+	}
+
+	const char** flatText = *reinterpret_cast<const char***>(
+		reinterpret_cast<u8*>(&Game.m_cFlatDataArr[1]) + 0x70);
+	return flatText[itemId * 5 + 4];
+}
 
 struct MenuCmdMembers {
 	unsigned char pad_0000[0xF8];
@@ -2174,6 +2230,8 @@ void CMenuPcs::DrawUniteList()
 	}
 
 	DrawInit__8CMenuPcsFv(this);
+	DAT_8032eec8 = 0;
+	s16* const unitePanels = list + list[1] * 0x20 + 4;
 	for (s32 i = 0; i < 8; i++) {
 		if (i >= foodCount) {
 			break;
@@ -2196,10 +2254,106 @@ void CMenuPcs::DrawUniteList()
 			}
 		}
 
-		if (DAT_8032eec8 < 3) {
-			s_UniteTop[DAT_8032eec8] = i;
-			DAT_8032eec8++;
+		if (DAT_8032eec8 >= 3) {
+			continue;
 		}
+
+		const s32 labelAnchor = (i == selected) ? i + 1 : i;
+		s16* const endEntry = list + (i + groupSize - 1) * 0x20 + 4;
+		s16* const anchorEntry = list + labelAnchor * 0x20 + 4;
+		s16* const startEntry = list + i * 0x20 + 4;
+		const bool active = (i <= selected) && (selected < i + groupSize);
+		const float panelX = static_cast<float>(topX * 2 - anchorEntry[0]);
+		const float panelY = (static_cast<float>(endEntry[2] + endEntry[3] - startEntry[2]) -
+		                      FLOAT_80332ac8) * static_cast<float>(DOUBLE_80332a60) +
+		                     static_cast<float>(startEntry[1]);
+		const float panelTone = active ? FLOAT_80332ac8 : FLOAT_80332ab0;
+		float panelAlpha;
+		if (cmd[0x30 / 2] == 3) {
+			panelAlpha = *reinterpret_cast<float*>(startEntry + 8);
+		} else {
+			panelAlpha = static_cast<float>(
+				fabs(static_cast<double>(panelX - static_cast<float>(topX))) * DOUBLE_80332ae0);
+		}
+
+		GXColor color;
+		color.r = 0xFF;
+		color.g = 0xFF;
+		color.b = 0xFF;
+		color.a = static_cast<u8>(FLOAT_80332acc * panelAlpha);
+		GXSetChanMatColor((_GXChannelID)4, color);
+
+		s16* const panel = unitePanels + DAT_8032eec8 * 0x20;
+		panel[0] = static_cast<s16>(panelX);
+		panel[1] = static_cast<s16>(panelY);
+		panel[2] = static_cast<s16>(FLOAT_80332aec);
+		panel[3] = static_cast<s16>(FLOAT_80332ac8);
+		*reinterpret_cast<float*>(panel + 4) = FLOAT_80332ab0;
+		*reinterpret_cast<float*>(panel + 6) = panelTone;
+		*reinterpret_cast<float*>(panel + 8) = panelAlpha;
+		s_UniteTop[DAT_8032eec8] = i;
+		DAT_8032eec8++;
+
+		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x38);
+		DrawRect__8CMenuPcsFUlfffffffff(this, 0,
+			panelX,
+			panelY - FLOAT_80332af0,
+			FLOAT_80332aec,
+			FLOAT_80332ac8,
+			FLOAT_80332af0,
+			panelTone,
+			FLOAT_80332a70,
+			FLOAT_80332a70,
+			FLOAT_80332a70);
+	}
+
+	font->SetMargin(FLOAT_80332a70);
+	font->SetShadow(1);
+	font->SetScale(FLOAT_80332a70);
+	font->DrawInit();
+	font->SetTlut(6);
+
+	for (s32 i = 0; i < DAT_8032eec8; i++) {
+		s16* const panel = unitePanels + i * 0x20;
+		const float alpha = (cmd[0x30 / 2] == 3) ? FLOAT_80332a70 : *reinterpret_cast<float*>(panel + 8);
+		GXColor color;
+		color.r = 0xFF;
+		color.g = 0xFF;
+		color.b = 0xFF;
+		color.a = static_cast<u8>(FLOAT_80332acc * alpha);
+		font->SetColor(color);
+
+		const int itemId = *reinterpret_cast<const s16*>(caravanWork + s_UniteTop[i] * 2 + 0x214);
+		const char* text = GetUniteListName(itemId);
+		const float width = static_cast<float>(font->GetWidth(text));
+		font->SetPosX((static_cast<float>(panel[2]) - width) *
+		                  static_cast<float>(DOUBLE_80332a60) +
+		              static_cast<float>(panel[0]));
+		font->SetPosY(((static_cast<float>(panel[3]) - static_cast<float>(DOUBLE_80332af8)) *
+		                   static_cast<float>(DOUBLE_80332a60) +
+		               static_cast<float>(panel[1])) -
+		              FLOAT_80332ae8 - static_cast<float>(DOUBLE_80332b00));
+		font->Draw(text);
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+	if ((cmd[0x30 / 2] == 0) &&
+	    (*reinterpret_cast<const s16*>(caravanWork + selected * 2 + 0x214) != 0)) {
+		int helpId = *reinterpret_cast<const s16*>(caravanWork + selected * 2 + 0x214);
+		if (helpId == 0x207 || helpId == 0x20B || helpId == 0x20F) {
+			helpId += 2;
+		}
+
+		const float alpha = *reinterpret_cast<float*>(reinterpret_cast<u8*>(list) + 0x18);
+		GXColor color;
+		color.r = 0xFF;
+		color.g = 0xFF;
+		color.b = 0xFF;
+		color.a = static_cast<u8>(FLOAT_80332acc * alpha);
+		DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
+			this, helpId, font, 0,
+			static_cast<int>(-(FLOAT_80332aec * FLOAT_80332a88 - FLOAT_80332b08)),
+			color, 0, FLOAT_80332a88, FLOAT_80332b08);
 	}
 }
 

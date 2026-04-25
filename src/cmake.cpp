@@ -17,6 +17,8 @@ extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void ChgModel__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" void SetAnim__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void PCAnimCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" void InitFrame0Info__8CMenuPcsFv(CMenuPcs*);
+extern "C" void CalcWMFrame0__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" unsigned short GetButtonRepeat__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" unsigned short GetButtonDown__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
@@ -539,10 +541,11 @@ void CMenuPcs::CalcSingCMake()
     int state = MenuS32(this, 0x82C);
 
     if (*reinterpret_cast<unsigned char*>(state + 0x0B) == 0) {
+        InitFrame0Info__8CMenuPcsFv(this);
         memset(&s_CmakeInfo, 0, sizeof(s_CmakeInfo));
         *reinterpret_cast<unsigned char*>(state + 0x0B) = 1;
         *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
-        *reinterpret_cast<short*>(state + 0x2E) = 0;
+        DAT_8032ef10 = -1;
         *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
     }
 
@@ -556,6 +559,7 @@ void CMenuPcs::CalcSingCMake()
     switch (step) {
     case 0:
         if (openMode == 0) {
+            CalcWMFrame0__8CMenuPcsFi(this, frame - 10);
             if (frame < 10) {
                 frame = frame + 1;
             } else {
@@ -568,6 +572,7 @@ void CMenuPcs::CalcSingCMake()
         } else if (openMode == 1) {
             result = 0;
         } else {
+            CalcWMFrame0__8CMenuPcsFi(this, -frame);
             if (frame < 10) {
                 frame = frame + 1;
             }
@@ -1739,23 +1744,24 @@ void CMenuPcs::CmakeNameDraw()
     font->SetShadow(0);
     font->SetScale(FLOAT_80333258);
     font->DrawInit();
-    font->SetMargin(FLOAT_80333258);
+    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+    font->SetMargin(FLOAT_803332c4);
     font->SetColor(col);
 
     for (int i = 0; i < 5; i++) {
         const char* rowText = s_cmakeNameRows[table * 5 + i];
-        font->SetPosX(200.0f);
+        font->SetPosX(FLOAT_803332c8);
         font->SetPosY((108.0f + i * 32.0f) - FLOAT_803332f4);
         font->Draw(rowText);
     }
 
+    reinterpret_cast<unsigned char*>(font)[0x24] &= 0xEF;
     DrawInit__8CMenuPcsFv(this);
 
     if (mode == 1 && row < 5) {
-        int cursorX = 200 + select * 20;
+        int cursorX = static_cast<int>(FLOAT_803332c8 + FLOAT_803332c0 * static_cast<float>(select));
         int cursorY = 112 + row * 32;
-        DrawCursor__8CMenuPcsFiif(this, cursorX - 24 + ((System.m_frameCounter & 7) - (System.m_frameCounter & 1)),
-            cursorY, alpha);
+        DrawCursor__8CMenuPcsFiif(this, cursorX + (System.m_frameCounter & 7), cursorY, FLOAT_80333258);
     }
 
     int showNameCursor = ((mode == 1) && (row < 5) && (strlen(name) <= 6)) ? 1 : 0;
@@ -1855,9 +1861,9 @@ void CMenuPcs::CmakeSexDraw()
     float alpha = CalcCmakeFadeAlpha(this);
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
     DrawCmakeSelectionBackdrop(this);
-    DrawCmakePreviewCharaAlpha(this, alpha);
+    DrawCmakePreviewCharaAlpha(this, FLOAT_80333258);
     DrawCmakePopupPanel(this, alpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284, 0.85f, 0.85f);
-    DrawCmakeTitle(2, 0.0f, alpha);
+    DrawCmakeTitle(2, FLOAT_80333258, alpha);
 
     CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
     font->SetMargin(FLOAT_80333258);
@@ -2053,7 +2059,7 @@ void CMenuPcs::CmakeTribeDraw()
         MenuPcsVoid(), 0, FLOAT_80333278, FLOAT_8033327c, FLOAT_803332a4, FLOAT_80333284,
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333318, 0.0f);
 
-    DrawCmakeTitle(3, 0.0f, alpha);
+    DrawCmakeTitle(3, FLOAT_80333258, alpha);
     DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, alpha);
 
     CFont* tribeFont = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
@@ -2252,7 +2258,7 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
     DrawCmakeSelectionBackdrop(this);
-    DrawCmakePreviewCharaAlpha(this, alpha);
+    DrawCmakePreviewCharaAlpha(this, FLOAT_80333258);
 
     int panelAlpha = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
     if (panelAlpha < 0) {
@@ -2272,7 +2278,7 @@ void CMenuPcs::CmakeJobDraw()
         FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
-    DrawCmakeTitle(5, 0.0f, alpha);
+    DrawCmakeTitle(5, FLOAT_80333258, alpha);
 
     CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
     font->SetMargin(FLOAT_80333258);
@@ -2903,7 +2909,7 @@ void CMenuPcs::CmakeVillageDraw()
         MenuPcsVoid(), 0, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
-    DrawCmakeTitle(0, alpha, FLOAT_80333258);
+    DrawCmakeTitle(0, FLOAT_80333258, alpha);
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
@@ -2939,6 +2945,7 @@ void CMenuPcs::CmakeVillageDraw()
     font->SetShadow(0);
     font->SetScale(FLOAT_80333258);
     font->DrawInit();
+    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
     font->SetMargin(FLOAT_803332c4);
     font->SetColor(col);
 
@@ -2956,7 +2963,7 @@ void CMenuPcs::CmakeVillageDraw()
         int wobble = System.m_frameCounter & 7;
         DrawCursor__8CMenuPcsFiif(this,
             static_cast<int>(FLOAT_803332c8 + select * FLOAT_803332c0) + wobble,
-            row * 0x20 + 0x70, alpha);
+            row * 0x20 + 0x70, FLOAT_80333258);
     }
 
     int showNameCursor = (mode == 1 && row < 5 && strlen(s_CmakeInfo.m_name) <= 6) ? 1 : 0;

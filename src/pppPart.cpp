@@ -97,80 +97,6 @@ Mtx ppvUnitMatrix;
 Vec ppvZeroVector;
 CAmemCacheSet ppvAmemCacheSet;
 
-struct PppMngStPartView {
-    void* m_pppResSet;
-    int m_partIndex;
-    Vec m_position;
-    int m_baseTime;
-    pppIVECTOR4 m_rotation;
-    int m_rotationSpeed;
-    int m_lifeEnd;
-    Vec m_scale;
-    int m_currentFrame;
-    int m_previousFrame;
-    int m_numControlPrograms;
-    float m_scaleFactor;
-    float m_ownerScale;
-    float m_userFloat0;
-    float m_userFloat1;
-    Vec m_savedPosition;
-    Vec m_previousPosition;
-    Vec m_paramVec0;
-    short m_kind;
-    short m_nodeIndex;
-    pppFMATRIX m_matrix;
-    unsigned char m_envColorR;
-    unsigned char m_envColorG;
-    unsigned char m_envColorB;
-    unsigned char m_envColorA;
-    int m_prioTime;
-    int m_previousFrame2;
-    int m_numPrograms;
-    int m_reservedB8;
-    unsigned int m_objHitMask;
-    unsigned int m_cylinderAttribute;
-    unsigned char m_pppPObjLinkHead[8];
-    void* m_pDataValList;
-    void* m_unknownD0;
-    void* m_unknownD4;
-    void* m_owner;
-    void* m_lookTarget;
-    CChara::CNode* m_bindNode;
-    unsigned char m_endRequested;
-    unsigned char m_stopRequested;
-    unsigned char m_isFinished;
-    unsigned char m_matrixMode;
-    unsigned char m_hitBgFlag;
-    unsigned char m_slotVisible;
-    unsigned char m_ownerFacing;
-    unsigned char m_drawVariant;
-    unsigned char m_rotationOrder;
-    unsigned char m_drawPass;
-    signed char m_drawSubType;
-    unsigned char m_useOwnerScaleSign;
-    unsigned char m_ownerFlagsInitialized;
-    unsigned char m_nodeScaleInitialized;
-    unsigned char m_fieldF2;
-    unsigned char m_padF3[2];
-    unsigned char m_mapTexLoaded;
-    unsigned char m_hasMapRef;
-    unsigned char m_fpBillboard;
-    unsigned char m_prio;
-    short m_frameCounter;
-    unsigned char m_padFB[3];
-    unsigned int m_paramA;
-    unsigned int m_paramB;
-    float m_cullRadiusSq;
-    float m_cullRadius;
-    float m_cullYOffset;
-    float m_sortDepth;
-    unsigned short m_field118;
-    short m_mapObjIndex;
-    PPPSEST m_soundEffectData;
-    PPPIFPARAM m_hitParams;
-    short m_hitObjectIds[0x10];
-};
-
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline unsigned char* PartPcsRaw() { return reinterpret_cast<unsigned char*>(&PartPcs); }
 
@@ -1610,7 +1536,6 @@ LocalOnly:
  */
 void pppSetFpMatrix(_pppMngSt* pppMngSt)
 {
-	PppMngStPartView* pppMngStView = reinterpret_cast<PppMngStPartView*>(pppMngSt);
 	Vec local_a8;
 	Vec local_9c;
 	Vec local_90;
@@ -1621,19 +1546,19 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	Mtx local_44;
 
 	PSMTXCopy(pppMngStPtr->m_matrix.value, local_44);
-	if (pppMngStView->m_fpBillboard == 0) {
-		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix.value, ppvWorldMatrix);
-		local_50.x = local_44[0][3];
-		local_50.y = local_44[1][3];
-		local_50.z = local_44[2][3];
-		PSMTXMultVec(ppvCameraMatrix0, &local_50, &local_50);
-	} else {
+	if (pppMngSt->m_fpBillboard != 0) {
 		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix.value, ppvWorldMatrix);
 		local_50.x = local_44[0][3];
 		local_50.y = local_44[1][3];
 		local_50.z = local_44[2][3];
 		PSMTXMultVecSR(ppvCameraMatrix0, &local_50, &local_50);
 		local_50.y += CameraPcs._228_4_;
+	} else {
+		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix.value, ppvWorldMatrix);
+		local_50.x = local_44[0][3];
+		local_50.y = local_44[1][3];
+		local_50.z = local_44[2][3];
+		PSMTXMultVec(ppvCameraMatrix0, &local_50, &local_50);
 	}
 
 	local_70.x = ppvWorldMatrix[0][1];

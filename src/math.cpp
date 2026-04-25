@@ -783,12 +783,12 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     Vec* p1, Vec* p2, Vec* p3)
 {
     float radiusSquared = radius * radius;
-    float radiusCubed = radius * radiusSquared;
     Vec4d coeffs;
-    coeffs.x = 1.0f + ((3.0f * radiusCubed) - (3.0f * radiusSquared));
-    coeffs.y = radius - ((3.0f * radiusSquared) - radiusCubed);
-    coeffs.z = (2.0f * radiusCubed) - (3.0f * radiusSquared);
-    coeffs.w = radiusCubed - radiusSquared;
+    coeffs.w = radiusSquared * radius;
+    coeffs.z = (-2.0f * coeffs.w) + (3.0f * radiusSquared);
+    coeffs.x = 1.0f + ((2.0f * coeffs.w) - (3.0f * radiusSquared));
+    coeffs.y = radius - ((2.0f * radiusSquared) - coeffs.w);
+    coeffs.w = coeffs.w - radiusSquared;
 
     Mtx44 control;
     control[0][0] = p1->x;

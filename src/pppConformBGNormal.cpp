@@ -192,8 +192,8 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 PSVECNormalize(&local_14c, &local_14c);
             } else {
                 local_140.y = kPppConformBgNormalZero;
-                local_140.x = kPppConformBgNormalOne;
                 local_140.z = kPppConformBgNormalZero;
+                local_140.x = kPppConformBgNormalOne;
                 PSVECCrossProduct(&local_158, &local_140, &local_14c);
                 PSVECNormalize(&local_14c, &local_14c);
                 PSVECCrossProduct(&local_14c, &local_158, &local_140);
@@ -230,9 +230,9 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     pppMngStPtr->m_matrix.value[1][3] = ownerY;
                     pppMngStPtr->m_matrix.value[2][3] = ownerZ;
                 } else {
-                    ownerX = owner->m_worldPosition.x;
                     ownerY = owner->m_worldPosition.y;
                     ownerZ = owner->m_worldPosition.z;
+                    ownerX = owner->m_worldPosition.x;
                     secondRayDirection.x = kPppConformBgNormalZero;
                     secondRayDirection.y = kPppConformBgNormalDownRayY;
                     secondRayDirection.z = kPppConformBgNormalZero;

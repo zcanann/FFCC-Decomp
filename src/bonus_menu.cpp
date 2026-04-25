@@ -3102,10 +3102,25 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1B);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, corner, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, y, corner, corner, corner, 0.0f, texScale, texScale, 0.0f);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, bottom, corner, corner, 0.0f, corner, texScale, texScale, 0.0f);
-	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, bottom, corner, corner, corner, corner, texScale, texScale, 0.0f);
+	for (int i = 0; i < 4; i++) {
+		float drawX = x;
+		float drawY = y;
+		float texU = 0.0f;
+		float texV = 0.0f;
+		if (i == 1) {
+			drawX = right;
+			texU = corner;
+		} else if (i == 2) {
+			drawY = bottom;
+			texV = corner;
+		} else if (i == 3) {
+			drawX = right;
+			drawY = bottom;
+			texU = corner;
+			texV = corner;
+		}
+		DrawRect__8CMenuPcsFUlfffffffff(this, 0, drawX, drawY, corner, corner, texU, texV, texScale, texScale, 0.0f);
+	}
 
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1C);
 	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, y, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);

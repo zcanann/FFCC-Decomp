@@ -167,8 +167,10 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 
                 GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
 
+                TRACE_POLYGON* current = poly;
+
                 for (i = 0; i < (s32)(work->visibleCount - 1); i++) {
-                    TRACE_POLYGON* next = poly + 1;
+                    TRACE_POLYGON* next = current + 1;
 
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
@@ -182,20 +184,20 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 
                     colorTop = g_pppYmTracer2_1;
                     colorBottom = g_pppYmTracer2_2;
-                    colorTop.bytes[0] = poly->colorR;
-                    colorTop.bytes[1] = poly->colorG;
-                    colorTop.bytes[2] = poly->colorB;
-                    colorTop.bytes[3] = (u8)(alphaScale * (f32)poly->alpha);
+                    colorTop.bytes[0] = current->colorR;
+                    colorTop.bytes[1] = current->colorG;
+                    colorTop.bytes[2] = current->colorB;
+                    colorTop.bytes[3] = (u8)(alphaScale * (f32)current->alpha);
                     colorBottom.bytes[0] = next->colorR;
                     colorBottom.bytes[1] = next->colorG;
                     colorBottom.bytes[2] = next->colorB;
                     colorBottom.bytes[3] = (u8)(alphaScale * (f32)next->alpha);
 
-                    GXPosition3f32(poly->targetPos.x, poly->targetPos.y, poly->targetPos.z);
+                    GXPosition3f32(current->targetPos.x, current->targetPos.y, current->targetPos.z);
                     GXColor1u32(colorTop.value);
                     GXTexCoord2f32(uTop, FLOAT_80331844);
 
-                    GXPosition3f32(poly->pos.x, poly->pos.y, poly->pos.z);
+                    GXPosition3f32(current->pos.x, current->pos.y, current->pos.z);
                     GXColor1u32(colorTop.value);
                     GXTexCoord2f32(uTop, FLOAT_80331840);
 
@@ -206,7 +208,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                     GXPosition3f32(next->pos.x, next->pos.y, next->pos.z);
                     GXColor1u32(colorBottom.value);
                     GXTexCoord2f32(uBottom, FLOAT_80331840);
-                    poly++;
+                    current++;
                 }
             }
         }

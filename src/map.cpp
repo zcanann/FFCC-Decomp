@@ -1737,11 +1737,14 @@ void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
     MapObjAttachObj* mapObj = reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954));
 
     while (true) {
-        unsigned int remaining = static_cast<unsigned int>(
-            (reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954 + *reinterpret_cast<short*>(Ptr(this, 0xC)) * 0xF0)) -
-                mapObj));
+        unsigned int stride = 0xF0;
+        MapObjAttachObj* mapObjEnd =
+            reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954 + *reinterpret_cast<short*>(Ptr(this, 0xC)) * 0xF0));
+        unsigned int remaining =
+            (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
+            stride;
 
-        if (mapObj < reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954 + *reinterpret_cast<short*>(Ptr(this, 0xC)) * 0xF0))) {
+        if (mapObj < mapObjEnd) {
             do {
                 if (mapObj->attr != 0 && mapObj->attr->type == 3) {
                     goto found;

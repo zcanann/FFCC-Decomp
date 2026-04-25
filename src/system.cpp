@@ -439,7 +439,7 @@ void CSystem::ExecScenegraph()
         }
 
         float totalTime = 0.0f;
-        CStopWatch watch(0);
+        CStopWatch watch((char*)"no name");
 
         int index = 0;
         for (COrder* order = m_orderSentinel.m_next;

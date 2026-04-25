@@ -309,7 +309,7 @@ s32 THPSimpleDrawCurrentFrame(GXRenderModeObj* obj, int x, int y, int polyWidth,
 s32 THPSimpleDecode(s32 audioTrack)
 {
     s32 status;
-    s32 decodeResult;
+    s32 decodeSuccess;
     u32 interruptState;
 
     interruptState = OSDisableInterrupts();
@@ -361,12 +361,17 @@ restore_interrupts_1:
         for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
             switch (*frameComp) {
             case 0:
-                decodeResult = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
+                decodeSuccess = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
                                               reinterpret_cast<void*>(SimpleControl.unk_9C));
-                if (decodeResult != 0) {
+                if (decodeSuccess != 0) {
+                    decodeSuccess = 0;
+                } else {
+                    decodeSuccess = 1;
+                    SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
+                }
+                if (decodeSuccess == 0) {
                     return 1;
                 }
-                SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
                 break;
             case 1: {
                 u32 samples = THPAudioDecode(SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer,
@@ -391,12 +396,17 @@ restore_interrupts_1:
         for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
             switch (*frameComp) {
             case 0:
-                decodeResult = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
+                decodeSuccess = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
                                               reinterpret_cast<void*>(SimpleControl.unk_9C));
-                if (decodeResult != 0) {
+                if (decodeSuccess != 0) {
+                    decodeSuccess = 0;
+                } else {
+                    decodeSuccess = 1;
+                    SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
+                }
+                if (decodeSuccess == 0) {
                     return 1;
                 }
-                SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
                 break;
             }
             compData += *compSizeTable;

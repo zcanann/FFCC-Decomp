@@ -140,8 +140,11 @@ struct pppFVECTOR4
 
 struct VColor
 {
-    unsigned char m_unknown[11]; // 0x0
-    unsigned char m_alpha;       // 0xb
+    unsigned char m_unknown[8]; // 0x0
+    unsigned char m_red;        // 0x8
+    unsigned char m_green;      // 0x9
+    unsigned char m_blue;       // 0xa
+    unsigned char m_alpha;      // 0xb
 }; // Size 0xC
 
 struct PPPIFPARAM

@@ -639,26 +639,20 @@ void __MidiCtrl_LoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command;
-    int loopIndexOffset;
-    unsigned short loopCount;
+    int loopCount;
 
-    command = *(unsigned char**)track;
-    *(unsigned char**)track = command + 1;
-    loopCount = command[0];
+    loopCount = *(*(unsigned char**)track)++;
     if (loopCount == 0) {
         loopCount = 0x100;
     }
 
-    loopIndexOffset = *(short*)((char*)track + 0x13C) * 2 + 0x128;
-    *(short*)((char*)track + loopIndexOffset) = *(short*)((char*)track + loopIndexOffset) + 1;
-    if (*(unsigned short*)((char*)track + *(short*)((char*)track + 0x13C) * 2 + 0x128) == loopCount) {
-        *(short*)((char*)track + 0x13C) = *(short*)((char*)track + 0x13C) - 1;
-        *(unsigned short*)((char*)track + 0x13C) &= 3;
+    ++*(short*)((char*)track + *(short*)((char*)track + 0x13C) * 2 + 0x128);
+    if (loopCount != *(short*)((char*)track + *(short*)((char*)track + 0x13C) * 2 + 0x128)) {
+        *(int*)track = *(int*)((char*)track + *(short*)((char*)track + 0x13C) * 4 + 8);
+        *(short*)((char*)track + 0x144) = *(short*)((char*)track + *(short*)((char*)track + 0x13C) * 2 + 0x130);
     } else {
-        *(int*)track = ((int*)track)[*(short*)((char*)track + 0x13C) + 2];
-        *(unsigned short*)((char*)track + 0x144) =
-            *(unsigned short*)((char*)track + *(short*)((char*)track + 0x13C) * 2 + 0x130);
+        --*(short*)((char*)track + 0x13C);
+        *(short*)((char*)track + 0x13C) &= 3;
     }
 }
 
@@ -687,15 +681,14 @@ void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 4
 void __MidiCtrl_TempoDirect(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    u8* command = (u8*)*(u32*)track;
-
-    *(u32*)track = (u32)(command + 1);
-    *(u32*)((u8*)control + 0x448) = ((u32)*command) << 0xc;
+    *(u32*)((u8*)control + 0x448) = ((u32)*(*(u8**)track)++) << 0xc;
     *(u32*)((u8*)control + 0x44C) = 0;
     *(u32*)((u8*)control + 0x450) = 0;
 }
+#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -1143,17 +1136,18 @@ void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command = (unsigned char*)*(int*)track;
-    int* trackData = (int*)track;
+    int value;
 
-    *trackData = (int)(command + 1);
-    trackData[0xd] = ((int)(char)*command) << 0xc;
-    trackData[0xe] = 0;
-    trackData[0xf] = 0;
+    value = ((int)*(*(char**)track)++) << 0xc;
+    ((int*)track)[0xd] = value;
+    ((int*)track)[0xe] = 0;
+    ((int*)track)[0xf] = 0;
     m_AChangeStatus |= 2;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

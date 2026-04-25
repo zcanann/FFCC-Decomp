@@ -738,31 +738,31 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     BreathModelRenderStep* step;
     int workOffset;
     int colorOffset;
-    int groupCount;
-    VBreathModel* work;
+    unsigned char* work;
     unsigned char* color;
-    pppModelSt* model;
     unsigned char colorR;
     unsigned char colorG;
     unsigned char colorB;
     unsigned char colorA;
     int i;
     float* particleData;
-    int matrixList;
+    Mtx* matrixList;
     float* particleColor;
     int* groupData;
+    int groupCount;
+    pppModelSt* model;
 
-    object = (_pppPObject*)breathModel;
+    object = reinterpret_cast<_pppPObject*>(breathModel);
     step = (BreathModelRenderStep*)pBreathModel;
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
-    work = (VBreathModel*)(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset);
+    work = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset;
     color = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset;
-    particleData = (float*)work->m_particleData;
-    matrixList = (int)work->m_particleWmats;
-    particleColor = (float*)work->m_particleColors;
-    groupData = (int*)work->m_groups;
-    groupCount = work->m_particleCount;
+    particleData = (float*)*(void**)(work + 0x30);
+    matrixList = *(Mtx**)(work + 0x34);
+    particleColor = (float*)*(void**)(work + 0x38);
+    groupData = *(int**)(work + 0x3C);
+    groupCount = *(int*)(work + 0x40);
 
     if (step->m_stepValue == 0xFFFF) {
         return;
@@ -845,8 +845,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
             pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((unsigned char*)breathModel + 0x70), 1);
         }
 
-        if (matrixList != 0) {
-            matrixList += 0x30;
+        if (matrixList != NULL) {
+            matrixList++;
         }
         if (particleColor != NULL) {
             particleColor += 8;
@@ -905,7 +905,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 sphereMtx[0][0] = groupScale;
                 sphereMtx[1][1] = groupScale;
                 sphereMtx[2][2] = groupScale;
-                PSMTXConcat(work->m_particleWmats[firstParticle], object->m_localMatrix.value, tempMtx);
+                PSMTXConcat(*(Mtx*)(*(int*)(work + 0x34) + firstParticle * 0x30), object->m_localMatrix.value, tempMtx);
                 PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
                 PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &pos);
                 sphereMtx[0][3] = pos.x;

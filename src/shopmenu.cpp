@@ -2127,7 +2127,7 @@ void CShopMenu::DrawSoubi()
 {
     DrawSoubiBase();
 
-    drawShapeSeq(0xF, 0, 0xA8, 0x5A, 0xFF, 0, 0, 0.0f, 0);
+    drawShapeSeq(0xF, 0, 0xA8, 0x5A, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
     DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), ShopMenuInt(this, 0x150), 0x40, 0x42, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
 
@@ -2143,16 +2143,16 @@ void CShopMenu::DrawSoubi()
         MenuPcsVoid(), font, GetItemName(ShopMenuInt(this, 0x150)), FLOAT_80332d54, 112.0f, 0x18, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-    DrawItemInfo(ShopMenuInt(this, 0x150), 0x98, 0x7E, 0, 0x9C, 0, 0, 0);
+    DrawItemInfo(ShopMenuInt(this, 0x150), 0x98, 0x7E, 0x98, 0x9C, 0, 0, 0);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     int barX = 0x1F6;
     while (barX > 0x42) {
-        drawShapeSeq(0xC, 0, barX, 0x17C, 0xFF, 0, 0, 0.0f, 0);
+        drawShapeSeq(0xC, 0, barX, 0x17C, 0xFF, 0, 0, FLOAT_80332d9c, 0);
         barX -= 0x10;
     }
-    drawShapeSeq(0xB, 0, 0x226, 0x158, 0xFF, 0, 0, 0.0f, 0);
-    drawShapeSeq(1, 1, barX, 0x17C, 0xFF, 0, 0, 0.0f, 0);
+    drawShapeSeq(0xB, 0, 0x226, 0x158, 0xFF, 0, 0, FLOAT_80332d9c, 0);
+    drawShapeSeq(1, 1, barX, 0x17C, 0xFF, 0, 0, FLOAT_80332d9c, 0);
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     CFont* labelFont = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
@@ -2177,7 +2177,7 @@ void CShopMenu::DrawSoubi()
     Draw__5CFontFPc(labelFont, cancelText);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-    DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0xD8, ShopMenuInt(this, 0x3C) * 0x18 + 0x13C, 1.0f);
+    DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), static_cast<int>(cancelTextX) - 0x24, ShopMenuInt(this, 0x3C) * 0x18 + 0x13C, 1.0f);
 }
 
 /*

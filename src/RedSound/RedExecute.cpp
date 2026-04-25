@@ -22,6 +22,7 @@ u32* p_ReverbSize;
 int* p_SkipKeyOn;
 
 extern int m_ADataBuffer;
+extern volatile u8 m_DataBuffer;
 extern int m_DataBufferSize;
 
 /*
@@ -35,8 +36,8 @@ extern int m_DataBufferSize;
  */
 u8 GetRandomData()
 {
-    u8 value = (u8)DAT_8021dcce[m_RandomIndex];
-    m_RandomIndex = m_RandomIndex + 1;
+    u8 value = (u8)DAT_8021dcce[m_DataBuffer];
+    m_DataBuffer = m_DataBuffer + 1;
     return value;
 }
 

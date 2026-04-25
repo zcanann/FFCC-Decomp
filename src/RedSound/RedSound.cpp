@@ -23,16 +23,36 @@ CRedDriver c_Driver;
 static int m_StandbyStatus[0x40];
 volatile unsigned int m_AutoID;
 static void* p_StreamBank;
-static const char s_redSoundMemorySettingErrorFmt[] = "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
-static const char sRedSoundLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
-static const char s_redSoundAMemorySettingErrorFmt[] = "%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
+static const char s_redSoundLogBlob[] =
+    "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n"
+    "\0"
+    "\x1B[7;34mSound\x1B[0m:"
+    "\0"
+    "%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n"
+    "\0"
+    "%s\"AR\" was not initialized.%s\n"
+    "\0"
+    "%s%sSound Driver Initialize OK.%s\n"
+    "\0"
+    "%s%sSound Driver Initialize ERROR !!%s\n"
+    "\0"
+    "%s%sSTREAM : This data was not 'STREAM-DATA'.%s\n"
+    "\0"
+    "Jun 17 2003"
+    "\0"
+    "18:02:37";
 static const char sRedSoundLogErrorColor[] = "\x1B[7;31m";
 static const char sRedSoundLogReset[] = "\x1B[0m";
 static const char sRedSoundLogInfoColor[] = "\x1B[4;34m";
-static const char s_redSoundArNotInitializedFmt[] = "%s\"AR\" was not initialized.%s\n";
-static const char s_redSoundInitOkFmt[] = "%s%sSound Driver Initialize OK.%s\n";
-static const char s_redSoundInitErrorFmt[] = "%s%sSound Driver Initialize ERROR !!%s\n";
-static const char s_redSoundInvalidStreamDataFmt[] = "%s%sSTREAM : This data was not 'STREAM-DATA'.%s\n";
+
+enum {
+    RED_SOUND_LOG_PREFIX_OFFSET = 0x33,
+    RED_SOUND_A_MEMORY_ERROR_FMT_OFFSET = 0x45,
+    RED_SOUND_AR_NOT_INITIALIZED_FMT_OFFSET = 0x77,
+    RED_SOUND_INIT_OK_FMT_OFFSET = 0x95,
+    RED_SOUND_INIT_ERROR_FMT_OFFSET = 0xB6,
+    RED_SOUND_INVALID_STREAM_DATA_FMT_OFFSET = 0xE2,
+};
 
 /*
  * --INFO--
@@ -118,7 +138,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 	if (param_3 > 0 && param_5 > 0) {
 		if ((((u32)param_2 & 0x1F) != 0) || (((u32)param_3 & 0x1F) != 0)) {
 			if (m_ReportPrint != 0) {
-				OSReport(s_redSoundMemorySettingErrorFmt, sRedSoundLogPrefix,
+				OSReport(s_redSoundLogBlob, s_redSoundLogBlob + RED_SOUND_LOG_PREFIX_OFFSET,
 				         sRedSoundLogErrorColor, (u32)param_2,
 				         param_3, sRedSoundLogReset);
 				fflush(__files + 1);
@@ -128,7 +148,8 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 
 		if ((((u32)param_4 & 0x1F) != 0) || (((u32)param_5 & 0x1F) != 0)) {
 			if (m_ReportPrint != 0) {
-				OSReport(s_redSoundAMemorySettingErrorFmt, sRedSoundLogPrefix,
+				OSReport(s_redSoundLogBlob + RED_SOUND_A_MEMORY_ERROR_FMT_OFFSET,
+				         s_redSoundLogBlob + RED_SOUND_LOG_PREFIX_OFFSET,
 				         sRedSoundLogErrorColor, param_4, param_5,
 				         sRedSoundLogReset);
 				fflush(__files + 1);
@@ -138,7 +159,8 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 
 		if (ARCheckInit() == 0) {
 			if (m_ReportPrint != 0) {
-				OSReport(s_redSoundArNotInitializedFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor,
+				OSReport(s_redSoundLogBlob + RED_SOUND_AR_NOT_INITIALIZED_FMT_OFFSET,
+				         s_redSoundLogBlob + RED_SOUND_LOG_PREFIX_OFFSET, sRedSoundLogErrorColor,
 				         sRedSoundLogReset);
 				fflush(__files + 1);
 			}
@@ -155,7 +177,9 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		c_Driver.Init();
 
 		if (m_ReportPrint != 0) {
-			OSReport(s_redSoundInitOkFmt, sRedSoundLogPrefix, sRedSoundLogInfoColor,
+			OSReport(s_redSoundLogBlob + RED_SOUND_INIT_OK_FMT_OFFSET,
+			         s_redSoundLogBlob + RED_SOUND_LOG_PREFIX_OFFSET,
+			         sRedSoundLogInfoColor,
 			         sRedSoundLogReset);
 			fflush(__files + 1);
 		}
@@ -163,7 +187,8 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		param_3 = 0;
 
 		if (m_ReportPrint != 0) {
-			OSReport(s_redSoundInitErrorFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor,
+			OSReport(s_redSoundLogBlob + RED_SOUND_INIT_ERROR_FMT_OFFSET,
+			         s_redSoundLogBlob + RED_SOUND_LOG_PREFIX_OFFSET, sRedSoundLogErrorColor,
 			         sRedSoundLogReset);
 			fflush(__files + 1);
 		}
@@ -757,7 +782,9 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 		id = GetAutoID();
 		c_Driver.StreamPlay(id, data, param_3, param_4, param_5);
 	} else if (m_ReportPrint != 0) {
-		OSReport(s_redSoundInvalidStreamDataFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, sRedSoundLogReset);
+		OSReport(s_redSoundLogBlob + RED_SOUND_INVALID_STREAM_DATA_FMT_OFFSET,
+		         s_redSoundLogBlob + RED_SOUND_LOG_PREFIX_OFFSET,
+		         sRedSoundLogErrorColor, sRedSoundLogReset);
 		fflush(__files + 1);
 	}
 

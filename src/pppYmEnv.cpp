@@ -660,15 +660,15 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displayList, unsigned long displayListSize,
                        _GXTexObj* blendTexObj, unsigned char mode)
 {
-    static const unsigned char s_texObjIndices[] = {0, 1, 2, 3, 4, 0, 1, 2, 3, 4};
-    static const unsigned char s_xAxisRotIndices[] = {0, 0, 0, 1, 1, 0, 0, 0, 1, 1};
-    static const unsigned char s_yAxisRotIndices[] = {0, 1, 0, 0, 1, 0, 1, 0, 0, 1};
-    static const float s_xAxisAngles[] = {0.0f, 90.0f, 180.0f, 270.0f};
-    static const unsigned char s_xAxisIds[] = {'x', 'x', 'x', 'x'};
-    static const float s_yAxisAngles[] = {0.0f, 1.0f};
-    static const Vec s_cameraPos = {0.0f, 0.0f, 0.0f};
-    static const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
-    static const Vec s_cameraLook = {0.0f, 0.0f, -1.0f};
+    const unsigned char s_texObjIndices[] = {0, 1, 2, 3, 4, 0, 1, 2, 3, 4};
+    const unsigned char s_xAxisRotIndices[] = {0, 0, 0, 1, 1, 0, 0, 0, 1, 1};
+    const unsigned char s_yAxisRotIndices[] = {0, 1, 0, 0, 1, 0, 1, 0, 0, 1};
+    const float s_xAxisAngles[] = {0.0f, 90.0f, 180.0f, 270.0f};
+    const unsigned char s_xAxisIds[] = {'x', 'x', 'x', 'x'};
+    const float s_yAxisAngles[] = {0.0f, 1.0f};
+    const Vec s_cameraPos = {0.0f, 0.0f, 0.0f};
+    const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
+    const Vec s_cameraLook = {0.0f, 0.0f, -1.0f};
 
     const unsigned short texWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned short texHeight = GXGetTexObjHeight(targetTexObj);

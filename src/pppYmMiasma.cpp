@@ -1,6 +1,7 @@
 #include "ffcc/pppYmMiasma.h"
 #include "ffcc/math.h"
 #include "ffcc/p_game.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
@@ -28,7 +29,6 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     unsigned char);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
-extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 
 struct VYmMiasma {
     PARTICLE_DATA* m_particles;
@@ -157,7 +157,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
     YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)param_2;
     int i;
 
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     for (i = 0; i < (int)step->m_particleCount; i++) {
         if (step->m_dataValIndex != 0xffff) {

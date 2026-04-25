@@ -844,18 +844,40 @@ CChara::CModel::CModel()
  */
 CChara::CModel::~CModel()
 {
-	void** data = (void**)((u8*)this + 0xA4);
-	if (data[0] != 0) {
-		__dla__FPv(data[0]);
-		data[0] = 0;
+	void*& texSet = *reinterpret_cast<void**>((u8*)this + 0xB4);
+	if (texSet != 0) {
+		ReleaseRefCounted(texSet);
+		texSet = 0;
 	}
-	if (data[1] != 0) {
-		__dla__FPv(data[1]);
-		data[1] = 0;
+
+	void*& anim = *reinterpret_cast<void**>((u8*)this + 0xD0);
+	if (anim != 0) {
+		ReleaseRefCounted(anim);
+		anim = 0;
 	}
-	if (data[2] != 0) {
-		__dla__FPv(data[2]);
-		data[2] = 0;
+
+	void*& texAnimSet = *reinterpret_cast<void**>((u8*)this + 0xD4);
+	if (texAnimSet != 0) {
+		ReleaseRefCounted(texAnimSet);
+		texAnimSet = 0;
+	}
+
+	void*& refData = *reinterpret_cast<void**>((u8*)this + 0xA4);
+	if (refData != 0) {
+		ReleaseRefCounted(refData);
+		refData = 0;
+	}
+
+	void*& nodes = *reinterpret_cast<void**>((u8*)this + 0xA8);
+	if (nodes != 0) {
+		__destroy_new_array(nodes, reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CNodeFv));
+		nodes = 0;
+	}
+
+	void*& meshes = *reinterpret_cast<void**>((u8*)this + 0xAC);
+	if (meshes != 0) {
+		__destroy_new_array(meshes, reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CMeshFv));
+		meshes = 0;
 	}
 }
 

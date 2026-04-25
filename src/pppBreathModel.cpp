@@ -55,12 +55,34 @@ struct BreathParticleGroup {
     Mtx matrix;
 };
 
+struct VBreathModel {
+    Mtx m_matrix;
+    PARTICLE_DATA* m_particleData;
+    PARTICLE_WMAT* m_particleWmats;
+    PARTICLE_COLOR* m_particleColors;
+    BreathParticleGroup* m_groups;
+    int m_particleCount;
+    u16 m_emitFrameCounter;
+    u16 _pad46;
+    Vec m_direction;
+    s16 m_groupCount;
+    s16 m_slotCount;
+    u8 m_flags;
+    u8 _pad59[3];
+};
+
 struct BreathModelRenderStep {
     int m_graphId;
     int m_dataValIndex;
     int m_initWork;
     int m_stepValue;
-    int m_arg3;
+    union {
+        int m_arg3;
+        struct {
+            u16 m_slotCount;
+            u16 m_groupCount;
+        } m_groupInfo;
+    };
     unsigned char m_payload[1];
 };
 
@@ -717,7 +739,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     int workOffset;
     int colorOffset;
     int groupCount;
-    unsigned char* work;
+    VBreathModel* work;
     unsigned char* color;
     pppModelSt* model;
     unsigned char colorR;
@@ -734,13 +756,13 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     step = (BreathModelRenderStep*)pBreathModel;
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
-    work = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset;
+    work = (VBreathModel*)(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset);
     color = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset;
-    particleData = *(float**)(work + 0x30);
-    matrixList = *(int*)(work + 0x34);
-    particleColor = *(float**)(work + 0x38);
-    groupData = *(int**)(work + 0x3C);
-    groupCount = *(int*)(work + 0x40);
+    particleData = (float*)work->m_particleData;
+    matrixList = (int)work->m_particleWmats;
+    particleColor = (float*)work->m_particleColors;
+    groupData = (int*)work->m_groups;
+    groupCount = work->m_particleCount;
 
     if (step->m_stepValue == 0xFFFF) {
         return;
@@ -835,8 +857,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     if ((CFlatFlags & 0x200000) != 0) {
         int slotCount;
 
-        groupCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)&step->m_arg3 + 2);
-        slotCount = (int)(unsigned short)*(unsigned short*)&step->m_arg3;
+        groupCount = (int)step->m_groupInfo.m_groupCount;
+        slotCount = (int)step->m_groupInfo.m_slotCount;
 
         for (i = 0; i < groupCount; i++) {
             if (groupData[0] == 1) {
@@ -883,7 +905,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 sphereMtx[0][0] = groupScale;
                 sphereMtx[1][1] = groupScale;
                 sphereMtx[2][2] = groupScale;
-                PSMTXConcat(*(Mtx*)(*(int*)(work + 0x34) + firstParticle * 0x30), object->m_localMatrix.value, tempMtx);
+                PSMTXConcat(work->m_particleWmats[firstParticle], object->m_localMatrix.value, tempMtx);
                 PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
                 PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &pos);
                 sphereMtx[0][3] = pos.x;
@@ -908,26 +930,26 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
  */
 extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
 {
-    unsigned char* state = (unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets;
+    VBreathModel* state = (VBreathModel*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
     float fVar1;
 
-    PSMTXIdentity(*(Mtx*)state);
+    PSMTXIdentity(state->m_matrix);
     fVar1 = kPppBreathModelZero;
 
-    *(float*)(state + 0x50) = kPppBreathModelZero;
-    *(float*)(state + 0x4C) = fVar1;
-    *(float*)(state + 0x48) = fVar1;
+    state->m_direction.z = kPppBreathModelZero;
+    state->m_direction.y = fVar1;
+    state->m_direction.x = fVar1;
 
-    *(int*)(state + 0x30) = 0;
-    *(int*)(state + 0x34) = 0;
-    *(int*)(state + 0x38) = 0;
-    *(int*)(state + 0x3C) = 0;
-    *(int*)(state + 0x40) = 0;
+    state->m_particleData = 0;
+    state->m_particleWmats = 0;
+    state->m_particleColors = 0;
+    state->m_groups = 0;
+    state->m_particleCount = 0;
 
-    *(short*)(state + 0x44) = 10000;
-    *(short*)(state + 0x54) = 0;
-    *(short*)(state + 0x56) = 0;
-    *(unsigned char*)(state + 0x58) = 0;
+    state->m_emitFrameCounter = 10000;
+    state->m_groupCount = 0;
+    state->m_slotCount = 0;
+    state->m_flags = 0;
 }
 
 /*
@@ -938,28 +960,28 @@ extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreat
 extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
 {
     BreathParticleGroup* group;
-    unsigned char* state = (unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets;
+    VBreathModel* state = (VBreathModel*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
 
-    if (*(void**)(state + 0x30) != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(state + 0x30));
-        *(void**)(state + 0x30) = NULL;
+    if (state->m_particleData != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleData);
+        state->m_particleData = 0;
     }
 
-    if (*(void**)(state + 0x34) != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(state + 0x34));
-        *(void**)(state + 0x34) = NULL;
+    if (state->m_particleWmats != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleWmats);
+        state->m_particleWmats = 0;
     }
 
-    if (*(void**)(state + 0x38) != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(state + 0x38));
-        *(void**)(state + 0x38) = NULL;
+    if (state->m_particleColors != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleColors);
+        state->m_particleColors = 0;
     }
 
-    group = *(BreathParticleGroup**)(state + 0x3C);
+    group = state->m_groups;
     if (group != NULL) {
         int i;
 
-        for (i = 0; i < *(short*)(state + 0x54); i++) {
+        for (i = 0; i < state->m_groupCount; i++) {
             if (group->particleIndices != NULL) {
                 pppHeapUseRate__FPQ27CMemory6CStage(group->particleIndices);
                 group->particleIndices = 0;
@@ -973,8 +995,8 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreath
             group = (BreathParticleGroup*)((unsigned char*)group + 0x5C);
         }
 
-        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(state + 0x3C));
-        *(void**)(state + 0x3C) = NULL;
+        pppHeapUseRate__FPQ27CMemory6CStage(state->m_groups);
+        state->m_groups = 0;
     }
 }
 

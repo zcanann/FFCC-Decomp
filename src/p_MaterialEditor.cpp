@@ -31,6 +31,10 @@ extern char lbl_8032E648[];
 static const char s_CMaterialEditorPcs_VIEWER_801D7D18[] = "CMaterialEditorPcs_VIEWER";
 static const char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
 extern "C" void* __vt__18CMaterialEditorPcs[];
+unsigned int m_table_desc0__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
+unsigned int m_table_desc1__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
+unsigned int m_table_desc2__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
+unsigned int m_table_desc3__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
 unsigned int m_table__18CMaterialEditorPcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMaterialEditorPcs_VIEWER_801D7D18)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0, 0, 0, 0, 0x41, 1
 };
@@ -41,26 +45,20 @@ CMaterialEditorPcs MaterialEditorPcs;
 struct MaterialEditorTableInit {
     MaterialEditorTableInit()
     {
-        static const unsigned int tableDesc[12] = {
-            0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv),
-            0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv),
-            0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv),
-            0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv),
-        };
         unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
 
-        dst[1] = tableDesc[0];
-        dst[2] = tableDesc[1];
-        dst[3] = tableDesc[2];
-        dst[4] = tableDesc[3];
-        dst[5] = tableDesc[4];
-        dst[6] = tableDesc[5];
-        dst[7] = tableDesc[6];
-        dst[8] = tableDesc[7];
-        dst[9] = tableDesc[8];
-        dst[12] = tableDesc[9];
-        dst[13] = tableDesc[10];
-        dst[14] = tableDesc[11];
+        dst[1] = m_table_desc0__18CMaterialEditorPcs[0];
+        dst[2] = m_table_desc0__18CMaterialEditorPcs[1];
+        dst[3] = m_table_desc0__18CMaterialEditorPcs[2];
+        dst[4] = m_table_desc1__18CMaterialEditorPcs[0];
+        dst[5] = m_table_desc1__18CMaterialEditorPcs[1];
+        dst[6] = m_table_desc1__18CMaterialEditorPcs[2];
+        dst[7] = m_table_desc2__18CMaterialEditorPcs[0];
+        dst[8] = m_table_desc2__18CMaterialEditorPcs[1];
+        dst[9] = m_table_desc2__18CMaterialEditorPcs[2];
+        dst[12] = m_table_desc3__18CMaterialEditorPcs[0];
+        dst[13] = m_table_desc3__18CMaterialEditorPcs[1];
+        dst[14] = m_table_desc3__18CMaterialEditorPcs[2];
     }
 };
 

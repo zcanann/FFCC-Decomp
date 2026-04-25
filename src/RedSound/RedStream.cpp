@@ -8,9 +8,15 @@
 #include <dolphin/os.h>
 #include <string.h>
 
+static const char s_redStreamBufferSecureErrorFmt[] = "%s%sStream Buffer didn't secure.%s\n";
 static const char sRedStreamLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
+static const char s_redStreamMainMemoryCreateErrorFmt[] = "%s%sM-Memory didn't create.(need:0x%6.6X)%s\n";
+static const char s_redStreamAuxMemoryCreateErrorFmt[] = "%s%sA-Memory didn't create.(need:0x%6.6X)%s\n";
 static const char s_redStreamPauseOnFmt[] = "%sPause : Stream : ON  %d\n";
 static const char s_redStreamPauseOffFmt[] = "%sPause : Stream : OFF %d\n";
+static const char sRedStreamLogErrorColor[] = "\x1B[7;31m";
+static const char sRedStreamLogReset[] = "\x1B[0m";
+static const char sRedStreamLogWarnColor[] = "\x1B[4;31m";
 
 extern "C" {
 void RedDelete__FPv(void*);
@@ -312,14 +318,28 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 		}
 
 		if ((*streamData == 0) || (streamData[3] == 0) || (streamData[0x4b] == 0)) {
-			if (streamData[3] != 0) {
+			if (m_ReportPrint != 0) {
+				OSReport(s_redStreamBufferSecureErrorFmt, sRedStreamLogPrefix, sRedStreamLogErrorColor,
+				         sRedStreamLogReset);
+				fflush(&DAT_8021d1a8);
+			}
+			if (streamData[3] == 0) {
+				if (m_ReportPrint != 0) {
+					OSReport(s_redStreamMainMemoryCreateErrorFmt, sRedStreamLogPrefix, sRedStreamLogWarnColor,
+					         0x4000, sRedStreamLogReset);
+					fflush(&DAT_8021d1a8);
+				}
+			} else {
 				RedDelete__FPv((void*)streamData[3]);
 			}
-			if (streamData[0x4b] != 0) {
+			if (streamData[0x4b] == 0) {
+				if (m_ReportPrint != 0) {
+					OSReport(s_redStreamAuxMemoryCreateErrorFmt, sRedStreamLogPrefix, sRedStreamLogWarnColor,
+					         amemSize, sRedStreamLogReset);
+					fflush(&DAT_8021d1a8);
+				}
+			} else {
 				RedDeleteA(streamData[0x4b]);
-			}
-			if (m_ReportPrint != 0) {
-				fflush(&DAT_8021d1a8);
 			}
 			return param_1;
 		}

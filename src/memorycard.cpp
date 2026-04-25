@@ -11,11 +11,37 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
 #include "string.h"
 
-char sMcSaveFileName[] = "FFCC";
-char* PTR_DAT_8032e854 = sMcSaveFileName;
+class CardConst
+{
+public:
+    static char* MC_ICONIMG_FNAME;
+    static char* MC_FNAME;
+    static char* MC_COMMENT;
+    static char* MCDAT_MAKER;
+    static char* MCDAT_TITLE;
+    static char* MCDAT_MACHINE;
+    static char* MCDAT_VERSION;
+};
+
+static const char sMcSaveFileName[] = "FFCC";
+static const char sMcdatTitle[] = "GCCP";
+static const char sMcdatMachine[] = "SAVE";
+static const char sMcdatVersion[] = "DATA";
+static const char s_icon_dat_801DA9E8[] = "icon.dat";
+static const char s_FF_Crystal_Chronicles_801DA9F4[] = "FF Crystal Chronicles";
+
+char* CardConst::MC_ICONIMG_FNAME = const_cast<char*>(s_icon_dat_801DA9E8);
+char* CardConst::MC_FNAME = const_cast<char*>(sMcSaveFileName);
+char* CardConst::MC_COMMENT = const_cast<char*>(s_FF_Crystal_Chronicles_801DA9F4);
+char* CardConst::MCDAT_MAKER = const_cast<char*>(sMcSaveFileName);
+char* CardConst::MCDAT_TITLE = const_cast<char*>(sMcdatTitle);
+char* CardConst::MCDAT_MACHINE = const_cast<char*>(sMcdatMachine);
+char* CardConst::MCDAT_VERSION = const_cast<char*>(sMcdatVersion);
+
 CMemoryCardMan MemoryCardMan;
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" int memcmp(const void* lhs, const void* rhs, unsigned long count);
 static const char sMemoryCardManagerName[] = "CMemoryCardMan";
 static const char sMemoryCardSourceFile[] = "memorycard.cpp";
 static const char sMemoryAllocationError[] = {
@@ -32,10 +58,6 @@ static const char sMemoryAllocationError[] = {
     0x74, 0x28, 0x25, 0x64, 0x29, 0x20, 0x65, 0x72, 0x72, 0x6F, 0x72, 0x28,
     0x25, 0x64, 0x29, 0x0A,
 };
-static const char s_icon_dat_801DA9E8[] = "icon.dat";
-static const char s_FF_Crystal_Chronicles_801DA9F4[] = "FF Crystal Chronicles";
-char* PTR_s_icon_dat = const_cast<char*>(s_icon_dat_801DA9E8);
-char* PTR_s_FF_Crystal_Chronicles = const_cast<char*>(s_FF_Crystal_Chronicles_801DA9F4);
 static const char sMemoryCardIconPathFmt[] = "dvd/%smenu/%s";
 static const char sMemoryCardOpenErrorFmt[] = "%s(%d): Error: %s open error";
 static const char sMemoryCardDataErrorFmt[] = "%s(%d): Error: [%s] data error";
@@ -345,7 +367,7 @@ int CMemoryCardMan::McUnmount(int chan)
  */
 int CMemoryCardMan::McOpen(int chan)
 { 
-	m_result = CARDOpen(chan, PTR_DAT_8032e854, &m_fileInfo);
+	m_result = CARDOpen(chan, CardConst::MC_FNAME, &m_fileInfo);
 	m_opDoneFlag = 1;
 	m_state = 3;
 
@@ -391,7 +413,7 @@ void CMemoryCardMan::McCreate(int chan)
 
     int result = CARDCreateAsync(
         chan,
-        PTR_DAT_8032e854,
+        CardConst::MC_FNAME,
         0x2C000, // size
         &m_fileInfo,
         &Attach
@@ -550,7 +572,7 @@ void CMemoryCardMan::SetMcIconImage()
     char path[136];
 
     const char* lang = (const char*) nullptr; // Game.GetLangString();
-    sprintf(path, const_cast<char*>(sMemoryCardIconPathFmt), lang, PTR_s_icon_dat);
+    sprintf(path, const_cast<char*>(sMemoryCardIconPathFmt), lang, CardConst::MC_ICONIMG_FNAME);
     CFile::CHandle* h = File.Open(path, 0, CFile::PRI_LOW);
 
     if (h == nullptr && System.m_execParam != 0)
@@ -610,8 +632,8 @@ void CMemoryCardMan::SetMcIconImage()
     m_cardStat.offsetIconTlut = 0x2840;
     m_cardStat.offsetIconTlut = 0x2A40;
 
-    size_t titleLen = strlen(PTR_s_FF_Crystal_Chronicles);
-    memcpy(m_saveBuffer, PTR_s_FF_Crystal_Chronicles, titleLen);
+    size_t titleLen = strlen(CardConst::MC_COMMENT);
+    memcpy(m_saveBuffer, CardConst::MC_COMMENT, titleLen);
 }
 
 /*
@@ -748,7 +770,7 @@ void CMemoryCardMan::McDelFile(int chan)
 	
     int result = CARDDeleteAsync(
         chan,
-        PTR_DAT_8032e854,
+        CardConst::MC_FNAME,
         &Attach
     );
 
@@ -786,11 +808,6 @@ bool CMemoryCardMan::IsBrokenFile()
  */
 void CMemoryCardMan::MakeSaveData()
 {
-    static const char s_magic0[] = "FFCC";
-    static const char s_magic1[] = "GCCP";
-    static const char s_magic2[] = "SAVE";
-    static const char s_magic3[] = "DATA";
-
     if (m_saveBuffer == (char*)nullptr)
     {
         m_saveBuffer = new char[0xA000];
@@ -813,10 +830,10 @@ void CMemoryCardMan::MakeSaveData()
     const u64 now = OSGetTime();
     memcpy(save + 0x8AD0, &now, sizeof(now));
 
-    memcpy(save + 0x00, s_magic0, strlen(s_magic0));
-    memcpy(save + 0x04, s_magic1, strlen(s_magic1));
-    memcpy(save + 0x08, s_magic2, strlen(s_magic2));
-    memcpy(save + 0x0C, s_magic3, strlen(s_magic3));
+    memcpy(save + 0x00, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER));
+    memcpy(save + 0x04, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE));
+    memcpy(save + 0x08, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE));
+    memcpy(save + 0x0C, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION));
     save[0x10] = 'E';
     save[0x11] = static_cast<u8>(*reinterpret_cast<u32*>(gameWork + 0x13D8) & 0xFF);
     save[0x12] = 0;
@@ -944,11 +961,6 @@ void CMemoryCardMan::MakeSaveData()
  */
 void CMemoryCardMan::SetLoadData()
 {
-    static const char s_magic0[] = "FFCC";
-    static const char s_magic1[] = "GCCP";
-    static const char s_magic2[] = "SAVE";
-    static const char s_magic3[] = "DATA";
-
     if (m_saveBuffer == (char*)nullptr)
     {
         return;
@@ -958,19 +970,19 @@ void CMemoryCardMan::SetLoadData()
     u8* game = reinterpret_cast<u8*>(&Game);
     u8* gameWork = game + 0x08;
 
-    if (save[0x00] != s_magic0[0] || save[0x01] != s_magic0[1] || save[0x02] != s_magic0[2] || save[0x03] != s_magic0[3])
+    if (memcmp(save + 0x00, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
     {
         return;
     }
-    if (save[0x04] != s_magic1[0] || save[0x05] != s_magic1[1] || save[0x06] != s_magic1[2] || save[0x07] != s_magic1[3])
+    if (memcmp(save + 0x04, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE)) != 0)
     {
         return;
     }
-    if (save[0x08] != s_magic2[0] || save[0x09] != s_magic2[1] || save[0x0A] != s_magic2[2] || save[0x0B] != s_magic2[3])
+    if (memcmp(save + 0x08, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE)) != 0)
     {
         return;
     }
-    if (save[0x0C] != s_magic3[0] || save[0x0D] != s_magic3[1] || save[0x0E] != s_magic3[2] || save[0x0F] != s_magic3[3])
+    if (memcmp(save + 0x0C, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION)) != 0)
     {
         return;
     }
@@ -1258,7 +1270,7 @@ int CMemoryCardMan::DummySave()
         return m_result;
     }
 
-    result = CARDOpen(0, PTR_DAT_8032e854, &m_fileInfo);
+    result = CARDOpen(0, CardConst::MC_FNAME, &m_fileInfo);
     m_result = result;
     m_opDoneFlag = 1;
     m_state = 3;
@@ -1270,7 +1282,7 @@ int CMemoryCardMan::DummySave()
 
         result = CARDCreateAsync(
             0,
-            PTR_DAT_8032e854,
+            CardConst::MC_FNAME,
             0x2C000,
             &m_fileInfo,
             &Attach
@@ -1563,7 +1575,7 @@ int CMemoryCardMan::DummyLoad()
         return m_result;
     }
 
-    result = CARDOpen(0, PTR_DAT_8032e854, &m_fileInfo);
+    result = CARDOpen(0, CardConst::MC_FNAME, &m_fileInfo);
     m_result = result;
     m_opDoneFlag = 1;
     m_state = 3;

@@ -121,6 +121,33 @@ static int CharaObjGetModelPdtNo(CGCharaObj* charaObj)
 	return reinterpret_cast<int*>(charaObj->m_charaModelHandle->m_pdtLoadRef)[2];
 }
 
+static bool CharaObjIsAttackAnimBoundary(CGCharaObj* charaObj)
+{
+	if (charaObj->m_charaModelHandle == 0 || charaObj->m_charaModelHandle->m_model == 0) {
+		return true;
+	}
+
+	CChara::CModel* model = charaObj->m_charaModelHandle->m_model;
+	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
+	if (*reinterpret_cast<void**>(modelBytes + 0xB8) == 0) {
+		return true;
+	}
+
+	float animStart = *reinterpret_cast<float*>(modelBytes + 0xC0);
+	float animEnd = *reinterpret_cast<float*>(modelBytes + 0xC4);
+	unsigned int span = static_cast<unsigned int>(1.0f + (animEnd - animStart));
+	if (span == 1) {
+		return true;
+	}
+
+	unsigned int frame = static_cast<unsigned int>(charaObj->m_turnSpeed);
+	if (*reinterpret_cast<float*>(charaObj->m_lastBgAttr) >= 0.05f) {
+		return span <= frame;
+	}
+
+	return (frame % span) == 0;
+}
+
 static float CharaObjGetMonsterScale(unsigned char* script9, bool isMon)
 {
 	if (!isMon || script9 == 0) {
@@ -2382,6 +2409,9 @@ void CGCharaObj::statAttack()
 	if ((cid & 0xAD) == 0xAD && m_subState == 0) {
 		void* animPoint = m_scriptHandle != 0 ? m_scriptHandle[4] : 0;
 		if (animPoint == reinterpret_cast<void*>(0x88) || animPoint == reinterpret_cast<void*>(0x87)) {
+			if (!CharaObjIsAttackAnimBoundary(this)) {
+				return;
+			}
 			m_subState = 1;
 			m_stateFrame = 0;
 		}

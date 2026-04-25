@@ -48,6 +48,10 @@ extern float FLOAT_80331a54;
 extern float FLOAT_80331a74;
 extern float FLOAT_80331a9c;
 extern float FLOAT_80331aa0;
+extern float FLOAT_80331A98;
+extern float FLOAT_80331AB0;
+extern float FLOAT_80331AB8;
+extern float FLOAT_80331AC0;
 extern float FLOAT_80331ac4;
 extern float FLOAT_80331ac8;
 extern float FLOAT_80331acc;
@@ -58,6 +62,8 @@ extern float FLOAT_80331ADC;
 extern float FLOAT_80331b00;
 extern float FLOAT_80331b04;
 extern float FLOAT_80331b08;
+extern float FLOAT_8032EE80;
+extern float FLOAT_8032EE84;
 
 struct GhostPartyWork {
 	int mood;
@@ -2068,19 +2074,67 @@ void CGPartyObj::statCarry()
  */
 void CGPartyObj::statPut()
 {
+	if (Game.m_gameWork.m_menuStageMode != 0 &&
+	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    (GetCID() & 0x6D) == 0x6D &&
+	    m_scriptHandle[0xED] != 0) {
+		if (m_stateFrame == 0) {
+			CancelMove(1);
+			FLOAT_8032EE80 = FLOAT_80331AB0;
+			FLOAT_8032EE84 = *reinterpret_cast<float*>(Game.unk_flat3_0xc7d0 + 0x160) - m_worldPosition.y;
+		}
+
+		if (m_stateFrame < 0x0C) {
+			const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
+			m_extraMoveVec.x = FLOAT_8032EE80 * phase * sinf(m_rotBaseY);
+			m_extraMoveVec.z = FLOAT_8032EE80 * phase * cosf(m_rotBaseY);
+			m_extraMoveVec.y = FLOAT_8032EE84 * phase + FLOAT_80331A98;
+		}
+	}
+
 	if (m_stateFrame == 0) {
 		int anim = 0x0E;
+		int seNo = 0x23;
 		if (m_lastStateId == 0x0D) {
 			anim = 0x19;
+			seNo = 0x24;
 		} else if (m_lastStateId == 0x1B) {
 			anim = 9;
+			if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
+				anim = 0x28;
+			}
+			seNo = 0x24;
 		}
 		reqAnim(anim, 0, 0);
+		playSe3D(seNo, 0x32, 0x96, 0, 0);
 	}
 
 	if (isLoopAnim() != 0) {
-		carry(2, (CGObject*)0, 1);
-		setIdleMotion();
+		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+		PartyObjOverlay& party = PartyData(this);
+		if (party.carryObject == 0) {
+			if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x24, 1);
+			} else if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
+				SetAnimSlot(0, 0);
+				SetAnimSlot(1, 1);
+			} else {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x30, 1);
+			}
+		} else if (*reinterpret_cast<int*>(CFlat + 0x12AC) == 0) {
+			if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
+				SetAnimSlot(0x0B, 0);
+				SetAnimSlot(0x0C, 1);
+			} else {
+				SetAnimSlot(0x0B, 0);
+				SetAnimSlot(2, 1);
+			}
+		} else {
+			SetAnimSlot(0x0B, 0);
+			SetAnimSlot(0x0C, 1);
+		}
 		changeStat(0, 0, 0);
 	}
 }

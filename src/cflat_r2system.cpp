@@ -3608,6 +3608,49 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0x22: {
+        const unsigned int mask = *object->m_localBase;
+        Vec target = {
+            static_cast<float>(object->m_localBase[1]),
+            static_cast<float>(object->m_localBase[2]),
+            static_cast<float>(object->m_localBase[3]),
+        };
+        const float margin = static_cast<float>(object->m_localBase[4]);
+        int found = 0;
+        unsigned int bestLine = 0;
+        float bestDistance = kLineBoundsInitMin;
+        float bestLineDistance = 0.0f;
+
+        for (unsigned int i = 0; i < 0x10; i++) {
+            CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + i * 0xB14);
+            const unsigned int lineMask = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(line) + 0x2C);
+            if (line->m_numPoints == 0 || (lineMask & mask) == 0 || line->IsInner(&target, margin) == 0) {
+                continue;
+            }
+
+            unsigned long segment = 0;
+            float segmentRatio = 0.0f;
+            float nearestDistance = 0.0f;
+            if (line->Calc((Vec*)0, &nearestDistance, &segment, &segmentRatio, &target, margin) != 0 &&
+                nearestDistance < bestDistance) {
+                found = 1;
+                bestLine = i;
+                bestDistance = nearestDistance;
+                bestLineDistance = line->m_segments[segment].length * segmentRatio + line->m_segments[segment].startLength;
+            }
+        }
+
+        if (found != 0) {
+            *reinterpret_cast<unsigned int*>(object->m_localBase[5]) = bestLine;
+            *reinterpret_cast<float*>(object->m_localBase[6]) = bestLineDistance;
+            *reinterpret_cast<unsigned int*>(object->m_localBase[7]) =
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x26EC + bestLine * 0xB14);
+        }
+
+        runtime->push(object, found);
+        outResult = 0;
+        return;
+    }
     case -0x1F:
         if (*object->m_localBase < 0x10) {
             const int lineOffset = *object->m_localBase * 0xB14;

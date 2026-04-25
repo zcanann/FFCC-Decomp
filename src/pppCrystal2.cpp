@@ -252,11 +252,11 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         Crystal2RefractionMap* textureInfo;
         u32 textureSize;
         float magnitude;
-        float xCoord;
-        float ySq;
         float stepX;
         float stepY;
         float yCoord;
+        float xCoord;
+        float ySq;
 
         work->m_refractionMap = (Crystal2RefractionMap*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             sizeof(Crystal2RefractionMap), pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xA8);

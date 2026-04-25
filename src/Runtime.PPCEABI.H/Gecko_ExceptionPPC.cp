@@ -694,13 +694,6 @@ void ExPPC_ThrowHandler(ThrowContext* context)
  * @note Address: N/A
  * @note Size: 0x144
  */
-extern "C" const char s_std_bad_exception[];
-extern "C" const char s_std_exception[];
-extern "C" const char s_bad_exception[0x20];
-
-extern "C" void* __RTTI__Q23std9exception_gecko[];
-extern "C" void* s_bad_exception_rtti[];
-extern "C" void* __RTTI__Q23std13bad_exception[];
 struct BadExceptionStorage {
 	void* vtable;
 };
@@ -708,31 +701,6 @@ struct BadExceptionStorage {
 extern "C" void __dt__Q23std13bad_exceptionFv(std::bad_exception*, s16);
 extern "C" void* __vt__Q23std9exception[];
 extern "C" void* __vt__Q23std13bad_exception[];
-
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - Gecko_ExceptionPPC.cp now rebuilds at 100% code/data on latest main, but
- *   flipping the unit to `Matching` still fails final main.dol checksum
- * - that means this unit is now a pure hidden-link / object-metadata blocker;
- *   the remaining miss is no longer in visible source code shape
- *
- * Most useful result so far:
- * - current latest-main source does now match __unexpected at 100% again: the
- *   keepable fix was to seed `stdExceptionBadExceptionType` from
- *   `unexpectedTypes`, then derive `badExceptionType` back from that pointer
- *   instead of initializing `badExceptionType` directly from the array base
- * - that source shape changes only the one live instruction seam at the second
- *   ExPPC_IsInSpecification compare, turning source `addi r3, r30, 0` into the
- *   target `mr r3, r30`
- * - a fresh Matching flip on this fixed source still fails final main.dol
- *   checksum, so the remaining blocker is no longer C code shape inside
- *   `__unexpected`; it is hidden object/linkage metadata elsewhere in the unit
- * - older flat probes are still worth remembering: a dedicated
- *   `compareBadExceptionType` local and fully collapsed direct-offset pointer
- *   initializers both stayed flat before the winning pointer-derivation shape
- */
 
 /**
  * @note Address: N/A
@@ -780,15 +748,6 @@ extern void __unexpected(CatchInfo* catchinfo)
 	}
 	terminate();
 }
-
-namespace std {
-bad_exception::~bad_exception() {}
-const char* bad_exception::what() const;
-} // namespace std
-
-extern "C" const char s_std_bad_exception[] = "std::bad_exception";
-extern "C" const char s_std_exception[] = "std::exception";
-extern "C" const char s_bad_exception[0x20] = "bad_exception\0\0\0exception";
 
 /**
  * @note Address: N/A
@@ -1141,9 +1100,3 @@ int __register_fragment(struct __eti_init_info* info, char* TOC)
 
 	return -1;
 }
-
-const char* std::bad_exception::what() const { return s_bad_exception; }
-
-extern "C" void* __RTTI__Q23std9exception_gecko[] = { (void*)s_std_exception, 0 };
-extern "C" void* s_bad_exception_rtti[]           = { __RTTI__Q23std9exception_gecko, 0, 0 };
-extern "C" void* __RTTI__Q23std13bad_exception[] = { (void*)s_std_bad_exception, s_bad_exception_rtti };

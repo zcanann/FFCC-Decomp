@@ -560,7 +560,7 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		reinterpret_cast<CGCharaObj*>(this)->ClearAllSta();
 		break;
 	case 6:
-		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560) = value;
+		reinterpret_cast<CGCharaObj*>(this)->m_itemId = value;
 		break;
 	case 7:
 		reinterpret_cast<CGPartyObj*>(this)->setAlive(1, 0);
@@ -585,7 +585,7 @@ int CGPrgObj::GetClassControl(int classControl)
 	case 9:
 		return reinterpret_cast<CGPartyObj*>(this)->isRideTarget();
 	case 10:
-		return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560);
+		return reinterpret_cast<CGCharaObj*>(this)->m_itemId;
 	default:
 		return 0;
 	}

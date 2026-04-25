@@ -1107,7 +1107,7 @@ void CRingMenu::DrawIcon()
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 	Vec4d clipPos;
-	MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(0, screenMtx, &viewPos, &clipPos);
+	MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(&Math, screenMtx, &viewPos, &clipPos);
 
 	float screenX = clipPos.x * (FLOAT_803309cc / clipPos.w);
 	float screenY = clipPos.y * (FLOAT_803309cc / clipPos.w);

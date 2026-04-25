@@ -19,6 +19,8 @@ int PitchCompute__Fiiii(int, int, int, int);
 int SearchSeEmptyTrack__Fiii(int, int, int);
 }
 
+#define redSoundDebugEnabled (*reinterpret_cast<int*>(&DAT_8032f3f0))
+
 /*
  * --INFO--
  * PAL Address: 0x801cb93c
@@ -333,7 +335,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 		if (streamData[0x4b] != 0) {
 			RedDeleteA(streamData[0x4b]);
 		}
-		if (gRedMemoryDebugEnabled != 0) {
+		if (redSoundDebugEnabled != 0) {
 			fflush(&DAT_8021d1a8);
 		}
 		return param_1;
@@ -476,7 +478,7 @@ void StreamPause(int param_1, int param_2)
 	int voiceData;
 	int pitch;
 
-	if (gRedMemoryDebugEnabled != 0) {
+	if (redSoundDebugEnabled != 0) {
 		if (param_2 == 1) {
 			OSReport(s_redStreamPauseOnFmt, sRedStreamLogPrefix, param_1);
 		} else {

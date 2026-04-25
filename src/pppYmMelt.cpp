@@ -97,6 +97,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 {
     s32 colorOffset;
     YmMeltWork* work;
+    YmMeltVertex* vertexData;
     YmMeltColorWork* colorWork;
     pppShapeSt* shape;
     CTexture* texture;

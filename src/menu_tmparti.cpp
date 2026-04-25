@@ -484,11 +484,11 @@ void CMenuPcs::TmpArtiCtrl()
 	if (hasInput) {
 		uVar3 = 0;
 	} else {
-		u8* padPtr = reinterpret_cast<u8*>(&Pad);
 		if ((__cntlzw((unsigned int)Pad._448_4_) & 0x20) == 0) {
-			padPtr += 0x54;
+			uVar3 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + 0x5c);
+		} else {
+			uVar3 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + 8);
 		}
-		uVar3 = *(u16*)(padPtr + 8);
 	}
 
 	if (uVar3 == 0) {

@@ -8,9 +8,9 @@
 #include <string.h>
 
 extern char DAT_8021dcab;
-extern const char DAT_80333d68;
-extern const char DAT_80333d75;
-extern const char DAT_80333d70;
+static const char sRedCommandLogWarnColor[] = "\x1B[4;31m";
+static const char sRedCommandLogReset[] = "\x1B[0m";
+static const char sRedCommandLogErrorColor[] = "\x1B[7;31m";
 static const char s_redCommandWaveNotEntryFmt[] = "%s%sWave is not Entry. (wave%4.4u)%s\n";
 static const char sRedCommandLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
 static const char s_redCommandSePauseOnFmt[] = "%sPause : SE     : ON  %d\n";
@@ -338,8 +338,8 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	waveBase = SearchWaveBase__9CRedEntryFi(&c_RedEntry, deltaTime);
 	if (waveBase == 0) {
 		if (m_ReportPrint != 0) {
-			OSReport(s_redCommandWaveNotEntryFmt, sRedCommandLogPrefix, &DAT_80333d68,
-			         deltaTime, &DAT_80333d70);
+			OSReport(s_redCommandWaveNotEntryFmt, sRedCommandLogPrefix, sRedCommandLogWarnColor,
+			         deltaTime, sRedCommandLogReset);
 			fflush(&DAT_8021d1a8);
 		}
 	} else {
@@ -718,12 +718,12 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	int trackBase = RedNew(*(char*)((char*)musicHead + 8) * 0x154);
 	if (trackBase == 0) {
 		if (m_ReportPrint != 0) {
-			OSReport(s_redCommandMusicTrackCreateErrorFmt, sRedCommandLogPrefix, &DAT_80333d75,
-			         &DAT_80333d70);
+			OSReport(s_redCommandMusicTrackCreateErrorFmt, sRedCommandLogPrefix, sRedCommandLogErrorColor,
+			         sRedCommandLogReset);
 			fflush(&DAT_8021d1a8);
-			OSReport(s_redCommandMusicNeedMemoryFmt, sRedCommandLogPrefix, &DAT_80333d75,
+			OSReport(s_redCommandMusicNeedMemoryFmt, sRedCommandLogPrefix, sRedCommandLogErrorColor,
 			         (int)*(short*)((char*)musicHead + 4), *(char*)((char*)musicHead + 8) * 0x154,
-			         &DAT_80333d70);
+			         sRedCommandLogReset);
 			fflush(&DAT_8021d1a8);
 		}
 		c_RedEntry.DisplayMMemoryInfo();

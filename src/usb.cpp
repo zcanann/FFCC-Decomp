@@ -2,7 +2,10 @@
 
 #include "ffcc/system.h"
 
-extern "C" void* __vt__8CManager[];
+extern "C" {
+extern void* __RTTI__8CManager[];
+void* CUSB_RTTI_base__4CUSB[] = {__RTTI__8CManager, 0, 0};
+}
 
 CUSB USB;
 

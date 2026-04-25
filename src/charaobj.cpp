@@ -556,8 +556,11 @@ void CGCharaObj::onFramePostCalc()
 		if (*reinterpret_cast<short*>(script + 0x42) != 0) {
 			unsigned short tickDiv = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3A);
 			if (m_stateTick != 0 && tickDiv != 0 && (m_stateTick % static_cast<int>(tickDiv)) == 0) {
-				playSe3D(0x19, 0x32, 0x96, 0, 0);
-				addHp(-1, 0);
+				if (*reinterpret_cast<unsigned short*>(script + 0x1C) > 1 &&
+				    (CFlat[0x12E4] & 0x20) == 0) {
+					playSe3D(0x19, 0x32, 0x96, 0, 0);
+					addHp(-1, 0);
+				}
 			}
 		}
 

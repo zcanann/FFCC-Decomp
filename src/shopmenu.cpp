@@ -562,26 +562,6 @@ static int GetShopMenuFigureStep(CShopMenu* shopMenu)
     return (ShopMenuInt(shopMenu, 0x38) == 1) ? 10 : 1;
 }
 
-static bool CanShopMenuIncreaseFigureQuantity(CShopMenu* shopMenu, int quantity)
-{
-    int caravan = ShopMenuCaravan(shopMenu);
-    if (quantity > (0x40 - *reinterpret_cast<unsigned short*>(caravan + 0x94))) {
-        return false;
-    }
-
-    int totalGil = 0;
-    if (ShopMenuInt(shopMenu, 0x28) != -1) {
-        int listType = ShopMenuInt(shopMenu, 0x14);
-        if ((listType == 0) || (listType == 1)) {
-            totalGil = quantity * CalcShopMenuTradeGil(shopMenu, ResolveShopMenuSelectedItemId(shopMenu));
-        } else {
-            totalGil = quantity * -1;
-        }
-    }
-
-    return CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -totalGil) != 0;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801589d0
@@ -1600,7 +1580,22 @@ void CShopMenu::SelectFigure()
         int figureMode = ShopMenuInt(this, 0x38);
         if (figureMode == 1) {
             ShopMenuInt(this, 0x44) += 10;
-            if (CanShopMenuIncreaseFigureQuantity(this, ShopMenuInt(this, 0x44))) {
+            int quantity = ShopMenuInt(this, 0x44);
+            int caravan = ShopMenuCaravan(this);
+            bool canIncrease = quantity <= (0x40 - *reinterpret_cast<unsigned short*>(caravan + 0x94));
+            if (canIncrease) {
+                int totalGil = 0;
+                if (ShopMenuInt(this, 0x28) != -1) {
+                    int listType = ShopMenuInt(this, 0x14);
+                    if ((listType == 0) || (listType == 1)) {
+                        totalGil = quantity * CalcShopMenuTradeGil(this, ResolveShopMenuSelectedItemId(this));
+                    } else {
+                        totalGil = quantity * -1;
+                    }
+                }
+                canIncrease = CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -totalGil) != 0;
+            }
+            if (canIncrease) {
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
                 return;
             }
@@ -1609,7 +1604,22 @@ void CShopMenu::SelectFigure()
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else if ((figureMode < 1) && (figureMode >= 0)) {
             ++ShopMenuInt(this, 0x44);
-            if (CanShopMenuIncreaseFigureQuantity(this, ShopMenuInt(this, 0x44))) {
+            int quantity = ShopMenuInt(this, 0x44);
+            int caravan = ShopMenuCaravan(this);
+            bool canIncrease = quantity <= (0x40 - *reinterpret_cast<unsigned short*>(caravan + 0x94));
+            if (canIncrease) {
+                int totalGil = 0;
+                if (ShopMenuInt(this, 0x28) != -1) {
+                    int listType = ShopMenuInt(this, 0x14);
+                    if ((listType == 0) || (listType == 1)) {
+                        totalGil = quantity * CalcShopMenuTradeGil(this, ResolveShopMenuSelectedItemId(this));
+                    } else {
+                        totalGil = quantity * -1;
+                    }
+                }
+                canIncrease = CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -totalGil) != 0;
+            }
+            if (canIncrease) {
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
                 return;
             }

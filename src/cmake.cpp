@@ -2945,6 +2945,7 @@ void CMenuPcs::CmakeVillageDraw()
     font->SetShadow(0);
     font->SetScale(FLOAT_80333258);
     font->DrawInit();
+    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
     font->SetMargin(FLOAT_803332c4);
     font->SetColor(col);
 
@@ -2962,7 +2963,7 @@ void CMenuPcs::CmakeVillageDraw()
         int wobble = System.m_frameCounter & 7;
         DrawCursor__8CMenuPcsFiif(this,
             static_cast<int>(FLOAT_803332c8 + select * FLOAT_803332c0) + wobble,
-            row * 0x20 + 0x70, alpha);
+            row * 0x20 + 0x70, FLOAT_80333258);
     }
 
     int showNameCursor = (mode == 1 && row < 5 && strlen(s_CmakeInfo.m_name) <= 6) ? 1 : 0;

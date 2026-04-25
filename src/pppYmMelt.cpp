@@ -110,7 +110,6 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     float phaseLerp;
     u32 drawColor;
     u8* drawColorBytes;
-    YmMeltVertex* vertexData;
     float worldX;
     float worldY;
     float worldZ;

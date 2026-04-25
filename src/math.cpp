@@ -776,13 +776,13 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outCoeffScalar, Vec* p0,
     Vec* p1, Vec* p2, Vec* p3)
 {
-    float r2 = radius * radius;
+    float radiusSquared = radius * radius;
+    float radiusCubed = radius * radiusSquared;
     Vec4d coeffs;
-    coeffs.w = radius * r2;
-    coeffs.z = (2.0f * coeffs.w) - (3.0f * r2);
-    coeffs.x = 1.0f + ((3.0f * coeffs.w) - (3.0f * r2));
-    coeffs.y = radius - ((3.0f * r2) - coeffs.w);
-    coeffs.w = coeffs.w - r2;
+    coeffs.x = 1.0f + ((3.0f * radiusCubed) - (3.0f * radiusSquared));
+    coeffs.y = radius - ((3.0f * radiusSquared) - radiusCubed);
+    coeffs.z = (2.0f * radiusCubed) - (3.0f * radiusSquared);
+    coeffs.w = radiusCubed - radiusSquared;
 
     Mtx44 control;
     control[0][0] = p1->x;
@@ -794,9 +794,10 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[2][2] = p2->z;
     control[3][2] = 1.0f;
 
+    float scaleAB = scaleA + scaleB;
     float t0 = 0.0f;
-    if (scaleA + scaleB != 0.0f) {
-        t0 = scaleA / (scaleA + scaleB);
+    if (scaleAB != 0.0f) {
+        t0 = scaleA / scaleAB;
     }
 
     Vec tangent;
@@ -810,9 +811,10 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[2][1] = tangent.z;
     control[3][1] = 1.0f;
 
+    float scaleBC = scaleB + scaleC;
     float t1 = 0.0f;
-    if (scaleB + scaleC != 0.0f) {
-        t1 = scaleB / (scaleB + scaleC);
+    if (scaleBC != 0.0f) {
+        t1 = scaleB / scaleBC;
     }
 
     PSVECSubtract(p3, p2, &tangent);

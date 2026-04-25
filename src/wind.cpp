@@ -167,7 +167,9 @@ found:
 		return -1;
 	}
 
+	float centerX = pos->x;
 	obj->type = 2;
+	float centerZ = pos->z;
 	obj->flags = static_cast<u8>(__rlwimi(obj->flags, 1, 7, 24, 24));
 
 	int id = m_nextId;
@@ -181,8 +183,8 @@ found:
 	obj->baseRadius = radius;
 	obj->life = life;
 	obj->lifeTimer = 0;
-	obj->centerX = pos->x;
-	obj->centerZ = pos->z;
+	obj->centerX = centerX;
+	obj->centerZ = centerZ;
 
 	return obj->id;
 }

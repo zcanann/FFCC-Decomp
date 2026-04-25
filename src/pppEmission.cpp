@@ -31,6 +31,7 @@ extern const float FLOAT_8033111C = 15.0f;
 extern const float FLOAT_80331120 = 7.0f;
 extern const double DOUBLE_80331128 = 4503599627370496.0;
 extern const float FLOAT_80331130 = 10000000.0f;
+extern const float FLOAT_803311e4;
 static const char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
@@ -372,7 +373,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
 
         if (step->m_payload[9] == 0) {
             for (int i = 0; i < step->m_initWOrk; i++) {
-                float scale = FLOAT_80331120;
+                float scale = FLOAT_803311e4;
                 scale += (float)i * state->m_scale0;
                 Mtx viewMtx;
                 Mtx objMtx;

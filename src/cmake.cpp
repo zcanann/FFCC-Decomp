@@ -2573,8 +2573,65 @@ void CMenuPcs::CmakeResultDraw()
     float alpha = CalcCmakeFadeAlpha(this);
 
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
-    DrawCmakeSelectionBackdrop(this);
-    DrawCmakePreviewChara(this);
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
+
+    GXColor backdropColor = {0xFF, 0xFF, 0xFF, 0xFF};
+    GXSetChanMatColor(GX_COLOR0A0, backdropColor);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x3F);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcsVoid(), 0,
+        FLOAT_80333254, FLOAT_803332d8, FLOAT_803332dc, FLOAT_803332e0,
+        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcsVoid(), 8,
+        FLOAT_803332e4, FLOAT_803332d8, FLOAT_803332dc, FLOAT_803332e0,
+        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x40);
+    for (int tileX = 0x20; tileX < 0x260; ) {
+        int tileW = 0x20;
+        if (0x260 - tileX < 0x20) {
+            tileW = 0x260 - tileX;
+        }
+
+        DrawRect__8CMenuPcsFUlfffffffff(
+            MenuPcsVoid(), 0,
+            static_cast<float>(tileX), FLOAT_803332d8, static_cast<float>(tileW), FLOAT_803332e0,
+            FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+        tileX += tileW;
+    }
+
+    int slot = static_cast<int>(MenuS16(this, 0x86A));
+    int modelBlock = MenuS32(this, 0x814);
+    if (*reinterpret_cast<int*>(modelBlock + (slot + 0x20) * 0x50) != 0) {
+        *reinterpret_cast<unsigned short*>(modelBlock + 0x6E8) = 0xFF24;
+        *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
+        DrawInit__8CMenuPcsFv(this);
+
+        int handle = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4);
+        if (*reinterpret_cast<int*>(handle) == 3) {
+            SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x32);
+            SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
+            GXColor charaColor = {0xFF, 0xFF, 0xFF, 0xFF};
+            GXSetChanMatColor(GX_COLOR0A0, charaColor);
+            DrawRect__8CMenuPcsFUlfffffffff(
+                MenuPcsVoid(), 0,
+                FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
+                FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+        } else {
+            SetProjection__8CMenuPcsFi(this, 0x16);
+            SetLight__8CMenuPcsFi(this, 2);
+            int model = *reinterpret_cast<int*>(handle + 0x168);
+            *reinterpret_cast<float*>(model + 0x9C) = FLOAT_80333258;
+            Draw__Q29CCharaPcs7CHandleFi(reinterpret_cast<void*>(handle), 5);
+            RestoreProjection__8CMenuPcsFv(this);
+        }
+
+        DrawInit__8CMenuPcsFv(this);
+    }
 
     if ((mode == 2) && (resultDir < 0)) {
         DrawCmakePopupPanel(this, FLOAT_80333258, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,

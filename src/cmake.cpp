@@ -1944,7 +1944,7 @@ void CMenuPcs::CmakeTribeCtrl()
     unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
     unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
 
-    if (repeat == 0 && down == 0) {
+    if (repeat == 0) {
         return;
     }
 

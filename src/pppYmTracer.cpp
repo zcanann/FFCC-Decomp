@@ -16,7 +16,8 @@ extern f32 FLOAT_803306e8;
 extern f32 FLOAT_803306ec;
 extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
-extern const f64 DOUBLE_803306F0 = 4503601774854144.0;
+extern const f64 DOUBLE_803306F0 = 4503599627370496.0;
+extern const f64 DOUBLE_803306f8 = 4503601774854144.0;
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -76,18 +77,6 @@ union PackedColor {
     u8 bytes[4];
 };
 
-static inline void copyPolygonData(TRACE_POLYGON* dst, const TRACE_POLYGON* src)
-{
-    pppCopyVector(dst->from, src->from);
-    pppCopyVector(dst->to, src->to);
-    dst->life = src->life;
-    dst->decay = src->decay;
-    dst->colorR = src->colorR;
-    dst->colorG = src->colorG;
-    dst->colorB = src->colorB;
-    dst->alpha = src->alpha;
-}
-
 /*
  * --INFO--
  * PAL Address: 8009312c
@@ -115,12 +104,12 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     f32 uvStep;
     int textureIndex[2];
 
-    dataValIndex = param_2->m_dataValIndex;
     dataOffset = *param_3->m_serializedDataOffsets;
     colorOffset = param_3->m_serializedDataOffsets[1];
-    work = (TracerWork*)(pppYmTracer->m_serializedData + dataOffset);
-    colorData = pppYmTracer->m_serializedData + colorOffset;
+    work = (TracerWork*)((u8*)pppYmTracer + 0x80 + dataOffset);
+    colorData = (u8*)pppYmTracer + 0x80 + colorOffset;
     poly = work->entries;
+    dataValIndex = param_2->m_dataValIndex;
     mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
 
     if (dataValIndex != 0xFFFF) {
@@ -202,6 +191,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
  */
 void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmTracerUnkC* param_3)
 {
+    _pppPObject* baseObj;
     TracerMngRaw* mng;
     TracerWork* work;
     TRACE_POLYGON* entries;
@@ -219,12 +209,14 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         return;
     }
 
-    work = (TracerWork*)(pppYmTracer->m_serializedData + *param_3->m_serializedDataOffsets);
+    baseObj = (_pppPObject*)pppYmTracer;
+    work = (TracerWork*)((u8*)pppYmTracer + 0x80 + *param_3->m_serializedDataOffsets);
     entries = work->entries;
     if (entries == 0) {
-        work->entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)*(u16*)(param_2->m_payload + 4) * sizeof(TRACE_POLYGON), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmTracer_cpp_801d9ce0), 0xEB);
+        work->entries = entries;
         fVar3 = FLOAT_803306e8;
         entry = work->entries;
         for (i = 0; i < (s32)(u32)*(u16*)(param_2->m_payload + 4); i++) {
@@ -239,9 +231,10 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             entry->to.x = fVar3;
             entry++;
         }
+        entries = work->entries;
     }
 
-    if (param_2->m_graphId == pppYmTracer->m_graphId) {
+    if (param_2->m_graphId == baseObj->m_graphId) {
         if (param_2->m_initWOrk == -1) {
             valuePtr = reinterpret_cast<float*>(gPppDefaultValueBuffer);
         } else {
@@ -265,8 +258,18 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     if (work->count + 1 < *(u16*)(param_2->m_payload + 4)) {
         source = entries + (*(u16*)(param_2->m_payload + 4) - 2);
         for (i = *(u16*)(param_2->m_payload + 4) - 2; i >= 0; i--) {
+            Vec from = source->from;
+            Vec to = source->to;
+
             dest = source + 1;
-            copyPolygonData(dest, source);
+            pppCopyVector(dest->from, from);
+            pppCopyVector(dest->to, to);
+            dest->life = source->life;
+            dest->decay = source->decay;
+            dest->colorR = source->colorR;
+            dest->colorG = source->colorG;
+            dest->colorB = source->colorB;
+            dest->alpha = source->alpha;
             source--;
         }
 
@@ -280,33 +283,31 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         entries[0].to.z = fVar3;
         entries[0].to.y = fVar3;
         entries[0].to.x = fVar3;
+        entries[0].life = *(s16*)(param_2->m_payload + 6);
 
-        fVar3 = work->initWork[0];
-        work->from.x = fVar3;
-        entries[0].from.x = fVar3;
-        fVar3 = work->initWork[1];
-        work->from.y = fVar3;
-        entries[0].from.y = fVar3;
-        fVar3 = work->initWork[2];
-        work->from.z = fVar3;
-        entries[0].from.z = fVar3;
-        fVar3 = work->arg3Work[0];
-        work->to.x = fVar3;
-        entries[0].to.x = fVar3;
-        fVar3 = work->arg3Work[1];
-        work->to.y = fVar3;
-        entries[0].to.y = fVar3;
-        fVar3 = work->arg3Work[2];
-        work->to.z = fVar3;
-        entries[0].to.z = fVar3;
+        {
+            f32* from = work->initWork;
+            f32* to = work->arg3Work;
 
-        entries[0].life = *(u16*)(param_2->m_payload + 6);
-        entries[0].alpha = param_2->m_payload[8];
+            work->from.x = from[0];
+            work->from.y = from[1];
+            work->from.z = from[2];
+            entries[0].from.x = from[0];
+            entries[0].from.y = from[1];
+            entries[0].from.z = from[2];
+
+            work->to.x = to[0];
+            work->to.y = to[1];
+            work->to.z = to[2];
+            entries[0].to.x = to[0];
+            entries[0].to.y = to[1];
+            entries[0].to.z = to[2];
+        }
 
         {
             pppFMATRIX result;
 
-            pppMulMatrix(result, pppMngStPtr->m_matrix, pppYmTracer->m_localMatrix);
+            pppMulMatrix(result, pppMngStPtr->m_matrix, baseObj->m_localMatrix);
             PSMTXMultVec(result.value, &entries[0].from, &entries[0].from);
             PSMTXMultVec(result.value, &entries[0].to, &entries[0].to);
         }
@@ -317,7 +318,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             Vec splineFrom[4];
             Vec splineTo[4];
             s16 splineCount = 0;
-            f64 stepScale = FLOAT_803306ec / (f32)((f64)(param_2->m_payload[9] + 1) - DOUBLE_803306F0);
+            f64 stepScale = FLOAT_803306ec / (f32)((f64)(param_2->m_payload[9] + 1) - DOUBLE_803306f8);
 
             for (i = 0; i < (s32)(u32)param_2->m_payload[9]; i++) {
                 f32 t = (f32)(stepScale * (f64)(i + 1));
@@ -337,8 +338,18 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             for (i = 0; i < splineCount; i++) {
                 source = entries + (*(u16*)(param_2->m_payload + 4) - 2);
                 for (s32 j = *(u16*)(param_2->m_payload + 4) - 2; j > 1; j--) {
+                    Vec from = source->from;
+                    Vec to = source->to;
+
                     dest = source + 1;
-                    copyPolygonData(dest, source);
+                    pppCopyVector(dest->from, from);
+                    pppCopyVector(dest->to, to);
+                    dest->life = source->life;
+                    dest->decay = source->decay;
+                    dest->colorR = source->colorR;
+                    dest->colorG = source->colorG;
+                    dest->colorB = source->colorB;
+                    dest->alpha = source->alpha;
                     source--;
                 }
             }
@@ -384,7 +395,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
  */
 void pppDestructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
 {
-    TracerWork* work = (TracerWork*)(pppYmTracer->m_serializedData + *param_2->m_serializedDataOffsets);
+    TracerWork* work = (TracerWork*)((u8*)pppYmTracer + 0x80 + *param_2->m_serializedDataOffsets);
     if (work->entries != 0) {
         pppHeapUseRate((CMemory::CStage*)work->entries);
     }
@@ -403,7 +414,7 @@ void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
 {
     TracerWork* work;
 
-    work = (TracerWork*)(pppYmTracer->m_serializedData + *param_2->m_serializedDataOffsets);
+    work = (TracerWork*)((u8*)pppYmTracer + 0x80 + *param_2->m_serializedDataOffsets);
     work->_pad2e = 0;
     work->count = 0;
 }
@@ -423,7 +434,7 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
     TracerWork* work;
 
     fVar1 = FLOAT_803306e8;
-    work = (TracerWork*)(pppYmTracer->m_serializedData + *param_2->m_serializedDataOffsets);
+    work = (TracerWork*)((u8*)pppYmTracer + 0x80 + *param_2->m_serializedDataOffsets);
 
     work->entries = 0;
     work->arg3Work = 0;

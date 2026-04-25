@@ -342,7 +342,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport(s__s_sWave_is_not_Entry___wave_4_4_801e7e18, &DAT_801e7e3e, &DAT_80333d68,
 			         deltaTime, &DAT_80333d70);
-			fflush(&DAT_8021d1a8);
+			fflush(__files + 1);
 		}
 	} else {
 		WaveHistoryManager__9CRedEntryFii(&DAT_8032e154, 1, *(short*)(waveBase + 2));
@@ -654,7 +654,7 @@ void SePause(int seId, int pause)
 		} else {
 			OSReport(s__sPause___SE___OFF__d_801e7e6b, &DAT_801e7e3e, seId);
 		}
-		fflush(&DAT_8021d1a8);
+		fflush(__files + 1);
 	}
 
 	trackBasePtr = (unsigned int*)((char*)DAT_8032f3f0 + 0xdbc);
@@ -722,11 +722,11 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport(s__s_sMusic_Start___Couldn_t_Creat_801e7e86, &DAT_801e7e3e, &DAT_80333d75,
 			         &DAT_80333d70);
-			fflush(&DAT_8021d1a8);
+			fflush(__files + 1);
 			OSReport(s__s_s___music_3_3u_bgm___need_0x__801e7eb2, &DAT_801e7e3e, &DAT_80333d75,
 			         (int)*(short*)((char*)musicHead + 4), *(char*)((char*)musicHead + 8) * 0x154,
 			         &DAT_80333d70);
-			fflush(&DAT_8021d1a8);
+			fflush(__files + 1);
 		}
 		DAT_8032e154.DisplayMMemoryInfo();
 		return;

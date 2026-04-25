@@ -4038,6 +4038,102 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(object, 0);
         outResult = 0;
         return;
+    case -8: {
+        const unsigned int x = object->m_localBase[0];
+        const unsigned int y = object->m_localBase[1];
+        char* format = strBlob + strOffs[object->m_localBase[2]];
+
+        if (object->m_argCount == 3) {
+            Graphic.Printf(x, y, format);
+        } else {
+            char spec[256];
+            char rendered[256];
+            char line[264];
+            line[0] = '\0';
+
+            for (int i = 0; i < object->m_argCount - 3; i++) {
+                while (true) {
+                    int specLen = 0;
+                    while ((format[specLen] != '\0') && ((specLen == 0) || (format[specLen] != '%'))) {
+                        spec[specLen] = format[specLen];
+                        specLen++;
+                    }
+                    spec[specLen] = '\0';
+                    format += specLen;
+
+                    if (spec[0] == '%') {
+                        break;
+                    }
+                    strcat(line, spec, sizeof(line));
+                }
+
+                rendered[0] = '\0';
+                const int argIndex = i + 3;
+                char* scan = spec + 1;
+                if (spec[0] == '%') {
+                    int fmtIndex = 1;
+                    int width = 0;
+                    int started = spec[1] == '0';
+                    for (; (*scan >= '0') && (*scan <= '9'); scan++) {
+                        fmtIndex++;
+                        width = width * 10 + (*scan - '0');
+                    }
+
+                    if (spec[fmtIndex] == 'b') {
+                        char* out = rendered;
+                        unsigned int value = object->m_localBase[argIndex];
+                        int outLen = 0;
+                        for (int bit = 0; bit < width; bit++) {
+                            const unsigned int cur = (value >> ((width - bit) - 1U)) & 1U;
+                            if (started == 0 && cur != 0) {
+                                started = 1;
+                            }
+                            if (started != 0) {
+                                *out++ = static_cast<char>(cur + '0');
+                                outLen++;
+                            }
+                        }
+                        rendered[outLen] = '\0';
+                        strcat(rendered, spec + fmtIndex + 1, sizeof(rendered));
+                    } else {
+                        while (*scan != '\0') {
+                            switch (*scan) {
+                            case 'd':
+                            case 'x':
+                                sprintf(rendered, spec, object->m_localBase[argIndex]);
+                                scan = const_cast<char*>("");
+                                break;
+                            case 'f': {
+                                union {
+                                    unsigned int word;
+                                    float value;
+                                } arg;
+                                arg.word = object->m_localBase[argIndex];
+                                sprintf(rendered, spec, static_cast<double>(arg.value));
+                                scan = const_cast<char*>("");
+                                break;
+                            }
+                            case 's':
+                                sprintf(rendered, spec, strBlob + strOffs[object->m_localBase[argIndex]]);
+                                scan = const_cast<char*>("");
+                                break;
+                            default:
+                                scan++;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                strcat(line, rendered, sizeof(line));
+            }
+
+            Graphic.Printf(x, y, line);
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -7: {
         float value = cosf(static_cast<float>(*object->m_localBase));
         runtime->push(object, *reinterpret_cast<int*>(&value));

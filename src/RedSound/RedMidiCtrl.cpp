@@ -4,12 +4,8 @@
 #include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedGlobals.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
-extern "C" {
-void* memcpy(void*, const void*, unsigned long);
-void* memmove(void*, const void*, unsigned long);
-void* memset(void*, int, unsigned long);
-}
 int SwingEntryFunction[] = {
     (int)SineSwing, (int)TriangleSwing, (int)SawSwing, (int)DutySwing,
     (int)RandomSwing, (int)DutySwing,     (int)DutySwing, (int)DutySwing,

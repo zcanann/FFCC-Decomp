@@ -1,14 +1,6 @@
 #ifndef _FFCC_REDSOUND_REDMEMORY_H
 #define _FFCC_REDSOUND_REDMEMORY_H
 
-extern int m_ReportPrint;
-
-extern const char sRedMemoryLogPrefix[];
-extern const char sRedMemoryLogSuffixA[];
-extern const char sRedMemoryLogSuffixB[];
-extern const char s_redMemoryMainBankFullFmt[];
-extern const char s_redMemoryAuxBankFullFmt[];
-
 int RedNew(int);
 void RedDelete(int);
 void RedDelete(void*);

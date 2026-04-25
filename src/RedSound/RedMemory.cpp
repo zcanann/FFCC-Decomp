@@ -1,6 +1,7 @@
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedGlobals.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <dolphin/os.h>
 
 int m_DataBuffer;
@@ -16,14 +17,6 @@ const char s_redMemoryAuxBankFullFmt[] = "%s%sA-Memory Bank Full !!%s\n";
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
 const char sRedMemoryLogSuffixB[8] = "\x1b[0m";
 
-// Memory functions
-extern "C" {
-	void* memmove(void* dest, const void* src, unsigned int n);
-	void* memcpy(void* dest, const void* src, unsigned int n);
-	void* memset(void* s, int c, unsigned int n);
-}
-
-// Function declarations
 extern "C" {
 	void __dl__FPv(void*);
 }

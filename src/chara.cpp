@@ -409,6 +409,11 @@ static inline MtxPtr NodeWorldMtx(CChara::CNode* node)
 	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(node) + 0x44);
 }
 
+static inline MtxPtr NodeLocalRuntimeMtx(CChara::CNode* node)
+{
+	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(node) + 0x14);
+}
+
 static inline Vec& NodeDynPosition(CChara::CNode* node)
 {
 	return *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(node) + 0xA4);
@@ -1156,20 +1161,44 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
  */
 void CChara::CModel::setup()
 {
-	void* ref = *(void**)((u8*)this + 0xA4);
-	CNode* node = *(CNode**)((u8*)this + 0xA8);
-	CMesh* mesh = *(CMesh**)((u8*)this + 0xAC);
-	u32 nodeCount = *(u16*)((u8*)ref + 8);
-	u32 meshCount = *(u16*)((u8*)ref + 0xA);
+	CNode* node = ModelNodes(this);
+	CMesh* mesh = reinterpret_cast<CMesh*>(ModelMeshes(this));
+	u32 nodeCount = ModelNodeCount(this);
+	u32 meshCount = ModelMeshCount(this);
 	for (u32 i = 0; i < nodeCount; i++) {
+		PSMTXCopy(NodeRefLocalMtx(node), NodeLocalRuntimeMtx(node));
 		s8 disp = *(s8*)((u8*)*(void**)node + 4);
 		if (disp >= 0 && static_cast<u32>(disp) < meshCount) {
 			*(void**)((u8*)node + 4) = (u8*)mesh + (disp * 0x14);
 		}
 		node = (CNode*)((u8*)node + 0xC0);
 	}
+
 	calcBindMatrix();
+
+	CCharaMeshRaw* meshRaw = ModelMeshes(this);
+	for (u32 i = 0; i < meshCount; i++) {
+		CCharaMeshRefRaw* meshData = meshRaw->m_data;
+		u8* skin = reinterpret_cast<u8*>(meshData->m_skins);
+		for (u32 j = 0; j < meshData->m_skinCount; j++) {
+			u32 skinNodeIndex = *reinterpret_cast<u32*>(skin + 0x60);
+			MtxPtr skinInvBind = reinterpret_cast<MtxPtr>(skin + 0x30);
+			PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(&ModelNodes(this)[skinNodeIndex])) + 0x3C),
+			             skinInvBind);
+			PSMTXConcat(skinInvBind,
+			            reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(&ModelNodes(this)[meshData->m_nodeIndex])) + 0x3C),
+			            skinInvBind);
+			skin += 0x64;
+		}
+		meshRaw++;
+	}
+
 	AttachAnim(*(CAnim**)((u8*)this + 0xD0), -1, -1, 0);
+
+	CMaterialSet* materialSet = ModelMaterialSet(this);
+	if (materialSet != 0) {
+		SetTextureSet__12CMaterialSetFP11CTextureSet(materialSet, *reinterpret_cast<CTextureSet**>((u8*)this + 0xB4));
+	}
 }
 
 /*

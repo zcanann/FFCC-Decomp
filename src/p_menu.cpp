@@ -658,62 +658,112 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
  */
 void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    int currentMode = *reinterpret_cast<int*>(self + 0x740);
-    int nextMode = static_cast<int>(mode);
+    int currentMode;
+    int refCount;
+    int* refObject;
+    int i;
+    CMenuPcs* slotMenu;
 
-    if (currentMode == nextMode) {
-        return;
-    }
+    if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740) != static_cast<int>(mode)) {
+        _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(kPMenuSourceFile), 0x1B0);
+        currentMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
+        if (currentMode == 1) {
+            destroyWorld();
+        } else if (currentMode < 1) {
+            if ((currentMode != -1) && (-2 < currentMode)) {
+                refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(this) + 0xFC);
+                if (refObject != nullptr) {
+                    refCount = refObject[1];
+                    refObject[1] = refCount - 1;
+                    if ((refCount - 1 == 0) && (refObject != nullptr)) {
+                        reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(refObject[0] + 8))(refObject, 1);
+                    }
+                    *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0xFC) = nullptr;
+                }
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(kPMenuSourceFile), 0x1B0);
+                i = 0;
+                slotMenu = this;
+                do {
+                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x1E4);
+                    if (refObject != nullptr) {
+                        refCount = refObject[1];
+                        refObject[1] = refCount - 1;
+                        if ((refCount - 1 == 0) && (refObject != nullptr)) {
+                            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(refObject[0] + 8))(refObject, 1);
+                        }
+                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x1E4) = nullptr;
+                    }
+                    i++;
+                    slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                } while (i < 10);
 
-    if (currentMode == 1) {
-        destroyWorld();
-    } else if (currentMode == 0) {
-        ReleaseRefObject(*reinterpret_cast<void**>(self + 0xFC));
-        *reinterpret_cast<void**>(self + 0xFC) = nullptr;
+                i = 0;
+                slotMenu = this;
+                do {
+                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x154);
+                    if (refObject != nullptr) {
+                        refCount = refObject[1];
+                        refObject[1] = refCount - 1;
+                        if ((refCount - 1 == 0) && (refObject != nullptr)) {
+                            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(refObject[0] + 8))(refObject, 1);
+                        }
+                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x154) = nullptr;
+                    }
+                    i++;
+                    slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                } while (i < 2);
 
-        void** slot = reinterpret_cast<void**>(self + 0x1E4);
-        for (int i = 0; i < 10; i++, slot++) {
-            ReleaseRefObject(*slot);
-            *slot = nullptr;
+                i = 0;
+                slotMenu = this;
+                do {
+                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x13C);
+                    if (refObject != nullptr) {
+                        refCount = refObject[1];
+                        refObject[1] = refCount - 1;
+                        if ((refCount - 1 == 0) && (refObject != nullptr)) {
+                            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(refObject[0] + 8))(refObject, 1);
+                        }
+                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x13C) = nullptr;
+                    }
+                    i++;
+                    slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                } while (i < 4);
+
+                i = 0;
+                slotMenu = this;
+                do {
+                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x10C);
+                    if (refObject != nullptr) {
+                        refCount = refObject[1];
+                        refObject[1] = refCount - 1;
+                        if ((refCount - 1 == 0) && (refObject != nullptr)) {
+                            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(refObject[0] + 8))(refObject, 1);
+                        }
+                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x10C) = nullptr;
+                    }
+                    i++;
+                    slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                } while (i < 12);
+
+                destroySingleMenu__8CMenuPcsFv(this);
+                destroyVillageMenu__8CMenuPcsFv(this);
+            }
+        } else if (currentMode < 3) {
+            destroyBonus__8CMenuPcsFv(this);
         }
 
-        slot = reinterpret_cast<void**>(self + 0x154);
-        for (int i = 0; i < 2; i++, slot++) {
-            ReleaseRefObject(*slot);
-            *slot = nullptr;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740) = static_cast<int>(mode);
+        currentMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
+        if (currentMode == 1) {
+            createWorld();
+        } else if (currentMode < 1) {
+            if ((currentMode != -1) && (-2 < currentMode)) {
+                createBattle();
+                createSingleMenu__8CMenuPcsFv(this);
+            }
+        } else if (currentMode < 3) {
+            createBonus__8CMenuPcsFv(this);
         }
-
-        slot = reinterpret_cast<void**>(self + 0x13C);
-        for (int i = 0; i < 4; i++, slot++) {
-            ReleaseRefObject(*slot);
-            *slot = nullptr;
-        }
-
-        slot = reinterpret_cast<void**>(self + 0x10C);
-        for (int i = 0; i < 12; i++, slot++) {
-            ReleaseRefObject(*slot);
-            *slot = nullptr;
-        }
-
-        destroySingleMenu__8CMenuPcsFv(this);
-        destroyVillageMenu__8CMenuPcsFv(this);
-    } else if (currentMode < 3) {
-        destroyBonus__8CMenuPcsFv(this);
-    }
-
-    *reinterpret_cast<int*>(self + 0x740) = nextMode;
-    currentMode = *reinterpret_cast<int*>(self + 0x740);
-
-    if (currentMode == 1) {
-        createWorld();
-    } else if (currentMode == 0) {
-        createBattle();
-        createSingleMenu__8CMenuPcsFv(this);
-    } else if (currentMode < 3) {
-        createBonus__8CMenuPcsFv(this);
     }
 }
 

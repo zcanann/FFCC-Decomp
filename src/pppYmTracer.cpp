@@ -12,11 +12,11 @@ extern u8 gPppDefaultValueBuffer[];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern f32 FLOAT_803306e8;
-extern f32 FLOAT_803306ec;
+static const f32 FLOAT_803306e8 = 0.0f;
+static const f32 FLOAT_803306ec = 1.0f;
 extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
-extern const f64 DOUBLE_803306F0 = 4503601774854144.0;
+static const f64 DOUBLE_803306f8 = 4503599627370496.0;
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -317,10 +317,10 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             Vec splineFrom[4];
             Vec splineTo[4];
             s16 splineCount = 0;
-            f64 stepScale = FLOAT_803306ec / (f32)((f64)(param_2->m_payload[9] + 1) - DOUBLE_803306F0);
+            f64 stepScale = FLOAT_803306ec / (f32)(param_2->m_payload[9] + 1);
 
             for (i = 0; i < (s32)(u32)param_2->m_payload[9]; i++) {
-                f32 t = (f32)(stepScale * (f64)(i + 1));
+                f32 t = stepScale * (f32)(i + 1);
 
                 gUtil.GetSplinePos(splineFrom[(param_2->m_payload[9] - 1) - i], entries[3].to, entries[2].to,
                                           entries[1].to, entries[0].from, t, FLOAT_803306ec);

@@ -51,7 +51,7 @@ extern float FLOAT_8032fc90;
 extern float FLOAT_8032fc88;
 extern float FLOAT_8032fc8c;
 extern float FLOAT_8032fc94;
-extern float FLOAT_8032ed10;
+float FLOAT_8032ed10;
 extern double DOUBLE_8032fc68;
 extern float DAT_801ea430;
 extern unsigned int DAT_8032e620;

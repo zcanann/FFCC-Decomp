@@ -158,54 +158,75 @@ struct TmpArtiFlatData {
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 408b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::TmpArtiInit()
 {
+	double dVar1;
+	float fVar2;
+	float fVar3;
+	double dVar4;
+	double dVar5;
 	TmpArtiState* state = GetTmpArtiStateStruct(this);
 	TmpArtiList* list = GetTmpArtiListStruct(this);
+	TmpArtiEntry* entry;
+	int iVar6;
+	int iVar10;
 
 	memset(list, 0, sizeof(TmpArtiList));
-	TmpArtiEntry* entry = list->entries;
-	for (int i = 0; i < 8; i++) {
-		entry[0].z = FLOAT_80332f30;
-		entry[1].z = FLOAT_80332f30;
-		entry[2].z = FLOAT_80332f30;
-		entry[3].z = FLOAT_80332f30;
-		entry[4].z = FLOAT_80332f30;
-		entry[5].z = FLOAT_80332f30;
-		entry[6].z = FLOAT_80332f30;
-		entry[7].z = FLOAT_80332f30;
-		entry += 8;
-	}
-
-	int row = 0;
+	fVar3 = FLOAT_80332f30;
 	entry = list->entries;
-	for (int i = 0; i < 2; i++) {
+	iVar10 = 8;
+	do {
+		entry[0].z = fVar3;
+		entry[1].z = fVar3;
+		entry[2].z = fVar3;
+		entry[3].z = fVar3;
+		entry[4].z = fVar3;
+		entry[5].z = fVar3;
+		entry[6].z = fVar3;
+		entry[7].z = fVar3;
+		dVar5 = DOUBLE_80332f58;
+		dVar4 = DOUBLE_80332f40;
+		fVar2 = FLOAT_80332f2c;
+		dVar1 = DOUBLE_80332f20;
+		entry += 8;
+		iVar10 = iVar10 - 1;
+	} while (iVar10 != 0);
+
+	iVar6 = 0;
+	entry = list->entries;
+	iVar10 = 2;
+	do {
 		entry[0].tex = 0x37;
 		entry[0].width = 200;
 		entry[0].height = 0x28;
-		entry[0].x = static_cast<short>(-(((double)entry[0].width - DOUBLE_80332f40) * DOUBLE_80332f20 - DOUBLE_80332f58));
-		entry[0].y = static_cast<short>(row * (entry[0].height - 8) + 0x60);
-		entry[0].s = FLOAT_80332f2c;
-		entry[0].t = FLOAT_80332f2c;
-		entry[0].startFrame = row;
+		entry[0].x = (short)(int)-(((double)entry[0].width - dVar4) * dVar1 - dVar5);
+		entry[0].y = (short)iVar6 * (entry[0].height + -8) + 0x60;
+		entry[0].s = fVar2;
+		entry[0].t = fVar2;
+		entry[0].startFrame = iVar6;
 		entry[0].duration = 3;
 
 		entry[1].tex = 0x37;
 		entry[1].width = 200;
 		entry[1].height = 0x28;
-		entry[1].x = static_cast<short>(-(((double)entry[1].width - DOUBLE_80332f40) * DOUBLE_80332f20 - DOUBLE_80332f58));
-		entry[1].y = static_cast<short>((row + 1) * (entry[1].height - 8) + 0x60);
-		entry[1].s = FLOAT_80332f2c;
-		entry[1].t = FLOAT_80332f2c;
-		entry[1].startFrame = row + 1;
+		entry[1].x = (short)(int)-(((double)entry[1].width - dVar4) * dVar1 - dVar5);
+		entry[1].y = (short)(iVar6 + 1) * (entry[1].height + -8) + 0x60;
+		entry[1].s = fVar2;
+		entry[1].t = fVar2;
+		entry[1].startFrame = iVar6 + 1;
 		entry[1].duration = 3;
 
-		row += 2;
+		iVar6 = iVar6 + 2;
 		entry += 2;
-	}
+		iVar10 = iVar10 - 1;
+	} while (iVar10 != 0);
 
 	list->count = 4;
 	state->unk_26 = 0;

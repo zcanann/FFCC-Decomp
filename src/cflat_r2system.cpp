@@ -3178,6 +3178,29 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0x40: {
+        float* values = reinterpret_cast<float*>(object->m_localBase);
+        Quaternion rotation = {values[0], values[1], values[2], values[3]};
+        Mtx matrix;
+        PSMTXQuat(matrix, &rotation);
+        CameraPcs.SetWorldMapMatrix(matrix);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x3F: {
+        Mtx matrix;
+        Quaternion rotation;
+        CameraPcs.GetWorldMapMatrix(matrix);
+        C_QUATMtx(&rotation, matrix);
+        *reinterpret_cast<float*>(object->m_localBase[0]) = rotation.x;
+        *reinterpret_cast<float*>(object->m_localBase[1]) = rotation.y;
+        *reinterpret_cast<float*>(object->m_localBase[2]) = rotation.z;
+        *reinterpret_cast<float*>(object->m_localBase[3]) = rotation.w;
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x3E:
         PartMng.pppEndPart(*object->m_localBase);
         runtime->push(object, 0);

@@ -2909,7 +2909,7 @@ void CMenuPcs::CmakeVillageDraw()
         MenuPcsVoid(), 0, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
-    DrawCmakeTitle(0, alpha, FLOAT_80333258);
+    DrawCmakeTitle(0, FLOAT_80333258, alpha);
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);

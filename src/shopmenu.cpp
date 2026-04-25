@@ -2186,9 +2186,10 @@ void CShopMenu::DrawSoubi()
 {
     DrawSoubiBase();
 
+    int resultItem = ShopMenuInt(this, 0x150);
     drawShapeSeq(0xF, 0, 0xA8, 0x5A, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
-    DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), ShopMenuInt(this, 0x150), 0x40, 0x42, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
+    DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), resultItem, 0x40, 0x42, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
 
     CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
     SetMargin__5CFontFf(FLOAT_80332d28, font);
@@ -2198,11 +2199,16 @@ void CShopMenu::DrawSoubi()
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     SetColor__5CFontF8_GXColor(font, &white);
     DrawInit__5CFontFv(font);
+
+    char* itemName = 0;
+    if (resultItem >= 1) {
+        itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[resultItem * 5 + 4]);
+    }
     DrawShadowFont__8CMenuPcsFP5CFontPcffii(
-        MenuPcsVoid(), font, GetItemName(ShopMenuInt(this, 0x150)), FLOAT_80332d54, 112.0f, 0x18, 0x12);
+        MenuPcsVoid(), font, itemName, FLOAT_80332d54, 112.0f, 0x18, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-    DrawItemInfo(ShopMenuInt(this, 0x150), 0x98, 0x7E, 0x98, 0x9C, 0, 0, 0);
+    DrawItemInfo(resultItem, 0x98, 0x7E, 0x98, 0x9C, 0, 0, 0);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     int barX = 0x1F6;

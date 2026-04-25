@@ -29,6 +29,7 @@ int SearchSeEmptyTrack__Fiii(int, int, int);
  * JP Size: TODO
  */
 #pragma optimization_level 0
+#pragma dont_inline on
 RedStreamDATA* _SearchEmptyStreamData()
 {
 	RedStreamDATA* streamData = (RedStreamDATA*)DAT_8032f420;
@@ -43,6 +44,7 @@ RedStreamDATA* _SearchEmptyStreamData()
 
 	return 0;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

@@ -11,9 +11,6 @@ void* memmove(void*, const void*, unsigned long);
 void* memset(void*, int, unsigned long);
 int GetWaveBank__9CRedEntryFi(CRedEntry*, int);
 }
-
-extern int m_ADataBufferSize;
-
 int PTR_SineSwing__Fi[] = {
     (int)SineSwing, (int)TriangleSwing, (int)SawSwing, (int)DutySwing,
     (int)RandomSwing, (int)DutySwing,     (int)DutySwing, (int)DutySwing,

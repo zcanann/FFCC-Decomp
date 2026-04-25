@@ -810,22 +810,21 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     *(int*)((char*)this + 0x3DA4) = 0;
     *(unsigned int*)((char*)this + 0x3D8C) = (unsigned int)flags;
 
-    dVar4 = DOUBLE_80330900;
-    fVar1 = FLOAT_803308dc;
-    if (*(int*)((char*)this + 0x18) < 4) {
-        SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 0);
-        *(float*)((char*)this + 0x3D9C) = FLOAT_803308e0;
-        fVar1 = FLOAT_803308e4;
-        *(float*)((char*)this + 0x3DA0) = fVar1;
-    } else {
+    if (*(int*)((char*)this + 0x18) >= 4) {
         *(float*)((char*)this + 0x3D6C) = (float)x;
         *(float*)((char*)this + 0x3D70) = (float)y;
         *(int*)((char*)this + 0x3D88) = 1;
         uVar2 = ((unsigned int)__cntlzw((unsigned int)(flags & 2))) >> 5;
+        fVar1 = FLOAT_803308dc;
         *(float*)((char*)this + 0x3D9C) = fVar1;
         *(float*)((char*)this + 0x3DA0) = fVar1;
         *(unsigned int*)((char*)this + 0x3D50) = (unsigned int)(-(flags >> 1 & 1) & 0x1C);
         *(unsigned int*)((char*)this + 0x3D54) = uVar2;
+    } else {
+        SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 0);
+        *(float*)((char*)this + 0x3D9C) = FLOAT_803308e0;
+        fVar1 = FLOAT_803308e4;
+        *(float*)((char*)this + 0x3DA0) = fVar1;
     }
 
     *(int*)((char*)this + 0x3D90) = unk1;
@@ -838,32 +837,30 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     *(float*)((char*)this + 0x3D80) = fVar1 * *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3CC4);
 
     fVar1 = FLOAT_803308ec;
-    if (*(int*)((char*)this + 0x18) < 4) {
-        if ((flags & 0x100) == 0) {
-            fVar1 = *(float*)((char*)this + 0x3D7C);
-            if (fVar1 < FLOAT_803308f0) {
-                fVar1 = FLOAT_803308f0;
-            }
-            *(float*)((char*)this + 0x3D7C) = fVar1;
-        }
-    } else if ((flags & 8) == 0) {
-        if ((flags & 0x8000) != 0) {
+    if (*(int*)((char*)this + 0x18) >= 4) {
+        if ((flags & 8) != 0) {
+            *(float*)((char*)this + 0x3D6C) = -(FLOAT_803308ec * *(float*)((char*)this + 0x3D7C) - *(float*)((char*)this + 0x3D6C));
+            *(float*)((char*)this + 0x3D70) = -(fVar1 * *(float*)((char*)this + 0x3D80) - *(float*)((char*)this + 0x3D70));
+        } else if ((flags & 0x8000) != 0) {
             *(float*)((char*)this + 0x3D6C) -= *(float*)((char*)this + 0x3D7C);
         }
-    } else {
-        *(float*)((char*)this + 0x3D6C) = -(FLOAT_803308ec * *(float*)((char*)this + 0x3D7C) - *(float*)((char*)this + 0x3D6C));
-        *(float*)((char*)this + 0x3D70) = -(fVar1 * *(float*)((char*)this + 0x3D80) - *(float*)((char*)this + 0x3D70));
+    } else if ((flags & 0x100) == 0) {
+        fVar1 = *(float*)((char*)this + 0x3D7C);
+        if (fVar1 < FLOAT_803308f0) {
+            fVar1 = FLOAT_803308f0;
+        }
+        *(float*)((char*)this + 0x3D7C) = fVar1;
     }
 
     uVar2 = (unsigned int)*(int*)((char*)this + 0x18);
     if ((int)uVar2 < 4) {
-        if ((uVar2 & 2) == 0) {
-            dVar4 = (double)(FLOAT_803308f8 + *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) +
-                             *(float*)((char*)this + 0x3D78));
-        } else {
+        if ((uVar2 & 2) != 0) {
             dVar4 = (double)((*(float*)((char*)this + 0x3DA0) + (*(float*)((char*)this + 0x3D70) - FLOAT_803308f4) +
                               *(float*)((char*)this + 0x3D78)) -
                              *(float*)((char*)this + 0x3D80));
+        } else {
+            dVar4 = (double)(FLOAT_803308f8 + *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) +
+                             *(float*)((char*)this + 0x3D78));
         }
     } else {
         dVar4 = (double)(*(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78));

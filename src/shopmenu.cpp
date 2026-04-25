@@ -1529,7 +1529,11 @@ void CShopMenu::SelectItemIdx()
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 }
             } else if (listType == 1) {
-                canSelect = CanTradeShopMenuItem(this, itemIndex, itemNo);
+                if ((itemIndex != -1) && (itemNo >= 1)) {
+                    if (EquipChk__8CMenuPcsFi(MenuPcsVoid(), itemIndex) == 0) {
+                        canSelect = itemNo >= 0x9F;
+                    }
+                }
                 if (canSelect) {
                     ShopMenuInt(this, 0x10) = 2;
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -1537,7 +1541,12 @@ void CShopMenu::SelectItemIdx()
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 }
             } else if (listType == 2) {
-                canSelect = CanTradeShopMenuItem(this, itemIndex, itemNo);
+                if ((itemIndex != -1) && (itemNo >= 1)) {
+                    unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
+                    int caravan = ShopMenuCaravan(this);
+                    canSelect = (*reinterpret_cast<unsigned int*>(caravan + ((itemNo - 0x191) >> 5) * 4 + 0xC08) &
+                                 (1U << (bit & 0x1F))) != 0;
+                }
                 if (canSelect) {
                     ShopMenuInt(this, 0x8) = 0xC;
                     ShopMenuInt(this, 0x150) = GetSmithItem__8CMenuPcsFi(MenuPcsVoid(), itemNo);

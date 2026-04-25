@@ -11,10 +11,6 @@ int* m_MemoryBank;
 int* m_AMemoryBank;
 
 const char sRedMemoryLogPrefix[] = "\x1b[7;34mSound\x1b[0m:";
-#define redMainDataBuffer DAT_8032f478[0]
-#define redMainDataBufferSize DAT_8032f480
-#define redADataBufferSize DAT_8032f484
-#define redMainMemoryBank ((int*)DAT_8032f488[0])
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
 const char sRedMemoryLogSuffixB[8] = "\x1b[0m";
 const char s_redMemoryMainBankFullFmt[] = "%s%sMemory Bank Full !!%s\n";

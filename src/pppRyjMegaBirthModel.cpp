@@ -802,10 +802,6 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
     if ((*u8_at(p, 0x9e) != 0) && ((u16)*s16_at(p, 0x22) <= *u8_at(p, 0x9e))) {
         *f32_at(p, 0x98) += (float)alpha / (float)payload[0x9E];
     }
-
-    *f32_at((u8*)vRyjMegaBirthModel, 0x20) = *f32_at((u8*)vRyjMegaBirthModel, 0x2C);
-    *f32_at((u8*)vRyjMegaBirthModel, 0x24) = *f32_at((u8*)vRyjMegaBirthModel, 0x30);
-    *f32_at((u8*)vRyjMegaBirthModel, 0x28) = *f32_at((u8*)vRyjMegaBirthModel, 0x34);
 }
 
 /*

@@ -1,10 +1,11 @@
 #include "ffcc/pppConstrainCameraDir.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/ppp_linkage.h"
 #include "ffcc/pppYmEnv.h"
 #include <dolphin/mtx.h>
 
-extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
+void pppSetFpMatrix(_pppMngSt*);
 
 /*
  * --INFO--
@@ -63,7 +64,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
                 pppMngStPtr->m_matrix.value[2][3] = resultZ;
             }
 
-            pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
+            pppSetFpMatrix(pppMngSt);
         }
     }
 }

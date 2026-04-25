@@ -1146,9 +1146,20 @@ extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(void* model, void* obje
 				gObject->PlayAnim(0x37, 1, 0, -1, -1, 0);
 				messageId = 7;
 			}
-		} else if (gObject->IsLoopAnim(1) != 0) {
-			gObject->CancelAnim(1);
-			work.m_state = 0;
+		} else if (work.m_state == 1) {
+			unsigned char* objectBytes = reinterpret_cast<unsigned char*>(gObject);
+			if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD4])) {
+				if (gObject->IsLoopAnim(1) != 0) {
+					gObject->PlayAnim(0x38, 1, 0, -1, -1, 0);
+				}
+			} else if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD5])) {
+				if ((rotateButtons & 4) != 0) {
+					gObject->PlayAnim(0x39, 1, 0, -1, -1, 0);
+				}
+			} else if (gObject->IsLoopAnim(1) != 0) {
+				gObject->CancelAnim(1);
+				work.m_state = 0;
+			}
 		}
 	}
 

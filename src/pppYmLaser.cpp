@@ -206,17 +206,17 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	CMapCylinderRaw cyl;
 	Mtx charaMtx;
 	Mtx tempMtx;
-	bool emptyHistory;
+	int emptyHistory;
 
 	if ((gPppCalcDisabled == 0) && (step->m_stepValue != 0xFFFF)) {
 	work = (pppYmLaserWork*)((u8*)laser + 0x80 + data->m_serializedDataOffsets[2]);
-	emptyHistory = false;
+	emptyHistory = 0;
 
 	if (work->m_points == 0) {
 		work->m_points = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 			(u32)step->m_payload[0x1e] * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmLaser_cpp), 0x5d);
 		memset(work->m_points, 0, (u32)step->m_payload[0x1e] * 0xc);
-		emptyHistory = true;
+		emptyHistory = 1;
 	}
 
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
@@ -265,7 +265,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 			double t = (FLOAT_80330de0 / (float)(countDouble.d - DOUBLE_80330dd8)) *
 				(float)(indexDouble.d - DOUBLE_80330dd8);
 			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(pppMngStPtr, (float)t, charaMtx) == 0) {
-				emptyHistory = true;
+				emptyHistory = 1;
 				continue;
 			} else {
 				PSMTXConcat(charaMtx, baseObj->m_localMatrix.value, charaMtx);
@@ -276,15 +276,15 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		pppSubVector(localA, work->m_points[i], work->m_origin);
 		PSVECScale(&localA, &localA, FLOAT_80330de4);
 
-		cyl.m_bottom = work->m_origin;
-		cyl.m_direction = localA;
-		cyl.m_radius = kPppYmLaserOne;
 		cyl.m_top.x = FLOAT_80330de8;
 		cyl.m_top.y = FLOAT_80330de8;
 		cyl.m_top.z = FLOAT_80330de8;
 		cyl.m_direction2.x = FLOAT_80330dec;
 		cyl.m_direction2.y = FLOAT_80330dec;
 		cyl.m_direction2.z = FLOAT_80330dec;
+		cyl.m_bottom = work->m_origin;
+		cyl.m_direction = localA;
+		cyl.m_radius = kPppYmLaserOne;
 
 		int hit = 0;
 		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &localA, 0xffffffff) != 0) {
@@ -343,13 +343,12 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		}
 	}
 
-		if (emptyHistory) {
-			Vec* points = work->m_points;
-			for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
-				pppCopyVector(points[i], points[0]);
-			}
+	if (emptyHistory) {
+		for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
+			pppCopyVector(work->m_points[i], work->m_points[0]);
 		}
 	}
+}
 }
 
 /*

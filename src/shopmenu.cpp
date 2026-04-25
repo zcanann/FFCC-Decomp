@@ -1666,28 +1666,60 @@ void CShopMenu::SelectYesNo()
         return;
     }
 
-    if (ShopMenuInt(this, 0x3C) == 1) {
+    int yesNo = ShopMenuInt(this, 0x3C);
+    if (yesNo == 1) {
         Sound.PlaySe(3, 0x40, 0x7F, 0);
         ShopMenuInt(this, 0x10) = (ShopMenuInt(this, 0x14) == 0) ? 1 : 0;
         return;
     }
 
+    if ((yesNo >= 1) || (yesNo < 0)) {
+        return;
+    }
+
     ShopMenuInt(this, 0x10) = 0;
-    if (ShopMenuInt(this, 0x14) == 0) {
+    int listType = ShopMenuInt(this, 0x14);
+    if (listType == 0) {
         Sound.PlaySe(0x50, 0x40, 0x7F, 0);
-        ExecuteShopMenuBuyConfirm(this);
+        int caravan = ShopMenuCaravan(this);
+        int itemId = ResolveShopMenuSelectedItemId(this);
+        int quantity = 0;
+
+        while ((quantity < ShopMenuInt(this, 0x44)) && ((unsigned short)(*reinterpret_cast<unsigned short*>(caravan + 0x94) + 1) < 0x41)) {
+            int gilValue = CalcShopMenuTradeGil(this, itemId);
+            if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -gilValue) == 0) {
+                return;
+            }
+
+            AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravan), static_cast<short>(itemId), 0);
+            AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -CalcShopMenuTradeGil(this, itemId));
+            ++quantity;
+        }
         return;
     }
 
     int itemIndex = ShopMenuInt(this, 0x28);
-    int itemId = ResolveShopMenuSelectedItemId(this);
-    if (!CanTradeShopMenuItem(this, itemIndex, itemId)) {
+    bool canTrade = false;
+    if (itemIndex != -1) {
+        int itemId = ResolveShopMenuSelectedItemId(this);
+        canTrade = CanTradeShopMenuItem(this, itemIndex, itemId);
+    }
+
+    if (!canTrade) {
         Sound.PlaySe(4, 0x40, 0x7F, 0);
         return;
     }
 
     Sound.PlaySe(0x50, 0x40, 0x7F, 0);
-    ExecuteShopMenuSellConfirm(this);
+    int caravan = ShopMenuCaravan(this);
+    int itemId = ResolveShopMenuSelectedItemId(this);
+    int gilValue = CalcShopMenuTradeGil(this, itemId);
+    if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), gilValue) == 0) {
+        return;
+    }
+
+    DeleteItemIdx__12CCaravanWorkFii(reinterpret_cast<void*>(caravan), ShopMenuInt(this, 0x28), 0);
+    AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), CalcShopMenuTradeGil(this, itemId));
 }
 
 /*

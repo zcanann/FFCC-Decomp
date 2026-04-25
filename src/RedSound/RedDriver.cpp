@@ -113,9 +113,6 @@ void* p_MusicSkipThreadStack;
 int m_MusicSkipComplete;
 void* p_ReverbDepth;
 int m_Mute[2];
-CRedMemory c_RedMemory;
-static int m_DMAExecute;
-static int m_DMAInThread;
 static u8 gRedDriverSyncBuffer[0x1F18];
 static OSSemaphore m_MainSemaphore;
 static OSThread m_WaveSettingThread;
@@ -127,6 +124,9 @@ static ARQRequest m_DMARequest;
 OSThread m_MusicSkipThread;
 OSSemaphore m_MusicSkipSemaphore;
 void* p_SeBlockData[4];
+CRedMemory c_RedMemory;
+static int m_DMAExecute;
+static int m_DMAInThread;
 CRedEntry c_RedEntry;
 
 static inline RedDriverSyncState& RedDriverSync()

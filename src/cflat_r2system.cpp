@@ -4018,6 +4018,25 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -4:
+        if (CameraPcs.IsAbsolute() != 0) {
+            Vec refPosition = {
+                static_cast<float>(object->m_localBase[0]),
+                static_cast<float>(object->m_localBase[1]),
+                static_cast<float>(object->m_localBase[2]),
+            };
+            Vec position = {
+                static_cast<float>(object->m_localBase[3]),
+                static_cast<float>(object->m_localBase[4]),
+                static_cast<float>(object->m_localBase[5]),
+            };
+            CameraPcs.SetRefPosition(&refPosition);
+            CameraPcs.SetPosition(&position);
+            CameraPcs.SetFromScript();
+        }
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
     case -3:
         runtime->push(object, getNumFreeObject__13CFlatRuntime2Fi(this, 5));
         outResult = 0;

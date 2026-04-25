@@ -304,30 +304,6 @@ static inline unsigned char* GetCmakeRosterEntry(CMenuPcs* menu, int slot)
     return reinterpret_cast<unsigned char*>(MenuS32(menu, 0x814) + 0x7930 + slot * 0xC30);
 }
 
-static int FindDuplicateCmakeJob(CMenuPcs* menu, int selectedJob)
-{
-    int activeSlot = static_cast<int>(MenuS16(menu, 0x86A));
-
-    for (int slot = 0; slot < 8; slot++) {
-        if (slot == activeSlot) {
-            continue;
-        }
-
-        unsigned char* entry = GetCmakeRosterEntry(menu, slot);
-        if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
-            continue;
-        }
-        if (*(entry + 0x1F96) == 1) {
-            continue;
-        }
-        if ((*reinterpret_cast<int*>(entry + 0x179C) & 0xFF) == selectedJob) {
-            return slot;
-        }
-    }
-
-    return -1;
-}
-
 static bool IsDuplicateCmakeTribeHair(CMenuPcs* menu, int tribe, int hair, int sex)
 {
     int activeSlot = static_cast<int>(MenuS16(menu, 0x86A));
@@ -2242,7 +2218,26 @@ void CMenuPcs::CmakeJobCtrl()
 
         if ((repeat & 0xF) == 0) {
             if ((down & 0x100) != 0) {
-                if (FindDuplicateCmakeJob(this, static_cast<int>(job)) < 0) {
+                int duplicateSlot = 8;
+                for (int slot = 0; slot < 8; slot++) {
+                    if (slot == static_cast<int>(MenuS16(this, 0x86A))) {
+                        continue;
+                    }
+
+                    unsigned char* entry = GetCmakeRosterEntry(this, slot);
+                    if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
+                        continue;
+                    }
+                    if (*(entry + 0x1F96) == 1) {
+                        continue;
+                    }
+                    if ((*reinterpret_cast<int*>(entry + 0x179C) & 0xFF) == static_cast<int>(job)) {
+                        duplicateSlot = slot;
+                        break;
+                    }
+                }
+
+                if (duplicateSlot > 7) {
                     s_CmakeInfo.m_job = static_cast<signed char>(job);
                     MenuS16(this, 0x864) = job;
                     SetSingMakeChara();

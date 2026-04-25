@@ -203,7 +203,6 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	pppYmLaserWork* work;
 	Vec localA;
 	Vec localB;
-	Vec localPos;
 	CMapCylinderRaw cyl;
 	Mtx charaMtx;
 	Mtx tempMtx;
@@ -274,13 +273,12 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 			}
 		}
 
-		localPos = work->m_origin;
-		pppSubVector(localA, work->m_points[i], localPos);
+		pppSubVector(localA, work->m_points[i], work->m_origin);
 		PSVECScale(&localA, &localA, FLOAT_80330de4);
 
 		cyl.m_bottom = work->m_origin;
 		cyl.m_direction = localA;
-		cyl.m_radius = FLOAT_80330de8;
+		cyl.m_radius = kPppYmLaserOne;
 		cyl.m_top.x = FLOAT_80330de8;
 		cyl.m_top.y = FLOAT_80330de8;
 		cyl.m_top.z = FLOAT_80330de8;

@@ -9,10 +9,10 @@ extern int gPppCalcDisabled;
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-static const float kPppCoronaScreenWidth = 640.0f;
-static const float kPppCoronaScreenHeight = 448.0f;
-static const float kPppCoronaScreenCenterX = 320.0f;
-static const float kPppCoronaScreenCenterY = 224.0f;
+extern const float kPppCoronaScreenWidth;
+extern const float kPppCoronaScreenHeight;
+extern const float kPppCoronaScreenCenterX;
+extern const float kPppCoronaScreenCenterY;
 
 struct CoronaWork {
     s16 m_shapeX;
@@ -176,3 +176,8 @@ void pppConstructCorona(pppCorona* param1, pppCoronaUnkC* param2)
     *(float*)(puVar2 + 6) = fVar1;
     *(float*)(puVar2 + 4) = fVar1;
 }
+
+extern const float kPppCoronaScreenWidth = 640.0f;
+extern const float kPppCoronaScreenHeight = 448.0f;
+extern const float kPppCoronaScreenCenterX = 320.0f;
+extern const float kPppCoronaScreenCenterY = 224.0f;

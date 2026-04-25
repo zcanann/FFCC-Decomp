@@ -7,7 +7,7 @@
 
 typedef struct PObjPointEntry {
     u32 unk0;
-    u32 vecOffset;
+    s32 vecOffset;
     u32 unk8;
     u32 unkC;
 } PObjPointEntry;
@@ -30,14 +30,17 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
     PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + *(s32*)container->ptrData + 0x80);
 
     if (objData->id == pointData->id) {
-        if ((objData->field_4 + 0x10000) == 0xFFFF) {
-            objPtr->vecPtr = gPppDefaultValueBuffer;
-        } else {
-            PObjPointEntry* table = *(PObjPointEntry**)((u8*)pppMngStPtr + 0xD4);
-            u8* data = (u8*)objData->data;
+        u8* vecPtr;
+        s32 index = objData->field_4;
 
-            objPtr->vecPtr = data + 0x80 + table[objData->field_4].vecOffset;
+        if ((index + 0x10000) == 0xFFFF) {
+            vecPtr = gPppDefaultValueBuffer;
+        } else {
+            PObjPointEntry* table = (PObjPointEntry*)pppMngStPtr->m_pppPDataVals;
+            vecPtr = (u8*)objData->data + (table[index].vecOffset + 0x80);
         }
+
+        objPtr->vecPtr = vecPtr;
     }
 
     objPtr->x = ((f32*)objPtr->vecPtr)[0];

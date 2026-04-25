@@ -75,6 +75,8 @@ u16 gTHPSimpleVolumeTable[0x80] = {
 };
 s16 WorkBuffer_32_[0x280] ATTRIBUTE_ALIGN(32);
 
+extern const float FLOAT_8033186C;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -939,8 +941,8 @@ s32 THPSimpleOpen(const char* path)
     SimpleControl.isBufferSet = 0;
     SimpleControl.isLooping = 0;
     SimpleControl.isOpen = 1;
-    SimpleControl.unk_C4 = 0.0f;
-    SimpleControl.unk_C8 = 0.0f;
+    SimpleControl.unk_C4 = FLOAT_8033186C;
+    SimpleControl.unk_C8 = FLOAT_8033186C;
     SimpleControl.unk_D0 = 0;
 
     return 1;

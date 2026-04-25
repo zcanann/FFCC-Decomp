@@ -110,6 +110,11 @@ extern float FLOAT_80332d90;
 extern float FLOAT_80332d94;
 extern float FLOAT_80332d98;
 extern float FLOAT_80332d9c;
+extern double DOUBLE_80332DA0;
+extern double DOUBLE_80332DA8;
+extern double DOUBLE_80332DB0;
+extern double DOUBLE_80332DB8;
+extern double DOUBLE_80332DC0;
 extern char DAT_80332d84[];
 extern char DAT_80332d14[];
 extern char DAT_80332d18[];
@@ -2508,8 +2513,12 @@ void CShopMenu::DrawObi(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80151F98
+ * PAL Size: 1324b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CShopMenu::DrawItemList()
 {
@@ -2595,16 +2604,16 @@ void CShopMenu::DrawItemList()
         int frameX;
         if (ShopMenuInt(this, 0x28) == itemIndex) {
             frameX = 0x198;
-            drawShapeSeq(frame, 1, frameX, y - 4, 0xFF, 0, 0, 0.0f, 0);
+            drawShapeSeq(frame, 1, frameX, y - 4, 0xFF, 0, 0, FLOAT_80332d9c, 0);
             DrawInit__8CMenuPcsFv(MenuPcsVoid());
             if (ShopMenuInt(this, 0x10) == 0) {
-                DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0x114 + (System.m_frameCounter & 7), y - 0x14, 1.0f);
+                DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0x114 + (System.m_frameCounter & 7), y - 0x14, FLOAT_80332d28);
             } else if ((System.m_frameCounter & 1) == 0) {
-                DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0x114, y - 0x14, 1.0f);
+                DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0x114, y - 0x14, FLOAT_80332d28);
             }
         } else {
             frameX = 0x1B8;
-            drawShapeSeq(frame, 0, frameX, y, 0xFF, 0, 0, 0.0f, 0);
+            drawShapeSeq(frame, 0, frameX, y, 0xFF, 0, 0, FLOAT_80332d9c, 0);
         }
 
         if (itemNo > 0) {
@@ -2629,12 +2638,19 @@ void CShopMenu::DrawItemList()
         y += 0x1C;
     }
 
-    int alpha = 0xC0 + (System.m_frameCounter & 0x3F);
+    int pulseFrame = System.m_frameCounter % 0x14;
+    int pulse = pulseFrame - 10;
+    if (pulse < 0) {
+        pulse = -pulse;
+    }
+    int alpha = static_cast<int>(DOUBLE_80332DA0 * (DOUBLE_80332DB0 * static_cast<double>(pulse) + DOUBLE_80332DA8));
+    float scale = static_cast<float>(DOUBLE_80332DA8 * (DOUBLE_80332DC0 * static_cast<double>(pulse) + DOUBLE_80332DB8));
+
     if (ShopMenuInt(this, 0x30) != 0) {
-        drawShapeSeqScale(2, 0, 0x24E, 0x6A, 1.0f, -1.0f, alpha);
+        drawShapeSeqScale(2, 0, 0x24E, 0x6A, scale, -scale, alpha);
     }
     if (ShopMenuInt(this, 0x34) != 0) {
-        drawShapeSeqScale(2, 0, 0x24E, 0xEC, 1.0f, 1.0f, alpha);
+        drawShapeSeqScale(2, 0, 0x24E, 0xEC, scale, scale, alpha);
     }
 }
 

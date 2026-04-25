@@ -820,6 +820,35 @@ static void FurInitTextureDefaults()
 	}
 }
 
+static void FurSetupTextureCopyEnv()
+{
+	GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
+	GXSetAlphaUpdate(GX_TRUE);
+	GXSetViewport(0.0f, 0.0f, 128.0f, 128.0f, 0.0f, 1.0f);
+	GXSetScissor(0, 0, 0x80, 0x80);
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	GXSetZCompLoc(GX_FALSE);
+	_GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+	GXSetCullMode(GX_CULL_NONE);
+	GXSetNumTevStages(1);
+	GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+	GXSetNumChans(1);
+	GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+	GXSetTexCopySrc(0, 0, 0x80, 0x80);
+	GXSetTexCopyDst(0x80, 0x80, GX_TF_IA4, GX_FALSE);
+
+	Mtx44 projection;
+	PSMTX44Identity(projection);
+	GXSetProjection(projection, GX_ORTHOGRAPHIC);
+}
+
 static void FurInitHairSet(CHairSet& hair, unsigned int& rng)
 {
 	hair.m_vec0.x = 64.0f + (FurRand01(rng) - 0.5f) * 56.0f;
@@ -1803,6 +1832,8 @@ extern "C" void makeFurTex__6CCharaFv()
 	for (int i = 0; i < 0x20; i++) {
 		FurInitHairSet(hairSet[i], rng);
 	}
+
+	FurSetupTextureCopyEnv();
 
 	for (int layer = 0; layer < 8; layer++) {
 		unsigned short* layerTex = tex + (layer * 0x4000 / 2);

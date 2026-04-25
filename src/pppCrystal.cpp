@@ -130,9 +130,6 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	float texH;
 	s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
 	s32 dataValIndex = param_2->m_dataValIndex;
-	CrystalWork* work = (CrystalWork*)((u8*)pppCrystal + serializedDataOffsets[2] + 0x80);
-	pppCrystalColorBlock* colorBlock = (pppCrystalColorBlock*)((u8*)pppCrystal + serializedDataOffsets[1] + 0x80);
-	pppCrystalRenderObject* object;
 
 	if (dataValIndex == 0xFFFF) {
 		return;
@@ -158,6 +155,9 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	if (backBufferTex == 0) {
 		return;
 	}
+
+	CrystalWork* work = (CrystalWork*)((u8*)pppCrystal + serializedDataOffsets[2] + 0x80);
+	pppCrystalColorBlock* colorBlock = (pppCrystalColorBlock*)((u8*)pppCrystal + serializedDataOffsets[1] + 0x80);
 
 	pppSetBlendMode(param_2->m_payload[1]);
 	pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -229,7 +229,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	GXSetVtxDesc((GXAttr)10, GX_INDEX16);
 	GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
 	GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
-	object = (pppCrystalRenderObject*)pppCrystal;
+	pppCrystalRenderObject* object = (pppCrystalRenderObject*)pppCrystal;
 	pppDrawMesh__FP10pppModelStP3Veci(model, object->m_drawMatrixPtr, 0);
 	GXSetNumIndStages(0);
 	GXSetTevDirect((GXTevStageID)0);

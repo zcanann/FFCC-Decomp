@@ -206,38 +206,41 @@ void calc(
 	}
 
 	*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + *f32_at(particlePayload, 0x2C);
-	if ((paramPayload[0xEB] & 0x10) == 0)
+	if ((paramPayload[0xEB] & 0x10) != 0)
 	{
-		*f32_at(particlePayload, 0x2C) = *f32_at(particlePayload, 0x2C) + *f32_at(paramPayload, 0x98);
+		*f32_at(particlePayload, 0x2C) =
+			*f32_at(particlePayload, 0x2C) + (*f32_at(paramPayload, 0x98) + *f32_at(particlePayload, 0x30));
 	}
 	else
 	{
 		*f32_at(particlePayload, 0x2C) = *f32_at(particlePayload, 0x2C) + *f32_at(paramPayload, 0x98);
-		*f32_at(particlePayload, 0x2C) = *f32_at(particlePayload, 0x2C) + *f32_at(particlePayload, 0x30);
 	}
 
-	while (FLOAT_8033045c <= *f32_at(particlePayload, 0x28))
+	float angleWrap = FLOAT_80330458;
+	float angleMax = FLOAT_8033045c;
+	while (angleMax <= *f32_at(particlePayload, 0x28))
 	{
-		*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) - FLOAT_80330458;
+		*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) - angleWrap;
 	}
-	while (*f32_at(particlePayload, 0x28) < FLOAT_80330460)
+	float angleMin = FLOAT_80330460;
+	while (*f32_at(particlePayload, 0x28) < angleMin)
 	{
-		*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + FLOAT_80330458;
+		*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + angleWrap;
 	}
 
 	*f32_at(particlePayload, 0x34) = *f32_at(particlePayload, 0x34) + *f32_at(particlePayload, 0x3C);
 	*f32_at(particlePayload, 0x38) = *f32_at(particlePayload, 0x38) + *f32_at(particlePayload, 0x40);
-	if ((paramPayload[0xEA] & 0x10) == 0)
+	if ((paramPayload[0xEA] & 0x10) != 0)
 	{
-		*f32_at(particlePayload, 0x3C) = *f32_at(particlePayload, 0x3C) + *f32_at(paramPayload, 0x70);
-		*f32_at(particlePayload, 0x40) = *f32_at(particlePayload, 0x40) + *f32_at(paramPayload, 0x74);
+		*f32_at(particlePayload, 0x3C) =
+			*f32_at(particlePayload, 0x3C) + (*f32_at(paramPayload, 0x70) + *f32_at(particlePayload, 0x44));
+		*f32_at(particlePayload, 0x40) =
+			*f32_at(particlePayload, 0x40) + (*f32_at(paramPayload, 0x74) + *f32_at(particlePayload, 0x48));
 	}
 	else
 	{
 		*f32_at(particlePayload, 0x3C) = *f32_at(particlePayload, 0x3C) + *f32_at(paramPayload, 0x70);
-		*f32_at(particlePayload, 0x3C) = *f32_at(particlePayload, 0x3C) + *f32_at(particlePayload, 0x44);
 		*f32_at(particlePayload, 0x40) = *f32_at(particlePayload, 0x40) + *f32_at(paramPayload, 0x74);
-		*f32_at(particlePayload, 0x40) = *f32_at(particlePayload, 0x40) + *f32_at(particlePayload, 0x48);
 	}
 
 	*f32_at(particlePayload, 0x4C) = *f32_at(particlePayload, 0x4C) + *f32_at(paramPayload, 0xC4);

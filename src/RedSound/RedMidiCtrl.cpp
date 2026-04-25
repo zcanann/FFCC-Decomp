@@ -449,7 +449,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
     seTrack = DAT_8032f444;
     do {
         if ((RedTrackDATA*)*seTrack == track) {
-            ((unsigned char*)seTrack)[0x1a] &= (unsigned char)0xfa;
+            ((unsigned char*)seTrack)[0x1a] &= -6;
         }
         seTrack += 0x30;
     } while (seTrack < DAT_8032f444 + 0xc00);

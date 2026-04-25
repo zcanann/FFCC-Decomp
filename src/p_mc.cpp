@@ -2,6 +2,9 @@
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 
+extern "C" void* __RTTI__8CManager[];
+extern "C" void* __RTTI__8CProcess[];
+
 extern char lbl_80331B10[];
 
 extern const float FLOAT_80331b18 = 1.0f;

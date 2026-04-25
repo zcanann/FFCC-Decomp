@@ -3651,6 +3651,39 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
+    case -0x21: {
+        const float yaw = static_cast<float>(object->m_localBase[5]);
+        const float pitch = static_cast<float>(object->m_localBase[6]);
+        const float sinYaw = sinf(yaw);
+        const float cosYaw = cosf(yaw);
+        const float sinPitch = sinf(pitch);
+        const float cosPitch = cosf(pitch);
+        Vec direction = {-sinYaw * cosPitch, -sinPitch, -cosYaw * cosPitch};
+        _GXColor color = {
+            static_cast<u8>(object->m_localBase[2]),
+            static_cast<u8>(object->m_localBase[3]),
+            static_cast<u8>(object->m_localBase[4]),
+            0xFF,
+        };
+
+        SetDiffuse__9CCharaPcsFiUlP8_GXColorP3Vec(
+            &CharaPcs, *object->m_localBase, object->m_localBase[1], &color, &direction);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0x20: {
+        _GXColor color = {
+            static_cast<u8>(object->m_localBase[1]),
+            static_cast<u8>(object->m_localBase[2]),
+            static_cast<u8>(object->m_localBase[3]),
+            0xFF,
+        };
+        SetAmbient__9CCharaPcsFiP8_GXColor(&CharaPcs, *object->m_localBase, &color);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
     case -0x1F:
         if (*object->m_localBase < 0x10) {
             const int lineOffset = *object->m_localBase * 0xB14;

@@ -131,7 +131,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             float baseY;
             float lengthXY;
             float segmentStep;
-            float drawScale;
+            double drawScale;
             pppColumValue* values;
 
             PSMTXIdentity(identityMtx);
@@ -157,7 +157,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             values = frameWork->m_values;
             segmentStep =
                 (FLOAT_803310A8 * lengthXY) / (float)((double)param_2->m_count - DOUBLE_803310B0);
-            drawScale = (float)DOUBLE_803310B8;
+            drawScale = DOUBLE_803310B8;
 
             for (int i = 0; i < param_2->m_count; i++) {
                 float positionScale = segmentStep * values->m_positionScale;
@@ -204,8 +204,8 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                                    shapePosB, j);
                     pppGetShapeUV((long*)shapeSt->m_animData, frameWork->m_shapeB, uvA, uvB, j);
 
-                    PSVECScale(&shapePosA, &shapePosA, drawScale);
-                    PSVECScale(&shapePosB, &shapePosB, drawScale);
+                    PSVECScale(&shapePosA, &shapePosA, (float)drawScale);
+                    PSVECScale(&shapePosB, &shapePosB, (float)drawScale);
                     PSVECAdd(&shapePosA, &center, &shapePosA);
                     PSVECAdd(&shapePosB, &center, &shapePosB);
 

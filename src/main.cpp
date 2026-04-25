@@ -64,17 +64,19 @@ void game(int argc, char** argv)
     int i;
     int copyScriptName;
     int parseLanguage;
+    char* startScriptName;
     char** argument;
 
     Game.Init();
-    strcpy(Game.m_startScriptName, kDefaultScriptName);
+    startScriptName = Game.m_startScriptName;
+    strcpy(startScriptName, kDefaultScriptName);
 
     if (argc != 0) {
         copyScriptName = 0;
         parseLanguage = 0;
         for (i = 1, argument = argv + 1; i < argc; i++, argument++) {
             if (copyScriptName) {
-                strcpy(Game.m_startScriptName, *argument);
+                strcpy(startScriptName, *argument);
                 copyScriptName = 0;
             } else if (parseLanguage) {
                 int cmp = strcmp(*argument, kLanguageArgUs);

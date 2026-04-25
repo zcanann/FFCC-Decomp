@@ -52,8 +52,6 @@ extern double DOUBLE_80331098;
 extern float FLOAT_803310A0;
 extern float FLOAT_803310A4;
 extern float FLOAT_803310A8;
-extern double DOUBLE_803310B0;
-extern double DOUBLE_803310B8;
 
 extern "C" {
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -131,7 +129,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             float baseY;
             float lengthXY;
             float segmentStep;
-            double drawScale;
+            float drawScale;
             pppColumValue* values;
 
             PSMTXIdentity(identityMtx);
@@ -149,15 +147,15 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             } else if (ColumFpClassify(lengthXY) == 1) {
                 lengthXY = *(float*)__float_nan;
             }
-            if (FLOAT_803310A0 < lengthXY) {
+            drawScale = FLOAT_80331084;
+            if (lengthXY > FLOAT_803310A0) {
                 PSVECScale(&cameraDelta, &cameraDelta, FLOAT_803310A4 / lengthXY);
             }
 
             pppInitBlendMode();
             values = frameWork->m_values;
             segmentStep =
-                (FLOAT_803310A8 * lengthXY) / (float)((double)param_2->m_count - DOUBLE_803310B0);
-            drawScale = DOUBLE_803310B8;
+                (FLOAT_803310A8 * lengthXY) / (float)param_2->m_count;
 
             for (int i = 0; i < param_2->m_count; i++) {
                 float positionScale = segmentStep * values->m_positionScale;

@@ -30,10 +30,10 @@ extern "C" char lbl_8032E648[];
 extern "C" const char s_CMaterialEditorPcs_VIEWER_801D7D18[];
 extern "C" const char s_CMaterialEditorPcs_801D7D34[];
 extern "C" const char s_MaterialEditor_pctc_801D7D60[];
-extern "C" const char* gDebugSpinnerText_addr;
-extern "C" char gDebugSpinnerTextInitialized_addr;
-extern "C" int gDebugSpinnerFrame_addr;
-extern "C" char gDebugSpinnerFrameInitialized_addr;
+extern "C" const char* gDebugSpinnerText_addr = 0;
+extern "C" char gDebugSpinnerTextInitialized_addr = 0;
+extern "C" int gDebugSpinnerFrame_addr = 0;
+extern "C" char gDebugSpinnerFrameInitialized_addr = 0;
 
 unsigned int m_table_desc0__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
 unsigned int m_table_desc1__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};

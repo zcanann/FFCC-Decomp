@@ -3261,15 +3261,49 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
  */
 void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 {
-	BonusAnimSprite* currentSprite = reinterpret_cast<BonusAnimSprite*>(a);
-	BonusAnimSprite* layoutSprite = reinterpret_cast<BonusAnimSprite*>(b);
+	short* board = reinterpret_cast<short*>(a);
+	short* icon = reinterpret_cast<short*>(b);
+	float* pos = gBonusCheckMarkPosBuffer;
 
-	if (gBonusCheckMarkPosBuffer == 0) {
-		return;
+	float x = (float)board[0];
+	float y = (float)board[1];
+	float w = (float)board[2];
+	float h = (float)board[3];
+	float iconW = (float)icon[2];
+	float iconH = (float)icon[3];
+	float halfW = w * 0.5f;
+	float halfH = h * 0.5f;
+	float iconHalfW = iconW * 0.5f;
+	float iconHalfH = iconH * 0.5f;
+
+	pos[0] = x + halfW;
+	pos[1] = y + halfH;
+	pos[14] = pos[0] - iconHalfW;
+	pos[15] = y;
+	pos[6] = pos[14];
+	pos[7] = y + h - iconH;
+	pos[10] = x;
+	pos[11] = pos[1] - iconHalfH;
+	pos[2] = x + w - iconW;
+	pos[3] = pos[11];
+
+	float baseX = x + w * 0.25f - iconHalfW;
+	float baseY = y + h * 0.25f - iconHalfH;
+	for (int row = 0; row < 2; row++) {
+		float slotY = baseY;
+		if (row == 0) {
+			pos[12] = baseX;
+			pos[13] = slotY;
+			pos[16] = baseX + halfW;
+			pos[17] = slotY;
+		} else {
+			slotY += halfH;
+			pos[8] = baseX;
+			pos[9] = slotY;
+			pos[4] = baseX + halfW;
+			pos[5] = slotY;
+		}
 	}
-
-	memset(gBonusCheckMarkPosBuffer, 0, sizeof(float) * 18);
-	FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer, currentSprite, layoutSprite);
 }
 
 /*

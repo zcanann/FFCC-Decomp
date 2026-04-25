@@ -28,6 +28,8 @@ extern const float FLOAT_8032fd80;
 extern float FLOAT_8032fd90;
 extern float FLOAT_8032fd94;
 extern float FLOAT_8032fd98;
+extern const float FLOAT_8032fd9c;
+extern const float FLOAT_8032fda0;
 extern const float FLOAT_8032fda4;
 extern const float FLOAT_8032fda8;
 
@@ -449,8 +451,8 @@ void CFunnyShape::Render()
 
     for (s32 i = 0; i < count; i++) {
         Vec2d pos;
-        pos.x = 320.0f + *reinterpret_cast<float*>(Ptr(work, 8));
-        pos.y = 224.0f + *reinterpret_cast<float*>(Ptr(work, 0xC));
+        pos.x = FLOAT_8032fd9c + *reinterpret_cast<float*>(Ptr(work, 8));
+        pos.y = FLOAT_8032fda0 + *reinterpret_cast<float*>(Ptr(work, 0xC));
 
         u8* animData = reinterpret_cast<u8*>(AnimData(this));
         const s16 frame = *reinterpret_cast<s16*>(Ptr(work, 0x14));

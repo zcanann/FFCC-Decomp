@@ -1222,8 +1222,12 @@ void CCharaPcs::ReleaseUnusedAnimBank()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80079760
+ * PAL Size: 248b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CCharaPcs::TryReleaseAnimBank(int requiredSize)
 {
@@ -1234,21 +1238,16 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
 
     for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0 || loadAnim->m_anim == 0) {
-            continue;
-        }
 
         const unsigned int bankPtr = *reinterpret_cast<unsigned int*>(Ptr(loadAnim->m_anim, 0x20));
         const int bankSize = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 0x24));
-        if (bankPtr == 0 || bankSize <= releaseSize) {
-            continue;
+        if (bankPtr != 0 && releaseSize < bankSize) {
+            releaseAnim = loadAnim;
+            releaseSize = bankSize;
         }
-
-        releaseAnim = loadAnim;
-        releaseSize = bankSize;
     }
 
-    if (releaseAnim == 0 || releaseAnim->m_anim == 0) {
+    if (releaseAnim == 0) {
         return 0;
     }
 

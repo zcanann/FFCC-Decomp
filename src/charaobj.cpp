@@ -38,6 +38,7 @@ extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*
 extern "C" void pppEndPart__8CPartMngFi(void*, int);
 extern "C" unsigned char calcSpecialPolygonGroup__6CAStarFP3Vec(void*, Vec*);
 extern "C" unsigned char m_boss__8CGMonObj[];
+extern char SoundBuffer[];
 
 extern "C" char sCharaObjDebugStatFormat[];
 
@@ -1932,6 +1933,11 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 			outA < 2) {
 			outA = 2;
 		}
+	}
+
+	if ((GetCID() & 0xAD) == 0xAD && *reinterpret_cast<int*>(script + 0x10) == 0x7F &&
+	    static_cast<signed char>(SoundBuffer[0x4FC]) < 0) {
+		outA = 3;
 	}
 
 	if (*reinterpret_cast<short*>(script + 0x74) != 0) {

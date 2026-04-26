@@ -40,6 +40,7 @@ CRedMemory::CRedMemory()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldDelete)
 {
 	if ((redMemory != 0) && (0 < shouldDelete)) {
@@ -47,6 +48,7 @@ extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldD
 	}
 	return redMemory;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

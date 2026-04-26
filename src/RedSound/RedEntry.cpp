@@ -509,12 +509,10 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		int historyNo = SearchWaveSequence(waveNo);
 		if (historyNo >= 0) {
 			if ((waveBankNo >= 0) && (historyNo != waveBankNo)) {
-				int src = entry[0] + historyNo * 0x10;
-				int dst = entry[0] + waveBankNo * 0x10;
-				*(int*)(dst + 0x0) = *(int*)(src + 0x0);
-				*(int*)(dst + 0x4) = *(int*)(src + 0x4);
-				*(int*)(dst + 0x8) = *(int*)(src + 0x8);
-				*(int*)(dst + 0xC) = *(int*)(src + 0xC);
+				*(int*)(entry[0] + waveBankNo * 0x10 + 0x0) = *(int*)(entry[0] + historyNo * 0x10 + 0x0);
+				*(int*)(entry[0] + waveBankNo * 0x10 + 0x4) = *(int*)(entry[0] + historyNo * 0x10 + 0x4);
+				*(int*)(entry[0] + waveBankNo * 0x10 + 0x8) = *(int*)(entry[0] + historyNo * 0x10 + 0x8);
+				*(int*)(entry[0] + waveBankNo * 0x10 + 0xC) = *(int*)(entry[0] + historyNo * 0x10 + 0xC);
 				historyNo = waveBankNo;
 			}
 

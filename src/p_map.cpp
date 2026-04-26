@@ -17,7 +17,8 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 CMapPcs MapPcs;
-extern void* __vt__8CManager;
+extern "C" void* __vt__8CManager[];
+extern "C" void* __vt__8CProcess[];
 extern "C" void* __vt__7CMapPcs[];
 extern "C" void create__7CMapPcsFv(CMapPcs*);
 extern "C" void destroy__7CMapPcsFv(CMapPcs*);
@@ -102,6 +103,8 @@ static const char s_dvd_map_stage_map_fmt[] = "dvd/map/stg%03d/map%03d";
 extern "C" void Destroy__7CMapMngFv(CMapMng*);
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
+extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
+extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile*, short);
 
 extern "C" void __dl__FPv(void*);
 extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColor);
@@ -136,6 +139,10 @@ struct CMapMngAsyncLoadState {
     CFile::CHandle* m_asyncHandles[16];
 };
 
+u8 g_hit_prof_desc[0xC];
+u8 g_map_calc_prof_desc[0xC];
+u8 g_map_draw_prof_desc[0xC];
+
 /*
  * --INFO--
  * PAL Address: 0x80036254
@@ -151,13 +158,20 @@ CRelProfile::~CRelProfile()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80035e84
+ * PAL Size: 976b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CMapPcs::CMapPcs()
+extern "C" void __sinit_p_map_cpp(void)
 {
     unsigned int* dst = &m_table__7CMapPcs[0][0];
 
+    *reinterpret_cast<void**>(&MapPcs) = __vt__8CManager;
+    *reinterpret_cast<void**>(&MapPcs) = __vt__8CProcess;
+    *reinterpret_cast<void**>(&MapPcs) = __vt__7CMapPcs;
     dst[0x004 / 4] = m_table_desc0__7CMapPcs[0];
     dst[0x008 / 4] = m_table_desc0__7CMapPcs[1];
     dst[0x00C / 4] = m_table_desc0__7CMapPcs[2];
@@ -230,6 +244,10 @@ CMapPcs::CMapPcs()
     dst[0x338 / 4] = m_table_desc23__7CMapPcs[0];
     dst[0x33C / 4] = m_table_desc23__7CMapPcs[1];
     dst[0x340 / 4] = m_table_desc23__7CMapPcs[2];
+
+    __register_global_object(&g_hit_prof, __dt__11CRelProfileFv, g_hit_prof_desc);
+    __register_global_object(&g_map_calc_prof, __dt__11CRelProfileFv, g_map_calc_prof_desc);
+    __register_global_object(&g_map_draw_prof, __dt__11CRelProfileFv, g_map_draw_prof_desc);
 }
 
 /*

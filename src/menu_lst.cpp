@@ -42,6 +42,32 @@ extern double DOUBLE_80333418;
 extern double DOUBLE_80333420;
 extern float FLOAT_803333F0;
 
+extern "C" const float FLOAT_80333614 = 196.0f;
+extern "C" const float FLOAT_80333618 = 168.0f;
+extern "C" const float FLOAT_8033361C = 24.0f;
+extern "C" const float FLOAT_80333620 = 20.0f;
+extern "C" const float FLOAT_80333624 = 16.0f;
+extern "C" const float FLOAT_80333628 = 564.0f;
+extern "C" const float FLOAT_8033362C = 0.07692308f;
+extern "C" const float FLOAT_80333630 = 6.923077f;
+extern "C" const float FLOAT_80333634 = 4.0f;
+extern "C" const double DOUBLE_80333638 = 4503599627370496.0;
+extern "C" const double DOUBLE_80333640 = 4503601774854144.0;
+extern "C" const float kOptionOpenAnimStep = 0.04f;
+extern "C" const float kOptionColumnAnimStep = 0.2f;
+extern "C" const float kOptionVolumeScale = 10.583333f;
+extern "C" const float FLOAT_80333654 = 25.0f;
+extern "C" const char DAT_80333658[4] = "";
+extern "C" const char DAT_8033365c[] = "%s";
+static const unsigned char gap_8033365f[] = {0};
+extern "C" const char DAT_80333660[] = "+1";
+static const unsigned char gap_80333663[] = {0};
+extern "C" const char DAT_80333664[] = "%c%d";
+static const unsigned char gap_80333669[] = {0, 0, 0};
+extern "C" const char DAT_8033366c[] = " ";
+static const unsigned char gap_8033366e[] = {0, 0};
+extern "C" const char DAT_80333670[] = " %d";
+
 STATIC_ASSERT(offsetof(CMenuPcs, listFont) == 0x108);
 STATIC_ASSERT(offsetof(CMenuPcs, lstState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, lstData) == 0x850);
@@ -88,7 +114,11 @@ void CMenuPcs::MLstDraw()
 			float z = item->z;
 
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
-			GXColor color = {0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * alpha)};
+			GXColor color;
+			color.r = 0xff;
+			color.g = 0xff;
+			color.b = 0xff;
+			color.a = (unsigned char)(FLOAT_803333D4 * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
 			float v = FLOAT_803333D0;
@@ -152,7 +182,7 @@ void CMenuPcs::MLstDraw()
 		MenuLstEntry* curItem = &list->entries[state->cursor];
 		float cursorYOffset = (float)((double)(float)(curItem->height - 0x20) * DOUBLE_803333E8);
 		int cursorY = (int)((float)curItem->y + cursorYOffset);
-		int cursorX = (int)((float)curItem->x - 56.0f + (float)(System.m_frameCounter & 7));
+		int cursorX = (int)((float)(curItem->x - 0x38) + (float)(System.m_frameCounter & 7));
 		DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, FLOAT_803333F0);
 	}
 
@@ -197,7 +227,7 @@ int CMenuPcs::MLstClose()
 	if ((int)itemCount > 0) {
 		do {
 			if (entry->startFrame <= currentFrame) {
-				if (currentFrame < entry->startFrame + entry->duration) {
+				if (entry->startFrame + entry->duration > currentFrame) {
 					entry->timer = entry->timer + 1;
 					double ratio = DOUBLE_80333410 / (double)entry->duration;
 					entry->alpha = (float)(DOUBLE_80333410 - ratio * (double)entry->timer);
@@ -479,7 +509,7 @@ int CMenuPcs::MLstOpen()
 	if ((int)itemCount > 0) {
 		do {
 			if (entry->startFrame <= currentFrame) {
-				if (currentFrame < entry->startFrame + entry->duration) {
+				if (entry->startFrame + entry->duration > currentFrame) {
 					entry->timer = entry->timer + 1;
 					double ratio = DOUBLE_80333410 / (double)entry->duration;
 					entry->alpha = (float)(ratio * (double)entry->timer);

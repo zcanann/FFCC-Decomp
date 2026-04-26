@@ -503,7 +503,6 @@ void StreamPause(int param_1, int param_2)
 {
 	const RedStreamDebugStrings* debugStrings = &sRedStreamDebugStrings;
 	RedStreamDATA* streamData;
-	RedStreamDATA* streamEnd;
 
 	if (m_ReportPrint != 0) {
 		if (param_2 == 1) {
@@ -514,8 +513,7 @@ void StreamPause(int param_1, int param_2)
 		fflush(__files + 1);
 	}
 	streamData = p_Stream;
-	streamEnd = p_Stream + 4;
-	while (streamData < streamEnd) {
+	do {
 		if ((streamData->m_streamId != 0) && ((param_1 == -1) || (param_1 == streamData->m_streamId))) {
 			unsigned int voiceData = (unsigned int)streamData->m_voiceData;
 			if (param_2 == 1) {
@@ -541,7 +539,7 @@ void StreamPause(int param_1, int param_2)
 			}
 		}
 		streamData++;
-	}
+	} while (streamData < p_Stream + 4);
 }
 
 /*

@@ -826,7 +826,6 @@ s32 THPSimpleOpen(const char* path)
     u32 componentIdx;
     s32 status;
     s32 componentOffset;
-    u8* frameComp;
 
     if (gTHPSimpleInitialized == 0) {
         return 0;
@@ -885,9 +884,8 @@ s32 THPSimpleOpen(const char* path)
     SimpleControl.hasAudio = 0;
     componentOffset = static_cast<s32>(SimpleControl.header.mCompInfoDataOffsets + sizeof(THPFrameCompInfo));
 
-    frameComp = SimpleControl.compInfo.mFrameComp;
     for (componentIdx = 0; componentIdx < SimpleControl.compInfo.mNumComponents; componentIdx++) {
-        if (*frameComp == 1) {
+        if (SimpleControl.compInfo.mFrameComp[componentIdx] == 1) {
             while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
                 status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
                 if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
@@ -904,7 +902,7 @@ s32 THPSimpleOpen(const char* path)
             memcpy(&SimpleControl.audioInfo, sReadBuffer, sizeof(THPAudioInfo));
             componentOffset += sizeof(THPAudioInfo);
             SimpleControl.hasAudio = 1;
-        } else if (*frameComp == 0) {
+        } else if (SimpleControl.compInfo.mFrameComp[componentIdx] == 0) {
             while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
                 status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
                 if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
@@ -923,7 +921,6 @@ s32 THPSimpleOpen(const char* path)
         } else {
             return 0;
         }
-        frameComp++;
     }
 
     SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);

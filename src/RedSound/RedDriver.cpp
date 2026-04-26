@@ -300,8 +300,7 @@ void _MusicCrossPlaySequence(int* param_1)
     void* pvVar2;
     
     param_1[2] = param_1[2] * 200;
-    iVar1 = param_1[2] / 0x3c + (param_1[2] >> 0x1f);
-    param_1[2] = iVar1 - (iVar1 >> 0x1f);
+    param_1[2] = param_1[2] / 0x3c;
     if (param_1[2] == 0) {
         param_1[2] = param_1[2] + 1;
     }

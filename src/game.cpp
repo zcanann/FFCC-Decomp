@@ -28,6 +28,7 @@
 #include "ffcc/p_map.h"
 #include "ffcc/p_mc.h"
 #include "ffcc/p_menu.h"
+#include "ffcc/p_tina.h"
 #include "ffcc/p_usb.h"
 
 #include <string.h>
@@ -80,12 +81,9 @@ void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CS
     void*, int, int, int, int, void*, void*);
 void Draw__5CWindFv(void*);
 void CheckMenu__10CGPartyObjFv();
-void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
-void LoadFieldPdt__8CPartPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 void CheckMenu__10CGPartyObjFv(void);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
-unsigned char PartPcs[];
 extern const s16 DAT_8032e3d0[];
 int sprintf(char*, const char*, ...);
 int rand(void);
@@ -569,8 +567,8 @@ void CGame::Create()
         m_currentMapId = mapId;
         m_currentMapVariantId = mapVariant;
 
-        LoadMap__7CMapPcsFiiPvUlUc(&MapPcs, mapId, mapVariant, 0, 0, 0);
-        LoadFieldPdt__8CPartPcsFiiPvUlUc(&PartPcs, mapId, mapVariant, 0, 0, 0);
+        MapPcs.LoadMap(mapId, mapVariant, 0, 0, 0);
+        PartPcs.LoadFieldPdt(mapId, mapVariant, 0, 0, 0);
 
         System.MapChanged(mapId, mapVariant, 1);
     }
@@ -854,22 +852,22 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
         m_currentMapVariantId = mapVariant;
         hasParamMask = (u32)((-param4 | param4) >> 31);
 
-        LoadMap__7CMapPcsFiiPvUlUc(
-            &MapPcs, mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, 0);
+        MapPcs.LoadMap(
+            mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, 0);
 
         hasParamMask = (u32)((-param4 | param4) >> 31);
-        LoadFieldPdt__8CPartPcsFiiPvUlUc(
-            &PartPcs, mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, 0);
+        PartPcs.LoadFieldPdt(
+            mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, 0);
 
         System.MapChanged(mapId, mapVariant, 1);
     } else {
         hasParamMask = (u32)((-param4 | param4) >> 31);
-        LoadMap__7CMapPcsFiiPvUlUc(
-            &MapPcs, mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, param4 & 0xFF);
+        MapPcs.LoadMap(
+            mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, param4 & 0xFF);
 
         hasParamMask = (u32)((-param4 | param4) >> 31);
-        LoadFieldPdt__8CPartPcsFiiPvUlUc(
-            &PartPcs, mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, (u8)param4);
+        PartPcs.LoadFieldPdt(
+            mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, (u8)param4);
     }
 }
 

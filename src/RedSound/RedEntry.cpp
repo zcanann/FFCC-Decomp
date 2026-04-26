@@ -1400,7 +1400,7 @@ int CRedEntry::MusicOldClear()
 	unsigned int history = (unsigned int)*(int*)((int)this + 8);
 
 	do {
-		if (historyNo < *(int*)(history + 4)) {
+		if (*(int*)(history + 4) > historyNo) {
 			historyNo = *(int*)(history + 4);
 			selected = history;
 		}
@@ -1429,7 +1429,7 @@ unsigned int CRedEntry::MusicOldChoice()
 		if (*(int*)(history + 0xc) == 0) {
 			return history;
 		}
-		if (historyNo < *(int*)(history + 4)) {
+		if (*(int*)(history + 4) > historyNo) {
 			historyNo = *(int*)(history + 4);
 			selected = history;
 		}

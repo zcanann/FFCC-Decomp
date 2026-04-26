@@ -1068,7 +1068,7 @@ void __MidiCtrl_VolumeDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
     trackData[10] = volume;
     trackData[0xb] = 0;
     trackData[0xc] = 0;
-    m_ADataBufferSize |= 2;
+    m_ChangeStatus |= 2;
 }
 
 /*
@@ -1121,7 +1121,7 @@ void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
     trackData[0xd] = ((int)(char)*command) << 0xc;
     trackData[0xe] = 0;
     trackData[0xf] = 0;
-    m_ADataBufferSize |= 2;
+    m_ChangeStatus |= 2;
 }
 
 /*
@@ -1171,7 +1171,7 @@ void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     if ((u32)reinterpret_cast<int*>(track)[0x2d] == 0) {
         reinterpret_cast<int*>(track)[0x33] = 0;
     }
-    m_ADataBufferSize |= 2;
+    m_ChangeStatus |= 2;
 }
 #pragma optimization_level 4
 
@@ -2234,7 +2234,7 @@ void __MidiCtrl_FineTuneAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 
 	((int*)track)[0] = (int)(command + 1);
 	((u8*)track)[0x148] = *command;
-	m_ADataBufferSize |= 1;
+	m_ChangeStatus |= 1;
 }
 
 /*
@@ -2254,7 +2254,7 @@ void __MidiCtrl_FineTuneRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 	((int*)track)[0] = (int)(command + 1);
 	register int fineTuneResult = fineTune + *command;
 	((s8*)track)[0x148] = fineTuneResult;
-	m_ADataBufferSize |= 1;
+	m_ChangeStatus |= 1;
 }
 
 /*
@@ -2272,7 +2272,7 @@ void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
 
 	((int*)track)[0] = (int)(command + 1);
 	*(short*)((char*)track + 0x142) = (short)(*command << 8);
-	m_ADataBufferSize |= 1;
+	m_ChangeStatus |= 1;
 }
 
 /*
@@ -2291,7 +2291,7 @@ void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
 
 	((int*)track)[0] = (int)(command + 1);
 	*(short*)((char*)track + 0x142) = keyTranspose + (*command << 8);
-	m_ADataBufferSize |= 1;
+	m_ChangeStatus |= 1;
 }
 
 /*
@@ -2386,7 +2386,7 @@ void __MidiCtrl_ReverbOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
     trackData[0x3f] |= 0x3c00;
     SetVoiceSwitch(track, trackData[0x3f]);
-    m_ADataBufferSize |= 2;
+    m_ChangeStatus |= 2;
 }
 
 /*
@@ -2405,7 +2405,7 @@ void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     trackData[0x3f] &= 0xffffcfff;
     trackData[0x3f] |= 0xc00;
     SetVoiceSwitch(track, trackData[0x3f]);
-    m_ADataBufferSize |= 2;
+    m_ChangeStatus |= 2;
 }
 
 /*
@@ -2445,7 +2445,7 @@ void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     }
     trackData[0] += 2;
     SetVoiceSwitch(track, trackData[0x3f]);
-    m_ADataBufferSize |= 2;
+    m_ChangeStatus |= 2;
 }
 
 /*

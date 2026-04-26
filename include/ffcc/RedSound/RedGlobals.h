@@ -51,7 +51,6 @@ extern int m_MusicSkipComplete;
 extern void* p_ReverbDepth;
 extern int m_Mute[2];
 extern CRedMemory c_RedMemory;
-extern int m_ADataBufferSize;
 extern u32 m_ChangeStatus;
 extern CRedDriver c_Driver;
 

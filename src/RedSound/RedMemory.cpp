@@ -7,7 +7,7 @@
 static int m_DataBuffer;
 static int m_ADataBuffer;
 static int m_DataBufferSize;
-int m_ADataBufferSize;
+static int m_ADataBufferSize;
 static int* m_MemoryBank;
 static int* m_AMemoryBank;
 

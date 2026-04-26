@@ -2575,7 +2575,7 @@ RedSound/RedDriver.cpp:
 	.ctors      start:0x801D544C end:0x801D5450
 	.rodata     start:0x801E7788 end:0x801E7888
 	.bss        start:0x8032B860 end:0x8032E170
-	.sbss       start:0x8032F3D0 end:0x8032F4A8
+	.sbss       start:0x8032F3B8 end:0x8032F490
 	.sdata2     start:0x80333D10 end:0x80333D20
 
 RedSound/RedMemory.cpp:
@@ -2583,7 +2583,7 @@ RedSound/RedMemory.cpp:
 	extabindex  start:0x80011CA4 end:0x80011D04
 	.text       start:0x801BFF34 end:0x801C05F8
 	.rodata     start:0x801E7888 end:0x801E78D8
-	.sbss       start:0x8032F4A8 end:0x8032F4C0
+	.sbss       start:0x8032F490 end:0x8032F4A8
 	.sdata2     start:0x80333D20 end:0x80333D30
 
 RedSound/RedEntry.cpp:
@@ -2598,7 +2598,7 @@ RedSound/RedExecute.cpp:
 	extabindex  start:0x80011F20 end:0x800120D0
 	.text       start:0x801C2FC4 end:0x801C7478
 	.sdata      start:0x8032EC30 end:0x8032EC34
-	.sbss       start:0x8032F4C0 end:0x8032F4D4
+	.sbss       start:0x8032F4A8 end:0x8032F4BC
 	.sdata2     start:0x80333D58 end:0x80333D68
 
 RedSound/RedMidiCtrl.cpp:
@@ -2629,7 +2629,7 @@ RedSound/RedSound.cpp:
 	.ctors      start:0x801D5450 end:0x801D5454
 	.rodata     start:0x801E7FE8 end:0x801E8110
 	.bss        start:0x8032E170 end:0x8032E280
-	.sbss       start:0x8032F4D4 end:0x8032F4E0
+	.sbss       start:0x8032F4C0 end:0x8032F4CC
 	.sdata2     start:0x80333D98 end:0x80333DB0
 
 thp/THPDec.c:

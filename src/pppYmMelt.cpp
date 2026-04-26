@@ -170,9 +170,11 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     worldZ = pppMngStPtr->m_matrix.value[2][3];
     pppGetShapeUV__FPlsR5Vec2dR5Vec2di((long*)shape->m_animData, work->m_shapeDrawFrame, uvMin, uvMax, 0);
 
+    uStep = uvMax.x - uvMin.x;
+    vStep = uvMax.y - uvMin.y;
     grid = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
-    uStep = (uvMax.x - uvMin.x) / (f32)grid;
-    vStep = (uvMax.y - uvMin.y) / (f32)grid;
+    uStep = uStep / (f32)grid;
+    vStep = vStep / (f32)grid;
     GXBegin((GXPrimitive)0x80, GX_VTXFMT7, (u16)((grid * grid * 4) & 0xFFFC));
 
     for (int z = 0; z < *(u16*)((u8*)&ctrl->m_initWOrk + 2); z++) {

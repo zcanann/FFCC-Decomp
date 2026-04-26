@@ -37,7 +37,7 @@ static const float s_ReverbEffectScale = 100.0f;
 u8 GetRandomData()
 {
     u8 value = (u8)t_RandomData[m_RandomIndex];
-    m_RandomIndex = m_RandomIndex + 1;
+    m_RandomIndex++;
     return value;
 }
 #pragma optimization_level 4

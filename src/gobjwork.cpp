@@ -1517,42 +1517,23 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(lbl_801D9F64));
 	}
 
-	for (int i = 0; i < 25; i++) {
-		if (artifactIndex < 96 && (short)m_artifacts[artifactIndex] > 0) {
+	unsigned short* artifact = m_artifacts;
+	for (int i = 0; i < 50; i++, artifactIndex += 2, artifact += 2) {
+		if (artifactIndex < 96 && (short)artifact[0] > 0) {
 			unsigned short* artifactData =
-				(unsigned short*)(Game.unkCFlatData0[2] + (short)m_artifacts[artifactIndex] * 0x48);
+				(unsigned short*)(Game.unkCFlatData0[2] + (short)artifact[0] * 0x48);
 			if (artifactData[0] == 0xDB) {
 				totalSlots += artifactData[3];
 			}
 		}
 
-		if ((artifactIndex + 1) < 96 && (short)m_artifacts[artifactIndex + 1] > 0) {
+		if ((artifactIndex + 1) < 96 && (short)artifact[1] > 0) {
 			unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
-															 (short)m_artifacts[artifactIndex + 1] * 0x48);
+															 (short)artifact[1] * 0x48);
 			if (artifactData[0] == 0xDB) {
 				totalSlots += artifactData[3];
 			}
 		}
-
-		artifactIndex += 2;
-
-		if (artifactIndex < 96 && (short)m_artifacts[artifactIndex] > 0) {
-			unsigned short* artifactData =
-				(unsigned short*)(Game.unkCFlatData0[2] + (short)m_artifacts[artifactIndex] * 0x48);
-			if (artifactData[0] == 0xDB) {
-				totalSlots += artifactData[3];
-			}
-		}
-
-		if ((artifactIndex + 1) < 96 && (short)m_artifacts[artifactIndex + 1] > 0) {
-			unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
-															 (short)m_artifacts[artifactIndex + 1] * 0x48);
-			if (artifactData[0] == 0xDB) {
-				totalSlots += artifactData[3];
-			}
-		}
-
-		artifactIndex += 2;
 	}
 
 	totalSlots += (short)m_baseCmdListSlots;

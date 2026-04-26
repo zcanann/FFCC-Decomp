@@ -283,10 +283,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         GXSetTexCoordGen2(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX2, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
 
         GXClearVtxDesc();
-        GXSetVtxDesc((GXAttr)9, GX_INDEX8);
-        GXSetVtxDesc((GXAttr)10, GX_INDEX8);
-        GXSetVtxDesc((GXAttr)0xB, GX_INDEX8);
-        GXSetVtxDesc((GXAttr)0xD, GX_INDEX8);
+        GXSetVtxDesc((GXAttr)9, GX_INDEX16);
+        GXSetVtxDesc((GXAttr)10, GX_INDEX16);
+        GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
+        GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
 
         meshColor = *(u8**)((u8*)model + 0x3C);
         meshColor[0] = 0xFF;
@@ -302,7 +302,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         GXSetNumTevStages(1);
         GXSetNumTexGens(0);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-        GXSetProjection(screenMtx, GX_ORTHOGRAPHIC);
+        GXSetProjection(screenMtx, GX_PERSPECTIVE);
         PSMTXScale(scaleMtx, FLOAT_80331940, FLOAT_80331940, FLOAT_80331940);
         PSMTXConcat(scaleMtx, pppMiasma->m_localMatrix.value, localMtx);
         PSMTXConcat(ppvWorldMatrix, localMtx, pppMiasma->m_drawMatrix.value);
@@ -358,10 +358,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
             }
             gUtil.RenderColorQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
             GXClearVtxDesc();
-            GXSetVtxDesc((GXAttr)9, GX_INDEX8);
-            GXSetVtxDesc((GXAttr)10, GX_INDEX8);
-            GXSetVtxDesc((GXAttr)0xB, GX_INDEX8);
-            GXSetVtxDesc((GXAttr)0xD, GX_INDEX8);
+            GXSetVtxDesc((GXAttr)9, GX_INDEX16);
+            GXSetVtxDesc((GXAttr)10, GX_INDEX16);
+            GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
+            GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
 
             meshColor = *(u8**)((u8*)model + 0x3C);
             meshColor[0] = 0xFF;

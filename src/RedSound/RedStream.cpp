@@ -504,20 +504,18 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 void StreamPause(int param_1, int param_2)
 {
 	const char* logBlob = s_redStreamLogBlob;
-	const char* logPrefix = logBlob + RED_STREAM_LOG_PREFIX_OFFSET;
 	RedStreamDATA* streamData;
 	RedStreamDATA* streamEnd;
 
-	streamData = p_Stream;
 	if (m_ReportPrint != 0) {
 		if (param_2 == 1) {
-			OSReport(logBlob + RED_STREAM_PAUSE_ON_FMT_OFFSET, logPrefix, param_1);
+			OSReport(logBlob + RED_STREAM_PAUSE_ON_FMT_OFFSET, logBlob + RED_STREAM_LOG_PREFIX_OFFSET, param_1);
 		} else {
-			OSReport(logBlob + RED_STREAM_PAUSE_OFF_FMT_OFFSET, logPrefix, param_1);
+			OSReport(logBlob + RED_STREAM_PAUSE_OFF_FMT_OFFSET, logBlob + RED_STREAM_LOG_PREFIX_OFFSET, param_1);
 		}
 		fflush(__files + 1);
-		streamData = p_Stream;
 	}
+	streamData = p_Stream;
 	streamEnd = p_Stream + 4;
 	while (streamData < streamEnd) {
 		if ((streamData->m_streamId != 0) && ((param_1 == -1) || (param_1 == streamData->m_streamId))) {

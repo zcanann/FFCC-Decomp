@@ -447,24 +447,19 @@ void CTextureMan::Quit()
  */
 int CTextureMan::SetTexture(_GXTexMapID texMapId, CTexture* texture)
 {
-    bool usePalette;
-
-    usePalette = false;
-    if ((U8At(texture, 0x60) == 9) || (U8At(texture, 0x60) == 8)) {
-        usePalette = true;
-    }
+    int usePalette = (texture->m_format == 9) || (texture->m_format == 8);
 
     if (usePalette) {
-        GXInitTexObjTlut(reinterpret_cast<GXTexObj*>(Ptr(texture, 0x28)), GX_TLUT0);
+        GXInitTexObjTlut(&texture->m_texObj, GX_TLUT0);
     }
 
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(texture, 0x28)), texMapId);
+    GXLoadTexObj(&texture->m_texObj, texMapId);
 
     if (usePalette) {
-        GXInitTexObjTlut(reinterpret_cast<GXTexObj*>(Ptr(texture, 0x28)), GX_TLUT1);
-        GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(texture, 0x28)), static_cast<_GXTexMapID>(texMapId + 1));
-        GXLoadTlut(reinterpret_cast<GXTlutObj*>(Ptr(texture, 0x48)), GX_TLUT0);
-        GXLoadTlut(reinterpret_cast<GXTlutObj*>(Ptr(texture, 0x54)), GX_TLUT1);
+        GXInitTexObjTlut(&texture->m_texObj, GX_TLUT1);
+        GXLoadTexObj(&texture->m_texObj, static_cast<_GXTexMapID>(texMapId + 1));
+        GXLoadTlut(&texture->m_tlutObj0, GX_TLUT0);
+        GXLoadTlut(&texture->m_tlutObj1, GX_TLUT1);
     }
 
     return 0;
@@ -491,12 +486,22 @@ int CTextureMan::SetTextureTev(CTexture* texture)
         return 1;
     }
 
-    usePalette = *(u8*)((u8*)texture + 0x60) == 9 || *(u8*)((u8*)texture + 0x60) == 8;
+    usePalette = (texture->m_format == 9) || (texture->m_format == 8);
     if (usePalette) {
-        GXColor tevColor1 = {0xFF, 0, 0, 0xFF};
-        GXSetTevColor((GXTevRegID)1, tevColor1);
+        GXColor tevColor2;
+        GXColor tevColor1;
 
-        GXColor tevColor2 = {0, 0, 0, 0xFF};
+        tevColor1.r = 0xFF;
+        tevColor1.g = 0xFF;
+        tevColor1.b = 0;
+        tevColor1.a = 0;
+
+        tevColor2.r = 0;
+        tevColor2.g = 0;
+        tevColor2.b = 0xFF;
+        tevColor2.a = 0xFF;
+
+        GXSetTevColor((GXTevRegID)1, tevColor1);
         GXSetTevColor((GXTevRegID)2, tevColor2);
 
         _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
@@ -1147,7 +1152,6 @@ void CTexture::FlushExternalTlut(void*, int)
  */
 CTextureSet::CTextureSet()
 {
-    *reinterpret_cast<void**>(this) = __vt__11CTextureSet;
     __ct__21CPtrArray_P8CTexture_Fv(Textures(this));
     SetDefaultSize__21CPtrArray_P8CTexture_FUl(Textures(this), 0x10);
     SetStage__21CPtrArray_P8CTexture_FPQ27CMemory6CStage(Textures(this), TextureMan.m_memoryStage);

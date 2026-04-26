@@ -1383,10 +1383,10 @@ int CRedDriver::GetProgramTime()
     int sum = 0;
     int* p = p_Tick;
 
-    while (p < p_Tick + 100) {
+    do {
         sum += *p;
         p++;
-    }
+    } while (p < p_Tick + 100);
     return sum;
 }
 

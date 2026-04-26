@@ -68,7 +68,7 @@ int m_KeyOnEntry;
 void* volatile p_KeyOnData;
 int m_SoundPlayMode;
 int m_SoundMasterControl;
-int m_ReportPrint;
+volatile int m_ReportPrint;
 int m_MusicFastSpeed;
 volatile int m_MusicSkipLine;
 int m_MusicKeySignature;

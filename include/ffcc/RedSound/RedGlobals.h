@@ -30,7 +30,7 @@ extern int m_KeyOnEntry;
 extern void* volatile p_KeyOnData;
 extern int m_SoundPlayMode;
 extern int m_SoundMasterControl;
-extern int m_ReportPrint;
+extern volatile int m_ReportPrint;
 extern int m_MusicFastSpeed;
 extern volatile int m_MusicSkipLine;
 extern int m_MusicKeySignature;

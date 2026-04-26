@@ -150,10 +150,10 @@ struct CharaBreakMeshData {
 };
 
 struct CharaBreakMeshRef {
+    u8 _pad0[0x8];
+    CharaBreakMeshData* m_data;
     S16Vec* m_workPositions;
     S16Vec* m_workNormals;
-    CharaBreakMeshData* m_data;
-    u8 _padC[0x8];
 };
 
 struct CharaBreakModelData {
@@ -167,13 +167,21 @@ struct CharaBreakModelData {
 };
 
 struct CharaBreakModelView {
-    u8 _pad0[0x38];
+    u8 _pad0[0x8];
     Mtx m_localMtx;
-    u8 _pad68[0x3C];
+    u8 _pad38[0x6C];
     CharaBreakModelData* m_data;
     void* m_nodes;
     CharaBreakMeshRef* m_meshes;
 };
+
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
+STATIC_ASSERT(offsetof(CharaBreakModelView, m_localMtx) == 0x8);
+STATIC_ASSERT(offsetof(CharaBreakModelView, m_data) == 0xA4);
+STATIC_ASSERT(offsetof(CharaBreakModelView, m_nodes) == 0xA8);
+STATIC_ASSERT(offsetof(CharaBreakModelView, m_meshes) == 0xAC);
 
 /*
  * --INFO--
@@ -321,18 +329,21 @@ extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32 v
 void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
     CharaBreakMeshData* meshData = *(CharaBreakMeshData**)((u8*)mesh + 8);
-    s32 isSkinned = meshData->m_skinCount != 0;
-    S16Vec* workPositions = *(S16Vec**)mesh;
+    s32 isRigid = 0;
+    S16Vec* workPositions;
     u16* stream = (u16*)displayList;
     u8* polygonBytes = (u8*)polygonData;
     Mtx meshMtx;
 
-    if (isSkinned == 0) {
-        PSMTXConcat(*(Mtx*)((u8*)model + 0x38), *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (meshData->m_nodeIndex * 0xC0) + 0xC),
+    if (meshData->m_skinCount == 0) {
+        isRigid = 1;
+        PSMTXConcat(*(Mtx*)((u8*)model + 0x8), *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (meshData->m_nodeIndex * 0xC0) + 0x6C),
                     meshMtx);
     }
+    workPositions = ((CharaBreakMeshRef*)mesh)->m_workPositions;
 
-    for (;;) {
+    s32 keepReading = 1;
+    while (keepReading != 0) {
         u8 drawCmd = *(u8*)stream;
         u16 drawCount = *(u16*)((u8*)stream + 1);
         u8 primitive = drawCmd & 0xF8;
@@ -342,78 +353,79 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 
         stream = (u16*)((u8*)stream + 3);
         if (IsHasDrawFmtDL__5CUtilFUc(&gUtil, drawCmd) == 0) {
-            break;
-        }
-
-        triCount = (s16)(drawCount - 2);
-        outVertex = 0;
-        stripRestart = 0;
-
-        if (primitive == 0x90) {
-            triCount = (s16)(((u64)((s64)(s32)(u32)drawCount * 0x55555556ULL)) >> 32);
-        }
-
-        for (;;) {
-            u16* previousRestart = stripRestart;
-            u16 posIndex = stream[0];
-            u16 nrmIndex = stream[1];
-            u16 texIndex = stream[3];
-
-            stripRestart = stream + 4;
-            if ((drawCmd & 7) == 2) {
-                stripRestart = stream + 5;
-            }
-            stream = stripRestart;
-
-            if (isSkinned != 0) {
-                S16Vec* sourcePos = workPositions + posIndex;
-                s32 positionOffset = outVertex * 6;
-                *(s16*)(polygonBytes + positionOffset + 0x10) = sourcePos->x;
-                *(s16*)(polygonBytes + positionOffset + 0x12) = sourcePos->y;
-                *(s16*)(polygonBytes + positionOffset + 0x14) = sourcePos->z;
-            } else {
-                S16Vec* sourcePos = workPositions + posIndex;
-                S16Vec posQuantized;
-                Vec posFloat;
-
-                posQuantized.x = sourcePos->x;
-                posQuantized.y = sourcePos->y;
-                posQuantized.z = sourcePos->z;
-                ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &posFloat, posQuantized,
-                                                    *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
-                PSMTXMultVec(meshMtx, &posFloat, &posFloat);
-                ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, (S16Vec*)(polygonBytes + (outVertex * 6) + 0x10), posFloat,
-                                                    *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
-            }
-
-            *(u16*)(polygonBytes + (outVertex * 2) + 0x22) = posIndex;
-            *(u16*)(polygonBytes + (outVertex * 2) + 0x2E) = texIndex;
-            *(u16*)(polygonBytes + (outVertex * 2) + 0x28) = nrmIndex;
-            outVertex++;
-            stripRestart = previousRestart;
+            keepReading = 0;
+        } else {
+            triCount = (s16)(drawCount - 2);
+            outVertex = 0;
+            stripRestart = 0;
+            s32 keepTri = 1;
 
             if (primitive == 0x90) {
-                if (outVertex == 3) {
-                    triCount--;
-                    if (triCount < 1) {
-                        break;
-                    }
-                    outVertex = 0;
-                    polygonBytes += 0x34;
+                triCount = (s16)((s32)drawCount / 3);
+            }
+
+            while (keepTri != 0) {
+                u16* previousRestart = stripRestart;
+                u16 posIndex = stream[0];
+                u16 nrmIndex = stream[1];
+                u16 texIndex = stream[3];
+
+                stripRestart = stream + 4;
+                if ((drawCmd & 7) == 2) {
+                    stripRestart = stream + 5;
                 }
-            } else if (primitive == 0x98) {
-                if (outVertex == 1) {
-                    stripRestart = stream;
-                } else if (outVertex == 3) {
-                    triCount--;
-                    if (triCount < 1) {
-                        break;
+                stream = stripRestart;
+
+                if (isRigid != 0) {
+                    S16Vec* sourcePos = workPositions + posIndex;
+                    S16Vec posQuantized;
+                    Vec posFloat;
+
+                    posQuantized.x = sourcePos->x;
+                    posQuantized.y = sourcePos->y;
+                    posQuantized.z = sourcePos->z;
+                    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &posFloat, posQuantized,
+                                                        *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
+                    PSMTXMultVec(meshMtx, &posFloat, &posFloat);
+                    ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, (S16Vec*)(polygonBytes + (outVertex * 6) + 0x10), posFloat,
+                                                        *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
+                } else {
+                    S16Vec* sourcePos = workPositions + posIndex;
+                    s32 positionOffset = outVertex * 6;
+                    *(s16*)(polygonBytes + positionOffset + 0x10) = sourcePos->x;
+                    *(s16*)(polygonBytes + positionOffset + 0x12) = sourcePos->y;
+                    *(s16*)(polygonBytes + positionOffset + 0x14) = sourcePos->z;
+                }
+
+                *(u16*)(polygonBytes + (outVertex * 2) + 0x22) = posIndex;
+                *(u16*)(polygonBytes + (outVertex * 2) + 0x2E) = texIndex;
+                *(u16*)(polygonBytes + (outVertex * 2) + 0x28) = nrmIndex;
+                outVertex++;
+                stripRestart = previousRestart;
+
+                if (primitive == 0x90) {
+                    if (outVertex == 3) {
+                        triCount--;
+                        if (triCount < 1) {
+                            keepTri = 0;
+                        }
+                        outVertex = 0;
+                        polygonBytes += 0x34;
                     }
-                    if ((triCount & 1) == 0) {
-                        stream = previousRestart;
+                } else if (primitive == 0x98) {
+                    if (outVertex == 1) {
+                        stripRestart = stream;
+                    } else if (outVertex == 3) {
+                        triCount--;
+                        if (triCount < 1) {
+                            keepTri = 0;
+                        }
+                        if ((triCount & 1) == 0) {
+                            stream = previousRestart;
+                        }
+                        outVertex = 0;
+                        polygonBytes += 0x34;
                     }
-                    outVertex = 0;
-                    polygonBytes += 0x34;
                 }
             }
         }
@@ -524,11 +536,12 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
         bool needsMtxUpdate = false;
         Mtx meshToWorld;
         CharaBreakMeshData* meshData = *(CharaBreakMeshData**)((u8*)mesh + 8);
-        S16Vec* workPositions = *(S16Vec**)mesh;
+        CharaBreakMeshRef* meshRef = (CharaBreakMeshRef*)mesh;
+        S16Vec* workPositions = meshRef->m_workPositions;
 
         if (meshData->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
             needsMtxUpdate = true;
-            PSMTXConcat(*(Mtx*)((u8*)model + 0x38), *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (meshData->m_nodeIndex * 0xC0) + 0xC),
+            PSMTXConcat(*(Mtx*)((u8*)model + 0x8), *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (meshData->m_nodeIndex * 0xC0) + 0x6C),
                         meshToWorld);
         }
 
@@ -917,7 +930,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     &gUtil,
                     &work->m_bboxMin,
                     &work->m_bboxMax,
-                    *(S16Vec**)mesh,
+                    ((CharaBreakMeshRef*)mesh)->m_workPositions,
                     meshData->m_vertexCount,
                     *(u32*)(*(u32*)(model + 0xA4) + 0x34));
             }

@@ -100,7 +100,7 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* pa
     unsigned char* anglePtr;
     unsigned char* work;
     int i;
-    float one;
+    float scale;
 
     work = (unsigned char*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_2)->m_serializedDataOffsets[0]);
     work[0x1c3] = 0;
@@ -115,16 +115,16 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* pa
     memset(work + 0x20, 0, 8);
     memset(work + 0x28, 0, 8);
 
-    one = kPppKeShpTail3XOne;
+    scale = kPppKeShpTail3XZero;
     i = 0;
     anglePtr = work;
     do {
         s32 rnd = rand();
         *(s16*)(anglePtr + 0x180) = (s16)(rnd - (rnd / 0x168) * 0x168);
         anglePtr += 2;
-        *(float*)(work + 0x38) = one;
-        *(float*)(work + 0x34) = one;
-        *(float*)(work + 0x30) = one;
+        *(float*)(work + 0x38) = scale;
+        *(float*)(work + 0x34) = scale;
+        *(float*)(work + 0x30) = scale;
         work += 0xc;
         i++;
     } while (i < 0x1c);

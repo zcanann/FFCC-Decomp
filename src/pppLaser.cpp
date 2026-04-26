@@ -246,12 +246,11 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
     LaserWork* work;
     Vec localA;
     Vec localB;
-    Vec localPos;
     CMapCylinderRaw cyl;
     Mtx charaMtx;
     Mtx tempMtx;
 
-    bool emptyHistory;
+    int emptyHistory;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -265,12 +264,12 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         return;
     }
 
-    emptyHistory = false;
+    emptyHistory = 0;
     if (work->m_points == 0) {
         work->m_points = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)step->m_payload[0x1e] * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppLaser_cpp), 0x7d);
         memset(work->m_points, 0, (u32)step->m_payload[0x1e] * 0xc);
-        emptyHistory = true;
+        emptyHistory = 1;
     }
 
     CalcGraphValue((_pppPObject*)baseObj, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
@@ -314,7 +313,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             double t = (FLOAT_80333448 / (float)(countDouble.d - DOUBLE_80333440)) *
                 (float)(indexDouble.d - DOUBLE_80333440);
             if (GetCharaNodeFrameMatrix(pppMngStPtr, (float)t, charaMtx) == 0) {
-                emptyHistory = true;
+                emptyHistory = 1;
                 continue;
             } else {
                 PSMTXConcat(charaMtx, baseObj->m_localMatrix.value, charaMtx);
@@ -322,8 +321,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             }
         }
 
-        localPos = work->m_origin;
-        pppSubVector(localA, work->m_points[i], localPos);
+        pppSubVector(localA, work->m_points[i], work->m_origin);
         PSVECScale(&localA, &localA, FLOAT_8033344c);
 
         cyl.m_bottom = work->m_origin;
@@ -404,9 +402,8 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
     }
 
     if (emptyHistory) {
-        Vec* points = work->m_points;
         for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
-            pppCopyVector(points[i], points[0]);
+            pppCopyVector(work->m_points[i], work->m_points[0]);
         }
     }
 }

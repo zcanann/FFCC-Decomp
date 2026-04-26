@@ -1169,7 +1169,7 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 			addSubStat__8CGPrgObjFv(this);
 		}
 	} else {
-		if ((worldParamA != 0xCB || *(int*)(self + 0x520) == 0x24) && *(int*)(self + 0x520) != 0x25) {
+		if (!(((worldParamA != 0xCB) || (*(int*)(self + 0x520) != 0x24)) && *(int*)(self + 0x520) != 0x25)) {
 			if ((particleAttr >= 0x65 && particleAttr <= 0x67)) {
 				unsigned char* classObj = 0;
 
@@ -1236,7 +1236,7 @@ void CGItemObj::loadModel()
 			modelVariant = 1;
 			useParticleTable = 0;
 		}
-	} else if (worldParamA >= 0x1F && worldParamA <= 0x21) {
+	} else if (!(worldParamA != 0x24 && (worldParamA > 0x23 || worldParamA > 0x21 || worldParamA < 0x1F))) {
 		unsigned short itemEntry = *(unsigned short*)(Game.unkCFlatData0[2] + worldParamB * 0x48 + 2);
 
 		self[0x53] = 1;

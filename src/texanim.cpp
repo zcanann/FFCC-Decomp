@@ -824,10 +824,9 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
     unsigned int texAnimCount;
 
     for (texAnimIndex = 0;
-         ((texAnimCount = static_cast<unsigned int>(GetSize__21CPtrArray_P8CTexAnim_Fv(&self->texAnims))), texAnimIndex < texAnimCount);
+         ((texAnimCount = static_cast<unsigned int>(self->texAnims.GetSize())), texAnimIndex < texAnimCount);
          texAnimIndex = texAnimIndex + 1) {
-        CTexAnimStorage* texAnim =
-            reinterpret_cast<CTexAnimStorage*>(__vc__21CPtrArray_P8CTexAnim_FUl(&self->texAnims, texAnimIndex));
+        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[texAnimIndex]);
         int* material = reinterpret_cast<int*>(*reinterpret_cast<void**>((int)texAnim->refData + 0x108));
         int materialIndex;
 

@@ -211,13 +211,12 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     curIndex = work->m_head;
     nextIndex = curIndex + 1;
     lastIndex = work->m_count - 1;
-    if (curIndex == lastIndex) {
-        nextIndex = 0;
-    }
-
     segBaseX = work->m_posHistory[curIndex].x;
     segBaseY = work->m_posHistory[curIndex].y;
     segBaseZ = work->m_posHistory[curIndex].z;
+    if (curIndex == lastIndex) {
+        nextIndex = 0;
+    }
     nextBaseX = work->m_posHistory[nextIndex].x;
     nextBaseY = work->m_posHistory[nextIndex].y;
     nextBaseZ = work->m_posHistory[nextIndex].z;
@@ -265,6 +264,7 @@ draw_loop:
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((void*)0, &drawMtx,
                                                                (step->m_useEnvDepth != 0) ? step->m_envDepth : zero, 0,
                                                                step->m_drawA, step->m_blendMode, 0, zEnable, 1, 0);
+    GXLoadPosMtxImm(drawMtx.value, 0);
 
     {
         GXColor amb;

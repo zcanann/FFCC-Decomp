@@ -54,6 +54,7 @@ static const char s_pppLocationTitle_cpp_801DB510[] = "pppLocationTitle.cpp";
  */
 void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3)
 {
+    int dataValIndex;
     int serializedOffset;
     LocationTitleWork* work;
     int graphFrame;
@@ -62,17 +63,18 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     LocationTitleParticle* particles;
     long** shapeTable;
 
+    dataValIndex = param_2->m_dataValIndex;
     serializedOffset = *param_3->m_serializedDataOffsets;
     work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
 
-    if (param_2->m_dataValIndex == 0xFFFF) {
+    if (dataValIndex == 0xFFFF) {
         return;
     }
 
     fadeDivisor = -1;
     particles = (LocationTitleParticle*)work->m_particles;
     shapeTable =
-        *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (param_2->m_dataValIndex * 4));
+        *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (dataValIndex * 4));
     graphFrame = pppLocationTitle->m_graphId / 0x1000;
 
     if ((int)param_2->m_fadeStartFrame <= graphFrame) {

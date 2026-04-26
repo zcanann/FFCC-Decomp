@@ -814,7 +814,7 @@ void CSound::Frame()
     unsigned char* se = reinterpret_cast<unsigned char*>(this) + 0x2C;
     u32 i = 0;
     do {
-        if (static_cast<signed char>(*se) < 0) {
+        if ((*se & 0x80) != 0) {
             int pan;
             int volume[3];
 
@@ -926,7 +926,7 @@ void CSound::Draw()
     CSoundLayout& sound = SoundData(this);
     unsigned char* se = sound.m_seWork;
     for (u32 i = 0; i < 0x80; i++, se += 0x28) {
-        if (static_cast<signed char>(*se) < 0) {
+        if ((*se & 0x80) != 0) {
             u32 innerColor;
             u32 outerColor;
             Graphic.DrawSphere(cameraMatrix, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x10),
@@ -1765,7 +1765,7 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
         se = sound.m_seWork;
 
         for (loopCount = 0x80; loopCount != 0; loopCount--, se += 0x28) {
-            if (static_cast<s8>(*se) < 0) {
+            if ((*se & 0x80) != 0) {
                 continue;
             }
 
@@ -1839,7 +1839,7 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
         se = sound.m_seWork;
 
         for (loopCount = 0x80; loopCount != 0; loopCount--, se += 0x28) {
-            if (static_cast<s8>(*se) < 0) {
+            if ((*se & 0x80) != 0) {
                 continue;
             }
 
@@ -2012,10 +2012,10 @@ void CSound::StopSe3D(int se3dHandle)
         int idx = 0;
         int count = 0x20;
         do {
-            if (((((static_cast<s8>(*se) < 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-                  ((found = se + 0x28), static_cast<s8>(*found) < 0 && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle)) ||
-                 ((found = se + 0x50), static_cast<s8>(*found) < 0 && *reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
-                (static_cast<s8>(se[0x78]) < 0 && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+            if (((((*se & 0x80) != 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+                 ((found = se + 0x28), ((*found & 0x80) != 0) && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle)) ||
+                ((found = se + 0x50), ((*found & 0x80) != 0) && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) ||
+                (((se[0x78] & 0x80) != 0) && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
                 goto found_entry;
             }
             idx += 3;
@@ -2058,10 +2058,10 @@ _pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
     int ret = 0;
     int count = 0x20;
     do {
-        if (((((static_cast<s8>(*se) < 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-              ((found = se + 0x28), static_cast<s8>(*found) < 0 && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle)) ||
-             ((found = se + 0x50), static_cast<s8>(*found) < 0 && *reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
-            (static_cast<s8>(se[0x78]) < 0 && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+        if (((((*se & 0x80) != 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+             ((found = se + 0x28), ((*found & 0x80) != 0) && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle)) ||
+            ((found = se + 0x50), ((*found & 0x80) != 0) && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) ||
+            (((se[0x78] & 0x80) != 0) && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
             goto found_entry;
         }
         ret += 3;
@@ -2108,10 +2108,10 @@ int CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
         ret = 0;
         count = 0x20;
         do {
-            if (((((*se < '\0') && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-                  ((found = se + 0x28), *found < '\0' && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
-                 ((found = se + 0x50), *found < '\0' && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle))) ||
-                ((se[0x78] < '\0' && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle)))) {
+            if (((((*se & 0x80) != 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+                 ((found = se + 0x28), ((*found & 0x80) != 0) && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
+                ((found = se + 0x50), ((*found & 0x80) != 0) && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
+                (((se[0x78] & 0x80) != 0) && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
                 goto found_entry;
             }
             ret += 3;
@@ -2148,10 +2148,10 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
         int remaining = 0x20;
 
         do {
-            if ((((se[0].m_flags < 0) && (found = &se[0], se[0].m_handle == se3dHandle)) ||
-                 ((se[1].m_flags < 0) && (found = &se[1], se[1].m_handle == se3dHandle))) ||
-                ((se[2].m_flags < 0) && (found = &se[2], se[2].m_handle == se3dHandle)) ||
-                ((se[3].m_flags < 0) && (found = &se[3], se[3].m_handle == se3dHandle))) {
+            if ((((se[0].m_flags & 0x80) != 0 && (found = &se[0], se[0].m_handle == se3dHandle)) ||
+                 ((se[1].m_flags & 0x80) != 0 && (found = &se[1], se[1].m_handle == se3dHandle))) ||
+                ((se[2].m_flags & 0x80) != 0 && (found = &se[2], se[2].m_handle == se3dHandle)) ||
+                ((se[3].m_flags & 0x80) != 0 && (found = &se[3], se[3].m_handle == se3dHandle))) {
                 goto found_entry;
             }
 

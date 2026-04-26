@@ -280,8 +280,8 @@ void CMenuPcs::MLstCtrl()
 {
 	bool blocked;
 	float one;
-	short press;
-	short hold;
+	unsigned short press;
+	unsigned short hold;
 	unsigned int itemCount;
 	unsigned int chunkCount;
 	int i;

@@ -1528,6 +1528,7 @@ pppChangeTex.cpp:
 	extabindex  start:0x80010D80 end:0x80010DBC
 	.text       start:0x8013EF94 end:0x8013F9D0
 	.rodata     start:0x801DD660 end:0x801DD678
+	.sdata2     start:0x80332020 end:0x80332040
 
 pppCharaBreak.cpp:
 	extab       start:0x80009B4C end:0x80009B84

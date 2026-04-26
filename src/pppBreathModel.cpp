@@ -170,10 +170,8 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreath
 extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
 {
     VBreathModel* state = (VBreathModel*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
-    float zero;
-
     PSMTXIdentity(state->m_matrix);
-    zero = 0.0f;
+    const float& zero = kPppBreathModelZero;
 
     state->m_direction.z = zero;
     state->m_direction.y = zero;

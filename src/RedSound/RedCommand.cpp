@@ -961,12 +961,12 @@ void SetMusicVolume(int seId, int volume, int duration, int mode)
 	if (volume != 0) {
 		volume = (((volume + 1) * 4) - 1) * 0x1000;
 	}
+	volume |= 0x800;
 
 	if (duration < 1) {
 		step = 1;
 	} else {
-		step = (duration * 200) / 0x3c + (duration * 200 >> 0x1f);
-		step = step - (step >> 0x1f);
+		step = (duration * 200) / 0x3c;
 	}
 
 	do {
@@ -975,7 +975,7 @@ void SetMusicVolume(int seId, int volume, int duration, int mode)
 				music[0x116] = -music[0x115] / step;
 				music[0x117] = step;
 			} else {
-				music[8] = (((unsigned int)volume | 0x800U) - (unsigned int)music[7]) / (unsigned int)step;
+				music[8] = (volume - music[7]) / step;
 				music[9] = step;
 			}
 		}

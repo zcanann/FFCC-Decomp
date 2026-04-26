@@ -1910,20 +1910,23 @@ void CRedDriver::SePause(int param_1, int param_2)
  */
 int CRedDriver::GetSeVolume(int param_1, int param_2)
 {
-    int* seInfo;
+    unsigned int* seInfo;
 
-    seInfo = *(int**)((int)p_SoundControlBuffer + 0xdbc);
+    seInfo = *(unsigned int**)((int)p_SoundControlBuffer + 0xdbc);
     while (1) {
-        if ((*seInfo != 0) && ((param_1 == -1) || (param_1 == seInfo[0x3e]))) {
-            if (param_2 == 1) {
-                return seInfo[0x15];
+        if ((*seInfo != 0) && ((param_1 == -1) || (param_1 == (int)seInfo[0x3e]))) {
+            if (*seInfo != 0) {
+                if (param_2 == 1) {
+                    return seInfo[0x15];
+                }
+                return (int)seInfo[0x13] >> 0xc;
             }
-            return seInfo[0x13] >> 0xc;
         }
         seInfo += 0x55;
-        if ((int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80) <= seInfo) {
-            return 0;
+        if (seInfo < (unsigned int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80)) {
+            continue;
         }
+        return 0;
     }
 }
 

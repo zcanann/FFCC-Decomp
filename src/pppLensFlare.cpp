@@ -124,13 +124,20 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		Mtx cameraMtx;
 		float projection[7];
 		float viewport[6];
+		u8 flareWidth;
+		int halfWidth;
+		u32 z0;
+		int x;
+		int y;
+		int x0;
+		int y0;
+		s16 stepSize;
 		int projectedXInt;
 		int projectedYInt;
 		float alphaScale;
 
 		alphaScale = (float)sourceAlpha;
 		alphaScale *= 0.0078125f;
-
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);
 		PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
@@ -158,15 +165,15 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		projectedXInt = (int)work->m_projectedX;
 		projectedYInt = (int)work->m_projectedY;
 		zAtPixel = 0;
-		u8 flareWidth = unkB->m_arg3;
-		int halfWidth = flareWidth >> 1;
-		u32 z0 = __cvt_fp2unsigned((double)(16777215.0f * work->m_projectedZ));
-		int x0 = (u16)projectedXInt;
-		int y0 = (u16)projectedYInt;
-		s16 stepSize = (s16)((u16)flareWidth / (u16)unkB->m_count);
+		flareWidth = unkB->m_arg3;
+		halfWidth = flareWidth >> 1;
+		z0 = __cvt_fp2unsigned((double)(16777215.0f * work->m_projectedZ));
+		y0 = (u16)projectedYInt;
+		x0 = (u16)projectedXInt;
+		stepSize = (s16)((u16)flareWidth / (u16)unkB->m_count);
 
-		for (int y = y0 - halfWidth; y <= (y0 + halfWidth); y += stepSize) {
-			for (int x = x0 - halfWidth; x <= (x0 + halfWidth); x += stepSize) {
+		for (y = y0 - halfWidth; y <= (y0 + halfWidth); y += stepSize) {
+			for (x = x0 - halfWidth; x <= (x0 + halfWidth); x += stepSize) {
 				s16 xShort = (s16)x;
 				s16 yShort = (s16)y;
 
@@ -179,9 +186,9 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 			}
 		}
 
-		int alpha = work->m_alpha;
 		int sampleCount = unkB->m_count + 1;
 		sampleCount *= sampleCount;
+		int alpha = work->m_alpha;
 		if (alpha == sampleCount) {
 			work->m_alpha = 0xff;
 		} else {

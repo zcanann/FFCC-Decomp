@@ -7,7 +7,7 @@ extern "C" {
 extern const float kMaterialEditorControlMaxInit;
 extern const float kMaterialEditorControlMinInit;
 extern unsigned int kMaterialEditorDefaultColorRgba;
-extern const char sMaterialEditorSpinnerText[];
+extern const char sMaterialEditorSpinnerText[5];
 }
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
@@ -552,8 +552,7 @@ void CMaterialEditorPcs::drawViewer()
     }
 
     gDebugSpinnerFrame_addr = gDebugSpinnerFrame_addr + 1;
-    int sign = gDebugSpinnerFrame_addr >> 31;
-    int idx = (sign * 4 | (unsigned int)(((gDebugSpinnerFrame_addr >> 4) * 0x40000000) + sign) >> 30) - sign;
+    int idx = (gDebugSpinnerFrame_addr >> 4) % 4;
     Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)(char)gDebugSpinnerText_addr[idx]);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
@@ -625,8 +624,11 @@ void CMaterialEditorPcs::drawViewer()
                         dstFactor = 5;
                     } else if ((src == 0) && (dst == 2)) {
                         srcFactor = 4;
+                        dstFactor = 1;
                     } else if ((src == 2) && (dst == 0)) {
                         blend = 3;
+                        srcFactor = 1;
+                        dstFactor = 1;
                     }
 
                     GXSetZCompLoc(GX_FALSE);
@@ -634,7 +636,7 @@ void CMaterialEditorPcs::drawViewer()
                     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(blend, srcFactor, dstFactor, 3);
                     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
                     GXSetCullMode(GX_CULL_NONE);
-                } else {
+                } else if (pass == 0) {
                     if ((polygon->flags & 0x400) != 0) {
                         continue;
                     }
@@ -643,7 +645,9 @@ void CMaterialEditorPcs::drawViewer()
                     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 0, 0, 7);
                 }
 
-                if ((polygon->textureMarker == 'H') && (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount))) {
+                switch (polygon->textureMarker) {
+                case 'H':
+                if (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount)) {
                     s16* textureHeader = m_textureHeader[polygon->textureIndex];
                     float scaleU = static_cast<float>(DOUBLE_8032FCC0 / (static_cast<double>(textureHeader[2]) - DOUBLE_8032FCD0));
                     float scaleV = static_cast<float>(DOUBLE_8032FCC0 / (static_cast<double>(textureHeader[3]) - DOUBLE_8032FCD0));
@@ -740,6 +744,7 @@ void CMaterialEditorPcs::drawViewer()
                         GXLoadTlut(m_tlutObj0[polygon->textureIndex], 0);
                         GXLoadTlut(m_tlutObj1[polygon->textureIndex], 1);
                     }
+                }
                 }
 
                 GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);

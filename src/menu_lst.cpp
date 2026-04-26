@@ -199,8 +199,8 @@ int CMenuPcs::MLstClose()
 			if (entry->startFrame <= currentFrame) {
 				if (currentFrame < entry->startFrame + entry->duration) {
 					entry->timer = entry->timer + 1;
-					entry->alpha =
-						(float)(DOUBLE_80333410 - (DOUBLE_80333410 / (double)entry->duration) * (double)entry->timer);
+					double ratio = DOUBLE_80333410 / (double)entry->duration;
+					entry->alpha = (float)(DOUBLE_80333410 - ratio * (double)entry->timer);
 					if ((double)entry->alpha < DOUBLE_80333418) {
 						entry->alpha = FLOAT_803333D0;
 					}
@@ -284,10 +284,9 @@ void CMenuPcs::MLstCtrl()
 	unsigned short hold;
 	unsigned int itemCount;
 	unsigned int chunkCount;
-	int entryBase;
 	int i;
 	int startFrame;
-	int offset;
+	int duration;
 
 	blocked = false;
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -296,11 +295,9 @@ void CMenuPcs::MLstCtrl()
 	if (blocked) {
 		press = 0;
 	} else {
-		if ((__cntlzw((unsigned int)Pad._448_4_) & 0x20) == 0) {
-			press = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x5c);
-		} else {
-			press = Pad._8_2_;
-		}
+		int padIndex = 0;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		press = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * 0x54 + 0x8);
 	}
 
 	blocked = false;
@@ -310,11 +307,9 @@ void CMenuPcs::MLstCtrl()
 	if (blocked) {
 		hold = 0;
 	} else {
-		if ((__cntlzw((unsigned int)Pad._448_4_) & 0x20) == 0) {
-			hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x68);
-		} else {
-			hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x14);
-		}
+		int padIndex = 0;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * 0x54 + 0x14);
 	}
 
 	if (hold == 0) {
@@ -357,63 +352,51 @@ void CMenuPcs::MLstCtrl()
 		return;
 	}
 
-	entryBase = (int)this->lstData + 8;
+	MenuLstEntry* entry = this->lstData->entries;
 	for (i = 0; (itemCount = (unsigned int)this->lstData->count), i < (int)itemCount; i++) {
-		*(float*)(entryBase + 0x10) = one;
-		*(float*)(entryBase + 0x14) = one;
-		entryBase += 0x40;
+		entry->alpha = one;
+		entry->z = one;
+		entry++;
 	}
 
 	startFrame = 0;
-	offset = ((int)itemCount - 1) * 0x40;
+	duration = 4;
 	if (-1 < (int)(itemCount - 1)) {
+		entry = &this->lstData->entries[itemCount - 1];
 		chunkCount = itemCount >> 3;
 		if (chunkCount != 0) {
 			do {
-				int entryPtr = (int)this->lstData + offset + 8;
-				*(int*)(entryPtr + 0x24) = startFrame;
-				*(unsigned int*)(entryPtr + 0x28) = 4;
-				entryPtr = (int)this->lstData + offset - 0x38;
-				*(int*)(entryPtr + 0x24) = startFrame + 1;
-				*(unsigned int*)(entryPtr + 0x28) = 4;
-				entryPtr = (int)this->lstData + offset - 0x78;
-				*(int*)(entryPtr + 0x24) = startFrame + 2;
-				*(unsigned int*)(entryPtr + 0x28) = 4;
-				entryPtr = (int)this->lstData + offset - 0xb8;
-				*(int*)(entryPtr + 0x24) = startFrame + 3;
-				*(unsigned int*)(entryPtr + 0x28) = 4;
-				entryPtr = (int)this->lstData + offset - 0xf8;
-				*(int*)(entryPtr + 0x24) = startFrame + 4;
-				*(unsigned int*)(entryPtr + 0x28) = 4;
-				entryPtr = (int)this->lstData + offset - 0x138;
-				*(int*)(entryPtr + 0x24) = startFrame + 5;
-				*(unsigned int*)(entryPtr + 0x28) = 4;
-				entryPtr = (int)this->lstData + offset - 0x178;
-				*(int*)(entryPtr + 0x24) = startFrame + 6;
-				*(unsigned int*)(entryPtr + 0x28) = 4;
-				entryPtr = offset - 0x1b8;
-				offset -= 0x200;
-				entryPtr = (int)this->lstData + entryPtr;
-				*(int*)(entryPtr + 0x24) = startFrame + 7;
-				startFrame += 8;
-				*(unsigned int*)(entryPtr + 0x28) = 4;
+				entry[0].startFrame = startFrame++;
+				entry[0].duration = duration;
+				entry[-1].startFrame = startFrame++;
+				entry[-1].duration = duration;
+				entry[-2].startFrame = startFrame++;
+				entry[-2].duration = duration;
+				entry[-3].startFrame = startFrame++;
+				entry[-3].duration = duration;
+				entry[-4].startFrame = startFrame++;
+				entry[-4].duration = duration;
+				entry[-5].startFrame = startFrame++;
+				entry[-5].duration = duration;
+				entry[-6].startFrame = startFrame++;
+				entry[-6].duration = duration;
+				entry[-7].startFrame = startFrame++;
+				entry[-7].duration = duration;
+				entry -= 8;
 				chunkCount--;
 			} while (chunkCount != 0);
 
-				itemCount &= 7;
-				if (itemCount == 0) {
-					this->lstState->frame = 0;
-					return;
-				}
+			itemCount &= 7;
+			if (itemCount == 0) {
+				this->lstState->frame = 0;
+				return;
 			}
+		}
 
 		do {
-			int entryPtr = offset + 8;
-			offset -= 0x40;
-			entryPtr = (int)this->lstData + entryPtr;
-			*(int*)(entryPtr + 0x24) = startFrame;
-			startFrame++;
-			*(unsigned int*)(entryPtr + 0x28) = 4;
+			entry->startFrame = startFrame++;
+			entry->duration = duration;
+			entry--;
 			itemCount--;
 		} while (itemCount != 0);
 	}
@@ -498,7 +481,8 @@ int CMenuPcs::MLstOpen()
 			if (entry->startFrame <= currentFrame) {
 				if (currentFrame < entry->startFrame + entry->duration) {
 					entry->timer = entry->timer + 1;
-					entry->alpha = (float)((DOUBLE_80333410 / (double)entry->duration) * (double)entry->timer);
+					double ratio = DOUBLE_80333410 / (double)entry->duration;
+					entry->alpha = (float)(ratio * (double)entry->timer);
 				} else {
 					completedItems++;
 					entry->alpha = FLOAT_803333F0;

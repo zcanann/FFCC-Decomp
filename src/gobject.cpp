@@ -3491,12 +3491,16 @@ bool CGObject::IsDispRader()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007BE54
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::onHit(int, CGObject*, int, Vec*)
+int CGObject::onHit(int, CGObject*, int, Vec*)
 {
-	return;
+	return 0;
 }
 
 /*

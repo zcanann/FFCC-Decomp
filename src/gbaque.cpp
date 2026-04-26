@@ -2038,7 +2038,7 @@ unsigned int GbaQueue::GetScrFlg()
 	unsigned int flag;
 
 	i = 0;
-	semaphoreIter = reinterpret_cast<OSSemaphore*>(this);
+	semaphoreIter = accessSemaphores;
 	do {
 		OSWaitSemaphore(semaphoreIter);
 		i++;
@@ -2046,16 +2046,17 @@ unsigned int GbaQueue::GetScrFlg()
 	} while (i < 4);
 
 	flag = *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + 0x2AF8);
+	flag = (-flag | flag) >> 31;
 
 	i = 0;
-	semaphoreIter = reinterpret_cast<OSSemaphore*>(this);
+	semaphoreIter = accessSemaphores;
 	do {
 		OSSignalSemaphore(semaphoreIter);
 		i++;
 		semaphoreIter++;
 	} while (i < 4);
 
-	return (-flag | flag) >> 31;
+	return flag;
 }
 
 /*

@@ -286,14 +286,14 @@ int CBound::CheckFrustum0(CBound& outBound)
 {
     float maxInit;
     float minInit;
-    unsigned int clipMask;
+    unsigned char clipMask;
     int zIndex;
     unsigned int insideMask;
     int yIndex;
     unsigned int outsideMask;
     int xIndex;
-    double viewZ;
-    double zero;
+    float viewZ;
+    float zero;
     float* clipBound = reinterpret_cast<float*>(&outBound);
     float* inBound = reinterpret_cast<float*>(this);
     Vec vertex;
@@ -333,9 +333,9 @@ int CBound::CheckFrustum0(CBound& outBound)
                     }
                     PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
-                    clipBound[0] = transformed.x < clipBound[0] ? transformed.x : clipBound[0];
-                    clipBound[1] = transformed.y < clipBound[1] ? transformed.y : clipBound[1];
-                    clipBound[2] = transformed.z < clipBound[2] ? transformed.z : clipBound[2];
+                    clipBound[0] = clipBound[0] < transformed.x ? clipBound[0] : transformed.x;
+                    clipBound[1] = clipBound[1] < transformed.y ? clipBound[1] : transformed.y;
+                    clipBound[2] = clipBound[2] < transformed.z ? clipBound[2] : transformed.z;
                     clipBound[3] = clipBound[3] < transformed.x ? transformed.x : clipBound[3];
                     clipBound[4] = clipBound[4] < transformed.y ? transformed.y : clipBound[4];
                     clipBound[5] = clipBound[5] < transformed.z ? transformed.z : clipBound[5];
@@ -374,47 +374,39 @@ int CBound::CheckFrustum0(CBound& outBound)
                 }
                 PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
-                clipBound[0] = transformed.x < clipBound[0] ? transformed.x : clipBound[0];
-                clipBound[1] = transformed.y < clipBound[1] ? transformed.y : clipBound[1];
-                clipBound[2] = transformed.z < clipBound[2] ? transformed.z : clipBound[2];
+                clipBound[0] = clipBound[0] < transformed.x ? clipBound[0] : transformed.x;
+                clipBound[1] = clipBound[1] < transformed.y ? clipBound[1] : transformed.y;
+                clipBound[2] = clipBound[2] < transformed.z ? clipBound[2] : transformed.z;
                 clipBound[3] = clipBound[3] < transformed.x ? transformed.x : clipBound[3];
                 clipBound[4] = clipBound[4] < transformed.y ? transformed.y : clipBound[4];
                 clipBound[5] = clipBound[5] < transformed.z ? transformed.z : clipBound[5];
 
-                viewZ = (double)transformed.z;
-                if (viewZ <= zero) {
-                    if ((double)transformed.x <= -viewZ) {
-                        if (viewZ <= (double)transformed.x) {
-                            clipMask = 0;
-                        } else {
-                            clipMask = 2;
-                        }
+                viewZ = transformed.z;
+                if (viewZ > zero) {
+                    if (transformed.x > -viewZ) {
+                        clipMask = 0x11;
+                    } else if (transformed.x < viewZ) {
+                        clipMask = 0x12;
                     } else {
-                        clipMask = 1;
+                        clipMask = 0x10;
                     }
-                    if ((double)transformed.y <= -viewZ) {
-                        if ((double)transformed.y < viewZ) {
-                            clipMask = clipMask | 8;
-                        }
-                    } else {
-                        clipMask = clipMask | 4;
+                    if (transformed.y > -viewZ) {
+                        clipMask = clipMask | 0x14;
+                    } else if (transformed.y < viewZ) {
+                        clipMask = clipMask | 0x18;
                     }
                 } else {
-                    if ((double)transformed.x <= -viewZ) {
-                        if (viewZ <= (double)transformed.x) {
-                            clipMask = 0x10;
-                        } else {
-                            clipMask = 0x12;
-                        }
+                    if (transformed.x > -viewZ) {
+                        clipMask = 1;
+                    } else if (transformed.x < viewZ) {
+                        clipMask = 2;
                     } else {
-                        clipMask = 0x11;
+                        clipMask = 0;
                     }
-                    if ((double)transformed.y <= -viewZ) {
-                        if ((double)transformed.y < viewZ) {
-                            clipMask = clipMask | 0x18;
-                        }
-                    } else {
-                        clipMask = clipMask | 0x14;
+                    if (transformed.y > -viewZ) {
+                        clipMask = clipMask | 4;
+                    } else if (transformed.y < viewZ) {
+                        clipMask = clipMask | 8;
                     }
                 }
                 zIndex = zIndex + 1;
@@ -426,11 +418,11 @@ int CBound::CheckFrustum0(CBound& outBound)
         xIndex = xIndex + 1;
     } while (xIndex < 2);
 
-    if (insideMask != 0) {
+    if ((unsigned char)insideMask != 0) {
         return 0;
     }
 
-    insideMask = (unsigned int)__cntlzw(outsideMask);
+    insideMask = (unsigned int)__cntlzw((unsigned char)outsideMask);
     return (int)(insideMask >> 5) + 1;
 }
 
@@ -458,7 +450,7 @@ int CBound::CheckFrustum0(float farPlane)
     Vec transformed;
 
     if ((s_f_vpos.x <= inBound[3]) && (s_f_vpos.y <= inBound[4]) && (s_f_vpos.z <= inBound[5]) &&
-        (inBound[0] <= s_f_vpos.x) && (inBound[1] <= s_f_vpos.y) && (inBound[2] <= s_f_vpos.z)) {
+        (s_f_vpos.x >= inBound[0]) && (s_f_vpos.y >= inBound[1]) && (s_f_vpos.z >= inBound[2])) {
         return 1;
     }
 
@@ -491,31 +483,31 @@ int CBound::CheckFrustum0(float farPlane)
                 if (farthestZ < transformed.z) {
                     farthestZ = transformed.z;
                 }
-                if (zero < transformed.z) {
-                    if (-transformed.z < transformed.x) {
+                if (transformed.z > zero) {
+                    if (transformed.x > -transformed.z) {
                         clipMask = 0x11;
                     } else if (transformed.x < transformed.z) {
                         clipMask = 0x12;
                     } else {
                         clipMask = 0x10;
                     }
-                    if (-transformed.z < transformed.y) {
-                        clipMask = clipMask | 0x14;
+                    if (transformed.y > -transformed.z) {
+                        clipMask = (unsigned char)(clipMask | 0x14);
                     } else if (transformed.y < transformed.z) {
-                        clipMask = clipMask | 0x18;
+                        clipMask = (unsigned char)(clipMask | 0x18);
                     }
                 } else {
-                    if (-transformed.z < transformed.x) {
+                    if (transformed.x > -transformed.z) {
                         clipMask = 1;
                     } else if (transformed.x < transformed.z) {
                         clipMask = 2;
                     } else {
                         clipMask = 0;
                     }
-                    if (-transformed.z < transformed.y) {
-                        clipMask = clipMask | 4;
+                    if (transformed.y > -transformed.z) {
+                        clipMask = (unsigned char)(clipMask | 4);
                     } else if (transformed.y < transformed.z) {
-                        clipMask = clipMask | 8;
+                        clipMask = (unsigned char)(clipMask | 8);
                     }
                 }
                 zIndex = zIndex + 1;
@@ -530,11 +522,11 @@ int CBound::CheckFrustum0(float farPlane)
     if (farthestZ < farPlane) {
         return 0;
     }
-    if (insideMask != 0) {
+    if ((unsigned char)insideMask != 0) {
         return 0;
     }
 
-    insideMask = (unsigned int)__cntlzw(outsideMask);
+    insideMask = (unsigned int)__cntlzw((unsigned char)outsideMask);
     return (int)(insideMask >> 5) + 1;
 }
 

@@ -1213,43 +1213,15 @@ void CLightPcs::MakeLightMap()
  */
 void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, Vec* vec, unsigned char mode)
 {
-    Mtx* input = (Mtx*)mat;
-    float* scale = (float*)vec;
-
     Mtx cam;
     PSMTXCopy(CameraMatrix(), cam);
-    Mtx* out = &m_bumpTexMtx1;
+    Mtx out;
 
-    if (mode == 0) {
-        if (scale == nullptr ||
-            ((FLOAT_8032fc14 == scale[0]) && (FLOAT_8032fc14 == scale[1]) && (FLOAT_8032fc14 == scale[2]))) {
-            PSMTXConcat(cam, *input, *out);
-        } else {
-            Mtx tmp;
-            PSMTXCopy(*input, tmp);
-            Vec camPos;
-            camPos.x = CameraPosX();
-            camPos.y = CameraPosY();
-            camPos.z = CameraPosZ();
-            Vec objPos;
-            objPos.x = tmp[0][3];
-            objPos.y = tmp[1][3];
-            objPos.z = tmp[2][3];
-            PSVECSubtract(&camPos, &objPos, &camPos);
-            camPos.x = camPos.x * scale[0];
-            camPos.y = camPos.y * scale[1];
-            camPos.z = camPos.z * scale[2];
-            PSMTXMultVecSR(cam, &camPos, &camPos);
-            PSMTXConcat(cam, tmp, *out);
-            (*out)[0][3] += camPos.x;
-            (*out)[1][3] += camPos.y;
-            (*out)[2][3] += camPos.z;
-        }
-    } else {
+    if (mode != 0) {
         Vec pos;
-        pos.x = (*input)[0][3];
-        pos.y = (*input)[1][3];
-        pos.z = (*input)[2][3];
+        pos.x = mat[0][3];
+        pos.y = mat[1][3];
+        pos.z = mat[2][3];
         PSMTXMultVec(cam, &pos, &pos);
 
         if (mode == 1) {
@@ -1287,24 +1259,49 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             cam[2][2] = zAxis.z;
         }
 
-        PSMTXConcat(cam, *input, *out);
-        (*out)[0][3] = pos.x;
-        (*out)[1][3] = pos.y;
-        (*out)[2][3] = pos.z;
+        PSMTXConcat(cam, mat, out);
+        out[0][3] = pos.x;
+        out[1][3] = pos.y;
+        out[2][3] = pos.z;
+    } else {
+        if (vec == nullptr ||
+            ((FLOAT_8032fc14 == vec->x) && (FLOAT_8032fc14 == vec->y) && (FLOAT_8032fc14 == vec->z))) {
+            PSMTXConcat(cam, mat, out);
+        } else {
+            Mtx tmp;
+            PSMTXCopy(mat, tmp);
+            Vec camPos;
+            camPos.x = CameraPosX();
+            camPos.y = CameraPosY();
+            camPos.z = CameraPosZ();
+            Vec objPos;
+            objPos.x = tmp[0][3];
+            objPos.y = tmp[1][3];
+            objPos.z = tmp[2][3];
+            PSVECSubtract(&camPos, &objPos, &camPos);
+            camPos.x = camPos.x * vec->x;
+            camPos.y = camPos.y * vec->y;
+            camPos.z = camPos.z * vec->z;
+            PSMTXMultVecSR(cam, &camPos, &camPos);
+            PSMTXConcat(cam, tmp, out);
+            out[0][3] += camPos.x;
+            out[1][3] += camPos.y;
+            out[2][3] += camPos.z;
+        }
     }
 
-    GXLoadPosMtxImm(*out, 0);
+    GXLoadPosMtxImm(out, 0);
 
     Mtx nrm;
-    nrm[0][0] = (*out)[0][0];
-    nrm[1][0] = (*out)[1][0];
-    nrm[2][0] = (*out)[2][0];
-    nrm[0][1] = (*out)[0][1];
-    nrm[1][1] = (*out)[1][1];
-    nrm[2][1] = (*out)[2][1];
-    nrm[0][2] = (*out)[0][2];
-    nrm[1][2] = (*out)[1][2];
-    nrm[2][2] = (*out)[2][2];
+    nrm[0][0] = out[0][0];
+    nrm[1][0] = out[1][0];
+    nrm[2][0] = out[2][0];
+    nrm[0][1] = out[0][1];
+    nrm[1][1] = out[1][1];
+    nrm[2][1] = out[2][1];
+    nrm[0][2] = out[0][2];
+    nrm[1][2] = out[1][2];
+    nrm[2][2] = out[2][2];
     nrm[0][3] = FLOAT_8032fc14;
     nrm[1][3] = FLOAT_8032fc14;
     nrm[2][3] = FLOAT_8032fc14;
@@ -1313,27 +1310,25 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
     if ((bump != nullptr) && (bump->m_hasTexture != 0)) {
         Mtx* bumpMat0 = &m_bumpTexMtx0;
         Mtx* bumpMat1 = &m_bumpTexMtx1;
+        Mtx texMtx;
 
         if (bump->m_useViewSpace == 1) {
-            Mtx tmp;
-            PSMTXTrans(tmp, FLOAT_8032fc18, FLOAT_8032fc18, FLOAT_8032fc14);
-            PSMTXConcat(tmp, nrm, *bumpMat0);
-            PSMTXScale(tmp, FLOAT_8032fc20, FLOAT_8032fc20, FLOAT_8032fc20);
-            PSMTXConcat(*bumpMat0, tmp, *bumpMat0);
+            PSMTXTrans(texMtx, FLOAT_8032fc18, FLOAT_8032fc18, FLOAT_8032fc14);
+            PSMTXConcat(texMtx, nrm, *bumpMat0);
+            PSMTXScale(texMtx, FLOAT_8032fc20, FLOAT_8032fc20, FLOAT_8032fc20);
+            PSMTXConcat(*bumpMat0, texMtx, *bumpMat0);
             Mtx posOnly;
-            PSMTXCopy(*out, posOnly);
+            PSMTXCopy(out, posOnly);
             posOnly[0][3] = FLOAT_8032fc14;
             posOnly[1][3] = FLOAT_8032fc14;
             posOnly[2][3] = FLOAT_8032fc14;
-            PSMTXConcat(posOnly, tmp, *bumpMat1);
+            PSMTXConcat(posOnly, texMtx, *bumpMat1);
         } else {
-            Mtx tmp;
-            Mtx ident;
-            PSMTXIdentity(ident);
-            PSMTXTrans(tmp, FLOAT_8032fc18, FLOAT_8032fc18, FLOAT_8032fc14);
-            PSMTXConcat(tmp, ident, *bumpMat0);
-            PSMTXScale(tmp, FLOAT_8032fc20, FLOAT_8032fc20, FLOAT_8032fc20);
-            PSMTXConcat(*bumpMat0, tmp, *bumpMat0);
+            PSMTXIdentity(nrm);
+            PSMTXTrans(texMtx, FLOAT_8032fc18, FLOAT_8032fc18, FLOAT_8032fc14);
+            PSMTXConcat(texMtx, nrm, *bumpMat0);
+            PSMTXScale(texMtx, FLOAT_8032fc20, FLOAT_8032fc20, FLOAT_8032fc20);
+            PSMTXConcat(*bumpMat0, texMtx, *bumpMat0);
 
             double camX = (double)CameraPosX();
             double camZ = (double)CameraPosZ();

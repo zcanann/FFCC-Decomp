@@ -1,7 +1,7 @@
 import subprocess
 import time
 
-CMD = 'codex exec --yolo "Follow the instructions in AGENTS.MD. NEVER ask the user for input. Simply follow the instructions and make a PR if there is an improvement. Pay careful attention to any important rules."'
+CMD = 'codex exec --yolo "Follow the instructions in AGENTS.MD. NEVER ask the user for input. Simply follow the instructions and make a PR if there is an improvement. Relentlessly push for real improvements, not just tiny patches. Checkpointing with multiple commits before a PR is encouraged. Pay careful attention to any important rules."'
 TIMEOUT_SECONDS = 25 * 60
 CYCLE_DELAY = 10
 

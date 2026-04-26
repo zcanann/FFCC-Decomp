@@ -1243,10 +1243,7 @@ void CGItemObj::loadModel()
 		modelNo = itemEntry & 0xFFF;
 		modelVariant = itemEntry >> 0xC;
 		self[0x50] = (self[0x50] & 0xF7) | 8;
-		self[0x94] = 0;
-		self[0x95] = 0;
-		self[0x96] = 0x11;
-		self[0x97] = 0x94;
+		*(int*)(self + 0x94) = 0x1194;
 		animFlags = 0x12;
 		modelFlag = 1;
 	}
@@ -1280,7 +1277,7 @@ void CGItemObj::loadModel()
 	}
 
 	if (worldParamA == 0xCB) {
-		*(int*)(self + 0x1D4) = (int)(FLOAT_80331b54 - RandF__5CMathFf(FLOAT_80331b58, &Math));
+		*(float*)(self + 0x1D4) = FLOAT_80331b54 - RandF__5CMathFf(FLOAT_80331b58, &Math);
 		*(unsigned char*)(self + 0x9A) &= 0xFB;
 	}
 

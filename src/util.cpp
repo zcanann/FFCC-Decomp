@@ -576,7 +576,7 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXSetColorUpdate(GX_FALSE);
     GXSetAlphaUpdate(GX_FALSE);
 
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
     GXPosition3f32(x, y, kUtilQuadDepth);
     GXColor1u32(*reinterpret_cast<u32*>(&white));
     GXPosition3f32(x2, y, kUtilQuadDepth);
@@ -664,7 +664,7 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     float z4 = kUtilZero;
     u32 colorValue = *reinterpret_cast<u32*>(&color);
 
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
     GXPosition3f32(x1, y1, z1);
     GXColor1u32(colorValue);
     GXPosition3f32(x2, y1, z2);
@@ -764,7 +764,7 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
             v2 = uv2->y;
         }
 
-        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+        GXBegin(GX_QUADS, GX_VTXFMT7, 4);
         GXPosition3f32(x, y, kUtilZero);
         GXColor1u32(0xFFFFFFFF);
         GXTexCoord2f32(u1, v1);
@@ -794,7 +794,7 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
             v2 = uv2->y;
         }
 
-        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+        GXBegin(GX_QUADS, GX_VTXFMT7, 4);
         GXPosition3f32(x, y, kUtilZero);
         GXColor1u32(colorValue);
         GXTexCoord2f32(u1, v1);
@@ -909,7 +909,7 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
             v2 = uv2->y;
         }
 
-        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+        GXBegin(GX_QUADS, GX_VTXFMT7, 4);
         GXPosition3f32(x, y, kUtilZero);
         GXColor1u32(0xFFFFFFFF);
         GXTexCoord2f32(u1, v1);
@@ -939,7 +939,7 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
             v2 = uv2->y;
         }
 
-        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+        GXBegin(GX_QUADS, GX_VTXFMT7, 4);
         GXPosition3f32(x, y, kUtilZero);
         GXColor1u32(colorValue);
         GXTexCoord2f32(u1, v1);

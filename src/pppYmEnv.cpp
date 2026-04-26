@@ -101,11 +101,11 @@ CChara::CModel* GetModelPtr(CGObject* gObject)
     }
 
     CChara::CModel* model = handle->m_model;
-    if (model == 0) {
-        return 0;
+    if (handle != 0) {
+        return model;
     }
 
-    return model;
+    return 0;
 }
 /*
  * --INFO--

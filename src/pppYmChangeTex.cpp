@@ -85,7 +85,7 @@ extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
 extern float DAT_80330e10;
 static const char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.cpp";
-extern double DOUBLE_80330e08;
+extern double DOUBLE_80330E08;
 extern float FLOAT_80330df8;
 extern float FLOAT_80330dfc;
 extern float FLOAT_80330e00;
@@ -260,7 +260,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	frameScale.u[1] = ((1 << model0Raw->m_data->m_frameShift) ^ 0x80000000);
 
 	ChangeTexMeshRef* curMesh = model0Raw->m_meshes;
-	int frame = (int)(state->m_value0 * (frameScale.d - DOUBLE_80330e08));
+	int frame = (int)(state->m_value0 * (frameScale.d - DOUBLE_80330E08));
 	short frameShort = (short)frame;
 	Mtx modelMtx;
 	PSMTXCopy(model0Raw->m_matrix, modelMtx);

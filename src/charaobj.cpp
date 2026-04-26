@@ -1058,13 +1058,13 @@ void CGCharaObj::damageDelete()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
+int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 {
 	typedef unsigned int (*VCall0C)(void*);
-	typedef void (*VCall80)(void*, void*, int, int, int, Vec*);
+	typedef int (*VCall80)(void*, void*, int, int, int, Vec*);
 
 	if (sourceObj == 0) {
-		return;
+		return 0;
 	}
 
 	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x0C);
@@ -1072,7 +1072,7 @@ void CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos
 	if ((sourceCid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 		sourceCid = cidFn(sourceObj);
 		if ((sourceCid & 0x6D) == 0x6D && sourceObj->m_scriptHandle != 0 && sourceObj->m_scriptHandle[0xED] != 0) {
-			return;
+			return 0;
 		}
 	}
 
@@ -1092,12 +1092,12 @@ void CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos
 			break;
 		}
 		if (slotData.m_source == sourceObj) {
-			return;
+			return 2;
 		}
 	}
 
 	if (slot < 0) {
-		return;
+		return 2;
 	}
 
 	if ((sourceObj->m_objectFlags & 0x100) != 0) {
@@ -1109,6 +1109,8 @@ void CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos
 		VCall80 onHitVCall = *reinterpret_cast<VCall80*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x80);
 		onHitVCall(sourceObj, this, m_itemId, hitArg, hitType, hitPos);
 	}
+
+	return 1;
 }
 
 /*

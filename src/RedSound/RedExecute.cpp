@@ -18,7 +18,7 @@ struct RedReverbDATA {
 static volatile u8 m_RandomIndex;
 static RedReverbDATA* volatile p_ReverbData;
 static u32* p_ReverbSize;
-u32 m_ChangeStatus;
+volatile u32 m_ChangeStatus;
 u32 m_TerminateNote[1] = { 0 };
 static int* p_SkipKeyOn;
 static const float s_ReverbTimeScale = 1000.0f;

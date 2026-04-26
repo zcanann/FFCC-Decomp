@@ -385,92 +385,96 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 	unsigned char* head = (unsigned char*)waveHead;
 	int* entry = (int*)this;
 
-	if ((head[0] == 'W') && (head[1] == 'D')) {
-		if (*(int*)(head + 0x14) < *(int*)(head + 4)) {
-			*(int*)(head + 0x14) = *(int*)(head + 4);
-		}
-
-		if ((waveNo < 100) || (299 < waveNo)) {
-			if ((waveNo < 10) || (0x45 < waveNo)) {
-				if (((0x153 < waveNo) && (waveNo < 0x17a)) || ((0x17e < waveNo) && (waveNo < 0x182)) ||
-				    (waveNo == 0x183)) {
-					*(int*)(head + 0x14) = 0x1000;
-				}
-			} else {
-				*(int*)(head + 0x14) += 0x27FFF;
-				int blocks = *(int*)(head + 0x14) / 0x28000 + (*(int*)(head + 0x14) >> 0x1F);
-				blocks = blocks - (blocks >> 0x1F);
-				*(int*)(head + 0x14) = blocks * 0x28000;
-			}
-		} else if (*(int*)(head + 0x14) < 0x200001) {
-			*(int*)(head + 0x14) = 0x2000;
-		} else if (*(int*)(head + 0x14) < 0x400001) {
-			*(int*)(head + 0x14) = 0x4000;
-		}
-
-		int minOffset;
-		int maxOffset;
-		if ((waveNo < 100) || (299 < waveNo)) {
-			if (((waveNo < 0x154) || (0x179 < waveNo)) &&
-			    (((waveNo < 0x17f) || (0x181 < waveNo)) && (waveNo != 0x183))) {
-				minOffset = 0;
-				maxOffset = 0x300000;
-			} else {
-				minOffset = 0x300000;
-				maxOffset = 0x400000;
-			}
-		} else {
-			minOffset = 0x400000;
-			maxOffset = 0x800000;
-		}
-
-		do {
-			int* historyBank;
-			if (waveBankNo < 0) {
-				historyBank = (int*)(entry[0] + 0x100);
-				while ((historyBank[3] != 0) && (historyBank < (int*)(entry[0] + 0x400U))) {
-					historyBank += 4;
-				}
-			} else {
-				waveBankNo &= 0xF;
-				historyBank = (int*)(entry[0] + waveBankNo * 0x10);
-				if (historyBank[3] != 0) {
-					WaveDelete((RedHistoryBANK*)historyBank);
-				}
-			}
-
-			int arAddress;
-			if ((historyBank < (int*)(entry[0] + 0x400U)) &&
-			    ((arAddress = RedNewA(*(int*)(head + 0x14), minOffset, maxOffset)) != 0)) {
-				int copySize = (((*(int*)(head + 8) * 4) + 0x1F) & 0xFFFFFFE0) + *(int*)(head + 0xC) * 0x60 +
-				               0x20;
-				void* copied = (void*)RedNew(copySize);
-				if (copied != 0) {
-					historyBank[2] = (int)copied;
-					historyBank[3] = copySize;
-					*(int*)(head + 0x10) = arAddress;
-					historyBank[0] = waveNo;
-					*(short*)(head + 2) = (short)waveNo;
-					if (waveBankNo < 0) {
-						WaveHistoryAdd(1);
-						historyBank[1] = 1;
-					} else {
-						historyBank[1] = 0;
-					}
-					memcpy(copied, head, copySize);
-					return arAddress;
-				}
-				RedDeleteA(arAddress);
-			}
-		} while (WaveOldClear(minOffset, maxOffset) != 0);
-
+	if ((head[0] != 'W') || (head[1] != 'D')) {
 		if (m_ReportPrint != 0) {
-			OSReport(s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991, DAT_801e7905, DAT_80333d30, (int)*(short*)(head + 2),
-			         *(int*)(head + 4), DAT_80333d38);
+			OSReport(s__s_sWave_Header_was_broken__s_801e7972, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
 			fflush(__files + 1);
 		}
-	} else if (m_ReportPrint != 0) {
-		OSReport(s__s_sWave_Header_was_broken__s_801e7972, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
+
+		return -1;
+	}
+
+	if (*(int*)(head + 0x14) < *(int*)(head + 4)) {
+		*(int*)(head + 0x14) = *(int*)(head + 4);
+	}
+
+	if ((waveNo < 100) || (299 < waveNo)) {
+		if ((waveNo < 10) || (0x45 < waveNo)) {
+			if (((0x153 < waveNo) && (waveNo < 0x17a)) || ((0x17e < waveNo) && (waveNo < 0x182)) ||
+			    (waveNo == 0x183)) {
+				*(int*)(head + 0x14) = 0x100000;
+			}
+		} else {
+			*(int*)(head + 0x14) += 0x27FFF;
+			int blocks = *(int*)(head + 0x14) / 0x28000 + (*(int*)(head + 0x14) >> 0x1F);
+			blocks = blocks - (blocks >> 0x1F);
+			*(int*)(head + 0x14) = blocks * 0x28000;
+		}
+	} else if (*(int*)(head + 0x14) < 0x200001) {
+		*(int*)(head + 0x14) = 0x200000;
+	} else if (*(int*)(head + 0x14) < 0x400001) {
+		*(int*)(head + 0x14) = 0x400000;
+	}
+
+	int minOffset;
+	int maxOffset;
+	if ((waveNo < 100) || (299 < waveNo)) {
+		if (((waveNo < 0x154) || (0x179 < waveNo)) &&
+		    (((waveNo < 0x17f) || (0x181 < waveNo)) && (waveNo != 0x183))) {
+			minOffset = 0;
+			maxOffset = 0x300000;
+		} else {
+			minOffset = 0x300000;
+			maxOffset = 0x400000;
+		}
+	} else {
+		minOffset = 0x400000;
+		maxOffset = 0x800000;
+	}
+
+	do {
+		int* historyBank;
+		if (waveBankNo < 0) {
+			historyBank = (int*)(entry[0] + 0x100);
+			while ((historyBank[3] != 0) && (historyBank < (int*)(entry[0] + 0x400U))) {
+				historyBank += 4;
+			}
+		} else {
+			waveBankNo &= 0xF;
+			historyBank = (int*)(entry[0] + waveBankNo * 0x10);
+			if (historyBank[3] != 0) {
+				WaveDelete((RedHistoryBANK*)historyBank);
+			}
+		}
+
+		int arAddress;
+		if ((historyBank < (int*)(entry[0] + 0x400U)) &&
+		    ((arAddress = RedNewA(*(int*)(head + 0x14), minOffset, maxOffset)) != 0)) {
+			int copySize = (((*(int*)(head + 8) * 4) + 0x1F) & 0xFFFFFFE0) + *(int*)(head + 0xC) * 0x60 +
+			               0x20;
+			void* copied = (void*)RedNew(copySize);
+			if (copied != 0) {
+				historyBank[2] = (int)copied;
+				historyBank[3] = copySize;
+				*(int*)(head + 0x10) = arAddress;
+				historyBank[0] = waveNo;
+				*(short*)(head + 2) = (short)waveNo;
+				if (waveBankNo < 0) {
+					WaveHistoryAdd(1);
+					historyBank[1] = 1;
+				} else {
+					historyBank[1] = 0;
+				}
+				memcpy(copied, head, copySize);
+				return arAddress;
+			}
+			RedDeleteA(arAddress);
+		}
+	} while (WaveOldClear(minOffset, maxOffset) != 0);
+
+	if (m_ReportPrint != 0) {
+		OSReport(s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991, DAT_801e7905, DAT_80333d30, (int)*(short*)(head + 2),
+		         *(int*)(head + 4), DAT_80333d38);
 		fflush(__files + 1);
 	}
 

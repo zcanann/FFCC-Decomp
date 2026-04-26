@@ -331,12 +331,14 @@ void RedDeleteA(void* param_1)
  */
 void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
-	m_DataBufferSize = param2 - 0x4000;
-	m_AMemoryBank = (int*)(param1 + 0x2000);
-	m_DataBuffer = param1 + 0x4000;
+	int bankSize = (0x2000 + 0x1f) & ~0x1f;
+
 	m_MemoryBank = (int*)param1;
-	memset((void*)param1, 0, 0x2000);
-	memset(m_AMemoryBank, 0, 0x2000);
+	m_AMemoryBank = (int*)((int)m_MemoryBank + bankSize);
+	m_DataBuffer = (int)m_AMemoryBank + bankSize;
+	m_DataBufferSize = param2 - bankSize * 2;
+	memset(m_MemoryBank, 0, bankSize);
+	memset(m_AMemoryBank, 0, bankSize);
 	m_ADataBuffer = param3;
 	m_ADataBufferSize = param4;
 }

@@ -77,16 +77,16 @@ union PackedColor {
     u8 bytes[4];
 };
 
-static inline void copyPolygonData(TRACE_POLYGON* dst, const TRACE_POLYGON* src)
+static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 {
     pppCopyVector(dst->from, src->from);
     pppCopyVector(dst->to, src->to);
     dst->life = src->life;
+    dst->alpha = src->alpha;
     dst->decay = src->decay;
     dst->colorR = src->colorR;
     dst->colorG = src->colorG;
     dst->colorB = src->colorB;
-    dst->alpha = src->alpha;
 }
 
 /*
@@ -263,7 +263,17 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     entries = work->entries;
     if (work->count + 1 < *(u16*)(param_2->m_payload + 4)) {
         for (i = *(u16*)(param_2->m_payload + 4) - 2; i >= 0; i--) {
-            copyPolygonData(&entries[i + 1], &entries[i]);
+            TRACE_POLYGON* current = &entries[i];
+            TRACE_POLYGON* next = &entries[i + 1];
+
+            pppCopyVector(next->from, current->from);
+            pppCopyVector(next->to, current->to);
+            next->life = current->life;
+            next->alpha = current->alpha;
+            next->decay = current->decay;
+            next->colorR = current->colorR;
+            next->colorG = current->colorG;
+            next->colorB = current->colorB;
         }
 
         entries[0].life = -1;

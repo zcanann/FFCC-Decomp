@@ -360,8 +360,14 @@ void CSystem::ExecScenegraph()
             {
                 unsigned short trigger;
                 unsigned short held;
+                bool padBlocked = false;
 
                 if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
+                {
+                    padBlocked = true;
+                }
+
+                if (padBlocked)
                 {
                     trigger = 0;
                 }
@@ -371,7 +377,13 @@ void CSystem::ExecScenegraph()
                     trigger = *(unsigned short*)((unsigned char*)&Pad + 0xA + padIndex * 0x54);
                 }
 
+                padBlocked = false;
                 if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
+                {
+                    padBlocked = true;
+                }
+
+                if (padBlocked)
                 {
                     held = 0;
                 }
@@ -419,23 +431,20 @@ void CSystem::ExecScenegraph()
         {
             stepGate = (m_frameCounter & 3) != 0;
         }
-        else if (scenegraphStepMode >= 4)
-        {
-            if (scenegraphStepMode < 6)
-            {
-                stepGate = m_frameCounter & 1;
-            }
-        }
-        else
+        else if (scenegraphStepMode < 4)
         {
             if (scenegraphStepMode == 2)
             {
                 stepGate = 1;
             }
-            else if (scenegraphStepMode > 2)
+            else if (1 < scenegraphStepMode)
             {
                 stepGate = (m_frameCounter & 7) != 0;
             }
+        }
+        else if (scenegraphStepMode < 6)
+        {
+            stepGate = m_frameCounter & 1;
         }
 
         float totalTime = 0.0f;
@@ -451,7 +460,15 @@ void CSystem::ExecScenegraph()
 
             unsigned int flags = order->m_entry->m_flags;
             unsigned int skip;
-            if ((flags & 1) == 0)
+            if ((flags & 1) != 0)
+            {
+                skip = 0;
+                if (drawToggle == 0)
+                {
+                    skip = 1;
+                }
+            }
+            else
             {
                 skip = stepGate;
                 if ((stepGate != 0) && (drawToggle != 0) && ((flags & 4) != 0))
@@ -459,19 +476,8 @@ void CSystem::ExecScenegraph()
                     skip = 0;
                 }
             }
-            else
-            {
-                skip = (drawToggle == 0);
-            }
 
-            if (Game.m_gameWork.m_gamePaused == 0)
-            {
-                if ((flags & 0x10) != 0)
-                {
-                    skip = 1;
-                }
-            }
-            else
+            if (Game.m_gameWork.m_gamePaused != 0)
             {
                 if ((flags & 8) == 0)
                 {
@@ -482,16 +488,23 @@ void CSystem::ExecScenegraph()
                     skip = 0;
                 }
             }
+            else
+            {
+                if ((flags & 0x10) != 0)
+                {
+                    skip = 1;
+                }
+            }
 
             if (skip == 0)
             {
                 watch.Reset();
                 watch.Start();
-                if ((flags & 1) != 0)
+                if ((order->m_entry->m_flags & 1) != 0)
                 {
                     Graphic.SetDrawDoneDebugData(-1);
                 }
-                __ptmf_scall(order->m_owner);
+                (order->m_owner->*order->m_entry->m_callback)();
                 watch.Stop();
                 order->m_lastTime = watch.Get();
 

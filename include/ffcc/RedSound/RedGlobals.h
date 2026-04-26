@@ -32,7 +32,7 @@ extern int m_SoundPlayMode;
 extern int m_SoundMasterControl;
 extern int m_ReportPrint;
 extern int m_MusicFastSpeed;
-extern int m_MusicSkipLine;
+extern volatile int m_MusicSkipLine;
 extern int m_MusicKeySignature;
 extern void* volatile p_MusicReplayPoint;
 extern int* volatile p_MusicTempoControl;

@@ -70,7 +70,7 @@ int m_SoundPlayMode;
 int m_SoundMasterControl;
 int m_ReportPrint;
 int m_MusicFastSpeed;
-int m_MusicSkipLine;
+volatile int m_MusicSkipLine;
 int m_MusicKeySignature;
 void* volatile p_MusicReplayPoint;
 int* volatile p_MusicTempoControl;

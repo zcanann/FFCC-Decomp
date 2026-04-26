@@ -399,12 +399,6 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
     int i;
     float zero;
     Vec tmp;
-    double d;
-    double inv;
-    double nx;
-    double nz;
-    double yRand;
-
     zero = FLOAT_80330ef0;
     out->z = FLOAT_80330ef0;
     out->y = zero;
@@ -424,31 +418,26 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                     PSVECScale(&obj->force, &tmp, (float)Math.RandF());
                     PSVECAdd(out, &tmp, out);
                 }
-            } else {
-                if ((obj->minX < pos->x) && (obj->minZ < pos->z) && (obj->maxX > pos->x) && (obj->maxZ > pos->z)) {
-                    nz = (double)(pos->z - obj->centerZ);
-                    nx = (double)(pos->x - obj->centerX);
-                    d = (double)(float)(nx * nx + (double)(float)(nz * nz));
-                    if (d < (double)FLOAT_80330ef4) {
-                        d = (double)FLOAT_80330ef4;
-                    }
+            } else if ((obj->minX < pos->x) && (obj->minZ < pos->z) && (pos->x < obj->maxX) && (pos->z < obj->maxZ)) {
+                const float deltaZ = pos->z - obj->centerZ;
+                const float deltaX = pos->x - obj->centerX;
+                float distanceSq = deltaX * deltaX + deltaZ * deltaZ;
+                if (distanceSq < FLOAT_80330ef4) {
+                    distanceSq = FLOAT_80330ef4;
+                }
 
-                    if (obj->type == 2) {
-                        if (d < (double)obj->radiusSq) {
-                            yRand = (double)(FLOAT_80330ef8 - obj->lifeRatio * obj->lifeRatio);
-                            d = sqrt(d);
-                            inv = (double)(float)(yRand / d);
-                            out->x = (float)(nx * inv + (double)out->x);
-                            yRand = (double)Math.RandF();
-                            out->y = (float)((double)(float)(FLOAT_80330f18 + yRand) *
-                                                 (double)(float)(FLOAT_80330ef8 - obj->lifeRatio * obj->lifeRatio) +
-                                             (double)out->y);
-                            out->z = (float)(nz * inv + (double)out->z);
-                        }
-                    } else {
-                        PSVECScale(&obj->force, &tmp, FLOAT_80330ef8 - (float)(d / (double)obj->radiusSq));
-                        PSVECAdd(out, &tmp, out);
+                if (obj->type == 2) {
+                    if (distanceSq < obj->radiusSq) {
+                        const float lifeScale = FLOAT_80330ef8 - obj->lifeRatio * obj->lifeRatio;
+                        const float distance = sqrtf(distanceSq);
+                        const float forceScale = lifeScale / distance;
+                        out->x += deltaX * forceScale;
+                        out->y += (FLOAT_80330f18 + Math.RandF()) * lifeScale;
+                        out->z += deltaZ * forceScale;
                     }
+                } else {
+                    PSVECScale(&obj->force, &tmp, FLOAT_80330ef8 - distanceSq / obj->radiusSq);
+                    PSVECAdd(out, &tmp, out);
                 }
             }
         }

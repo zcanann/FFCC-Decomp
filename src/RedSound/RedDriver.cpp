@@ -1404,6 +1404,7 @@ int CRedDriver::GetProgramTime()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedDriver::SetSoundMode(int soundMode)
 {
     _EntryExecCommand(_SetSoundMode, soundMode, 0, 0, 0, 0, 0, 0);
@@ -2085,6 +2086,7 @@ void CRedDriver::StreamPause(int param_1, int param_2)
 {
     _EntryExecCommand(_StreamPause, param_1, param_2, 0, 0, 0, 0, 0);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2095,6 +2097,7 @@ void CRedDriver::StreamPause(int param_1, int param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedDriver::ClearWaveData(int param_1)
 {
     c_RedEntry.ClearWaveData(param_1);
@@ -2241,3 +2244,4 @@ void CRedDriver::TestProcess(int processType)
         break;
     }
 }
+#pragma optimization_level 4

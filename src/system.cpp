@@ -362,6 +362,7 @@ void CSystem::ExecScenegraph()
                 unsigned short held;
                 bool padBlocked = false;
 
+                noInput = false;
                 if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
                 {
                     padBlocked = true;
@@ -427,7 +428,7 @@ void CSystem::ExecScenegraph()
         }
 
         unsigned int stepGate = 0;
-        if (scenegraphStepMode == 4)
+        if (scenegraphStepMode != 4)
         {
             stepGate = (m_frameCounter & 3) != 0;
         }

@@ -22,7 +22,7 @@ extern float FLOAT_80330664;
 extern float FLOAT_80330668;
 extern float FLOAT_80330658;
 extern double DOUBLE_80330648;
-extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
+extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -30,6 +30,7 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     unsigned char);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
+extern "C" const char s_pppYmMiasma_cpp_801D9CA8[] = "pppYmMiasma.cpp";
 
 struct VYmMiasma {
     PARTICLE_DATA* m_particles;
@@ -216,7 +217,6 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
  */
 void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
 {
-    static const char sPppYmMiasmaCpp[] = "pppYmMiasma.cpp";
     VYmMiasma* work;
     YmMiasmaFrameStep* step = (YmMiasmaFrameStep*)param_2;
     int i;
@@ -242,7 +242,8 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
 
     if (work->m_particles == 0) {
         work->m_particles = (PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            (unsigned long)step->m_particleCount * 0x50, pppEnvStPtr->m_stagePtr, const_cast<char*>(sPppYmMiasmaCpp),
+            (unsigned long)step->m_particleCount * 0x50, pppEnvStPtr->m_stagePtr,
+            const_cast<char*>(s_pppYmMiasma_cpp_801D9CA8),
             0x18d);
         particle = work->m_particles;
         for (i = 0; i < step->m_particleCount; i++) {

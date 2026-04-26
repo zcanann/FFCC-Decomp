@@ -94,6 +94,9 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     float cz;
     float sxsy;
     float cxsy;
+    float zRotX;
+    float zRotY;
+    float zRotZ;
 
     PSMTXScale(out, s[6], s[7], s[8]);
     sx = (float)sin((double)s[3]);
@@ -111,9 +114,12 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     rot[0][1] = cz * sxsy - (cx * sz);
     rot[1][1] = sz * sxsy + (cx * cz);
     rot[2][1] = sx * cy;
-    rot[2][2] = cx * cy;
-    rot[0][2] = cz * cxsy + (sx * sz);
-    rot[1][2] = sz * cxsy - (sx * cz);
+    zRotZ = cx * cy;
+    zRotX = cz * cxsy + (sx * sz);
+    zRotY = sz * cxsy - (sx * cz);
+    rot[0][2] = zRotX;
+    rot[1][2] = zRotY;
+    rot[2][2] = zRotZ;
     rot[0][3] = s[0];
     rot[1][3] = s[1];
     rot[2][3] = s[2];
@@ -732,15 +738,17 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
             if (dVar8 < 0.0f) {
                 hit = false;
             } else {
-                dVar8 = -dVar6 - sqrtf(fVar1);
+                dVar8 = sqrtf(dVar8);
+                dVar8 = -dVar6 - dVar8;
                 if ((dVar8 <= 0.0f) || (dVar7 < dVar8)) {
                     hit = false;
                 } else {
+                    dVar8 = dVar8 / dVar7;
                     if (outT != NULL) {
-                        *outT = dVar8 / dVar7;
+                        *outT = dVar8;
                     }
                     if (outPos != NULL) {
-                        PSVECScale(&local_6c, &local_84, dVar8 / dVar7);
+                        PSVECScale(&local_6c, &local_84, dVar8);
                         PSVECAdd(&local_60, &local_84, outPos);
                     }
                     hit = true;
@@ -1053,24 +1061,25 @@ unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
  */
 float CMath::DstRot(float from, float to)
 {
-    const float s0 = (float)sin((double)from);
-    const float c0 = (float)cos((double)from);
-    const float s1 = (float)sin((double)to);
-    const float c1 = (float)cos((double)to);
-    const float dot = s0 * s1 + c0 * c1;
+    float s0 = (float)sin((double)from);
+    float c0 = (float)cos((double)from);
+    float s1 = (float)sin((double)to);
+    float c1 = (float)cos((double)to);
+    float dot = s0 * s1 + c0 * c1;
 
     if (dot == 0.0f) {
         return 0.0f;
     }
 
-    float angle = -1.0f;
-    if (!(dot < angle)) {
-        angle = 1.0f;
-        if (!(angle < dot)) {
-            angle = dot;
-        }
+    if (dot < -1.0f) {
+        dot = -1.0f;
+    } else if (1.0f < dot) {
+        dot = 1.0f;
+    } else {
+        dot = dot;
     }
-    angle = (float)acos((double)angle);
+
+    float angle = (float)acos((double)dot);
     if (s0 * c1 - s1 * c0 < 0.0f) {
         angle = -angle;
     }

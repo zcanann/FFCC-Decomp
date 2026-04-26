@@ -859,7 +859,7 @@ pppKeShpTail3X.cpp:
 	extab       start:0x80007A38 end:0x80007A50
 	extabindex  start:0x8000DCA8 end:0x8000DCCC
 	.text       start:0x8008922C end:0x8008A38C
-	.sdata2     start:0x80330520 end:0x80330540
+	.sdata2     start:0x80330520 end:0x80330548
 
 pppYmDrawMdlTexAnm.cpp:
 	extab       start:0x80007A50 end:0x80007A70
@@ -1528,6 +1528,7 @@ pppChangeTex.cpp:
 	extabindex  start:0x80010D80 end:0x80010DBC
 	.text       start:0x8013EF94 end:0x8013F9D0
 	.rodata     start:0x801DD660 end:0x801DD678
+	.sdata2     start:0x80332020 end:0x80332040
 
 pppCharaBreak.cpp:
 	extab       start:0x80009B4C end:0x80009B84
@@ -1577,7 +1578,7 @@ singmenu.cpp:
 	.text       start:0x801453F4 end:0x8014A940
 	.data       start:0x802140F0 end:0x80214A50
 	.data       start:0x80214A50 end:0x80214D58
-	.bss        start:0x8030B644 end:0x8030BA48
+	.bss        start:0x8030B630 end:0x8030BA48
 	.sbss       start:0x8032EEB8 end:0x8032EEC8
 	.sdata2     start:0x803331F0 end:0x80333278
 

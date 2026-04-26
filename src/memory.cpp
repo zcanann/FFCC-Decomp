@@ -1288,6 +1288,8 @@ void CMemory::CStage::drawHeapBar(int y)
                         } else {
                             color = 0x400080;
                         }
+                    } else if (stageGetAllocationMode(this) == 0) {
+                        color = colors[drawColor];
                     } else {
                         color = colors[drawColor];
                     }
@@ -1397,18 +1399,10 @@ void CMemory::CStage::drawHeapTitle(int y)
             int srcLen = strlen(sourceName);
             strcpy(line, sourceName + ((srcLen - 12U) & ~((srcLen - 12U) >> 31)));
             Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
-            int maxRound = 0;
-            if ((static_cast<int>(maxUnuse) < 0) && ((maxUnuse & 0x3ff) != 0)) {
-                maxRound = 1;
-            }
-            int totalRound = 0;
-            if ((static_cast<int>(totalUnuse) < 0) && ((totalUnuse & 0x3ff) != 0)) {
-                totalRound = 1;
-            }
 
             sprintf(line, s_drawHeapTitleFmt, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
-                    (static_cast<int>(totalUnuse) >> 10) + totalRound, (static_cast<int>(maxUnuse) >> 10) + maxRound);
-            Graphic.DrawDebugStringDirect(0x208, y, line, 8);
+                    static_cast<int>(totalUnuse) / 1024, static_cast<int>(maxUnuse) / 1024);
+            Graphic.DrawDebugStringDirect(0x208, static_cast<unsigned short>(y), line, 8);
             return;
         }
 
@@ -2290,31 +2284,41 @@ void CAmemCacheSet::DumpCache()
  */
 void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse, unsigned long& heapUnuse)
 {
-    int mode = stageGetAllocationMode(this);
-    int node = stageGetHeapHead(this);
-    if (mode != 2) {
-        node = *reinterpret_cast<int*>(node + 8);
+    int usedSize;
+    int freeSize;
+    int blockTail;
+    int i;
+    int top;
+    int node;
+
+    if (stageGetAllocationMode(this) == 2) {
+        node = stageGetHeapHead(this);
+    } else {
+        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
     }
 
     heapTotal = 0;
     heapUse = 0;
     heapUnuse = 0;
 
-    if (mode == 2) {
-        int top = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
-        int tail = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 12);
-        int count = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120);
+    if (stageGetAllocationMode(this) == 2) {
+        top = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
 
-        for (int i = 0; i <= count; i++) {
-            int blockTail = (i == count) ? tail : *reinterpret_cast<int*>(node + 4);
-            int freeSize = blockTail - top;
+        for (i = 0; i <= *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120); i++) {
+            if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120) == i) {
+                blockTail = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x0C);
+            } else {
+                blockTail = *reinterpret_cast<int*>(node + 4);
+            }
+
+            freeSize = blockTail - top;
             if (freeSize != 0) {
                 heapUnuse += freeSize;
                 heapTotal += freeSize;
             }
 
-            if (i < count) {
-                int usedSize = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
+            if (i < *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120)) {
+                usedSize = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
                 heapUse += usedSize;
                 top = blockTail + usedSize;
                 heapTotal += usedSize;

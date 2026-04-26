@@ -120,6 +120,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 {
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
     u8* objBytes = (u8*)column;
+    pppColumValue* values;
     pppColumFrameWork* frameWork = (pppColumFrameWork*)(objBytes + serializedDataOffsets[3] + 0x80);
     pppColumPositionWork* positionWork =
         (pppColumPositionWork*)(objBytes + serializedDataOffsets[2] + 0x80);
@@ -148,9 +149,8 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             float segmentStep;
             float drawScale;
             float zero;
-            pppColumValue* values;
-            float deltaX;
             float deltaY;
+            float deltaX;
             float deltaX2;
             float deltaY2;
 
@@ -187,15 +187,14 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 
             for (int i = 0; i < param_2->m_count; i++) {
                 float positionScale = segmentStep * values->m_positionScale;
-                float index = (float)(i + 1);
                 float offsetX;
                 float offsetY;
                 u8 alpha;
 
                 center.z = zero;
-                offsetX = cameraDelta.x * index;
+                offsetX = cameraDelta.x * (float)(i + 1);
                 center.x = baseX + positionScale * offsetX;
-                offsetY = cameraDelta.y * index;
+                offsetY = cameraDelta.y * (float)(i + 1);
                 center.y = baseY + positionScale * offsetY;
 
                 PSVECSubtract(&center, &positionWork->m_position, &offset);

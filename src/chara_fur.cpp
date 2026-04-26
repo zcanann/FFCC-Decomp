@@ -17,6 +17,12 @@
 #include <math.h>
 #include <string.h>
 
+extern const float FLOAT_80331060 = 0.0f;
+extern const float FLOAT_80331064 = 0.0078125f;
+extern const float FLOAT_80331068 = -1.0f;
+extern const float FLOAT_8033106C = 16777215.0f;
+extern const double DOUBLE_80331070 = 4503601774854144.0;
+
 struct Vec4d
 {
 	float x;

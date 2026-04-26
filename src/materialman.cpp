@@ -403,8 +403,7 @@ read_slot:
     unsigned int padIndexU = static_cast<unsigned int>(padIndex);
     unsigned int resolvedIndex =
         padIndexU & ~((~(_1c0_4_ - padIndexU | padIndexU - _1c0_4_)) >> 31);
-    return *reinterpret_cast<unsigned short*>(
-        reinterpret_cast<unsigned char*>(this) + (resolvedIndex * 0x54) + 8);
+    return GetPadInputs()[resolvedIndex].buttonDown[0];
 }
 
 /*

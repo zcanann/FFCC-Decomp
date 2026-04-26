@@ -35,6 +35,25 @@ static const char s_replay_host_msg[] =
     "\x83\x8A\x83\x76\x83\x8C\x83\x43\x83\x66\x81\x5B\x83\x5E\x82\xF0\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xDC\x82"
     "\xB5\x82\xBD\x81\x42\x0A";
 
+namespace {
+struct ReplayFrame
+{
+    PADStatus pad[4];
+    CPad::Gba gba[4];
+};
+
+struct ReplayBuffer
+{
+    u32 cursor;
+    u32 recordMode;
+    s32 frameCount;
+    ReplayFrame frames[0x1A5E0];
+};
+
+typedef char ReplayFrame_size_check[(sizeof(ReplayFrame) == 0x40) ? 1 : -1];
+typedef char ReplayBuffer_size_check[(sizeof(ReplayBuffer) == 0x69780C) ? 1 : -1];
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80020494
@@ -523,16 +542,14 @@ void CPad::Frame()
  */
 void CPad::Quit()
 {
-	char* const base = reinterpret_cast<char*>(this);
-	void* replayBuf = *reinterpret_cast<void**>(base + 0x1B0);
-	if (replayBuf != nullptr)
+	if (_1b0_4_ != 0)
 	{
-		operator delete[](replayBuf);
-		*reinterpret_cast<void**>(base + 0x1B0) = nullptr;
+		operator delete[](_1b0_4_);
+		_1b0_4_ = 0;
 	}
 
-	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(base + 0x1AC);
-	if (stage != nullptr)
+	CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(_1ac_4_);
+	if (stage != 0)
 	{
 		Memory.DestroyStage(stage);
 	}

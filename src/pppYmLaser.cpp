@@ -2,7 +2,6 @@
 #include "ffcc/graphic.h"
 #include "ffcc/math.h"
 #include "ffcc/map.h"
-#include "ffcc/p_game.h"
 #include "ffcc/linkage.h"
 extern "C" {
 extern const f32 kPppYmLaserOne;

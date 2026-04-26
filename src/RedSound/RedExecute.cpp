@@ -16,7 +16,7 @@ struct RedReverbDATA {
 };
 
 static volatile u8 m_RandomIndex;
-static RedReverbDATA* p_ReverbData;
+static RedReverbDATA* volatile p_ReverbData;
 static u32* p_ReverbSize;
 u32 m_ChangeStatus;
 u32 m_TerminateNote[1] = { 0 };

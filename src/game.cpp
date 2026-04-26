@@ -1267,12 +1267,19 @@ void CGame::LoadScript(char* scriptData)
 {
     int scriptOffset = 0;
     int entryOffset = 0;
+    int entryIndex = 0;
 
-    for (int i = 0; i < *(int*)(CFlat + 4); i++, entryOffset += 4) {
-        if ((*(u8*)(*(int*)(CFlat + 8) + entryOffset + 1) & 0x20) != 0) {
-            *(u32*)(*(int*)(CFlat + 12) + entryOffset) = *(u32*)(scriptData + scriptOffset);
-            scriptOffset += 4;
-        }
+    if (entryIndex < *(int*)(CFlat + 4)) {
+        do {
+            if ((*(u8*)(*(int*)(CFlat + 8) + entryOffset + 1) & 0x20) != 0) {
+                u32* scriptValue = (u32*)(scriptData + scriptOffset);
+                scriptOffset += 4;
+                *(u32*)(*(int*)(CFlat + 12) + entryOffset) = *scriptValue;
+            }
+
+            entryOffset += 4;
+            entryIndex++;
+        } while (entryIndex < *(int*)(CFlat + 4));
     }
 }
 

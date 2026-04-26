@@ -2747,18 +2747,8 @@ int CMenuPcs::SingWinMessHeight()
 {
     float scaled = FLOAT_80332960 * FLOAT_8032ea78;
     int lineHeight = static_cast<int>(scaled);
-    union {
-        struct {
-            u32 hi;
-            u32 lo;
-        } words;
-        double d;
-    } conv;
 
-    conv.words.hi = 0x43300000;
-    conv.words.lo = static_cast<u32>(lineHeight ^ 0x80000000U);
-    if (FLOAT_8033294c <
-        scaled - static_cast<float>(conv.d - DOUBLE_80332938)) {
+    if (FLOAT_8033294c < scaled - static_cast<float>(lineHeight)) {
         lineHeight += 1;
     }
     return lineHeight + 3;

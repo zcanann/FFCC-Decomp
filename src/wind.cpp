@@ -109,47 +109,40 @@ int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 
 	do {
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
 		if (active == 0) {
 			goto found;
@@ -206,47 +199,40 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 
 	for (int blocks = 4; blocks != 0; blocks--) {
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
 		if (active == 0) {
 			goto found;
@@ -310,47 +296,40 @@ int CWind::AddAmbient(float dir, float speed)
 
 	for (int blocks = 4; blocks != 0; blocks--) {
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
-		if (active != 0) {
-			obj++;
-		} else {
+		if (active == 0) {
 			goto found;
 		}
+		obj++;
 		active = GetWindActiveFlag(obj);
 		if (active == 0) {
 			goto found;

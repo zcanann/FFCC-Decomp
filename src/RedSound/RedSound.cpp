@@ -18,9 +18,9 @@ CRedDriver c_Driver;
 static int m_StandbyStatus[0x40];
 volatile unsigned int m_AutoID;
 static void* p_StreamBank;
-static const char s_redSoundMemorySettingErrorFmt[] =
-    "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
-static const char sRedSoundLogPrefix[] =
+static const char sRedSoundDebugStrings[] =
+    "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n"
+    "\0"
     "\x1B[7;34mSound\x1B[0m:"
     "\0"
     "%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n"
@@ -29,8 +29,8 @@ static const char sRedSoundLogPrefix[] =
     "\0"
     "%s%sSound Driver Initialize OK.%s\n"
     "\0"
-    "%s%sSound Driver Initialize ERROR !!%s\n";
-static const char s_redSoundInvalidStreamDataFmt[] =
+    "%s%sSound Driver Initialize ERROR !!%s\n"
+    "\0"
     "%s%sSTREAM : This data was not 'STREAM-DATA'.%s\n"
     "\0"
     "Jun 17 2003"
@@ -125,7 +125,7 @@ int* CRedSound::EntryStandbyID(int id)
  */
 int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 {
-	const char* logBlob = s_redSoundMemorySettingErrorFmt;
+	const char* logBlob = sRedSoundDebugStrings;
 
 	memset(m_StandbyStatus, 0, 0x100);
 
@@ -772,7 +772,8 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 		id = GetAutoID();
 		c_Driver.StreamPlay(id, data, param_3, param_4, param_5);
 	} else if (m_ReportPrint != 0) {
-		OSReport(s_redSoundInvalidStreamDataFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor,
+		OSReport(sRedSoundDebugStrings + RED_SOUND_INVALID_STREAM_DATA_FMT_OFFSET,
+		         sRedSoundDebugStrings + RED_SOUND_LOG_PREFIX_OFFSET, sRedSoundLogErrorColor,
 		         sRedSoundLogReset);
 		fflush(__files + 1);
 	}

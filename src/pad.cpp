@@ -19,12 +19,12 @@ CPad Pad;
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
 
 static const char s_CPad[] = "CPad";
+static const float FLOAT_8032f820 = 0.0f;
+static const float FLOAT_8032f824 = 0.0078125f;
+static const float FLOAT_8032f828 = 255.0f;
 
 extern "C" {
 unsigned char g_pad[0x30];
-extern const float FLOAT_8032f820 = 0.0f;
-extern const float FLOAT_8032f824 = 0.0078125f;
-extern const float FLOAT_8032f828 = 255.0f;
 }
 
 static const char s_pad_cpp[] = "pad.cpp";

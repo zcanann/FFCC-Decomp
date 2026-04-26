@@ -20,7 +20,7 @@ static RedReverbDATA* volatile p_ReverbData;
 static u32* p_ReverbSize;
 volatile u32 m_ChangeStatus;
 u32 m_TerminateNote[1] = { 0 };
-static int* p_SkipKeyOn;
+static int* volatile p_SkipKeyOn;
 static const float s_ReverbTimeScale = 1000.0f;
 static const float s_ReverbEffectScale = 100.0f;
 

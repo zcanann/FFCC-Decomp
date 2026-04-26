@@ -270,7 +270,7 @@ draw_loop:
         if (step->m_useRandomShape != 0) {
             u32 lcg = (u32)rng * 0x80du + 7u;
             rng = (u16)lcg;
-            drawScale *= kPppKeShpTail3XOne - (((float)rng / kPppKeShpTail3XRandomMax) * step->m_randomScale);
+            drawScale *= -(((float)rng / kPppKeShpTail3XRandomMax) * step->m_randomScale - kPppKeShpTail3XOne);
             {
                 u32 shapeIdx = (u32)(life + rng) / shapeSetCount;
                 shapeEntry = (long*)(shapeData + *(s16*)(shapeData + (shapeIdx % (u32)shapeCount) * 8 + 0x10));

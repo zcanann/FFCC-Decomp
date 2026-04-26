@@ -25,7 +25,6 @@ struct RedWaveHEAD {
 };
 
 extern "C" {
-    void __dl__FPv(void*);
     int __OSReadROM();
 }
 
@@ -150,7 +149,7 @@ static const char s_redDriverHeaderErrorBlob[] =
     "\0"
     "%s%sSE-Sep-Header was broken !!%s\n";
 static const char sRedDriverLogWarnColor[] = "\x1B[4;31m";
-static const char sRedDriverLogReset[8] = "\x1B[0m";
+static const char sRedDriverLogReset[] = "\x1B[0m";
 
 enum {
     RED_DRIVER_STATUS_FMT_OFFSET = 0x12,
@@ -167,7 +166,6 @@ enum {
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void _SetSoundMode(int* param_1)
 {
     m_SoundMode = *param_1;
@@ -186,7 +184,6 @@ void _SetSoundMode(int* param_1)
         break;
     }
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -200,19 +197,21 @@ void _SetSoundMode(int* param_1)
 void _SetReverbDepth(int* param_1)
 {
     unsigned int reverbIndex;
+    unsigned int reverbBank;
     unsigned int reverbDepth;
     unsigned int fadeFrame;
     int fadeStep;
     int* seInfo;
 
     reverbIndex = (unsigned int)param_1[0];
+    reverbBank = reverbIndex & 1;
     reverbDepth = (unsigned int)param_1[1] & 0x7f;
     fadeFrame = (unsigned int)param_1[2];
     if (reverbDepth != 0) {
         reverbDepth = (((reverbDepth + 1) * 0x100) - 1) * 0x1000;
     }
-    *(unsigned int*)((char*)p_ReverbDepth + (reverbIndex & 1) * 0xc) = reverbDepth;
-    if ((reverbIndex & 1) != 0) {
+    *(unsigned int*)((char*)p_ReverbDepth + reverbBank * 0xc) = reverbDepth;
+    if (reverbBank != 0) {
         fadeStep = (int)(fadeFrame * 0x60) / 0x3c;
         if (fadeStep == 0) {
             fadeStep = 1;
@@ -234,7 +233,6 @@ void _SetReverbDepth(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
 void _SetMusicData(int* param_1)
 {
     c_RedEntry.SetMusicData((RedMusicHEAD*)*param_1);
@@ -527,7 +525,6 @@ void _SeSepPlay(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 4
 void _SeSepPlaySequence(int* param_1)
 {
     int iVar1;
@@ -538,7 +535,6 @@ void _SeSepPlaySequence(int* param_1)
         SeSepPlay(param_1[0], param_1[1], param_1[2], param_1[3]);
     }
 }
-#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -657,7 +653,6 @@ void _StreamPause(int* param_1)
 {
 	StreamPause(param_1[0], param_1[1]);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -733,7 +728,6 @@ void _ExecuteCommand()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 unsigned int DeltaTimeSumup(unsigned char** buffer)
 {
 	unsigned int deltaTime = 0;
@@ -750,7 +744,6 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
 
 	return deltaTime;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -781,12 +774,10 @@ struct RedSleepAlarm {
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void _MyAlarmHandler(OSAlarm* param_1, OSContext*)
 {
     OSResumeThread(((RedSleepAlarm*)param_1)->thread);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1155,8 +1146,8 @@ int _DmaExecuteThread(void*)
         m_DMAExecute = 1;
         if (m_ThreadControl != 0) {
             _DmaExecute();
-            m_DMAExecute = 0;
         }
+        m_DMAExecute = 0;
     }
     m_ThreadExecute &= ~2;
     return 0;
@@ -1218,15 +1209,9 @@ CRedDriver::CRedDriver()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
-extern "C" CRedDriver* __dt__10CRedDriverFv(CRedDriver* redDriver, short shouldDelete)
+CRedDriver::~CRedDriver()
 {
-    if ((redDriver != 0) && (0 < shouldDelete)) {
-        __dl__FPv(redDriver);
-    }
-    return redDriver;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1404,7 +1389,6 @@ void CRedDriver::End()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int CRedDriver::GetProgramTime()
 {
     int sum = 0;
@@ -1416,7 +1400,6 @@ int CRedDriver::GetProgramTime()
     } while (p < p_Tick + 100);
     return sum;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1427,7 +1410,6 @@ int CRedDriver::GetProgramTime()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedDriver::SetSoundMode(int soundMode)
 {
     _EntryExecCommand(_SetSoundMode, soundMode, 0, 0, 0, 0, 0, 0);
@@ -2114,7 +2096,6 @@ void CRedDriver::StreamPause(int param_1, int param_2)
 {
     _EntryExecCommand(_StreamPause, param_1, param_2, 0, 0, 0, 0, 0);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2125,7 +2106,6 @@ void CRedDriver::StreamPause(int param_1, int param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedDriver::ClearWaveData(int param_1)
 {
     c_RedEntry.ClearWaveData(param_1);
@@ -2272,4 +2252,3 @@ void CRedDriver::TestProcess(int processType)
         break;
     }
 }
-#pragma optimization_level 4

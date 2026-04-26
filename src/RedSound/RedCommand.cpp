@@ -558,19 +558,23 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 void SetSeVolume(int seId, int volume, int frameCount, int mode)
 {
 	int* track;
-	int step;
+	volume <<= 12;
+	volume |= 0x800;
 
 	if (frameCount < 1) {
 		frameCount = 1;
 	}
 
 	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
-	step = (frameCount * 0x60) / 0x3c;
+	frameCount *= 0x60;
+	frameCount /= 0x3c;
 
 	do {
-		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
-			track[0x14] = (int)(((volume << 0xc) | 0x800U) - track[0x13]) / step;
-			track[0x15] = step;
+		if (((u32)*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
+			int delta = volume - track[0x13];
+			delta /= frameCount;
+			track[0x14] = delta;
+			track[0x15] = frameCount;
 			track[0x16] = mode;
 		}
 		track += 0x55;
@@ -589,19 +593,23 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 void SetSePan(int seId, int pan, int frameCount)
 {
 	int* track;
-	int step;
+	pan <<= 12;
+	pan |= 0x800;
 
 	if (frameCount < 1) {
 		frameCount = 1;
 	}
 
 	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
-	step = (frameCount * 0x60) / 0x3c;
+	frameCount *= 0x60;
+	frameCount /= 0x3c;
 
 	do {
-		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
-			track[0x11] = (int)(((pan << 0xc) | 0x800U) - track[0x10]) / step;
-			track[0x12] = step;
+		if (((u32)*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
+			int delta = pan - track[0x10];
+			delta /= frameCount;
+			track[0x11] = delta;
+			track[0x12] = frameCount;
 		}
 		track += 0x55;
 	} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
@@ -619,19 +627,22 @@ void SetSePan(int seId, int pan, int frameCount)
 void SetSePitch(int seId, int pitch, int frameCount)
 {
 	int* track;
-	int step;
+	pitch <<= 12;
+	pitch |= 0x800;
 
 	if (frameCount < 1) {
 		frameCount = 1;
 	}
 
 	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
-	step = (frameCount * 0x60) / 0x3c;
+	frameCount *= 0x60;
+	frameCount /= 0x3c;
 
 	do {
-		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
-			track[0x18] = (int)(((pitch << 0xc) | 0x800U) - track[0x17]) / step;
-			track[0x19] = step;
+		if (((u32)*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
+			int delta = pitch - track[0x17];
+			track[0x18] = delta / frameCount;
+			track[0x19] = frameCount;
 		}
 		track += 0x55;
 	} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
@@ -927,10 +938,10 @@ void MusicStop(int seId)
  */
 int MusicPlay(int musicId, int volume, int mode)
 {
-	int musicBank = (int)c_RedEntry.SearchMusicBank(musicId);
+	int* musicBank = c_RedEntry.SearchMusicBank(musicId);
 
 	if (musicBank != 0) {
-		RedMusicHEAD* musicHead = *(RedMusicHEAD**)(musicBank + 8);
+		RedMusicHEAD* musicHead = (RedMusicHEAD*)musicBank[2];
 		RedWaveHeadWD* waveHead =
 		    (RedWaveHeadWD*)c_RedEntry.SearchWaveBase(*(short*)((char*)musicHead + 6));
 
@@ -955,28 +966,31 @@ int MusicPlay(int musicId, int volume, int mode)
  */
 void SetMusicVolume(int seId, int volume, int duration, int mode)
 {
-	int step;
 	int* music = (int*)p_SoundControlBuffer;
 
 	if (volume != 0) {
-		volume = (((volume + 1) * 4) - 1) * 0x1000;
+		volume++;
+		volume <<= 2;
+		volume--;
+		volume <<= 12;
 	}
 	volume |= 0x800;
 
 	if (duration < 1) {
-		step = 1;
+		duration = 1;
 	} else {
-		step = (duration * 200) / 0x3c;
+		duration *= 200;
+		duration /= 0x3c;
 	}
 
 	do {
 		if ((seId == -1) || (seId == music[0x11c]) || (music[0x11c] < 0)) {
 			if (mode == 1) {
-				music[0x116] = -music[0x115] / step;
-				music[0x117] = step;
+				music[0x116] = -music[0x115] / duration;
+				music[0x117] = duration;
 			} else {
-				music[8] = (volume - music[7]) / step;
-				music[9] = step;
+				music[8] = (volume - music[7]) / duration;
+				music[9] = duration;
 			}
 		}
 		music += 0x125;

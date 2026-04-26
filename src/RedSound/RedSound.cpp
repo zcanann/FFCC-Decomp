@@ -13,18 +13,14 @@
 #include "dolphin/ax.h"
 #include "dolphin/axart.h"
 
-extern "C" {
-	void __dl__FPv(void*);
-}
-
 // RedSound global linkage that is shared across Red* units.
 CRedDriver c_Driver;
 static int m_StandbyStatus[0x40];
 volatile unsigned int m_AutoID;
 static void* p_StreamBank;
-static const char s_redSoundMemorySettingErrorFmt[] =
-    "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
-static const char sRedSoundLogPrefix[] =
+static const char sRedSoundDebugStrings[] =
+    "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n"
+    "\0"
     "\x1B[7;34mSound\x1B[0m:"
     "\0"
     "%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n"
@@ -33,8 +29,8 @@ static const char sRedSoundLogPrefix[] =
     "\0"
     "%s%sSound Driver Initialize OK.%s\n"
     "\0"
-    "%s%sSound Driver Initialize ERROR !!%s\n";
-static const char s_redSoundInvalidStreamDataFmt[] =
+    "%s%sSound Driver Initialize ERROR !!%s\n"
+    "\0"
     "%s%sSTREAM : This data was not 'STREAM-DATA'.%s\n"
     "\0"
     "Jun 17 2003"
@@ -72,15 +68,9 @@ CRedSound::CRedSound()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
-extern "C" CRedSound* __dt__9CRedSoundFv(CRedSound* redSound, short shouldDelete)
+CRedSound::~CRedSound()
 {
-    if ((redSound != 0) && (0 < shouldDelete)) {
-        __dl__FPv(redSound);
-    }
-    return redSound;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -110,7 +100,6 @@ unsigned int CRedSound::GetAutoID()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int* CRedSound::EntryStandbyID(int id)
 {
 	int* slot = m_StandbyStatus;
@@ -136,7 +125,7 @@ int* CRedSound::EntryStandbyID(int id)
  */
 int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 {
-	const char* logBlob = s_redSoundMemorySettingErrorFmt;
+	const char* logBlob = sRedSoundDebugStrings;
 
 	memset(m_StandbyStatus, 0, 0x100);
 
@@ -271,9 +260,8 @@ void CRedSound::ReportPrint(int debugFlag)
 int CRedSound::ReportStandby(int id)
 {
 	int i;
-	int result;
+	int result = 0;
 
-	result = 0;
 	if (id == 0) {
 		i = 0;
 		do {
@@ -296,7 +284,6 @@ int CRedSound::ReportStandby(int id)
 
 	return result;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -307,7 +294,6 @@ int CRedSound::ReportStandby(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void (*callback)(void*), void* userData)
 {
 	RedDmaEntry(type, src, dst, length, flags, callback, userData);
@@ -326,7 +312,6 @@ int CRedSound::DMACheck(int id)
 {
 	return RedDmaSearchID(id);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -337,7 +322,6 @@ int CRedSound::DMACheck(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::SetSoundMode(int mode)
 {
 	c_Driver.SetSoundMode(mode);
@@ -600,7 +584,7 @@ void CRedSound::SeStopMG(int bank, int sep, int group, int kind)
  */
 int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
 {
-	unsigned int autoID = GetAutoID();
+	int autoID = GetAutoID();
 	c_Driver.SePlay(seID, sepID, autoID, unk, volume, pitch);
 	return autoID;
 }
@@ -791,7 +775,8 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 		id = GetAutoID();
 		c_Driver.StreamPlay(id, data, param_3, param_4, param_5);
 	} else if (m_ReportPrint != 0) {
-		OSReport(s_redSoundInvalidStreamDataFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor,
+		OSReport(sRedSoundDebugStrings + RED_SOUND_INVALID_STREAM_DATA_FMT_OFFSET,
+		         sRedSoundDebugStrings + RED_SOUND_LOG_PREFIX_OFFSET, sRedSoundLogErrorColor,
 		         sRedSoundLogReset);
 		fflush(__files + 1);
 	}
@@ -909,4 +894,3 @@ void CRedSound::TestProcess(int mode)
 {
 	c_Driver.TestProcess(mode);
 }
-#pragma optimization_level 4

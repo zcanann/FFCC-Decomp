@@ -15,11 +15,7 @@ const char s_redMemoryMainBankFullFmt[] = "%s%sMemory Bank Full !!%s\n";
 const char sRedMemoryLogPrefix[] = "\x1b[7;34mSound\x1b[0m:";
 const char s_redMemoryAuxBankFullFmt[] = "%s%sA-Memory Bank Full !!%s\n";
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
-const char sRedMemoryLogSuffixB[8] = "\x1b[0m";
-
-extern "C" {
-	void __dl__FPv(void*);
-}
+const char sRedMemoryLogSuffixB[] = "\x1b[0m";
 
 /*
  * --INFO--
@@ -40,15 +36,9 @@ CRedMemory::CRedMemory()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
-extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldDelete)
+CRedMemory::~CRedMemory()
 {
-	if ((redMemory != 0) && (0 < shouldDelete)) {
-		__dl__FPv(redMemory);
-	}
-	return redMemory;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -87,7 +77,8 @@ int RedNew(int param_1)
 					if ((slot[1] == 0) || ((address + alignedSize) <= *slot)) {
 						if (blockList[0x7FF] > 0) {
 							if (m_ReportPrint != 0) {
-								OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
+								OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA,
+								         sRedMemoryLogSuffixB);
 								fflush(__files + 1);
 							}
 							break;
@@ -171,12 +162,10 @@ void RedDelete(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void RedDelete(void* param_1)
 {
 	RedDelete((int)param_1);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -319,12 +308,10 @@ void RedDeleteA(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void RedDeleteA(void* param_1)
 {
 	RedDeleteA((int)param_1);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -335,23 +322,17 @@ void RedDeleteA(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
-	int bankSize = 0x2000;
-	bankSize += 0x1f;
-	bankSize &= ~0x1f;
-
 	m_MemoryBank = (int*)param1;
-	m_AMemoryBank = (int*)((int)m_MemoryBank + bankSize);
-	m_DataBuffer = (int)m_AMemoryBank + bankSize;
-	m_DataBufferSize = param2 - bankSize * 2;
-	memset(m_MemoryBank, 0, bankSize);
-	memset(m_AMemoryBank, 0, bankSize);
+	m_AMemoryBank = (int*)(param1 + 0x2000);
+	m_DataBuffer = param1 + 0x4000;
+	m_DataBufferSize = param2 - 0x4000;
+	memset(m_MemoryBank, 0, 0x2000);
+	memset(m_AMemoryBank, 0, 0x2000);
 	m_ADataBuffer = param3;
 	m_ADataBufferSize = param4;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--

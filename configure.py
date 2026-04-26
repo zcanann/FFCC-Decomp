@@ -320,6 +320,10 @@ def redsound_flags_from_profile(profile: str) -> List[str]:
         return [*base, "-char signed"]
     if profile == "inline_deferred":
         return replace_flag_prefix(base, "-inline ", "-inline deferred")
+    if profile == "opt_level0_sched":
+        flags = replace_flag_prefix(base, "-inline ", "-inline deferred")
+        flags = [flag for flag in flags if not flag.startswith("-O")]
+        return [*flags, "-opt level=0, peephole, schedule, nospace"]
     if profile == "inline_auto_deferred":
         return replace_flag_prefix(base, "-inline ", "-inline auto,deferred")
     if profile == "str_pool_common_off":
@@ -361,17 +365,37 @@ def parse_flag_env_list(name: str) -> List[str]:
     return [part.strip() for part in value.split(";") if part.strip()]
 
 
-# RedSound is built pragma-free; inline-deferred currently gives the best
-# aggregate objdiff score across the RedSound units.
-redsound_profile = os.environ.get("FFCC_REDSOUND_PROFILE", "inline_deferred")
+# RedSound is built pragma-free. Reference projects use this Metrowerks
+# library-style opt profile for some shipped objects, and it matches RedSound's
+# stack/register patterns far better than source-local optimization pragmas.
+redsound_profile = os.environ.get("FFCC_REDSOUND_PROFILE", "opt_level0_sched")
 redsound_cflags = redsound_flags_from_profile(redsound_profile)
 redsound_cpp_exceptions_cflags = replace_flag_prefix(
     redsound_cflags, "-Cpp_exceptions ", "-Cpp_exceptions on"
 )
+# PAL RedSound objects carry exception tables across the library; keep the
+# source build configured the same way instead of faking extab data.
+redsound_cpp_exceptions_units = {
+    "RedCommand",
+    "RedDriver",
+    "RedEntry",
+    "RedExecute",
+    "RedMemory",
+    "RedMidiCtrl",
+    "RedSound",
+    "RedStream",
+    *parse_unit_env_set("FFCC_REDSOUND_CPP_EXCEPTIONS_UNITS"),
+}
 redsound_opt0_units = parse_unit_env_set("FFCC_REDSOUND_OPT0_UNITS")
-# RedStream's codegen is unchanged by inline-off, but its exception table
-# layout moves closer to the MAP/object target with this unit-local flag.
+# These RedSound objects' code report measures are unchanged by inline-off,
+# but their generated exception table layouts move closer to the MAP/object
+# targets with this unit-local flag.
 redsound_inline_off_units = {
+    "RedCommand",
+    "RedEntry",
+    "RedExecute",
+    "RedMemory",
+    "RedSound",
     "RedStream",
     *parse_unit_env_set("FFCC_REDSOUND_INLINE_OFF_UNITS"),
 }
@@ -383,7 +407,8 @@ redsound_extra_flags = parse_flag_env_list("FFCC_REDSOUND_EXTRA_FLAGS")
 
 
 def redsound_unit_cflags(unit_name: str, *, cpp_exceptions: bool = False) -> List[str]:
-    flags = redsound_cpp_exceptions_cflags if cpp_exceptions else redsound_cflags
+    has_cpp_exceptions = cpp_exceptions or unit_name in redsound_cpp_exceptions_units
+    flags = redsound_cpp_exceptions_cflags if has_cpp_exceptions else redsound_cflags
     for prefix in redsound_remove_flag_prefixes:
         flags = [flag for flag in flags if not flag.startswith(prefix)]
     if unit_name in redsound_opt0_units:
@@ -445,7 +470,7 @@ config.libs = [
         Object(
             NonMatching,
             "RedSound/RedStream.cpp",
-            cflags=redsound_unit_cflags("RedStream", cpp_exceptions=True),
+            cflags=redsound_unit_cflags("RedStream"),
         ),
     ]),
     {

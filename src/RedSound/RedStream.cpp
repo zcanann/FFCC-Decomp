@@ -44,23 +44,18 @@ static const char sRedStreamLogWarnColor[] = "\x1B[4;31m";
 RedStreamDATA* _SearchEmptyStreamData()
 {
 	RedStreamDATA* streamData = p_Stream;
-	RedStreamDATA* result;
 
 	for (;;) {
 		if (streamData->m_streamId == 0) {
-			result = streamData;
-			break;
+			return streamData;
 		}
 
 		streamData = (RedStreamDATA*)((u8*)streamData + 0x130);
 
 		if (!((u8*)streamData < (u8*)p_Stream + 0x4C0)) {
-			result = 0;
-			break;
+			return 0;
 		}
 	}
-
-	return result;
 }
 
 /*
@@ -109,7 +104,7 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
 	unsigned char* dstBuffer;
 	int streamStruct;
 	int dmaDstOffset;
-	int dmaID = 0;
+	int dmaID;
 
 	param_2 &= 1;
 
@@ -135,23 +130,21 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
 		dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
 
 		if ((param_2 == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
-			int zero = 0;
 			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ec) = (unsigned short)*dstBuffer;
-			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = zero;
-			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) = zero;
+			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = 0;
+			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) = 0;
 			*(unsigned int*)(*(int*)(streamStruct + 0x14) + 0x1c) |= 0x100000;
 		}
 
 		if (*(short*)((int)param_1 + 0x2a) == 2) {
 			dstBuffer += 0x2000;
 			dmaDstOffset += 0x2000;
-			dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
 			streamStruct += 0xc0;
+			dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
 			if ((param_2 == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
-				int zero = 0;
 				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ec) = (unsigned short)*dstBuffer;
-				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = zero;
-				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) = zero;
+				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = 0;
+				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) = 0;
 				*(unsigned int*)(*(int*)(streamStruct + 0x14) + 0x1c) |= 0x100000;
 			}
 		}
@@ -468,12 +461,17 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 	if (param_3 < 1) {
 		param_3 = 1;
 	} else {
-		param_3 = (param_3 * 200) / 60;
+		param_3 *= 200;
+		param_3 /= 60;
 	}
 
 	param_2 &= 0x7f;
 	if (param_2 != 0) {
-		param_2 = ((param_2 + 1) * 0x100 - 1) * 0x1000 | 0x800;
+		param_2++;
+		param_2 <<= 8;
+		param_2--;
+		param_2 <<= 12;
+		param_2 |= 0x800;
 	}
 
 	streamData = p_Stream;

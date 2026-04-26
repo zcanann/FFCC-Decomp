@@ -2598,6 +2598,7 @@ RedSound/RedExecute.cpp:
 	extab       start:0x8000A760 end:0x8000A880
 	extabindex  start:0x80011F20 end:0x800120D0
 	.text       start:0x801C2FC4 end:0x801C7478
+	.data       start:0x8021D7F0 end:0x8021E1D0
 	.sdata      start:0x8032EC30 end:0x8032EC34
 	.sbss       start:0x8032F4A8 end:0x8032F4BC
 	.sdata2     start:0x80333D58 end:0x80333D68
@@ -2606,7 +2607,7 @@ RedSound/RedMidiCtrl.cpp:
 	extab       start:0x8000A880 end:0x8000AB00
 	extabindex  start:0x800120D0 end:0x80012490
 	.text       start:0x801C7478 end:0x801CA038
-	.data       start:0x8021E9D0 end:0x8021EC10
+	.data       start:0x8021E1D0 end:0x8021EC10
 
 RedSound/RedCommand.cpp:
 	extab       start:0x8000AB00 end:0x8000AB80

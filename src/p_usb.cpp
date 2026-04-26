@@ -12,9 +12,6 @@ extern "C" void create__7CUSBPcsFv(CUSBPcs*);
 extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
 extern "C" void func__7CUSBPcsFv(CUSBPcs*);
 
-u32 m_table_desc0__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__7CUSBPcsFv)};
-u32 m_table_desc1__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__7CUSBPcsFv)};
-u32 m_table_desc2__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(func__7CUSBPcsFv)};
 const char s_CUSBPcs_8032f810[] = "CUSBPcs";
 u32 m_table__7CUSBPcs[0x11C / sizeof(u32)] = {
     reinterpret_cast<u32>(const_cast<char*>(s_CUSBPcs_8032f810)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x12
@@ -30,10 +27,10 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stag
  */
 inline CUSBPcs::CUSBPcs()
 {
-    u32* table = m_table__7CUSBPcs;
-    const u32* desc0 = m_table_desc0__7CUSBPcs;
-    const u32* desc1 = m_table_desc1__7CUSBPcs;
-    const u32* desc2 = m_table_desc2__7CUSBPcs;
+    u32* table = reinterpret_cast<u32*>(m_table__7CUSBPcs);
+    static u32 desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__7CUSBPcsFv)};
+    static u32 desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__7CUSBPcsFv)};
+    static u32 desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(func__7CUSBPcsFv)};
 
     table[1] = desc0[0];
     table[2] = desc0[1];

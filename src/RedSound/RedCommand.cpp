@@ -958,28 +958,31 @@ int MusicPlay(int musicId, int volume, int mode)
  */
 void SetMusicVolume(int seId, int volume, int duration, int mode)
 {
-	int step;
 	int* music = (int*)p_SoundControlBuffer;
 
 	if (volume != 0) {
-		volume = (((volume + 1) * 4) - 1) * 0x1000;
+		volume++;
+		volume <<= 2;
+		volume--;
+		volume <<= 12;
 	}
 	volume |= 0x800;
 
 	if (duration < 1) {
-		step = 1;
+		duration = 1;
 	} else {
-		step = (duration * 200) / 0x3c;
+		duration *= 200;
+		duration /= 0x3c;
 	}
 
 	do {
 		if ((seId == -1) || (seId == music[0x11c]) || (music[0x11c] < 0)) {
 			if (mode == 1) {
-				music[0x116] = -music[0x115] / step;
-				music[0x117] = step;
+				music[0x116] = -music[0x115] / duration;
+				music[0x117] = duration;
 			} else {
-				music[8] = (volume - music[7]) / step;
-				music[9] = step;
+				music[8] = (volume - music[7]) / duration;
+				music[9] = duration;
 			}
 		}
 		music += 0x125;

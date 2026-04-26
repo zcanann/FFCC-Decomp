@@ -127,13 +127,13 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		u8 flareWidth;
 		int halfWidth;
 		u32 z0;
+		int projectedXInt;
+		int projectedYInt;
 		int x;
 		int y;
 		int x0;
 		int y0;
 		s16 stepSize;
-		int projectedXInt;
-		int projectedYInt;
 		float alphaScale;
 
 		alphaScale = (float)sourceAlpha;

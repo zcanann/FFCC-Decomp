@@ -177,10 +177,13 @@ void _SetSoundMode(int* param_1)
         OSGetSoundMode(1);
     }
     m_SoundPlayMode = m_SoundMode;
-    if (m_SoundPlayMode == 2) {
+    switch (m_SoundPlayMode) {
+    case 2:
         AXSetMode(2);
-    } else {
+        break;
+    default:
         AXSetMode(0);
+        break;
     }
 }
 #pragma optimization_level 4

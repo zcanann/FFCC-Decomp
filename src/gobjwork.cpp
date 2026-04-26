@@ -1555,11 +1555,12 @@ void CCaravanWork::SafeDeleteTempItem()
 	}
 
 	totalSlots += (short)m_baseCmdListSlots;
-	for (; totalSlots < 8; totalSlots++) {
-		if ((short)m_commandListInventorySlotRef[totalSlots] >= 0) {
-			m_commandListInventorySlotRef[totalSlots] = 0xFFFF;
+	short* commandSlot = m_commandListInventorySlotRef + totalSlots;
+	for (int slotIndex = totalSlots; slotIndex < 8; slotIndex++, commandSlot++) {
+		if (*commandSlot >= 0) {
+			*commandSlot = -1;
 			if ((unsigned int)System.m_execParam >= 3U) {
-				System.Printf(const_cast<char*>(lbl_801D9F94), totalSlots);
+				System.Printf(const_cast<char*>(lbl_801D9F94), slotIndex);
 			}
 		}
 	}

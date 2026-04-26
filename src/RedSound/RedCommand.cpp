@@ -346,14 +346,14 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
 	deltaTime = (unsigned int)((unsigned char*)info)[2] * 0x100 + (unsigned int)((unsigned char*)info)[1];
 	waveBase = c_RedEntry.SearchWaveBase(deltaTime);
-	if (waveBase == 0) {
+	if (waveBase != 0) {
+		c_RedEntry.WaveHistoryManager(1, *(short*)(waveBase + 2));
+	} else {
 		if (m_ReportPrint != 0) {
 			OSReport(s_redCommandLogBlob, s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogWarnColor,
 			         deltaTime, sRedCommandLogReset);
 			fflush(__files + 1);
 		}
-	} else {
-		c_RedEntry.WaveHistoryManager(1, *(short*)(waveBase + 2));
 	}
 
 	flag = ((unsigned char*)info)[0];

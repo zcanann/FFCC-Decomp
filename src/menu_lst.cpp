@@ -199,8 +199,8 @@ int CMenuPcs::MLstClose()
 			if (entry->startFrame <= currentFrame) {
 				if (currentFrame < entry->startFrame + entry->duration) {
 					entry->timer = entry->timer + 1;
-					entry->alpha =
-						(float)(DOUBLE_80333410 - (DOUBLE_80333410 / (double)entry->duration) * (double)entry->timer);
+					double ratio = DOUBLE_80333410 / (double)entry->duration;
+					entry->alpha = (float)(DOUBLE_80333410 - ratio * (double)entry->timer);
 					if ((double)entry->alpha < DOUBLE_80333418) {
 						entry->alpha = FLOAT_803333D0;
 					}
@@ -481,7 +481,8 @@ int CMenuPcs::MLstOpen()
 			if (entry->startFrame <= currentFrame) {
 				if (currentFrame < entry->startFrame + entry->duration) {
 					entry->timer = entry->timer + 1;
-					entry->alpha = (float)((DOUBLE_80333410 / (double)entry->duration) * (double)entry->timer);
+					double ratio = DOUBLE_80333410 / (double)entry->duration;
+					entry->alpha = (float)(ratio * (double)entry->timer);
 				} else {
 					completedItems++;
 					entry->alpha = FLOAT_803333F0;

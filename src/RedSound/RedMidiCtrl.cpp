@@ -293,7 +293,8 @@ int DutySwing(int phase)
 int RandomSwing(int phase)
 {
     phase >>= 8;
-    int result = (int)t_RandomData[phase & 0xFF] << 8;
+    phase &= 0xff;
+    int result = (int)t_RandomData[phase] << 8;
 
     return result;
 }

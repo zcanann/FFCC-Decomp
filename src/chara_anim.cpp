@@ -277,7 +277,10 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 					m_interpOffset = chunkFile.Get4();
 					break;
 				case 0x4652414D:
-					m_frameCount = static_cast<unsigned short>(chunkFile.Get4());
+					{
+						float frameCount = chunkFile.Get4();
+						m_frameCount = static_cast<unsigned short>(static_cast<int>(frameCount));
+					}
 					break;
 				case 0x494E464F:
 					m_quantizeX = static_cast<unsigned char>(chunkFile.Get4());

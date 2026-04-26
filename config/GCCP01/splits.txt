@@ -2606,7 +2606,7 @@ RedSound/RedMidiCtrl.cpp:
 	extab       start:0x8000A880 end:0x8000AB00
 	extabindex  start:0x800120D0 end:0x80012490
 	.text       start:0x801C7478 end:0x801CA038
-	.data       start:0x8021E9D0 end:0x8021EC10
+	.data       start:0x8021E1D0 end:0x8021EC10
 
 RedSound/RedCommand.cpp:
 	extab       start:0x8000AB00 end:0x8000AB80

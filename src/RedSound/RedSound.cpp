@@ -260,15 +260,12 @@ void CRedSound::ReportPrint(int debugFlag)
 int CRedSound::ReportStandby(int id)
 {
 	int i;
-	int result;
 
-	result = 0;
 	if (id == 0) {
 		i = 0;
 		do {
 			if (m_StandbyStatus[i] != 0) {
-				result++;
-				break;
+				return 1;
 			}
 			i++;
 		} while (i < 0x40);
@@ -276,14 +273,13 @@ int CRedSound::ReportStandby(int id)
 		i = 0;
 		do {
 			if (id == m_StandbyStatus[i]) {
-				result++;
-				break;
+				return 1;
 			}
 			i++;
 		} while (i < 0x40);
 	}
 
-	return result;
+	return 0;
 }
 
 /*
@@ -585,7 +581,7 @@ void CRedSound::SeStopMG(int bank, int sep, int group, int kind)
  */
 int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
 {
-	unsigned int autoID = GetAutoID();
+	int autoID = GetAutoID();
 	c_Driver.SePlay(seID, sepID, autoID, unk, volume, pitch);
 	return autoID;
 }

@@ -18,7 +18,6 @@ extern signed char t_KeySignatureData[];
 extern signed char t_RandomData[];
 extern s16 t_PanningData[];
 extern s16 t_PanningDataR[];
-extern int m_SignDataTable[];
 extern int t_ReverbModeData[];
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;

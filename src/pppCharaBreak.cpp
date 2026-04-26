@@ -150,10 +150,10 @@ struct CharaBreakMeshData {
 };
 
 struct CharaBreakMeshRef {
+    u8 _pad0[0x8];
+    CharaBreakMeshData* m_data;
     S16Vec* m_workPositions;
     S16Vec* m_workNormals;
-    CharaBreakMeshData* m_data;
-    u8 _padC[0x8];
 };
 
 struct CharaBreakModelData {
@@ -174,6 +174,14 @@ struct CharaBreakModelView {
     void* m_nodes;
     CharaBreakMeshRef* m_meshes;
 };
+
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
+STATIC_ASSERT(offsetof(CharaBreakModelView, m_localMtx) == 0x8);
+STATIC_ASSERT(offsetof(CharaBreakModelView, m_data) == 0xA4);
+STATIC_ASSERT(offsetof(CharaBreakModelView, m_nodes) == 0xA8);
+STATIC_ASSERT(offsetof(CharaBreakModelView, m_meshes) == 0xAC);
 
 /*
  * --INFO--
@@ -321,21 +329,22 @@ extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32 v
 void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
     CharaBreakMeshData* meshData = *(CharaBreakMeshData**)((u8*)mesh + 8);
+    s32 isRigid = 0;
+    S16Vec* workPositions;
     u16* stream = (u16*)displayList;
     u8* polygonBytes = (u8*)polygonData;
     BOOL transformPositions = FALSE;
     Mtx meshMtx;
 
     if (meshData->m_skinCount == 0) {
-        transformPositions = TRUE;
+        isRigid = 1;
         PSMTXConcat(*(Mtx*)((u8*)model + 0x8), *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (meshData->m_nodeIndex * 0xC0) + 0x6C),
                     meshMtx);
     }
+    workPositions = ((CharaBreakMeshRef*)mesh)->m_workPositions;
 
-    S16Vec* workPositions = *(S16Vec**)mesh;
-
-    bool hasPackets = true;
-    while (hasPackets) {
+    s32 keepReading = 1;
+    while (keepReading != 0) {
         u8 drawCmd = *(u8*)stream;
         u16 drawCount = *(u16*)((u8*)stream + 1);
         u8 primitive = drawCmd & 0xF8;
@@ -345,19 +354,18 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 
         stream = (u16*)((u8*)stream + 3);
         if (IsHasDrawFmtDL__5CUtilFUc(&gUtil, drawCmd) == 0) {
-            hasPackets = false;
+            keepReading = 0;
         } else {
-            bool hasPolygons = true;
-
             triCount = (s16)(drawCount - 2);
             outVertex = 0;
             stripRestart = 0;
+            s32 keepTri = 1;
 
             if (primitive == 0x90) {
                 triCount = (s16)((s32)drawCount / 3);
             }
 
-            while (hasPolygons) {
+            while (keepTri != 0) {
                 u16* previousRestart = stripRestart;
                 u16 posIndex = stream[0];
                 u16 nrmIndex = stream[1];
@@ -369,7 +377,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                 }
                 stream = stripRestart;
 
-                if (transformPositions != FALSE) {
+                if (isRigid != 0) {
                     S16Vec* sourcePos = workPositions + posIndex;
                     S16Vec posQuantized;
                     Vec posFloat;
@@ -400,7 +408,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                     if (outVertex == 3) {
                         triCount--;
                         if (triCount < 1) {
-                            hasPolygons = false;
+                            keepTri = 0;
                         }
                         outVertex = 0;
                         polygonBytes += 0x34;
@@ -411,7 +419,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                     } else if (outVertex == 3) {
                         triCount--;
                         if (triCount < 1) {
-                            hasPolygons = false;
+                            keepTri = 0;
                         }
                         if ((triCount & 1) == 0) {
                             stream = previousRestart;
@@ -528,7 +536,8 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
         bool needsMtxUpdate = false;
         Mtx meshToWorld;
         CharaBreakMeshData* meshData = *(CharaBreakMeshData**)((u8*)mesh + 8);
-        S16Vec* workPositions = *(S16Vec**)mesh;
+        CharaBreakMeshRef* meshRef = (CharaBreakMeshRef*)mesh;
+        S16Vec* workPositions = meshRef->m_workPositions;
 
         if (meshData->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
             needsMtxUpdate = true;
@@ -935,7 +944,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     &gUtil,
                     &work->m_bboxMin,
                     &work->m_bboxMax,
-                    *(S16Vec**)mesh,
+                    ((CharaBreakMeshRef*)mesh)->m_workPositions,
                     meshData->m_vertexCount,
                     *(u32*)(*(u32*)(model + 0xA4) + 0x34));
             }

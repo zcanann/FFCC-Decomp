@@ -259,7 +259,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             r = colorR;
             g = colorG;
             b = colorB;
-            a = (int)((double)(int)colorA - DOUBLE_80330c88 - source[6].y);
+            a = (int)((float)(int)colorA - source[6].y);
             if (colorDelta != 0) {
                 r += (int)colorDelta[0];
                 g += (int)colorDelta[1];
@@ -318,26 +318,32 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                 Mtx tempMtx;
                 Vec debugPos;
 
-                if ((i == 0) || (i == 2)) {
+                switch (i) {
+                case 0:
+                case 2:
                     debugColor.r = 0x80;
                     debugColor.g = 0x00;
                     debugColor.b = 0x00;
                     debugColor.a = 0xFF;
-                } else if (i == 1) {
+                    break;
+                case 1:
                     debugColor.r = 0x80;
                     debugColor.g = 0x80;
                     debugColor.b = 0xFF;
                     debugColor.a = 0xFF;
-                } else if (i == 3) {
+                    break;
+                case 3:
                     debugColor.r = 0x80;
                     debugColor.g = 0x80;
                     debugColor.b = 0x80;
                     debugColor.a = 0xFF;
-                } else {
+                    break;
+                default:
                     debugColor.r = 0x00;
                     debugColor.g = 0x60;
                     debugColor.b = 0x80;
                     debugColor.a = 0xFF;
+                    break;
                 }
 
                 firstParticle = -1;
@@ -348,7 +354,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                     }
                 }
 
-                scale = (float)groupData[10];
+                scale = *(float*)(groupData + 10);
                 PSMTXIdentity(sphereMtx);
                 sphereMtx[0][0] = scale;
                 sphereMtx[1][1] = scale;
@@ -421,8 +427,8 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         int* groupTable;
 
         work->m_particleCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x1E);
-        work->m_slotCount = *(short*)((unsigned char*)pYmBreath + 0x12);
-        work->m_groupCount = *(short*)((unsigned char*)pYmBreath + 0x14);
+        work->m_slotCount = *(unsigned short*)((unsigned char*)pYmBreath + 0x12);
+        work->m_groupCount = *(unsigned short*)((unsigned char*)pYmBreath + 0x14);
 
         work->m_particleData =
             (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x60),
@@ -524,8 +530,9 @@ group_ready:
             *(float*)(groupTable + 0x28) = scaledOwner;
             pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
             PSMTXMultVec(rotMtx.value, &dir, &dir);
+            pppCopyVector(dirNorm, dir);
             pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
-            PSVECScale(&dirNorm, &target, *(float*)(groupTable + 0x24));
+            PSVECScale(&dir, &target, *(float*)(groupTable + 0x24));
             pppAddVector(target, origin, target);
             pppSubVector(hitVector, target, origin);
             pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner,
@@ -776,7 +783,7 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
     if (*(unsigned char*)(breath + 0xC8) == 0) {
         float start = *(float*)(breath + 0xA0);
         float zero = 0.0f;
-        if ((start > zero) && (*(float*)(breath + 0xA4) < zero)) {
+        if ((zero < start) && (*(float*)(breath + 0xA4) < zero)) {
             if (particle[6].z < zero) {
                 particle[6].z = zero;
             }
@@ -841,7 +848,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
 
     baseDir.x = 0.0f;
     baseDir.y = 0.0f;
-    baseDir.z = -1.0f;
+    baseDir.z = FLOAT_80330C90;
 
     angle.x = (short)(range * Math.RandF() - spread);
     angle.y = (short)(range * Math.RandF() - spread);

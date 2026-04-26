@@ -22,6 +22,7 @@ struct RedStreamDATA {
     int m_pan;
     int m_panStep;
     int m_panStepCount;
+    int m_unk108;
     int m_streamId;
     int m_state;
     int m_dmaId;

@@ -2019,7 +2019,7 @@ int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int
     sound[0x121] = frames;
     sound[4] += frames;
 
-    while (sound[5] <= sound[4]) {
+    while (sound[4] >= sound[5]) {
         sound[3]++;
         sound[4] -= sound[5];
     }
@@ -2106,7 +2106,7 @@ int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
         sound[0x121] = frames;
         sound[4] += frames;
 
-        while (sound[5] <= sound[4]) {
+        while (sound[4] >= sound[5]) {
             sound[3]++;
             sound[4] -= sound[5];
         }
@@ -2123,7 +2123,7 @@ int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
             }
         }
 
-        if (m_MusicSkipLine < 1) {
+        if (m_MusicSkipLine <= 0) {
             break;
         }
     } while (*(s16*)((u8*)sound + 0x48E) != 0);

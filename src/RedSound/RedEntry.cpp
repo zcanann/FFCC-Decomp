@@ -891,14 +891,13 @@ void CRedEntry::DisplayWaveInfo()
  */
 void CRedEntry::SeSepHistoryAdd()
 {
-	int* const entry = (int*)this;
-	unsigned int history = (unsigned int)entry[1];
+	unsigned int history = *(unsigned int*)((int)this + 4);
 	do {
 		if (*(int*)(history + 4) != 0) {
 			*(int*)(history + 4) = *(int*)(history + 4) + 1;
 		}
 		history += 0x10;
-	} while (history < (unsigned int)(entry[1] + 0x1000));
+	} while (history < *(unsigned int*)((int)this + 4) + 0x1000);
 }
 
 /*
@@ -913,14 +912,13 @@ void CRedEntry::SeSepHistoryAdd()
 void CRedEntry::SeSepHistoryDelete(int historyNo)
 {
 	if (historyNo != 0) {
-		int* const entry = (int*)this;
-		unsigned int history = (unsigned int)entry[1];
+		unsigned int history = *(unsigned int*)((int)this + 4);
 		do {
-			if (historyNo < *(int*)(history + 4)) {
+			if (*(int*)(history + 4) > historyNo) {
 				*(int*)(history + 4) = *(int*)(history + 4) - 1;
 			}
 			history += 0x10;
-		} while (history < (unsigned int)(entry[1] + 0x1000));
+		} while (history < *(unsigned int*)((int)this + 4) + 0x1000);
 	}
 }
 
@@ -936,14 +934,13 @@ void CRedEntry::SeSepHistoryDelete(int historyNo)
 void CRedEntry::SeSepHistoryChoice(RedHistoryBANK* bank)
 {
 	if (((int*)bank)[1] != 0) {
-		int* const entry = (int*)this;
-		unsigned int history = (unsigned int)entry[1];
+		unsigned int history = *(unsigned int*)((int)this + 4);
 		do {
 			if ((*(int*)(history + 4) != 0) && (*(int*)(history + 4) < ((int*)bank)[1])) {
 				*(int*)(history + 4) = *(int*)(history + 4) + 1;
 			}
 			history += 0x10;
-		} while (history < (unsigned int)(entry[1] + 0x1000));
+		} while (history < *(unsigned int*)((int)this + 4) + 0x1000);
 		((int*)bank)[1] = 1;
 	}
 }
@@ -959,22 +956,19 @@ void CRedEntry::SeSepHistoryChoice(RedHistoryBANK* bank)
  */
 int CRedEntry::SearchSeSepSequence(int seNo)
 {
-	unsigned int offset;
 	int* seSepBank = *(int**)((int)this + 4);
 
 	if (seNo == -1) {
 		do {
 			if (seSepBank[3] != 0) {
-				offset = (int)seSepBank - *(int*)((int)this + 4);
-				return (int)offset / 0x10;
+				return ((int)seSepBank - *(int*)((int)this + 4)) / 0x10;
 			}
 			seSepBank += 4;
 		} while (seSepBank < (int*)(*(int*)((int)this + 4) + 0x1000));
 	} else {
 		do {
 			if ((seSepBank[3] != 0) && (seSepBank[0] == seNo)) {
-				offset = (int)seSepBank - *(int*)((int)this + 4);
-				return (int)offset / 0x10;
+				return ((int)seSepBank - *(int*)((int)this + 4)) / 0x10;
 			}
 			seSepBank += 4;
 		} while (seSepBank < (int*)(*(int*)((int)this + 4) + 0x1000));
@@ -1306,7 +1300,7 @@ void CRedEntry::MusicHistoryDelete(int historyNo)
 	if (historyNo != 0) {
 		unsigned int history = (unsigned int)*(int*)((int)this + 8);
 		do {
-			if (historyNo < *(int*)(history + 4)) {
+			if (*(int*)(history + 4) > historyNo) {
 				*(int*)(history + 4) = *(int*)(history + 4) - 1;
 			}
 			history += 0x10;
@@ -1321,16 +1315,15 @@ void CRedEntry::MusicHistoryDelete(int historyNo)
  */
 void CRedEntry::MusicHistoryChoice(RedHistoryBANK* bank)
 {
-	int* bankData = (int*)bank;
-	if (bankData[1] != 0) {
+	if (((int*)bank)[1] != 0) {
 		unsigned int history = (unsigned int)*(int*)((int)this + 8);
 		do {
-			if ((*(int*)(history + 4) != 0) && (*(int*)(history + 4) < bankData[1])) {
+			if ((*(int*)(history + 4) != 0) && (*(int*)(history + 4) < ((int*)bank)[1])) {
 				*(int*)(history + 4) = *(int*)(history + 4) + 1;
 			}
 			history += 0x10;
 		} while (history < (unsigned int)*(int*)((int)this + 8) + 0x40);
-		bankData[1] = 1;
+		((int*)bank)[1] = 1;
 	}
 }
 
@@ -1346,15 +1339,13 @@ void CRedEntry::MusicHistoryChoice(RedHistoryBANK* bank)
 int CRedEntry::SearchMusicSequence(int musicNo)
 {
 	int* musicBank = *(int**)((int)this + 8);
-	int* end = (int*)(*(int*)((int)this + 8) + 0x40);
 
 	do {
 		if ((musicBank[3] != 0) && (*musicBank == musicNo)) {
-			int offset = (int)musicBank - *(int*)((int)this + 8);
-			return offset / 0x10;
+			return ((int)musicBank - *(int*)((int)this + 8)) / 0x10;
 		}
 		musicBank += 4;
-	} while (musicBank < end);
+	} while (musicBank < (int*)(*(int*)((int)this + 8) + 0x40));
 
 	return -1;
 }

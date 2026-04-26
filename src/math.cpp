@@ -738,15 +738,17 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
             if (dVar8 < 0.0f) {
                 hit = false;
             } else {
-                dVar8 = -dVar6 - sqrtf(fVar1);
+                dVar8 = sqrtf(dVar8);
+                dVar8 = -dVar6 - dVar8;
                 if ((dVar8 <= 0.0f) || (dVar7 < dVar8)) {
                     hit = false;
                 } else {
+                    dVar8 = dVar8 / dVar7;
                     if (outT != NULL) {
-                        *outT = dVar8 / dVar7;
+                        *outT = dVar8;
                     }
                     if (outPos != NULL) {
-                        PSVECScale(&local_6c, &local_84, dVar8 / dVar7);
+                        PSVECScale(&local_6c, &local_84, dVar8);
                         PSVECAdd(&local_60, &local_84, outPos);
                     }
                     hit = true;

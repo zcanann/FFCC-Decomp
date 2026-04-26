@@ -38,15 +38,51 @@ extern inline float sqrtf(float x)
 {
     static const double _half = .5;
     static const double _three = 3.0;
-    volatile float y;
+    union {
+        float f;
+        unsigned long bits;
+    } bits;
+    int fpclass;
+
     if (x > 0.0f) {
         double guess = __frsqrte((double)x); // returns an approximation to
         guess = _half * guess * (_three - guess * guess * x); // now have 12 sig bits
         guess = _half * guess * (_three - guess * guess * x); // now have 24 sig bits
         guess = _half * guess * (_three - guess * guess * x); // now have 32 sig bits
-        y = (float)(x * guess);
-        return y;
+        x = (float)(x * guess);
+        return x;
     }
+
+    if ((double)x < 0.0) {
+        x = NAN;
+        return x;
+    }
+
+    bits.f = x;
+    switch (bits.bits & 0x7f800000) {
+    case 0x7f800000:
+        if ((bits.bits & 0x7fffff) != 0) {
+            fpclass = 1;
+        } else {
+            fpclass = 2;
+        }
+        break;
+    case 0:
+        if ((bits.bits & 0x7fffff) != 0) {
+            fpclass = 5;
+        } else {
+            fpclass = 3;
+        }
+        break;
+    default:
+        fpclass = 4;
+        break;
+    }
+
+    if (fpclass == 1) {
+        x = NAN;
+    }
+
     return x;
 }
 #else

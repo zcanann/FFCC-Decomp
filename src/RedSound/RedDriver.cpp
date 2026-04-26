@@ -79,7 +79,7 @@ int m_MusicPhraseStop;
 static int* volatile p_MusicNextPlay;
 int m_CrossTime;
 volatile int m_MasterMusicVolume;
-int m_MasterSEVolume;
+volatile int m_MasterSEVolume;
 RedStreamDATA* volatile p_Stream;
 static int m_DMAMode;
 int m_SeSkipStep;

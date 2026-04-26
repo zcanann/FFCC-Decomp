@@ -464,7 +464,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 				memcpy(copied, head, copySize);
 				return arAddress;
 			}
-			RedDeleteA(arAddress);
+			RedDeleteA((void*)arAddress);
 		}
 	} while (WaveOldClear(minOffset, maxOffset) != 0);
 

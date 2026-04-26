@@ -22,7 +22,7 @@ extern int m_SignDataTable[];
 extern int t_ReverbModeData[];
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;
-extern void* p_SeBlockData[];
+extern void* volatile p_SeBlockData[];
 extern void* p_ZeroData;
 extern void* volatile p_SoundControlBuffer;
 extern void* volatile p_SoundControl;

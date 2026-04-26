@@ -106,7 +106,7 @@ static OSSemaphore m_DmaExecuteSemaphore;
 static ARQRequest m_DMARequest;
 OSThread m_MusicSkipThread;
 OSSemaphore m_MusicSkipSemaphore;
-void* p_SeBlockData[4];
+void* volatile p_SeBlockData[4];
 CRedMemory c_RedMemory;
 static volatile int m_DMAExecute;
 static volatile int m_DMAInThread;

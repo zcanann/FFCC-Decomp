@@ -74,7 +74,8 @@ int DataAddCompute(int* current, int target, int* delta)
     int result = 0;
 
     if (target - (*current >> 0xc) != 0) {
-        result = (((target << 0xc) | 0x800) - *current) / *delta;
+        result = ((target << 0xc) | 0x800) - *current;
+        result /= *delta;
     } else {
         *delta = 0;
     }

@@ -1481,31 +1481,31 @@ int CRedEntry::ReentryMusicData(int musicNo)
 void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 {
 	if (mode == 0) {
-		bool inUse = false;
+		int inUse = 0;
 		if ((*reinterpret_cast<short*>((int)p_SoundControlBuffer + 0x48E) != 0)
 		    && (*reinterpret_cast<int*>((int)p_SoundControlBuffer + 0x470) == musicNo)) {
-			inUse = true;
+			inUse |= 1;
 		}
 		if ((*reinterpret_cast<short*>((int)p_SoundControlBuffer + 0x922) != 0)
 		    && (*reinterpret_cast<int*>((int)p_SoundControlBuffer + 0x904) == musicNo)) {
-			inUse = true;
+			inUse |= 1;
 		}
 
-		int musicSeq = SearchMusicSequence(musicNo);
-		if ((!inUse) && (musicSeq >= 0)) {
-			int* const musicBank = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8));
-			if (musicBank[musicSeq * 4 + 1] == 0) {
-				MusicHistoryAdd();
-				musicBank[musicSeq * 4 + 1] = 1;
+		if (inUse == 0) {
+			int musicSeq = SearchMusicSequence(musicNo);
+			if (musicSeq >= 0) {
+				if (reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8))[musicSeq * 4 + 1] == 0) {
+					MusicHistoryAdd();
+					reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8))[musicSeq * 4 + 1] = 1;
+				}
 			}
 		}
 	} else {
 		int musicSeq = SearchMusicSequence(musicNo);
 		if (musicSeq >= 0) {
-			int* const musicBank = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8));
-			if (musicBank[musicSeq * 4 + 1] != 0) {
-				MusicHistoryDelete(musicBank[musicSeq * 4 + 1]);
-				musicBank[musicSeq * 4 + 1] = 0;
+			if (reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8))[musicSeq * 4 + 1] != 0) {
+				MusicHistoryDelete(reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8))[musicSeq * 4 + 1]);
+				reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8))[musicSeq * 4 + 1] = 0;
 			}
 		}
 	}

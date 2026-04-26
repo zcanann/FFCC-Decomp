@@ -1063,16 +1063,14 @@ float CMath::DstRot(float from, float to)
         return 0.0f;
     }
 
-    float clamped;
-    if (dot < -1.0f) {
-        clamped = -1.0f;
-    } else if (dot > 1.0f) {
-        clamped = 1.0f;
-    } else {
-        clamped = dot;
+    float angle = -1.0f;
+    if (!(dot < angle)) {
+        angle = 1.0f;
+        if (!(angle < dot)) {
+            angle = dot;
+        }
     }
-
-    float angle = (float)acos((double)clamped);
+    angle = (float)acos((double)angle);
     if (s0 * c1 - s1 * c0 < 0.0f) {
         angle = -angle;
     }

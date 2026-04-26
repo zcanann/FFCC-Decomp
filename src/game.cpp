@@ -201,7 +201,7 @@ static const char* s_localLangDirs[] = {
 static const char s_numNameFmt[] = "%d %s";
 static const char s_nameJoinFmt[] = "%s%s%s";
 static const char s_nameSep[] = " ";
-static const char s_nameNoSep[] = "";
+static const char s_nameNoSep[4] = "";
 
 struct CFlatDataTableEntryView
 {

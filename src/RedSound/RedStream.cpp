@@ -75,26 +75,26 @@ RedStreamDATA* _SearchEmptyStreamData()
 void _StreamStop(RedStreamDATA* streamData)
 {
 	fflush(__files + 1);
-	if (*(int*)((int)streamData + 0x10c) != 0) {
-		*(int*)((int)streamData + 0x10c) = 0;
-		*(int*)((int)streamData + 0x110) = 0;
-		if (*(int*)((int)streamData + 0xc) != 0) {
-			RedDelete((void*)*(int*)((int)streamData + 0xc));
-			*(int*)((int)streamData + 0xc) = 0;
+	if (streamData->m_streamId != 0) {
+		streamData->m_streamId = 0;
+		streamData->m_state = 0;
+		if (streamData->m_buffer != 0) {
+			RedDelete(streamData->m_buffer);
+			streamData->m_buffer = 0;
 		}
-		if (*(int*)((int)streamData + 0x12c) != 0) {
-			RedDeleteA(*(int*)((int)streamData + 0x12c));
-			*(int*)((int)streamData + 0x12c) = 0;
+		if (streamData->m_aramBuffer != 0) {
+			RedDeleteA(streamData->m_aramBuffer);
+			streamData->m_aramBuffer = 0;
 		}
-		*(unsigned int*)(*(int*)((int)streamData + 4) + 0x90) |= 2;
-		*(unsigned char*)(*(int*)((int)streamData + 0) + 0x26) &= -3;
-		*(unsigned char*)(*(int*)((int)streamData + 4) + 0x1a) &= -3;
-		*(int*)(*(int*)((int)streamData + 4) + 0x8c) = 0;
-		if (*(short*)((int)streamData + 0x2a) == 2) {
-			*(unsigned int*)(*(int*)((int)streamData + 4) + 0x150) |= 2;
-			*(unsigned char*)(*(int*)((int)streamData + 0) + 0x17a) &= -3;
-			*(unsigned char*)(*(int*)((int)streamData + 4) + 0xda) &= -3;
-			*(int*)(*(int*)((int)streamData + 4) + 0x14c) = 0;
+		*(unsigned int*)(streamData->m_voiceData + 0x90) |= 2;
+		*(unsigned char*)(streamData->m_track + 0x26) &= -3;
+		*(unsigned char*)(streamData->m_voiceData + 0x1a) &= -3;
+		*(int*)(streamData->m_voiceData + 0x8c) = 0;
+		if (streamData->m_channelCount == 2) {
+			*(unsigned int*)(streamData->m_voiceData + 0x150) |= 2;
+			*(unsigned char*)(streamData->m_track + 0x17a) &= -3;
+			*(unsigned char*)(streamData->m_voiceData + 0xda) &= -3;
+			*(int*)(streamData->m_voiceData + 0x14c) = 0;
 		}
 	}
 }

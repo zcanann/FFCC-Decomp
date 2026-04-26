@@ -266,7 +266,7 @@ void _MusicPlaySequence(int* param_1)
     if ((((*param_1 != *(int*)(srcBuffer + 0x470)) &&
           (*param_1 != *(int*)(srcBuffer + 0x904))) &&
          (*param_1 != *(int*)(srcBuffer + 0xd98))) &&
-        ((iVar1 = c_RedEntry.SearchMusicSequence(*param_1)), -1 < iVar1)) {
+        ((iVar1 = c_RedEntry.SearchMusicSequence(*param_1)), iVar1 >= 0)) {
         iVar1 = param_1[2];
         if (*(int*)(srcBuffer + 0x470) != -1) {
             if (*(int*)(srcBuffer + 0x904) != -1) {
@@ -356,7 +356,7 @@ void _MusicNextPlaySequence(int* param_1)
     if ((((*param_1 != *(int*)((int)p_SoundControlBuffer + 0x470)) &&
           (*param_1 != *(int*)((int)p_SoundControlBuffer + 0x904))) &&
          (*param_1 != *(int*)((int)p_SoundControlBuffer + 0xd98))) &&
-        ((iVar1 = c_RedEntry.SearchMusicSequence(*param_1)), -1 < iVar1)) {
+        ((iVar1 = c_RedEntry.SearchMusicSequence(*param_1)), iVar1 >= 0)) {
         p_MusicNextPlay[0] = *param_1;
         p_MusicNextPlay[1] = param_1[1];
         p_MusicNextPlay[2] = param_1[2];

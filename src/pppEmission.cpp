@@ -360,13 +360,13 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
 void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIndex, float (*param_5)[4]) {
     SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x66);
 
+    EmissionModelView* modelView = (EmissionModelView*)model;
     EmissionState* state = (EmissionState*)param_2;
     pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
-    EmissionMeshData* meshData = ((EmissionModelView*)model)->m_meshes[meshIndex].m_data;
+    EmissionMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
     if ((strcmp((const char*)meshData, &DAT_803311fc) == 0) && (state->m_colorA != 0)) {
         int texture = state->m_texture;
-        int drawTevBits = 0xACE0F;
-        int fullTevBits = drawTevBits | 0x40000;
+        u32 drawTevBits = 0xACE0F;
 
         pppInitBlendMode();
         pppSetBlendMode(step->m_payload[8]);
@@ -405,13 +405,13 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(int*)(MaterialManRaw() + 0x58) = 0;
                     *(int*)(MaterialManRaw() + 0x5C) = 0;
                     *(u8*)(MaterialManRaw() + 0x208) = 0;
-                    *(int*)(MaterialManRaw() + 0x48) = fullTevBits;
+                    *(u32*)(MaterialManRaw() + 0x48) |= 0x40000;
                     *(int*)(MaterialManRaw() + 0x128) = 0;
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
                     *(int*)(MaterialManRaw() + 0x130) = 0;
-                    *(int*)(MaterialManRaw() + 0x40) = fullTevBits;
+                    *(u32*)(MaterialManRaw() + 0x40) = *(u32*)(MaterialManRaw() + 0x48);
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                        &MaterialMan, ((EmissionModelView*)model)->m_data->m_materialSet, displayList->m_material, 0, 0);
+                        &MaterialMan, modelView->m_data->m_materialSet, displayList->m_material, 0, 0);
 
                     if (step->m_payload[10] == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
@@ -459,13 +459,13 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(int*)(MaterialManRaw() + 0x58) = 0;
                     *(int*)(MaterialManRaw() + 0x5C) = 0;
                     *(u8*)(MaterialManRaw() + 0x208) = 0;
-                    *(int*)(MaterialManRaw() + 0x48) = fullTevBits;
+                    *(u32*)(MaterialManRaw() + 0x48) |= 0x40000;
                     *(int*)(MaterialManRaw() + 0x128) = 0;
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
                     *(int*)(MaterialManRaw() + 0x130) = 0;
-                    *(int*)(MaterialManRaw() + 0x40) = fullTevBits;
+                    *(u32*)(MaterialManRaw() + 0x40) = *(u32*)(MaterialManRaw() + 0x48);
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                        &MaterialMan, ((EmissionModelView*)model)->m_data->m_materialSet, displayList->m_material, 0, 0);
+                        &MaterialMan, modelView->m_data->m_materialSet, displayList->m_material, 0, 0);
 
                     if (step->m_payload[10] == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);

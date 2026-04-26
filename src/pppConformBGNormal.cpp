@@ -188,8 +188,8 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 PSVECNormalize(&local_14c, &local_14c);
             } else {
                 local_140.y = kPppConformBgNormalZero;
-                local_140.z = kPppConformBgNormalZero;
                 local_140.x = kPppConformBgNormalOne;
+                local_140.z = kPppConformBgNormalZero;
                 PSVECCrossProduct(&local_158, &local_140, &local_14c);
                 PSVECNormalize(&local_14c, &local_14c);
                 PSVECCrossProduct(&local_14c, &local_158, &local_140);
@@ -217,15 +217,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
                     pppMngStPtr->m_matrix.value[1][3] = owner->m_worldPosition.y;
                     pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
-                } else if (((s8)((s32)((u32)(*(u8*)&owner->m_weaponNodeFlags & 2) << 30) >> 31) != 0) &&
-                    (owner->m_attachOwner != NULL)) {
-                    ownerY = owner->m_attachOwner->m_worldPosition.y;
-                    ownerZ = owner->m_worldPosition.z;
-                    ownerX = owner->m_worldPosition.x;
-                    pppMngStPtr->m_matrix.value[0][3] = ownerX;
-                    pppMngStPtr->m_matrix.value[1][3] = ownerY;
-                    pppMngStPtr->m_matrix.value[2][3] = ownerZ;
-                } else {
+                } else if (((*(u8*)&owner->m_weaponNodeFlags & 1) == 0) || (owner->m_attachOwner == NULL)) {
                     ownerY = owner->m_worldPosition.y;
                     ownerZ = owner->m_worldPosition.z;
                     ownerX = owner->m_worldPosition.x;
@@ -261,6 +253,13 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                         pppMngStPtr->m_matrix.value[1][3] = matrixY;
                         pppMngStPtr->m_matrix.value[2][3] = ownerZ;
                     }
+                } else {
+                    ownerY = owner->m_attachOwner->m_worldPosition.y;
+                    ownerZ = owner->m_worldPosition.z;
+                    ownerX = owner->m_worldPosition.x;
+                    pppMngStPtr->m_matrix.value[0][3] = ownerX;
+                    pppMngStPtr->m_matrix.value[1][3] = ownerY;
+                    pppMngStPtr->m_matrix.value[2][3] = ownerZ;
                 }
             } else if (mode == 1) {
                 if (hitFound != 0) {

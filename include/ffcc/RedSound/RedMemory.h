@@ -1,14 +1,6 @@
 #ifndef _FFCC_REDSOUND_REDMEMORY_H
 #define _FFCC_REDSOUND_REDMEMORY_H
 
-extern int gRedMemoryDebugEnabled;
-
-extern const char sRedMemoryLogPrefix[];
-extern const char sRedMemoryLogSuffixA[];
-extern const char sRedMemoryLogSuffixB[];
-extern const char s_redMemoryMainBankFullFmt[];
-extern const char s_redMemoryAuxBankFullFmt[];
-
 int RedNew(int);
 void RedDelete(int);
 void RedDelete(void*);
@@ -29,9 +21,6 @@ public:
 	int GetABufferAddress();
 	int GetABufferSize();
 	int* GetABankAddress();
-
-private:
-	int m_unused;
 };
 
 #endif // _FFCC_REDSOUND_REDMEMORY_H

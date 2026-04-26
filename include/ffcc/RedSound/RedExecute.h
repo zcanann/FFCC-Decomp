@@ -15,7 +15,7 @@ struct RedKeyOnDATA;
 u8 GetRandomData();
 int PitchCompute(int, int, int, int);
 void _ReverbNullCallback(AXFX_BUFFERUPDATE*, void*);
-void ReverbAreaAlloc(unsigned long);
+void* ReverbAreaAlloc(unsigned long);
 void ReverbAreaFree(void*);
 void InitReverb();
 void _SetReverbData(RedReverbDATA*, int*);

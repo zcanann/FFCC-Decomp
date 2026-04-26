@@ -6,8 +6,10 @@
 #include "ffcc/RedSound/RedExecute.h"
 #include "ffcc/RedSound/RedGlobals.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include "dolphin/ar.h"
 #include "dolphin/ax.h"
+#include "dolphin/axfx.h"
 #include "dolphin/os.h"
 
 // Global objects that need initialization
@@ -24,27 +26,6 @@ struct RedWaveHEAD {
 
 extern "C" {
     void __dl__FPv(void*);
-    void* RedNew__Fi(int);
-    void RedDelete__FPv(void*);
-    void* memcpy(void*, const void*, unsigned long);
-    void* memmove(void*, const void*, unsigned long);
-    void* memset(void*, int, unsigned long);
-    void SetMusicData__9CRedEntryFP12RedMusicHEAD(CRedEntry*, RedMusicHEAD*);
-    int SetSeSepData__9CRedEntryFP12RedSeSepHEAD(CRedEntry*, RedSeSepHEAD*);
-    void ClearSeSepData__9CRedEntryFi(CRedEntry*, int);
-    void ClearSeSepDataMG__9CRedEntryFiiii(void*, int, int, int, int);
-    int ReentrySeSepData__9CRedEntryFi(void*, int);
-    int ReentryMusicData__9CRedEntryFi(void*, int);
-    int SearchMusicSequence__9CRedEntryFi(void*, int);
-    int SearchSeSepSequence__9CRedEntryFi(void*, int);
-    int ReentryWaveData__9CRedEntryFi(void*, int);
-    void ClearWaveData__9CRedEntryFi(void*, int);
-    void ClearWaveDataM__9CRedEntryFiiii(void*, int, int, int, int);
-    void ClearWaveBank__9CRedEntryFi(void*, int);
-    void MusicStop__Fi(int);
-    void MusicPlay__Fiii(int, int, int);
-    void AXSetCompressor(int);
-    void AXFXSetHooks(void (*)(unsigned long), void (*)(void*));
     int __OSReadROM();
 }
 
@@ -68,131 +49,114 @@ struct RedDriverSyncState {
     OSSemaphore m_musicSemaphore;
 };
 
-struct RedSemaphoreThreadBlock {
-    OSSemaphore m_semaphore;
-    u32 m_padC;
-    u8 m_thread[0x318];
-
-    OSThread* Thread()
-    {
-        return reinterpret_cast<OSThread*>(m_thread);
-    }
-};
-
-struct RedWaveSettingThreadContext {
-    int slot;
-    int waveID;
-    void* waveData;
-    int waveSize;
-    u32 m_pad10;
-    u8 m_thread[0x318];
-
-    OSThread* Thread()
-    {
-        return reinterpret_cast<OSThread*>(m_thread);
-    }
-};
-
-struct RedDmaRequestThreadContext {
-    ARQRequest m_request;
-    u32 m_pad20;
-    u8 m_thread[0x318];
-
-    OSThread* Thread()
-    {
-        return reinterpret_cast<OSThread*>(m_thread);
-    }
-};
-
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
-int DAT_8032f3c4;
-int DAT_8032f3c0;
-int DAT_8032f3c8;
-int gRedMemoryDebugEnabled;
-int DAT_8032f400;
-int DAT_8032f414;
-int DAT_8032f404;
-int DAT_8032f410;
-int DAT_8032f40c;
-int gRedDriverStatus;
-int DAT_8032f484;
-int DAT_8032f434;
-int DAT_8032f430;
-int DAT_8032f424;
-int DAT_8032f440;
-int DAT_8032f43c;
-int DAT_8032f470;
-int DAT_8032f458;
-void* DAT_8032f3f0;
-void* DAT_8032f418;
-int DAT_8032f42c;
-int* DAT_8032f3cc;
-void* DAT_8032f3d0;
-int* DAT_8032f41c;
-int* volatile DAT_8032f420;
-void* DAT_8032f3d4;
-void* DAT_8032f3d8;
-void* DAT_8032f3dc;
-void* DAT_8032f3f4;
-int DAT_8032f3f8;
-void* DAT_8032f3fc;
-unsigned int* DAT_8032f444;
-void* DAT_8032f450;
-void* DAT_8032f474;
-int* DAT_8032f428;
-RedStreamDATA* p_Stream;
-void* DAT_8032f464;
-void* DAT_8032f45c;
-void* DAT_8032f46c;
-void* DAT_8032f454;
-int DAT_8032f460;
-
-int DAT_8032f488[2];
-int DAT_8032f448[2];
-int DAT_8032f478[2];
-int DAT_8032f3bc;
-int DAT_8032f3b8;
-void* DAT_8032f3e0[2];
-void* DAT_8032f3e8[2];
-u8 gRedDriverSyncBuffer[0x1F18];
-RedSemaphoreThreadBlock DAT_8032d778;
-OSSemaphore DAT_8032daa0;
-RedWaveSettingThreadContext DAT_8032daac;
-OSSemaphore DAT_8032ddd8;
-RedDmaRequestThreadContext DAT_8032dde4;
-OSSemaphore DAT_8032e120;
-void* DAT_8032e12c[4];
-CRedMemory DAT_8032f468;
-CRedEntry DAT_8032e154;
+static int m_RedMasterTime;
+static volatile int m_SequencialID;
+static volatile int m_ThreadControl;
+static volatile int m_ThreadExecute;
+static int m_SoundMode;
+static int* volatile p_Tick;
+void* volatile p_ZeroData;
+static void* volatile p_ExecCommand;
+static void* volatile p_ExecCommandNow;
+static void* volatile p_ExecCommandOld;
+static void* p_DmaControlNow[2];
+static void* p_DmaControlOld[2];
+void* volatile p_SoundControlBuffer;
+void* volatile p_SoundControl;
+volatile int m_KeyOnEntry;
+void* volatile p_KeyOnData;
+int m_SoundPlayMode;
+int m_SoundMasterControl;
+volatile int m_ReportPrint;
+int m_MusicFastSpeed;
+volatile int m_MusicSkipLine;
+int m_MusicKeySignature;
+void* volatile p_MusicReplayPoint;
+int* volatile p_MusicTempoControl;
+int* volatile p_MusicPitchControl;
+int m_MusicPhraseStop;
+static int* volatile p_MusicNextPlay;
+int m_CrossTime;
+volatile int m_MasterMusicVolume;
+volatile int m_MasterSEVolume;
+RedStreamDATA* volatile p_Stream;
+static int m_DMAMode;
+volatile int m_SeSkipStep;
+unsigned int* volatile p_VoiceData;
+int p_EditorVoice[2];
+void* p_EditorTrack;
+static void* volatile p_MainThreadStack;
+static int m_MainThreadTime;
+static void* volatile p_WaveSettingThreadStack;
+static int m_WaveSettingStatus;
+static void* volatile p_DmaExecuteThreadStack;
+static volatile int m_DMAStatus;
+void* volatile p_MusicSkipThreadStack;
+int m_MusicSkipComplete;
+void* volatile p_ReverbDepth;
+int m_Mute[2];
+static int m_DmaControl[0x700];
+static OSThread m_MainThread;
+static OSSemaphore m_MainSemaphore;
+static OSThread m_WaveSettingThread;
+static OSSemaphore m_WaveSettingSemaphore;
+static RedWaveSettingState m_WaveSettingData;
+static OSThread m_DmaExecuteThread;
+static OSSemaphore m_DmaExecuteSemaphore;
+static ARQRequest m_DMARequest;
+OSThread m_MusicSkipThread;
+OSSemaphore m_MusicSkipSemaphore;
+void* volatile p_SeBlockData[4];
+CRedMemory c_RedMemory;
+static volatile int m_DMAExecute;
+static volatile int m_DMAInThread;
+CRedEntry c_RedEntry;
 
 static inline RedDriverSyncState& RedDriverSync()
 {
-    return *reinterpret_cast<RedDriverSyncState*>(gRedDriverSyncBuffer);
+    return *reinterpret_cast<RedDriverSyncState*>(m_DmaControl);
 }
 
 static inline int* RedDriverMainDmaQueue()
 {
-    return RedDriverSync().m_dmaQueue;
+    return m_DmaControl;
 }
 
 static inline int* RedDriverStreamDmaQueue()
 {
-    return RedDriverSync().m_streamDmaQueue;
+    return m_DmaControl + 0x380;
 }
 
 static inline int* RedDriverStreamDmaQueueEnd()
 {
-    return reinterpret_cast<int*>(&RedDriverSync().m_mainThread);
+    return m_DmaControl + 0x700;
 }
 
 static inline OSThread& RedDriverMainThread()
 {
-    return RedDriverSync().m_mainThread;
+    return m_MainThread;
 }
 
-extern void ReverbAreaAlloc(unsigned long);
-extern void ReverbAreaFree(void*);
-extern void InitReverb();
+static const char s_redDriverDmaCheckHeaderFmt[] = "%s **** DMA CHECK PROCESS ****\n";
+static const char s_redDriverDmaCheckLogBlob[] =
+    "\x1B[7;34mSound\x1B[0m:"
+    "\0"
+    "%s Status = %d, Semaphore = %d, Execute = %d, In Thread = %d\n"
+    "\0"
+    "%s ID = %d, MMem = %8.8X, AMem = %8.8X, Size = %8.8X, Callback = %8.8X\n";
+static const char s_redDriverHeaderErrorBlob[] =
+    "%s%sMusic-Header was broken !!%s\n"
+    "\0"
+    "%s%sSE-Sep-Header was broken !!%s\n";
+static const char sRedDriverLogWarnColor[] = "\x1B[4;31m";
+static const char sRedDriverLogReset[8] = "\x1B[0m";
+
+enum {
+    RED_DRIVER_STATUS_FMT_OFFSET = 0x12,
+    RED_DRIVER_DMA_ENTRY_FMT_OFFSET = 0x50,
+    RED_DRIVER_SE_HEADER_ERROR_FMT_OFFSET = 0x22,
+};
 
 /*
  * --INFO--
@@ -203,20 +167,26 @@ extern void InitReverb();
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void _SetSoundMode(int* param_1)
 {
-    DAT_8032f3c8 = *param_1;
+    m_SoundMode = *param_1;
     if (*param_1 == 1) {
         OSGetSoundMode(0);
     } else {
         OSGetSoundMode(1);
     }
-    if ((DAT_8032f400 = DAT_8032f3c8) != 2) {
-        AXSetMode(0);
-    } else {
+    m_SoundPlayMode = m_SoundMode;
+    switch (m_SoundPlayMode) {
+    case 2:
         AXSetMode(2);
+        break;
+    default:
+        AXSetMode(0);
+        break;
     }
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -241,20 +211,21 @@ void _SetReverbDepth(int* param_1)
     if (reverbDepth != 0) {
         reverbDepth = (((reverbDepth + 1) * 0x100) - 1) * 0x1000;
     }
-    *(unsigned int*)((char*)DAT_8032f45c + (reverbIndex & 1) * 0xc) = reverbDepth;
+    *(unsigned int*)((char*)p_ReverbDepth + (reverbIndex & 1) * 0xc) = reverbDepth;
     if ((reverbIndex & 1) != 0) {
         fadeStep = (int)(fadeFrame * 0x60) / 0x3c;
         if (fadeStep == 0) {
-            fadeStep++;
+            fadeStep = 1;
         }
-        seInfo = *(int**)((char*)DAT_8032f3d8 + 0xdbc);
+        reverbDepth |= 0x800;
+        seInfo = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
         do {
             if (*seInfo != 0) {
-                seInfo[0x1b] = (int)((reverbDepth | 0x800) - (seInfo[0x1a] & 0xfffff000U)) / fadeStep;
+                seInfo[0x1b] = (int)(reverbDepth - (seInfo[0x1a] & 0xfffff000U)) / fadeStep;
                 seInfo[0x1c] = fadeStep;
             }
             seInfo += 0x55;
-        } while (seInfo < (int*)(*(int*)((char*)DAT_8032f3d8 + 0xdbc) + 0x2a80));
+        } while (seInfo < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
     }
 }
 
@@ -266,9 +237,8 @@ void _SetReverbDepth(int* param_1)
 #pragma optimization_level 0
 void _SetMusicData(int* param_1)
 {
-    SetMusicData__9CRedEntryFP12RedMusicHEAD(&DAT_8032e154, (RedMusicHEAD*)*param_1);
+    c_RedEntry.SetMusicData((RedMusicHEAD*)*param_1);
 }
-#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -277,12 +247,12 @@ void _SetMusicData(int* param_1)
  */
 void _MusicStop(int* param_1)
 {
-    MusicStop__Fi(*param_1);
-    if ((*param_1 == -1) || (DAT_8032f428[0] == *param_1)) {
-        DAT_8032f428[0] = -1;
+    MusicStop(*param_1);
+    if ((*param_1 == -1) || (p_MusicNextPlay[0] == *param_1)) {
+        p_MusicNextPlay[0] = -1;
     }
-    if (DAT_8032f428[0] < 0) {
-        DAT_8032f424 = 0;
+    if (p_MusicNextPlay[0] < 0) {
+        m_MusicPhraseStop = 0;
     }
 }
 
@@ -295,35 +265,33 @@ void _MusicStop(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void _MusicPlaySequence(int* param_1)
 {
     int iVar1;
     int srcBuffer;
 
-    srcBuffer = (int)DAT_8032f3f0;
+    srcBuffer = (int)p_SoundControlBuffer;
     if ((((*param_1 != *(int*)(srcBuffer + 0x470)) &&
           (*param_1 != *(int*)(srcBuffer + 0x904))) &&
          (*param_1 != *(int*)(srcBuffer + 0xd98))) &&
-        ((iVar1 = SearchMusicSequence__9CRedEntryFi(&DAT_8032e154, *param_1)), -1 < iVar1)) {
+        (c_RedEntry.SearchMusicSequence(*param_1) >= 0)) {
         iVar1 = param_1[2];
         if (*(int*)(srcBuffer + 0x470) != -1) {
             if (*(int*)(srcBuffer + 0x904) != -1) {
-                MusicStop__Fi(*(int*)(srcBuffer + 0x904));
+                MusicStop(*(int*)(srcBuffer + 0x904));
             }
             if (iVar1 == 0) {
-                iVar1 = *(int*)((int)DAT_8032f418 + *param_1 * 4);
-                *(int*)((int)DAT_8032f418 + *param_1 * 4) = 0;
+                iVar1 = *(int*)((int)p_MusicReplayPoint + *param_1 * 4);
+                *(int*)((int)p_MusicReplayPoint + *param_1 * 4) = 0;
             }
             if (iVar1 == 0) {
                 memcpy((void*)(srcBuffer + 0x494), (void*)srcBuffer, 0x494);
                 *(int*)(srcBuffer + 0x470) = -1;
             }
         }
-        MusicPlay__Fiii(*param_1, param_1[1], iVar1);
+        MusicPlay(*param_1, param_1[1], iVar1);
     }
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -340,46 +308,45 @@ void _MusicCrossPlaySequence(int* param_1)
     void* pvVar2;
     
     param_1[2] = param_1[2] * 200;
-    iVar1 = param_1[2] / 0x3c + (param_1[2] >> 0x1f);
-    param_1[2] = iVar1 - (iVar1 >> 0x1f);
+    param_1[2] = param_1[2] / 0x3c;
     if (param_1[2] == 0) {
         param_1[2] = param_1[2] + 1;
     }
-    pvVar2 = DAT_8032f3f0;
-    if ((*param_1 != *(int*)((int)DAT_8032f3f0 + 0x470)) &&
-       (*param_1 != *(int*)((int)DAT_8032f3f0 + 0xd98))) {
-        if (*param_1 == *(int*)((int)DAT_8032f3f0 + 0x904)) {
-            *(int*)((int)DAT_8032f3f0 + 0x458) = -*(int*)((int)DAT_8032f3f0 + 0x454) / param_1[2];
+    pvVar2 = p_SoundControlBuffer;
+    if ((*param_1 != *(int*)((int)p_SoundControlBuffer + 0x470)) &&
+       (*param_1 != *(int*)((int)p_SoundControlBuffer + 0xd98))) {
+        if (*param_1 == *(int*)((int)p_SoundControlBuffer + 0x904)) {
+            *(int*)((int)p_SoundControlBuffer + 0x458) = -*(int*)((int)p_SoundControlBuffer + 0x454) / param_1[2];
             *(int*)((int)pvVar2 + 0x45c) = param_1[2];
-            pvVar2 = DAT_8032f3f0;
-            *(int*)((int)DAT_8032f3f0 + 0x8ec) =
-                 (0x1ff800 - *(int*)((int)DAT_8032f3f0 + 0x8e8)) / param_1[2];
+            pvVar2 = p_SoundControlBuffer;
+            *(int*)((int)p_SoundControlBuffer + 0x8ec) =
+                 (0x1ff800 - *(int*)((int)p_SoundControlBuffer + 0x8e8)) / param_1[2];
             *(int*)((int)pvVar2 + 0x8f0) = param_1[2];
-            pvVar2 = RedNew__Fi(0x494);
-            memcpy(pvVar2, (void*)((int)DAT_8032f3f0 + 0x494), 0x494);
-            memcpy((void*)((int)DAT_8032f3f0 + 0x494), DAT_8032f3f0, 0x494);
-            memcpy(DAT_8032f3f0, pvVar2, 0x494);
-            RedDelete__FPv(pvVar2);
+            pvVar2 = (void*)RedNew(0x494);
+            memcpy(pvVar2, (void*)((int)p_SoundControlBuffer + 0x494), 0x494);
+            memcpy((void*)((int)p_SoundControlBuffer + 0x494), p_SoundControlBuffer, 0x494);
+            memcpy(p_SoundControlBuffer, pvVar2, 0x494);
+            RedDelete(pvVar2);
         }
         else {
-            iVar1 = SearchMusicSequence__9CRedEntryFi(&DAT_8032e154, *param_1);
-            if (-1 < iVar1) {
-                DAT_8032f42c = param_1[2];
+            iVar1 = c_RedEntry.SearchMusicSequence(*param_1);
+            if (iVar1 >= 0) {
+                m_CrossTime = param_1[2];
                 iVar1 = 0;
                 if (*(int*)((int)pvVar2 + 0x470) != -1) {
                     if (*(int*)((int)pvVar2 + 0x904) != -1) {
-                        MusicStop__Fi(*(int*)((int)pvVar2 + 0x904));
+                        MusicStop(*(int*)((int)pvVar2 + 0x904));
                     }
                     *(int*)((int)pvVar2 + 0x458) = -*(int*)((int)pvVar2 + 0x454) / param_1[2];
                     *(int*)((int)pvVar2 + 0x45c) = param_1[2];
-                    iVar1 = *(int*)((char*)DAT_8032f418 + *param_1 * 4);
-                    *(int*)((char*)DAT_8032f418 + *param_1 * 4) = 0;
+                    iVar1 = *(int*)((char*)p_MusicReplayPoint + *param_1 * 4);
+                    *(int*)((char*)p_MusicReplayPoint + *param_1 * 4) = 0;
                     if (iVar1 == 0) {
                         memcpy((void*)((int)pvVar2 + 0x494), pvVar2, 0x494);
                         *(int*)((int)pvVar2 + 0x470) = 0xffffffff;
                     }
                 }
-                MusicPlay__Fiii(*param_1, param_1[1], iVar1);
+                MusicPlay(*param_1, param_1[1], iVar1);
             }
         }
     }
@@ -392,15 +359,16 @@ void _MusicCrossPlaySequence(int* param_1)
  */
 void _MusicNextPlaySequence(int* param_1)
 {
-    int iVar1;
+    int srcBuffer;
 
-    if ((((*param_1 != *(int*)((int)DAT_8032f3f0 + 0x470)) &&
-          (*param_1 != *(int*)((int)DAT_8032f3f0 + 0x904))) &&
-         (*param_1 != *(int*)((int)DAT_8032f3f0 + 0xd98))) &&
-        ((iVar1 = SearchMusicSequence__9CRedEntryFi(&DAT_8032e154, *param_1)), -1 < iVar1)) {
-        DAT_8032f428[0] = *param_1;
-        DAT_8032f428[1] = param_1[1];
-        DAT_8032f428[2] = param_1[2];
+    srcBuffer = (int)p_SoundControlBuffer;
+    if ((((*param_1 != *(int*)(srcBuffer + 0x470)) &&
+          (*param_1 != *(int*)(srcBuffer + 0x904))) &&
+         (*param_1 != *(int*)(srcBuffer + 0xd98))) &&
+        (c_RedEntry.SearchMusicSequence(*param_1) >= 0)) {
+        p_MusicNextPlay[0] = *param_1;
+        p_MusicNextPlay[1] = param_1[1];
+        p_MusicNextPlay[2] = param_1[2];
     }
 }
 
@@ -413,15 +381,17 @@ void _MusicMasterVolume(int* param_1)
 {
     unsigned int* puVar1;
 
-    DAT_8032f430 = *param_1 & 0x7f;
-    puVar1 = DAT_8032f444;
-    if (DAT_8032f430 != 0) {
-        DAT_8032f430 = (DAT_8032f430 + 1) * 4 - 1;
+    m_MasterMusicVolume = *param_1 & 0x7f;
+    if (m_MasterMusicVolume != 0) {
+        m_MasterMusicVolume = m_MasterMusicVolume + 1;
+        m_MasterMusicVolume = m_MasterMusicVolume * 4;
+        m_MasterMusicVolume = m_MasterMusicVolume - 1;
     }
+    puVar1 = p_VoiceData;
     do {
         puVar1[0x2e] = puVar1[0x2e] | 2;
         puVar1 += 0x30;
-    } while (puVar1 < DAT_8032f444 + 0xc00);
+    } while (puVar1 < p_VoiceData + 0xc00);
 }
 
 /*
@@ -432,8 +402,8 @@ void _MusicMasterVolume(int* param_1)
 void _MusicVolume(int* param_1)
 {
     if (param_1[3] == 1) {
-        DAT_8032f428[0] = -1;
-        DAT_8032f424 = 0;
+        p_MusicNextPlay[0] = -1;
+        m_MusicPhraseStop = 0;
     }
     SetMusicVolume(param_1[0], param_1[1], param_1[2], param_1[3]);
 }
@@ -445,7 +415,7 @@ void _MusicVolume(int* param_1)
  */
 void _SetMusicPhraseStop(int* param_1)
 {
-    DAT_8032f424 = *param_1;
+    m_MusicPhraseStop = *param_1;
 }
 
 /*
@@ -458,9 +428,9 @@ void _SetSeBlockData(int* param_1)
     u32 index = (u32)*param_1 & 3;
     char* seBlockData;
 
-    if (DAT_8032e12c[index] != 0) {
-        RedDelete__FPv(DAT_8032e12c[index]);
-        DAT_8032e12c[index] = 0;
+    if (p_SeBlockData[index] != 0) {
+        RedDelete(p_SeBlockData[index]);
+        p_SeBlockData[index] = 0;
     }
 
     if (param_1[1] != 0) {
@@ -468,9 +438,9 @@ void _SetSeBlockData(int* param_1)
         if ((*seBlockData = 'S') && (seBlockData[1] = 'e') && (seBlockData[2] = 'B') &&
             (seBlockData[3] = 'l') && (seBlockData[4] = 'o') && (seBlockData[5] = 'c') &&
             (seBlockData[6] = 'k')) {
-            DAT_8032e12c[index] = seBlockData;
+            p_SeBlockData[index] = seBlockData;
         } else {
-            RedDelete__FPv(seBlockData);
+            RedDelete(seBlockData);
         }
     }
 }
@@ -482,7 +452,7 @@ void _SetSeBlockData(int* param_1)
  */
 void _SetSeSepData(int* param_1)
 {
-    SetSeSepData__9CRedEntryFP12RedSeSepHEAD(&DAT_8032e154, (RedSeSepHEAD*)*param_1);
+    c_RedEntry.SetSeSepData((RedSeSepHEAD*)*param_1);
 }
 
 /*
@@ -492,7 +462,7 @@ void _SetSeSepData(int* param_1)
  */
 void _ClearSeSepData(int* param_1)
 {
-    ClearSeSepData__9CRedEntryFi(&DAT_8032e154, *param_1);
+    c_RedEntry.ClearSeSepData(*param_1);
 }
 
 /*
@@ -502,7 +472,7 @@ void _ClearSeSepData(int* param_1)
  */
 void _ClearSeSepDataMG(int* param_1)
 {
-    ClearSeSepDataMG__9CRedEntryFiiii(&DAT_8032e154, param_1[0], param_1[1], param_1[2], param_1[3]);
+    c_RedEntry.ClearSeSepDataMG(param_1[0], param_1[1], param_1[2], param_1[3]);
 }
 
 /*
@@ -532,7 +502,7 @@ void _SeStopMG(int* param_1)
  */
 void _SeBlockPlay(int* param_1)
 {
-    DAT_8032f440 = param_1[5];
+    m_SeSkipStep = param_1[5];
     SeBlockPlay(param_1[0], param_1[1], param_1[2], param_1[3], param_1[4]);
 }
 
@@ -545,9 +515,9 @@ void _SeSepPlay(int* param_1)
 {
     int iVar1;
 
-    iVar1 = SetSeSepData__9CRedEntryFP12RedSeSepHEAD(&DAT_8032e154, (RedSeSepHEAD*)param_1[1]);
+    iVar1 = c_RedEntry.SetSeSepData((RedSeSepHEAD*)param_1[1]);
     if (iVar1 != 0) {
-        DAT_8032f440 = param_1[4];
+        m_SeSkipStep = param_1[4];
         SeSepPlay(param_1[0], *(int*)(iVar1 + 8), param_1[2], param_1[3]);
     }
 }
@@ -557,16 +527,18 @@ void _SeSepPlay(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 4
 void _SeSepPlaySequence(int* param_1)
 {
     int iVar1;
 
-    iVar1 = SearchSeSepSequence__9CRedEntryFi(&DAT_8032e154, param_1[1]);
+    iVar1 = c_RedEntry.SearchSeSepSequence(param_1[1]);
     if (iVar1 >= 0) {
-        DAT_8032f440 = param_1[4];
+        m_SeSkipStep = param_1[4];
         SeSepPlay(param_1[0], param_1[1], param_1[2], param_1[3]);
     }
 }
+#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -577,15 +549,17 @@ void _SeMasterVolume(int* param_1)
 {
     unsigned int* puVar1;
 
-    DAT_8032f434 = *param_1 & 0x7f;
-    puVar1 = DAT_8032f444;
-    if (DAT_8032f434 != 0) {
-        DAT_8032f434 = (DAT_8032f434 + 1) * 4 - 1;
+    m_MasterSEVolume = *param_1 & 0x7f;
+    if (m_MasterSEVolume != 0) {
+        m_MasterSEVolume = m_MasterSEVolume + 1;
+        m_MasterSEVolume = m_MasterSEVolume * 4;
+        m_MasterSEVolume = m_MasterSEVolume - 1;
     }
+    puVar1 = p_VoiceData;
     do {
         puVar1[0x2e] = puVar1[0x2e] | 2;
         puVar1 += 0x30;
-    } while (puVar1 < DAT_8032f444 + 0xc00);
+    } while (puVar1 < p_VoiceData + 0xc00);
 }
 
 /*
@@ -683,6 +657,7 @@ void _StreamPause(int* param_1)
 {
 	StreamPause(param_1[0], param_1[1]);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -693,8 +668,7 @@ void _StreamPause(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
-void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int param_4, int param_5,
+int* _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int param_4, int param_5,
                        int param_6, int param_7, int param_8)
 {
     unsigned int interruptLevel;
@@ -702,7 +676,7 @@ void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
     int* nextPos;
 
     interruptLevel = OSDisableInterrupts();
-    writePos = (int*)DAT_8032f3d8;
+    writePos = (int*)p_ExecCommandNow;
     writePos[0] = (int)param_1;
     writePos[1] = param_2;
     writePos[2] = param_3;
@@ -712,13 +686,13 @@ void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
     writePos[6] = param_7;
     writePos[7] = param_8;
     nextPos = writePos + 8;
-    if (nextPos == (int*)DAT_8032f3d4 + 0x800) {
-        nextPos = (int*)DAT_8032f3d4;
+    if (nextPos == (int*)p_ExecCommand + 0x800) {
+        nextPos = (int*)p_ExecCommand;
     }
-    DAT_8032f3d8 = nextPos;
+    p_ExecCommandNow = nextPos;
     OSRestoreInterrupts(interruptLevel);
+    return nextPos;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -729,25 +703,26 @@ void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void _ExecuteCommand()
 {
-	unsigned int* executePos = (unsigned int*)DAT_8032f3d8;
-	unsigned int* readPos = (unsigned int*)DAT_8032f3dc;
+	volatile unsigned int* readPos;
+	volatile unsigned int* executePos;
+
+	executePos = (volatile unsigned int*)p_ExecCommandNow;
+	readPos = (volatile unsigned int*)p_ExecCommandOld;
 
 	while (executePos != readPos) {
 		if (*readPos != 0) {
 			((void (*)(int*))(*readPos))((int*)(readPos + 1));
 		}
 		readPos += 8;
-		if (readPos == (unsigned int*)DAT_8032f3d4 + 0x800) {
-			readPos = (unsigned int*)DAT_8032f3d4;
+		if (readPos == (volatile unsigned int*)p_ExecCommand + 0x800) {
+			readPos = (volatile unsigned int*)p_ExecCommand;
 		}
 	}
 
-	DAT_8032f3dc = readPos;
+	p_ExecCommandOld = (void*)readPos;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -758,6 +733,7 @@ void _ExecuteCommand()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 unsigned int DeltaTimeSumup(unsigned char** buffer)
 {
 	unsigned int deltaTime = 0;
@@ -774,22 +750,22 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
 
 	return deltaTime;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma dont_inline on
 unsigned int GetMyEntryID()
 {
-    DAT_8032f3bc = (DAT_8032f3bc + 1) & 0x7fffffff;
-    if (DAT_8032f3bc == 0) {
-        DAT_8032f3bc = 1;
+    m_SequencialID++;
+    m_SequencialID &= 0x7fffffff;
+    if (m_SequencialID == 0) {
+        m_SequencialID++;
     }
-    return DAT_8032f3bc;
+    return m_SequencialID;
 }
-#pragma dont_inline reset
 
 struct RedSleepAlarm {
     OSAlarm alarm;
@@ -805,10 +781,12 @@ struct RedSleepAlarm {
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void _MyAlarmHandler(OSAlarm* param_1, OSContext*)
 {
     OSResumeThread(((RedSleepAlarm*)param_1)->thread);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -819,7 +797,6 @@ void _MyAlarmHandler(OSAlarm* param_1, OSContext*)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void RedSleep(int param_1)
 {
     unsigned int interruptLevel;
@@ -837,7 +814,6 @@ void RedSleep(int param_1)
     OSSuspendThread(currentThread);
     OSRestoreInterrupts(interruptLevel);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -851,38 +827,38 @@ int _MainThread(void*)
     int iVar3;
     unsigned int uVar4;
 
-    DAT_8032f3c4 = DAT_8032f3c4 | 1;
-    while (DAT_8032f3c0 != 0) {
-        OSWaitSemaphore(&DAT_8032d778.m_semaphore);
-        if (DAT_8032f3c0 != 0) {
+    m_ThreadExecute = m_ThreadExecute | 1;
+    while (m_ThreadControl != 0) {
+        OSWaitSemaphore(&m_MainSemaphore);
+        if (m_ThreadControl != 0) {
             iVar2 = OSGetTick();
-            iVar1 = (int)DAT_8032f3f0;
-            iVar3 = DAT_8032f3b8;
-            uVar4 = (unsigned int)(DAT_8032f3b8 - DAT_8032f458);
+            iVar1 = (int)p_SoundControlBuffer;
+            iVar3 = m_RedMasterTime;
+            uVar4 = (unsigned int)(m_RedMasterTime - m_MainThreadTime);
             if (*(short*)(iVar1 + 0x48e) != 0) {
                 *(unsigned int*)(iVar1 + 0x478) = *(unsigned int*)(iVar1 + 0x478) + uVar4;
             }
-            DAT_8032f458 = iVar3;
+            m_MainThreadTime = iVar3;
             if (4 < uVar4) {
                 uVar4 = 4;
             }
             MainControl(uVar4);
             StreamControl();
             _ExecuteCommand();
-            if ((-1 < DAT_8032f428[0]) && (*(int*)(iVar1 + 0x470) < 0)) {
-                _MusicPlaySequence(DAT_8032f428);
-                DAT_8032f428[0] = -1;
-                DAT_8032f424 = 0;
+            if ((-1 < p_MusicNextPlay[0]) && (*(int*)(iVar1 + 0x470) < 0)) {
+                _MusicPlaySequence(p_MusicNextPlay);
+                p_MusicNextPlay[0] = -1;
+                m_MusicPhraseStop = 0;
             }
             do {
-                iVar3 = OSTryWaitSemaphore(&DAT_8032d778.m_semaphore);
+                iVar3 = OSTryWaitSemaphore(&m_MainSemaphore);
             } while (0 < iVar3);
-            memmove((int*)DAT_8032f3cc + 1, DAT_8032f3cc, 0x18c);
+            memmove((int*)p_Tick + 1, p_Tick, 0x18c);
             iVar3 = OSGetTick();
-            *(int*)DAT_8032f3cc = iVar3 - iVar2;
+            *(int*)p_Tick = iVar3 - iVar2;
         }
     }
-    DAT_8032f3c4 = DAT_8032f3c4 & ~1;
+    m_ThreadExecute = m_ThreadExecute & ~1;
     return 0;
 }
 
@@ -901,21 +877,21 @@ int _WaveSettingThread(void* param_1)
     RedWaveSettingState* waveSetting;
 
     waveSetting = (RedWaveSettingState*)param_1;
-    DAT_8032f3c4 = DAT_8032f3c4 | 4;
-    DAT_8032f460 = 0;
-    while (DAT_8032f3c0 != 0) {
-        OSWaitSemaphore(&DAT_8032daa0);
-        if (DAT_8032f3c0 != 0) {
-            DAT_8032f460 = DAT_8032f460 + 1;
-            DAT_8032e154.SetWaveData(waveSetting->waveID, waveSetting->waveData, waveSetting->waveSize);
+    m_ThreadExecute = m_ThreadExecute | 4;
+    m_WaveSettingStatus = 0;
+    while (m_ThreadControl != 0) {
+        OSWaitSemaphore(&m_WaveSettingSemaphore);
+        if (m_ThreadControl != 0) {
+            m_WaveSettingStatus = m_WaveSettingStatus + 1;
+            c_RedEntry.SetWaveData(waveSetting->waveID, waveSetting->waveData, waveSetting->waveSize);
             *(int*)waveSetting->slot = 0;
             do {
-                threadResult = OSTryWaitSemaphore(&DAT_8032daa0);
+                threadResult = OSTryWaitSemaphore(&m_WaveSettingSemaphore);
             } while (0 < threadResult);
-            DAT_8032f460 = 0;
+            m_WaveSettingStatus = 0;
         }
     }
-    DAT_8032f3c4 = DAT_8032f3c4 & ~4;
+    m_ThreadExecute = m_ThreadExecute & ~4;
     return 0;
 }
 
@@ -928,34 +904,33 @@ int _WaveSettingThread(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void _DMACheckProcess()
 {
     int semCount;
     int* dmaInfo;
 
-    if (gRedMemoryDebugEnabled != 0) {
-        OSReport("[%s]------DMA_CHECK_PROCESS------\n", "RedDriver");
-        fflush(&DAT_8021d1a8);
+    if (m_ReportPrint != 0) {
+        OSReport(s_redDriverDmaCheckHeaderFmt, s_redDriverDmaCheckLogBlob);
+        fflush(__files + 1);
 
-        semCount = OSGetSemaphoreCount(&DAT_8032ddd8);
-        OSReport("[%s]Status = %d Semaphore = %d Entry = %d/%d\n", "RedDriver", gRedDriverStatus, semCount, DAT_8032f484,
-                 DAT_8032f488[0]);
-        fflush(&DAT_8021d1a8);
+        semCount = OSGetSemaphoreCount(&m_DmaExecuteSemaphore);
+        OSReport(s_redDriverDmaCheckLogBlob + RED_DRIVER_STATUS_FMT_OFFSET, s_redDriverDmaCheckLogBlob, m_DMAStatus,
+                 semCount, m_DMAExecute, m_DMAInThread);
+        fflush(__files + 1);
     }
 
     dmaInfo = RedDriverMainDmaQueue();
     do {
-        if ((*dmaInfo != 0) && (gRedMemoryDebugEnabled != 0)) {
-            OSReport("[%s]ID = %d MMem = %8.8X AMem = %8.8X Size = %d %d\n", "RedDriver", dmaInfo[0], dmaInfo[2], dmaInfo[3], dmaInfo[4], dmaInfo[5]);
-            fflush(&DAT_8021d1a8);
+        if ((*dmaInfo != 0) && (m_ReportPrint != 0)) {
+            OSReport(s_redDriverDmaCheckLogBlob + RED_DRIVER_DMA_ENTRY_FMT_OFFSET, s_redDriverDmaCheckLogBlob,
+                     dmaInfo[0], dmaInfo[2], dmaInfo[3], dmaInfo[4], dmaInfo[5]);
+            fflush(__files + 1);
         }
         dmaInfo += 7;
     } while (dmaInfo < RedDriverStreamDmaQueueEnd());
 
-    fflush(&DAT_8021d1a8);
+    fflush(__files + 1);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -968,7 +943,7 @@ void _DMACheckProcess()
  */
 void _DmaCallback(unsigned long)
 {
-    gRedDriverStatus = 0;
+    m_DMAStatus = 0;
 }
 
 /*
@@ -994,16 +969,16 @@ int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5,
 
     interrupt = OSDisableInterrupts();
     if ((param_1 & 0xffff7fff) != 0) {
-        queuePtr = (int**)&DAT_8032f3e0[0];
+        queuePtr = (int**)&p_DmaControlNow[0];
         queueBase = RedDriverMainDmaQueue();
     } else {
         queueBase = RedDriverStreamDmaQueue();
-        queuePtr = (int**)&DAT_8032f3e0[1];
+        queuePtr = (int**)&p_DmaControlNow[1];
     }
     queueEntry = *queuePtr;
     entryID = GetMyEntryID();
     size = (unsigned int)(param_5 + 0x1f) & 0xffffffe0;
-    if ((DAT_8032f43c != 0) || ((param_1 & 0x8000) != 0)) {
+    if ((m_DMAMode != 0) || ((param_1 & 0x8000) != 0)) {
         queueEnd = queueBase + 0x380;
         do {
             chunkSize = size;
@@ -1045,7 +1020,7 @@ int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5,
         }
         *queuePtr = nextEntry;
     }
-    OSSignalSemaphore(&DAT_8032ddd8);
+    OSSignalSemaphore(&m_DmaExecuteSemaphore);
     OSRestoreInterrupts(interrupt);
     return entryID;
 }
@@ -1101,53 +1076,55 @@ void _DmaExecute()
     int* piVar7;
     int* piVar8;
 
-    while ((DAT_8032f3e0[0] != DAT_8032f3e8[0]) || (DAT_8032f3e0[1] != DAT_8032f3e8[1])) {
-        DAT_8032f488[0] = 1;
-        if (DAT_8032f3e0[0] == DAT_8032f3e8[0]) {
-            ppiVar5 = (int**)&DAT_8032f3e8[1];
-            piVar4 = RedDriverStreamDmaQueue();
-        } else {
-            ppiVar5 = (int**)&DAT_8032f3e8[0];
-            piVar4 = RedDriverMainDmaQueue();
-        }
-        piVar7 = *ppiVar5;
-        DAT_8032f488[0] = 2;
-        piVar6 = 0;
-        if (*piVar7 != 0) {
-            gRedDriverStatus = 1;
-            if (piVar7[1] == 0) {
-                DCFlushRange((void*)piVar7[2], (u32)piVar7[4]);
-                iVar3 = piVar7[2];
-                iVar2 = piVar7[3];
-            } else {
-                DCInvalidateRange((void*)piVar7[2], (u32)piVar7[4]);
-                iVar3 = piVar7[3];
-                iVar2 = piVar7[2];
+    do {
+        do {
+            if ((p_DmaControlNow[0] == p_DmaControlOld[0]) && (p_DmaControlNow[1] == p_DmaControlOld[1])) {
+                m_DMAInThread = 0;
+                return;
             }
-            DAT_8032f488[0] = 3;
-            ARQSetChunkSize((u32)piVar7[4]);
-            ARQPostRequest(&DAT_8032dde4.m_request, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
-                           (u32)piVar7[4], _DmaCallback);
-            piVar6 = piVar7;
-            DAT_8032f488[0] = 4;
-        }
-        piVar8 = piVar7 + 7;
-        DAT_8032f488[0] = 5;
-        if (piVar4 + 0x380 <= piVar7 + 7) {
-            piVar8 = piVar4;
-        }
-        *ppiVar5 = piVar8;
-        DAT_8032f488[0] = 6;
+            if (p_DmaControlNow[0] == p_DmaControlOld[0]) {
+                ppiVar5 = (int**)&p_DmaControlOld[1];
+                piVar4 = RedDriverStreamDmaQueue();
+            } else {
+                ppiVar5 = (int**)&p_DmaControlOld[0];
+                piVar4 = RedDriverMainDmaQueue();
+            }
+            piVar7 = *ppiVar5;
+            m_DMAInThread = 2;
+            piVar6 = 0;
+            if (*piVar7 != 0) {
+                m_DMAStatus = 1;
+                if (piVar7[1] == 0) {
+                    DCFlushRange((void*)piVar7[2], (u32)piVar7[4]);
+                    iVar3 = piVar7[2];
+                    iVar2 = piVar7[3];
+                } else {
+                    DCInvalidateRange((void*)piVar7[2], (u32)piVar7[4]);
+                    iVar3 = piVar7[3];
+                    iVar2 = piVar7[2];
+                }
+                m_DMAInThread = 3;
+                ARQSetChunkSize((u32)piVar7[4]);
+                ARQPostRequest(&m_DMARequest, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
+                               (u32)piVar7[4], _DmaCallback);
+                piVar6 = piVar7;
+            }
+            piVar8 = piVar7 + 7;
+            if (piVar4 + 0x380 <= piVar7 + 7) {
+                piVar8 = piVar4;
+            }
+            *ppiVar5 = piVar8;
+        } while (piVar6 == 0);
         while (piVar6 != 0) {
-            DAT_8032f488[0] = 7;
-            if (gRedDriverStatus == 0) {
-                DAT_8032f488[0] = 8;
+            m_DMAInThread = 7;
+            if (m_DMAStatus == 0) {
+                m_DMAInThread = 8;
                 if (piVar6[5] != 0) {
                     uVar1 = OSDisableInterrupts();
                     ((void (*)(void*))piVar6[5])((void*)piVar6[6]);
                     OSRestoreInterrupts(uVar1);
                 }
-                DAT_8032f488[0] = 9;
+                m_DMAInThread = 9;
                 if (piVar6[1] == 1) {
                     DCFlushRange((void*)piVar6[2], (u32)piVar6[4]);
                 }
@@ -1156,8 +1133,7 @@ void _DmaExecute()
             }
             RedSleep(0);
         }
-    }
-    DAT_8032f488[0] = 0;
+    } while (true);
 }
 
 /*
@@ -1171,18 +1147,18 @@ void _DmaExecute()
  */
 int _DmaExecuteThread(void*)
 {
-    DAT_8032f3c4 |= 2;
-    DAT_8032f484 = 0;
-    DAT_8032f488[0] = 0;
-    while (DAT_8032f3c0 != 0) {
-        OSWaitSemaphore(&DAT_8032ddd8);
-        DAT_8032f484 = 1;
-        if (DAT_8032f3c0 != 0) {
+    m_ThreadExecute |= 2;
+    m_DMAExecute = 0;
+    m_DMAInThread = 0;
+    while (m_ThreadControl != 0) {
+        OSWaitSemaphore(&m_DmaExecuteSemaphore);
+        m_DMAExecute = 1;
+        if (m_ThreadControl != 0) {
             _DmaExecute();
-            DAT_8032f484 = 0;
+            m_DMAExecute = 0;
         }
     }
-    DAT_8032f3c4 &= ~2;
+    m_ThreadExecute &= ~2;
     return 0;
 }
 
@@ -1197,17 +1173,17 @@ int _DmaExecuteThread(void*)
  */
 int _MusicSkipThread(void*)
 {
-    DAT_8032f3c4 |= 8;
-    DAT_8032f470 = 0;
-    while (DAT_8032f3c0 != 0) {
-        OSWaitSemaphore(&DAT_8032e120);
-        if (DAT_8032f3c0 != 0) {
+    m_ThreadExecute |= 8;
+    m_MusicSkipComplete = 0;
+    while (m_ThreadControl != 0) {
+        OSWaitSemaphore(&m_MusicSkipSemaphore);
+        if (m_ThreadControl != 0) {
             MusicSkipFunction();
         }
-        while (OSTryWaitSemaphore(&DAT_8032e120) > 0) {
+        while (OSTryWaitSemaphore(&m_MusicSkipSemaphore) > 0) {
         }
     }
-    DAT_8032f3c4 &= ~8;
+    m_ThreadExecute &= ~8;
     return 0;
 }
 
@@ -1218,9 +1194,9 @@ int _MusicSkipThread(void*)
  */
 void _RedAXCallback()
 {
-    DAT_8032f3b8 = DAT_8032f3b8 + 1;
+    m_RedMasterTime = m_RedMasterTime + 1;
     EnvelopeKeyExecute();
-    OSSignalSemaphore(&DAT_8032d778.m_semaphore);
+    OSSignalSemaphore(&m_MainSemaphore);
 }
 
 /*
@@ -1270,125 +1246,125 @@ void CRedDriver::Init()
     int iVar6;
     void* uVar3;
 
-    DAT_8032f3c4 = 0;
-    DAT_8032f3c0 = 1;
-    gRedMemoryDebugEnabled = 1;
-    DAT_8032f3c8 = 0;
+    m_ThreadExecute = 0;
+    m_ThreadControl = 1;
+    m_ReportPrint = 1;
+    m_SoundMode = 0;
     GetSoundMode();
-    if (DAT_8032f400 == 2) {
+    if (m_SoundPlayMode == 2) {
         AXSetMode(2);
     } else {
         AXSetMode(0);
     }
-    DAT_8032f3cc = (int*)RedNew__Fi(400);
-    memset(DAT_8032f3cc, 0, 400);
+    p_Tick = (int*)RedNew(400);
+    memset(p_Tick, 0, 400);
     AXSetCompressor(0);
-    DAT_8032f414 = 0;
-    DAT_8032f404 = 0;
-    DAT_8032f410 = 0;
-    DAT_8032f40c = 0;
-    gRedDriverStatus = 0;
-    DAT_8032f42c = 0;
-    DAT_8032f434 = 0x1ff;
-    DAT_8032f430 = 0x1ff;
+    m_MusicKeySignature = 0;
+    m_SoundMasterControl = 0;
+    m_MusicSkipLine = 0;
+    m_MusicFastSpeed = 0;
+    m_DMAStatus = 0;
+    m_CrossTime = 0;
+    m_MasterSEVolume = 0x1ff;
+    m_MasterMusicVolume = 0x1ff;
     iVar6 = 0;
     do {
         iVar5 = iVar6 + 1;
-        DAT_8032e12c[iVar6] = 0;
+        p_SeBlockData[iVar6] = 0;
         iVar6 = iVar5;
     } while (iVar5 < 4);
-    DAT_8032f3d0 = RedNew__Fi(0x1000);
-    memset(DAT_8032f3d0, 0, 0x1000);
-    DAT_8032f418 = RedNew__Fi(0x400);
-    memset(DAT_8032f418, 0, 0x400);
-    DAT_8032f41c = (int*)RedNew__Fi(0xc);
-    memset(DAT_8032f41c, 0, 0xc);
-    DAT_8032f420 = (int*)RedNew__Fi(0xc);
-    memset(DAT_8032f420, 0, 0xc);
-    DAT_8032f3d4 = RedNew__Fi(0x2000);
-    DAT_8032f3d8 = DAT_8032f3d4;
-    DAT_8032f3dc = DAT_8032f3d4;
-    memset(DAT_8032f3d4, 0, 0x2000);
-    DAT_8032f3f0 = RedNew__Fi(0x1250);
-    DAT_8032f3f4 = DAT_8032f3f0;
-    memset(DAT_8032f3f0, 0, 0x1250);
-    *(int*)((char*)DAT_8032f3f4 + 0xdd8) = 0x1ff000;
-    *(int*)((char*)DAT_8032f3f4 + 0x944) = 0x1ff000;
-    *(int*)((char*)DAT_8032f3f4 + 0x4b0) = 0x1ff000;
-    *(int*)((char*)DAT_8032f3f4 + 0x1c) = 0x1ff000;
-    *(int*)((char*)DAT_8032f3f4 + 0x1210) = 0x1ff000;
-    *(int*)((char*)DAT_8032f3f4 + 0xd7c) = 0x1ff000;
-    *(int*)((char*)DAT_8032f3f4 + 0x8e8) = 0x1ff000;
-    *(int*)((char*)DAT_8032f3f4 + 0x454) = 0x1ff000;
-    *(int*)((char*)DAT_8032f3f4 + 0xd98) = -1;
-    *(int*)((char*)DAT_8032f3f4 + 0x904) = -1;
-    *(int*)((char*)DAT_8032f3f4 + 0x470) = -1;
-    DAT_8032f3fc = RedNew__Fi(0x600);
-    memset(DAT_8032f3fc, 0, 0x600);
-    DAT_8032f444 = (unsigned int*)RedNew__Fi(0x3000);
-    memset(DAT_8032f444, 0, 0x3000);
+    p_ZeroData = (void*)RedNew(0x1000);
+    memset(p_ZeroData, 0, 0x1000);
+    p_MusicReplayPoint = (void*)RedNew(0x400);
+    memset(p_MusicReplayPoint, 0, 0x400);
+    p_MusicTempoControl = (int*)RedNew(0xc);
+    memset(p_MusicTempoControl, 0, 0xc);
+    p_MusicPitchControl = (int*)RedNew(0xc);
+    memset(p_MusicPitchControl, 0, 0xc);
+    p_ExecCommand = (void*)RedNew(0x2000);
+    p_ExecCommandNow = p_ExecCommand;
+    p_ExecCommandOld = p_ExecCommand;
+    memset(p_ExecCommand, 0, 0x2000);
+    p_SoundControlBuffer = (void*)RedNew(0x1250);
+    p_SoundControl = p_SoundControlBuffer;
+    memset(p_SoundControlBuffer, 0, 0x1250);
+    *(int*)((char*)p_SoundControl + 0xdd8) = 0x1ff000;
+    *(int*)((char*)p_SoundControl + 0x944) = 0x1ff000;
+    *(int*)((char*)p_SoundControl + 0x4b0) = 0x1ff000;
+    *(int*)((char*)p_SoundControl + 0x1c) = 0x1ff000;
+    *(int*)((char*)p_SoundControl + 0x1210) = 0x1ff000;
+    *(int*)((char*)p_SoundControl + 0xd7c) = 0x1ff000;
+    *(int*)((char*)p_SoundControl + 0x8e8) = 0x1ff000;
+    *(int*)((char*)p_SoundControl + 0x454) = 0x1ff000;
+    *(int*)((char*)p_SoundControl + 0xd98) = -1;
+    *(int*)((char*)p_SoundControl + 0x904) = -1;
+    *(int*)((char*)p_SoundControl + 0x470) = -1;
+    p_KeyOnData = (void*)RedNew(0x600);
+    memset(p_KeyOnData, 0, 0x600);
+    p_VoiceData = (unsigned int*)RedNew(0x3000);
+    memset(p_VoiceData, 0, 0x3000);
     iVar6 = 0;
     do {
         iVar2 = iVar6 * 0xc0;
         iVar5 = iVar6 * 0x8000000;
         iVar4 = iVar6 >> 0x1f;
         iVar6 = iVar6 + 1;
-        *(unsigned int*)((char*)DAT_8032f444 + iVar2 + 0xa8) =
+        *(unsigned int*)((char*)p_VoiceData + iVar2 + 0xa8) =
             (iVar4 * 0x20 | (unsigned int)(iVar5 + iVar4) >> 0x1b) - iVar4;
     } while (iVar6 < 0x40);
-    DAT_8032f448[1] = 0;
-    DAT_8032f448[0] = 0;
-    uVar3 = RedNew__Fi(0x2a80);
-    *(void**)((char*)DAT_8032f3f0 + 0xdbc) = uVar3;
-    memset(*(void**)((char*)DAT_8032f3f0 + 0xdbc), 0, 0x2a80);
+    p_EditorVoice[1] = 0;
+    p_EditorVoice[0] = 0;
+    uVar3 = (void*)RedNew(0x2a80);
+    *(void**)((char*)p_SoundControlBuffer + 0xdbc) = uVar3;
+    memset(*(void**)((char*)p_SoundControlBuffer + 0xdbc), 0, 0x2a80);
     iVar5 = 0;
-    iVar6 = (int)*(void**)((char*)DAT_8032f3f0 + 0xdbc);
+    iVar6 = (int)*(void**)((char*)p_SoundControlBuffer + 0xdbc);
     do {
         iVar4 = iVar5 * 0x154;
         cVar1 = (char)iVar5;
         iVar5 = iVar5 + 1;
         *(char*)(iVar6 + iVar4 + 0x14e) = (char)(cVar1 + ' ');
     } while (iVar5 < 0x20);
-    DAT_8032f450 = RedNew__Fi(0x154);
-    memset(DAT_8032f450, 0, 0x154);
-    DAT_8032f474 = RedNew__Fi(0x18);
-    memset(DAT_8032f474, 0, 0x18);
-    DAT_8032f478[1] = 0;
-    DAT_8032f478[0] = 0;
-    DAT_8032f428 = (int*)RedNew__Fi(0x10);
-    DAT_8032f428[0] = -1;
-    DAT_8032f424 = 0;
-    p_Stream = (RedStreamDATA*)RedNew__Fi(0x4c0);
+    p_EditorTrack = (void*)RedNew(0x154);
+    memset(p_EditorTrack, 0, 0x154);
+    p_ReverbDepth = (void*)RedNew(0x18);
+    memset(p_ReverbDepth, 0, 0x18);
+    m_Mute[1] = 0;
+    m_Mute[0] = 0;
+    p_MusicNextPlay = (int*)RedNew(0x10);
+    p_MusicNextPlay[0] = -1;
+    m_MusicPhraseStop = 0;
+    p_Stream = (RedStreamDATA*)RedNew(0x4c0);
     memset(p_Stream, 0, 0x4c0);
-    DAT_8032f43c = 0;
-    memset(&gRedDriverSyncBuffer, 0, 0x1c00);
-    DAT_8032f3e0[0] = RedDriverMainDmaQueue();
-    DAT_8032f3e8[0] = RedDriverMainDmaQueue();
-    DAT_8032f3e0[1] = RedDriverStreamDmaQueue();
-    DAT_8032f3e8[1] = RedDriverStreamDmaQueue();
-    DAT_8032f3b8 = 0;
+    m_DMAMode = 0;
+    memset(m_DmaControl, 0, sizeof(m_DmaControl));
+    p_DmaControlNow[0] = RedDriverMainDmaQueue();
+    p_DmaControlOld[0] = RedDriverMainDmaQueue();
+    p_DmaControlNow[1] = RedDriverStreamDmaQueue();
+    p_DmaControlOld[1] = RedDriverStreamDmaQueue();
+    m_RedMasterTime = 0;
     AXRegisterCallback(_RedAXCallback);
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);
     InitReverb();
-    OSInitSemaphore(&DAT_8032ddd8, 0);
-    DAT_8032f464 = RedNew__Fi(0x1000);
-    OSCreateThread(DAT_8032dde4.Thread(), (void* (*)(void*))_DmaExecuteThread, 0, (char*)DAT_8032f464 + 0x1000, 0x1000,
+    OSInitSemaphore(&m_DmaExecuteSemaphore, 0);
+    p_DmaExecuteThreadStack = (void*)RedNew(0x1000);
+    OSCreateThread(&m_DmaExecuteThread, (void* (*)(void*))_DmaExecuteThread, 0, (char*)p_DmaExecuteThreadStack + 0x1000, 0x1000,
                    3, 1);
-    OSResumeThread(DAT_8032dde4.Thread());
-    OSInitSemaphore(&DAT_8032daa0, 0);
-    DAT_8032f45c = RedNew__Fi(0x1000);
-    OSCreateThread(DAT_8032d778.Thread(), (void* (*)(void*))_WaveSettingThread, &DAT_8032daac,
-                   (char*)DAT_8032f45c + 0x1000, 0x1000, 4, 1);
-    OSResumeThread(DAT_8032d778.Thread());
-    OSInitSemaphore(&DAT_8032e120, 0);
-    DAT_8032f46c = RedNew__Fi(0x1000);
-    OSCreateThread(DAT_8032daac.Thread(), (void* (*)(void*))_MusicSkipThread, 0, (char*)DAT_8032f46c + 0x1000, 0x1000,
+    OSResumeThread(&m_DmaExecuteThread);
+    OSInitSemaphore(&m_WaveSettingSemaphore, 0);
+    p_WaveSettingThreadStack = (void*)RedNew(0x1000);
+    OSCreateThread(&m_WaveSettingThread, (void* (*)(void*))_WaveSettingThread, &m_WaveSettingData,
+                   (char*)p_WaveSettingThreadStack + 0x1000, 0x1000, 4, 1);
+    OSResumeThread(&m_WaveSettingThread);
+    OSInitSemaphore(&m_MusicSkipSemaphore, 0);
+    p_MusicSkipThreadStack = (void*)RedNew(0x1000);
+    OSCreateThread(&m_MusicSkipThread, (void* (*)(void*))_MusicSkipThread, 0, (char*)p_MusicSkipThreadStack + 0x1000, 0x1000,
                    4, 1);
-    OSResumeThread(DAT_8032daac.Thread());
-    OSInitSemaphore(&DAT_8032d778.m_semaphore, 0);
-    DAT_8032f458 = 0;
-    DAT_8032f454 = RedNew__Fi(0x1000);
-    OSCreateThread(&RedDriverMainThread(), (void* (*)(void*))_MainThread, 0, (char*)DAT_8032f454 + 0x1000, 0x1000,
+    OSResumeThread(&m_MusicSkipThread);
+    OSInitSemaphore(&m_MainSemaphore, 0);
+    m_MainThreadTime = 0;
+    p_MainThreadStack = (void*)RedNew(0x1000);
+    OSCreateThread(&RedDriverMainThread(), (void* (*)(void*))_MainThread, 0, (char*)p_MainThreadStack + 0x1000, 0x1000,
                    4, 1);
     OSResumeThread(&RedDriverMainThread());
 }
@@ -1407,12 +1383,12 @@ void CRedDriver::End()
     RedDriverSyncState& sync = RedDriverSync();
 
     AXRegisterCallback(0);
-    DAT_8032f3c0 = 0;
+    m_ThreadControl = 0;
     OSSignalSemaphore(&sync.m_mainSemaphore);
     OSSignalSemaphore(&sync.m_waveSemaphore);
     OSSignalSemaphore(&sync.m_dmaSemaphore);
     OSSignalSemaphore(&sync.m_musicSemaphore);
-    while (DAT_8032f3c4 != 0) {
+    while (m_ThreadExecute != 0) {
         RedSleep(0);
     }
     AXRegisterAuxACallback(0, 0);
@@ -1431,18 +1407,16 @@ void CRedDriver::End()
 #pragma optimization_level 0
 int CRedDriver::GetProgramTime()
 {
-    int sum;
-    int* p;
+    int sum = 0;
+    int* p = p_Tick;
 
-    sum = 0;
-    p = DAT_8032f3cc;
     do {
-        sum = sum + *p;
-        p = p + 1;
-    } while (p < DAT_8032f3cc + 100);
+        sum += *p;
+        p++;
+    } while (p < p_Tick + 100);
     return sum;
 }
-#pragma optimization_level 0
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1453,6 +1427,7 @@ int CRedDriver::GetProgramTime()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedDriver::SetSoundMode(int soundMode)
 {
     _EntryExecCommand(_SetSoundMode, soundMode, 0, 0, 0, 0, 0, 0);
@@ -1472,11 +1447,11 @@ int CRedDriver::GetSoundMode()
     int soundMode = __OSReadROM();
 
     if (soundMode == 0) {
-        DAT_8032f400 = 1;
+        m_SoundPlayMode = 1;
     } else {
-        DAT_8032f400 = DAT_8032f3c8;
+        m_SoundPlayMode = m_SoundMode;
     }
-    return DAT_8032f400;
+    return m_SoundPlayMode;
 }
 
 /*
@@ -1488,7 +1463,7 @@ int CRedDriver::GetSoundMode()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetMusicData(void* param_1)
+int CRedDriver::SetMusicData(void* param_1)
 {
     char localHeader[0x20];
     char* musicHeader = (char*)param_1;
@@ -1499,19 +1474,20 @@ void CRedDriver::SetMusicData(void* param_1)
     if (((musicHeader[0] == 'B') && (musicHeader[1] == 'G')) && (musicHeader[2] == 'M')) {
         memcpy(localHeader, musicHeader, sizeof(localHeader));
         headerSize = *(int*)(localHeader + 0x10);
-        copiedHeader = RedNew__Fi(headerSize);
+        copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
             memcpy(copiedHeader, musicHeader, headerSize);
             _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
             musicID = *(short*)(localHeader + 4);
-            (void)musicID;
-            return;
+            return musicID;
         }
+        return -1;
     }
-    if (gRedMemoryDebugEnabled != 0) {
-        OSReport("Music Header was broken.\n");
-        fflush(&DAT_8021d1a8);
+    if (m_ReportPrint != 0) {
+        OSReport(s_redDriverHeaderErrorBlob, s_redDriverDmaCheckLogBlob, sRedDriverLogWarnColor, sRedDriverLogReset);
+        fflush(__files + 1);
     }
+    return -1;
 }
 
 /*
@@ -1529,7 +1505,7 @@ int CRedDriver::ReentryMusicData(int musicID)
     int result;
 
     interrupt = OSDisableInterrupts();
-    result = ReentryMusicData__9CRedEntryFi(&DAT_8032e154, musicID);
+    result = c_RedEntry.ReentryMusicData(musicID);
     OSRestoreInterrupts(interrupt);
     return result;
 }
@@ -1663,7 +1639,7 @@ void CRedDriver::SetSeBlockData(int param_1, void* param_2)
         copySize = *(int*)((char*)param_2 + 0xc);
         if (copySize < 1) {
         } else {
-            copiedBuffer = RedNew__Fi(copySize);
+            copiedBuffer = (void*)RedNew(copySize);
             if (copiedBuffer != 0) {
                 memcpy(copiedBuffer, param_2, copySize);
             }
@@ -1687,25 +1663,26 @@ int CRedDriver::SetSeSepData(void* param_1)
     int iVar2;
     void* pvVar3;
     char* pcVar4;
-    int result;
 
-    result = -1;
     pcVar4 = (char*)param_1;
     if ((((pcVar4[0] == 'S') && (pcVar4[1] == 'e')) && (pcVar4[2] == 'S')) &&
         ((pcVar4[3] == 'e' && (pcVar4[4] == 'p')))) {
         iVar1 = *(int*)(pcVar4 + 0xc) & 0x7fffffff;
-        pvVar3 = RedNew__Fi(iVar1);
+        pvVar3 = (void*)RedNew(iVar1);
         if (pvVar3 != 0) {
             memcpy(pvVar3, param_1, iVar1);
             iVar2 = *(int*)((int)pvVar3 + 8);
             _EntryExecCommand(_SetSeSepData, (int)pvVar3, 0, 0, 0, 0, 0, 0);
-            result = iVar2;
+            return iVar2;
         }
-    } else if (gRedMemoryDebugEnabled != 0) {
-        OSReport("SE Sep Header was broken.\n");
-        fflush(&DAT_8021d1a8);
+        return -1;
     }
-    return result;
+    if (m_ReportPrint != 0) {
+        OSReport(s_redDriverHeaderErrorBlob + RED_DRIVER_SE_HEADER_ERROR_FMT_OFFSET, s_redDriverDmaCheckLogBlob,
+                 sRedDriverLogWarnColor, sRedDriverLogReset);
+        fflush(__files + 1);
+    }
+    return -1;
 }
 
 /*
@@ -1747,7 +1724,7 @@ int CRedDriver::ReentrySeSepData(int id)
     int result;
 
     interrupts = OSDisableInterrupts();
-    result = ReentrySeSepData__9CRedEntryFi(&DAT_8032e154, id);
+    result = c_RedEntry.ReentrySeSepData(id);
     OSRestoreInterrupts(interrupts);
     return result;
 }
@@ -1766,38 +1743,36 @@ int CRedDriver::SePlayState(int param_1)
     unsigned int uVar1;
     int* piVar2;
     int* piVar3;
-    int iVar4;
 
     uVar1 = OSDisableInterrupts();
-    iVar4 = 0;
-    piVar3 = *(int**)((int)DAT_8032f3f0 + 0xdbc);
-    while (piVar3 < (int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80)) {
-        if ((*piVar3 != 0) && ((param_1 == -1 || (piVar3[0x3e] == param_1)))) {
-            iVar4 = 1;
+    piVar3 = *(int**)((int)p_SoundControlBuffer + 0xdbc);
+    do {
+        piVar2 = piVar3;
+        if ((*piVar2 != 0) && ((param_1 == -1 || (piVar2[0x3e] == param_1)))) {
             break;
         }
-        piVar3 = piVar3 + 0x55;
-    }
-    if (iVar4 == 0) {
-        piVar3 = (int*)DAT_8032f3dc;
-        while (piVar3 != (int*)DAT_8032f3d8) {
-            piVar2 = piVar3;
-            if (((*piVar2 != 0) &&
-                ((((void (*)(int*))*piVar2 == _SeBlockPlay) ||
-                  (((void (*)(int*))*piVar2 == _SeSepPlay))) ||
-                 ((void (*)(int*))*piVar2 == _SeSepPlaySequence))) &&
-                ((param_1 == -1 || (param_1 == piVar2[1])))) {
-                iVar4 = 1;
+        piVar3 = piVar2 + 0x55;
+        piVar2 = 0;
+    } while (piVar3 < (int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80));
+    piVar3 = (int*)p_ExecCommandOld;
+    if (piVar2 == 0) {
+        while ((int*)p_ExecCommandNow != piVar3) {
+            if (((*piVar3 != 0) &&
+                ((((void (*)(int*))*piVar3 == _SeBlockPlay) ||
+                  (((void (*)(int*))*piVar3 == _SeSepPlay))) ||
+                 ((void (*)(int*))*piVar3 == _SeSepPlaySequence))) &&
+                ((param_1 == -1 || (param_1 == piVar3[1])))) {
+                piVar2 = (int*)1;
                 break;
             }
-            piVar3 = piVar2 + 8;
-            if (piVar3 == (int*)DAT_8032f3d4 + 0x800) {
-                piVar3 = (int*)DAT_8032f3d4;
+            piVar3 = piVar3 + 8;
+            if (piVar3 == (int*)p_ExecCommand + 0x800) {
+                piVar3 = (int*)p_ExecCommand;
             }
         }
     }
     OSRestoreInterrupts(uVar1);
-    return iVar4;
+    return (int)piVar2;
 }
 
 /*
@@ -1940,20 +1915,23 @@ void CRedDriver::SePause(int param_1, int param_2)
  */
 int CRedDriver::GetSeVolume(int param_1, int param_2)
 {
-    int* seInfo;
+    unsigned int* seInfo;
 
-    seInfo = *(int**)((int)DAT_8032f3f0 + 0xdbc);
+    seInfo = *(unsigned int**)((int)p_SoundControlBuffer + 0xdbc);
     while (1) {
-        if ((*seInfo != 0) && ((param_1 == -1) || (param_1 == seInfo[0x3e]))) {
-            if (param_2 == 1) {
-                return seInfo[0x15];
+        if ((*seInfo != 0) && ((param_1 == -1) || (param_1 == (int)seInfo[0x3e]))) {
+            if (*seInfo != 0) {
+                if (param_2 == 1) {
+                    return seInfo[0x15];
+                }
+                return (int)seInfo[0x13] >> 0xc;
             }
-            return seInfo[0x13] >> 0xc;
         }
         seInfo += 0x55;
-        if ((int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80) <= seInfo) {
-            return 0;
+        if (seInfo < (unsigned int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80)) {
+            continue;
         }
+        return 0;
     }
 }
 
@@ -1970,14 +1948,14 @@ int CRedDriver::ReportSeLoop(int param_1)
 {
     unsigned int* seInfo;
 
-    seInfo = *(unsigned int**)((int)DAT_8032f3f0 + 0xdbc);
+    seInfo = *(unsigned int**)((int)p_SoundControlBuffer + 0xdbc);
     while (1) {
         if ((*seInfo != 0) &&
             (((param_1 == -1) || (param_1 == (int)seInfo[0x3e])) && ((seInfo[0x40] & 1U) != 0))) {
             return 1;
         }
         seInfo += 0x55;
-        if (seInfo < (unsigned int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80)) {
+        if (seInfo < (unsigned int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80)) {
             continue;
         }
         return 0;
@@ -1991,7 +1969,7 @@ int CRedDriver::ReportSeLoop(int param_1)
  */
 void CRedDriver::DisplaySePlayInfo()
 {
-	DAT_8032e154.DisplaySePlayInfo();
+	c_RedEntry.DisplaySePlayInfo();
 }
 
 /*
@@ -2005,10 +1983,11 @@ void CRedDriver::DisplaySePlayInfo()
  */
 int CRedDriver::StreamPlayState(int param_1)
 {
+	void* commandNow;
 	unsigned int interrupts;
 	unsigned int streamData;
 	int result;
-	int* command;
+	unsigned int* command;
 
 	interrupts = OSDisableInterrupts();
 	result = 0;
@@ -2022,17 +2001,18 @@ int CRedDriver::StreamPlayState(int param_1)
 		streamData += 0x130;
 	} while (streamData < (unsigned int)p_Stream + 0x4C0);
 
-	command = (int*)DAT_8032f3dc;
 	if (result == 0) {
-		while ((void*)command != DAT_8032f3d8) {
+		commandNow = p_ExecCommandNow;
+		command = (unsigned int*)p_ExecCommandOld;
+		while (commandNow != (void*)command) {
 			if ((*command != 0) && ((void (*)(int*))*command == _StreamPlay) &&
-			    ((param_1 == -1) || (param_1 == command[1]))) {
+			    ((param_1 == -1) || (param_1 == (int)command[1]))) {
 				result = 1;
 				break;
 			}
 			command += 8;
-			if (command == (int*)DAT_8032f3d4 + 0x800) {
-				command = (int*)DAT_8032f3d4;
+			if (command == (unsigned int*)p_ExecCommand + 0x800) {
+				command = (unsigned int*)p_ExecCommand;
 			}
 		}
 	}
@@ -2062,7 +2042,7 @@ int CRedDriver::GetStreamPlayPoint(int param_1, int* param_2, int* param_3)
 		*param_3 = 0;
 	}
 	streamData = (unsigned int)p_Stream;
-	while (streamData < (unsigned int)p_Stream + 0x4C0) {
+	do {
 		if ((*(int*)(streamData + 0x10C) != 0) && (*(int*)(streamData + 0x10C) == param_1)) {
 			if (param_2 != 0) {
 				*param_2 = *(int*)(streamData + 0x11C);
@@ -2074,7 +2054,7 @@ int CRedDriver::GetStreamPlayPoint(int param_1, int* param_2, int* param_3)
 			break;
 		}
 		streamData += 0x130;
-	}
+	} while (streamData < (unsigned int)p_Stream + 0x4C0);
 	return found;
 }
 
@@ -2134,6 +2114,7 @@ void CRedDriver::StreamPause(int param_1, int param_2)
 {
     _EntryExecCommand(_StreamPause, param_1, param_2, 0, 0, 0, 0, 0);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2144,9 +2125,10 @@ void CRedDriver::StreamPause(int param_1, int param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedDriver::ClearWaveData(int param_1)
 {
-    ClearWaveData__9CRedEntryFi(&DAT_8032e154, param_1);
+    c_RedEntry.ClearWaveData(param_1);
 }
 
 /*
@@ -2160,7 +2142,7 @@ void CRedDriver::ClearWaveData(int param_1)
  */
 void CRedDriver::ClearWaveDataM(int param_1, int param_2, int param_3, int param_4)
 {
-    ClearWaveDataM__9CRedEntryFiiii(&DAT_8032e154, param_1, param_2, param_3, param_4);
+    c_RedEntry.ClearWaveDataM(param_1, param_2, param_3, param_4);
 }
 
 /*
@@ -2174,7 +2156,7 @@ void CRedDriver::ClearWaveDataM(int param_1, int param_2, int param_3, int param
  */
 void CRedDriver::ClearWaveBank(int param_1)
 {
-    ClearWaveBank__9CRedEntryFi(&DAT_8032e154, param_1);
+    c_RedEntry.ClearWaveBank(param_1);
 }
 
 /*
@@ -2189,30 +2171,30 @@ void CRedDriver::ClearWaveBank(int param_1)
 void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
 {
     while (true) {
-        if (DAT_8032f460 == 0) {
+        if (m_WaveSettingStatus == 0) {
             break;
         }
 
         RedSleep(0);
     }
 
-    DAT_8032daac.slot = slot;
-    DAT_8032daac.waveID = waveID;
-    DAT_8032daac.waveData = waveData;
-    DAT_8032daac.waveSize = waveSize;
+    m_WaveSettingData.slot = slot;
+    m_WaveSettingData.waveID = waveID;
+    m_WaveSettingData.waveData = waveData;
+    m_WaveSettingData.waveSize = waveSize;
 
     if (waveSize == -1) {
         RedWaveHEAD* const waveHeader = (RedWaveHEAD*)waveData;
 
         if ((waveHeader->magic[0] == 'W') && (waveHeader->magic[1] == 'D')) {
-            DAT_8032daac.waveSize =
+            m_WaveSettingData.waveSize =
                 waveHeader->dataSize + (((waveHeader->regionCount * 4) + 0x3fU) & 0xffffffc0) +
                 (waveHeader->sampleCount * 0x60) + 0x20;
         } else {
-            DAT_8032daac.waveSize = 0;
+            m_WaveSettingData.waveSize = 0;
         }
     }
-    OSSignalSemaphore(&DAT_8032daa0);
+    OSSignalSemaphore(&m_WaveSettingSemaphore);
 }
 
 /*
@@ -2226,7 +2208,7 @@ int CRedDriver::ReentryWaveData(int id)
     int result;
 
     interrupts = OSDisableInterrupts();
-    result = ReentryWaveData__9CRedEntryFi(&DAT_8032e154, id);
+    result = c_RedEntry.ReentryWaveData(id);
     OSRestoreInterrupts(interrupts);
     return result;
 }
@@ -2242,7 +2224,7 @@ int CRedDriver::ReentryWaveData(int id)
  */
 void CRedDriver::DisplayWaveInfo()
 {
-    DAT_8032e154.DisplayWaveInfo();
+    c_RedEntry.DisplayWaveInfo();
 }
 
 /*
@@ -2256,7 +2238,7 @@ void CRedDriver::DisplayWaveInfo()
  */
 void CRedDriver::SetReverb(int bank, int kind)
 {
-    ::SetReverb(bank, *(int*)((char*)DAT_8021ec10 + kind * 0x1c), (int*)((char*)DAT_8021ec10 + kind * 0x1c + 4));
+    ::SetReverb(bank, t_ReverbModeData[kind * 7], &t_ReverbModeData[kind * 7 + 1]);
 }
 
 /*
@@ -2290,3 +2272,4 @@ void CRedDriver::TestProcess(int processType)
         break;
     }
 }
+#pragma optimization_level 4

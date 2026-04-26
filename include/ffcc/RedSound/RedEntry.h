@@ -67,7 +67,6 @@ public:
 	int m_waveHistoryIndex;
 	int m_seSepHistoryIndex;
 	int m_musicHistoryIndex;
-	int m_unused;
 };
 
 #endif // _FFCC_REDSOUND_REDENTRY_H

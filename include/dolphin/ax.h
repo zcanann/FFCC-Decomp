@@ -276,6 +276,7 @@ void AXRegisterAuxBCallback(void (*callback)(void*, void*), void* context);
 
 // AXCL
 void AXSetMode(u32 mode);
+void AXSetCompressor(u32 i);
 u32 AXGetMode(void);
 
 // AXOut

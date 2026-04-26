@@ -107,8 +107,8 @@ static const char s_charaDumpPdtFmt[] = "%3d %1d %3d %1d %8d %3d %08x\n";
 static const char s_charaDumpAnimHdr1[] = "ANIM\n";
 static const char s_charaDumpAnimHdr2[] = " no t num name lv mask addr banksz sum bankaddr\n";
 static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %-14s %3d %08x %08x %d %08x\n";
-static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
-static char s_ptrarray_grow_error[] = "CPtrArray grow error";
+static char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
+static char s_p_chara_ptrarray_grow_error[] = "CPtrArray grow error";
 
 template <class T>
 class CPtrArray
@@ -248,13 +248,13 @@ int CPtrArray<T>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(s_ptrarray_grow_error);
+                System.Printf(s_p_chara_ptrarray_grow_error);
             }
             m_size = m_size << 1;
         }
 
         newItems = (T*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, (unsigned long)(m_size << 2), m_stage, s_collection_ptrarray_h, 0xFA, 0);
+            &Memory, (unsigned long)(m_size << 2), m_stage, s_p_chara_collection_ptrarray_h, 0xFA, 0);
         if (newItems == 0) {
             return 0;
         }

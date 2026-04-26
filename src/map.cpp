@@ -119,9 +119,9 @@ static const char s_mapMtxPathFmt[] = "%s_%d.mtx";
 static const char s_mapReadMtxFmt[] = "ReadMtx fn=%s\n";
 static const char s_map_manager_label_block[] = "CMapMng.mapmng\0\0CMapObjAtr\0";
 static const char s_CMapTexAnimSet[] = "CMapTexAnimSet";
-static const char s_ptrarray_grow_error[] =
+static const char s_map_ptrarray_grow_error[] =
     "\x83\x6f\x83\x62\x83\x74\x83\x40\x90\xac\x92\xb7\x82\xaa\x95\x73\x8b\x96\x89\xc2\x82\xc5\x82\xb7\x81\x42\n";
-static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
+static const char s_map_collection_ptrarray_h[] = "collection_ptrarray.h";
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -476,13 +476,13 @@ bool CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(const_cast<char*>(s_ptrarray_grow_error));
+                System.Printf(const_cast<char*>(s_map_ptrarray_grow_error));
             }
             m_size = m_size << 1;
         }
 
         newItems = (CMapLightHolder**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, m_size << 2, m_stage, const_cast<char*>(s_collection_ptrarray_h), 0xFA, 0);
+            &Memory, m_size << 2, m_stage, const_cast<char*>(s_map_collection_ptrarray_h), 0xFA, 0);
         if (newItems == 0) {
             return false;
         }
@@ -735,13 +735,13 @@ bool CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(const_cast<char*>(s_ptrarray_grow_error));
+                System.Printf(const_cast<char*>(s_map_ptrarray_grow_error));
             }
             m_size = m_size << 1;
         }
 
         newItems = (CMapAnim**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, m_size << 2, m_stage, const_cast<char*>(s_collection_ptrarray_h), 0xFA, 0);
+            &Memory, m_size << 2, m_stage, const_cast<char*>(s_map_collection_ptrarray_h), 0xFA, 0);
         if (newItems == 0) {
             return false;
         }

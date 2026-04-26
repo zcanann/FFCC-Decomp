@@ -148,18 +148,20 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
 {
     pppModelSt* model;
     s16* work;
+    u8* colorData;
+    u8* radiusScaleData;
     PackedMiasmaColor packedWork;
     PackedMiasmaColor packedColor;
     Vec managerPos;
     Vec cameraPos;
     float radius;
     float maxRadius;
-    int radiusScaleOffset;
     int texWidth;
     int texHeight;
+    u32 scissorWidth;
+    u32 scissorHeight;
     int i4TexSize;
     int rgba8TexSize;
-    int colorOffset;
     int textureIndex;
     int yOffset;
     float yPos;
@@ -168,7 +170,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     int slice;
     int tevSwapChannel;
     int tevAlphaScale;
-    bool inFarZone;
+    bool inNearZone;
     GXTexObj backI4Tex;
     GXTexObj backRgba8Tex;
     GXTexObj backRgba8Tex2;
@@ -184,8 +186,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     Graphic.SetDrawDoneDebugData(0x31);
 
     work = (s16*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[2]);
-    colorOffset = param_3->m_serializedDataOffsets[1];
-    radiusScaleOffset = param_3->m_serializedDataOffsets[3];
+    colorData = (u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[1];
+    radiusScaleData = (u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[3];
 
     textureIndex = 0;
     model = (pppModelSt*)(((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex]);
@@ -198,20 +200,23 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     texWidth = (int)FLOAT_80331928;
     texHeight = (int)FLOAT_8033192c;
 
-    packedColor.raw = *(u32*)((u8*)pppMiasma + 0x88 + colorOffset);
+    packedColor.bytes[0] = colorData[8];
+    packedColor.bytes[1] = colorData[9];
+    packedColor.bytes[2] = colorData[10];
+    packedColor.bytes[3] = colorData[11];
     packedWork.bytes[0] = (u8)(work[0] >> 7);
     packedWork.bytes[1] = (u8)(work[1] >> 7);
     packedWork.bytes[2] = (u8)(work[2] >> 7);
     packedWork.bytes[3] = (u8)(work[3] >> 7);
 
     i4TexSize = GXGetTexBufferSize(texWidth, texHeight, (GXTexFmt)6, GX_FALSE, 0);
-    rgba8TexSize = GXGetTexBufferSize(texWidth, texHeight, (GXTexFmt)0x28, GX_FALSE, 0);
+    rgba8TexSize = GXGetTexBufferSize((int)FLOAT_80331928, (int)FLOAT_8033192c, (GXTexFmt)0x28, GX_FALSE, 0);
 
     managerPos.x = pppMngStPtr->m_matrix.value[0][3];
     managerPos.y = pppMngStPtr->m_matrix.value[1][3];
     managerPos.z = pppMngStPtr->m_matrix.value[2][3];
 
-    if (Game.m_currentSceneId == 7) {
+    if ((s32)Game.m_currentSceneId == 7) {
         float* radiusArray;
         u16 meshCount;
 
@@ -235,24 +240,37 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         maxRadius = FLOAT_80331934;
     }
 
-    maxRadius = maxRadius * *(float*)((u8*)pppMiasma + 0x80 + radiusScaleOffset);
-    if (Game.m_currentSceneId != 7) {
+    maxRadius = maxRadius * *(float*)radiusScaleData;
+    if ((s32)Game.m_currentSceneId != 7) {
         Game.unkFloat_0xca10 = maxRadius;
     }
 
-    inFarZone = (FLOAT_80331938 + maxRadius) <= PSVECDistance(&cameraPos, &managerPos);
+    inNearZone = false;
+    if ((FLOAT_80331938 + maxRadius) > PSVECDistance(&cameraPos, &managerPos)) {
+        inNearZone = true;
+    }
+
+    scissorHeight = (u32)FLOAT_8033192c;
+    scissorWidth = (u32)FLOAT_80331928;
 
     for (slice = 0; slice < 2; slice++) {
         yPos = (float)slice * FLOAT_8033192c;
         yOffset = (int)yPos;
 
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backI4Tex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR, GX_TF_I4, 0);
-        GXSetScissor(0, yOffset, texWidth, texHeight);
+        GXSetScissor(0, (u32)yPos, scissorWidth, scissorHeight);
 
-        drawColor.rgba[0] = inFarZone ? 0 : 0xFF;
-        drawColor.rgba[1] = drawColor.rgba[0];
-        drawColor.rgba[2] = drawColor.rgba[0];
-        drawColor.rgba[3] = 0xFF;
+        if (inNearZone) {
+            drawColor.rgba[0] = 0xFF;
+            drawColor.rgba[1] = 0xFF;
+            drawColor.rgba[2] = 0xFF;
+            drawColor.rgba[3] = 0xFF;
+        } else {
+            drawColor.rgba[0] = 0;
+            drawColor.rgba[1] = 0;
+            drawColor.rgba[2] = 0;
+            drawColor.rgba[3] = 0xFF;
+        }
         gUtil.RenderColorQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
 
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -302,7 +320,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
             0, 7, 7, 7, 6);
         _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 2, 1, 0);
 
-        if (inFarZone) {
+        if (!inNearZone) {
             Graphic.SetDrawDoneDebugData(0x32);
             pppDrawMesh__FP10pppModelStP3Veci(model, pppMiasma->m_meshPoints, 0);
             Graphic.SetDrawDoneDebugData(0x33);
@@ -327,10 +345,17 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize, GX_LINEAR,
                                    GX_TF_RGBA8, 0);
         if (param_2->m_payload[0x1D] != 0) {
-            drawColor.rgba[0] = inFarZone ? 0 : 0xFF;
-            drawColor.rgba[1] = drawColor.rgba[0];
-            drawColor.rgba[2] = drawColor.rgba[0];
-            drawColor.rgba[3] = 0xFF;
+            if (inNearZone) {
+                drawColor.rgba[0] = 0xFF;
+                drawColor.rgba[1] = 0xFF;
+                drawColor.rgba[2] = 0xFF;
+                drawColor.rgba[3] = 0xFF;
+            } else {
+                drawColor.rgba[0] = 0;
+                drawColor.rgba[1] = 0;
+                drawColor.rgba[2] = 0;
+                drawColor.rgba[3] = 0xFF;
+            }
             gUtil.RenderColorQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
             GXClearVtxDesc();
             GXSetVtxDesc((GXAttr)9, GX_INDEX8);
@@ -369,7 +394,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
                 0, 7, 7, 7, 6);
             _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
 
-            if (inFarZone) {
+            if (!inNearZone) {
                 Graphic.SetDrawDoneDebugData(0x36);
                 pppDrawMesh__FP10pppModelStP3Veci(model, pppMiasma->m_meshPoints, 0);
                 Graphic.SetDrawDoneDebugData(0x37);

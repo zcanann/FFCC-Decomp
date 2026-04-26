@@ -326,7 +326,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             PSMTXMultVec(MStack_78, &entries[0].pos, &entries[0].pos);
             PSMTXMultVec(MStack_78, &entries[0].targetPos, &entries[0].targetPos);
         } else if (!useFallback) {
-            frameT = (FLOAT_80331860[0] / (f32)((s32)param_2->m_payload[9] + 1)) * (f32)(s32)i;
+            frameT = (-1.0f / (f32)((s32)param_2->m_payload[9] + 1)) * (f32)(s32)i;
             if (GetCharaNodeFrameMatrix(pppMngStPtr, frameT, MStack_78) == 0) {
                 useFallback = true;
             } else {

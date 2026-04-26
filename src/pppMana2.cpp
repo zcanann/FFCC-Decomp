@@ -1421,9 +1421,9 @@ static void CalculateNormal(VMana2* mana2)
     indices = *(u16**)((u8*)mana2 + 0x50);
 
     for (s32 i = 0; i < 0x121; i++) {
-        normals[i].x = 0.0f;
-        normals[i].y = 0.0f;
         normals[i].z = 0.0f;
+        normals[i].y = 0.0f;
+        normals[i].x = 0.0f;
     }
 
     for (s32 i = 0; i < 0x200; i++) {

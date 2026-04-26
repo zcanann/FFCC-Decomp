@@ -697,20 +697,23 @@ int* _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
  */
 void _ExecuteCommand()
 {
-	unsigned int* executePos = (unsigned int*)p_ExecCommandNow;
-	unsigned int* readPos = (unsigned int*)p_ExecCommandOld;
+	volatile unsigned int* readPos;
+	volatile unsigned int* executePos;
+
+	executePos = (volatile unsigned int*)p_ExecCommandNow;
+	readPos = (volatile unsigned int*)p_ExecCommandOld;
 
 	while (executePos != readPos) {
 		if (*readPos != 0) {
 			((void (*)(int*))(*readPos))((int*)(readPos + 1));
 		}
 		readPos += 8;
-		if (readPos == (unsigned int*)p_ExecCommand + 0x800) {
-			readPos = (unsigned int*)p_ExecCommand;
+		if (readPos == (volatile unsigned int*)p_ExecCommand + 0x800) {
+			readPos = (volatile unsigned int*)p_ExecCommand;
 		}
 	}
 
-	p_ExecCommandOld = readPos;
+	p_ExecCommandOld = (void*)readPos;
 }
 
 /*

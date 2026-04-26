@@ -781,14 +781,13 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
     unsigned char clampScale = *(unsigned char*)(breath + 0xC8);
     if (clampScale == 0) {
         float zero = kPppBreathModelZero;
-        float start = *(float*)(breath + 0xA0);
-        if (zero < start) {
+        if (zero < *(float*)(breath + 0xA0)) {
             if (*(float*)(breath + 0xA4) < zero) {
                 if (particle[11].z < zero) {
                     particle[11].z = zero;
                 }
             }
-        } else if (start < zero) {
+        } else if (*(float*)(breath + 0xA0) < zero) {
             if ((zero < *(float*)(breath + 0xA4)) && (zero < particle[11].z)) {
                 particle[11].z = zero;
             }

@@ -83,11 +83,11 @@ unsigned int m_table__7CMapPcs[3][0x414 / 3 / sizeof(unsigned int)] = {
 CRelProfile g_hit_prof;
 CRelProfile g_map_calc_prof;
 CRelProfile g_map_draw_prof;
-unsigned short s_loadedStageNo__7CMapPcs;
-unsigned short s_loadedMapNo__7CMapPcs;
+unsigned int s_loadedStageNo__7CMapPcs;
+unsigned int s_loadedMapNo__7CMapPcs;
 extern const float DrawRangeDefault;
-extern const float kPMapBoundMinInit = 10000000000.0f;
-extern const float kPMapBoundMaxInit = -10000000000.0f;
+extern const float kPMapBoundMinInit;
+extern const float kPMapBoundMaxInit;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 static const char s_p_map_cpp_801d7728[] = "p_map.cpp";
@@ -323,13 +323,13 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 {
     CMapMngAsyncLoadState* asyncLoadState =
         reinterpret_cast<CMapMngAsyncLoadState*>(reinterpret_cast<char*>(&MapMng) + 0x22994);
-    unsigned short prevStageNo = s_loadedStageNo__7CMapPcs;
-    unsigned short prevMapNo = s_loadedMapNo__7CMapPcs;
+    unsigned int prevStageNo = s_loadedStageNo__7CMapPcs;
+    unsigned int prevMapNo = s_loadedMapNo__7CMapPcs;
     Vec unusedVec;
     char mapPath[0x104];
 
-    s_loadedStageNo__7CMapPcs = static_cast<unsigned short>(stageNo);
-    s_loadedMapNo__7CMapPcs = static_cast<unsigned short>(mapNo);
+    s_loadedStageNo__7CMapPcs = stageNo;
+    s_loadedMapNo__7CMapPcs = mapNo;
     sprintf(mapPath, s_dvd_map_stage_map_fmt, stageNo, mapNo);
 
     if (mode != 2) {
@@ -339,6 +339,9 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         MapMng.SetDrawRangeMapObj(DrawRangeDefault);
     }
 
+    asyncLoadState->m_mapLoadStart = mapPtr;
+    asyncLoadState->m_mapLoadCursor = mapPtr;
+    asyncLoadState->m_mapLoadSize = static_cast<unsigned int>(mapSize);
     asyncLoadState->m_asyncReadIndex = 0;
     asyncLoadState->m_asyncOpenIndex = 0;
     if (mapSize == 0) {
@@ -367,16 +370,12 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         asyncLoadState->m_mapReadMode = 1;
     }
 
-    asyncLoadState->m_mapLoadStart = mapPtr;
-    asyncLoadState->m_mapLoadCursor = mapPtr;
-    asyncLoadState->m_mapLoadSize = static_cast<unsigned int>(mapSize);
-
     MapMng.ReadMtx(mapPath);
     MapMng.ReadMpl(mapPath);
     MapMng.ReadOtm(mapPath);
     MapMng.ReadMid(mapPath);
 
-    if ((mode != 1) && (mode != 2)) {
+    if (static_cast<unsigned char>(mode - 1) > 1) {
         if ((m_viewerMode != 0) &&
             (strcmp(s_lastLoadedMapPath__7CMapPcs, mapPath) != 0)) {
             strcpy(s_lastLoadedMapPath__7CMapPcs, mapPath);
@@ -398,14 +397,15 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                     unusedVec.z = mapCenter[2];
                 }
             }
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = unusedVec.y + kMapCameraCenterYOffset;
+            unusedVec.y += kMapCameraCenterYOffset;
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = unusedVec.x;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = unusedVec.y;
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = unusedVec.z;
         }
 
-        if (static_cast<unsigned int>(System.m_execParam) > 2U) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
             CMemory::CStage* mapStage = *reinterpret_cast<CMemory::CStage**>(&MapMng);
-            unsigned int heapUnuse = mapStage->GetHeapUnuse();
+            int heapUnuse = mapStage->GetHeapUnuse();
 
             Printf__7CSystemFPce(
                 &System,
@@ -413,16 +413,15 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                 mapPath,
                 (int)*reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
                 (int)*reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),
-                ((int)heapUnuse >> 10) +
-                    (unsigned int)(((int)heapUnuse < 0) && ((heapUnuse & 0x3FF) != 0)));
+                heapUnuse / 1024);
         }
 
         CPtrArray<CMapLightHolder*>* mapLightHolderArr =
             reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450);
         int mapLightHolderCount = mapLightHolderArr[1].GetSize();
-        if (mapLightHolderCount != 0) {
-            mapLightHolderArr[1][0]->GetLightHolder(
-                reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&CameraPcs) + 0x1E0), static_cast<Vec*>(0));
+        if (static_cast<unsigned int>(mapLightHolderCount) > 0U) {
+            mapLightHolderArr[1][0]->GetLightHolder(reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C),
+                                                    static_cast<Vec*>(0));
         }
     }
 
@@ -581,15 +580,15 @@ void CMapPcs::calc()
                     cameraPos.z = mapCenter[2];
                 }
             }
+            cameraPos.y += kMapCameraCenterYOffset;
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = cameraPos.x;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = cameraPos.y + kMapCameraCenterYOffset;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = cameraPos.y;
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = cameraPos.z;
         }
 
-        if (static_cast<unsigned int>(System.m_execParam) > 2U) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
             CMemory::CStage* mapStage = *reinterpret_cast<CMemory::CStage**>(&MapMng);
             int heapUnuse = mapStage->GetHeapUnuse();
-            int heapUnuseKB = (heapUnuse >> 10) + static_cast<int>((heapUnuse < 0) && ((heapUnuse & 0x3FF) != 0));
 
             Printf__7CSystemFPce(
                 &System,
@@ -597,12 +596,12 @@ void CMapPcs::calc()
                 m_mapName,
                 *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
                 *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),
-                heapUnuseKB);
+                heapUnuse / 1024);
         }
 
         CPtrArray<CMapLightHolder*>* mapLightHolderArr =
             reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450);
-        if (mapLightHolderArr[1].GetSize() != 0) {
+        if (static_cast<unsigned int>(mapLightHolderArr[1].GetSize()) > 0U) {
             mapLightHolderArr[1][0]->GetLightHolder(reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C),
                                                     static_cast<Vec*>(0));
         }

@@ -26,7 +26,7 @@ extern void* volatile p_SeBlockData[];
 extern void* volatile p_ZeroData;
 extern void* volatile p_SoundControlBuffer;
 extern void* volatile p_SoundControl;
-extern int m_KeyOnEntry;
+extern volatile int m_KeyOnEntry;
 extern void* volatile p_KeyOnData;
 extern int m_SoundPlayMode;
 extern int m_SoundMasterControl;

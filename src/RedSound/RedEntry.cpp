@@ -507,7 +507,19 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		}
 
 		int historyNo = SearchWaveSequence(waveNo);
-		if (historyNo < 0) {
+		if (historyNo >= 0) {
+			if ((waveBankNo >= 0) && (historyNo != waveBankNo)) {
+				int src = entry[0] + historyNo * 0x10;
+				int dst = entry[0] + waveBankNo * 0x10;
+				*(int*)(dst + 0x0) = *(int*)(src + 0x0);
+				*(int*)(dst + 0x4) = *(int*)(src + 0x4);
+				*(int*)(dst + 0x8) = *(int*)(src + 0x8);
+				*(int*)(dst + 0xC) = *(int*)(src + 0xC);
+				historyNo = waveBankNo;
+			}
+
+			WaveHistoryChoice((RedHistoryBANK*)(entry[0] + historyNo * 0x10));
+		} else {
 			entry[3] = waveNo;
 			waveAddress = WaveHeadAdd(waveBankNo, waveHead, waveNo);
 			if (waveAddress < 0) {
@@ -524,18 +536,6 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 			entry[5] = waveAddress;
 			waveDataSize -= waveHeadSize;
 			waveData = (void*)((unsigned char*)waveData + waveHeadSize);
-		} else {
-			if ((waveBankNo >= 0) && (historyNo != waveBankNo)) {
-				int src = entry[0] + historyNo * 0x10;
-				int dst = entry[0] + waveBankNo * 0x10;
-				*(int*)(dst + 0x0) = *(int*)(src + 0x0);
-				*(int*)(dst + 0x4) = *(int*)(src + 0x4);
-				*(int*)(dst + 0x8) = *(int*)(src + 0x8);
-				*(int*)(dst + 0xC) = *(int*)(src + 0xC);
-				historyNo = waveBankNo;
-			}
-
-			WaveHistoryChoice((RedHistoryBANK*)(entry[0] + historyNo * 0x10));
 		}
 	} else {
 		waveAddress = entry[5];

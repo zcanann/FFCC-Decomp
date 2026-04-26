@@ -82,11 +82,11 @@ static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
     pppCopyVector(dst->from, src->from);
     pppCopyVector(dst->to, src->to);
     dst->life = src->life;
-    dst->alpha = src->alpha;
     dst->decay = src->decay;
     dst->colorR = src->colorR;
     dst->colorG = src->colorG;
     dst->colorB = src->colorB;
+    dst->alpha = src->alpha;
 }
 
 /*
@@ -269,11 +269,11 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             pppCopyVector(next->from, current->from);
             pppCopyVector(next->to, current->to);
             next->life = current->life;
-            next->alpha = current->alpha;
             next->decay = current->decay;
             next->colorR = current->colorR;
             next->colorG = current->colorG;
             next->colorB = current->colorB;
+            next->alpha = current->alpha;
         }
 
         entries[0].life = -1;

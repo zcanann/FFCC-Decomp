@@ -68,14 +68,13 @@ int p_MidiControl_Function[] = {
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int DataAddCompute(int* current, int target, int* delta)
 {
     int result = 0;
-    int value = *current;
 
-    if (target != (value >> 0xc)) {
-        int targetValue = (target << 0xc) | 0x800;
-        result = (targetValue - value) / *delta;
+    if (target - (*current >> 0xc) != 0) {
+        result = (((target << 0xc) | 0x800) - *current) / *delta;
     } else {
         *delta = 0;
     }
@@ -94,14 +93,15 @@ int DataAddCompute(int* current, int target, int* delta)
  */
 void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* slot = (int*)keyOnData;
+    unsigned int* slot = (unsigned int*)keyOnData;
     do {
-        if (*slot == (int)track) {
+        if (*slot == (unsigned int)track) {
             *slot = 0;
         }
         slot += 2;
-    } while (slot < (int*)((int)keyOnData + 0x600));
+    } while (slot < (unsigned int*)((int)keyOnData + 0x600));
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -201,10 +201,11 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int SineSwing(int phase)
 {
-    u32 index = (u32)phase & 0x1FF;
-    int value = m_SignDataTable[index];
+    int value = phase & 0x1FF;
+    value = m_SignDataTable[value];
 
     if (((u32)phase & 0x200) != 0) {
         value = -value;
@@ -223,8 +224,7 @@ int SineSwing(int phase)
  */
 int TriangleSwing(int phase)
 {
-    u32 low = (u32)phase & 0xFF;
-    int result = low << 8;
+    int result = (phase & 0xFF) << 8;
 
     switch (((u32)phase >> 8) & 3) {
     case 1:
@@ -238,7 +238,7 @@ int TriangleSwing(int phase)
         break;
     }
 
-    return (low | result);
+    return result;
 }
 
 /*
@@ -291,7 +291,8 @@ int DutySwing(int phase)
  */
 int RandomSwing(int phase)
 {
-    int result = (int)t_RandomData[(phase >> 8) & 0xFF] << 8;
+    phase >>= 8;
+    int result = (int)t_RandomData[phase & 0xFF] << 8;
 
     return result;
 }
@@ -323,24 +324,24 @@ int SineSwingR(int phase)
  */
 int TriangleSwingR(int phase)
 {
-    int mode;
     int result;
 
     phase ^= 0x200;
-    mode = (phase >> 8) & 3;
     result = (phase & 0xFF) << 8;
-    if (mode != 2) {
-        if (mode >= 2) {
-            if (mode < 4) {
-                result -= 0x10000;
-            }
-        } else if (mode != 0) {
-            result = 0x10000 - result;
-        }
-    } else {
+
+    switch (((u32)phase >> 8) & 3) {
+    case 1:
+        result = 0x10000 - result;
+        break;
+    case 2:
         result = -result;
+        break;
+    case 3:
+        result -= 0x10000;
+        break;
     }
-    return (phase & 0xFF) | result;
+
+    return result;
 }
 
 /*
@@ -387,10 +388,12 @@ int SawSwingR(int phase)
  */
 int RandomSwingR(int phase)
 {
-    int result = (int)t_RandomData[((phase >> 8) & 0xFF) ^ 0x40] << 8;
+    phase >>= 8;
+    int result = (int)t_RandomData[(phase & 0xFF) ^ 0x40] << 8;
 
     return result;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

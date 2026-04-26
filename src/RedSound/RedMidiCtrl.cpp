@@ -391,7 +391,9 @@ int SawSwingR(int phase)
 int RandomSwingR(int phase)
 {
     phase >>= 8;
-    int result = (int)t_RandomData[(phase & 0xFF) ^ 0x40] << 8;
+    phase &= 0xff;
+    phase ^= 0x40;
+    int result = (int)t_RandomData[phase] << 8;
 
     return result;
 }

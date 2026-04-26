@@ -25,7 +25,7 @@ extern OSSemaphore m_MusicSkipSemaphore;
 extern void* p_SeBlockData[];
 extern void* p_ZeroData;
 extern void* p_SoundControlBuffer;
-extern void* p_SoundControl;
+extern void* volatile p_SoundControl;
 extern int m_KeyOnEntry;
 extern void* p_KeyOnData;
 extern int m_SoundPlayMode;

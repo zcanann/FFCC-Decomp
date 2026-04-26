@@ -189,4 +189,6 @@ public:
 STATIC_ASSERT(sizeof(CGame::CGameWork) == 0x13E8);
 STATIC_ASSERT(sizeof(CGame) == 0x11F88);
 
+extern CGame Game;
+
 #endif // _FFCC_GAME_H_

@@ -196,17 +196,17 @@ void _SetSoundMode(int* param_1)
  */
 void _SetReverbDepth(int* param_1)
 {
-    unsigned int reverbIndex;
-    unsigned int reverbBank;
-    unsigned int reverbDepth;
-    unsigned int fadeFrame;
+    int reverbIndex;
+    int reverbBank;
+    int reverbDepth;
+    int fadeFrame;
     int fadeStep;
     int* seInfo;
 
-    reverbIndex = (unsigned int)param_1[0];
+    reverbIndex = param_1[0];
     reverbBank = reverbIndex & 1;
-    reverbDepth = (unsigned int)param_1[1] & 0x7f;
-    fadeFrame = (unsigned int)param_1[2];
+    reverbDepth = param_1[1] & 0x7f;
+    fadeFrame = param_1[2];
     if (reverbDepth != 0) {
         reverbDepth = (((reverbDepth + 1) * 0x100) - 1) * 0x1000;
     }
@@ -214,7 +214,7 @@ void _SetReverbDepth(int* param_1)
     if (reverbBank != 0) {
         fadeStep = (int)(fadeFrame * 0x60) / 0x3c;
         if (fadeStep == 0) {
-            fadeStep = 1;
+            fadeStep++;
         }
         reverbDepth |= 0x800;
         seInfo = *(int**)((char*)p_SoundControlBuffer + 0xdbc);

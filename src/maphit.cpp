@@ -24,8 +24,8 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 }
 }
 
-int g_hit_edge_idx_min = -1;
-float g_hit_t_min = 3.4e38f;
+int g_hit_edge_idx_min = 9;
+float g_hit_t_min = 0.0f;
 CMapHitFace* gMapHitFace = 0;
 unsigned char gMapHitFaceFlag = 0;
 

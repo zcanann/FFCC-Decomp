@@ -1757,13 +1757,11 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
     int slot;
     int pan;
     int volume;
-    CRedSound* redSound;
 
     if (soundId < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         CSoundLayout& sound = SoundData(this);
-        redSound = RedSound(this);
         se = sound.m_seWork;
 
         for (loopCount = 0x80; loopCount != 0; loopCount--, se += 0x28) {
@@ -1792,20 +1790,20 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
             se[0x27] = 0xFF;
 
             if (soundId < 0) {
-                Printf__7CSystemFPce(&System, s_soundErrorFmt);
+                Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                 slot = -1;
             } else if (soundId < 4000) {
                 int bank = soundId / 1000;
-                slot = SePlay__9CRedSoundFiiiii(redSound, bank, soundId - bank * 1000, pan,
+                slot = SePlay__9CRedSoundFiiiii(RedSound(this), bank, soundId - bank * 1000, pan,
                                                 volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
                 if (fadeFrames != 0) {
-                    SeVolume__9CRedSoundFiii(redSound, slot, volume, fadeFrames);
+                    SeVolume__9CRedSoundFiii(RedSound(this), slot, volume, fadeFrames);
                 }
             } else {
-                slot = SePlay__9CRedSoundFiiiii(redSound, -1, soundId, pan,
+                slot = SePlay__9CRedSoundFiiiii(RedSound(this), -1, soundId, pan,
                                                 volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
                 if (fadeFrames != 0) {
-                    SeVolume__9CRedSoundFiii(redSound, slot, volume, fadeFrames);
+                    SeVolume__9CRedSoundFiii(RedSound(this), slot, volume, fadeFrames);
                 }
             }
 
@@ -1833,13 +1831,11 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
     int slot;
     int pan;
     int volume;
-    CRedSound* redSound;
 
     if (soundId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         CSoundLayout& sound = SoundData(this);
-        redSound = RedSound(this);
         se = sound.m_seWork;
 
         for (loopCount = 0x80; loopCount != 0; loopCount--, se += 0x28) {
@@ -1871,16 +1867,16 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
                 slot = -1;
             } else if (soundId < 4000) {
                 int bank = soundId / 1000;
-                slot = SePlay__9CRedSoundFiiiii(redSound, bank, soundId - bank * 1000, pan,
+                slot = SePlay__9CRedSoundFiiiii(RedSound(this), bank, soundId - bank * 1000, pan,
                                                volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
                 if (fadeFrames != 0) {
-                    SeVolume__9CRedSoundFiii(redSound, slot, volume, fadeFrames);
+                    SeVolume__9CRedSoundFiii(RedSound(this), slot, volume, fadeFrames);
                 }
             } else {
-                slot = SePlay__9CRedSoundFiiiii(redSound, -1, soundId, pan,
+                slot = SePlay__9CRedSoundFiiiii(RedSound(this), -1, soundId, pan,
                                                volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
                 if (fadeFrames != 0) {
-                    SeVolume__9CRedSoundFiii(redSound, slot, volume, fadeFrames);
+                    SeVolume__9CRedSoundFiii(RedSound(this), slot, volume, fadeFrames);
                 }
             }
 
@@ -2009,7 +2005,7 @@ found_se:
 void CSound::StopSe3D(int se3dHandle)
 {
     if (se3dHandle < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         u8* se = reinterpret_cast<u8*>(this) + 0x2C;
         u8* found;
@@ -2032,9 +2028,9 @@ found_entry:
         if (found != 0) {
             const int playId = *reinterpret_cast<int*>(found + 8);
             if (playId < 0) {
-                Printf__7CSystemFPce(&System, s_soundErrorFmt, idx);
+                Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
             } else {
-                SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), playId);
+                SeStop__9CRedSoundFi(RedSound(this), playId);
             }
             *found &= 0x7F;
         }

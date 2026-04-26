@@ -1288,6 +1288,8 @@ void CMemory::CStage::drawHeapBar(int y)
                         } else {
                             color = 0x400080;
                         }
+                    } else if (stageGetAllocationMode(this) == 0) {
+                        color = colors[drawColor];
                     } else {
                         color = colors[drawColor];
                     }
@@ -1397,18 +1399,10 @@ void CMemory::CStage::drawHeapTitle(int y)
             int srcLen = strlen(sourceName);
             strcpy(line, sourceName + ((srcLen - 12U) & ~((srcLen - 12U) >> 31)));
             Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
-            int maxRound = 0;
-            if ((static_cast<int>(maxUnuse) < 0) && ((maxUnuse & 0x3ff) != 0)) {
-                maxRound = 1;
-            }
-            int totalRound = 0;
-            if ((static_cast<int>(totalUnuse) < 0) && ((totalUnuse & 0x3ff) != 0)) {
-                totalRound = 1;
-            }
 
             sprintf(line, s_drawHeapTitleFmt, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
-                    (static_cast<int>(totalUnuse) >> 10) + totalRound, (static_cast<int>(maxUnuse) >> 10) + maxRound);
-            Graphic.DrawDebugStringDirect(0x208, y, line, 8);
+                    static_cast<int>(totalUnuse) / 1024, static_cast<int>(maxUnuse) / 1024);
+            Graphic.DrawDebugStringDirect(0x208, static_cast<unsigned short>(y), line, 8);
             return;
         }
 

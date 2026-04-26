@@ -32,6 +32,17 @@ struct McListInfo
 class CMenuPcs : public CProcess
 {
 public:
+    struct BattleHudState
+    {
+        int m_visible;
+        float m_worldPos[3];
+        int m_fadeCounter;
+        int m_gaugeCounter;
+        int m_width;
+        int m_gaugeMax;
+        int m_gaugeValue;
+    };
+
     struct CTmp
 	{
 	};
@@ -261,17 +272,23 @@ public:
     void AlphaAdd();
     void GetFontWorld();
 
-    unsigned char m_pad04[0xEC - 0x04];
+    unsigned char m_pad04[0x48 - 0x04];
+    BattleHudState m_battleHud;
+    unsigned char m_pad70[0xEC - 0x70];
     CMemory::CStage* m_menuStage;
     CMemory::CStage* m_stageF0;
     CMemory::CStage* m_stageF4;
     CFont* m_fonts[5];
-    unsigned char m_pad10C[0x14C - 0x10C];
+    CMesMenu* m_battleMesMenus[12];
+    CRingMenu* m_battleRingMenus[4];
     CTextureSet* m_textureSets[16];
     CTexture* m_textures[105];
     unsigned char m_pad330[0x340 - 0x330];
     unsigned char m_externalFontTlut[0x740 - 0x340];
-    unsigned char m_pad740[0x8A0 - 0x740];
+    int m_mode;
+    unsigned char m_pad744[0x864 - 0x744];
+    unsigned short m_battleStateFlag;
+    unsigned char m_pad866[0x8A0 - 0x866];
 };
 
 extern CMenuPcs MenuPcs;

@@ -31,7 +31,6 @@ public:
     int isLoopAnimDirect();
     int playSe3D(int, int, int, int, Vec*);
     virtual void onChangePrg(int);
-    void changePrg(int);
     void putParticle(int, int, Vec*, float, int);
     void putParticle(int, int, CGObject*, float, int);
     void putParticleTrace(int, int, CGObject*, float, int);

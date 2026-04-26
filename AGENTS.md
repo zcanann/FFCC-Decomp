@@ -74,7 +74,7 @@ Agents are explicitly allowed, and expected, to go on a **crusade around the tar
 - repair nearby structs, globals, constructors, vtables, and helper functions
 - update `config/GCCP01/symbols.txt` when symbol naming is the real issue
 - adjust `configure.py` flags when flags are the blocker, not the source
-- reference .MAP files for trying to figure out how sdata, bss, etc sections may be set up
+- If working on data, ALWAYS reference .MAP files as ground-truth for how data was laid out (.sdata, .bss, .rodata, etc. appear in these)
 
 Do not optimize only for the named symbol if the surrounding code is what prevents a real match.
 

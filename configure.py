@@ -416,7 +416,7 @@ def RedSoundLib(objects: List[Object]) -> Dict[str, Any]:
         "lib": "RedSound",
         "mw_version": config.linker_version,
         "cflags": redsound_cflags,
-        "progress_category": "game",
+        "progress_category": "redsound",
         "objects": objects,
     }
 
@@ -1250,6 +1250,7 @@ def link_order_callback(module_id: int, objects: List[str]) -> List[str]:
 # Adjust as desired for your project
 config.progress_categories = [
     ProgressCategory("game", "Game Code"),
+    ProgressCategory("redsound", "RedSound"),
     ProgressCategory("sdk", "SDK Code"),
 ]
 config.progress_each_module = args.verbose

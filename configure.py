@@ -369,7 +369,12 @@ redsound_cpp_exceptions_cflags = replace_flag_prefix(
     redsound_cflags, "-Cpp_exceptions ", "-Cpp_exceptions on"
 )
 redsound_opt0_units = parse_unit_env_set("FFCC_REDSOUND_OPT0_UNITS")
-redsound_inline_off_units = parse_unit_env_set("FFCC_REDSOUND_INLINE_OFF_UNITS")
+# RedStream's codegen is unchanged by inline-off, but its exception table
+# layout moves closer to the MAP/object target with this unit-local flag.
+redsound_inline_off_units = {
+    "RedStream",
+    *parse_unit_env_set("FFCC_REDSOUND_INLINE_OFF_UNITS"),
+}
 redsound_inline_deferred_units = parse_unit_env_set(
     "FFCC_REDSOUND_INLINE_DEFERRED_UNITS"
 )

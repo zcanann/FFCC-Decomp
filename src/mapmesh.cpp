@@ -366,20 +366,6 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                 offset += 6;
             }
             break;
-        case 0x4E425420:
-            m_nbtCount = static_cast<unsigned short>(chunk.m_size / 0x12);
-            cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
-            m_nbt = cursor;
-            cursor += chunk.m_size;
-
-            offset = 0;
-            for (int i = 0; i < static_cast<int>(m_nbtCount); i++) {
-                for (int j = 0; j < 9; j++) {
-                    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_nbt) + offset) = reader.Get2();
-                    offset += 2;
-                }
-            }
-            break;
         case 0x434F4C52:
             m_colorCount = static_cast<unsigned short>(chunk.m_size >> 2);
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));

@@ -2032,7 +2032,7 @@ int CRedDriver::GetStreamPlayPoint(int param_1, int* param_2, int* param_3)
 		*param_3 = 0;
 	}
 	streamData = (unsigned int)p_Stream;
-	while (streamData < (unsigned int)p_Stream + 0x4C0) {
+	do {
 		if ((*(int*)(streamData + 0x10C) != 0) && (*(int*)(streamData + 0x10C) == param_1)) {
 			if (param_2 != 0) {
 				*param_2 = *(int*)(streamData + 0x11C);
@@ -2044,7 +2044,7 @@ int CRedDriver::GetStreamPlayPoint(int param_1, int* param_2, int* param_3)
 			break;
 		}
 		streamData += 0x130;
-	}
+	} while (streamData < (unsigned int)p_Stream + 0x4C0);
 	return found;
 }
 

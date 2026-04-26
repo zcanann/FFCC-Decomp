@@ -72,7 +72,7 @@ int m_ReportPrint;
 int m_MusicFastSpeed;
 int m_MusicSkipLine;
 int m_MusicKeySignature;
-void* p_MusicReplayPoint;
+void* volatile p_MusicReplayPoint;
 int* volatile p_MusicTempoControl;
 int* volatile p_MusicPitchControl;
 int m_MusicPhraseStop;

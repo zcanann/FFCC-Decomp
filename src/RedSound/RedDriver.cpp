@@ -1146,8 +1146,8 @@ int _DmaExecuteThread(void*)
         m_DMAExecute = 1;
         if (m_ThreadControl != 0) {
             _DmaExecute();
-            m_DMAExecute = 0;
         }
+        m_DMAExecute = 0;
     }
     m_ThreadExecute &= ~2;
     return 0;

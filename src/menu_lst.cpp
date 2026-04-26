@@ -223,25 +223,23 @@ int CMenuPcs::MLstClose()
 	itemCount = (unsigned int)this->lstData->count;
 	entry = this->lstData->entries;
 	currentFrame = (int)this->lstState->frame;
-	count = itemCount;
 	if ((int)itemCount > 0) {
-		do {
+		for (int i = 0; i < (int)itemCount; i++) {
 			if (entry->startFrame <= currentFrame) {
-				if (entry->startFrame + entry->duration > currentFrame) {
+				if (entry->startFrame + entry->duration <= currentFrame) {
+					completedItems++;
+					entry->alpha = FLOAT_803333D0;
+				} else {
 					entry->timer = entry->timer + 1;
 					double ratio = DOUBLE_80333410 / (double)entry->duration;
 					entry->alpha = (float)(DOUBLE_80333410 - ratio * (double)entry->timer);
 					if ((double)entry->alpha < DOUBLE_80333418) {
 						entry->alpha = FLOAT_803333D0;
 					}
-				} else {
-					completedItems++;
-					entry->alpha = FLOAT_803333D0;
 				}
 			}
 			entry++;
-			count--;
-		} while (count != 0);
+		}
 	}
 	zero = FLOAT_803333D0;
 	if (this->lstData->count == completedItems) {
@@ -505,22 +503,20 @@ int CMenuPcs::MLstOpen()
 	itemCount = (unsigned int)this->lstData->count;
 	entry = this->lstData->entries;
 	currentFrame = (int)this->lstState->frame;
-	count = itemCount;
 	if ((int)itemCount > 0) {
-		do {
+		for (int i = 0; i < (int)itemCount; i++) {
 			if (entry->startFrame <= currentFrame) {
-				if (entry->startFrame + entry->duration > currentFrame) {
+				if (entry->startFrame + entry->duration <= currentFrame) {
+					completedItems++;
+					entry->alpha = FLOAT_803333F0;
+				} else {
 					entry->timer = entry->timer + 1;
 					double ratio = DOUBLE_80333410 / (double)entry->duration;
 					entry->alpha = (float)(ratio * (double)entry->timer);
-				} else {
-					completedItems++;
-					entry->alpha = FLOAT_803333F0;
 				}
 			}
 			entry++;
-			count--;
-		} while (count != 0);
+		}
 	}
 
 	one = FLOAT_803333F0;

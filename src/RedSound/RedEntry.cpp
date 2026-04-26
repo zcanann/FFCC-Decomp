@@ -97,6 +97,7 @@ CRedEntry::CRedEntry()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 0
 extern "C" CRedEntry* __dt__9CRedEntryFv(CRedEntry* redEntry, short shouldDelete)
 {
 	if (redEntry != 0) {
@@ -106,6 +107,7 @@ extern "C" CRedEntry* __dt__9CRedEntryFv(CRedEntry* redEntry, short shouldDelete
 	}
 	return redEntry;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

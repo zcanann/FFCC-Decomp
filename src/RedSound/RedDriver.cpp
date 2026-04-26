@@ -1199,6 +1199,7 @@ CRedDriver::CRedDriver()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 extern "C" CRedDriver* __dt__10CRedDriverFv(CRedDriver* redDriver, short shouldDelete)
 {
     if ((redDriver != 0) && (0 < shouldDelete)) {
@@ -1206,6 +1207,7 @@ extern "C" CRedDriver* __dt__10CRedDriverFv(CRedDriver* redDriver, short shouldD
     }
     return redDriver;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

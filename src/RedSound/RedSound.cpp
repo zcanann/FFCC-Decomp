@@ -72,6 +72,7 @@ CRedSound::CRedSound()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 extern "C" CRedSound* __dt__9CRedSoundFv(CRedSound* redSound, short shouldDelete)
 {
     if ((redSound != 0) && (0 < shouldDelete)) {
@@ -79,6 +80,7 @@ extern "C" CRedSound* __dt__9CRedSoundFv(CRedSound* redSound, short shouldDelete
     }
     return redSound;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

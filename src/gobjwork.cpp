@@ -1513,7 +1513,7 @@ void CCaravanWork::SafeDeleteTempItem()
 	int totalSlots = 0;
 	int artifactIndex = 0;
 
-	if ((unsigned int)System.m_execParam > 2U) {
+	if ((unsigned int)System.m_execParam >= 3U) {
 		System.Printf(const_cast<char*>(lbl_801D9F64));
 	}
 
@@ -1522,16 +1522,34 @@ void CCaravanWork::SafeDeleteTempItem()
 		if (artifactIndex < 96 && (short)artifact[0] > 0) {
 			unsigned short* artifactData =
 				(unsigned short*)(Game.unkCFlatData0[2] + (short)artifact[0] * 0x48);
-			if (artifactData[0] == 0xDB) {
+			switch (artifactData[0]) {
+			case 0xDB:
 				totalSlots += artifactData[3];
+				break;
+			case 0x9F:
+			case 0xB6:
+			case 0xCC:
+			case 0xDF:
+			case 0xE4:
+			default:
+				break;
 			}
 		}
 
 		if ((artifactIndex + 1) < 96 && (short)artifact[1] > 0) {
 			unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
 															 (short)artifact[1] * 0x48);
-			if (artifactData[0] == 0xDB) {
+			switch (artifactData[0]) {
+			case 0xDB:
 				totalSlots += artifactData[3];
+				break;
+			case 0x9F:
+			case 0xB6:
+			case 0xCC:
+			case 0xDF:
+			case 0xE4:
+			default:
+				break;
 			}
 		}
 	}
@@ -1540,48 +1558,50 @@ void CCaravanWork::SafeDeleteTempItem()
 	for (; totalSlots < 8; totalSlots++) {
 		if ((short)m_commandListInventorySlotRef[totalSlots] >= 0) {
 			m_commandListInventorySlotRef[totalSlots] = 0xFFFF;
-			if ((unsigned int)System.m_execParam > 2U) {
+			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(const_cast<char*>(lbl_801D9F94), totalSlots);
 			}
 		}
 	}
 
-	m_treasures[0] = 0xFFFF;
-	m_treasures[1] = 0xFFFF;
-	m_treasures[2] = 0xFFFF;
-	m_treasures[3] = 0xFFFF;
+	short invalidItem = -1;
+	m_treasures[0] = invalidItem;
+	m_treasures[1] = invalidItem;
+	m_treasures[2] = invalidItem;
+	m_treasures[3] = invalidItem;
 
 	for (int i = 0; i < 64; i++) {
-		unsigned short item = m_inventoryItems[i];
-		if (((short)item > 0xFF) && ((short)item < 0x125) && item != 0xFFFF) {
-			m_inventoryItems[i] = 0xFFFF;
+		short item = m_inventoryItems[i];
+		if ((item > 0xFF) && (item < 0x125) && (item != -1)) {
+			m_inventoryItems[i] = invalidItem;
 			m_inventoryItemCount--;
 		}
 	}
 
-	if ((short)m_commandListInventorySlotRef[2] >= 0 &&
-		(short)m_inventoryItems[(short)m_commandListInventorySlotRef[2]] < 0) {
-		m_commandListInventorySlotRef[2] = 0xFFFF;
+	short invalidSlot = -1;
+	short slot = m_commandListInventorySlotRef[2];
+	if (slot >= 0 && m_inventoryItems[slot] < 0) {
+		m_commandListInventorySlotRef[2] = invalidSlot;
 	}
-	if ((short)m_commandListInventorySlotRef[3] >= 0 &&
-		(short)m_inventoryItems[(short)m_commandListInventorySlotRef[3]] < 0) {
-		m_commandListInventorySlotRef[3] = 0xFFFF;
+	slot = m_commandListInventorySlotRef[3];
+	if (slot >= 0 && m_inventoryItems[slot] < 0) {
+		m_commandListInventorySlotRef[3] = invalidSlot;
 	}
-	if ((short)m_commandListInventorySlotRef[4] >= 0 &&
-		(short)m_inventoryItems[(short)m_commandListInventorySlotRef[4]] < 0) {
-		m_commandListInventorySlotRef[4] = 0xFFFF;
+	slot = m_commandListInventorySlotRef[4];
+	if (slot >= 0 && m_inventoryItems[slot] < 0) {
+		m_commandListInventorySlotRef[4] = invalidSlot;
 	}
-	if ((short)m_commandListInventorySlotRef[5] >= 0 &&
-		(short)m_inventoryItems[(short)m_commandListInventorySlotRef[5]] < 0) {
-		m_commandListInventorySlotRef[5] = 0xFFFF;
+	slot = m_commandListInventorySlotRef[5];
+	if (slot >= 0 && m_inventoryItems[slot] < 0) {
+		m_commandListInventorySlotRef[5] = invalidSlot;
 	}
-	if ((short)m_commandListInventorySlotRef[6] >= 0 &&
-		(short)m_inventoryItems[(short)m_commandListInventorySlotRef[6]] < 0) {
-		m_commandListInventorySlotRef[6] = 0xFFFF;
+	slot = m_commandListInventorySlotRef[6];
+	if (slot >= 0 && m_inventoryItems[slot] < 0) {
+		m_commandListInventorySlotRef[6] = invalidSlot;
 	}
-	if ((short)m_commandListInventorySlotRef[7] >= 0 &&
-		(short)m_inventoryItems[(short)m_commandListInventorySlotRef[7]] < 0) {
-		m_commandListInventorySlotRef[7] = 0xFFFF;
+	slot = m_commandListInventorySlotRef[7];
+	if (slot >= 0 && m_inventoryItems[slot] < 0) {
+		m_commandListInventorySlotRef[7] = invalidSlot;
 	}
 
 	m_currentCmdListIndex = 0;

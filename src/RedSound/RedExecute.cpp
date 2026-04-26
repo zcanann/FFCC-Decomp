@@ -233,10 +233,9 @@ int PitchCompute(int param_1, int param_2, int param_3, int param_4)
  */
 void _ReverbNullCallback(AXFX_BUFFERUPDATE* param_1, void*)
 {
-    u32* data = (u32*)param_1;
-    memset((void*)data[0], 0, 0x280);
-    memset((void*)data[1], 0, 0x280);
-    memset((void*)data[2], 0, 0x280);
+    memset((void*)((u32*)param_1)[0], 0, 0x280);
+    memset((void*)((u32*)param_1)[1], 0, 0x280);
+    memset((void*)((u32*)param_1)[2], 0, 0x280);
 }
 
 /*

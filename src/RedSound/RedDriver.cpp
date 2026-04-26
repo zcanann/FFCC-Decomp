@@ -52,8 +52,8 @@ struct RedDriverSyncState {
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 static int m_RedMasterTime;
 static int m_SequencialID;
-static int m_ThreadControl;
-static int m_ThreadExecute;
+static volatile int m_ThreadControl;
+static volatile int m_ThreadExecute;
 static int m_SoundMode;
 static int* volatile p_Tick;
 void* volatile p_ZeroData;

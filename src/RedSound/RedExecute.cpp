@@ -33,12 +33,14 @@ static const float s_ReverbEffectScale = 100.0f;
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 u8 GetRandomData()
 {
     u8 value = (u8)t_RandomData[m_RandomIndex];
     m_RandomIndex = m_RandomIndex + 1;
     return value;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

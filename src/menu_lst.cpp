@@ -114,7 +114,11 @@ void CMenuPcs::MLstDraw()
 			float z = item->z;
 
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
-			GXColor color = {0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * alpha)};
+			GXColor color;
+			color.r = 0xff;
+			color.g = 0xff;
+			color.b = 0xff;
+			color.a = (unsigned char)(FLOAT_803333D4 * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
 			float v = FLOAT_803333D0;
@@ -178,7 +182,7 @@ void CMenuPcs::MLstDraw()
 		MenuLstEntry* curItem = &list->entries[state->cursor];
 		float cursorYOffset = (float)((double)(float)(curItem->height - 0x20) * DOUBLE_803333E8);
 		int cursorY = (int)((float)curItem->y + cursorYOffset);
-		int cursorX = (int)((float)curItem->x - 56.0f + (float)(System.m_frameCounter & 7));
+		int cursorX = (int)((float)(curItem->x - 0x38) + (float)(System.m_frameCounter & 7));
 		DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, FLOAT_803333F0);
 	}
 

@@ -382,9 +382,15 @@ redsound_cpp_exceptions_units = {
     *parse_unit_env_set("FFCC_REDSOUND_CPP_EXCEPTIONS_UNITS"),
 }
 redsound_opt0_units = parse_unit_env_set("FFCC_REDSOUND_OPT0_UNITS")
-# RedStream's codegen is unchanged by inline-off, but its exception table
-# layout moves closer to the MAP/object target with this unit-local flag.
+# These RedSound objects' code report measures are unchanged by inline-off,
+# but their generated exception table layouts move closer to the MAP/object
+# targets with this unit-local flag.
 redsound_inline_off_units = {
+    "RedCommand",
+    "RedEntry",
+    "RedExecute",
+    "RedMemory",
+    "RedSound",
     "RedStream",
     *parse_unit_env_set("FFCC_REDSOUND_INLINE_OFF_UNITS"),
 }

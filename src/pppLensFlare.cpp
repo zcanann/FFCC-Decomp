@@ -188,17 +188,16 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 
 		int sampleCount = unkB->m_count + 1;
 		sampleCount *= sampleCount;
-		int alpha = work->m_alpha;
-		if (alpha == sampleCount) {
+		if (work->m_alpha == sampleCount) {
 			work->m_alpha = 0xff;
 		} else {
-			int scaledAlpha = alpha * (0xFF / sampleCount);
+			int scaledAlpha = work->m_alpha * (0xFF / sampleCount);
 
-			work->m_alpha = (u8)scaledAlpha;
+			work->m_alpha = scaledAlpha;
 			if (0xFF < (int)(u8)scaledAlpha) {
 				work->m_alpha = 0xff;
 			} else {
-				work->m_alpha = (u8)scaledAlpha;
+				work->m_alpha = scaledAlpha;
 			}
 		}
 

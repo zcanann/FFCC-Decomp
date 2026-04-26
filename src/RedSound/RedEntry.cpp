@@ -240,11 +240,7 @@ int CRedEntry::SearchWaveSequence(int waveNo)
 	do {
 		if ((waveBank[3] != 0) && (*waveBank == waveNo)) {
 			int offset = (int)waveBank - entry[0];
-			int result = offset >> 4;
-			if ((offset < 0) && ((offset & 0xF) != 0)) {
-				result++;
-			}
-			return result;
+			return offset / 0x10;
 		}
 		waveBank += 4;
 	} while (waveBank < end);
@@ -974,7 +970,7 @@ int CRedEntry::SearchSeSepSequence(int seNo)
 		do {
 			if (seSepBank[3] != 0) {
 				offset = (int)seSepBank - *(int*)((int)this + 4);
-				return ((int)offset >> 4) + ((int)offset < 0 && (offset & 0xF) != 0);
+				return (int)offset / 0x10;
 			}
 			seSepBank += 4;
 		} while (seSepBank < (int*)(*(int*)((int)this + 4) + 0x1000));
@@ -982,7 +978,7 @@ int CRedEntry::SearchSeSepSequence(int seNo)
 		do {
 			if ((seSepBank[3] != 0) && (seSepBank[0] == seNo)) {
 				offset = (int)seSepBank - *(int*)((int)this + 4);
-				return ((int)offset >> 4) + ((int)offset < 0 && (offset & 0xF) != 0);
+				return (int)offset / 0x10;
 			}
 			seSepBank += 4;
 		} while (seSepBank < (int*)(*(int*)((int)this + 4) + 0x1000));
@@ -1355,7 +1351,7 @@ int CRedEntry::SearchMusicSequence(int musicNo)
 	do {
 		if ((musicBank[3] != 0) && (*musicBank == musicNo)) {
 			int offset = (int)musicBank - *(int*)((int)this + 8);
-			return (offset >> 4) + ((offset < 0) && ((offset & 0xF) != 0));
+			return offset / 0x10;
 		}
 		musicBank += 4;
 	} while (musicBank < end);

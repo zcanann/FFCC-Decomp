@@ -41,6 +41,7 @@ public:
         int m_width;
         int m_gaugeMax;
         int m_gaugeValue;
+        int m_unk1c;
     };
 
     struct CTmp

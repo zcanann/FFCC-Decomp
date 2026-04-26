@@ -612,13 +612,23 @@ void CMenuPcs::InitOptionMenuParam()
 void CMenuPcs::CalcOptionMenu()
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
-	bool optionChanged = false;
-
 	const float minValue = kOptionAnimMin;
 	const float maxValue = kOptionAnimMax;
 	const float animStep = kOptionRowAnimStep;
 	const float animStep2 = kOptionColumnAnimStep;
-	const unsigned short press = GetMenuPress();
+	unsigned short press;
+	bool padBlocked = false;
+	bool optionChanged = false;
+
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		padBlocked = true;
+	}
+	if (padBlocked) {
+		press = 0;
+	} else {
+		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+		press = static_cast<unsigned short>(Pad._8_2_);
+	}
 
 	signed char& menuState = *reinterpret_cast<signed char*>(self + 0x9C);
 	float& openAnim = *reinterpret_cast<float*>(self + 0x98);
@@ -730,7 +740,19 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (specialModeEdit == 0) {
-		const unsigned short press2 = GetMenuPress();
+		unsigned short press2;
+		bool padBlocked2 = false;
+
+		if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+			padBlocked2 = true;
+		}
+		if (padBlocked2) {
+			press2 = 0;
+		} else {
+			__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+			press2 = static_cast<unsigned short>(Pad._8_2_);
+		}
+
 		if ((press2 & 0x200) != 0) {
 			menuState = 2;
 			Sound.PlaySe(3, 0x40, 0x7F, 0);
@@ -821,7 +843,19 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (optionIndex == 4) {
-		const unsigned short press3 = GetMenuPress();
+		unsigned short press3;
+		bool padBlocked3 = false;
+
+		if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+			padBlocked3 = true;
+		}
+		if (padBlocked3) {
+			press3 = 0;
+		} else {
+			__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+			press3 = static_cast<unsigned short>(Pad._8_2_);
+		}
+
 		if ((press3 & 0x100) != 0) {
 			if (specialModeEdit == 0) {
 				specialModeCursor = 0;
@@ -829,7 +863,19 @@ void CMenuPcs::CalcOptionMenu()
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			}
 		} else if (specialModeEdit != 0) {
-			const unsigned short press4 = GetMenuPress();
+			unsigned short press4;
+			bool padBlocked4 = false;
+
+			if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+				padBlocked4 = true;
+			}
+			if (padBlocked4) {
+				press4 = 0;
+			} else {
+				__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+				press4 = static_cast<unsigned short>(Pad._8_2_);
+			}
+
 			if ((press4 & 0x200) != 0) {
 				specialModeCursor = 0;
 				specialModeEdit = 0;

@@ -26,7 +26,11 @@ class CMapObjAtr
 public:
     enum TYPE
     {
-        TODO,
+        SPOT_LIGHT = 0,
+        POINT_LIGHT = 1,
+        MIME = 2,
+        MESH_NAME = 3,
+        PLAY_STA = 4,
     };
     
     CMapObjAtr();

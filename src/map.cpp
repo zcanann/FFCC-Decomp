@@ -119,9 +119,9 @@ static const char s_mapMtxPathFmt[] = "%s_%d.mtx";
 static const char s_mapReadMtxFmt[] = "ReadMtx fn=%s\n";
 static const char s_map_manager_label_block[] = "CMapMng.mapmng\0\0CMapObjAtr\0";
 static const char s_CMapTexAnimSet[] = "CMapTexAnimSet";
-static const char s_ptrarray_grow_error[] =
+static const char s_map_ptrarray_grow_error[] =
     "\x83\x6f\x83\x62\x83\x74\x83\x40\x90\xac\x92\xb7\x82\xaa\x95\x73\x8b\x96\x89\xc2\x82\xc5\x82\xb7\x81\x42\n";
-static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
+static const char s_map_collection_ptrarray_h[] = "collection_ptrarray.h";
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -476,13 +476,13 @@ bool CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(const_cast<char*>(s_ptrarray_grow_error));
+                System.Printf(const_cast<char*>(s_map_ptrarray_grow_error));
             }
             m_size = m_size << 1;
         }
 
         newItems = (CMapLightHolder**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, m_size << 2, m_stage, const_cast<char*>(s_collection_ptrarray_h), 0xFA, 0);
+            &Memory, m_size << 2, m_stage, const_cast<char*>(s_map_collection_ptrarray_h), 0xFA, 0);
         if (newItems == 0) {
             return false;
         }
@@ -735,13 +735,13 @@ bool CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(const_cast<char*>(s_ptrarray_grow_error));
+                System.Printf(const_cast<char*>(s_map_ptrarray_grow_error));
             }
             m_size = m_size << 1;
         }
 
         newItems = (CMapAnim**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, m_size << 2, m_stage, const_cast<char*>(s_collection_ptrarray_h), 0xFA, 0);
+            &Memory, m_size << 2, m_stage, const_cast<char*>(s_map_collection_ptrarray_h), 0xFA, 0);
         if (newItems == 0) {
             return false;
         }
@@ -1746,7 +1746,7 @@ void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 
         if (mapObj < mapObjEnd) {
             do {
-                if (mapObj->attr != 0 && mapObj->attr->type == 3) {
+                if (mapObj->attr != 0 && mapObj->attr->type == CMapObjAtr::MESH_NAME) {
                     goto found;
                 }
                 mapObj++;
@@ -1793,7 +1793,7 @@ int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
 
     while (mapObj < mapObjEnd) {
         unsigned char* mapObjAtr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
-        if (mapObjAtr != 0 && *reinterpret_cast<int*>(mapObjAtr + 4) == 4 &&
+        if (mapObjAtr != 0 && *reinterpret_cast<int*>(mapObjAtr + 4) == CMapObjAtr::PLAY_STA &&
             *(mapObjAtr + 8) == static_cast<unsigned char>(playStaNo)) {
             vec->x = *reinterpret_cast<float*>(mapObj + 0xC4);
             vec->y = *reinterpret_cast<float*>(mapObj + 0xD4);
@@ -1830,7 +1830,7 @@ void CMapMng::SetLightSource()
         if (atr != 0) {
             const int type = *reinterpret_cast<int*>(atr + 4);
 
-            if (type == 1) {
+            if (type == CMapObjAtr::POINT_LIGHT) {
                 if (*reinterpret_cast<int*>(atr + 0x34) == 0) {
                     CLightPcs::CLight light;
                     light.m_type = 1;
@@ -1895,7 +1895,7 @@ void CMapMng::SetLightSource()
                     PSVECNormalize(reinterpret_cast<Vec*>(&light->m_direction), reinterpret_cast<Vec*>(&light->m_direction));
                 }
                 mapLightIndex += 1;
-            } else if (type == 0) {
+            } else if (type == CMapObjAtr::SPOT_LIGHT) {
                 CLightPcs::CLight light;
                 light.m_type = 0;
                 light.m_position.x = *reinterpret_cast<float*>(mapObj + 0xC4);
@@ -2452,7 +2452,7 @@ void CMapMng::ReadOtm(char* mapName)
         if (atr == 0) {
             continue;
         }
-        if (*reinterpret_cast<int*>(atr + 4) != 1 || *reinterpret_cast<int*>(atr + 0x34) == 0) {
+        if (*reinterpret_cast<int*>(atr + 4) != CMapObjAtr::POINT_LIGHT || *reinterpret_cast<int*>(atr + 0x34) == 0) {
             continue;
         }
 
@@ -3490,7 +3490,7 @@ found:
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this) + (objIndex * 0xF0) + 0x954;
     unsigned char* mapObjLight = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
 
-    if (*reinterpret_cast<int*>(mapObjLight + 4) == 1) {
+    if (*reinterpret_cast<int*>(mapObjLight + 4) == CMapObjAtr::POINT_LIGHT) {
         const unsigned char* colorBytes = reinterpret_cast<const unsigned char*>(&packedColor);
         *reinterpret_cast<unsigned char*>(mapObjLight + 8) = colorBytes[0];
         *reinterpret_cast<unsigned char*>(mapObjLight + 9) = colorBytes[1];

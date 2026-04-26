@@ -21,6 +21,7 @@ extern const float kMapObjInitNegOne;
 extern const float kMapObjDegToRad;
 extern const float kMapObjInitValue50;
 unsigned int DAT_8032e498 = 0xFFFFFFFF;
+extern "C" void __ct__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
@@ -34,6 +35,43 @@ static inline unsigned char* Ptr(CMapObj* self, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(self) + offset;
 }
+
+struct MapObjAttrBaseLayout
+{
+    void* vtable;
+    int type;
+};
+
+struct MapObjAttrPlayStaLayout
+{
+    void* vtable;
+    int type;
+    unsigned char playStaNo;
+    unsigned char pad09[3];
+};
+
+struct MapObjAttrMimeLayout
+{
+    void* vtable;
+    int type;
+    unsigned char vertexListCount;
+    unsigned char pad09[3];
+    void* vertexLists;
+    int vertexCount;
+    CMapKeyFrame keyFrame;
+};
+
+struct MapObjAttrMeshNameLayout
+{
+    void* vtable;
+    int type;
+    char name[0x20];
+};
+
+STATIC_ASSERT(sizeof(MapObjAttrBaseLayout) == 0x8);
+STATIC_ASSERT(sizeof(MapObjAttrPlayStaLayout) == 0xC);
+STATIC_ASSERT(sizeof(MapObjAttrMimeLayout) == 0x3C);
+STATIC_ASSERT(sizeof(MapObjAttrMeshNameLayout) == 0x28);
 
 static inline void*& PtrAt(CMapObj* self, unsigned int offset)
 {
@@ -422,7 +460,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
             if (mime != 0) {
                 reinterpret_cast<CMapObjAtrMime*>(mime)->CMapObjAtrMime::CMapObjAtrMime();
-                *reinterpret_cast<int*>(mime + 0x4) = 2;
+                *reinterpret_cast<int*>(mime + 0x4) = CMapObjAtr::MIME;
                 *reinterpret_cast<void**>(mime + 0xC) = 0;
                 *reinterpret_cast<int*>(mime + 0x10) = 0;
                 *reinterpret_cast<int*>(mime + 0x14) = 0;
@@ -926,7 +964,7 @@ void CMapObj::Calc()
     int attr = S32At(this, 0xEC);
     if (attr != 0) {
         int attrType = *reinterpret_cast<int*>(attr + 4);
-        if (attrType == 1) {
+        if (attrType == CMapObjAtr::POINT_LIGHT) {
             _GXColor& colorCurrent = *reinterpret_cast<_GXColor*>(attr + 8);
             _GXColor* colorTable = reinterpret_cast<_GXColor*>(attr + 0x40);
 
@@ -936,8 +974,7 @@ void CMapObj::Calc()
             }
 
             calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xE8), colorCurrent, colorTable);
-        } else if (attrType < 1) {
-            if (attrType >= 0) {
+        } else if (attrType == CMapObjAtr::SPOT_LIGHT) {
                 _GXColor& colorCurrent = *reinterpret_cast<_GXColor*>(attr + 8);
                 _GXColor* colorTable = reinterpret_cast<_GXColor*>(attr + 0x24);
 
@@ -947,8 +984,8 @@ void CMapObj::Calc()
                 }
 
                 calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xCC), colorCurrent, colorTable);
-            }
-        } else if ((attrType < 3) && (IsRun__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(attr + 0x14)) != 0)) {
+        } else if ((attrType == CMapObjAtr::MIME) &&
+                   (IsRun__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(attr + 0x14)) != 0)) {
             int key0 = 0;
             int key1 = 0;
             float blend = 0.0f;
@@ -1537,7 +1574,10 @@ static inline void FreeAndClear(void* base, unsigned int offset)
  */
 CMapObjAtrPlaySta::CMapObjAtrPlaySta()
 {
-	// TODO
+    MapObjAttrPlayStaLayout* self = reinterpret_cast<MapObjAttrPlayStaLayout*>(this);
+
+    self->type = CMapObjAtr::PLAY_STA;
+    self->playStaNo = 0;
 }
 
 /*
@@ -1547,7 +1587,7 @@ CMapObjAtrPlaySta::CMapObjAtrPlaySta()
  */
 CMapObjAtr::CMapObjAtr()
 {
-	// TODO
+    reinterpret_cast<MapObjAttrBaseLayout*>(this)->type = -1;
 }
 
 /*
@@ -1557,7 +1597,13 @@ CMapObjAtr::CMapObjAtr()
  */
 CMapObjAtrMime::CMapObjAtrMime()
 {
-	// TODO
+    MapObjAttrMimeLayout* self = reinterpret_cast<MapObjAttrMimeLayout*>(this);
+
+    self->type = CMapObjAtr::MIME;
+    self->vertexListCount = 0;
+    self->vertexLists = 0;
+    self->vertexCount = 0;
+    __ct__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<unsigned char*>(this) + 0x14));
 }
 
 /*
@@ -1577,7 +1623,10 @@ void CMapObj::SetCalcMtx()
  */
 CMapObjAtrMeshName::CMapObjAtrMeshName()
 {
-	// TODO
+    MapObjAttrMeshNameLayout* self = reinterpret_cast<MapObjAttrMeshNameLayout*>(this);
+
+    self->type = CMapObjAtr::MESH_NAME;
+    memset(self->name, 0, sizeof(self->name));
 }
 
 /*

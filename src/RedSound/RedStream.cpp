@@ -8,29 +8,29 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-static const char s_redStreamLogBlob[0xC8] =
-    "%s%sStream Buffer didn't secure.%s\n"
-    "\0"
-    "\x1B[7;34mSound\x1B[0m:"
-    "\0"
-    "%s%sM-Memory didn't create.(need:0x%6.6X)%s\n"
-    "\0"
-    "%s%sA-Memory didn't create.(need:0x%6.6X)%s\n"
-    "\0"
-    "%sPause : Stream : ON  %d\n"
-    "\0"
-    "%sPause : Stream : OFF %d\n";
+struct RedStreamDebugStrings {
+    char bufferDidntSecure[sizeof("%s%sStream Buffer didn't secure.%s\n")];
+    char logPrefix[sizeof("\x1B[7;34mSound\x1B[0m:")];
+    char mainMemoryDidntCreate[sizeof("%s%sM-Memory didn't create.(need:0x%6.6X)%s\n")];
+    char aramMemoryDidntCreate[sizeof("%s%sA-Memory didn't create.(need:0x%6.6X)%s\n")];
+    char pauseOn[sizeof("%sPause : Stream : ON  %d\n")];
+    char pauseOff[sizeof("%sPause : Stream : OFF %d\n")];
+    char pad[2];
+};
+
+static const RedStreamDebugStrings sRedStreamDebugStrings = {
+    "%s%sStream Buffer didn't secure.%s\n",
+    "\x1B[7;34mSound\x1B[0m:",
+    "%s%sM-Memory didn't create.(need:0x%6.6X)%s\n",
+    "%s%sA-Memory didn't create.(need:0x%6.6X)%s\n",
+    "%sPause : Stream : ON  %d\n",
+    "%sPause : Stream : OFF %d\n",
+    { 0, 0 },
+};
+
 static const char sRedStreamLogErrorColor[] = "\x1B[7;31m";
 static const char sRedStreamLogReset[] = "\x1B[0m";
 static const char sRedStreamLogWarnColor[] = "\x1B[4;31m";
-
-enum {
-    RED_STREAM_LOG_PREFIX_OFFSET = 0x24,
-    RED_STREAM_MAIN_MEMORY_CREATE_ERROR_FMT_OFFSET = 0x36,
-    RED_STREAM_AUX_MEMORY_CREATE_ERROR_FMT_OFFSET = 0x63,
-    RED_STREAM_PAUSE_ON_FMT_OFFSET = 0x90,
-    RED_STREAM_PAUSE_OFF_FMT_OFFSET = 0xAB,
-};
 
 /*
  * --INFO--
@@ -314,7 +314,7 @@ void StreamStop(int param_1)
  */
 int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5)
 {
-	const char* logBlob = s_redStreamLogBlob;
+	const RedStreamDebugStrings* debugStrings = &sRedStreamDebugStrings;
 	int amemSize;
 	int arOffset;
 	int pitch;
@@ -424,14 +424,14 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 		streamData[0x44] = 3;
 	} else {
 		if (m_ReportPrint != 0) {
-			OSReport(logBlob, logBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogErrorColor,
+			OSReport(debugStrings->bufferDidntSecure, debugStrings->logPrefix, sRedStreamLogErrorColor,
 			         sRedStreamLogReset);
 			fflush(__files + 1);
 		}
 		if (streamData[3] == 0) {
 			if (m_ReportPrint != 0) {
-				OSReport(logBlob + RED_STREAM_MAIN_MEMORY_CREATE_ERROR_FMT_OFFSET,
-				         logBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogWarnColor, 0x4000,
+				OSReport(debugStrings->mainMemoryDidntCreate,
+				         debugStrings->logPrefix, sRedStreamLogWarnColor, 0x4000,
 				         sRedStreamLogReset);
 				fflush(__files + 1);
 			}
@@ -440,8 +440,8 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 		}
 		if (streamData[0x4b] == 0) {
 			if (m_ReportPrint != 0) {
-				OSReport(logBlob + RED_STREAM_AUX_MEMORY_CREATE_ERROR_FMT_OFFSET,
-				         logBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogWarnColor, amemSize,
+				OSReport(debugStrings->aramMemoryDidntCreate,
+				         debugStrings->logPrefix, sRedStreamLogWarnColor, amemSize,
 				         sRedStreamLogReset);
 				fflush(__files + 1);
 			}
@@ -503,15 +503,15 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
  */
 void StreamPause(int param_1, int param_2)
 {
-	const char* logBlob = s_redStreamLogBlob;
+	const RedStreamDebugStrings* debugStrings = &sRedStreamDebugStrings;
 	RedStreamDATA* streamData;
 	RedStreamDATA* streamEnd;
 
 	if (m_ReportPrint != 0) {
 		if (param_2 == 1) {
-			OSReport(logBlob + RED_STREAM_PAUSE_ON_FMT_OFFSET, logBlob + RED_STREAM_LOG_PREFIX_OFFSET, param_1);
+			OSReport(debugStrings->pauseOn, debugStrings->logPrefix, param_1);
 		} else {
-			OSReport(logBlob + RED_STREAM_PAUSE_OFF_FMT_OFFSET, logBlob + RED_STREAM_LOG_PREFIX_OFFSET, param_1);
+			OSReport(debugStrings->pauseOff, debugStrings->logPrefix, param_1);
 		}
 		fflush(__files + 1);
 	}

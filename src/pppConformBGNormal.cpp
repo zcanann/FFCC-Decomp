@@ -217,7 +217,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
                     pppMngStPtr->m_matrix.value[1][3] = owner->m_worldPosition.y;
                     pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
-                } else if (((s8)((s32)((u32)*(u8*)&owner->m_weaponNodeFlags << 31) >> 31) != 0) &&
+                } else if (((s8)((s32)((u32)(*(u8*)&owner->m_weaponNodeFlags & 2) << 30) >> 31) != 0) &&
                     (owner->m_attachOwner != NULL)) {
                     ownerY = owner->m_attachOwner->m_worldPosition.y;
                     ownerZ = owner->m_worldPosition.z;

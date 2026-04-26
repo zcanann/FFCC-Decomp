@@ -38,7 +38,7 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void DrawSphere__8CGraphicFPA4_f8_GXColor(void*, Mtx, _GXColor);
 }
 
-static const char s_pppBreathModel_cpp[] = "pppBreathModel.cpp";
+extern "C" const char s_pppBreathModel_cpp_801DB5A0[] = "pppBreathModel.cpp";
 
 struct pppBreathModelUnkC {
     unsigned char _pad[0xC];
@@ -441,21 +441,21 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
 
         *(void**)(work + 0x30) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) * 0x98), pppEnvStPtr->m_stagePtr,
-                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x257);
+                                                  const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x257);
         if (*(void**)(work + 0x30) != NULL) {
             memset(*(void**)(work + 0x30), 0, (unsigned long)(*(int*)(work + 0x40) * 0x98));
         }
 
         *(void**)(work + 0x34) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) * 0x30), pppEnvStPtr->m_stagePtr,
-                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x25d);
+                                                  const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x25d);
         if (*(void**)(work + 0x34) != NULL) {
             memset(*(void**)(work + 0x34), 0, (unsigned long)(*(int*)(work + 0x40) * 0x30));
         }
 
         *(void**)(work + 0x38) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) << 5), pppEnvStPtr->m_stagePtr,
-                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x263);
+                                                  const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x263);
         if (*(void**)(work + 0x38) != NULL) {
             memset(*(void**)(work + 0x38), 0, (unsigned long)(*(int*)(work + 0x40) << 5));
         }
@@ -463,7 +463,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         *(void**)(work + 0x3C) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12) * 0x5C),
-                pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x269);
+                pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x269);
         if (*(void**)(work + 0x3C) != NULL) {
             memset(*(void**)(work + 0x3C), 0,
                    (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12) * 0x5C));
@@ -472,14 +472,14 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
             for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); i++) {
                 groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                     (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10),
-                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x274);
+                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x274);
                 void* particleIndices = (void*)groupTable[1];
                 memset(particleIndices, -1,
                        (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10));
 
                 groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                     (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10),
-                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x277);
+                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x277);
                 void* particleStates = (void*)groupTable[2];
                 memset(particleStates, -1,
                        (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10));

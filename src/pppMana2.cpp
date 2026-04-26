@@ -19,7 +19,7 @@ struct Vec2d {
     float y;
 };
 
-static const char s_pppMana2_cpp[] = "pppMana2.cpp";
+extern "C" const char s_pppMana2_cpp_801DC4E0[] = "pppMana2.cpp";
 
 extern char s_Render_Mana2___801dc4d0[];
 extern float FLOAT_803318fc;
@@ -531,28 +531,28 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     work[0x1F] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((char*)param_2 + 0x2C), pppEnvStPtr);
 
     if (work[0x1D] == 0) {
-        work[0x1D] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1D7);
+        work[0x1D] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x1D7);
     }
     if (work[10] == 0) {
-        work[10] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1DD);
+        work[10] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x1DD);
     }
     if (work[11] == 0) {
-        work[11] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1E1);
+        work[11] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x1E1);
     }
 
     texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
     if (work[12] == 0) {
-        work[12] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1E9);
+        work[12] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x1E9);
     }
     if (work[13] == 0) {
-        work[13] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1EB);
+        work[13] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x1EB);
     }
 
     GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
     if (work[8] == 0) {
-        work[8] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1F6);
+        work[8] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x1F6);
     }
     dstBuffer = (void*)work[8];
     texList = &work[2];
@@ -568,7 +568,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     InitTexObj__8CTextureFv((void*)work[0x1F]);
 
     if (work[9] == 0) {
-        work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x211);
+        work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x211);
         genParaboloidMap__FPvPUlUs9_GXVtxFmt((void*)work[9], &work[0x39], 0x1E, GX_VTXFMT7);
     }
 
@@ -584,7 +584,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                 if (work[0x19] == 0) {
                     work[0x19] =
                         (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) * 0xC, pppEnvStPtr->m_stagePtr,
-                                         const_cast<char*>(s_pppMana2_cpp), 0x232);
+                                         const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x232);
                     Vec* reflectionVec = (Vec*)work[0x19];
                     float zero = FLOAT_80331898;
                     for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
@@ -598,7 +598,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                 if (work[0x1A] == 0) {
                     work[0x1A] =
                         (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) << 2, pppEnvStPtr->m_stagePtr,
-                                         const_cast<char*>(s_pppMana2_cpp), 0x23B);
+                                         const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x23B);
                     u8* color = (u8*)work[0x1A];
                     for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
                         color[0] = 0xFF;
@@ -612,7 +612,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                 if (work[0x1B] == 0) {
                     work[0x1B] =
                         (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) * 6, pppEnvStPtr->m_stagePtr,
-                                         const_cast<char*>(s_pppMana2_cpp), 0x244);
+                                         const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x244);
                     u16* texCoord = (u16*)work[0x1B];
                     for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
                         texCoord[1] = 0;
@@ -622,12 +622,12 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                 }
 
                 work[0x18] = (u32)pppMemAlloc(*(s32*)(meshShape + 0x4C) << 2, pppEnvStPtr->m_stagePtr,
-                                              const_cast<char*>(s_pppMana2_cpp), 0x24B);
+                                              const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x24B);
                 u32* dlInfo = *(u32**)(meshShape + 0x50);
                 dlOffset = (*(s32*)(meshShape + 0x4C) - 1) * 4;
                 for (s32 dlIndex = *(s32*)(meshShape + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
                     *(u32*)(work[0x18] + dlOffset) =
-                        (u32)pppMemAlloc(dlInfo[0], pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x255);
+                        (u32)pppMemAlloc(dlInfo[0], pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x255);
                     *(u32*)(work[0x18] + dlOffset) = (*(u32*)(work[0x18] + dlOffset) + 0x1F) & 0xFFFFFFE0;
                     work[0x3A] = dlInfo[0];
                     memcpy((void*)*(u32*)(work[0x18] + dlOffset), (void*)dlInfo[1], dlInfo[0]);
@@ -640,15 +640,15 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
 
             if (((type == 1) && strcmp((char*)meshShape, DAT_803318ec) == 0) ||
                 ((type == 2) && strcmp((char*)meshShape, DAT_803318f4) == 0)) {
-                work[0xF] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26A);
-                work[0x10] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26B);
-                work[0x17] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26C);
-                work[0x15] = (u32)pppMemAlloc(0x908, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26D);
-                work[0x16] = (u32)pppMemAlloc(0x908, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26E);
-                work[0x12] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26F);
-                work[0x13] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x270);
-                work[0x14] = (u32)pppMemAlloc(0xC00, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x271);
-                work[0x11] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x272);
+                work[0xF] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x26A);
+                work[0x10] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x26B);
+                work[0x17] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x26C);
+                work[0x15] = (u32)pppMemAlloc(0x908, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x26D);
+                work[0x16] = (u32)pppMemAlloc(0x908, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x26E);
+                work[0x12] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x26F);
+                work[0x13] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x270);
+                work[0x14] = (u32)pppMemAlloc(0xC00, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x271);
+                work[0x11] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x272);
 
                 float* waterHeightA = (float*)work[0x12];
                 float* waterHeightB = (float*)work[0x13];

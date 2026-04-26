@@ -70,7 +70,7 @@ struct VYmBreath {
     unsigned char _pad59[3];
 };
 
-static const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
+extern "C" const char s_pppYmBreath_cpp_801DA9B0[] = "pppYmBreath.cpp";
 
 /*
  * --INFO--
@@ -427,7 +427,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         work->m_particleData =
             (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x60),
                                                                   pppEnvStPtr->m_stagePtr,
-                                                                  const_cast<char*>(s_pppYmBreath_cpp), 0x243);
+                                                                  const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x243);
         if (work->m_particleData != NULL) {
             memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * 0x60));
         }
@@ -435,7 +435,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         work->m_particleWmats =
             (Mtx*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x30),
                                                        pppEnvStPtr->m_stagePtr,
-                                                       const_cast<char*>(s_pppYmBreath_cpp), 0x249);
+                                                       const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x249);
         if (work->m_particleWmats != NULL) {
             memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * 0x30));
         }
@@ -443,7 +443,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         work->m_particleColors =
             (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount << 5),
                                                                    pppEnvStPtr->m_stagePtr,
-                                                                   const_cast<char*>(s_pppYmBreath_cpp), 0x24F);
+                                                                   const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x24F);
         if (work->m_particleColors != NULL) {
             memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount << 5));
         }
@@ -452,7 +452,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
             (YmBreathParticleGroup*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14) * 0x5C),
                 pppEnvStPtr->m_stagePtr,
-                const_cast<char*>(s_pppYmBreath_cpp), 0x255);
+                const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x255);
         if (work->m_groups != NULL) {
             memset(work->m_groups, 0,
                    (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14) * 0x5C));
@@ -461,13 +461,13 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
             for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14); i++) {
                 groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                     (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12),
-                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmBreath_cpp), 0x260);
+                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x260);
                 memset((void*)groupTable[1], 0xFF,
                        (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12));
 
                 groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                     (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12),
-                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmBreath_cpp), 0x263);
+                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x263);
                 memset((void*)groupTable[2], 0xFF,
                        (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12));
                 groupTable[0] = 0;

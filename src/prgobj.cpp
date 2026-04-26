@@ -73,7 +73,7 @@ int CGPrgObj::GetCID()
 					CancelAnim(0);
 				}
 			} else if (m_animFlagBits.bits.m_animDirect != 0) {
-				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BE8[0];
+				// *reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BE8[0];
 				PlayAnim(m_reqAnimId, (m_animFlagBits.m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
 			} else {
 				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BD0;

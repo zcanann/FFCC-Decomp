@@ -171,10 +171,12 @@ void RedDelete(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void RedDelete(void* param_1)
 {
 	RedDelete((int)param_1);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -317,10 +319,12 @@ void RedDeleteA(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void RedDeleteA(void* param_1)
 {
 	RedDeleteA((int)param_1);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

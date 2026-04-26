@@ -120,10 +120,12 @@ void* ReverbAreaAlloc(unsigned long size)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void ReverbAreaFree(void* param_1)
 {
     RedDelete(param_1);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

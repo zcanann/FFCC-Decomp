@@ -450,21 +450,21 @@ int CTextureMan::SetTexture(_GXTexMapID texMapId, CTexture* texture)
     bool usePalette;
 
     usePalette = false;
-    if ((U8At(texture, 0x60) == 9) || (U8At(texture, 0x60) == 8)) {
+    if ((texture->m_format == 9) || (texture->m_format == 8)) {
         usePalette = true;
     }
 
     if (usePalette) {
-        GXInitTexObjTlut(reinterpret_cast<GXTexObj*>(Ptr(texture, 0x28)), GX_TLUT0);
+        GXInitTexObjTlut(&texture->m_texObj, GX_TLUT0);
     }
 
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(texture, 0x28)), texMapId);
+    GXLoadTexObj(&texture->m_texObj, texMapId);
 
     if (usePalette) {
-        GXInitTexObjTlut(reinterpret_cast<GXTexObj*>(Ptr(texture, 0x28)), GX_TLUT1);
-        GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(texture, 0x28)), static_cast<_GXTexMapID>(texMapId + 1));
-        GXLoadTlut(reinterpret_cast<GXTlutObj*>(Ptr(texture, 0x48)), GX_TLUT0);
-        GXLoadTlut(reinterpret_cast<GXTlutObj*>(Ptr(texture, 0x54)), GX_TLUT1);
+        GXInitTexObjTlut(&texture->m_texObj, GX_TLUT1);
+        GXLoadTexObj(&texture->m_texObj, static_cast<_GXTexMapID>(texMapId + 1));
+        GXLoadTlut(&texture->m_tlutObj0, GX_TLUT0);
+        GXLoadTlut(&texture->m_tlutObj1, GX_TLUT1);
     }
 
     return 0;
@@ -491,7 +491,7 @@ int CTextureMan::SetTextureTev(CTexture* texture)
         return 1;
     }
 
-    usePalette = *(u8*)((u8*)texture + 0x60) == 9 || *(u8*)((u8*)texture + 0x60) == 8;
+    usePalette = texture->m_format == 9 || texture->m_format == 8;
     if (usePalette) {
         GXColor tevColor1 = {0xFF, 0, 0, 0xFF};
         GXSetTevColor((GXTevRegID)1, tevColor1);

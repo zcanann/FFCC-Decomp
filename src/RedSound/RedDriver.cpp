@@ -322,7 +322,7 @@ void _MusicCrossPlaySequence(int* param_1)
         }
         else {
             iVar1 = c_RedEntry.SearchMusicSequence(*param_1);
-            if (-1 < iVar1) {
+            if (iVar1 >= 0) {
                 m_CrossTime = param_1[2];
                 iVar1 = 0;
                 if (*(int*)((int)pvVar2 + 0x470) != -1) {

@@ -222,6 +222,7 @@ static const float sDebugScreenY = 320.0f;            // FLOAT_80330370
 static const float sDebugScreenX = 224.0f;            // FLOAT_80330374
 static const float sNegativeOne = -1.0f;              // FLOAT_80330390
 static const float sLargeDistance = 10000000.0f;      // FLOAT_80330394
+static const float sDefaultMoveBaseSpeed = 2.0f;      // FLOAT_803303d4
 static const float sHitProbeHeight = 100.0f;          // FLOAT_80330410
 static const float sHitMoveScale = 0.16000001f;       // FLOAT_80330414
 static const float sJumpLift = 10.0f;                 // FLOAT_80330418
@@ -231,6 +232,10 @@ static const float sCrossCheckOuterRadius = 50.0f;    // FLOAT_80330424
 static const float sGroundOffsetFloor = -5.0f;        // FLOAT_80330428
 static const float sAnalogSpeedScale = 4.0f;          // FLOAT_8033042c
 static const float sSlideThreshold = 0.01f;           // FLOAT_80330430
+static const float sDefaultAttackColRadius = 7.0f;    // FLOAT_80330434
+static const float sDefaultBodyColRadius = 6.0f;      // FLOAT_80330438
+static const float sDefaultFrontHitAngle = 0.78539819f; // FLOAT_8033043c
+static const float sDefaultBgDownDist = 0.033333335f; // FLOAT_80330440
 
 /*
  * --INFO--
@@ -279,10 +284,10 @@ void CGObject::onCreate()
     m_rotTargetZ = 0.0f;
 
     m_bodyOffset.x = 0.0f;
-    m_bodyOffset.y = 0.5f;
+    m_bodyOffset.y = sNegativeOne;
     m_bodyOffset.z = 0.0f;
     m_jumpOffset.x = 0.0f;
-    m_jumpOffset.y = 1.0f;
+    m_jumpOffset.y = sJumpLift;
     m_jumpOffset.z = 0.0f;
     m_moveOffset.x = 0.0f;
     m_moveOffset.y = 1.0f;
@@ -297,18 +302,18 @@ void CGObject::onCreate()
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xBF) | 0x40;
     *((u8*)&m_weaponNodeFlags + 1) &= 0xDF;
 
-    m_moveBaseSpeed = 10.0f;
+    m_moveBaseSpeed = sDefaultMoveBaseSpeed;
     m_currentAnimSlot = -1;
     m_animSlotSel = -1;
 
-    m_bodyEllipsoidRadius = 2.0f;
+    m_bodyEllipsoidRadius = sStepProbeHeight;
     m_bodyEllipsoidOffset = 0.0f;
     m_bodyEllipsoidAspect = 1.0f;
-    m_capsuleHalfHeight = 2.0f;
+    m_capsuleHalfHeight = sStepProbeHeight;
 
-    m_attackColRadius = 3.0f;
-    m_bodyColRadius = 3.5f;
-    m_nearColRadius = 1.0f;
+    m_attackColRadius = sDefaultAttackColRadius;
+    m_bodyColRadius = sDefaultBodyColRadius;
+    m_nearColRadius = sJumpLift;
     m_bgColMask = 0;
 
     *((u8*)&m_weaponNodeFlags) = (*((u8*)&m_weaponNodeFlags) & 0xEF) | 0x10;
@@ -344,7 +349,7 @@ void CGObject::onCreate()
     *((u8*)&m_shieldNodeFlags) &= 0xFB;
     *((u8*)&m_shieldNodeFlags) &= 0xFE;
 
-    m_frontHitAngle = 3.1415927f;
+    m_frontHitAngle = sDefaultFrontHitAngle;
     m_lookAtTarget = 0;
     m_stepSlopeLimit = 1.0f;
     m_lookAtTimer = 1.0f;
@@ -383,10 +388,10 @@ void CGObject::onCreate()
     m_moveMode = 0;
     m_moveModePrevious = 4;
 
-    m_hitNormal.x = sNegativeOne;
+    m_hitNormal.x = sBgAttrFast;
     m_hitNormal.y = 0.0f;
     m_hitNormal.z = 0.0f;
-    m_bgDownDist = 9.0f;
+    m_bgDownDist = sDefaultBgDownDist;
     m_groundSlide = 0.0f;
     m_worldParam = 0.0f;
     m_worldParamA = 0;

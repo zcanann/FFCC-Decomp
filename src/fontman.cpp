@@ -198,99 +198,99 @@ find_fallback:
  */
 void CFont::Draw(unsigned short ch)
 {
-    unsigned short* glyph = m_glyphBuckets[ch & 0xFF] + 1;
-    unsigned int count = static_cast<unsigned int>(m_glyphBuckets[ch & 0xFF][0]);
+	unsigned short* glyph = m_glyphBuckets[ch & 0xFF] + 1;
+	unsigned int count = static_cast<unsigned int>(m_glyphBuckets[ch & 0xFF][0]);
 
-    for (; count != 0; count--) {
-        if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == ((ch >> 8) & 0xFF)) {
-            goto found_glyph;
-        }
-        glyph += 4;
-    }
-    glyph = 0;
+	for (; count != 0; count--) {
+		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == ((ch >> 8) & 0xFF)) {
+			goto found_glyph;
+		}
+		glyph += 4;
+	}
+	glyph = 0;
 
 found_glyph:
-    if (glyph == 0) {
-        glyph = m_glyphBuckets[63] + 1;
-        for (count = static_cast<unsigned int>(m_glyphBuckets[63][0]); count != 0; count--) {
-            if (*reinterpret_cast<char*>(glyph + 1) == '\0') {
-                goto found_fallback;
-            }
-            glyph += 4;
-        }
-        glyph = 0;
+	if (glyph == 0) {
+		unsigned short* glyphBucket = m_glyphBuckets[63];
+		glyph = glyphBucket + 1;
+		for (count = static_cast<unsigned int>(*glyphBucket); count != 0; count--) {
+			if (*reinterpret_cast<unsigned char*>(glyph + 1) == '\0') {
+				goto found_fallback;
+			}
+			glyph += 4;
+		}
+		glyph = 0;
 
 found_fallback:
-        if (glyph == 0) {
-            return;
-        }
-    }
+		if (glyph == 0) {
+			return;
+		}
+	}
 
-    unsigned char flags = renderFlags;
-    unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) + ((static_cast<signed char>(flags) < 0) ? 5 : 3);
+	unsigned char flags = renderFlags;
+	signed char sign = static_cast<signed char>(flags) >> 7;
+	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) +
+	                           ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 3);
+	unsigned int drawWidth;
+	unsigned int glyphIndex;
+	unsigned int row;
+	float u0;
+	float v0;
 
-    unsigned int drawWidth;
-    unsigned int texX;
-    int texY;
-    unsigned int glyphIndex = static_cast<unsigned int>(*glyph);
-    unsigned int row = glyphIndex / m_glyphColumns;
+	if (static_cast<int>((static_cast<unsigned int>(flags) << 27) | static_cast<unsigned int>(flags >> 5)) < 0) {
+		drawWidth = static_cast<unsigned int>(m_glyphWidth);
+		glyphIndex = static_cast<unsigned int>(*glyph);
+		row = glyphIndex / m_glyphColumns;
+		u0 = static_cast<float>(drawWidth * (glyphIndex - row * m_glyphColumns) * 2);
+		v0 = static_cast<float>(m_glyphHeight * row * 2);
+	} else {
+		glyphIndex = static_cast<unsigned int>(*glyph);
+		row = glyphIndex / m_glyphColumns;
+		drawWidth = static_cast<unsigned int>(glyphInfo[1]);
+		u0 = static_cast<float>((static_cast<unsigned int>(glyphInfo[0]) + m_glyphWidth * (glyphIndex - row * m_glyphColumns)) * 2);
+		v0 = static_cast<float>(m_glyphHeight * row * 2);
+	}
 
-    if ((flags & 0x10) != 0) {
-        drawWidth = static_cast<unsigned int>(m_glyphWidth);
-        texY = static_cast<int>(m_glyphHeight * row);
-        texX = drawWidth * (glyphIndex - row * m_glyphColumns);
-    } else {
-        row = glyphIndex / m_glyphColumns;
-        drawWidth = static_cast<unsigned int>(glyphInfo[1]);
-        texY = static_cast<int>(m_glyphHeight * row);
-        texX = static_cast<unsigned int>(glyphInfo[0]) + m_glyphWidth * (glyphIndex - row * m_glyphColumns);
-    }
+	float x0 = posX;
+	float y0 = posY;
+	if (static_cast<int>((static_cast<unsigned int>(flags) << 28) | static_cast<unsigned int>(flags >> 4)) < 0) {
+		x0 = static_cast<float>(floor(x0));
+		y0 = static_cast<float>(floor(y0));
+	}
 
-    double x0 = static_cast<double>(posX);
-    double y0 = static_cast<double>(posY);
-    if ((flags & 0x08) != 0) {
-        x0 = static_cast<double>(static_cast<float>(floor(x0)));
-        y0 = static_cast<double>(static_cast<float>(floor(y0)));
-    }
+	float advance = scaleX * (margin + static_cast<float>(drawWidth));
+	float x1 = x0 + static_cast<float>(drawWidth) * scaleX;
+	float y1 = y0 + static_cast<float>(m_glyphHeight) * scaleY;
+	float u1 = u0 + static_cast<float>(drawWidth * 2);
+	float v1 = v0 + static_cast<float>(m_glyphHeight * 2);
 
-    double advance = static_cast<double>(scaleX) * static_cast<double>(margin + static_cast<float>(drawWidth));
-    double u0 = static_cast<double>(static_cast<float>(texX * 2));
-    double v0 = static_cast<double>(static_cast<float>(texY * 2));
-    double x1 = static_cast<double>(
-        static_cast<float>(static_cast<double>(static_cast<float>(drawWidth)) * static_cast<double>(scaleX) + x0));
-    double y1 =
-        static_cast<double>(static_cast<float>(static_cast<double>(m_glyphHeight) * static_cast<double>(scaleY) + y0));
+	if (static_cast<int>((static_cast<unsigned int>(flags) << 28) | static_cast<unsigned int>(flags >> 4)) < 0) {
+		advance = static_cast<float>(floor(advance));
+	}
+	posX += advance;
 
-    if ((flags & 0x08) != 0) {
-        advance = floor(advance);
-    }
-    posX += static_cast<float>(advance);
+	if (glyphInfo[0] == 0) {
+		u0 += 1.0f;
+	}
+	if (m_glyphWidth == static_cast<unsigned short>(glyphInfo[0] + glyphInfo[1])) {
+		u1 -= 1.0f;
+	}
 
-    if (glyphInfo[0] == 0) {
-        u0 = static_cast<double>(static_cast<float>(u0 + 1.0));
-    }
+	v0 += 1.0f;
+	v1 -= 1.0f;
 
-    double u1 = static_cast<double>(static_cast<float>(u0 + static_cast<double>(static_cast<float>(drawWidth * 2))));
-    if (m_glyphWidth == static_cast<unsigned short>(glyphInfo[0] + glyphInfo[1])) {
-        u1 = static_cast<double>(static_cast<float>(u1 - 1.0));
-    }
+	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+	GXPosition3f32(x0, y0, posZ);
+	GXTexCoord2u16(static_cast<unsigned short>(u0), static_cast<unsigned short>(v0));
 
-    v0 = static_cast<double>(static_cast<float>(v0 + 1.0));
-    double v1 =
-        static_cast<double>(static_cast<float>(v0 + static_cast<double>(static_cast<float>(m_glyphHeight * 2)) - 2.0));
+	GXPosition3f32(x1, y0, posZ);
+	GXTexCoord2u16(static_cast<unsigned short>(u1), static_cast<unsigned short>(v0));
 
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(static_cast<float>(x0), static_cast<float>(y0), posZ);
-    GXTexCoord2u16(static_cast<unsigned short>(u0), static_cast<unsigned short>(v0));
+	GXPosition3f32(x1, y1, posZ);
+	GXTexCoord2u16(static_cast<unsigned short>(u1), static_cast<unsigned short>(v1));
 
-    GXPosition3f32(static_cast<float>(x1), static_cast<float>(y0), posZ);
-    GXTexCoord2u16(static_cast<unsigned short>(u1), static_cast<unsigned short>(v0));
-
-    GXPosition3f32(static_cast<float>(x1), static_cast<float>(y1), posZ);
-    GXTexCoord2u16(static_cast<unsigned short>(u1), static_cast<unsigned short>(v1));
-
-    GXPosition3f32(static_cast<float>(x0), static_cast<float>(y1), posZ);
-    GXTexCoord2u16(static_cast<unsigned short>(u0), static_cast<unsigned short>(v1));
+	GXPosition3f32(x0, y1, posZ);
+	GXTexCoord2u16(static_cast<unsigned short>(u0), static_cast<unsigned short>(v1));
 }
 
 /*

@@ -487,6 +487,8 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 	int* entry = (int*)this;
 	int waveNo;
 	int waveAddress;
+	int waveSize;
+	void* waveDataTop;
 
 	if (waveDataSize == 0) {
 		if ((entry[3] >= 0) && ((waveNo = SearchWaveSequence(entry[3])) >= 0)) {
@@ -530,24 +532,29 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 			    ((((*(int*)((unsigned char*)waveHead + 8) * 4) + 0x1F) & 0xFFFFFFE0) +
 			     *(int*)((unsigned char*)waveHead + 0xC) * 0x60) +
 			    0x20;
-			entry[4] = *(int*)((unsigned char*)waveHead + 4);
-			entry[5] = waveAddress;
+			waveSize = *(int*)((unsigned char*)waveHead + 4);
 			waveDataSize -= waveHeadSize;
-			waveData = (void*)((unsigned char*)waveData + waveHeadSize);
+			waveDataTop = (void*)((unsigned char*)waveData + waveHeadSize);
 		}
 	} else {
 		waveAddress = entry[5];
+		waveDataTop = waveData;
+		waveSize = entry[4];
 	}
 
 	if ((waveAddress != 0) && (waveDataSize > 0)) {
-		int transferSize = entry[4];
-		if (waveDataSize < transferSize) {
+		int transferSize;
+		if (waveSize > waveDataSize) {
 			transferSize = waveDataSize;
+		} else {
+			transferSize = waveSize;
 		}
 
-		int dmaID = RedDmaEntry(0x8000, 0, (int)waveData, waveAddress, transferSize, 0, 0);
-		entry[4] -= transferSize;
-		entry[5] += transferSize;
+		int dmaID = RedDmaEntry(0x8000, 0, (int)waveDataTop, waveAddress, transferSize, 0, 0);
+		waveSize -= transferSize;
+		waveAddress += transferSize;
+		entry[4] = waveSize;
+		entry[5] = waveAddress;
 
 		while (RedDmaSearchID(dmaID) > 0) {
 			RedSleep(1000);

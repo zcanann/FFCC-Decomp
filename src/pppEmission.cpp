@@ -32,6 +32,7 @@ extern const float FLOAT_80331120 = 7.0f;
 extern const double DOUBLE_80331128 = 4503599627370496.0;
 extern const float FLOAT_80331130 = 10000000.0f;
 extern const float FLOAT_803311e4;
+extern const float FLOAT_803311f8;
 static const char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
@@ -276,8 +277,8 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
         state[0] = 0;
     }
 
-    baseScale = FLOAT_80331130;
-    *(float*)(state + 5) = FLOAT_80331130;
+    baseScale = FLOAT_803311f8;
+    *(float*)(state + 5) = FLOAT_803311f8;
     *(float*)(state + 4) = baseScale;
     *(float*)(state + 3) = baseScale;
 }
@@ -292,7 +293,7 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
  * JP Size: TODO
  */
 void pppConstruct2Emission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
-    float baseScale = FLOAT_80331130;
+    float baseScale = FLOAT_803311f8;
     int offset = param_2->m_serializedDataOffsets[2];
     float* state = (float*)((u8*)pppEmission_ + 0x80 + offset);
     state[5] = baseScale;
@@ -324,7 +325,7 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
         u8 field1C;
     };
 
-    float baseScale = FLOAT_80331130;
+    float baseScale = FLOAT_803311f8;
     s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
     int offset = serializedDataOffsets[2];
     EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + offset);

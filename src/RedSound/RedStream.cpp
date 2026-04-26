@@ -44,23 +44,18 @@ static const char sRedStreamLogWarnColor[] = "\x1B[4;31m";
 RedStreamDATA* _SearchEmptyStreamData()
 {
 	RedStreamDATA* streamData = p_Stream;
-	RedStreamDATA* result;
 
 	for (;;) {
 		if (streamData->m_streamId == 0) {
-			result = streamData;
-			break;
+			return streamData;
 		}
 
 		streamData = (RedStreamDATA*)((u8*)streamData + 0x130);
 
 		if (!((u8*)streamData < (u8*)p_Stream + 0x4C0)) {
-			result = 0;
-			break;
+			return 0;
 		}
 	}
-
-	return result;
 }
 
 /*

@@ -561,19 +561,19 @@ void StreamControl()
 	do {
 		if (*(int*)(streamData + 0x110) == 1) {
 			int voiceData = *(int*)(streamData + 4);
-			if (*(int*)(voiceData + 0x14) != 0) {
+			if (*(void**)(voiceData + 0x14) != 0) {
 				if (*(int*)(*(int*)(voiceData + 0x14) + 0xc) == 0) {
 					_StreamStop((RedStreamDATA*)streamData);
 				} else {
 					int sampleStart = (*(int*)(streamData + 0x12c) + *(int*)(streamData + 0x128)) * 2;
 					int samplePos = (*(unsigned short*)(*(int*)(voiceData + 0x14) + 0x1b2) << 16) |
 						*(unsigned short*)(*(int*)(voiceData + 0x14) + 0x1b4);
-					if ((sampleStart <= samplePos) && (samplePos < sampleStart + 0x2000)) {
-						bool stopped = false;
+					if ((samplePos >= sampleStart) && (samplePos < sampleStart + 0x2000)) {
+						int stopped = 0;
 						if ((*(int*)(streamData + 0x20) < 0) &&
 							((*(int*)(streamData + 0x1c) = *(int*)(streamData + 0x1c) - 0x200), *(int*)(streamData + 0x1c) < 1)) {
 							_StreamStop((RedStreamDATA*)streamData);
-							stopped = true;
+							stopped = 1;
 						}
 						*(int*)(streamData + 0x11c) += *(short*)(streamData + 0x2a) * 0x1000;
 						if (*(int*)(streamData + 0x118) <= *(int*)(streamData + 0x11c)) {
@@ -581,11 +581,13 @@ void StreamControl()
 						}
 
 						if (!stopped) {
-							int side = *(int*)(streamData + 0x128) == 0;
-							if (side) {
-								*(int*)(streamData + 0x128) = 0x1000;
-							} else {
+							int side;
+							if (*(int*)(streamData + 0x128) != 0) {
+								side = 0;
 								*(int*)(streamData + 0x128) = 0;
+							} else {
+								side = 1;
+								*(int*)(streamData + 0x128) = 0x1000;
 							}
 
 							if (*(int*)(streamData + 0x20) < 0) {
@@ -595,26 +597,26 @@ void StreamControl()
 							}
 						}
 					}
-				}
 
-				RedStreamDATA* stream = (RedStreamDATA*)streamData;
-				int changed = stream->m_panStepCount != 0;
-				if (changed) {
-					stream->m_panStepCount -= 1;
-					stream->m_pan += stream->m_panStep;
-				}
-				if (stream->m_volumeStepCount != 0) {
-					changed += 1;
-					stream->m_volumeStepCount -= 1;
-					stream->m_volume += stream->m_volumeStep;
-				}
-				if (changed != 0) {
-					if (*(short*)(streamData + 0x2a) == 2) {
-						SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0, stream->m_volume >> 0xc);
-						SetVoiceVolumeMix((RedVoiceDATA*)(voiceData + 0xc0), 0x7f, stream->m_volume >> 0xc);
-					} else {
-						SetVoiceVolumeMix((RedVoiceDATA*)voiceData, stream->m_pan >> 0xc,
-							stream->m_volume >> 0xc);
+					RedStreamDATA* stream = (RedStreamDATA*)streamData;
+					int changed = stream->m_panStepCount != 0;
+					if (changed) {
+						stream->m_panStepCount -= 1;
+						stream->m_pan += stream->m_panStep;
+					}
+					if (stream->m_volumeStepCount != 0) {
+						changed += 1;
+						stream->m_volumeStepCount -= 1;
+						stream->m_volume += stream->m_volumeStep;
+					}
+					if (changed != 0) {
+						if (*(short*)(streamData + 0x2a) == 2) {
+							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0, stream->m_volume >> 0xc);
+							SetVoiceVolumeMix((RedVoiceDATA*)(voiceData + 0xc0), 0x7f, stream->m_volume >> 0xc);
+						} else {
+							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, stream->m_pan >> 0xc,
+								stream->m_volume >> 0xc);
+						}
 					}
 				}
 			}

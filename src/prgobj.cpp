@@ -20,7 +20,7 @@ extern "C" const float FLOAT_80331BD0 = 1.0f;
 extern "C" const float FLOAT_80331BD4 = 0.0f;
 extern "C" const float FLOAT_80331BD8 = 3.1415927f;
 extern "C" const double DOUBLE_80331BE0 = 4503601774854144.0;
-extern "C" const float FLOAT_80331BE8 = -1.0f;
+extern "C" const float FLOAT_80331BE8[2] = {-1.0f, 0.0f};
 extern "C" const char DAT_80331bf0[] = "GMGR";
 extern "C" const float FLOAT_80331bf8 = 0.0f;
 extern "C" const float FLOAT_80331bfc = 1.0f;
@@ -107,7 +107,7 @@ void CGPrgObj::onFrame()
 					CancelAnim(0);
 				}
 			} else if (m_animFlagBits.bits.m_animDirect != 0) {
-				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BE8;
+				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BE8[0];
 				PlayAnim(m_reqAnimId, (m_animFlagBits.m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
 			} else {
 				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BD0;

@@ -98,14 +98,18 @@ Treat these as first-class wins:
 
 Small local regressions are acceptable if they unlock larger real gains nearby.
 
-### 7. Create a PR only if both are true
+### 7. Decide to create a PR or do more work
+Before checkpointing, ensure that:
 **A) Real net progress**
 - objdiff or build output improved in code, data, or linkage
 - gains are real, not formatting, renames, or temporary hacks
+- minor score regressions are ONLY acceptable if the code is closer to plausible source (ie if a change was made that is backed up by the .MAP files)
 
 **B) Plausible original source**
 - the code looks like something the FFCC developers could have written
 - types, fields, control flow, and linkage are more coherent than before
+
+If these are true, make the checkpoint, and decide if we want to go back to step 1 or continue to submit. Prioritize repeating if only minor changes were made.
 
 ### 8. Submit
 ```sh

@@ -207,8 +207,6 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     TracerWork* work;
     TRACE_POLYGON* entries;
     TRACE_POLYGON* entry;
-    TRACE_POLYGON* source;
-    TRACE_POLYGON* dest;
     TRACE_POLYGON* poly;
     float* valuePtr;
     f32 fVar3;
@@ -264,11 +262,8 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
 
     entries = work->entries;
     if (work->count + 1 < *(u16*)(param_2->m_payload + 4)) {
-        source = entries + (*(u16*)(param_2->m_payload + 4) - 2);
         for (i = *(u16*)(param_2->m_payload + 4) - 2; i >= 0; i--) {
-            dest = source + 1;
-            copyPolygonData(dest, source);
-            source--;
+            copyPolygonData(&entries[i + 1], &entries[i]);
         }
 
         entries[0].life = -1;
@@ -336,11 +331,8 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             }
 
             for (i = 0; i < splineCount; i++) {
-                source = entries + (*(u16*)(param_2->m_payload + 4) - 2);
                 for (s32 j = *(u16*)(param_2->m_payload + 4) - 2; j > 1; j--) {
-                    dest = source + 1;
-                    copyPolygonData(dest, source);
-                    source--;
+                    copyPolygonData(&entries[j + 1], &entries[j]);
                 }
             }
 
@@ -358,14 +350,14 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         if (poly->life > 0) {
             alpha = poly->alpha;
             decay = poly->decay;
-            if ((s32)((u32)alpha - (u32)decay) < 1) {
-                poly->alpha = 0;
-            } else {
+            if (alpha - decay > 0) {
                 poly->alpha = alpha - decay;
+            } else {
+                poly->alpha = 0;
             }
 
             poly->life--;
-            if (poly->life < 1) {
+            if (poly->life <= 0) {
                 work->count--;
                 poly->life = 0;
             }

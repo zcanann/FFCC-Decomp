@@ -659,17 +659,18 @@ void SetSePitch(int seId, int pitch, int frameCount)
  */
 void SePause(int seId, int pause)
 {
+	const char* logBlob = s_redCommandLogBlob;
 	unsigned int* trackBasePtr;
 	unsigned int track;
 	unsigned int voice;
 
 	if (m_ReportPrint != 0) {
 		if (pause == 1) {
-			OSReport(s_redCommandLogBlob + RED_COMMAND_SE_PAUSE_ON_FMT_OFFSET,
-			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
+			OSReport(logBlob + RED_COMMAND_SE_PAUSE_ON_FMT_OFFSET,
+			         logBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
 		} else {
-			OSReport(s_redCommandLogBlob + RED_COMMAND_SE_PAUSE_OFF_FMT_OFFSET,
-			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
+			OSReport(logBlob + RED_COMMAND_SE_PAUSE_OFF_FMT_OFFSET,
+			         logBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
 		}
 		fflush(__files + 1);
 	}
@@ -680,7 +681,7 @@ void SePause(int seId, int pause)
 	do {
 		if ((*(int*)(track + 0xf8) != 0) && ((seId == -1) || (seId == *(int*)(track + 0xf8)))) {
 			if (pause == 1) {
-				if (*(int*)(voice + 0x14) != 0) {
+				if (*(void**)(voice + 0x14) != 0) {
 					*(unsigned int*)(voice + 0x9c) = 0;
 					*(unsigned int*)(voice + 0x90) |= 0x18;
 				}

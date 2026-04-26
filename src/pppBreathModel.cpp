@@ -204,7 +204,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     BreathModelRenderStep* step;
     int workOffset;
     int colorOffset;
-    unsigned char* work;
+    VBreathModel* work;
     VColor* color;
     unsigned char colorR;
     unsigned char colorG;
@@ -222,13 +222,13 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     step = (BreathModelRenderStep*)pBreathModel;
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
-    work = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset;
+    work = reinterpret_cast<VBreathModel*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset);
     color = reinterpret_cast<VColor*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
-    particleData = (float*)*(void**)(work + 0x30);
-    matrixList = *(Mtx**)(work + 0x34);
-    particleColor = (float*)*(void**)(work + 0x38);
-    groupData = *(int**)(work + 0x3C);
-    groupCount = *(int*)(work + 0x40);
+    particleData = reinterpret_cast<float*>(work->m_particleData);
+    matrixList = work->m_particleWmats;
+    particleColor = reinterpret_cast<float*>(work->m_particleColors);
+    groupData = reinterpret_cast<int*>(work->m_groups);
+    groupCount = work->m_particleCount;
 
     if (step->m_stepValue == 0xFFFF) {
         return;
@@ -262,8 +262,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                        *(float*)((u8*)pppMngStPtr + 0x2C) * particleData[0x1A],
                        *(float*)((u8*)pppMngStPtr + 0x30) * particleData[0x1B]);
             PSMTXConcat(*(Mtx*)particleData, drawMtx, tempMtx);
-            PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
-            PSMTXConcat(ppvCameraMatrix0, *(Mtx*)particleData, drawMtx);
+            PSMTXConcat(ppvCameraMatrix02, tempMtx, tempMtx);
+            PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, drawMtx);
             PSMTXMultVec(drawMtx, (Vec*)(particleData + 0xC), &pos);
             tempMtx[0][3] = pos.x;
             tempMtx[1][3] = pos.y;
@@ -320,13 +320,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
         particleData += 0x26;
     }
 
-    if ((CFlatFlags & 0x200000) != 0) {
-        int slotCount;
-
-        groupCount = (int)step->m_groupInfo.m_groupCount;
-        slotCount = (int)step->m_groupInfo.m_slotCount;
-
-        for (i = 0; i < groupCount; i++) {
+    if ((*(u32*)(CFlat + 0x129C) & 0x200000) != 0) {
+        for (i = 0; i < (int)step->m_groupInfo.m_groupCount; i++) {
             if (groupData[0] == 1) {
                 _GXColor debugColor;
                 int firstParticle;
@@ -336,30 +331,45 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 Mtx tempMtx;
                 Vec pos;
 
-                if ((i == 0) || (i == 2)) {
+                if (i != 2) {
+                    if (i >= 2) {
+                        if (i >= 4) {
+                            debugColor.r = 0x00;
+                            debugColor.g = 0x60;
+                            debugColor.b = 0x80;
+                            debugColor.a = 0xFF;
+                        } else {
+                            debugColor.r = 0x80;
+                            debugColor.g = 0x80;
+                            debugColor.b = 0x80;
+                            debugColor.a = 0xFF;
+                        }
+                    } else if (i == 0) {
+                        debugColor.r = 0x80;
+                        debugColor.g = 0x00;
+                        debugColor.b = 0x00;
+                        debugColor.a = 0xFF;
+                    } else if (i >= 0) {
+                        debugColor.r = 0x80;
+                        debugColor.g = 0x80;
+                        debugColor.b = 0xFF;
+                        debugColor.a = 0xFF;
+                    } else {
+                        debugColor.r = 0x00;
+                        debugColor.g = 0x60;
+                        debugColor.b = 0x80;
+                        debugColor.a = 0xFF;
+                    }
+                } else {
                     debugColor.r = 0x80;
                     debugColor.g = 0x00;
                     debugColor.b = 0x00;
                     debugColor.a = 0xFF;
-                } else if (i == 1) {
-                    debugColor.r = 0x80;
-                    debugColor.g = 0x80;
-                    debugColor.b = 0xFF;
-                    debugColor.a = 0xFF;
-                } else if (i == 3) {
-                    debugColor.r = 0x80;
-                    debugColor.g = 0x80;
-                    debugColor.b = 0x80;
-                    debugColor.a = 0xFF;
-                } else {
-                    debugColor.r = 0x00;
-                    debugColor.g = 0x60;
-                    debugColor.b = 0x80;
-                    debugColor.a = 0xFF;
                 }
 
                 firstParticle = -1;
-                for (j = 0; j < slotCount; j++) {
+                groupScale = *(float*)(groupData + 10);
+                for (j = 0; j < (int)step->m_groupInfo.m_slotCount; j++) {
                     if (*(signed char*)(groupData[2] + j) != -1) {
                         firstParticle = (int)*(signed char*)(groupData[1] + j);
                         break;
@@ -367,12 +377,11 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 }
 
                 PSMTXIdentity(sphereMtx);
-                groupScale = *(float*)(groupData + 10);
                 sphereMtx[0][0] = groupScale;
                 sphereMtx[1][1] = groupScale;
                 sphereMtx[2][2] = groupScale;
-                PSMTXConcat(*(Mtx*)(*(int*)(work + 0x34) + firstParticle * 0x30), object->m_localMatrix.value, tempMtx);
-                PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
+                PSMTXConcat(work->m_particleWmats[firstParticle], object->m_localMatrix.value, tempMtx);
+                PSMTXConcat(ppvCameraMatrix02, tempMtx, tempMtx);
                 PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &pos);
                 sphereMtx[0][3] = pos.x;
                 sphereMtx[1][3] = pos.y;
@@ -498,7 +507,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     particleWMat = work->m_particleWmats;
     groupData = (int*)work->m_groups;
     for (groupIndex = 0; groupIndex < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
-         groupIndex++) {
+        groupIndex++) {
         slotCount = (unsigned int)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
         groupTable = (int)groupData;
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
@@ -986,7 +995,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     (*(Mtx*)particleWmat)[2][3] = pos.z;
 
     PSMTXConcat(*(Mtx*)particleWmat, *(Mtx*)((unsigned char*)pppObject + 4), *(Mtx*)particleData);
-    PSMTXConcat(ppvCameraMatrix0, *(Mtx*)particleData, workMtx);
+    PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, workMtx);
 
     *(float*)(particle + 0x3C) = kPppBreathModelZero;
     *(float*)(particle + 0x40) = kPppBreathModelZero;

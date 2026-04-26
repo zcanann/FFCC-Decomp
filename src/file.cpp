@@ -2,10 +2,9 @@
 
 #include "ffcc/color.h"
 #include "ffcc/fontman.h"
-#include "ffcc/goout.h"
+#include "ffcc/game.h"
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
-#include "ffcc/p_game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"

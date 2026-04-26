@@ -320,6 +320,10 @@ def redsound_flags_from_profile(profile: str) -> List[str]:
         return [*base, "-char signed"]
     if profile == "inline_deferred":
         return replace_flag_prefix(base, "-inline ", "-inline deferred")
+    if profile == "opt_level0_sched":
+        flags = replace_flag_prefix(base, "-inline ", "-inline deferred")
+        flags = [flag for flag in flags if not flag.startswith("-O")]
+        return [*flags, "-opt level=0, peephole, schedule, nospace"]
     if profile == "inline_auto_deferred":
         return replace_flag_prefix(base, "-inline ", "-inline auto,deferred")
     if profile == "str_pool_common_off":
@@ -361,9 +365,10 @@ def parse_flag_env_list(name: str) -> List[str]:
     return [part.strip() for part in value.split(";") if part.strip()]
 
 
-# RedSound is built pragma-free; inline-deferred currently gives the best
-# aggregate objdiff score across the RedSound units.
-redsound_profile = os.environ.get("FFCC_REDSOUND_PROFILE", "inline_deferred")
+# RedSound is built pragma-free. Reference projects use this Metrowerks
+# library-style opt profile for some shipped objects, and it matches RedSound's
+# stack/register patterns far better than source-local optimization pragmas.
+redsound_profile = os.environ.get("FFCC_REDSOUND_PROFILE", "opt_level0_sched")
 redsound_cflags = redsound_flags_from_profile(redsound_profile)
 redsound_cpp_exceptions_cflags = replace_flag_prefix(
     redsound_cflags, "-Cpp_exceptions ", "-Cpp_exceptions on"

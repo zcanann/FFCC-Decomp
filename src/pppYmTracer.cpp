@@ -335,13 +335,13 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
 
                 splineCount++;
                 work->count++;
-                if (*(u16*)(param_2->m_payload + 4) <= work->count + 1) {
+                if (work->count + 1 >= *(u16*)(param_2->m_payload + 4)) {
                     break;
                 }
             }
 
             for (i = 0; i < splineCount; i++) {
-                for (s32 j = *(u16*)(param_2->m_payload + 4) - 2; j > 1; j--) {
+                for (s32 j = *(u16*)(param_2->m_payload + 4) - 2; j >= 2; j--) {
                     copyPolygonData(&entries[j + 1], &entries[j]);
                 }
             }

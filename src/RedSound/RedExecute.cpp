@@ -259,7 +259,7 @@ void _ClearReverb(int bank)
     }
 
     reverb->callback = 0;
-    RedDelete(reverb->context);
+    RedDelete((int)reverb->context);
 }
 
 /*

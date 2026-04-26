@@ -398,38 +398,34 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		*(int*)(head + 0x14) = *(int*)(head + 4);
 	}
 
-	if ((waveNo < 100) || (299 < waveNo)) {
-		if ((waveNo < 10) || (0x45 < waveNo)) {
-			if (((0x153 < waveNo) && (waveNo < 0x17a)) || ((0x17e < waveNo) && (waveNo < 0x182)) ||
-			    (waveNo == 0x183)) {
-				*(int*)(head + 0x14) = 0x100000;
-			}
-		} else {
-			*(int*)(head + 0x14) += 0x27FFF;
-			int blocks = *(int*)(head + 0x14) / 0x28000 + (*(int*)(head + 0x14) >> 0x1F);
-			blocks = blocks - (blocks >> 0x1F);
-			*(int*)(head + 0x14) = blocks * 0x28000;
+	if ((waveNo >= 100) && (waveNo < 300)) {
+		if (*(int*)(head + 0x14) <= 0x200000) {
+			*(int*)(head + 0x14) = 0x200000;
+		} else if (*(int*)(head + 0x14) <= 0x400000) {
+			*(int*)(head + 0x14) = 0x400000;
 		}
-	} else if (*(int*)(head + 0x14) < 0x200001) {
-		*(int*)(head + 0x14) = 0x200000;
-	} else if (*(int*)(head + 0x14) < 0x400001) {
-		*(int*)(head + 0x14) = 0x400000;
+	} else if ((waveNo >= 10) && (waveNo < 70)) {
+		*(int*)(head + 0x14) += 0x27FFF;
+		int blocks = *(int*)(head + 0x14) / 0x28000 + (*(int*)(head + 0x14) >> 0x1F);
+		blocks = blocks - (blocks >> 0x1F);
+		*(int*)(head + 0x14) = blocks * 0x28000;
+	} else if (((waveNo >= 0x154) && (waveNo < 0x17a)) || ((waveNo >= 0x17f) && (waveNo < 0x182)) ||
+	           (waveNo == 0x183)) {
+		*(int*)(head + 0x14) = 0x100000;
 	}
 
 	int minOffset;
 	int maxOffset;
-	if ((waveNo < 100) || (299 < waveNo)) {
-		if (((waveNo < 0x154) || (0x179 < waveNo)) &&
-		    (((waveNo < 0x17f) || (0x181 < waveNo)) && (waveNo != 0x183))) {
-			minOffset = 0;
-			maxOffset = 0x300000;
-		} else {
-			minOffset = 0x300000;
-			maxOffset = 0x400000;
-		}
-	} else {
+	if ((waveNo >= 100) && (waveNo < 300)) {
 		minOffset = 0x400000;
 		maxOffset = 0x800000;
+	} else if (((waveNo >= 0x154) && (waveNo < 0x17a)) || ((waveNo >= 0x17f) && (waveNo < 0x182)) ||
+	           (waveNo == 0x183)) {
+		minOffset = 0x300000;
+		maxOffset = 0x400000;
+	} else {
+		minOffset = 0;
+		maxOffset = 0x300000;
 	}
 
 	do {

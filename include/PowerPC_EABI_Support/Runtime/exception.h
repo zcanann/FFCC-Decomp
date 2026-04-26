@@ -16,7 +16,7 @@ class bad_exception : public exception {
 public:
 	bad_exception() {}
 	virtual ~bad_exception() {}
-	virtual const char* what() const { return "bad_exception\0\0"; }
+	virtual const char* what() const { return "bad_exception"; }
 };
 
 typedef void (*unexpected_handler)();

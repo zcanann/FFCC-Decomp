@@ -304,14 +304,6 @@ static inline int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
 char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info);
 void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info);
 void ExPPC_ThrowHandler(ThrowContext* context);
-extern "C" void __dt__Q23std13bad_exceptionFv(std::bad_exception*, s16);
-
-struct BadExceptionStorage {
-	void* vtable;
-};
-
-extern "C" void* __vt__Q23std9exception[];
-extern "C" void* __vt__Q23std13bad_exception[];
 
 /**
  * @note Address: N/A
@@ -704,51 +696,24 @@ void ExPPC_ThrowHandler(ThrowContext* context)
  */
 extern void __unexpected(CatchInfo* catchinfo)
 {
-	static const char unexpectedTypes[0x54] = "!bad_exception!!\0\0\0\0"
-	                                          "!std::exception!!std::bad_exception!!\0\0\0"
-	                                          "!std::bad_exception!!\0\0";
-	char* badExceptionType;
-	char* stdExceptionBadExceptionType;
-	char* stdBadExceptionType;
 	ex_specification* unexp = (ex_specification*)catchinfo->stacktop;
-
-	stdExceptionBadExceptionType = (char*)unexpectedTypes;
-	stdExceptionBadExceptionType += sizeof("!bad_exception!!\0\0\0");
-	badExceptionType = stdExceptionBadExceptionType;
-	badExceptionType -= sizeof("!bad_exception!!\0\0\0");
-	stdBadExceptionType = stdExceptionBadExceptionType;
-	stdBadExceptionType += sizeof("!std::exception!!std::bad_exception!!\0\0");
 
 #pragma exception_magic // allow access to __exception_magic in try/catch blocks
 
 	try {
 		unexpected();
 	} catch (...) {
-		BadExceptionStorage badException;
-
 		if (ExPPC_IsInSpecification((char*)((CatchInfo*)&__exception_magic)->typeinfo, unexp)) {
 			throw;
 		}
-		if (ExPPC_IsInSpecification(badExceptionType, unexp)) {
-			badException.vtable = __vt__Q23std9exception;
-			badException.vtable = __vt__Q23std13bad_exception;
-			__throw((char*)stdExceptionBadExceptionType, &badException, __dt__Q23std13bad_exceptionFv);
+		if (ExPPC_IsInSpecification("!bad_exception!!", unexp)) {
+			throw bad_exception();
 		}
-		if (ExPPC_IsInSpecification(stdBadExceptionType, unexp)) {
-			BadExceptionStorage stdBadException;
-
-			stdBadException.vtable = __vt__Q23std9exception;
-			stdBadException.vtable = __vt__Q23std13bad_exception;
-			__throw((char*)stdExceptionBadExceptionType, &stdBadException, __dt__Q23std13bad_exceptionFv);
+		if (ExPPC_IsInSpecification("!std::bad_exception!!", unexp)) {
+			throw bad_exception();
 		}
 	}
 	terminate();
-}
-
-static void ExPPC_EmitBadException()
-{
-	std::bad_exception badException;
-	badException.what();
 }
 
 /**

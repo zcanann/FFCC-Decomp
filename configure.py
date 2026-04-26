@@ -945,8 +945,8 @@ config.libs = [
             Object(
                 Matching,
                 "Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp",
-                mw_version="GC/2.7",
-                extra_cflags=["-char signed", "-RTTI on"],
+                mw_version="GC/2.6",
+                extra_cflags=["-char signed", "-RTTI on", "-str reuse,nopool,readonly"],
                 extab_padding=[0x02, 0x55],
             ),
             Object(

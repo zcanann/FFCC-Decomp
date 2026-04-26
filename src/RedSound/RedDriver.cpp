@@ -91,7 +91,7 @@ static int m_MainThreadTime;
 static void* p_WaveSettingThreadStack;
 static int m_WaveSettingStatus;
 static void* p_DmaExecuteThreadStack;
-static int m_DMAStatus;
+static volatile int m_DMAStatus;
 void* p_MusicSkipThreadStack;
 int m_MusicSkipComplete;
 void* volatile p_ReverbDepth;
@@ -108,8 +108,8 @@ OSThread m_MusicSkipThread;
 OSSemaphore m_MusicSkipSemaphore;
 void* p_SeBlockData[4];
 CRedMemory c_RedMemory;
-static int m_DMAExecute;
-static int m_DMAInThread;
+static volatile int m_DMAExecute;
+static volatile int m_DMAInThread;
 CRedEntry c_RedEntry;
 
 static inline RedDriverSyncState& RedDriverSync()

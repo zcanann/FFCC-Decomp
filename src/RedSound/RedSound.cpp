@@ -94,8 +94,9 @@ extern "C" CRedSound* __dt__9CRedSoundFv(CRedSound* redSound, short shouldDelete
 unsigned int CRedSound::GetAutoID()
 {
 	do {
-		m_AutoID = (m_AutoID + 1) & 0x7FFFFFFF;
-	} while (m_AutoID == 0);
+		m_AutoID++;
+		m_AutoID &= 0x7FFFFFFF;
+	} while ((int)m_AutoID == 0);
 
 	return m_AutoID;
 }
@@ -109,6 +110,7 @@ unsigned int CRedSound::GetAutoID()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int* CRedSound::EntryStandbyID(int id)
 {
 	int* slot = m_StandbyStatus;
@@ -290,6 +292,7 @@ int CRedSound::ReportStandby(int id)
 
 	return 0;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -300,6 +303,7 @@ int CRedSound::ReportStandby(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void (*callback)(void*), void* userData)
 {
 	RedDmaEntry(type, src, dst, length, flags, callback, userData);
@@ -318,6 +322,7 @@ int CRedSound::DMACheck(int id)
 {
 	return RedDmaSearchID(id);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

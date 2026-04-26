@@ -65,7 +65,7 @@ static void* p_DmaControlOld[2];
 void* volatile p_SoundControlBuffer;
 void* volatile p_SoundControl;
 int m_KeyOnEntry;
-void* p_KeyOnData;
+void* volatile p_KeyOnData;
 int m_SoundPlayMode;
 int m_SoundMasterControl;
 int m_ReportPrint;

@@ -27,7 +27,7 @@ extern void* p_ZeroData;
 extern void* volatile p_SoundControlBuffer;
 extern void* volatile p_SoundControl;
 extern int m_KeyOnEntry;
-extern void* p_KeyOnData;
+extern void* volatile p_KeyOnData;
 extern int m_SoundPlayMode;
 extern int m_SoundMasterControl;
 extern int m_ReportPrint;

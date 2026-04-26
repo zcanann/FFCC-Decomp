@@ -1345,7 +1345,7 @@ void CRedEntry::MusicHistoryChoice(RedHistoryBANK* bank)
  */
 int CRedEntry::SearchMusicSequence(int musicNo)
 {
-	register int* musicBank = *(int**)((int)this + 8);
+	int* musicBank = *(int**)((int)this + 8);
 	int* end = (int*)(*(int*)((int)this + 8) + 0x40);
 
 	do {

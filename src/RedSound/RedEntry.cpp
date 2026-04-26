@@ -1121,6 +1121,7 @@ int CRedEntry::ClearSeSepData(int seNo)
  */
 int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
 {
+	int result = 0;
 	int* bank = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4));
 
 	do {
@@ -1133,7 +1134,7 @@ int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
 		bank += 4;
 	} while (bank < reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + 0x1000));
 
-	return 0;
+	return result;
 }
 
 /*

@@ -56,7 +56,7 @@ static int m_ThreadControl;
 static int m_ThreadExecute;
 static int m_SoundMode;
 static int* volatile p_Tick;
-void* p_ZeroData;
+void* volatile p_ZeroData;
 static void* volatile p_ExecCommand;
 static void* volatile p_ExecCommandNow;
 static void* volatile p_ExecCommandOld;

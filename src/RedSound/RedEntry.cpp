@@ -266,7 +266,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 	int soundBase = (int)p_SoundControlBuffer + 0x494;
 
 	do {
-		if ((-1 < *(int*)(soundBase + 0x470)) && (*(int*)(soundBase + 0x47c) == waveNo)) {
+		if ((*(int*)(soundBase + 0x470) >= 0) && (*(int*)(soundBase + 0x47c) == waveNo)) {
 			found = 1;
 			MusicStop(*(int*)(soundBase + 0x470));
 		}
@@ -613,7 +613,7 @@ void CRedEntry::ClearWaveData(int waveNo)
 		}
 	} else {
 		historyNo = SearchWaveSequence(waveNo);
-		if (-1 < historyNo) {
+		if (historyNo >= 0) {
 			WaveDelete((RedHistoryBANK*)(entry[0] + historyNo * 0x10));
 		}
 	}

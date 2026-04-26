@@ -28,48 +28,14 @@ extern "C" const double DOUBLE_80331C00 = 4503599627370496.0;
 
 /*
  * --INFO--
- * PAL Address: 0x80127AF0
- * PAL Size: 100b
+ * PAL Address: 0x80127008
+ * PAL Size: 8b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPrgObj::onCreate()
-{
-	CGObject::onCreate();
-	m_lastStateId = 0;
-	m_stateArg = 0;
-	m_animFlagBits.bits.m_animRequested = 0;
-	m_animFlagBits.bits.m_animLoop = 0;
-	m_animFlagBits.bits.m_animDirect = 0;
-	m_reqAnimId = -1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80127AD0
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGPrgObj::onDestroy()
-{
-	CGObject::onDestroy();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801278DC
- * PAL Size: 500b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGPrgObj::onFrame()
+int CGPrgObj::GetCID()
 {
     unsigned char animFlags;
 
@@ -120,7 +86,6 @@ void CGPrgObj::onFrame()
 
     onFrameAlwaysAfter();
 }
-
 /*
  * --INFO--
  * PAL Address: 0x80127010
@@ -201,321 +166,25 @@ void CGPrgObj::onChangePrg(int)
 
 /*
  * --INFO--
- * PAL Address: 0x80127838
- * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGPrgObj::changeStat(int state, int subState, int stateArg)
-{
-	int oldState = getReplaceStat(state);
-	if (oldState != -1) {
-		onCancelStat(state);
-		m_stateArg = stateArg;
-		onChangeStat(state);
-		m_lastStateId = oldState;
-		m_stateFrame = 0;
-		m_stateFrameGate = 1;
-		m_subState = subState;
-		m_subFrame = 0;
-		m_subFrameGate = 1;
-	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::changeSubStat(int subState)
-{
-	m_subState = subState;
-	m_subFrame = 0;
-	m_subFrameGate = 1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::addSubStat()
-{ 
-	m_subState = m_subState + 1;
-	m_subFrame = 0;
-	m_subFrameGate = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801277C8
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGPrgObj::reqAnim(int animId, int loop, int direct)
-{
-	signed char loopFlag = loop;
-	signed char directFlag = direct;
-
-	m_animFlagBits.bits.m_animRequested = 1;
-	m_reqAnimId = animId;
-	m_animFlagBits.bits.m_animLoop = loopFlag;
-	m_animFlagBits.bits.m_animDirect = directFlag;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012776C
+ * PAL Address: 0x80127028
  * PAL Size: 92b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGPrgObj::isLoopAnim()
+int CGPrgObj::GetClassControl(int classControl)
 {
-	if (m_animFlagBits.bits.m_animLoop != 0 ||
-	    m_animFlagBits.bits.m_animRequested != 0 || (IsLoopAnim(2) == 0)) {
+	switch (classControl) {
+	case 8:
+		return reinterpret_cast<CGPartyObj*>(this)->isDispTarget();
+	case 9:
+		return reinterpret_cast<CGPartyObj*>(this)->isRideTarget();
+	case 10:
+		return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560);
+	default:
 		return 0;
 	}
-
-	return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80127720
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGPrgObj::isLoopAnimDirect()
-{
-	signed char requestedFlag = m_animFlagBits.bits.m_animRequested;
-
-	if ((requestedFlag != 0) || (IsLoopAnim(2) == 0)) {
-		return 0;
-	}
-
-	return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80127650
- * PAL Size: 208b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
-{
-	if (seNo == 0 || seNo == 0xffff) {
-		return -1;
-	}
-
-	int handle = Sound.PlaySe3D(seNo, pos != nullptr ? pos : &m_worldPosition,
-	                            static_cast<float>(volume), static_cast<float>(dist), 0);
-
-	if (pitch != 0) {
-		Sound.ChangeSe3DPitch(handle, pitch, 0);
-	}
-
-	return handle;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::changePrg(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801275AC
- * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGPrgObj::putParticle(int no, int dataNo, Vec* pos, float scale, int seNo)
-{
-	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
-	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
-	SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, FLOAT_80331BD4);
-	if (seNo != 0) {
-		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
-	}
-	PutParticleWork__13CFlatRuntime2Fv(CFlat);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80127510
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGPrgObj::putParticle(int no, int dataNo, CGObject* traceObj, float scale, int seNo)
-{
-	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
-	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
-	SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
-	if (seNo != 0) {
-		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
-	}
-	PutParticleWork__13CFlatRuntime2Fv(CFlat);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80127474
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGPrgObj::putParticleTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
-{
-	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
-	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
-	SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
-	PutParticleWork__13CFlatRuntime2Fv(CFlat);
-	if (seNo != 0) {
-		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801273BC
- * PAL Size: 184b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
-{
-	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
-	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
-	SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
-	SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, obj);
-	PutParticleWork__13CFlatRuntime2Fv(CFlat);
-	if (seNo != 0) {
-		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012732C
- * PAL Size: 144b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-float CGPrgObj::getTargetRot(CGPrgObj* target)
-{
-	float targetRot;
-	float zero;
-	CVector targetPos(target->m_worldPosition);
-	CVector basePos(m_worldPosition);
-	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
-	CVector deltaPos;
-
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
-	zero = FLOAT_80331BD4;
-	if (deltaPos.x == zero || deltaPos.z == zero) {
-		targetRot = zero;
-	} else {
-		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
-	}
-
-	return targetRot;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80127290
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGPrgObj::rotTarget(CGPrgObj* target)
-{
-	CVector targetPos(target->m_worldPosition);
-	CVector basePos(m_worldPosition);
-	Vec deltaPos;
-	float targetRot;
-	float deltaX;
-	float zero;
-	float deltaZ;
-	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
-
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
-	deltaX = deltaPos.x;
-	zero = FLOAT_80331BD4;
-	deltaZ = deltaPos.z;
-	if (zero == deltaX || zero == deltaZ) {
-		targetRot = FLOAT_80331BD4;
-	} else {
-		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
-	}
-	m_rotTargetY = targetRot;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801271E0
- * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGPrgObj::dstTargetRot(CGPrgObj* target)
-{
-	CGPrgObj* self = this;
-	float targetRot;
-	CVector targetPos(target->m_worldPosition);
-	CVector basePos(self->m_worldPosition);
-	CVector deltaPos;
-	float deltaX;
-	float zero;
-	float deltaZ;
-	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
-
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
-	deltaX = deltaPos.x;
-	zero = FLOAT_80331BD4;
-	deltaZ = deltaPos.z;
-	if (zero == deltaX || zero == deltaZ) {
-		targetRot = FLOAT_80331BD4;
-	} else {
-		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
-	}
-
-	Math.DstRot(self->m_rotBaseY, FLOAT_80331BD8 + targetRot);
 }
 
 /*
@@ -579,33 +248,412 @@ void CGPrgObj::ClassControl(int classControl, int value)
 
 /*
  * --INFO--
- * PAL Address: 0x80127028
+ * PAL Address: 0x801271E0
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::dstTargetRot(CGPrgObj* target)
+{
+	CGPrgObj* self = this;
+	float targetRot;
+	CVector targetPos(target->m_worldPosition);
+	CVector basePos(self->m_worldPosition);
+	CVector deltaPos;
+	float deltaX;
+	float zero;
+	float deltaZ;
+	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
+
+	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	deltaX = deltaPos.x;
+	zero = FLOAT_80331BD4;
+	deltaZ = deltaPos.z;
+	if (zero == deltaX || zero == deltaZ) {
+		targetRot = FLOAT_80331BD4;
+	} else {
+		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
+	}
+
+	Math.DstRot(self->m_rotBaseY, FLOAT_80331BD8 + targetRot);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127290
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::rotTarget(CGPrgObj* target)
+{
+	CVector targetPos(target->m_worldPosition);
+	CVector basePos(m_worldPosition);
+	Vec deltaPos;
+	float targetRot;
+	float deltaX;
+	float zero;
+	float deltaZ;
+	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
+
+	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
+	deltaX = deltaPos.x;
+	zero = FLOAT_80331BD4;
+	deltaZ = deltaPos.z;
+	if (zero == deltaX || zero == deltaZ) {
+		targetRot = FLOAT_80331BD4;
+	} else {
+		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
+	}
+	m_rotTargetY = targetRot;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012732C
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+float CGPrgObj::getTargetRot(CGPrgObj* target)
+{
+	float targetRot;
+	float zero;
+	CVector targetPos(target->m_worldPosition);
+	CVector basePos(m_worldPosition);
+	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
+	CVector deltaPos;
+
+	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	zero = FLOAT_80331BD4;
+	if (deltaPos.x == zero || deltaPos.z == zero) {
+		targetRot = zero;
+	} else {
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+	}
+
+	return targetRot;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801273BC
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
+{
+	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
+	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
+	SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+	SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, obj);
+	PutParticleWork__13CFlatRuntime2Fv(CFlat);
+	if (seNo != 0) {
+		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127474
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::putParticleTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
+{
+	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
+	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
+	SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+	PutParticleWork__13CFlatRuntime2Fv(CFlat);
+	if (seNo != 0) {
+		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127510
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::putParticle(int no, int dataNo, CGObject* traceObj, float scale, int seNo)
+{
+	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
+	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
+	SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+	if (seNo != 0) {
+		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+	}
+	PutParticleWork__13CFlatRuntime2Fv(CFlat);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801275AC
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::putParticle(int no, int dataNo, Vec* pos, float scale, int seNo)
+{
+	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
+	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
+	SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, FLOAT_80331BD4);
+	if (seNo != 0) {
+		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+	}
+	PutParticleWork__13CFlatRuntime2Fv(CFlat);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127650
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
+{
+	if (seNo == 0 || seNo == 0xffff) {
+		return -1;
+	}
+
+	int handle = Sound.PlaySe3D(seNo, pos != nullptr ? pos : &m_worldPosition,
+	                            static_cast<float>(volume), static_cast<float>(dist), 0);
+
+	if (pitch != 0) {
+		Sound.ChangeSe3DPitch(handle, pitch, 0);
+	}
+
+	return handle;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127720
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGPrgObj::isLoopAnimDirect()
+{
+	signed char requestedFlag = m_animFlagBits.bits.m_animRequested;
+
+	if ((requestedFlag != 0) || (IsLoopAnim(2) == 0)) {
+		return 0;
+	}
+
+	return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012776C
  * PAL Size: 92b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGPrgObj::GetClassControl(int classControl)
+int CGPrgObj::isLoopAnim()
 {
-	switch (classControl) {
-	case 8:
-		return reinterpret_cast<CGPartyObj*>(this)->isDispTarget();
-	case 9:
-		return reinterpret_cast<CGPartyObj*>(this)->isRideTarget();
-	case 10:
-		return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560);
-	default:
+	if (m_animFlagBits.bits.m_animLoop != 0 ||
+	    m_animFlagBits.bits.m_animRequested != 0 || (IsLoopAnim(2) == 0)) {
 		return 0;
+	}
+
+	return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801277C8
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::reqAnim(int animId, int loop, int direct)
+{
+	signed char loopFlag = loop;
+	signed char directFlag = direct;
+
+	m_animFlagBits.bits.m_animRequested = 1;
+	m_reqAnimId = animId;
+	m_animFlagBits.bits.m_animLoop = loopFlag;
+	m_animFlagBits.bits.m_animDirect = directFlag;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127800
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::addSubStat()
+{ 
+	m_subState = m_subState + 1;
+	m_subFrame = 0;
+	m_subFrameGate = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127820
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::changeSubStat(int subState)
+{
+	m_subState = subState;
+	m_subFrame = 0;
+	m_subFrameGate = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127838
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::changeStat(int state, int subState, int stateArg)
+{
+	int oldState = getReplaceStat(state);
+	if (oldState != -1) {
+		onCancelStat(state);
+		m_stateArg = stateArg;
+		onChangeStat(state);
+		m_lastStateId = oldState;
+		m_stateFrame = 0;
+		m_stateFrameGate = 1;
+		m_subState = subState;
+		m_subFrame = 0;
+		m_subFrameGate = 1;
 	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801278DC
+ * PAL Size: 500b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int CGPrgObj::GetCID()
+void CGPrgObj::onFrame()
 {
-	return 13;
+    unsigned char animFlags;
+
+    onFrameAlways();
+
+	if (static_cast<signed char>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) < 0) {
+		if ((GetCID() & 0x2d) == 0x2d &&
+		    reinterpret_cast<unsigned char*>(&PartPcs)[0x2e] != 0) {
+			return;
+		}
+
+		m_animFlagBits.bits.m_animRequested = 0;
+		onFramePreCalc();
+
+		if (m_stateFrameGate != 0) {
+			m_stateFrameGate = 0;
+		} else {
+			m_stateFrame++;
+		}
+
+		if (m_subFrameGate != 0) {
+			m_subFrameGate = 0;
+		} else {
+			m_subFrame++;
+		}
+
+		onFrameStat();
+		onFramePostCalc();
+
+		animFlags = m_animFlagBits.m_animFlags;
+		if ((animFlags & 0x80) != 0) {
+			if (m_reqAnimId == -1) {
+				if (static_cast<int>(m_currentAnimSlot) >= 0) {
+					*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BD0;
+					CancelAnim(0);
+				}
+			} else if (m_animFlagBits.bits.m_animDirect != 0) {
+				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BE8;
+				PlayAnim(m_reqAnimId, (m_animFlagBits.m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
+			} else {
+				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BD0;
+				PlayAnim(m_reqAnimId, (m_animFlagBits.m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
+			}
+
+			m_animFlagBits.bits.m_animRequested = 0;
+		}
+	}
+
+    onFrameAlwaysAfter();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127AD0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::onDestroy()
+{
+	CGObject::onDestroy();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127AF0
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::onCreate()
+{
+	CGObject::onCreate();
+	m_lastStateId = 0;
+	m_stateArg = 0;
+	m_animFlagBits.bits.m_animRequested = 0;
+	m_animFlagBits.bits.m_animLoop = 0;
+	m_animFlagBits.bits.m_animDirect = 0;
+	m_reqAnimId = -1;
 }

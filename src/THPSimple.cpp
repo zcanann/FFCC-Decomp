@@ -856,12 +856,13 @@ s32 THPSimpleOpen(const char* path)
         }
     }
     memcpy(&SimpleControl.header, sReadBuffer, sizeof(THPHeader));
-    compInfoOffset = SimpleControl.header.mCompInfoDataOffsets;
 
     if (strcmp(SimpleControl.header.mMagic, lbl_80331868) != 0) {
         DVDClose(&SimpleControl.fileInfo);
         return 0;
     }
+
+    compInfoOffset = SimpleControl.header.mCompInfoDataOffsets;
 
     if (SimpleControl.header.mVersion != 0x11000) {
         DVDClose(&SimpleControl.fileInfo);

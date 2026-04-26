@@ -1,5 +1,6 @@
 #include "ffcc/singmenu.h"
 #include "ffcc/chara.h"
+#include "ffcc/color.h"
 #include "ffcc/file.h"
 #include "ffcc/fontman.h"
 #include "ffcc/graphic.h"
@@ -2535,8 +2536,8 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     font->SetScale(FLOAT_8032ea78);
     font->DrawInit();
 
-    _GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-    font->SetColor(color);
+    CColor color(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(color.color);
 
     int lineCount = gSingDynamicWinMessInfo[0];
     const SingMenuStaticMessageInfo& staticMessage = DAT_80214a50[messageNo];

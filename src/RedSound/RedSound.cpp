@@ -132,13 +132,15 @@ int* CRedSound::EntryStandbyID(int id)
  */
 int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 {
+	const char* logBlob = s_redSoundLogBlob;
+	const char* logPrefix = logBlob + RED_SOUND_LOG_PREFIX_OFFSET;
+
 	memset(m_StandbyStatus, 0, 0x100);
 
 	if (param_3 > 0 && param_5 > 0) {
 		if ((((u32)param_2 & 0x1F) != 0) || (((u32)param_3 & 0x1F) != 0)) {
 			if (m_ReportPrint != 0) {
-				OSReport(s_redSoundLogBlob, s_redSoundLogBlob + RED_SOUND_LOG_PREFIX_OFFSET,
-				         sRedSoundLogErrorColor, (u32)param_2,
+				OSReport(logBlob, logPrefix, sRedSoundLogErrorColor, (u32)param_2,
 				         param_3, sRedSoundLogReset);
 				fflush(__files + 1);
 			}
@@ -147,10 +149,8 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 
 		if ((((u32)param_4 & 0x1F) != 0) || (((u32)param_5 & 0x1F) != 0)) {
 			if (m_ReportPrint != 0) {
-				OSReport(s_redSoundLogBlob + RED_SOUND_A_MEMORY_ERROR_FMT_OFFSET,
-				         s_redSoundLogBlob + RED_SOUND_LOG_PREFIX_OFFSET,
-				         sRedSoundLogErrorColor, param_4, param_5,
-				         sRedSoundLogReset);
+				OSReport(logBlob + RED_SOUND_A_MEMORY_ERROR_FMT_OFFSET, logPrefix,
+				         sRedSoundLogErrorColor, param_4, param_5, sRedSoundLogReset);
 				fflush(__files + 1);
 			}
 			return 0;
@@ -158,9 +158,8 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 
 		if (ARCheckInit() == 0) {
 			if (m_ReportPrint != 0) {
-				OSReport(s_redSoundLogBlob + RED_SOUND_AR_NOT_INITIALIZED_FMT_OFFSET,
-				         s_redSoundLogBlob + RED_SOUND_LOG_PREFIX_OFFSET, sRedSoundLogErrorColor,
-				         sRedSoundLogReset);
+				OSReport(logBlob + RED_SOUND_AR_NOT_INITIALIZED_FMT_OFFSET, logPrefix,
+				         sRedSoundLogErrorColor, sRedSoundLogReset);
 				fflush(__files + 1);
 			}
 			return 0;
@@ -176,9 +175,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		c_Driver.Init();
 
 		if (m_ReportPrint != 0) {
-			OSReport(s_redSoundLogBlob + RED_SOUND_INIT_OK_FMT_OFFSET,
-			         s_redSoundLogBlob + RED_SOUND_LOG_PREFIX_OFFSET,
-			         sRedSoundLogInfoColor,
+			OSReport(logBlob + RED_SOUND_INIT_OK_FMT_OFFSET, logPrefix, sRedSoundLogInfoColor,
 			         sRedSoundLogReset);
 			fflush(__files + 1);
 		}
@@ -186,9 +183,8 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		param_3 = 0;
 
 		if (m_ReportPrint != 0) {
-			OSReport(s_redSoundLogBlob + RED_SOUND_INIT_ERROR_FMT_OFFSET,
-			         s_redSoundLogBlob + RED_SOUND_LOG_PREFIX_OFFSET, sRedSoundLogErrorColor,
-			         sRedSoundLogReset);
+			OSReport(logBlob + RED_SOUND_INIT_ERROR_FMT_OFFSET, logPrefix,
+			         sRedSoundLogErrorColor, sRedSoundLogReset);
 			fflush(__files + 1);
 		}
 	}

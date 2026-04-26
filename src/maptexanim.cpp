@@ -201,17 +201,17 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
 
     m_currentFrame = m_currentFrame + m_frameStep;
     const float endFrame = static_cast<float>(m_endFrame);
-    if (endFrame <= m_currentFrame) {
-        if (m_wrapMode == 0) {
-            m_currentFrame = endFrame;
-        } else {
+    if (m_currentFrame >= endFrame) {
+        if (m_wrapMode != 0) {
             m_currentFrame = m_currentFrame - static_cast<float>(m_endFrame - m_startFrame);
+        } else {
+            m_currentFrame = endFrame;
         }
     }
 
     if (m_usesBlendTexture != 0) {
         int nextFrame = (frameIndex + 1) & 0xFFFF;
-        if (static_cast<float>(m_frameCount) <= static_cast<float>(frameIndex + 1)) {
+        if (static_cast<float>(static_cast<unsigned short>(nextFrame)) >= static_cast<float>(m_frameCount)) {
             nextFrame = 0;
         }
 
@@ -220,7 +220,7 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
             static_cast<unsigned long>(m_textureSlot + 1), TextureAt(textureSet, nextTextureIndex));
         void* material = MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex));
         *reinterpret_cast<char*>(Ptr(material, 0xA4)) =
-            static_cast<char>(FLOAT_8032fd38 * (frame - static_cast<float>(frameIndex & 0xFFFF)));
+            static_cast<char>(FLOAT_8032fd38 * (frame - static_cast<float>(static_cast<unsigned short>(frameIndex))));
         *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
     }
 }

@@ -96,7 +96,8 @@ void* volatile p_MusicSkipThreadStack;
 int m_MusicSkipComplete;
 void* volatile p_ReverbDepth;
 int m_Mute[2];
-static u8 gRedDriverSyncBuffer[0x1F18];
+static int m_DmaControl[0x700];
+static OSThread m_MainThread;
 static OSSemaphore m_MainSemaphore;
 static OSThread m_WaveSettingThread;
 static OSSemaphore m_WaveSettingSemaphore;
@@ -114,27 +115,27 @@ CRedEntry c_RedEntry;
 
 static inline RedDriverSyncState& RedDriverSync()
 {
-    return *reinterpret_cast<RedDriverSyncState*>(gRedDriverSyncBuffer);
+    return *reinterpret_cast<RedDriverSyncState*>(m_DmaControl);
 }
 
 static inline int* RedDriverMainDmaQueue()
 {
-    return RedDriverSync().m_dmaQueue;
+    return m_DmaControl;
 }
 
 static inline int* RedDriverStreamDmaQueue()
 {
-    return RedDriverSync().m_streamDmaQueue;
+    return m_DmaControl + 0x380;
 }
 
 static inline int* RedDriverStreamDmaQueueEnd()
 {
-    return reinterpret_cast<int*>(&RedDriverSync().m_mainThread);
+    return m_DmaControl + 0x700;
 }
 
 static inline OSThread& RedDriverMainThread()
 {
-    return RedDriverSync().m_mainThread;
+    return m_MainThread;
 }
 
 static const char s_redDriverDmaCheckHeaderFmt[] = "%s **** DMA CHECK PROCESS ****\n";
@@ -1311,7 +1312,7 @@ void CRedDriver::Init()
     p_Stream = (RedStreamDATA*)RedNew(0x4c0);
     memset(p_Stream, 0, 0x4c0);
     m_DMAMode = 0;
-    memset(&gRedDriverSyncBuffer, 0, 0x1c00);
+    memset(m_DmaControl, 0, sizeof(m_DmaControl));
     p_DmaControlNow[0] = RedDriverMainDmaQueue();
     p_DmaControlOld[0] = RedDriverMainDmaQueue();
     p_DmaControlNow[1] = RedDriverStreamDmaQueue();

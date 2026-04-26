@@ -2290,31 +2290,41 @@ void CAmemCacheSet::DumpCache()
  */
 void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse, unsigned long& heapUnuse)
 {
-    int mode = stageGetAllocationMode(this);
-    int node = stageGetHeapHead(this);
-    if (mode != 2) {
-        node = *reinterpret_cast<int*>(node + 8);
+    int usedSize;
+    int freeSize;
+    int blockTail;
+    int i;
+    int top;
+    int node;
+
+    if (stageGetAllocationMode(this) == 2) {
+        node = stageGetHeapHead(this);
+    } else {
+        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
     }
 
     heapTotal = 0;
     heapUse = 0;
     heapUnuse = 0;
 
-    if (mode == 2) {
-        int top = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
-        int tail = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 12);
-        int count = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120);
+    if (stageGetAllocationMode(this) == 2) {
+        top = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
 
-        for (int i = 0; i <= count; i++) {
-            int blockTail = (i == count) ? tail : *reinterpret_cast<int*>(node + 4);
-            int freeSize = blockTail - top;
+        for (i = 0; i <= *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120); i++) {
+            if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120) == i) {
+                blockTail = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x0C);
+            } else {
+                blockTail = *reinterpret_cast<int*>(node + 4);
+            }
+
+            freeSize = blockTail - top;
             if (freeSize != 0) {
                 heapUnuse += freeSize;
                 heapTotal += freeSize;
             }
 
-            if (i < count) {
-                int usedSize = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
+            if (i < *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120)) {
+                usedSize = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
                 heapUse += usedSize;
                 top = blockTail + usedSize;
                 heapTotal += usedSize;

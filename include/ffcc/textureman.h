@@ -42,7 +42,7 @@ public:
     GXTexObj m_texObj;
     GXTlutObj m_tlutObj0;
     GXTlutObj m_tlutObj1;
-    int m_format;
+    unsigned int m_format;
     int m_width;
     int m_height;
     int m_wrapMode;

@@ -2546,21 +2546,21 @@ void MainControl(int frames)
 
     p_SoundControl = (void*)((u8*)p_SoundControlBuffer + 0xDBC);
     _SeMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData,
-                       *(RedTrackDATA**)p_SoundControl, *(int*)((u8*)p_SoundControlBuffer + 0x1230), frames);
+                       *(RedTrackDATA**)p_SoundControl, *(int*)((u8*)p_SoundControl + 0x474), frames);
     p_SoundControl = p_SoundControlBuffer;
 
-    if (*(s16*)((u8*)p_SoundControlBuffer + 0x48E) != 0) {
-        if ((((u32*)p_SoundControlBuffer)[0x11B] & 0x10) == 0) {
+    if (*(s16*)((u8*)p_SoundControl + 0x48E) != 0) {
+        if ((((u32*)p_SoundControl)[0x11B] & 0x10) == 0) {
             mul = ((u32)*p_MusicTempoControl >> 0xC) & 0xFFFF;
-            step = *(int*)((u8*)p_SoundControlBuffer + 0x448) >> 0xC;
+            step = *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
             if (mul != 0) {
                 if (*p_MusicTempoControl < 0) {
                     step = (step * (int)mul) >> 0x10;
                 } else {
-                    step = ((step * ((int)mul + 1)) >> 0xF) + (*(int*)((u8*)p_SoundControlBuffer + 0x448) >> 0xC);
+                    step = ((step * ((int)mul + 1)) >> 0xF) + (*(int*)((u8*)p_SoundControl + 0x448) >> 0xC);
                 }
             }
-            *(s16*)((u8*)p_SoundControlBuffer + 0x48C) -= (s16)step * (s16)frames;
+            *(s16*)((u8*)p_SoundControl + 0x48C) -= step * frames;
             while (*(s16*)((u8*)p_SoundControl + 0x48C) < 1) {
                 *(s16*)((u8*)p_SoundControl + 0x48C) += 0xFA;
                 _MusicNoteExecute();
@@ -2570,7 +2570,7 @@ void MainControl(int frames)
 
     if (*(s16*)((u8*)p_SoundControlBuffer + 0x922) != 0) {
         p_SoundControl = (void*)((u8*)p_SoundControlBuffer + 0x494);
-        *(s16*)((u8*)p_SoundControlBuffer + 0x920) -= (s16)(*(int*)((u8*)p_SoundControlBuffer + 0x8DC) >> 0xC) * (s16)frames;
+        *(s16*)((u8*)p_SoundControl + 0x48C) -= (*(int*)((u8*)p_SoundControl + 0x448) >> 0xC) * frames;
         while (*(s16*)((u8*)p_SoundControl + 0x48C) < 1) {
             *(s16*)((u8*)p_SoundControl + 0x48C) += 0xFA;
             _MusicNoteExecute();

@@ -124,39 +124,46 @@ void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
  * JP Size: TODO
  */
 #pragma dont_inline on
+#pragma optimization_level 0
 void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* slot;
-    int* limit;
+    unsigned int* slot;
 
     if ((((signed char*)track)[0x26] & 5) != 0) {
-        slot = (int*)((int)keyOnData + ((signed char*)track)[0x14e] * 8);
-        if ((*slot == 0) || (*slot == (int)track)) {
-            *slot = (int)track;
-            slot[1] = ((int*)track)[9];
+        slot = (unsigned int*)((int)keyOnData + ((signed char*)track)[0x14e] * 8);
+        if ((*slot == 0) || (*slot == (unsigned int)track)) {
+            *slot = (unsigned int)track;
+            slot[1] = ((unsigned int*)track)[9];
             DAT_8032f3f8++;
         }
         return;
     }
 
     if ((((unsigned char*)track)[0x26] & 8) != 0) {
-        slot = (int*)((int)keyOnData + 0x200);
-        limit = (int*)((int)keyOnData + 0x400);
+        slot = (unsigned int*)((int)keyOnData + 0x200);
+        do {
+            if (*slot == 0) {
+                *slot = (unsigned int)track;
+                slot[1] = ((unsigned int*)track)[9];
+                DAT_8032f3f8++;
+                break;
+            }
+            slot += 2;
+        } while (slot < (unsigned int*)((int)keyOnData + 0x400));
     } else {
-        slot = (int*)((int)keyOnData + 0x400);
-        limit = (int*)((int)keyOnData + 0x600);
+        slot = (unsigned int*)((int)keyOnData + 0x400);
+        do {
+            if (*slot == 0) {
+                *slot = (unsigned int)track;
+                slot[1] = ((unsigned int*)track)[9];
+                DAT_8032f3f8++;
+                break;
+            }
+            slot += 2;
+        } while (slot < (unsigned int*)((int)keyOnData + 0x600));
     }
-
-    do {
-        if (*slot == 0) {
-            *slot = (int)track;
-            slot[1] = ((int*)track)[9];
-            DAT_8032f3f8++;
-            break;
-        }
-        slot += 2;
-    } while (slot < limit);
 }
+#pragma optimization_level 4
 #pragma dont_inline reset
 
 /*
@@ -169,6 +176,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
  * JP Size: TODO
  */
 #pragma dont_inline on
+#pragma optimization_level 0
 void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     char key;
@@ -196,6 +204,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
         } while (slot < (int*)(DAT_8032f444 + 0xc00));
     }
 }
+#pragma optimization_level 4
 #pragma dont_inline reset
 
 /*
@@ -952,6 +961,7 @@ void __MidiCtrl_KeyOffSame(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, Re
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_KeyOffNoteVelocity(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     int* trackData = reinterpret_cast<int*>(track);
@@ -983,6 +993,7 @@ void __MidiCtrl_KeyOffNote(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, Re
 
     KeyOffSet(control, keyOnData, track);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

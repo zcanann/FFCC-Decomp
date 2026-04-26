@@ -701,6 +701,7 @@ void SePause(int seId, int pause)
  */
 void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume, int mode)
 {
+	const char* logBlob = s_redCommandLogBlob;
 	int waveBase = c_RedEntry.SearchWaveBase((int)*(short*)((char*)musicHead + 6));
 	if (waveBase == 0) {
 		return;
@@ -730,14 +731,12 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	int trackBase = RedNew(*(char*)((char*)musicHead + 8) * 0x154);
 	if (trackBase == 0) {
 		if (m_ReportPrint != 0) {
-			OSReport(s_redCommandLogBlob + RED_COMMAND_MUSIC_TRACK_CREATE_ERROR_FMT_OFFSET,
-			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogErrorColor,
-			         sRedCommandLogReset);
+			OSReport(logBlob + RED_COMMAND_MUSIC_TRACK_CREATE_ERROR_FMT_OFFSET,
+			         logBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogErrorColor, sRedCommandLogReset);
 			fflush(__files + 1);
-			OSReport(s_redCommandLogBlob + RED_COMMAND_MUSIC_NEED_MEMORY_FMT_OFFSET,
-			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogErrorColor,
-			         (int)*(short*)((char*)musicHead + 4), *(char*)((char*)musicHead + 8) * 0x154,
-			         sRedCommandLogReset);
+			OSReport(logBlob + RED_COMMAND_MUSIC_NEED_MEMORY_FMT_OFFSET,
+			         logBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogErrorColor,
+			         (int)*(short*)((char*)musicHead + 4), *(char*)((char*)musicHead + 8) * 0x154, sRedCommandLogReset);
 			fflush(__files + 1);
 		}
 		c_RedEntry.DisplayMMemoryInfo();

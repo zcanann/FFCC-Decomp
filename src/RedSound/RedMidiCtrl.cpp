@@ -1355,7 +1355,7 @@ void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 
     voice = (int*)p_VoiceData;
     do {
-        if ((voice[0] == (int)trackData) && (voice[1] != 0)) {
+        if (((unsigned int)voice[0] == (unsigned int)trackData) && ((unsigned int)voice[1] != 0)) {
             memcpy(voice + 0x14, (void*)(voice[1] + 0x50), 0xc);
             voice[0x24] |= 0x3c0;
         }

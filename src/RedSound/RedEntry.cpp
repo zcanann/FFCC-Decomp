@@ -1144,8 +1144,7 @@ int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
 
 	do {
 		if (bank[3] != 0) {
-			int seNo = bank[0] / 1000 + (bank[0] >> 31);
-			seNo = seNo - (seNo >> 31);
+			int seNo = bank[0] / 1000;
 			if ((bankNo != seNo) && (sepNo != seNo) && (groupNo != seNo) && (kindNo != seNo)) {
 				SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(bank));
 			}

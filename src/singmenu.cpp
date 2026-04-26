@@ -4,7 +4,6 @@
 #include "ffcc/fontman.h"
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
-#include "ffcc/astar.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
@@ -744,6 +743,7 @@ extern "C" char* gSingMenuAttrTableEs[] = {
     s_Revitalia_801DE674, s_Superataque_801DE680, lbl_801DE68C, s_No_se_aturde_801DE69C,
 };
 extern "C" {
+int gSingDynamicWinMessInfo[5];
 char s_DynamicMessStr[0x404];
 }
 
@@ -2538,7 +2538,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     _GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
     font->SetColor(color);
 
-    int lineCount = AStar.m_bestPath.m_pathLength;
+    int lineCount = gSingDynamicWinMessInfo[0];
     const SingMenuStaticMessageInfo& staticMessage = DAT_80214a50[messageNo];
     if (useDynamic == 0) {
         lineCount = staticMessage.lineCount;
@@ -2602,7 +2602,7 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     font->SetShadow(1);
     font->SetScale(FLOAT_8032ea78);
 
-    int lineCount = AStar.m_bestPath.m_pathLength;
+    int lineCount = gSingDynamicWinMessInfo[0];
     const SingMenuStaticMessageInfo& staticMessage = DAT_80214a50[messageNo];
     if (useDynamic == 0) {
         lineCount = staticMessage.lineCount;
@@ -2678,7 +2678,7 @@ void CMenuPcs::SetSingDynamicWinMessInfo(
     char* line6,
     char* line7)
 {
-    AStar.m_bestPath.m_pathLength = lineCount;
+    gSingDynamicWinMessInfo[0] = lineCount;
 
     if (line0 != 0) {
         strcpy(s_DynamicMessStr, line0);

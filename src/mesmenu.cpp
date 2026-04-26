@@ -681,36 +681,30 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     }
 
     unsigned char colorStorage[8];
-    __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (int)(FLOAT_80330908 * alpha));
-    SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
+    SetColor__8CMenuPcsFR6CColor(
+        &MenuPcs, __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (int)(FLOAT_80330908 * alpha)));
     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x17);
 
-    unsigned int menuIndex = *(unsigned int*)((char*)this + 0x18);
-    unsigned int offset = 0x4C;
+    int menuIndex = *(int*)((char*)this + 0x18);
+    int offset = 0x4C;
     if ((menuIndex & 1) != 0) {
         offset = 0x30;
     }
 
-    double baseY = (double)(FLOAT_8033090c + y);
-    double stepScale = (double)FLOAT_80330910;
+    float baseY = FLOAT_8033090c + y;
+    float stepScale = FLOAT_80330910;
     int valueOffset = 0;
-    double baseX = x + (double)(float)offset;
-    double timerScale = (double)FLOAT_80330918;
-    double one = (double)FLOAT_80330914;
-    double pulseScale = (double)FLOAT_8033091c;
-    double pulseMul = (double)FLOAT_80330920;
-    double zero = (double)FLOAT_803308d8;
+    float baseX = x + (float)offset;
+    float timerScale = FLOAT_80330918;
+    float one = FLOAT_80330914;
+    float pulseScale = FLOAT_8033091c;
+    float pulseMul = FLOAT_80330920;
     int timerOffset = (int)this;
-    double intBias = DOUBLE_80330900;
 
     for (int i = 0; i < (int)(unsigned int)(*(unsigned short*)(scriptFood + 0x1A) >> 1); i++) {
         int heartValue = *(int*)((char*)this + 0x3DA8) - valueOffset;
-        double timer = (double)(float)*(unsigned int*)(timerOffset + 0x3DB0);
-        double pulse = (double)(float)((double)(float)(pulseScale *
-                                                        (double)(float)sin((double)(float)(stepScale *
-                                                                                           -(double)(float)((double)(float)(timer * timerScale) - one))) +
-                                                        one) *
-                                       pulseMul);
+        float timer = (float)*(unsigned int*)(timerOffset + 0x3DB0);
+        float pulse = (pulseScale * (float)sin(stepScale * -(timer * timerScale - one)) + one) * pulseMul;
 
         unsigned int subTimer = *(unsigned int*)(timerOffset + 0x3DD0);
         int shakeX = 0;
@@ -723,27 +717,27 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
             shakeY = ((int)subTimer >> 2) * DAT_8020f998[subTimer & 3];
         }
 
-        double drawX = (double)(float)(baseX + (double)(float)shakeX);
-        double drawY = (double)(float)(baseY + (double)(float)shakeY);
+        float drawX = baseX + (float)shakeX;
+        float drawY = baseY + (float)shakeY;
 
         DrawRect__8CMenuPcsFUlfffffffff(
-            &MenuPcs, 3, (float)drawX, (float)drawY, FLOAT_803308dc, FLOAT_803308dc, (float)zero, (float)zero, (float)pulse,
-            (float)pulse, FLOAT_803308d8);
+            &MenuPcs, 3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, FLOAT_803308d8, FLOAT_803308d8, pulse, pulse,
+            FLOAT_803308d8);
 
         if (heartValue > 0) {
-            int fillAmount = heartValue;
-            if (fillAmount > 0x0B) {
-                fillAmount = 0x0B;
+            int fillAmount = 0x0B;
+            if (heartValue < 0x0B) {
+                fillAmount = heartValue;
             }
 
-            float u = *(unsigned short*)(scriptFood + 0x42) != 0 ? 24.0f : 0.0f;
+            float u = (float)((*(unsigned short*)(scriptFood + 0x42) != 0) * 0x18);
             float v = (float)((0x0C - fillAmount) * 0x18);
             DrawRect__8CMenuPcsFUlfffffffff(
-                &MenuPcs, 3, (float)drawX, (float)drawY, FLOAT_803308dc, FLOAT_803308dc, u, v, (float)pulse, (float)pulse,
+                &MenuPcs, 3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, u, v, pulse, pulse,
                 FLOAT_803308d8);
         }
 
-        baseX = (double)(float)(baseX + (double)(((menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928));
+        baseX += ((menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
         valueOffset += 0x0C;
         timerOffset += 4;
     }

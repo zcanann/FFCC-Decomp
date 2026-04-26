@@ -206,15 +206,15 @@ void _SetReverbDepth(int* param_1)
     }
     *(unsigned int*)((char*)p_ReverbDepth + (reverbIndex & 1) * 0xc) = reverbDepth;
     if ((reverbIndex & 1) != 0) {
-        fadeStep = (int)(fadeFrame * 0x60) / 0x3c + ((int)(fadeFrame * 0x60) >> 0x1f);
-        fadeStep = fadeStep - (fadeStep >> 0x1f);
+        fadeStep = (int)(fadeFrame * 0x60) / 0x3c;
         if (fadeStep == 0) {
             fadeStep = 1;
         }
+        reverbDepth |= 0x800;
         seInfo = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
         do {
             if (*seInfo != 0) {
-                seInfo[0x1b] = (int)((reverbDepth | 0x800) - (seInfo[0x1a] & 0xfffff000U)) / fadeStep;
+                seInfo[0x1b] = (int)(reverbDepth - (seInfo[0x1a] & 0xfffff000U)) / fadeStep;
                 seInfo[0x1c] = fadeStep;
             }
             seInfo += 0x55;

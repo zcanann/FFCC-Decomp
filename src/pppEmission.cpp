@@ -372,16 +372,21 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
         pppSetBlendMode(step->m_payload[8]);
         *(int*)(MaterialManRaw() + 0xD0) = texture + 0x28;
 
+        Mtx viewMtx0;
+        Mtx objMtx0;
+        Mtx viewMtx1;
+        Mtx objMtx1;
+        Mtx texMtx0;
+        Mtx texMtx1;
+
         if (step->m_payload[9] == 0) {
             for (int i = 0; i < step->m_initWOrk; i++) {
                 float scale = FLOAT_803311e4;
                 scale += (float)i * state->m_scale0;
-                Mtx viewMtx;
-                Mtx objMtx;
-                PSMTXScale(objMtx, scale, scale, scale);
-                PSMTXConcat(param_5, objMtx, objMtx);
-                PSMTXCopy(CameraMatrix(), viewMtx);
-                SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx, objMtx);
+                PSMTXScale(objMtx0, scale, scale, scale);
+                PSMTXConcat(param_5, objMtx0, objMtx0);
+                PSMTXCopy(CameraMatrix(), viewMtx0);
+                SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx0, objMtx0);
 
                 int remaining = meshData->m_displayListCount - 1;
                 EmissionDisplayList* displayList = meshData->m_displayLists;
@@ -411,9 +416,8 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     if (step->m_payload[10] == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
-                        Mtx texMtx;
-                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
-                        GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
+                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx0);
+                        GXLoadTexMtxImm(texMtx0, 0x1E, GX_MTX3x4);
                         if (step->m_payload[10] == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
                         } else if (step->m_payload[10] == 2) {
@@ -432,13 +436,11 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
             EmissionParticle* particle = (EmissionParticle*)state->m_particles;
             for (int i = 0; i < step->m_initWOrk; i++) {
                 float scale = particle->m_scale;
-                Mtx objMtx;
-                Mtx viewMtx;
-                PSMTXScale(objMtx, scale, scale, scale);
-                PSMTXConcat(param_5, objMtx, objMtx);
-                PSMTXCopy(CameraMatrix(), viewMtx);
-                PSMTXConcat(viewMtx, objMtx, objMtx);
-                GXLoadPosMtxImm(objMtx, 0);
+                PSMTXScale(objMtx1, scale, scale, scale);
+                PSMTXConcat(param_5, objMtx1, objMtx1);
+                PSMTXCopy(CameraMatrix(), viewMtx1);
+                PSMTXConcat(viewMtx1, objMtx1, objMtx1);
+                GXLoadPosMtxImm(objMtx1, 0);
 
                 int remaining = meshData->m_displayListCount - 1;
                 EmissionDisplayList* displayList = meshData->m_displayLists;
@@ -468,9 +470,8 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     if (step->m_payload[10] == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
-                        Mtx texMtx;
-                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
-                        GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
+                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx1);
+                        GXLoadTexMtxImm(texMtx1, 0x1E, GX_MTX3x4);
                         if (step->m_payload[10] == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
                         } else if (step->m_payload[10] == 2) {

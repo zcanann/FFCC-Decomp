@@ -48,7 +48,7 @@ struct THPSimpleControl {
 };
 
 THPSimpleControl SimpleControl;
-static u8 sReadBuffer[0x40];
+static u8 sReadBuffer[0x40] ATTRIBUTE_ALIGN(32);
 s32 gTHPSimpleInitialized;
 s32 gTHPSimpleSoundBufferIndex;
 void (*gTHPSimpleOldAIDCallback)(void);

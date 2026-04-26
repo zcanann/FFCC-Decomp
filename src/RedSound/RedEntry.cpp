@@ -750,39 +750,40 @@ int CRedEntry::ReentryWaveData(int waveNo)
  */
 void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 {
-	int* entry = (int*)this;
-	bool used;
+	int used;
 	int seq;
 	int* track;
 
 	if (mode == 0) {
-		used = false;
+		used = 0;
 		if ((*(short*)((char*)p_SoundControlBuffer + 0x48e) != 0) && (*(int*)((char*)p_SoundControlBuffer + 0x47c) == waveNo)) {
-			used = true;
+			used |= 1;
 		}
 		if ((*(short*)((char*)p_SoundControlBuffer + 0x922) != 0) && (*(int*)((char*)p_SoundControlBuffer + 0x910) == waveNo)) {
-			used = true;
+			used |= 1;
 		}
-		if (!used) {
+		if (used == 0) {
 			track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 			do {
 				if (((*track != 0) && (track[6] != 0)) && (*(short*)(track[6] + 2) == waveNo)) {
-					used = true;
+					used++;
 					break;
 				}
 				track += 0x55;
 			} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
 		}
-		if (((!used) && (seq = SearchWaveSequence(waveNo), 0xf < seq)) &&
-		    (*(int*)(*entry + seq * 0x10 + 4) == 0)) {
-			WaveHistoryAdd(0x14);
-			*(int*)(*entry + seq * 0x10 + 4) = 0x14;
+		if (used == 0) {
+			seq = SearchWaveSequence(waveNo);
+			if ((0xf < seq) && (*(int*)(*(int*)this + seq * 0x10 + 4) == 0)) {
+				WaveHistoryAdd(0x14);
+				*(int*)(*(int*)this + seq * 0x10 + 4) = 0x14;
+			}
 		}
 	} else {
 		seq = SearchWaveSequence(waveNo);
-		if ((0xf < seq) && (*(int*)(*entry + seq * 0x10 + 4) != 0)) {
-			WaveHistoryDelete(*(int*)(*entry + seq * 0x10 + 4));
-			*(int*)(*entry + seq * 0x10 + 4) = 0;
+		if ((0xf < seq) && (*(int*)(*(int*)this + seq * 0x10 + 4) != 0)) {
+			WaveHistoryDelete(*(int*)(*(int*)this + seq * 0x10 + 4));
+			*(int*)(*(int*)this + seq * 0x10 + 4) = 0;
 		}
 	}
 }
@@ -1199,28 +1200,32 @@ int CRedEntry::ReentrySeSepData(int seNo)
 void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 {
 	if (mode == 0) {
-		bool inUse = false;
+		int inUse = 0;
 		int* track = *(int**)((int)p_SoundControlBuffer + 0xdbc);
 
 		do {
 			if ((*track != 0) && (track[0x3D] == seNo)) {
-				inUse = true;
+				inUse |= 1;
 				break;
 			}
 			track += 0x55;
 		} while (track < (int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80));
 
-		int sequenceNo = SearchSeSepSequence(seNo);
-		if ((!inUse) && (-1 < sequenceNo) &&
-		    (*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) == 0)) {
-			SeSepHistoryAdd();
-			*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) = 1;
+		if (inUse == 0) {
+			int sequenceNo = SearchSeSepSequence(seNo);
+			if ((sequenceNo >= 0) &&
+			    (*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) == 0)) {
+				SeSepHistoryAdd();
+				*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) = 1;
+			}
 		}
 	} else {
 		int sequenceNo = SearchSeSepSequence(seNo);
-		if (*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) != 0) {
-			SeSepHistoryDelete(*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4));
-			*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) = 0;
+		if (sequenceNo >= 0) {
+			if (*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) != 0) {
+				SeSepHistoryDelete(*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4));
+				*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) = 0;
+			}
 		}
 	}
 }

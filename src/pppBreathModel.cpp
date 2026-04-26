@@ -400,7 +400,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
 {
     int colorOffset;
     int* dataOffsets;
-    unsigned char* work;
+    VBreathModel* work;
     VColor* color;
     int* groupData;
     Mtx* particleWMat;
@@ -429,46 +429,46 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     dataOffsets = offsets->m_serializedDataOffsets;
     _pppMngSt* mngSt = pppMngStPtr;
     colorOffset = dataOffsets[1];
-    work = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + dataOffsets[0];
+    work = reinterpret_cast<VBreathModel*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + dataOffsets[0]);
     color = (VColor*)(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
 
-    if (*(void**)(work + 0x30) == NULL) {
+    if (work->m_particleData == NULL) {
         int* groupTable;
 
-        *(int*)(work + 0x40) = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x1A);
-        *(short*)(work + 0x56) = *(unsigned short*)((unsigned char*)pBreathModel + 0x10);
-        *(short*)(work + 0x54) = *(unsigned short*)((unsigned char*)pBreathModel + 0x12);
+        work->m_particleCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x1A);
+        work->m_slotCount = *(unsigned short*)((unsigned char*)pBreathModel + 0x10);
+        work->m_groupCount = *(unsigned short*)((unsigned char*)pBreathModel + 0x12);
 
-        *(void**)(work + 0x30) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) * 0x98), pppEnvStPtr->m_stagePtr,
+        work->m_particleData =
+            (PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x98), pppEnvStPtr->m_stagePtr,
                                                   const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x257);
-        if (*(void**)(work + 0x30) != NULL) {
-            memset(*(void**)(work + 0x30), 0, (unsigned long)(*(int*)(work + 0x40) * 0x98));
+        if (work->m_particleData != NULL) {
+            memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * 0x98));
         }
 
-        *(void**)(work + 0x34) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) * 0x30), pppEnvStPtr->m_stagePtr,
+        work->m_particleWmats =
+            (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x30), pppEnvStPtr->m_stagePtr,
                                                   const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x25d);
-        if (*(void**)(work + 0x34) != NULL) {
-            memset(*(void**)(work + 0x34), 0, (unsigned long)(*(int*)(work + 0x40) * 0x30));
+        if (work->m_particleWmats != NULL) {
+            memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * 0x30));
         }
 
-        *(void**)(work + 0x38) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) << 5), pppEnvStPtr->m_stagePtr,
+        work->m_particleColors =
+            (PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount << 5), pppEnvStPtr->m_stagePtr,
                                                   const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x263);
-        if (*(void**)(work + 0x38) != NULL) {
-            memset(*(void**)(work + 0x38), 0, (unsigned long)(*(int*)(work + 0x40) << 5));
+        if (work->m_particleColors != NULL) {
+            memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount << 5));
         }
 
-        *(void**)(work + 0x3C) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->m_groups =
+            (BreathParticleGroup*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12) * 0x5C),
                 pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x269);
-        if (*(void**)(work + 0x3C) != NULL) {
-            memset(*(void**)(work + 0x3C), 0,
+        if (work->m_groups != NULL) {
+            memset(work->m_groups, 0,
                    (unsigned long)((int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12) * 0x5C));
 
-            groupTable = (int*)*(void**)(work + 0x3C);
+            groupTable = (int*)work->m_groups;
             for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); i++) {
                 groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                     (unsigned long)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10),
@@ -488,17 +488,17 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
             }
         }
 
-        *(float*)(work + 0x48) = kPppBreathModelZero;
-        *(float*)(work + 0x4C) = kPppBreathModelZero;
-        *(float*)(work + 0x50) = FLOAT_80330F80;
-        PSVECNormalize((Vec*)(work + 0x48), (Vec*)(work + 0x48));
+        work->m_direction.x = kPppBreathModelZero;
+        work->m_direction.y = kPppBreathModelZero;
+        work->m_direction.z = FLOAT_80330F80;
+        PSVECNormalize(&work->m_direction, &work->m_direction);
     }
 
-    PSMTXCopy(pppMngStPtr->m_matrix.value, *(Mtx*)work);
-    UpdateAllParticle(reinterpret_cast<_pppPObject*>(breathModel), (VBreathModel*)work, pBreathModel, color);
+    PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_matrix);
+    UpdateAllParticle(reinterpret_cast<_pppPObject*>(breathModel), work, pBreathModel, color);
 
-    particleWMat = *(Mtx**)(work + 0x34);
-    groupData = *(int**)(work + 0x3C);
+    particleWMat = work->m_particleWmats;
+    groupData = (int*)work->m_groups;
     for (groupIndex = 0; groupIndex < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
          groupIndex++) {
         slotCount = (unsigned int)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
@@ -576,12 +576,12 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     unsigned short* emitFrameCounter;
 
     spawnCount = 0;
-    particleData = (unsigned char*)*(void**)((unsigned char*)vBreathModel + 0x30);
-    particleWmat = (unsigned char*)*(void**)((unsigned char*)vBreathModel + 0x34);
-    particleColor = (unsigned char*)*(void**)((unsigned char*)vBreathModel + 0x38);
-    groupTable = *(BreathParticleGroup**)((unsigned char*)vBreathModel + 0x3C);
-    maxParticleCount = *(int*)((unsigned char*)vBreathModel + 0x40);
-    emitFrameCounter = (unsigned short*)((unsigned char*)vBreathModel + 0x44);
+    particleData = (unsigned char*)vBreathModel->m_particleData;
+    particleWmat = (unsigned char*)vBreathModel->m_particleWmats;
+    particleColor = (unsigned char*)vBreathModel->m_particleColors;
+    groupTable = vBreathModel->m_groups;
+    maxParticleCount = vBreathModel->m_particleCount;
+    emitFrameCounter = &vBreathModel->m_emitFrameCounter;
 
     if ((gPppCalcDisabled == 0) && (*(int*)((unsigned char*)pBreathModel + 0xC) != 0xFFFF)) {
         *emitFrameCounter = *emitFrameCounter + 1;
@@ -593,7 +593,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
             } else {
                 float zero = kPppBreathModelZero;
 
-                groupTableWork = *(int*)((unsigned char*)vBreathModel + 0x3C);
+                groupTableWork = (int)vBreathModel->m_groups;
                 for (foundGroup = 0;
                      foundGroup < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
                      foundGroup++) {
@@ -621,7 +621,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                     unsigned int slotCount;
 
                     slot = 0;
-                    group = *(int*)((unsigned char*)vBreathModel + 0x3C) + (int)foundGroup * 0x5C;
+                    group = (int)vBreathModel->m_groups + (int)foundGroup * 0x5C;
                     slotCount = *(unsigned short*)((unsigned char*)pBreathModel + 0x10);
                     while (slotCount != 0) {
                         if ((*(signed char*)(*(int*)(group + 4) + slot) != -1) ||

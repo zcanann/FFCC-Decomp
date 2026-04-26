@@ -377,13 +377,3 @@ void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
 	*(float*)(basePtr + 0x18) = zero;
 	*(float*)(basePtr + 0x14) = zero;
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void SetUpIndWarp(VYmDeformationScreen*)
-{
-	// TODO
-}

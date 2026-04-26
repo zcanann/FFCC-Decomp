@@ -227,7 +227,7 @@ int CMenuPcs::MLstClose()
 	if ((int)itemCount > 0) {
 		do {
 			if (entry->startFrame <= currentFrame) {
-				if (currentFrame < entry->startFrame + entry->duration) {
+				if (entry->startFrame + entry->duration > currentFrame) {
 					entry->timer = entry->timer + 1;
 					double ratio = DOUBLE_80333410 / (double)entry->duration;
 					entry->alpha = (float)(DOUBLE_80333410 - ratio * (double)entry->timer);
@@ -509,7 +509,7 @@ int CMenuPcs::MLstOpen()
 	if ((int)itemCount > 0) {
 		do {
 			if (entry->startFrame <= currentFrame) {
-				if (currentFrame < entry->startFrame + entry->duration) {
+				if (entry->startFrame + entry->duration > currentFrame) {
 					entry->timer = entry->timer + 1;
 					double ratio = DOUBLE_80333410 / (double)entry->duration;
 					entry->alpha = (float)(ratio * (double)entry->timer);

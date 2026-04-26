@@ -16,8 +16,8 @@ extern const f32 FLOAT_803306e8;
 extern const f32 FLOAT_803306ec;
 extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
-static const f64 DOUBLE_803306F0 = 4503601774854144.0;
-static const f64 DOUBLE_803306f8 = 4503599627370496.0;
+static const f64 DOUBLE_803306F0 = 4503599627370496.0;
+static const f64 DOUBLE_803306f8 = 4503601774854144.0;
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -77,6 +77,11 @@ union PackedColor {
     u8 bytes[4];
 };
 
+union TracerDoubleBits {
+    f64 d;
+    u32 u[2];
+};
+
 static inline void copyPolygonData(TRACE_POLYGON* dst, const TRACE_POLYGON* src)
 {
     pppCopyVector(dst->from, src->from);
@@ -114,6 +119,8 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
+    TracerDoubleBits countDouble;
+    TracerDoubleBits indexDouble;
     int textureIndex[2];
 
     dataOffset = *param_3->m_serializedDataOffsets;
@@ -150,7 +157,9 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
                 SetUpPaletteEnv(texture);
             }
 
-            uvStep = FLOAT_803306ec / (f32)work->count;
+            countDouble.u[0] = 0x43300000;
+            countDouble.u[1] = (u32)work->count;
+            uvStep = FLOAT_803306ec / (f32)(countDouble.d - DOUBLE_803306F0);
             GXSetCullMode(GX_CULL_NONE);
 
             for (i = 0; i < (s32)(work->count - 1); i++) {
@@ -162,8 +171,11 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
                     (FLOAT_803306e8 != next->to.x) && (FLOAT_803306e8 != next->to.y) &&
                     (FLOAT_803306e8 != next->to.z) && (FLOAT_803306e8 != next->from.x) &&
                     (FLOAT_803306e8 != next->from.y) && (FLOAT_803306e8 != next->from.z)) {
-                    uTop = (f32)i * uvStep;
-                    uBottom = (f32)(i + 1) * uvStep;
+                    indexDouble.u[0] = 0x43300000;
+                    indexDouble.u[1] = (u32)i ^ 0x80000000;
+                    uTop = (f32)((f32)(indexDouble.d - DOUBLE_803306f8) * uvStep);
+                    indexDouble.u[1] = (u32)(i + 1) ^ 0x80000000;
+                    uBottom = (f32)((f32)(indexDouble.d - DOUBLE_803306f8) * uvStep);
                     colorTop.value = DAT_803306e0;
                     colorBottom.value = DAT_803306e4;
                     colorTop.bytes[3] = poly->alpha;
@@ -318,10 +330,20 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             Vec splineFrom[4];
             Vec splineTo[4];
             s16 splineCount = 0;
-            f64 stepScale = FLOAT_803306ec / (f32)(param_2->m_payload[9] + 1);
+            f64 stepScale;
+            TracerDoubleBits countDouble;
+            TracerDoubleBits indexDouble;
+
+            countDouble.u[0] = 0x43300000;
+            countDouble.u[1] = (u32)(param_2->m_payload[9] + 1) ^ 0x80000000;
+            stepScale = FLOAT_803306ec / (f32)(countDouble.d - DOUBLE_803306f8);
 
             for (i = 0; i < (s32)(u32)param_2->m_payload[9]; i++) {
-                f32 t = stepScale * (f32)(i + 1);
+                f32 t;
+
+                indexDouble.u[0] = 0x43300000;
+                indexDouble.u[1] = (u32)(i + 1) ^ 0x80000000;
+                t = (f32)(stepScale * (f64)(f32)(indexDouble.d - DOUBLE_803306f8));
 
                 gUtil.GetSplinePos(splineFrom[(param_2->m_payload[9] - 1) - i], entries[3].to, entries[2].to,
                                           entries[1].to, entries[0].from, t, FLOAT_803306ec);

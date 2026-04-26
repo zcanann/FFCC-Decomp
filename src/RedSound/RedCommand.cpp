@@ -930,10 +930,10 @@ void MusicStop(int seId)
  */
 int MusicPlay(int musicId, int volume, int mode)
 {
-	int musicBank = (int)c_RedEntry.SearchMusicBank(musicId);
+	int* musicBank = c_RedEntry.SearchMusicBank(musicId);
 
 	if (musicBank != 0) {
-		RedMusicHEAD* musicHead = *(RedMusicHEAD**)(musicBank + 8);
+		RedMusicHEAD* musicHead = (RedMusicHEAD*)musicBank[2];
 		RedWaveHeadWD* waveHead =
 		    (RedWaveHeadWD*)c_RedEntry.SearchWaveBase(*(short*)((char*)musicHead + 6));
 

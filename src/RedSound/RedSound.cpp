@@ -260,12 +260,14 @@ void CRedSound::ReportPrint(int debugFlag)
 int CRedSound::ReportStandby(int id)
 {
 	int i;
+	int result = 0;
 
 	if (id == 0) {
 		i = 0;
 		do {
 			if (m_StandbyStatus[i] != 0) {
-				return 1;
+				result++;
+				break;
 			}
 			i++;
 		} while (i < 0x40);
@@ -273,13 +275,14 @@ int CRedSound::ReportStandby(int id)
 		i = 0;
 		do {
 			if (id == m_StandbyStatus[i]) {
-				return 1;
+				result++;
+				break;
 			}
 			i++;
 		} while (i < 0x40);
 	}
 
-	return 0;
+	return result;
 }
 
 /*

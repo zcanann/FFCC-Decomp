@@ -76,7 +76,7 @@ void* p_MusicReplayPoint;
 int* volatile p_MusicTempoControl;
 int* volatile p_MusicPitchControl;
 int m_MusicPhraseStop;
-static int* p_MusicNextPlay;
+static int* volatile p_MusicNextPlay;
 int m_CrossTime;
 int m_MasterMusicVolume;
 int m_MasterSEVolume;

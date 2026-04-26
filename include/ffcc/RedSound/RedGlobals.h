@@ -39,7 +39,7 @@ extern int* volatile p_MusicTempoControl;
 extern int* volatile p_MusicPitchControl;
 extern int m_MusicPhraseStop;
 extern int m_CrossTime;
-extern int m_MasterMusicVolume;
+extern volatile int m_MasterMusicVolume;
 extern int m_MasterSEVolume;
 extern RedStreamDATA* volatile p_Stream;
 extern int m_SeSkipStep;

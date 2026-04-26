@@ -477,6 +477,8 @@ void StreamPause(int param_1, int param_2)
 	unsigned int streamData;
 	int voiceData;
 	int pitch;
+	int volume;
+	int pan;
 
 	if (redSoundDebugEnabled != 0) {
 		if (param_2 == 1) {
@@ -501,12 +503,14 @@ void StreamPause(int param_1, int param_2)
 				}
 			} else if (*(void**)(voiceData + 0x14) != 0) {
 				pitch = PitchCompute__Fiiii(0x3c00000, 0, *(int*)(streamData + 0x24), 0);
+				volume = *(int*)(streamData + 0xf0) >> 0xc;
 				if (*(short*)(streamData + 0x2a) == 2) {
 					*(int*)(voiceData + 0x9c) = pitch;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;
 					*(int*)(voiceData + 0x15c) = pitch;
 					*(unsigned int*)(voiceData + 0x150) |= 0x10;
 				} else {
+					pan = *(int*)(streamData + 0x100) >> 0xc;
 					*(int*)(voiceData + 0x9c) = pitch;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;
 				}

@@ -1,6 +1,6 @@
 #include "ffcc/pppYmMiasma.h"
 #include "ffcc/math.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppPart.h"
@@ -11,6 +11,7 @@
 #include <string.h>
 
 extern "C" int rand(void);
+extern CGame Game;
 extern float FLOAT_80330640;
 extern float FLOAT_80330644;
 extern float FLOAT_80330650;

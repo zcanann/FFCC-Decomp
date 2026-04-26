@@ -238,9 +238,9 @@ void CRedSound::End()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::GetProgramTime()
+int CRedSound::GetProgramTime()
 {
-	c_Driver.GetProgramTime();
+	return c_Driver.GetProgramTime();
 }
 
 /*
@@ -314,9 +314,9 @@ void CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::DMACheck(int id)
+int CRedSound::DMACheck(int id)
 {
-	RedDmaSearchID(id);
+	return RedDmaSearchID(id);
 }
 
 /*
@@ -342,9 +342,9 @@ void CRedSound::SetSoundMode(int mode)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::GetSoundMode()
+int CRedSound::GetSoundMode()
 {
-	c_Driver.GetSoundMode();
+	return c_Driver.GetSoundMode();
 }
 
 /*
@@ -550,9 +550,9 @@ void CRedSound::ReentrySeSepData(int id)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::SePlayState(int id)
+int CRedSound::SePlayState(int id)
 {
-	c_Driver.SePlayState(id);
+	return c_Driver.SePlayState(id);
 }
 
 /*
@@ -688,9 +688,9 @@ void CRedSound::SePause(int seID, int pause)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::GetSeVolume(int seID, int outVolume)
+int CRedSound::GetSeVolume(int seID, int outVolume)
 {
-	c_Driver.GetSeVolume(seID, outVolume);
+	return c_Driver.GetSeVolume(seID, outVolume);
 }
 
 /*
@@ -730,9 +730,9 @@ void CRedSound::DisplaySePlayInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::StreamPlayState(int streamID)
+int CRedSound::StreamPlayState(int streamID)
 {
-	c_Driver.StreamPlayState(streamID);
+	return c_Driver.StreamPlayState(streamID);
 }
 
 /*

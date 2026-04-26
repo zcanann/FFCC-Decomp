@@ -12,15 +12,15 @@ public:
 	int Init(void*, int, int, int);
 	void Start();
 	void End();
-	void GetProgramTime();
+	int GetProgramTime();
 	void ReportPrint(int);
 	int ReportStandby(int);
 
 	void DMAEntry(int, int, int, int, int, void (*)(void*), void*);
-	void DMACheck(int);
+	int DMACheck(int);
 
 	void SetSoundMode(int);
-	void GetSoundMode();
+	int GetSoundMode();
 
 	void SetReverb(int, int);
 	void SetReverbDepth(int, int, int);
@@ -42,7 +42,7 @@ public:
 	void ClearSeSepDataMG(int, int, int, int);
 	void ReentrySeSepData(int);
 
-	void SePlayState(int);
+	int SePlayState(int);
 	void SeStop(int);
 	void SeStopMG(int, int, int, int);
 	int SePlay(int, int, int, int, int);
@@ -52,11 +52,11 @@ public:
 	void SePan(int, int, int);
 	void SePitch(int, int, int);
 	void SePause(int, int);
-	void GetSeVolume(int, int);
+	int GetSeVolume(int, int);
 	void ReportSeLoop(int);
 	void DisplaySePlayInfo();
 
-	void StreamPlayState(int);
+	int StreamPlayState(int);
 	void GetStreamPlayPoint(int, int*, int*);
 	void StreamStop(int);
 	int StreamPlay(void*, int, int, int);

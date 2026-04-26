@@ -25,7 +25,6 @@ struct RedWaveHEAD {
 };
 
 extern "C" {
-    void __dl__FPv(void*);
     int __OSReadROM();
 }
 
@@ -167,7 +166,6 @@ enum {
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void _SetSoundMode(int* param_1)
 {
     m_SoundMode = *param_1;
@@ -186,7 +184,6 @@ void _SetSoundMode(int* param_1)
         break;
     }
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -236,7 +233,6 @@ void _SetReverbDepth(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
 void _SetMusicData(int* param_1)
 {
     c_RedEntry.SetMusicData((RedMusicHEAD*)*param_1);
@@ -529,7 +525,6 @@ void _SeSepPlay(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 4
 void _SeSepPlaySequence(int* param_1)
 {
     int iVar1;
@@ -540,7 +535,6 @@ void _SeSepPlaySequence(int* param_1)
         SeSepPlay(param_1[0], param_1[1], param_1[2], param_1[3]);
     }
 }
-#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -659,7 +653,6 @@ void _StreamPause(int* param_1)
 {
 	StreamPause(param_1[0], param_1[1]);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -735,7 +728,6 @@ void _ExecuteCommand()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 unsigned int DeltaTimeSumup(unsigned char** buffer)
 {
 	unsigned int deltaTime = 0;
@@ -752,7 +744,6 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
 
 	return deltaTime;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -783,12 +774,10 @@ struct RedSleepAlarm {
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void _MyAlarmHandler(OSAlarm* param_1, OSContext*)
 {
     OSResumeThread(((RedSleepAlarm*)param_1)->thread);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1220,15 +1209,9 @@ CRedDriver::CRedDriver()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
-extern "C" CRedDriver* __dt__10CRedDriverFv(CRedDriver* redDriver, short shouldDelete)
+CRedDriver::~CRedDriver()
 {
-    if ((redDriver != 0) && (0 < shouldDelete)) {
-        __dl__FPv(redDriver);
-    }
-    return redDriver;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1406,7 +1389,6 @@ void CRedDriver::End()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int CRedDriver::GetProgramTime()
 {
     int sum = 0;
@@ -1418,7 +1400,6 @@ int CRedDriver::GetProgramTime()
     } while (p < p_Tick + 100);
     return sum;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1429,7 +1410,6 @@ int CRedDriver::GetProgramTime()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedDriver::SetSoundMode(int soundMode)
 {
     _EntryExecCommand(_SetSoundMode, soundMode, 0, 0, 0, 0, 0, 0);
@@ -2116,7 +2096,6 @@ void CRedDriver::StreamPause(int param_1, int param_2)
 {
     _EntryExecCommand(_StreamPause, param_1, param_2, 0, 0, 0, 0, 0);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2127,7 +2106,6 @@ void CRedDriver::StreamPause(int param_1, int param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedDriver::ClearWaveData(int param_1)
 {
     c_RedEntry.ClearWaveData(param_1);
@@ -2274,4 +2252,3 @@ void CRedDriver::TestProcess(int processType)
         break;
     }
 }
-#pragma optimization_level 4

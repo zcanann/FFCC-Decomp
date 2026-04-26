@@ -68,7 +68,6 @@ int p_MidiControl_Function[] = {
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int DataAddCompute(int* current, int target, int* delta)
 {
     int result = 0;
@@ -102,7 +101,6 @@ void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
         slot += 2;
     } while (slot < (unsigned int*)((int)keyOnData + 0x600));
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -114,7 +112,6 @@ void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
  * JP Size: TODO
  */
 #pragma dont_inline on
-#pragma optimization_level 0
 void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     unsigned int* slot;
@@ -153,7 +150,6 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
         } while (slot < (unsigned int*)((int)keyOnData + 0x600));
     }
 }
-#pragma optimization_level 4
 #pragma dont_inline reset
 
 /*
@@ -202,7 +198,6 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int SineSwing(int phase)
 {
     int value = phase & 0x1FF;
@@ -397,7 +392,6 @@ int RandomSwingR(int phase)
 
     return result;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -985,14 +979,12 @@ void __MidiCtrl_KeyOffNote(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, Re
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void __MidiCtrl_KeyOffVelocity(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     *reinterpret_cast<int*>(track) += 1;
 
     KeyOffSet(control, keyOnData, track);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1175,7 +1167,6 @@ void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     u32 pan;
@@ -1189,7 +1180,6 @@ void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     }
     m_ChangeStatus |= 2;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--

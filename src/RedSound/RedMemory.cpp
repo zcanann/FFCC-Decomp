@@ -17,10 +17,6 @@ const char s_redMemoryAuxBankFullFmt[] = "%s%sA-Memory Bank Full !!%s\n";
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
 const char sRedMemoryLogSuffixB[8] = "\x1b[0m";
 
-extern "C" {
-	void __dl__FPv(void*);
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -40,15 +36,9 @@ CRedMemory::CRedMemory()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
-extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldDelete)
+CRedMemory::~CRedMemory()
 {
-	if ((redMemory != 0) && (0 < shouldDelete)) {
-		__dl__FPv(redMemory);
-	}
-	return redMemory;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -171,12 +161,10 @@ void RedDelete(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void RedDelete(void* param_1)
 {
 	RedDelete((int)param_1);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -319,12 +307,10 @@ void RedDeleteA(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void RedDeleteA(void* param_1)
 {
 	RedDeleteA((int)param_1);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -335,7 +321,6 @@ void RedDeleteA(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
 	int bankSize = 0x2000;
@@ -351,7 +336,6 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
 	m_ADataBuffer = param3;
 	m_ADataBufferSize = param4;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--

@@ -78,10 +78,6 @@ static const char DAT_80333d45[] = "\x1B[4;34m";
 static const char DAT_80333d4d[] = "\n";
 static const char DAT_80333d4f[] = "%s\n";
 
-extern "C" {
-	void __dl__FPv(void*);
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -97,17 +93,9 @@ CRedEntry::CRedEntry()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
-extern "C" CRedEntry* __dt__9CRedEntryFv(CRedEntry* redEntry, short shouldDelete)
+CRedEntry::~CRedEntry()
 {
-	if (redEntry != 0) {
-		if (0 < shouldDelete) {
-			__dl__FPv(redEntry);
-		}
-	}
-	return redEntry;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1168,7 +1156,6 @@ int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int* CRedEntry::SearchSeSepBank(int seNo)
 {
 	int* seSepBank = (int*)*(int*)((int)this + 4);
@@ -1181,7 +1168,6 @@ int* CRedEntry::SearchSeSepBank(int seNo)
 
 	return 0;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1452,7 +1438,6 @@ unsigned int CRedEntry::MusicOldChoice()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int* CRedEntry::SearchMusicBank(int musicNo)
 {
 	int* musicBank = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8));
@@ -1465,7 +1450,6 @@ int* CRedEntry::SearchMusicBank(int musicNo)
 
 	return 0;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--

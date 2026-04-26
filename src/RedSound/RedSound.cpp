@@ -13,10 +13,6 @@
 #include "dolphin/ax.h"
 #include "dolphin/axart.h"
 
-extern "C" {
-	void __dl__FPv(void*);
-}
-
 // RedSound global linkage that is shared across Red* units.
 CRedDriver c_Driver;
 static int m_StandbyStatus[0x40];
@@ -72,15 +68,9 @@ CRedSound::CRedSound()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
-extern "C" CRedSound* __dt__9CRedSoundFv(CRedSound* redSound, short shouldDelete)
+CRedSound::~CRedSound()
 {
-    if ((redSound != 0) && (0 < shouldDelete)) {
-        __dl__FPv(redSound);
-    }
-    return redSound;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -110,7 +100,6 @@ unsigned int CRedSound::GetAutoID()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int* CRedSound::EntryStandbyID(int id)
 {
 	int* slot = m_StandbyStatus;
@@ -296,7 +285,6 @@ int CRedSound::ReportStandby(int id)
 
 	return result;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -307,7 +295,6 @@ int CRedSound::ReportStandby(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void (*callback)(void*), void* userData)
 {
 	RedDmaEntry(type, src, dst, length, flags, callback, userData);
@@ -326,7 +313,6 @@ int CRedSound::DMACheck(int id)
 {
 	return RedDmaSearchID(id);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -337,7 +323,6 @@ int CRedSound::DMACheck(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::SetSoundMode(int mode)
 {
 	c_Driver.SetSoundMode(mode);
@@ -909,4 +894,3 @@ void CRedSound::TestProcess(int mode)
 {
 	c_Driver.TestProcess(mode);
 }
-#pragma optimization_level 4

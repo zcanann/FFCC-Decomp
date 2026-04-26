@@ -13,7 +13,7 @@ extern const char s_CGbaPcs_80330870[];
 extern const char s_JoyBus__LoadBin___error_801d9de0[];
 
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
-const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error\n";
+const char s_JoyBus__LoadBin___error_801d9de0[32] = "JoyBus::LoadBin() error\n";
 
 CGbaPcsTable CGbaPcs::m_table = {
     const_cast<char*>(s_CGbaPcs_80330870),

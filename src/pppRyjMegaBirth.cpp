@@ -333,16 +333,16 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 				*(u16*)((u8*)particle + 0x20) = frame;
 				frameData = colorSet + (u32)frame * 8 + 0x10;
 
-				*(s16*)((u8*)particle + 0x1C) = *(s16*)((u8*)particle + 0x1C) + *(s16*)(paramPayload + 0x08);
+				*(u16*)((u8*)particle + 0x1C) = *(u16*)((u8*)particle + 0x1C) + *(u32*)(paramPayload + 0x08);
 				frame = *(u16*)((u8*)particle + 0x1C);
 				duration = *(s16*)(frameData + 2);
 
-				if ((s32)duration <= (s32)frame)
+				if ((s32)frame >= (s32)duration)
 				{
 					*(u16*)((u8*)particle + 0x1C) = frame - duration;
 					*(u16*)((u8*)particle + 0x1E) = *(u16*)((u8*)particle + 0x1E) + 1;
 
-					if ((s32)*(s16*)(colorSet + 6) <= (s32)(*(u16*)((u8*)particle + 0x1E)))
+					if ((s32)*(u16*)((u8*)particle + 0x1E) >= (s32)*(s16*)(colorSet + 6))
 					{
 						if ((*(u8*)(frameData + 4) & 0x80) == 0)
 						{

@@ -32,6 +32,10 @@ extern "C" unsigned int __cvt_fp2unsigned(double);
 extern const double DOUBLE_80330FF0 = 0.0;
 extern const float FLOAT_80330FF8 = 1.0f;
 extern const double DOUBLE_80331000 = 0.2f;
+extern const float FLOAT_80331060;
+extern const float FLOAT_80331064;
+extern const float FLOAT_80331068;
+extern const float FLOAT_8033106C;
 
 /*
  * --INFO--
@@ -84,7 +88,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 			local_70.rgba[2] = colorBase[10];
 			local_70.rgba[3] = shapeBase[0x32];
 
-			pppSetDrawEnv(&local_70, (pppFMATRIX*)0, 0.0f, unkB->m_payload[0], unkB->m_unk13, unkB->m_unk12, 0,
+			pppSetDrawEnv(&local_70, (pppFMATRIX*)0, FLOAT_80331060, unkB->m_payload[0], unkB->m_unk13, unkB->m_unk12, 0,
 						  1, 1, 0);
 
 			pppSetBlendMode(unkB->m_unk12);
@@ -137,7 +141,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		float alphaScale;
 
 		alphaScale = (float)sourceAlpha;
-		alphaScale *= 0.0078125f;
+		alphaScale *= FLOAT_80331064;
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);
 		PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
@@ -157,7 +161,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		objectPos.y = pppMngStPtr->m_matrix.value[1][3];
 		objectPos.z = pppMngStPtr->m_matrix.value[2][3];
 		PSVECSubtract(&cameraPos, &objectPos, &cameraToObject);
-		PSVECScale(&cameraToObject, &cameraToObject, -1.0f);
+		PSVECScale(&cameraToObject, &cameraToObject, FLOAT_80331068);
 		PSVECNormalize(&lookDir, &lookDir);
 		PSVECNormalize(&cameraToObject, &cameraToObject);
 		work->m_dot = PSVECDotProduct(&cameraToObject, &lookDir);
@@ -167,7 +171,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		zAtPixel = 0;
 		flareWidth = unkB->m_arg3;
 		halfWidth = flareWidth >> 1;
-		z0 = __cvt_fp2unsigned((double)(16777215.0f * work->m_projectedZ));
+		z0 = __cvt_fp2unsigned((double)(FLOAT_8033106C * work->m_projectedZ));
 		y0 = (u16)projectedYInt;
 		x0 = (u16)projectedXInt;
 		stepSize = (s16)((u16)flareWidth / (u16)unkB->m_count);
@@ -229,7 +233,7 @@ void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
 	LensFlareWork* work = (LensFlareWork*)((char*)obj + ctrlTable->m_serializedDataOffsets[2] + 0x80);
 
-	float initValue = 0.0f;
+	float initValue = FLOAT_80331060;
 
 	work->m_projectedZ = initValue;
 	work->m_projectedY = initValue;

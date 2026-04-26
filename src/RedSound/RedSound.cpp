@@ -326,6 +326,7 @@ int CRedSound::DMACheck(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::SetSoundMode(int mode)
 {
 	c_Driver.SetSoundMode(mode);
@@ -898,3 +899,4 @@ void CRedSound::TestProcess(int mode)
 {
 	c_Driver.TestProcess(mode);
 }
+#pragma optimization_level 4

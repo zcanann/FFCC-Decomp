@@ -314,6 +314,8 @@ void StreamStop(int param_1)
  */
 int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5)
 {
+	const char* logBlob = s_redStreamLogBlob;
+	const char* logPrefix = logBlob + RED_STREAM_LOG_PREFIX_OFFSET;
 	int amemSize;
 	int arOffset;
 	int pitch;
@@ -343,14 +345,14 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 
 	if ((*streamData == 0) || (streamData[3] == 0) || (streamData[0x4b] == 0)) {
 		if (m_ReportPrint != 0) {
-			OSReport(s_redStreamLogBlob, s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogErrorColor,
+			OSReport(logBlob, logPrefix, sRedStreamLogErrorColor,
 			         sRedStreamLogReset);
 			fflush(__files + 1);
 		}
 		if (streamData[3] == 0) {
 			if (m_ReportPrint != 0) {
-				OSReport(s_redStreamLogBlob + RED_STREAM_MAIN_MEMORY_CREATE_ERROR_FMT_OFFSET,
-				         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogWarnColor, 0x4000,
+				OSReport(logBlob + RED_STREAM_MAIN_MEMORY_CREATE_ERROR_FMT_OFFSET,
+				         logPrefix, sRedStreamLogWarnColor, 0x4000,
 				         sRedStreamLogReset);
 				fflush(__files + 1);
 			}
@@ -359,8 +361,8 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 		}
 		if (streamData[0x4b] == 0) {
 			if (m_ReportPrint != 0) {
-				OSReport(s_redStreamLogBlob + RED_STREAM_AUX_MEMORY_CREATE_ERROR_FMT_OFFSET,
-				         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, sRedStreamLogWarnColor, amemSize,
+				OSReport(logBlob + RED_STREAM_AUX_MEMORY_CREATE_ERROR_FMT_OFFSET,
+				         logPrefix, sRedStreamLogWarnColor, amemSize,
 				         sRedStreamLogReset);
 				fflush(__files + 1);
 			}
@@ -503,17 +505,17 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
  */
 void StreamPause(int param_1, int param_2)
 {
+	const char* logBlob = s_redStreamLogBlob;
+	const char* logPrefix = logBlob + RED_STREAM_LOG_PREFIX_OFFSET;
 	RedStreamDATA* streamData;
 	RedStreamDATA* streamEnd;
 
 	streamData = p_Stream;
 	if (m_ReportPrint != 0) {
 		if (param_2 == 1) {
-			OSReport(s_redStreamLogBlob + RED_STREAM_PAUSE_ON_FMT_OFFSET,
-			         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, param_1);
+			OSReport(logBlob + RED_STREAM_PAUSE_ON_FMT_OFFSET, logPrefix, param_1);
 		} else {
-			OSReport(s_redStreamLogBlob + RED_STREAM_PAUSE_OFF_FMT_OFFSET,
-			         s_redStreamLogBlob + RED_STREAM_LOG_PREFIX_OFFSET, param_1);
+			OSReport(logBlob + RED_STREAM_PAUSE_OFF_FMT_OFFSET, logPrefix, param_1);
 		}
 		fflush(__files + 1);
 		streamData = p_Stream;

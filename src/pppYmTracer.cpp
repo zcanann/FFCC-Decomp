@@ -355,15 +355,15 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         }
     }
 
-    poly = work->entries;
+    poly = entries;
     for (i = 0; i < (s32)(u32)work->count; i++) {
         if (poly->life > 0) {
             alpha = poly->alpha;
             decay = poly->decay;
-            if (alpha - decay > 0) {
-                poly->alpha = alpha - decay;
-            } else {
+            if (alpha - decay <= 0) {
                 poly->alpha = 0;
+            } else {
+                poly->alpha = alpha - decay;
             }
 
             poly->life--;

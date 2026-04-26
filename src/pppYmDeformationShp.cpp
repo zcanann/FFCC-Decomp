@@ -245,7 +245,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				vertices[3].x = split;
 				vertices[3].y = split;
 				vertices[3].z = kPppYmDeformationShpZero;
-			} else {
+			} else if (param_2->m_orientation == 1) {
 				vertices[0].x = split;
 				vertices[0].y = kPppYmDeformationShpZero;
 				vertices[0].z = -split;
@@ -348,9 +348,9 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
 			}
 		}
-	}
 
-	DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(1, 0);
+		DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(1, 0);
+	}
 }
 /*
  * --INFO--

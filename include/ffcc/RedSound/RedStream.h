@@ -19,10 +19,10 @@ struct RedStreamDATA {
     int m_volume;
     int m_volumeStep;
     int m_volumeStepCount;
+    int m_padFC;
     int m_pan;
     int m_panStep;
     int m_panStepCount;
-    int m_unk108;
     int m_streamId;
     int m_state;
     int m_dmaId;

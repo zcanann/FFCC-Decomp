@@ -228,6 +228,7 @@ void _SetReverbDepth(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 0
 void _SetMusicData(int* param_1)
 {
     c_RedEntry.SetMusicData((RedMusicHEAD*)*param_1);
@@ -517,6 +518,7 @@ void _SeSepPlay(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 4
 void _SeSepPlaySequence(int* param_1)
 {
     int iVar1;
@@ -527,6 +529,7 @@ void _SeSepPlaySequence(int* param_1)
         SeSepPlay(param_1[0], param_1[1], param_1[2], param_1[3]);
     }
 }
+#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -643,6 +646,7 @@ void _StreamPause(int* param_1)
 {
 	StreamPause(param_1[0], param_1[1]);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

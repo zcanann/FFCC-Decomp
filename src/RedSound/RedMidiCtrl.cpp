@@ -2441,23 +2441,27 @@ void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     trackData[0x3f] &= 0xFFFFC3FF;
     value = *(unsigned char*)trackData[0];
 
-    if (value == 2) {
+    switch (value) {
+    case 1:
         trackData[0x3f] |= 0x1000;
-        trackData[0x3f] |= 0x400;
-    } else if ((value < 2) && (value != 0)) {
+        break;
+    case 2:
         trackData[0x3f] |= 0x1000;
-    } else {
+    default:
         trackData[0x3f] |= 0x400;
+        break;
     }
 
     value = *(unsigned char*)(trackData[0] + 1);
-    if (value == 2) {
+    switch (value) {
+    case 1:
         trackData[0x3f] |= 0x2000;
-        trackData[0x3f] |= 0x800;
-    } else if ((value < 2) && (value != 0)) {
+        break;
+    case 2:
         trackData[0x3f] |= 0x2000;
-    } else {
+    default:
         trackData[0x3f] |= 0x800;
+        break;
     }
     trackData[0] += 2;
     SetVoiceSwitch(track, trackData[0x3f]);

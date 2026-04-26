@@ -104,7 +104,7 @@ static inline float CameraWorldZ()
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
 }
 
 extern "C" {
@@ -1189,11 +1189,9 @@ void CGraphic::makeSphere()
 void CGraphic::DrawBound(CBound& bound, _GXColor color)
 {
     float* box = reinterpret_cast<float*>(&bound);
-    _GXColor materialColor = color;
-    _GXColor ambientColor = color;
     Mtx cameraMtx;
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZCompLoc(GX_FALSE);
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -1202,89 +1200,43 @@ void CGraphic::DrawBound(CBound& bound, _GXColor color)
     _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_PASSCLR);
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 
     PSMTXCopy(CameraMatrix(), cameraMtx);
     GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
+    _GXColor materialColor = color;
     GXSetChanMatColor(GX_COLOR0A0, materialColor);
+    _GXColor ambientColor = color;
     GXSetChanAmbColor(GX_COLOR0A0, ambientColor);
 
     GXBegin(GX_LINES, GX_VTXFMT7, 0x18);
-    GXWGFifo.f32 = box[0];
-    GXWGFifo.f32 = box[1];
-    GXWGFifo.f32 = box[2];
-    GXWGFifo.f32 = box[3];
-    GXWGFifo.f32 = box[1];
-    GXWGFifo.f32 = box[2];
-    GXWGFifo.f32 = box[0];
-    GXWGFifo.f32 = box[4];
-    GXWGFifo.f32 = box[2];
-    GXWGFifo.f32 = box[3];
-    GXWGFifo.f32 = box[4];
-    GXWGFifo.f32 = box[2];
-    GXWGFifo.f32 = box[0];
-    GXWGFifo.f32 = box[1];
-    GXWGFifo.f32 = box[5];
-    GXWGFifo.f32 = box[3];
-    GXWGFifo.f32 = box[1];
-    GXWGFifo.f32 = box[5];
-    GXWGFifo.f32 = box[0];
-    GXWGFifo.f32 = box[4];
-    GXWGFifo.f32 = box[5];
-    GXWGFifo.f32 = box[3];
-    GXWGFifo.f32 = box[4];
-    GXWGFifo.f32 = box[5];
-    GXWGFifo.f32 = box[0];
-    GXWGFifo.f32 = box[1];
-    GXWGFifo.f32 = box[2];
-    GXWGFifo.f32 = box[0];
-    GXWGFifo.f32 = box[4];
-    GXWGFifo.f32 = box[2];
-    GXWGFifo.f32 = box[3];
-    GXWGFifo.f32 = box[1];
-    GXWGFifo.f32 = box[2];
-    GXWGFifo.f32 = box[3];
-    GXWGFifo.f32 = box[4];
-    GXWGFifo.f32 = box[2];
-    GXWGFifo.f32 = box[0];
-    GXWGFifo.f32 = box[1];
-    GXWGFifo.f32 = box[5];
-    GXWGFifo.f32 = box[0];
-    GXWGFifo.f32 = box[4];
-    GXWGFifo.f32 = box[5];
-    GXWGFifo.f32 = box[3];
-    GXWGFifo.f32 = box[1];
-    GXWGFifo.f32 = box[5];
-    GXWGFifo.f32 = box[3];
-    GXWGFifo.f32 = box[4];
-    GXWGFifo.f32 = box[5];
-    GXWGFifo.f32 = box[0];
-    GXWGFifo.f32 = box[1];
-    GXWGFifo.f32 = box[2];
-    GXWGFifo.f32 = box[0];
-    GXWGFifo.f32 = box[1];
-    GXWGFifo.f32 = box[5];
-    GXWGFifo.f32 = box[3];
-    GXWGFifo.f32 = box[1];
-    GXWGFifo.f32 = box[2];
-    GXWGFifo.f32 = box[3];
-    GXWGFifo.f32 = box[1];
-    GXWGFifo.f32 = box[5];
-    GXWGFifo.f32 = box[0];
-    GXWGFifo.f32 = box[4];
-    GXWGFifo.f32 = box[2];
-    GXWGFifo.f32 = box[0];
-    GXWGFifo.f32 = box[4];
-    GXWGFifo.f32 = box[5];
-    GXWGFifo.f32 = box[3];
-    GXWGFifo.f32 = box[4];
-    GXWGFifo.f32 = box[2];
-    GXWGFifo.f32 = box[3];
-    GXWGFifo.f32 = box[4];
-    GXWGFifo.f32 = box[5];
+    GXPosition3f32(box[0], box[1], box[2]);
+    GXPosition3f32(box[3], box[1], box[2]);
+    GXPosition3f32(box[0], box[4], box[2]);
+    GXPosition3f32(box[3], box[4], box[2]);
+    GXPosition3f32(box[0], box[1], box[5]);
+    GXPosition3f32(box[3], box[1], box[5]);
+    GXPosition3f32(box[0], box[4], box[5]);
+    GXPosition3f32(box[3], box[4], box[5]);
+    GXPosition3f32(box[0], box[1], box[2]);
+    GXPosition3f32(box[0], box[4], box[2]);
+    GXPosition3f32(box[3], box[1], box[2]);
+    GXPosition3f32(box[3], box[4], box[2]);
+    GXPosition3f32(box[0], box[1], box[5]);
+    GXPosition3f32(box[0], box[4], box[5]);
+    GXPosition3f32(box[3], box[1], box[5]);
+    GXPosition3f32(box[3], box[4], box[5]);
+    GXPosition3f32(box[0], box[1], box[2]);
+    GXPosition3f32(box[0], box[1], box[5]);
+    GXPosition3f32(box[3], box[1], box[2]);
+    GXPosition3f32(box[3], box[1], box[5]);
+    GXPosition3f32(box[0], box[4], box[2]);
+    GXPosition3f32(box[0], box[4], box[5]);
+    GXPosition3f32(box[3], box[4], box[2]);
+    GXPosition3f32(box[3], box[4], box[5]);
 }
 
 /*
@@ -1868,7 +1820,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     Vec quadMax;
     _GXColor white;
     Mtx cameraMtx;
-    float projection[7];
+    Mtx44 projection;
     int halfWidth = static_cast<int>(width) / 2;
     int halfHeight = static_cast<int>(height) / 2;
 
@@ -1878,18 +1830,18 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
 
     GXSetNumChans(1);
     GXSetZCompLoc(0);
-    GXSetAlphaCompare(GX_ALWAYS, 1, GX_AOP_AND, GX_ALWAYS, 0);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(GX_ALWAYS, 1, GX_AOP_OR, GX_ALWAYS, 0);
     GXSetCullMode(GX_CULL_NONE);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 1);
-    GXSetAlphaCompare(GX_ALWAYS, 1, GX_AOP_OR, GX_ALWAYS, 0);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(GX_ALWAYS, 1, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetNumTevStages(1);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
     GXSetNumTexGens(1);
     GXSetNumTevStages(1);
-    GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_REPLACE);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 1);
     GXSetColorUpdate(GX_TRUE);
     GXSetAlphaUpdate(GX_FALSE);
@@ -1950,9 +1902,9 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     PSMTXCopy(CameraMatrix(), cameraMtx);
-    GXGetProjectionv(projection);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
     GXLoadPosMtxImm(cameraMtx, 0);
-    GXSetProjectionv(projection);
+    GXSetProjection(projection, GX_PERSPECTIVE);
 }
 
 /*

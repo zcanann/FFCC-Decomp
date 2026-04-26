@@ -278,21 +278,21 @@ unsigned int CMenuPcs::TmpArtiClose()
 		do {
 			dVar2 = DOUBLE_80332f40;
 			if (*(int *)(psVar4 + 0x12) <= iVar7) {
-				if (*(int *)(psVar4 + 0x12) + *(int *)(psVar4 + 0x14) > iVar7) {
+				if (*(int *)(psVar4 + 0x12) + *(int *)(psVar4 + 0x14) <= iVar7) {
+					iVar5 = iVar5 + 1;
+					*(float *)(psVar4 + 8) = FLOAT_80332f2c;
+				}
+				else {
 					*(int *)(psVar4 + 0x10) = *(int *)(psVar4 + 0x10) + 1;
 					dVar3 = DOUBLE_80332f50;
 					*(float *)(psVar4 + 8) =
-					    (float)-((DOUBLE_80332f48 /
-					              ((double)(int)*(unsigned int *)(psVar4 + 0x14) - dVar2)) *
-					             ((double)(int)*(unsigned int *)(psVar4 + 0x10) - dVar2) -
-					             DOUBLE_80332f48);
+					    (float)(DOUBLE_80332f48 -
+					            (DOUBLE_80332f48 /
+					             ((double)(int)*(unsigned int *)(psVar4 + 0x14) - dVar2)) *
+					                ((double)(int)*(unsigned int *)(psVar4 + 0x10) - dVar2));
 					if ((double)*(float *)(psVar4 + 8) < dVar3) {
 						*(float *)(psVar4 + 8) = FLOAT_80332f2c;
 					}
-				}
-				else {
-					iVar5 = iVar5 + 1;
-					*(float *)(psVar4 + 8) = FLOAT_80332f2c;
 				}
 			}
 			psVar4 = psVar4 + 0x20;
@@ -557,14 +557,15 @@ unsigned int CMenuPcs::TmpArtiOpen()
 		do {
 			dVar1 = DOUBLE_80332f40;
 			if (entry->startFrame <= iVar10) {
-				if (entry->startFrame + entry->duration > iVar10) {
+				if (entry->startFrame + entry->duration <= iVar10) {
+					iVar6 = iVar6 + 1;
+					entry->alpha = FLOAT_80332f30;
+				}
+				else {
 					entry->timer = entry->timer + 1;
 					entry->alpha = (float)((DOUBLE_80332f48 /
 						((double)(unsigned int)entry->duration - dVar1)) *
 						((double)(unsigned int)entry->timer - dVar1));
-				} else {
-					iVar6 = iVar6 + 1;
-					entry->alpha = FLOAT_80332f30;
 				}
 			}
 			entry = entry + 1;

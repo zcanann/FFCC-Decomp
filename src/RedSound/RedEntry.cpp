@@ -256,15 +256,15 @@ int CRedEntry::SearchUseWave(int waveNo)
 		soundBase -= 0x494;
 	} while ((unsigned int)soundBase >= (unsigned int)p_SoundControlBuffer);
 
-	int* trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
-	int* track = (int*)*trackBasePtr;
+	soundBase = (int)p_SoundControlBuffer + 0xdbc;
+	int* track = (int*)*(int*)soundBase;
 	do {
 		if (((u32)*track != 0) && ((u32)track[6] != 0) && (*(short*)(track[6] + 2) == waveNo)) {
 			found = 1;
 			SeStopID(track[0x3e]);
 		}
 		track += 0x55;
-	} while (track < (int*)(*trackBasePtr + 0x2a80));
+	} while (track < (int*)(*(int*)soundBase + 0x2a80));
 
 	OSRestoreInterrupts(interruptLevel);
 	return found;

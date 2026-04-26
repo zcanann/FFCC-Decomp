@@ -157,15 +157,14 @@ void CRedEntry::Init()
  */
 void CRedEntry::WaveHistoryAdd(int historyNo)
 {
-	int* const entry = reinterpret_cast<int*>(this);
-	unsigned int history = static_cast<unsigned int>(entry[0] + 0x100);
+	unsigned int history = static_cast<unsigned int>(*reinterpret_cast<int*>(this) + 0x100);
 
 	do {
-		if (historyNo <= *reinterpret_cast<int*>(history + 4)) {
+		if (*reinterpret_cast<int*>(history + 4) >= historyNo) {
 			*reinterpret_cast<int*>(history + 4) = *reinterpret_cast<int*>(history + 4) + 1;
 		}
 		history += 0x10;
-	} while (history < static_cast<unsigned int>(entry[0] + 0x400));
+	} while (history < static_cast<unsigned int>(*reinterpret_cast<int*>(this) + 0x400));
 }
 
 /*
@@ -182,9 +181,8 @@ void CRedEntry::WaveHistoryDelete(int historyNo)
 	if (historyNo != 0) {
 		unsigned int history = static_cast<unsigned int>(*reinterpret_cast<int*>(this));
 		do {
-			int* const priority = reinterpret_cast<int*>(history + 4);
-			if ((*priority != 0) && (historyNo < *priority)) {
-				*priority = *priority - 1;
+			if ((*reinterpret_cast<int*>(history + 4) != 0) && (*reinterpret_cast<int*>(history + 4) > historyNo)) {
+				*reinterpret_cast<int*>(history + 4) = *reinterpret_cast<int*>(history + 4) - 1;
 			}
 			history += 0x10;
 		} while (history < static_cast<unsigned int>(*reinterpret_cast<int*>(this)) + 0x400);
@@ -205,9 +203,9 @@ void CRedEntry::WaveHistoryChoice(RedHistoryBANK* bank)
 	if (reinterpret_cast<int*>(bank)[1] != 0) {
 		unsigned int history = static_cast<unsigned int>(*reinterpret_cast<int*>(this));
 		do {
-			int* const priority = reinterpret_cast<int*>(history + 4);
-			if ((*priority != 0) && (*priority < reinterpret_cast<int*>(bank)[1])) {
-				*priority = *priority + 1;
+			if ((*reinterpret_cast<int*>(history + 4) != 0) &&
+			    (*reinterpret_cast<int*>(history + 4) < reinterpret_cast<int*>(bank)[1])) {
+				*reinterpret_cast<int*>(history + 4) = *reinterpret_cast<int*>(history + 4) + 1;
 			}
 			history += 0x10;
 		} while (history < static_cast<unsigned int>(*reinterpret_cast<int*>(this)) + 0x400);
@@ -223,17 +221,14 @@ void CRedEntry::WaveHistoryChoice(RedHistoryBANK* bank)
  */
 int CRedEntry::SearchWaveSequence(int waveNo)
 {
-	int* entry = (int*)this;
-	int* waveBank = (int*)entry[0];
-	int* end = (int*)(entry[0] + 0x400);
+	int* waveBank = (int*)*(int*)this;
 
-	do {
+	while (waveBank < (int*)(*(int*)this + 0x400)) {
 		if ((waveBank[3] != 0) && (*waveBank == waveNo)) {
-			int offset = (int)waveBank - entry[0];
-			return offset / 0x10;
+			return ((int)waveBank - *(int*)this) / 0x10;
 		}
 		waveBank += 4;
-	} while (waveBank < end);
+	}
 
 	return -1;
 }

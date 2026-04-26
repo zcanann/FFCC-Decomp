@@ -23,10 +23,6 @@
 #include "ffcc/p_minigame.h"
 #include <string.h>
 
-extern "C" {
-#include "PowerPC_EABI_Support/Runtime/ptmf.h"
-}
-
 CSystem System;
 
 class CScenegraphProcessProxy {
@@ -450,6 +446,7 @@ void CSystem::ExecScenegraph()
         }
 
         float totalTime = 0.0f;
+        unsigned int perfEnabled = perfTrigger & 1;
         CStopWatch watch((char*)"no name");
 
         int index = 0;
@@ -502,19 +499,19 @@ void CSystem::ExecScenegraph()
                 {
                     Graphic.SetDrawDoneDebugData(-1);
                 }
-                __ptmf_scall(order->m_owner);
+                (order->m_owner->*order->m_entry->m_callback)();
                 watch.Stop();
                 order->m_lastTime = watch.Get();
 
                 watch.Start();
-                if ((perfTrigger & 1) != 0)
+                if (perfEnabled != 0)
                 {
                     Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x2CA);
                     GXReadGP0Metric();
                     GXReadGP1Metric();
                 }
                 watch.Stop();
-                if ((perfTrigger & 1) != 0)
+                if (perfEnabled != 0)
                 {
                     order->m_lastTime = watch.Get();
                 }

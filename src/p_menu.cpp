@@ -1556,13 +1556,13 @@ void CMenuPcs::drawPause()
         return;
     }
 
-    CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x190);
+    CTexture* texture = m_textures[1];
     TextureMan.SetTexture(GX_TEXMAP0, texture);
 
     if (texture != nullptr) {
         Mtx texMtx;
-        float width = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x64));
-        float height = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x68));
+        float width = static_cast<float>(texture->m_width);
+        float height = static_cast<float>(texture->m_height);
         PSMTXScale(texMtx, 1.0f / width, 1.0f / height, 1.0f);
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
         GXSetNumTexGens(1);
@@ -1588,10 +1588,12 @@ void CMenuPcs::drawPause()
  */
 void CMenuPcs::createBattle()
 {
+    static const int kBattleTextureSetStart = 2;
+    static const int kBattleTextureStart = 0x16;
+
     char path[0x104];
     char fontPath[0x80];
     int* textureInfo = sMenuTextureInfoTable;
-    u8* self = reinterpret_cast<u8*>(this);
 
     for (int i = 0; i < 2; i++) {
         const char* language = Game.GetLangString();
@@ -1602,11 +1604,10 @@ void CMenuPcs::createBattle()
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
 
-            void* stage = *reinterpret_cast<int*>(self + 0x740) == 1 ? *reinterpret_cast<void**>(&MapMng)
-                                                                     : *reinterpret_cast<void**>(self + 0xEC);
+            void* stage = m_mode == 1 ? *reinterpret_cast<void**>(&MapMng) : m_menuStage;
 
             CTextureSet* textureSet = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0x182) CTextureSet;
-            *reinterpret_cast<CTextureSet**>(self + 0x14C + i * 4) = textureSet;
+            m_textureSets[kBattleTextureSetStart + i] = textureSet;
             if (textureSet != 0) {
                 textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
             }
@@ -1616,18 +1617,18 @@ void CMenuPcs::createBattle()
     }
 
     for (int i = 0; i < 10; i++) {
-        CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(self + 0x14C + textureInfo[0] * 4);
+        CTextureSet* textureSet = m_textureSets[textureInfo[0]];
         const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(reinterpret_cast<char*>(textureInfo[1])));
         CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8))[textureIndex];
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
             *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
-        *reinterpret_cast<CTexture**>(self + 0x1E4 + i * 4) = texture;
+        m_textures[kBattleTextureStart + i] = texture;
         textureInfo += 2;
     }
 
     for (int i = 0; i < 12; i++) {
         CMesMenu* menu = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0x48B) CMesMenu;
-        *reinterpret_cast<CMesMenu**>(self + 0x10C + i * 4) = menu;
+        m_battleMesMenus[i] = menu;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x18) = i;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x1C) = i;
         menu->Create();
@@ -1635,7 +1636,7 @@ void CMenuPcs::createBattle()
 
     for (int i = 0; i < 4; i++) {
         CRingMenu* menu = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0x492) CRingMenu;
-        *reinterpret_cast<CRingMenu**>(self + 0x13C + i * 4) = menu;
+        m_battleRingMenus[i] = menu;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 8) = i;
         menu->Create();
     }
@@ -1665,7 +1666,7 @@ void CMenuPcs::createBattle()
     }
 
     fontTexture->FlushExternalTlut(m_externalFontTlut);
-    *reinterpret_cast<u16*>(self + 0x864) = 0;
+    m_battleStateFlag = 0;
 }
 
 /*
@@ -1711,31 +1712,29 @@ void CMenuPcs::destroyBattle()
  */
 void CMenuPcs::calcBattle()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     for (int i = 0; i < 4; i++) {
-        Calc__5CMenuFv(*reinterpret_cast<CMenu**>(self + 0x13C + i * 4));
+        Calc__5CMenuFv(m_battleRingMenus[i]);
     }
 
     for (int i = 0; i < 0xC; i++) {
-        Calc__5CMenuFv(*reinterpret_cast<CMenu**>(self + 0x10C + i * 4));
+        Calc__5CMenuFv(reinterpret_cast<CMenu*>(m_battleMesMenus[i]));
     }
 
-    int limit = *reinterpret_cast<int*>(self + 0x68);
-    int value = *reinterpret_cast<int*>(self + 0x6C) - 1;
+    int limit = m_battleHud.m_gaugeMax;
+    int value = m_battleHud.m_gaugeValue - 1;
     if (value <= limit) {
-        int alt = *reinterpret_cast<int*>(self + 0x6C) + 1;
+        int alt = m_battleHud.m_gaugeValue + 1;
         value = limit;
         if (alt < limit) {
             value = alt;
         }
     }
-    *reinterpret_cast<int*>(self + 0x6C) = value;
+    m_battleHud.m_gaugeValue = value;
 
-    u32 counter = *reinterpret_cast<u32*>(self + 0x58) - 1;
-    *reinterpret_cast<u32*>(self + 0x58) = counter & ~((int)counter >> 31);
-    counter = *reinterpret_cast<u32*>(self + 0x5C) - 1;
-    *reinterpret_cast<u32*>(self + 0x5C) = counter & ~((int)counter >> 31);
+    u32 counter = m_battleHud.m_fadeCounter - 1;
+    m_battleHud.m_fadeCounter = counter & ~((int)counter >> 31);
+    counter = m_battleHud.m_gaugeCounter - 1;
+    m_battleHud.m_gaugeCounter = counter & ~((int)counter >> 31);
 
     calcVillageMenu__8CMenuPcsFv(this);
 }
@@ -1751,10 +1750,8 @@ void CMenuPcs::calcBattle()
  */
 void CMenuPcs::drawBattle()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
-    if (*reinterpret_cast<s32*>(self + 0x48) != 0) {
-        const float frame = static_cast<float>(*reinterpret_cast<s32*>(self + 0x58));
+    if (m_battleHud.m_visible != 0) {
+        const float frame = static_cast<float>(m_battleHud.m_fadeCounter);
         float fade = 1.0f - (frame * 0.05f);
         if (fade < 0.0f) {
             fade = 0.0f;
@@ -1763,10 +1760,10 @@ void CMenuPcs::drawBattle()
         Mtx44 screenMtx;
         Vec4d projected;
         PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48), screenMtx);
-        Math.MTX44MultVec4(screenMtx, reinterpret_cast<Vec*>(self + 0x4C), &projected);
+        Math.MTX44MultVec4(screenMtx, reinterpret_cast<Vec*>(m_battleHud.m_worldPos), &projected);
 
         if (projected.w > 0.0f) {
-            const int totalWidth = static_cast<int>(static_cast<float>(*reinterpret_cast<s32*>(self + 0x60)) * fade);
+            const int totalWidth = static_cast<int>(static_cast<float>(m_battleHud.m_width) * fade);
             const int halfWidth = totalWidth / 2;
             float screenX = 320.0f + (320.0f * projected.x) / projected.w;
             float screenY = 240.0f - (240.0f * projected.y) / projected.w;
@@ -1787,9 +1784,8 @@ void CMenuPcs::drawBattle()
             }
 
             int fillWidth = 0;
-            if (*reinterpret_cast<s32*>(self + 0x64) != 0) {
-                fillWidth = ((totalWidth - 16) * *reinterpret_cast<s32*>(self + 0x6C)) /
-                            *reinterpret_cast<s32*>(self + 0x64);
+            if (m_battleHud.m_gaugeMax != 0) {
+                fillWidth = ((totalWidth - 16) * m_battleHud.m_gaugeValue) / m_battleHud.m_gaugeMax;
             }
 
             const float left = screenX - static_cast<float>(halfWidth);
@@ -1800,12 +1796,12 @@ void CMenuPcs::drawBattle()
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
 
             if (totalWidth > 0) {
-                CTexture* tex = *reinterpret_cast<CTexture**>(self + 0x500);
+                CTexture* tex = m_textures[0xDD];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 if (tex != 0) {
                     Mtx texMtx;
-                    const u32 width = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(tex) + 0x64);
-                    const u32 height = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(tex) + 0x68);
+                    const u32 width = tex->m_width;
+                    const u32 height = tex->m_height;
                     PSMTXScale(texMtx, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
                     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
                     GXSetNumTexGens(1);
@@ -1814,12 +1810,12 @@ void CMenuPcs::drawBattle()
                 TextureMan.SetTextureTev(tex);
                 DrawRect(0, left, screenY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-                tex = *reinterpret_cast<CTexture**>(self + 0x504);
+                tex = m_textures[0xDE];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 if (tex != 0) {
                     Mtx texMtx;
-                    const u32 width = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(tex) + 0x64);
-                    const u32 height = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(tex) + 0x68);
+                    const u32 width = tex->m_width;
+                    const u32 height = tex->m_height;
                     PSMTXScale(texMtx, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
                     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
                     GXSetNumTexGens(1);
@@ -1828,12 +1824,12 @@ void CMenuPcs::drawBattle()
                 TextureMan.SetTextureTev(tex);
                 DrawRect(0, bodyLeft, screenY, static_cast<float>(totalWidth - 16), 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-                tex = *reinterpret_cast<CTexture**>(self + 0x508);
+                tex = m_textures[0xDF];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 if (tex != 0) {
                     Mtx texMtx;
-                    const u32 width = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(tex) + 0x64);
-                    const u32 height = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(tex) + 0x68);
+                    const u32 width = tex->m_width;
+                    const u32 height = tex->m_height;
                     PSMTXScale(texMtx, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
                     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
                     GXSetNumTexGens(1);
@@ -1843,13 +1839,13 @@ void CMenuPcs::drawBattle()
                 DrawRect(0, (left + static_cast<float>(totalWidth)) - 8.0f, screenY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
             }
 
-            const u8 gauge = static_cast<u8>((*reinterpret_cast<s32*>(self + 0x5C) * 0xFF) >> 4);
+            const u8 gauge = static_cast<u8>((m_battleHud.m_gaugeCounter * 0xFF) >> 4);
             const CColor fillTop(0xFF, gauge, gauge, alpha);
             GXSetChanMatColor(GX_COLOR0A0, fillTop.color);
             TextureMan.SetTextureTev(0);
             DrawRect(0, bodyLeft, screenY + 1.0f, static_cast<float>(fillWidth), 3.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-            const u8 gaugeTop = static_cast<u8>(((*reinterpret_cast<s32*>(self + 0x5C) * 0x7F) >> 4) + 0x80);
+            const u8 gaugeTop = static_cast<u8>(((m_battleHud.m_gaugeCounter * 0x7F) >> 4) + 0x80);
             const CColor fillBottom(0xFF, gaugeTop, gauge, alpha);
             GXSetChanMatColor(GX_COLOR0A0, fillBottom.color);
             DrawRect(0, bodyLeft, screenY + 4.0f, static_cast<float>(fillWidth), 3.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -1857,19 +1853,19 @@ void CMenuPcs::drawBattle()
     }
 
     for (int i = 0; i < 4; i++) {
-        CMenu* menu = *reinterpret_cast<CMenu**>(self + 0x13C + i * 4);
+        CMenu* menu = m_battleRingMenus[i];
         if (menu != 0) {
             menu->Draw();
         }
     }
     for (int i = 0; i < 12; i++) {
-        CMenu* menu = *reinterpret_cast<CMenu**>(self + 0x10C + i * 4);
+        CMenu* menu = reinterpret_cast<CMenu*>(m_battleMesMenus[i]);
         if (menu != 0) {
             menu->Draw();
         }
     }
     for (int i = 0; i < 4; i++) {
-        CRingMenu* menu = *reinterpret_cast<CRingMenu**>(self + 0x13C + i * 4);
+        CRingMenu* menu = m_battleRingMenus[i];
         if (menu != 0) {
             menu->DrawIcon();
         }

@@ -74,7 +74,7 @@ int m_MusicSkipLine;
 int m_MusicKeySignature;
 void* p_MusicReplayPoint;
 int* p_MusicTempoControl;
-int* p_MusicPitchControl;
+int* volatile p_MusicPitchControl;
 int m_MusicPhraseStop;
 static int* p_MusicNextPlay;
 int m_CrossTime;

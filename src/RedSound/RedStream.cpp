@@ -468,12 +468,17 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 	if (param_3 < 1) {
 		param_3 = 1;
 	} else {
-		param_3 = (param_3 * 200) / 60;
+		param_3 *= 200;
+		param_3 /= 60;
 	}
 
 	param_2 &= 0x7f;
 	if (param_2 != 0) {
-		param_2 = ((param_2 + 1) * 0x100 - 1) * 0x1000 | 0x800;
+		param_2++;
+		param_2 <<= 8;
+		param_2--;
+		param_2 <<= 12;
+		param_2 |= 0x800;
 	}
 
 	streamData = p_Stream;

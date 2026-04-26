@@ -9,7 +9,7 @@ public:
     void EquipInit1();
     int EquipOpen();
     void EquipCtrl();
-    void EquipClose();
+    int EquipClose();
     void EquipDraw();
     int EquipCtrlCur();
     bool EquipOpen0();

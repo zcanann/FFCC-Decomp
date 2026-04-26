@@ -471,25 +471,23 @@ int CMenuPcs::EquipOpen()
 	uVar8 = (u32)*GetEquipList(this);
 	psVar7 = GetEquipList(this) + 4;
 	iVar11 = (int)*(s16*)(GetEquipStateBase(this) + 0x22);
-	uVar12 = uVar8;
 	if (0 < (int)uVar8) {
-		do {
+		for (int i = 0; i < (int)uVar8; i++) {
 			dVar2 = DOUBLE_80332ed8;
 			if (*(int*)(psVar7 + 0x12) <= iVar11) {
-				if (iVar11 < *(int*)(psVar7 + 0x12) + *(int*)(psVar7 + 0x14)) {
+				if (iVar11 >= *(int*)(psVar7 + 0x12) + *(int*)(psVar7 + 0x14)) {
+					iVar6++;
+					*(float*)(psVar7 + 8) = FLOAT_80332ee0;
+				} else {
 					*(int*)(psVar7 + 0x10) = *(int*)(psVar7 + 0x10) + 1;
 					dVar20 = (double)(((u64)((u32)*(u32*)(psVar7 + 0x14) ^ 0x80000000U)) | 0x4330000000000000ULL);
 					*(float*)(psVar7 + 8) =
 					    (float)((DOUBLE_80332ec0 / (dVar20 - dVar2)) *
 					            ((double)(((u64)((u32)*(u32*)(psVar7 + 0x10) ^ 0x80000000U)) | 0x4330000000000000ULL) - dVar2));
-				} else {
-					iVar6++;
-					*(float*)(psVar7 + 8) = FLOAT_80332ee0;
 				}
 			}
 			psVar7 += 0x20;
-			uVar12--;
-		} while (uVar12 != 0);
+		}
 	}
 
 	fVar5 = FLOAT_80332ee0;
@@ -631,7 +629,7 @@ void CMenuPcs::EquipCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::EquipClose()
+int CMenuPcs::EquipClose()
 {
 	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
 	s16* menuData = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850);
@@ -644,7 +642,10 @@ void CMenuPcs::EquipClose()
 
 	for (int i = 0; i < itemCount; i++) {
 		if (*reinterpret_cast<int*>(item + 0x12) <= timer) {
-			if (timer < (*reinterpret_cast<int*>(item + 0x12) + *reinterpret_cast<int*>(item + 0x14))) {
+			if (timer >= (*reinterpret_cast<int*>(item + 0x12) + *reinterpret_cast<int*>(item + 0x14))) {
+				doneCount++;
+				*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
+			} else {
 				*reinterpret_cast<int*>(item + 0x10) = *reinterpret_cast<int*>(item + 0x10) + 1;
 				float ratio = FLOAT_80332ee0 -
 				              (static_cast<float>(*reinterpret_cast<int*>(item + 0x10)) /
@@ -653,9 +654,6 @@ void CMenuPcs::EquipClose()
 				if (*reinterpret_cast<float*>(item + 8) < FLOAT_80332eb8) {
 					*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
 				}
-			} else {
-				doneCount++;
-				*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
 			}
 		}
 		item += 0x20;
@@ -671,7 +669,9 @@ void CMenuPcs::EquipClose()
 			*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
 			item += 0x20;
 		}
+		return 1;
 	}
+	return 0;
 }
 
 /*

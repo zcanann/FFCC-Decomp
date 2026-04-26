@@ -499,17 +499,17 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	float targetRot;
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(self->m_worldPosition);
-	Vec deltaPos;
+	CVector deltaPos;
 	float deltaX;
 	float zero;
 	float deltaZ;
 	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
 
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
+	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
 	deltaX = deltaPos.x;
 	zero = FLOAT_80331BD4;
 	deltaZ = deltaPos.z;
-	if (deltaX == zero || deltaZ == zero) {
+	if (zero == deltaX || zero == deltaZ) {
 		targetRot = FLOAT_80331BD4;
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);

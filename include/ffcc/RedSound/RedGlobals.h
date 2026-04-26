@@ -35,7 +35,7 @@ extern int m_MusicFastSpeed;
 extern int m_MusicSkipLine;
 extern int m_MusicKeySignature;
 extern void* p_MusicReplayPoint;
-extern int* p_MusicTempoControl;
+extern int* volatile p_MusicTempoControl;
 extern int* volatile p_MusicPitchControl;
 extern int m_MusicPhraseStop;
 extern int m_CrossTime;

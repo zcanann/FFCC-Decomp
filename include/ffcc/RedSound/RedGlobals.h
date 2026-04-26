@@ -42,7 +42,7 @@ extern int m_CrossTime;
 extern volatile int m_MasterMusicVolume;
 extern volatile int m_MasterSEVolume;
 extern RedStreamDATA* volatile p_Stream;
-extern int m_SeSkipStep;
+extern volatile int m_SeSkipStep;
 extern unsigned int* volatile p_VoiceData;
 extern int p_EditorVoice[2];
 extern void* p_EditorTrack;

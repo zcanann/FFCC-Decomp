@@ -436,15 +436,22 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 {
 	float targetRot;
 	CVector targetPos(target->m_worldPosition);
+	Vec* targetPosVec = reinterpret_cast<Vec*>(&targetPos);
 	CVector basePos(m_worldPosition);
-	Vec deltaPos;
+	CVector deltaPos;
+	float deltaX;
+	float zero;
+	float deltaZ;
 	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
 
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
-	if (deltaPos.x == FLOAT_80331BD4 || deltaPos.z == FLOAT_80331BD4) {
-		targetRot = 0.0f;
+	PSVECSubtract(basePosVec, targetPosVec, reinterpret_cast<Vec*>(&deltaPos));
+	deltaX = deltaPos.x;
+	zero = FLOAT_80331BD4;
+	deltaZ = deltaPos.z;
+	if (zero == deltaX || zero == deltaZ) {
+		targetRot = FLOAT_80331BD4;
 	} else {
-		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
 
 	return targetRot;

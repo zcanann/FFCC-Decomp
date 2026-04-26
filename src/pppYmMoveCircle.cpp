@@ -137,3 +137,5 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     pppCopyVector(work->m_center, *(Vec*)((u8*)pppMngSt + 0x58));
     work->m_hasInit = 0;
 }
+
+extern const float FLOAT_80330D94 = 0.0f;

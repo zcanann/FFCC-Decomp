@@ -5,6 +5,7 @@
 extern "C" {
 extern const float kPppKeShpTail2XZero;
 extern const float kPppKeShpTail2XAlphaScale;
+extern const float kPppKeShpTail2XHalf;
 extern int gPppCalcDisabled;
 }
 #include <dolphin/gx.h>
@@ -190,15 +191,15 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
         colorStepB = (colorB - (float)step->m_colorEndB) / invCountMinusOne;
         colorStepA = (colorA - colorEndA) / invCountMinusOne;
     } else {
-        colorStepR = zero;
-        colorStepG = zero;
-        colorStepB = zero;
-        colorStepA = zero;
+        colorStepR = kPppKeShpTail2XHalf;
+        colorStepG = kPppKeShpTail2XHalf;
+        colorStepB = kPppKeShpTail2XHalf;
+        colorStepA = kPppKeShpTail2XHalf;
     }
 
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
     shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
-    shapeEntry = (long*)((u8*)*shapeTable + *(s16*)((u8*)*shapeTable + ((u16)work->m_shapePrevFrame << 3) + 0x10));
+    shapeEntry = (long*)((u8*)*shapeTable + *(s16*)((u8*)*shapeTable + (work->m_shapePrevFrame << 3) + 0x10));
 
     pppCopyMatrix(localBase, obj->pppPObject.m_localMatrix);
     pppUnitMatrix(drawMtx);
@@ -208,15 +209,15 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     trailStep = step->m_stepDistance * pppMngStPtr->m_scale.x;
 
     curIndex = work->m_head;
+    segBaseX = work->m_posHistory[curIndex].x;
+    segBaseY = work->m_posHistory[curIndex].y;
+    segBaseZ = work->m_posHistory[curIndex].z;
     nextIndex = curIndex + 1;
     lastIndex = work->m_count - 1;
     if (curIndex == lastIndex) {
         nextIndex = 0;
     }
 
-    segBaseX = work->m_posHistory[curIndex].x;
-    segBaseY = work->m_posHistory[curIndex].y;
-    segBaseZ = work->m_posHistory[curIndex].z;
     nextBaseX = work->m_posHistory[nextIndex].x;
     nextBaseY = work->m_posHistory[nextIndex].y;
     nextBaseZ = work->m_posHistory[nextIndex].z;

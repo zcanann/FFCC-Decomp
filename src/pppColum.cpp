@@ -123,8 +123,8 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
     pppColumFrameWork* frameWork = (pppColumFrameWork*)(objBytes + serializedDataOffsets[3] + 0x80);
     pppColumPositionWork* positionWork =
         (pppColumPositionWork*)(objBytes + serializedDataOffsets[2] + 0x80);
-    pppCVECTOR color;
     int textureIndex = 0;
+    pppCVECTOR color;
 
     if (param_2->m_dataValIndex != 0xFFFF) {
         pppShapeSt* shapeSt =
@@ -143,20 +143,30 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             Vec2d uvB;
             float baseX;
             float baseY;
+            float baseZ;
             float lengthXY;
             float segmentStep;
             float drawScale;
             float zero;
             pppColumValue* values;
+            float deltaX;
+            float deltaY;
+            float deltaX2;
+            float deltaY2;
 
             PSMTXIdentity(identityMtx);
             baseX = positionWork->m_position.x;
             baseY = positionWork->m_position.y;
-            cameraDelta.x = FLOAT_80331078 - baseX;
-            cameraDelta.y = FLOAT_8033107C - baseY;
-            cameraDelta.z = FLOAT_80331080 + positionWork->m_position.z;
+            baseZ = positionWork->m_position.z;
+            deltaX = FLOAT_80331078 - baseX;
+            deltaY = FLOAT_8033107C - baseY;
+            cameraDelta.x = deltaX;
+            cameraDelta.y = deltaY;
+            cameraDelta.z = FLOAT_80331080 + baseZ;
 
-            lengthXY = cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y;
+            deltaX2 = deltaX * deltaX;
+            deltaY2 = deltaY * deltaY;
+            lengthXY = deltaX2 + deltaY2;
             if (lengthXY > FLOAT_80331084) {
                 lengthXY = ColumSqrtPositive(lengthXY);
             } else if ((double)lengthXY < DOUBLE_80331098) {
@@ -165,30 +175,35 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 lengthXY = *(float*)__float_nan;
             }
             drawScale = FLOAT_80331084;
-            if (FLOAT_803310A0 < lengthXY) {
+            if (lengthXY > FLOAT_803310A0) {
                 PSVECScale(&cameraDelta, &cameraDelta, FLOAT_803310A4 / lengthXY);
             }
 
             pppInitBlendMode();
             values = frameWork->m_values;
             segmentStep =
-                (FLOAT_803310A8 * lengthXY) / (float)((double)param_2->m_count - DOUBLE_803310B0);
+                (FLOAT_803310A8 * lengthXY) / (float)param_2->m_count;
             zero = FLOAT_80331084;
 
             for (int i = 0; i < param_2->m_count; i++) {
                 float positionScale = segmentStep * values->m_positionScale;
                 float index = (float)(i + 1);
-                u8 alpha = positionWork->m_alpha;
+                float offsetX;
+                float offsetY;
+                u8 alpha;
 
                 center.z = zero;
-                center.x = baseX + positionScale * (cameraDelta.x * index);
-                center.y = baseY + positionScale * (cameraDelta.y * index);
+                offsetX = cameraDelta.x * index;
+                center.x = baseX + positionScale * offsetX;
+                offsetY = cameraDelta.y * index;
+                center.y = baseY + positionScale * offsetY;
 
                 PSVECSubtract(&center, &positionWork->m_position, &offset);
                 {
                     float dist = PSVECMag(&offset);
                     float fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
 
+                    alpha = positionWork->m_alpha;
                     if (dist < *(float*)(param_2->m_payload + 0x10) && fadeAmount > FLOAT_80331084) {
                         alpha = (u8)((float)alpha * fadeAmount);
                     }

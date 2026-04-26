@@ -96,7 +96,7 @@ void CPad::Frame()
 	do
 	{
 		iVar6 = SIProbe(uVar17);
-		gba->connected = __cntlzw(0x40000 - iVar6);
+		gba->connected = (0x40000 - iVar6) == 0;
 		gba->ctrlMode = Joybus.GetCtrlMode(uVar17);
 		gba->noController = gba->connected && (gba->ctrlMode == 0);
 		gba->button = 0;

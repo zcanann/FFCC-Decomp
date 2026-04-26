@@ -83,7 +83,7 @@ int m_MasterSEVolume;
 RedStreamDATA* volatile p_Stream;
 static int m_DMAMode;
 int m_SeSkipStep;
-unsigned int* p_VoiceData;
+unsigned int* volatile p_VoiceData;
 int p_EditorVoice[2];
 void* p_EditorTrack;
 static void* p_MainThreadStack;

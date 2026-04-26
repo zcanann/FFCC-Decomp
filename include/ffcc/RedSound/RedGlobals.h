@@ -43,7 +43,7 @@ extern int m_MasterMusicVolume;
 extern int m_MasterSEVolume;
 extern RedStreamDATA* volatile p_Stream;
 extern int m_SeSkipStep;
-extern unsigned int* p_VoiceData;
+extern unsigned int* volatile p_VoiceData;
 extern int p_EditorVoice[2];
 extern void* p_EditorTrack;
 extern void* p_MusicSkipThreadStack;

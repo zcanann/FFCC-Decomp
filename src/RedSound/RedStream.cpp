@@ -8,9 +8,25 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-static const char sRedStreamLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
-static const char s_redStreamPauseOnFmt[] = "%sPause : Stream : ON  %d\n";
-static const char s_redStreamPauseOffFmt[] = "%sPause : Stream : OFF %d\n";
+struct RedStreamDebugStrings {
+    char bufferDidntSecure[sizeof("%s%sStream Buffer didn't secure.%s\n")];
+    char logPrefix[sizeof("\x1B[7;34mSound\x1B[0m:")];
+    char mainMemoryDidntCreate[sizeof("%s%sM-Memory didn't create.(need:0x%6.6X)%s\n")];
+    char aramMemoryDidntCreate[sizeof("%s%sA-Memory didn't create.(need:0x%6.6X)%s\n")];
+    char pauseOn[sizeof("%sPause : Stream : ON  %d\n")];
+    char pauseOff[sizeof("%sPause : Stream : OFF %d\n")];
+    char pad[2];
+};
+
+static const RedStreamDebugStrings sRedStreamDebugStrings = {
+    "%s%sStream Buffer didn't secure.%s\n",
+    "\x1B[7;34mSound\x1B[0m:",
+    "%s%sM-Memory didn't create.(need:0x%6.6X)%s\n",
+    "%s%sA-Memory didn't create.(need:0x%6.6X)%s\n",
+    "%sPause : Stream : ON  %d\n",
+    "%sPause : Stream : OFF %d\n",
+    { 0, 0 },
+};
 
 extern "C" {
 void RedDelete__FPv(void*);
@@ -475,16 +491,18 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 void StreamPause(int param_1, int param_2)
 {
 	unsigned int streamData;
+	const RedStreamDebugStrings* debugStrings;
 	int voiceData;
 	int pitch;
 	int volume;
 	int pan;
 
+	debugStrings = &sRedStreamDebugStrings;
 	if (redSoundDebugEnabled != 0) {
 		if (param_2 == 1) {
-			OSReport(s_redStreamPauseOnFmt, sRedStreamLogPrefix, param_1);
+			OSReport(debugStrings->pauseOn, debugStrings->logPrefix, param_1);
 		} else {
-			OSReport(s_redStreamPauseOffFmt, sRedStreamLogPrefix, param_1);
+			OSReport(debugStrings->pauseOff, debugStrings->logPrefix, param_1);
 		}
 		fflush(__files + 1);
 	}

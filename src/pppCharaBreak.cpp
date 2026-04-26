@@ -625,8 +625,8 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                     short avgY = (short)(sumY / 3);
                     short avgZ = (short)(sumZ / 3);
 
-                    if (avgX > -0x7531 && avgX < 0x7531 && avgY > -0x7531 && avgY < 0x7531 && avgZ > -0x7531 &&
-                        avgZ < 0x7531) {
+                    if (avgX >= -0x7530 && avgX <= 0x7530 && avgY >= -0x7530 && avgY <= 0x7530 && avgZ >= -0x7530 &&
+                        avgZ <= 0x7530) {
                         Vec center;
                         Vec verts[3];
                         S16Vec normalA;
@@ -698,12 +698,12 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                             if (stepData->m_spinMode == 0) {
                                 verts[i].x += velocity.x;
-                                verts[i].y += -(stepData->m_gravity * (float)*(u16*)(polygon + 2) - velocity.y);
+                                verts[i].y += velocity.y - stepData->m_gravity * (float)*(u16*)(polygon + 2);
                                 verts[i].z += velocity.z;
                             } else if (stepData->m_spinMode == 1) {
                                 wobbleScale = FLOAT_8033204c + Math.RandF(FLOAT_80332064);
                                 verts[i].x += cosValue * wobbleScale;
-                                verts[i].y += -(stepData->m_gravity * (float)*(u16*)(polygon + 2) - velocity.y);
+                                verts[i].y += velocity.y - stepData->m_gravity * (float)*(u16*)(polygon + 2);
                                 wobbleScale = FLOAT_8033204c + Math.RandF(FLOAT_80332064);
                                 verts[i].z += sinValue * wobbleScale;
                             }

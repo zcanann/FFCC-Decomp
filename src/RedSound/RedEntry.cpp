@@ -254,12 +254,12 @@ int CRedEntry::SearchUseWave(int waveNo)
 			MusicStop(*(int*)(soundBase + 0x470));
 		}
 		soundBase -= 0x494;
-	} while ((int)p_SoundControlBuffer <= soundBase);
+	} while ((unsigned int)soundBase >= (unsigned int)p_SoundControlBuffer);
 
 	int* trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
 	int* track = (int*)*trackBasePtr;
 	do {
-		if ((*track != 0) && (track[6] != 0) && (*(short*)(track[6] + 2) == waveNo)) {
+		if (((u32)*track != 0) && ((u32)track[6] != 0) && (*(short*)(track[6] + 2) == waveNo)) {
 			found = 1;
 			SeStopID(track[0x3e]);
 		}

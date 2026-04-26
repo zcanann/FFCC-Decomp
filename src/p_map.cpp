@@ -86,6 +86,8 @@ CRelProfile g_map_draw_prof;
 unsigned short s_loadedStageNo__7CMapPcs;
 unsigned short s_loadedMapNo__7CMapPcs;
 extern const float DrawRangeDefault;
+extern const float kPMapBoundMinInit = 10000000000.0f;
+extern const float kPMapBoundMaxInit = -10000000000.0f;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 static const char s_p_map_cpp_801d7728[] = "p_map.cpp";
@@ -105,12 +107,21 @@ extern "C" void __dl__FPv(void*);
 extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColor);
 
 struct CBoundHack {
-    u32 p0;
-    u32 p1;
-    u32 p2;
-    u32 p3;
-    u32 p4;
-    u32 p5;
+    Vec m_min;
+    Vec m_max;
+
+    CBoundHack()
+    {
+        float min = kPMapBoundMinInit;
+        m_min.z = min;
+        m_min.y = min;
+        m_min.x = min;
+
+        float max = kPMapBoundMaxInit;
+        m_max.z = max;
+        m_max.y = max;
+        m_max.x = max;
+    }
 };
 
 struct CMapMngAsyncLoadState {
@@ -877,7 +888,6 @@ void CMapPcs::drawAfter()
 {
     if (m_mapCalcReady == 0) {
         if (m_drawEnabled != 0) {
-            CBoundHack bound;
             Mtx cameraMtx;
             Mtx44 screenMtx;
 
@@ -909,9 +919,10 @@ void CMapPcs::drawAfter()
 
             MapMng.DrawAfter();
 
-            if ((CFlatFlags & 0x02000000) != 0) {
-                CColor debugColor(0xFF, 0xFF, 0x80, 0xFF);
+            if ((*reinterpret_cast<u32*>(CFlat + 0x129C) & 0x02000000) != 0) {
+                CBoundHack bound;
                 bound = *reinterpret_cast<CBoundHack*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
+                CColor debugColor(0xFF, 0xFF, 0x80, 0xFF);
                 DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, debugColor.color);
             }
         }
@@ -931,9 +942,8 @@ void CMapPcs::drawAfterViewer()
 {
     if (m_mapCalcReady == 0) {
         if (m_drawEnabled != 0) {
-            CBoundHack bound;
-            Mtx cameraMtx;
             Mtx44 screenMtx;
+            Mtx cameraMtx;
 
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
@@ -963,9 +973,10 @@ void CMapPcs::drawAfterViewer()
 
             MapMng.DrawAfter();
 
-            if ((CFlatFlags & 0x02000000) != 0) {
-                CColor debugColor(0xFF, 0xFF, 0x80, 0xFF);
+            if ((*reinterpret_cast<u32*>(CFlat + 0x129C) & 0x02000000) != 0) {
+                CBoundHack bound;
                 bound = *reinterpret_cast<CBoundHack*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
+                CColor debugColor(0xFF, 0xFF, 0x80, 0xFF);
                 DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, debugColor.color);
             }
         }

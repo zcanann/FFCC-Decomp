@@ -711,7 +711,6 @@ void CGCharaObj::onFramePreCalc()
 		m_aStarGroupId = static_cast<unsigned short>(
 			calcSpecialPolygonGroup__6CAStarFP3Vec(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x2A5C, &m_worldPosition));
 	}
-	m_lastBgGroupCopy = m_lastBgGroup;
 }
 
 /*

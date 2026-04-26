@@ -149,7 +149,7 @@ static const char s_redDriverHeaderErrorBlob[] =
     "\0"
     "%s%sSE-Sep-Header was broken !!%s\n";
 static const char sRedDriverLogWarnColor[] = "\x1B[4;31m";
-static const char sRedDriverLogReset[8] = "\x1B[0m";
+static const char sRedDriverLogReset[] = "\x1B[0m";
 
 enum {
     RED_DRIVER_STATUS_FMT_OFFSET = 0x12,

@@ -19,6 +19,12 @@ const char s_CUSBPcs_8032f810[] = "CUSBPcs";
 u32 m_table__7CUSBPcs[0x11C / sizeof(u32)] = {
     reinterpret_cast<u32>(const_cast<char*>(s_CUSBPcs_8032f810)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x12
 };
+extern "C" char __RTTI__8CProcess[];
+u32 CUSBPcs_RTTI_base__7CUSBPcs[3] = {reinterpret_cast<u32>(__RTTI__8CProcess), 0, 0};
+u32 CUSBPcs_RTTI__7CUSBPcs[5] = {
+    0, reinterpret_cast<u32>(const_cast<char*>(s_CUSBPcs_8032f810)), 0, 0,
+    reinterpret_cast<u32>(CUSBPcs_RTTI_base__7CUSBPcs)
+};
 static const char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
 static const char s_usbRootPath[0x10] = "plot/kmitsuru/";
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);

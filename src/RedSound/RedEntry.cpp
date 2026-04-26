@@ -594,19 +594,19 @@ void CRedEntry::ClearWaveData(int waveNo)
 	if (waveNo < 0) {
 		if (waveNo == -1) {
 			for (historyBank = (int*)entry[0]; historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
-				if (-1 < historyBank[0]) {
+				if (historyBank[0] >= 0) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveNo == -2) {
 			for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
-				if (-1 < historyBank[0]) {
+				if (historyBank[0] >= 0) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveNo == -3) {
 			for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
-				if ((-1 < historyBank[0]) && (0 < historyBank[1])) {
+				if ((historyBank[0] >= 0) && (0 < historyBank[1])) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
@@ -638,7 +638,7 @@ void CRedEntry::ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo
 	}
 
 	for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
-		if (((-1 < historyBank[0]) && (0 < historyBank[1])) &&
+		if (((historyBank[0] >= 0) && (0 < historyBank[1])) &&
 		    (historyBank[0] != waveNo0) && (historyBank[0] != waveNo1) &&
 		    (historyBank[0] != waveNo2) && (historyBank[0] != waveNo3)) {
 			WaveDelete((RedHistoryBANK*)historyBank);
@@ -662,19 +662,19 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
 	if (waveBankNo < 0) {
 		if (waveBankNo == -1) {
 			for (int* historyBank = (int*)entry[0]; historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
-				if (-1 < historyBank[0]) {
+				if (!(historyBank[0] < 0)) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveBankNo == -2) {
 			for (int* historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
-				if (-1 < historyBank[0]) {
+				if (!(historyBank[0] < 0)) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveBankNo == -3) {
 			for (int* historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
-				if ((-1 < historyBank[0]) && (0 < historyBank[1])) {
+				if (!(historyBank[0] < 0) && (0 < historyBank[1])) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}

@@ -1288,6 +1288,8 @@ void CMemory::CStage::drawHeapBar(int y)
                         } else {
                             color = 0x400080;
                         }
+                    } else if (stageGetAllocationMode(this) == 0) {
+                        color = colors[drawColor];
                     } else {
                         color = colors[drawColor];
                     }

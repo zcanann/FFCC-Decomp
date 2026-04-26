@@ -228,14 +228,14 @@ int TriangleSwing(int phase)
     int result = (phase & 0xFF) << 8;
 
     switch (((u32)phase >> 8) & 3) {
-    case 1:
-        result = 0x10000 - result;
+    case 3:
+        result -= 0x10000;
         break;
     case 2:
         result = -result;
         break;
-    case 3:
-        result -= 0x10000;
+    case 1:
+        result = 0x10000 - result;
         break;
     }
 
@@ -332,14 +332,14 @@ int TriangleSwingR(int phase)
     result = (phase & 0xFF) << 8;
 
     switch (((u32)phase >> 8) & 3) {
-    case 1:
-        result = 0x10000 - result;
+    case 3:
+        result -= 0x10000;
         break;
     case 2:
         result = -result;
         break;
-    case 3:
-        result -= 0x10000;
+    case 1:
+        result = 0x10000 - result;
         break;
     }
 

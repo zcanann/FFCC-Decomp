@@ -2,7 +2,6 @@
 #include "ffcc/graphic.h"
 #include "ffcc/math.h"
 #include "ffcc/map.h"
-#include "ffcc/p_game.h"
 #include "ffcc/linkage.h"
 extern "C" {
 extern const f32 kPppYmLaserOne;
@@ -23,7 +22,7 @@ extern f32 FLOAT_80330de0;
 extern f32 FLOAT_80330de4;
 extern f32 FLOAT_80330de8;
 extern f32 FLOAT_80330dec;
-extern "C" const f64 DOUBLE_80330DD0 = 4503599627370496.0;
+extern "C" const f64 DOUBLE_80330DD0;
 extern f64 DOUBLE_80330dd8;
 
 void pppInitBlendMode(void);

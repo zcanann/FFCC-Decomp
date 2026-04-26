@@ -101,145 +101,236 @@ static inline unsigned int Align32(unsigned int value)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapMesh::CMapMesh()
-{
-    const float minInit = 10000000000.0f;
-    const float maxInit = -10000000000.0f;
-
-    F32At(this, 0x14) = minInit;
-    F32At(this, 0x10) = minInit;
-    F32At(this, 0xC) = minInit;
-    F32At(this, 0x20) = maxInit;
-    F32At(this, 0x1C) = maxInit;
-    F32At(this, 0x18) = maxInit;
-
-    S32At(this, 0x24) = 0;
-    S32At(this, 0x28) = 0;
-    S32At(this, 0x2C) = 0;
-    S32At(this, 0x30) = 0;
-    S32At(this, 0x34) = 0;
-    S32At(this, 0x3C) = 0;
-    S32At(this, 0x38) = 0;
-    S32At(this, 0x40) = 0;
-    U16At(this, 0xA) = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80028648
- * PAL Size: 152b
+ * PAL Address: 0x80027774
+ * PAL Size: 120b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapMesh::~CMapMesh()
+void CMapMesh::pppCacheDumpModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
 {
-    if (PtrAt(this, 0x24) != 0) {
-        __dla__FPv(PtrAt(this, 0x24));
-        PtrAt(this, 0x24) = 0;
+    int remaining = static_cast<int>(U16At(this, 0xA));
+    MeshDrawEntry* entry = DrawEntries(this);
+    while (remaining-- != 0) {
+        if (entry->size != 0) {
+            if (entry->materialIdx == 0xFFFF) {
+                entry->materialIdx = 0;
+            } else {
+                CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, (unsigned int)entry->materialIdx, cacheSet);
+            }
+        }
+        entry++;
     }
-
-    if (PtrAt(this, 0x28) != 0) {
-        __dla__FPv(PtrAt(this, 0x28));
-        PtrAt(this, 0x28) = 0;
-    }
-
-    U16At(this, 0x0) = 0;
-    U16At(this, 0x2) = 0;
-    U16At(this, 0x4) = 0;
-    U16At(this, 0x8) = 0;
-    U16At(this, 0x6) = 0;
-    U16At(this, 0xA) = 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800286e0
- * PAL Size: 116b
+ * PAL Address: 0x800277ec
+ * PAL Size: 120b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMesh::Destroy()
+void CMapMesh::pppCacheLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
 {
-    if (PtrAt(this, 0x24) != 0) {
-        __dla__FPv(PtrAt(this, 0x24));
-        PtrAt(this, 0x24) = 0;
+    int remaining = static_cast<int>(U16At(this, 0xA));
+    MeshDrawEntry* entry = DrawEntries(this);
+    while (remaining-- != 0) {
+        if (entry->size != 0) {
+            if (entry->materialIdx == 0xFFFF) {
+                entry->materialIdx = 0;
+            } else {
+                CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, (unsigned int)entry->materialIdx, cacheSet);
+            }
+        }
+        entry++;
     }
-
-    if (PtrAt(this, 0x28) != 0) {
-        __dla__FPv(PtrAt(this, 0x28));
-        PtrAt(this, 0x28) = 0;
-    }
-
-    U16At(this, 0x0) = 0;
-    U16At(this, 0x2) = 0;
-    U16At(this, 0x4) = 0;
-    U16At(this, 0x8) = 0;
-    U16At(this, 0x6) = 0;
-    U16At(this, 0xA) = 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800285dc
- * PAL Size: 108b
+ * PAL Address: 0x80027864
+ * PAL Size: 132b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMesh::Ptr2Off()
+void CMapMesh::SetDisplayListMaterial(CMaterialSet* materialSet, char** textureNames, CAmemCacheSet*)
 {
-    if (PtrAt(this, 0x24) == 0) {
-        return;
-    }
+    int remaining = static_cast<int>(U16At(this, 0xA));
+    MeshDrawEntry* entry = DrawEntries(this);
 
-    S32At(this, 0x2C) -= S32At(this, 0x24);
-    S32At(this, 0x30) -= S32At(this, 0x24);
-    S32At(this, 0x34) -= S32At(this, 0x24);
-    S32At(this, 0x38) -= S32At(this, 0x24);
-    S32At(this, 0x3C) -= S32At(this, 0x24);
-    S32At(this, 0x40) -= S32At(this, 0x24);
+    while (remaining-- != 0) {
+        if (entry->size != 0) {
+            if (entry->materialIdx == 0xFFFF) {
+                entry->materialIdx = 0;
+            } else {
+                entry->materialIdx = FindTexName__12CMaterialSetFPcPl(materialSet, textureNames[entry->materialIdx], 0);
+            }
+        }
+        entry++;
+    }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80028540
- * PAL Size: 156b
+ * PAL Address: 0x800278e8
+ * PAL Size: 88b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMesh::Off2Ptr()
+void* CMapMesh::GetTexture(CMaterialSet* materialSet, int& textureIndex)
 {
-    int iVar1;
-    int iVar2;
-    int iVar3;
+    unsigned int* drawEntry;
 
-    S32At(this, 0x2C) += S32At(this, 0x24);
-    S32At(this, 0x30) += S32At(this, 0x24);
-    S32At(this, 0x34) += S32At(this, 0x24);
-    S32At(this, 0x38) += S32At(this, 0x24);
-    S32At(this, 0x3C) += S32At(this, 0x24);
-    S32At(this, 0x40) += S32At(this, 0x24);
-
-    iVar3 = 0;
-    iVar1 = 0;
-    while (iVar3 < (int)(unsigned int)U16At(this, 0xA)) {
-        int base = S32At(this, 0x24);
-        int drawEntriesBase = S32At(this, 0x40);
-        iVar2 = drawEntriesBase + iVar1;
-        iVar1 = iVar1 + 0x10;
-        *reinterpret_cast<int*>(iVar2 + 4) = base + *reinterpret_cast<int*>(iVar2 + 0xC);
-        iVar3++;
+    if (U16At(this, 0xA) != 0) {
+        drawEntry = reinterpret_cast<unsigned int*>(PtrAt(this, 0x40));
+        if (*drawEntry != 0) {
+            textureIndex = (unsigned int)*reinterpret_cast<unsigned short*>(drawEntry + 2);
+            CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(
+                reinterpret_cast<unsigned char*>(materialSet) + 8))[*reinterpret_cast<unsigned short*>(drawEntry + 2)];
+            return *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
+        }
     }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80027940
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMesh::DrawPart(CMaterialSet* materialSet, int drawMaterialPart)
+{
+    int remaining = static_cast<int>(U16At(this, 0xA));
+    MeshDrawEntry* entry = DrawEntries(this);
+
+    while (remaining-- != 0) {
+        if (entry->size != 0) {
+            if (drawMaterialPart != 0) {
+                SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet, entry->materialIdx, 1);
+            }
+            GXCallDisplayList(entry->displayList, entry->size);
+        }
+        entry++;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800279c4
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMesh::Draw(CMaterialSet* materialSet)
+{
+    if (materialSet == 0) {
+        materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213D4);
+    }
+
+    int remaining = static_cast<int>(U16At(this, 0xA));
+    MeshDrawEntry* entry = DrawEntries(this);
+
+    while (remaining-- != 0) {
+        if (entry->size != 0) {
+            SetBlendMode__12CMaterialManFP12CMaterialSeti(&MaterialMan, materialSet, entry->materialIdx);
+            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, entry->materialIdx, 0,
+                                                                       1);
+            GXCallDisplayList(entry->displayList, entry->size);
+        }
+        entry++;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80027a7c
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count)
+{
+    unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+    int remaining = count;
+    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
+
+    while (remaining-- != 0) {
+        if (entry->size != 0) {
+            CMaterial* material =
+                (*reinterpret_cast<CPtrArray<CMaterial*>*>(
+                    reinterpret_cast<unsigned char*>(*reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4)) + 8))[
+                    entry->materialIdx];
+
+            if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material) + 0x24) &
+                 0x100000) != 0) {
+                SetMaterialCharaShadow__12CMaterialManFP9CMaterial(&MaterialMan, material);
+                GXCallDisplayList(entry->displayList, entry->size);
+            }
+        }
+        entry++;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80027b24
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
+{
+    int remaining = count;
+    unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
+
+    while (remaining-- != 0) {
+        if (entry->size != 0) {
+            SetBlendMode__12CMaterialManFP12CMaterialSeti(
+                &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4), entry->materialIdx);
+            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+                &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4),
+                                                                       entry->materialIdx, 0, 1);
+            GXCallDisplayList(entry->displayList, entry->size);
+        }
+        entry++;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80027bd4
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMesh::SetRenderArray()
+{
+    GXSetArray((GXAttr)9, PtrAt(this, 0x2C), 0xC);
+    GXSetArray((GXAttr)0xB, PtrAt(this, 0x3C), 4);
+    GXSetArray((GXAttr)0xD, PtrAt(this, 0x38), 4);
+    GXSetArray((GXAttr)0xE, PtrAt(this, 0x38), 4);
+    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 4) = PtrAt(this, 0x30);
 }
 
 /*
@@ -490,160 +581,149 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
 
 /*
  * --INFO--
- * PAL Address: 0x80027bd4
- * PAL Size: 120b
+ * PAL Address: 0x80028540
+ * PAL Size: 156b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMesh::SetRenderArray()
+void CMapMesh::Off2Ptr()
 {
-    GXSetArray((GXAttr)9, PtrAt(this, 0x2C), 0xC);
-    GXSetArray((GXAttr)0xB, PtrAt(this, 0x3C), 4);
-    GXSetArray((GXAttr)0xD, PtrAt(this, 0x38), 4);
-    GXSetArray((GXAttr)0xE, PtrAt(this, 0x38), 4);
-    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 4) = PtrAt(this, 0x30);
-}
+    int iVar1;
+    int iVar2;
+    int iVar3;
 
-/*
- * --INFO--
- * PAL Address: 0x80027b24
- * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
-{
-    int remaining = count;
-    unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
-    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
+    S32At(this, 0x2C) += S32At(this, 0x24);
+    S32At(this, 0x30) += S32At(this, 0x24);
+    S32At(this, 0x34) += S32At(this, 0x24);
+    S32At(this, 0x38) += S32At(this, 0x24);
+    S32At(this, 0x3C) += S32At(this, 0x24);
+    S32At(this, 0x40) += S32At(this, 0x24);
 
-    while (remaining-- != 0) {
-        if (entry->size != 0) {
-            SetBlendMode__12CMaterialManFP12CMaterialSeti(
-                &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4), entry->materialIdx);
-            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4),
-                                                                       entry->materialIdx, 0, 1);
-            GXCallDisplayList(entry->displayList, entry->size);
-        }
-        entry++;
+    iVar3 = 0;
+    iVar1 = 0;
+    while (iVar3 < (int)(unsigned int)U16At(this, 0xA)) {
+        int base = S32At(this, 0x24);
+        int drawEntriesBase = S32At(this, 0x40);
+        iVar2 = drawEntriesBase + iVar1;
+        iVar1 = iVar1 + 0x10;
+        *reinterpret_cast<int*>(iVar2 + 4) = base + *reinterpret_cast<int*>(iVar2 + 0xC);
+        iVar3++;
     }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80027a7c
- * PAL Size: 168b
+ * PAL Address: 0x800285dc
+ * PAL Size: 108b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count)
+void CMapMesh::Ptr2Off()
 {
-    unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
-    int remaining = count;
-    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
-
-    while (remaining-- != 0) {
-        if (entry->size != 0) {
-            CMaterial* material =
-                (*reinterpret_cast<CPtrArray<CMaterial*>*>(
-                    reinterpret_cast<unsigned char*>(*reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4)) + 8))[
-                    entry->materialIdx];
-
-            if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material) + 0x24) &
-                 0x100000) != 0) {
-                SetMaterialCharaShadow__12CMaterialManFP9CMaterial(&MaterialMan, material);
-                GXCallDisplayList(entry->displayList, entry->size);
-            }
-        }
-        entry++;
+    if (PtrAt(this, 0x24) == 0) {
+        return;
     }
+
+    S32At(this, 0x2C) -= S32At(this, 0x24);
+    S32At(this, 0x30) -= S32At(this, 0x24);
+    S32At(this, 0x34) -= S32At(this, 0x24);
+    S32At(this, 0x38) -= S32At(this, 0x24);
+    S32At(this, 0x3C) -= S32At(this, 0x24);
+    S32At(this, 0x40) -= S32At(this, 0x24);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800279c4
- * PAL Size: 184b
+ * PAL Address: 0x80028648
+ * PAL Size: 152b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMesh::Draw(CMaterialSet* materialSet)
+CMapMesh::~CMapMesh()
 {
-    if (materialSet == 0) {
-        materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213D4);
+    if (PtrAt(this, 0x24) != 0) {
+        __dla__FPv(PtrAt(this, 0x24));
+        PtrAt(this, 0x24) = 0;
     }
 
-    int remaining = static_cast<int>(U16At(this, 0xA));
-    MeshDrawEntry* entry = DrawEntries(this);
-
-    while (remaining-- != 0) {
-        if (entry->size != 0) {
-            SetBlendMode__12CMaterialManFP12CMaterialSeti(&MaterialMan, materialSet, entry->materialIdx);
-            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, entry->materialIdx, 0,
-                                                                       1);
-            GXCallDisplayList(entry->displayList, entry->size);
-        }
-        entry++;
+    if (PtrAt(this, 0x28) != 0) {
+        __dla__FPv(PtrAt(this, 0x28));
+        PtrAt(this, 0x28) = 0;
     }
+
+    U16At(this, 0x0) = 0;
+    U16At(this, 0x2) = 0;
+    U16At(this, 0x4) = 0;
+    U16At(this, 0x8) = 0;
+    U16At(this, 0x6) = 0;
+    U16At(this, 0xA) = 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80027940
- * PAL Size: 132b
+ * PAL Address: 0x800286e0
+ * PAL Size: 116b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMesh::DrawPart(CMaterialSet* materialSet, int drawMaterialPart)
+void CMapMesh::Destroy()
 {
-    int remaining = static_cast<int>(U16At(this, 0xA));
-    MeshDrawEntry* entry = DrawEntries(this);
-
-    while (remaining-- != 0) {
-        if (entry->size != 0) {
-            if (drawMaterialPart != 0) {
-                SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet, entry->materialIdx, 1);
-            }
-            GXCallDisplayList(entry->displayList, entry->size);
-        }
-        entry++;
+    if (PtrAt(this, 0x24) != 0) {
+        __dla__FPv(PtrAt(this, 0x24));
+        PtrAt(this, 0x24) = 0;
     }
+
+    if (PtrAt(this, 0x28) != 0) {
+        __dla__FPv(PtrAt(this, 0x28));
+        PtrAt(this, 0x28) = 0;
+    }
+
+    U16At(this, 0x0) = 0;
+    U16At(this, 0x2) = 0;
+    U16At(this, 0x4) = 0;
+    U16At(this, 0x8) = 0;
+    U16At(this, 0x6) = 0;
+    U16At(this, 0xA) = 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800278e8
- * PAL Size: 88b
+ * PAL Address: 0x80028754
+ * PAL Size: 76b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void* CMapMesh::GetTexture(CMaterialSet* materialSet, int& textureIndex)
+CMapMesh::CMapMesh()
 {
-    unsigned int* drawEntry;
+    const float minInit = 10000000000.0f;
+    const float maxInit = -10000000000.0f;
 
-    if (U16At(this, 0xA) != 0) {
-        drawEntry = reinterpret_cast<unsigned int*>(PtrAt(this, 0x40));
-        if (*drawEntry != 0) {
-            textureIndex = (unsigned int)*reinterpret_cast<unsigned short*>(drawEntry + 2);
-            CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(
-                reinterpret_cast<unsigned char*>(materialSet) + 8))[*reinterpret_cast<unsigned short*>(drawEntry + 2)];
-            return *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
-        }
-    }
+    F32At(this, 0x14) = minInit;
+    F32At(this, 0x10) = minInit;
+    F32At(this, 0xC) = minInit;
+    F32At(this, 0x20) = maxInit;
+    F32At(this, 0x1C) = maxInit;
+    F32At(this, 0x18) = maxInit;
 
-    return 0;
+    S32At(this, 0x24) = 0;
+    S32At(this, 0x28) = 0;
+    S32At(this, 0x2C) = 0;
+    S32At(this, 0x30) = 0;
+    S32At(this, 0x34) = 0;
+    S32At(this, 0x3C) = 0;
+    S32At(this, 0x38) = 0;
+    S32At(this, 0x40) = 0;
+    U16At(this, 0xA) = 0;
 }
 
 /*
@@ -674,80 +754,4 @@ template <>
 CMaterial* CPtrArray<CMaterial*>::GetAt(unsigned long index)
 {
     return m_items[index];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80027864
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMesh::SetDisplayListMaterial(CMaterialSet* materialSet, char** textureNames, CAmemCacheSet*)
-{
-    int remaining = static_cast<int>(U16At(this, 0xA));
-    MeshDrawEntry* entry = DrawEntries(this);
-
-    while (remaining-- != 0) {
-        if (entry->size != 0) {
-            if (entry->materialIdx == 0xFFFF) {
-                entry->materialIdx = 0;
-            } else {
-                entry->materialIdx = FindTexName__12CMaterialSetFPcPl(materialSet, textureNames[entry->materialIdx], 0);
-            }
-        }
-        entry++;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800277ec
- * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMesh::pppCacheLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
-{
-    int remaining = static_cast<int>(U16At(this, 0xA));
-    MeshDrawEntry* entry = DrawEntries(this);
-    while (remaining-- != 0) {
-        if (entry->size != 0) {
-            if (entry->materialIdx == 0xFFFF) {
-                entry->materialIdx = 0;
-            } else {
-                CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, (unsigned int)entry->materialIdx, cacheSet);
-            }
-        }
-        entry++;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80027774
- * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMesh::pppCacheDumpModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
-{
-    int remaining = static_cast<int>(U16At(this, 0xA));
-    MeshDrawEntry* entry = DrawEntries(this);
-    while (remaining-- != 0) {
-        if (entry->size != 0) {
-            if (entry->materialIdx == 0xFFFF) {
-                entry->materialIdx = 0;
-            } else {
-                CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, (unsigned int)entry->materialIdx, cacheSet);
-            }
-        }
-        entry++;
-    }
 }

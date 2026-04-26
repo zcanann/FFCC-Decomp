@@ -66,11 +66,6 @@ struct KeShpTail3XWork {
     u8 m_initialized;
 };
 
-struct KeShpTail3XObject {
-    u8 _pad0[0xc];
-    _pppPObject m_obj;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x8008922c
@@ -143,7 +138,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 {
     KeShpTail3XStep* step = (KeShpTail3XStep*)param_2;
     KeShpTail3XOffsets* offsets = (KeShpTail3XOffsets*)param_3;
-    KeShpTail3XObject* tailObj = (KeShpTail3XObject*)obj;
     KeShpTail3XWork* work;
     long** shapeTable;
     long* shapeEntry;
@@ -154,6 +148,10 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     float colorG;
     float colorB;
     float colorA;
+    float colorEndR;
+    float colorEndG;
+    float colorEndB;
+    float colorEndA;
     float colorStepR;
     float colorStepG;
     float colorStepB;
@@ -165,9 +163,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     pppFMATRIX tmpMtx;
     Vec zeroVec;
     Vec pos;
-    Vec nextPos;
     Vec seg;
-    _pppMngSt* mng;
     float envDepth;
     float drawScale;
     float segDx;
@@ -188,29 +184,40 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     float segBaseX;
     float segBaseY;
     float segBaseZ;
-    u8 currentIndex;
-    u8 nextIndex;
+    float nextBaseX;
+    float nextBaseY;
+    float nextBaseZ;
+    u32 currentIndex;
+    u32 nextIndex;
     u8 zEnable;
+    float zero;
+    s32 dataValIndex;
 
-    if (step->m_dataValIndex == 0xffff) {
+    zero = kPppKeShpTail3XZero;
+    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
+    dataValIndex = step->m_dataValIndex;
+    if (dataValIndex == 0xffff) {
         return;
     }
 
     count = step->m_drawCount;
 
-    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
     invCountMinusOne = (float)(count - 1);
     alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / kPppKeShpTail3XAlphaScale;
     colorR = (float)(work->m_values[0] >> 7);
     colorG = (float)(work->m_values[1] >> 7);
     colorB = (float)(work->m_values[2] >> 7);
     colorA = (float)(work->m_values[3] >> 7) * alphaMul;
+    colorEndR = (float)(work->m_values[4] >> 7);
+    colorEndG = (float)(work->m_values[5] >> 7);
+    colorEndB = (float)(work->m_values[6] >> 7);
+    colorEndA = (float)(work->m_values[7] >> 7) * alphaMul;
 
-    if (invCountMinusOne != kPppKeShpTail3XZero) {
-        colorStepR = (colorR - (float)(work->m_values[4] >> 7)) / invCountMinusOne;
-        colorStepG = (colorG - (float)(work->m_values[5] >> 7)) / invCountMinusOne;
-        colorStepB = (colorB - (float)(work->m_values[6] >> 7)) / invCountMinusOne;
-        colorStepA = (colorA - ((float)(work->m_values[7] >> 7) * alphaMul)) / invCountMinusOne;
+    if (invCountMinusOne != zero) {
+        colorStepR = (colorR - colorEndR) / invCountMinusOne;
+        colorStepG = (colorG - colorEndG) / invCountMinusOne;
+        colorStepB = (colorB - colorEndB) / invCountMinusOne;
+        colorStepA = (colorA - colorEndA) / invCountMinusOne;
     } else {
         colorStepR = kPppKeShpTail3XHalf;
         colorStepG = kPppKeShpTail3XHalf;
@@ -218,45 +225,43 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
         colorStepA = kPppKeShpTail3XHalf;
     }
 
-    mng = (_pppMngSt*)pppMngStPtr;
-    shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+    shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
     shapeData = (u8*)*shapeTable;
 
-    pppCopyMatrix(localBase, tailObj->m_obj.m_localMatrix);
+    pppCopyMatrix(localBase, obj->pppPObject.m_localMatrix);
     pppUnitMatrix(drawMtx);
 
     shapeScale = (float)step->m_stepValue;
-    shapeScaleStep = ((float)step->m_stepValue - (float)step->m_arg3) / invCountMinusOne;
-    trailStep = step->m_stepDistance * mng->m_scale.x;
-    trailStepDelta = trailStep * (shapeScaleStep / (float)step->m_stepValue);
-    if (trailStep == kPppKeShpTail3XZero) {
+    shapeScaleStep = (shapeScale - (float)step->m_arg3) / invCountMinusOne;
+    trailStep = step->m_stepDistance * pppMngStPtr->m_scale.x;
+    trailStepDelta = trailStep * (shapeScaleStep / shapeScale);
+    if (trailStep == zero) {
         return;
     }
 
     currentIndex = work->m_head;
+    segBaseX = work->m_posHistory[currentIndex].x;
+    segBaseY = work->m_posHistory[currentIndex].y;
+    segBaseZ = work->m_posHistory[currentIndex].z;
     nextIndex = currentIndex + 1;
     if (currentIndex == 0x1b) {
         nextIndex = 0;
     }
-
-    pos = work->m_posHistory[currentIndex];
-    nextPos = work->m_posHistory[nextIndex];
-    segDx = nextPos.x - pos.x;
-    segDy = nextPos.y - pos.y;
-    segDz = nextPos.z - pos.z;
+    nextBaseX = work->m_posHistory[nextIndex].x;
+    nextBaseY = work->m_posHistory[nextIndex].y;
+    nextBaseZ = work->m_posHistory[nextIndex].z;
+    segDx = nextBaseX - segBaseX;
+    segDy = nextBaseY - segBaseY;
+    segDz = nextBaseZ - segBaseZ;
     seg.x = segDx;
     seg.y = segDy;
     seg.z = segDz;
-    zeroVec.x = kPppKeShpTail3XZero;
-    zeroVec.y = kPppKeShpTail3XZero;
-    zeroVec.z = kPppKeShpTail3XZero;
+    zeroVec.x = zero;
+    zeroVec.y = zero;
+    zeroVec.z = zero;
     segLen = PSVECDistance(&zeroVec, &seg);
     segRemain = segLen;
     segCursor = kPppKeShpTail3XZero;
-    segBaseX = pos.x;
-    segBaseY = pos.y;
-    segBaseZ = pos.z;
-
     life = work->m_shapeData;
     shapeSetCount = *(u16*)(shapeData + 0x12);
     rng = work->m_rand;
@@ -264,7 +269,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 
 draw_loop:
     while (count != 0) {
-        envDepth = kPppKeShpTail3XZero;
+        envDepth = zero;
         drawScale = shapeScale;
 
         if (step->m_useRandomShape != 0) {
@@ -284,8 +289,8 @@ draw_loop:
         pos.z = segBaseZ;
 
         if (step->m_worldSpaceMode == 0) {
-            PSMTXScaleApply(localBase.value, obj->field_0x40.value, drawScale * mng->m_scale.x, drawScale * mng->m_scale.y,
-                            drawScale * mng->m_scale.z);
+            PSMTXScaleApply(localBase.value, obj->field_0x40.value, drawScale * pppMngStPtr->m_scale.x,
+                            drawScale * pppMngStPtr->m_scale.y, drawScale * pppMngStPtr->m_scale.z);
             if ((step->m_rotateEnabled != 0) && (count != 0)) {
                 PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
                 pppCopyMatrix(tmpMtx, obj->field_0x40);
@@ -295,9 +300,9 @@ draw_loop:
             PSMTXCopy(obj->field_0x40.value, drawMtx.value);
         } else if (step->m_worldSpaceMode == 1) {
             pppUnitMatrix(drawMtx);
-            drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * mng->m_scale.x);
-            drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * mng->m_scale.y);
-            drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * mng->m_scale.z);
+            drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);
+            drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y);
+            drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z);
             if ((step->m_rotateEnabled != 0) && (count != 0)) {
                 PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
                 pppCopyMatrix(tmpMtx, drawMtx);
@@ -370,21 +375,22 @@ advance_segment:
             return;
         }
 
-        pos = nextPos;
         trailLen = segCursor - segLen;
-        nextPos = work->m_posHistory[nextIndex];
-        segDx = nextPos.x - pos.x;
-        segDy = nextPos.y - pos.y;
-        segDz = nextPos.z - pos.z;
+        segBaseX = nextBaseX;
+        segBaseY = nextBaseY;
+        segBaseZ = nextBaseZ;
+        nextBaseX = work->m_posHistory[nextIndex].x;
+        nextBaseY = work->m_posHistory[nextIndex].y;
+        nextBaseZ = work->m_posHistory[nextIndex].z;
+        segDx = nextBaseX - segBaseX;
+        segDy = nextBaseY - segBaseY;
+        segDz = nextBaseZ - segBaseZ;
         seg.x = segDx;
         seg.y = segDy;
         seg.z = segDz;
         segLen = PSVECDistance(&zeroVec, &seg);
         segCursor = trailLen;
         segRemain += segLen;
-        segBaseX = pos.x;
-        segBaseY = pos.y;
-        segBaseZ = pos.z;
         goto draw_loop;
     }
 }
@@ -402,8 +408,10 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
 {
     KeShpTail3XStep* step;
     KeShpTail3XWork* work;
-    Vec pos;
+    pppFMATRIX outMatrix;
     Vec historyPos ATTRIBUTE_ALIGN(8);
+    Vec initPos ATTRIBUTE_ALIGN(8);
+    Vec pos ATTRIBUTE_ALIGN(8);
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -416,19 +424,17 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
         work->m_initialized = 1;
 
         if (step->m_worldSpaceMode == 0) {
-            pos.x = obj->pppPObject.m_localMatrix.value[0][3];
-            pos.y = obj->pppPObject.m_localMatrix.value[1][3];
-            pos.z = obj->pppPObject.m_localMatrix.value[2][3];
+            initPos.x = obj->pppPObject.m_localMatrix.value[0][3];
+            initPos.y = obj->pppPObject.m_localMatrix.value[1][3];
+            initPos.z = obj->pppPObject.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
-            pppFMATRIX outMatrix;
-
             pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
-            pos.x = outMatrix.value[0][3];
-            pos.y = outMatrix.value[1][3];
-            pos.z = outMatrix.value[2][3];
+            initPos.x = outMatrix.value[0][3];
+            initPos.y = outMatrix.value[1][3];
+            initPos.z = outMatrix.value[2][3];
         }
 
-        pppCopyVector(historyPos, pos);
+        pppCopyVector(historyPos, initPos);
         Vec* history = work->m_posHistory;
         s32 i = 0x1c;
         do {
@@ -448,8 +454,6 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
         pos.y = obj->pppPObject.m_localMatrix.value[1][3];
         pos.z = obj->pppPObject.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
-        pppFMATRIX outMatrix;
-
         pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];

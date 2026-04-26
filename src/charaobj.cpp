@@ -509,27 +509,30 @@ void CGCharaObj::onChangeStat(int state)
 void CGCharaObj::onCancelStat(int)
 {
 	int state = m_lastStateId;
-	int* slots = m_particleSlots;
 
-	if (state == 6) {
+	if (state != 6) {
+		if (state < 6) {
+			if (state == 2) {
+				for (int i = 0; i < 0x16; i++) {
+					if (((1U << i) & 0x18U) != 0) {
+						EndParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+					}
+				}
+			}
+		} else if (state == 0x12) {
+			for (int i = 0; i < 0x16; i++) {
+				if (((1U << i) & 1U) != 0) {
+					EndParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+				}
+			}
+		}
+	} else {
 		for (int i = 0; i < 0x16; i++) {
 			if (((1U << i) & 0x138U) != 0) {
-				EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+				EndParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
 			}
 		}
 		m_damageParticle = -1;
-	} else if (state == 2) {
-		for (int i = 0; i < 0x16; i++) {
-			if (((1U << i) & 0x18U) != 0) {
-				EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
-			}
-		}
-	} else if (state == 0x12) {
-		for (int i = 0; i < 0x16; i++) {
-			if (((1U << i) & 1U) != 0) {
-				EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
-			}
-		}
 	}
 
 	m_comboFrame = 0;

@@ -435,14 +435,16 @@ void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float sca
 float CGPrgObj::getTargetRot(CGPrgObj* target)
 {
 	float targetRot;
+	float zero;
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
-	Vec deltaPos;
 	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
+	CVector deltaPos;
 
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
-	if (deltaPos.x == FLOAT_80331BD4 || deltaPos.z == FLOAT_80331BD4) {
-		targetRot = 0.0f;
+	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	zero = FLOAT_80331BD4;
+	if (deltaPos.x == zero || deltaPos.z == zero) {
+		targetRot = zero;
 	} else {
 		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}

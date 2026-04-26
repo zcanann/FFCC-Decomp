@@ -7,7 +7,7 @@ extern "C" {
 extern const float kMaterialEditorControlMaxInit;
 extern const float kMaterialEditorControlMinInit;
 extern unsigned int kMaterialEditorDefaultColorRgba;
-extern const char sMaterialEditorSpinnerText[];
+extern const char sMaterialEditorSpinnerText[5];
 }
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
@@ -24,8 +24,8 @@ extern "C" void destroyViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
-extern "C" char __vt__8CManager[];
-extern "C" char __vt_CProcess[];
+extern "C" void* __vt__8CManager[];
+extern "C" void* __vt__8CProcess[];
 extern "C" char lbl_8032E648[];
 extern "C" const char s_CMaterialEditorPcs_VIEWER_801D7D18[];
 extern "C" const char s_CMaterialEditorPcs_801D7D34[];
@@ -47,26 +47,48 @@ unsigned int m_table__18CMaterialEditorPcs[0x15C / sizeof(unsigned int)] = {
 unsigned int lbl_801EA624[3] = {reinterpret_cast<unsigned int>(lbl_8032E648), 0, 0};
 unsigned int lbl_801EA630 = reinterpret_cast<unsigned int>(lbl_8032E648);
 CMaterialEditorPcs MaterialEditorPcs;
+u8 lbl_8026D338[0xC];
 
-struct MaterialEditorTableInit {
-    MaterialEditorTableInit()
-    {
-        m_table__18CMaterialEditorPcs[1] = m_table_desc0__18CMaterialEditorPcs[0];
-        m_table__18CMaterialEditorPcs[2] = m_table_desc0__18CMaterialEditorPcs[1];
-        m_table__18CMaterialEditorPcs[3] = m_table_desc0__18CMaterialEditorPcs[2];
-        m_table__18CMaterialEditorPcs[4] = m_table_desc1__18CMaterialEditorPcs[0];
-        m_table__18CMaterialEditorPcs[5] = m_table_desc1__18CMaterialEditorPcs[1];
-        m_table__18CMaterialEditorPcs[6] = m_table_desc1__18CMaterialEditorPcs[2];
-        m_table__18CMaterialEditorPcs[7] = m_table_desc2__18CMaterialEditorPcs[0];
-        m_table__18CMaterialEditorPcs[8] = m_table_desc2__18CMaterialEditorPcs[1];
-        m_table__18CMaterialEditorPcs[9] = m_table_desc2__18CMaterialEditorPcs[2];
-        m_table__18CMaterialEditorPcs[12] = m_table_desc3__18CMaterialEditorPcs[0];
-        m_table__18CMaterialEditorPcs[13] = m_table_desc3__18CMaterialEditorPcs[1];
-        m_table__18CMaterialEditorPcs[14] = m_table_desc3__18CMaterialEditorPcs[2];
-    }
-};
+/*
+ * --INFO--
+ * PAL Address: 0x8004c588
+ * PAL Size: 280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_MaterialEditor_cpp(void)
+{
+    u8* self = reinterpret_cast<u8*>(&MaterialEditorPcs);
+    unsigned int* dst = m_table__18CMaterialEditorPcs;
+    unsigned int* desc0 = m_table_desc0__18CMaterialEditorPcs;
+    unsigned int* desc1 = m_table_desc1__18CMaterialEditorPcs;
+    unsigned int* desc2 = m_table_desc2__18CMaterialEditorPcs;
+    unsigned int* desc3 = m_table_desc3__18CMaterialEditorPcs;
 
-static MaterialEditorTableInit sMaterialEditorTableInit;
+    *reinterpret_cast<void**>(self) = __vt__8CManager;
+    *reinterpret_cast<void**>(self) = __vt__8CProcess;
+    *reinterpret_cast<void**>(self) = __vt__18CMaterialEditorPcs;
+
+    __ct__14CUSBStreamDataFv(self + 0x84);
+    __ct__5ZLISTFv(self + 0xC8);
+    __ct__5ZLISTFv(self + 0xD8);
+    __register_global_object(self, __dt__18CMaterialEditorPcsFv, lbl_8026D338);
+
+    dst[1] = desc0[0];
+    dst[2] = desc0[1];
+    dst[3] = desc0[2];
+    dst[4] = desc1[0];
+    dst[5] = desc1[1];
+    dst[6] = desc1[2];
+    dst[7] = desc2[0];
+    dst[8] = desc2[1];
+    dst[9] = desc2[2];
+    dst[12] = desc3[0];
+    dst[13] = desc3[1];
+    dst[14] = desc3[2];
+}
 
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -530,8 +552,7 @@ void CMaterialEditorPcs::drawViewer()
     }
 
     gDebugSpinnerFrame_addr = gDebugSpinnerFrame_addr + 1;
-    int sign = gDebugSpinnerFrame_addr >> 31;
-    int idx = (sign * 4 | (unsigned int)(((gDebugSpinnerFrame_addr >> 4) * 0x40000000) + sign) >> 30) - sign;
+    int idx = (gDebugSpinnerFrame_addr >> 4) % 4;
     Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)(char)gDebugSpinnerText_addr[idx]);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
@@ -603,8 +624,11 @@ void CMaterialEditorPcs::drawViewer()
                         dstFactor = 5;
                     } else if ((src == 0) && (dst == 2)) {
                         srcFactor = 4;
+                        dstFactor = 1;
                     } else if ((src == 2) && (dst == 0)) {
                         blend = 3;
+                        srcFactor = 1;
+                        dstFactor = 1;
                     }
 
                     GXSetZCompLoc(GX_FALSE);
@@ -612,7 +636,7 @@ void CMaterialEditorPcs::drawViewer()
                     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(blend, srcFactor, dstFactor, 3);
                     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
                     GXSetCullMode(GX_CULL_NONE);
-                } else {
+                } else if (pass == 0) {
                     if ((polygon->flags & 0x400) != 0) {
                         continue;
                     }
@@ -621,7 +645,9 @@ void CMaterialEditorPcs::drawViewer()
                     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 0, 0, 7);
                 }
 
-                if ((polygon->textureMarker == 'H') && (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount))) {
+                switch (polygon->textureMarker) {
+                case 'H':
+                if (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount)) {
                     s16* textureHeader = m_textureHeader[polygon->textureIndex];
                     float scaleU = static_cast<float>(DOUBLE_8032FCC0 / (static_cast<double>(textureHeader[2]) - DOUBLE_8032FCD0));
                     float scaleV = static_cast<float>(DOUBLE_8032FCC0 / (static_cast<double>(textureHeader[3]) - DOUBLE_8032FCD0));
@@ -718,6 +744,7 @@ void CMaterialEditorPcs::drawViewer()
                         GXLoadTlut(m_tlutObj0[polygon->textureIndex], 0);
                         GXLoadTlut(m_tlutObj1[polygon->textureIndex], 1);
                     }
+                }
                 }
 
                 GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);

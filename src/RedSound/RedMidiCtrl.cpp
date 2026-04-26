@@ -705,10 +705,10 @@ void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDAT
     unsigned int delta[3];
     int* controlData = (int*)control;
 
-    if (*(char*)*(int*)track == '\0') {
-        delta[0] = 0x100;
-    } else {
+    if (*(char*)*(int*)track != '\0') {
         delta[0] = *(unsigned char*)*(int*)track;
+    } else {
+        delta[0] = 0x100;
     }
 
     controlData[0x113] = DataAddCompute(controlData + 0x112, *(unsigned char*)(*(int*)track + 1), (int*)delta);

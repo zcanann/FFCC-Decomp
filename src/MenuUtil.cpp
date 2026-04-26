@@ -612,14 +612,13 @@ void CMenuPcs::InitOptionMenuParam()
 void CMenuPcs::CalcOptionMenu()
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
-	bool optionChanged = false;
-
 	const float minValue = kOptionAnimMin;
 	const float maxValue = kOptionAnimMax;
 	const float animStep = kOptionRowAnimStep;
 	const float animStep2 = kOptionColumnAnimStep;
 	unsigned short press;
 	bool padBlocked = false;
+	bool optionChanged = false;
 
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		padBlocked = true;

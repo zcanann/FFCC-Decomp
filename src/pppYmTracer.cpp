@@ -82,11 +82,11 @@ static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
     pppCopyVector(dst->from, src->from);
     pppCopyVector(dst->to, src->to);
     dst->life = src->life;
-    dst->alpha = src->alpha;
     dst->decay = src->decay;
     dst->colorR = src->colorR;
     dst->colorG = src->colorG;
     dst->colorB = src->colorB;
+    dst->alpha = src->alpha;
 }
 
 /*
@@ -269,11 +269,11 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             pppCopyVector(next->from, current->from);
             pppCopyVector(next->to, current->to);
             next->life = current->life;
-            next->alpha = current->alpha;
             next->decay = current->decay;
             next->colorR = current->colorR;
             next->colorG = current->colorG;
             next->colorB = current->colorB;
+            next->alpha = current->alpha;
         }
 
         entries[0].life = -1;
@@ -335,13 +335,13 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
 
                 splineCount++;
                 work->count++;
-                if (*(u16*)(param_2->m_payload + 4) <= work->count + 1) {
+                if (work->count + 1 >= *(u16*)(param_2->m_payload + 4)) {
                     break;
                 }
             }
 
             for (i = 0; i < splineCount; i++) {
-                for (s32 j = *(u16*)(param_2->m_payload + 4) - 2; j > 1; j--) {
+                for (s32 j = *(u16*)(param_2->m_payload + 4) - 2; j >= 2; j--) {
                     copyPolygonData(&entries[j + 1], &entries[j]);
                 }
             }
@@ -355,15 +355,15 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         }
     }
 
-    poly = work->entries;
+    poly = entries;
     for (i = 0; i < (s32)(u32)work->count; i++) {
         if (poly->life > 0) {
             alpha = poly->alpha;
             decay = poly->decay;
-            if (alpha - decay > 0) {
-                poly->alpha = alpha - decay;
-            } else {
+            if (alpha - decay <= 0) {
                 poly->alpha = 0;
+            } else {
+                poly->alpha = alpha - decay;
             }
 
             poly->life--;

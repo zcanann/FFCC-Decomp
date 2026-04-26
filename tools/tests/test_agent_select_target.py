@@ -121,6 +121,26 @@ class NumericParsingTests(unittest.TestCase):
         self.assertTrue(viable)
         self.assertEqual(reason, "viable")
 
+    def test_is_viable_target_rejects_redsound_source_path(self):
+        unit = {
+            "name": "main/RedStream",
+            "measures": {},
+            "metadata": {"source_path": "src/RedSound/RedStream.cpp"},
+        }
+        viable, reason = agent_select_target.is_viable_target(unit, [])
+        self.assertFalse(viable)
+        self.assertEqual(reason, "permanently blacklisted")
+
+    def test_is_viable_target_rejects_redsound_module_name(self):
+        unit = {
+            "name": "main/RedDriver",
+            "measures": {},
+            "metadata": {"source_path": "unknown"},
+        }
+        viable, reason = agent_select_target.is_viable_target(unit, [])
+        self.assertFalse(viable)
+        self.assertEqual(reason, "permanently blacklisted")
+
     def test_extract_candidates_handles_non_numeric_function_match(self):
         report = {
             "units": [

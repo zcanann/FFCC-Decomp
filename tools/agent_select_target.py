@@ -46,6 +46,17 @@ PERMANENTLY_BLACKLISTED_UNITS = {
     "main/pppSRandUpFV",
 }
 
+REDSOUND_BLACKLISTED_STEMS = {
+    "redcommand",
+    "reddriver",
+    "redentry",
+    "redexecute",
+    "redmemory",
+    "redmidictrl",
+    "redsound",
+    "redstream",
+}
+
 
 def _path_name(path_str):
     """Return basename for paths that may use POSIX or Windows separators."""
@@ -129,6 +140,24 @@ def load_blacklist():
         return []
 
 
+def is_redsound_unit(unit):
+    """Return True for RedSound modules regardless of report path shape."""
+    metadata = unit.get("metadata", {})
+    paths = [unit.get("name"), metadata.get("source_path")]
+
+    for path in paths:
+        if not isinstance(path, str):
+            continue
+        normalized = path.replace("\\", "/").lower()
+        parts = [part for part in normalized.split("/") if part]
+        if "redsound" in parts:
+            return True
+        if _path_stem(path).lower() in REDSOUND_BLACKLISTED_STEMS:
+            return True
+
+    return False
+
+
 def is_viable_target(unit, blacklist):
     """Check if unit is a good target candidate"""
     name = unit.get("name")
@@ -141,7 +170,7 @@ def is_viable_target(unit, blacklist):
         return False, "auto-generated"
 
     # Skip permanently blacklisted units (thrash between extab/code, waste PR cycles)
-    if name in PERMANENTLY_BLACKLISTED_UNITS:
+    if name in PERMANENTLY_BLACKLISTED_UNITS or is_redsound_unit(unit):
         return False, "permanently blacklisted"
 
     # Skip recently failed units

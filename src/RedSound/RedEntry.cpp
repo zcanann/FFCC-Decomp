@@ -1076,26 +1076,26 @@ int CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 	int result;
 	char* data = reinterpret_cast<char*>(seSepHead);
 
-	if ((data[0] == 'S') && (data[1] == 'e') && (data[2] == 'S') && (data[3] == 'e') && (data[4] == 'p')) {
-		result = SearchSeSepSequence(*reinterpret_cast<int*>(data + 8));
-		if (result < 0) {
-			result = SeSepHeadAdd(seSepHead);
-			if (result == 0) {
-				RedDelete(seSepHead);
-			}
-		} else {
-			RedDelete(seSepHead);
-			SeSepHistoryChoice(reinterpret_cast<RedHistoryBANK*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) +
-			                                                   result * 0x10));
-			result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + result * 0x10 + 8);
-		}
-	} else {
+	if ((data[0] != 'S') || (data[1] != 'e') || (data[2] != 'S') || (data[3] != 'e') || (data[4] != 'p')) {
 		RedDelete(seSepHead);
 		if (m_ReportPrint != 0) {
 			OSReport(s__s_sSE_Sep_Header_was_broken__s_801e7b50, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
 			fflush(__files + 1);
 		}
-		result = 0;
+		return 0;
+	}
+
+	result = SearchSeSepSequence(*reinterpret_cast<int*>(data + 8));
+	if (result >= 0) {
+		RedDelete(seSepHead);
+		SeSepHistoryChoice(reinterpret_cast<RedHistoryBANK*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) +
+		                                                   result * 0x10));
+		result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + result * 0x10 + 8);
+	} else {
+		result = SeSepHeadAdd(seSepHead);
+		if (result == 0) {
+			RedDelete(seSepHead);
+		}
 	}
 
 	return result;
@@ -1547,26 +1547,26 @@ int CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 	int result;
 	char* data = reinterpret_cast<char*>(musicHead);
 
-	if ((data[0] == 'B') && (data[1] == 'G') && (data[2] == 'M')) {
-		result = SearchMusicSequence(static_cast<int>(*reinterpret_cast<short*>(data + 4)));
-		if (result < 0) {
-			result = MusicHeadAdd(musicHead);
-			if (result == 0) {
-				RedDelete(musicHead);
-			}
-		} else {
-			RedDelete(musicHead);
-			MusicHistoryChoice(reinterpret_cast<RedHistoryBANK*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) +
-			                                                    result * 0x10));
-			result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + result * 0x10 + 8);
-		}
-	} else {
+	if ((data[0] != 'B') || (data[1] != 'G') || (data[2] != 'M')) {
 		RedDelete(musicHead);
 		if (m_ReportPrint != 0) {
 			OSReport(s__s_sMusic_Header_was_broken__s_801e7c1d, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
 			fflush(__files + 1);
 		}
-		result = 0;
+		return 0;
+	}
+
+	result = SearchMusicSequence(static_cast<int>(*reinterpret_cast<short*>(data + 4)));
+	if (result >= 0) {
+		RedDelete(musicHead);
+		MusicHistoryChoice(reinterpret_cast<RedHistoryBANK*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) +
+		                                                    result * 0x10));
+		result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + result * 0x10 + 8);
+	} else {
+		result = MusicHeadAdd(musicHead);
+		if (result == 0) {
+			RedDelete(musicHead);
+		}
 	}
 
 	return result;

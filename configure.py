@@ -368,6 +368,19 @@ redsound_cflags = redsound_flags_from_profile(redsound_profile)
 redsound_cpp_exceptions_cflags = replace_flag_prefix(
     redsound_cflags, "-Cpp_exceptions ", "-Cpp_exceptions on"
 )
+# PAL RedSound objects carry exception tables across the library; keep the
+# source build configured the same way instead of faking extab data.
+redsound_cpp_exceptions_units = {
+    "RedCommand",
+    "RedDriver",
+    "RedEntry",
+    "RedExecute",
+    "RedMemory",
+    "RedMidiCtrl",
+    "RedSound",
+    "RedStream",
+    *parse_unit_env_set("FFCC_REDSOUND_CPP_EXCEPTIONS_UNITS"),
+}
 redsound_opt0_units = parse_unit_env_set("FFCC_REDSOUND_OPT0_UNITS")
 # RedStream's codegen is unchanged by inline-off, but its exception table
 # layout moves closer to the MAP/object target with this unit-local flag.
@@ -383,7 +396,8 @@ redsound_extra_flags = parse_flag_env_list("FFCC_REDSOUND_EXTRA_FLAGS")
 
 
 def redsound_unit_cflags(unit_name: str, *, cpp_exceptions: bool = False) -> List[str]:
-    flags = redsound_cpp_exceptions_cflags if cpp_exceptions else redsound_cflags
+    has_cpp_exceptions = cpp_exceptions or unit_name in redsound_cpp_exceptions_units
+    flags = redsound_cpp_exceptions_cflags if has_cpp_exceptions else redsound_cflags
     for prefix in redsound_remove_flag_prefixes:
         flags = [flag for flag in flags if not flag.startswith(prefix)]
     if unit_name in redsound_opt0_units:
@@ -445,7 +459,7 @@ config.libs = [
         Object(
             NonMatching,
             "RedSound/RedStream.cpp",
-            cflags=redsound_unit_cflags("RedStream", cpp_exceptions=True),
+            cflags=redsound_unit_cflags("RedStream"),
         ),
     ]),
     {

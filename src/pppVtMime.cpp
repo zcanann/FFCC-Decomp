@@ -40,7 +40,7 @@ struct VtMimeEnv
     void** sourceTable;
 };
 
-static const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
+extern "C" const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long size, void* stage, const char* file, int line);

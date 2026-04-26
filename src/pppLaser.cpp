@@ -62,7 +62,7 @@ void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
 
 }
 
-static const char s_pppLaser_cpp[] = "pppLaser.cpp";
+extern "C" const char s_pppLaser_cpp_801E3048[] = "pppLaser.cpp";
 
 struct LaserStep {
     s32 m_graphId;
@@ -267,7 +267,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
     emptyHistory = 0;
     if (work->m_points == 0) {
         work->m_points = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            (u32)step->m_payload[0x1e] * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppLaser_cpp), 0x7d);
+            (u32)step->m_payload[0x1e] * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppLaser_cpp_801E3048), 0x7d);
         memset(work->m_points, 0, (u32)step->m_payload[0x1e] * 0xc);
         emptyHistory = 1;
     }

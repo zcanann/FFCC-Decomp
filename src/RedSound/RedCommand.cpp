@@ -565,8 +565,7 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 	}
 
 	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
-	step = (frameCount * 0x60) / 0x3c + ((frameCount * 0x60) >> 0x1f);
-	step = step - (step >> 0x1f);
+	step = (frameCount * 0x60) / 0x3c;
 
 	do {
 		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
@@ -597,8 +596,7 @@ void SetSePan(int seId, int pan, int frameCount)
 	}
 
 	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
-	step = (frameCount * 0x60) / 0x3c + ((frameCount * 0x60) >> 0x1f);
-	step = step - (step >> 0x1f);
+	step = (frameCount * 0x60) / 0x3c;
 
 	do {
 		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
@@ -628,8 +626,7 @@ void SetSePitch(int seId, int pitch, int frameCount)
 	}
 
 	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
-	step = (frameCount * 0x60) / 0x3c + ((frameCount * 0x60) >> 0x1f);
-	step = step - (step >> 0x1f);
+	step = (frameCount * 0x60) / 0x3c;
 
 	do {
 		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {

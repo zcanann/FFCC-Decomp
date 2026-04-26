@@ -653,7 +653,7 @@ void _StreamPause(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int param_4, int param_5,
+int* _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int param_4, int param_5,
                        int param_6, int param_7, int param_8)
 {
     unsigned int interruptLevel;
@@ -676,6 +676,7 @@ void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
     }
     p_ExecCommandNow = nextPos;
     OSRestoreInterrupts(interruptLevel);
+    return nextPos;
 }
 
 /*
@@ -2202,8 +2203,8 @@ void CRedDriver::DisplayWaveInfo()
  */
 void CRedDriver::SetReverb(int bank, int kind)
 {
-    ::SetReverb(bank, *(int*)((char*)t_ReverbModeData + kind * 0x1c),
-                (int*)((char*)t_ReverbModeData + kind * 0x1c + 4));
+    int* params = t_ReverbModeData + kind * 7;
+    ::SetReverb(bank, params[0], params + 1);
 }
 
 /*

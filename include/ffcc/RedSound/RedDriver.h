@@ -32,7 +32,7 @@ void _StreamStop(int*);
 void _StreamPlay(int*);
 void _StreamVolume(int*);
 void _StreamPause(int*);
-void _EntryExecCommand(void (*)(int*), int, int, int, int, int, int, int);
+int* _EntryExecCommand(void (*)(int*), int, int, int, int, int, int, int);
 void _ExecuteCommand();
 unsigned int DeltaTimeSumup(unsigned char**);
 unsigned int GetMyEntryID();

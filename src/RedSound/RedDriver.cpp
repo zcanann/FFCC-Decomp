@@ -80,7 +80,7 @@ static int* p_MusicNextPlay;
 int m_CrossTime;
 int m_MasterMusicVolume;
 int m_MasterSEVolume;
-RedStreamDATA* p_Stream;
+RedStreamDATA* volatile p_Stream;
 static int m_DMAMode;
 int m_SeSkipStep;
 unsigned int* p_VoiceData;

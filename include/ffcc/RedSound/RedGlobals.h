@@ -41,7 +41,7 @@ extern int m_MusicPhraseStop;
 extern int m_CrossTime;
 extern int m_MasterMusicVolume;
 extern int m_MasterSEVolume;
-extern RedStreamDATA* p_Stream;
+extern RedStreamDATA* volatile p_Stream;
 extern int m_SeSkipStep;
 extern unsigned int* p_VoiceData;
 extern int p_EditorVoice[2];

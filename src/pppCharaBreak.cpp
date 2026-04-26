@@ -515,17 +515,16 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 {
     CharaBreakStep* stepData = (CharaBreakStep*)step;
     CharaBreakWork* workData = (CharaBreakWork*)work;
-    CChara::CMesh* mesh = (CChara::CMesh*)*(u8**)((u8*)model + 0xAC);
-    u32 meshCount = *(u32*)(*(u8**)((u8*)model + 0xA4) + 0xC);
-    u32 posQuant = *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34);
-    u32 normQuant = *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x38);
+    CharaBreakModelView* modelView = (CharaBreakModelView*)model;
+    CharaBreakModelData* modelData = modelView->m_data;
+    CChara::CMesh* mesh = (CChara::CMesh*)modelView->m_meshes;
     u32 meshIndex;
-    short threshold;
+    s32 threshold;
 
-    threshold = (short)((workData->m_value0 * (workData->m_bboxMax.y - workData->m_bboxMin.y)) *
-                        (float)((double)(1 << posQuant)));
+    threshold = (s32)((workData->m_value0 * (workData->m_bboxMax.y - workData->m_bboxMin.y)) *
+                      (float)((double)(1 << modelData->m_posQuant)));
 
-    for (meshIndex = 0; meshIndex < meshCount; meshIndex++) {
+    for (meshIndex = 0; meshIndex < modelData->m_meshCount; meshIndex++) {
         bool needsMtxUpdate = false;
         Mtx meshToWorld;
         CharaBreakMeshData* meshData = *(CharaBreakMeshData**)((u8*)mesh + 8);
@@ -562,10 +561,10 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             worldPos.y = srcPos->y;
                             worldPos.z = srcPos->z;
                             ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &transformedPos, worldPos,
-                                                                 posQuant);
+                                                                 modelData->m_posQuant);
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
                             ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, dst, transformedPos,
-                                                                 posQuant);
+                                                                 modelData->m_posQuant);
                         } else {
                             *dst = *srcPos;
                         }
@@ -589,7 +588,21 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         }
                     }
 
-                    polygon[0] = (flags[0] != 0 && flags[1] != 0 && flags[2] != 0) ? 1 : 0;
+                    if (flags[0] == 0) {
+                        polygon[0] = 0;
+                    } else {
+                        polygon[0] = 1;
+                        if (flags[1] == 0) {
+                            polygon[0] = 0;
+                        } else {
+                            polygon[0] = 1;
+                            if (flags[2] == 0) {
+                                polygon[0] = 0;
+                            } else {
+                                polygon[0] = 1;
+                            }
+                        }
+                    }
 
                     if (stepData->m_worldSpaceMode == 1 && polygon[0] != 0) {
                         *(S16Vec*)(polygon + 0x10) = transformed[0];
@@ -634,7 +647,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             pos.x = *(short*)(polygon + 0x10 + (i * 6));
                             pos.y = *(short*)(polygon + 0x12 + (i * 6));
                             pos.z = *(short*)(polygon + 0x14 + (i * 6));
-                            ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &verts[i], pos, posQuant);
+                            ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &verts[i], pos, modelData->m_posQuant);
                             PSVECAdd(&center, &verts[i], &center);
                         }
 
@@ -643,12 +656,12 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         normalB.x = *(short*)(polygon + 0xA);
                         normalB.y = *(short*)(polygon + 0xC);
                         normalB.z = *(short*)(polygon + 0xE);
-                        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &axis, normalB, normQuant);
+                        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &axis, normalB, modelData->m_normQuant);
 
                         normalA.x = *(short*)(polygon + 4);
                         normalA.y = *(short*)(polygon + 6);
                         normalA.z = *(short*)(polygon + 8);
-                        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &velocity, normalA, normQuant);
+                        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &velocity, normalA, modelData->m_normQuant);
                         PSVECScale(&velocity, &velocity, stepData->m_velocityBase + Math.RandF(stepData->m_velocityRange));
 
                         C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon[1]);
@@ -700,7 +713,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             verts[i].z += stepData->m_direction.z * workData->m_value3;
 
                             ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, (S16Vec*)(polygon + 0x10 + (i * 6)), verts[i],
-                                                                 posQuant);
+                                                                 modelData->m_posQuant);
                         }
                         *(short*)(polygon + 2) = *(short*)(polygon + 2) + 1;
                     }

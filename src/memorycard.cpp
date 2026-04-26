@@ -1849,23 +1849,27 @@ void CMemoryCardMan::EncodeData()
  */
 void CMemoryCardMan::DecodeData()
 {
-    const int rotAmount = 0x20 - (static_cast<signed char>(m_saveBuffer[0x11]) % 0x20);
     u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
-    int count = 0x5B6;
+    const int rotAmount = 0x20 - (reinterpret_cast<unsigned char*>(m_saveBuffer)[0x11] % 0x20);
 
-    do
+    for (int count = 0; count < 0x5B6; count++)
     {
-        ptr[0] = (ptr[0] << (rotAmount & 0x1F)) | (ptr[0] >> (0x20 - (rotAmount & 0x1F)));
-        ptr[1] = (ptr[1] << (rotAmount & 0x1F)) | (ptr[1] >> (0x20 - (rotAmount & 0x1F)));
-        ptr[2] = (ptr[2] << (rotAmount & 0x1F)) | (ptr[2] >> (0x20 - (rotAmount & 0x1F)));
-        ptr[3] = (ptr[3] << (rotAmount & 0x1F)) | (ptr[3] >> (0x20 - (rotAmount & 0x1F)));
-        ptr[4] = (ptr[4] << (rotAmount & 0x1F)) | (ptr[4] >> (0x20 - (rotAmount & 0x1F)));
-        ptr[5] = (ptr[5] << (rotAmount & 0x1F)) | (ptr[5] >> (0x20 - (rotAmount & 0x1F)));
-        ptr[6] = (ptr[6] << (rotAmount & 0x1F)) | (ptr[6] >> (0x20 - (rotAmount & 0x1F)));
+        u32 word = ptr[0];
+        ptr[0] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[1];
+        ptr[1] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[2];
+        ptr[2] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[3];
+        ptr[3] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[4];
+        ptr[4] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[5];
+        ptr[5] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[6];
+        ptr[6] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
         ptr += 7;
-        count--;
     }
-    while (count != 0);
 }
 
 void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)

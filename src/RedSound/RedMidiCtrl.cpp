@@ -427,7 +427,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
     seTrack = p_VoiceData;
     do {
         if ((RedTrackDATA*)*seTrack == track) {
-            ((unsigned char*)seTrack)[0x1a] &= (unsigned char)0xfa;
+            ((unsigned char*)seTrack)[0x1a] &= -6;
         }
         seTrack += 0x30;
     } while (seTrack < p_VoiceData + 0xc00);
@@ -969,14 +969,14 @@ void __MidiCtrl_KeyOffNote(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, Re
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_KeyOffVelocity(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* trackData = reinterpret_cast<int*>(track);
-
-    trackData[0] += 1;
+    *reinterpret_cast<int*>(track) += 1;
 
     KeyOffSet(control, keyOnData, track);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1159,21 +1159,21 @@ void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    u8* command;
-    int* trackData = (int*)track;
+    u32 pan;
 
-    command = (u8*)trackData[0];
-    trackData[0] = (int)(command + 1);
-    trackData[0x10] = ((u32)*command) << 0xc;
-    trackData[0x11] = 0;
-    trackData[0x12] = 0;
-    if (trackData[0x2d] == 0) {
-        trackData[0x33] = 0;
+    pan = *(*reinterpret_cast<u8**>(track))++;
+    reinterpret_cast<int*>(track)[0x10] = pan << 0xc;
+    reinterpret_cast<int*>(track)[0x11] = 0;
+    reinterpret_cast<int*>(track)[0x12] = 0;
+    if ((u32)reinterpret_cast<int*>(track)[0x2d] == 0) {
+        reinterpret_cast<int*>(track)[0x33] = 0;
     }
     m_ADataBufferSize |= 2;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

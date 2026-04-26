@@ -55,6 +55,7 @@ void (*gTHPSimpleOldAIDCallback)(void);
 s16* gTHPSimpleCurAudioBuffer;
 s16* gTHPSimpleLastAudioBuffer;
 s32 gTHPSimpleAudioSystem;
+static s32 sTHPSimpleVolume = 5;
 u16 gTHPSimpleVolumeTable[0x80] = {
     0x0000, 0x0002, 0x0008, 0x0012, 0x0020, 0x0032, 0x0049, 0x0063,
     0x0082, 0x00A4, 0x00CB, 0x00F5, 0x0124, 0x0157, 0x018E, 0x01C9,
@@ -75,6 +76,7 @@ u16 gTHPSimpleVolumeTable[0x80] = {
 };
 s16 WorkBuffer_32_[0x280] ATTRIBUTE_ALIGN(32);
 
+extern const char lbl_80331868[4];
 extern const float FLOAT_8033186C;
 
 /*
@@ -855,7 +857,7 @@ s32 THPSimpleOpen(const char* path)
     }
     memcpy(&SimpleControl.header, sReadBuffer, sizeof(THPHeader));
 
-    if (strcmp(SimpleControl.header.mMagic, "THP") != 0) {
+    if (strcmp(SimpleControl.header.mMagic, lbl_80331868) != 0) {
         DVDClose(&SimpleControl.fileInfo);
         return 0;
     }

@@ -382,11 +382,9 @@ void CMenuPcs::TmpArtiCtrl()
 	if (hasInput) {
 		uVar3 = 0;
 	} else {
-		if ((__cntlzw((unsigned int)Pad._448_4_) & 0x20) == 0) {
-			uVar3 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + 0x5c);
-		} else {
-			uVar3 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + 8);
-		}
+		int padIndex = hasInput;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		uVar3 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
 	}
 
 	if (uVar3 == 0) {

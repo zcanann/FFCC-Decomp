@@ -999,8 +999,8 @@ config.libs = [
             Object(
                 Matching,
                 "Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp",
-                mw_version="GC/2.7",
-                extra_cflags=["-char signed", "-RTTI on"],
+                mw_version="GC/2.6",
+                extra_cflags=["-char signed", "-RTTI on", "-str reuse,nopool,readonly"],
                 extab_padding=[0x02, 0x55],
             ),
             Object(
@@ -1250,6 +1250,7 @@ config.progress_categories = [
 config.progress_each_module = args.verbose
 # Optional extra arguments to `objdiff-cli report generate`
 config.progress_report_args = [
+    "--deduplicate",
     # Marks relocations as mismatching if the target value is different
     # Default is "functionRelocDiffs=none", which is most lenient
     "--config", "functionRelocDiffs=none",

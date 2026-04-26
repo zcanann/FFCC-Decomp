@@ -105,7 +105,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		default:
 			goto setCountdown;
 		case 0:
-			goto mode0Test;
+			goto mode0Dispatch;
 		mode0Body:
 			{
 				if (state->index >= entry->maxValue) {
@@ -162,9 +162,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 			}
 			goto setCountdown;
 		case 1:
-			goto mode1Init;
-		mode1Init:
-			goto mode1Test;
+			goto mode1Dispatch;
 		mode1Body:
 			{
 				f32 randValue = Math.RandF();
@@ -227,6 +225,10 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 
 exitStub:
 	goto functionEnd;
+mode0Dispatch:
+	goto mode0Test;
+mode1Dispatch:
+	goto mode1Test;
 functionEnd:
 	;
 }

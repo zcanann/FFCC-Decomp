@@ -966,7 +966,7 @@ void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
         numEntries = 0x100;
     }
 
-    GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutBase), GX_TL_IA8, static_cast<u16>(numEntries));
+    GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutBase), GX_TL_IA8, numEntries);
 
     numEntries = 0x10;
     if (m_format == 9) {
@@ -976,7 +976,7 @@ void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
     if (m_format == 9) {
         offset = 0x100;
     }
-    GXInitTlutObj(&m_tlutObj1, reinterpret_cast<void*>(tlutBase + offset * 2), GX_TL_IA8, static_cast<u16>(numEntries));
+    GXInitTlutObj(&m_tlutObj1, reinterpret_cast<void*>(tlutBase + offset * 2), GX_TL_IA8, numEntries);
 
     if (loadToGX != 0) {
         GXLoadTlut(&m_tlutObj0, GX_TLUT0);
@@ -1091,13 +1091,16 @@ void CTexture::SetExternalTlutColor(void* tlutData, int tlutOffset, int index, _
  */
 void CTexture::FlushTlut()
 {
-    int numEntries = 0;
+    int numEntries;
+
     if (m_format == 9) {
         numEntries = 0x100;
     } else if (m_format == 8) {
         numEntries = 0x10;
+    } else {
+        numEntries = 0;
     }
-    DCFlushRange(m_tlutData, static_cast<unsigned int>(numEntries << 2));
+    DCFlushRange(m_tlutData, numEntries << 2);
 }
 
 /*
@@ -1111,13 +1114,16 @@ void CTexture::FlushTlut()
  */
 void CTexture::FlushExternalTlut(void* tlutData)
 {
-    int numEntries = 0;
+    int numEntries;
+
     if (m_format == 9) {
         numEntries = 0x100;
     } else if (m_format == 8) {
         numEntries = 0x10;
+    } else {
+        numEntries = 0;
     }
-    DCFlushRange(tlutData, static_cast<unsigned int>(numEntries << 2));
+    DCFlushRange(tlutData, numEntries << 2);
 }
 
 /*

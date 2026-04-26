@@ -1,6 +1,8 @@
 #ifndef _FFCC_MAPANIM_H_
 #define _FFCC_MAPANIM_H_
 
+#include "ffcc/ptrarray.h"
+
 class CChunkFile;
 class CMapAnim;
 class CMapAnimNode;
@@ -29,6 +31,8 @@ public:
 
 class CMapAnim
 {
+    CPtrArray<CMapAnimNode*> mapAnimNodes;
+
 public:
     CMapAnim();
     ~CMapAnim();

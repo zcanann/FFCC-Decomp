@@ -16,11 +16,15 @@ extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
 extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
-extern const f64 DOUBLE_80331BE0 = 4503601774854144.0;
-extern "C" float FLOAT_80331BD0;
-extern "C" float FLOAT_80331BD4;
-extern "C" float FLOAT_80331BD8;
-extern "C" float FLOAT_80331BE8;
+extern "C" const float FLOAT_80331BD0 = 1.0f;
+extern "C" const float FLOAT_80331BD4 = 0.0f;
+extern "C" const float FLOAT_80331BD8 = 3.1415927f;
+extern "C" const double DOUBLE_80331BE0 = 4503601774854144.0;
+extern "C" const float FLOAT_80331BE8 = -1.0f;
+extern "C" const char DAT_80331bf0[] = "GMGR";
+extern "C" const float FLOAT_80331bf8 = 0.0f;
+extern "C" const float FLOAT_80331bfc = 1.0f;
+extern "C" const double DOUBLE_80331C00 = 4503599627370496.0;
 
 /*
  * --INFO--

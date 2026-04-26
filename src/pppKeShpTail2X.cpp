@@ -5,6 +5,7 @@
 extern "C" {
 extern const float kPppKeShpTail2XZero;
 extern const float kPppKeShpTail2XAlphaScale;
+extern const float FLOAT_80330508;
 extern int gPppCalcDisabled;
 }
 #include <dolphin/gx.h>
@@ -70,11 +71,6 @@ struct KeShpTail2XWork {
     Vec m_posHistory[31];
 };
 
-struct KeShpTail2XObject {
-    u8 _pad0[0xc];
-    _pppPObject m_obj;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80088698
@@ -128,11 +124,10 @@ void pppKeShpTail2XCon(void* obj, void* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2XUnkC* param_3)
+void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2XUnkC* param_3)
 {
     KeShpTail2XStep* step = (KeShpTail2XStep*)param_2;
     KeShpTail2XOffsets* offsets = (KeShpTail2XOffsets*)param_3;
-    KeShpTail2XObject* tailObj = (KeShpTail2XObject*)obj;
     KeShpTail2XWork* work;
     long** shapeTable;
     long* shapeEntry;
@@ -153,7 +148,6 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     pppFMATRIX drawMtx;
     Vec zeroVec ATTRIBUTE_ALIGN(8);
     Vec pos ATTRIBUTE_ALIGN(8);
-    Vec nextPos ATTRIBUTE_ALIGN(8);
     Vec seg ATTRIBUTE_ALIGN(8);
     float trailLen;
     float segLen;
@@ -165,6 +159,9 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     float segBaseX;
     float segBaseY;
     float segBaseZ;
+    float nextBaseX;
+    float nextBaseY;
+    float nextBaseZ;
     float drawScale;
     float trailStep;
     float scaleStepDelta;
@@ -194,25 +191,22 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
         colorStepB = (colorB - (float)step->m_colorEndB) / invCountMinusOne;
         colorStepA = (colorA - colorEndA) / invCountMinusOne;
     } else {
-        colorStepR = zero;
-        colorStepG = zero;
-        colorStepB = zero;
-        colorStepA = zero;
+        colorStepR = FLOAT_80330508;
+        colorStepG = FLOAT_80330508;
+        colorStepB = FLOAT_80330508;
+        colorStepA = FLOAT_80330508;
     }
 
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
     shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
     shapeEntry = (long*)((u8*)*shapeTable + *(s16*)((u8*)*shapeTable + ((u16)work->m_shapePrevFrame << 3) + 0x10));
 
-    pppCopyMatrix(localBase, tailObj->m_obj.m_localMatrix);
+    pppCopyMatrix(localBase, obj->pppPObject.m_localMatrix);
     pppUnitMatrix(drawMtx);
 
     drawScale = step->m_scaleStart;
     scaleStepDelta = (step->m_scaleStart - step->m_scaleEnd) / invCountMinusOne;
     trailStep = step->m_stepDistance * pppMngStPtr->m_scale.x;
-    if (trailStep <= zero) {
-        return;
-    }
 
     curIndex = work->m_head;
     nextIndex = curIndex + 1;
@@ -221,11 +215,15 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
         nextIndex = 0;
     }
 
-    pos = work->m_posHistory[curIndex];
-    nextPos = work->m_posHistory[nextIndex];
-    segDx = nextPos.x - pos.x;
-    segDy = nextPos.y - pos.y;
-    segDz = nextPos.z - pos.z;
+    segBaseX = work->m_posHistory[curIndex].x;
+    segBaseY = work->m_posHistory[curIndex].y;
+    segBaseZ = work->m_posHistory[curIndex].z;
+    nextBaseX = work->m_posHistory[nextIndex].x;
+    nextBaseY = work->m_posHistory[nextIndex].y;
+    nextBaseZ = work->m_posHistory[nextIndex].z;
+    segDx = nextBaseX - segBaseX;
+    segDy = nextBaseY - segBaseY;
+    segDz = nextBaseZ - segBaseZ;
     seg.x = segDx;
     seg.y = segDy;
     seg.z = segDz;
@@ -235,9 +233,6 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     segLen = PSVECDistance(&zeroVec, &seg);
     segRemain = segLen;
     segCursor = zero;
-    segBaseX = pos.x;
-    segBaseY = pos.y;
-    segBaseZ = pos.z;
 
     if (step->m_skipFirst != 0) {
         goto move_next_segment;
@@ -249,11 +244,11 @@ draw_loop:
     pos.z = segBaseZ;
 
     if (step->m_worldSpaceMode == 0) {
-        PSMTXScaleApply(localBase.value, *(Mtx*)((u8*)&tailObj->m_obj + 0x40), drawScale * pppMngStPtr->m_scale.x,
+        PSMTXScaleApply(localBase.value, obj->field_0x40.value, drawScale * pppMngStPtr->m_scale.x,
                         drawScale * pppMngStPtr->m_scale.y,
                         drawScale * pppMngStPtr->m_scale.z);
         PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
-        PSMTXCopy(*(Mtx*)((u8*)&tailObj->m_obj + 0x40), drawMtx.value);
+        PSMTXCopy(obj->field_0x40.value, drawMtx.value);
     } else if (step->m_worldSpaceMode == 1) {
         pppUnitMatrix(drawMtx);
         drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);
@@ -321,21 +316,22 @@ advance_segment:
     }
 
 move_next_segment:
-    pos = nextPos;
     trailLen = segCursor - segLen;
-    nextPos = work->m_posHistory[nextIndex];
-    segDx = nextPos.x - pos.x;
-    segDy = nextPos.y - pos.y;
-    segDz = nextPos.z - pos.z;
+    segBaseX = nextBaseX;
+    segBaseY = nextBaseY;
+    segBaseZ = nextBaseZ;
+    nextBaseX = work->m_posHistory[nextIndex].x;
+    nextBaseY = work->m_posHistory[nextIndex].y;
+    nextBaseZ = work->m_posHistory[nextIndex].z;
+    segDx = nextBaseX - segBaseX;
+    segDy = nextBaseY - segBaseY;
+    segDz = nextBaseZ - segBaseZ;
     seg.x = segDx;
     seg.y = segDy;
     seg.z = segDz;
     segLen = PSVECDistance(&zeroVec, &seg);
     segCursor = trailLen;
     segRemain += segLen;
-    segBaseX = pos.x;
-    segBaseY = pos.y;
-    segBaseZ = pos.z;
     goto draw_loop;
 }
 
@@ -348,11 +344,10 @@ move_next_segment:
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2XUnkC* param_3)
+void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2XUnkC* param_3)
 {
     KeShpTail2XStep* step;
     KeShpTail2XWork* work;
-    KeShpTail2XObject* tailObj;
     pppFMATRIX outMatrix;
     Vec historyPos ATTRIBUTE_ALIGN(8);
     Vec initPos ATTRIBUTE_ALIGN(8);
@@ -363,16 +358,15 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     }
 
     step = (KeShpTail2XStep*)param_2;
-    tailObj = (KeShpTail2XObject*)obj;
     work = (KeShpTail2XWork*)((u8*)obj + ((KeShpTail2XOffsets*)param_3)->m_serializedDataOffsets[0] + 0x80);
 
-    if (tailObj->m_obj.m_graphId == 0) {
+    if (obj->pppPObject.m_graphId == 0) {
         if (step->m_worldSpaceMode == 0) {
-            initPos.x = tailObj->m_obj.m_localMatrix.value[0][3];
-            initPos.y = tailObj->m_obj.m_localMatrix.value[1][3];
-            initPos.z = tailObj->m_obj.m_localMatrix.value[2][3];
+            initPos.x = obj->pppPObject.m_localMatrix.value[0][3];
+            initPos.y = obj->pppPObject.m_localMatrix.value[1][3];
+            initPos.z = obj->pppPObject.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
-            pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, tailObj->m_obj.m_localMatrix);
+            pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
             initPos.x = outMatrix.value[0][3];
             initPos.y = outMatrix.value[1][3];
             initPos.z = outMatrix.value[2][3];
@@ -394,11 +388,11 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     work->m_head--;
 
     if (step->m_worldSpaceMode == 0) {
-        pos.x = tailObj->m_obj.m_localMatrix.value[0][3];
-        pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
-        pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
+        pos.x = obj->pppPObject.m_localMatrix.value[0][3];
+        pos.y = obj->pppPObject.m_localMatrix.value[1][3];
+        pos.z = obj->pppPObject.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
-        pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, tailObj->m_obj.m_localMatrix);
+        pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
         pos.z = outMatrix.value[2][3];

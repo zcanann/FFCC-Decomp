@@ -89,19 +89,20 @@ extern double DOUBLE_80333100;
 extern double DOUBLE_80333118;
 extern double DOUBLE_80333120;
 
+static short DAT_8032eee8 = 0;
+static unsigned char DAT_8032eeea = 0;
+static unsigned char DAT_8032eeeb = 0;
+static unsigned char DAT_8032eeec = 0;
+static signed char DAT_8032eeed = 0;
+static unsigned char DAT_8032eeee = 0;
+static int DAT_8032eef0 = 0;
+static int DAT_8032eef4 = 0;
+static int DAT_8032eef8 = 0;
+static int DAT_8032eefc = 0;
+static int DAT_8032ef00 = 0;
+static char s_ReplyStr[0x80];
+
 namespace {
-unsigned char DAT_8032eeea = 0;
-short DAT_8032eee8 = 0;
-unsigned char DAT_8032eeec = 0;
-unsigned char DAT_8032eeeb = 0;
-int DAT_8032eef0 = 0;
-unsigned char DAT_8032eeee = 0;
-signed char DAT_8032eeed = 0;
-int DAT_8032eef4 = 0;
-int DAT_8032eef8 = 0;
-int DAT_8032eefc = 0;
-int DAT_8032ef00 = 0;
-char s_ReplyStr[0x80];
 static const char s_menu_letter_cpp[] = "menu_letter.cpp";
 static const char s_letterItemInfoFmt[] = "%s%d%s%s";
 
@@ -2300,11 +2301,14 @@ void CMenuPcs::LetterDrawPageMark(int pageMark)
  */
 void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
 {
-	DAT_8032eef0 = itemIndex;
+	unsigned int caravanWork = Game.m_scriptFoodBase[0];
+
 	if (DAT_8032eeed == 0) {
 		DAT_8032eeee = static_cast<unsigned char>(itemIndex);
-		DAT_8032eef0 = *reinterpret_cast<short*>(Game.m_scriptFoodBase[0] + itemIndex * 2 + 0xB6);
+		caravanWork += itemIndex * 2;
+		DAT_8032eef0 = *reinterpret_cast<short*>(caravanWork + 0xB6);
+	} else {
+		DAT_8032eef0 = itemIndex;
 	}
 	DAT_8032eef4 = flag;
 }
-

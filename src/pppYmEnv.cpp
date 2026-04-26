@@ -491,24 +491,25 @@ void DisableIndWarp(_GXTevStageID tevStage, _GXIndTexStageID indStage)
  */
 void SetUpPaletteEnv(CTexture* texture)
 {
-    GXColorS10 tevColor2;
-    GXColorS10 tevColor3;
+    GXColor tevColor3;
+    GXColor tevColor2;
     CTextureLite* textureLite;
 
     GXSetNumTevStages(3);
     GXSetNumTexGens(1);
 
-    tevColor2.r = -1;
-    tevColor2.g = 0;
+    tevColor2.r = 0xFF;
+    tevColor2.g = 0xFF;
     tevColor2.b = 0;
-    tevColor2.a = -1;
-    GXSetTevColorS10((GXTevRegID)2, tevColor2);
+    tevColor2.a = 0;
 
     tevColor3.r = 0;
     tevColor3.g = 0;
-    tevColor3.b = 0;
-    tevColor3.a = -1;
-    GXSetTevColorS10((GXTevRegID)3, tevColor3);
+    tevColor3.b = 0xFF;
+    tevColor3.a = 0xFF;
+
+    GXSetTevColor((GXTevRegID)2, tevColor2);
+    GXSetTevColor((GXTevRegID)3, tevColor3);
 
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
 
@@ -659,15 +660,15 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displayList, unsigned long displayListSize,
                        _GXTexObj* blendTexObj, unsigned char mode)
 {
-    static const unsigned char s_texObjIndices[] = {0, 1, 2, 3, 4, 0, 1, 2, 3, 4};
-    static const unsigned char s_xAxisRotIndices[] = {0, 0, 0, 1, 1, 0, 0, 0, 1, 1};
-    static const unsigned char s_yAxisRotIndices[] = {0, 1, 0, 0, 1, 0, 1, 0, 0, 1};
-    static const float s_xAxisAngles[] = {0.0f, 90.0f, 180.0f, 270.0f};
-    static const unsigned char s_xAxisIds[] = {'x', 'x', 'x', 'x'};
-    static const float s_yAxisAngles[] = {0.0f, 1.0f};
-    static const Vec s_cameraPos = {0.0f, 0.0f, 0.0f};
-    static const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
-    static const Vec s_cameraLook = {0.0f, 0.0f, -1.0f};
+    const unsigned char s_texObjIndices[] = {0, 1, 2, 3, 4, 0, 1, 2, 3, 4};
+    const unsigned char s_xAxisRotIndices[] = {0, 0, 0, 1, 1, 0, 0, 0, 1, 1};
+    const unsigned char s_yAxisRotIndices[] = {0, 1, 0, 0, 1, 0, 1, 0, 0, 1};
+    const float s_xAxisAngles[] = {0.0f, 90.0f, 180.0f, 270.0f};
+    const unsigned char s_xAxisIds[] = {'x', 'x', 'x', 'x'};
+    const float s_yAxisAngles[] = {0.0f, 1.0f};
+    const Vec s_cameraPos = {0.0f, 0.0f, 0.0f};
+    const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
+    const Vec s_cameraLook = {0.0f, 0.0f, -1.0f};
 
     const unsigned short texWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned short texHeight = GXGetTexObjHeight(targetTexObj);

@@ -64,27 +64,29 @@ void CPad::Frame()
 	u16* puVar18;
 	int iVar19;
 	CPad::Gba local_98[4];
-	u16 local_88[24];
+	PADStatus local_88[4];
 	u8* self = reinterpret_cast<u8*>(this);
 
-	PADRead(reinterpret_cast<PADStatus*>(local_88));
-	PADClamp(reinterpret_cast<PADStatus*>(local_88));
-	memcpy(g_pad, local_88, 0x30);
+	PADRead(local_88);
+	PADClamp(local_88);
+	memcpy(g_pad, local_88, sizeof(local_88));
 	*reinterpret_cast<u32*>(self + 0x1C4) = 0;
 	uVar17 = 0;
+	CPad::Gba* gba = local_98;
 	puVar18 = reinterpret_cast<u16*>(local_98);
 	do
 	{
 		iVar6 = SIProbe(uVar17);
-		local_98[uVar17].connected = iVar6 == 0x40000;
-		local_98[uVar17].ctrlMode = Joybus.GetCtrlMode(uVar17);
-		local_98[uVar17].noController = local_98[uVar17].connected && (local_98[uVar17].ctrlMode == 0);
-		local_98[uVar17].button = 0;
-		if (local_98[uVar17].connected)
+		gba->connected = __cntlzw(0x40000 - iVar6);
+		gba->ctrlMode = Joybus.GetCtrlMode(uVar17);
+		gba->noController = gba->connected && (gba->ctrlMode == 0);
+		gba->button = 0;
+		if (gba->connected)
 		{
-			local_98[uVar17].button = Joybus.GetPadData(uVar17);
+			gba->button = Joybus.GetPadData(uVar17);
 		}
 		uVar17 = uVar17 + 1;
+		gba++;
 	} while (uVar17 < 4);
 
 	if ((_1b0_4_ != 0) && ((iVar14 = _1bc_4_), iVar14 >= 0))
@@ -95,7 +97,7 @@ void CPad::Frame()
 			{
 				iVar6 = 0;
 				iVar14 = 0;
-				puVar7 = local_88;
+				puVar7 = reinterpret_cast<u16*>(local_88);
 				puVar13 = reinterpret_cast<u16*>(local_98);
 				for (iVar19 = 0; iVar19 < 4; iVar19++)
 				{
@@ -136,7 +138,7 @@ void CPad::Frame()
 		{
 			iVar6 = 0;
 			iVar19 = 0;
-			puVar7 = local_88;
+			puVar7 = reinterpret_cast<u16*>(local_88);
 			puVar13 = reinterpret_cast<u16*>(local_98);
 			for (iVar11 = 0; iVar11 < 4; iVar11++)
 			{
@@ -172,7 +174,7 @@ void CPad::Frame()
 		}
 	}
 
-	puVar13 = local_88;
+	puVar13 = reinterpret_cast<u16*>(local_88);
 	puVar10 = reinterpret_cast<u16*>(self + 0x154);
 	uVar16 = 0;
 	uVar17 = 0;
@@ -181,28 +183,31 @@ void CPad::Frame()
 	{
 		cVar9 = *reinterpret_cast<s8*>(puVar7 + 5);
 		uVar15 = 0x80000000 >> uVar17;
-		if (cVar9 == -1)
+		if (cVar9 != -1)
+		{
+			if (cVar9 >= -1)
+			{
+				if (cVar9 < 1)
+				{
+					_1a8_4_ = _1a8_4_ | uVar15;
+				}
+			}
+			else if (cVar9 == -3)
+			{
+				_1a8_4_ = _1a8_4_ | uVar15;
+			}
+			else if (cVar9 > -4)
+			{
+				_1a8_4_ = _1a8_4_ & ~uVar15;
+			}
+		}
+		else
 		{
 			if (static_cast<u8>(Joybus.GBAReady(uVar17)) == 0)
 			{
 				uVar16 = uVar16 | uVar15;
 			}
 			_1a8_4_ = _1a8_4_ & ~uVar15;
-		}
-		else if (cVar9 < -1)
-		{
-			if (cVar9 == -3)
-			{
-				_1a8_4_ = _1a8_4_ | uVar15;
-			}
-			else if (-4 < cVar9)
-			{
-				_1a8_4_ = _1a8_4_ & ~uVar15;
-			}
-		}
-		else if (cVar9 < 1)
-		{
-			_1a8_4_ = _1a8_4_ | uVar15;
 		}
 		uVar17 = uVar17 + 1;
 		puVar7 = puVar7 + 6;
@@ -268,19 +273,19 @@ void CPad::Frame()
 					*reinterpret_cast<u32*>(iVar6 + 0x40) = 0;
 					if ((*reinterpret_cast<s8*>(iVar6 + 0x44) == 0) || reinterpret_cast<CPad::Gba*>(puVar18)->noController)
 					{
-						if (!reinterpret_cast<CPad::Gba*>(puVar18)->noController)
-						{
-							*puVar12 = *puVar13;
-						}
-						else
+						if (reinterpret_cast<CPad::Gba*>(puVar18)->noController)
 						{
 							*puVar12 = puVar18[1];
 						}
-						if (*reinterpret_cast<u8*>(puVar13 + 3) > 99)
+						else
+						{
+							*puVar12 = *puVar13;
+						}
+						if (*reinterpret_cast<u8*>(puVar13 + 3) >= 100)
 						{
 							*puVar12 = static_cast<u16>(*puVar12 | PAD_TRIGGER_L);
 						}
-						if (*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar13) + 7) > 99)
+						if (*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar13) + 7) >= 100)
 						{
 							*puVar12 = static_cast<u16>(*puVar12 | PAD_TRIGGER_R);
 						}

@@ -1,16 +1,9 @@
 #include "ffcc/pppPObjPoint.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
-
-
-typedef struct PObjPointEntry {
-    u32 unk0;
-    u32 vecOffset;
-    u32 unk8;
-    u32 unkC;
-} PObjPointEntry;
 
 /*
  * --INFO--
@@ -36,9 +29,8 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
         if (objData->field_4 == -1) {
             vecPtr = (u8*)gPppDefaultValueBuffer;
         } else {
-            PObjPointEntry* table = *(PObjPointEntry**)((u8*)pppMngStPtr + 0xD4);
             u8* data = (u8*)objData->data;
-            u32 vecOffset = table[objData->field_4].vecOffset;
+            u32 vecOffset = pppMngStPtr->m_pppPDataVals[objData->field_4].m_nextSpawnTime;
             vecPtr = data + 0x80;
             vecPtr += vecOffset;
         }

@@ -558,20 +558,23 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 void SetSeVolume(int seId, int volume, int frameCount, int mode)
 {
 	int* track;
-	int step;
-	int targetVolume = (volume << 0xc) | 0x800;
+	volume <<= 12;
+	volume |= 0x800;
 
 	if (frameCount < 1) {
 		frameCount = 1;
 	}
 
 	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
-	step = (frameCount * 0x60) / 0x3c;
+	frameCount *= 0x60;
+	frameCount /= 0x3c;
 
 	do {
-		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
-			track[0x14] = (targetVolume - track[0x13]) / step;
-			track[0x15] = step;
+		if (((u32)*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
+			int delta = volume - track[0x13];
+			delta /= frameCount;
+			track[0x14] = delta;
+			track[0x15] = frameCount;
 			track[0x16] = mode;
 		}
 		track += 0x55;
@@ -590,20 +593,23 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 void SetSePan(int seId, int pan, int frameCount)
 {
 	int* track;
-	int step;
-	int targetPan = (pan << 0xc) | 0x800;
+	pan <<= 12;
+	pan |= 0x800;
 
 	if (frameCount < 1) {
 		frameCount = 1;
 	}
 
 	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
-	step = (frameCount * 0x60) / 0x3c;
+	frameCount *= 0x60;
+	frameCount /= 0x3c;
 
 	do {
-		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
-			track[0x11] = (targetPan - track[0x10]) / step;
-			track[0x12] = step;
+		if (((u32)*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
+			int delta = pan - track[0x10];
+			delta /= frameCount;
+			track[0x11] = delta;
+			track[0x12] = frameCount;
 		}
 		track += 0x55;
 	} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
@@ -621,20 +627,22 @@ void SetSePan(int seId, int pan, int frameCount)
 void SetSePitch(int seId, int pitch, int frameCount)
 {
 	int* track;
-	int step;
-	int targetPitch = (pitch << 0xc) | 0x800;
+	pitch <<= 12;
+	pitch |= 0x800;
 
 	if (frameCount < 1) {
 		frameCount = 1;
 	}
 
 	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
-	step = (frameCount * 0x60) / 0x3c;
+	frameCount *= 0x60;
+	frameCount /= 0x3c;
 
 	do {
-		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
-			track[0x18] = (targetPitch - track[0x17]) / step;
-			track[0x19] = step;
+		if (((u32)*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
+			int delta = pitch - track[0x17];
+			track[0x18] = delta / frameCount;
+			track[0x19] = frameCount;
 		}
 		track += 0x55;
 	} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));

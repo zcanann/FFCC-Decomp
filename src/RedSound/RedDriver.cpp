@@ -167,6 +167,7 @@ enum {
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void _SetSoundMode(int* param_1)
 {
     m_SoundMode = *param_1;
@@ -175,12 +176,14 @@ void _SetSoundMode(int* param_1)
     } else {
         OSGetSoundMode(1);
     }
-    if ((m_SoundPlayMode = m_SoundMode) != 2) {
-        AXSetMode(0);
-    } else {
+    m_SoundPlayMode = m_SoundMode;
+    if (m_SoundPlayMode == 2) {
         AXSetMode(2);
+    } else {
+        AXSetMode(0);
     }
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -719,6 +722,7 @@ void _ExecuteCommand()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 unsigned int DeltaTimeSumup(unsigned char** buffer)
 {
 	unsigned int deltaTime = 0;
@@ -735,6 +739,7 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
 
 	return deltaTime;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -743,9 +748,10 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
  */
 unsigned int GetMyEntryID()
 {
-    m_SequencialID = (m_SequencialID + 1) & 0x7fffffff;
+    m_SequencialID++;
+    m_SequencialID &= 0x7fffffff;
     if (m_SequencialID == 0) {
-        m_SequencialID = 1;
+        m_SequencialID++;
     }
     return m_SequencialID;
 }
@@ -764,10 +770,12 @@ struct RedSleepAlarm {
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void _MyAlarmHandler(OSAlarm* param_1, OSContext*)
 {
     OSResumeThread(((RedSleepAlarm*)param_1)->thread);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1385,6 +1393,7 @@ void CRedDriver::End()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int CRedDriver::GetProgramTime()
 {
     int sum = 0;
@@ -1396,6 +1405,7 @@ int CRedDriver::GetProgramTime()
     } while (p < p_Tick + 100);
     return sum;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

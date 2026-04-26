@@ -105,14 +105,14 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     Vec2d uvMin;
     Vec2d uvMax;
     u16 grid;
+    float worldX;
+    float worldY;
+    float worldZ;
     float uStep;
     float vStep;
     float phaseLerp;
     u32 drawColor;
     u8* drawColorBytes;
-    float worldX;
-    float worldY;
-    float worldZ;
 
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
@@ -199,18 +199,18 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
             vtx0.y += worldY;
             vtx1.y += worldY;
-            vtx2.y += worldY;
             vtx3.y += worldY;
+            vtx2.y += worldY;
 
             if (FLOAT_80330af4 != work->m_phase) {
                 vtx0.x = phaseLerp * (worldX - vtx0.x) + vtx0.x;
                 vtx0.z = phaseLerp * (worldZ - vtx0.z) + vtx0.z;
                 vtx1.x = phaseLerp * (worldX - vtx1.x) + vtx1.x;
                 vtx1.z = phaseLerp * (worldZ - vtx1.z) + vtx1.z;
-                vtx2.x = phaseLerp * (worldX - vtx2.x) + vtx2.x;
-                vtx2.z = phaseLerp * (worldZ - vtx2.z) + vtx2.z;
                 vtx3.x = phaseLerp * (worldX - vtx3.x) + vtx3.x;
                 vtx3.z = phaseLerp * (worldZ - vtx3.z) + vtx3.z;
+                vtx2.x = phaseLerp * (worldX - vtx2.x) + vtx2.x;
+                vtx2.z = phaseLerp * (worldZ - vtx2.z) + vtx2.z;
             }
 
             GXPosition3f32(vtx0.x, vtx0.y, vtx0.z);

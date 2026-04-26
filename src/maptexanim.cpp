@@ -1,4 +1,6 @@
+#define FFCC_PTRARRAY_DECL_ONLY
 #include "ffcc/maptexanim.h"
+#undef FFCC_PTRARRAY_DECL_ONLY
 #include "ffcc/chunkfile.h"
 #include "ffcc/map.h"
 #include "ffcc/memory.h"

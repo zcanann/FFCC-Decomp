@@ -170,10 +170,8 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreath
 extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
 {
     VBreathModel* state = (VBreathModel*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
-    float zero;
-
     PSMTXIdentity(state->m_matrix);
-    zero = 0.0f;
+    const float& zero = kPppBreathModelZero;
 
     state->m_direction.z = zero;
     state->m_direction.y = zero;
@@ -783,14 +781,13 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
     unsigned char clampScale = *(unsigned char*)(breath + 0xC8);
     if (clampScale == 0) {
         float zero = kPppBreathModelZero;
-        float start = *(float*)(breath + 0xA0);
-        if (zero < start) {
+        if (zero < *(float*)(breath + 0xA0)) {
             if (*(float*)(breath + 0xA4) < zero) {
                 if (particle[11].z < zero) {
                     particle[11].z = zero;
                 }
             }
-        } else if (start < zero) {
+        } else if (*(float*)(breath + 0xA0) < zero) {
             if ((zero < *(float*)(breath + 0xA4)) && (zero < particle[11].z)) {
                 particle[11].z = zero;
             }

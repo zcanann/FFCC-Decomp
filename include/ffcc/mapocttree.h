@@ -29,8 +29,8 @@ public:
 	float m_boundMaxZ;      // 0x14
 	u32 m_unk18;            // 0x18
 	COctNode* m_children[8]; // 0x1C
-	u16 m_meshStart;        // 0x3C
-	u16 m_meshCount;        // 0x3E
+	u16 m_meshCount;        // 0x3C
+	u16 m_meshStart;        // 0x3E
 	u32 m_drawFlags;        // 0x40
 	u32 m_lightFlags;       // 0x44
 	u32 m_shadowFlags;      // 0x48

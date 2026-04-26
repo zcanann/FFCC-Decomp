@@ -33,6 +33,15 @@ struct Vec4d {
 	float w;
 };
 
+struct VYmDeformationScreen {
+	float m_depth;
+	s16 m_angle;
+	u8 m_direction;
+	u8 m_pad;
+	float m_scale;
+	float m_values[5];
+};
+
 struct YmDeformationScreenData {
 	char pad[0xc];
 	int* m_serializedDataOffsets;
@@ -57,15 +66,15 @@ struct _pppEnvStYmDeformationScreen {
 	CMapMesh** m_mapMeshPtr;
 };
 
-extern float FLOAT_80330670;
-extern float FLOAT_80330674;
-extern float FLOAT_80330678;
-extern float FLOAT_8033067C;
-extern float FLOAT_80330680;
-extern float FLOAT_80330684;
-extern float FLOAT_80330688;
-extern float FLOAT_8033068C;
-extern float FLOAT_80330690;
+extern const float FLOAT_80330670;
+extern const float FLOAT_80330674;
+extern const float FLOAT_80330678;
+extern const float FLOAT_8033067C;
+extern const float FLOAT_80330680;
+extern const float FLOAT_80330684;
+extern const float FLOAT_80330688;
+extern const float FLOAT_8033068C;
+extern const float FLOAT_80330690;
 
 void pppSetFpMatrix(_pppMngSt*);
 
@@ -99,7 +108,8 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, void* param3)
 {
 	YmDeformationScreenStep* step = (YmDeformationScreenStep*)param2;
-	float* work = (float*)((char*)param1 + 0x80 + ((YmDeformationScreenData*)param3)->m_serializedDataOffsets[2]);
+	VYmDeformationScreen* work =
+		(VYmDeformationScreen*)((char*)param1 + 0x80 + ((YmDeformationScreenData*)param3)->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	GXTexObj backTexObj;
 	Mtx identity;
@@ -126,7 +136,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	color.rgba[2] = 0x40;
 	color.rgba[3] = 0x40;
 	pppSetBlendMode(0);
-	pppSetDrawEnv(&color, (pppFMATRIX*)0, 0.0f, (u8)0, (u8)0, (u8)0, (u8)0, (u8)1, (u8)1, (u8)0);
+	pppSetDrawEnv(&color, (pppFMATRIX*)0, FLOAT_80330670, (u8)0, (u8)0, (u8)0, (u8)0, (u8)1, (u8)1, (u8)0);
 	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 	GXSetNumTexGens(2);
 	GXSetNumChans(1);
@@ -166,22 +176,22 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 		_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
 		GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
 
-		depth = work[0];
+		depth = work->m_depth;
 		GXSetNumIndStages(1);
 		GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD0, GX_TEXMAP1);
 		GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
 		GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 
-		if ((*(short*)(work + 1) == 0) || (*(short*)(work + 1) == 0x168)) {
-			*(short*)(work + 1) = 1;
+		if ((work->m_angle == 0) || (work->m_angle == 0x168)) {
+			work->m_angle = 1;
 		}
 
-		PSMTXRotRad(rot, 'z', FLOAT_80330684 * (float)(*(short*)(work + 1)));
-		indMtx[0][0] = rot[0][0] * work[2];
-		indMtx[0][1] = rot[0][1] * work[2];
+		PSMTXRotRad(rot, 'z', FLOAT_80330684 * (float)work->m_angle);
+		indMtx[0][0] = rot[0][0] * work->m_scale;
+		indMtx[0][1] = rot[0][1] * work->m_scale;
 		indMtx[0][2] = 0.0f;
-		indMtx[1][0] = rot[1][0] * work[2];
-		indMtx[1][1] = rot[1][1] * work[2];
+		indMtx[1][0] = rot[1][0] * work->m_scale;
+		indMtx[1][1] = rot[1][1] * work->m_scale;
 		indMtx[1][2] = 0.0f;
 		GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 	}
@@ -212,7 +222,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 
 	Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 224, 640, 224, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
-	depth = work[0];
+	depth = work->m_depth;
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
 	GXPosition3f32(FLOAT_80330670, FLOAT_8033068C, depth);
 	GXColor1u32(*(u32*)color.rgba);
@@ -251,8 +261,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 	Vec4d outVec;
 	Vec4d inVec;
 	Mtx44 screenMtx;
-	float* work;
-	u8* workBytes;
+	VYmDeformationScreen* work;
 	int* serializedDataOffsets;
 	float cameraX;
 	float cameraY;
@@ -262,24 +271,25 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 	if (gPppCalcDisabled == 0) {
 		step = (YmDeformationScreenStep*)param2;
 		serializedDataOffsets = ((YmDeformationScreenData*)param3)->m_serializedDataOffsets;
-		work = (float*)((char*)param1 + 0x80 + serializedDataOffsets[2]);
-		workBytes = (u8*)work;
+		work = (VYmDeformationScreen*)((char*)param1 + 0x80 + serializedDataOffsets[2]);
 
 		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-			param1, step->m_graphId, work + 2, work + 3, work + 4, step->m_initWOrk, &step->m_stepValue, &step->m_arg3);
+			param1, step->m_graphId, &work->m_scale, &work->m_values[0], &work->m_values[1], step->m_initWOrk,
+			&step->m_stepValue, &step->m_arg3);
 		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-			param1, step->m_graphId, work + 5, work + 6, work + 7, step->m_payload0, &step->m_payload1, &step->m_payload2);
+			param1, step->m_graphId, &work->m_values[2], &work->m_values[3], &work->m_values[4], step->m_payload0,
+			&step->m_payload1, &step->m_payload2);
 
 		if (gPppInConstructor == 0) {
-			if (workBytes[6] != 0) {
-				*(s16*)(workBytes + 4) += (int)work[5];
-				if (*(s16*)(workBytes + 4) > step->m_payload3) {
-					workBytes[6] = 0;
+			if (work->m_direction != 0) {
+				work->m_angle += (int)work->m_values[2];
+				if (work->m_angle > step->m_payload3) {
+					work->m_direction = 0;
 				}
 			} else {
-				*(s16*)(workBytes + 4) -= (int)work[5];
-				if (*(s16*)(workBytes + 4) < -step->m_payload3) {
-					workBytes[6] = 1;
+				work->m_angle -= (int)work->m_values[2];
+				if (work->m_angle < -step->m_payload3) {
+					work->m_direction = 1;
 				}
 			}
 
@@ -296,7 +306,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 						outVec.z /= outW;
 					}
 				}
-				work[0] = outVec.z;
+				work->m_depth = outVec.z;
 			}
 
 			if ((s32)Game.m_currentSceneId == 7) {
@@ -342,15 +352,15 @@ void pppDestructYmDeformationScreen(pppYmDeformationScreen*, void*)
 void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
 {
 	float zero = FLOAT_80330670;
-	int offset = ((YmDeformationScreenParam*)param2)->offsetData->offset;
-	char* basePtr = (char*)obj + offset + 0x80;
+	VYmDeformationScreen* work =
+		(VYmDeformationScreen*)((char*)obj + ((YmDeformationScreenParam*)param2)->offsetData->offset + 0x80);
 
-	*(float*)(basePtr + 0x10) = zero;
-	*(float*)(basePtr + 0xc) = zero;
-	*(float*)(basePtr + 0x8) = zero;
-	*(float*)(basePtr + 0x1c) = zero;
-	*(float*)(basePtr + 0x18) = zero;
-	*(float*)(basePtr + 0x14) = zero;
+	work->m_values[1] = zero;
+	work->m_values[0] = zero;
+	work->m_scale = zero;
+	work->m_values[4] = zero;
+	work->m_values[3] = zero;
+	work->m_values[2] = zero;
 }
 
 /*
@@ -364,18 +374,20 @@ void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
  */
 void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
 {
-	int offset = ((YmDeformationScreenParam*)param2)->offsetData->offset;
-	char* basePtr = (char*)obj + offset + 0x80;
-	float zero = 0.0f;
+	YmDeformationScreenOffsetData* offsetData = ((YmDeformationScreenParam*)param2)->offsetData;
+	short angle = 0;
+	char direction = 1;
+	float zero = FLOAT_80330670;
+	VYmDeformationScreen* work = (VYmDeformationScreen*)((char*)obj + offsetData->offset + 0x80);
 
-	*(short*)(basePtr + 0x4) = 0;
-	*(char*)(basePtr + 0x6) = 1;
-	*(float*)(basePtr + 0x10) = zero;
-	*(float*)(basePtr + 0xc) = zero;
-	*(float*)(basePtr + 0x8) = zero;
-	*(float*)(basePtr + 0x1c) = zero;
-	*(float*)(basePtr + 0x18) = zero;
-	*(float*)(basePtr + 0x14) = zero;
+	work->m_angle = angle;
+	work->m_direction = direction;
+	work->m_values[1] = zero;
+	work->m_values[0] = zero;
+	work->m_scale = zero;
+	work->m_values[4] = zero;
+	work->m_values[3] = zero;
+	work->m_values[2] = zero;
 }
 
 /*

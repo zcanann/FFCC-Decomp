@@ -1053,24 +1053,25 @@ unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
  */
 float CMath::DstRot(float from, float to)
 {
-    const float s0 = (float)sin((double)from);
-    const float c0 = (float)cos((double)from);
-    const float s1 = (float)sin((double)to);
-    const float c1 = (float)cos((double)to);
-    const float dot = s0 * s1 + c0 * c1;
+    float s0 = (float)sin((double)from);
+    float c0 = (float)cos((double)from);
+    float s1 = (float)sin((double)to);
+    float c1 = (float)cos((double)to);
+    float dot = s0 * s1 + c0 * c1;
 
     if (dot == 0.0f) {
         return 0.0f;
     }
 
-    float angle = -1.0f;
-    if (!(dot < angle)) {
-        angle = 1.0f;
-        if (!(angle < dot)) {
-            angle = dot;
-        }
+    if (dot < -1.0f) {
+        dot = -1.0f;
+    } else if (1.0f < dot) {
+        dot = 1.0f;
+    } else {
+        dot = dot;
     }
-    angle = (float)acos((double)angle);
+
+    float angle = (float)acos((double)dot);
     if (s0 * c1 - s1 * c0 < 0.0f) {
         angle = -angle;
     }

@@ -33,6 +33,8 @@ extern float FLOAT_80332f80;
 extern float FLOAT_80332f84;
 extern double DOUBLE_80332f88;
 extern double DOUBLE_80332F90;
+extern double DOUBLE_80332F98;
+extern double DOUBLE_80332FA0;
 
 namespace {
 unsigned int s_Money = 0;
@@ -176,7 +178,8 @@ void CMenuPcs::MoneyInit()
 	*(short *)(iVar4 + 10) = 0x68;
 	*(short *)(iVar4 + 0xc) = 0xf8;
 	*(short *)(iVar4 + 0xe) = 0x88;
-	*(short *)(iVar4 + 8) = static_cast<short>(-(static_cast<int>(*(short *)(iVar4 + 0xc)) / 2));
+	*(short *)(iVar4 + 8) =
+		static_cast<short>(static_cast<int>(DOUBLE_80332F98 - (double)*(short *)(iVar4 + 0xc) * DOUBLE_80332FA0));
 	*(float *)(iVar4 + 0x10) = FLOAT_80332f64;
 	*(float *)(iVar4 + 0x14) = FLOAT_80332f64;
 	*(float *)(iVar4 + 0x1c) = FLOAT_80332f70;
@@ -271,7 +274,8 @@ bool CMenuPcs::MoneyOpen()
 		*(short *)(iVar8 + 10) = 0x68;
 		*(short *)(iVar8 + 0xc) = 0xf8;
 		*(short *)(iVar8 + 0xe) = 0x88;
-		*(short *)(iVar8 + 8) = static_cast<short>(-(static_cast<int>(*(short *)(iVar8 + 0xc)) / 2));
+		*(short *)(iVar8 + 8) =
+			static_cast<short>(static_cast<int>(DOUBLE_80332F98 - (double)*(short *)(iVar8 + 0xc) * DOUBLE_80332FA0));
 		*(float *)(iVar8 + 0x10) = FLOAT_80332f64;
 		*(float *)(iVar8 + 0x14) = FLOAT_80332f64;
 		*(float *)(iVar8 + 0x1c) = FLOAT_80332f70;
@@ -331,11 +335,16 @@ bool CMenuPcs::MoneyOpen()
 			if (*(int *)(psVar11 + 0x12) <= iVar7) {
 				if (iVar7 < *(int *)(psVar11 + 0x12) + *(int *)(psVar11 + 0x14)) {
 					*(int *)(psVar11 + 0x10) = *(int *)(psVar11 + 0x10) + 1;
-					fVar1 = static_cast<float>(*(int *)(psVar11 + 0x10)) / static_cast<float>(*(int *)(psVar11 + 0x14));
+					fVar1 = (float)((DOUBLE_80332F90 / (double)*(int *)(psVar11 + 0x14)) *
+					                (double)*(int *)(psVar11 + 0x10));
 					*(float *)(psVar11 + 8) = fVar1;
 					if ((*(unsigned int *)(psVar11 + 0x16) & 2) == 0) {
-						*(float *)(psVar11 + 0x18) = (*(float *)(psVar11 + 0x1c) - static_cast<float>(*psVar11)) * fVar1;
-						*(float *)(psVar11 + 0x1a) = (*(float *)(psVar11 + 0x1e) - static_cast<float>(psVar11[1])) * fVar1;
+						float t = (float)((DOUBLE_80332F90 / (double)*(int *)(psVar11 + 0x14)) *
+						                  (double)*(int *)(psVar11 + 0x10));
+						float dx = *(float *)(psVar11 + 0x1c) - static_cast<float>(*psVar11);
+						float dy = *(float *)(psVar11 + 0x1e) - static_cast<float>(psVar11[1]);
+						*(float *)(psVar11 + 0x18) = dx * t;
+						*(float *)(psVar11 + 0x1a) = dy * t;
 					}
 				} else {
 					iVar15 = iVar15 + 1;
@@ -349,7 +358,10 @@ bool CMenuPcs::MoneyOpen()
 		} while (iVar8 != 0);
 	}
 
-	return iVar12 == iVar15;
+	if (iVar12 == iVar15) {
+		return true;
+	}
+	return false;
 }
 
 /*
@@ -413,7 +425,6 @@ bool CMenuPcs::MoneyClose()
     int remaining;
     MenuMoneyOpenAnim* anim;
 
-    zero = FLOAT_80332f64;
     finished = 0;
     *(short*)(GetMoneyStateBase(this) + 0x22) = *(short*)(GetMoneyStateBase(this) + 0x22) + 1;
     count = (int)*GetMoneyPanel(this);
@@ -423,27 +434,33 @@ bool CMenuPcs::MoneyClose()
     remaining = count;
 
     if (0 < count) {
-        do {
+        for (; remaining != 0; remaining--) {
             if (anim->startFrame <= step) {
                 if (anim->startFrame + anim->duration <= step) {
+                    zero = FLOAT_80332f64;
                     finished = finished + 1;
                     anim->progress = zero;
                     anim->dx = zero;
                     anim->dy = zero;
                 } else {
                     anim->frame = anim->frame + 1;
-                    anim->progress = -(float)(((double)anim->frame * DOUBLE_80332F90) / (double)anim->duration - DOUBLE_80332F90);
+                    anim->progress = (float)(DOUBLE_80332F90 - (DOUBLE_80332F90 / (double)anim->duration) * (double)anim->frame);
                     if ((anim->flags & 2) == 0) {
-                        float t = -(float)(((double)anim->frame * DOUBLE_80332F90) / (double)anim->duration - DOUBLE_80332F90);
-                        anim->dx = (anim->targetX - (float)anim->x) * t;
-                        anim->dy = (anim->targetY - (float)anim->y) * t;
+                        float t = (float)(DOUBLE_80332F90 - (DOUBLE_80332F90 / (double)anim->duration) * (double)anim->frame);
+                        float dx = anim->targetX - (float)anim->x;
+                        float dy = anim->targetY - (float)anim->y;
+                        anim->dx = dx * t;
+                        anim->dy = dy * t;
                     }
                 }
             }
             anim = anim + 1;
-        } while (--remaining != 0);
+        }
     }
-    return count == finished;
+    if (count == finished) {
+        return true;
+    }
+    return false;
 }
 
 /*

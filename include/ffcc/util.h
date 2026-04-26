@@ -43,8 +43,6 @@ public:
     int GetNumPolygonFromDL(void*, unsigned long);
     void GetDirectVector(Vec*, Vec*, Vec);
     void InitConstantRegister();
-    void SSepa(char*);
-    void SNl();
     virtual void Init();
     virtual void Quit();
 };

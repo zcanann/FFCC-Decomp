@@ -277,18 +277,22 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 float CGPrgObj::getTargetRot(CGPrgObj* target)
 {
 	float targetRot;
-	float zero;
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
-	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
 	CVector deltaPos;
+	float deltaX;
+	float zero;
+	float deltaZ;
+	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
 
 	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	deltaX = deltaPos.x;
 	zero = FLOAT_80331BD4;
-	if (deltaPos.x == zero || deltaPos.z == zero) {
+	deltaZ = deltaPos.z;
+	if (zero == deltaX || zero == deltaZ) {
 		targetRot = zero;
 	} else {
-		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
 
 	return targetRot;
@@ -527,8 +531,6 @@ void CGPrgObj::changeStat(int state, int subState, int stateArg)
  */
 void CGPrgObj::onFrame()
 {
-    unsigned char animFlags;
-
     onFrameAlways();
 
 	if (static_cast<signed char>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) < 0) {
@@ -555,8 +557,7 @@ void CGPrgObj::onFrame()
 		onFrameStat();
 		onFramePostCalc();
 
-		animFlags = m_animFlagBits.m_animFlags;
-		if ((animFlags & 0x80) != 0) {
+		if (m_animFlagBits.bits.m_animRequested != 0) {
 			if (m_reqAnimId == -1) {
 				if (static_cast<int>(m_currentAnimSlot) >= 0) {
 					*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BD0;
@@ -564,10 +565,10 @@ void CGPrgObj::onFrame()
 				}
 			} else if (m_animFlagBits.bits.m_animDirect != 0) {
 				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BE8;
-				PlayAnim(m_reqAnimId, (m_animFlagBits.m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
+				PlayAnim(m_reqAnimId, m_animFlagBits.bits.m_animLoop, 0, -1, -1, 0);
 			} else {
 				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BD0;
-				PlayAnim(m_reqAnimId, (m_animFlagBits.m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
+				PlayAnim(m_reqAnimId, m_animFlagBits.bits.m_animLoop, 0, -1, -1, 0);
 			}
 
 			m_animFlagBits.bits.m_animRequested = 0;

@@ -140,8 +140,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		s16 stepSize;
 		float alphaScale;
 
-		alphaScale = (float)sourceAlpha;
-		alphaScale *= FLOAT_80331064;
+		alphaScale = (float)sourceAlpha * FLOAT_80331064;
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);
 		PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);

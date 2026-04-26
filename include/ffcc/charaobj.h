@@ -50,7 +50,7 @@ public:
 	void resetIgnoreHit();
 	void decIgnoreHit();
 	void damageDelete();
-	void onHit(int, CGObject*, int, Vec*);
+	int onHit(int, CGObject*, int, Vec*);
 	void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);
 	int getReplaceStat(int);
 	void putHitParticleFromItem(CGPrgObj*, int);
@@ -104,8 +104,8 @@ public:
 	int m_castFrameStart;
 	int m_castFrameEnd;
 	int m_castFrameCurrent;
+	int m_unk63C;
 	IgnoreHitSlot m_ignoreHit[4];
-	unsigned char m_unk65C[4];
 	int m_comboFrame;
 	int m_comboFramePrev;
 	int m_comboState;

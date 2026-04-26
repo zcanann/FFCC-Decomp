@@ -78,7 +78,7 @@ public:
     float CalcSafePos(int, CGObject*, Vec*);
     void PutDropItem();
     virtual bool IsDispRader();
-    virtual void onHit(int, CGObject*, int, Vec*);
+    virtual int onHit(int, CGObject*, int, Vec*);
     virtual void onAnimPoint(int, int);
     virtual float onAlphaUpdate();
     virtual void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);

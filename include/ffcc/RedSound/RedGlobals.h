@@ -24,7 +24,7 @@ extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;
 extern void* p_SeBlockData[];
 extern void* p_ZeroData;
-extern void* p_SoundControlBuffer;
+extern void* volatile p_SoundControlBuffer;
 extern void* volatile p_SoundControl;
 extern int m_KeyOnEntry;
 extern void* p_KeyOnData;

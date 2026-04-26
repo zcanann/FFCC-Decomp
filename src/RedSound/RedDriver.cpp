@@ -92,7 +92,7 @@ static void* p_WaveSettingThreadStack;
 static int m_WaveSettingStatus;
 static void* p_DmaExecuteThreadStack;
 static volatile int m_DMAStatus;
-void* p_MusicSkipThreadStack;
+void* volatile p_MusicSkipThreadStack;
 int m_MusicSkipComplete;
 void* volatile p_ReverbDepth;
 int m_Mute[2];

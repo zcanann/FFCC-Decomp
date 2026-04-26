@@ -42,7 +42,7 @@ static const char sRedEntryLogBlob[0x540] =
     "%s -------- : 0x%8.8X : 0x%8.8X : 0x%8.8X\n\0"
     "%s   Entry Items = %d\n";
 #define sRedEntryColoredBlankLineFmt (sRedEntryLogBlob + 0x000)
-#define DAT_801e7905 (sRedEntryLogBlob + 0x02D)
+#define sRedEntryLogPrefix (sRedEntryLogBlob + 0x02D)
 #define s__s_s__________ERROR___________s_801e7917 (sRedEntryLogBlob + 0x03F)
 #define s__s_s_Erase_Using_Wave_Data_____W_801e7944 (sRedEntryLogBlob + 0x06C)
 #define s__s_sWave_Header_was_broken__s_801e7972 (sRedEntryLogBlob + 0x09A)
@@ -71,12 +71,12 @@ static const char sRedEntryLogBlob[0x540] =
 #define s__s_SE_6_6d___0x_8_8X___0x_8_8X___801e7da8 (sRedEntryLogBlob + 0x4D0)
 #define s__s____________0x_8_8X___0x_8_8X___801e7dd2 (sRedEntryLogBlob + 0x4FA)
 #define s__s_Entry_Items____d_801e7dfd (sRedEntryLogBlob + 0x525)
-static const char DAT_80333d30[] = "\x1B[7;31m";
-static const char DAT_80333d38[] = "\x1B[0m";
-static const char DAT_80333d3d[] = "\x1B[4;31m";
-static const char DAT_80333d45[] = "\x1B[4;34m";
-static const char DAT_80333d4d[] = "\n";
-static const char DAT_80333d4f[] = "%s\n";
+static const char sRedEntryErrorColor[] = "\x1B[7;31m";
+static const char sRedEntryResetColor[] = "\x1B[0m";
+static const char sRedEntryHeaderErrorColor[] = "\x1B[4;31m";
+static const char sRedEntryInfoColor[] = "\x1B[4;34m";
+static const char sRedEntryNewline[] = "\n";
+static const char sRedEntryPrefixedNewlineFmt[] = "%s\n";
 
 /*
  * --INFO--
@@ -302,14 +302,14 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 		if (sequenceNo < 0) {
 			iVar1 = SearchUseWave(iVar2);
 			if ((iVar1 != 0) && (m_ReportPrint != 0)) {
-				OSReport(sRedEntryColoredBlankLineFmt, DAT_801e7905, DAT_80333d30, DAT_80333d38);
+				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
 				fflush(__files + 1);
-				OSReport(s__s_s__________ERROR___________s_801e7917, DAT_801e7905, DAT_80333d30, DAT_80333d38);
+				OSReport(s__s_s__________ERROR___________s_801e7917, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
 				fflush(__files + 1);
-				OSReport(s__s_s_Erase_Using_Wave_Data_____W_801e7944, DAT_801e7905, DAT_80333d30, iVar2,
-				         DAT_80333d38);
+				OSReport(s__s_s_Erase_Using_Wave_Data_____W_801e7944, sRedEntryLogPrefix, sRedEntryErrorColor, iVar2,
+				         sRedEntryResetColor);
 				fflush(__files + 1);
-				OSReport(sRedEntryColoredBlankLineFmt, DAT_801e7905, DAT_80333d30, DAT_80333d38);
+				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
 				fflush(__files + 1);
 			}
 			RedDeleteA(*reinterpret_cast<int*>(bankEntry[2] + 0x10));
@@ -377,7 +377,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 
 	if ((head[0] != 'W') || (head[1] != 'D')) {
 		if (m_ReportPrint != 0) {
-			OSReport(s__s_sWave_Header_was_broken__s_801e7972, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
+			OSReport(s__s_sWave_Header_was_broken__s_801e7972, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
 			fflush(__files + 1);
 		}
 
@@ -459,8 +459,8 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 	} while (WaveOldClear(minOffset, maxOffset) != 0);
 
 	if (m_ReportPrint != 0) {
-		OSReport(s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991, DAT_801e7905, DAT_80333d30, (int)*(short*)(head + 2),
-		         *(int*)(head + 4), DAT_80333d38);
+		OSReport(s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991, sRedEntryLogPrefix, sRedEntryErrorColor, (int)*(short*)(head + 2),
+		         *(int*)(head + 4), sRedEntryResetColor);
 		fflush(__files + 1);
 	}
 
@@ -552,7 +552,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 
 		if (entry[4] < 1) {
 			if (m_ReportPrint != 0) {
-				OSReport(s__s_sWave_Entry___wave_4_4u__s_801e79ce, DAT_801e7905, DAT_80333d45, entry[3], DAT_80333d38);
+				OSReport(s__s_sWave_Entry___wave_4_4u__s_801e79ce, sRedEntryLogPrefix, sRedEntryInfoColor, entry[3], sRedEntryResetColor);
 				fflush(__files + 1);
 			}
 
@@ -797,11 +797,11 @@ void CRedEntry::DisplayWaveInfo()
 	int* entry = (int*)this;
 
 	if (m_ReportPrint != 0) {
-		OSReport(DAT_80333d4d);
+		OSReport(sRedEntryNewline);
 		fflush(__files + 1);
-		OSReport(s__s_____AMemory_Information______801e79ed, DAT_801e7905);
+		OSReport(s__s_____AMemory_Information______801e79ed, sRedEntryLogPrefix);
 		fflush(__files + 1);
-		OSReport(s__s_Bank___Name___Start___Size___F_801e7a0e, DAT_801e7905);
+		OSReport(s__s_Bank___Name___Start___Size___F_801e7a0e, sRedEntryLogPrefix);
 		fflush(__files + 1);
 
 		int maxFreeSize = 0;
@@ -832,12 +832,12 @@ void CRedEntry::DisplayWaveInfo()
 				if (history < (unsigned int)entry[0] + 0x400) {
 					if (history < (unsigned int)entry[0] + 0x100) {
 						unsigned int index = history - (unsigned int)entry[0];
-						OSReport(s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53, DAT_801e7905, (int)(index >> 4),
+						OSReport(s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53, sRedEntryLogPrefix, (int)(index >> 4),
 						         (int)*(short*)(*(int*)(history + 8) + 2), *(int*)(*(int*)(history + 8) + 0x10), bank[1],
 						         freeSize, *(int*)(history + 4));
 						fflush(__files + 1);
 					} else {
-						OSReport(s__s______WAVE_4_4d___0x_8_8X___0x_801e7a8f, DAT_801e7905,
+						OSReport(s__s______WAVE_4_4d___0x_8_8X___0x_801e7a8f, sRedEntryLogPrefix,
 						         (int)*(short*)(*(int*)(history + 8) + 2), *(int*)(*(int*)(history + 8) + 0x10), bank[1],
 						         freeSize, *(int*)(history + 4));
 						fflush(__files + 1);
@@ -845,7 +845,7 @@ void CRedEntry::DisplayWaveInfo()
 					entryWave += 1;
 				} else {
 					unsigned int bankIndex = (unsigned int)((int)bank - (int)aBankAddress);
-					OSReport(s__s______________0x_8_8X___0x_8_8_801e7aca, DAT_801e7905, bank[0], bank[1], freeSize,
+					OSReport(s__s______________0x_8_8X___0x_8_8_801e7aca, sRedEntryLogPrefix, bank[0], bank[1], freeSize,
 					         (int)(bankIndex >> 3));
 					fflush(__files + 1);
 				}
@@ -865,17 +865,17 @@ void CRedEntry::DisplayWaveInfo()
             maxFreeSize = (aBase + c_RedMemory.GetABufferSize()) - aBufferAddress;
 		}
 
-		OSReport(DAT_80333d4f, DAT_801e7905);
+		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
-		OSReport(s__s_Entry_Wave____d_801e7b01, DAT_801e7905, entryWave);
+		OSReport(s__s_Entry_Wave____d_801e7b01, sRedEntryLogPrefix, entryWave);
 		fflush(__files + 1);
-		OSReport(s__s_Total_Size___0x_8_8X_801e7b18, DAT_801e7905, totalSize);
+		OSReport(s__s_Total_Size___0x_8_8X_801e7b18, sRedEntryLogPrefix, totalSize);
 		fflush(__files + 1);
-		OSReport(s__s_Max_Free_Size___0x_8_8X_801e7b34, DAT_801e7905, maxFreeSize);
+		OSReport(s__s_Max_Free_Size___0x_8_8X_801e7b34, sRedEntryLogPrefix, maxFreeSize);
 		fflush(__files + 1);
-		OSReport(DAT_80333d4f, DAT_801e7905);
+		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
-		OSReport(DAT_80333d4d);
+		OSReport(sRedEntryNewline);
 		fflush(__files + 1);
 	}
 }
@@ -1075,7 +1075,7 @@ int CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 	if ((data[0] != 'S') || (data[1] != 'e') || (data[2] != 'S') || (data[3] != 'e') || (data[4] != 'p')) {
 		RedDelete(seSepHead);
 		if (m_ReportPrint != 0) {
-			OSReport(s__s_sSE_Sep_Header_was_broken__s_801e7b50, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
+			OSReport(s__s_sSE_Sep_Header_was_broken__s_801e7b50, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
 			fflush(__files + 1);
 		}
 		return 0;
@@ -1237,11 +1237,11 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 void CRedEntry::DisplaySePlayInfo()
 {
 	if (m_ReportPrint != 0) {
-		OSReport(DAT_80333d4d);
+		OSReport(sRedEntryNewline);
 		fflush(__files + 1);
-		OSReport(s__s_____SE_Play_Information______801e7b71, DAT_801e7905);
+		OSReport(s__s_____SE_Play_Information______801e7b71, sRedEntryLogPrefix);
 		fflush(__files + 1);
-		OSReport(s__s_Track___Name___Wave_801e7b92, DAT_801e7905);
+		OSReport(s__s_Track___Name___Wave_801e7b92, sRedEntryLogPrefix);
 		fflush(__files + 1);
 
 		int* trackHead = (int*)((int)p_SoundControlBuffer + 0xdbc);
@@ -1249,11 +1249,11 @@ void CRedEntry::DisplaySePlayInfo()
 		do {
 			int trackIndex = ((int)track - *trackHead) / 0x154 + (((int)track - *trackHead) >> 0x1F);
 			if (track[0] == 0) {
-				OSReport(s__s__2d_____801e7c01, DAT_801e7905, (trackIndex - (trackIndex >> 0x1F)) + 0x20);
+				OSReport(s__s__2d_____801e7c01, sRedEntryLogPrefix, (trackIndex - (trackIndex >> 0x1F)) + 0x20);
 				fflush(__files + 1);
 			} else if ((track[0x3D] & 0x80000000) == 0) {
 				int* seSepBank = SearchSeSepBank(track[0x3D]);
-				OSReport(s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc, DAT_801e7905,
+				OSReport(s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc, sRedEntryLogPrefix,
 				         (trackIndex - (trackIndex >> 0x1F)) + 0x20, track[0x3D],
 				         ((int)*(unsigned char*)(seSepBank[2] + 0x12) << 8) | *(unsigned char*)(seSepBank[2] + 0x11));
 				fflush(__files + 1);
@@ -1264,7 +1264,7 @@ void CRedEntry::DisplaySePlayInfo()
 				seqBase += *(short*)(((int*)&p_SeBlockData)[songNo] + 10) * 4;
 				seqBase += (*(unsigned int*)(seqBase + (seDataNo & 0x1FF) * 4) & 0x7FFFFFFF);
 
-				OSReport(s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2, DAT_801e7905,
+				OSReport(s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2, sRedEntryLogPrefix,
 				         (trackIndex - (trackIndex >> 0x1F)) + 0x20, songNo, seDataNo & 0x1FF,
 				         ((int)*(unsigned char*)(seqBase + 2) << 8) | *(unsigned char*)(seqBase + 1));
 				fflush(__files + 1);
@@ -1272,9 +1272,9 @@ void CRedEntry::DisplaySePlayInfo()
 			track += 0x55;
 		} while (track < (int*)(*trackHead + 0x2A80));
 
-		OSReport(DAT_80333d4f, DAT_801e7905);
+		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
-		OSReport(DAT_80333d4d);
+		OSReport(sRedEntryNewline);
 		fflush(__files + 1);
 	}
 }
@@ -1550,7 +1550,7 @@ int CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 	if ((data[0] != 'B') || (data[1] != 'G') || (data[2] != 'M')) {
 		RedDelete(musicHead);
 		if (m_ReportPrint != 0) {
-			OSReport(s__s_sMusic_Header_was_broken__s_801e7c1d, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
+			OSReport(s__s_sMusic_Header_was_broken__s_801e7c1d, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
 			fflush(__files + 1);
 		}
 		return 0;
@@ -1600,11 +1600,11 @@ void CRedEntry::DisplayMMemoryInfo()
 		return;
 	}
 
-	OSReport(DAT_80333d4d);
+	OSReport(sRedEntryNewline);
 	fflush(__files + 1);
-	OSReport(s__s_____MMemory_Information______801e7cce, DAT_801e7905);
+	OSReport(s__s_____MMemory_Information______801e7cce, sRedEntryLogPrefix);
 	fflush(__files + 1);
-	OSReport(s__s_Name___Start___Size___Free_801e7cef, DAT_801e7905);
+	OSReport(s__s_Name___Start___Size___Free_801e7cef, sRedEntryLogPrefix);
 	fflush(__files + 1);
 
 	maxFreeSize = 0;
@@ -1629,7 +1629,7 @@ void CRedEntry::DisplayMMemoryInfo()
 			history = (unsigned int)entry[2];
 			do {
 				if ((*(int*)(history + 0xC) != 0) && (*(int*)(history + 8) == bankEntry[0])) {
-					OSReport(s__s_MUSIC_3_3d___0x_8_8X___0x_8_8_801e7d24, DAT_801e7905,
+					OSReport(s__s_MUSIC_3_3d___0x_8_8X___0x_8_8_801e7d24, sRedEntryLogPrefix,
 					         (int)*(short*)(bankEntry[0] + 4), bankEntry[0], bankEntry[1], freeSize);
 					fflush(__files + 1);
 					matched = 1;
@@ -1642,7 +1642,7 @@ void CRedEntry::DisplayMMemoryInfo()
 				i = 0;
 				do {
 					if ((seBlockBase[i] != 0) && (bankEntry[0] == seBlockBase[i])) {
-						OSReport(s__s_SE_BLOCK___0x_8_8X___0x_8_8X___801e7d51, DAT_801e7905, bankEntry[0],
+						OSReport(s__s_SE_BLOCK___0x_8_8X___0x_8_8X___801e7d51, sRedEntryLogPrefix, bankEntry[0],
 						         bankEntry[1], freeSize);
 						fflush(__files + 1);
 						matched = 1;
@@ -1656,7 +1656,7 @@ void CRedEntry::DisplayMMemoryInfo()
 				history = (unsigned int)entry[0];
 				do {
 					if ((*(int*)(history + 0xC) != 0) && (*(int*)(history + 8) == bankEntry[0])) {
-						OSReport(s__s_WAVE_4_4d___0x_8_8X___0x_8_8X_801e7d7c, DAT_801e7905,
+						OSReport(s__s_WAVE_4_4d___0x_8_8X___0x_8_8X_801e7d7c, sRedEntryLogPrefix,
 						         (int)*(short*)(bankEntry[0] + 2), bankEntry[0], bankEntry[1], freeSize);
 						fflush(__files + 1);
 						matched = 1;
@@ -1670,7 +1670,7 @@ void CRedEntry::DisplayMMemoryInfo()
 				history = (unsigned int)entry[1];
 				do {
 					if ((*(int*)(history + 0xC) != 0) && (*(int*)(history + 8) == bankEntry[0])) {
-						OSReport(s__s_SE_6_6d___0x_8_8X___0x_8_8X___801e7da8, DAT_801e7905,
+						OSReport(s__s_SE_6_6d___0x_8_8X___0x_8_8X___801e7da8, sRedEntryLogPrefix,
 						         *(int*)(bankEntry[0] + 8), bankEntry[0], bankEntry[1], freeSize);
 						fflush(__files + 1);
 						matched = 1;
@@ -1681,7 +1681,7 @@ void CRedEntry::DisplayMMemoryInfo()
 			}
 
 			if (matched == 0) {
-				OSReport(s__s____________0x_8_8X___0x_8_8X___801e7dd2, DAT_801e7905, bankEntry[0], bankEntry[1],
+				OSReport(s__s____________0x_8_8X___0x_8_8X___801e7dd2, sRedEntryLogPrefix, bankEntry[0], bankEntry[1],
 				         freeSize);
 				fflush(__files + 1);
 			}
@@ -1703,16 +1703,16 @@ void CRedEntry::DisplayMMemoryInfo()
 		maxFreeSize = freeSize;
 	}
 
-	OSReport(DAT_80333d4f, DAT_801e7905);
+	OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 	fflush(__files + 1);
-	OSReport(s__s_Entry_Items____d_801e7dfd, DAT_801e7905, entryCount);
+	OSReport(s__s_Entry_Items____d_801e7dfd, sRedEntryLogPrefix, entryCount);
 	fflush(__files + 1);
-	OSReport(s__s_Total_Size___0x_8_8X_801e7b18, DAT_801e7905, totalSize);
+	OSReport(s__s_Total_Size___0x_8_8X_801e7b18, sRedEntryLogPrefix, totalSize);
 	fflush(__files + 1);
-	OSReport(s__s_Max_Free_Size___0x_8_8X_801e7b34, DAT_801e7905, maxFreeSize);
+	OSReport(s__s_Max_Free_Size___0x_8_8X_801e7b34, sRedEntryLogPrefix, maxFreeSize);
 	fflush(__files + 1);
-	OSReport(DAT_80333d4f, DAT_801e7905);
+	OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 	fflush(__files + 1);
-	OSReport(DAT_80333d4d);
+	OSReport(sRedEntryNewline);
 	fflush(__files + 1);
 }

@@ -2487,10 +2487,10 @@ void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
     command = (char*)trackData[0];
     trackData[0] = (int)(command + 1);
     value = *command;
-    if (value == 0) {
-        step = 0;
-    } else {
+    if (value != 0) {
         step = *(short*)(trackData + 0x4e) + (short)value;
+    } else {
+        step = 0;
     }
     *(short*)(trackData + 0x4e) = step;
     *(short*)((char*)trackData + 0x13a) = 0;
@@ -2523,10 +2523,10 @@ void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tra
     value = *command;
     *(short*)(trackData + 0x4e) = 0;
 
-    if (value == 0) {
-        step = 0;
-    } else {
+    if (value != 0) {
         step = *(short*)((char*)trackData + 0x13a) + (unsigned short)value;
+    } else {
+        step = 0;
     }
     *(short*)((char*)trackData + 0x13a) = step;
 

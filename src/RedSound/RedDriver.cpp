@@ -1978,10 +1978,11 @@ void CRedDriver::DisplaySePlayInfo()
  */
 int CRedDriver::StreamPlayState(int param_1)
 {
+	void* commandNow;
 	unsigned int interrupts;
 	unsigned int streamData;
 	int result;
-	int* command;
+	unsigned int* command;
 
 	interrupts = OSDisableInterrupts();
 	result = 0;
@@ -1995,17 +1996,18 @@ int CRedDriver::StreamPlayState(int param_1)
 		streamData += 0x130;
 	} while (streamData < (unsigned int)p_Stream + 0x4C0);
 
-	command = (int*)p_ExecCommandOld;
 	if (result == 0) {
-		while ((void*)command != p_ExecCommandNow) {
+		commandNow = p_ExecCommandNow;
+		command = (unsigned int*)p_ExecCommandOld;
+		while (commandNow != (void*)command) {
 			if ((*command != 0) && ((void (*)(int*))*command == _StreamPlay) &&
-			    ((param_1 == -1) || (param_1 == command[1]))) {
+			    ((param_1 == -1) || (param_1 == (int)command[1]))) {
 				result = 1;
 				break;
 			}
 			command += 8;
-			if (command == (int*)p_ExecCommand + 0x800) {
-				command = (int*)p_ExecCommand;
+			if (command == (unsigned int*)p_ExecCommand + 0x800) {
+				command = (unsigned int*)p_ExecCommand;
 			}
 		}
 	}

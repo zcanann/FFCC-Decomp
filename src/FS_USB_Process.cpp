@@ -33,8 +33,17 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self) {
     return reinterpret_cast<CFunnyShape*>(self->m_funnyShapeStorage);
 }
 
+static inline u32 LoadSwap32(u32 value) {
+    return __lwbrx(&value, 0);
+}
+
 static inline void StoreSwap32(u32* value) {
-    __stwbrx(*value, value, 0);
+    *value = LoadSwap32(*value);
+}
+
+static inline void StoreSwap32(f32* value) {
+    f32 raw = *value;
+    *reinterpret_cast<u32*>(value) = LoadSwap32(*reinterpret_cast<u32*>(&raw));
 }
 
 static inline u16 LoadSwap16(u16 value) {

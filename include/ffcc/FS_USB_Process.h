@@ -11,18 +11,18 @@ struct FS_DISPLAY_STATUS
 {
     u32 flags;        // 0x00
     GXColor clear;    // 0x04
-    u32 unk08;        // 0x08
-    u32 unk0C;        // 0x0C
-    u32 unk10;        // 0x10
-    u32 unk14;        // 0x14
-    u32 unk18;        // 0x18
-    u32 unk1C;        // 0x1C
-    u32 unk20;        // 0x20
-    u32 unk24;        // 0x24
-    u16 unk28;        // 0x28
-    u16 unk2A;        // 0x2A
-    u32 unk2C;        // 0x2C
-    u32 unk30;        // 0x30
+    f32 unk08;        // 0x08
+    f32 unk0C;        // 0x0C
+    f32 unk10;        // 0x10
+    f32 unk14;        // 0x14
+    f32 unk18;        // 0x18
+    f32 unk1C;        // 0x1C
+    f32 unk20;        // 0x20
+    f32 unk24;        // 0x24
+    s16 unk28;        // 0x28
+    s16 unk2A;        // 0x2A
+    f32 unk2C;        // 0x2C
+    f32 unk30;        // 0x30
     u8 unk34[0xC];    // 0x34
 };
 

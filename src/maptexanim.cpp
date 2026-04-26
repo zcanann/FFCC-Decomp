@@ -201,12 +201,11 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
         static_cast<unsigned long>(m_textureSlot), TextureAt(textureSet, textureIndex));
 
     m_currentFrame = m_currentFrame + m_frameStep;
-    const float endFrame = static_cast<float>(m_endFrame);
-    if (m_currentFrame >= endFrame) {
+    if (m_currentFrame >= static_cast<float>(m_endFrame)) {
         if (m_wrapMode != 0) {
             m_currentFrame = m_currentFrame - static_cast<float>(m_endFrame - m_startFrame);
         } else {
-            m_currentFrame = endFrame;
+            m_currentFrame = static_cast<float>(m_endFrame);
         }
     }
 

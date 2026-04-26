@@ -781,14 +781,14 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 		}
 		if (used == 0) {
 			seq = SearchWaveSequence(waveNo);
-			if ((0xf < seq) && (*(int*)(*(int*)this + seq * 0x10 + 4) == 0)) {
+			if ((seq >= 0x10) && (*(int*)(*(int*)this + seq * 0x10 + 4) == 0)) {
 				WaveHistoryAdd(0x14);
 				*(int*)(*(int*)this + seq * 0x10 + 4) = 0x14;
 			}
 		}
 	} else {
 		seq = SearchWaveSequence(waveNo);
-		if ((0xf < seq) && (*(int*)(*(int*)this + seq * 0x10 + 4) != 0)) {
+		if ((seq >= 0x10) && (*(int*)(*(int*)this + seq * 0x10 + 4) != 0)) {
 			WaveHistoryDelete(*(int*)(*(int*)this + seq * 0x10 + 4));
 			*(int*)(*(int*)this + seq * 0x10 + 4) = 0;
 		}

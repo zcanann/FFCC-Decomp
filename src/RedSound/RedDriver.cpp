@@ -382,10 +382,12 @@ void _MusicMasterVolume(int* param_1)
     unsigned int* puVar1;
 
     m_MasterMusicVolume = *param_1 & 0x7f;
-    puVar1 = p_VoiceData;
     if (m_MasterMusicVolume != 0) {
-        m_MasterMusicVolume = (m_MasterMusicVolume + 1) * 4 - 1;
+        m_MasterMusicVolume = m_MasterMusicVolume + 1;
+        m_MasterMusicVolume = m_MasterMusicVolume * 4;
+        m_MasterMusicVolume = m_MasterMusicVolume - 1;
     }
+    puVar1 = p_VoiceData;
     do {
         puVar1[0x2e] = puVar1[0x2e] | 2;
         puVar1 += 0x30;
@@ -548,10 +550,12 @@ void _SeMasterVolume(int* param_1)
     unsigned int* puVar1;
 
     m_MasterSEVolume = *param_1 & 0x7f;
-    puVar1 = p_VoiceData;
     if (m_MasterSEVolume != 0) {
-        m_MasterSEVolume = (m_MasterSEVolume + 1) * 4 - 1;
+        m_MasterSEVolume = m_MasterSEVolume + 1;
+        m_MasterSEVolume = m_MasterSEVolume * 4;
+        m_MasterSEVolume = m_MasterSEVolume - 1;
     }
+    puVar1 = p_VoiceData;
     do {
         puVar1[0x2e] = puVar1[0x2e] | 2;
         puVar1 += 0x30;

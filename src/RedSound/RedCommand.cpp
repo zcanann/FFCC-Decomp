@@ -287,11 +287,10 @@ int SeStopMG(int bank, int sep, int group, int kind)
 	track = *(int**)(soundBase + 0xdbc);
 	do {
 		if ((*track != 0) && ((track[0x3d] & 0x80000000U) == 0)) {
-			int id = track[0x3d] / 1000 + (track[0x3d] >> 0x1f);
-			id = id - (id >> 0x1f);
-				if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
-					int trackNo;
-					int seTrackOffset;
+			int id = track[0x3d] / 1000;
+			if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
+				int trackNo;
+				int seTrackOffset;
 
 				KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 				track[0x3e] = 0;

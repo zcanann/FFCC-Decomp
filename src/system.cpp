@@ -360,8 +360,14 @@ void CSystem::ExecScenegraph()
             {
                 unsigned short trigger;
                 unsigned short held;
+                bool noInput;
 
+                noInput = false;
                 if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
+                {
+                    noInput = true;
+                }
+                if (noInput)
                 {
                     trigger = 0;
                 }
@@ -371,7 +377,12 @@ void CSystem::ExecScenegraph()
                     trigger = *(unsigned short*)((unsigned char*)&Pad + 0xA + padIndex * 0x54);
                 }
 
+                noInput = false;
                 if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
+                {
+                    noInput = true;
+                }
+                if (noInput)
                 {
                     held = 0;
                 }
@@ -415,27 +426,27 @@ void CSystem::ExecScenegraph()
         }
 
         unsigned int stepGate = 0;
-        if (scenegraphStepMode == 4)
+        if (scenegraphStepMode != 4)
         {
-            stepGate = (m_frameCounter & 3) != 0;
-        }
-        else if (scenegraphStepMode >= 4)
-        {
-            if (scenegraphStepMode < 6)
+            if (scenegraphStepMode < 4)
+            {
+                if (scenegraphStepMode == 2)
+                {
+                    stepGate = 1;
+                }
+                else if (scenegraphStepMode > 2)
+                {
+                    stepGate = (m_frameCounter & 7) != 0;
+                }
+            }
+            else if (scenegraphStepMode < 6)
             {
                 stepGate = m_frameCounter & 1;
             }
         }
         else
         {
-            if (scenegraphStepMode == 2)
-            {
-                stepGate = 1;
-            }
-            else if (scenegraphStepMode > 2)
-            {
-                stepGate = (m_frameCounter & 7) != 0;
-            }
+            stepGate = (m_frameCounter & 3) != 0;
         }
 
         float totalTime = 0.0f;

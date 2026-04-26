@@ -94,6 +94,9 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     float cz;
     float sxsy;
     float cxsy;
+    float zRotX;
+    float zRotY;
+    float zRotZ;
 
     PSMTXScale(out, s[6], s[7], s[8]);
     sx = (float)sin((double)s[3]);
@@ -111,9 +114,12 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     rot[0][1] = cz * sxsy - (cx * sz);
     rot[1][1] = sz * sxsy + (cx * cz);
     rot[2][1] = sx * cy;
-    rot[2][2] = cx * cy;
-    rot[0][2] = cz * cxsy + (sx * sz);
-    rot[1][2] = sz * cxsy - (sx * cz);
+    zRotZ = cx * cy;
+    zRotX = cz * cxsy + (sx * sz);
+    zRotY = sz * cxsy - (sx * cz);
+    rot[0][2] = zRotX;
+    rot[1][2] = zRotY;
+    rot[2][2] = zRotZ;
     rot[0][3] = s[0];
     rot[1][3] = s[1];
     rot[2][3] = s[2];

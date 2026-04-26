@@ -22,7 +22,7 @@ extern float FLOAT_80330c80;
 extern float FLOAT_80330c84;
 extern float FLOAT_80330C90;
 extern double DOUBLE_80330c88;
-extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
+extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 
 struct pppYmBreathUnkC {
     unsigned char _pad[0xC];

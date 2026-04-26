@@ -48,7 +48,7 @@ extern int p_EditorVoice[2];
 extern void* p_EditorTrack;
 extern void* p_MusicSkipThreadStack;
 extern int m_MusicSkipComplete;
-extern void* p_ReverbDepth;
+extern void* volatile p_ReverbDepth;
 extern int m_Mute[2];
 extern CRedMemory c_RedMemory;
 extern volatile u32 m_ChangeStatus;

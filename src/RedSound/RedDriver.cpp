@@ -94,7 +94,7 @@ static void* p_DmaExecuteThreadStack;
 static int m_DMAStatus;
 void* p_MusicSkipThreadStack;
 int m_MusicSkipComplete;
-void* p_ReverbDepth;
+void* volatile p_ReverbDepth;
 int m_Mute[2];
 static u8 gRedDriverSyncBuffer[0x1F18];
 static OSSemaphore m_MainSemaphore;

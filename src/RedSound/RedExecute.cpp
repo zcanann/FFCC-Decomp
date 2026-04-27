@@ -1232,36 +1232,37 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
  */
 void _AdsrStart(RedVoiceDATA* voice)
 {
-    int* voiceData = (int*)voice;
-    u32 prevLevel;
-    u32 nextLevel;
-    u32 stepFrames;
+    u8* adsrData = (u8*)voice + 0x50;
+    int* stage = (int*)((u8*)voice + 0x5c);
+    int prevLevel;
+    int nextLevel;
+    int stepFrames;
 
-    voiceData[0x17] = 0;
-    nextLevel = *(u8*)((u8*)voiceData + 0x58);
+    *stage = 0;
+    nextLevel = *(u8*)((u8*)voice + 0x58);
     do {
         prevLevel = nextLevel;
-        stepFrames = *(u16*)((u8*)voiceData + 0x50 + voiceData[0x17] * 2);
-        nextLevel = *(u8*)((u8*)voiceData + 0x50 + voiceData[0x17] + 9);
+        stepFrames = *(u16*)(adsrData + *stage * 2);
+        nextLevel = *(u8*)(adsrData + *stage + 9);
         if (stepFrames != 0) {
             break;
         }
-        voiceData[0x17] += 1;
-    } while (voiceData[0x17] < 3);
+        *stage = *stage + 1;
+    } while (*stage < 3);
 
-    voiceData[0x18] = stepFrames;
+    *(int*)((u8*)voice + 0x60) = stepFrames;
     if (nextLevel != 0) {
         nextLevel = (((nextLevel + 1) * 0x100) - 1) * 0x1000;
     }
 
-    if (stepFrames == 0) {
-        voiceData[0x2B] = nextLevel;
-    } else {
+    if (stepFrames != 0) {
         if (prevLevel != 0) {
             prevLevel = (((prevLevel + 1) * 0x100) - 1) * 0x1000;
         }
-        voiceData[0x2B] = prevLevel;
-        voiceData[0x19] = (int)((nextLevel | 0x800) - prevLevel) / (int)stepFrames;
+        *(int*)((u8*)voice + 0xac) = prevLevel;
+        *(int*)((u8*)voice + 0x64) = (int)((nextLevel | 0x800) - prevLevel) / (int)stepFrames;
+    } else {
+        *(int*)((u8*)voice + 0xac) = nextLevel;
     }
 }
 

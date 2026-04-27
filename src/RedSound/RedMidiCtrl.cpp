@@ -1103,20 +1103,19 @@ void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_VolumeDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned int volume;
-    unsigned char* command;
-    int* trackData = (int*)track;
+    int volume;
 
-    command = (unsigned char*)trackData[0];
-    trackData[0] = (int)(command + 1);
-    volume = *command;
+    volume = *(*(unsigned char**)track)++;
     if (volume != 0) {
-        volume = (((volume + 1) * 0x100) - 1) << 0xc;
+        volume++;
+        volume <<= 8;
+        volume--;
+        volume <<= 12;
     }
 
-    trackData[10] = volume;
-    trackData[0xb] = 0;
-    trackData[0xc] = 0;
+    ((int*)track)[10] = volume;
+    ((int*)track)[0xb] = 0;
+    ((int*)track)[0xc] = 0;
     m_ChangeStatus |= 2;
 }
 

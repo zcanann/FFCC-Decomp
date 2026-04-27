@@ -125,18 +125,25 @@ int CGraphicPcs::GetTable(unsigned long index)
  */
 void CGraphicPcs::create()
 {
+    float dofDefault;
+    float farZ;
+    float nearZ;
+
     _InitGxFunc();
     m_unkB8 = 0;
+    nearZ = FLOAT_8032fbfc;
     m_copySaveFlag = 0;
+    farZ = FLOAT_8032fc00;
     m_dofFlag = 0;
+    dofDefault = FLOAT_8032fb78;
     m_dofFlagB = 1;
-    m_dofNearZ = FLOAT_8032fbfc;
-    m_dofFarZ = FLOAT_8032fc00;
+    m_dofNearZ = nearZ;
+    m_dofFarZ = farZ;
     m_dofFlagA = 0;
     m_dofMode = 0;
-    m_dofFocus = FLOAT_8032fb78;
-    m_dofBlurNear = FLOAT_8032fb78;
-    m_dofBlurFar = FLOAT_8032fb78;
+    m_dofBlurFar = dofDefault;
+    m_dofBlurNear = dofDefault;
+    m_dofFocus = dofDefault;
     memset(m_screenFade, 0, sizeof(m_screenFade));
     m_blurMode = 0;
     m_blurFadeOutFlag = 0;
@@ -212,7 +219,7 @@ void CGraphicPcs::destroy()
 void CGraphicPcs::calc()
 {
     for (int i = 0; i < 4; i++) {
-        if (m_screenFade[i].m_timer > 0) {
+        if (m_screenFade[i].m_timer > 0 && i != 1) {
             m_screenFade[i].m_timer--;
             if (m_screenFade[i].m_timer == 0) {
                 m_screenFade[i].m_targetObj = 0;
@@ -679,7 +686,7 @@ void CGraphicPcs::drawSFRect(float, float, float, float, _GXColor, _GXColor)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGraphicPcs::drawSFCircle(int innerRadius, int centerX, int outerRadius, int centerY, _GXColor innerColor, _GXColor outerColor)
+void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, int centerY, _GXColor innerColor, _GXColor outerColor)
 {
     float ringPoints[32][4];
     const float step = 0.19634955f;
@@ -904,8 +911,8 @@ void CGraphicPcs::drawScreenFade()
                     }
 
                     const int radius = (int)(640.0f * (1.0f - t));
-                    drawSFCircle(0x500, (int)sx, radius, (int)sy, baseColor, baseColor);
-                    drawSFCircle(radius, (int)sx, radius - 8, (int)sy, baseColor, baseColor2);
+                    drawSFCircle(0x500, radius, (int)sx, (int)sy, baseColor, baseColor);
+                    drawSFCircle(radius, radius - 8, (int)sx, (int)sy, baseColor, baseColor2);
                     continue;
                 }
             }

@@ -2304,7 +2304,7 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
     if (stageGetAllocationMode(this) == 2) {
         top = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
 
-        for (i = 0; i <= *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120); i++) {
+        for (i = 0; i <= *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120); i++, node += 0x40) {
             if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120) == i) {
                 blockTail = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x0C);
             } else {
@@ -2324,16 +2324,15 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
                 heapTotal += usedSize;
             }
 
-            node += 0x40;
         }
         return;
     }
 
     while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
-        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) {
-            heapUnuse += *reinterpret_cast<int*>(node + 0x10);
-        } else {
+        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) != 0) {
             heapUse += *reinterpret_cast<int*>(node + 0x10);
+        } else {
+            heapUnuse += *reinterpret_cast<int*>(node + 0x10);
         }
 
         heapTotal += *reinterpret_cast<int*>(node + 8) - node;

@@ -90,6 +90,7 @@ struct pppScreenBreakUnkC {
 extern float FLOAT_80331cc0;
 extern float FLOAT_80331cc4;
 extern float FLOAT_80331cd0;
+extern float FLOAT_80331ce8;
 extern float FLOAT_80331cec;
 extern float FLOAT_80331cf0;
 static const float kPppScreenBreakDoubleScale = 2.0f;
@@ -351,7 +352,7 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     void* gObject = *(void**)((u8*)pppMngStPtr + 0xD8);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    float f = 0.0f;
+    float f = FLOAT_80331cc4;
     *(u32*)((u8*)gObject + 0x60) |= 0x40;
     *(void**)(model + 0xF0) = (void*)SB_BeforeDrawCallback;
     *(void**)(model + 0xFC) = (void*)SB_DrawMeshDLCallback;
@@ -576,8 +577,8 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
 
     if (work[0x24] != 0) {
         CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)modelView->m_data->m_materialSet + 8))[displayList->m_material];
-        unsigned char colorStorage1[4];
-        unsigned char colorStorage0[4];
+        GXColor colorStorage0;
+        GXColor colorStorage1;
 
         MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 1, (_GXTevScale)0);
         GXSetArray((GXAttr)0xB, work + 0x28, 4);
@@ -585,8 +586,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
         if (*(u16*)((u8*)material + 0x18) == 1) {
             GXSetNumChans(1);
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-            GXSetTevKColor((GXTevKColorID)0,
-                           *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage0, 0xA0, 0xA0, 0xA0, 0xA0)));
+            GXSetTevKColor((GXTevKColorID)0, *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(&colorStorage0, 0xA0, 0xA0, 0xA0, 0xA0)));
             GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xC);
             GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1C);
             _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 10, 0xE, 10, 0xF);
@@ -595,8 +595,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
             _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
 
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 0, 0, 4);
-            GXSetTevKColor((GXTevKColorID)1,
-                           *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage1, 0x60, 0x60, 0x60, work[0x2B])));
+            GXSetTevKColor((GXTevKColorID)1, *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(&colorStorage1, 0x60, 0x60, 0x60, work[0x2B])));
             GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xD);
             GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1D);
             _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(1, 0xF, 0xE, 0, 0xF);
@@ -635,7 +634,7 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     Vec lightDir;
     GXLightObj lightObj;
     u8* camera = reinterpret_cast<u8*>(&CameraPcs);
-    const float cameraOffset = kPppScreenBreakCameraOffset;
+    const float cameraOffset = FLOAT_80331ce8;
 
     lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
     lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));

@@ -90,6 +90,7 @@ static const char s_fatalErrorEs2[] = {0x64, 0x65, 0x20, 0x4E, 0x69, 0x6E, 0x74,
 
 static const char s_emptyErrorText[] = "";
 
+static const char s_cManager[] = "CManager";
 static const char s_cFile[] = "CFile";
 static const char s_drawErrorFmt[] = "CFile::drawError: %d\n";
 static const char s_fileCpp[] = "file.cpp";

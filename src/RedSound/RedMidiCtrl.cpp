@@ -1710,33 +1710,32 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
     unsigned int depth;
     int value;
     unsigned int* entry;
-    int* trackData = (int*)track;
 
-    trackData[0x20] = (unsigned int)(*(unsigned char*)trackData[0]) << 0xc;
-    if (*(char*)(trackData[0] + 1) == '\0') {
+    ((int*)track)[0x20] = (unsigned int)(*(unsigned char*)((int*)track)[0]) << 0xc;
+    if (*(char*)(((int*)track)[0] + 1) == '\0') {
         depth = 0x100;
     } else {
-        depth = (unsigned int)(*(unsigned char*)(trackData[0] + 1));
+        depth = (unsigned int)(*(unsigned char*)(((int*)track)[0] + 1));
     }
 
-    trackData[0x1e] = 0x100000 / depth;
-    trackData[0x1d] = SwingEntryFunction[*(unsigned char*)(trackData[0] + 2) & 0xf];
-    *(short*)((int)trackData + 0x8e) = 0;
-    *(short*)(trackData + 0x23) = 0;
-    trackData[0] = trackData[0] + 3;
+    ((int*)track)[0x1e] = 0x100000 / depth;
+    ((int*)track)[0x1d] = SwingEntryFunction[*(unsigned char*)(((int*)track)[0] + 2) & 0xf];
+    *(short*)((int)track + 0x8e) = 0;
+    *(short*)((int*)track + 0x23) = 0;
+    ((int*)track)[0] = ((int*)track)[0] + 3;
 
     entry = p_VoiceData;
     do {
-        if ((int*)*entry == trackData) {
+        if ((RedTrackDATA*)*entry == track) {
             value = 0x100;
-            *(short*)(entry + 10) = *(short*)(trackData + 0x24);
-            if (trackData[0x1e] >> 0xc != 0) {
-                value = 0x100 / (trackData[0x1e] >> 0xc);
+            *(short*)(entry + 10) = *(short*)((int*)track + 0x24);
+            if (((int*)track)[0x1e] >> 0xc != 0) {
+                value = 0x100 / (((int*)track)[0x1e] >> 0xc);
             }
-            if (*(short*)((int)trackData + 0x92) == 0) {
+            if (*(short*)((int)track + 0x92) == 0) {
                 value = 0;
             } else {
-                value = (int)*(short*)((int)trackData + 0x92) * value * 4;
+                value = (int)*(short*)((int)track + 0x92) * value * 4;
             }
             entry[8] = value;
             entry[9] = 0;
@@ -1896,34 +1895,32 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	unsigned int rateDivisor;
 	int value;
-	int* trackData;
 	unsigned int* voice;
 
-	trackData = (int*)track;
-	trackData[0x28] = (unsigned int)(*(unsigned char*)trackData[0]) << 0xc;
-	if (*(char*)(trackData[0] + 1) == '\0') {
+	((int*)track)[0x28] = (unsigned int)(*(unsigned char*)((int*)track)[0]) << 0xc;
+	if (*(char*)(((int*)track)[0] + 1) == '\0') {
 		rateDivisor = 0x100;
 	} else {
-		rateDivisor = (unsigned int)(*(unsigned char*)(trackData[0] + 1));
+		rateDivisor = (unsigned int)(*(unsigned char*)(((int*)track)[0] + 1));
 	}
-	trackData[0x26] = 0x100000 / rateDivisor;
-	trackData[0x25] = SwingEntryFunction[*(unsigned char*)(trackData[0] + 2) & 0xf];
-	*(short*)((int)trackData + 0xae) = 0;
-	*(short*)(trackData + 0x2b) = 0;
-	trackData[0] += 3;
+	((int*)track)[0x26] = 0x100000 / rateDivisor;
+	((int*)track)[0x25] = SwingEntryFunction[*(unsigned char*)(((int*)track)[0] + 2) & 0xf];
+	*(short*)((int)track + 0xae) = 0;
+	*(short*)((int*)track + 0x2b) = 0;
+	((int*)track)[0] += 3;
 
 	voice = p_VoiceData;
 	do {
-		if ((int*)*voice == trackData) {
+		if ((RedTrackDATA*)*voice == track) {
 			value = 0x100;
-			*(short*)(voice + 0xe) = *(short*)(trackData + 0x2c);
-			if (trackData[0x26] >> 0xc != 0) {
-				value = 0x100 / (trackData[0x26] >> 0xc);
+			*(short*)(voice + 0xe) = *(short*)((int*)track + 0x2c);
+			if (((int*)track)[0x26] >> 0xc != 0) {
+				value = 0x100 / (((int*)track)[0x26] >> 0xc);
 			}
-			if (*(short*)((int)trackData + 0xb2) == 0) {
+			if (*(short*)((int)track + 0xb2) == 0) {
 				value = 0;
 			} else {
-				value = *(short*)((int)trackData + 0xb2) * value * 4;
+				value = *(short*)((int)track + 0xb2) * value * 4;
 			}
 			voice[0xc] = value;
 			voice[0xd] = 0;

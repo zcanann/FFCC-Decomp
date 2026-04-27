@@ -113,23 +113,3 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
         target_colors[3] = (u8)(target_colors[3] + delta);
     }
 }
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void randchar(char, float)
-{
-    // TODO
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void randf(unsigned char)
-{
-    // TODO
-}

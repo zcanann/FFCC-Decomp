@@ -2,8 +2,6 @@
 #define _PPP_RANDUPCV_H_
 
 #ifdef __cplusplus
-char randchar(char, float);
-
 extern "C" {
 #endif
 

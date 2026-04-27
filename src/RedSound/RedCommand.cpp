@@ -45,11 +45,10 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 {
 	int* trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
 	int* track = (int*)*trackBasePtr;
-	u8 mask = (u8)attrMask;
 
 	do {
 		if ((*track != 0) && ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
-		    ((((unsigned int)*(unsigned char*)(track + 0x54)) & (unsigned int)mask) != 0)) {
+		    ((((unsigned int)*(unsigned char*)(track + 0x54)) & (unsigned int)attrMask) != 0)) {
 			int trackNo;
 			int seTrackOffset;
 

@@ -1849,15 +1849,14 @@ void __MidiCtrl_VibrateDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
 void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	int delta[1];
-	int* trackData = (int*)track;
 
-	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	delta[0] = DeltaTimeSumup((unsigned char**)track);
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	trackData[0x21] = DataAddCompute(trackData + 0x20, *(u8*)trackData[0], delta);
-	*(short*)((int)trackData + 0x8e) = (short)delta[0];
-	trackData[0] += 1;
+	((int*)track)[0x21] = DataAddCompute((int*)track + 0x20, *(u8*)((int*)track)[0], delta);
+	*(short*)((int)track + 0x8e) = (short)delta[0];
+	((int*)track)[0] += 1;
 }
 
 /*
@@ -2044,15 +2043,14 @@ void __MidiCtrl_TremoloDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
 void __MidiCtrl_TremoloDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	int delta[1];
-	int* trackData = (int*)track;
 
-	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	delta[0] = DeltaTimeSumup((unsigned char**)track);
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	trackData[0x29] = DataAddCompute(trackData + 0x28, *(u8*)trackData[0], delta);
-	*(short*)((int)trackData + 0xae) = (short)delta[0];
-	trackData[0] += 1;
+	((int*)track)[0x29] = DataAddCompute((int*)track + 0x28, *(u8*)((int*)track)[0], delta);
+	*(short*)((int)track + 0xae) = (short)delta[0];
+	((int*)track)[0] += 1;
 }
 
 /*
@@ -2210,15 +2208,14 @@ void __MidiCtrl_ShakeDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	int delta[1];
-	int* trackData = (int*)track;
 
-	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	delta[0] = DeltaTimeSumup((unsigned char**)track);
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	trackData[0x31] = DataAddCompute(trackData + 0x30, *(u8*)trackData[0], delta);
-	*(short*)((int)trackData + 0xd2) = (short)delta[0];
-	trackData[0] += 1;
+	((int*)track)[0x31] = DataAddCompute((int*)track + 0x30, *(u8*)((int*)track)[0], delta);
+	*(short*)((int)track + 0xd2) = (short)delta[0];
+	((int*)track)[0] += 1;
 }
 
 /*

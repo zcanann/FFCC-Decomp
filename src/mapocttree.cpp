@@ -89,6 +89,7 @@ CBoundRaw s_bound;
 CMapCylinderRaw s_cyl;
 Vec s_mvec;
 static unsigned long s_checkHitCylinderMask;
+static unsigned long s_insertLightBitIndex;
 static unsigned long s_insertShadowBitIndex;
 static int s_insertShadowDepth;
 
@@ -1098,9 +1099,9 @@ void InsertLight_r(COctNode* node)
 	}
 
 	if (node->m_meshCount != 0) {
-		unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
+		unsigned long byteOffset = (s_insertLightBitIndex >> 3) & 0x1ffffffc;
 		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&node->m_lightFlags, byteOffset));
-		*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
+		*bits |= 1UL << (s_insertLightBitIndex & 0x1f);
 	}
 
 	for (int i = 0; i < 8; i++) {
@@ -1157,9 +1158,9 @@ void InsertLight_r(COctNode* node)
 
 		if (childOverlap) {
 			if (child->m_meshCount != 0) {
-				unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
+				unsigned long byteOffset = (s_insertLightBitIndex >> 3) & 0x1ffffffc;
 				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&child->m_lightFlags, byteOffset));
-				*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
+				*bits |= 1UL << (s_insertLightBitIndex & 0x1f);
 			}
 
 			for (int j = 0; j < 8; j++) {
@@ -1170,7 +1171,7 @@ void InsertLight_r(COctNode* node)
 
 				if ((reinterpret_cast<CBound*>(&s_bound)->CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
 					if (grandChild->m_meshCount != 0) {
-						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x44)), s_insertShadowBitIndex);
+						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x44)), s_insertLightBitIndex);
 					}
 
 					for (int k = 0; k < 8; k++) {
@@ -1208,7 +1209,7 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
 		return;
 	}
 
-	s_insertShadowBitIndex = bitIndex;
+	s_insertLightBitIndex = bitIndex;
 	PSMTXInverse(reinterpret_cast<MtxPtr>(mapObj + 0xB8), inverseMtx);
 	PSMTXMultVec(inverseMtx, &position, &localPosition);
 

@@ -105,7 +105,7 @@ struct YmBreathParams {
 struct YmBreathParticleGroup {
     int active;
     signed char* particleIndices;
-    unsigned char* particleStates;
+    signed char* particleStates;
     Vec position;
     Vec direction;
     float speed;
@@ -552,13 +552,15 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
                 groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                     (unsigned long)params->m_slotCount,
                     pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x260);
-                memset((void*)groupTable[1], 0xFF,
+                void* particleIndices = (void*)groupTable[1];
+                memset(particleIndices, -1,
                        (unsigned long)params->m_slotCount);
 
                 groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                     (unsigned long)params->m_slotCount,
                     pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x263);
-                memset((void*)groupTable[2], 0xFF,
+                void* particleStates = (void*)groupTable[2];
+                memset(particleStates, -1,
                        (unsigned long)params->m_slotCount);
                 groupTable[0] = 0;
                 groupTable += 0x17;
@@ -718,7 +720,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                     if (found) {
                         groupData = &groupTable[(int)foundGroup];
                         for (slot = 0; slot < (int)params->m_slotCount; slot++) {
-                            groupData->particleStates[slot] = 0xFF;
+                            groupData->particleStates[slot] = -1;
                             groupData->position.x = zero;
                             groupData->position.y = zero;
                             groupData->position.z = zero;
@@ -739,7 +741,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                     groupData = groupTable;
                     for (j = 0; j < (int)params->m_groupCount; j++) {
                         for (k = 0; k < (int)params->m_slotCount; k++) {
-                            if ((groupData->particleIndices[k] == -1) && (groupData->particleStates[k] == 0xFF)) {
+                            if ((groupData->particleIndices[k] == -1) && (groupData->particleStates[k] == -1)) {
                                 groupData->particleIndices[k] = (signed char)i;
                                 found = false;
                                 groupData->particleStates[k] = 1;
@@ -826,7 +828,7 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
         particleColor->m_colorFrameDeltas[1] += params->m_colorFrameAccel1;
         particleColor->m_colorFrameDeltas[2] += params->m_colorFrameAccel2;
         particleColor->m_colorFrameDeltas[3] += params->m_colorFrameAccel3;
-        alpha = (unsigned int)vColor->m_alpha + (int)particleColor->m_color[3];
+        alpha = (int)vColor->m_alpha + (int)particleColor->m_color[3];
         if (alpha > 0xFF) {
             alpha = 0xFF;
         }
@@ -859,14 +861,17 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
 
     particle->m_scale += params->m_scaleAccel;
     if (params->m_disableScaleClamp == 0) {
-        float start = params->m_scaleClampStart;
         float zero = 0.0f;
-        if ((zero < start) && (params->m_scaleAccel < zero)) {
-            if (particle->m_scale < zero) {
+        if (zero < params->m_scaleClampStart) {
+            if (params->m_scaleAccel < zero) {
+                if (particle->m_scale < zero) {
+                    particle->m_scale = zero;
+                }
+            }
+        } else if (params->m_scaleClampStart < zero) {
+            if ((zero < params->m_scaleAccel) && (zero < particle->m_scale)) {
                 particle->m_scale = zero;
             }
-        } else if ((start < zero) && (zero < params->m_scaleAccel) && (zero < particle->m_scale)) {
-            particle->m_scale = zero;
         }
     }
 
@@ -903,12 +908,10 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
-    int angle[3];
+    int angle[4];
     pppFMATRIX rotMtx;
     Vec baseDir;
-    float normX;
-    float normY;
-    float normZ;
+    Vec directionNorm;
     float spread;
     float range;
     unsigned char flags;
@@ -931,6 +934,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     angle[0] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
     angle[1] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
     angle[2] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
+    angle[3] = 0;
 
     pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
     PSMTXMultVecSR(rotMtx.value, &baseDir, &particle->m_direction);
@@ -939,10 +943,8 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     particle->m_direction.y *= params->m_directionScaleY;
     particle->m_direction.z *= params->m_directionScaleZ;
 
-    normX = particle->m_direction.x;
-    normY = particle->m_direction.y;
-    normZ = particle->m_direction.z;
-    pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&particle->m_direction), reinterpret_cast<Vec*>(&normX));
+    directionNorm = particle->m_direction;
+    pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&particle->m_direction), &directionNorm);
 
     if (params->m_spawnOffset != 0.0f) {
         PSVECScale(&particle->m_direction, &particle->m_position, params->m_spawnOffset);

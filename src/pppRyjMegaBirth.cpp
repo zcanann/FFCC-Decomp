@@ -181,7 +181,7 @@ void calc(
 	int alpha;
 	u8* paramPayload;
 	u8* particlePayload;
-	u8 frameCount;
+	u32 frameCount;
 	Vec step;
 
 	alpha = vColor->m_alpha;
@@ -275,9 +275,9 @@ void calc(
 
 	*u8_at(particlePayload, 0x58) = *u8_at(particlePayload, 0x58) + 1;
 	frameCount = *u8_at(particlePayload, 0x59);
-	if ((frameCount != 0) && ((int)(unsigned int)*u8_at(particlePayload, 0x58) <= (int)frameCount))
+	if ((frameCount != 0) && ((u32)*u8_at(particlePayload, 0x58) <= frameCount))
 	{
-		*f32_at(particlePayload, 0x54) = *f32_at(particlePayload, 0x54) - (float)alpha / (float)(int)frameCount;
+		*f32_at(particlePayload, 0x54) = *f32_at(particlePayload, 0x54) - (float)alpha / (float)frameCount;
 	}
 
 	frameCount = *u8_at(particlePayload, 0x5A);

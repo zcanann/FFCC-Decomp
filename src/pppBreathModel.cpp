@@ -100,7 +100,7 @@ struct BreathModelParams {
     u16 m_particleCount;
     u16 m_emitCount;
     u16 m_emitInterval;
-    s16 m_particleLifetime;
+    u16 m_particleLifetime;
     u8 m_fadeOutFrames;
     u8 m_fadeInFrames;
     unsigned char _pad24[0x04];
@@ -953,7 +953,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
 
         particle->m_angleRandom = params->m_angleRandomRange * Math.RandF();
         if ((flags & 1) && (flags & 2)) {
-            if (DOUBLE_80330F98 < Math.RandF()) {
+            if (Math.RandF() > DOUBLE_80330F98) {
                 particle->m_angleRandom *= FLOAT_80330F80;
             }
         } else if (flags & 2) {
@@ -990,13 +990,13 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
             particle->m_rotationAccelY = params->m_rotationRandomY * Math.RandF();
             particle->m_rotationAccelZ = params->m_rotationRandomZ * Math.RandF();
             if ((flags & 1) && (flags & 2)) {
-                if (DOUBLE_80330F98 < Math.RandF()) {
+                if (Math.RandF() > DOUBLE_80330F98) {
                     particle->m_rotationAccelX *= FLOAT_80330F80;
                 }
-                if (DOUBLE_80330F98 < Math.RandF()) {
+                if (Math.RandF() > DOUBLE_80330F98) {
                     particle->m_rotationAccelY *= FLOAT_80330F80;
                 }
-                if (DOUBLE_80330F98 < Math.RandF()) {
+                if (Math.RandF() > DOUBLE_80330F98) {
                     particle->m_rotationAccelZ *= FLOAT_80330F80;
                 }
             } else if (flags & 2) {
@@ -1011,7 +1011,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
             particle->m_rotationAccelY = value;
             particle->m_rotationAccelZ = value;
             if ((flags & 1) && (flags & 2)) {
-                if (DOUBLE_80330F98 < Math.RandF()) {
+                if (Math.RandF() > DOUBLE_80330F98) {
                     particle->m_rotationAccelX *= FLOAT_80330F80;
                     particle->m_rotationAccelY *= FLOAT_80330F80;
                     particle->m_rotationAccelZ *= FLOAT_80330F80;

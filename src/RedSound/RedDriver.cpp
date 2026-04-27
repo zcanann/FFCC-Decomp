@@ -777,18 +777,16 @@ void _MyAlarmHandler(OSAlarm* param_1, OSContext*)
 void RedSleep(int param_1)
 {
     unsigned int interruptLevel;
-    OSThread* currentThread;
     RedSleepAlarm alarm;
 
     if (param_1 < 0xfa) {
         param_1 = 0xfa;
     }
     interruptLevel = OSDisableInterrupts();
-    currentThread = OSGetCurrentThread();
+    alarm.thread = OSGetCurrentThread();
     OSCreateAlarm(&alarm.alarm);
-    alarm.thread = currentThread;
-    OSSetAlarm(&alarm.alarm, (param_1 * (OS_BUS_CLOCK / 500000)) >> 3, _MyAlarmHandler);
-    OSSuspendThread(currentThread);
+    OSSetAlarm(&alarm.alarm, (param_1 * (OS_TIMER_CLOCK / 125000)) >> 3, _MyAlarmHandler);
+    OSSuspendThread(alarm.thread);
     OSRestoreInterrupts(interruptLevel);
 }
 
@@ -879,16 +877,14 @@ int _WaveSettingThread(void* param_1)
  */
 void _DMACheckProcess()
 {
-    int semCount;
     int* dmaInfo;
 
     if (m_ReportPrint != 0) {
         OSReport(s_redDriverDmaCheckHeaderFmt, sRedDriverLogPrefix);
         fflush(__files + 1);
 
-        semCount = OSGetSemaphoreCount(&m_DmaExecuteSemaphore);
         OSReport(sRedDriverDmaStatusFmt, sRedDriverLogPrefix, m_DMAStatus,
-                 semCount, m_DMAExecute, m_DMAInThread);
+                 OSGetSemaphoreCount(&m_DmaExecuteSemaphore), m_DMAExecute, m_DMAInThread);
         fflush(__files + 1);
     }
 
@@ -1049,50 +1045,49 @@ void _DmaExecute()
     int* piVar7;
     int* piVar8;
 
-    do {
-        do {
-            if ((p_DmaControlNow[0] == p_DmaControlOld[0]) && (p_DmaControlNow[1] == p_DmaControlOld[1])) {
-                m_DMAInThread = 0;
-                return;
-            }
-            if (p_DmaControlNow[0] == p_DmaControlOld[0]) {
-                ppiVar5 = (int**)&p_DmaControlOld[1];
-                piVar4 = RedDriverStreamDmaQueue();
+    while ((p_DmaControlNow[0] != p_DmaControlOld[0]) || (p_DmaControlNow[1] != p_DmaControlOld[1])) {
+        m_DMAInThread = 1;
+        if (p_DmaControlNow[0] == p_DmaControlOld[0]) {
+            ppiVar5 = (int**)&p_DmaControlOld[1];
+            piVar4 = RedDriverStreamDmaQueue();
+        } else {
+            ppiVar5 = (int**)&p_DmaControlOld[0];
+            piVar4 = RedDriverMainDmaQueue();
+        }
+        piVar7 = *ppiVar5;
+        m_DMAInThread = 2;
+        piVar6 = 0;
+        if (*piVar7 != 0) {
+            m_DMAStatus = 1;
+            if (piVar7[1] == 0) {
+                DCFlushRange((void*)piVar7[2], (u32)piVar7[4]);
+                iVar3 = piVar7[2];
+                iVar2 = piVar7[3];
             } else {
-                ppiVar5 = (int**)&p_DmaControlOld[0];
-                piVar4 = RedDriverMainDmaQueue();
+                DCInvalidateRange((void*)piVar7[2], (u32)piVar7[4]);
+                iVar3 = piVar7[3];
+                iVar2 = piVar7[2];
             }
-            piVar7 = *ppiVar5;
-            m_DMAInThread = 2;
-            piVar6 = 0;
-            if (*piVar7 != 0) {
-                m_DMAStatus = 1;
-                if (piVar7[1] == 0) {
-                    DCFlushRange((void*)piVar7[2], (u32)piVar7[4]);
-                    iVar3 = piVar7[2];
-                    iVar2 = piVar7[3];
-                } else {
-                    DCInvalidateRange((void*)piVar7[2], (u32)piVar7[4]);
-                    iVar3 = piVar7[3];
-                    iVar2 = piVar7[2];
-                }
-                m_DMAInThread = 3;
-                ARQSetChunkSize((u32)piVar7[4]);
-                ARQPostRequest(&m_DMARequest, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
-                               (u32)piVar7[4], _DmaCallback);
-                piVar6 = piVar7;
-            }
-            piVar8 = piVar7 + 7;
-            if (piVar4 + 0x380 <= piVar7 + 7) {
-                piVar8 = piVar4;
-            }
-            *ppiVar5 = piVar8;
-        } while (piVar6 == 0);
+            m_DMAInThread = 3;
+            ARQSetChunkSize((u32)piVar7[4]);
+            ARQPostRequest(&m_DMARequest, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
+                           (u32)piVar7[4], _DmaCallback);
+            m_DMAInThread = 4;
+            piVar6 = piVar7;
+        }
+        piVar8 = piVar7 + 7;
+        m_DMAInThread = 5;
+        if (piVar4 + 0x380 <= piVar7 + 7) {
+            piVar8 = piVar4;
+        }
+        *ppiVar5 = piVar8;
+        m_DMAInThread = 6;
+
         while (piVar6 != 0) {
             m_DMAInThread = 7;
             if (m_DMAStatus == 0) {
                 m_DMAInThread = 8;
-                if (piVar6[5] != 0) {
+                if ((u32)piVar6[5] != 0) {
                     uVar1 = OSDisableInterrupts();
                     ((void (*)(void*))piVar6[5])((void*)piVar6[6]);
                     OSRestoreInterrupts(uVar1);
@@ -1106,7 +1101,8 @@ void _DmaExecute()
             }
             RedSleep(0);
         }
-    } while (true);
+    }
+    m_DMAInThread = 0;
 }
 
 /*
@@ -1433,25 +1429,23 @@ int CRedDriver::SetMusicData(void* param_1)
     char* musicHeader = (char*)param_1;
     void* copiedHeader;
     int headerSize;
-    short musicID;
+    int result;
 
+    result = -1;
     if (((musicHeader[0] == 'B') && (musicHeader[1] == 'G')) && (musicHeader[2] == 'M')) {
         memcpy(localHeader, musicHeader, sizeof(localHeader));
         headerSize = *(int*)(localHeader + 0x10);
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
             memcpy(copiedHeader, musicHeader, headerSize);
+            result = *(short*)(localHeader + 4);
             _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
-            musicID = *(short*)(localHeader + 4);
-            return musicID;
         }
-        return -1;
-    }
-    if (m_ReportPrint != 0) {
+    } else if (m_ReportPrint != 0) {
         OSReport(sRedDriverMusicHeaderErrorFmt, sRedDriverLogPrefix, sRedDriverLogWarnColor, sRedDriverLogReset);
         fflush(__files + 1);
     }
-    return -1;
+    return result;
 }
 
 /*
@@ -1627,30 +1621,27 @@ void* CRedDriver::SetSeBlockData(int param_1, void* param_2)
  */
 int CRedDriver::SetSeSepData(void* param_1)
 {
-    int iVar1;
-    int iVar2;
-    void* pvVar3;
-    char* pcVar4;
+    char* seSepHeader = (char*)param_1;
+    void* copiedHeader;
+    int headerSize;
+    int result;
 
-    pcVar4 = (char*)param_1;
-    if ((((pcVar4[0] == 'S') && (pcVar4[1] == 'e')) && (pcVar4[2] == 'S')) &&
-        ((pcVar4[3] == 'e' && (pcVar4[4] == 'p')))) {
-        iVar1 = *(int*)(pcVar4 + 0xc) & 0x7fffffff;
-        pvVar3 = (void*)RedNew(iVar1);
-        if (pvVar3 != 0) {
-            memcpy(pvVar3, param_1, iVar1);
-            iVar2 = *(int*)((int)pvVar3 + 8);
-            _EntryExecCommand(_SetSeSepData, (int)pvVar3, 0, 0, 0, 0, 0, 0);
-            return iVar2;
+    result = -1;
+    if ((((seSepHeader[0] == 'S') && (seSepHeader[1] == 'e')) && (seSepHeader[2] == 'S')) &&
+        ((seSepHeader[3] == 'e' && (seSepHeader[4] == 'p')))) {
+        headerSize = *(int*)(seSepHeader + 0xc) & 0x7fffffff;
+        copiedHeader = (void*)RedNew(headerSize);
+        if (copiedHeader != 0) {
+            memcpy(copiedHeader, seSepHeader, headerSize);
+            result = *(int*)((int)copiedHeader + 8);
+            _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
-        return -1;
-    }
-    if (m_ReportPrint != 0) {
+    } else if (m_ReportPrint != 0) {
         OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,
                  sRedDriverLogWarnColor, sRedDriverLogReset);
         fflush(__files + 1);
     }
-    return -1;
+    return result;
 }
 
 /*
@@ -1709,38 +1700,43 @@ int CRedDriver::ReentrySeSepData(int id)
 int CRedDriver::SePlayState(int param_1)
 {
     unsigned int uVar1;
-    int* piVar2;
-    int* piVar3;
+    int result;
+    int* seInfo;
+    int** seInfoBase;
+    int* commandNow;
+    int* command;
 
     uVar1 = OSDisableInterrupts();
-    piVar3 = *(int**)((int)p_SoundControlBuffer + 0xdbc);
+    result = 0;
+    seInfoBase = (int**)((int)p_SoundControlBuffer + 0xdbc);
+    seInfo = *seInfoBase;
     do {
-        piVar2 = piVar3;
-        if ((*piVar2 != 0) && ((param_1 == -1 || (piVar2[0x3e] == param_1)))) {
+        if (((u32)*seInfo != 0) && ((param_1 == -1 || (seInfo[0x3e] == param_1)))) {
+            result = (int)seInfo;
             break;
         }
-        piVar3 = piVar2 + 0x55;
-        piVar2 = 0;
-    } while (piVar3 < (int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80));
-    piVar3 = (int*)p_ExecCommandOld;
-    if (piVar2 == 0) {
-        while ((int*)p_ExecCommandNow != piVar3) {
-            if (((*piVar3 != 0) &&
-                ((((void (*)(int*))*piVar3 == _SeBlockPlay) ||
-                  (((void (*)(int*))*piVar3 == _SeSepPlay))) ||
-                 ((void (*)(int*))*piVar3 == _SeSepPlaySequence))) &&
-                ((param_1 == -1 || (param_1 == piVar3[1])))) {
-                piVar2 = (int*)1;
+        seInfo += 0x55;
+    } while (seInfo < (int*)((int)*seInfoBase + 0x2a80));
+    if (result == 0) {
+        commandNow = (int*)p_ExecCommandNow;
+        command = (int*)p_ExecCommandOld;
+        while (commandNow != command) {
+            if ((((u32)*command != 0) &&
+                ((((void (*)(int*))*command == _SeBlockPlay) ||
+                  (((void (*)(int*))*command == _SeSepPlay))) ||
+                 ((void (*)(int*))*command == _SeSepPlaySequence))) &&
+                ((param_1 == -1 || (param_1 == command[1])))) {
+                result = 1;
                 break;
             }
-            piVar3 = piVar3 + 8;
-            if (piVar3 == (int*)p_ExecCommand + 0x800) {
-                piVar3 = (int*)p_ExecCommand;
+            command += 8;
+            if (command == (int*)p_ExecCommand + 0x800) {
+                command = (int*)p_ExecCommand;
             }
         }
     }
     OSRestoreInterrupts(uVar1);
-    return (int)piVar2;
+    return result;
 }
 
 /*
@@ -2147,18 +2143,20 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
     m_WaveSettingData.slot = slot;
     m_WaveSettingData.waveID = waveID;
     m_WaveSettingData.waveData = waveData;
-    m_WaveSettingData.waveSize = waveSize;
 
     if (waveSize == -1) {
         RedWaveHEAD* const waveHeader = (RedWaveHEAD*)waveData;
 
         if ((waveHeader->magic[0] == 'W') && (waveHeader->magic[1] == 'D')) {
-            m_WaveSettingData.waveSize =
-                waveHeader->dataSize + (((waveHeader->regionCount * 4) + 0x3fU) & 0xffffffc0) +
-                (waveHeader->sampleCount * 0x60) + 0x20;
+            int dataSize =
+                (((waveHeader->regionCount * 4) + 0x3fU) & 0xffffffc0) + (waveHeader->sampleCount * 0x60);
+            dataSize = waveHeader->dataSize + dataSize;
+            m_WaveSettingData.waveSize = dataSize + 0x20;
         } else {
             m_WaveSettingData.waveSize = 0;
         }
+    } else {
+        m_WaveSettingData.waveSize = waveSize;
     }
     OSSignalSemaphore(&m_WaveSettingSemaphore);
 }

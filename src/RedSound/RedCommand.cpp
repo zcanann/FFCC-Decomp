@@ -45,11 +45,10 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 {
 	int* trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
 	int* track = (int*)*trackBasePtr;
-	u8 mask = (u8)attrMask;
 
 	do {
 		if ((*track != 0) && ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
-		    ((((unsigned int)*(unsigned char*)(track + 0x54)) & (unsigned int)mask) != 0)) {
+		    ((((unsigned int)*(unsigned char*)(track + 0x54)) & (unsigned int)attrMask) != 0)) {
 			int trackNo;
 			int seTrackOffset;
 
@@ -122,8 +121,8 @@ int _EraseTime(int eraseTrack)
 		if ((*track != 0) && (*(char*)(track + 0x54) == '\0') &&
 		    ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
 		    (track[0x43] == maxWait)) {
-			unsigned char trackNo;
-			unsigned int* seTrack;
+			int trackNo;
+			int seTrackOffset;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			track[0x3e] = 0;
@@ -131,14 +130,13 @@ int _EraseTime(int eraseTrack)
 			*track = 0;
 			track[0x16] = 0;
 
-			trackNo = *(unsigned char*)((char*)track + 0x14e);
-			((unsigned char*)p_VoiceData)[trackNo * 0xc0 + 0x1a] &=
-			    (unsigned char)0xfa;
-			seTrack = (unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0);
-			seTrack[0x25] &= 0xfffffff7;
-			seTrack[0x24] &= 0xfffffffe;
-			seTrack[0x24] |= 2;
-			seTrack[0x23] = 0;
+			trackNo = *(char*)((char*)track + 0x14e);
+			seTrackOffset = trackNo * 0xc0;
+			((unsigned char*)p_VoiceData)[seTrackOffset + 0x1a] &= (unsigned char)0xfa;
+			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x94) &= 0xfffffff7;
+			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) &= 0xfffffffe;
+			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) |= 2;
+			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x8c) = 0;
 
 			if (track[6] != 0) {
 				c_RedEntry.WaveHistoryManager(0, *(short*)(track[6] + 2));
@@ -214,15 +212,18 @@ int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
  */
 int SeStopID(int seId)
 {
-	int* trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
+	int soundBase;
+	int* trackBasePtr;
 	int* track;
 
-	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
-	track = (int*)*trackBasePtr;
+	soundBase = (int)p_SoundControlBuffer;
+	trackBasePtr = (int*)(soundBase + 0xdbc);
+	*(unsigned int*)(soundBase + 0x1244) = 0;
+	track = *(int**)(soundBase + 0xdbc);
 	do {
 		if ((*track != 0) && ((seId == -1) || (track[0x3e] == seId))) {
-			unsigned char trackNo;
-			unsigned int* seTrack;
+			int trackNo;
+			int seTrackOffset;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			track[0x3e] = 0;
@@ -230,14 +231,14 @@ int SeStopID(int seId)
 			*track = 0;
 			track[0x16] = 0;
 
-			trackNo = *(unsigned char*)((char*)track + 0x14e);
-			((unsigned char*)p_VoiceData)[trackNo * 0xc0 + 0x1a] &= (unsigned char)0xfa;
-			seTrack = (unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0);
-			seTrack[0x25] &= 0xfffffff7;
-			seTrack[0x24] &= 0xfffffffe;
-			seTrack[0x24] |= 2;
-			seTrack[0] = 0;
-			seTrack[0x23] = 0;
+			trackNo = *(char*)((char*)track + 0x14e);
+			seTrackOffset = trackNo * 0xc0;
+			((unsigned char*)p_VoiceData)[seTrackOffset + 0x1a] &= (unsigned char)0xfa;
+			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x94) &= 0xfffffff7;
+			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) &= 0xfffffffe;
+			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) |= 2;
+			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset) = 0;
+			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x8c) = 0;
 
 			if (track[6] != 0) {
 				c_RedEntry.WaveHistoryManager(0, *(short*)(track[6] + 2));
@@ -468,31 +469,27 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
  */
 int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 {
-	int bankIndex = bank & 3;
-	int seNo = no & 0x1FF;
-	int playPan = pan;
-	int playVolume = volume;
-	int playSeId = seId;
+	bank = bank & 3;
+	no = no & 0x1FF;
 
-	if (p_SeBlockData[bankIndex] != 0) {
-		int bankData = (int)p_SeBlockData[bankIndex];
-		int playNo = seNo + (bankIndex << 9);
-		short count = *(short*)(bankData + 10);
+	if (p_SeBlockData[bank] != 0) {
+		int bankData = (int)p_SeBlockData[bank];
+		int seNo = no;
+		int playNo = no + (bank << 9);
 
 		playNo |= 0x80000000;
-		if (seNo < count) {
+		if (seNo < *(short*)(bankData + 10)) {
 			int dataBase = bankData + 0x10;
 			int offset = *(int*)(dataBase + seNo * 4);
 
 			if (offset != -1) {
 				RedSeINFO* seInfo =
-				    (RedSeINFO*)(dataBase + count * 4 + ((unsigned int)*(int*)(dataBase + seNo * 4) & 0x7FFFFFFF));
-				RedSeINFO* playInfo = seInfo;
+				    (RedSeINFO*)(dataBase + *(short*)(bankData + 10) * 4 + ((unsigned int)offset & 0x7FFFFFFF));
 
 				if (((unsigned int)offset & 0x80000000) != 0) {
-					*(unsigned char*)playInfo |= 0x80;
+					*(unsigned char*)seInfo |= 0x80;
 				}
-				if (_SePlayStart(playInfo, playSeId, playNo, playPan, playVolume) != 0) {
+				if (_SePlayStart(seInfo, seId, playNo, pan, volume) != 0) {
 					return seNo;
 				}
 			}

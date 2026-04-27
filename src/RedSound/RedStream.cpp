@@ -8,26 +8,12 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-struct RedStreamDebugStrings {
-    char bufferDidntSecure[sizeof("%s%sStream Buffer didn't secure.%s\n")];
-    char logPrefix[sizeof("\x1B[7;34mSound\x1B[0m:")];
-    char mainMemoryDidntCreate[sizeof("%s%sM-Memory didn't create.(need:0x%6.6X)%s\n")];
-    char aramMemoryDidntCreate[sizeof("%s%sA-Memory didn't create.(need:0x%6.6X)%s\n")];
-    char pauseOn[sizeof("%sPause : Stream : ON  %d\n")];
-    char pauseOff[sizeof("%sPause : Stream : OFF %d\n")];
-    char pad[2];
-};
-
-static const RedStreamDebugStrings sRedStreamDebugStrings = {
-    "%s%sStream Buffer didn't secure.%s\n",
-    "\x1B[7;34mSound\x1B[0m:",
-    "%s%sM-Memory didn't create.(need:0x%6.6X)%s\n",
-    "%s%sA-Memory didn't create.(need:0x%6.6X)%s\n",
-    "%sPause : Stream : ON  %d\n",
-    "%sPause : Stream : OFF %d\n",
-    { 0, 0 },
-};
-
+static const char sRedStreamBufferDidntSecureFmt[] = "%s%sStream Buffer didn't secure.%s\n";
+static const char sRedStreamLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
+static const char sRedStreamMainMemoryDidntCreateFmt[] = "%s%sM-Memory didn't create.(need:0x%6.6X)%s\n";
+static const char sRedStreamAramMemoryDidntCreateFmt[] = "%s%sA-Memory didn't create.(need:0x%6.6X)%s\n";
+static const char sRedStreamPauseOnFmt[] = "%sPause : Stream : ON  %d\n";
+static const char sRedStreamPauseOffFmt[] = "%sPause : Stream : OFF %d\n";
 static const char sRedStreamLogErrorColor[] = "\x1B[7;31m";
 static const char sRedStreamLogReset[] = "\x1B[0m";
 static const char sRedStreamLogWarnColor[] = "\x1B[4;31m";
@@ -170,7 +156,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 	unsigned char* pbVar6;
 	unsigned int* puVar7;
 	int iVar8;
-	int dmaID = 0;
+	int dmaID;
 
 	param_2 = param_2 & 1;
 	
@@ -307,25 +293,25 @@ void StreamStop(int param_1)
  */
 int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5)
 {
-	const RedStreamDebugStrings* debugStrings = &sRedStreamDebugStrings;
 	int amemSize;
 	int arOffset;
 	int pitch;
 	int iVar2;
+	int sampleOffset;
+	u8* headerData;
 	int* streamData;
 	int* voice;
 
 	streamData = (int*)_SearchEmptyStreamData();
-	if (streamData == (int*)0) {
-		return param_1;
-	}
+	if (streamData != (int*)0) {
 
 	memcpy(streamData + 4, param_2, 0x20);
 	*streamData = (int)SearchSeEmptyTrack(*(short*)((int)streamData + 0x2a), 0xff, 0);
 	streamData[3] = RedNew(0x4000);
 	amemSize = *(short*)((int)streamData + 0x2a) << 0xd;
-	arOffset = 0;
-	if (c_RedMemory.GetABufferSize() >= 0x800000) {
+	if (c_RedMemory.GetABufferSize() < 0x800000) {
+		arOffset = 0;
+	} else {
 		arOffset = 0x300000;
 	}
 	streamData[0x4b] = RedNewA(amemSize, 0, arOffset);
@@ -335,18 +321,20 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 	}
 
 	if ((*streamData != 0) && (streamData[3] != 0) && (streamData[0x4b] != 0)) {
-		*(short*)((int)param_2 + 0x42) = (short)*(char*)((int)param_2 + 0x1000);
+		sampleOffset = 0x1000;
+		*(short*)((int)param_2 + 0x42) = (short)*(char*)((int)param_2 + sampleOffset);
 		*(unsigned short*)((int)param_2 + 0x46) = 0;
 		*(unsigned short*)((int)param_2 + 0x44) = 0;
+		headerData = (u8*)param_2 + 0x20;
 		if (*(short*)((int)streamData + 0x2a) == 2) {
 			if (streamData[8] < 0) {
-				iVar2 = 0x2000;
+				sampleOffset += 0x1000;
 			} else {
-				iVar2 = 0x1008;
+				sampleOffset += 8;
 			}
-			*(short*)((int)param_2 + 0x70) = (short)*(char*)((int)param_2 + iVar2);
-			*(unsigned short*)((int)param_2 + 0x74) = 0;
-			*(unsigned short*)((int)param_2 + 0x72) = 0;
+			*(short*)(headerData + 0x50) = (short)*(char*)((int)param_2 + sampleOffset);
+			*(unsigned short*)(headerData + 0x54) = 0;
+			*(unsigned short*)(headerData + 0x52) = 0;
 		}
 
 		streamData[0x43] = param_1;
@@ -374,7 +362,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 			}
 			*(int*)(*voice + 0xfc) = 1;
 			voice[0x2c] = 0x8000;
-			voice[1] = (int)(streamData + iVar2 * 0x18 + 0xc);
+			voice[1] = (int)streamData + iVar2 * 0x60 + 0x30;
 			voice[0x27] = pitch;
 			*(int*)(*voice + 0x68) = *(int*)((int)p_ReverbDepth + 0xc);
 			*(int*)(*voice + 0x70) = 0;
@@ -392,8 +380,8 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 			}
 			SetVoiceVolumeMix((RedVoiceDATA*)(streamData[1] + iVar2 * 0xc0), streamData[0x40] >> 0xc, streamData[0x3c] >> 0xc);
 			*(int*)(*streamData + iVar2 * 0x154 + 0x11c) = streamData[0x4b] + iVar2 * 0x2000;
-			memset(streamData + iVar2 * 0x18 + 0xc, 0, 0x60);
-			memcpy((void*)((int)streamData + iVar2 * 0x60 + 0x52), (void*)((int)param_2 + 0x20 + iVar2 * 0x2e), 0x2e);
+			memset((void*)((int)streamData + iVar2 * 0x60 + 0x30), 0, 0x60);
+			memcpy((void*)((int)streamData + iVar2 * 0x60 + 0x52), headerData + iVar2 * 0x2e, 0x2e);
 			*(unsigned char*)((int)voice + 0x5a) = 0;
 			*(unsigned char*)((int)voice + 0x59) = 0;
 			*(unsigned char*)(voice + 0x16) = 0;
@@ -402,45 +390,47 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 			*(unsigned short*)((int)voice + 0x52) = 0;
 			*(unsigned short*)(voice + 0x14) = 0;
 			*(unsigned short*)((int)voice + 0x56) = 10;
-			streamData[iVar2 * 0x18 + 0xd] = 0;
-			streamData[iVar2 * 0x18 + 0xf] = 0x3fff;
-			streamData[iVar2 * 0x18 + 0xe] = 2;
+			*(int*)((int)streamData + iVar2 * 0x60 + 0x34) = 0;
+			*(int*)((int)streamData + iVar2 * 0x60 + 0x3c) = 0x3fff;
+			*(int*)((int)streamData + iVar2 * 0x60 + 0x38) = 2;
 			iVar2 += 1;
 		} while (iVar2 < *(short*)((int)streamData + 0x2a));
 
+		int dmaID;
 		if (streamData[8] < 0) {
-			streamData[0x45] = _ArrangeStreamDataNoLoop((RedStreamDATA*)streamData, 0, 0x2000);
+			dmaID = _ArrangeStreamDataNoLoop((RedStreamDATA*)streamData, 0, 0x2000);
 		} else {
-			streamData[0x45] = _ArrangeStreamDataLoop((RedStreamDATA*)streamData, 0, 0x2000);
+			dmaID = _ArrangeStreamDataLoop((RedStreamDATA*)streamData, 0, 0x2000);
 		}
+		streamData[0x45] = dmaID;
 		streamData[0x4a] = 0x1000;
 		streamData[0x44] = 3;
 	} else {
 		if (m_ReportPrint != 0) {
-			OSReport(debugStrings->bufferDidntSecure, debugStrings->logPrefix, sRedStreamLogErrorColor,
-			         sRedStreamLogReset);
+			OSReport(sRedStreamBufferDidntSecureFmt, sRedStreamLogPrefix, sRedStreamLogErrorColor, sRedStreamLogReset);
 			fflush(__files + 1);
 		}
-		if (streamData[3] == 0) {
-			if (m_ReportPrint != 0) {
-				OSReport(debugStrings->mainMemoryDidntCreate,
-				         debugStrings->logPrefix, sRedStreamLogWarnColor, 0x4000,
-				         sRedStreamLogReset);
-				fflush(__files + 1);
-			}
-		} else {
+		if (streamData[3] != 0) {
 			RedDelete((void*)streamData[3]);
-		}
-		if (streamData[0x4b] == 0) {
+		} else {
 			if (m_ReportPrint != 0) {
-				OSReport(debugStrings->aramMemoryDidntCreate,
-				         debugStrings->logPrefix, sRedStreamLogWarnColor, amemSize,
+				OSReport(sRedStreamMainMemoryDidntCreateFmt,
+				         sRedStreamLogPrefix, sRedStreamLogWarnColor, 0x4000,
 				         sRedStreamLogReset);
 				fflush(__files + 1);
 			}
-		} else {
-			RedDeleteA(streamData[0x4b]);
 		}
+		if (streamData[0x4b] != 0) {
+			RedDeleteA(streamData[0x4b]);
+		} else {
+			if (m_ReportPrint != 0) {
+				OSReport(sRedStreamAramMemoryDidntCreateFmt,
+				         sRedStreamLogPrefix, sRedStreamLogWarnColor, *(short*)((int)streamData + 0x2a) << 0xd,
+				         sRedStreamLogReset);
+				fflush(__files + 1);
+			}
+		}
+	}
 	}
 	return param_1;
 }
@@ -501,14 +491,15 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
  */
 void StreamPause(int param_1, int param_2)
 {
-	const RedStreamDebugStrings* debugStrings = &sRedStreamDebugStrings;
-	RedStreamDATA* streamData;
+	volatile RedStreamDATA* streamData;
+	int volume;
+	int pan;
 
 	if (m_ReportPrint != 0) {
 		if (param_2 == 1) {
-			OSReport(debugStrings->pauseOn, debugStrings->logPrefix, param_1);
+			OSReport(sRedStreamPauseOnFmt, sRedStreamLogPrefix, param_1);
 		} else {
-			OSReport(debugStrings->pauseOff, debugStrings->logPrefix, param_1);
+			OSReport(sRedStreamPauseOffFmt, sRedStreamLogPrefix, param_1);
 		}
 		fflush(__files + 1);
 	}
@@ -527,12 +518,15 @@ void StreamPause(int param_1, int param_2)
 				}
 			} else if (*(void**)(voiceData + 0x14) != 0) {
 				unsigned int pitch = PitchCompute(0x3c00000, 0, *(int*)((u8*)streamData + 0x24), 0);
-				if (streamData->m_channelCount == 2) {
+				short channelCount = streamData->m_channelCount;
+				volume = streamData->m_volume >> 0xc;
+				if (channelCount == 2) {
 					*(int*)(voiceData + 0x9c) = pitch;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;
 					*(int*)(voiceData + 0x15c) = pitch;
 					*(unsigned int*)(voiceData + 0x150) |= 0x10;
 				} else {
+					pan = streamData->m_pan >> 0xc;
 					*(int*)(voiceData + 0x9c) = pitch;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;
 				}
@@ -561,23 +555,27 @@ void StreamControl()
 				if (*(int*)(*(int*)(voiceData + 0x14) + 0xc) == 0) {
 					_StreamStop((RedStreamDATA*)streamData);
 				} else {
+					int samplePos = *(unsigned short*)(*(int*)(voiceData + 0x14) + 0x1b2);
 					int sampleStart = (*(int*)(streamData + 0x12c) + *(int*)(streamData + 0x128)) * 2;
-					int samplePos = (*(unsigned short*)(*(int*)(voiceData + 0x14) + 0x1b2) << 16) |
-						*(unsigned short*)(*(int*)(voiceData + 0x14) + 0x1b4);
+					samplePos <<= 16;
+					samplePos |= *(unsigned short*)(*(int*)(voiceData + 0x14) + 0x1b4);
 					if ((samplePos >= sampleStart) && (samplePos < sampleStart + 0x2000)) {
 						int stopped = 0;
-						if ((*(int*)(streamData + 0x20) < 0) &&
-							((*(int*)(streamData + 0x1c) = *(int*)(streamData + 0x1c) - 0x200), *(int*)(streamData + 0x1c) < 1)) {
-							_StreamStop((RedStreamDATA*)streamData);
-							stopped = 1;
+						if (*(int*)(streamData + 0x20) < 0) {
+							*(int*)(streamData + 0x1c) = *(int*)(streamData + 0x1c) - 0x200;
+							if (*(int*)(streamData + 0x1c) < 1) {
+								_StreamStop((RedStreamDATA*)streamData);
+								stopped = 1;
+							}
 						}
 						*(int*)(streamData + 0x11c) += *(short*)(streamData + 0x2a) * 0x1000;
-						if (*(int*)(streamData + 0x118) <= *(int*)(streamData + 0x11c)) {
+						if (*(int*)(streamData + 0x11c) >= *(int*)(streamData + 0x118)) {
 							*(int*)(streamData + 0x11c) -= *(int*)(streamData + 0x118);
 						}
 
 						if (!stopped) {
 							int side;
+							int dmaID;
 							if (*(int*)(streamData + 0x128) != 0) {
 								side = 0;
 								*(int*)(streamData + 0x128) = 0;
@@ -587,31 +585,32 @@ void StreamControl()
 							}
 
 							if (*(int*)(streamData + 0x20) < 0) {
-								*(int*)(streamData + 0x114) = _ArrangeStreamDataNoLoop((RedStreamDATA*)streamData, side, 0x1000);
+								dmaID = _ArrangeStreamDataNoLoop((RedStreamDATA*)streamData, side, 0x1000);
 							} else {
-								*(int*)(streamData + 0x114) = _ArrangeStreamDataLoop((RedStreamDATA*)streamData, side, 0x1000);
+								dmaID = _ArrangeStreamDataLoop((RedStreamDATA*)streamData, side, 0x1000);
 							}
+							*(int*)(streamData + 0x114) = dmaID;
 						}
 					}
 
-					RedStreamDATA* stream = (RedStreamDATA*)streamData;
-					int changed = stream->m_panStepCount != 0;
-					if (changed) {
-						stream->m_panStepCount -= 1;
-						stream->m_pan += stream->m_panStep;
-					}
-					if (stream->m_volumeStepCount != 0) {
+					int changed = 0;
+					if (*(int*)(streamData + 0x108) != 0) {
 						changed += 1;
-						stream->m_volumeStepCount -= 1;
-						stream->m_volume += stream->m_volumeStep;
+						*(int*)(streamData + 0x108) -= 1;
+						*(int*)(streamData + 0x100) += *(int*)(streamData + 0x104);
+					}
+					if (*(int*)(streamData + 0xf8) != 0) {
+						changed += 1;
+						*(int*)(streamData + 0xf8) -= 1;
+						*(int*)(streamData + 0xf0) += *(int*)(streamData + 0xf4);
 					}
 					if (changed != 0) {
 						if (*(short*)(streamData + 0x2a) == 2) {
-							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0, stream->m_volume >> 0xc);
-							SetVoiceVolumeMix((RedVoiceDATA*)(voiceData + 0xc0), 0x7f, stream->m_volume >> 0xc);
+							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0, *(int*)(streamData + 0xf0) >> 0xc);
+							SetVoiceVolumeMix((RedVoiceDATA*)(voiceData + 0xc0), 0x7f, *(int*)(streamData + 0xf0) >> 0xc);
 						} else {
-							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, stream->m_pan >> 0xc,
-								stream->m_volume >> 0xc);
+							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, *(int*)(streamData + 0x100) >> 0xc,
+								*(int*)(streamData + 0xf0) >> 0xc);
 						}
 					}
 				}

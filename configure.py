@@ -555,7 +555,7 @@ config.libs = [
             Object(NonMatching, "p_light.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "p_map.cpp", cflags=[*cflags_game, "-sdata 0", "-sdata2 0"], extra_cflags=["-RTTI on"]),
             Object(NonMatching, "p_MaterialEditor.cpp", extra_cflags=["-RTTI on"]),
-            Object(NonMatching, "p_mc.cpp", extra_cflags=["-RTTI on"]),
+            Object(NonMatching, "p_mc.cpp"),
             Object(NonMatching, "p_menu.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "p_minigame.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "p_sample.cpp"),

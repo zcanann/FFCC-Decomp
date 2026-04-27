@@ -21,6 +21,11 @@ typedef struct RandHCVCtx {
     s32* fieldC;
 } RandHCVCtx;
 
+static inline short randshort(short value, float scale)
+{
+    return (short)(((f32)value * scale) - (f32)value);
+}
+
 /*
  * --INFO--
  * PAL Address: 80061f88
@@ -65,25 +70,11 @@ void pppRandHCV(void* p1, void* p2, void* p3)
 
     {
         f32 scale = *randomValue;
-        target[0] += (s16)((f32)params->field8 * scale - (f32)params->field8);
-        target[1] += (s16)((f32)params->fieldA * scale - (f32)params->fieldA);
-        target[2] += (s16)((f32)params->fieldC * scale - (f32)params->fieldC);
-        target[3] += (s16)((f32)params->fieldE * scale - (f32)params->fieldE);
+        target[0] += randshort(params->field8, scale);
+        target[1] += randshort(params->fieldA, scale);
+        target[2] += randshort(params->fieldC, scale);
+        target[3] += randshort(params->fieldE, scale);
     }
 }
 
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static short randshort(short value, float scale)
-{
-    return (short)(((f32)value * scale) - (f32)value);
 }

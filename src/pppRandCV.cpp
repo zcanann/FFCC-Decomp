@@ -59,7 +59,7 @@ void pppRandCV(void* param1, void* param2, void* param3)
     u8* targetColor;
     s32 colorOffset = params->colorOffset;
     if (colorOffset == -1) {
-        targetColor = gPppDefaultValueBuffer;
+        targetColor = &gPppDefaultValueBuffer[0];
     } else {
         targetColor = base + colorOffset + 0x80;
     }
@@ -84,18 +84,4 @@ void pppRandCV(void* param1, void* param2, void* param3)
             targetColor[3] = color + (s8)((f32)params->delta[3] * scale - (f32)params->delta[3]);
         }
     }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-char randchar(char value, float scale)
-{
-    return (char)(((f32)value * scale) - (f32)value);
 }

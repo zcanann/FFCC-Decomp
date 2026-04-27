@@ -1087,7 +1087,7 @@ void _DmaExecute()
             m_DMAInThread = 7;
             if (m_DMAStatus == 0) {
                 m_DMAInThread = 8;
-                if (piVar6[5] != 0) {
+                if ((u32)piVar6[5] != 0) {
                     uVar1 = OSDisableInterrupts();
                     ((void (*)(void*))piVar6[5])((void*)piVar6[6]);
                     OSRestoreInterrupts(uVar1);

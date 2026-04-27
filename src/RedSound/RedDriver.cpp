@@ -138,24 +138,13 @@ static inline OSThread& RedDriverMainThread()
 }
 
 static const char s_redDriverDmaCheckHeaderFmt[] = "%s **** DMA CHECK PROCESS ****\n";
-static const char s_redDriverDmaCheckLogBlob[] =
-    "\x1B[7;34mSound\x1B[0m:"
-    "\0"
-    "%s Status = %d, Semaphore = %d, Execute = %d, In Thread = %d\n"
-    "\0"
-    "%s ID = %d, MMem = %8.8X, AMem = %8.8X, Size = %8.8X, Callback = %8.8X\n";
-static const char s_redDriverHeaderErrorBlob[] =
-    "%s%sMusic-Header was broken !!%s\n"
-    "\0"
-    "%s%sSE-Sep-Header was broken !!%s\n";
+static const char sRedDriverLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
+static const char sRedDriverDmaStatusFmt[] = "%s Status = %d, Semaphore = %d, Execute = %d, In Thread = %d\n";
+static const char sRedDriverDmaEntryFmt[] = "%s ID = %d, MMem = %8.8X, AMem = %8.8X, Size = %8.8X, Callback = %8.8X\n";
+static const char sRedDriverMusicHeaderErrorFmt[] = "%s%sMusic-Header was broken !!%s\n";
+static const char sRedDriverSeSepHeaderErrorFmt[] = "%s%sSE-Sep-Header was broken !!%s\n";
 static const char sRedDriverLogWarnColor[] = "\x1B[4;31m";
 static const char sRedDriverLogReset[] = "\x1B[0m";
-
-enum {
-    RED_DRIVER_STATUS_FMT_OFFSET = 0x12,
-    RED_DRIVER_DMA_ENTRY_FMT_OFFSET = 0x50,
-    RED_DRIVER_SE_HEADER_ERROR_FMT_OFFSET = 0x22,
-};
 
 /*
  * --INFO--
@@ -894,11 +883,11 @@ void _DMACheckProcess()
     int* dmaInfo;
 
     if (m_ReportPrint != 0) {
-        OSReport(s_redDriverDmaCheckHeaderFmt, s_redDriverDmaCheckLogBlob);
+        OSReport(s_redDriverDmaCheckHeaderFmt, sRedDriverLogPrefix);
         fflush(__files + 1);
 
         semCount = OSGetSemaphoreCount(&m_DmaExecuteSemaphore);
-        OSReport(s_redDriverDmaCheckLogBlob + RED_DRIVER_STATUS_FMT_OFFSET, s_redDriverDmaCheckLogBlob, m_DMAStatus,
+        OSReport(sRedDriverDmaStatusFmt, sRedDriverLogPrefix, m_DMAStatus,
                  semCount, m_DMAExecute, m_DMAInThread);
         fflush(__files + 1);
     }
@@ -906,7 +895,7 @@ void _DMACheckProcess()
     dmaInfo = RedDriverMainDmaQueue();
     do {
         if ((*dmaInfo != 0) && (m_ReportPrint != 0)) {
-            OSReport(s_redDriverDmaCheckLogBlob + RED_DRIVER_DMA_ENTRY_FMT_OFFSET, s_redDriverDmaCheckLogBlob,
+            OSReport(sRedDriverDmaEntryFmt, sRedDriverLogPrefix,
                      dmaInfo[0], dmaInfo[2], dmaInfo[3], dmaInfo[4], dmaInfo[5]);
             fflush(__files + 1);
         }
@@ -1459,7 +1448,7 @@ int CRedDriver::SetMusicData(void* param_1)
         return -1;
     }
     if (m_ReportPrint != 0) {
-        OSReport(s_redDriverHeaderErrorBlob, s_redDriverDmaCheckLogBlob, sRedDriverLogWarnColor, sRedDriverLogReset);
+        OSReport(sRedDriverMusicHeaderErrorFmt, sRedDriverLogPrefix, sRedDriverLogWarnColor, sRedDriverLogReset);
         fflush(__files + 1);
     }
     return -1;
@@ -1657,7 +1646,7 @@ int CRedDriver::SetSeSepData(void* param_1)
         return -1;
     }
     if (m_ReportPrint != 0) {
-        OSReport(s_redDriverHeaderErrorBlob + RED_DRIVER_SE_HEADER_ERROR_FMT_OFFSET, s_redDriverDmaCheckLogBlob,
+        OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,
                  sRedDriverLogWarnColor, sRedDriverLogReset);
         fflush(__files + 1);
     }

@@ -2315,7 +2315,6 @@ void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
         (unsigned int)*(unsigned char*)((int*)track)[0];
 
     *(short*)((int*)track + 0x50) = bend;
-    bend = (short)bend;
     bend = (bend * *(char*)((char*)track + 0x14b)) >> 5;
     *(short*)((char*)track + 0x13e) = bend;
     ((int*)track)[0] += 2;

@@ -778,11 +778,9 @@ void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDAT
  */
 void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    char* command = (char*)((int*)track)[0];
     int* reverbDepth = (int*)track + 0x1a;
 
-    ((int*)track)[0] = (int)(command + 1);
-    *reverbDepth = *command;
+    *reverbDepth = *(*(s8**)track)++;
 
     if (*reverbDepth != 0) {
         *reverbDepth += 1;
@@ -791,8 +789,8 @@ void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
         *reverbDepth <<= 0xc;
     }
 
-    ((int*)track)[0x1b] = 0;
-    ((int*)track)[0x1c] = 0;
+    reverbDepth[1] = 0;
+    reverbDepth[2] = 0;
     SetVoiceAccess(track, 8);
 }
 

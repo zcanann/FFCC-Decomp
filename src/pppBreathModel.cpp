@@ -100,7 +100,7 @@ struct BreathModelParams {
     u16 m_particleCount;
     u16 m_emitCount;
     u16 m_emitInterval;
-    s16 m_particleLifetime;
+    u16 m_particleLifetime;
     u8 m_fadeOutFrames;
     u8 m_fadeInFrames;
     unsigned char _pad24[0x04];
@@ -128,6 +128,7 @@ struct BreathModelParams {
     float m_rotationRandomX;
     float m_rotationRandomY;
     float m_rotationRandomZ;
+    unsigned char _pad8C[0x04];
     float m_angleStart;
     float m_angleStep;
     float m_angleAccel;
@@ -139,6 +140,7 @@ struct BreathModelParams {
     float m_spawnJitterX;
     float m_spawnJitterY;
     float m_spawnJitterZ;
+    unsigned char _padBC[0x04];
     u8 m_rotationFlags;
     u8 m_angleFlags;
     unsigned char _padC2[0x06];
@@ -149,6 +151,7 @@ struct BreathParticleData {
     Mtx m_modelMtx;
     Vec m_position;
     Vec m_direction;
+    u8 _pad48[0x08];
     s16 m_life;
     u8 _pad52[0x02];
     u8 m_fadeOutFrames;
@@ -919,6 +922,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     BreathModelParams* params = reinterpret_cast<BreathModelParams*>(pBreathModel);
     BreathParticleData* particle = reinterpret_cast<BreathParticleData*>(particleData);
     Mtx workMtx;
+    Mtx cameraMtx;
     Vec jitter;
     Vec pos;
 
@@ -1075,7 +1079,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     (*(Mtx*)particleWmat)[2][3] = pos.z;
 
     PSMTXConcat(*(Mtx*)particleWmat, pppObject->m_localMatrix.value, *(Mtx*)particleData);
-    PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, workMtx);
+    PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, cameraMtx);
 
     particle->m_direction.x = kPppBreathModelZero;
     particle->m_direction.y = kPppBreathModelZero;

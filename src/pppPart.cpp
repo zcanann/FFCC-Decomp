@@ -398,7 +398,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 		_pppPObjLink m_pppPObjLinkHead;
 		u8 m_pad3[0xF8 - 0xD0];
 		u8 m_prio;
-		s16 m_prioTime;
+		u16 m_prioTime;
 	};
 
 	bool firstAllocFailure = true;
@@ -426,7 +426,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 
 		pppMngStRaw* selectedMngSt = 0;
 		u8 selectedPrio = 1;
-		s16 selectedPrioTime = 0;
+		u16 selectedPrioTime = 0;
 
 		for (s32 i = 0; i < 0x180; i += 2)
 		{
@@ -563,7 +563,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 		_pppPObjLink m_pppPObjLinkHead;
 		u8 m_pad3[0xF8 - 0xD0];
 		u8 m_prio;
-		s16 m_prioTime;
+		u16 m_prioTime;
 	};
 
 	bool firstAllocFailure = true;
@@ -591,7 +591,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 
 		pppMngStRaw* selectedMngSt = 0;
 		u8 selectedPrio = 1;
-		s16 selectedPrioTime = 0;
+		u16 selectedPrioTime = 0;
 		for (s32 i = 0; i < 0x180; i += 2)
 		{
 			pppMngStRaw* candidateA = (pppMngStRaw*)(((u8*)&PartMng + 0x1D4) + (i * 0x158));
@@ -873,6 +873,16 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 		s16 m_prioTime;
 	};
 
+	struct pppPObjectRaw
+	{
+		_pppPObjLink m_link;
+		u8 m_pad0C[0x70 - 0x0C];
+		void* m_field70;
+		void* m_field74;
+		u8 m_pad78[4];
+		u8 m_field7C;
+	};
+
 	pppPDataValRaw* dataVal = (pppPDataValRaw*)pppPDataVal;
 	pppProgramSetDefRaw* programSet = dataVal->m_programSetDef;
 	s16 numStages = programSet->m_numStages;
@@ -881,7 +891,6 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	_pppPObjLink* newObj = 0;
 	bool firstFailure = true;
 	u8 denied[0x180];
-	pppMngStRaw* allMngSt = (pppMngStRaw*)(((u8*)&PartMng) + 0x1D4);
 
 	gPppBlendModeState = 0;
 	for (;;)
@@ -897,30 +906,41 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 		{
 			firstFailure = false;
 			memset(denied, 0, sizeof(denied));
-			denied[(pppMngStRaw*)pppMngSt - allMngSt] = 1;
+
+			s32 currentIdx = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x1D4))) / 0x158;
+			denied[currentIdx] = 1;
 		}
 
 		pppMngStRaw* selectedMngSt = 0;
 		u8 selectedPrio = 1;
 		s16 selectedPrioTime = 0;
-		for (s32 i = 0; i < 0x180; i++)
+
+		for (s32 i = 0; i < 0x180; i += 2)
 		{
-			pppMngStRaw* candidate = &allMngSt[i];
-			if (denied[i] != 0 || candidate->m_baseTime == -0x1000 || candidate->m_kind == 0)
+			pppMngStRaw* candidateA = (pppMngStRaw*)(((u8*)&PartMng + 0x1D4) + (i * 0x158));
+			if (denied[i] == 0 && candidateA->m_baseTime != -0x1000 && candidateA->m_kind != 0)
 			{
-				continue;
-			}
-			if (candidate->m_prio <= 1)
-			{
-				continue;
+				u8 prioA = candidateA->m_prio;
+				if (prioA > 1 &&
+					(selectedPrio < prioA || (selectedPrio == prioA && selectedPrioTime < candidateA->m_prioTime)))
+				{
+					selectedMngSt = candidateA;
+					selectedPrio = prioA;
+					selectedPrioTime = candidateA->m_prioTime;
+				}
 			}
 
-			if (selectedPrio < candidate->m_prio ||
-				(selectedPrio == candidate->m_prio && selectedPrioTime < candidate->m_prioTime))
+			pppMngStRaw* candidateB = candidateA + 1;
+			if (denied[i + 1] == 0 && candidateB->m_baseTime != -0x1000 && candidateB->m_kind != 0)
 			{
-				selectedMngSt = candidate;
-				selectedPrio = candidate->m_prio;
-				selectedPrioTime = candidate->m_prioTime;
+				u8 prioB = candidateB->m_prio;
+				if (prioB > 1 &&
+					(selectedPrio < prioB || (selectedPrio == prioB && selectedPrioTime < candidateB->m_prioTime)))
+				{
+					selectedMngSt = candidateB;
+					selectedPrio = prioB;
+					selectedPrioTime = candidateB->m_prioTime;
+				}
 			}
 		}
 
@@ -932,7 +952,8 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			return 0;
 		}
 
-		denied[selectedMngSt - allMngSt] = 1;
+		s32 deniedIdx = ((s32)((u8*)selectedMngSt - ((u8*)&PartMng + 0x1D4))) / 0x158;
+		denied[deniedIdx] = 1;
 		_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
 		_pppPObjLink* obj = prev->m_next;
 		while (obj != 0)
@@ -973,11 +994,12 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 		}
 	}
 
-	((u8*)newObj)[0x0C] = 0;
-	((u8*)newObj)[0x70] = 0;
-	((u8*)newObj)[0x74] = 0;
-	newObj->m_owner = pppPDataVal;
-	((u8*)newObj)[0x7C] = 1;
+	pppPObjectRaw* newObjectRaw = (pppPObjectRaw*)newObj;
+	newObjectRaw->m_pad0C[0] = 0;
+	newObjectRaw->m_field70 = 0;
+	newObjectRaw->m_field74 = 0;
+	newObjectRaw->m_link.m_owner = pppPDataVal;
+	newObjectRaw->m_field7C = 1;
 
 	_pppPObjLink* objHead = (_pppPObjLink*)(((u8*)pppMngSt) + 0xC4);
 	_pppPObjLink* firstObj = objHead->m_next;

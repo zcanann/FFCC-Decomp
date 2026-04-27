@@ -1820,26 +1820,25 @@ void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int trackDelta[1];
-    int* trackData = (int*)track;
     int rate;
     int divisor;
 
-    trackDelta[0] = DeltaTimeSumup((unsigned char**)trackData);
+    trackDelta[0] = DeltaTimeSumup((unsigned char**)track);
     if (trackDelta[0] == 0) {
         trackDelta[0] += 1;
     }
 
-    if (*(u8*)trackData[0] != 0) {
-        rate = *(u8*)trackData[0];
+    if (*(u8*)((int*)track)[0] != 0) {
+        rate = *(u8*)((int*)track)[0];
     } else {
         rate = 0x100;
     }
 
     divisor = rate;
     rate = 0x100 / divisor;
-    trackData[0x1f] = DataAddCompute(trackData + 0x1e, rate, trackDelta);
-    *(short*)(trackData + 0x23) = (short)trackDelta[0];
-    trackData[0] += 1;
+    ((int*)track)[0x1f] = DataAddCompute((int*)track + 0x1e, rate, trackDelta);
+    *(short*)((int*)track + 0x23) = (short)trackDelta[0];
+    ((int*)track)[0] += 1;
 }
 
 /*
@@ -2014,22 +2013,21 @@ void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 	int delta[1];
 	int rate;
 	int divisor;
-	int* trackData = (int*)track;
 
-	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	delta[0] = DeltaTimeSumup((unsigned char**)track);
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	if (*(u8*)trackData[0] != 0) {
-		rate = *(u8*)trackData[0];
+	if (*(u8*)((int*)track)[0] != 0) {
+		rate = *(u8*)((int*)track)[0];
 	} else {
 		rate = 0x100;
 	}
 	divisor = rate;
 	rate = 0x100 / divisor;
-	trackData[0x27] = DataAddCompute(trackData + 0x26, rate, delta);
-	*(short*)(trackData + 0x2b) = (short)delta[0];
-	trackData[0] += 1;
+	((int*)track)[0x27] = DataAddCompute((int*)track + 0x26, rate, delta);
+	*(short*)((int*)track + 0x2b) = (short)delta[0];
+	((int*)track)[0] += 1;
 }
 
 /*
@@ -2179,22 +2177,21 @@ void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
 	int delta[1];
 	int rate;
 	int divisor;
-	int* trackData = (int*)track;
 
-	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	delta[0] = DeltaTimeSumup((unsigned char**)track);
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	if (*(u8*)trackData[0] != 0) {
-		rate = *(u8*)trackData[0];
+	if (*(u8*)((int*)track)[0] != 0) {
+		rate = *(u8*)((int*)track)[0];
 	} else {
 		rate = 0x100;
 	}
 	divisor = rate;
 	rate = 0x100 / divisor;
-	trackData[0x2f] = DataAddCompute(trackData + 0x2e, rate, delta);
-	*(short*)(trackData + 0x34) = (short)delta[0];
-	trackData[0] += 1;
+	((int*)track)[0x2f] = DataAddCompute((int*)track + 0x2e, rate, delta);
+	*(short*)((int*)track + 0x34) = (short)delta[0];
+	((int*)track)[0] += 1;
 }
 
 /*

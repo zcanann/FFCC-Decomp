@@ -1,4 +1,6 @@
 #include "ffcc/p_chara_viewer.h"
+#include "ffcc/chara.h"
+#include "ffcc/color.h"
 #include "ffcc/file.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
@@ -84,6 +86,29 @@ static inline void destroyRef(int* ref)
     vtable[2](ref, 1);
 }
 
+template <class T>
+static inline void ReleaseShared(T*& ptr)
+{
+    if (ptr != 0) {
+        int* ref = reinterpret_cast<int*>(ptr);
+        int count = ref[1];
+        ref[1] = count - 1;
+        if ((count - 1 == 0) && (ref != 0)) {
+            destroyRef(ref);
+        }
+        ptr = 0;
+    }
+}
+
+template <class T>
+static inline void AddSharedRef(T* ptr)
+{
+    if (ptr != 0) {
+        int* ref = reinterpret_cast<int*>(ptr);
+        ref[1] = ref[1] + 1;
+    }
+}
+
 static void releaseRef(unsigned char* p, int offset)
 {
     int* ref = *(int**)(p + offset);
@@ -103,6 +128,51 @@ static void addRef(unsigned char* p, int offset)
     if (ref != 0) {
         ref[1] = ref[1] + 1;
     }
+}
+
+static inline CMemory::CStage*& ViewerModelStage(CCharaPcs* self)
+{
+    return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(self) + 0xCC);
+}
+
+static inline CMemory::CStage*& ViewerTextureStage(CCharaPcs* self)
+{
+    return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(self) + 0xD0);
+}
+
+static inline CMemory::CStage*& ViewerAnimStage(CCharaPcs* self)
+{
+    return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(self) + 0xD4);
+}
+
+static inline CChara::CModel*& ViewerModel(CCharaPcs* self, int index)
+{
+    return reinterpret_cast<CChara::CModel**>(reinterpret_cast<unsigned char*>(self) + 0x190)[index];
+}
+
+static inline CChara::CAnim*& ViewerAnim(CCharaPcs* self, int index)
+{
+    return reinterpret_cast<CChara::CAnim**>(reinterpret_cast<unsigned char*>(self) + 0x198)[index];
+}
+
+static inline CTextureSet*& ViewerTextureSet(CCharaPcs* self, int index)
+{
+    return reinterpret_cast<CTextureSet**>(reinterpret_cast<unsigned char*>(self) + 0x2B0)[index];
+}
+
+static inline CChara::CAnim*& ViewerSavedAnim(CCharaPcs* self)
+{
+    return *reinterpret_cast<CChara::CAnim**>(reinterpret_cast<unsigned char*>(self) + 0x1A0);
+}
+
+static inline CChara::CAnim*& ViewerAnimBank(CCharaPcs* self, int index)
+{
+    return reinterpret_cast<CChara::CAnim**>(reinterpret_cast<unsigned char*>(self) + 0x1B0)[index];
+}
+
+static inline CTextureSet*& ViewerBackTextureSet(CCharaPcs* self)
+{
+    return *reinterpret_cast<CTextureSet**>(reinterpret_cast<unsigned char*>(self) + 0x2B8);
 }
 
 static const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
@@ -512,12 +582,13 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
  */
 extern "C" void createViewer__9CCharaPcsFv(void* param_1)
 {
-    unsigned char* p = (unsigned char*)param_1;
+    CCharaPcs* self = reinterpret_cast<CCharaPcs*>(param_1);
+    unsigned char* p = reinterpret_cast<unsigned char*>(self);
     unsigned int i;
     unsigned int x;
-    unsigned char colorTmp[4];
-    unsigned char colorCopy[4];
-    unsigned char white[4];
+    CColor colorTmp;
+    CColor colorCopy;
+    CColor white;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
     unsigned char bumpLight[0x138];
@@ -526,9 +597,10 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     Vec lightDir;
 
     memset(p + 0xCC, 0, 0x18);
-    *(void**)(p + 0xCC) = CreateStage__7CMemoryFUlPci(&Memory, 0x177000, s_load_model, 0);
-    *(void**)(p + 0xD0) = CreateStage__7CMemoryFUlPci(&Memory, 0x200000, s_load_texture, 0);
-    *(void**)(p + 0xD4) = CreateStage__7CMemoryFUlPci(&Memory, 0x190000, s_load_anim, 0);
+    ViewerModelStage(self) = reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x177000, s_load_model, 0));
+    ViewerTextureStage(self) =
+        reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x200000, s_load_texture, 0));
+    ViewerAnimStage(self) = reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x190000, s_load_anim, 0));
 
     p[0xE8] = 0x3F;
     p[0xE9] = 0x3F;
@@ -552,19 +624,20 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(float*)(p + 0x128) = kCharaViewerFineStep;
 
     for (i = 0; i < 5; i++) {
-        __ct__6CColorFUcUcUcUc(white, 0xFF, 0xFF, 0xFF, 0xFF);
-        __ct__6CColorFv(colorTmp);
+        unsigned char* whiteChannels =
+            reinterpret_cast<unsigned char*>(__ct__6CColorFUcUcUcUc(&white, 0xFF, 0xFF, 0xFF, 0xFF));
+        __ct__6CColorFv(&colorTmp);
         x = i ^ 0x80000000;
         for (int c = 0; c < 4; c++) {
-            double v = (double)(float)(((double)(unsigned int)white[c] - kCharaViewerColorWhiteBias) *
+            double v = (double)(float)(((double)(unsigned int)whiteChannels[c] - kCharaViewerColorWhiteBias) *
                                         ((float)((double)x - kCharaViewerColorCenterBias) * kCharaViewerLerpScale));
-            colorTmp[c] = (unsigned char)(int)v;
+            reinterpret_cast<unsigned char*>(&colorTmp)[c] = (unsigned char)(int)v;
         }
-        __ct__6CColorFR6CColor(colorCopy, colorTmp);
-        p[0x12C + i * 4 + 0] = colorCopy[0];
-        p[0x12C + i * 4 + 1] = colorCopy[1];
-        p[0x12C + i * 4 + 2] = colorCopy[2];
-        p[0x12C + i * 4 + 3] = colorCopy[3];
+        __ct__6CColorFR6CColor(&colorCopy, &colorTmp);
+        p[0x12C + i * 4 + 0] = reinterpret_cast<unsigned char*>(&colorCopy)[0];
+        p[0x12C + i * 4 + 1] = reinterpret_cast<unsigned char*>(&colorCopy)[1];
+        p[0x12C + i * 4 + 2] = reinterpret_cast<unsigned char*>(&colorCopy)[2];
+        p[0x12C + i * 4 + 3] = reinterpret_cast<unsigned char*>(&colorCopy)[3];
     }
 
     unsigned int clearColor = 0x404040FF;
@@ -615,7 +688,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     if (fileHandle != 0) {
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
-        *(void**)(p + 0x2B8) = createTextureSet__9CCharaPcsFPvi(p, File.m_readBuffer, 0);
+        ViewerBackTextureSet(self) = reinterpret_cast<CTextureSet*>(createTextureSet__9CCharaPcsFPvi(p, File.m_readBuffer, 0));
         File.Close(fileHandle);
     }
 

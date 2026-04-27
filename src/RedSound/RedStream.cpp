@@ -307,8 +307,9 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 	*streamData = (int)SearchSeEmptyTrack(*(short*)((int)streamData + 0x2a), 0xff, 0);
 	streamData[3] = RedNew(0x4000);
 	amemSize = *(short*)((int)streamData + 0x2a) << 0xd;
-	arOffset = 0;
-	if (c_RedMemory.GetABufferSize() >= 0x800000) {
+	if (c_RedMemory.GetABufferSize() < 0x800000) {
+		arOffset = 0;
+	} else {
 		arOffset = 0x300000;
 	}
 	streamData[0x4b] = RedNewA(amemSize, 0, arOffset);

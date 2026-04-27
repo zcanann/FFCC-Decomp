@@ -152,7 +152,7 @@ s16 t_PanningDataR[] = {
 };
 
 struct RedReverbDATA {
-    void (*callback)(void*, void*);
+    int callback;
     void* context;
     int kind;
 };
@@ -233,10 +233,9 @@ int PitchCompute(int param_1, int param_2, int param_3, int param_4)
  */
 void _ReverbNullCallback(AXFX_BUFFERUPDATE* param_1, void*)
 {
-    u32* data = (u32*)param_1;
-    memset((void*)data[0], 0, 0x280);
-    memset((void*)data[1], 0, 0x280);
-    memset((void*)data[2], 0, 0x280);
+    memset((void*)((u32*)param_1)[0], 0, 0x280);
+    memset((void*)((u32*)param_1)[1], 0, 0x280);
+    memset((void*)((u32*)param_1)[2], 0, 0x280);
 }
 
 /*
@@ -431,7 +430,7 @@ int* SetReverb(int bank, int kind, int* params)
     }
 
     reverb = p_ReverbData + (bank & 1);
-    if ((reverb->callback != nullptr) && (reverb->kind == kind)) {
+    if ((reverb->callback != 0) && (reverb->kind == kind)) {
         _SetReverbData(reverb, params);
         return (int*)p_ReverbSize;
     }
@@ -447,7 +446,7 @@ int* SetReverb(int bank, int kind, int* params)
     case 1: {
         AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)RedNew(sizeof(AXFX_REVERBSTD));
         reverb->context = std;
-        reverb->callback = (void (*)(void*, void*))AXFXReverbStdCallback;
+        reverb->callback = (int)AXFXReverbStdCallback;
         std->tempDisableFX = 0;
         std->preDelay = (float)params[0] / s_ReverbTimeScale;
         std->time = (float)params[1] / s_ReverbTimeScale;
@@ -460,7 +459,7 @@ int* SetReverb(int bank, int kind, int* params)
     case 2: {
         AXFX_REVERBHI* hi = (AXFX_REVERBHI*)RedNew(sizeof(AXFX_REVERBHI));
         reverb->context = hi;
-        reverb->callback = (void (*)(void*, void*))AXFXReverbHiCallback;
+        reverb->callback = (int)AXFXReverbHiCallback;
         hi->tempDisableFX = 0;
         hi->preDelay = (float)params[0] / s_ReverbTimeScale;
         hi->time = (float)params[1] / s_ReverbTimeScale;
@@ -474,7 +473,7 @@ int* SetReverb(int bank, int kind, int* params)
     case 3: {
         AXFX_DELAY* delay = (AXFX_DELAY*)RedNew(sizeof(AXFX_DELAY));
         reverb->context = delay;
-        reverb->callback = (void (*)(void*, void*))AXFXDelayCallback;
+        reverb->callback = (int)AXFXDelayCallback;
         delay->delay[0] = (u32)params[0];
         delay->delay[1] = (u32)params[0];
         delay->delay[2] = (u32)params[0];
@@ -490,7 +489,7 @@ int* SetReverb(int bank, int kind, int* params)
     case 4: {
         AXFX_CHORUS* chorus = (AXFX_CHORUS*)RedNew(sizeof(AXFX_CHORUS));
         reverb->context = chorus;
-        reverb->callback = (void (*)(void*, void*))AXFXChorusCallback;
+        reverb->callback = (int)AXFXChorusCallback;
         chorus->baseDelay = (u32)params[0];
         chorus->variation = (u32)params[1];
         chorus->period = (u32)params[2];
@@ -500,7 +499,7 @@ int* SetReverb(int bank, int kind, int* params)
     case 5: {
         AXFX_REVERBHI_DPL2* hiDpl2 = (AXFX_REVERBHI_DPL2*)RedNew(sizeof(AXFX_REVERBHI_DPL2));
         reverb->context = hiDpl2;
-        reverb->callback = (void (*)(void*, void*))AXFXReverbHiCallbackDpl2;
+        reverb->callback = (int)AXFXReverbHiCallbackDpl2;
         hiDpl2->tempDisableFX = 0;
         hiDpl2->preDelay = (float)params[0] / s_ReverbTimeScale;
         hiDpl2->time = (float)params[1] / s_ReverbTimeScale;
@@ -514,10 +513,10 @@ int* SetReverb(int bank, int kind, int* params)
 
     if (result == 1) {
         if (bank == 0) {
-            AXRegisterAuxACallback(reverb->callback, reverb->context);
+            AXRegisterAuxACallback((void (*)(void*, void*))reverb->callback, reverb->context);
         }
         else {
-            AXRegisterAuxBCallback(reverb->callback, reverb->context);
+            AXRegisterAuxBCallback((void (*)(void*, void*))reverb->callback, reverb->context);
         }
     }
     else {
@@ -1191,13 +1190,13 @@ RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voic
  */
 void SetVoiceAccess(RedTrackDATA* track, int mask)
 {
-    int* voiceData = (int*)p_VoiceData;
+    u32* voiceData = (u32*)p_VoiceData;
     do {
-        if ((voiceData[0] != 0) && (voiceData[0] == (int)track)) {
+        if ((voiceData[0] != 0) && (voiceData[0] == (u32)track)) {
             voiceData[0x24] |= mask;
         }
         voiceData += 0x30;
-    } while (voiceData < (int*)p_VoiceData + 0xC00);
+    } while (voiceData < (u32*)p_VoiceData + 0xC00);
 }
 
 /*
@@ -1211,13 +1210,13 @@ void SetVoiceAccess(RedTrackDATA* track, int mask)
  */
 void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 {
-    int* voiceData = (int*)p_VoiceData;
+    u32* voiceData = (u32*)p_VoiceData;
     do {
-        if ((voiceData[0] != 0) && (voiceData[0] == (int)track)) {
+        if ((voiceData[0] != 0) && (voiceData[0] == (u32)track)) {
             voiceData[0x25] = voiceSwitch;
         }
         voiceData += 0x30;
-    } while (voiceData < (int*)p_VoiceData + 0xC00);
+    } while (voiceData < (u32*)p_VoiceData + 0xC00);
 }
 
 /*
@@ -1939,7 +1938,7 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
 {
     int* track = *(int**)control;
     do {
-        if (*track != 0) {
+        if ((u32)*track != 0) {
             int step = frames;
             m_ChangeStatus = 0;
             if (track[0x42] < frames) {
@@ -1950,13 +1949,13 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
             if (((track[0x41] & 0x200000) == 0) && (track[0x42] == 1)) {
                 KeyOffSet(control, keyOnData, (RedTrackDATA*)track);
             }
-            while ((*track != 0) && (track[0x42] < 1)) {
+            while (((u32)*track != 0) && (track[0x42] < 1)) {
                 unsigned char* cmd = (unsigned char*)*track;
                 int delta;
                 *track = (int)(cmd + 1);
                 ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))p_MidiControl_Function[*cmd])(
                     control, keyOnData, (RedTrackDATA*)track);
-                if (*track != 0) {
+                if ((u32)*track != 0) {
                     if (track[0x42] < 1) {
                         delta = DeltaTimeSumup((unsigned char**)track);
                     } else {
@@ -2020,7 +2019,7 @@ int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int
     sound[0x121] = frames;
     sound[4] += frames;
 
-    while (sound[5] <= sound[4]) {
+    while (sound[4] >= sound[5]) {
         sound[3]++;
         sound[4] -= sound[5];
     }
@@ -2107,7 +2106,7 @@ int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
         sound[0x121] = frames;
         sound[4] += frames;
 
-        while (sound[5] <= sound[4]) {
+        while (sound[4] >= sound[5]) {
             sound[3]++;
             sound[4] -= sound[5];
         }
@@ -2124,7 +2123,7 @@ int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
             }
         }
 
-        if (m_MusicSkipLine < 1) {
+        if (m_MusicSkipLine <= 0) {
             break;
         }
     } while (*(s16*)((u8*)sound + 0x48E) != 0);
@@ -2547,21 +2546,21 @@ void MainControl(int frames)
 
     p_SoundControl = (void*)((u8*)p_SoundControlBuffer + 0xDBC);
     _SeMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData,
-                       *(RedTrackDATA**)p_SoundControl, *(int*)((u8*)p_SoundControlBuffer + 0x1230), frames);
+                       *(RedTrackDATA**)p_SoundControl, *(int*)((u8*)p_SoundControl + 0x474), frames);
     p_SoundControl = p_SoundControlBuffer;
 
-    if (*(s16*)((u8*)p_SoundControlBuffer + 0x48E) != 0) {
-        if ((((u32*)p_SoundControlBuffer)[0x11B] & 0x10) == 0) {
+    if (*(s16*)((u8*)p_SoundControl + 0x48E) != 0) {
+        if ((((u32*)p_SoundControl)[0x11B] & 0x10) == 0) {
             mul = ((u32)*p_MusicTempoControl >> 0xC) & 0xFFFF;
-            step = *(int*)((u8*)p_SoundControlBuffer + 0x448) >> 0xC;
+            step = *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
             if (mul != 0) {
                 if (*p_MusicTempoControl < 0) {
                     step = (step * (int)mul) >> 0x10;
                 } else {
-                    step = ((step * ((int)mul + 1)) >> 0xF) + (*(int*)((u8*)p_SoundControlBuffer + 0x448) >> 0xC);
+                    step = ((step * ((int)mul + 1)) >> 0xF) + (*(int*)((u8*)p_SoundControl + 0x448) >> 0xC);
                 }
             }
-            *(s16*)((u8*)p_SoundControlBuffer + 0x48C) -= (s16)step * (s16)frames;
+            *(s16*)((u8*)p_SoundControl + 0x48C) -= step * frames;
             while (*(s16*)((u8*)p_SoundControl + 0x48C) < 1) {
                 *(s16*)((u8*)p_SoundControl + 0x48C) += 0xFA;
                 _MusicNoteExecute();
@@ -2571,7 +2570,7 @@ void MainControl(int frames)
 
     if (*(s16*)((u8*)p_SoundControlBuffer + 0x922) != 0) {
         p_SoundControl = (void*)((u8*)p_SoundControlBuffer + 0x494);
-        *(s16*)((u8*)p_SoundControlBuffer + 0x920) -= (s16)(*(int*)((u8*)p_SoundControlBuffer + 0x8DC) >> 0xC) * (s16)frames;
+        *(s16*)((u8*)p_SoundControl + 0x48C) -= (*(int*)((u8*)p_SoundControl + 0x448) >> 0xC) * frames;
         while (*(s16*)((u8*)p_SoundControl + 0x48C) < 1) {
             *(s16*)((u8*)p_SoundControl + 0x48C) += 0xFA;
             _MusicNoteExecute();

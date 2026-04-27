@@ -565,9 +565,9 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 		frameCount = 1;
 	}
 
-	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 	frameCount *= 0x60;
 	frameCount /= 0x3c;
+	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 
 	do {
 		if (((u32)*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
@@ -600,9 +600,9 @@ void SetSePan(int seId, int pan, int frameCount)
 		frameCount = 1;
 	}
 
-	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 	frameCount *= 0x60;
 	frameCount /= 0x3c;
+	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 
 	do {
 		if (((u32)*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
@@ -634,9 +634,9 @@ void SetSePitch(int seId, int pitch, int frameCount)
 		frameCount = 1;
 	}
 
-	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 	frameCount *= 0x60;
 	frameCount /= 0x3c;
+	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 
 	do {
 		if (((u32)*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
@@ -660,16 +660,17 @@ void SetSePitch(int seId, int pitch, int frameCount)
 void SePause(int seId, int pause)
 {
 	unsigned int* trackBasePtr;
+	const char* logBlob = s_redCommandLogBlob;
 	unsigned int track;
 	unsigned int voice;
 
 	if (m_ReportPrint != 0) {
 		if (pause == 1) {
-			OSReport(s_redCommandLogBlob + RED_COMMAND_SE_PAUSE_ON_FMT_OFFSET,
-			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
+			OSReport(logBlob + RED_COMMAND_SE_PAUSE_ON_FMT_OFFSET,
+			         logBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
 		} else {
-			OSReport(s_redCommandLogBlob + RED_COMMAND_SE_PAUSE_OFF_FMT_OFFSET,
-			         s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
+			OSReport(logBlob + RED_COMMAND_SE_PAUSE_OFF_FMT_OFFSET,
+			         logBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
 		}
 		fflush(__files + 1);
 	}
@@ -680,7 +681,7 @@ void SePause(int seId, int pause)
 	do {
 		if ((*(int*)(track + 0xf8) != 0) && ((seId == -1) || (seId == *(int*)(track + 0xf8)))) {
 			if (pause == 1) {
-				if (*(int*)(voice + 0x14) != 0) {
+				if (*(void**)(voice + 0x14) != 0) {
 					*(unsigned int*)(voice + 0x9c) = 0;
 					*(unsigned int*)(voice + 0x90) |= 0x18;
 				}
@@ -871,8 +872,8 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
  */
 void MusicStop(int seId)
 {
-	unsigned int* musicBase = (unsigned int*)p_SoundControlBuffer;
-	unsigned int* music = musicBase;
+	unsigned int* music = (unsigned int*)p_SoundControlBuffer;
+	unsigned int* musicBase = music;
 
 	do {
 		if ((seId == -1) || (((int)music[0x11c] >= 0) && (music[0x11c] == (unsigned int)seId))) {
@@ -898,7 +899,7 @@ void MusicStop(int seId)
 
 				int* track = (int*)*music;
 				do {
-					if (*track != 0) {
+					if ((u32)*track != 0) {
 						KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 						*track = 0;
 					}
@@ -966,7 +967,7 @@ int MusicPlay(int musicId, int volume, int mode)
  */
 void SetMusicVolume(int seId, int volume, int duration, int mode)
 {
-	int* music = (int*)p_SoundControlBuffer;
+	int* music;
 
 	if (volume != 0) {
 		volume++;
@@ -983,6 +984,7 @@ void SetMusicVolume(int seId, int volume, int duration, int mode)
 		duration /= 0x3c;
 	}
 
+	music = (int*)p_SoundControlBuffer;
 	do {
 		if ((seId == -1) || (seId == music[0x11c]) || (music[0x11c] < 0)) {
 			if (mode == 1) {

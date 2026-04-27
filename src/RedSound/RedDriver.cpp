@@ -92,7 +92,7 @@ static int m_WaveSettingStatus;
 static void* volatile p_DmaExecuteThreadStack;
 static volatile int m_DMAStatus;
 void* volatile p_MusicSkipThreadStack;
-int m_MusicSkipComplete;
+volatile int m_MusicSkipComplete;
 void* volatile p_ReverbDepth;
 int m_Mute[2];
 static int m_DmaControl[0x700];
@@ -196,17 +196,17 @@ void _SetSoundMode(int* param_1)
  */
 void _SetReverbDepth(int* param_1)
 {
-    unsigned int reverbIndex;
-    unsigned int reverbBank;
-    unsigned int reverbDepth;
-    unsigned int fadeFrame;
+    int reverbIndex;
+    int reverbBank;
+    int reverbDepth;
+    int fadeFrame;
     int fadeStep;
     int* seInfo;
 
-    reverbIndex = (unsigned int)param_1[0];
+    reverbIndex = param_1[0];
     reverbBank = reverbIndex & 1;
-    reverbDepth = (unsigned int)param_1[1] & 0x7f;
-    fadeFrame = (unsigned int)param_1[2];
+    reverbDepth = param_1[1] & 0x7f;
+    fadeFrame = param_1[2];
     if (reverbDepth != 0) {
         reverbDepth = (((reverbDepth + 1) * 0x100) - 1) * 0x1000;
     }
@@ -214,12 +214,12 @@ void _SetReverbDepth(int* param_1)
     if (reverbBank != 0) {
         fadeStep = (int)(fadeFrame * 0x60) / 0x3c;
         if (fadeStep == 0) {
-            fadeStep = 1;
+            fadeStep++;
         }
         reverbDepth |= 0x800;
         seInfo = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
         do {
-            if (*seInfo != 0) {
+            if ((u32)*seInfo != 0) {
                 seInfo[0x1b] = (int)(reverbDepth - (seInfo[0x1a] & 0xfffff000U)) / fadeStep;
                 seInfo[0x1c] = fadeStep;
             }
@@ -527,10 +527,7 @@ void _SeSepPlay(int* param_1)
  */
 void _SeSepPlaySequence(int* param_1)
 {
-    int iVar1;
-
-    iVar1 = c_RedEntry.SearchSeSepSequence(param_1[1]);
-    if (iVar1 >= 0) {
+    if (c_RedEntry.SearchSeSepSequence(param_1[1]) >= 0) {
         m_SeSkipStep = param_1[4];
         SeSepPlay(param_1[0], param_1[1], param_1[2], param_1[3]);
     }
@@ -864,21 +861,17 @@ int _MainThread(void*)
  */
 int _WaveSettingThread(void* param_1)
 {
-    int threadResult;
-    RedWaveSettingState* waveSetting;
-
-    waveSetting = (RedWaveSettingState*)param_1;
     m_ThreadExecute = m_ThreadExecute | 4;
     m_WaveSettingStatus = 0;
     while (m_ThreadControl != 0) {
         OSWaitSemaphore(&m_WaveSettingSemaphore);
         if (m_ThreadControl != 0) {
+            RedWaveSettingState* waveSetting = (RedWaveSettingState*)param_1;
             m_WaveSettingStatus = m_WaveSettingStatus + 1;
             c_RedEntry.SetWaveData(waveSetting->waveID, waveSetting->waveData, waveSetting->waveSize);
             *(int*)waveSetting->slot = 0;
             do {
-                threadResult = OSTryWaitSemaphore(&m_WaveSettingSemaphore);
-            } while (0 < threadResult);
+            } while (OSTryWaitSemaphore(&m_WaveSettingSemaphore) > 0);
             m_WaveSettingStatus = 0;
         }
     }

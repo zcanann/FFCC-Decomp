@@ -534,7 +534,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
             controlData[0] = 0;
         }
     } else {
-        if (((int*)track)[6] != 0) {
+        if ((u32)((int*)track)[6] != 0) {
             c_RedEntry.WaveHistoryManager(0, *(short*)(((int*)track)[6] + 2));
         }
         c_RedEntry.SeSepHistoryManager(0, ((int*)track)[0x3d]);
@@ -556,7 +556,7 @@ void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrac
     if ((m_MusicPhraseStop == 1) && ((void*)control == p_SoundControlBuffer)) {
         int* track = (int*)*(int*)control;
         do {
-            if (*track != 0) {
+            if ((u32)*track != 0) {
                 __MidiCtrl_Stop(control, keyOnData, (RedTrackDATA*)track);
             }
             track += 0x55;

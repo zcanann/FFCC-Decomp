@@ -28,62 +28,6 @@ CSamplePcs SamplePcs;
 
 /*
  * --INFO--
- * PAL Address: 0x8001fe74
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CProcess::onScriptChanging(char*)
-{
-	return;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001fe78
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CProcess::onScriptChanged(char*, int)
-{
-	return;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001fe7c
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CProcess::onMapChanging(int, int)
-{
-	return;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001fe80
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CProcess::onMapChanged(int, int, int)
-{
-	return;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8001FE84
  * PAL Size: 4b
  * EN Address: TODO

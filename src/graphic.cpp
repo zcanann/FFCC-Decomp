@@ -1551,24 +1551,26 @@ void CGraphic::RenderNoTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXCol
 {
 	GXBegin(GX_QUADS, GX_VTXFMT6, 4);
 
+	float z1 = pos1.z;
+
 	GXWGFifo.f32 = pos1.x;
 	GXWGFifo.f32 = pos1.y;
-	GXWGFifo.f32 = pos1.z;
+	GXWGFifo.f32 = z1;
 	GXWGFifo.u32 = *(u32*)&color1;
 
 	GXWGFifo.f32 = pos2.x;
 	GXWGFifo.f32 = pos1.y;
-	GXWGFifo.f32 = pos1.z;
+	GXWGFifo.f32 = z1;
 	GXWGFifo.u32 = *(u32*)&color2;
 
 	GXWGFifo.f32 = pos2.x;
 	GXWGFifo.f32 = pos2.y;
-	GXWGFifo.f32 = pos1.z;
+	GXWGFifo.f32 = z1;
 	GXWGFifo.u32 = *(u32*)&color4;
 
 	GXWGFifo.f32 = pos1.x;
 	GXWGFifo.f32 = pos2.y;
-	GXWGFifo.f32 = pos1.z;
+	GXWGFifo.f32 = z1;
 	GXWGFifo.u32 = *(u32*)&color3;
 }
 
@@ -1821,8 +1823,8 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     _GXColor white;
     Mtx cameraMtx;
     Mtx44 projection;
-    int halfWidth = static_cast<int>(width) / 2;
-    int halfHeight = static_cast<int>(height) / 2;
+    long halfWidth = width / 2;
+    long halfHeight = height / 2;
 
     gUtil.SetOrthoEnv();
     gUtil.SetVtxFmt_POS_CLR_TEX();
@@ -1972,8 +1974,9 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);
 
+    int textureOffset = 0;
     for (int i = 0; i < static_cast<int>(U8At(this, 0x735E)); i++) {
-        u8* textureBase = reinterpret_cast<u8*>(PtrAt(this, 0x71EC)) + i * 0x46000;
+        u8* textureBase = reinterpret_cast<u8*>(PtrAt(this, 0x71EC)) + textureOffset;
         GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
@@ -1996,13 +1999,14 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
             quadMax.z = 0.0f;
             gUtil.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
         }
+        textureOffset += 0x46000;
     }
 
     GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
     PSMTXIdentity(identity);
-    GXLoadPosMtxImm(identity, 0);
+    GXLoadPosMtxImm(CameraMatrix(), 0);
     GXSetCurrentMtx(0);
-    GXSetProjection(reinterpret_cast<f32(*)[4]>(reinterpret_cast<u8*>(this) + 0x73A4), GX_ORTHOGRAPHIC);
+    GXSetProjection(CameraPcs.m_screenMatrix, GX_PERSPECTIVE);
     GXSetAlphaUpdate(GX_TRUE);
 
     if (U8At(this, 0x735C) < textureDelay) {

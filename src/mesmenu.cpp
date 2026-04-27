@@ -3,6 +3,7 @@
 #include "ffcc/menu.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_menu.h"
+#include "ffcc/ringmenu.h"
 #include "ffcc/sound.h"
 
 #include <math.h>
@@ -23,6 +24,14 @@ void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CS
     void* flatRuntime, int object, int type, int id, int stackCount, void* stack, void* stack2);
 void SetMargin__5CFontFf(float margin, void* font);
 void SetShadow__5CFontFi(void* font, int enable);
+void SetScale__5CFontFf(float scale, void* font);
+void DrawInit__5CFontFv(void* font);
+void SetTlut__5CFontFi(void* font, int tlut);
+float GetWidth__5CFontFPc(void* font, const char* text);
+void SetColor__5CFontF8_GXColor(void* font, void* color);
+void SetPosX__5CFontFf(float x, void* font);
+void SetPosY__5CFontFf(float y, void* font);
+void Draw__5CFontFPc(void* font, const char* text);
 void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void* menuPcs, int fmt);
 void DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(void* menuPcs, float x, float y, float w, float h, int tex, float rot);
 void DrawInit__8CMenuPcsFv(void* menuPcs);
@@ -30,6 +39,7 @@ void Draw__4CMesFv(void* mes);
 void* __ct__6CColorFUcUcUcUc(void* color, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void SetColor__8CMenuPcsFR6CColor(void* menuPcs, void* color);
 void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void* menuPcs, int tex);
+void SetExternalTlut__8CTextureFPvi(void* texture, void* tlut, int enable);
 void DrawRect__8CMenuPcsFUlfffffffff(
     void* menuPcs, unsigned long flags, float x, float y, float w, float h, float u, float v, float uvScaleX, float uvScaleY,
     float rot);
@@ -65,9 +75,46 @@ extern float FLOAT_80330924;
 extern float FLOAT_80330928;
 extern float FLOAT_8033092c;
 extern float FLOAT_80330930;
+extern float FLOAT_80330934;
+extern float FLOAT_80330938;
+extern float FLOAT_8033093c;
+extern float FLOAT_80330940;
+extern float FLOAT_80330944;
+extern float FLOAT_80330948;
+extern float FLOAT_8033094c;
+extern float FLOAT_80330950;
+extern float FLOAT_80330954;
+extern float FLOAT_80330958;
+extern float FLOAT_8033095c;
+extern float FLOAT_80330960;
+extern float FLOAT_80330964;
+extern float FLOAT_80330968;
+extern float FLOAT_8033096c;
+extern float FLOAT_80330970;
+extern float FLOAT_80330974;
+extern double DOUBLE_80330978;
+extern float FLOAT_80330984;
+extern float FLOAT_80330988;
+extern float FLOAT_8033098c;
+extern float FLOAT_80330990;
 extern float FLOAT_80330980;
 extern float FLOAT_80330994;
 }
+
+struct CFlatDataTableEntryView
+{
+    int count;
+    char** index;
+    char* buffer;
+};
+
+struct CFlatDataView
+{
+    int dataCount;
+    char pad[0x68 - 4];
+    int tableCount;
+    CFlatDataTableEntryView m_table[8];
+};
 
 /*
  * --INFO--
@@ -462,6 +509,7 @@ void CMesMenu::onCalc()
  */
 void CMesMenu::onDraw()
 {
+    CFont* font = MenuPcs.m_fonts[0];
     int menuIndex = *(int*)((char*)this + 0x18);
     if (!((menuIndex < 4) || (*(int*)((char*)this + 8) != 0))) {
         return;
@@ -470,7 +518,6 @@ void CMesMenu::onDraw()
         return;
     }
 
-    void* font = *(void**)((unsigned char*)&MenuPcs + 0xF8);
     SetMargin__5CFontFf(FLOAT_803308d8, font);
     SetShadow__5CFontFi(font, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
@@ -491,6 +538,9 @@ void CMesMenu::onDraw()
             stateBlend = FLOAT_80330914;
         }
     }
+    if (stateBlend <= FLOAT_803308d8) {
+        return;
+    }
 
     if (menuIndex < 4) {
         unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
@@ -499,6 +549,7 @@ void CMesMenu::onDraw()
         }
 
         float pulse = FLOAT_8033092c * (FLOAT_80330914 - sinf(FLOAT_80330930 * stageBlend));
+        (void)MenuPcs.m_battleRingMenus[menuIndex]->GetDispCounter();
         float baseX = *(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74);
         float baseY = *(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78);
         float dirX = ((menuIndex & 1) != 0) ? FLOAT_80330914 : -FLOAT_80330914;
@@ -506,26 +557,119 @@ void CMesMenu::onDraw()
         baseX += dirX * pulse;
         baseY += dirY * pulse;
 
-        float alphaF = FLOAT_80330908 * stateBlend * stageBlend;
-        if (alphaF < FLOAT_803308d8) {
-            alphaF = FLOAT_803308d8;
-        } else if (alphaF > 255.0f) {
-            alphaF = 255.0f;
-        }
-        unsigned char alpha = (unsigned char)(int)alphaF;
-        unsigned char colorStorage[8];
-        __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, alpha);
-        SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
-        DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(
-            &MenuPcs, baseX, baseY, *(float*)((char*)this + 0x3D7C) * stateBlend, *(float*)((char*)this + 0x3D80) * stateBlend, 2,
-            FLOAT_8033092c);
+        if (stateBlend > FLOAT_803308d8) {
+            float width = *(float*)((char*)this + 0x3D7C) * stateBlend;
+            float height = *(float*)((char*)this + 0x3D80) * stateBlend;
+            float drawX = baseX;
+            if ((menuIndex & 1) == 0) {
+                drawX -= *(float*)((char*)this + 0x3D7C) - width;
+            }
 
-        if ((*(int*)((char*)this + 0x0C) == 1) && (stageBlend == FLOAT_80330914)) {
-            Draw__4CMesFv((char*)this + 0x1C);
+            float edgeY = FLOAT_803308f8;
+            if ((menuIndex & 2) != 0) {
+                edgeY = (FLOAT_80330934 - *(float*)((char*)this + 0x3D80)) + (*(float*)((char*)this + 0x3D80) - height);
+            }
+            float drawY = baseY + edgeY;
+
+            float alphaF = FLOAT_80330908 * stateBlend * stageBlend;
+            unsigned char colorStorage[8];
+            __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
+            SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
+            DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(&MenuPcs, drawX, drawY, width, height, 2, FLOAT_8033092c);
+
+            if ((*(int*)((char*)this + 0x0C) == 1) && (stageBlend == FLOAT_80330914)) {
+                Draw__4CMesFv((char*)this + 0x1C);
+                DrawInit__8CMenuPcsFv(&MenuPcs);
+            }
+
+            if ((*(int*)((char*)this + 0x3D94) >= 0) || (*(int*)((char*)this + 0x3D98) >= 0)) {
+                SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x14);
+                __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
+                SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
+
+                float cursorWave = sinf(FLOAT_80330930 * (FLOAT_80330914 - stateBlend) + FLOAT_80330930);
+                float signX = ((menuIndex & 1) != 0) ? 32.0f : -32.0f;
+                float iconX = drawX + signX * (FLOAT_80330914 - cursorWave);
+                iconX += ((menuIndex & 1) != 0) ? FLOAT_80330938 : (width - FLOAT_8033093c) - FLOAT_80330938;
+                float iconY = drawY + (((menuIndex & 2) != 0) ? FLOAT_80330940 + height : FLOAT_80330944);
+                DrawRect__8CMenuPcsFUlfffffffff(
+                    &MenuPcs, ((menuIndex & 1) != 0) ? 8 : 0, iconX, iconY, FLOAT_8033093c, FLOAT_80330948,
+                    ((menuIndex & 2) != 0) ? 144.0f : FLOAT_803308d8, FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914,
+                    FLOAT_803308d8);
+
+                CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&Game.m_cFlatDataArr[1]);
+                if (*(int*)((char*)this + 0x3D98) >= 0) {
+                    SetScale__5CFontFf(FLOAT_8033094c, font);
+                    SetShadow__5CFontFi(font, 1);
+                    SetMargin__5CFontFf(FLOAT_803308d8, font);
+                    float textWidth = GetWidth__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
+                    DrawInit__5CFontFv(font);
+                    SetTlut__5CFontFi(font, 0xF);
+                    __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
+                    SetColor__5CFontF8_GXColor(font, colorStorage);
+                    SetPosX__5CFontFf(
+                        iconX + (((menuIndex & 1) != 0) ? FLOAT_80330950 : FLOAT_80330954 - textWidth), font);
+                    SetPosY__5CFontFf(iconY + (((menuIndex & 2) != 0) ? 8.0f : 31.0f), font);
+                    Draw__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
+                    DrawInit__8CMenuPcsFv(&MenuPcs);
+                }
+
+                if (*(int*)((char*)this + 0x3D94) >= 0) {
+                    int itemIndex = *(int*)((char*)this + 0x3D94);
+                    SetColor__8CMenuPcsFR6CColor(&MenuPcs, __ct__6CColorFUcUcUcUc(
+                                                               colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF));
+                    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x18);
+                    SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], 0, 1);
+                    float itemX = iconX + (((menuIndex & 1) != 0) ? 13.0f : 83.0f);
+                    int iconColumn = itemIndex % 8;
+                    int iconRow = itemIndex / 8;
+                    DrawRect__8CMenuPcsFUlfffffffff(
+                        &MenuPcs, (((menuIndex & 1) != 0) && ((*(unsigned int*)((char*)this + 0x3D8C) & 4) == 0)) ? 8 : 0,
+                        itemX, iconY + FLOAT_80330958, FLOAT_8033095c, FLOAT_80330960, (float)(iconColumn * 0x30),
+                        (float)(iconRow * 0x30), FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
+                }
+            }
+
+            SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x16);
+            __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
+            SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
+            float frameX = baseX - (((menuIndex & 1) != 0) ? 128.0f : FLOAT_803308d8);
+            float frameY = baseY - (((menuIndex & 2) != 0) ? 56.0f : FLOAT_803308d8);
+            DrawRect__8CMenuPcsFUlfffffffff(
+                &MenuPcs, 0, frameX, frameY, FLOAT_80330964, FLOAT_80330948,
+                ((menuIndex & 2) != 0) ? 128.0f : FLOAT_803308d8,
+                ((menuIndex & 1) != 0) ? 56.0f : FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
+
+            SetScale__5CFontFf(FLOAT_8033094c, font);
+            float titleWidth = GetWidth__5CFontFPc(font, reinterpret_cast<char*>(scriptFood + 0x3CA));
+            DrawInit__5CFontFv(font);
+            SetTlut__5CFontFi(font, 0xF);
+            __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
+            SetColor__5CFontF8_GXColor(font, colorStorage);
+            SetPosX__5CFontFf(frameX + (((menuIndex & 1) != 0) ? FLOAT_80330968 - titleWidth : FLOAT_80330950), font);
+            SetPosY__5CFontFf(frameY + FLOAT_8033096c, font);
+            Draw__5CFontFPc(font, reinterpret_cast<char*>(scriptFood + 0x3CA));
             DrawInit__8CMenuPcsFv(&MenuPcs);
-        }
 
-        DrawHeart(baseX, baseY, FLOAT_803308d8, alphaF);
+            DrawHeart(frameX, frameY, FLOAT_803308d8, stageBlend);
+
+            unsigned int foodTimer = *(unsigned int*)((char*)this + 0x3DF0);
+            unsigned int foodAmount = (unsigned int)*(unsigned short*)(scriptFood + 0x14) % 100;
+            if (foodTimer != 0) {
+                foodAmount += 4;
+            }
+            float shakeX = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - ((foodTimer + 1) & 3)) & 3]) : 0.0f;
+            float shakeY = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - (foodTimer & 3)) & 3]) : 0.0f;
+            SetColor__8CMenuPcsFR6CColor(
+                &MenuPcs, __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend)));
+            SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x18);
+            SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], (*(short*)(scriptFood + 0x1C) == 0) ? (void*)0x802ea500 : 0, 1);
+            DrawRect__8CMenuPcsFUlfffffffff(
+                &MenuPcs, ((menuIndex & 1) == 0) ? 8 : 0, frameX + shakeX + (((menuIndex & 1) != 0) ? 75.0f : 5.0f),
+                frameY + shakeY + FLOAT_80330958, FLOAT_8033095c, FLOAT_80330960,
+                (float)((foodAmount % 8) * 0x30), (float)((foodAmount / 8) * 0x30), FLOAT_80330914, FLOAT_80330914,
+                FLOAT_803308d8);
+        }
     } else {
         float sizeX = *(float*)((char*)this + 0x3D7C) * stateBlend;
         float sizeY = *(float*)((char*)this + 0x3D80) * stateBlend;
@@ -533,20 +677,90 @@ void CMesMenu::onDraw()
         float baseY = *(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78);
         float drawX = -(FLOAT_803308ec * sizeX - (FLOAT_803308ec * *(float*)((char*)this + 0x3D7C) + baseX));
         float drawY = -(FLOAT_803308ec * sizeY - (FLOAT_803308ec * *(float*)((char*)this + 0x3D80) + baseY));
+        unsigned char colorStorage[8];
 
         if ((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) {
             float alphaF = FLOAT_80330908 * stateBlend * stageBlend;
-            if (alphaF < FLOAT_803308d8) {
-                alphaF = FLOAT_803308d8;
-            } else if (alphaF > 255.0f) {
-                alphaF = 255.0f;
-            }
-            unsigned char colorStorage[8];
             __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
             SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
 
             int tex = ((*(unsigned int*)((char*)this + 0x3D8C) & 0x200) != 0) ? 2 : 0xB;
             DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(&MenuPcs, drawX, drawY, sizeX, sizeY, tex, FLOAT_8033092c);
+
+            if (((*(int*)((char*)this + 0x3D94) >= 0) || (*(int*)((char*)this + 0x3D98) >= 0)) &&
+                (((*(unsigned int*)((char*)this + 0x3D8C) >> 10) & 7) != 0)) {
+                unsigned int iconAnchor = ((*(unsigned int*)((char*)this + 0x3D8C) >> 10) & 7) - 1;
+                unsigned int anchorX = iconAnchor & 1;
+                unsigned int anchorY = iconAnchor & 2;
+                SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x14);
+                SetColor__8CMenuPcsFR6CColor(
+                    &MenuPcs, __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF));
+                float iconX = drawX + FLOAT_80330938 + ((anchorX == 0) ? sizeX - FLOAT_8033093c : FLOAT_803308d8);
+                float iconY = drawY + ((anchorY != 0) ? FLOAT_80330940 + sizeY : FLOAT_80330944);
+                DrawRect__8CMenuPcsFUlfffffffff(
+                    &MenuPcs, anchorX != 0 ? 8 : 0, iconX, iconY, FLOAT_8033093c, FLOAT_80330948,
+                    anchorY != 0 ? 144.0f : FLOAT_803308d8, FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914,
+                    FLOAT_803308d8);
+
+                CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&Game.m_cFlatDataArr[1]);
+                if (*(int*)((char*)this + 0x3D98) >= 0) {
+                    SetScale__5CFontFf(FLOAT_8033094c, font);
+                    SetShadow__5CFontFi(font, 1);
+                    SetMargin__5CFontFf(FLOAT_803308d8, font);
+                    float textWidth = GetWidth__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
+                    DrawInit__5CFontFv(font);
+                    SetTlut__5CFontFi(font, 0xF);
+                    SetColor__5CFontF8_GXColor(
+                        font, __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF));
+                    SetPosX__5CFontFf(iconX + ((anchorX == 0) ? FLOAT_80330954 - textWidth : FLOAT_80330950), font);
+                    SetPosY__5CFontFf(iconY + (anchorY != 0 ? 8.0f : 31.0f), font);
+                    Draw__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
+                    DrawInit__8CMenuPcsFv(&MenuPcs);
+                }
+
+                if (*(int*)((char*)this + 0x3D94) >= 0) {
+                    int itemIndex = *(int*)((char*)this + 0x3D94);
+                    SetColor__8CMenuPcsFR6CColor(
+                        &MenuPcs, __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF));
+                    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x18);
+                    SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], 0, 1);
+                    DrawRect__8CMenuPcsFUlfffffffff(
+                        &MenuPcs, (anchorX != 0 && ((*(unsigned int*)((char*)this + 0x3D8C) & 4) == 0)) ? 8 : 0,
+                        iconX + (anchorX != 0 ? 13.0f : 83.0f), iconY + FLOAT_80330958, FLOAT_8033095c, FLOAT_80330960,
+                        (float)((itemIndex % 8) * 0x30), (float)((itemIndex / 8) * 0x30), FLOAT_80330914, FLOAT_80330914,
+                        FLOAT_803308d8);
+                }
+            }
+        }
+
+        if ((*(int*)((char*)this + 0x0C) == 1) && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x2000) != 0)) {
+            float windowScale = stateBlend * stageBlend;
+            float pulseScale = FLOAT_80330970 * (FLOAT_80330914 - windowScale) + FLOAT_80330914;
+            float time = fmod(FLOAT_80330974 * (float)*(int*)((char*)this + 0x10), (float)DOUBLE_80330978);
+            if (time > FLOAT_80330914) {
+                time = FLOAT_803308e8 - time;
+            }
+
+            float angle = FLOAT_80330910 * time;
+            float sinX = sinf(FLOAT_80330980 + angle);
+            float sinY = sinf(angle);
+            SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x1E);
+            int shadowAlpha = (int)((FLOAT_803308ec * (FLOAT_80330908 * windowScale)) * stageBlend);
+            SetColor__8CMenuPcsFR6CColor(&MenuPcs, __ct__6CColorFUcUcUcUc(colorStorage, 0, 0, 0, shadowAlpha));
+            float promptX = FLOAT_803308f8 + drawX;
+            float promptY = FLOAT_8033092c + drawY;
+            float waveX = promptX + FLOAT_80330984 * (pulseScale * sinX);
+            float waveY = promptY - FLOAT_80330988 * (pulseScale * sinY);
+            float fadeScale = FLOAT_80330914 - pulseScale;
+            DrawRect__8CMenuPcsFUlfffffffff(
+                &MenuPcs, 3, FLOAT_803308e4 + waveX, FLOAT_803308e4 + waveY, FLOAT_8033098c, FLOAT_8033095c, FLOAT_803308d8,
+                FLOAT_803308d8, FLOAT_80330990 * (FLOAT_80330914 + fadeScale), FLOAT_80330990 * (pulseScale + fadeScale),
+                FLOAT_803308d8);
+            SetColor__8CMenuPcsFR6CColor(
+                &MenuPcs, __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)((FLOAT_80330908 * windowScale) * stageBlend)));
+            DrawRect__8CMenuPcsFUlfffffffff(
+                &MenuPcs, 3, waveX, waveY, FLOAT_8033098c, FLOAT_8033095c, FLOAT_803308d8, FLOAT_803308d8,
+                FLOAT_80330990 * pulseScale, FLOAT_80330990 * pulseScale, FLOAT_803308d8);
         }
 
         if (*(int*)((char*)this + 0x0C) == 1) {

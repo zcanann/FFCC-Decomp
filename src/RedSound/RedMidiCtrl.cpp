@@ -1229,9 +1229,9 @@ void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
 	delta[0] = DeltaTimeSumup((unsigned char**)track);
 	if (delta[0] == 0) {
-		delta[0] = 1;
+		delta[0]++;
 	}
-	if (((int*)track)[0x2d] == 0) {
+	if ((u32)((int*)track)[0x2d] == 0) {
 		((int*)track)[0x10] += ((int*)track)[0x33] * 0x1000;
 		((int*)track)[0x33] = 0;
 	}

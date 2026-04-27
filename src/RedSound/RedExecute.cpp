@@ -240,16 +240,18 @@ void _ReverbNullCallback(AXFX_BUFFERUPDATE* param_1, void*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C3154
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void* ReverbAreaAlloc(unsigned long size)
 {
-    unsigned long requestedSize = size;
-    unsigned long alignedSize = ((u32)requestedSize + 0x1F) & ~0x1F;
-    p_ReverbSize[0] += (u32)requestedSize;
-    p_ReverbSize[1] += (u32)alignedSize;
-    return (void*)RedNew((int)requestedSize);
+    p_ReverbSize[0] += (u32)size;
+    p_ReverbSize[1] += ((u32)size + 0x1F) & ~0x1F;
+    return (void*)RedNew((int)size);
 }
 
 /*
@@ -1230,36 +1232,37 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
  */
 void _AdsrStart(RedVoiceDATA* voice)
 {
-    int* voiceData = (int*)voice;
-    u32 prevLevel;
-    u32 nextLevel;
-    u32 stepFrames;
+    u8* adsrData = (u8*)voice + 0x50;
+    int* stage = (int*)((u8*)voice + 0x5c);
+    int prevLevel;
+    int nextLevel;
+    int stepFrames;
 
-    voiceData[0x17] = 0;
-    nextLevel = *(u8*)((u8*)voiceData + 0x58);
+    *stage = 0;
+    nextLevel = *(u8*)((u8*)voice + 0x58);
     do {
         prevLevel = nextLevel;
-        stepFrames = *(u16*)((u8*)voiceData + 0x50 + voiceData[0x17] * 2);
-        nextLevel = *(u8*)((u8*)voiceData + 0x50 + voiceData[0x17] + 9);
+        stepFrames = *(u16*)(adsrData + *stage * 2);
+        nextLevel = *(u8*)(adsrData + *stage + 9);
         if (stepFrames != 0) {
             break;
         }
-        voiceData[0x17] += 1;
-    } while (voiceData[0x17] < 3);
+        *stage = *stage + 1;
+    } while (*stage < 3);
 
-    voiceData[0x18] = stepFrames;
+    *(int*)((u8*)voice + 0x60) = stepFrames;
     if (nextLevel != 0) {
         nextLevel = (((nextLevel + 1) * 0x100) - 1) * 0x1000;
     }
 
-    if (stepFrames == 0) {
-        voiceData[0x2B] = nextLevel;
-    } else {
+    if (stepFrames != 0) {
         if (prevLevel != 0) {
             prevLevel = (((prevLevel + 1) * 0x100) - 1) * 0x1000;
         }
-        voiceData[0x2B] = prevLevel;
-        voiceData[0x19] = (int)((nextLevel | 0x800) - prevLevel) / (int)stepFrames;
+        *(int*)((u8*)voice + 0xac) = prevLevel;
+        *(int*)((u8*)voice + 0x64) = (int)((nextLevel | 0x800) - prevLevel) / (int)stepFrames;
+    } else {
+        *(int*)((u8*)voice + 0xac) = nextLevel;
     }
 }
 
@@ -1274,39 +1277,44 @@ void _AdsrStart(RedVoiceDATA* voice)
  */
 void _AdsrDataCompute(RedVoiceDATA* voice)
 {
-    u32 prevValue = 0;
-    u32 stepCount;
-    int* stage = (int*)((int)voice + 0x5c);
-    u32 level;
-    u32 current = *(u32*)((int)voice + 0xac);
+    u8* adsrData = (u8*)voice + 0x50;
+    int prevValue;
+    int stepCount;
+    int level;
+    int* stage = (int*)((u8*)voice + 0x5c);
 
-    while ((level = current, *stage < 3)) {
-        level = (u32)*(u8*)((int)voice + 0x50 + *stage + 9);
-        stepCount = (u32)*(u16*)((int)voice + 0x50 + *stage * 2);
+    level = *(int*)((u8*)voice + 0xac);
+    stepCount = 0;
+    while (*stage < 3) {
+        prevValue = level;
+        level = (u32)*(u8*)(adsrData + *stage + 9);
+        stepCount = (u32)*(u16*)(adsrData + *stage * 2);
         if (level != 0) {
             level = ((level + 1) * 0x100 - 1) * 0x1000;
         }
-        prevValue = current;
         if (stepCount != 0) {
             break;
         }
         *stage = *stage + 1;
-        current = level;
     }
 
-    *(u32*)((int)voice + 0x60) = stepCount;
-    if (stepCount == 0) {
-        *(u32*)((int)voice + 0xac) = level;
-    } else {
-        *(u32*)((int)voice + 0xac) = prevValue;
+    *(int*)((int)voice + 0x60) = stepCount;
+    if (stepCount != 0) {
+        *(int*)((int)voice + 0xac) = prevValue;
         *(int*)((int)voice + 100) = (int)((level | 0x800) - prevValue) / (int)stepCount;
+    } else {
+        *(int*)((int)voice + 0xac) = level;
     }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C4F00
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 u32 _AdsrDataExecute(RedVoiceDATA* voice)
 {
@@ -1315,12 +1323,12 @@ u32 _AdsrDataExecute(RedVoiceDATA* voice)
 
     if (voiceData[0x17] < 4) {
         if (((voiceData[0x24] & 4U) != 0) || (voiceData[0x17] < 3)) {
-            changed = 1;
+            changed += 1;
             voiceData[0x18] -= 1;
             voiceData[0x2B] += voiceData[0x19];
             if ((voiceData[0x18] == 0) && (voiceData[0x17] < 3)) {
                 voiceData[0x17] += 1;
-                _AdsrDataCompute(voice);
+                _AdsrDataCompute((RedVoiceDATA*)voiceData);
             }
         }
     } else {
@@ -1347,11 +1355,10 @@ u32 _AdsrDataExecute(RedVoiceDATA* voice)
 void _VoiceDropedCallback(void* param_1)
 {
     unsigned int* puVar1;
-    int iParam1 = (int)param_1;
     
     puVar1 = p_VoiceData;
     do {
-        if ((puVar1[5] != 0) && ((int)puVar1[5] == iParam1)) {
+        if ((puVar1[5] != 0) && ((void*)puVar1[5] == param_1)) {
             puVar1[0x23] = 0;
             *puVar1 = 0;
             puVar1[5] = 0;

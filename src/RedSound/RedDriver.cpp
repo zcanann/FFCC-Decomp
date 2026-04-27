@@ -1605,22 +1605,26 @@ void CRedDriver::SetMusicPhraseStop(int stop)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetSeBlockData(int param_1, void* param_2)
+void* CRedDriver::SetSeBlockData(int param_1, void* param_2)
 {
-    void* copiedBuffer = 0;
+    void* copiedBuffer;
     int copySize;
 
     if (param_2 != 0) {
         copySize = *(int*)((char*)param_2 + 0xc);
-        if (copySize < 1) {
-        } else {
+        if (copySize > 0) {
             copiedBuffer = (void*)RedNew(copySize);
             if (copiedBuffer != 0) {
                 memcpy(copiedBuffer, param_2, copySize);
             }
+        } else {
+            copiedBuffer = 0;
         }
+    } else {
+        copiedBuffer = 0;
     }
     _EntryExecCommand(_SetSeBlockData, param_1, (int)copiedBuffer, 0, 0, 0, 0, 0);
+    return copiedBuffer;
 }
 
 /*

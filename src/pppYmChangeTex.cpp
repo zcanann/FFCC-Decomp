@@ -254,7 +254,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	Mtx modelMtx;
 
 	ChangeTexMeshRef* curMesh = model0Raw->m_meshes;
-	int frame = (int)((double)state->m_value0 * (double)(1 << model0Raw->m_data->m_frameShift));
+	int frame = (int)(state->m_value0 * (float)(1 << model0Raw->m_data->m_frameShift));
 	short frameShort = (short)frame;
 	PSMTXCopy(model0Raw->m_matrix, modelMtx);
 

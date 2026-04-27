@@ -1136,35 +1136,35 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
  */
 RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voiceMask)
 {
-    int* voiceData = (int*)p_VoiceData;
-    int* trackData = (int*)track;
+    int* voiceData;
 
-    if ((trackData[0x41] & 0x80000U) == 0) {
-        voiceData = (int*)EntryVoiceSearch(track);
-    } else {
+    if ((((u32*)track)[0x41] & 0x80000U) != 0) {
+        voiceData = (int*)p_VoiceData;
         do {
-            if (*voiceData == (int)track) {
+            if ((u32)*voiceData == (u32)track) {
                 break;
             }
             voiceData += 0x30;
         } while (voiceData < (int*)p_VoiceData + 0xC00);
 
-        if ((int*)p_VoiceData + 0xC00 <= voiceData) {
+        if (!(voiceData < (int*)p_VoiceData + 0xC00)) {
             voiceData = (int*)EntryVoiceSearch(track);
         }
+    } else {
+        voiceData = (int*)EntryVoiceSearch(track);
     }
 
     if (voiceData != 0) {
-        RedWaveDATA* wave = _WaveSplitSelect((RedWaveDATA*)trackData[7], note);
-        voiceData[1] = (int)wave;
+        voiceData[1] = (int)_WaveSplitSelect((RedWaveDATA*)((int*)track)[7], note);
         _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
 
-        if (((*(u32*)voiceData[1] & 1) != 0) && ((((u8*)trackData)[0x26] & 5) == 0)) {
+        if (((*(u32*)voiceData[1] & 1) != 0) && ((*(s8*)((u8*)track + 0x26) & 5) == 0)) {
+            int wave = voiceData[1];
             voiceData[0x25] |= 0x40;
             voiceData = (int*)EntryVoiceSearch(track);
             if (voiceData != 0) {
                 voiceData[0x25] |= 0x80;
-                voiceData[1] = (int)((u8*)wave + 0x60);
+                voiceData[1] = wave + 0x60;
                 _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
             }
         }

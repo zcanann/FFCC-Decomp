@@ -2487,36 +2487,31 @@ void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-    unsigned char value;
+    ((int*)track)[0x3f] &= 0xFFFFC3FF;
 
-    trackData[0x3f] &= 0xFFFFC3FF;
-    value = *(unsigned char*)trackData[0];
-
-    switch (value) {
+    switch (**(unsigned char**)track) {
     case 1:
-        trackData[0x3f] |= 0x1000;
+        ((int*)track)[0x3f] |= 0x1000;
         break;
     case 2:
-        trackData[0x3f] |= 0x1000;
+        ((int*)track)[0x3f] |= 0x1000;
     default:
-        trackData[0x3f] |= 0x400;
+        ((int*)track)[0x3f] |= 0x400;
         break;
     }
 
-    value = *(unsigned char*)(trackData[0] + 1);
-    switch (value) {
+    switch ((*(unsigned char**)track)[1]) {
     case 1:
-        trackData[0x3f] |= 0x2000;
+        ((int*)track)[0x3f] |= 0x2000;
         break;
     case 2:
-        trackData[0x3f] |= 0x2000;
+        ((int*)track)[0x3f] |= 0x2000;
     default:
-        trackData[0x3f] |= 0x800;
+        ((int*)track)[0x3f] |= 0x800;
         break;
     }
-    trackData[0] += 2;
-    SetVoiceSwitch(track, trackData[0x3f]);
+    *(unsigned char**)track += 2;
+    SetVoiceSwitch(track, ((int*)track)[0x3f]);
     m_ChangeStatus |= 2;
 }
 

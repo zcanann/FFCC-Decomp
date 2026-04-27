@@ -382,7 +382,12 @@ bool CMenuPcs::ItemOpen()
             dVar3 = DOUBLE_80332ea0;
             fVar1 = FLOAT_80332e60;
             if (*(int*)(psVar4 + 0x12) <= iVar7) {
-                if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
+                if (*(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14) <= iVar7) {
+                    iVar5 = iVar5 + 1;
+                    *(float*)(psVar4 + 8) = FLOAT_80332e64;
+                    *(float*)(psVar4 + 0x18) = fVar1;
+                    *(float*)(psVar4 + 0x1A) = fVar1;
+                } else {
                     *(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
                     dVar2 = DOUBLE_80332e68;
                     *(float*)(psVar4 + 8) =
@@ -392,11 +397,6 @@ bool CMenuPcs::ItemOpen()
                         *(float*)(psVar4 + 0x18) = (*(float*)(psVar4 + 0x1C) - (float)*psVar4) * fVar1;
                         *(float*)(psVar4 + 0x1A) = (*(float*)(psVar4 + 0x1E) - (float)psVar4[1]) * fVar1;
                     }
-                } else {
-                    iVar5 = iVar5 + 1;
-                    *(float*)(psVar4 + 8) = FLOAT_80332e64;
-                    *(float*)(psVar4 + 0x18) = fVar1;
-                    *(float*)(psVar4 + 0x1A) = fVar1;
                 }
             }
             psVar4 = psVar4 + 0x20;

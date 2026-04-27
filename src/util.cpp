@@ -182,7 +182,6 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
 {
     S16Vec min;
     S16Vec max;
-    int scale = 1 << shift;
 
     min.z = 0x7FFF;
     min.y = 0x7FFF;
@@ -200,12 +199,16 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
         max.z = max.z < vecs->z ? vecs->z : max.z;
     }
 
-    minOut->x = (float)min.x / (float)scale;
-    minOut->y = (float)min.y / (float)scale;
-    minOut->z = (float)min.z / (float)scale;
-    maxOut->x = (float)max.x / (float)scale;
-    maxOut->y = (float)max.y / (float)scale;
-    maxOut->z = (float)max.z / (float)scale;
+    S16Vec finalMin = min;
+    S16Vec finalMax = max;
+    int scale = 1 << shift;
+
+    minOut->x = (float)finalMin.x / (float)scale;
+    minOut->y = (float)finalMin.y / (float)scale;
+    minOut->z = (float)finalMin.z / (float)scale;
+    maxOut->x = (float)finalMax.x / (float)scale;
+    maxOut->y = (float)finalMax.y / (float)scale;
+    maxOut->z = (float)finalMax.z / (float)scale;
 }
 
 /*

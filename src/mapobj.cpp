@@ -18,6 +18,7 @@ extern const float kMapObjBoundMaxInit;
 extern const float kMapObjZero;
 extern const float kMapObjOne;
 extern const float kMapObjInitNegOne;
+extern const float kMapObjColorBlendScale;
 extern const float kMapObjDegToRad;
 extern const float kMapObjInitValue50;
 unsigned int DAT_8032e498 = 0xFFFFFFFF;
@@ -889,7 +890,7 @@ void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
     if (Get__12CMapKeyFrameFRiRiRf(keyFrame, &key0, &key1, &blend) == 0) {
         out = colors[key0];
     } else {
-        int blendRate = static_cast<int>(kMapObjDegToRad * blend);
+        int blendRate = static_cast<int>(kMapObjColorBlendScale * blend);
         _GXColor c0 = colors[key0];
         _GXColor c1 = colors[key1];
 
@@ -1384,9 +1385,6 @@ int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         PSMTXInverse(MtxAt(this, 0xB8), inverseMtx);
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_direction, &localCylinder.m_direction);
-        PSMTXMultVecSR(
-            inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&localCylinder.m_radius));
-        PSMTXMultVecSR(inverseMtx, move, &localMove);
 
         localCylinder.m_top.y = cylinder->m_top.y;
         float margin = kMapObjZero + localCylinder.m_top.y;

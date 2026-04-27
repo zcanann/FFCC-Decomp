@@ -128,6 +128,7 @@ struct BreathModelParams {
     float m_rotationRandomX;
     float m_rotationRandomY;
     float m_rotationRandomZ;
+    unsigned char _pad8C[0x04];
     float m_angleStart;
     float m_angleStep;
     float m_angleAccel;
@@ -139,6 +140,7 @@ struct BreathModelParams {
     float m_spawnJitterX;
     float m_spawnJitterY;
     float m_spawnJitterZ;
+    unsigned char _padBC[0x04];
     u8 m_rotationFlags;
     u8 m_angleFlags;
     unsigned char _padC2[0x06];
@@ -149,6 +151,7 @@ struct BreathParticleData {
     Mtx m_modelMtx;
     Vec m_position;
     Vec m_direction;
+    u8 _pad48[0x08];
     s16 m_life;
     u8 _pad52[0x02];
     u8 m_fadeOutFrames;
@@ -624,8 +627,9 @@ group_ready:
             *(float*)(groupTable + 0x28) = scaledOwner;
             pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
             PSMTXMultVec(rotMtx.value, &dir, &dir);
+            pppCopyVector(dirNorm, dir);
             pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
-            PSVECScale(&dirNorm, &target, *(float*)(groupTable + 0x24));
+            PSVECScale(&dir, &target, *(float*)(groupTable + 0x24));
             pppAddVector(target, origin, target);
             pppSubVector(hitVector, target, origin);
             pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner,
@@ -786,9 +790,9 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 unitVelocity.z = FLOAT_80330F80;
                 groupData->speed = *(float*)((unsigned char*)pBreathModel + 0x14);
                 pppCopyVector(groupData->direction, unitVelocity);
-                groupData->position.x = 0.0f;
-                groupData->position.y = 0.0f;
-                groupData->position.z = 0.0f;
+                groupData->position.x = kPppBreathModelZero;
+                groupData->position.y = kPppBreathModelZero;
+                groupData->position.z = kPppBreathModelZero;
                 PSMTXCopy(*(Mtx*)pppMngStPtr, groupData->matrix);
                 groupData->active = 1;
             }
@@ -886,7 +890,7 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
     PSVECScale(&particle->m_direction, &step, particle->m_scale);
     PSVECAdd(&step, &particle->m_position, &particle->m_position);
 
-    unsigned short life = params->m_particleLifetime;
+    short life = params->m_particleLifetime;
     if (life != 0) {
         particle->m_life = particle->m_life - 1;
     }
@@ -949,7 +953,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
 
         particle->m_angleRandom = params->m_angleRandomRange * Math.RandF();
         if ((flags & 1) && (flags & 2)) {
-            if (Math.RandF() > 0.5f) {
+            if (DOUBLE_80330F98 < Math.RandF()) {
                 particle->m_angleRandom *= FLOAT_80330F80;
             }
         } else if (flags & 2) {
@@ -986,13 +990,13 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
             particle->m_rotationAccelY = params->m_rotationRandomY * Math.RandF();
             particle->m_rotationAccelZ = params->m_rotationRandomZ * Math.RandF();
             if ((flags & 1) && (flags & 2)) {
-                if (Math.RandF() > 0.5f) {
+                if (DOUBLE_80330F98 < Math.RandF()) {
                     particle->m_rotationAccelX *= FLOAT_80330F80;
                 }
-                if (Math.RandF() > 0.5f) {
+                if (DOUBLE_80330F98 < Math.RandF()) {
                     particle->m_rotationAccelY *= FLOAT_80330F80;
                 }
-                if (Math.RandF() > 0.5f) {
+                if (DOUBLE_80330F98 < Math.RandF()) {
                     particle->m_rotationAccelZ *= FLOAT_80330F80;
                 }
             } else if (flags & 2) {
@@ -1007,7 +1011,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
             particle->m_rotationAccelY = value;
             particle->m_rotationAccelZ = value;
             if ((flags & 1) && (flags & 2)) {
-                if (Math.RandF() > 0.5f) {
+                if (DOUBLE_80330F98 < Math.RandF()) {
                     particle->m_rotationAccelX *= FLOAT_80330F80;
                     particle->m_rotationAccelY *= FLOAT_80330F80;
                     particle->m_rotationAccelZ *= FLOAT_80330F80;
@@ -1033,7 +1037,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
 
     particle->m_scale = params->m_groupSpeed;
     if (params->m_scaleRandomRange != kPppBreathModelZero) {
-        particle->m_scale += (2.0f * params->m_scaleRandomRange) * Math.RandF() - params->m_scaleRandomRange;
+        particle->m_scale += (FLOAT_80330FA0 * params->m_scaleRandomRange) * Math.RandF() - params->m_scaleRandomRange;
     }
 
     if (params->m_particleLifetime == 0) {
@@ -1062,9 +1066,9 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     PSMTXMultVec(workMtx, &particle->m_direction, &particle->m_direction);
     PSVECNormalize(&particle->m_direction, &particle->m_direction);
 
-    jitter.x = -(params->m_spawnJitterX * 0.5f - Math.RandF(params->m_spawnJitterX));
-    jitter.y = -(params->m_spawnJitterY * 0.5f - Math.RandF(params->m_spawnJitterY));
-    jitter.z = -(params->m_spawnJitterZ * 0.5f - Math.RandF(params->m_spawnJitterZ));
+    jitter.x = -(params->m_spawnJitterX * FLOAT_80330FA4 - Math.RandF(params->m_spawnJitterX));
+    jitter.y = -(params->m_spawnJitterY * FLOAT_80330FA4 - Math.RandF(params->m_spawnJitterY));
+    jitter.z = -(params->m_spawnJitterZ * FLOAT_80330FA4 - Math.RandF(params->m_spawnJitterZ));
 
     pos.x = (*(Mtx*)particleWmat)[0][3];
     pos.y = (*(Mtx*)particleWmat)[1][3];

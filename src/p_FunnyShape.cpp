@@ -65,7 +65,13 @@ extern u8 ARRAY_8026D728[];
 
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 extern const char s_CFunnyShapePcs[];
-static const char s_funnyShapeSpinnerText[] = "|/-\\";
+extern "C" const char lbl_8032FD1C[] = "|/-\\";
+extern "C" {
+char* gFunnyShapeSpinnerText;
+s8 gFunnyShapeSpinnerTextInitialized;
+int gFunnyShapeSpinnerFrame;
+s8 gFunnyShapeSpinnerFrameInitialized;
+}
 
 namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
@@ -399,10 +405,6 @@ void CFunnyShapePcs::drawViewer()
     Vec at = {0.0f, 0.0f, 0.0f};
     Vec up = {0.0f, 1.0f, 0.0f};
     static const char s_funnyShapeFmt[] = "FunnyShape %c";
-    static char* pFan;
-    static s8 init;
-    static int alive;
-    static s8 init_0;
 
     C_MTXOrtho(ortho, kFunnyShapeNdcMax, kFunnyShapeNdcMin, kFunnyShapeNdcMin, kFunnyShapeNdcMax, kFunnyShapeNdcMax, kFunnyShapeOrthoFarZ);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);
@@ -425,24 +427,24 @@ void CFunnyShapePcs::drawViewer()
         FunnyShape(this)->Render();
     }
 
-    if (!init) {
-        pFan = const_cast<char*>(s_funnyShapeSpinnerText);
-        init = true;
+    if (!gFunnyShapeSpinnerTextInitialized) {
+        gFunnyShapeSpinnerText = const_cast<char*>(lbl_8032FD1C);
+        gFunnyShapeSpinnerTextInitialized = true;
     }
-    if (!init_0) {
-        alive = 0;
-        init_0 = true;
+    if (!gFunnyShapeSpinnerFrameInitialized) {
+        gFunnyShapeSpinnerFrame = 0;
+        gFunnyShapeSpinnerFrameInitialized = true;
     }
 
-    alive++;
-    if (alive > 100000) {
-        alive = 0;
+    gFunnyShapeSpinnerFrame++;
+    if (gFunnyShapeSpinnerFrame > 100000) {
+        gFunnyShapeSpinnerFrame = 0;
     }
 
     GXSetViewport(kFunnyShapeViewportOrigin, kFunnyShapeViewportOrigin, kFunnyShapeViewportWidth, kFunnyShapeViewportHeight, kFunnyShapeViewportOrigin, kFunnyShapeNdcMax);
     {
-        int frame = alive >> 4;
-        Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), pFan[frame % 4]);
+        int frame = gFunnyShapeSpinnerFrame >> 4;
+        Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), gFunnyShapeSpinnerText[frame % 4]);
     }
 }
 

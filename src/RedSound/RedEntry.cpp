@@ -1008,24 +1008,26 @@ unsigned int CRedEntry::SeSepOldDelete()
  */
 int CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 {
-	unsigned int base = *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(this) + 4);
-	int* bank = reinterpret_cast<int*>(base);
+	int* bank = *reinterpret_cast<int**>(reinterpret_cast<int>(this) + 4);
+	int result = 0;
 
-	while ((bank[3] != 0) && (reinterpret_cast<unsigned int>(bank) < base + 0x1000)) {
+	while ((bank[3] != 0) &&
+	       (bank < reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + 0x1000U))) {
 		bank += 4;
 	}
-	if (base + 0x1000 <= reinterpret_cast<unsigned int>(bank)) {
+	if (bank < reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + 0x1000U)) {
+	} else {
 		bank = reinterpret_cast<int*>(SeSepOldDelete());
 	}
 
-	int result = 0;
-	if ((bank != 0) && (reinterpret_cast<unsigned int>(bank) < base + 0x1000)) {
+	if ((bank != 0) &&
+	    (bank < reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + 0x1000U))) {
 		bank[2] = reinterpret_cast<int>(seSepHead);
+		result = reinterpret_cast<int>(seSepHead);
 		bank[3] = *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(seSepHead) + 0xC) & 0x7FFFFFFF;
 		bank[0] = *reinterpret_cast<int*>(reinterpret_cast<int>(seSepHead) + 8);
 		SeSepHistoryAdd();
 		bank[1] = 1;
-		result = reinterpret_cast<int>(seSepHead);
 	}
 
 	return result;

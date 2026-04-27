@@ -2470,7 +2470,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _SeMidiNoteExecute(
+int _SeMidiNoteExecute(
     RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* trackData, int frames, int tickStep)
 {
     int* track = (int*)trackData;
@@ -2531,6 +2531,7 @@ void _SeMidiNoteExecute(
         track += 0x55;
     } while (track < (int*)(*(int*)control + 0x2A80));
     ((int*)control)[0x11D] = 1;
+    return *(s16*)((u8*)control + 0x48E);
 }
 
 /*

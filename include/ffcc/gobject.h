@@ -110,6 +110,8 @@ public:
     unsigned char m_ownerSlot;        // 0x53
     unsigned char m_moveMode;         // 0x54
     unsigned char m_moveModePrevious; // 0x55
+    unsigned char m_field_0x56;       // 0x56
+    unsigned char m_field_0x57;       // 0x57
     void** m_scriptHandle;            // 0x58
     unsigned int m_objectFlags;       // 0x5C
     unsigned int m_displayFlags;      // 0x60

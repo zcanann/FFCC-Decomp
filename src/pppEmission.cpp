@@ -36,8 +36,6 @@ extern const float FLOAT_803311f8;
 static const char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
-static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
-
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
 
@@ -366,7 +364,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     if ((strcmp((const char*)meshData, &DAT_803311fc) == 0) && (state->m_colorA != 0)) {
         int texture = state->m_texture;
         int drawTevBits = 0xACE0F;
-        int fullTevBits = drawTevBits | 0x40000;
+        int fullTevBits = 0xECE0F;
 
         pppInitBlendMode();
         pppSetBlendMode(step->m_payload[8]);
@@ -385,7 +383,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 scale += (float)i * state->m_scale0;
                 PSMTXScale(objMtx0, scale, scale, scale);
                 PSMTXConcat(param_5, objMtx0, objMtx0);
-                PSMTXCopy(CameraMatrix(), viewMtx0);
+                PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx0);
                 SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx0, objMtx0);
 
                 int remaining = meshData->m_displayListCount - 1;
@@ -438,7 +436,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 float scale = particle->m_scale;
                 PSMTXScale(objMtx1, scale, scale, scale);
                 PSMTXConcat(param_5, objMtx1, objMtx1);
-                PSMTXCopy(CameraMatrix(), viewMtx1);
+                PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx1);
                 PSMTXConcat(viewMtx1, objMtx1, objMtx1);
                 GXLoadPosMtxImm(objMtx1, 0);
 

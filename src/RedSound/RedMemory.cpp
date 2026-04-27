@@ -129,19 +129,17 @@ void RedDelete(int address)
 	}
 
 	unsigned int interrupts = OSDisableInterrupts();
-	int* blockList = m_MemoryBank;
 
-	if (blockList != 0) {
-		int* blockEnd = blockList + 0x800;
-		int* blockPtr = blockList;
+	if (m_MemoryBank != 0) {
+		int* blockPtr = m_MemoryBank;
 
-		while ((blockPtr[1] != 0) && (blockPtr < blockEnd)) {
+		while ((blockPtr[1] != 0) && (blockPtr < m_MemoryBank + 0x800)) {
 			if (*blockPtr == address) {
-				int entryCount = ((int)(blockList + 0x800) - (int)(blockPtr + 2)) / 8;
+				int entryCount = ((int)(m_MemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
 
 				if (entryCount > 0) {
 					memcpy(blockPtr, blockPtr + 2, entryCount * 8);
-					memset(blockList + 0x7FE, 0, 8);
+					memset(m_MemoryBank + 0x7FE, 0, 8);
 				}
 				break;
 			}
@@ -275,19 +273,17 @@ void RedDeleteA(int address)
 	}
 
 	unsigned int interrupts = OSDisableInterrupts();
-	int* blockList = m_AMemoryBank;
 
-	if (blockList != 0) {
-		int* blockEnd = blockList + 0x800;
-		int* blockPtr = blockList;
+	if (m_AMemoryBank != 0) {
+		int* blockPtr = m_AMemoryBank;
 
-		while ((blockPtr[1] != 0) && (blockPtr < blockEnd)) {
+		while ((blockPtr[1] != 0) && (blockPtr < m_AMemoryBank + 0x800)) {
 			if (*blockPtr == address) {
-				int entryCount = ((int)(blockList + 0x800) - (int)(blockPtr + 2)) / 8;
+				int entryCount = ((int)(m_AMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
 
 				if (entryCount > 0) {
 					memcpy(blockPtr, blockPtr + 2, entryCount * 8);
-					memset(blockList + 0x7FE, 0, 8);
+					memset(m_AMemoryBank + 0x7FE, 0, 8);
 				}
 				break;
 			}

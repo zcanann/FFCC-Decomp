@@ -345,7 +345,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
                 work->m_length = work->m_maxLength - FLOAT_80333458;
                 ParticleFrameCallback__5CGameFiiiiiP3Vec(
                     &Game, partIndex, (int)pppMngStPtr->m_kind, (int)pppMngStPtr->m_nodeIndex, 3,
-                    baseObj->m_graphId / 0x1000, &work->m_points[i]);
+                    baseObj->m_graphId / 0x1000, work->m_points);
                 work->m_spawnEnabled = 0;
             }
             if (work->m_spawnEnabled != 0) {

@@ -182,30 +182,44 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
 {
     S16Vec min;
     S16Vec max;
+    S16Vec* minPtr = &min;
+    S16Vec* maxPtr = &max;
     int scale = 1 << shift;
 
-    min.z = 0x7FFF;
-    min.y = 0x7FFF;
-    min.x = 0x7FFF;
-    max.z = -0x7FFF;
-    max.y = -0x7FFF;
-    max.x = -0x7FFF;
+    minPtr->z = 0x7FFF;
+    minPtr->y = 0x7FFF;
+    minPtr->x = 0x7FFF;
+    maxPtr->z = -0x7FFF;
+    maxPtr->y = -0x7FFF;
+    maxPtr->x = -0x7FFF;
 
     for (unsigned long i = 0; i < count; i++, vecs++) {
-        min.x = min.x < vecs->x ? min.x : vecs->x;
-        min.y = min.y < vecs->y ? min.y : vecs->y;
-        min.z = min.z < vecs->z ? min.z : vecs->z;
-        max.x = max.x < vecs->x ? vecs->x : max.x;
-        max.y = max.y < vecs->y ? vecs->y : max.y;
-        max.z = max.z < vecs->z ? vecs->z : max.z;
+        if (minPtr->x > vecs->x) {
+            minPtr->x = vecs->x;
+        }
+        if (minPtr->y > vecs->y) {
+            minPtr->y = vecs->y;
+        }
+        if (minPtr->z > vecs->z) {
+            minPtr->z = vecs->z;
+        }
+        if (maxPtr->x < vecs->x) {
+            maxPtr->x = vecs->x;
+        }
+        if (maxPtr->y < vecs->y) {
+            maxPtr->y = vecs->y;
+        }
+        if (maxPtr->z < vecs->z) {
+            maxPtr->z = vecs->z;
+        }
     }
 
-    minOut->x = (float)min.x / (float)scale;
-    minOut->y = (float)min.y / (float)scale;
-    minOut->z = (float)min.z / (float)scale;
-    maxOut->x = (float)max.x / (float)scale;
-    maxOut->y = (float)max.y / (float)scale;
-    maxOut->z = (float)max.z / (float)scale;
+    minOut->x = (float)minPtr->x / (float)scale;
+    minOut->y = (float)minPtr->y / (float)scale;
+    minOut->z = (float)minPtr->z / (float)scale;
+    maxOut->x = (float)maxPtr->x / (float)scale;
+    maxOut->y = (float)maxPtr->y / (float)scale;
+    maxOut->z = (float)maxPtr->z / (float)scale;
 }
 
 /*

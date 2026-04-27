@@ -485,7 +485,9 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
  */
 void StreamPause(int param_1, int param_2)
 {
-	RedStreamDATA* streamData;
+	volatile RedStreamDATA* streamData;
+	int volume;
+	int pan;
 
 	if (m_ReportPrint != 0) {
 		if (param_2 == 1) {
@@ -510,12 +512,15 @@ void StreamPause(int param_1, int param_2)
 				}
 			} else if (*(void**)(voiceData + 0x14) != 0) {
 				unsigned int pitch = PitchCompute(0x3c00000, 0, *(int*)((u8*)streamData + 0x24), 0);
-				if (streamData->m_channelCount == 2) {
+				short channelCount = streamData->m_channelCount;
+				volume = streamData->m_volume >> 0xc;
+				if (channelCount == 2) {
 					*(int*)(voiceData + 0x9c) = pitch;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;
 					*(int*)(voiceData + 0x15c) = pitch;
 					*(unsigned int*)(voiceData + 0x150) |= 0x10;
 				} else {
+					pan = streamData->m_pan >> 0xc;
 					*(int*)(voiceData + 0x9c) = pitch;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;
 				}

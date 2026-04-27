@@ -240,16 +240,18 @@ void _ReverbNullCallback(AXFX_BUFFERUPDATE* param_1, void*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C3154
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void* ReverbAreaAlloc(unsigned long size)
 {
-    unsigned long requestedSize = size;
-    unsigned long alignedSize = ((u32)requestedSize + 0x1F) & ~0x1F;
-    p_ReverbSize[0] += (u32)requestedSize;
-    p_ReverbSize[1] += (u32)alignedSize;
-    return (void*)RedNew((int)requestedSize);
+    p_ReverbSize[0] += (u32)size;
+    p_ReverbSize[1] += ((u32)size + 0x1F) & ~0x1F;
+    return (void*)RedNew((int)size);
 }
 
 /*

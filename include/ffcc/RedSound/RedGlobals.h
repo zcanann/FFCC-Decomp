@@ -46,7 +46,7 @@ extern unsigned int* volatile p_VoiceData;
 extern int p_EditorVoice[2];
 extern void* p_EditorTrack;
 extern void* volatile p_MusicSkipThreadStack;
-extern int m_MusicSkipComplete;
+extern volatile int m_MusicSkipComplete;
 extern void* volatile p_ReverbDepth;
 extern int m_Mute[2];
 extern CRedMemory c_RedMemory;

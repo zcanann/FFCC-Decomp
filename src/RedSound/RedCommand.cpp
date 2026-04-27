@@ -872,8 +872,8 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
  */
 void MusicStop(int seId)
 {
-	unsigned int* musicBase = (unsigned int*)p_SoundControlBuffer;
-	unsigned int* music = musicBase;
+	unsigned int* music = (unsigned int*)p_SoundControlBuffer;
+	unsigned int* musicBase = music;
 
 	do {
 		if ((seId == -1) || (((int)music[0x11c] >= 0) && (music[0x11c] == (unsigned int)seId))) {

@@ -755,11 +755,7 @@ void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDAT
 {
     unsigned int delta;
 
-    if (*(u8*)*(int*)track != 0) {
-        delta = *(u8*)*(int*)track;
-    } else {
-        delta = 0x100;
-    }
+    delta = (*(u8*)*(int*)track != 0) ? *(u8*)*(int*)track : 0x100;
 
     ((int*)control)[0x113] = DataAddCompute((int*)control + 0x112, *(unsigned char*)(*(int*)track + 1), (int*)&delta);
     ((int*)control)[0x114] = delta;

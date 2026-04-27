@@ -727,7 +727,7 @@ void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    *(int*)track = ((int*)track)[*(short*)((char*)track + 0x13c) + 2];
+    *(int*)track = *(int*)((char*)track + (*(short*)((char*)track + 0x13c) * 4) + 8);
     *(short*)((char*)track + 0x144) =
         *(short*)((char*)track + *(short*)((char*)track + 0x13c) * 2 + 0x130);
 }
@@ -743,10 +743,7 @@ void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_TempoDirect(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    u8* command = (u8*)*(u32*)track;
-
-    *(u32*)track = (u32)(command + 1);
-    *(u32*)((u8*)control + 0x448) = ((u32)*command) << 0xc;
+    *(u32*)((u8*)control + 0x448) = ((u32)*(*(u8**)track)++) << 0xc;
     *(u32*)((u8*)control + 0x44C) = 0;
     *(u32*)((u8*)control + 0x450) = 0;
 }

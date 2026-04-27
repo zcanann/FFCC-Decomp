@@ -3,6 +3,7 @@
 
 #include "ffcc/memory.h"
 #include "ffcc/memorycard.h"
+#include "ffcc/p_sample.h"
 #include "ffcc/system.h"
 
 #include <dolphin/gx.h>
@@ -29,7 +30,7 @@ struct McListInfo
     void operator=(const McListInfo&);
 };
 
-class CMenuPcs : public CProcess
+class CMenuPcs : public CSamplePcs
 {
 public:
     struct BattleHudState

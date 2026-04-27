@@ -2,11 +2,12 @@
 #define _PPP_POBJPOINT_H_
 
 #include <stddef.h>
+#include <dolphin/types.h>
 
 struct PppObjData {
     int id;          // 0x0
     unsigned int field_4;     // 0x4
-    void* data;      // 0x8
+    u8* data;      // 0x8
     unsigned int objId;       // 0xc
 };
 
@@ -39,7 +40,7 @@ struct PppPointObj {
     float y;           // 0x4
     float z;           // 0x8
     unsigned char padding[4];   // 0xc
-    void* vecPtr;    // 0x10
+    u8* vecPtr;    // 0x10
 };
 
 #ifdef __cplusplus

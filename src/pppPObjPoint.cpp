@@ -27,10 +27,12 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
         u8* vecPtr;
 
         if (objData->field_4 == -1) {
-            vecPtr = (u8*)gPppDefaultValueBuffer;
+            vecPtr = gPppDefaultValueBuffer;
         } else {
-            u8* data = (u8*)objData->data;
-            u32 vecOffset = pppMngStPtr->m_pppPDataVals[objData->field_4].m_nextSpawnTime;
+            u8* data = objData->data;
+            _pppPDataVal* pDataVal = pppMngStPtr->m_pppPDataVals;
+            pDataVal = &pDataVal[objData->field_4];
+            s32 vecOffset = pDataVal->m_nextSpawnTime;
             vecPtr = data + 0x80;
             vecPtr += vecOffset;
         }

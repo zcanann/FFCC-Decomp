@@ -537,14 +537,24 @@ int* SetReverb(int bank, int kind, int* params)
 RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 {
     int* bestVoice = 0;
-    int* voice = 0;
+    int* voice;
     int bestEnvelope;
     int* voiceEnd;
 
-    if ((((u8*)track)[0x26] & 5) == 0) {
-        voice = (int*)p_VoiceData;
-        if ((((u8*)track)[0x26] & 8) == 0) {
-            voice = (int*)p_VoiceData + *(s8*)((u8*)p_SoundControl + 0x490) * 0x30;
+    if ((*(s8*)((u8*)track + 0x26) & 5) != 0) {
+        if (((((u8*)track)[0x26] & 1) == 0) &&
+            (*(u32*)((u8*)p_VoiceData + *(s8*)((u8*)track + 0x14E) * 0xC0) != 0) &&
+            (*(u32*)((u8*)p_VoiceData + *(s8*)((u8*)track + 0x14E) * 0xC0) != (u32)track)) {
+            voice = 0;
+        }
+        else {
+            voice = (int*)((u8*)p_VoiceData + *(s8*)((u8*)track + 0x14E) * 0xC0);
+        }
+    } else {
+        if ((((u8*)track)[0x26] & 8) != 0) {
+            voice = (int*)p_VoiceData;
+        } else {
+            voice = (int*)((u8*)p_VoiceData + *(s8*)((u8*)p_SoundControl + 0x490) * 0xC0);
         }
 
         bestEnvelope = 0x8000;
@@ -567,18 +577,15 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
         } while (voice < voiceEnd);
 
         if (voice == voiceEnd) {
-            *(u32*)((u8*)p_SoundControl + 0x488) = *(u32*)((u8*)p_SoundControl + 0x488) | 2;
-            voice = bestVoice;
+            int* selectedVoice;
+            u32* soundControl = (u32*)p_SoundControl;
+            soundControl[0x122] = soundControl[0x122] | 2;
             if (bestEnvelope == 0x8000) {
-                voice = 0;
+                selectedVoice = 0;
+            } else {
+                selectedVoice = bestVoice;
             }
-        }
-    } else {
-        s8 voiceIndex = *(s8*)((u8*)track + 0x14E);
-        voice = (int*)p_VoiceData + voiceIndex * 0x30;
-
-        if (((((u8*)track)[0x26] & 1) == 0) && (*voice != 0) && (*voice != (int)track)) {
-            voice = 0;
+            voice = selectedVoice;
         }
     }
 

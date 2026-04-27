@@ -2072,22 +2072,23 @@ void __MidiCtrl_TremoloDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	u32 rate;
-	int* trackData = (int*)track;
+	int rate;
+	int divisor;
 
-	trackData[0x30] = *(u8*)trackData[0] << 0xc;
-	if (*(char*)(trackData[0] + 1) == '\0') {
-		rate = 0x100;
+	((int*)track)[0x30] = *(u8*)((int*)track)[0] << 0xc;
+	if (*(u8*)(((int*)track)[0] + 1) != '\0') {
+		rate = *(u8*)(((int*)track)[0] + 1);
 	} else {
-		rate = *(u8*)(trackData[0] + 1);
+		rate = 0x100;
 	}
-	trackData[0x2e] = 0x100000 / rate;
-	trackData[0x2d] = SwingEntryFunction[*(u8*)(trackData[0] + 2) & 0xf];
-	*(u16*)((u8*)trackData + 0xd2) = 0;
-	*(u16*)(trackData + 0x34) = 0;
-	trackData[0x32] = 0;
-	trackData[0x33] = 0;
-	trackData[0] += 3;
+	divisor = rate;
+	((int*)track)[0x2e] = 0x100000 / divisor;
+	((int*)track)[0x2d] = SwingEntryFunction[*(u8*)(((int*)track)[0] + 2) & 0xf];
+	*(u16*)((u8*)track + 0xd2) = 0;
+	*(u16*)((int*)track + 0x34) = 0;
+	((int*)track)[0x32] = 0;
+	((int*)track)[0x33] = 0;
+	((int*)track)[0] += 3;
 }
 
 /*

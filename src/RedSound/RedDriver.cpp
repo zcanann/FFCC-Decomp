@@ -212,7 +212,8 @@ void _SetReverbDepth(int* param_1)
     }
     *(unsigned int*)((char*)p_ReverbDepth + reverbBank * 0xc) = reverbDepth;
     if (reverbBank != 0) {
-        fadeStep = (int)(fadeFrame * 0x60) / 0x3c;
+        fadeStep = fadeFrame * 0x60;
+        fadeStep = fadeStep / 0x3c;
         if (fadeStep == 0) {
             fadeStep++;
         }

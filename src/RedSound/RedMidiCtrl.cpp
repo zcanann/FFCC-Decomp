@@ -1131,24 +1131,22 @@ void __MidiCtrl_VolumeDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int delta[4];
-    unsigned char* command;
-    unsigned int volume;
-    int* trackData = (int*)track;
+    int volume;
 
-    delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+    delta[0] = DeltaTimeSumup((unsigned char**)track);
     if (delta[0] == 0) {
         delta[0] = 1;
     }
 
-    command = (unsigned char*)trackData[0];
-    trackData[0] = (int)(command + 1);
-    volume = *command;
+    volume = *(*(unsigned char**)track)++;
     if (volume != 0) {
-        volume = ((volume + 1) * 0x100) - 1;
+        volume++;
+        volume <<= 8;
+        volume--;
     }
 
-    trackData[0xb] = DataAddCompute(trackData + 10, volume, delta);
-    trackData[0xc] = delta[0];
+    ((int*)track)[0xb] = DataAddCompute((int*)track + 10, volume, delta);
+    ((int*)track)[0xc] = delta[0];
 }
 
 /*
@@ -1183,18 +1181,16 @@ void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int delta[4];
-    char* command;
-    int* trackData = (int*)track;
+    int expression;
 
-    delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+    delta[0] = DeltaTimeSumup((unsigned char**)track);
     if (delta[0] == 0) {
         delta[0] = 1;
     }
 
-    command = (char*)trackData[0];
-    trackData[0] = (int)(command + 1);
-    trackData[0xe] = DataAddCompute(trackData + 0xd, *command, delta);
-    trackData[0xf] = delta[0];
+    expression = *(*(char**)track)++;
+    ((int*)track)[0xe] = DataAddCompute((int*)track + 0xd, expression, delta);
+    ((int*)track)[0xf] = delta[0];
 }
 
 /*

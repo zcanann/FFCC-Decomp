@@ -1431,25 +1431,23 @@ int CRedDriver::SetMusicData(void* param_1)
     char* musicHeader = (char*)param_1;
     void* copiedHeader;
     int headerSize;
-    short musicID;
+    int result;
 
+    result = -1;
     if (((musicHeader[0] == 'B') && (musicHeader[1] == 'G')) && (musicHeader[2] == 'M')) {
         memcpy(localHeader, musicHeader, sizeof(localHeader));
         headerSize = *(int*)(localHeader + 0x10);
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
             memcpy(copiedHeader, musicHeader, headerSize);
+            result = *(short*)(localHeader + 4);
             _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
-            musicID = *(short*)(localHeader + 4);
-            return musicID;
         }
-        return -1;
-    }
-    if (m_ReportPrint != 0) {
+    } else if (m_ReportPrint != 0) {
         OSReport(sRedDriverMusicHeaderErrorFmt, sRedDriverLogPrefix, sRedDriverLogWarnColor, sRedDriverLogReset);
         fflush(__files + 1);
     }
-    return -1;
+    return result;
 }
 
 /*

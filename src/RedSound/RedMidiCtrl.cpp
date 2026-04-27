@@ -1186,7 +1186,7 @@ void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
         delta[0]++;
     }
 
-    expression = *(*(char**)track)++;
+    expression = (char)*(*(unsigned char**)track)++;
     ((int*)track)[0xe] = DataAddCompute((int*)track + 0xd, expression, delta);
     ((int*)track)[0xf] = delta[0];
 }

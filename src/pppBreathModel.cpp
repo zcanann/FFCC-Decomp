@@ -923,6 +923,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     BreathModelParams* params = reinterpret_cast<BreathModelParams*>(pBreathModel);
     BreathParticleData* particle = reinterpret_cast<BreathParticleData*>(particleData);
     Mtx workMtx;
+    Mtx cameraMtx;
     Vec jitter;
     Vec pos;
 
@@ -1079,7 +1080,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     (*(Mtx*)particleWmat)[2][3] = pos.z;
 
     PSMTXConcat(*(Mtx*)particleWmat, pppObject->m_localMatrix.value, *(Mtx*)particleData);
-    PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, workMtx);
+    PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, cameraMtx);
 
     particle->m_direction.x = kPppBreathModelZero;
     particle->m_direction.y = kPppBreathModelZero;

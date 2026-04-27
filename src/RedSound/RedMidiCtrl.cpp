@@ -1228,21 +1228,17 @@ void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	int delta[4];
-	u8* command;
-	int* trackData = (int*)track;
 
-	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	delta[0] = DeltaTimeSumup((unsigned char**)track);
 	if (delta[0] == 0) {
 		delta[0] = 1;
 	}
-	if (trackData[0x2d] == 0) {
-		trackData[0x10] += trackData[0x33] * 0x1000;
-		trackData[0x33] = 0;
+	if (((int*)track)[0x2d] == 0) {
+		((int*)track)[0x10] += ((int*)track)[0x33] * 0x1000;
+		((int*)track)[0x33] = 0;
 	}
-	command = (u8*)trackData[0];
-	trackData[0] = (int)(command + 1);
-	trackData[0x11] = DataAddCompute(trackData + 0x10, *command, delta);
-	trackData[0x12] = delta[0];
+	((int*)track)[0x11] = DataAddCompute((int*)track + 0x10, *(*(u8**)track)++, delta);
+	((int*)track)[0x12] = delta[0];
 }
 
 /*

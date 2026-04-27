@@ -870,27 +870,26 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
  * JP Address: TODO
  * JP Size: TODO
  */
-void MusicStop(int seId)
+int MusicStop(int seId)
 {
 	unsigned int* music = (unsigned int*)p_SoundControlBuffer;
-	unsigned int* musicBase = music;
 
 	do {
-		if ((seId == -1) || (((int)music[0x11c] >= 0) && (music[0x11c] == (unsigned int)seId))) {
+		if ((seId == -1) || (((int)music[0x11c] >= 0) && ((int)music[0x11c] == seId))) {
 			unsigned int musicId = music[0x11c];
 			music[0x122] = 0;
 			music[0x11c] = -1;
 			if (*(short*)((char*)music + 0x48e) != 0) {
 				unsigned int* seTrack = p_VoiceData;
 				do {
-					if ((*music <= *seTrack) &&
+					if ((*seTrack >= *music) &&
 					    (*seTrack <
 					     *music + (unsigned int)*(unsigned char*)((char*)music + 0x491) *
 					                   0x154)) {
 						seTrack[0x25] &= 0xfffffff3;
 						seTrack[0x24] &= 0xfffffffe;
 						seTrack[0x24] |= 2;
-						*((unsigned char*)seTrack + 0x1a) &= 0xfb;
+						*((unsigned char*)seTrack + 0x1a) &= ~4;
 						*seTrack = 0;
 						seTrack[0x23] = 0;
 					}
@@ -917,15 +916,18 @@ void MusicStop(int seId)
 			}
 		}
 		music += 0x125;
-	} while (music < musicBase + 0x24a);
+	} while (music < (unsigned int*)p_SoundControlBuffer + 0x24a);
 
-	if (((int)musicBase[0x11c] < 0) && ((int)musicBase[0x241] >= 0)) {
-		memcpy(musicBase, musicBase + 0x125, 0x494);
-		*(short*)((char*)musicBase + 0x922) = 0;
-		*(unsigned char*)((char*)musicBase + 0x925) = 0;
-		musicBase[0x241] = -1;
-		musicBase[0x125] = 0;
+	music = (unsigned int*)p_SoundControlBuffer;
+	if (((int)music[0x11c] < 0) && ((int)music[0x241] >= 0)) {
+		memcpy((void*)p_SoundControlBuffer, (unsigned int*)p_SoundControlBuffer + 0x125, 0x494);
+		*(short*)((char*)music + 0x922) = 0;
+		*(unsigned char*)((char*)music + 0x925) = 0;
+		music[0x241] = -1;
+		music[0x125] = 0;
 	}
+
+	return seId;
 }
 
 /*

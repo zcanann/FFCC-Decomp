@@ -50,7 +50,7 @@ void _SkipMusicEntry();
 void MusicSkipFunction();
 
 void _SeTrackDataExecute(RedTrackDATA*, int);
-void _SeMidiNoteExecute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*, int, int);
+int _SeMidiNoteExecute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*, int, int);
 
 void MainControl(int);
 

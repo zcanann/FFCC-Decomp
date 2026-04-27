@@ -18,7 +18,7 @@ void SetSePan(int, int, int);
 void SetSePitch(int, int, int);
 void SePause(int, int);
 void _MusicPlayStart(RedMusicHEAD*, RedWaveHeadWD*, int, int, int);
-void MusicStop(int);
+int MusicStop(int);
 int MusicPlay(int, int, int);
 void SetMusicVolume(int, int, int, int);
 

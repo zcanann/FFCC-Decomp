@@ -212,7 +212,8 @@ void _SetReverbDepth(int* param_1)
     }
     *(unsigned int*)((char*)p_ReverbDepth + reverbBank * 0xc) = reverbDepth;
     if (reverbBank != 0) {
-        fadeStep = (int)(fadeFrame * 0x60) / 0x3c;
+        fadeStep = fadeFrame * 0x60;
+        fadeStep = fadeStep / 0x3c;
         if (fadeStep == 0) {
             fadeStep++;
         }
@@ -665,7 +666,6 @@ int* _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
 {
     unsigned int interruptLevel;
     int* writePos;
-    int* nextPos;
 
     interruptLevel = OSDisableInterrupts();
     writePos = (int*)p_ExecCommandNow;
@@ -677,13 +677,13 @@ int* _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
     writePos[5] = param_6;
     writePos[6] = param_7;
     writePos[7] = param_8;
-    nextPos = writePos + 8;
-    if (nextPos == (int*)p_ExecCommand + 0x800) {
-        nextPos = (int*)p_ExecCommand;
+    writePos += 8;
+    if (writePos == (int*)p_ExecCommand + 0x800) {
+        writePos = (int*)p_ExecCommand;
     }
-    p_ExecCommandNow = nextPos;
+    p_ExecCommandNow = writePos;
     OSRestoreInterrupts(interruptLevel);
-    return nextPos;
+    return writePos;
 }
 
 /*
@@ -1605,22 +1605,26 @@ void CRedDriver::SetMusicPhraseStop(int stop)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetSeBlockData(int param_1, void* param_2)
+void* CRedDriver::SetSeBlockData(int param_1, void* param_2)
 {
-    void* copiedBuffer = 0;
+    void* copiedBuffer;
     int copySize;
 
     if (param_2 != 0) {
         copySize = *(int*)((char*)param_2 + 0xc);
-        if (copySize < 1) {
-        } else {
+        if (copySize > 0) {
             copiedBuffer = (void*)RedNew(copySize);
             if (copiedBuffer != 0) {
                 memcpy(copiedBuffer, param_2, copySize);
             }
+        } else {
+            copiedBuffer = 0;
         }
+    } else {
+        copiedBuffer = 0;
     }
     _EntryExecCommand(_SetSeBlockData, param_1, (int)copiedBuffer, 0, 0, 0, 0, 0);
+    return copiedBuffer;
 }
 
 /*
@@ -2211,7 +2215,8 @@ void CRedDriver::DisplayWaveInfo()
  */
 void CRedDriver::SetReverb(int bank, int kind)
 {
-    ::SetReverb(bank, t_ReverbModeData[kind * 7], &t_ReverbModeData[kind * 7 + 1]);
+    ::SetReverb(bank, *(int*)((char*)t_ReverbModeData + kind * 0x1c),
+                (int*)((char*)t_ReverbModeData + kind * 0x1c + 4));
 }
 
 /*

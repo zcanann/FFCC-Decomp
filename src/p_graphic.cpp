@@ -1,4 +1,5 @@
 #include "ffcc/p_graphic.h"
+#include "ffcc/color.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
@@ -473,34 +474,34 @@ void CGraphicPcs::drawBar()
         hue += 0x168;
     }
 
-    const u32 frameColor = (Graphic.IsFrameRateOver() == 0) ? 0x00FF00FF : 0xFF0000FF;
+    CColor frameColor = (Graphic.IsFrameRateOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(0.0f, 468.0f, 0.0f);
-    GXColor1u32(frameColor);
+    GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
     GXTexCoord2u16(0, 0);
     GXPosition3f32(32.0f, 468.0f, 0.0f);
-    GXColor1u32(frameColor);
+    GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
     GXTexCoord2u16(2, 0);
     GXPosition3f32(32.0f, 472.0f, 0.0f);
-    GXColor1u32(frameColor);
+    GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
     GXTexCoord2u16(2, 2);
     GXPosition3f32(0.0f, 472.0f, 0.0f);
-    GXColor1u32(frameColor);
+    GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
     GXTexCoord2u16(0, 2);
 
-    const u32 fifoColor = (Graphic.IsFifoOver() == 0) ? 0x00FF00FF : 0xFF0000FF;
+    CColor fifoColor = (Graphic.IsFifoOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(40.0f, 468.0f, 0.0f);
-    GXColor1u32(fifoColor);
+    GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
     GXTexCoord2u16(0, 0);
     GXPosition3f32(48.0f, 468.0f, 0.0f);
-    GXColor1u32(fifoColor);
+    GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
     GXTexCoord2u16(2, 0);
     GXPosition3f32(48.0f, 472.0f, 0.0f);
-    GXColor1u32(fifoColor);
+    GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
     GXTexCoord2u16(2, 2);
     GXPosition3f32(40.0f, 472.0f, 0.0f);
-    GXColor1u32(fifoColor);
+    GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
     GXTexCoord2u16(0, 2);
 
     if (drawText) {

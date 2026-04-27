@@ -1705,10 +1705,7 @@ void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_ChannelAlloc(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command = *(unsigned char**)track;
-
-    *(unsigned char**)track = command + 1;
-    *((unsigned char*)control + 0x490) = *command;
+    *((unsigned char*)control + 0x490) = *(*(unsigned char**)track)++;
 }
 
 /*
@@ -1830,12 +1827,8 @@ void __MidiCtrl_VibrateOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_VibrateDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int* trackData = (int*)track;
-	u8* command = (u8*)trackData[0];
-
-	trackData[0] = (int)(command + 1);
-	trackData[0x20] = (unsigned int)(*command) << 0xc;
-	*(short*)((int)trackData + 0x8e) = 0;
+	((int*)track)[0x20] = (unsigned int)*(*(u8**)track)++ << 0xc;
+	*(short*)((int)track + 0x8e) = 0;
 }
 
 /*
@@ -2024,12 +2017,8 @@ void __MidiCtrl_TremoloOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_TremoloDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int* trackData = (int*)track;
-	u8* command = (u8*)trackData[0];
-
-	trackData[0] = (int)(command + 1);
-	trackData[0x28] = (u32)*command << 0xc;
-	*(u16*)((u8*)trackData + 0xae) = 0;
+	((int*)track)[0x28] = (u32)*(*(u8**)track)++ << 0xc;
+	*(u16*)((u8*)track + 0xae) = 0;
 }
 
 /*
@@ -2191,9 +2180,7 @@ void __MidiCtrl_ShakeOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ShakeDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command = *(unsigned char**)track;
-    *(unsigned char**)track = command + 1;
-    ((int*)track)[0x30] = ((int)(*command)) << 0xc;
+    ((int*)track)[0x30] = (unsigned int)*(*(u8**)track)++ << 0xc;
     *(unsigned short*)((unsigned char*)track + 0xd2) = 0;
 }
 
@@ -2299,10 +2286,7 @@ void __MidiCtrl_ShakeType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_FineTuneAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	u8* command = (u8*)((int*)track)[0];
-
-	((int*)track)[0] = (int)(command + 1);
-	((u8*)track)[0x148] = *command;
+	((u8*)track)[0x148] = *(*(u8**)track)++;
 	m_ChangeStatus |= 1;
 }
 

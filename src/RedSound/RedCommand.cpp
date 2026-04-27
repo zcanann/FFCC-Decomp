@@ -659,8 +659,8 @@ void SetSePitch(int seId, int pitch, int frameCount)
  */
 void SePause(int seId, int pause)
 {
-	const char* logBlob = s_redCommandLogBlob;
 	unsigned int* trackBasePtr;
+	const char* logBlob = s_redCommandLogBlob;
 	unsigned int track;
 	unsigned int voice;
 

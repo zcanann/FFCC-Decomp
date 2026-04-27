@@ -1707,38 +1707,43 @@ int CRedDriver::ReentrySeSepData(int id)
 int CRedDriver::SePlayState(int param_1)
 {
     unsigned int uVar1;
-    int* piVar2;
-    int* piVar3;
+    int result;
+    int* seInfo;
+    int** seInfoBase;
+    int* commandNow;
+    int* command;
 
     uVar1 = OSDisableInterrupts();
-    piVar3 = *(int**)((int)p_SoundControlBuffer + 0xdbc);
+    result = 0;
+    seInfoBase = (int**)((int)p_SoundControlBuffer + 0xdbc);
+    seInfo = *seInfoBase;
     do {
-        piVar2 = piVar3;
-        if ((*piVar2 != 0) && ((param_1 == -1 || (piVar2[0x3e] == param_1)))) {
+        if (((u32)*seInfo != 0) && ((param_1 == -1 || (seInfo[0x3e] == param_1)))) {
+            result = (int)seInfo;
             break;
         }
-        piVar3 = piVar2 + 0x55;
-        piVar2 = 0;
-    } while (piVar3 < (int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80));
-    piVar3 = (int*)p_ExecCommandOld;
-    if (piVar2 == 0) {
-        while ((int*)p_ExecCommandNow != piVar3) {
-            if (((*piVar3 != 0) &&
-                ((((void (*)(int*))*piVar3 == _SeBlockPlay) ||
-                  (((void (*)(int*))*piVar3 == _SeSepPlay))) ||
-                 ((void (*)(int*))*piVar3 == _SeSepPlaySequence))) &&
-                ((param_1 == -1 || (param_1 == piVar3[1])))) {
-                piVar2 = (int*)1;
+        seInfo += 0x55;
+    } while (seInfo < (int*)((int)*seInfoBase + 0x2a80));
+    if (result == 0) {
+        commandNow = (int*)p_ExecCommandNow;
+        command = (int*)p_ExecCommandOld;
+        while (commandNow != command) {
+            if ((((u32)*command != 0) &&
+                ((((void (*)(int*))*command == _SeBlockPlay) ||
+                  (((void (*)(int*))*command == _SeSepPlay))) ||
+                 ((void (*)(int*))*command == _SeSepPlaySequence))) &&
+                ((param_1 == -1 || (param_1 == command[1])))) {
+                result = 1;
                 break;
             }
-            piVar3 = piVar3 + 8;
-            if (piVar3 == (int*)p_ExecCommand + 0x800) {
-                piVar3 = (int*)p_ExecCommand;
+            command += 8;
+            if (command == (int*)p_ExecCommand + 0x800) {
+                command = (int*)p_ExecCommand;
             }
         }
     }
     OSRestoreInterrupts(uVar1);
-    return (int)piVar2;
+    return result;
 }
 
 /*

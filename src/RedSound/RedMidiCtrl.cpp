@@ -998,7 +998,8 @@ void __MidiCtrl_KeyOffNoteVelocity(RedSoundCONTROL* control, RedKeyOnDATA* keyOn
  */
 void __MidiCtrl_KeyOffNote(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(track) + 0x24) = *(*reinterpret_cast<unsigned char**>(track))++;
+    char note = *(*reinterpret_cast<unsigned char**>(track))++;
+    *reinterpret_cast<char*>(reinterpret_cast<int>(track) + 0x24) = note;
 
     KeyOffSet(control, keyOnData, track);
 }

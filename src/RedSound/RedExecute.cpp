@@ -1938,7 +1938,7 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
 {
     int* track = *(int**)control;
     do {
-        if (*track != 0) {
+        if ((u32)*track != 0) {
             int step = frames;
             m_ChangeStatus = 0;
             if (track[0x42] < frames) {
@@ -1949,13 +1949,13 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
             if (((track[0x41] & 0x200000) == 0) && (track[0x42] == 1)) {
                 KeyOffSet(control, keyOnData, (RedTrackDATA*)track);
             }
-            while ((*track != 0) && (track[0x42] < 1)) {
+            while (((u32)*track != 0) && (track[0x42] < 1)) {
                 unsigned char* cmd = (unsigned char*)*track;
                 int delta;
                 *track = (int)(cmd + 1);
                 ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))p_MidiControl_Function[*cmd])(
                     control, keyOnData, (RedTrackDATA*)track);
-                if (*track != 0) {
+                if ((u32)*track != 0) {
                     if (track[0x42] < 1) {
                         delta = DeltaTimeSumup((unsigned char**)track);
                     } else {

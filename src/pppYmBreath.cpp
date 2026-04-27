@@ -45,6 +45,63 @@ struct YmBreathRenderStep {
     unsigned char m_payload[1];
 };
 
+struct YmBreathParams {
+    unsigned char _pad00[0x04];
+    float m_groupRadius;
+    float m_groupOwnerScale;
+    int m_shapeStepValue;
+    short m_shapeFrameArg;
+    unsigned short m_slotCount;
+    unsigned short m_groupCount;
+    float m_groupSpeed;
+    unsigned char _pad1C[0x02];
+    unsigned short m_particleCount;
+    unsigned short m_emitCount;
+    unsigned short m_emitInterval;
+    short m_particleLifetime;
+    unsigned char m_fadeOutFrames;
+    unsigned char m_fadeInFrames;
+    unsigned char m_spread;
+    unsigned char _pad29[0x03];
+    float m_colorFrameDelta0;
+    float m_colorFrameDelta1;
+    float m_colorFrameDelta2;
+    float m_colorFrameDelta3;
+    float m_colorFrameAccel0;
+    float m_colorFrameAccel1;
+    float m_colorFrameAccel2;
+    float m_colorFrameAccel3;
+    unsigned char _pad48[0x08];
+    float m_rotationStartX;
+    float m_rotationStartY;
+    unsigned char _pad58[0x08];
+    float m_rotationVelocityX;
+    float m_rotationVelocityY;
+    unsigned char _pad68[0x08];
+    float m_rotationAccelX;
+    float m_rotationAccelY;
+    unsigned char _pad78[0x08];
+    float m_rotationRandomX;
+    float m_rotationRandomY;
+    unsigned char _pad88[0x08];
+    float m_angleStart;
+    float m_angleStep;
+    float m_angleAccel;
+    float m_angleRandomRange;
+    float m_scaleClampStart;
+    float m_scaleAccel;
+    float m_scaleRandomRange;
+    float m_spawnOffset;
+    float m_directionScaleX;
+    float m_directionScaleY;
+    float m_directionScaleZ;
+    unsigned char _padBC[0x05];
+    unsigned char m_rotationFlags;
+    unsigned char m_angleFlags;
+    unsigned char _padC3[0x05];
+    unsigned char m_disableScaleClamp;
+};
+
 struct YmBreathParticleGroup {
     int active;
     signed char* particleIndices;
@@ -70,6 +127,30 @@ struct VYmBreath {
     short m_slotCount;
     unsigned char m_flags;
     unsigned char _pad59[3];
+};
+
+struct YmBreathParticleData {
+    Vec m_position;
+    Vec m_direction;
+    unsigned char _pad18[0x08];
+    short m_life;
+    unsigned char _pad22[0x02];
+    unsigned char m_fadeOutFrames;
+    unsigned char m_fadeInFrames;
+    unsigned char _pad26[0x02];
+    float m_angle;
+    float m_angleVelocity;
+    float m_angleRandom;
+    float m_rotationX;
+    float m_rotationY;
+    float m_rotationVelocityX;
+    float m_rotationVelocityY;
+    float m_rotationAccelX;
+    float m_rotationAccelY;
+    float m_alpha;
+    float m_scale;
+    unsigned char m_age;
+    unsigned char _pad55[0x0B];
 };
 
 extern "C" const char s_pppYmBreath_cpp_801DA9B0[] = "pppYmBreath.cpp";
@@ -732,9 +813,9 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
 void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* particleData, VColor* vColor,
                     _PARTICLE_COLOR* particleColor)
 {
-    unsigned char* breath = (unsigned char*)pYmBreath;
+    YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     int alpha = vColor->m_alpha;
-    Vec* particle = reinterpret_cast<Vec*>(particleData);
+    YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
     char frameCount;
     Vec step;
     float angleRange;
@@ -746,70 +827,70 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
         particleColor->m_color[1] += particleColor->m_colorFrameDeltas[1];
         particleColor->m_color[2] += particleColor->m_colorFrameDeltas[2];
         particleColor->m_color[3] += particleColor->m_colorFrameDeltas[3];
-        particleColor->m_colorFrameDeltas[0] += *(float*)(breath + 0x3C);
-        particleColor->m_colorFrameDeltas[1] += *(float*)(breath + 0x40);
-        particleColor->m_colorFrameDeltas[2] += *(float*)(breath + 0x44);
-        particleColor->m_colorFrameDeltas[3] += *(float*)(breath + 0x48);
+        particleColor->m_colorFrameDeltas[0] += params->m_colorFrameAccel0;
+        particleColor->m_colorFrameDeltas[1] += params->m_colorFrameAccel1;
+        particleColor->m_colorFrameDeltas[2] += params->m_colorFrameAccel2;
+        particleColor->m_colorFrameDeltas[3] += params->m_colorFrameAccel3;
         alpha = (unsigned int)vColor->m_alpha + (int)particleColor->m_color[3];
         if (alpha > 0xFF) {
             alpha = 0xFF;
         }
     }
 
-    particle[3].y += particle[3].z;
-    if ((*(unsigned char*)(breath + 0xC2) & 0x10) != 0) {
-        particle[3].z += *(float*)(breath + 0x98) + particle[4].x;
+    particle->m_angle += particle->m_angleVelocity;
+    if (params->m_angleFlags & 0x10) {
+        particle->m_angleVelocity = params->m_angleAccel + particle->m_angleRandom + particle->m_angleVelocity;
     } else {
-        particle[3].z += *(float*)(breath + 0x98);
+        particle->m_angleVelocity += params->m_angleAccel;
     }
 
     angleRange = 6.2831855f;
-    while (angleRange <= particle[3].y) {
-        particle[3].y -= angleRange;
+    while (angleRange <= particle->m_angle) {
+        particle->m_angle -= angleRange;
     }
-    while (particle[3].y < 0.0f) {
-        particle[3].y += angleRange;
+    while (particle->m_angle < 0.0f) {
+        particle->m_angle += angleRange;
     }
 
-    particle[4].y += particle[5].x;
-    particle[4].z += particle[5].y;
-    if ((*(unsigned char*)(breath + 0xC1) & 0x10) != 0) {
-        particle[5].x += *(float*)(breath + 0x70) + particle[5].z;
-        particle[5].y += *(float*)(breath + 0x74) + particle[6].x;
+    particle->m_rotationX += particle->m_rotationVelocityX;
+    particle->m_rotationY += particle->m_rotationVelocityY;
+    if (params->m_rotationFlags & 0x10) {
+        particle->m_rotationVelocityX = params->m_rotationAccelX + particle->m_rotationAccelX + particle->m_rotationVelocityX;
+        particle->m_rotationVelocityY = params->m_rotationAccelY + particle->m_rotationAccelY + particle->m_rotationVelocityY;
     } else {
-        particle[5].x += *(float*)(breath + 0x70);
-        particle[5].y += *(float*)(breath + 0x74);
+        particle->m_rotationVelocityX += params->m_rotationAccelX;
+        particle->m_rotationVelocityY += params->m_rotationAccelY;
     }
 
-    particle[6].z += *(float*)(breath + 0xA4);
-    if (*(unsigned char*)(breath + 0xC8) == 0) {
-        float start = *(float*)(breath + 0xA0);
+    particle->m_scale += params->m_scaleAccel;
+    if (params->m_disableScaleClamp == 0) {
+        float start = params->m_scaleClampStart;
         float zero = 0.0f;
-        if ((zero < start) && (*(float*)(breath + 0xA4) < zero)) {
-            if (particle[6].z < zero) {
-                particle[6].z = zero;
+        if ((zero < start) && (params->m_scaleAccel < zero)) {
+            if (particle->m_scale < zero) {
+                particle->m_scale = zero;
             }
-        } else if ((start < zero) && (zero < *(float*)(breath + 0xA4)) && (zero < particle[6].z)) {
-            particle[6].z = zero;
+        } else if ((start < zero) && (zero < params->m_scaleAccel) && (zero < particle->m_scale)) {
+            particle->m_scale = zero;
         }
     }
 
-    PSVECScale(&particle[1], &step, particle[6].z);
-    PSVECAdd(&step, &particle[0], &particle[0]);
+    PSVECScale(&particle->m_direction, &step, particle->m_scale);
+    PSVECAdd(&step, &particle->m_position, &particle->m_position);
 
-    if (*(unsigned short*)(breath + 0x24) != 0) {
-        *(short*)&particle[2].z = *(short*)&particle[2].z - 1;
+    if (params->m_particleLifetime != 0) {
+        particle->m_life = particle->m_life - 1;
     }
-    *(char*)&particle[7].x = *(char*)&particle[7].x + 1;
+    particle->m_age = particle->m_age + 1;
 
-    frameCount = *(char*)&particle[3].x;
-    if ((frameCount != '\0') && ((int)(unsigned int)*(unsigned char*)&particle[7].x <= (int)frameCount)) {
-        *(float*)&particle[6].y -= (float)alpha / (float)(int)frameCount;
+    frameCount = particle->m_fadeOutFrames;
+    if ((frameCount != '\0') && ((int)(unsigned int)particle->m_age <= (int)frameCount)) {
+        particle->m_alpha -= (float)alpha / (float)(int)frameCount;
     }
 
-    frameCount = *(char*)((unsigned char*)&particle[3].x + 1);
-    if ((frameCount != '\0') && ((int)*(short*)&particle[2].z <= (int)frameCount)) {
-        *(float*)&particle[6].y += (float)alpha / (float)(unsigned int)*(unsigned char*)(breath + 0x27);
+    frameCount = particle->m_fadeInFrames;
+    if ((frameCount != '\0') && ((int)particle->m_life <= (int)frameCount)) {
+        particle->m_alpha += (float)alpha / (float)(unsigned int)params->m_fadeInFrames;
     }
 }
 

@@ -230,27 +230,28 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
 {
     char key;
     int* slot;
+    int* voice;
 
     if (((void*)control == (void*)((int)p_SoundControlBuffer + 0x928)) || ((((unsigned int*)track)[0x41] & 0x80000) == 0)) {
         ((int*)track)[0x44] = 0;
         key = ((char*)track)[0x24];
         slot = (int*)keyOnData;
         do {
-            if ((*slot == (int)track) && (*(char*)(slot + 1) == key)) {
+            if (((u32)*slot == (u32)track) && (*(char*)(slot + 1) == key)) {
                 *slot = 0;
             }
             slot += 2;
         } while (slot < (int*)((int)keyOnData + 0x600));
 
         key = ((char*)track)[0x24];
-        slot = (int*)p_VoiceData;
+        voice = (int*)p_VoiceData;
         do {
-            if ((*slot == (int)track && (*(char*)(slot + 6) == key))) {
-                slot[0x24] &= 0xfffffffe;
-                slot[0x24] |= 2;
+            if (((u32)*voice == (u32)track) && (*(char*)(voice + 6) == key)) {
+                voice[0x24] &= 0xfffffffe;
+                voice[0x24] |= 2;
             }
-            slot += 0x30;
-        } while (slot < (int*)(p_VoiceData + 0xc00));
+            voice += 0x30;
+        } while (voice < (int*)(p_VoiceData + 0xc00));
     }
 }
 

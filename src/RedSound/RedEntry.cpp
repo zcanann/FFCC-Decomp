@@ -983,9 +983,9 @@ int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
 unsigned int CRedEntry::SeSepOldDelete()
 {
 	unsigned int selected = 0;
-	int entry = reinterpret_cast<int>(this);
+	CRedEntry* entry = this;
 	int historyNo = 0;
-	unsigned int history = *reinterpret_cast<unsigned int*>(entry + 4);
+	unsigned int history = *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(entry) + 4);
 
 	do {
 		if ((*reinterpret_cast<int*>(history + 0xC) != 0) && (historyNo < *reinterpret_cast<int*>(history + 4))) {
@@ -993,10 +993,10 @@ unsigned int CRedEntry::SeSepOldDelete()
 			selected = history;
 		}
 		history += 0x10;
-	} while (history < *reinterpret_cast<unsigned int*>(entry + 4) + 0x1000);
+	} while (history < *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(entry) + 4) + 0x1000);
 
 	if (selected != 0) {
-		SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(selected));
+		entry->SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(selected));
 	}
 
 	return selected;

@@ -182,10 +182,12 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
     unsigned int& innerChunkSize = innerChunkData[3];
     int hasChunk;
     int* item;
+    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray;
     unsigned int keyData;
     int nodeIdx;
 
     chunkFile.PushChunk();
+    mapAnimKeyDtArray = reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x21418);
     while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(outerChunkData)))) != 0) {
         if (chunkId == 0x4652414D) {
             reinterpret_cast<int*>(this)[7] = static_cast<int>(chunkFile.Get4());
@@ -215,8 +217,7 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
                     }
 
                     item[2] = keyData;
-                    reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x21418)
-                        ->Add(reinterpret_cast<CMapAnimKeyDt*>(item[2]));
+                    mapAnimKeyDtArray->Add(reinterpret_cast<CMapAnimKeyDt*>(item[2]));
                     *reinterpret_cast<unsigned int*>(item[2]) = innerChunkSize >> 4;
                     *reinterpret_cast<int*>(item[2] + 0x4) = reinterpret_cast<int>(
                         __nwa__FUlPQ27CMemory6CStagePci(

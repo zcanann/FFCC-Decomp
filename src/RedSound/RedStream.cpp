@@ -301,9 +301,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 	int* voice;
 
 	streamData = (int*)_SearchEmptyStreamData();
-	if (streamData == (int*)0) {
-		return param_1;
-	}
+	if (streamData != (int*)0) {
 
 	memcpy(streamData + 4, param_2, 0x20);
 	*streamData = (int)SearchSeEmptyTrack(*(short*)((int)streamData + 0x2a), 0xff, 0);
@@ -425,6 +423,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 		} else {
 			RedDeleteA(streamData[0x4b]);
 		}
+	}
 	}
 	return param_1;
 }

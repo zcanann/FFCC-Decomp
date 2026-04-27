@@ -297,6 +297,8 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 	int arOffset;
 	int pitch;
 	int iVar2;
+	int sampleOffset;
+	u8* headerData;
 	int* streamData;
 	int* voice;
 
@@ -319,18 +321,20 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 	}
 
 	if ((*streamData != 0) && (streamData[3] != 0) && (streamData[0x4b] != 0)) {
-		*(short*)((int)param_2 + 0x42) = (short)*(char*)((int)param_2 + 0x1000);
+		sampleOffset = 0x1000;
+		*(short*)((int)param_2 + 0x42) = (short)*(char*)((int)param_2 + sampleOffset);
 		*(unsigned short*)((int)param_2 + 0x46) = 0;
 		*(unsigned short*)((int)param_2 + 0x44) = 0;
+		headerData = (u8*)param_2 + 0x20;
 		if (*(short*)((int)streamData + 0x2a) == 2) {
 			if (streamData[8] < 0) {
-				iVar2 = 0x2000;
+				sampleOffset += 0x1000;
 			} else {
-				iVar2 = 0x1008;
+				sampleOffset += 8;
 			}
-			*(short*)((int)param_2 + 0x70) = (short)*(char*)((int)param_2 + iVar2);
-			*(unsigned short*)((int)param_2 + 0x74) = 0;
-			*(unsigned short*)((int)param_2 + 0x72) = 0;
+			*(short*)(headerData + 0x50) = (short)*(char*)((int)param_2 + sampleOffset);
+			*(unsigned short*)(headerData + 0x54) = 0;
+			*(unsigned short*)(headerData + 0x52) = 0;
 		}
 
 		streamData[0x43] = param_1;
@@ -358,7 +362,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 			}
 			*(int*)(*voice + 0xfc) = 1;
 			voice[0x2c] = 0x8000;
-			voice[1] = (int)(streamData + iVar2 * 0x18 + 0xc);
+			voice[1] = (int)streamData + iVar2 * 0x60 + 0x30;
 			voice[0x27] = pitch;
 			*(int*)(*voice + 0x68) = *(int*)((int)p_ReverbDepth + 0xc);
 			*(int*)(*voice + 0x70) = 0;
@@ -376,8 +380,8 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 			}
 			SetVoiceVolumeMix((RedVoiceDATA*)(streamData[1] + iVar2 * 0xc0), streamData[0x40] >> 0xc, streamData[0x3c] >> 0xc);
 			*(int*)(*streamData + iVar2 * 0x154 + 0x11c) = streamData[0x4b] + iVar2 * 0x2000;
-			memset(streamData + iVar2 * 0x18 + 0xc, 0, 0x60);
-			memcpy((void*)((int)streamData + iVar2 * 0x60 + 0x52), (void*)((int)param_2 + 0x20 + iVar2 * 0x2e), 0x2e);
+			memset((void*)((int)streamData + iVar2 * 0x60 + 0x30), 0, 0x60);
+			memcpy((void*)((int)streamData + iVar2 * 0x60 + 0x52), headerData + iVar2 * 0x2e, 0x2e);
 			*(unsigned char*)((int)voice + 0x5a) = 0;
 			*(unsigned char*)((int)voice + 0x59) = 0;
 			*(unsigned char*)(voice + 0x16) = 0;
@@ -386,17 +390,19 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 			*(unsigned short*)((int)voice + 0x52) = 0;
 			*(unsigned short*)(voice + 0x14) = 0;
 			*(unsigned short*)((int)voice + 0x56) = 10;
-			streamData[iVar2 * 0x18 + 0xd] = 0;
-			streamData[iVar2 * 0x18 + 0xf] = 0x3fff;
-			streamData[iVar2 * 0x18 + 0xe] = 2;
+			*(int*)((int)streamData + iVar2 * 0x60 + 0x34) = 0;
+			*(int*)((int)streamData + iVar2 * 0x60 + 0x3c) = 0x3fff;
+			*(int*)((int)streamData + iVar2 * 0x60 + 0x38) = 2;
 			iVar2 += 1;
 		} while (iVar2 < *(short*)((int)streamData + 0x2a));
 
+		int dmaID;
 		if (streamData[8] < 0) {
-			streamData[0x45] = _ArrangeStreamDataNoLoop((RedStreamDATA*)streamData, 0, 0x2000);
+			dmaID = _ArrangeStreamDataNoLoop((RedStreamDATA*)streamData, 0, 0x2000);
 		} else {
-			streamData[0x45] = _ArrangeStreamDataLoop((RedStreamDATA*)streamData, 0, 0x2000);
+			dmaID = _ArrangeStreamDataLoop((RedStreamDATA*)streamData, 0, 0x2000);
 		}
+		streamData[0x45] = dmaID;
 		streamData[0x4a] = 0x1000;
 		streamData[0x44] = 3;
 	} else {

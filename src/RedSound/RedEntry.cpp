@@ -1218,13 +1218,14 @@ void CRedEntry::DisplaySePlayInfo()
 		int* track = (int*)*trackHead;
 		do {
 			int trackIndex = ((int)track - *trackHead) / 0x154 + (((int)track - *trackHead) >> 0x1F);
+			trackIndex = (trackIndex - (trackIndex >> 0x1F)) + 0x20;
 			if (track[0] == 0) {
-				OSReport(s__s__2d_____801e7c01, sRedEntryLogPrefix, (trackIndex - (trackIndex >> 0x1F)) + 0x20);
+				OSReport(s__s__2d_____801e7c01, sRedEntryLogPrefix, trackIndex);
 				fflush(__files + 1);
 			} else if ((track[0x3D] & 0x80000000) == 0) {
 				int* seSepBank = SearchSeSepBank(track[0x3D]);
 				OSReport(s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc, sRedEntryLogPrefix,
-				         (trackIndex - (trackIndex >> 0x1F)) + 0x20, track[0x3D],
+				         trackIndex, track[0x3D],
 				         ((int)*(unsigned char*)(seSepBank[2] + 0x12) << 8) | *(unsigned char*)(seSepBank[2] + 0x11));
 				fflush(__files + 1);
 			} else {
@@ -1235,7 +1236,7 @@ void CRedEntry::DisplaySePlayInfo()
 				seqBase += (*(unsigned int*)(seqBase + (seDataNo & 0x1FF) * 4) & 0x7FFFFFFF);
 
 				OSReport(s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2, sRedEntryLogPrefix,
-				         (trackIndex - (trackIndex >> 0x1F)) + 0x20, songNo, seDataNo & 0x1FF,
+				         trackIndex, songNo, seDataNo & 0x1FF,
 				         ((int)*(unsigned char*)(seqBase + 2) << 8) | *(unsigned char*)(seqBase + 1));
 				fflush(__files + 1);
 			}

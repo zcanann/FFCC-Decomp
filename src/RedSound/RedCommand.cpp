@@ -468,32 +468,24 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
  */
 int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 {
-	int bankIndex = bank & 3;
-	int seNo = no & 0x1FF;
-	int playPan = pan;
-	int playVolume = volume;
-	int playSeId = seId;
+	bank = bank & 3;
+	no = no & 0x1FF;
 
-	if (p_SeBlockData[bankIndex] != 0) {
-		int bankData = (int)p_SeBlockData[bankIndex];
-		int playNo = seNo + (bankIndex << 9);
-		short count = *(short*)(bankData + 10);
-
-		playNo |= 0x80000000;
-		if (seNo < count) {
+	if (p_SeBlockData[bank] != 0) {
+		int bankData = (int)p_SeBlockData[bank];
+		if (no < *(short*)(bankData + 10)) {
 			int dataBase = bankData + 0x10;
-			int offset = *(int*)(dataBase + seNo * 4);
+			int offset = *(int*)(dataBase + no * 4);
 
 			if (offset != -1) {
 				RedSeINFO* seInfo =
-				    (RedSeINFO*)(dataBase + count * 4 + ((unsigned int)*(int*)(dataBase + seNo * 4) & 0x7FFFFFFF));
-				RedSeINFO* playInfo = seInfo;
+				    (RedSeINFO*)(dataBase + *(short*)(bankData + 10) * 4 + ((unsigned int)offset & 0x7FFFFFFF));
 
 				if (((unsigned int)offset & 0x80000000) != 0) {
-					*(unsigned char*)playInfo |= 0x80;
+					*(unsigned char*)seInfo |= 0x80;
 				}
-				if (_SePlayStart(playInfo, playSeId, playNo, playPan, playVolume) != 0) {
-					return seNo;
+				if (_SePlayStart(seInfo, seId, (no + bank * 0x200) | 0x80000000, pan, volume) != 0) {
+					return no;
 				}
 			}
 		}

@@ -2527,12 +2527,9 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    u8* command;
-    s8 mode;
+    int mode;
 
-    command = *(u8**)track;
-    *(u8**)track = command + 1;
-    mode = *command;
+    mode = *(*(u8**)track)++;
 
     switch (mode) {
     case 2:

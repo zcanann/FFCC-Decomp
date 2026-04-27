@@ -899,7 +899,7 @@ void MusicStop(int seId)
 
 				int* track = (int*)*music;
 				do {
-					if (*track != 0) {
+					if ((u32)*track != 0) {
 						KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 						*track = 0;
 					}

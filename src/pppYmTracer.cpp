@@ -328,10 +328,10 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             for (i = 0; i < (s32)(u32)param_2->m_payload[9]; i++) {
                 f32 t = stepScale * (f32)(i + 1);
 
-                gUtil.GetSplinePos(splineFrom[(param_2->m_payload[9] - 1) - i], entries[3].to, entries[2].to,
-                                          entries[1].to, entries[0].from, t, FLOAT_803306ec);
-                gUtil.GetSplinePos(splineTo[(param_2->m_payload[9] - 1) - i], entries[4].from, entries[3].from,
-                                          entries[2].from, entries[0].to, t, FLOAT_803306ec);
+                gUtil.GetSplinePos(splineFrom[(param_2->m_payload[9] - 1) - i], entries[3].from, entries[2].from,
+                                          entries[1].from, entries[0].from, t, FLOAT_803306ec);
+                gUtil.GetSplinePos(splineTo[(param_2->m_payload[9] - 1) - i], entries[3].to, entries[2].to,
+                                          entries[1].to, entries[0].to, t, FLOAT_803306ec);
 
                 splineCount++;
                 work->count++;

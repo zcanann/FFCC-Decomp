@@ -777,18 +777,16 @@ void _MyAlarmHandler(OSAlarm* param_1, OSContext*)
 void RedSleep(int param_1)
 {
     unsigned int interruptLevel;
-    OSThread* currentThread;
     RedSleepAlarm alarm;
 
     if (param_1 < 0xfa) {
         param_1 = 0xfa;
     }
     interruptLevel = OSDisableInterrupts();
-    currentThread = OSGetCurrentThread();
+    alarm.thread = OSGetCurrentThread();
     OSCreateAlarm(&alarm.alarm);
-    alarm.thread = currentThread;
-    OSSetAlarm(&alarm.alarm, (param_1 * (OS_BUS_CLOCK / 500000)) >> 3, _MyAlarmHandler);
-    OSSuspendThread(currentThread);
+    OSSetAlarm(&alarm.alarm, (param_1 * (OS_TIMER_CLOCK / 125000)) >> 3, _MyAlarmHandler);
+    OSSuspendThread(alarm.thread);
     OSRestoreInterrupts(interruptLevel);
 }
 

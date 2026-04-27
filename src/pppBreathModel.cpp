@@ -52,7 +52,7 @@ struct pppBreathModel {
 struct BreathParticleGroup {
     int active;
     signed char* particleIndices;
-    unsigned char* particleStates;
+    signed char* particleStates;
     Vec position;
     Vec direction;
     float speed;
@@ -729,7 +729,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                     if (found) {
                         groupData = &groupTable[(int)foundGroup];
                         for (slot = 0; slot < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10); slot++) {
-                            groupData->particleStates[slot] = 0xFF;
+                            groupData->particleStates[slot] = -1;
                             groupData->position.x = zero;
                             groupData->position.y = zero;
                             groupData->position.z = zero;
@@ -752,7 +752,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                     groupData = groupTable;
                     for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); j++) {
                         for (k = 0; k < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10); k++) {
-                            if ((groupData->particleIndices[k] == -1) && (groupData->particleStates[k] == 0xFF)) {
+                            if ((groupData->particleIndices[k] == -1) && (groupData->particleStates[k] == -1)) {
                                 groupData->particleIndices[k] = (signed char)i;
                                 found = false;
                                 groupData->particleStates[k] = 1;
@@ -1130,7 +1130,7 @@ void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, s
 
     if (isDead) {
         for (i = 0; i < *(unsigned short*)((unsigned char*)pBreathModel + 0x10); i++) {
-            groupData->particleStates[i] = 0xFF;
+            groupData->particleStates[i] = -1;
             groupData->position.x = zero;
             groupData->position.y = zero;
             groupData->position.z = zero;

@@ -61,6 +61,7 @@ extern float FLOAT_80331048;
 extern float FLOAT_8033104c;
 extern float FLOAT_80331050;
 extern float FLOAT_80331054;
+extern const double DOUBLE_80330FE8 = 3.0;
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 

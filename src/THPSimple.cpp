@@ -48,7 +48,7 @@ struct THPSimpleControl {
 };
 
 THPSimpleControl SimpleControl;
-static u8 sReadBuffer[0x40];
+static u8 sReadBuffer[0x40] ATTRIBUTE_ALIGN(32);
 s32 gTHPSimpleInitialized;
 s32 gTHPSimpleSoundBufferIndex;
 void (*gTHPSimpleOldAIDCallback)(void);
@@ -849,7 +849,11 @@ s32 THPSimpleOpen(const char* path)
             File.DrawError(SimpleControl.fileInfo, status);
         }
     }
-    while ((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb)) != DVD_STATE_END) {
+    for (;;) {
+        status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+        if (status == DVD_STATE_END) {
+            break;
+        }
         status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
         if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
             File.DrawError(SimpleControl.fileInfo, status);
@@ -862,12 +866,12 @@ s32 THPSimpleOpen(const char* path)
         return 0;
     }
 
-    compInfoOffset = SimpleControl.header.mCompInfoDataOffsets;
-
     if (SimpleControl.header.mVersion != 0x11000) {
         DVDClose(&SimpleControl.fileInfo);
         return 0;
     }
+
+    compInfoOffset = SimpleControl.header.mCompInfoDataOffsets;
 
     while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x20, compInfoOffset, (DVDCallback)0, 2)) {
         status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
@@ -875,7 +879,11 @@ s32 THPSimpleOpen(const char* path)
             File.DrawError(SimpleControl.fileInfo, status);
         }
     }
-    while ((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb)) != DVD_STATE_END) {
+    for (;;) {
+        status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+        if (status == DVD_STATE_END) {
+            break;
+        }
         status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
         if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
             File.DrawError(SimpleControl.fileInfo, status);
@@ -887,14 +895,40 @@ s32 THPSimpleOpen(const char* path)
     componentOffset = static_cast<s32>(compInfoOffset + sizeof(THPFrameCompInfo));
 
     for (componentIdx = 0; componentIdx < SimpleControl.compInfo.mNumComponents; componentIdx++) {
-        if (SimpleControl.compInfo.mFrameComp[componentIdx] == 1) {
+        switch (SimpleControl.compInfo.mFrameComp[componentIdx]) {
+        case 0:
             while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
                 status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
                 if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
                     File.DrawError(SimpleControl.fileInfo, status);
                 }
             }
-            while ((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb)) != DVD_STATE_END) {
+            for (;;) {
+                status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+                if (status == DVD_STATE_END) {
+                    break;
+                }
+                status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+                if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
+                    File.DrawError(SimpleControl.fileInfo, status);
+                }
+            }
+
+            memcpy(&SimpleControl.videoInfo, sReadBuffer, sizeof(THPVideoInfo));
+            componentOffset += sizeof(THPVideoInfo);
+            break;
+        case 1:
+            while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
+                status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+                if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
+                    File.DrawError(SimpleControl.fileInfo, status);
+                }
+            }
+            for (;;) {
+                status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+                if (status == DVD_STATE_END) {
+                    break;
+                }
                 status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
                 if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
                     File.DrawError(SimpleControl.fileInfo, status);
@@ -904,23 +938,8 @@ s32 THPSimpleOpen(const char* path)
             memcpy(&SimpleControl.audioInfo, sReadBuffer, sizeof(THPAudioInfo));
             componentOffset += sizeof(THPAudioInfo);
             SimpleControl.hasAudio = 1;
-        } else if (SimpleControl.compInfo.mFrameComp[componentIdx] == 0) {
-            while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
-                status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
-                if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
-                    File.DrawError(SimpleControl.fileInfo, status);
-                }
-            }
-            while ((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb)) != DVD_STATE_END) {
-                status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
-                if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
-                    File.DrawError(SimpleControl.fileInfo, status);
-                }
-            }
-
-            memcpy(&SimpleControl.videoInfo, sReadBuffer, sizeof(THPVideoInfo));
-            componentOffset += sizeof(THPVideoInfo);
-        } else {
+            break;
+        default:
             return 0;
         }
     }

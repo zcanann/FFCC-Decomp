@@ -403,11 +403,7 @@ void CPad::Frame()
 						static_cast<u16>(*reinterpret_cast<u16*>(iVar6 + 0x0E) &
 						                 (*reinterpret_cast<u16*>(iVar6 + 0x0C) ^ *reinterpret_cast<u16*>(iVar6 + 0x0E)));
 					*reinterpret_cast<u16*>(iVar6 + 0x14) = static_cast<u16>(puVar12[0x26] & *puVar12 & 0x1F7F);
-					if (*reinterpret_cast<s16*>(iVar6 + 0x14) == 0)
-					{
-						*reinterpret_cast<u32*>(iVar6 + 0x4C) = 0;
-					}
-					else
+					if (*reinterpret_cast<u16*>(iVar6 + 0x14) != 0)
 					{
 						*reinterpret_cast<int*>(iVar6 + 0x4C) = *reinterpret_cast<int*>(iVar6 + 0x4C) + 1;
 						if (*reinterpret_cast<u32*>(iVar6 + 0x4C) < 0x10)
@@ -419,15 +415,13 @@ void CPad::Frame()
 							*reinterpret_cast<u16*>(iVar6 + 0x14) = 0;
 						}
 					}
+					else
+					{
+						*reinterpret_cast<u32*>(iVar6 + 0x4C) = 0;
+					}
 					*reinterpret_cast<u16*>(iVar6 + 0x14) =
 						static_cast<u16>(*reinterpret_cast<u16*>(iVar6 + 0x14) | puVar12[2]);
-					if (*reinterpret_cast<int*>(iVar6 + 0x3C) == 0)
-					{
-						*reinterpret_cast<u16*>(iVar6 + 0x38) = 0;
-						*reinterpret_cast<u16*>(iVar6 + 0x36) = 0;
-						*reinterpret_cast<u16*>(iVar6 + 0x34) = 0;
-					}
-					else
+					if (*reinterpret_cast<int*>(iVar6 + 0x3C) != 0)
 					{
 						*reinterpret_cast<u16*>(iVar6 + 0x34) = *puVar12;
 						*reinterpret_cast<u16*>(iVar6 + 0x36) = puVar12[2];
@@ -438,6 +432,12 @@ void CPad::Frame()
 						puVar12[2] = 0;
 						*reinterpret_cast<u16*>(iVar6 + 0x12) = 0;
 						*puVar12 = 0;
+					}
+					else
+					{
+						*reinterpret_cast<u16*>(iVar6 + 0x38) = 0;
+						*reinterpret_cast<u16*>(iVar6 + 0x36) = 0;
+						*reinterpret_cast<u16*>(iVar6 + 0x34) = 0;
 					}
 				}
 				puVar7[2] = static_cast<u16>(puVar7[2] | puVar12[2]);
@@ -521,7 +521,7 @@ void CPad::Frame()
 		iVar6 = iVar6 + 0x54;
 	} while (uVar17 < 4);
 
-	if (-1 < _1bc_4_)
+	if (_1bc_4_ >= 0)
 	{
 		_1bc_4_ = _1bc_4_ + 1;
 	}

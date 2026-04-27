@@ -653,7 +653,7 @@ void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, 
     if ((m_MusicPhraseStop == 1) && ((void*)control == p_SoundControlBuffer)) {
         int* track = (int*)((int*)control)[0];
         do {
-            if (*track != 0) {
+            if ((u32)*track != 0) {
                 __MidiCtrl_Stop(control, keyOnData, (RedTrackDATA*)track);
             }
             track += 0x55;

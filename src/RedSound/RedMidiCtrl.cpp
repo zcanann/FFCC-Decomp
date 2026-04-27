@@ -1033,16 +1033,15 @@ void __MidiCtrl_KeyOffVelocity(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
  */
 void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command;
-    unsigned int waveNo;
+    int waveNo;
+    int waveTable;
 
     ((int*)track)[7] = 0;
     ((int*)track)[0x47] = 0;
-    command = *(unsigned char**)track;
-    *(unsigned char**)track = command + 1;
-    waveNo = (unsigned int)*command;
-    if ((((int*)track)[6] != 0) && ((int)waveNo < *(int*)(((int*)track)[6] + 8))) {
-        ((int*)track)[7] = ((int*)track)[6] + *(int*)(((int*)track)[6] + 0x20 + waveNo * 4);
+    waveNo = *(*(u8**)track)++;
+    if ((((int*)track)[6] != 0) && (waveNo < *(int*)(((int*)track)[6] + 8))) {
+        waveTable = ((int*)track)[6] + 0x20;
+        ((int*)track)[7] = ((int*)track)[6] + *(int*)(waveTable + waveNo * 4);
         ((int*)track)[0x47] = *(int*)(((int*)track)[6] + 0x10);
         memset((int*)track + 0x35, 0xffffffff, 0xc);
     }

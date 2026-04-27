@@ -93,6 +93,21 @@ struct GbaQueuePlayerDataView
 };
 STATIC_ASSERT(sizeof(GbaQueuePlayerDataView) == 0xDC);
 
+struct GbaQueueCMakeInfoView
+{
+	unsigned char m_active;
+	unsigned char m_resultCode;
+	short m_packetCount;
+	short m_crc;
+	unsigned char m_playerSlot;
+	char m_name[0x11];
+	unsigned char m_charaType;
+	unsigned char m_favoriteLead[2];
+	unsigned char m_favorite[4];
+	unsigned char m_jobType;
+};
+STATIC_ASSERT(sizeof(GbaQueueCMakeInfoView) == 0x20);
+
 static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
 {
 	return reinterpret_cast<GbaQueueFlagView*>(gbaQueue);
@@ -2364,7 +2379,7 @@ unsigned int GbaQueue::GetLetterLstFlg(int channel)
 	unsigned int value;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	value = static_cast<unsigned int>(flags->m_letterDatFlg) & (1U << channel);
+	value = static_cast<int>(static_cast<char>(flags->m_letterDatFlg)) & (1 << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return (-value | value) >> 31;
 }
@@ -2399,7 +2414,7 @@ unsigned int GbaQueue::GetLetterDatFlg(int channel)
 	unsigned int value;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	value = static_cast<unsigned int>(flags->m_letterDatFlg) & (0x10U << channel);
+	value = static_cast<int>(static_cast<char>(flags->m_letterDatFlg)) & (0x10 << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return (-value | value) >> 31;
 }
@@ -2916,11 +2931,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		return;
 	}
 
-	unsigned char resultCode;
-	unsigned char compareSlot;
-	short expectedCrc;
-	unsigned char nameBuffer[0x11];
-	bool hasFullName = false;
+	GbaQueueCMakeInfoView localInfo;
 
 	OSWaitSemaphore(semaphore);
 	{
@@ -2931,15 +2942,13 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		obj[0x2CB8 + cmakeOffset + writeOffset] = static_cast<char>(byte1);
 		obj[0x2CB9 + cmakeOffset + writeOffset] = static_cast<char>(byte0);
 
-		hasFullName = (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) > 5);
-		resultCode = static_cast<unsigned char>(obj[0x2CB3 + cmakeOffset]);
-		expectedCrc = *reinterpret_cast<short*>(obj + 0x2CB6 + cmakeOffset);
-		compareSlot = static_cast<unsigned char>(obj[0x2CB8 + cmakeOffset]);
-		memcpy(nameBuffer, obj + 0x2CB9 + cmakeOffset, sizeof(nameBuffer));
+		if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) > 5) {
+			localInfo = *reinterpret_cast<GbaQueueCMakeInfoView*>(obj + 0x2CB2 + cmakeOffset);
+		}
 	}
 	OSSignalSemaphore(semaphore);
 
-	if (!hasFullName) {
+	if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) <= 5) {
 		return;
 	}
 
@@ -2950,7 +2959,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 	}
 
 	unsigned short crc = 0xFFFF;
-	if (Joybus.Crc16(0x10, nameBuffer, &crc) == expectedCrc) {
+	if (Joybus.Crc16(0x10, reinterpret_cast<unsigned char*>(localInfo.m_name), &crc) == localInfo.m_crc) {
 		for (int i = 0; i < 4; i++) {
 			OSWaitSemaphore(accessSemaphores + i);
 		}
@@ -2958,12 +2967,12 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		for (int i = 0; i < 4; i++) {
 			const int otherOffset = i * 0x20;
 			if ((channel != i) && (cmakeInfo[i][0] != '\0') &&
-			    (strcmp(obj + 0x2CB9 + otherOffset, reinterpret_cast<char*>(nameBuffer)) == 0)) {
+			    (strcmp(obj + 0x2CB9 + otherOffset, localInfo.m_name) == 0)) {
 				memset(obj + 0x2CB9 + cmakeOffset, 0, 0x11);
 				for (int j = 0; j < 4; j++) {
 					OSSignalSemaphore(accessSemaphores + j);
 				}
-				Joybus.SendResult(channel, 1, resultCode, 0);
+				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
 			}
 		}
@@ -2974,8 +2983,8 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 
 		GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
 		for (int i = 0; i < 0x100; i++) {
-			if (strcmp(flatData->m_tabl[2].m_strings[i], reinterpret_cast<char*>(nameBuffer)) == 0) {
-				Joybus.SendResult(channel, 1, resultCode, 0);
+			if (strcmp(flatData->m_tabl[2].m_strings[i], localInfo.m_name) == 0) {
+				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
 			}
 		}
@@ -2983,15 +2992,15 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		for (int i = 0; i < 8; i++) {
 			CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
 			char* caravanObj = reinterpret_cast<char*>(caravanWork);
-			if ((i != compareSlot) && (*reinterpret_cast<int*>(caravanObj + 0x3A4) != 0) &&
+			if ((i != localInfo.m_playerSlot) && (*reinterpret_cast<int*>(caravanObj + 0x3A4) != 0) &&
 			    (caravanObj[0xBA6] == '\0') &&
-			    (strcmp(caravanObj + 0x3CA, reinterpret_cast<char*>(nameBuffer)) == 0)) {
-				Joybus.SendResult(channel, 1, resultCode, 0);
+			    (strcmp(caravanObj + 0x3CA, localInfo.m_name) == 0)) {
+				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
 			}
 		}
 
-		Joybus.SendResult(channel, 0, resultCode, 0);
+		Joybus.SendResult(channel, 0, localInfo.m_resultCode, 0);
 		OSWaitSemaphore(semaphore);
 		obj[0x2CB3 + cmakeOffset] = 0;
 		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + cmakeOffset) = 0;
@@ -3001,7 +3010,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		if (System.m_execParam != 0) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_name_crc_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0xAD3);
 		}
-		Joybus.SendResult(channel, 1, resultCode, 0);
+		Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 	}
 }
 
@@ -3193,10 +3202,7 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 		return;
 	}
 
-	unsigned char resultCode = 0;
-	short expectedCrc = 0;
-	unsigned char crcData[4];
-	bool hasData = false;
+	GbaQueueCMakeInfoView localInfo;
 
 	OSWaitSemaphore(semaphore);
 	{
@@ -3208,21 +3214,18 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 		obj[0x2CCD + cmakeOffset + writeOffset] = static_cast<char>(byte0);
 
 		if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) > 1) {
-			resultCode = static_cast<unsigned char>(obj[0x2CB3 + cmakeOffset]);
-			expectedCrc = *reinterpret_cast<short*>(obj + 0x2CB6 + cmakeOffset);
-			memcpy(crcData, obj + 0x2CCD + cmakeOffset, sizeof(crcData));
-			hasData = true;
+			localInfo = *reinterpret_cast<GbaQueueCMakeInfoView*>(obj + 0x2CB2 + cmakeOffset);
 		}
 	}
 	OSSignalSemaphore(semaphore);
 
-	if (!hasData) {
+	if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) <= 1) {
 		return;
 	}
 
 	unsigned short crc = 0xFFFF;
-	if (Joybus.Crc16(4, crcData, &crc) == expectedCrc) {
-		Joybus.SendResult(channel, 0, resultCode, 0);
+	if (Joybus.Crc16(4, localInfo.m_favorite, &crc) == localInfo.m_crc) {
+		Joybus.SendResult(channel, 0, localInfo.m_resultCode, 0);
 		OSWaitSemaphore(semaphore);
 		obj[0x2CB3 + cmakeOffset] = 0;
 		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + cmakeOffset) = 0;
@@ -3232,7 +3235,7 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 		if (System.m_execParam != 0) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_favorite_crc_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0xBDC);
 		}
-		Joybus.SendResult(channel, 1, resultCode, 0);
+		Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 	}
 }
 
@@ -3831,7 +3834,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
  * JP Address: TODO
  * JP Size: TODO
  */
-void GbaQueue::MakeSmithData(int channel, char* outData)
+int GbaQueue::MakeSmithData(int channel, char* outData)
 {
 	unsigned char* smithIndices = static_cast<unsigned char*>(
 __nwa__FUlPQ27CMemory6CStagePci(0x40, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xE41));
@@ -3839,7 +3842,7 @@ __nwa__FUlPQ27CMemory6CStagePci(0x40, Game.m_mainStage, const_cast<char*>(s_gbaq
 		if (System.m_execParam != 0) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xE43);
 		}
-		return;
+		return -1;
 	}
 	memset(smithIndices, 0xFF, 0x40);
 
@@ -3961,6 +3964,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	Joybus.SetLetterSize(channel, totalSize);
+	return totalSize;
 }
 
 /*
@@ -3978,7 +3982,7 @@ unsigned int GbaQueue::GetSellFlg(int channel)
 	unsigned int value;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	value = static_cast<unsigned int>(flags->m_sellFlg) & (1U << channel);
+	value = static_cast<int>(static_cast<char>(flags->m_sellFlg)) & (1 << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return (-value | value) >> 31;
 }
@@ -4017,7 +4021,7 @@ unsigned int GbaQueue::GetBuyFlg(int channel)
 	unsigned int value;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	value = static_cast<unsigned int>(flags->m_buyFlg) & (1U << channel);
+	value = static_cast<int>(static_cast<char>(flags->m_buyFlg)) & (1 << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return (-value | value) >> 31;
 }
@@ -4056,7 +4060,7 @@ unsigned int GbaQueue::GetMkSmithFlg(int channel)
 	unsigned int value;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	value = static_cast<unsigned int>(flags->m_mkSmithFlg) & (1U << channel);
+	value = static_cast<int>(static_cast<char>(flags->m_mkSmithFlg)) & (1 << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return (-value | value) >> 31;
 }
@@ -4436,9 +4440,10 @@ unsigned int GbaQueue::GetRadarMode(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D41])) & (1U << channel);
+	char radarMode = obj[0x2D41];
 	OSSignalSemaphore(accessSemaphores + channel);
-	return (-value | value) >> 31U;
+	unsigned int value = static_cast<int>(radarMode) & (1 << channel);
+	return (-value | value) >> 31;
 }
 
 /*
@@ -4474,9 +4479,10 @@ unsigned int GbaQueue::GetChgRadarMode(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D42])) & (1U << channel);
+	char radarMode = obj[0x2D42];
 	OSSignalSemaphore(accessSemaphores + channel);
-	return (-value | value) >> 31U;
+	unsigned int value = static_cast<int>(radarMode) & (1 << channel);
+	return (-value | value) >> 31;
 }
 
 /*
@@ -4707,7 +4713,7 @@ void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
 	OSWaitSemaphore(accessSemaphores + channel);
 	hitInfo[channel * 2] = enemyId;
 	hitInfo[channel * 2 + 1] = enemyType;
-	obj[0x2CE8] = static_cast<char>(obj[0x2CE8] | (1 << channel));
+	obj[0x2D54] = static_cast<char>(obj[0x2D54] | (1 << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 

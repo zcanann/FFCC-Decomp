@@ -2282,25 +2282,24 @@ void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
  */
 void _PitchBendCompute(RedTrackDATA* track, int bend)
 {
-    int* voiceData = (int*)p_VoiceData;
-    int* trackData = (int*)track;
+    unsigned int* voiceData = (unsigned int*)p_VoiceData;
 
     do {
-        if (voiceData[0] == (int)trackData) {
+        if (voiceData[0] == (unsigned int)track) {
             if (voiceData[1] != 0) {
                 int pitch;
-                if ((((unsigned char*)voiceData)[0x1a] & 3) == 0) {
-                    pitch = voiceData[0x28] + *p_MusicPitchControl;
+                if ((((unsigned char*)voiceData)[0x1a] & 3) != 0) {
+                    pitch = voiceData[0x28] + ((int*)track)[0x17];
                 } else {
-                    pitch = voiceData[0x28] + trackData[0x17];
+                    pitch = voiceData[0x28] + *p_MusicPitchControl;
                 }
-                voiceData[0x26] = PitchCompute(pitch, *(short*)((char*)trackData + 0x142) + bend, ((int*)voiceData[1])[5],
-                                               *(char*)((char*)trackData + 0x148));
+                voiceData[0x26] = PitchCompute(pitch, *(short*)((char*)track + 0x142) + bend, ((int*)voiceData[1])[5],
+                                               *(char*)((char*)track + 0x148));
                 voiceData[0x2e] |= 1;
             }
         }
         voiceData += 0x30;
-    } while (voiceData < (int*)(p_VoiceData + 0xc00));
+    } while (voiceData < (unsigned int*)(p_VoiceData + 0xc00));
 }
 
 /*

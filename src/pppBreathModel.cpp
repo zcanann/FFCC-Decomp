@@ -869,7 +869,7 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
     PSVECScale(&particle->m_direction, &step, particle->m_scale);
     PSVECAdd(&step, &particle->m_position, &particle->m_position);
 
-    short life = params->m_particleLifetime;
+    unsigned short life = params->m_particleLifetime;
     if (life != 0) {
         particle->m_life = particle->m_life - 1;
     }
@@ -929,14 +929,12 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     particle->m_angle = params->m_angleStart;
     particle->m_angleVelocity = params->m_angleStep;
     if (params->m_angleFlags != 0) {
-        unsigned char flags = params->m_angleFlags;
-
         particle->m_angleRandom = params->m_angleRandomRange * Math.RandF();
-        if ((flags & 1) && (flags & 2)) {
-            if (Math.RandF() > DOUBLE_80330F98) {
+        if ((params->m_angleFlags & 1) && (params->m_angleFlags & 2)) {
+            if (DOUBLE_80330F98 < Math.RandF()) {
                 particle->m_angleRandom *= FLOAT_80330F80;
             }
-        } else if (flags & 2) {
+        } else if (params->m_angleFlags & 2) {
             particle->m_angleRandom *= FLOAT_80330F80;
         }
     }
@@ -963,40 +961,36 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     particle->m_rotationVelocityZ = params->m_rotationVelocityZ;
 
     if (params->m_rotationFlags != 0) {
-        unsigned char flags = params->m_rotationFlags;
-
-        if ((flags & 0x20) == 0) {
+        if ((params->m_rotationFlags & 0x20) == 0) {
             particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
             particle->m_rotationAccelY = params->m_rotationRandomY * Math.RandF();
             particle->m_rotationAccelZ = params->m_rotationRandomZ * Math.RandF();
-            if ((flags & 1) && (flags & 2)) {
-                if (Math.RandF() > DOUBLE_80330F98) {
+            if ((params->m_rotationFlags & 1) && (params->m_rotationFlags & 2)) {
+                if (DOUBLE_80330F98 < Math.RandF()) {
                     particle->m_rotationAccelX *= FLOAT_80330F80;
                 }
-                if (Math.RandF() > DOUBLE_80330F98) {
+                if (DOUBLE_80330F98 < Math.RandF()) {
                     particle->m_rotationAccelY *= FLOAT_80330F80;
                 }
-                if (Math.RandF() > DOUBLE_80330F98) {
+                if (DOUBLE_80330F98 < Math.RandF()) {
                     particle->m_rotationAccelZ *= FLOAT_80330F80;
                 }
-            } else if (flags & 2) {
+            } else if (params->m_rotationFlags & 2) {
                 particle->m_rotationAccelX *= FLOAT_80330F80;
                 particle->m_rotationAccelY *= FLOAT_80330F80;
                 particle->m_rotationAccelZ *= FLOAT_80330F80;
             }
         } else {
-            float value = params->m_rotationRandomX * Math.RandF();
-
-            particle->m_rotationAccelX = value;
-            particle->m_rotationAccelY = value;
-            particle->m_rotationAccelZ = value;
-            if ((flags & 1) && (flags & 2)) {
-                if (Math.RandF() > DOUBLE_80330F98) {
+            particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
+            particle->m_rotationAccelY = particle->m_rotationAccelX;
+            particle->m_rotationAccelZ = particle->m_rotationAccelX;
+            if ((params->m_rotationFlags & 1) && (params->m_rotationFlags & 2)) {
+                if (DOUBLE_80330F98 < Math.RandF()) {
                     particle->m_rotationAccelX *= FLOAT_80330F80;
                     particle->m_rotationAccelY *= FLOAT_80330F80;
                     particle->m_rotationAccelZ *= FLOAT_80330F80;
                 }
-            } else if (flags & 2) {
+            } else if (params->m_rotationFlags & 2) {
                 particle->m_rotationAccelX *= FLOAT_80330F80;
                 particle->m_rotationAccelY *= FLOAT_80330F80;
                 particle->m_rotationAccelZ *= FLOAT_80330F80;

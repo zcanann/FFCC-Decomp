@@ -875,21 +875,21 @@ int MusicStop(int seId)
 	unsigned int* music = (unsigned int*)p_SoundControlBuffer;
 
 	do {
-		if ((seId == -1) || (((int)music[0x11c] >= 0) && (music[0x11c] == (unsigned int)seId))) {
+		if ((seId == -1) || (((int)music[0x11c] >= 0) && ((int)music[0x11c] == seId))) {
 			unsigned int musicId = music[0x11c];
 			music[0x122] = 0;
 			music[0x11c] = -1;
 			if (*(short*)((char*)music + 0x48e) != 0) {
 				unsigned int* seTrack = p_VoiceData;
 				do {
-					if ((*music <= *seTrack) &&
+					if ((*seTrack >= *music) &&
 					    (*seTrack <
 					     *music + (unsigned int)*(unsigned char*)((char*)music + 0x491) *
 					                   0x154)) {
 						seTrack[0x25] &= 0xfffffff3;
 						seTrack[0x24] &= 0xfffffffe;
 						seTrack[0x24] |= 2;
-						*((unsigned char*)seTrack + 0x1a) &= 0xfb;
+						*((unsigned char*)seTrack + 0x1a) &= ~4;
 						*seTrack = 0;
 						seTrack[0x23] = 0;
 					}
@@ -920,7 +920,7 @@ int MusicStop(int seId)
 
 	music = (unsigned int*)p_SoundControlBuffer;
 	if (((int)music[0x11c] < 0) && ((int)music[0x241] >= 0)) {
-		memcpy(music, music + 0x125, 0x494);
+		memcpy((void*)p_SoundControlBuffer, (unsigned int*)p_SoundControlBuffer + 0x125, 0x494);
 		*(short*)((char*)music + 0x922) = 0;
 		*(unsigned char*)((char*)music + 0x925) = 0;
 		music[0x241] = -1;

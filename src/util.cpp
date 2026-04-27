@@ -180,32 +180,54 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
  */
 void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, unsigned long count, unsigned long shift)
 {
-    S16Vec min;
-    S16Vec max;
-    int scale = 1 << shift;
+    short minX = 0x7FFF;
+    short minY = 0x7FFF;
+    short minZ = 0x7FFF;
+    short maxX = -0x7FFF;
+    short maxY = -0x7FFF;
+    short maxZ = -0x7FFF;
 
-    min.z = 0x7FFF;
-    min.y = 0x7FFF;
-    min.x = 0x7FFF;
-    max.z = -0x7FFF;
-    max.y = -0x7FFF;
-    max.x = -0x7FFF;
+    if (count != 0) {
+        do {
+            short x = vecs->x;
+            short y = vecs->y;
+            short z = vecs->z;
 
-    for (unsigned long i = 0; i < count; i++, vecs++) {
-        min.x = min.x < vecs->x ? min.x : vecs->x;
-        min.y = min.y < vecs->y ? min.y : vecs->y;
-        min.z = min.z < vecs->z ? min.z : vecs->z;
-        max.x = max.x < vecs->x ? vecs->x : max.x;
-        max.y = max.y < vecs->y ? vecs->y : max.y;
-        max.z = max.z < vecs->z ? vecs->z : max.z;
+            if (minX < x) {
+                x = minX;
+            }
+            if (minY < y) {
+                y = minY;
+            }
+            if (minZ < z) {
+                z = minZ;
+            }
+            if (maxX < vecs->x) {
+                maxX = vecs->x;
+            }
+            if (maxY < vecs->y) {
+                maxY = vecs->y;
+            }
+            if (maxZ < vecs->z) {
+                maxZ = vecs->z;
+            }
+
+            vecs++;
+            count--;
+            minZ = z;
+            minY = y;
+            minX = x;
+        } while (count != 0);
     }
 
-    minOut->x = (float)min.x / (float)scale;
-    minOut->y = (float)min.y / (float)scale;
-    minOut->z = (float)min.z / (float)scale;
-    maxOut->x = (float)max.x / (float)scale;
-    maxOut->y = (float)max.y / (float)scale;
-    maxOut->z = (float)max.z / (float)scale;
+    int scale = 1 << shift;
+
+    minOut->x = (float)minX / (float)scale;
+    minOut->y = (float)minY / (float)scale;
+    minOut->z = (float)minZ / (float)scale;
+    maxOut->x = (float)maxX / (float)scale;
+    maxOut->y = (float)maxY / (float)scale;
+    maxOut->z = (float)maxZ / (float)scale;
 }
 
 /*

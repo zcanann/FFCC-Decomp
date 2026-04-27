@@ -649,17 +649,15 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
  */
 void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA*)
 {
-    int* controlData = (int*)control;
-
-    controlData[0x11b] |= 2;
+    ((int*)control)[0x11b] |= 2;
     if ((m_MusicPhraseStop == 1) && ((void*)control == p_SoundControlBuffer)) {
-        int* track = (int*)controlData[0];
+        int* track = (int*)((int*)control)[0];
         do {
             if (*track != 0) {
                 __MidiCtrl_Stop(control, keyOnData, (RedTrackDATA*)track);
             }
             track += 0x55;
-        } while (track < (int*)(controlData[0] + (unsigned int)*(unsigned char*)((char*)control + 0x491) * 0x154));
+        } while (track < (int*)(((int*)control)[0] + (unsigned int)*(unsigned char*)((char*)control + 0x491) * 0x154));
     }
 }
 
@@ -783,12 +781,11 @@ void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDAT
  */
 void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command = (unsigned char*)((int*)track)[0];
-    int* trackData = (int*)track;
-    int* reverbDepth = trackData + 0x1a;
+    char* command = (char*)((int*)track)[0];
+    int* reverbDepth = (int*)track + 0x1a;
 
-    trackData[0] = (int)(command + 1);
-    *reverbDepth = (int)*command;
+    ((int*)track)[0] = (int)(command + 1);
+    *reverbDepth = *command;
 
     if (*reverbDepth != 0) {
         *reverbDepth += 1;
@@ -797,8 +794,8 @@ void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
         *reverbDepth <<= 0xc;
     }
 
-    trackData[0x1b] = 0;
-    trackData[0x1c] = 0;
+    ((int*)track)[0x1b] = 0;
+    ((int*)track)[0x1c] = 0;
     SetVoiceAccess(track, 8);
 }
 

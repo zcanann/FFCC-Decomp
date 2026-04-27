@@ -10,30 +10,14 @@
 static const char sRedCommandLogWarnColor[] = "\x1B[4;31m";
 static const char sRedCommandLogReset[] = "\x1B[0m";
 static const char sRedCommandLogErrorColor[] = "\x1B[7;31m";
-static const char s_redCommandLogBlob[0x108] =
-    "%s%sWave is not Entry. (wave%4.4u)%s\n"
-    "\0"
-    "\x1B[7;34mSound\x1B[0m:"
-    "\0"
-    "%sPause : SE     : ON  %d\n"
-    "\0"
-    "%sPause : SE     : OFF %d\n"
-    "\0"
-    "%s%sMusic Start : Couldn't Create Track.%s\n"
-    "\0"
-    "%s%s            : music%3.3u.bgm : need 0x%6.6X%s\n"
-    "\0"
-    "%sPause : Music  : ON  %d\n"
-    "\0"
-    "%sPause : Music  : OFF %d\n";
-
-enum {
-    RED_COMMAND_LOG_PREFIX_OFFSET = 0x26,
-    RED_COMMAND_SE_PAUSE_ON_FMT_OFFSET = 0x38,
-    RED_COMMAND_SE_PAUSE_OFF_FMT_OFFSET = 0x53,
-    RED_COMMAND_MUSIC_TRACK_CREATE_ERROR_FMT_OFFSET = 0x6E,
-    RED_COMMAND_MUSIC_NEED_MEMORY_FMT_OFFSET = 0x9A,
-};
+static const char sRedCommandWaveNotEntryFmt[] = "%s%sWave is not Entry. (wave%4.4u)%s\n";
+static const char sRedCommandLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
+static const char sRedCommandSePauseOnFmt[] = "%sPause : SE     : ON  %d\n";
+static const char sRedCommandSePauseOffFmt[] = "%sPause : SE     : OFF %d\n";
+static const char sRedCommandMusicTrackCreateErrorFmt[] = "%s%sMusic Start : Couldn't Create Track.%s\n";
+static const char sRedCommandMusicNeedMemoryFmt[] = "%s%s            : music%3.3u.bgm : need 0x%6.6X%s\n";
+static const char sRedCommandMusicPauseOnFmt[] = "%sPause : Music  : ON  %d\n";
+static const char sRedCommandMusicPauseOffFmt[] = "%sPause : Music  : OFF %d\n";
 
 int* SetReverb(int, int, int*);
 
@@ -349,7 +333,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 		c_RedEntry.WaveHistoryManager(1, *(short*)(waveBase + 2));
 	} else {
 		if (m_ReportPrint != 0) {
-			OSReport(s_redCommandLogBlob, s_redCommandLogBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogWarnColor,
+			OSReport(sRedCommandWaveNotEntryFmt, sRedCommandLogPrefix, sRedCommandLogWarnColor,
 			         deltaTime, sRedCommandLogReset);
 			fflush(__files + 1);
 		}
@@ -660,17 +644,14 @@ void SetSePitch(int seId, int pitch, int frameCount)
 void SePause(int seId, int pause)
 {
 	unsigned int* trackBasePtr;
-	const char* logBlob = s_redCommandLogBlob;
 	unsigned int track;
 	unsigned int voice;
 
 	if (m_ReportPrint != 0) {
 		if (pause == 1) {
-			OSReport(logBlob + RED_COMMAND_SE_PAUSE_ON_FMT_OFFSET,
-			         logBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
+			OSReport(sRedCommandSePauseOnFmt, sRedCommandLogPrefix, seId);
 		} else {
-			OSReport(logBlob + RED_COMMAND_SE_PAUSE_OFF_FMT_OFFSET,
-			         logBlob + RED_COMMAND_LOG_PREFIX_OFFSET, seId);
+			OSReport(sRedCommandSePauseOffFmt, sRedCommandLogPrefix, seId);
 		}
 		fflush(__files + 1);
 	}
@@ -709,7 +690,6 @@ void SePause(int seId, int pause)
  */
 void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume, int mode)
 {
-	const char* logBlob = s_redCommandLogBlob;
 	int waveBase = c_RedEntry.SearchWaveBase((int)*(short*)((char*)musicHead + 6));
 	if (waveBase == 0) {
 		return;
@@ -739,11 +719,11 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	int trackBase = RedNew(*(char*)((char*)musicHead + 8) * 0x154);
 	if (trackBase == 0) {
 		if (m_ReportPrint != 0) {
-			OSReport(logBlob + RED_COMMAND_MUSIC_TRACK_CREATE_ERROR_FMT_OFFSET,
-			         logBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogErrorColor, sRedCommandLogReset);
+			OSReport(sRedCommandMusicTrackCreateErrorFmt,
+			         sRedCommandLogPrefix, sRedCommandLogErrorColor, sRedCommandLogReset);
 			fflush(__files + 1);
-			OSReport(logBlob + RED_COMMAND_MUSIC_NEED_MEMORY_FMT_OFFSET,
-			         logBlob + RED_COMMAND_LOG_PREFIX_OFFSET, sRedCommandLogErrorColor,
+			OSReport(sRedCommandMusicNeedMemoryFmt,
+			         sRedCommandLogPrefix, sRedCommandLogErrorColor,
 			         (int)*(short*)((char*)musicHead + 4), *(char*)((char*)musicHead + 8) * 0x154, sRedCommandLogReset);
 			fflush(__files + 1);
 		}

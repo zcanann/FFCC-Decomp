@@ -2568,10 +2568,10 @@ void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char value;
+    int* trackData = (int*)track;
+    int value;
     short step;
     unsigned char* command;
-    int* trackData = (int*)track;
 
     command = (unsigned char*)trackData[0];
     trackData[0] = (int)(command + 1);

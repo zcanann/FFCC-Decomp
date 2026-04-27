@@ -56,26 +56,19 @@ int RedNew(int param_1)
 	int address;
 	int entryCount;
 	int moveCount;
-	int* blockList;
-	int* blockEnd;
 	int* slot;
-	int result;
-
-	result = 0;
 
 	if (param_1 >= 1) {
-		blockList = m_MemoryBank;
-		if (blockList != 0) {
+		if (m_MemoryBank != 0) {
 			address = m_DataBuffer;
 			if (address != 0) {
 				interrupts = OSDisableInterrupts();
 				alignedSize = (param_1 + 0x1F) & 0xFFFFFFE0;
-				blockEnd = blockList + 0x800;
-				slot = blockList;
+				slot = m_MemoryBank;
 
 				do {
 					if ((slot[1] == 0) || ((address + alignedSize) <= *slot)) {
-						if (blockList[0x7FF] > 0) {
+						if (m_MemoryBank[0x7FF] > 0) {
 							if (m_ReportPrint != 0) {
 								OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA,
 								         sRedMemoryLogSuffixB);
@@ -87,7 +80,7 @@ int RedNew(int param_1)
 						if ((unsigned int)(address + alignedSize) <=
 						    (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
 							if (slot[1] > 0) {
-								moveCount = (int)(blockList + 0x800) - (int)(slot + 2);
+								moveCount = (int)(m_MemoryBank + 0x800) - (int)(slot + 2);
 								entryCount = moveCount / 8;
 								if (entryCount > 0) {
 									memmove(slot + 2, slot, entryCount * 8);
@@ -105,13 +98,13 @@ int RedNew(int param_1)
 
 					address = *slot + slot[1];
 					slot += 2;
-				} while (slot < blockEnd);
+				} while (slot < m_MemoryBank + 0x800);
 
 				OSRestoreInterrupts(interrupts);
 			}
 		}
 	}
-	return result;
+	return 0;
 }
 /*
  * --INFO--

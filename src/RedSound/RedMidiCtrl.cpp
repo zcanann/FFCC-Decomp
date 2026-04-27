@@ -1361,15 +1361,14 @@ void __MidiCtrl_TenutoOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int* voice;
-    int* trackData = (int*)track;
 
-    trackData[0x35] = -1;
-    trackData[0x36] = -1;
-    memset(trackData + 0x35, 0xffffffff, 0xc);
+    ((int*)track)[0x35] = -1;
+    ((int*)track)[0x36] = -1;
+    memset((int*)track + 0x35, 0xffffffff, 0xc);
 
     voice = (int*)p_VoiceData;
     do {
-        if (((unsigned int)voice[0] == (unsigned int)trackData) && ((unsigned int)voice[1] != 0)) {
+        if (((unsigned int)voice[0] == (unsigned int)track) && ((unsigned int)voice[1] != 0)) {
             memcpy(voice + 0x14, (void*)(voice[1] + 0x50), 0xc);
             voice[0x24] |= 0x3c0;
         }

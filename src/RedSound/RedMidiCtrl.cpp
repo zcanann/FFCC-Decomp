@@ -1159,10 +1159,9 @@ void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command = (unsigned char*)*(int*)track;
+    int value = ((int)(char)*(*(unsigned char**)track)++) << 0xc;
 
-    *(int*)track = (int)(command + 1);
-    ((int*)track)[0xd] = ((int)(char)*command) << 0xc;
+    ((int*)track)[0xd] = value;
     ((int*)track)[0xe] = 0;
     ((int*)track)[0xf] = 0;
     m_ChangeStatus |= 2;

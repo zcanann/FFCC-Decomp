@@ -926,14 +926,8 @@ void __MidiCtrl_KeyOnSame(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDAT
  */
 void __MidiCtrl_KeyOnNoteVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* trackData = reinterpret_cast<int*>(track);
-    unsigned char* command = reinterpret_cast<unsigned char*>(trackData[0]);
-
-    trackData[0] = reinterpret_cast<int>(command + 1);
-    *reinterpret_cast<unsigned char*>(trackData + 9) = *command;
-    command = reinterpret_cast<unsigned char*>(trackData[0]);
-    trackData[0] = reinterpret_cast<int>(command + 1);
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(trackData) + 0x25) = *command;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(track) + 0x24) = *(*reinterpret_cast<unsigned char**>(track))++;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(track) + 0x25) = *(*reinterpret_cast<unsigned char**>(track))++;
 
     KeyOnReserve(keyOnData, track);
 }
@@ -949,11 +943,7 @@ void __MidiCtrl_KeyOnNoteVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, Red
  */
 void __MidiCtrl_KeyOnNote(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* trackData = reinterpret_cast<int*>(track);
-    unsigned char* command = reinterpret_cast<unsigned char*>(trackData[0]);
-
-    trackData[0] = reinterpret_cast<int>(command + 1);
-    *reinterpret_cast<unsigned char*>(trackData + 9) = *command;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(track) + 0x24) = *(*reinterpret_cast<unsigned char**>(track))++;
 
     KeyOnReserve(keyOnData, track);
 }
@@ -969,11 +959,7 @@ void __MidiCtrl_KeyOnNote(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDAT
  */
 void __MidiCtrl_KeyOnVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* trackData = reinterpret_cast<int*>(track);
-    unsigned char* command = reinterpret_cast<unsigned char*>(trackData[0]);
-
-    trackData[0] = reinterpret_cast<int>(command + 1);
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(trackData) + 0x25) = *command;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(track) + 0x25) = *(*reinterpret_cast<unsigned char**>(track))++;
 
     KeyOnReserve(keyOnData, track);
 }
@@ -1003,12 +989,8 @@ void __MidiCtrl_KeyOffSame(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, Re
  */
 void __MidiCtrl_KeyOffNoteVelocity(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* trackData = reinterpret_cast<int*>(track);
-    unsigned char* command = reinterpret_cast<unsigned char*>(trackData[0]);
-
-    trackData[0] = reinterpret_cast<int>(command + 1);
-    *reinterpret_cast<unsigned char*>(trackData + 9) = *command;
-    trackData[0] += 1;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(track) + 0x24) = *(*reinterpret_cast<unsigned char**>(track))++;
+    *reinterpret_cast<int*>(track) += 1;
 
     KeyOffSet(control, keyOnData, track);
 }
@@ -1024,11 +1006,7 @@ void __MidiCtrl_KeyOffNoteVelocity(RedSoundCONTROL* control, RedKeyOnDATA* keyOn
  */
 void __MidiCtrl_KeyOffNote(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* trackData = reinterpret_cast<int*>(track);
-    unsigned char* command = reinterpret_cast<unsigned char*>(trackData[0]);
-
-    trackData[0] = reinterpret_cast<int>(command + 1);
-    *reinterpret_cast<unsigned char*>(trackData + 9) = *command;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(track) + 0x24) = *(*reinterpret_cast<unsigned char**>(track))++;
 
     KeyOffSet(control, keyOnData, track);
 }

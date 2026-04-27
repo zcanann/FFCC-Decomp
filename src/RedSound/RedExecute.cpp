@@ -893,55 +893,28 @@ void _PitchExecute(RedVoiceDATA* param_1)
  */
 RedWaveDATA* _WaveSplitSelect(RedWaveDATA* param_1, RedNoteDATA* param_2)
 {
-    u32* waveData = (u32*)param_1;
-    char* noteData = (char*)param_2;
-    u32 flags;
-
-    if (waveData == nullptr) {
-        return (RedWaveDATA*)waveData;
-    }
-
-    flags = *waveData;
-    if ((flags & 0x30000) == 0) {
-        return (RedWaveDATA*)waveData;
-    }
-
-    while (true) {
-        if ((flags & 0x200) != 0) {
-            break;
+    if ((param_1 != 0) && ((((u32*)param_1)[0] & 0x30000) != 0)) {
+        for (; (((((u32*)param_1)[0] & 0x200) == 0) && (*(char*)((u32*)param_1 + 6) < *(char*)param_2));
+             param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18)) {
+            if ((((u32*)param_1)[0] & 1) != 0) {
+                param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18);
+            }
         }
-        if (*(char*)(waveData + 6) >= *noteData) {
-            break;
-        }
-        if ((flags & 1) != 0) {
-            waveData += 0x18;
-        }
-        waveData += 0x18;
-        flags = *waveData;
-    }
 
-    {
-        char* splitKeyPtr = (char*)(waveData + 6);
-
-        while (true) {
-            if ((flags & 0x200) != 0) {
-                return (RedWaveDATA*)waveData;
+        char* splitKey = (char*)((u32*)param_1 + 6);
+        for (; (((((u32*)param_1)[0] & 0x200) == 0) &&
+                 ((int)(u32)*(u8*)((int)param_1 + 0x19) < (int)((char*)param_2)[1]));
+             param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18)) {
+            if (*splitKey != *(char*)((u32*)param_1 + 6)) {
+                return param_1;
             }
-            if ((u8)*((char*)waveData + 0x19) >= (u8)noteData[1]) {
-                return (RedWaveDATA*)waveData;
+            if ((((u32*)param_1)[0] & 1) != 0) {
+                param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18);
             }
-            if (*splitKeyPtr != *(char*)(waveData + 6)) {
-                return (RedWaveDATA*)waveData;
-            }
-            if ((flags & 1) != 0) {
-                waveData += 0x18;
-            }
-            waveData += 0x18;
-            flags = *waveData;
         }
     }
 
-    return (RedWaveDATA*)waveData;
+    return param_1;
 }
 
 /*

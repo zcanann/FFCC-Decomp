@@ -693,26 +693,25 @@ void __MidiCtrl_LoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command;
-    int* trackData = (int*)track;
-    unsigned int loopCount;
+    u8* command;
+    u16 loopCount;
     int loopIndexOffset;
 
-    command = (unsigned char*)trackData[0];
-    trackData[0] = (int)(command + 1);
+    command = *(u8**)track;
+    *(u8**)track = command + 1;
     loopCount = command[0];
     if (loopCount == 0) {
         loopCount = 0x100;
     }
 
-    loopIndexOffset = *(short*)(trackData + 0x4f) * 2 + 0x128;
-    *(short*)((char*)trackData + loopIndexOffset) = *(short*)((char*)trackData + loopIndexOffset) + 1;
-    if (*(unsigned short*)((char*)trackData + *(short*)(trackData + 0x4f) * 2 + 0x128) == loopCount) {
-        *(short*)(trackData + 0x4f) = *(short*)(trackData + 0x4f) - 1;
-        *(unsigned short*)(trackData + 0x4f) &= 3;
+    loopIndexOffset = *(short*)((char*)track + 0x13c) * 2 + 0x128;
+    *(short*)((char*)track + loopIndexOffset) = *(short*)((char*)track + loopIndexOffset) + 1;
+    if (loopCount != *(u16*)((char*)track + *(short*)((char*)track + 0x13c) * 2 + 0x128)) {
+        *(u8**)track = *(u8**)((char*)track + *(short*)((char*)track + 0x13c) * 4 + 8);
+        *(short*)((char*)track + 0x144) = *(short*)((char*)track + *(short*)((char*)track + 0x13c) * 2 + 0x130);
     } else {
-        trackData[0] = trackData[*(short*)(trackData + 0x4f) + 2];
-        *(short*)(trackData + 0x51) = *(short*)((char*)trackData + *(short*)(trackData + 0x4f) * 2 + 0x130);
+        *(short*)((char*)track + 0x13c) = *(short*)((char*)track + 0x13c) - 1;
+        *(u16*)((char*)track + 0x13c) &= 3;
     }
 }
 

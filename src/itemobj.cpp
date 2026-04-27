@@ -1213,36 +1213,39 @@ void CGItemObj::loadModel()
 	int modelVariant = 0;
 	int modelFlag = 0;
 	unsigned long animFlags = (unsigned long)-1;
+	char* standAnim = const_cast<char*>(s_stand_801dd018);
 	int useParticleTable = 1;
-	int worldParamA = *(int*)(self + 0x500);
-	int worldParamB = *(int*)(self + 0x504);
 
-	if (worldParamA < 0x18) {
-		if (worldParamA == 0xD) {
+	if (*(int*)(self + 0x500) < 0x18) {
+		if (*(int*)(self + 0x500) == 0xD) {
 			modelNo = 0x33;
 			useParticleTable = 0;
-		} else if (worldParamA < 0xD) {
-			if (worldParamA != 0xB) {
-				if (worldParamA > 9) {
-					modelNo = 8;
-					useParticleTable = 0;
+		} else if (*(int*)(self + 0x500) < 0xD) {
+			if (*(int*)(self + 0x500) != 0xB) {
+				if (*(int*)(self + 0x500) < 0xB) {
+					if (*(int*)(self + 0x500) >= 0xA) {
+						modelNo = 8;
+						useParticleTable = 0;
+					}
 				}
 			} else {
 				modelNo = 0x27;
 				useParticleTable = 0;
 			}
-		} else if (worldParamA < 0x12 && worldParamA < 0xF) {
+		} else if (*(int*)(self + 0x500) < 0x12 && *(int*)(self + 0x500) < 0xF) {
 			modelNo = 0x33;
 			modelVariant = 1;
 			useParticleTable = 0;
 		}
-	} else if (!(worldParamA != 0x24 && (worldParamA > 0x23 || worldParamA > 0x21 || worldParamA < 0x1F))) {
-		unsigned short itemEntry = *(unsigned short*)(Game.unkCFlatData0[2] + worldParamB * 0x48 + 2);
+	} else if (!(*(int*)(self + 0x500) != 0x24 &&
+	             (*(int*)(self + 0x500) > 0x23 || *(int*)(self + 0x500) > 0x21 || *(int*)(self + 0x500) < 0x1F))) {
+		int itemEntryBase = Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48;
+		int itemEntry = *(unsigned short*)(itemEntryBase + 2);
 
 		self[0x53] = 1;
 		modelNo = itemEntry & 0xFFF;
 		modelVariant = itemEntry >> 0xC;
-		self[0x50] = (self[0x50] & 0xF7) | 8;
+		self[0x50] = static_cast<unsigned char>(__rlwimi(self[0x50], 1, 3, 28, 28));
 		*(int*)(self + 0x94) = 0x1194;
 		animFlags = 0x12;
 		modelFlag = 1;
@@ -1250,38 +1253,39 @@ void CGItemObj::loadModel()
 
 	if (modelNo >= 0) {
 		LoadModel__8CGObjectFiUlUli(this, 3, modelNo, modelVariant, modelFlag);
-		LoadAnim__8CGObjectFPciiiUl(this, const_cast<char*>(s_stand_801dd018), 0, 0, 3, animFlags);
+		LoadAnim__8CGObjectFPciiiUl(this, standAnim, 0, 0, 3, animFlags);
 		SetAnimSlot__8CGObjectFii(this, 0, 0);
 		PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
 	}
 
-	if (worldParamA == 0x12) {
+	if (*(int*)(self + 0x500) == 0x12) {
 		DispCharaParts__8CGObjectFi(this, 0);
-		self[0x50] = (self[0x50] & 0xEF) | 0x10;
+		self[0x50] = static_cast<unsigned char>(__rlwimi(self[0x50], 1, 4, 27, 27));
 	}
 
 	if (useParticleTable != 0) {
 		for (int i = 0; i < 3; i++) {
-			if (i != 0 || *(short*)(self + 0x550) != 1) {
-				int entryBase = Game.unkCFlatData0[2] + worldParamB * 0x48;
+			if (i != 0 || *(unsigned short*)(self + 0x550) != 1) {
+				int entryBase = Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48;
 				unsigned short particleNo = *(unsigned short*)(entryBase + i * 2 + 0x14);
 
 				if (particleNo != 0xFFFF) {
 					float particleScale =
 					    FLOAT_80331b50 * (float)(unsigned short)*(unsigned short*)(entryBase + 0x10) + FLOAT_80331b4c;
 					putParticle__8CGPrgObjFiiP8CGObjectfi(
-					    this, particleNo | 0x100, *(int*)(self + 0x554), this, particleScale, 0);
+					    this, particleNo | 0x100, *(int*)(self + 0x55C), this, particleScale, 0);
 				}
 			}
 		}
 	}
 
-	if (worldParamA == 0xCB) {
+	if (*(int*)(self + 0x500) == 0xCB) {
 		*(float*)(self + 0x1D4) = FLOAT_80331b54 - RandF__5CMathFf(FLOAT_80331b58, &Math);
-		*(unsigned char*)(self + 0x9A) &= 0xFB;
+		*(unsigned char*)(self + 0x9A) =
+		    static_cast<unsigned char>(__rlwimi(*(unsigned char*)(self + 0x9A), 0, 2, 29, 29));
 	}
 
-	self[0x54C] = (self[0x54C] & 0x7F) | 0x80;
+	self[0x54C] = static_cast<unsigned char>(__rlwimi(self[0x54C], 1, 7, 24, 24));
 }
 
 /*

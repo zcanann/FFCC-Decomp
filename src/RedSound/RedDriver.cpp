@@ -877,16 +877,14 @@ int _WaveSettingThread(void* param_1)
  */
 void _DMACheckProcess()
 {
-    int semCount;
     int* dmaInfo;
 
     if (m_ReportPrint != 0) {
         OSReport(s_redDriverDmaCheckHeaderFmt, sRedDriverLogPrefix);
         fflush(__files + 1);
 
-        semCount = OSGetSemaphoreCount(&m_DmaExecuteSemaphore);
         OSReport(sRedDriverDmaStatusFmt, sRedDriverLogPrefix, m_DMAStatus,
-                 semCount, m_DMAExecute, m_DMAInThread);
+                 OSGetSemaphoreCount(&m_DmaExecuteSemaphore), m_DMAExecute, m_DMAInThread);
         fflush(__files + 1);
     }
 

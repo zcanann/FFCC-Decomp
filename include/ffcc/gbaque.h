@@ -99,7 +99,7 @@ public:
     void SmithEnd(int);
     void MakeBuyData(int, char*);
     void MakeSellData(int, char*);
-    void MakeSmithData(int, char*);
+    int MakeSmithData(int, char*);
     unsigned int GetSellFlg(int);
     void ClrSellFlg(int);
     unsigned int GetBuyFlg(int);

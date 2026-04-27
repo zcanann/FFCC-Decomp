@@ -812,22 +812,24 @@ void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
     unsigned int stepCount[2];
     u8* command;
     int value;
-    s8 targetDepth;
+    int targetDepth;
 
     command = *(u8**)track;
-    if ((s8)*command == '\0') {
+    if (*command == '\0') {
         stepCount[0] = 0x100;
     } else {
         stepCount[0] = *command;
     }
 
     *(u8**)track = command + 1;
-    targetDepth = *command;
+    targetDepth = (s8)*command;
     if (targetDepth != 0) {
-        targetDepth = -1;
+        targetDepth += 1;
+        targetDepth <<= 8;
+        targetDepth -= 1;
     }
 
-    value = DataAddCompute((int*)track + 0x1a, (int)targetDepth, (int*)stepCount);
+    value = DataAddCompute((int*)track + 0x1a, (s8)targetDepth, (int*)stepCount);
     ((int*)track)[0x1b] = value;
     ((int*)track)[0x1c] = stepCount[0];
     *(u8**)track += 2;

@@ -325,18 +325,10 @@ int CBound::CheckFrustum0(CBound& outBound)
             }
             yIndex = 0;
             do {
-                if (yIndex == 0) {
-                    vertex.y = inBound[1];
-                } else {
-                    vertex.y = inBound[4];
-                }
+                vertex.y = (yIndex == 0) ? inBound[1] : inBound[4];
                 zIndex = 0;
                 do {
-                    if (zIndex == 0) {
-                        vertex.z = inBound[2];
-                    } else {
-                        vertex.z = inBound[5];
-                    }
+                    vertex.z = (zIndex == 0) ? inBound[2] : inBound[5];
                     PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
                     clipBound[0] = clipBound[0] < transformed.x ? clipBound[0] : transformed.x;
@@ -366,18 +358,10 @@ int CBound::CheckFrustum0(CBound& outBound)
         }
         yIndex = 0;
         do {
-            if (yIndex == 0) {
-                vertex.y = inBound[1];
-            } else {
-                vertex.y = inBound[4];
-            }
+            vertex.y = (yIndex == 0) ? inBound[1] : inBound[4];
             zIndex = 0;
             do {
-                if (zIndex == 0) {
-                    vertex.z = inBound[2];
-                } else {
-                    vertex.z = inBound[5];
-                }
+                vertex.z = (zIndex == 0) ? inBound[2] : inBound[5];
                 PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
                 clipBound[0] = clipBound[0] < transformed.x ? clipBound[0] : transformed.x;
@@ -473,18 +457,10 @@ int CBound::CheckFrustum0(float farPlane)
         }
         yIndex = 0;
         do {
-            if (yIndex == 0) {
-                vertex.y = inBound[1];
-            } else {
-                vertex.y = inBound[4];
-            }
+            vertex.y = (yIndex == 0) ? inBound[1] : inBound[4];
             zIndex = 0;
             do {
-                if (zIndex == 0) {
-                    vertex.z = inBound[2];
-                } else {
-                    vertex.z = inBound[5];
-                }
+                vertex.z = (zIndex == 0) ? inBound[2] : inBound[5];
                 PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
                 if (farthestZ < transformed.z) {
                     farthestZ = transformed.z;

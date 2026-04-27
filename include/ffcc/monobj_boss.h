@@ -39,7 +39,7 @@ public:
     void attackedFuncSaw();
 
     void frameStatFuncLKShooter();
-    void attackCheckFuncLKShooter(int);
+    int attackCheckFuncLKShooter(int);
 
     void changeStatFuncDragonZombie(int);
     void cancelStatFuncDragonZombie();
@@ -76,14 +76,14 @@ public:
     void frameStatFuncMeteoParasiteC();
     int calcBranchFuncMeteoParasiteC(int);
     void logicFuncMeteoParasiteC();
-    void attackCheckFuncMeteoParasiteC(int);
+    int attackCheckFuncMeteoParasiteC(int);
 
     void initFinishedFuncMeteoParasite();
     void changeStatFuncMeteoParasite(int);
     void alwaysFuncMeteoParasite();
     void frameStatFuncMeteoParasite();
     void logicFuncMeteoParasite();
-    void attackCheckFuncMeteoParasite(int);
+    int attackCheckFuncMeteoParasite(int);
 
     void aiAddDuct(int&);
     void initFinishedFuncDuct();

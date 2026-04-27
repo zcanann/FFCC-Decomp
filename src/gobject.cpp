@@ -336,7 +336,7 @@ void CGObject::onCreate()
 
     unk_0x184 = 0.0f;
     unk_0x188 = 0.0f;
-    m_moveVec.x = NAN;
+    m_moveVec.x = -NAN;
     m_turnSpeed = 0.0f;
     m_pushParamA = 0;
     m_pushParamB = 0;
@@ -395,6 +395,7 @@ void CGObject::onCreate()
     m_groundSlide = 0.0f;
     m_worldParam = 0.0f;
     m_worldParamA = 0;
+    m_field_0x56 = 0x7D;
     *reinterpret_cast<float*>(m_worldMode) = 0.0f;
 
     m_lookAtTargetNodeIndex = -1;

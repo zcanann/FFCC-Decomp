@@ -16,7 +16,7 @@ struct MonAiFuncTable {
     MonCalcFunc calcBranch;
     MonVoidFunc damaged;
     MonVoidFunc attacked;
-    MonStateFunc attackCheck;
+    MonCalcFunc attackCheck;
     MonVoidFunc always;
 };
 

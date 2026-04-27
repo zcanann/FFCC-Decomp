@@ -1096,24 +1096,34 @@ void CGMonObj::frameStatFuncLKShooter()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::attackCheckFuncLKShooter(int)
+int CGMonObj::attackCheckFuncLKShooter(int)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int result = -1;
-	if (*reinterpret_cast<int*>(SoundBuffer + 1268) == 0) {
-		Vec left = {FLOAT_80331d90, FLOAT_80331cf8, FLOAT_80331d94};
-		Vec right = {FLOAT_80331d9c, FLOAT_80331cf8, FLOAT_80331d9c};
-		if (PSVECDistance(&left, &object->m_worldPosition) < FLOAT_80331d98 && *reinterpret_cast<int*>(SoundBuffer + 1272) == 0) {
-			*reinterpret_cast<int*>(SoundBuffer + 1272) = 300;
-			*reinterpret_cast<int*>(mon + 0x6B4) = 2;
-			result = 100;
-		} else if (PSVECDistance(&right, &object->m_worldPosition) < FLOAT_80331d98 && *reinterpret_cast<int*>(SoundBuffer + 1276) == 0) {
-			*reinterpret_cast<int*>(mon + 0x6B4) = 1;
-			result = 100;
+	unsigned char* work = reinterpret_cast<unsigned char*>(SoundBuffer_1260_);
+
+	if (*reinterpret_cast<int*>(work + 8) == 0) {
+		if ((work[0x14] & 0x40) == 0 && (*reinterpret_cast<int*>(CFlat + 0x12E8) & 2) == 0) {
+			CVector left(FLOAT_80331d90, FLOAT_80331cf8, FLOAT_80331d94);
+			if (PSVECDistance(reinterpret_cast<Vec*>(&left), &object->m_worldPosition) < FLOAT_80331d98 &&
+			    *reinterpret_cast<int*>(work + 0xC) == 0) {
+				work[0x14] |= 0x40;
+				*reinterpret_cast<int*>(work + 0xC) = 300;
+				*reinterpret_cast<int*>(mon + 0x6D0) = 2;
+				return 100;
+			}
+		}
+		if ((work[0x14] & 0x20) == 0 && (*reinterpret_cast<int*>(CFlat + 0x12E8) & 1) == 0) {
+			CVector right(FLOAT_80331d9c, FLOAT_80331cf8, FLOAT_80331d9c);
+			if (PSVECDistance(reinterpret_cast<Vec*>(&right), &object->m_worldPosition) < FLOAT_80331d98 &&
+			    *reinterpret_cast<int*>(work + 0x10) == 0) {
+				work[0x14] |= 0x20;
+				*reinterpret_cast<int*>(mon + 0x6D0) = 1;
+				return 100;
+			}
 		}
 	}
-	*reinterpret_cast<int*>(mon + 0x6C4) = result;
+	return -1;
 }
 
 /*
@@ -1657,14 +1667,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
  */
 int CGMonObj::calcBranchFuncTetsukyojin(int)
 {
-	const int branch = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6B4);
-	if (branch > 0) {
-		return 1;
-	}
-	if (branch < 0) {
-		return -1;
-	}
-	return 0;
+	const int branch = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0);
+	return (branch >> 31) + (static_cast<unsigned int>(branch) >= 1);
 }
 
 /*
@@ -2234,11 +2238,10 @@ void CGMonObj::logicFuncMeteoParasiteC()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::attackCheckFuncMeteoParasiteC(int)
+int CGMonObj::attackCheckFuncMeteoParasiteC(int)
 {
-	int branch = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6B4);
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) =
-	    (((branch - 1U) | (1U - branch)) >> 31) - 1;
+	const int branch = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0);
+	return (((branch - 1) | (1 - branch)) >> 31) - 1;
 }
 
 /*
@@ -2537,51 +2540,28 @@ void CGMonObj::logicFuncMeteoParasite()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::attackCheckFuncMeteoParasite(int)
+int CGMonObj::attackCheckFuncMeteoParasite(int)
 {
-	#if 0
-	// Function: attackCheckFuncMeteoParasite__8CGMonObjFi
-	// Entry: 8012f984
-	// Size: 156 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	undefined4 attackCheckFuncMeteoParasite__8CGMonObjFi(CGMonObj *gMonObj)
-	
-	{
-	  void *pvVar1;
-	  
-	  pvVar1 = (gMonObj->gObject).m_scriptHandle[4];
-	  if (pvVar1 == (void *)0x86) {
-	    if ((m_boss__8CGMonObj._88_4_ == 1) && (gMonObj->_bossBranchRelated == 1)) {
-	      return 0xffffffff;
-	    }
-	    return 0xfffffffe;
-	  }
-	  if ((int)pvVar1 < 0x86) {
-	    if (0x84 < (int)pvVar1) {
-	      return 0xfffffffe;
-	    }
-	  }
-	  else if ((int)pvVar1 < 0x88) {
-	    if ((m_boss__8CGMonObj._88_4_ == 2) && (gMonObj->_bossBranchRelated < 2)) {
-	      return 0xffffffff;
-	    }
-	    return 0xfffffffe;
-	  }
-	  return 0xffffffff;
-	}
-	
-	#endif
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int result = -1;
-	if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x86)) {
-		result = (*reinterpret_cast<int*>(SoundBuffer + 1348) == 1 && *reinterpret_cast<int*>(mon + 0x6B4) == 1) ? -1 : -2;
-	} else if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x85) || object->m_scriptHandle[4] == reinterpret_cast<void*>(0x87)) {
-		result = (*reinterpret_cast<int*>(SoundBuffer + 1348) == 2 && *reinterpret_cast<int*>(mon + 0x6B4) < 2) ? -1 : -2;
+	int scriptState = reinterpret_cast<int>(object->m_scriptHandle[4]);
+
+	switch (scriptState) {
+	case 0x85:
+		return -2;
+	case 0x86:
+		if (*reinterpret_cast<int*>(SoundBuffer_1260_ + 0x78) == 1 && *reinterpret_cast<int*>(mon + 0x6D0) == 1) {
+			return -1;
+		}
+		return -2;
+	case 0x87:
+		if (*reinterpret_cast<int*>(SoundBuffer_1260_ + 0x78) == 2 && *reinterpret_cast<int*>(mon + 0x6D0) < 2) {
+			return -1;
+		}
+		return -2;
+	default:
+		return -1;
 	}
-	*reinterpret_cast<int*>(mon + 0x6C4) = result;
 }
 
 /*

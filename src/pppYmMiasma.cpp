@@ -219,10 +219,11 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
 {
     VYmMiasma* work;
     YmMiasmaFrameStep* step = (YmMiasmaFrameStep*)param_2;
-    int i;
     PARTICLE_DATA* particle;
+    int i;
     Vec matrixPos;
     Vec delta;
+    float zero;
     union {
         unsigned long long ull;
         double d;
@@ -252,10 +253,11 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
         }
     }
 
+    zero = FLOAT_80330644;
     work->m_emitTimer = work->m_emitTimer + 1;
     work->m_speedDecay = work->m_speedDecay - step->m_speedDecayStep;
-    if (work->m_speedDecay < FLOAT_80330644) {
-        work->m_speedDecay = FLOAT_80330644;
+    if (work->m_speedDecay < zero) {
+        work->m_speedDecay = zero;
     }
 
     if (work->m_emitTimer > step->m_emitInterval) {
@@ -273,7 +275,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
         angleDelta = (s16)(r - (r / (int)step->m_angleRange) * step->m_angleRange);
         signBit = (u32)(int)angleDelta >> 31;
         if (((((int)angleDelta & 1U) ^ signBit) - signBit) == 0) {
-            angleDelta = angleDelta * -1;
+            angleDelta *= -1;
         }
 
         local_28 = 0x43300000;

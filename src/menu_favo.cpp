@@ -7,6 +7,17 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+typedef signed short s16;
+
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
+extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
+extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
+extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
+extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
+extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
+extern CMenuPcs MenuPcs;
+
 unsigned char s_rank[0x20];
 
 extern float FLOAT_80333040;
@@ -410,40 +421,47 @@ void CMenuPcs::FavoInit0()
  */
 bool CMenuPcs::FavoOpen()
 {
-	int finished = 0;
+    int finishedCount;
+    int count;
+    int frame;
+    int remaining;
+    FavoEntry* entry;
 
 	if (singMenuState->initialized == 0) {
 		FavoInit();
 	}
 
-	singMenuState->frame++;
+    finishedCount = 0;
+	singMenuState->frame = singMenuState->frame + 1;
+    count = static_cast<unsigned short>(*favoList);
+    entry = reinterpret_cast<FavoEntry*>(favoList + 4);
+    frame = singMenuState->frame;
+    remaining = count;
+    if (0 < count) {
+        do {
+            float step = FLOAT_80333040;
+            if (entry->startFrame <= frame) {
+                if (frame < entry->startFrame + entry->duration) {
+                    entry->step = entry->step + 1;
+                    entry->alpha = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
+                    if ((entry->flags & 2) == 0) {
+                        step = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
+                        entry->dx = (entry->targetX - (float)entry->x) * step;
+                        entry->dy = (entry->targetY - (float)entry->y) * step;
+                    }
+                } else {
+                    finishedCount = finishedCount + 1;
+                    entry->alpha = FLOAT_80333048;
+                    entry->dx = step;
+                    entry->dy = step;
+                }
+            }
+            entry++;
+            remaining = remaining + -1;
+        } while (remaining != 0);
+    }
 
-	int count = favoList[0];
-	FavoEntry* anim = reinterpret_cast<FavoEntry*>((unsigned char*)favoList + 8);
-	int frame = singMenuState->frame;
-
-	for (int i = 0; i < count; i++, anim++) {
-		float zeroF = FLOAT_80333040;
-		if (anim->startFrame <= frame) {
-			if (!(frame < anim->startFrame + anim->duration)) {
-				finished++;
-				anim->alpha = FLOAT_80333048;
-				anim->dx = zeroF;
-				anim->dy = zeroF;
-			} else {
-				anim->step++;
-				double oneD = DOUBLE_80333050;
-				anim->alpha = (float)((DOUBLE_80333050 / (double)anim->duration) * (double)anim->step);
-				if ((anim->flags & 2) == 0) {
-					float ratio = (float)((oneD / (double)anim->duration) * (double)anim->step);
-					anim->dx = (anim->targetX - (float)anim->x) * ratio;
-					anim->dy = (anim->targetY - (float)anim->y) * ratio;
-				}
-			}
-		}
-	}
-
-	return count == finished;
+	return count == finishedCount;
 }
 
 /*
@@ -518,35 +536,45 @@ unsigned int CMenuPcs::FavoCtrl()
  */
 bool CMenuPcs::FavoClose()
 {
-	int finished = 0;
-	singMenuState->frame++;
+    int finishedCount;
+    int count;
+    int frame;
+    int remaining;
+    FavoEntry* entry;
 
-	int count = favoList[0];
-	FavoEntry* anim = reinterpret_cast<FavoEntry*>((unsigned char*)favoList + 8);
-	int frame = singMenuState->frame;
+    finishedCount = 0;
+	singMenuState->frame = singMenuState->frame + 1;
+    count = static_cast<unsigned short>(*favoList);
+    entry = reinterpret_cast<FavoEntry*>(favoList + 4);
+    frame = singMenuState->frame;
+    remaining = count;
+    if (0 < count) {
+        do {
+            float step = FLOAT_80333040;
+            if (entry->startFrame <= frame) {
+                if (frame < entry->startFrame + entry->duration) {
+                    entry->step = entry->step + 1;
+                    entry->alpha =
+                        (float)-((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step - DOUBLE_80333050);
+                    if ((entry->flags & 2) == 0) {
+                        step =
+                            (float)-((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step - DOUBLE_80333050);
+                        entry->dx = (entry->targetX - (float)entry->x) * step;
+                        entry->dy = (entry->targetY - (float)entry->y) * step;
+                    }
+                } else {
+                    finishedCount = finishedCount + 1;
+                    entry->alpha = FLOAT_80333040;
+                    entry->dx = step;
+                    entry->dy = step;
+                }
+            }
+            entry++;
+            remaining = remaining + -1;
+        } while (remaining != 0);
+    }
 
-	for (int i = 0; i < count; i++, anim++) {
-		float zeroF = FLOAT_80333040;
-		if (anim->startFrame <= frame) {
-			if (!(frame < anim->startFrame + anim->duration)) {
-				finished++;
-				anim->alpha = FLOAT_80333040;
-				anim->dx = zeroF;
-				anim->dy = zeroF;
-			} else {
-				anim->step++;
-				double oneD = DOUBLE_80333050;
-				anim->alpha = (float)-((DOUBLE_80333050 / (double)anim->duration) * (double)anim->step - DOUBLE_80333050);
-				if ((anim->flags & 2) == 0) {
-					float ratio = (float)-((oneD / (double)anim->duration) * (double)anim->step - oneD);
-					anim->dx = (anim->targetX - (float)anim->x) * ratio;
-					anim->dy = (anim->targetY - (float)anim->y) * ratio;
-				}
-			}
-		}
-	}
-
-	return count == finished;
+	return count == finishedCount;
 }
 
 /*
@@ -560,26 +588,26 @@ bool CMenuPcs::FavoClose()
  */
 void CMenuPcs::FavoDraw()
 {
-	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
-	SetAttrFmt((FMT)0);
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
-	FavoEntry* entry = reinterpret_cast<FavoEntry*>((unsigned char*)favoList + 8);
+	short* entry = reinterpret_cast<short*>((int)favoList + 8);
 	int count = *favoList;
 	for (int i = 0; i < count; i++) {
-		int tex = entry->tex;
+		int tex = *reinterpret_cast<int*>(entry + 0xE);
 		if (tex >= 0) {
-			float x = (float)entry->x;
-			float y = (float)entry->y;
-			float w = (float)entry->w;
-			float h = (float)entry->h;
-			float u = entry->u;
-			float v = entry->v;
-			float alpha = entry->alpha;
-			float uvScale = entry->uvScale;
+			float x = static_cast<float>(entry[0]);
+			float y = static_cast<float>(entry[1]);
+			float w = static_cast<float>(entry[2]);
+			float h = static_cast<float>(entry[3]);
+			float u = *reinterpret_cast<float*>(entry + 4);
+			float v = *reinterpret_cast<float*>(entry + 6);
+			float alpha = *reinterpret_cast<float*>(entry + 8);
+			float uvScale = *reinterpret_cast<float*>(entry + 10);
 
 			if (i < 3) {
-				SetAttrFmt((FMT)1);
-				SetTexture((TEX)tex);
+				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 1);
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 
 				GXColor colors[4] = {
 					{0xFF, 0xFF, 0xFF, 0xFF},
@@ -590,157 +618,142 @@ void CMenuPcs::FavoDraw()
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 				float fillW = alpha * w;
-				if (fillW > 0.0f) {
+				if (fillW > FLOAT_80333040) {
 					if (tex == 0x32) {
-						float xStep = y;
+						float yStep = y;
 						float end = y + h;
-						while (xStep < end) {
-							float tile = end - xStep;
-							if (tile > 32.0f) {
-								tile = 32.0f;
+						while (yStep < end) {
+							float tileH = end - yStep;
+							if (tileH > 32.0f) {
+								tileH = 32.0f;
 							}
-							DrawRect((unsigned long)entry->drawFlags, x, xStep, fillW, tile, u, v, colors, uvScale, 1.0f,
-							         0.0f);
-							xStep += 32.0f;
+							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
+							    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, fillW, tileH, u,
+							    v, colors, uvScale, FLOAT_80333048, FLOAT_80333040);
+							yStep += 32.0f;
 						}
 					} else {
-						DrawRect((unsigned long)entry->drawFlags, x, y, fillW, h, u, v, colors, uvScale, 1.0f, 0.0f);
+						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
+						    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, fillW, h, u, v, colors,
+						    uvScale, FLOAT_80333048, FLOAT_80333040);
 					}
+
+					x += fillW * uvScale;
 				}
 
-				if (fillW > 0.0f && fillW < w) {
+				if (fillW > FLOAT_80333040 && fillW < w) {
 					GXColor fadeColors[4] = {
 						{0xFF, 0xFF, 0xFF, 0x00},
 						{0xFF, 0xFF, 0xFF, 0x00},
 						{0xFF, 0xFF, 0xFF, 0x00},
 						{0xFF, 0xFF, 0xFF, 0x00},
 					};
-					float remainW = (48.0f / (float)entry->duration) * w;
+					float remainW = (48.0f / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14))) * w;
 					if (tex == 0x32) {
-						float xStep = y;
+						float yStep = y;
 						float end = y + h;
-						while (xStep < end) {
-							float tile = end - xStep;
-							if (tile > 32.0f) {
-								tile = 32.0f;
+						while (yStep < end) {
+							float tileH = end - yStep;
+							if (tileH > 32.0f) {
+								tileH = 32.0f;
 							}
-							DrawRect((unsigned long)entry->drawFlags, x + fillW, xStep, remainW, tile, u, v, fadeColors,
-							         uvScale, 1.0f, 0.0f);
-							xStep += 32.0f;
+							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
+							    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, remainW, tileH,
+							    u, v, fadeColors, uvScale, FLOAT_80333048, FLOAT_80333040);
+							yStep += 32.0f;
 						}
 					} else {
-						DrawRect((unsigned long)entry->drawFlags, x + fillW, y, remainW, h, u, v, fadeColors, uvScale,
-						         1.0f, 0.0f);
+						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
+						    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, remainW, h, u, v,
+						    fadeColors, uvScale, FLOAT_80333048, FLOAT_80333040);
 					}
 				}
 
-				SetAttrFmt((FMT)0);
+				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 			} else {
-				SetTexture((TEX)tex);
-				GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+				GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha * 255.0f)};
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
+				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80333040);
 			}
 		}
-		entry++;
+
+		entry += 0x20;
 	}
 
-	FavoEntry* rankEntry = reinterpret_cast<FavoEntry*>((unsigned char*)favoList + 8);
-	int scanCount = count;
-	while (scanCount > 0) {
-		if (rankEntry->tex == 0x37) {
+	short* rankEntry = reinterpret_cast<short*>((int)favoList + 8);
+	int remaining = count;
+	while (0 < remaining) {
+		if (*reinterpret_cast<int*>(rankEntry + 0xE) == 0x37) {
 			break;
 		}
-		rankEntry++;
-		scanCount--;
+		rankEntry += 0x20;
+		remaining--;
 	}
 
 	unsigned char* rank = s_rank;
+	short* drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
-		int barX = (int)rankEntry->x + rankEntry->w + 0x18;
-		int barY = (int)((float)(rankEntry->h - 6) * 0.5f + (float)rankEntry->y);
-		DrawSingBar(barX, barY, *(short*)(rank + 2), rankEntry->alpha);
+		int barX = drawEntry[0] + drawEntry[2] + 0x18;
+		int barY = static_cast<int>((static_cast<float>(drawEntry[3]) - 6.0f) * 0.5f + static_cast<float>(drawEntry[1]));
+		DrawSingBar(barX, barY, *reinterpret_cast<short*>(rank + 2), *reinterpret_cast<float*>(drawEntry + 8));
 		rank += 4;
-		rankEntry++;
+		drawEntry += 0x20;
 	}
 
 	rank = s_rank;
-	rankEntry = reinterpret_cast<FavoEntry*>((unsigned char*)favoList + 8);
-	while (count > 0) {
-		if (rankEntry->tex == 0x37) {
-			break;
-		}
-		rankEntry++;
-		count--;
-	}
-
+	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
-		int iconX = (int)rankEntry->x + rankEntry->w - 0x10;
-		int iconY = (int)((float)(rankEntry->h - 32) * 0.5f + (float)rankEntry->y);
-		DrawSingleIcon((int)(rank[1] + 0x14), iconX, iconY, rankEntry->alpha, 1, 1.0f);
+		int iconX = drawEntry[0] + drawEntry[2] - 0x10;
+		int iconY = static_cast<int>((static_cast<float>(drawEntry[3]) - 32.0f) * 0.5f + static_cast<float>(drawEntry[1]));
+		DrawSingleIcon__8CMenuPcsFiiifif(this, static_cast<char>(rank[1]) + 0x14, iconX, iconY, *reinterpret_cast<float*>(drawEntry + 8), 1,
+		                                 FLOAT_80333048);
 		rank += 4;
-		rankEntry++;
+		drawEntry += 0x20;
 	}
 
 	CFont* rankFont = font22;
 	rankFont->SetShadow(1);
-	rankFont->SetScale(1.0f);
+	rankFont->SetScale(FLOAT_80333048);
 	rankFont->DrawInit();
 
 	char textBuf[0x10];
+	memset(textBuf, 0, sizeof(textBuf));
 	rank = s_rank;
-	rankEntry = reinterpret_cast<FavoEntry*>((unsigned char*)favoList + 8);
-	int tmpCount = *favoList;
-	while (tmpCount > 0) {
-		if (rankEntry->tex == 0x37) {
-			break;
-		}
-		rankEntry++;
-		tmpCount--;
-	}
-
+	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		rankFont->SetTlut(6);
-		GXColor textColor = {0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * rankEntry->alpha)};
+		GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * *reinterpret_cast<float*>(drawEntry + 8))};
 		rankFont->SetColor(textColor);
-		rankFont->SetMargin(1.0f);
-		sprintf(textBuf, "%d", (int)rank[0]);
-		rankFont->SetPosX((float)rankEntry->x - 12.0f);
-		rankFont->SetPosY((float)rankEntry->y);
+		rankFont->SetMargin(FLOAT_80333048);
+		sprintf(textBuf, "%d", static_cast<int>(*rank));
+		rankFont->SetPosX(static_cast<float>(drawEntry[0] - 0xC));
+		rankFont->SetPosY(static_cast<float>(drawEntry[1]) - 5.0f);
 		rankFont->Draw(textBuf);
 		rankFont->SetShadow(0);
 		rank += 4;
-		rankEntry++;
+		drawEntry += 0x20;
 	}
 
 	CFont* nameFont = font16;
 	nameFont->SetShadow(0);
 	nameFont->SetScale(0.875f);
-	nameFont->SetMargin(1.0f);
+	nameFont->SetMargin(FLOAT_80333048);
 	nameFont->DrawInit();
 
-	const FavoFlatData* flatData = (const FavoFlatData*)&Game.m_cFlatDataArr[1];
+	const FavoFlatData* flatData = reinterpret_cast<const FavoFlatData*>(&Game.m_cFlatDataArr[1]);
 	rank = s_rank;
-	rankEntry = reinterpret_cast<FavoEntry*>((unsigned char*)favoList + 8);
-	tmpCount = *favoList;
-	while (tmpCount > 0) {
-		if (rankEntry->tex == 0x37) {
-			break;
-		}
-		rankEntry++;
-		tmpCount--;
-	}
-
+	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
-		GXColor textColor = {0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * rankEntry->alpha)};
+		GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * *reinterpret_cast<float*>(drawEntry + 8))};
 		nameFont->SetColor(textColor);
-		const char* name = flatData->table[0].strings[((char)rank[1] + 0x17D) * 5 + 4];
-		nameFont->SetPosX((float)rankEntry->x + 28.0f);
-		nameFont->SetPosY((float)rankEntry->y);
-		nameFont->Draw((char*)name);
+		const char* name = flatData->table[0].strings[(static_cast<char>(rank[1]) + 0x17D) * 5 + 4];
+		nameFont->SetPosX(static_cast<float>(drawEntry[0] + 0x1C));
+		nameFont->SetPosY(static_cast<float>(drawEntry[1]) - 5.0f);
+		nameFont->Draw(const_cast<char*>(name));
 		rank += 4;
-		rankEntry++;
+		drawEntry += 0x20;
 	}
 
-	DrawInit();
+	DrawInit__8CMenuPcsFv(this);
 }

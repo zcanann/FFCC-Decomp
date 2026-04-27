@@ -1333,9 +1333,8 @@ int CRedEntry::SearchMusicSequence(int musicNo)
  */
 int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
 {
+	WaveHistoryManager(0, (int)*(short*)(((int*)bank)[2] + 6));
 	int* bankData = (int*)bank;
-
-	WaveHistoryManager(0, (int)*(short*)(bankData[2] + 6));
 	RedDelete(bankData[2]);
 	int freedSize = bankData[3];
 	bankData[3] = 0;

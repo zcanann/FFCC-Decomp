@@ -967,7 +967,7 @@ int MusicPlay(int musicId, int volume, int mode)
  */
 void SetMusicVolume(int seId, int volume, int duration, int mode)
 {
-	int* music = (int*)p_SoundControlBuffer;
+	int* music;
 
 	if (volume != 0) {
 		volume++;
@@ -984,6 +984,7 @@ void SetMusicVolume(int seId, int volume, int duration, int mode)
 		duration /= 0x3c;
 	}
 
+	music = (int*)p_SoundControlBuffer;
 	do {
 		if ((seId == -1) || (seId == music[0x11c]) || (music[0x11c] < 0)) {
 			if (mode == 1) {

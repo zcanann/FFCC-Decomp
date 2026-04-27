@@ -32,8 +32,8 @@ typedef struct {
 typedef struct {
     s32 m_graphId;
     s32 m_dataValIndex;
-    u16 m_initWOrk;
-    u8 m_pad_0x0a[2];
+    u8 m_initWOrk;
+    u8 m_pad_0x09[3];
     float m_stepValue;
     u8 m_arg3;
     u8 m_pad_0x11[3];

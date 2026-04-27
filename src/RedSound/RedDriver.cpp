@@ -2145,18 +2145,20 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
     m_WaveSettingData.slot = slot;
     m_WaveSettingData.waveID = waveID;
     m_WaveSettingData.waveData = waveData;
-    m_WaveSettingData.waveSize = waveSize;
 
     if (waveSize == -1) {
         RedWaveHEAD* const waveHeader = (RedWaveHEAD*)waveData;
 
         if ((waveHeader->magic[0] == 'W') && (waveHeader->magic[1] == 'D')) {
-            m_WaveSettingData.waveSize =
-                waveHeader->dataSize + (((waveHeader->regionCount * 4) + 0x3fU) & 0xffffffc0) +
-                (waveHeader->sampleCount * 0x60) + 0x20;
+            int dataSize =
+                (((waveHeader->regionCount * 4) + 0x3fU) & 0xffffffc0) + (waveHeader->sampleCount * 0x60);
+            dataSize = waveHeader->dataSize + dataSize;
+            m_WaveSettingData.waveSize = dataSize + 0x20;
         } else {
             m_WaveSettingData.waveSize = 0;
         }
+    } else {
+        m_WaveSettingData.waveSize = waveSize;
     }
     OSSignalSemaphore(&m_WaveSettingSemaphore);
 }

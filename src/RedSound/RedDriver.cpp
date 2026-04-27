@@ -864,21 +864,17 @@ int _MainThread(void*)
  */
 int _WaveSettingThread(void* param_1)
 {
-    int threadResult;
-    RedWaveSettingState* waveSetting;
-
-    waveSetting = (RedWaveSettingState*)param_1;
     m_ThreadExecute = m_ThreadExecute | 4;
     m_WaveSettingStatus = 0;
     while (m_ThreadControl != 0) {
         OSWaitSemaphore(&m_WaveSettingSemaphore);
         if (m_ThreadControl != 0) {
+            RedWaveSettingState* waveSetting = (RedWaveSettingState*)param_1;
             m_WaveSettingStatus = m_WaveSettingStatus + 1;
             c_RedEntry.SetWaveData(waveSetting->waveID, waveSetting->waveData, waveSetting->waveSize);
             *(int*)waveSetting->slot = 0;
             do {
-                threadResult = OSTryWaitSemaphore(&m_WaveSettingSemaphore);
-            } while (0 < threadResult);
+            } while (OSTryWaitSemaphore(&m_WaveSettingSemaphore) > 0);
             m_WaveSettingStatus = 0;
         }
     }

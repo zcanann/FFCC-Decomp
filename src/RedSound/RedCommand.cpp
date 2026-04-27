@@ -870,7 +870,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
  * JP Address: TODO
  * JP Size: TODO
  */
-void MusicStop(int seId)
+int MusicStop(int seId)
 {
 	unsigned int* music = (unsigned int*)p_SoundControlBuffer;
 	unsigned int* musicBase = music;
@@ -926,6 +926,8 @@ void MusicStop(int seId)
 		musicBase[0x241] = -1;
 		musicBase[0x125] = 0;
 	}
+
+	return seId;
 }
 
 /*

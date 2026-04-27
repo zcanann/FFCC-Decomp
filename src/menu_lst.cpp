@@ -224,7 +224,8 @@ int CMenuPcs::MLstClose()
 	entry = this->lstData->entries;
 	currentFrame = (int)this->lstState->frame;
 	if ((int)itemCount > 0) {
-		for (int i = 0; i < (int)itemCount; i++) {
+		unsigned int remaining = itemCount;
+		do {
 			if (entry->startFrame <= currentFrame) {
 				if (entry->startFrame + entry->duration <= currentFrame) {
 					completedItems++;
@@ -239,46 +240,44 @@ int CMenuPcs::MLstClose()
 				}
 			}
 			entry++;
-		}
+			remaining--;
+		} while (remaining != 0);
 	}
 	zero = FLOAT_803333D0;
 	if (this->lstData->count == completedItems) {
 		entry = this->lstData->entries;
 		if ((int)itemCount > 0) {
 			count = itemCount >> 3;
-			if (count != 0) {
-				do {
-					entry[0].startFrame = 0;
-					entry[0].duration = 1;
-					entry[0].alpha = zero;
-					entry[1].startFrame = 0;
-					entry[1].duration = 1;
-					entry[1].alpha = zero;
-					entry[2].startFrame = 0;
-					entry[2].duration = 1;
-					entry[2].alpha = zero;
-					entry[3].startFrame = 0;
-					entry[3].duration = 1;
-					entry[3].alpha = zero;
-					entry[4].startFrame = 0;
-					entry[4].duration = 1;
-					entry[4].alpha = zero;
-					entry[5].startFrame = 0;
-					entry[5].duration = 1;
-					entry[5].alpha = zero;
-					entry[6].startFrame = 0;
-					entry[6].duration = 1;
-					entry[6].alpha = zero;
-					entry[7].startFrame = 0;
-					entry[7].duration = 1;
-					entry[7].alpha = zero;
-					entry += 8;
-					count--;
-				} while (count != 0);
-				itemCount &= 7;
-				if (itemCount == 0) {
-					return 1;
-				}
+			for (; count != 0; count--) {
+				entry[0].startFrame = 0;
+				entry[0].duration = 1;
+				entry[0].alpha = zero;
+				entry[1].startFrame = 0;
+				entry[1].duration = 1;
+				entry[1].alpha = zero;
+				entry[2].startFrame = 0;
+				entry[2].duration = 1;
+				entry[2].alpha = zero;
+				entry[3].startFrame = 0;
+				entry[3].duration = 1;
+				entry[3].alpha = zero;
+				entry[4].startFrame = 0;
+				entry[4].duration = 1;
+				entry[4].alpha = zero;
+				entry[5].startFrame = 0;
+				entry[5].duration = 1;
+				entry[5].alpha = zero;
+				entry[6].startFrame = 0;
+				entry[6].duration = 1;
+				entry[6].alpha = zero;
+				entry[7].startFrame = 0;
+				entry[7].duration = 1;
+				entry[7].alpha = zero;
+				entry += 8;
+			}
+			itemCount &= 7;
+			if (itemCount == 0) {
+				return 1;
 			}
 
 			do {
@@ -504,7 +503,8 @@ int CMenuPcs::MLstOpen()
 	entry = this->lstData->entries;
 	currentFrame = (int)this->lstState->frame;
 	if ((int)itemCount > 0) {
-		for (int i = 0; i < (int)itemCount; i++) {
+		unsigned int remaining = itemCount;
+		do {
 			if (entry->startFrame <= currentFrame) {
 				if (entry->startFrame + entry->duration <= currentFrame) {
 					completedItems++;
@@ -516,7 +516,8 @@ int CMenuPcs::MLstOpen()
 				}
 			}
 			entry++;
-		}
+			remaining--;
+		} while (remaining != 0);
 	}
 
 	one = FLOAT_803333F0;
@@ -524,39 +525,36 @@ int CMenuPcs::MLstOpen()
 		entry = this->lstData->entries;
 		if ((int)itemCount > 0) {
 			count = itemCount >> 3;
-			if (count != 0) {
-				do {
-					entry[0].startFrame = 0;
-					entry[0].duration = 1;
-					entry[0].alpha = one;
-					entry[1].startFrame = 0;
-					entry[1].duration = 1;
-					entry[1].alpha = one;
-					entry[2].startFrame = 0;
-					entry[2].duration = 1;
-					entry[2].alpha = one;
-					entry[3].startFrame = 0;
-					entry[3].duration = 1;
-					entry[3].alpha = one;
-					entry[4].startFrame = 0;
-					entry[4].duration = 1;
-					entry[4].alpha = one;
-					entry[5].startFrame = 0;
-					entry[5].duration = 1;
-					entry[5].alpha = one;
-					entry[6].startFrame = 0;
-					entry[6].duration = 1;
-					entry[6].alpha = one;
-					entry[7].startFrame = 0;
-					entry[7].duration = 1;
-					entry[7].alpha = one;
-					entry += 8;
-					count--;
-				} while (count != 0);
-				itemCount &= 7;
-				if (itemCount == 0) {
-					return 1;
-				}
+			for (; count != 0; count--) {
+				entry[0].startFrame = 0;
+				entry[0].duration = 1;
+				entry[0].alpha = one;
+				entry[1].startFrame = 0;
+				entry[1].duration = 1;
+				entry[1].alpha = one;
+				entry[2].startFrame = 0;
+				entry[2].duration = 1;
+				entry[2].alpha = one;
+				entry[3].startFrame = 0;
+				entry[3].duration = 1;
+				entry[3].alpha = one;
+				entry[4].startFrame = 0;
+				entry[4].duration = 1;
+				entry[4].alpha = one;
+				entry[5].startFrame = 0;
+				entry[5].duration = 1;
+				entry[5].alpha = one;
+				entry[6].startFrame = 0;
+				entry[6].duration = 1;
+				entry[6].alpha = one;
+				entry[7].startFrame = 0;
+				entry[7].duration = 1;
+				entry[7].alpha = one;
+				entry += 8;
+			}
+			itemCount &= 7;
+			if (itemCount == 0) {
+				return 1;
 			}
 
 			do {

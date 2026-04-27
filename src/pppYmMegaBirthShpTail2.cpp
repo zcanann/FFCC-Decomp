@@ -204,6 +204,12 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                 }
             }
         }
+        if (wmats != 0) {
+            wmats = wmats + 1;
+        }
+        if (colors != 0) {
+            colors = colors + 1;
+        }
     }
 }
 

@@ -1072,13 +1072,16 @@ void _DmaExecute()
             ARQSetChunkSize((u32)piVar7[4]);
             ARQPostRequest(&m_DMARequest, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
                            (u32)piVar7[4], _DmaCallback);
+            m_DMAInThread = 4;
             piVar6 = piVar7;
         }
         piVar8 = piVar7 + 7;
+        m_DMAInThread = 5;
         if (piVar4 + 0x380 <= piVar7 + 7) {
             piVar8 = piVar4;
         }
         *ppiVar5 = piVar8;
+        m_DMAInThread = 6;
 
         while (piVar6 != 0) {
             m_DMAInThread = 7;

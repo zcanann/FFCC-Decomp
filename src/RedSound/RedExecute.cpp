@@ -894,22 +894,34 @@ void _PitchExecute(RedVoiceDATA* param_1)
 RedWaveDATA* _WaveSplitSelect(RedWaveDATA* param_1, RedNoteDATA* param_2)
 {
     if ((param_1 != 0) && ((((u32*)param_1)[0] & 0x30000) != 0)) {
-        for (; (((((u32*)param_1)[0] & 0x200) == 0) && (*(char*)((u32*)param_1 + 6) < *(char*)param_2));
-             param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18)) {
+        for (;;) {
+            if ((((u32*)param_1)[0] & 0x200) != 0) {
+                break;
+            }
+            if (*(char*)param_2 <= *(char*)((u32*)param_1 + 6)) {
+                break;
+            }
             if ((((u32*)param_1)[0] & 1) != 0) {
                 param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18);
             }
+            param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18);
         }
 
-        char* splitKey = (char*)((u32*)param_1 + 6);
-        for (; (((((u32*)param_1)[0] & 0x200) == 0) &&
-                 ((int)(u32)*(u8*)((int)param_1 + 0x19) < (int)((char*)param_2)[1]));
-             param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18)) {
-            if (*splitKey != *(char*)((u32*)param_1 + 6)) {
-                return param_1;
+        int splitKey = *(char*)((u32*)param_1 + 6);
+        for (;;) {
+            if ((((u32*)param_1)[0] & 0x200) != 0) {
+                break;
             }
-            if ((((u32*)param_1)[0] & 1) != 0) {
+            if (((char*)param_2)[1] <= *(u8*)((int)param_1 + 0x19)) {
+                break;
+            }
+            if (splitKey == *(char*)((u32*)param_1 + 6)) {
+                if ((((u32*)param_1)[0] & 1) != 0) {
+                    param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18);
+                }
                 param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18);
+            } else {
+                return param_1;
             }
         }
     }

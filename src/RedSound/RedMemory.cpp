@@ -324,7 +324,9 @@ void RedDeleteA(void* param_1)
  */
 void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
-	int bankSize = (0x2000 + 0x1F) & ~0x1F;
+	int bankSize = 0x2000;
+	bankSize += 0x1F;
+	bankSize &= ~0x1F;
 
 	m_MemoryBank = (int*)param1;
 	m_AMemoryBank = (int*)((int)m_MemoryBank + bankSize);

@@ -246,17 +246,17 @@ void calc(
 	*f32_at(particlePayload, 0x4C) = *f32_at(particlePayload, 0x4C) + *f32_at(paramPayload, 0xC4);
 	if (paramPayload[0xEE] == 0)
 	{
-		if ((*f32_at(paramPayload, 0xC0) < kPppRyjMegaBirthZero) &&
-		    (kPppRyjMegaBirthZero < *f32_at(paramPayload, 0xC4)))
+		if ((kPppRyjMegaBirthZero < *f32_at(paramPayload, 0xC0)) &&
+		    (*f32_at(paramPayload, 0xC4) < kPppRyjMegaBirthZero))
 		{
-			if (kPppRyjMegaBirthZero < *f32_at(particlePayload, 0x4C))
+			if (*f32_at(particlePayload, 0x4C) < kPppRyjMegaBirthZero)
 			{
 				*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
 			}
 		}
-		else if ((*f32_at(paramPayload, 0xC0) > kPppRyjMegaBirthZero) &&
-		         (kPppRyjMegaBirthZero > *f32_at(paramPayload, 0xC4)) &&
-		         (*f32_at(particlePayload, 0x4C) < kPppRyjMegaBirthZero))
+		else if ((*f32_at(paramPayload, 0xC0) < kPppRyjMegaBirthZero) &&
+		         (kPppRyjMegaBirthZero < *f32_at(paramPayload, 0xC4)) &&
+		         (kPppRyjMegaBirthZero < *f32_at(particlePayload, 0x4C)))
 		{
 			*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
 		}
@@ -270,18 +270,18 @@ void calc(
 
 	if (*u16_at(paramPayload, 0x26) != 0)
 	{
-		*s16_at(particlePayload, 0x22) = *s16_at(particlePayload, 0x22) - 1;
+		*u16_at(particlePayload, 0x22) = *u16_at(particlePayload, 0x22) - 1;
 	}
 
 	*u8_at(particlePayload, 0x58) = *u8_at(particlePayload, 0x58) + 1;
 	frameCount = *u8_at(particlePayload, 0x59);
-	if ((frameCount != '\0') && ((int)(unsigned int)*u8_at(particlePayload, 0x58) <= (int)frameCount))
+	if ((frameCount != 0) && ((int)(unsigned int)*u8_at(particlePayload, 0x58) <= (int)frameCount))
 	{
 		*f32_at(particlePayload, 0x54) = *f32_at(particlePayload, 0x54) - (float)alpha / (float)(int)frameCount;
 	}
 
 	frameCount = *u8_at(particlePayload, 0x5A);
-	if ((frameCount != '\0') && ((int)*s16_at(particlePayload, 0x22) <= (int)frameCount))
+	if ((frameCount != 0) && ((int)*u16_at(particlePayload, 0x22) <= (int)frameCount))
 	{
 		*f32_at(particlePayload, 0x54) =
 			*f32_at(particlePayload, 0x54) + (float)alpha / (float)(unsigned int)paramPayload[0x29];

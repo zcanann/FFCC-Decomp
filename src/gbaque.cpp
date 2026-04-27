@@ -34,6 +34,7 @@ extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" int GetItemIcon__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void* __copy(char*, char*, unsigned int);
 
 extern CMenuPcs MenuPcs;
 
@@ -92,6 +93,21 @@ struct GbaQueuePlayerDataView
 	unsigned char _padDB;
 };
 STATIC_ASSERT(sizeof(GbaQueuePlayerDataView) == 0xDC);
+
+struct GbaQueueCMakeInfoView
+{
+    unsigned char m_infoType;
+    unsigned char m_resultCode;
+    short m_chunkCount;
+    unsigned short m_crc;
+    unsigned char m_field6;
+    char m_name[0x11];
+    unsigned char m_field18;
+    char m_favoritePrefix[2];
+    unsigned char m_favoriteData[4];
+    unsigned char m_field1F;
+};
+STATIC_ASSERT(sizeof(GbaQueueCMakeInfoView) == 0x20);
 
 static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
 {
@@ -3175,64 +3191,70 @@ void GbaQueue::CMakeBarthday(int, unsigned int)
 void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 {
 	char* obj = reinterpret_cast<char*>(this);
-	unsigned char byte0 = static_cast<unsigned char>(value);
-	unsigned char byte1 = static_cast<unsigned char>(value >> 8);
-	unsigned char byte2 = static_cast<unsigned char>(value >> 16);
-	unsigned char cmdType = static_cast<unsigned char>(value >> 24);
+	unsigned int packet = value;
+	unsigned char* packetBytes = reinterpret_cast<unsigned char*>(&packet);
 	int cmakeOffset = channel * 0x20;
 	OSSemaphore* semaphore = accessSemaphores + channel;
+	GbaQueueCMakeInfoView* cmakeInfo = reinterpret_cast<GbaQueueCMakeInfoView*>(obj + 0x2CB2 + cmakeOffset);
+	GbaQueueCMakeInfoView infoCopy;
+	unsigned short crcSeed[2];
 
-	if ((static_cast<int>(value >> 24) >> 6) == 0) {
+	if ((static_cast<signed char>(packetBytes[0]) >> 6) == 0) {
 		OSWaitSemaphore(semaphore);
-		obj[0x2CB3 + cmakeOffset] = static_cast<char>(cmdType);
-		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + cmakeOffset) = 1;
-		*reinterpret_cast<short*>(obj + 0x2CB6 + cmakeOffset) = static_cast<short>(value >> 8);
+		cmakeInfo->m_resultCode = packetBytes[0];
+		cmakeInfo->m_chunkCount = 1;
+		cmakeInfo->m_crc = static_cast<unsigned short>((packetBytes[1] << 8) | packetBytes[2]);
 		memset(obj + 0x2CCD + cmakeOffset, 0, 4);
-		obj[0x2CCD + cmakeOffset] = static_cast<char>(byte0);
+		cmakeInfo->m_favoriteData[0] = packetBytes[3];
 		OSSignalSemaphore(semaphore);
 		return;
 	}
 
-	unsigned char resultCode = 0;
-	short expectedCrc = 0;
-	unsigned char crcData[4];
-	bool hasData = false;
-
 	OSWaitSemaphore(semaphore);
 	{
-		int writeOffset = static_cast<int>(*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset)) * 3;
-		*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) =
-			static_cast<short>(*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) + 1);
-		obj[0x2CCB + cmakeOffset + writeOffset] = static_cast<char>(byte2);
-		obj[0x2CCC + cmakeOffset + writeOffset] = static_cast<char>(byte1);
-		obj[0x2CCD + cmakeOffset + writeOffset] = static_cast<char>(byte0);
+		unsigned char* favoriteData = reinterpret_cast<unsigned char*>(cmakeInfo) + 0x1B;
+		int writeOffset = static_cast<int>(cmakeInfo->m_chunkCount) * 3;
 
-		if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) > 1) {
-			resultCode = static_cast<unsigned char>(obj[0x2CB3 + cmakeOffset]);
-			expectedCrc = *reinterpret_cast<short*>(obj + 0x2CB6 + cmakeOffset);
-			memcpy(crcData, obj + 0x2CCD + cmakeOffset, sizeof(crcData));
-			hasData = true;
+		cmakeInfo->m_chunkCount = static_cast<short>(cmakeInfo->m_chunkCount + 1);
+		favoriteData[writeOffset - 2] = packetBytes[1];
+		favoriteData[writeOffset - 1] = packetBytes[2];
+		favoriteData[writeOffset] = packetBytes[3];
+
+		if (cmakeInfo->m_chunkCount > 1) {
+			infoCopy.m_infoType = cmakeInfo->m_infoType;
+			infoCopy.m_resultCode = cmakeInfo->m_resultCode;
+			infoCopy.m_chunkCount = cmakeInfo->m_chunkCount;
+			infoCopy.m_crc = cmakeInfo->m_crc;
+			infoCopy.m_field6 = cmakeInfo->m_field6;
+			__copy(infoCopy.m_name, cmakeInfo->m_name, 0x11);
+			infoCopy.m_field18 = cmakeInfo->m_field18;
+			__copy(infoCopy.m_favoritePrefix, cmakeInfo->m_favoritePrefix, 2);
+			__copy(reinterpret_cast<char*>(infoCopy.m_favoriteData),
+			       reinterpret_cast<char*>(cmakeInfo->m_favoriteData), 4);
+			infoCopy.m_field1F = cmakeInfo->m_field1F;
 		}
 	}
 	OSSignalSemaphore(semaphore);
 
-	if (!hasData) {
+	if (cmakeInfo->m_chunkCount < 2) {
 		return;
 	}
 
-	unsigned short crc = 0xFFFF;
-	if (Joybus.Crc16(4, crcData, &crc) == expectedCrc) {
-		Joybus.SendResult(channel, 0, resultCode, 0);
-		OSWaitSemaphore(semaphore);
-		obj[0x2CB3 + cmakeOffset] = 0;
-		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + cmakeOffset) = 0;
-		*reinterpret_cast<unsigned short*>(obj + 0x2CB6 + cmakeOffset) = 0;
-		OSSignalSemaphore(semaphore);
-	} else {
-		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_favorite_crc_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0xBDC);
+	crcSeed[0] = 0xFFFF;
+	if (static_cast<unsigned short>(Joybus.Crc16(4, infoCopy.m_favoriteData, crcSeed)) != infoCopy.m_crc) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+			Printf__7CSystemFPce(
+			    &System, const_cast<char*>(s_cmake_favorite_crc_error),
+			    const_cast<char*>(s_gbaque_cpp_801DB370), 0xBDC);
 		}
-		Joybus.SendResult(channel, 1, resultCode, 0);
+		Joybus.SendResult(channel, 1, infoCopy.m_resultCode, 0);
+	} else {
+		Joybus.SendResult(channel, 0, infoCopy.m_resultCode, 0);
+		OSWaitSemaphore(semaphore);
+		cmakeInfo->m_resultCode = 0;
+		cmakeInfo->m_chunkCount = 0;
+		cmakeInfo->m_crc = 0;
+		OSSignalSemaphore(semaphore);
 	}
 }
 

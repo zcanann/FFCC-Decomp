@@ -165,12 +165,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     int textureIndex;
     int yOffset;
     float yPos;
-    u32 colorRaw;
     u16 i;
     int slice;
     int tevSwapChannel;
     int tevAlphaScale;
-    bool inNearZone;
+    int inNearZone;
     GXTexObj backI4Tex;
     GXTexObj backRgba8Tex;
     GXTexObj backRgba8Tex2;
@@ -244,9 +243,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         Game.unkFloat_0xca10 = maxRadius;
     }
 
-    inNearZone = false;
+    inNearZone = 0;
     if ((FLOAT_80331938 + maxRadius) > PSVECDistance(&cameraPos, &managerPos)) {
-        inNearZone = true;
+        inNearZone = 1;
     }
 
     scissorHeight = (u32)FLOAT_8033192c;
@@ -291,9 +290,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         ((u8*)model->m_colors)[1] = 0xFF;
         ((u8*)model->m_colors)[2] = 0xFF;
         ((u8*)model->m_colors)[3] = 0xFF;
-        colorRaw = *(u32*)model->m_colors;
-        GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)&colorRaw);
-        GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&colorRaw);
+        GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)model->m_colors);
+        GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)model->m_colors);
         GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
         GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
@@ -365,9 +363,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
             ((u8*)model->m_colors)[1] = 0xFF;
             ((u8*)model->m_colors)[2] = 0xFF;
             ((u8*)model->m_colors)[3] = 0xFF;
-            colorRaw = *(u32*)model->m_colors;
-            GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)&colorRaw);
-            GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&colorRaw);
+            GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)model->m_colors);
+            GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)model->m_colors);
             GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
             GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
             GXSetNumTevStages(1);

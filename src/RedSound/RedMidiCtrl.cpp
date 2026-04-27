@@ -2427,15 +2427,12 @@ void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    char value;
+    int value;
     short step;
-    char* command;
 
-    command = *(char**)track;
-    *(char**)track = command + 1;
-    value = *command;
+    value = *(*(s8**)track)++;
     if (value != 0) {
-        step = *(short*)((int*)track + 0x4e) + (short)value;
+        step = *(short*)((int*)track + 0x4e) + value;
     } else {
         step = 0;
     }
@@ -2462,15 +2459,12 @@ void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tra
 {
     int value;
     short step;
-    unsigned char* command;
 
-    command = *(unsigned char**)track;
-    *(unsigned char**)track = command + 1;
-    value = *command;
+    value = *(*(unsigned char**)track)++;
     *(short*)((int*)track + 0x4e) = 0;
 
     if (value != 0) {
-        step = *(short*)((char*)track + 0x13a) + (unsigned short)value;
+        step = *(short*)((char*)track + 0x13a) + value;
     } else {
         step = 0;
     }

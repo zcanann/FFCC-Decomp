@@ -20,6 +20,10 @@ static const char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
 static const char s_usbRootPath[16] = "plot/kmitsuru/";
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 
+unsigned int m_table_desc0__7CUSBPcs[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
+unsigned int m_table_desc1__7CUSBPcs[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
+unsigned int m_table_desc2__7CUSBPcs[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
+
 /*
  * --INFO--
  * Address:	TODO
@@ -27,10 +31,10 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stag
  */
 inline CUSBPcs::CUSBPcs()
 {
-    u32* table = reinterpret_cast<u32*>(m_table__7CUSBPcs);
-    static u32 desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__7CUSBPcsFv)};
-    static u32 desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__7CUSBPcsFv)};
-    static u32 desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(func__7CUSBPcsFv)};
+    unsigned int* table = reinterpret_cast<unsigned int*>(m_table__7CUSBPcs);
+    const unsigned int* desc0 = m_table_desc0__7CUSBPcs;
+    const unsigned int* desc1 = m_table_desc1__7CUSBPcs;
+    const unsigned int* desc2 = m_table_desc2__7CUSBPcs;
 
     table[1] = desc0[0];
     table[2] = desc0[1];

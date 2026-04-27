@@ -2486,17 +2486,17 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     }
 
     switch (mode) {
-    case 2:
-        ((int*)track)[0x3a] = value;
-        ((int*)track)[0x3f] |= 0x10000;
+    case 3:
+        ((int*)track)[0x3b] = value;
+        ((int*)track)[0x3f] |= 0x20000;
         return;
     case 1:
         ((int*)track)[0x39] = value;
         ((int*)track)[0x3f] |= 0x8000;
         return;
-    case 3:
-        ((int*)track)[0x3b] = value;
-        ((int*)track)[0x3f] |= 0x20000;
+    case 2:
+        ((int*)track)[0x3a] = value;
+        ((int*)track)[0x3f] |= 0x10000;
         return;
     case 4:
         ((int*)track)[0x3c] = value;
@@ -2526,14 +2526,14 @@ void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     mode = *(*(u8**)track)++;
 
     switch (mode) {
-    case 2:
-        ((int*)track)[0x3f] &= 0xFFFEFFFF;
+    case 3:
+        ((int*)track)[0x3f] &= 0xFFFDFFFF;
         return;
     case 1:
         ((int*)track)[0x3f] &= 0xFFFF7FFF;
         return;
-    case 3:
-        ((int*)track)[0x3f] &= 0xFFFDFFFF;
+    case 2:
+        ((int*)track)[0x3f] &= 0xFFFEFFFF;
         return;
     case 4:
         ((int*)track)[0x3f] &= 0xFFFBFFFF;

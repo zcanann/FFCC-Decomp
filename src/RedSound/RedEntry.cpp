@@ -1232,12 +1232,12 @@ void CRedEntry::DisplaySePlayInfo()
 				unsigned int seDataNo = (unsigned int)track[0x3D];
 				int songNo = (int)(seDataNo & 0x7FFFFFFF) >> 9;
 				int seqBase = ((int*)&p_SeBlockData)[songNo] + 0x10;
-				seqBase += *(short*)(((int*)&p_SeBlockData)[songNo] + 10) * 4;
-				seqBase += (*(unsigned int*)(seqBase + (seDataNo & 0x1FF) * 4) & 0x7FFFFFFF);
+				int seqInfo = seqBase + *(short*)(((int*)&p_SeBlockData)[songNo] + 10) * 4;
+				seqInfo += (*(unsigned int*)(seqBase + (seDataNo & 0x1FF) * 4) & 0x7FFFFFFF);
 
 				OSReport(s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2, sRedEntryLogPrefix,
 				         trackIndex, songNo, seDataNo & 0x1FF,
-				         ((int)*(unsigned char*)(seqBase + 2) << 8) | *(unsigned char*)(seqBase + 1));
+				         ((int)*(unsigned char*)(seqInfo + 2) << 8) | *(unsigned char*)(seqInfo + 1));
 				fflush(__files + 1);
 			}
 			track += 0x55;

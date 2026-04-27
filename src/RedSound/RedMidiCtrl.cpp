@@ -1186,12 +1186,11 @@ void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     unsigned char* command = (unsigned char*)*(int*)track;
-    int* trackData = (int*)track;
 
-    *trackData = (int)(command + 1);
-    trackData[0xd] = ((int)(char)*command) << 0xc;
-    trackData[0xe] = 0;
-    trackData[0xf] = 0;
+    *(int*)track = (int)(command + 1);
+    ((int*)track)[0xd] = ((int)(char)*command) << 0xc;
+    ((int*)track)[0xe] = 0;
+    ((int*)track)[0xf] = 0;
     m_ChangeStatus |= 2;
 }
 
@@ -2294,7 +2293,7 @@ void __MidiCtrl_FineTuneAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  */
 void __MidiCtrl_FineTuneRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	((s8*)track)[0x148] += *(*(s8**)track)++;
+	((s8*)track)[0x148] = ((s8*)track)[0x148] + *(*(s8**)track)++;
 	m_ChangeStatus |= 1;
 }
 
@@ -2324,7 +2323,7 @@ void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
  */
 void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	*(short*)((char*)track + 0x142) += (short)(*(*(s8**)track)++ << 8);
+	*(short*)((char*)track + 0x142) += *(*(s8**)track)++ << 8;
 	m_ChangeStatus |= 1;
 }
 

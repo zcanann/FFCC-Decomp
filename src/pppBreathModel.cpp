@@ -100,7 +100,7 @@ struct BreathModelParams {
     u16 m_particleCount;
     u16 m_emitCount;
     u16 m_emitInterval;
-    s16 m_particleLifetime;
+    u16 m_particleLifetime;
     u8 m_fadeOutFrames;
     u8 m_fadeInFrames;
     unsigned char _pad24[0x04];
@@ -128,6 +128,7 @@ struct BreathModelParams {
     float m_rotationRandomX;
     float m_rotationRandomY;
     float m_rotationRandomZ;
+    unsigned char _pad8C[0x04];
     float m_angleStart;
     float m_angleStep;
     float m_angleAccel;
@@ -139,6 +140,7 @@ struct BreathModelParams {
     float m_spawnJitterX;
     float m_spawnJitterY;
     float m_spawnJitterZ;
+    unsigned char _padBC[0x04];
     u8 m_rotationFlags;
     u8 m_angleFlags;
     unsigned char _padC2[0x06];
@@ -149,6 +151,7 @@ struct BreathParticleData {
     Mtx m_modelMtx;
     Vec m_position;
     Vec m_direction;
+    u8 _pad48[0x08];
     s16 m_life;
     u8 _pad52[0x02];
     u8 m_fadeOutFrames;
@@ -949,7 +952,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
 
         particle->m_angleRandom = params->m_angleRandomRange * Math.RandF();
         if ((flags & 1) && (flags & 2)) {
-            if (Math.RandF() > 0.5f) {
+            if (Math.RandF() > DOUBLE_80330F98) {
                 particle->m_angleRandom *= FLOAT_80330F80;
             }
         } else if (flags & 2) {
@@ -986,13 +989,13 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
             particle->m_rotationAccelY = params->m_rotationRandomY * Math.RandF();
             particle->m_rotationAccelZ = params->m_rotationRandomZ * Math.RandF();
             if ((flags & 1) && (flags & 2)) {
-                if (Math.RandF() > 0.5f) {
+                if (Math.RandF() > DOUBLE_80330F98) {
                     particle->m_rotationAccelX *= FLOAT_80330F80;
                 }
-                if (Math.RandF() > 0.5f) {
+                if (Math.RandF() > DOUBLE_80330F98) {
                     particle->m_rotationAccelY *= FLOAT_80330F80;
                 }
-                if (Math.RandF() > 0.5f) {
+                if (Math.RandF() > DOUBLE_80330F98) {
                     particle->m_rotationAccelZ *= FLOAT_80330F80;
                 }
             } else if (flags & 2) {
@@ -1007,7 +1010,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
             particle->m_rotationAccelY = value;
             particle->m_rotationAccelZ = value;
             if ((flags & 1) && (flags & 2)) {
-                if (Math.RandF() > 0.5f) {
+                if (Math.RandF() > DOUBLE_80330F98) {
                     particle->m_rotationAccelX *= FLOAT_80330F80;
                     particle->m_rotationAccelY *= FLOAT_80330F80;
                     particle->m_rotationAccelZ *= FLOAT_80330F80;

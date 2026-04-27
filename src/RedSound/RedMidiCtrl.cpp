@@ -1134,7 +1134,7 @@ void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 
     delta[0] = DeltaTimeSumup((unsigned char**)track);
     if (delta[0] == 0) {
-        delta[0] = 1;
+        delta[0]++;
     }
 
     volume = *(*(unsigned char**)track)++;
@@ -1183,7 +1183,7 @@ void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 
     delta[0] = DeltaTimeSumup((unsigned char**)track);
     if (delta[0] == 0) {
-        delta[0] = 1;
+        delta[0]++;
     }
 
     expression = *(*(char**)track)++;

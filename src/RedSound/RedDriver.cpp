@@ -1623,30 +1623,27 @@ void* CRedDriver::SetSeBlockData(int param_1, void* param_2)
  */
 int CRedDriver::SetSeSepData(void* param_1)
 {
-    int iVar1;
-    int iVar2;
-    void* pvVar3;
-    char* pcVar4;
+    char* seSepHeader = (char*)param_1;
+    void* copiedHeader;
+    int headerSize;
+    int result;
 
-    pcVar4 = (char*)param_1;
-    if ((((pcVar4[0] == 'S') && (pcVar4[1] == 'e')) && (pcVar4[2] == 'S')) &&
-        ((pcVar4[3] == 'e' && (pcVar4[4] == 'p')))) {
-        iVar1 = *(int*)(pcVar4 + 0xc) & 0x7fffffff;
-        pvVar3 = (void*)RedNew(iVar1);
-        if (pvVar3 != 0) {
-            memcpy(pvVar3, param_1, iVar1);
-            iVar2 = *(int*)((int)pvVar3 + 8);
-            _EntryExecCommand(_SetSeSepData, (int)pvVar3, 0, 0, 0, 0, 0, 0);
-            return iVar2;
+    result = -1;
+    if ((((seSepHeader[0] == 'S') && (seSepHeader[1] == 'e')) && (seSepHeader[2] == 'S')) &&
+        ((seSepHeader[3] == 'e' && (seSepHeader[4] == 'p')))) {
+        headerSize = *(int*)(seSepHeader + 0xc) & 0x7fffffff;
+        copiedHeader = (void*)RedNew(headerSize);
+        if (copiedHeader != 0) {
+            memcpy(copiedHeader, seSepHeader, headerSize);
+            result = *(int*)((int)copiedHeader + 8);
+            _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
-        return -1;
-    }
-    if (m_ReportPrint != 0) {
+    } else if (m_ReportPrint != 0) {
         OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,
                  sRedDriverLogWarnColor, sRedDriverLogReset);
         fflush(__files + 1);
     }
-    return -1;
+    return result;
 }
 
 /*

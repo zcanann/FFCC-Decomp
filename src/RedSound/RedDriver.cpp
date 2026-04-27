@@ -219,7 +219,7 @@ void _SetReverbDepth(int* param_1)
         reverbDepth |= 0x800;
         seInfo = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
         do {
-            if (*seInfo != 0) {
+            if ((u32)*seInfo != 0) {
                 seInfo[0x1b] = (int)(reverbDepth - (seInfo[0x1a] & 0xfffff000U)) / fadeStep;
                 seInfo[0x1c] = fadeStep;
             }

@@ -49,7 +49,7 @@ struct YmDeformationShpColorInfo {
 };
 
 struct VYmDeformationShp {
-	int m_backBuffer;
+	GXTexObj* m_backBuffer;
 	int m_pad0;
 	int m_pad1;
 	s16 m_angle;
@@ -84,7 +84,7 @@ void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int comp0, in
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int stage, int texCoord, int texMap, int chan);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int stage, int mode);
 void SetVtxFmt_POS_TEX0_TEX1__5CUtilFv(void* util);
-int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic* graphic, int& left, int& top, int& width, int& height, int copy);
+GXTexObj* GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic* graphic, int& left, int& top, int& width, int& height, int copy);
 void DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(int stage, int indStage);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
 }
@@ -497,7 +497,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	offsetY = projectedObj[maxYIndex].y - texScaleY * (projected[maxYIndex].y - (float)top);
 
 	if (left < 0) {
-		if ((left + width) < 641) {
+		if ((left + width) <= 640) {
 			int minIndex = 0;
 			for (i = 1; i < 4; i++) {
 				if (projected[i].x < projected[minIndex].x) {
@@ -514,7 +514,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	}
 
 	if (top < 0) {
-		if ((top + height) < 449) {
+		if ((top + height) <= 448) {
 			int minIndex = 0;
 			for (i = 1; i < 4; i++) {
 				if (projected[i].y < projected[minIndex].y) {
@@ -531,11 +531,11 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	}
 
 	PSMTXConcat(texMtx, layout->m_modelMatrix.value, texMtx);
-	GXLoadTexMtxImm(texMtx, 0x1e, GX_MTX2x4);
-	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_POS, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+	GXLoadTexMtxImm(texMtx, 0x1e, GX_MTX3x4);
+	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
 	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
 	GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
-	GXLoadTexObj((GXTexObj*)work->m_backBuffer, GX_TEXMAP0);
+	GXLoadTexObj(work->m_backBuffer, GX_TEXMAP0);
 
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
 	for (i = 0; i < 4; i++) {

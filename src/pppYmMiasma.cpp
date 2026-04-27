@@ -560,9 +560,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     trigCos = trigSin * (vYmMiasma->m_radius + radiusJitter);
     particleData->m_matrix[0][2] = trigCos;
     particleData->m_matrix[1][2] = trigCos;
-    normalizedPos.x = particleData->m_matrix[1][0];
-    normalizedPos.y = particleData->m_matrix[1][1];
-    normalizedPos.z = particleData->m_matrix[1][2];
+    pppCopyVector(normalizedPos, *(Vec*)particleData->m_matrix[1]);
     pppNormalize__FR3Vec3Vec(particleData->m_matrix[1], &normalizedPos);
     if ((s32)Game.m_currentSceneId != 7) {
         basePos.x = pppMngStPtr->m_matrix.value[0][3];

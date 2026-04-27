@@ -1383,26 +1383,23 @@ int CTextureSet::Find(char* name)
  */
 void CTextureSet::ReleaseTextureIdx(int idx, CAmemCacheSet* amemCacheSet)
 {
-    if (__vc__21CPtrArray_P8CTexture_FUl(Textures(this), idx) == 0) {
-        return;
-    }
+    if (__vc__21CPtrArray_P8CTexture_FUl(Textures(this), idx) != 0) {
+        if (S16At(__vc__21CPtrArray_P8CTexture_FUl(Textures(this), idx), 0x72) != -1) {
+            if (*reinterpret_cast<int*>(Ptr(__vc__21CPtrArray_P8CTexture_FUl(Textures(this), idx), 4)) < 2) {
+                amemCacheSet->DestroyCache(S16At(__vc__21CPtrArray_P8CTexture_FUl(Textures(this), idx), 0x72));
+                PtrAt(__vc__21CPtrArray_P8CTexture_FUl(Textures(this), idx), 0x78) = 0;
+            }
+        }
 
-    if ((S16At(__vc__21CPtrArray_P8CTexture_FUl(Textures(this), idx), 0x72) != -1)
-        && (*reinterpret_cast<int*>(Ptr(__vc__21CPtrArray_P8CTexture_FUl(Textures(this), idx), 4)) <= 1)) {
-        short cacheId = S16At(__vc__21CPtrArray_P8CTexture_FUl(Textures(this), idx), 0x72);
-        amemCacheSet->DestroyCache(cacheId);
-        PtrAt(__vc__21CPtrArray_P8CTexture_FUl(Textures(this), idx), 0x78) = 0;
-    }
+        int* refObj = reinterpret_cast<int*>(__vc__21CPtrArray_P8CTexture_FUl(Textures(this), idx));
+        int refCount = refObj[1];
+        refObj[1] = refCount - 1;
+        if ((refCount - 1 == 0) && (refObj != 0)) {
+            (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
+        }
 
-    CTexture* texture = __vc__21CPtrArray_P8CTexture_FUl(Textures(this), idx);
-    int* refObj = reinterpret_cast<int*>(texture);
-    int refCount = refObj[1] - 1;
-    refObj[1] = refCount;
-    if ((refCount == 0) && (refObj != 0)) {
-        (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
+        SetAt__21CPtrArray_P8CTexture_FUlP8CTexture(Textures(this), idx, 0);
     }
-
-    SetAt__21CPtrArray_P8CTexture_FUlP8CTexture(Textures(this), idx, 0);
 }
 
 /*

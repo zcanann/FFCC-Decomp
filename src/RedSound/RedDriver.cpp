@@ -527,10 +527,7 @@ void _SeSepPlay(int* param_1)
  */
 void _SeSepPlaySequence(int* param_1)
 {
-    int iVar1;
-
-    iVar1 = c_RedEntry.SearchSeSepSequence(param_1[1]);
-    if (iVar1 >= 0) {
+    if (c_RedEntry.SearchSeSepSequence(param_1[1]) >= 0) {
         m_SeSkipStep = param_1[4];
         SeSepPlay(param_1[0], param_1[1], param_1[2], param_1[3]);
     }

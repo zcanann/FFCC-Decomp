@@ -109,29 +109,9 @@ static inline MenuTmpArtiMembers& GetMenuTmpArtiMembers(CMenuPcs* menu)
     return *reinterpret_cast<MenuTmpArtiMembers*>(menu);
 }
 
-static inline short* GetTmpArtiState(CMenuPcs* menu)
-{
-    return GetMenuTmpArtiMembers(menu).m_tmpArtiState;
-}
-
-static inline TmpArtiList* GetTmpArtiListStruct(CMenuPcs* menu)
-{
-    return reinterpret_cast<TmpArtiList*>(GetMenuTmpArtiMembers(menu).m_tmpArtiList);
-}
-
 static inline short* GetTmpArtiList(CMenuPcs* menu)
 {
     return GetMenuTmpArtiMembers(menu).m_tmpArtiList;
-}
-
-static inline TmpArtiState* GetTmpArtiStateStruct(CMenuPcs* menu)
-{
-    return reinterpret_cast<TmpArtiState*>(GetMenuTmpArtiMembers(menu).m_tmpArtiState);
-}
-
-static inline int GetTmpArtiStateBase(CMenuPcs* menu)
-{
-    return reinterpret_cast<int>(GetTmpArtiState(menu));
 }
 
 static inline int GetTmpArtiListBase(CMenuPcs* menu)
@@ -268,10 +248,10 @@ unsigned int CMenuPcs::TmpArtiClose()
 	unsigned int uVar8;
 
 	iVar5 = 0;
-	*(short *)(GetTmpArtiStateBase(this) + 0x22) = *(short *)(GetTmpArtiStateBase(this) + 0x22) + 1;
-	uVar6 = (unsigned int)*GetTmpArtiList(this);
-	psVar4 = GetTmpArtiList(this) + 4;
-	iVar7 = (int)*(short *)(GetTmpArtiStateBase(this) + 0x22);
+	*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x22) = *(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x22) + 1;
+	uVar6 = (unsigned int)*this->m_tmpArtiList;
+	psVar4 = this->m_tmpArtiList + 4;
+	iVar7 = (int)*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x22);
 	uVar8 = uVar6;
 
 	if (0 < (int)uVar6) {
@@ -301,8 +281,8 @@ unsigned int CMenuPcs::TmpArtiClose()
 	}
 
 	fVar1 = FLOAT_80332f2c;
-	if (*GetTmpArtiList(this) == iVar5) {
-		psVar4 = GetTmpArtiList(this) + 4;
+	if (*this->m_tmpArtiList == iVar5) {
+		psVar4 = this->m_tmpArtiList + 4;
 		if (0 < (int)uVar6) {
 			uVar8 = uVar6 >> 3;
 			if (uVar8 != 0) {
@@ -374,7 +354,7 @@ void CMenuPcs::TmpArtiCtrl()
 	unsigned int uVar9;
 
 	hasInput = false;
-	*(short *)(GetTmpArtiStateBase(this) + 0x32) = *(short *)(GetTmpArtiStateBase(this) + 0x30);
+	*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x32) = *(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x30);
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		hasInput = true;
 	}
@@ -390,18 +370,18 @@ void CMenuPcs::TmpArtiCtrl()
 	if (uVar3 == 0) {
 		hasInput = false;
 	} else if ((uVar3 & 0x20) != 0) {
-		*(short *)(GetTmpArtiStateBase(this) + 0x1e) = 1;
+		*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x1e) = 1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		hasInput = true;
 	} else if ((uVar3 & 0x40) != 0) {
-		*(short *)(GetTmpArtiStateBase(this) + 0x1e) = -1;
+		*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x1e) = -1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		hasInput = true;
 	} else if ((uVar3 & 0x100) != 0) {
 		Sound.PlaySe(4, 0x40, 0x7f, 0);
 		hasInput = false;
 	} else if ((uVar3 & 0x200) != 0) {
-		*(unsigned char *)(GetTmpArtiStateBase(this) + 0xd) = 1;
+		*(unsigned char *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0xd) = 1;
 		Sound.PlaySe(3, 0x40, 0x7f, 0);
 		hasInput = true;
 	} else {
@@ -411,8 +391,8 @@ void CMenuPcs::TmpArtiCtrl()
 	fVar2 = FLOAT_80332f30;
 	uVar4 = Game.m_scriptFoodBase[0];
 	if (hasInput) {
-		iVar6 = GetTmpArtiListBase(this) + 8;
-		for (iVar7 = 0; iVar7 < *GetTmpArtiList(this); iVar7 = iVar7 + 1) {
+		iVar6 = reinterpret_cast<int>(this->m_tmpArtiList) + 8;
+		for (iVar7 = 0; iVar7 < *this->m_tmpArtiList; iVar7 = iVar7 + 1) {
 			*(float *)(iVar6 + 0x10) = fVar2;
 			*(float *)(iVar6 + 0x14) = fVar2;
 			iVar6 = iVar6 + 0x40;
@@ -425,30 +405,30 @@ void CMenuPcs::TmpArtiCtrl()
 			uVar9 = uVar5 >> 3;
 			if (uVar9 != 0) {
 				do {
-					iVar8 = GetTmpArtiListBase(this) + iVar6 + 8;
+					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + 8;
 					*(int *)(iVar8 + 0x24) = iVar7;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = GetTmpArtiListBase(this) + iVar6 + -0x38;
+					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x38;
 					*(int *)(iVar8 + 0x24) = iVar7 + 1;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = GetTmpArtiListBase(this) + iVar6 + -0x78;
+					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x78;
 					*(int *)(iVar8 + 0x24) = iVar7 + 2;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = GetTmpArtiListBase(this) + iVar6 + -0xb8;
+					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0xb8;
 					*(int *)(iVar8 + 0x24) = iVar7 + 3;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = GetTmpArtiListBase(this) + iVar6 + -0xf8;
+					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0xf8;
 					*(int *)(iVar8 + 0x24) = iVar7 + 4;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = GetTmpArtiListBase(this) + iVar6 + -0x138;
+					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x138;
 					*(int *)(iVar8 + 0x24) = iVar7 + 5;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = GetTmpArtiListBase(this) + iVar6 + -0x178;
+					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x178;
 					*(int *)(iVar8 + 0x24) = iVar7 + 6;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = iVar6 + -0x1b8;
 					iVar6 = iVar6 + -0x200;
-					iVar8 = GetTmpArtiListBase(this) + iVar8;
+					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar8;
 					*(int *)(iVar8 + 0x24) = iVar7 + 7;
 					iVar7 = iVar7 + 8;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
@@ -462,7 +442,7 @@ void CMenuPcs::TmpArtiCtrl()
 			do {
 				iVar8 = iVar6 + 8;
 				iVar6 = iVar6 + -0x40;
-				iVar8 = GetTmpArtiListBase(this) + iVar8;
+				iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar8;
 				*(int *)(iVar8 + 0x24) = iVar7;
 				iVar7 = iVar7 + 1;
 				*(unsigned int *)(iVar8 + 0x28) = 3;
@@ -493,8 +473,8 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	unsigned int uVar8;
 	int iVar10;
 	unsigned int uVar11;
-	TmpArtiState* state = GetTmpArtiStateStruct(this);
-	TmpArtiList* list = GetTmpArtiListStruct(this);
+	TmpArtiState* state = reinterpret_cast<TmpArtiState*>(this->m_tmpArtiState);
+	TmpArtiList* list = reinterpret_cast<TmpArtiList*>(this->m_tmpArtiList);
 
 	if (state->initialized == '\0') {
 		memset(list, 0, sizeof(TmpArtiList));

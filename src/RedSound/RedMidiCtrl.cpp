@@ -2506,7 +2506,6 @@ void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tra
  */
 void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
     unsigned char* command = *(unsigned char**)track;
     unsigned int value = command[1];
 
@@ -2518,26 +2517,26 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     }
 
     switch (*command) {
-    case 3:
-        trackData[0x3b] = value;
-        trackData[0x3f] |= 0x20000;
+    case 2:
+        ((int*)track)[0x3a] = value;
+        ((int*)track)[0x3f] |= 0x10000;
         return;
     case 1:
-        trackData[0x39] = value;
-        trackData[0x3f] |= 0x8000;
+        ((int*)track)[0x39] = value;
+        ((int*)track)[0x3f] |= 0x8000;
         return;
-    case 2:
-        trackData[0x3a] = value;
-        trackData[0x3f] |= 0x10000;
+    case 3:
+        ((int*)track)[0x3b] = value;
+        ((int*)track)[0x3f] |= 0x20000;
         return;
     case 4:
-        trackData[0x3c] = value;
-        trackData[0x3f] |= 0x40000;
+        ((int*)track)[0x3c] = value;
+        ((int*)track)[0x3f] |= 0x40000;
         return;
     case 0:
     default:
-        trackData[0x38] = value;
-        trackData[0x3f] |= 0x4000;
+        ((int*)track)[0x38] = value;
+        ((int*)track)[0x3f] |= 0x4000;
         return;
     }
 }
@@ -2553,27 +2552,29 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-    s8 mode = *(s8*)trackData[0];
+    u8* command;
+    s8 mode;
 
-    trackData[0] += 1;
+    command = *(u8**)track;
+    *(u8**)track = command + 1;
+    mode = *command;
 
     switch (mode) {
-    case 1:
-        trackData[0x3f] &= 0xFFFF7FFF;
-        return;
     case 2:
-        trackData[0x3f] &= 0xFFFEFFFF;
+        ((int*)track)[0x3f] &= 0xFFFEFFFF;
+        return;
+    case 1:
+        ((int*)track)[0x3f] &= 0xFFFF7FFF;
         return;
     case 3:
-        trackData[0x3f] &= 0xFFFDFFFF;
+        ((int*)track)[0x3f] &= 0xFFFDFFFF;
         return;
     case 4:
-        trackData[0x3f] &= 0xFFFBFFFF;
+        ((int*)track)[0x3f] &= 0xFFFBFFFF;
         return;
     case 0:
     default:
-        trackData[0x3f] &= 0xFFFFBFFF;
+        ((int*)track)[0x3f] &= 0xFFFFBFFF;
         return;
     }
 }

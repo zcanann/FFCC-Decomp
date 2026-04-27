@@ -201,10 +201,11 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 {
                     float dist = PSVECMag(&offset);
                     float fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
+                    u32 baseAlpha = positionWork->m_alpha;
 
-                    alpha = positionWork->m_alpha;
+                    alpha = (u8)baseAlpha;
                     if (dist < *(float*)(param_2->m_payload + 0x10) && fadeAmount > FLOAT_80331084) {
-                        alpha = (u8)((float)alpha * fadeAmount);
+                        alpha = (u8)((float)baseAlpha * fadeAmount);
                     }
                 }
                 color.rgba[0] = *((u8*)&param_2->m_stepValue + 0) + values->m_colorR;

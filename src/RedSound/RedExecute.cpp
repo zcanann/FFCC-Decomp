@@ -1349,11 +1349,10 @@ u32 _AdsrDataExecute(RedVoiceDATA* voice)
 void _VoiceDropedCallback(void* param_1)
 {
     unsigned int* puVar1;
-    int iParam1 = (int)param_1;
     
     puVar1 = p_VoiceData;
     do {
-        if ((puVar1[5] != 0) && ((int)puVar1[5] == iParam1)) {
+        if ((puVar1[5] != 0) && ((void*)puVar1[5] == param_1)) {
             puVar1[0x23] = 0;
             *puVar1 = 0;
             puVar1[5] = 0;

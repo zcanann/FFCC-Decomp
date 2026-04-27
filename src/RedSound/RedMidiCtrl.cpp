@@ -2334,14 +2334,12 @@ void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     unsigned char* command;
-    signed char range;
 
     command = *(unsigned char**)track;
     *(unsigned char**)track = command + 1;
-    range = *(signed char*)command;
-    *(char*)((char*)track + 0x14b) = range;
-    range = *(char*)((char*)track + 0x14b);
-    *(short*)((char*)track + 0x13e) = (*(short*)((int*)track + 0x50) * range) >> 5;
+    *(char*)((char*)track + 0x14b) = *command;
+    *(short*)((char*)track + 0x13e) =
+        (*(short*)((int*)track + 0x50) * *(char*)((char*)track + 0x14b)) >> 5;
     _PitchBendCompute(track, *(short*)((char*)track + 0x13e));
 }
 

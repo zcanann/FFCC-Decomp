@@ -279,9 +279,9 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     GXSetCurrentMtx(0);
 
     PSMTX44Identity(projection);
+    projection[2][2] = FLOAT_8033103c;
     projection[0][0] = FLOAT_80331034;
     projection[1][1] = FLOAT_80331038;
-    projection[2][2] = FLOAT_8033103c;
     projection[0][3] = FLOAT_80331040;
     projection[1][3] = FLOAT_8033103c;
     projection[2][3] = FLOAT_80331030;

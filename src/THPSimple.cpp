@@ -553,11 +553,7 @@ s32 THPSimplePreLoad(s32 loop)
     u32 readCount;
     u8* readPtr;
 
-    if (SimpleControl.isOpen == 0) {
-        return 0;
-    }
-
-    if (SimpleControl.isPreLoaded == 0) {
+    if ((SimpleControl.isOpen != 0) && (SimpleControl.isPreLoaded == 0)) {
         readCount = 8;
         if ((loop == 0) && (SimpleControl.header.mNumFrames < 8)) {
             readCount = SimpleControl.header.mNumFrames;

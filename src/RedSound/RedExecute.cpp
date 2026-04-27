@@ -1250,7 +1250,7 @@ void _AdsrStart(RedVoiceDATA* voice)
         *stage = *stage + 1;
     } while (*stage < 3);
 
-    *(int*)((u8*)voice + 0x60) = stepFrames;
+    stage[1] = stepFrames;
     if (nextLevel != 0) {
         nextLevel = (((nextLevel + 1) * 0x100) - 1) * 0x1000;
     }
@@ -1260,7 +1260,7 @@ void _AdsrStart(RedVoiceDATA* voice)
             prevLevel = (((prevLevel + 1) * 0x100) - 1) * 0x1000;
         }
         *(int*)((u8*)voice + 0xac) = prevLevel;
-        *(int*)((u8*)voice + 0x64) = (int)((nextLevel | 0x800) - prevLevel) / (int)stepFrames;
+        stage[2] = (int)((nextLevel | 0x800) - prevLevel) / (int)stepFrames;
     } else {
         *(int*)((u8*)voice + 0xac) = nextLevel;
     }

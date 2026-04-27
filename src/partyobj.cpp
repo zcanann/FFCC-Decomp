@@ -36,6 +36,7 @@ extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
 extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
+extern const char lbl_801DCB38[];
 
 static const char s_partyObjStateFmt[] = "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d";
 static const char s_partyBonusCountFmt[] = "SetBonusCondition num:%d";
@@ -2901,8 +2902,27 @@ void CGPartyObj::ChangeCommandMode(int mode)
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (*reinterpret_cast<short*>(self + 0x6F4) != mode) {
 		*reinterpret_cast<short*>(self + 0x6F4) = static_cast<short>(mode);
-		*reinterpret_cast<int*>(self + 0x6EC) = 0;
-		*reinterpret_cast<CGObject**>(self + 0x6E4) = (CGObject*)0;
+
+		unsigned char* menuPcs = reinterpret_cast<unsigned char*>(&MenuPcs);
+		unsigned char* scriptHandle = reinterpret_cast<unsigned char*>(m_scriptHandle);
+		CRingMenu** battleMenus = reinterpret_cast<CRingMenu**>(menuPcs + 0x13C);
+		int port = *reinterpret_cast<int*>(scriptHandle + 0x3B4);
+		CRingMenu* ring = battleMenus[port];
+		if (ring != 0) {
+			ring->SetBattleCommand(0, -1, -1);
+
+			scriptHandle = reinterpret_cast<unsigned char*>(m_scriptHandle);
+			port = *reinterpret_cast<int*>(scriptHandle + 0x3B4);
+			battleMenus[port]->SetBattleCommand(1, -1, -1);
+
+			scriptHandle = reinterpret_cast<unsigned char*>(m_scriptHandle);
+			port = *reinterpret_cast<int*>(scriptHandle + 0x3B4);
+			battleMenus[port]->SetBattleCommand(2, -1, -1);
+		} else {
+			if ((unsigned int)System.m_execParam >= 2) {
+				Printf__7CSystemFPce(&System, lbl_801DCB38);
+			}
+		}
 	}
 }
 

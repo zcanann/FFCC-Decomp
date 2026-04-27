@@ -643,15 +643,15 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                     m_glyphHeight = static_cast<unsigned short>(chunkFile.Get4());
                     m_glyphColumns = static_cast<unsigned short>(chunkFile.Get4());
                 } else if (chunk.m_id == 0x44415441) {
-                    if (m_usesEmbeddedData == 0) {
-                        m_glyphData = ::operator new(chunk.m_size, stage, const_cast<char*>(s_fontman_cpp), 0xCF);
-                        chunkFile.Get(m_glyphData, chunk.m_size);
-                    } else {
+                    if (m_usesEmbeddedData != 0) {
                         m_glyphData = chunkFile.GetAddress();
+                    } else {
+                        m_glyphData = new (stage, const_cast<char*>(s_fontman_cpp), 0xCF) unsigned char[chunk.m_size];
+                        chunkFile.Get(m_glyphData, chunk.m_size);
                     }
 
                     unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
-                    for (int i = 0; i < 64; i++) {
+                    for (int i = 0; i < 256; i++) {
                         m_glyphBuckets[i] = bucket;
                         bucket = reinterpret_cast<unsigned short*>(
                             reinterpret_cast<unsigned char*>(bucket) + static_cast<unsigned int>(*bucket) * 8 + 2);

@@ -38,9 +38,6 @@ extern double DOUBLE_80332F98;
 extern double DOUBLE_80332FA0;
 
 namespace {
-unsigned int s_Money = 0;
-signed char s_place[16];
-
 static unsigned short GetPadHoldMask() {
     return *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(&Pad) + 0x20);
 }
@@ -69,6 +66,9 @@ static void UpdateDigits(unsigned int value, signed char* outDigits) {
     }
 }
 } // namespace
+
+unsigned int gMenuMoneyTransferAmount = 0;
+signed char s_place[16];
 
 STATIC_ASSERT(offsetof(CMenuPcs, moneyFont) == 0x108);
 STATIC_ASSERT(offsetof(CMenuPcs, moneyState) == 0x82C);
@@ -154,7 +154,7 @@ void CMenuPcs::MoneyInit()
 	*(int *)(iVar4 + 0x30) = 10;
 	this->moneyPanel->count = 1;
 
-	s_Money = 0;
+	gMenuMoneyTransferAmount = 0;
 	puVar10 = s_place;
 	iVar5 = 0;
 	do {
@@ -250,7 +250,7 @@ bool CMenuPcs::MoneyOpen()
 		*(int *)(iVar8 + 0x30) = 10;
 		this->moneyPanel->count = 1;
 
-		s_Money = 0;
+		gMenuMoneyTransferAmount = 0;
 		puVar9 = s_place;
 		iVar15 = 0;
 		do {
@@ -619,8 +619,8 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((press & 0x100) != 0) {
 			if (*selectedFlag == 0) {
-				caravanWork->FGPutGil(static_cast<int>(s_Money));
-				s_Money = 0;
+				caravanWork->FGPutGil(static_cast<int>(gMenuMoneyTransferAmount));
+				gMenuMoneyTransferAmount = 0;
 				UpdateDigits(static_cast<unsigned int>(caravanWork->m_gil), s_place);
 				UpdateDigits(0, s_place + 8);
 			}
@@ -642,17 +642,18 @@ int CMenuPcs::MoneyCtrlCur()
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		} else {
 			unsigned int maxValue = static_cast<unsigned int>(caravanWork->m_gil);
-			unsigned int nextValue = s_Money + placeValue;
-			s_Money = (nextValue < maxValue) ? nextValue : maxValue;
-			UpdateDigits(s_Money, s_place + 8);
+			unsigned int nextValue = gMenuMoneyTransferAmount + placeValue;
+			gMenuMoneyTransferAmount = (nextValue < maxValue) ? nextValue : maxValue;
+			UpdateDigits(gMenuMoneyTransferAmount, s_place + 8);
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 	} else if ((hold & 4) != 0) {
-		if (s_Money == 0) {
+		if (gMenuMoneyTransferAmount == 0) {
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		} else {
-			s_Money = (s_Money >= placeValue) ? (s_Money - placeValue) : 0;
-			UpdateDigits(s_Money, s_place + 8);
+			gMenuMoneyTransferAmount =
+				(gMenuMoneyTransferAmount >= placeValue) ? (gMenuMoneyTransferAmount - placeValue) : 0;
+			UpdateDigits(gMenuMoneyTransferAmount, s_place + 8);
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 	}
@@ -690,7 +691,7 @@ int CMenuPcs::MoneyCtrlCur()
 			return 0;
 		}
 		if ((press & 0x100) != 0) {
-			if (s_Money < 1) {
+			if (gMenuMoneyTransferAmount < 1) {
 				Sound.PlaySe(4, 0x40, 0x7f, 0);
 			} else {
 				moneyState->messageMask = 2;

@@ -91,6 +91,89 @@ struct BreathModelRenderStep {
     unsigned char m_payload[1];
 };
 
+struct BreathModelParams {
+    unsigned char _pad00[0x10];
+    u16 m_slotCount;
+    u16 m_groupCount;
+    float m_groupSpeed;
+    unsigned char _pad18[0x02];
+    u16 m_particleCount;
+    u16 m_emitCount;
+    u16 m_emitInterval;
+    u16 m_particleLifetime;
+    u8 m_fadeOutFrames;
+    u8 m_fadeInFrames;
+    unsigned char _pad24[0x04];
+    float m_colorFrameDelta0;
+    float m_colorFrameDelta1;
+    float m_colorFrameDelta2;
+    float m_colorFrameDelta3;
+    float m_colorFrameAccel0;
+    float m_colorFrameAccel1;
+    float m_colorFrameAccel2;
+    float m_colorFrameAccel3;
+    unsigned char _pad48[0x08];
+    float m_rotationStartX;
+    float m_rotationStartY;
+    float m_rotationStartZ;
+    unsigned char _pad5C[0x04];
+    float m_rotationVelocityX;
+    float m_rotationVelocityY;
+    float m_rotationVelocityZ;
+    unsigned char _pad6C[0x04];
+    float m_rotationAccelX;
+    float m_rotationAccelY;
+    float m_rotationAccelZ;
+    unsigned char _pad7C[0x04];
+    float m_rotationRandomX;
+    float m_rotationRandomY;
+    float m_rotationRandomZ;
+    unsigned char _pad8C[0x04];
+    float m_angleStart;
+    float m_angleStep;
+    float m_angleAccel;
+    float m_angleRandomRange;
+    float m_scaleClampStart;
+    float m_scaleAccel;
+    float m_scaleRandomRange;
+    unsigned char _padAC[0x04];
+    float m_spawnJitterX;
+    float m_spawnJitterY;
+    float m_spawnJitterZ;
+    unsigned char _padBC[0x04];
+    u8 m_rotationFlags;
+    u8 m_angleFlags;
+    unsigned char _padC2[0x06];
+    u8 m_disableScaleClamp;
+};
+
+struct BreathParticleData {
+    Mtx m_modelMtx;
+    Vec m_position;
+    Vec m_direction;
+    u8 _pad48[0x08];
+    s16 m_life;
+    u8 _pad52[0x02];
+    u8 m_fadeOutFrames;
+    u8 m_fadeInFrames;
+    float m_angle;
+    float m_angleVelocity;
+    float m_angleRandom;
+    float m_rotationX;
+    float m_rotationY;
+    float m_rotationZ;
+    float m_rotationVelocityX;
+    float m_rotationVelocityY;
+    float m_rotationVelocityZ;
+    float m_rotationAccelX;
+    float m_rotationAccelY;
+    float m_rotationAccelZ;
+    float m_alpha;
+    float m_scale;
+    u8 m_age;
+    u8 _pad91[0x07];
+};
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -544,8 +627,9 @@ group_ready:
             *(float*)(groupTable + 0x28) = scaledOwner;
             pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
             PSMTXMultVec(rotMtx.value, &dir, &dir);
+            pppCopyVector(dirNorm, dir);
             pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
-            PSVECScale(&dirNorm, &target, *(float*)(groupTable + 0x24));
+            PSVECScale(&dir, &target, *(float*)(groupTable + 0x24));
             pppAddVector(target, origin, target);
             pppSubVector(hitVector, target, origin);
             pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner,
@@ -706,9 +790,9 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 unitVelocity.z = FLOAT_80330F80;
                 groupData->speed = *(float*)((unsigned char*)pBreathModel + 0x14);
                 pppCopyVector(groupData->direction, unitVelocity);
-                groupData->position.x = 0.0f;
-                groupData->position.y = 0.0f;
-                groupData->position.z = 0.0f;
+                groupData->position.x = kPppBreathModelZero;
+                groupData->position.y = kPppBreathModelZero;
+                groupData->position.z = kPppBreathModelZero;
                 PSMTXCopy(*(Mtx*)pppMngStPtr, groupData->matrix);
                 groupData->active = 1;
             }
@@ -737,8 +821,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
 extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP6VColorP14PARTICLE_COLOR(
     VBreathModel*, PBreathModel* pBreathModel, PARTICLE_DATA* particleData, VColor* vColor, PARTICLE_COLOR* particleColor)
 {
-    unsigned char* breath = (unsigned char*)pBreathModel;
-    Vec* particle = reinterpret_cast<Vec*>(particleData);
+    BreathModelParams* params = reinterpret_cast<BreathModelParams*>(pBreathModel);
+    BreathParticleData* particle = reinterpret_cast<BreathParticleData*>(particleData);
     int alpha = vColor->m_alpha;
     char frameCount;
     Vec step;
@@ -748,78 +832,78 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
         particleColor->m_color[1] += particleColor->m_colorFrameDeltas[1];
         particleColor->m_color[2] += particleColor->m_colorFrameDeltas[2];
         particleColor->m_color[3] += particleColor->m_colorFrameDeltas[3];
-        particleColor->m_colorFrameDeltas[0] += *(float*)(breath + 0x38);
-        particleColor->m_colorFrameDeltas[1] += *(float*)(breath + 0x3C);
-        particleColor->m_colorFrameDeltas[2] += *(float*)(breath + 0x40);
-        particleColor->m_colorFrameDeltas[3] += *(float*)(breath + 0x44);
+        particleColor->m_colorFrameDeltas[0] += params->m_colorFrameAccel0;
+        particleColor->m_colorFrameDeltas[1] += params->m_colorFrameAccel1;
+        particleColor->m_colorFrameDeltas[2] += params->m_colorFrameAccel2;
+        particleColor->m_colorFrameDeltas[3] += params->m_colorFrameAccel3;
         alpha = (int)vColor->m_alpha + (int)particleColor->m_color[3];
         if (alpha > 0xFF) {
             alpha = 0xFF;
         }
     }
 
-    particle[7].y += particle[7].z;
-    if (*(unsigned char*)(breath + 0xC1) & 0x10) {
-        particle[7].z = *(float*)(breath + 0x98) + particle[8].x + particle[7].z;
+    particle->m_angle += particle->m_angleVelocity;
+    if (params->m_angleFlags & 0x10) {
+        particle->m_angleVelocity = params->m_angleAccel + particle->m_angleRandom + particle->m_angleVelocity;
     } else {
-        particle[7].z += *(float*)(breath + 0x98);
+        particle->m_angleVelocity += params->m_angleAccel;
     }
 
-    while (FLOAT_80330F88 <= particle[7].y) {
-        particle[7].y -= FLOAT_80330F84;
+    while (FLOAT_80330F88 <= particle->m_angle) {
+        particle->m_angle -= FLOAT_80330F84;
     }
-    while (particle[7].y < FLOAT_80330F8C) {
-        particle[7].y += FLOAT_80330F84;
+    while (particle->m_angle < FLOAT_80330F8C) {
+        particle->m_angle += FLOAT_80330F84;
     }
 
-    particle[8].y += particle[9].y;
-    particle[8].z += particle[9].z;
-    particle[9].x += particle[10].x;
+    particle->m_rotationX += particle->m_rotationVelocityX;
+    particle->m_rotationY += particle->m_rotationVelocityY;
+    particle->m_rotationZ += particle->m_rotationVelocityZ;
 
-    if (*(unsigned char*)(breath + 0xC0) & 0x10) {
-        particle[9].y = *(float*)(breath + 0x70) + particle[10].y + particle[9].y;
-        particle[9].z = *(float*)(breath + 0x74) + particle[10].z + particle[9].z;
-        particle[10].x = *(float*)(breath + 0x78) + particle[11].x + particle[10].x;
+    if (params->m_rotationFlags & 0x10) {
+        particle->m_rotationVelocityX = params->m_rotationAccelX + particle->m_rotationAccelX + particle->m_rotationVelocityX;
+        particle->m_rotationVelocityY = params->m_rotationAccelY + particle->m_rotationAccelY + particle->m_rotationVelocityY;
+        particle->m_rotationVelocityZ = params->m_rotationAccelZ + particle->m_rotationAccelZ + particle->m_rotationVelocityZ;
     } else {
-        particle[9].y += *(float*)(breath + 0x70);
-        particle[9].z += *(float*)(breath + 0x74);
-        particle[10].x += *(float*)(breath + 0x78);
+        particle->m_rotationVelocityX += params->m_rotationAccelX;
+        particle->m_rotationVelocityY += params->m_rotationAccelY;
+        particle->m_rotationVelocityZ += params->m_rotationAccelZ;
     }
 
-    particle[11].z += *(float*)(breath + 0xA4);
-    unsigned char clampScale = *(unsigned char*)(breath + 0xC8);
+    particle->m_scale += params->m_scaleAccel;
+    unsigned char clampScale = params->m_disableScaleClamp;
     if (clampScale == 0) {
         float zero = kPppBreathModelZero;
-        if (zero < *(float*)(breath + 0xA0)) {
-            if (*(float*)(breath + 0xA4) < zero) {
-                if (particle[11].z < zero) {
-                    particle[11].z = zero;
+        if (zero < params->m_scaleClampStart) {
+            if (params->m_scaleAccel < zero) {
+                if (particle->m_scale < zero) {
+                    particle->m_scale = zero;
                 }
             }
-        } else if (*(float*)(breath + 0xA0) < zero) {
-            if ((zero < *(float*)(breath + 0xA4)) && (zero < particle[11].z)) {
-                particle[11].z = zero;
+        } else if (params->m_scaleClampStart < zero) {
+            if ((zero < params->m_scaleAccel) && (zero < particle->m_scale)) {
+                particle->m_scale = zero;
             }
         }
     }
 
-    PSVECScale(&particle[5], &step, particle[11].z);
-    PSVECAdd(&step, &particle[4], &particle[4]);
+    PSVECScale(&particle->m_direction, &step, particle->m_scale);
+    PSVECAdd(&step, &particle->m_position, &particle->m_position);
 
-    unsigned short life = *(unsigned short*)(breath + 0x20);
+    short life = params->m_particleLifetime;
     if (life != 0) {
-        *(short*)&particle[6].z = *(short*)&particle[6].z - 1;
+        particle->m_life = particle->m_life - 1;
     }
-    *(char*)&particle[12].x = *(char*)&particle[12].x + 1;
+    particle->m_age = particle->m_age + 1;
 
-    frameCount = *(char*)&particle[7].x;
-    if ((frameCount != '\0') && ((int)(unsigned int)*(unsigned char*)&particle[12].x <= (int)frameCount)) {
-        *(float*)&particle[11].y -= (float)alpha / (float)(int)frameCount;
+    frameCount = particle->m_fadeOutFrames;
+    if ((frameCount != '\0') && ((int)(unsigned int)particle->m_age <= (int)frameCount)) {
+        particle->m_alpha -= (float)alpha / (float)(int)frameCount;
     }
 
-    frameCount = *(char*)((unsigned char*)&particle[7].x + 1);
-    if ((frameCount != '\0') && ((int)*(short*)&particle[6].z <= (int)frameCount)) {
-        *(float*)&particle[11].y += (float)alpha / (float)(unsigned int)*(unsigned char*)(breath + 0x23);
+    frameCount = particle->m_fadeInFrames;
+    if ((frameCount != '\0') && ((int)particle->m_life <= (int)frameCount)) {
+        particle->m_alpha += (float)alpha / (float)(unsigned int)params->m_fadeInFrames;
     }
 }
 
@@ -836,8 +920,8 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     _pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor,
     PARTICLE_DATA* particleData, PARTICLE_WMAT* particleWmat, PARTICLE_COLOR* particleColor)
 {
-    unsigned char* breath = (unsigned char*)pBreathModel;
-    unsigned char* particle = (unsigned char*)particleData;
+    BreathModelParams* params = reinterpret_cast<BreathModelParams*>(pBreathModel);
+    BreathParticleData* particle = reinterpret_cast<BreathParticleData*>(particleData);
     Mtx workMtx;
     Vec jitter;
     Vec pos;
@@ -854,121 +938,121 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     Math.RandF();
     Math.RandF();
 
-    if (*(unsigned char*)(breath + 0x22) != 0) {
-        *(float*)(particle + 0x88) = (float)(unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
-        *(unsigned char*)(particle + 0x54) = *(unsigned char*)(breath + 0x22);
+    if (params->m_fadeOutFrames != 0) {
+        particle->m_alpha = (float)(unsigned int)vColor->m_alpha;
+        particle->m_fadeOutFrames = params->m_fadeOutFrames;
     }
-    if (*(unsigned char*)(breath + 0x23) != 0) {
-        *(unsigned char*)(particle + 0x55) = *(unsigned char*)(breath + 0x23);
+    if (params->m_fadeInFrames != 0) {
+        particle->m_fadeInFrames = params->m_fadeInFrames;
     }
 
-    *(float*)(particle + 0x58) = *(float*)(breath + 0x90);
-    *(float*)(particle + 0x5C) = *(float*)(breath + 0x94);
-    if (*(unsigned char*)(breath + 0xC1) != 0) {
-        unsigned char flags = *(unsigned char*)(breath + 0xC1);
+    particle->m_angle = params->m_angleStart;
+    particle->m_angleVelocity = params->m_angleStep;
+    if (params->m_angleFlags != 0) {
+        unsigned char flags = params->m_angleFlags;
 
-        *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * Math.RandF();
+        particle->m_angleRandom = params->m_angleRandomRange * Math.RandF();
         if ((flags & 1) && (flags & 2)) {
-            if (Math.RandF() > 0.5f) {
-                *(float*)(particle + 0x60) *= FLOAT_80330F80;
+            if (Math.RandF() > DOUBLE_80330F98) {
+                particle->m_angleRandom *= FLOAT_80330F80;
             }
         } else if (flags & 2) {
-            *(float*)(particle + 0x60) *= FLOAT_80330F80;
+            particle->m_angleRandom *= FLOAT_80330F80;
         }
     }
 
-    if ((*(unsigned char*)(breath + 0xC1) & 4) != 0) {
-        *(float*)(particle + 0x58) += *(float*)(particle + 0x60);
+    if ((params->m_angleFlags & 4) != 0) {
+        particle->m_angle += particle->m_angleRandom;
     }
-    if ((*(unsigned char*)(breath + 0xC1) & 8) != 0) {
-        *(float*)(particle + 0x5C) += *(float*)(particle + 0x60);
-    }
-
-    while (*(float*)(particle + 0x58) >= FLOAT_80330F88) {
-        *(float*)(particle + 0x58) -= FLOAT_80330F84;
-    }
-    while (*(float*)(particle + 0x58) < FLOAT_80330F8C) {
-        *(float*)(particle + 0x58) += FLOAT_80330F84;
+    if ((params->m_angleFlags & 8) != 0) {
+        particle->m_angleVelocity += particle->m_angleRandom;
     }
 
-    *(float*)(particle + 0x64) = *(float*)(breath + 0x50);
-    *(float*)(particle + 0x68) = *(float*)(breath + 0x54);
-    *(float*)(particle + 0x6C) = *(float*)(breath + 0x58);
-    *(float*)(particle + 0x70) = *(float*)(breath + 0x60);
-    *(float*)(particle + 0x74) = *(float*)(breath + 0x64);
-    *(float*)(particle + 0x78) = *(float*)(breath + 0x68);
+    while (particle->m_angle >= FLOAT_80330F88) {
+        particle->m_angle -= FLOAT_80330F84;
+    }
+    while (particle->m_angle < FLOAT_80330F8C) {
+        particle->m_angle += FLOAT_80330F84;
+    }
 
-    if (*(unsigned char*)(breath + 0xC0) != 0) {
-        unsigned char flags = *(unsigned char*)(breath + 0xC0);
+    particle->m_rotationX = params->m_rotationStartX;
+    particle->m_rotationY = params->m_rotationStartY;
+    particle->m_rotationZ = params->m_rotationStartZ;
+    particle->m_rotationVelocityX = params->m_rotationVelocityX;
+    particle->m_rotationVelocityY = params->m_rotationVelocityY;
+    particle->m_rotationVelocityZ = params->m_rotationVelocityZ;
+
+    if (params->m_rotationFlags != 0) {
+        unsigned char flags = params->m_rotationFlags;
 
         if ((flags & 0x20) == 0) {
-            *(float*)(particle + 0x7C) = *(float*)(breath + 0x80) * Math.RandF();
-            *(float*)(particle + 0x80) = *(float*)(breath + 0x84) * Math.RandF();
-            *(float*)(particle + 0x84) = *(float*)(breath + 0x88) * Math.RandF();
+            particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
+            particle->m_rotationAccelY = params->m_rotationRandomY * Math.RandF();
+            particle->m_rotationAccelZ = params->m_rotationRandomZ * Math.RandF();
             if ((flags & 1) && (flags & 2)) {
-                if (Math.RandF() > 0.5f) {
-                    *(float*)(particle + 0x7C) *= FLOAT_80330F80;
+                if (Math.RandF() > DOUBLE_80330F98) {
+                    particle->m_rotationAccelX *= FLOAT_80330F80;
                 }
-                if (Math.RandF() > 0.5f) {
-                    *(float*)(particle + 0x80) *= FLOAT_80330F80;
+                if (Math.RandF() > DOUBLE_80330F98) {
+                    particle->m_rotationAccelY *= FLOAT_80330F80;
                 }
-                if (Math.RandF() > 0.5f) {
-                    *(float*)(particle + 0x84) *= FLOAT_80330F80;
+                if (Math.RandF() > DOUBLE_80330F98) {
+                    particle->m_rotationAccelZ *= FLOAT_80330F80;
                 }
             } else if (flags & 2) {
-                *(float*)(particle + 0x7C) *= FLOAT_80330F80;
-                *(float*)(particle + 0x80) *= FLOAT_80330F80;
-                *(float*)(particle + 0x84) *= FLOAT_80330F80;
+                particle->m_rotationAccelX *= FLOAT_80330F80;
+                particle->m_rotationAccelY *= FLOAT_80330F80;
+                particle->m_rotationAccelZ *= FLOAT_80330F80;
             }
         } else {
-            float value = *(float*)(breath + 0x80) * Math.RandF();
+            float value = params->m_rotationRandomX * Math.RandF();
 
-            *(float*)(particle + 0x7C) = value;
-            *(float*)(particle + 0x80) = value;
-            *(float*)(particle + 0x84) = value;
+            particle->m_rotationAccelX = value;
+            particle->m_rotationAccelY = value;
+            particle->m_rotationAccelZ = value;
             if ((flags & 1) && (flags & 2)) {
-                if (Math.RandF() > 0.5f) {
-                    *(float*)(particle + 0x7C) *= FLOAT_80330F80;
-                    *(float*)(particle + 0x80) *= FLOAT_80330F80;
-                    *(float*)(particle + 0x84) *= FLOAT_80330F80;
+                if (Math.RandF() > DOUBLE_80330F98) {
+                    particle->m_rotationAccelX *= FLOAT_80330F80;
+                    particle->m_rotationAccelY *= FLOAT_80330F80;
+                    particle->m_rotationAccelZ *= FLOAT_80330F80;
                 }
             } else if (flags & 2) {
-                *(float*)(particle + 0x7C) *= FLOAT_80330F80;
-                *(float*)(particle + 0x80) *= FLOAT_80330F80;
-                *(float*)(particle + 0x84) *= FLOAT_80330F80;
+                particle->m_rotationAccelX *= FLOAT_80330F80;
+                particle->m_rotationAccelY *= FLOAT_80330F80;
+                particle->m_rotationAccelZ *= FLOAT_80330F80;
             }
         }
     }
 
-    if ((*(unsigned char*)(breath + 0xC0) & 4) != 0) {
-        *(float*)(particle + 0x64) += *(float*)(particle + 0x7C);
-        *(float*)(particle + 0x68) += *(float*)(particle + 0x80);
-        *(float*)(particle + 0x6C) += *(float*)(particle + 0x84);
+    if ((params->m_rotationFlags & 4) != 0) {
+        particle->m_rotationX += particle->m_rotationAccelX;
+        particle->m_rotationY += particle->m_rotationAccelY;
+        particle->m_rotationZ += particle->m_rotationAccelZ;
     }
-    if ((*(unsigned char*)(breath + 0xC0) & 8) != 0) {
-        *(float*)(particle + 0x70) += *(float*)(particle + 0x7C);
-        *(float*)(particle + 0x74) += *(float*)(particle + 0x80);
-        *(float*)(particle + 0x78) += *(float*)(particle + 0x84);
-    }
-
-    *(float*)(particle + 0x8C) = *(float*)(breath + 0x14);
-    if (*(float*)(breath + 0xA8) != kPppBreathModelZero) {
-        *(float*)(particle + 0x8C) += (2.0f * *(float*)(breath + 0xA8)) * Math.RandF() - *(float*)(breath + 0xA8);
+    if ((params->m_rotationFlags & 8) != 0) {
+        particle->m_rotationVelocityX += particle->m_rotationAccelX;
+        particle->m_rotationVelocityY += particle->m_rotationAccelY;
+        particle->m_rotationVelocityZ += particle->m_rotationAccelZ;
     }
 
-    if (*(short*)(breath + 0x20) == 0) {
-        *(short*)(particle + 0x50) = -1;
+    particle->m_scale = params->m_groupSpeed;
+    if (params->m_scaleRandomRange != kPppBreathModelZero) {
+        particle->m_scale += (FLOAT_80330FA0 * params->m_scaleRandomRange) * Math.RandF() - params->m_scaleRandomRange;
+    }
+
+    if (params->m_particleLifetime == 0) {
+        particle->m_life = -1;
     } else {
-        *(short*)(particle + 0x50) = *(short*)(breath + 0x20);
+        particle->m_life = params->m_particleLifetime;
     }
-    *(unsigned char*)(particle + 0x90) = 0;
+    particle->m_age = 0;
 
     PSMTXCopy(*(Mtx*)vBreathModel, *(Mtx*)particleWmat);
     if (particleColor != NULL) {
-        *(u32*)((unsigned char*)particleColor + 0x10) = *(u32*)(breath + 0x28);
-        *(u32*)((unsigned char*)particleColor + 0x14) = *(u32*)(breath + 0x2C);
-        *(u32*)((unsigned char*)particleColor + 0x18) = *(u32*)(breath + 0x30);
-        *(u32*)((unsigned char*)particleColor + 0x1C) = *(u32*)(breath + 0x34);
+        particleColor->m_colorFrameDeltas[0] = params->m_colorFrameDelta0;
+        particleColor->m_colorFrameDeltas[1] = params->m_colorFrameDelta1;
+        particleColor->m_colorFrameDeltas[2] = params->m_colorFrameDelta2;
+        particleColor->m_colorFrameDeltas[3] = params->m_colorFrameDelta3;
     }
 
     PSMTXCopy(*(Mtx*)particleWmat, workMtx);
@@ -976,15 +1060,15 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     workMtx[1][3] = kPppBreathModelZero;
     workMtx[2][3] = kPppBreathModelZero;
 
-    *(float*)(particle + 0x3C) = kPppBreathModelZero;
-    *(float*)(particle + 0x40) = kPppBreathModelZero;
-    *(float*)(particle + 0x44) = FLOAT_80330F80;
-    PSMTXMultVec(workMtx, (Vec*)(particle + 0x3C), (Vec*)(particle + 0x3C));
-    PSVECNormalize((Vec*)(particle + 0x3C), (Vec*)(particle + 0x3C));
+    particle->m_direction.x = kPppBreathModelZero;
+    particle->m_direction.y = kPppBreathModelZero;
+    particle->m_direction.z = FLOAT_80330F80;
+    PSMTXMultVec(workMtx, &particle->m_direction, &particle->m_direction);
+    PSVECNormalize(&particle->m_direction, &particle->m_direction);
 
-    jitter.x = -(*(float*)(breath + 0xB0) * 0.5f - Math.RandF(*(float*)(breath + 0xB0)));
-    jitter.y = -(*(float*)(breath + 0xB4) * 0.5f - Math.RandF(*(float*)(breath + 0xB4)));
-    jitter.z = -(*(float*)(breath + 0xB8) * 0.5f - Math.RandF(*(float*)(breath + 0xB8)));
+    jitter.x = -(params->m_spawnJitterX * FLOAT_80330FA4 - Math.RandF(params->m_spawnJitterX));
+    jitter.y = -(params->m_spawnJitterY * FLOAT_80330FA4 - Math.RandF(params->m_spawnJitterY));
+    jitter.z = -(params->m_spawnJitterZ * FLOAT_80330FA4 - Math.RandF(params->m_spawnJitterZ));
 
     pos.x = (*(Mtx*)particleWmat)[0][3];
     pos.y = (*(Mtx*)particleWmat)[1][3];
@@ -994,12 +1078,12 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     (*(Mtx*)particleWmat)[1][3] = pos.y;
     (*(Mtx*)particleWmat)[2][3] = pos.z;
 
-    PSMTXConcat(*(Mtx*)particleWmat, *(Mtx*)((unsigned char*)pppObject + 4), *(Mtx*)particleData);
+    PSMTXConcat(*(Mtx*)particleWmat, pppObject->m_localMatrix.value, *(Mtx*)particleData);
     PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, workMtx);
 
-    *(float*)(particle + 0x3C) = kPppBreathModelZero;
-    *(float*)(particle + 0x40) = kPppBreathModelZero;
-    *(float*)(particle + 0x44) = FLOAT_80330F80;
+    particle->m_direction.x = kPppBreathModelZero;
+    particle->m_direction.y = kPppBreathModelZero;
+    particle->m_direction.z = FLOAT_80330F80;
 }
 
 /*

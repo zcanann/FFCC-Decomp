@@ -179,7 +179,6 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     Mtx44 screenMtx;
     pppCVECTOR drawColor;
     GXColor stepColor;
-    u8* meshColor;
     Vec quadA;
     Vec quadB;
 
@@ -225,8 +224,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         cameraPos.z = ppvCameraMatrix02[2][3];
         maxRadius = FLOAT_80331930;
 
-        meshCount = *(u16*)((u8*)model + 0x0);
-        radiusArray = *(float**)((u8*)model + 0x2c);
+        meshCount = model->m_vertexCount;
+        radiusArray = (float*)model->m_vertices;
         for (i = 0; i < meshCount; i++) {
             radius = radiusArray[i * 3];
             if (maxRadius < radius) {
@@ -288,12 +287,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
         GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
 
-        meshColor = *(u8**)((u8*)model + 0x3C);
-        meshColor[0] = 0xFF;
-        meshColor[1] = 0xFF;
-        meshColor[2] = 0xFF;
-        meshColor[3] = 0xFF;
-        colorRaw = *(u32*)meshColor;
+        ((u8*)model->m_colors)[0] = 0xFF;
+        ((u8*)model->m_colors)[1] = 0xFF;
+        ((u8*)model->m_colors)[2] = 0xFF;
+        ((u8*)model->m_colors)[3] = 0xFF;
+        colorRaw = *(u32*)model->m_colors;
         GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)&colorRaw);
         GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&colorRaw);
         GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -363,12 +361,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
             GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
             GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
 
-            meshColor = *(u8**)((u8*)model + 0x3C);
-            meshColor[0] = 0xFF;
-            meshColor[1] = 0xFF;
-            meshColor[2] = 0xFF;
-            meshColor[3] = 0xFF;
-            colorRaw = *(u32*)meshColor;
+            ((u8*)model->m_colors)[0] = 0xFF;
+            ((u8*)model->m_colors)[1] = 0xFF;
+            ((u8*)model->m_colors)[2] = 0xFF;
+            ((u8*)model->m_colors)[3] = 0xFF;
+            colorRaw = *(u32*)model->m_colors;
             GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)&colorRaw);
             GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&colorRaw);
             GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -426,9 +423,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 
-        if ((u8)param_2->m_initWOrk == 0) {
+        if (param_2->m_initWOrk == 0) {
             tevSwapChannel = 0;
-        } else if ((u8)param_2->m_initWOrk == 1) {
+        } else if (param_2->m_initWOrk == 1) {
             tevSwapChannel = 1;
         } else {
             tevSwapChannel = 2;

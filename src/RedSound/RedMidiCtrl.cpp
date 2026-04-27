@@ -2320,15 +2320,15 @@ void _PitchBendCompute(RedTrackDATA* track, int bend)
  */
 void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-    int bend = (unsigned int)*(unsigned char*)trackData[0] + (unsigned int)*(unsigned char*)(trackData[0] + 1) * 0x80 + -0x2000;
+    int bend = ((unsigned int)*(unsigned char*)(((int*)track)[0] + 1) * 0x80 - 0x2000) +
+        (unsigned int)*(unsigned char*)((int*)track)[0];
 
-    *(short*)(trackData + 0x50) = bend;
+    *(short*)((int*)track + 0x50) = bend;
     bend = (short)bend;
-    bend = (bend * *(char*)((char*)trackData + 0x14b)) >> 5;
-    *(short*)((char*)trackData + 0x13e) = bend;
-    trackData[0] += 2;
-    _PitchBendCompute(track, *(short*)((char*)trackData + 0x13e));
+    bend = (bend * *(char*)((char*)track + 0x14b)) >> 5;
+    *(short*)((char*)track + 0x13e) = bend;
+    ((int*)track)[0] += 2;
+    _PitchBendCompute(track, *(short*)((char*)track + 0x13e));
 }
 
 /*
@@ -2342,16 +2342,16 @@ void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-    unsigned char* command = (unsigned char*)((int*)track)[0];
+    unsigned char* command;
     signed char range;
 
-    trackData[0] = (int)(command + 1);
+    command = *(unsigned char**)track;
+    *(unsigned char**)track = command + 1;
     range = *(signed char*)command;
-    *(char*)((char*)trackData + 0x14b) = range;
-    range = *(char*)((char*)trackData + 0x14b);
-    *(short*)((char*)trackData + 0x13e) = (*(short*)(trackData + 0x50) * range) >> 5;
-    _PitchBendCompute(track, *(short*)((char*)trackData + 0x13e));
+    *(char*)((char*)track + 0x14b) = range;
+    range = *(char*)((char*)track + 0x14b);
+    *(short*)((char*)track + 0x13e) = (*(short*)((int*)track + 0x50) * range) >> 5;
+    _PitchBendCompute(track, *(short*)((char*)track + 0x13e));
 }
 
 /*

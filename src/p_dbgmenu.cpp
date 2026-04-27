@@ -59,6 +59,9 @@ static const char s_CHARA_INFO_801DD470[] = "CHARA INFO";
 static const char s_ITEM_WEAPON_801DD47C[] = "ITEM WEAPON";
 static const char s_SMITH_MASTER_801DD488[] = "SMITH MASTER";
 static const char lbl_80331C80[] = "CHARA";
+static const char lbl_80331CB4[] = "ON";
+static const char lbl_80331CB8[] = "OFF";
+static const char lbl_80331CBC[] = "?";
 
 u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
 u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
@@ -501,30 +504,25 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, 640.0f, 480.0f, 0.0f, 1.0f);
 
 		int type = menu->m_type;
-		if (type != 2) {
-			if (type >= 2) {
-				if (type < 4) {
-					drawWindow(((-menu->m_state | menu->m_state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
-				}
-			} else if (type == 0) {
+		if (type == 2) {
+			drawWindow(((-menu->m_state | menu->m_state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
+
+			char* stateText = const_cast<char*>(lbl_80331CBC);
+			if (menu->m_state == 1) {
+				stateText = const_cast<char*>(lbl_80331CB4);
+			} else if (menu->m_state == 0) {
+				stateText = const_cast<char*>(lbl_80331CB8);
+			}
+
+			drawFont(9, 0x10, 8, stateText);
+		} else if (type < 2) {
+			if (type == 0) {
 				drawWindow(menu->m_y, 0, 0, menu->m_unk18, menu->m_unk1C, menu->m_text);
 			} else if (type >= 0) {
 				drawFont(menu->m_y, 0, 0, menu->m_text);
 			}
-		} else {
+		} else if (type < 4) {
 			drawWindow(((-menu->m_state | menu->m_state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
-
-			const char* stateText;
-			if (menu->m_state == 1) {
-				stateText = "ON";
-			} else {
-				stateText = "?";
-				if (menu->m_state == 0) {
-					stateText = "OFF";
-				}
-			}
-
-			drawFont(9, 0x10, 8, const_cast<char*>(stateText));
 		}
 
 		menu = menu->m_next;

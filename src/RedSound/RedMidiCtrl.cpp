@@ -1848,7 +1848,8 @@ void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
         rate = (unsigned int)*(unsigned char*)trackData[0];
     }
 
-    trackData[0x1f] = DataAddCompute(trackData + 0x1e, 0x100 / rate, trackDelta);
+    rate = 0x100 / rate;
+    trackData[0x1f] = DataAddCompute(trackData + 0x1e, rate, trackDelta);
     *(short*)(trackData + 0x23) = (short)trackDelta[0];
     trackData[0] += 1;
 }
@@ -2034,7 +2035,8 @@ void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 	} else {
 		rate = *(u8*)trackData[0];
 	}
-	trackData[0x27] = DataAddCompute(trackData + 0x26, 0x100 / rate, delta);
+	rate = 0x100 / rate;
+	trackData[0x27] = DataAddCompute(trackData + 0x26, rate, delta);
 	*(short*)(trackData + 0x2b) = (short)delta[0];
 	trackData[0] += 1;
 }
@@ -2195,7 +2197,8 @@ void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
 	} else {
 		rate = *(u8*)trackData[0];
 	}
-	trackData[0x2f] = DataAddCompute(trackData + 0x2e, 0x100 / rate, delta);
+	rate = 0x100 / rate;
+	trackData[0x2f] = DataAddCompute(trackData + 0x2e, rate, delta);
 	*(short*)(trackData + 0x34) = (short)delta[0];
 	trackData[0] += 1;
 }

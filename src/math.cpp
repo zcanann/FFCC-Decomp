@@ -942,14 +942,16 @@ float CMath::Spline1D(int lastIndex, float t, float* x, float* y, float* secondD
         low--;
     }
 
+    float x0 = x[low];
     float sd0 = secondDerivatives[low];
-    float dt = t - x[low];
-    float dx = x[low + 1] - x[low];
+    float sd1 = secondDerivatives[low + 1];
+    float dt = t - x0;
+    float y0 = y[low];
+    float dx = x[low + 1] - x0;
+    float cubic = FLOAT_8032F758 * sd0 + (dt * (sd1 - sd0)) / dx;
+    float linear = dx * (FLOAT_8032F75C * sd0 + sd1) - (y[low + 1] - y0) / dx;
 
-    return dt * (dt * (FLOAT_8032F758 * sd0 + (dt * (secondDerivatives[low + 1] - sd0)) / dx) +
-                 -(dx * (FLOAT_8032F75C * sd0 + secondDerivatives[low + 1]) -
-                   (y[low + 1] - y[low]) / dx)) +
-           y[low];
+    return ((dt * cubic) - linear) * dt + y0;
 }
 
 /*

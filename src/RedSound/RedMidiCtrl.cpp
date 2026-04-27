@@ -1309,26 +1309,26 @@ void __MidiCtrl_SlurOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-    int delta = DeltaTimeSumup((unsigned char**)trackData);
+    int delta[2];
     char* command;
     int value = 0;
     int* voiceData;
 
-    if (delta == 0) {
-        delta = 1;
+    delta[0] = DeltaTimeSumup((unsigned char**)track);
+    if (delta[0] == 0) {
+        delta[0] = 1;
     }
 
-    command = (char*)trackData[0];
-    trackData[0] = (int)(command + 1);
-    DataAddCompute(&value, ((int)*command) << 8, &delta);
-    trackData[0x45] = value;
-    trackData[0x44] = delta;
-    trackData[0x48] &= 0xfffff000;
+    command = *(char**)track;
+    *(char**)track = command + 1;
+    DataAddCompute(&value, ((int)*command) << 8, delta);
+    ((int*)track)[0x45] = value;
+    ((int*)track)[0x44] = delta[0];
+    ((int*)track)[0x48] &= 0xfffff000;
 
     voiceData = (int*)p_VoiceData;
     do {
-        if ((int*)voiceData[0] == trackData) {
+        if ((RedTrackDATA*)voiceData[0] == track) {
             voiceData[0x28] &= 0xfffff000;
         }
         voiceData += 0x30;
@@ -2440,23 +2440,22 @@ void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
     char value;
     short step;
     char* command;
-    int* trackData = (int*)track;
 
-    command = (char*)trackData[0];
-    trackData[0] = (int)(command + 1);
+    command = *(char**)track;
+    *(char**)track = command + 1;
     value = *command;
     if (value != 0) {
-        step = *(short*)(trackData + 0x4e) + (short)value;
+        step = *(short*)((int*)track + 0x4e) + (short)value;
     } else {
         step = 0;
     }
-    *(short*)(trackData + 0x4e) = step;
-    *(short*)((char*)trackData + 0x13a) = 0;
+    *(short*)((int*)track + 0x4e) = step;
+    *(short*)((char*)track + 0x13a) = 0;
 
-    if (*(short*)(trackData + 0x4e) < -9999) {
-        *(short*)(trackData + 0x4e) = -9999;
-    } else if (*(short*)(trackData + 0x4e) > 9999) {
-        *(short*)(trackData + 0x4e) = 9999;
+    if (*(short*)((int*)track + 0x4e) < -9999) {
+        *(short*)((int*)track + 0x4e) = -9999;
+    } else if (*(short*)((int*)track + 0x4e) > 9999) {
+        *(short*)((int*)track + 0x4e) = 9999;
     }
 }
 
@@ -2471,27 +2470,26 @@ void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
     int value;
     short step;
     unsigned char* command;
 
-    command = (unsigned char*)trackData[0];
-    trackData[0] = (int)(command + 1);
+    command = *(unsigned char**)track;
+    *(unsigned char**)track = command + 1;
     value = *command;
-    *(short*)(trackData + 0x4e) = 0;
+    *(short*)((int*)track + 0x4e) = 0;
 
     if (value != 0) {
-        step = *(short*)((char*)trackData + 0x13a) + (unsigned short)value;
+        step = *(short*)((char*)track + 0x13a) + (unsigned short)value;
     } else {
         step = 0;
     }
-    *(short*)((char*)trackData + 0x13a) = step;
+    *(short*)((char*)track + 0x13a) = step;
 
-    if (*(short*)((char*)trackData + 0x13a) < -9999) {
-        *(short*)((char*)trackData + 0x13a) = -9999;
-    } else if (*(short*)((char*)trackData + 0x13a) > 9999) {
-        *(short*)((char*)trackData + 0x13a) = 9999;
+    if (*(short*)((char*)track + 0x13a) < -9999) {
+        *(short*)((char*)track + 0x13a) = -9999;
+    } else if (*(short*)((char*)track + 0x13a) > 9999) {
+        *(short*)((char*)track + 0x13a) = 9999;
     }
 }
 

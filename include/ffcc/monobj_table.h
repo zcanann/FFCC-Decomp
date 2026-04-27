@@ -13,9 +13,9 @@ public:
     void alwaysFuncDefault();
     void alwaysFuncMeteoParasite();
     void alwaysFuncOrcKing();
-    void attackCheckFuncLKShooter(int);
-    void attackCheckFuncMeteoParasite(int);
-    void attackCheckFuncMeteoParasiteC(int);
+    int attackCheckFuncLKShooter(int);
+    int attackCheckFuncMeteoParasite(int);
+    int attackCheckFuncMeteoParasiteC(int);
     void attackedFuncSaw();
     int calcBranchFuncDragonZombie(int);
     int calcBranchFuncGiantCrab(int);

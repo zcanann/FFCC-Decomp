@@ -225,7 +225,8 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             (u32)*(u16*)(param_2->m_payload + 4) * sizeof(TRACE_POLYGON), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmTracer_cpp_801d9ce0), 0xEB);
         fVar3 = FLOAT_803306e8;
-        entry = work->entries;
+        entries = work->entries;
+        entry = entries;
         for (i = 0; i < (s32)(u32)*(u16*)(param_2->m_payload + 4); i++) {
             entry->life = -1;
             entry->alpha = param_2->m_payload[8];
@@ -260,7 +261,6 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         work->arg3Work = valuePtr;
     }
 
-    entries = work->entries;
     if (work->count + 1 < *(u16*)(param_2->m_payload + 4)) {
         for (i = *(u16*)(param_2->m_payload + 4) - 2; i >= 0; i--) {
             TRACE_POLYGON* current = &entries[i];

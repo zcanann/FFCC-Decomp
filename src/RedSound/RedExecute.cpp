@@ -1276,32 +1276,33 @@ void _AdsrStart(RedVoiceDATA* voice)
  */
 void _AdsrDataCompute(RedVoiceDATA* voice)
 {
-    u32 prevValue = 0;
-    u32 stepCount;
-    int* stage = (int*)((int)voice + 0x5c);
-    u32 level;
-    u32 current = *(u32*)((int)voice + 0xac);
+    u8* adsrData = (u8*)voice + 0x50;
+    int prevValue;
+    int stepCount;
+    int level;
+    int* stage = (int*)((u8*)voice + 0x5c);
 
-    while ((level = current, *stage < 3)) {
-        level = (u32)*(u8*)((int)voice + 0x50 + *stage + 9);
-        stepCount = (u32)*(u16*)((int)voice + 0x50 + *stage * 2);
+    level = *(int*)((u8*)voice + 0xac);
+    stepCount = 0;
+    while (*stage < 3) {
+        prevValue = level;
+        level = (u32)*(u8*)(adsrData + *stage + 9);
+        stepCount = (u32)*(u16*)(adsrData + *stage * 2);
         if (level != 0) {
             level = ((level + 1) * 0x100 - 1) * 0x1000;
         }
-        prevValue = current;
         if (stepCount != 0) {
             break;
         }
         *stage = *stage + 1;
-        current = level;
     }
 
-    *(u32*)((int)voice + 0x60) = stepCount;
-    if (stepCount == 0) {
-        *(u32*)((int)voice + 0xac) = level;
-    } else {
-        *(u32*)((int)voice + 0xac) = prevValue;
+    *(int*)((int)voice + 0x60) = stepCount;
+    if (stepCount != 0) {
+        *(int*)((int)voice + 0xac) = prevValue;
         *(int*)((int)voice + 100) = (int)((level | 0x800) - prevValue) / (int)stepCount;
+    } else {
+        *(int*)((int)voice + 0xac) = level;
     }
 }
 

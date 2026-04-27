@@ -1699,18 +1699,21 @@ void __MidiCtrl_ChannelFix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrackDATA* track)
 {
-    unsigned int depth;
+    int depth;
+    int divisor;
     int value;
+    int output;
     unsigned int* entry;
 
     ((int*)track)[0x20] = (unsigned int)(*(unsigned char*)((int*)track)[0]) << 0xc;
-    if (*(char*)(((int*)track)[0] + 1) == '\0') {
-        depth = 0x100;
-    } else {
+    if (*(unsigned char*)(((int*)track)[0] + 1) != '\0') {
         depth = (unsigned int)(*(unsigned char*)(((int*)track)[0] + 1));
+    } else {
+        depth = 0x100;
     }
 
-    ((int*)track)[0x1e] = 0x100000 / depth;
+    divisor = depth;
+    ((int*)track)[0x1e] = 0x100000 / divisor;
     ((int*)track)[0x1d] = SwingEntryFunction[*(unsigned char*)(((int*)track)[0] + 2) & 0xf];
     *(short*)((int)track + 0x8e) = 0;
     *(short*)((int*)track + 0x23) = 0;
@@ -1725,11 +1728,11 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
                 value = 0x100 / (((int*)track)[0x1e] >> 0xc);
             }
             if (*(short*)((int)track + 0x92) == 0) {
-                value = 0;
+                output = 0;
             } else {
-                value = (int)*(short*)((int)track + 0x92) * value * 4;
+                output = (int)*(short*)((int)track + 0x92) * (value * 4);
             }
-            entry[8] = value;
+            entry[8] = output;
             entry[9] = 0;
             entry[7] = 0;
         }
@@ -1885,17 +1888,20 @@ void __MidiCtrl_VibrateDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	unsigned int rateDivisor;
+	int rateDivisor;
+	int divisor;
 	int value;
+	int output;
 	unsigned int* voice;
 
 	((int*)track)[0x28] = (unsigned int)(*(unsigned char*)((int*)track)[0]) << 0xc;
-	if (*(char*)(((int*)track)[0] + 1) == '\0') {
-		rateDivisor = 0x100;
-	} else {
+	if (*(unsigned char*)(((int*)track)[0] + 1) != '\0') {
 		rateDivisor = (unsigned int)(*(unsigned char*)(((int*)track)[0] + 1));
+	} else {
+		rateDivisor = 0x100;
 	}
-	((int*)track)[0x26] = 0x100000 / rateDivisor;
+	divisor = rateDivisor;
+	((int*)track)[0x26] = 0x100000 / divisor;
 	((int*)track)[0x25] = SwingEntryFunction[*(unsigned char*)(((int*)track)[0] + 2) & 0xf];
 	*(short*)((int)track + 0xae) = 0;
 	*(short*)((int*)track + 0x2b) = 0;
@@ -1910,11 +1916,11 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 				value = 0x100 / (((int*)track)[0x26] >> 0xc);
 			}
 			if (*(short*)((int)track + 0xb2) == 0) {
-				value = 0;
+				output = 0;
 			} else {
-				value = *(short*)((int)track + 0xb2) * value * 4;
+				output = *(short*)((int)track + 0xb2) * (value * 4);
 			}
-			voice[0xc] = value;
+			voice[0xc] = output;
 			voice[0xd] = 0;
 			voice[0xb] = 0;
 		}

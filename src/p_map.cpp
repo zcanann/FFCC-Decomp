@@ -529,11 +529,11 @@ void CMapPcs::calc()
                     *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
                 if (rootNode != 0) {
                     cameraPos.x =
-                        (rootNode->m_boundMinX + rootNode->m_boundMaxX) * kMapBoundsCenterScale;
+                        kMapBoundsCenterScale * (rootNode->m_boundMinX + rootNode->m_boundMaxX);
                     cameraPos.y =
-                        (rootNode->m_boundMinY + rootNode->m_boundMaxY) * kMapBoundsCenterScale;
+                        kMapBoundsCenterScale * (rootNode->m_boundMinY + rootNode->m_boundMaxY);
                     cameraPos.z =
-                        (rootNode->m_boundMinZ + rootNode->m_boundMaxZ) * kMapBoundsCenterScale;
+                        kMapBoundsCenterScale * (rootNode->m_boundMinZ + rootNode->m_boundMaxZ);
                 } else {
                     float* mapCenter =
                         reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0xAA8);
@@ -549,23 +549,20 @@ void CMapPcs::calc()
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-            CMemory::CStage* mapStage = *reinterpret_cast<CMemory::CStage**>(&MapMng);
-            int heapUnuse = mapStage->GetHeapUnuse();
-
             Printf__7CSystemFPce(
                 &System,
                 s_map_load_ok_fmt,
                 m_mapName,
                 *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
                 *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),
-                heapUnuse / 1024);
+                (*reinterpret_cast<CMemory::CStage**>(&MapMng))->GetHeapUnuse() / 1024);
         }
 
-        CPtrArray<CMapLightHolder*>* mapLightHolderArr =
-            reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450);
-        if (static_cast<unsigned int>(mapLightHolderArr[1].GetSize()) > 0U) {
-            mapLightHolderArr[1][0]->GetLightHolder(reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C),
-                                                    static_cast<Vec*>(0));
+        CPtrArray<CMapLightHolder*>& mapLightHolderArr =
+            reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450)[1];
+        if (mapLightHolderArr.GetSize() > 0) {
+            mapLightHolderArr[0]->GetLightHolder(reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C),
+                                                 static_cast<Vec*>(0));
         }
 
         m_forceMapReload = 0;

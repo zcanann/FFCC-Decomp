@@ -214,11 +214,14 @@ int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
  */
 int SeStopID(int seId)
 {
-	int* trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
+	int soundBase;
+	int* trackBasePtr;
 	int* track;
 
-	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
-	track = (int*)*trackBasePtr;
+	soundBase = (int)p_SoundControlBuffer;
+	trackBasePtr = (int*)(soundBase + 0xdbc);
+	*(unsigned int*)(soundBase + 0x1244) = 0;
+	track = *(int**)(soundBase + 0xdbc);
 	do {
 		if ((*track != 0) && ((seId == -1) || (track[0x3e] == seId))) {
 			int trackNo;

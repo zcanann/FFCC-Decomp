@@ -352,9 +352,9 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     void* gObject = *(void**)((u8*)pppMngStPtr + 0xD8);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    float f = FLOAT_80331cc4;
     *(u32*)((u8*)gObject + 0x60) |= 0x40;
     *(void**)(model + 0xF0) = (void*)SB_BeforeDrawCallback;
+    float f = FLOAT_80331cc4;
     *(void**)(model + 0xFC) = (void*)SB_DrawMeshDLCallback;
     *(void**)(model + 0xF4) = (void*)SB_BeforeMeshLockEnvCallback;
     *(void**)(model + 0xEC) = (void*)SB_BeforeCalcMatrixCallback;

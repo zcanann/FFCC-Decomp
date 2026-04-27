@@ -105,7 +105,7 @@ struct YmBreathParams {
 struct YmBreathParticleGroup {
     int active;
     signed char* particleIndices;
-    unsigned char* particleStates;
+    signed char* particleStates;
     Vec position;
     Vec direction;
     float speed;
@@ -718,7 +718,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                     if (found) {
                         groupData = &groupTable[(int)foundGroup];
                         for (slot = 0; slot < (int)params->m_slotCount; slot++) {
-                            groupData->particleStates[slot] = 0xFF;
+                            groupData->particleStates[slot] = -1;
                             groupData->position.x = zero;
                             groupData->position.y = zero;
                             groupData->position.z = zero;
@@ -739,7 +739,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                     groupData = groupTable;
                     for (j = 0; j < (int)params->m_groupCount; j++) {
                         for (k = 0; k < (int)params->m_slotCount; k++) {
-                            if ((groupData->particleIndices[k] == -1) && (groupData->particleStates[k] == 0xFF)) {
+                            if ((groupData->particleIndices[k] == -1) && (groupData->particleStates[k] == -1)) {
                                 groupData->particleIndices[k] = (signed char)i;
                                 found = false;
                                 groupData->particleStates[k] = 1;

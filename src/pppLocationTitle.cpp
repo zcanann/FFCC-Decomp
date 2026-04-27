@@ -58,10 +58,10 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     int serializedOffset;
     LocationTitleWork* work;
     int graphFrame;
-    int fadeDivisor;
     LocationTitleParticle* particle;
     LocationTitleParticle* particles;
     long** shapeTable;
+    int fadeDivisor;
 
     dataValIndex = param_2->m_dataValIndex;
     serializedOffset = *param_3->m_serializedDataOffsets;

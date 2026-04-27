@@ -79,8 +79,8 @@ public:
 	_GXColor m_color;
 	CTexture* texturePtr;
 	void* m_glyphData;
-	unsigned short* m_glyphBuckets[64];
-	unsigned char m_pad13c[0x304];
+	unsigned short* m_glyphBuckets[256];
+	unsigned char m_pad43c[4];
 	unsigned char m_tlutData[0x1000];
 };
 

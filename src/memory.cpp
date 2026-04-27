@@ -1391,35 +1391,41 @@ void CMemory::CStage::drawHeapTitle(int y)
     unsigned int totalUnuse = 0;
     unsigned int maxUnuse = 0;
     int prev = *reinterpret_cast<int*>(node + 4);
+    int heapTop = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
     char line[264];
-    char* sourceName = reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10);
 
-    do {
-        if ((*reinterpret_cast<unsigned char*>(node + 2) & 2) != 0) {
-            int srcLen = strlen(sourceName);
-            strcpy(line, sourceName + ((srcLen - 12U) & ~((srcLen - 12U) >> 31)));
-            Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
-
-            sprintf(line, s_drawHeapTitleFmt, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
-                    static_cast<int>(totalUnuse) / 1024, static_cast<int>(maxUnuse) / 1024);
-            Graphic.DrawDebugStringDirect(0x208, static_cast<unsigned short>(y), line, 8);
-            return;
-        }
-
+    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
         if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) {
-            int blockSize = *reinterpret_cast<int*>(node + 8) - (node + 0x40);
+            int blockStart = (node + 0x40) - heapTop;
+            int blockEnd = *reinterpret_cast<int*>(node + 8) - heapTop;
+            int blockSize = blockEnd - blockStart;
             totalUnuse += blockSize;
             if (static_cast<int>(maxUnuse) < blockSize) {
                 maxUnuse = blockSize;
             }
         }
-    } while ((*reinterpret_cast<int*>(node + 0x10) == *reinterpret_cast<int*>(node + 8) - (node + 0x40)) &&
-             ((*reinterpret_cast<int*>(node + 4) == prev) &&
-              ((prev = node), (node = *reinterpret_cast<int*>(node + 8)), true)));
 
-    if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, DAT_801d67d8);
+        if ((*reinterpret_cast<int*>(node + 0x10) != *reinterpret_cast<int*>(node + 8) - (node + 0x40)) ||
+            (*reinterpret_cast<int*>(node + 4) != prev)) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                Printf__7CSystemFPce(&System, DAT_801d67d8);
+            }
+            return;
+        }
+
+        prev = node;
+        node = *reinterpret_cast<int*>(node + 8);
     }
+
+    int srcLen = strlen(reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10));
+    int sourceOffset = srcLen - 12;
+    sourceOffset &= ~(sourceOffset >> 31);
+    strcpy(line, reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + sourceOffset + 0x10));
+    Graphic.DrawDebugStringDirect(0x10, y, line, 8);
+
+    sprintf(line, s_drawHeapTitleFmt, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
+            static_cast<int>(totalUnuse) / 1024, static_cast<int>(maxUnuse) / 1024);
+    Graphic.DrawDebugStringDirect(0x208, y, line, 8);
 }
 
 /*

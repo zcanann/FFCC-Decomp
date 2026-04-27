@@ -1935,11 +1935,9 @@ void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
  */
 void __MidiCtrl_VibrateDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int* trackData = (int*)track;
-
-	*(unsigned short*)(trackData + 0x24) = (unsigned short)*(u8*)trackData[0];
-	*(unsigned short*)((int)trackData + 0x92) = (unsigned short)*(u8*)(trackData[0] + 1);
-	trackData[0] += 2;
+	*(unsigned short*)((int*)track + 0x24) = (unsigned short)*(u8*)((int*)track)[0];
+	*(unsigned short*)((int)track + 0x92) = (unsigned short)*(u8*)(((int*)track)[0] + 1);
+	((int*)track)[0] += 2;
 }
 
 /*
@@ -2123,11 +2121,9 @@ void __MidiCtrl_TremoloType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
  */
 void __MidiCtrl_TremoloDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int* trackData = (int*)track;
-
-	*(u16*)(trackData + 0x2c) = (u16)*(u8*)trackData[0];
-	*(u16*)((u8*)trackData + 0xb2) = (u16)*(u8*)(trackData[0] + 1);
-	trackData[0] += 2;
+	*(u16*)((int*)track + 0x2c) = (u16)*(u8*)((int*)track)[0];
+	*(u16*)((u8*)track + 0xb2) = (u16)*(u8*)(((int*)track)[0] + 1);
+	((int*)track)[0] += 2;
 }
 
 /*
@@ -2301,12 +2297,7 @@ void __MidiCtrl_FineTuneAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  */
 void __MidiCtrl_FineTuneRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	s8* command = (s8*)((int*)track)[0];
-	s8 fineTune = ((s8*)track)[0x148];
-
-	((int*)track)[0] = (int)(command + 1);
-	int fineTuneResult = fineTune + *command;
-	((s8*)track)[0x148] = fineTuneResult;
+	((s8*)track)[0x148] += *(*(s8**)track)++;
 	m_ChangeStatus |= 1;
 }
 
@@ -2321,10 +2312,7 @@ void __MidiCtrl_FineTuneRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  */
 void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	s8* command = (s8*)((int*)track)[0];
-
-	((int*)track)[0] = (int)(command + 1);
-	*(short*)((char*)track + 0x142) = (short)(*command << 8);
+	*(short*)((char*)track + 0x142) = (short)(*(*(s8**)track)++ << 8);
 	m_ChangeStatus |= 1;
 }
 
@@ -2339,11 +2327,7 @@ void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
  */
 void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	s8* command = (s8*)((int*)track)[0];
-	short keyTranspose = *(short*)((char*)track + 0x142);
-
-	((int*)track)[0] = (int)(command + 1);
-	*(short*)((char*)track + 0x142) = keyTranspose + (*command << 8);
+	*(short*)((char*)track + 0x142) += (short)(*(*(s8**)track)++ << 8);
 	m_ChangeStatus |= 1;
 }
 

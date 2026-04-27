@@ -665,7 +665,6 @@ int* _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
 {
     unsigned int interruptLevel;
     int* writePos;
-    int* nextPos;
 
     interruptLevel = OSDisableInterrupts();
     writePos = (int*)p_ExecCommandNow;
@@ -677,13 +676,13 @@ int* _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
     writePos[5] = param_6;
     writePos[6] = param_7;
     writePos[7] = param_8;
-    nextPos = writePos + 8;
-    if (nextPos == (int*)p_ExecCommand + 0x800) {
-        nextPos = (int*)p_ExecCommand;
+    writePos += 8;
+    if (writePos == (int*)p_ExecCommand + 0x800) {
+        writePos = (int*)p_ExecCommand;
     }
-    p_ExecCommandNow = nextPos;
+    p_ExecCommandNow = writePos;
     OSRestoreInterrupts(interruptLevel);
-    return nextPos;
+    return writePos;
 }
 
 /*

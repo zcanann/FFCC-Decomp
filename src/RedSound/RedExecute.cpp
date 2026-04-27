@@ -2020,30 +2020,28 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
  */
 int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
 {
-    int* sound = (int*)control;
-
     frames <<= m_MusicFastSpeed;
-    sound[0x121] = frames;
-    sound[4] += frames;
+    *(int*)((u8*)control + 0x484) = frames;
+    *(int*)((u8*)control + 0x10) += frames;
 
-    while (sound[4] >= sound[5]) {
-        sound[3]++;
-        sound[4] -= sound[5];
+    while (*(int*)((u8*)control + 0x10) >= *(int*)((u8*)control + 0x14)) {
+        *(int*)((u8*)control + 0x0C) += 1;
+        *(int*)((u8*)control + 0x10) -= *(int*)((u8*)control + 0x14);
     }
 
-    if (*(s16*)((u8*)sound + 0x48E) != 0) {
+    if (*(s16*)((u8*)control + 0x48E) != 0) {
         _MidiTrackExecute(control, keyOnData, frames);
     }
 
-    sound[0x11D] = 1;
-    if ((m_MusicPhraseStop == 0) && ((sound[0x11B] & 2) != 0)) {
-        sound[0x11B] &= ~2;
-        if ((sound[0x11B] & 1) != 0) {
-            *(s16*)((u8*)sound + 0x48E) = 0;
+    *(int*)((u8*)control + 0x474) = 1;
+    if ((m_MusicPhraseStop == 0) && ((*(int*)((u8*)control + 0x46C) & 2) != 0)) {
+        *(int*)((u8*)control + 0x46C) &= ~2;
+        if ((*(int*)((u8*)control + 0x46C) & 1) != 0) {
+            *(s16*)((u8*)control + 0x48E) = 0;
         }
     }
 
-    return *(s16*)((u8*)sound + 0x48E);
+    return *(s16*)((u8*)control + 0x48E);
 }
 
 /*
@@ -2106,26 +2104,24 @@ void _MusicNoteExecute()
  */
 int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
 {
-    int* sound = (int*)control;
-
     do {
-        sound[0x11D] = frames;
-        sound[0x121] = frames;
-        sound[4] += frames;
+        *(int*)((u8*)control + 0x474) = frames;
+        *(int*)((u8*)control + 0x484) = frames;
+        *(int*)((u8*)control + 0x10) += frames;
 
-        while (sound[4] >= sound[5]) {
-            sound[3]++;
-            sound[4] -= sound[5];
+        while (*(int*)((u8*)control + 0x10) >= *(int*)((u8*)control + 0x14)) {
+            *(int*)((u8*)control + 0x0C) += 1;
+            *(int*)((u8*)control + 0x10) -= *(int*)((u8*)control + 0x14);
         }
 
-        if (*(s16*)((u8*)sound + 0x48E) != 0) {
+        if (*(s16*)((u8*)control + 0x48E) != 0) {
             _MidiTrackExecute(control, keyOnData, frames);
         }
 
         if (m_MusicSkipLine != 0) {
-            if ((*(s16*)((u8*)sound + 0x48E) != 0) && ((sound[0x11B] & 2) == 0)) {
+            if ((*(s16*)((u8*)control + 0x48E) != 0) && ((*(int*)((u8*)control + 0x46C) & 2) == 0)) {
                 m_MusicSkipLine--;
-                frames = sound[5];
+                frames = *(int*)((u8*)control + 0x14);
                 RedSleep(1000);
             }
         }
@@ -2133,17 +2129,17 @@ int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
         if (m_MusicSkipLine <= 0) {
             break;
         }
-    } while (*(s16*)((u8*)sound + 0x48E) != 0);
+    } while (*(s16*)((u8*)control + 0x48E) != 0);
 
-    sound[0x11D] = 1;
-    if ((sound[0x11B] & 2) != 0) {
-        sound[0x11B] &= ~2;
-        if ((sound[0x11B] & 1) != 0) {
-            *(s16*)((u8*)sound + 0x48E) = 0;
+    *(int*)((u8*)control + 0x474) = 1;
+    if ((*(int*)((u8*)control + 0x46C) & 2) != 0) {
+        *(int*)((u8*)control + 0x46C) &= ~2;
+        if ((*(int*)((u8*)control + 0x46C) & 1) != 0) {
+            *(s16*)((u8*)control + 0x48E) = 0;
         }
     }
 
-    return *(s16*)((u8*)sound + 0x48E);
+    return *(s16*)((u8*)control + 0x48E);
 }
 
 /*

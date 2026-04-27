@@ -1061,24 +1061,22 @@ void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	u8* command;
-	u8 bankNo;
-	u32 waveNo;
+	int bankNo;
+	int waveNo;
 	int waveBank;
+	int waveBankData;
+	int waveTable;
 
-	command = *(u8**)track;
-	*(u8**)track = command + 1;
-	bankNo = *command;
-	command = *(u8**)track;
-	*(u8**)track = command + 1;
-	waveNo = *command;
+	bankNo = *(*(u8**)track)++;
+	waveNo = *(*(u8**)track)++;
 	((int*)track)[7] = 0;
 	((int*)track)[0x47] = 0;
 	waveBank = c_RedEntry.GetWaveBank(bankNo);
 	if (waveBank != 0) {
-		waveBank = *(int*)(waveBank + 8);
-		((int*)track)[7] = waveBank + *(int*)(waveBank + 0x20 + waveNo * 4);
-		((int*)track)[0x47] = *(int*)(waveBank + 0x10);
+		waveBankData = *(int*)(waveBank + 8);
+		waveTable = waveBankData + 0x20;
+		((int*)track)[7] = waveBankData + *(int*)(waveTable + waveNo * 4);
+		((int*)track)[0x47] = *(int*)(waveBankData + 0x10);
 		memset((int*)track + 0x35, 0xffffffff, 0xc);
 	}
 	*(u8*)((int)track + 0x14d) = bankNo;

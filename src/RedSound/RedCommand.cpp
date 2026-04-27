@@ -473,9 +473,13 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 
 	if (p_SeBlockData[bank] != 0) {
 		int bankData = (int)p_SeBlockData[bank];
-		if (no < *(short*)(bankData + 10)) {
+		int seNo = no;
+		int playNo = no + (bank << 9);
+
+		playNo |= 0x80000000;
+		if (seNo < *(short*)(bankData + 10)) {
 			int dataBase = bankData + 0x10;
-			int offset = *(int*)(dataBase + no * 4);
+			int offset = *(int*)(dataBase + seNo * 4);
 
 			if (offset != -1) {
 				RedSeINFO* seInfo =
@@ -484,8 +488,8 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 				if (((unsigned int)offset & 0x80000000) != 0) {
 					*(unsigned char*)seInfo |= 0x80;
 				}
-				if (_SePlayStart(seInfo, seId, (no + bank * 0x200) | 0x80000000, pan, volume) != 0) {
-					return no;
+				if (_SePlayStart(seInfo, seId, playNo, pan, volume) != 0) {
+					return seNo;
 				}
 			}
 		}

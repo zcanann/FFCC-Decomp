@@ -2415,10 +2415,8 @@ void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
  */
 void __MidiCtrl_ReverbOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-
-    trackData[0x3f] |= 0x3c00;
-    SetVoiceSwitch(track, trackData[0x3f]);
+    ((int*)track)[0x3f] |= 0x3c00;
+    SetVoiceSwitch(track, ((int*)track)[0x3f]);
     m_ChangeStatus |= 2;
 }
 
@@ -2433,11 +2431,9 @@ void __MidiCtrl_ReverbOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-
-    trackData[0x3f] &= 0xffffcfff;
-    trackData[0x3f] |= 0xc00;
-    SetVoiceSwitch(track, trackData[0x3f]);
+    ((int*)track)[0x3f] &= 0xffffcfff;
+    ((int*)track)[0x3f] |= 0xc00;
+    SetVoiceSwitch(track, ((int*)track)[0x3f]);
     m_ChangeStatus |= 2;
 }
 

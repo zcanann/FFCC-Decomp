@@ -90,8 +90,16 @@ struct GhostPartyWork {
 
 static GhostPartyWork sGhostPartyWork;
 
+struct PartyObjFlags {
+	unsigned char commandActive : 1;
+	unsigned char reserved : 7;
+};
+
 struct PartyObjOverlay {
-	unsigned char partyFlags;
+	union {
+		unsigned char partyFlags;
+		PartyObjFlags flags;
+	};
 	unsigned char _pad6B9[3];
 	int unk6BC;
 	int unk6C0;
@@ -2050,7 +2058,7 @@ void CGPartyObj::onTalk(CGBaseObj* other, int talkType)
  */
 void CGPartyObj::commandFinished()
 {
-	PartyData(this).partyFlags &= 0x7F;
+	PartyData(this).flags.commandActive = 0;
 }
 
 /*

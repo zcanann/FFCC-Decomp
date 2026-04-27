@@ -1835,20 +1835,22 @@ void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 {
     int trackDelta[1];
     int* trackData = (int*)track;
-    unsigned int rate;
+    int rate;
+    int divisor;
 
     trackDelta[0] = DeltaTimeSumup((unsigned char**)trackData);
     if (trackDelta[0] == 0) {
         trackDelta[0] += 1;
     }
 
-    if (*(char*)trackData[0] == '\0') {
-        rate = 0x100;
+    if (*(u8*)trackData[0] != 0) {
+        rate = *(u8*)trackData[0];
     } else {
-        rate = (unsigned int)*(unsigned char*)trackData[0];
+        rate = 0x100;
     }
 
-    rate = 0x100 / rate;
+    divisor = rate;
+    rate = 0x100 / divisor;
     trackData[0x1f] = DataAddCompute(trackData + 0x1e, rate, trackDelta);
     *(short*)(trackData + 0x23) = (short)trackDelta[0];
     trackData[0] += 1;
@@ -2023,19 +2025,21 @@ void __MidiCtrl_TremoloRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	int delta[1];
-	u32 rate;
+	int rate;
+	int divisor;
 	int* trackData = (int*)track;
 
 	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	if (*(char*)trackData[0] == '\0') {
-		rate = 0x100;
-	} else {
+	if (*(u8*)trackData[0] != 0) {
 		rate = *(u8*)trackData[0];
+	} else {
+		rate = 0x100;
 	}
-	rate = 0x100 / rate;
+	divisor = rate;
+	rate = 0x100 / divisor;
 	trackData[0x27] = DataAddCompute(trackData + 0x26, rate, delta);
 	*(short*)(trackData + 0x2b) = (short)delta[0];
 	trackData[0] += 1;
@@ -2185,19 +2189,21 @@ void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
 void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	int delta[1];
-	u32 rate;
+	int rate;
+	int divisor;
 	int* trackData = (int*)track;
 
 	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	if (*(char*)trackData[0] == '\0') {
-		rate = 0x100;
-	} else {
+	if (*(u8*)trackData[0] != 0) {
 		rate = *(u8*)trackData[0];
+	} else {
+		rate = 0x100;
 	}
-	rate = 0x100 / rate;
+	divisor = rate;
+	rate = 0x100 / divisor;
 	trackData[0x2f] = DataAddCompute(trackData + 0x2e, rate, delta);
 	*(short*)(trackData + 0x34) = (short)delta[0];
 	trackData[0] += 1;

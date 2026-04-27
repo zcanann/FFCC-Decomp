@@ -152,7 +152,7 @@ s16 t_PanningDataR[] = {
 };
 
 struct RedReverbDATA {
-    void (*callback)(void*, void*);
+    int callback;
     void* context;
     int kind;
 };
@@ -430,7 +430,7 @@ int* SetReverb(int bank, int kind, int* params)
     }
 
     reverb = p_ReverbData + (bank & 1);
-    if ((reverb->callback != nullptr) && (reverb->kind == kind)) {
+    if ((reverb->callback != 0) && (reverb->kind == kind)) {
         _SetReverbData(reverb, params);
         return (int*)p_ReverbSize;
     }
@@ -446,7 +446,7 @@ int* SetReverb(int bank, int kind, int* params)
     case 1: {
         AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)RedNew(sizeof(AXFX_REVERBSTD));
         reverb->context = std;
-        reverb->callback = (void (*)(void*, void*))AXFXReverbStdCallback;
+        reverb->callback = (int)AXFXReverbStdCallback;
         std->tempDisableFX = 0;
         std->preDelay = (float)params[0] / s_ReverbTimeScale;
         std->time = (float)params[1] / s_ReverbTimeScale;
@@ -459,7 +459,7 @@ int* SetReverb(int bank, int kind, int* params)
     case 2: {
         AXFX_REVERBHI* hi = (AXFX_REVERBHI*)RedNew(sizeof(AXFX_REVERBHI));
         reverb->context = hi;
-        reverb->callback = (void (*)(void*, void*))AXFXReverbHiCallback;
+        reverb->callback = (int)AXFXReverbHiCallback;
         hi->tempDisableFX = 0;
         hi->preDelay = (float)params[0] / s_ReverbTimeScale;
         hi->time = (float)params[1] / s_ReverbTimeScale;
@@ -473,7 +473,7 @@ int* SetReverb(int bank, int kind, int* params)
     case 3: {
         AXFX_DELAY* delay = (AXFX_DELAY*)RedNew(sizeof(AXFX_DELAY));
         reverb->context = delay;
-        reverb->callback = (void (*)(void*, void*))AXFXDelayCallback;
+        reverb->callback = (int)AXFXDelayCallback;
         delay->delay[0] = (u32)params[0];
         delay->delay[1] = (u32)params[0];
         delay->delay[2] = (u32)params[0];
@@ -489,7 +489,7 @@ int* SetReverb(int bank, int kind, int* params)
     case 4: {
         AXFX_CHORUS* chorus = (AXFX_CHORUS*)RedNew(sizeof(AXFX_CHORUS));
         reverb->context = chorus;
-        reverb->callback = (void (*)(void*, void*))AXFXChorusCallback;
+        reverb->callback = (int)AXFXChorusCallback;
         chorus->baseDelay = (u32)params[0];
         chorus->variation = (u32)params[1];
         chorus->period = (u32)params[2];
@@ -499,7 +499,7 @@ int* SetReverb(int bank, int kind, int* params)
     case 5: {
         AXFX_REVERBHI_DPL2* hiDpl2 = (AXFX_REVERBHI_DPL2*)RedNew(sizeof(AXFX_REVERBHI_DPL2));
         reverb->context = hiDpl2;
-        reverb->callback = (void (*)(void*, void*))AXFXReverbHiCallbackDpl2;
+        reverb->callback = (int)AXFXReverbHiCallbackDpl2;
         hiDpl2->tempDisableFX = 0;
         hiDpl2->preDelay = (float)params[0] / s_ReverbTimeScale;
         hiDpl2->time = (float)params[1] / s_ReverbTimeScale;
@@ -513,10 +513,10 @@ int* SetReverb(int bank, int kind, int* params)
 
     if (result == 1) {
         if (bank == 0) {
-            AXRegisterAuxACallback(reverb->callback, reverb->context);
+            AXRegisterAuxACallback((void (*)(void*, void*))reverb->callback, reverb->context);
         }
         else {
-            AXRegisterAuxBCallback(reverb->callback, reverb->context);
+            AXRegisterAuxBCallback((void (*)(void*, void*))reverb->callback, reverb->context);
         }
     }
     else {

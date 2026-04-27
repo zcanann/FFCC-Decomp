@@ -837,7 +837,7 @@ void CSound::Frame()
 
                     if (static_cast<signed char>(se[2]) != pan) {
                         if (*reinterpret_cast<int*>(se + 8) < 0) {
-                            Printf__7CSystemFPce(&System, s_soundErrorFmt);
+                            Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                         } else {
                             SePan__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), pan, 0x1E);
                         }
@@ -846,7 +846,7 @@ void CSound::Frame()
 
                     if (static_cast<signed char>(se[1]) != volume[0]) {
                         if (*reinterpret_cast<int*>(se + 8) < 0) {
-                            Printf__7CSystemFPce(&System, s_soundErrorFmt);
+                            Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                         } else {
                             SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), volume[0], 0x1E);
                         }
@@ -861,7 +861,7 @@ void CSound::Frame()
                 int vol = volume[0];
                 int seNo = *reinterpret_cast<int*>(se + 0xC);
                 if (seNo < 0) {
-                    Printf__7CSystemFPce(&System, s_soundErrorFmt);
+                    Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                     seNo = -1;
                 } else if (seNo < 4000) {
                     int bank = seNo / 1000;
@@ -1066,7 +1066,7 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
 
     if (waveNo < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else if (ReentryWaveData__9CRedSoundFi(redSound, waveNo) == -1) {
         CSoundLayout& sound = SoundData(this);
         CFile::CHandle*& waveFile = sound.m_waveFile;
@@ -1147,7 +1147,7 @@ void CSound::LoadBgm(int bgmId)
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
 
     if (bgmId < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else if (ReentryMusicData__9CRedSoundFi(redSound, bgmId) == -1) {
         char musicPath[256];
         sprintf(musicPath, s_soundMusicPathFmt, bgmId);
@@ -1176,7 +1176,7 @@ void CSound::PlayBgm(int bgmId)
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
 
     if (bgmId < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         MusicStop__9CRedSoundFi(redSound, -1);
         SetMusicPhraseStop__9CRedSoundFi(redSound, 0);
@@ -1198,7 +1198,7 @@ void CSound::CrossPlayBgm(int bgmId, int crossFrames)
     CRedSound* redSound = RedSound(this);
 
     if (bgmId < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         SetMusicPhraseStop__9CRedSoundFi(redSound, 0);
         MusicCrossPlay__9CRedSoundFiii(redSound, bgmId, 0x7F, crossFrames);
@@ -1363,7 +1363,7 @@ void CSound::LoadSe(int seId)
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
 
     if (seId < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else if (ReentrySeSepData__9CRedSoundFi(redSound, seId) == -1) {
         char sePath[264];
         sprintf(sePath, s_soundSeSepPathFmt, seId);
@@ -1413,11 +1413,11 @@ void CSound::LoadWave(int waveId)
     CFile::CHandle*& waveFile = sound.m_waveFile;
 
     if (waveId < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         if (ReentryWaveData__9CRedSoundFi(redSound, waveId) == -1) {
             if (waveId < 0) {
-                Printf__7CSystemFPce(&System, s_soundErrorFmt);
+                Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
             } else if (ReentryWaveData__9CRedSoundFi(redSound, waveId) == -1) {
                 if (waveFile != 0) {
                     File.Close(waveFile);
@@ -1548,7 +1548,7 @@ int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
 
     if (seNo < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
         seId = -1;
     } else if (seNo < 4000) {
         const int seBank = seNo / 1000;
@@ -2236,7 +2236,7 @@ void CSound::SetReverb(int reverb, int depth)
 void CSound::LoadStream(int streamID)
 {
     if (streamID < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         CSoundLayout& sound = SoundData(this);
         bool isPlaying = false;

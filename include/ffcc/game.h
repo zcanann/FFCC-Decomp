@@ -99,10 +99,10 @@ public:
     void clearWorkScript();
     void CheckScriptChange();
     void ChangeMap(int, int, int, int);
-    virtual void ScriptChanging(char*);
-    virtual void ScriptChanged(char*, int);
-    virtual void MapChanging(int, int);
-    virtual void MapChanged(int, int, int);
+    void ScriptChanging(char*);
+    void ScriptChanged(char*, int);
+    void MapChanging(int, int);
+    void MapChanged(int, int, int);
     void loadCfd();
     void Calc();
     void Calc2();

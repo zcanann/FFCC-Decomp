@@ -200,6 +200,10 @@ unsigned int lbl_801EAD84[3] = {reinterpret_cast<unsigned int>(lbl_8032E69C), 0x
 unsigned int lbl_801EAD90 = reinterpret_cast<unsigned int>(lbl_8032E69C);
 int DAT_8032ed38;
 int DAT_8032ed3c;
+static const char* s_drawAfterViewerFan;
+static char s_drawAfterViewerFanInitialized;
+static int s_drawAfterViewerAlive;
+static char s_drawAfterViewerAliveInitialized;
 CPartPcs PartPcs;
 CProfile g_par_calc_prof(const_cast<char*>(s_no_name_8032fdcc));
 CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
@@ -1239,11 +1243,6 @@ void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
  */
 void CPartPcs::drawAfterViewer()
 {
-	static const char* pFan;
-	static char init;
-	static int alive;
-	static char init_0;
-
 	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x3f1);
 	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
 	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
@@ -1256,17 +1255,18 @@ void CPartPcs::drawAfterViewer()
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 
-	if (init == 0) {
-		pFan = sDebugSpinnerText;
-		init = 1;
+	if (s_drawAfterViewerFanInitialized == 0) {
+		s_drawAfterViewerFan = sDebugSpinnerText;
+		s_drawAfterViewerFanInitialized = 1;
 	}
-	if (init_0 == 0) {
-		alive = 0;
-		init_0 = 1;
+	if (s_drawAfterViewerAliveInitialized == 0) {
+		s_drawAfterViewerAlive = 0;
+		s_drawAfterViewerAliveInitialized = 1;
 	}
 
-	alive++;
-	Graphic.Printf(const_cast<char*>(s_tina_title_fmt_801d8014), pFan[(alive >> 4) % 4]);
+	s_drawAfterViewerAlive++;
+	Graphic.Printf(
+		const_cast<char*>(s_tina_title_fmt_801d8014), s_drawAfterViewerFan[(s_drawAfterViewerAlive >> 4) % 4]);
 
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();

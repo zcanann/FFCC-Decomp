@@ -1,11 +1,12 @@
 #ifndef _FFCC_P_USB_H_
 #define _FFCC_P_USB_H_
 
+#include "ffcc/p_sample.h"
 #include "ffcc/memory.h"
+#include "ffcc/p_sample.h"
 #include "ffcc/usb.h"
-#include "ffcc/system.h"
 
-class CUSBPcs : public CProcess
+class CUSBPcs : public CSamplePcs
 {
 public:
     CUSBPcs();

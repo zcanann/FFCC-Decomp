@@ -74,7 +74,7 @@ found_fallback:
 	unsigned char flags = renderFlags;
 	unsigned int drawWidth;
 
-	if (static_cast<int>((static_cast<unsigned int>(flags) << 27) | static_cast<unsigned int>(flags >> 5)) < 0) {
+	if ((flags & 8) != 0) {
 		drawWidth = static_cast<unsigned int>(m_glyphWidth);
 	} else {
 		signed char sign = static_cast<signed char>(flags) >> 7;
@@ -84,7 +84,7 @@ found_fallback:
 	}
 
 	double width = static_cast<double>(scaleX * (margin + static_cast<float>(drawWidth)));
-	if (static_cast<int>((static_cast<unsigned int>(flags) << 28) | static_cast<unsigned int>(flags >> 4)) < 0) {
+	if ((flags & 0x10) != 0) {
 		width = static_cast<double>(static_cast<float>(floor(width)));
 	}
 
@@ -122,19 +122,16 @@ find_fallback:
 float CFont::GetWidth(char* text)
 {
 	float width = 0.0f;
-	unsigned short ch;
+	unsigned int ch = 0;
 
-	while (true) {
-		ch = static_cast<unsigned char>(*text);
-		if (ch == '\0') {
-			break;
-		}
+	goto read_char;
+
+	while (ch != '\0') {
 		unsigned short* glyph = m_glyphBuckets[ch] + 1;
 		int count = static_cast<int>(m_glyphBuckets[ch][0]);
-		text++;
 
 		for (; count > 0; count--) {
-			if (*reinterpret_cast<char*>(glyph + 1) != '\0') {
+			if (*reinterpret_cast<unsigned char*>(glyph + 1) != 0) {
 				glyph += 4;
 			} else {
 				goto use_glyph;
@@ -147,7 +144,7 @@ use_glyph:
 		unsigned char flags = renderFlags;
 		unsigned int drawWidth;
 
-		if (static_cast<int>((static_cast<unsigned int>(flags) << 27) | static_cast<unsigned int>(flags >> 5)) < 0) {
+		if ((flags & 8) != 0) {
 			drawWidth = static_cast<unsigned int>(m_glyphWidth);
 		} else {
 			signed char sign = static_cast<signed char>(flags);
@@ -158,18 +155,18 @@ use_glyph:
 		}
 
 		float charWidth = scaleX * (margin + static_cast<float>(drawWidth));
-		if (static_cast<int>((static_cast<unsigned int>(flags) << 28) | static_cast<unsigned int>(flags >> 4)) < 0) {
+		if ((flags & 0x10) != 0) {
 			charWidth = static_cast<float>(floor(charWidth));
 		}
 
 		width += charWidth;
-		continue;
+		goto read_char;
 
 find_fallback:
 		unsigned short* glyphBucket = m_glyphBuckets[63];
 		unsigned short* fallbackGlyph = glyphBucket + 1;
 		for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
-			if (*reinterpret_cast<char*>(fallbackGlyph + 1) != '\0') {
+			if (*reinterpret_cast<unsigned char*>(fallbackGlyph + 1) != 0) {
 				fallbackGlyph += 4;
 			} else {
 				break;
@@ -182,6 +179,10 @@ find_fallback:
 		if (glyph != 0) {
 			goto use_glyph;
 		}
+
+read_char:
+		ch = static_cast<unsigned char>(*text);
+		text++;
 	}
 
 	return width;

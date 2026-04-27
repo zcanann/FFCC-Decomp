@@ -139,49 +139,89 @@ struct CharaBreakDisplayList {
 };
 
 struct CharaBreakMeshData {
-    char m_name[0x14];
+    char m_name[0x10];
+    u8 m_flags;
+    u8 _pad11[3];
     u32 m_vertexCount;
-    u8 _pad18[0x34];
+    S16Vec* m_vertices;
+    u32 m_normalCount;
+    S16Vec* m_normals;
+    u32 m_colorCount;
+    void* m_colors;
+    u32 m_uvCount;
+    void* m_uvs;
+    u32 m_oneWeightCountOrSize;
+    void* m_oneWeightData;
+    u32 m_twoWeightCountOrSize;
+    void* m_twoWeightData;
+    u32 m_threeWeightCountOrSize;
+    void* m_threeWeightData;
     s32 m_displayListCount;
     CharaBreakDisplayList* m_displayLists;
     u32 m_skinCount;
-    u8 _pad58[0x4];
+    void* m_skins;
+    u32 m_infoWord1;
     s32 m_nodeIndex;
 };
 
 struct CharaBreakMeshRef {
-    u8 _pad0[0x8];
     CharaBreakMeshData* m_data;
     S16Vec* m_workPositions;
     S16Vec* m_workNormals;
+    u8 _padC[8];
 };
 
 struct CharaBreakModelData {
-    u8 _pad0[0xC];
-    u32 m_meshCount;
-    u8 _pad10[0x14];
+    u8 _pad0[0xA];
+    u16 m_meshCount;
+    u8 _padC[0x14];
     void* m_materialSet;
-    u8 _pad28[0xC];
+    u8 _pad24[0x8];
     u32 m_posQuant;
     u32 m_normQuant;
 };
 
 struct CharaBreakModelView {
-    u8 _pad0[0x8];
-    Mtx m_localMtx;
-    u8 _pad38[0x6C];
+    u8 _pad0[0xA4];
     CharaBreakModelData* m_data;
     void* m_nodes;
     CharaBreakMeshRef* m_meshes;
 };
 
-STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
-STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
-STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
-STATIC_ASSERT(offsetof(CharaBreakModelView, m_localMtx) == 0x8);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x0);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0x4);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x8);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_data) == 0xA4);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_nodes) == 0xA8);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_meshes) == 0xAC);
+STATIC_ASSERT(offsetof(CharaBreakModelData, m_meshCount) == 0xA);
+STATIC_ASSERT(offsetof(CharaBreakModelData, m_materialSet) == 0x20);
+STATIC_ASSERT(offsetof(CharaBreakModelData, m_posQuant) == 0x2C);
+STATIC_ASSERT(offsetof(CharaBreakModelData, m_normQuant) == 0x30);
+STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayListCount) == 0x4C);
+STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayLists) == 0x50);
+STATIC_ASSERT(offsetof(CharaBreakMeshData, m_skinCount) == 0x54);
+STATIC_ASSERT(offsetof(CharaBreakMeshData, m_nodeIndex) == 0x60);
+
+static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
+{
+    return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(model) + 0x8);
+}
+
+static inline CharaBreakModelData* ModelData(CChara::CModel* model)
+{
+    return *reinterpret_cast<CharaBreakModelData**>(reinterpret_cast<u8*>(model) + 0xA4);
+}
+
+static inline void* ModelNodes(CChara::CModel* model)
+{
+    return *reinterpret_cast<void**>(reinterpret_cast<u8*>(model) + 0xA8);
+}
+
+static inline CharaBreakMeshRef* ModelMeshes(CChara::CModel* model)
+{
+    return *reinterpret_cast<CharaBreakMeshRef**>(reinterpret_cast<u8*>(model) + 0xAC);
+}
 
 /*
  * --INFO--
@@ -328,7 +368,9 @@ extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32 v
  */
 void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
-    CharaBreakMeshData* meshData = *(CharaBreakMeshData**)((u8*)mesh + 8);
+    CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
+    CharaBreakMeshData* meshData = meshRef->m_data;
+    CharaBreakModelData* modelData = ModelData(model);
     s32 isRigid = 0;
     S16Vec* workPositions;
     u16* stream = (u16*)displayList;
@@ -338,10 +380,10 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 
     if (meshData->m_skinCount == 0) {
         isRigid = 1;
-        PSMTXConcat(*(Mtx*)((u8*)model + 0x8), *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (meshData->m_nodeIndex * 0xC0) + 0x6C),
+        PSMTXConcat(ModelDrawMtx(model), *(Mtx*)((u8*)ModelNodes(model) + (meshData->m_nodeIndex * 0xC0) + 0x6C),
                     meshMtx);
     }
-    workPositions = ((CharaBreakMeshRef*)mesh)->m_workPositions;
+    workPositions = meshRef->m_workPositions;
 
     s32 keepReading = 1;
     while (keepReading != 0) {
@@ -385,11 +427,10 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                     posQuantized.x = sourcePos->x;
                     posQuantized.y = sourcePos->y;
                     posQuantized.z = sourcePos->z;
-                    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &posFloat, posQuantized,
-                                                        *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
+                    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &posFloat, posQuantized, modelData->m_posQuant);
                     PSMTXMultVec(meshMtx, &posFloat, &posFloat);
                     ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, (S16Vec*)(polygonBytes + (outVertex * 6) + 0x10), posFloat,
-                                                        *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
+                                                        modelData->m_posQuant);
                 } else {
                     S16Vec* sourcePos = workPositions + posIndex;
                     s32 positionOffset = outVertex * 6;
@@ -446,10 +487,9 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
                           CChara::CModel* model, CChara::CMesh* mesh)
 {
     CharaBreakStep* stepData = (CharaBreakStep*)charaBreak;
-    CharaBreakModelView* modelView = (CharaBreakModelView*)model;
-    CharaBreakMeshRef* meshRef = (CharaBreakMeshRef*)mesh;
+    CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
     S16Vec* workNormals = meshRef->m_workNormals;
-    u32 normQuant = modelView->m_data->m_normQuant;
+    u32 normQuant = ModelData(model)->m_normQuant;
 
     for (u32 i = 0; i < polygonCount; i++) {
         Vec normal;
@@ -523,9 +563,8 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 {
     CharaBreakStep* stepData = (CharaBreakStep*)step;
     CharaBreakWork* workData = (CharaBreakWork*)work;
-    CharaBreakModelView* modelView = (CharaBreakModelView*)model;
-    CharaBreakModelData* modelData = modelView->m_data;
-    CChara::CMesh* mesh = (CChara::CMesh*)modelView->m_meshes;
+    CharaBreakModelData* modelData = ModelData(model);
+    CChara::CMesh* mesh = reinterpret_cast<CChara::CMesh*>(ModelMeshes(model));
     u32 meshIndex;
     s32 threshold;
 
@@ -535,13 +574,13 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
     for (meshIndex = 0; meshIndex < modelData->m_meshCount; meshIndex++) {
         bool needsMtxUpdate = false;
         Mtx meshToWorld;
-        CharaBreakMeshData* meshData = *(CharaBreakMeshData**)((u8*)mesh + 8);
-        CharaBreakMeshRef* meshRef = (CharaBreakMeshRef*)mesh;
+        CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
+        CharaBreakMeshData* meshData = meshRef->m_data;
         S16Vec* workPositions = meshRef->m_workPositions;
 
         if (meshData->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
             needsMtxUpdate = true;
-            PSMTXConcat(*(Mtx*)((u8*)model + 0x8), *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (meshData->m_nodeIndex * 0xC0) + 0x6C),
+            PSMTXConcat(ModelDrawMtx(model), *(Mtx*)((u8*)ModelNodes(model) + (meshData->m_nodeIndex * 0xC0) + 0x6C),
                         meshToWorld);
         }
 
@@ -920,8 +959,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
         }
     }
 
-    mesh = *(u8**)(model + 0xAC);
-    meshCount = *(u32*)(*(u8**)(model + 0xA4) + 0xC);
+    mesh = reinterpret_cast<u8*>(ModelMeshes(reinterpret_cast<CChara::CModel*>(model)));
+    meshCount = ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount;
 
     if (work->m_meshBuffers == NULL) {
         work->m_miscValue = FLOAT_80332050;
@@ -932,7 +971,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
             goto fail;
         }
 
-        for (i = 0; i < *(u32*)(*(u8**)(model + 0xA4) + 0xC); i++) {
+        for (i = 0; i < ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount; i++) {
             ((u32*)work->m_meshBuffers)[i] = 0;
         }
 
@@ -944,9 +983,9 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     &gUtil,
                     &work->m_bboxMin,
                     &work->m_bboxMax,
-                    ((CharaBreakMeshRef*)mesh)->m_workPositions,
+                    reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_workPositions,
                     meshData->m_vertexCount,
-                    *(u32*)(*(u32*)(model + 0xA4) + 0x34));
+                    ModelData(reinterpret_cast<CChara::CModel*>(model))->m_posQuant);
             }
 
             ((u32*)work->m_meshBuffers)[i] = (u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(

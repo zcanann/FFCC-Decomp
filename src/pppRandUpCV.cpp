@@ -17,6 +17,11 @@ struct RandUpCVCtx {
     s32* outputOffset;
 };
 
+inline char randchar(char value, float scale)
+{
+    return (char)((f32)value * scale);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80062708
@@ -61,19 +66,19 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
         f32 scale = *valuePtr;
         {
             s8 baseValue = in->delta[0];
-            target[0] = (u8)(target[0] + (s32)((f32)baseValue * scale));
+            target[0] = (u8)(target[0] + randchar(baseValue, scale));
         }
         {
             s8 baseValue = in->delta[1];
-            target[1] = (u8)(target[1] + (s32)((f32)baseValue * scale));
+            target[1] = (u8)(target[1] + randchar(baseValue, scale));
         }
         {
             s8 baseValue = in->delta[2];
-            target[2] = (u8)(target[2] + (s32)((f32)baseValue * scale));
+            target[2] = (u8)(target[2] + randchar(baseValue, scale));
         }
         {
             s8 baseValue = in->delta[3];
-            target[3] = (u8)(target[3] + (s32)((f32)baseValue * scale));
+            target[3] = (u8)(target[3] + randchar(baseValue, scale));
         }
     }
 }
@@ -87,7 +92,3 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-char randchar(char value, float scale)
-{
-    return (char)((f32)value * scale);
-}

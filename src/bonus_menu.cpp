@@ -1089,8 +1089,6 @@ void CMenuPcs::BonusInit()
 {
 	gBonusMenuWork0 = 0;
 	GetBonusMenuMembers(this).m_bonusAnimPtr = 0;
-	s_bonusSummaryData = 0;
-	s_bonusBoardState = 0;
 	gBonusCheckMarkPosBuffer = 0;
 }
 

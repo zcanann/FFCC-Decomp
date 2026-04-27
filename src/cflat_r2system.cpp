@@ -664,12 +664,13 @@ extern "C" unsigned short GetGbaButtonDown__4CPadFl(void* pad, long padIndex)
 {
     bool isInvalidPad = false;
     unsigned int result;
+    CPad* self = static_cast<CPad*>(pad);
 
-    if (*(int*)((char*)pad + 0x1C4) == 0) {
+    if (self->_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (*(int*)((char*)pad + 0x1C0) == -1) {
+        if (self->_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -679,11 +680,9 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int activePad = *(int*)((char*)pad + 0x1C0);
-        int validMask = ~((activePad - padIndex) | (padIndex - activePad));
-        int slot = padIndex & ~(validMask >> 31);
-        unsigned int offset = static_cast<unsigned int>(slot) * 0x54 + 0xA;
-        result = *(unsigned short*)((char*)pad + offset);
+        int activePad = self->_448_4_;
+        int slot = padIndex & ~((int)~(activePad - padIndex | padIndex - activePad) >> 31);
+        result = self->GetPadInputs()[slot].buttonDown[1];
     }
 
     return (unsigned short)result;
@@ -698,15 +697,16 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" double GetRightStickY__4CPadFl(void* pad, long padIndex)
+extern "C" float GetRightStickY__4CPadFl(void* pad, long padIndex)
 {
     bool isInvalidPad = false;
+    CPad* self = static_cast<CPad*>(pad);
 
-    if (*(int*)((char*)pad + 0x1C4) == 0) {
+    if (self->_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (*(int*)((char*)pad + 0x1C0) == -1) {
+        if (self->_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -714,14 +714,11 @@ extern "C" double GetRightStickY__4CPadFl(void* pad, long padIndex)
 
 done_check:
     if (isInvalidPad) {
-        return (double)0.0f;
+        return 0.0f;
     }
 
-    return (double)*(float*)((char*)pad + (padIndex & ~((int)~(*(int*)((char*)pad + 0x1C0) - padIndex |
-                                                        padIndex - *(int*)((char*)pad + 0x1C0)) >>
-                                          31)) *
-                                               0x54 +
-                             0x30);
+    return self->GetPadInputs()[padIndex & ~((int)~(self->_448_4_ - padIndex | padIndex - self->_448_4_) >> 31)]
+        .substickYF;
 }
 
 /*
@@ -733,15 +730,16 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" double GetRightStickX__4CPadFl(void* pad, long padIndex)
+extern "C" float GetRightStickX__4CPadFl(void* pad, long padIndex)
 {
     bool isInvalidPad = false;
+    CPad* self = static_cast<CPad*>(pad);
 
-    if (*(int*)((char*)pad + 0x1C4) == 0) {
+    if (self->_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (*(int*)((char*)pad + 0x1C0) == -1) {
+        if (self->_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -749,14 +747,11 @@ extern "C" double GetRightStickX__4CPadFl(void* pad, long padIndex)
 
 done_check:
     if (isInvalidPad) {
-        return (double)0.0f;
+        return 0.0f;
     }
 
-    return (double)*(float*)((char*)pad + (padIndex & ~((int)~(*(int*)((char*)pad + 0x1C0) - padIndex |
-                                                        padIndex - *(int*)((char*)pad + 0x1C0)) >>
-                                          31)) *
-                                               0x54 +
-                             0x2C);
+    return self->GetPadInputs()[padIndex & ~((int)~(self->_448_4_ - padIndex | padIndex - self->_448_4_) >> 31)]
+        .substickXF;
 }
 
 /*
@@ -768,15 +763,16 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" double GetLeftStickY__4CPadFl(void* pad, long padIndex)
+extern "C" float GetLeftStickY__4CPadFl(void* pad, long padIndex)
 {
     bool isInvalidPad = false;
+    CPad* self = static_cast<CPad*>(pad);
 
-    if (*(int*)((char*)pad + 0x1C4) == 0) {
+    if (self->_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (*(int*)((char*)pad + 0x1C0) == -1) {
+        if (self->_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -784,14 +780,11 @@ extern "C" double GetLeftStickY__4CPadFl(void* pad, long padIndex)
 
 done_check:
     if (isInvalidPad) {
-        return (double)0.0f;
+        return 0.0f;
     }
 
-    return (double)*(float*)((char*)pad + (padIndex & ~((int)~(*(int*)((char*)pad + 0x1C0) - padIndex |
-                                                        padIndex - *(int*)((char*)pad + 0x1C0)) >>
-                                          31)) *
-                                               0x54 +
-                             0x28);
+    return self->GetPadInputs()[padIndex & ~((int)~(self->_448_4_ - padIndex | padIndex - self->_448_4_) >> 31)]
+        .stickYF;
 }
 
 /*
@@ -803,15 +796,16 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" double GetLeftStickX__4CPadFl(void* pad, long padIndex)
+extern "C" float GetLeftStickX__4CPadFl(void* pad, long padIndex)
 {
     bool isInvalidPad = false;
+    CPad* self = static_cast<CPad*>(pad);
 
-    if (*(int*)((char*)pad + 0x1C4) == 0) {
+    if (self->_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (*(int*)((char*)pad + 0x1C0) == -1) {
+        if (self->_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -819,14 +813,11 @@ extern "C" double GetLeftStickX__4CPadFl(void* pad, long padIndex)
 
 done_check:
     if (isInvalidPad) {
-        return (double)0.0f;
+        return 0.0f;
     }
 
-    return (double)*(float*)((char*)pad + (padIndex & ~((int)~(*(int*)((char*)pad + 0x1C0) - padIndex |
-                                                        padIndex - *(int*)((char*)pad + 0x1C0)) >>
-                                          31)) *
-                                               0x54 +
-                             0x24);
+    return self->GetPadInputs()[padIndex & ~((int)~(self->_448_4_ - padIndex | padIndex - self->_448_4_) >> 31)]
+        .stickXF;
 }
 
 /*
@@ -842,12 +833,13 @@ extern "C" unsigned short GetButtonRepeat__4CPadFl(void* pad, long padIndex)
 {
     bool isInvalidPad = false;
     unsigned int result;
+    CPad* self = static_cast<CPad*>(pad);
 
-    if (*(int*)((char*)pad + 0x1C4) == 0) {
+    if (self->_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (*(int*)((char*)pad + 0x1C0) == -1) {
+        if (self->_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -857,11 +849,9 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int activePad = *(int*)((char*)pad + 0x1C0);
-        int validMask = ~((activePad - padIndex) | (padIndex - activePad));
-        int slot = padIndex & ~(validMask >> 31);
-        unsigned int offset = static_cast<unsigned int>(slot) * 0x54 + 0x14;
-        result = *(unsigned short*)((char*)pad + offset);
+        int activePad = self->_448_4_;
+        int slot = padIndex & ~((int)~(activePad - padIndex | padIndex - activePad) >> 31);
+        result = self->GetPadInputs()[slot].repeatButton;
     }
 
     return (unsigned short)result;
@@ -880,12 +870,13 @@ extern "C" unsigned short GetButton__4CPadFl(void* pad, long padIndex)
 {
     bool isInvalidPad = false;
     unsigned int result;
+    CPad* self = static_cast<CPad*>(pad);
 
-    if (*(int*)((char*)pad + 0x1C4) == 0) {
+    if (self->_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (*(int*)((char*)pad + 0x1C0) == -1) {
+        if (self->_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -895,11 +886,9 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int activePad = *(int*)((char*)pad + 0x1C0);
-        int validMask = ~((activePad - padIndex) | (padIndex - activePad));
-        int slot = padIndex & ~(validMask >> 31);
-        unsigned int offset = static_cast<unsigned int>(slot) * 0x54 + 4;
-        result = *(unsigned short*)((char*)pad + offset);
+        int activePad = self->_448_4_;
+        int slot = padIndex & ~((int)~(activePad - padIndex | padIndex - activePad) >> 31);
+        result = self->GetPadInputs()[slot].button[0];
     }
 
     return (unsigned short)result;

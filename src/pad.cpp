@@ -22,18 +22,14 @@ static const char s_CPad[] = "CPad";
 static const float FLOAT_8032f820 = 0.0f;
 static const float FLOAT_8032f824 = 0.0078125f;
 static const float FLOAT_8032f828 = 255.0f;
+extern const char s_pad_cpp[8];
+extern const char s_rb[3];
+extern const char s_replay_dat[12];
+extern const char s_replay_host_msg[64];
 
 extern "C" {
 unsigned char g_pad[0x30];
 }
-
-static const char s_pad_cpp[] = "pad.cpp";
-static const char s_rb[] = "rb";
-static const char s_replay_dat[] = "/replay.dat";
-static const char s_replay_host_msg[] =
-    "\x43\x50\x61\x64\x2E\x49\x6E\x69\x74\x3A\x20\x68\x6F\x73\x74\x82\xA9\x82\xE7\x96\xF1\x25\x64\x95\x62\x82\xCC"
-    "\x83\x8A\x83\x76\x83\x8C\x83\x43\x83\x66\x81\x5B\x83\x5E\x82\xF0\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xDC\x82"
-    "\xB5\x82\xBD\x81\x42\x0A";
 
 namespace {
 struct ReplayFrame

@@ -675,6 +675,10 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) != 0) {
+				if (((int)*(u8*)(menuState + 9) & (1 << *(s16*)(optBase + 0x26))) == 0) {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+					return 0;
+				}
 				if (*(s16*)(optBase + 0x26) == 0) {
 					FGPutGil__12CCaravanWorkFi((void*)caravanWork, (int)gMenuMoneyTransferAmount);
 					gMenuMoneyTransferAmount = 0;

@@ -1226,6 +1226,7 @@ void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	int delta[4];
+	u32 pan;
 
 	delta[0] = DeltaTimeSumup((unsigned char**)track);
 	if (delta[0] == 0) {
@@ -1235,7 +1236,8 @@ void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 		((int*)track)[0x10] += ((int*)track)[0x33] * 0x1000;
 		((int*)track)[0x33] = 0;
 	}
-	((int*)track)[0x11] = DataAddCompute((int*)track + 0x10, *(*(u8**)track)++, delta);
+	pan = *(*(u8**)track)++;
+	((int*)track)[0x11] = DataAddCompute((int*)track + 0x10, pan, delta);
 	((int*)track)[0x12] = delta[0];
 }
 

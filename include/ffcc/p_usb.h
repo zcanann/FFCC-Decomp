@@ -3,6 +3,7 @@
 
 #include "ffcc/p_sample.h"
 #include "ffcc/memory.h"
+#include "ffcc/p_sample.h"
 #include "ffcc/usb.h"
 
 class CUSBPcs : public CSamplePcs

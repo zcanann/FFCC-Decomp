@@ -252,8 +252,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		CrystalWork* work = (CrystalWork*)((u8*)pppCrystal + param_3->m_serializedDataOffsets[2] + 0x80);
 
 		if (param_2->m_dataValIndex != 0xFFFF) {
-			CMapMesh** mapMeshTable = pppEnvStPtr->m_mapMeshPtr;
-			CMapMesh* mapMesh = mapMeshTable[param_2->m_dataValIndex];
+			CMapMesh* mapMesh = pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex];
 			int textureIndex = 0;
 
 			GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);
@@ -263,7 +262,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 					return;
 				}
 
-				mapMesh = mapMeshTable[param_2->m_initWOrk];
+				mapMesh = pppEnvStPtr->m_mapMeshPtr[param_2->m_initWOrk];
 				GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);
 			}
 

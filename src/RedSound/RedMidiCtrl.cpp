@@ -1038,20 +1038,19 @@ void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     unsigned char* command;
     unsigned int waveNo;
-    int* trackData = (int*)track;
 
-    trackData[7] = 0;
-    trackData[0x47] = 0;
-    command = (unsigned char*)*trackData;
-    *trackData = (int)(command + 1);
+    ((int*)track)[7] = 0;
+    ((int*)track)[0x47] = 0;
+    command = *(unsigned char**)track;
+    *(unsigned char**)track = command + 1;
     waveNo = (unsigned int)*command;
-    if ((trackData[6] != 0) && ((int)waveNo < *(int*)(trackData[6] + 8))) {
-        trackData[7] = trackData[6] + *(int*)(trackData[6] + 0x20 + waveNo * 4);
-        trackData[0x47] = *(int*)(trackData[6] + 0x10);
-        memset(trackData + 0x35, 0xffffffff, 0xc);
+    if ((((int*)track)[6] != 0) && ((int)waveNo < *(int*)(((int*)track)[6] + 8))) {
+        ((int*)track)[7] = ((int*)track)[6] + *(int*)(((int*)track)[6] + 0x20 + waveNo * 4);
+        ((int*)track)[0x47] = *(int*)(((int*)track)[6] + 0x10);
+        memset((int*)track + 0x35, 0xffffffff, 0xc);
     }
-    *(unsigned char*)((int)trackData + 0x14d) = 0x10;
-    trackData[0x49] = waveNo;
+    *(unsigned char*)((int)track + 0x14d) = 0x10;
+    ((int*)track)[0x49] = waveNo;
 }
 
 /*
@@ -1069,25 +1068,24 @@ void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 	u8 bankNo;
 	u32 waveNo;
 	int waveBank;
-	int* trackData = (int*)track;
 
-	command = (u8*)trackData[0];
-	trackData[0] = (int)(command + 1);
+	command = *(u8**)track;
+	*(u8**)track = command + 1;
 	bankNo = *command;
-	command = (u8*)trackData[0];
-	trackData[0] = (int)(command + 1);
+	command = *(u8**)track;
+	*(u8**)track = command + 1;
 	waveNo = *command;
-	trackData[7] = 0;
-	trackData[0x47] = 0;
+	((int*)track)[7] = 0;
+	((int*)track)[0x47] = 0;
 	waveBank = c_RedEntry.GetWaveBank(bankNo);
 	if (waveBank != 0) {
 		waveBank = *(int*)(waveBank + 8);
-		trackData[7] = waveBank + *(int*)(waveBank + 0x20 + waveNo * 4);
-		trackData[0x47] = *(int*)(waveBank + 0x10);
-		memset(trackData + 0x35, 0xffffffff, 0xc);
+		((int*)track)[7] = waveBank + *(int*)(waveBank + 0x20 + waveNo * 4);
+		((int*)track)[0x47] = *(int*)(waveBank + 0x10);
+		memset((int*)track + 0x35, 0xffffffff, 0xc);
 	}
-	*(u8*)((int)trackData + 0x14d) = bankNo;
-	trackData[0x49] = waveNo;
+	*(u8*)((int)track + 0x14d) = bankNo;
+	((int*)track)[0x49] = waveNo;
 }
 
 /*

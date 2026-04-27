@@ -6,71 +6,53 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-static const char sRedEntryLogBlob[0x540] =
-    "%s%s                                     %s\n\0"
-    "\x1B[7;34mSound\x1B[0m:\0"
-    "%s%s ********       ERROR       ******** %s\n\0"
-    "%s%s Erase Using Wave Data !! (WAVE%4.4d) %s\n\0"
-    "%s%sWave-Header was broken.%s\n\0"
-    "%s%sNOT HAVE A-MEMORY FREE AREA (WAVE%4.4u:0x%6.6X need).%s\n\0"
-    "%s%sWave Entry. (wave%4.4u)%s\n\0"
-    "%s==== AMemory Information ====\n\0"
-    "%s Bank : Name     : Start      : Size       : Free       : History\n\0"
-    "%s  %2d  : WAVE%4.4d : 0x%8.8X : 0x%8.8X : 0x%8.8X :   %3d\n\0"
-    "%s  --  : WAVE%4.4d : 0x%8.8X : 0x%8.8X : 0x%8.8X :   %3d\n\0"
-    "%s      : -------- : 0x%8.8X : 0x%8.8X : 0x%8.8X : %d\n\0"
-    "%s    Entry Wave = %d\n\0"
-    "%s    Total Size = 0x%8.8X\n\0"
-    "%s Max Free Size = 0x%8.8X\n\0"
-    "%s%sSE-Sep-Header was broken.%s\n\0"
-    "%s==== SE Play Information ====\n\0"
-    "%s Track : Name         : Wave\n\0"
-    "%s    %2d : %3.3u:%3.3u      : WAVE%4.4u\n\0"
-    "%s    %2d : se%6.6u.sep : WAVE%4.4u\n\0"
-    "%s    %2d :              :\n\0"
-    "%s%sMusic-Header was broken.%s\n\0"
-    "%s==== MUSIC Information ====\n\0"
-    "%s BGM      : Wave : Size     : \n\0"
-    "%s music%3.3u : %4.4u : 0x%6.6X : Play\n\0"
-    "%s music%3.3u : %4.4u : 0x%6.6X : Stop\n\0"
-    "%s==== MMemory Information ====\n\0"
-    "%s Name     : Start      : Size       : Free       \n\0"
-    "%s MUSIC%3.3d : 0x%8.8X : 0x%8.8X : 0x%8.8X\n\0"
-    "%s SE-BLOCK : 0x%8.8X : 0x%8.8X : 0x%8.8X\n\0"
-    "%s WAVE%4.4d : 0x%8.8X : 0x%8.8X : 0x%8.8X\n\0"
-    "%s SE%6.6d : 0x%8.8X : 0x%8.8X : 0x%8.8X\n\0"
-    "%s -------- : 0x%8.8X : 0x%8.8X : 0x%8.8X\n\0"
-    "%s   Entry Items = %d\n";
-#define sRedEntryColoredBlankLineFmt (sRedEntryLogBlob + 0x000)
-#define sRedEntryLogPrefix (sRedEntryLogBlob + 0x02D)
-#define s__s_s__________ERROR___________s_801e7917 (sRedEntryLogBlob + 0x03F)
-#define s__s_s_Erase_Using_Wave_Data_____W_801e7944 (sRedEntryLogBlob + 0x06C)
-#define s__s_sWave_Header_was_broken__s_801e7972 (sRedEntryLogBlob + 0x09A)
-#define s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991 (sRedEntryLogBlob + 0x0B9)
-#define s__s_sWave_Entry___wave_4_4u__s_801e79ce (sRedEntryLogBlob + 0x0F6)
-#define s__s_____AMemory_Information______801e79ed (sRedEntryLogBlob + 0x115)
-#define s__s_Bank___Name___Start___Size___F_801e7a0e (sRedEntryLogBlob + 0x136)
-#define s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53 (sRedEntryLogBlob + 0x17B)
-#define s__s______WAVE_4_4d___0x_8_8X___0x_801e7a8f (sRedEntryLogBlob + 0x1B7)
-#define s__s______________0x_8_8X___0x_8_8_801e7aca (sRedEntryLogBlob + 0x1F2)
-#define s__s_Entry_Wave____d_801e7b01 (sRedEntryLogBlob + 0x229)
-#define s__s_Total_Size___0x_8_8X_801e7b18 (sRedEntryLogBlob + 0x240)
-#define s__s_Max_Free_Size___0x_8_8X_801e7b34 (sRedEntryLogBlob + 0x25C)
-#define s__s_sSE_Sep_Header_was_broken__s_801e7b50 (sRedEntryLogBlob + 0x278)
-#define s__s_____SE_Play_Information______801e7b71 (sRedEntryLogBlob + 0x299)
-#define s__s_Track___Name___Wave_801e7b92 (sRedEntryLogBlob + 0x2BA)
-#define s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2 (sRedEntryLogBlob + 0x2DA)
-#define s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc (sRedEntryLogBlob + 0x304)
-#define s__s__2d_____801e7c01 (sRedEntryLogBlob + 0x329)
-#define s__s_sMusic_Header_was_broken__s_801e7c1d (sRedEntryLogBlob + 0x345)
-#define s__s_____MMemory_Information______801e7cce (sRedEntryLogBlob + 0x3F6)
-#define s__s_Name___Start___Size___Free_801e7cef (sRedEntryLogBlob + 0x417)
-#define s__s_MUSIC_3_3d___0x_8_8X___0x_8_8_801e7d24 (sRedEntryLogBlob + 0x44C)
-#define s__s_SE_BLOCK___0x_8_8X___0x_8_8X___801e7d51 (sRedEntryLogBlob + 0x479)
-#define s__s_WAVE_4_4d___0x_8_8X___0x_8_8X_801e7d7c (sRedEntryLogBlob + 0x4A4)
-#define s__s_SE_6_6d___0x_8_8X___0x_8_8X___801e7da8 (sRedEntryLogBlob + 0x4D0)
-#define s__s____________0x_8_8X___0x_8_8X___801e7dd2 (sRedEntryLogBlob + 0x4FA)
-#define s__s_Entry_Items____d_801e7dfd (sRedEntryLogBlob + 0x525)
+static const char sRedEntryColoredBlankLineFmt[] = "%s%s                                     %s\n";
+static const char sRedEntryLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
+static const char s__s_s__________ERROR___________s_801e7917[] = "%s%s ********       ERROR       ******** %s\n";
+static const char s__s_s_Erase_Using_Wave_Data_____W_801e7944[] =
+    "%s%s Erase Using Wave Data !! (WAVE%4.4d) %s\n";
+static const char s__s_sWave_Header_was_broken__s_801e7972[] = "%s%sWave-Header was broken.%s\n";
+static const char s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991[] =
+    "%s%sNOT HAVE A-MEMORY FREE AREA (WAVE%4.4u:0x%6.6X need).%s\n";
+static const char s__s_sWave_Entry___wave_4_4u__s_801e79ce[] = "%s%sWave Entry. (wave%4.4u)%s\n";
+static const char s__s_____AMemory_Information______801e79ed[] = "%s==== AMemory Information ====\n";
+static const char s__s_Bank___Name___Start___Size___F_801e7a0e[] =
+    "%s Bank : Name     : Start      : Size       : Free       : History\n";
+static const char s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53[] =
+    "%s  %2d  : WAVE%4.4d : 0x%8.8X : 0x%8.8X : 0x%8.8X :   %3d\n";
+static const char s__s______WAVE_4_4d___0x_8_8X___0x_801e7a8f[] =
+    "%s  --  : WAVE%4.4d : 0x%8.8X : 0x%8.8X : 0x%8.8X :   %3d\n";
+static const char s__s______________0x_8_8X___0x_8_8_801e7aca[] =
+    "%s      : -------- : 0x%8.8X : 0x%8.8X : 0x%8.8X : %d\n";
+static const char s__s_Entry_Wave____d_801e7b01[] = "%s    Entry Wave = %d\n";
+static const char s__s_Total_Size___0x_8_8X_801e7b18[] = "%s    Total Size = 0x%8.8X\n";
+static const char s__s_Max_Free_Size___0x_8_8X_801e7b34[] = "%s Max Free Size = 0x%8.8X\n";
+static const char s__s_sSE_Sep_Header_was_broken__s_801e7b50[] = "%s%sSE-Sep-Header was broken.%s\n";
+static const char s__s_____SE_Play_Information______801e7b71[] = "%s==== SE Play Information ====\n";
+static const char s__s_Track___Name___Wave_801e7b92[] = "%s Track : Name         : Wave\n";
+static const char s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2[] =
+    "%s    %2d : %3.3u:%3.3u      : WAVE%4.4u\n";
+static const char s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc[] =
+    "%s    %2d : se%6.6u.sep : WAVE%4.4u\n";
+static const char s__s__2d_____801e7c01[] = "%s    %2d :              :\n";
+static const char s__s_sMusic_Header_was_broken__s_801e7c1d[] = "%s%sMusic-Header was broken.%s\n";
+static const char sRedEntryMusicInformationHeaderFmt[] = "%s==== MUSIC Information ====\n";
+static const char sRedEntryMusicInfoColumnFmt[] = "%s BGM      : Wave : Size     : \n";
+static const char sRedEntryMusicInfoPlayFmt[] = "%s music%3.3u : %4.4u : 0x%6.6X : Play\n";
+static const char sRedEntryMusicInfoStopFmt[] = "%s music%3.3u : %4.4u : 0x%6.6X : Stop\n";
+static const char s__s_____MMemory_Information______801e7cce[] = "%s==== MMemory Information ====\n";
+static const char s__s_Name___Start___Size___Free_801e7cef[] = "%s Name     : Start      : Size       : Free       \n";
+static const char s__s_MUSIC_3_3d___0x_8_8X___0x_8_8_801e7d24[] =
+    "%s MUSIC%3.3d : 0x%8.8X : 0x%8.8X : 0x%8.8X\n";
+static const char s__s_SE_BLOCK___0x_8_8X___0x_8_8X___801e7d51[] =
+    "%s SE-BLOCK : 0x%8.8X : 0x%8.8X : 0x%8.8X\n";
+static const char s__s_WAVE_4_4d___0x_8_8X___0x_8_8X_801e7d7c[] =
+    "%s WAVE%4.4d : 0x%8.8X : 0x%8.8X : 0x%8.8X\n";
+static const char s__s_SE_6_6d___0x_8_8X___0x_8_8X___801e7da8[] =
+    "%s SE%6.6d : 0x%8.8X : 0x%8.8X : 0x%8.8X\n";
+static const char s__s____________0x_8_8X___0x_8_8X___801e7dd2[] =
+    "%s -------- : 0x%8.8X : 0x%8.8X : 0x%8.8X\n";
+static const char s__s_Entry_Items____d_801e7dfd[] = "%s   Entry Items = %d\n";
 static const char sRedEntryErrorColor[] = "\x1B[7;31m";
 static const char sRedEntryResetColor[] = "\x1B[0m";
 static const char sRedEntryHeaderErrorColor[] = "\x1B[4;31m";

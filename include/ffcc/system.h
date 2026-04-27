@@ -16,10 +16,10 @@ class CProcess : public CManager
 public:
     CProcess() {}
     virtual int GetTable(unsigned long) = 0;
-    virtual void onScriptChanging(char*) {}
-    virtual void onScriptChanged(char*, int) {}
-    virtual void onMapChanging(int, int) {}
-    virtual void onMapChanged(int, int, int) {}
+    virtual void onScriptChanging(char*);
+    virtual void onScriptChanged(char*, int);
+    virtual void onMapChanging(int, int);
+    virtual void onMapChanged(int, int, int);
 
     void ScriptChanging(char* script) { onScriptChanging(script); }
     void ScriptChanged(char* script, int param) { onScriptChanged(script, param); }

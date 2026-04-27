@@ -1309,8 +1309,12 @@ void _AdsrDataCompute(RedVoiceDATA* voice)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C4F00
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 u32 _AdsrDataExecute(RedVoiceDATA* voice)
 {
@@ -1319,12 +1323,12 @@ u32 _AdsrDataExecute(RedVoiceDATA* voice)
 
     if (voiceData[0x17] < 4) {
         if (((voiceData[0x24] & 4U) != 0) || (voiceData[0x17] < 3)) {
-            changed = 1;
+            changed += 1;
             voiceData[0x18] -= 1;
             voiceData[0x2B] += voiceData[0x19];
             if ((voiceData[0x18] == 0) && (voiceData[0x17] < 3)) {
                 voiceData[0x17] += 1;
-                _AdsrDataCompute(voice);
+                _AdsrDataCompute((RedVoiceDATA*)voiceData);
             }
         }
     } else {

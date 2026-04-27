@@ -2,11 +2,20 @@
 #include "PowerPC_EABI_Support/Runtime/New.h"
 
 namespace std {
+
 class exception {
 public:
-	virtual ~exception();
-	virtual const char* what() const;
+    virtual ~exception();
+    virtual const char* what() const;
 };
+
+exception::~exception() {}
+
+const char* exception::what() const
+{
+    return "exception";
+}
+
 } // namespace std
 
 __declspec(weak) void operator delete(void* arg0) throw()
@@ -15,8 +24,3 @@ __declspec(weak) void operator delete(void* arg0) throw()
         free(arg0);
     }
 }
-
-namespace std {
-exception::~exception() {}
-const char* exception::what() const { return "exception"; }
-} // namespace std

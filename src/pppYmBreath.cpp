@@ -21,6 +21,8 @@ extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u
 extern float FLOAT_80330c80;
 extern float FLOAT_80330c84;
 extern float FLOAT_80330C90;
+extern float FLOAT_80330C98;
+extern float FLOAT_80330CA8;
 extern double DOUBLE_80330c88;
 extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 
@@ -825,7 +827,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
 {
     unsigned char* breath = (unsigned char*)pYmBreath;
     Vec* particle = reinterpret_cast<Vec*>(particleData);
-    pppIVECTOR4 angle;
+    int angle[3];
     pppFMATRIX rotMtx;
     Vec baseDir;
     float normX;
@@ -836,7 +838,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     unsigned char flags;
 
     spread = (float)(unsigned int)*(unsigned char*)(breath + 0x28);
-    range = spread + spread;
+    range = FLOAT_80330CA8 * spread;
 
     memset(particleData, 0, 0x60);
     if (particleWmat != NULL) {
@@ -850,10 +852,9 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     baseDir.y = 0.0f;
     baseDir.z = FLOAT_80330C90;
 
-    angle.x = (short)(range * Math.RandF() - spread);
-    angle.y = (short)(range * Math.RandF() - spread);
-    angle.z = (short)(range * Math.RandF() - spread);
-    angle.w = 0;
+    angle[0] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
+    angle[1] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
+    angle[2] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
 
     pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
     PSMTXMultVecSR(rotMtx.value, &baseDir, &particle[1]);

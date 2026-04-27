@@ -155,6 +155,24 @@ static inline unsigned char& U8At(void* p, unsigned int offset)
     return *reinterpret_cast<unsigned char*>(Ptr(p, offset));
 }
 
+static inline int IsTexAnimChinFlag(unsigned char flags)
+{
+    unsigned int bits = (static_cast<unsigned int>(flags) << 25) & 0xC0000000;
+    return static_cast<int>(bits) >> 31;
+}
+
+static inline char IsTexAnimE1Flag(unsigned char flags)
+{
+    unsigned int bits = (static_cast<unsigned int>(flags) << 26) & 0xC0000000;
+    return static_cast<char>(static_cast<int>(bits) >> 31);
+}
+
+static inline char IsTexAnimInterpFlag(unsigned char flags)
+{
+    unsigned int bits = (static_cast<unsigned int>(flags) << 24) & 0xC0000000;
+    return static_cast<char>(static_cast<int>(bits) >> 31);
+}
+
 static inline void ReleaseRef(void** slot)
 {
     int* ref = reinterpret_cast<int*>(*slot);
@@ -874,7 +892,7 @@ void CTexAnimSet::AddFrame()
             reinterpret_cast<CTexAnimSeqStorage*>(__vc__25CPtrArray_P11CTexAnimSeq_FUl(&refData->texAnimSeqs, texAnim->unk0C));
         float frameStep;
 
-        if ((seq->flags & 0x40) != 0) {
+        if (IsTexAnimChinFlag(seq->flags)) {
             frameStep = FLOAT_8032fb4c;
         } else {
             frameStep = FLOAT_8032fb3c;
@@ -884,7 +902,7 @@ void CTexAnimSet::AddFrame()
         refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
         seq = reinterpret_cast<CTexAnimSeqStorage*>(__vc__25CPtrArray_P11CTexAnimSeq_FUl(&refData->texAnimSeqs, texAnim->unk0C));
 
-        if (((seq->flags & 0x40) == 0) || (FLOAT_8032fb3c != texAnim->unk10) || (Math.Rand(0x1E) == 0)) {
+        if (!IsTexAnimE1Flag(seq->flags) || (FLOAT_8032fb3c != texAnim->unk10) || (Math.Rand(0x1E) == 0)) {
             float currentFrame = (float)fmod((double)texAnim->unk10, (double)(float)seq->totalFrames);
             unsigned int keyCount = seq->keyCount;
             unsigned int* keys = seq->keys;
@@ -915,9 +933,9 @@ void CTexAnimSet::AddFrame()
                     PSVECScale(reinterpret_cast<Vec*>(nextKeyData + 9), &v1, t);
                     PSVECAdd(&v0, &v1, reinterpret_cast<Vec*>(&texAnim->unk18));
 
-                    if ((seq->flags & 0x80) == 0) {
-                        U32At(texAnim, 0x18) = keyData[9];
-                        U32At(texAnim, 0x1C) = keyData[10];
+                    if (!IsTexAnimInterpFlag(seq->flags)) {
+                        texAnim->unk18 = reinterpret_cast<float*>(keyData)[9];
+                        texAnim->unk1C = reinterpret_cast<float*>(keyData)[10];
                     }
                     break;
                 }
@@ -943,7 +961,7 @@ void CTexAnimSet::AddFrame()
         texAnim = reinterpret_cast<CTexAnimStorage*>(__vc__21CPtrArray_P8CTexAnim_FUl(&self->texAnims, i));
         refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
         seq = reinterpret_cast<CTexAnimSeqStorage*>(__vc__25CPtrArray_P11CTexAnimSeq_FUl(&refData->texAnimSeqs, texAnim->unk0C));
-        if ((seq->flags & 0x40) != 0) {
+        if (IsTexAnimChinFlag(seq->flags)) {
             texAnim = reinterpret_cast<CTexAnimStorage*>(__vc__21CPtrArray_P8CTexAnim_FUl(&self->texAnims, i));
             self->unk24 = texAnim->unk20;
         } else {

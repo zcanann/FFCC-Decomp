@@ -2416,7 +2416,7 @@ void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
     int value;
     short step;
 
-    value = *(*(s8**)track)++;
+    value = (s8)*(*(u8**)track)++;
     if (value != 0) {
         step = *(short*)((int*)track + 0x4e) + value;
     } else {

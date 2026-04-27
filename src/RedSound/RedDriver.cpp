@@ -1045,45 +1045,41 @@ void _DmaExecute()
     int* piVar7;
     int* piVar8;
 
-    do {
-        do {
-            if ((p_DmaControlNow[0] == p_DmaControlOld[0]) && (p_DmaControlNow[1] == p_DmaControlOld[1])) {
-                m_DMAInThread = 0;
-                return;
-            }
-            if (p_DmaControlNow[0] == p_DmaControlOld[0]) {
-                ppiVar5 = (int**)&p_DmaControlOld[1];
-                piVar4 = RedDriverStreamDmaQueue();
+    while ((p_DmaControlNow[0] != p_DmaControlOld[0]) || (p_DmaControlNow[1] != p_DmaControlOld[1])) {
+        m_DMAInThread = 1;
+        if (p_DmaControlNow[0] == p_DmaControlOld[0]) {
+            ppiVar5 = (int**)&p_DmaControlOld[1];
+            piVar4 = RedDriverStreamDmaQueue();
+        } else {
+            ppiVar5 = (int**)&p_DmaControlOld[0];
+            piVar4 = RedDriverMainDmaQueue();
+        }
+        piVar7 = *ppiVar5;
+        m_DMAInThread = 2;
+        piVar6 = 0;
+        if (*piVar7 != 0) {
+            m_DMAStatus = 1;
+            if (piVar7[1] == 0) {
+                DCFlushRange((void*)piVar7[2], (u32)piVar7[4]);
+                iVar3 = piVar7[2];
+                iVar2 = piVar7[3];
             } else {
-                ppiVar5 = (int**)&p_DmaControlOld[0];
-                piVar4 = RedDriverMainDmaQueue();
+                DCInvalidateRange((void*)piVar7[2], (u32)piVar7[4]);
+                iVar3 = piVar7[3];
+                iVar2 = piVar7[2];
             }
-            piVar7 = *ppiVar5;
-            m_DMAInThread = 2;
-            piVar6 = 0;
-            if (*piVar7 != 0) {
-                m_DMAStatus = 1;
-                if (piVar7[1] == 0) {
-                    DCFlushRange((void*)piVar7[2], (u32)piVar7[4]);
-                    iVar3 = piVar7[2];
-                    iVar2 = piVar7[3];
-                } else {
-                    DCInvalidateRange((void*)piVar7[2], (u32)piVar7[4]);
-                    iVar3 = piVar7[3];
-                    iVar2 = piVar7[2];
-                }
-                m_DMAInThread = 3;
-                ARQSetChunkSize((u32)piVar7[4]);
-                ARQPostRequest(&m_DMARequest, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
-                               (u32)piVar7[4], _DmaCallback);
-                piVar6 = piVar7;
-            }
-            piVar8 = piVar7 + 7;
-            if (piVar4 + 0x380 <= piVar7 + 7) {
-                piVar8 = piVar4;
-            }
-            *ppiVar5 = piVar8;
-        } while (piVar6 == 0);
+            m_DMAInThread = 3;
+            ARQSetChunkSize((u32)piVar7[4]);
+            ARQPostRequest(&m_DMARequest, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
+                           (u32)piVar7[4], _DmaCallback);
+            piVar6 = piVar7;
+        }
+        piVar8 = piVar7 + 7;
+        if (piVar4 + 0x380 <= piVar7 + 7) {
+            piVar8 = piVar4;
+        }
+        *ppiVar5 = piVar8;
+
         while (piVar6 != 0) {
             m_DMAInThread = 7;
             if (m_DMAStatus == 0) {
@@ -1102,7 +1098,8 @@ void _DmaExecute()
             }
             RedSleep(0);
         }
-    } while (true);
+    }
+    m_DMAInThread = 0;
 }
 
 /*

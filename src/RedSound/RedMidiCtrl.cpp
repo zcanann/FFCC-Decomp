@@ -1430,7 +1430,7 @@ void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 void __MidiCtrl_ADSR_AL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     u8* sequencePos;
-    u8 value;
+    int value;
     int* voice;
 
     sequencePos = *(u8**)track;
@@ -1489,7 +1489,7 @@ void __MidiCtrl_ADSR_AR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_ADSR_DL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     u8* sequencePos;
-    u8 value;
+    int value;
     int* voice;
 
     sequencePos = *(u8**)track;
@@ -1548,7 +1548,7 @@ void __MidiCtrl_ADSR_DR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_ADSR_SL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     u8* sequencePos;
-    u8 value;
+    int value;
     int* voice;
 
     sequencePos = *(u8**)track;
@@ -1607,7 +1607,7 @@ void __MidiCtrl_ADSR_SR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_ADSR_RL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     u8* sequencePos;
-    u8 value;
+    int value;
     int* voice;
 
     sequencePos = *(u8**)track;

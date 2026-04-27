@@ -1954,7 +1954,6 @@ void CSound::StopSe3DGroup(int group)
             } else {
                 u8* search = reinterpret_cast<u8*>(this) + 0x2C;
                 int count = 0x20;
-                int idx = 0;
                 u8* found;
                 do {
                     if ((((search[0] & 0x80) != 0 &&
@@ -1967,7 +1966,6 @@ void CSound::StopSe3DGroup(int group)
                           (found = search + 0x78, *reinterpret_cast<int*>(search + 0x7C) == se3dHandle)))) {
                         goto found_se;
                     }
-                    idx += 3;
                     search += 0xA0;
                     count--;
                 } while (count != 0);
@@ -2027,7 +2025,7 @@ found_entry:
         if (found != 0) {
             const int playId = *reinterpret_cast<int*>(found + 8);
             if (playId < 0) {
-                Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
+                Printf__7CSystemFPce(&System, s_soundMinusOneFmt, idx);
             } else {
                 SeStop__9CRedSoundFi(RedSound(this), playId);
             }

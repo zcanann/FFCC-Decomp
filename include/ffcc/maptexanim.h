@@ -48,8 +48,9 @@ public:
             m_keyFrame.m_loop = static_cast<unsigned char>(wrapMode);
             m_keyFrame.m_isRun = 1;
         } else {
-            m_startFrame = static_cast<short>(frameStart);
-            m_currentFrame = static_cast<float>(static_cast<short>(frameStart));
+            short startFrame = static_cast<short>(frameStart);
+            m_startFrame = startFrame;
+            m_currentFrame = startFrame;
             if (frameEnd > m_frameCount) {
                 end = m_frameCount;
             }

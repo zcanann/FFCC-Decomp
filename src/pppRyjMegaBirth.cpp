@@ -483,16 +483,9 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirth* params, VRyjMegaBirth* work)
 {
 	u8* payload = (u8*)params;
+	u8 mode = payload[0x2A];
 
-	switch (payload[0x2A]) {
-	default:
-		PSMTXCopy(pppMngStPtr->m_matrix.value, out.value);
-		break;
-	case 1:
-	case 3:
-	case 5:
-	case 7:
-	case 9:
+	if ((mode == 1) || (mode == 3) || (mode == 5) || (mode == 7) || (mode == 9)) {
 		PSMTXIdentity(out.value);
 		out.value[0][0] = pppMngStPtr->m_scale.x;
 		out.value[1][1] = pppMngStPtr->m_scale.y;
@@ -500,7 +493,8 @@ static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBi
 		out.value[0][3] = pppMngStPtr->m_position.x;
 		out.value[1][3] = pppMngStPtr->m_position.y;
 		out.value[2][3] = pppMngStPtr->m_position.z;
-		break;
+	} else {
+		PSMTXCopy(pppMngStPtr->m_matrix.value, out.value);
 	}
 
 	if (work != NULL) {

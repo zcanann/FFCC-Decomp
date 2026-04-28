@@ -4,6 +4,7 @@
 #include "ffcc/maphit.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
+#include "ffcc/partyobj.h"
 #include "ffcc/prgobj.h"
 #include "ffcc/p_game.h"
 #include "ffcc/vector.h"
@@ -438,27 +439,10 @@ void CGItemObj::onFrameStat()
 			bool useBossAttachName = false;
 
 			if (Game.m_gameWork.m_menuStageMode != 0) {
-				bool condA = false;
-				bool condB = false;
-				bool condC = false;
-
-				if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-					condC = true;
-				}
-				if (condC) {
-					CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
-					typedef unsigned int (*PartyVFunc)(CGPartyObj*);
-					PartyVFunc getCid = reinterpret_cast<PartyVFunc>((*reinterpret_cast<void***>(carryObj))[3]);
-					unsigned int cid = getCid(carryObj);
-					unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
-					if (((stageCarry >> 5) & 0xFF) != 0) {
-						condB = true;
-					}
-				}
-				if (condB && *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4) != 0) {
-					condA = true;
-				}
-				if (condA) {
+				CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
+				if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+				    (static_cast<unsigned int>(carryObj->GetCID()) & 0x6D) == 0x6D &&
+				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3B4) != 0) {
 					useBossAttachName = true;
 				}
 			}
@@ -513,6 +497,34 @@ void CGItemObj::onFrameStat()
 			}
 
 			Vec safePos;
+			float launchSpeed = FLOAT_80331b40;
+
+			if (*(int*)(self + 0x520) == 0xC) {
+				bool useMenuLaunchSpeed = false;
+
+				if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+					unsigned int carryCid = static_cast<unsigned int>(carryObj->GetCID());
+					if ((carryCid & 0x6D) == 0x6D &&
+					    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3B4) != 0) {
+						useMenuLaunchSpeed = true;
+					}
+				}
+
+				if (useMenuLaunchSpeed) {
+					launchSpeed = FLOAT_80331b18;
+				} else if (*(int*)(CFlat + 0x4780) == 1) {
+					unsigned int carryCid = static_cast<unsigned int>(carryObj->GetCID());
+					if ((carryCid & 0x6D) == 0x6D &&
+					    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3E0)) {
+						launchSpeed = FLOAT_80331b18;
+					} else {
+						launchSpeed = FLOAT_80331ba8;
+					}
+				} else {
+					launchSpeed = FLOAT_80331b90;
+				}
+			}
+
 			float safeDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(this, 0x41, carryObj, &safePos);
 
 			if (FLOAT_80331b20 < safeDist) {
@@ -680,14 +692,18 @@ void CGItemObj::onFrameStat()
 		    -FLOAT_80331b50 * (prgObj->m_worldPosition.z - *(float*)(*(unsigned char**)(self + 0x550) + 0x164));
 		break;
 	case 0x25: {
+		CVector monTarget(*reinterpret_cast<Vec*>(m_aiWork__8CGMonObj + 4));
+		CVector worldPos(prgObj->m_worldPosition);
 		CVector delta;
-		Vec monTarget = *reinterpret_cast<Vec*>(m_aiWork__8CGMonObj + 4);
 
 		prgObj->m_moveOffset.y = FLOAT_80331bb0;
 		prgObj->m_rotTargetY = prgObj->m_rotTargetY + FLOAT_80331bbc;
-		PSVECSubtract(&monTarget, &prgObj->m_worldPosition, reinterpret_cast<Vec*>(&delta));
+		PSVECSubtract(reinterpret_cast<Vec*>(&monTarget), reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&delta));
+		monTarget.x = delta.x;
+		monTarget.y = delta.y;
+		monTarget.z = delta.z;
 
-		float distance = PSVECMag(reinterpret_cast<Vec*>(&delta));
+		float distance = PSVECMag(reinterpret_cast<Vec*>(&monTarget));
 		if (distance < FLOAT_80331bb8) {
 			changeStat__8CGPrgObjFiii(this, 0x27, 0, 0);
 		} else if (distance <= zero) {
@@ -697,9 +713,9 @@ void CGItemObj::onFrameStat()
 		} else {
 			float moveScale = FLOAT_80331bc0 * prgObj->m_moveTimer;
 
-			prgObj->m_groundHitOffset.x += FLOAT_80331bc4 * delta.x * moveScale;
-			prgObj->m_groundHitOffset.y += FLOAT_80331bc4 * delta.y * moveScale;
-			prgObj->m_groundHitOffset.z += FLOAT_80331bc4 * delta.z * moveScale;
+			prgObj->m_groundHitOffset.x += FLOAT_80331bc4 * monTarget.x * moveScale;
+			prgObj->m_groundHitOffset.y += FLOAT_80331bc4 * monTarget.y * moveScale;
+			prgObj->m_groundHitOffset.z += FLOAT_80331bc4 * monTarget.z * moveScale;
 		}
 		break;
 	}

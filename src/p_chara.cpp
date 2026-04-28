@@ -30,6 +30,8 @@ extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*,
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
+extern "C" void __ct__6CColorFv(void*);
+extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, const char*, int);
@@ -74,6 +76,11 @@ extern "C" void loadModelASyncFrame__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*)
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 extern "C" unsigned char MiniGamePcs[];
 extern unsigned char PTR_s_CCharaPcs_GAME__801fce10[];
+
+inline void* operator new(unsigned long, void* ptr)
+{
+    return ptr;
+}
 
 static const char s_p_chara_cpp[] = "p_chara.cpp";
 static const char s_CCharaPcs_stage[] = "CCharaPcs";
@@ -120,16 +127,15 @@ template <class T>
 class CPtrArray
 {
 public:
-    void** m_vtable;
+    CPtrArray();
+    virtual ~CPtrArray();
+
     unsigned long m_numItems;
     unsigned long m_size;
     unsigned long m_defaultSize;
     T* m_items;
     CMemory::CStage* m_stage;
     int m_growCapacity;
-
-    CPtrArray();
-    ~CPtrArray();
     bool Add(T item);
     int GetSize();
     void ReleaseAndRemoveAll();
@@ -146,7 +152,6 @@ public:
 template <class T>
 CPtrArray<T>::CPtrArray()
 {
-    m_vtable = 0;
     m_size = 0;
     m_numItems = 0;
     m_defaultSize = 0x10;
@@ -700,7 +705,11 @@ CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int stageIndex, CMemory::CStage* stage)
  */
 CCharaPcs::CCharaPcs()
 {
-	// TODO
+    new (LoadModelArray(this)) CPtrArray<CLoadModel*>();
+    new (LoadAnimArray(this)) CPtrArray<CLoadAnim*>();
+    new (LoadTextureArray(this)) CPtrArray<CLoadTexture*>();
+    new (LoadPdtArray(this)) CPtrArray<CLoadPdt*>();
+    __construct_array(Ptr(this, 0x12C), __ct__6CColorFv, 0, 4, 5);
 }
 
 /*
@@ -710,10 +719,10 @@ CCharaPcs::CCharaPcs()
  */
 CCharaPcs::~CCharaPcs()
 {
-    dtor_8007B904(LoadPdtArray(this), static_cast<short>(-1));
-    dtor_8007B9B4(LoadTextureArray(this), static_cast<short>(-1));
-    dtor_8007BA64(LoadAnimArray(this), static_cast<short>(-1));
-    dtor_8007BB14(LoadModelArray(this), static_cast<short>(-1));
+    LoadPdtArray(this)->~CPtrArray<CLoadPdt*>();
+    LoadTextureArray(this)->~CPtrArray<CLoadTexture*>();
+    LoadAnimArray(this)->~CPtrArray<CLoadAnim*>();
+    LoadModelArray(this)->~CPtrArray<CLoadModel*>();
 }
 
 /*

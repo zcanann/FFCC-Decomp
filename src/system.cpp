@@ -422,31 +422,24 @@ void CSystem::ExecScenegraph()
         }
 
         unsigned int stepGate = 0;
-        if (scenegraphStepMode != 4)
+        switch (scenegraphStepMode)
         {
-            if (scenegraphStepMode < 4)
-            {
-                if (scenegraphStepMode == 2)
-                {
-                    stepGate = 1;
-                }
-                else if (scenegraphStepMode > 2)
-                {
-                    stepGate = (m_frameCounter & 7) != 0;
-                }
-            }
-            else if (scenegraphStepMode < 6)
-            {
-                stepGate = m_frameCounter & 1;
-            }
-        }
-        else
-        {
+        case 2:
+            stepGate = 1;
+            break;
+        case 3:
+            stepGate = (m_frameCounter & 7) != 0;
+            break;
+        case 4:
             stepGate = (m_frameCounter & 3) != 0;
+            break;
+        case 5:
+            stepGate = m_frameCounter & 1;
+            break;
         }
 
         float totalTime = 0.0f;
-        unsigned int perfEnabled = perfTrigger & 1;
+        perfTrigger &= 1;
         CStopWatch watch((char*)"no name");
 
         int index = 0;
@@ -458,18 +451,24 @@ void CSystem::ExecScenegraph()
             m_currentOrderIndex = index;
 
             unsigned int flags = order->m_entry->m_flags;
-            unsigned int skip;
+            unsigned int skip = 0;
             if ((flags & 1) == 0)
             {
-                skip = stepGate;
                 if ((stepGate != 0) && (drawToggle != 0) && ((flags & 4) != 0))
                 {
                     skip = 0;
                 }
+                else
+                {
+                    skip = stepGate;
+                }
             }
             else
             {
-                skip = (drawToggle == 0);
+                if (drawToggle == 0)
+                {
+                    skip = 1;
+                }
             }
 
             if (Game.m_gameWork.m_gamePaused == 0)
@@ -504,14 +503,14 @@ void CSystem::ExecScenegraph()
                 order->m_lastTime = watch.Get();
 
                 watch.Start();
-                if (perfEnabled != 0)
+                if (perfTrigger != 0)
                 {
                     Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x2CA);
                     GXReadGP0Metric();
                     GXReadGP1Metric();
                 }
                 watch.Stop();
-                if (perfEnabled != 0)
+                if (perfTrigger != 0)
                 {
                     order->m_lastTime = watch.Get();
                 }

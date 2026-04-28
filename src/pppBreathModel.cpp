@@ -402,39 +402,37 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 Mtx tempMtx;
                 Vec pos;
 
-                if (i != 2) {
-                    if (i >= 2) {
-                        if (i >= 4) {
-                            debugColor.r = 0x00;
-                            debugColor.g = 0x60;
-                            debugColor.b = 0x80;
-                            debugColor.a = 0xFF;
-                        } else {
-                            debugColor.r = 0x80;
-                            debugColor.g = 0x80;
-                            debugColor.b = 0x80;
-                            debugColor.a = 0xFF;
-                        }
-                    } else if (i == 0) {
+                if (i == 2) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x00;
+                    debugColor.b = 0x00;
+                    debugColor.a = 0xFF;
+                } else if (i < 2) {
+                    if (i == 0) {
                         debugColor.r = 0x80;
                         debugColor.g = 0x00;
                         debugColor.b = 0x00;
                         debugColor.a = 0xFF;
-                    } else if (i >= 0) {
-                        debugColor.r = 0x80;
-                        debugColor.g = 0x80;
-                        debugColor.b = 0xFF;
-                        debugColor.a = 0xFF;
-                    } else {
+                    } else if (i < 0) {
                         debugColor.r = 0x00;
                         debugColor.g = 0x60;
                         debugColor.b = 0x80;
                         debugColor.a = 0xFF;
+                    } else {
+                        debugColor.r = 0x80;
+                        debugColor.g = 0x80;
+                        debugColor.b = 0xFF;
+                        debugColor.a = 0xFF;
                     }
-                } else {
+                } else if (i < 4) {
                     debugColor.r = 0x80;
-                    debugColor.g = 0x00;
-                    debugColor.b = 0x00;
+                    debugColor.g = 0x80;
+                    debugColor.b = 0x80;
+                    debugColor.a = 0xFF;
+                } else {
+                    debugColor.r = 0x00;
+                    debugColor.g = 0x60;
+                    debugColor.b = 0x80;
                     debugColor.a = 0xFF;
                 }
 

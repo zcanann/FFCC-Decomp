@@ -1,8 +1,8 @@
 #include "ffcc/menu_tmparti.h"
 #include "ffcc/fontman.h"
+#include "ffcc/game.h"
 #include "ffcc/sound.h"
 #include "ffcc/pad.h"
-#include "ffcc/p_game.h"
 #include "ffcc/color.h"
 #include "ffcc/linkage.h"
 #include <string.h>

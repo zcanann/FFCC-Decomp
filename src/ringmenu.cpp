@@ -6,9 +6,10 @@
 #include "ffcc/math.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/pad.h"
+#include "ffcc/system.h"
 #include "ffcc/vector.h"
 
 #include <dolphin/gx.h>

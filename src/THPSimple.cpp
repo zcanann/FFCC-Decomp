@@ -346,116 +346,114 @@ restore_interrupts_1:
         File.DrawError(SimpleControl.fileInfo, status);
     }
 
-    if (SimpleControl.readBuffer[SimpleControl.readFrame].mIsValid == 0) {
-        return 2;
-    }
+    if (SimpleControl.readBuffer[SimpleControl.readFrame].mIsValid != 0) {
+        u32* compSizeTable = reinterpret_cast<u32*>(SimpleControl.readBuffer[SimpleControl.readFrame].mPtr + 8);
+        u8* compData =
+            SimpleControl.readBuffer[SimpleControl.readFrame].mPtr + 8 + SimpleControl.compInfo.mNumComponents * 4;
 
-    u32* compSizeTable = reinterpret_cast<u32*>(SimpleControl.readBuffer[SimpleControl.readFrame].mPtr + 8);
-    u8* compData = SimpleControl.readBuffer[SimpleControl.readFrame].mPtr + 8 + SimpleControl.compInfo.mNumComponents * 4;
-    u8* frameComp = SimpleControl.compInfo.mFrameComp;
-
-    if (SimpleControl.hasAudio != 0) {
-        if ((audioTrack < 0) || (static_cast<u32>(audioTrack) >= SimpleControl.audioInfo.mSndNumTracks)) {
-            return 4;
-        }
-        if (SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample != 0) {
-            return 3;
-        }
-
-        for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
-            switch (*frameComp) {
-            case 0:
-                decodeSuccess = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
-                                              reinterpret_cast<void*>(SimpleControl.unk_9C));
-                if (decodeSuccess != 0) {
-                    decodeSuccess = 0;
-                } else {
-                    decodeSuccess = 1;
-                    SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
-                }
-                if (decodeSuccess == 0) {
-                    return 1;
-                }
-                break;
-            case 1: {
-                u32 samples = THPAudioDecode(SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer,
-                                             compData + *compSizeTable * audioTrack, 0);
-                u32 lock = OSDisableInterrupts();
-                SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample = samples;
-                SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mCurPtr =
-                    SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer;
-                OSRestoreInterrupts(lock);
-                SimpleControl.audioDecodeIndex++;
-                if (SimpleControl.audioDecodeIndex >= 3) {
-                    SimpleControl.audioDecodeIndex = 0;
-                }
-                break;
+        if (SimpleControl.hasAudio != 0) {
+            if ((audioTrack < 0) || (static_cast<u32>(audioTrack) >= SimpleControl.audioInfo.mSndNumTracks)) {
+                return 4;
             }
+            if (SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample != 0) {
+                return 3;
             }
-            compData += *compSizeTable;
-            compSizeTable++;
-            frameComp++;
-        }
-    } else {
-        for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
-            switch (*frameComp) {
-            case 0:
-                decodeSuccess = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
-                                              reinterpret_cast<void*>(SimpleControl.unk_9C));
-                if (decodeSuccess != 0) {
-                    decodeSuccess = 0;
-                } else {
-                    decodeSuccess = 1;
-                    SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
+
+            for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
+                switch (SimpleControl.compInfo.mFrameComp[i]) {
+                case 0:
+                    decodeSuccess = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
+                                                  reinterpret_cast<void*>(SimpleControl.unk_9C));
+                    if (decodeSuccess != 0) {
+                        decodeSuccess = 0;
+                    } else {
+                        decodeSuccess = 1;
+                        SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
+                    }
+                    if (decodeSuccess == 0) {
+                        return 1;
+                    }
+                    break;
+                case 1: {
+                    u32 samples = THPAudioDecode(SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer,
+                                                 compData + *compSizeTable * audioTrack, 0);
+                    u32 lock = OSDisableInterrupts();
+                    SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample = samples;
+                    SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mCurPtr =
+                        SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer;
+                    OSRestoreInterrupts(lock);
+                    SimpleControl.audioDecodeIndex++;
+                    if (SimpleControl.audioDecodeIndex >= 3) {
+                        SimpleControl.audioDecodeIndex = 0;
+                    }
+                    break;
                 }
-                if (decodeSuccess == 0) {
-                    return 1;
                 }
-                break;
+                compData += *compSizeTable;
+                compSizeTable++;
             }
-            compData += *compSizeTable;
-            compSizeTable++;
-            frameComp++;
-        }
-    }
-
-    SimpleControl.readBuffer[SimpleControl.readFrame].mIsValid = 0;
-    SimpleControl.readFrame++;
-    if (SimpleControl.readFrame >= 8) {
-        SimpleControl.readFrame = 0;
-    }
-
-    interruptState = OSDisableInterrupts();
-    if ((SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) && (SimpleControl.isReadFrameAsync == 0U) &&
-        (SimpleControl.readError == 0) && (SimpleControl.isPreLoaded == 1)) {
-        if (static_cast<u32>(SimpleControl.curAudioTrack) > (SimpleControl.header.mNumFrames - 1)) {
-            if (SimpleControl.isLooping != 1) {
-                goto restore_interrupts_2;
+        } else {
+            for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
+                switch (SimpleControl.compInfo.mFrameComp[i]) {
+                case 0:
+                    decodeSuccess = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
+                                                  reinterpret_cast<void*>(SimpleControl.unk_9C));
+                    if (decodeSuccess != 0) {
+                        decodeSuccess = 0;
+                    } else {
+                        decodeSuccess = 1;
+                        SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
+                    }
+                    if (decodeSuccess == 0) {
+                        return 1;
+                    }
+                    break;
+                }
+                compData += *compSizeTable;
+                compSizeTable++;
             }
-            SimpleControl.curAudioTrack = 0;
-            SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);
-            SimpleControl.readSize = static_cast<s32>(SimpleControl.header.mFirstFrameSize);
         }
 
-        SimpleControl.isReadFrameAsync = 1;
-        if (DVDReadAsyncPrio(&SimpleControl.fileInfo, SimpleControl.readBuffer[SimpleControl.readIndex].mPtr,
-                             SimpleControl.readSize, SimpleControl.readOffset,
-                             static_cast<DVDCallback>(__THPSimpleDVDCallback), 2) != 1) {
-            SimpleControl.isReadFrameAsync = 0;
-            SimpleControl.readError = 1;
+        SimpleControl.readBuffer[SimpleControl.readFrame].mIsValid = 0;
+        SimpleControl.readFrame++;
+        if (SimpleControl.readFrame >= 8) {
+            SimpleControl.readFrame = 0;
         }
+
+        interruptState = OSDisableInterrupts();
+        if ((SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) && (SimpleControl.isReadFrameAsync == 0U) &&
+            (SimpleControl.readError == 0) && (SimpleControl.isPreLoaded == 1)) {
+            if (static_cast<u32>(SimpleControl.curAudioTrack) > (SimpleControl.header.mNumFrames - 1)) {
+                if (SimpleControl.isLooping != 1) {
+                    goto restore_interrupts_2;
+                }
+                SimpleControl.curAudioTrack = 0;
+                SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);
+                SimpleControl.readSize = static_cast<s32>(SimpleControl.header.mFirstFrameSize);
+            }
+
+            SimpleControl.isReadFrameAsync = 1;
+            if (DVDReadAsyncPrio(&SimpleControl.fileInfo, SimpleControl.readBuffer[SimpleControl.readIndex].mPtr,
+                                 SimpleControl.readSize, SimpleControl.readOffset,
+                                 static_cast<DVDCallback>(__THPSimpleDVDCallback), 2) != 1) {
+                SimpleControl.isReadFrameAsync = 0;
+                SimpleControl.readError = 1;
+            }
+        }
+
+    restore_interrupts_2:
+        OSRestoreInterrupts(interruptState);
+
+        if ((SimpleControl.isReadFrameAsync != 0U) &&
+            (((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb), status == 0xB) || ((status - 4U) <= 2)) ||
+             (status == -1))) {
+            File.DrawError(SimpleControl.fileInfo, status);
+        }
+
+        return 0;
     }
 
-restore_interrupts_2:
-    OSRestoreInterrupts(interruptState);
-
-    if ((SimpleControl.isReadFrameAsync != 0U) &&
-        (((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb), status == 0xB) || ((status - 4U) <= 2)) ||
-         (status == -1))) {
-        File.DrawError(SimpleControl.fileInfo, status);
-    }
-
-    return 0;
+    return 2;
 }
 
 /*

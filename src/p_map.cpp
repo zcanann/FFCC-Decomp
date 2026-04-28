@@ -304,9 +304,10 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 
     *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A0) = 0;
     *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A4) = 0;
-    if (mapSize == 0) {
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 0;
-    } else {
+    *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22994) = mapPtr;
+    *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22998) = mapPtr;
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x2299C) = mapSize;
+    if (mapSize != 0) {
         if (mode == 1) {
             *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 2;
         } else if (mode == 2) {
@@ -330,10 +331,9 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         } else {
             *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 1;
         }
+    } else {
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 0;
     }
-    *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22994) = mapPtr;
-    *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22998) = mapPtr;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x2299C) = mapSize;
 
     MapMng.ReadMtx(mapPath);
     MapMng.ReadMpl(mapPath);
@@ -346,19 +346,19 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
                 COctNode* rootNode =
                     *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
-                if (rootNode == 0) {
+                if (rootNode != 0) {
+                    cameraPos.x =
+                        (rootNode->m_boundMinX + rootNode->m_boundMaxX) * kMapBoundsCenterScale;
+                    cameraPos.y =
+                        (rootNode->m_boundMinY + rootNode->m_boundMaxY) * kMapBoundsCenterScale;
+                    cameraPos.z =
+                        (rootNode->m_boundMinZ + rootNode->m_boundMaxZ) * kMapBoundsCenterScale;
+                } else {
                     float* mapCenter =
                         reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0xAA8);
                     cameraPos.x = mapCenter[0];
                     cameraPos.y = mapCenter[1];
                     cameraPos.z = mapCenter[2];
-                } else {
-                    cameraPos.x =
-                        kMapBoundsCenterScale * (rootNode->m_boundMinX + rootNode->m_boundMaxX);
-                    cameraPos.y =
-                        kMapBoundsCenterScale * (rootNode->m_boundMinY + rootNode->m_boundMaxY);
-                    cameraPos.z =
-                        kMapBoundsCenterScale * (rootNode->m_boundMinZ + rootNode->m_boundMaxZ);
                 }
             }
             cameraPos.y += kMapCameraCenterYOffset;
@@ -379,8 +379,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 
         CPtrArray<CMapLightHolder*>& mapLightHolderArr =
             reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450)[1];
-        int mapLightHolderCount = mapLightHolderArr.GetSize();
-        if (mapLightHolderCount > 0) {
+        if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) != 0) {
             mapLightHolderArr[0]->GetLightHolder(
                 reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C), static_cast<Vec*>(0));
         }

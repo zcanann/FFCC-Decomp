@@ -55,7 +55,9 @@ public:
     void MLstDraw();
     void MLstCtrlCur();
 
-    char pad_00[0x108];
+    char pad_00[0xF8];
+    CFont* helpFont;
+    char pad_fc[0x0C];
     CFont* listFont;
     char pad_10c[0x720];
     MenuLstState* lstState;

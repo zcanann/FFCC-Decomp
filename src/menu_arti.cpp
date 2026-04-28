@@ -777,7 +777,7 @@ int CMenuPcs::ArtiCtrlCur()
 	if (bVar2) {
 		uVar4 = 0;
 	} else {
-		uVar4 = *(unsigned short*)((char*)&Pad + 0x20);
+		uVar4 = Pad._20_2_;
 	}
 
 	if (uVar4 == 0) {

@@ -9,10 +9,11 @@ extern int gPppCalcDisabled;
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-static const float kPppCoronaScreenWidth = 640.0f;
-static const float kPppCoronaScreenHeight = 448.0f;
-static const float kPppCoronaScreenCenterX = 320.0f;
-static const float kPppCoronaScreenCenterY = 224.0f;
+extern const float FLOAT_80331048 = 640.0f;
+extern const float FLOAT_8033104c = 448.0f;
+extern const float FLOAT_80331050 = 320.0f;
+extern const float FLOAT_80331054 = 224.0f;
+extern const double DOUBLE_80331058 = 4503601774854144.0;
 
 struct CoronaWork {
     s16 m_shapeX;
@@ -70,16 +71,16 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
 
     PSMTXIdentity(mtx.value);
 
-    viewDir.x = kPppCoronaScreenWidth;
-    viewDir.y = kPppCoronaScreenHeight;
-    viewDir.z = kPppCoronaScreenCenterX;
+    viewDir.x = FLOAT_80331048;
+    viewDir.y = FLOAT_8033104c;
+    viewDir.z = FLOAT_80331050;
     PSVECSubtract(&vecWork->m_cameraOffset, &viewDir, &fromOrigin);
 
     mag = PSVECMag(&fromOrigin);
     scale = param2->m_distMin;
     if (mag < param2->m_distRange) {
         distScale = param2->m_distMax - param2->m_distMin;
-        distScale *= kPppCoronaScreenCenterY - (mag / param2->m_distRange);
+        distScale *= FLOAT_80331054 - (mag / param2->m_distRange);
         scale = param2->m_distMin + distScale;
     }
 
@@ -99,7 +100,7 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
     color.rgba[2] = param2->m_colorB;
     color.rgba[3] = alpha;
 
-    pppSetDrawEnv(&color, (pppFMATRIX*)0, kPppCoronaScreenCenterX, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
+    pppSetDrawEnv(&color, (pppFMATRIX*)0, FLOAT_80331050, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
                   1, 0);
     pppSetBlendMode(param2->m_blendMode);
     pppDrawShp(*shape, work->m_shapeY, pppEnvStPtr->m_materialSetPtr, param2->m_blendMode);
@@ -167,7 +168,7 @@ void pppDestructCorona(pppCorona*, pppCoronaUnkC*)
  */
 void pppConstructCorona(pppCorona* param1, pppCoronaUnkC* param2)
 {
-    float fVar1 = kPppCoronaScreenCenterX;
+    float fVar1 = FLOAT_80331050;
     u16* puVar2 = (u16*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[3]);
     puVar2[2] = 0;
     puVar2[1] = 0;

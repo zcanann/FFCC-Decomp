@@ -417,7 +417,7 @@ bool CMenuPcs::ItemOpen()
  */
 int CMenuPcs::ItemCtrl()
 {
-    short sVar1;
+    int sVar1;
     int iVar2;
     int iVar3;
 
@@ -749,7 +749,7 @@ int CMenuPcs::ItemCtrlCur()
     if (blocked) {
         hold = 0;
     } else {
-        hold = *(u16*)((u8*)&Pad + 0x20);
+        hold = Pad._20_2_;
     }
 
     if (hold == 0) {

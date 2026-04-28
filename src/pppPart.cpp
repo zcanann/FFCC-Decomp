@@ -76,6 +76,7 @@ extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(void*, float (*)[4], void*);
+extern "C" int printf(const char*, ...);
 
 _pppEnvSt* pppEnvStPtr;
 _pppMngSt* pppMngStPtr;
@@ -101,6 +102,7 @@ static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned
 static inline unsigned char* PartPcsRaw() { return reinterpret_cast<unsigned char*>(&PartPcs); }
 
 static const char s_pppPart_cpp[] = "pppPart.cpp";
+static const char s_ERROR_prog_NULL[] = "\nERROR!!!! prog=NULL\n\n";
 static const char s_CPartPcs_heap_801D821C[] = "CPartPcs.heap";
 static const float FLOAT_8032fddc = 0.0f;
 extern "C" float FLOAT_8032fde0;
@@ -2267,7 +2269,7 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 		u8* pDataVals = (u8*)(*(void**)(((u8*)pppMngSt) + 0xC8));
 		_pppPDataVal* pDataVal = (_pppPDataVal*)(pDataVals + pDataOffset);
 
-		if (pDataVals != 0 && pDataVal->m_programSetDef != 0)
+		if (pDataVal != 0 && pDataVal->m_programSetDef != 0)
 		{
 			_pppProgSetDef* progSet = pDataVal->m_programSetDef;
 			u16 activeCount = pDataVal->m_activeCount;
@@ -2303,6 +2305,10 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 							}
 						}
 					}
+					else
+					{
+						printf(s_ERROR_prog_NULL);
+					}
 
 					stageIter++;
 					workOffsetStep += 4;
@@ -2337,7 +2343,9 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 		u8* pDataVals = (u8*)(*(void**)(((u8*)pppMngSt) + 0xC8));
 		_pppPDataVal* pDataVal = (_pppPDataVal*)(pDataVals + pDataOffset);
 
-		if (pDataVals != 0 && pDataVal->m_programSetDef != 0 && pDataVal->m_activeCount > 0)
+		if (pDataVal != 0 && pDataVal->m_programSetDef != 0 &&
+		    *(reinterpret_cast<u8*>(pDataVal->m_programSetDef) + 0x0C) < 0x80 &&
+		    pDataVal->m_activeCount > 0)
 		{
 			s32 workOffsetStep = 0;
 			_pppProgSetDef* progSet = pDataVal->m_programSetDef;
@@ -2369,6 +2377,10 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 
 						Graphic.SetDrawDoneDebugDataPartControl(0x7FFF);
 					}
+				}
+				else
+				{
+					printf(s_ERROR_prog_NULL);
 				}
 
 				stageIter++;

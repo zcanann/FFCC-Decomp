@@ -222,6 +222,7 @@ ref.cpp:
 	extab       start:0x80006754 end:0x8000675C
 	extabindex  start:0x8000C2BC end:0x8000C2C8
 	.text       start:0x80043D10 end:0x80043D70
+	.data       start:0x801E9C08 end:0x801E9C14
 
 texanim.cpp:
 	extab       start:0x8000675C end:0x80006850

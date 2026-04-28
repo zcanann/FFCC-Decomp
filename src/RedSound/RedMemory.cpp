@@ -193,15 +193,18 @@ int RedNewA(int size, int offset, int maxSize)
 	}
 	maxSize -= offset;
 	size = (size + 0x1F) & 0xFFFFFFE0;
-	result = rangeStart;
+	currentAddress = rangeStart;
+	result = -1;
 	maxGap = maxSize;
 	bestBlock = 0;
 
 	for (blockPtr = m_AMemoryBank; (blockPtr[1] != 0) && (*blockPtr < rangeStart); blockPtr += 2) {
 	}
 
-	if (blockPtr[1] != 0) {
-		currentAddress = rangeStart;
+	if (blockPtr[1] == 0) {
+		result = currentAddress;
+		bestBlock = blockPtr;
+	} else {
 		for (; (blockPtr[1] != 0) && (blockPtr < m_AMemoryBank + 0x800); blockPtr += 2) {
 			if (currentAddress < rangeStart + maxSize) {
 				if ((int)(currentAddress + size) <= *blockPtr) {
@@ -224,8 +227,6 @@ int RedNewA(int size, int offset, int maxSize)
 			result = currentAddress;
 			bestBlock = blockPtr;
 		}
-	} else {
-		bestBlock = blockPtr;
 	}
 
 	if ((bestBlock == 0) || ((unsigned int)(rangeStart + maxSize) < result + size)) {

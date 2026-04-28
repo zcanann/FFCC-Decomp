@@ -669,7 +669,7 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     float innerRadius, float outerRadius)
 {
     (void)math;
-    bool hit;
+    int hit;
     float fVar1;
     float dVar6;
     float dVar7;
@@ -685,13 +685,13 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     dVar10 = dVar8 / (outerRadius + scale);
     PSVECSubtract(origin, ellipseScale, &local_60);
     dVar9 = dVar8 * dVar8;
-    local_78.y = local_60.y * dVar10;
+    local_60.y = local_60.y * dVar10;
     local_6c.x = vector->x;
     local_6c.y = vector->y * dVar10;
     local_6c.z = vector->z;
     local_78.x = local_60.x;
+    local_78.y = local_60.y;
     local_78.z = local_60.z;
-    local_60.y = local_78.y;
     dVar8 = PSVECDotProduct(&local_78, &local_78);
     if (dVar8 < dVar9) {
         if (outT != NULL) {
@@ -702,22 +702,21 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
             outPos->y = local_60.y;
             outPos->z = local_60.z;
         }
-        hit = true;
+        hit = 1;
     } else {
         dVar6 = PSVECDotProduct(&local_6c, &local_78);
         if (0.0f < dVar6) {
-            hit = false;
+            hit = 0;
         } else {
             dVar7 = PSVECDotProduct(&local_6c, &local_6c);
             fVar1 = dVar6 * dVar6 - dVar7 * (dVar8 - dVar9);
-            dVar8 = fVar1;
-            if (dVar8 < 0.0f) {
-                hit = false;
+            if (fVar1 < 0.0f) {
+                hit = 0;
             } else {
-                dVar8 = sqrtf(dVar8);
-                dVar8 = -dVar6 - dVar8;
+                fVar1 = sqrtf(fVar1);
+                dVar8 = -dVar6 - fVar1;
                 if ((dVar8 <= 0.0f) || (dVar7 < dVar8)) {
-                    hit = false;
+                    hit = 0;
                 } else {
                     dVar8 = dVar8 / dVar7;
                     if (outT != NULL) {
@@ -727,7 +726,7 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
                         PSVECScale(&local_6c, &local_84, dVar8);
                         PSVECAdd(&local_60, &local_84, outPos);
                     }
-                    hit = true;
+                    hit = 1;
                 }
             }
         }

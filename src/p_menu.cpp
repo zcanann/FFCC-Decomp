@@ -516,7 +516,7 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
             stage = m_menuStage;
         }
     } else if (type < 3) {
-        stage = pppEnvStPtr->m_stagePtr;
+        stage = PartMng.m_pppEnvSt.m_stagePtr;
     }
 
     if ((slot == 0) && (FontMan.m_font != 0)) {
@@ -1868,22 +1868,13 @@ void CMenuPcs::drawBattle()
     }
 
     for (int i = 0; i < 4; i++) {
-        CMenu* menu = m_battleRingMenus[i];
-        if (menu != 0) {
-            menu->Draw();
-        }
+        m_battleRingMenus[i]->Draw();
     }
     for (int i = 0; i < 12; i++) {
-        CMenu* menu = reinterpret_cast<CMenu*>(m_battleMesMenus[i]);
-        if (menu != 0) {
-            menu->Draw();
-        }
+        reinterpret_cast<CMenu*>(m_battleMesMenus[i])->Draw();
     }
     for (int i = 0; i < 4; i++) {
-        CRingMenu* menu = m_battleRingMenus[i];
-        if (menu != 0) {
-            menu->DrawIcon();
-        }
+        m_battleRingMenus[i]->DrawIcon();
     }
 }
 

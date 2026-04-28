@@ -2281,12 +2281,14 @@ void _PitchBendCompute(RedTrackDATA* track, int bend)
         if (voiceData[0] == (unsigned int)track) {
             if (voiceData[1] != 0) {
                 int pitch;
+                int computedPitch;
                 if ((((unsigned char*)voiceData)[0x1a] & 3) != 0) {
                     pitch = voiceData[0x28] + ((int*)track)[0x17];
                 } else {
                     pitch = voiceData[0x28] + *p_MusicPitchControl;
                 }
-                voiceData[0x26] = PitchCompute(pitch, *(short*)((char*)track + 0x142) + bend, ((int*)voiceData[1])[5],
+                computedPitch = pitch;
+                voiceData[0x26] = PitchCompute(computedPitch, *(short*)((char*)track + 0x142) + bend, ((int*)voiceData[1])[5],
                                                *(char*)((char*)track + 0x148));
                 voiceData[0x2e] |= 1;
             }

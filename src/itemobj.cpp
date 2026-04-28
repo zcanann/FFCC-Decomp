@@ -477,6 +477,41 @@ void CGItemObj::onFrameStat()
 	case 0xD:
 		if (*(int*)(self + 0x528) == *(int*)(self + 0x554)) {
 			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
+			float launchSpeed;
+
+			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+				typedef unsigned int (*PartyVFunc)(CGPartyObj*);
+				PartyVFunc getCid = reinterpret_cast<PartyVFunc>((*reinterpret_cast<void***>(carryObj))[3]);
+				unsigned int cid = getCid(carryObj);
+
+				if ((cid & 0x6D) == 0x6D &&
+				    *(int*)(*(unsigned char**)((unsigned char*)carryObj + 0x58) + 0x3B4) != 0) {
+					launchSpeed = FLOAT_80331b18;
+				} else if (*(int*)(CFlat + 0x4780) == 1) {
+					if ((cid & 0x6D) == 0x6D &&
+					    *(unsigned short*)(*(unsigned char**)((unsigned char*)carryObj + 0x58) + 0x3E0) > 1) {
+						launchSpeed = FLOAT_80331b18;
+					} else {
+						launchSpeed = FLOAT_80331ba8;
+					}
+				} else {
+					launchSpeed = FLOAT_80331b90;
+				}
+			} else if (*(int*)(CFlat + 0x4780) == 1) {
+				typedef unsigned int (*PartyVFunc)(CGPartyObj*);
+				PartyVFunc getCid = reinterpret_cast<PartyVFunc>((*reinterpret_cast<void***>(carryObj))[3]);
+				unsigned int cid = getCid(carryObj);
+
+				if ((cid & 0x6D) == 0x6D &&
+				    *(unsigned short*)(*(unsigned char**)((unsigned char*)carryObj + 0x58) + 0x3E0) > 1) {
+					launchSpeed = FLOAT_80331b18;
+				} else {
+					launchSpeed = FLOAT_80331ba8;
+				}
+			} else {
+				launchSpeed = FLOAT_80331b90;
+			}
+
 			Vec safePos;
 			float safeDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(this, 0x41, carryObj, &safePos);
 
@@ -489,7 +524,6 @@ void CGItemObj::onFrameStat()
 			Detach__8CGObjectFv(this);
 			*(Vec*)(self + 0x15C) = safePos;
 
-			float launchSpeed = FLOAT_80331b90;
 			if (*(int*)(self + 0x520) != 0xC) {
 				launchSpeed = FLOAT_80331b40;
 			}
@@ -512,6 +546,35 @@ void CGItemObj::onFrameStat()
 			} else if (isActive) {
 				changeStat__8CGPrgObjFiii(this, 0, 0, 0);
 			}
+		}
+		break;
+	case 0xE:
+		if (*(int*)(self + 0x528) == 0) {
+			prgObj->m_bgColMask = 0;
+			*reinterpret_cast<unsigned char*>(&prgObj->m_weaponNodeFlags) &= 0xEF;
+			prgObj->m_groundHitOffset.z = zero;
+			prgObj->m_groundHitOffset.y = zero;
+			prgObj->m_groundHitOffset.x = zero;
+		} else if (*(int*)(self + 0x528) == 4) {
+			prgObj->m_bgDownDist = FLOAT_80331b68;
+			prgObj->m_stepSlopeLimit = zero;
+			EndParticle__13CFlatRuntime2FPQ29CCharaPcs7CHandle(CFlat, *(void**)(self + 0xF8));
+		} else if (*(int*)(self + 0x528) == 0xC) {
+			self[0x54D] = (self[0x54D] & 0x7F) | 0x80;
+		}
+
+		if (*(int*)(self + 0x528) > 7) {
+			CGObject* owner = *(CGObject**)(self + 0x550);
+
+			prgObj->m_rotTargetY += FLOAT_80331b54;
+			prgObj->m_worldPosition.x += (owner->m_worldPosition.x - prgObj->m_worldPosition.x) * FLOAT_80331b54;
+			prgObj->m_worldPosition.y +=
+			    ((FLOAT_80331b3c * owner->unk_0x188 + owner->m_worldPosition.y) - prgObj->m_worldPosition.y) *
+			    FLOAT_80331b54;
+			prgObj->m_worldPosition.z += (owner->m_worldPosition.z - prgObj->m_worldPosition.z) * FLOAT_80331b54;
+			prgObj->m_rotationX *= FLOAT_80331bac;
+			prgObj->m_rotationY *= FLOAT_80331bac;
+			prgObj->m_rotationZ *= FLOAT_80331bac;
 		}
 		break;
 	case 0x1b:
@@ -653,10 +716,11 @@ void CGItemObj::onFrameStat()
 		if (*(int*)(self + 0x528) == 0) {
 			prgObj->m_stepSlopeLimit = zero;
 			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
-
-			CGObject* owner = *(CGObject**)(self + 0x550);
-			if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_pdtLoadRef != 0) {
-				pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(owner->m_charaModelHandle->m_pdtLoadRef) + 0x14);
+			pdtNo = *(int*)(*(int*)(SoundBuffer + 0x1260 + 0xF8) + 0x178);
+			if (pdtNo == 0) {
+				pdtNo = -1;
+			} else {
+				pdtNo = *(int*)(pdtNo + 0x14);
 			}
 
 			float particleScale =

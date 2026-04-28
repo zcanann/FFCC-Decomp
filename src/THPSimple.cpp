@@ -355,42 +355,43 @@ restore_interrupts_1:
             if ((audioTrack < 0) || (static_cast<u32>(audioTrack) >= SimpleControl.audioInfo.mSndNumTracks)) {
                 return 4;
             }
-            if (SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample != 0) {
+            if (SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample == 0) {
+                for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
+                    switch (SimpleControl.compInfo.mFrameComp[i]) {
+                    case 0:
+                        decodeSuccess =
+                            THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
+                                           reinterpret_cast<void*>(SimpleControl.unk_9C));
+                        if (decodeSuccess == 0) {
+                            decodeSuccess = 1;
+                            SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
+                        } else {
+                            decodeSuccess = 0;
+                        }
+                        if (decodeSuccess == 0) {
+                            return 1;
+                        }
+                        break;
+                    case 1: {
+                        u32 samples = THPAudioDecode(SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer,
+                                                     compData + *compSizeTable * audioTrack, 0);
+                        u32 lock = OSDisableInterrupts();
+                        SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample = samples;
+                        SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mCurPtr =
+                            SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer;
+                        OSRestoreInterrupts(lock);
+                        SimpleControl.audioDecodeIndex++;
+                        if (SimpleControl.audioDecodeIndex >= 3) {
+                            SimpleControl.audioDecodeIndex = 0;
+                        }
+                        break;
+                    }
+                    }
+                    compData += *compSizeTable;
+                    compSizeTable++;
+                }
+            } else {
                 return 3;
-            }
-
-            for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
-                switch (SimpleControl.compInfo.mFrameComp[i]) {
-                case 0:
-                    decodeSuccess = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
-                                                  reinterpret_cast<void*>(SimpleControl.unk_9C));
-                    if (decodeSuccess != 0) {
-                        decodeSuccess = 0;
-                    } else {
-                        decodeSuccess = 1;
-                        SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
-                    }
-                    if (decodeSuccess == 0) {
-                        return 1;
-                    }
-                    break;
-                case 1: {
-                    u32 samples = THPAudioDecode(SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer,
-                                                 compData + *compSizeTable * audioTrack, 0);
-                    u32 lock = OSDisableInterrupts();
-                    SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample = samples;
-                    SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mCurPtr =
-                        SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer;
-                    OSRestoreInterrupts(lock);
-                    SimpleControl.audioDecodeIndex++;
-                    if (SimpleControl.audioDecodeIndex >= 3) {
-                        SimpleControl.audioDecodeIndex = 0;
-                    }
-                    break;
-                }
-                }
-                compData += *compSizeTable;
-                compSizeTable++;
             }
         } else {
             for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
@@ -398,11 +399,11 @@ restore_interrupts_1:
                 case 0:
                     decodeSuccess = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
                                                   reinterpret_cast<void*>(SimpleControl.unk_9C));
-                    if (decodeSuccess != 0) {
-                        decodeSuccess = 0;
-                    } else {
+                    if (decodeSuccess == 0) {
                         decodeSuccess = 1;
                         SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
+                    } else {
+                        decodeSuccess = 0;
                     }
                     if (decodeSuccess == 0) {
                         return 1;
@@ -415,9 +416,9 @@ restore_interrupts_1:
         }
 
         SimpleControl.readBuffer[SimpleControl.readFrame].mIsValid = 0;
-        SimpleControl.readFrame++;
-        if (SimpleControl.readFrame >= 8) {
-            SimpleControl.readFrame = 0;
+        {
+            s32 next = SimpleControl.readFrame + 1;
+            SimpleControl.readFrame = (next >= 8) ? 0 : next;
         }
 
         interruptState = OSDisableInterrupts();
@@ -586,7 +587,10 @@ s32 THPSimplePreLoad(s32 loop)
             SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid = 1;
             SimpleControl.readBuffer[SimpleControl.readIndex].mFrameNumber = SimpleControl.curAudioTrack;
             SimpleControl.curAudioTrack++;
-            SimpleControl.readIndex = (SimpleControl.readIndex + 1) % 8;
+            {
+                s32 next = SimpleControl.readIndex + 1;
+                SimpleControl.readIndex = (next >= 8) ? 0 : next;
+            }
 
             if (((SimpleControl.header.mNumFrames - 1) < static_cast<u32>(SimpleControl.curAudioTrack)) &&
                 (SimpleControl.isLooping == 1)) {

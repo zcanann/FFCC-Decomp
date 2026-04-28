@@ -9,30 +9,6 @@
 #include <math.h>
 #include "dolphin/mtx.h"
 
-template <class T>
-class CPtrArray
-{
-public:
-    CPtrArray();
-    virtual ~CPtrArray();
-
-    bool Add(T item);
-    int GetSize();
-    void RemoveAll();
-    void ReleaseAndRemoveAll();
-    T operator[](unsigned long index);
-    void SetStage(CMemory::CStage* stage);
-    int setSize(unsigned long newSize);
-    T GetAt(unsigned long index);
-
-    int m_numItems;
-    int m_size;
-    int m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-};
-
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
@@ -356,7 +332,7 @@ void CPtrArray<CTexAnimSeq*>::SetStage(CMemory::CStage* stage)
  * JP Size: TODO
  */
 template <>
-int CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
+bool CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
 {
     CTexAnimSeq** newItems;
 
@@ -573,7 +549,7 @@ void CPtrArray<CTexAnim*>::SetStage(CMemory::CStage* stage)
  * JP Size: TODO
  */
 template <>
-int CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
+bool CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
 {
     CTexAnim** newItems;
 
@@ -632,12 +608,7 @@ CTexAnim* CPtrArray<CTexAnim*>::GetAt(unsigned long index)
  */
 CTexAnimSet::CTexAnimSet()
 {
-    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
-
-    __ct__4CRefFv(this);
-    self->vtable = __vt__11CTexAnimSet;
-    __ct__21CPtrArray_P8CTexAnim_Fv(&self->texAnims);
-    self->unk24 = FLOAT_8032fb38;
+    reinterpret_cast<CTexAnimSetStorage*>(this)->unk24 = FLOAT_8032fb38;
 }
 
 /*
@@ -652,12 +623,7 @@ CTexAnimSet::CTexAnimSet()
 #pragma dont_inline on
 CTexAnimSet::~CTexAnimSet()
 {
-    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
-
-    self->vtable = __vt__11CTexAnimSet;
-    self->texAnims.ReleaseAndRemoveAll();
-    __dt__21CPtrArray_P8CTexAnim_Fv(&self->texAnims, -1);
-    __dt__4CRefFv(this, 0);
+    reinterpret_cast<CTexAnimSetStorage*>(this)->texAnims.ReleaseAndRemoveAll();
 }
 #pragma dont_inline reset
 
@@ -1065,8 +1031,6 @@ CTexAnim::CTexAnim()
 {
     CTexAnimStorage* self = reinterpret_cast<CTexAnimStorage*>(this);
 
-    __ct__4CRefFv(this);
-    self->vtable = __vt__8CTexAnim;
     self->refData = 0;
     self->unk0C = 0;
     self->unk10 = FLOAT_8032fb38;
@@ -1087,7 +1051,6 @@ CTexAnim::CTexAnim()
  */
 CTexAnim::~CTexAnim()
 {
-    *reinterpret_cast<void**>(this) = __vt__8CTexAnim;
     CRef* refData = reinterpret_cast<CRef*>(*reinterpret_cast<void**>(Ptr(this, 8)));
     if (refData != 0) {
         int* refDataWords = reinterpret_cast<int*>(refData);
@@ -1100,7 +1063,6 @@ CTexAnim::~CTexAnim()
         }
         *reinterpret_cast<void**>(Ptr(this, 8)) = 0;
     }
-    __dt__4CRefFv(this, 0);
 }
 
 /*
@@ -1444,9 +1406,6 @@ CTexAnim::CRefData::CRefData()
 {
     CTexAnimRefDataStorage* self = reinterpret_cast<CTexAnimRefDataStorage*>(this);
 
-    __ct__4CRefFv(this);
-    self->vtable = __vt__Q28CTexAnim8CRefData;
-    __ct__25CPtrArray_P11CTexAnimSeq_Fv(&self->texAnimSeqs);
     self->material = 0;
     self->texSrtIndex = 0;
 }
@@ -1465,7 +1424,6 @@ CTexAnim::CRefData::~CRefData()
 {
     CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(this);
 
-    refData->vtable = __vt__Q28CTexAnim8CRefData;
     CRef* material = reinterpret_cast<CRef*>(refData->material);
     if (material != 0) {
         int* materialWords = reinterpret_cast<int*>(material);
@@ -1479,9 +1437,6 @@ CTexAnim::CRefData::~CRefData()
         refData->material = 0;
     }
     refData->texAnimSeqs.ReleaseAndRemoveAll();
-    __dt__25CPtrArray_P11CTexAnimSeq_Fv(&refData->texAnimSeqs, -1);
-
-    __dt__4CRefFv(this, 0);
 }
 #pragma dont_inline reset
 
@@ -1498,8 +1453,6 @@ CTexAnimSeq::CTexAnimSeq()
 {
     CTexAnimSeqStorage* self = reinterpret_cast<CTexAnimSeqStorage*>(this);
 
-    __ct__4CRefFv(this);
-    self->vtable = __vt__11CTexAnimSeq;
     self->name[0] = '\0';
     self->totalFrames = 0;
     self->keyCount = 0;
@@ -1518,13 +1471,12 @@ CTexAnimSeq::CTexAnimSeq()
  */
 CTexAnimSeq::~CTexAnimSeq()
 {
-    *reinterpret_cast<void**>(this) = __vt__11CTexAnimSeq;
-    void** keys = reinterpret_cast<void**>(Ptr(this, 0x114));
-    if (*keys != 0) {
-        __dla__FPv(*keys);
-        *keys = 0;
+    CTexAnimSeqStorage* self = reinterpret_cast<CTexAnimSeqStorage*>(this);
+
+    if (self->keys != 0) {
+        __dla__FPv(self->keys);
+        self->keys = 0;
     }
-    __dt__4CRefFv(this, 0);
 }
 
 /*

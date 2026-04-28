@@ -19,6 +19,7 @@ extern float FLOAT_80330898;
 extern float FLOAT_8033089c;
 extern float FLOAT_803308a0;
 extern float FLOAT_803308a4;
+extern float FLOAT_803308A8;
 extern float FLOAT_803308ac;
 extern float FLOAT_803308b0;
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
@@ -124,6 +125,32 @@ static char* GetFlatName(int tableIdx, int entryIdx)
 		return (char*)s_mesEmpty;
 	}
 	return flat->m_tabl[tableIdx].m_strings[entryIdx];
+}
+
+static void AdvanceMesLine(CMes* mes, CFont* font)
+{
+	*(float*)((char*)mes + 0x3C84) = FLOAT_8033089c;
+	*(float*)((char*)mes + 0x3C88) =
+	    *(float*)((char*)mes + 0x3C88) + FLOAT_803308a4 + (float)font->m_glyphHeight * font->scaleY;
+
+	if (*(int*)((char*)mes + 0x3D10) != 0)
+	{
+		*(int*)((char*)mes + 0x3D14) = *(int*)((char*)mes + 0x3D14) + 1;
+		*(float*)((char*)mes + 0x3C84) =
+		    *(float*)((char*)mes + 0x3C84) + FLOAT_803308A8 + *(float*)((char*)mes + 0x3D3C);
+	}
+}
+
+static void AddMesFlag(CMes* mes, unsigned char type, unsigned char index, short value)
+{
+	int count = *(int*)((char*)mes + 0x3C0C);
+	unsigned char* entry = (unsigned char*)mes + count * 6 + 0x3C14;
+	entry[0] = type;
+	entry[1] = 0;
+	entry[2] = index;
+	entry[3] = 0;
+	*(short*)(entry + 4) = value;
+	*(int*)((char*)mes + 0x3C0C) = count + 1;
 }
 
 /*
@@ -380,8 +407,7 @@ void CMes::addString(char** text, int branchMode)
 			switch (tag)
 			{
 			case 0:
-				*(int*)((char*)this + 0x3C84) = 0;
-				*(int*)((char*)this + 0x3C88) = *(int*)((char*)this + 0x3C88) + *(int*)((char*)this + 0x3CB0);
+				AdvanceMesLine(this, font);
 				break;
 			case 1:
 			{
@@ -392,11 +418,26 @@ void CMes::addString(char** text, int branchMode)
 				}
 				*(int*)((char*)this + 0x3C78) = wait;
 				*(int*)((char*)this + 0x3C74) = 1;
+				AdvanceMesLine(this, font);
 				return;
 			}
 			case 2:
 				*(int*)((char*)this + 0x3C78) = 4;
 				*(int*)((char*)this + 0x3C74) = 1;
+				AdvanceMesLine(this, font);
+				return;
+			case 0x24:
+				*(int*)((char*)this + 0x3C78) = 2;
+				AdvanceMesLine(this, font);
+				return;
+			case 0x28:
+				*(int*)((char*)this + 0x3C78) = 1;
+				AdvanceMesLine(this, font);
+				return;
+			case 0x29:
+				*(int*)((char*)this + 0x3C78) = 5;
+				*(int*)((char*)this + 0x3C74) = 1;
+				AdvanceMesLine(this, font);
 				return;
 			case 3:
 				*(int*)((char*)this + 0x3C7C) = *(int*)((char*)this + 0x3C7C) + ReadTagS8(text);
@@ -410,6 +451,38 @@ void CMes::addString(char** text, int branchMode)
 			case 6:
 				*(int*)((char*)this + 0x3D2C) = 1;
 				break;
+			case 7:
+				*(int*)((char*)this + 0x3D10) = 1;
+				*(int*)((char*)this + 0x3D14) = 0;
+				*(int*)((char*)this + 0x3D18) = ReadTagS8(text);
+				*(int*)((char*)this + 0x3D24) =
+				    (int)(FLOAT_803308a4 + (float)font->m_glyphHeight * font->scaleY);
+				*(int*)((char*)this + 0x3D20) = *(int*)((char*)this + 0x3C88);
+				*(int*)((char*)this + 0x3D1C) = ReadTagS8(text);
+				*(float*)((char*)this + 0x3C84) =
+				    *(float*)((char*)this + 0x3C84) + FLOAT_803308A8 + *(float*)((char*)this + 0x3D3C);
+				break;
+			case 0x0A:
+			{
+				unsigned char idx = (unsigned char)ReadTagU8(text);
+				short value = (short)ReadTagS16(text);
+				CMes::m_tempVar[idx] = value;
+				if (branchMode == 0)
+				{
+					AddMesFlag(this, 2, idx, value);
+				}
+				break;
+			}
+			case 0x0B:
+			{
+				unsigned char idx = (unsigned char)ReadTagU8(text);
+				CMes::m_tempVar[idx] = CMes::m_tempVar[idx] + 1;
+				if (branchMode == 0)
+				{
+					AddMesFlag(this, 1, idx, 0);
+				}
+				break;
+			}
 			case 0x0C:
 			case 0x0D:
 			case 0x0E:
@@ -445,7 +518,7 @@ void CMes::addString(char** text, int branchMode)
 			case 0x25:
 			{
 				int value = ReadTagS8(text);
-				if (*(int*)((char*)this + 0x3D4C) == 0)
+				if (*(int*)((char*)this + 0x3D30) == 0)
 				{
 					if (value == 0x7F)
 					{
@@ -467,6 +540,9 @@ void CMes::addString(char** text, int branchMode)
 			case 0x31:
 				*(int*)((char*)this + 0x3C84) = ReadTagS16(text);
 				*(int*)((char*)this + 0x3C88) = ReadTagS16(text);
+				break;
+			case 0x32:
+				*(int*)((char*)this + 0x3D28) = 9;
 				break;
 			case 0x33:
 				*(int*)((char*)this + 0x3D3C) = ReadTagS8(text);
@@ -498,6 +574,15 @@ void CMes::addString(char** text, int branchMode)
 				font->SetScaleY(*(float*)((char*)this + 0x3D48));
 				break;
 			}
+			case 0x36:
+			{
+				unsigned char idx = (unsigned char)ReadTagU8(text);
+				if (branchMode == 0)
+				{
+					AddMesFlag(this, 4, idx, 0);
+				}
+				break;
+			}
 			case 0x41:
 			{
 				int mode = ReadTagU8(text);
@@ -519,6 +604,18 @@ void CMes::addString(char** text, int branchMode)
 			{
 				int idx = ReadTagU8(text);
 				flowMode = (CMes::m_tempVar[idx] == 1) ? 1 : 2;
+				break;
+			}
+			case 0x43:
+				flowMode = (Game.m_gameWork.m_menuStageMode != 0) ? 1 : 2;
+				break;
+			case 0x44:
+				flowMode = (Game.m_caravanWorkArr[*(int*)((char*)this + 0x3D0C)].m_genderFlag == 0) ? 1 : 2;
+				break;
+			case 0x45:
+			{
+				int idx = ReadTagU8(text);
+				flowMode = (Game.m_caravanWorkArr[CMes::m_tempVar[idx]].m_genderFlag == 0) ? 1 : 2;
 				break;
 			}
 			case 0x46:
@@ -999,7 +1096,6 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		unsigned char c = in[0];
 		if (c == 0)
 		{
-			*dst = '\0';
 			return;
 		}
 
@@ -1024,7 +1120,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			{
 				*dst++ = '\n';
 			}
-			else if ((dst > out) && (dst[-1] == '-'))
+			else if (dst[-1] == '-')
 			{
 				dst[-1] = '\0';
 				dst--;
@@ -1313,7 +1409,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 			else if ((tag == 0xA0) && (breakOnLineTag != 0))
 			{
 				font->SetPosX((float)lineStartXInt);
-				font->SetPosY((float)lineBaseY + font->posY + (float)font->m_glyphWidth * font->scaleY);
+				font->SetPosY((float)lineBaseY + font->posY + (float)font->m_glyphHeight * font->scaleY);
 			}
 		}
 		else

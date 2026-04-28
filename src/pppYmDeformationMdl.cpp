@@ -53,6 +53,12 @@ extern float FLOAT_80330DA4;
 extern float FLOAT_80330DA8;
 extern float FLOAT_80330dac = 0.0f;
 
+static inline float YmDeformationMdlZero()
+{
+    const float* zero = &FLOAT_80330dac;
+    return *zero;
+}
+
 static inline Mtx& CameraMatrix()
 {
     return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);

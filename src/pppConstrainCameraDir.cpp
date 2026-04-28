@@ -6,6 +6,7 @@
 #include <dolphin/mtx.h>
 
 void pppSetFpMatrix(_pppMngSt*);
+extern const float FLOAT_803320C4;
 
 /*
  * --INFO--
@@ -94,7 +95,7 @@ void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
  */
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
-    float uVar1 = 0.0f;
+    float uVar1 = FLOAT_803320C4;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
@@ -112,9 +113,11 @@ void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDi
  */
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
-    float uVar1 = 0.0f;
+    float uVar1 = FLOAT_803320C4;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
     puVar2[0] = uVar1;
 }
+
+extern const float FLOAT_803331ec = 0.0f;

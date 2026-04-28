@@ -2467,15 +2467,17 @@ void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tra
 void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int mode;
-    unsigned int value;
+    int value;
+    int fuzzyValue;
 
     mode = *(*(u8**)track)++;
     value = *(*(u8**)track)++;
     if (value != 0) {
-        value += 1;
+        fuzzyValue = value + 1;
     } else {
-        value = 0x100;
+        fuzzyValue = 0x100;
     }
+    value = fuzzyValue;
 
     switch (mode) {
     case 3:
@@ -2494,7 +2496,6 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
         ((int*)track)[0x3c] = value;
         ((int*)track)[0x3f] |= 0x40000;
         return;
-    case 0:
     default:
         ((int*)track)[0x38] = value;
         ((int*)track)[0x3f] |= 0x4000;
@@ -2530,7 +2531,6 @@ void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     case 4:
         ((int*)track)[0x3f] &= 0xFFFBFFFF;
         return;
-    case 0:
     default:
         ((int*)track)[0x3f] &= 0xFFFFBFFF;
         return;

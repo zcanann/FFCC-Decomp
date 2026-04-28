@@ -131,9 +131,17 @@ struct _pppPObject
     u8 m_workArea[1];           // 0x80 - per-instance work block, indexed by _pppCtrlTable::m_serializedDataOffsets[N]
 };
 
-struct _pppPObjLink;
 struct _pppPDataVal;
 struct _pppCtrlTable;
+
+// Doubly-linked list head for the active _pppPObject instances owned by
+// a _pppPDataVal. The head sits inline inside _pppMngSt at 0xC4.
+struct _pppPObjLink
+{
+    _pppPObjLink* m_next;     // 0x0
+    _pppPObjLink* m_previous; // 0x4
+    _pppPDataVal* m_owner;    // 0x8
+}; // Size 0xc
 
 typedef void (*pppProgAnyCallback)(void);
 typedef void (*pppProgOperationCallback)(_pppPObject*, void*, _pppCtrlTable*);
@@ -265,8 +273,7 @@ struct _pppMngSt
     int m_reservedB8;                  // 0xB8
     unsigned int m_objHitMask;         // 0xBC
     unsigned int m_cylinderAttribute;  // 0xC0
-    unsigned char m_pObjList[8];       // 0xC4
-    void* m_pDataValList;              // 0xCC
+    _pppPObjLink m_pppPObjLinkHead;    // 0xC4 (size 0xC)
     void* m_controlProgramTable;       // 0xD0
     _pppPDataVal* m_pppPDataVals;      // 0xD4
     void* m_owner;                     // 0xD8

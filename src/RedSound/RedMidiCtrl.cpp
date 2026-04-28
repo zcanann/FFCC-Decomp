@@ -1283,21 +1283,21 @@ void __MidiCtrl_SlurOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int delta[2];
+    int delta;
     int command;
     int value;
     int* voiceData;
 
-    delta[0] = DeltaTimeSumup((unsigned char**)track);
-    if (delta[0] == 0) {
-        delta[0] += 1;
+    delta = DeltaTimeSumup((unsigned char**)track);
+    if (delta == 0) {
+        delta += 1;
     }
 
     command = *(*(s8**)track)++;
     value = 0;
     command <<= 8;
-    ((int*)track)[0x45] = DataAddCompute(&value, command, delta);
-    ((int*)track)[0x44] = delta[0];
+    ((int*)track)[0x45] = DataAddCompute(&value, command, &delta);
+    ((int*)track)[0x44] = delta;
     ((int*)track)[0x48] &= 0xfffff000;
 
     voiceData = (int*)p_VoiceData;

@@ -85,49 +85,49 @@ void _StreamStop(RedStreamDATA* streamData)
  * Address:	TODO
  * Size:	TODO
  */
-int _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
+int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCount)
 {
 	unsigned char* dstBuffer;
 	int streamStruct;
 	int dmaDstOffset;
 	int dmaID;
 
-	param_2 &= 1;
+	bufferIndex &= 1;
 
 	do {
-		dstBuffer = (unsigned char*)(*(int*)((int)param_1 + 0xc) + param_2 * 0x1000);
-		streamStruct = *(int*)((int)param_1 + 4);
+		dstBuffer = (unsigned char*)(*(int*)((int)stream + 0xc) + bufferIndex * 0x1000);
+		streamStruct = *(int*)((int)stream + 4);
 
-		memcpy(dstBuffer, (void*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120)), 0x1000);
-		*(int*)((int)param_1 + 0x120) += 0x1000;
-		if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
-			*(int*)((int)param_1 + 0x120) = 0;
+		memcpy(dstBuffer, (void*)(*(int*)((int)stream + 8) + *(int*)((int)stream + 0x120)), 0x1000);
+		*(int*)((int)stream + 0x120) += 0x1000;
+		if (*(int*)((int)stream + 0x120) >= *(int*)((int)stream + 0x118)) {
+			*(int*)((int)stream + 0x120) = 0;
 		}
 
-		if (*(short*)((int)param_1 + 0x2a) == 2) {
-			memcpy(dstBuffer + 0x2000, (void*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120)), 0x1000);
-			*(int*)((int)param_1 + 0x120) += 0x1000;
-			if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
-				*(int*)((int)param_1 + 0x120) = 0;
+		if (*(short*)((int)stream + 0x2a) == 2) {
+			memcpy(dstBuffer + 0x2000, (void*)(*(int*)((int)stream + 8) + *(int*)((int)stream + 0x120)), 0x1000);
+			*(int*)((int)stream + 0x120) += 0x1000;
+			if (*(int*)((int)stream + 0x120) >= *(int*)((int)stream + 0x118)) {
+				*(int*)((int)stream + 0x120) = 0;
 			}
 		}
 
-		dmaDstOffset = *(int*)((int)param_1 + 0x12c) + param_2 * 0x1000;
+		dmaDstOffset = *(int*)((int)stream + 0x12c) + bufferIndex * 0x1000;
 		dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
 
-		if ((param_2 == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
+		if ((bufferIndex == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
 			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ec) = (unsigned short)*dstBuffer;
 			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) =
 			    *(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = 0;
 			*(unsigned int*)(*(int*)(streamStruct + 0x14) + 0x1c) |= 0x100000;
 		}
 
-		if (*(short*)((int)param_1 + 0x2a) == 2) {
+		if (*(short*)((int)stream + 0x2a) == 2) {
 			dstBuffer += 0x2000;
 			dmaDstOffset += 0x2000;
 			streamStruct += 0xc0;
 			dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
-			if ((param_2 == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
+			if ((bufferIndex == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
 				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ec) = (unsigned short)*dstBuffer;
 				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) =
 				    *(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = 0;
@@ -135,10 +135,10 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
 			}
 		}
 
-		param_3 -= 0x1000;
-		param_2 ^= 1;
-		*(int*)((int)param_1 + 0x124) += 0x200;
-	} while (0 < param_3);
+		byteCount -= 0x1000;
+		bufferIndex ^= 1;
+		*(int*)((int)stream + 0x124) += 0x200;
+	} while (0 < byteCount);
 
 	return dmaID;
 }
@@ -148,7 +148,7 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
  * Address:	801cbc6c
  * Size:	856b
  */
-int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
+int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount)
 {
 	unsigned int* puVar3;
 	unsigned char* pbVar4;
@@ -158,13 +158,13 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 	int iVar8;
 	int dmaID;
 
-	param_2 = param_2 & 1;
+	bufferIndex = bufferIndex & 1;
 	
-	if (*(short*)((int)param_1 + 0x2a) == 2) {
+	if (*(short*)((int)stream + 0x2a) == 2) {
 		do {
-			pbVar6 = (unsigned char*)(*(int*)((int)param_1 + 0xc) + param_2 * 0x1000);
-			iVar8 = *(int*)((int)param_1 + 4);
-			puVar7 = (unsigned int*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120));
+			pbVar6 = (unsigned char*)(*(int*)((int)stream + 0xc) + bufferIndex * 0x1000);
+			iVar8 = *(int*)((int)stream + 4);
+			puVar7 = (unsigned int*)(*(int*)((int)stream + 8) + *(int*)((int)stream + 0x120));
 			pbVar4 = pbVar6 + 0x2000;
 			puVar3 = puVar7 + 0x400;
 			pbVar5 = pbVar6;
@@ -179,12 +179,12 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 				pbVar4 = pbVar4 + 8;
 			} while (puVar7 < puVar3);
 			
-			*(int*)((int)param_1 + 0x120) = *(int*)((int)param_1 + 0x120) + 0x1000;
-			if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
-				*(int*)((int)param_1 + 0x120) = 0;
+			*(int*)((int)stream + 0x120) = *(int*)((int)stream + 0x120) + 0x1000;
+			if (*(int*)((int)stream + 0x120) >= *(int*)((int)stream + 0x118)) {
+				*(int*)((int)stream + 0x120) = 0;
 			}
 			
-			puVar7 = (unsigned int*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120));
+			puVar7 = (unsigned int*)(*(int*)((int)stream + 8) + *(int*)((int)stream + 0x120));
 			puVar3 = puVar7 + 0x400;
 			
 			do {
@@ -197,15 +197,15 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 				pbVar4 = pbVar4 + 8;
 			} while (puVar7 < puVar3);
 			
-			*(int*)((int)param_1 + 0x120) = *(int*)((int)param_1 + 0x120) + 0x1000;
-			if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
-				*(int*)((int)param_1 + 0x120) = 0;
+			*(int*)((int)stream + 0x120) = *(int*)((int)stream + 0x120) + 0x1000;
+			if (*(int*)((int)stream + 0x120) >= *(int*)((int)stream + 0x118)) {
+				*(int*)((int)stream + 0x120) = 0;
 			}
 			
-			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar6, *(int*)((int)param_1 + 300) + param_2 * 0x1000, 0x1000, 0, 0);
-			dmaID = RedDmaEntry(0x8001, 0, (int)(pbVar6 + 0x2000), *(int*)((int)param_1 + 300) + (param_2 + 2) * 0x1000, 0x1000, 0, 0);
+			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar6, *(int*)((int)stream + 300) + bufferIndex * 0x1000, 0x1000, 0, 0);
+			dmaID = RedDmaEntry(0x8001, 0, (int)(pbVar6 + 0x2000), *(int*)((int)stream + 300) + (bufferIndex + 2) * 0x1000, 0x1000, 0, 0);
 			
-			if ((param_2 == 0) && (*(void**)(iVar8 + 0x14) != 0)) {
+			if ((bufferIndex == 0) && (*(void**)(iVar8 + 0x14) != 0)) {
 				int zero = 0;
 				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ec) = (unsigned short)*pbVar6;
 				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1f0) = zero;
@@ -217,29 +217,29 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 				*(unsigned int*)(*(int*)(iVar8 + 0xd4) + 0x1c) = *(unsigned int*)(*(int*)(iVar8 + 0xd4) + 0x1c) | 0x100000;
 			}
 			
-			param_2 = param_2 ^ 1;
-			param_3 = param_3 + -0x1000;
-			*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) + 0x200;
+			bufferIndex = bufferIndex ^ 1;
+			byteCount = byteCount + -0x1000;
+			*(int*)((int)stream + 0x124) = *(int*)((int)stream + 0x124) + 0x200;
 			
-			if (*(int*)((int)param_1 + 0x124) >= *(int*)((int)param_1 + 0x1c)) {
-				*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) - *(int*)((int)param_1 + 0x1c);
-				*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) + *(int*)((int)param_1 + 0x20);
+			if (*(int*)((int)stream + 0x124) >= *(int*)((int)stream + 0x1c)) {
+				*(int*)((int)stream + 0x124) = *(int*)((int)stream + 0x124) - *(int*)((int)stream + 0x1c);
+				*(int*)((int)stream + 0x124) = *(int*)((int)stream + 0x124) + *(int*)((int)stream + 0x20);
 			}
-		} while (0 < param_3);
+		} while (0 < byteCount);
 	} else {
 		do {
-			pbVar5 = (unsigned char*)(*(int*)((int)param_1 + 0xc) + param_2 * 0x1000);
-			iVar8 = *(int*)((int)param_1 + 4);
-			memcpy(pbVar5, (void*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120)), 0x1000);
-			*(int*)((int)param_1 + 0x120) = *(int*)((int)param_1 + 0x120) + 0x1000;
+			pbVar5 = (unsigned char*)(*(int*)((int)stream + 0xc) + bufferIndex * 0x1000);
+			iVar8 = *(int*)((int)stream + 4);
+			memcpy(pbVar5, (void*)(*(int*)((int)stream + 8) + *(int*)((int)stream + 0x120)), 0x1000);
+			*(int*)((int)stream + 0x120) = *(int*)((int)stream + 0x120) + 0x1000;
 			
-			if (*(int*)((int)param_1 + 0x120) >= *(int*)((int)param_1 + 0x118)) {
-				*(int*)((int)param_1 + 0x120) = 0;
+			if (*(int*)((int)stream + 0x120) >= *(int*)((int)stream + 0x118)) {
+				*(int*)((int)stream + 0x120) = 0;
 			}
 			
-			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar5, *(int*)((int)param_1 + 300) + param_2 * 0x1000, 0x1000, 0, 0);
+			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar5, *(int*)((int)stream + 300) + bufferIndex * 0x1000, 0x1000, 0, 0);
 			
-			if ((param_2 == 0) && (*(void**)(iVar8 + 0x14) != 0)) {
+			if ((bufferIndex == 0) && (*(void**)(iVar8 + 0x14) != 0)) {
 				int zero = 0;
 				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ec) = (unsigned short)*pbVar5;
 				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1f0) = zero;
@@ -247,15 +247,15 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 				*(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) = *(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) | 0x100000;
 			}
 			
-			param_2 = param_2 ^ 1;
-			param_3 = param_3 + -0x1000;
-			*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) + 0x200;
+			bufferIndex = bufferIndex ^ 1;
+			byteCount = byteCount + -0x1000;
+			*(int*)((int)stream + 0x124) = *(int*)((int)stream + 0x124) + 0x200;
 			
-			if (*(int*)((int)param_1 + 0x124) >= *(int*)((int)param_1 + 0x1c)) {
-				*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) - *(int*)((int)param_1 + 0x1c);
-				*(int*)((int)param_1 + 0x124) = *(int*)((int)param_1 + 0x124) + *(int*)((int)param_1 + 0x20);
+			if (*(int*)((int)stream + 0x124) >= *(int*)((int)stream + 0x1c)) {
+				*(int*)((int)stream + 0x124) = *(int*)((int)stream + 0x124) - *(int*)((int)stream + 0x1c);
+				*(int*)((int)stream + 0x124) = *(int*)((int)stream + 0x124) + *(int*)((int)stream + 0x20);
 			}
-		} while (0 < param_3);
+		} while (0 < byteCount);
 	}
 
 	return dmaID;
@@ -270,12 +270,12 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void StreamStop(int param_1)
+void StreamStop(int streamID)
 {
 	volatile RedStreamDATA* streamData = p_Stream;
 
 	do {
-		if ((streamData->m_streamId != 0) && ((param_1 == -1) || (param_1 == streamData->m_streamId))) {
+		if ((streamData->m_streamId != 0) && ((streamID == -1) || (streamID == streamData->m_streamId))) {
 			_StreamStop((RedStreamDATA*)streamData);
 		}
 		streamData++;
@@ -291,7 +291,7 @@ void StreamStop(int param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5)
+int StreamPlay(int streamID, void* streamHeader, int volume, int pan, int loopMode)
 {
 	int amemSize;
 	int arOffset;
@@ -305,7 +305,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 	streamData = (int*)_SearchEmptyStreamData();
 	if (streamData != (int*)0) {
 
-	memcpy(streamData + 4, param_2, 0x20);
+	memcpy(streamData + 4, streamHeader, 0x20);
 	*streamData = (int)SearchSeEmptyTrack(*(short*)((int)streamData + 0x2a), 0xff, 0);
 	streamData[3] = RedNew(0x4000);
 	amemSize = *(short*)((int)streamData + 0x2a) << 0xd;
@@ -322,32 +322,32 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 
 	if ((*streamData != 0) && (streamData[3] != 0) && (streamData[0x4b] != 0)) {
 		sampleOffset = 0x1000;
-		*(short*)((int)param_2 + 0x42) = (short)*(char*)((int)param_2 + sampleOffset);
-		*(unsigned short*)((int)param_2 + 0x46) = 0;
-		*(unsigned short*)((int)param_2 + 0x44) = 0;
-		headerData = (u8*)param_2 + 0x20;
+		*(short*)((int)streamHeader + 0x42) = (short)*(char*)((int)streamHeader + sampleOffset);
+		*(unsigned short*)((int)streamHeader + 0x46) = 0;
+		*(unsigned short*)((int)streamHeader + 0x44) = 0;
+		headerData = (u8*)streamHeader + 0x20;
 		if (*(short*)((int)streamData + 0x2a) == 2) {
 			if (streamData[8] < 0) {
 				sampleOffset += 0x1000;
 			} else {
 				sampleOffset += 8;
 			}
-			*(short*)(headerData + 0x50) = (short)*(char*)((int)param_2 + sampleOffset);
+			*(short*)(headerData + 0x50) = (short)*(char*)((int)streamHeader + sampleOffset);
 			*(unsigned short*)(headerData + 0x54) = 0;
 			*(unsigned short*)(headerData + 0x52) = 0;
 		}
 
-		streamData[0x43] = param_1;
+		streamData[0x43] = streamID;
 		streamData[0x47] = 0;
 		streamData[0x48] = 0x1000;
 		streamData[0x49] = 0;
 		streamData[1] = (int)p_VoiceData + *(char*)(*streamData + 0x14e) * 0xc0;
-		streamData[2] = (int)param_2;
-		streamData[0x46] = param_3;
-		if (param_5 != 0) {
-			param_5 = ((param_5 + 1) * 0x100 - 1) * 0x1000;
+		streamData[2] = (int)streamHeader;
+		streamData[0x46] = volume;
+		if (loopMode != 0) {
+			loopMode = ((loopMode + 1) * 0x100 - 1) * 0x1000;
 		}
-		streamData[0x3c] = param_5;
+		streamData[0x3c] = loopMode;
 		streamData[0x3e] = 0;
 		pitch = PitchCompute(0x3c00000, 0, streamData[9], 0);
 		iVar2 = 0;
@@ -375,7 +375,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 					streamData[0x42] = 0;
 				}
 			} else {
-				streamData[0x40] = param_4 << 0xc;
+				streamData[0x40] = pan << 0xc;
 				streamData[0x42] = 0;
 			}
 			SetVoiceVolumeMix((RedVoiceDATA*)(streamData[1] + iVar2 * 0xc0), streamData[0x40] >> 0xc, streamData[0x3c] >> 0xc);
@@ -432,7 +432,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 		}
 	}
 	}
-	return param_1;
+	return streamID;
 }
 
 /*
@@ -444,35 +444,35 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
  * JP Address: TODO
  * JP Size: TODO
  */
-void SetStreamVolume(int param_1, int param_2, int param_3)
+void SetStreamVolume(int streamID, int volume, int frameCount)
 {
 	volatile RedStreamDATA* streamData;
 
-	if (param_3 < 1) {
-		param_3 = 1;
+	if (frameCount < 1) {
+		frameCount = 1;
 	} else {
-		param_3 *= 200;
-		param_3 /= 60;
+		frameCount *= 200;
+		frameCount /= 60;
 	}
 
-	param_2 &= 0x7f;
-	if (param_2 != 0) {
-		param_2++;
-		param_2 <<= 8;
-		param_2--;
-		param_2 <<= 12;
-		param_2 |= 0x800;
+	volume &= 0x7f;
+	if (volume != 0) {
+		volume++;
+		volume <<= 8;
+		volume--;
+		volume <<= 12;
+		volume |= 0x800;
 	}
 
 	streamData = p_Stream;
 	do {
-		if ((streamData->m_streamId != 0) && ((param_1 == -1) || (param_1 == streamData->m_streamId))) {
-			if (param_3 > 0) {
-				int delta = param_2 - streamData->m_volume;
-				streamData->m_volumeStep = delta / param_3;
-				streamData->m_volumeStepCount = param_3;
+		if ((streamData->m_streamId != 0) && ((streamID == -1) || (streamID == streamData->m_streamId))) {
+			if (frameCount > 0) {
+				int delta = volume - streamData->m_volume;
+				streamData->m_volumeStep = delta / frameCount;
+				streamData->m_volumeStepCount = frameCount;
 			} else {
-				streamData->m_volume = param_2;
+				streamData->m_volume = volume;
 				streamData->m_volumeStepCount = 0;
 			}
 		}
@@ -489,25 +489,25 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void StreamPause(int param_1, int param_2)
+void StreamPause(int streamID, int pause)
 {
 	volatile RedStreamDATA* streamData;
 	int volume;
 	int pan;
 
 	if (m_ReportPrint != 0) {
-		if (param_2 == 1) {
-			OSReport(sRedStreamPauseOnFmt, sRedStreamLogPrefix, param_1);
+		if (pause == 1) {
+			OSReport(sRedStreamPauseOnFmt, sRedStreamLogPrefix, streamID);
 		} else {
-			OSReport(sRedStreamPauseOffFmt, sRedStreamLogPrefix, param_1);
+			OSReport(sRedStreamPauseOffFmt, sRedStreamLogPrefix, streamID);
 		}
 		fflush(__files + 1);
 	}
 	streamData = p_Stream;
 	do {
-		if ((streamData->m_streamId != 0) && ((param_1 == -1) || (param_1 == streamData->m_streamId))) {
+		if ((streamData->m_streamId != 0) && ((streamID == -1) || (streamID == streamData->m_streamId))) {
 			unsigned int voiceData = (unsigned int)streamData->m_voiceData;
-			if (param_2 == 1) {
+			if (pause == 1) {
 				if (*(void**)(voiceData + 0x14) != 0) {
 					*(int*)(voiceData + 0x9c) = 0;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;

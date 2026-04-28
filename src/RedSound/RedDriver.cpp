@@ -155,10 +155,10 @@ static const char sRedDriverLogReset[] = "\x1B[0m";
  * JP Address: TODO
  * JP Size: TODO
  */
-void _SetSoundMode(int* param_1)
+void _SetSoundMode(int* command)
 {
-    m_SoundMode = *param_1;
-    if (*param_1 == 1) {
+    m_SoundMode = *command;
+    if (*command == 1) {
         OSGetSoundMode(0);
     } else {
         OSGetSoundMode(1);
@@ -183,7 +183,7 @@ void _SetSoundMode(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _SetReverbDepth(int* param_1)
+void _SetReverbDepth(int* command)
 {
     int reverbBank;
     int reverbDepth;
@@ -191,9 +191,9 @@ void _SetReverbDepth(int* param_1)
     int fadeDepth;
     int* seInfo;
 
-    reverbBank = param_1[0] & 1;
-    reverbDepth = param_1[1] & 0x7f;
-    fadeStep = param_1[2];
+    reverbBank = command[0] & 1;
+    reverbDepth = command[1] & 0x7f;
+    fadeStep = command[2];
     if (reverbDepth != 0) {
         reverbDepth += 1;
         reverbDepth <<= 8;
@@ -225,9 +225,9 @@ void _SetReverbDepth(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetMusicData(int* param_1)
+void _SetMusicData(int* command)
 {
-    c_RedEntry.SetMusicData((RedMusicHEAD*)*param_1);
+    c_RedEntry.SetMusicData((RedMusicHEAD*)*command);
 }
 
 /*
@@ -235,10 +235,10 @@ void _SetMusicData(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicStop(int* param_1)
+void _MusicStop(int* command)
 {
-    MusicStop(*param_1);
-    if ((*param_1 == -1) || (p_MusicNextPlay[0] == *param_1)) {
+    MusicStop(*command);
+    if ((*command == -1) || (p_MusicNextPlay[0] == *command)) {
         p_MusicNextPlay[0] = -1;
     }
     if (p_MusicNextPlay[0] < 0) {
@@ -255,31 +255,31 @@ void _MusicStop(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _MusicPlaySequence(int* param_1)
+void _MusicPlaySequence(int* command)
 {
     int iVar1;
     int srcBuffer;
 
     srcBuffer = (int)p_SoundControlBuffer;
-    if ((((*param_1 != *(int*)(srcBuffer + 0x470)) &&
-          (*param_1 != *(int*)(srcBuffer + 0x904))) &&
-         (*param_1 != *(int*)(srcBuffer + 0xd98))) &&
-        (c_RedEntry.SearchMusicSequence(*param_1) >= 0)) {
-        iVar1 = param_1[2];
+    if ((((*command != *(int*)(srcBuffer + 0x470)) &&
+          (*command != *(int*)(srcBuffer + 0x904))) &&
+         (*command != *(int*)(srcBuffer + 0xd98))) &&
+        (c_RedEntry.SearchMusicSequence(*command) >= 0)) {
+        iVar1 = command[2];
         if (*(int*)(srcBuffer + 0x470) != -1) {
             if (*(int*)(srcBuffer + 0x904) != -1) {
                 MusicStop(*(int*)(srcBuffer + 0x904));
             }
             if (iVar1 == 0) {
-                iVar1 = *(int*)((int)p_MusicReplayPoint + *param_1 * 4);
-                *(int*)((int)p_MusicReplayPoint + *param_1 * 4) = 0;
+                iVar1 = *(int*)((int)p_MusicReplayPoint + *command * 4);
+                *(int*)((int)p_MusicReplayPoint + *command * 4) = 0;
             }
             if (iVar1 == 0) {
                 memcpy((void*)(srcBuffer + 0x494), (void*)srcBuffer, 0x494);
                 *(int*)(srcBuffer + 0x470) = -1;
             }
         }
-        MusicPlay(*param_1, param_1[1], iVar1);
+        MusicPlay(*command, command[1], iVar1);
     }
 }
 
@@ -292,26 +292,26 @@ void _MusicPlaySequence(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _MusicCrossPlaySequence(int* param_1)
+void _MusicCrossPlaySequence(int* command)
 {
     int iVar1;
     void* pvVar2;
     
-    param_1[2] = param_1[2] * 200;
-    param_1[2] = param_1[2] / 0x3c;
-    if (param_1[2] == 0) {
-        param_1[2] = param_1[2] + 1;
+    command[2] = command[2] * 200;
+    command[2] = command[2] / 0x3c;
+    if (command[2] == 0) {
+        command[2] = command[2] + 1;
     }
     pvVar2 = p_SoundControlBuffer;
-    if ((*param_1 != *(int*)((int)p_SoundControlBuffer + 0x470)) &&
-       (*param_1 != *(int*)((int)p_SoundControlBuffer + 0xd98))) {
-        if (*param_1 == *(int*)((int)p_SoundControlBuffer + 0x904)) {
-            *(int*)((int)p_SoundControlBuffer + 0x458) = -*(int*)((int)p_SoundControlBuffer + 0x454) / param_1[2];
-            *(int*)((int)pvVar2 + 0x45c) = param_1[2];
+    if ((*command != *(int*)((int)p_SoundControlBuffer + 0x470)) &&
+       (*command != *(int*)((int)p_SoundControlBuffer + 0xd98))) {
+        if (*command == *(int*)((int)p_SoundControlBuffer + 0x904)) {
+            *(int*)((int)p_SoundControlBuffer + 0x458) = -*(int*)((int)p_SoundControlBuffer + 0x454) / command[2];
+            *(int*)((int)pvVar2 + 0x45c) = command[2];
             pvVar2 = p_SoundControlBuffer;
             *(int*)((int)p_SoundControlBuffer + 0x8ec) =
-                 (0x1ff800 - *(int*)((int)p_SoundControlBuffer + 0x8e8)) / param_1[2];
-            *(int*)((int)pvVar2 + 0x8f0) = param_1[2];
+                 (0x1ff800 - *(int*)((int)p_SoundControlBuffer + 0x8e8)) / command[2];
+            *(int*)((int)pvVar2 + 0x8f0) = command[2];
             pvVar2 = (void*)RedNew(0x494);
             memcpy(pvVar2, (void*)((int)p_SoundControlBuffer + 0x494), 0x494);
             memcpy((void*)((int)p_SoundControlBuffer + 0x494), p_SoundControlBuffer, 0x494);
@@ -319,24 +319,24 @@ void _MusicCrossPlaySequence(int* param_1)
             RedDelete(pvVar2);
         }
         else {
-            iVar1 = c_RedEntry.SearchMusicSequence(*param_1);
+            iVar1 = c_RedEntry.SearchMusicSequence(*command);
             if (iVar1 >= 0) {
-                m_CrossTime = param_1[2];
+                m_CrossTime = command[2];
                 iVar1 = 0;
                 if (*(int*)((int)pvVar2 + 0x470) != -1) {
                     if (*(int*)((int)pvVar2 + 0x904) != -1) {
                         MusicStop(*(int*)((int)pvVar2 + 0x904));
                     }
-                    *(int*)((int)pvVar2 + 0x458) = -*(int*)((int)pvVar2 + 0x454) / param_1[2];
-                    *(int*)((int)pvVar2 + 0x45c) = param_1[2];
-                    iVar1 = *(int*)((char*)p_MusicReplayPoint + *param_1 * 4);
-                    *(int*)((char*)p_MusicReplayPoint + *param_1 * 4) = 0;
+                    *(int*)((int)pvVar2 + 0x458) = -*(int*)((int)pvVar2 + 0x454) / command[2];
+                    *(int*)((int)pvVar2 + 0x45c) = command[2];
+                    iVar1 = *(int*)((char*)p_MusicReplayPoint + *command * 4);
+                    *(int*)((char*)p_MusicReplayPoint + *command * 4) = 0;
                     if (iVar1 == 0) {
                         memcpy((void*)((int)pvVar2 + 0x494), pvVar2, 0x494);
                         *(int*)((int)pvVar2 + 0x470) = 0xffffffff;
                     }
                 }
-                MusicPlay(*param_1, param_1[1], iVar1);
+                MusicPlay(*command, command[1], iVar1);
             }
         }
     }
@@ -347,18 +347,18 @@ void _MusicCrossPlaySequence(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicNextPlaySequence(int* param_1)
+void _MusicNextPlaySequence(int* command)
 {
     int srcBuffer;
 
     srcBuffer = (int)p_SoundControlBuffer;
-    if ((((*param_1 != *(int*)(srcBuffer + 0x470)) &&
-          (*param_1 != *(int*)(srcBuffer + 0x904))) &&
-         (*param_1 != *(int*)(srcBuffer + 0xd98))) &&
-        (c_RedEntry.SearchMusicSequence(*param_1) >= 0)) {
-        p_MusicNextPlay[0] = *param_1;
-        p_MusicNextPlay[1] = param_1[1];
-        p_MusicNextPlay[2] = param_1[2];
+    if ((((*command != *(int*)(srcBuffer + 0x470)) &&
+          (*command != *(int*)(srcBuffer + 0x904))) &&
+         (*command != *(int*)(srcBuffer + 0xd98))) &&
+        (c_RedEntry.SearchMusicSequence(*command) >= 0)) {
+        p_MusicNextPlay[0] = *command;
+        p_MusicNextPlay[1] = command[1];
+        p_MusicNextPlay[2] = command[2];
     }
 }
 
@@ -367,11 +367,11 @@ void _MusicNextPlaySequence(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicMasterVolume(int* param_1)
+void _MusicMasterVolume(int* command)
 {
     unsigned int* puVar1;
 
-    m_MasterMusicVolume = *param_1 & 0x7f;
+    m_MasterMusicVolume = *command & 0x7f;
     if (m_MasterMusicVolume != 0) {
         m_MasterMusicVolume = m_MasterMusicVolume + 1;
         m_MasterMusicVolume = m_MasterMusicVolume * 4;
@@ -389,13 +389,13 @@ void _MusicMasterVolume(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicVolume(int* param_1)
+void _MusicVolume(int* command)
 {
-    if (param_1[3] == 1) {
+    if (command[3] == 1) {
         p_MusicNextPlay[0] = -1;
         m_MusicPhraseStop = 0;
     }
-    SetMusicVolume(param_1[0], param_1[1], param_1[2], param_1[3]);
+    SetMusicVolume(command[0], command[1], command[2], command[3]);
 }
 
 /*
@@ -403,9 +403,9 @@ void _MusicVolume(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetMusicPhraseStop(int* param_1)
+void _SetMusicPhraseStop(int* command)
 {
-    m_MusicPhraseStop = *param_1;
+    m_MusicPhraseStop = *command;
 }
 
 /*
@@ -413,9 +413,9 @@ void _SetMusicPhraseStop(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetSeBlockData(int* param_1)
+void _SetSeBlockData(int* command)
 {
-    u32 index = (u32)*param_1 & 3;
+    u32 index = (u32)*command & 3;
     char* seBlockData;
 
     if (p_SeBlockData[index] != 0) {
@@ -423,8 +423,8 @@ void _SetSeBlockData(int* param_1)
         p_SeBlockData[index] = 0;
     }
 
-    if (param_1[1] != 0) {
-        seBlockData = (char*)param_1[1];
+    if (command[1] != 0) {
+        seBlockData = (char*)command[1];
         if ((*seBlockData = 'S') && (seBlockData[1] = 'e') && (seBlockData[2] = 'B') &&
             (seBlockData[3] = 'l') && (seBlockData[4] = 'o') && (seBlockData[5] = 'c') &&
             (seBlockData[6] = 'k')) {
@@ -440,9 +440,9 @@ void _SetSeBlockData(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetSeSepData(int* param_1)
+void _SetSeSepData(int* command)
 {
-    c_RedEntry.SetSeSepData((RedSeSepHEAD*)*param_1);
+    c_RedEntry.SetSeSepData((RedSeSepHEAD*)*command);
 }
 
 /*
@@ -450,9 +450,9 @@ void _SetSeSepData(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _ClearSeSepData(int* param_1)
+void _ClearSeSepData(int* command)
 {
-    c_RedEntry.ClearSeSepData(*param_1);
+    c_RedEntry.ClearSeSepData(*command);
 }
 
 /*
@@ -460,9 +460,9 @@ void _ClearSeSepData(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _ClearSeSepDataMG(int* param_1)
+void _ClearSeSepDataMG(int* command)
 {
-    c_RedEntry.ClearSeSepDataMG(param_1[0], param_1[1], param_1[2], param_1[3]);
+    c_RedEntry.ClearSeSepDataMG(command[0], command[1], command[2], command[3]);
 }
 
 /*
@@ -470,9 +470,9 @@ void _ClearSeSepDataMG(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeStop(int* param_1)
+void _SeStop(int* command)
 {
-    SeStopID(param_1[0]);
+    SeStopID(command[0]);
 }
 
 /*
@@ -480,9 +480,9 @@ void _SeStop(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeStopMG(int* param_1)
+void _SeStopMG(int* command)
 {
-    SeStopMG(param_1[0], param_1[1], param_1[2], param_1[3]);
+    SeStopMG(command[0], command[1], command[2], command[3]);
 }
 
 /*
@@ -490,10 +490,10 @@ void _SeStopMG(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeBlockPlay(int* param_1)
+void _SeBlockPlay(int* command)
 {
-    m_SeSkipStep = param_1[5];
-    SeBlockPlay(param_1[0], param_1[1], param_1[2], param_1[3], param_1[4]);
+    m_SeSkipStep = command[5];
+    SeBlockPlay(command[0], command[1], command[2], command[3], command[4]);
 }
 
 /*
@@ -501,15 +501,15 @@ void _SeBlockPlay(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeSepPlay(int* param_1)
+void _SeSepPlay(int* command)
 {
     int iVar1;
 
-    iVar1 = c_RedEntry.SetSeSepData((RedSeSepHEAD*)param_1[1]);
+    iVar1 = c_RedEntry.SetSeSepData((RedSeSepHEAD*)command[1]);
     if (iVar1 != 0) {
-        m_SeSkipStep = param_1[4];
-        int seID = param_1[0];
-        SeSepPlay(seID, *(int*)(iVar1 + 8), param_1[2], param_1[3]);
+        m_SeSkipStep = command[4];
+        int seID = command[0];
+        SeSepPlay(seID, *(int*)(iVar1 + 8), command[2], command[3]);
     }
 }
 
@@ -518,11 +518,11 @@ void _SeSepPlay(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeSepPlaySequence(int* param_1)
+void _SeSepPlaySequence(int* command)
 {
-    if (c_RedEntry.SearchSeSepSequence(param_1[1]) >= 0) {
-        m_SeSkipStep = param_1[4];
-        SeSepPlay(param_1[0], param_1[1], param_1[2], param_1[3]);
+    if (c_RedEntry.SearchSeSepSequence(command[1]) >= 0) {
+        m_SeSkipStep = command[4];
+        SeSepPlay(command[0], command[1], command[2], command[3]);
     }
 }
 
@@ -531,11 +531,11 @@ void _SeSepPlaySequence(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeMasterVolume(int* param_1)
+void _SeMasterVolume(int* command)
 {
     unsigned int* puVar1;
 
-    m_MasterSEVolume = *param_1 & 0x7f;
+    m_MasterSEVolume = *command & 0x7f;
     if (m_MasterSEVolume != 0) {
         m_MasterSEVolume = m_MasterSEVolume + 1;
         m_MasterSEVolume = m_MasterSEVolume * 4;
@@ -553,9 +553,9 @@ void _SeMasterVolume(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeVolume(int* param_1)
+void _SeVolume(int* command)
 {
-    SetSeVolume(param_1[0], param_1[1], param_1[2], param_1[3]);
+    SetSeVolume(command[0], command[1], command[2], command[3]);
 }
 
 /*
@@ -563,9 +563,9 @@ void _SeVolume(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePan(int* param_1)
+void _SePan(int* command)
 {
-    SetSePan(param_1[0], param_1[1], param_1[2]);
+    SetSePan(command[0], command[1], command[2]);
 }
 
 /*
@@ -573,9 +573,9 @@ void _SePan(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePitch(int* param_1)
+void _SePitch(int* command)
 {
-    SetSePitch(param_1[0], param_1[1], param_1[2]);
+    SetSePitch(command[0], command[1], command[2]);
 }
 
 /*
@@ -583,9 +583,9 @@ void _SePitch(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePause(int* param_1)
+void _SePause(int* command)
 {
-    SePause(param_1[0], param_1[1]);
+    SePause(command[0], command[1]);
 }
 
 /*
@@ -597,9 +597,9 @@ void _SePause(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _StreamStop(int* param_1)
+void _StreamStop(int* command)
 {
-	StreamStop(*param_1);
+	StreamStop(*command);
 }
 
 /*
@@ -611,9 +611,9 @@ void _StreamStop(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _StreamPlay(int* param_1)
+void _StreamPlay(int* command)
 {
-	StreamPlay(param_1[0], (void*)param_1[1], param_1[2], param_1[3], param_1[4]);
+	StreamPlay(command[0], (void*)command[1], command[2], command[3], command[4]);
 }
 
 /*
@@ -625,9 +625,9 @@ void _StreamPlay(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _StreamVolume(int* param_1)
+void _StreamVolume(int* command)
 {
-	SetStreamVolume(param_1[0], param_1[1], param_1[2]);
+	SetStreamVolume(command[0], command[1], command[2]);
 }
 
 /*
@@ -639,9 +639,9 @@ void _StreamVolume(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _StreamPause(int* param_1)
+void _StreamPause(int* command)
 {
-	StreamPause(param_1[0], param_1[1]);
+	StreamPause(command[0], command[1]);
 }
 
 /*
@@ -653,22 +653,22 @@ void _StreamPause(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-int* _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int param_4, int param_5,
-                       int param_6, int param_7, int param_8)
+int* _EntryExecCommand(void (*func)(int*), int arg1, int arg2, int arg3, int arg4,
+                       int arg5, int arg6, int arg7)
 {
     unsigned int interruptLevel;
     int* writePos;
 
     interruptLevel = OSDisableInterrupts();
     writePos = (int*)p_ExecCommandNow;
-    writePos[0] = (int)param_1;
-    writePos[1] = param_2;
-    writePos[2] = param_3;
-    writePos[3] = param_4;
-    writePos[4] = param_5;
-    writePos[5] = param_6;
-    writePos[6] = param_7;
-    writePos[7] = param_8;
+    writePos[0] = (int)func;
+    writePos[1] = arg1;
+    writePos[2] = arg2;
+    writePos[3] = arg3;
+    writePos[4] = arg4;
+    writePos[5] = arg5;
+    writePos[6] = arg6;
+    writePos[7] = arg7;
     writePos += 8;
     if (writePos == (int*)p_ExecCommand + 0x800) {
         writePos = (int*)p_ExecCommand;
@@ -763,9 +763,9 @@ struct RedSleepAlarm {
  * JP Address: TODO
  * JP Size: TODO
  */
-void _MyAlarmHandler(OSAlarm* param_1, OSContext*)
+void _MyAlarmHandler(OSAlarm* alarm, OSContext*)
 {
-    OSResumeThread(((RedSleepAlarm*)param_1)->thread);
+    OSResumeThread(((RedSleepAlarm*)alarm)->thread);
 }
 
 /*
@@ -777,18 +777,18 @@ void _MyAlarmHandler(OSAlarm* param_1, OSContext*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void RedSleep(int param_1)
+void RedSleep(int microseconds)
 {
     unsigned int interruptLevel;
     RedSleepAlarm alarm;
 
-    if (param_1 < 0xfa) {
-        param_1 = 0xfa;
+    if (microseconds < 0xfa) {
+        microseconds = 0xfa;
     }
     interruptLevel = OSDisableInterrupts();
     alarm.thread = OSGetCurrentThread();
     OSCreateAlarm(&alarm.alarm);
-    OSSetAlarm(&alarm.alarm, (param_1 * (OS_TIMER_CLOCK / 125000)) >> 3, _MyAlarmHandler);
+    OSSetAlarm(&alarm.alarm, (microseconds * (OS_TIMER_CLOCK / 125000)) >> 3, _MyAlarmHandler);
     OSSuspendThread(alarm.thread);
     OSRestoreInterrupts(interruptLevel);
 }
@@ -849,14 +849,14 @@ int _MainThread(void*)
  * JP Address: TODO
  * JP Size: TODO
  */
-int _WaveSettingThread(void* param_1)
+int _WaveSettingThread(void* threadArg)
 {
     m_ThreadExecute = m_ThreadExecute | 4;
     m_WaveSettingStatus = 0;
     while (m_ThreadControl != 0) {
         OSWaitSemaphore(&m_WaveSettingSemaphore);
         if (m_ThreadControl != 0) {
-            RedWaveSettingState* waveSetting = (RedWaveSettingState*)param_1;
+            RedWaveSettingState* waveSetting = (RedWaveSettingState*)threadArg;
             m_WaveSettingStatus = m_WaveSettingStatus + 1;
             c_RedEntry.SetWaveData(waveSetting->waveID, waveSetting->waveData, waveSetting->waveSize);
             *(int*)waveSetting->slot = 0;
@@ -1426,21 +1426,20 @@ int CRedDriver::GetSoundMode()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::SetMusicData(void* param_1)
+int CRedDriver::SetMusicData(void* musicData)
 {
     char localHeader[0x20];
-    char* musicHeader = (char*)param_1;
     void* copiedHeader;
     int headerSize;
     int result;
 
     result = -1;
-    if (((musicHeader[0] == 'B') && (musicHeader[1] == 'G')) && (musicHeader[2] == 'M')) {
-        memcpy(localHeader, musicHeader, sizeof(localHeader));
+    if (((((char*)musicData)[0] == 'B') && (((char*)musicData)[1] == 'G')) && (((char*)musicData)[2] == 'M')) {
+        memcpy(localHeader, musicData, sizeof(localHeader));
         headerSize = *(int*)(localHeader + 0x10);
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
-            memcpy(copiedHeader, musicHeader, headerSize);
+            memcpy(copiedHeader, musicData, headerSize);
             result = *(short*)(localHeader + 4);
             _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
@@ -1463,12 +1462,11 @@ int CRedDriver::SetMusicData(void* param_1)
 int CRedDriver::ReentryMusicData(int musicID)
 {
     unsigned int interrupt;
-    int result;
 
     interrupt = OSDisableInterrupts();
-    result = c_RedEntry.ReentryMusicData(musicID);
+    musicID   = c_RedEntry.ReentryMusicData(musicID);
     OSRestoreInterrupts(interrupt);
-    return result;
+    return musicID;
 }
 
 /*
@@ -1567,9 +1565,9 @@ void CRedDriver::MusicFadeOut(int musicID, int fadeTime)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::MusicVolume(int param_1, int param_2, int param_3)
+void CRedDriver::MusicVolume(int musicID, int volume, int frameCount)
 {
-    _EntryExecCommand(_MusicVolume, param_1, param_2, param_3, 0, 0, 0, 0);
+    _EntryExecCommand(_MusicVolume, musicID, volume, frameCount, 0, 0, 0, 0);
 }
 
 /*
@@ -1591,17 +1589,17 @@ void CRedDriver::SetMusicPhraseStop(int stop)
  * JP Address: TODO
  * JP Size: TODO
  */
-void* CRedDriver::SetSeBlockData(int param_1, void* param_2)
+void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
 {
     void* copiedBuffer;
     int copySize;
 
-    if (param_2 != 0) {
-        copySize = *(int*)((char*)param_2 + 0xc);
+    if (seBlockData != 0) {
+        copySize = *(int*)((char*)seBlockData + 0xc);
         if (copySize > 0) {
             copiedBuffer = (void*)RedNew(copySize);
             if (copiedBuffer != 0) {
-                memcpy(copiedBuffer, param_2, copySize);
+                memcpy(copiedBuffer, seBlockData, copySize);
             }
         } else {
             copiedBuffer = 0;
@@ -1609,7 +1607,7 @@ void* CRedDriver::SetSeBlockData(int param_1, void* param_2)
     } else {
         copiedBuffer = 0;
     }
-    _EntryExecCommand(_SetSeBlockData, param_1, (int)copiedBuffer, 0, 0, 0, 0, 0);
+    _EntryExecCommand(_SetSeBlockData, blockIndex, (int)copiedBuffer, 0, 0, 0, 0, 0);
     return copiedBuffer;
 }
 
@@ -1622,20 +1620,19 @@ void* CRedDriver::SetSeBlockData(int param_1, void* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::SetSeSepData(void* param_1)
+int CRedDriver::SetSeSepData(void* seSepData)
 {
-    char* seSepHeader = (char*)param_1;
     void* copiedHeader;
     int headerSize;
     int result;
 
     result = -1;
-    if ((((seSepHeader[0] == 'S') && (seSepHeader[1] == 'e')) && (seSepHeader[2] == 'S')) &&
-        ((seSepHeader[3] == 'e' && (seSepHeader[4] == 'p')))) {
-        headerSize = *(int*)(seSepHeader + 0xc) & 0x7fffffff;
+    if ((((((char*)seSepData)[0] == 'S') && (((char*)seSepData)[1] == 'e')) && (((char*)seSepData)[2] == 'S')) &&
+        ((((char*)seSepData)[3] == 'e' && (((char*)seSepData)[4] == 'p')))) {
+        headerSize = *(int*)((char*)seSepData + 0xc) & 0x7fffffff;
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
-            memcpy(copiedHeader, seSepHeader, headerSize);
+            memcpy(copiedHeader, seSepData, headerSize);
             result = *(int*)((int)copiedHeader + 8);
             _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
@@ -1683,12 +1680,11 @@ void CRedDriver::ClearSeSepDataMG(int id1, int id2, int id3, int id4)
 int CRedDriver::ReentrySeSepData(int id)
 {
     unsigned int interrupts;
-    int result;
 
     interrupts = OSDisableInterrupts();
-    result = c_RedEntry.ReentrySeSepData(id);
+    id         = c_RedEntry.ReentrySeSepData(id);
     OSRestoreInterrupts(interrupts);
-    return result;
+    return id;
 }
 
 /*
@@ -1700,7 +1696,7 @@ int CRedDriver::ReentrySeSepData(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::SePlayState(int param_1)
+int CRedDriver::SePlayState(int seID)
 {
     unsigned int uVar1;
     int result;
@@ -1714,7 +1710,7 @@ int CRedDriver::SePlayState(int param_1)
     seInfoBase = (int**)((int)p_SoundControlBuffer + 0xdbc);
     seInfo = *seInfoBase;
     do {
-        if (((u32)*seInfo != 0) && ((param_1 == -1 || (seInfo[0x3e] == param_1)))) {
+        if (((u32)*seInfo != 0) && ((seID == -1 || (seInfo[0x3e] == seID)))) {
             result = (int)seInfo;
             break;
         }
@@ -1728,7 +1724,7 @@ int CRedDriver::SePlayState(int param_1)
                 ((((void (*)(int*))*command == _SeBlockPlay) ||
                   (((void (*)(int*))*command == _SeSepPlay))) ||
                  ((void (*)(int*))*command == _SeSepPlaySequence))) &&
-                ((param_1 == -1 || (param_1 == command[1])))) {
+                ((seID == -1 || (seID == command[1])))) {
                 result = 1;
                 break;
             }
@@ -1828,9 +1824,9 @@ void CRedDriver::SeFadeOut(int seID, int fadeTime)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SeVolume(int param_1, int param_2, int param_3)
+void CRedDriver::SeVolume(int seID, int volume, int frameCount)
 {
-    _EntryExecCommand(_SeVolume, param_1, param_2, param_3, 0, 0, 0, 0);
+    _EntryExecCommand(_SeVolume, seID, volume, frameCount, 0, 0, 0, 0);
 }
 
 /*
@@ -1842,9 +1838,9 @@ void CRedDriver::SeVolume(int param_1, int param_2, int param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SePan(int param_1, int param_2, int param_3)
+void CRedDriver::SePan(int seID, int pan, int frameCount)
 {
-    _EntryExecCommand(_SePan, param_1, param_2, param_3, 0, 0, 0, 0);
+    _EntryExecCommand(_SePan, seID, pan, frameCount, 0, 0, 0, 0);
 }
 
 /*
@@ -1856,9 +1852,9 @@ void CRedDriver::SePan(int param_1, int param_2, int param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SePitch(int param_1, int param_2, int param_3)
+void CRedDriver::SePitch(int seID, int pitch, int frameCount)
 {
-    _EntryExecCommand(_SePitch, param_1, param_2, param_3, 0, 0, 0, 0);
+    _EntryExecCommand(_SePitch, seID, pitch, frameCount, 0, 0, 0, 0);
 }
 
 /*
@@ -1870,9 +1866,9 @@ void CRedDriver::SePitch(int param_1, int param_2, int param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SePause(int param_1, int param_2)
+void CRedDriver::SePause(int seID, int pause)
 {
-    _EntryExecCommand(_SePause, param_1, param_2, 0, 0, 0, 0, 0);
+    _EntryExecCommand(_SePause, seID, pause, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1880,15 +1876,15 @@ void CRedDriver::SePause(int param_1, int param_2)
  * Address:	TODO
  * Size:	TODO
  */
-int CRedDriver::GetSeVolume(int param_1, int param_2)
+int CRedDriver::GetSeVolume(int seID, int mode)
 {
     unsigned int* seInfo;
 
     seInfo = *(unsigned int**)((int)p_SoundControlBuffer + 0xdbc);
     while (1) {
-        if ((*seInfo != 0) && ((param_1 == -1) || (param_1 == (int)seInfo[0x3e]))) {
+        if ((*seInfo != 0) && ((seID == -1) || (seID == (int)seInfo[0x3e]))) {
             if (*seInfo != 0) {
-                if (param_2 == 1) {
+                if (mode == 1) {
                     return seInfo[0x15];
                 }
                 return (int)seInfo[0x13] >> 0xc;
@@ -1911,14 +1907,14 @@ int CRedDriver::GetSeVolume(int param_1, int param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::ReportSeLoop(int param_1)
+int CRedDriver::ReportSeLoop(int seID)
 {
     unsigned int* seInfo;
 
     seInfo = *(unsigned int**)((int)p_SoundControlBuffer + 0xdbc);
     while (1) {
         if ((*seInfo != 0) &&
-            (((param_1 == -1) || (param_1 == (int)seInfo[0x3e])) && ((seInfo[0x40] & 1U) != 0))) {
+            (((seID == -1) || (seID == (int)seInfo[0x3e])) && ((seInfo[0x40] & 1U) != 0))) {
             return 1;
         }
         seInfo += 0x55;
@@ -1948,7 +1944,7 @@ void CRedDriver::DisplaySePlayInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::StreamPlayState(int param_1)
+int CRedDriver::StreamPlayState(int streamID)
 {
 	void* commandNow;
 	unsigned int interrupts;
@@ -1961,7 +1957,7 @@ int CRedDriver::StreamPlayState(int param_1)
 	streamData = (unsigned int)p_Stream;
 	do {
 		if ((*(int*)(streamData + 0x10C) != 0) &&
-		    ((param_1 == -1) || (*(int*)(streamData + 0x10C) == param_1))) {
+		    ((streamID == -1) || (*(int*)(streamData + 0x10C) == streamID))) {
 			result = 1;
 			break;
 		}
@@ -1973,7 +1969,7 @@ int CRedDriver::StreamPlayState(int param_1)
 		command = (unsigned int*)p_ExecCommandOld;
 		while (commandNow != (void*)command) {
 			if ((*command != 0) && ((void (*)(int*))*command == _StreamPlay) &&
-			    ((param_1 == -1) || (param_1 == (int)command[1]))) {
+			    ((streamID == -1) || (streamID == (int)command[1]))) {
 				result = 1;
 				break;
 			}
@@ -1996,26 +1992,26 @@ int CRedDriver::StreamPlayState(int param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::GetStreamPlayPoint(int param_1, int* param_2, int* param_3)
+int CRedDriver::GetStreamPlayPoint(int streamID, int* outPoint1, int* outPoint2)
 {
 	unsigned int streamData;
 	int found;
 
 	found = 0;
-	if (param_2 != 0) {
-		*param_2 = 0;
+	if (outPoint1 != 0) {
+		*outPoint1 = 0;
 	}
-	if (param_3 != 0) {
-		*param_3 = 0;
+	if (outPoint2 != 0) {
+		*outPoint2 = 0;
 	}
 	streamData = (unsigned int)p_Stream;
 	do {
-		if ((*(int*)(streamData + 0x10C) != 0) && (*(int*)(streamData + 0x10C) == param_1)) {
-			if (param_2 != 0) {
-				*param_2 = *(int*)(streamData + 0x11C);
+		if ((*(int*)(streamData + 0x10C) != 0) && (*(int*)(streamData + 0x10C) == streamID)) {
+			if (outPoint1 != 0) {
+				*outPoint1 = *(int*)(streamData + 0x11C);
 			}
-			if (param_3 != 0) {
-				*param_3 = *(int*)(streamData + 0x120);
+			if (outPoint2 != 0) {
+				*outPoint2 = *(int*)(streamData + 0x120);
 			}
 			found = 1;
 			break;
@@ -2034,9 +2030,9 @@ int CRedDriver::GetStreamPlayPoint(int param_1, int* param_2, int* param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::StreamStop(int param_1)
+void CRedDriver::StreamStop(int streamID)
 {
-    _EntryExecCommand(_StreamStop, param_1, 0, 0, 0, 0, 0, 0);
+    _EntryExecCommand(_StreamStop, streamID, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -2048,10 +2044,10 @@ void CRedDriver::StreamStop(int param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5)
+int CRedDriver::StreamPlay(int streamID, void* streamData, int volume, int pan, int loopMode)
 {
-	_EntryExecCommand(_StreamPlay, param_1, (int)param_2, param_3, param_4, param_5, 0, 0);
-	return param_1;
+	_EntryExecCommand(_StreamPlay, streamID, (int)streamData, volume, pan, loopMode, 0, 0);
+	return streamID;
 }
 
 /*
@@ -2063,9 +2059,9 @@ int CRedDriver::StreamPlay(int param_1, void* param_2, int param_3, int param_4,
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::StreamVolume(int param_1, int param_2, int param_3)
+void CRedDriver::StreamVolume(int streamID, int volume, int frameCount)
 {
-    _EntryExecCommand(_StreamVolume, param_1, param_2, param_3, 0, 0, 0, 0);
+    _EntryExecCommand(_StreamVolume, streamID, volume, frameCount, 0, 0, 0, 0);
 }
 
 /*
@@ -2077,9 +2073,9 @@ void CRedDriver::StreamVolume(int param_1, int param_2, int param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::StreamPause(int param_1, int param_2)
+void CRedDriver::StreamPause(int streamID, int pause)
 {
-    _EntryExecCommand(_StreamPause, param_1, param_2, 0, 0, 0, 0, 0);
+    _EntryExecCommand(_StreamPause, streamID, pause, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -2091,9 +2087,9 @@ void CRedDriver::StreamPause(int param_1, int param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::ClearWaveData(int param_1)
+void CRedDriver::ClearWaveData(int waveID)
 {
-    c_RedEntry.ClearWaveData(param_1);
+    c_RedEntry.ClearWaveData(waveID);
 }
 
 /*
@@ -2119,9 +2115,9 @@ void CRedDriver::ClearWaveDataM(int param_1, int param_2, int param_3, int param
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::ClearWaveBank(int param_1)
+void CRedDriver::ClearWaveBank(int waveBank)
 {
-    c_RedEntry.ClearWaveBank(param_1);
+    c_RedEntry.ClearWaveBank(waveBank);
 }
 
 /*
@@ -2172,12 +2168,11 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
 int CRedDriver::ReentryWaveData(int id)
 {
     unsigned int interrupts;
-    int result;
 
     interrupts = OSDisableInterrupts();
-    result = c_RedEntry.ReentryWaveData(id);
+    id         = c_RedEntry.ReentryWaveData(id);
     OSRestoreInterrupts(interrupts);
-    return result;
+    return id;
 }
 
 /*

@@ -105,25 +105,25 @@ int* CRedSound::EntryStandbyID(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
+int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int aramBufferSize)
 {
 	memset(m_StandbyStatus, 0, 0x100);
 
-	if (param_3 > 0 && param_5 > 0) {
-		if ((((u32)param_2 & 0x1F) != 0) || (((u32)param_3 & 0x1F) != 0)) {
+	if (mainBufferSize > 0 && aramBufferSize > 0) {
+		if ((((u32)mainBuffer & 0x1F) != 0) || (((u32)mainBufferSize & 0x1F) != 0)) {
 			if (m_ReportPrint != 0) {
-				OSReport(sRedSoundMemorySettingError, sRedSoundLogPrefix, sRedSoundLogErrorColor, (u32)param_2,
-				         param_3, sRedSoundLogReset);
+				OSReport(sRedSoundMemorySettingError, sRedSoundLogPrefix, sRedSoundLogErrorColor, (u32)mainBuffer,
+				         mainBufferSize, sRedSoundLogReset);
 				fflush(__files + 1);
 			}
 			return 0;
 		}
 
-		if ((((u32)param_4 & 0x1F) != 0) || (((u32)param_5 & 0x1F) != 0)) {
+		if ((((u32)aramBuffer & 0x1F) != 0) || (((u32)aramBufferSize & 0x1F) != 0)) {
 			if (m_ReportPrint != 0) {
 				OSReport(sRedSoundAMemorySettingError,
-				         sRedSoundLogPrefix, sRedSoundLogErrorColor, param_4,
-				         param_5, sRedSoundLogReset);
+				         sRedSoundLogPrefix, sRedSoundLogErrorColor, aramBuffer,
+				         aramBufferSize, sRedSoundLogReset);
 				fflush(__files + 1);
 			}
 			return 0;
@@ -143,7 +143,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		AIInit(0);
 		AXInit();
 		AXARTInit();
-        c_RedMemory.Init((int)param_2, param_3, param_4, param_5);
+        c_RedMemory.Init((int)mainBuffer, mainBufferSize, aramBuffer, aramBufferSize);
 		c_RedEntry.Init();
 		Start();
 		c_Driver.Init();
@@ -154,7 +154,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 			fflush(__files + 1);
 		}
 	} else {
-		param_3 = 0;
+		mainBufferSize = 0;
 
 		if (m_ReportPrint != 0) {
 			OSReport(sRedSoundInitError,
@@ -164,7 +164,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		}
 	}
 
-	return param_3;
+	return mainBufferSize;
 }
 
 /*
@@ -746,14 +746,14 @@ void CRedSound::StreamStop(int streamID)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
+int CRedSound::StreamPlay(void* data, int volume, int pan, int loopMode)
 {
 	int id = 0;
 	char* streamData = (char*)data;
 
 	if (streamData[0] == 'S' && streamData[1] == 'T' && streamData[2] == 'R') {
 		id = GetAutoID();
-		c_Driver.StreamPlay(id, data, param_3, param_4, param_5);
+		c_Driver.StreamPlay(id, data, volume, pan, loopMode);
 	} else if (m_ReportPrint != 0) {
 		OSReport(sRedSoundInvalidStreamData,
 		         sRedSoundLogPrefix, sRedSoundLogErrorColor,

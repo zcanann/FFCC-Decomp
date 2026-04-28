@@ -664,10 +664,25 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                     }
 
                     unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
-                    for (int i = 0; i < 256; i++) {
-                        m_glyphBuckets[i] = bucket;
-                        bucket = reinterpret_cast<unsigned short*>(
-                            reinterpret_cast<unsigned char*>(bucket) + static_cast<unsigned int>(*bucket) * 8 + 2);
+                    unsigned short** bucketSlot = m_glyphBuckets;
+                    for (int i = 0; i < 32; i++) {
+                        bucketSlot[0] = bucket;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucketSlot[1] = bucket;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucketSlot[2] = bucket;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucketSlot[3] = bucket;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucketSlot[4] = bucket;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucketSlot[5] = bucket;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucketSlot[6] = bucket;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucketSlot[7] = bucket;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucketSlot += 8;
                     }
                 } else if (chunk.m_id == 0x54585452) {
                     texturePtr = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp), 0xDF) CTexture;

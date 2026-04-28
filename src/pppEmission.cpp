@@ -185,9 +185,8 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
                 0x16F);
 
             EmissionParticle* particle = (EmissionParticle*)state->m_particles;
-            float scaleBase = 7.0f;
             for (int i = 0; i < param_2->m_initWOrk; i++) {
-                Math.RandF(7.0f);
+                Math.RandF(FLOAT_803311e4);
 
                 s16 lifeJitter = (s16)(rand() % payload[0xD]);
                 s16 safeJitter = (lifeJitter >= 1) ? lifeJitter : 1;
@@ -195,7 +194,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
                 particle->m_fieldC = payload[0xF] + safeJitter;
                 s16 fade = (u16)payload[0xC] + safeJitter;
                 particle->m_fieldA = particle->m_fieldC + safeJitter + fade;
-                particle->m_scale = ((float)i * Math.RandF(*(float*)(payload + 4))) + scaleBase;
+                particle->m_scale = ((float)i * Math.RandF(*(float*)(payload + 4))) + FLOAT_803311e4;
                 particle->m_alpha = 0;
                 particle->m_fieldE = (u8)((int)payload[0xB] / (int)fade);
                 particle++;
@@ -231,7 +230,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
 
                 particle->m_fieldC = payload[0xF];
                 particle->m_fieldA = payload[0xF] + payload[0xE] + jitter + payload[0xC];
-                particle->m_scale = 7.0f + Math.RandF(*(float*)(payload + 4));
+                particle->m_scale = FLOAT_803311e4 + Math.RandF(*(float*)(payload + 4));
                 particle->m_alpha = 0;
                 particle->m_fieldE = payload[0xB] / payload[0xC];
             }

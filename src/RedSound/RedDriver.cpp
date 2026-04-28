@@ -1463,12 +1463,11 @@ int CRedDriver::SetMusicData(void* musicData)
 int CRedDriver::ReentryMusicData(int musicID)
 {
     unsigned int interrupt;
-    int result;
 
     interrupt = OSDisableInterrupts();
-    result = c_RedEntry.ReentryMusicData(musicID);
+    musicID   = c_RedEntry.ReentryMusicData(musicID);
     OSRestoreInterrupts(interrupt);
-    return result;
+    return musicID;
 }
 
 /*
@@ -1683,12 +1682,11 @@ void CRedDriver::ClearSeSepDataMG(int id1, int id2, int id3, int id4)
 int CRedDriver::ReentrySeSepData(int id)
 {
     unsigned int interrupts;
-    int result;
 
     interrupts = OSDisableInterrupts();
-    result = c_RedEntry.ReentrySeSepData(id);
+    id         = c_RedEntry.ReentrySeSepData(id);
     OSRestoreInterrupts(interrupts);
-    return result;
+    return id;
 }
 
 /*
@@ -2172,12 +2170,11 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
 int CRedDriver::ReentryWaveData(int id)
 {
     unsigned int interrupts;
-    int result;
 
     interrupts = OSDisableInterrupts();
-    result = c_RedEntry.ReentryWaveData(id);
+    id         = c_RedEntry.ReentryWaveData(id);
     OSRestoreInterrupts(interrupts);
-    return result;
+    return id;
 }
 
 /*

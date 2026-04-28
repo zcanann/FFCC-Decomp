@@ -1,4 +1,5 @@
 #include "ffcc/pppRandUpFloat.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
@@ -13,11 +14,6 @@ struct RandUpFloatParam {
     u8 randomTwice;
 };
 
-struct RandUpFloatCtx {
-    u8 unk0[0xC];
-    s32* outputOffset;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x800628e0
@@ -27,38 +23,36 @@ struct RandUpFloatCtx {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandUpFloat(void* param1, void* param2, void* param3) {
+void pppRandUpFloat(void* basePtr, RandUpFloatParam* in, _pppCtrlTable* ctrl) {
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    u8* base = (u8*)param1;
-    RandUpFloatCtx* p3 = (RandUpFloatCtx*)param3;
-    RandUpFloatParam* p2 = (RandUpFloatParam*)param2;
+    u8* base = (u8*)basePtr;
     f32* valuePtr;
 
     s32 id = *(s32*)(base + 0xC);
     if (id == 0) {
         f32 value = Math.RandF();
 
-        if (p2->randomTwice != 0) {
+        if (in->randomTwice != 0) {
             f32 randomValue = value + Math.RandF();
             f32 scale = kPppRandUpFloatDualSampleScale;
             value = randomValue * scale;
         }
 
-        valuePtr = (f32*)(base + *p3->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
         *valuePtr = value;
     } else {
-        if (p2->targetId != id) {
+        if (in->targetId != id) {
             return;
         }
-        valuePtr = (f32*)(base + *p3->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
-    s32 sourceOffset = p2->sourceOffset;
+    s32 sourceOffset = in->sourceOffset;
     f32* source = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
 
-    f32 delta = p2->blend * *valuePtr;
+    f32 delta = in->blend * *valuePtr;
     *source = *source + delta;
 }

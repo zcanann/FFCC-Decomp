@@ -1,13 +1,16 @@
 #ifndef _PPP_RANDDOWNFV_H_
 #define _PPP_RANDDOWNFV_H_
 
+
+struct _pppCtrlTable;
+struct PppRandDownFVParam2;
 #ifdef __cplusplus
 void randf(float, float);
 
 extern "C" {
 #endif
 
-void pppRandDownFV(void*, void*, void*);
+void pppRandDownFV(void* basePtr, struct PppRandDownFVParam2* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

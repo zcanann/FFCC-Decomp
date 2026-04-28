@@ -1,4 +1,5 @@
 #include "ffcc/pppRandDownChar.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
@@ -15,11 +16,6 @@ struct PppRandDownCharParam2 {
     u8 field9;
 };
 
-struct PppRandDownCharParam3 {
-    u8 unk0[0xC];
-    s32* fieldC;
-};
-
 /*
  * --INFO--
  * PAL Address: 80061258
@@ -29,15 +25,13 @@ struct PppRandDownCharParam3 {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandDownChar(void* param1, void* param2, void* param3)
+void pppRandDownChar(void* basePtr, PppRandDownCharParam2* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    u8* base = (u8*)param1;
-    PppRandDownCharParam2* in = (PppRandDownCharParam2*)param2;
-    PppRandDownCharParam3* out = (PppRandDownCharParam3*)param3;
+    u8* base = (u8*)basePtr;
     f32* valuePtr;
 
     s32 baseState = *(s32*)(base + 0xC);
@@ -49,13 +43,13 @@ void pppRandDownChar(void* param1, void* param2, void* param3)
             value = mixed * scale;
         }
 
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
         *valuePtr = value;
     } else {
         if (in->field0 != baseState) {
             return;
         }
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
     u8* target = (in->field4 == -1) ? gPppDefaultValueBuffer : (u8*)(base + in->field4 + 0x80);

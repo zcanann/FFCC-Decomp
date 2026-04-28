@@ -1,4 +1,5 @@
 #include "ffcc/pppSRandDownCV.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 #include "ffcc/pppColor.h"
@@ -16,7 +17,7 @@ const float kPppSRandDownCVDualSampleScale = 0.5f;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandDownCV(void* param1, void* param2, void* param3)
+void pppSRandDownCV(void* basePtr, void* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
@@ -24,13 +25,13 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
 
     float* target;
 
-    if (*(int*)param2 == *((int*)param1 + 3)) {
-        int** base_ptr = (int**)((char*)param3 + 0xC);
+    if (*(int*)in == *((int*)basePtr + 3)) {
+        int** base_ptr = (int**)((char*)ctrl + 0xC);
         int offset = **base_ptr;
-        target = (float*)((char*)param1 + offset + 0x80);
+        target = (float*)((char*)basePtr + offset + 0x80);
 
         {
-            u8 flag = *((u8*)param2 + 0xC);
+            u8 flag = *((u8*)in + 0xC);
             float value = -Math.RandF();
             if (flag != 0) {
                 float random = Math.RandF();
@@ -42,7 +43,7 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
         }
 
         {
-            u8 flag = *((u8*)param2 + 0xC);
+            u8 flag = *((u8*)in + 0xC);
             float value = -Math.RandF();
             if (flag != 0) {
                 float random = Math.RandF();
@@ -54,7 +55,7 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
         }
 
         {
-            u8 flag = *((u8*)param2 + 0xC);
+            u8 flag = *((u8*)in + 0xC);
             float value = -Math.RandF();
             if (flag != 0) {
                 float random = Math.RandF();
@@ -66,7 +67,7 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
         }
 
         {
-            u8 flag = *((u8*)param2 + 0xC);
+            u8 flag = *((u8*)in + 0xC);
             float value = -Math.RandF();
             if (flag != 0) {
                 float random = Math.RandF();
@@ -77,38 +78,38 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
             target[3] = value;
         }
     } else {
-        if (*(int*)param2 != *((int*)param1 + 3)) {
+        if (*(int*)in != *((int*)basePtr + 3)) {
             return;
         }
-        int** base_ptr = (int**)((char*)param3 + 0xC);
+        int** base_ptr = (int**)((char*)ctrl + 0xC);
         int offset = **base_ptr;
-        target = (float*)((char*)param1 + offset + 0x80);
+        target = (float*)((char*)basePtr + offset + 0x80);
     }
 
-    int color_offset = *((int*)param2 + 1);
+    int color_offset = *((int*)in + 1);
     u8* target_colors =
-        (color_offset == -1) ? gPppDefaultValueBuffer : (u8*)((char*)param1 + color_offset + 0x80);
+        (color_offset == -1) ? gPppDefaultValueBuffer : (u8*)((char*)basePtr + color_offset + 0x80);
 
     {
-        s8 base = *(s8*)((char*)param2 + 0x8);
+        s8 base = *(s8*)((char*)in + 0x8);
         s8 delta = (s8)((f32)base * target[0]);
         target_colors[0] = (u8)(target_colors[0] + delta);
     }
 
     {
-        s8 base = *(s8*)((char*)param2 + 0x9);
+        s8 base = *(s8*)((char*)in + 0x9);
         s8 delta = (s8)((f32)base * target[1]);
         target_colors[1] = (u8)(target_colors[1] + delta);
     }
 
     {
-        s8 base = *(s8*)((char*)param2 + 0xA);
+        s8 base = *(s8*)((char*)in + 0xA);
         s8 delta = (s8)((f32)base * target[2]);
         target_colors[2] = (u8)(target_colors[2] + delta);
     }
 
     {
-        s8 base = *(s8*)((char*)param2 + 0xB);
+        s8 base = *(s8*)((char*)in + 0xB);
         s8 delta = (s8)((f32)base * target[3]);
         target_colors[3] = (u8)(target_colors[3] + delta);
     }

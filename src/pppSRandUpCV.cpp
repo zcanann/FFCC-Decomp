@@ -1,4 +1,5 @@
 #include "ffcc/pppSRandUpCV.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 #include "ffcc/pppColor.h"
@@ -14,11 +15,6 @@ struct SRandUpCVParam {
     u8 randomTwice;
 };
 
-struct SRandUpCVCtx {
-    u8 _pad[0xC];
-    s32* outputOffset;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80064114
@@ -28,19 +24,17 @@ struct SRandUpCVCtx {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandUpCV(void* param1, void* param2, void* param3)
+void pppSRandUpCV(void* basePtr, SRandUpCVParam* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    u8* base = (u8*)param1;
-    SRandUpCVParam* in = (SRandUpCVParam*)param2;
-    SRandUpCVCtx* ctx = (SRandUpCVCtx*)param3;
+    u8* base = (u8*)basePtr;
     f32* target;
 
     if (in->targetId == *(s32*)(base + 0xC)) {
-        target = (f32*)(base + *ctx->outputOffset + 0x80);
+        target = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
 
         {
             u8 flag = in->randomTwice;
@@ -89,7 +83,7 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
         if (in->targetId != *(s32*)(base + 0xC)) {
             return;
         }
-        target = (f32*)(base + *ctx->outputOffset + 0x80);
+        target = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
     s32 color_offset = in->sourceOffset;

@@ -1,4 +1,5 @@
 #include "ffcc/pppRandUpCV.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
@@ -10,11 +11,6 @@ struct RandUpCVParam {
     s32 sourceOffset;
     s8 delta[4];
     u8 randomTwice;
-};
-
-struct RandUpCVCtx {
-    u8 _pad[0xC];
-    s32* outputOffset;
 };
 
 inline char randchar(char value, float scale)
@@ -31,11 +27,9 @@ inline char randchar(char value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandUpCV(void* param1, void* param2, void* param3)
+void pppRandUpCV(void* basePtr, RandUpCVParam* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)param1;
-    RandUpCVParam* in = (RandUpCVParam*)param2;
-    RandUpCVCtx* ctx = (RandUpCVCtx*)param3;
+    u8* base = (u8*)basePtr;
     u8* target;
     f32* valuePtr;
 
@@ -52,12 +46,12 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
             value = blend * scale;
         }
 
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
         *valuePtr = value;
     } else if (in->targetId != *(s32*)(base + 0xC)) {
         return;
     } else {
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
     target = (in->sourceOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + in->sourceOffset + 0x80);

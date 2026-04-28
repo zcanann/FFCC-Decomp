@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void pppSRandUpHCV(void* param1, void* param2, void* param3);
+void pppSRandUpHCV(void* basePtr, struct PppSRandUpHCVParam2* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

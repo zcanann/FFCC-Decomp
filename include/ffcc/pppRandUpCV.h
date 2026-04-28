@@ -7,7 +7,7 @@ char randchar(char, float);
 extern "C" {
 #endif
 
-void pppRandUpCV(void* param1, void* param2, void* param3);
+void pppRandUpCV(void* basePtr, struct RandUpCVParam* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

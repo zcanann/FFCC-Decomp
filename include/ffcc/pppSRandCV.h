@@ -8,7 +8,7 @@ void randf(unsigned char);
 extern "C" {
 #endif
 
-void pppSRandCV(void* param1, void* param2, void* param3);
+void pppSRandCV(void* basePtr, struct SRandCVParam* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

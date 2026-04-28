@@ -1,4 +1,5 @@
 #include "ffcc/pppRandUpShort.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
@@ -13,11 +14,6 @@ struct RandUpShortParam {
     u8 randomTwice;
 };
 
-struct RandUpShortCtx {
-    u8 _pad[0xC];
-    s32* outputOffset;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80062fa0
@@ -27,11 +23,9 @@ struct RandUpShortCtx {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
+extern "C" void pppRandUpShort(void* basePtr, RandUpShortParam* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)param1;
-    RandUpShortParam* in = (RandUpShortParam*)param2;
-    RandUpShortCtx* ctx = (RandUpShortCtx*)param3;
+    u8* base = (u8*)basePtr;
     s16* target;
     f32* valuePtr;
 
@@ -48,13 +42,13 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
             value = mixed * scale;
         }
 
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
         *valuePtr = value;
     } else {
         if (in->targetId != state) {
             return;
         }
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
     target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->sourceOffset + 0x80);

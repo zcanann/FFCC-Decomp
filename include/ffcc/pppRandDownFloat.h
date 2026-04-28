@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void pppRandDownFloat(void* r3, void* r4, void* r5);
+void pppRandDownFloat(void* basePtr, struct RandDownFloatParam* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

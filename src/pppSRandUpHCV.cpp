@@ -1,4 +1,5 @@
 #include "ffcc/pppSRandUpHCV.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 #include "ffcc/pppColor.h"
@@ -16,11 +17,6 @@ struct PppSRandUpHCVParam2 {
     u8 field10;
 };
 
-struct PppSRandUpHCVParam3 {
-    u8 field0[0xC];
-    s32* fieldC;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80064550
@@ -30,12 +26,9 @@ struct PppSRandUpHCVParam3 {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandUpHCV(void* param1, void* param2, void* param3)
+void pppSRandUpHCV(void* basePtr, PppSRandUpHCVParam2* in, _pppCtrlTable* ctrl)
 {
-	u8* base = (u8*)param1;
-	PppSRandUpHCVParam2* in = (PppSRandUpHCVParam2*)param2;
-	PppSRandUpHCVParam3* out = (PppSRandUpHCVParam3*)param3;
-
+	u8* base = (u8*)basePtr;
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
@@ -43,7 +36,7 @@ void pppSRandUpHCV(void* param1, void* param2, void* param3)
 	float* target;
 
 	if (in->field0 == *(s32*)(base + 0xC)) {
-		target = (float*)(base + *out->fieldC + 0x80);
+		target = (float*)(base + *ctrl->m_serializedDataOffsets + 0x80);
 
 		{
 			u8 flag = in->field10;
@@ -96,7 +89,7 @@ void pppSRandUpHCV(void* param1, void* param2, void* param3)
 		if (in->field0 != *(s32*)(base + 0xC)) {
 			return;
 		}
-		target = (float*)(base + *out->fieldC + 0x80);
+		target = (float*)(base + *ctrl->m_serializedDataOffsets + 0x80);
 	}
 
 	s32 color_offset = in->field4;

@@ -1,4 +1,5 @@
 #include "ffcc/pppRandDownHCV.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
@@ -16,11 +17,6 @@ struct PppRandDownHCVParam2 {
     u8 field10;
 };
 
-struct PppRandDownHCVParam3 {
-    u8 field0[0xC];
-    s32* fieldC;
-};
-
 /*
  * --INFO--
  * PAL Address: 80061794
@@ -30,11 +26,9 @@ struct PppRandDownHCVParam3 {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
+extern "C" void pppRandDownHCV(void* basePtr, PppRandDownHCVParam2* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)param1;
-    PppRandDownHCVParam2* in = (PppRandDownHCVParam2*)param2;
-    PppRandDownHCVParam3* out = (PppRandDownHCVParam3*)param3;
+    u8* base = (u8*)basePtr;
     s16* target;
     f32* valuePtr;
 
@@ -51,12 +45,12 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
             value = blend * scale;
         }
 
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
         *valuePtr = value;
     } else if (in->field0 != *(s32*)(base + 0xC)) {
         return;
     } else {
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
     target = (in->field4 == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->field4 + 0x80);

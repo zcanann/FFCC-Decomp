@@ -1,5 +1,6 @@
 #include "ffcc/pppRandFloat.h"
 #include "ffcc/math.h"
+#include "ffcc/partMng.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
@@ -13,13 +14,6 @@ struct RandFloatParam {
     u8 randomTwice;
 };
 
-struct RandFloatCtx {
-    void* unk0;
-    void* unk4;
-    void* unk8;
-    s32* outputOffset;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80061d48
@@ -29,10 +23,8 @@ struct RandFloatCtx {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandFloat(void* param1, void* param2, void* param3)
+void pppRandFloat(void* basePtrIn, RandFloatParam* in, _pppCtrlTable* ctrl)
 {
-    RandFloatCtx* ctx = (RandFloatCtx*)param3;
-    RandFloatParam* in = (RandFloatParam*)param2;
     u8* base;
     f32* valuePtr;
 
@@ -40,7 +32,7 @@ void pppRandFloat(void* param1, void* param2, void* param3)
         return;
     }
 
-    base = (u8*)param1;
+    base = (u8*)basePtrIn;
     s32 state = *(s32*)(base + 0xC);
 
     if (state == 0) {
@@ -51,13 +43,13 @@ void pppRandFloat(void* param1, void* param2, void* param3)
             value *= kPppRandFloatSingleSampleScale;
         }
 
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
         *valuePtr = value;
     } else {
         if (in->targetId != state) {
             return;
         }
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
     s32 sourceOffset = in->sourceOffset;

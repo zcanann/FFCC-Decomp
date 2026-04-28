@@ -182,10 +182,10 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
         Graphic._WaitDrawDone(const_cast<char*>(s_fileCpp), 0x2CC);
 
-        int compactLayout = 0;
-        if (Graphic.m_scratchTextureBuffer != 0 && !usingFallbackFont)
+        int compactLayout = Graphic.m_scratchTextureBuffer != 0;
+        if (usingFallbackFont)
         {
-            compactLayout = 1;
+            compactLayout = 0;
         }
 
         if (compactLayout)
@@ -218,15 +218,15 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
         int msgIndex = 0;
         switch (errorCode)
         {
-        case 4:
-        case 6:
-            msgIndex = 2;
+        case 0x0B:
+            msgIndex = 0;
             break;
         case 5:
             msgIndex = 1;
             break;
-        case 0x0B:
-            msgIndex = 0;
+        case 4:
+        case 6:
+            msgIndex = 2;
             break;
         case -1:
             msgIndex = 3;
@@ -291,8 +291,13 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
         VIFlush();
 
         int status;
-        while ((status = DVDGetCommandBlockStatus(&info.cb)) == errorCode)
+        while (true)
         {
+            status = DVDGetCommandBlockStatus(&info.cb);
+            if (status != errorCode)
+            {
+                break;
+            }
             VIWaitForRetrace();
         }
 

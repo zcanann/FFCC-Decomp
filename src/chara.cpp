@@ -2561,7 +2561,9 @@ CChara::CNode::CRefData::~CRefData()
  */
 CChara::CMesh::CMesh()
 {
-	memset(this, 0, 0x14);
+	m_data = 0;
+	m_workPositions = 0;
+	m_workNormals = 0;
 }
 
 /*

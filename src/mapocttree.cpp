@@ -577,87 +577,87 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 	COctNode* child6;
 	COctNode* child7;
 	COctNode* child8;
-	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)) != 0) {
-		*reinterpret_cast<unsigned long*>(Ptr(octNode, 0x40)) |= 1;
+	if (octNode->m_meshCount != 0) {
+		octNode->m_drawFlags |= 1;
 	}
 
 	for (int i = 0; i < 8; i++) {
-		child1 = *reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C));
+		child1 = octNode->m_children[0];
 		if (child1 == 0) {
 			return;
 		}
-		if (*reinterpret_cast<unsigned short*>(Ptr(child1, 0x3C)) != 0) {
-			*reinterpret_cast<unsigned long*>(Ptr(child1, 0x40)) |= 1;
+		if (child1->m_meshCount != 0) {
+			child1->m_drawFlags |= 1;
 		}
 
 		for (int j = 0; j < 8; j++) {
-			child2 = *reinterpret_cast<COctNode**>(Ptr(child1, 0x1C));
+			child2 = child1->m_children[0];
 			if (child2 == 0) {
 				break;
 			}
-			if (*reinterpret_cast<unsigned short*>(Ptr(child2, 0x3C)) != 0) {
-				*reinterpret_cast<unsigned long*>(Ptr(child2, 0x40)) |= 1;
+			if (child2->m_meshCount != 0) {
+				child2->m_drawFlags |= 1;
 			}
 
 			for (int k = 0; k < 8; k++) {
-				child3 = *reinterpret_cast<COctNode**>(Ptr(child2, 0x1C));
+				child3 = child2->m_children[0];
 				if (child3 == 0) {
 					break;
 				}
-				if (*reinterpret_cast<unsigned short*>(Ptr(child3, 0x3C)) != 0) {
-					*reinterpret_cast<unsigned long*>(Ptr(child3, 0x40)) |= 1;
+				if (child3->m_meshCount != 0) {
+					child3->m_drawFlags |= 1;
 				}
 
 				for (int m = 0; m < 8; m++) {
-					child4 = *reinterpret_cast<COctNode**>(Ptr(child3, 0x1C));
+					child4 = child3->m_children[0];
 					if (child4 == 0) {
 						break;
 					}
-					if (*reinterpret_cast<unsigned short*>(Ptr(child4, 0x3C)) != 0) {
-						*reinterpret_cast<unsigned long*>(Ptr(child4, 0x40)) |= 1;
+					if (child4->m_meshCount != 0) {
+						child4->m_drawFlags |= 1;
 					}
 
 					for (int n = 0; n < 8; n++) {
-						child5 = *reinterpret_cast<COctNode**>(Ptr(child4, 0x1C));
+						child5 = child4->m_children[0];
 						if (child5 == 0) {
 							break;
 						}
-						if (*reinterpret_cast<unsigned short*>(Ptr(child5, 0x3C)) != 0) {
-							*reinterpret_cast<unsigned long*>(Ptr(child5, 0x40)) |= 1;
+						if (child5->m_meshCount != 0) {
+							child5->m_drawFlags |= 1;
 						}
 
 						for (int o = 0; o < 8; o++) {
-							child6 = *reinterpret_cast<COctNode**>(Ptr(child5, 0x1C));
+							child6 = child5->m_children[0];
 							if (child6 == 0) {
 								break;
 							}
-							if (*reinterpret_cast<unsigned short*>(Ptr(child6, 0x3C)) != 0) {
-								*reinterpret_cast<unsigned long*>(Ptr(child6, 0x40)) |= 1;
+							if (child6->m_meshCount != 0) {
+								child6->m_drawFlags |= 1;
 							}
 
 							for (int p = 0; p < 8; p++) {
-								child7 = *reinterpret_cast<COctNode**>(Ptr(child6, 0x1C));
+								child7 = child6->m_children[0];
 								if (child7 == 0) {
 									break;
 								}
-								if (*reinterpret_cast<unsigned short*>(Ptr(child7, 0x3C)) != 0) {
-									*reinterpret_cast<unsigned long*>(Ptr(child7, 0x40)) |= 1;
+								if (child7->m_meshCount != 0) {
+									child7->m_drawFlags |= 1;
 								}
 
 								for (int q = 0; q < 8; q++) {
-									child8 = *reinterpret_cast<COctNode**>(Ptr(child7, 0x1C));
+									child8 = child7->m_children[0];
 									if (child8 == 0) {
 										break;
 									}
-									if (*reinterpret_cast<unsigned short*>(Ptr(child8, 0x3C)) != 0) {
-										*reinterpret_cast<unsigned long*>(Ptr(child8, 0x40)) |= 1;
+									if (child8->m_meshCount != 0) {
+										child8->m_drawFlags |= 1;
 									}
 
 									for (int r = 0; r < 8; r++) {
-										if (*reinterpret_cast<COctNode**>(Ptr(child8, 0x1C)) == 0) {
+										if (child8->m_children[0] == 0) {
 											break;
 										}
-										DrawTypeMeshFrustumIn_r(*reinterpret_cast<COctNode**>(Ptr(child8, 0x1C)));
+										DrawTypeMeshFrustumIn_r(child8->m_children[0]);
 										child8 = reinterpret_cast<COctNode*>(Ptr(child8, 4));
 									}
 
@@ -697,15 +697,15 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
  */
 void COctTree::DrawTypeMesh_r(COctNode* octNode)
 {
-	float localX = *reinterpret_cast<float*>(Ptr(this, 0x3C));
-	float localY = *reinterpret_cast<float*>(Ptr(this, 0x40));
-	float localZ = *reinterpret_cast<float*>(Ptr(this, 0x44));
+	float localX = m_localPosX;
+	float localY = m_localPosY;
+	float localZ = m_localPosZ;
 	unsigned int orMask;
 
-	if (((*reinterpret_cast<float*>(Ptr(octNode, 0x0C)) < localX) || (*reinterpret_cast<float*>(Ptr(octNode, 0x10)) < localY) ||
-	     (*reinterpret_cast<float*>(Ptr(octNode, 0x14)) < localZ)) ||
-	    ((localX < *reinterpret_cast<float*>(Ptr(octNode, 0x00))) || (localY < *reinterpret_cast<float*>(Ptr(octNode, 0x04))) ||
-	     (localZ < *reinterpret_cast<float*>(Ptr(octNode, 0x08))))) {
+	if (((octNode->m_boundMaxX < localX) || (octNode->m_boundMaxY < localY) ||
+	     (octNode->m_boundMaxZ < localZ)) ||
+	    ((localX < octNode->m_boundMinX) || (localY < octNode->m_boundMinY) ||
+	     (localZ < octNode->m_boundMinZ))) {
 		Vec localCorner;
 		Vec viewPos;
 		float maxDepth = kOctTreeBoundMinInit;
@@ -716,15 +716,15 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 		orMask = 0;
 
 		for (int x = 0; x < 2; x++) {
-			localCorner.x = (x == 0) ? *reinterpret_cast<float*>(Ptr(octNode, 0x00)) : *reinterpret_cast<float*>(Ptr(octNode, 0x0C));
+			localCorner.x = (x == 0) ? octNode->m_boundMinX : octNode->m_boundMaxX;
 			for (int y = 0; y < 2; y++) {
-				localCorner.y = (y == 0) ? *reinterpret_cast<float*>(Ptr(octNode, 0x04)) : *reinterpret_cast<float*>(Ptr(octNode, 0x10));
+				localCorner.y = (y == 0) ? octNode->m_boundMinY : octNode->m_boundMaxY;
 				for (int z = 0; z < 2; z++) {
 					unsigned int clipFlags;
 					double depth;
 
-					localCorner.z = (z == 0) ? *reinterpret_cast<float*>(Ptr(octNode, 0x08)) : *reinterpret_cast<float*>(Ptr(octNode, 0x14));
-					PSMTXMultVec(reinterpret_cast<float(*)[4]>(Ptr(this, 0x0C)), &localCorner, &viewPos);
+					localCorner.z = (z == 0) ? octNode->m_boundMinZ : octNode->m_boundMaxZ;
+					PSMTXMultVec(reinterpret_cast<float(*)[4]>(m_pad0C), &localCorner, &viewPos);
 
 					depth = static_cast<double>(viewPos.z);
 					if (maxDepth < viewPos.z) {
@@ -789,24 +789,24 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 		orMask = 0xF;
 	}
 
-	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)) != 0) {
-		*reinterpret_cast<unsigned long*>(Ptr(octNode, 0x40)) |= 1;
+	if (octNode->m_meshCount != 0) {
+		octNode->m_drawFlags |= 1;
 	}
 
 	if (orMask == 0) {
 		for (int i = 0; i < 8; i++) {
-			if (*reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C)) == 0) {
+			if (octNode->m_children[0] == 0) {
 				return;
 			}
-			DrawTypeMeshFrustumIn_r(*reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C)));
+			DrawTypeMeshFrustumIn_r(octNode->m_children[0]);
 			octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
 		}
 	} else {
 		for (int i = 0; i < 8; i++) {
-			if (*reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C)) == 0) {
+			if (octNode->m_children[0] == 0) {
 				return;
 			}
-			DrawTypeMesh_r(*reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C)));
+			DrawTypeMesh_r(octNode->m_children[0]);
 			octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
 		}
 	}

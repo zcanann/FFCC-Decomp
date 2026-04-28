@@ -249,7 +249,7 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 
 	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
 	deltaX = deltaPos.x;
-	zero = 0.0f;
+	zero = FLOAT_80331BD4;
 	deltaZ = deltaPos.z;
 	if (zero == deltaX || zero == deltaZ) {
 		targetRot = zero;
@@ -273,12 +273,12 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	float targetRot;
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
-	CVector deltaPos;
+	Vec deltaPos;
 	float deltaX;
 	float zero;
 	float deltaZ;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
 	deltaX = deltaPos.x;
 	zero = FLOAT_80331BD4;
 	deltaZ = deltaPos.z;

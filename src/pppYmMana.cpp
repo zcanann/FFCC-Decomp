@@ -1139,7 +1139,6 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     float zero;
     float normalY;
     float radius;
-    float step;
     float uvStep;
     float x;
     float z;
@@ -1158,19 +1157,17 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     zero = FLOAT_80330e4c;
     rowCount = 0;
     uvStep = FLOAT_80330e6c;
-    step = size * uvStep;
     radius = size * FLOAT_80330e5c;
-    for (z = radius; -radius <= z; z -= step) {
+    for (z = radius; -radius <= z; z -= size * uvStep) {
         colCount = 0;
         rowUv = static_cast<float>(rowCount) * uvStep;
         positions = reinterpret_cast<float*>(positionsInOut);
         normals = reinterpret_cast<float*>(normalsOut);
         uvs = reinterpret_cast<float*>(uvOut);
-        for (x = -radius; x <= radius; x += step) {
+        for (x = -radius; x <= radius; x += size * uvStep) {
             *positions = x;
             positionsInOut = reinterpret_cast<Vec*>(positions + 3);
             positions[1] = zero;
-            colCount = colCount + 1;
             normalsOut = reinterpret_cast<Vec*>(normals + 3);
             uvOut = reinterpret_cast<Vec2d*>(uvs + 2);
             positions[2] = z;
@@ -1179,9 +1176,10 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
             normals[1] = normalY;
             normals[2] = zero;
             normals = normals + 3;
-            *uvs = static_cast<float>(colCount - 1) * uvStep;
+            *uvs = static_cast<float>(colCount) * uvStep;
             uvs[1] = rowUv;
             uvs = uvs + 2;
+            colCount = colCount + 1;
         }
         rowCount = rowCount + 1;
     }

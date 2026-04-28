@@ -36,8 +36,8 @@ extern char DAT_80333660[];
 extern char DAT_80333664[];
 extern char DAT_8033366c[];
 extern char DAT_80333670[];
-extern char DAT_80333674[];
-extern char DAT_8033367c[];
+extern char lbl_80333674[];
+extern char lbl_8033367C[];
 extern char* PTR_s_Strength__80215a48[];
 extern char* PTR_s_Defence__80215a4c[];
 
@@ -404,7 +404,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				} else {
 					font->SetTlut(9);
 				}
-				sprintf(scratch, DAT_80333674, delta);
+				sprintf(scratch, lbl_80333674, delta);
 				if (delta != 0) {
 					font->Draw(scratch);
 				}
@@ -421,7 +421,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			font->Draw(scratch);
 			font->SetTlut(9);
 			if ((attr != 0) && (attr < 9)) {
-				sprintf(scratch, DAT_8033367c, DAT_80333660);
+				sprintf(scratch, lbl_8033367C, DAT_80333660);
 				font->Draw(scratch);
 			}
 		}

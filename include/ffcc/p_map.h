@@ -4,7 +4,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-#include "ffcc/system.h"
+#include "ffcc/p_sample.h"
 
 struct Vec;
 
@@ -12,7 +12,7 @@ void mapInitDrawEnv();
 extern const float kMapBoundsCenterScale;
 extern const float kMapCameraCenterYOffset;
 
-class CMapPcs : public CProcess
+class CMapPcs : public CSamplePcs
 {
 public:
     CMapPcs();

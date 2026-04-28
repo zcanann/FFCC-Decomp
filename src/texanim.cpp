@@ -950,16 +950,15 @@ void CTexAnimSet::AddFrame()
 void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
 {
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
-    for (unsigned int texAnimIndex = 0; texAnimIndex < static_cast<unsigned int>(GetSize__21CPtrArray_P8CTexAnim_Fv(&self->texAnims));
+    unsigned int seqIndex;
+    unsigned int texAnimIndex;
+
+    for (texAnimIndex = 0; texAnimIndex < static_cast<unsigned int>(GetSize__21CPtrArray_P8CTexAnim_Fv(&self->texAnims));
          texAnimIndex = texAnimIndex + 1) {
         CTexAnimStorage* texAnim =
             reinterpret_cast<CTexAnimStorage*>(__vc__21CPtrArray_P8CTexAnim_FUl(&self->texAnims, texAnimIndex));
-        unsigned int seqIndex;
-        unsigned int seqCount;
-
         for (seqIndex = 0;
-             ((seqCount = static_cast<unsigned int>(GetSize__25CPtrArray_P11CTexAnimSeq_Fv(Ptr(texAnim->refData, 0x110)))),
-              seqIndex < seqCount);
+             seqIndex < static_cast<unsigned int>(GetSize__25CPtrArray_P11CTexAnimSeq_Fv(Ptr(texAnim->refData, 0x110)));
              seqIndex = seqIndex + 1) {
             CTexAnimSeqStorage* seq =
                 reinterpret_cast<CTexAnimSeqStorage*>(__vc__25CPtrArray_P11CTexAnimSeq_FUl(Ptr(texAnim->refData, 0x110), seqIndex));

@@ -629,7 +629,7 @@ group_ready:
 void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor)
 {
     PBreathModel* params = reinterpret_cast<PBreathModel*>(pBreathModel);
-    bool found;
+    int found;
     int spawnCount;
     int i;
     int j;
@@ -660,16 +660,20 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
         *emitFrameCounter = *emitFrameCounter + 1;
 
         for (i = 0; i < maxParticleCount; i++) {
-            if (*(short*)(particleData + 0x50) >= 1) {
+            if (*(short*)(particleData + 0x50) > 0) {
                 UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP6VColorP14PARTICLE_COLOR(
                     vBreathModel, pBreathModel, (PARTICLE_DATA*)particleData, vColor, (PARTICLE_COLOR*)particleColor);
             } else {
                 float zero = kPppBreathModelZero;
 
                 groupTableWork = (int)vBreathModel->m_groups;
-                for (foundGroup = 0; foundGroup < (int)params->m_groupCount; foundGroup++) {
-                    for (foundSlot = 0; foundSlot < (int)params->m_slotCount; foundSlot++) {
-                        if ((int)(short)i == (int)*(signed char*)(*(int*)(groupTableWork + 4) + (int)foundSlot)) {
+                foundGroup = -1;
+                foundSlot = -1;
+                for (short groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
+                    for (short slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
+                        if ((int)(short)i == (int)*(signed char*)(*(int*)(groupTableWork + 4) + (int)slotIndex)) {
+                            foundGroup = groupIndex;
+                            foundSlot = slotIndex;
                             found = true;
                             goto found_index;
                         }
@@ -677,8 +681,6 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                     groupTableWork += 0x5C;
                 }
                 found = false;
-                foundSlot = -1;
-                foundGroup = -1;
 
             found_index:
                 if (found) {
@@ -687,19 +689,15 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
 
                 if ((int)foundGroup != -1) {
                     int slot;
-                    unsigned int slotCount;
 
                     slot = 0;
                     group = (int)vBreathModel->m_groups + (int)foundGroup * 0x5C;
-                    slotCount = params->m_slotCount;
-                    while (slotCount != 0) {
+                    for (slot = 0; slot < (int)params->m_slotCount; slot++) {
                         if ((*(signed char*)(*(int*)(group + 4) + slot) != -1) ||
                             (*(signed char*)(*(int*)(group + 8) + slot) != 1)) {
                             found = false;
                             goto group_checked;
                         }
-                        slot++;
-                        slotCount--;
                     }
                     found = true;
 
@@ -708,12 +706,12 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                         groupData = &groupTable[(int)foundGroup];
                         for (slot = 0; slot < (int)params->m_slotCount; slot++) {
                             groupData->particleStates[slot] = -1;
-                            groupData->position.x = zero;
-                            groupData->position.y = zero;
                             groupData->position.z = zero;
-                            groupData->direction.x = zero;
-                            groupData->direction.y = zero;
+                            groupData->position.y = zero;
+                            groupData->position.x = zero;
                             groupData->direction.z = zero;
+                            groupData->direction.y = zero;
+                            groupData->direction.x = zero;
                             groupData->speed = zero;
                         }
                         groupData->active = 0;
@@ -767,9 +765,9 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 unitVelocity.z = FLOAT_80330F80;
                 groupData->speed = params->m_groupSpeed;
                 pppCopyVector(groupData->direction, unitVelocity);
-                groupData->position.x = kPppBreathModelZero;
-                groupData->position.y = kPppBreathModelZero;
                 groupData->position.z = kPppBreathModelZero;
+                groupData->position.y = kPppBreathModelZero;
+                groupData->position.x = kPppBreathModelZero;
                 PSMTXCopy(*(Mtx*)pppMngStPtr, groupData->matrix);
                 groupData->active = 1;
             }
@@ -960,9 +958,9 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
 
     if (params->m_rotationFlags != 0) {
         if (params->m_rotationFlags & 0x20) {
-            particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
-            particle->m_rotationAccelY = particle->m_rotationAccelX;
-            particle->m_rotationAccelZ = particle->m_rotationAccelX;
+            particle->m_rotationAccelZ = params->m_rotationRandomX * Math.RandF();
+            particle->m_rotationAccelY = particle->m_rotationAccelZ;
+            particle->m_rotationAccelX = particle->m_rotationAccelZ;
             if ((params->m_rotationFlags & 1) && (params->m_rotationFlags & 2)) {
                 if (DOUBLE_80330F98 < Math.RandF()) {
                     particle->m_rotationAccelX *= FLOAT_80330F80;
@@ -1009,7 +1007,9 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
 
     particle->m_scale = params->m_groupSpeed;
     if (params->m_scaleRandomRange != kPppBreathModelZero) {
-        particle->m_scale += (FLOAT_80330FA0 * params->m_scaleRandomRange) * Math.RandF() - params->m_scaleRandomRange;
+        float rand = Math.RandF();
+        float scaledRange = FLOAT_80330FA0 * params->m_scaleRandomRange;
+        particle->m_scale += scaledRange * rand - params->m_scaleRandomRange;
     }
 
     if (params->m_particleLifetime == 0) {

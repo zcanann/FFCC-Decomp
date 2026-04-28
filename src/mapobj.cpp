@@ -300,17 +300,26 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         CHUNK_GEOM = 0x47454F4D,
         CHUNK_ID = 0x49442020,
         CHUNK_LTST = 0x4C545354,
+        CHUNK_LDAT = 0x4C444154,
         CHUNK_MIME = 0x4D494D45,
         CHUNK_MSID = 0x4D534944,
         CHUNK_PIDX = 0x50494458,
+        CHUNK_PLIT = 0x504C4954,
         CHUNK_PSTA = 0x50535441,
         CHUNK_PRIO = 0x5052494F,
         CHUNK_SDST = 0x53445354,
+        CHUNK_SLIT = 0x534C4954,
         CHUNK_TFRM = 0x5446524D,
         CHUNK_TRNS = 0x54524E53,
+        CHUNK_CFRM = 0x4346524D,
+        CHUNK_CJUN = 0x434A554E,
+        CHUNK_CKEY = 0x434B4559,
         CHUNK_FRAM = 0x4652414D,
         CHUNK_JUN = 0x4A554E20,
         CHUNK_KEY = 0x4B455920,
+        CHUNK_MFRM = 0x4D46524D,
+        CHUNK_MJUN = 0x4D4A554E,
+        CHUNK_MKEY = 0x4D4B4559,
         CHUNK_VTX = 0x56545820,
         CHUNK_VTXL = 0x5654584C,
     };
@@ -526,6 +535,149 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             chunkFile.PopChunk();
             PtrAt(this, 0xEC) = mime;
+        } else if (chunk.m_id == CHUNK_PLIT) {
+            unsigned char* pointLight = reinterpret_cast<unsigned char*>(
+                __nw__FUlPQ27CMemory6CStagePci(0xF4, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0xD4));
+
+            if (pointLight != 0) {
+                reinterpret_cast<CMapObjAtrPointLight*>(pointLight)->CMapObjAtrPointLight::CMapObjAtrPointLight();
+            }
+
+            if (chunk.m_version == 2) {
+                chunkFile.PushChunk();
+                CChunkFile::CChunk lightChunk;
+                while (chunkFile.GetNextChunk(lightChunk) != 0) {
+                    if (lightChunk.m_id == CHUNK_LDAT) {
+                        *reinterpret_cast<float*>(pointLight + 0x10) = chunkFile.GetF4();
+                        *reinterpret_cast<float*>(pointLight + 0x14) = chunkFile.GetF4();
+                        *(pointLight + 0x1C) = chunkFile.Get1();
+                        *(pointLight + 0x1F) = chunkFile.Get1();
+                        *(pointLight + 0x20) = chunkFile.Get1();
+                        chunkFile.Get1();
+
+                        *(pointLight + 0x1D) = chunkFile.Get1();
+                        unsigned char* color = pointLight + 0x24;
+                        for (int i = 0; i < static_cast<int>(*(pointLight + 0x1D)); i++) {
+                            color[0] = chunkFile.Get1();
+                            color[1] = chunkFile.Get1();
+                            color[2] = chunkFile.Get1();
+                            color[3] = chunkFile.Get1();
+                            color += 4;
+                        }
+
+                        *(pointLight + 0x1E) = chunkFile.Get1();
+                        color = pointLight + 0x64;
+                        for (int i = 0; i < static_cast<int>(*(pointLight + 0x1E)); i++) {
+                            color[0] = chunkFile.Get1();
+                            color[1] = chunkFile.Get1();
+                            color[2] = chunkFile.Get1();
+                            color[3] = chunkFile.Get1();
+                            color += 4;
+                        }
+
+                        *reinterpret_cast<unsigned int*>(pointLight + 0x8) = *reinterpret_cast<unsigned int*>(pointLight + 0x24);
+                        *reinterpret_cast<unsigned int*>(pointLight + 0xC) = *reinterpret_cast<unsigned int*>(pointLight + 0x64);
+                    } else if (lightChunk.m_id == CHUNK_CFRM) {
+                        ReadFrame__12CMapKeyFrameFR10CChunkFilei(reinterpret_cast<CMapKeyFrame*>(pointLight + 0xCC), &chunkFile);
+                    } else if (lightChunk.m_id == CHUNK_CJUN) {
+                        ReadJun__12CMapKeyFrameFR10CChunkFilei(
+                            reinterpret_cast<CMapKeyFrame*>(pointLight + 0xCC), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                    } else if (lightChunk.m_id == CHUNK_CKEY) {
+                        ReadKey__12CMapKeyFrameFR10CChunkFilei(
+                            reinterpret_cast<CMapKeyFrame*>(pointLight + 0xCC), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                    } else if (lightChunk.m_id == CHUNK_MFRM) {
+                        ReadFrame__12CMapKeyFrameFR10CChunkFilei(reinterpret_cast<CMapKeyFrame*>(pointLight + 0xA4), &chunkFile);
+                    } else if (lightChunk.m_id == CHUNK_MJUN) {
+                        ReadJun__12CMapKeyFrameFR10CChunkFilei(
+                            reinterpret_cast<CMapKeyFrame*>(pointLight + 0xA4), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                    } else if (lightChunk.m_id == CHUNK_MKEY) {
+                        ReadKey__12CMapKeyFrameFR10CChunkFilei(
+                            reinterpret_cast<CMapKeyFrame*>(pointLight + 0xA4), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                    }
+                }
+                chunkFile.PopChunk();
+            }
+            PtrAt(this, 0xEC) = pointLight;
+        } else if (chunk.m_id == CHUNK_SLIT) {
+            unsigned char* spotLight = reinterpret_cast<unsigned char*>(
+                __nw__FUlPQ27CMemory6CStagePci(0x110, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x139));
+
+            if (spotLight != 0) {
+                reinterpret_cast<CMapObjAtrSpotLight*>(spotLight)->CMapObjAtrSpotLight::CMapObjAtrSpotLight();
+            }
+
+            if (chunk.m_version == 6) {
+                chunkFile.PushChunk();
+                CChunkFile::CChunk lightChunk;
+                while (chunkFile.GetNextChunk(lightChunk) != 0) {
+                    if (lightChunk.m_id == CHUNK_LDAT) {
+                        spotLight[0x34] = chunkFile.Get1();
+                        spotLight[0x35] = chunkFile.Get1();
+                        spotLight[0x36] = chunkFile.Get1();
+                        spotLight[0x37] = chunkFile.Get1();
+                        *reinterpret_cast<float*>(spotLight + 0x14) = chunkFile.GetF4();
+                        *reinterpret_cast<float*>(spotLight + 0x18) = chunkFile.GetF4();
+                        *reinterpret_cast<float*>(spotLight + 0x1C) = chunkFile.GetF4();
+                        *reinterpret_cast<float*>(spotLight + 0x20) = chunkFile.GetF4();
+                        chunkFile.GetF4();
+                        *reinterpret_cast<float*>(spotLight + 0x24) = chunkFile.GetF4();
+                        unsigned short targetIndex = chunkFile.Get2();
+                        *reinterpret_cast<CMapObj**>(spotLight + 0x10) = MapObjArrayStart() + targetIndex;
+                        spotLight[0x2C] = chunkFile.Get1();
+                        spotLight[0x2D] = chunkFile.Get1();
+                        *reinterpret_cast<float*>(spotLight + 0x28) = chunkFile.GetF4();
+                        spotLight[0x2E] = chunkFile.Get1();
+                        spotLight[0x2F] = chunkFile.Get1();
+                        spotLight[0x30] = chunkFile.Get1();
+                        chunkFile.Get1();
+                        chunkFile.Get4();
+                        chunkFile.Get4();
+                        chunkFile.Get4();
+                        chunkFile.Get4();
+
+                        spotLight[0x3C] = chunkFile.Get1();
+                        unsigned char* color = spotLight + 0x40;
+                        for (int i = 0; i < static_cast<int>(spotLight[0x3C]); i++) {
+                            color[0] = chunkFile.Get1();
+                            color[1] = chunkFile.Get1();
+                            color[2] = chunkFile.Get1();
+                            color[3] = chunkFile.Get1();
+                            color += 4;
+                        }
+
+                        spotLight[0x3D] = chunkFile.Get1();
+                        color = spotLight + 0x80;
+                        for (int i = 0; i < static_cast<int>(spotLight[0x3D]); i++) {
+                            color[0] = chunkFile.Get1();
+                            color[1] = chunkFile.Get1();
+                            color[2] = chunkFile.Get1();
+                            color[3] = chunkFile.Get1();
+                            color += 4;
+                        }
+
+                        *reinterpret_cast<unsigned int*>(spotLight + 0x8) = *reinterpret_cast<unsigned int*>(spotLight + 0x40);
+                        *reinterpret_cast<unsigned int*>(spotLight + 0xC) = *reinterpret_cast<unsigned int*>(spotLight + 0x80);
+                    } else if (lightChunk.m_id == CHUNK_CFRM) {
+                        ReadFrame__12CMapKeyFrameFR10CChunkFilei(reinterpret_cast<CMapKeyFrame*>(spotLight + 0xE8), &chunkFile);
+                    } else if (lightChunk.m_id == CHUNK_CJUN) {
+                        ReadJun__12CMapKeyFrameFR10CChunkFilei(
+                            reinterpret_cast<CMapKeyFrame*>(spotLight + 0xE8), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                    } else if (lightChunk.m_id == CHUNK_CKEY) {
+                        ReadKey__12CMapKeyFrameFR10CChunkFilei(
+                            reinterpret_cast<CMapKeyFrame*>(spotLight + 0xE8), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                    } else if (lightChunk.m_id == CHUNK_MFRM) {
+                        ReadFrame__12CMapKeyFrameFR10CChunkFilei(reinterpret_cast<CMapKeyFrame*>(spotLight + 0xC0), &chunkFile);
+                    } else if (lightChunk.m_id == CHUNK_MJUN) {
+                        ReadJun__12CMapKeyFrameFR10CChunkFilei(
+                            reinterpret_cast<CMapKeyFrame*>(spotLight + 0xC0), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                    } else if (lightChunk.m_id == CHUNK_MKEY) {
+                        ReadKey__12CMapKeyFrameFR10CChunkFilei(
+                            reinterpret_cast<CMapKeyFrame*>(spotLight + 0xC0), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                    }
+                }
+                chunkFile.PopChunk();
+            }
+            PtrAt(this, 0xEC) = spotLight;
         } else if (chunk.m_id == CHUNK_PSTA) {
             CMapObjAtrPlaySta* playSta = reinterpret_cast<CMapObjAtrPlaySta*>(
                 __nw__FUlPQ27CMemory6CStagePci(0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x39B));
@@ -965,7 +1117,7 @@ void CMapObj::Calc()
     int attr = S32At(this, 0xEC);
     if (attr != 0) {
         int attrType = *reinterpret_cast<int*>(attr + 4);
-        if (attrType == CMapObjAtr::POINT_LIGHT) {
+        if (attrType == CMapObjAtr::SPOT_LIGHT) {
             _GXColor& colorCurrent = *reinterpret_cast<_GXColor*>(attr + 8);
             _GXColor* colorTable = reinterpret_cast<_GXColor*>(attr + 0x40);
 
@@ -975,7 +1127,7 @@ void CMapObj::Calc()
             }
 
             calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xE8), colorCurrent, colorTable);
-        } else if (attrType == CMapObjAtr::SPOT_LIGHT) {
+        } else if (attrType == CMapObjAtr::POINT_LIGHT) {
                 _GXColor& colorCurrent = *reinterpret_cast<_GXColor*>(attr + 8);
                 _GXColor* colorTable = reinterpret_cast<_GXColor*>(attr + 0x24);
 

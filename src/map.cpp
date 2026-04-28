@@ -1830,7 +1830,7 @@ void CMapMng::SetLightSource()
         if (atr != 0) {
             const int type = *reinterpret_cast<int*>(atr + 4);
 
-            if (type == CMapObjAtr::POINT_LIGHT) {
+            if (type == CMapObjAtr::SPOT_LIGHT) {
                 if (*reinterpret_cast<int*>(atr + 0x34) == 0) {
                     CLightPcs::CLight light;
                     light.m_type = 1;
@@ -1895,7 +1895,7 @@ void CMapMng::SetLightSource()
                     PSVECNormalize(reinterpret_cast<Vec*>(&light->m_direction), reinterpret_cast<Vec*>(&light->m_direction));
                 }
                 mapLightIndex += 1;
-            } else if (type == CMapObjAtr::SPOT_LIGHT) {
+            } else if (type == CMapObjAtr::POINT_LIGHT) {
                 CLightPcs::CLight light;
                 light.m_type = 0;
                 light.m_position.x = *reinterpret_cast<float*>(mapObj + 0xC4);
@@ -2452,7 +2452,7 @@ void CMapMng::ReadOtm(char* mapName)
         if (atr == 0) {
             continue;
         }
-        if (*reinterpret_cast<int*>(atr + 4) != CMapObjAtr::POINT_LIGHT || *reinterpret_cast<int*>(atr + 0x34) == 0) {
+        if (*reinterpret_cast<int*>(atr + 4) != CMapObjAtr::SPOT_LIGHT || *reinterpret_cast<int*>(atr + 0x34) == 0) {
             continue;
         }
 
@@ -3490,7 +3490,7 @@ found:
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this) + (objIndex * 0xF0) + 0x954;
     unsigned char* mapObjLight = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
 
-    if (*reinterpret_cast<int*>(mapObjLight + 4) == CMapObjAtr::POINT_LIGHT) {
+    if (*reinterpret_cast<int*>(mapObjLight + 4) == CMapObjAtr::SPOT_LIGHT) {
         const unsigned char* colorBytes = reinterpret_cast<const unsigned char*>(&packedColor);
         *reinterpret_cast<unsigned char*>(mapObjLight + 8) = colorBytes[0];
         *reinterpret_cast<unsigned char*>(mapObjLight + 9) = colorBytes[1];

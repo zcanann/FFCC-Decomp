@@ -2630,9 +2630,9 @@ RedSound/RedSound.cpp:
 	.text       start:0x801CCA34 end:0x801CD8F4
 	.ctors      start:0x801D5450 end:0x801D5454
 	.rodata     start:0x801E7FE8 end:0x801E8110
-	.bss        start:0x8032E170 end:0x8032E280
+	.bss        start:0x8032E170 end:0x8032E27C
 	.sbss       start:0x8032F4C0 end:0x8032F4CC
-	.sdata2     start:0x80333D98 end:0x80333DB0
+	.sdata2     start:0x80333D98 end:0x80333DAD
 
 thp/THPDec.c:
 	.text       start:0x801CD8F4 end:0x801D4E5C

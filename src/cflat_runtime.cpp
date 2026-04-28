@@ -52,12 +52,12 @@ CFlatRuntime::CFlatRuntime()
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
 
 	*reinterpret_cast<void***>(self) = __vt__12CFlatRuntime;
-	*reinterpret_cast<void***>(self + 0x1204) = __vt__Q212CFlatRuntime7CObject;
-	self[0x123C] &= 0xEF;
-	*reinterpret_cast<void***>(self + 0x124C) = __vt__Q212CFlatRuntime7CObject;
-	self[0x1284] &= 0xEF;
-	self[0x1294] = 0;
-	self[0x1298] = 1;
+	*reinterpret_cast<void***>(self + 0x914) = __vt__Q212CFlatRuntime7CObject;
+	self[0x904] &= 0xEF;
+	*reinterpret_cast<void***>(self + 0x960) = __vt__Q212CFlatRuntime7CObject;
+	self[0x950] &= 0xEF;
+	*reinterpret_cast<int*>(self + 0x970) = 0;
+	*reinterpret_cast<int*>(self + 0x1298) = 1;
 
 	clear();
 }

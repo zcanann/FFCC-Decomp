@@ -24,8 +24,6 @@
 
 class CFont;
 
-extern "C" void reset__6CAStarFv(void*);
-extern "C" void drawAStar__6CAStarFv(void*);
 extern "C" void StaticFrame__10CGCharaObjFv();
 extern "C" void CheckGameOver__10CGPartyObjFv();
 extern "C" void DrawDebug__8CGObjectFP5CFont(CGObject*, CFont*);
@@ -1124,7 +1122,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 	GXClearVtxDesc();
 	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-	drawAStar__6CAStarFv(DbgMenuPcsRaw() + 0x2A5C);
+	AStar.drawAStar();
 
 	CFlatRuntime::CObject* const root =
 		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
@@ -2794,7 +2792,7 @@ void CFlatRuntime2::resetChangeScript()
 	*reinterpret_cast<u32*>(PadRaw() + 0x1C8) = 1;
 	*reinterpret_cast<u32*>(GraphicsPcsRaw() + 0x44) = 0;
 	*reinterpret_cast<u32*>(CameraPcsRaw() + 0x434) = 1;
-	reset__6CAStarFv(DbgMenuPcsRaw() + 0x2A5C);
+	AStar.reset();
 }
 
 /*

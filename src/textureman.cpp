@@ -976,6 +976,7 @@ void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
     if (static_cast<unsigned int>(m_format) == 9) {
         numEntries = 0x100;
     }
+    GXTlutObj* tlutObj = &m_tlutObj1;
     offset = 0x10;
     if (static_cast<unsigned int>(m_format) == 9) {
         offset = 0x100;

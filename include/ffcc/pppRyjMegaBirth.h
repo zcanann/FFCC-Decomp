@@ -16,7 +16,7 @@ struct VRyjMegaBirth
     _PARTICLE_COLOR* m_colorBlock;
     s32 m_numParticles;
     u16 m_emitTimer;
-    u16 m_unused4E;
+    u16 m_meshEmitIndex;
 };
 
 struct PRyjMegaBirthOffsets

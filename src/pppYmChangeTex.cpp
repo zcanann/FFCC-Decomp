@@ -74,7 +74,9 @@ struct ChangeTexModelRaw {
 	u8 _padB0[0x34];
 	pppYmChangeTexState* m_state;
 	pppYmChangeTexStep* m_step;
-	u8 _padEC[0x10];
+	u8 _padEC[0x8];
+	void* m_beforeDrawCallback;
+	u8 _padF8[0x4];
 	void (*m_drawMeshDlCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 	u8 _pad100[0x4];
 	void (*m_afterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
@@ -93,6 +95,7 @@ STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_data) == 0xA4);
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_meshes) == 0xAC);
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_state) == 0xE4);
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_step) == 0xE8);
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_beforeDrawCallback) == 0xF4);
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_drawMeshDlCallback) == 0xFC);
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_afterDrawMeshCallback) == 0x104);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
@@ -318,40 +321,40 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 0);
 	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 1);
 	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 2);
-	u32 model = 0;
+	ChangeTexModelRaw* model = 0;
 
 	if (handle0 != 0) {
-		model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
-		*(void**)(model + 0xe4) = 0;
-		*(void**)(model + 0xe8) = 0;
-		*(void**)(model + 0xf4) = 0;
-		*(void**)(model + 0xfc) = 0;
-		*(void**)(model + 0x104) = 0;
+		model = (ChangeTexModelRaw*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
+		model->m_state = 0;
+		model->m_step = 0;
+		model->m_beforeDrawCallback = 0;
+		model->m_drawMeshDlCallback = 0;
+		model->m_afterDrawMeshCallback = 0;
 	}
-	u32 model1;
-	if ((handle1 != 0) && ((model1 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1)), model1 != 0)) {
-		*(void**)(model1 + 0xe4) = 0;
-		*(void**)(model1 + 0xe8) = 0;
-		*(void**)(model1 + 0xf4) = 0;
-		*(void**)(model1 + 0xfc) = 0;
-		*(void**)(model1 + 0x104) = 0;
+	ChangeTexModelRaw* model1;
+	if ((handle1 != 0) && ((model1 = (ChangeTexModelRaw*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1)), model1 != 0)) {
+		model1->m_state = 0;
+		model1->m_step = 0;
+		model1->m_beforeDrawCallback = 0;
+		model1->m_drawMeshDlCallback = 0;
+		model1->m_afterDrawMeshCallback = 0;
 	}
-	u32 model2;
-	if ((handle2 != 0) && ((model2 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2)), model2 != 0)) {
-		*(void**)(model2 + 0xe4) = 0;
-		*(void**)(model2 + 0xe8) = 0;
-		*(void**)(model2 + 0xf4) = 0;
-		*(void**)(model2 + 0xfc) = 0;
-		*(void**)(model2 + 0x104) = 0;
+	ChangeTexModelRaw* model2;
+	if ((handle2 != 0) && ((model2 = (ChangeTexModelRaw*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2)), model2 != 0)) {
+		model2->m_state = 0;
+		model2->m_step = 0;
+		model2->m_beforeDrawCallback = 0;
+		model2->m_drawMeshDlCallback = 0;
+		model2->m_afterDrawMeshCallback = 0;
 	}
 
 	void** stageArray = (void**)state->m_displayListArrays;
 	void** meshArray;
 	if ((stageArray != 0) && ((meshArray = (void**)state->m_meshColorArrays), meshArray != 0)) {
-		int meshList = *(int*)(model + 0xac);
+		int meshList = (int)model->m_meshes;
 		void** curStageArray = stageArray;
 		void** curMeshArray = meshArray;
-		for (unsigned int i = 0; i < *(unsigned int*)(*(int*)(model + 0xA4) + 0xC); i++) {
+		for (unsigned int i = 0; i < model->m_data->m_meshCount; i++) {
 			int meshData = *(int*)(meshList + 8);
 			void** dlEntries = (void**)*curStageArray;
 			for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {

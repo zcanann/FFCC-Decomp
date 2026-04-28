@@ -89,20 +89,28 @@ struct pppScreenBreakUnkC {
 
 extern float FLOAT_80331cc0;
 extern float FLOAT_80331cc4;
+extern float FLOAT_80331cc8;
+extern float FLOAT_80331ccc;
 extern float FLOAT_80331cd0;
+extern float FLOAT_80331cd4;
+extern float FLOAT_80331cd8;
 extern float FLOAT_80331ce8;
 extern float FLOAT_80331cec;
 extern float FLOAT_80331cf0;
-static const float kPppScreenBreakDoubleScale = 2.0f;
-static const float kPppScreenBreakZero = 0.0f;
-static const float kPppScreenBreakRandRange = 0.3f;
-static const float kPppScreenBreakVelocityScale = -0.5f;
-static const float kPppScreenBreakOne = 1.0f;
-static const float kPppScreenBreakNegOne = -1.0f;
-static const float kPppScreenBreakDegreesToRadians = 0.017453292f;
-static const float kPppScreenBreakCameraOffset = 30.0f;
-static const float kPppScreenBreakLightAttn = 4.0f;
-static const float kPppScreenBreakLightBias = -3.0f;
+
+extern const char lbl_80331C54[] = "PAUSE";
+extern const char lbl_80331C5C[] = "BATTLE";
+extern const char lbl_80331C64[] = "ANALOG";
+extern const char lbl_80331C6C[] = "A*";
+extern const char lbl_80331C70[] = "PRINTF";
+extern const char lbl_80331C78[] = "SHADOW";
+extern const char lbl_80331C80[] = "CHARA";
+extern const u32 DAT_80331C88 = 0x00000080;
+extern const u32 DAT_80331C8C = 0xFFFFFFFF;
+extern const char s_Debug_80331c90[] = "Debug";
+extern const float FLOAT_80331C98 = 0.0f;
+extern const double DOUBLE_80331CA0 = 4503601774854144.0;
+
 static const Vec DAT_801dd4b0 = { 0.0f, 1.0f, 0.0f };
 static const char s_f999_root_801dd4c8[] = "f999_root";
 static const char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
@@ -412,13 +420,13 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     Vec* inVec;
     s32 iVar16;
     float dVar17;
-    const float dVar18 = -kPppScreenBreakRandRange;
-    const float dVar19 = kPppScreenBreakRandRange;
-    const float dVar20 = kPppScreenBreakOne;
-    const float dVar21 = kPppScreenBreakNegOne;
-    const float dVar22 = kPppScreenBreakZero;
-    const float dVar24 = kPppScreenBreakDoubleScale;
-    const float dVar25 = kPppScreenBreakDegreesToRadians;
+    const float dVar18 = -FLOAT_80331cc8;
+    const float dVar19 = FLOAT_80331cc8;
+    const float dVar20 = FLOAT_80331cd0;
+    const float dVar21 = FLOAT_80331cd4;
+    const float dVar22 = FLOAT_80331cc4;
+    const float dVar24 = FLOAT_80331cc0;
+    const float dVar25 = FLOAT_80331cd8;
     S16Vec local_e8;
     S16Vec local_e0;
     S16Vec local_d8;
@@ -519,14 +527,14 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         local_e0.y = local_d8.y;
         local_d8.z = local_e0.z;
         ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, local_e0, *(u32*)(modelData + 0x34));
-        PSVECScale(inVec + 3, inVec + 3, kPppScreenBreakVelocityScale);
+        PSVECScale(inVec + 3, inVec + 3, FLOAT_80331ccc);
 
         dVar17 = inVec[3].x;
         if (dVar19 < dVar17) {
-            dVar17 = Math.RandF(kPppScreenBreakRandRange);
+            dVar17 = Math.RandF(FLOAT_80331cc8);
         }
         if (inVec[3].x < dVar18) {
-            dVar17 = -Math.RandF(kPppScreenBreakRandRange);
+            dVar17 = -Math.RandF(FLOAT_80331cc8);
         }
 
         inVec->x = dVar17;

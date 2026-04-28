@@ -45,20 +45,20 @@ static const char lbl_80331C3C[] = "MUTEKI";
 static const char lbl_80331C44[] = "FOLLOW";
 static const char s_DISPPRINT_801DD434[] = "DISPPRINT";
 static const char lbl_80331C4C[] = "COMBO";
-static const char lbl_80331C54[] = "PAUSE";
-static const char lbl_80331C5C[] = "BATTLE";
-static const char lbl_80331C64[] = "ANALOG";
+extern const char lbl_80331C54[];
+extern const char lbl_80331C5C[];
+extern const char lbl_80331C64[];
 static const char s_COLCHECK_801DD440[] = "COLCHECK";
-static const char lbl_80331C6C[] = "A*";
+extern const char lbl_80331C6C[];
 static const char s_PARTICLE_801DD44C[] = "PARTICLE";
-static const char lbl_80331C70[] = "PRINTF";
+extern const char lbl_80331C70[];
 static const char s_SOUND_INFO_801DD458[] = "SOUND INFO";
-static const char lbl_80331C78[] = "SHADOW";
+extern const char lbl_80331C78[];
 static const char s_PART_HEAP_801DD464[] = "PART HEAP";
 static const char s_CHARA_INFO_801DD470[] = "CHARA INFO";
 static const char s_ITEM_WEAPON_801DD47C[] = "ITEM WEAPON";
 static const char s_SMITH_MASTER_801DD488[] = "SMITH MASTER";
-static const char lbl_80331C80[] = "CHARA";
+extern const char lbl_80331C80[];
 
 u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
 u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
@@ -68,7 +68,7 @@ u32 m_table__11CDbgMenuPcs[0x15C / sizeof(u32)] = {
     reinterpret_cast<u32>(const_cast<char*>(s_CDbgMenuPcs_801DD428)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x11, 0, 0, 0, 0, 0x4A, 1
 };
 
-const char s_Debug_80331c90[] = "Debug";
+extern const char s_Debug_80331c90[];
 
 DbgMenuDef PTR_DAT_80212524[] = {
     { lbl_80331C18, 100, 2, 1 },      { lbl_80331C20, 101, 2, 1 },      { lbl_80331C28, 102, 2, 1 },

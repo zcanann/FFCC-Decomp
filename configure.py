@@ -466,7 +466,7 @@ config.libs = [
         Object(NonMatching, "RedSound/RedExecute.cpp", cflags=redsound_unit_cflags("RedExecute")),
         Object(NonMatching, "RedSound/RedMemory.cpp", cflags=redsound_unit_cflags("RedMemory")),
         Object(NonMatching, "RedSound/RedMidiCtrl.cpp", cflags=redsound_unit_cflags("RedMidiCtrl")),
-        Object(NonMatching, "RedSound/RedSound.cpp", cflags=redsound_unit_cflags("RedSound")),
+        Object(Matching, "RedSound/RedSound.cpp", cflags=redsound_unit_cflags("RedSound")),
         Object(
             NonMatching,
             "RedSound/RedStream.cpp",

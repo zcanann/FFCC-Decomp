@@ -398,8 +398,7 @@ void CGItemObj::onFrameStat()
 	switch (stateId) {
 	case 0: {
 		int hasOwner = *(int*)(self + 0x550) != 0;
-		unsigned char stateFlags = self[0x50];
-		int isActive = (int)(((unsigned int)stateFlags << 0x1c) | ((unsigned int)stateFlags >> 4)) < 0;
+		int isActive = (self[0x50] & 8) != 0;
 
 		if (!hasOwner && isActive) {
 			double distance = (double)FLOAT_80331b20;
@@ -506,7 +505,7 @@ void CGItemObj::onFrameStat()
 
 		if (*(int*)(self + 0x554) <= *(int*)(self + 0x528)) {
 			int worldParamA = *(int*)(self + 0x500);
-			bool isActive = (int)((unsigned int)self[0x50] << 0x18) < 0;
+			bool isActive = (self[0x50] & 0x80) != 0;
 
 			if ((worldParamA == 1 || worldParamA == 2) && isActive) {
 				changeStat__8CGPrgObjFiii(this, 0x1F, 0, 0);
@@ -735,8 +734,7 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
 			 itemObj != 0;
 			 itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-			if (*(int*)(itemObj + 0x44) == 0 &&
-				(int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0 &&
+			if (*(int*)(itemObj + 0x44) == 0 && (itemObj[0x50] & 8) != 0 &&
 				(((int)(char)itemObj[0x53] & deleteMask) != 0) && *(int*)(itemObj + 0x48) < bestScriptObjectPos) {
 				bestScriptObjectPos = *(int*)(itemObj + 0x48);
 				bestItemObj = itemObj;
@@ -798,8 +796,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
 		     itemObj != 0;
 		     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-			unsigned char flags = itemObj[0x50];
-			int isActive = (int)(((unsigned int)flags << 28) | ((unsigned int)flags >> 4)) < 0;
+			int isActive = (itemObj[0x50] & 8) != 0;
 			int canDelete = (itemObj[0x53] & 1) != 0;
 			int scriptPos = *(int*)(itemObj + 0x48);
 
@@ -1316,10 +1313,8 @@ void CGItemObj::onNewFinished()
 void CGItemObj::DrawOmoideName(CFont* font)
 {
 	unsigned char* self = (unsigned char*)this;
-	unsigned char nodeFlags = *(unsigned char*)(self + 0x9A);
-	unsigned int rotatedFlags = ((unsigned int)nodeFlags << 26) | ((unsigned int)nodeFlags >> 6);
 
-	if ((int)rotatedFlags >= 0) {
+	if ((*(unsigned char*)(self + 0x9A) & 0x20) == 0) {
 		return;
 	}
 
@@ -1419,7 +1414,7 @@ void CGItemObj::DeleteAllFieldItem()
 	     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
 		void* owner = *(void**)(itemObj + 0x550);
 
-		if (owner == 0 && (signed char)(itemObj[0x50] << 4) < 0) {
+		if (owner == 0 && (itemObj[0x50] & 8) != 0) {
 			itemObj[0x38] |= 0x80;
 		}
 	}
@@ -1440,7 +1435,7 @@ void CGItemObj::DispAllFieldItem(int show)
 	     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
 		void* owner = *(void**)(itemObj + 0x550);
 
-		if (owner == 0 && (signed char)(itemObj[0x50] << 4) < 0) {
+		if (owner == 0 && (itemObj[0x50] & 8) != 0) {
 			if (show != 0) {
 				*(unsigned int*)(itemObj + 0x60) &= 0xffbfffff;
 			} else {

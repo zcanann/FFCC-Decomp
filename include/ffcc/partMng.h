@@ -113,11 +113,22 @@ struct _PARTICLE_DATA
 };
 typedef _PARTICLE_DATA PARTICLE_DATA;
 
+// The fixed 0x34-byte prefix that wrapper types embed by value when they
+// continue with their own fields after it. The full _pppPObject (used as
+// the callback parameter type) extends this with a per-instance work-area
+// block at offset 0x80.
+struct _pppPObjectHead
+{
+    s32 m_graphId;              // 0x0
+    pppFMATRIX m_localMatrix;   // 0x4 (size 0x30)
+};
+
 struct _pppPObject
 {
     s32 m_graphId;              // 0x0
     pppFMATRIX m_localMatrix;   // 0x4 (size 0x30)
-    // Additional members may exist
+    char m_pad34[0x80 - 0x34];  // 0x34
+    u8 m_workArea[1];           // 0x80 - per-instance work block, indexed by _pppCtrlTable::m_serializedDataOffsets[N]
 };
 
 struct _pppPObjLink;

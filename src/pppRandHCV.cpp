@@ -29,7 +29,7 @@ typedef struct RandHCVParams {
 
 extern "C" {
 
-void pppRandHCV(void* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
+void pppRandHCV(_pppPObject* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     s16* target;
@@ -47,12 +47,12 @@ void pppRandHCV(void* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
             value *= kPppRandHCVSingleSampleScale;
         }
 
-        randomValue = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        randomValue = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *randomValue = value;
     } else if (in->field0 != *(s32*)(base + 0xC)) {
         return;
     } else {
-        randomValue = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        randomValue = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     target = (in->field4 == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->field4 + 0x80);

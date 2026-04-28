@@ -2,6 +2,8 @@
 #define _FFCC_PPPCOLOR_H_
 
 
+
+struct _pppPObject;
 struct _pppCtrlTable;
 struct _pppColor
 {
@@ -30,8 +32,8 @@ extern const double kPppColorScale;
 extern "C" {
 #endif
 
-void pppColor(void* param1, void* param2, struct _pppCtrlTable* param3);
-void pppColorCon(void* param1, struct _pppCtrlTable* param2);
+void pppColor(struct _pppPObject* param1, void* param2, struct _pppCtrlTable* param3);
+void pppColorCon(struct _pppPObject* param1, struct _pppCtrlTable* param2);
 
 #ifdef __cplusplus
 }

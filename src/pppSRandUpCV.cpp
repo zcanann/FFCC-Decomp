@@ -24,7 +24,7 @@ struct SRandUpCVParam {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandUpCV(void* basePtr, SRandUpCVParam* in, _pppCtrlTable* ctrl)
+void pppSRandUpCV(_pppPObject* basePtr, SRandUpCVParam* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
@@ -34,7 +34,7 @@ void pppSRandUpCV(void* basePtr, SRandUpCVParam* in, _pppCtrlTable* ctrl)
     f32* target;
 
     if (in->targetId == *(s32*)(base + 0xC)) {
-        target = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        target = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
 
         {
             u8 flag = in->randomTwice;
@@ -83,7 +83,7 @@ void pppSRandUpCV(void* basePtr, SRandUpCVParam* in, _pppCtrlTable* ctrl)
         if (in->targetId != *(s32*)(base + 0xC)) {
             return;
         }
-        target = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        target = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     s32 color_offset = in->sourceOffset;

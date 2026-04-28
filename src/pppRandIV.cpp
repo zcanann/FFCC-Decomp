@@ -31,7 +31,7 @@ inline int randint(int value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandIV(void* basePtr, PppRandIVParam2* in, _pppCtrlTable* ctrl)
+void pppRandIV(_pppPObject* basePtr, PppRandIVParam2* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     f32 value;
@@ -49,13 +49,13 @@ void pppRandIV(void* basePtr, PppRandIVParam2* in, _pppCtrlTable* ctrl)
             value *= kPppRandIVSingleSampleScale;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
         if (in->field0 != *(s32*)(base + 0xC)) {
             return;
         }
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     s32* target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);

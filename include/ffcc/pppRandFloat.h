@@ -1,6 +1,8 @@
 #ifndef _PPP_RANDFLOAT_H_
 #define _PPP_RANDFLOAT_H_
 
+
+struct _pppPObject;
 #include "dolphin/types.h"
 
 struct _pppCtrlTable;
@@ -10,7 +12,7 @@ struct RandFloatParam;
 extern "C" {
 #endif
 
-void pppRandFloat(void* basePtr, struct RandFloatParam* in, struct _pppCtrlTable* ctrl);
+void pppRandFloat(struct _pppPObject* basePtr, struct RandFloatParam* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

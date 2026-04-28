@@ -23,7 +23,7 @@ struct PppRandUpIntParam2 {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandUpInt(void* basePtr, PppRandUpIntParam2* in, _pppCtrlTable* ctrl)
+void pppRandUpInt(_pppPObject* basePtr, PppRandUpIntParam2* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
@@ -41,13 +41,13 @@ void pppRandUpInt(void* basePtr, PppRandUpIntParam2* in, _pppCtrlTable* ctrl)
             value = mixed * scale;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
         if (in->field0 != baseState) {
             return;
         }
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     s32* target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);

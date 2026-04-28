@@ -6,7 +6,7 @@
 struct pppKeShpTail2X
 {
     u8 _pad0[0xc];
-    _pppPObject pppPObject;
+    _pppPObjectHead pppPObject;
     pppFMATRIX field_0x40;
 };
 

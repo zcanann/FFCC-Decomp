@@ -26,7 +26,7 @@ struct PppRandDownFVParam2 {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandDownFV(void* basePtr, PppRandDownFVParam2* in, _pppCtrlTable* ctrl)
+void pppRandDownFV(_pppPObject* basePtr, PppRandDownFVParam2* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
@@ -44,14 +44,14 @@ void pppRandDownFV(void* basePtr, PppRandDownFVParam2* in, _pppCtrlTable* ctrl)
             value = randomValue * scale;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
         if (in->field0 != baseState) {
             return;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     s32 sourceOffset = in->field4;

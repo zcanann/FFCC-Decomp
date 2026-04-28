@@ -52,29 +52,6 @@ static inline unsigned char clamp_u8(float value)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void get_rand()
-{
-	(void)Math.RandF();
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void get_noise(unsigned char count)
-{
-	while (count != 0) {
-		(void)Math.RandF();
-		count--;
-	}
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80083070
  * PAL Size: 4468b
  * EN Address: TODO
@@ -216,16 +193,21 @@ void calc(
 		*f32_at(particlePayload, 0x2C) = *f32_at(particlePayload, 0x2C) + *f32_at(paramPayload, 0x98);
 	}
 
-	float angleWrap = FLOAT_80330458;
-	float angleMax = FLOAT_8033045c;
-	while (angleMax <= *f32_at(particlePayload, 0x28))
 	{
-		*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) - angleWrap;
+		float angleWrap = FLOAT_80330458;
+		float angleMax = FLOAT_8033045c;
+		while (angleMax <= *f32_at(particlePayload, 0x28))
+		{
+			*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) - angleWrap;
+		}
 	}
-	float angleMin = FLOAT_80330460;
-	while (*f32_at(particlePayload, 0x28) < angleMin)
 	{
-		*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + angleWrap;
+		float angleWrap = FLOAT_80330458;
+		float angleMin = FLOAT_80330460;
+		while (*f32_at(particlePayload, 0x28) < angleMin)
+		{
+			*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + angleWrap;
+		}
 	}
 
 	*f32_at(particlePayload, 0x34) = *f32_at(particlePayload, 0x34) + *f32_at(particlePayload, 0x3C);
@@ -254,11 +236,14 @@ void calc(
 				*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
 			}
 		}
-		else if ((*f32_at(paramPayload, 0xC0) < kPppRyjMegaBirthZero) &&
-		         (kPppRyjMegaBirthZero < *f32_at(paramPayload, 0xC4)) &&
-		         (kPppRyjMegaBirthZero < *f32_at(particlePayload, 0x4C)))
+		else
 		{
-			*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
+			float zero = kPppRyjMegaBirthZero;
+			if ((*f32_at(paramPayload, 0xC0) < zero) && (zero < *f32_at(paramPayload, 0xC4)) &&
+			    (zero < *f32_at(particlePayload, 0x4C)))
+			{
+				*f32_at(particlePayload, 0x4C) = zero;
+			}
 		}
 	}
 
@@ -495,7 +480,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
  * Address:	TODO
  * Size:	TODO
  */
-void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirth* params, VRyjMegaBirth* work)
+static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirth* params, VRyjMegaBirth* work)
 {
 	u8* payload = (u8*)params;
 
@@ -528,7 +513,7 @@ void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirth* params, V
  * Address:	TODO
  * Size:	TODO
  */
-void set_matrix(
+static inline void set_matrix(
 	_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirth* params, VRyjMegaBirth* work, _PARTICLE_DATA* particle,
 	_PARTICLE_WMAT* particleWorldMat)
 {

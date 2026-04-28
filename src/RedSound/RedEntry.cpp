@@ -552,34 +552,32 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
  */
 void CRedEntry::ClearWaveData(int waveNo)
 {
-	int historyNo;
 	int* historyBank;
-	int* entry = (int*)this;
 
 	if (waveNo < 0) {
 		if (waveNo == -1) {
-			for (historyBank = (int*)entry[0]; historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+			for (historyBank = (int*)*(int*)this; historyBank < (int*)(*(int*)this + 0x400); historyBank += 4) {
 				if (historyBank[0] >= 0) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveNo == -2) {
-			for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+			for (historyBank = (int*)(*(int*)this + 0x100); historyBank < (int*)(*(int*)this + 0x400); historyBank += 4) {
 				if (historyBank[0] >= 0) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveNo == -3) {
-			for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+			for (historyBank = (int*)(*(int*)this + 0x100); historyBank < (int*)(*(int*)this + 0x400); historyBank += 4) {
 				if ((historyBank[0] >= 0) && (0 < historyBank[1])) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		}
 	} else {
-		historyNo = SearchWaveSequence(waveNo);
-		if (historyNo >= 0) {
-			WaveDelete((RedHistoryBANK*)(entry[0] + historyNo * 0x10));
+		waveNo = SearchWaveSequence(waveNo);
+		if (waveNo >= 0) {
+			WaveDelete((RedHistoryBANK*)(*(int*)this + waveNo * 0x10));
 		}
 	}
 }

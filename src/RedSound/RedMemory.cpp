@@ -59,10 +59,10 @@ int RedNew(int param_1)
 
 	if (param_1 >= 1) {
 		if (m_MemoryBank != 0) {
-			address = m_DataBuffer;
-			if (address != 0) {
+			if (m_DataBuffer != 0) {
 				interrupts = OSDisableInterrupts();
 				alignedSize = (param_1 + 0x1F) & 0xFFFFFFE0;
+				address = m_DataBuffer;
 				slot = m_MemoryBank;
 
 				do {

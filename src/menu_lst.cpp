@@ -27,20 +27,21 @@ extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 
-extern double DOUBLE_803333E8;
-extern double DOUBLE_803333D8;
-extern float FLOAT_803333D0;
-extern float FLOAT_803333D4;
-extern float FLOAT_803333E0;
-extern float FLOAT_803333F4;
-extern float FLOAT_803333F8;
-extern float FLOAT_803333FC;
-extern float FLOAT_80333400;
-extern double DOUBLE_80333408;
-extern double DOUBLE_80333410;
-extern double DOUBLE_80333418;
-extern double DOUBLE_80333420;
-extern float FLOAT_803333F0;
+static const float FLOAT_803333D0 = 0.0f;
+static const float FLOAT_803333D4 = 255.0f;
+static const double DOUBLE_803333D8 = 20.0;
+static const float FLOAT_803333E0 = 40.0f;
+static const double DOUBLE_803333E8 = 0.5;
+static const float FLOAT_803333F0 = 1.0f;
+static const float FLOAT_803333F4 = 4.0f;
+static const float FLOAT_803333F8 = 320.0f;
+static const float FLOAT_803333FC = 0.5f;
+static const float FLOAT_80333400 = 352.0f;
+static const float FLOAT_80333404 = 3.0f;
+static const double DOUBLE_80333408 = 4503601774854144.0;
+static const double DOUBLE_80333410 = 1.0;
+static const double DOUBLE_80333418 = 0.0;
+static const double DOUBLE_80333420 = 216.0;
 
 extern "C" const float FLOAT_80333614 = 196.0f;
 extern "C" const float FLOAT_80333618 = 168.0f;
@@ -67,6 +68,11 @@ static const unsigned char gap_80333669[] = {0, 0, 0};
 extern "C" const char DAT_8033366c[] = " ";
 static const unsigned char gap_8033366e[] = {0, 0};
 extern "C" const char DAT_80333670[] = " %d";
+extern "C" const char lbl_80333674[] = " %+d";
+extern "C" const char lbl_8033367C[] = " %s";
+extern "C" const char lbl_80333680[] = "Empty.";
+extern "C" const char lbl_80333688[] = "Vuoto.";
+extern "C" const char lbl_80333690[] = "Vide";
 
 STATIC_ASSERT(offsetof(CMenuPcs, listFont) == 0x108);
 STATIC_ASSERT(offsetof(CMenuPcs, lstState) == 0x82C);
@@ -165,7 +171,7 @@ void CMenuPcs::MLstDraw()
 		font->GetWidth(text);
 
 		float textX = (float)(item->x + 0x28);
-		float textY = (float)(item->y + 3) - FLOAT_803333F4;
+		float textY = ((float)item->y + FLOAT_80333404) - FLOAT_803333F4;
 		if ((menuMode == 1) && (i == state->cursor)) {
 			textX = (float)(textX + DOUBLE_803333D8);
 		}

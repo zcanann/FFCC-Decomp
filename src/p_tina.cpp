@@ -524,8 +524,9 @@ unsigned int pppFreeMngStPrioForData()
 			}
 		}
 
-		pppMngStPrioData* candidateB = reinterpret_cast<pppMngStPrioData*>(partMngBase + 0x2B70);
-		partMngBase += 0x158;
+		char* nextPartMngBase = partMngBase + 0x158;
+		pppMngStPrioData* candidateB = reinterpret_cast<pppMngStPrioData*>(nextPartMngBase + 0x2A18);
+		partMngBase = nextPartMngBase;
 		if (reinterpret_cast<_pppMngSt*>(candidateB) != currentMngSt && candidateB->m_baseTime != -0x1000 &&
 		    candidateB->m_kind != 0) {
 			unsigned char prioB = candidateB->m_prio;
@@ -556,13 +557,14 @@ unsigned int pppFreeMngStPrioForData()
 		System.Printf(DAT_801ead4c, index);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
+		char* pdtName = reinterpret_cast<char*>(&PartMng) + 0x22E30 + ((int)selectedMngSt->m_kind * 0x38);
 		System.Printf(
 			const_cast<char*>(s_tina_prio_time_fmt_801d81a0),
 			(unsigned int)selectedMngSt->m_prioTime,
 			(unsigned int)selectedMngSt->m_prio,
 			(int)selectedMngSt->m_kind,
 			(int)selectedMngSt->m_nodeIndex,
-			reinterpret_cast<char*>(&PartMng) + 0x22E30 + ((int)selectedMngSt->m_kind * 0x38));
+			pdtName);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(DAT_801d81d4));

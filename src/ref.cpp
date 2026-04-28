@@ -1,6 +1,17 @@
 #include "ffcc/ref.h"
 
-extern "C" void __dl__FPv(void*);
+/*
+ * --INFO--
+ * PAL Address: 0x80043d10
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CRef::~CRef()
+{
+}
 
 /*
  * --INFO--
@@ -14,17 +25,4 @@ extern "C" void __dl__FPv(void*);
 CRef::CRef()
 {
 	this->refCount = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80043d10
- * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CRef::~CRef()
-{
 }

@@ -50,14 +50,15 @@ struct CFlatRuntimeLifecycleProxy
 CFlatRuntime::CFlatRuntime()
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
+	const u32 clearBit = 0;
 
 	*reinterpret_cast<void***>(self) = __vt__12CFlatRuntime;
-	*reinterpret_cast<void***>(self + 0x1204) = __vt__Q212CFlatRuntime7CObject;
-	self[0x123C] &= 0xEF;
-	*reinterpret_cast<void***>(self + 0x124C) = __vt__Q212CFlatRuntime7CObject;
-	self[0x1284] &= 0xEF;
-	self[0x1294] = 0;
-	self[0x1298] = 1;
+	*reinterpret_cast<void***>(self + 0x914) = __vt__Q212CFlatRuntime7CObject;
+	self[0x904] = static_cast<u8>((self[0x904] & 0xEF) | (clearBit << 4));
+	*reinterpret_cast<void***>(self + 0x960) = __vt__Q212CFlatRuntime7CObject;
+	self[0x950] = static_cast<u8>((self[0x950] & 0xEF) | (clearBit << 4));
+	*reinterpret_cast<u32*>(self + 0x970) = clearBit;
+	*reinterpret_cast<u32*>(self + 0x1298) = 1;
 
 	clear();
 }
@@ -465,7 +466,7 @@ void CFlatRuntime::Create(void* filePtr)
 	}
 
 	createObject(-1);
-	self[0x1294] = 1;
+	*reinterpret_cast<u32*>(self + 0x970) = 1;
 	*reinterpret_cast<u8*>(self + 0x974) = 1;
 }
 
@@ -844,7 +845,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 
 	u32 allowKeep = 1;
 	if (classIndex == -1) {
-		allowKeep = static_cast<u32>(__cntlzw(*reinterpret_cast<u32*>(self + 0x1294))) >> 5 & 0xFF;
+		allowKeep = static_cast<u32>(__cntlzw(*reinterpret_cast<u32*>(self + 0x970))) >> 5 & 0xFF;
 	}
 
 	u8* defs = 0;

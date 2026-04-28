@@ -417,7 +417,7 @@ bool CMenuPcs::ItemOpen()
  */
 int CMenuPcs::ItemCtrl()
 {
-    short sVar1;
+    int sVar1;
     int iVar2;
     int iVar3;
 

@@ -1,7 +1,6 @@
 #include "ffcc/ref.h"
 
 extern "C" void __dl__FPv(void*);
-extern "C" void* __vt__4CRef[];
 
 /*
  * --INFO--
@@ -26,13 +25,6 @@ CRef::CRef()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CRef* __dt__4CRefFv(CRef* ref, short param_2)
+CRef::~CRef()
 {
-	if (ref != 0) {
-		*(void**)ref = __vt__4CRef;
-		if (0 < param_2) {
-			__dl__FPv(ref);
-		}
-	}
-	return ref;
 }

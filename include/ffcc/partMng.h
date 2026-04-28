@@ -146,7 +146,6 @@ typedef void (*pppProgDestructCallback)(_pppPObjLink*, _pppCtrlTable*);
 
 struct pppFVECTOR4
 {
-
 };
 
 struct VColor
@@ -179,23 +178,13 @@ struct pppProg
     pppProgAnyCallback m_pppFunctionDestructor;   // 0x28
 }; // Size 0x2c
 
-struct _pppCtrlTableData
-{
-    int m_workOffset;       // 0x0
-    int m_workOffsetAlt;    // 0x4
-    int m_ownerWorkOffset;  // 0x8
-};
-
 struct _pppCtrlTable
 {
     pppProg* m_prog;                    // 0x0
     unsigned short m_workOffset;        // 0x4
     unsigned short m_workFlags;         // 0x6
     int m_unk8;                         // 0x8
-    union {
-        _pppCtrlTableData* m_serializedDef; // 0xC
-        int* m_serializedDataOffsets;       // 0xC
-    };
+    int* m_serializedDataOffsets;       // 0xC
 };
 
 struct _pppDataHead

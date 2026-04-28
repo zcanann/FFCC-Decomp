@@ -29,7 +29,7 @@ struct pppPointRApStep {
 void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 {
     pppPointRApStep* payload = (pppPointRApStep*)step;
-    u32* ctrlData = (u32*)ctrlTable->m_serializedDef;
+    u32* ctrlData = (u32*)ctrlTable->m_serializedDataOffsets;
     u8* state = (u8*)pObject + ctrlData[1] + 0x80;
 
     if (gPppCalcDisabled != 0) {
@@ -95,7 +95,7 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
  */
 void pppPointRApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-    u32* ctrlData = (u32*)ctrlTable->m_serializedDef;
+    u32* ctrlData = (u32*)ctrlTable->m_serializedDataOffsets;
     u32 offset = ctrlData[1];
     u8* state = (u8*)pObject + offset;
     state[0x81] = 0;

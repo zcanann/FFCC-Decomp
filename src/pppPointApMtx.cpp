@@ -25,7 +25,7 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 {
 	pppPointApMtxStep* payload = (pppPointApMtxStep*)step;
 	Vec pos;
-	u32* offsets = (u32*)ctrlTable->m_serializedDef;
+	u32* offsets = (u32*)ctrlTable->m_serializedDataOffsets;
 	Vec* source = (Vec*)((u8*)pObject + offsets[0] + 0x80);
 	Mtx* target = (Mtx*)((u8*)pObject + offsets[1] + 0x80);
 
@@ -82,7 +82,7 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
  */
 void pppPointApMtxCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-	unsigned long offset = (unsigned long)(((u32*)ctrlTable->m_serializedDef)[1]);
+	unsigned long offset = (unsigned long)(((u32*)ctrlTable->m_serializedDataOffsets)[1]);
 	_pppPObject* object = (_pppPObject*)((char*)pObject + offset);
 
 	*(unsigned char*)((char*)object + 0x81) = 0;

@@ -9,7 +9,7 @@
  */
 void pppAngleCon(void* dest, _pppCtrlTable* ctrlTable)
 {
-    int offset = ((int*)ctrlTable->m_serializedDef)[0];
+    int offset = (ctrlTable->m_serializedDataOffsets)[0];
     
     int* ptr = (int*)((char*)dest + offset + 0x80);
     ptr[2] = 0;
@@ -32,7 +32,7 @@ void pppAngle(void* dest, void* src, _pppCtrlTable* ctrlTable)
         return;
     }
 
-    int offset = ((int*)ctrlTable->m_serializedDef)[0];
+    int offset = (ctrlTable->m_serializedDataOffsets)[0];
     int* destPtr = (int*)((char*)dest + offset + 0x80);
     int* srcPtr = (int*)((char*)src + 8);
 

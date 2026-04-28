@@ -1244,12 +1244,18 @@ void _AdsrStart(RedVoiceDATA* voice)
 
     stage[1] = stepFrames;
     if (nextLevel != 0) {
-        nextLevel = (((nextLevel + 1) * 0x100) - 1) * 0x1000;
+        nextLevel += 1;
+        nextLevel <<= 8;
+        nextLevel -= 1;
+        nextLevel <<= 0xc;
     }
 
     if (stepFrames != 0) {
         if (prevLevel != 0) {
-            prevLevel = (((prevLevel + 1) * 0x100) - 1) * 0x1000;
+            prevLevel += 1;
+            prevLevel <<= 8;
+            prevLevel -= 1;
+            prevLevel <<= 0xc;
         }
         *(int*)((u8*)voice + 0xac) = prevLevel;
         stage[2] = (int)((nextLevel | 0x800) - prevLevel) / (int)stepFrames;
@@ -1282,7 +1288,10 @@ void _AdsrDataCompute(RedVoiceDATA* voice)
         level = (u32)*(u8*)(adsrData + *stage + 9);
         stepCount = (u32)*(u16*)(adsrData + *stage * 2);
         if (level != 0) {
-            level = ((level + 1) * 0x100 - 1) * 0x1000;
+            level += 1;
+            level <<= 8;
+            level -= 1;
+            level <<= 0xc;
         }
         if (stepCount != 0) {
             break;
@@ -2551,9 +2560,12 @@ void MainControl(int frames)
             step = *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
             if (mul != 0) {
                 if (*p_MusicTempoControl < 0) {
-                    step = (step * (int)mul) >> 0x10;
+                    step *= (int)mul;
+                    step >>= 0x10;
                 } else {
-                    step = ((step * ((int)mul + 1)) >> 0xF) + (*(int*)((u8*)p_SoundControl + 0x448) >> 0xC);
+                    step *= (int)mul + 1;
+                    step >>= 0xF;
+                    step += *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
                 }
             }
             *(s16*)((u8*)p_SoundControl + 0x48C) -= step * frames;
@@ -2566,7 +2578,8 @@ void MainControl(int frames)
 
     if (*(s16*)((u8*)p_SoundControlBuffer + 0x922) != 0) {
         p_SoundControl = (void*)((u8*)p_SoundControlBuffer + 0x494);
-        *(s16*)((u8*)p_SoundControl + 0x48C) -= (*(int*)((u8*)p_SoundControl + 0x448) >> 0xC) * frames;
+        step = *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
+        *(s16*)((u8*)p_SoundControl + 0x48C) -= step * frames;
         while (*(s16*)((u8*)p_SoundControl + 0x48C) < 1) {
             *(s16*)((u8*)p_SoundControl + 0x48C) += 0xFA;
             _MusicNoteExecute();

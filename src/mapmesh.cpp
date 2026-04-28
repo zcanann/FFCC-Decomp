@@ -447,14 +447,12 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             m_normals = cursor;
             cursor += chunk.m_size;
 
-            offset = 0;
-            for (int i = 0; i < static_cast<int>(m_normalCount); i++) {
+            for (int i = 0, offset = 0; i < static_cast<int>(m_normalCount); i++, offset += 6) {
                 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_normals) + offset) = reader.Get2();
                 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_normals) + offset + 2) =
                     reader.Get2();
                 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_normals) + offset + 4) =
                     reader.Get2();
-                offset += 6;
             }
             break;
         case 0x434F4C52:

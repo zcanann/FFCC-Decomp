@@ -1,4 +1,5 @@
 #include "ffcc/pppRandDownCV.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
@@ -17,11 +18,6 @@ struct PppRandDownCVParam2 {
     u8 fieldC;
 };
 
-struct PppRandDownCVParam3 {
-    u8 field0[0xC];
-    s32* fieldC;
-};
-
 inline char randchar(char value, float scale)
 {
     return (char)((f32)value * scale);
@@ -36,11 +32,9 @@ inline char randchar(char value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandDownCV(void* param1, void* param2, void* param3)
+extern "C" void pppRandDownCV(void* basePtr, PppRandDownCVParam2* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)param1;
-    PppRandDownCVParam2* in = (PppRandDownCVParam2*)param2;
-    PppRandDownCVParam3* out = (PppRandDownCVParam3*)param3;
+    u8* base = (u8*)basePtr;
     u8* target;
     f32* valuePtr;
 
@@ -57,12 +51,12 @@ extern "C" void pppRandDownCV(void* param1, void* param2, void* param3)
             value = blend * scale;
         }
 
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
         *valuePtr = value;
     } else if (in->field0 != *(s32*)(base + 0xC)) {
         return;
     } else {
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
     target = (in->field4 == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + in->field4 + 0x80);

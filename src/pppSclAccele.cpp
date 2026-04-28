@@ -1,22 +1,16 @@
 #include "ffcc/pppSclAccele.h"
+#include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
 const float kPppSclAcceleZero = 0.0f;
 
-typedef struct {
+struct PppSclAcceleStep {
     int m_graphId;
     int m_pad;
     float m_x;
     float m_y;
     float m_z;
-} PppSclAcceleStep;
-
-typedef struct {
-    int m_pad0;
-    int m_pad1;
-    int m_pad2;
-    int* m_offsets;
-} PppSclAcceleConfig;
+};
 
 /*
  * --INFO--
@@ -27,10 +21,8 @@ typedef struct {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSclAcceleCon(void* arg1, void* arg2)
-{
-    PppSclAcceleConfig* config = (PppSclAcceleConfig*)arg2;
-    float* accel = (float*)((char*)arg1 + config->m_offsets[1] + 0x80);
+void pppSclAcceleCon(void* arg1, _pppCtrlTable* arg2){
+    float* accel = (float*)((char*)arg1 + arg2->m_serializedDataOffsets[1] + 0x80);
     float zero = kPppSclAcceleZero;
 
     accel[2] = zero;
@@ -47,21 +39,18 @@ void pppSclAcceleCon(void* arg1, void* arg2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSclAccele(void* arg1, void* arg2, void* arg3)
-{
-    PppSclAcceleConfig* config = (PppSclAcceleConfig*)arg3;
-    PppSclAcceleStep* step = (PppSclAcceleStep*)arg2;
-    float* scale = (float*)((char*)arg1 + config->m_offsets[0] + 0x80);
-    float* accel = (float*)((char*)arg1 + config->m_offsets[1] + 0x80);
+void pppSclAccele(void* arg1, PppSclAcceleStep* arg2, _pppCtrlTable* arg3){
+    float* scale = (float*)((char*)arg1 + arg3->m_serializedDataOffsets[0] + 0x80);
+    float* accel = (float*)((char*)arg1 + arg3->m_serializedDataOffsets[1] + 0x80);
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    if (step->m_graphId == ((int*)arg1)[3]) {
-        accel[0] += step->m_x;
-        accel[1] += step->m_y;
-        accel[2] += step->m_z;
+    if (arg2->m_graphId == ((int*)arg1)[3]) {
+        accel[0] += arg2->m_x;
+        accel[1] += arg2->m_y;
+        accel[2] += arg2->m_z;
     }
 
     scale[0] += accel[0];

@@ -7,7 +7,7 @@ extern "C" {
 
 void randfloat(float, float);
 void randf(unsigned char);
-void pppSRandDownFV(void* param1, void* param2, void* param3);
+void pppSRandDownFV(void* basePtr, struct PppSRandDownFVParam2* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

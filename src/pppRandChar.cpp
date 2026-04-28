@@ -1,4 +1,5 @@
 #include "ffcc/pppRandChar.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
@@ -14,11 +15,6 @@ struct RandCharParam {
     u8 randomTwice;
 };
 
-struct RandCharCtx {
-    u8 _pad[0xC];
-    s32* outputOffset;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80060efc
@@ -28,11 +24,9 @@ struct RandCharCtx {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandChar(void* param1, void* param2, void* param3)
+extern "C" void pppRandChar(void* basePtr, RandCharParam* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)param1;
-    RandCharParam* in = (RandCharParam*)param2;
-    RandCharCtx* ctx = (RandCharCtx*)param3;
+    u8* base = (u8*)basePtr;
     u8* target;
     f32* valuePtr;
 
@@ -49,13 +43,13 @@ extern "C" void pppRandChar(void* param1, void* param2, void* param3)
             value *= kPppRandCharSingleSampleScale;
         }
 
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
         *valuePtr = value;
     } else {
         if (in->targetId != state) {
             return;
         }
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
     s32 colorOffset = in->sourceOffset;

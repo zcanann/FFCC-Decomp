@@ -1,4 +1,5 @@
 #include "ffcc/pppRandIV.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
@@ -16,11 +17,6 @@ struct PppRandIVParam2 {
     u8 field18;
 };
 
-struct PppRandIVParam3 {
-    u8 field0[0xC];
-    s32* fieldC;
-};
-
 inline int randint(int value, float scale)
 {
     return (int)((float)value * scale - (float)value);
@@ -35,11 +31,9 @@ inline int randint(int value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandIV(void* param1, void* param2, void* param3)
+void pppRandIV(void* basePtr, PppRandIVParam2* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)param1;
-    PppRandIVParam2* in = (PppRandIVParam2*)param2;
-    PppRandIVParam3* out = (PppRandIVParam3*)param3;
+    u8* base = (u8*)basePtr;
     f32 value;
     f32* valuePtr;
 
@@ -55,13 +49,13 @@ void pppRandIV(void* param1, void* param2, void* param3)
             value *= kPppRandIVSingleSampleScale;
         }
 
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
         *valuePtr = value;
     } else {
         if (in->field0 != *(s32*)(base + 0xC)) {
             return;
         }
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
     s32* target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);

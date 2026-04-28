@@ -1,4 +1,5 @@
 #include "ffcc/pppSRandDownFV.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 #include "ffcc/pppColor.h"
@@ -16,11 +17,6 @@ struct PppSRandDownFVParam2 {
     u8 field18;
 };
 
-struct PppSRandDownFVParam3 {
-    u8 unk0[0xC];
-    s32* fieldC;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80063840
@@ -30,22 +26,19 @@ struct PppSRandDownFVParam3 {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandDownFV(void* param1, void* param2, void* param3)
+void pppSRandDownFV(void* basePtr, PppSRandDownFVParam2* in, _pppCtrlTable* ctrl)
 {
-    u8* self = (u8*)param2;
-    PppSRandDownFVParam2* cfg = (PppSRandDownFVParam2*)param1;
-
     if (gPppCalcDisabled != 0) {
         return;
     }
 
     f32* randVec;
-    s32 currentIndex = *(s32*)(self + 0xC);
+    s32 currentIndex = *(s32*)((u8*)basePtr + 0xC);
     if (currentIndex == 0) {
-        randVec = (f32*)(self + *((PppSRandDownFVParam3*)param3)->fieldC + 0x80);
+        randVec = (f32*)((u8*)basePtr + *ctrl->m_serializedDataOffsets + 0x80);
 
         {
-            u8 flag = cfg->field18;
+            u8 flag = in->field18;
             f32 value = -Math.RandF();
             if (flag != 0) {
                 f32 random = Math.RandF();
@@ -57,7 +50,7 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
         }
 
         {
-            u8 flag = cfg->field18;
+            u8 flag = in->field18;
             f32 value = -Math.RandF();
             if (flag != 0) {
                 f32 random = Math.RandF();
@@ -69,7 +62,7 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
         }
 
         {
-            u8 flag = cfg->field18;
+            u8 flag = in->field18;
             f32 value = -Math.RandF();
             if (flag != 0) {
                 f32 random = Math.RandF();
@@ -80,24 +73,24 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
             randVec[2] = value;
         }
     } else {
-        if (cfg->field0 != currentIndex) {
+        if (in->field0 != currentIndex) {
             return;
         }
-        randVec = (f32*)(self + *((PppSRandDownFVParam3*)param3)->fieldC + 0x80);
+        randVec = (f32*)((u8*)basePtr + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
-    f32* target = (cfg->field4 == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(self + cfg->field4 + 0x80);
+    f32* target = (in->field4 == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)((u8*)basePtr + in->field4 + 0x80);
 
     {
-        f32 value = cfg->field8 * randVec[0];
+        f32 value = in->field8 * randVec[0];
         target[0] = target[0] + value;
     }
     {
-        f32 value = cfg->fieldC * randVec[1];
+        f32 value = in->fieldC * randVec[1];
         target[1] = target[1] + value;
     }
     {
-        f32 value = cfg->field10 * randVec[2];
+        f32 value = in->field10 * randVec[2];
         target[2] = target[2] + value;
     }
 }

@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-void pppRandDownShort(void* param1, void* param2, void* param3);
+void pppRandDownShort(void* basePtr, struct RandDownShortParam* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

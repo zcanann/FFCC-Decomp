@@ -1,4 +1,5 @@
 #include "ffcc/pppRandHCV.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 #include "ffcc/pppColor.h"
@@ -16,11 +17,6 @@ typedef struct RandHCVParams {
     u8 field10;
 } RandHCVParams;
 
-typedef struct RandHCVCtx {
-    u8 field0[0xC];
-    s32* fieldC;
-} RandHCVCtx;
-
 /*
  * --INFO--
  * PAL Address: 80061f88
@@ -33,11 +29,9 @@ typedef struct RandHCVCtx {
 
 extern "C" {
 
-void pppRandHCV(void* p1, void* p2, void* p3)
+void pppRandHCV(void* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)p1;
-    RandHCVParams* params = (RandHCVParams*)p2;
-    RandHCVCtx* ctx = (RandHCVCtx*)p3;
+    u8* base = (u8*)basePtr;
     s16* target;
     f32* randomValue;
 
@@ -45,30 +39,30 @@ void pppRandHCV(void* p1, void* p2, void* p3)
         return;
     }
 
-    if (params->field0 == *(s32*)(base + 0xC)) {
+    if (in->field0 == *(s32*)(base + 0xC)) {
         f32 value = Math.RandF();
-        if (params->field10 != 0) {
+        if (in->field10 != 0) {
             value += Math.RandF();
         } else {
             value *= kPppRandHCVSingleSampleScale;
         }
 
-        randomValue = (f32*)(base + *ctx->fieldC + 0x80);
+        randomValue = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
         *randomValue = value;
-    } else if (params->field0 != *(s32*)(base + 0xC)) {
+    } else if (in->field0 != *(s32*)(base + 0xC)) {
         return;
     } else {
-        randomValue = (f32*)(base + *ctx->fieldC + 0x80);
+        randomValue = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
-    target = (params->field4 == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + params->field4 + 0x80);
+    target = (in->field4 == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->field4 + 0x80);
 
     {
         f32 scale = *randomValue;
-        target[0] += (s16)((f32)params->field8 * scale - (f32)params->field8);
-        target[1] += (s16)((f32)params->fieldA * scale - (f32)params->fieldA);
-        target[2] += (s16)((f32)params->fieldC * scale - (f32)params->fieldC);
-        target[3] += (s16)((f32)params->fieldE * scale - (f32)params->fieldE);
+        target[0] += (s16)((f32)in->field8 * scale - (f32)in->field8);
+        target[1] += (s16)((f32)in->fieldA * scale - (f32)in->fieldA);
+        target[2] += (s16)((f32)in->fieldC * scale - (f32)in->fieldC);
+        target[3] += (s16)((f32)in->fieldE * scale - (f32)in->fieldE);
     }
 }
 

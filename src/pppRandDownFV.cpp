@@ -1,4 +1,5 @@
 #include "ffcc/pppRandDownFV.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
@@ -16,11 +17,6 @@ struct PppRandDownFVParam2 {
     u8 field18;
 };
 
-struct PppRandDownFVParam3 {
-    u8 unk0[0xC];
-    s32* fieldC;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80061664
@@ -30,15 +26,13 @@ struct PppRandDownFVParam3 {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandDownFV(void* param1, void* param2, void* param3)
+void pppRandDownFV(void* basePtr, PppRandDownFVParam2* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    u8* base = (u8*)param1;
-    PppRandDownFVParam3* out = (PppRandDownFVParam3*)param3;
-    PppRandDownFVParam2* in = (PppRandDownFVParam2*)param2;
+    u8* base = (u8*)basePtr;
     f32* valuePtr;
 
     s32 baseState = *(s32*)(base + 0xC);
@@ -50,14 +44,14 @@ void pppRandDownFV(void* param1, void* param2, void* param3)
             value = randomValue * scale;
         }
 
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
         *valuePtr = value;
     } else {
         if (in->field0 != baseState) {
             return;
         }
 
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
     }
 
     s32 sourceOffset = in->field4;

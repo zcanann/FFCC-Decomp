@@ -49,13 +49,11 @@ typedef struct ShapeControlData {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawShape2(void* param1, void* param2, void* param3)
-{
+void pppDrawShape2(void* param1, ShapeControlData* param2, void* param3){
     ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
-    ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
     void* posData = (u8*)param1 + runtimeData->posDataOffset + 0x80;
-    s32 type = controlData->type;
+    s32 type = param2->type;
 
     if (type == 0xFFFF) {
         return;
@@ -69,18 +67,18 @@ void pppDrawShape2(void* param1, void* param2, void* param3)
     pppSetDrawEnv(
         (pppCVECTOR*)((u8*)posData + 8),
         (pppFMATRIX*)((u8*)param1 + 0x40),
-        controlData->scale,
-        controlData->param15,
-        controlData->paramE,
-        controlData->blendMode,
+        param2->scale,
+        param2->param15,
+        param2->paramE,
+        param2->blendMode,
         0,
-        controlData->param14,
+        param2->param14,
         1,
         0
     );
 
-    pppSetBlendMode(controlData->blendMode);
-    pppDrawShp((tagOAN3_SHAPE*)drawShape, *(CMaterialSet**)((u8*)pppEnvStPtr + 0x4), controlData->blendMode);
+    pppSetBlendMode(param2->blendMode);
+    pppDrawShp((tagOAN3_SHAPE*)drawShape, *(CMaterialSet**)((u8*)pppEnvStPtr + 0x4), param2->blendMode);
 }
 
 
@@ -93,16 +91,14 @@ void pppDrawShape2(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCalcShape2(void* param1, void* param2, void* param3)
-{
+void pppCalcShape2(void* param1, ShapeControlData* param2, void* param3){
     if (gPppCalcDisabled != 0) {
         return;
     }
 
     ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
-    ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
-    s32 type = controlData->type;
+    s32 type = param2->type;
 
     if (type == 0xFFFF) {
         return;
@@ -113,7 +109,7 @@ void pppCalcShape2(void* param1, void* param2, void* param3)
     ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
 
     shapeData->currentId = shapeData->counter;
-    shapeData->value = (u16)(shapeData->value + controlData->step);
+    shapeData->value = (u16)(shapeData->value + param2->step);
     s32 value = shapeData->value;
     s32 maxValue = shape->maxValue;
 

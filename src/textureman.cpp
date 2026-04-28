@@ -837,8 +837,8 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
                      static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)), 1 - (texture[0x74] >> 31));
     }
 
-    if (texture[0x74] >= 2) {
-        GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(texture + 0x28), GX_LINEAR, GX_LINEAR, 0.0f,
+    if (1 < texture[0x74]) {
+        GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(texture + 0x28), GX_LIN_MIP_LIN, GX_LINEAR, 0.0f,
                         static_cast<float>(texture[0x74] - 1), 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     }
 }
@@ -1046,10 +1046,8 @@ void CTexture::SetTlutColor(int index, _GXColor color)
 {
     int offset;
     u16* tlut = reinterpret_cast<u16*>(m_tlutData);
-    union {
-        _GXColor color;
-        u32 value;
-    } packedColor;
+    unsigned char* packedColor = reinterpret_cast<unsigned char*>(&color);
+    u16 lowColor = packedColor[0] | (packedColor[1] << 8);
 
     if (m_format == 9) {
         offset = 0x100;
@@ -1059,9 +1057,8 @@ void CTexture::SetTlutColor(int index, _GXColor color)
         offset = 0;
     }
 
-    packedColor.color = color;
-    tlut[index + offset] = static_cast<u16>(packedColor.value >> 16);
-    tlut[index] = static_cast<u16>(packedColor.value);
+    tlut[index + offset] = packedColor[2] | (packedColor[3] << 8);
+    tlut[index] = lowColor;
 }
 
 /*

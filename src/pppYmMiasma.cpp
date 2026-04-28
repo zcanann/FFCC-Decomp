@@ -272,7 +272,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
         work->m_speedDecay = step->m_unk18;
 
         r = rand();
-        angleDelta = (s16)(r - (r / (int)step->m_angleRange) * step->m_angleRange);
+        angleDelta = (s16)(r % step->m_angleRange);
         signBit = (u32)(int)angleDelta >> 31;
         if (((((int)angleDelta & 1U) ^ signBit) - signBit) == 0) {
             angleDelta *= -1;
@@ -511,7 +511,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
 void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
     YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
-    s32 angle;
+    u32 angle;
     float trigCos;
     float trigSin;
     s32 randomValue;
@@ -546,12 +546,12 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     shapeRandom = rand();
     shapeCount = *(short*)((u8*)shape + 6);
     angle = (s32)(FLOAT_80330650 * (FLOAT_80330654 * (FLOAT_80330660 * randomScale)) - FLOAT_80330664);
-    shapeCount = (short)(shapeRandom - (shapeRandom / (int)shapeCount) * shapeCount);
+    shapeCount = (short)(shapeRandom % shapeCount);
     state->m_shapeDrawFrame = shapeCount;
     state->m_shapeCurrentFrame = shapeCount;
-    trigCos = *(float*)((u8*)gPppTrigTable + (((u16)(angle + 0x4000) >> 2) << 2));
-    trigSin = *(float*)((u8*)gPppTrigTable + (((u16)angle >> 2) << 2));
-    *(short*)((u8*)&particleData->m_velocity.x + 8) = (short)(randomValue - (randomValue / 0x168) * 0x168);
+    trigCos = *(float*)((u8*)gPppTrigTable + ((angle + 0x4000) & 0xfffc));
+    trigSin = *(float*)((u8*)gPppTrigTable + (angle & 0xfffc));
+    *(short*)((u8*)&particleData->m_velocity.x + 8) = (short)(randomValue % 0x168);
     radiusJitter = randomScale * pYmMiasma->m_radiusJitter;
     trigCos = trigCos * (vYmMiasma->m_radius + radiusJitter);
     particleData->m_matrix[0][0] = trigCos;
@@ -572,7 +572,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     }
     lifeRange = pYmMiasma->m_lifeRange;
     lifeBase = pYmMiasma->m_lifeBase;
-    state->m_lifeFrames = (short)(lifeBase + (randomValue - (randomValue / (int)lifeRange) * lifeRange));
+    state->m_lifeFrames = (short)(lifeBase + (randomValue % lifeRange));
     state->m_color.m_r = (u16)pYmMiasma->m_colorStartR;
     state->m_color.m_g = (u16)pYmMiasma->m_colorStartG;
     state->m_color.m_b = (u16)pYmMiasma->m_colorStartB;

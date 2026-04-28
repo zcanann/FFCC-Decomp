@@ -2621,8 +2621,8 @@ RedSound/RedStream.cpp:
 	extab       start:0x8000AB80 end:0x8000ABC8
 	extabindex  start:0x80012550 end:0x800125BC
 	.text       start:0x801CB93C end:0x801CCA34
-	.rodata     start:0x801E7F20 end:0x801E7FE8
-	.sdata2     start:0x80333D80 end:0x80333D98
+	.rodata     start:0x801E7F20 end:0x801E7FE6
+	.sdata2     start:0x80333D80 end:0x80333D95
 
 RedSound/RedSound.cpp:
 	extab       start:0x8000ABC8 end:0x8000AD80

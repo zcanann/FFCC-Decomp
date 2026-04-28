@@ -309,7 +309,7 @@ void CMenuPcs::CompaCtrl()
 	if (activeInput) {
 		hold = 0;
 	} else {
-		hold = *reinterpret_cast<short*>(reinterpret_cast<char*>(&Pad) + 0x20);
+		hold = Pad._20_2_;
 	}
 
 	if (hold == 0) {
@@ -666,7 +666,7 @@ void CMenuPcs::CompaCtrlCur()
 	if (activeInput) {
 		hold = 0;
 	} else {
-		hold = *reinterpret_cast<short*>(reinterpret_cast<char*>(&Pad) + 0x20);
+		hold = Pad._20_2_;
 	}
 
 	if (hold == 0) {

@@ -838,7 +838,7 @@ int CMenuPcs::EquipCtrlCur()
 	if (blocked) {
 		hold = 0;
 	} else {
-		hold = *reinterpret_cast<u16*>(reinterpret_cast<char*>(&Pad) + 0x20);
+		hold = Pad._20_2_;
 	}
 
 	if (hold == 0) {

@@ -218,14 +218,13 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	float deltaX;
 	float zero;
 	float deltaZ;
-	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
 
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
 	deltaX = deltaPos.x;
-	zero = FLOAT_80331BD4;
+	zero = 0.0f;
 	deltaZ = deltaPos.z;
 	if (zero == deltaX || zero == deltaZ) {
-		targetRot = FLOAT_80331BD4;
+		targetRot = zero;
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
@@ -251,14 +250,13 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	float deltaX;
 	float zero;
 	float deltaZ;
-	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
 
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
 	deltaX = deltaPos.x;
-	zero = FLOAT_80331BD4;
+	zero = 0.0f;
 	deltaZ = deltaPos.z;
 	if (zero == deltaX || zero == deltaZ) {
-		targetRot = FLOAT_80331BD4;
+		targetRot = zero;
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
@@ -283,11 +281,10 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	float deltaX;
 	float zero;
 	float deltaZ;
-	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
 
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
 	deltaX = deltaPos.x;
-	zero = FLOAT_80331BD4;
+	zero = 0.0f;
 	deltaZ = deltaPos.z;
 	if (zero == deltaX || zero == deltaZ) {
 		targetRot = zero;

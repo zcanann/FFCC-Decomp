@@ -21,10 +21,6 @@ extern "C" const float FLOAT_80331BD4 = 0.0f;
 extern "C" const float FLOAT_80331BD8 = 3.1415927f;
 extern "C" const double DOUBLE_80331BE0 = 4503601774854144.0;
 extern "C" const float FLOAT_80331BE8 = -1.0f;
-extern "C" const char DAT_80331bf0[] = "GMGR";
-extern "C" const float FLOAT_80331bf8 = 0.0f;
-extern "C" const float FLOAT_80331bfc = 1.0f;
-extern "C" const double DOUBLE_80331C00 = 4503599627370496.0;
 
 /*
  * --INFO--

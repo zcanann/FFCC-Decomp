@@ -1808,13 +1808,13 @@ void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
     }
 
     if (*(u8*)((int*)track)[0] != 0) {
-        rate = *(u8*)((int*)track)[0];
+        divisor = *(u8*)((int*)track)[0];
     } else {
-        rate = 0x100;
+        divisor = 0x100;
     }
 
-    divisor = rate;
-    rate = 0x100 / divisor;
+    rate = divisor;
+    rate = 0x100 / rate;
     ((int*)track)[0x1f] = DataAddCompute((int*)track + 0x1e, rate, trackDelta);
     *(short*)((int*)track + 0x23) = (short)trackDelta[0];
     ((int*)track)[0] += 1;
@@ -1997,12 +1997,12 @@ void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 		delta[0] += 1;
 	}
 	if (*(u8*)((int*)track)[0] != 0) {
-		rate = *(u8*)((int*)track)[0];
+		divisor = *(u8*)((int*)track)[0];
 	} else {
-		rate = 0x100;
+		divisor = 0x100;
 	}
-	divisor = rate;
-	rate = 0x100 / divisor;
+	rate = divisor;
+	rate = 0x100 / rate;
 	((int*)track)[0x27] = DataAddCompute((int*)track + 0x26, rate, delta);
 	*(short*)((int*)track + 0x2b) = (short)delta[0];
 	((int*)track)[0] += 1;
@@ -2161,12 +2161,12 @@ void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
 		delta[0] += 1;
 	}
 	if (*(u8*)((int*)track)[0] != 0) {
-		rate = *(u8*)((int*)track)[0];
+		divisor = *(u8*)((int*)track)[0];
 	} else {
-		rate = 0x100;
+		divisor = 0x100;
 	}
-	divisor = rate;
-	rate = 0x100 / divisor;
+	rate = divisor;
+	rate = 0x100 / rate;
 	((int*)track)[0x2f] = DataAddCompute((int*)track + 0x2e, rate, delta);
 	*(short*)((int*)track + 0x34) = (short)delta[0];
 	((int*)track)[0] += 1;

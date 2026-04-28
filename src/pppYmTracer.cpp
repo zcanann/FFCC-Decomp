@@ -150,7 +150,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
                 SetUpPaletteEnv(texture);
             }
 
-            uvStep = FLOAT_803306ec / (f32)(s32)work->count;
+            uvStep = FLOAT_803306ec / (f32)(u32)work->count;
             GXSetCullMode(GX_CULL_NONE);
 
             for (i = 0; i < (s32)(work->count - 1); i++) {

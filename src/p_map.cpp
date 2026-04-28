@@ -37,6 +37,9 @@ class CRelProfile
 {
 public:
     ~CRelProfile();
+
+private:
+    unsigned int m_data;
 };
 
 unsigned int m_table_desc0__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
@@ -116,11 +119,11 @@ unsigned int m_table__7CMapPcs[3][0x414 / 3 / sizeof(unsigned int)] = {
     },
 };
 
-CRelProfile g_hit_prof;
-CRelProfile g_map_calc_prof;
-CRelProfile g_map_draw_prof;
 unsigned int s_loadedStageNo__7CMapPcs;
 unsigned int s_loadedMapNo__7CMapPcs;
+CRelProfile s_mapRelProfile0__7CMapPcs;
+CRelProfile s_mapRelProfile1__7CMapPcs;
+CRelProfile s_mapRelProfile2__7CMapPcs;
 extern const float DrawRangeDefault;
 extern const float kPMapBoundMinInit;
 extern const float kPMapBoundMaxInit;

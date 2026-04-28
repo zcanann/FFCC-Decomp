@@ -309,6 +309,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 					float xCoord = FLOAT_80330FD4;
 
 					for (x = 0; x < (u32)textureInfo->m_width; x++) {
+						u32 xFine = x & 3;
 						float magnitude = xCoord * xCoord + ySq;
 						if (magnitude > FLOAT_80330FD8) {
 							magnitude = CrystalSqrtPositive(magnitude);
@@ -324,7 +325,6 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 
 						double modulation = fmod(magnitude, DOUBLE_80331000);
 						magnitude = FLOAT_80331008 * (magnitude * (float)modulation);
-						u32 xFine = x & 3;
 						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80331010 + FLOAT_8033100C));
 						u8* pixel = textureInfo->m_imageData +
 							yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +

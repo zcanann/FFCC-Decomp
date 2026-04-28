@@ -241,12 +241,12 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
  */
 void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3)
 {
-    Crystal2Work* work;
+    if (gPppCalcDisabled != 0) {
+        return;
+    }
 
-    if ((gPppCalcDisabled == 0) &&
-        ((work = (Crystal2Work*)((u8*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80)),
-         (param_2->m_payload[0] != 0)) &&
-        (work->m_refractionMap == 0)) {
+    Crystal2Work* work = (Crystal2Work*)((u8*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80);
+    if ((param_2->m_payload[0] != 0) && (work->m_refractionMap == 0)) {
         u32 y;
         u32 x;
         Crystal2RefractionMap* textureInfo;
@@ -282,6 +282,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
             xCoord = FLOAT_80331FE4;
 
             for (x = 0; x < (u32)textureInfo->m_width; x++) {
+                u32 xFine = x & 3;
                 magnitude = xCoord * xCoord + ySq;
 
                 if (magnitude > FLOAT_80331FE8) {
@@ -296,7 +297,6 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
                     magnitude = FLOAT_80332008;
                 }
 
-                u32 xFine = x & 3;
                 u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80332010 + FLOAT_8033200C));
                 u8* pixel = textureInfo->m_imageData +
                     yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +

@@ -189,10 +189,8 @@ struct _pppCtrlTableData
 struct _pppCtrlTable
 {
     pppProg* m_prog;                    // 0x0
-    struct {
-        unsigned short m_workOffset;    // 0x4
-        unsigned short m_workFlags;     // 0x6
-    } m_workInfo;
+    unsigned short m_workOffset;        // 0x4
+    unsigned short m_workFlags;         // 0x6
     int m_unk8;                         // 0x8
     union {
         _pppCtrlTableData* m_serializedDef; // 0xC
@@ -272,10 +270,7 @@ struct _pppMngSt
     unsigned char m_envColorG;         // 0xA9
     unsigned char m_envColorB;         // 0xAA
     unsigned char m_envColorA;         // 0xAB
-    union {
-        int m_prioTime;                // 0xAC
-        int m_spawnedCount;
-    };
+    int m_spawnedCount;                // 0xAC
     int m_previousFrame2;              // 0xB0
     int m_numPrograms;                 // 0xB4
     int m_reservedB8;                  // 0xB8
@@ -309,7 +304,7 @@ struct _pppMngSt
     unsigned char m_fpBillboard;       // 0xF7
     unsigned char m_prio;              // 0xF8
     unsigned char m_padF9;             // 0xF9
-    short m_frameCounter;              // 0xFA
+    short m_prioTime;                  // 0xFA
     unsigned char m_padFC[4];          // 0xFC
     unsigned int m_paramA;             // 0x100
     unsigned int m_paramB;             // 0x104

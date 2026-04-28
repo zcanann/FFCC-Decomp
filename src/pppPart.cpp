@@ -789,7 +789,7 @@ void callCon2Prog(_pppPObject* pObject)
 			u32 stageSlotOffset = progSet->m_workBaseOffset + stageIdx * 4;
 			u32* stageSlot = *(u32**)(((u8*)pObject) + stageSlotOffset);
 			pppProg* prog = stage->m_prog;
-			u32* nextSlot = (u32*)(((u8*)stageSlot) + stage->m_workInfo.m_workOffset);
+			u32* nextSlot = (u32*)(((u8*)stageSlot) + stage->m_workOffset);
 
 			if (*nextSlot == *(u32*)(((u8*)pObject) + 0x0C))
 			{
@@ -2440,7 +2440,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					_pppCtrlTable* stage = &progSet->m_stages[stageIdx];
 					u32 stageSlotOffset = progSet->m_workBaseOffset + stageIdx * 4;
 					u32* stageSlot = *(u32**)(((u8*)obj) + stageSlotOffset);
-					u32* nextSlot = (u32*)(((u8*)stageSlot) + stage->m_workInfo.m_workOffset);
+					u32* nextSlot = (u32*)(((u8*)stageSlot) + stage->m_workOffset);
 					if (*nextSlot == *(u32*)(((u8*)obj) + 0x0C))
 					{
 						*(u32**)(((u8*)obj) + stageSlotOffset) = nextSlot;

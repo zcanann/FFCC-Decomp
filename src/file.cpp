@@ -182,10 +182,11 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
         Graphic._WaitDrawDone(const_cast<char*>(s_fileCpp), 0x2CC);
 
-        int compactLayout = Graphic.m_scratchTextureBuffer != 0;
-        if (usingFallbackFont)
+        int scratchAvailable = Graphic.m_scratchTextureBuffer != 0;
+        int compactLayout = 0;
+        if (scratchAvailable && usingFallbackFont == 0)
         {
-            compactLayout = 0;
+            compactLayout = 1;
         }
 
         if (compactLayout)

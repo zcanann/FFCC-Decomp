@@ -2170,8 +2170,8 @@ void CAmemCacheSet::CalcPrio()
         int* entry = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x58) + offset);
         unsigned char* entryBytes = reinterpret_cast<unsigned char*>(entry);
 
-        if ((entryBytes[0x0E] != 0) && (*reinterpret_cast<short*>(entryBytes + 0x0C) == 0) && (*entry != 0) &&
-            (entry[4] != 0)) {
+        if ((entryBytes[0x0E] != 0) && (*reinterpret_cast<unsigned short*>(entryBytes + 0x0C) == 0) &&
+            (*reinterpret_cast<unsigned int*>(entry) != 0) && (static_cast<unsigned int>(entry[4]) != 0)) {
             entry[4]--;
         }
 

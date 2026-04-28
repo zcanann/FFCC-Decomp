@@ -28,12 +28,12 @@ typedef void (*VirtualDtorFn)(void*, int);
 
 struct CFontRenderFlagBits
 {
-	unsigned char shadow : 1;
-	unsigned char zCompare : 1;
-	unsigned char zUpdate : 1;
-	unsigned char snapPosition : 1;
-	unsigned char fixedWidth : 1;
-	unsigned char pad : 3;
+	signed char shadow : 1;
+	signed char zCompare : 1;
+	signed char zUpdate : 1;
+	signed char snapPosition : 1;
+	signed char fixedWidth : 1;
+	signed char pad : 3;
 };
 
 static CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)

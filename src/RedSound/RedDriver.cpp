@@ -1429,18 +1429,17 @@ int CRedDriver::GetSoundMode()
 int CRedDriver::SetMusicData(void* musicData)
 {
     char localHeader[0x20];
-    char* musicHeader = (char*)musicData;
     void* copiedHeader;
     int headerSize;
     int result;
 
     result = -1;
-    if (((musicHeader[0] == 'B') && (musicHeader[1] == 'G')) && (musicHeader[2] == 'M')) {
-        memcpy(localHeader, musicHeader, sizeof(localHeader));
+    if (((((char*)musicData)[0] == 'B') && (((char*)musicData)[1] == 'G')) && (((char*)musicData)[2] == 'M')) {
+        memcpy(localHeader, musicData, sizeof(localHeader));
         headerSize = *(int*)(localHeader + 0x10);
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
-            memcpy(copiedHeader, musicHeader, headerSize);
+            memcpy(copiedHeader, musicData, headerSize);
             result = *(short*)(localHeader + 4);
             _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
@@ -1623,18 +1622,17 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
  */
 int CRedDriver::SetSeSepData(void* seSepData)
 {
-    char* seSepHeader = (char*)seSepData;
     void* copiedHeader;
     int headerSize;
     int result;
 
     result = -1;
-    if ((((seSepHeader[0] == 'S') && (seSepHeader[1] == 'e')) && (seSepHeader[2] == 'S')) &&
-        ((seSepHeader[3] == 'e' && (seSepHeader[4] == 'p')))) {
-        headerSize = *(int*)(seSepHeader + 0xc) & 0x7fffffff;
+    if ((((((char*)seSepData)[0] == 'S') && (((char*)seSepData)[1] == 'e')) && (((char*)seSepData)[2] == 'S')) &&
+        ((((char*)seSepData)[3] == 'e' && (((char*)seSepData)[4] == 'p')))) {
+        headerSize = *(int*)((char*)seSepData + 0xc) & 0x7fffffff;
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
-            memcpy(copiedHeader, seSepHeader, headerSize);
+            memcpy(copiedHeader, seSepData, headerSize);
             result = *(int*)((int)copiedHeader + 8);
             _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }

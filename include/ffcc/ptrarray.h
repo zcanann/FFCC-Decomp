@@ -3,6 +3,11 @@
 
 #include "global.h"
 #include "ffcc/memory.h"
+#include "ffcc/system.h"
+#include <string.h>
+
+static char s_CPtrArrayGrowError[] = "CPtrArray grow error";
+static char s_CPtrArrayFile[] = "collection/ptrarray.h";
 
 template <class T>
 class CPtrArray
@@ -129,25 +134,20 @@ bool CPtrArray<T>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                // Printf error - skipping for now
+                System.Printf(s_CPtrArrayGrowError);
             }
             m_size = m_size << 1;
         }
         
-        // Allocate new buffer (simplified - would need proper memory management)
-        newItems = new T[m_size];
+        newItems = static_cast<T*>(Memory._Alloc(m_size * sizeof(T), m_stage, s_CPtrArrayFile, 0xfa, 0));
         if (newItems == 0) {
             return false;
         }
         
-        // Copy existing items
         if (m_items != 0) {
-            for (unsigned long i = 0; i < m_numItems; i++) {
-                newItems[i] = m_items[i];
-            }
+            memcpy(newItems, m_items, m_numItems * sizeof(T));
         }
         
-        // Free old buffer
         if (m_items != 0) {
             delete[] m_items;
             m_items = 0;

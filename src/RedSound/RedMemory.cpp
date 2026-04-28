@@ -49,7 +49,7 @@ CRedMemory::~CRedMemory()
  * JP Address: TODO
  * JP Size: TODO
  */
-int RedNew(int param_1)
+int RedNew(int size)
 {
 	unsigned int interrupts;
 	int alignedSize;
@@ -58,12 +58,12 @@ int RedNew(int param_1)
 	int moveCount;
 	int* slot;
 
-	if (param_1 >= 1) {
+	if (size >= 1) {
 		if (m_MemoryBank != 0) {
 			address = m_DataBuffer;
 			if (address != 0) {
 				interrupts = OSDisableInterrupts();
-				alignedSize = (param_1 + 0x1F) & 0xFFFFFFE0;
+				alignedSize = (size + 0x1F) & 0xFFFFFFE0;
 				slot = m_MemoryBank;
 
 				do {
@@ -153,9 +153,9 @@ void RedDelete(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
-void RedDelete(void* param_1)
+void RedDelete(void* address)
 {
-	RedDelete((int)param_1);
+	RedDelete((int)address);
 }
 
 /*
@@ -297,9 +297,9 @@ void RedDeleteA(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
-void RedDeleteA(void* param_1)
+void RedDeleteA(void* address)
 {
-	RedDeleteA((int)param_1);
+	RedDeleteA((int)address);
 }
 
 /*

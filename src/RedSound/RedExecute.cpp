@@ -231,11 +231,11 @@ int PitchCompute(int param_1, int param_2, int param_3, int param_4)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _ReverbNullCallback(AXFX_BUFFERUPDATE* param_1, void*)
+void _ReverbNullCallback(AXFX_BUFFERUPDATE* update, void*)
 {
-    memset((void*)((u32*)param_1)[0], 0, 0x280);
-    memset((void*)((u32*)param_1)[1], 0, 0x280);
-    memset((void*)((u32*)param_1)[2], 0, 0x280);
+    memset((void*)((u32*)update)[0], 0, 0x280);
+    memset((void*)((u32*)update)[1], 0, 0x280);
+    memset((void*)((u32*)update)[2], 0, 0x280);
 }
 
 /*
@@ -263,9 +263,9 @@ void* ReverbAreaAlloc(unsigned long size)
  * JP Address: TODO
  * JP Size: TODO
  */
-void ReverbAreaFree(void* param_1)
+void ReverbAreaFree(void* area)
 {
-    RedDelete(param_1);
+    RedDelete(area);
 }
 
 /*
@@ -838,10 +838,10 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _PitchExecute(RedVoiceDATA* param_1)
+void _PitchExecute(RedVoiceDATA* voice)
 {
     int pitchDelta = 0;
-    int* voiceData = (int*)param_1;
+    int* voiceData = (int*)voice;
     int* trackData = (int*)voiceData[0];
 
     if ((trackData[0x1D] != 0) && (((s16*)voiceData)[10] == 0)) {
@@ -898,42 +898,42 @@ void _PitchExecute(RedVoiceDATA* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-RedWaveDATA* _WaveSplitSelect(RedWaveDATA* param_1, RedNoteDATA* param_2)
+RedWaveDATA* _WaveSplitSelect(RedWaveDATA* wave, RedNoteDATA* note)
 {
-    if ((param_1 != 0) && ((((u32*)param_1)[0] & 0x30000) != 0)) {
+    if ((wave != 0) && ((((u32*)wave)[0] & 0x30000) != 0)) {
         for (;;) {
-            if ((((u32*)param_1)[0] & 0x200) != 0) {
+            if ((((u32*)wave)[0] & 0x200) != 0) {
                 break;
             }
-            if (*(char*)param_2 <= *(char*)((u32*)param_1 + 6)) {
+            if (*(char*)note <= *(char*)((u32*)wave + 6)) {
                 break;
             }
-            if ((((u32*)param_1)[0] & 1) != 0) {
-                param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18);
+            if ((((u32*)wave)[0] & 1) != 0) {
+                wave = (RedWaveDATA*)((u32*)wave + 0x18);
             }
-            param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18);
+            wave = (RedWaveDATA*)((u32*)wave + 0x18);
         }
 
-        int splitKey = *(char*)((u32*)param_1 + 6);
+        int splitKey = *(char*)((u32*)wave + 6);
         for (;;) {
-            if ((((u32*)param_1)[0] & 0x200) != 0) {
+            if ((((u32*)wave)[0] & 0x200) != 0) {
                 break;
             }
-            if (((char*)param_2)[1] <= *(u8*)((int)param_1 + 0x19)) {
+            if (((char*)note)[1] <= *(u8*)((int)wave + 0x19)) {
                 break;
             }
-            if (splitKey == *(char*)((u32*)param_1 + 6)) {
-                if ((((u32*)param_1)[0] & 1) != 0) {
-                    param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18);
+            if (splitKey == *(char*)((u32*)wave + 6)) {
+                if ((((u32*)wave)[0] & 1) != 0) {
+                    wave = (RedWaveDATA*)((u32*)wave + 0x18);
                 }
-                param_1 = (RedWaveDATA*)((u32*)param_1 + 0x18);
+                wave = (RedWaveDATA*)((u32*)wave + 0x18);
             } else {
-                return param_1;
+                return wave;
             }
         }
     }
 
-    return param_1;
+    return wave;
 }
 
 /*
@@ -1353,13 +1353,13 @@ u32 _AdsrDataExecute(RedVoiceDATA* voice)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _VoiceDropedCallback(void* param_1)
+void _VoiceDropedCallback(void* dropped)
 {
     unsigned int* puVar1;
     
     puVar1 = p_VoiceData;
     do {
-        if ((puVar1[5] != 0) && ((void*)puVar1[5] == param_1)) {
+        if ((puVar1[5] != 0) && ((void*)puVar1[5] == dropped)) {
             puVar1[0x23] = 0;
             *puVar1 = 0;
             puVar1[5] = 0;

@@ -310,23 +310,41 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 	COctNode* pCVar3;
 	COctNode* pCVar4;
 	int iVar5;
+	CMaterialManEnvRaw* env = reinterpret_cast<CMaterialManEnvRaw*>(&MaterialMan);
+	CMapObj* mapObj = static_cast<CMapObj*>(m_mapObject);
+	CMapMesh* mapMesh = *reinterpret_cast<CMapMesh**>(Ptr(mapObj, 0xC));
 
 	if ((*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)) != 0) &&
 	    ((*reinterpret_cast<unsigned long*>(Ptr(octNode, 0x40)) & 1) != 0)) {
-		MaterialMan.InitEnv();
-		if (*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x22)) != 0) {
-			CameraPcs.SetFullScreenShadow(reinterpret_cast<float(*)[4]>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xB8)), 0);
+		env->m_curEnvTevBit = 0xACE0F;
+		env->m_activeEnvTevBit = 0xFFFFFFFF;
+		env->m_alphaRef = 0xFF;
+		env->m_texMapIdCurShadow = 0;
+		env->m_stdTexMapId = 0;
+		env->m_texMtxCurShadow = 0x1E;
+		env->m_stdTexMtx = 0x1E;
+		env->m_texCoordIdCurShadow = 0;
+		env->m_stdTexCoordId = 0;
+		env->m_blendMode = 0xFF;
+		env->m_fogEnable = 0xFF;
+		env->m_lockedEnvTevBit = 0;
+		env->m_lockedEnvUnknown5c = 0;
+		env->m_shadowKColorMask = 0;
+		if (*reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x22)) != 0) {
+			CameraPcs.SetFullScreenShadow(reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)), 0);
 		}
-		if (*reinterpret_cast<unsigned long*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x3C)) != 0) {
+		if (*reinterpret_cast<unsigned long*>(Ptr(mapObj, 0x3C)) != 0) {
 			MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(octNode, 0x48)),
-			                           reinterpret_cast<float(*)[4]>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xB8)));
+			                           reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)));
 		}
-		MaterialMan.LockEnv();
+		env->m_texMapIdCurShadow = env->m_stdTexMapId;
+		env->m_texMtxCurShadow = env->m_stdTexMtx;
+		env->m_texCoordIdCurShadow = env->m_stdTexCoordId;
+		env->m_stdEnvTevBit = env->m_curEnvTevBit;
 		LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(octNode, 0x44)));
-		(*reinterpret_cast<CMapObj**>(Ptr(this, 0x8)))->SetDrawEnv();
-		(*reinterpret_cast<CMapMesh**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
-			->DrawMesh(*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)),
-			           *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)));
+		mapObj->SetDrawEnv();
+		mapMesh->DrawMesh(*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)),
+		                  *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)));
 	}
 	iVar2 = 0;
 	do {
@@ -336,20 +354,35 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 		}
 		if ((*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3C)) != 0) &&
 		    ((*reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x40)) & 1) != 0)) {
-			MaterialMan.InitEnv();
-			if (*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x22)) != 0) {
-				CameraPcs.SetFullScreenShadow(reinterpret_cast<float(*)[4]>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xB8)), 0);
+			env->m_curEnvTevBit = 0xACE0F;
+			env->m_activeEnvTevBit = 0xFFFFFFFF;
+			env->m_alphaRef = 0xFF;
+			env->m_texMapIdCurShadow = 0;
+			env->m_stdTexMapId = 0;
+			env->m_texMtxCurShadow = 0x1E;
+			env->m_stdTexMtx = 0x1E;
+			env->m_texCoordIdCurShadow = 0;
+			env->m_stdTexCoordId = 0;
+			env->m_blendMode = 0xFF;
+			env->m_fogEnable = 0xFF;
+			env->m_lockedEnvTevBit = 0;
+			env->m_lockedEnvUnknown5c = 0;
+			env->m_shadowKColorMask = 0;
+			if (*reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x22)) != 0) {
+				CameraPcs.SetFullScreenShadow(reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)), 0);
 			}
-			if (*reinterpret_cast<unsigned long*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x3C)) != 0) {
+			if (*reinterpret_cast<unsigned long*>(Ptr(mapObj, 0x3C)) != 0) {
 				MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x48)),
-				                           reinterpret_cast<float(*)[4]>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xB8)));
+				                           reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)));
 			}
-			MaterialMan.LockEnv();
+			env->m_texMapIdCurShadow = env->m_stdTexMapId;
+			env->m_texMtxCurShadow = env->m_stdTexMtx;
+			env->m_texCoordIdCurShadow = env->m_stdTexCoordId;
+			env->m_stdEnvTevBit = env->m_curEnvTevBit;
 			LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x44)));
-			(*reinterpret_cast<CMapObj**>(Ptr(this, 0x8)))->SetDrawEnv();
-			(*reinterpret_cast<CMapMesh**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
-				->DrawMesh(*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3E)),
-				           *reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3C)));
+			mapObj->SetDrawEnv();
+			mapMesh->DrawMesh(*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3E)),
+			                  *reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3C)));
 		}
 		iVar5 = 0;
 		do {
@@ -361,18 +394,17 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			    ((*reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x40)) & 1) != 0)) {
 				MaterialMan.InitEnv();
 				if (*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x22)) != 0) {
-					CameraPcs.SetFullScreenShadow(reinterpret_cast<float(*)[4]>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xB8)), 0);
+					CameraPcs.SetFullScreenShadow(reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)), 0);
 				}
-				if (*reinterpret_cast<unsigned long*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x3C)) != 0) {
+				if (*reinterpret_cast<unsigned long*>(Ptr(mapObj, 0x3C)) != 0) {
 					MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x48)),
-					                           reinterpret_cast<float(*)[4]>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xB8)));
+					                           reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)));
 				}
 				MaterialMan.LockEnv();
 				LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x44)));
-				(*reinterpret_cast<CMapObj**>(Ptr(this, 0x8)))->SetDrawEnv();
-				(*reinterpret_cast<CMapMesh**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
-					->DrawMesh(*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3E)),
-					           *reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3C)));
+				mapObj->SetDrawEnv();
+				mapMesh->DrawMesh(*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3E)),
+				                  *reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3C)));
 			}
 			iVar1 = 0;
 			do {

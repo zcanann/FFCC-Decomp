@@ -2154,11 +2154,11 @@ void CGMonObj::setUndeadEffect(int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CGMonObj::IsDispRader()
+unsigned int CGMonObj::IsDispRader()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	if (object->IsDispRader() == 0) {
-		return false;
+		return 0;
 	}
 	return static_cast<int>(static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) < 0;
 }

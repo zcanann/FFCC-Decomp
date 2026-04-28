@@ -2885,15 +2885,15 @@ void CGPartyObj::InitFinished()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CGPartyObj::IsDispRader()
+unsigned int CGPartyObj::IsDispRader()
 {
 	if (CGObject::IsDispRader()) {
 		if (((int)((unsigned int)(unsigned char)m_weaponNodeFlags << 24) < 0) &&
 		    ((int)((unsigned int)(unsigned char)(m_weaponNodeFlags >> 8) << 24) < 0)) {
-			return true;
+			return 1;
 		}
 	}
-	return false;
+	return 0;
 }
 
 /*

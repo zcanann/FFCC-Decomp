@@ -223,7 +223,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		**(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeArg1,
 		work->m_shapeArg2, work->m_shapeArg0, *(short*)(step->m_payload + 0x2c));
 
-	for (int i = 0; i < (int)(step->m_payload[0x3a] + 1); i++) {
+	for (int i = 0; i < (int)((u32)step->m_payload[0x3a] + 1); i++) {
 		int max = (int)step->m_payload[0x1e] - 2;
 
 		for (int j = max; (int)i <= j; j--) {
@@ -253,9 +253,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 			indexDouble.u[0] = 0x43300000;
 			indexDouble.u[1] = (u32)i ^ 0x80000000;
 
-			float count = (float)(countDouble.d - DOUBLE_80330dd8);
-			float index = (float)(indexDouble.d - DOUBLE_80330dd8);
-			float t = (FLOAT_80330de0 / count) * index;
+			float t = (FLOAT_80330de0 / (countDouble.d - DOUBLE_80330dd8)) *
+				(indexDouble.d - DOUBLE_80330dd8);
 			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(pppMngStPtr, t, charaMtx) == 0) {
 				emptyHistory = 1;
 				continue;

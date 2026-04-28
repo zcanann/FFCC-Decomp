@@ -844,13 +844,21 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
 {
     u32 hasParamMask;
 
-    if (param5 != 0) {
+    if (param5 == 0) {
+        hasParamMask = (u32)((-param4 | param4) >> 31);
+        MapPcs.LoadMap(
+            mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, param4 & 0xFF);
+
+        hasParamMask = (u32)((-param4 | param4) >> 31);
+        PartPcs.LoadFieldPdt(
+            mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, (u8)param4);
+    } else {
         Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp_801d6190), 0x24E);
         System.MapChanging(mapId, mapVariant);
 
         m_currentMapId = mapId;
-        m_currentMapVariantId = mapVariant;
         hasParamMask = (u32)((-param4 | param4) >> 31);
+        m_currentMapVariantId = mapVariant;
 
         MapPcs.LoadMap(
             mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, 0);
@@ -860,14 +868,6 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
             mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, 0);
 
         System.MapChanged(mapId, mapVariant, 1);
-    } else {
-        hasParamMask = (u32)((-param4 | param4) >> 31);
-        MapPcs.LoadMap(
-            mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, param4 & 0xFF);
-
-        hasParamMask = (u32)((-param4 | param4) >> 31);
-        PartPcs.LoadFieldPdt(
-            mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, (u8)param4);
     }
 }
 
@@ -1241,7 +1241,11 @@ void CGame::SaveScript(char* scriptData)
     int entryOffset = 0;
     int i = 0;
 
-    while (i < *(int*)(CFlat + 4)) {
+    while (true) {
+        if (i >= *(int*)(CFlat + 4)) {
+            break;
+        }
+
         if ((*(u8*)(*(int*)(CFlat + 8) + entryOffset + 1) & 0x20) != 0) {
             *(u32*)(scriptData + scriptOffset) = *(u32*)(*(int*)(CFlat + 12) + entryOffset);
             scriptOffset += 4;
@@ -1265,12 +1269,20 @@ void CGame::LoadScript(char* scriptData)
 {
     int scriptOffset = 0;
     int entryOffset = 0;
+    int i = 0;
 
-    for (int i = 0; i < *(int*)(CFlat + 4); i++, entryOffset += 4) {
+    while (true) {
+        if (i >= *(int*)(CFlat + 4)) {
+            break;
+        }
+
         if ((*(u8*)(*(int*)(CFlat + 8) + entryOffset + 1) & 0x20) != 0) {
             *(u32*)(*(int*)(CFlat + 12) + entryOffset) = *(u32*)(scriptData + scriptOffset);
             scriptOffset += 4;
         }
+
+        entryOffset += 4;
+        i++;
     }
 }
 

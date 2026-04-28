@@ -2574,10 +2574,10 @@ RedSound/RedDriver.cpp:
 	extabindex  start:0x80011860 end:0x80011CA4
 	.text       start:0x801BCF0C end:0x801BFF34
 	.ctors      start:0x801D544C end:0x801D5450
-	.rodata     start:0x801E7788 end:0x801E7888
-	.bss        start:0x8032B860 end:0x8032E170
-	.sbss       start:0x8032F3B8 end:0x8032F490
-	.sdata2     start:0x80333D10 end:0x80333D20
+	.rodata     start:0x801E7788 end:0x801E7885
+	.bss        start:0x8032B860 end:0x8032E16C
+	.sbss       start:0x8032F3B8 end:0x8032F48C
+	.sdata2     start:0x80333D10 end:0x80333D1D
 
 RedSound/RedMemory.cpp:
 	extab       start:0x8000A5B8 end:0x8000A5F8

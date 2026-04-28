@@ -1021,7 +1021,7 @@ void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     ((int*)track)[7] = 0;
     ((int*)track)[0x47] = 0;
     waveNo = *(*(u8**)track)++;
-    if ((((int*)track)[6] != 0) && (waveNo < *(int*)(((int*)track)[6] + 8))) {
+    if ((((u32*)track)[6] != 0) && (waveNo < *(int*)(((int*)track)[6] + 8))) {
         waveTable = ((int*)track)[6] + 0x20;
         ((int*)track)[7] = ((int*)track)[6] + *(int*)(waveTable + waveNo * 4);
         ((int*)track)[0x47] = *(int*)(((int*)track)[6] + 0x10);

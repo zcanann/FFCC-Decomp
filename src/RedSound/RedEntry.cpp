@@ -1042,9 +1042,10 @@ int CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 int CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 {
 	int result;
-	char* data = reinterpret_cast<char*>(seSepHead);
 
-	if ((data[0] != 'S') || (data[1] != 'e') || (data[2] != 'S') || (data[3] != 'e') || (data[4] != 'p')) {
+	if ((reinterpret_cast<char*>(seSepHead)[0] != 'S') || (reinterpret_cast<char*>(seSepHead)[1] != 'e') ||
+	    (reinterpret_cast<char*>(seSepHead)[2] != 'S') || (reinterpret_cast<char*>(seSepHead)[3] != 'e') ||
+	    (reinterpret_cast<char*>(seSepHead)[4] != 'p')) {
 		RedDelete(seSepHead);
 		if (m_ReportPrint != 0) {
 			OSReport(s__s_sSE_Sep_Header_was_broken__s_801e7b50, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
@@ -1053,7 +1054,7 @@ int CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 		return 0;
 	}
 
-	result = SearchSeSepSequence(*reinterpret_cast<int*>(data + 8));
+	result = SearchSeSepSequence(*reinterpret_cast<int*>(reinterpret_cast<char*>(seSepHead) + 8));
 	if (result >= 0) {
 		RedDelete(seSepHead);
 		SeSepHistoryChoice(reinterpret_cast<RedHistoryBANK*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) +

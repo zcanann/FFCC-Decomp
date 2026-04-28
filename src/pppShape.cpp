@@ -75,10 +75,10 @@ void pppCalcFrameShape(long* animData, short& currentFrame, short& drawFrame, sh
  */
 void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv, int shapeIndex)
 {
-    int shapeBase = *(short*)((int)animData + frameIndex * 8 + 0x10);
-    int shapeEntry = *(int*)((int)animData + shapeBase + 0xc + shapeIndex * 8);
-    float* minUvF = (float*)&minUv;
-    float* maxUvF = (float*)&maxUv;
+    float* minUvF = reinterpret_cast<float*>(&minUv);
+    float* maxUvF = reinterpret_cast<float*>(&maxUv);
+    int shapeEntry =
+        *(int*)((int)animData + *(short*)((int)animData + frameIndex * 8 + 0x10) + 0xc + shapeIndex * 8);
     const float uvScale = FLOAT_80330108;
 
     minUvF[0] = (float)*(short*)(shapeEntry + 0x13) * uvScale;
@@ -117,33 +117,27 @@ void pppGetShapePos(long* animData, short frameIndex, Vec& minPos, Vec& maxPos, 
  */
 void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
-    short shapeOffset;
-    char* currentFrame;
-    int frameIndex;
     char* animData;
+    char* currentFrame;
+    unsigned char textureUsed[0x100];
     unsigned char* texturePtr;
     unsigned int textureIndex;
-    unsigned char textureUsed[0x100];
+    int frameIndex;
 
     animData = (char*)shapeSt->m_animData;
     memset(textureUsed, 0, sizeof(textureUsed));
 
     currentFrame = animData;
-    for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
-        unsigned char* shapeEntry;
-        char* shapeBase;
-        int shapeStep;
+    for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex++) {
+        short shapeOffset = *(short*)((int)currentFrame + 0x10);
+        int shapeEntryOffset = 0;
         int shapeIndex;
 
-        shapeOffset = *(short*)((int)currentFrame + 0x10);
-        shapeBase = animData + shapeOffset;
-        shapeIndex = 0;
-        shapeStep = 0;
-        while (shapeIndex < *(short*)(shapeBase + 2)) {
-            shapeEntry = (unsigned char*)(shapeBase + 8 + shapeStep);
-            shapeIndex += 1;
-            shapeStep += 8;
-            textureUsed[shapeEntry[2]] = 1;
+        for (shapeIndex = 0; shapeIndex < *(short*)((int)animData + shapeOffset + 2); shapeIndex++) {
+            int shapeEntry = shapeEntryOffset + shapeOffset;
+
+            shapeEntryOffset += 8;
+            textureUsed[(unsigned char)*(char*)((int)animData + shapeEntry + 10)] = 1;
         }
         currentFrame += 8;
     }
@@ -170,33 +164,27 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
  */
 void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
-    short shapeOffset;
-    char* currentFrame;
-    int frameIndex;
     char* animData;
+    char* currentFrame;
+    unsigned char textureUsed[0x100];
     unsigned char* texturePtr;
     unsigned int textureIndex;
-    unsigned char textureUsed[0x100];
+    int frameIndex;
 
     animData = (char*)shapeSt->m_animData;
     memset(textureUsed, 0, sizeof(textureUsed));
 
     currentFrame = animData;
-    for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
-        unsigned char* shapeEntry;
-        char* shapeBase;
-        int shapeStep;
+    for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex++) {
+        short shapeOffset = *(short*)((int)currentFrame + 0x10);
+        int shapeEntryOffset = 0;
         int shapeIndex;
 
-        shapeOffset = *(short*)((int)currentFrame + 0x10);
-        shapeBase = animData + shapeOffset;
-        shapeIndex = 0;
-        shapeStep = 0;
-        while (shapeIndex < *(short*)(shapeBase + 2)) {
-            shapeEntry = (unsigned char*)(shapeBase + 8 + shapeStep);
-            shapeIndex += 1;
-            shapeStep += 8;
-            textureUsed[shapeEntry[2]] = 1;
+        for (shapeIndex = 0; shapeIndex < *(short*)((int)animData + shapeOffset + 2); shapeIndex++) {
+            int shapeEntry = shapeEntryOffset + shapeOffset;
+
+            shapeEntryOffset += 8;
+            textureUsed[(unsigned char)*(char*)((int)animData + shapeEntry + 10)] = 1;
         }
         currentFrame += 8;
     }

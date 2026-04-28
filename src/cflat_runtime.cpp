@@ -1066,7 +1066,7 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 		}
 	} else {
 		const s16 classIndex = *reinterpret_cast<s16*>(targetObject + 0x16);
-		u8* const classes = *reinterpret_cast<u8**>(self + 0x14);
+		u8* const classes = *reinterpret_cast<u8**>(self + 0x18);
 		const int funcIndex = *reinterpret_cast<int*>(classes + (classIndex * 0x22C) + 0x24 + (systemIndex * 4));
 		if (funcIndex >= 0) {
 			func = *reinterpret_cast<u8**>(self + 0x20) + (funcIndex * 0x50);
@@ -1079,29 +1079,96 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 
 	const int reqFlagIndex = *reinterpret_cast<int*>(func + 0x48);
 	if (reqFlagIndex >= 0) {
-		const u16 reqFlags = *reinterpret_cast<u16*>(targetObject + 0x34);
-		int highestBit = -1;
-		for (int bit = 31; bit >= 0; bit--) {
-			if ((reqFlags & (1U << bit)) != 0) {
-				highestBit = bit;
+		unsigned int reqFlags = static_cast<unsigned int>(*reinterpret_cast<u16*>(targetObject + 0x34));
+		int bitBase = 0x1F;
+		int scanCount = 4;
+		int highestBit;
+
+		do {
+			highestBit = bitBase;
+			if ((((((reqFlags & 0x80000000) != 0)
+			       || ((highestBit = bitBase - 1), (reqFlags & 0x40000000) != 0))
+			      || ((highestBit = bitBase - 2), (reqFlags & 0x20000000) != 0))
+			     || (((highestBit = bitBase - 3), (reqFlags & 0x10000000) != 0)
+			         || ((highestBit = bitBase - 4), (reqFlags & 0x08000000) != 0)))
+			    || (((highestBit = bitBase - 5), (reqFlags & 0x04000000) != 0)
+			        || (((highestBit = bitBase - 6), (reqFlags & 0x02000000) != 0)
+			            || ((highestBit = bitBase - 7), (reqFlags & 0x01000000) != 0)))) {
 				break;
 			}
+
+			reqFlags <<= 8;
+			bitBase -= 8;
+			scanCount--;
+		} while (scanCount != 0);
+
+		if (scanCount == 0) {
+			highestBit = -1;
 		}
+
 		if (reqFlagIndex <= highestBit) {
 			return 0;
 		}
 		*reinterpret_cast<u16*>(targetObject + 0x34) |= static_cast<u16>(1 << reqFlagIndex);
 	}
 
-	u32 copiedArgs = 0;
+	int copiedArgs = 0;
 	if (argCount > 0) {
-		u32* sp = *reinterpret_cast<u32**>(targetObject + 0x08);
-		while (copiedArgs < static_cast<u32>(argCount)) {
-			*sp++ = args[copiedArgs].m_word;
-			copiedArgs++;
+		if (argCount > 8) {
+			unsigned int batchCount = (static_cast<unsigned int>(argCount) - 1) >> 3;
+			int byteOffset = 0;
+			CStack* batchArgs = args;
+
+			if (argCount - 8 > 0) {
+				do {
+					const int offset1 = byteOffset + 4;
+					const int offset2 = byteOffset + 8;
+					const int offset3 = byteOffset + 0xC;
+					const int offset4 = byteOffset + 0x10;
+					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + byteOffset) =
+					    batchArgs[0].m_word;
+					const int offset5 = byteOffset + 0x14;
+					const int offset6 = byteOffset + 0x18;
+					const int offset7 = byteOffset + 0x1C;
+					byteOffset += 0x20;
+					copiedArgs += 8;
+					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset1) =
+					    batchArgs[1].m_word;
+					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset2) =
+					    batchArgs[2].m_word;
+					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset3) =
+					    batchArgs[3].m_word;
+					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset4) =
+					    batchArgs[4].m_word;
+					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset5) =
+					    batchArgs[5].m_word;
+					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset6) =
+					    batchArgs[6].m_word;
+					CStack* finalArg = batchArgs + 7;
+					batchArgs += 8;
+					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset7) =
+					    finalArg->m_word;
+					batchCount--;
+				} while (batchCount != 0);
+			}
 		}
-		*reinterpret_cast<u32**>(targetObject + 0x08) = sp;
+
+		int byteOffset = copiedArgs * 4;
+		int remainingArgs = argCount - copiedArgs;
+		CStack* tailArgs = args + copiedArgs;
+		if (copiedArgs < argCount) {
+			do {
+				CStack* const arg = tailArgs;
+				tailArgs++;
+				copiedArgs++;
+				*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + byteOffset) =
+				    arg->m_word;
+				byteOffset += 4;
+				remainingArgs--;
+			} while (remainingArgs != 0);
+		}
 	}
+	*reinterpret_cast<u32*>(targetObject + 0x08) += copiedArgs * 4;
 
 	const u32 prevCodePos = *reinterpret_cast<u32*>(targetObject + 0x1C);
 	const u8 prevFlags = targetObject[0x38];

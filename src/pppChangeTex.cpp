@@ -49,8 +49,6 @@ struct ChangeTexMeshRef {
 	u8 _pad10[0x14 - 0x10];
 };
 
-struct ChangeTexWork;
-
 struct ChangeTexModelData {
 	u8 _pad0[0xC];
 	u32 m_meshCount;
@@ -58,22 +56,6 @@ struct ChangeTexModelData {
 	CMaterialSet* m_materialSet;
 	u8 _pad28[0xC];
 	s32 m_frameShift;
-};
-
-struct ChangeTexModelRaw {
-	u8 _pad0[0x68];
-	Mtx m_matrix;
-	u8 _pad98[0xC];
-	ChangeTexModelData* m_data;
-	u8 _padA8[0x4];
-	ChangeTexMeshRef* m_meshes;
-	u8 _padB0[0x34];
-	ChangeTexWork* m_work;
-	pppChangeTexUnkB* m_step;
-	u8 _padEC[0x10];
-	void (*m_drawMeshDlCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
-	u8 _pad100[0x4];
-	void (*m_afterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
 };
 
 struct ChangeTexWork {
@@ -93,6 +75,28 @@ struct ChangeTexWork {
 	float m_cachedValue;
 };
 
+struct ChangeTexModelRaw {
+	u8 _pad0[0x68];
+	Mtx m_matrix;
+	u8 _pad98[0xC];
+	ChangeTexModelData* m_data;
+	u8 _padA8[0x4];
+	ChangeTexMeshRef* m_meshes;
+	u8 _padB0[0x34];
+	ChangeTexWork* m_state;
+	pppChangeTexUnkB* m_step;
+	u8 _padEC[0x10];
+	void (*m_drawMeshDlCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+	u8 _pad100[0x4];
+	void (*m_afterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
+};
+
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_data) == 0xA4);
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_meshes) == 0xAC);
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_state) == 0xE4);
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_step) == 0xE8);
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_drawMeshDlCallback) == 0xFC);
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_afterDrawMeshCallback) == 0x104);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
@@ -101,12 +105,6 @@ STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_points) == 0xC);
 STATIC_ASSERT(offsetof(ChangeTexModelData, m_meshCount) == 0xC);
 STATIC_ASSERT(offsetof(ChangeTexModelData, m_materialSet) == 0x24);
 STATIC_ASSERT(offsetof(ChangeTexModelData, m_frameShift) == 0x34);
-STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_data) == 0xA4);
-STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_meshes) == 0xAC);
-STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_work) == 0xE4);
-STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_step) == 0xE8);
-STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_drawMeshDlCallback) == 0xFC);
-STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_afterDrawMeshCallback) == 0x104);
 
 extern const float FLOAT_80332020 = -10000.0f;
 extern const char DAT_80332024[] = "obj";
@@ -471,7 +469,9 @@ void pppConstructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
  */
 extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
 {
-	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
+	ChangeTexModelRaw* modelRaw = (ChangeTexModelRaw*)model;
+	ChangeTexWork* work = (ChangeTexWork*)param_2;
+	ChangeTexMeshRef* meshes = modelRaw->m_meshes;
 	int displayListIdx;
 	int* displayListPtr;
 	int dlArrayBase;
@@ -486,8 +486,8 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 	ChangeTexDisplayList* displayList;
 
 	if (*(u8*)((char*)param_3 + 0x14) != 0) {
-		meshColorArrays = *(void**)((char*)param_2 + 0xC);
-		dlOffset = *(int*)((char*)param_2 + 0x1c);
+		meshColorArrays = work->m_meshColorArrays;
+		dlOffset = (int)work->m_texture;
 		meshData = meshes[meshIdx].m_data;
 		displayList = meshData->m_displayLists;
 		if (meshColorArrays != 0) {
@@ -496,16 +496,15 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
 				*(int*)(MaterialManRaw() + 0xd0) = dlOffset + 0x28;
+				fullTevBits = 0xADE0F;
 				drawTevBits = 0xACE0F;
-				fullTevBits = drawTevBits;
-				fullTevBits |= 0x1000;
 				allOnes = -1;
 				u8 fullByte = 0xFF;
 				tevScale = 0x1e;
 				displayListIdx = meshData->m_displayListCount - 1;
 				dlOffset = displayListIdx * 4;
 				while (displayListIdx >= 0) {
-					dlArrayBase = *(int*)(meshIdx * 4 + *(int*)((char*)param_2 + 0x10));
+					dlArrayBase = *(int*)(meshIdx * 4 + (int)work->m_displayListArrays);
 					*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
 					*(int*)(MaterialManRaw() + 0x128) = 0;
 					*(int*)(MaterialManRaw() + 0x12c) = tevScale;
@@ -526,7 +525,7 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 					*(int*)(MaterialManRaw() + 0x130) = 0;
 					*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
 					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-					    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
+					    &MaterialMan, modelRaw->m_data->m_materialSet, displayList->m_material, 0, 0);
 					displayListPtr = *(int**)(dlArrayBase + dlOffset);
 					GXCallDisplayList((void*)displayListPtr[0], (unsigned int)displayListPtr[1]);
 					dlOffset -= 4;
@@ -549,22 +548,22 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
  */
 extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
 {
-	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
+	ChangeTexModelRaw* modelRaw = (ChangeTexModelRaw*)model;
+	ChangeTexWork* work = (ChangeTexWork*)param_2;
+	ChangeTexMeshRef* meshes = modelRaw->m_meshes;
 	ChangeTexMeshData* meshData = meshes[param_4].m_data;
 	ChangeTexDisplayList* displayList = meshData->m_displayLists + param_5;
-	int textureInfo = *(int*)((char*)param_2 + 0x1C);
+	int textureInfo = (int)work->m_texture;
 
 	if (*(u8*)((char*)param_3 + 0x14) == 0) {
-		int drawTevBits = 0xACE0F;
-		int fullTevBits = drawTevBits;
+		int fullTevBits = 0xADE0F;
 		int zero = 0;
 		int allOnes = -1;
 		int tevScale = 0x1E;
 		u8 fullByte = 0xFF;
 
-		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
+		*(int*)(MaterialManRaw() + 0x48) = 0xACE0F;
 		*(int*)(MaterialManRaw() + 0x128) = zero;
-		fullTevBits |= 0x1000;
 		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
 		*(int*)(MaterialManRaw() + 0x130) = zero;
 		*(int*)(MaterialManRaw() + 0x44) = allOnes;
@@ -586,6 +585,6 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
 	}
 
 	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-	    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
+	    &MaterialMan, modelRaw->m_data->m_materialSet, displayList->m_material, 0, 0);
 	GXCallDisplayList(displayList->m_data, displayList->m_size);
 }

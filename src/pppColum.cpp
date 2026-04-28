@@ -154,6 +154,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             float deltaX2;
             float deltaY2;
 
+            zero = FLOAT_80331084;
             PSMTXIdentity(identityMtx);
             baseX = positionWork->m_position.x;
             baseY = positionWork->m_position.y;
@@ -183,7 +184,6 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             values = frameWork->m_values;
             segmentStep =
                 (FLOAT_803310A8 * lengthXY) / (float)param_2->m_count;
-            zero = FLOAT_80331084;
 
             for (int i = 0; i < param_2->m_count; i++) {
                 float positionScale = segmentStep * values->m_positionScale;

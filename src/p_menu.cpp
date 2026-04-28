@@ -123,8 +123,17 @@ unsigned int m_table_desc4__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsi
 unsigned int m_table_desc5__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
 
 unsigned int m_table__8CMenuPcs[0x57] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(kMenuPcsStageName)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1A, 0, 0, 0, 0,
-    0x49, 0x1, 0, 0, 0, 0x1A, 0x10, 0, 0, 0, 0x49, 0x11
+    reinterpret_cast<unsigned int>(const_cast<char*>(kMenuPcsStageName)),
+    m_table_desc0__8CMenuPcs[0], m_table_desc0__8CMenuPcs[1], m_table_desc0__8CMenuPcs[2],
+    m_table_desc1__8CMenuPcs[0], m_table_desc1__8CMenuPcs[1], m_table_desc1__8CMenuPcs[2],
+    m_table_desc2__8CMenuPcs[0], m_table_desc2__8CMenuPcs[1], m_table_desc2__8CMenuPcs[2],
+    0x1A, 0,
+    m_table_desc3__8CMenuPcs[0], m_table_desc3__8CMenuPcs[1], m_table_desc3__8CMenuPcs[2],
+    0x49, 0x1,
+    m_table_desc4__8CMenuPcs[0], m_table_desc4__8CMenuPcs[1], m_table_desc4__8CMenuPcs[2],
+    0x1A, 0x10,
+    m_table_desc5__8CMenuPcs[0], m_table_desc5__8CMenuPcs[1], m_table_desc5__8CMenuPcs[2],
+    0x49, 0x11
 };
 
 int DAT_8020ef9c[] = {

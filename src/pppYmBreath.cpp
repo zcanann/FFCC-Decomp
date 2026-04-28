@@ -275,7 +275,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     float* colorDelta;
     int* groupData;
     int groupCount;
-    long* shape;
+    long** shape;
     unsigned char colorR;
     unsigned char colorG;
     unsigned char colorB;
@@ -297,7 +297,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
         return;
     }
 
-    shape = *(long**)(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pppEnvStPtr) + 0xC) + step->m_stepValue * 4);
+    shape = *(long***)(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pppEnvStPtr) + 0xC) +
+                       step->m_stepValue * 4);
     pppSetBlendMode(step->m_payload[8]);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -376,7 +377,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             amb.b = (unsigned char)b;
             amb.a = (unsigned char)a;
             GXSetChanAmbColor(GX_COLOR0A0, amb);
-            pppDrawShp__FPlsP12CMaterialSetUc(shape, *(short*)((unsigned char*)&source[7].y + 2),
+            pppDrawShp__FPlsP12CMaterialSetUc(*shape, *(short*)((unsigned char*)&source[7].y + 2),
                                               pppEnvStPtr->m_materialSetPtr,
                                               step->m_payload[8]);
         }
@@ -671,7 +672,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             if (*(short*)(particleData + 0x50) >= 1) {
                 UpdateParticle(vYmBreath, pYmBreath, (_PARTICLE_DATA*)particleData, vColor,
                                (_PARTICLE_COLOR*)particleColor);
-                pppCalcFrameShape(*(long**)(*(int*)(pppEnvStPtr + 0xC) + *(int*)((unsigned char*)pYmBreath + 0xC) * 4),
+                pppCalcFrameShape(**(long***)(*(int*)((unsigned char*)pppEnvStPtr + 0xC) +
+                                             *(int*)((unsigned char*)pYmBreath + 0xC) * 4),
                                   *(short*)(particleData + 0x58), *(short*)(particleData + 0x5A),
                                   *(short*)(particleData + 0x56), *(short*)((unsigned char*)pYmBreath + 0x10));
             } else {

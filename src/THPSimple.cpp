@@ -114,24 +114,24 @@ void THPAudioMixCallback()
 	}
 
 	if (gTHPSimpleAudioSystem == 1) {
-		if (gTHPSimpleCurAudioBuffer != NULL) {
-			gTHPSimpleLastAudioBuffer = gTHPSimpleCurAudioBuffer;
+		if (gTHPSimpleLastAudioBuffer != NULL) {
+			gTHPSimpleCurAudioBuffer = gTHPSimpleLastAudioBuffer;
 		}
 		gTHPSimpleOldAIDCallback();
-		gTHPSimpleCurAudioBuffer = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
+		gTHPSimpleLastAudioBuffer = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
 	} else {
 		gTHPSimpleOldAIDCallback();
-		gTHPSimpleLastAudioBuffer = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
+		gTHPSimpleCurAudioBuffer = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
 	}
 
 	gTHPSimpleSoundBufferIndex ^= 1;
 	AIInitDMA((u32)(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280), 0x280);
 	interruptState = OSEnableInterrupts();
-	if (gTHPSimpleLastAudioBuffer != NULL) {
-		DCInvalidateRange(gTHPSimpleLastAudioBuffer, 0x280);
+	if (gTHPSimpleCurAudioBuffer != NULL) {
+		DCInvalidateRange(gTHPSimpleCurAudioBuffer, 0x280);
 	}
 	MixAudio(reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280),
-	         gTHPSimpleLastAudioBuffer, 0xA0);
+	         gTHPSimpleCurAudioBuffer, 0xA0);
 	DCFlushRange(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280, 0x280);
 	OSRestoreInterrupts(interruptState);
 }
@@ -1003,8 +1003,8 @@ s32 THPSimpleInit(s32 audioMixMode)
     interruptState = OSDisableInterrupts();
     gTHPSimpleAudioSystem = audioMixMode;
     gTHPSimpleSoundBufferIndex = 0;
-    gTHPSimpleCurAudioBuffer = (s16*)NULL;
     gTHPSimpleLastAudioBuffer = (s16*)NULL;
+    gTHPSimpleCurAudioBuffer = (s16*)NULL;
     gTHPSimpleOldAIDCallback = AIRegisterDMACallback(THPAudioMixCallback);
 
     if ((gTHPSimpleOldAIDCallback == NULL) && (gTHPSimpleAudioSystem != 0)) {

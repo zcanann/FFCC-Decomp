@@ -217,8 +217,9 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
     }
 
-    float sx = FLOAT_80331cc0 * value[6];
-    float sy = FLOAT_80331cc0 * value[7];
+    const float& two = FLOAT_80331cc0;
+    float sx = two * value[6];
+    float sy = two * value[7];
     u8* piece = (u8*)*(void**)&value[3];
     for (u32 i = 0; i < *(u32*)(*(u8**)(model + 0xA4) + 0xC); i++) {
         switch (param_2->m_initWOrk) {
@@ -326,7 +327,7 @@ void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
     float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
-    float f = FLOAT_80331cc4;
+    const float& f = FLOAT_80331cc4;
     value[2] = f;
     value[1] = f;
     *value = f;
@@ -351,7 +352,7 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(u32*)((u8*)gObject + 0x60) |= 0x40;
     *(void**)(model + 0xF0) = (void*)SB_BeforeDrawCallback;
-    float f = FLOAT_80331cc4;
+    const float& f = FLOAT_80331cc4;
     *(void**)(model + 0xFC) = (void*)SB_DrawMeshDLCallback;
     *(void**)(model + 0xF4) = (void*)SB_BeforeMeshLockEnvCallback;
     *(void**)(model + 0xEC) = (void*)SB_BeforeCalcMatrixCallback;
@@ -631,15 +632,19 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     Vec lightDir;
     GXLightObj lightObj;
     u8* camera = reinterpret_cast<u8*>(&CameraPcs);
-    const float cameraOffset = FLOAT_80331ce8;
+    const float& cameraOffset = FLOAT_80331ce8;
+    const float& zero = FLOAT_80331cc4;
+    const float& one = FLOAT_80331cd0;
+    const float& attnA = FLOAT_80331cec;
+    const float& attnB = FLOAT_80331cf0;
 
     lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
     lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));
     lightDir.z = *(float*)(camera + 0xF4) - (cameraOffset + *(float*)(camera + 0xE8));
     PSVECNormalize(&lightDir, &lightDir);
 
-    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cc4);
-    GXInitLightAttn(&lightObj, FLOAT_80331cc4, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cec, FLOAT_80331cc4, FLOAT_80331cf0);
+    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, one, zero);
+    GXInitLightAttn(&lightObj, zero, zero, one, attnA, zero, attnB);
 
     GXInitLightColor(&lightObj,
                      *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(&colorStorage, 0xFF, 0xFF, 0xFF, 0xFF)));

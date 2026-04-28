@@ -2551,9 +2551,12 @@ void MainControl(int frames)
             step = *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
             if (mul != 0) {
                 if (*p_MusicTempoControl < 0) {
-                    step = (step * (int)mul) >> 0x10;
+                    step *= (int)mul;
+                    step >>= 0x10;
                 } else {
-                    step = ((step * ((int)mul + 1)) >> 0xF) + (*(int*)((u8*)p_SoundControl + 0x448) >> 0xC);
+                    step *= (int)mul + 1;
+                    step >>= 0xF;
+                    step += *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
                 }
             }
             *(s16*)((u8*)p_SoundControl + 0x48C) -= step * frames;
@@ -2566,7 +2569,8 @@ void MainControl(int frames)
 
     if (*(s16*)((u8*)p_SoundControlBuffer + 0x922) != 0) {
         p_SoundControl = (void*)((u8*)p_SoundControlBuffer + 0x494);
-        *(s16*)((u8*)p_SoundControl + 0x48C) -= (*(int*)((u8*)p_SoundControl + 0x448) >> 0xC) * frames;
+        step = *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
+        *(s16*)((u8*)p_SoundControl + 0x48C) -= step * frames;
         while (*(s16*)((u8*)p_SoundControl + 0x48C) < 1) {
             *(s16*)((u8*)p_SoundControl + 0x48C) += 0xFA;
             _MusicNoteExecute();

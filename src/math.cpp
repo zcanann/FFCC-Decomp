@@ -994,32 +994,32 @@ unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
 
         if (hue < 60) {
             rgba[0] = val;
+            rgba[2] = low;
             rgba[1] = low + delta;
-            rgba[2] = low;
         } else if (hue < 120) {
-            rgba[0] = val - delta;
             rgba[1] = val;
             rgba[2] = low;
+            rgba[0] = val - delta;
         } else if (hue < 180) {
-            rgba[0] = low;
             rgba[1] = val;
+            rgba[0] = low;
             rgba[2] = low + delta;
         } else if (hue < 240) {
+            rgba[2] = val;
             rgba[0] = low;
             rgba[1] = val - delta;
-            rgba[2] = val;
         } else if (hue < 300) {
-            rgba[0] = low + delta;
-            rgba[1] = low;
             rgba[2] = val;
+            rgba[1] = low;
+            rgba[0] = low + delta;
         } else if (hue < 360) {
             rgba[0] = val;
             rgba[1] = low;
             rgba[2] = val - delta;
         } else {
-            rgba[0] = 0;
-            rgba[1] = 0;
             rgba[2] = 0;
+            rgba[1] = 0;
+            rgba[0] = 0;
         }
     }
 

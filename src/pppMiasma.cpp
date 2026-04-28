@@ -150,10 +150,14 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     s16* work;
     u8* colorData;
     u8* radiusScaleData;
+    pppCVECTOR drawColor;
     PackedMiasmaColor packedWork;
+    int textureIndex;
     PackedMiasmaColor packedColor;
-    Vec managerPos;
+    Vec quadA;
+    Vec quadB;
     Vec cameraPos;
+    Vec managerPos;
     float radius;
     float maxRadius;
     int texWidth;
@@ -162,7 +166,6 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     u32 scissorHeight;
     int i4TexSize;
     int rgba8TexSize;
-    int textureIndex;
     int yOffset;
     float yPos;
     u16 i;
@@ -176,10 +179,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     Mtx scaleMtx;
     Mtx localMtx;
     Mtx44 screenMtx;
-    pppCVECTOR drawColor;
     GXColor stepColor;
-    Vec quadA;
-    Vec quadB;
 
     Graphic.SetDrawDoneDebugData(0x31);
 

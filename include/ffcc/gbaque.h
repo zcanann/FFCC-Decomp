@@ -58,7 +58,7 @@ public:
     int GetItemAll(int, unsigned char*);
     unsigned int GetScrFlg();
     int GetPlayerHP(int, unsigned char*);
-    void MakeLetterList(int, char*);
+    int MakeLetterList(int, char*);
     int MakeLetterData(int, char*, int);
     unsigned int GetLetterLstFlg(int);
     void ClrLetterLstFlg(int);

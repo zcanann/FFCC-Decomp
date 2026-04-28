@@ -2131,7 +2131,7 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::MakeLetterList(int channel, char* outData)
+int GbaQueue::MakeLetterList(int channel, char* outData)
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	const unsigned int scriptFood = Game.m_scriptFoodBase[channel];
@@ -2141,7 +2141,7 @@ void GbaQueue::MakeLetterList(int channel, char* outData)
 		self[0x2C8A] = static_cast<unsigned char>(self[0x2C8A] | channelMask);
 		Joybus.SetLetterSize(channel, 0);
 		self[0x2C89] = static_cast<unsigned char>(self[0x2C89] & ~channelMask);
-		return;
+		return 0;
 	}
 
 char* npcNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
@@ -2150,7 +2150,7 @@ char* npcNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
 		if (System.m_execParam != 0) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7A9);
 		}
-		return;
+		return -1;
 	}
 	memset(npcNameBuf, 0, 0x800);
 
@@ -2161,7 +2161,7 @@ char* subjectNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B3);
 		}
 		__dla__FPv(npcNameBuf);
-		return;
+		return -1;
 	}
 	memset(subjectNameBuf, 0, 0x1800);
 
@@ -2173,7 +2173,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 		}
 		__dla__FPv(subjectNameBuf);
 		__dla__FPv(npcNameBuf);
-		return;
+		return -1;
 	}
 	memset(letterEntryBuf, 0, 0x800);
 
@@ -2259,7 +2259,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<
 			flags |= 8;
 		}
 
-		const unsigned int value = cur[0] >> 16 & 0x1FF;
+		const unsigned int value = *reinterpret_cast<const unsigned short*>(scriptFood + 0x3EE + i * 0xC) & 0x1FF;
 		if ((curWord & 8) == 0) {
 			if (value != 0) {
 				if (value < 0x100 || value > 0x124) {
@@ -2306,6 +2306,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast
 	self[0x2C8A] = static_cast<unsigned char>(self[0x2C8A] | channelMask);
 	Joybus.SetLetterSize(channel, totalSize);
 	self[0x2C89] = static_cast<unsigned char>(self[0x2C89] & ~channelMask);
+	return totalSize;
 }
 
 /*
@@ -3958,9 +3959,9 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 
 	__dla__FPv(smithIndices);
 
+	GbaQueueFlagView* flags = GetFlagView(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	reinterpret_cast<unsigned char*>(this)[0x2D56] =
-		static_cast<unsigned char>(reinterpret_cast<unsigned char*>(this)[0x2D56] | (1 << channel));
+	flags->m_mkSmithFlg = static_cast<unsigned char>(flags->m_mkSmithFlg | (1 << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	Joybus.SetLetterSize(channel, totalSize);

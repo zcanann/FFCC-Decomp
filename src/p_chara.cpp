@@ -70,6 +70,8 @@ extern "C" void* __ct__Q26CChara5CAnimFv(void*);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void LoadSe__6CSoundFPv(void*, void*);
 extern "C" void LoadWave__6CSoundFPv(void*, void*);
+extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
+extern "C" void __ct__6CColorFR6CColor(void*, void*);
 extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void loadModelASyncFrame__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*);
@@ -944,8 +946,12 @@ void CCharaPcs::destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80079d9c
+ * PAL Size: 568b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCharaPcs::Reset(CCharaPcs::RESET mode)
 {
@@ -953,12 +959,8 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
 
     for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
         unsigned char* loadAnim = reinterpret_cast<unsigned char*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
-        if (loadAnim == 0) {
-            continue;
-        }
-
         unsigned char* anim = *reinterpret_cast<unsigned char**>(loadAnim + 0x28);
-        if (anim != 0 && *reinterpret_cast<void**>(anim + 0x20) != 0) {
+        if (*reinterpret_cast<void**>(anim + 0x20) != 0) {
             __dl__FPv(*reinterpret_cast<void**>(anim + 0x20));
             *reinterpret_cast<void**>(anim + 0x20) = 0;
         }
@@ -989,10 +991,6 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
 
             for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
                 int* loadAnim = reinterpret_cast<int*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
-                if (loadAnim == 0) {
-                    continue;
-                }
-
                 const bool releaseByKind = loadAnim[4] < 0 && loadAnim[1] == 1;
                 const bool releaseByMask = loadAnim[4] >= 0 && ((releaseMask & static_cast<unsigned int>(loadAnim[5])) != 0);
                 if (!releaseByKind && !releaseByMask) {
@@ -1024,9 +1022,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     }
 
     CharaAmemSize() = static_cast<unsigned int>(charaAmemSize < 0 ? 0 : charaAmemSize);
-    if (gCharaPartWorkPtr != 0) {
-        gCharaPartWorkPtr[0x6B] = 0xFF;
-    }
+    gCharaPartWorkPtr[0x6B] = 0xFF;
     FreeMergeMask(this) = 0;
 }
 
@@ -1114,18 +1110,37 @@ int CCharaPcs::correctLoadAnimAmem()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007999c
+ * PAL Size: 420b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCharaPcs::onScriptChanging(char*)
 {
+    unsigned char* fadeColor = reinterpret_cast<unsigned char*>(this);
+
     for (int i = 0; i < 5; i++) {
-        const unsigned char shade = static_cast<unsigned char>((i * 0xFF) / 4);
-        _GXColor& fadeColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0x12C + i * 4));
-        fadeColor.r = shade;
-        fadeColor.g = shade;
-        fadeColor.b = shade;
-        fadeColor.a = 0xFF;
+        unsigned char shadeCopy[4];
+        unsigned char white[4];
+        unsigned char shade[4];
+        unsigned char* whiteChannels =
+            reinterpret_cast<unsigned char*>(__ct__6CColorFUcUcUcUc(white, 0xFF, 0xFF, 0xFF, 0xFF));
+        __ct__6CColorFv(shade);
+
+        float scale = static_cast<float>(i) * 0.25f;
+        shade[0] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[0]) * scale));
+        shade[1] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[1]) * scale));
+        shade[2] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[2]) * scale));
+        shade[3] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[3]) * scale));
+        __ct__6CColorFR6CColor(shadeCopy, shade);
+
+        fadeColor[0x12C] = shadeCopy[0];
+        fadeColor[0x12D] = shadeCopy[1];
+        fadeColor[0x12E] = shadeCopy[2];
+        fadeColor[0x12F] = shadeCopy[3];
+        fadeColor += 4;
     }
 
     *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;

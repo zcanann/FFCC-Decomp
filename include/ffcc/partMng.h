@@ -189,13 +189,10 @@ struct _pppCtrlTableData
 struct _pppCtrlTable
 {
     pppProg* m_prog;                    // 0x0
-    union {
-        int m_initialWork;              // 0x4
-        struct {
-            unsigned short m_workOffset; // 0x4
-            unsigned short m_workFlags;  // 0x6
-        } m_workInfo;
-    };
+    struct {
+        unsigned short m_workOffset;    // 0x4
+        unsigned short m_workFlags;     // 0x6
+    } m_workInfo;
     int m_unk8;                         // 0x8
     union {
         _pppCtrlTableData* m_serializedDef; // 0xC
@@ -266,14 +263,7 @@ struct _pppMngSt
     float m_userFloat0;                // 0x48
     float m_userFloat1;                // 0x4C
     Vec m_savedPosition;               // 0x50
-    union {
-        Vec m_previousPosition;        // 0x5C
-        struct {
-            float m_previousPositionX; // 0x5C
-            float m_previousPositionY; // 0x60
-            float m_paramD;            // 0x64
-        } m_previousPositionFields;
-    };
+    Vec m_previousPosition;            // 0x5C (third float doubles as a generic param)
     Vec m_paramVec0;                   // 0x68
     short m_kind;                      // 0x74
     short m_nodeIndex;                 // 0x76

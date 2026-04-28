@@ -364,7 +364,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         if (step->m_payload[0x3b] == 0) {
             pppHitCylinderSendSystem(
                 pppMngStPtr, &work->m_origin, &localA,
-                pppMngStPtr->m_previousPositionFields.m_paramD * *(float*)(step->m_payload + 0x24),
+                pppMngStPtr->m_previousPosition.z * *(float*)(step->m_payload + 0x24),
                 *(float*)(step->m_payload + 0x20));
         }
 
@@ -614,7 +614,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             GXSetZMode(1, GX_LEQUAL, 0);
 
             PSMTXIdentity(tempMtx);
-            tempMtx[0][0] = pppMngStPtr->m_previousPositionFields.m_paramD * *(float*)(step->m_payload + 0x24);
+            tempMtx[0][0] = pppMngStPtr->m_previousPosition.z * *(float*)(step->m_payload + 0x24);
             tempMtx[1][1] = tempMtx[0][0];
             tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
             PSMTXConcat(baseObj->m_localMatrix.value, tempMtx, tempMtx);

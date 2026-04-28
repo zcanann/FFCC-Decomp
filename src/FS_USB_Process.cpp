@@ -43,7 +43,8 @@ static inline void StoreSwap32(u32* value) {
 
 static inline void StoreSwap32(f32* value) {
     f32 raw = *value;
-    *reinterpret_cast<u32*>(value) = LoadSwap32(*reinterpret_cast<u32*>(&raw));
+    u32 swapped = LoadSwap32(*reinterpret_cast<u32*>(&raw));
+    *value = *reinterpret_cast<f32*>(&swapped);
 }
 
 static inline u16 LoadSwap16(u16 value) {
@@ -85,8 +86,10 @@ void CFunnyShapePcs::SetUSBData()
         StoreSwap32(&m_displayPending.unk30);
         DCStoreRange(&m_displayPending, 0x40);
 
-        GXSetCopyClear(m_displayPending.clear, 0xFFFFFF);
-        m_displayCurrent = m_displayPending;
+        GXColor clear = m_displayPending.clear;
+        GXSetCopyClear(clear, 0xFFFFFF);
+        FS_DISPLAY_STATUS display = m_displayPending;
+        m_displayCurrent = display;
         break;
     }
     case 5: {
@@ -222,15 +225,15 @@ void CFunnyShapePcs::SetUSBData()
         break;
     }
     case 15: {
-        u8 local[0x10];
-        memcpy(local, usb->m_data, sizeof(local));
+        OSFS_SHAPE_ST shape;
+        memcpy(&shape, usb->m_data, sizeof(shape));
 
-        m_shape.flags = LoadSwap16(*reinterpret_cast<u16*>(local + 0x0));
-        m_shape.count = LoadSwap16(*reinterpret_cast<u16*>(local + 0x2));
-        m_shape.unk04 = *reinterpret_cast<u32*>(local + 0x4);
-        m_shape.unk08 = LoadSwap16(*reinterpret_cast<u16*>(local + 0x8));
-        memcpy(m_shape.unk0A, local + 0xA, 4);
-        m_shape.unk0E = *reinterpret_cast<u16*>(local + 0xE);
+        m_shape.flags = LoadSwap16(shape.flags);
+        m_shape.count = LoadSwap16(shape.count);
+        m_shape.unk04 = shape.unk04;
+        m_shape.unk08 = LoadSwap16(shape.unk08);
+        memcpy(m_shape.unk0A, shape.unk0A, 4);
+        m_shape.unk0E = shape.unk0E;
         break;
     }
     case 16: {

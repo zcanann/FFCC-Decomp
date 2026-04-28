@@ -51,13 +51,8 @@ extern float FLOAT_80330D9C;
 extern float FLOAT_80330DA0;
 extern float FLOAT_80330DA4;
 extern float FLOAT_80330DA8;
-extern float FLOAT_80330dac = 0.0f;
-
-static inline float YmDeformationMdlZero()
-{
-    const float* zero = &FLOAT_80330dac;
-    return *zero;
-}
+extern const double DOUBLE_80330DB0;
+extern const float FLOAT_80330dac = 0.0f;
 
 static inline Mtx& CameraMatrix()
 {

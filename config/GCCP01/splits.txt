@@ -2583,9 +2583,9 @@ RedSound/RedMemory.cpp:
 	extab       start:0x8000A5B8 end:0x8000A5F8
 	extabindex  start:0x80011CA4 end:0x80011D04
 	.text       start:0x801BFF34 end:0x801C05F8
-	.rodata     start:0x801E7888 end:0x801E78D8
+	.rodata     start:0x801E7888 end:0x801E78D2
 	.sbss       start:0x8032F490 end:0x8032F4A8
-	.sdata2     start:0x80333D20 end:0x80333D30
+	.sdata2     start:0x80333D20 end:0x80333D2D
 
 RedSound/RedEntry.cpp:
 	extab       start:0x8000A5F8 end:0x8000A760

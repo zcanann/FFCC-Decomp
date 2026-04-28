@@ -236,7 +236,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     trailStep = step->m_stepDistance * pppMngStPtr->m_scale.x;
     trailStepDelta = trailStep * (shapeScaleStep / shapeScale);
     if (trailStep == zero) {
-        return;
+        count = 0;
     }
 
     currentIndex = work->m_head;

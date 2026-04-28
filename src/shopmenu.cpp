@@ -201,7 +201,7 @@ static unsigned short GetShopMenuListButtons()
             return 0;
         }
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20);
+        return Pad._20_2_;
     }
 
     unsigned short buttons;
@@ -646,7 +646,7 @@ unsigned short getButtonRepeat(int, unsigned short noRepeatMask)
             buttons = 0;
         } else {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-            buttons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20);
+            buttons = Pad._20_2_;
         }
     } else {
         bool hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
@@ -3203,4 +3203,3 @@ void CShopMenu::setFaceAlpha(int, int alpha)
 {
     ShopMenuInt(this, 0x40) = alpha;
 }
-

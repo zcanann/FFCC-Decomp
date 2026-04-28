@@ -21,6 +21,16 @@ extern const float FLOAT_80331008;
 extern const float FLOAT_8033100C;
 extern const float FLOAT_80331010;
 
+extern const float FLOAT_80330fa8 = 32.0f;
+extern const float FLOAT_80330fac = -0.5f;
+extern const float FLOAT_80330fb0 = 640.0f;
+extern const float FLOAT_80330fb4 = 448.0f;
+extern const float FLOAT_80330fb8 = 33.3f;
+extern const float FLOAT_80330fbc = 1.3333334f;
+extern const float FLOAT_80330fc0 = 0.5f;
+extern const double DOUBLE_80330FC8 = 4503599627370496.0;
+extern const float FLOAT_80330FD0 = 2.0f;
+
 #define CRYSTAL_REFRACTION_SIZE 32.0f
 #define CRYSTAL_HALF_NEGATIVE -0.5f
 #define CRYSTAL_SCREEN_WIDTH 640.0f
@@ -299,6 +309,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 					float xCoord = FLOAT_80330FD4;
 
 					for (x = 0; x < (u32)textureInfo->m_width; x++) {
+						u32 xFine = x & 3;
 						float magnitude = xCoord * xCoord + ySq;
 						if (magnitude > FLOAT_80330FD8) {
 							magnitude = CrystalSqrtPositive(magnitude);
@@ -314,7 +325,6 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 
 						double modulation = fmod(magnitude, DOUBLE_80331000);
 						magnitude = FLOAT_80331008 * (magnitude * (float)modulation);
-						u32 xFine = x & 3;
 						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80331010 + FLOAT_8033100C));
 						u8* pixel = textureInfo->m_imageData +
 							yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +

@@ -99,7 +99,7 @@ public:
     static void SetBonusCondition(int, int, int, int, int);
 
     void InitFinished();
-    bool IsDispRader();
+    unsigned int IsDispRader();
 
     void ChangeCommandMode(int);
     void checkAndSetWeapon();

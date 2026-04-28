@@ -160,19 +160,18 @@ struct CharaBreakMeshData {
     CharaBreakDisplayList* m_displayLists;
     u32 m_skinCount;
     void* m_skins;
-    u32 m_infoWord1;
     s32 m_nodeIndex;
 };
 
 struct CharaBreakMeshRef {
+    u8 _pad0[8];
     CharaBreakMeshData* m_data;
     S16Vec* m_workPositions;
     S16Vec* m_workNormals;
-    u8 _padC[8];
 };
 
 struct CharaBreakModelData {
-    u8 _pad0[0xA];
+    u8 _pad0[0x12];
     u16 m_meshCount;
     u8 _padC[0x14];
     void* m_materialSet;
@@ -188,20 +187,20 @@ struct CharaBreakModelView {
     CharaBreakMeshRef* m_meshes;
 };
 
-STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x0);
-STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0x4);
-STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x8);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_data) == 0xA4);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_nodes) == 0xA8);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_meshes) == 0xAC);
-STATIC_ASSERT(offsetof(CharaBreakModelData, m_meshCount) == 0xA);
-STATIC_ASSERT(offsetof(CharaBreakModelData, m_materialSet) == 0x20);
-STATIC_ASSERT(offsetof(CharaBreakModelData, m_posQuant) == 0x2C);
-STATIC_ASSERT(offsetof(CharaBreakModelData, m_normQuant) == 0x30);
+STATIC_ASSERT(offsetof(CharaBreakModelData, m_meshCount) == 0x12);
+STATIC_ASSERT(offsetof(CharaBreakModelData, m_materialSet) == 0x28);
+STATIC_ASSERT(offsetof(CharaBreakModelData, m_posQuant) == 0x34);
+STATIC_ASSERT(offsetof(CharaBreakModelData, m_normQuant) == 0x38);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_skinCount) == 0x54);
-STATIC_ASSERT(offsetof(CharaBreakMeshData, m_nodeIndex) == 0x60);
+STATIC_ASSERT(offsetof(CharaBreakMeshData, m_nodeIndex) == 0x5C);
 
 static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
 {
@@ -370,7 +369,6 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 {
     CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
     CharaBreakMeshData* meshData = meshRef->m_data;
-    CharaBreakModelData* modelData = ModelData(model);
     s32 isRigid = 0;
     S16Vec* workPositions;
     u16* stream = (u16*)displayList;
@@ -389,6 +387,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
     while (keepReading != 0) {
         u8 drawCmd = *(u8*)stream;
         u16 drawCount = *(u16*)((u8*)stream + 1);
+        u8 drawMode = drawCmd & 7;
         u8 primitive = drawCmd & 0xF8;
         s16 triCount;
         s32 outVertex;
@@ -414,23 +413,20 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                 u16 texIndex = stream[3];
 
                 stripRestart = stream + 4;
-                if ((drawCmd & 7) == 2) {
+                if (drawMode == 2) {
                     stripRestart = stream + 5;
                 }
                 stream = stripRestart;
 
                 if (isRigid != 0) {
                     S16Vec* sourcePos = workPositions + posIndex;
-                    S16Vec posQuantized;
+                    S16Vec posQuantized = *sourcePos;
                     Vec posFloat;
 
-                    posQuantized.x = sourcePos->x;
-                    posQuantized.y = sourcePos->y;
-                    posQuantized.z = sourcePos->z;
-                    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &posFloat, posQuantized, modelData->m_posQuant);
+                    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &posFloat, posQuantized, ModelData(model)->m_posQuant);
                     PSMTXMultVec(meshMtx, &posFloat, &posFloat);
                     ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, (S16Vec*)(polygonBytes + (outVertex * 6) + 0x10), posFloat,
-                                                        modelData->m_posQuant);
+                                                        ModelData(model)->m_posQuant);
                 } else {
                     S16Vec* sourcePos = workPositions + posIndex;
                     s32 positionOffset = outVertex * 6;

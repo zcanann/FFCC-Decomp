@@ -3490,7 +3490,7 @@ void CGObject::PutDropItem()
  * Address:	TODO
  * Size:	TODO
  */
-bool CGObject::IsDispRader()
+unsigned int CGObject::IsDispRader()
 { 
 	return m_displayFlags & 1;
 }

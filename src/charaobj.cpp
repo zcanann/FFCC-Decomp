@@ -1,4 +1,5 @@
 #include "ffcc/charaobj.h"
+#include "ffcc/astar.h"
 #include "ffcc/fontman.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/linkage.h"
@@ -36,7 +37,6 @@ extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern "C" int intToClass__13CFlatRuntime2Fi(void*, int);
 extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
 extern "C" void pppEndPart__8CPartMngFi(void*, int);
-extern "C" unsigned char calcSpecialPolygonGroup__6CAStarFP3Vec(void*, Vec*);
 extern "C" unsigned char m_boss__8CGMonObj[];
 extern char SoundBuffer[];
 
@@ -711,8 +711,7 @@ void CGCharaObj::onFramePreCalc()
 	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) == 0) {
 		m_aStarGroupId = static_cast<unsigned short>(static_cast<unsigned char>(m_lastBgGroup));
 	} else {
-		m_aStarGroupId = static_cast<unsigned short>(
-			calcSpecialPolygonGroup__6CAStarFP3Vec(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x2A5C, &m_worldPosition));
+		m_aStarGroupId = static_cast<unsigned short>(AStar.calcSpecialPolygonGroup(&m_worldPosition));
 	}
 }
 

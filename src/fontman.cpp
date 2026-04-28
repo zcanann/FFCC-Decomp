@@ -1,5 +1,6 @@
 #include "ffcc/fontman.h"
 #include "ffcc/chunkfile.h"
+#include "ffcc/color.h"
 #include "ffcc/p_camera.h"
 extern "C" {
 unsigned char g_tFont22[0x10D40] ATTRIBUTE_ALIGN(32) = {
@@ -7,8 +8,8 @@ unsigned char g_tFont22[0x10D40] ATTRIBUTE_ALIGN(32) = {
 };
 }
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
 #include <dolphin/mtx.h>
-#include <math.h>
 
 extern "C" void __dt__8CFontManFv(void*);
 extern "C" void __ct__4CRefFv(void*);
@@ -74,7 +75,7 @@ found_fallback:
 	unsigned char flags = renderFlags;
 	unsigned int drawWidth;
 
-	if ((flags & 8) != 0) {
+	if ((flags & 0x10) != 0) {
 		drawWidth = static_cast<unsigned int>(m_glyphWidth);
 	} else {
 		signed char sign = static_cast<signed char>(flags) >> 7;
@@ -84,7 +85,7 @@ found_fallback:
 	}
 
 	double width = static_cast<double>(scaleX * (margin + static_cast<float>(drawWidth)));
-	if ((flags & 0x10) != 0) {
+	if ((flags & 8) != 0) {
 		width = static_cast<double>(static_cast<float>(floor(width)));
 	}
 
@@ -122,16 +123,17 @@ find_fallback:
 float CFont::GetWidth(char* text)
 {
 	float width = 0.0f;
-	unsigned int ch = 0;
+	unsigned short ch = 0;
 
 	goto read_char;
 
 	while (ch != '\0') {
-		unsigned short* glyph = m_glyphBuckets[ch] + 1;
-		int count = static_cast<int>(m_glyphBuckets[ch][0]);
+		unsigned short* currentBucket = m_glyphBuckets[ch & 0xFF];
+		unsigned short* glyph = currentBucket + 1;
+		int count = static_cast<int>(*currentBucket);
 
 		for (; count > 0; count--) {
-			if (*reinterpret_cast<unsigned char*>(glyph + 1) != 0) {
+			if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
 				glyph += 4;
 			} else {
 				goto use_glyph;
@@ -144,7 +146,7 @@ use_glyph:
 		unsigned char flags = renderFlags;
 		unsigned int drawWidth;
 
-		if ((flags & 8) != 0) {
+		if ((flags & 0x10) != 0) {
 			drawWidth = static_cast<unsigned int>(m_glyphWidth);
 		} else {
 			signed char sign = static_cast<signed char>(flags);
@@ -155,7 +157,7 @@ use_glyph:
 		}
 
 		float charWidth = scaleX * (margin + static_cast<float>(drawWidth));
-		if ((flags & 0x10) != 0) {
+		if ((flags & 8) != 0) {
 			charWidth = static_cast<float>(floor(charWidth));
 		}
 
@@ -182,7 +184,9 @@ find_fallback:
 
 read_char:
 		ch = static_cast<unsigned char>(*text);
-		text++;
+		if (ch != '\0') {
+			text++;
+		}
 	}
 
 	return width;
@@ -305,14 +309,19 @@ found_fallback:
  */
 void CFont::Draw(char* text)
 {
-	unsigned char ch;
-	do {
+	unsigned short ch = 0;
+
+	goto read_char;
+
+	while (ch != '\0') {
+		Draw(ch);
+
+read_char:
 		ch = static_cast<unsigned char>(*text);
 		if (ch != '\0') {
-			Draw(static_cast<unsigned short>(ch));
 			text++;
 		}
-	} while (ch != '\0');
+	}
 }
 
 /*
@@ -346,18 +355,22 @@ void CFont::DrawInit()
     Mtx identityMtx;
     Mtx44 projMtx;
     Mtx texMtx;
-    _GXColor white = { 0xFF, 0xFF, 0xFF, 0xFF };
 
     GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanMatColor(GX_COLOR0A0, m_color);
-    GXSetChanAmbColor(GX_COLOR0A0, white);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    GXSetChanAmbColor(GX_COLOR0A0, white.color);
 
-    C_MTXOrtho(projMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
-    if ((renderFlags & 0x80) != 0 || (renderFlags & 0x40) != 0) {
+    unsigned char flags = renderFlags;
+    if (static_cast<int>((static_cast<unsigned int>(flags) << 25) | static_cast<unsigned int>(flags >> 7)) < 0 ||
+        static_cast<int>((static_cast<unsigned int>(flags) << 26) | static_cast<unsigned int>(flags >> 6)) < 0) {
+        C_MTXOrtho(projMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
         projMtx[2][2] = 1.0f;
         projMtx[2][3] = 0.0f;
+    } else {
+        C_MTXOrtho(projMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
     }
     GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
 
@@ -368,12 +381,13 @@ void CFont::DrawInit()
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 
+    flags = renderFlags;
     int zFunction = 7;
-    if ((renderFlags & 0x40) != 0) {
+    if ((flags & 0x40) != 0) {
         zFunction = 3;
     }
-    int zEnable = ((renderFlags & 0x80) != 0 || (renderFlags & 0x40) != 0) ? 1 : 0;
-    int zUpdate = ((renderFlags & 0x40) != 0) ? 1 : 0;
+    int zEnable = ((flags & 0x80) != 0 || (flags & 0x40) != 0) ? 1 : 0;
+    int zUpdate = ((flags & 0x40) != 0) ? 1 : 0;
     GXSetZMode(zEnable, (GXCompare)zFunction, zUpdate);
 
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
@@ -395,12 +409,13 @@ void CFont::DrawInit()
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 1);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 1);
 
     TextureMan.SetTextureTev(texturePtr);
 
-    renderFlags &= static_cast<unsigned char>(~0x10);
-    renderFlags &= 0xF7;
+    CFontRenderFlagBits& bits = GetRenderFlagBits(renderFlags);
+    bits.snapPosition = 0;
+    bits.fixedWidth = 0;
 }
 
 /*
@@ -567,11 +582,8 @@ void CFont::SetMargin(float value)
  */
 void CFont::SetZMode(int compareEnable, int updateEnable)
 {
-	signed char compare = static_cast<signed char>(compareEnable);
-	signed char update = static_cast<signed char>(updateEnable);
-	CFontRenderFlagBits& bits = GetRenderFlagBits(renderFlags);
-	bits.zCompare = compare;
-	bits.zUpdate = update;
+	GetRenderFlagBits(renderFlags).zCompare = static_cast<signed char>(compareEnable);
+	GetRenderFlagBits(renderFlags).zUpdate = static_cast<signed char>(updateEnable);
 }
 
 /*
@@ -726,16 +738,17 @@ CFont::CFont()
 	posZ = 0.0f;
 	posY = 0.0f;
 	posX = 0.0f;
-	renderFlags &= 0x7F;
+	CFontRenderFlagBits& bits = GetRenderFlagBits(renderFlags);
+	bits.shadow = 0;
 	scaleY = 1.0f;
 	scaleX = 1.0f;
-	renderFlags &= 0xF7;
+	bits.fixedWidth = 0;
 	m_color.r = 0xFF;
 	m_color.g = 0xFF;
 	m_color.b = 0xFF;
 	m_color.a = 0xFF;
-	renderFlags &= 0xBF;
-	renderFlags &= 0xDF;
+	bits.zCompare = 0;
+	bits.zUpdate = 0;
 	m_usesEmbeddedData = 0;
 }
 
@@ -812,16 +825,17 @@ void CFontMan::Init()
 		font->posZ = 0.0f;
 		font->posY = 0.0f;
 		font->posX = 0.0f;
-		font->renderFlags &= 0x7F;
+		CFontRenderFlagBits& bits = GetRenderFlagBits(font->renderFlags);
+		bits.shadow = 0;
 		font->scaleY = 1.0f;
 		font->scaleX = 1.0f;
-		font->renderFlags &= 0xF7;
+		bits.fixedWidth = 0;
 		font->m_color.r = 0xFF;
 		font->m_color.g = 0xFF;
 		font->m_color.b = 0xFF;
 		font->m_color.a = 0xFF;
-		font->renderFlags &= 0xBF;
-		font->renderFlags &= 0xDF;
+		bits.zCompare = 0;
+		bits.zUpdate = 0;
 		font->m_usesEmbeddedData = 0;
 	}
 

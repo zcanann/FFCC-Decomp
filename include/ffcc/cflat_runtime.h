@@ -31,8 +31,8 @@ public:
 	class CObject
 	{
 	public:
-		CObject();
-		~CObject();
+		CObject() {}
+		~CObject() {}
 		void onNewFinished();
 
 		unsigned int m_id;         // 0x0

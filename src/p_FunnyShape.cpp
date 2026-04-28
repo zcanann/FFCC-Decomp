@@ -404,7 +404,7 @@ void CFunnyShapePcs::drawViewer()
     Vec eye = {0.0f, 0.0f, 0.0f};
     Vec at = {0.0f, 0.0f, 0.0f};
     Vec up = {0.0f, 1.0f, 0.0f};
-    static const char s_funnyShapeFmt[] = "FunnyShape %c";
+    static const char s_funnyShapeFmt[] = "FunnyShape [%c]";
 
     C_MTXOrtho(ortho, kFunnyShapeNdcMax, kFunnyShapeNdcMin, kFunnyShapeNdcMin, kFunnyShapeNdcMax, kFunnyShapeNdcMax, kFunnyShapeOrthoFarZ);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);

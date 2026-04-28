@@ -1,4 +1,5 @@
 #include "ffcc/pppRyjMegaBirth.h"
+#include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/math.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
@@ -13,6 +14,11 @@ extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern float FLOAT_80330458;
 extern float FLOAT_8033045c;
 extern float FLOAT_80330460;
+extern float FLOAT_80330470;
+extern float FLOAT_80330474;
+extern float FLOAT_80330478;
+extern double DOUBLE_80330488;
+extern float FLOAT_80330490;
 
 static Mtx g_matUnit;
 
@@ -50,6 +56,47 @@ static inline unsigned char clamp_u8(float value)
 	return (unsigned char)ivalue;
 }
 
+static inline float calc_spawn_speed(float speed, u8 mode)
+{
+	float halfSpeed = FLOAT_80330478 * speed;
+
+	switch (mode) {
+	case 1:
+		(void)Math.RandF();
+		return speed * Math.RandF() - halfSpeed;
+	case 2:
+		return speed * Math.RandF() * Math.RandF() - halfSpeed;
+	case 3:
+		return -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+	case 4:
+		return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
+	case 5:
+		return -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+	default:
+		return speed * Math.RandF() - halfSpeed;
+	}
+}
+
+static inline signed char random_signed_byte_span(u8 span)
+{
+	return (signed char)((s32)((float)(span << 1) * Math.RandF() - (float)(span >> 1)));
+}
+
+static inline void apply_signed_randomization_2(u8* particle, s32 offset, u8 flags)
+{
+	if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+		if (DOUBLE_80330488 < (double)Math.RandF()) {
+			*f32_at(particle, offset) = *f32_at(particle, offset) * FLOAT_80330490;
+		}
+		if (DOUBLE_80330488 < (double)Math.RandF()) {
+			*f32_at(particle, offset + 4) = *f32_at(particle, offset + 4) * FLOAT_80330490;
+		}
+	} else if ((flags & 2) != 0) {
+		*f32_at(particle, offset) = *f32_at(particle, offset) * FLOAT_80330490;
+		*f32_at(particle, offset + 4) = *f32_at(particle, offset + 4) * FLOAT_80330490;
+	}
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80083070
@@ -63,83 +110,184 @@ void birth(
     _pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* param, VColor* color, _PARTICLE_DATA* particle,
     _PARTICLE_WMAT* worldMat, _PARTICLE_COLOR* colorData)
 {
-    u8* payload;
-    u8* particlePayload;
-    float halfSpeed;
-    float directionSpeed;
-    float randomYaw;
-    float randomPitch;
-    float randomRoll;
-    s16 life;
+	u8* payload;
+	u8* particlePayload;
+	u8 mode;
+	float speed;
+	s16 life;
 
-    payload = (u8*)param;
-    particlePayload = (u8*)particle;
+	payload = (u8*)param;
+	particlePayload = (u8*)particle;
+	mode = payload[0x2A];
 
-    memset(particle, 0, 0x60);
-    if (worldMat != NULL) {
-        memset(worldMat, 0, 0x30);
-    }
-    if (colorData != NULL) {
-        memset(colorData, 0, 0x20);
-    }
+	memset(particle, 0, 0x60);
+	if (worldMat != NULL) {
+		memset(worldMat, 0, 0x30);
+	}
+	if (colorData != NULL) {
+		memset(colorData, 0, 0x20);
+	}
 
-    directionSpeed = *(float*)(payload + 0x94);
-    halfSpeed = directionSpeed * 0.5f;
-    randomYaw = Math.RandF() * directionSpeed - halfSpeed;
-    randomPitch = Math.RandF() * directionSpeed - halfSpeed;
-    randomRoll = Math.RandF() * directionSpeed - halfSpeed;
+	if (mode < 8) {
+		Vec baseDirection;
+		Vec* direction;
+		pppIVECTOR4 angle;
+		pppFMATRIX rot;
+		float spread;
+		float range;
 
-    particle->m_velocity.x = randomYaw * *(float*)(payload + 0xA0);
-    particle->m_velocity.y = randomPitch * *(float*)(payload + 0xA4);
-    particle->m_velocity.z = randomRoll * *(float*)(payload + 0xA8);
+		baseDirection.x = *f32_at(payload, 0xA0);
+		baseDirection.y = *f32_at(payload, 0xA4);
+		baseDirection.z = *f32_at(payload, 0xA8);
+		spread = (float)payload[0x2B];
+		range = FLOAT_80330470 * spread;
 
-    particle->m_directionTail.x = *(float*)(payload + 0x90);
-    particle->m_directionTail.y = *(float*)(payload + 0x94);
-    particle->m_directionTail.z = *(float*)(payload + 0x98);
-    particle->m_colorDeltaAdd[0] = *(float*)(payload + 0x9C);
-    particle->m_colorDeltaAdd[1] = *(float*)(payload + 0xA0);
+		angle.x = (s16)(range * Math.RandF() - spread);
+		angle.y = (s16)(range * Math.RandF() - spread);
+		angle.z = (s16)(range * Math.RandF() - spread);
+		angle.w = 0;
 
-    particle->m_matrix[2][2] = *(float*)(payload + 0x90);
-    particle->m_matrix[2][3] = *(float*)(payload + 0x94);
-    particle->m_sizeStart = *(float*)(payload + 0xAC);
-    particle->m_sizeVal = *(float*)(payload + 0xB0);
-    particle->m_sizeEnd = *(float*)(payload + 0xB4);
+		if ((mode == 2) || (mode == 3)) {
+			angle.x = 0;
+			angle.y = 0;
+			angle.z = 0;
+			angle.w = 0;
+		}
 
-    life = *(s16*)(payload + 0x96);
-    if (life == 0) {
-        *(s16*)(particlePayload + 0x22) = -1;
-    } else {
-        *(s16*)(particlePayload + 0x22) = life;
-    }
-    *(u16*)(particlePayload + 0x1C) = 0;
-    *(u16*)(particlePayload + 0x1E) = 0;
-    *(u16*)(particlePayload + 0x20) = 0;
-    *(u8*)(particlePayload + 0x58) = 0;
+		pppGetRotMatrixXYZ(rot, &angle);
+		direction = (Vec*)(particlePayload + 0x10);
+		PSMTXMultVecSR(rot.value, &baseDirection, direction);
+		direction->x = direction->x * *f32_at(payload, 0xB0);
+		direction->y = direction->y * *f32_at(payload, 0xB4);
+		direction->z = direction->z * *f32_at(payload, 0xB8);
+		PSVECNormalize(direction, direction);
+	}
 
-    if (*(u8*)(payload + 0x8E) != 0) {
-        *(u8*)(particlePayload + 0x59) = *(u8*)(payload + 0x8E);
-        particle->m_sizeEnd = (float)color->m_alpha;
-    }
+	speed = *f32_at(payload, 0xBC);
+	if (speed != kPppRyjMegaBirthZero) {
+		u8 speedMode = payload[0xE8];
 
-    if (worldMat != NULL) {
-        switch (payload[0x8B]) {
-        case 1:
-            PSMTXCopy(work->m_worldMatrix, *(PARTICLE_WMAT*)worldMat);
-            break;
-        case 2:
-            PSMTXCopy(pObject->m_localMatrix.value, *(PARTICLE_WMAT*)worldMat);
-            break;
-        default:
-            break;
-        }
-    }
+		if (mode < 6) {
+			*f32_at(particlePayload, 0x00) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xB0);
+			*f32_at(particlePayload, 0x04) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xB4);
+			*f32_at(particlePayload, 0x08) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xB8);
+		} else if (mode >= 10) {
+			Vec* direction = (Vec*)(particlePayload + 0x10);
+			Vec* position = (Vec*)particlePayload;
+			PSVECScale(direction, position, calc_spawn_speed(speed, speedMode));
+		}
+	}
 
-    if (colorData != NULL) {
-        colorData->m_colorFrameDeltas[0] = *(float*)(payload + 0xC0);
-        colorData->m_colorFrameDeltas[1] = *(float*)(payload + 0xC4);
-        colorData->m_colorFrameDeltas[2] = *(float*)(payload + 0xC8);
-        colorData->m_colorFrameDeltas[3] = *(float*)(payload + 0xCC);
-    }
+	*u8_at(particlePayload, 0x21) = random_signed_byte_span(payload[0x58]);
+	*u8_at(particlePayload, 0x25) = random_signed_byte_span(payload[0x59]);
+	*u8_at(particlePayload, 0x26) = random_signed_byte_span(payload[0x5A]);
+	*u8_at(particlePayload, 0x27) = random_signed_byte_span(payload[0x5B]);
+
+	if (payload[0x22] != 0) {
+		*f32_at(particlePayload, 0x54) = (float)color->m_alpha;
+		*u8_at(particlePayload, 0x59) = payload[0x22];
+	}
+	if (payload[0x29] != 0) {
+		*u8_at(particlePayload, 0x5A) = payload[0x29];
+	}
+
+	*f32_at(particlePayload, 0x28) = *f32_at(payload, 0x90);
+	*f32_at(particlePayload, 0x2C) = *f32_at(payload, 0x94);
+
+	if (payload[0xEB] != 0) {
+		*f32_at(particlePayload, 0x30) = *f32_at(payload, 0x9C) * Math.RandF();
+		if (((payload[0xEB] & 1) != 0) && ((payload[0xEB] & 2) != 0)) {
+			if (DOUBLE_80330488 < (double)Math.RandF()) {
+				*f32_at(particlePayload, 0x30) = *f32_at(particlePayload, 0x30) * FLOAT_80330490;
+			}
+		} else if ((payload[0xEB] & 2) != 0) {
+			*f32_at(particlePayload, 0x30) = *f32_at(particlePayload, 0x30) * FLOAT_80330490;
+		}
+	}
+	if ((payload[0xEB] & 4) != 0) {
+		*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + *f32_at(particlePayload, 0x30);
+	}
+	if ((payload[0xEB] & 8) != 0) {
+		*f32_at(particlePayload, 0x2C) = *f32_at(particlePayload, 0x2C) + *f32_at(particlePayload, 0x30);
+	}
+	{
+		float angleWrap = FLOAT_80330458;
+		float angleMax = FLOAT_8033045c;
+		while (angleMax <= *f32_at(particlePayload, 0x28)) {
+			*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) - angleWrap;
+		}
+	}
+	{
+		float angleWrap = FLOAT_80330458;
+		float angleMin = FLOAT_80330460;
+		while (*f32_at(particlePayload, 0x28) < angleMin) {
+			*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + angleWrap;
+		}
+	}
+
+	*f32_at(particlePayload, 0x34) = *f32_at(payload, 0x60);
+	*f32_at(particlePayload, 0x38) = *f32_at(payload, 0x5C);
+	*f32_at(particlePayload, 0x3C) = *f32_at(payload, 0x68);
+	*f32_at(particlePayload, 0x40) = *f32_at(payload, 0x6C);
+
+	if (payload[0xEA] != 0) {
+		if ((payload[0xEA] & 0x20) == 0) {
+			*f32_at(particlePayload, 0x44) = *f32_at(payload, 0x78) * Math.RandF();
+			*f32_at(particlePayload, 0x48) = *f32_at(payload, 0x7C) * Math.RandF();
+		} else {
+			float randomRotation = *f32_at(payload, 0x78) * Math.RandF();
+			*f32_at(particlePayload, 0x44) = randomRotation;
+			*f32_at(particlePayload, 0x48) = randomRotation;
+		}
+		apply_signed_randomization_2(particlePayload, 0x44, payload[0xEA]);
+	}
+	if ((payload[0xEA] & 4) != 0) {
+		*f32_at(particlePayload, 0x34) = *f32_at(particlePayload, 0x34) + *f32_at(particlePayload, 0x44);
+		*f32_at(particlePayload, 0x38) = *f32_at(particlePayload, 0x38) + *f32_at(particlePayload, 0x48);
+	}
+	if ((payload[0xEA] & 8) != 0) {
+		*f32_at(particlePayload, 0x3C) = *f32_at(particlePayload, 0x3C) + *f32_at(particlePayload, 0x44);
+		*f32_at(particlePayload, 0x40) = *f32_at(particlePayload, 0x40) + *f32_at(particlePayload, 0x48);
+	}
+
+	*f32_at(particlePayload, 0x4C) = *f32_at(payload, 0xC0);
+	*f32_at(particlePayload, 0x50) = *f32_at(payload, 0xCC);
+	if (*f32_at(payload, 0xC8) != kPppRyjMegaBirthZero) {
+		*f32_at(particlePayload, 0x4C) =
+			*f32_at(particlePayload, 0x4C) + FLOAT_80330470 * *f32_at(payload, 0xC8) * Math.RandF() -
+			*f32_at(payload, 0xC8);
+	}
+
+	life = *(s16*)(payload + 0x26);
+	if (life == 0) {
+		*(s16*)(particlePayload + 0x22) = -1;
+	} else {
+		*(s16*)(particlePayload + 0x22) = life;
+	}
+	*(u16*)(particlePayload + 0x1C) = 0;
+	*(u16*)(particlePayload + 0x1E) = 0;
+	*(u16*)(particlePayload + 0x20) = 0;
+	*(u8*)(particlePayload + 0x58) = 0;
+
+	if (worldMat != NULL) {
+		switch (payload[0xEC]) {
+		case 1:
+			PSMTXCopy(work->m_worldMatrix, *(PARTICLE_WMAT*)worldMat);
+			break;
+		case 2:
+			PSMTXCopy(pObject->m_localMatrix.value, *(PARTICLE_WMAT*)worldMat);
+			break;
+		default:
+			break;
+		}
+	}
+
+	if (colorData != NULL) {
+		colorData->m_colorFrameDeltas[0] = *(float*)(payload + 0x2C);
+		colorData->m_colorFrameDeltas[1] = *(float*)(payload + 0x30);
+		colorData->m_colorFrameDeltas[2] = *(float*)(payload + 0x34);
+		colorData->m_colorFrameDeltas[3] = *(float*)(payload + 0x38);
+	}
 }
 
 /*
@@ -483,16 +631,9 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirth* params, VRyjMegaBirth* work)
 {
 	u8* payload = (u8*)params;
+	u8 mode = payload[0x2A];
 
-	switch (payload[0x2A]) {
-	default:
-		PSMTXCopy(pppMngStPtr->m_matrix.value, out.value);
-		break;
-	case 1:
-	case 3:
-	case 5:
-	case 7:
-	case 9:
+	if ((mode == 1) || (mode == 3) || (mode == 5) || (mode == 7) || (mode == 9)) {
 		PSMTXIdentity(out.value);
 		out.value[0][0] = pppMngStPtr->m_scale.x;
 		out.value[1][1] = pppMngStPtr->m_scale.y;
@@ -500,7 +641,8 @@ static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBi
 		out.value[0][3] = pppMngStPtr->m_position.x;
 		out.value[1][3] = pppMngStPtr->m_position.y;
 		out.value[2][3] = pppMngStPtr->m_position.z;
-		break;
+	} else {
+		PSMTXCopy(pppMngStPtr->m_matrix.value, out.value);
 	}
 
 	if (work != NULL) {
@@ -626,7 +768,7 @@ void pppRyjMegaBirthCon(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 	work->m_colorBlock = 0;
 	work->m_numParticles = 0;
 	work->m_emitTimer = 0;
-	work->m_unused4E = 0;
+	work->m_meshEmitIndex = 0;
 	work->m_emitTimer = 10000;
 
 	PSMTXIdentity(g_matUnit);

@@ -1540,8 +1540,7 @@ void GbaQueue::LoadEnemyStat()
 				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
 				const int enemyDataBase = Game.unkCFlatData0[1] + enemyWork->m_baseDataIndex * 0x1D0;
 				const short enemyKind = *reinterpret_cast<short*>(enemyDataBase + 0x10C);
-				typedef int (*IsDispRadarFn)(CGObject*);
-				const int isDispRadar = reinterpret_cast<IsDispRadarFn>((*reinterpret_cast<void***>(enemyObj))[0xB])(enemyObj);
+				const int isDispRadar = enemyObj->IsDispRader();
 
 				if (enemyKind == 10) {
 					enemyEntry[1] = 1;
@@ -1627,8 +1626,7 @@ void GbaQueue::LoadMapItemStat()
 					mapItemEntry[1] = (itemStage < bossStageLimit) ? 4 : 5;
 				}
 
-				typedef int (*IsDispRadarFn)(CGObject*);
-				int isDispRader = reinterpret_cast<IsDispRadarFn>((*reinterpret_cast<void***>(object))[0xB])(object);
+				int isDispRader = object->IsDispRader();
 				numMapItems++;
 				mapItemEntry[2] = static_cast<unsigned char>((-isDispRader | isDispRader) >> 31);
 				*reinterpret_cast<short*>(mapItemEntry + 8) = static_cast<short>(object->m_worldPosition.x / 100.0f);
@@ -2128,8 +2126,12 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cd850
+ * PAL Size: 1436b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int GbaQueue::MakeLetterList(int channel, char* outData)
 {

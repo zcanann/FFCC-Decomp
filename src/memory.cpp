@@ -43,7 +43,7 @@ extern char DAT_801d669c[];
 extern char DAT_801d67d8[];
 extern char DAT_801d6bdc[];
 extern char DAT_801d6bec[];
-extern char DAT_8032f7d4[];
+extern char DAT_8032f7d4[4];
 extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
 extern float FLOAT_8032f7d8;
@@ -162,10 +162,13 @@ static void stageDestroyInternal(CMemory::CStage* stage)
  */
 void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
+    char* source;
     if (file == (char*)nullptr) {
-        file = const_cast<char*>(s_memory_cpp);
+        source = DAT_8032f7d4;
+    } else {
+        source = file;
     }
-    return stage->alloc(size, file, line, 0);
+    return stage->alloc(size, source, line, 0);
 }
 
 /*
@@ -179,10 +182,13 @@ void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int l
  */
 void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
+    char* source;
     if (file == (char*)nullptr) {
-        file = const_cast<char*>(s_memory_cpp);
+        source = DAT_8032f7d4;
+    } else {
+        source = file;
     }
-    return stage->alloc(size, file, line, 0);
+    return stage->alloc(size, source, line, 0);
 }
 
 /*
@@ -801,12 +807,15 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMemory::_Alloc(unsigned long size, CMemory::CStage* stage, char* source, int line, int noError)
+void* CMemory::_Alloc(unsigned long size, CMemory::CStage* stage, char* source, int line, int noError)
 {
+    char* allocSource;
     if (source == (char*)nullptr) {
-        source = DAT_8032f7d4;
+        allocSource = DAT_8032f7d4;
+    } else {
+        allocSource = source;
     }
-    stage->alloc(size, source, line, noError);
+    return stage->alloc(size, allocSource, line, noError);
 }
 
 /*

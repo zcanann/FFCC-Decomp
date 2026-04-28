@@ -41,7 +41,7 @@ public:
     void SetGroup(void*, int);
     CStage* CreateStage(unsigned long, char*, int);
     void DestroyStage(CMemory::CStage*);
-    void _Alloc(unsigned long, CMemory::CStage*, char*, int, int);
+    void* _Alloc(unsigned long, CMemory::CStage*, char*, int, int);
     void Free(void*);
     void IncHeapWalkerLevel();
     void DecHeapWalkerLevel();

@@ -1,8 +1,10 @@
 #include "ffcc/mesmenu.h"
+#include "ffcc/chara.h"
 #include "ffcc/game.h"
 #include "ffcc/linkage.h"
 #include "ffcc/menu.h"
 #include "ffcc/p_menu.h"
+#include "ffcc/pad.h"
 #include "ffcc/ringmenu.h"
 #include "ffcc/sound.h"
 
@@ -53,6 +55,7 @@ void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 
 extern void* __vt__8CMesMenu[];
 extern const char DAT_801d9e9c[];
+extern int DAT_8020F9A8[4];
 extern int DAT_8020f998[4];
 extern float FLOAT_803308d8;
 extern float FLOAT_803308dc;
@@ -509,6 +512,43 @@ void CMesMenu::onCalc()
  */
 void CMesMenu::onDraw()
 {
+    if ((*(int*)((char*)this + 0x18) == 0) && ((*(unsigned char*)(CFlat + 0x12E4) & 2) != 0)) {
+        int iconFrame = 0;
+        int charaMode = *(int*)((char*)&Chara + 0x2004);
+        if (charaMode == 2) {
+            iconFrame = 5;
+        } else if (charaMode < 2) {
+            if (charaMode == 0) {
+                iconFrame = 3;
+            } else if (charaMode >= 0) {
+                iconFrame = 4;
+            }
+        } else if (charaMode == 4) {
+            unsigned short buttons;
+            if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+                buttons = 0;
+            } else {
+                __cntlzw((unsigned int)Pad._448_4_);
+                buttons = Pad._4_2_;
+            }
+
+            iconFrame = DAT_8020F9A8[0];
+            if ((buttons & 0x100) != 0) {
+                iconFrame = DAT_8020F9A8[(System.m_frameCounter & 6) >> 1];
+            }
+        } else if (charaMode < 4) {
+            iconFrame = 2;
+        }
+
+        unsigned char colorStorage[8];
+        SetColor__8CMenuPcsFR6CColor(&MenuPcs, __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, 0xFF));
+        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0);
+        DrawRect__8CMenuPcsFUlfffffffff(
+            &MenuPcs, 0, (float)(*(int*)((char*)&Chara + 0x200C) - 0x20), (float)*(int*)((char*)&Chara + 0x2010),
+            FLOAT_8033092c, FLOAT_8033092c, FLOAT_803308d8, (float)(iconFrame << 5), FLOAT_80330914, FLOAT_80330914,
+            FLOAT_803308d8);
+    }
+
     CFont* font = MenuPcs.m_fonts[0];
     int menuIndex = *(int*)((char*)this + 0x18);
     if (!((menuIndex < 4) || (*(int*)((char*)this + 8) != 0))) {
@@ -651,13 +691,73 @@ void CMesMenu::onDraw()
             Draw__5CFontFPc(font, reinterpret_cast<char*>(scriptFood + 0x3CA));
             DrawInit__8CMenuPcsFv(&MenuPcs);
 
-            DrawHeart(frameX, frameY, FLOAT_803308d8, stageBlend);
+            {
+                unsigned int heartFood = Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
+                if ((heartFood != 0) && (stageBlend > FLOAT_803308d8)) {
+                    __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (int)(FLOAT_80330908 * stageBlend));
+                    SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
+                    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x17);
+
+                    int heartOffset = 0x4C;
+                    if ((menuIndex & 1) != 0) {
+                        heartOffset = 0x30;
+                    }
+
+                    float heartBaseY = FLOAT_8033090c + frameY;
+                    float heartBaseX = frameX + (float)heartOffset;
+                    int heartValueOffset = 0;
+                    int heartTimerOffset = (int)this;
+
+                    for (int heartIndex = 0; heartIndex < (int)(unsigned int)(*(unsigned short*)(heartFood + 0x1A) >> 1);
+                         heartIndex++) {
+                        int heartValue = *(int*)((char*)this + 0x3DA8) - heartValueOffset;
+                        float heartTimer = (float)*(unsigned int*)(heartTimerOffset + 0x3DB0);
+                        float heartPulse =
+                            (FLOAT_8033091c * (float)sin(FLOAT_80330910 * -(heartTimer * FLOAT_80330918 - FLOAT_80330914)) +
+                             FLOAT_80330914) *
+                            FLOAT_80330920;
+
+                        unsigned int heartSubTimer = *(unsigned int*)(heartTimerOffset + 0x3DD0);
+                        int heartShakeX = 0;
+                        if (heartSubTimer != 0) {
+                            heartShakeX = ((int)heartSubTimer >> 2) * DAT_8020f998[((heartSubTimer + 1) * 4 & 0xC) / 4];
+                        }
+
+                        int heartShakeY = 0;
+                        if (heartSubTimer != 0) {
+                            heartShakeY = ((int)heartSubTimer >> 2) * DAT_8020f998[heartSubTimer & 3];
+                        }
+
+                        float heartX = heartBaseX + (float)heartShakeX;
+                        float heartY = heartBaseY + (float)heartShakeY;
+
+                        DrawRect__8CMenuPcsFUlfffffffff(
+                            &MenuPcs, 3, heartX, heartY, FLOAT_803308dc, FLOAT_803308dc, FLOAT_803308d8, FLOAT_803308d8,
+                            heartPulse, heartPulse, FLOAT_803308d8);
+
+                        if (heartValue > 0) {
+                            int fillAmount = 0x0B;
+                            if (heartValue < 0x0B) {
+                                fillAmount = heartValue;
+                            }
+
+                            float u = (float)((*(unsigned short*)(heartFood + 0x42) != 0) * 0x18);
+                            float v = (float)((0x0C - fillAmount) * 0x18);
+                            DrawRect__8CMenuPcsFUlfffffffff(
+                                &MenuPcs, 3, heartX, heartY, FLOAT_803308dc, FLOAT_803308dc, u, v, heartPulse, heartPulse,
+                                FLOAT_803308d8);
+                        }
+
+                        heartBaseX += ((menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
+                        heartValueOffset += 0x0C;
+                        heartTimerOffset += 4;
+                    }
+                }
+            }
 
             unsigned int foodTimer = *(unsigned int*)((char*)this + 0x3DF0);
-            unsigned int foodAmount = (unsigned int)*(unsigned short*)(scriptFood + 0x14) % 100;
-            if (foodTimer != 0) {
-                foodAmount += 4;
-            }
+            unsigned int foodAmount = (unsigned int)*(unsigned short*)(scriptFood + 0x14);
+            unsigned int foodIcon = (foodAmount % 100) + (foodAmount / 100) * 4;
             float shakeX = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - ((foodTimer + 1) & 3)) & 3]) : 0.0f;
             float shakeY = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - (foodTimer & 3)) & 3]) : 0.0f;
             SetColor__8CMenuPcsFR6CColor(
@@ -667,7 +767,7 @@ void CMesMenu::onDraw()
             DrawRect__8CMenuPcsFUlfffffffff(
                 &MenuPcs, ((menuIndex & 1) == 0) ? 8 : 0, frameX + shakeX + (((menuIndex & 1) != 0) ? 75.0f : 5.0f),
                 frameY + shakeY + FLOAT_80330958, FLOAT_8033095c, FLOAT_80330960,
-                (float)((foodAmount % 8) * 0x30), (float)((foodAmount / 8) * 0x30), FLOAT_80330914, FLOAT_80330914,
+                (float)((foodIcon % 8) * 0x30), (float)((foodIcon / 8) * 0x30), FLOAT_80330914, FLOAT_80330914,
                 FLOAT_803308d8);
         }
     } else {
@@ -772,11 +872,6 @@ void CMesMenu::onDraw()
     if ((*(int*)((char*)this + 0x0C) == 1) && (GetWait__4CMesFv((char*)this + 0x1C) == 3)) {
         SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0);
         float alphaF = FLOAT_80330908 * stageBlend;
-        if (alphaF < FLOAT_803308d8) {
-            alphaF = FLOAT_803308d8;
-        } else if (alphaF > 255.0f) {
-            alphaF = 255.0f;
-        }
         unsigned char colorStorage[8];
         __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
         SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);

@@ -185,23 +185,24 @@ void _SetSoundMode(int* param_1)
  */
 void _SetReverbDepth(int* param_1)
 {
-    int reverbIndex;
     int reverbBank;
     int reverbDepth;
-    int fadeFrame;
     int fadeStep;
+    int fadeDepth;
     int* seInfo;
 
-    reverbIndex = param_1[0];
-    reverbBank = reverbIndex & 1;
+    reverbBank = param_1[0] & 1;
     reverbDepth = param_1[1] & 0x7f;
-    fadeFrame = param_1[2];
+    fadeStep = param_1[2];
     if (reverbDepth != 0) {
-        reverbDepth = (((reverbDepth + 1) * 0x100) - 1) * 0x1000;
+        reverbDepth += 1;
+        reverbDepth <<= 8;
+        reverbDepth -= 1;
+        reverbDepth <<= 12;
     }
     *(unsigned int*)((char*)p_ReverbDepth + reverbBank * 0xc) = reverbDepth;
     if (reverbBank != 0) {
-        fadeStep = fadeFrame * 0x60;
+        fadeStep = fadeStep * 0x60;
         fadeStep = fadeStep / 0x3c;
         if (fadeStep == 0) {
             fadeStep++;
@@ -210,7 +211,8 @@ void _SetReverbDepth(int* param_1)
         seInfo = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
         do {
             if ((u32)*seInfo != 0) {
-                seInfo[0x1b] = (int)(reverbDepth - (seInfo[0x1a] & 0xfffff000U)) / fadeStep;
+                fadeDepth = reverbDepth - (seInfo[0x1a] & 0xfffff000U);
+                seInfo[0x1b] = fadeDepth / fadeStep;
                 seInfo[0x1c] = fadeStep;
             }
             seInfo += 0x55;
@@ -506,7 +508,8 @@ void _SeSepPlay(int* param_1)
     iVar1 = c_RedEntry.SetSeSepData((RedSeSepHEAD*)param_1[1]);
     if (iVar1 != 0) {
         m_SeSkipStep = param_1[4];
-        SeSepPlay(param_1[0], *(int*)(iVar1 + 8), param_1[2], param_1[3]);
+        int seID = param_1[0];
+        SeSepPlay(seID, *(int*)(iVar1 + 8), param_1[2], param_1[3]);
     }
 }
 

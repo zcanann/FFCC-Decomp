@@ -2574,31 +2574,31 @@ RedSound/RedDriver.cpp:
 	extabindex  start:0x80011860 end:0x80011CA4
 	.text       start:0x801BCF0C end:0x801BFF34
 	.ctors      start:0x801D544C end:0x801D5450
-	.rodata     start:0x801E7788 end:0x801E7888
-	.bss        start:0x8032B860 end:0x8032E170
-	.sbss       start:0x8032F3B8 end:0x8032F490
-	.sdata2     start:0x80333D10 end:0x80333D20
+	.rodata     start:0x801E7788 end:0x801E7885
+	.bss        start:0x8032B860 end:0x8032E16C
+	.sbss       start:0x8032F3B8 end:0x8032F48C
+	.sdata2     start:0x80333D10 end:0x80333D1D
 
 RedSound/RedMemory.cpp:
 	extab       start:0x8000A5B8 end:0x8000A5F8
 	extabindex  start:0x80011CA4 end:0x80011D04
 	.text       start:0x801BFF34 end:0x801C05F8
-	.rodata     start:0x801E7888 end:0x801E78D8
+	.rodata     start:0x801E7888 end:0x801E78D2
 	.sbss       start:0x8032F490 end:0x8032F4A8
-	.sdata2     start:0x80333D20 end:0x80333D30
+	.sdata2     start:0x80333D20 end:0x80333D2D
 
 RedSound/RedEntry.cpp:
 	extab       start:0x8000A5F8 end:0x8000A760
 	extabindex  start:0x80011D04 end:0x80011F20
 	.text       start:0x801C05F8 end:0x801C2FC4
-	.rodata     start:0x801E78D8 end:0x801E7E18
-	.sdata2     start:0x80333D30 end:0x80333D58
+	.rodata     start:0x801E78D8 end:0x801E7E14
+	.sdata2     start:0x80333D30 end:0x80333D53
 
 RedSound/RedExecute.cpp:
 	extab       start:0x8000A760 end:0x8000A880
 	extabindex  start:0x80011F20 end:0x800120D0
 	.text       start:0x801C2FC4 end:0x801C7478
-	.data       start:0x8021D7F0 end:0x8021E1D0
+	.data       start:0x8021D7F0 end:0x8021E1CE
 	.sdata      start:0x8032EC30 end:0x8032EC34
 	.sbss       start:0x8032F4A8 end:0x8032F4BC
 	.sdata2     start:0x80333D58 end:0x80333D68
@@ -2613,16 +2613,16 @@ RedSound/RedCommand.cpp:
 	extab       start:0x8000AB00 end:0x8000AB80
 	extabindex  start:0x80012490 end:0x80012550
 	.text       start:0x801CA038 end:0x801CB93C
-	.rodata     start:0x801E7E18 end:0x801E7F20
+	.rodata     start:0x801E7E18 end:0x801E7F1B
 	.data       start:0x8021EC10 end:0x8021ECF0
-	.sdata2     start:0x80333D68 end:0x80333D80
+	.sdata2     start:0x80333D68 end:0x80333D7D
 
 RedSound/RedStream.cpp:
 	extab       start:0x8000AB80 end:0x8000ABC8
 	extabindex  start:0x80012550 end:0x800125BC
 	.text       start:0x801CB93C end:0x801CCA34
-	.rodata     start:0x801E7F20 end:0x801E7FE8
-	.sdata2     start:0x80333D80 end:0x80333D98
+	.rodata     start:0x801E7F20 end:0x801E7FE6
+	.sdata2     start:0x80333D80 end:0x80333D95
 
 RedSound/RedSound.cpp:
 	extab       start:0x8000ABC8 end:0x8000AD80
@@ -2630,9 +2630,9 @@ RedSound/RedSound.cpp:
 	.text       start:0x801CCA34 end:0x801CD8F4
 	.ctors      start:0x801D5450 end:0x801D5454
 	.rodata     start:0x801E7FE8 end:0x801E8110
-	.bss        start:0x8032E170 end:0x8032E280
+	.bss        start:0x8032E170 end:0x8032E27C
 	.sbss       start:0x8032F4C0 end:0x8032F4CC
-	.sdata2     start:0x80333D98 end:0x80333DB0
+	.sdata2     start:0x80333D98 end:0x80333DAD
 
 thp/THPDec.c:
 	.text       start:0x801CD8F4 end:0x801D4E5C

@@ -552,34 +552,32 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
  */
 void CRedEntry::ClearWaveData(int waveNo)
 {
-	int historyNo;
 	int* historyBank;
-	int* entry = (int*)this;
 
 	if (waveNo < 0) {
 		if (waveNo == -1) {
-			for (historyBank = (int*)entry[0]; historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+			for (historyBank = (int*)*(int*)this; historyBank < (int*)(*(int*)this + 0x400); historyBank += 4) {
 				if (historyBank[0] >= 0) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveNo == -2) {
-			for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+			for (historyBank = (int*)(*(int*)this + 0x100); historyBank < (int*)(*(int*)this + 0x400); historyBank += 4) {
 				if (historyBank[0] >= 0) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveNo == -3) {
-			for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+			for (historyBank = (int*)(*(int*)this + 0x100); historyBank < (int*)(*(int*)this + 0x400); historyBank += 4) {
 				if ((historyBank[0] >= 0) && (0 < historyBank[1])) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		}
 	} else {
-		historyNo = SearchWaveSequence(waveNo);
-		if (historyNo >= 0) {
-			WaveDelete((RedHistoryBANK*)(entry[0] + historyNo * 0x10));
+		waveNo = SearchWaveSequence(waveNo);
+		if (waveNo >= 0) {
+			WaveDelete((RedHistoryBANK*)(*(int*)this + waveNo * 0x10));
 		}
 	}
 }
@@ -595,14 +593,13 @@ void CRedEntry::ClearWaveData(int waveNo)
  */
 void CRedEntry::ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo3)
 {
-	int* entry = (int*)this;
 	int* historyBank;
 
 	if (((waveNo0 == -1) && (waveNo1 == -1) && (waveNo2 == -1)) && (waveNo3 == -1)) {
 		return;
 	}
 
-	for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+	for (historyBank = (int*)(*(int*)this + 0x100); historyBank < (int*)(*(int*)this + 0x400); historyBank += 4) {
 		if (((historyBank[0] >= 0) && (0 < historyBank[1])) &&
 		    (historyBank[0] != waveNo0) && (historyBank[0] != waveNo1) &&
 		    (historyBank[0] != waveNo2) && (historyBank[0] != waveNo3)) {
@@ -622,30 +619,30 @@ void CRedEntry::ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo
  */
 void CRedEntry::ClearWaveBank(int waveBankNo)
 {
-	int* const entry = (int*)this;
+	int* historyBank;
 
 	if (waveBankNo < 0) {
 		if (waveBankNo == -1) {
-			for (int* historyBank = (int*)entry[0]; historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+			for (historyBank = (int*)*(int*)this; historyBank < (int*)(*(int*)this + 0x400); historyBank += 4) {
 				if (!(historyBank[0] < 0)) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveBankNo == -2) {
-			for (int* historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+			for (historyBank = (int*)(*(int*)this + 0x100); historyBank < (int*)(*(int*)this + 0x400); historyBank += 4) {
 				if (!(historyBank[0] < 0)) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveBankNo == -3) {
-			for (int* historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+			for (historyBank = (int*)(*(int*)this + 0x100); historyBank < (int*)(*(int*)this + 0x400); historyBank += 4) {
 				if (!(historyBank[0] < 0) && (0 < historyBank[1])) {
 					WaveDelete((RedHistoryBANK*)historyBank);
 				}
 			}
 		}
-	} else if (waveBankNo < 0x10) {
-		WaveDelete((RedHistoryBANK*)(entry[0] + waveBankNo * 0x10));
+	} else if ((waveBankNo >= 0) && (waveBankNo < 0x10)) {
+		WaveDelete((RedHistoryBANK*)(*(int*)this + waveBankNo * 0x10));
 	}
 }
 
@@ -1355,8 +1352,9 @@ int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
 int CRedEntry::MusicOldClear()
 {
 	int historyNo = 0;
+	CRedEntry* entry = this;
 	unsigned int selected = 0;
-	unsigned int history = (unsigned int)*(int*)((int)this + 8);
+	unsigned int history = (unsigned int)*(int*)((int)entry + 8);
 
 	do {
 		if (*(int*)(history + 4) > historyNo) {
@@ -1364,10 +1362,10 @@ int CRedEntry::MusicOldClear()
 			selected = history;
 		}
 		history += 0x10;
-	} while (history < (unsigned int)*(int*)((int)this + 8) + 0x40);
+	} while (history < (unsigned int)*(int*)((int)entry + 8) + 0x40);
 
 	if (historyNo != 0) {
-		MusicMemoryFree((RedHistoryBANK*)selected);
+		entry->MusicMemoryFree((RedHistoryBANK*)selected);
 	}
 
 	return historyNo;

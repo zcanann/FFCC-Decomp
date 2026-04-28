@@ -15,7 +15,6 @@ class CMapCylinder
 {
 public:
     CMapCylinder();
-    void operator=(const CMapCylinder&);
 
     Vec m_bottom;     // 0x0
     Vec m_direction;  // 0xc

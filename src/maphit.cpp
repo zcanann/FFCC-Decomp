@@ -461,23 +461,6 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapCylinder::operator= (const CMapCylinder& other)
-{
-    m_bottom = other.m_bottom;
-    m_direction = other.m_direction;
-    m_radius = other.m_radius;
-    m_height = other.m_height;
-    m_top = other.m_top;
-    m_direction2 = other.m_direction2;
-    m_radius2 = other.m_radius2;
-    m_height2 = other.m_height2;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80025dd4
  * PAL Size: 32b
  * EN Address: TODO
@@ -657,17 +640,12 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     unsigned int faceIndex = static_cast<unsigned short>(startFace);
     unsigned int endFace = static_cast<unsigned short>(startFace + faceCount);
     int faceOffset = static_cast<int>(faceIndex) * 0x50;
-    CMapHitFace* savedFaces = m_faces;
-    unsigned short savedFaceCount = m_faceCount;
 
     while (faceIndex < endFace) {
-        m_faces = reinterpret_cast<CMapHitFace*>(Ptr(savedFaces, faceOffset));
+        gMapHitFace = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
         g_hit_t_min = s_large_pos;
-        m_faceCount = 1;
 
         if (CheckHitFaceCylinder(mask) != 0) {
-            m_faces = savedFaces;
-            m_faceCount = savedFaceCount;
             return 1;
         }
 
@@ -675,8 +653,6 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
         faceIndex++;
     }
 
-    m_faces = savedFaces;
-    m_faceCount = savedFaceCount;
     return 0;
 }
 
@@ -717,19 +693,12 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
     unsigned int endFace = static_cast<unsigned short>(startFace + faceCount);
     int faceOffset = static_cast<int>(faceIndex) * 0x50;
 
-    CMapHitFace* savedFaces = m_faces;
-    unsigned short savedFaceCount = m_faceCount;
     while (faceIndex < endFace) {
-        m_faces = reinterpret_cast<CMapHitFace*>(Ptr(savedFaces, faceOffset));
-        m_faceCount = 1;
-        gMapHitFace = m_faces;
+        gMapHitFace = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
         CheckHitFaceCylinder(mask);
         faceOffset += 0x50;
         faceIndex++;
     }
-
-    m_faces = savedFaces;
-    m_faceCount = savedFaceCount;
 }
 
 /*

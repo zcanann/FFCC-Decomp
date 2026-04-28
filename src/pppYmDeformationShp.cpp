@@ -365,7 +365,6 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 {
 	pppYmDeformationShpLayout* layout = (pppYmDeformationShpLayout*)obj;
 	Vec4d projected[4];
-	Vec localVertex;
 	Vec4d clipPos;
 	Vec worldPos;
 	float maxX;
@@ -394,50 +393,98 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	float screenScaleY = FLOAT_8033061c;
 	int i;
 
-	for (i = 0; i < 4; i++) {
-		localVertex = vertices[i];
-		PSMTXMultVec(layout->m_modelMatrix.value, &localVertex, &worldPos);
-		clipPos.x = worldPos.x;
-		clipPos.y = worldPos.y;
-		clipPos.z = worldPos.z;
-		clipPos.w = one;
-		MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, ppvScreenMatrix, &clipPos, &projected[i]);
-		projected[i].x = projected[i].x / projected[i].w;
-		projected[i].y = projected[i].y / projected[i].w;
-		projected[i].z = projected[i].z / projected[i].w;
-		projected[i].x = screenCenterX + projected[i].x / screenScaleX;
-		projected[i].y = screenCenterY - projected[i].y / screenScaleY;
+	{
+		Vec4d* projectedPos = projected;
+		Vec* vertex = vertices;
+
+		for (i = 0; i < 4; i++) {
+			Vec localVertex;
+
+			localVertex.x = vertex->x;
+			localVertex.y = vertex->y;
+			localVertex.z = vertex->z;
+			PSMTXMultVec(layout->m_modelMatrix.value, &localVertex, &worldPos);
+			clipPos.x = worldPos.x;
+			clipPos.y = worldPos.y;
+			clipPos.z = worldPos.z;
+			clipPos.w = one;
+			MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, ppvScreenMatrix, &clipPos, projectedPos);
+			projectedPos->x = projectedPos->x / projectedPos->w;
+			projectedPos->y = projectedPos->y / projectedPos->w;
+			projectedPos->z = projectedPos->z / projectedPos->w;
+			projectedPos->x = screenCenterX + projectedPos->x / screenScaleX;
+			projectedPos->y = screenCenterY - projectedPos->y / screenScaleY;
+			projectedPos++;
+			vertex++;
+		}
 	}
 
 	maxX = FLOAT_80330624;
+	if (maxX < projected[0].x) {
+		maxX = projected[0].x;
+	}
 	maxY = FLOAT_80330624;
+	if (maxY < projected[0].y) {
+		maxY = projected[0].y;
+	}
 	minX = FLOAT_80330620;
+	if (projected[0].x < minX) {
+		minX = projected[0].x;
+	}
 	minY = FLOAT_80330620;
-	for (i = 0; i < 4; i++) {
-		if (maxX < projected[i].x) {
-			maxX = projected[i].x;
-		}
-		if (maxY < projected[i].y) {
-			maxY = projected[i].y;
-		}
-		if (projected[i].x < minX) {
-			minX = projected[i].x;
-		}
-		if (projected[i].y < minY) {
-			minY = projected[i].y;
-		}
+	if (projected[0].y < minY) {
+		minY = projected[0].y;
 	}
 
-	if (((int)minX % 2) != 0) {
+	if (maxX < projected[1].x) {
+		maxX = projected[1].x;
+	}
+	if (maxY < projected[1].y) {
+		maxY = projected[1].y;
+	}
+	if (projected[1].x < minX) {
+		minX = projected[1].x;
+	}
+	if (projected[1].y < minY) {
+		minY = projected[1].y;
+	}
+
+	if (maxX < projected[2].x) {
+		maxX = projected[2].x;
+	}
+	if (maxY < projected[2].y) {
+		maxY = projected[2].y;
+	}
+	if (projected[2].x < minX) {
+		minX = projected[2].x;
+	}
+	if (projected[2].y < minY) {
+		minY = projected[2].y;
+	}
+
+	if (maxX < projected[3].x) {
+		maxX = projected[3].x;
+	}
+	if (maxY < projected[3].y) {
+		maxY = projected[3].y;
+	}
+	if (projected[3].x < minX) {
+		minX = projected[3].x;
+	}
+	if (projected[3].y < minY) {
+		minY = projected[3].y;
+	}
+
+	if (((int)minX & 1) != 0) {
 		minX = minX - FLOAT_803305f8;
 	}
-	if (((int)minY % 2) != 0) {
+	if (((int)minY & 1) != 0) {
 		minY = minY - FLOAT_803305f8;
 	}
-	if (((int)maxX % 2) != 0) {
+	if (((int)maxX & 1) != 0) {
 		maxX = maxX + FLOAT_803305f8;
 	}
-	if (((int)maxY % 2) != 0) {
+	if (((int)maxY & 1) != 0) {
 		maxY = maxY + FLOAT_803305f8;
 	}
 

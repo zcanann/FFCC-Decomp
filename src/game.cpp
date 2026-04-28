@@ -1199,27 +1199,27 @@ void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PP
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::ParticleFrameCallback(int effectIndex, int scriptLine, int scriptStep, int, int callbackType, Vec* pos)
+void CGame::ParticleFrameCallback(int effectIndex, int scriptLine, int scriptStep, int callbackType, int graphFrame, Vec*)
 {
 	int ifData = pppGetIfDt__8CPartMngFs(&PartMng, (short)effectIndex);
 	*(u8*)(ifData + 7) |= 1 << callbackType;
 
 	if (callbackType == 0) {
-		if (System.m_execParam > 2) {
-			System.Printf(const_cast<char*>(DAT_801d60d4), scriptLine, scriptStep, effectIndex, pos);
+		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+			System.Printf(const_cast<char*>(DAT_801d60d4), scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	} else if (callbackType == 1) {
 		*(u8*)(ifData + 7) &= ~2;
 		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
 
-		if (System.m_execParam > 2) {
-			System.Printf(const_cast<char*>(DAT_801d6114), scriptLine, scriptStep, effectIndex, pos);
+		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+			System.Printf(const_cast<char*>(DAT_801d6114), scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	} else if (callbackType == 3) {
 		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
 
-		if (System.m_execParam > 2) {
-			System.Printf(const_cast<char*>(DAT_801d6154), scriptLine, scriptStep, effectIndex, pos);
+		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+			System.Printf(const_cast<char*>(DAT_801d6154), scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	}
 }

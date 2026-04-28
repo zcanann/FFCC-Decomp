@@ -273,29 +273,32 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     GXSetVtxAttrFmt((GXVtxFmt)vtxFmt, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt((GXVtxFmt)vtxFmt, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
 
+    GXBegin(GX_TRIANGLEFAN, GX_VTXFMT7, rings + 2);
+
     const float latStep = kHalfPi / (float)rings;
     const float firstLat = latStep;
     const float firstRingSin = (float)sin(firstLat);
     const float firstRingCos = (float)cos(firstLat);
+    const float firstNormalZ = kNormalScale * firstRingCos * firstRingCos;
 
-    GXBegin(GX_TRIANGLEFAN, GX_VTXFMT7, rings + 2);
     GXPosition3f32(kZero, kZero, kOne);
     GXNormal3f32(kZero, kZero, kOne);
 
-    for (unsigned int i = 0; i <= rings; i++) {
-        const float lon = (2.0f * kPi * (float)i) / (float)rings;
-        const float lonSin = (float)sin(lon);
-        const float lonCos = (float)cos(lon);
-
-        const float x = firstRingSin * lonCos;
-        const float y = firstRingSin * lonSin;
+    int i = 0;
+    float lon = kZero;
+    while (i <= (int)rings) {
+        const float x = firstRingSin * (float)cos(lon);
+        const float y = firstRingSin * (float)sin(lon);
         const float z = firstRingCos;
 
         GXPosition3f32(x, y, z);
-        GXNormal3f32(kNormalScale * x * z, kNormalScale * y * z, z * z);
+        GXNormal3f32(kNormalScale * x * z, kNormalScale * y * z, firstNormalZ);
+
+        i++;
+        lon = (2.0f * kPi * (float)i) / (float)rings;
     }
 
-    for (unsigned int ring = 2; ring < rings; ring++) {
+    for (int ring = 2; ring < (int)rings; ring++) {
         const float upperLat = (kHalfPi * (float)(ring - 1)) / (float)rings;
         const float lowerLat = (kHalfPi * (float)ring) / (float)rings;
 
@@ -303,26 +306,29 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
         const float upperCos = (float)cos(upperLat);
         const float lowerSin = (float)sin(lowerLat);
         const float lowerCos = (float)cos(lowerLat);
+        const float upperNormalZ = kNormalScale * upperCos * upperCos;
+        const float lowerNormalZ = kNormalScale * lowerCos * lowerCos;
 
         if ((float)fabs(upperCos) < 1.0e-6f || (float)fabs(lowerCos) < 1.0e-6f) {
             break;
         }
 
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, ringVertexCount * 2);
-        for (unsigned int i = 0; i <= rings; i++) {
-            const float lon = (2.0f * kPi * (float)i) / (float)rings;
-            const float lonSin = (float)sin(lon);
-            const float lonCos = (float)cos(lon);
-
-            const float lx = lowerSin * lonCos;
-            const float ly = lowerSin * lonSin;
+        i = 0;
+        lon = kZero;
+        while (i <= (int)rings) {
+            const float lx = lowerSin * (float)cos(lon);
+            const float ly = lowerSin * (float)sin(lon);
             GXPosition3f32(lx, ly, lowerCos);
-            GXNormal3f32(kNormalScale * lx * lowerCos, kNormalScale * ly * lowerCos, lowerCos * lowerCos);
+            GXNormal3f32(kNormalScale * lx * lowerCos, kNormalScale * ly * lowerCos, lowerNormalZ);
 
-            const float ux = upperSin * lonCos;
-            const float uy = upperSin * lonSin;
+            const float ux = upperSin * (float)cos(lon);
+            const float uy = upperSin * (float)sin(lon);
             GXPosition3f32(ux, uy, upperCos);
-            GXNormal3f32(kNormalScale * ux * upperCos, kNormalScale * uy * upperCos, upperCos * upperCos);
+            GXNormal3f32(kNormalScale * ux * upperCos, kNormalScale * uy * upperCos, upperNormalZ);
+
+            i++;
+            lon = (2.0f * kPi * (float)i) / (float)rings;
         }
     }
 

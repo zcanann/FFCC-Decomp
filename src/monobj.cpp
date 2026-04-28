@@ -23,7 +23,6 @@ extern "C" char DAT_80331a4c[];
 extern "C" void __ptmf_scall(...);
 extern "C" int calcCastTime__10CGCharaObjFi(CGCharaObj*, int);
 extern "C" void aiAddDuct__8CGMonObjFRi(CGMonObj*, int&);
-extern "C" int calcPolygonGroup__6CAStarFP3Veci(void*, Vec*, int);
 extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
 extern "C" int getNearParty__8CGMonObjFiiffi(CGMonObj*, int, int, float, float, int);
@@ -2155,11 +2154,11 @@ void CGMonObj::setUndeadEffect(int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CGMonObj::IsDispRader()
+unsigned int CGMonObj::IsDispRader()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	if (object->IsDispRader() == 0) {
-		return false;
+		return 0;
 	}
 	return static_cast<int>(static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) < 0;
 }
@@ -2502,8 +2501,7 @@ void CGMonObj::moveFrame()
 		in_f29 = PSVECDistance(&local_68, &object->m_worldPosition);
 
 		if (((moveFlags & 0x30000) != 0) && (*reinterpret_cast<unsigned int*>(ARRAY_8030918c) != 0)) {
-			int polygonGroup = calcPolygonGroup__6CAStarFP3Veci(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x2A5C, &local_68,
-			                                                   (int)object->m_moveVec.x);
+			int polygonGroup = AStar.calcPolygonGroup(&local_68, static_cast<int>(object->m_moveVec.x));
 			moveAStar(aStarGroupId, polygonGroup, local_68);
 		}
 	} else if ((moveFlags & 0x2000) != 0) {

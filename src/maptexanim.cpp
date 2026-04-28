@@ -172,8 +172,9 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
                     void* nextTexture = TextureAt(textureSet, nextTextureIndex);
                     SetMaterialTextureSlot(MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex)),
                         static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
+                    char blendValue = static_cast<char>(FLOAT_8032fd38 * frame);
                     void* material = MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex));
-                    *reinterpret_cast<char*>(Ptr(material, 0xA4)) = static_cast<char>(FLOAT_8032fd38 * frame);
+                    *reinterpret_cast<char*>(Ptr(material, 0xA4)) = blendValue;
                     *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
                 }
             } else {
@@ -226,7 +227,7 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
             nextFrame = 0;
         }
 
-        const unsigned short nextTextureIndex = m_frameTable[nextFrame];
+        const unsigned short nextTextureIndex = m_frameTable[static_cast<unsigned short>(nextFrame)];
         SetMaterialTextureSlot(MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex)),
             static_cast<unsigned long>(m_textureSlot + 1), TextureAt(textureSet, nextTextureIndex));
         void* material = MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex));

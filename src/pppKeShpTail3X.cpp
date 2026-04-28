@@ -57,7 +57,7 @@ struct KeShpTail3XOffsets {
 struct KeShpTail3XWork {
     s16 m_values[24];
     Vec m_posHistory[28];
-    s16 m_angles[28];
+    u16 m_angles[28];
     u32 m_shapeData;
     u16 m_shapeFrame;
     u16 m_unk1be;
@@ -164,7 +164,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     Vec zeroVec;
     Vec pos;
     Vec seg;
-    float envDepth;
     float drawScale;
     float segDx;
     float segDy;
@@ -236,7 +235,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     trailStep = step->m_stepDistance * pppMngStPtr->m_scale.x;
     trailStepDelta = trailStep * (shapeScaleStep / shapeScale);
     if (trailStep == zero) {
-        return;
+        count = 0;
     }
 
     currentIndex = work->m_head;
@@ -269,7 +268,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 
 draw_loop:
     while (count != 0) {
-        envDepth = zero;
         drawScale = shapeScale;
 
         if (step->m_useRandomShape != 0) {
@@ -315,12 +313,10 @@ draw_loop:
         drawMtx.value[1][3] = pos.y;
         drawMtx.value[2][3] = pos.z;
 
-        if (step->m_useEnvDepth != 0) {
-            envDepth = step->m_envDepth;
-        }
         zEnable = (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5);
-        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((void*)0, &drawMtx, envDepth, 0, step->m_drawA,
-                                                                  step->m_blendMode, 0, zEnable, 1, 0);
+        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+            (void*)0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : zero, 0, step->m_drawA,
+            step->m_blendMode, 0, zEnable, 1, 0);
         GXLoadPosMtxImm(drawMtx.value, 0);
 
         {

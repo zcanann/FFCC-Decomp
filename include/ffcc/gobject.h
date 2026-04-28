@@ -77,7 +77,7 @@ public:
     void SetAnimSlot(int, int);
     float CalcSafePos(int, CGObject*, Vec*);
     void PutDropItem();
-    virtual bool IsDispRader();
+    virtual unsigned int IsDispRader();
     virtual int onHit(int, CGObject*, int, Vec*);
     virtual void onAnimPoint(int, int);
     virtual float onAlphaUpdate();

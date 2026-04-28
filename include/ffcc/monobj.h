@@ -77,7 +77,7 @@ public:
     void setIceJEffect(int);
     void setFlyEffect(int, int);
     void setUndeadEffect(int, int);
-    bool IsDispRader();
+    unsigned int IsDispRader();
     void setRepop(int);
     void statMove();
     void moveAStar(int, int, Vec&);

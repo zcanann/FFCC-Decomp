@@ -1352,8 +1352,9 @@ int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
 int CRedEntry::MusicOldClear()
 {
 	int historyNo = 0;
+	CRedEntry* entry = this;
 	unsigned int selected = 0;
-	unsigned int history = (unsigned int)*(int*)((int)this + 8);
+	unsigned int history = (unsigned int)*(int*)((int)entry + 8);
 
 	do {
 		if (*(int*)(history + 4) > historyNo) {
@@ -1361,10 +1362,10 @@ int CRedEntry::MusicOldClear()
 			selected = history;
 		}
 		history += 0x10;
-	} while (history < (unsigned int)*(int*)((int)this + 8) + 0x40);
+	} while (history < (unsigned int)*(int*)((int)entry + 8) + 0x40);
 
 	if (historyNo != 0) {
-		MusicMemoryFree((RedHistoryBANK*)selected);
+		entry->MusicMemoryFree((RedHistoryBANK*)selected);
 	}
 
 	return historyNo;

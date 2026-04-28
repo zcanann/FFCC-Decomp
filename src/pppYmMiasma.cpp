@@ -186,7 +186,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             if ((s32)Game.m_currentSceneId == 7) {
                 PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
             } else {
-                PSMTXMultVec(ppvCameraMatrix0, &worldPos, &worldPos);
+                PSMTXMultVec(ppvCameraMatrix02, &worldPos, &worldPos);
             }
 
             model.value[0][3] = worldPos.x;

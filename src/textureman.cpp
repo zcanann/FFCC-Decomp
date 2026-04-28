@@ -1045,9 +1045,7 @@ void CTexture::GetExternalTlutColor(void*, int, int)
 void CTexture::SetTlutColor(int index, _GXColor color)
 {
     int offset;
-    u16* tlut = reinterpret_cast<u16*>(m_tlutData);
     unsigned char* packedColor = reinterpret_cast<unsigned char*>(&color);
-    u16 lowColor = packedColor[0] | (packedColor[1] << 8);
 
     if (m_format == 9) {
         offset = 0x100;
@@ -1057,8 +1055,16 @@ void CTexture::SetTlutColor(int index, _GXColor color)
         offset = 0;
     }
 
-    tlut[index + offset] = packedColor[2] | (packedColor[3] << 8);
-    tlut[index] = lowColor;
+    u32 packed;
+    unsigned char* packedBytes = reinterpret_cast<unsigned char*>(&packed);
+    packedBytes[3] = packedColor[0];
+    packedBytes[0] = packedColor[3];
+    packedBytes[1] = packedColor[2];
+    packedBytes[2] = packedColor[1];
+
+    u16* tlut = reinterpret_cast<u16*>(m_tlutData);
+    tlut[index + offset] = packed >> 16;
+    tlut[index] = packed;
 }
 
 /*

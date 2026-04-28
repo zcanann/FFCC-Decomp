@@ -1,7 +1,6 @@
 #include "ffcc/wind.h"
 
 #include <string.h>
-#include <math.h>
 #include "ffcc/graphic.h"
 #include "ffcc/color.h"
 #include "ffcc/vector.h"
@@ -14,6 +13,10 @@
 #include "ffcc/system.h"
 
 CWind Wind;
+
+extern int __float_nan[];
+double cos(double);
+double sin(double);
 
 static inline s8 GetWindActiveFlag(const WindObject* obj)
 {
@@ -39,6 +42,54 @@ const double DOUBLE_80330f40 = 4503601774854144.0;
 extern char DAT_801db528[];
 extern char DAT_801db548[];
 extern char DAT_801db568[];
+
+static inline float WindSqrtf(float x)
+{
+    union {
+        float f;
+        unsigned long bits;
+    } bits;
+    int fpclass;
+
+    if (x > FLOAT_80330ef0) {
+        double guess = __frsqrte((double)x);
+        guess = DOUBLE_80330f00 * guess * (DOUBLE_80330f08 - guess * guess * x);
+        guess = DOUBLE_80330f00 * guess * (DOUBLE_80330f08 - guess * guess * x);
+        guess = DOUBLE_80330f00 * guess * (DOUBLE_80330f08 - guess * guess * x);
+        return (float)(x * guess);
+    }
+
+    if ((double)x < DOUBLE_80330f10) {
+        return *(float*)__float_nan;
+    }
+
+    bits.f = x;
+    switch (bits.bits & 0x7f800000) {
+    case 0x7f800000:
+        if ((bits.bits & 0x7fffff) != 0) {
+            fpclass = 1;
+        } else {
+            fpclass = 2;
+        }
+        break;
+    case 0:
+        if ((bits.bits & 0x7fffff) != 0) {
+            fpclass = 5;
+        } else {
+            fpclass = 3;
+        }
+        break;
+    default:
+        fpclass = 4;
+        break;
+    }
+
+    if (fpclass == 1) {
+        return *(float*)__float_nan;
+    }
+
+    return x;
+}
 
 /*
  * --INFO--
@@ -429,7 +480,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                 if (obj->type == 2) {
                     if (distanceSq < obj->radiusSq) {
                         const float lifeScale = FLOAT_80330ef8 - obj->lifeRatio * obj->lifeRatio;
-                        const float distance = sqrtf(distanceSq);
+                        const float distance = WindSqrtf(distanceSq);
                         const float forceScale = lifeScale / distance;
                         out->x += deltaX * forceScale;
                         out->y += (FLOAT_80330f18 + Math.RandF()) * lifeScale;
@@ -584,16 +635,15 @@ void CWind::Frame()
             }
 
             obj->curPower = FLOAT_80330f38 * (obj->targetPower - obj->curPower) + obj->curPower;
-            d0 = (double)Math.RandF();
+            f0 = Math.RandF();
             obj->curDir = obj->curDir +
-                          (float)((double)FLOAT_80330f2c * d0 +
-                                  (double)(FLOAT_80330f38 * (obj->targetDir - obj->curDir) - FLOAT_80330f28));
+                          (FLOAT_80330f2c * f0 +
+                           (FLOAT_80330f38 * (obj->targetDir - obj->curDir) - FLOAT_80330f28));
 
             if ((obj->type == 0) || (obj->type == 1)) {
                 d0 = (double)sin((double)obj->curDir);
                 obj->force.x = obj->curPower * (float)d0;
-                d0 = (double)Math.RandF();
-                obj->force.y = obj->curPower * (float)((double)FLOAT_80330f20 * d0 + (double)FLOAT_80330f24);
+                obj->force.y = obj->curPower * (FLOAT_80330f20 * Math.RandF() + FLOAT_80330f24);
                 d0 = (double)cos((double)obj->curDir);
                 obj->force.z = obj->curPower * (float)d0;
             }

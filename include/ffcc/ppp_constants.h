@@ -10,7 +10,6 @@ extern float gPppPointRApSpinScale;
 extern const float gPppScaleLoopAutoZero;
 
 extern const float gPppYmMoveParabolaYOffsetStep;
-extern const float gPppYmMoveParabolaZero;
 extern const float gPppYmMoveParabolaAngleScale;
 extern const float gPppYmMoveParabolaAngleDivisor;
 extern const float gPppYmMoveParabolaGravityScale;

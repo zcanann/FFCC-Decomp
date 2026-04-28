@@ -282,6 +282,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
             xCoord = FLOAT_80331FE4;
 
             for (x = 0; x < (u32)textureInfo->m_width; x++) {
+                u32 xFine = x & 3;
                 magnitude = xCoord * xCoord + ySq;
 
                 if (magnitude > FLOAT_80331FE8) {
@@ -296,7 +297,6 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
                     magnitude = FLOAT_80332008;
                 }
 
-                u32 xFine = x & 3;
                 u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80332010 + FLOAT_8033200C));
                 u8* pixel = textureInfo->m_imageData +
                     yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +

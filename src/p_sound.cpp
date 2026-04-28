@@ -6,6 +6,8 @@ extern "C" void create__9CSoundPcsFv(CSoundPcs*);
 extern "C" void destroy__9CSoundPcsFv(CSoundPcs*);
 extern "C" void calc__9CSoundPcsFv(CSoundPcs*);
 extern "C" void draw__9CSoundPcsFv(CSoundPcs*);
+extern "C" char lbl_8032E890[];
+extern "C" char lbl_8032E898[];
 
 extern "C" const char s_CSoundPcs_801DB4E8[] = "CSoundPcs";
 unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
@@ -27,6 +29,8 @@ unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
     0x44,
     1
 };
+u32 CSoundPcs_RTTI_base__9CSoundPcs[3] = {reinterpret_cast<u32>(lbl_8032E890), 0, 0};
+u32 CSoundPcs_RTTI__9CSoundPcs[5] = {reinterpret_cast<u32>(lbl_8032E890), 0, reinterpret_cast<u32>(lbl_8032E898), 0, 0};
 
 CSoundPcs SoundPcs;
 

@@ -354,7 +354,7 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 		int meshList = (int)model->m_meshes;
 		void** curStageArray = stageArray;
 		void** curMeshArray = meshArray;
-		for (unsigned int i = 0; i < model->m_data->m_meshCount; i++) {
+		for (unsigned int i = 0; i < model->m_data->m_meshCount; i++, meshList += 0x14) {
 			int meshData = *(int*)(meshList + 8);
 			void** dlEntries = (void**)*curStageArray;
 			for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {
@@ -380,7 +380,6 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 
 			curStageArray++;
 			curMeshArray++;
-			meshList += 0x14;
 		}
 
 		if (stageArray != 0) {

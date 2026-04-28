@@ -425,7 +425,7 @@ CSound::~CSound()
  */
 void CSound::Init()
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
     CSoundLayout& sound = SoundData(this);
     CMemory::CStage* stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, s_CSound_80330ce0, 0);
     sound.m_stage = stage;
@@ -479,7 +479,7 @@ void CSound::Init()
  */
 void CSound::Quit()
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
     CSoundLayout& sound = SoundData(this);
 
     CFile::CHandle*& waveFile = sound.m_waveFile;
@@ -616,7 +616,7 @@ void CSound::destroy()
  */
 void CSound::Realloc(int isMinMemoryMode)
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
     CSoundLayout& sound = SoundData(this);
 
     CFile::CHandle*& waveFile = sound.m_waveFile;
@@ -759,7 +759,7 @@ void CSound::Realloc(int isMinMemoryMode)
  */
 float CSound::GetPerformance()
 {
-    unsigned int programTime = GetProgramTime__9CRedSoundFv(reinterpret_cast<CRedSound*>(this));
+    unsigned int programTime = GetProgramTime__9CRedSoundFv(RedSound(this));
     float numer = (float)(programTime / 0xF);
     float denom = (float)(((OS_BUS_CLOCK / 500000) * 0x8235) >> 3);
     return FLOAT_80330d00 * (numer / denom);
@@ -790,12 +790,12 @@ void CSound::CheckDriver(int mode)
     CSoundLayout& sound = SoundData(this);
     unsigned int oldPrint = sound.m_debugPrint;
     sound.m_debugPrint = 1;
-    ReportPrint__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), 1);
-    TestProcess__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), mode);
-    DisplayWaveInfo__9CRedSoundFv(reinterpret_cast<CRedSound*>(this));
-    DisplaySePlayInfo__9CRedSoundFv(reinterpret_cast<CRedSound*>(this));
+    ReportPrint__9CRedSoundFi(RedSound(this), 1);
+    TestProcess__9CRedSoundFi(RedSound(this), mode);
+    DisplayWaveInfo__9CRedSoundFv(RedSound(this));
+    DisplaySePlayInfo__9CRedSoundFv(RedSound(this));
     sound.m_debugPrint = oldPrint;
-    ReportPrint__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), (-oldPrint | oldPrint) >> 0x1F);
+    ReportPrint__9CRedSoundFi(RedSound(this), (-oldPrint | oldPrint) >> 0x1F);
 }
 
 /*
@@ -810,27 +810,50 @@ void CSound::CheckDriver(int mode)
 void CSound::Frame()
 {
     loadWaveFrame();
+    CRedSound* redSound = RedSound(this);
     unsigned char* se = reinterpret_cast<unsigned char*>(this) + 0x2C;
     u32 i = 0;
     do {
         if ((*se & 0x80) != 0) {
             int pan;
-            int volume[3];
+            int volume;
 
-            calcVolumePan(reinterpret_cast<CSe3D*>(se), volume[0], pan);
+            calcVolumePan(reinterpret_cast<CSe3D*>(se), volume, pan);
 
-            if (((*se >> 6) & 1) == 0) {
-                if (SePlayState__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8)) == 0) {
+            if (((*se >> 6) & 1) != 0) {
+                if (volume != 0) {
+                    if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
+                        Printf__7CSystemFPce(&System, s_soundEnvSePlayFmt, *reinterpret_cast<int*>(se + 0xC));
+                    }
+
+                    int vol = volume;
+                    int seNo = *reinterpret_cast<int*>(se + 0xC);
+                    if (seNo < 0) {
+                        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
+                        seNo = -1;
+                    } else if (seNo < 4000) {
+                        int bank = seNo / 1000;
+                        seNo = SePlay__9CRedSoundFiiiii(redSound, bank, seNo - (bank * 1000), pan, 0, 0);
+                        SeVolume__9CRedSoundFiii(redSound, seNo, vol, 0x1E);
+                    } else {
+                        seNo = SePlay__9CRedSoundFiiiii(redSound, -1, seNo, pan, 0, 0);
+                        SeVolume__9CRedSoundFiii(redSound, seNo, vol, 0x1E);
+                    }
+                    *reinterpret_cast<int*>(se + 8) = seNo;
+                    *se &= 0xBF;
+                }
+            } else {
+                if (SePlayState__9CRedSoundFi(redSound, *reinterpret_cast<int*>(se + 8)) == 0) {
                     *se &= 0x7F;
                 } else {
-                    int playing = ReportSeLoop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8));
+                    int playing = ReportSeLoop__9CRedSoundFi(redSound, *reinterpret_cast<int*>(se + 8));
                     if ((playing != 0) &&
-                        (GetSeVolume__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), 0) == 0) &&
-                        (GetSeVolume__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), 1) == 0)) {
+                        (GetSeVolume__9CRedSoundFii(redSound, *reinterpret_cast<int*>(se + 8), 0) == 0) &&
+                        (GetSeVolume__9CRedSoundFii(redSound, *reinterpret_cast<int*>(se + 8), 1) == 0)) {
                         if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
                             Printf__7CSystemFPce(&System, s_soundEnvSeStopFmt, *reinterpret_cast<int*>(se + 0xC));
                         }
-                        SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8));
+                        SeStop__9CRedSoundFi(redSound, *reinterpret_cast<int*>(se + 8));
                         *se = (*se & 0xBF) | 0x40;
                         goto next;
                     }
@@ -839,40 +862,20 @@ void CSound::Frame()
                         if (*reinterpret_cast<int*>(se + 8) < 0) {
                             Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                         } else {
-                            SePan__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), pan, 0x1E);
+                            SePan__9CRedSoundFiii(redSound, *reinterpret_cast<int*>(se + 8), pan, 0x1E);
                         }
                         se[2] = static_cast<unsigned char>(pan);
                     }
 
-                    if (static_cast<signed char>(se[1]) != volume[0]) {
+                    if (static_cast<signed char>(se[1]) != volume) {
                         if (*reinterpret_cast<int*>(se + 8) < 0) {
                             Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                         } else {
-                            SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), volume[0], 0x1E);
+                            SeVolume__9CRedSoundFiii(redSound, *reinterpret_cast<int*>(se + 8), volume, 0x1E);
                         }
-                        se[1] = static_cast<unsigned char>(volume[0]);
+                        se[1] = static_cast<unsigned char>(volume);
                     }
                 }
-            } else if (volume[0] != 0) {
-                if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
-                    Printf__7CSystemFPce(&System, s_soundEnvSePlayFmt, *reinterpret_cast<int*>(se + 0xC));
-                }
-
-                int vol = volume[0];
-                int seNo = *reinterpret_cast<int*>(se + 0xC);
-                if (seNo < 0) {
-                    Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
-                    seNo = -1;
-                } else if (seNo < 4000) {
-                    int bank = seNo / 1000;
-                    seNo = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), bank, seNo - (bank * 1000), pan, 0, 0);
-                    SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), seNo, vol, 0x1E);
-                } else {
-                    seNo = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), -1, seNo, pan, 0, 0);
-                    SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), seNo, vol, 0x1E);
-                }
-                *reinterpret_cast<int*>(se + 8) = seNo;
-                *se &= 0xBF;
             }
         }
 next:
@@ -890,7 +893,7 @@ next:
         }
     }
 
-    MusicVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), -1, sound.m_curMusicVolume, 0);
+    MusicVolume__9CRedSoundFiii(RedSound(this), -1, sound.m_curMusicVolume, 0);
 }
 
 /*
@@ -958,7 +961,7 @@ void CSound::Draw()
  */
 void CSound::loadWaveFrame()
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
     CSoundLayout& sound = SoundData(this);
     CFile::CHandle*& waveFile = sound.m_waveFile;
     int& waveRemain = sound.m_waveRemain;
@@ -988,7 +991,7 @@ void CSound::loadWaveFrame()
         } else if (waveState == 1 && File.IsCompleted(waveFile)) {
             SetWaveData__9CRedSoundFiPvi(redSound, waveID, File.m_readBuffer, (int)waveFile->m_chunkSize);
 
-            while (ReportStandby__9CRedSoundFi(reinterpret_cast<CRedSound*>(&Sound), 0) != 0) {
+            while (ReportStandby__9CRedSoundFi(RedSound(&Sound), 0) != 0) {
             }
 
             waveState = 0;
@@ -1063,7 +1066,7 @@ void CSound::loadWaveFrame()
  */
 void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
 
     if (waveNo < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
@@ -1144,7 +1147,7 @@ int CSound::IsLoadWaveASyncCompleted()
  */
 void CSound::LoadBgm(int bgmId)
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
 
     if (bgmId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
@@ -1173,7 +1176,7 @@ void CSound::LoadBgm(int bgmId)
  */
 void CSound::PlayBgm(int bgmId)
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
 
     if (bgmId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
@@ -1265,7 +1268,7 @@ void CSound::FadeOutBgm(int fadeFrames)
  */
 void CSound::LoadBlock()
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
     CSoundLayout& sound = SoundData(this);
     CFile::CHandle*& waveFile = sound.m_waveFile;
 
@@ -1341,7 +1344,7 @@ void CSound::LoadBlock()
  */
 void CSound::FreeBlock()
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
     redSound->ClearWaveBank(500);
     redSound->ClearWaveBank(0);
     for (int i = 0; i < 4; i++) {
@@ -1360,7 +1363,7 @@ void CSound::FreeBlock()
  */
 void CSound::LoadSe(int seId)
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
 
     if (seId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
@@ -1391,7 +1394,7 @@ void CSound::LoadSe(int seId)
  */
 void CSound::LoadSe(void* seData)
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
     if (ReentrySeSepData__9CRedSoundFi(redSound, *reinterpret_cast<s32*>((u8*)seData + 8)) == -1) {
         SetSeSepData__9CRedSoundFPv(redSound, seData);
     }
@@ -1408,7 +1411,7 @@ void CSound::LoadSe(void* seData)
  */
 void CSound::LoadWave(int waveId)
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
     CSoundLayout& sound = SoundData(this);
     CFile::CHandle*& waveFile = sound.m_waveFile;
 
@@ -1461,7 +1464,7 @@ void CSound::LoadWave(int waveId)
  */
 void CSound::LoadWave(void* waveData)
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
     CFile::CHandle*& waveFile = SoundData(this).m_waveFile;
 
     if (ReentryWaveData__9CRedSoundFi(redSound, reinterpret_cast<s16*>(waveData)[1]) == -1) {
@@ -1506,21 +1509,21 @@ void CSound::StopAndFreeAllSe(int clearMode)
 {
     CSoundLayout& sound = SoundData(this);
     if (clearMode != 0) {
-        SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -1);
-        ClearSeSepData__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -1);
-        ClearWaveData__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -3);
+        SeStop__9CRedSoundFi(RedSound(this), -1);
+        ClearSeSepData__9CRedSoundFi(RedSound(this), -1);
+        ClearWaveData__9CRedSoundFi(RedSound(this), -3);
     } else {
-        SeStopMG__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(this),
+        SeStopMG__9CRedSoundFiiii(RedSound(this),
                                   sound.m_noFreeSeGroups[0],
                                   sound.m_noFreeSeGroups[1],
                                   sound.m_noFreeSeGroups[2],
                                   sound.m_noFreeSeGroups[3]);
-        ClearSeSepDataMG__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(this),
+        ClearSeSepDataMG__9CRedSoundFiiii(RedSound(this),
                                           sound.m_noFreeSeGroups[0],
                                           sound.m_noFreeSeGroups[1],
                                           sound.m_noFreeSeGroups[2],
                                           sound.m_noFreeSeGroups[3]);
-        ClearWaveDataM__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(this),
+        ClearWaveDataM__9CRedSoundFiiii(RedSound(this),
                                         sound.m_noFreeWaves[0],
                                         sound.m_noFreeWaves[1],
                                         sound.m_noFreeWaves[2],
@@ -1545,7 +1548,7 @@ void CSound::StopAndFreeAllSe(int clearMode)
 int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
 {
     int seId;
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
 
     if (seNo < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
@@ -2320,7 +2323,7 @@ void CSound::PlayStreamASync()
     }
 
     int streamNo = StreamPlay__9CRedSoundFPviii(
-        reinterpret_cast<CRedSound*>(this), sound.m_streamBuffer, 0x20000, 0x40, clampedVolume);
+        RedSound(this), sound.m_streamBuffer, 0x20000, 0x40, clampedVolume);
     sound.m_streamID = streamNo;
     sound.m_streamPlaying = 1;
 }

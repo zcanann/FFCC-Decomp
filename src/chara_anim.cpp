@@ -23,6 +23,12 @@ extern unsigned char Chara[];
 extern CCharaPcs CharaPcs;
 extern const float kCharaSharedZeroF;
 extern const float kCharaSharedOneF;
+extern const double DOUBLE_80330C78 = 4503599627370496.0;
+extern const float FLOAT_80330c80 = 0.0f;
+extern const float FLOAT_80330c84 = 0.01745329238474369f;
+extern const double DOUBLE_80330c88 = 4503601774854144.0;
+extern const float FLOAT_80330C90 = -1.0f;
+extern const float FLOAT_80330C94 = 360.0f;
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)

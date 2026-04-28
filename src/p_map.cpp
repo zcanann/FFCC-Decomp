@@ -560,7 +560,7 @@ void CMapPcs::calc()
 
         CPtrArray<CMapLightHolder*>& mapLightHolderArr =
             reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450)[1];
-        if (mapLightHolderArr.GetSize() > 0) {
+        if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) > 0) {
             mapLightHolderArr[0]->GetLightHolder(reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C),
                                                  static_cast<Vec*>(0));
         }

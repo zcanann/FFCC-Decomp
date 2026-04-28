@@ -48,7 +48,7 @@ struct CMesFlatDataView
 	CMesFlatTableView m_tabl[8];
 };
 
-static int GetMesNibbleValue(const char* data)
+static inline int GetMesNibbleValue(const char* data)
 {
 	unsigned char high = (unsigned char)data[0];
 	unsigned char low = (unsigned char)data[1];
@@ -57,14 +57,18 @@ static int GetMesNibbleValue(const char* data)
 
 static int ReadTagU8(char** text)
 {
-	int value = GetMesNibbleValue(*text);
+	unsigned char high = (unsigned char)(*text)[0];
+	unsigned char low = (unsigned char)(*text)[1];
+	int value = (int)((unsigned int)(high << 4) | ((unsigned int)low & 0x0F));
 	*text += 2;
 	return value;
 }
 
 static int ReadTagS8(char** text)
 {
-	int value = GetMesNibbleValue(*text);
+	unsigned char high = (unsigned char)(*text)[0];
+	unsigned char low = (unsigned char)(*text)[1];
+	int value = (int)((unsigned int)(high << 4) | ((unsigned int)low & 0x0F));
 	*text += 2;
 	return (int)(signed char)value;
 }
@@ -317,16 +321,6 @@ void CMes::Next()
 			}
 		}
 	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMes::getFont(int, int)
-{
-	// TODO
 }
 
 /*
@@ -620,26 +614,6 @@ render_char:
 		}
 		*(int*)((char*)this + 8) = *(int*)((char*)this + 8) + 1;
 	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMes::GET_2(char **)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMes::GET_1(char **)
-{
-	// TODO
 }
 
 /*
@@ -994,26 +968,6 @@ int CMes::useFlag(int maxCount, int stopOnClear)
 	}
 
 	return 1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMes::addFlag(CMes::CFlag&)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMes::CFlag::operator= (const CMes::CFlag&)
-{
-	// TODO
 }
 
 /*

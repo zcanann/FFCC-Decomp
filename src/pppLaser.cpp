@@ -112,8 +112,8 @@ struct LaserColorData {
 };
 
 struct LaserBaseObject {
+    u8 m_pad0[0x0C];
     s32 m_graphId;
-    u8 m_pad4[0x0C];
     pppFMATRIX m_localMatrix;
     pppFMATRIX m_drawMatrix;
 };
@@ -260,11 +260,11 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
     }
 
     work = (LaserWork*)((u8*)pppLaser + 0x80 + param_3->m_serializedDataOffsets[2]);
-    if (work->m_maxLength == FLOAT_80333448) {
+    emptyHistory = 0;
+    if (FLOAT_80333448 == work->m_maxLength) {
         return;
     }
 
-    emptyHistory = 0;
     if (work->m_points == 0) {
         work->m_points = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)step->m_payload[0x1e] * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppLaser_cpp_801E3048), 0x7d);
@@ -281,7 +281,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         **(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeArg1,
         work->m_shapeArg2, work->m_shapeArg0, *(short*)(step->m_payload + 0x2c));
 
-    for (u32 i = 0; i < (u32)step->m_payload[0x3a] + 1; i++) {
+    for (int i = 0; i < (int)(u32)(step->m_payload[0x3a] + 1); i++) {
         int max = (int)step->m_payload[0x1e] - 2;
 
         for (int j = max; (int)i <= j; j--) {
@@ -324,18 +324,19 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         pppSubVector(localA, work->m_points[i], work->m_origin);
         PSVECScale(&localA, &localA, FLOAT_8033344c);
 
-        cyl.m_bottom = work->m_origin;
-        cyl.m_direction = localA;
-        cyl.m_radius = kPppLaserZero;
         cyl.m_top.x = FLOAT_80333450;
         cyl.m_top.y = FLOAT_80333450;
         cyl.m_top.z = FLOAT_80333450;
         cyl.m_direction2.x = FLOAT_80333454;
         cyl.m_direction2.y = FLOAT_80333454;
         cyl.m_direction2.z = FLOAT_80333454;
+        cyl.m_bottom = work->m_origin;
+        cyl.m_direction = localA;
+        cyl.m_radius = kPppLaserZero;
 
+        int check = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &localA, 0xffffffff);
         int hit = 0;
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &localA, 0xffffffff) != 0) {
+        if (check != 0) {
             hit = 1;
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &work->m_points[i]);
             work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);

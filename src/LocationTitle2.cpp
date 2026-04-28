@@ -68,7 +68,7 @@ struct pppMngStLocationTitle2Raw {
     CGObject* m_charaObj;
 };
 
-static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
+static const char s_LocationTitle2_cpp_801DB588[] = "LocationTitle2.cpp";
 
 /*
  * --INFO--
@@ -190,7 +190,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 }
 
-static const char s_locationNodeName[] = "loc";
+static const char DAT_80330f50[] = "loc";
 
 /*
  * --INFO--
@@ -242,7 +242,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         float zOffset;
 
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
+            unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp_801DB588,
             0x70);
         memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
         particles = (LocationTitle2Particle*)work->m_particles;
@@ -271,7 +271,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         }
 
         modelRaw = (LocationTitle2ModelRaw*)model;
-        nodeIndex = SearchNode__Q26CChara6CModelFPc(model, const_cast<char*>(s_locationNodeName));
+        nodeIndex = SearchNode__Q26CChara6CModelFPc(model, const_cast<char*>(DAT_80330f50));
         node = modelRaw->m_nodes + nodeIndex * 0xC0;
         zOffset = 1.0f;
 

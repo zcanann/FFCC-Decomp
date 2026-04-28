@@ -958,17 +958,19 @@ int CTexture::CheckName(char* name)
  */
 void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
 {
-    int load = loadToGX;
-    int tlutBase = reinterpret_cast<int>(tlutData);
     unsigned int numEntries;
     int offset;
 
-    if (tlutBase == 0) {
-        tlutBase = reinterpret_cast<int>(m_tlutData);
+    if (tlutData == 0) {
+        tlutData = m_tlutData;
     }
 
-    GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutBase), GX_TL_IA8,
-                  static_cast<u16>((static_cast<unsigned int>(m_format) == 9) ? 0x100 : 0x10));
+    numEntries = 0x10;
+    if (static_cast<unsigned int>(m_format) == 9) {
+        numEntries = 0x100;
+    }
+
+    GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8, numEntries);
 
     numEntries = 0x10;
     if (static_cast<unsigned int>(m_format) == 9) {
@@ -979,9 +981,9 @@ void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
     if (static_cast<unsigned int>(m_format) == 9) {
         offset = 0x100;
     }
-    GXInitTlutObj(tlutObj, reinterpret_cast<void*>(tlutBase + offset * 2), GX_TL_IA8, numEntries);
+    GXInitTlutObj(&m_tlutObj1, reinterpret_cast<void*>(reinterpret_cast<int>(tlutData) + offset * 2), GX_TL_IA8, numEntries);
 
-    if (load != 0) {
+    if (loadToGX != 0) {
         GXLoadTlut(&m_tlutObj0, GX_TLUT0);
         GXLoadTlut(&m_tlutObj1, GX_TLUT1);
     }

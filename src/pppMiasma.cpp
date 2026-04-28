@@ -2,7 +2,9 @@
 #include "ffcc/graphic.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/render_buffers.h"
+#define FFCC_PTRARRAY_DECL_ONLY
 #include "ffcc/game.h"
+#undef FFCC_PTRARRAY_DECL_ONLY
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 #include "ffcc/util.h"

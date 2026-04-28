@@ -3,7 +3,9 @@
 #include "ffcc/graphic.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
+#define FFCC_PTRARRAY_DECL_ONLY
 #include "ffcc/ptrarray.h"
+#undef FFCC_PTRARRAY_DECL_ONLY
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/linkage.h"

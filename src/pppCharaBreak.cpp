@@ -165,10 +165,10 @@ struct CharaBreakMeshData {
 };
 
 struct CharaBreakMeshRef {
+    u8 _pad0[8];
     CharaBreakMeshData* m_data;
     S16Vec* m_workPositions;
     S16Vec* m_workNormals;
-    u8 _padC[8];
 };
 
 struct CharaBreakModelData {
@@ -188,9 +188,9 @@ struct CharaBreakModelView {
     CharaBreakMeshRef* m_meshes;
 };
 
-STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x0);
-STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0x4);
-STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x8);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
+STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_data) == 0xA4);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_nodes) == 0xA8);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_meshes) == 0xAC);
@@ -389,6 +389,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
     while (keepReading != 0) {
         u8 drawCmd = *(u8*)stream;
         u16 drawCount = *(u16*)((u8*)stream + 1);
+        u8 drawMode = drawCmd & 7;
         u8 primitive = drawCmd & 0xF8;
         s16 triCount;
         s32 outVertex;
@@ -414,7 +415,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                 u16 texIndex = stream[3];
 
                 stripRestart = stream + 4;
-                if ((drawCmd & 7) == 2) {
+                if (drawMode == 2) {
                     stripRestart = stream + 5;
                 }
                 stream = stripRestart;

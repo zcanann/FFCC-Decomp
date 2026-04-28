@@ -23,6 +23,7 @@ extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void FGPutGil__12CCaravanWorkFi(void*, int);
+extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
 
 
 extern float FLOAT_80332f60;
@@ -541,17 +542,19 @@ void CMenuPcs::MoneyDraw()
  */
 int CMenuPcs::MoneyCtrlCur()
 {
-	bool blocked = false;
+	bool blocked;
 	u16 press;
 	u16 hold;
 	int caravanWork = Game.m_scriptFoodBase[0];
 
+	blocked = false;
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		press = 0;
 	} else {
+		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
 		press = Pad._8_2_;
 	}
 
@@ -562,6 +565,7 @@ int CMenuPcs::MoneyCtrlCur()
 	if (blocked) {
 		hold = 0;
 	} else {
+		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
 		hold = *(u16*)((u8*)&Pad + 0x20);
 	}
 
@@ -573,11 +577,13 @@ int CMenuPcs::MoneyCtrlCur()
 	s16* singWindowInfo = this->singWindowInfo;
 	int mode = (int)*(s16*)(menuState + 0x30);
 	int maxDigits = 1;
-	int maxGil = *(int*)(caravanWork + 0x200);
+	int maxGil = *(int*)(Game.m_scriptFoodBase[0] + 0x200);
+	SingGetLetterAttachflg__8CMenuPcsFv(this);
 
-	while ((maxDigits < 8) && (9 < maxGil)) {
-		maxGil /= 10;
-		maxDigits++;
+	if ((((((0 < maxGil / 10) && (maxDigits = 2, 0 < maxGil / 100)) && (maxDigits = 3, 0 < maxGil / 1000)) &&
+	      ((maxDigits = 4, 0 < maxGil / 10000 && (maxDigits = 5, 0 < maxGil / 100000)))) &&
+	     (maxDigits = 6, 0 < maxGil / 1000000)) && (maxDigits = 7, 0 < maxGil / 10000000)) {
+		maxDigits = 8;
 	}
 
 	if (mode == 0) {
@@ -589,28 +595,73 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((hold & 8) == 0) {
 			if ((hold & 4) != 0) {
-				if (gMenuMoneyTransferAmount == 0) {
+				unsigned int gil = *(unsigned int*)(caravanWork + 0x200);
+				if (gil == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					if (gMenuMoneyTransferAmount < placeValue) {
-						gMenuMoneyTransferAmount = 0;
-					} else {
-						gMenuMoneyTransferAmount = gMenuMoneyTransferAmount - placeValue;
+					if (-1 < (int)(gMenuMoneyTransferAmount - placeValue)) {
+						gil = gMenuMoneyTransferAmount - placeValue;
 					}
-					UpdateDigits(gMenuMoneyTransferAmount, s_place + 8);
+					int iVar9 = 0;
+					int iVar8 = 10000000;
+					signed char* puVar10 = s_place + 8;
+					int iVar11 = 8;
+					bool started = false;
+					gMenuMoneyTransferAmount = gil;
+					do {
+						if ((!started) && (iVar8 <= (int)gil)) {
+							started = true;
+						}
+						if (((started) || (iVar8 <= (int)gil)) || (6 < iVar9)) {
+							int digit = (int)gil / iVar8;
+							if (9 < digit) {
+								digit = 9;
+							}
+							*puVar10 = static_cast<signed char>(digit);
+							gil = gil - ((int)gil / iVar8) * iVar8;
+						} else {
+							*puVar10 = -1;
+						}
+						puVar10 = puVar10 + 1;
+						iVar9 = iVar9 + 1;
+						iVar8 /= 10;
+						iVar11 = iVar11 + -1;
+					} while (iVar11 != 0);
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
 		} else if (*(int*)(caravanWork + 0x200) == 0) {
 			Sound.PlaySe(4, 0x40, 0x7F, 0);
 		} else {
-			unsigned int nextValue = gMenuMoneyTransferAmount + placeValue;
-			if ((unsigned int)*(int*)(caravanWork + 0x200) < nextValue) {
-				gMenuMoneyTransferAmount = *(int*)(caravanWork + 0x200);
-			} else {
-				gMenuMoneyTransferAmount = nextValue;
+			unsigned int gil = gMenuMoneyTransferAmount + placeValue;
+			if ((unsigned int)*(int*)(caravanWork + 0x200) < gil) {
+				gil = *(int*)(caravanWork + 0x200);
 			}
-			UpdateDigits(gMenuMoneyTransferAmount, s_place + 8);
+			int iVar9 = 0;
+			int iVar8 = 10000000;
+			signed char* puVar10 = s_place + 8;
+			int iVar11 = 8;
+			bool started = false;
+			gMenuMoneyTransferAmount = gil;
+			do {
+				if ((!started) && (iVar8 <= (int)gil)) {
+					started = true;
+				}
+				if (((started) || (iVar8 <= (int)gil)) || (6 < iVar9)) {
+					int digit = (int)gil / iVar8;
+					if (9 < digit) {
+						digit = 9;
+					}
+					*puVar10 = static_cast<signed char>(digit);
+					gil = gil - ((int)gil / iVar8) * iVar8;
+				} else {
+					*puVar10 = -1;
+				}
+				puVar10 = puVar10 + 1;
+				iVar9 = iVar9 + 1;
+				iVar8 /= 10;
+				iVar11 = iVar11 + -1;
+			} while (iVar11 != 0);
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}
 
@@ -684,8 +735,57 @@ int CMenuPcs::MoneyCtrlCur()
 				if (*(s16*)(optBase + 0x26) == 0) {
 					FGPutGil__12CCaravanWorkFi((void*)caravanWork, (int)gMenuMoneyTransferAmount);
 					gMenuMoneyTransferAmount = 0;
-					UpdateDigits((unsigned int)*(int*)(caravanWork + 0x200), s_place);
-					UpdateDigits(0, s_place + 8);
+					int iVar8 = *(int*)(Game.m_scriptFoodBase[0] + 0x200);
+					int iVar9 = 0;
+					int iVar11 = 10000000;
+					bool started = false;
+					signed char* puVar10 = s_place;
+					int count = 8;
+					do {
+						if ((!started) && (iVar11 <= iVar8)) {
+							started = true;
+						}
+						if (((started) || (iVar11 <= iVar8)) || (6 < iVar9)) {
+							int digit = iVar8 / iVar11;
+							if (9 < digit) {
+								digit = 9;
+							}
+							*puVar10 = static_cast<signed char>(digit);
+							iVar8 = iVar8 - (iVar8 / iVar11) * iVar11;
+						} else {
+							*puVar10 = -1;
+						}
+						puVar10 = puVar10 + 1;
+						iVar9 = iVar9 + 1;
+						iVar11 /= 10;
+						count = count + -1;
+					} while (count != 0);
+
+					iVar8 = 0;
+					iVar9 = 0;
+					iVar11 = 10000000;
+					started = false;
+					puVar10 = s_place + 8;
+					count = 8;
+					do {
+						if ((!started) && (iVar11 <= iVar8)) {
+							started = true;
+						}
+						if (((started) || (iVar11 <= iVar8)) || (6 < iVar9)) {
+							int digit = iVar8 / iVar11;
+							if (9 < digit) {
+								digit = 9;
+							}
+							*puVar10 = static_cast<signed char>(digit);
+							iVar8 = iVar8 - (iVar8 / iVar11) * iVar11;
+						} else {
+							*puVar10 = -1;
+						}
+						puVar10 = puVar10 + 1;
+						iVar9 = iVar9 + 1;
+						iVar11 /= 10;
+						count = count + -1;
+					} while (count != 0);
 				}
 				*(s16*)((int)singWindowInfo + 10) = 2;
 				*(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;

@@ -55,7 +55,6 @@ int RedNew(int param_1)
 	int alignedSize;
 	int address;
 	int entryCount;
-	int moveCount;
 	int* slot;
 
 	if (param_1 >= 1) {
@@ -80,8 +79,7 @@ int RedNew(int param_1)
 						if ((unsigned int)(address + alignedSize) <=
 						    (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
 							if (slot[1] > 0) {
-								moveCount = (int)(m_MemoryBank + 0x800) - (int)(slot + 2);
-								entryCount = moveCount / 8;
+								entryCount = ((int)(m_MemoryBank + 0x800) - (int)(slot + 2)) / 8;
 								if (entryCount > 0) {
 									memmove(slot + 2, slot, entryCount * 8);
 								}
@@ -170,7 +168,6 @@ void RedDelete(void* param_1)
 int RedNewA(int size, int offset, int maxSize)
 {
 	unsigned int alignedSize;
-	unsigned int moveCount;
 	unsigned int interrupts;
 	int result;
 	int rangeStart;
@@ -240,9 +237,9 @@ int RedNewA(int size, int offset, int maxSize)
 
 	blockPtr = bestBlock;
 	if (blockPtr[1] > 0) {
-		moveCount = ((int)(m_AMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
-		if ((int)moveCount > 0) {
-			memmove(blockPtr + 2, blockPtr, moveCount * 8);
+		gap = ((int)(m_AMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
+		if (gap > 0) {
+			memmove(blockPtr + 2, blockPtr, gap * 8);
 		}
 	}
 	*blockPtr = result;

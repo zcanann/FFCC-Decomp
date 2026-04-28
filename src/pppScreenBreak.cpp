@@ -574,8 +574,8 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
 
     if (work[0x24] != 0) {
         CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)modelView->m_data->m_materialSet + 8))[displayList->m_material];
-        GXColor colorStorage0;
         GXColor colorStorage1;
+        GXColor colorStorage0;
 
         MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 1, (_GXTevScale)0);
         GXSetArray((GXAttr)0xB, work + 0x28, 4);

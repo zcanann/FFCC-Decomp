@@ -1375,7 +1375,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 				nodeMtx[2][3] += pppMngStPtr->m_position.z;
 				PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 			} else {
-				if (pppMngSt->m_mapObjIndex == -1) {
+				if (pppMngSt->m_matrixMode < 2 || pppMngSt->m_mapObjIndex == -1) {
 					goto LocalOnly;
 				}
 				MapMng.GetMapObjWMtx(pppMngSt->m_mapObjIndex, nodeMtx);

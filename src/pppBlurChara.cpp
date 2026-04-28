@@ -200,9 +200,8 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     }
 
     pppInitBlendMode();
-    const float drawDepth = FLOAT_80331030;
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, (pppFMATRIX*)0, drawDepth,
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, (pppFMATRIX*)0, FLOAT_80331030,
                                                                param_2->m_alpha, 0, 0, 0, 1, 1, 0);
     objPosBase = texData->m_objPosBase;
 

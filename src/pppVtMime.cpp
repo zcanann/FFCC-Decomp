@@ -130,7 +130,7 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
         return;
     }
 
-    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
+    VtMimeState* state = (VtMimeState*)(object->m_workArea + *ctrl->m_serializedDataOffsets);
     VtMimeEnv* env = (VtMimeEnv*)pppEnvStPtr;
     void** sourceTable = env->sourceTable;
     int vertIdx2 = data->sourceB;
@@ -172,7 +172,7 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
  */
 void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
 {
-    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
+    VtMimeState* state = (VtMimeState*)(object->m_workArea + *ctrl->m_serializedDataOffsets);
     VtMimeData* data = (VtMimeData*)step;
 
     if (gPppCalcDisabled != 0) {

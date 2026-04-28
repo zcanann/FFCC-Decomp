@@ -166,8 +166,8 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             System.Printf(const_cast<char*>(s_drawErrorFmt), errorCode);
         }
 
-        int usingFallbackFont = 0;
         CFont* font = MenuPcs.m_fonts[0];
+        int usingFallbackFont = 0;
         if (font == 0)
         {
             usingFallbackFont = 1;
@@ -752,46 +752,20 @@ void CFile::Init()
         __nwa__FUlPQ27CMemory6CStagePci(
             sizeof(CHandle) * 0x80 + 0x10, (CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2e),
         0, 0, sizeof(CHandle), 0x80);
-    CHandle* nextHandle;
-    unsigned int handleIndex = 0;
-    int byteOffset = 0;
-
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
     m_freeList = (CHandle*)m_handlePoolHead.m_currentOffset;
 
-    for (int blockCount = 0x20; blockCount != 0; blockCount--) {
-        if (handleIndex == 0x7F) {
+    for (unsigned int i = 0; i < 0x80; i++) {
+        CHandle* nextHandle;
+        if (i == 0x7F) {
             nextHandle = (CHandle*)&m_freeListSentinelDummy;
         } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (i + 1) * sizeof(CHandle));
         }
-        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x4) = nextHandle;
 
-        if (++handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
-        } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
-        }
-        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0xB0) = nextHandle;
-
-        if (++handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
-        } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
-        }
-        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x15C) = nextHandle;
-
-        if (++handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
-        } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
-        }
-        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x208) = nextHandle;
-
-        byteOffset += 0x2B0;
-        handleIndex++;
+        ((CHandle*)(m_handlePoolHead.m_currentOffset + i * sizeof(CHandle)))->m_previous = nextHandle;
     }
 }
 

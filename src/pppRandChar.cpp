@@ -24,7 +24,7 @@ struct RandCharParam {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandChar(void* basePtr, RandCharParam* in, _pppCtrlTable* ctrl)
+extern "C" void pppRandChar(_pppPObject* basePtr, RandCharParam* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     u8* target;
@@ -43,13 +43,13 @@ extern "C" void pppRandChar(void* basePtr, RandCharParam* in, _pppCtrlTable* ctr
             value *= kPppRandCharSingleSampleScale;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
         if (in->targetId != state) {
             return;
         }
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     s32 colorOffset = in->sourceOffset;

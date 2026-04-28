@@ -149,14 +149,14 @@ void pppLightCon(void* param1, void* param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppLight(void* param1, void* param2, void* param3)
+void pppLight(_pppPObject* param1, void* param2, void* param3)
 {
 	u8* pObject = (u8*)param1;
 	PppLightStep* step = (PppLightStep*)param2;
 	_pppCtrlTable* ctrlTable = (_pppCtrlTable*)param3;
 
 	if (gPppCalcDisabled == 0) {
-		PppLightWork* work = (PppLightWork*)(pObject + ctrlTable->m_serializedDataOffsets[0] + 0x80);
+		PppLightWork* work = (PppLightWork*)(param1->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
 		if (gPppCalcDisabled != 0) {
 			goto create_light;

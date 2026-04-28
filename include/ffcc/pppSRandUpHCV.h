@@ -1,11 +1,13 @@
 #ifndef _PPP_SRANDUPHCV_H_
 #define _PPP_SRANDUPHCV_H_
 
+
+struct _pppPObject;
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppSRandUpHCV(void* basePtr, struct PppSRandUpHCVParam2* in, struct _pppCtrlTable* ctrl);
+void pppSRandUpHCV(struct _pppPObject* basePtr, struct PppSRandUpHCVParam2* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

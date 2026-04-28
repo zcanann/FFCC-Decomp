@@ -27,7 +27,7 @@ inline char randchar(char value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandUpCV(void* basePtr, RandUpCVParam* in, _pppCtrlTable* ctrl)
+void pppRandUpCV(_pppPObject* basePtr, RandUpCVParam* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     u8* target;
@@ -46,12 +46,12 @@ void pppRandUpCV(void* basePtr, RandUpCVParam* in, _pppCtrlTable* ctrl)
             value = blend * scale;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else if (in->targetId != *(s32*)(base + 0xC)) {
         return;
     } else {
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     target = (in->sourceOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + in->sourceOffset + 0x80);

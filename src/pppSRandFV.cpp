@@ -29,7 +29,7 @@ struct PppSRandFVParam2 {
     u8 field18;
 };
 
-void pppSRandFV(void* basePtr, PppSRandFVParam2* in, _pppCtrlTable* ctrl)
+void pppSRandFV(_pppPObject* basePtr, PppSRandFVParam2* in, _pppCtrlTable* ctrl)
 {
     f32* randVec;
     if (gPppCalcDisabled != 0) {
@@ -38,7 +38,7 @@ void pppSRandFV(void* basePtr, PppSRandFVParam2* in, _pppCtrlTable* ctrl)
 
     s32 currentIndex = *(s32*)((u8*)basePtr + 0xC);
     if (currentIndex == 0) {
-        randVec = (f32*)((u8*)basePtr + *ctrl->m_serializedDataOffsets + 0x80);
+        randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         {
             u8 flag = in->field18;
             f32 value = Math.RandF();
@@ -78,7 +78,7 @@ void pppSRandFV(void* basePtr, PppSRandFVParam2* in, _pppCtrlTable* ctrl)
         if (in->field0 != currentIndex) {
             return;
         }
-        randVec = (f32*)((u8*)basePtr + *ctrl->m_serializedDataOffsets + 0x80);
+        randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     f32* target = (in->field4 == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)((u8*)basePtr + in->field4 + 0x80);

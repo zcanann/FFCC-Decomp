@@ -26,7 +26,7 @@ struct PppSRandUpFVParam2 {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandUpFV(void* basePtr, PppSRandUpFVParam2* in, _pppCtrlTable* ctrl)
+void pppSRandUpFV(_pppPObject* basePtr, PppSRandUpFVParam2* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
@@ -35,7 +35,7 @@ void pppSRandUpFV(void* basePtr, PppSRandUpFVParam2* in, _pppCtrlTable* ctrl)
     s32 currentIndex = *(s32*)((u8*)basePtr + 0xC);
     f32* randVec;
     if (currentIndex == 0) {
-        randVec = (f32*)((u8*)basePtr + *ctrl->m_serializedDataOffsets + 0x80);
+        randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
 
         {
             u8 flag = in->field18;
@@ -76,7 +76,7 @@ void pppSRandUpFV(void* basePtr, PppSRandUpFVParam2* in, _pppCtrlTable* ctrl)
         if (in->field0 != currentIndex) {
             return;
         }
-        randVec = (f32*)((u8*)basePtr + *ctrl->m_serializedDataOffsets + 0x80);
+        randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     f32* target = (in->field4 == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)((u8*)basePtr + in->field4 + 0x80);

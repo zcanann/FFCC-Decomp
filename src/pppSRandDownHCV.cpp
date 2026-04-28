@@ -26,7 +26,7 @@ struct PppSRandDownHCVParam2 {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandDownHCV(void* basePtr, PppSRandDownHCVParam2* in, _pppCtrlTable* ctrl)
+void pppSRandDownHCV(_pppPObject* basePtr, PppSRandDownHCVParam2* in, _pppCtrlTable* ctrl)
 {
 	u8* base = (u8*)basePtr;
 	if (gPppCalcDisabled != 0) {
@@ -36,7 +36,7 @@ void pppSRandDownHCV(void* basePtr, PppSRandDownHCVParam2* in, _pppCtrlTable* ct
 	float* target;
 
 	if (in->field0 == *(s32*)(base + 0xC)) {
-		target = (float*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+		target = (float*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
 
 		{
 			u8 flag = in->field10;
@@ -89,7 +89,7 @@ void pppSRandDownHCV(void* basePtr, PppSRandDownHCVParam2* in, _pppCtrlTable* ct
 		if (in->field0 != *(s32*)(base + 0xC)) {
 			return;
 		}
-		target = (float*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+		target = (float*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
 	}
 
 	s32 color_offset = in->field4;

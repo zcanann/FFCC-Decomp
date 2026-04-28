@@ -21,8 +21,8 @@ struct PppSclAcceleStep {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSclAcceleCon(void* arg1, _pppCtrlTable* arg2){
-    float* accel = (float*)((char*)arg1 + arg2->m_serializedDataOffsets[1] + 0x80);
+void pppSclAcceleCon(_pppPObject* arg1, _pppCtrlTable* arg2){
+    float* accel = (float*)(arg1->m_workArea + arg2->m_serializedDataOffsets[1]);
     float zero = kPppSclAcceleZero;
 
     accel[2] = zero;
@@ -39,9 +39,9 @@ void pppSclAcceleCon(void* arg1, _pppCtrlTable* arg2){
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSclAccele(void* arg1, PppSclAcceleStep* arg2, _pppCtrlTable* arg3){
-    float* scale = (float*)((char*)arg1 + arg3->m_serializedDataOffsets[0] + 0x80);
-    float* accel = (float*)((char*)arg1 + arg3->m_serializedDataOffsets[1] + 0x80);
+void pppSclAccele(_pppPObject* arg1, PppSclAcceleStep* arg2, _pppCtrlTable* arg3){
+    float* scale = (float*)(arg1->m_workArea + arg3->m_serializedDataOffsets[0]);
+    float* accel = (float*)(arg1->m_workArea + arg3->m_serializedDataOffsets[1]);
 
     if (gPppCalcDisabled != 0) {
         return;

@@ -26,7 +26,7 @@ struct PppRandFVParam2 {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandFV(void* basePtr, PppRandFVParam2* in, _pppCtrlTable* ctrl)
+void pppRandFV(_pppPObject* basePtr, PppRandFVParam2* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
@@ -44,13 +44,13 @@ void pppRandFV(void* basePtr, PppRandFVParam2* in, _pppCtrlTable* ctrl)
             value *= kPppRandFVSingleSampleScale;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
         if (in->field0 != state) {
             return;
         }
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     f32* target = (in->field4 == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + in->field4 + 0x80);

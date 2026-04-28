@@ -23,7 +23,7 @@ struct RandFloatParam {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandFloat(void* basePtrIn, RandFloatParam* in, _pppCtrlTable* ctrl)
+void pppRandFloat(_pppPObject* basePtrIn, RandFloatParam* in, _pppCtrlTable* ctrl)
 {
     u8* base;
     f32* valuePtr;
@@ -43,13 +43,13 @@ void pppRandFloat(void* basePtrIn, RandFloatParam* in, _pppCtrlTable* ctrl)
             value *= kPppRandFloatSingleSampleScale;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtrIn->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
         if (in->targetId != state) {
             return;
         }
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtrIn->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     s32 sourceOffset = in->sourceOffset;

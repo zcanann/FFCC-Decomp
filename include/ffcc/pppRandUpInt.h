@@ -1,11 +1,13 @@
 #ifndef _PPP_RANDUPINT_H_
 #define _PPP_RANDUPINT_H_
 
+
+struct _pppPObject;
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppRandUpInt(void* basePtr, struct PppRandUpIntParam2* in, struct _pppCtrlTable* ctrl);
+void pppRandUpInt(struct _pppPObject* basePtr, struct PppRandUpIntParam2* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

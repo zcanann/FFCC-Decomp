@@ -23,7 +23,7 @@ struct RandDownFloatParam {
  * JP Address: TODO  
  * JP Size: TODO
  */
-void pppRandDownFloat(void* basePtr, RandDownFloatParam* in, _pppCtrlTable* ctrl)
+void pppRandDownFloat(_pppPObject* basePtr, RandDownFloatParam* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
@@ -41,13 +41,13 @@ void pppRandDownFloat(void* basePtr, RandDownFloatParam* in, _pppCtrlTable* ctrl
             value = randomValue * scale;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
         if (in->targetId != id) {
             return;
         }
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     s32 sourceOffset = in->sourceOffset;

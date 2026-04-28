@@ -585,7 +585,10 @@ CTexture::CTexture()
  */
 CTexture::~CTexture()
 {
-    if (m_usesExternalAddress == 0) {
+    if (m_usesExternalAddress != 0) {
+        m_imageData = 0;
+        m_tlutData = 0;
+    } else {
         if (m_imageData != 0) {
             __dla__FPv(m_imageData);
             m_imageData = 0;
@@ -594,9 +597,6 @@ CTexture::~CTexture()
             __dla__FPv(m_tlutData);
             m_tlutData = 0;
         }
-    } else {
-        m_imageData = 0;
-        m_tlutData = 0;
     }
 }
 

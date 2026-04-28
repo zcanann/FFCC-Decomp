@@ -26,8 +26,6 @@ void* pppMemAlloc__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, ch
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 
 }
-extern float FLOAT_80331bf8;
-extern float FLOAT_80331bfc;
 static const char s_pppLerpPos_cpp_801dd418[] = "pppLerpPos.cpp";
 
 /*
@@ -65,9 +63,9 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
                 (*historyPtr)[iVar7].z = pppMngStPtr->m_matrix.value[2][3];
             }
         } else {
-            local_2c.z = FLOAT_80331bf8;
-            local_2c.y = FLOAT_80331bf8;
-            local_2c.x = FLOAT_80331bf8;
+            local_2c.z = 0.0f;
+            local_2c.y = 0.0f;
+            local_2c.x = 0.0f;
 
             iVar5 = (u8)param_2->m_dataValIndex - 1;
             iVar7 = iVar5 * 0xc;
@@ -88,7 +86,7 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
                 iVar7 = iVar7 + 0xc;
             }
 
-            PSVECScale(&local_2c, &local_2c, FLOAT_80331bfc / (f32)count);
+            PSVECScale(&local_2c, &local_2c, 1.0f / (f32)count);
             pppMngStPtr->m_matrix.value[0][3] = local_2c.x;
             pppMngStPtr->m_matrix.value[1][3] = local_2c.y;
             pppMngStPtr->m_matrix.value[2][3] = local_2c.z;

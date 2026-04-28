@@ -1,5 +1,6 @@
 #include "ffcc/game.h"
 
+#include "ffcc/ptrarray.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/system.h"
 #include "ffcc/vector.h"

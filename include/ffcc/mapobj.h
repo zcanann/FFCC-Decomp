@@ -1,8 +1,6 @@
 #ifndef _FFCC_MAPOBJ_H_
 #define _FFCC_MAPOBJ_H_
 
-#include "ffcc/ptrarray.h"
-
 class CChunkFile;
 class CMapKeyFrame;
 class CMapCylinder;

@@ -365,13 +365,12 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 {
 	pppYmDeformationShpLayout* layout = (pppYmDeformationShpLayout*)obj;
 	Vec4d projected[4];
-	Vec localVertex;
 	Vec4d clipPos;
 	Vec worldPos;
-	float maxX;
+	float minY;
 	float maxY;
 	float minX;
-	float minY;
+	float maxX;
 	int left = 0;
 	int top = 0;
 	int width = 0;
@@ -381,8 +380,8 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	Vec origin;
 	Vec cameraPos;
 	Vec projectedObj[4];
-	int maxXIndex;
-	int maxYIndex;
+	int minXIndex;
+	int minYIndex;
 	float texScaleX;
 	float texScaleY;
 	float offsetX;
@@ -395,7 +394,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	int i;
 
 	for (i = 0; i < 4; i++) {
-		localVertex = vertices[i];
+		Vec localVertex = vertices[i];
 		PSMTXMultVec(layout->m_modelMatrix.value, &localVertex, &worldPos);
 		clipPos.x = worldPos.x;
 		clipPos.y = worldPos.y;
@@ -409,15 +408,15 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 		projected[i].y = screenCenterY - projected[i].y / screenScaleY;
 	}
 
-	maxX = FLOAT_80330624;
-	maxY = FLOAT_80330624;
-	minX = FLOAT_80330620;
 	minY = FLOAT_80330620;
+	maxY = FLOAT_80330624;
+	minX = minY;
+	maxX = maxY;
 	for (i = 0; i < 4; i++) {
-		if (maxX < projected[i].x) {
+		if (projected[i].x > maxX) {
 			maxX = projected[i].x;
 		}
-		if (maxY < projected[i].y) {
+		if (projected[i].y > maxY) {
 			maxY = projected[i].y;
 		}
 		if (projected[i].x < minX) {
@@ -480,32 +479,32 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 		projectedObj[i].y = projectedObj[i].y / projectedObj[i].z;
 	}
 
-	maxXIndex = 0;
-	maxYIndex = 0;
+	minXIndex = 0;
+	minYIndex = 0;
 	for (i = 1; i < 4; i++) {
-		if (projected[maxXIndex].x < projected[i].x) {
-			maxXIndex = i;
+		if (projected[minXIndex].x > projected[i].x) {
+			minXIndex = i;
 		}
-		if (projected[maxYIndex].y < projected[i].y) {
-			maxYIndex = i;
+		if (projected[minYIndex].y > projected[i].y) {
+			minYIndex = i;
 		}
 	}
 
 	texScaleX = one / (float)width;
 	texScaleY = one / (float)height;
-	offsetX = projectedObj[maxXIndex].x - texScaleX * (projected[maxXIndex].x - (float)left);
-	offsetY = projectedObj[maxYIndex].y - texScaleY * (projected[maxYIndex].y - (float)top);
+	offsetX = projectedObj[minXIndex].x - texScaleX * (projected[minXIndex].x - (float)left);
+	offsetY = projectedObj[minYIndex].y - texScaleY * (projected[minYIndex].y - (float)top);
 
 	if (left < 0) {
 		if ((left + width) <= 640) {
-			int minIndex = 0;
+			int maxIndex = 0;
 			for (i = 1; i < 4; i++) {
-				if (projected[i].x < projected[minIndex].x) {
-					minIndex = i;
+				if (projected[maxIndex].x < projected[i].x) {
+					maxIndex = i;
 				}
 			}
-			texMtx[0][2] = texMtx[0][2] + (texScaleX * ((float)(left + width) - projected[minIndex].x) +
-			                               projectedObj[minIndex].x - FLOAT_803305f8);
+			texMtx[0][2] = texMtx[0][2] + (texScaleX * ((float)(left + width) - projected[maxIndex].x) +
+			                               projectedObj[maxIndex].x - FLOAT_803305f8);
 		} else {
 			texMtx[0][2] = texMtx[0][2] + (FLOAT_80330630 - cameraPos.x);
 		}
@@ -515,14 +514,14 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 
 	if (top < 0) {
 		if ((top + height) <= 448) {
-			int minIndex = 0;
+			int maxIndex = 0;
 			for (i = 1; i < 4; i++) {
-				if (projected[i].y < projected[minIndex].y) {
-					minIndex = i;
+				if (projected[maxIndex].y < projected[i].y) {
+					maxIndex = i;
 				}
 			}
-			texMtx[1][2] = texMtx[1][2] + (texScaleY * ((float)(top + height) - projected[minIndex].y) +
-			                               projectedObj[minIndex].y - FLOAT_803305f8);
+			texMtx[1][2] = texMtx[1][2] + (texScaleY * ((float)(top + height) - projected[maxIndex].y) +
+			                               projectedObj[maxIndex].y - FLOAT_803305f8);
 		} else {
 			texMtx[1][2] = texMtx[1][2] + (FLOAT_80330630 - cameraPos.y);
 		}
@@ -533,7 +532,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	PSMTXConcat(texMtx, layout->m_modelMatrix.value, texMtx);
 	GXLoadTexMtxImm(texMtx, 0x1e, GX_MTX3x4);
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
+	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
 	GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 	GXLoadTexObj(work->m_backBuffer, GX_TEXMAP0);
 

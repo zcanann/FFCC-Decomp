@@ -8,8 +8,8 @@ unsigned char g_tFont22[0x10D40] ATTRIBUTE_ALIGN(32) = {
 };
 }
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
 #include <dolphin/mtx.h>
-#include <math.h>
 
 extern "C" void __dt__8CFontManFv(void*);
 extern "C" void __ct__4CRefFv(void*);
@@ -75,7 +75,7 @@ found_fallback:
 	unsigned char flags = renderFlags;
 	unsigned int drawWidth;
 
-	if ((flags & 8) != 0) {
+	if ((flags & 0x10) != 0) {
 		drawWidth = static_cast<unsigned int>(m_glyphWidth);
 	} else {
 		signed char sign = static_cast<signed char>(flags) >> 7;
@@ -85,7 +85,7 @@ found_fallback:
 	}
 
 	double width = static_cast<double>(scaleX * (margin + static_cast<float>(drawWidth)));
-	if ((flags & 0x10) != 0) {
+	if ((flags & 8) != 0) {
 		width = static_cast<double>(static_cast<float>(floor(width)));
 	}
 
@@ -146,7 +146,7 @@ use_glyph:
 		unsigned char flags = renderFlags;
 		unsigned int drawWidth;
 
-		if ((flags & 8) != 0) {
+		if ((flags & 0x10) != 0) {
 			drawWidth = static_cast<unsigned int>(m_glyphWidth);
 		} else {
 			signed char sign = static_cast<signed char>(flags);
@@ -157,7 +157,7 @@ use_glyph:
 		}
 
 		float charWidth = scaleX * (margin + static_cast<float>(drawWidth));
-		if ((flags & 0x10) != 0) {
+		if ((flags & 8) != 0) {
 			charWidth = static_cast<float>(floor(charWidth));
 		}
 

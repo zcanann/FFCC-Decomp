@@ -936,7 +936,7 @@ void __MidiCtrl_KeyOnNote(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDAT
  */
 void __MidiCtrl_KeyOnVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(track) + 0x25) = *(*reinterpret_cast<unsigned char**>(track))++;
+    *reinterpret_cast<char*>(reinterpret_cast<int>(track) + 0x25) = *(*reinterpret_cast<unsigned char**>(track))++;
 
     KeyOnReserve(keyOnData, track);
 }

@@ -6,8 +6,10 @@
 #include "ffcc/system.h"
 #include <string.h>
 
+#ifndef FFCC_PTRARRAY_DECL_ONLY
 static char s_CPtrArrayGrowError[] = "CPtrArray grow error";
 static char s_CPtrArrayFile[] = "collection/ptrarray.h";
+#endif
 
 template <class T>
 class CPtrArray

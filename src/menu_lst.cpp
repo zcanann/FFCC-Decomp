@@ -68,13 +68,9 @@ static const unsigned char gap_80333669[] = {0, 0, 0};
 extern "C" const char DAT_8033366c[] = " ";
 static const unsigned char gap_8033366e[] = {0, 0};
 extern "C" const char DAT_80333670[] = " %d";
-extern "C" const char lbl_80333674[] = " %+d";
-extern "C" const char lbl_8033367C[] = " %s";
-extern "C" const char lbl_80333680[] = "Empty.";
-extern "C" const char lbl_80333688[] = "Vuoto.";
-extern "C" const char lbl_80333690[] = "Vide";
 
 STATIC_ASSERT(offsetof(CMenuPcs, listFont) == 0x108);
+STATIC_ASSERT(offsetof(CMenuPcs, helpFont) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, lstState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, lstData) == 0x850);
 STATIC_ASSERT(offsetof(MenuLstEntry, tex) == 0x1C);
@@ -197,7 +193,7 @@ void CMenuPcs::MLstDraw()
 	DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
 		this,
 		state->cursor + 0x25c,
-		font,
+		this->helpFont,
 		0,
 		-(int)FLOAT_80333400,
 		helpColor.color,
@@ -313,36 +309,36 @@ void CMenuPcs::MLstCtrl()
 {
 	bool blocked;
 	float one;
-	unsigned short press;
-	unsigned short hold;
+	short press;
+	short hold;
 	unsigned int itemCount;
 	unsigned int chunkCount;
 	int i;
 	int startFrame;
 	int duration;
+	int padLock;
 
 	blocked = false;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+	padLock = Pad._452_4_;
+	if ((padLock != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		press = 0;
 	} else {
-		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		press = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * 0x54 + 0x8);
+		__cntlzw((unsigned int)Pad._448_4_);
+		press = Pad._8_2_;
 	}
 
 	blocked = false;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+	if ((padLock != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		hold = 0;
 	} else {
-		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * 0x54 + 0x14);
+		__cntlzw((unsigned int)Pad._448_4_);
+		hold = Pad._20_2_;
 	}
 
 	if (hold == 0) {

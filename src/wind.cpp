@@ -446,7 +446,7 @@ void CWind::searchFreeObj()
  */
 void CWind::Calc(Vec* out, const Vec* pos, int randomize)
 {
-    WindObject* obj = m_objects;
+    WindObject* obj;
     int i;
     float zero;
     Vec tmp;
@@ -459,6 +459,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
         return;
     }
 
+    obj = m_objects;
     i = 0;
     do {
         if (GetWindActiveFlag(obj) != 0) {
@@ -469,7 +470,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                     PSVECScale(&obj->force, &tmp, (float)Math.RandF());
                     PSVECAdd(out, &tmp, out);
                 }
-            } else if ((obj->minX < pos->x) && (obj->minZ < pos->z) && (pos->x < obj->maxX) && (pos->z < obj->maxZ)) {
+            } else if ((obj->minX < pos->x) && (obj->minZ < pos->z) && (obj->maxX > pos->x) && (obj->maxZ > pos->z)) {
                 const float deltaZ = pos->z - obj->centerZ;
                 const float deltaX = pos->x - obj->centerX;
                 float distanceSq = deltaX * deltaX + deltaZ * deltaZ;

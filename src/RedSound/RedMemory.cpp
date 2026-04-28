@@ -52,7 +52,6 @@ CRedMemory::~CRedMemory()
 int RedNew(int param_1)
 {
 	unsigned int interrupts;
-	int alignedSize;
 	int address;
 	int entryCount;
 	int* slot;
@@ -61,12 +60,12 @@ int RedNew(int param_1)
 		if (m_MemoryBank != 0) {
 			if (m_DataBuffer != 0) {
 				interrupts = OSDisableInterrupts();
-				alignedSize = (param_1 + 0x1F) & 0xFFFFFFE0;
+				param_1 = (param_1 + 0x1F) & 0xFFFFFFE0;
 				address = m_DataBuffer;
 				slot = m_MemoryBank;
 
 				do {
-					if ((slot[1] == 0) || ((address + alignedSize) <= *slot)) {
+					if ((slot[1] == 0) || ((address + param_1) <= *slot)) {
 						if (m_MemoryBank[0x7FF] > 0) {
 							if (m_ReportPrint != 0) {
 								OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA,
@@ -76,7 +75,7 @@ int RedNew(int param_1)
 							break;
 						}
 
-						if ((unsigned int)(address + alignedSize) <=
+						if ((unsigned int)(address + param_1) <=
 						    (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
 							if (slot[1] > 0) {
 								entryCount = ((int)(m_MemoryBank + 0x800) - (int)(slot + 2)) / 8;
@@ -86,7 +85,7 @@ int RedNew(int param_1)
 							}
 
 							*slot = address;
-							slot[1] = alignedSize;
+							slot[1] = param_1;
 							OSRestoreInterrupts(interrupts);
 							return address;
 						}
@@ -167,7 +166,6 @@ void RedDelete(void* param_1)
  */
 int RedNewA(int size, int offset, int maxSize)
 {
-	unsigned int alignedSize;
 	unsigned int interrupts;
 	int result;
 	int rangeStart;
@@ -194,7 +192,7 @@ int RedNewA(int size, int offset, int maxSize)
 		maxSize = m_ADataBufferSize;
 	}
 	maxSize -= offset;
-	alignedSize = (size + 0x1F) & 0xFFFFFFE0;
+	size = (size + 0x1F) & 0xFFFFFFE0;
 	result = rangeStart;
 	maxGap = maxSize;
 	bestBlock = 0;
@@ -206,7 +204,7 @@ int RedNewA(int size, int offset, int maxSize)
 		currentAddress = rangeStart;
 		for (; (blockPtr[1] != 0) && (blockPtr < m_AMemoryBank + 0x800); blockPtr += 2) {
 			if (currentAddress < rangeStart + maxSize) {
-				if ((int)(currentAddress + alignedSize) <= *blockPtr) {
+				if ((int)(currentAddress + size) <= *blockPtr) {
 					gap = *blockPtr - currentAddress;
 					if (maxGap > gap) {
 						maxGap = gap;
@@ -220,8 +218,8 @@ int RedNewA(int size, int offset, int maxSize)
 			currentAddress = blockPtr[0] + blockPtr[1];
 		}
 
-		if (((blockPtr[1] == 0) && (blockPtr < m_AMemoryBank + 0x800)) &&
-		    (gap = (rangeStart + maxSize) - currentAddress, (int)alignedSize <= gap) &&
+	if (((blockPtr[1] == 0) && (blockPtr < m_AMemoryBank + 0x800)) &&
+		    (gap = (rangeStart + maxSize) - currentAddress, size <= gap) &&
 		    (maxGap > gap)) {
 			result = currentAddress;
 			bestBlock = blockPtr;
@@ -230,7 +228,7 @@ int RedNewA(int size, int offset, int maxSize)
 		bestBlock = blockPtr;
 	}
 
-	if ((bestBlock == 0) || ((unsigned int)(rangeStart + maxSize) < result + alignedSize)) {
+	if ((bestBlock == 0) || ((unsigned int)(rangeStart + maxSize) < result + size)) {
 		OSRestoreInterrupts(interrupts);
 		return 0;
 	}
@@ -243,7 +241,7 @@ int RedNewA(int size, int offset, int maxSize)
 		}
 	}
 	*blockPtr = result;
-	blockPtr[1] = alignedSize;
+	blockPtr[1] = size;
 	OSRestoreInterrupts(interrupts);
 	return result;
 }

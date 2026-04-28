@@ -7,8 +7,6 @@
 #include "dolphin/mtx.h"
 
 extern CGame Game;
-extern double DOUBLE_80330E30;
-
 struct pppYmMoveParabolaWork {
     f32 m_distance;
     f32 m_velocity;
@@ -99,7 +97,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
  */
 extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkC* dataPtr)
 {
-    const f32 zero = gPppYmMoveParabolaZero;
+    const f32 zero = 0.0f;
     _pppMngSt* pppMngSt = pppMngStPtr;
     pppYmMoveParabolaWork* work =
         (pppYmMoveParabolaWork*)((u8*)basePtr + *dataPtr->m_serializedDataOffsets + 0x80);

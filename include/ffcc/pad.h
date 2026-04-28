@@ -68,7 +68,9 @@ public:
     short _6_2_;
     short _8_2_;
     short _a_2_;
-    unsigned char _c_1_[0x19c];
+    unsigned char _c_1_[0x14];
+    short _20_2_;
+    unsigned char _22_1_[0x186];
     unsigned int _1a8_4_;
     void* _1ac_4_;
     unsigned char* _1b0_4_;

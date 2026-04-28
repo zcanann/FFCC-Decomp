@@ -52,8 +52,8 @@ static u8 sReadBuffer[0x40] ATTRIBUTE_ALIGN(32);
 s32 gTHPSimpleInitialized;
 s32 gTHPSimpleSoundBufferIndex;
 void (*gTHPSimpleOldAIDCallback)(void);
-s16* gTHPSimpleCurAudioBuffer;
 s16* gTHPSimpleLastAudioBuffer;
+s16* gTHPSimpleCurAudioBuffer;
 s32 gTHPSimpleAudioSystem;
 static s32 sTHPSimpleVolume = 5;
 u16 gTHPSimpleVolumeTable[0x80] = {

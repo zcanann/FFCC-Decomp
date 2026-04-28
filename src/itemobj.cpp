@@ -617,14 +617,18 @@ void CGItemObj::onFrameStat()
 		    -FLOAT_80331b50 * (prgObj->m_worldPosition.z - *(float*)(*(unsigned char**)(self + 0x550) + 0x164));
 		break;
 	case 0x25: {
+		CVector monTarget(*reinterpret_cast<Vec*>(m_aiWork__8CGMonObj + 4));
+		CVector worldPos(prgObj->m_worldPosition);
 		CVector delta;
-		Vec monTarget = *reinterpret_cast<Vec*>(m_aiWork__8CGMonObj + 4);
 
 		prgObj->m_moveOffset.y = FLOAT_80331bb0;
 		prgObj->m_rotTargetY = prgObj->m_rotTargetY + FLOAT_80331bbc;
-		PSVECSubtract(&monTarget, &prgObj->m_worldPosition, reinterpret_cast<Vec*>(&delta));
+		PSVECSubtract(reinterpret_cast<Vec*>(&monTarget), reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&delta));
+		monTarget.x = delta.x;
+		monTarget.y = delta.y;
+		monTarget.z = delta.z;
 
-		float distance = PSVECMag(reinterpret_cast<Vec*>(&delta));
+		float distance = PSVECMag(reinterpret_cast<Vec*>(&monTarget));
 		if (distance < FLOAT_80331bb8) {
 			changeStat__8CGPrgObjFiii(this, 0x27, 0, 0);
 		} else if (distance <= zero) {
@@ -634,9 +638,9 @@ void CGItemObj::onFrameStat()
 		} else {
 			float moveScale = FLOAT_80331bc0 * prgObj->m_moveTimer;
 
-			prgObj->m_groundHitOffset.x += FLOAT_80331bc4 * delta.x * moveScale;
-			prgObj->m_groundHitOffset.y += FLOAT_80331bc4 * delta.y * moveScale;
-			prgObj->m_groundHitOffset.z += FLOAT_80331bc4 * delta.z * moveScale;
+			prgObj->m_groundHitOffset.x += FLOAT_80331bc4 * monTarget.x * moveScale;
+			prgObj->m_groundHitOffset.y += FLOAT_80331bc4 * monTarget.y * moveScale;
+			prgObj->m_groundHitOffset.z += FLOAT_80331bc4 * monTarget.z * moveScale;
 		}
 		break;
 	}

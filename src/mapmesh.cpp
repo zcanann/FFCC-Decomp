@@ -399,8 +399,6 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     DAT_8032EC98 = stage;
     unsigned char* cursor;
     int offset;
-    float minInit;
-    float maxInit;
     unsigned int dlOffset;
     reader.PushChunk();
     while (reader.GetNextChunk(chunk)) {
@@ -408,12 +406,12 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
         case 0x56455254:
             m_meshData = __nwa__FUlPQ27CMemory6CStagePci(workSize, DAT_8032EC98, s_mapmesh_cpp_801D70B0, 0x13A);
 
-            minInit = FLOAT_8032F930;
+            float minInit = FLOAT_8032F930;
+            float maxInit = FLOAT_8032F934;
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(m_meshData)));
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
             m_vertices = cursor;
             offset = 0;
-            maxInit = FLOAT_8032F934;
             cursor += chunk.m_size;
             m_bboxMinZ = minInit;
             m_bboxMinY = minInit;

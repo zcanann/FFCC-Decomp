@@ -51,7 +51,7 @@ extern float FLOAT_80330D9C;
 extern float FLOAT_80330DA0;
 extern float FLOAT_80330DA4;
 extern float FLOAT_80330DA8;
-extern const float FLOAT_80330dac = 0.0f;
+extern float FLOAT_80330dac = 0.0f;
 
 static inline float YmDeformationMdlZero()
 {
@@ -67,6 +67,11 @@ static inline Mtx& CameraMatrix()
 static inline Mtx44& CameraScreenMatrix()
 {
     return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
+}
+
+static inline float DeformationMdlZero()
+{
+    return *reinterpret_cast<const float*>(&FLOAT_80330dac);
 }
 
 void pppInitBlendMode(void);
@@ -341,4 +346,5 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
     *(float*)(puVar2 + 8) = fVar1;
 }
 
+extern const double DOUBLE_80330DB0 = 4503601774854144.0;
 extern const double kPppYmSharedDoubleBias = 4503601774854144.0;

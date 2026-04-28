@@ -417,26 +417,6 @@ found:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CWind::getObj(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CWind::searchFreeObj()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800d9840
  * PAL Size: 748b
  * EN Address: TODO

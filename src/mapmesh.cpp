@@ -399,15 +399,15 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     DAT_8032EC98 = stage;
     unsigned char* cursor;
     int offset;
-    unsigned int dlOffset;
+    int dlOffset;
     reader.PushChunk();
     while (reader.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x56455254:
             m_meshData = __nwa__FUlPQ27CMemory6CStagePci(workSize, DAT_8032EC98, s_mapmesh_cpp_801D70B0, 0x13A);
 
-            float minInit = FLOAT_8032F930;
             float maxInit = FLOAT_8032F934;
+            float minInit = FLOAT_8032F930;
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(m_meshData)));
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
             m_vertices = cursor;
@@ -459,8 +459,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             m_colors = cursor;
             cursor += chunk.m_size;
 
-            offset = 0;
-            for (int i = 0; i < static_cast<int>(m_colorCount); i++) {
+            for (int i = 0, offset = 0; i < static_cast<int>(m_colorCount); i++) {
                 *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset) = reader.Get1();
                 *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 1) =
                     reader.Get1();
@@ -491,11 +490,10 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             cursor += chunk.m_size;
 
             offset = 0;
-            for (int i = 0; i < static_cast<int>(m_uvCount); i++) {
+            for (int i = 0; i < static_cast<int>(m_uvCount); i++, offset += 4) {
                 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_uvPairs) + offset) = reader.Get2();
                 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_uvPairs) + offset + 2) =
                     reader.Get2();
-                offset += 4;
             }
             break;
         case 0x444C4844:

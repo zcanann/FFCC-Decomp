@@ -1019,208 +1019,50 @@ void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, pppYmManaUnkC*)
  */
 void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* param_3)
 {
-    u32 texBufferSize;
-    u32* work;
-    void* dstBuffer;
-    u32* texList;
-    s32 meshData;
-    void* handle;
-    s32 model;
-    CGObject* gObject;
-    s32 i;
-    u32 meshIndex;
-    s32 setupOffset;
+    float zero;
+    float normalY;
+    float radius;
+    float uvStep;
+    float x;
+    float z;
+    float rowUv;
+    int indexOffset;
+    int quadIndex;
+    int rowBase;
+    float* positions;
+    int rowCount;
+    float* normals;
+    float* uvs;
+    int colCount;
+    int pairCount;
 
-    if (gPppCalcDisabled != 0) {
-        return;
-    }
-
-    gObject = *(CGObject**)((u8*)pppMngStPtr + 0xDC);
-    setupOffset = param_3->m_serializedDataOffsets[1];
-    work = (u32*)((u8*)pppYmMana + 8 + param_3->m_serializedDataOffsets[2]);
-    if (gObject == NULL) {
-        return;
-    }
-
-    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    work[0x1D] = (u32)param_2;
-    if (Game.m_currentMapId == 0x21) {
-        *((u8*)param_2 + 0x24) = 0;
-    }
-
-    if ((*(u8*)&gObject->m_weaponNodeFlags & 1) != 0) {
-        work[0x3E] = (u32)gObject->m_attachOwner;
-    }
-
-    *(u32*)(model + 0xE4) = (u32)work;
-    *(u32*)(model + 0xE8) = (u32)param_2;
-    *(u32*)(model + 0xF0) = (u32)Mana_BeforeDrawCallback;
-    *(u32*)(model + 0xFC) = (u32)Mana_DrawMeshDLCallback;
-
-    MaterialManRaw()[0x228] = (u8)((float)*((u8*)pppYmMana + 0x8B + setupOffset) * gObject->m_lookAtTimer);
-    *((u8*)work + 0xE8) = MaterialManRaw()[0x228];
-
-    if (*(s32*)pppYmMana != 0) {
-        return;
-    }
-
-    work[0] = (u32)gObject;
-    *(u32*)(model + 0xE4) = (u32)work;
-    *(u32*)(model + 0xE8) = (u32)param_2;
-    *(u32*)(model + 0xF0) = (u32)Mana_BeforeDrawCallback;
-    *(u32*)(model + 0xFC) = (u32)Mana_DrawMeshDLCallback;
-    work[2] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x08), pppEnvStPtr);
-    work[3] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x0C), pppEnvStPtr);
-    work[4] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x10), pppEnvStPtr);
-    work[5] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x14), pppEnvStPtr);
-    work[6] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x20), pppEnvStPtr);
-    work[7] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x24), pppEnvStPtr);
-    work[0x1F] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x30), pppEnvStPtr);
-    work[0x20] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x34), pppEnvStPtr);
-
-    *(u32*)(work[0x1F] + 0x6C) = 0;
-    InitTexObj__8CTextureFv((void*)work[0x1F]);
-    *(u32*)(work[0x20] + 0x6C) = 0;
-    InitTexObj__8CTextureFv((void*)work[0x20]);
-
-    if (work[0x1E] == 0) {
-        work[0x1E] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x38F);
-    }
-    if (work[10] == 0) {
-        work[10] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x395);
-    }
-    if (work[11] == 0) {
-        work[11] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x399);
-    }
-
-    texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
-    if (work[12] == 0) {
-        work[12] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3A1);
-    }
-    if (work[13] == 0) {
-        work[13] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3A3);
-    }
-
-    GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-
-    if (work[8] == 0) {
-        work[8] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3B0);
-    }
-    dstBuffer = (void*)work[8];
-    texList = &work[2];
-    for (i = 0; i < 6; i++) {
-        *(u32*)(texList[0] + 0x6C) = 0;
-        InitTexObj__8CTextureFv((void*)texList[0]);
-        memcpy(dstBuffer, (void*)(texList[0] + 0x28), 0x20);
-        dstBuffer = (void*)((u8*)dstBuffer + 0x20);
-        texList++;
-    }
-
-    if (work[9] == 0) {
-        work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3CB);
-        genParaboloidMap__FPvPUlUs9_GXVtxFmt((void*)work[9], &work[0x3B], 0x1E, GX_VTXFMT7);
-    }
-
-    meshData = *(s32*)(model + 0xAC);
-    if (work[0xF] == 0 && work[0x10] == 0 && work[0x12] == 0) {
-        for (meshIndex = 0; meshIndex < *(u32*)(*(s32*)(model + 0xA4) + 0xC); meshIndex++) {
-            s32 meshShape = *(s32*)(meshData + 8);
-            u8 type = *(u8*)((u8*)param_2 + 0x1C);
-
-            if (((type == 1) && strcmp((char*)meshShape, DAT_80330e88) == 0) ||
-                ((type == 2) && strcmp((char*)meshShape, DAT_80330e90) == 0) ||
-                ((type == 3) && strcmp((char*)meshShape, DAT_80330e98) == 0)) {
-                if (work[0x19] == 0) {
-                    work[0x19] =
-                        (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) * 0xC, pppEnvStPtr->m_stagePtr,
-                                         const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 1000);
-                    memset((void*)work[0x19], 0, *(s32*)(meshShape + 0x14) * 0xC);
-                }
-                if (work[0x1A] == 0) {
-                    work[0x1A] =
-                        (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) << 2, pppEnvStPtr->m_stagePtr,
-                                         const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3F1);
-                    memset((void*)work[0x1A], 0xFF, *(s32*)(meshShape + 0x14) << 2);
-                }
-                if (work[0x1B] == 0) {
-                    s32 texCoordSize = *(s32*)(meshShape + 0x14) * 6;
-                    work[0x1B] = (u32)pppMemAlloc(texCoordSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3FA);
-                    work[0x1C] = (u32)pppMemAlloc(texCoordSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3FB);
-                    memset((void*)work[0x1B], 0, texCoordSize);
-                    memset((void*)work[0x1C], 0, texCoordSize);
-                }
-
-                work[0x18] = (u32)pppMemAlloc(*(s32*)(meshShape + 0x4C) << 2, pppEnvStPtr->m_stagePtr,
-                                              const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x407);
-                u32* dlInfo = *(u32**)(meshShape + 0x50);
-                s32 dlOffset = (*(s32*)(meshShape + 0x4C) - 1) * 4;
-                for (s32 dlIndex = *(s32*)(meshShape + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
-                    *(u32*)(work[0x18] + dlOffset) =
-                        (u32)pppMemAlloc(dlInfo[0], pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x411);
-                    *(u32*)(work[0x18] + dlOffset) = (*(u32*)(work[0x18] + dlOffset) + 0x1F) & 0xFFFFFFE0;
-                    work[0x3C] = dlInfo[0];
-                    memcpy((void*)*(u32*)(work[0x18] + dlOffset), (void*)dlInfo[1], dlInfo[0]);
-                    DCFlushRange((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0]);
-                    ReWriteDisplayList__5CUtilFPvUlUl((void*)gUtil, (void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0], 3);
-                    dlOffset -= 4;
-                    dlInfo += 3;
-                }
-            }
-
-            if (((type == 1) && strcmp((char*)meshShape, DAT_80330ea0) == 0) ||
-                ((type == 2) && strcmp((char*)meshShape, DAT_80330ea8) == 0)) {
-                work[0xF] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x427);
-                work[0x10] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x428);
-                work[0x17] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x429);
-                work[0x15] = (u32)pppMemAlloc(0x908, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x42A);
-                work[0x16] = (u32)pppMemAlloc(0x908, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x42B);
-                work[0x12] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x42C);
-                work[0x13] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x42D);
-                work[0x14] = (u32)pppMemAlloc(0xC00, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x42E);
-                work[0x11] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x42F);
-                memset((void*)work[0x12], 0, 0x484);
-                memset((void*)work[0x13], 0, 0x484);
-                CreateWaterMesh((Vec*)work[0xF], (Vec*)work[0x10], (Vec2d*)work[0x15], (unsigned short*)work[0x14],
-                                *(float*)((u8*)param_2 + 0x2C));
-            }
-
-            meshData += 0x14;
-        }
-    }
-
-    if ((*(u8*)((u8*)param_2 + 0x1C) == 1 || *(u8*)((u8*)param_2 + 0x1C) == 2) && work[0x12] != 0) {
-        *(u32*)(work[0x12] + 0x240) = *(u32*)((u8*)param_2 + 0x34);
-    }
-
-    if (*(u8*)((u8*)param_2 + 0x1C) != 0) {
-        if (*(u8*)((u8*)param_2 + 0x1C) == 1 || *(u8*)((u8*)param_2 + 0x1C) == 2) {
-            UpdateWaterMesh((VYmMana*)work);
-        }
-
-        meshData = *(s32*)(model + 0xAC);
-        for (meshIndex = 0; meshIndex < *(u32*)(*(s32*)(model + 0xA4) + 0xC); meshIndex++) {
-            s32 meshShape = *(s32*)(meshData + 8);
-            u8 type = *(u8*)((u8*)param_2 + 0x1C);
-
-            if (((type == 1) && strcmp((char*)meshShape, DAT_80330e88) == 0) ||
-                ((type == 2) && strcmp((char*)meshShape, DAT_80330e90) == 0) ||
-                ((type == 3) && strcmp((char*)meshShape, DAT_80330e98) == 0)) {
-                s32 dlOffset = (*(s32*)(meshShape + 0x4C) - 1) * 4;
-                for (s32 dlIndex = *(s32*)(meshShape + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
-                    CalcReflectionVector2(
-                        (Vec*)work[0x19], *(S16Vec**)(meshShape + 0x18), *(S16Vec**)(meshShape + 0x20),
-                        *(s32*)(meshShape + 0x14), *(u32*)(*(s32*)(model + 0xA4) + 0x34),
-                        *(u32*)(*(s32*)(model + 0xA4) + 0x38), (float(*)[4])(model + 8),
-                        *(void**)(work[0x18] + dlOffset), work[0x3C], (_GXColor*)work[0x1A], (S16Vec2d*)work[0x1B],
-                        (S16Vec2d*)work[0x1C], (CChara::CNode*)(*(s32*)(model + 0xA8) + *(s32*)(meshShape + 0x5C) * 0xC0),
-                        pppYmMana, (VYmMana*)work);
-                    dlOffset -= 4;
-                }
-            }
-
-            meshData += 0x14;
+    normalY = FLOAT_80330e58;
+    zero = FLOAT_80330e4c;
+    rowCount = 0;
+    uvStep = FLOAT_80330e6c;
+    radius = size * FLOAT_80330e5c;
+    for (z = radius; -radius <= z; z -= size * uvStep) {
+        colCount = 0;
+        rowUv = static_cast<float>(rowCount) * uvStep;
+        positions = reinterpret_cast<float*>(positionsInOut);
+        normals = reinterpret_cast<float*>(normalsOut);
+        uvs = reinterpret_cast<float*>(uvOut);
+        for (x = -radius; x <= radius; x += size * uvStep) {
+            *positions = x;
+            positionsInOut = reinterpret_cast<Vec*>(positions + 3);
+            positions[1] = zero;
+            normalsOut = reinterpret_cast<Vec*>(normals + 3);
+            uvOut = reinterpret_cast<Vec2d*>(uvs + 2);
+            positions[2] = z;
+            positions = positions + 3;
+            *normals = zero;
+            normals[1] = normalY;
+            normals[2] = zero;
+            normals = normals + 3;
+            *uvs = static_cast<float>(colCount) * uvStep;
+            uvs[1] = rowUv;
+            uvs = uvs + 2;
+            colCount = colCount + 1;
         }
     }
 }

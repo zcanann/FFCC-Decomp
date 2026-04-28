@@ -959,17 +959,16 @@ int CRedEntry::SearchSeSepSequence(int seNo)
  */
 int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
 {
-	int* bankData = reinterpret_cast<int*>(bank);
-	int waveNo = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(bankData[2] + 0x11)) +
-	             static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(bankData[2] + 0x12)) * 0x100;
+	int waveNo = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<int*>(bank)[2] + 0x11)) +
+	             static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<int*>(bank)[2] + 0x12)) * 0x100;
 
-	RedDelete(bankData[2]);
-	SeSepHistoryDelete(bankData[1]);
+	RedDelete(reinterpret_cast<int*>(bank)[2]);
+	SeSepHistoryDelete(reinterpret_cast<int*>(bank)[1]);
 
-	int freedSize = bankData[3];
-	bankData[3] = 0;
-	bankData[2] = 0;
-	bankData[0] = -1;
+	int freedSize = reinterpret_cast<int*>(bank)[3];
+	reinterpret_cast<int*>(bank)[3] = 0;
+	reinterpret_cast<int*>(bank)[2] = 0;
+	reinterpret_cast<int*>(bank)[0] = -1;
 
 	WaveHistoryManager(0, waveNo);
 	return freedSize;
@@ -1338,14 +1337,13 @@ int CRedEntry::SearchMusicSequence(int musicNo)
  */
 int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
 {
-	WaveHistoryManager(0, (int)*(short*)(((int*)bank)[2] + 6));
-	int* bankData = (int*)bank;
-	RedDelete(bankData[2]);
-	int freedSize = bankData[3];
-	bankData[3] = 0;
-	bankData[2] = 0;
-	bankData[1] = 0;
-	bankData[0] = -1;
+	WaveHistoryManager(0, (int)*(short*)(reinterpret_cast<int*>(bank)[2] + 6));
+	RedDelete(reinterpret_cast<int*>(bank)[2]);
+	int freedSize = reinterpret_cast<int*>(bank)[3];
+	reinterpret_cast<int*>(bank)[3] = 0;
+	reinterpret_cast<int*>(bank)[2] = 0;
+	reinterpret_cast<int*>(bank)[1] = 0;
+	reinterpret_cast<int*>(bank)[0] = -1;
 	return freedSize;
 }
 

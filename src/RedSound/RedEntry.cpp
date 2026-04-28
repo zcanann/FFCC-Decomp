@@ -1489,20 +1489,20 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
  */
 int CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 {
+	int result = 0;
 	int* bank = reinterpret_cast<int*>(MusicOldChoice());
 	if ((bank != 0) && (bank[3] != 0)) {
 		MusicOldClear();
 		bank = reinterpret_cast<int*>(MusicOldChoice());
 	}
 
-	int result = 0;
 	if (bank != 0) {
 		bank[2] = reinterpret_cast<int>(musicHead);
+		result = reinterpret_cast<int>(musicHead);
 		bank[3] = *reinterpret_cast<int*>(reinterpret_cast<int>(musicHead) + 0x10);
 		bank[0] = static_cast<int>(*reinterpret_cast<short*>(reinterpret_cast<int>(musicHead) + 4));
 		MusicHistoryAdd();
 		bank[1] = 1;
-		result = reinterpret_cast<int>(musicHead);
 	}
 
 	return result;
@@ -1516,9 +1516,9 @@ int CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 int CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 {
 	int result;
-	char* data = reinterpret_cast<char*>(musicHead);
 
-	if ((data[0] != 'B') || (data[1] != 'G') || (data[2] != 'M')) {
+	if ((reinterpret_cast<char*>(musicHead)[0] != 'B') || (reinterpret_cast<char*>(musicHead)[1] != 'G') ||
+	    (reinterpret_cast<char*>(musicHead)[2] != 'M')) {
 		RedDelete(musicHead);
 		if (m_ReportPrint != 0) {
 			OSReport(s__s_sMusic_Header_was_broken__s_801e7c1d, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
@@ -1527,7 +1527,7 @@ int CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 		return 0;
 	}
 
-	result = SearchMusicSequence(static_cast<int>(*reinterpret_cast<short*>(data + 4)));
+	result = SearchMusicSequence(static_cast<int>(*reinterpret_cast<short*>(reinterpret_cast<char*>(musicHead) + 4)));
 	if (result >= 0) {
 		RedDelete(musicHead);
 		MusicHistoryChoice(reinterpret_cast<RedHistoryBANK*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) +

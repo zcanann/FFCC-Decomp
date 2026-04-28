@@ -1337,8 +1337,7 @@ int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
 	WaveHistoryManager(0, (int)*(short*)(reinterpret_cast<int*>(bank)[2] + 6));
 	RedDelete(reinterpret_cast<int*>(bank)[2]);
 	int freedSize = reinterpret_cast<int*>(bank)[3];
-	reinterpret_cast<int*>(bank)[3] = 0;
-	reinterpret_cast<int*>(bank)[2] = 0;
+	reinterpret_cast<int*>(bank)[2] = reinterpret_cast<int*>(bank)[3] = 0;
 	reinterpret_cast<int*>(bank)[1] = 0;
 	reinterpret_cast<int*>(bank)[0] = -1;
 	return freedSize;

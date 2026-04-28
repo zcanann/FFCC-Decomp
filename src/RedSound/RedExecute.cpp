@@ -1302,7 +1302,8 @@ void _AdsrDataCompute(RedVoiceDATA* voice)
     stage[1] = stepCount;
     if (stepCount != 0) {
         *(int*)((int)voice + 0xac) = prevValue;
-        stage[2] = (int)((level | 0x800) - prevValue) / (int)stepCount;
+        level |= 0x800;
+        stage[2] = (level - prevValue) / stepCount;
     } else {
         *(int*)((int)voice + 0xac) = level;
     }

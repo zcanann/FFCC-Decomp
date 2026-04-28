@@ -511,12 +511,14 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 int SeSepPlay(int seId, int sepId, int pan, int volume)
 {
 	int* sepBank;
+	int sepBase;
 	unsigned char* sepInfo;
 
 	sepBank = c_RedEntry.SearchSeSepBank(sepId);
 	if (sepBank != 0) {
-		sepInfo = (unsigned char*)(sepBank[2] + 0x10);
-		if ((*(unsigned int*)(sepBank[2] + 0xc) & 0x80000000) != 0) {
+		sepBase = sepBank[2];
+		sepInfo = (unsigned char*)(sepBase + 0x10);
+		if ((*(unsigned int*)(sepBase + 0xc) & 0x80000000) != 0) {
 			*sepInfo |= 0x80;
 		}
 		if (_SePlayStart((RedSeINFO*)sepInfo, seId, sepId, pan, volume) != 0) {

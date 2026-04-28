@@ -87,29 +87,18 @@ struct pppScreenBreakUnkC {
     s32* m_serializedDataOffsets;
 };
 
-extern float FLOAT_80331cc0;
-extern float FLOAT_80331cc4;
-extern float FLOAT_80331cc8;
-extern float FLOAT_80331ccc;
-extern float FLOAT_80331cd0;
-extern float FLOAT_80331cd4;
-extern float FLOAT_80331cd8;
-extern float FLOAT_80331ce8;
-extern float FLOAT_80331cec;
-extern float FLOAT_80331cf0;
-
-extern const char lbl_80331C54[] = "PAUSE";
-extern const char lbl_80331C5C[] = "BATTLE";
-extern const char lbl_80331C64[] = "ANALOG";
-extern const char lbl_80331C6C[] = "A*";
-extern const char lbl_80331C70[] = "PRINTF";
-extern const char lbl_80331C78[] = "SHADOW";
-extern const char lbl_80331C80[] = "CHARA";
-extern const u32 DAT_80331C88 = 0x00000080;
-extern const u32 DAT_80331C8C = 0xFFFFFFFF;
-extern const char s_Debug_80331c90[] = "Debug";
-extern const float FLOAT_80331C98 = 0.0f;
-extern const double DOUBLE_80331CA0 = 4503601774854144.0;
+extern const float FLOAT_80331cc0 = 2.0f;
+extern const float FLOAT_80331cc4 = 0.0f;
+extern const float FLOAT_80331cc8 = 0.3f;
+extern const float FLOAT_80331ccc = -0.5f;
+extern const float FLOAT_80331cd0 = 1.0f;
+extern const float FLOAT_80331cd4 = -1.0f;
+extern const float FLOAT_80331cd8 = 0.017453292f;
+extern const double DOUBLE_80331CE0 = 4503599627370496.0;
+extern const float FLOAT_80331ce8 = 30.0f;
+extern const float FLOAT_80331cec = 4.0f;
+extern const float FLOAT_80331cf0 = -3.0f;
+extern const float FLOAT_80331cf4 = 0.5f;
 
 static const Vec DAT_801dd4b0 = { 0.0f, 1.0f, 0.0f };
 static const char s_f999_root_801dd4c8[] = "f999_root";

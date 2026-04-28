@@ -1478,7 +1478,7 @@ p_dbgmenu.cpp:
 	.data       start:0x80212398 end:0x802127A0
 	.bss        start:0x80306708 end:0x80309174
 	.sdata      start:0x8032EA48 end:0x8032EA50
-	.sdata2     start:0x80331C18 end:0x80331C54
+	.sdata2     start:0x80331C18 end:0x80331CC0
 
 pppChangeBGColor.cpp:
 	.text       start:0x8012D3FC end:0x8012D458
@@ -1489,13 +1489,13 @@ pppScreenBreak.cpp:
 	.text       start:0x8012D458 end:0x8012E5DC
 	.rodata     start:0x801DD4BC end:0x801DD4E8
 	.data       start:0x802127A0 end:0x802127BC
-	.sdata2     start:0x80331C54 end:0x80331CA8
+	.sdata2     start:0x80331CC0 end:0x80331CF8
 
 monobj_boss.cpp:
 	extab       start:0x80009834 end:0x80009A34
 	extabindex  start:0x80010918 end:0x80010C18
 	.text       start:0x8012E5DC end:0x80133108
-	.sdata2     start:0x80331CA8 end:0x80331D10
+	.sdata2     start:0x80331CF8 end:0x80331D10
 
 bonus_menu.cpp:
 	extab       start:0x80009A34 end:0x80009AC4

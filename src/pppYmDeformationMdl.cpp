@@ -52,7 +52,6 @@ extern float FLOAT_80330D9C;
 extern float FLOAT_80330DA0;
 extern float FLOAT_80330DA4;
 extern float FLOAT_80330DA8;
-extern const float FLOAT_80330dac = 0.0f;
 
 static inline Mtx& CameraMatrix()
 {

@@ -2036,7 +2036,7 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 			int topIdx = cmdListIdx;
 			if (cmdListIdx >= 0) {
 				do {
-					if (slotRef[0] != 0xFFFF) {
+					if (slotRef[0] != -1) {
 						break;
 					}
 					slotRef--;
@@ -2050,7 +2050,7 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 			slotRef = caravanWork->m_commandListInventorySlotRef + topIdx + 1;
 			if ((topIdx + 1) < caravanWork->m_numCmdListSlots) {
 				do {
-					if (slotRef[0] != 0xFFFF) {
+					if (slotRef[0] != -1) {
 						break;
 					}
 					groupedCount++;
@@ -2066,7 +2066,7 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 		short* slotRef = caravanWork->m_commandListInventorySlotRef + cmdListIdx;
 		if (cmdListIdx >= 0) {
 			do {
-				if (slotRef[0] != 0xFFFF) {
+				if (slotRef[0] != -1) {
 					break;
 				}
 				slotRef--;

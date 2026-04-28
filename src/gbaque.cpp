@@ -2162,6 +2162,7 @@ char* subjectNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
 		if (System.m_execParam != 0) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B3);
 		}
+		__dla__FPv(npcNameBuf);
 		return -1;
 	}
 	memset(subjectNameBuf, 0, 0x1800);
@@ -2172,6 +2173,8 @@ unsigned int* letterEntryBuf = static_cast<unsigned int*>(__nwa__FUlPQ27CMemory6
 		if (System.m_execParam != 0) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7BD);
 		}
+		__dla__FPv(subjectNameBuf);
+		__dla__FPv(npcNameBuf);
 		return -1;
 	}
 	memset(letterEntryBuf, 0, 0x800);
@@ -2258,7 +2261,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<
 			flags |= 8;
 		}
 
-		const unsigned int value = cur[0] >> 16 & 0x1FF;
+		const unsigned int value = *reinterpret_cast<const unsigned short*>(scriptFood + 0x3EE + i * 0xC) & 0x1FF;
 		if ((curWord & 8) == 0) {
 			if (value != 0) {
 				if (value < 0x100 || value > 0x124) {
@@ -3958,9 +3961,9 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 
 	__dla__FPv(smithIndices);
 
+	GbaQueueFlagView* flags = GetFlagView(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	reinterpret_cast<unsigned char*>(this)[0x2D56] =
-		static_cast<unsigned char>(reinterpret_cast<unsigned char*>(this)[0x2D56] | (1 << channel));
+	flags->m_mkSmithFlg = static_cast<unsigned char>(flags->m_mkSmithFlg | (1 << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	Joybus.SetLetterSize(channel, totalSize);

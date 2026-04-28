@@ -961,7 +961,22 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     particle->m_rotationVelocityZ = params->m_rotationVelocityZ;
 
     if (params->m_rotationFlags != 0) {
-        if ((params->m_rotationFlags & 0x20) == 0) {
+        if (params->m_rotationFlags & 0x20) {
+            particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
+            particle->m_rotationAccelY = particle->m_rotationAccelX;
+            particle->m_rotationAccelZ = particle->m_rotationAccelX;
+            if ((params->m_rotationFlags & 1) && (params->m_rotationFlags & 2)) {
+                if (DOUBLE_80330F98 < Math.RandF()) {
+                    particle->m_rotationAccelX *= FLOAT_80330F80;
+                    particle->m_rotationAccelY *= FLOAT_80330F80;
+                    particle->m_rotationAccelZ *= FLOAT_80330F80;
+                }
+            } else if (params->m_rotationFlags & 2) {
+                particle->m_rotationAccelX *= FLOAT_80330F80;
+                particle->m_rotationAccelY *= FLOAT_80330F80;
+                particle->m_rotationAccelZ *= FLOAT_80330F80;
+            }
+        } else {
             particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
             particle->m_rotationAccelY = params->m_rotationRandomY * Math.RandF();
             particle->m_rotationAccelZ = params->m_rotationRandomZ * Math.RandF();
@@ -973,21 +988,6 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
                     particle->m_rotationAccelY *= FLOAT_80330F80;
                 }
                 if (DOUBLE_80330F98 < Math.RandF()) {
-                    particle->m_rotationAccelZ *= FLOAT_80330F80;
-                }
-            } else if (params->m_rotationFlags & 2) {
-                particle->m_rotationAccelX *= FLOAT_80330F80;
-                particle->m_rotationAccelY *= FLOAT_80330F80;
-                particle->m_rotationAccelZ *= FLOAT_80330F80;
-            }
-        } else {
-            particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
-            particle->m_rotationAccelY = particle->m_rotationAccelX;
-            particle->m_rotationAccelZ = particle->m_rotationAccelX;
-            if ((params->m_rotationFlags & 1) && (params->m_rotationFlags & 2)) {
-                if (DOUBLE_80330F98 < Math.RandF()) {
-                    particle->m_rotationAccelX *= FLOAT_80330F80;
-                    particle->m_rotationAccelY *= FLOAT_80330F80;
                     particle->m_rotationAccelZ *= FLOAT_80330F80;
                 }
             } else if (params->m_rotationFlags & 2) {

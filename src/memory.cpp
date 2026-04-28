@@ -2163,8 +2163,8 @@ void CAmemCacheSet::CacheClear()
 void CAmemCacheSet::CalcPrio()
 {
     unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-    int i = 0;
     int offset = 0;
+    int i = 0;
 
     while (i < *reinterpret_cast<int*>(bytes + 0x3C)) {
         int* entry = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x58) + offset);

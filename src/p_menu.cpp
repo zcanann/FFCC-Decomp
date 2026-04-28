@@ -537,6 +537,14 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         MenuFontTlutPalette* palette = &sMenuFontTlutPaletteTable[tlutMode * 0x1C];
 
         for (int colorIndex = 0; colorIndex < 0x10; colorIndex++) {
+            float blend = 0.0f;
+            float blendInv = 0.0f;
+
+            if (colorIndex >= 8) {
+                blend = 1.0f - static_cast<float>(colorIndex - 8) * 0.125f;
+                blendInv = 1.0f - blend;
+            }
+
             for (int tlutIndex = 0; tlutIndex < 0x1C; tlutIndex++) {
                 _GXColor color = {
                     static_cast<u8>(0xFF - sMenuFontShadeTable[colorIndex]),
@@ -550,9 +558,6 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
                     color.g = palette[tlutIndex].highlight.g;
                     color.b = palette[tlutIndex].highlight.b;
                 } else {
-                    float blend = 1.0f - static_cast<float>(colorIndex - 8) * 0.125f;
-                    float blendInv = 1.0f - blend;
-
                     color.r = static_cast<u8>(static_cast<float>(palette[tlutIndex].shadow.r) * blendInv +
                                               static_cast<float>(palette[tlutIndex].highlight.r) * blend);
                     color.g = static_cast<u8>(static_cast<float>(palette[tlutIndex].shadow.g) * blendInv +

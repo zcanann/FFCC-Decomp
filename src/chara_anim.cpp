@@ -21,6 +21,8 @@ extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 class CCharaPcs;
 extern unsigned char Chara[];
 extern CCharaPcs CharaPcs;
+extern const float kCharaSharedZeroF;
+extern const float kCharaSharedOneF;
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -399,7 +401,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 
 	float frameFrac = frame - static_cast<float>(frameInt);
 	if (frameInt == anim->m_frameCount - 1) {
-		frameFrac = 0.0f;
+		frameFrac = kCharaSharedZeroF;
 	}
 
 	register int flags = static_cast<int>((m_flags >> 0xD) & 0x3FFFF);
@@ -418,7 +420,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 				inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (anim->m_frameCount + 1) * 2);
 			}
 		} else {
-			*outData = 0.0f;
+			*outData = kCharaSharedZeroF;
 		}
 		flags >>= 2;
 		outData++;
@@ -434,7 +436,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 				inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (anim->m_frameCount + 1) * 2);
 			}
 		} else {
-			*outData = 0.0f;
+			*outData = kCharaSharedZeroF;
 		}
 		flags >>= 2;
 		outData++;
@@ -450,7 +452,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 				inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (anim->m_frameCount + 1) * 2);
 			}
 		} else {
-			*outData = 1.0f;
+			*outData = kCharaSharedOneF;
 		}
 		flags >>= 2;
 		outData++;

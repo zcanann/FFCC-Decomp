@@ -1055,19 +1055,20 @@ cflat_r2class.cpp:
 	extabindex  start:0x8000E9EC end:0x8000EA10
 	.text       start:0x800BA2FC end:0x800BD848
 	.data       start:0x80210378 end:0x80210534
-	.sdata2     start:0x80330C10 end:0x80330C18
+	.sdata2     start:0x80330BE0 end:0x80330BF8
 
 p_chara_viewer.cpp:
 	extab       start:0x80008350 end:0x80008390
 	extabindex  start:0x8000EA10 end:0x8000EA40
 	.text       start:0x800BD848 end:0x800BF620
+	.sdata2     start:0x80330BF8 end:0x80330C78
 
 chara_anim.cpp:
 	extab       start:0x80008390 end:0x800083C0
 	extabindex  start:0x8000EA40 end:0x8000EA88
 	.text       start:0x800BF620 end:0x800BFE78
 	.data       start:0x80210534 end:0x80210540
-	.sdata2     start:0x80330C68 end:0x80330C78
+	.sdata2     start:0x80330C78 end:0x80330C98
 
 pppYmBreath.cpp:
 	extab       start:0x800083C0 end:0x800083F8

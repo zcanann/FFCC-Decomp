@@ -339,11 +339,11 @@ bool CMenuPcs::MoneyOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::MoneyCtrl()
+int CMenuPcs::MoneyCtrl()
 {
 	int iVar2;
 	int iVar3;
-	s16 sVar1;
+	int sVar1;
 
 	iVar2 = 0;
 	*(s16*)((int)this->moneyState + 0x32) = *(s16*)((int)this->moneyState + 0x30);
@@ -365,12 +365,14 @@ void CMenuPcs::MoneyCtrl()
 	}
 
 	if (iVar2 != 0) {
-		iVar2 = (int)this->moneyPanel;
-		*(float*)(iVar2 + 0x18) = FLOAT_80332f70;
-		*(int*)(iVar2 + 0x2C) = 0;
-		*(int*)(iVar2 + 0x30) = 10;
-		*(int*)(iVar2 + 0x28) = 0;
+		MoneyMenuAnim* anim = this->moneyPanel->anims;
+		anim->progress = FLOAT_80332f70;
+		anim->startFrame = 0;
+		anim->duration = 10;
+		anim->frame = 0;
 	}
+
+	return iVar2;
 }
 
 /*

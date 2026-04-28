@@ -1645,12 +1645,15 @@ void CCaravanWork::CalcStatus()
 
 	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
 
-	m_strength = baseData[4];
-	m_baseStrength = m_strength;
-	m_magic = baseData[5];
-	m_baseMagic = m_magic;
-	m_defense = baseData[6];
-	m_baseDefense = m_defense;
+	unsigned short stat = baseData[4];
+	m_strength = stat;
+	m_baseStrength = stat;
+	stat = baseData[5];
+	m_magic = stat;
+	m_baseMagic = stat;
+	stat = baseData[6];
+	m_defense = stat;
+	m_baseDefense = stat;
 	m_maxHp = baseData[3];
 
 	m_equipEffectFlags = 0;
@@ -1658,27 +1661,33 @@ void CCaravanWork::CalcStatus()
 	memset(m_equipEffectParams, 0, 7);
 
 	if (m_tempStatBuffTimer != 0) {
-		if (m_tempStatBuffId >= 0x185) {
+		int tempStatBuffId = m_tempStatBuffId;
+		if (tempStatBuffId < 0x183) {
+			if (tempStatBuffId >= 0x180) {
+				m_defense += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
+			} else if (tempStatBuffId > 0x17C) {
+				m_magic += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
+			}
+		} else if (tempStatBuffId < 0x185) {
 			m_strength += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6A);
-		} else if (m_tempStatBuffId >= 0x180) {
-			m_defense += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
-		} else if (m_tempStatBuffId > 0x17C) {
-			m_magic += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
 		}
 		m_tempStatBuffTimer--;
 	}
 
-	if (Game.m_gameWork.m_chaliceElement == 4) {
-		m_elementResistances[3]++;
-	} else if (Game.m_gameWork.m_chaliceElement < 4) {
-		if (Game.m_gameWork.m_chaliceElement == 2) {
-			m_elementResistances[2]++;
-		} else if ((Game.m_gameWork.m_chaliceElement < 2) && (Game.m_gameWork.m_chaliceElement > 0)) {
-			m_elementResistances[1]++;
+	int chaliceElement = Game.m_gameWork.m_chaliceElement;
+	if (chaliceElement != 4) {
+		if (chaliceElement < 4) {
+			if (chaliceElement == 2) {
+				m_elementResistances[2]++;
+			} else if ((chaliceElement < 2) && (chaliceElement > 0)) {
+				m_elementResistances[1]++;
+			}
+		} else if (chaliceElement == 8) {
+			m_statusTimers[0]++;
+			m_statusTimers[2]++;
 		}
-	} else if (Game.m_gameWork.m_chaliceElement == 8) {
-		m_statusTimers[0]++;
-		m_statusTimers[2]++;
+	} else {
+		m_elementResistances[3]++;
 	}
 
 	short hpBonus = 0;
@@ -1686,29 +1695,31 @@ void CCaravanWork::CalcStatus()
 	short strBonus = 0;
 	short magBonus = 0;
 	short defBonus = 0;
-	unsigned short* artifact = &m_artifacts[0];
+	short* artifact = reinterpret_cast<short*>(m_artifacts);
 	for (int i = 0; i < 100; i++, artifact++) {
-		if (*(short*)artifact > 0) {
-			unsigned short* artifactData = GetItemDataPtr(*(short*)artifact);
-			unsigned short artifactEffect = artifactData[0];
+		short artifactId = *artifact;
+		if (artifactId > 0) {
+			unsigned short* artifactData = GetItemDataPtr(artifactId);
+			int artifactEffect = artifactData[0];
 			short value = artifactData[3];
 
-			if (artifactEffect == 0xDB) {
-				cmdBonus += value;
-			} else if (artifactEffect < 0xDB) {
-				if (artifactEffect == 0xB6) {
-					magBonus += value;
-				} else if (artifactEffect < 0xB6) {
-					if (artifactEffect == 0x9F) {
-						strBonus += value;
-					}
-				} else if (artifactEffect == 0xCC) {
-					defBonus += value;
-				}
-			} else if (artifactEffect == 0xE4) {
-				hpBonus += value;
-			} else if ((artifactEffect < 0xE4) && (artifactEffect == 0xDF)) {
+			switch (artifactEffect) {
+			case 0x9F:
+				strBonus += value;
+				break;
+			case 0xB6:
+			case 0xDF:
 				magBonus += value;
+				break;
+			case 0xCC:
+				defBonus += value;
+				break;
+			case 0xDB:
+				cmdBonus += value;
+				break;
+			case 0xE4:
+				hpBonus += value;
+				break;
 			}
 		}
 	}
@@ -1722,22 +1733,27 @@ void CCaravanWork::CalcStatus()
 	m_numCmdListSlots += cmdBonus;
 	m_maxHp += hpBonus;
 
-	if ((short)m_numCmdListSlots > 8) {
-		m_numCmdListSlots = 8;
+	unsigned short cappedValue = 8;
+	if ((short)m_numCmdListSlots < 8) {
+		cappedValue = m_numCmdListSlots;
 	}
-	if (m_maxHp > 0x10) {
-		m_maxHp = 0x10;
+	m_numCmdListSlots = cappedValue;
+
+	cappedValue = 0x10;
+	if (m_maxHp < 0x10) {
+		cappedValue = m_maxHp;
 	}
+	m_maxHp = cappedValue;
 
 	for (int equipIdx = 0; equipIdx < 4; equipIdx++) {
 		if (m_equipment[equipIdx] >= 0) {
 			int itemIdx = (short)m_inventoryItems[m_equipment[equipIdx]];
 			unsigned short* itemData = GetItemDataPtr(itemIdx);
-			unsigned short itemType = itemData[0];
+			int itemType = itemData[0];
 
 			if (itemType == 1) {
-				int weaponItem = 0;
-				int weaponRef = 0;
+				int weaponItem;
+				int weaponRef;
 				GetCurrentWeaponItem(weaponItem, weaponRef);
 				if (weaponItem > 0) {
 					itemIdx = weaponItem;
@@ -1746,81 +1762,89 @@ void CCaravanWork::CalcStatus()
 			}
 
 			short itemValue = (short)itemData[3];
-			if (itemType == 0x45) {
-				m_defense += itemValue;
-				m_baseDefense += itemValue;
-			apply_effect:
-				switch (itemData[4]) {
-				case 1:
-					m_elementResistances[1]++;
-					break;
-				case 2:
-					m_elementResistances[2]++;
-					break;
-				case 3:
-					m_elementResistances[3]++;
-					break;
-				case 4:
-					m_elementResistances[4]++;
-					break;
-				case 5:
-					m_elementResistances[5]++;
-					break;
-				case 6:
-					m_statusTimers[0]++;
-					break;
-				case 7:
-					m_statusTimers[1]++;
-					break;
-				case 8:
-					m_statusTimers[2]++;
-					break;
-				case 9:
-					m_equipEffectParams[0] += (char)itemValue;
-					break;
-				case 10:
-					m_equipEffectParams[1] += (char)itemValue;
-					break;
-				case 0xB:
-					m_equipEffectParams[2] += (char)itemValue;
-					break;
-				case 0xC:
-					m_equipEffectParams[3] += (char)itemValue;
-					break;
-				case 0x10:
-					m_equipEffectParams[4] += (char)itemValue;
-					break;
-				case 0x11:
-					m_equipEffectParams[5] += (char)itemValue;
-					break;
-				case 0x12:
-					m_equipEffectParams[6] += (char)itemValue;
-					break;
-				case 0x13:
-					m_elementResistances[0]++;
-					break;
+			if (itemType != 0x45) {
+				if (itemType >= 0x45) {
+					if (itemType == 0x7F) {
+						goto apply_effect;
+					}
+					goto no_effect;
 				}
-				m_equipEffectFlags |= 1 << itemData[4];
-			} else if (itemType < 0x45) {
 				if (itemType == 1) {
 					m_strength += itemValue;
 					m_baseStrength += itemValue;
 				}
-			} else if (itemType == 0x7F) {
-				m_defense += itemValue;
-				m_baseDefense += itemValue;
-				goto apply_effect;
+				goto no_effect;
 			}
+
+			m_defense += itemValue;
+			m_baseDefense += itemValue;
+		apply_effect:
+			int itemEffect = itemData[4];
+			switch (itemEffect) {
+			case 1:
+				m_elementResistances[1]++;
+				break;
+			case 2:
+				m_elementResistances[2]++;
+				break;
+			case 3:
+				m_elementResistances[3]++;
+				break;
+			case 4:
+				m_elementResistances[4]++;
+				break;
+			case 5:
+				m_elementResistances[5]++;
+				break;
+			case 6:
+				m_statusTimers[0]++;
+				break;
+			case 7:
+				m_statusTimers[1]++;
+				break;
+			case 8:
+				m_statusTimers[2]++;
+				break;
+			case 9:
+				m_equipEffectParams[0] += (char)itemValue;
+				break;
+			case 10:
+				m_equipEffectParams[1] += (char)itemValue;
+				break;
+			case 0xB:
+				m_equipEffectParams[2] += (char)itemValue;
+				break;
+			case 0xC:
+				m_equipEffectParams[3] += (char)itemValue;
+				break;
+			case 0x10:
+				m_equipEffectParams[4] += (char)itemValue;
+				break;
+			case 0x11:
+				m_equipEffectParams[5] += (char)itemValue;
+				break;
+			case 0x12:
+				m_equipEffectParams[6] += (char)itemValue;
+				break;
+			case 0x13:
+				m_elementResistances[0]++;
+				break;
+			}
+			m_equipEffectFlags |= 1 << itemEffect;
+		no_effect:
+			;
 		}
 	}
 
 	for (int i = 0; i < 11; i++) {
-		if (m_elementResistances[i] > 2) {
-			m_elementResistances[i] = 2;
+		unsigned short resistance = 2;
+		if (m_elementResistances[i] < 2) {
+			resistance = m_elementResistances[i];
 		}
+		m_elementResistances[i] = resistance;
 	}
 
-	if (m_maxHp < m_hp) {
+	if (m_hp > m_maxHp) {
 		m_hp = m_maxHp;
 	}
 
@@ -1837,24 +1861,41 @@ void CCaravanWork::CalcStatus()
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
 	}
 
-	if (m_strength > 99) {
-		m_strength = 99;
+	cappedValue = 99;
+	if (m_strength < 100) {
+		cappedValue = m_strength;
 	}
-	if (m_defense > 99) {
-		m_defense = 99;
+	m_strength = cappedValue;
+
+	cappedValue = 99;
+	if (m_defense < 100) {
+		cappedValue = m_defense;
 	}
-	if (m_magic > 99) {
-		m_magic = 99;
+	m_defense = cappedValue;
+
+	cappedValue = 99;
+	if (m_magic < 100) {
+		cappedValue = m_magic;
 	}
-	if (m_baseStrength > 99) {
-		m_baseStrength = 99;
+	m_magic = cappedValue;
+
+	cappedValue = 99;
+	if (m_baseStrength < 100) {
+		cappedValue = m_baseStrength;
 	}
-	if (m_baseDefense > 99) {
-		m_baseDefense = 99;
+	m_baseStrength = cappedValue;
+
+	cappedValue = 99;
+	if (m_baseDefense < 100) {
+		cappedValue = m_baseDefense;
 	}
-	if (m_baseMagic > 99) {
-		m_baseMagic = 99;
+	m_baseDefense = cappedValue;
+
+	cappedValue = 99;
+	if (m_baseMagic < 100) {
+		cappedValue = m_baseMagic;
 	}
+	m_baseMagic = cappedValue;
 }
 
 /*

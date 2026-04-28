@@ -1,8 +1,4 @@
-#define FFCC_PTRARRAY_DECL_ONLY
-#define FFCC_PTRARRAY_INT_RETURN
 #include "ffcc/mapanim.h"
-#undef FFCC_PTRARRAY_INT_RETURN
-#undef FFCC_PTRARRAY_DECL_ONLY
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"

@@ -209,14 +209,14 @@ CPtrArray<CTexAnimSeq*>::~CPtrArray()
  * JP Size: TODO
  */
 template <>
-bool CPtrArray<CTexAnimSeq*>::Add(CTexAnimSeq* item)
+int CPtrArray<CTexAnimSeq*>::Add(CTexAnimSeq* item)
 {
     if (setSize(m_numItems + 1) == 0) {
-        return false;
+        return 0;
     }
     m_items[m_numItems] = item;
     m_numItems = m_numItems + 1;
-    return true;
+    return 1;
 }
 
 /*
@@ -332,7 +332,7 @@ void CPtrArray<CTexAnimSeq*>::SetStage(CMemory::CStage* stage)
  * JP Size: TODO
  */
 template <>
-bool CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
+int CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
 {
     CTexAnimSeq** newItems;
 
@@ -426,14 +426,14 @@ CPtrArray<CTexAnim*>::~CPtrArray()
  * JP Size: TODO
  */
 template <>
-bool CPtrArray<CTexAnim*>::Add(CTexAnim* item)
+int CPtrArray<CTexAnim*>::Add(CTexAnim* item)
 {
     if (setSize(m_numItems + 1) == 0) {
-        return false;
+        return 0;
     }
     m_items[m_numItems] = item;
     m_numItems = m_numItems + 1;
-    return true;
+    return 1;
 }
 
 /*
@@ -549,7 +549,7 @@ void CPtrArray<CTexAnim*>::SetStage(CMemory::CStage* stage)
  * JP Size: TODO
  */
 template <>
-bool CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
+int CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
 {
     CTexAnim** newItems;
 

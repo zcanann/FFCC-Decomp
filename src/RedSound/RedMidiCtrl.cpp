@@ -2317,7 +2317,8 @@ void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     int bend;
 
     *(char*)((char*)track + 0x14b) = *(*(unsigned char**)track)++;
-    bend = (*(short*)((int*)track + 0x50) * *(char*)((char*)track + 0x14b)) >> 5;
+    bend = *(short*)((int*)track + 0x50) * *(char*)((char*)track + 0x14b);
+    bend >>= 5;
     *(short*)((char*)track + 0x13e) = bend;
     _PitchBendCompute(track, *(short*)((char*)track + 0x13e));
 }

@@ -150,8 +150,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     s16* work;
     u8* colorData;
     u8* radiusScaleData;
-    PackedMiasmaColor packedWork;
     PackedMiasmaColor packedColor;
+    PackedMiasmaColor packedWork;
     Vec managerPos;
     Vec cameraPos;
     float radius;

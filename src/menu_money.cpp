@@ -566,7 +566,7 @@ int CMenuPcs::MoneyCtrlCur()
 		hold = 0;
 	} else {
 		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
-		hold = *(u16*)((u8*)&Pad + 0x20);
+		hold = Pad._20_2_;
 	}
 
 	if (hold == 0) {

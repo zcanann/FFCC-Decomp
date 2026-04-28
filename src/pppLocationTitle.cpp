@@ -135,6 +135,24 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     int graphFrame;
     long* shapeTable;
     LocationTitleParticle* particles;
+    LocationTitleParticle* particle;
+    float zero;
+    int randomValue;
+    s16 shapeCount;
+    s16 shape;
+    pppFMATRIX resultMatrix;
+    Vec subVec;
+    Vec interp[50];
+    int startIndex;
+    int inserted;
+    float stepScale;
+    Vec* startPos;
+    Vec* interpRead;
+    Vec* interpWrite;
+    Vec scaled;
+    float t;
+    int nextCount;
+    LocationTitleParticle* dst;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -162,9 +180,6 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     }
 
     if (work->m_particles == NULL) {
-        LocationTitleParticle* particle;
-        float zero;
-
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             param_2->m_maxCount * sizeof(LocationTitleParticle), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppLocationTitle_cpp_801DB510), 0x6d);
@@ -172,10 +187,6 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         particle = (LocationTitleParticle*)work->m_particles;
 
         for (int i = 0; i < param_2->m_maxCount; i++) {
-            int randomValue;
-            s16 shapeCount;
-            s16 shape;
-
             particle->m_pos.x = zero;
             particle->m_pos.y = zero;
             particle->m_pos.z = zero;
@@ -197,8 +208,6 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     if (work->m_count + 1 < param_2->m_maxCount) {
         graphFrame = pppLocationTitle->m_graphId / 0x1000;
         if (graphFrame >= (int)param_2->m_spawnFrame) {
-            pppFMATRIX resultMatrix;
-
             pppMulMatrix(resultMatrix, pppMngStPtr->m_matrix, pppLocationTitle->m_localMatrix);
 
             particles[work->m_count].m_pos.x = resultMatrix.value[0][3];
@@ -216,15 +225,6 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             work->m_count++;
 
             if (work->m_count > 1) {
-                Vec subVec;
-                Vec interp[50];
-                int startIndex;
-                int inserted;
-                float stepScale;
-                Vec* startPos;
-                Vec* interpRead;
-                Vec* interpWrite;
-
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startPos = &particles[startIndex].m_pos;
@@ -234,9 +234,6 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                 interpWrite = interpRead;
 
                 for (int i = 0; i < param_2->m_stepCount; i++) {
-                    Vec scaled;
-                    float t;
-
                     t = stepScale * (float)(i + 1);
                     PSVECScale(&subVec, &scaled, t);
                     PSVECAdd(startPos, &scaled, interpWrite);
@@ -244,7 +241,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                     work->m_count++;
 
                     {
-                        int nextCount = work->m_count + 1;
+                        nextCount = work->m_count + 1;
 
                         if (nextCount >= param_2->m_maxCount) {
                             break;
@@ -258,8 +255,6 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                               particles[startIndex + 1].m_pos);
 
                 for (int i = 0; i < inserted; i++) {
-                    LocationTitleParticle* dst;
-
                     dst = &particles[startIndex + (i + 1)];
 
                     pppCopyVector(dst->m_pos, *interpRead);

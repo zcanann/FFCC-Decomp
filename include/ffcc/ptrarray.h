@@ -18,6 +18,9 @@ public:
     bool Add(T item);
 #endif
     void RemoveAll();
+#ifdef FFCC_PTRARRAY_RELEASE_AND_REMOVE_ALL
+    void ReleaseAndRemoveAll();
+#endif
     T GetAt(unsigned long index);
     T operator[](unsigned long index);
     void SetStage(CMemory::CStage* stage);

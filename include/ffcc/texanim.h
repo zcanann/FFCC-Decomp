@@ -2,13 +2,23 @@
 #define _FFCC_PPP_TEXANIM_H_
 
 #include "ffcc/memory.h"
+#include "ffcc/ref.h"
+
+#define FFCC_PTRARRAY_RELEASE_AND_REMOVE_ALL
+#define FFCC_PTRARRAY_DECL_ONLY
+#include "ffcc/ptrarray.h"
+#undef FFCC_PTRARRAY_DECL_ONLY
+#undef FFCC_PTRARRAY_RELEASE_AND_REMOVE_ALL
 
 class CMaterialSet;
+class CMaterial;
 class CChunkFile;
 class CMemory;
 struct Vec;
+class CTexAnim;
+class CTexAnimSeq;
 
-class CTexAnimSet
+class CTexAnimSet : public CRef
 {
 public:
     enum ANIM_TYPE
@@ -25,9 +35,13 @@ public:
     void AddFrame();
     void Change(char*, float, ANIM_TYPE);
     void SetTexGen();
+
+private:
+    CPtrArray<CTexAnim*> m_texAnims;
+    float m_chin;
 };
 
-class CTexAnimSeq
+class CTexAnimSeq : public CRef
 {
 public:
     CTexAnimSeq();
@@ -38,17 +52,37 @@ public:
     unsigned int GetTotalFrame();
     char* GetName();
     int IsChin();
+
+private:
+    friend class CTexAnim;
+    friend class CTexAnimSet;
+
+    char m_name[0x100];
+    unsigned int m_totalFrames;
+    int m_keyCount;
+    unsigned char m_flags;
+    unsigned char m_pad111[3];
+    unsigned int* m_keys;
 };
 
-class CTexAnim
+class CTexAnim : public CRef
 {
 public:
-	class CRefData
-	{
-	public:
-		CRefData();
-		~CRefData();
-	};
+    class CRefData : public CRef
+    {
+    public:
+        CRefData();
+        ~CRefData();
+
+    private:
+        friend class CTexAnim;
+        friend class CTexAnimSet;
+
+        char m_name[0x100];
+        CMaterial* m_material;
+        int m_texSrtIndex;
+        CPtrArray<CTexAnimSeq*> m_texAnimSeqs;
+    };
 
     CTexAnim();
     ~CTexAnim();
@@ -62,6 +96,17 @@ public:
     void SetTexGen();
     int IsChin();
     float GetChin();
+
+private:
+    friend class CTexAnimSet;
+
+    CRefData* m_refData;
+    int m_seqIndex;
+    float m_frame;
+    int m_mode;
+    float m_texGenS;
+    float m_texGenT;
+    float m_chin;
 };
 
 #endif // _FFCC_PPP_TEXANIM_H_

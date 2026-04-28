@@ -283,8 +283,8 @@ unsigned int CMenuPcs::TmpArtiClose()
 					*(float *)(psVar4 + 8) =
 					    (float)(DOUBLE_80332f48 -
 					            (DOUBLE_80332f48 /
-					             ((double)(int)*(unsigned int *)(psVar4 + 0x14) - dVar2)) *
-					                ((double)(int)*(unsigned int *)(psVar4 + 0x10) - dVar2));
+					             ((double)*(int *)(psVar4 + 0x14) - dVar2)) *
+					                ((double)*(int *)(psVar4 + 0x10) - dVar2));
 					if ((double)*(float *)(psVar4 + 8) < dVar3) {
 						*(float *)(psVar4 + 8) = FLOAT_80332f2c;
 					}

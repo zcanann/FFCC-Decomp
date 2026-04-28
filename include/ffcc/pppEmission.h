@@ -8,12 +8,7 @@
 class CMaterialMan;
 
 struct pppEmission {
-    union {
-        void* ptr;
-        struct {
-            u32 m_graphId;
-        };
-    } field0_0x0;
+    u32 m_graphId;
 
     u8 _pad0[0x84];
     u8 field_0x88;

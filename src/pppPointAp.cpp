@@ -30,7 +30,7 @@ struct _pppPointApStep {
  */
 void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 {
-    _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDef;
+    _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDataOffsets;
     u32 srcOffset = data->srcOffset;
     u32 targetOffset = data->targetOffset;
     Vec* src = (Vec*)((u8*)pObject + srcOffset + 0x80);
@@ -82,7 +82,7 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
  */
 void pppPointApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-    _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDef;
+    _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDataOffsets;
     u8* target = (u8*)pObject + data->targetOffset;
     target[0x81] = 0;
 }

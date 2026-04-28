@@ -4,12 +4,7 @@
 #include <dolphin/types.h>
 
 struct pppCallBackDistance {
-    union {
-        void* ptr;
-        struct {
-            u32 m_graphId;
-        };
-    } field0_0x0;
+    u32 m_graphId;
 };
 
 struct pppCallBackDistanceUnkB {
@@ -36,4 +31,3 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUn
 #endif
 
 #endif // _FFCC_PPPCALLBACKDISTANCE_H_
-

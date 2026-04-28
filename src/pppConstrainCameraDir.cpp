@@ -25,7 +25,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
         float* value = (float*)((char*)pppConstrainCameraDir + *param_3->m_serializedDataOffsets + 0x80);
         unsigned char* flags = (unsigned char*)&param_2->m_arg3;
 
-        CalcGraphValue(&pppConstrainCameraDir->m_pppPObject, param_2->m_graphId, value[0], value[1], value[2],
+        CalcGraphValue((_pppPObject*)pppConstrainCameraDir, param_2->m_graphId, value[0], value[1], value[2],
                        param_2->m_dataValIndex, param_2->m_initWOrk, param_2->m_stepValue);
 
         if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {

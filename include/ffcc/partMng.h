@@ -146,7 +146,6 @@ typedef void (*pppProgDestructCallback)(_pppPObjLink*, _pppCtrlTable*);
 
 struct pppFVECTOR4
 {
-
 };
 
 struct VColor
@@ -179,28 +178,13 @@ struct pppProg
     pppProgAnyCallback m_pppFunctionDestructor;   // 0x28
 }; // Size 0x2c
 
-struct _pppCtrlTableData
-{
-    int m_workOffset;       // 0x0
-    int m_workOffsetAlt;    // 0x4
-    int m_ownerWorkOffset;  // 0x8
-};
-
 struct _pppCtrlTable
 {
     pppProg* m_prog;                    // 0x0
-    union {
-        int m_initialWork;              // 0x4
-        struct {
-            unsigned short m_workOffset; // 0x4
-            unsigned short m_workFlags;  // 0x6
-        } m_workInfo;
-    };
+    unsigned short m_workOffset;        // 0x4
+    unsigned short m_workFlags;         // 0x6
     int m_unk8;                         // 0x8
-    union {
-        _pppCtrlTableData* m_serializedDef; // 0xC
-        int* m_serializedDataOffsets;       // 0xC
-    };
+    int* m_serializedDataOffsets;       // 0xC
 };
 
 struct _pppDataHead
@@ -266,14 +250,7 @@ struct _pppMngSt
     float m_userFloat0;                // 0x48
     float m_userFloat1;                // 0x4C
     Vec m_savedPosition;               // 0x50
-    union {
-        Vec m_previousPosition;        // 0x5C
-        struct {
-            float m_previousPositionX; // 0x5C
-            float m_previousPositionY; // 0x60
-            float m_paramD;            // 0x64
-        } m_previousPositionFields;
-    };
+    Vec m_previousPosition;            // 0x5C (third float doubles as a generic param)
     Vec m_paramVec0;                   // 0x68
     short m_kind;                      // 0x74
     short m_nodeIndex;                 // 0x76
@@ -282,10 +259,7 @@ struct _pppMngSt
     unsigned char m_envColorG;         // 0xA9
     unsigned char m_envColorB;         // 0xAA
     unsigned char m_envColorA;         // 0xAB
-    union {
-        int m_prioTime;                // 0xAC
-        int m_spawnedCount;
-    };
+    int m_spawnedCount;                // 0xAC
     int m_previousFrame2;              // 0xB0
     int m_numPrograms;                 // 0xB4
     int m_reservedB8;                  // 0xB8
@@ -319,7 +293,7 @@ struct _pppMngSt
     unsigned char m_fpBillboard;       // 0xF7
     unsigned char m_prio;              // 0xF8
     unsigned char m_padF9;             // 0xF9
-    short m_frameCounter;              // 0xFA
+    short m_prioTime;                  // 0xFA
     unsigned char m_padFC[4];          // 0xFC
     unsigned int m_paramA;             // 0x100
     unsigned int m_paramB;             // 0x104

@@ -32,7 +32,7 @@ struct PppAngMoveInput {
  */
 void pppAngMoveCon(void* dest, _pppCtrlTable* ctrlTable)
 {
-    int offset = ctrlTable->m_serializedDef->m_workOffsetAlt;
+    int offset = ctrlTable->m_serializedDataOffsets[1];
     int* ptr = (int*)((char*)dest + offset + 0x80);
     ptr[2] = 0;
     ptr[1] = 0;
@@ -50,7 +50,7 @@ void pppAngMoveCon(void* dest, _pppCtrlTable* ctrlTable)
  */
 void pppAngMove(void* basePtr, void* input, _pppCtrlTable* ctrlTable)
 {
-    PppAngMoveOffsets* offsets = (PppAngMoveOffsets*)ctrlTable->m_serializedDef;
+    PppAngMoveOffsets* offsets = (PppAngMoveOffsets*)ctrlTable->m_serializedDataOffsets;
     PppAngMoveObj* a = (PppAngMoveObj*)((char*)basePtr + offsets->a + 0x80);
     PppAngMoveObj* b = (PppAngMoveObj*)((char*)basePtr + offsets->b + 0x80);
     PppAngMoveInput* inputData = (PppAngMoveInput*)input;

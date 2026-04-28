@@ -5,12 +5,7 @@
 #include <dolphin/types.h>
 
 struct pppBlurChara {
-    union {
-        void* ptr;
-        struct {
-            u32 m_graphId;
-        };
-    } field0_0x0;
+    u32 m_graphId;
 };
 
 struct pppBlurCharaUnkB {

@@ -586,7 +586,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
 group_ready:
         if (ready) {
             firstParticle = -1;
-            scaledOwner = mngSt->m_previousPositionFields.m_paramD * pBreathModel->m_groupOwnerScale;
+            scaledOwner = mngSt->m_previousPosition.z * pBreathModel->m_groupOwnerScale;
             for (slotIndex = 0; slotCount != 0; slotCount--) {
                 if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
                     firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);

@@ -2297,19 +2297,29 @@ void CSound::PlayStreamASync()
 
     int streamId = sound.m_streamWaveID;
     int volume;
-    if (streamId == 5 || streamId == 1) {
-        volume = sound.m_bgmMasterVolume;
-        if (streamId == 1) {
-            volume -= (volume * 0x19) / 0x7f;
-        }
-    } else if (streamId > 0 && streamId < 7) {
+    switch (streamId) {
+    case 2:
+    case 3:
+    case 4:
+    case 6:
         volume = 0x7f;
         if (streamId == 6) {
             volume = 0x70;
         }
-    } else {
+        break;
+    case 1:
+    case 5:
+        volume = sound.m_bgmMasterVolume;
+        if (streamId == 1) {
+            volume -= (volume * 0x19) / 0x7f;
+        }
+        break;
+    default:
         volume = sound.m_seMasterVolume;
+        break;
     }
+    void* streamBuffer = sound.m_streamBuffer;
+    CRedSound* redSound = RedSound(this);
     int clampedVolume;
     if (volume < 0) {
         clampedVolume = 0;
@@ -2319,8 +2329,7 @@ void CSound::PlayStreamASync()
         clampedVolume = volume;
     }
 
-    int streamNo = StreamPlay__9CRedSoundFPviii(
-        reinterpret_cast<CRedSound*>(this), sound.m_streamBuffer, 0x20000, 0x40, clampedVolume);
+    int streamNo = StreamPlay__9CRedSoundFPviii(redSound, streamBuffer, 0x20000, 0x40, clampedVolume);
     sound.m_streamID = streamNo;
     sound.m_streamPlaying = 1;
 }

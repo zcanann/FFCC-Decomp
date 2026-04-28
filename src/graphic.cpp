@@ -1081,14 +1081,14 @@ void CGraphic::makeSphere()
 
     for (int ring = 0; ring < 5; ring++) {
         float pitch = (3.1415927f * (float)(ring + 1)) / 6.0f;
-        float x = cosf(pitch);
-        float radius = sinf(pitch);
+        float x = cos(pitch);
+        float radius = sin(pitch);
 
         for (int seg = 0; seg < 8; seg++) {
             float yaw = (6.2831855f * (float)seg) / 8.0f;
             vertices[vertexCount * 3 + 0] = x;
-            vertices[vertexCount * 3 + 1] = radius * sinf(yaw);
-            vertices[vertexCount * 3 + 2] = radius * cosf(yaw);
+            vertices[vertexCount * 3 + 1] = radius * sin(yaw);
+            vertices[vertexCount * 3 + 2] = radius * cos(yaw);
             vertexCount++;
         }
     }

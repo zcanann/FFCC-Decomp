@@ -45,21 +45,17 @@ struct pppScaleLoopAutoContext {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
-{
-    pppScaleLoopAutoStep* step = (pppScaleLoopAutoStep*)arg2;
-    pppScaleLoopAutoContext* context = (pppScaleLoopAutoContext*)arg3;
-
+void pppScaleLoopAuto(void* arg1, pppScaleLoopAutoStep* arg2, pppScaleLoopAutoContext* arg3){
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    pppScaleLoopAutoWork* work = (pppScaleLoopAutoWork*)((u8*)arg1 + context->m_serializedDataOffsets[0] + 0x80);
+    pppScaleLoopAutoWork* work = (pppScaleLoopAutoWork*)((u8*)arg1 + arg3->m_serializedDataOffsets[0] + 0x80);
 
-    if (step->m_index == *(s32*)((u8*)arg1 + 0xC)) {
-        work->m_scale[0] += step->m_addScale[0];
-        work->m_scale[1] += step->m_addScale[1];
-        work->m_scale[2] += step->m_addScale[2];
+    if (arg2->m_index == *(s32*)((u8*)arg1 + 0xC)) {
+        work->m_scale[0] += arg2->m_addScale[0];
+        work->m_scale[1] += arg2->m_addScale[1];
+        work->m_scale[2] += arg2->m_addScale[2];
     }
 
     if (work->m_initialized == 0) {
@@ -67,8 +63,8 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
         work->m_baseScale[0] = work->m_scale[0];
         work->m_baseScale[1] = work->m_scale[1];
         work->m_baseScale[2] = work->m_scale[2];
-        work->m_countA = step->m_countA;
-        work->m_countB = step->m_countB;
+        work->m_countA = arg2->m_countA;
+        work->m_countB = arg2->m_countB;
         return;
     }
 
@@ -93,20 +89,20 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
     }
 
     work->m_step++;
-    if (work->m_step > step->m_stepCount) {
+    if (work->m_step > arg2->m_stepCount) {
         work->m_step = 0;
         work->m_angle = 0;
-        work->m_countA = step->m_countA;
-        work->m_countB = step->m_countB;
+        work->m_countA = arg2->m_countA;
+        work->m_countB = arg2->m_countB;
         return;
     }
 
-    work->m_angle += 360 / (s32)step->m_stepCount;
+    work->m_angle += 360 / (s32)arg2->m_stepCount;
 
     {
         s32 tableAngle = (s32)(((f32)((s32)work->m_angle << 15)) / 180.0f);
         f32 sinVal = *(f32*)((u8*)gPppTrigTable + (tableAngle & 0xFFFC));
-        f32 delta = (step->m_amplitude * sinVal) * step->m_scale;
+        f32 delta = (arg2->m_amplitude * sinVal) * arg2->m_scale;
 
         work->m_delta = delta;
         work->m_scale[0] = work->m_baseScale[0] + delta;

@@ -1,13 +1,15 @@
 #ifndef _PPP_MATRIXSCL_H_
 #define _PPP_MATRIXSCL_H_
 
+
+#include "dolphin/types.h"
 #include "dolphin/mtx.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppMatrixScl(void* target, void* unused, void* param);
+void pppMatrixScl(f32* target, void* unused, void* param);
 
 #ifdef __cplusplus
 }

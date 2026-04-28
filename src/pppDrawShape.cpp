@@ -44,13 +44,11 @@ typedef struct ShapeSpecEntry {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawShape(void* pppShape, void* data, void* additionalData)
-{
+void pppDrawShape(void* pppShape, ShapeControlData* data, void* additionalData){
 	ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)additionalData + 0xC);
-	ShapeControlData* controlData = (ShapeControlData*)data;
 	ShapeState* shapeData = (ShapeState*)((u8*)pppShape + runtimeData->shapeDataOffset + 0x80);
 	void* posData = (u8*)pppShape + runtimeData->posDataOffset + 0x80;
-	s32 type = controlData->type;
+	s32 type = data->type;
 	if (type == 0xFFFF) {
 		return;
 	}
@@ -63,18 +61,18 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 	pppSetDrawEnv(
 		(pppCVECTOR*)((u8*)posData + 8),
 		(pppFMATRIX*)((u8*)pppShape + 0x40),
-		controlData->scale,
-		controlData->param15,
-		controlData->paramE,
-		controlData->blendMode,
+		data->scale,
+		data->param15,
+		data->paramE,
+		data->blendMode,
 		0,
 		1,
 		1,
 		0
 	);
 
-	pppSetBlendMode(controlData->blendMode);
-	pppDrawShp((tagOAN3_SHAPE*)drawShape, *(CMaterialSet**)((u8*)pppEnvStPtr + 0x4), controlData->blendMode);
+	pppSetBlendMode(data->blendMode);
+	pppDrawShp((tagOAN3_SHAPE*)drawShape, *(CMaterialSet**)((u8*)pppEnvStPtr + 0x4), data->blendMode);
 }
 
 
@@ -88,16 +86,14 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCalcShape(void* pppShape, void* data, void* additionalData)
-{
+void pppCalcShape(void* pppShape, ShapeControlData* data, void* additionalData){
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
 	ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)additionalData + 0xC);
-	ShapeControlData* controlData = (ShapeControlData*)data;
 	ShapeState* shapeData = (ShapeState*)((u8*)pppShape + runtimeData->shapeDataOffset + 0x80);
-	s32 type = controlData->type;
+	s32 type = data->type;
 	if (type == 0xFFFF) {
 		return;
 	}
@@ -107,7 +103,7 @@ void pppCalcShape(void* pppShape, void* data, void* additionalData)
 	ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
 
 	shapeData->currentId = shapeData->counter;
-	shapeData->value = (u16)(shapeData->value + controlData->step);
+	shapeData->value = (u16)(shapeData->value + data->step);
 	s32 value = shapeData->value;
 	s32 maxValue = shape->maxValue;
 	if (value < maxValue) {

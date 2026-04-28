@@ -1,4 +1,5 @@
 #include "ffcc/pppColor.h"
+#include "ffcc/partMng.h"
 #include "types.h"
 #include "ffcc/ppp_linkage.h"
 
@@ -11,15 +12,8 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppColorCon(void* param1, void* param2)
-{
-    struct PppColorOffsets {
-        u8 pad[0xC];
-        s32* m_serializedDataOffsets;
-    };
-
-    PppColorOffsets* offsets = (PppColorOffsets*)param2;
-    _pppColorWork* work = (_pppColorWork*)((u8*)param1 + offsets->m_serializedDataOffsets[0] + 0x80);
+void pppColorCon(void* param1, _pppCtrlTable* param2){
+    _pppColorWork* work = (_pppColorWork*)((u8*)param1 + param2->m_serializedDataOffsets[0] + 0x80);
     
     work->a = 0;
     work->b = 0;
@@ -36,15 +30,8 @@ void pppColorCon(void* param1, void* param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppColor(void* param1, void* param2, void* param3)
-{
-    struct PppColorOffsets {
-        u8 pad[0xC];
-        s32* m_serializedDataOffsets;
-    };
-
-    PppColorOffsets* offsets = (PppColorOffsets*)param3;
-    _pppColorWork* work = (_pppColorWork*)((u8*)param1 + offsets->m_serializedDataOffsets[0] + 0x80);
+void pppColor(void* param1, void* param2, _pppCtrlTable* param3){
+    _pppColorWork* work = (_pppColorWork*)((u8*)param1 + param3->m_serializedDataOffsets[0] + 0x80);
 
     if (gPppCalcDisabled != 0) {
         return;

@@ -24,7 +24,7 @@ struct RandUpCharParam {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandUpChar(void* basePtr, RandUpCharParam* in, _pppCtrlTable* ctrl)
+extern "C" void pppRandUpChar(_pppPObject* basePtr, RandUpCharParam* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     u8* target;
@@ -43,13 +43,13 @@ extern "C" void pppRandUpChar(void* basePtr, RandUpCharParam* in, _pppCtrlTable*
             value = mixed * scale;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
         if (in->targetId != state) {
             return;
         }
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     target = (in->sourceOffset == -1) ? gPppDefaultValueBuffer : (u8*)(base + in->sourceOffset + 0x80);

@@ -1,4 +1,5 @@
 #include "ffcc/pppRyjMegaBirthModel.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "ffcc/pppPart.h"
 #include <string.h>
@@ -222,7 +223,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
     float posZ;
     bool hasRequiredMemory;
     s32 colorOffset = offsets->m_serializedDataOffsets[1];
-    u8* work = (u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2];
+    u8* work = pObject->m_workArea + offsets->m_serializedDataOffsets[2];
     u8* payload = (u8*)params;
 
     if (*(void**)(work + 0xC) == 0) {
@@ -817,7 +818,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* c
 {
     PRyjMegaBirthModel* params = (PRyjMegaBirthModel*)stepData;
     VRyjMegaBirthModel* work =
-        (VRyjMegaBirthModel*)((u8*)obj + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
+        (VRyjMegaBirthModel*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
     int modelIndex = *(int*)((u8*)params + 4);
 
     if (modelIndex == 0xFFFF || work->m_particleBlock == NULL) {
@@ -1048,7 +1049,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
  */
 void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
 {
-    u8* work = (u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2];
+    u8* work = pObject->m_workArea + offsets->m_serializedDataOffsets[2];
     float value1;
     float value0;
 
@@ -1080,7 +1081,7 @@ void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* of
  */
 void pppRyjMegaBirthModelDes(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
 {
-    u8* work = (u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2];
+    u8* work = pObject->m_workArea + offsets->m_serializedDataOffsets[2];
 
     if (*(void**)(work + 0xC) != 0) {
         pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0xC));

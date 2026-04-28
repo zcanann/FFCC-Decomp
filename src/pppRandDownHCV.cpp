@@ -26,7 +26,7 @@ struct PppRandDownHCVParam2 {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandDownHCV(void* basePtr, PppRandDownHCVParam2* in, _pppCtrlTable* ctrl)
+extern "C" void pppRandDownHCV(_pppPObject* basePtr, PppRandDownHCVParam2* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     s16* target;
@@ -45,12 +45,12 @@ extern "C" void pppRandDownHCV(void* basePtr, PppRandDownHCVParam2* in, _pppCtrl
             value = blend * scale;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else if (in->field0 != *(s32*)(base + 0xC)) {
         return;
     } else {
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     target = (in->field4 == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->field4 + 0x80);

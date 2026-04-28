@@ -2,6 +2,8 @@
 #define _PPP_SRANDUPFV_H_
 
 
+
+struct _pppPObject;
 struct _pppCtrlTable;
 struct PppSRandUpFVParam2;
 #ifdef __cplusplus
@@ -10,7 +12,7 @@ extern "C" {
 
 void randfloat(float, float);
 void randf(unsigned char);
-void pppSRandUpFV(void* basePtr, struct PppSRandUpFVParam2* in, struct _pppCtrlTable* ctrl);
+void pppSRandUpFV(struct _pppPObject* basePtr, struct PppSRandUpFVParam2* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

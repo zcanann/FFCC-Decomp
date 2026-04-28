@@ -12,8 +12,8 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppColorCon(void* param1, _pppCtrlTable* param2){
-    _pppColorWork* work = (_pppColorWork*)((u8*)param1 + param2->m_serializedDataOffsets[0] + 0x80);
+void pppColorCon(_pppPObject* param1, _pppCtrlTable* param2){
+    _pppColorWork* work = (_pppColorWork*)(param1->m_workArea + param2->m_serializedDataOffsets[0]);
     
     work->a = 0;
     work->b = 0;
@@ -30,8 +30,8 @@ void pppColorCon(void* param1, _pppCtrlTable* param2){
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppColor(void* param1, void* param2, _pppCtrlTable* param3){
-    _pppColorWork* work = (_pppColorWork*)((u8*)param1 + param3->m_serializedDataOffsets[0] + 0x80);
+void pppColor(_pppPObject* param1, void* param2, _pppCtrlTable* param3){
+    _pppColorWork* work = (_pppColorWork*)(param1->m_workArea + param3->m_serializedDataOffsets[0]);
 
     if (gPppCalcDisabled != 0) {
         return;

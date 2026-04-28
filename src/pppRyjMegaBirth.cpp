@@ -1,4 +1,5 @@
 #include "ffcc/pppRyjMegaBirth.h"
+#include "ffcc/partMng.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/math.h"
 #include "ffcc/pppPart.h"
@@ -689,7 +690,7 @@ static inline void set_matrix(
 void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
 {
 	PRyjMegaBirth* params = (PRyjMegaBirth*)stepData;
-	VRyjMegaBirth* work = (VRyjMegaBirth*)((u8*)obj + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
+	VRyjMegaBirth* work = (VRyjMegaBirth*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 	u8* payload = (u8*)params;
 	int dataValIndex = *(int*)(payload + 4);
 
@@ -755,7 +756,7 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
  */
 void pppRyjMegaBirthCon(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 {
-	VRyjMegaBirth* work = (VRyjMegaBirth*)((u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2]);
+	VRyjMegaBirth* work = (VRyjMegaBirth*)(pObject->m_workArea + offsets->m_serializedDataOffsets[2]);
 	float zero;
 
 	PSMTXIdentity(work->m_worldMatrix);
@@ -785,7 +786,7 @@ void pppRyjMegaBirthCon(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
  */
 void pppRyjMegaBirthDes(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 {
-	u8* work = (u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2];
+	u8* work = pObject->m_workArea + offsets->m_serializedDataOffsets[2];
 
 	if (*(void**)(work + 0x3C) != 0)
 	{

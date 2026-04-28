@@ -25,7 +25,7 @@ typedef struct RandCVParams {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandCV(void* basePtr, RandCVParams* in, _pppCtrlTable* ctrl)
+void pppRandCV(_pppPObject* basePtr, RandCVParams* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     f32* valuePtr;
@@ -42,12 +42,12 @@ void pppRandCV(void* basePtr, RandCVParams* in, _pppCtrlTable* ctrl)
             value *= kPppRandCVSingleSampleScale;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else if (in->index != *(s32*)(base + 0xC)) {
         return;
     } else {
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     u8* targetColor;

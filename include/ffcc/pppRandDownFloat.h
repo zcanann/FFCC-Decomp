@@ -1,11 +1,13 @@
 #ifndef _PPP_RANDDOWNFLOAT_H_
 #define _PPP_RANDDOWNFLOAT_H_
 
+
+struct _pppPObject;
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppRandDownFloat(void* basePtr, struct RandDownFloatParam* in, struct _pppCtrlTable* ctrl);
+void pppRandDownFloat(struct _pppPObject* basePtr, struct RandDownFloatParam* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

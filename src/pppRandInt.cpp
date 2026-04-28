@@ -26,7 +26,7 @@ struct PppRandIntParam2 {
     u8 fieldC;
 };
 
-void pppRandInt(void* basePtr, PppRandIntParam2* in, _pppCtrlTable* ctrl)
+void pppRandInt(_pppPObject* basePtr, PppRandIntParam2* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     f32* valuePtr;
@@ -44,14 +44,14 @@ void pppRandInt(void* basePtr, PppRandIntParam2* in, _pppCtrlTable* ctrl)
             value *= kPppRandIntSingleSampleScale;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
         if (in->field0 != baseState) {
             return;
         }
 
-        valuePtr = (f32*)(base + *ctrl->m_serializedDataOffsets + 0x80);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
     s32* target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);

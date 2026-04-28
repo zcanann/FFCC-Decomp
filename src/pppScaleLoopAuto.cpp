@@ -1,4 +1,5 @@
 #include "ffcc/pppScaleLoopAuto.h"
+#include "ffcc/partMng.h"
 #include "ffcc/ppp_constants.h"
 #include <dolphin/types.h>
 #include "ffcc/ppp_linkage.h"
@@ -45,12 +46,12 @@ struct pppScaleLoopAutoContext {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppScaleLoopAuto(void* arg1, pppScaleLoopAutoStep* arg2, pppScaleLoopAutoContext* arg3){
+void pppScaleLoopAuto(_pppPObject* arg1, pppScaleLoopAutoStep* arg2, pppScaleLoopAutoContext* arg3){
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    pppScaleLoopAutoWork* work = (pppScaleLoopAutoWork*)((u8*)arg1 + arg3->m_serializedDataOffsets[0] + 0x80);
+    pppScaleLoopAutoWork* work = (pppScaleLoopAutoWork*)(arg1->m_workArea + arg3->m_serializedDataOffsets[0]);
 
     if (arg2->m_index == *(s32*)((u8*)arg1 + 0xC)) {
         work->m_scale[0] += arg2->m_addScale[0];

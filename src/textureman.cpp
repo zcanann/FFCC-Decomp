@@ -73,7 +73,7 @@ static const char s_ptrarray_grow_error_801D79D8[] = "CPtrArray grow error";
 static const char s_collection_ptrarray_h_801D79F4[] = "collection_ptrarray.h";
 static const char s_textureman_cpp[] = "textureman.cpp";
 static const char s_error_width_height[] = "Error width %d, height %d\n";
-static const char s_texture_stage_name[] = "CTexture.texture";
+static const char s_CTexture_texture_801D79A0[] = "CTexture.texture";
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -419,7 +419,7 @@ CTexture* CPtrArray<CTexture*>::GetAt(unsigned long index)
  */
 void CTextureMan::Init()
 {
-	m_memoryStage = Memory.CreateStage(0x40000, const_cast<char*>(s_texture_stage_name), 0);
+	m_memoryStage = Memory.CreateStage(0x40000, const_cast<char*>(s_CTexture_texture_801D79A0), 0);
 }
 
 /*

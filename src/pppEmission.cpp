@@ -380,17 +380,16 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
         Mtx texMtx1;
 
         if (step->m_payload[9] == 0) {
-            for (int i = 0; i < step->m_initWOrk; i++) {
-                float scale = FLOAT_803311e4;
-                scale += (float)i * state->m_scale0;
+            for (u32 i = 0; (int)i < step->m_initWOrk; i++) {
+                float scale = (float)i * state->m_scale0 + FLOAT_803311e4;
                 PSMTXScale(objMtx0, scale, scale, scale);
                 PSMTXConcat(param_5, objMtx0, objMtx0);
                 PSMTXCopy(CameraMatrix(), viewMtx0);
                 SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx0, objMtx0);
 
-                int remaining = meshData->m_displayListCount - 1;
+                u32 displayListCount = meshData->m_displayListCount;
                 EmissionDisplayList* displayList = meshData->m_displayLists;
-                while (remaining >= 0) {
+                while (displayListCount = displayListCount - 1, -1 < (int)displayListCount) {
                     *(int*)(MaterialManRaw() + 0x48) = drawTevBits;
                     *(int*)(MaterialManRaw() + 0x128) = 0;
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
@@ -428,7 +427,6 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     GXSetArray((GXAttr)0xB, &state->m_colorR, 4);
                     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
                     GXCallDisplayList(displayList->m_data, displayList->m_size);
-                    remaining--;
                     displayList++;
                 }
             }
@@ -442,9 +440,9 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 PSMTXConcat(viewMtx1, objMtx1, objMtx1);
                 GXLoadPosMtxImm(objMtx1, 0);
 
-                int remaining = meshData->m_displayListCount - 1;
+                u32 displayListCount = meshData->m_displayListCount;
                 EmissionDisplayList* displayList = meshData->m_displayLists;
-                while (remaining >= 0) {
+                while (displayListCount = displayListCount - 1, -1 < (int)displayListCount) {
                     *(int*)(MaterialManRaw() + 0x48) = drawTevBits;
                     *(int*)(MaterialManRaw() + 0x128) = 0;
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
@@ -482,7 +480,6 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     GXSetArray((GXAttr)0xB, &particle->m_colorR, 4);
                     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
                     GXCallDisplayList(displayList->m_data, displayList->m_size);
-                    remaining--;
                     displayList++;
                 }
                 particle++;

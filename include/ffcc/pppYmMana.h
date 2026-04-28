@@ -21,8 +21,6 @@ void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int);
 void Chara_DrawShadowMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 void Mana_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 void Mana_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
-void GXSetViewportv(void);
-void MakeWave(Vec*, unsigned short*, float*, Vec&, float, float);
 void CalcReflectionVector2(Vec*, S16Vec*, S16Vec*, long, unsigned long, unsigned long, float (*)[4], void*, unsigned long, _GXColor*, S16Vec2d*, S16Vec2d*, CChara::CNode*, PYmMana*, VYmMana*);
 
 #ifdef __cplusplus

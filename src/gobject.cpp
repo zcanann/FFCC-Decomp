@@ -300,11 +300,9 @@ void CGObject::onCreate()
     m_animStateMisc = 0xFF;
     *((u8*)&m_weaponNodeFlags + 1) &= 0x7F;
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xBF) | 0x40;
-    *((u8*)&m_weaponNodeFlags + 1) &= 0xDF;
 
     m_moveBaseSpeed = sDefaultMoveBaseSpeed;
     m_currentAnimSlot = -1;
-    m_animSlotSel = -1;
 
     m_bodyEllipsoidRadius = sStepProbeHeight;
     m_bodyEllipsoidOffset = 0.0f;
@@ -316,13 +314,10 @@ void CGObject::onCreate()
     m_nearColRadius = sJumpLift;
     m_bgColMask = 0;
 
+    *((u8*)&m_weaponNodeFlags + 1) &= 0xDF;
     *((u8*)&m_weaponNodeFlags) = (*((u8*)&m_weaponNodeFlags) & 0xEF) | 0x10;
     *((u8*)&m_weaponNodeFlags) &= 0xF7;
     *((u8*)&m_weaponNodeFlags) = (*((u8*)&m_weaponNodeFlags) & 0xFB) | 4;
-    *((u8*)&m_weaponNodeFlags) &= 0xFE;
-    *((u8*)&m_weaponNodeFlags) = (*((u8*)&m_weaponNodeFlags) & 0xDF) | 0x20;
-    *((u8*)&m_weaponNodeFlags) &= 0xBF;
-    *((u8*)&m_weaponNodeFlags) &= 0x7F;
 
     m_objectFlags = 1;
     m_displayFlags = 3;
@@ -336,23 +331,21 @@ void CGObject::onCreate()
 
     unk_0x184 = 0.0f;
     unk_0x188 = 0.0f;
-    m_moveVec.x = -NAN;
+    *reinterpret_cast<s32*>(&m_moveVec.x) = -1;
+    *((u8*)&m_weaponNodeFlags) &= 0xFE;
+    *((u8*)&m_weaponNodeFlags) = (*((u8*)&m_weaponNodeFlags) & 0xDF) | 0x20;
+    *((u8*)&m_weaponNodeFlags) &= 0xBF;
+    m_animSlotSel = -1;
     m_turnSpeed = 0.0f;
     m_pushParamA = 0;
     m_pushParamB = 0;
 
     *((u8*)&m_shieldNodeFlags) &= 0xBF;
-    *((u8*)&m_shieldNodeFlags) &= 0xDF;
-    *((u8*)&m_shieldNodeFlags) &= 0xEF;
-    *((u8*)&m_shieldNodeFlags) &= 0x7F;
-    *((u8*)&m_shieldNodeFlags) &= 0xF7;
-    *((u8*)&m_shieldNodeFlags) &= 0xFB;
-    *((u8*)&m_shieldNodeFlags) &= 0xFE;
-
     m_frontHitAngle = sDefaultFrontHitAngle;
     m_lookAtTarget = 0;
     m_stepSlopeLimit = 1.0f;
     m_lookAtTimer = 1.0f;
+    *((u8*)&m_shieldNodeFlags) &= 0xDF;
     m_animBlend = 1.0f;
     m_bgAttrValue = 1.0f;
     m_bounceFactor = 1.0f;
@@ -360,16 +353,18 @@ void CGObject::onCreate()
     m_jumpLandingDampening = 0.0f;
 
     m_stateFlags0 &= 0xEF;
-    m_stateFlags0 &= 0xF7;
-    m_stateFlags0 &= 0x7F;
 
     m_bgCollisionQtrn.x = 0.0f;
     m_bgCollisionQtrn.y = 0.0f;
     m_bgCollisionQtrn.z = 0.0f;
     m_bgCollisionQtrn.w = 1.0f;
 
+    *((u8*)&m_shieldNodeFlags) &= 0xEF;
     m_dispItemTimer = 0;
+    *((u8*)&m_shieldNodeFlags) &= 0x7F;
     *reinterpret_cast<float*>(m_lastBgAttr) = 1.0f;
+    *((u8*)&m_shieldNodeFlags) &= 0xF7;
+    *((u8*)&m_shieldNodeFlags) &= 0xFB;
     m_collisionPushTimerMax = 0x32;
 
     m_radiusCtrl.x = 0.0f;
@@ -384,7 +379,9 @@ void CGObject::onCreate()
     m_moveAnimSubState = 0;
     m_randSeedLo = 0;
     m_randSeedHi = 0;
+    m_stateFlags0 &= 0xF7;
     m_ownerSlot = 0;
+    m_stateFlags0 &= 0x7F;
     m_moveMode = 0;
     m_moveModePrevious = 4;
 
@@ -405,15 +402,52 @@ void CGObject::onCreate()
     m_shieldAttachNodeIndex = -1;
     m_lastMapIdHit = 0;
     m_lastMapIdExtra = 0;
+    *((u8*)&m_weaponNodeFlags) &= 0x7F;
     m_extraMoveVec.x = 0.0f;
     m_extraMoveVec.y = 0.0f;
     m_extraMoveVec.z = 0.0f;
+    *((u8*)&m_shieldNodeFlags) &= 0xFE;
 
-    for (int i = 0; i < 4; i++) {
-        m_animQueue[i] = -1;
+    int animStateOffset = 0;
+    for (int i = 0; i < 2; i++) {
+        s8* animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x41;
+        animState[0] = -1;
+        animState[1] = -1;
+        animState[2] = -1;
+        animState[3] = -1;
+        animState[4] = 0xFF;
+        animState[5] = -1;
+        animState[6] = -1;
+        animState[7] = 0xFF;
+        animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x39;
+        animState[0] = -1;
+        animState[1] = -1;
+        animState[2] = -1;
+        animState[3] = -1;
+        animState[4] = 0xFF;
+        animState[5] = -1;
+        animState[6] = -1;
+        animState[7] = 0xFF;
+        animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x31;
+        animState[0] = -1;
+        animState[1] = -1;
+        animState[2] = -1;
+        animState[3] = -1;
+        animState[4] = 0xFF;
+        animState[5] = -1;
+        animState[6] = -1;
+        animState[7] = 0xFF;
+        animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x29;
+        animStateOffset += 0x20;
+        animState[0] = -1;
+        animState[1] = -1;
+        animState[2] = -1;
+        animState[3] = -1;
+        animState[4] = 0xFF;
+        animState[5] = -1;
+        animState[6] = -1;
+        animState[7] = 0xFF;
     }
-    m_animQueueFlags = 0xFF;
-    m_animQueuePos = 0xFF;
 
     memset(&m_attackColliders[0].m_localStart.y, 0, 0x180);
     memset(&m_damageColliders[0].m_localPosition.y, 0, 0x140);

@@ -492,7 +492,8 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned char* paramBytes = reinterpret_cast<unsigned char*>(param);
-    unsigned char* gbaContext = self + (paramBytes[0xBC] * 0x60) + 0x16AC;
+    int channel = static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC));
+    unsigned char* gbaContext = self + (channel * 0x60) + 0x16AC;
 
     memset(gbaContext, 0, 0x60);
     if (initMode == 0)
@@ -523,23 +524,12 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
     gbaContext[0x22] = 0xFF;
     gbaContext[0x23] = 0xFF;
 
-    if (Game.m_partyObjArr[0] == 0)
-    {
-        gbaContext[0x14] = 5;
-        gbaContext[0x15] = 0x11;
-        gbaContext[0x16] = 0x1E;
-        gbaContext[0x17] = 0x2A;
-        gbaContext[0x18] = 0x37;
-        gbaContext[0x19] = 0x43;
-        gbaContext[0x1A] = 0x50;
-        gbaContext[0x1B] = 0x5C;
-    }
-    else
+    if (Game.m_partyObjArr[0] != 0)
     {
         for (int i = 0; i < 8; i++)
         {
             int foodLevel = 0;
-            if (Game.m_gameWork.m_menuStageMode == 0)
+            if (Game.m_gameWork.m_menuStageMode != 0)
             {
                 foodLevel = Game.GetFoodLevel(0, i);
             }
@@ -560,6 +550,17 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
             gbaContext[i + 0x14] = static_cast<unsigned char>(foodLevel);
         }
     }
+    else
+    {
+        gbaContext[0x14] = 5;
+        gbaContext[0x15] = 0x11;
+        gbaContext[0x16] = 0x1E;
+        gbaContext[0x17] = 0x2A;
+        gbaContext[0x18] = 0x37;
+        gbaContext[0x19] = 0x43;
+        gbaContext[0x1A] = 0x50;
+        gbaContext[0x1B] = 0x5C;
+    }
 
     gbaContext[0x24] = 0xFF;
     gbaContext[0x25] = 0xFF;
@@ -578,29 +579,18 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
     gbaContext[0x32] = 0xFF;
     gbaContext[0x33] = 0xFF;
 
-    if (Game.m_partyObjArr[1] == 0)
-    {
-        gbaContext[0x24] = 5;
-        gbaContext[0x25] = 0x11;
-        gbaContext[0x26] = 0x1E;
-        gbaContext[0x27] = 0x2A;
-        gbaContext[0x28] = 0x37;
-        gbaContext[0x29] = 0x43;
-        gbaContext[0x2A] = 0x50;
-        gbaContext[0x2B] = 0x5C;
-    }
-    else
+    if (Game.m_partyObjArr[1] != 0)
     {
         for (int i = 0; i < 8; i++)
         {
             int foodLevel = 0;
-            if (Game.m_gameWork.m_menuStageMode == 0)
+            if (Game.m_gameWork.m_menuStageMode != 0)
             {
-                foodLevel = Game.GetFoodLevel(1, i);
+                foodLevel = Game.GetFoodLevel(0, i);
             }
             else
             {
-                foodLevel = Game.GetFoodLevel(0, i);
+                foodLevel = Game.GetFoodLevel(1, i);
             }
 
             if (foodLevel < 1)
@@ -614,6 +604,17 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
 
             gbaContext[i + 0x24] = static_cast<unsigned char>(foodLevel);
         }
+    }
+    else
+    {
+        gbaContext[0x24] = 5;
+        gbaContext[0x25] = 0x11;
+        gbaContext[0x26] = 0x1E;
+        gbaContext[0x27] = 0x2A;
+        gbaContext[0x28] = 0x37;
+        gbaContext[0x29] = 0x43;
+        gbaContext[0x2A] = 0x50;
+        gbaContext[0x2B] = 0x5C;
     }
 
     gbaContext[0x34] = 0xFF;
@@ -633,29 +634,18 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
     gbaContext[0x42] = 0xFF;
     gbaContext[0x43] = 0xFF;
 
-    if (Game.m_partyObjArr[2] == 0)
-    {
-        gbaContext[0x34] = 5;
-        gbaContext[0x35] = 0x11;
-        gbaContext[0x36] = 0x1E;
-        gbaContext[0x37] = 0x2A;
-        gbaContext[0x38] = 0x37;
-        gbaContext[0x39] = 0x43;
-        gbaContext[0x3A] = 0x50;
-        gbaContext[0x3B] = 0x5C;
-    }
-    else
+    if (Game.m_partyObjArr[2] != 0)
     {
         for (int i = 0; i < 8; i++)
         {
             int foodLevel = 0;
-            if (Game.m_gameWork.m_menuStageMode == 0)
+            if (Game.m_gameWork.m_menuStageMode != 0)
             {
-                foodLevel = Game.GetFoodLevel(2, i);
+                foodLevel = Game.GetFoodLevel(0, i);
             }
             else
             {
-                foodLevel = Game.GetFoodLevel(0, i);
+                foodLevel = Game.GetFoodLevel(2, i);
             }
 
             if (foodLevel < 1)
@@ -669,6 +659,17 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
 
             gbaContext[i + 0x34] = static_cast<unsigned char>(foodLevel);
         }
+    }
+    else
+    {
+        gbaContext[0x34] = 5;
+        gbaContext[0x35] = 0x11;
+        gbaContext[0x36] = 0x1E;
+        gbaContext[0x37] = 0x2A;
+        gbaContext[0x38] = 0x37;
+        gbaContext[0x39] = 0x43;
+        gbaContext[0x3A] = 0x50;
+        gbaContext[0x3B] = 0x5C;
     }
 
     gbaContext[0x44] = 0xFF;
@@ -688,29 +689,18 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
     gbaContext[0x52] = 0xFF;
     gbaContext[0x53] = 0xFF;
 
-    if (Game.m_partyObjArr[3] == 0)
-    {
-        gbaContext[0x44] = 5;
-        gbaContext[0x45] = 0x11;
-        gbaContext[0x46] = 0x1E;
-        gbaContext[0x47] = 0x2A;
-        gbaContext[0x48] = 0x37;
-        gbaContext[0x49] = 0x43;
-        gbaContext[0x4A] = 0x50;
-        gbaContext[0x4B] = 0x5C;
-    }
-    else
+    if (Game.m_partyObjArr[3] != 0)
     {
         for (int i = 0; i < 8; i++)
         {
             int foodLevel = 0;
-            if (Game.m_gameWork.m_menuStageMode == 0)
+            if (Game.m_gameWork.m_menuStageMode != 0)
             {
-                foodLevel = Game.GetFoodLevel(3, i);
+                foodLevel = Game.GetFoodLevel(0, i);
             }
             else
             {
-                foodLevel = Game.GetFoodLevel(0, i);
+                foodLevel = Game.GetFoodLevel(3, i);
             }
 
             if (foodLevel < 1)
@@ -724,6 +714,17 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
 
             gbaContext[i + 0x44] = static_cast<unsigned char>(foodLevel);
         }
+    }
+    else
+    {
+        gbaContext[0x44] = 5;
+        gbaContext[0x45] = 0x11;
+        gbaContext[0x46] = 0x1E;
+        gbaContext[0x47] = 0x2A;
+        gbaContext[0x48] = 0x37;
+        gbaContext[0x49] = 0x43;
+        gbaContext[0x4A] = 0x50;
+        gbaContext[0x4B] = 0x5C;
     }
 }
 
@@ -1350,7 +1351,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned char* paramBytes = reinterpret_cast<unsigned char*>(context);
-    int channel = static_cast<int>(paramBytes[0xBC]);
+    int channel = static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC));
     int stateOffset = channel * 0x60;
     bool doWrite = true;
     bool wasResync = false;
@@ -1785,15 +1786,16 @@ void CMiniGamePcs::MngThreadMain(void*)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     int managerStackOffset = 0x1000;
+    unsigned char* threadParam = self + 0x138C;
+    unsigned char* threadState = self + 0x1830;
+    unsigned char* spMode = Game.m_gameWork.m_spModeFlags;
 
-    for (int i = 0; i < 4; i++)
+    int i = 0;
+    do
     {
-        unsigned char* threadParam = self + 0x138C + i * 200;
-        unsigned char* threadState = self + 0x1830 + i * 0x318;
-
         unsigned int imageSize = *reinterpret_cast<unsigned int*>(self + 0x1358);
         void* imageBase = *reinterpret_cast<void**>(self + 0x1354);
-        if (self[0x1344 + i] != 0)
+        if (*spMode != 0)
         {
             imageSize = *reinterpret_cast<unsigned int*>(self + 0x1360);
             imageBase = *reinterpret_cast<void**>(self + 0x135C);
@@ -1816,7 +1818,11 @@ void CMiniGamePcs::MngThreadMain(void*)
         OSResumeThread(reinterpret_cast<OSThread*>(threadState));
 
         managerStackOffset += 0x1000;
-    }
+        threadParam += 200;
+        threadState += 0x318;
+        spMode++;
+        i++;
+    } while (i < 4);
 
     OSTime startTime = OSGetTime();
     unsigned int loopCounter = 0;

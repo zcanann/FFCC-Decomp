@@ -880,8 +880,7 @@ void CMapPcs::drawAfter()
             if ((*reinterpret_cast<u32*>(CFlat + 0x129C) & 0x02000000) != 0) {
                 CBoundHack bound;
                 bound = *reinterpret_cast<CBoundHack*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
-                CColor debugColor(0xFF, 0xFF, 0x80, 0xFF);
-                DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, debugColor.color);
+                DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, CColor(0xFF, 0xFF, 0x80, 0xFF).color);
             }
         }
     }
@@ -934,8 +933,7 @@ void CMapPcs::drawAfterViewer()
             if ((*reinterpret_cast<u32*>(CFlat + 0x129C) & 0x02000000) != 0) {
                 CBoundHack bound;
                 bound = *reinterpret_cast<CBoundHack*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
-                CColor debugColor(0xFF, 0xFF, 0x80, 0xFF);
-                DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, debugColor.color);
+                DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, CColor(0xFF, 0xFF, 0x80, 0xFF).color);
             }
         }
     }

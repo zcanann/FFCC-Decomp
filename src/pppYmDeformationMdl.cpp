@@ -52,7 +52,7 @@ extern float FLOAT_80330D9C;
 extern float FLOAT_80330DA0;
 extern float FLOAT_80330DA4;
 extern float FLOAT_80330DA8;
-extern const float FLOAT_80330dac = 0.0f;
+extern float FLOAT_80330dac = 0.0f;
 
 static inline Mtx& CameraMatrix()
 {
@@ -62,6 +62,11 @@ static inline Mtx& CameraMatrix()
 static inline Mtx44& CameraScreenMatrix()
 {
     return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
+}
+
+static inline float DeformationMdlZero()
+{
+    return *reinterpret_cast<const float*>(&FLOAT_80330dac);
 }
 
 void pppInitBlendMode(void);
@@ -300,10 +305,10 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, pppYmDeformationMdlUnkC*)
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
 {
-    float value = 0.0f;
+    float value = DeformationMdlZero();
     float* state = (float*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-    state[3] = 0.0f;
+    state[3] = value;
     state[2] = value;
     state[1] = value;
     state[6] = value;
@@ -324,7 +329,7 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
 {
     u8 direction = 1;
     u16* puVar2 = (u16*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-    float fVar1 = 0.0f;
+    float fVar1 = DeformationMdlZero();
 
     *puVar2 = 0;
     *(u8*)(puVar2 + 1) = direction;

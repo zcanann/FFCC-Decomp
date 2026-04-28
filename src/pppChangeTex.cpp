@@ -33,7 +33,9 @@ struct ChangeTexDisplayList {
 };
 
 struct ChangeTexMeshData {
-	u8 _pad0[0x20];
+	u8 _pad0[0x14];
+	u32 m_vertexCount;
+	u8 _pad18[0x8];
 	void* m_normals;
 	u8 _pad1[0x28];
 	s32 m_displayListCount;
@@ -43,7 +45,35 @@ struct ChangeTexMeshData {
 struct ChangeTexMeshRef {
 	u8 _pad0[0x8];
 	ChangeTexMeshData* m_data;
-	u8 _padC[0x14 - 0xC];
+	s16* m_points;
+	u8 _pad10[0x14 - 0x10];
+};
+
+struct ChangeTexWork;
+
+struct ChangeTexModelData {
+	u8 _pad0[0xC];
+	u32 m_meshCount;
+	u8 _pad10[0x14];
+	CMaterialSet* m_materialSet;
+	u8 _pad28[0xC];
+	s32 m_frameShift;
+};
+
+struct ChangeTexModelRaw {
+	u8 _pad0[0x68];
+	Mtx m_matrix;
+	u8 _pad98[0xC];
+	ChangeTexModelData* m_data;
+	u8 _padA8[0x4];
+	ChangeTexMeshRef* m_meshes;
+	u8 _padB0[0x34];
+	ChangeTexWork* m_work;
+	pppChangeTexUnkB* m_step;
+	u8 _padEC[0x10];
+	void (*m_drawMeshDlCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+	u8 _pad100[0x4];
+	void (*m_afterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
 };
 
 struct ChangeTexWork {
@@ -62,6 +92,21 @@ struct ChangeTexWork {
 	Vec m_bboxMax;
 	float m_cachedValue;
 };
+
+STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
+STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
+STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
+STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayLists) == 0x50);
+STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_points) == 0xC);
+STATIC_ASSERT(offsetof(ChangeTexModelData, m_meshCount) == 0xC);
+STATIC_ASSERT(offsetof(ChangeTexModelData, m_materialSet) == 0x24);
+STATIC_ASSERT(offsetof(ChangeTexModelData, m_frameShift) == 0x34);
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_data) == 0xA4);
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_meshes) == 0xAC);
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_work) == 0xE4);
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_step) == 0xE8);
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_drawMeshDlCallback) == 0xFC);
+STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_afterDrawMeshCallback) == 0x104);
 
 extern const float FLOAT_80332020 = -10000.0f;
 extern const char DAT_80332024[] = "obj";

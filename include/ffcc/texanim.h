@@ -3,12 +3,7 @@
 
 #include "ffcc/memory.h"
 #include "ffcc/ref.h"
-
-#define FFCC_PTRARRAY_RELEASE_AND_REMOVE_ALL
-#define FFCC_PTRARRAY_DECL_ONLY
 #include "ffcc/ptrarray.h"
-#undef FFCC_PTRARRAY_DECL_ONLY
-#undef FFCC_PTRARRAY_RELEASE_AND_REMOVE_ALL
 
 class CMaterialSet;
 class CMaterial;

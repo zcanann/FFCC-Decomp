@@ -404,7 +404,7 @@ extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*
 }
 
 template <>
-bool CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize);
+int CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize);
 
 /*
  * --INFO--
@@ -416,14 +416,14 @@ bool CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize);
  * JP Size: TODO
  */
 template <>
-bool CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
+int CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
 {
-    bool success = setSize(m_numItems + 1);
-    if (success) {
-        m_items[m_numItems] = item;
-        m_numItems++;
+    if (setSize(m_numItems + 1) == 0) {
+        return 0;
     }
-    return success;
+    m_items[m_numItems] = item;
+    m_numItems++;
+    return 1;
 }
 
 /*
@@ -467,7 +467,7 @@ void CPtrArray<CMapLightHolder*>::SetStage(CMemory::CStage* stage)
  * JP Size: TODO
  */
 template <>
-bool CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize)
+int CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize)
 {
     CMapLightHolder** newItems;
 
@@ -484,7 +484,7 @@ bool CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize)
         newItems = (CMapLightHolder**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, m_size << 2, m_stage, const_cast<char*>(s_map_collection_ptrarray_h), 0xFA, 0);
         if (newItems == 0) {
-            return false;
+            return 0;
         }
 
         if (m_items != 0) {
@@ -498,11 +498,11 @@ bool CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize)
         m_items = newItems;
     }
 
-    return true;
+    return 1;
 }
 
 template <>
-bool CPtrArray<CMapAnim*>::setSize(unsigned long newSize);
+int CPtrArray<CMapAnim*>::setSize(unsigned long newSize);
 
 /*
  * --INFO--
@@ -514,14 +514,14 @@ bool CPtrArray<CMapAnim*>::setSize(unsigned long newSize);
  * JP Size: TODO
  */
 template <>
-bool CPtrArray<CMapAnim*>::Add(CMapAnim* item)
+int CPtrArray<CMapAnim*>::Add(CMapAnim* item)
 {
-    bool success = setSize(m_numItems + 1);
-    if (success) {
-        m_items[m_numItems] = item;
-        m_numItems++;
+    if (setSize(m_numItems + 1) == 0) {
+        return 0;
     }
-    return success;
+    m_items[m_numItems] = item;
+    m_numItems++;
+    return 1;
 }
 
 /*
@@ -726,7 +726,7 @@ void CPtrArray<CMapAnim*>::SetStage(CMemory::CStage* stage)
  * JP Size: TODO
  */
 template <>
-bool CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
+int CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
 {
     CMapAnim** newItems;
 
@@ -743,7 +743,7 @@ bool CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
         newItems = (CMapAnim**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, m_size << 2, m_stage, const_cast<char*>(s_map_collection_ptrarray_h), 0xFA, 0);
         if (newItems == 0) {
-            return false;
+            return 0;
         }
 
         if (m_items != 0) {
@@ -757,7 +757,7 @@ bool CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
         m_items = newItems;
     }
 
-    return true;
+    return 1;
 }
 
 /*

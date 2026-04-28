@@ -208,6 +208,29 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     s32* serializedOffsets;
     LocationTitle2Work* work;
     LocationTitle2ColorBlock* colorData;
+    LocationTitle2Particle* particles;
+    CChara::CModel* model;
+    LocationTitle2ModelRaw* modelRaw;
+    int nodeIndex;
+    u8* node;
+    float zOffset;
+    CCharaPcs::CHandle* handle;
+    CCharaPcs::CHandle* ownerHandle;
+    CGObject* owner;
+    CChara::CModel* handleModel;
+    Mtx nodeMtx;
+    int nextCount;
+    Vec stepDir;
+    Vec interp[21];
+    int startIndex;
+    int inserted;
+    float stepScale;
+    Vec* startPos;
+    Vec* interpRead;
+    Vec* interpWrite;
+    Vec scaled;
+    float t;
+    LocationTitle2Particle* dst;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -234,13 +257,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     }
 
     if (work->m_particles == 0) {
-        LocationTitle2Particle* particles;
-        CChara::CModel* model;
-        LocationTitle2ModelRaw* modelRaw;
-        int nodeIndex;
-        u8* node;
-        float zOffset;
-
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
             0x70);
@@ -249,10 +265,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 
         model = 0;
         {
-            CCharaPcs::CHandle* handle;
-            CCharaPcs::CHandle* ownerHandle;
-            CGObject* owner;
-
             owner = ((pppMngStLocationTitle2Raw*)pppMngStPtr)->m_charaObj;
             handle = 0;
             ownerHandle = owner->m_charaModelHandle;
@@ -261,8 +273,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             }
 
             {
-                CChara::CModel* handleModel;
-
                 handleModel = handle->m_model;
                 if (handleModel != 0) {
                     model = handleModel;
@@ -276,8 +286,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         zOffset = 1.0f;
 
         for (int frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
-            Mtx nodeMtx;
-
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, model);
             SetFrame__Q26CChara6CModelFf((float)frameIndex, model);
             CalcMatrix__Q26CChara6CModelFv(model);
@@ -298,7 +306,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             work->m_count++;
 
             {
-                int nextCount = (int)work->m_count + 1;
+                nextCount = (int)work->m_count + 1;
 
                 if (nextCount >= unkB->m_maxCount) {
                     return;
@@ -306,15 +314,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             }
 
             if (work->m_count > 1) {
-                Vec stepDir;
-                Vec interp[21];
-                int startIndex;
-                int inserted;
-                float stepScale;
-                Vec* startPos;
-                Vec* interpRead;
-                Vec* interpWrite;
-
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startPos = &particles[startIndex].m_pos;
@@ -324,9 +323,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                 interpWrite = interpRead;
 
                 for (int i = 0; i < unkB->m_stepCount; i++) {
-                    Vec scaled;
-                    float t;
-
                     t = stepScale * (float)(i + 1);
                     PSVECScale(&stepDir, &scaled, t);
                     PSVECAdd(startPos, &scaled, interpWrite);
@@ -334,7 +330,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     work->m_count++;
 
                     {
-                        int nextCount = (int)work->m_count + 1;
+                        nextCount = (int)work->m_count + 1;
 
                         if (nextCount >= unkB->m_maxCount) {
                             break;
@@ -348,8 +344,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                               particles[startIndex + 1].m_pos);
 
                 for (int i = 0; i < inserted; i++) {
-                    LocationTitle2Particle* dst;
-
                     dst = &particles[startIndex + (i + 1)];
                     interpRead->z += zOffset;
                     pppCopyVector(dst->m_pos, *interpRead);

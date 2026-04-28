@@ -134,7 +134,7 @@ public:
 		float m_animEnd;
 	};
 
-	class CMesh
+	class CMesh : public CRef
 	{
 		CMesh();
 		~CMesh();
@@ -155,6 +155,10 @@ public:
 		void Duplicate(CChara::CMesh*, CMemory::CStage*);
 		void skin(int, int, int, CChara::CSkin*, void*, void*, void*, S16Vec*, S16Vec*, S16Vec*, S16Vec*);
 		void Calc(CChara::CModel*);
+
+		CRefData* m_data;
+		S16Vec* m_workPositions;
+		S16Vec* m_workNormals;
 	};
 	
 	CChara() {}

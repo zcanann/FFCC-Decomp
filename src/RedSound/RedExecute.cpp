@@ -1230,8 +1230,8 @@ void _AdsrStart(RedVoiceDATA* voice)
     int nextLevel;
     int stepFrames;
 
-    *stage = 0;
     nextLevel = *(u8*)((u8*)voice + 0x58);
+    *stage    = 0;
     do {
         prevLevel = nextLevel;
         stepFrames = *(u16*)(adsrData + *stage * 2);

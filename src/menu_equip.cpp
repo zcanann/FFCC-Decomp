@@ -39,23 +39,43 @@ extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int
 extern "C" int GetAttrStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 
-static const float FLOAT_80332eb8 = 0.0f;
-static const float FLOAT_80332ee0 = 1.0f;
-static const float FLOAT_80332ee4 = 255.0f;
-static const float FLOAT_80332ee8 = 0.8999999761581421f;
-static const float FLOAT_80332eec = 4.0f;
-static const float FLOAT_80332ef0 = 12.0f;
-static const float FLOAT_80332ef4 = 24.0f;
-static const float FLOAT_80332ef8 = 320.0f;
-static const float FLOAT_80332efc = 0.5f;
-static const float FLOAT_80332f00 = 352.0f;
-static const float FLOAT_80332f10 = 128.0f;
-static const float FLOAT_80332f14 = 8.0f;
-static const float FLOAT_80332f18 = 0.75f;
-static const double DOUBLE_80332ec0 = 1.0;
-static const double DOUBLE_80332ec8 = 216.0;
-static const double DOUBLE_80332ed0 = 0.5;
-static const double DOUBLE_80332ed8 = 4503601774854144.0;
+extern const float FLOAT_80332eb8;
+extern const double DOUBLE_80332ec0;
+extern const double DOUBLE_80332ec8;
+extern const double DOUBLE_80332ed0;
+extern const double DOUBLE_80332ed8;
+extern const float FLOAT_80332ee0;
+extern const float FLOAT_80332ee4;
+extern const float FLOAT_80332ee8;
+extern const float FLOAT_80332eec;
+extern const float FLOAT_80332ef0;
+extern const float FLOAT_80332ef4;
+extern const float FLOAT_80332ef8;
+extern const float FLOAT_80332efc;
+extern const float FLOAT_80332f00;
+extern const float FLOAT_80332f10;
+extern const float FLOAT_80332f14;
+extern const float FLOAT_80332f18;
+
+extern const float FLOAT_803333a8 = 40.0f;
+extern const float FLOAT_803333ac = 278.0f;
+extern const float FLOAT_803333b0 = 248.0f;
+extern const double DOUBLE_803333b8 = 20.0;
+extern const double DOUBLE_803333c0 = 8.0;
+extern const float FLOAT_803333c8[2] = {208.0f, 0.0f};
+extern const float FLOAT_803333D0 = 0.0f;
+extern const float FLOAT_803333D4 = 255.0f;
+extern const double DOUBLE_803333D8 = 20.0;
+extern const float FLOAT_803333E0 = 40.0f;
+extern const double DOUBLE_803333E8 = 0.5;
+extern const float FLOAT_803333F0 = 1.0f;
+extern const float FLOAT_803333F4 = 4.0f;
+extern const float FLOAT_803333F8 = 320.0f;
+extern const float FLOAT_803333FC = 0.5f;
+extern const float FLOAT_80333400 = 352.0f;
+extern const float FLOAT_80333404 = 3.0f;
+extern const double DOUBLE_80333408 = 4503601774854144.0;
+extern const double DOUBLE_80333410 = 1.0;
 
 namespace {
 struct MenuEquipMembers {

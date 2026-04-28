@@ -92,8 +92,8 @@ struct CModelRaw {
 void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displayList, unsigned long displayListSize,
                        _GXTexObj* blendTexObj, unsigned char mode)
 {
-    const unsigned char s_texObjIndices[] = {0, 1, 2, 3, 4, 0, 1, 2, 3, 4};
-    const unsigned char s_xAxisRotIndices[] = {0, 0, 0, 1, 1, 0, 0, 0, 1, 1};
+    const unsigned char s_texObjIndices[] = {5, 2, 1, 0, 4, 5, 0, 0, 0, 0};
+    const unsigned char s_xAxisRotIndices[] = {0, 0, 0, 0, 1, 1, 0, 0, 2, 0};
     const unsigned char s_yAxisRotIndices[] = {0, 1, 0, 0, 1, 0, 1, 0, 0, 1};
     const float s_xAxisAngles[] = {0.0f, 90.0f, 180.0f, 270.0f};
     const unsigned char s_xAxisIds[] = {'x', 'x', 'x', 'x'};

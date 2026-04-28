@@ -305,8 +305,8 @@ int CBound::CheckFrustum0(CBound& outBound)
     Vec vertex;
     Vec transformed;
 
-    maxInit = 3.40282347e38f;
-    minInit = -3.40282347e38f;
+    maxInit = FLOAT_8032F784;
+    minInit = FLOAT_8032F788;
     clipBound[2] = maxInit;
     clipBound[1] = maxInit;
     clipBound[0] = maxInit;

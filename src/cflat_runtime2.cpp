@@ -683,8 +683,7 @@ CMemory::CStage* CFlatRuntime2::getDebugStage()
 void CFlatRuntime2::onNewObject(CFlatRuntime::CObject* object)
 {
 	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(object);
-	u8& isActive = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(baseObj) + 0x4C);
-	isActive = (isActive & 0x7F) | 0x80;
+	baseObj->m_isActive = (baseObj->m_isActive & 0x7F) | 0x80;
 	Create__9CGBaseObjFv(baseObj);
 }
 
@@ -697,8 +696,7 @@ void CFlatRuntime2::onDeleteObject(CFlatRuntime::CObject* object)
 {
 	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(object);
 	Destroy__9CGBaseObjFv(baseObj);
-	u8& isActive = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(baseObj) + 0x4C);
-	isActive &= 0x7F;
+	baseObj->m_isActive &= 0x7F;
 }
 
 /*

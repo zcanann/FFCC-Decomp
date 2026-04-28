@@ -241,12 +241,12 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
  */
 void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3)
 {
-    Crystal2Work* work;
+    if (gPppCalcDisabled != 0) {
+        return;
+    }
 
-    if ((gPppCalcDisabled == 0) &&
-        ((work = (Crystal2Work*)((u8*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80)),
-         (param_2->m_payload[0] != 0)) &&
-        (work->m_refractionMap == 0)) {
+    Crystal2Work* work = (Crystal2Work*)((u8*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80);
+    if ((param_2->m_payload[0] != 0) && (work->m_refractionMap == 0)) {
         u32 y;
         u32 x;
         Crystal2RefractionMap* textureInfo;

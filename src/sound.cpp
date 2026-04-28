@@ -302,44 +302,45 @@ extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float*
 
 extern "C" void Draw__9CLine(CLine* line)
 {
-    if (line->pointCount == 0) {
-        return;
-    }
+    if (line->pointCount != 0) {
+        u32 i;
+        Vec* point;
 
-    GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(line->pointCount & 0xFFFF));
-    u32 i = 0;
-    Vec* point = &line->points[0];
-    while (i < line->pointCount) {
-        GXWGFifo.f32 = point->x;
-        GXWGFifo.f32 = point->y;
-        GXWGFifo.f32 = point->z;
-        point++;
-        i++;
-    }
+        GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(line->pointCount & 0xFFFF));
+        i = 0;
+        point = line->points;
+        while (i < line->pointCount) {
+            GXWGFifo.f32 = point->x;
+            GXWGFifo.f32 = point->y;
+            GXWGFifo.f32 = point->z;
+            point++;
+            i++;
+        }
 
-    GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(line->pointCount & 0xFFFF));
-    i = 0;
-    point = &line->points[0];
-    while (i < line->pointCount) {
-        GXWGFifo.f32 = point->x;
-        GXWGFifo.f32 = FLOAT_80330cf4 + point->y;
-        GXWGFifo.f32 = point->z;
-        point++;
-        i++;
-    }
+        GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(line->pointCount & 0xFFFF));
+        i = 0;
+        point = line->points;
+        while (i < line->pointCount) {
+            GXWGFifo.f32 = point->x;
+            GXWGFifo.f32 = FLOAT_80330cf4 + point->y;
+            GXWGFifo.f32 = point->z;
+            point++;
+            i++;
+        }
 
-    GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((line->pointCount & 0x7FFF) << 1));
-    i = 0;
-    point = &line->points[0];
-    while (i < line->pointCount) {
-        GXWGFifo.f32 = point->x;
-        GXWGFifo.f32 = point->y;
-        GXWGFifo.f32 = point->z;
-        GXWGFifo.f32 = point->x;
-        GXWGFifo.f32 = FLOAT_80330cf4 + point->y;
-        GXWGFifo.f32 = point->z;
-        point++;
-        i++;
+        GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((line->pointCount & 0x7FFF) << 1));
+        i = 0;
+        point = line->points;
+        while (i < line->pointCount) {
+            GXWGFifo.f32 = point->x;
+            GXWGFifo.f32 = point->y;
+            GXWGFifo.f32 = point->z;
+            GXWGFifo.f32 = point->x;
+            GXWGFifo.f32 = FLOAT_80330cf4 + point->y;
+            GXWGFifo.f32 = point->z;
+            point++;
+            i++;
+        }
     }
 }
 

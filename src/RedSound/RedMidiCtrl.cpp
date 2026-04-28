@@ -1283,21 +1283,21 @@ void __MidiCtrl_SlurOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int delta[2];
+    int delta;
     int command;
     int value;
     int* voiceData;
 
-    delta[0] = DeltaTimeSumup((unsigned char**)track);
-    if (delta[0] == 0) {
-        delta[0] += 1;
+    delta = DeltaTimeSumup((unsigned char**)track);
+    if (delta == 0) {
+        delta += 1;
     }
 
     command = *(*(s8**)track)++;
     value = 0;
     command <<= 8;
-    ((int*)track)[0x45] = DataAddCompute(&value, command, delta);
-    ((int*)track)[0x44] = delta[0];
+    ((int*)track)[0x45] = DataAddCompute(&value, command, &delta);
+    ((int*)track)[0x44] = delta;
     ((int*)track)[0x48] &= 0xfffff000;
 
     voiceData = (int*)p_VoiceData;
@@ -2481,10 +2481,6 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     value = fuzzyValue;
 
     switch (mode) {
-    case 3:
-        ((int*)track)[0x3b] = value;
-        ((int*)track)[0x3f] |= 0x20000;
-        return;
     case 1:
         ((int*)track)[0x39] = value;
         ((int*)track)[0x3f] |= 0x8000;
@@ -2492,6 +2488,10 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     case 2:
         ((int*)track)[0x3a] = value;
         ((int*)track)[0x3f] |= 0x10000;
+        return;
+    case 3:
+        ((int*)track)[0x3b] = value;
+        ((int*)track)[0x3f] |= 0x20000;
         return;
     case 4:
         ((int*)track)[0x3c] = value;
@@ -2520,14 +2520,14 @@ void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     mode = *(*(u8**)track)++;
 
     switch (mode) {
-    case 3:
-        ((int*)track)[0x3f] &= 0xFFFDFFFF;
-        return;
     case 1:
         ((int*)track)[0x3f] &= 0xFFFF7FFF;
         return;
     case 2:
         ((int*)track)[0x3f] &= 0xFFFEFFFF;
+        return;
+    case 3:
+        ((int*)track)[0x3f] &= 0xFFFDFFFF;
         return;
     case 4:
         ((int*)track)[0x3f] &= 0xFFFBFFFF;

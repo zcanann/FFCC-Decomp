@@ -507,7 +507,8 @@ void _SeSepPlay(int* param_1)
     iVar1 = c_RedEntry.SetSeSepData((RedSeSepHEAD*)param_1[1]);
     if (iVar1 != 0) {
         m_SeSkipStep = param_1[4];
-        SeSepPlay(param_1[0], *(int*)(iVar1 + 8), param_1[2], param_1[3]);
+        int seID = param_1[0];
+        SeSepPlay(seID, *(int*)(iVar1 + 8), param_1[2], param_1[3]);
     }
 }
 

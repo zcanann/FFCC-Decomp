@@ -218,7 +218,7 @@ int RedNewA(int size, int offset, int maxSize)
 			currentAddress = blockPtr[0] + blockPtr[1];
 		}
 
-	if (((blockPtr[1] == 0) && (blockPtr < m_AMemoryBank + 0x800)) &&
+		if (((blockPtr[1] == 0) && (blockPtr < m_AMemoryBank + 0x800)) &&
 		    (gap = (rangeStart + maxSize) - currentAddress, size <= gap) &&
 		    (maxGap > gap)) {
 			result = currentAddress;

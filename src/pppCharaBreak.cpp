@@ -387,6 +387,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
     while (keepReading != 0) {
         u8 drawCmd = *(u8*)stream;
         u16 drawCount = *(u16*)((u8*)stream + 1);
+        u8 drawMode = drawCmd & 7;
         u8 primitive = drawCmd & 0xF8;
         s16 triCount;
         s32 outVertex;
@@ -412,7 +413,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                 u16 texIndex = stream[3];
 
                 stripRestart = stream + 4;
-                if ((drawCmd & 7) == 2) {
+                if (drawMode == 2) {
                     stripRestart = stream + 5;
                 }
                 stream = stripRestart;

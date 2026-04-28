@@ -17,8 +17,8 @@ extern float FLOAT_803304bc;
 extern float FLOAT_803304c0;
 extern float FLOAT_803304c4;
 extern float FLOAT_803304c8;
-extern double DOUBLE_803304e0;
-extern float FLOAT_803304e8;
+extern double DOUBLE_803304E0;
+extern float FLOAT_803304E8;
 
 PARTICLE_WMAT g_matKeep;
 PARTICLE_WMAT g_matTmp;
@@ -112,14 +112,14 @@ static void apply_signed_randomization(u8* particleBytes, s32 offset, u8 flags)
     if (((flags & 1) != 0) && ((flags & 2) != 0)) {
         for (int i = 0; i < 3; i++) {
             float* value = f32_at(particleBytes, offset + i * 4);
-            if (DOUBLE_803304e0 < (double)Math.RandF()) {
-                *value = *value * FLOAT_803304e8;
+            if (DOUBLE_803304E0 < (double)Math.RandF()) {
+                *value = *value * FLOAT_803304E8;
             }
         }
     } else if ((flags & 2) != 0) {
         for (int i = 0; i < 3; i++) {
             float* value = f32_at(particleBytes, offset + i * 4);
-            *value = *value * FLOAT_803304e8;
+            *value = *value * FLOAT_803304E8;
         }
     }
 }
@@ -507,19 +507,19 @@ void birth(
             *f32_at(particleData, 0x7C) = *(float*)(payload + 0xC8) * Math.RandF();
 
             if ((payload[0x132] & 1) != 0 && (payload[0x132] & 2) != 0) {
-                if (DOUBLE_803304e0 < (double)Math.RandF()) {
-                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304e8;
+                if (DOUBLE_803304E0 < (double)Math.RandF()) {
+                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8;
                 }
-                if (DOUBLE_803304e0 < (double)Math.RandF()) {
-                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304e8;
+                if (DOUBLE_803304E0 < (double)Math.RandF()) {
+                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8;
                 }
-                if (DOUBLE_803304e0 < (double)Math.RandF()) {
-                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304e8;
+                if (DOUBLE_803304E0 < (double)Math.RandF()) {
+                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8;
                 }
             } else if ((payload[0x132] & 2) != 0) {
-                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304e8;
-                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304e8;
-                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304e8;
+                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8;
+                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8;
+                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8;
             }
         } else {
             float randomVelocity = *(float*)(payload + 0xC0) * Math.RandF();
@@ -529,15 +529,15 @@ void birth(
             *f32_at(particleData, 0x7C) = randomVelocity;
 
             if ((payload[0x132] & 1) != 0 && (payload[0x132] & 2) != 0) {
-                if (DOUBLE_803304e0 < (double)Math.RandF()) {
-                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304e8;
-                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304e8;
-                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304e8;
+                if (DOUBLE_803304E0 < (double)Math.RandF()) {
+                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8;
+                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8;
+                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8;
                 }
             } else if ((payload[0x132] & 2) != 0) {
-                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304e8;
-                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304e8;
-                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304e8;
+                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8;
+                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8;
+                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8;
             }
         }
 

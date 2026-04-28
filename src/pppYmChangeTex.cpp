@@ -161,7 +161,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	}
 
 	s32* serializedDataOffsets = data->m_serializedDataOffsets;
-	u8* base = (u8*)&ymChangeTex->field0_0x0;
+	u8* base = (u8*)ymChangeTex;
 	pppYmChangeTexState* state = (pppYmChangeTexState*)(base + serializedDataOffsets[2] + 0x80);
 	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr((CGObject*)pppMngStPtr->m_charaObj, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
@@ -200,7 +200,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 
 	state->m_value1 = state->m_value1 + state->m_value2;
 	state->m_value0 = state->m_value0 + state->m_value1;
-	if (step->m_graphId == ymChangeTex->field0_0x0.data.m_graphId) {
+	if (step->m_graphId == ymChangeTex->m_graphId) {
 		state->m_value0 = state->m_value0 + step->m_initWOrk;
 		state->m_value1 = state->m_value1 + step->m_stepValue;
 		state->m_value2 = state->m_value2 + step->m_arg3;

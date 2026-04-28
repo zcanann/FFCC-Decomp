@@ -5,13 +5,8 @@
 #include <dolphin/types.h>
 
 struct pppYmChangeTex {
-    union {
-        void* ptr;
-        struct {
-            u8 _pad0[0xC];
-            s32 m_graphId;
-        } data;
-    } field0_0x0;
+    u8 _pad0[0xC];
+    s32 m_graphId;
 };
 
 struct pppYmChangeTexStep {

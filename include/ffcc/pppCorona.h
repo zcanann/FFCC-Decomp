@@ -4,12 +4,7 @@
 #include <dolphin/types.h>
 
 struct pppCorona {
-    union {
-        void* ptr;
-        struct {
-            u32 m_graphId;
-        };
-    } field0_0x0;
+    s32 m_graphId;
 };
 
 struct pppCoronaUnkC {
@@ -49,4 +44,3 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
 #endif
 
 #endif // _FFCC_PPPCORONA_H_
-

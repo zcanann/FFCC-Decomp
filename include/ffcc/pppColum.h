@@ -10,13 +10,8 @@ typedef struct pppCVector {
 } pppCVector;
 
 struct pppColum {
-    union {
-        void* ptr;
-        struct {
-            u32 m_graphId;
-        };
-    } field0_0x0;
-    
+    u32 m_graphId;
+
     // Add padding/fields up to the offsets we need
     char pad[0x82];
     u16 field_0x82;

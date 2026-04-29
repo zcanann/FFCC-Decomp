@@ -3,6 +3,7 @@
 
 #include "ffcc/memory.h"
 #include "ffcc/p_sample.h"
+#include "ffcc/p_usb.h"
 #include "ffcc/system.h"
 #include "ffcc/FS_USB_Process.h"
 #include "ffcc/p_usb.h"

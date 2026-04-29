@@ -2,7 +2,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/pppPart.h"
 
 #include <dolphin/gx.h>

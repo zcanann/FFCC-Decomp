@@ -8,7 +8,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/maplight.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_light.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/mapocttree.h"
@@ -496,11 +496,11 @@ void CMapPcs::calc()
                     *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
                 if (rootNode != 0) {
                     cameraPos.x =
-                        kMapBoundsCenterScale * (rootNode->m_boundMinX + rootNode->m_boundMaxX);
+                        (rootNode->m_boundMinX + rootNode->m_boundMaxX) * kMapBoundsCenterScale;
                     cameraPos.y =
-                        kMapBoundsCenterScale * (rootNode->m_boundMinY + rootNode->m_boundMaxY);
+                        (rootNode->m_boundMinY + rootNode->m_boundMaxY) * kMapBoundsCenterScale;
                     cameraPos.z =
-                        kMapBoundsCenterScale * (rootNode->m_boundMinZ + rootNode->m_boundMaxZ);
+                        (rootNode->m_boundMinZ + rootNode->m_boundMaxZ) * kMapBoundsCenterScale;
                 } else {
                     float* mapCenter =
                         reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0xAA8);
@@ -527,7 +527,7 @@ void CMapPcs::calc()
 
         CPtrArray<CMapLightHolder*>& mapLightHolderArr =
             reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450)[1];
-        if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) > 0) {
+        if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) != 0) {
             mapLightHolderArr[0]->GetLightHolder(reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C),
                                                  static_cast<Vec*>(0));
         }

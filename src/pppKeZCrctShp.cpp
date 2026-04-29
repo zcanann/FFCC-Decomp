@@ -5,11 +5,6 @@
 extern const float FLOAT_803304F8;
 extern const float kPppKeShpTail2XAlphaScale = 16384.0f;
 
-struct pppKeZCrctShpObject {
-    u8 _pad0[0xc];
-    _pppPObjectHead m_object;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x8008821c
@@ -35,7 +30,7 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
 
     (void)ctrlTable;
 
-    pppGetRowVector(((pppKeZCrctShpObject*)object)->m_object.m_localMatrix, rowX, rowY, rowZ, rowPos);
+    pppGetRowVector(object->m_localMatrix, rowX, rowY, rowZ, rowPos);
     pppScaleVector(scaledX, rowX, pppMngStPtr->m_scale.x);
     pppScaleVector(scaledY, rowY, pppMngStPtr->m_scale.y);
     pppScaleVector(scaledZ, rowZ, pppMngStPtr->m_scale.z);

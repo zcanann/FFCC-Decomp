@@ -437,8 +437,7 @@ void CFunnyShape::Render()
 
     GXColor chanColor = DAT_8032fd60;
     GXSetChanAmbColor(GX_COLOR0, chanColor);
-    GXColor matColor = chanColor;
-    GXSetChanMatColor(GX_COLOR0, matColor);
+    GXSetChanMatColor(GX_COLOR0, chanColor);
 
     s32 count;
     if ((ShapeFlags(this) & 0x80) != 0) {
@@ -455,9 +454,10 @@ void CFunnyShape::Render()
         pos.y = FLOAT_8032fda0 + *reinterpret_cast<float*>(Ptr(work, 0xC));
 
         u8* animData = reinterpret_cast<u8*>(AnimData(this));
-        const s16 frame = *reinterpret_cast<s16*>(Ptr(work, 0x14));
-        const s16 shapeOffset = reinterpret_cast<s16*>(animData)[frame * 4 + 8];
-        RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + shapeOffset), pos, *reinterpret_cast<float*>(Ptr(work, 0x28)));
+        s16 frame = *reinterpret_cast<s16*>(Ptr(work, 0x14));
+        FS_tagOAN3_SHAPE* shape =
+            reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + *reinterpret_cast<s16*>(animData + 0x10 + frame * 8));
+        RenderShape(shape, pos, *reinterpret_cast<float*>(Ptr(work, 0x28)));
         work = reinterpret_cast<CFunnyShape*>(Ptr(work, 0x30));
     }
 }

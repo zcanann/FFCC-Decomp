@@ -281,8 +281,8 @@ void CSystem::ExecScenegraph()
 
     do
     {
-        unsigned int stepTrigger;
-        unsigned int perfTrigger;
+        u16 stepTrigger;
+        u16 perfTrigger;
 
         if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.m_gameWork.m_gamePaused)
         {
@@ -356,8 +356,8 @@ void CSystem::ExecScenegraph()
         {
             for (int port = 0; port < 4; port++)
             {
-                unsigned int trigger;
-                unsigned int held;
+                u16 trigger;
+                u16 held;
                 bool noInput;
 
                 noInput = false;

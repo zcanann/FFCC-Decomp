@@ -30,6 +30,7 @@ extern const char DAT_803311fc;
 extern const float FLOAT_803311e0;
 extern const float FLOAT_803311e4;
 extern const float FLOAT_803311f8;
+extern const double DOUBLE_803311e8 = 4503599627370496.0;
 static const char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }

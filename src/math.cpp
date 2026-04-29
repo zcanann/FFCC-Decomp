@@ -612,12 +612,11 @@ int CBound::CheckFrustum0(float farPlane)
     int xIndex;
     float farthestZ;
     float zero;
-    float* inBound = reinterpret_cast<float*>(this);
     Vec vertex;
     Vec transformed;
 
-    if ((s_f_vpos.x <= inBound[3]) && (s_f_vpos.y <= inBound[4]) && (s_f_vpos.z <= inBound[5]) &&
-        (s_f_vpos.x >= inBound[0]) && (s_f_vpos.y >= inBound[1]) && (s_f_vpos.z >= inBound[2])) {
+    if ((s_f_vpos.x <= m_max.x) && (s_f_vpos.y <= m_max.y) && (s_f_vpos.z <= m_max.z) &&
+        (s_f_vpos.x >= m_min.x) && (s_f_vpos.y >= m_min.y) && (s_f_vpos.z >= m_min.z)) {
         return 1;
     }
 
@@ -628,16 +627,16 @@ int CBound::CheckFrustum0(float farPlane)
     xIndex = 0;
     do {
         if (xIndex == 0) {
-            vertex.x = inBound[0];
+            vertex.x = m_min.x;
         } else {
-            vertex.x = inBound[3];
+            vertex.x = m_max.x;
         }
         yIndex = 0;
         do {
-            vertex.y = (yIndex == 0) ? inBound[1] : inBound[4];
+            vertex.y = (yIndex == 0) ? m_min.y : m_max.y;
             zIndex = 0;
             do {
-                vertex.z = (zIndex == 0) ? inBound[2] : inBound[5];
+                vertex.z = (zIndex == 0) ? m_min.z : m_max.z;
                 PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
                 if (farthestZ < transformed.z) {
                     farthestZ = transformed.z;
@@ -710,43 +709,41 @@ int CBound::CheckFrustum0(CBound& outBound)
     int xIndex;
     float viewZ;
     float zero;
-    float* clipBound = reinterpret_cast<float*>(&outBound);
-    float* inBound = reinterpret_cast<float*>(this);
     Vec vertex;
     Vec transformed;
 
     maxInit = FLOAT_8032F784;
     minInit = FLOAT_8032F788;
-    clipBound[2] = maxInit;
-    clipBound[1] = maxInit;
-    clipBound[0] = maxInit;
-    clipBound[5] = minInit;
-    clipBound[4] = minInit;
-    clipBound[3] = minInit;
+    outBound.m_min.z = maxInit;
+    outBound.m_min.y = maxInit;
+    outBound.m_min.x = maxInit;
+    outBound.m_max.z = minInit;
+    outBound.m_max.y = minInit;
+    outBound.m_max.x = minInit;
 
-    if ((s_f_vpos.x <= inBound[3]) && (s_f_vpos.y <= inBound[4]) && (s_f_vpos.z <= inBound[5]) &&
-        (s_f_vpos.x >= inBound[0]) && (s_f_vpos.y >= inBound[1]) && (s_f_vpos.z >= inBound[2])) {
+    if ((s_f_vpos.x <= m_max.x) && (s_f_vpos.y <= m_max.y) && (s_f_vpos.z <= m_max.z) &&
+        (s_f_vpos.x >= m_min.x) && (s_f_vpos.y >= m_min.y) && (s_f_vpos.z >= m_min.z)) {
         xIndex = 0;
         do {
             if (xIndex == 0) {
-                vertex.x = inBound[0];
+                vertex.x = m_min.x;
             } else {
-                vertex.x = inBound[3];
+                vertex.x = m_max.x;
             }
             yIndex = 0;
             do {
-                vertex.y = (yIndex == 0) ? inBound[1] : inBound[4];
+                vertex.y = (yIndex == 0) ? m_min.y : m_max.y;
                 zIndex = 0;
                 do {
-                    vertex.z = (zIndex == 0) ? inBound[2] : inBound[5];
+                    vertex.z = (zIndex == 0) ? m_min.z : m_max.z;
                     PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
-                    clipBound[0] = clipBound[0] < transformed.x ? clipBound[0] : transformed.x;
-                    clipBound[1] = clipBound[1] < transformed.y ? clipBound[1] : transformed.y;
-                    clipBound[2] = clipBound[2] < transformed.z ? clipBound[2] : transformed.z;
-                    clipBound[3] = clipBound[3] < transformed.x ? transformed.x : clipBound[3];
-                    clipBound[4] = clipBound[4] < transformed.y ? transformed.y : clipBound[4];
-                    clipBound[5] = clipBound[5] < transformed.z ? transformed.z : clipBound[5];
+                    outBound.m_min.x = outBound.m_min.x < transformed.x ? outBound.m_min.x : transformed.x;
+                    outBound.m_min.y = outBound.m_min.y < transformed.y ? outBound.m_min.y : transformed.y;
+                    outBound.m_min.z = outBound.m_min.z < transformed.z ? outBound.m_min.z : transformed.z;
+                    outBound.m_max.x = outBound.m_max.x > transformed.x ? outBound.m_max.x : transformed.x;
+                    outBound.m_max.y = outBound.m_max.y > transformed.y ? outBound.m_max.y : transformed.y;
+                    outBound.m_max.z = outBound.m_max.z > transformed.z ? outBound.m_max.z : transformed.z;
                     zIndex = zIndex + 1;
                 } while (zIndex < 2);
                 yIndex = yIndex + 1;
@@ -762,24 +759,24 @@ int CBound::CheckFrustum0(CBound& outBound)
     xIndex = 0;
     do {
         if (xIndex == 0) {
-            vertex.x = inBound[0];
+            vertex.x = m_min.x;
         } else {
-            vertex.x = inBound[3];
+            vertex.x = m_max.x;
         }
         yIndex = 0;
         do {
-            vertex.y = (yIndex == 0) ? inBound[1] : inBound[4];
+            vertex.y = (yIndex == 0) ? m_min.y : m_max.y;
             zIndex = 0;
             do {
-                vertex.z = (zIndex == 0) ? inBound[2] : inBound[5];
+                vertex.z = (zIndex == 0) ? m_min.z : m_max.z;
                 PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
-                clipBound[0] = clipBound[0] < transformed.x ? clipBound[0] : transformed.x;
-                clipBound[1] = clipBound[1] < transformed.y ? clipBound[1] : transformed.y;
-                clipBound[2] = clipBound[2] < transformed.z ? clipBound[2] : transformed.z;
-                clipBound[3] = clipBound[3] < transformed.x ? transformed.x : clipBound[3];
-                clipBound[4] = clipBound[4] < transformed.y ? transformed.y : clipBound[4];
-                clipBound[5] = clipBound[5] < transformed.z ? transformed.z : clipBound[5];
+                outBound.m_min.x = outBound.m_min.x < transformed.x ? outBound.m_min.x : transformed.x;
+                outBound.m_min.y = outBound.m_min.y < transformed.y ? outBound.m_min.y : transformed.y;
+                outBound.m_min.z = outBound.m_min.z < transformed.z ? outBound.m_min.z : transformed.z;
+                outBound.m_max.x = outBound.m_max.x > transformed.x ? outBound.m_max.x : transformed.x;
+                outBound.m_max.y = outBound.m_max.y > transformed.y ? outBound.m_max.y : transformed.y;
+                outBound.m_max.z = outBound.m_max.z > transformed.z ? outBound.m_max.z : transformed.z;
 
                 viewZ = transformed.z;
                 if (viewZ > zero) {

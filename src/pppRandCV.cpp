@@ -18,7 +18,7 @@ typedef struct RandCVParams {
 
 inline char randchar(char value, float scale)
 {
-    return (char)(((f32)value * scale) - (f32)value);
+    return (char)((f32)value * scale - (f32)value);
 }
 
 /*
@@ -55,13 +55,7 @@ void pppRandCV(_pppPObject* basePtr, RandCVParams* in, _pppCtrlTable* ctrl)
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    u8* targetColor;
-    s32 colorOffset = in->colorOffset;
-    if (colorOffset == -1) {
-        targetColor = gPppDefaultValueBuffer;
-    } else {
-        targetColor = base + colorOffset + 0x80;
-    }
+    u8* targetColor = (in->colorOffset == -1) ? gPppDefaultValueBuffer : (base + in->colorOffset + 0x80);
 
     {
         f32 scale = *valuePtr;

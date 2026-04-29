@@ -476,23 +476,17 @@ void CMapHit::GetHitFaceNormal(Vec* out)
  */
 int CMapHit::CalcHitSlide(Vec* out, float y)
 {
-    if (gMapHitFace == 0) {
-        out->x = 0.0f;
-        out->y = 0.0f;
-        out->z = 0.0f;
-        return 1;
-    }
-
     if (g_hit_edge_idx_min == -1) {
-        if (y <= gMapHitFace->m_boundsMin.y) {
-            float len = PSVECMag(&g_hit_cyl_min.m_direction);
-            PSVECScale(&g_hit_cyl_min.m_direction, out, g_hit_t - (s_push / len));
+        Vec* normal = &gMapHitFace->m_normal;
+        if (y <= normal->y) {
+            Vec* hitDirection = reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius);
+            float len = PSVECMag(hitDirection);
+            PSVECScale(hitDirection, out, g_hit_t - (s_push / len));
             return 0;
         }
 
         if (s_epsilon < g_hit_t) {
-            Vec* normal = reinterpret_cast<Vec*>(gMapHitFace);
-            float planeD = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(gMapHitFace) + 0x0C);
+            float planeD = gMapHitFace->m_planeD;
             float planeDot = PSVECDotProduct(&g_hit_cyl_min.m_direction, normal);
 
             Vec push;
@@ -508,9 +502,10 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
         return 1;
     }
 
-    if (y <= gMapHitFace->m_boundsMin.y) {
-        float len = PSVECMag(&g_hit_cyl_min.m_direction);
-        PSVECScale(&g_hit_cyl_min.m_direction, out, g_hit_t - (s_push / len));
+    if (y <= gMapHitFace->m_normal.y) {
+        Vec* hitDirection = reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius);
+        float len = PSVECMag(hitDirection);
+        PSVECScale(hitDirection, out, g_hit_t - (s_push / len));
         return 0;
     }
 

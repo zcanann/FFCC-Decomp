@@ -142,7 +142,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     long** shapeTable;
     long* shapeEntry;
     u8* shapeData;
-    u8 count;
+    int count;
     float alphaMul;
     float colorR;
     float colorG;

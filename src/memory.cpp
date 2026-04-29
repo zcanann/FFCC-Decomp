@@ -1276,7 +1276,7 @@ void CMemory::CStage::drawHeapBar(int y)
     colors[15] = DAT_801d64e4;
 
     int node;
-    if (stageGetAllocationMode(this) == 2) {
+    if (m_unknown11C == 2) {
         node = stageGetHeapHead(this);
     } else {
         node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
@@ -1458,7 +1458,7 @@ void CMemory::CStage::drawHeapTitle(int y)
  */
 int CMemory::CStage::GetHeapUnuse()
 {
-    int node = (stageGetAllocationMode(this) == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    int node = (m_unknown11C == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
     int total = 0;
 
     while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
@@ -2252,7 +2252,7 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
     int top;
     int node;
 
-    if (stageGetAllocationMode(this) == 2) {
+    if (m_unknown11C == 2) {
         node = stageGetHeapHead(this);
     } else {
         node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
@@ -2262,7 +2262,7 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
     heapUse = 0;
     heapUnuse = 0;
 
-    if (stageGetAllocationMode(this) == 2) {
+    if (m_unknown11C == 2) {
         top = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
 
         for (i = 0; i <= *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120); i++, node += 0x40) {

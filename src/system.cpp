@@ -312,6 +312,7 @@ void CSystem::ExecScenegraph()
             unsigned int stepPad = (Pad._448_4_ == 4) ? 0 : 4;
             stepTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x36 + stepPad * 0x54);
         }
+        stepTrigger = (unsigned short)stepTrigger;
 
         if (Pad._452_4_ != 0)
         {
@@ -322,6 +323,7 @@ void CSystem::ExecScenegraph()
             unsigned int perfPad = (Pad._448_4_ == 4) ? 0 : 4;
             perfTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x34 + perfPad * 0x54);
         }
+        perfTrigger = (unsigned short)perfTrigger;
 
         if ((stepTrigger & 0xC) != 0)
         {
@@ -372,6 +374,7 @@ void CSystem::ExecScenegraph()
                     unsigned int padIndex = (Pad._448_4_ == port) ? 0 : port;
                     trigger = *(unsigned short*)((unsigned char*)&Pad + 0xA + padIndex * 0x54);
                 }
+                trigger = (unsigned short)trigger;
 
                 noInput = false;
                 if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
@@ -387,6 +390,7 @@ void CSystem::ExecScenegraph()
                     unsigned int padIndex = (Pad._448_4_ == port) ? 0 : port;
                     held = *(unsigned short*)((unsigned char*)&Pad + 0x8 + padIndex * 0x54);
                 }
+                held = (unsigned short)held;
 
                 if (((trigger | held) & 0x1000) != 0)
                 {

@@ -800,64 +800,69 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
     CharaBreakStep* stepData = (CharaBreakStep*)charaBreak;
     CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
     S16Vec* workNormals = meshRef->m_workNormals;
-    u32 normQuant = ModelData(model)->m_normQuant;
+    u32 count = polygonCount;
+    CChara::CModel* modelPtr = model;
+    POLYGON_DATA* polygon = polygonData;
+    f32 zero = FLOAT_80332048;
 
-    for (u32 i = 0; i < polygonCount; i++) {
+    for (u32 i = 0; i < count; i++) {
         Vec normal;
-        Vec tangent;
         Vec up = kPppCharaBreakUpVector;
+        Vec tangent;
 
         int alpha = (int)stepData->m_alphaBase + rand() % stepData->m_alphaRange;
         if (alpha > 0xFF) {
             alpha = 0xFF;
         }
 
-        polygonData->m_alpha = (u8)alpha;
-        polygonData->m_enabled = 0;
-        polygonData->_pad2 = 0;
+        polygon->m_alpha = (u8)alpha;
+        polygon->m_enabled = 0;
+        polygon->_pad2 = 0;
 
         if (stepData->m_clipMode == 2) {
-            polygonData->m_enabled = 1;
+            polygon->m_enabled = 1;
         }
 
         if (meshRef->m_data->m_skinCount == 0) {
             normal.x = Math.RandF(FLOAT_8033204c);
             normal.y = Math.RandF(FLOAT_8033204c);
             normal.z = Math.RandF(FLOAT_8033204c);
-            normal.x *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
-            normal.y *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
-            normal.z *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
+            normal.x *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078;
+            normal.y *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078;
+            normal.z *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078;
             PSVECNormalize(&normal, &normal);
-            ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygonData->m_normalA, normal, normQuant);
+            ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygon->m_normalA, normal, ModelData(modelPtr)->m_normQuant);
         } else {
-            polygonData->m_normalA = workNormals[polygonData->m_nrmIndices[0]];
-            ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &normal, polygonData->m_normalA, normQuant);
+            polygon->m_normalA = workNormals[polygon->m_nrmIndices[0]];
+            ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &normal, workNormals[polygon->m_nrmIndices[0]],
+                                                ModelData(modelPtr)->m_normQuant);
         }
 
         PSVECCrossProduct(&up, &normal, &tangent);
         float tangentMag = PSVECMag(&tangent);
-        if (tangentMag == FLOAT_80332048) {
-            tangent.x = FLOAT_80332048;
-            tangent.y = FLOAT_80332048;
-            tangent.z = FLOAT_80332048;
+        if (zero == tangentMag) {
+            tangent.x = zero;
+            tangent.y = zero;
+            tangent.z = zero;
         } else {
             PSVECScale(&tangent, &tangent, FLOAT_8033204c / tangentMag);
         }
 
-        if (tangent.x == FLOAT_80332048 && tangent.y == FLOAT_80332048 && tangent.z == FLOAT_80332048) {
+        if (zero == tangent.x && zero == tangent.y && zero == tangent.z) {
             tangent.x = FLOAT_8033204c;
-            tangent.y = FLOAT_80332048;
-            tangent.z = FLOAT_80332048;
+            tangent.y = zero;
+            tangent.z = zero;
         }
 
-        if (stepData->m_spinMode == 1) {
-            polygonData->m_normalA.x = 0;
-            polygonData->m_normalA.z = 0;
-            polygonData->m_normalA.y = rand() % 2;
+        if (stepData->m_spinMode != 0 && stepData->m_spinMode == 1) {
+            polygon->m_normalA.z = 0;
+            polygon->m_normalA.y = 0;
+            polygon->m_normalA.x = 0;
+            polygon->m_normalA.y = rand() % 2;
         }
 
-        ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygonData->m_normalB, tangent, normQuant);
-        polygonData++;
+        ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygon->m_normalB, tangent, ModelData(modelPtr)->m_normQuant);
+        polygon++;
     }
 }
 

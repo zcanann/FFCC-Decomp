@@ -71,7 +71,7 @@ struct YmBreathParams {
     float m_colorFrameAccel1;
     float m_colorFrameAccel2;
     float m_colorFrameAccel3;
-    unsigned char _pad48[0x08];
+    unsigned char _pad4C[0x04];
     float m_rotationStartX;
     float m_rotationStartY;
     unsigned char _pad58[0x08];

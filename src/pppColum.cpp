@@ -154,7 +154,6 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             float deltaX2;
             float deltaY2;
 
-            zero = FLOAT_80331084;
             PSMTXIdentity(identityMtx);
             baseX = positionWork->m_position.x;
             baseY = positionWork->m_position.y;
@@ -180,6 +179,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 PSVECScale(&cameraDelta, &cameraDelta, FLOAT_803310A4 / lengthXY);
             }
 
+            zero = FLOAT_80331084;
             pppInitBlendMode();
             values = frameWork->m_values;
             segmentStep =

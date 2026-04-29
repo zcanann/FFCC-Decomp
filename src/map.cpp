@@ -91,7 +91,7 @@ extern "C" unsigned char Vec_80245758[];
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
 extern "C" void SetLink__7CMapObjFv();
-extern "C" void ReadOtmOctTree__8COctTreeFR10CChunkFile(void*, CChunkFile&);
+extern "C" int ReadOtmOctTree__8COctTreeFR10CChunkFile(void*, CChunkFile&);
 extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>*, short);
 
 static const char s_map_cpp[] = "map.cpp";
@@ -1736,7 +1736,24 @@ void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 {
     MapObjAttachObj* mapObj = reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954));
 
+    goto search;
     while (true) {
+        if (strcmp(mapHitName, mapObj->attr->name) == 0) {
+            mapObj->mapHit = mapHit;
+
+            MapObjAttachAttr* mapObjAtr = mapObj->attr;
+            if (mapObjAtr != 0) {
+                if (mapObjAtr != 0) {
+                    typedef void (*MapObjAtrDtor)(MapObjAttachAttr*, int);
+                    reinterpret_cast<MapObjAtrDtor*>(*reinterpret_cast<void***>(mapObjAtr))[2](mapObjAtr, 1);
+                }
+                mapObj->attr = 0;
+            }
+        }
+
+        mapObj++;
+
+search:
         unsigned int stride = 0xF0;
         MapObjAttachObj* mapObjEnd =
             reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954 + *reinterpret_cast<short*>(Ptr(this, 0xC)) * 0xF0));
@@ -1759,21 +1776,6 @@ found:
         if (mapObj == 0) {
             return;
         }
-
-        if (strcmp(mapHitName, mapObj->attr->name) == 0) {
-            mapObj->mapHit = mapHit;
-
-            MapObjAttachAttr* mapObjAtr = mapObj->attr;
-            if (mapObjAtr != 0) {
-                if (mapObjAtr != 0) {
-                    typedef void (*MapObjAtrDtor)(MapObjAttachAttr*, int);
-                    reinterpret_cast<MapObjAtrDtor*>(*reinterpret_cast<void***>(mapObjAtr))[2](mapObjAtr, 1);
-                }
-                mapObj->attr = 0;
-            }
-        }
-
-        mapObj++;
     }
 }
 

@@ -266,16 +266,10 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             TRACE_POLYGON* current = &entries[i];
             TRACE_POLYGON* next = &entries[i + 1];
 
-            pppCopyVector(next->from, current->from);
-            pppCopyVector(next->to, current->to);
-            next->life = current->life;
-            next->decay = current->decay;
-            next->colorR = current->colorR;
-            next->colorG = current->colorG;
-            next->colorB = current->colorB;
-            next->alpha = current->alpha;
+            copyPolygonData(next, current);
         }
 
+        entries = work->entries;
         entries[0].life = -1;
         entries[0].alpha = param_2->m_payload[8];
         entries[0].decay = (u8)((u16)param_2->m_payload[8] / *(u16*)(param_2->m_payload + 6));

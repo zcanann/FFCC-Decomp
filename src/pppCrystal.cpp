@@ -15,6 +15,7 @@ extern const float FLOAT_80330FD8;
 extern const double DOUBLE_80330FE0;
 extern const double DOUBLE_80330FE8;
 extern const double DOUBLE_80330FF0;
+extern const float FLOAT_80330FD0;
 extern const float FLOAT_80330FF8;
 extern const double DOUBLE_80331000;
 extern const float FLOAT_80331008;
@@ -288,8 +289,8 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 				textureInfo->m_imageCount = 0x100;
 				textureInfo->m_bufferSize = textureSize;
 
-				stepX = 2.0f / (float)(textureInfo->m_width - 1);
-				stepY = 2.0f / (float)(textureInfo->m_height - 1);
+				stepX = FLOAT_80330FD0 / (float)(textureInfo->m_width - 1);
+				stepY = FLOAT_80330FD0 / (float)(textureInfo->m_height - 1);
 				yCoord = FLOAT_80330FD4;
 
 				for (y = 0; y < (u32)textureInfo->m_height; y++) {

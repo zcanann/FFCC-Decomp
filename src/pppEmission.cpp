@@ -79,11 +79,20 @@ struct EmissionModelData {
     void* m_materialSet;
 };
 
+struct EmissionState;
+
 struct EmissionModelView {
     u8 _pad0[0xA4];
     EmissionModelData* m_data;
     u8 _padA8[0x4];
     EmissionMeshRef* m_meshes;
+    u8 _padB0[0x34];
+    EmissionState* m_state;
+    pppEmissionUnkB* m_step;
+    u8 _padEC[0x10];
+    void (*m_drawMeshDlCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+    u8 _pad100[0x4];
+    void (*m_afterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
 };
 
 struct EmissionState {
@@ -112,6 +121,17 @@ struct EmissionParticle {
     u8 m_fieldE;
     u8 m_padF;
 };
+
+STATIC_ASSERT(offsetof(EmissionModelView, m_data) == 0xA4);
+STATIC_ASSERT(offsetof(EmissionModelView, m_meshes) == 0xAC);
+STATIC_ASSERT(offsetof(EmissionModelView, m_state) == 0xE4);
+STATIC_ASSERT(offsetof(EmissionModelView, m_step) == 0xE8);
+STATIC_ASSERT(offsetof(EmissionModelView, m_drawMeshDlCallback) == 0xFC);
+STATIC_ASSERT(offsetof(EmissionModelView, m_afterDrawMeshCallback) == 0x104);
+STATIC_ASSERT(offsetof(EmissionMeshData, m_colors) == 0x28);
+STATIC_ASSERT(offsetof(EmissionMeshData, m_displayListCount) == 0x4C);
+STATIC_ASSERT(offsetof(EmissionMeshData, m_displayLists) == 0x50);
+STATIC_ASSERT(offsetof(EmissionModelData, m_materialSet) == 0x24);
 
 /*
  * --INFO--
@@ -144,11 +164,11 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     u8* dataSet = (u8*)pppEmission_ + 0x80 + serializedDataOffsets[1];
 
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    *(EmissionState**)(model + 0xE4) = state;
-    *(pppEmissionUnkB**)(model + 0xE8) = param_2;
-    *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
-    *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
+    EmissionModelView* model = (EmissionModelView*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    model->m_state = state;
+    model->m_step = param_2;
+    model->m_drawMeshDlCallback = Emission_DrawMeshDLCallback;
+    model->m_afterDrawMeshCallback = Emission_AfterDrawMeshCallback;
 
     float alphaScale = (float)dataSet[0xB] / FLOAT_803311e0;
     state->m_colorR = dataSet[8];
@@ -260,12 +280,12 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     float baseScale;
     int* state = (int*)((u8*)pppEmission_ + 0x80 + param_2->m_serializedDataOffsets[2]);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    EmissionModelView* model = (EmissionModelView*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
-    *(u32*)(model + 0xE4) = 0;
-    *(u32*)(model + 0xE8) = 0;
-    *(u32*)(model + 0xFC) = 0;
-    *(u32*)(model + 0x104) = 0;
+    model->m_state = 0;
+    model->m_step = 0;
+    model->m_drawMeshDlCallback = 0;
+    model->m_afterDrawMeshCallback = 0;
 
     _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppEmission_cpp_801db7e8), 0x118);
     CMemory::CStage* stage = (CMemory::CStage*)state[0];
@@ -337,11 +357,11 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     state->fieldC = baseScale;
 
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
-    *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
+    EmissionModelView* model = (EmissionModelView*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    model->m_drawMeshDlCallback = Emission_DrawMeshDLCallback;
+    model->m_afterDrawMeshCallback = Emission_AfterDrawMeshCallback;
     state->field0 = 0;
-    state->field18 = *(float*)(model + 0x9C);
+    state->field18 = *(float*)((u8*)model + 0x9C);
     state->field1C = 0;
 }
 
@@ -503,8 +523,8 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
 void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIndex, int displayListIndex, float (*)[4]) {
     SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x64);
 
-    EmissionMeshRef* meshList = *(EmissionMeshRef**)((u8*)model + 0xAC);
-    EmissionMeshData* meshData = meshList[meshIndex].m_data;
+    EmissionModelView* modelView = (EmissionModelView*)model;
+    EmissionMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
     EmissionDisplayList* displayList = meshData->m_displayLists;
     displayList += displayListIndex;
 
@@ -514,9 +534,8 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
         meshData->m_colors[2] = 0;
         meshData->m_colors[3] = 0;
     } else {
-        EmissionModelData* modelData = *(EmissionModelData**)((u8*)model + 0xA4);
         SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-            &MaterialMan, modelData->m_materialSet, displayList->m_material, 0, 0);
+            &MaterialMan, modelView->m_data->m_materialSet, displayList->m_material, 0, 0);
         GXCallDisplayList(displayList->m_data, displayList->m_size);
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x65);
     }

@@ -1843,10 +1843,13 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
 
         voiceData = (int*)p_VoiceData;
         do {
-            if ((*voiceData == (int)track) && ((voiceData[0x28] += addPitch), (voiceData[1] != 0))) {
-                voiceData[0x26] = PitchCompute(voiceData[0x28] + *p_MusicPitchControl,
-                                               (int)*(s16*)((u8*)track + 0x142) + (int)*(s16*)((u8*)track + 0x13E),
-                                               *(int*)((u8*)voiceData[1] + 0x14), (s8)((u8*)track)[0x148]);
+            if (*voiceData == (int)track) {
+                voiceData[0x28] += addPitch;
+                if (voiceData[1] != 0) {
+                    voiceData[0x26] = PitchCompute(voiceData[0x28] + *p_MusicPitchControl,
+                                                   (int)*(s16*)((u8*)track + 0x142) + (int)*(s16*)((u8*)track + 0x13E),
+                                                   *(int*)((u8*)voiceData[1] + 0x14), (s8)((u8*)track)[0x148]);
+                }
             }
             voiceData += 0x30;
         } while (voiceData < (int*)p_VoiceData + 0xC00);

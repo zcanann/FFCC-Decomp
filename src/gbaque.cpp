@@ -129,12 +129,12 @@ static inline GbaQueuePlayerDataView* GetPlayerDataView(GbaQueue* gbaQueue, int 
 
 static inline unsigned short SwapU16(unsigned short value)
 {
-	return static_cast<unsigned short>((value << 8) | (value >> 8));
+	return __lhbrx(&value, 0);
 }
 
 static inline unsigned int SwapU32(unsigned int value)
 {
-	return (value << 24) | ((value >> 8 & 0xFF) << 16) | ((value >> 16 & 0xFF) << 8) | (value >> 24);
+	return __lwbrx(&value, 0);
 }
 
 static const char s_gbaque_cpp_801DB370[] = "gbaque.cpp";
@@ -2015,8 +2015,8 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 {
 	GbaQueuePlayerDataView localPlayerData;
 	unsigned short itemList[0x40];
-	unsigned int artifactData[3];
-	unsigned short tmpArtifactList[4];
+	unsigned int artifacts[3];
+	unsigned short tmpArtifacts[4];
 	unsigned short artifactList[8];
 	int i;
 
@@ -2029,15 +2029,15 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 	}
 	memcpy(outData, itemList, sizeof(itemList));
 
-	artifactData[0] = __lwbrx(&localPlayerData.m_artifacts[0], 0);
-	artifactData[1] = __lwbrx(&localPlayerData.m_artifacts[1], 0);
-	artifactData[2] = __lwbrx(&localPlayerData.m_artifacts[2], 0);
-	memcpy(outData + 0x80, artifactData, sizeof(artifactData));
+	artifacts[0] = __lwbrx(&localPlayerData.m_artifacts[0], 0);
+	artifacts[1] = __lwbrx(&localPlayerData.m_artifacts[1], 0);
+	artifacts[2] = __lwbrx(&localPlayerData.m_artifacts[2], 0);
+	memcpy(outData + 0x80, artifacts, sizeof(artifacts));
 
 	for (i = 0; i < 4; i++) {
-		tmpArtifactList[i] = __lhbrx(&localPlayerData.m_tmpArtifacts[i], 0);
+		tmpArtifacts[i] = __lhbrx(&localPlayerData.m_tmpArtifacts[i], 0);
 	}
-	memcpy(outData + 0x8C, tmpArtifactList, sizeof(tmpArtifactList));
+	memcpy(outData + 0x8C, tmpArtifacts, sizeof(tmpArtifacts));
 
 	outData[0x94] = localPlayerData.m_commandData[0];
 	outData[0x95] = localPlayerData.m_commandData[1];

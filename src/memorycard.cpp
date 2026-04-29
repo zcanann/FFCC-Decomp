@@ -579,9 +579,13 @@ void CMemoryCardMan::SetMcIconImage()
 {
     if (m_saveBuffer == (char*)nullptr)
     {
-        m_saveBuffer = (char*)nullptr; // (char*)__nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
+        if (m_saveBuffer == (char*)nullptr)
+        {
+            m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+                0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
+        }
 
-        if (m_saveBuffer == (char*)nullptr && System.m_execParam != 0)
+        if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
@@ -591,11 +595,11 @@ void CMemoryCardMan::SetMcIconImage()
 	
     char path[136];
 
-    const char* lang = (const char*) nullptr; // Game.GetLangString();
+    const char* lang = Game.GetLangString();
     sprintf(path, const_cast<char*>(sMemoryCardIconPathFmt), lang, CardConst::MC_ICONIMG_FNAME);
     CFile::CHandle* h = File.Open(path, 0, CFile::PRI_LOW);
 
-    if (h == nullptr && System.m_execParam != 0)
+    if (h == nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
     {
         System.Printf(const_cast<char*>(sMemoryCardOpenErrorFmt), const_cast<char*>(sMemoryCardSourceFile), 0x2EF, path);
     }
@@ -605,12 +609,13 @@ void CMemoryCardMan::SetMcIconImage()
 
     int len = File.GetLength(h);
 
-    if (len != 0x2A00 && System.m_execParam != 0)
+    if (len != 0x2A00 && static_cast<unsigned int>(System.m_execParam) >= 1)
     {
         System.Printf(const_cast<char*>(sMemoryCardDataErrorFmt), const_cast<char*>(sMemoryCardSourceFile), 0x2F6, path);
     }
 
-    memcpy(m_saveBuffer + 0x40, File.m_readBuffer, len);
+    char* saveBuffer = m_saveBuffer;
+    memcpy(saveBuffer + 0x40, File.m_readBuffer, len);
 
     File.Close(h);
 
@@ -618,7 +623,6 @@ void CMemoryCardMan::SetMcIconImage()
     m_cardStat.iconAddr    = 0x40;
 
     m_cardStat.bannerFormat = (m_cardStat.bannerFormat & ~0x03) | 0x02; // lower 2 bits = 2
-    m_cardStat.bannerFormat &= ~0x04;  // clear bit 2
 
     m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x0003) | 0x0001;
     m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x0003) | 0x0002;
@@ -648,12 +652,13 @@ void CMemoryCardMan::SetMcIconImage()
     m_cardStat.iconSpeed  &= ~0xC000;
 
     m_cardStat.offsetIcon[7] = 0xFFFFFFFF;
+    m_cardStat.bannerFormat &= ~0x04;
 
     m_cardStat.offsetIconTlut = 0x2840;
     m_cardStat.offsetIconTlut = 0x2A40;
 
     size_t titleLen = strlen(CardConst::MC_COMMENT);
-    memcpy(m_saveBuffer, CardConst::MC_COMMENT, titleLen);
+    memcpy(saveBuffer, CardConst::MC_COMMENT, titleLen);
 }
 
 /*
@@ -1359,13 +1364,12 @@ int CMemoryCardMan::DummySave()
 
         if (m_saveBuffer == 0)
         {
-            m_saveBuffer = (char*)0;  
-            // __nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
+            m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+                0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
 
             if (m_saveBuffer == 0 && System.m_execParam != 0)
             {
-                // "%s(%d): Error: memory allocation"
-                System.Printf("%s", const_cast<char*>(sMemoryAllocationError));
+                System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
             }
         }
 
@@ -1447,12 +1451,12 @@ int CMemoryCardMan::DummySave()
     {
         if (m_saveBuffer == 0)
         {
-            m_saveBuffer = (char*)0;
-            // __nwa__(0xA000, ...)
+            m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+                0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
 
             if (m_saveBuffer == 0 && System.m_execParam != 0)
             {
-                System.Printf("%s", const_cast<char*>(sMemoryAllocationError));
+                System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
             }
         }
 
@@ -1620,12 +1624,12 @@ int CMemoryCardMan::DummyLoad()
 
     if (m_saveBuffer == 0)
     {
-        m_saveBuffer = (char*)0; 
-        // __nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
+        m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+            0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
 
         if (m_saveBuffer == 0 && System.m_execParam != 0)
         {
-            System.Printf("%s", const_cast<char*>(sMemoryAllocationError));
+            System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
     }
 

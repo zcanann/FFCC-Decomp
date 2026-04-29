@@ -359,9 +359,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 void CMenuPcs::TmpArtiCtrl()
 {
 	bool hasInput;
-	float fVar2;
 	unsigned short uVar3;
-	unsigned int uVar4;
 	unsigned int uVar5;
 	int iVar6;
 	int iVar7;
@@ -403,9 +401,10 @@ void CMenuPcs::TmpArtiCtrl()
 		hasInput = false;
 	}
 
-	fVar2 = FLOAT_80332f30;
-	uVar4 = Game.m_scriptFoodBase[0];
 	if (hasInput) {
+		float fVar2 = FLOAT_80332f30;
+		unsigned int uVar4 = Game.m_scriptFoodBase[0];
+
 		iVar6 = reinterpret_cast<int>(this->m_tmpArtiList) + 8;
 		for (iVar7 = 0; iVar7 < *this->m_tmpArtiList; iVar7 = iVar7 + 1) {
 			*(float *)(iVar6 + 0x10) = fVar2;

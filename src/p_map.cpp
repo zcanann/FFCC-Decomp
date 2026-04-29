@@ -193,15 +193,6 @@ CRelProfile::~CRelProfile()
  * Address:	TODO
  * Size:	TODO
  */
-CMapPcs::CMapPcs()
-{
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CMapPcs::Init()
 {
 	m_forceMapReload = 0;
@@ -263,16 +254,6 @@ void CMapPcs::createViewer()
     MapMng.Create();
 
     m_viewerMode = 1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapPcs::LoadMap(char*, void*, unsigned long, unsigned char)
-{
-	// TODO
 }
 
 /*
@@ -937,14 +918,4 @@ void CMapPcs::drawAfterViewer()
             }
         }
     }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapPcs::GetMapLightHolder(long, _GXColor*, Vec*)
-{
-	// TODO
 }

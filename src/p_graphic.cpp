@@ -51,7 +51,6 @@ u32 m_table__11CGraphicPcs[0x15C / sizeof(u32)] = {
     0x9, 0, 0, 0, 0x48, 1, 0, 0, 0, 0x4B, 0x9, 0, 0, 0, 0x2B, 0x9, 0, 0, 0, 0x34, 0x9
 };
 
-extern int DAT_802381a0;
 extern "C" float FLOAT_8032fb78;
 extern "C" float FLOAT_8032fbfc;
 extern "C" float FLOAT_8032fc00;
@@ -568,16 +567,16 @@ void CGraphicPcs::drawCopy()
 	}
 
 	int initBlur = 0;
-	if ((m_blurMode == 1) && (DAT_802381a0 == 0)) {
-		DAT_802381a0 = 1;
+	if ((m_blurMode == 1) && (Graphic.m_blurActive == 0)) {
+		Graphic.m_blurActive = 1;
 		Graphic.InitBlurParameter();
 		initBlur = 1;
 		m_blurStep = m_blurB / m_blurR;
 		m_blurFadeOutFlag = 0;
 	}
 
-	if ((m_blurMode != 0) || (DAT_802381a0 != 0) || (m_blurFadeOutFlag != 0)) {
-		if (m_blurMode != DAT_802381a0) {
+	if ((m_blurMode != 0) || (Graphic.m_blurActive != 0) || (m_blurFadeOutFlag != 0)) {
+		if (m_blurMode != Graphic.m_blurActive) {
 			m_blurFadeOutFlag = 1;
 		}
 
@@ -588,7 +587,7 @@ void CGraphicPcs::drawCopy()
 				m_blurB = 0;
 				m_blurFadeOutFlag = 0;
 				m_blurMode = 0;
-				DAT_802381a0 = 0;
+				Graphic.m_blurActive = 0;
 			} else {
 				m_blurB = m_blurB - m_blurStep;
 			}

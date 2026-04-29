@@ -232,10 +232,10 @@ void CGraphic::Init()
     S32At(this, 0x7350) = 0;
     S32At(this, 0x7354) = 0;
     makeSphere();
-    S32At(this, 0x7358) = 0;
-    U8At(this, 0x735C) = 0;
-    U8At(this, 0x735D) = 0;
-    U8At(this, 0x735E) = 0;
+    m_blurActive = 0;
+    m_blurDelayCounter = 0;
+    m_blurBufferIndex = 0;
+    m_blurTextureCount = 0;
     GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
     PtrAt(this, 0x7368) = const_cast<char*>(s_graphic_cpp_801d6348);
     S32At(this, 0x736C) = 0xBE;
@@ -1920,9 +1920,9 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
  */
 void CGraphic::InitBlurParameter()
 {
-    U8At(this, 0x735D) = 0;
-    U8At(this, 0x735E) = 0;
-    U8At(this, 0x735C) = 0xE8;
+    m_blurBufferIndex = 0;
+    m_blurTextureCount = 0;
+    m_blurDelayCounter = 0xE8;
 }
 
 /*
@@ -1975,7 +1975,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     GXSetNumTexGens(1);
 
     int textureOffset = 0;
-    for (int i = 0; i < static_cast<int>(U8At(this, 0x735E)); i++) {
+    for (int i = 0; i < static_cast<int>(m_blurTextureCount); i++) {
         u8* textureBase = reinterpret_cast<u8*>(PtrAt(this, 0x71EC)) + textureOffset;
         GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
@@ -2009,19 +2009,19 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     GXSetProjection(CameraPcs.m_screenMatrix, GX_PERSPECTIVE);
     GXSetAlphaUpdate(GX_TRUE);
 
-    if (U8At(this, 0x735C) < textureDelay) {
-        U8At(this, 0x735C) += 1;
+    if (m_blurDelayCounter < textureDelay) {
+        m_blurDelayCounter += 1;
     } else if (System.m_scenegraphStepMode != 2) {
         CreateSmallBackTexture(PtrAt(this, 0x71EC), &texObj, 0x140, 0xE0, GX_NEAR, GX_TF_I8,
-                               static_cast<unsigned long>(U8At(this, 0x735D)) * 0x46000);
-        U8At(this, 0x735C) = 0;
-        U8At(this, 0x735E) += 1;
-        if (U8At(this, 0x735E) > 2) {
-            U8At(this, 0x735E) = 2;
+                               static_cast<unsigned long>(m_blurBufferIndex) * 0x46000);
+        m_blurDelayCounter = 0;
+        m_blurTextureCount += 1;
+        if (m_blurTextureCount > 2) {
+            m_blurTextureCount = 2;
         }
-        U8At(this, 0x735D) += 1;
-        if (U8At(this, 0x735D) > 1) {
-            U8At(this, 0x735D) = 0;
+        m_blurBufferIndex += 1;
+        if (m_blurBufferIndex > 1) {
+            m_blurBufferIndex = 0;
         }
     }
 }

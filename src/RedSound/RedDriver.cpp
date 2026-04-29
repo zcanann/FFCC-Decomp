@@ -351,10 +351,12 @@ void _MusicNextPlaySequence(int* command)
     int srcBuffer;
 
     srcBuffer = (int)p_SoundControlBuffer;
-    if ((((*command != *(int*)(srcBuffer + 0x470)) &&
-          (*command != *(int*)(srcBuffer + 0x904))) &&
-         (*command != *(int*)(srcBuffer + 0xd98))) &&
-        (c_RedEntry.SearchMusicSequence(*command) >= 0)) {
+    if ((*command == *(int*)(srcBuffer + 0x470)) ||
+        (*command == *(int*)(srcBuffer + 0x904)) ||
+        (*command == *(int*)(srcBuffer + 0xd98))) {
+        return;
+    }
+    if (c_RedEntry.SearchMusicSequence(*command) >= 0) {
         p_MusicNextPlay[0] = *command;
         p_MusicNextPlay[1] = command[1];
         p_MusicNextPlay[2] = command[2];

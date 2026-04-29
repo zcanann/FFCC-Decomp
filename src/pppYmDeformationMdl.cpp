@@ -305,10 +305,10 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, pppYmDeformationMdlUnkC*)
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
 {
-    float value = FLOAT_80330dac;
+    float value = DeformationMdlZero();
     float* state = (float*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-    state[3] = FLOAT_80330dac;
+    state[3] = DeformationMdlZero();
     state[2] = value;
     state[1] = value;
     state[6] = value;
@@ -329,7 +329,7 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
 {
     u8 direction = 1;
     u16* puVar2 = (u16*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-    float fVar1 = FLOAT_80330dac;
+    float fVar1 = DeformationMdlZero();
 
     *puVar2 = 0;
     *(u8*)(puVar2 + 1) = direction;

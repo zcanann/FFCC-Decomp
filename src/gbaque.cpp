@@ -585,18 +585,24 @@ int GbaQueue::SetQueue(int channel, unsigned int value)
 	int ret;
 
 	OSWaitSemaphore(semaphore);
-	if (obj[0x440 + channel] == 0) {
-		int* queueCount = reinterpret_cast<int*>(obj + 0x430 + channel * 4);
-		if (*queueCount < 0x40) {
-			ret = 0;
-			reinterpret_cast<unsigned int*>(obj + 0x30 + channel * 0x100)[*queueCount] = value;
-			*queueCount = *queueCount + 1;
-		} else {
-			ret = -1;
-			obj[0x440 + channel] = 1;
-		}
-	} else {
+	char* channelFlag = obj + channel;
+	if (channelFlag[0x440] != 0) {
 		ret = -1;
+	} else {
+		char* queueCountBase = obj + channel * 4;
+		int queueCount = *reinterpret_cast<int*>(queueCountBase + 0x430);
+		if (queueCount >= 0x40) {
+			ret = -1;
+			channelFlag[0x440] = 1;
+		} else {
+			char* queueBase = obj + channel * 0x100;
+			char* queueEntry = queueBase;
+			queueEntry += queueCount * 4;
+			ret = 0;
+			*reinterpret_cast<unsigned int*>(queueEntry + 0x30) = value;
+			*reinterpret_cast<int*>(queueCountBase + 0x430) =
+				*reinterpret_cast<int*>(queueCountBase + 0x430) + 1;
+		}
 	}
 	OSSignalSemaphore(semaphore);
 	return ret;

@@ -951,18 +951,23 @@ int CRedEntry::SearchSeSepSequence(int seNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c1c20
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
 {
+	int freedSize;
 	int waveNo = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<int*>(bank)[2] + 0x11)) +
 	             static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<int*>(bank)[2] + 0x12)) * 0x100;
 
 	RedDelete(reinterpret_cast<int*>(bank)[2]);
 	SeSepHistoryDelete(reinterpret_cast<int*>(bank)[1]);
 
-	int freedSize = reinterpret_cast<int*>(bank)[3];
+	freedSize = reinterpret_cast<int*>(bank)[3];
 	reinterpret_cast<int*>(bank)[3] = 0;
 	reinterpret_cast<int*>(bank)[2] = 0;
 	reinterpret_cast<int*>(bank)[0] = -1;

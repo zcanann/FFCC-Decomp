@@ -816,7 +816,9 @@ void COctTree::Draw(unsigned char drawType)
 
 	if (m_type == 0) {
 		mapObj = m_mapObject;
-		if ((*reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) == drawType) &&
+		unsigned char mapDrawType = *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15));
+		unsigned char targetDrawType = drawType;
+		if ((mapDrawType == targetDrawType) &&
 		    ((*reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x18)) & 1) != 0)) {
 			if ((*reinterpret_cast<unsigned char*>(Ptr(&MapMng, 0x2298A)) != 0) &&
 			    ((*reinterpret_cast<void**>(Ptr(mapObj, 0x10)) != 0) &&
@@ -841,8 +843,9 @@ void COctTree::Draw(unsigned char drawType)
 			if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x27)) != 0) {
 				GXSetZMode(1, (GXCompare)3, 1);
 			}
-			if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40))) {
-				CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(Ptr(m_mapObject, 0x40)));
+			float offsetZ = *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40));
+			if (offsetZ != kMapOctTreeDefaultOffsetZ) {
+				CameraPcs.SetOffsetZBuff(offsetZ);
 			}
 		}
 	}
@@ -861,7 +864,8 @@ void COctTree::DrawCharaShadow(unsigned char drawType)
 {
 	void* mapObj;
 
-	if ((m_type == 0) && (mapObj = m_mapObject, *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) == drawType)) {
+	if ((m_type == 0) && (mapObj = m_mapObject,
+	                      *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) == static_cast<unsigned char>(drawType))) {
 		LightPcs.SetBumpTexMatirx(reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)), 0, reinterpret_cast<Vec*>(Ptr(mapObj, 0x58)),
 		                          *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x1A)));
 
@@ -872,8 +876,9 @@ void COctTree::DrawCharaShadow(unsigned char drawType)
 		reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))->SetRenderArray();
 		DrawCharaShadowTypeMeshFlag_r(m_nodePool);
 
-		if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40))) {
-			CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(Ptr(m_mapObject, 0x40)));
+		float offsetZ = *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40));
+		if (offsetZ != kMapOctTreeDefaultOffsetZ) {
+			CameraPcs.SetOffsetZBuff(offsetZ);
 		}
 	}
 }

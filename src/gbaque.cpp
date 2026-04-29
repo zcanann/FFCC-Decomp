@@ -3508,11 +3508,11 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
  */
 void GbaQueue::SetShopFlg(int channel)
 {
-	u8 mask = static_cast<u8>(1 << channel);
-	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(reinterpret_cast<char*>(this) + channel * 0xC + 0x80);
+	OSSemaphore* semaphore = accessSemaphores + channel;
 	u8* flags = reinterpret_cast<u8*>(this) + 0x2D38;
 
 	OSWaitSemaphore(semaphore);
+	int mask = 1 << channel;
 	*flags = static_cast<u8>(*flags | mask);
 	OSSignalSemaphore(semaphore);
 
@@ -3556,11 +3556,11 @@ void GbaQueue::ClrShopFlg(int channel)
  */
 void GbaQueue::SetSmithFlg(int channel)
 {
-	u8 mask = static_cast<u8>(0x10 << channel);
-	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(reinterpret_cast<char*>(this) + channel * 0xC + 0x80);
+	OSSemaphore* semaphore = accessSemaphores + channel;
 	u8* flags = reinterpret_cast<u8*>(this) + 0x2D38;
 
 	OSWaitSemaphore(semaphore);
+	int mask = 0x10 << channel;
 	*flags = static_cast<u8>(*flags | mask);
 	OSSignalSemaphore(semaphore);
 

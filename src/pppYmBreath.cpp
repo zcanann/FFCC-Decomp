@@ -62,7 +62,7 @@ struct YmBreathParams {
     u16 m_particleCount;
     u16 m_emitCount;
     u16 m_emitInterval;
-    s16 m_particleLifetime;
+    u16 m_particleLifetime;
     u8 m_fadeOutFrames;
     u8 m_fadeInFrames;
     u8 m_spread;

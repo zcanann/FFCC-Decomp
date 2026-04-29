@@ -876,42 +876,53 @@ void CCaravanWork::CanAddTmpArtifact(int)
 int CCaravanWork::FindItem(int itemId)
 {
 	int baseIdx = 0;
-	int rowCount = 8;
 	CCaravanWork* cur = this;
 
-	while (true) {
-		if ((short)cur->m_inventoryItems[0] != -1 && (short)cur->m_inventoryItems[0] == itemId) {
+	for (int rowCount = 8; rowCount != 0; rowCount--) {
+		if (cur->m_inventoryItems[0] != -1 && cur->m_inventoryItems[0] == itemId) {
 			return baseIdx;
 		}
-		if ((short)cur->m_inventoryItems[1] != -1 && (short)cur->m_inventoryItems[1] == itemId) {
-			return baseIdx + 1;
+		short item = cur->m_inventoryItems[1];
+		baseIdx++;
+		if (item != -1 && item == itemId) {
+			return baseIdx;
 		}
-		if ((short)cur->m_inventoryItems[2] != -1 && (short)cur->m_inventoryItems[2] == itemId) {
-			return baseIdx + 2;
+		item = cur->m_inventoryItems[2];
+		baseIdx++;
+		if (item != -1 && item == itemId) {
+			return baseIdx;
 		}
-		if ((short)cur->m_inventoryItems[3] != -1 && (short)cur->m_inventoryItems[3] == itemId) {
-			return baseIdx + 3;
+		item = cur->m_inventoryItems[3];
+		baseIdx++;
+		if (item != -1 && item == itemId) {
+			return baseIdx;
 		}
-		if ((short)cur->m_inventoryItems[4] != -1 && (short)cur->m_inventoryItems[4] == itemId) {
-			return baseIdx + 4;
+		item = cur->m_inventoryItems[4];
+		baseIdx++;
+		if (item != -1 && item == itemId) {
+			return baseIdx;
 		}
-		if ((short)cur->m_inventoryItems[5] != -1 && (short)cur->m_inventoryItems[5] == itemId) {
-			return baseIdx + 5;
+		item = cur->m_inventoryItems[5];
+		baseIdx++;
+		if (item != -1 && item == itemId) {
+			return baseIdx;
 		}
-		if ((short)cur->m_inventoryItems[6] != -1 && (short)cur->m_inventoryItems[6] == itemId) {
-			return baseIdx + 6;
+		item = cur->m_inventoryItems[6];
+		baseIdx++;
+		if (item != -1 && item == itemId) {
+			return baseIdx;
 		}
-		if ((short)cur->m_inventoryItems[7] != -1 && (short)cur->m_inventoryItems[7] == itemId) {
-			return baseIdx + 7;
+		item = cur->m_inventoryItems[7];
+		baseIdx++;
+		if (item != -1 && item == itemId) {
+			return baseIdx;
 		}
 
 		cur = (CCaravanWork*)&cur->m_baseDataIndex;
-		baseIdx += 8;
-		rowCount--;
-		if (rowCount == 0) {
-			return -1;
-		}
+		baseIdx++;
 	}
+
+	return -1;
 }
 
 /*

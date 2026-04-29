@@ -4,10 +4,6 @@
 #include "ffcc/system.h"
 
 extern u32 m_table__11CDbgMenuPcs[];
-extern u32 m_table_desc0__11CDbgMenuPcs[];
-extern u32 m_table_desc1__11CDbgMenuPcs[];
-extern u32 m_table_desc2__11CDbgMenuPcs[];
-extern u32 m_table_desc3__11CDbgMenuPcs[];
 
 class CDbgMenuPcs : public CProcess
 {

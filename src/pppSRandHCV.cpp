@@ -17,7 +17,7 @@ struct PppSRandHCVParam2 {
     u8 field10;
 };
 
-static float randf(unsigned char flag)
+static inline float randf(unsigned char flag)
 {
     float value = Math.RandF();
     if (flag != 0) {
@@ -29,7 +29,7 @@ static float randf(unsigned char flag)
     return value;
 }
 
-static short randshort(short value, float scale)
+static inline short randshort(short value, float scale)
 {
     return (short)((f32)value * scale - (f32)value);
 }

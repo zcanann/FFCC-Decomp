@@ -7,7 +7,7 @@
 #include "ffcc/ppp_linkage.h"
 
 
-static float randf(unsigned char flag)
+static inline float randf(unsigned char flag)
 {
     float value = -Math.RandF();
     if (flag != 0) {
@@ -19,7 +19,7 @@ static float randf(unsigned char flag)
     return value;
 }
 
-static char randchar(char value, float scale)
+static inline char randchar(char value, float scale)
 {
     return (char)((f32)value * scale);
 }

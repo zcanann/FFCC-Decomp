@@ -388,7 +388,7 @@ extern "C" void __sinit_monobj_table_cpp(void);
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::alwaysFuncDefault()
+void CGMonObj::moveCancelFuncLastBoss()
 {
 	// TODO
 }
@@ -398,7 +398,7 @@ void CGMonObj::alwaysFuncDefault()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::frameStatFuncDefault()
+void CGMonObj::moveFrameFuncLastBoss()
 {
 	// TODO
 }
@@ -408,7 +408,7 @@ void CGMonObj::frameStatFuncDefault()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::cancelStatFuncDefault()
+void CGMonObj::moveCancelFuncRamoe()
 {
 	// TODO
 }
@@ -418,7 +418,7 @@ void CGMonObj::cancelStatFuncDefault()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::changeStatFuncDefault(int)
+void CGMonObj::moveFrameFuncRamoe()
 {
 	// TODO
 }
@@ -428,7 +428,7 @@ void CGMonObj::changeStatFuncDefault(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveCancelFuncDefault()
+void CGMonObj::moveCancelFuncLich()
 {
 	// TODO
 }
@@ -438,7 +438,7 @@ void CGMonObj::moveCancelFuncDefault()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveFrameFuncDefault()
+void CGMonObj::moveFrameFuncLich()
 {
 	// TODO
 }
@@ -448,7 +448,7 @@ void CGMonObj::moveFrameFuncDefault()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::cancelStatFuncGiantCrab()
+void CGMonObj::moveCancelFuncTetsukyojin()
 {
 	// TODO
 }
@@ -458,397 +458,7 @@ void CGMonObj::cancelStatFuncGiantCrab()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::changeStatFuncGiantCrab(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancelFuncGiantCrab()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveFrameFuncGiantCrab()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::changeStatFuncOrcKing(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::cancelStatFuncGolem()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancelFuncGolem()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveFrameFuncGolem()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancelFuncArmstrong()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveFrameFuncArmstrong()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::changeStatFuncGoblinKing(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancelFuncGoblinKing()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveFrameFuncGoblinKing()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancelFuncMolbol()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveFrameFuncMolbol()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::frameStatFuncLizardmanKing()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::cancelStatFuncLizardmanKing()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::changeStatFuncLizardmanKing(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancelFuncLizardmanKing()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveFrameFuncLizardmanKing()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancelFuncCaveWorm()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveFrameFuncCaveWorm()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::frameStatFuncGigasLoad()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::cancelStatFuncGigasLoad()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::changeStatFuncGigasLoad(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancelFuncGigasLoad()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveFrameFuncGigasLoad()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::cancelStatFuncMeteoParasite()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancelFuncMeteoParasite()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveFrameFuncMeteoParasite()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::cancelStatFuncMeteoParasiteC()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::changeStatFuncMeteoParasiteC(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancelFuncMeteoParasiteC()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveFrameFuncMeteoParasiteC()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::frameStatFuncDuct()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::cancelStatFuncDuct()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::changeStatFuncDuct(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancelFuncDuct()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveFrameFuncDuct()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveCancelFuncDragonZombie()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::moveFrameFuncDragonZombie()
+void CGMonObj::moveFrameFuncTetsukyojin()
 {
 	// TODO
 }
@@ -908,7 +518,7 @@ void CGMonObj::moveFrameFuncAntrion()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveCancelFuncTetsukyojin()
+void CGMonObj::moveCancelFuncDragonZombie()
 {
 	// TODO
 }
@@ -918,7 +528,7 @@ void CGMonObj::moveCancelFuncTetsukyojin()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveFrameFuncTetsukyojin()
+void CGMonObj::moveFrameFuncDragonZombie()
 {
 	// TODO
 }
@@ -928,7 +538,7 @@ void CGMonObj::moveFrameFuncTetsukyojin()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveCancelFuncLich()
+void CGMonObj::frameStatFuncDuct()
 {
 	// TODO
 }
@@ -938,7 +548,7 @@ void CGMonObj::moveCancelFuncLich()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveFrameFuncLich()
+void CGMonObj::cancelStatFuncDuct()
 {
 	// TODO
 }
@@ -948,7 +558,7 @@ void CGMonObj::moveFrameFuncLich()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveCancelFuncRamoe()
+void CGMonObj::changeStatFuncDuct(int)
 {
 	// TODO
 }
@@ -958,7 +568,7 @@ void CGMonObj::moveCancelFuncRamoe()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveFrameFuncRamoe()
+void CGMonObj::moveCancelFuncDuct()
 {
 	// TODO
 }
@@ -968,7 +578,7 @@ void CGMonObj::moveFrameFuncRamoe()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveCancelFuncLastBoss()
+void CGMonObj::moveFrameFuncDuct()
 {
 	// TODO
 }
@@ -978,7 +588,397 @@ void CGMonObj::moveCancelFuncLastBoss()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveFrameFuncLastBoss()
+void CGMonObj::cancelStatFuncMeteoParasiteC()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::changeStatFuncMeteoParasiteC(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveCancelFuncMeteoParasiteC()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveFrameFuncMeteoParasiteC()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::cancelStatFuncMeteoParasite()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveCancelFuncMeteoParasite()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveFrameFuncMeteoParasite()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::frameStatFuncGigasLoad()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::cancelStatFuncGigasLoad()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::changeStatFuncGigasLoad(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveCancelFuncGigasLoad()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveFrameFuncGigasLoad()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveCancelFuncCaveWorm()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveFrameFuncCaveWorm()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::frameStatFuncLizardmanKing()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::cancelStatFuncLizardmanKing()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::changeStatFuncLizardmanKing(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveCancelFuncLizardmanKing()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveFrameFuncLizardmanKing()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveCancelFuncMolbol()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveFrameFuncMolbol()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::changeStatFuncGoblinKing(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveCancelFuncGoblinKing()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveFrameFuncGoblinKing()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveCancelFuncArmstrong()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveFrameFuncArmstrong()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::cancelStatFuncGolem()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveCancelFuncGolem()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveFrameFuncGolem()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::changeStatFuncOrcKing(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::cancelStatFuncGiantCrab()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::changeStatFuncGiantCrab(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveCancelFuncGiantCrab()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveFrameFuncGiantCrab()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::alwaysFuncDefault()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::frameStatFuncDefault()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::cancelStatFuncDefault()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::changeStatFuncDefault(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveCancelFuncDefault()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGMonObj::moveFrameFuncDefault()
 {
 	// TODO
 }

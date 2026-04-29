@@ -1539,8 +1539,7 @@ void GbaQueue::LoadEnemyStat()
 				CGObject* enemyObj = reinterpret_cast<CGObject*>(enemyObjPtrs[i]);
 				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
 				const int enemyDataBase = Game.unkCFlatData0[1] + enemyWork->m_baseDataIndex * 0x1D0;
-				const short enemyKind = *reinterpret_cast<short*>(enemyDataBase + 0x10C);
-				const int isDispRadar = enemyObj->IsDispRader();
+				const int enemyKind = *reinterpret_cast<short*>(enemyDataBase + 0x10C);
 
 				if (enemyKind == 10) {
 					enemyEntry[1] = 1;
@@ -1553,7 +1552,9 @@ void GbaQueue::LoadEnemyStat()
 				enemyEntry[3] = static_cast<unsigned char>(enemyWork->m_baseDataIndex);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 4) = enemyWork->m_hp;
 				*reinterpret_cast<unsigned short*>(enemyEntry + 6) = enemyWork->m_maxHp;
-				enemyEntry[2] = static_cast<unsigned char>((-isDispRadar | isDispRadar) >> 31);
+				int isDispRadar = static_cast<int>(enemyObj->IsDispRader());
+				int isDispRadarMask = -isDispRadar | isDispRadar;
+				enemyEntry[2] = static_cast<unsigned char>(isDispRadarMask >> 31);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 0xC) =
 				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x510);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 0xE) =
@@ -1562,10 +1563,10 @@ void GbaQueue::LoadEnemyStat()
 				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x514);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 0x12) =
 				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x516);
-				*reinterpret_cast<short*>(enemyEntry + 8) =
-				    static_cast<short>(enemyObj->m_worldPosition.x / FLOAT_80330D54);
-				*reinterpret_cast<short*>(enemyEntry + 0xA) =
-				    static_cast<short>(enemyObj->m_worldPosition.z / FLOAT_80330D54);
+				long long posX = static_cast<int>(enemyObj->m_worldPosition.x / FLOAT_80330D54);
+				*reinterpret_cast<short*>(enemyEntry + 8) = static_cast<short>(posX);
+				long long posZ = static_cast<int>(enemyObj->m_worldPosition.z / FLOAT_80330D54);
+				*reinterpret_cast<short*>(enemyEntry + 0xA) = static_cast<short>(posZ);
 			}
 
 			enemyEntry += 0x14;

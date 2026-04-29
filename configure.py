@@ -73,7 +73,14 @@ parser.add_argument(
 parser.add_argument(
     "--map",
     action="store_true",
-    help="generate map file(s)",
+    default=True,
+    help="generate map file(s) (default: enabled)",
+)
+parser.add_argument(
+    "--no-map",
+    dest="map",
+    action="store_false",
+    help="disable map file generation",
 )
 parser.add_argument(
     "--debug",
@@ -487,7 +494,7 @@ config.libs = [
             Object(NonMatching, "cflat_r2system.cpp"),
             Object(NonMatching, "cflat_runtime.cpp"),
             Object(NonMatching, "cflat_runtime2.cpp"),
-            Object(NonMatching, "chara_anim.cpp", extra_cflags=["-inline auto,deferred"]),
+            Object(NonMatching, "chara_anim.cpp", extra_cflags=["-inline deferred"]),
             Object(NonMatching, "chara_fur.cpp"),
             Object(NonMatching, "chara.cpp"),
             Object(NonMatching, "charaobj.cpp"),
@@ -1047,7 +1054,7 @@ config.libs = [
             Object(
                 Matching,
                 "Runtime.PPCEABI.H/NMWException.cp",
-                extra_cflags=["-inline auto,deferred"],
+                extra_cflags=["-inline deferred"],
             ),
             Object(Matching, "Runtime.PPCEABI.H/ptmf.c"),
             Object(Matching, "Runtime.PPCEABI.H/runtime.c"),

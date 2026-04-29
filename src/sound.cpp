@@ -2100,34 +2100,32 @@ found_entry:
 int CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
 {
     int ret;
-    char* se;
-    char* found;
+    CSe3D* se;
+    CSe3D* found;
     int count;
     
     if (se3dHandle < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
         ret = 0;
     } else {
-        se = reinterpret_cast<char*>(this) + 0x2C;
+        se = reinterpret_cast<CSe3D*>(reinterpret_cast<u8*>(this) + 0x2C);
         ret = 0;
         count = 0x20;
         do {
-            if (((((*se & 0x80) != 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-                 ((found = se + 0x28), ((*found & 0x80) != 0) && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
-                ((found = se + 0x50), ((*found & 0x80) != 0) && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
-                (((se[0x78] & 0x80) != 0) && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+            if ((((se[0].m_flags < 0) && (found = &se[0], se[0].m_handle == se3dHandle)) ||
+                 ((se[1].m_flags < 0) && (found = &se[1], se[1].m_handle == se3dHandle))) ||
+                ((se[2].m_flags < 0) && (found = &se[2], se[2].m_handle == se3dHandle)) ||
+                ((se[3].m_flags < 0) && (found = &se[3], se[3].m_handle == se3dHandle))) {
                 goto found_entry;
             }
             ret += 3;
-            se += 0xA0;
+            se += 4;
             count = count + -1;
         } while (count != 0);
         found = 0;
 found_entry:
         if (found != 0) {
-            *reinterpret_cast<float*>(found + 0x18) = position->x;
-            *reinterpret_cast<float*>(found + 0x1C) = position->y;
-            *reinterpret_cast<float*>(found + 0x20) = position->z;
+            found->m_position = *position;
         }
     }
     return ret;

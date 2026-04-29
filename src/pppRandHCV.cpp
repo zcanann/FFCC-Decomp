@@ -17,7 +17,7 @@ typedef struct RandHCVParams {
     u8 field10;
 } RandHCVParams;
 
-inline short randshort(short value, float scale)
+static short randshort(short value, float scale)
 {
     return (short)((f32)value * scale - (f32)value);
 }

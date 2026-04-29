@@ -16,7 +16,7 @@ struct SRandCVParam {
     u8 _pad[3];
 };
 
-inline char randchar(char value, float scale)
+static char randchar(char value, float scale)
 {
     return (char)((f32)value * scale - (f32)value);
 }

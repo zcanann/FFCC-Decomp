@@ -16,7 +16,7 @@ typedef struct RandCVParams {
     u8 pad[3];
 } RandCVParams;
 
-inline char randchar(char value, float scale)
+static char randchar(char value, float scale)
 {
     return (char)((f32)value * scale - (f32)value);
 }

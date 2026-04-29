@@ -8,7 +8,7 @@
 
 const float kPppSRandDownCVDualSampleScale = 0.5f;
 
-inline char randchar(char value, float scale)
+static char randchar(char value, float scale)
 {
     return (char)((f32)value * scale);
 }

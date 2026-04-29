@@ -23,6 +23,10 @@ extern const float kDrawAStarSphereRadius = 10.0f;
 extern const float kInfiniteCost = 10000000.0f;
 extern const char kAStarStepDebugFormat[] = "%d ";
 extern const char kAStarNewLine[] = "\n";
+extern const float FLOAT_803320B8 = 1.0f;
+extern const float FLOAT_803320BC = 25.0f;
+extern const float FLOAT_803320C0 = 1.3333f;
+extern const float FLOAT_803320C4 = 0.0f;
 }
 #include "ffcc/system.h"
 #include "ffcc/vector.h"

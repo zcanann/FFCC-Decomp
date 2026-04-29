@@ -32,6 +32,8 @@ extern "C" char SoundBuffer_1248_[];
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
 	int, int, int, CGObject*, float, void*);
 extern "C" float DAT_8032ec24;
+extern float FLOAT_803319F8;
+extern float FLOAT_80331A34;
 extern double DOUBLE_803319E0;
 extern double DOUBLE_80331A10;
 extern double DOUBLE_80331A18;
@@ -717,7 +719,105 @@ void CGMonObj::onCancelStat(int state)
  */
 void CGMonObj::isValidTarget()
 {
-	// TODO
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
+	unsigned char* script9 = reinterpret_cast<unsigned char*>(scriptHandle[9]);
+	float maxDist = static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script9 + 0xCC)) -
+	                                   DOUBLE_803319E0);
+	float homeDist = PSVECDistance(reinterpret_cast<Vec*>(mon + 0x6F8), reinterpret_cast<Vec*>(mon + 0x15C));
+	unsigned char* aiData;
+
+	if (*reinterpret_cast<short*>(mon + 0x6E4) == 0) {
+		aiData = script9;
+	} else {
+		aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+		         (*reinterpret_cast<short*>(mon + 0x6E4) + *reinterpret_cast<unsigned short*>(script9 + 0x100)) *
+		             0x1D0 +
+		         0x10;
+	}
+
+	if ((*reinterpret_cast<int*>(mon + 0x6C4) >= 0) &&
+	    ((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x20) != 0)) {
+		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+		memset(mon + 0x70C, 0, 0x34);
+		*reinterpret_cast<int*>(mon + 0x6D8) = 2;
+		*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+		mon[0x6BB] = 1;
+		return;
+	}
+
+	if (((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x20) != 0) ||
+	    ((*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 8) != 0)) {
+		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+		memset(mon + 0x70C, 0, 0x34);
+		*reinterpret_cast<int*>(mon + 0x6D8) = 0;
+		*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+		mon[0x6BB] = 1;
+		return;
+	}
+
+	if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
+		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x21;
+		if (*reinterpret_cast<int*>(mon + 0x734) != 3) {
+			memset(mon + 0x70C, 0, 0x34);
+			*reinterpret_cast<int*>(mon + 0x70C) = 0x806;
+			*reinterpret_cast<int*>(mon + 0x734) = 3;
+		}
+		*reinterpret_cast<int*>(mon + 0x718) = *reinterpret_cast<int*>(mon + 0x6F8);
+		*reinterpret_cast<int*>(mon + 0x71C) = *reinterpret_cast<int*>(mon + 0x6FC);
+		*reinterpret_cast<int*>(mon + 0x720) = *reinterpret_cast<int*>(mon + 0x700);
+	}
+
+	if (((*reinterpret_cast<short*>(script9 + 0x10C) != 1) || (*reinterpret_cast<int*>(mon + 0x730) < 0x19)) &&
+	    ((*reinterpret_cast<short*>(script9 + 0x10C) == 1) || (FLOAT_80331A34 * maxDist <= homeDist))) {
+		goto check_home;
+	}
+
+	{
+		double soundLimit = DOUBLE_80331A18;
+		if (Game.m_gameWork.m_soundOptionFlag != 0) {
+			soundLimit = DOUBLE_80331A10;
+		}
+
+		int partyIndex = -1;
+		if (soundLimit > static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC))) {
+			float hitScale;
+			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
+			         static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script9 + 0xC8)) -
+			                            DOUBLE_803319E0),
+			         &hitScale, &partyIndex);
+			if (partyIndex < 0) {
+				partyIndex = -1;
+			}
+		}
+
+		if (partyIndex >= 0) {
+			*reinterpret_cast<int*>(mon + 0x6C4) = partyIndex;
+			if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
+				*reinterpret_cast<int*>(mon + 0x6D8) = 2;
+			} else {
+				*reinterpret_cast<int*>(mon + 0x6D8) = 1;
+			}
+			*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+			mon[0x6BB] = 1;
+			return;
+		}
+	}
+
+check_home:
+	if ((homeDist < FLOAT_803319F8) ||
+	    (*reinterpret_cast<unsigned int*>(mon + 0x6DC) == *reinterpret_cast<unsigned short*>(script9 + 0x1B8))) {
+		*reinterpret_cast<int*>(mon + 0x6F8) = *reinterpret_cast<int*>(mon + 0x15C);
+		*reinterpret_cast<int*>(mon + 0x6FC) = *reinterpret_cast<int*>(mon + 0x160);
+		*reinterpret_cast<int*>(mon + 0x700) = *reinterpret_cast<int*>(mon + 0x164);
+		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+		memset(mon + 0x70C, 0, 0x34);
+		*reinterpret_cast<int*>(mon + 0x6D8) = 0;
+		*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+		mon[0x6BB] = 1;
+	} else if (*reinterpret_cast<short*>(script9 + 0x10C) != 1) {
+		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x1C;
+	}
 }
 
 /*

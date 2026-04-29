@@ -773,8 +773,8 @@ s32 THPSimpleSetBuffer(u8* buffer)
 s32 THPSimpleCalcNeedMemory(void)
 {
     if (SimpleControl.isOpen != 0) {
-        s32 frameSize = SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize;
         s32 need = ((SimpleControl.header.mBufferSize + 0x1F) * 8) & ~0xFF;
+        s32 frameSize = SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize;
         need += (frameSize + 0x1F) & ~0x1F;
         frameSize = (((u32)frameSize >> 2) + 0x1F) & ~0x1F;
         need += frameSize;

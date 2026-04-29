@@ -2284,30 +2284,30 @@ void CSound::LoadStream(int streamID)
             StreamStop__9CRedSoundFi(RedSound(this), sound.m_streamID);
         }
 
-        CFile::CHandle*& streamFile = sound.m_streamFile;
-        if (streamFile != 0) {
-            File.Close(streamFile);
-            streamFile = 0;
+        if (sound.m_streamFile != 0) {
+            File.Close(sound.m_streamFile);
+            sound.m_streamFile = 0;
         }
 
         sound.m_streamPlaying = 0;
 
         char streamPath[268];
         sprintf(streamPath, s_soundStreamPathFmt, streamID);
-        streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
-        if (streamFile != 0) {
+        sound.m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
+        if (sound.m_streamFile != 0) {
+            CFile::CHandle* streamFile = sound.m_streamFile;
             streamFile->m_chunkSize = 0x20000;
             streamFile->m_currentOffset = 0;
-            File.Read(streamFile);
-            File.SyncCompleted(streamFile);
+            File.Read(sound.m_streamFile);
+            File.SyncCompleted(sound.m_streamFile);
             memcpy(sound.m_streamBuffer, File.m_readBuffer, 0x20000);
             sound.m_streamOffset = 0x20000;
             sound.m_streamHalf = 0;
-            sound.m_streamRemain = File.GetLength(streamFile) - 0x20000;
+            sound.m_streamRemain = File.GetLength(sound.m_streamFile) - 0x20000;
             sound.m_streamState = 0;
             sound.m_streamWaveID = streamID;
-            File.Close(streamFile);
-            streamFile = 0;
+            File.Close(sound.m_streamFile);
+            sound.m_streamFile = 0;
         }
     }
 }

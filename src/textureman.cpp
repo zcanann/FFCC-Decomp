@@ -681,7 +681,7 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
     unsigned char* texture = reinterpret_cast<unsigned char*>(this);
     unsigned int width;
     unsigned int height;
-    int format;
+    unsigned int format;
 
     *reinterpret_cast<unsigned int*>(texture + 0x6C) = 1;
     *reinterpret_cast<unsigned int*>(texture + 0x60) = 6;
@@ -848,7 +848,7 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
 {
     if (m_cacheId != -1) {
         if (IsEnable__13CAmemCacheSetFs(amemCacheSet, m_cacheId) == 0) {
-            int format;
+            unsigned int format;
             int tlutBase;
             int numEntries;
             int offset;
@@ -856,7 +856,7 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
             m_imageData = reinterpret_cast<void*>(
                 GetData__13CAmemCacheSetFsPci(amemCacheSet, m_cacheId, const_cast<char*>(s_textureman_cpp), 0x1DD));
 
-            format = static_cast<int>(m_format);
+            format = static_cast<unsigned int>(m_format);
             if ((format == 9) || (format == 8)) {
                 GXInitTexObjCI(&m_texObj, m_imageData, m_width & 0xFFFF, m_height & 0xFFFF,
                                static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),

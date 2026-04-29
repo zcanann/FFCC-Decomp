@@ -21,9 +21,18 @@ extern CMenuPcs MenuPcs;
 unsigned char s_rank[0x20];
 
 extern float FLOAT_80333040;
+extern float FLOAT_80333044;
 extern float FLOAT_80333048;
 extern double DOUBLE_80333050;
+extern float FLOAT_80333058;
+extern float FLOAT_8033305c;
+extern double DOUBLE_80333060;
+extern const char lbl_80333068[];
+extern float FLOAT_8033306c;
+extern float FLOAT_80333070;
 extern double DOUBLE_80333078;
+extern float FLOAT_80333080;
+extern float FLOAT_80333084;
 
 struct FavoFlatTableEntry
 {
@@ -89,7 +98,7 @@ void CMenuPcs::FavoInit()
 
 	uVar3 = Game.m_scriptFoodBase[0];
 	memset(favoList, 0, 0x1008);
-	fVar4 = 1.0f;
+	fVar4 = FLOAT_80333048;
 	iVar8 = (int)favoList + 8;
 	iVar16 = 8;
 	do {
@@ -111,7 +120,7 @@ void CMenuPcs::FavoInit()
 	*(short*)(iVar8 + 8) = 0x30;
 	fVar4 = 0.0f;
 	*(short*)(iVar8 + 10) = 0x28;
-	fVar5 = 320.0f;
+	fVar5 = FLOAT_80333080;
 	*(short*)(iVar8 + 0xc) = 0x158;
 	*(short*)(iVar8 + 0xe) = 0x20;
 	*(float*)(iVar8 + 0x10) = fVar4;
@@ -146,10 +155,10 @@ void CMenuPcs::FavoInit()
 
 	iVar8 = (int)favoList;
 	*(int*)(iVar8 + 0xe4) = 0x45;
-	fVar5 = 1.0f;
+	fVar5 = FLOAT_80333048;
 	sVar9 = 0;
 	*(short*)(iVar8 + 200) = 0x18;
-	fVar7 = 0.5f;
+	fVar7 = FLOAT_80333084;
 	sVar11 = 6;
 	*(short*)(iVar8 + 0xca) = 0xe;
 	*(short*)(iVar8 + 0xcc) = 0x30;
@@ -624,13 +633,13 @@ void CMenuPcs::FavoDraw()
 						float end = y + h;
 						while (yStep < end) {
 							float tileH = end - yStep;
-							if (tileH > 32.0f) {
-								tileH = 32.0f;
+							if (tileH > FLOAT_80333044) {
+								tileH = FLOAT_80333044;
 							}
 							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
 							    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, fillW, tileH, u,
 							    v, colors, uvScale, FLOAT_80333048, FLOAT_80333040);
-							yStep += 32.0f;
+							yStep += FLOAT_80333044;
 						}
 					} else {
 						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
@@ -648,19 +657,19 @@ void CMenuPcs::FavoDraw()
 						{0xFF, 0xFF, 0xFF, 0x00},
 						{0xFF, 0xFF, 0xFF, 0x00},
 					};
-					float remainW = (48.0f / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14))) * w;
+					float remainW = (static_cast<float>(DOUBLE_80333050) / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14))) * w;
 					if (tex == 0x32) {
 						float yStep = y;
 						float end = y + h;
 						while (yStep < end) {
 							float tileH = end - yStep;
-							if (tileH > 32.0f) {
-								tileH = 32.0f;
+							if (tileH > FLOAT_80333044) {
+								tileH = FLOAT_80333044;
 							}
 							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
 							    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, remainW, tileH,
 							    u, v, fadeColors, uvScale, FLOAT_80333048, FLOAT_80333040);
-							yStep += 32.0f;
+							yStep += FLOAT_80333044;
 						}
 					} else {
 						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
@@ -672,7 +681,7 @@ void CMenuPcs::FavoDraw()
 				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 			} else {
 				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
-				GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha * 255.0f)};
+				GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha * FLOAT_80333058)};
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80333040);
 			}
@@ -695,7 +704,8 @@ void CMenuPcs::FavoDraw()
 	short* drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		int barX = drawEntry[0] + drawEntry[2] + 0x18;
-		int barY = static_cast<int>((static_cast<float>(drawEntry[3]) - 6.0f) * 0.5f + static_cast<float>(drawEntry[1]));
+		int barY = static_cast<int>((static_cast<float>(drawEntry[3]) - FLOAT_8033305c) * static_cast<float>(DOUBLE_80333060) +
+		                            static_cast<float>(drawEntry[1]));
 		DrawSingBar(barX, barY, *reinterpret_cast<short*>(rank + 2), *reinterpret_cast<float*>(drawEntry + 8));
 		rank += 4;
 		drawEntry += 0x20;
@@ -705,7 +715,8 @@ void CMenuPcs::FavoDraw()
 	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		int iconX = drawEntry[0] + drawEntry[2] - 0x10;
-		int iconY = static_cast<int>((static_cast<float>(drawEntry[3]) - 32.0f) * 0.5f + static_cast<float>(drawEntry[1]));
+		int iconY = static_cast<int>((static_cast<float>(drawEntry[3]) - FLOAT_80333044) * static_cast<float>(DOUBLE_80333060) +
+		                             static_cast<float>(drawEntry[1]));
 		DrawSingleIcon__8CMenuPcsFiiifif(this, static_cast<char>(rank[1]) + 0x14, iconX, iconY, *reinterpret_cast<float*>(drawEntry + 8), 1,
 		                                 FLOAT_80333048);
 		rank += 4;
@@ -723,12 +734,12 @@ void CMenuPcs::FavoDraw()
 	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		rankFont->SetTlut(6);
-		GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * *reinterpret_cast<float*>(drawEntry + 8))};
+		GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80333058 * *reinterpret_cast<float*>(drawEntry + 8))};
 		rankFont->SetColor(textColor);
 		rankFont->SetMargin(FLOAT_80333048);
-		sprintf(textBuf, "%d", static_cast<int>(*rank));
+		sprintf(textBuf, lbl_80333068, static_cast<int>(*rank));
 		rankFont->SetPosX(static_cast<float>(drawEntry[0] - 0xC));
-		rankFont->SetPosY(static_cast<float>(drawEntry[1]) - 5.0f);
+		rankFont->SetPosY(static_cast<float>(drawEntry[1]) - FLOAT_8033306c);
 		rankFont->Draw(textBuf);
 		rankFont->SetShadow(0);
 		rank += 4;
@@ -737,7 +748,7 @@ void CMenuPcs::FavoDraw()
 
 	CFont* nameFont = font16;
 	nameFont->SetShadow(0);
-	nameFont->SetScale(0.875f);
+	nameFont->SetScale(FLOAT_80333070);
 	nameFont->SetMargin(FLOAT_80333048);
 	nameFont->DrawInit();
 
@@ -745,11 +756,11 @@ void CMenuPcs::FavoDraw()
 	rank = s_rank;
 	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
-		GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * *reinterpret_cast<float*>(drawEntry + 8))};
+		GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80333058 * *reinterpret_cast<float*>(drawEntry + 8))};
 		nameFont->SetColor(textColor);
 		const char* name = flatData->table[0].strings[(static_cast<char>(rank[1]) + 0x17D) * 5 + 4];
 		nameFont->SetPosX(static_cast<float>(drawEntry[0] + 0x1C));
-		nameFont->SetPosY(static_cast<float>(drawEntry[1]) - 5.0f);
+		nameFont->SetPosY(static_cast<float>(drawEntry[1]) - FLOAT_8033306c);
 		nameFont->Draw(const_cast<char*>(name));
 		rank += 4;
 		drawEntry += 0x20;

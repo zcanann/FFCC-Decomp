@@ -422,7 +422,6 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
 {
     unsigned int uVar4 = (unsigned int)vColor->m_alpha;
 
-    // Update particle color if present
     if (particleColor != nullptr) {
         particleColor->m_color[0] = particleColor->m_color[0] + particleColor->m_colorFrameDeltas[0];
         particleColor->m_color[1] = particleColor->m_color[1] + particleColor->m_colorFrameDeltas[1];
@@ -438,10 +437,21 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
     particleData->m_matrix[2][2] = particleData->m_matrix[2][2] + pYmMegaBirthShpTail3->m_colorDeltaAdd[2];
     particleData->m_matrix[2][3] = particleData->m_matrix[2][3] + pYmMegaBirthShpTail3->m_sizeVal;
 
-    // Age particle and update lifetime
+    Vec local;
+    Vec scaled;
+
+    local.x = particleData->m_matrix[1][0];
+    local.y = particleData->m_matrix[1][1];
+    local.z = particleData->m_matrix[1][2];
+    pppScaleVectorXYZ(scaled, local, particleData->m_matrix[2][2]);
+    pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
+
+    local = vYmMegaBirthShpTail3->m_tailScaleDirection;
+    pppScaleVectorXYZ(scaled, local, particleData->m_matrix[2][3]);
+    pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
+
     *(char*)&(particleData->m_directionTail).y = *(char*)&(particleData->m_directionTail).y + 1;
 
-    // Alpha fade logic with timing
     unsigned int fadeTime = (unsigned int)*(unsigned char*)((int)&(particleData->m_directionTail).y + 1);
     if (fadeTime != 0 && *(unsigned char*)&(particleData->m_directionTail).y <= fadeTime) {
         particleData->m_directionTail.x = particleData->m_directionTail.x -
@@ -451,7 +461,6 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
         }
     }
 
-    // Second fade phase logic
     unsigned short fadeTime2 = (unsigned short)*(unsigned char*)((int)&(particleData->m_directionTail).y + 2);
     if (fadeTime2 != 0 && *(unsigned short*)((int)particleData->m_matrix[2] + 2) <= fadeTime2) {
         unsigned char fadeInFrames = *((unsigned char*)&pYmMegaBirthShpTail3->m_matrix[1] + 7);
@@ -464,13 +473,11 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
         }
     }
 
-    // Timer initialization
     if (*(char*)&(particleData->m_directionTail).z == 0) {
         *(char*)&(particleData->m_directionTail).z = *(char*)((int)&(particleData->m_directionTail).y + 3);
     }
     *(char*)&(particleData->m_directionTail).z = *(char*)&(particleData->m_directionTail).z - 1;
 
-    // Transform particle position using local matrix
     PSMTXMultVec(pppPObject->m_localMatrix.value, (Vec*)particleData,
                  (Vec*)(particleData->m_colorDeltaAdd +
                        (unsigned int)*(unsigned char*)&(particleData->m_directionTail).z * 3 + 0x11));

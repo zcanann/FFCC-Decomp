@@ -285,9 +285,9 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         node = modelRaw->m_nodes + nodeIndex * 0xC0;
         zOffset = 1.0f;
 
-        for (int frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
+        for (u32 frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, model);
-            SetFrame__Q26CChara6CModelFf((float)frameIndex, model);
+            SetFrame__Q26CChara6CModelFf((float)(s32)frameIndex, model);
             CalcMatrix__Q26CChara6CModelFv(model);
             PSMTXCopy((float(*)[4])(node + 0x14), nodeMtx);
 
@@ -315,10 +315,12 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 
             if (work->m_count > 1) {
                 startIndex = (int)work->m_count - 2;
+                int nextIndex = startIndex + 1;
                 inserted = 0;
                 startPos = &particles[startIndex].m_pos;
+                Vec* nextPos = &particles[nextIndex].m_pos;
                 stepScale = 1.0f / (float)(unkB->m_stepCount + 1);
-                PSVECSubtract(&particles[startIndex + 1].m_pos, startPos, &stepDir);
+                PSVECSubtract(nextPos, startPos, &stepDir);
                 interpRead = interp;
                 interpWrite = interpRead;
 
@@ -340,8 +342,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     interpWrite++;
                 }
 
-                pppCopyVector(particles[startIndex + (inserted + 1)].m_pos,
-                              particles[startIndex + 1].m_pos);
+                pppCopyVector(particles[nextIndex + inserted].m_pos, particles[nextIndex].m_pos);
 
                 for (int i = 0; i < inserted; i++) {
                     dst = &particles[startIndex + (i + 1)];

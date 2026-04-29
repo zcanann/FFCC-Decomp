@@ -31,6 +31,8 @@ CUSBPcsTable m_table__7CUSBPcs = {
         0x12,
     },
 };
+static unsigned int s_CUSBPcsTablePad0[3] = {0, 0, 0};
+static unsigned int s_CUSBPcsTablePad1[5] = {0, 0, 0, 0, 0};
 extern const char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
 extern const char s_usbRootPath[16] = "plot/kmitsuru/";
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
@@ -128,9 +130,12 @@ void CUSBPcs::mccReadData()
     s_usbReadPollFrameCounter++;
     if (4 < s_usbReadPollFrameCounter) {
         s_usbReadPollFrameCounter = 0;
-        if (USB.IsConnected() == 0) {
-            return;
-        }
+    } else {
+        return;
+    }
+
+    if (USB.IsConnected() == 0) {
+        return;
     }
 }
 

@@ -63,7 +63,7 @@ struct Vec2d {
 };
 
 struct PartMngEditRaw {
-    u8 m_pad00[0x23554];
+    u8 m_pad00[0x1C8];
     void* m_recvBuff;
 };
 
@@ -456,24 +456,22 @@ CCharaPcs::CHandle* GetCharaHandlePtr(CGObject* gObject, long modelType)
         return 0;
     }
 
-    if (modelType != 1) {
-        if (modelType < 1) {
-            if (modelType < 0) {
-                return 0;
-            }
-
-            if (gObject->m_charaModelHandle != 0) {
-                return gObject->m_charaModelHandle;
-            }
-        } else if (modelType < 3) {
-            if (gObject->m_shieldModelHandle != 0) {
-                return gObject->m_shieldModelHandle;
-            }
+    switch (modelType) {
+    case 0:
+        if (gObject->m_charaModelHandle != 0) {
+            return gObject->m_charaModelHandle;
         }
-    } else {
+        break;
+    case 1:
         if (gObject->m_weaponModelHandle != 0) {
             return gObject->m_weaponModelHandle;
         }
+        break;
+    case 2:
+        if (gObject->m_shieldModelHandle != 0) {
+            return gObject->m_shieldModelHandle;
+        }
+        break;
     }
 
     return 0;
@@ -559,10 +557,13 @@ void CalcGraphValue(_pppPObject* object, long graphId, float& value, float& velo
 int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)[4])
 {
     void* nodeNameBase;
+    CGObject* owner;
     CModelRaw* modelRaw;
     CChara::CModel* model;
+    CChara::CNode* node;
     int skNodeIndex;
     int animFrameMax;
+    u32 animFrameCount;
     int frameInt;
     float frame;
     Vec local88;
@@ -580,17 +581,18 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     Vec local118;
     pppFMATRIX localMatrix;
 
-    if (Game.m_currentSceneId == 7) {
+    owner = (CGObject*)mngSt->m_owner;
+    if ((s32)Game.m_currentSceneId == 7) {
         nodeNameBase = (u8*)(reinterpret_cast<PartMngEditRaw*>(&PartMng)->m_recvBuff) + mngSt->m_nodeIndex * 0x60;
     } else {
         nodeNameBase = (u8*)(*(u32*)mngSt->m_pppResSet) + mngSt->m_nodeIndex * 0x60 + 0x20;
     }
 
-    if (mngSt->m_owner == 0) {
+    if (owner == 0) {
         return 0;
     }
 
-    CCharaPcs::CHandle* handle = ((CGObject*)mngSt->m_owner)->m_charaModelHandle;
+    CCharaPcs::CHandle* handle = owner->m_charaModelHandle;
     if (handle == 0) {
         return 0;
     }
@@ -606,12 +608,14 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     }
 
     modelRaw = (CModelRaw*)model;
+    node = (CChara::CNode*)(modelRaw->m_nodes + skNodeIndex * 0xC0);
     if (modelRaw->m_anim == 0) {
-        animFrameMax = 0;
+        animFrameCount = 0;
     } else {
-        animFrameMax = modelRaw->m_anim->m_frameCount;
+        animFrameCount = modelRaw->m_anim->m_frameCount;
     }
 
+    animFrameMax = (int)(float)animFrameCount;
     frameInt = (int)modelRaw->m_time;
     frame = (float)(frameInt - (frameInt / animFrameMax) * animFrameMax);
     if (frame < 0.0f) {
@@ -622,28 +626,65 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         frame -= 1.0f;
     }
 
-    CalcFrameMatrix__Q26CChara6CModelFfPQ26CChara5CNodePA4_f(model, frame + frameAdd,
-                                                              (CChara::CNode*)(modelRaw->m_nodes + skNodeIndex * 0xC0),
-                                                              outMatrix);
+    CalcFrameMatrix__Q26CChara6CModelFfPQ26CChara5CNodePA4_f(model, frame + frameAdd, node, outMatrix);
 
-    u8 rotationOrder = mngSt->m_rotationOrder;
-    if (rotationOrder == 3) {
+    switch (mngSt->m_rotationOrder) {
+    case 0:
+        pppGetRotMatrixXYZ(localMatrix, &mngSt->m_rotation);
+        break;
+    case 1:
+        pppGetRotMatrixXZY(localMatrix, &mngSt->m_rotation);
+        break;
+    case 2:
+        pppGetRotMatrixYXZ(localMatrix, &mngSt->m_rotation);
+        break;
+    case 3:
         pppGetRotMatrixYZX(localMatrix, &mngSt->m_rotation);
-    } else if (rotationOrder < 3) {
-        if (rotationOrder == 1) {
-            pppGetRotMatrixXZY(localMatrix, &mngSt->m_rotation);
-        } else if (rotationOrder == 0) {
-            pppGetRotMatrixXYZ(localMatrix, &mngSt->m_rotation);
-        } else {
-            pppGetRotMatrixYXZ(localMatrix, &mngSt->m_rotation);
-        }
-    } else if (rotationOrder == 5) {
-        pppGetRotMatrixZYX(localMatrix, &mngSt->m_rotation);
-    } else if (rotationOrder < 5) {
+        break;
+    case 4:
         pppGetRotMatrixZXY(localMatrix, &mngSt->m_rotation);
+        break;
+    case 5:
+        pppGetRotMatrixZYX(localMatrix, &mngSt->m_rotation);
+        break;
     }
 
-    if (mngSt->m_matrixMode == 5) {
+    switch (mngSt->m_matrixMode) {
+    case 3:
+        if (mngSt->m_bindNode != 0) {
+            PSMTXMultVecSR(outMatrix, &pppMngStPtr->m_position, &local88);
+            outMatrix[0][3] += local88.x;
+            outMatrix[1][3] += local88.y;
+            outMatrix[2][3] += local88.z;
+            PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
+
+            local94.x = localMatrix.value[0][0];
+            local94.y = localMatrix.value[1][0];
+            local94.z = localMatrix.value[2][0];
+            PSVECScale(&local94, &local94, mngSt->m_scale.x);
+            localMatrix.value[0][0] = local94.x;
+            localMatrix.value[1][0] = local94.y;
+            localMatrix.value[2][0] = local94.z;
+
+            localA0.x = localMatrix.value[0][1];
+            localA0.y = localMatrix.value[1][1];
+            localA0.z = localMatrix.value[2][1];
+            PSVECScale(&localA0, &localA0, mngSt->m_scale.y);
+            localMatrix.value[0][1] = localA0.x;
+            localMatrix.value[1][1] = localA0.y;
+            localMatrix.value[2][1] = localA0.z;
+
+            localAC.x = localMatrix.value[0][2];
+            localAC.y = localMatrix.value[1][2];
+            localAC.z = localMatrix.value[2][2];
+            PSVECScale(&localAC, &localAC, mngSt->m_scale.z);
+            localMatrix.value[0][2] = localAC.x;
+            localMatrix.value[1][2] = localAC.y;
+            localMatrix.value[2][2] = localAC.z;
+            goto copy_out;
+        }
+        break;
+    case 5:
         if (mngSt->m_bindNode != 0) {
             outMatrix[0][3] += pppMngStPtr->m_position.x;
             outMatrix[1][3] += pppMngStPtr->m_position.y;
@@ -679,78 +720,49 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
             }
             goto copy_out;
         }
-    } else if (mngSt->m_matrixMode < 5) {
-        if ((mngSt->m_matrixMode == 3) && (mngSt->m_bindNode != 0)) {
+        break;
+    case 6:
+        if (mngSt->m_bindNode != 0) {
+            PSVECNormalize((Vec*)outMatrix, (Vec*)outMatrix);
+            PSVECNormalize((Vec*)&outMatrix[1][0], (Vec*)&outMatrix[1][0]);
+            PSVECNormalize((Vec*)&outMatrix[2][0], (Vec*)&outMatrix[2][0]);
             PSMTXMultVecSR(outMatrix, &pppMngStPtr->m_position, &local88);
-            outMatrix[0][3] += local88.x;
-            outMatrix[1][3] += local88.y;
-            outMatrix[2][3] += local88.z;
             PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
 
-            local94.x = localMatrix.value[0][0];
-            local94.y = localMatrix.value[1][0];
-            local94.z = localMatrix.value[2][0];
-            PSVECScale(&local94, &local94, mngSt->m_scale.x);
-            localMatrix.value[0][0] = local94.x;
-            localMatrix.value[1][0] = local94.y;
-            localMatrix.value[2][0] = local94.z;
+            if (mngSt->m_scale.x != 1.0f) {
+                localDC.x = localMatrix.value[0][0];
+                localDC.y = localMatrix.value[1][0];
+                localDC.z = localMatrix.value[2][0];
+                PSVECScale(&localDC, &localDC, mngSt->m_scale.x);
+                localMatrix.value[0][0] = localDC.x;
+                localMatrix.value[1][0] = localDC.y;
+                localMatrix.value[2][0] = localDC.z;
+            }
+            if (mngSt->m_scale.y != 1.0f) {
+                localE8.x = localMatrix.value[0][1];
+                localE8.y = localMatrix.value[1][1];
+                localE8.z = localMatrix.value[2][1];
+                PSVECScale(&localE8, &localE8, mngSt->m_scale.y);
+                localMatrix.value[0][1] = localE8.x;
+                localMatrix.value[1][1] = localE8.y;
+                localMatrix.value[2][1] = localE8.z;
+            }
+            if (mngSt->m_scale.z != 1.0f) {
+                localF4.x = localMatrix.value[0][2];
+                localF4.y = localMatrix.value[1][2];
+                localF4.z = localMatrix.value[2][2];
+                PSVECScale(&localF4, &localF4, mngSt->m_scale.z);
+                localMatrix.value[0][2] = localF4.x;
+                localMatrix.value[1][2] = localF4.y;
+                localMatrix.value[2][2] = localF4.z;
+            }
 
-            localA0.x = localMatrix.value[0][1];
-            localA0.y = localMatrix.value[1][1];
-            localA0.z = localMatrix.value[2][1];
-            PSVECScale(&localA0, &localA0, mngSt->m_scale.y);
-            localMatrix.value[0][1] = localA0.x;
-            localMatrix.value[1][1] = localA0.y;
-            localMatrix.value[2][1] = localA0.z;
-
-            localAC.x = localMatrix.value[0][2];
-            localAC.y = localMatrix.value[1][2];
-            localAC.z = localMatrix.value[2][2];
-            PSVECScale(&localAC, &localAC, mngSt->m_scale.z);
-            localMatrix.value[0][2] = localAC.x;
-            localMatrix.value[1][2] = localAC.y;
-            localMatrix.value[2][2] = localAC.z;
+            localMatrix.value[0][3] += local88.x;
+            localMatrix.value[1][3] += local88.y;
+            localMatrix.value[2][3] += local88.z;
             goto copy_out;
         }
-    } else if ((mngSt->m_matrixMode < 7) && (mngSt->m_bindNode != 0)) {
-        PSVECNormalize((Vec*)outMatrix, (Vec*)outMatrix);
-        PSVECNormalize((Vec*)&outMatrix[1][0], (Vec*)&outMatrix[1][0]);
-        PSVECNormalize((Vec*)&outMatrix[2][0], (Vec*)&outMatrix[2][0]);
-        PSMTXMultVecSR(outMatrix, &pppMngStPtr->m_position, &local88);
-        PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
-
-        if (mngSt->m_scale.x != 1.0f) {
-            localDC.x = localMatrix.value[0][0];
-            localDC.y = localMatrix.value[1][0];
-            localDC.z = localMatrix.value[2][0];
-            PSVECScale(&localDC, &localDC, mngSt->m_scale.x);
-            localMatrix.value[0][0] = localDC.x;
-            localMatrix.value[1][0] = localDC.y;
-            localMatrix.value[2][0] = localDC.z;
-        }
-        if (mngSt->m_scale.y != 1.0f) {
-            localE8.x = localMatrix.value[0][1];
-            localE8.y = localMatrix.value[1][1];
-            localE8.z = localMatrix.value[2][1];
-            PSVECScale(&localE8, &localE8, mngSt->m_scale.y);
-            localMatrix.value[0][1] = localE8.x;
-            localMatrix.value[1][1] = localE8.y;
-            localMatrix.value[2][1] = localE8.z;
-        }
-        if (mngSt->m_scale.z != 1.0f) {
-            localF4.x = localMatrix.value[0][2];
-            localF4.y = localMatrix.value[1][2];
-            localF4.z = localMatrix.value[2][2];
-            PSVECScale(&localF4, &localF4, mngSt->m_scale.z);
-            localMatrix.value[0][2] = localF4.x;
-            localMatrix.value[1][2] = localF4.y;
-            localMatrix.value[2][2] = localF4.z;
-        }
-
-        localMatrix.value[0][3] += local88.x;
-        localMatrix.value[1][3] += local88.y;
-        localMatrix.value[2][3] += local88.z;
-        goto copy_out;
+        break;
     }
 
     if (mngSt->m_scale.x != 1.0f) {

@@ -661,7 +661,7 @@ void CTexture::InitTexObj()
     }
 
     if (1 < m_maxLod) {
-        GXInitTexObjLOD(&m_texObj, GX_LIN_MIP_LIN, GX_LINEAR, 0.0f, static_cast<float>(m_maxLod) - 1.0f, 0.0f, GX_FALSE,
+        GXInitTexObjLOD(&m_texObj, GX_LIN_MIP_LIN, GX_LINEAR, 0.0f, static_cast<float>(m_maxLod) - 1.0f, 0.0f, GX_TRUE,
                         GX_FALSE, GX_ANISO_1);
     }
 }
@@ -831,7 +831,7 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
 
     if (1 < texture[0x74]) {
         GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(texture + 0x28), GX_LIN_MIP_LIN, GX_LINEAR, 0.0f,
-                        static_cast<float>(texture[0x74] - 1), 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+                        static_cast<float>(texture[0x74] - 1), 0.0f, GX_TRUE, GX_FALSE, GX_ANISO_1);
     }
 }
 
@@ -876,7 +876,7 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
             }
 
             if (1 < m_maxLod) {
-                GXInitTexObjLOD(&m_texObj, GX_LIN_MIP_LIN, GX_LINEAR, 0.0f, static_cast<float>(m_maxLod) - 1.0f, 0.0f, GX_FALSE,
+                GXInitTexObjLOD(&m_texObj, GX_LIN_MIP_LIN, GX_LINEAR, 0.0f, static_cast<float>(m_maxLod) - 1.0f, 0.0f, GX_TRUE,
                                 GX_FALSE, GX_ANISO_1);
             }
         }

@@ -310,9 +310,10 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             indexDouble.u[0] = 0x43300000;
             indexDouble.u[1] = (u32)(int)i ^ 0x80000000;
 
-            f32 t = (FLOAT_80333448 / (countDouble.d - DOUBLE_80333440)) *
-                (indexDouble.d - DOUBLE_80333440);
-            if (GetCharaNodeFrameMatrix(pppMngStPtr, (float)t, charaMtx) == 0) {
+            float count = (float)(countDouble.d - DOUBLE_80333440);
+            float index = (float)(indexDouble.d - DOUBLE_80333440);
+            float t = (FLOAT_80333448 / count) * index;
+            if (GetCharaNodeFrameMatrix(pppMngStPtr, t, charaMtx) == 0) {
                 emptyHistory = 1;
                 continue;
             } else {

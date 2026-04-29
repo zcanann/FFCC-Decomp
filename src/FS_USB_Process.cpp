@@ -330,7 +330,7 @@ void CFunnyShapePcs::SetUSBData()
  * PAL Address: UNUSED  
  * PAL Size: 52b
  */
-void CFunnyShapePcs::USBDataCallback(CDataHeader* dataHeader)
+void CFunnyShapePcs::USBDataCallback(CUSBPcs::CDataHeader* dataHeader)
 {
     (void)dataHeader;
 }

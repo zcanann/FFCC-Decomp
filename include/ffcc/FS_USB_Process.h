@@ -4,7 +4,6 @@
 #include "types.h"
 #include "dolphin/gx/GXStruct.h"
 
-class CDataHeader;
 class CFunnyShapePcs;
 
 struct FS_DISPLAY_STATUS

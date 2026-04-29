@@ -3,10 +3,9 @@
 
 #include "ffcc/memory.h"
 #include "ffcc/p_sample.h"
+#include "ffcc/p_usb.h"
 #include "ffcc/system.h"
 #include "ffcc/FS_USB_Process.h"
-
-class CDataHeader;
 
 extern "C" void* __ct__14CUSBStreamDataFv(void*);
 extern "C" void* __ct__11CFunnyShapeFv(void*);
@@ -34,7 +33,7 @@ public:
     void drawViewer();
 
     void SetUSBData();
-    void USBDataCallback(CDataHeader*);
+    void USBDataCallback(CUSBPcs::CDataHeader*);
 
     CMemory::CStage* m_viewerStage;        // 0x04
     u8 m_viewerState[0x34];                // 0x08

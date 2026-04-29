@@ -263,11 +263,11 @@ int CRedEntry::SearchUseWave(int waveNo)
  */
 int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 {
+	int* bankEntry = reinterpret_cast<int*>(bank);
 	int iVar2;
 	int sequenceNo = -1;
-	int* bankEntry = reinterpret_cast<int*>(bank);
 
-	if (-1 < bankEntry[0]) {
+	if (bankEntry[0] >= 0) {
 		WaveHistoryDelete(bankEntry[1]);
 		iVar2 = bankEntry[0];
 

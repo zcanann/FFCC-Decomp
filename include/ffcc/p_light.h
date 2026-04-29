@@ -25,8 +25,6 @@ public:
     public:
         CLight();
 
-        void Set(CLightPcs::CLight*);
-
         u32 m_type;               // 0x00
         Vec3f m_position;         // 0x04
         Vec3f m_targetPosition;   // 0x10

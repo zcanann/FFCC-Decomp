@@ -608,7 +608,8 @@ void StreamControl()
 					if (changed != 0) {
 						if (*(short*)(streamData + 0x2a) == 2) {
 							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0, *(int*)(streamData + 0xf0) >> 0xc);
-							SetVoiceVolumeMix((RedVoiceDATA*)(voiceData + 0xc0), 0x7f, *(int*)(streamData + 0xf0) >> 0xc);
+							voiceData += 0xc0;
+							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0x7f, *(int*)(streamData + 0xf0) >> 0xc);
 						} else {
 							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, *(int*)(streamData + 0x100) >> 0xc,
 								*(int*)(streamData + 0xf0) >> 0xc);

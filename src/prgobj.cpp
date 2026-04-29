@@ -209,13 +209,13 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	CGPrgObj* self = this;
 	float targetRot;
 	CVector targetPos(target->m_worldPosition);
-	CVector basePos(self->m_worldPosition);
-	Vec deltaPos;
+	CVector* basePos = &CVector(self->m_worldPosition);
+	CVector deltaPos;
 	float deltaX;
 	float zero;
 	float deltaZ;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
+	PSVECSubtract(reinterpret_cast<Vec*>(basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
 	deltaX = deltaPos.x;
 	zero = FLOAT_80331BD4;
 	deltaZ = deltaPos.z;
@@ -240,14 +240,14 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 void CGPrgObj::rotTarget(CGPrgObj* target)
 {
 	CVector targetPos(target->m_worldPosition);
-	CVector basePos(m_worldPosition);
-	Vec deltaPos;
+	CVector* basePos = &CVector(m_worldPosition);
+	CVector deltaPos;
 	float targetRot;
 	float deltaX;
 	float zero;
 	float deltaZ;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
+	PSVECSubtract(reinterpret_cast<Vec*>(basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
 	deltaX = deltaPos.x;
 	zero = FLOAT_80331BD4;
 	deltaZ = deltaPos.z;
@@ -272,13 +272,13 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 {
 	float targetRot;
 	CVector targetPos(target->m_worldPosition);
-	CVector basePos(m_worldPosition);
-	Vec deltaPos;
+	CVector* basePos = &CVector(m_worldPosition);
+	CVector deltaPos;
 	float deltaX;
 	float zero;
 	float deltaZ;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
+	PSVECSubtract(reinterpret_cast<Vec*>(basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
 	deltaX = deltaPos.x;
 	zero = FLOAT_80331BD4;
 	deltaZ = deltaPos.z;

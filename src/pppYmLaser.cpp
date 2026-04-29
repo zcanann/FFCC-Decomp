@@ -244,7 +244,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 				continue;
 			}
 
-			float t = (FLOAT_80330de0 / (float)(s32)(step->m_payload[0x3a] + 1)) * (float)i;
+			s32 frameCount = step->m_payload[0x3a] + 1;
+			float t = (FLOAT_80330de0 / (float)frameCount) * (float)i;
 			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(pppMngStPtr, t, charaMtx) == 0) {
 				emptyHistory = 1;
 				continue;
@@ -267,13 +268,13 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		cyl.m_direction = localA;
 		cyl.m_radius = kPppYmLaserOne;
 
-		int hit;
-		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &localA, 0xffffffff) != 0) {
+		int check = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &localA, 0xffffffff);
+		int hit = 0;
+		if (check != 0) {
 			hit = 1;
 			CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &work->m_points[i]);
 			work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
 		} else {
-			hit = 0;
 			if (i == 0) {
 				work->m_length += work->m_lengthStep;
 			}

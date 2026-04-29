@@ -10,7 +10,7 @@ struct SRandUpHCVParams {
     s32 targetId;
     s32 sourceOffset;
     s16 delta[4];
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
 static inline float randf(unsigned char flag)
@@ -52,7 +52,7 @@ void pppSRandUpHCV(_pppPObject* basePtr, SRandUpHCVParams* in, _pppCtrlTable* ct
 		target = (float*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
 
 		{
-			u8 flag = in->randomTwice;
+			u8 flag = in->useNormalDistribution;
 			float value = Math.RandF();
 			if (flag != 0) {
 				float random = Math.RandF();
@@ -64,7 +64,7 @@ void pppSRandUpHCV(_pppPObject* basePtr, SRandUpHCVParams* in, _pppCtrlTable* ct
 		}
 
 		{
-			u8 flag = in->randomTwice;
+			u8 flag = in->useNormalDistribution;
 			float value = Math.RandF();
 			if (flag != 0) {
 				float random = Math.RandF();
@@ -76,7 +76,7 @@ void pppSRandUpHCV(_pppPObject* basePtr, SRandUpHCVParams* in, _pppCtrlTable* ct
 		}
 
 		{
-			u8 flag = in->randomTwice;
+			u8 flag = in->useNormalDistribution;
 			float value = Math.RandF();
 			if (flag != 0) {
 				float random = Math.RandF();
@@ -88,7 +88,7 @@ void pppSRandUpHCV(_pppPObject* basePtr, SRandUpHCVParams* in, _pppCtrlTable* ct
 		}
 
 		{
-			u8 flag = in->randomTwice;
+			u8 flag = in->useNormalDistribution;
 			float value = Math.RandF();
 			if (flag != 0) {
 				float random = Math.RandF();

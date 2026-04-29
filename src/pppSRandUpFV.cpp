@@ -11,7 +11,7 @@ struct SRandUpFVParams {
     s32 sourceOffset;
     f32 blend[3];
     u8 _pad[4];
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
 static inline float randf(unsigned char flag)
@@ -47,7 +47,7 @@ void pppSRandUpFV(_pppPObject* basePtr, SRandUpFVParams* in, _pppCtrlTable* ctrl
         randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
 
         {
-            u8 flag = in->randomTwice;
+            u8 flag = in->useNormalDistribution;
             f32 value = Math.RandF();
             if (flag != 0) {
                 f32 random = Math.RandF();
@@ -59,7 +59,7 @@ void pppSRandUpFV(_pppPObject* basePtr, SRandUpFVParams* in, _pppCtrlTable* ctrl
         }
 
         {
-            u8 flag = in->randomTwice;
+            u8 flag = in->useNormalDistribution;
             f32 value = Math.RandF();
             if (flag != 0) {
                 f32 random = Math.RandF();
@@ -71,7 +71,7 @@ void pppSRandUpFV(_pppPObject* basePtr, SRandUpFVParams* in, _pppCtrlTable* ctrl
         }
 
         {
-            u8 flag = in->randomTwice;
+            u8 flag = in->useNormalDistribution;
             f32 value = Math.RandF();
             if (flag != 0) {
                 f32 random = Math.RandF();

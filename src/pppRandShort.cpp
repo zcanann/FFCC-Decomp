@@ -10,7 +10,7 @@ struct RandShortParams {
     s32 targetId;
     s32 sourceOffset;
     u16 blend;
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
 /*
@@ -34,7 +34,7 @@ void pppRandShort(_pppPObject* basePtr, RandShortParams* in, _pppCtrlTable* ctrl
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
         f32 value = Math.RandF();
-        if (in->randomTwice != 0) {
+        if (in->useNormalDistribution != 0) {
             value += Math.RandF();
         } else {
             value *= 2.0f;

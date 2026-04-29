@@ -11,7 +11,7 @@ struct SRandCVParam {
     s32 targetId;
     s32 sourceOffset;
     s8 delta[4];
-    u8 randomTwice;
+    u8 useNormalDistribution;
     u8 _pad[3];
 };
 
@@ -54,7 +54,7 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
         target = (float*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
 
         {
-            u8 flag = in->randomTwice;
+            u8 flag = in->useNormalDistribution;
             float value = Math.RandF();
             if (flag != 0) {
                 value = value + Math.RandF();
@@ -66,7 +66,7 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
         }
 
         {
-            u8 flag = in->randomTwice;
+            u8 flag = in->useNormalDistribution;
             float value = Math.RandF();
             if (flag != 0) {
                 value = value + Math.RandF();
@@ -78,7 +78,7 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
         }
 
         {
-            u8 flag = in->randomTwice;
+            u8 flag = in->useNormalDistribution;
             float value = Math.RandF();
             if (flag != 0) {
                 value = value + Math.RandF();
@@ -90,7 +90,7 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
         }
 
         {
-            u8 flag = in->randomTwice;
+            u8 flag = in->useNormalDistribution;
             float value = Math.RandF();
             if (flag != 0) {
                 value = value + Math.RandF();

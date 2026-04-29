@@ -11,7 +11,7 @@ struct RandCharParam {
     s32 targetId;
     s32 sourceOffset;
     u8 scale;
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
 /*
@@ -36,7 +36,7 @@ extern "C" void pppRandChar(_pppPObject* basePtr, RandCharParam* in, _pppCtrlTab
     s32 state = *(s32*)(base + 0xC);
     if (state == 0) {
         f32 value = Math.RandF();
-        if (in->randomTwice != 0) {
+        if (in->useNormalDistribution != 0) {
             value += Math.RandF();
         } else {
             value *= 2.0f;

@@ -32,7 +32,7 @@ struct SRandFVParams {
     s32 sourceOffset;
     f32 blend[3];
     u8 _pad[4];
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
 void pppSRandFV(_pppPObject* basePtr, SRandFVParams* in, _pppCtrlTable* ctrl)
@@ -46,7 +46,7 @@ void pppSRandFV(_pppPObject* basePtr, SRandFVParams* in, _pppCtrlTable* ctrl)
     if (currentIndex == 0) {
         randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         {
-            u8 flag = in->randomTwice;
+            u8 flag = in->useNormalDistribution;
             f32 value = Math.RandF();
             if (flag != 0) {
                 value = value + Math.RandF();
@@ -58,7 +58,7 @@ void pppSRandFV(_pppPObject* basePtr, SRandFVParams* in, _pppCtrlTable* ctrl)
         }
 
         {
-            u8 flag = in->randomTwice;
+            u8 flag = in->useNormalDistribution;
             f32 value = Math.RandF();
             if (flag != 0) {
                 value = value + Math.RandF();
@@ -70,7 +70,7 @@ void pppSRandFV(_pppPObject* basePtr, SRandFVParams* in, _pppCtrlTable* ctrl)
         }
 
         {
-            u8 flag = in->randomTwice;
+            u8 flag = in->useNormalDistribution;
             f32 value = Math.RandF();
             if (flag != 0) {
                 value = value + Math.RandF();

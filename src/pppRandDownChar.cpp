@@ -12,7 +12,7 @@ struct RandDownCharParams {
     s32 targetId;
     s32 sourceOffset;
     u8 blend;
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
 /*
@@ -36,7 +36,7 @@ void pppRandDownChar(_pppPObject* basePtr, RandDownCharParams* in, _pppCtrlTable
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
         f32 value = -Math.RandF();
-        if (in->randomTwice != 0) {
+        if (in->useNormalDistribution != 0) {
             f32 mixed = value - Math.RandF();
             f32 scale = 0.5f;
             value = mixed * scale;

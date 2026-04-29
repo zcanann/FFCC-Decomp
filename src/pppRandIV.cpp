@@ -11,7 +11,7 @@ struct RandIVParams {
     s32 sourceOffset;
     s32 blend[3];
     u8 _pad[4];
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
 static inline int randint(int value, float scale)
@@ -40,7 +40,7 @@ void pppRandIV(_pppPObject* basePtr, RandIVParams* in, _pppCtrlTable* ctrl)
 
     if (in->targetId == *(s32*)(base + 0xC)) {
         value = Math.RandF();
-        if (in->randomTwice != 0) {
+        if (in->useNormalDistribution != 0) {
             value += Math.RandF();
         } else {
             value *= 2.0f;

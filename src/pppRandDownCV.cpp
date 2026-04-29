@@ -11,7 +11,7 @@ struct RandDownCVParams {
     s32 targetId;
     s32 sourceOffset;
     s8 delta[4];
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
 static inline char randchar(char value, float scale)
@@ -40,7 +40,7 @@ extern "C" void pppRandDownCV(_pppPObject* basePtr, RandDownCVParams* in, _pppCt
 
     if (in->targetId == *(s32*)(base + 0xC)) {
         f32 value = -Math.RandF();
-        if (in->randomTwice != 0) {
+        if (in->useNormalDistribution != 0) {
             f32 random = Math.RandF();
             f32 blend = value - random;
             f32 scale = 0.5f;

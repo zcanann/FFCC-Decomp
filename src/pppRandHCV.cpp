@@ -10,7 +10,7 @@ typedef struct RandHCVParams {
     s32 targetId;
     s32 sourceOffset;
     s16 delta[4];
-    u8 randomTwice;
+    u8 useNormalDistribution;
 } RandHCVParams;
 
 static inline short randshort(short value, float scale)
@@ -42,7 +42,7 @@ void pppRandHCV(_pppPObject* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
 
     if (in->targetId == *(s32*)(base + 0xC)) {
         f32 value = Math.RandF();
-        if (in->randomTwice != 0) {
+        if (in->useNormalDistribution != 0) {
             value += Math.RandF();
         } else {
             value *= 2.0f;

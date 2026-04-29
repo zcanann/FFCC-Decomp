@@ -11,7 +11,7 @@ struct RandDownIVParams {
     s32 sourceOffset;
     s32 blend[3];
     u8 _pad[4];
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
 static inline int randint(int value, float scale)
@@ -40,7 +40,7 @@ extern "C" void pppRandDownIV(_pppPObject* basePtr, RandDownIVParams* in, _pppCt
 
     if (in->targetId == *(s32*)(base + 0xC)) {
         value = -Math.RandF();
-        if (in->randomTwice != 0) {
+        if (in->useNormalDistribution != 0) {
             f32 randValue = value - Math.RandF();
             f32 scale = 0.5f;
             value = randValue * scale;

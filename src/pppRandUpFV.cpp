@@ -11,7 +11,7 @@ struct RandUpFVParams {
     s32 sourceOffset;
     f32 blend[3];
     u8 _pad[4];
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
 static inline float randf(float value, float scale)
@@ -40,7 +40,7 @@ void pppRandUpFV(_pppPObject* basePtrIn, RandUpFVParams* in, _pppCtrlTable* ctrl
     s32 state = *(s32*)(base + 0xC);
     if (state == 0) {
         f32 value = Math.RandF();
-        if (in->randomTwice != 0) {
+        if (in->useNormalDistribution != 0) {
             f32 randomValue = value + Math.RandF();
             f32 scale = 0.5f;
             value = randomValue * scale;

@@ -5,7 +5,8 @@
 extern "C" {
 #endif
 
-void pppSRandDownCV(void* basePtr, void* in, struct _pppCtrlTable* ctrl);
+struct SRandDownCVParams;
+void pppSRandDownCV(struct _pppPObject* basePtr, struct SRandDownCVParams* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

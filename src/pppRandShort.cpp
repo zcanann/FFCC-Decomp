@@ -6,11 +6,11 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-struct PppRandShortParam2 {
-    s32 field0;
-    s32 field4;
-    u16 field8;
-    u8 fieldA;
+struct RandShortParams {
+    s32 targetId;
+    s32 sourceOffset;
+    u16 blend;
+    u8 useNormalDistribution;
 };
 
 /*
@@ -22,7 +22,7 @@ struct PppRandShortParam2 {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandShort(_pppPObject* basePtr, PppRandShortParam2* in, _pppCtrlTable* ctrl)
+void pppRandShort(_pppPObject* basePtr, RandShortParams* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     f32* valuePtr;
@@ -34,7 +34,7 @@ void pppRandShort(_pppPObject* basePtr, PppRandShortParam2* in, _pppCtrlTable* c
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
         f32 value = Math.RandF();
-        if (in->fieldA != 0) {
+        if (in->useNormalDistribution != 0) {
             value += Math.RandF();
         } else {
             value *= 2.0f;
@@ -43,14 +43,14 @@ void pppRandShort(_pppPObject* basePtr, PppRandShortParam2* in, _pppCtrlTable* c
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
-        if (in->field0 != baseState) {
+        if (in->targetId != baseState) {
             return;
         }
 
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    s16* target = (in->field4 == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->field4 + 0x80);
-    f32 delta = ((f32)in->field8 * *valuePtr) - (f32)in->field8;
+    s16* target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->sourceOffset + 0x80);
+    f32 delta = ((f32)in->blend * *valuePtr) - (f32)in->blend;
     *target = (s16)(*target + (s16)delta);
 }

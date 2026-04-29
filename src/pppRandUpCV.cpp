@@ -10,10 +10,10 @@ struct RandUpCVParam {
     s32 targetId;
     s32 sourceOffset;
     s8 delta[4];
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
-static char randchar(char value, float scale)
+static inline char randchar(char value, float scale)
 {
     return (char)((f32)value * scale);
 }
@@ -39,7 +39,7 @@ void pppRandUpCV(_pppPObject* basePtr, RandUpCVParam* in, _pppCtrlTable* ctrl)
 
     if (in->targetId == *(s32*)(base + 0xC)) {
         f32 value = Math.RandF();
-        if (in->randomTwice != 0) {
+        if (in->useNormalDistribution != 0) {
             f32 random = Math.RandF();
             f32 blend = value + random;
             f32 scale = 0.5f;

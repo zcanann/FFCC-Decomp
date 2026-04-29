@@ -5,13 +5,13 @@
 
 struct _pppPObject;
 struct _pppCtrlTable;
-struct PppRandDownCVParam2;
+struct RandDownCVParams;
 #ifdef __cplusplus
 
 extern "C" {
 #endif
 
-void pppRandDownCV(struct _pppPObject* basePtr, struct PppRandDownCVParam2* in, struct _pppCtrlTable* ctrl);
+void pppRandDownCV(struct _pppPObject* basePtr, struct RandDownCVParams* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

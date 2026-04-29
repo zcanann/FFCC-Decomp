@@ -7,16 +7,13 @@
 #include "ffcc/ppp_default_buffer.h"
 
 typedef struct RandHCVParams {
-    s32 field0;
-    s32 field4;
-    s16 field8;
-    s16 fieldA;
-    s16 fieldC;
-    s16 fieldE;
-    u8 field10;
+    s32 targetId;
+    s32 sourceOffset;
+    s16 delta[4];
+    u8 useNormalDistribution;
 } RandHCVParams;
 
-static short randshort(short value, float scale)
+static inline short randshort(short value, float scale)
 {
     return (short)((f32)value * scale - (f32)value);
 }
@@ -43,9 +40,9 @@ void pppRandHCV(_pppPObject* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
         return;
     }
 
-    if (in->field0 == *(s32*)(base + 0xC)) {
+    if (in->targetId == *(s32*)(base + 0xC)) {
         f32 value = Math.RandF();
-        if (in->field10 != 0) {
+        if (in->useNormalDistribution != 0) {
             value += Math.RandF();
         } else {
             value *= 2.0f;
@@ -53,20 +50,20 @@ void pppRandHCV(_pppPObject* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
 
         randomValue = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *randomValue = value;
-    } else if (in->field0 != *(s32*)(base + 0xC)) {
+    } else if (in->targetId != *(s32*)(base + 0xC)) {
         return;
     } else {
         randomValue = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    target = (in->field4 == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->field4 + 0x80);
+    target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->sourceOffset + 0x80);
 
     {
         f32 scale = *randomValue;
-        target[0] = target[0] + randshort(in->field8, scale);
-        target[1] = target[1] + randshort(in->fieldA, scale);
-        target[2] = target[2] + randshort(in->fieldC, scale);
-        target[3] = target[3] + randshort(in->fieldE, scale);
+        target[0] = target[0] + randshort(in->delta[0], scale);
+        target[1] = target[1] + randshort(in->delta[1], scale);
+        target[2] = target[2] + randshort(in->delta[2], scale);
+        target[3] = target[3] + randshort(in->delta[3], scale);
     }
 }
 

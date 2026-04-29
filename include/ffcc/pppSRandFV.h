@@ -5,12 +5,12 @@
 
 struct _pppPObject;
 struct _pppCtrlTable;
-struct PppSRandFVParam2;
+struct SRandFVParams;
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppSRandFV(struct _pppPObject* basePtr, struct PppSRandFVParam2* in, struct _pppCtrlTable* ctrl);
+void pppSRandFV(struct _pppPObject* basePtr, struct SRandFVParams* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

@@ -5,12 +5,12 @@
 
 struct _pppPObject;
 struct _pppCtrlTable;
-struct PppRandUpHCVParam2;
+struct RandUpHCVParams;
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppRandUpHCV(struct _pppPObject* basePtr, struct PppRandUpHCVParam2* in, struct _pppCtrlTable* ctrl);
+void pppRandUpHCV(struct _pppPObject* basePtr, struct RandUpHCVParams* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

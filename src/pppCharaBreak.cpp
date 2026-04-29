@@ -800,9 +800,12 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
     CharaBreakStep* stepData = (CharaBreakStep*)charaBreak;
     CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
     S16Vec* workNormals = meshRef->m_workNormals;
+    u32 count = polygonCount;
+    CChara::CModel* modelPtr = model;
     POLYGON_DATA* polygon = polygonData;
+    f32 zero = FLOAT_80332048;
 
-    for (u32 i = 0; i < polygonCount; i++) {
+    for (u32 i = 0; i < count; i++) {
         Vec normal;
         Vec up = kPppCharaBreakUpVector;
         Vec tangent;
@@ -828,27 +831,27 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             normal.y *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078;
             normal.z *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078;
             PSVECNormalize(&normal, &normal);
-            ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygon->m_normalA, normal, ModelData(model)->m_normQuant);
+            ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygon->m_normalA, normal, ModelData(modelPtr)->m_normQuant);
         } else {
             polygon->m_normalA = workNormals[polygon->m_nrmIndices[0]];
             ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &normal, workNormals[polygon->m_nrmIndices[0]],
-                                                 ModelData(model)->m_normQuant);
+                                                ModelData(modelPtr)->m_normQuant);
         }
 
         PSVECCrossProduct(&up, &normal, &tangent);
         float tangentMag = PSVECMag(&tangent);
-        if (tangentMag == 0.0f) {
-            tangent.x = 0.0f;
-            tangent.y = 0.0f;
-            tangent.z = 0.0f;
+        if (zero == tangentMag) {
+            tangent.x = zero;
+            tangent.y = zero;
+            tangent.z = zero;
         } else {
             PSVECScale(&tangent, &tangent, FLOAT_8033204c / tangentMag);
         }
 
-        if (tangent.x == 0.0f && tangent.y == 0.0f && tangent.z == 0.0f) {
+        if (zero == tangent.x && zero == tangent.y && zero == tangent.z) {
             tangent.x = FLOAT_8033204c;
-            tangent.y = 0.0f;
-            tangent.z = 0.0f;
+            tangent.y = zero;
+            tangent.z = zero;
         }
 
         if (stepData->m_spinMode != 0 && stepData->m_spinMode == 1) {
@@ -858,7 +861,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             polygon->m_normalA.y = rand() % 2;
         }
 
-        ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygon->m_normalB, tangent, ModelData(model)->m_normQuant);
+        ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygon->m_normalB, tangent, ModelData(modelPtr)->m_normQuant);
         polygon++;
     }
 }

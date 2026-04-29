@@ -430,6 +430,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
     int i;
     float zero;
     Vec tmp;
+    Vec tmp2;
     zero = FLOAT_80330ef0;
     out->z = FLOAT_80330ef0;
     out->y = zero;
@@ -468,8 +469,8 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                         out->z += deltaZ * forceScale;
                     }
                 } else {
-                    PSVECScale(&obj->force, &tmp, FLOAT_80330ef8 - distanceSq / obj->radiusSq);
-                    PSVECAdd(out, &tmp, out);
+                    PSVECScale(&obj->force, &tmp2, FLOAT_80330ef8 - distanceSq / obj->radiusSq);
+                    PSVECAdd(out, &tmp2, out);
                 }
             }
         }
@@ -489,8 +490,6 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
  */
 void CWind::Draw()
 {
-    int i;
-    WindObject* obj;
     Mtx viewMtx;
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
@@ -510,19 +509,19 @@ void CWind::Draw()
     GXSetVtxAttrFmt((_GXVtxFmt)0, (_GXAttr)9, (_GXCompCnt)1, (_GXCompType)4, 0);
 
     if ((*(u32*)(CFlat + 0x129c) & 0x800000) != 0) {
-        i = 0;
-        obj = m_objects;
+        WindObject* obj = m_objects;
+        int i = 0;
         do {
             if (GetWindActiveFlag(obj) != 0) {
                 if (obj->type == 1) {
-                    CColor color(0xff, 0xff, 0, 0xff);
-                    CVector pos(obj->centerX, FLOAT_80330ef0, obj->centerZ);
-                    Graphic.DrawSphere(viewMtx, (Vec*)&pos, obj->radius, &color.color);
+                    Graphic.DrawSphere(viewMtx,
+                                       (Vec*)&CVector(obj->centerX, FLOAT_80330ef0, obj->centerZ),
+                                       obj->radius, &CColor(0xff, 0xff, 0, 0xff).color);
                 } else {
                     int alpha = (int)(FLOAT_80330f1c * (FLOAT_80330ef8 - obj->lifeRatio));
-                    CColor color(0xff, 0xff, 0x80, alpha);
-                    CVector pos(obj->centerX, FLOAT_80330ef0, obj->centerZ);
-                    Graphic.DrawSphere(viewMtx, (Vec*)&pos, obj->radius, &color.color);
+                    Graphic.DrawSphere(viewMtx,
+                                       (Vec*)&CVector(obj->centerX, FLOAT_80330ef0, obj->centerZ),
+                                       obj->radius, &CColor(0xff, 0xff, 0x80, alpha).color);
                 }
             }
 

@@ -1916,16 +1916,16 @@ int CSound::SetSe3DGroup(int se3dHandle, int group)
         do {
             if ((*se < 0 &&
                   (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-                 (se[0x28] < 0 &&
-                  (found = se + 0x28, *reinterpret_cast<int*>(se + 0x2C) == se3dHandle)) ||
-                 (se[0x50] < 0 &&
-                  (found = se + 0x50, *reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
-                 (se[0x78] < 0 &&
-                  (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+                 (*(se += 0x28) < 0 &&
+                  (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+                 (*(se += 0x28) < 0 &&
+                  (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+                 (*(se += 0x28) < 0 &&
+                  (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle))) {
                 goto found_se;
             }
             result += 3;
-            se += 0xA0;
+            se += 0x28;
             count--;
         } while (count != 0);
         found = 0;
@@ -1964,15 +1964,15 @@ void CSound::StopSe3DGroup(int group)
                 do {
                     if ((((search[0] & 0x80) != 0 &&
                           (found = search, *reinterpret_cast<int*>(search + 4) == se3dHandle)) ||
-                         (found = search + 0x28, (*found & 0x80) != 0 &&
-                          (*reinterpret_cast<int*>(search + 0x2C) == se3dHandle)) ||
-                         (found = search + 0x50, (*found & 0x80) != 0 &&
-                          (*reinterpret_cast<int*>(search + 0x54) == se3dHandle)) ||
-                         ((search[0x78] & 0x80) != 0 &&
-                          (found = search + 0x78, *reinterpret_cast<int*>(search + 0x7C) == se3dHandle)))) {
+                         ((*(search += 0x28) & 0x80) != 0 &&
+                          (found = search, *reinterpret_cast<int*>(search + 4) == se3dHandle)) ||
+                         ((*(search += 0x28) & 0x80) != 0 &&
+                          (found = search, *reinterpret_cast<int*>(search + 4) == se3dHandle)) ||
+                         ((*(search += 0x28) & 0x80) != 0 &&
+                          (found = search, *reinterpret_cast<int*>(search + 4) == se3dHandle)))) {
                         goto found_se;
                     }
-                    search += 0xA0;
+                    search += 0x28;
                     count--;
                 } while (count != 0);
                 found = 0;
@@ -2016,13 +2016,16 @@ void CSound::StopSe3D(int se3dHandle)
         int count = 0x20;
         do {
             if (((((*se & 0x80) != 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-                 ((found = se + 0x28), ((*found & 0x80) != 0) && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle)) ||
-                ((found = se + 0x50), ((*found & 0x80) != 0) && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) ||
-                (((se[0x78] & 0x80) != 0) && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+                 (((*(se += 0x28) & 0x80) != 0) &&
+                  (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle))) ||
+                (((*(se += 0x28) & 0x80) != 0) &&
+                 (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+                (((*(se += 0x28) & 0x80) != 0) &&
+                 (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle))) {
                 goto found_entry;
             }
             idx += 3;
-            se += 0xA0;
+            se += 0x28;
             count--;
         } while (count != 0);
         found = 0;
@@ -2062,13 +2065,16 @@ _pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
     int count = 0x20;
     do {
         if (((((*se & 0x80) != 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-             ((found = se + 0x28), ((*found & 0x80) != 0) && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle)) ||
-            ((found = se + 0x50), ((*found & 0x80) != 0) && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) ||
-            (((se[0x78] & 0x80) != 0) && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+             (((*(se += 0x28) & 0x80) != 0) &&
+              (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle))) ||
+            (((*(se += 0x28) & 0x80) != 0) &&
+             (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+            (((*(se += 0x28) & 0x80) != 0) &&
+             (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle))) {
             goto found_entry;
         }
         ret += 3;
-        se += 0xA0;
+        se += 0x28;
         count--;
     } while (count != 0);
     found = 0;
@@ -2102,24 +2108,44 @@ int CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
     char* se;
     char* found;
     int count;
-    
+
     if (se3dHandle < 0) {
         ret = Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         se = reinterpret_cast<char*>(this) + 0x2C;
         ret = 0;
-        count = 0x20;
-        do {
-            if (((((*se & 0x80) != 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-                 ((found = se + 0x28), ((*found & 0x80) != 0) && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
-                ((found = se + 0x50), ((*found & 0x80) != 0) && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
-                (((se[0x78] & 0x80) != 0) && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
-                goto found_entry;
+        for (count = 0x20; count != 0; count--) {
+            found = se;
+            if ((*found & 0x80) != 0) {
+                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
+                    goto found_entry;
+                }
             }
+
+            found += 0x28;
+            if ((*found & 0x80) != 0) {
+                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
+                    goto found_entry;
+                }
+            }
+
+            found += 0x28;
+            if ((*found & 0x80) != 0) {
+                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
+                    goto found_entry;
+                }
+            }
+
+            found += 0x28;
+            if ((*found & 0x80) != 0) {
+                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
+                    goto found_entry;
+                }
+            }
+
             ret += 3;
-            se += 0xA0;
-            count = count + -1;
-        } while (count != 0);
+            se = found + 0x28;
+        }
         found = 0;
 found_entry:
         if (found != 0) {

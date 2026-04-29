@@ -1,7 +1,7 @@
 #include "ffcc/pppPart.h"
 
 #include "ffcc/map.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/memory.h"
 #include "ffcc/sound.h"

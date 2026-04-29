@@ -798,7 +798,9 @@ int CMenuPcs::ArtiCtrlCur()
 	if (bVar2) {
 		uVar3 = 0;
 	} else {
-		uVar3 = Pad._8_2_;
+		int padIndex = bVar2;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		uVar3 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
 	}
 
 	bVar2 = false;
@@ -808,7 +810,9 @@ int CMenuPcs::ArtiCtrlCur()
 	if (bVar2) {
 		uVar4 = 0;
 	} else {
-		uVar4 = Pad._20_2_;
+		int padIndex = bVar2;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		uVar4 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 0x14);
 	}
 
 	if (uVar4 == 0) {

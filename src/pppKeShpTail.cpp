@@ -20,7 +20,7 @@ struct KeShpTailWork {
 
 struct KeShpTailObject {
     u8 _pad0[0xc];
-    _pppPObject m_obj;
+    _pppPObjectHead m_obj;
 };
 
 /*

@@ -3,7 +3,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/p_chara.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 extern "C" {

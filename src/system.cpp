@@ -281,8 +281,8 @@ void CSystem::ExecScenegraph()
 
     do
     {
-        int stepTrigger;
-        int perfTrigger;
+        unsigned int stepTrigger;
+        unsigned int perfTrigger;
 
         if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.m_gameWork.m_gamePaused)
         {
@@ -312,6 +312,7 @@ void CSystem::ExecScenegraph()
             unsigned int stepPad = (Pad._448_4_ == 4) ? 0 : 4;
             stepTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x36 + stepPad * 0x54);
         }
+        stepTrigger = (unsigned short)stepTrigger;
 
         if (Pad._452_4_ != 0)
         {
@@ -322,6 +323,7 @@ void CSystem::ExecScenegraph()
             unsigned int perfPad = (Pad._448_4_ == 4) ? 0 : 4;
             perfTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x34 + perfPad * 0x54);
         }
+        perfTrigger = (unsigned short)perfTrigger;
 
         if ((stepTrigger & 0xC) != 0)
         {
@@ -354,8 +356,8 @@ void CSystem::ExecScenegraph()
         {
             for (int port = 0; port < 4; port++)
             {
-                int trigger;
-                int held;
+                unsigned int trigger;
+                unsigned int held;
                 bool noInput;
 
                 noInput = false;
@@ -372,6 +374,7 @@ void CSystem::ExecScenegraph()
                     unsigned int padIndex = (Pad._448_4_ == port) ? 0 : port;
                     trigger = *(unsigned short*)((unsigned char*)&Pad + 0xA + padIndex * 0x54);
                 }
+                trigger = (unsigned short)trigger;
 
                 noInput = false;
                 if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
@@ -387,6 +390,7 @@ void CSystem::ExecScenegraph()
                     unsigned int padIndex = (Pad._448_4_ == port) ? 0 : port;
                     held = *(unsigned short*)((unsigned char*)&Pad + 0x8 + padIndex * 0x54);
                 }
+                held = (unsigned short)held;
 
                 if (((trigger | held) & 0x1000) != 0)
                 {
@@ -439,7 +443,7 @@ void CSystem::ExecScenegraph()
         }
 
         float totalTime = 0.0f;
-        perfTrigger &= 1;
+        int readGPMetrics = perfTrigger & 1;
         CStopWatch watch(reinterpret_cast<char*>(-1));
 
         int index = 0;
@@ -503,14 +507,14 @@ void CSystem::ExecScenegraph()
                 order->m_lastTime = watch.Get();
 
                 watch.Start();
-                if (perfTrigger != 0)
+                if (readGPMetrics != 0)
                 {
                     Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x2CA);
                     GXReadGP0Metric();
                     GXReadGP1Metric();
                 }
                 watch.Stop();
-                if (perfTrigger != 0)
+                if (readGPMetrics != 0)
                 {
                     order->m_lastTime = watch.Get();
                 }

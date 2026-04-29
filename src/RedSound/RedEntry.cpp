@@ -448,16 +448,16 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 	void* waveDataTop;
 
 	if (waveDataSize == 0) {
-		if ((entry[3] >= 0) && ((waveNo = SearchWaveSequence(entry[3])) >= 0)) {
+		if ((m_waveLoadNo >= 0) && ((waveNo = SearchWaveSequence(m_waveLoadNo)) >= 0)) {
 			WaveDelete((RedHistoryBANK*)(entry[0] + waveNo * 0x10));
 		}
 
-		entry[3] = -1;
+		m_waveLoadNo = -1;
 		return -1;
 	}
 
 	waveAddress = 0;
-	if (entry[3] < 0) {
+	if (m_waveLoadNo < 0) {
 		RedWaveHeadWD* waveHead = (RedWaveHeadWD*)waveData;
 		waveNo = *(short*)((unsigned char*)waveHead + 2);
 
@@ -477,11 +477,11 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 
 			WaveHistoryChoice((RedHistoryBANK*)(entry[0] + historyNo * 0x10));
 		} else {
-			entry[3] = waveNo;
+			m_waveLoadNo = waveNo;
 			waveAddress = WaveHeadAdd(waveBankNo, waveHead, waveNo);
 			if (waveAddress < 0) {
-				entry[4] = 0;
-				entry[3] = -1;
+				m_waveLoadSize = 0;
+				m_waveLoadNo = -1;
 				return -1;
 			}
 
@@ -494,9 +494,9 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 			waveDataTop = (void*)((unsigned char*)waveData + waveHeadSize);
 		}
 	} else {
-		waveAddress = entry[5];
+		waveAddress = m_waveLoadAddress;
 		waveDataTop = waveData;
-		waveSize = entry[4];
+		waveSize = m_waveLoadSize;
 	}
 
 	if ((waveAddress != 0) && (waveDataSize > 0)) {
@@ -510,25 +510,25 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		int dmaID = RedDmaEntry(0x8000, 0, (int)waveDataTop, waveAddress, transferSize, 0, 0);
 		waveSize -= transferSize;
 		waveAddress += transferSize;
-		entry[4] = waveSize;
-		entry[5] = waveAddress;
+		m_waveLoadSize = waveSize;
+		m_waveLoadAddress = waveAddress;
 
 		while (RedDmaSearchID(dmaID) > 0) {
 			RedSleep(1000);
 		}
 
-		if (entry[4] < 1) {
+		if (m_waveLoadSize < 1) {
 			if (m_ReportPrint != 0) {
-				OSReport(s__s_sWave_Entry___wave_4_4u__s_801e79ce, sRedEntryLogPrefix, sRedEntryInfoColor, entry[3], sRedEntryResetColor);
+				OSReport(s__s_sWave_Entry___wave_4_4u__s_801e79ce, sRedEntryLogPrefix, sRedEntryInfoColor, m_waveLoadNo, sRedEntryResetColor);
 				fflush(__files + 1);
 			}
 
-			entry[3] = -1;
+			m_waveLoadNo = -1;
 			return 0;
 		}
 	}
 
-	return entry[3];
+	return m_waveLoadNo;
 }
 
 /*

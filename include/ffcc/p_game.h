@@ -21,6 +21,7 @@ extern unsigned int m_table__8CGamePcs[];
 class CGamePcs : public CProcess
 {
 public:
+#ifdef FFCC_DEFINE_CGAMEPCS_CTOR
     CGamePcs()
     {
         unsigned int* table = reinterpret_cast<unsigned int*>(m_table__8CGamePcs);
@@ -62,6 +63,9 @@ public:
         table[38] = desc8[1];
         table[39] = desc8[2];
     }
+#else
+    CGamePcs();
+#endif
 
     void Init();
     void Quit();

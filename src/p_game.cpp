@@ -1,3 +1,4 @@
+#define FFCC_DEFINE_CGAMEPCS_CTOR
 #include "ffcc/p_game.h"
 
 extern "C" void create__8CGamePcsFv(CGamePcs*);

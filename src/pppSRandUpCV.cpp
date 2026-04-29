@@ -20,6 +20,18 @@ static char randchar(char value, float scale)
     return (char)((f32)value * scale);
 }
 
+static float randf(unsigned char flag)
+{
+    float value = Math.RandF();
+    if (flag != 0) {
+        float random = Math.RandF();
+        float blend = value + random;
+        float scale = kPppSRandUpCVDualSampleScale;
+        value = blend * scale;
+    }
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80064114

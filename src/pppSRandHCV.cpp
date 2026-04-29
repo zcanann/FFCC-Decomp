@@ -23,6 +23,18 @@ static short randshort(short value, float scale)
     return (short)((f32)value * scale - (f32)value);
 }
 
+static float randf(unsigned char flag)
+{
+    float value = Math.RandF();
+    if (flag != 0) {
+        value = value + Math.RandF();
+    } else {
+        float scale = kPppSRandHCVSingleSampleScale;
+        value = value * scale;
+    }
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 80063e34

@@ -7,8 +7,17 @@
 #include "ffcc/ppp_default_buffer.h"
 
 const float kPppSRandFVSingleSampleScale = 2.0f;
-void randfloat(float, float);
-void randf(unsigned char);
+static float randf(unsigned char flag)
+{
+    float value = Math.RandF();
+    if (flag != 0) {
+        value = value + Math.RandF();
+    } else {
+        float scale = kPppSRandFVSingleSampleScale;
+        value = value * scale;
+    }
+    return value;
+}
 
 /*
  * --INFO--

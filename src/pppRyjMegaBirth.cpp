@@ -115,11 +115,15 @@ void birth(
 	u8* particlePayload;
 	u8 mode;
 	float speed;
+	float spread;
+	float range;
 	s16 life;
 
 	payload = (u8*)param;
 	particlePayload = (u8*)particle;
 	mode = payload[0x2A];
+	spread = (float)payload[0x2B];
+	range = FLOAT_80330470 * spread;
 
 	memset(particle, 0, 0x60);
 	if (worldMat != NULL) {
@@ -134,14 +138,10 @@ void birth(
 		Vec* direction;
 		pppIVECTOR4 angle;
 		pppFMATRIX rot;
-		float spread;
-		float range;
 
 		baseDirection.x = *f32_at(payload, 0xA0);
 		baseDirection.y = *f32_at(payload, 0xA4);
 		baseDirection.z = *f32_at(payload, 0xA8);
-		spread = (float)payload[0x2B];
-		range = FLOAT_80330470 * spread;
 
 		angle.x = (s16)(range * Math.RandF() - spread);
 		angle.y = (s16)(range * Math.RandF() - spread);

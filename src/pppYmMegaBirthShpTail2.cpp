@@ -26,6 +26,11 @@ pppFMATRIX g_matUnit2;
 
 static const char s_pppYmMegaBirthShpTail2_cpp_801d9c68[] = "pppYmMegaBirthShpTail2.cpp";
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8008acc4
@@ -645,7 +650,7 @@ void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBi
     float initVal;
 
     pppUnitMatrix(*work);
-    initVal = kPppYmMegaBirthShpTail2Zero;
+    initVal = LoadFloat(kPppYmMegaBirthShpTail2Zero);
 
     work[1].value[0][2] = initVal;
     work[1].value[0][1] = initVal;

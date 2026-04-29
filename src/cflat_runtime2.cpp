@@ -1522,10 +1522,13 @@ void CFlatRuntime2::Calc()
 				*reinterpret_cast<CTextureSet**>(layer + 4) = 0;
 			}
 
-			textureSet = new (Game.m_mainStage, const_cast<char*>(sCFlatRuntime2FileTag), 0x335) CTextureSet;
+			textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x335) CTextureSet;
 			*reinterpret_cast<CTextureSet**>(layer + 4) = textureSet;
 			if (textureSet != 0) {
-				textureSet->Create(File.m_readBuffer, Game.m_mainStage, 0, 0, 0, 0);
+				textureSet->Create(
+					File.m_readBuffer,
+					GET_CHARA_ALLOC_STAGE_S(*reinterpret_cast<int*>(layer), Game.m_mainStage),
+					0, 0, 0, 0);
 			}
 
 			File.Close(fileHandle);

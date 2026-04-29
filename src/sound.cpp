@@ -1227,13 +1227,13 @@ void CSound::CrossPlayBgm(int bgmId, int crossFrames)
  */
 void CSound::PlayNextBgm(int bgmId)
 {
-    CSound* sound = this;
+    CRedSound* redSound = RedSound(this);
 
     if (bgmId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
-        MusicNextPlay__9CRedSoundFiii(RedSound(sound), bgmId, 0x7F, 0);
-        SetMusicPhraseStop__9CRedSoundFi(RedSound(sound), 1);
+        MusicNextPlay__9CRedSoundFiii(redSound, bgmId, 0x7F, 0);
+        SetMusicPhraseStop__9CRedSoundFi(redSound, 1);
     }
 }
 

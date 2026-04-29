@@ -92,12 +92,7 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
     }
 
     s32 color_offset = in->sourceOffset;
-    u8* target_colors;
-    if (color_offset == -1) {
-        target_colors = gPppDefaultValueBuffer;
-    } else {
-        target_colors = base + color_offset + 0x80;
-    }
+    u8* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (base + color_offset + 0x80);
 
     {
         u8 color = target_colors[0];

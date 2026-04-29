@@ -28,17 +28,15 @@ static inline float randf(float value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandUpFV(_pppPObject* basePtrIn, RandUpFVParams* in, _pppCtrlTable* ctrl)
+void pppRandUpFV(_pppPObject* basePtr, RandUpFVParams* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    u8* base = (u8*)basePtrIn;
     f32* valuePtr;
-
-    s32 state = *(s32*)(base + 0xC);
-    if (state == 0) {
+    s32 currentIndex = *(s32*)((u8*)basePtr + 0xC);
+    if (currentIndex == 0) {
         f32 value = Math.RandF();
         if (in->useNormalDistribution != 0) {
             f32 randomValue = value + Math.RandF();
@@ -46,19 +44,18 @@ void pppRandUpFV(_pppPObject* basePtrIn, RandUpFVParams* in, _pppCtrlTable* ctrl
             value = randomValue * scale;
         }
 
-        valuePtr = (f32*)(basePtrIn->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
-        if (in->targetId != state) {
+        if (in->targetId != currentIndex) {
             return;
         }
-        valuePtr = (f32*)(basePtrIn->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    s32 sourceOffset = in->sourceOffset;
-    f32* target = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
+    f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)((u8*)basePtr + in->sourceOffset + 0x80);
     f32 scale = *valuePtr;
-    
+
     target[0] += randf(in->blend[0], scale);
     target[1] += randf(in->blend[1], scale);
     target[2] += randf(in->blend[2], scale);

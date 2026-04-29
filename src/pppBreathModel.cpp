@@ -942,7 +942,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
         particle->m_angleVelocity += particle->m_angleRandom;
     }
 
-    while (particle->m_angle >= FLOAT_80330F88) {
+    while (FLOAT_80330F88 <= particle->m_angle) {
         particle->m_angle -= FLOAT_80330F84;
     }
     while (particle->m_angle < FLOAT_80330F8C) {
@@ -958,9 +958,10 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
 
     if (params->m_rotationFlags != 0) {
         if (params->m_rotationFlags & 0x20) {
-            particle->m_rotationAccelZ = params->m_rotationRandomX * Math.RandF();
-            particle->m_rotationAccelY = particle->m_rotationAccelZ;
-            particle->m_rotationAccelX = particle->m_rotationAccelZ;
+            float rotationAccel = params->m_rotationRandomX * Math.RandF();
+            particle->m_rotationAccelZ = rotationAccel;
+            particle->m_rotationAccelY = rotationAccel;
+            particle->m_rotationAccelX = rotationAccel;
             if ((params->m_rotationFlags & 1) && (params->m_rotationFlags & 2)) {
                 if (DOUBLE_80330F98 < Math.RandF()) {
                     particle->m_rotationAccelX *= FLOAT_80330F80;
@@ -1038,9 +1039,10 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     PSMTXMultVec(workMtx, &particle->m_direction, &particle->m_direction);
     PSVECNormalize(&particle->m_direction, &particle->m_direction);
 
-    jitter.x = -(params->m_spawnJitterX * FLOAT_80330FA4 - Math.RandF(params->m_spawnJitterX));
-    jitter.y = -(params->m_spawnJitterY * FLOAT_80330FA4 - Math.RandF(params->m_spawnJitterY));
-    jitter.z = -(params->m_spawnJitterZ * FLOAT_80330FA4 - Math.RandF(params->m_spawnJitterZ));
+    const float& half = FLOAT_80330FA4;
+    jitter.x = Math.RandF(params->m_spawnJitterX) - params->m_spawnJitterX * half;
+    jitter.y = Math.RandF(params->m_spawnJitterY) - params->m_spawnJitterY * half;
+    jitter.z = Math.RandF(params->m_spawnJitterZ) - params->m_spawnJitterZ * half;
 
     pos.x = (*(Mtx*)particleWmat)[0][3];
     pos.y = (*(Mtx*)particleWmat)[1][3];

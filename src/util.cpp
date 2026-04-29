@@ -13,6 +13,7 @@ extern const float kUtilHermiteCoeff2;
 extern const float kUtilHermiteCoeff3;
 extern const float kUtilHermiteCoeffNeg2;
 extern "C" const Vec gUtilUpVector = {0.0f, 1.0f, 0.0f};
+static Vec s_zeroVector = {0.0f, 0.0f, 0.0f};
 
 static inline MtxPtr GetCameraMatrix()
 {

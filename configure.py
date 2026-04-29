@@ -526,7 +526,7 @@ config.libs = [
             Object(NonMatching, "ME_AppRequest.cpp"),
             Object(NonMatching, "ME_USB_process.cpp", cflags=[*cflags_game, "-sdata 0", "-sdata2 0"]),
             Object(NonMatching, "memory.cpp"),
-            Object(NonMatching, "memorycard.cpp"),
+            Object(NonMatching, "memorycard.cpp", extra_cflags=["-sdata 8", "-str reuse"]),
             Object(Matching, "menu.cpp"),
             Object(NonMatching, "menu_arti.cpp"),
             Object(NonMatching, "menu_cmd.cpp"),

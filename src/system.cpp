@@ -392,7 +392,7 @@ void CSystem::ExecScenegraph()
                 }
                 held = (unsigned short)held;
 
-                if (((trigger | held) & 0x1000) != 0)
+                if (((held | trigger) & 0x1000) != 0)
                 {
                     if (System.m_scenegraphStepMode != 2)
                     {
@@ -443,13 +443,12 @@ void CSystem::ExecScenegraph()
         }
 
         float totalTime = 0.0f;
-        CStopWatch watch((char*)-1);
         int perfEnabled = perfTrigger & 1;
+        CStopWatch watch((char*)-1);
 
+        COrder* order = m_orderSentinel.m_next;
         int index = 0;
-        for (COrder* order = m_orderSentinel.m_next;
-             order != &m_orderSentinel;
-             order = order->m_next, index++)
+        for (; order != &m_orderSentinel; order = order->m_next, index++)
         {
             m_currentOrder = order;
             m_currentOrderIndex = index;

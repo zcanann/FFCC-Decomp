@@ -1620,7 +1620,7 @@ void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_ChannelAlloc(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    *((unsigned char*)control + 0x490) = *(*(unsigned char**)track)++;
+    *((unsigned char*)control + 0x490) = (int)*(*(unsigned char**)track)++;
 }
 
 /*
@@ -2199,7 +2199,7 @@ void __MidiCtrl_ShakeType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_FineTuneAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	((u8*)track)[0x148] = *(*(u8**)track)++;
+	((u8*)track)[0x148] = (int)*(*(u8**)track)++;
 	m_ChangeStatus |= 1;
 }
 

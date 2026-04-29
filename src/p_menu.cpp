@@ -663,18 +663,20 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
  */
 void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int textureStart, int textureCount)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     for (int i = 0; i < textureCount; i++) {
-        void** slot = reinterpret_cast<void**>(self + 0x18C + (textureStart + i) * 4);
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
+        CTexture* texture = m_textures[textureStart + i];
+        if (texture != nullptr) {
+            ReleaseRefObjectNonNull(texture);
+            m_textures[textureStart + i] = 0;
+        }
     }
 
     for (int i = 0; i < textureSetCount; i++) {
-        void** slot = reinterpret_cast<void**>(self + 0x14C + (textureSetStart + i) * 4);
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
+        CTextureSet* textureSet = m_textureSets[textureSetStart + i];
+        if (textureSet != nullptr) {
+            ReleaseRefObjectNonNull(textureSet);
+            m_textureSets[textureSetStart + i] = 0;
+        }
     }
 }
 

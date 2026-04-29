@@ -90,42 +90,34 @@ CRedEntry::~CRedEntry()
  */
 void CRedEntry::Init()
 {
-	int iVar1;
 	int iVar2;
-	int* entry = (int*)this;
 
-	iVar2 = RedNew(0x400);
-	entry[0] = iVar2;
-	iVar2 = RedNew(0x1000);
-	entry[1] = iVar2;
-	iVar2 = RedNew(0x40);
-	entry[2] = iVar2;
+	m_waveBankBase = RedNew(0x400);
+	m_seSepBankBase = RedNew(0x1000);
+	m_musicBankBase = RedNew(0x40);
 
-	memset((void*)entry[0], 0, 0x400);
+	memset((void*)m_waveBankBase, 0, 0x400);
 	iVar2 = 0;
 	do {
-		iVar1 = iVar2 * 0x10;
+		*(int*)(m_waveBankBase + iVar2 * 0x10) = -1;
 		iVar2 = iVar2 + 1;
-		*(int*)(entry[0] + iVar1) = -1;
 	} while (iVar2 < 0x40);
 
-	memset((void*)entry[1], 0, 0x1000);
+	memset((void*)m_seSepBankBase, 0, 0x1000);
 	iVar2 = 0;
 	do {
-		iVar1 = iVar2 * 0x10;
+		*(int*)(m_seSepBankBase + iVar2 * 0x10) = -1;
 		iVar2 = iVar2 + 1;
-		*(int*)(entry[1] + iVar1) = -1;
 	} while (iVar2 < 0x100);
 
-	memset((void*)entry[2], 0, 0x40);
+	memset((void*)m_musicBankBase, 0, 0x40);
 	iVar2 = 0;
 	do {
-		iVar1 = iVar2 * 0x10;
+		*(int*)(m_musicBankBase + iVar2 * 0x10) = -1;
 		iVar2 = iVar2 + 1;
-		*(int*)(entry[2] + iVar1) = -1;
 	} while (iVar2 < 4);
 
-	entry[3] = -1;
+	m_waveHistoryIndex = -1;
 }
 
 /*

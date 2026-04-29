@@ -145,15 +145,15 @@ private:
     CClass* m_classes;              // 0x0018
     int m_funcCount;                // 0x001C
     u8* m_funcs;                    // 0x0020
-    void* m_0x24;                   // 0x0024
-    void* m_0x28;                   // 0x0028
-    void* m_0x2C;                   // 0x002C
-    void* m_0x30;                   // 0x0030
-    void* m_0x34;                   // 0x0034
-    void* m_0x38;                   // 0x0038
-    void* m_0x3C;                   // 0x003C
-    void* m_0x40;                   // 0x0040
-    void* m_0x44;                   // 0x0044
+    int m_strCount;                 // 0x0024
+    char* m_strBlob;                // 0x0028
+    u16* m_strOffsets;              // 0x002C
+    int m_fstrCount;                // 0x0030
+    char* m_fstrBlob;               // 0x0034
+    u16* m_fstrOffsets;             // 0x0038
+    int m_vstrCount;                // 0x003C
+    char* m_vstrBlob;               // 0x0040
+    u16* m_vstrOffsets;             // 0x0044
     u8 m_performanceBlock[0x804];   // 0x0048
     u8 m_pad_084C[0x80];            // 0x084C
     CObject m_objectSentinel;       // 0x08CC

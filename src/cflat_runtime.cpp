@@ -86,13 +86,14 @@ CFlatRuntime::~CFlatRuntime()
 void CFlatRuntime::Init()
 {
 	typedef void* (*GetStageFn)(CFlatRuntime*);
-	GetStageFn getStage = reinterpret_cast<GetStageFn>((*reinterpret_cast<void***>(this))[0x11]);
 
 	m_permanentVarValues = static_cast<u8*>(
 	    __nwa__FUlPQ27CMemory6CStagePci(
-	        0x3000, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x2A));
+	        0x3000, reinterpret_cast<GetStageFn>((*reinterpret_cast<void***>(this))[0x11])(this),
+	        const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x2A));
 	m_initScratchA = __nwa__FUlPQ27CMemory6CStagePci(
-	    0x14880, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x2B);
+	    0x14880, reinterpret_cast<GetStageFn>((*reinterpret_cast<void***>(this))[0x11])(this),
+	    const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x2B);
 }
 
 /*
@@ -170,32 +171,32 @@ void CFlatRuntime::Destroy()
 		__dla__FPv(reinterpret_cast<u8*>(ptr) - 0x10);
 	}
 
-	ptr = m_0x28;
+	ptr = m_strBlob;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
 
-	ptr = m_0x2C;
+	ptr = m_strOffsets;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
 
-	ptr = m_0x34;
+	ptr = m_fstrBlob;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
 
-	ptr = m_0x38;
+	ptr = m_fstrOffsets;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
 
-	ptr = m_0x40;
+	ptr = m_vstrBlob;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
 
-	ptr = m_0x44;
+	ptr = m_vstrOffsets;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
@@ -222,15 +223,15 @@ void CFlatRuntime::clear()
 	m_funcCount = 0;
 	m_classes = 0;
 	m_initScratchB = 0;
-	m_0x2C = 0;
-	m_0x28 = 0;
-	m_0x24 = 0;
-	m_0x38 = 0;
-	m_0x34 = 0;
-	m_0x30 = 0;
-	m_0x44 = 0;
-	m_0x40 = 0;
-	m_0x3C = 0;
+	m_strOffsets = 0;
+	m_strBlob = 0;
+	m_strCount = 0;
+	m_fstrOffsets = 0;
+	m_fstrBlob = 0;
+	m_fstrCount = 0;
+	m_vstrOffsets = 0;
+	m_vstrBlob = 0;
+	m_vstrCount = 0;
 
 	*reinterpret_cast<short*>(self + 0x964) =
 	    static_cast<short>((*reinterpret_cast<short*>(self + 0x964) & 0x000F) | (clearMaskBits << 4));

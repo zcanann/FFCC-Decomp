@@ -1736,7 +1736,24 @@ void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 {
     MapObjAttachObj* mapObj = reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954));
 
+    goto search;
     while (true) {
+        if (strcmp(mapHitName, mapObj->attr->name) == 0) {
+            mapObj->mapHit = mapHit;
+
+            MapObjAttachAttr* mapObjAtr = mapObj->attr;
+            if (mapObjAtr != 0) {
+                if (mapObjAtr != 0) {
+                    typedef void (*MapObjAtrDtor)(MapObjAttachAttr*, int);
+                    reinterpret_cast<MapObjAtrDtor*>(*reinterpret_cast<void***>(mapObjAtr))[2](mapObjAtr, 1);
+                }
+                mapObj->attr = 0;
+            }
+        }
+
+        mapObj++;
+
+search:
         unsigned int stride = 0xF0;
         MapObjAttachObj* mapObjEnd =
             reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954 + *reinterpret_cast<short*>(Ptr(this, 0xC)) * 0xF0));
@@ -1759,21 +1776,6 @@ found:
         if (mapObj == 0) {
             return;
         }
-
-        if (strcmp(mapHitName, mapObj->attr->name) == 0) {
-            mapObj->mapHit = mapHit;
-
-            MapObjAttachAttr* mapObjAtr = mapObj->attr;
-            if (mapObjAtr != 0) {
-                if (mapObjAtr != 0) {
-                    typedef void (*MapObjAtrDtor)(MapObjAttachAttr*, int);
-                    reinterpret_cast<MapObjAtrDtor*>(*reinterpret_cast<void***>(mapObjAtr))[2](mapObjAtr, 1);
-                }
-                mapObj->attr = 0;
-            }
-        }
-
-        mapObj++;
     }
 }
 

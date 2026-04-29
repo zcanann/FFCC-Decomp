@@ -318,9 +318,9 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
 	bankSize &= ~0x1F;
 
 	m_MemoryBank = (int*)param1;
+	m_DataBufferSize = param2 - bankSize * 2;
 	m_AMemoryBank = (int*)((int)m_MemoryBank + bankSize);
 	m_DataBuffer = (int)m_AMemoryBank + bankSize;
-	m_DataBufferSize = param2 - bankSize * 2;
 	memset(m_MemoryBank, 0, bankSize);
 	memset(m_AMemoryBank, 0, bankSize);
 	m_ADataBuffer = param3;

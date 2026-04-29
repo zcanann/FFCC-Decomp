@@ -720,7 +720,8 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 		if (used == 0) {
 			track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 			do {
-				if (((*track != 0) && (track[6] != 0)) && (*(short*)(track[6] + 2) == waveNo)) {
+				if (((*reinterpret_cast<unsigned int*>(track) != 0) && (*reinterpret_cast<unsigned int*>(track + 6) != 0)) &&
+				    (*(short*)(track[6] + 2) == waveNo)) {
 					used++;
 					break;
 				}

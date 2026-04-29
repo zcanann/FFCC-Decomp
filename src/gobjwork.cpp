@@ -1006,8 +1006,12 @@ int CCaravanWork::AddTmpArtifact(int itemId, int* outIndex)
  */
 int CCaravanWork::CanAddGil(int gilAmount)
 {
+	unsigned char canAdd = 0;
 	int totalGil = m_gil + gilAmount;
-	return (totalGil >= 0 && totalGil < 100000000);
+	if ((totalGil >= 0) && (totalGil <= 99999999)) {
+		canAdd = 1;
+	}
+	return canAdd != 0;
 }
 
 /*
@@ -1048,12 +1052,13 @@ int CCaravanWork::AddGil(int gilToAdd)
 int CCaravanWork::GetFoodRank(int playerIdx)
 {
 	CCaravanWork* cur = this;
+	unsigned short* target = &m_letterMeta[playerIdx];
 	int rank = 0;
 	int baseIdx = 0;
 
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < 4; j++) {
-			if ((playerIdx != baseIdx) && (cur->m_letterMeta[j] > m_letterMeta[playerIdx])) {
+			if ((playerIdx != baseIdx) && (cur->m_letterMeta[j] > *target)) {
 				rank++;
 			}
 			baseIdx++;
@@ -2423,9 +2428,8 @@ void CCaravanWork::SetCurrentWeaponIdx(int weaponIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::CheckAndResetCurrentWeaponIdx(int)
+void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
 {
-	short weaponIdx = m_weaponIdx;
 	int reset = 0;
 	int weaponItem = DelCmdListAndItem(weaponIdx, reset);
 	if ((0 < weaponItem) && (*GetItemDataPtr(weaponItem) == 1)) {

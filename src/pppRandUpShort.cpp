@@ -22,7 +22,7 @@ struct RandUpShortParam {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandUpShort(_pppPObject* basePtr, RandUpShortParam* in, _pppCtrlTable* ctrl)
+void pppRandUpShort(_pppPObject* basePtr, RandUpShortParam* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     s16* target;
@@ -51,9 +51,9 @@ extern "C" void pppRandUpShort(_pppPObject* basePtr, RandUpShortParam* in, _pppC
     }
 
     target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->sourceOffset + 0x80);
-
     u16 scale = in->scale;
     f32 scaled = (f32)scale * *valuePtr;
     s32 delta = (s32)scaled;
+    
     *target = (s16)(*target + delta);
 }

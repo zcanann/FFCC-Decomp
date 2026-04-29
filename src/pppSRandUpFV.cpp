@@ -57,16 +57,7 @@ void pppSRandUpFV(_pppPObject* basePtr, SRandUpFVParams* in, _pppCtrlTable* ctrl
 
     f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)((u8*)basePtr + in->sourceOffset + 0x80);
 
-    {
-        f32 value = in->blend[0] * randVec[0];
-        target[0] +=value;
-    }
-    {
-        f32 value = in->blend[1] * randVec[1];
-        target[1] +=value;
-    }
-    {
-        f32 value = in->blend[2] * randVec[2];
-        target[2] +=value;
-    }
+    target[0] += in->blend[0] * randVec[0];
+    target[1] += in->blend[1] * randVec[1];
+    target[2] += in->blend[2] * randVec[2];
 }

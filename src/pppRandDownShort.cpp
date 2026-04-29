@@ -22,7 +22,7 @@ struct RandDownShortParam {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandDownShort(_pppPObject* basePtr, RandDownShortParam* in, _pppCtrlTable* ctrl)
+void pppRandDownShort(_pppPObject* basePtr, RandDownShortParam* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     s16* target;

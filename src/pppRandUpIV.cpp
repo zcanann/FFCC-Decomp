@@ -28,7 +28,7 @@ static inline int randint(int value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandUpIV(_pppPObject* basePtr, RandUpIVParams* in, _pppCtrlTable* ctrl)
+void pppRandUpIV(_pppPObject* basePtr, RandUpIVParams* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;

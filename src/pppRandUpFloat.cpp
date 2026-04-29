@@ -51,7 +51,7 @@ void pppRandUpFloat(_pppPObject* basePtr, RandUpFloatParam* in, _pppCtrlTable* c
 
     s32 sourceOffset = in->sourceOffset;
     f32* source = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
-
     f32 delta = in->blend * *valuePtr;
+    
     *source = *source + delta;
 }

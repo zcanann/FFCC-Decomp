@@ -23,7 +23,7 @@ struct RandCharParam {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandChar(_pppPObject* basePtr, RandCharParam* in, _pppCtrlTable* ctrl)
+void pppRandChar(_pppPObject* basePtr, RandCharParam* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     u8* target;

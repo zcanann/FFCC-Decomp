@@ -57,8 +57,8 @@ void pppRandUpFV(_pppPObject* basePtrIn, RandUpFVParams* in, _pppCtrlTable* ctrl
 
     s32 sourceOffset = in->sourceOffset;
     f32* target = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
-
     f32 scale = *valuePtr;
+    
     target[0] += randf(in->blend[0], scale);
     target[1] += randf(in->blend[1], scale);
     target[2] += randf(in->blend[2], scale);

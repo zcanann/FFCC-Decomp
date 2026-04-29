@@ -27,9 +27,6 @@ static inline short randshort(short value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-
-extern "C" {
-
 void pppRandHCV(_pppPObject* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
@@ -65,6 +62,4 @@ void pppRandHCV(_pppPObject* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
         target[2] += randshort(in->delta[2], scale);
         target[3] += randshort(in->delta[3], scale);
     }
-}
-
 }

@@ -41,6 +41,7 @@ extern "C" void DrawSingLife__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
 extern "C" void DrawEquipMark__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 
+extern CMenuPcs MenuPcs;
 
 extern double DOUBLE_80332ea0;
 extern float FLOAT_80332e60;
@@ -506,10 +507,10 @@ bool CMenuPcs::ItemClose()
 void CMenuPcs::ItemDraw()
 {
     bool hasSelectedItem = false;
-    int selectedItemId = -1;
+    int selectedItemId;
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
     int caravanWork = Game.m_scriptFoodBase[0];
     ItemMenuState* itemState = this->itemMenuState;
@@ -537,39 +538,61 @@ void CMenuPcs::ItemDraw()
         float uvScale = *(float*)(entry + 10);
 
         if (i == 0) {
-            SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 1);
-            SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+            SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 1);
+            SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 
-            GXColor barColors[4] = {
-                {0xFF, 0xFF, 0xFF, 0xFF},
-                {0xFF, 0xFF, 0xFF, 0xFF},
-                {0xFF, 0xFF, 0xFF, 0xFF},
-                {0xFF, 0xFF, 0xFF, 0xFF},
-            };
+            GXColor barColors[4];
+            barColors[0].r = 0xFF;
+            barColors[0].g = 0xFF;
+            barColors[0].b = 0xFF;
+            barColors[0].a = 0xFF;
+            barColors[1].r = 0xFF;
+            barColors[1].g = 0xFF;
+            barColors[1].b = 0xFF;
+            barColors[1].a = 0xFF;
+            barColors[2].r = 0xFF;
+            barColors[2].g = 0xFF;
+            barColors[2].b = 0xFF;
+            barColors[2].a = 0xFF;
+            barColors[3].r = 0xFF;
+            barColors[3].g = 0xFF;
+            barColors[3].b = 0xFF;
+            barColors[3].a = 0xFF;
 
             GXSetChanMatColor(GX_COLOR0A0, barColors[0]);
             float fillW = alpha * w;
             if (fillW > FLOAT_80332e60) {
                 DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-                    this, 0, x, y, fillW, h, u, v, barColors, FLOAT_80332e64, FLOAT_80332e64, 0.0f);
+                    &MenuPcs, 0, x, y, fillW, h, u, v, barColors, FLOAT_80332e64, FLOAT_80332e64, 0.0f);
                 x += fillW;
                 u += fillW;
             }
 
             if (fillW > FLOAT_80332e60 && fillW < w) {
-                GXColor fadeColors[4] = {
-                    {0xFF, 0xFF, 0xFF, 0x00},
-                    {0xFF, 0xFF, 0xFF, 0x00},
-                    {0xFF, 0xFF, 0xFF, 0x00},
-                    {0xFF, 0xFF, 0xFF, 0x00},
-                };
+                GXColor fadeColors[4];
+                fadeColors[0].r = 0xFF;
+                fadeColors[0].g = 0xFF;
+                fadeColors[0].b = 0xFF;
+                fadeColors[0].a = 0;
+                fadeColors[1].r = 0xFF;
+                fadeColors[1].g = 0xFF;
+                fadeColors[1].b = 0xFF;
+                fadeColors[1].a = 0;
+                fadeColors[2].r = 0xFF;
+                fadeColors[2].g = 0xFF;
+                fadeColors[2].b = 0xFF;
+                fadeColors[2].a = 0;
+                fadeColors[3].r = 0xFF;
+                fadeColors[3].g = 0xFF;
+                fadeColors[3].b = 0xFF;
+                fadeColors[3].a = 0;
 
                 float remainW = (float)((double)(DOUBLE_80332e68 / (double)*(int*)(entry + 0x14)) * (double)w);
                 DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-                    this, 0, x, y, remainW, h, u, v, fadeColors, FLOAT_80332e64, FLOAT_80332e64, 0.0f);
+                    &MenuPcs, 0, x, y, remainW, h, u, v, fadeColors, FLOAT_80332e64, FLOAT_80332e64, 0.0f);
             }
 
-            SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+            SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
         } else {
             float itemAlpha = alpha;
             if (tex == 0x37) {
@@ -596,10 +619,14 @@ void CMenuPcs::ItemDraw()
                 drawIndex++;
             }
 
-            SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
-            GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332e80 * itemAlpha)};
+            SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+            GXColor color;
+            color.r = 0xFF;
+            color.g = 0xFF;
+            color.b = 0xFF;
+            color.a = (u8)(FLOAT_80332e80 * itemAlpha);
             GXSetChanMatColor(GX_COLOR0A0, color);
-            DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
+            DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
         }
     }
 
@@ -625,8 +652,8 @@ void CMenuPcs::ItemDraw()
             menuIndex -= 0x40;
         }
 
-        GXColor textColor = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332e80 * *(float*)(listStart + 8))};
-        listFont->SetColor(textColor);
+        CColor textColor(0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332e80 * *(float*)(listStart + 8)));
+        listFont->SetColor(textColor.color);
 
         s16 itemId = *(s16*)(caravanWork + menuIndex * 2 + 0xB6);
         if (itemId > 0) {
@@ -759,9 +786,8 @@ int CMenuPcs::ItemCtrlCur()
     }
 
     int menuState = (int)itemMenuState;
-    s16* singWindowInfo = this->singWindowInfo;
-    s16 letterAttachFlg = SingGetLetterAttachflg__8CMenuPcsFv(this);
     int mode = (int)*(s16*)(menuState + 0x30);
+    s16 letterAttachFlg = SingGetLetterAttachflg__8CMenuPcsFv(this);
 
     if (mode == 0) {
         if ((hold & 8) == 0) {
@@ -837,7 +863,7 @@ int CMenuPcs::ItemCtrlCur()
                     GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 0);
                     SetSingWinInfo__8CMenuPcsFiiii(this, 0xF0, 0xA0, winW, winH);
 
-                    *(s16*)((int)singWindowInfo + 10) = 0;
+                    this->singWindowInfo[5] = 0;
                     *(s16*)(menuState + 0x12) = 0;
                     *(s16*)(menuState + 0x30) = 1;
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -895,12 +921,12 @@ int CMenuPcs::ItemCtrlCur()
                         DeleteItemIdx__12CCaravanWorkFii((void*)caravanWork, idx, 0);
                     }
 
-                    *(s16*)((int)singWindowInfo + 10) = 2;
+                    this->singWindowInfo[5] = 2;
                     *(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
                 }
             } else if ((press & 0x200) != 0) {
-                *(s16*)((int)singWindowInfo + 10) = 2;
+                this->singWindowInfo[5] = 2;
                 *(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
             }

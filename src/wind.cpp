@@ -429,6 +429,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
     WindObject* obj;
     int i;
     float zero;
+    Vec randTmp;
     Vec tmp;
     zero = FLOAT_80330ef0;
     out->z = FLOAT_80330ef0;
@@ -447,8 +448,8 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                 if (randomize == 0) {
                     PSVECAdd(out, &obj->force, out);
                 } else {
-                    PSVECScale(&obj->force, &tmp, (float)Math.RandF());
-                    PSVECAdd(out, &tmp, out);
+                    PSVECScale(&obj->force, &randTmp, (float)Math.RandF());
+                    PSVECAdd(out, &randTmp, out);
                 }
             } else if ((obj->minX < pos->x) && (obj->minZ < pos->z) && (obj->maxX > pos->x) && (obj->maxZ > pos->z)) {
                 const float deltaZ = pos->z - obj->centerZ;

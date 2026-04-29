@@ -310,8 +310,8 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             indexDouble.u[0] = 0x43300000;
             indexDouble.u[1] = (u32)(int)i ^ 0x80000000;
 
-            double t = (FLOAT_80333448 / (float)(countDouble.d - DOUBLE_80333440)) *
-                (float)(indexDouble.d - DOUBLE_80333440);
+            f32 t = (FLOAT_80333448 / (countDouble.d - DOUBLE_80333440)) *
+                (indexDouble.d - DOUBLE_80333440);
             if (GetCharaNodeFrameMatrix(pppMngStPtr, (float)t, charaMtx) == 0) {
                 emptyHistory = 1;
                 continue;
@@ -342,10 +342,11 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
         } else if (i == 0 && work->m_spawnEnabled != 0) {
             if (work->m_maxLength - FLOAT_80333458 < work->m_length) {
-                s32 partIndex = ((s32)((u8*)pppMngStPtr - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
+                _pppMngSt* mngSt = pppMngStPtr;
+                s32 partIndex = ((s32)((u8*)mngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
                 work->m_length = work->m_maxLength - FLOAT_80333458;
                 ParticleFrameCallback__5CGameFiiiiiP3Vec(
-                    &Game, partIndex, (int)pppMngStPtr->m_kind, (int)pppMngStPtr->m_nodeIndex, 3,
+                    &Game, partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3,
                     baseObj->m_graphId / 0x1000, work->m_points);
                 work->m_spawnEnabled = 0;
             }

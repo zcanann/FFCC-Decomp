@@ -429,7 +429,10 @@ void CSystem::ExecScenegraph()
         switch (scenegraphStepMode)
         {
         case 5:
-            stepGate = m_frameCounter & 1;
+            {
+                unsigned int frameBit = (m_frameCounter & 1) != 0;
+                stepGate = frameBit;
+            }
             break;
         case 4:
             stepGate = (m_frameCounter & 3) != 0;

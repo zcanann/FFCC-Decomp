@@ -668,7 +668,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
         *emitFrameCounter = *emitFrameCounter + 1;
 
         for (i = 0; i < maxParticleCount; i++) {
-            if (*(short*)(particleData + 0x50) >= 1) {
+            if (*(short*)(particleData + 0x50) > 0) {
                 UpdateParticle(vYmBreath, pYmBreath, (_PARTICLE_DATA*)particleData, vColor,
                                (_PARTICLE_COLOR*)particleColor);
                 pppCalcFrameShape(**(long***)(*(int*)((unsigned char*)pppEnvStPtr + 0xC) +
@@ -924,8 +924,8 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         memset(particleColor, 0, 0x20);
     }
 
-    baseDir.x = 0.0f;
-    baseDir.y = 0.0f;
+    baseDir.x = FLOAT_80330c80;
+    baseDir.y = FLOAT_80330c80;
     baseDir.z = FLOAT_80330C90;
 
     angle[0] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
@@ -943,7 +943,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     directionNorm = particle->m_direction;
     pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&particle->m_direction), &directionNorm);
 
-    if (params->m_spawnOffset != 0.0f) {
+    if (FLOAT_80330c80 != params->m_spawnOffset) {
         PSVECScale(&particle->m_direction, &particle->m_position, params->m_spawnOffset);
     }
 

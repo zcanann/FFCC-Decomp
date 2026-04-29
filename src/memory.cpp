@@ -84,22 +84,32 @@ extern "C" void __dt__10CAmemCacheFv(void*, int);
 
 static int stageGetAllocationMode(CMemory::CStage* stage)
 {
-    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x11C);
+    return stage->m_allocationMode;
 }
 
 static int stageGetHeapHead(CMemory::CStage* stage)
 {
-    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x110);
+    return stage->m_heapHead;
 }
 
 static void stageSetHeapHead(CMemory::CStage* stage, int value)
 {
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x110) = value;
+    stage->m_heapHead = value;
 }
 
 static char* stageGetSourceName(CMemory::CStage* stage)
 {
-    return reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(stage) + 0x10);
+    return stage->m_allocationSourceStr;
+}
+
+static CAmemCache& cacheEntryAt(CAmemCacheSet* cacheSet, int index)
+{
+    return cacheSet->m_cacheTable[index];
+}
+
+static const CAmemCache& cacheEntryAt(const CAmemCacheSet* cacheSet, int index)
+{
+    return cacheSet->m_cacheTable[index];
 }
 
 static bool stageHasUnfreedBlocks(CMemory::CStage* stage)
@@ -1505,44 +1515,38 @@ void CAmemCacheSet::Init(char* sourceName, CMemory::CStage* rStage, CMemory::CSt
                          unsigned char (*releaseAction)(unsigned long), unsigned long releaseActionArg,
                          unsigned char (*overflowHook)(unsigned long), unsigned long overflowHookArg)
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    strcpy(m_name, sourceName);
 
-    strcpy(reinterpret_cast<char*>(bytes), sourceName);
-
-    *reinterpret_cast<ConstructorDestructor*>(bytes + 0x40) =
-        reinterpret_cast<ConstructorDestructor>(releaseAction);
-    *reinterpret_cast<unsigned long*>(bytes + 0x44) = releaseActionArg;
-    *reinterpret_cast<ConstructorDestructor*>(bytes + 0x48) =
-        reinterpret_cast<ConstructorDestructor>(releaseCheck);
-    *reinterpret_cast<unsigned long*>(bytes + 0x4C) = releaseCheckArg;
-    *reinterpret_cast<ConstructorDestructor*>(bytes + 0x50) =
-        reinterpret_cast<ConstructorDestructor>(overflowHook);
-    *reinterpret_cast<unsigned long*>(bytes + 0x54) = overflowHookArg;
-    *reinterpret_cast<CMemory::CStage**>(bytes + 0x20) = rStage;
-    *reinterpret_cast<CMemory::CStage**>(bytes + 0x24) = stage;
+    m_releaseCheck = releaseCheck;
+    m_releaseCheckArg = releaseCheckArg;
+    m_releaseAction = releaseAction;
+    m_releaseActionArg = releaseActionArg;
+    m_overflowHook = overflowHook;
+    m_overflowHookArg = overflowHookArg;
+    m_rStage = rStage;
+    m_stage = stage;
 
     if (stage == nullptr) {
-        *reinterpret_cast<int*>(bytes + 0x3C) = 0;
-        *reinterpret_cast<unsigned long*>(bytes + 0x30) = 0;
-        *reinterpret_cast<unsigned long*>(bytes + 0x28) = 0;
-        *reinterpret_cast<unsigned long*>(bytes + 0x2C) = 0;
-        *reinterpret_cast<unsigned long*>(bytes + 0x38) = 0;
-        *reinterpret_cast<void**>(bytes + 0x58) = 0;
+        m_cacheCount = 0;
+        m_amemCursor = 0;
+        m_amemStart = 0;
+        m_amemEnd = 0;
+        m_amemLock = 0;
+        m_cacheTable = 0;
     } else {
-        *reinterpret_cast<int*>(bytes + 0x3C) = cacheCount;
-        unsigned long start = *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(stage) + 8);
-        *reinterpret_cast<unsigned long*>(bytes + 0x28) = start;
-        *reinterpret_cast<unsigned long*>(bytes + 0x30) = start;
-        *reinterpret_cast<unsigned long*>(bytes + 0x2C) =
-            *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(stage) + 0x0C);
-        *reinterpret_cast<unsigned long*>(bytes + 0x38) = 0;
+        m_cacheCount = cacheCount;
+        unsigned long start = stage->m_heapTop;
+        m_amemStart = start;
+        m_amemCursor = start;
+        m_amemEnd = stage->m_heapBottom;
+        m_amemLock = 0;
 
-        int count = *reinterpret_cast<int*>(bytes + 0x3C);
+        int count = m_cacheCount;
         void* block = rStage->alloc(count * 0x1C + 0x10, const_cast<char*>(s_memory_cpp), 0x787, 0);
         void* table = __construct_new_array(
             block, reinterpret_cast<ConstructorDestructor>(__ct__10CAmemCacheFv),
             reinterpret_cast<ConstructorDestructor>(__dt__10CAmemCacheFv), 0x1C, count);
-        *reinterpret_cast<void**>(bytes + 0x58) = table;
+        m_cacheTable = reinterpret_cast<CAmemCache*>(table);
     }
 }
 
@@ -1557,7 +1561,7 @@ void CAmemCacheSet::Init(char* sourceName, CMemory::CStage* rStage, CMemory::CSt
  */
 void CAmemCacheSet::SetRStage(CMemory::CStage* stage)
 {
-    *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0x20) = stage;
+    m_rStage = stage;
 }
 
 /*
@@ -1571,12 +1575,11 @@ void CAmemCacheSet::SetRStage(CMemory::CStage* stage)
  */
 void CAmemCacheSet::Destroy()
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-    void* cacheArray = reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x58));
+    void* cacheArray = m_cacheTable;
 
     if (cacheArray != nullptr) {
         __destroy_new_array(cacheArray, (ConstructorDestructor)__dt__10CAmemCacheFv);
-        *reinterpret_cast<int*>(bytes + 0x58) = 0;
+        m_cacheTable = 0;
     }
 }
 
@@ -1591,31 +1594,29 @@ void CAmemCacheSet::Destroy()
  */
 void CAmemCacheSet::DestroyCache(int index)
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-    unsigned char* entry =
-        reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x58) + index * 0x1C);
-    int cacheData = *reinterpret_cast<int*>(entry + 0x00);
-    int workData = *reinterpret_cast<int*>(entry + 0x04);
+    CAmemCache& entry = cacheEntryAt(this, index);
+    int cacheData = reinterpret_cast<int>(entry.m_cacheData);
+    int workData = reinterpret_cast<int>(entry.m_workData);
 
-    if (entry[0x1A] == 0) {
+    if (entry.m_dmaCopy == 0) {
         if (workData != 0) {
             operator delete(reinterpret_cast<void*>(workData));
         }
-        *reinterpret_cast<int*>(entry + 0x00) = 0;
-        *reinterpret_cast<int*>(entry + 0x04) = 0;
+        entry.m_cacheData = 0;
+        entry.m_workData = 0;
     } else {
         if (cacheData != 0) {
             operator delete(reinterpret_cast<void*>(cacheData));
-            *reinterpret_cast<int*>(entry + 0x00) = 0;
+            entry.m_cacheData = 0;
         }
         if (workData != 0) {
-            *reinterpret_cast<int*>(entry + 0x04) = 0;
+            entry.m_workData = 0;
         }
     }
 
-    *reinterpret_cast<unsigned short*>(entry + 0x18) = 0;
-    *reinterpret_cast<unsigned short*>(entry + 0x0C) = 0;
-    entry[0x0E] = 0;
+    entry.m_refCnt0 = 0;
+    entry.m_refCount = 0;
+    entry.m_inUse = 0;
 }
 
 /*
@@ -1639,8 +1640,7 @@ void CAmemCacheSet::RefCnt0Up(int)
  */
 void CAmemCacheSet::AmemSetLock()
 {
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x38) =
-        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x30);
+    m_amemLock = m_amemCursor;
 }
 
 /*
@@ -1654,9 +1654,9 @@ void CAmemCacheSet::AmemSetLock()
  */
 void CAmemCacheSet::AmemGetLock()
 {
-    int lock = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x38);
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x34) = lock;
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x30) = lock;
+    unsigned long lock = m_amemLock;
+    m_amemPrev = lock;
+    m_amemCursor = lock;
 }
 
 /*
@@ -1680,8 +1680,7 @@ void CAmemCacheSet::AmemAlloc(int)
  */
 void CAmemCacheSet::AmemPrev()
 {
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x30) =
-        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x34);
+    m_amemCursor = m_amemPrev;
 }
 
 /*
@@ -1705,26 +1704,26 @@ void CAmemCacheSet::GetFree()
  */
 int CAmemCacheSet::GetData(short index, char* source, int line)
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
     while (true) {
-        int* cacheEntry = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x58) + index * 0x1C);
+        CAmemCache& entry = cacheEntryAt(this, index);
         int data = 0;
 
-        if (*cacheEntry == 0) {
-            if (*reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(cacheEntry) + 0x1A) == 0) {
-                *cacheEntry = cacheEntry[1];
-                data = *cacheEntry;
+        if (entry.m_cacheData == 0) {
+            if (entry.m_dmaCopy == 0) {
+                entry.m_cacheData = entry.m_workData;
+                data = reinterpret_cast<int>(entry.m_cacheData);
             } else {
                 if (source == 0) {
                     source = DAT_8032f7d4;
                 }
 
                 data = reinterpret_cast<int>(
-                    reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<void**>(bytes))->alloc(
-                        static_cast<unsigned long>(cacheEntry[2]), source, static_cast<unsigned long>(line), 1));
-                *cacheEntry = data;
+                    m_rStage->alloc(static_cast<unsigned long>(entry.m_size), source, static_cast<unsigned long>(line), 1));
+                entry.m_cacheData = reinterpret_cast<void*>(data);
                 if (data != 0) {
-                    int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(&Sound, 0, 1, *cacheEntry, cacheEntry[1], cacheEntry[2], 0, 0);
+                    int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
+                        &Sound, 0, 1, reinterpret_cast<int>(entry.m_cacheData),
+                        reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
                     CStopWatch watch((char*)-1);
                     watch.Start();
                     while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
@@ -1740,7 +1739,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                             watch.Start();
                         }
                     }
-                    data = *cacheEntry;
+                    data = reinterpret_cast<int>(entry.m_cacheData);
                 }
             }
         }
@@ -1748,7 +1747,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
         if (data != 0) {
             return data;
         }
-        AmemFreeLowPrio(*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x58) + index * 0x1C + 8));
+        AmemFreeLowPrio(entry.m_size);
     }
 }
 
@@ -1763,19 +1762,16 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
  */
 int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCopy)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     short slot = 0;
-    int scanOffset = 0;
-    int remaining = *reinterpret_cast<int*>(self + 0x3C);
+    int remaining = m_cacheCount;
     int index = -1;
 
     if (remaining > 0) {
         do {
-            if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(self + 0x58) + scanOffset + 0x0E) == 0) {
+            if (cacheEntryAt(this, slot).m_inUse == 0) {
                 index = slot;
                 break;
             }
-            scanOffset += 0x1C;
             slot++;
             remaining--;
         } while (remaining != 0);
@@ -1785,29 +1781,27 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
         return -1;
     }
 
-    unsigned int* entry = reinterpret_cast<unsigned int*>(*reinterpret_cast<int*>(self + 0x58) + static_cast<short>(index) * 0x1C);
+    CAmemCache& entry = cacheEntryAt(this, static_cast<short>(index));
     unsigned int allocSize = (static_cast<unsigned int>(size) + 0x1F) & ~0x1F;
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(entry) + 0x0E) = 1;
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(entry) + 0x0F) = static_cast<unsigned char>(type);
-    *reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(entry) + 0x1A) = static_cast<char>(dmaCopy);
-    *reinterpret_cast<short*>(entry + 3) = 0;
+    entry.m_inUse = 1;
+    entry.m_type = static_cast<unsigned char>(type);
+    entry.m_dmaCopy = static_cast<unsigned char>(dmaCopy);
+    entry.m_refCount = 0;
 
     if (dmaCopy == 0) {
         while (true) {
-            entry[1] = reinterpret_cast<unsigned int>(
-                reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<void**>(self))->alloc(
-                    allocSize, const_cast<char*>(s_memory_cpp), 0x807, 1));
-            if (entry[1] != 0) {
+            entry.m_workData = m_rStage->alloc(allocSize, const_cast<char*>(s_memory_cpp), 0x807, 1);
+            if (entry.m_workData != 0) {
                 break;
             }
             AmemFreeLowPrio(allocSize);
         }
 
-        entry[0] = 0;
-        entry[2] = allocSize;
+        entry.m_cacheData = 0;
+        entry.m_size = static_cast<int>(allocSize);
 
         int checksum = 0x12345678;
-        unsigned int remainingBytes = entry[2];
+        unsigned int remainingBytes = static_cast<unsigned int>(entry.m_size);
         const unsigned char* data = reinterpret_cast<const unsigned char*>(src);
         if (remainingBytes != 0) {
             unsigned int chunks = remainingBytes >> 3;
@@ -1832,12 +1826,13 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
         }
 
     checksum_done_copy:
-        entry[5] = static_cast<unsigned int>(checksum);
+        entry.m_checksum = checksum;
 
-        if (*reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(entry) + 0x1A) == 0) {
-            memcpy(reinterpret_cast<void*>(entry[1]), src, entry[2]);
+        if (entry.m_dmaCopy == 0) {
+            memcpy(entry.m_workData, src, static_cast<unsigned long>(entry.m_size));
         } else {
-            int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(&Sound, 0, 0, reinterpret_cast<int>(src), entry[1], entry[2], 0, 0);
+            int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
+                &Sound, 0, 0, reinterpret_cast<int>(src), reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
             CStopWatch watch((char*)-1);
             watch.Start();
             while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
@@ -1847,18 +1842,18 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
             }
         }
 
-        DCFlushRange(reinterpret_cast<void*>(entry[1]), allocSize);
+        DCFlushRange(entry.m_workData, allocSize);
         return index;
     }
 
-    *reinterpret_cast<int*>(self + 0x34) = *reinterpret_cast<int*>(self + 0x30);
-    *reinterpret_cast<unsigned int*>(self + 0x30) = *reinterpret_cast<unsigned int*>(self + 0x30) + allocSize;
-    entry[1] = *reinterpret_cast<unsigned int*>(self + 0x34);
-    entry[0] = 0;
-    entry[2] = allocSize;
+    m_amemPrev = m_amemCursor;
+    m_amemCursor += allocSize;
+    entry.m_workData = reinterpret_cast<void*>(m_amemPrev);
+    entry.m_cacheData = 0;
+    entry.m_size = static_cast<int>(allocSize);
 
     int checksum = 0x12345678;
-    unsigned int remainingBytes = entry[2];
+    unsigned int remainingBytes = static_cast<unsigned int>(entry.m_size);
     const unsigned char* data = reinterpret_cast<const unsigned char*>(src);
     if (remainingBytes != 0) {
         unsigned int chunks = remainingBytes >> 3;
@@ -1883,12 +1878,13 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
     }
 
 checksum_done_dma:
-    entry[5] = static_cast<unsigned int>(checksum);
+    entry.m_checksum = checksum;
 
-    if (*reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(entry) + 0x1A) == 0) {
-        memcpy(reinterpret_cast<void*>(entry[1]), src, entry[2]);
+    if (entry.m_dmaCopy == 0) {
+        memcpy(entry.m_workData, src, static_cast<unsigned long>(entry.m_size));
     } else {
-        int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(&Sound, 0, 0, reinterpret_cast<int>(src), entry[1], entry[2], 0, 0);
+        int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
+            &Sound, 0, 0, reinterpret_cast<int>(src), reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
         CStopWatch watch((char*)-1);
         watch.Start();
         while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
@@ -1912,8 +1908,7 @@ checksum_done_dma:
  */
 unsigned int CAmemCacheSet::IsEnable(short index)
 {
-    int table = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58);
-    unsigned int value = *reinterpret_cast<unsigned int*>(table + index * 0x1c);
+    unsigned int value = reinterpret_cast<unsigned int>(cacheEntryAt(this, index).m_cacheData);
     return ((0u - value) | value) >> 31;
 }
 
@@ -1938,45 +1933,38 @@ void CAmemCache::IsEnable()
  */
 void CAmemCacheSet::AddRef(short index)
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-    int tableBase = *reinterpret_cast<int*>(bytes + 0x58);
-    int entryOffset = static_cast<int>(index) * 0x1C;
-    int entry = tableBase + entryOffset;
+    CAmemCache& entry = cacheEntryAt(this, index);
 
-    *reinterpret_cast<short*>(entry + 0x0C) += 1;
-    if (*reinterpret_cast<short*>(entry + 0x0C) == -1) {
+    entry.m_refCount += 1;
+    if (entry.m_refCount == -1) {
         if (System.m_execParam > 2) {
             Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt, static_cast<int>(index));
         }
 
-        int count = *reinterpret_cast<int*>(bytes + 0x3C);
-        int offset = 0;
-        for (int i = 0; i < count; i++) {
-            unsigned char* current = reinterpret_cast<unsigned char*>(tableBase + offset);
-            int data = *reinterpret_cast<int*>(current + 0x00);
-            if ((current[0x0E] != 0) || (data != 0)) {
+        for (int i = 0; i < m_cacheCount; i++) {
+            CAmemCache& current = cacheEntryAt(this, i);
+            int data = reinterpret_cast<int>(current.m_cacheData);
+            if ((current.m_inUse != 0) || (data != 0)) {
                 if (System.m_execParam > 2) {
-                    const char* useType = (current[0x0E] == 0) ? "FREE" : "USE";
+                    const char* useType = (current.m_inUse == 0) ? "FREE" : "USE";
                     Printf__7CSystemFPce(
                         &System, s_amemCacheEntryFmt, i, useType,
-                        static_cast<int>(current[0x0F]), *reinterpret_cast<short*>(current + 0x0C),
-                        *reinterpret_cast<int*>(current + 0x10), data);
+                        static_cast<int>(current.m_type), current.m_refCount, current.m_priority, data);
                 }
             }
-            offset += 0x1C;
         }
 
         if (System.m_execParam > 2) {
             Printf__7CSystemFPce(&System, s_amemCacheSeparator);
         }
 
-        void (*overflowHook)(int) = *reinterpret_cast<void (**)(int)>(bytes + 0x50);
+        void (*overflowHook)(int) = reinterpret_cast<void (*)(int)>(m_overflowHook);
         if (overflowHook != 0) {
             overflowHook(static_cast<int>(index));
         }
     }
 
-    *reinterpret_cast<int*>(entry + 0x10) = 0x7FFFFFF0;
+    entry.m_priority = 0x7FFFFFF0;
 }
 
 /*
@@ -1990,35 +1978,30 @@ void CAmemCacheSet::AddRef(short index)
  */
 void CAmemCacheSet::Release(short index)
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-    int tableBase = *reinterpret_cast<int*>(bytes + 0x58);
-    int entry = tableBase + static_cast<int>(index) * 0x1C;
-    *reinterpret_cast<short*>(entry + 0x0C) -= 1;
+    CAmemCache& entry = cacheEntryAt(this, index);
+    entry.m_refCount -= 1;
 
-    if (*reinterpret_cast<short*>(tableBase + static_cast<int>(index) * 0x1C + 0x0C) == -1) {
+    if (entry.m_refCount == -1) {
         if (System.m_execParam > 2) {
             Printf__7CSystemFPce(&System, s_amemCacheSeparator);
         }
 
-        int offset = 0;
-        int count = *reinterpret_cast<int*>(bytes + 0x3C);
-        for (int i = 0; i < count; i++) {
-            int* cache = reinterpret_cast<int*>(tableBase + offset);
-            if (((*reinterpret_cast<unsigned char*>(cache + 3) != 0) || (*cache != 0)) && (System.m_execParam > 2)) {
-                const char* useType = (*reinterpret_cast<unsigned char*>(cache + 3) != 0) ? "USE" : "FREE";
+        for (int i = 0; i < m_cacheCount; i++) {
+            CAmemCache& cache = cacheEntryAt(this, i);
+            if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) && (System.m_execParam > 2)) {
+                const char* useType = (cache.m_inUse != 0) ? "USE" : "FREE";
                 Printf__7CSystemFPce(
                     &System, s_amemCacheEntryPaddedFmt, i, useType,
-                    static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(cache) + 0x0F)),
-                    *reinterpret_cast<short*>(cache + 3), cache[4], *cache);
+                    static_cast<int>(cache.m_type), cache.m_refCount,
+                    cache.m_priority, reinterpret_cast<int>(cache.m_cacheData));
             }
-            offset += 0x1C;
         }
 
         if (System.m_execParam > 2) {
             Printf__7CSystemFPce(&System, s_amemCacheSeparator);
         }
 
-        void (*onUnderflow)(int) = *reinterpret_cast<void (**)(int)>(bytes + 0x50);
+        void (*onUnderflow)(int) = reinterpret_cast<void (*)(int)>(m_overflowHook);
         if (onUnderflow != 0) {
             onUnderflow(static_cast<int>(index));
         }
@@ -2036,34 +2019,31 @@ void CAmemCacheSet::Release(short index)
  */
 void CAmemCacheSet::AmemFreeLowPrio(int size)
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
     unsigned int bestPriority = 0x7ffffff1;
     int currentSize = size;
 
     while (true) {
-        int cacheCount = *reinterpret_cast<int*>(bytes + 0x3C);
-        unsigned char* bestEntry = 0;
+        CAmemCache* bestEntry = 0;
 
-        for (int i = 0; i < cacheCount; i++) {
-            unsigned char* entry = reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x58) + i * 0x1C);
-            if (entry[0x0E] != 0 && *reinterpret_cast<short*>(entry + 0x0C) == 0 && entry[0x1A] != 0 &&
-                *reinterpret_cast<int*>(entry + 0x00) != 0 && currentSize <= *reinterpret_cast<int*>(entry + 0x08) &&
-                *reinterpret_cast<unsigned int*>(entry + 0x10) < bestPriority) {
-                bestEntry = entry;
-                bestPriority = *reinterpret_cast<unsigned int*>(entry + 0x10);
+        for (int i = 0; i < m_cacheCount; i++) {
+            CAmemCache& entry = cacheEntryAt(this, i);
+            if (entry.m_inUse != 0 && entry.m_refCount == 0 && entry.m_dmaCopy != 0 &&
+                entry.m_cacheData != 0 && currentSize <= entry.m_size &&
+                static_cast<unsigned int>(entry.m_priority) < bestPriority) {
+                bestEntry = &entry;
+                bestPriority = static_cast<unsigned int>(entry.m_priority);
             }
         }
 
         if (bestEntry != 0) {
-            int cachedData = *reinterpret_cast<int*>(bestEntry + 0x00);
+            int cachedData = reinterpret_cast<int>(bestEntry->m_cacheData);
             if (cachedData != 0) {
                 operator delete(reinterpret_cast<void*>(cachedData));
             }
-            *reinterpret_cast<int*>(bestEntry + 0x00) = 0;
+            bestEntry->m_cacheData = 0;
         }
 
-        CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(bytes + 0x00);
-        int allocated = reinterpret_cast<int>(stage->alloc(size, const_cast<char*>(s_memory_cpp), 0x86D, 1));
+        int allocated = reinterpret_cast<int>(m_rStage->alloc(size, const_cast<char*>(s_memory_cpp), 0x86D, 1));
         if (allocated != 0) {
             operator delete(reinterpret_cast<void*>(allocated));
             return;
@@ -2078,14 +2058,10 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         }
 
         if (bestPriority == 0xFFFFFFFF) {
-            unsigned char (*releaseCheck)(unsigned long) =
-                *reinterpret_cast<unsigned char (**)(unsigned long)>(bytes + 0x40);
-            if (releaseCheck != 0 && releaseCheck(*reinterpret_cast<unsigned long*>(bytes + 0x44)) != 0) {
+            if (m_releaseCheck != 0 && m_releaseCheck(m_releaseCheckArg) != 0) {
                 continue;
             }
-            unsigned char (*releaseAction)(unsigned long) =
-                *reinterpret_cast<unsigned char (**)(unsigned long)>(bytes + 0x48);
-            releaseAction(*reinterpret_cast<unsigned long*>(bytes + 0x4C));
+            m_releaseAction(m_releaseActionArg);
             bestPriority = 0xFFFFFFFF;
             continue;
         }
@@ -2103,17 +2079,11 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
  */
 void CAmemCacheSet::CacheClear()
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-    int i = 0;
-    int offset = 0;
+    for (int i = 0; i < m_cacheCount; i++) {
+        CAmemCache& entry = cacheEntryAt(this, i);
 
-    while (i < *reinterpret_cast<int*>(bytes + 0x3C)) {
-        int* entry = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x58) + offset);
-        unsigned char* entryBytes = reinterpret_cast<unsigned char*>(entry);
-
-        if ((entryBytes[0x0E] != 0) && (*reinterpret_cast<short*>(entryBytes + 0x0C) == 0) &&
-            (entryBytes[0x1A] != 0)) {
-            int data = *entry;
+        if ((entry.m_inUse != 0) && (entry.m_refCount == 0) && (entry.m_dmaCopy != 0)) {
+            int data = reinterpret_cast<int>(entry.m_cacheData);
             if (data != 0) {
                 unsigned char* mem = reinterpret_cast<unsigned char*>(data);
                 if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4B41) ||
@@ -2142,12 +2112,9 @@ void CAmemCacheSet::CacheClear()
                 }
 
                 *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x34) + 0x124) -= 1;
-                *entry = 0;
+                entry.m_cacheData = 0;
             }
         }
-
-        offset += 0x1C;
-        i++;
     }
 }
 
@@ -2162,21 +2129,13 @@ void CAmemCacheSet::CacheClear()
  */
 void CAmemCacheSet::CalcPrio()
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-    int offset = 0;
-    int i = 0;
+    for (int i = 0; i < m_cacheCount; i++) {
+        CAmemCache& entry = cacheEntryAt(this, i);
 
-    while (i < *reinterpret_cast<int*>(bytes + 0x3C)) {
-        int* entry = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x58) + offset);
-        unsigned char* entryBytes = reinterpret_cast<unsigned char*>(entry);
-
-        if ((entryBytes[0x0E] != 0) && (*reinterpret_cast<unsigned short*>(entryBytes + 0x0C) == 0) &&
-            (*reinterpret_cast<unsigned int*>(entry) != 0) && (static_cast<unsigned int>(entry[4]) != 0)) {
-            entry[4]--;
+        if ((entry.m_inUse != 0) && (entry.m_refCount == 0) &&
+            (entry.m_cacheData != 0) && (static_cast<unsigned int>(entry.m_priority) != 0)) {
+            entry.m_priority--;
         }
-
-        offset += 0x1C;
-        i++;
     }
 }
 
@@ -2191,8 +2150,7 @@ void CAmemCacheSet::CalcPrio()
  */
 int CAmemCacheSet::AmemGetFreeSize()
 {
-    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x2c) -
-           *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x30);
+    return static_cast<int>(m_amemEnd - m_amemCursor);
 }
 
 /*
@@ -2216,24 +2174,18 @@ void CAmemCacheSet::RefCnt0Clear()
  */
 void CAmemCacheSet::RefCnt0Compare()
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-
     if (System.m_execParam > 2) {
         Printf__7CSystemFPce(&System, s_refCntCompareBanner);
     }
 
-    int count = *reinterpret_cast<int*>(bytes + 0x3C);
-    int offset = 0;
-    for (int i = 0; i < count; i++) {
-        unsigned char* entry = reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x58) + offset);
-        if ((entry[0x0E] != 0 && *reinterpret_cast<short*>(entry + 0x0C) != 0) && System.m_execParam > 2) {
-            const char* useType = (entry[0x0E] == 0) ? "FREE" : "USE";
+    for (int i = 0; i < m_cacheCount; i++) {
+        CAmemCache& entry = cacheEntryAt(this, i);
+        if ((entry.m_inUse != 0 && entry.m_refCount != 0) && System.m_execParam > 2) {
+            const char* useType = (entry.m_inUse == 0) ? "FREE" : "USE";
             Printf__7CSystemFPce(
-                &System, s_amemCacheEntryFmt, i, useType, static_cast<int>(entry[0x0F]),
-                *reinterpret_cast<short*>(entry + 0x0C), *reinterpret_cast<int*>(entry + 0x10),
-                *reinterpret_cast<int*>(entry + 0x00));
+                &System, s_amemCacheEntryFmt, i, useType, static_cast<int>(entry.m_type),
+                entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
         }
-        offset += 0x1C;
     }
 
     if (System.m_execParam > 2) {
@@ -2252,25 +2204,19 @@ void CAmemCacheSet::RefCnt0Compare()
  */
 void CAmemCacheSet::AssertCache()
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-
     if (System.m_execParam > 2) {
         Printf__7CSystemFPce(&System, s_amemCacheSeparator);
     }
 
-    int count = *reinterpret_cast<int*>(bytes + 0x3C);
-    int offset = 0;
-    for (int i = 0; i < count; i++) {
-        unsigned char* entry = reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x58) + offset);
-        int data = *reinterpret_cast<int*>(entry + 0x00);
-        if ((entry[0x0E] != 0 || data != 0) && System.m_execParam > 2) {
-            const char* useType = (entry[0x0E] == 0) ? "FREE" : "USE";
+    for (int i = 0; i < m_cacheCount; i++) {
+        CAmemCache& entry = cacheEntryAt(this, i);
+        int data = reinterpret_cast<int>(entry.m_cacheData);
+        if ((entry.m_inUse != 0 || data != 0) && System.m_execParam > 2) {
+            const char* useType = (entry.m_inUse == 0) ? "FREE" : "USE";
             Printf__7CSystemFPce(
                 &System, s_amemCacheEntryFmt, i, useType,
-                static_cast<int>(entry[0x0F]), *reinterpret_cast<short*>(entry + 0x0C),
-                *reinterpret_cast<int*>(entry + 0x10), data);
+                static_cast<int>(entry.m_type), entry.m_refCount, entry.m_priority, data);
         }
-        offset += 0x1C;
     }
 
     if (System.m_execParam > 2) {

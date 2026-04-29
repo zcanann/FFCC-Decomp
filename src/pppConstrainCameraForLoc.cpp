@@ -1,5 +1,5 @@
 #include "ffcc/pppConstrainCameraForLoc.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"
 extern "C" {

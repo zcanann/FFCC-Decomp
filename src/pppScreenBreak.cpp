@@ -103,7 +103,7 @@ extern const float FLOAT_80331cf4 = 0.5f;
 extern const Vec DAT_801dd4b0;
 static const Vec DAT_801dd4bc = { 0.0f, 1.0f, 0.0f };
 static const char s_f999_root_801dd4c8[] = "f999_root";
-static const char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
+extern "C" const char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
 static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
 static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }

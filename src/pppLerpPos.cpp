@@ -26,7 +26,7 @@ void* pppMemAlloc__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, ch
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 
 }
-static const char s_pppLerpPos_cpp_801dd418[] = "pppLerpPos.cpp";
+extern "C" const char s_pppLerpPos_cpp_801dd418[] = "pppLerpPos.cpp";
 
 /*
  * --INFO--

@@ -13,7 +13,7 @@ extern unsigned char gPppInConstructor;
 }
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
-static const char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
+extern "C" const char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
 
 extern "C" {
 int rand(void);

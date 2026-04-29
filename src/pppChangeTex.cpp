@@ -114,7 +114,7 @@ extern const char DAT_80332024[] = "obj";
 extern const float FLOAT_80332028 = 255.0f;
 extern const double DOUBLE_80332030 = 4503601774854144.0;
 extern const double DOUBLE_80332038 = 4503599627370496.0;
-static const char s_pppChangeTex_cpp_801dd660[] = "pppChangeTex.cpp";
+extern "C" const char s_pppChangeTex_cpp_801dd660[] = "pppChangeTex.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 

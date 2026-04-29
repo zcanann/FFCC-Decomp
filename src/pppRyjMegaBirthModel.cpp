@@ -24,7 +24,7 @@ extern float FLOAT_803304E8;
 PARTICLE_WMAT g_matKeep;
 PARTICLE_WMAT g_matTmp;
 
-static const char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";
+extern "C" const char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";
 
 static inline float* f32_at(void* base, s32 off)
 {

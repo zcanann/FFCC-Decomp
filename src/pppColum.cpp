@@ -39,7 +39,7 @@ union ColumFloatBits {
     u32 bits;
 };
 
-static const char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
+extern "C" const char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 
 extern const float FLOAT_80331008 = 5.0f;
 extern const float FLOAT_8033100C = 128.0f;

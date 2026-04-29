@@ -22,7 +22,7 @@ extern struct _pppEnvSt {
     CMemory::CStage* m_stagePtr;
 } *pppEnvStPtr;
 class CMaterialMan;
-static const char s_pppCharaBreak_cpp_801dd690[] = "pppCharaBreak.cpp";
+extern "C" const char s_pppCharaBreak_cpp_801dd690[] = "pppCharaBreak.cpp";
 extern float FLOAT_80332048;
 extern float FLOAT_8033204c;
 extern float FLOAT_80332050;

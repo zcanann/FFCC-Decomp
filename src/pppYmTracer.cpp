@@ -32,7 +32,7 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 }
 
-static const char s_pppYmTracer_cpp_801d9ce0[] = "pppYmTracer.cpp";
+extern "C" const char s_pppYmTracer_cpp_801d9ce0[] = "pppYmTracer.cpp";
 
 struct TracerDataValue {
     u32 unk0;

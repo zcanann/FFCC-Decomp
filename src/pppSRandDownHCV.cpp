@@ -16,11 +16,6 @@ struct PppSRandDownHCVParam2 {
     u8 field10;
 };
 
-static short randshort(short value, float scale)
-{
-    return (short)((f32)value * scale);
-}
-
 static float randf(unsigned char flag)
 {
     float value = -Math.RandF();
@@ -31,6 +26,11 @@ static float randf(unsigned char flag)
         value = blend * scale;
     }
     return value;
+}
+
+static short randshort(short value, float scale)
+{
+    return (short)((f32)value * scale);
 }
 
 /*

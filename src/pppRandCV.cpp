@@ -16,6 +16,11 @@ typedef struct RandCVParams {
     u8 pad[3];
 } RandCVParams;
 
+static char randchar(char value, float scale)
+{
+    return (char)((f32)value * scale - (f32)value);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8006103C
@@ -50,46 +55,13 @@ void pppRandCV(_pppPObject* basePtr, RandCVParams* in, _pppCtrlTable* ctrl)
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    u8* targetColor;
-    s32 colorOffset = in->colorOffset;
-    if (colorOffset == -1) {
-        targetColor = gPppDefaultValueBuffer;
-    } else {
-        targetColor = base + colorOffset + 0x80;
-    }
+    u8* targetColor = (in->colorOffset == -1) ? gPppDefaultValueBuffer : (base + in->colorOffset + 0x80);
 
     {
         f32 scale = *valuePtr;
-
-        {
-            u8 color = targetColor[0];
-            targetColor[0] = color + (s8)((f32)in->delta[0] * scale - (f32)in->delta[0]);
-        }
-        {
-            u8 color = targetColor[1];
-            targetColor[1] = color + (s8)((f32)in->delta[1] * scale - (f32)in->delta[1]);
-        }
-        {
-            u8 color = targetColor[2];
-            targetColor[2] = color + (s8)((f32)in->delta[2] * scale - (f32)in->delta[2]);
-        }
-        {
-            u8 color = targetColor[3];
-            targetColor[3] = color + (s8)((f32)in->delta[3] * scale - (f32)in->delta[3]);
-        }
+        targetColor[0] = targetColor[0] + randchar(in->delta[0], scale);
+        targetColor[1] = targetColor[1] + randchar(in->delta[1], scale);
+        targetColor[2] = targetColor[2] + randchar(in->delta[2], scale);
+        targetColor[3] = targetColor[3] + randchar(in->delta[3], scale);
     }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-char randchar(char value, float scale)
-{
-    return (char)(((f32)value * scale) - (f32)value);
 }

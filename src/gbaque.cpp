@@ -1123,15 +1123,16 @@ void GbaQueue::GetStageNo(int channel, int* stageNo, int* mapNo)
  */
 unsigned int GbaQueue::GetStageFlg(int channel)
 {
-	unsigned int flag;
+	int flag;
 	char stageFlg;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	stageFlg = *(reinterpret_cast<char*>(this) + 0x44C);
-	flag = static_cast<unsigned int>(stageFlg) & static_cast<unsigned int>(1 << channel);
+	flag = static_cast<int>(stageFlg) & (1 << channel);
+	flag = (-flag | flag) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	return static_cast<unsigned int>((-static_cast<int>(flag) | static_cast<int>(flag)) >> 31);
+	return static_cast<unsigned int>(flag);
 }
 
 /*
@@ -1682,8 +1683,6 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 {
 	unsigned char localPlayerData[0x370];
 	unsigned char packet[0xC];
-	short xPos[4];
-	short zPos[4];
 	int i;
 	short baseX;
 	short baseZ;
@@ -1695,7 +1694,7 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 
 	memset(packet, 0, sizeof(packet));
 
-	if (reinterpret_cast<unsigned char*>(this)[0x2D56] != 0) {
+	if (static_cast<char>(reinterpret_cast<unsigned char*>(this)[0x2D56]) != 0) {
 		channel = 0;
 	}
 
@@ -1712,30 +1711,35 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 		const short px = *reinterpret_cast<const short*>(player + 0x36);
 		const short pz = *reinterpret_cast<const short*>(player + 0x38);
 
-		xPos[i] = px;
-		zPos[i] = pz;
-
 		if (i == channel) {
 			nearbyMask |= static_cast<unsigned char>(1 << i);
-		} else if (player[3] != 0) {
+		} else if (static_cast<char>(player[3]) != 0) {
 			const int dx = static_cast<int>(px) - static_cast<int>(baseX);
 			const int dz = static_cast<int>(pz) - static_cast<int>(baseZ);
 
-			if ((dx > -0x51 && dx < 0x51) && (dz > -0x41 && dz < 0x41)) {
+			if ((dx >= -0x50 && dx <= 0x50) && (dz >= -0x40 && dz <= 0x40)) {
 				nearbyMask |= static_cast<unsigned char>(1 << i);
 			}
 		}
 	}
 
 	packet[1] = nearbyMask;
-	packet[2] = static_cast<unsigned char>(static_cast<char>(xPos[0]) - static_cast<char>(baseX));
-	packet[3] = static_cast<unsigned char>(static_cast<char>(zPos[0]) - static_cast<char>(baseZ));
-	packet[5] = static_cast<unsigned char>(static_cast<char>(xPos[1]) - static_cast<char>(baseX));
-	packet[6] = static_cast<unsigned char>(static_cast<char>(zPos[1]) - static_cast<char>(baseZ));
-	packet[7] = static_cast<unsigned char>(static_cast<char>(xPos[2]) - static_cast<char>(baseX));
-	packet[9] = static_cast<unsigned char>(static_cast<char>(zPos[2]) - static_cast<char>(baseZ));
-	packet[10] = static_cast<unsigned char>(static_cast<char>(xPos[3]) - static_cast<char>(baseX));
-	packet[11] = static_cast<unsigned char>(static_cast<char>(zPos[3]) - static_cast<char>(baseZ));
+	packet[2] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x36)) - static_cast<char>(baseX));
+	packet[3] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x38)) - static_cast<char>(baseZ));
+	packet[5] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x112)) - static_cast<char>(baseX));
+	packet[6] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x114)) - static_cast<char>(baseZ));
+	packet[7] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x1EE)) - static_cast<char>(baseX));
+	packet[9] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x1F0)) - static_cast<char>(baseZ));
+	packet[10] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x2CA)) - static_cast<char>(baseX));
+	packet[11] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x2CC)) - static_cast<char>(baseZ));
 
 	memcpy(outData, packet, sizeof(packet));
 }
@@ -2397,8 +2401,9 @@ unsigned int GbaQueue::GetLetterLstFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(flags->m_letterDatFlg)) & (1 << channel);
+	value = (-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return (-value | value) >> 31;
+	return value;
 }
 
 /*
@@ -2432,8 +2437,9 @@ unsigned int GbaQueue::GetLetterDatFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(flags->m_letterDatFlg)) & (0x10 << channel);
+	value = (-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return (-value | value) >> 31;
+	return value;
 }
 
 /*
@@ -2778,8 +2784,9 @@ unsigned int GbaQueue::GetFavoriteFlg(int channel)
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
 	unsigned int mask = static_cast<unsigned int>(obj[0x2CB1]) & (1U << channel);
+	mask = (-mask | mask) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return (-mask | mask) >> 31;
+	return mask;
 }
 
 /*
@@ -2833,8 +2840,9 @@ unsigned int GbaQueue::GetMoneyFlg(int channel)
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
 	unsigned int mask = static_cast<unsigned int>(obj[0x2CB0]) & (1U << channel);
+	mask = (-mask | mask) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return (-mask | mask) >> 31;
+	return mask;
 }
 
 /*
@@ -3281,8 +3289,9 @@ unsigned int GbaQueue::GetCompatibilityFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<char>(flags->m_compatibilityFlg[channel]);
+	value = (-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return static_cast<unsigned int>((-value | value) >> 31);
+	return static_cast<unsigned int>(value);
 }
 
 /*
@@ -4008,8 +4017,9 @@ unsigned int GbaQueue::GetSellFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(flags->m_sellFlg)) & (1 << channel);
+	value = (-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return (-value | value) >> 31;
+	return value;
 }
 
 /*
@@ -4047,8 +4057,9 @@ unsigned int GbaQueue::GetBuyFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(flags->m_buyFlg)) & (1 << channel);
+	value = (-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return (-value | value) >> 31;
+	return value;
 }
 
 /*
@@ -4086,8 +4097,9 @@ unsigned int GbaQueue::GetMkSmithFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(flags->m_mkSmithFlg)) & (1 << channel);
+	value = (-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return (-value | value) >> 31;
+	return value;
 }
 
 /*
@@ -4158,10 +4170,13 @@ unsigned char GbaQueue::GetBonus(int channel)
 unsigned int GbaQueue::GetArtifactFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
+	int value;
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D36])) & (1U << channel);
+	value = static_cast<int>(static_cast<char>(obj[0x2D36])) & (1 << channel);
+	value = (-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return (-value | value) >> 31;
+	return static_cast<unsigned int>(value);
 }
 
 /*
@@ -4230,10 +4245,13 @@ int GbaQueue::GetUseItemFlg(int channel)
 unsigned int GbaQueue::GetChgUseItemFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
+	int value;
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D37])) & (1U << channel);
+	value = static_cast<int>(static_cast<char>(obj[0x2D37])) & (1 << channel);
+	value = static_cast<unsigned int>((-value | value) >> 31) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return ((-static_cast<int>(value) | static_cast<int>(value)) >> 31U);
+	return static_cast<unsigned int>(value);
 }
 
 /*
@@ -4270,10 +4288,13 @@ void GbaQueue::SetChgUseItemFlg(int channel)
 unsigned int GbaQueue::GetStrengthFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
+	int value;
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D3E])) & (1U << channel);
+	value = static_cast<int>(static_cast<char>(obj[0x2D3E])) & (1 << channel);
+	value = (-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return (-value | value) >> 31U;
+	return static_cast<unsigned int>(value);
 }
 
 /*
@@ -4319,10 +4340,13 @@ int GbaQueue::GetStrengthData(int channel, unsigned char* strengthData)
 unsigned int GbaQueue::GetArtiDatFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
+	int value;
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D3F])) & (1U << channel);
+	value = static_cast<int>(static_cast<char>(obj[0x2D3F])) & (1 << channel);
+	value = static_cast<unsigned int>((-value | value) >> 31) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return (-value | value) >> 31U;
+	return static_cast<unsigned int>(value);
 }
 
 /*

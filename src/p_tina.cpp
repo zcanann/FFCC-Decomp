@@ -498,6 +498,7 @@ unsigned int pppFreeMngStPrioForData()
 		char padFC[0x5c];
 	};
 
+	char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
 	pppMngStPrioData* selectedMngSt = 0;
 	char* partMngBase = reinterpret_cast<char*>(&PartMng);
 	_pppMngSt* currentMngSt = pppMngStPtr;
@@ -559,7 +560,7 @@ unsigned int pppFreeMngStPrioForData()
 	if ((unsigned int)System.m_execParam >= 3) {
 		char* pdtName = reinterpret_cast<char*>(&PartMng) + 0x22E30 + ((int)selectedMngSt->m_kind * 0x38);
 		System.Printf(
-			const_cast<char*>(s_tina_prio_time_fmt_801d81a0),
+			stringBase + 0x2C0,
 			(unsigned int)selectedMngSt->m_prioTime,
 			(unsigned int)selectedMngSt->m_prio,
 			(int)selectedMngSt->m_kind,
@@ -567,13 +568,13 @@ unsigned int pppFreeMngStPrioForData()
 			pdtName);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(const_cast<char*>(DAT_801d81d4));
+		System.Printf(stringBase + 0x2F4);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(DAT_801ead4c);
 	}
 
-	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0xfc);
+	Graphic._WaitDrawDone(stringBase + 0x128, 0xfc);
 	_pppAllFreePObject(reinterpret_cast<_pppMngSt*>(selectedMngSt));
 	return 1;
 }

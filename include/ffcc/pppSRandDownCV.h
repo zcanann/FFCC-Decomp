@@ -5,8 +5,6 @@
 extern "C" {
 #endif
 
-void randchar(char, float);
-void randf(unsigned char);
 void pppSRandDownCV(void* basePtr, void* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus

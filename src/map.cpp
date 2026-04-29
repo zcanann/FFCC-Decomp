@@ -78,6 +78,11 @@ unsigned char DAT_8032ec88;
 extern const float FLOAT_8032f988 = 1.0e15f;
 extern const float FLOAT_8032f98c = -1.0f;
 extern const float FLOAT_8032f9a0 = 0.0f;
+
+static inline CMapMngAsyncLoadState& GetMapMngAsyncLoadState(CMapMng* mapMng)
+{
+    return *reinterpret_cast<CMapMngAsyncLoadState*>(reinterpret_cast<unsigned char*>(mapMng) + 0x22994);
+}
 extern const float FLOAT_8032f9a4 = 0.0001f;
 extern const float FLOAT_8032f9a8 = -0.0001f;
 extern const float FLOAT_8032f9ac = 10.0f;
@@ -1963,12 +1968,13 @@ void CMapMng::InitMapShadow()
 void CMapMng::ReadMtx(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
     int loadIndex = 0;
     int append = 0;
 
     *reinterpret_cast<unsigned char*>(self + 0x2298B) = 1;
 
-    if (*reinterpret_cast<int*>(self + 0x229A8) != 2 && *reinterpret_cast<int*>(self + 0x229A8) != 3) {
+    if (asyncLoadState.m_mapReadMode != 2 && asyncLoadState.m_mapReadMode != 3) {
         CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0x0);
         CTextureSet* textureSet =
             static_cast<CTextureSet*>(
@@ -1983,7 +1989,7 @@ void CMapMng::ReadMtx(char* mapName)
         sprintf(g_StrTmp, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
 
         bool exists = false;
-        if (*reinterpret_cast<int*>(self + 0x229A8) == 1) {
+        if (asyncLoadState.m_mapReadMode == 1) {
             exists = true;
         } else {
             CFile::CHandle* openProbe = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
@@ -1997,12 +2003,12 @@ void CMapMng::ReadMtx(char* mapName)
         }
 
         void* filePtr = File.m_readBuffer;
-        if (*reinterpret_cast<int*>(self + 0x229A8) == 1) {
-            int& readIndex = *reinterpret_cast<int*>(self + 0x229A0);
-            int size = *reinterpret_cast<int*>(self + 0x229AC + (readIndex * 4));
-            void* amemCursor = *reinterpret_cast<void**>(self + 0x22998);
+        if (asyncLoadState.m_mapReadMode == 1) {
+            int& readIndex = asyncLoadState.m_asyncReadIndex;
+            int size = asyncLoadState.m_fileSizes[readIndex];
+            void* amemCursor = asyncLoadState.m_mapLoadCursor;
             Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
-            *reinterpret_cast<unsigned char**>(self + 0x22998) += size;
+            asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
             CheckSum__FPvi(filePtr, size);
             readIndex += 1;
         } else {
@@ -2011,25 +2017,26 @@ void CMapMng::ReadMtx(char* mapName)
                 filePtr = 0;
             } else {
                 int size = File.GetLength(handle);
-                if (*reinterpret_cast<int*>(self + 0x229A8) == 3) {
+                if (asyncLoadState.m_mapReadMode == 3) {
                     File.ReadASync(handle);
                     filePtr = reinterpret_cast<void*>(1);
-                    int& openIndex = *reinterpret_cast<int*>(self + 0x229A4);
-                    *reinterpret_cast<CFile::CHandle**>(self + 0x22A2C + (openIndex * 4)) = handle;
+                    int& openIndex = asyncLoadState.m_asyncOpenIndex;
+                    asyncLoadState.m_asyncHandles[openIndex] = handle;
                     openIndex += 1;
                 } else {
                     File.Read(handle);
                     File.SyncCompleted(handle);
                     filePtr = File.m_readBuffer;
                     File.Close(handle);
-                    if (*reinterpret_cast<int*>(self + 0x229A8) == 2) {
-                        int& readIndex = *reinterpret_cast<int*>(self + 0x229A0);
-                        void* amemCursor = *reinterpret_cast<void**>(self + 0x22998);
+                    if (asyncLoadState.m_mapReadMode == 2) {
+                        int& readIndex = asyncLoadState.m_asyncReadIndex;
+                        void* amemCursor = asyncLoadState.m_mapLoadCursor;
                         Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
-                        *reinterpret_cast<int*>(self + 0x229AC + (readIndex * 4)) = size;
-                        *reinterpret_cast<unsigned int*>(self + 0x229EC + (readIndex * 4)) = CheckSum__FPvi(filePtr, size);
+                        asyncLoadState.m_fileSizes[readIndex] = size;
+                        asyncLoadState.m_fileChecksums[readIndex] = CheckSum__FPvi(filePtr, size);
                         readIndex += 1;
-                        *reinterpret_cast<unsigned char**>(self + 0x22998) += size;
+                        asyncLoadState.m_mapLoadCursor =
+                            reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
                     }
                 }
             }
@@ -2039,12 +2046,12 @@ void CMapMng::ReadMtx(char* mapName)
             return;
         }
 
-        if (*reinterpret_cast<int*>(self + 0x229A8) != 3) {
+        if (asyncLoadState.m_mapReadMode != 3) {
             CChunkFile chunkFile;
             chunkFile.SetBuf(filePtr);
             CChunkFile::CChunk chunk;
 
-            if (*reinterpret_cast<int*>(self + 0x229A8) == 2) {
+            if (asyncLoadState.m_mapReadMode == 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x54534554 && chunk.m_arg0 == 1) {
                         return;
@@ -2086,6 +2093,7 @@ void CMapMng::ReadMtx(char* mapName)
 void CMapMng::ReadMpl(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
     int loadIndex = 0;
 
     *reinterpret_cast<unsigned char*>(self + 0x2298B) = 1;
@@ -2094,7 +2102,7 @@ void CMapMng::ReadMpl(char* mapName)
         sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
 
         bool canRead = false;
-        const int readMode = *reinterpret_cast<int*>(self + 0x229A8);
+        const int readMode = asyncLoadState.m_mapReadMode;
         if (readMode == 1) {
             canRead = true;
         } else {
@@ -2124,12 +2132,12 @@ void CMapMng::ReadMpl(char* mapName)
 
         void* filePtr = File.m_readBuffer;
         if (readMode == 1) {
-            int& readIndex = *reinterpret_cast<int*>(self + 0x229A0);
-            const int size = *reinterpret_cast<int*>(self + 0x229AC + (readIndex * 4));
-            void* amemCursor = *reinterpret_cast<void**>(self + 0x22998);
+            int& readIndex = asyncLoadState.m_asyncReadIndex;
+            const int size = asyncLoadState.m_fileSizes[readIndex];
+            void* amemCursor = asyncLoadState.m_mapLoadCursor;
 
             Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, (size + 0x1F) & ~0x1F);
-            *reinterpret_cast<unsigned char**>(self + 0x22998) += size;
+            asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
             CheckSum__FPvi(filePtr, size);
             readIndex += 1;
         } else {
@@ -2141,8 +2149,8 @@ void CMapMng::ReadMpl(char* mapName)
                 if (readMode == 3) {
                     File.ReadASync(fileHandle);
                     filePtr = reinterpret_cast<void*>(1);
-                    int& openIndex = *reinterpret_cast<int*>(self + 0x229A4);
-                    *reinterpret_cast<CFile::CHandle**>(self + 0x22A2C + (openIndex * 4)) = fileHandle;
+                    int& openIndex = asyncLoadState.m_asyncOpenIndex;
+                    asyncLoadState.m_asyncHandles[openIndex] = fileHandle;
                     openIndex += 1;
                 } else {
                     File.Read(fileHandle);
@@ -2150,13 +2158,14 @@ void CMapMng::ReadMpl(char* mapName)
                     filePtr = File.m_readBuffer;
                     File.Close(fileHandle);
                     if (readMode == 2) {
-                        int& readIndex = *reinterpret_cast<int*>(self + 0x229A0);
-                        void* amemCursor = *reinterpret_cast<void**>(self + 0x22998);
+                        int& readIndex = asyncLoadState.m_asyncReadIndex;
+                        void* amemCursor = asyncLoadState.m_mapLoadCursor;
                         Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
-                        *reinterpret_cast<int*>(self + 0x229AC + (readIndex * 4)) = size;
-                        *reinterpret_cast<unsigned int*>(self + 0x229EC + (readIndex * 4)) = CheckSum__FPvi(filePtr, size);
+                        asyncLoadState.m_fileSizes[readIndex] = size;
+                        asyncLoadState.m_fileChecksums[readIndex] = CheckSum__FPvi(filePtr, size);
                         readIndex += 1;
-                        *reinterpret_cast<unsigned char**>(self + 0x22998) += size;
+                        asyncLoadState.m_mapLoadCursor =
+                            reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
                     }
                 }
             }
@@ -2228,6 +2237,7 @@ void CMapMng::ReadMpl(char* mapName)
 void CMapMng::ReadOtm(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
     CFile::CHandle* fileHandle = 0;
     void* filePtr = File.m_readBuffer;
 
@@ -2235,14 +2245,14 @@ void CMapMng::ReadOtm(char* mapName)
     sprintf(g_StrTmp, "%s", mapName);
     *reinterpret_cast<int*>(self + 0x22A6C) = 0;
 
-    const int readMode = *reinterpret_cast<int*>(self + 0x229A8);
+    const int readMode = asyncLoadState.m_mapReadMode;
     if (readMode == 1) {
-        int& readIndex = *reinterpret_cast<int*>(self + 0x229A0);
-        const int size = *reinterpret_cast<int*>(self + 0x229AC + (readIndex * 4));
-        void* amemCursor = *reinterpret_cast<void**>(self + 0x22998);
+        int& readIndex = asyncLoadState.m_asyncReadIndex;
+        const int size = asyncLoadState.m_fileSizes[readIndex];
+        void* amemCursor = asyncLoadState.m_mapLoadCursor;
 
         Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, (size + 0x1F) & ~0x1F);
-        *reinterpret_cast<unsigned char**>(self + 0x22998) += size;
+        asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
         CheckSum__FPvi(File.m_readBuffer, size);
         readIndex += 1;
     } else {
@@ -2252,8 +2262,8 @@ void CMapMng::ReadOtm(char* mapName)
             if (readMode == 3) {
                 File.ReadASync(fileHandle);
                 filePtr = reinterpret_cast<void*>(1);
-                int& openIndex = *reinterpret_cast<int*>(self + 0x229A4);
-                *reinterpret_cast<CFile::CHandle**>(self + 0x22A2C + (openIndex * 4)) = fileHandle;
+                int& openIndex = asyncLoadState.m_asyncOpenIndex;
+                asyncLoadState.m_asyncHandles[openIndex] = fileHandle;
                 openIndex += 1;
             } else {
                 File.Read(fileHandle);
@@ -2262,13 +2272,14 @@ void CMapMng::ReadOtm(char* mapName)
                 File.Close(fileHandle);
 
                 if (readMode == 2) {
-                    int& readIndex = *reinterpret_cast<int*>(self + 0x229A0);
-                    void* amemCursor = *reinterpret_cast<void**>(self + 0x22998);
+                    int& readIndex = asyncLoadState.m_asyncReadIndex;
+                    void* amemCursor = asyncLoadState.m_mapLoadCursor;
                     Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
-                    *reinterpret_cast<int*>(self + 0x229AC + (readIndex * 4)) = size;
-                    *reinterpret_cast<unsigned int*>(self + 0x229EC + (readIndex * 4)) = CheckSum__FPvi(filePtr, size);
+                    asyncLoadState.m_fileSizes[readIndex] = size;
+                    asyncLoadState.m_fileChecksums[readIndex] = CheckSum__FPvi(filePtr, size);
                     readIndex += 1;
-                    *reinterpret_cast<unsigned char**>(self + 0x22998) += size;
+                    asyncLoadState.m_mapLoadCursor =
+                        reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
                 }
             }
         } else {

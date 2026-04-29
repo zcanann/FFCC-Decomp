@@ -660,15 +660,11 @@ void CCaravanWork::FGPutGil(int gilToRemove)
 {
 	int put = putGil__10CGPartyObjFi((CGPartyObj*)m_ownerObj, gilToRemove);
 	if (put != 0) {
-		int gil = m_gil;
-		gil += -gilToRemove;
-		m_gil = gil;
-		if (gil <= 99999999) {
-			if (gil < 0) {
-				m_gil = 0;
-			}
-		} else {
+		m_gil += -gilToRemove;
+		if (99999999 < m_gil) {
 			m_gil -= m_gil - 99999999;
+		} else if (m_gil < 0) {
+			m_gil = 0;
 		}
 	}
 }
@@ -875,43 +871,55 @@ void CCaravanWork::CanAddTmpArtifact(int)
  */
 int CCaravanWork::FindItem(int itemId)
 {
-	int baseIdx = 0;
-	int rowCount = 8;
 	CCaravanWork* cur = this;
+	int itemIdx = 0;
 
-	while (true) {
-		if ((short)cur->m_inventoryItems[0] != -1 && (short)cur->m_inventoryItems[0] == itemId) {
-			return baseIdx;
+	for (int row = 0; row < 8; row++) {
+		short item = cur->m_inventoryItems[0];
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[1] != -1 && (short)cur->m_inventoryItems[1] == itemId) {
-			return baseIdx + 1;
+		item = cur->m_inventoryItems[1];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[2] != -1 && (short)cur->m_inventoryItems[2] == itemId) {
-			return baseIdx + 2;
+		item = cur->m_inventoryItems[2];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[3] != -1 && (short)cur->m_inventoryItems[3] == itemId) {
-			return baseIdx + 3;
+		item = cur->m_inventoryItems[3];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[4] != -1 && (short)cur->m_inventoryItems[4] == itemId) {
-			return baseIdx + 4;
+		item = cur->m_inventoryItems[4];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[5] != -1 && (short)cur->m_inventoryItems[5] == itemId) {
-			return baseIdx + 5;
+		item = cur->m_inventoryItems[5];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[6] != -1 && (short)cur->m_inventoryItems[6] == itemId) {
-			return baseIdx + 6;
+		item = cur->m_inventoryItems[6];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[7] != -1 && (short)cur->m_inventoryItems[7] == itemId) {
-			return baseIdx + 7;
+		item = cur->m_inventoryItems[7];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
 
 		cur = (CCaravanWork*)&cur->m_baseDataIndex;
-		baseIdx += 8;
-		rowCount--;
-		if (rowCount == 0) {
-			return -1;
-		}
+		itemIdx++;
 	}
+
+	return -1;
 }
 
 /*

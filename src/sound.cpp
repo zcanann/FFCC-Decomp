@@ -1074,11 +1074,9 @@ void CSound::loadWaveFrame()
  */
 void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
 {
-    CRedSound* redSound = RedSound(this);
-
     if (waveNo < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
-    } else if (ReentryWaveData__9CRedSoundFi(redSound, waveNo) == -1) {
+    } else if (ReentryWaveData__9CRedSoundFi(RedSound(this), waveNo) == -1) {
         CSoundLayout& sound = SoundData(this);
         CFile::CHandle*& waveFile = sound.m_waveFile;
         if (waveFile != 0) {
@@ -1087,9 +1085,9 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
             Printf__7CSystemFPce(&System, s_soundLoadWaveErrorFmt);
         }
 
-        SetWaveData__9CRedSoundFiPvi(redSound, -1, nullptr, 0);
+        SetWaveData__9CRedSoundFiPvi(RedSound(this), -1, nullptr, 0);
 
-        char wavePath[260];
+        char wavePath[244];
         sprintf(wavePath, s_soundWavePathFmt, waveNo);
         waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
@@ -2291,7 +2289,7 @@ void CSound::LoadStream(int streamID)
 
         sound.m_streamPlaying = 0;
 
-        char streamPath[268];
+        char streamPath[252];
         sprintf(streamPath, s_soundStreamPathFmt, streamID);
         sound.m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
         if (sound.m_streamFile != 0) {

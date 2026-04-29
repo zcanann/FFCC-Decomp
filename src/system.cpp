@@ -602,6 +602,7 @@ void CSystem::Init()
     CFile::CHandle* fileHandle;
     unsigned int count;
     int mapSize;
+    unsigned int mapSizeValue;
     unsigned int offset;
 
     m_initialized = 1;
@@ -655,9 +656,10 @@ void CSystem::Init()
         fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)
         {
-            mapSize = File.GetLength(fileHandle);
-            m_mapSize = mapSize;
-            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(s_system_cpp), 0x123) unsigned char[mapSize];
+            mapSizeValue = File.GetLength(fileHandle);
+            m_mapSize = mapSizeValue;
+            mapSize = mapSizeValue;
+            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(s_system_cpp), 0x123) unsigned char[mapSizeValue];
             for (offset = 0; (int)mapSize != 0; mapSize -= count)
             {
                 count = 0x100000;

@@ -25,7 +25,7 @@ static float randf(unsigned char flag)
     if (flag != 0) {
         float random = Math.RandF();
         float blend = value + random;
-        float scale = kPppSRandUpCVDualSampleScale;
+        float scale = 0.5f;
         value = blend * scale;
     }
     return value;

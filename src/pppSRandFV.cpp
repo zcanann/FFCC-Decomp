@@ -12,7 +12,7 @@ static float randf(unsigned char flag)
     if (flag != 0) {
         value = value + Math.RandF();
     } else {
-        float scale = kPppSRandFVSingleSampleScale;
+        float scale = 2.0f;
         value = value * scale;
     }
     return value;

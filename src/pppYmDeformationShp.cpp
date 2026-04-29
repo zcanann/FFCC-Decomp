@@ -103,11 +103,11 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 	VYmDeformationShp* work =
 		(VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
-	float indMtx[2][3];
+	Mtx drawMtx;
+	Vec vertices[4];
 	Mtx rotMtx;
 	Vec2d uvs[4];
-	Vec vertices[4];
-	Mtx drawMtx;
+	float indMtx[2][3];
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
 		YmDeformationShpColorInfo* colorInfo =

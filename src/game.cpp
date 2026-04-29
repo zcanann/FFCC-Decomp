@@ -85,7 +85,6 @@ void CheckMenu__10CGPartyObjFv();
 void CheckMenu__10CGPartyObjFv(void);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
-extern const s16 DAT_8032e3d0[];
 int sprintf(char*, const char*, ...);
 int rand(void);
 void __construct_array(void*, ConstructorDestructor, ConstructorDestructor, unsigned long, unsigned long);
@@ -177,7 +176,6 @@ static const char* m_tStatus[] = {
     s_SN_PARTVIEW_801D6048,
     0,
 };
-static const s16 s_bossArtifactStartTable[] = {0, 4, 8};
 const char* PTR_s_dvd__scft_param_cfd[] = {
     s_dvd_pctscft_param_cfd_801D6054,
     s_dvd_pctscft_c_system_cfd_801D6068,
@@ -1318,15 +1316,16 @@ void CGame::Draw()
  */
 int CGame::GetBossArtifact(int ratioIndex, int amount)
 {
+    static s16 s_top[] = {0, 4, 8};
+
     int stage =
         Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
     if (2 < stage) {
         stage = 2;
     }
 
-    s16 stageBase = s_bossArtifactStartTable[stage];
-    u32 amountUnsigned = amount;
-    int scaledAmount = (int)((float)amountUnsigned * s_ratio[ratioIndex]);
+    s16 stageBase = s_top[stage];
+    int scaledAmount = (int)((float)amount * s_ratio[ratioIndex - 1]);
 
     u16 thresholds[4];
     memset(thresholds, 0, 8);

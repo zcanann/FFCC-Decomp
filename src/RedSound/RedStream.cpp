@@ -491,7 +491,7 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
  */
 void StreamPause(int streamID, int pause)
 {
-	volatile RedStreamDATA* streamData;
+	RedStreamDATA* streamData;
 	int volume;
 	int pan;
 

@@ -17,6 +17,11 @@ typedef struct RandHCVParams {
     u8 field10;
 } RandHCVParams;
 
+inline short randshort(short value, float scale)
+{
+    return (short)((f32)value * scale - (f32)value);
+}
+
 /*
  * --INFO--
  * PAL Address: 80061f88
@@ -59,25 +64,11 @@ void pppRandHCV(_pppPObject* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
 
     {
         f32 scale = *randomValue;
-        target[0] += (s16)((f32)in->field8 * scale - (f32)in->field8);
-        target[1] += (s16)((f32)in->fieldA * scale - (f32)in->fieldA);
-        target[2] += (s16)((f32)in->fieldC * scale - (f32)in->fieldC);
-        target[3] += (s16)((f32)in->fieldE * scale - (f32)in->fieldE);
+        target[0] = target[0] + randshort(in->field8, scale);
+        target[1] = target[1] + randshort(in->fieldA, scale);
+        target[2] = target[2] + randshort(in->fieldC, scale);
+        target[3] = target[3] + randshort(in->fieldE, scale);
     }
 }
 
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static short randshort(short value, float scale)
-{
-    return (short)(((f32)value * scale) - (f32)value);
 }

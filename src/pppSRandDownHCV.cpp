@@ -17,6 +17,11 @@ struct PppSRandDownHCVParam2 {
     u8 field10;
 };
 
+inline short randshort(short value, float scale)
+{
+    return (short)((f32)value * scale);
+}
+
 /*
  * --INFO--
  * PAL Address: 800639ec

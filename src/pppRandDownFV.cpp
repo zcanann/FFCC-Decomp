@@ -17,6 +17,11 @@ struct PppRandDownFVParam2 {
     u8 field18;
 };
 
+inline float randf(float value, float scale)
+{
+    return value * scale;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80061664

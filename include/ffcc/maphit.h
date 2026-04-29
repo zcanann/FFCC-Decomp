@@ -8,7 +8,7 @@ class CMapCylinder;
 class CMapHit;
 class CBound;
 
-void FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&);
+int FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&);
 void CheckLineCylinder(const Vec&, const Vec&, const CMapCylinder&, float&);
 
 class CMapCylinder

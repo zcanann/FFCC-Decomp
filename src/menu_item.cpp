@@ -40,6 +40,7 @@ extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingLife__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
 extern "C" void DrawEquipMark__8CMenuPcsFiif(CMenuPcs*, int, int, float);
+extern "C" int __cntlzw(unsigned int);
 
 
 extern double DOUBLE_80332ea0;
@@ -744,7 +745,9 @@ int CMenuPcs::ItemCtrlCur()
     if (blocked) {
         press = 0;
     } else {
-        press = Pad._8_2_;
+        int padIndex = blocked;
+        padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+        press = *(u16*)((u8*)&Pad + padIndex * 0x54 + 8);
     }
 
     blocked = false;
@@ -754,7 +757,9 @@ int CMenuPcs::ItemCtrlCur()
     if (blocked) {
         hold = 0;
     } else {
-        hold = Pad._20_2_;
+        int padIndex = blocked;
+        padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+        hold = *(u16*)((u8*)&Pad + padIndex * 0x54 + 0x14);
     }
 
     if (hold == 0) {

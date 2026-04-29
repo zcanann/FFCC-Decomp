@@ -657,12 +657,12 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 
         if ((voiceData[0x25] & 0x3000U) != 0) {
             u16 monoMix = (u16)((monoBase * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
-            if ((voiceData[0x25] & 2U) == 0) {
-                *(u16*)(voiceData + 0x1e) = monoMix;
-                *(u16*)(voiceData + 0x1f) = monoMix;
-            } else {
+            if ((voiceData[0x25] & 2U) != 0) {
                 *(u16*)(voiceData + 0x1c) = monoMix;
                 *(u16*)(voiceData + 0x1d) = monoMix;
+            } else {
+                *(u16*)(voiceData + 0x1e) = monoMix;
+                *(u16*)(voiceData + 0x1f) = monoMix;
             }
         }
         break;
@@ -702,19 +702,19 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 
         if ((voiceData[0x25] & 0x1000U) != 0) {
             iVar1 = (leftMix * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
-            if ((voiceData[0x25] & 2U) == 0) {
-                *(u16*)(voiceData + 0x1e) = (u16)iVar1;
-            } else {
+            if ((voiceData[0x25] & 2U) != 0) {
                 *(u16*)(voiceData + 0x1c) = (u16)iVar1;
+            } else {
+                *(u16*)(voiceData + 0x1e) = (u16)iVar1;
             }
         }
 
         if ((voiceData[0x25] & 0x2000U) != 0) {
             iVar2 = (rightMix * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
-            if ((voiceData[0x25] & 2U) == 0) {
-                *(u16*)(voiceData + 0x1f) = (u16)iVar2;
-            } else {
+            if ((voiceData[0x25] & 2U) != 0) {
                 *(u16*)(voiceData + 0x1d) = (u16)iVar2;
+            } else {
+                *(u16*)(voiceData + 0x1f) = (u16)iVar2;
             }
         }
         break;

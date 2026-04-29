@@ -18,8 +18,8 @@ extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void* __vt__5CFont[];
 
-static const char s_fontman_cpp[] = "fontman.cpp";
-static const char s_CFontMan[] = "CFontMan";
+extern "C" const char s_fontman_cpp_801D9CB8[] = "fontman.cpp";
+extern "C" const char s_CFontMan_801D9CC4[] = "CFontMan";
 
 CFontMan FontMan;
 
@@ -665,7 +665,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                     if (m_usesEmbeddedData != 0) {
                         m_glyphData = chunkFile.GetAddress();
                     } else {
-                        m_glyphData = new (stage, const_cast<char*>(s_fontman_cpp), 0xCF) unsigned char[chunk.m_size];
+                        m_glyphData = new (stage, const_cast<char*>(s_fontman_cpp_801D9CB8), 0xCF) unsigned char[chunk.m_size];
                         chunkFile.Get(m_glyphData, chunk.m_size);
                     }
 
@@ -691,7 +691,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                         bucketSlot += 8;
                     }
                 } else if (chunk.m_id == 0x54585452) {
-                    texturePtr = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp), 0xDF) CTexture;
+                    texturePtr = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp_801D9CB8), 0xDF) CTexture;
                     texturePtr->Create(chunkFile, stage, 0, 0, m_usesEmbeddedData != 0);
                 }
             }
@@ -825,7 +825,7 @@ void CFontMan::Init()
 {
 	m_font = 0;
 
-	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan), 0);
+	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan_801D9CC4), 0);
 	m_stage = stage;
 
 	CFont* font = reinterpret_cast<CFont*>(
@@ -833,7 +833,7 @@ void CFontMan::Init()
 	        &Memory,
 	        sizeof(CFont),
 	        FontMan.m_stage,
-	        const_cast<char*>(s_fontman_cpp),
+	        const_cast<char*>(s_fontman_cpp_801D9CB8),
 	        0x3D,
 	        0));
 

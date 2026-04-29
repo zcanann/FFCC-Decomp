@@ -599,8 +599,8 @@ void CSystem::Quit()
  */
 void CSystem::Init()
 {
-    CFile::CHandle* fileHandle;
     unsigned int count;
+    CFile::CHandle* fileHandle;
     int mapSize;
     unsigned int offset;
 

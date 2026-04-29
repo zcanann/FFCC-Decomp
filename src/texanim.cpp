@@ -6,13 +6,13 @@
 #include "ffcc/math.h"
 
 #include <string.h>
-#include <math.h>
 #include "dolphin/mtx.h"
 
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
+extern "C" double fmod(double, double);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* __vt__11CTexAnimSet[];
@@ -27,7 +27,8 @@ extern "C" int GetSize__21CPtrArray_P8CTexAnim_Fv(void*);
 extern "C" int GetSize__25CPtrArray_P11CTexAnimSeq_Fv(void*);
 extern "C" void* __vc__21CPtrArray_P8CTexAnim_FUl(void*, unsigned long);
 extern "C" void* __vc__25CPtrArray_P11CTexAnimSeq_FUl(void*, unsigned long);
-extern "C" void SetStage__25CPtrArray_P11CTexAnimSeq_Fv(void*, CMemory::CStage*);
+extern "C" int Add__25CPtrArray_P11CTexAnimSeq_FP11CTexAnimSeq(void*, CTexAnimSeq*);
+extern "C" void SetStage__25CPtrArray_P11CTexAnimSeq_FPQ27CMemory6CStage(void*, CMemory::CStage*);
 extern "C" {
 char s_texanim_cpp_801d7adc[] = "texanim.cpp";
 }
@@ -684,7 +685,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                 refData->texSrtIndex = 0;
             }
             *reinterpret_cast<void**>((int)texAnim + 8) = refData;
-            SetStage__25CPtrArray_P11CTexAnimSeq_Fv(&refData->texAnimSeqs, stage);
+            SetStage__25CPtrArray_P11CTexAnimSeq_FPQ27CMemory6CStage(&refData->texAnimSeqs, stage);
 
             chunkFile.PushChunk();
             while ((int)chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(middleChunkData)) != 0) {
@@ -725,7 +726,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                         }
                     }
                     chunkFile.PopChunk();
-                    refData->texAnimSeqs.Add(seq);
+                    Add__25CPtrArray_P11CTexAnimSeq_FP11CTexAnimSeq(&refData->texAnimSeqs, seq);
                 } else if (((int)middleChunkId < 0x53455120) && (middleChunkId == 0x4E414D45)) {
                     middleChunkArg0 = middleChunkData[1];
                     refData->texSrtIndex = middleChunkArg0;

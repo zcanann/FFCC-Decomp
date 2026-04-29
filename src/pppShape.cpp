@@ -123,9 +123,9 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     int shapeStep;
     char* currentFrame;
     int frameIndex;
-    unsigned int textureIndex;
     char* animData;
     unsigned char* texturePtr;
+    unsigned int textureIndex;
     unsigned char* shapeEntry;
     unsigned char textureUsed[0x100];
 
@@ -175,9 +175,9 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     int shapeStep;
     char* currentFrame;
     int frameIndex;
-    unsigned int textureIndex;
     char* animData;
     unsigned char* texturePtr;
+    unsigned int textureIndex;
     unsigned char* shapeEntry;
     unsigned char textureUsed[0x100];
 

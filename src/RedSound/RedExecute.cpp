@@ -320,15 +320,15 @@ void _SetReverbData(RedReverbDATA* reverb, int* params)
     }
     case 3: {
         AXFX_DELAY* delay = (AXFX_DELAY*)reverb->context;
-        delay->delay[0] = (u32)params[0];
-        delay->delay[1] = (u32)params[0];
         delay->delay[2] = (u32)params[0];
-        delay->feedback[0] = (u32)params[1];
-        delay->feedback[1] = (u32)params[1];
+        delay->delay[1] = (u32)params[0];
+        delay->delay[0] = (u32)params[0];
         delay->feedback[2] = (u32)params[1];
-        delay->output[0] = (u32)params[2];
-        delay->output[1] = (u32)params[2];
+        delay->feedback[1] = (u32)params[1];
+        delay->feedback[0] = (u32)params[1];
         delay->output[2] = (u32)params[2];
+        delay->output[1] = (u32)params[2];
+        delay->output[0] = (u32)params[2];
         result = AXFXDelaySettings(delay);
         break;
     }
@@ -425,7 +425,7 @@ int* SetReverb(int bank, int kind, int* params)
         return (int*)p_ReverbSize;
     }
 
-    if (kind > 5) {
+    if (kind == 5) {
         return 0;
     }
 
@@ -474,15 +474,15 @@ int* SetReverb(int bank, int kind, int* params)
         AXFX_DELAY* delay = (AXFX_DELAY*)RedNew(sizeof(AXFX_DELAY));
         reverb->context = delay;
         reverb->callback = (int)AXFXDelayCallback;
-        delay->delay[0] = (u32)params[0];
-        delay->delay[1] = (u32)params[0];
         delay->delay[2] = (u32)params[0];
-        delay->feedback[0] = (u32)params[1];
-        delay->feedback[1] = (u32)params[1];
+        delay->delay[1] = (u32)params[0];
+        delay->delay[0] = (u32)params[0];
         delay->feedback[2] = (u32)params[1];
-        delay->output[0] = (u32)params[2];
-        delay->output[1] = (u32)params[2];
+        delay->feedback[1] = (u32)params[1];
+        delay->feedback[0] = (u32)params[1];
         delay->output[2] = (u32)params[2];
+        delay->output[1] = (u32)params[2];
+        delay->output[0] = (u32)params[2];
         result = AXFXDelayInit(delay);
         break;
     }

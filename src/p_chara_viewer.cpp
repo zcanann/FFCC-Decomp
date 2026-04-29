@@ -4,6 +4,7 @@
 #include "ffcc/file.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
+#include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/pad.h"
@@ -76,6 +77,11 @@ extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, v
 extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
 extern "C" void Draw__Q26CChara6CModelFPA4_fii(void*, Mtx, int, int);
 extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void*, Mtx, int);
+extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(void*, Mtx);
+extern "C" void CalcMatrix__Q26CChara6CModelFv(void*);
+extern "C" void CalcSkin__Q26CChara6CModelFv(void*);
+extern "C" void SRTToMatrix__5CMathFPA4_fP3SRT(void*, Mtx, void*);
+extern "C" void Change__11CTexAnimSetFPcfQ211CTexAnimSet9ANIM_TYPE(void*, char*, float, int);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 extern "C" void Destroy__6CCharaFv(CChara*);
@@ -106,6 +112,29 @@ extern "C" float FLOAT_80330BF0;
 extern "C" float FLOAT_80330BF4;
 extern "C" float FLOAT_80330BF8;
 extern "C" double fmod(double, double);
+
+struct CharaViewerSRT {
+    float transX;
+    float transY;
+    float transZ;
+    float rotX;
+    float rotY;
+    float rotZ;
+    float scaleX;
+    float scaleY;
+    float scaleZ;
+    int pad;
+};
+
+extern "C" {
+CharaViewerSRT gCharaViewerSrt;
+const char* gCharaViewerSpinnerText;
+char gCharaViewerSpinnerTextInitialized;
+int gCharaViewerSpinnerFrame;
+char gCharaViewerSpinnerFrameInitialized;
+int gCharaViewerSrtNeedsInit;
+char gCharaViewerSrtInitialized;
+}
 
 static inline void destroyRef(int* ref)
 {
@@ -202,11 +231,42 @@ static inline CTextureSet*& ViewerBackTextureSet(CCharaPcs* self)
     return *reinterpret_cast<CTextureSet**>(reinterpret_cast<unsigned char*>(self) + 0x2B8);
 }
 
+static inline float& ViewerModelTime(void* model)
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4);
+}
+
+static inline CChara::CAnim*& ViewerModelAnim(void* model)
+{
+    return *reinterpret_cast<CChara::CAnim**>(reinterpret_cast<unsigned char*>(model) + 0xD0);
+}
+
+static inline CTexAnimSet*& ViewerModelTexAnimSet(void* model)
+{
+    return *reinterpret_cast<CTexAnimSet**>(reinterpret_cast<unsigned char*>(model) + 0xD4);
+}
+
+static inline int ViewerModelNodeCount(void* model)
+{
+    unsigned char* modelData = *reinterpret_cast<unsigned char**>(reinterpret_cast<unsigned char*>(model) + 0xA4);
+    return *reinterpret_cast<int*>(modelData + 8);
+}
+
+static inline int ViewerModelFrameShift(void* model)
+{
+    unsigned char* modelData = *reinterpret_cast<unsigned char**>(reinterpret_cast<unsigned char*>(model) + 0xA4);
+    return *reinterpret_cast<int*>(modelData + 0x34);
+}
+
 static const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
 static const char s_gpu_profile_fmt[] = "GPU = %f.5%%(C = %.5f%% G = %.5f%%)";
 static const char s_no_texture[] = "no texture...";
 static const char s_calc_viewer_fmt[] = "CCharaPcs.calcViewer: %s\n";
 static const char s_anim_path_fmt[] = "%splot%d.cha";
+static const char s_frame_speed_fmt[] = "FRAME = %.2f SPEED=%.2f";
+static const char s_iframe_fmt[] = "I = %s IFRAME = %.2f %s";
+static const char s_cont_fmt[] = "CONT = %d";
+static const char s_cpu_profile_fmt[] = "CPU = %.5f%%(M = %.5f%% S = %.5f%%) %dNODES";
 static const char s_load_model[] = "CCharaPcs LoadModel";
 static const char s_load_texture[] = "CCharaPcs LoadTexture";
 static const char s_load_anim[] = "CCharaPcs LoadAnim";
@@ -490,6 +550,19 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         }
     }
 
+    if (gCharaViewerSpinnerTextInitialized == 0) {
+        gCharaViewerSpinnerText = kCharaViewerSpinner;
+        gCharaViewerSpinnerTextInitialized = 1;
+    }
+    if (gCharaViewerSpinnerFrameInitialized == 0) {
+        gCharaViewerSpinnerFrame = 0;
+        gCharaViewerSpinnerFrameInitialized = 1;
+    }
+    gCharaViewerSpinnerFrame++;
+    Printf__8CGraphicFPce(&Graphic, kCharaViewerChoiceFmt,
+                          (int)(char)gCharaViewerSpinnerText[(gCharaViewerSpinnerFrame >> 4) % 4],
+                          USBPcs.m_rootPath);
+
     unsigned short heldButtons;
     unsigned short triggerButtons;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -560,40 +633,126 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         }
 
         unsigned char* anim = *(unsigned char**)(p + 0x198 + i * 4);
-        if (anim == 0) {
-            continue;
+        if (anim != 0) {
+            if ((i == 0) && (*(int*)(p + 0x1A4) != 0)) {
+                SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
+                float animFrames = (float)*(unsigned short*)(anim + 0x10);
+                if (animFrames <= *(float*)(*(unsigned char**)(p + 0x190) + 0xB4)) {
+                    int nextIndex = *(int*)(p + 0x1AC) + 1;
+                    int animCount = *(int*)(p + 0x1A4);
+                    *(int*)(p + 0x1AC) = nextIndex - (nextIndex / animCount) * animCount;
+                    AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190),
+                                                                      *(void**)(p + 0x1B0 + *(int*)(p + 0x1AC) * 4),
+                                                                      -1, -1, 0);
+                    releaseRef(p, 0x198);
+                    *(void**)(p + 0x198) = *(void**)(p + 0x1B0 + *(int*)(p + 0x1AC) * 4);
+                    addRef(p, 0x198);
+                }
+            } else if ((i == 0) && (*(int*)(p + 0x708) != 0)) {
+                float animFrames = (float)*(unsigned short*)(*(unsigned char**)(p + 0x198) + 0x10);
+                if (*(int*)(p + 0x704) == 0) {
+                    if (*(float*)(p + 0x700) + animFrames <= *(float*)(model + 0xB4)) {
+                        *(int*)(p + 0x704) = 1;
+                        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(model, *(void**)(p + 0x1A0), -1, -1, -1);
+                    }
+                } else {
+                    if (animFrames <= *(float*)(model + 0xB4)) {
+                        *(int*)(p + 0x704) = 0;
+                        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(model, *(void**)(p + 0x198), -1, -1, 0);
+                    }
+                }
+                SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
+            } else {
+                SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
+            }
         }
 
-        if ((i == 0) && (*(int*)(p + 0x1A4) != 0)) {
-            SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
-            float animFrames = (float)*(unsigned short*)(anim + 0x10);
-            if (animFrames <= *(float*)(*(unsigned char**)(p + 0x190) + 0xB4)) {
-                int nextIndex = *(int*)(p + 0x1AC) + 1;
-                int animCount = *(int*)(p + 0x1A4);
-                *(int*)(p + 0x1AC) = nextIndex - (nextIndex / animCount) * animCount;
-                AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190),
-                                                                  *(void**)(p + 0x1B0 + *(int*)(p + 0x1AC) * 4),
-                                                                  -1, -1, 0);
-                releaseRef(p, 0x198);
-                *(void**)(p + 0x198) = *(void**)(p + 0x1B0 + *(int*)(p + 0x1AC) * 4);
-                addRef(p, 0x198);
-            }
-        } else if ((i == 0) && (*(int*)(p + 0x708) != 0)) {
-            float animFrames = (float)*(unsigned short*)(*(unsigned char**)(p + 0x198) + 0x10);
-            if (*(int*)(p + 0x704) == 0) {
-                if (*(float*)(p + 0x700) + animFrames <= *(float*)(model + 0xB4)) {
-                    *(int*)(p + 0x704) = 1;
-                    AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(model, *(void**)(p + 0x1A0), -1, -1, -1);
+        float translateX = kCharaViewerZero;
+        if ((i != 0) && (*(void**)(p + 0x190) != 0)) {
+            int frameShift = ViewerModelFrameShift(*(void**)(p + 0x190));
+            translateX = static_cast<float>((1 << (15 - frameShift)) / 8);
+        }
+
+        if ((i == 0) && (*(int*)(p + 0x5C8) != 0)) {
+            *(int*)(p + 0x5C8) = 0;
+            CTexAnimSet* texAnimSet = ViewerModelTexAnimSet(model);
+            if (texAnimSet != 0) {
+                int texAnimFrame = *(int*)(p + 0x5EC);
+                int animType = -2;
+                if (texAnimFrame >= 0) {
+                    animType = -3;
                 }
-            } else {
-                if (animFrames <= *(float*)(model + 0xB4)) {
-                    *(int*)(p + 0x704) = 0;
-                    AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(model, *(void**)(p + 0x198), -1, -1, 0);
-                }
+                Change__11CTexAnimSetFPcfQ211CTexAnimSet9ANIM_TYPE(
+                    texAnimSet, reinterpret_cast<char*>(p + 0x5CC),
+                    static_cast<float>((texAnimFrame < 0) ? 0 : texAnimFrame), animType);
             }
-            SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
-        } else {
-            SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
+        }
+
+        if (gCharaViewerSrtInitialized == 0) {
+            gCharaViewerSrtNeedsInit = 1;
+            gCharaViewerSrtInitialized = 1;
+        }
+        if (gCharaViewerSrtNeedsInit != 0) {
+            gCharaViewerSrt.transZ = kCharaViewerZero;
+            gCharaViewerSrt.transY = kCharaViewerZero;
+            gCharaViewerSrt.rotZ = kCharaViewerZero;
+            gCharaViewerSrt.rotY = kCharaViewerZero;
+            gCharaViewerSrt.rotX = kCharaViewerZero;
+            gCharaViewerSrt.scaleZ = kCharaViewerUnitStep;
+            gCharaViewerSrt.scaleY = kCharaViewerUnitStep;
+            gCharaViewerSrt.scaleX = kCharaViewerUnitStep;
+            gCharaViewerSrtNeedsInit = 0;
+        }
+
+        float rotY = kCharaViewerZero;
+        if (Pad._452_4_ == 0) {
+            unsigned int padIndex = (~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 31) & 4U);
+            rotY = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x2C + padIndex * 0x54);
+        }
+        gCharaViewerSrt.rotY = gCharaViewerSrt.rotY + rotY;
+        gCharaViewerSrt.transX = translateX;
+
+        Mtx modelMtx;
+        SRTToMatrix__5CMathFPA4_fP3SRT(&Math, modelMtx, &gCharaViewerSrt);
+        SetMatrix__Q26CChara6CModelFPA4_f(model, modelMtx);
+
+        CStopWatch matrixWatch(reinterpret_cast<char*>(-1));
+        matrixWatch.Reset();
+        matrixWatch.Start();
+        CalcMatrix__Q26CChara6CModelFv(model);
+        matrixWatch.Stop();
+        float matrixTime = matrixWatch.Get();
+
+        matrixWatch.Reset();
+        matrixWatch.Start();
+        CalcSkin__Q26CChara6CModelFv(model);
+        matrixWatch.Stop();
+        float skinTime = matrixWatch.Get();
+
+        if (i == 0) {
+            CChara::CAnim* modelAnim = ViewerModelAnim(model);
+            if (modelAnim != 0) {
+                float animFrames = (float)*reinterpret_cast<unsigned short*>(
+                    reinterpret_cast<unsigned char*>(modelAnim) + 0x10);
+                float frame = (float)fmod((double)ViewerModelTime(model), (double)(frameAdvance + animFrames));
+                Printf__8CGraphicFPce(&Graphic, s_frame_speed_fmt, frame, frameAdvance);
+            }
+            if (*(void**)(p + 0x1A0) != 0) {
+                const char* iframeMode = kCharaViewerOff;
+                if (*(int*)(p + 0x708) != 0) {
+                    iframeMode = kCharaViewerOn;
+                }
+                const char* iframeState = kCharaViewerKeep;
+                if (*(int*)(p + 0x704) == 0) {
+                    iframeState = kCharaViewerOrg;
+                }
+                Printf__8CGraphicFPce(&Graphic, s_iframe_fmt, iframeMode, *(float*)(p + 0x700), iframeState);
+            }
+            if (*(int*)(p + 0x1A4) != 0) {
+                Printf__8CGraphicFPce(&Graphic, s_cont_fmt, *(int*)(p + 0x1AC));
+            }
+            Printf__8CGraphicFPce(&Graphic, s_cpu_profile_fmt, matrixTime + skinTime, matrixTime, skinTime,
+                                  ViewerModelNodeCount(model));
         }
     }
 }

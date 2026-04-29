@@ -1014,9 +1014,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
             int charaAmemSize = correctLoadAnimAmem();
             if (charaAmemSize >= 0) {
                 CharaAmemSize() = static_cast<unsigned int>(charaAmemSize);
-                gCharaPartWorkPtr[0x6B] = 0xFF;
-                FreeMergeMask(this) = 0;
-                return;
+                goto complete;
             }
 
             if (System.m_execParam > 1) {
@@ -1030,6 +1028,8 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     LoadTextureArray(this)->ReleaseAndRemoveAll();
     LoadPdtArray(this)->ReleaseAndRemoveAll();
     CharaAmemSize() = 0;
+
+complete:
     gCharaPartWorkPtr[0x6B] = 0xFF;
     FreeMergeMask(this) = 0;
 }

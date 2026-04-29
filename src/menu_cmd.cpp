@@ -110,11 +110,9 @@ static const s16 s_UnitePatternData[] = {
     static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF),
 };
 
-static const s16* const s_UnitePatternTable = s_UnitePatternData;
-static const s16* const s_UnitePatternBaseLen = s_UnitePatternData + 2;
-static const s16* const s_UnitePatternGroups = s_UnitePatternData + 6;
+} // namespace
 
-static const char* const s_FlameStrikeNames[] = {
+const char* s_SkillStr_us[] = {
     "Flamestrike",
     "Icestrike",
     "Thunderstrike",
@@ -122,7 +120,7 @@ static const char* const s_FlameStrikeNames[] = {
     "",
 };
 
-static const char* const s_GermanStrikeNames[] = {
+const char* s_SkillStr_ge[] = {
     "Feuer-Hieb",
     "Eis-Hieb",
     "Blitz-Hieb",
@@ -130,7 +128,7 @@ static const char* const s_GermanStrikeNames[] = {
     "",
 };
 
-static const char* const s_ItalianStrikeNames[] = {
+const char* s_SkillStr_it[] = {
     "Colpo Fire",
     "Colpo Blizzard",
     "Colpo Thunder",
@@ -138,7 +136,7 @@ static const char* const s_ItalianStrikeNames[] = {
     "",
 };
 
-static const char* const s_FrenchStrikeNames[] = {
+const char* s_SkillStr_fr[] = {
     "Pyro-Frappe",
     "Cryo-Frappe",
     "\x52\x68\xE9\x6F-Frappe",
@@ -146,14 +144,15 @@ static const char* const s_FrenchStrikeNames[] = {
     "",
 };
 
-static const char* const s_SpanishStrikeNames[] = {
+const char* s_SkillStr_sp[] = {
     "Efecto Fuego",
     "Efecto Hielo",
     "Efecto Electro",
     "",
     "",
-    0,
 };
+
+namespace {
 
 static const char* GetLocalizedStrikeName(int itemId)
 {
@@ -174,19 +173,19 @@ static const char* GetLocalizedStrikeName(int itemId)
 		return 0;
 	}
 
-	const char* const* names = s_FlameStrikeNames;
+	const char** names = s_SkillStr_us;
 	switch (Game.m_gameWork.m_languageId) {
 	case 2:
-		names = s_GermanStrikeNames;
+		names = s_SkillStr_ge;
 		break;
 	case 3:
-		names = s_ItalianStrikeNames;
+		names = s_SkillStr_it;
 		break;
 	case 4:
-		names = s_FrenchStrikeNames;
+		names = s_SkillStr_fr;
 		break;
 	case 5:
-		names = s_SpanishStrikeNames;
+		names = s_SkillStr_sp;
 		break;
 	default:
 		break;
@@ -1977,7 +1976,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	if (itemKinds[selected] > 0) {
 		if ((itemKinds[selected] == 999) && (selected > 2)) {
 			int patIdx = 0;
-			for (const s16* pat = s_UnitePatternTable; pat[1] >= 0; pat += 6, patIdx++) {
+			for (const s16* pat = s_UnitePatternData; pat[1] >= 0; pat += 6, patIdx++) {
 				if ((pat[0] == 0) || ((pat[2] == 2) && (static_cast<s32>(selectedNegMask) < 0))) {
 					continue;
 				}
@@ -1998,7 +1997,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				}
 			}
 		} else if (static_cast<s32>(selectedNegMask) >= 0) {
-			const int baseLen = static_cast<int>(s_UnitePatternBaseLen[0]);
+			const int baseLen = static_cast<int>(s_UnitePatternData[2]);
 			int start = selected - (baseLen - 1);
 			for (int i = 0; i < baseLen; i++, start++) {
 				int ok = 0;
@@ -2007,7 +2006,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 					if (candidates[slot] != 0) {
 						break;
 					}
-					if (s_UnitePatternTable[3 + k] == itemKinds[slot]) {
+					if (s_UnitePatternData[3 + k] == itemKinds[slot]) {
 						ok++;
 					}
 				}
@@ -2021,7 +2020,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 		int group = 1;
 		int* matchWrite = matches + matchCount * 2;
-		for (const s16* pat = s_UnitePatternGroups; pat[1] >= 0; pat += 6, group++) {
+		for (const s16* pat = s_UnitePatternData + 6; pat[1] >= 0; pat += 6, group++) {
 			if (((pat[0] != 0) && (itemKinds[selected] == 999) && (selected >= 3)) ||
 			    ((pat[2] == 2) && (static_cast<s32>(selectedNegMask) < 0))) {
 				continue;
@@ -2059,7 +2058,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			int (*dst)[2] = comboOut;
 			for (int i = 0; i < matchCount; i++) {
 				const int* m = &matches[i * 2];
-				if (rank + 2 == s_UnitePatternBaseLen[m[0] * 6]) {
+				if (rank + 2 == s_UnitePatternData[2 + m[0] * 6]) {
 					dst[0][0] = m[0];
 					dst[0][1] = m[1];
 					dst++;
@@ -2862,21 +2861,21 @@ const char* CMenuPcs::GetSkillStr(int index)
 	const s8 languageId = Game.m_gameWork.m_languageId;
 
 	if (languageId == '\x03') {
-		return s_ItalianStrikeNames[index];
+		return s_SkillStr_it[index];
 	}
 	if (languageId < 3) {
 		if ((languageId != '\x01') && (languageId != '\0')) {
-			return s_GermanStrikeNames[index];
+			return s_SkillStr_ge[index];
 		}
 	} else {
 		if (languageId == '\x05') {
-			return s_SpanishStrikeNames[index];
+			return s_SkillStr_sp[index];
 		}
 		if (languageId < 5) {
-			return s_FrenchStrikeNames[index];
+			return s_SkillStr_fr[index];
 		}
 	}
-	return s_FlameStrikeNames[index];
+	return s_SkillStr_us[index];
 }
 
 /*

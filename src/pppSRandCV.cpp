@@ -6,7 +6,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-const float kPppSRandCVSingleSampleScale = 2.0f;
 
 struct SRandCVParam {
     s32 targetId;
@@ -16,21 +15,21 @@ struct SRandCVParam {
     u8 _pad[3];
 };
 
-static char randchar(char value, float scale)
-{
-    return (char)((f32)value * scale - (f32)value);
-}
-
-static float randf(unsigned char flag)
+static inline float randf(unsigned char flag)
 {
     float value = Math.RandF();
     if (flag != 0) {
         value = value + Math.RandF();
     } else {
-        float scale = kPppSRandCVSingleSampleScale;
+        float scale = 2.0f;
         value = value * scale;
     }
     return value;
+}
+
+static inline char randchar(char value, float scale)
+{
+    return (char)((f32)value * scale - (f32)value);
 }
 
 /*
@@ -60,7 +59,7 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                float scale = kPppSRandCVSingleSampleScale;
+                float scale = 2.0f;
                 value = value * scale;
             }
             target[0] = value;
@@ -72,7 +71,7 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                float scale = kPppSRandCVSingleSampleScale;
+                float scale = 2.0f;
                 value = value * scale;
             }
             target[1] = value;
@@ -84,7 +83,7 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                float scale = kPppSRandCVSingleSampleScale;
+                float scale = 2.0f;
                 value = value * scale;
             }
             target[2] = value;
@@ -96,7 +95,7 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                float scale = kPppSRandCVSingleSampleScale;
+                float scale = 2.0f;
                 value = value * scale;
             }
             target[3] = value;

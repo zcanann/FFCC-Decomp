@@ -6,14 +6,13 @@
 #include "dolphin/types.h"
 #include "ffcc/ppp_default_buffer.h"
 
-const float kPppSRandFVSingleSampleScale = 2.0f;
 static float randf(unsigned char flag)
 {
     float value = Math.RandF();
     if (flag != 0) {
         value = value + Math.RandF();
     } else {
-        float scale = kPppSRandFVSingleSampleScale;
+        float scale = 2.0f;
         value = value * scale;
     }
     return value;
@@ -54,7 +53,7 @@ void pppSRandFV(_pppPObject* basePtr, PppSRandFVParam2* in, _pppCtrlTable* ctrl)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                f32 scale = kPppSRandFVSingleSampleScale;
+                f32 scale = 2.0f;
                 value = value * scale;
             }
             randVec[0] = value;
@@ -66,7 +65,7 @@ void pppSRandFV(_pppPObject* basePtr, PppSRandFVParam2* in, _pppCtrlTable* ctrl)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                f32 scale = kPppSRandFVSingleSampleScale;
+                f32 scale = 2.0f;
                 value = value * scale;
             }
             randVec[1] = value;
@@ -78,7 +77,7 @@ void pppSRandFV(_pppPObject* basePtr, PppSRandFVParam2* in, _pppCtrlTable* ctrl)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                f32 scale = kPppSRandFVSingleSampleScale;
+                f32 scale = 2.0f;
                 value = value * scale;
             }
             randVec[2] = value;

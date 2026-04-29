@@ -6,7 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-const float kPppSRandDownFVDualSampleScale = 0.5f;
 struct PppSRandDownFVParam2 {
     s32 field0;
     s32 field4;
@@ -23,7 +22,7 @@ static float randf(unsigned char flag)
     if (flag != 0) {
         float random = Math.RandF();
         float blend = value - random;
-        float scale = kPppSRandDownFVDualSampleScale;
+        float scale = 0.5f;
         value = blend * scale;
     }
     return value;
@@ -55,7 +54,7 @@ void pppSRandDownFV(_pppPObject* basePtr, PppSRandDownFVParam2* in, _pppCtrlTabl
             if (flag != 0) {
                 f32 random = Math.RandF();
                 f32 blend = value - random;
-                f32 scale = kPppSRandDownFVDualSampleScale;
+                f32 scale = 0.5f;
                 value = blend * scale;
             }
             randVec[0] = value;
@@ -67,7 +66,7 @@ void pppSRandDownFV(_pppPObject* basePtr, PppSRandDownFVParam2* in, _pppCtrlTabl
             if (flag != 0) {
                 f32 random = Math.RandF();
                 f32 blend = value - random;
-                f32 scale = kPppSRandDownFVDualSampleScale;
+                f32 scale = 0.5f;
                 value = blend * scale;
             }
             randVec[1] = value;
@@ -79,7 +78,7 @@ void pppSRandDownFV(_pppPObject* basePtr, PppSRandDownFVParam2* in, _pppCtrlTabl
             if (flag != 0) {
                 f32 random = Math.RandF();
                 f32 blend = value - random;
-                f32 scale = kPppSRandDownFVDualSampleScale;
+                f32 scale = 0.5f;
                 value = blend * scale;
             }
             randVec[2] = value;

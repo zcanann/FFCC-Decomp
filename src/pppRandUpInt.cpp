@@ -6,7 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-const float kPppRandUpIntDualSampleScale = 0.5f;
 struct PppRandUpIntParam2 {
     s32 field0;
     s32 field4;
@@ -37,7 +36,7 @@ void pppRandUpInt(_pppPObject* basePtr, PppRandUpIntParam2* in, _pppCtrlTable* c
         f32 value = Math.RandF();
         if (in->fieldC != 0) {
             f32 mixed = value + Math.RandF();
-            f32 scale = kPppRandUpIntDualSampleScale;
+            f32 scale = 0.5f;
             value = mixed * scale;
         }
 

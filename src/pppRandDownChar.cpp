@@ -6,7 +6,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-const float kPppRandDownCharDualSampleScale = 0.5f;
 
 
 struct PppRandDownCharParam2 {
@@ -39,7 +38,7 @@ void pppRandDownChar(_pppPObject* basePtr, PppRandDownCharParam2* in, _pppCtrlTa
         f32 value = -Math.RandF();
         if (in->field9 != 0) {
             f32 mixed = value - Math.RandF();
-            f32 scale = kPppRandDownCharDualSampleScale;
+            f32 scale = 0.5f;
             value = mixed * scale;
         }
 

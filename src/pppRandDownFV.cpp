@@ -6,7 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-const float kPppRandDownFVDualSampleScale = 0.5f;
 struct PppRandDownFVParam2 {
     s32 field0;
     s32 field4;
@@ -45,7 +44,7 @@ void pppRandDownFV(_pppPObject* basePtr, PppRandDownFVParam2* in, _pppCtrlTable*
         f32 value = -Math.RandF();
         if (in->field18 != 0) {
             f32 randomValue = value - Math.RandF();
-            f32 scale = kPppRandDownFVDualSampleScale;
+            f32 scale = 0.5f;
             value = randomValue * scale;
         }
 

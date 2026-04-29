@@ -6,7 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-const float kPppRandHCVSingleSampleScale = 2.0f;
 typedef struct RandHCVParams {
     s32 field0;
     s32 field4;
@@ -49,7 +48,7 @@ void pppRandHCV(_pppPObject* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
         if (in->field10 != 0) {
             value += Math.RandF();
         } else {
-            value *= kPppRandHCVSingleSampleScale;
+            value *= 2.0f;
         }
 
         randomValue = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);

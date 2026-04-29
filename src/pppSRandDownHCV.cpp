@@ -6,7 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-const float kPppSRandDownHCVDualSampleScale = 0.5f;
 struct PppSRandDownHCVParam2 {
     s32 field0;
     s32 field4;
@@ -17,21 +16,21 @@ struct PppSRandDownHCVParam2 {
     u8 field10;
 };
 
-static short randshort(short value, float scale)
-{
-    return (short)((f32)value * scale);
-}
-
-static float randf(unsigned char flag)
+static inline float randf(unsigned char flag)
 {
     float value = -Math.RandF();
     if (flag != 0) {
         float random = Math.RandF();
         float blend = value - random;
-        float scale = kPppSRandDownHCVDualSampleScale;
+        float scale = 0.5f;
         value = blend * scale;
     }
     return value;
+}
+
+static inline short randshort(short value, float scale)
+{
+    return (short)((f32)value * scale);
 }
 
 /*
@@ -61,7 +60,7 @@ void pppSRandDownHCV(_pppPObject* basePtr, PppSRandDownHCVParam2* in, _pppCtrlTa
 			if (flag != 0) {
 				float random = Math.RandF();
 				float blend = value - random;
-				float scale = kPppSRandDownHCVDualSampleScale;
+				float scale = 0.5f;
 				value = blend * scale;
 			}
 			target[0] = value;
@@ -73,7 +72,7 @@ void pppSRandDownHCV(_pppPObject* basePtr, PppSRandDownHCVParam2* in, _pppCtrlTa
 			if (flag != 0) {
 				float random = Math.RandF();
 				float blend = value - random;
-				float scale = kPppSRandDownHCVDualSampleScale;
+				float scale = 0.5f;
 				value = blend * scale;
 			}
 			target[1] = value;
@@ -85,7 +84,7 @@ void pppSRandDownHCV(_pppPObject* basePtr, PppSRandDownHCVParam2* in, _pppCtrlTa
 			if (flag != 0) {
 				float random = Math.RandF();
 				float blend = value - random;
-				float scale = kPppSRandDownHCVDualSampleScale;
+				float scale = 0.5f;
 				value = blend * scale;
 			}
 			target[2] = value;
@@ -97,7 +96,7 @@ void pppSRandDownHCV(_pppPObject* basePtr, PppSRandDownHCVParam2* in, _pppCtrlTa
 			if (flag != 0) {
 				float random = Math.RandF();
 				float blend = value - random;
-				float scale = kPppSRandDownHCVDualSampleScale;
+				float scale = 0.5f;
 				value = blend * scale;
 			}
 			target[3] = value;

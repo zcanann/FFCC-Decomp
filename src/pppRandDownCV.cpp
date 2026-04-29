@@ -6,7 +6,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-const float kPppRandDownCVDualSampleScale = 0.5f;
 
 struct PppRandDownCVParam2 {
     s32 field0;
@@ -47,7 +46,7 @@ extern "C" void pppRandDownCV(_pppPObject* basePtr, PppRandDownCVParam2* in, _pp
         if (in->fieldC != 0) {
             f32 random = Math.RandF();
             f32 blend = value - random;
-            f32 scale = kPppRandDownCVDualSampleScale;
+            f32 scale = 0.5f;
             value = blend * scale;
         }
 

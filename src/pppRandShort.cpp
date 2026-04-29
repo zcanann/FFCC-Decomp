@@ -6,7 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-const float kPppRandShortSingleSampleScale = 2.0f;
 struct PppRandShortParam2 {
     s32 field0;
     s32 field4;
@@ -38,7 +37,7 @@ void pppRandShort(_pppPObject* basePtr, PppRandShortParam2* in, _pppCtrlTable* c
         if (in->fieldA != 0) {
             value += Math.RandF();
         } else {
-            value *= kPppRandShortSingleSampleScale;
+            value *= 2.0f;
         }
 
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);

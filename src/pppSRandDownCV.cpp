@@ -6,23 +6,22 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-const float kPppSRandDownCVDualSampleScale = 0.5f;
 
-static char randchar(char value, float scale)
-{
-    return (char)((f32)value * scale);
-}
-
-static float randf(unsigned char flag)
+static inline float randf(unsigned char flag)
 {
     float value = -Math.RandF();
     if (flag != 0) {
         float random = Math.RandF();
         float blend = value - random;
-        float scale = kPppSRandDownCVDualSampleScale;
+        float scale = 0.5f;
         value = blend * scale;
     }
     return value;
+}
+
+static inline char randchar(char value, float scale)
+{
+    return (char)((f32)value * scale);
 }
 
 /*
@@ -53,7 +52,7 @@ void pppSRandDownCV(void* basePtr, void* in, _pppCtrlTable* ctrl)
             if (flag != 0) {
                 float random = Math.RandF();
                 float blend = value - random;
-                float scale = kPppSRandDownCVDualSampleScale;
+                float scale = 0.5f;
                 value = blend * scale;
             }
             target[0] = value;
@@ -65,7 +64,7 @@ void pppSRandDownCV(void* basePtr, void* in, _pppCtrlTable* ctrl)
             if (flag != 0) {
                 float random = Math.RandF();
                 float blend = value - random;
-                float scale = kPppSRandDownCVDualSampleScale;
+                float scale = 0.5f;
                 value = blend * scale;
             }
             target[1] = value;
@@ -77,7 +76,7 @@ void pppSRandDownCV(void* basePtr, void* in, _pppCtrlTable* ctrl)
             if (flag != 0) {
                 float random = Math.RandF();
                 float blend = value - random;
-                float scale = kPppSRandDownCVDualSampleScale;
+                float scale = 0.5f;
                 value = blend * scale;
             }
             target[2] = value;
@@ -89,7 +88,7 @@ void pppSRandDownCV(void* basePtr, void* in, _pppCtrlTable* ctrl)
             if (flag != 0) {
                 float random = Math.RandF();
                 float blend = value - random;
-                float scale = kPppSRandDownCVDualSampleScale;
+                float scale = 0.5f;
                 value = blend * scale;
             }
             target[3] = value;

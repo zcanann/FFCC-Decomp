@@ -6,7 +6,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-const float kPppSRandUpCVDualSampleScale = 0.5f;
 
 struct SRandUpCVParam {
     s32 targetId;
@@ -15,21 +14,21 @@ struct SRandUpCVParam {
     u8 randomTwice;
 };
 
-static char randchar(char value, float scale)
-{
-    return (char)((f32)value * scale);
-}
-
-static float randf(unsigned char flag)
+static inline float randf(unsigned char flag)
 {
     float value = Math.RandF();
     if (flag != 0) {
         float random = Math.RandF();
         float blend = value + random;
-        float scale = kPppSRandUpCVDualSampleScale;
+        float scale = 0.5f;
         value = blend * scale;
     }
     return value;
+}
+
+static inline char randchar(char value, float scale)
+{
+    return (char)((f32)value * scale);
 }
 
 /*
@@ -58,7 +57,7 @@ void pppSRandUpCV(_pppPObject* basePtr, SRandUpCVParam* in, _pppCtrlTable* ctrl)
             f32 value = Math.RandF();
             if (flag != 0) {
                 f32 randomPair = value + Math.RandF();
-                f32 scale = kPppSRandUpCVDualSampleScale;
+                f32 scale = 0.5f;
                 value = randomPair * scale;
             }
             target[0] = value;
@@ -69,7 +68,7 @@ void pppSRandUpCV(_pppPObject* basePtr, SRandUpCVParam* in, _pppCtrlTable* ctrl)
             f32 value = Math.RandF();
             if (flag != 0) {
                 f32 randomPair = value + Math.RandF();
-                f32 scale = kPppSRandUpCVDualSampleScale;
+                f32 scale = 0.5f;
                 value = randomPair * scale;
             }
             target[1] = value;
@@ -80,7 +79,7 @@ void pppSRandUpCV(_pppPObject* basePtr, SRandUpCVParam* in, _pppCtrlTable* ctrl)
             f32 value = Math.RandF();
             if (flag != 0) {
                 f32 randomPair = value + Math.RandF();
-                f32 scale = kPppSRandUpCVDualSampleScale;
+                f32 scale = 0.5f;
                 value = randomPair * scale;
             }
             target[2] = value;
@@ -91,7 +90,7 @@ void pppSRandUpCV(_pppPObject* basePtr, SRandUpCVParam* in, _pppCtrlTable* ctrl)
             f32 value = Math.RandF();
             if (flag != 0) {
                 f32 randomPair = value + Math.RandF();
-                f32 scale = kPppSRandUpCVDualSampleScale;
+                f32 scale = 0.5f;
                 value = randomPair * scale;
             }
             target[3] = value;

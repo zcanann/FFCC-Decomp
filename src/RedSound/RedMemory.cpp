@@ -59,9 +59,9 @@ int RedNew(int size)
 
 	if (size >= 1) {
 		if (m_MemoryBank != 0) {
-			address = m_DataBuffer;
-			if (address != 0) {
+			if (m_DataBuffer != 0) {
 				interrupts = OSDisableInterrupts();
+				address = m_DataBuffer;
 				size = (size + 0x1F) & 0xFFFFFFE0;
 				slot = m_MemoryBank;
 

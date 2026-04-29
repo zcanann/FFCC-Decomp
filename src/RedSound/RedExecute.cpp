@@ -762,7 +762,7 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
     }
 
     pan = *(u8*)(voiceData[1] + 0x1a) & 0x7f;
-    if ((*(u8*)(voiceData[1] + 0x1a) & 0x7f) != 0) {
+    if (pan != 0) {
         pan = pan + 1;
     }
 
@@ -805,7 +805,7 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
             pan = *(int*)voiceData[4] >> 0xc;
         } else {
             pan = *(u8*)(voiceData[1] + 0x1b) & 0x7f;
-            if ((*(u8*)(voiceData[1] + 0x1b) & 0x7f) == 0) {
+            if (pan == 0) {
                 pan = 0x40;
             }
         }

@@ -377,13 +377,15 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	int height = 0;
 	Mtx texMtx;
 	Mtx tempMtx;
-	Vec origin;
 	Vec cameraPos;
 	Vec projectedObj[4];
+	Vec* projectedObjPtrs[4];
 	int minXIndex;
 	int minYIndex;
 	float texScaleX;
 	float texScaleY;
+	float projectedOffsetX;
+	float projectedOffsetY;
 	float offsetX;
 	float offsetY;
 	float one = FLOAT_803305f8;
@@ -463,10 +465,10 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	texMtx[2][2] = FLOAT_8033062c;
 
 	PSMTXConcat(texMtx, layout->m_modelMatrix.value, tempMtx);
-	origin.x = kPppYmDeformationShpZero;
-	origin.y = kPppYmDeformationShpZero;
-	origin.z = kPppYmDeformationShpZero;
-	PSMTXMultVec(tempMtx, &origin, &cameraPos);
+	cameraPos.x = kPppYmDeformationShpZero;
+	cameraPos.y = kPppYmDeformationShpZero;
+	cameraPos.z = kPppYmDeformationShpZero;
+	PSMTXMultVec(tempMtx, &cameraPos, &cameraPos);
 	cameraPos.x = cameraPos.x / cameraPos.z;
 	cameraPos.y = cameraPos.y / cameraPos.z;
 	texMtx[0][2] = FLOAT_8033062c + cameraPos.x;
@@ -474,9 +476,10 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	PSMTXConcat(texMtx, layout->m_modelMatrix.value, tempMtx);
 
 	for (i = 0; i < 4; i++) {
-		PSMTXMultVec(tempMtx, &vertices[i], &projectedObj[i]);
-		projectedObj[i].x = projectedObj[i].x / projectedObj[i].z;
-		projectedObj[i].y = projectedObj[i].y / projectedObj[i].z;
+		projectedObjPtrs[i] = &projectedObj[i];
+		PSMTXMultVec(tempMtx, &vertices[i], projectedObjPtrs[i]);
+		projectedObjPtrs[i]->x = projectedObjPtrs[i]->x / projectedObjPtrs[i]->z;
+		projectedObjPtrs[i]->y = projectedObjPtrs[i]->y / projectedObjPtrs[i]->z;
 	}
 
 	minXIndex = 0;
@@ -492,38 +495,40 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 
 	texScaleX = one / (float)width;
 	texScaleY = one / (float)height;
-	offsetX = projectedObj[minXIndex].x - texScaleX * (projected[minXIndex].x - (float)left);
-	offsetY = projectedObj[minYIndex].y - texScaleY * (projected[minYIndex].y - (float)top);
+	projectedOffsetX = texScaleX * (projected[minXIndex].x - (float)left);
+	offsetX = projectedObj[minXIndex].x - projectedOffsetX;
+	projectedOffsetY = texScaleY * (projected[minYIndex].y - (float)top);
+	offsetY = projectedObj[minYIndex].y - projectedOffsetY;
 
 	if (left < 0) {
-		if ((left + width) <= 640) {
+		if (640 < (left + width)) {
+			texMtx[0][2] = texMtx[0][2] + (FLOAT_80330630 - cameraPos.x);
+		} else {
 			int maxIndex = 0;
 			for (i = 1; i < 4; i++) {
 				if (projected[maxIndex].x < projected[i].x) {
 					maxIndex = i;
 				}
 			}
-			texMtx[0][2] = texMtx[0][2] + (texScaleX * ((float)(left + width) - projected[maxIndex].x) +
-			                               projectedObj[maxIndex].x - FLOAT_803305f8);
-		} else {
-			texMtx[0][2] = texMtx[0][2] + (FLOAT_80330630 - cameraPos.x);
+			projectedOffsetX = texScaleX * ((float)(left + width) - projected[maxIndex].x);
+			texMtx[0][2] = texMtx[0][2] + (projectedObj[maxIndex].x + projectedOffsetX - FLOAT_803305f8);
 		}
 	} else {
 		texMtx[0][2] = texMtx[0][2] + offsetX;
 	}
 
 	if (top < 0) {
-		if ((top + height) <= 448) {
+		if (448 < (top + height)) {
+			texMtx[1][2] = texMtx[1][2] + (FLOAT_80330630 - cameraPos.y);
+		} else {
 			int maxIndex = 0;
 			for (i = 1; i < 4; i++) {
 				if (projected[maxIndex].y < projected[i].y) {
 					maxIndex = i;
 				}
 			}
-			texMtx[1][2] = texMtx[1][2] + (texScaleY * ((float)(top + height) - projected[maxIndex].y) +
-			                               projectedObj[maxIndex].y - FLOAT_803305f8);
-		} else {
-			texMtx[1][2] = texMtx[1][2] + (FLOAT_80330630 - cameraPos.y);
+			projectedOffsetY = texScaleY * ((float)(top + height) - projected[maxIndex].y);
+			texMtx[1][2] = texMtx[1][2] + (projectedObj[maxIndex].y + projectedOffsetY - FLOAT_803305f8);
 		}
 	} else {
 		texMtx[1][2] = texMtx[1][2] + offsetY;

@@ -14,7 +14,7 @@ struct RandIVParams {
     u8 useNormalDistribution;
 };
 
-static inline int randint(int value, float scale)
+int randint(int value, float scale)
 {
     return (int)((float)value * scale - (float)value);
 }

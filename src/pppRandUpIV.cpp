@@ -23,7 +23,7 @@ struct RandUpIVParams {
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline int randint(int value, float scale)
+int randint(int value, float scale)
 {
     return (int)((f32)value * scale);
 }

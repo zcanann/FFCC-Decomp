@@ -13,7 +13,7 @@ struct RandDownHCVParams {
     u8 useNormalDistribution;
 };
 
-static inline short randshort(short value, float scale)
+short randshort(short value, float scale)
 {
     return (short)((f32)value * scale);
 }

@@ -23,7 +23,7 @@ struct RandDownIVParams {
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline int randint(int value, float scale)
+int randint(int value, float scale)
 {
     return (int)((float)value * scale);
 }

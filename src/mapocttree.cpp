@@ -816,41 +816,37 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
  */
 void COctTree::Draw(unsigned char drawType)
 {
-	unsigned char* mapObj;
-	unsigned char* mapMng;
-	unsigned char* bumpLight;
+	void* mapObj;
 
 	if (m_type == 0) {
-		mapObj = reinterpret_cast<unsigned char*>(m_mapObject);
-		if ((mapObj[0x15] == drawType) && ((mapObj[0x18] & 1) != 0)) {
-			mapMng = reinterpret_cast<unsigned char*>(&MapMng);
-			bumpLight = *reinterpret_cast<unsigned char**>(mapObj + 0x10);
-			if ((mapMng[0x2298A] != 0) && (bumpLight != 0) && (bumpLight[0xB1] == 2)) {
+		mapObj = m_mapObject;
+		if ((*reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) == drawType) &&
+		    ((*reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x18)) & 1) != 0)) {
+			if ((*reinterpret_cast<unsigned char*>(Ptr(&MapMng, 0x2298A)) != 0) &&
+			    ((*reinterpret_cast<void**>(Ptr(mapObj, 0x10)) != 0) &&
+			     (*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(mapObj, 0x10)), 0xB1)) == 2))) {
 				MaterialMan.SetUnderWaterTex();
-				mapMng[0x2298A] = 0;
+				*reinterpret_cast<unsigned char*>(Ptr(&MapMng, 0x2298A)) = 0;
 			}
 
-			LightPcs.SetBumpTexMatirx(reinterpret_cast<float(*)[4]>(mapObj + 0xB8),
-			                          reinterpret_cast<CLightPcs::CBumpLight*>(*reinterpret_cast<void**>(mapObj + 0x10)),
-			                          reinterpret_cast<Vec*>(mapObj + 0x58), mapObj[0x1A]);
-
-			if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(mapObj + 0x40)) {
-				CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
+			mapObj = m_mapObject;
+			LightPcs.SetBumpTexMatirx(reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)),
+			                          *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(mapObj, 0x10)),
+			                          reinterpret_cast<Vec*>(Ptr(mapObj, 0x58)),
+			                          *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x1A)));
+			if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40))) {
+				CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(Ptr(m_mapObject, 0x40)));
 			}
-
-			if (mapObj[0x27] != 0) {
-				GXSetZMode(1, GX_LEQUAL, 0);
+			if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x27)) != 0) {
+				GXSetZMode(1, (GXCompare)3, 0);
 			}
-
-			reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(mapObj + 0xC))->SetRenderArray();
+			reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))->SetRenderArray();
 			DrawTypeMeshFlag_r(m_nodePool);
-
-			if (mapObj[0x27] != 0) {
-				GXSetZMode(1, GX_LEQUAL, 1);
+			if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x27)) != 0) {
+				GXSetZMode(1, (GXCompare)3, 1);
 			}
-
-			if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(mapObj + 0x40)) {
-				CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
+			if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40))) {
+				CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(Ptr(m_mapObject, 0x40)));
 			}
 		}
 	}
@@ -904,40 +900,21 @@ void COctTree::DrawCharaShadow(unsigned char drawType)
  */
 void COctTree::SetDrawFlag()
 {
-	unsigned char* thisBytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* mapObj;
-	float localMtx[4][4];
+	Mtx localMtx;
 
-	if ((*reinterpret_cast<unsigned long*>(thisBytes + 0x48) & 1) != 0) {
-		return;
+	if (((m_drawFlags & 1) == 0) && (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x1D)) == 1)) {
+		PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&MapMng, 0x22928)),
+		            reinterpret_cast<float(*)[4]>(Ptr(m_mapObject, 0xB8)), reinterpret_cast<float(*)[4]>(Ptr(this, 0xC)));
+		PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&MapMng, 0x228F8)),
+		            reinterpret_cast<float(*)[4]>(Ptr(m_mapObject, 0xB8)), localMtx);
+		PSMTXInverse(localMtx, localMtx);
+
+		m_localPosX = localMtx[0][3];
+		m_localPosY = localMtx[1][3];
+		m_localPosZ = localMtx[2][3];
+		ClearFlag(1);
+		DrawTypeMesh_r(m_nodePool);
 	}
-
-	mapObj = *reinterpret_cast<unsigned char**>(thisBytes + 8);
-	if (mapObj[0x1D] != 1) {
-		return;
-	}
-
-	PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&MapMng, 0x22928)), reinterpret_cast<float(*)[4]>(mapObj + 0xB8),
-	            reinterpret_cast<float(*)[4]>(thisBytes + 0xC));
-	PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&MapMng, 0x228F8)), reinterpret_cast<float(*)[4]>(mapObj + 0xB8), localMtx);
-	PSMTXInverse(localMtx, localMtx);
-
-	*reinterpret_cast<float*>(thisBytes + 0x3C) = localMtx[0][3];
-	*reinterpret_cast<float*>(thisBytes + 0x40) = localMtx[1][3];
-	*reinterpret_cast<float*>(thisBytes + 0x44) = localMtx[2][3];
-
-	ClearFlag(1);
-	DrawTypeMesh_r(*reinterpret_cast<COctNode**>(thisBytes + 4));
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void COctTree::GetLocalPosition(Vec&, Vec&)
-{
-	// TODO
 }
 
 /*
@@ -1478,16 +1455,6 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 		s_insertShadowDepth = 0;
 		InsertShadow_r(m_nodePool);
 	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CBound::operator= (const CBound&)
-{
-	// TODO
 }
 
 /*

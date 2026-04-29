@@ -1561,7 +1561,7 @@ void _KeyOnControl()
 
     if (m_KeyOnEntry != 0) {
         do {
-            if ((*reserve != 0) && (*(int*)(*reserve + 0x1C) != 0)) {
+            if (((u32)*reserve != 0) && (*(int*)(*reserve + 0x1C) != 0)) {
                 voiceData = (unsigned int*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)&local_28);
             }
             reserve += 2;
@@ -1571,7 +1571,7 @@ void _KeyOnControl()
     if ((*(s16*)((u8*)p_SoundControlBuffer + 0x48E) != 0) && ((((u32*)p_SoundControlBuffer)[0x11B] & 0x10) == 0)) {
         int* track = *(int**)p_SoundControlBuffer;
         do {
-            if ((*track != 0) && (track[0x2D] != 0)) {
+            if (((u32)*track != 0) && (track[0x2D] != 0)) {
                 waveFunc = (int (*)(int))track[0x2D];
                 track[0x33] = (((track[0x30] >> 0xC) + 1) * waveFunc((u32)track[0x32] >> 0xC)) >> 0x10;
                 track[0x32] += track[0x2E];
@@ -1584,7 +1584,7 @@ void _KeyOnControl()
         int* track = (int*)((u32*)p_SoundControlBuffer)[0x125];
         u32* trackBase = (u32*)p_SoundControlBuffer + 0x125;
         do {
-            if ((*track != 0) && (track[0x2D] != 0)) {
+            if (((u32)*track != 0) && (track[0x2D] != 0)) {
                 waveFunc = (int (*)(int))track[0x2D];
                 track[0x33] = (((track[0x30] >> 0xC) + 1) * waveFunc((u32)track[0x32] >> 0xC)) >> 0x10;
                 track[0x32] += track[0x2E];
@@ -1597,7 +1597,7 @@ void _KeyOnControl()
         u32* seTrackBase = (u32*)p_SoundControlBuffer + 0x36F;
         int* track = (int*)((u32*)p_SoundControlBuffer)[0x36F];
         do {
-            if ((*track != 0) && (track[0x2D] != 0)) {
+            if (((u32)*track != 0) && (track[0x2D] != 0)) {
                 waveFunc = (int (*)(int))track[0x2D];
                 track[0x33] = (((track[0x30] >> 0xC) + 1) * waveFunc((u32)track[0x32] >> 0xC)) >> 0x10;
                 track[0x32] += track[0x2E];

@@ -707,28 +707,28 @@ void CMenuPcs::CmdInit2()
  */
 void CMenuPcs::CmdOpen()
 {
-	u8* self = reinterpret_cast<u8*>(this);
 	s16* cmd = GetCmdState(this);
-	s16* list = GetCmdList(this);
 
-	if (*reinterpret_cast<u8*>(reinterpret_cast<u8*>(cmd) + 0x0b) == 0) {
+	if (*reinterpret_cast<char*>(reinterpret_cast<u8*>(cmd) + 0x0b) == '\0') {
 		CmdInit();
 	}
 
+	cmd = GetCmdState(this);
+	s16* list = GetCmdList(this);
 	s32 finishedCount = 0;
 	cmd[0x11] = static_cast<s16>(cmd[0x11] + 1);
 
 	u32 count = static_cast<u32>(list[0]);
 	s16* entry = list + 4;
 	const s32 timer = static_cast<s32>(cmd[0x11]);
-	u32 remaining = count;
+	s32 remaining = static_cast<s32>(count);
 
-	if (static_cast<s32>(remaining) > 0) {
+	if (remaining > 0) {
 		do {
 			if (*reinterpret_cast<s32*>(entry + 0x12) <= timer) {
 				const s32 start = *reinterpret_cast<s32*>(entry + 0x12);
 				const s32 length = *reinterpret_cast<s32*>(entry + 0x14);
-				if (timer < (start + length)) {
+				if ((start + length) > timer) {
 					s32 value = *reinterpret_cast<s32*>(entry + 0x10);
 					value += 1;
 					*reinterpret_cast<s32*>(entry + 0x10) = value;
@@ -752,45 +752,29 @@ void CMenuPcs::CmdOpen()
 			u32 batch = count >> 3;
 			if (batch != 0) {
 				do {
-					entry[0x12] = 0;
-					entry[0x13] = 0;
-					entry[0x14] = 0;
-					entry[0x15] = 1;
+					*reinterpret_cast<s32*>(entry + 0x12) = 0;
+					*reinterpret_cast<s32*>(entry + 0x14) = 1;
 					*reinterpret_cast<float*>(entry + 8) = anim;
-					entry[0x32] = 0;
-					entry[0x33] = 0;
-					entry[0x34] = 0;
-					entry[0x35] = 1;
+					*reinterpret_cast<s32*>(entry + 0x32) = 0;
+					*reinterpret_cast<s32*>(entry + 0x34) = 1;
 					*reinterpret_cast<float*>(entry + 0x28) = anim;
-					entry[0x52] = 0;
-					entry[0x53] = 0;
-					entry[0x54] = 0;
-					entry[0x55] = 1;
+					*reinterpret_cast<s32*>(entry + 0x52) = 0;
+					*reinterpret_cast<s32*>(entry + 0x54) = 1;
 					*reinterpret_cast<float*>(entry + 0x48) = anim;
-					entry[0x72] = 0;
-					entry[0x73] = 0;
-					entry[0x74] = 0;
-					entry[0x75] = 1;
+					*reinterpret_cast<s32*>(entry + 0x72) = 0;
+					*reinterpret_cast<s32*>(entry + 0x74) = 1;
 					*reinterpret_cast<float*>(entry + 0x68) = anim;
-					entry[0x92] = 0;
-					entry[0x93] = 0;
-					entry[0x94] = 0;
-					entry[0x95] = 1;
+					*reinterpret_cast<s32*>(entry + 0x92) = 0;
+					*reinterpret_cast<s32*>(entry + 0x94) = 1;
 					*reinterpret_cast<float*>(entry + 0x88) = anim;
-					entry[0xb2] = 0;
-					entry[0xb3] = 0;
-					entry[0xb4] = 0;
-					entry[0xb5] = 1;
+					*reinterpret_cast<s32*>(entry + 0xb2) = 0;
+					*reinterpret_cast<s32*>(entry + 0xb4) = 1;
 					*reinterpret_cast<float*>(entry + 0xa8) = anim;
-					entry[0xd2] = 0;
-					entry[0xd3] = 0;
-					entry[0xd4] = 0;
-					entry[0xd5] = 1;
+					*reinterpret_cast<s32*>(entry + 0xd2) = 0;
+					*reinterpret_cast<s32*>(entry + 0xd4) = 1;
 					*reinterpret_cast<float*>(entry + 200) = anim;
-					entry[0xf2] = 0;
-					entry[0xf3] = 0;
-					entry[0xf4] = 0;
-					entry[0xf5] = 1;
+					*reinterpret_cast<s32*>(entry + 0xf2) = 0;
+					*reinterpret_cast<s32*>(entry + 0xf4) = 1;
 					*reinterpret_cast<float*>(entry + 0xe8) = anim;
 					entry += 0x100;
 					batch -= 1;
@@ -803,10 +787,8 @@ void CMenuPcs::CmdOpen()
 
 			if (done == false) {
 				do {
-					entry[0x12] = 0;
-					entry[0x13] = 0;
-					entry[0x14] = 0;
-					entry[0x15] = 1;
+					*reinterpret_cast<s32*>(entry + 0x12) = 0;
+					*reinterpret_cast<s32*>(entry + 0x14) = 1;
 					*reinterpret_cast<float*>(entry + 8) = anim;
 					entry += 0x20;
 					count -= 1;

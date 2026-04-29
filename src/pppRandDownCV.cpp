@@ -6,7 +6,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-
 struct RandDownCVParams {
     s32 targetId;
     s32 sourceOffset;
@@ -14,6 +13,15 @@ struct RandDownCVParams {
     u8 useNormalDistribution;
 };
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static inline char randchar(char value, float scale)
 {
     return (char)((f32)value * scale);
@@ -63,13 +71,3 @@ void pppRandDownCV(_pppPObject* basePtr, RandDownCVParams* in, _pppCtrlTable* ct
     target[2] = (u8)(target[2] + randchar(in->delta[2], scale));
     target[3] = (u8)(target[3] + randchar(in->delta[3], scale));
 }
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */

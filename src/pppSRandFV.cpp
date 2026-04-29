@@ -18,6 +18,11 @@ static inline float randf(unsigned char flag)
     return value;
 }
 
+static inline float randfloat(float value, float scale)
+{
+    return value * scale - value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80063c7c
@@ -57,7 +62,7 @@ void pppSRandFV(_pppPObject* basePtr, SRandFVParams* in, _pppCtrlTable* ctrl)
 
     f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)((u8*)basePtr + in->sourceOffset + 0x80);
 
-    target[0] += (in->blend[0] * randVec[0] - in->blend[0]);
-    target[1] += (in->blend[1] * randVec[1] - in->blend[1]);
-    target[2] += (in->blend[2] * randVec[2] - in->blend[2]);
+    target[0] += randfloat(in->blend[0], randVec[0]);
+    target[1] += randfloat(in->blend[1], randVec[1]);
+    target[2] += randfloat(in->blend[2], randVec[2]);
 }

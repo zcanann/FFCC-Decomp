@@ -56,5 +56,6 @@ void pppRandDownShort(_pppPObject* basePtr, RandDownShortParam* in, _pppCtrlTabl
     f32 current = *valuePtr;
     f32 scaled = scale * current;
     s32 delta = (s32)scaled;
+    
     *target = (s16)(*target + delta);
 }

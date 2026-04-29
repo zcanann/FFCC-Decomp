@@ -54,12 +54,10 @@ void pppRandHCV(_pppPObject* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
     }
 
     target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->sourceOffset + 0x80);
-
-    {
-        f32 scale = *randomValue;
-        target[0] += randshort(in->delta[0], scale);
-        target[1] += randshort(in->delta[1], scale);
-        target[2] += randshort(in->delta[2], scale);
-        target[3] += randshort(in->delta[3], scale);
-    }
+    f32 scale = *randomValue;
+    
+    target[0] += randshort(in->delta[0], scale);
+    target[1] += randshort(in->delta[1], scale);
+    target[2] += randshort(in->delta[2], scale);
+    target[3] += randshort(in->delta[3], scale);
 }

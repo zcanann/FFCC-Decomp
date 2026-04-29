@@ -14,6 +14,15 @@ struct RandUpIVParams {
     u8 useNormalDistribution;
 };
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static inline int randint(int value, float scale)
 {
     return (int)((f32)value * scale);
@@ -62,13 +71,3 @@ void pppRandUpIV(_pppPObject* basePtr, RandUpIVParams* in, _pppCtrlTable* ctrl)
     target[1] += randint(in->blend[1], scale);
     target[2] += randint(in->blend[2], scale);
 }
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */

@@ -128,7 +128,9 @@ void CUSBPcs::mccReadData()
     s_usbReadPollFrameCounter++;
     if (4 < s_usbReadPollFrameCounter) {
         s_usbReadPollFrameCounter = 0;
-        USB.IsConnected();
+        if (USB.IsConnected() == 0) {
+            return;
+        }
     }
 }
 

@@ -135,7 +135,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
         u32 size = usb.m_sizeBytes;
         u32 dataSize = size * 0xC;
-        float* xyzData;
+        u32* xyzData;
 
         if (rsdItem->ptr10 != 0) {
             __dla__FPv(rsdItem->ptr10);
@@ -151,15 +151,11 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
 
         memcpy(rsdItem->ptr10, usb.m_data, dataSize);
 
-        xyzData = reinterpret_cast<float*>(rsdItem->ptr10);
-        for (u32 i = 0; i < size; i++) {
-            u32 id = BSWAP32(*reinterpret_cast<u32*>(xyzData + 0));
-            float y = -static_cast<float>(BSWAP32(*reinterpret_cast<u32*>(xyzData + 1)));
-            float z = -static_cast<float>(BSWAP32(*reinterpret_cast<u32*>(xyzData + 2)));
-
-            *reinterpret_cast<u32*>(xyzData + 0) = id;
-            xyzData[1] = y;
-            xyzData[2] = z;
+        xyzData = reinterpret_cast<u32*>(rsdItem->ptr10);
+        for (u32 i = size; i != 0; i--) {
+            xyzData[0] = BSWAP32(xyzData[0]);
+            *reinterpret_cast<float*>(xyzData + 1) = -static_cast<float>(BSWAP32(xyzData[1]));
+            *reinterpret_cast<float*>(xyzData + 2) = -static_cast<float>(BSWAP32(xyzData[2]));
             xyzData += 3;
         }
         DCStoreRange(rsdItem->ptr10, dataSize);
@@ -242,7 +238,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
         u32 size = usb.m_sizeBytes;
         u32 dataSize = size * 0xC;
-        float* xyzData;
+        u32* xyzData;
 
         if (rsdItem->ptr14 != 0) {
             __dla__FPv(rsdItem->ptr14);
@@ -258,15 +254,11 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
 
         memcpy(rsdItem->ptr14, usb.m_data, dataSize);
 
-        xyzData = reinterpret_cast<float*>(rsdItem->ptr14);
-        for (u32 i = 0; i < size; i++) {
-            u32 id = BSWAP32(*reinterpret_cast<u32*>(xyzData + 0));
-            float y = -static_cast<float>(BSWAP32(*reinterpret_cast<u32*>(xyzData + 1)));
-            float z = -static_cast<float>(BSWAP32(*reinterpret_cast<u32*>(xyzData + 2)));
-
-            *reinterpret_cast<u32*>(xyzData + 0) = id;
-            xyzData[1] = y;
-            xyzData[2] = z;
+        xyzData = reinterpret_cast<u32*>(rsdItem->ptr14);
+        for (u32 i = size; i != 0; i--) {
+            xyzData[0] = BSWAP32(xyzData[0]);
+            *reinterpret_cast<float*>(xyzData + 1) = -static_cast<float>(BSWAP32(xyzData[1]));
+            *reinterpret_cast<float*>(xyzData + 2) = -static_cast<float>(BSWAP32(xyzData[2]));
             xyzData += 3;
         }
         DCStoreRange(rsdItem->ptr14, dataSize);

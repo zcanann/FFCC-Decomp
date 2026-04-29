@@ -26,12 +26,6 @@ extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSe
 
 extern const float FLOAT_80331840;
 extern const float FLOAT_80331844;
-extern const float FLOAT_80331848 = 255.0f;
-extern const double DOUBLE_80331850 = 4503599627370496.0;
-extern const double DOUBLE_80331858 = 4503601774854144.0;
-extern const float FLOAT_80331860[2] = {-1.0f, 0.0f};
-extern const char lbl_80331868[4] = "THP";
-extern const float FLOAT_8033186C = 127.0f;
 
 static const char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";
 
@@ -163,7 +157,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
             GXSetCullMode(GX_CULL_NONE);
 
             if (work->visibleCount > 1) {
-                f32 alphaScale = (f32)colorData[0x0B] / FLOAT_80331848;
+                f32 alphaScale = (f32)colorData[0x0B] / 255.0f;
 
                 GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
 
@@ -432,3 +426,7 @@ void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2
     work->alphaStep = 0;
     work->pad32 = 0;
 }
+
+extern const float FLOAT_80331864 = 0.0f;
+extern const char lbl_80331868[4] = "THP";
+extern const float FLOAT_8033186C = 127.0f;

@@ -98,6 +98,11 @@ static const char s_charaMergePathFmt[] = "dvd/mrg/m%04d_%02d.mrg";
 static const char s_charaMergeDupFmt[] = "CCharaPcs duplicate merge %d\n";
 static const char s_charaMergeOpenFmt[] = "CCharaPcs missing merge %d\n";
 static const char s_charaMergeDoneFmt[] = "CCharaPcs LoadMergeFile %d 0x%x\n";
+static const char s_charaFreeMergeFmt[] = "CCharaPcs.FreeMergeFile: 0x%08x\n";
+static const char s_charaAmemCompactFailed[] =
+    "\x83\x4b\x83\x78\x81\x5b\x83\x57\x83\x52\x83\x8c\x83\x4e\x83\x56\x83\x87"
+    "\x83\x93\x82\xc9\x8e\xb8\x94\x73\x82\xb5\x82\xbd\x82\xcc\x82\xc5\x81\x41"
+    "\x91\x53\x82\xc4\x8f\xc1\x8b\x8e\x82\xb5\x82\xdc\x82\xb7\x81\x42\n";
 static const char s_charaBasePathFmt[] = "dvd/char/k%02d/chara%03d/chara%03d";
 static const char s_charaAnimPathFmt[] = "dvd/char/k%02d/chara%03d/%s.cha";
 static const char s_charaModelSuffix[] = ".mdl";
@@ -987,7 +992,6 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
         }
     }
 
-    int charaAmemSize = static_cast<int>(CharaAmemSize());
     if (resetMode != 1) {
         if (resetMode == 0) {
             const unsigned int releaseMask = ~(FreeMergeMask(this) | 0x10000000U);
@@ -1008,24 +1012,27 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
                 LoadAnimArray(this)->RemoveAt(static_cast<unsigned long>(i));
             }
 
+            Printf__7CSystemFPce(&System, s_charaFreeMergeFmt, releaseMask);
             LoadPdtArray(this)->ReleaseAndRemoveAll();
-            charaAmemSize = correctLoadAnimAmem();
-        } else {
-            LoadModelArray(this)->ReleaseAndRemoveAll();
-            LoadAnimArray(this)->ReleaseAndRemoveAll();
-            LoadTextureArray(this)->ReleaseAndRemoveAll();
-            LoadPdtArray(this)->ReleaseAndRemoveAll();
-            charaAmemSize = 0;
+            int charaAmemSize = correctLoadAnimAmem();
+            if (charaAmemSize >= 0) {
+                CharaAmemSize() = static_cast<unsigned int>(charaAmemSize);
+                gCharaPartWorkPtr[0x6B] = 0xFF;
+                FreeMergeMask(this) = 0;
+                return;
+            }
+
+            if (System.m_execParam > 1) {
+                Printf__7CSystemFPce(&System, s_charaAmemCompactFailed);
+            }
         }
-    } else {
-        LoadModelArray(this)->ReleaseAndRemoveAll();
-        LoadAnimArray(this)->ReleaseAndRemoveAll();
-        LoadTextureArray(this)->ReleaseAndRemoveAll();
-        LoadPdtArray(this)->ReleaseAndRemoveAll();
-        charaAmemSize = 0;
     }
 
-    CharaAmemSize() = static_cast<unsigned int>(charaAmemSize < 0 ? 0 : charaAmemSize);
+    LoadModelArray(this)->ReleaseAndRemoveAll();
+    LoadAnimArray(this)->ReleaseAndRemoveAll();
+    LoadTextureArray(this)->ReleaseAndRemoveAll();
+    LoadPdtArray(this)->ReleaseAndRemoveAll();
+    CharaAmemSize() = 0;
     gCharaPartWorkPtr[0x6B] = 0xFF;
     FreeMergeMask(this) = 0;
 }

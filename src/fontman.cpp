@@ -17,6 +17,8 @@ extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned lo
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void* __vt__5CFont[];
+extern "C" const float FLOAT_803306B8;
+extern "C" const float FLOAT_803306C8;
 
 static const char s_fontman_cpp[] = "fontman.cpp";
 static const char s_CFontMan[] = "CFontMan";
@@ -842,14 +844,14 @@ void CFontMan::Init()
 		*reinterpret_cast<void**>(font) = __vt__5CFont;
 		font->m_glyphData = 0;
 		font->texturePtr = 0;
-		font->margin = 0.0f;
-		font->posZ = 0.0f;
-		font->posY = 0.0f;
-		font->posX = 0.0f;
+		font->margin = FLOAT_803306B8;
+		font->posZ = FLOAT_803306B8;
+		font->posY = FLOAT_803306B8;
+		font->posX = FLOAT_803306B8;
 		CFontRenderFlagBits& bits = GetRenderFlagBits(font->renderFlags);
 		bits.shadow = 0;
-		font->scaleY = 1.0f;
-		font->scaleX = 1.0f;
+		font->scaleY = FLOAT_803306C8;
+		font->scaleX = FLOAT_803306C8;
 		bits.fixedWidth = 0;
 		font->m_color.r = 0xFF;
 		font->m_color.g = 0xFF;

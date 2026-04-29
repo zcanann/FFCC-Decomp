@@ -281,8 +281,8 @@ void CSystem::ExecScenegraph()
 
     do
     {
-        int stepTrigger;
-        int perfTrigger;
+        u16 stepTrigger;
+        u16 perfTrigger;
 
         if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.m_gameWork.m_gamePaused)
         {
@@ -354,8 +354,8 @@ void CSystem::ExecScenegraph()
         {
             for (int port = 0; port < 4; port++)
             {
-                int trigger;
-                int held;
+                u16 trigger;
+                u16 held;
                 bool noInput;
 
                 noInput = false;
@@ -439,8 +439,8 @@ void CSystem::ExecScenegraph()
         }
 
         float totalTime = 0.0f;
-        perfTrigger &= 1;
-        CStopWatch watch(reinterpret_cast<char*>(-1));
+        CStopWatch watch((char*)-1);
+        int perfEnabled = perfTrigger & 1;
 
         int index = 0;
         for (COrder* order = m_orderSentinel.m_next;
@@ -503,14 +503,14 @@ void CSystem::ExecScenegraph()
                 order->m_lastTime = watch.Get();
 
                 watch.Start();
-                if (perfTrigger != 0)
+                if (perfEnabled != 0)
                 {
                     Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x2CA);
                     GXReadGP0Metric();
                     GXReadGP1Metric();
                 }
                 watch.Stop();
-                if (perfTrigger != 0)
+                if (perfEnabled != 0)
                 {
                     order->m_lastTime = watch.Get();
                 }

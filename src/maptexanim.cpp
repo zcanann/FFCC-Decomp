@@ -27,8 +27,8 @@ char s_SetMapTexAnim_MaterialIdNotFound[];
 extern "C" float FLOAT_8032fd38;
 extern "C" float FLOAT_8032fd48;
 extern "C" float FLOAT_8032fd4c;
-extern "C" const double DOUBLE_8032FCD0 = 4503601774854144.0;
-extern "C" const float FLOAT_8032FCD8 = 0.0f;
+extern "C" const double DOUBLE_8032FCD0;
+extern "C" const float FLOAT_8032FCD8;
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)

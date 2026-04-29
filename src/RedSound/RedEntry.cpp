@@ -117,7 +117,7 @@ void CRedEntry::Init()
 		iVar2 = iVar2 + 1;
 	} while (iVar2 < 4);
 
-	m_waveHistoryIndex = -1;
+	m_waveLoadNo = -1;
 }
 
 /*

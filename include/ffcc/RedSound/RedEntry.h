@@ -64,9 +64,9 @@ public:
 	int m_waveBankBase;
 	int m_seSepBankBase;
 	int m_musicBankBase;
-	int m_waveHistoryIndex;
-	int m_seSepHistoryIndex;
-	int m_musicHistoryIndex;
+	int m_waveLoadNo;
+	int m_waveLoadSize;
+	int m_waveLoadAddress;
 };
 
 #endif // _FFCC_REDSOUND_REDENTRY_H

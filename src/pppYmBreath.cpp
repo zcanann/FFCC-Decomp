@@ -908,6 +908,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     unsigned char* breath = (unsigned char*)pYmBreath;
     Vec* particle = reinterpret_cast<Vec*>(particleData);
     int angle[4];
+    short life;
     pppFMATRIX rotMtx;
     Vec baseDir;
     Vec directionNorm;
@@ -1037,10 +1038,11 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         particle[6].z += (spread + spread) * Math.RandF() - spread;
     }
 
-    if (*(short*)(breath + 0x24) == 0) {
+    life = *(short*)(breath + 0x24);
+    if (life == 0) {
         *(short*)&particle[2].z = -1;
     } else {
-        *(short*)&particle[2].z = *(short*)(breath + 0x24);
+        *(short*)&particle[2].z = life;
     }
     *(unsigned char*)&particle[7].x = 0;
 

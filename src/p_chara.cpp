@@ -983,13 +983,11 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
         }
     }
 
-    if (HandleListHead(this) != 0) {
-        CHandle* handle = HandleListHead(this)->m_next;
-        while (handle != HandleListHead(this)) {
-            CHandle* next = handle->m_next;
-            __dt__Q29CCharaPcs7CHandleFv(handle, 1);
-            handle = next;
-        }
+    CHandle* handle = HandleListHead(this)->m_next;
+    while (handle != HandleListHead(this)) {
+        CHandle* next = handle->m_next;
+        __dt__Q29CCharaPcs7CHandleFv(handle, 1);
+        handle = next;
     }
 
     if (resetMode != 1) {

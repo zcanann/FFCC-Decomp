@@ -1364,13 +1364,12 @@ int CMemoryCardMan::DummySave()
 
         if (m_saveBuffer == 0)
         {
-            m_saveBuffer = (char*)0;  
-            // __nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
+            m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+                0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
 
             if (m_saveBuffer == 0 && System.m_execParam != 0)
             {
-                // "%s(%d): Error: memory allocation"
-                System.Printf("%s", const_cast<char*>(sMemoryAllocationError));
+                System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
             }
         }
 
@@ -1452,12 +1451,12 @@ int CMemoryCardMan::DummySave()
     {
         if (m_saveBuffer == 0)
         {
-            m_saveBuffer = (char*)0;
-            // __nwa__(0xA000, ...)
+            m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+                0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
 
             if (m_saveBuffer == 0 && System.m_execParam != 0)
             {
-                System.Printf("%s", const_cast<char*>(sMemoryAllocationError));
+                System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
             }
         }
 
@@ -1625,12 +1624,12 @@ int CMemoryCardMan::DummyLoad()
 
     if (m_saveBuffer == 0)
     {
-        m_saveBuffer = (char*)0; 
-        // __nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
+        m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+            0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
 
         if (m_saveBuffer == 0 && System.m_execParam != 0)
         {
-            System.Printf("%s", const_cast<char*>(sMemoryAllocationError));
+            System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
     }
 

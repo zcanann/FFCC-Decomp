@@ -966,8 +966,7 @@ int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
 	SeSepHistoryDelete(reinterpret_cast<int*>(bank)[1]);
 
 	freedSize = reinterpret_cast<int*>(bank)[3];
-	reinterpret_cast<int*>(bank)[3] = 0;
-	reinterpret_cast<int*>(bank)[2] = 0;
+	reinterpret_cast<int*>(bank)[2] = reinterpret_cast<int*>(bank)[3] = 0;
 	reinterpret_cast<int*>(bank)[0] = -1;
 
 	WaveHistoryManager(0, waveNo);

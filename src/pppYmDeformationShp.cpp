@@ -149,7 +149,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 
 		if (param_2->m_splitMode == 0) {
-			short size = param_2->m_size;
+			u8 size = param_2->m_size;
 			float quadSize = (float)size;
 			if (param_2->m_orientation == 0) {
 				vertices[0].x = -quadSize;

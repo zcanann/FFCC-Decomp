@@ -308,11 +308,11 @@ void _MusicCrossPlaySequence(int* command)
         return;
     }
     if (*command == *(int*)((int)pvVar2 + 0x904)) {
-        *(int*)((int)p_SoundControlBuffer + 0x458) = -*(int*)((int)p_SoundControlBuffer + 0x454) / command[2];
+        *(int*)((int)pvVar2 + 0x458) = -*(int*)((int)pvVar2 + 0x454) / command[2];
         *(int*)((int)pvVar2 + 0x45c) = command[2];
         pvVar2 = p_SoundControlBuffer;
-        *(int*)((int)p_SoundControlBuffer + 0x8ec) =
-             (0x1ff800 - *(int*)((int)p_SoundControlBuffer + 0x8e8)) / command[2];
+        *(int*)((int)pvVar2 + 0x8ec) =
+             (0x1ff800 - *(int*)((int)pvVar2 + 0x8e8)) / command[2];
         *(int*)((int)pvVar2 + 0x8f0) = command[2];
         pvVar2 = (void*)RedNew(0x494);
         memcpy(pvVar2, (void*)((int)p_SoundControlBuffer + 0x494), 0x494);

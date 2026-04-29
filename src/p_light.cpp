@@ -608,11 +608,9 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
         GXInitLightAttnK(&m_mapLightObj, FLOAT_8032fc84 / dist, FLOAT_8032fc88 / atten, FLOAT_8032fc8c / atten);
 
         reinterpret_cast<unsigned char*>(&DAT_8032e620)[3] = alpha;
-        _GXColor lightColor;
-        *(u32*)&lightColor = DAT_8032e620;
-        GXInitLightColor(&m_mapLightObj, lightColor);
+        GXInitLightColor(&m_mapLightObj, *reinterpret_cast<_GXColor*>(&DAT_8032e620));
 
-        if (m_loadedLightCount > 7) {
+        if (m_loadedLightCount >= 8) {
             m_loadedLightCount = 7;
         }
 

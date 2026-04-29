@@ -89,14 +89,18 @@ struct pppFMATRIX
 {
     Mtx value;
 };
+#ifndef PPP_CUSTOM_PARTICLE_TYPE_NAMES
 typedef Mtx PARTICLE_WMAT;  // Size 0x30
+#endif
 
 struct _PARTICLE_COLOR
 {
     float m_color[4];            // 0x0
     float m_colorFrameDeltas[4]; // 0x10
 };
+#ifndef PPP_CUSTOM_PARTICLE_TYPE_NAMES
 typedef _PARTICLE_COLOR PARTICLE_COLOR;
+#endif
 
 struct _PARTICLE_DATA
 {
@@ -111,7 +115,9 @@ struct _PARTICLE_DATA
     int m_age;             // 0x68 - 0x6c
     char m_padding[0x140 - 0x6c]; // Pad to 0x140 bytes total
 };
+#ifndef PPP_CUSTOM_PARTICLE_TYPE_NAMES
 typedef _PARTICLE_DATA PARTICLE_DATA;
+#endif
 
 // The fixed 0x34-byte prefix that wrapper types embed by value when they
 // continue with their own fields after it. The full _pppPObject (used as

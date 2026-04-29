@@ -17,6 +17,8 @@ CWind Wind;
 extern int __float_nan[];
 double cos(double);
 double sin(double);
+extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
+extern "C" void* __ct__7CVectorFfff(void*, float, float, float);
 
 static inline s8 GetWindActiveFlag(const WindObject* obj)
 {
@@ -516,14 +518,21 @@ void CWind::Draw()
         do {
             if (GetWindActiveFlag(obj) != 0) {
                 if (obj->type == 1) {
-                    CColor color(0xff, 0xff, 0, 0xff);
-                    CVector pos(obj->centerX, FLOAT_80330ef0, obj->centerZ);
-                    Graphic.DrawSphere(viewMtx, (Vec*)&pos, obj->radius, &color.color);
+                    u32 color;
+                    Vec pos;
+                    Graphic.DrawSphere(viewMtx,
+                                       static_cast<Vec*>(__ct__7CVectorFfff(&pos, obj->centerX, FLOAT_80330ef0, obj->centerZ)),
+                                       obj->radius,
+                                       static_cast<_GXColor*>(__ct__6CColorFUcUcUcUc(&color, 0xff, 0xff, 0, 0xff)));
                 } else {
                     int alpha = (int)(FLOAT_80330f1c * (FLOAT_80330ef8 - obj->lifeRatio));
-                    CColor color(0xff, 0xff, 0x80, alpha);
-                    CVector pos(obj->centerX, FLOAT_80330ef0, obj->centerZ);
-                    Graphic.DrawSphere(viewMtx, (Vec*)&pos, obj->radius, &color.color);
+                    u32 color;
+                    Vec pos;
+                    Graphic.DrawSphere(viewMtx,
+                                       static_cast<Vec*>(__ct__7CVectorFfff(&pos, obj->centerX, FLOAT_80330ef0, obj->centerZ)),
+                                       obj->radius,
+                                       static_cast<_GXColor*>(
+                                           __ct__6CColorFUcUcUcUc(&color, 0xff, 0xff, 0x80, static_cast<unsigned char>(alpha))));
                 }
             }
 

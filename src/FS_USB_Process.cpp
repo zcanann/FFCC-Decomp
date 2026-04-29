@@ -86,19 +86,40 @@ void CFunnyShapePcs::SetUSBData()
         StoreSwap32(&m_displayPending.unk30);
         DCStoreRange(&m_displayPending, 0x40);
 
-        GXColor clear = m_displayPending.clear;
+        GXColor clear;
+        clear.r = m_displayPending.clear.r;
+        clear.g = m_displayPending.clear.g;
+        clear.b = m_displayPending.clear.b;
+        clear.a = m_displayPending.clear.a;
         GXSetCopyClear(clear, 0xFFFFFF);
         FS_DISPLAY_STATUS display = m_displayPending;
-        m_displayCurrent = display;
+        m_displayCurrent.flags = display.flags;
+        m_displayCurrent.clear.r = display.clear.r;
+        m_displayCurrent.clear.g = display.clear.g;
+        m_displayCurrent.clear.b = display.clear.b;
+        m_displayCurrent.clear.a = display.clear.a;
+        m_displayCurrent.unk08 = display.unk08;
+        m_displayCurrent.unk0C = display.unk0C;
+        m_displayCurrent.unk10 = display.unk10;
+        m_displayCurrent.unk14 = display.unk14;
+        m_displayCurrent.unk18 = display.unk18;
+        m_displayCurrent.unk1C = display.unk1C;
+        m_displayCurrent.unk20 = display.unk20;
+        m_displayCurrent.unk24 = display.unk24;
+        m_displayCurrent.unk28 = display.unk28;
+        m_displayCurrent.unk2A = display.unk2A;
+        m_displayCurrent.unk2C = display.unk2C;
+        m_displayCurrent.unk30 = display.unk30;
+        m_displayCurrent.unk34[0] = display.unk34[0];
+        memcpy(&m_displayCurrent.unk34[1], &display.unk34[1], sizeof(m_displayCurrent.unk34) - 1);
         break;
     }
     case 5: {
-        char textureIndex;
         u16* tmp = static_cast<u16*>(__nwa__FUlPQ27CMemory6CStagePci(
             usb->m_sizeBytes, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x55));
-        textureIndex = m_textureCount;
-        m_textureHeaders[textureIndex] = __nw__FUlPQ27CMemory6CStagePci(
+        void* textureHeader = __nw__FUlPQ27CMemory6CStagePci(
             0x30, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x57);
+        m_textureHeaders[m_textureCount] = textureHeader;
 
         memcpy(tmp, usb->m_data, usb->m_sizeBytes);
         for (int i = 0; i < 8; i++) {
@@ -108,16 +129,16 @@ void CFunnyShapePcs::SetUSBData()
         tmp[0x11] = LoadSwap16(tmp[0x11]);
 
         DCFlushRange(tmp, 0x30);
-        memcpy(m_textureHeaders[textureIndex], tmp, 0x30);
+        memcpy(m_textureHeaders[m_textureCount], tmp, 0x30);
 
-        m_textureData[textureIndex] = __nwa__FUlPQ27CMemory6CStagePci(
+        m_textureData[m_textureCount] = __nwa__FUlPQ27CMemory6CStagePci(
             usb->m_sizeBytes - 0x30, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x6C);
-        memcpy(m_textureData[textureIndex], tmp + 0x18, usb->m_sizeBytes - 0x30);
-        DCFlushRange(m_textureData[textureIndex], usb->m_sizeBytes - 0x30);
+        memcpy(m_textureData[m_textureCount], tmp + 0x18, usb->m_sizeBytes - 0x30);
+        DCFlushRange(m_textureData[m_textureCount], usb->m_sizeBytes - 0x30);
 
-        m_texObjData[textureIndex] = __nw__FUlPQ27CMemory6CStagePci(
+        m_texObjData[m_textureCount] = __nw__FUlPQ27CMemory6CStagePci(
             0x20, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x73);
-        GXInitTexObj(static_cast<GXTexObj*>(m_texObjData[textureIndex]), m_textureData[textureIndex], tmp[2], tmp[3], GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObj(static_cast<GXTexObj*>(m_texObjData[m_textureCount]), m_textureData[m_textureCount], tmp[2], tmp[3], GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
         m_textureCount++;
         if (tmp != 0) {

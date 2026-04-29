@@ -17,19 +17,19 @@ extern u8* gCharaPartWorkPtr;
 extern const double kCharaViewerColorCenterBias;
 extern const float kCharaViewerZero;
 extern const float kCharaViewerGridMax;
-extern const float kCharaViewerUnitStep;
-extern const float kCharaViewerGridSpacing;
-extern const float kCharaViewerGridMin;
-extern const double kCharaViewerColorWhiteBias;
-extern const float kCharaViewerFineStep;
-extern const float kCharaViewerLerpScale;
-extern char kCharaViewerDefaultModelPath[];
-extern const float kCharaViewerLightPosX;
-extern const float kCharaViewerLightPosY;
-extern const float kCharaViewerLightPosZ;
-extern const float kCharaViewerLightTargetX;
-extern const float kCharaViewerLightTargetY;
-extern const float kCharaViewerLightTargetZ;
+extern const float kCharaViewerUnitStep = 1.0f;
+extern const float kCharaViewerGridSpacing = 10.0f;
+extern const float kCharaViewerGridMin = 100.0f;
+extern const double kCharaViewerColorWhiteBias = 4503599627370496.0;
+extern const float kCharaViewerFineStep = -1.0f;
+extern const float kCharaViewerLerpScale = 0.25f;
+extern const char kCharaViewerDefaultModelPath[] = "m1";
+extern const float kCharaViewerLightPosX = -533.0f;
+extern const float kCharaViewerLightPosY = -131.0f;
+extern const float kCharaViewerLightPosZ = -117.0f;
+extern const float kCharaViewerLightTargetX = 4391.0f;
+extern const float kCharaViewerLightTargetY = -1864.0f;
+extern const float kCharaViewerLightTargetZ = 7194.0f;
 }
 #include "ffcc/textureman.h"
 #include <dolphin/gx.h>

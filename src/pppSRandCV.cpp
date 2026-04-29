@@ -52,54 +52,10 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
 
     if (in->targetId == *(s32*)(base + 0xC)) {
         target = (float*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
-
-        {
-            u8 flag = in->useNormalDistribution;
-            float value = Math.RandF();
-            if (flag != 0) {
-                value = value + Math.RandF();
-            } else {
-                float scale = 2.0f;
-                value = value * scale;
-            }
-            target[0] = value;
-        }
-
-        {
-            u8 flag = in->useNormalDistribution;
-            float value = Math.RandF();
-            if (flag != 0) {
-                value = value + Math.RandF();
-            } else {
-                float scale = 2.0f;
-                value = value * scale;
-            }
-            target[1] = value;
-        }
-
-        {
-            u8 flag = in->useNormalDistribution;
-            float value = Math.RandF();
-            if (flag != 0) {
-                value = value + Math.RandF();
-            } else {
-                float scale = 2.0f;
-                value = value * scale;
-            }
-            target[2] = value;
-        }
-
-        {
-            u8 flag = in->useNormalDistribution;
-            float value = Math.RandF();
-            if (flag != 0) {
-                value = value + Math.RandF();
-            } else {
-                float scale = 2.0f;
-                value = value * scale;
-            }
-            target[3] = value;
-        }
+        target[0] = randf(in->useNormalDistribution);
+        target[1] = randf(in->useNormalDistribution);
+        target[2] = randf(in->useNormalDistribution);
+        target[3] = randf(in->useNormalDistribution);
     } else {
         if (in->targetId != *(s32*)(base + 0xC)) {
             return;

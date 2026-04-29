@@ -50,54 +50,10 @@ void pppSRandDownHCV(_pppPObject* basePtr, SRandDownHCVParams* in, _pppCtrlTable
 
 	if (in->targetId == *(s32*)(base + 0xC)) {
 		target = (float*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
-
-		{
-			u8 flag = in->useNormalDistribution;
-			float value = -Math.RandF();
-			if (flag != 0) {
-				float random = Math.RandF();
-				float blend = value - random;
-				float scale = 0.5f;
-				value = blend * scale;
-			}
-			target[0] = value;
-		}
-
-		{
-			u8 flag = in->useNormalDistribution;
-			float value = -Math.RandF();
-			if (flag != 0) {
-				float random = Math.RandF();
-				float blend = value - random;
-				float scale = 0.5f;
-				value = blend * scale;
-			}
-			target[1] = value;
-		}
-
-		{
-			u8 flag = in->useNormalDistribution;
-			float value = -Math.RandF();
-			if (flag != 0) {
-				float random = Math.RandF();
-				float blend = value - random;
-				float scale = 0.5f;
-				value = blend * scale;
-			}
-			target[2] = value;
-		}
-
-		{
-			u8 flag = in->useNormalDistribution;
-			float value = -Math.RandF();
-			if (flag != 0) {
-				float random = Math.RandF();
-				float blend = value - random;
-				float scale = 0.5f;
-				value = blend * scale;
-			}
-			target[3] = value;
-		}
+		target[0] = randf(in->useNormalDistribution);
+		target[1] = randf(in->useNormalDistribution);
+		target[2] = randf(in->useNormalDistribution);
+		target[3] = randf(in->useNormalDistribution);
 	} else {
 		if (in->targetId != *(s32*)(base + 0xC)) {
 			return;

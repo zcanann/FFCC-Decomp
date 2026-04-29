@@ -118,11 +118,11 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
 
     dataOffset = *param_3->m_serializedDataOffsets;
     colorOffset = param_3->m_serializedDataOffsets[1];
-    work = (TracerWork*)(pppYmTracer->m_serializedData + dataOffset);
-    colorData = pppYmTracer->m_serializedData + colorOffset;
-    poly = work->entries;
     dataValIndex = param_2->m_dataValIndex;
+    work = (TracerWork*)(pppYmTracer->m_serializedData + dataOffset);
+    poly = work->entries;
     mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
+    colorData = pppYmTracer->m_serializedData + colorOffset;
 
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_payload[10]);
@@ -219,8 +219,9 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     }
 
     work = (TracerWork*)(pppYmTracer->m_serializedData + *param_3->m_serializedDataOffsets);
-    entries = work->entries;
-    if (entries == 0) {
+    entry = work->entries;
+    entries = entry;
+    if (entry == 0) {
         work->entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)*(u16*)(param_2->m_payload + 4) * sizeof(TRACE_POLYGON), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmTracer_cpp_801d9ce0), 0xEB);

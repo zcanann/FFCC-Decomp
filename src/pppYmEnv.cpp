@@ -466,13 +466,13 @@ CCharaPcs::CHandle* GetCharaHandlePtr(CGObject* gObject, long modelType)
                 return gObject->m_charaModelHandle;
             }
         } else if (modelType < 3) {
-            if (gObject->m_shieldModelHandle != 0) {
-                return gObject->m_shieldModelHandle;
+            if (gObject->m_weaponModelHandle != 0) {
+                return gObject->m_weaponModelHandle;
             }
         }
     } else {
-        if (gObject->m_weaponModelHandle != 0) {
-            return gObject->m_weaponModelHandle;
+        if (gObject->m_shieldModelHandle != 0) {
+            return gObject->m_shieldModelHandle;
         }
     }
 

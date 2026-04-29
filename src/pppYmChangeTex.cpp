@@ -427,7 +427,10 @@ void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* da
  */
 void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
 {
-	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
+	ChangeTexModelRaw* modelRaw = (ChangeTexModelRaw*)model;
+	pppYmChangeTexState* state = (pppYmChangeTexState*)param_2;
+	pppYmChangeTexStep* step = (pppYmChangeTexStep*)param_3;
+	ChangeTexMeshRef* meshes = modelRaw->m_meshes;
 	int displayListIdx;
 	int* displayListPtr;
 	int dlArrayBase;
@@ -441,9 +444,9 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 	ChangeTexMeshData* meshData;
 	ChangeTexDisplayList* displayList;
 
-	if (*(u8*)((char*)param_3 + 0x14) != 0) {
-		meshColorArrays = *(void**)((char*)param_2 + 0xc);
-		dlOffset = *(int*)((char*)param_2 + 0x1c);
+	if (step->m_payload[0] != 0) {
+		meshColorArrays = state->m_meshColorArrays;
+		dlOffset = (int)state->m_texture;
 		meshData = meshes[meshIdx].m_data;
 		displayList = meshData->m_displayLists;
 		if (meshColorArrays != 0) {
@@ -452,7 +455,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
 
-				if ((*(u8*)((char*)param_3 + 0x14) == 2) || (*(u8*)((char*)param_3 + 0x14) == 3)) {
+				if ((step->m_payload[0] == 2) || (step->m_payload[0] == 3)) {
 					*(int*)(MaterialManRaw() + 0xd0) = 0;
 				} else {
 					*(int*)(MaterialManRaw() + 0xd0) = dlOffset + 0x28;
@@ -467,7 +470,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 				displayListIdx = meshData->m_displayListCount - 1;
 				dlOffset = displayListIdx * 4;
 				while (displayListIdx >= 0) {
-					dlArrayBase = *(int*)(meshIdx * 4 + *(int*)((char*)param_2 + 0x10));
+					dlArrayBase = *(int*)(meshIdx * 4 + (int)state->m_displayListArrays);
 					*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
 					*(int*)(MaterialManRaw() + 0x128) = 0;
 					*(int*)(MaterialManRaw() + 0x12c) = tevScale;
@@ -489,7 +492,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 					*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
 
 					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-					    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
+					    &MaterialMan, modelRaw->m_data->m_materialSet, displayList->m_material, 0, 0);
 
 					displayListPtr = *(int**)(dlArrayBase + dlOffset);
 					GXCallDisplayList((void*)displayListPtr[0], (unsigned int)displayListPtr[1]);
@@ -513,12 +516,15 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
  */
 void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, int displayListIdx, float (*) [4])
 {
-	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
+	ChangeTexModelRaw* modelRaw = (ChangeTexModelRaw*)model;
+	pppYmChangeTexState* state = (pppYmChangeTexState*)param_2;
+	pppYmChangeTexStep* step = (pppYmChangeTexStep*)param_3;
+	ChangeTexMeshRef* meshes = modelRaw->m_meshes;
 	ChangeTexMeshData* meshData = meshes[meshIdx].m_data;
 	ChangeTexDisplayList* displayList = meshData->m_displayLists + displayListIdx;
-	int textureInfo = *(int*)((char*)param_2 + 0x1C);
+	int textureInfo = (int)state->m_texture;
 
-	if (*(u8*)((char*)param_3 + 0x14) == 0) {
+	if (step->m_payload[0] == 0) {
 		int drawTevBits = 0xACE0F;
 		int zero = 0;
 		int allOnes = -1;
@@ -549,9 +555,9 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 	}
 
 	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-	    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
+	    &MaterialMan, modelRaw->m_data->m_materialSet, displayList->m_material, 0, 0);
 
-	if ((*(u8*)((char*)param_3 + 0x14) == 1) || (*(u8*)((char*)param_3 + 0x14) == 0)) {
+	if ((step->m_payload[0] == 1) || (step->m_payload[0] == 0)) {
 		GXCallDisplayList(displayList->m_data, displayList->m_size);
 	}
 }

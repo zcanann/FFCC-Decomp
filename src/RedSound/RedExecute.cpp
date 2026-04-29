@@ -2474,7 +2474,7 @@ int _SeMidiNoteExecute(
 {
     int* track = (int*)trackData;
     do {
-        if ((*track != 0) && ((track[0x3F] & 8) == 0)) {
+        if (((u32)*track != 0) && ((track[0x3F] & 8) == 0)) {
             *(s16*)((u8*)track + 0x146) += (s16)(tickStep * -0x78);
             while (*(s16*)((u8*)track + 0x146) < 1) {
                 int step = frames;
@@ -2489,7 +2489,7 @@ int _SeMidiNoteExecute(
                 }
 
                 m_ChangeStatus = 0;
-                while ((*track != 0) && (track[0x42] < 1)) {
+                while (((u32)*track != 0) && (track[0x42] < 1)) {
                     int delta;
                     unsigned char* cmd;
                     *(s16*)(track + 0x51) += 1;
@@ -2497,7 +2497,7 @@ int _SeMidiNoteExecute(
                     *track = (int)(cmd + 1);
                     ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))p_MidiControl_Function[*cmd])(
                         control, keyOnData, (RedTrackDATA*)track);
-                    if (*track != 0) {
+                    if ((u32)*track != 0) {
                         delta = DeltaTimeSumup((unsigned char**)track);
                         if (delta != 0) {
                             delta += *(s16*)(track + 0x4E);

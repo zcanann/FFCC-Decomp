@@ -1186,20 +1186,25 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
 {
 	Mtx inverseMtx;
 	Vec localPosition;
-	unsigned char* mapObj = reinterpret_cast<unsigned char*>(m_mapObject);
+	unsigned char* mapObj;
 
-	if ((m_type != 0) || ((*reinterpret_cast<unsigned long*>(mapObj + 0x38) & mask) == 0)) {
+	if (m_type != 0) {
+		return;
+	}
+
+	mapObj = reinterpret_cast<unsigned char*>(m_mapObject);
+	if ((*reinterpret_cast<unsigned long*>(mapObj + 0x38) & mask) == 0) {
 		return;
 	}
 
 	s_insertLightBitIndex = bitIndex;
-	PSMTXInverse(reinterpret_cast<MtxPtr>(mapObj + 0xB8), inverseMtx);
+	PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
 	PSMTXMultVec(inverseMtx, &position, &localPosition);
 
 	s_bound.m_min.x = localPosition.x - radius;
-	s_bound.m_max.x = localPosition.x + radius;
 	s_bound.m_min.y = localPosition.y - radius;
 	s_bound.m_min.z = localPosition.z - radius;
+	s_bound.m_max.x = localPosition.x + radius;
 	s_bound.m_max.y = localPosition.y + radius;
 	s_bound.m_max.z = localPosition.z + radius;
 
@@ -1500,8 +1505,7 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 		PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
 		PSMTXMultVec(inverseMtx, &position, &localPosition);
 
-		s_bound.m_min = bound.m_min;
-		s_bound.m_max = bound.m_max;
+		s_bound = bound;
 
 		PSVECAdd(&s_bound.m_min, &localPosition, &s_bound.m_min);
 		PSVECAdd(&s_bound.m_max, &localPosition, &s_bound.m_max);
@@ -1531,87 +1535,87 @@ void ClearFlag_r(COctNode* node)
 	COctNode* child7;
 	COctNode* child8;
 
-	if (*reinterpret_cast<unsigned short*>(Ptr(node, 0x3C)) != 0) {
-		*reinterpret_cast<unsigned long*>(Ptr(node, 0x40)) &= s_clearFlagMask;
+	if (node->m_meshCount != 0) {
+		node->m_drawFlags &= s_clearFlagMask;
 	}
 
 	for (int i = 0; i < 8; i++) {
-		child1 = *reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
+		child1 = node->m_children[0];
 		if (child1 == 0) {
 			return;
 		}
-		if (*reinterpret_cast<unsigned short*>(Ptr(child1, 0x3C)) != 0) {
-			*reinterpret_cast<unsigned long*>(Ptr(child1, 0x40)) &= s_clearFlagMask;
+		if (child1->m_meshCount != 0) {
+			child1->m_drawFlags &= s_clearFlagMask;
 		}
 
 		for (int j = 0; j < 8; j++) {
-			child2 = *reinterpret_cast<COctNode**>(Ptr(child1, 0x1C));
+			child2 = child1->m_children[0];
 			if (child2 == 0) {
 				break;
 			}
-			if (*reinterpret_cast<unsigned short*>(Ptr(child2, 0x3C)) != 0) {
-				*reinterpret_cast<unsigned long*>(Ptr(child2, 0x40)) &= s_clearFlagMask;
+			if (child2->m_meshCount != 0) {
+				child2->m_drawFlags &= s_clearFlagMask;
 			}
 
 			for (int k = 0; k < 8; k++) {
-				child3 = *reinterpret_cast<COctNode**>(Ptr(child2, 0x1C));
+				child3 = child2->m_children[0];
 				if (child3 == 0) {
 					break;
 				}
-				if (*reinterpret_cast<unsigned short*>(Ptr(child3, 0x3C)) != 0) {
-					*reinterpret_cast<unsigned long*>(Ptr(child3, 0x40)) &= s_clearFlagMask;
+				if (child3->m_meshCount != 0) {
+					child3->m_drawFlags &= s_clearFlagMask;
 				}
 
 				for (int m = 0; m < 8; m++) {
-					child4 = *reinterpret_cast<COctNode**>(Ptr(child3, 0x1C));
+					child4 = child3->m_children[0];
 					if (child4 == 0) {
 						break;
 					}
-					if (*reinterpret_cast<unsigned short*>(Ptr(child4, 0x3C)) != 0) {
-						*reinterpret_cast<unsigned long*>(Ptr(child4, 0x40)) &= s_clearFlagMask;
+					if (child4->m_meshCount != 0) {
+						child4->m_drawFlags &= s_clearFlagMask;
 					}
 
 					for (int n = 0; n < 8; n++) {
-						child5 = *reinterpret_cast<COctNode**>(Ptr(child4, 0x1C));
+						child5 = child4->m_children[0];
 						if (child5 == 0) {
 							break;
 						}
-						if (*reinterpret_cast<unsigned short*>(Ptr(child5, 0x3C)) != 0) {
-							*reinterpret_cast<unsigned long*>(Ptr(child5, 0x40)) &= s_clearFlagMask;
+						if (child5->m_meshCount != 0) {
+							child5->m_drawFlags &= s_clearFlagMask;
 						}
 
 						for (int o = 0; o < 8; o++) {
-							child6 = *reinterpret_cast<COctNode**>(Ptr(child5, 0x1C));
+							child6 = child5->m_children[0];
 							if (child6 == 0) {
 								break;
 							}
-							if (*reinterpret_cast<unsigned short*>(Ptr(child6, 0x3C)) != 0) {
-								*reinterpret_cast<unsigned long*>(Ptr(child6, 0x40)) &= s_clearFlagMask;
+							if (child6->m_meshCount != 0) {
+								child6->m_drawFlags &= s_clearFlagMask;
 							}
 
 							for (int p = 0; p < 8; p++) {
-								child7 = *reinterpret_cast<COctNode**>(Ptr(child6, 0x1C));
+								child7 = child6->m_children[0];
 								if (child7 == 0) {
 									break;
 								}
-								if (*reinterpret_cast<unsigned short*>(Ptr(child7, 0x3C)) != 0) {
-									*reinterpret_cast<unsigned long*>(Ptr(child7, 0x40)) &= s_clearFlagMask;
+								if (child7->m_meshCount != 0) {
+									child7->m_drawFlags &= s_clearFlagMask;
 								}
 
 								for (int q = 0; q < 8; q++) {
-									child8 = *reinterpret_cast<COctNode**>(Ptr(child7, 0x1C));
+									child8 = child7->m_children[0];
 									if (child8 == 0) {
 										break;
 									}
-									if (*reinterpret_cast<unsigned short*>(Ptr(child8, 0x3C)) != 0) {
-										*reinterpret_cast<unsigned long*>(Ptr(child8, 0x40)) &= s_clearFlagMask;
+									if (child8->m_meshCount != 0) {
+										child8->m_drawFlags &= s_clearFlagMask;
 									}
 
 									for (int r = 0; r < 8; r++) {
-										if (*reinterpret_cast<COctNode**>(Ptr(child8, 0x1C)) == 0) {
+										if (child8->m_children[0] == 0) {
 											break;
 										}
-										ClearFlag_r(*reinterpret_cast<COctNode**>(Ptr(child8, 0x1C)));
+										ClearFlag_r(child8->m_children[0]);
 										child8 = reinterpret_cast<COctNode*>(Ptr(child8, 4));
 									}
 

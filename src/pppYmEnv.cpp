@@ -1,7 +1,7 @@
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/gobject.h"
 #include "ffcc/mapmesh.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/graphic.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"

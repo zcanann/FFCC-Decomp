@@ -1,7 +1,6 @@
 #include "ffcc/pppYmCallBack.h"
 #include "ffcc/game.h"
 #include "ffcc/partMng.h"
-#include "ffcc/p_game.h"
 
 #include <dolphin/mtx.h>
 

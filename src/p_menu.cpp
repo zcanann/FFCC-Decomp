@@ -1521,10 +1521,7 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
 
     if (font != 0) {
         u32* raw = reinterpret_cast<u32*>(font);
-        int refCount = static_cast<int>(raw[1]);
-        int nextRefCount = refCount - 1;
-        raw[1] = static_cast<u32>(nextRefCount);
-        if (refCount - 1 == 0) {
+        if (--raw[1] == 0) {
             reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(raw[0] + 8))(font, 1);
         }
         *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + slot) = 0;
@@ -1549,8 +1546,10 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
     int slotOffset = fontNo * 4;
 
     for (int i = 0; i < 0x10; i++) {
-        CTexture* texture = *reinterpret_cast<CTexture**>(*reinterpret_cast<u32*>(self + 0x100 + slotOffset) + 0x34);
-        _GXColor out = texture->GetTlutColor(i);
+        CTexture* texture =
+            *reinterpret_cast<CTexture**>(*reinterpret_cast<u32*>(self + 0x100 + slotOffset) + 0x34);
+        u8 alpha = texture->GetTlutColor(i).a;
+        _GXColor out;
 
         if (i < 9) {
             out.r = color.r;
@@ -1558,10 +1557,11 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
             out.b = color.b;
         } else {
             float blend = 1.0f - static_cast<float>(i - 9) / 10.0f;
-            out.r = static_cast<u8>(245.5f - (245.0f - static_cast<float>(color.r)) * blend);
-            out.g = static_cast<u8>(245.5f - (245.0f - static_cast<float>(color.g)) * blend);
-            out.b = static_cast<u8>(245.5f - (245.0f - static_cast<float>(color.b)) * blend);
+            out.r = static_cast<u8>(245.5f - static_cast<float>(0xF5 - color.r) * blend);
+            out.g = static_cast<u8>(245.5f - static_cast<float>(0xF5 - color.g) * blend);
+            out.b = static_cast<u8>(245.5f - static_cast<float>(0xF5 - color.b) * blend);
         }
+        out.a = alpha;
 
         texture->SetTlutColor(i, out);
     }

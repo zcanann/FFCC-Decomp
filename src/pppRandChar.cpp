@@ -6,7 +6,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-const float kPppRandCharSingleSampleScale = 2.0f;
 
 struct RandCharParam {
     s32 targetId;
@@ -40,7 +39,7 @@ extern "C" void pppRandChar(_pppPObject* basePtr, RandCharParam* in, _pppCtrlTab
         if (in->randomTwice != 0) {
             value += Math.RandF();
         } else {
-            value *= kPppRandCharSingleSampleScale;
+            value *= 2.0f;
         }
 
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);

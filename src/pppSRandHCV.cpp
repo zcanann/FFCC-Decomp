@@ -6,7 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-const float kPppSRandHCVSingleSampleScale = 2.0f;
 
 struct PppSRandHCVParam2 {
     s32 field0;
@@ -45,7 +44,7 @@ void pppSRandHCV(_pppPObject* basePtr, PppSRandHCVParam2* in, _pppCtrlTable* ctr
 			if (flag != 0) {
 				value = value + Math.RandF();
 			} else {
-				float scale = kPppSRandHCVSingleSampleScale;
+				float scale = 2.0f;
 				value = value * scale;
 			}
 			target[0] = value;
@@ -57,7 +56,7 @@ void pppSRandHCV(_pppPObject* basePtr, PppSRandHCVParam2* in, _pppCtrlTable* ctr
 			if (flag != 0) {
 				value = value + Math.RandF();
 			} else {
-				float scale = kPppSRandHCVSingleSampleScale;
+				float scale = 2.0f;
 				value = value * scale;
 			}
 			target[1] = value;
@@ -69,7 +68,7 @@ void pppSRandHCV(_pppPObject* basePtr, PppSRandHCVParam2* in, _pppCtrlTable* ctr
 			if (flag != 0) {
 				value = value + Math.RandF();
 			} else {
-				float scale = kPppSRandHCVSingleSampleScale;
+				float scale = 2.0f;
 				value = value * scale;
 			}
 			target[2] = value;
@@ -81,7 +80,7 @@ void pppSRandHCV(_pppPObject* basePtr, PppSRandHCVParam2* in, _pppCtrlTable* ctr
 			if (flag != 0) {
 				value = value + Math.RandF();
 			} else {
-				float scale = kPppSRandHCVSingleSampleScale;
+				float scale = 2.0f;
 				value = value * scale;
 			}
 			target[3] = value;

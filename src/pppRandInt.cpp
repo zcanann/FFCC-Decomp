@@ -6,7 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-const float kPppRandIntSingleSampleScale = 2.0f;
 /*
  * --INFO--
  * PAL Address: 0x80062194
@@ -41,7 +40,7 @@ void pppRandInt(_pppPObject* basePtr, PppRandIntParam2* in, _pppCtrlTable* ctrl)
         if (in->fieldC != 0) {
             value += Math.RandF();
         } else {
-            value *= kPppRandIntSingleSampleScale;
+            value *= 2.0f;
         }
 
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);

@@ -6,7 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-const float kPppSRandUpHCVDualSampleScale = 0.5f;
 struct PppSRandUpHCVParam2 {
     s32 field0;
     s32 field4;
@@ -44,7 +43,7 @@ void pppSRandUpHCV(_pppPObject* basePtr, PppSRandUpHCVParam2* in, _pppCtrlTable*
 			if (flag != 0) {
 				float random = Math.RandF();
 				float blend = value + random;
-				float scale = kPppSRandUpHCVDualSampleScale;
+				float scale = 0.5f;
 				value = blend * scale;
 			}
 			target[0] = value;
@@ -56,7 +55,7 @@ void pppSRandUpHCV(_pppPObject* basePtr, PppSRandUpHCVParam2* in, _pppCtrlTable*
 			if (flag != 0) {
 				float random = Math.RandF();
 				float blend = value + random;
-				float scale = kPppSRandUpHCVDualSampleScale;
+				float scale = 0.5f;
 				value = blend * scale;
 			}
 			target[1] = value;
@@ -68,7 +67,7 @@ void pppSRandUpHCV(_pppPObject* basePtr, PppSRandUpHCVParam2* in, _pppCtrlTable*
 			if (flag != 0) {
 				float random = Math.RandF();
 				float blend = value + random;
-				float scale = kPppSRandUpHCVDualSampleScale;
+				float scale = 0.5f;
 				value = blend * scale;
 			}
 			target[2] = value;
@@ -80,7 +79,7 @@ void pppSRandUpHCV(_pppPObject* basePtr, PppSRandUpHCVParam2* in, _pppCtrlTable*
 			if (flag != 0) {
 				float random = Math.RandF();
 				float blend = value + random;
-				float scale = kPppSRandUpHCVDualSampleScale;
+				float scale = 0.5f;
 				value = blend * scale;
 			}
 			target[3] = value;

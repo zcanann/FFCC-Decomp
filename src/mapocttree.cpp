@@ -321,12 +321,12 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 		env->m_curEnvTevBit = 0xACE0F;
 		env->m_activeEnvTevBit = 0xFFFFFFFF;
 		env->m_alphaRef = 0xFF;
-		env->m_texMapIdCurShadow = 0;
 		env->m_stdTexMapId = 0;
-		env->m_texMtxCurShadow = 0x1E;
+		env->m_texMapIdCur = 0;
 		env->m_stdTexMtx = 0x1E;
-		env->m_texCoordIdCurShadow = 0;
+		env->m_texMtxCur = 0x1E;
 		env->m_stdTexCoordId = 0;
+		env->m_texCoordIdCur = 0;
 		env->m_blendMode = 0xFF;
 		env->m_fogEnable = 0xFF;
 		env->m_lockedEnvTevBit = 0;
@@ -339,9 +339,9 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(octNode, 0x48)),
 			                           reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)));
 		}
-		env->m_texMapIdCurShadow = env->m_stdTexMapId;
-		env->m_texMtxCurShadow = env->m_stdTexMtx;
-		env->m_texCoordIdCurShadow = env->m_stdTexCoordId;
+		env->m_stdTexMapId = env->m_texMapIdCur;
+		env->m_stdTexMtx = env->m_texMtxCur;
+		env->m_stdTexCoordId = env->m_texCoordIdCur;
 		env->m_stdEnvTevBit = env->m_curEnvTevBit;
 		LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(octNode, 0x44)));
 		mapObj->SetDrawEnv();
@@ -359,12 +359,12 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			env->m_curEnvTevBit = 0xACE0F;
 			env->m_activeEnvTevBit = 0xFFFFFFFF;
 			env->m_alphaRef = 0xFF;
-			env->m_texMapIdCurShadow = 0;
 			env->m_stdTexMapId = 0;
-			env->m_texMtxCurShadow = 0x1E;
+			env->m_texMapIdCur = 0;
 			env->m_stdTexMtx = 0x1E;
-			env->m_texCoordIdCurShadow = 0;
+			env->m_texMtxCur = 0x1E;
 			env->m_stdTexCoordId = 0;
+			env->m_texCoordIdCur = 0;
 			env->m_blendMode = 0xFF;
 			env->m_fogEnable = 0xFF;
 			env->m_lockedEnvTevBit = 0;
@@ -377,9 +377,9 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 				MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x48)),
 				                           reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)));
 			}
-			env->m_texMapIdCurShadow = env->m_stdTexMapId;
-			env->m_texMtxCurShadow = env->m_stdTexMtx;
-			env->m_texCoordIdCurShadow = env->m_stdTexCoordId;
+			env->m_stdTexMapId = env->m_texMapIdCur;
+			env->m_stdTexMtx = env->m_texMtxCur;
+			env->m_stdTexCoordId = env->m_texCoordIdCur;
 			env->m_stdEnvTevBit = env->m_curEnvTevBit;
 			LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x44)));
 			mapObj->SetDrawEnv();

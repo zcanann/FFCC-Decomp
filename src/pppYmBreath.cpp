@@ -71,7 +71,7 @@ struct YmBreathParams {
     float m_colorFrameAccel1;
     float m_colorFrameAccel2;
     float m_colorFrameAccel3;
-    unsigned char _pad48[0x08];
+    unsigned char _pad48[0x04];
     float m_rotationStartX;
     float m_rotationStartY;
     unsigned char _pad58[0x08];
@@ -858,7 +858,7 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
 
     particle->m_scale += params->m_scaleAccel;
     if (params->m_disableScaleClamp == 0) {
-        float zero = 0.0f;
+        float zero = FLOAT_80330c80;
         if (zero < params->m_scaleClampStart) {
             if (params->m_scaleAccel < zero) {
                 if (particle->m_scale < zero) {
@@ -924,8 +924,8 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         memset(particleColor, 0, 0x20);
     }
 
-    baseDir.x = 0.0f;
-    baseDir.y = 0.0f;
+    baseDir.x = FLOAT_80330c80;
+    baseDir.y = FLOAT_80330c80;
     baseDir.z = FLOAT_80330C90;
 
     angle[0] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);

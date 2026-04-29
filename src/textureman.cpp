@@ -173,26 +173,6 @@ CPtrArray<CTexture*>::~CPtrArray()
 
 /*
  * --INFO--
- * PAL Address: 0x8003BE70
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CTexture*>* dtor_8003BE70(CPtrArray<CTexture*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        ptrArray->~CPtrArray<CTexture*>();
-        if (0 < param_2) {
-            __dl__FPv(ptrArray);
-        }
-    }
-    return ptrArray;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8003BECC
  * PAL Size: 112b
  * EN Address: TODO
@@ -898,26 +878,6 @@ void CTexture::CacheUnLoadTexture(CAmemCacheSet* amemCacheSet)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTexture::CacheRefCnt0UpTexture(CAmemCacheSet*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTexture::CacheDumpTexture(CAmemCacheSet*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8003B030
  * PAL Size: 44b
  * EN Address: TODO
@@ -994,16 +954,6 @@ _GXColor CTexture::GetTlutColor(int index)
     color.g = bytes[2];
     color.b = bytes[1];
     return color;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTexture::GetExternalTlutColor(void*, int, int)
-{
-	// TODO
 }
 
 /*
@@ -1105,16 +1055,6 @@ void CTexture::FlushExternalTlut(void* tlutData)
         numEntries = 0;
     }
     DCFlushRange(tlutData, numEntries << 2);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTexture::FlushExternalTlut(void*, int)
-{
-	// TODO
 }
 
 /*
@@ -1375,16 +1315,6 @@ void CTextureSet::ReleaseTextureIdx(int idx, CAmemCacheSet* amemCacheSet)
 
         SetAt__21CPtrArray_P8CTexture_FUlP8CTexture(TextureArray(m_textureArrayStorage), idx, 0);
     }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTexture::GetNumTlut()
-{
-	// TODO
 }
 
 /*

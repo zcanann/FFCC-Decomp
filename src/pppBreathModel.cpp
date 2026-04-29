@@ -49,6 +49,11 @@ struct pppBreathModel {
     unsigned char _pad[8];
 };
 
+struct BreathModelObject {
+    u8 m_pad0[0x10];
+    pppFMATRIX m_localMatrix;
+};
+
 struct BreathParticleGroup {
     int active;
     signed char* particleIndices;
@@ -277,7 +282,7 @@ extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreat
  */
 extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
 {
-    _pppPObject* object;
+    BreathModelObject* object;
     int workOffset;
     int colorOffset;
     VBreathModel* work;
@@ -294,7 +299,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     int groupCount;
     pppModelSt* model;
 
-    object = reinterpret_cast<_pppPObject*>(breathModel);
+    object = reinterpret_cast<BreathModelObject*>(breathModel);
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = reinterpret_cast<VBreathModel*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset);

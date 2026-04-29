@@ -310,8 +310,8 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             indexDouble.u[0] = 0x43300000;
             indexDouble.u[1] = (u32)(int)i ^ 0x80000000;
 
-            double t = (FLOAT_80333448 / (float)(countDouble.d - DOUBLE_80333440)) *
-                (float)(indexDouble.d - DOUBLE_80333440);
+            f32 t = (FLOAT_80333448 / (countDouble.d - DOUBLE_80333440)) *
+                (indexDouble.d - DOUBLE_80333440);
             if (GetCharaNodeFrameMatrix(pppMngStPtr, (float)t, charaMtx) == 0) {
                 emptyHistory = 1;
                 continue;
@@ -342,10 +342,11 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
         } else if (i == 0 && work->m_spawnEnabled != 0) {
             if (work->m_maxLength - FLOAT_80333458 < work->m_length) {
-                s32 partIndex = ((s32)((u8*)pppMngStPtr - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
+                _pppMngSt* mngSt = pppMngStPtr;
+                s32 partIndex = ((s32)((u8*)mngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
                 work->m_length = work->m_maxLength - FLOAT_80333458;
                 ParticleFrameCallback__5CGameFiiiiiP3Vec(
-                    &Game, partIndex, (int)pppMngStPtr->m_kind, (int)pppMngStPtr->m_nodeIndex, 3,
+                    &Game, partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3,
                     baseObj->m_graphId / 0x1000, work->m_points);
                 work->m_spawnEnabled = 0;
             }
@@ -481,7 +482,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     length = work->m_length;
 
     pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&modelView, &pppMngStPtr->m_matrix, &baseObj->m_localMatrix);
-    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, (pppFMATRIX*)&ppvCameraMatrix0, &modelView);
+    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, (pppFMATRIX*)&ppvCameraMatrix02, &modelView);
     GXLoadPosMtxImm(mtxOut.value, 0);
 
     GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
@@ -522,7 +523,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             PSMTXRotRad(tempMtx, 'z', work->m_shapeRotation);
             PSMTXConcat(shapeMtx.value, tempMtx, shapeMtx.value);
         }
-        PSMTXMultVec(ppvCameraMatrix0, work->m_points, &shapePos);
+        PSMTXMultVec(ppvCameraMatrix02, work->m_points, &shapePos);
         shapeMtx.value[0][3] = shapePos.x;
         shapeMtx.value[1][3] = shapePos.y;
         shapeMtx.value[2][3] = shapePos.z;
@@ -545,7 +546,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
         }
 
-        GXLoadPosMtxImm(ppvCameraMatrix0, GX_PNMTX0);
+        GXLoadPosMtxImm(ppvCameraMatrix02, GX_PNMTX0);
         alphaMax = step->m_payload[0x2b];
         alphaStep = (u8)((u32)alphaMax / step->m_payload[0x1e]);
         colorBase = *(u32*)(step->m_payload + 0x28) & 0xFFFFFF00;
@@ -619,7 +620,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
             PSMTXConcat(baseObj->m_localMatrix.value, tempMtx, tempMtx);
             PSMTXConcat(pppMngStPtr->m_matrix.value, tempMtx, tempMtx);
-            PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
+            PSMTXConcat(ppvCameraMatrix02, tempMtx, tempMtx);
             shapePos.x = kPppLaserZero;
             shapePos.y = kPppLaserZero;
             shapePos.z = FLOAT_8033342c;
@@ -642,14 +643,14 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
                 tempMtx[0][3] = points[i].x;
                 tempMtx[1][3] = points[i].y;
                 tempMtx[2][3] = points[i].z;
-                PSMTXConcat(ppvCameraMatrix0, tempMtx, sphereMtx);
+                PSMTXConcat(ppvCameraMatrix02, tempMtx, sphereMtx);
                 Graphic.DrawSphere(sphereMtx, debugColor);
             }
 
             tempMtx[0][3] = work->m_origin.x;
             tempMtx[1][3] = work->m_origin.y;
             tempMtx[2][3] = work->m_origin.z;
-            PSMTXConcat(ppvCameraMatrix0, tempMtx, sphereMtx);
+            PSMTXConcat(ppvCameraMatrix02, tempMtx, sphereMtx);
             Graphic.DrawSphere(sphereMtx, debugColor);
             pppInitBlendMode();
         }

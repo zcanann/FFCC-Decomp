@@ -49,7 +49,7 @@ class CMenuPcs
 	void CmakeTribeDraw();
 
 	void CmakeJobOpen();
-	void CmakeJobCtrl();
+	unsigned short CmakeJobCtrl();
 	void CmakeJobClose();
 	void CmakeJobDraw();
 

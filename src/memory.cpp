@@ -1544,10 +1544,10 @@ void CAmemCacheSet::Init(char* sourceName, CMemory::CStage* rStage, CMemory::CSt
 {
     strcpy(m_name, sourceName);
 
-    m_releaseCheck = releaseCheck;
-    m_releaseCheckArg = releaseCheckArg;
     m_releaseAction = releaseAction;
     m_releaseActionArg = releaseActionArg;
+    m_releaseCheck = releaseCheck;
+    m_releaseCheckArg = releaseCheckArg;
     m_overflowHook = overflowHook;
     m_overflowHookArg = overflowHookArg;
     m_rStage = rStage;

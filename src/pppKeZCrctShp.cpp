@@ -7,7 +7,7 @@ extern const float kPppKeShpTail2XAlphaScale = 16384.0f;
 
 struct pppKeZCrctShpObject {
     u8 _pad0[0xc];
-    _pppPObject m_object;
+    _pppPObjectHead m_object;
 };
 
 /*

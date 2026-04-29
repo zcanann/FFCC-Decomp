@@ -7,6 +7,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/p_light.h"
 #include "ffcc/texanim.h"
+#include "ffcc/textureman.h"
 
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <math.h>
@@ -1320,9 +1321,9 @@ void CChara::CModel::calcBindMatrix()
  */
 void CChara::CModel::CalcMatrix()
 {
-	float(*localMtx)[4] = (float(*)[4])((u8*)this + 0x14);
-	float(*worldBaseMtx)[4] = (float(*)[4])((u8*)this + 0x44);
-	float(*drawMtx)[4] = (float(*)[4])((u8*)this + 0x74);
+	float(*localMtx)[4] = (float(*)[4])((u8*)this + 0x08);
+	float(*worldBaseMtx)[4] = (float(*)[4])((u8*)this + 0x38);
+	float(*drawMtx)[4] = (float(*)[4])((u8*)this + 0x68);
 	const float zero = FLOAT_803301b0;
 	const float one = FLOAT_803301bc;
 
@@ -2141,13 +2142,14 @@ void CChara::CModel::CalcInterpFrame()
 void CChara::CModel::CalcSafeNodeWorldMatrix(float (*outMtx) [4], CChara::CNode* node)
 {
 	u8 flags = *(u8*)((u8*)this + 0xA0);
-	if ((flags & 0x40) != 0) {
-		PSMTXCopy((float(*)[4])((u8*)node + 0x44), outMtx);
-		outMtx[0][3] += *(float*)((u8*)this + 0x80);
-		outMtx[1][3] += *(float*)((u8*)this + 0x90);
-		outMtx[2][3] += *(float*)((u8*)this + 0xA0);
+	s8 safeNodeFlag = static_cast<s32>((static_cast<u32>(flags) << 26) & 0xC0000000) >> 31;
+	if (safeNodeFlag != 0) {
+		PSMTXCopy((float(*)[4])((u8*)node + 0x6C), outMtx);
+		outMtx[0][3] += *(float*)((u8*)this + 0x74);
+		outMtx[1][3] += *(float*)((u8*)this + 0x84);
+		outMtx[2][3] += *(float*)((u8*)this + 0x94);
 	} else {
-		PSMTXCopy((float(*)[4])((u8*)this + 0x14), outMtx);
+		PSMTXCopy((float(*)[4])((u8*)this + 0x08), outMtx);
 	}
 }
 
@@ -2281,8 +2283,8 @@ void CChara::CModel::AttachTextureSet(CTextureSet* texSet)
 			int* refData = reinterpret_cast<int*>(oldTexSet);
 			int refCount = refData[1] - 1;
 			refData[1] = refCount;
-			if ((refCount == 0) && (oldTexSet != 0)) {
-				(*(void (**)(void*, int))(*refData + 8))(oldTexSet, 1);
+			if (refCount == 0) {
+				delete oldTexSet;
 			}
 			m_texSet = 0;
 		}

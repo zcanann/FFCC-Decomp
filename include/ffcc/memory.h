@@ -17,6 +17,21 @@ public:
     class CStage
     {
     public:
+        CStage* m_prev;
+        CStage* m_next;
+        unsigned long m_heapTop;
+        unsigned long m_heapBottom;
+        char m_allocationSourceStr[0xF8];
+        unsigned long m_group;
+        int m_allocationMode;
+        int m_heapHead;
+        int m_heapTail;
+        int m_unknown118;
+        int m_unknown11C;
+        int m_blockCount;
+        int m_allocCount;
+        unsigned long m_defaultParam;
+
         void initBlock();
         void quitBlock();
         void* alloc(unsigned long, char*, unsigned long, int);
@@ -61,6 +76,18 @@ private:
 class CAmemCache
 {
 public:
+    void* m_cacheData;
+    void* m_workData;
+    int m_size;
+    short m_refCount;
+    unsigned char m_inUse;
+    unsigned char m_type;
+    int m_priority;
+    int m_checksum;
+    unsigned short m_refCnt0;
+    unsigned char m_dmaCopy;
+    unsigned char m_pad1B;
+
     enum TYPE
     {
         TODO,
@@ -78,6 +105,23 @@ public:
 class CAmemCacheSet
 {
 public:
+    char m_name[0x20];
+    CMemory::CStage* m_rStage;
+    CMemory::CStage* m_stage;
+    unsigned long m_amemStart;
+    unsigned long m_amemEnd;
+    unsigned long m_amemCursor;
+    unsigned long m_amemPrev;
+    unsigned long m_amemLock;
+    int m_cacheCount;
+    unsigned char (*m_releaseCheck)(unsigned long);
+    unsigned long m_releaseCheckArg;
+    unsigned char (*m_releaseAction)(unsigned long);
+    unsigned long m_releaseActionArg;
+    unsigned char (*m_overflowHook)(unsigned long);
+    unsigned long m_overflowHookArg;
+    CAmemCache* m_cacheTable;
+
     void Init(char*, CMemory::CStage* rStage, CMemory::CStage* stage, int,
               unsigned char (*)(unsigned long), unsigned long,
               unsigned char (*)(unsigned long), unsigned long,
@@ -105,8 +149,6 @@ public:
     void AssertCache();
     void DumpCache();
 
-private:
-    u8 m_storage[0x5C];
 };
 
 void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int line);

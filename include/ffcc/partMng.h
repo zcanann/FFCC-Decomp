@@ -113,26 +113,17 @@ struct _PARTICLE_DATA
 };
 typedef _PARTICLE_DATA PARTICLE_DATA;
 
+struct _pppPDataVal;
+struct _pppCtrlTable;
+
 // The fixed 0x34-byte prefix that wrapper types embed by value when they
-// continue with their own fields after it. The full _pppPObject (used as
-// the callback parameter type) extends this with a per-instance work-area
-// block at offset 0x80.
+// continue with their own fields after it. Allocated _pppPObject instances
+// include link fields before this graph id and matrix block.
 struct _pppPObjectHead
 {
     s32 m_graphId;              // 0x0
     pppFMATRIX m_localMatrix;   // 0x4 (size 0x30)
 };
-
-struct _pppPObject
-{
-    s32 m_graphId;              // 0x0
-    pppFMATRIX m_localMatrix;   // 0x4 (size 0x30)
-    char m_pad34[0x80 - 0x34];  // 0x34
-    u8 m_workArea[1];           // 0x80 - per-instance work block, indexed by _pppCtrlTable::m_serializedDataOffsets[N]
-};
-
-struct _pppPDataVal;
-struct _pppCtrlTable;
 
 // Doubly-linked list head for the active _pppPObject instances owned by
 // a _pppPDataVal. The head sits inline inside _pppMngSt at 0xC4.
@@ -142,6 +133,15 @@ struct _pppPObjLink
     _pppPObjLink* m_previous; // 0x4
     _pppPDataVal* m_owner;    // 0x8
 }; // Size 0xc
+
+struct _pppPObject
+{
+    _pppPObjLink m_link;        // 0x0
+    s32 m_graphId;              // 0xc
+    pppFMATRIX m_localMatrix;   // 0x10 (size 0x30)
+    char m_pad40[0x80 - 0x40];  // 0x40
+    u8 m_workArea[1];           // 0x80 - per-instance work block, indexed by _pppCtrlTable::m_serializedDataOffsets[N]
+};
 
 typedef void (*pppProgAnyCallback)(void);
 typedef void (*pppProgOperationCallback)(_pppPObject*, void*, _pppCtrlTable*);

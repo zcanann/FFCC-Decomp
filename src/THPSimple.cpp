@@ -637,8 +637,11 @@ void __THPSimpleDVDCallback(long result, DVDFileInfo*)
         SimpleControl.readOffset += SimpleControl.readSize;
 
         oldReadIndex = SimpleControl.readIndex;
-        SimpleControl.readIndex = (SimpleControl.readIndex + 1) & 7;
         SimpleControl.readSize = *reinterpret_cast<s32*>(SimpleControl.readBuffer[oldReadIndex].mPtr);
+        {
+            s32 next = SimpleControl.readIndex + 1;
+            SimpleControl.readIndex = (next >= 8) ? 0 : next;
+        }
 
         if ((SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) && (SimpleControl.readError == 0) &&
             (SimpleControl.isPreLoaded == 1)) {

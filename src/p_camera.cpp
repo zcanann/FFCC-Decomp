@@ -21,6 +21,10 @@
 
 CCameraPcs CameraPcs;
 
+extern "C" void* __vt__8CManager[];
+extern "C" void* __vt__8CProcess[];
+extern "C" void* __vt__10CCameraPcs[];
+
 extern "C" void create__10CCameraPcsFv(CCameraPcs*);
 extern "C" void destroy__10CCameraPcsFv(CCameraPcs*);
 extern "C" void calc__10CCameraPcsFv(CCameraPcs*);
@@ -54,7 +58,7 @@ const char s_CCameraPcs_MAP_801D7888[] = "CCameraPcs(MAP)";
 const char s_CCameraPcs_MATERIALEDITOR_801D7898[] = "CCameraPcs(MATERIALEDITOR)";
 const char s_CCameraPcs_FUNNYSHAPE_801D78B4[] = "CCameraPcs(FUNNYSHAPE)";
 const char s_CCameraPcs_PART_801D78CC[] = "CCameraPcs(PART)";
-const char s_CCameraPcs_SHADOW_801D78E0[20] = "CCameraPcs(SHADOW)";
+const char s_CCameraPcs_SHADOW_801D78E0[] = "CCameraPcs(SHADOW)";
 
 extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;
@@ -163,6 +167,108 @@ extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
 void pppEditGetViewMatrix__FPA4_f(float (*)[4]);
 void pppEditGetProjectionMatrix__FPA4_f(float (*)[4]);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003A250
+ * PAL Size: 940b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_camera_cpp(void)
+{
+    u8* self = reinterpret_cast<u8*>(&CameraPcs);
+    unsigned int* dst = &PTR_s_CCameraPcs_GAME__801e915c[0][0];
+
+    *reinterpret_cast<void**>(self) = __vt__8CManager;
+    *reinterpret_cast<void**>(self) = __vt__8CProcess;
+    *reinterpret_cast<void**>(self) = __vt__10CCameraPcs;
+
+    *reinterpret_cast<float*>(self + 0x414) = FLOAT_8032fa78;
+    *reinterpret_cast<float*>(self + 0x418) = FLOAT_8032fa78;
+    *reinterpret_cast<float*>(self + 0x41C) = FLOAT_8032fa78;
+    *reinterpret_cast<float*>(self + 0x420) = FLOAT_8032fa7c;
+    *reinterpret_cast<float*>(self + 0x424) = FLOAT_8032fa7c;
+    *reinterpret_cast<float*>(self + 0x428) = FLOAT_8032fa7c;
+
+    dst[0x004 / 4] = m_table_desc0__10CCameraPcs[0];
+    dst[0x008 / 4] = m_table_desc0__10CCameraPcs[1];
+    dst[0x00C / 4] = m_table_desc0__10CCameraPcs[2];
+    dst[0x010 / 4] = m_table_desc1__10CCameraPcs[0];
+    dst[0x014 / 4] = m_table_desc1__10CCameraPcs[1];
+    dst[0x018 / 4] = m_table_desc1__10CCameraPcs[2];
+    dst[0x01C / 4] = m_table_desc2__10CCameraPcs[0];
+    dst[0x020 / 4] = m_table_desc2__10CCameraPcs[1];
+    dst[0x024 / 4] = m_table_desc2__10CCameraPcs[2];
+    dst[0x030 / 4] = m_table_desc3__10CCameraPcs[0];
+    dst[0x034 / 4] = m_table_desc3__10CCameraPcs[1];
+    dst[0x038 / 4] = m_table_desc3__10CCameraPcs[2];
+    dst[0x03C / 4] = m_table_desc4__10CCameraPcs[0];
+    dst[0x040 / 4] = m_table_desc4__10CCameraPcs[1];
+    dst[0x044 / 4] = m_table_desc4__10CCameraPcs[2];
+    dst[0x160 / 4] = m_table_desc5__10CCameraPcs[0];
+    dst[0x164 / 4] = m_table_desc5__10CCameraPcs[1];
+    dst[0x168 / 4] = m_table_desc5__10CCameraPcs[2];
+    dst[0x16C / 4] = m_table_desc6__10CCameraPcs[0];
+    dst[0x170 / 4] = m_table_desc6__10CCameraPcs[1];
+    dst[0x174 / 4] = m_table_desc6__10CCameraPcs[2];
+    dst[0x178 / 4] = m_table_desc7__10CCameraPcs[0];
+    dst[0x17C / 4] = m_table_desc7__10CCameraPcs[1];
+    dst[0x180 / 4] = m_table_desc7__10CCameraPcs[2];
+    dst[0x2BC / 4] = m_table_desc8__10CCameraPcs[0];
+    dst[0x2C0 / 4] = m_table_desc8__10CCameraPcs[1];
+    dst[0x2C4 / 4] = m_table_desc8__10CCameraPcs[2];
+    dst[0x2C8 / 4] = m_table_desc9__10CCameraPcs[0];
+    dst[0x2CC / 4] = m_table_desc9__10CCameraPcs[1];
+    dst[0x2D0 / 4] = m_table_desc9__10CCameraPcs[2];
+    dst[0x2D4 / 4] = m_table_desc10__10CCameraPcs[0];
+    dst[0x2D8 / 4] = m_table_desc10__10CCameraPcs[1];
+    dst[0x2DC / 4] = m_table_desc10__10CCameraPcs[2];
+    dst[0x418 / 4] = m_table_desc11__10CCameraPcs[0];
+    dst[0x41C / 4] = m_table_desc11__10CCameraPcs[1];
+    dst[0x420 / 4] = m_table_desc11__10CCameraPcs[2];
+    dst[0x424 / 4] = m_table_desc12__10CCameraPcs[0];
+    dst[0x428 / 4] = m_table_desc12__10CCameraPcs[1];
+    dst[0x42C / 4] = m_table_desc12__10CCameraPcs[2];
+    dst[0x430 / 4] = m_table_desc13__10CCameraPcs[0];
+    dst[0x434 / 4] = m_table_desc13__10CCameraPcs[1];
+    dst[0x438 / 4] = m_table_desc13__10CCameraPcs[2];
+    dst[0x574 / 4] = m_table_desc14__10CCameraPcs[0];
+    dst[0x578 / 4] = m_table_desc14__10CCameraPcs[1];
+    dst[0x57C / 4] = m_table_desc14__10CCameraPcs[2];
+    dst[0x580 / 4] = m_table_desc15__10CCameraPcs[0];
+    dst[0x584 / 4] = m_table_desc15__10CCameraPcs[1];
+    dst[0x588 / 4] = m_table_desc15__10CCameraPcs[2];
+    dst[0x58C / 4] = m_table_desc16__10CCameraPcs[0];
+    dst[0x590 / 4] = m_table_desc16__10CCameraPcs[1];
+    dst[0x594 / 4] = m_table_desc16__10CCameraPcs[2];
+    dst[0x6D0 / 4] = m_table_desc17__10CCameraPcs[0];
+    dst[0x6D4 / 4] = m_table_desc17__10CCameraPcs[1];
+    dst[0x6D8 / 4] = m_table_desc17__10CCameraPcs[2];
+    dst[0x6DC / 4] = m_table_desc18__10CCameraPcs[0];
+    dst[0x6E0 / 4] = m_table_desc18__10CCameraPcs[1];
+    dst[0x6E4 / 4] = m_table_desc18__10CCameraPcs[2];
+    dst[0x6E8 / 4] = m_table_desc19__10CCameraPcs[0];
+    dst[0x6EC / 4] = m_table_desc19__10CCameraPcs[1];
+    dst[0x6F0 / 4] = m_table_desc19__10CCameraPcs[2];
+    dst[0x82C / 4] = m_table_desc20__10CCameraPcs[0];
+    dst[0x830 / 4] = m_table_desc20__10CCameraPcs[1];
+    dst[0x834 / 4] = m_table_desc20__10CCameraPcs[2];
+    dst[0x838 / 4] = m_table_desc21__10CCameraPcs[0];
+    dst[0x83C / 4] = m_table_desc21__10CCameraPcs[1];
+    dst[0x840 / 4] = m_table_desc21__10CCameraPcs[2];
+    dst[0x844 / 4] = m_table_desc22__10CCameraPcs[0];
+    dst[0x848 / 4] = m_table_desc22__10CCameraPcs[1];
+    dst[0x84C / 4] = m_table_desc22__10CCameraPcs[2];
+    dst[0x858 / 4] = m_table_desc23__10CCameraPcs[0];
+    dst[0x85C / 4] = m_table_desc23__10CCameraPcs[1];
+    dst[0x860 / 4] = m_table_desc23__10CCameraPcs[2];
+    dst[0x880 / 4] = m_table_desc24__10CCameraPcs[0];
+    dst[0x884 / 4] = m_table_desc24__10CCameraPcs[1];
+    dst[0x888 / 4] = m_table_desc24__10CCameraPcs[2];
 }
 
 /*
@@ -300,18 +406,19 @@ void CCameraPcs::onScriptChanging(char*)
 void CCameraPcs::onScriptChanged(char*, int fromScript)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    float zero = FLOAT_8032fa34;
     MtxPtr mathMtx = reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&Math) + 4);
 
     PSMTXCopy(mathMtx, reinterpret_cast<MtxPtr>(self + 0x34));
     PSMTXInverse(mathMtx, reinterpret_cast<MtxPtr>(self + 0x64));
 
+    float refValue = FLOAT_8032fa88;
+    float zero = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xDC) = zero;
     *reinterpret_cast<float*>(self + 0xD8) = zero;
     *reinterpret_cast<float*>(self + 0xD4) = zero;
     *reinterpret_cast<float*>(self + 0xE0) = zero;
-    *reinterpret_cast<float*>(self + 0xE4) = FLOAT_8032fa88;
-    *reinterpret_cast<float*>(self + 0xE8) = FLOAT_8032fa88;
+    *reinterpret_cast<float*>(self + 0xE4) = refValue;
+    *reinterpret_cast<float*>(self + 0xE8) = refValue;
 
     if (fromScript != 0) {
         *reinterpret_cast<int*>(self + 0x444) = 1;
@@ -804,16 +911,23 @@ void CCameraPcs::SetViewerSRT(const SRT* srt)
 {
     u32* dst = reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x448);
     const u32* src = reinterpret_cast<const u32*>(srt);
-
+    u32 value1 = src[1];
     dst[0] = src[0];
-    dst[1] = src[1];
-    dst[2] = src[2];
-    dst[3] = src[3];
-    dst[4] = src[4];
-    dst[5] = src[5];
-    dst[6] = src[6];
-    dst[7] = src[7];
-    dst[8] = src[8];
+    u32 value2 = src[2];
+    dst[1] = value1;
+    value1 = src[3];
+    dst[2] = value2;
+    value2 = src[4];
+    dst[3] = value1;
+    value1 = src[5];
+    dst[4] = value2;
+    u32 value3 = src[6];
+    dst[5] = value1;
+    value2 = src[7];
+    dst[6] = value3;
+    value1 = src[8];
+    dst[7] = value2;
+    dst[8] = value1;
     *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x46C) = 1;
 }
 

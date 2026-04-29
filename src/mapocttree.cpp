@@ -700,19 +700,22 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 	float localX = m_localPosX;
 	float localY = m_localPosY;
 	float localZ = m_localPosZ;
+	unsigned int andMask;
+	int farCount;
 	unsigned int orMask;
 
-	if (((octNode->m_boundMaxX < localX) || (octNode->m_boundMaxY < localY) ||
-	     (octNode->m_boundMaxZ < localZ)) ||
-	    ((localX < octNode->m_boundMinX) || (localY < octNode->m_boundMinY) ||
-	     (localZ < octNode->m_boundMinZ))) {
+	if ((localX <= octNode->m_boundMaxX) && (localY <= octNode->m_boundMaxY) &&
+	    (localZ <= octNode->m_boundMaxZ) && (octNode->m_boundMinX <= localX) &&
+	    (octNode->m_boundMinY <= localY) && (octNode->m_boundMinZ <= localZ)) {
+		orMask = 0xF;
+	} else {
 		Vec localCorner;
 		Vec viewPos;
 		float maxDepth = kOctTreeBoundMinInit;
 		float minDepth = kOctTreeBoundMaxInit;
-		unsigned int andMask = 0xF;
-		int farCount = 0;
 
+		andMask = 0xF;
+		farCount = 0;
 		orMask = 0;
 
 		for (int x = 0; x < 2; x++) {
@@ -726,47 +729,39 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 					localCorner.z = (z == 0) ? octNode->m_boundMinZ : octNode->m_boundMaxZ;
 					PSMTXMultVec(reinterpret_cast<float(*)[4]>(m_pad0C), &localCorner, &viewPos);
 
-					depth = static_cast<double>(viewPos.z);
 					if (maxDepth < viewPos.z) {
 						maxDepth = viewPos.z;
 					}
 
-					if (depth <= static_cast<double>(minDepth)) {
-						if (static_cast<double>(viewPos.x) <= -depth) {
-							if (depth <= static_cast<double>(viewPos.x)) {
-								clipFlags = 0;
-							} else {
-								clipFlags = 2;
-							}
+					depth = static_cast<double>(viewPos.z);
+					if (minDepth < viewPos.z) {
+						farCount++;
+						if (-depth < static_cast<double>(viewPos.x)) {
+							clipFlags = 0x11;
+						} else if (static_cast<double>(viewPos.x) < depth) {
+							clipFlags = 0x12;
 						} else {
-							clipFlags = 1;
+							clipFlags = 0x10;
 						}
 
-						if (static_cast<double>(viewPos.y) <= -depth) {
-							if (static_cast<double>(viewPos.y) < depth) {
-								clipFlags |= 8;
-							}
-						} else {
-							clipFlags |= 4;
+						if (-depth < static_cast<double>(viewPos.y)) {
+							clipFlags |= 0x14;
+						} else if (static_cast<double>(viewPos.y) < depth) {
+							clipFlags |= 0x18;
 						}
 					} else {
-						farCount++;
-						if (static_cast<double>(viewPos.x) <= -depth) {
-							if (depth <= static_cast<double>(viewPos.x)) {
-								clipFlags = 0x10;
-							} else {
-								clipFlags = 0x12;
-							}
+						if (-depth < static_cast<double>(viewPos.x)) {
+							clipFlags = 1;
+						} else if (static_cast<double>(viewPos.x) < depth) {
+							clipFlags = 2;
 						} else {
-							clipFlags = 0x11;
+							clipFlags = 0;
 						}
 
-						if (static_cast<double>(viewPos.y) <= -depth) {
-							if (static_cast<double>(viewPos.y) < depth) {
-								clipFlags |= 0x18;
-							}
-						} else {
-							clipFlags |= 0x14;
+						if (-depth < static_cast<double>(viewPos.y)) {
+							clipFlags |= 4;
+						} else if (static_cast<double>(viewPos.y) < depth) {
+							clipFlags |= 8;
 						}
 					}
 
@@ -785,8 +780,6 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 		if (andMask != 0) {
 			return;
 		}
-	} else {
-		orMask = 0xF;
 	}
 
 	if (octNode->m_meshCount != 0) {
@@ -823,48 +816,43 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
  */
 void COctTree::Draw(unsigned char drawType)
 {
-	unsigned char* thisBytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* mapObj;
 	unsigned char* mapMng;
 	unsigned char* bumpLight;
 
-	if (*thisBytes != 0) {
-		return;
-	}
+	if (m_type == 0) {
+		mapObj = reinterpret_cast<unsigned char*>(m_mapObject);
+		if ((mapObj[0x15] == drawType) && ((mapObj[0x18] & 1) != 0)) {
+			mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+			bumpLight = *reinterpret_cast<unsigned char**>(mapObj + 0x10);
+			if ((mapMng[0x2298A] != 0) && (bumpLight != 0) && (bumpLight[0xB1] == 2)) {
+				MaterialMan.SetUnderWaterTex();
+				mapMng[0x2298A] = 0;
+			}
 
-	mapObj = *reinterpret_cast<unsigned char**>(thisBytes + 8);
-	if ((mapObj[0x15] != drawType) || ((mapObj[0x18] & 1) == 0)) {
-		return;
-	}
+			LightPcs.SetBumpTexMatirx(reinterpret_cast<float(*)[4]>(mapObj + 0xB8),
+			                          reinterpret_cast<CLightPcs::CBumpLight*>(*reinterpret_cast<void**>(mapObj + 0x10)),
+			                          reinterpret_cast<Vec*>(mapObj + 0x58), mapObj[0x1A]);
 
-	mapMng = reinterpret_cast<unsigned char*>(&MapMng);
-	bumpLight = *reinterpret_cast<unsigned char**>(mapObj + 0x10);
-	if ((mapMng[0x2298A] != 0) && (bumpLight != 0) && (bumpLight[0xB1] == 2)) {
-		MaterialMan.SetUnderWaterTex();
-		mapMng[0x2298A] = 0;
-	}
+			if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(mapObj + 0x40)) {
+				CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
+			}
 
-	LightPcs.SetBumpTexMatirx(reinterpret_cast<float(*)[4]>(mapObj + 0xB8),
-	                          reinterpret_cast<CLightPcs::CBumpLight*>(*reinterpret_cast<void**>(mapObj + 0x10)),
-	                          reinterpret_cast<Vec*>(mapObj + 0x58), mapObj[0x1A]);
+			if (mapObj[0x27] != 0) {
+				GXSetZMode(1, GX_LEQUAL, 0);
+			}
 
-	if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(mapObj + 0x40)) {
-		CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
-	}
+			reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(mapObj + 0xC))->SetRenderArray();
+			DrawTypeMeshFlag_r(m_nodePool);
 
-	if (mapObj[0x27] != 0) {
-		GXSetZMode(1, GX_LEQUAL, 0);
-	}
+			if (mapObj[0x27] != 0) {
+				GXSetZMode(1, GX_LEQUAL, 1);
+			}
 
-	reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(mapObj + 0xC))->SetRenderArray();
-	DrawTypeMeshFlag_r(*reinterpret_cast<COctNode**>(thisBytes + 4));
-
-	if (mapObj[0x27] != 0) {
-		GXSetZMode(1, GX_LEQUAL, 1);
-	}
-
-	if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(mapObj + 0x40)) {
-		CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
+			if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(mapObj + 0x40)) {
+				CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
+			}
+		}
 	}
 }
 
@@ -1471,19 +1459,18 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 {
 	Vec localPosition;
 	Mtx inverseMtx;
-	float* srcBound = reinterpret_cast<float*>(&bound);
 
 	if (m_type == 0) {
 		s_insertShadowBitIndex = bitIndex;
 		PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
 		PSMTXMultVec(inverseMtx, &position, &localPosition);
 
-		s_bound.m_min.x = srcBound[0];
-		s_bound.m_min.y = srcBound[1];
-		s_bound.m_min.z = srcBound[2];
-		s_bound.m_max.x = srcBound[3];
-		s_bound.m_max.y = srcBound[4];
-		s_bound.m_max.z = srcBound[5];
+		s_bound.m_min.x = bound.m_min.x;
+		s_bound.m_min.y = bound.m_min.y;
+		s_bound.m_min.z = bound.m_min.z;
+		s_bound.m_max.x = bound.m_max.x;
+		s_bound.m_max.y = bound.m_max.y;
+		s_bound.m_max.z = bound.m_max.z;
 
 		PSVECAdd(&s_bound.m_min, &localPosition, &s_bound.m_min);
 		PSVECAdd(&s_bound.m_max, &localPosition, &s_bound.m_max);

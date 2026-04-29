@@ -670,7 +670,7 @@ config.libs = [
             Object(NonMatching, "pppRandDownIV.cpp"),
             Object(Matching, "pppRandDownShort.cpp"),
             Object(Matching, "pppRandFloat.cpp"),
-            Object(NonMatching, "pppRandFV.cpp"),
+            Object(Matching, "pppRandFV.cpp"),
             Object(NonMatching, "pppRandHCV.cpp"),
             Object(Matching, "pppRandInt.cpp"),
             Object(NonMatching, "pppRandIV.cpp"),

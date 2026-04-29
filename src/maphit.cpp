@@ -40,14 +40,14 @@ CMapHitFace* g_hit_lpface_min;
  * JP Address: TODO
  * JP Size: TODO
  */
-void FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder& cyl, float& outT)
+int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder& cyl, float& outT)
 {
-    outT = -1.0f;
+    outT = 0.0f;
 
     Vec axis = cyl.m_direction2;
     f32 axisLen = PSVECMag(&axis);
     if (axisLen <= 0.0f) {
-        return;
+        return 0;
     }
     PSVECScale(&axis, &axis, 1.0f / axisLen);
 
@@ -134,6 +134,7 @@ void FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder
     }
 
     outT = bestT;
+    return bestT >= 0.0f;
 }
 
 /*

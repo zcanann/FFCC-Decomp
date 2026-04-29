@@ -179,7 +179,7 @@ int RedNewA(int size, int offset, int maxSize)
 	int* bestBlock;
 	int* blockPtr;
 
-	if ((size < 1) || (m_AMemoryBank == 0) || (m_ADataBuffer == 0)) {
+	if ((size < 1) || (m_AMemoryBank == 0) || ((unsigned int)m_ADataBuffer == 0)) {
 		return 0;
 	}
 	if (m_AMemoryBank[0x7FF] > 0) {

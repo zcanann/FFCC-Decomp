@@ -135,11 +135,26 @@ void CFunnyShapePcs::SetUSBData()
         m_textureHeaders[m_textureCount] = textureHeader;
 
         memcpy(tmp, usb->m_data, usb->m_sizeBytes);
-        for (int i = 0; i < 8; i++) {
-            tmp[i] = LoadSwap16(tmp[i]);
-        }
-        reinterpret_cast<u16*>(tmp)[0x10] = LoadSwapU16(reinterpret_cast<u16*>(tmp)[0x10]);
-        reinterpret_cast<u16*>(tmp)[0x11] = LoadSwapU16(reinterpret_cast<u16*>(tmp)[0x11]);
+        s16 header0 = tmp[0];
+        tmp[0] = LoadSwap16(header0);
+        s16 header1 = tmp[1];
+        tmp[1] = LoadSwap16(header1);
+        s16 header2 = tmp[2];
+        tmp[2] = LoadSwap16(header2);
+        s16 header3 = tmp[3];
+        tmp[3] = LoadSwap16(header3);
+        s16 header4 = tmp[4];
+        tmp[4] = LoadSwap16(header4);
+        s16 header5 = tmp[5];
+        tmp[5] = LoadSwap16(header5);
+        s16 header6 = tmp[6];
+        tmp[6] = LoadSwap16(header6);
+        s16 header7 = tmp[7];
+        tmp[7] = LoadSwap16(header7);
+        u16 header10 = reinterpret_cast<u16*>(tmp)[0x10];
+        reinterpret_cast<u16*>(tmp)[0x10] = LoadSwapU16(header10);
+        u16 header11 = reinterpret_cast<u16*>(tmp)[0x11];
+        reinterpret_cast<u16*>(tmp)[0x11] = LoadSwapU16(header11);
 
         DCFlushRange(tmp, 0x30);
         memcpy(m_textureHeaders[m_textureCount], tmp, 0x30);

@@ -15,14 +15,11 @@ extern const float kMapCameraCenterYOffset;
 class CMapPcs : public CSamplePcs
 {
 public:
-    CMapPcs();
-	
     void Init();
     void Quit();
     int GetTable(unsigned long);
     void create();
     void createViewer();
-    void LoadMap(char*, void*, unsigned long, unsigned char);
     void LoadMap(int, int, void*, unsigned long, unsigned char);
     unsigned long long IsLoadMapCompleted();
     void destroy();
@@ -36,7 +33,6 @@ public:
     void drawViewer();
     void drawAfter();
     void drawAfterViewer();
-    void GetMapLightHolder(long, _GXColor*, Vec*);
 
 private:
     Mtx m_viewMtx;                       // 0x04

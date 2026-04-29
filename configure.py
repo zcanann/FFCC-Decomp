@@ -748,7 +748,7 @@ config.libs = [
                 ],
             ),
             Object(NonMatching, "THPSimple.cpp"),
-            Object(NonMatching, "usb.cpp", extra_cflags=["-RTTI on"]),
+            Object(NonMatching, "usb.cpp"),
             Object(Matching, "USBStreamData.cpp"),
             Object(NonMatching, "util.cpp", extra_cflags=["-RTTI on"]),
             Object(Matching, "vector.cpp", mw_version="GC/2.6"),

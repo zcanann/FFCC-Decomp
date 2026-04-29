@@ -393,10 +393,13 @@ CMaterial* CPtrArray<CMaterial*>::GetAt(unsigned long index)
 unsigned short CPad::GetButtonDown(long padIndex)
 {
     bool shouldZero = false;
-    unsigned short result;
+    unsigned int result;
 
     if (_452_4_ == 0) {
-        if ((padIndex == 0) && (_448_4_ == -1)) {
+        if (padIndex != 0) {
+            goto read_slot;
+        }
+        if (_448_4_ == -1) {
             goto read_slot;
         }
     }
@@ -405,16 +408,13 @@ unsigned short CPad::GetButtonDown(long padIndex)
 read_slot:
     if (shouldZero) {
         result = 0;
-        goto done;
-    }
-
-    {
-        unsigned int resolvedIndex = padIndex & ~((int)~(_448_4_ - padIndex | padIndex - _448_4_) >> 31);
+    } else {
+        int diffMask = ~((_448_4_ - padIndex) | (padIndex - _448_4_));
+        unsigned int resolvedIndex = padIndex & ~(diffMask >> 31);
         result = GetPadInputs()[resolvedIndex].buttonDown[0];
     }
 
-done:
-    return result;
+    return static_cast<unsigned short>(result);
 }
 
 /*

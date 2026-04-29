@@ -150,21 +150,6 @@ void CheckLineCylinder(const Vec& start, const Vec& end, const CMapCylinder& cyl
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapCylinder::CMapCylinder()
-{
-	m_direction2.y = 0.0f;
-	m_direction2.x = 0.0f;
-	m_top.z = 0.0f;
-	m_height2 = 1.0f;
-	m_radius2 = 1.0f;
-	m_direction2.z = 1.0f;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80026dec
  * PAL Size: 56b
  * EN Address: TODO

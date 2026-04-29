@@ -8,7 +8,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_light.h"
 #include <dolphin/mtx.h>
 #include <string.h>
@@ -22,7 +22,8 @@ extern const float kMapObjInitNegOne;
 extern const float kMapObjColorBlendScale;
 extern const float kMapObjDegToRad;
 extern const float kMapObjInitValue50;
-unsigned int DAT_8032e498 = 0xFFFFFFFF;
+extern unsigned int DAT_8032e498;
+unsigned int DAT_8032E8B8 = 5;
 extern "C" void __ct__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);
@@ -1424,7 +1425,7 @@ void CMapObj::DrawHitNormal()
  */
 int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    if ((U8At(this, 0x1D) != 2) || (PtrAt(this, 0xC) == 0) || (U8At(this, 0x1F) != 0xFF)) {
+    if ((U8At(this, 0x1D) != 2) || (PtrAt(this, 0xC) == 0) || (S8At(this, 0x1F) != -1)) {
         return 0;
     }
 
@@ -1530,7 +1531,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
  */
 int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    if ((S8At(this, 0x1D) == 2) && (PtrAt(this, 0xC) != 0) && (S8At(this, 0x1F) == -1)) {
+    if ((U8At(this, 0x1D) == 2) && (PtrAt(this, 0xC) != 0) && (S8At(this, 0x1F) == -1)) {
         Mtx inverseMtx;
         Vec localMove;
 

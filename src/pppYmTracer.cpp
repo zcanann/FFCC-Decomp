@@ -116,13 +116,13 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     f32 uvStep;
     int textureIndex[2];
 
-    dataOffset = *param_3->m_serializedDataOffsets;
-    colorOffset = param_3->m_serializedDataOffsets[1];
-    work = (TracerWork*)(pppYmTracer->m_serializedData + dataOffset);
-    colorData = pppYmTracer->m_serializedData + colorOffset;
-    poly = work->entries;
     dataValIndex = param_2->m_dataValIndex;
+    dataOffset = *param_3->m_serializedDataOffsets;
+    work = (TracerWork*)(pppYmTracer->m_serializedData + dataOffset);
+    colorOffset = param_3->m_serializedDataOffsets[1];
+    poly = work->entries;
     mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
+    colorData = pppYmTracer->m_serializedData + colorOffset;
 
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_payload[10]);

@@ -18,7 +18,7 @@ struct _pppPDataVal
     _pppProgSetDef* m_programSetDef; // 0x0
     s32 m_nextSpawnTime;             // 0x4
     _pppPObjLink* m_pppPObjLink;     // 0x8
-    s16 m_activeCount;               // 0xc
+    u16 m_activeCount;               // 0xc
     u8 m_index;                      // 0xe
     u8 m_pad;                        // 0xf
 }; // Size 0x10

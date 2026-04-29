@@ -12,7 +12,7 @@ extern "C" void create__7CUSBPcsFv(CUSBPcs*);
 extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
 extern "C" void func__7CUSBPcsFv(CUSBPcs*);
 
-const char s_CUSBPcs_8032f810[] = "CUSBPcs";
+extern const char s_CUSBPcs_8032f810[] = "CUSBPcs";
 unsigned int m_table_desc0__7CUSBPcs[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
 unsigned int m_table_desc1__7CUSBPcs[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
 unsigned int m_table_desc2__7CUSBPcs[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
@@ -31,8 +31,8 @@ CUSBPcsTable m_table__7CUSBPcs = {
         0x12,
     },
 };
-static const char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
-static const char s_usbRootPath[16] = "plot/kmitsuru/";
+extern const char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
+extern const char s_usbRootPath[16] = "plot/kmitsuru/";
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 
 static inline unsigned int Swap32(unsigned int x)
@@ -128,7 +128,9 @@ void CUSBPcs::mccReadData()
     s_usbReadPollFrameCounter++;
     if (4 < s_usbReadPollFrameCounter) {
         s_usbReadPollFrameCounter = 0;
-        USB.IsConnected();
+        if (USB.IsConnected() == 0) {
+            return;
+        }
     }
 }
 

@@ -101,6 +101,7 @@ extern const float FLOAT_80331cf0 = -3.0f;
 extern const float FLOAT_80331cf4 = 0.5f;
 
 static const Vec DAT_801dd4b0 = { 0.0f, 1.0f, 0.0f };
+static const Vec DAT_801dd4bc = { 0.0f, 1.0f, 0.0f };
 static const char s_f999_root_801dd4c8[] = "f999_root";
 static const char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
@@ -410,8 +411,8 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     Vec* inVec;
     s32 iVar16;
     float dVar17;
-    const float dVar18 = -FLOAT_80331cc8;
     const float dVar19 = FLOAT_80331cc8;
+    const float dVar18 = -dVar19;
     const float dVar20 = FLOAT_80331cd0;
     const float dVar21 = FLOAT_80331cd4;
     const float dVar22 = FLOAT_80331cc4;
@@ -420,7 +421,6 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     S16Vec local_e8;
     S16Vec local_e0;
     S16Vec local_d8;
-    Vec local_c8;
     u32 uStack_b4;
     s16 sVar8;
     s16 sVar10;
@@ -531,17 +531,15 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec->y = dVar20;
         inVec->z = dVar21;
         PSVECNormalize(inVec, inVec);
-        local_c8.x = DAT_801dd4b0.x;
-        local_c8.y = DAT_801dd4b0.y;
-        local_c8.z = DAT_801dd4b0.z;
+        Vec local_c8 = DAT_801dd4bc;
         PSVECCrossProduct(inVec, &local_c8, inVec + 2);
 
         dVar17 = Math.RandF(*(float*)((u8*)step + 0x3C));
         PSVECScale(inVec, inVec, *(float*)((u8*)step + 0x38) + dVar17);
 
-        inVec[1].x = dVar22;
-        inVec[1].y = dVar22;
         inVec[1].z = dVar22;
+        inVec[1].y = dVar22;
+        inVec[1].x = dVar22;
         inVec[4].x = dVar22;
 
         uStack_b4 = (u32)*(u8*)((u8*)step + 0x34);

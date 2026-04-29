@@ -1,4 +1,5 @@
 #include "ffcc/menu_item.h"
+#include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 #include "ffcc/pad.h"
@@ -54,6 +55,7 @@ extern float FLOAT_80332e88;
 extern float FLOAT_80332e8c;
 extern float FLOAT_80332e90;
 extern float FLOAT_80332e94;
+extern float FLOAT_80332E98;
 extern float FLOAT_80332EA8;
 extern float FLOAT_80332EAC;
 extern float FLOAT_80332EB0;
@@ -704,17 +706,17 @@ void CMenuPcs::ItemDraw()
     }
 
     CFont* helpFont = this->helpFont;
-    GXColor helpColor = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332e80 * *(float*)(cursorEntry + 8))};
+    CColor helpColor(0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332e80 * *(float*)(cursorEntry + 8)));
     DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
         this,
         selectedItemId,
         helpFont,
-        0,
-        (int)-FLOAT_80332e94,
-        helpColor,
-        0,
+        (int)-((double)(DOUBLE_80332e78 * (double)FLOAT_80332e90) - (double)FLOAT_80332e8c),
+        (int)FLOAT_80332e94,
+        helpColor.color,
+        10,
         FLOAT_80332e64,
-        (float)-((double)(DOUBLE_80332e78 * (double)FLOAT_80332e90) - (double)FLOAT_80332e8c));
+        FLOAT_80332E98);
 }
 
 /*

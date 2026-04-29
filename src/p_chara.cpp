@@ -151,6 +151,8 @@ public:
     void RemoveAll();
 };
 
+#pragma dont_inline on
+
 template <class T>
 CPtrArray<T>::CPtrArray()
 {
@@ -306,6 +308,8 @@ template class CPtrArray<CCharaPcs::CLoadPdt*>;
 template class CPtrArray<CCharaPcs::CLoadTexture*>;
 template class CPtrArray<CCharaPcs::CLoadAnim*>;
 template class CPtrArray<CCharaPcs::CLoadModel*>;
+
+#pragma dont_inline reset
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)

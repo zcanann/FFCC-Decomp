@@ -58,8 +58,8 @@ extern "C" void pppRandDownHCV(_pppPObject* basePtr, RandDownHCVParams* in, _ppp
 
     f32 scale = *valuePtr;
 
-    target[0] = target[0] + randshort(in->delta[0], scale);
-    target[1] = target[1] + randshort(in->delta[1], scale);
-    target[2] = target[2] + randshort(in->delta[2], scale);
-    target[3] = target[3] + randshort(in->delta[3], scale);
+    target[0] += randshort(in->delta[0], scale);
+    target[1] += randshort(in->delta[1], scale);
+    target[2] += randshort(in->delta[2], scale);
+    target[3] += randshort(in->delta[3], scale);
 }

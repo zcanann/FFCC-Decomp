@@ -59,7 +59,7 @@ void pppRandFV(_pppPObject* basePtr, RandFVParams* in, _pppCtrlTable* ctrl)
 
     f32 x = in->blend[0];
     f32 scale = *valuePtr;
-    target[0] = target[0] + randf(x, scale);
-    target[1] = target[1] + randf(in->blend[1], scale);
-    target[2] = target[2] + randf(in->blend[2], scale);
+    target[0] += randf(x, scale);
+    target[1] += randf(in->blend[1], scale);
+    target[2] += randf(in->blend[2], scale);
 }

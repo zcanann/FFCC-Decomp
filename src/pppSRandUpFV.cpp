@@ -59,14 +59,14 @@ void pppSRandUpFV(_pppPObject* basePtr, SRandUpFVParams* in, _pppCtrlTable* ctrl
 
     {
         f32 value = in->blend[0] * randVec[0];
-        target[0] = target[0] + value;
+        target[0] +=value;
     }
     {
         f32 value = in->blend[1] * randVec[1];
-        target[1] = target[1] + value;
+        target[1] +=value;
     }
     {
         f32 value = in->blend[2] * randVec[2];
-        target[2] = target[2] + value;
+        target[2] +=value;
     }
 }

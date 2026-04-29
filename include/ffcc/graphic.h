@@ -92,7 +92,12 @@ public:
     void* m_frameBuffer;
     void* m_scratchTextureBuffer;
     void* m_savedFrameBuffer;
-    u8 _pad_0x71F0_to_0x7373[0x184];
+    u8 _pad_0x71F0_to_0x7357[0x168];
+    int m_blurActive;
+    u8 m_blurDelayCounter;
+    u8 m_blurBufferIndex;
+    u8 m_blurTextureCount;
+    u8 _pad_0x735F_to_0x7373[0x15];
 };
 
 extern CGraphic Graphic;

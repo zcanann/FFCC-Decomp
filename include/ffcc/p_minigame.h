@@ -74,6 +74,9 @@ public:
     int GetMiniGameParam(int);
     void SetMiniGameParam(int, int);
     void SetNumPlayer();
+
+private:
+    u8 m_work[0x649C];
 };
 
 extern CMiniGamePcs MiniGamePcs;

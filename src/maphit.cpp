@@ -9,7 +9,6 @@
 CMapCylinder g_hit_cyl;
 CMapCylinder g_hit_cyl_min;
 Vec g_hit_mvec;
-extern unsigned char DAT_8032ec88;
 
 namespace {
 static const char s_maphit_cpp[] = "maphit.cpp";
@@ -24,10 +23,13 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 }
 }
 
-int g_hit_edge_idx_min = 9;
-float g_hit_t_min = 0.0f;
-CMapHitFace* gMapHitFace = 0;
-unsigned char gMapHitFaceFlag = 0;
+int g_hit_edge_idx_min;
+float g_hit_t;
+float g_hit_t_min;
+float g_hit_t_slide_min;
+unsigned char g_hit_f;
+CMapHitFace* g_hit_lpface;
+CMapHitFace* g_hit_lpface_min;
 
 /*
  * --INFO--
@@ -383,7 +385,7 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
  */
 int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 {
-    unsigned char* face = reinterpret_cast<unsigned char*>(gMapHitFace);
+    unsigned char* face = reinterpret_cast<unsigned char*>(g_hit_lpface);
     unsigned char groupIndex = face[0x47];
     unsigned char* mapMngBytes = reinterpret_cast<unsigned char*>(&MapMng);
     unsigned long groupMask = *reinterpret_cast<unsigned long*>(mapMngBytes + 0x214E8 + groupIndex * 0x14);
@@ -452,10 +454,12 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
+    g_hit_t = hitT;
     g_hit_t_min = hitT;
     g_hit_edge_idx_min = -1;
+    g_hit_lpface_min = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;
-    DAT_8032ec88 = 1;
+    g_hit_f = 1;
     return 1;
 }
 
@@ -497,11 +501,11 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
     if (g_hit_edge_idx_min == -1) {
         if (y <= gMapHitFace->m_boundsMin.y) {
             float len = PSVECMag(&g_hit_cyl_min.m_direction);
-            PSVECScale(&g_hit_cyl_min.m_direction, out, g_hit_t_min - (s_push / len));
+            PSVECScale(&g_hit_cyl_min.m_direction, out, g_hit_t - (s_push / len));
             return 0;
         }
 
-        if (s_epsilon < g_hit_t_min) {
+        if (s_epsilon < g_hit_t) {
             Vec* normal = reinterpret_cast<Vec*>(gMapHitFace);
             float planeD = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(gMapHitFace) + 0x0C);
             float planeDot = PSVECDotProduct(&g_hit_cyl_min.m_direction, normal);
@@ -521,7 +525,7 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
 
     if (y <= gMapHitFace->m_boundsMin.y) {
         float len = PSVECMag(&g_hit_cyl_min.m_direction);
-        PSVECScale(&g_hit_cyl_min.m_direction, out, g_hit_t_min - (s_push / len));
+        PSVECScale(&g_hit_cyl_min.m_direction, out, g_hit_t - (s_push / len));
         return 0;
     }
 
@@ -589,11 +593,11 @@ void CMapHit::CalcHitPosition(Vec* position)
 {
     if (g_hit_edge_idx_min != -1) {
         float len = PSVECMag(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius));
-        PSVECScale(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius), position, g_hit_t_min - (s_epsilon / len));
+        PSVECScale(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius), position, g_hit_t - (s_epsilon / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     } else {
         float len = PSVECMag(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius));
-        PSVECScale(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius), position, g_hit_t_min - (s_push / len));
+        PSVECScale(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius), position, g_hit_t - (s_push / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     }
 }
@@ -615,7 +619,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     int faceIndex = 0;
     int faceOffset = 0;
     while (faceIndex < static_cast<int>(m_faceCount)) {
-        gMapHitFace = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
+        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
         g_hit_t_min = s_large_pos;
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;
@@ -642,7 +646,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     int faceOffset = static_cast<int>(faceIndex) * 0x50;
 
     while (faceIndex < endFace) {
-        gMapHitFace = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
+        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
         g_hit_t_min = s_large_pos;
 
         if (CheckHitFaceCylinder(mask) != 0) {
@@ -669,7 +673,7 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
     CMapHitFace* face = m_faces;
     int faceOffset = 0;
     for (int i = 0; i < m_faceCount; i++) {
-        gMapHitFace = reinterpret_cast<CMapHitFace*>(Ptr(face, faceOffset));
+        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(face, faceOffset));
         CheckHitFaceCylinder(mask);
         faceOffset += 0x50;
     }
@@ -694,7 +698,7 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
     int faceOffset = static_cast<int>(faceIndex) * 0x50;
 
     while (faceIndex < endFace) {
-        gMapHitFace = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
+        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
         CheckHitFaceCylinder(mask);
         faceOffset += 0x50;
         faceIndex++;

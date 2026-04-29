@@ -797,11 +797,19 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
     *u8_at(p, 0x9c) = *u8_at(p, 0x9c) + 1;
 
     if ((*u8_at(p, 0x9d) != 0) && (*u8_at(p, 0x9c) <= *u8_at(p, 0x9d))) {
-        *f32_at(p, 0x98) -= (float)alpha / (float)*u8_at(p, 0x9d);
+        float fadeAlpha = (float)alpha;
+        float fadeFrameCount = (float)(unsigned int)*u8_at(p, 0x9d);
+        float particleAlpha = *f32_at(p, 0x98);
+
+        *f32_at(p, 0x98) = particleAlpha - fadeAlpha / fadeFrameCount;
     }
 
     if ((*u8_at(p, 0x9e) != 0) && ((u16)*s16_at(p, 0x22) <= *u8_at(p, 0x9e))) {
-        *f32_at(p, 0x98) += (float)alpha / (float)*u8_at(p, 0x9e);
+        float fadeAlpha = (float)alpha;
+        float fadeFrameCount = (float)(unsigned int)payload[0x29];
+        float particleAlpha = *f32_at(p, 0x98);
+
+        *f32_at(p, 0x98) = particleAlpha + fadeAlpha / fadeFrameCount;
     }
 }
 

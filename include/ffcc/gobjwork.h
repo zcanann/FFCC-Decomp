@@ -88,8 +88,7 @@ public:
     int AddItem(int, int*);
     void SetArtifact(int, int);
     void FGAddItemIdx(int, int);
-    int ChkNumItem(char*, int);
-    void CanAddTmpArtifact(int);
+    int CanAddTmpArtifact(int);
     int FindItem(int);
     void DeleteItemIdx(int, int);
     int DeleteItem(int, int);
@@ -133,7 +132,7 @@ public:
     unsigned short m_inventoryItemCount;        // 0x00B4
     short m_inventoryItems[64];                 // 0x00B6
     unsigned short m_artifacts[96];             // 0x0136
-    unsigned short m_treasures[4];              // 0x01F6
+    short m_treasures[4];                       // 0x01F6
     unsigned char m_treasureFlags;              // 0x01FE
     unsigned char m_moneyFlags;                 // 0x01FF
     int m_gil;                                  // 0x0200

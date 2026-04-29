@@ -835,37 +835,31 @@ void CCaravanWork::FGAddItemIdx(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1e8c
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int CCaravanWork::ChkNumItem(char*, int numItems)
+int CCaravanWork::CanAddTmpArtifact(int numItems)
 {
 	int emptySlots = 0;
 
-	if (m_treasures[0] == 0xFFFF) {
+	if (m_treasures[0] == -1) {
 		emptySlots++;
 	}
-	if (m_treasures[1] == 0xFFFF) {
+	if (m_treasures[1] == -1) {
 		emptySlots++;
 	}
-	if (m_treasures[2] == 0xFFFF) {
+	if (m_treasures[2] == -1) {
 		emptySlots++;
 	}
-	if (m_treasures[3] == 0xFFFF) {
+	if (m_treasures[3] == -1) {
 		emptySlots++;
 	}
 
 	return (numItems <= emptySlots);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::CanAddTmpArtifact(int)
-{
-	// TODO
 }
 
 /*
@@ -988,7 +982,7 @@ int CCaravanWork::AddTmpArtifact(int itemId, int* outIndex)
     for (int i = 0; i < 4; i++) {
         short* slot = reinterpret_cast<short*>(treasure + offsetof(CCaravanWork, m_treasures));
         if (*slot == -1) {
-            m_treasures[i] = (unsigned short)itemId;
+            m_treasures[i] = (short)itemId;
             Joybus.SetTmpArti(m_joybusCaravanId, i, itemId);
             if (outIndex != 0) {
                 *outIndex = i;

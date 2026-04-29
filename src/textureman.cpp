@@ -38,7 +38,6 @@ extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void* __vt__8CPtrArrayIP8CTexture[];
 extern "C" void* __vt__8CTexture[];
 extern "C" void* __vt__11CTextureSet[];
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -901,20 +900,24 @@ void CTexture::CacheUnLoadTexture(CAmemCacheSet* amemCacheSet)
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CTexture::CacheRefCnt0UpTexture(CAmemCacheSet*)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CTexture::CacheDumpTexture(CAmemCacheSet*)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -1001,10 +1004,12 @@ _GXColor CTexture::GetTlutColor(int index)
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CTexture::GetExternalTlutColor(void*, int, int)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -1112,10 +1117,12 @@ void CTexture::FlushExternalTlut(void* tlutData)
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CTexture::FlushExternalTlut(void*, int)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -1382,10 +1389,12 @@ void CTextureSet::ReleaseTextureIdx(int idx, CAmemCacheSet* amemCacheSet)
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CTexture::GetNumTlut()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--

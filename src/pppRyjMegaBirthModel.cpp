@@ -153,62 +153,6 @@ static void randomize_particle_triplet(u8* particleBytes, s32 offset, u8 flags, 
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void get_rand(void)
-{
-    (void)Math.RandF();
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void get_noise(unsigned char count)
-{
-    while (count > 0) {
-        (void)Math.RandF();
-        count--;
-    }
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void alloc_check(VRyjMegaBirthModel* work, PRyjMegaBirthModel* params)
-{
-    u8* payload = (u8*)params;
-    if (work->m_particleBlock == NULL) {
-        work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            work->m_numParticles * 0xA0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x8D);
-        if (work->m_particleBlock != NULL) {
-            memset(work->m_particleBlock, 0, work->m_numParticles * 0xA0);
-        }
-    }
-
-    if ((payload[0x136] != 0) && (work->m_worldMatrixBlock == NULL)) {
-        work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            work->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x97);
-        if (work->m_worldMatrixBlock != NULL) {
-            memset(work->m_worldMatrixBlock, 0, work->m_numParticles * 0x30);
-        }
-    }
-
-    if ((payload[0x131] != 0) && (work->m_colorBlock == NULL)) {
-        work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            work->m_numParticles << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0xA2);
-        if (work->m_colorBlock != NULL) {
-            memset(work->m_colorBlock, 0, work->m_numParticles << 5);
-        }
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80087ce8
  * PAL Size: 520b
  * EN Address: TODO
@@ -228,7 +172,32 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
 
     if (*(void**)(work + 0xC) == 0) {
         ((VRyjMegaBirthModel*)work)->m_numParticles = *(u16*)(payload + 0x20);
-        alloc_check((VRyjMegaBirthModel*)work, params);
+        if (((VRyjMegaBirthModel*)work)->m_particleBlock == NULL) {
+            ((VRyjMegaBirthModel*)work)->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                ((VRyjMegaBirthModel*)work)->m_numParticles * 0xA0, pppEnvStPtr->m_stagePtr,
+                const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x8D);
+            if (((VRyjMegaBirthModel*)work)->m_particleBlock != NULL) {
+                memset(((VRyjMegaBirthModel*)work)->m_particleBlock, 0, ((VRyjMegaBirthModel*)work)->m_numParticles * 0xA0);
+            }
+        }
+
+        if ((payload[0x136] != 0) && (((VRyjMegaBirthModel*)work)->m_worldMatrixBlock == NULL)) {
+            ((VRyjMegaBirthModel*)work)->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                ((VRyjMegaBirthModel*)work)->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr,
+                const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x97);
+            if (((VRyjMegaBirthModel*)work)->m_worldMatrixBlock != NULL) {
+                memset(((VRyjMegaBirthModel*)work)->m_worldMatrixBlock, 0, ((VRyjMegaBirthModel*)work)->m_numParticles * 0x30);
+            }
+        }
+
+        if ((payload[0x131] != 0) && (((VRyjMegaBirthModel*)work)->m_colorBlock == NULL)) {
+            ((VRyjMegaBirthModel*)work)->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                ((VRyjMegaBirthModel*)work)->m_numParticles << 5, pppEnvStPtr->m_stagePtr,
+                const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0xA2);
+            if (((VRyjMegaBirthModel*)work)->m_colorBlock != NULL) {
+                memset(((VRyjMegaBirthModel*)work)->m_colorBlock, 0, ((VRyjMegaBirthModel*)work)->m_numParticles << 5);
+            }
+        }
 
         *(float*)(work + 0x0) = *(float*)(payload + 0xF8);
         *(float*)(work + 0x4) = *(float*)(payload + 0xFC);
@@ -276,13 +245,13 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
  */
 void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirthModel* params, VColor* color)
 {
-    s32 i;
-    s32 emitted;
-    s32 maxParticles;
-    u8* payload;
     _PARTICLE_DATA* particleData;
     _PARTICLE_WMAT* particleWMat;
     _PARTICLE_COLOR* particleColor;
+    s32 maxParticles;
+    s32 emitted;
+    s32 i;
+    u8* payload;
     u16* emitTimer;
 
     emitted = 0;
@@ -294,22 +263,26 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirth
     emitTimer = (u16*)((u8*)work + 0x1C);
 
     if (gPppCalcDisabled == 0) {
+        float posX = pObject->m_localMatrix.value[0][3];
+        float posY = pObject->m_localMatrix.value[1][3];
+        float posZ = pObject->m_localMatrix.value[2][3];
+
         *(float*)((u8*)work + 0x20) = *(float*)((u8*)work + 0x2C);
         *(float*)((u8*)work + 0x24) = *(float*)((u8*)work + 0x30);
         *(float*)((u8*)work + 0x28) = *(float*)((u8*)work + 0x34);
-        *(float*)((u8*)work + 0x2C) = pObject->m_localMatrix.value[0][3];
-        *(float*)((u8*)work + 0x30) = pObject->m_localMatrix.value[1][3];
-        *(float*)((u8*)work + 0x34) = pObject->m_localMatrix.value[2][3];
+        *(float*)((u8*)work + 0x2C) = posX;
+        *(float*)((u8*)work + 0x30) = posY;
+        *(float*)((u8*)work + 0x34) = posZ;
         *emitTimer = *emitTimer + 1;
 
         for (i = 0; i < maxParticles; i = i + 1) {
-            if (*(s16*)&particleData->m_directionTail.x == 0) {
+            if (*(u16*)((u8*)particleData + 0x30) != 0) {
+                calc(pObject, work, params, particleData, color, particleColor);
+            } else {
                 if ((*(u16*)(payload + 0x24) <= *emitTimer) && (emitted < (s32)(u32)*(u16*)(payload + 0x22))) {
                     birth(pObject, work, params, color, particleData, particleWMat, particleColor);
                     emitted = emitted + 1;
                 }
-            } else {
-                calc(pObject, work, params, particleData, color, particleColor);
             }
 
             if (particleWMat != NULL) {

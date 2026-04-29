@@ -38,7 +38,7 @@ struct KeShpTail2XStep {
     u8 m_colorEndA;
     float m_stepDistance;
     u16 m_drawCount;
-    u8 m_skipFirst;
+    u8 m_drawFirst;
     u8 m_drawA;
     u8 m_drawB;
     u8 m_useEnvDepth;
@@ -133,16 +133,10 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     long* shapeEntry;
     s32 count;
     float alphaMul;
-    float colorR;
-    float colorG;
-    float colorB;
-    float colorA;
-    float colorEndA;
+    float color[4];
+    float endColor[4];
     float zero;
-    float colorStepR;
-    float colorStepG;
-    float colorStepB;
-    float colorStepA;
+    float colorStep[4];
     float invCountMinusOne;
     pppFMATRIX localBase;
     pppFMATRIX drawMtx;
@@ -180,26 +174,29 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     count = step->m_drawCount;
     invCountMinusOne = (float)(count - 1);
     alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / kPppKeShpTail2XAlphaScale;
-    colorR = (float)step->m_colorStartR;
-    colorG = (float)step->m_colorStartG;
-    colorB = (float)step->m_colorStartB;
-    colorA = (float)step->m_colorStartA * alphaMul;
-    colorEndA = (float)step->m_colorEndA * alphaMul;
+    color[0] = (float)step->m_colorStartR;
+    color[1] = (float)step->m_colorStartG;
+    color[2] = (float)step->m_colorStartB;
+    color[3] = (float)step->m_colorStartA * alphaMul;
+    endColor[0] = (float)step->m_colorEndR;
+    endColor[1] = (float)step->m_colorEndG;
+    endColor[2] = (float)step->m_colorEndB;
+    endColor[3] = (float)step->m_colorEndA * alphaMul;
     if (invCountMinusOne != zero) {
-        colorStepR = (colorR - (float)step->m_colorEndR) / invCountMinusOne;
-        colorStepG = (colorG - (float)step->m_colorEndG) / invCountMinusOne;
-        colorStepB = (colorB - (float)step->m_colorEndB) / invCountMinusOne;
-        colorStepA = (colorA - colorEndA) / invCountMinusOne;
+        colorStep[0] = (color[0] - endColor[0]) / invCountMinusOne;
+        colorStep[1] = (color[1] - endColor[1]) / invCountMinusOne;
+        colorStep[2] = (color[2] - endColor[2]) / invCountMinusOne;
+        colorStep[3] = (color[3] - endColor[3]) / invCountMinusOne;
     } else {
-        colorStepR = FLOAT_80330508;
-        colorStepG = FLOAT_80330508;
-        colorStepB = FLOAT_80330508;
-        colorStepA = FLOAT_80330508;
+        colorStep[0] = FLOAT_80330508;
+        colorStep[1] = FLOAT_80330508;
+        colorStep[2] = FLOAT_80330508;
+        colorStep[3] = FLOAT_80330508;
     }
 
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
     shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
-    shapeEntry = (long*)((u8*)*shapeTable + *(s16*)((u8*)*shapeTable + ((u16)work->m_shapePrevFrame << 3) + 0x10));
+    shapeEntry = (long*)((u8*)*shapeTable + *(s16*)((u8*)*shapeTable + (work->m_shapePrevFrame << 3) + 0x10));
 
     pppCopyMatrix(localBase, obj->pppPObject.m_localMatrix);
     pppUnitMatrix(drawMtx);
@@ -233,8 +230,8 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     segRemain = segLen;
     segCursor = zero;
 
-    if (step->m_skipFirst != 0) {
-        goto move_next_segment;
+    if (step->m_drawFirst == 0) {
+        goto update_step;
     }
 
 draw_loop:
@@ -267,49 +264,50 @@ draw_loop:
 
     {
         GXColor amb;
-        amb.r = (u8)colorR;
-        amb.g = (u8)colorG;
-        amb.b = (u8)colorB;
-        amb.a = (u8)colorA;
+        amb.r = (u8)color[0];
+        amb.g = (u8)color[1];
+        amb.b = (u8)color[2];
+        amb.a = (u8)color[3];
         GXSetChanAmbColor(GX_COLOR0A0, amb);
     }
 
     pppSetBlendMode(step->m_blendMode);
     pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(shapeEntry, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
 
+update_step:
     count--;
     if (count == 0) {
         return;
     }
 
-    colorR -= colorStepR;
-    colorG -= colorStepG;
-    colorB -= colorStepB;
-    colorA -= colorStepA;
+    color[0] -= colorStep[0];
+    color[1] -= colorStep[1];
+    color[2] -= colorStep[2];
+    color[3] -= colorStep[3];
     drawScale -= scaleStepDelta;
     if (trailStep <= zero) {
         return;
     }
 
-    if (segRemain < trailStep) {
-        goto advance_segment;
+    if (segRemain >= trailStep) {
+        pos.x = (segDx * segCursor) / segLen + segBaseX;
+        pos.y = (segDy * segCursor) / segLen + segBaseY;
+        pos.z = (segDz * segCursor) / segLen + segBaseZ;
+        segCursor += trailStep;
+        segRemain -= trailStep;
+        segBaseX = pos.x;
+        segBaseY = pos.y;
+        segBaseZ = pos.z;
+        goto draw_loop;
     }
-
-    pos.x = segDx * (segCursor / segLen) + segBaseX;
-    pos.y = segDy * (segCursor / segLen) + segBaseY;
-    pos.z = segDz * (segCursor / segLen) + segBaseZ;
-    segCursor += trailStep;
-    segRemain -= trailStep;
-    segBaseX = pos.x;
-    segBaseY = pos.y;
-    segBaseZ = pos.z;
-    goto draw_loop;
 
 advance_segment:
-    nextIndex++;
-    if (nextIndex == work->m_count) {
+    if (nextIndex == lastIndex) {
         nextIndex = 0;
+        goto wrapped_segment;
     }
+    nextIndex++;
+wrapped_segment:
     if (nextIndex == work->m_head) {
         return;
     }

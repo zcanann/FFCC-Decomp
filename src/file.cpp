@@ -367,8 +367,7 @@ CFile::CHandle* CFile::CheckQueue()
             }
             else if (dvdStatus < 0)
             {
-                completionStatus = 4;
-                handle->m_completionStatus = completionStatus;
+                handle->m_completionStatus = completionStatus = 4;
             }
             else
             {

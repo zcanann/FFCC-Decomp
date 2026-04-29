@@ -89,7 +89,7 @@ public:
     void ClrCompatibilityFlg(int);
     int GetCompatibility(int, unsigned char*);
     void GetCMakeInfo(int, GbaCMakeInfo*);
-    void GetCmdData(int, unsigned char*);
+    int GetCmdData(int, unsigned char*);
     int GetEquipData(int, unsigned char*);
     void SetShopFlg(int);
     void ClrShopFlg(int);

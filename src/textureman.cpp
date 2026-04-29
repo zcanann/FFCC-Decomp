@@ -607,8 +607,8 @@ CTextureSet::~CTextureSet()
 void CTexture::InitTexObj()
 {
     int format;
-    int tlutBase;
-    unsigned int numEntries;
+    unsigned char* tlutData;
+    unsigned short numEntries;
     int offset;
 
     format = m_format;
@@ -617,23 +617,17 @@ void CTexture::InitTexObj()
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                        static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
 
-        tlutBase = reinterpret_cast<int>(m_tlutData);
-        numEntries = 0x10;
-        if (m_format == 9) {
-            numEntries = 0x100;
-        }
-        GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutBase), GX_TL_IA8, static_cast<u16>(numEntries));
+        tlutData = reinterpret_cast<unsigned char*>(m_tlutData);
+        numEntries = (m_format == 9) ? 0x100 : 0x10;
+        GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8, static_cast<u16>(numEntries));
 
-        numEntries = 0x10;
-        if (m_format == 9) {
-            numEntries = 0x100;
-        }
+        numEntries = (m_format == 9) ? 0x100 : 0x10;
 
         offset = 0x10;
         if (m_format == 9) {
             offset = 0x100;
         }
-        GXInitTlutObj(&m_tlutObj1, reinterpret_cast<void*>(tlutBase + offset * 2), GX_TL_IA8, static_cast<u16>(numEntries));
+        GXInitTlutObj(&m_tlutObj1, tlutData + offset * 2, GX_TL_IA8, static_cast<u16>(numEntries));
     } else {
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),

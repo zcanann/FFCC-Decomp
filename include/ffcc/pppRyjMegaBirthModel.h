@@ -24,9 +24,6 @@ struct PRyjMegaBirthModelOffsets
     s32* m_serializedDataOffsets;
 };
 
-void get_rand(void);
-void get_noise(unsigned char);
-void alloc_check(VRyjMegaBirthModel*, PRyjMegaBirthModel*);
 void calc_particle(_pppPObject*, VRyjMegaBirthModel*, PRyjMegaBirthModel*, VColor*);
 void birth(_pppPObject*, VRyjMegaBirthModel*, PRyjMegaBirthModel*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
 void calc(_pppPObject*, VRyjMegaBirthModel*, PRyjMegaBirthModel*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);

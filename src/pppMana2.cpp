@@ -22,26 +22,27 @@ struct Vec2d {
 extern "C" const char s_pppMana2_cpp_801DC4E0[] = "pppMana2.cpp";
 
 extern char s_Render_Mana2___801dc4d0[];
-extern float FLOAT_803318fc;
-extern float FLOAT_80331898;
-extern float FLOAT_8033189c;
-extern float FLOAT_803318a0;
-extern float FLOAT_803318a4;
-extern float FLOAT_803318A8;
-extern float FLOAT_803318b8;
-extern float FLOAT_803318bc;
-extern float FLOAT_803318c0;
-extern float FLOAT_803318c4;
-extern float FLOAT_803318c8;
-extern float FLOAT_803318cc;
-extern float FLOAT_803318d0;
-extern float FLOAT_80331904;
-extern char DAT_80331900[];
-extern char DAT_803318d4[];
-extern char DAT_803318dc[];
-extern char DAT_803318e4[];
-extern char DAT_803318ec[];
-extern char DAT_803318f4[];
+extern const float FLOAT_80331898 = 0.0f;
+extern const float FLOAT_8033189c = -1.0f;
+extern const float FLOAT_803318a0 = 1.0f;
+extern const float FLOAT_803318a4 = 0.5f;
+extern const float FLOAT_803318A8 = 0.0625f;
+extern const double DOUBLE_803318B0 = 4503601774854144.0;
+extern const float FLOAT_803318b8 = 2.0f;
+extern const float FLOAT_803318bc = 0.25f;
+extern const float FLOAT_803318c0 = 0.75f;
+extern const float FLOAT_803318c4 = 5.0f;
+extern const float FLOAT_803318c8 = 128.0f;
+extern const float FLOAT_803318cc = 90.0f;
+extern const float FLOAT_803318d0 = 10000.0f;
+extern const char DAT_803318d4[] = "obj5";
+extern const char DAT_803318dc[] = "obj3";
+extern const char DAT_803318e4[] = "obj1";
+extern const char DAT_803318ec[] = "obj4";
+extern const char DAT_803318f4[] = "obj2";
+extern const float FLOAT_803318fc = 0.99999f;
+extern const char DAT_80331900[] = "obj";
+extern const float FLOAT_80331904 = -1.5707964f;
 
 static inline float CameraWorldX()
 {
@@ -1407,10 +1408,11 @@ static void CalculateNormal(VMana2* mana2)
     normals = *(Vec**)((u8*)mana2 + 0x40);
     indices = *(u16**)((u8*)mana2 + 0x50);
 
+    float zero = FLOAT_80331898;
     for (s32 i = 0; i < 0x121; i++) {
-        normals[i].z = 0.0f;
-        normals[i].y = 0.0f;
-        normals[i].x = 0.0f;
+        normals[i].z = zero;
+        normals[i].y = zero;
+        normals[i].x = zero;
     }
 
     for (s32 i = 0; i < 0x200; i++) {

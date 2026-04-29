@@ -136,6 +136,11 @@ STATIC_ASSERT(offsetof(EmissionMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(EmissionModelData, m_materialSet) == 0x24);
 
+static inline EmissionMeshData* EmissionMeshAt(EmissionModelView* modelView, int meshIndex)
+{
+    return modelView->m_meshes[meshIndex].m_data;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800E6060
@@ -383,7 +388,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     EmissionModelView* modelView = (EmissionModelView*)model;
     EmissionState* state = (EmissionState*)param_2;
     pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
-    EmissionMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
+    EmissionMeshData* meshData = EmissionMeshAt(modelView, meshIndex);
     if ((strcmp((const char*)meshData, &DAT_803311fc) == 0) && (state->m_colorA != 0)) {
         int texture = state->m_texture;
         u32 drawTevBits = 0xACE0F;

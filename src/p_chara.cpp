@@ -999,9 +999,8 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
 
             for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
                 int* loadAnim = reinterpret_cast<int*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
-                const bool releaseByKind = loadAnim[4] < 0 && loadAnim[1] == 1;
-                const bool releaseByMask = loadAnim[4] >= 0 && ((releaseMask & static_cast<unsigned int>(loadAnim[5])) != 0);
-                if (!releaseByKind && !releaseByMask) {
+                if (!(((loadAnim[4] < 0) && (loadAnim[1] == 1)) ||
+                      ((loadAnim[4] >= 0) && ((releaseMask & static_cast<unsigned int>(loadAnim[5])) != 0)))) {
                     continue;
                 }
 

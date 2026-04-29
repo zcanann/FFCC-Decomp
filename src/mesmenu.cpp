@@ -38,7 +38,7 @@ void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void* menuPcs, int fmt);
 void DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(void* menuPcs, float x, float y, float w, float h, int tex, float rot);
 void DrawInit__8CMenuPcsFv(void* menuPcs);
 void Draw__4CMesFv(void* mes);
-void* __ct__6CColorFUcUcUcUc(void* color, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+void* __ct__6CColorFUcUcUcUc(void* color, int r, int g, int b, int a);
 void SetColor__8CMenuPcsFR6CColor(void* menuPcs, void* color);
 void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void* menuPcs, int tex);
 void SetExternalTlut__8CTextureFPvi(void* texture, void* tlut, int enable);
@@ -165,32 +165,34 @@ void CMesMenu::Create()
 {
     typedef void (*VFunc)(void*);
 
-    (*(VFunc*)((u8*)*(void***)this + 0x10))(this);
+    VFunc* vtable = *reinterpret_cast<VFunc**>(this);
+    vtable[4](this);
     Create__5CMenuFv(this);
 
-    *(float*)((char*)this + 0x3D78) = FLOAT_803308d8;
-    *(float*)((char*)this + 0x3D74) = FLOAT_803308d8;
+    float defaultValue = FLOAT_803308d8;
+    *(float*)((char*)this + 0x3D78) = defaultValue;
+    *(float*)((char*)this + 0x3D74) = defaultValue;
     *(int*)((char*)this + 8) = 0;
     *(int*)((char*)this + 0xC) = 4;
     *(int*)((char*)this + 0x3DF4) = 0;
     *(int*)((char*)this + 0x3DF8) = 0;
 
     if (*(int*)((char*)this + 0x18) < 4) {
-        unsigned int x = 0x10;
+        int x = 0x10;
         if ((*(int*)((char*)this + 0x18) & 1) != 0) {
             x = 0x270;
         }
         *(float*)((char*)this + 0x3D6C) = (float)x;
 
-        unsigned int y = 0x18;
+        int y = 0x18;
         if ((*(int*)((char*)this + 0x18) & 2) != 0) {
             y = 0x1B0;
         }
         *(float*)((char*)this + 0x3D70) = (float)y;
 
-        *(float*)((char*)this + 0x3D7C) = FLOAT_803308d8;
-        *(float*)((char*)this + 0x3D80) = FLOAT_803308d8;
-        *(float*)((char*)this + 0x3D84) = FLOAT_803308d8;
+        *(float*)((char*)this + 0x3D7C) = defaultValue;
+        *(float*)((char*)this + 0x3D80) = defaultValue;
+        *(float*)((char*)this + 0x3D84) = defaultValue;
         *(int*)((char*)this + 0x3D88) = 0;
         *(int*)((char*)this + 0x3D8C) = 0;
         *(int*)((char*)this + 0x3DA8) = 0;
@@ -263,20 +265,20 @@ void CMesMenu::onCalc()
             unsigned int foodCount = (unsigned int)*(unsigned short*)(scriptFood + 0x1C);
             int targetValue = (int)(foodCount * 6);
             if (*(int*)((char*)this + 0x3DAC) < targetValue) {
-                *(int*)((char*)this + 0x3DAC) = targetValue;
+                *(int*)((char*)this + 0x3DAC) += targetValue - *(int*)((char*)this + 0x3DAC);
             } else if (targetValue < *(int*)((char*)this + 0x3DAC)) {
-                *(unsigned int*)((char*)this + 0x3DAC) = foodCount * 6;
+                *(int*)((char*)this + 0x3DAC) -= *(int*)((char*)this + 0x3DAC) - targetValue;
             }
 
             int currentValue = *(int*)((char*)this + 0x3DA8);
             if (currentValue < *(int*)((char*)this + 0x3DAC)) {
-                int idx = currentValue / 0xC + (currentValue >> 0x1F);
-                int slotBase = (int)this + (idx - (idx >> 0x1F)) * 4;
+                int idx = currentValue / 0xC;
+                int slotBase = (int)this + idx * 4;
                 if (*(int*)(slotBase + 0x3DB0) == 0) {
                     *(int*)(slotBase + 0x3DB0) = 0x10;
                 }
 
-                int nextValue = currentValue + 2;
+                int nextValue = *(int*)((char*)this + 0x3DA8) + 2;
                 int maxValue = *(int*)((char*)this + 0x3DAC);
                 if (nextValue < maxValue) {
                     maxValue = nextValue;
@@ -286,8 +288,8 @@ void CMesMenu::onCalc()
                 *(unsigned int*)((char*)this + 0x3DA8) = (currentValue - 2U) & ~((int)(currentValue - 2U) >> 0x1F);
 
                 int decValue = *(int*)((char*)this + 0x3DA8);
-                int idx = decValue / 0xC + (decValue >> 0x1F);
-                int slotBase = (int)this + (idx - (idx >> 0x1F)) * 4;
+                int idx = decValue / 0xC;
+                int slotBase = (int)this + idx * 4;
                 if (*(int*)(slotBase + 0x3DD0) == 0) {
                     *(int*)(slotBase + 0x3DD0) = 0x10;
                 }
@@ -296,10 +298,9 @@ void CMesMenu::onCalc()
                 }
             }
 
-            int i = 2;
             int base = (int)this;
             unsigned int value;
-            do {
+            for (int i = 0; i < 2; i++) {
                 value = *(int*)(base + 0x3DB0) - 1;
                 *(unsigned int*)(base + 0x3DB0) = value & ~((int)value >> 0x1F);
 
@@ -325,8 +326,7 @@ void CMesMenu::onCalc()
                 *(unsigned int*)(base + 0x3DDC) = value & ~((int)value >> 0x1F);
 
                 base += 0x10;
-                i--;
-            } while (i != 0);
+            }
 
             value = *(int*)((char*)this + 0x3DF0) - 1;
             *(unsigned int*)((char*)this + 0x3DF0) = value & ~((int)value >> 0x1F);
@@ -903,20 +903,20 @@ void CMesMenu::CalcHeart()
     unsigned int foodCount = (unsigned int)*(unsigned short*)(scriptFood + 0x1C);
     int targetValue = (int)(foodCount * 6);
     if (*(int*)((char*)this + 0x3DAC) < targetValue) {
-        *(int*)((char*)this + 0x3DAC) = targetValue;
+        *(int*)((char*)this + 0x3DAC) += targetValue - *(int*)((char*)this + 0x3DAC);
     } else if (targetValue < *(int*)((char*)this + 0x3DAC)) {
-        *(unsigned int*)((char*)this + 0x3DAC) = foodCount * 6;
+        *(int*)((char*)this + 0x3DAC) -= *(int*)((char*)this + 0x3DAC) - targetValue;
     }
 
     int currentValue = *(int*)((char*)this + 0x3DA8);
     if (currentValue < *(int*)((char*)this + 0x3DAC)) {
-        int index = currentValue / 0xC + (currentValue >> 0x1F);
-        int base = (int)this + (index - (index >> 0x1F)) * 4;
+        int index = currentValue / 0xC;
+        int base = (int)this + index * 4;
         if (*(int*)(base + 0x3DB0) == 0) {
             *(int*)(base + 0x3DB0) = 0x10;
         }
 
-        int nextValue = currentValue + 2;
+        int nextValue = *(int*)((char*)this + 0x3DA8) + 2;
         int maxValue = *(int*)((char*)this + 0x3DAC);
         if (nextValue < maxValue) {
             maxValue = nextValue;
@@ -926,8 +926,8 @@ void CMesMenu::CalcHeart()
         *(unsigned int*)((char*)this + 0x3DA8) = (currentValue - 2U) & ~((int)(currentValue - 2U) >> 0x1F);
 
         int decValue = *(int*)((char*)this + 0x3DA8);
-        int index = decValue / 0xC + (decValue >> 0x1F);
-        int base = (int)this + (index - (index >> 0x1F)) * 4;
+        int index = decValue / 0xC;
+        int base = (int)this + index * 4;
         if (*(int*)(base + 0x3DD0) == 0) {
             *(int*)(base + 0x3DD0) = 0x10;
         }
@@ -936,9 +936,8 @@ void CMesMenu::CalcHeart()
         }
     }
 
-    int i = 2;
     int base = (int)this;
-    do {
+    for (int i = 0; i < 2; i++) {
         unsigned int value = *(int*)(base + 0x3DB0) - 1;
         *(unsigned int*)(base + 0x3DB0) = value & ~((int)value >> 0x1F);
 
@@ -964,8 +963,7 @@ void CMesMenu::CalcHeart()
         *(unsigned int*)(base + 0x3DDC) = value & ~((int)value >> 0x1F);
 
         base += 0x10;
-        i--;
-    } while (i != 0);
+    }
 
     unsigned int value = *(int*)((char*)this + 0x3DF0) - 1;
     *(unsigned int*)((char*)this + 0x3DF0) = value & ~((int)value >> 0x1F);
@@ -985,7 +983,11 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     (void)z;
 
     unsigned int scriptFood = Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
-    if ((scriptFood == 0) || (alpha <= FLOAT_803308d8)) {
+    if (scriptFood == 0) {
+        return;
+    }
+
+    if (FLOAT_803308d8 >= alpha) {
         return;
     }
 

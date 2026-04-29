@@ -668,15 +668,11 @@ void CCaravanWork::FGPutGil(int gilToRemove)
 {
 	int put = putGil__10CGPartyObjFi((CGPartyObj*)m_ownerObj, gilToRemove);
 	if (put != 0) {
-		int gil = m_gil;
-		gil += -gilToRemove;
-		m_gil = gil;
-		if (gil <= 99999999) {
-			if (gil < 0) {
-				m_gil = 0;
-			}
-		} else {
+		m_gil += -gilToRemove;
+		if (99999999 < m_gil) {
 			m_gil -= m_gil - 99999999;
+		} else if (m_gil < 0) {
+			m_gil = 0;
 		}
 	}
 }
@@ -883,51 +879,52 @@ void CCaravanWork::CanAddTmpArtifact(int)
  */
 int CCaravanWork::FindItem(int itemId)
 {
-	int baseIdx = 0;
 	CCaravanWork* cur = this;
+	int itemIdx = 0;
 
-	for (int rowCount = 8; rowCount != 0; rowCount--) {
-		if (cur->m_inventoryItems[0] != -1 && cur->m_inventoryItems[0] == itemId) {
-			return baseIdx;
-		}
-		short item = cur->m_inventoryItems[1];
-		baseIdx++;
+	for (int row = 0; row < 8; row++) {
+		short item = cur->m_inventoryItems[0];
 		if (item != -1 && item == itemId) {
-			return baseIdx;
+			return itemIdx;
+		}
+		item = cur->m_inventoryItems[1];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
 		item = cur->m_inventoryItems[2];
-		baseIdx++;
+		itemIdx++;
 		if (item != -1 && item == itemId) {
-			return baseIdx;
+			return itemIdx;
 		}
 		item = cur->m_inventoryItems[3];
-		baseIdx++;
+		itemIdx++;
 		if (item != -1 && item == itemId) {
-			return baseIdx;
+			return itemIdx;
 		}
 		item = cur->m_inventoryItems[4];
-		baseIdx++;
+		itemIdx++;
 		if (item != -1 && item == itemId) {
-			return baseIdx;
+			return itemIdx;
 		}
 		item = cur->m_inventoryItems[5];
-		baseIdx++;
+		itemIdx++;
 		if (item != -1 && item == itemId) {
-			return baseIdx;
+			return itemIdx;
 		}
 		item = cur->m_inventoryItems[6];
-		baseIdx++;
+		itemIdx++;
 		if (item != -1 && item == itemId) {
-			return baseIdx;
+			return itemIdx;
 		}
 		item = cur->m_inventoryItems[7];
-		baseIdx++;
+		itemIdx++;
 		if (item != -1 && item == itemId) {
-			return baseIdx;
+			return itemIdx;
 		}
 
 		cur = (CCaravanWork*)&cur->m_baseDataIndex;
-		baseIdx++;
+		itemIdx++;
 	}
 
 	return -1;

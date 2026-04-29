@@ -193,6 +193,35 @@ CRingMenu::CRingMenu()
 
 /*
  * --INFO--
+ * PAL Address: 0x800a52dc
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CRingMenu::~CRingMenu()
+{
+	typedef void (*VFunc)(void*);
+	register short shouldDelete;
+	asm {
+		mr shouldDelete, r4
+	}
+
+	if (this == 0) {
+		return;
+	}
+
+	*reinterpret_cast<void***>(this) = __vt__9CRingMenu;
+	(*(VFunc*)((unsigned char*)*(void***)this + 0x10))(this);
+	__dt__5CMenuFv(this, 0);
+	if (0 < shouldDelete) {
+		__dl__FPv(this);
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800a5204
  * PAL Size: 216b
  * EN Address: TODO
@@ -200,7 +229,7 @@ CRingMenu::CRingMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-CRingMenu::~CRingMenu()
+void CRingMenu::Create()
 {
 	reinterpret_cast<void (*)(CRingMenu*)>(reinterpret_cast<void**>(this)[4])(this);
 	CMenu::Create();
@@ -239,35 +268,6 @@ CRingMenu::~CRingMenu()
 	*reinterpret_cast<int*>(self + 0x4FC) = 0;
 	*reinterpret_cast<int*>(self + 0x508) = 0;
 	*reinterpret_cast<float*>(self + 0x50C) = 0.0f;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800a52dc
- * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRingMenu::Create()
-{
-	typedef void (*VFunc)(void*);
-	register short shouldDelete;
-	asm {
-		mr shouldDelete, r4
-	}
-
-	if (this == 0) {
-		return;
-	}
-
-	*reinterpret_cast<void***>(this) = __vt__9CRingMenu;
-	(*(VFunc*)((unsigned char*)*(void***)this + 0x10))(this);
-	__dt__5CMenuFv(this, 0);
-	if (0 < shouldDelete) {
-		__dl__FPv(this);
-	}
 }
 
 /*

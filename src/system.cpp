@@ -281,8 +281,8 @@ void CSystem::ExecScenegraph()
 
     do
     {
-        unsigned short stepTrigger;
-        unsigned short perfTrigger;
+        int stepTrigger;
+        int perfTrigger;
 
         if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.m_gameWork.m_gamePaused)
         {
@@ -354,8 +354,8 @@ void CSystem::ExecScenegraph()
         {
             for (int port = 0; port < 4; port++)
             {
-                unsigned short trigger;
-                unsigned short held;
+                int trigger;
+                int held;
                 bool noInput;
 
                 noInput = false;
@@ -411,7 +411,7 @@ void CSystem::ExecScenegraph()
         }
 
         int scenegraphStepMode = m_scenegraphStepMode;
-        unsigned int drawToggle;
+        int drawToggle;
         if (scenegraphStepMode == 1)
         {
             drawToggle = ((unsigned int)__cntlzw(m_frameCounter & 3) >> 5) & 0xFF;
@@ -421,26 +421,26 @@ void CSystem::ExecScenegraph()
             drawToggle = 1;
         }
 
-        unsigned int stepGate = 0;
+        int stepGate = 0;
         switch (scenegraphStepMode)
         {
-        case 2:
-            stepGate = 1;
-            break;
-        case 3:
-            stepGate = (m_frameCounter & 7) != 0;
+        case 5:
+            stepGate = m_frameCounter & 1;
             break;
         case 4:
             stepGate = (m_frameCounter & 3) != 0;
             break;
-        case 5:
-            stepGate = m_frameCounter & 1;
+        case 3:
+            stepGate = (m_frameCounter & 7) != 0;
+            break;
+        case 2:
+            stepGate = 1;
             break;
         }
 
         float totalTime = 0.0f;
         perfTrigger &= 1;
-        CStopWatch watch((char*)"no name");
+        CStopWatch watch(reinterpret_cast<char*>(-1));
 
         int index = 0;
         for (COrder* order = m_orderSentinel.m_next;
@@ -451,8 +451,15 @@ void CSystem::ExecScenegraph()
             m_currentOrderIndex = index;
 
             unsigned int flags = order->m_entry->m_flags;
-            unsigned int skip = 0;
-            if ((flags & 1) == 0)
+            int skip = 0;
+            if ((flags & 1) != 0)
+            {
+                if (drawToggle == 0)
+                {
+                    skip = 1;
+                }
+            }
+            else
             {
                 if ((stepGate != 0) && (drawToggle != 0) && ((flags & 4) != 0))
                 {
@@ -463,22 +470,8 @@ void CSystem::ExecScenegraph()
                     skip = stepGate;
                 }
             }
-            else
-            {
-                if (drawToggle == 0)
-                {
-                    skip = 1;
-                }
-            }
 
-            if (Game.m_gameWork.m_gamePaused == 0)
-            {
-                if ((flags & 0x10) != 0)
-                {
-                    skip = 1;
-                }
-            }
-            else
+            if (Game.m_gameWork.m_gamePaused != 0)
             {
                 if ((flags & 8) == 0)
                 {
@@ -489,12 +482,19 @@ void CSystem::ExecScenegraph()
                     skip = 0;
                 }
             }
+            else
+            {
+                if ((flags & 0x10) != 0)
+                {
+                    skip = 1;
+                }
+            }
 
             if (skip == 0)
             {
                 watch.Reset();
                 watch.Start();
-                if ((flags & 1) != 0)
+                if ((order->m_entry->m_flags & 1) != 0)
                 {
                     Graphic.SetDrawDoneDebugData(-1);
                 }

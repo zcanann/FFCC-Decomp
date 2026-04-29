@@ -320,15 +320,15 @@ void _SetReverbData(RedReverbDATA* reverb, int* params)
     }
     case 3: {
         AXFX_DELAY* delay = (AXFX_DELAY*)reverb->context;
-        delay->delay[0] = (u32)params[0];
-        delay->delay[1] = (u32)params[0];
         delay->delay[2] = (u32)params[0];
-        delay->feedback[0] = (u32)params[1];
-        delay->feedback[1] = (u32)params[1];
+        delay->delay[1] = (u32)params[0];
+        delay->delay[0] = (u32)params[0];
         delay->feedback[2] = (u32)params[1];
-        delay->output[0] = (u32)params[2];
-        delay->output[1] = (u32)params[2];
+        delay->feedback[1] = (u32)params[1];
+        delay->feedback[0] = (u32)params[1];
         delay->output[2] = (u32)params[2];
+        delay->output[1] = (u32)params[2];
+        delay->output[0] = (u32)params[2];
         result = AXFXDelaySettings(delay);
         break;
     }
@@ -425,7 +425,7 @@ int* SetReverb(int bank, int kind, int* params)
         return (int*)p_ReverbSize;
     }
 
-    if (kind > 5) {
+    if (kind == 5) {
         return 0;
     }
 
@@ -474,15 +474,15 @@ int* SetReverb(int bank, int kind, int* params)
         AXFX_DELAY* delay = (AXFX_DELAY*)RedNew(sizeof(AXFX_DELAY));
         reverb->context = delay;
         reverb->callback = (int)AXFXDelayCallback;
-        delay->delay[0] = (u32)params[0];
-        delay->delay[1] = (u32)params[0];
         delay->delay[2] = (u32)params[0];
-        delay->feedback[0] = (u32)params[1];
-        delay->feedback[1] = (u32)params[1];
+        delay->delay[1] = (u32)params[0];
+        delay->delay[0] = (u32)params[0];
         delay->feedback[2] = (u32)params[1];
-        delay->output[0] = (u32)params[2];
-        delay->output[1] = (u32)params[2];
+        delay->feedback[1] = (u32)params[1];
+        delay->feedback[0] = (u32)params[1];
         delay->output[2] = (u32)params[2];
+        delay->output[1] = (u32)params[2];
+        delay->output[0] = (u32)params[2];
         result = AXFXDelayInit(delay);
         break;
     }
@@ -644,11 +644,33 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
     mixData = (u16*)(voiceData + 0x1a);
     memset(mixData, 0, 0x24);
 
-    if (m_SoundPlayMode == 2) {
-        *mixData = (u16)((u32)(volume * t_PanningData[pan]) >> 8);
-        *(s16*)(voiceData + 0x1e) = (s16)((u32)(volume * t_PanningDataR[pan]) >> 8);
-        *(s16*)(voiceData + 0x1b) = (s16)((u32)(volume * t_PanningData[pan ^ 0x7f]) >> 8);
-        *(s16*)(voiceData + 0x1f) = (s16)((u32)(volume * t_PanningDataR[pan ^ 0x7f]) >> 8);
+    switch (m_SoundPlayMode) {
+    case 1:
+        volFactor = (int)t_PanningData[0x40];
+        int monoBase = (volume * volFactor) >> 8;
+
+        if ((voiceData[0x25] & 0xc00U) != 0) {
+            uVar3 = (u16)monoBase;
+            *mixData = uVar3;
+            *(u16*)(voiceData + 0x1b) = uVar3;
+        }
+
+        if ((voiceData[0x25] & 0x3000U) != 0) {
+            u16 monoMix = (u16)((monoBase * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
+            if ((voiceData[0x25] & 2U) != 0) {
+                *(u16*)(voiceData + 0x1c) = monoMix;
+                *(u16*)(voiceData + 0x1d) = monoMix;
+            } else {
+                *(u16*)(voiceData + 0x1e) = monoMix;
+                *(u16*)(voiceData + 0x1f) = monoMix;
+            }
+        }
+        break;
+    case 2:
+        *mixData = (u16)((volume * t_PanningData[pan]) >> 8);
+        *(s16*)(voiceData + 0x1e) = (s16)((volume * t_PanningDataR[pan]) >> 8);
+        *(s16*)(voiceData + 0x1b) = (s16)((volume * t_PanningData[pan ^ 0x7f]) >> 8);
+        *(s16*)(voiceData + 0x1f) = (s16)((volume * t_PanningDataR[pan ^ 0x7f]) >> 8);
 
         if ((voiceData[0x25] & 0x1000U) != 0) {
             *(s16*)(voiceData + 0x1c) = (s16)((int)((u32)*mixData * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
@@ -659,58 +681,43 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
             *(s16*)(voiceData + 0x1d) = (s16)((int)((u32)*(u16*)(voiceData + 0x1b) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
             *(s16*)(voiceData + 0x20) = (s16)((int)((u32)*(u16*)(voiceData + 0x1f) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
         }
-    } else if ((m_SoundPlayMode < 2) && (0 < m_SoundPlayMode)) {
-        volFactor = (int)t_PanningData[0x40];
-
-        if ((voiceData[0x25] & 0xc00U) != 0) {
-            uVar3 = (u16)((u32)(volume * volFactor) >> 8);
-            *mixData = uVar3;
-            *(u16*)(voiceData + 0x1b) = uVar3;
-        }
-
-        if ((voiceData[0x25] & 0x3000U) != 0) {
-            u16 monoMix = (u16)(((volume * volFactor >> 8) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
-            if ((voiceData[0x25] & 2U) == 0) {
-                *(u16*)(voiceData + 0x1e) = monoMix;
-                *(u16*)(voiceData + 0x1f) = monoMix;
-            } else {
-                *(u16*)(voiceData + 0x1c) = monoMix;
-                *(u16*)(voiceData + 0x1d) = monoMix;
-            }
-        }
-    } else {
+        break;
+    default:
         if (0x80 < pan) {
             pan = 0x100 - pan;
         }
 
         leftPan = t_PanningData[pan];
         rightPan = t_PanningData[pan ^ 0x7f];
+        int leftMix = (volume * leftPan) >> 8;
+        int rightMix = (volume * rightPan) >> 8;
 
         if ((voiceData[0x25] & 0x400U) != 0) {
-            *mixData = (u16)((u32)(volume * leftPan) >> 8);
+            *mixData = (u16)leftMix;
         }
 
         if ((voiceData[0x25] & 0x800U) != 0) {
-            *(s16*)(voiceData + 0x1b) = (s16)((u32)(volume * rightPan) >> 8);
+            *(s16*)(voiceData + 0x1b) = (s16)rightMix;
         }
 
         if ((voiceData[0x25] & 0x1000U) != 0) {
-            iVar1 = ((volume * leftPan >> 8) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
-            if ((voiceData[0x25] & 2U) == 0) {
-                *(u16*)(voiceData + 0x1e) = (u16)iVar1;
-            } else {
+            iVar1 = (leftMix * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
+            if ((voiceData[0x25] & 2U) != 0) {
                 *(u16*)(voiceData + 0x1c) = (u16)iVar1;
+            } else {
+                *(u16*)(voiceData + 0x1e) = (u16)iVar1;
             }
         }
 
         if ((voiceData[0x25] & 0x2000U) != 0) {
-            iVar2 = ((volume * rightPan >> 8) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
-            if ((voiceData[0x25] & 2U) == 0) {
-                *(u16*)(voiceData + 0x1f) = (u16)iVar2;
-            } else {
+            iVar2 = (rightMix * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
+            if ((voiceData[0x25] & 2U) != 0) {
                 *(u16*)(voiceData + 0x1d) = (u16)iVar2;
+            } else {
+                *(u16*)(voiceData + 0x1f) = (u16)iVar2;
             }
         }
+        break;
     }
 
     voiceData[0x24] |= 8;
@@ -755,7 +762,7 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
     }
 
     pan = *(u8*)(voiceData[1] + 0x1a) & 0x7f;
-    if ((*(u8*)(voiceData[1] + 0x1a) & 0x7f) != 0) {
+    if (pan != 0) {
         pan = pan + 1;
     }
 
@@ -798,7 +805,7 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
             pan = *(int*)voiceData[4] >> 0xc;
         } else {
             pan = *(u8*)(voiceData[1] + 0x1b) & 0x7f;
-            if ((*(u8*)(voiceData[1] + 0x1b) & 0x7f) == 0) {
+            if (pan == 0) {
                 pan = 0x40;
             }
         }
@@ -840,41 +847,44 @@ void _PitchExecute(RedVoiceDATA* voice)
 {
     int pitchDelta = 0;
     int* voiceData = (int*)voice;
-    int* trackData = (int*)voiceData[0];
 
-    if ((trackData[0x1D] != 0) && (((s16*)voiceData)[10] == 0)) {
-        u32 pitchLfo = (u32)trackData[0x20] >> 0xC;
-        if ((int)pitchLfo < 0x80) {
-            pitchDelta = ((int)pitchLfo + 1) * 2;
+    if (((u32)*(int*)(voiceData[0] + 0x74) != 0) && (*(s16*)(voiceData + 10) == 0)) {
+        int pitchLfo = *(int*)(voiceData[0] + 0x80) >> 0xC;
+        if (pitchLfo < 0x80) {
+            pitchDelta = (pitchLfo + 1) * 2;
         } else {
-            pitchDelta = ((int)(pitchLfo & 0x7F) + 1) * 0x18;
+            pitchDelta = ((pitchLfo & 0x7F) + 1) * 0x18;
         }
 
-        if ((((u8*)voiceData)[0x1A] & 3) == 0) {
+        pitchDelta = *(s16*)(voiceData[0] + 0x13E) + pitchDelta;
+        pitchDelta = *(s16*)(voiceData[0] + 0x142) + pitchDelta;
+
+        if ((((u8*)voiceData)[0x1A] & 3) != 0) {
             pitchDelta = PitchCompute(
-                voiceData[0x28] + *p_MusicPitchControl,
-                ((s16*)trackData)[0xA1] + ((s16*)trackData)[0x9F] + pitchDelta,
+                voiceData[0x28] + *(int*)(voiceData[0] + 0x5C),
+                pitchDelta,
                 ((int*)voiceData[1])[5],
-                ((s8*)trackData)[0x148]);
+                *(s8*)(voiceData[0] + 0x148));
         } else {
             pitchDelta = PitchCompute(
-                voiceData[0x28] + trackData[0x17],
-                ((s16*)trackData)[0xA1] + ((s16*)trackData)[0x9F] + pitchDelta,
+                voiceData[0x28] + *p_MusicPitchControl,
+                pitchDelta,
                 ((int*)voiceData[1])[5],
-                ((s8*)trackData)[0x148]);
+                *(s8*)(voiceData[0] + 0x148));
         }
 
         {
             int currentPitch = voiceData[0x26];
-            int (*pitchWaveFunc)(u32) = *(int (**)(u32))((u8*)trackData + 0x74);
+            int (*pitchWaveFunc)(u32) = *(int (**)(u32))(voiceData[0] + 0x74);
             int pitchWave = pitchWaveFunc((u32)voiceData[7] >> 0xC);
             pitchDelta = ((pitchDelta - currentPitch) * (pitchWave >> 4)) >> 0xC;
         }
 
         if (voiceData[8] != 0) {
             int frame = voiceData[9];
-            voiceData[9] = frame + 1;
-            pitchDelta = (pitchDelta * frame) / voiceData[8];
+            int rampedPitch = pitchDelta * frame;
+            voiceData[9] = voiceData[9] + 1;
+            pitchDelta = rampedPitch / voiceData[8];
             if (voiceData[8] <= voiceData[9]) {
                 voiceData[8] = 0;
             }
@@ -884,7 +894,7 @@ void _PitchExecute(RedVoiceDATA* voice)
             pitchDelta >>= 1;
         }
 
-        voiceData[7] += trackData[0x1E];
+        voiceData[7] += *(int*)(voiceData[0] + 0x78);
     }
 
     voiceData[0x27] = pitchDelta + voiceData[0x26] + voiceData[0xF];
@@ -1561,7 +1571,7 @@ void _KeyOnControl()
 
     if (m_KeyOnEntry != 0) {
         do {
-            if ((*reserve != 0) && (*(int*)(*reserve + 0x1C) != 0)) {
+            if (((u32)*reserve != 0) && (*(int*)(*reserve + 0x1C) != 0)) {
                 voiceData = (unsigned int*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)&local_28);
             }
             reserve += 2;
@@ -1571,7 +1581,7 @@ void _KeyOnControl()
     if ((*(s16*)((u8*)p_SoundControlBuffer + 0x48E) != 0) && ((((u32*)p_SoundControlBuffer)[0x11B] & 0x10) == 0)) {
         int* track = *(int**)p_SoundControlBuffer;
         do {
-            if ((*track != 0) && (track[0x2D] != 0)) {
+            if (((u32)*track != 0) && (track[0x2D] != 0)) {
                 waveFunc = (int (*)(int))track[0x2D];
                 track[0x33] = (((track[0x30] >> 0xC) + 1) * waveFunc((u32)track[0x32] >> 0xC)) >> 0x10;
                 track[0x32] += track[0x2E];
@@ -1584,7 +1594,7 @@ void _KeyOnControl()
         int* track = (int*)((u32*)p_SoundControlBuffer)[0x125];
         u32* trackBase = (u32*)p_SoundControlBuffer + 0x125;
         do {
-            if ((*track != 0) && (track[0x2D] != 0)) {
+            if (((u32)*track != 0) && (track[0x2D] != 0)) {
                 waveFunc = (int (*)(int))track[0x2D];
                 track[0x33] = (((track[0x30] >> 0xC) + 1) * waveFunc((u32)track[0x32] >> 0xC)) >> 0x10;
                 track[0x32] += track[0x2E];
@@ -1597,7 +1607,7 @@ void _KeyOnControl()
         u32* seTrackBase = (u32*)p_SoundControlBuffer + 0x36F;
         int* track = (int*)((u32*)p_SoundControlBuffer)[0x36F];
         do {
-            if ((*track != 0) && (track[0x2D] != 0)) {
+            if (((u32)*track != 0) && (track[0x2D] != 0)) {
                 waveFunc = (int (*)(int))track[0x2D];
                 track[0x33] = (((track[0x30] >> 0xC) + 1) * waveFunc((u32)track[0x32] >> 0xC)) >> 0x10;
                 track[0x32] += track[0x2E];
@@ -1843,16 +1853,19 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
 
         voiceData = (int*)p_VoiceData;
         do {
-            if ((*voiceData == (int)track) && ((voiceData[0x28] += addPitch), (voiceData[1] != 0))) {
-                voiceData[0x26] = PitchCompute(voiceData[0x28] + *p_MusicPitchControl,
-                                               (int)*(s16*)((u8*)track + 0x142) + (int)*(s16*)((u8*)track + 0x13E),
-                                               *(int*)((u8*)voiceData[1] + 0x14), (s8)((u8*)track)[0x148]);
+            if (*voiceData == (int)track) {
+                voiceData[0x28] += addPitch;
+                if (voiceData[1] != 0) {
+                    voiceData[0x26] = PitchCompute(voiceData[0x28] + *p_MusicPitchControl,
+                                                   (int)*(s16*)((u8*)track + 0x142) + (int)*(s16*)((u8*)track + 0x13E),
+                                                   *(int*)((u8*)voiceData[1] + 0x14), (s8)((u8*)track)[0x148]);
+                }
             }
             voiceData += 0x30;
         } while (voiceData < (int*)p_VoiceData + 0xC00);
     }
 
-    if (trackData[0x1D] != 0) {
+    if ((u32)trackData[0x1D] != 0) {
         if (*(s16*)((u8*)track + 0x8C) != 0) {
             int step = frames;
             if (*(s16*)((u8*)track + 0x8C) <= frames) {
@@ -1871,7 +1884,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         }
     }
 
-    if (trackData[0x25] != 0) {
+    if ((u32)trackData[0x25] != 0) {
         if (*(s16*)((u8*)track + 0xAC) != 0) {
             int step = frames;
             if (*(s16*)((u8*)track + 0xAC) <= frames) {
@@ -1891,7 +1904,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
     }
 
     voiceData = (int*)p_VoiceData;
-    if (trackData[0x2D] != 0) {
+    if ((u32)trackData[0x2D] != 0) {
         if (*(s16*)((u8*)track + 0xD0) != 0) {
             int step = frames;
             if (*(s16*)((u8*)track + 0xD0) <= frames) {
@@ -2474,7 +2487,7 @@ int _SeMidiNoteExecute(
 {
     int* track = (int*)trackData;
     do {
-        if ((*track != 0) && ((track[0x3F] & 8) == 0)) {
+        if (((u32)*track != 0) && ((track[0x3F] & 8) == 0)) {
             *(s16*)((u8*)track + 0x146) += (s16)(tickStep * -0x78);
             while (*(s16*)((u8*)track + 0x146) < 1) {
                 int step = frames;
@@ -2489,7 +2502,7 @@ int _SeMidiNoteExecute(
                 }
 
                 m_ChangeStatus = 0;
-                while ((*track != 0) && (track[0x42] < 1)) {
+                while (((u32)*track != 0) && (track[0x42] < 1)) {
                     int delta;
                     unsigned char* cmd;
                     *(s16*)(track + 0x51) += 1;
@@ -2497,7 +2510,7 @@ int _SeMidiNoteExecute(
                     *track = (int)(cmd + 1);
                     ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))p_MidiControl_Function[*cmd])(
                         control, keyOnData, (RedTrackDATA*)track);
-                    if (*track != 0) {
+                    if ((u32)*track != 0) {
                         delta = DeltaTimeSumup((unsigned char**)track);
                         if (delta != 0) {
                             delta += *(s16*)(track + 0x4E);

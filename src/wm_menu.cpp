@@ -15,7 +15,9 @@
 #include "ffcc/partMng.h"
 #include "ffcc/THPSimple.h"
 #include "ffcc/joybus.h"
+#include "ffcc/color.h"
 
+#include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 #include <math.h>
@@ -51,6 +53,18 @@ extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, V
 extern "C" void Create__9CGBaseObjFv(void*);
 extern "C" void SetViewport__8CGraphicFv(void*);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
+extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
+extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
+extern "C" void DrawInit__5CFontFv(CFont*);
+extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void Draw__Q29CCharaPcs7CHandleFi(void*, int);
 extern "C" void InitEnv__9CCharaPcsFi(void*, int);
 extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, int, void*, int);
@@ -151,9 +165,14 @@ extern float FLOAT_803314f8;
 extern float FLOAT_803314fc;
 extern float FLOAT_80331500;
 extern float FLOAT_80331554;
+extern float FLOAT_80331548;
+extern float FLOAT_80331550;
+extern float FLOAT_80331558;
+extern float FLOAT_8033155C;
 extern float FLOAT_80331568;
 extern float FLOAT_80331594;
 extern float FLOAT_803315b4;
+extern float FLOAT_8033158C;
 extern float FLOAT_80331778;
 extern float FLOAT_8033177c;
 extern float FLOAT_80331780;
@@ -164,6 +183,17 @@ extern float FLOAT_803317c4;
 extern float FLOAT_803317c8;
 extern float FLOAT_803317cc;
 extern float FLOAT_803314a4;
+extern float FLOAT_8033166C;
+extern float FLOAT_80331680;
+extern float FLOAT_80331684;
+extern float FLOAT_80331688;
+extern double DOUBLE_80331418;
+extern double DOUBLE_80331460;
+extern double DOUBLE_803314E8;
+extern double DOUBLE_80331510;
+extern double DOUBLE_803315C0;
+extern double DOUBLE_80331670;
+extern double DOUBLE_80331678;
 extern double DOUBLE_80331420;
 extern double DOUBLE_803314a8;
 extern double DOUBLE_803314d0;
@@ -189,6 +219,13 @@ extern char DAT_80331648[];
 extern char DAT_8033164c[];
 extern char DAT_80331654[];
 extern char DAT_8033165c[];
+extern const char* lbl_8032E8F0[];
+extern const char* lbl_8032E8F8[];
+extern const char* DAT_8032E900[];
+extern const char* lbl_8032E908[];
+extern const char* lbl_8032E910[];
+extern int DAT_8032E918;
+extern float* DAT_8032E91C;
 char gWmMenuCursorX[2];
 char gWmMenuCursorY[2];
 int gWmMenuWorkA;
@@ -267,6 +304,29 @@ static inline short* GetWmWorldState(CMenuPcs* menu)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menu);
 	return reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+}
+
+static inline unsigned char* GetWmCmakeWork(CMenuPcs* menu)
+{
+	return reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(menu)[0x888] == 1
+	                                            ? *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(menu) + 0x88C)
+	                                            : 0);
+}
+
+static inline int GetWmMenuFade(short state, short frame)
+{
+	if (state == 1) {
+		return static_cast<int>(FLOAT_80331458 * static_cast<float>(DOUBLE_803314E8 * (static_cast<double>(frame) - DOUBLE_80331408)));
+	}
+	if (state == 2) {
+		return static_cast<int>(FLOAT_80331458);
+	}
+	return static_cast<int>(FLOAT_80331458 * static_cast<float>(-(DOUBLE_803314E8 * (static_cast<double>(frame) - DOUBLE_80331408) - DOUBLE_80331420)));
+}
+
+static inline CFont* GetWmFont(CMenuPcs* menu)
+{
+	return *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(menu) + 0xF8);
 }
 
 static inline void QueueWmCharaAnimState(CMenuPcs* menu, int slot, int state)
@@ -6499,7 +6559,131 @@ void CMenuPcs::CalcCharaSelect()
  */
 void CMenuPcs::DrawCharaName()
 {
-	DrawCursor(0, 0, 1.0f);
+	CFont* const font = GetWmFont(this);
+	short* const worldState = GetWmWorldState(this);
+	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
+	unsigned char* const cmakeWork = GetWmCmakeWork(this);
+
+	const char** emptyText = lbl_8032E8F0;
+	if (Game.m_gameWork.m_languageId == 3) {
+		emptyText = DAT_8032E900;
+	} else if (Game.m_gameWork.m_languageId < 3) {
+		if (Game.m_gameWork.m_languageId != 0 && Game.m_gameWork.m_languageId != 1) {
+			emptyText = lbl_8032E8F8;
+		}
+	} else if (Game.m_gameWork.m_languageId == 5) {
+		emptyText = lbl_8032E910;
+	} else if (Game.m_gameWork.m_languageId < 5) {
+		emptyText = lbl_8032E908;
+	}
+
+	const int alpha = GetWmMenuFade(worldState[0x10 / 2], worldState[0x22 / 2]);
+	unsigned int activeMask = 0;
+	unsigned int confirmedMask = 0;
+	unsigned int pendingMask = 0;
+	for (int i = 0; i < 8; i++) {
+		const WmCharaSelectEntry& entry = selectEntries[i];
+		if (entry.m_connected != 0) {
+			const unsigned int bit = 1u << entry.m_currentSlot;
+			activeMask |= bit;
+			if (entry.m_confirmed != 0) {
+				confirmedMask |= bit;
+			}
+			if (entry.m_cmakePending != 0 || entry.m_cmakeReady != 0) {
+				pendingMask |= bit;
+			}
+		}
+	}
+
+	SetMargin__5CFontFf(FLOAT_803313e8, font);
+	SetShadow__5CFontFi(font, 0);
+	SetScale__5CFontFf(FLOAT_8033158C, font);
+	DrawInit__5CFontFv(font);
+	DrawInit__8CMenuPcsFv(this);
+
+	CColor shade(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha));
+	GXSetChanMatColor(GX_COLOR0A0, shade.color);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x28);
+	for (int row = 0; row < 2; row++) {
+		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8) + FLOAT_80331684;
+		if (row != 0) {
+			y += FLOAT_80331548;
+		}
+		for (int col = 0; col < 4; col++) {
+			const int slot = row * 4 + col;
+			if ((confirmedMask & (1u << slot)) != 0) {
+				const char* const text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].unk_0x3ca_0x3dd);
+				float scale = FLOAT_803313e8;
+				float xOffset = -(static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331680) - DOUBLE_80331678));
+				const float width = GetWidth__5CFontFPc(font, text);
+				if (static_cast<double>(FLOAT_80331680) < static_cast<double>(width) * DOUBLE_803313f8) {
+					scale = static_cast<float>((static_cast<double>(width) + DOUBLE_80331510) * DOUBLE_803313f8 /
+					                          static_cast<double>(FLOAT_80331680));
+					xOffset = FLOAT_8033155C - static_cast<float>(static_cast<double>(width) + DOUBLE_80331510);
+				}
+				const float x = FLOAT_80331410 + static_cast<float>(col * 0x90) + xOffset * static_cast<float>(DOUBLE_803313f8);
+				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, FLOAT_80331680, FLOAT_80331410,
+				                                FLOAT_803313dc, FLOAT_803313dc, scale, FLOAT_803313e8, 0.0f);
+				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 8, FLOAT_80331680 * scale + x, y,
+				                                FLOAT_80331680, FLOAT_80331410, FLOAT_803313dc, FLOAT_803313dc,
+				                                scale, FLOAT_803313e8, 0.0f);
+			}
+		}
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+	SetMargin__5CFontFf(FLOAT_803313e8, font);
+	SetShadow__5CFontFi(font, 1);
+	SetScale__5CFontFf(FLOAT_8033158C, font);
+	DrawInit__5CFontFv(font);
+	SetColor__5CFontF8_GXColor(font, &shade.color);
+
+	for (int row = 0; row < 2; row++) {
+		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8) + FLOAT_80331688 - FLOAT_80331550;
+		if (row != 0) {
+			y += FLOAT_80331548;
+		}
+		for (int col = 0; col < 4; col++) {
+			const int slot = row * 4 + col;
+			bool restoreColor = false;
+			const char* text = 0;
+
+			if (worldState[0x1C / 2] == 8 && cmakeWork != 0 &&
+			    *reinterpret_cast<int*>(cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
+				text = reinterpret_cast<const char*>(cmakeWork + slot * 0x9C0 + 0x15C0);
+				SetTlut__5CFontFi(font, (activeMask & (1u << slot)) != 0 ? 6 : 8);
+			} else if (Game.m_caravanWorkArr[slot].m_shopState != 0) {
+				text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].unk_0x3ca_0x3dd);
+				SetTlut__5CFontFi(font, (activeMask & (1u << slot)) != 0 ? 6 : 8);
+			} else if ((pendingMask & (1u << slot)) == 0) {
+				text = emptyText[0];
+				SetTlut__5CFontFi(font, (activeMask & (1u << slot)) != 0 ? 7 : 8);
+			} else {
+				text = emptyText[1];
+				SetTlut__5CFontFi(font, 0x10);
+				if (worldState[0x10 / 2] == 2) {
+					const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
+					const int blink = static_cast<int>(FLOAT_80331458 *
+					                                   static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(phase < 0 ? -phase : phase) -
+					                                                        DOUBLE_80331420)));
+					CColor blinkColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(blink));
+					SetColor__5CFontF8_GXColor(font, &blinkColor.color);
+					restoreColor = true;
+				}
+			}
+
+			const float x = FLOAT_80331410 + static_cast<float>(col * 0x90) +
+			                (FLOAT_8033155C - GetWidth__5CFontFPc(font, text)) * static_cast<float>(DOUBLE_803313f8);
+			SetPosX__5CFontFf(x, font);
+			SetPosY__5CFontFf(y, font);
+			Draw__5CFontFPc(font, text);
+			if (restoreColor) {
+				SetColor__5CFontF8_GXColor(font, &shade.color);
+			}
+		}
+	}
+
+	DrawInit__8CMenuPcsFv(this);
 }
 
 /*
@@ -6513,7 +6697,119 @@ void CMenuPcs::DrawCharaName()
  */
 void CMenuPcs::DrawCMLife()
 {
-	DrawCursor(0, 0, 1.0f);
+	short* const worldState = GetWmWorldState(this);
+	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
+	unsigned char* const cmakeWork = GetWmCmakeWork(this);
+
+	const int alpha = GetWmMenuFade(worldState[0x10 / 2], worldState[0x22 / 2]);
+	unsigned int readyMask = 0;
+	for (int i = 0; i < 8; i++) {
+		const WmCharaSelectEntry& entry = selectEntries[i];
+		if (entry.m_connected != 0 && entry.m_cmakePending == 0 && entry.m_cmakeReady == 0) {
+			readyMask |= 1u << entry.m_currentSlot;
+		}
+	}
+
+	for (int slot = 0; slot < 8; slot++) {
+		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x27);
+
+		unsigned short life = 0;
+		bool enabled = false;
+		if (worldState[0x1C / 2] == 8 && reinterpret_cast<unsigned char*>(this)[0x888] == 1 && cmakeWork != 0 &&
+		    *reinterpret_cast<int*>(cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
+			life = *reinterpret_cast<unsigned short*>(cmakeWork + slot * 0x9C0 + 0x14D6);
+			enabled = true;
+		} else if (Game.m_caravanWorkArr[slot].m_shopState != 0) {
+			life = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Game.m_caravanWorkArr[slot]) + 0x1A);
+			enabled = true;
+		}
+
+		if (!enabled) {
+			continue;
+		}
+
+		const int count = static_cast<int>(life) >> 1;
+		float red = FLOAT_80331434;
+		float green = FLOAT_80331668;
+		if ((readyMask & (1u << slot)) != 0) {
+			red = FLOAT_803313e8;
+			green = FLOAT_803313e8;
+		}
+
+		CColor color(static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * red)),
+		             static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * green)),
+		             static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * green)),
+		             static_cast<unsigned char>(alpha));
+		GXSetChanMatColor(GX_COLOR0A0, color.color);
+
+		const int row = slot / 4;
+		const int col = slot - row * 4;
+		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8);
+		if (row != 0) {
+			y += FLOAT_80331548;
+		}
+		const float xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
+		const float yBase = y + FLOAT_8033166C;
+		float x = xBase + static_cast<float>(0x90 - count * 0x10) * static_cast<float>(DOUBLE_803313f8);
+		float step = static_cast<float>(8 - count) * static_cast<float>(DOUBLE_803313f8);
+
+		for (int i = 0; i < count; i++) {
+			float yAdd = FLOAT_803313dc;
+			const float t = step / FLOAT_803314c0;
+			if (t < DAT_8032E91C[DAT_8032E918 * 4 - 4]) {
+				for (int j = 0; j < DAT_8032E918; j++) {
+					if (t <= DAT_8032E91C[j * 4]) {
+						if (j == 0) {
+							yAdd = DAT_8032E91C[1];
+						} else {
+							float* const cur = DAT_8032E91C + j * 4;
+							float* const prev = DAT_8032E91C + (j - 1) * 4;
+							const float width = cur[0] - prev[0];
+							const float u = (t - prev[0]) / width;
+							const float u2 = u * u;
+							const float u3 = u2 * u;
+							yAdd = width * (prev[3] * (u - (FLOAT_803314c8 * u2 - u3)) +
+							                cur[2] * (u3 - u2)) +
+							       prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							       cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+						}
+						break;
+					}
+				}
+			} else {
+				yAdd = DAT_8032E91C[DAT_8032E918 * 4 - 3];
+			}
+
+			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, yBase + yAdd, FLOAT_80331558, FLOAT_80331558,
+			                                FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+			step += static_cast<float>(DOUBLE_80331420);
+			x += FLOAT_80331558;
+		}
+
+		if (reinterpret_cast<unsigned char*>(this)[0x888] == 1 && cmakeWork != 0) {
+			const unsigned char* const work = cmakeWork + slot * 0x9C0;
+			const char flagA = work[0x1D90];
+			const char flagB = work[0x1D91];
+			if (flagA != 0 || flagB != 0) {
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x38);
+				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, xBase + static_cast<float>(DOUBLE_80331670),
+				                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
+				                                FLOAT_80331440, FLOAT_803313dc,
+				                                flagA != 0 ? FLOAT_803313dc : FLOAT_80331440,
+				                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+			}
+		} else {
+			const CCaravanWork& caravanWork = Game.m_caravanWorkArr[slot];
+			if (caravanWork.m_shopBusyFlag != 0 || caravanWork.m_caravanLocalFlags != 0) {
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x38);
+				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, xBase + static_cast<float>(DOUBLE_80331670),
+				                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
+				                                FLOAT_80331440, FLOAT_803313dc,
+				                                caravanWork.m_shopBusyFlag != 0 ? FLOAT_803313dc : FLOAT_80331440,
+				                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+			}
+		}
+	}
 }
 
 /*
@@ -7974,22 +8270,6 @@ void CMenuPcs::ClrMcList()
 unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	if (cameraSlot < 0) {
-		cameraSlot = slot;
-	}
-
-	unsigned char* effect = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x840)[0] + slot * 0x524);
-	if (slot == 5 && effectNo < 0x13) {
-		effect += 0x524;
-	} else if (slot > 0x10 && slot < 0x15 && effectNo > 0x19) {
-		effect += 0x524;
-	}
-
-	*reinterpret_cast<unsigned int*>(effect + 0x0) = static_cast<unsigned int>(effectNo);
-	*reinterpret_cast<unsigned int*>(effect + 0x8) = static_cast<unsigned int>(slot);
-	Create__9CGBaseObjFv(effect + 0xC);
-	*reinterpret_cast<unsigned int*>(effect + 0x104) = *reinterpret_cast<unsigned int*>(bytes + 0x4A8 + cameraSlot * 4);
-
 	unsigned char createParam[0x88];
 	*reinterpret_cast<unsigned int*>(createParam + 0x48) = 0xFFFFFFFF;
 	*reinterpret_cast<unsigned int*>(createParam + 0x58) = 0xFFFFFFFF;
@@ -8014,13 +8294,30 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	*reinterpret_cast<float*>(createParam + 0x24) = FLOAT_803313e8;
 	*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
 	createParam[0x2C] = 0;
+
+	if (cameraSlot < 0) {
+		cameraSlot = slot;
+	}
+
+	unsigned char* effect = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x840)[0] + slot * 0x524);
+	if (slot == 5 && effectNo < 0x13) {
+		effect += 0x524;
+	} else if (slot > 0x10 && slot < 0x15 && effectNo > 0x19) {
+		effect += 0x1490;
+	}
+
+	*reinterpret_cast<unsigned int*>(effect + 0x0) = static_cast<unsigned int>(effectNo);
+	*reinterpret_cast<unsigned int*>(effect + 0x8) = static_cast<unsigned int>(slot);
+	Create__9CGBaseObjFv(effect + 0xC);
+	*reinterpret_cast<unsigned int*>(effect + 0x104) = *reinterpret_cast<unsigned int*>(bytes + 0x4A8 + cameraSlot * 4);
+
 	*reinterpret_cast<void**>(createParam + 0x74) = effect + 0xC;
 	*reinterpret_cast<void**>(createParam + 0x70) = effect + 0xC;
 	*reinterpret_cast<float*>(createParam + 0x64) = FLOAT_803313e8;
 	*reinterpret_cast<float*>(createParam + 0x60) = FLOAT_803313e8;
 	createParam[0x5C] = 0;
 
-	const int group = ((effectNo ^ 100) >> 1) - ((((effectNo ^ 100) & effectNo)) >> 31);
+	const int group = (((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31;
 	const unsigned int partId = pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(&PartMng, group, effectNo, createParam, 1);
 	*reinterpret_cast<unsigned int*>(effect + 0x4) = partId;
 	return partId;

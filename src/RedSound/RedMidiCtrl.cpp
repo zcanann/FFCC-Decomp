@@ -606,13 +606,13 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
                  nextTrack += 0x55) {
                 int currentDelta = deltaAdjust + (nextTrack[0x42] - loopBase);
 
-                while ((currentDelta < 1) && (*nextTrack != 0)) {
+                while ((currentDelta < 1) && ((u32)*nextTrack != 0)) {
                     unsigned char* cmd = (unsigned char*)*nextTrack;
                     *nextTrack = (int)(cmd + 1);
                     ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))p_MidiControl_Function[*cmd])(
                         control, keyOnData, (RedTrackDATA*)nextTrack);
 
-                    if (*nextTrack != 0) {
+                    if ((u32)*nextTrack != 0) {
                         int step = DeltaTimeSumup((unsigned char**)nextTrack);
                         currentDelta += step;
                         nextTrack[0x42] += step;

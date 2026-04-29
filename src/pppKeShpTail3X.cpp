@@ -291,7 +291,7 @@ draw_loop:
                             drawScale * pppMngStPtr->m_scale.y, drawScale * pppMngStPtr->m_scale.z);
             if ((step->m_rotateEnabled != 0) && (count != 0)) {
                 PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
-                pppCopyMatrix(tmpMtx, obj->field_0x40);
+                tmpMtx = obj->field_0x40;
                 pppMulMatrix(obj->field_0x40, rotMtx, tmpMtx);
             }
             PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
@@ -303,7 +303,7 @@ draw_loop:
             drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z);
             if ((step->m_rotateEnabled != 0) && (count != 0)) {
                 PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
-                pppCopyMatrix(tmpMtx, drawMtx);
+                tmpMtx = drawMtx;
                 pppMulMatrix(drawMtx, rotMtx, tmpMtx);
             }
             PSMTXMultVec(ppvCameraMatrix02, &pos, &pos);

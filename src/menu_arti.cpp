@@ -447,10 +447,6 @@ void CMenuPcs::ArtiInit1()
  */
 unsigned int CMenuPcs::ArtiOpen()
 {
-	float ratio;
-	double dVar2;
-	double dVar3;
-	short* entry;
 	int finished;
 	int count;
 	int frame;
@@ -543,8 +539,8 @@ bool CMenuPcs::ArtiClose()
 
 	for (int i = 0; i < count; i++, anim++) {
 		float zeroF = FLOAT_80332fa8;
-		if (anim->startFrame <= frame) {
-			if (!(frame < anim->startFrame + anim->duration)) {
+		if (frame >= anim->startFrame) {
+			if (anim->startFrame + anim->duration <= frame) {
 				finished++;
 				anim->alpha = FLOAT_80332fa8;
 				anim->dx = zeroF;
@@ -555,8 +551,10 @@ bool CMenuPcs::ArtiClose()
 				anim->alpha = (float)-((DOUBLE_80332fb0 / (double)anim->duration) * (double)anim->step - DOUBLE_80332fb0);
 				if ((anim->flags & 2) == 0) {
 					float ratio = (float)-((oneD / (double)anim->duration) * (double)anim->step - oneD);
-					anim->dx = (anim->targetX - (float)anim->x) * ratio;
-					anim->dy = (anim->targetY - (float)anim->y) * ratio;
+					float dx = anim->targetX - (float)anim->x;
+					float dy = anim->targetY - (float)anim->y;
+					anim->dx = dx * ratio;
+					anim->dy = dy * ratio;
 				}
 			}
 		}

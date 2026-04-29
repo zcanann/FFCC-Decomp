@@ -15,22 +15,51 @@
 CMemory Memory;
 
 static const char s_memory_cpp[] = "memory.cpp";
-static const char s_heapWalkerTitle[] = "---- Heap Walker ----\n";
-static const char s_heapWalkerUseFmt[] = "Use  :%5dKB  %s\n";
-static const char s_heapWalkerUnuseFmt[] = "Unuse:%5dKB\n";
-static const char s_heapWalkerTotalFmt[] = "Total:%5dKB  Use:%5dKB  Unuse:%5dKB\n";
+extern "C" const char DAT_801d669c[] =
+    "===================================================================\n"
+    "===================================================================\n"
+    "                          GetData  TimeOut\n"
+    "===================================================================\n"
+    "===================================================================\n";
+extern "C" const char DAT_801d67d8[] =
+    "\x83\x71\x81\x5b\x83\x76\x82\xaa\x88\xd9\x8f\xed\x82\xc8\x82\xcc"
+    "\x82\xc5\x95\x60\x89\xe6\x82\xf0\x92\x86\x8e\x7e\x82\xb5\x82\xdc"
+    "\x82\xb7\x81\x42\n";
 static const char s_drawHeapTitleFmt[] = "%4d %4d %4d";
-static const char s_heapWalkerBanner[] = "***** HEAP WALKER *****\n";
-static const char s_heapWalkerStageNameFmt[] = "Stage Name : %s\n";
-static const char s_heapWalkerHeaderFmt[] = " No Flag Level  Size  Total  Address   Top      Tail     Source\n";
-static const char s_heapWalkerSeparator[] = "-----------------------------------------------------------------\n";
-static const char s_heapWalkerEntryFmt[] = "%3d %s %5d %7d %08x %08x %08x %-16.16s %04x\n";
-static const char s_heapWalkerUseUnuseFmt[] = "USE  : %d  UNUSE : %d\n";
-static const char s_amemCacheAddRefFmt[] = "amemCacheSet AddRef over %d\n";
-static const char s_amemCacheSeparator[] = "--------------------------------\n";
-static const char s_refCntCompareBanner[] = "---------- RefCnt0 Compare ----------\n";
-static const char s_amemCacheEntryFmt[] = "%3d %s type:%d RefCnt:%d prio:%d data:%08x\n";
-static const char s_amemCacheEntryPaddedFmt[] = "%03d %s type:%d RefCnt:%d prio:%d data:%08x\n";
+static const char s_heapWalkerStageNameFmt[] = "Stage Name = %s\n";
+static const char s_heapWalkerHeaderFmt[] =
+    "No  Flag Level Size    Total   Address  Prev     Next     Name                     Line \n";
+static const char s_heapWalkerSeparator[] = {
+    '-', '-', '-', ' ', '-', '-', '-', '-', ' ', '-', '-', '-',
+    '-', '-', ' ', '-', '-', '-', '-', '-', '-', '-', ' ', '-',
+    '-', '-', '-', '-', '-', '-', ' ', '-', '-', '-', '-', '-',
+    '-', '-', '-', ' ', '-', '-', '-', '-', '-', '-', '-', '-',
+    ' ', '-', '-', '-', '-', '-', '-', '-', '-', ' ', '-', '-',
+    '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-',
+    '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', ' ', '-'
+};
+extern const char s_AMEM_CACHE_DUMP_801D64F4[];
+extern const char s_amemCacheEntryFmt_801D6580[];
+extern const char s_refCntCompareBanner_801D65B4[];
+extern const char s_heapWalkerEntryFmt_801D68D8[];
+extern const char s_heapWalkerUseUnuseFmt_801D6958[];
+extern const char s_heapWalkerTitle_801D6BFC[];
+extern const char s_heapWalkerUseFmt_801D6C0C[];
+extern const char s_heapWalkerUnuseFmt_801D6C20[];
+extern const char s_heapWalkerTotalFmt_801D6C30[];
+extern const char s_amemCacheSeparator_8032F7C8[];
+#define s_heapWalkerTitle s_heapWalkerTitle_801D6BFC
+#define s_heapWalkerUseFmt s_heapWalkerUseFmt_801D6C0C
+#define s_heapWalkerUnuseFmt s_heapWalkerUnuseFmt_801D6C20
+#define s_heapWalkerTotalFmt s_heapWalkerTotalFmt_801D6C30
+#define s_heapWalkerBanner DAT_8032f7e8
+#define s_heapWalkerEntryFmt s_heapWalkerEntryFmt_801D68D8
+#define s_heapWalkerUseUnuseFmt s_heapWalkerUseUnuseFmt_801D6958
+#define s_amemCacheAddRefFmt s_AMEM_CACHE_DUMP_801D64F4
+#define s_amemCacheSeparator s_amemCacheSeparator_8032F7C8
+#define s_refCntCompareBanner s_refCntCompareBanner_801D65B4
+#define s_amemCacheEntryFmt s_amemCacheEntryFmt_801D6580
+#define s_amemCacheEntryPaddedFmt s_amemCacheEntryFmt_801D6580
 extern char DAT_801d6648[];
 extern char DAT_801d6a24[];
 extern char DAT_801d6a7c[];
@@ -39,8 +68,6 @@ extern char DAT_801d6bb0[];
 extern char DAT_801d6c58[];
 extern char DAT_801d6c88[];
 extern char DAT_801d6c98[];
-extern char DAT_801d669c[];
-extern char DAT_801d67d8[];
 extern char DAT_801d6bdc[];
 extern char DAT_801d6bec[];
 extern char DAT_8032f7d4[4];

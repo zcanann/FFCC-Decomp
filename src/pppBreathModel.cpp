@@ -89,7 +89,8 @@ struct PBreathModel {
     u16 m_slotCount;
     u16 m_groupCount;
     float m_groupSpeed;
-    unsigned char _pad18[0x02];
+    u8 m_blendMode;
+    u8 _pad19;
     u16 m_particleCount;
     u16 m_emitCount;
     u16 m_emitInterval;
@@ -136,8 +137,14 @@ struct PBreathModel {
     unsigned char _padBC[0x04];
     u8 m_rotationFlags;
     u8 m_angleFlags;
-    unsigned char _padC2[0x06];
+    unsigned char _padC2[0x02];
+    float m_drawEnvScale;
     u8 m_disableScaleClamp;
+    u8 m_drawEnvColor0;
+    u8 m_drawEnvColor1;
+    u8 m_drawEnvColor2;
+    u8 m_drawEnvColor3;
+    u8 m_drawEnvColor4;
 };
 
 struct BreathParticleData {
@@ -310,13 +317,12 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
 
     model = (pppModelSt*)(*(void***)((u8*)pppEnvStPtr + 8))[pBreathModel->m_stepValue];
     pppInitBlendMode();
-    pppSetBlendMode(*(reinterpret_cast<u8*>(pBreathModel) + 0x18));
+    pppSetBlendMode(pBreathModel->m_blendMode);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        NULL, NULL, *reinterpret_cast<float*>(reinterpret_cast<u8*>(pBreathModel) + 0xC4),
-        *(reinterpret_cast<u8*>(pBreathModel) + 0xCA), *(reinterpret_cast<u8*>(pBreathModel) + 0xC9),
-        *(reinterpret_cast<u8*>(pBreathModel) + 0x18), *(reinterpret_cast<u8*>(pBreathModel) + 0xCB),
-        *(reinterpret_cast<u8*>(pBreathModel) + 0xCC), 1, *(reinterpret_cast<u8*>(pBreathModel) + 0xCD));
+        NULL, NULL, pBreathModel->m_drawEnvScale, pBreathModel->m_drawEnvColor1, pBreathModel->m_drawEnvColor0,
+        pBreathModel->m_blendMode, pBreathModel->m_drawEnvColor2, pBreathModel->m_drawEnvColor3, 1,
+        pBreathModel->m_drawEnvColor4);
 
     colorR = color->m_red;
     colorG = color->m_green;
@@ -591,7 +597,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
 group_ready:
         if (ready) {
             firstParticle = -1;
-            scaledOwner = mngSt->m_previousPosition.z * pBreathModel->m_groupOwnerScale;
+            scaledOwner = mngSt->m_ownerScale * pBreathModel->m_groupOwnerScale;
             for (slotIndex = 0; slotCount != 0; slotCount--) {
                 if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
                     firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
@@ -773,7 +779,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 groupData->position.z = kPppBreathModelZero;
                 groupData->position.y = kPppBreathModelZero;
                 groupData->position.x = kPppBreathModelZero;
-                PSMTXCopy(*(Mtx*)pppMngStPtr, groupData->matrix);
+                PSMTXCopy(pppMngStPtr->m_matrix.value, groupData->matrix);
                 groupData->active = 1;
             }
             groupData += 1;
@@ -851,8 +857,7 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
     }
 
     particle->m_scale += params->m_scaleAccel;
-    unsigned char clampScale = params->m_disableScaleClamp;
-    if (clampScale == 0) {
+    if (params->m_disableScaleClamp == 0) {
         float zero = kPppBreathModelZero;
         if (zero < params->m_scaleClampStart) {
             if (params->m_scaleAccel < zero) {
@@ -870,8 +875,7 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
     PSVECScale(&particle->m_direction, &step, particle->m_scale);
     PSVECAdd(&step, &particle->m_position, &particle->m_position);
 
-    unsigned short life = params->m_particleLifetime;
-    if (life != 0) {
+    if (params->m_particleLifetime != 0) {
         particle->m_life = particle->m_life - 1;
     }
     particle->m_age = particle->m_age + 1;

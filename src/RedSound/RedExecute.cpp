@@ -689,17 +689,19 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 
         leftPan = t_PanningData[pan];
         rightPan = t_PanningData[pan ^ 0x7f];
+        int leftMix = (volume * leftPan) >> 8;
+        int rightMix = (volume * rightPan) >> 8;
 
         if ((voiceData[0x25] & 0x400U) != 0) {
-            *mixData = (u16)((volume * leftPan) >> 8);
+            *mixData = (u16)leftMix;
         }
 
         if ((voiceData[0x25] & 0x800U) != 0) {
-            *(s16*)(voiceData + 0x1b) = (s16)((volume * rightPan) >> 8);
+            *(s16*)(voiceData + 0x1b) = (s16)rightMix;
         }
 
         if ((voiceData[0x25] & 0x1000U) != 0) {
-            iVar1 = ((volume * leftPan >> 8) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
+            iVar1 = (leftMix * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
             if ((voiceData[0x25] & 2U) == 0) {
                 *(u16*)(voiceData + 0x1e) = (u16)iVar1;
             } else {
@@ -708,7 +710,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         }
 
         if ((voiceData[0x25] & 0x2000U) != 0) {
-            iVar2 = ((volume * rightPan >> 8) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
+            iVar2 = (rightMix * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
             if ((voiceData[0x25] & 2U) == 0) {
                 *(u16*)(voiceData + 0x1f) = (u16)iVar2;
             } else {

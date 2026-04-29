@@ -1156,20 +1156,23 @@ int CRedEntry::ReentrySeSepData(int seNo)
  */
 void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 {
+	int* track;
+	int sequenceNo;
+
 	if (mode == 0) {
-		int inUse = 0;
-		int* track = *(int**)((int)p_SoundControlBuffer + 0xdbc);
+		sequenceNo = 0;
+		track = *(int**)((int)p_SoundControlBuffer + 0xdbc);
 
 		do {
-			if ((*track != 0) && (track[0x3D] == seNo)) {
-				inUse |= 1;
+			if ((*reinterpret_cast<unsigned int*>(track) != 0) && (track[0x3D] == seNo)) {
+				sequenceNo |= 1;
 				break;
 			}
 			track += 0x55;
 		} while (track < (int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80));
 
-		if (inUse == 0) {
-			int sequenceNo = SearchSeSepSequence(seNo);
+		if (sequenceNo == 0) {
+			sequenceNo = SearchSeSepSequence(seNo);
 			if ((sequenceNo >= 0) &&
 			    (*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) == 0)) {
 				SeSepHistoryAdd();
@@ -1177,7 +1180,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 			}
 		}
 	} else {
-		int sequenceNo = SearchSeSepSequence(seNo);
+		sequenceNo = SearchSeSepSequence(seNo);
 		if (*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) != 0) {
 			SeSepHistoryDelete(*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4));
 			*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) = 0;

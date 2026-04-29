@@ -45,41 +45,9 @@ void pppSRandFV(_pppPObject* basePtr, SRandFVParams* in, _pppCtrlTable* ctrl)
     s32 currentIndex = *(s32*)((u8*)basePtr + 0xC);
     if (currentIndex == 0) {
         randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
-        {
-            u8 flag = in->useNormalDistribution;
-            f32 value = Math.RandF();
-            if (flag != 0) {
-                value = value + Math.RandF();
-            } else {
-                f32 scale = 2.0f;
-                value = value * scale;
-            }
-            randVec[0] = value;
-        }
-
-        {
-            u8 flag = in->useNormalDistribution;
-            f32 value = Math.RandF();
-            if (flag != 0) {
-                value = value + Math.RandF();
-            } else {
-                f32 scale = 2.0f;
-                value = value * scale;
-            }
-            randVec[1] = value;
-        }
-
-        {
-            u8 flag = in->useNormalDistribution;
-            f32 value = Math.RandF();
-            if (flag != 0) {
-                value = value + Math.RandF();
-            } else {
-                f32 scale = 2.0f;
-                value = value * scale;
-            }
-            randVec[2] = value;
-        }
+        randVec[0] = randf(in->useNormalDistribution);
+        randVec[1] = randf(in->useNormalDistribution);
+        randVec[2] = randf(in->useNormalDistribution);
     } else {
         if (in->targetId != currentIndex) {
             return;
@@ -89,16 +57,7 @@ void pppSRandFV(_pppPObject* basePtr, SRandFVParams* in, _pppCtrlTable* ctrl)
 
     f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)((u8*)basePtr + in->sourceOffset + 0x80);
 
-    {
-        f32 value = in->blend[0] * randVec[0] - in->blend[0];
-        target[0] = target[0] + value;
-    }
-    {
-        f32 value = in->blend[1] * randVec[1] - in->blend[1];
-        target[1] = target[1] + value;
-    }
-    {
-        f32 value = in->blend[2] * randVec[2] - in->blend[2];
-        target[2] = target[2] + value;
-    }
+    target[0] = target[0] + (in->blend[0] * randVec[0] - in->blend[0]);
+    target[1] = target[1] + (in->blend[1] * randVec[1] - in->blend[1]);
+    target[2] = target[2] + (in->blend[2] * randVec[2] - in->blend[2]);
 }

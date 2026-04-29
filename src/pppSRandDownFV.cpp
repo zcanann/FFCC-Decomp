@@ -45,42 +45,9 @@ void pppSRandDownFV(_pppPObject* basePtr, SRandDownFVParams* in, _pppCtrlTable* 
     s32 currentIndex = *(s32*)((u8*)basePtr + 0xC);
     if (currentIndex == 0) {
         randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
-
-        {
-            u8 flag = in->useNormalDistribution;
-            f32 value = -Math.RandF();
-            if (flag != 0) {
-                f32 random = Math.RandF();
-                f32 blend = value - random;
-                f32 scale = 0.5f;
-                value = blend * scale;
-            }
-            randVec[0] = value;
-        }
-
-        {
-            u8 flag = in->useNormalDistribution;
-            f32 value = -Math.RandF();
-            if (flag != 0) {
-                f32 random = Math.RandF();
-                f32 blend = value - random;
-                f32 scale = 0.5f;
-                value = blend * scale;
-            }
-            randVec[1] = value;
-        }
-
-        {
-            u8 flag = in->useNormalDistribution;
-            f32 value = -Math.RandF();
-            if (flag != 0) {
-                f32 random = Math.RandF();
-                f32 blend = value - random;
-                f32 scale = 0.5f;
-                value = blend * scale;
-            }
-            randVec[2] = value;
-        }
+        randVec[0] = randf(in->useNormalDistribution);
+        randVec[1] = randf(in->useNormalDistribution);
+        randVec[2] = randf(in->useNormalDistribution);
     } else {
         if (in->targetId != currentIndex) {
             return;

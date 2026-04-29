@@ -481,7 +481,6 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	double dVar1;
 	float fVar2;
 	float fVar3;
-	double dVar4;
 	double dVar5;
 	int iVar6;
 	short* psVar7;
@@ -507,7 +506,6 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			iVar10 = iVar10 - 1;
 		} while (iVar10 != 0);
 		dVar5 = DOUBLE_80332f58;
-		dVar4 = DOUBLE_80332f40;
 		fVar2 = FLOAT_80332f2c;
 		dVar1 = DOUBLE_80332f20;
 		iVar6 = 0;
@@ -517,7 +515,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			*(int *)(psVar7 + 0xe) = 0x37;
 			psVar7[2] = 200;
 			psVar7[3] = 0x28;
-			psVar7[0] = (short)(int)-(((double)psVar7[2] - dVar4) * dVar1 - dVar5);
+			psVar7[0] = (short)(int)-((TmpArtiIntToDouble(psVar7[2]) * dVar1) - dVar5);
 			psVar7[1] = (short)iVar6 * (psVar7[3] + -8) + 0x60;
 			*(float *)(psVar7 + 4) = fVar2;
 			*(float *)(psVar7 + 6) = fVar2;
@@ -526,7 +524,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			*(int *)(psVar7 + 0x2e) = 0x37;
 			psVar7[0x22] = 200;
 			psVar7[0x23] = 0x28;
-			psVar7[0x20] = (short)(int)-(((double)psVar7[0x22] - dVar4) * dVar1 - dVar5);
+			psVar7[0x20] = (short)(int)-((TmpArtiIntToDouble(psVar7[0x22]) * dVar1) - dVar5);
 			psVar7[0x21] = (short)(iVar6 + 1) * (psVar7[0x23] + -8) + 0x60;
 			*(float *)(psVar7 + 0x24) = fVar2;
 			*(float *)(psVar7 + 0x26) = fVar2;
@@ -557,9 +555,8 @@ unsigned int CMenuPcs::TmpArtiOpen()
 				else {
 					*(int *)(psVar7 + 0x10) = *(int *)(psVar7 + 0x10) + 1;
 					*(float *)(psVar7 + 8) =
-					    (float)((DOUBLE_80332f48 /
-					            ((double)(int)*(unsigned int *)(psVar7 + 0x14) - dVar1)) *
-					            ((double)(int)*(unsigned int *)(psVar7 + 0x10) - dVar1));
+					    (float)((DOUBLE_80332f48 / TmpArtiIntToDouble(*(int *)(psVar7 + 0x14))) *
+					            TmpArtiIntToDouble(*(int *)(psVar7 + 0x10)));
 				}
 			}
 			psVar7 = psVar7 + 0x20;

@@ -13,6 +13,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/pad.h"
 #include "ffcc/ptrarray.h"
+#include "ffcc/ref.h"
 #include "ffcc/ringmenu.h"
 extern "C" {
 extern const f32 kMenuInitOne;
@@ -259,7 +260,7 @@ static inline void ReleaseRefObject(void* object)
     int refCount = static_cast<int>(raw[1]);
     raw[1] = static_cast<u32>(refCount - 1);
     if (refCount - 1 == 0) {
-        reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(raw[0] + 8))(object, 1);
+        delete reinterpret_cast<CRef*>(object);
     }
 }
 
@@ -474,17 +475,25 @@ void CMenuPcs::destroy()
     changeMode(static_cast<CMenuPcs::MENUMODE>(-1));
 
     u8* self = reinterpret_cast<u8*>(this);
-    for (int i = 0; i < 0x16; i++) {
-        u8* slot = self + 0x18c + i * 4;
-        ReleaseRefObject(*reinterpret_cast<void**>(slot));
-        *reinterpret_cast<void**>(slot) = nullptr;
-    }
+    CMenuPcs* textureCursor = this;
+    int i = 0;
+    do {
+        void** slot = reinterpret_cast<void**>(reinterpret_cast<u8*>(textureCursor) + 0x18C);
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+        i++;
+        textureCursor = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureCursor) + 4);
+    } while (i < 0x16);
 
-    for (int i = 0; i < 2; i++) {
-        u8* slot = self + 0x14c + i * 4;
-        ReleaseRefObject(*reinterpret_cast<void**>(slot));
-        *reinterpret_cast<void**>(slot) = nullptr;
-    }
+    textureCursor = this;
+    i = 0;
+    do {
+        void** slot = reinterpret_cast<void**>(reinterpret_cast<u8*>(textureCursor) + 0x14C);
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+        i++;
+        textureCursor = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureCursor) + 4);
+    } while (i < 2);
 
     ReleaseRefObject(m_fonts[0]);
     m_fonts[0] = 0;

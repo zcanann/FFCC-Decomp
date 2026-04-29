@@ -115,6 +115,16 @@ static const char s_pppChangeTex_cpp_801dd660[] = "pppChangeTex.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
+
+static inline double LoadDouble(const double& value)
+{
+	return value;
+}
+
 void pppInitBlendMode(void);
 CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle*);
 CCharaPcs::CHandle* GetCharaHandlePtr(CGObject*, long);
@@ -224,7 +234,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 	int meshList = *(int*)((char*)model0 + 0xAC);
 	if ((work->m_meshColorArrays == 0) && (work->m_displayListArrays == 0)) {
-		work->m_cachedValue = FLOAT_80332020;
+		work->m_cachedValue = LoadFloat(FLOAT_80332020);
 		work->m_meshColorArrays = pppMemAlloc__FUlPQ27CMemory6CStagePci(
 		    *(int*)(*(int*)((char*)model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x163);
@@ -284,7 +294,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 	scale.u[0] = 0x43300000;
 	scale.u[1] = (1 << *(int*)(*(int*)((char*)model0 + 0xA4) + 0x34)) ^ 0x80000000;
-	short splitY = (short)(int)(currentValue * (float)(scale.d - DOUBLE_80332030));
+	short splitY = (short)(int)(currentValue * (float)(scale.d - LoadDouble(DOUBLE_80332030)));
 	if (work->m_cachedValue == currentValue) {
 		return;
 	}
@@ -293,7 +303,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 	scale.u[0] = 0x43300000;
 	scale.u[1] = colorData[0xB];
-	double alphaBase = (double)(FLOAT_80332028 * ((float)(scale.d - DOUBLE_80332038) / FLOAT_80332028));
+	double alphaBase = (double)(LoadFloat(FLOAT_80332028) * ((float)(scale.d - LoadDouble(DOUBLE_80332038)) / LoadFloat(FLOAT_80332028)));
 
 	int arrayOffset = 0;
 	meshList = *(int*)((char*)model0 + 0xAC);

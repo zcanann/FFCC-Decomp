@@ -57,52 +57,50 @@ int RedNew(int size)
 	int moveCount;
 	int* slot;
 
-	if (size >= 1) {
-		if (m_MemoryBank != 0) {
-			if ((unsigned int)m_DataBuffer != 0) {
-				interrupts = OSDisableInterrupts();
-				address = m_DataBuffer;
-				size = (size + 0x1F) & 0xFFFFFFE0;
-				slot = m_MemoryBank;
-
-				do {
-					if ((slot[1] == 0) || ((address + size) <= *slot)) {
-						if (m_MemoryBank[0x7FF] > 0) {
-							if (m_ReportPrint != 0) {
-								OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA,
-								         sRedMemoryLogSuffixB);
-								fflush(__files + 1);
-							}
-							break;
-						}
-
-						if ((unsigned int)(address + size) <=
-						    (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
-							if (slot[1] > 0) {
-								moveCount = (int)(m_MemoryBank + 0x800) - (int)(slot + 2);
-								entryCount = moveCount / 8;
-								if (entryCount > 0) {
-									memmove(slot + 2, slot, entryCount * 8);
-								}
-							}
-
-							*slot = address;
-							slot[1] = size;
-							OSRestoreInterrupts(interrupts);
-							return address;
-						}
-
-						break;
-					}
-
-					address = *slot + slot[1];
-					slot += 2;
-				} while (slot < m_MemoryBank + 0x800);
-
-				OSRestoreInterrupts(interrupts);
-			}
-		}
+	if ((size < 1) || (m_MemoryBank == 0) || ((unsigned int)m_DataBuffer == 0)) {
+		return 0;
 	}
+
+	interrupts = OSDisableInterrupts();
+	address = m_DataBuffer;
+	size = (size + 0x1F) & 0xFFFFFFE0;
+	slot = m_MemoryBank;
+
+	do {
+		if ((slot[1] == 0) || ((address + size) <= *slot)) {
+			if (m_MemoryBank[0x7FF] > 0) {
+				if (m_ReportPrint != 0) {
+					OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA,
+					         sRedMemoryLogSuffixB);
+					fflush(__files + 1);
+				}
+				break;
+			}
+
+			if ((unsigned int)(address + size) <=
+			    (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
+				if (slot[1] > 0) {
+					moveCount = (int)(m_MemoryBank + 0x800) - (int)(slot + 2);
+					entryCount = moveCount / 8;
+					if (entryCount > 0) {
+						memmove(slot + 2, slot, entryCount * 8);
+					}
+				}
+
+				*slot = address;
+				slot[1] = size;
+				OSRestoreInterrupts(interrupts);
+				return address;
+			}
+
+			break;
+		}
+
+		address = *slot + slot[1];
+		slot += 2;
+	} while (slot < m_MemoryBank + 0x800);
+
+	OSRestoreInterrupts(interrupts);
 	return 0;
 }
 /*

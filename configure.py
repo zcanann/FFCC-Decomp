@@ -730,7 +730,7 @@ config.libs = [
             Object(NonMatching, "pppYmTracer2.cpp"),
             Object(NonMatching, "prgobj.cpp"),
             Object(NonMatching, "quadobj.cpp"),
-            Object(NonMatching, "ref.cpp", extra_cflags=["-RTTI on", "-sdata 8"]),
+            Object(NonMatching, "ref.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "ringmenu.cpp"),
             Object(NonMatching, "shopmenu.cpp"),
             Object(NonMatching, "singmenu.cpp"),

@@ -312,110 +312,87 @@ void CMenuPcs::FavoInit()
  */
 void CMenuPcs::FavoInit0()
 {
-	int iVar2;
-	float fVar1;
-	short *psVar3;
-	unsigned int uVar4;
-	unsigned int uVar5;
+	float alpha;
+	unsigned int count;
+	unsigned int blockCount;
+	FavoEntry* entry;
 
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 0x2c) = 2;
-	*(int *)(iVar2 + 0x30) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 0x6c) = 2;
-	*(int *)(iVar2 + 0x70) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 0xac) = 2;
-	*(int *)(iVar2 + 0xb0) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 0xec) = 7;
-	*(int *)(iVar2 + 0xf0) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 300) = 7;
-	*(int *)(iVar2 + 0x130) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 0x174) = 2;
-	*(int *)(iVar2 + 0x16c) = 7;
-	*(int *)(iVar2 + 0x170) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 0x1b4) = 2;
-	*(int *)(iVar2 + 0x1ac) = 0;
-	*(int *)(iVar2 + 0x1b0) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 500) = 2;
-	*(int *)(iVar2 + 0x1ec) = 0;
-	*(int *)(iVar2 + 0x1f0) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 0x234) = 2;
-	*(int *)(iVar2 + 0x22c) = 0;
-	*(int *)(iVar2 + 0x230) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 0x274) = 2;
-	fVar1 = FLOAT_80333048;
-	*(int *)(iVar2 + 0x26c) = 0;
-	*(int *)(iVar2 + 0x270) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 0x2b4) = 2;
-	*(int *)(iVar2 + 0x2ac) = 0;
-	*(int *)(iVar2 + 0x2b0) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 0x2f4) = 2;
-	*(int *)(iVar2 + 0x2ec) = 0;
-	*(int *)(iVar2 + 0x2f0) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 0x334) = 2;
-	*(int *)(iVar2 + 0x32c) = 0;
-	*(int *)(iVar2 + 0x330) = 5;
-	iVar2 = (int)favoList;
-	*(int *)(iVar2 + 0x374) = 2;
-	*(int *)(iVar2 + 0x36c) = 0;
-	*(int *)(iVar2 + 0x370) = 5;
-	
-	uVar4 = (unsigned int)*favoList;
-	psVar3 = favoList + 4;
-	if (0 < (int)uVar4) {
-		uVar5 = uVar4 >> 3;
-		if (uVar5 != 0) {
+	entry = reinterpret_cast<FavoEntry*>(favoList + 4);
+	entry[0].startFrame = 2;
+	entry[0].duration = 5;
+	entry[1].startFrame = 2;
+	entry[1].duration = 5;
+	entry[2].startFrame = 2;
+	entry[2].duration = 5;
+	entry[3].startFrame = 7;
+	entry[3].duration = 5;
+	entry[4].startFrame = 7;
+	entry[4].duration = 5;
+	entry[5].flags = 2;
+	entry[5].startFrame = 7;
+	entry[5].duration = 5;
+	entry[6].flags = 2;
+	entry[6].startFrame = 0;
+	entry[6].duration = 5;
+	entry[7].flags = 2;
+	entry[7].startFrame = 0;
+	entry[7].duration = 5;
+	entry[8].flags = 2;
+	entry[8].startFrame = 0;
+	entry[8].duration = 5;
+	entry[9].flags = 2;
+	alpha = FLOAT_80333048;
+	entry[9].startFrame = 0;
+	entry[9].duration = 5;
+	entry[10].flags = 2;
+	entry[10].startFrame = 0;
+	entry[10].duration = 5;
+	entry[11].flags = 2;
+	entry[11].startFrame = 0;
+	entry[11].duration = 5;
+	entry[12].flags = 2;
+	entry[12].startFrame = 0;
+	entry[12].duration = 5;
+	entry[13].flags = 2;
+	entry[13].startFrame = 0;
+	entry[13].duration = 5;
+
+	count = (unsigned int)*favoList;
+	entry = reinterpret_cast<FavoEntry*>(favoList + 4);
+	if (0 < (int)count) {
+		blockCount = count >> 3;
+		if (blockCount != 0) {
 			do {
-				psVar3[0x10] = 0;
-				psVar3[0x11] = 0;
-				*(float *)(psVar3 + 8) = fVar1;
-				psVar3[0x30] = 0;
-				psVar3[0x31] = 0;
-				*(float *)(psVar3 + 0x28) = fVar1;
-				psVar3[0x50] = 0;
-				psVar3[0x51] = 0;
-				*(float *)(psVar3 + 0x48) = fVar1;
-				psVar3[0x70] = 0;
-				psVar3[0x71] = 0;
-				*(float *)(psVar3 + 0x68) = fVar1;
-				psVar3[0x90] = 0;
-				psVar3[0x91] = 0;
-				*(float *)(psVar3 + 0x88) = fVar1;
-				psVar3[0xb0] = 0;
-				psVar3[0xb1] = 0;
-				*(float *)(psVar3 + 0xa8) = fVar1;
-				psVar3[0xd0] = 0;
-				psVar3[0xd1] = 0;
-				*(float *)(psVar3 + 200) = fVar1;
-				psVar3[0xf0] = 0;
-				psVar3[0xf1] = 0;
-				*(float *)(psVar3 + 0xe8) = fVar1;
-				psVar3 = psVar3 + 0x100;
-				uVar5 = uVar5 - 1;
-			} while (uVar5 != 0);
-			uVar4 = uVar4 & 7;
-			if (uVar4 == 0) {
+				entry[0].step = 0;
+				entry[0].alpha = alpha;
+				entry[1].step = 0;
+				entry[1].alpha = alpha;
+				entry[2].step = 0;
+				entry[2].alpha = alpha;
+				entry[3].step = 0;
+				entry[3].alpha = alpha;
+				entry[4].step = 0;
+				entry[4].alpha = alpha;
+				entry[5].step = 0;
+				entry[5].alpha = alpha;
+				entry[6].step = 0;
+				entry[6].alpha = alpha;
+				entry[7].step = 0;
+				entry[7].alpha = alpha;
+				entry += 8;
+				blockCount = blockCount - 1;
+			} while (blockCount != 0);
+			count = count & 7;
+			if (count == 0) {
 				return;
 			}
 		}
 		do {
-			psVar3[0x10] = 0;
-			psVar3[0x11] = 0;
-			*(float *)(psVar3 + 8) = fVar1;
-			psVar3 = psVar3 + 0x20;
-			uVar4 = uVar4 - 1;
-		} while (uVar4 != 0);
+			entry->step = 0;
+			entry->alpha = alpha;
+			entry++;
+			count = count - 1;
+		} while (count != 0);
 	}
 }
 

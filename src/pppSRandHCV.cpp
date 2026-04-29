@@ -100,20 +100,8 @@ void pppSRandHCV(_pppPObject* basePtr, PppSRandHCVParam2* in, _pppCtrlTable* ctr
 	s32 color_offset = in->field4;
 	s16* target_colors = (color_offset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + color_offset + 0x80);
 
-	{
-		s16 color = target_colors[0];
-		target_colors[0] = color + (s8)((f32)in->field8 * target[0] - (f32)in->field8);
-	}
-	{
-		s16 color = target_colors[1];
-		target_colors[1] = color + (s8)((f32)in->fieldA * target[1] - (f32)in->fieldA);
-	}
-	{
-		s16 color = target_colors[2];
-		target_colors[2] = color + (s8)((f32)in->fieldC * target[2] - (f32)in->fieldC);
-	}
-	{
-		s16 color = target_colors[3];
-		target_colors[3] = color + (s8)((f32)in->fieldE * target[3] - (f32)in->fieldE);
-	}
+	target_colors[0] = target_colors[0] + (s8)randshort(in->field8, target[0]);
+	target_colors[1] = target_colors[1] + (s8)randshort(in->fieldA, target[1]);
+	target_colors[2] = target_colors[2] + (s8)randshort(in->fieldC, target[2]);
+	target_colors[3] = target_colors[3] + (s8)randshort(in->fieldE, target[3]);
 }

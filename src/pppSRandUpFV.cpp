@@ -16,7 +16,7 @@ struct PppSRandUpFVParam2 {
     u8 field18;
 };
 
-static float randf(unsigned char flag)
+static inline float randf(unsigned char flag)
 {
     float value = Math.RandF();
     if (flag != 0) {

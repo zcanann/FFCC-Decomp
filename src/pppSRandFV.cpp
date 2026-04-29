@@ -6,7 +6,7 @@
 #include "dolphin/types.h"
 #include "ffcc/ppp_default_buffer.h"
 
-static float randf(unsigned char flag)
+static inline float randf(unsigned char flag)
 {
     float value = Math.RandF();
     if (flag != 0) {

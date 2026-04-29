@@ -16,7 +16,7 @@ struct PppRandDownHCVParam2 {
     u8 field10;
 };
 
-static short randshort(short value, float scale)
+static inline short randshort(short value, float scale)
 {
     return (short)((f32)value * scale);
 }

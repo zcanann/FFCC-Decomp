@@ -16,7 +16,7 @@ struct PppRandUpIVParam2 {
     u8 field18;
 };
 
-static int randint(int value, float scale)
+static inline int randint(int value, float scale)
 {
     return (int)((f32)value * scale);
 }

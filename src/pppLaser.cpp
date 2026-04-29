@@ -342,10 +342,11 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
         } else if (i == 0 && work->m_spawnEnabled != 0) {
             if (work->m_maxLength - FLOAT_80333458 < work->m_length) {
-                s32 partIndex = ((s32)((u8*)pppMngStPtr - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
+                _pppMngSt* mng = pppMngStPtr;
                 work->m_length = work->m_maxLength - FLOAT_80333458;
+                s32 partIndex = ((s32)((u8*)mng - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
                 ParticleFrameCallback__5CGameFiiiiiP3Vec(
-                    &Game, partIndex, (int)pppMngStPtr->m_kind, (int)pppMngStPtr->m_nodeIndex, 3,
+                    &Game, partIndex, (int)mng->m_kind, (int)mng->m_nodeIndex, 3,
                     baseObj->m_graphId / 0x1000, work->m_points);
                 work->m_spawnEnabled = 0;
             }

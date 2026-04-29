@@ -1682,8 +1682,6 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 {
 	unsigned char localPlayerData[0x370];
 	unsigned char packet[0xC];
-	short xPos[4];
-	short zPos[4];
 	int i;
 	short baseX;
 	short baseZ;
@@ -1695,7 +1693,7 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 
 	memset(packet, 0, sizeof(packet));
 
-	if (reinterpret_cast<unsigned char*>(this)[0x2D56] != 0) {
+	if (static_cast<char>(reinterpret_cast<unsigned char*>(this)[0x2D56]) != 0) {
 		channel = 0;
 	}
 
@@ -1712,30 +1710,35 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 		const short px = *reinterpret_cast<const short*>(player + 0x36);
 		const short pz = *reinterpret_cast<const short*>(player + 0x38);
 
-		xPos[i] = px;
-		zPos[i] = pz;
-
 		if (i == channel) {
 			nearbyMask |= static_cast<unsigned char>(1 << i);
-		} else if (player[3] != 0) {
+		} else if (static_cast<char>(player[3]) != 0) {
 			const int dx = static_cast<int>(px) - static_cast<int>(baseX);
 			const int dz = static_cast<int>(pz) - static_cast<int>(baseZ);
 
-			if ((dx > -0x51 && dx < 0x51) && (dz > -0x41 && dz < 0x41)) {
+			if ((dx >= -0x50 && dx <= 0x50) && (dz >= -0x40 && dz <= 0x40)) {
 				nearbyMask |= static_cast<unsigned char>(1 << i);
 			}
 		}
 	}
 
 	packet[1] = nearbyMask;
-	packet[2] = static_cast<unsigned char>(static_cast<char>(xPos[0]) - static_cast<char>(baseX));
-	packet[3] = static_cast<unsigned char>(static_cast<char>(zPos[0]) - static_cast<char>(baseZ));
-	packet[5] = static_cast<unsigned char>(static_cast<char>(xPos[1]) - static_cast<char>(baseX));
-	packet[6] = static_cast<unsigned char>(static_cast<char>(zPos[1]) - static_cast<char>(baseZ));
-	packet[7] = static_cast<unsigned char>(static_cast<char>(xPos[2]) - static_cast<char>(baseX));
-	packet[9] = static_cast<unsigned char>(static_cast<char>(zPos[2]) - static_cast<char>(baseZ));
-	packet[10] = static_cast<unsigned char>(static_cast<char>(xPos[3]) - static_cast<char>(baseX));
-	packet[11] = static_cast<unsigned char>(static_cast<char>(zPos[3]) - static_cast<char>(baseZ));
+	packet[2] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x36)) - static_cast<char>(baseX));
+	packet[3] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x38)) - static_cast<char>(baseZ));
+	packet[5] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x112)) - static_cast<char>(baseX));
+	packet[6] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x114)) - static_cast<char>(baseZ));
+	packet[7] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x1EE)) - static_cast<char>(baseX));
+	packet[9] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x1F0)) - static_cast<char>(baseZ));
+	packet[10] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x2CA)) - static_cast<char>(baseX));
+	packet[11] = static_cast<unsigned char>(
+		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x2CC)) - static_cast<char>(baseZ));
 
 	memcpy(outData, packet, sizeof(packet));
 }
@@ -2011,6 +2014,9 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 {
 	GbaQueuePlayerDataView localPlayerData;
 	unsigned short itemList[0x40];
+	unsigned int artifactData[3];
+	unsigned short tmpArtifactList[4];
+	unsigned short artifactList[8];
 	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -2018,18 +2024,19 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	for (i = 0; i < 0x40; i++) {
-		itemList[i] = SwapU16(localPlayerData.m_items[i]);
+		itemList[i] = __lhbrx(&localPlayerData.m_items[i], 0);
 	}
 	memcpy(outData, itemList, sizeof(itemList));
 
-	*reinterpret_cast<unsigned int*>(outData + 0x80) = SwapU32(localPlayerData.m_artifacts[0]);
-	*reinterpret_cast<unsigned int*>(outData + 0x84) = SwapU32(localPlayerData.m_artifacts[1]);
-	*reinterpret_cast<unsigned int*>(outData + 0x88) = SwapU32(localPlayerData.m_artifacts[2]);
+	artifactData[0] = __lwbrx(&localPlayerData.m_artifacts[0], 0);
+	artifactData[1] = __lwbrx(&localPlayerData.m_artifacts[1], 0);
+	artifactData[2] = __lwbrx(&localPlayerData.m_artifacts[2], 0);
+	memcpy(outData + 0x80, artifactData, sizeof(artifactData));
 
 	for (i = 0; i < 4; i++) {
-		*reinterpret_cast<unsigned short*>(outData + 0x8C + i * 2) =
-			SwapU16(localPlayerData.m_tmpArtifacts[i]);
+		tmpArtifactList[i] = __lhbrx(&localPlayerData.m_tmpArtifacts[i], 0);
 	}
+	memcpy(outData + 0x8C, tmpArtifactList, sizeof(tmpArtifactList));
 
 	outData[0x94] = localPlayerData.m_commandData[0];
 	outData[0x95] = localPlayerData.m_commandData[1];
@@ -2037,9 +2044,9 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 	outData[0x97] = localPlayerData.m_commandData[3];
 
 	for (i = 0; i < 8; i++) {
-		*reinterpret_cast<unsigned short*>(outData + 0x98 + i * 2) =
-			SwapU16(localPlayerData.m_artifactList[i]);
+		artifactList[i] = __lhbrx(&localPlayerData.m_artifactList[i], 0);
 	}
+	memcpy(outData + 0x98, artifactList, sizeof(artifactList));
 
 	outData[0xA8] = localPlayerData.m_artifactCount;
 	return 0xA9;

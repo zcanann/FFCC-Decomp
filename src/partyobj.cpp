@@ -50,7 +50,7 @@ static const char s_partyBonusSubFmt[] = "bonus slot:%d sub:%d";
 static const char s_partyBonusUnknownFmt[] = "bonus unknown";
 
 extern float FLOAT_80331a78;
-extern float FLOAT_80331a54;
+extern const float FLOAT_80331a54;
 extern float FLOAT_80331a74;
 extern float FLOAT_80331a9c;
 extern float FLOAT_80331aa0;
@@ -1544,7 +1544,7 @@ void CGPartyObj::onStatShield()
  */
 void CGPartyObj::putComboParticle()
 {
-	putParticle(0x153, 0, reinterpret_cast<CGObject*>(this), 0.0f, 0);
+	putParticle(0x153, 0, reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0);
 }
 
 /*

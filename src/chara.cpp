@@ -7,6 +7,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/p_light.h"
 #include "ffcc/texanim.h"
+#include "ffcc/textureman.h"
 
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <math.h>
@@ -2281,8 +2282,8 @@ void CChara::CModel::AttachTextureSet(CTextureSet* texSet)
 			int* refData = reinterpret_cast<int*>(oldTexSet);
 			int refCount = refData[1] - 1;
 			refData[1] = refCount;
-			if ((refCount == 0) && (oldTexSet != 0)) {
-				(*(void (**)(void*, int))(*refData + 8))(oldTexSet, 1);
+			if (refCount == 0) {
+				delete oldTexSet;
 			}
 			m_texSet = 0;
 		}

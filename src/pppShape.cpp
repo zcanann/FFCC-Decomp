@@ -118,11 +118,15 @@ void pppGetShapePos(long* animData, short frameIndex, Vec& minPos, Vec& maxPos, 
 void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
     short shapeOffset;
+    char* shapeBase;
+    int shapeIndex;
+    int shapeStep;
     char* currentFrame;
     int frameIndex;
+    unsigned int textureIndex;
     char* animData;
     unsigned char* texturePtr;
-    unsigned int textureIndex;
+    unsigned char* shapeEntry;
     unsigned char textureUsed[0x100];
 
     animData = (char*)shapeSt->m_animData;
@@ -130,11 +134,6 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 
     currentFrame = animData;
     for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
-        unsigned char* shapeEntry;
-        char* shapeBase;
-        int shapeStep;
-        int shapeIndex;
-
         shapeOffset = *(short*)((int)currentFrame + 0x10);
         shapeBase = animData + shapeOffset;
         shapeIndex = 0;
@@ -171,11 +170,15 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
     short shapeOffset;
+    char* shapeBase;
+    int shapeIndex;
+    int shapeStep;
     char* currentFrame;
     int frameIndex;
+    unsigned int textureIndex;
     char* animData;
     unsigned char* texturePtr;
-    unsigned int textureIndex;
+    unsigned char* shapeEntry;
     unsigned char textureUsed[0x100];
 
     animData = (char*)shapeSt->m_animData;
@@ -183,11 +186,6 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 
     currentFrame = animData;
     for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
-        unsigned char* shapeEntry;
-        char* shapeBase;
-        int shapeStep;
-        int shapeIndex;
-
         shapeOffset = *(short*)((int)currentFrame + 0x10);
         shapeBase = animData + shapeOffset;
         shapeIndex = 0;

@@ -302,17 +302,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             if (emptyHistory) {
                 continue;
             }
-            LaserDoubleBits countDouble;
-            LaserDoubleBits indexDouble;
-
-            countDouble.u[0] = 0x43300000;
-            countDouble.u[1] = (u32)(int)(step->m_payload[0x3a] + 1) ^ 0x80000000;
-            indexDouble.u[0] = 0x43300000;
-            indexDouble.u[1] = (u32)(int)i ^ 0x80000000;
-
-            float count = (float)(countDouble.d - DOUBLE_80333440);
-            float index = (float)(indexDouble.d - DOUBLE_80333440);
-            float t = (FLOAT_80333448 / count) * index;
+            float t = (FLOAT_80333448 / (float)(s32)(step->m_payload[0x3a] + 1)) * (float)i;
             if (GetCharaNodeFrameMatrix(pppMngStPtr, t, charaMtx) == 0) {
                 emptyHistory = 1;
                 continue;

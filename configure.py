@@ -513,7 +513,7 @@ config.libs = [
             Object(NonMatching, "main.cpp"),
             Object(Matching, "manager.cpp"),
             Object(NonMatching, "map.cpp"),
-            Object(NonMatching, "mapanim.cpp"),
+            Object(NonMatching, "mapanim.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "maphit.cpp"),
             Object(Matching, "maplight.cpp"),
             Object(NonMatching, "mapmesh.cpp"),

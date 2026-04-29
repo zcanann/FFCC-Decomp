@@ -1852,7 +1852,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         } while (voiceData < (int*)p_VoiceData + 0xC00);
     }
 
-    if (trackData[0x1D] != 0) {
+    if ((u32)trackData[0x1D] != 0) {
         if (*(s16*)((u8*)track + 0x8C) != 0) {
             int step = frames;
             if (*(s16*)((u8*)track + 0x8C) <= frames) {
@@ -1871,7 +1871,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         }
     }
 
-    if (trackData[0x25] != 0) {
+    if ((u32)trackData[0x25] != 0) {
         if (*(s16*)((u8*)track + 0xAC) != 0) {
             int step = frames;
             if (*(s16*)((u8*)track + 0xAC) <= frames) {
@@ -1891,7 +1891,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
     }
 
     voiceData = (int*)p_VoiceData;
-    if (trackData[0x2D] != 0) {
+    if ((u32)trackData[0x2D] != 0) {
         if (*(s16*)((u8*)track + 0xD0) != 0) {
             int step = frames;
             if (*(s16*)((u8*)track + 0xD0) <= frames) {

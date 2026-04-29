@@ -1,7 +1,6 @@
 #include "ffcc/pppCallBackDistance.h"
 #include "ffcc/partMng.h"
 #include "ffcc/game.h"
-#include "ffcc/p_game.h"
 #include <dolphin/mtx.h>
 
 extern "C" {
@@ -98,5 +97,3 @@ void pppConstructCallBackDistance(pppCallBackDistance* param1, pppCallBackDistan
     local_1c.z = *(f32*)(pppMngSt + 0x70);
     *distancePtr = PSVECDistance(&local_28, &local_1c);
 }
-
-

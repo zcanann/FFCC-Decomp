@@ -36,9 +36,5 @@ public:
 };
 
 extern CGbaPcs GbaPcs;
-extern unsigned int gGbaStatusWordTriplet0[];
-extern unsigned int gGbaStatusWordTriplet1[];
-extern unsigned int gGbaStatusWordTriplet2[];
-extern unsigned int gGbaStatusWordTriplet3[];
 
 #endif // _FFCC_P_GBA_H_

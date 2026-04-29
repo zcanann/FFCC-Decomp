@@ -207,11 +207,11 @@ void CGbaPcs::Init()
  */
 inline CGbaPcs::CGbaPcs()
 {
+	static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CGbaPcsFv)};
+	static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CGbaPcsFv)};
+	static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CGbaPcsFv)};
+	static unsigned int desc3[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CGbaPcsFv)};
 	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table);
-	const unsigned int* desc0 = gGbaStatusWordTriplet0;
-	const unsigned int* desc1 = gGbaStatusWordTriplet1;
-	const unsigned int* desc2 = gGbaStatusWordTriplet2;
-	const unsigned int* desc3 = gGbaStatusWordTriplet3;
 
 	table[1] = desc0[0];
 	table[2] = desc0[1];

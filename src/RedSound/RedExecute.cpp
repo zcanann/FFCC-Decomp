@@ -647,15 +647,16 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
     switch (m_SoundPlayMode) {
     case 1:
         volFactor = (int)t_PanningData[0x40];
+        int monoBase = (volume * volFactor) >> 8;
 
         if ((voiceData[0x25] & 0xc00U) != 0) {
-            uVar3 = (u16)((volume * volFactor) >> 8);
+            uVar3 = (u16)monoBase;
             *mixData = uVar3;
             *(u16*)(voiceData + 0x1b) = uVar3;
         }
 
         if ((voiceData[0x25] & 0x3000U) != 0) {
-            u16 monoMix = (u16)(((volume * volFactor >> 8) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
+            u16 monoMix = (u16)((monoBase * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
             if ((voiceData[0x25] & 2U) == 0) {
                 *(u16*)(voiceData + 0x1e) = monoMix;
                 *(u16*)(voiceData + 0x1f) = monoMix;

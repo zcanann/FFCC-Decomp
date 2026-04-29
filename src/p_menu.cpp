@@ -255,10 +255,20 @@ static inline void ReleaseRefObject(void* object)
         return;
     }
 
-    u32* raw = reinterpret_cast<u32*>(object);
-    int refCount = static_cast<int>(raw[1]);
-    raw[1] = static_cast<u32>(refCount - 1);
-    if (refCount - 1 == 0) {
+    int* raw = reinterpret_cast<int*>(object);
+    int refCount = raw[1] - 1;
+    raw[1] = refCount;
+    if ((refCount == 0) && (object != nullptr)) {
+        reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(raw[0] + 8))(object, 1);
+    }
+}
+
+static inline void ReleaseRefObjectNonNull(void* object)
+{
+    int* raw = reinterpret_cast<int*>(object);
+    int refCount = raw[1] - 1;
+    raw[1] = refCount;
+    if ((refCount == 0) && (object != nullptr)) {
         reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(raw[0] + 8))(object, 1);
     }
 }
@@ -474,23 +484,29 @@ void CMenuPcs::destroy()
     changeMode(static_cast<CMenuPcs::MENUMODE>(-1));
 
     u8* self = reinterpret_cast<u8*>(this);
-    for (int i = 0; i < 0x16; i++) {
-        u8* slot = self + 0x18c + i * 4;
-        ReleaseRefObject(*reinterpret_cast<void**>(slot));
-        *reinterpret_cast<void**>(slot) = nullptr;
+    CTexture** textureSlot = m_textures;
+    for (int i = 0; i < 0x16; i++, textureSlot++) {
+        if (*textureSlot != nullptr) {
+            ReleaseRefObjectNonNull(*textureSlot);
+            *textureSlot = 0;
+        }
     }
 
-    for (int i = 0; i < 2; i++) {
-        u8* slot = self + 0x14c + i * 4;
-        ReleaseRefObject(*reinterpret_cast<void**>(slot));
-        *reinterpret_cast<void**>(slot) = nullptr;
+    CTextureSet** textureSetSlot = m_textureSets;
+    for (int i = 0; i < 2; i++, textureSetSlot++) {
+        if (*textureSetSlot != nullptr) {
+            ReleaseRefObjectNonNull(*textureSetSlot);
+            *textureSetSlot = 0;
+        }
     }
 
-    ReleaseRefObject(m_fonts[0]);
-    m_fonts[0] = 0;
+    if (m_fonts[0] != nullptr) {
+        ReleaseRefObjectNonNull(m_fonts[0]);
+        m_fonts[0] = 0;
+    }
 
     Memory.DestroyStage(m_menuStage);
-    if (*(self + 0x859) != 0) {
+    if (*reinterpret_cast<char*>(self + 0x859) != 0) {
         m_stageF0 = 0;
         *(self + 0x859) = 0;
     }

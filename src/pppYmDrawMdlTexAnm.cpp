@@ -223,14 +223,16 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     CMapMesh* mapMesh;
     s32 i;
     s32 frameU;
+    u32 tilesU;
 
     ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
     work = GetYmDrawMdlTexAnmWork(ymDrawMdlTexAnm, ctrl);
     if ((work->m_frame != 0) && ((mapMesh = GetMapMeshTable()[0]) != NULL)) {
         for (uvByteOffset = i = 0; i < (s32)(u16)mapMesh->m_uvCount; i++) {
             uvByteOffsetV = uvByteOffset + 2;
-            frameU = work->m_frame / work->m_tilesU;
-            s32 frameModU = work->m_frame - frameU * work->m_tilesU;
+            tilesU = work->m_tilesU;
+            frameU = work->m_frame / tilesU;
+            s32 frameModU = work->m_frame - frameU * tilesU;
 
             *(s16*)((u8*)mapMesh->m_uvPairs + uvByteOffset) =
                 (s16)(int)-(((f32)frameModU * work->m_perU) -

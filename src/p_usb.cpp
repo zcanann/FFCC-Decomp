@@ -120,14 +120,16 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  */
 void CUSBPcs::mccReadData()
 {
+    int* frameCounter = &s_usbReadPollFrameCounter;
+
     if (s_usbReadPollInitialized == '\0') {
-        s_usbReadPollFrameCounter = 0;
+        *frameCounter = 0;
         s_usbReadPollInitialized = '\x01';
     }
 
-    s_usbReadPollFrameCounter++;
-    if (4 < s_usbReadPollFrameCounter) {
-        s_usbReadPollFrameCounter = 0;
+    *frameCounter = *frameCounter + 1;
+    if (4 < *frameCounter) {
+        *frameCounter = 0;
         if (USB.IsConnected() == 0) {
             return;
         }

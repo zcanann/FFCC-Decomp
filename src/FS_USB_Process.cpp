@@ -25,6 +25,10 @@ struct CUSBStreamDataHeader {
     u32 m_packetCode;
 };
 
+struct DisplayTail {
+    u8 m_bytes[0xB];
+};
+
 static inline CUSBStreamDataHeader* UsbStream(CFunnyShapePcs* self) {
     return reinterpret_cast<CUSBStreamDataHeader*>(self->m_usbStreamDataStorage);
 }
@@ -119,7 +123,8 @@ void CFunnyShapePcs::SetUSBData()
         m_displayCurrent.unk2C = display.unk2C;
         m_displayCurrent.unk30 = display.unk30;
         m_displayCurrent.unk34[0] = display.unk34[0];
-        memcpy(&m_displayCurrent.unk34[1], &display.unk34[1], sizeof(m_displayCurrent.unk34) - 1);
+        *reinterpret_cast<DisplayTail*>(&m_displayCurrent.unk34[1]) =
+            *reinterpret_cast<DisplayTail*>(&display.unk34[1]);
         break;
     }
     case 5: {

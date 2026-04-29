@@ -46,7 +46,8 @@ struct pppBreathModelUnkC {
 };
 
 struct pppBreathModel {
-    unsigned char _pad[8];
+    unsigned char _pad[0x10];
+    pppFMATRIX m_localMatrix;
 };
 
 struct BreathParticleGroup {
@@ -449,7 +450,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 sphereMtx[0][0] = groupScale;
                 sphereMtx[1][1] = groupScale;
                 sphereMtx[2][2] = groupScale;
-                PSMTXConcat(work->m_particleWmats[firstParticle], object->m_localMatrix.value, tempMtx);
+                PSMTXConcat(work->m_particleWmats[firstParticle], breathModel->m_localMatrix.value, tempMtx);
                 PSMTXConcat(ppvCameraMatrix02, tempMtx, tempMtx);
                 PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &pos);
                 sphereMtx[0][3] = pos.x;
@@ -600,7 +601,7 @@ group_ready:
             scaleMtx[1][1] = scaledOwner;
             scaleMtx[2][2] = scaledOwner;
             particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
-            PSMTXConcat(*particleMtx, reinterpret_cast<_pppPObject*>(breathModel)->m_localMatrix.value, worldMtx);
+            PSMTXConcat(*particleMtx, breathModel->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
             rotMtx.value[0][3] = kPppBreathModelZero;
@@ -644,8 +645,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     int maxParticleCount;
     short foundSlot;
     short foundGroup;
-    Vec stepVelocity;
     Vec unitVelocity;
+    Vec stepVelocity;
     unsigned short* emitFrameCounter;
 
     spawnCount = 0;
@@ -768,18 +769,19 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 groupData->position.z = kPppBreathModelZero;
                 groupData->position.y = kPppBreathModelZero;
                 groupData->position.x = kPppBreathModelZero;
-                PSMTXCopy(*(Mtx*)pppMngStPtr, groupData->matrix);
+                PSMTXCopy(pppMngStPtr->m_matrix.value, groupData->matrix);
                 groupData->active = 1;
             }
             groupData += 1;
         }
 
+        groupData = groupTable;
         for (i = 0; i < (int)params->m_groupCount; i++) {
-            if (groupTable->active != 0) {
-                PSVECScale(&groupTable->direction, &stepVelocity, groupTable->speed);
-                PSVECAdd(&stepVelocity, &groupTable->position, &groupTable->position);
+            if (groupData->active != 0) {
+                PSVECScale(&groupData->direction, &stepVelocity, groupData->speed);
+                PSVECAdd(&stepVelocity, &groupData->position, &groupData->position);
             }
-            groupTable += 1;
+            groupData += 1;
         }
     }
 }
@@ -846,8 +848,7 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
     }
 
     particle->m_scale += params->m_scaleAccel;
-    unsigned char clampScale = params->m_disableScaleClamp;
-    if (clampScale == 0) {
+    if (params->m_disableScaleClamp == 0) {
         float zero = kPppBreathModelZero;
         if (zero < params->m_scaleClampStart) {
             if (params->m_scaleAccel < zero) {
@@ -865,8 +866,7 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
     PSVECScale(&particle->m_direction, &step, particle->m_scale);
     PSVECAdd(&step, &particle->m_position, &particle->m_position);
 
-    unsigned short life = params->m_particleLifetime;
-    if (life != 0) {
+    if (params->m_particleLifetime != 0) {
         particle->m_life = particle->m_life - 1;
     }
     particle->m_age = particle->m_age + 1;
@@ -1052,7 +1052,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     (*(Mtx*)particleWmat)[1][3] = pos.y;
     (*(Mtx*)particleWmat)[2][3] = pos.z;
 
-    PSMTXConcat(*(Mtx*)particleWmat, pppObject->m_localMatrix.value, *(Mtx*)particleData);
+    PSMTXConcat(*(Mtx*)particleWmat, reinterpret_cast<pppBreathModel*>(pppObject)->m_localMatrix.value, *(Mtx*)particleData);
     PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, cameraMtx);
 
     particle->m_direction.x = kPppBreathModelZero;

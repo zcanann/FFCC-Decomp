@@ -40,6 +40,7 @@ extern float FLOAT_80331d24;
 extern float FLOAT_80331d28;
 extern float FLOAT_80331d2c;
 extern float FLOAT_80331d30;
+extern float FLOAT_80331d58;
 extern float FLOAT_80331d84;
 extern float FLOAT_80331d90;
 extern float FLOAT_80331d94;
@@ -359,113 +360,77 @@ int CGMonObj::calcBranchFuncGolem(int)
  */
 void CGMonObj::frameStatFuncGolem()
 {
-	#if 0
-	// Function: frameStatFuncGolem__8CGMonObjFv
-	// Entry: 80132670
-	// Size: 700 bytes
-	
-	/* WARNING: Removing unreachable block (ram,0x80132910) */
-	/* WARNING: Removing unreachable block (ram,0x80132680) */
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void frameStatFuncGolem__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  byte bVar1;
-	  int iVar2;
-	  double dVar3;
-	  double in_f31;
-	  
-	  iVar2 = *(int *)&gMonObj->field_0x520;
-	  if (iVar2 != 0x66) {
-	    if (iVar2 < 0x66) {
-	      if (iVar2 == 100) {
-	        if (*(int *)&gMonObj->field_0x528 == 0) {
-	          playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,0xfa17,0x32,0x96,0,0);
-	        }
-	        else if (*(int *)&gMonObj->field_0x528 == 0x14) {
-	          DispCharaParts__8CGObjectFi(&gMonObj->gObject,1);
-	          playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,0xfa18,0x32,0x96,0,0);
-	          gMonObj->_bossBranchRelated = 1;
-	        }
-	        _statAttack__10CGCharaObjFv((CGCharaObj *)gMonObj);
-	        return;
-	      }
-	      if (iVar2 < 100) {
-	        return;
-	      }
-	      iVar2 = *(int *)&gMonObj->field_0x528;
-	      if (iVar2 == 0) {
-	        playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,0xfa1a,0x32,0x96,0,0);
-	      }
-	      else if (iVar2 == 4) {
-	        DispCharaParts__8CGObjectFi(&gMonObj->gObject,3);
-	        gMonObj->_bossBranchRelated = 0;
-	      }
-	      else if (iVar2 == 5) {
-	        DispCharaParts__8CGObjectFi(&gMonObj->gObject,7);
-	      }
-	      _statAttack__10CGCharaObjFv((CGCharaObj *)gMonObj);
-	      return;
-	    }
-	    if (iVar2 != 0x68) {
-	      if (0x67 < iVar2) {
-	        return;
-	      }
-	      if (*(int *)&gMonObj->field_0x528 != 0x32) {
-	        return;
-	      }
-	      changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,0,0,0);
-	      return;
-	    }
-	  }
-	  if (((*(int *)&gMonObj->field_0x528 == 0x14) ||
-	      (bVar1 = (gMonObj->gObject).m_stateFlags0, (int)((uint)bVar1 << 0x19 | (uint)(bVar1 >> 7)) < 0
-	      )) || ((iVar2 == 0x66 &&
-	             (*(float *)(&gMonObj->field_0x5d0 + *(int *)&gMonObj->field_0x6c4 * 4) <
-	              FLOAT_80331d58 * (gMonObj->gObject).m_bodyEllipsoidRadius)))) {
-	    dVar3 = (double)getTargetRot__8CGPrgObjFP8CGPrgObj
-	                              ((CGPrgObj *)gMonObj,
-	                               Game.m_partyObjArr[*(int *)&gMonObj->field_0x6c4]);
-	    (gMonObj->gObject).m_rotTargetY = (float)dVar3;
-	    setAttackAfter__8CGMonObjFi(gMonObj,*(undefined4 *)&gMonObj->field_0x560);
-	  }
-	  else {
-	    if (*(int *)&gMonObj->field_0x528 == 0) {
-	      if (iVar2 != 0x67) {
-	        if (iVar2 < 0x67) {
-	          if (0x65 < iVar2) {
-	            in_f31 = (double)FLOAT_80331cf8;
-	          }
-	        }
-	        else if (iVar2 < 0x69) {
-	          in_f31 = (double)FLOAT_80331d2c;
-	        }
-	      }
-	      reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,1,1,0);
-	      dVar3 = (double)getTargetRot__8CGPrgObjFP8CGPrgObj
-	                                ((CGPrgObj *)gMonObj,
-	                                 Game.m_partyObjArr[*(int *)&gMonObj->field_0x6c4]);
-	      (gMonObj->gObject).m_rotTargetY = (float)dVar3;
-	      SoundBuffer._1276_4_ = (undefined4)((double)(gMonObj->gObject).m_rotTargetY + in_f31);
-	    }
-	    moveVectorHRot__8CGObjectFfffi
-	              ((double)(float)SoundBuffer._1276_4_,(double)FLOAT_80331cf8,
-	               (double)(*(float *)&gMonObj->field_0x690 *
-	                       (FLOAT_80331d60 *
-	                        (float)((double)CONCAT44(0x43300000,
-	                                                 (uint)*(ushort *)
-	                                                        ((int)(gMonObj->gObject).m_scriptHandle[9] +
-	                                                        0xd4)) - DOUBLE_80331dc0) + FLOAT_80331db8))
-	               ,&gMonObj->gObject,1);
-	  }
-	  return;
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	int state = reinterpret_cast<CGPrgObj*>(this)->m_lastStateId;
+
+	if (state != 0x66) {
+		if (state < 0x66) {
+			if (state == 100) {
+				if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
+					playSe3D__8CGPrgObjFiiiiP3Vec(reinterpret_cast<CGPrgObj*>(this), 0xFA17, 0x32, 0x96, 0, 0);
+				} else if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) {
+					reinterpret_cast<CGObject*>(this)->DispCharaParts(1);
+					playSe3D__8CGPrgObjFiiiiP3Vec(reinterpret_cast<CGPrgObj*>(this), 0xFA18, 0x32, 0x96, 0, 0);
+					*reinterpret_cast<int*>(self + 0x6D0) = 1;
+				}
+				reinterpret_cast<CGCharaObj*>(this)->statAttack();
+				return;
+			}
+			if (state < 100) {
+				return;
+			}
+			int frame = reinterpret_cast<CGPrgObj*>(this)->m_stateFrame;
+			if (frame == 0) {
+				playSe3D__8CGPrgObjFiiiiP3Vec(reinterpret_cast<CGPrgObj*>(this), 0xFA1A, 0x32, 0x96, 0, 0);
+			} else if (frame == 4) {
+				reinterpret_cast<CGObject*>(this)->DispCharaParts(3);
+				*reinterpret_cast<int*>(self + 0x6D0) = 0;
+			} else if (frame == 5) {
+				reinterpret_cast<CGObject*>(this)->DispCharaParts(7);
+			}
+			reinterpret_cast<CGCharaObj*>(this)->statAttack();
+			return;
+		}
+		if (state != 0x68) {
+			if (0x67 < state) {
+				return;
+			}
+			if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame != 0x32) {
+				return;
+			}
+			changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 0, 0, 0);
+			return;
+		}
 	}
-	
-	#endif
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId >= 100) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+
+	if ((reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) ||
+	    ((reinterpret_cast<CGObject*>(this)->m_stateFlags0 & 0x40) != 0) ||
+	    ((state == 0x66) &&
+	     (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x6C4) * 4) <
+	      FLOAT_80331d58 * reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius))) {
+		reinterpret_cast<CGObject*>(this)->m_rotTargetY =
+		    reinterpret_cast<CGPrgObj*>(this)->getTargetRot(
+		        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*reinterpret_cast<int*>(self + 0x6C4)]));
+		setAttackAfter__8CGMonObjFi(this, *reinterpret_cast<int*>(self + 0x560));
+	} else {
+		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
+			float turnOffset = FLOAT_80331cf8;
+			if (state == 0x68) {
+				turnOffset = FLOAT_80331d2c;
+			}
+			reqAnim__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 1, 1, 0);
+			reinterpret_cast<CGObject*>(this)->m_rotTargetY =
+			    reinterpret_cast<CGPrgObj*>(this)->getTargetRot(
+			        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*reinterpret_cast<int*>(self + 0x6C4)]));
+			*reinterpret_cast<float*>(SoundBuffer + 0x4FC) = reinterpret_cast<CGObject*>(this)->m_rotTargetY + turnOffset;
+		}
+		unsigned short scriptScale =
+		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[9]) + 0xD4);
+		float moveSpeed =
+		    *reinterpret_cast<float*>(self + 0x690) *
+		    (FLOAT_80331d60 * (static_cast<float>(static_cast<double>(scriptScale) - DOUBLE_80331dc0)) + FLOAT_80331db8);
+		moveVectorHRot__8CGObjectFfffi(reinterpret_cast<CGObject*>(this), *reinterpret_cast<float*>(SoundBuffer + 0x4FC),
+		                               FLOAT_80331cf8, moveSpeed, 1);
 	}
 }
 

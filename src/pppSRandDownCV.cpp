@@ -8,11 +8,6 @@
 
 const float kPppSRandDownCVDualSampleScale = 0.5f;
 
-static char randchar(char value, float scale)
-{
-    return (char)((f32)value * scale);
-}
-
 static float randf(unsigned char flag)
 {
     float value = -Math.RandF();
@@ -23,6 +18,11 @@ static float randf(unsigned char flag)
         value = blend * scale;
     }
     return value;
+}
+
+static char randchar(char value, float scale)
+{
+    return (char)((f32)value * scale);
 }
 
 /*

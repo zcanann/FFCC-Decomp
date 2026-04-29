@@ -414,6 +414,10 @@ def print_bucket(name, targets, pal_map, en_map):
             for line in en_lines:
                 print(line)
 
+        if obj_file:
+            stem = Path(obj_file).stem
+            print(f"    MAP discrepancy: python3 tools/map/discrepancy.py {stem}")
+
         print()
 
 

@@ -23,6 +23,21 @@ public:
     static char* MCDAT_VERSION;
 };
 
+extern const char s_icon_dat_801DA9E8[];
+extern const char s_FF_Crystal_Chronicles_801DA9F4[];
+extern const char lbl_80330CB8[];
+extern const char lbl_80330CC0[];
+extern const char lbl_80330CC4[];
+extern const char lbl_80330CC8[];
+
+char* CardConst::MC_ICONIMG_FNAME = const_cast<char*>(s_icon_dat_801DA9E8);
+char* CardConst::MC_FNAME = const_cast<char*>(lbl_80330CB8);
+char* CardConst::MC_COMMENT = const_cast<char*>(s_FF_Crystal_Chronicles_801DA9F4);
+char* CardConst::MCDAT_MAKER = const_cast<char*>(lbl_80330CC0);
+char* CardConst::MCDAT_TITLE = const_cast<char*>(lbl_80330CB8);
+char* CardConst::MCDAT_MACHINE = const_cast<char*>(lbl_80330CC4);
+char* CardConst::MCDAT_VERSION = const_cast<char*>(lbl_80330CC8);
+
 CMemoryCardMan MemoryCardMan;
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);

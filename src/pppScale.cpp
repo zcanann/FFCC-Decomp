@@ -44,6 +44,7 @@ void pppScale(void* obj, void* param2, void* param3)
 
 	int* data = *((int**)((char*)param3 + 0x0c));
 	float* scale = (float*)((char*)obj + data[0] + 0x80);
+	
 	scale[0] += *((float*)((char*)param2 + 0x08));
 	scale[1] += *((float*)((char*)param2 + 0x0c));
 	scale[2] += *((float*)((char*)param2 + 0x10));

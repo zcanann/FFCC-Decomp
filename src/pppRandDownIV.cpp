@@ -14,6 +14,15 @@ struct RandDownIVParams {
     u8 useNormalDistribution;
 };
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static inline int randint(int value, float scale)
 {
     return (int)((float)value * scale);
@@ -28,7 +37,7 @@ static inline int randint(int value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandDownIV(_pppPObject* basePtr, RandDownIVParams* in, _pppCtrlTable* ctrl)
+void pppRandDownIV(_pppPObject* basePtr, RandDownIVParams* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
@@ -62,13 +71,3 @@ extern "C" void pppRandDownIV(_pppPObject* basePtr, RandDownIVParams* in, _pppCt
     target[1] += randint(in->blend[1], scale);
     target[2] += randint(in->blend[2], scale);
 }
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */

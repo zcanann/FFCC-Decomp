@@ -6,7 +6,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-
 struct RandDownCVParams {
     s32 targetId;
     s32 sourceOffset;
@@ -14,6 +13,15 @@ struct RandDownCVParams {
     u8 useNormalDistribution;
 };
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static inline char randchar(char value, float scale)
 {
     return (char)((f32)value * scale);
@@ -28,7 +36,7 @@ static inline char randchar(char value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandDownCV(_pppPObject* basePtr, RandDownCVParams* in, _pppCtrlTable* ctrl)
+void pppRandDownCV(_pppPObject* basePtr, RandDownCVParams* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     u8* target;
@@ -56,32 +64,10 @@ extern "C" void pppRandDownCV(_pppPObject* basePtr, RandDownCVParams* in, _pppCt
     }
 
     target = (in->sourceOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + in->sourceOffset + 0x80);
-
     f32 scale = *valuePtr;
-    {
-        s8 baseValue = in->delta[0];
-        target[0] = (u8)(target[0] + randchar(baseValue, scale));
-    }
-    {
-        s8 baseValue = in->delta[1];
-        target[1] = (u8)(target[1] + randchar(baseValue, scale));
-    }
-    {
-        s8 baseValue = in->delta[2];
-        target[2] = (u8)(target[2] + randchar(baseValue, scale));
-    }
-    {
-        s8 baseValue = in->delta[3];
-        target[3] = (u8)(target[3] + randchar(baseValue, scale));
-    }
-}
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
+    target[0] = (u8)(target[0] + randchar(in->delta[0], scale));
+    target[1] = (u8)(target[1] + randchar(in->delta[1], scale));
+    target[2] = (u8)(target[2] + randchar(in->delta[2], scale));
+    target[3] = (u8)(target[3] + randchar(in->delta[3], scale));
+}

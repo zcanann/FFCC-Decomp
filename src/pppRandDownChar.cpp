@@ -6,8 +6,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-
-
 struct RandDownCharParams {
     s32 targetId;
     s32 sourceOffset;
@@ -52,9 +50,9 @@ void pppRandDownChar(_pppPObject* basePtr, RandDownCharParams* in, _pppCtrlTable
     }
 
     u8* target = (in->sourceOffset == -1) ? gPppDefaultValueBuffer : (u8*)(base + in->sourceOffset + 0x80);
-
     f32 factor = (f32)in->blend;
     f32 scaled = factor * *valuePtr;
     s32 delta = (s32)scaled;
+
     *target = (u8)(*target + delta);
 }

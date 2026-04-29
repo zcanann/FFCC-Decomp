@@ -52,5 +52,6 @@ void pppRandShort(_pppPObject* basePtr, RandShortParams* in, _pppCtrlTable* ctrl
 
     s16* target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->sourceOffset + 0x80);
     f32 delta = ((f32)in->blend * *valuePtr) - (f32)in->blend;
+    
     *target = (s16)(*target + (s16)delta);
 }

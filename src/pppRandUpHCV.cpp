@@ -27,7 +27,7 @@ static inline short randshort(short value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandUpHCV(_pppPObject* basePtr, RandUpHCVParams* in, _pppCtrlTable* ctrl)
+void pppRandUpHCV(_pppPObject* basePtr, RandUpHCVParams* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     s16* target;
@@ -55,11 +55,10 @@ extern "C" void pppRandUpHCV(_pppPObject* basePtr, RandUpHCVParams* in, _pppCtrl
     }
 
     target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->sourceOffset + 0x80);
-
     f32 scale = *valuePtr;
 
-    target[0] = target[0] + randshort(in->delta[0], scale);
-    target[1] = target[1] + randshort(in->delta[1], scale);
-    target[2] = target[2] + randshort(in->delta[2], scale);
-    target[3] = target[3] + randshort(in->delta[3], scale);
+    target[0] += randshort(in->delta[0], scale);
+    target[1] += randshort(in->delta[1], scale);
+    target[2] += randshort(in->delta[2], scale);
+    target[3] += randshort(in->delta[3], scale);
 }

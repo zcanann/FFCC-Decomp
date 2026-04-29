@@ -50,9 +50,9 @@ void pppRandDownInt(_pppPObject* basePtr, RandDownIntParams* in, _pppCtrlTable* 
     }
 
     s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->sourceOffset + 0x80);
-
     f32 factor = (f32)in->blend;
     f32 scaled = factor * *valuePtr;
     s32 delta = (s32)scaled;
+    
     *target += delta;
 }

@@ -6,6 +6,13 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
+struct RandIntParams {
+    s32 targetId;
+    s32 sourceOffset;
+    u32 blend;
+    u8 useNormalDistribution;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80062194
@@ -15,16 +22,6 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-
-
-
-struct RandIntParams {
-    s32 targetId;
-    s32 sourceOffset;
-    u32 blend;
-    u8 useNormalDistribution;
-};
-
 void pppRandInt(_pppPObject* basePtr, RandIntParams* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
@@ -54,5 +51,6 @@ void pppRandInt(_pppPObject* basePtr, RandIntParams* in, _pppCtrlTable* ctrl)
     }
 
     s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->sourceOffset + 0x80);
+    
     *target += (s32)((f32)in->blend * *valuePtr - (f32)in->blend);
 }

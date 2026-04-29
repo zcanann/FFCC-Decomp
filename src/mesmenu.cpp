@@ -165,32 +165,34 @@ void CMesMenu::Create()
 {
     typedef void (*VFunc)(void*);
 
-    (*(VFunc*)((u8*)*(void***)this + 0x10))(this);
+    VFunc* vtable = *reinterpret_cast<VFunc**>(this);
+    vtable[4](this);
     Create__5CMenuFv(this);
 
-    *(float*)((char*)this + 0x3D78) = FLOAT_803308d8;
-    *(float*)((char*)this + 0x3D74) = FLOAT_803308d8;
+    float defaultValue = FLOAT_803308d8;
+    *(float*)((char*)this + 0x3D78) = defaultValue;
+    *(float*)((char*)this + 0x3D74) = defaultValue;
     *(int*)((char*)this + 8) = 0;
     *(int*)((char*)this + 0xC) = 4;
     *(int*)((char*)this + 0x3DF4) = 0;
     *(int*)((char*)this + 0x3DF8) = 0;
 
     if (*(int*)((char*)this + 0x18) < 4) {
-        unsigned int x = 0x10;
+        int x = 0x10;
         if ((*(int*)((char*)this + 0x18) & 1) != 0) {
             x = 0x270;
         }
         *(float*)((char*)this + 0x3D6C) = (float)x;
 
-        unsigned int y = 0x18;
+        int y = 0x18;
         if ((*(int*)((char*)this + 0x18) & 2) != 0) {
             y = 0x1B0;
         }
         *(float*)((char*)this + 0x3D70) = (float)y;
 
-        *(float*)((char*)this + 0x3D7C) = FLOAT_803308d8;
-        *(float*)((char*)this + 0x3D80) = FLOAT_803308d8;
-        *(float*)((char*)this + 0x3D84) = FLOAT_803308d8;
+        *(float*)((char*)this + 0x3D7C) = defaultValue;
+        *(float*)((char*)this + 0x3D80) = defaultValue;
+        *(float*)((char*)this + 0x3D84) = defaultValue;
         *(int*)((char*)this + 0x3D88) = 0;
         *(int*)((char*)this + 0x3D8C) = 0;
         *(int*)((char*)this + 0x3DA8) = 0;

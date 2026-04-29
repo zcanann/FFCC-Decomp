@@ -239,9 +239,9 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     secondCylinder.m_direction2.z = -10000000000.0f;
                     secondCylinder.m_direction2.y = -10000000000.0f;
                     secondCylinder.m_direction2.x = -10000000000.0f;
-                    secondCylinder.m_bottom.x = ownerX;
                     secondCylinder.m_bottom.y = ownerY;
                     secondCylinder.m_bottom.z = ownerZ;
+                    secondCylinder.m_bottom.x = ownerX;
                     secondCylinder.m_direction.x = kPppConformBgNormalZero;
                     secondCylinder.m_direction.y = -2000.0f;
                     secondCylinder.m_direction.z = kPppConformBgNormalZero;

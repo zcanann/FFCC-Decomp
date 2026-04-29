@@ -108,6 +108,15 @@ struct GbaQueueCMakeInfoView
 };
 STATIC_ASSERT(sizeof(GbaQueueCMakeInfoView) == 0x20);
 
+struct GbaQueueSetQueueView
+{
+	unsigned char _pad00[0x30];
+	unsigned int m_queue[4][0x40];
+	int m_queueCount[4];
+	char m_queueFull[4];
+};
+STATIC_ASSERT(sizeof(GbaQueueSetQueueView) == 0x444);
+
 static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
 {
 	return reinterpret_cast<GbaQueueFlagView*>(gbaQueue);
@@ -580,22 +589,22 @@ void GbaQueue::LoadMask()
  */
 int GbaQueue::SetQueue(int channel, unsigned int value)
 {
-	char* obj = reinterpret_cast<char*>(this);
+	GbaQueueSetQueueView* queue = reinterpret_cast<GbaQueueSetQueueView*>(this);
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	int ret;
 
 	OSWaitSemaphore(semaphore);
-	if (obj[0x440 + channel] != 0) {
+	if (queue->m_queueFull[channel] != 0) {
 		ret = -1;
 	} else {
-		int* queueCount = reinterpret_cast<int*>(obj + channel * 4);
-		if (queueCount[0x10C] >= 0x40) {
+		int* queueCount = &queue->m_queueCount[channel];
+		if (*queueCount >= 0x40) {
 			ret = -1;
-			obj[0x440 + channel] = 1;
+			queue->m_queueFull[channel] = 1;
 		} else {
 			ret = 0;
-			*reinterpret_cast<unsigned int*>(obj + 0x30 + channel * 0x100 + queueCount[0x10C] * 4) = value;
-			queueCount[0x10C] = queueCount[0x10C] + 1;
+			queue->m_queue[channel][*queueCount] = value;
+			*queueCount = *queueCount + 1;
 		}
 	}
 	OSSignalSemaphore(semaphore);

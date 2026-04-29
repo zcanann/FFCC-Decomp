@@ -62,11 +62,14 @@ static const char lbl_80331C80[] = "CHARA";
 extern const u32 DAT_80331C88 = 0x00000080;
 extern const u32 DAT_80331C8C = 0xFFFFFFFF;
 static const char s_Debug_80331c90[] = "Debug";
+static const char s_dbgMenuStateOn[] = "ON";
+static const char s_dbgMenuStateOff[] = "OFF";
+static const char s_dbgMenuStateUnknown[] = "?";
 
-u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
-u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
-u32 m_table_desc2__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
-u32 m_table_desc3__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
+static u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
+static u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
+static u32 m_table_desc2__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
+static u32 m_table_desc3__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
 u32 m_table__11CDbgMenuPcs[0x15C / sizeof(u32)] = {
     reinterpret_cast<u32>(const_cast<char*>(s_CDbgMenuPcs_801DD428)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x11, 0, 0, 0, 0, 0x4A, 1
 };
@@ -517,11 +520,11 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 
 			const char* stateText;
 			if (menu->m_state == 1) {
-				stateText = "ON";
+				stateText = s_dbgMenuStateOn;
 			} else {
-				stateText = "?";
+				stateText = s_dbgMenuStateUnknown;
 				if (menu->m_state == 0) {
-					stateText = "OFF";
+					stateText = s_dbgMenuStateOff;
 				}
 			}
 
@@ -632,7 +635,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 			alpha = 0xFF;
 		}
 
-		GXColor highlightColor = {0, 0, 0, 0xFF};
+		GXColor highlightColor = {0, 0, 0, static_cast<u8>(DAT_80331C88)};
 		highlightColor.r = alpha;
 		highlightColor.g = alpha;
 		highlightColor.b = alpha;

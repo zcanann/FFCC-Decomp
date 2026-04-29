@@ -52,7 +52,6 @@ CRedMemory::~CRedMemory()
 int RedNew(int size)
 {
 	unsigned int interrupts;
-	int alignedSize;
 	int address;
 	int entryCount;
 	int moveCount;
@@ -63,11 +62,11 @@ int RedNew(int size)
 			address = m_DataBuffer;
 			if (address != 0) {
 				interrupts = OSDisableInterrupts();
-				alignedSize = (size + 0x1F) & 0xFFFFFFE0;
+				size = (size + 0x1F) & 0xFFFFFFE0;
 				slot = m_MemoryBank;
 
 				do {
-					if ((slot[1] == 0) || ((address + alignedSize) <= *slot)) {
+					if ((slot[1] == 0) || ((address + size) <= *slot)) {
 						if (m_MemoryBank[0x7FF] > 0) {
 							if (m_ReportPrint != 0) {
 								OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA,
@@ -77,7 +76,7 @@ int RedNew(int size)
 							break;
 						}
 
-						if ((unsigned int)(address + alignedSize) <=
+						if ((unsigned int)(address + size) <=
 						    (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
 							if (slot[1] > 0) {
 								moveCount = (int)(m_MemoryBank + 0x800) - (int)(slot + 2);
@@ -88,7 +87,7 @@ int RedNew(int size)
 							}
 
 							*slot = address;
-							slot[1] = alignedSize;
+							slot[1] = size;
 							OSRestoreInterrupts(interrupts);
 							return address;
 						}
@@ -318,9 +317,9 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
 	bankSize &= ~0x1F;
 
 	m_MemoryBank = (int*)param1;
+	m_DataBufferSize = param2 - bankSize * 2;
 	m_AMemoryBank = (int*)((int)m_MemoryBank + bankSize);
 	m_DataBuffer = (int)m_AMemoryBank + bankSize;
-	m_DataBufferSize = param2 - bankSize * 2;
 	memset(m_MemoryBank, 0, bankSize);
 	memset(m_AMemoryBank, 0, bankSize);
 	m_ADataBuffer = param3;

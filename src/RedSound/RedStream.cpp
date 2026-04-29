@@ -491,7 +491,7 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
  */
 void StreamPause(int streamID, int pause)
 {
-	volatile RedStreamDATA* streamData;
+	RedStreamDATA* streamData;
 	int volume;
 	int pan;
 
@@ -549,8 +549,9 @@ void StreamControl()
 {
 	unsigned int streamData = (unsigned int)p_Stream;
 	do {
+		int voiceData;
 		if (*(int*)(streamData + 0x110) == 1) {
-			int voiceData = *(int*)(streamData + 4);
+			voiceData = *(int*)(streamData + 4);
 			if (*(void**)(voiceData + 0x14) != 0) {
 				if (*(int*)(*(int*)(voiceData + 0x14) + 0xc) == 0) {
 					_StreamStop((RedStreamDATA*)streamData);
@@ -607,7 +608,8 @@ void StreamControl()
 					if (changed != 0) {
 						if (*(short*)(streamData + 0x2a) == 2) {
 							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0, *(int*)(streamData + 0xf0) >> 0xc);
-							SetVoiceVolumeMix((RedVoiceDATA*)(voiceData + 0xc0), 0x7f, *(int*)(streamData + 0xf0) >> 0xc);
+							voiceData += 0xc0;
+							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0x7f, *(int*)(streamData + 0xf0) >> 0xc);
 						} else {
 							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, *(int*)(streamData + 0x100) >> 0xc,
 								*(int*)(streamData + 0xf0) >> 0xc);
@@ -616,7 +618,7 @@ void StreamControl()
 				}
 			}
 		} else if ((*(int*)(streamData + 0x110) == 3) && (RedDmaSearchID(*(int*)(streamData + 0x114)) == 0)) {
-			int voiceData = *(int*)(streamData + 4);
+			voiceData = *(int*)(streamData + 4);
 			*(int*)(streamData + 0x110) = 1;
 			*(unsigned int*)(voiceData + 0x90) |= 0x19;
 			*(unsigned int*)(voiceData + 4) = streamData + 0x30;

@@ -193,18 +193,16 @@ u8 GetRandomData()
  */
 int PitchCompute(int param_1, int param_2, int param_3, int param_4)
 {
+    int value;
     int pitch;
     int octaveAdjust;
     int noteBand;
-    int value;
 
     octaveAdjust = 0;
     pitch = (param_1 >> 12) + param_2 + (param_3 >> 16);
-    if (pitch < 0) {
-        do {
-            pitch += 0xC00;
-            octaveAdjust -= 1;
-        } while (pitch < 0);
+    while (pitch < 0) {
+        pitch += 0xC00;
+        octaveAdjust -= 1;
     }
 
     noteBand = (pitch >> 8) & 0x7F;

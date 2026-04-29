@@ -55,6 +55,7 @@ static const char s_compilerMapLoaded[] =
     "\225\361\202\360\147\141\155\145\120\141\154\115\056\155\141\160\202"
     "\251\202\347\223\307\202\335\215\236\202\335\202\334\202\265\202\275"
     "\201\102\012";
+extern const char s_systemStopwatchName[8];
 
 /*
  * --INFO--
@@ -447,7 +448,7 @@ void CSystem::ExecScenegraph()
 
         float totalTime = 0.0f;
         int perfEnabled = perfTrigger & 1;
-        CStopWatch watch((char*)-1);
+        CStopWatch watch(const_cast<char*>(s_systemStopwatchName));
 
         COrder* order = m_orderSentinel.m_next;
         int index = 0;

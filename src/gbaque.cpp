@@ -2656,10 +2656,10 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 {
 	unsigned char mapObjWork[0x188];
 	unsigned char* workEntry;
-	unsigned char* writePtr;
 	GbaQueue* semaphoreIter;
 	int i;
 	int outSize;
+	unsigned int drawFlags;
 
 	i = 0;
 	semaphoreIter = this;
@@ -2680,30 +2680,42 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 	} while (i < 4);
 
 	workEntry = mapObjWork;
+	outSize = 5;
 	outData[0] = mapObjWork[0];
-	outData[1] = mapObjWork[4];
-	outData[2] = mapObjWork[5];
-	outData[3] = mapObjWork[6];
-	outData[4] = mapObjWork[7];
+	drawFlags = *reinterpret_cast<unsigned int*>(mapObjWork + 4);
+	outData[1] = static_cast<unsigned char>(drawFlags);
+	outData[2] = static_cast<unsigned char>(drawFlags >> 8);
+	outData[3] = static_cast<unsigned char>(drawFlags >> 16);
+	outData[4] = static_cast<unsigned char>(drawFlags >> 24);
 
-	writePtr = outData + 5;
 	for (i = 0; i < mapObjWork[0]; i++) {
-		writePtr[0] = workEntry[8];
-		writePtr[1] = workEntry[0xC];
-		writePtr[2] = workEntry[0xD];
-		writePtr[3] = workEntry[0xE];
-		writePtr[4] = workEntry[0xF];
-		writePtr[5] = workEntry[0x10];
-		writePtr[6] = workEntry[0x11];
-		writePtr[7] = workEntry[0x12];
-		writePtr[8] = workEntry[0x13];
+		outData[outSize] = workEntry[8];
+		outSize++;
+		outData[outSize] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0xC));
+		outSize++;
+		outData[outSize] =
+			static_cast<unsigned char>(static_cast<unsigned short>(*reinterpret_cast<short*>(workEntry + 0xC)) >> 8);
+		outSize++;
+		outData[outSize] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0xE));
+		outSize++;
+		outData[outSize] =
+			static_cast<unsigned char>(static_cast<unsigned short>(*reinterpret_cast<short*>(workEntry + 0xE)) >> 8);
+		outSize++;
+		outData[outSize] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0x10));
+		outSize++;
+		outData[outSize] =
+			static_cast<unsigned char>(static_cast<unsigned short>(*reinterpret_cast<short*>(workEntry + 0x10)) >> 8);
+		outSize++;
+		outData[outSize] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0x12));
+		outSize++;
+		outData[outSize] =
+			static_cast<unsigned char>(static_cast<unsigned short>(*reinterpret_cast<short*>(workEntry + 0x12)) >> 8);
+		outSize++;
 
 		workEntry += 0xC;
-		writePtr += 9;
 	}
 
 	reinterpret_cast<char*>(this)[0x2C88] = 1;
-	outSize = static_cast<int>(writePtr - outData);
 	return outSize;
 }
 

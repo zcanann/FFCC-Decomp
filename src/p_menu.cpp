@@ -123,8 +123,17 @@ unsigned int m_table_desc4__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsi
 unsigned int m_table_desc5__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
 
 unsigned int m_table__8CMenuPcs[0x57] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(kMenuPcsStageName)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1A, 0, 0, 0, 0,
-    0x49, 0x1, 0, 0, 0, 0x1A, 0x10, 0, 0, 0, 0x49, 0x11
+    reinterpret_cast<unsigned int>(const_cast<char*>(kMenuPcsStageName)),
+    m_table_desc0__8CMenuPcs[0], m_table_desc0__8CMenuPcs[1], m_table_desc0__8CMenuPcs[2],
+    m_table_desc1__8CMenuPcs[0], m_table_desc1__8CMenuPcs[1], m_table_desc1__8CMenuPcs[2],
+    m_table_desc2__8CMenuPcs[0], m_table_desc2__8CMenuPcs[1], m_table_desc2__8CMenuPcs[2],
+    0x1A, 0,
+    m_table_desc3__8CMenuPcs[0], m_table_desc3__8CMenuPcs[1], m_table_desc3__8CMenuPcs[2],
+    0x49, 0x1,
+    m_table_desc4__8CMenuPcs[0], m_table_desc4__8CMenuPcs[1], m_table_desc4__8CMenuPcs[2],
+    0x1A, 0x10,
+    m_table_desc5__8CMenuPcs[0], m_table_desc5__8CMenuPcs[1], m_table_desc5__8CMenuPcs[2],
+    0x49, 0x11
 };
 
 int DAT_8020ef9c[] = {
@@ -507,7 +516,7 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
             stage = m_menuStage;
         }
     } else if (type < 3) {
-        stage = pppEnvStPtr->m_stagePtr;
+        stage = PartMng.m_pppEnvSt.m_stagePtr;
     }
 
     if ((slot == 0) && (FontMan.m_font != 0)) {
@@ -528,6 +537,14 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         MenuFontTlutPalette* palette = &sMenuFontTlutPaletteTable[tlutMode * 0x1C];
 
         for (int colorIndex = 0; colorIndex < 0x10; colorIndex++) {
+            float blend = 0.0f;
+            float blendInv = 0.0f;
+
+            if (colorIndex >= 8) {
+                blend = 1.0f - static_cast<float>(colorIndex - 8) * 0.125f;
+                blendInv = 1.0f - blend;
+            }
+
             for (int tlutIndex = 0; tlutIndex < 0x1C; tlutIndex++) {
                 _GXColor color = {
                     static_cast<u8>(0xFF - sMenuFontShadeTable[colorIndex]),
@@ -541,9 +558,6 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
                     color.g = palette[tlutIndex].highlight.g;
                     color.b = palette[tlutIndex].highlight.b;
                 } else {
-                    float blend = 1.0f - static_cast<float>(colorIndex - 8) * 0.125f;
-                    float blendInv = 1.0f - blend;
-
                     color.r = static_cast<u8>(static_cast<float>(palette[tlutIndex].shadow.r) * blendInv +
                                               static_cast<float>(palette[tlutIndex].highlight.r) * blend);
                     color.g = static_cast<u8>(static_cast<float>(palette[tlutIndex].shadow.g) * blendInv +
@@ -1758,9 +1772,18 @@ void CMenuPcs::drawBattle()
             fade = 0.0f;
         }
 
+        Mtx cameraMtx;
+        Mtx44 viewMtx;
         Mtx44 screenMtx;
         Vec4d projected;
-        PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48), screenMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        PSMTXCopy(cameraMtx, reinterpret_cast<MtxPtr>(viewMtx));
+        viewMtx[3][0] = 0.0f;
+        viewMtx[3][1] = 0.0f;
+        viewMtx[3][2] = 0.0f;
+        viewMtx[3][3] = 1.0f;
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        PSMTX44Concat(screenMtx, viewMtx, screenMtx);
         Math.MTX44MultVec4(screenMtx, reinterpret_cast<Vec*>(m_battleHud.m_worldPos), &projected);
 
         if (projected.w > 0.0f) {
@@ -1792,12 +1815,12 @@ void CMenuPcs::drawBattle()
             const float left = screenX - static_cast<float>(halfWidth);
             const float bodyLeft = left + 8.0f;
             const float alphaF = 80.0f * fade;
-            const u8 alpha = static_cast<u8>(alphaF < 0.0f ? 0.0f : (alphaF > 255.0f ? 255.0f : alphaF));
+            const u8 alpha = static_cast<u8>(alphaF);
             const CColor frameColor(0xFF, 0xFF, 0xFF, alpha);
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
 
             if (totalWidth > 0) {
-                CTexture* tex = m_textures[0xDD];
+                CTexture* tex = MenuPcs.m_textures[0xDD];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 if (tex != 0) {
                     Mtx texMtx;
@@ -1809,9 +1832,9 @@ void CMenuPcs::drawBattle()
                     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 }
                 TextureMan.SetTextureTev(tex);
-                DrawRect(0, left, screenY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                MenuPcs.DrawRect(0, left, screenY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-                tex = m_textures[0xDE];
+                tex = MenuPcs.m_textures[0xDE];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 if (tex != 0) {
                     Mtx texMtx;
@@ -1823,9 +1846,9 @@ void CMenuPcs::drawBattle()
                     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 }
                 TextureMan.SetTextureTev(tex);
-                DrawRect(0, bodyLeft, screenY, static_cast<float>(totalWidth - 16), 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                MenuPcs.DrawRect(0, bodyLeft, screenY, static_cast<float>(totalWidth - 16), 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-                tex = m_textures[0xDF];
+                tex = MenuPcs.m_textures[0xDF];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 if (tex != 0) {
                     Mtx texMtx;
@@ -1837,7 +1860,7 @@ void CMenuPcs::drawBattle()
                     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 }
                 TextureMan.SetTextureTev(tex);
-                DrawRect(0, (left + static_cast<float>(totalWidth)) - 8.0f, screenY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - 8.0f, screenY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
             }
 
             const u8 gauge = static_cast<u8>((m_battleHud.m_gaugeCounter * 0xFF) >> 4);
@@ -1854,22 +1877,13 @@ void CMenuPcs::drawBattle()
     }
 
     for (int i = 0; i < 4; i++) {
-        CMenu* menu = m_battleRingMenus[i];
-        if (menu != 0) {
-            menu->Draw();
-        }
+        m_battleRingMenus[i]->Draw();
     }
     for (int i = 0; i < 12; i++) {
-        CMenu* menu = reinterpret_cast<CMenu*>(m_battleMesMenus[i]);
-        if (menu != 0) {
-            menu->Draw();
-        }
+        reinterpret_cast<CMenu*>(m_battleMesMenus[i])->Draw();
     }
     for (int i = 0; i < 4; i++) {
-        CRingMenu* menu = m_battleRingMenus[i];
-        if (menu != 0) {
-            menu->DrawIcon();
-        }
+        m_battleRingMenus[i]->DrawIcon();
     }
 }
 

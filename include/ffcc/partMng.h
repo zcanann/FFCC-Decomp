@@ -441,7 +441,9 @@ public:
     }; // Size 0x38
 
     PppPdtSlot m_pdtSlots[0x18];          // 0x22E18
-    unsigned char m_unk23358[0x39C];      // 0x23358
+    unsigned char m_unk23358[0x1C4];      // 0x23358
+    _pppEnvSt m_pppEnvSt;                 // 0x2351C
+    unsigned char m_unk235A8[0x14C];      // 0x235A8
     unsigned int m_partAMemBase;          // 0x236F4
     unsigned int m_partAMemCursor;        // 0x236F8
     unsigned int m_partLoadCacheParam;    // 0x236FC

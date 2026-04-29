@@ -81,7 +81,6 @@ public:
     CMenuPcs()
     {
         unsigned int* mcCtrl = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x20);
-        unsigned int* table = m_table__8CMenuPcs;
 
         mcCtrl[0] = 0;
         mcCtrl[1] = 0;
@@ -91,25 +90,6 @@ public:
         mcCtrl[5] = 0;
         mcCtrl[6] = 0;
         mcCtrl[7] = 0;
-
-        table[1] = m_table_desc0__8CMenuPcs[0];
-        table[2] = m_table_desc0__8CMenuPcs[1];
-        table[3] = m_table_desc0__8CMenuPcs[2];
-        table[4] = m_table_desc1__8CMenuPcs[0];
-        table[5] = m_table_desc1__8CMenuPcs[1];
-        table[6] = m_table_desc1__8CMenuPcs[2];
-        table[7] = m_table_desc2__8CMenuPcs[0];
-        table[8] = m_table_desc2__8CMenuPcs[1];
-        table[9] = m_table_desc2__8CMenuPcs[2];
-        table[12] = m_table_desc3__8CMenuPcs[0];
-        table[13] = m_table_desc3__8CMenuPcs[1];
-        table[14] = m_table_desc3__8CMenuPcs[2];
-        table[17] = m_table_desc4__8CMenuPcs[0];
-        table[18] = m_table_desc4__8CMenuPcs[1];
-        table[19] = m_table_desc4__8CMenuPcs[2];
-        table[22] = m_table_desc5__8CMenuPcs[0];
-        table[23] = m_table_desc5__8CMenuPcs[1];
-        table[24] = m_table_desc5__8CMenuPcs[2];
     }
     ~CMenuPcs();
 

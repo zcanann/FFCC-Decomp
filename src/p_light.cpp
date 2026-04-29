@@ -1418,13 +1418,3 @@ void CLightPcs::CBumpLight::SetTexture(_GXTexMapID texMapID, int textureIdx)
 {
     GXLoadTexObj(&m_textures[textureIdx], texMapID);
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CLightPcs::CLight::Set(CLightPcs::CLight*)
-{
-	// TODO
-}

@@ -7,6 +7,14 @@
 #include "ffcc/ppp_linkage.h"
 
 
+struct SRandDownCVParams {
+    s32 targetId;
+    s32 sourceOffset;
+    s8 delta[4];
+    u8 useNormalDistribution;
+    u8 _pad[3];
+};
+
 static inline float randf(unsigned char flag)
 {
     float value = -Math.RandF();
@@ -33,81 +41,33 @@ static inline char randchar(char value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandDownCV(void* basePtr, void* in, _pppCtrlTable* ctrl)
+void pppSRandDownCV(_pppPObject* basePtr, SRandDownCVParams* in, _pppCtrlTable* ctrl)
 {
+    u8* base = (u8*)basePtr;
     if (gPppCalcDisabled != 0) {
         return;
     }
 
     float* target;
 
-    if (*(int*)in == *((int*)basePtr + 3)) {
-        int** base_ptr = (int**)((char*)ctrl + 0xC);
-        int offset = **base_ptr;
-        target = (float*)((char*)basePtr + offset + 0x80);
-
-        {
-            u8 flag = *((u8*)in + 0xC);
-            float value = -Math.RandF();
-            if (flag != 0) {
-                float random = Math.RandF();
-                float blend = value - random;
-                float scale = 0.5f;
-                value = blend * scale;
-            }
-            target[0] = value;
-        }
-
-        {
-            u8 flag = *((u8*)in + 0xC);
-            float value = -Math.RandF();
-            if (flag != 0) {
-                float random = Math.RandF();
-                float blend = value - random;
-                float scale = 0.5f;
-                value = blend * scale;
-            }
-            target[1] = value;
-        }
-
-        {
-            u8 flag = *((u8*)in + 0xC);
-            float value = -Math.RandF();
-            if (flag != 0) {
-                float random = Math.RandF();
-                float blend = value - random;
-                float scale = 0.5f;
-                value = blend * scale;
-            }
-            target[2] = value;
-        }
-
-        {
-            u8 flag = *((u8*)in + 0xC);
-            float value = -Math.RandF();
-            if (flag != 0) {
-                float random = Math.RandF();
-                float blend = value - random;
-                float scale = 0.5f;
-                value = blend * scale;
-            }
-            target[3] = value;
-        }
+    if (in->targetId == *(s32*)(base + 0xC)) {
+        target = (float*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        target[0] = randf(in->useNormalDistribution);
+        target[1] = randf(in->useNormalDistribution);
+        target[2] = randf(in->useNormalDistribution);
+        target[3] = randf(in->useNormalDistribution);
     } else {
-        if (*(int*)in != *((int*)basePtr + 3)) {
+        if (in->targetId != *(s32*)(base + 0xC)) {
             return;
         }
-        int** base_ptr = (int**)((char*)ctrl + 0xC);
-        int offset = **base_ptr;
-        target = (float*)((char*)basePtr + offset + 0x80);
+        target = (float*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    int color_offset = *((int*)in + 1);
-    u8* target_colors =
-        (color_offset == -1) ? gPppDefaultValueBuffer : (u8*)((char*)basePtr + color_offset + 0x80);
+    s32 color_offset = in->sourceOffset;
+    u8* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (base + color_offset + 0x80);
 
-    target_colors[0] = target_colors[0] + randchar(*(s8*)((char*)in + 0x8), target[0]);
-    target_colors[1] = target_colors[1] + randchar(*(s8*)((char*)in + 0x9), target[1]);
-    target_colors[2] = target_colors[2] + randchar(*(s8*)((char*)in + 0xA), target[2]);
-    target_colors[3] = target_colors[3] + randchar(*(s8*)((char*)in + 0xB), target[3]);
+    target_colors[0] = target_colors[0] + randchar(in->delta[0], target[0]);
+    target_colors[1] = target_colors[1] + randchar(in->delta[1], target[1]);
+    target_colors[2] = target_colors[2] + randchar(in->delta[2], target[2]);
+    target_colors[3] = target_colors[3] + randchar(in->delta[3], target[3]);
 }

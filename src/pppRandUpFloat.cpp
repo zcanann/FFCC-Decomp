@@ -10,7 +10,7 @@ struct RandUpFloatParam {
     s32 targetId;
     s32 sourceOffset;
     f32 blend;
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
 /*
@@ -34,7 +34,7 @@ void pppRandUpFloat(_pppPObject* basePtr, RandUpFloatParam* in, _pppCtrlTable* c
     if (id == 0) {
         f32 value = Math.RandF();
 
-        if (in->randomTwice != 0) {
+        if (in->useNormalDistribution != 0) {
             f32 randomValue = value + Math.RandF();
             f32 scale = 0.5f;
             value = randomValue * scale;

@@ -340,11 +340,13 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
                 }
             }
 
+            TRACE_POLYGON* splineEntry = entries;
             for (i = 0; i < splineCount; i++) {
                 s32 idx = i + 2;
-                entries[idx].alpha = param_2->m_payload[8] - idx * entries[0].decay;
+                entries[idx].alpha = param_2->m_payload[8] - idx * splineEntry[2].decay;
                 pppCopyVector(entries[idx].from, splineFrom[i]);
                 pppCopyVector(entries[idx].to, splineTo[i]);
+                splineEntry++;
             }
         }
     }
@@ -354,7 +356,8 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         if (poly->life > 0) {
             alpha = poly->alpha;
             decay = poly->decay;
-            if (alpha <= decay) {
+            s32 remainingAlpha = (u32)alpha - (u32)decay;
+            if (remainingAlpha <= 0) {
                 poly->alpha = 0;
             } else {
                 poly->alpha = alpha - decay;

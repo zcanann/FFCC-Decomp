@@ -6,17 +6,15 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-struct PppRandUpIVParam2 {
-    s32 field0;
-    s32 field4;
-    s32 field8;
-    s32 fieldC;
-    s32 field10;
-    u8 field14[4];
-    u8 field18;
+struct RandUpIVParams {
+    s32 targetId;
+    s32 sourceOffset;
+    s32 blend[3];
+    u8 _pad[4];
+    u8 useNormalDistribution;
 };
 
-static int randint(int value, float scale)
+static inline int randint(int value, float scale)
 {
     return (int)((f32)value * scale);
 }
@@ -30,7 +28,7 @@ static int randint(int value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandUpIV(_pppPObject* basePtr, PppRandUpIVParam2* in, _pppCtrlTable* ctrl)
+extern "C" void pppRandUpIV(_pppPObject* basePtr, RandUpIVParams* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
@@ -40,9 +38,9 @@ extern "C" void pppRandUpIV(_pppPObject* basePtr, PppRandUpIVParam2* in, _pppCtr
     f32 value;
     f32* valuePtr;
 
-    if (in->field0 == *(s32*)(base + 0xC)) {
+    if (in->targetId == *(s32*)(base + 0xC)) {
         value = Math.RandF();
-        if (in->field18 != 0) {
+        if (in->useNormalDistribution != 0) {
             f32 randValue = value + Math.RandF();
             f32 scale = 0.5f;
             value = randValue * scale;
@@ -51,18 +49,18 @@ extern "C" void pppRandUpIV(_pppPObject* basePtr, PppRandUpIVParam2* in, _pppCtr
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
-        if (in->field0 != *(s32*)(base + 0xC)) {
+        if (in->targetId != *(s32*)(base + 0xC)) {
             return;
         }
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    s32* target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);
+    s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->sourceOffset + 0x80);
     f32 scale = *valuePtr;
 
-    target[0] += randint(in->field8, scale);
-    target[1] += randint(in->fieldC, scale);
-    target[2] += randint(in->field10, scale);
+    target[0] += randint(in->blend[0], scale);
+    target[1] += randint(in->blend[1], scale);
+    target[2] += randint(in->blend[2], scale);
 }
 
 /*

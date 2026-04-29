@@ -7,7 +7,7 @@ struct _pppPObject;
 extern "C" {
 #endif
 
-void pppRandDownHCV(struct _pppPObject* basePtr, struct PppRandDownHCVParam2* in, struct _pppCtrlTable* ctrl);
+void pppRandDownHCV(struct _pppPObject* basePtr, struct RandDownHCVParams* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

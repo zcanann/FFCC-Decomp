@@ -64,6 +64,19 @@ public:
     CMapIdGrp();
 };
 
+struct CMapMngAsyncLoadState
+{
+    void* m_mapLoadStart;
+    void* m_mapLoadCursor;
+    unsigned int m_mapLoadSize;
+    int m_asyncReadIndex;
+    int m_asyncOpenIndex;
+    int m_mapReadMode;
+    int m_fileSizes[16];
+    unsigned int m_fileChecksums[16];
+    void* m_asyncHandles[16];
+};
+
 class CMapMng
 {
 public:

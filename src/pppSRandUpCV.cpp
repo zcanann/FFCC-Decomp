@@ -11,7 +11,7 @@ struct SRandUpCVParam {
     s32 targetId;
     s32 sourceOffset;
     s8 delta[4];
-    u8 randomTwice;
+    u8 useNormalDistribution;
 };
 
 static inline float randf(unsigned char flag)
@@ -51,50 +51,10 @@ void pppSRandUpCV(_pppPObject* basePtr, SRandUpCVParam* in, _pppCtrlTable* ctrl)
 
     if (in->targetId == *(s32*)(base + 0xC)) {
         target = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
-
-        {
-            u8 flag = in->randomTwice;
-            f32 value = Math.RandF();
-            if (flag != 0) {
-                f32 randomPair = value + Math.RandF();
-                f32 scale = 0.5f;
-                value = randomPair * scale;
-            }
-            target[0] = value;
-        }
-
-        {
-            u8 flag = in->randomTwice;
-            f32 value = Math.RandF();
-            if (flag != 0) {
-                f32 randomPair = value + Math.RandF();
-                f32 scale = 0.5f;
-                value = randomPair * scale;
-            }
-            target[1] = value;
-        }
-
-        {
-            u8 flag = in->randomTwice;
-            f32 value = Math.RandF();
-            if (flag != 0) {
-                f32 randomPair = value + Math.RandF();
-                f32 scale = 0.5f;
-                value = randomPair * scale;
-            }
-            target[2] = value;
-        }
-
-        {
-            u8 flag = in->randomTwice;
-            f32 value = Math.RandF();
-            if (flag != 0) {
-                f32 randomPair = value + Math.RandF();
-                f32 scale = 0.5f;
-                value = randomPair * scale;
-            }
-            target[3] = value;
-        }
+        target[0] = randf(in->useNormalDistribution);
+        target[1] = randf(in->useNormalDistribution);
+        target[2] = randf(in->useNormalDistribution);
+        target[3] = randf(in->useNormalDistribution);
     } else {
         if (in->targetId != *(s32*)(base + 0xC)) {
             return;

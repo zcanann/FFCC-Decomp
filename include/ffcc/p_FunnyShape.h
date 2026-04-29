@@ -32,7 +32,6 @@ public:
     void calcViewer();
     void drawViewer();
 
-    void SetDisplay(FS_DISPLAY_STATUS);
     void SetUSBData();
     void USBDataCallback(CDataHeader*);
 

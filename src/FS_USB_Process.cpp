@@ -43,7 +43,7 @@ static inline void StoreSwap32(u32* value) {
 
 static inline void StoreSwap32(f32* value) {
     f32 raw = *value;
-    u32 swapped = LoadSwap32(*reinterpret_cast<u32*>(&raw));
+    u32 swapped = __lwbrx(&raw, 0);
     *value = *reinterpret_cast<f32*>(&swapped);
 }
 
@@ -228,12 +228,10 @@ void CFunnyShapePcs::SetUSBData()
         OSFS_SHAPE_ST shape;
         memcpy(&shape, usb->m_data, sizeof(shape));
 
-        m_shape.flags = LoadSwap16(shape.flags);
-        m_shape.count = LoadSwap16(shape.count);
-        m_shape.unk04 = shape.unk04;
-        m_shape.unk08 = LoadSwap16(shape.unk08);
-        memcpy(m_shape.unk0A, shape.unk0A, 4);
-        m_shape.unk0E = shape.unk0E;
+        shape.flags = LoadSwap16(shape.flags);
+        shape.count = LoadSwap16(shape.count);
+        shape.unk08 = LoadSwap16(shape.unk08);
+        m_shape = shape;
         break;
     }
     case 16: {
@@ -314,13 +312,4 @@ void CFunnyShapePcs::SetUSBData()
 void CFunnyShapePcs::USBDataCallback(CDataHeader* dataHeader)
 {
     (void)dataHeader;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFunnyShapePcs::SetDisplay(FS_DISPLAY_STATUS)
-{
 }

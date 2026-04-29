@@ -1450,18 +1450,18 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 		if (inUse == 0) {
 			int musicSeq = SearchMusicSequence(musicNo);
 			if (musicSeq >= 0) {
-				if (reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8))[musicSeq * 4 + 1] == 0) {
+				if (*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * 0x10 + 4) == 0) {
 					MusicHistoryAdd();
-					reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8))[musicSeq * 4 + 1] = 1;
+					*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * 0x10 + 4) = 1;
 				}
 			}
 		}
 	} else {
 		int musicSeq = SearchMusicSequence(musicNo);
 		if (musicSeq >= 0) {
-			if (reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8))[musicSeq * 4 + 1] != 0) {
-				MusicHistoryDelete(reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8))[musicSeq * 4 + 1]);
-				reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8))[musicSeq * 4 + 1] = 0;
+			if (*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * 0x10 + 4) != 0) {
+				MusicHistoryDelete(*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * 0x10 + 4));
+				*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * 0x10 + 4) = 0;
 			}
 		}
 	}

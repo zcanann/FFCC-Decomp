@@ -281,8 +281,8 @@ void CSystem::ExecScenegraph()
 
     do
     {
-        int stepTrigger;
-        int perfTrigger;
+        unsigned short stepTrigger;
+        unsigned short perfTrigger;
 
         if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.m_gameWork.m_gamePaused)
         {
@@ -354,8 +354,8 @@ void CSystem::ExecScenegraph()
         {
             for (int port = 0; port < 4; port++)
             {
-                int trigger;
-                int held;
+                unsigned short trigger;
+                unsigned short held;
                 bool noInput;
 
                 noInput = false;
@@ -440,7 +440,7 @@ void CSystem::ExecScenegraph()
 
         float totalTime = 0.0f;
         perfTrigger &= 1;
-        CStopWatch watch(reinterpret_cast<char*>(-1));
+        CStopWatch watch(const_cast<char*>(""));
 
         int index = 0;
         for (COrder* order = m_orderSentinel.m_next;

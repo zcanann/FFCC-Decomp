@@ -628,7 +628,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 	GXPosition3f32((float)x, (float)(y + height), 0.0f);
 	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
 
-	if ((m_currentMenu->m_status & 0x40) != 0) {
+	if (((m_currentMenu->m_status << 25) & 0x80000000) != 0) {
 		u8 alpha = 0xC0;
 
 		if ((System.m_frameCounter >> 2 & 1) != 0) {

@@ -156,7 +156,14 @@ struct CLine {
 
 class CSound::CSe3D {
 public:
-    s8 m_flags;
+    union {
+        struct {
+            u8 m_active : 1;
+            u8 m_paused : 1;
+            u8 m_flagsRest : 6;
+        } m_bits;
+        s8 m_flags;
+    };
     u8 m_volume;
     u8 m_pan;
     s8 m_lineIndex;
@@ -1760,7 +1767,7 @@ void CSound::searchSe3D(int)
  */
 int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistance, int fadeFrames)
 {
-    u8* se;
+    CSe3D* se;
     int loopCount;
     int slot;
     int volume;
@@ -1772,29 +1779,29 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
     }
 
     CSoundLayout& sound = SoundData(this);
-    se = sound.m_seWork;
+    se = reinterpret_cast<CSe3D*>(sound.m_seWork);
 
-    for (loopCount = 0x80; loopCount != 0; loopCount--, se += 0x28) {
-        if ((*se & 0x80) != 0) {
+    for (loopCount = 0x80; loopCount != 0; loopCount--, se++) {
+        if (se->m_bits.m_active) {
             continue;
         }
 
-        *se = (*se & 0x7F) | 0x80;
-        *se &= 0xBF;
-        *reinterpret_cast<int*>(se + 0xC) = soundId;
+        se->m_bits.m_active = 1;
+        se->m_bits.m_paused = 0;
+        se->m_soundId = soundId;
         slot = sound.m_seCount;
         sound.m_seCount = slot + 1;
-        *reinterpret_cast<int*>(se + 4) = slot;
+        se->m_handle = slot;
 
-        *reinterpret_cast<float*>(se + 0x10) = nearDistance;
-        *reinterpret_cast<float*>(se + 0x14) = farDistance;
-        *reinterpret_cast<Vec*>(se + 0x18) = *pos;
-        se[3] = 0xFF;
+        se->m_nearDistance = nearDistance;
+        se->m_farDistance = farDistance;
+        se->m_position = *pos;
+        se->m_lineIndex = -1;
 
-        calcVolumePan(reinterpret_cast<CSe3D*>(se), volume, pan);
-        se[1] = static_cast<u8>(volume);
-        se[2] = static_cast<u8>(pan);
-        *reinterpret_cast<int*>(se + 0x24) = -1;
+        calcVolumePan(se, volume, pan);
+        se->m_volume = static_cast<u8>(volume);
+        se->m_pan = static_cast<u8>(pan);
+        se->m_group = -1;
 
         if (soundId < 0) {
             Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
@@ -1814,8 +1821,8 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
             }
         }
 
-        *reinterpret_cast<int*>(se + 8) = slot;
-        return *reinterpret_cast<int*>(se + 4);
+        se->m_playId = slot;
+        return se->m_handle;
     }
 
     return -1;
@@ -1832,7 +1839,7 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
  */
 int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float farDistance, int fadeFrames)
 {
-    u8* se;
+    CSe3D* se;
     int loopCount;
     int slot;
     int volume;
@@ -1844,28 +1851,28 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
     }
 
     CSoundLayout& sound = SoundData(this);
-    se = sound.m_seWork;
+    se = reinterpret_cast<CSe3D*>(sound.m_seWork);
 
-    for (loopCount = 0x80; loopCount != 0; loopCount--, se += 0x28) {
-        if ((*se & 0x80) != 0) {
+    for (loopCount = 0x80; loopCount != 0; loopCount--, se++) {
+        if (se->m_bits.m_active) {
             continue;
         }
 
-        *se = (*se & 0x7F) | 0x80;
-        *se &= 0xBF;
-        *reinterpret_cast<int*>(se + 0xC) = soundId;
+        se->m_bits.m_active = 1;
+        se->m_bits.m_paused = 0;
+        se->m_soundId = soundId;
         slot = sound.m_seCount;
         sound.m_seCount = slot + 1;
-        *reinterpret_cast<int*>(se + 4) = slot;
+        se->m_handle = slot;
 
-        *reinterpret_cast<float*>(se + 0x10) = nearDistance;
-        *reinterpret_cast<float*>(se + 0x14) = farDistance;
-        se[3] = static_cast<u8>(lineIndex);
+        se->m_nearDistance = nearDistance;
+        se->m_farDistance = farDistance;
+        se->m_lineIndex = static_cast<s8>(lineIndex);
 
-        calcVolumePan(reinterpret_cast<CSe3D*>(se), volume, pan);
-        se[1] = static_cast<u8>(volume);
-        se[2] = static_cast<u8>(pan);
-        *reinterpret_cast<int*>(se + 0x24) = -1;
+        calcVolumePan(se, volume, pan);
+        se->m_volume = static_cast<u8>(volume);
+        se->m_pan = static_cast<u8>(pan);
+        se->m_group = -1;
 
         if (soundId < 0) {
             Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
@@ -1885,8 +1892,8 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
             }
         }
 
-        *reinterpret_cast<int*>(se + 8) = slot;
-        return *reinterpret_cast<int*>(se + 4);
+        se->m_playId = slot;
+        return se->m_handle;
     }
 
     return -1;

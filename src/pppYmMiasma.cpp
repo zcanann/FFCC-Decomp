@@ -267,6 +267,8 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
         s32 angleIdx;
         u32 local_28;
         u32 uStack_24;
+        float impulseX;
+        float impulseZ;
 
         work->m_emitTimer = 0;
         work->m_speedDecay = step->m_unk18;
@@ -282,9 +284,11 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
         uStack_24 = (u32)(s16)(angleDelta + step->m_baseAngle) ^ 0x80000000;
         temp.ull = ((unsigned long long)local_28 << 32) | (unsigned long long)uStack_24;
         angleIdx = (s32)((((float)(temp.d - DOUBLE_80330648) * FLOAT_80330640) * FLOAT_80330650) / FLOAT_80330654);
-        work->m_impulse.x = *(float*)((u8*)gPppTrigTable + ((angleIdx + 0x4000) & 0xfffc));
+        impulseX = *(float*)((u8*)gPppTrigTable + ((angleIdx + 0x4000) & 0xfffc));
+        impulseZ = *(float*)((u8*)gPppTrigTable + (angleIdx & 0xfffc));
+        work->m_impulse.x = impulseX;
         work->m_impulse.y = FLOAT_80330644;
-        work->m_impulse.z = *(float*)((u8*)gPppTrigTable + (angleIdx & 0xfffc));
+        work->m_impulse.z = impulseZ;
     }
 
     work->m_radiusVelocity = work->m_radiusVelocity + work->m_radiusAcceleration;

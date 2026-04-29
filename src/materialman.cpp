@@ -104,6 +104,7 @@ private:
     int m_growCapacity;
 };
 
+#pragma dont_inline on
 template <>
 CPtrArray<CMaterial*>::CPtrArray()
 {
@@ -114,6 +115,7 @@ CPtrArray<CMaterial*>::CPtrArray()
     m_stage = 0;
     m_growCapacity = 1;
 }
+#pragma dont_inline reset
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -255,6 +257,7 @@ static void SetMaterialColor(CMaterial* material, unsigned int rgba)
 }
 }
 
+#pragma dont_inline on
 template <>
 CPtrArray<CMaterial*>::~CPtrArray()
 {
@@ -374,6 +377,7 @@ CMaterial* CPtrArray<CMaterial*>::GetAt(unsigned long index)
 {
     return m_items[index];
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -2947,12 +2951,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
     CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
     u32 textureIndex = 0;
 
-    do {
-        u32 textureCount = static_cast<u32>(textureArray->GetSize());
-        if (textureCount <= textureIndex) {
-            return;
-        }
-
+    while (textureIndex < static_cast<u32>(textureArray->GetSize())) {
         if ((*textureArray)[textureIndex] != 0) {
             u32 materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
             u32 materialIndex = textureIndex + 1;
@@ -2995,15 +2994,15 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             *reinterpret_cast<int*>(material + 0x9C) = pdtSlotIndex;
 
             materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
-            if (materialIndex < materialCount) {
-                materialArray->SetAt(materialIndex, reinterpret_cast<CMaterial*>(material));
-            } else {
+            if (materialIndex >= materialCount) {
                 materialArray->Add(reinterpret_cast<CMaterial*>(material));
+            } else {
+                materialArray->SetAt(materialIndex, reinterpret_cast<CMaterial*>(material));
             }
         }
 next:
         textureIndex = textureIndex + 1;
-    } while (true);
+    }
 }
 
 /*

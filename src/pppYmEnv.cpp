@@ -63,7 +63,7 @@ struct Vec2d {
 };
 
 struct PartMngEditRaw {
-    u8 m_pad00[0x23554];
+    u8 m_pad00[0x1C8];
     void* m_recvBuff;
 };
 
@@ -557,6 +557,7 @@ void CalcGraphValue(_pppPObject* object, long graphId, float& value, float& velo
 int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)[4])
 {
     void* nodeNameBase;
+    CGObject* owner;
     CModelRaw* modelRaw;
     CChara::CModel* model;
     int skNodeIndex;
@@ -578,17 +579,18 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     Vec local118;
     pppFMATRIX localMatrix;
 
+    owner = (CGObject*)mngSt->m_owner;
     if (Game.m_currentSceneId == 7) {
         nodeNameBase = (u8*)(reinterpret_cast<PartMngEditRaw*>(&PartMng)->m_recvBuff) + mngSt->m_nodeIndex * 0x60;
     } else {
         nodeNameBase = (u8*)(*(u32*)mngSt->m_pppResSet) + mngSt->m_nodeIndex * 0x60 + 0x20;
     }
 
-    if (mngSt->m_owner == 0) {
+    if (owner == 0) {
         return 0;
     }
 
-    CCharaPcs::CHandle* handle = ((CGObject*)mngSt->m_owner)->m_charaModelHandle;
+    CCharaPcs::CHandle* handle = owner->m_charaModelHandle;
     if (handle == 0) {
         return 0;
     }
@@ -624,21 +626,25 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                                                               (CChara::CNode*)(modelRaw->m_nodes + skNodeIndex * 0xC0),
                                                               outMatrix);
 
-    u8 rotationOrder = mngSt->m_rotationOrder;
-    if (rotationOrder == 3) {
+    switch (mngSt->m_rotationOrder) {
+    case 0:
+        pppGetRotMatrixXYZ(localMatrix, &mngSt->m_rotation);
+        break;
+    case 1:
+        pppGetRotMatrixXZY(localMatrix, &mngSt->m_rotation);
+        break;
+    case 2:
+        pppGetRotMatrixYXZ(localMatrix, &mngSt->m_rotation);
+        break;
+    case 3:
         pppGetRotMatrixYZX(localMatrix, &mngSt->m_rotation);
-    } else if (rotationOrder < 3) {
-        if (rotationOrder == 1) {
-            pppGetRotMatrixXZY(localMatrix, &mngSt->m_rotation);
-        } else if (rotationOrder == 0) {
-            pppGetRotMatrixXYZ(localMatrix, &mngSt->m_rotation);
-        } else {
-            pppGetRotMatrixYXZ(localMatrix, &mngSt->m_rotation);
-        }
-    } else if (rotationOrder == 5) {
-        pppGetRotMatrixZYX(localMatrix, &mngSt->m_rotation);
-    } else if (rotationOrder < 5) {
+        break;
+    case 4:
         pppGetRotMatrixZXY(localMatrix, &mngSt->m_rotation);
+        break;
+    case 5:
+        pppGetRotMatrixZYX(localMatrix, &mngSt->m_rotation);
+        break;
     }
 
     if (mngSt->m_matrixMode == 5) {

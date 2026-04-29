@@ -200,24 +200,20 @@ CRingMenu::CRingMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-CRingMenu::~CRingMenu()
+extern "C" CRingMenu* __dt__9CRingMenuFv(CRingMenu* ringMenu, short shouldDelete)
 {
 	typedef void (*VFunc)(void*);
-	register short shouldDelete;
-	asm {
-		mr shouldDelete, r4
+	if (ringMenu != 0) {
+		*reinterpret_cast<void***>(ringMenu) = __vt__9CRingMenu;
+		VFunc* vtable = *reinterpret_cast<VFunc**>(ringMenu);
+		vtable[4](ringMenu);
+		__dt__5CMenuFv(ringMenu, 0);
+		if (0 < shouldDelete) {
+			__dl__FPv(ringMenu);
+		}
 	}
 
-	if (this == 0) {
-		return;
-	}
-
-	*reinterpret_cast<void***>(this) = __vt__9CRingMenu;
-	(*(VFunc*)((unsigned char*)*(void***)this + 0x10))(this);
-	__dt__5CMenuFv(this, 0);
-	if (0 < shouldDelete) {
-		__dl__FPv(this);
-	}
+	return ringMenu;
 }
 
 /*

@@ -19,6 +19,8 @@ extern CUSBPcsTable m_table__7CUSBPcs;
 class CUSBPcs : public CSamplePcs
 {
 public:
+    class CDataHeader;
+
     CUSBPcs()
     {
         unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__7CUSBPcs);

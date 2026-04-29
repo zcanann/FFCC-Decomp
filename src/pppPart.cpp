@@ -385,7 +385,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 		pppProgramSetDefRaw* m_programSetDef;
 		s32 m_nextSpawnTime;
 		_pppPObjLink* m_pppPObjLink;
-		s16 m_activeCount;
+		u16 m_activeCount;
 		u8 m_index;
 		u8 m_pad;
 	};
@@ -550,7 +550,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 		pppProgramSetDefRaw* m_programSetDef;
 		s32 m_nextSpawnTime;
 		_pppPObjLink* m_pppPObjLink;
-		s16 m_activeCount;
+		u16 m_activeCount;
 		u8 m_index;
 		u8 m_pad;
 	};
@@ -857,7 +857,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 		pppProgramSetDefRaw* m_programSetDef;
 		s32 m_nextSpawnTime;
 		_pppPObjLink* m_pppPObjLink;
-		s16 m_activeCount;
+		u16 m_activeCount;
 		u8 m_index;
 		u8 m_pad;
 	};
@@ -872,7 +872,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 		_pppPObjLink m_pppPObjLinkHead;
 		u8 m_pad3[0xF8 - 0xD0];
 		u8 m_prio;
-		s16 m_prioTime;
+		u16 m_prioTime;
 	};
 
 	struct pppPObjectRaw
@@ -1111,7 +1111,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 		pppProgramSetDefRaw* m_programSetDef;
 		s32 m_nextSpawnTime;
 		_pppPObjLink* m_pppPObjLink;
-		s16 m_activeCount;
+		u16 m_activeCount;
 		u8 m_index;
 		u8 m_pad;
 	};
@@ -1381,9 +1381,10 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 					goto LocalOnly;
 				}
 				MapMng.GetMapObjWMtx(pppMngSt->m_mapObjIndex, nodeMtx);
-				nodeMtx[0][3] += pppMngStPtr->m_position.x;
-				nodeMtx[1][3] += pppMngStPtr->m_position.y;
-				nodeMtx[2][3] += pppMngStPtr->m_position.z;
+				PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
+				nodeMtx[0][3] += tmpPos.x;
+				nodeMtx[1][3] += tmpPos.y;
+				nodeMtx[2][3] += tmpPos.z;
 				PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 			}
 		}
@@ -1795,7 +1796,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		pppProgramSetDefRaw* m_programSetDef;
 		s32 m_nextSpawnTime;
 		_pppPObjLink* m_pppPObjLink;
-		s16 m_activeCount;
+		u16 m_activeCount;
 		u8 m_index;
 		u8 m_pad;
 	};
@@ -1818,7 +1819,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		_pppPObjLink m_pppPObjLinkHead;
 		u8 m_pad3[0xF8 - 0xD0];
 		u8 m_prio;
-		s16 m_prioTime;
+		u16 m_prioTime;
 	};
 
 	pppProgramSetDefRaw* programSet = (pppProgramSetDefRaw*)(pdt + 6);
@@ -2611,7 +2612,7 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 		void* m_programSetDef;
 		s32 m_nextSpawnTime;
 		_pppPObjLink* m_pppPObjLink;
-		s16 m_activeCount;
+		u16 m_activeCount;
 		u8 m_index;
 		u8 m_pad;
 	};

@@ -222,7 +222,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
         GXCallDisplayList(displayList, displayListSize);
     }
 
-    Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, texWidth, texHeight, 0, GX_LINEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, rtWidth, rtHeight, 0, GX_LINEAR, GX_TF_RGBA8, 0);
     GXSetScissor(0, 0, 0x280, 0x1C0);
     Graphic.SetViewport();
 
@@ -714,8 +714,8 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         }
     } else if ((mngSt->m_matrixMode < 7) && (mngSt->m_bindNode != 0)) {
         PSVECNormalize((Vec*)outMatrix, (Vec*)outMatrix);
-        PSVECNormalize((Vec*)&outMatrix[0][1], (Vec*)&outMatrix[0][1]);
-        PSVECNormalize((Vec*)&outMatrix[0][2], (Vec*)&outMatrix[0][2]);
+        PSVECNormalize((Vec*)&outMatrix[1][0], (Vec*)&outMatrix[1][0]);
+        PSVECNormalize((Vec*)&outMatrix[2][0], (Vec*)&outMatrix[2][0]);
         PSMTXMultVecSR(outMatrix, &pppMngStPtr->m_position, &local88);
         PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
 

@@ -300,7 +300,7 @@ struct _pppMngSt
     unsigned char m_fpBillboard;       // 0xF7
     unsigned char m_prio;              // 0xF8
     unsigned char m_padF9;             // 0xF9
-    short m_prioTime;                  // 0xFA
+    unsigned short m_prioTime;         // 0xFA
     unsigned char m_padFC[4];          // 0xFC
     unsigned int m_paramA;             // 0x100
     unsigned int m_paramB;             // 0x104

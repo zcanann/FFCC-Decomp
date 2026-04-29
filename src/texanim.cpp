@@ -1026,6 +1026,7 @@ void CTexAnimSet::SetTexGen()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 CTexAnim::CTexAnim()
 {
     CTexAnimStorage* self = reinterpret_cast<CTexAnimStorage*>(this);
@@ -1038,6 +1039,7 @@ CTexAnim::CTexAnim()
     self->unk1C = FLOAT_8032fb38;
     self->unk20 = FLOAT_8032fb38;
 }
+#endif
 
 /*
  * --INFO--
@@ -1073,6 +1075,7 @@ CTexAnim::~CTexAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
     CChunkFile::CChunk chunk;
@@ -1391,6 +1394,7 @@ float CTexAnim::GetChin()
 {
     return reinterpret_cast<CTexAnimStorage*>(this)->unk20;
 }
+#endif
 
 /*
  * --INFO--
@@ -1401,6 +1405,7 @@ float CTexAnim::GetChin()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 CTexAnim::CRefData::CRefData()
 {
     CTexAnimRefDataStorage* self = reinterpret_cast<CTexAnimRefDataStorage*>(this);
@@ -1408,6 +1413,7 @@ CTexAnim::CRefData::CRefData()
     self->material = 0;
     self->texSrtIndex = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -1448,6 +1454,7 @@ CTexAnim::CRefData::~CRefData()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 CTexAnimSeq::CTexAnimSeq()
 {
     CTexAnimSeqStorage* self = reinterpret_cast<CTexAnimSeqStorage*>(this);
@@ -1458,6 +1465,7 @@ CTexAnimSeq::CTexAnimSeq()
     self->flags = 0;
     self->keys = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -1487,6 +1495,7 @@ CTexAnimSeq::~CTexAnimSeq()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
     CChunkFile::CChunk chunk;
@@ -1572,3 +1581,4 @@ int CTexAnimSeq::IsChin()
 {
     return (reinterpret_cast<CTexAnimSeqStorage*>(this)->flags & 0x40) != 0;
 }
+#endif

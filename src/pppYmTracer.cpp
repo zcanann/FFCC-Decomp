@@ -165,8 +165,8 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
                     colorTop.value = DAT_803306e0;
-                    colorBottom.value = DAT_803306e4;
                     colorTop.bytes[3] = poly->alpha;
+                    colorBottom.value = DAT_803306e4;
                     colorBottom.bytes[3] = next->alpha;
 
                     GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);

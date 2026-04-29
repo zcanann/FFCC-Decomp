@@ -136,8 +136,9 @@ void CFlatRuntime::Destroy()
 		*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
 		*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
 
-		object->m_freeListNode[1] = *m_objectFreeListHead;
-		*m_objectFreeListHead = object->m_freeListNode;
+		void** freeHead = m_objectFreeListHead;
+		object->m_freeListNode[1] = freeHead[0];
+		freeHead[0] = object->m_freeListNode;
 
 		object->m_flags &= 0xEF;
 
@@ -706,8 +707,9 @@ void CFlatRuntime::AfterFrame(int mode)
 			*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
 			*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
 
-			object->m_freeListNode[1] = *m_objectFreeListHead;
-			*m_objectFreeListHead = object->m_freeListNode;
+			void** freeHead = m_objectFreeListHead;
+			object->m_freeListNode[1] = freeHead[0];
+			freeHead[0] = object->m_freeListNode;
 
 			object->m_flags &= 0xEF;
 
@@ -736,8 +738,9 @@ void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 	*(void**)((char*)*object->m_freeListNode + 4) = object->m_freeListNode[1];
 	*(void**)object->m_freeListNode[1] = *object->m_freeListNode;
 
-	object->m_freeListNode[1] = *m_objectFreeListHead;
-	*m_objectFreeListHead = object->m_freeListNode;
+	void** freeHead = m_objectFreeListHead;
+	object->m_freeListNode[1] = freeHead[0];
+	freeHead[0] = object->m_freeListNode;
 
 	object->m_flags &= 0xEF;
 

@@ -23,10 +23,10 @@ typedef _PARTICLE_COLOR PARTICLE_COLOR;
 #endif
 
 void get_rand(void);
-void BirthParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*, _PARTICLE_DATA*, Mtx*, _PARTICLE_COLOR*);
-void UpdateParticle(VYmBreath*, PYmBreath*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
+void BirthParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);
+void UpdateParticle(VYmBreath*, PYmBreath*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*);
 void UpdateAllParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*);
-void SetParticleMatrix(_pppPObject*, VYmBreath*, _PARTICLE_DATA*, Mtx*);
+void SetParticleMatrix(_pppPObject*, VYmBreath*, PARTICLE_DATA*, PARTICLE_WMAT*);
 
 #ifdef __cplusplus
 extern "C" {

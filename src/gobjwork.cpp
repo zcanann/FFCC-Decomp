@@ -1015,15 +1015,13 @@ int CCaravanWork::AddGil(int gilToAdd)
 
 	m_gil = m_gil + gilToAdd;
 	totalGil = m_gil;
-	if (totalGil <= 99999999) {
-		if (totalGil < 0) {
-			gilToAdd = gilToAdd - totalGil;
-			m_gil = 0;
-		}
-	} else {
+	if (totalGil > 99999999) {
 		int overflow = totalGil - 99999999;
 		m_gil = totalGil - overflow;
 		gilToAdd = gilToAdd - overflow;
+	} else if (totalGil < 0) {
+		gilToAdd = gilToAdd - totalGil;
+		m_gil = 0;
 	}
 	return gilToAdd;
 }
@@ -1039,29 +1037,27 @@ int CCaravanWork::AddGil(int gilToAdd)
  */
 int CCaravanWork::GetFoodRank(int playerIdx)
 {
+	CCaravanWork* cur = this;
 	int rank = 0;
 	int baseIdx = 0;
-	int loops = 2;
-	CCaravanWork* cur = this;
 
-	do {
-		if ((playerIdx != baseIdx) && (m_letterMeta[playerIdx] < cur->m_letterMeta[0])) {
+	for (int i = 0; i < 2; i++) {
+		if ((playerIdx != baseIdx) && (cur->m_letterMeta[0] > m_letterMeta[playerIdx])) {
 			rank++;
 		}
-		if ((playerIdx != (baseIdx + 1)) && (m_letterMeta[playerIdx] < cur->m_letterMeta[1])) {
+		if ((playerIdx != (baseIdx + 1)) && (cur->m_letterMeta[1] > m_letterMeta[playerIdx])) {
 			rank++;
 		}
-		if ((playerIdx != (baseIdx + 2)) && (m_letterMeta[playerIdx] < cur->m_letterMeta[2])) {
+		if ((playerIdx != (baseIdx + 2)) && (cur->m_letterMeta[2] > m_letterMeta[playerIdx])) {
 			rank++;
 		}
-		if ((playerIdx != (baseIdx + 3)) && (m_letterMeta[playerIdx] < cur->m_letterMeta[3])) {
+		if ((playerIdx != (baseIdx + 3)) && (cur->m_letterMeta[3] > m_letterMeta[playerIdx])) {
 			rank++;
 		}
 
 		cur = (CCaravanWork*)&cur->m_saveSlot;
 		baseIdx += 4;
-		loops--;
-	} while (loops != 0);
+	}
 
 	return rank;
 }

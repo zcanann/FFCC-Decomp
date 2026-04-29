@@ -21,7 +21,7 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
-    _pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, VColor*, _PARTICLE_COLOR*);
+    _pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 pppFMATRIX g_matUnit2;
 
 static const char s_pppYmMegaBirthShpTail2_cpp_801d9c68[] = "pppYmMegaBirthShpTail2.cpp";
@@ -229,14 +229,14 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
     _PARTICLE_WMAT* worldMat;
     _PARTICLE_COLOR* particleColor;
     VYmMegaBirthShpTail2* work;
+    VColor* colorWork;
 
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = (VYmMegaBirthShpTail2*)((u8*)object + 0x80 + offsets->m_serializedDataOffsets[2]);
+    colorWork = (VColor*)((u8*)object + 0x80 + colorOffset);
     paramPayload = (u8*)param;
 
     if (work->m_particles == 0) {
-        Vec tailScale;
-
         work->m_maxParticles = *(u16*)((u8*)&param->m_matrix + 0xe);
         work->m_particles = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             work->m_maxParticles * 0x1b8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail2_cpp_801d9c68), 0x30e);
@@ -259,8 +259,7 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
         }
 
         work->m_tailScaleDirection = param->m_directionTail;
-        tailScale = work->m_tailScaleDirection;
-        pppNormalize(work->m_tailScaleDirection, tailScale);
+        pppNormalize(work->m_tailScaleDirection, work->m_tailScaleDirection);
     }
 
     if (work->m_particles == 0) {
@@ -278,9 +277,6 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
     }
 
     switch (paramPayload[0x18]) {
-    default:
-        pppCopyMatrix(work->m_emitterMatrix, pppMngStPtr->m_matrix);
-        break;
     case 1:
     case 3:
     case 5:
@@ -321,33 +317,36 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
         work->m_emitterMatrix.value[2][3] = pppMngStPtr->m_position.z;
         break;
     }
-    }
-
-    if ((gPppCalcDisabled != 0) || (paramPayload[0x18] == 0)) {
-        return;
+    default:
+        pppCopyMatrix(work->m_emitterMatrix, pppMngStPtr->m_matrix);
+        break;
     }
 
     worldMat = work->m_wmats;
     particleColor = work->m_colors;
     particleData = (u8*)work->m_particles;
+
+    if ((gPppCalcDisabled != 0) || (*(u32*)((u8*)&param->m_matrix + 4) == 0xFFFF)) {
+        return;
+    }
+
     work->m_lifeLimit = work->m_lifeLimit + 1;
 
     for (i = 0; i < work->m_maxParticles; i++) {
-        if (*(s16*)(particleData + 0x22) == 0) {
+        if (*(u16*)(particleData + 0x22) != 0) {
+            calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
+                &object->field0_0x0, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
+        } else {
             if ((*(u16*)((u8*)&param->m_matrix + 0x12) <= work->m_lifeLimit) &&
                 (spawnCount < *(u16*)((u8*)&param->m_matrix + 0x10))) {
-                birth(&object->field0_0x0, work, param, (VColor*)((u8*)object + 0x80 + colorOffset),
-                    (_PARTICLE_DATA*)particleData, worldMat, particleColor);
+                birth(&object->field0_0x0, work, param, colorWork, (_PARTICLE_DATA*)particleData, worldMat,
+                    particleColor);
                 spawnCount = spawnCount + 1;
             }
-        } else {
-            calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
-                &object->field0_0x0, work, param, (VColor*)particleData,
-                (_PARTICLE_COLOR*)((u8*)object + 0x80 + colorOffset));
         }
 
         if (worldMat != 0) {
-            worldMat = worldMat + 1;
+            worldMat = (_PARTICLE_WMAT*)((u8*)worldMat + 0x30);
         }
         if (particleColor != 0) {
             particleColor = particleColor + 1;
@@ -371,9 +370,10 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
  */
 extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
     _pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
-    PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, VColor* vColor, _PARTICLE_COLOR* particleColor)
+    PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, _PARTICLE_DATA* particleData, VColor* vColor,
+    _PARTICLE_COLOR* particleColor)
 {
-    u8* color = (u8*)vColor;
+    u8* color = (u8*)particleData;
     u32 alpha = ((u8*)particleColor)[0xb];
     float* blend = (float*)(color + 0x30);
     float* velocityScale = (float*)(color + 0x28);

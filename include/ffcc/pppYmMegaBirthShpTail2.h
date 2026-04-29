@@ -27,7 +27,8 @@ struct VYmMegaBirthShpTail2
     _PARTICLE_WMAT* m_wmats;            // 0x40
     _PARTICLE_COLOR* m_colors;          // 0x44
     unsigned int m_maxParticles;        // 0x48
-    unsigned int m_lifeLimit;           // 0x4c
+    unsigned short m_lifeLimit;         // 0x4c
+    unsigned short m_lifeLimitPadding;  // 0x4e
 };
 
 struct pppYmMegaBirthShpTail2UnkB;
@@ -37,7 +38,7 @@ struct pppYmMegaBirthShpTail2UnkC {
 };
 
 void birth(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
-void calc(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, VColor*, _PARTICLE_COLOR*);
+void calc(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 
 #ifdef __cplusplus
 extern "C" {

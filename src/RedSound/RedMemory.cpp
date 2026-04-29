@@ -206,6 +206,7 @@ int RedNewA(int size, int offset, int maxSize)
 
 	if (blockPtr[1] != 0) {
 		currentAddress = rangeStart;
+		result = -1;
 		for (; (blockPtr[1] != 0) && (blockPtr < m_AMemoryBank + 0x800); blockPtr += 2) {
 			if (currentAddress < rangeStart + maxSize) {
 				if ((int)(currentAddress + alignedSize) <= *blockPtr) {

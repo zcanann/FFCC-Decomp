@@ -15,6 +15,37 @@ extern const char s_JoyBus__LoadBin___error_801d9de0[];
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
 const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error\n";
 
+/*
+ * --INFO--
+ * PAL Address: 0x800979f4
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CGbaPcs::CGbaPcs()
+{
+	static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CGbaPcsFv)};
+	static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CGbaPcsFv)};
+	static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CGbaPcsFv)};
+	static unsigned int desc3[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CGbaPcsFv)};
+	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table);
+
+	table[1] = desc0[0];
+	table[2] = desc0[1];
+	table[3] = desc0[2];
+	table[4] = desc1[0];
+	table[5] = desc1[1];
+	table[6] = desc1[2];
+	table[7] = desc2[0];
+	table[8] = desc2[1];
+	table[9] = desc2[2];
+	table[12] = desc3[0];
+	table[13] = desc3[1];
+	table[14] = desc3[2];
+}
+
 CGbaPcsTable CGbaPcs::m_table = {
     const_cast<char*>(s_CGbaPcs_80330870),
     {
@@ -194,35 +225,4 @@ void CGbaPcs::Init()
 {
 	m_stage = (CMemory::CStage*)0;
 	GBAInit();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800979f4
- * PAL Size: 212b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CGbaPcs::CGbaPcs()
-{
-	static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CGbaPcsFv)};
-	static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CGbaPcsFv)};
-	static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CGbaPcsFv)};
-	static unsigned int desc3[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CGbaPcsFv)};
-	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table);
-
-	table[1] = desc0[0];
-	table[2] = desc0[1];
-	table[3] = desc0[2];
-	table[4] = desc1[0];
-	table[5] = desc1[1];
-	table[6] = desc1[2];
-	table[7] = desc2[0];
-	table[8] = desc2[1];
-	table[9] = desc2[2];
-	table[12] = desc3[0];
-	table[13] = desc3[1];
-	table[14] = desc3[2];
 }

@@ -173,6 +173,7 @@ static inline void ReleaseRef(void** slot)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 CPtrArray<CTexAnimSeq*>::CPtrArray()
 {
@@ -379,6 +380,7 @@ CTexAnimSeq* CPtrArray<CTexAnimSeq*>::GetAt(unsigned long index)
 {
     return m_items[index];
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -661,16 +663,16 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                 *reinterpret_cast<int*>((int)texAnim + 0xC) = 0;
                 *reinterpret_cast<float*>((int)texAnim + 0x10) = FLOAT_8032fb38;
                 *reinterpret_cast<int*>((int)texAnim + 0x14) = -2;
-                *reinterpret_cast<float*>((int)texAnim + 0x18) = FLOAT_8032fb38;
-                *reinterpret_cast<float*>((int)texAnim + 0x1C) = FLOAT_8032fb38;
                 *reinterpret_cast<float*>((int)texAnim + 0x20) = FLOAT_8032fb38;
+                *reinterpret_cast<float*>((int)texAnim + 0x1C) = FLOAT_8032fb38;
+                *reinterpret_cast<float*>((int)texAnim + 0x18) = FLOAT_8032fb38;
             }
             int* ref = *reinterpret_cast<int**>((int)texAnim + 8);
             if (ref != 0) {
-                int refCount = ref[1];
-                ref[1] = refCount - 1;
-                if ((refCount - 1 == 0) && (ref != 0)) {
-                    (*reinterpret_cast<void (**)(int*, int)>(*ref + 8))(ref, 1);
+                int refCount = ref[1] - 1;
+                ref[1] = refCount;
+                if ((refCount == 0) && (ref != 0)) {
+                    reinterpret_cast<void (**)(int*, int)>(*ref)[2](ref, 1);
                 }
                 *reinterpret_cast<void**>((int)texAnim + 8) = 0;
             }
@@ -818,7 +820,7 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
             materialIndex = material[1] - 1;
             material[1] = materialIndex;
             if ((materialIndex == 0) && (material != 0)) {
-                (*(void (**)(int*, int))(*material + 8))(material, 1);
+                reinterpret_cast<void (**)(int*, int)>(*material)[2](material, 1);
             }
             *reinterpret_cast<int*>((int)texAnim->refData + 0x108) = 0;
         }

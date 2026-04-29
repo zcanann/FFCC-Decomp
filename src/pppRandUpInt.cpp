@@ -6,11 +6,11 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-struct PppRandUpIntParam2 {
-    s32 field0;
-    s32 field4;
-    u32 field8;
-    u8 fieldC;
+struct RandUpIntParams {
+    s32 targetId;
+    s32 sourceOffset;
+    u32 blend;
+    u8 randomTwice;
 };
 
 /*
@@ -22,7 +22,7 @@ struct PppRandUpIntParam2 {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandUpInt(_pppPObject* basePtr, PppRandUpIntParam2* in, _pppCtrlTable* ctrl)
+void pppRandUpInt(_pppPObject* basePtr, RandUpIntParams* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
@@ -34,7 +34,7 @@ void pppRandUpInt(_pppPObject* basePtr, PppRandUpIntParam2* in, _pppCtrlTable* c
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
         f32 value = Math.RandF();
-        if (in->fieldC != 0) {
+        if (in->randomTwice != 0) {
             f32 mixed = value + Math.RandF();
             f32 scale = 0.5f;
             value = mixed * scale;
@@ -43,15 +43,15 @@ void pppRandUpInt(_pppPObject* basePtr, PppRandUpIntParam2* in, _pppCtrlTable* c
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
-        if (in->field0 != baseState) {
+        if (in->targetId != baseState) {
             return;
         }
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    s32* target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);
+    s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->sourceOffset + 0x80);
 
-    f32 scaled = (f32)in->field8 * *valuePtr;
+    f32 scaled = (f32)in->blend * *valuePtr;
     s32 delta = (s32)scaled;
     *target += delta;
 }

@@ -18,14 +18,14 @@
 
 
 
-struct PppRandIntParam2 {
-    s32 field0;
-    s32 field4;
-    u32 field8;
-    u8 fieldC;
+struct RandIntParams {
+    s32 targetId;
+    s32 sourceOffset;
+    u32 blend;
+    u8 randomTwice;
 };
 
-void pppRandInt(_pppPObject* basePtr, PppRandIntParam2* in, _pppCtrlTable* ctrl)
+void pppRandInt(_pppPObject* basePtr, RandIntParams* in, _pppCtrlTable* ctrl)
 {
     u8* base = (u8*)basePtr;
     f32* valuePtr;
@@ -37,7 +37,7 @@ void pppRandInt(_pppPObject* basePtr, PppRandIntParam2* in, _pppCtrlTable* ctrl)
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
         f32 value = Math.RandF();
-        if (in->fieldC != 0) {
+        if (in->randomTwice != 0) {
             value += Math.RandF();
         } else {
             value *= 2.0f;
@@ -46,13 +46,13 @@ void pppRandInt(_pppPObject* basePtr, PppRandIntParam2* in, _pppCtrlTable* ctrl)
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
-        if (in->field0 != baseState) {
+        if (in->targetId != baseState) {
             return;
         }
 
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    s32* target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);
-    *target += (s32)((f32)in->field8 * *valuePtr - (f32)in->field8);
+    s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->sourceOffset + 0x80);
+    *target += (s32)((f32)in->blend * *valuePtr - (f32)in->blend);
 }

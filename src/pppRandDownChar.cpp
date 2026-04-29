@@ -8,11 +8,11 @@
 
 
 
-struct PppRandDownCharParam2 {
-    s32 field0;
-    s32 field4;
-    u8 field8;
-    u8 field9;
+struct RandDownCharParams {
+    s32 targetId;
+    s32 sourceOffset;
+    u8 blend;
+    u8 randomTwice;
 };
 
 /*
@@ -24,7 +24,7 @@ struct PppRandDownCharParam2 {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandDownChar(_pppPObject* basePtr, PppRandDownCharParam2* in, _pppCtrlTable* ctrl)
+void pppRandDownChar(_pppPObject* basePtr, RandDownCharParams* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
@@ -36,7 +36,7 @@ void pppRandDownChar(_pppPObject* basePtr, PppRandDownCharParam2* in, _pppCtrlTa
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
         f32 value = -Math.RandF();
-        if (in->field9 != 0) {
+        if (in->randomTwice != 0) {
             f32 mixed = value - Math.RandF();
             f32 scale = 0.5f;
             value = mixed * scale;
@@ -45,15 +45,15 @@ void pppRandDownChar(_pppPObject* basePtr, PppRandDownCharParam2* in, _pppCtrlTa
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
-        if (in->field0 != baseState) {
+        if (in->targetId != baseState) {
             return;
         }
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    u8* target = (in->field4 == -1) ? gPppDefaultValueBuffer : (u8*)(base + in->field4 + 0x80);
+    u8* target = (in->sourceOffset == -1) ? gPppDefaultValueBuffer : (u8*)(base + in->sourceOffset + 0x80);
 
-    f32 factor = (f32)in->field8;
+    f32 factor = (f32)in->blend;
     f32 scaled = factor * *valuePtr;
     s32 delta = (s32)scaled;
     *target = (u8)(*target + delta);

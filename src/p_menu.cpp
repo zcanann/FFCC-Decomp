@@ -610,8 +610,10 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
 
-            CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(&MapMng);
-            if ((*reinterpret_cast<int*>(self + 0x740) != 1) && (stageSelect != 3)) {
+            CMemory::CStage* stage;
+            if ((*reinterpret_cast<int*>(self + 0x740) == 1) || (stageSelect == 3)) {
+                stage = *reinterpret_cast<CMemory::CStage**>(&MapMng);
+            } else {
                 if ((Game.m_gameWork.m_menuStageMode == 0) || (stageSelect == 0)) {
                     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
                 } else if (stageSelect == 1) {
@@ -621,12 +623,10 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
                 }
             }
 
-            CTextureSet* textureSet = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0x182) CTextureSet;
+            CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(kPMenuSourceFile), 0x182) CTextureSet;
             *reinterpret_cast<CTextureSet**>(self + 0x14C + (textureSetStart + i) * 4) = textureSet;
 
-            if (textureSet != 0) {
-                textureSet->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
-            }
+            textureSet->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
 
             File.Close(fileHandle);
         }
@@ -1630,11 +1630,9 @@ void CMenuPcs::createBattle()
 
             void* stage = m_mode == 1 ? *reinterpret_cast<void**>(&MapMng) : m_menuStage;
 
-            CTextureSet* textureSet = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0x182) CTextureSet;
+            CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(kPMenuSourceFile), 0x182) CTextureSet;
             m_textureSets[kBattleTextureSetStart + i] = textureSet;
-            if (textureSet != 0) {
-                textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
-            }
+            textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
 
             File.Close(fileHandle);
         }
@@ -1651,7 +1649,7 @@ void CMenuPcs::createBattle()
     }
 
     for (int i = 0; i < 12; i++) {
-        CMesMenu* menu = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0x48B) CMesMenu;
+        CMesMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(kPMenuSourceFile), 0x48B) CMesMenu;
         m_battleMesMenus[i] = menu;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x18) = i;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x1C) = i;
@@ -1659,7 +1657,7 @@ void CMenuPcs::createBattle()
     }
 
     for (int i = 0; i < 4; i++) {
-        CRingMenu* menu = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0x492) CRingMenu;
+        CRingMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(kPMenuSourceFile), 0x492) CRingMenu;
         m_battleRingMenus[i] = menu;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 8) = i;
         menu->Create();

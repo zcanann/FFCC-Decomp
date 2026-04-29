@@ -33,6 +33,11 @@ struct CBoundRaw
         bound[3] = max;
     }
 
+	void operator=(const CBound& other)
+	{
+		*this = *reinterpret_cast<const CBoundRaw*>(&other);
+	}
+
     Vec m_min;
     Vec m_max;
 };
@@ -1432,12 +1437,7 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 		PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
 		PSMTXMultVec(inverseMtx, &position, &localPosition);
 
-		s_bound.m_min.x = bound.m_min.x;
-		s_bound.m_min.y = bound.m_min.y;
-		s_bound.m_min.z = bound.m_min.z;
-		s_bound.m_max.x = bound.m_max.x;
-		s_bound.m_max.y = bound.m_max.y;
-		s_bound.m_max.z = bound.m_max.z;
+		s_bound = bound;
 
 		PSVECAdd(&s_bound.m_min, &localPosition, &s_bound.m_min);
 		PSVECAdd(&s_bound.m_max, &localPosition, &s_bound.m_max);

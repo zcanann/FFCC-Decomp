@@ -1122,72 +1122,84 @@ void CGame::Calc3()
 
 /*
  * --INFO--
- * PAL Address: 0x800148f4
- * PAL Size: 64b
+ * PAL Address: 0x80014540
+ * PAL Size: 76b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::Draw()
+void CGame::LoadFinished()
 {
-	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	    CFlat, 0, 1, 6, 0, 0, 0);
+	for (int i = 0; i < 8; ++i) {
+		m_caravanWorkArr[i].LoadFinished();
+	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800148c0
- * PAL Size: 52b
+ * PAL Address: 0x8001458c
+ * PAL Size: 76b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::Draw2()
+void CGame::LoadInit()
 {
-	reinterpret_cast<CFlatRuntime2*>(CFlat)->Draw();
-	Wind.Draw();
+	for (int i = 0; i < 8; ++i) {
+		m_caravanWorkArr[i].LoadInit();
+	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001486c
+ * PAL Address: 0x800145d8
  * PAL Size: 84b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::Draw3()
+void CGame::LoadScript(char* scriptData)
 {
-	reinterpret_cast<CFlatRuntime2*>(CFlat)->Frame(0, 2);
-	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	    CFlat, 0, 1, 5, 0, 0, 0);
+    int scriptOffset = 0;
+    int entryOffset = 0;
+
+    for (int i = 0; i < *(int*)(CFlat + 4); i++, entryOffset += 4) {
+        if ((*(u8*)(*(int*)(CFlat + 8) + entryOffset + 1) & 0x20) != 0) {
+            *(u32*)(*(int*)(CFlat + 12) + entryOffset) = *(u32*)(scriptData + scriptOffset);
+            scriptOffset += 4;
+        }
+    }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800147f8
- * PAL Size: 116b
+ * PAL Address: 0x8001462c
+ * PAL Size: 136b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PPPIFPARAM* hitParam)
+void CGame::SaveScript(char* scriptData)
 {
-	CFlatRuntime::CStack stack[8];
-	stack[0].m_word = (u32)effectIndex;
-	stack[1].m_word = (u32)kind;
-	stack[2].m_word = (u32)nodeIndex;
-	*(float*)&stack[3].m_word = pos->x;
-	*(float*)&stack[4].m_word = pos->y;
-	*(float*)&stack[5].m_word = pos->z;
-	stack[6].m_word = (u32)hitParam->m_particleIndex;
-	stack[7].m_word = (u32)hitParam->m_classId;
-	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	    &CFlat, 0, 1, 1, 8, stack, 0);
+    memset(scriptData, 0, 0x800);
+
+    int scriptOffset = 0;
+    int entryOffset = 0;
+    int i = 0;
+
+    while (i < *(int*)(CFlat + 4)) {
+        if ((*(u8*)(*(int*)(CFlat + 8) + entryOffset + 1) & 0x20) != 0) {
+            *(u32*)(scriptData + scriptOffset) = *(u32*)(*(int*)(CFlat + 12) + entryOffset);
+            scriptOffset += 4;
+        }
+
+        entryOffset += 4;
+        i++;
+    }
 }
 
 /*
@@ -1227,84 +1239,72 @@ void CGame::ParticleFrameCallback(int effectIndex, int scriptLine, int scriptSte
 
 /*
  * --INFO--
- * PAL Address: 0x8001462c
- * PAL Size: 136b
+ * PAL Address: 0x800147f8
+ * PAL Size: 116b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::SaveScript(char* scriptData)
+void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PPPIFPARAM* hitParam)
 {
-    memset(scriptData, 0, 0x800);
-
-    int scriptOffset = 0;
-    int entryOffset = 0;
-    int i = 0;
-
-    while (i < *(int*)(CFlat + 4)) {
-        if ((*(u8*)(*(int*)(CFlat + 8) + entryOffset + 1) & 0x20) != 0) {
-            *(u32*)(scriptData + scriptOffset) = *(u32*)(*(int*)(CFlat + 12) + entryOffset);
-            scriptOffset += 4;
-        }
-
-        entryOffset += 4;
-        i++;
-    }
+	CFlatRuntime::CStack stack[8];
+	stack[0].m_word = (u32)effectIndex;
+	stack[1].m_word = (u32)kind;
+	stack[2].m_word = (u32)nodeIndex;
+	*(float*)&stack[3].m_word = pos->x;
+	*(float*)&stack[4].m_word = pos->y;
+	*(float*)&stack[5].m_word = pos->z;
+	stack[6].m_word = (u32)hitParam->m_particleIndex;
+	stack[7].m_word = (u32)hitParam->m_classId;
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	    &CFlat, 0, 1, 1, 8, stack, 0);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800145d8
+ * PAL Address: 0x8001486c
  * PAL Size: 84b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::LoadScript(char* scriptData)
+void CGame::Draw3()
 {
-    int scriptOffset = 0;
-    int entryOffset = 0;
-
-    for (int i = 0; i < *(int*)(CFlat + 4); i++, entryOffset += 4) {
-        if ((*(u8*)(*(int*)(CFlat + 8) + entryOffset + 1) & 0x20) != 0) {
-            *(u32*)(*(int*)(CFlat + 12) + entryOffset) = *(u32*)(scriptData + scriptOffset);
-            scriptOffset += 4;
-        }
-    }
+	reinterpret_cast<CFlatRuntime2*>(CFlat)->Frame(0, 2);
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	    CFlat, 0, 1, 5, 0, 0, 0);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001458c
- * PAL Size: 76b
+ * PAL Address: 0x800148c0
+ * PAL Size: 52b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::LoadInit()
+void CGame::Draw2()
 {
-	for (int i = 0; i < 8; ++i) {
-		m_caravanWorkArr[i].LoadInit();
-	}
+	reinterpret_cast<CFlatRuntime2*>(CFlat)->Draw();
+	Wind.Draw();
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80014540
- * PAL Size: 76b
+ * PAL Address: 0x800148f4
+ * PAL Size: 64b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::LoadFinished()
+void CGame::Draw()
 {
-	for (int i = 0; i < 8; ++i) {
-		m_caravanWorkArr[i].LoadFinished();
-	}
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	    CFlat, 0, 1, 6, 0, 0, 0);
 }
 
 /*

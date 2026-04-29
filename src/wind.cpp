@@ -17,6 +17,8 @@ CWind Wind;
 extern int __float_nan[];
 double cos(double);
 double sin(double);
+extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
+extern "C" void* __ct__7CVectorFfff(void*, float, float, float);
 
 static inline s8 GetWindActiveFlag(const WindObject* obj)
 {
@@ -429,6 +431,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
     WindObject* obj;
     int i;
     float zero;
+    Vec randTmp;
     Vec tmp;
     Vec tmp2;
     zero = FLOAT_80330ef0;
@@ -448,8 +451,8 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                 if (randomize == 0) {
                     PSVECAdd(out, &obj->force, out);
                 } else {
-                    PSVECScale(&obj->force, &tmp, (float)Math.RandF());
-                    PSVECAdd(out, &tmp, out);
+                    PSVECScale(&obj->force, &randTmp, (float)Math.RandF());
+                    PSVECAdd(out, &randTmp, out);
                 }
             } else if ((obj->minX < pos->x) && (obj->minZ < pos->z) && (obj->maxX > pos->x) && (obj->maxZ > pos->z)) {
                 const float deltaZ = pos->z - obj->centerZ;

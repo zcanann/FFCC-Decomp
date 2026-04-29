@@ -27,17 +27,15 @@ static inline float randf(unsigned char flag)
  * JP Address: TODO
  * JP Size: TODO
  */
-struct PppSRandFVParam2 {
-    s32 field0;
-    s32 field4;
-    f32 field8;
-    f32 fieldC;
-    f32 field10;
-    u8 _pad14[0x18 - 0x14];
-    u8 field18;
+struct SRandFVParams {
+    s32 targetId;
+    s32 sourceOffset;
+    f32 blend[3];
+    u8 _pad[4];
+    u8 randomTwice;
 };
 
-void pppSRandFV(_pppPObject* basePtr, PppSRandFVParam2* in, _pppCtrlTable* ctrl)
+void pppSRandFV(_pppPObject* basePtr, SRandFVParams* in, _pppCtrlTable* ctrl)
 {
     f32* randVec;
     if (gPppCalcDisabled != 0) {
@@ -48,7 +46,7 @@ void pppSRandFV(_pppPObject* basePtr, PppSRandFVParam2* in, _pppCtrlTable* ctrl)
     if (currentIndex == 0) {
         randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         {
-            u8 flag = in->field18;
+            u8 flag = in->randomTwice;
             f32 value = Math.RandF();
             if (flag != 0) {
                 value = value + Math.RandF();
@@ -60,7 +58,7 @@ void pppSRandFV(_pppPObject* basePtr, PppSRandFVParam2* in, _pppCtrlTable* ctrl)
         }
 
         {
-            u8 flag = in->field18;
+            u8 flag = in->randomTwice;
             f32 value = Math.RandF();
             if (flag != 0) {
                 value = value + Math.RandF();
@@ -72,7 +70,7 @@ void pppSRandFV(_pppPObject* basePtr, PppSRandFVParam2* in, _pppCtrlTable* ctrl)
         }
 
         {
-            u8 flag = in->field18;
+            u8 flag = in->randomTwice;
             f32 value = Math.RandF();
             if (flag != 0) {
                 value = value + Math.RandF();
@@ -83,24 +81,24 @@ void pppSRandFV(_pppPObject* basePtr, PppSRandFVParam2* in, _pppCtrlTable* ctrl)
             randVec[2] = value;
         }
     } else {
-        if (in->field0 != currentIndex) {
+        if (in->targetId != currentIndex) {
             return;
         }
         randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    f32* target = (in->field4 == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)((u8*)basePtr + in->field4 + 0x80);
+    f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)((u8*)basePtr + in->sourceOffset + 0x80);
 
     {
-        f32 value = in->field8 * randVec[0] - in->field8;
+        f32 value = in->blend[0] * randVec[0] - in->blend[0];
         target[0] = target[0] + value;
     }
     {
-        f32 value = in->fieldC * randVec[1] - in->fieldC;
+        f32 value = in->blend[1] * randVec[1] - in->blend[1];
         target[1] = target[1] + value;
     }
     {
-        f32 value = in->field10 * randVec[2] - in->field10;
+        f32 value = in->blend[2] * randVec[2] - in->blend[2];
         target[2] = target[2] + value;
     }
 }

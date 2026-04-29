@@ -6,14 +6,12 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-struct PppRandDownFVParam2 {
-    s32 field0;
-    s32 field4;
-    f32 field8;
-    f32 fieldC;
-    f32 field10;
-    u8 unk14[0x18 - 0x14];
-    u8 field18;
+struct RandDownFVParams {
+    s32 targetId;
+    s32 sourceOffset;
+    f32 blend[3];
+    u8 _pad[4];
+    u8 randomTwice;
 };
 
 static inline float randf(float value, float scale)
@@ -30,7 +28,7 @@ static inline float randf(float value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandDownFV(_pppPObject* basePtr, PppRandDownFVParam2* in, _pppCtrlTable* ctrl)
+void pppRandDownFV(_pppPObject* basePtr, RandDownFVParams* in, _pppCtrlTable* ctrl)
 {
     if (gPppCalcDisabled != 0) {
         return;
@@ -42,7 +40,7 @@ void pppRandDownFV(_pppPObject* basePtr, PppRandDownFVParam2* in, _pppCtrlTable*
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
         f32 value = -Math.RandF();
-        if (in->field18 != 0) {
+        if (in->randomTwice != 0) {
             f32 randomValue = value - Math.RandF();
             f32 scale = 0.5f;
             value = randomValue * scale;
@@ -51,18 +49,18 @@ void pppRandDownFV(_pppPObject* basePtr, PppRandDownFVParam2* in, _pppCtrlTable*
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
-        if (in->field0 != baseState) {
+        if (in->targetId != baseState) {
             return;
         }
 
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    s32 sourceOffset = in->field4;
+    s32 sourceOffset = in->sourceOffset;
     f32* target = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
 
     f32 scale = *valuePtr;
-    target[0] = target[0] + randf(in->field8, scale);
-    target[1] = target[1] + randf(in->fieldC, scale);
-    target[2] = target[2] + randf(in->field10, scale);
+    target[0] = target[0] + randf(in->blend[0], scale);
+    target[1] = target[1] + randf(in->blend[1], scale);
+    target[2] = target[2] + randf(in->blend[2], scale);
 }

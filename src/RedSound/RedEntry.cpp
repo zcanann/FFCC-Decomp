@@ -263,7 +263,6 @@ int CRedEntry::SearchUseWave(int waveNo)
  */
 int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 {
-	int iVar1;
 	int iVar2;
 	int sequenceNo = -1;
 	int* bankEntry = reinterpret_cast<int*>(bank);
@@ -277,8 +276,7 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 
 		sequenceNo = SearchWaveSequence(iVar2);
 		if (sequenceNo < 0) {
-			iVar1 = SearchUseWave(iVar2);
-			if ((iVar1 != 0) && (m_ReportPrint != 0)) {
+			if ((SearchUseWave(iVar2) != 0) && (m_ReportPrint != 0)) {
 				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
 				fflush(__files + 1);
 				OSReport(s__s_s__________ERROR___________s_801e7917, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);

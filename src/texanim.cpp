@@ -6,15 +6,15 @@
 #include "ffcc/math.h"
 
 #include <string.h>
-#include <math.h>
 #include "dolphin/mtx.h"
 
+extern "C" double fmod(double, double);
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
+extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, const char*, int, int);
 extern "C" void* __vt__11CTexAnimSet[];
 extern "C" void* __vt__8CTexAnim[];
 extern "C" void* __vt__11CTexAnimSeq[];
@@ -29,7 +29,7 @@ extern "C" void* __vc__21CPtrArray_P8CTexAnim_FUl(void*, unsigned long);
 extern "C" void* __vc__25CPtrArray_P11CTexAnimSeq_FUl(void*, unsigned long);
 extern "C" void SetStage__25CPtrArray_P11CTexAnimSeq_Fv(void*, CMemory::CStage*);
 extern "C" {
-char s_texanim_cpp_801d7adc[] = "texanim.cpp";
+extern const char s_texanim_cpp_801d7adc[] = "texanim.cpp";
 }
 extern const float FLOAT_8032fb38 = 0.0f;
 extern const float FLOAT_8032fb3c = 1.0f;
@@ -37,8 +37,8 @@ extern const double DOUBLE_8032fb40 = 4503599627370496.0;
 extern const char DAT_8032fb48[] = "e1";
 extern const float FLOAT_8032fb4c = 1.25f;
 
-static char s_collection_ptrarray_h_801D7B30[] = "collection_ptrarray.h";
-static char s_ptrarray_grow_error_801D7B14[] = "CPtrArray grow error";
+static const char s_collection_ptrarray_h_801D7B30[] = "collection_ptrarray.h";
+static const char s_ptrarray_grow_error_801D7B14[] = "CPtrArray grow error";
 
 inline void* operator new(unsigned long, void* p)
 {
@@ -341,7 +341,7 @@ int CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(s_ptrarray_grow_error_801D7B14);
+                System.Printf(const_cast<char*>(s_ptrarray_grow_error_801D7B14));
             }
             m_size = m_size << 1;
         }
@@ -558,7 +558,7 @@ int CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(s_ptrarray_grow_error_801D7B14);
+                System.Printf(const_cast<char*>(s_ptrarray_grow_error_801D7B14));
             }
             m_size = m_size << 1;
         }

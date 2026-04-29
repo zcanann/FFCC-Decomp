@@ -170,7 +170,7 @@ void CMenuPcs::TmpArtiDraw()
 
 	for (int i = 0; i < *GetTmpArtiList(this); i++) {
 		int tex = *(int*)(entry + 0xE);
-		if (-1 < tex) {
+		if (tex >= 0) {
 			float alpha = *(float*)(entry + 8);
 			float left = (float)entry[0];
 			float top = (float)entry[1];
@@ -178,7 +178,6 @@ void CMenuPcs::TmpArtiDraw()
 			float height = (float)entry[3];
 			float s = *(float*)(entry + 4);
 			float t = *(float*)(entry + 6);
-			float z = *(float*)(entry + 10);
 
 			if (*(short*)(foodPtr + 0x1F6) < 0) {
 				tex = 0x34;
@@ -187,10 +186,15 @@ void CMenuPcs::TmpArtiDraw()
 
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 
-			CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332F28 * alpha));
-			GXSetChanMatColor(GX_COLOR0A0, color.color);
+			GXColor color;
+			color.r = 0xFF;
+			color.g = 0xFF;
+			color.b = 0xFF;
+			color.a = (unsigned char)(int)(FLOAT_80332F28 * alpha);
+			GXSetChanMatColor(GX_COLOR0A0, color);
 
-			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, left, top, width, height, s, t, z, z, FLOAT_80332f2c);
+			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, left, top, width, height, s, t, *(float*)(entry + 10),
+			                                *(float*)(entry + 10), FLOAT_80332f2c);
 		}
 		foodPtr += 2;
 		entry += 0x20;
@@ -200,9 +204,9 @@ void CMenuPcs::TmpArtiDraw()
 	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
 		short icon = *(short*)(foodPtr + 0x1F6);
-		if (-1 < icon) {
-			int posX = (int)entry[0] + (int)entry[2] - 0x10;
-			int posY = (int)((float)TmpArtiIntToDouble(entry[1] + 6) - FLOAT_80332f30);
+		if (icon >= 0) {
+			int posX = (int)TmpArtiIntToDouble(entry[0] + entry[2] - 0x10);
+			int posY = (int)(TmpArtiIntToDouble(entry[1] + 6) - FLOAT_80332f30);
 			DrawSingleIcon__8CMenuPcsFiiifif(this, icon, posX, posY, *(float*)(entry + 8), 0, FLOAT_80332f2c);
 		}
 		entry += 0x20;
@@ -220,14 +224,14 @@ void CMenuPcs::TmpArtiDraw()
 	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
 		short itemId = *(short*)(foodPtr + 0x1F6);
-		if (-1 < itemId) {
+		if (itemId >= 0) {
 			float alpha = *(float*)(entry + 8);
 			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332F28 * alpha));
 			SetColor__5CFontF8_GXColor(font, &textColor.color);
 
 			const char* text = flatData->table[0].strings[itemId * 5 + 4];
-			int width = GetWidth__5CFontFPc(font, text);
-			float posX = (float)(((TmpArtiIntToDouble(entry[2]) - TmpArtiIntToDouble(width)) * DOUBLE_80332f20) +
+			float width = GetWidth__5CFontFPc(font, text);
+			float posX = (float)(((TmpArtiIntToDouble(entry[2]) - width) * DOUBLE_80332f20) +
 			                       TmpArtiIntToDouble(entry[0]));
 			float posY = (float)TmpArtiIntToDouble(entry[1] + 11) - FLOAT_80332F38;
 
@@ -421,31 +425,30 @@ void CMenuPcs::TmpArtiCtrl()
 			if (uVar9 != 0) {
 				do {
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + 8;
-					*(int *)(iVar8 + 0x24) = iVar7;
+					*(int *)(iVar8 + 0x24) = iVar7++;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x38;
-					*(int *)(iVar8 + 0x24) = iVar7 + 1;
+					*(int *)(iVar8 + 0x24) = iVar7++;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x78;
-					*(int *)(iVar8 + 0x24) = iVar7 + 2;
+					*(int *)(iVar8 + 0x24) = iVar7++;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0xb8;
-					*(int *)(iVar8 + 0x24) = iVar7 + 3;
+					*(int *)(iVar8 + 0x24) = iVar7++;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0xf8;
-					*(int *)(iVar8 + 0x24) = iVar7 + 4;
+					*(int *)(iVar8 + 0x24) = iVar7++;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x138;
-					*(int *)(iVar8 + 0x24) = iVar7 + 5;
+					*(int *)(iVar8 + 0x24) = iVar7++;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x178;
-					*(int *)(iVar8 + 0x24) = iVar7 + 6;
+					*(int *)(iVar8 + 0x24) = iVar7++;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = iVar6 + -0x1b8;
 					iVar6 = iVar6 + -0x200;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar8;
-					*(int *)(iVar8 + 0x24) = iVar7 + 7;
-					iVar7 = iVar7 + 8;
+					*(int *)(iVar8 + 0x24) = iVar7++;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					uVar9 = uVar9 - 1;
 				} while (uVar9 != 0);
@@ -458,8 +461,7 @@ void CMenuPcs::TmpArtiCtrl()
 				iVar8 = iVar6 + 8;
 				iVar6 = iVar6 + -0x40;
 				iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar8;
-				*(int *)(iVar8 + 0x24) = iVar7;
-				iVar7 = iVar7 + 1;
+				*(int *)(iVar8 + 0x24) = iVar7++;
 				*(unsigned int *)(iVar8 + 0x28) = 3;
 				uVar5 = uVar5 - 1;
 			} while (uVar5 != 0);
@@ -521,17 +523,16 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			psVar7[1] = (short)iVar6 * (psVar7[3] + -8) + 0x60;
 			*(float *)(psVar7 + 4) = fVar2;
 			*(float *)(psVar7 + 6) = fVar2;
-			*(int *)(psVar7 + 0x12) = iVar6;
+			*(int *)(psVar7 + 0x12) = iVar6++;
 			*(int *)(psVar7 + 0x14) = 3;
 			*(int *)(psVar7 + 0x2e) = 0x37;
 			psVar7[0x22] = 200;
 			psVar7[0x23] = 0x28;
 			psVar7[0x20] = (short)(int)-(((double)psVar7[0x22] - dVar4) * dVar1 - dVar5);
-			psVar7[0x21] = (short)(iVar6 + 1) * (psVar7[0x23] + -8) + 0x60;
+			psVar7[0x21] = (short)iVar6 * (psVar7[0x23] + -8) + 0x60;
 			*(float *)(psVar7 + 0x24) = fVar2;
 			*(float *)(psVar7 + 0x26) = fVar2;
-			*(int *)(psVar7 + 0x32) = iVar6 + 1;
-			iVar6 = iVar6 + 2;
+			*(int *)(psVar7 + 0x32) = iVar6++;
 			*(int *)(psVar7 + 0x34) = 3;
 			psVar7 = psVar7 + 0x40;
 			iVar10 = iVar10 - 1;

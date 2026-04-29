@@ -303,9 +303,9 @@ void _MusicCrossPlaySequence(int* command)
         command[2] = command[2] + 1;
     }
     pvVar2 = p_SoundControlBuffer;
-    if ((*command != *(int*)((int)p_SoundControlBuffer + 0x470)) &&
-       (*command != *(int*)((int)p_SoundControlBuffer + 0xd98))) {
-        if (*command == *(int*)((int)p_SoundControlBuffer + 0x904)) {
+    if ((*command != *(int*)((int)pvVar2 + 0x470)) &&
+       (*command != *(int*)((int)pvVar2 + 0xd98))) {
+        if (*command == *(int*)((int)pvVar2 + 0x904)) {
             *(int*)((int)p_SoundControlBuffer + 0x458) = -*(int*)((int)p_SoundControlBuffer + 0x454) / command[2];
             *(int*)((int)pvVar2 + 0x45c) = command[2];
             pvVar2 = p_SoundControlBuffer;

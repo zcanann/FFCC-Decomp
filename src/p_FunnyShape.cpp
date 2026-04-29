@@ -56,6 +56,7 @@ extern "C" void drawViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
 extern "C" void* __vt__8CManager[];
+extern "C" void* __vt__10CSamplePcs[];
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
 extern "C" void* __vt__14CFunnyShapePcs[];
@@ -109,7 +110,7 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     unsigned int* desc3 = m_table_desc3__14CFunnyShapePcs;
 
     *reinterpret_cast<void**>(self) = __vt__8CManager;
-    *reinterpret_cast<void**>(self) = __vt__8CProcess;
+    *reinterpret_cast<void**>(self) = __vt__10CSamplePcs;
     *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
 
     __ct__14CUSBStreamDataFv(self + 0x3C);

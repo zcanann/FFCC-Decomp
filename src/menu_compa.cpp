@@ -1,8 +1,10 @@
 #include "ffcc/menu_compa.h"
+#include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
+#include "ffcc/system.h"
 #include <string.h>
 
 typedef signed short s16;
@@ -15,6 +17,7 @@ extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float,
 extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
+extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern CMenuPcs MenuPcs;
 
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
@@ -22,10 +25,21 @@ extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
 
 extern float FLOAT_80333000;
 extern float FLOAT_80332ff8;
+extern float FLOAT_80332FFC;
+extern float FLOAT_80333010;
+extern float FLOAT_80333014;
+extern float FLOAT_80333018;
+extern float FLOAT_8033301C;
+extern float FLOAT_80333020;
+extern float FLOAT_80333024;
+extern float FLOAT_80333028;
 extern float FLOAT_80333038;
-extern float FLOAT_8033303c;
+extern float FLOAT_8033303C;
 extern double DOUBLE_80333008;
 extern double DOUBLE_80333030;
+
+extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[];
+extern "C" const char s_menu_compa_cpp_801DEDE8[];
 
 struct CompaOpenAnim {
 	s16 x;
@@ -156,7 +170,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0xec) = 0;
 	*reinterpret_cast<int*>(iVar4 + 0xf0) = 5;
 
-	fVar3 = FLOAT_8033303c;
+	fVar3 = FLOAT_8033303C;
 	fVar2 = FLOAT_80333038;
 	iVar4 = (int)compaList;
 	*reinterpret_cast<int*>(iVar4 + 0x124) = 0x5e;
@@ -425,7 +439,7 @@ void CMenuPcs::CompaDraw()
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
-	int scriptFood = Game.m_scriptFoodBase[0];
+	unsigned int scriptFood = Game.m_scriptFoodBase[0];
 	short* compaList = this->compaList;
 	short* entry = reinterpret_cast<short*>((int)compaList + 8);
 	int count = *compaList;
@@ -454,63 +468,63 @@ void CMenuPcs::CompaDraw()
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 				float fillW = alpha * w;
-				if (fillW > 0.0f) {
+				if (fillW > FLOAT_80332ff8) {
 					if (tex == 0x51) {
 						float yStep = y;
 						float end = y + h;
 						while (yStep < end) {
 							float tileH = end - yStep;
-							if (tileH > 24.0f) {
-								tileH = 24.0f;
+							if (tileH > FLOAT_80332FFC) {
+								tileH = FLOAT_80332FFC;
 							}
 							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
 								&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, fillW, tileH, u, v,
-								colors, uvScale, 1.0f, 0.0f);
-							yStep += 24.0f;
+								colors, uvScale, FLOAT_80333000, FLOAT_80332ff8);
+							yStep += FLOAT_80332FFC;
 						}
 					} else {
 						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
 							&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, fillW, h, u, v,
-							colors, uvScale, 1.0f, 0.0f);
+							colors, uvScale, FLOAT_80333000, FLOAT_80332ff8);
 					}
 
-					x += fillW * *reinterpret_cast<float*>(entry + 10);
+					x += fillW * uvScale;
 				}
 
-				if (fillW > 0.0f && fillW < w) {
+				if (fillW > FLOAT_80332ff8 && fillW < w) {
 					GXColor fadeColors[4] = {
 						{0xFF, 0xFF, 0xFF, 0x00},
 						{0xFF, 0xFF, 0xFF, 0x00},
 						{0xFF, 0xFF, 0xFF, 0x00},
 						{0xFF, 0xFF, 0xFF, 0x00},
 					};
-					float remainW = (48.0f / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14))) * w;
+					float remainW = (static_cast<float>(DOUBLE_80333008) / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14))) * w;
 					if (tex == 0x51) {
 						float yStep = y;
 						float end = y + h;
 						while (yStep < end) {
 							float tileH = end - yStep;
-							if (tileH > 24.0f) {
-								tileH = 24.0f;
+							if (tileH > FLOAT_80332FFC) {
+								tileH = FLOAT_80332FFC;
 							}
 							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
 								&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, remainW, tileH, u, v,
-								fadeColors, uvScale, 1.0f, 0.0f);
-							yStep += 24.0f;
+								fadeColors, uvScale, FLOAT_80333000, FLOAT_80332ff8);
+							yStep += FLOAT_80332FFC;
 						}
 					} else {
 						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
 							&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, remainW, h, u, v,
-							fadeColors, uvScale, 1.0f, 0.0f);
+							fadeColors, uvScale, FLOAT_80333000, FLOAT_80332ff8);
 					}
 				}
 
 				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 			} else {
 				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
-				GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha * 255.0f)};
+				GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha * FLOAT_80333010)};
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
+				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332ff8);
 			}
 		}
 
@@ -520,15 +534,18 @@ void CMenuPcs::CompaDraw()
 	int menuData = (int)compaList;
 	float globalAlpha = *reinterpret_cast<float*>(menuData + 0x18);
 
-	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(globalAlpha * 255.0f)};
+	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(globalAlpha * FLOAT_80333010)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x3A);
 
 	int familyCount = 2;
-	for (int i = 0; i < 5; i++) {
+	for (int i = 2; i < 7; i++) {
 		if (*reinterpret_cast<short*>(scriptFood + 0x9CA + i * 2) > 0) {
 			familyCount++;
 		}
+	}
+	if (familyCount > 4 && System.m_execParam >= 1) {
+		Printf__7CSystemFPce(&System, s_pcts_pctd_family_cnt_error_pctd_801DEDC8, s_menu_compa_cpp_801DEDE8, 0x1BF, familyCount);
 	}
 	if (familyCount > 4) {
 		familyCount = 4;
@@ -539,7 +556,8 @@ void CMenuPcs::CompaDraw()
 			&MenuPcs, 0,
 			static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x10),
 			static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x40 + i * 0x28),
-			12.0f, 24.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+			FLOAT_80333014, FLOAT_80333018, FLOAT_80332ff8, FLOAT_80332ff8, FLOAT_80333000,
+			FLOAT_80333000, FLOAT_80332ff8);
 	}
 
 	int memberIndex = 0;
@@ -547,7 +565,7 @@ void CMenuPcs::CompaDraw()
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = memberIndex;
 		if (memberIndex > 1) {
-			while (drawIndex < 8 && *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2) <= 0) {
+			while (drawIndex < 8 && *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2) == 0) {
 				drawIndex++;
 			}
 			if (drawIndex > 7) {
@@ -555,7 +573,11 @@ void CMenuPcs::CompaDraw()
 			}
 		}
 
-		short food = *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2);
+		const u8* compatibility = reinterpret_cast<const u8*>(&Game) + *reinterpret_cast<int*>(scriptFood + 8) * 0x208 + drawIndex + 0xA9;
+		u8 food = *compatibility;
+		if (food == 0 && System.m_execParam >= 1) {
+			Printf__7CSystemFPce(&System, s_pcts_pctd_family_cnt_error_pctd_801DEDC8, s_menu_compa_cpp_801DEDE8, 0x1E0, shown);
+		}
 		int icon = 0x1D;
 		if (food < 0x15) {
 			icon = 0x21;
@@ -571,20 +593,20 @@ void CMenuPcs::CompaDraw()
 			this, icon,
 			static_cast<int>(*reinterpret_cast<short*>(menuData + 8) + 0x128),
 			static_cast<int>(*reinterpret_cast<short*>(menuData + 0xA) + 0x40 + shown * 0x28),
-			globalAlpha, 0, 0.0f);
+			globalAlpha, 1, FLOAT_80333000);
 
 		shown++;
 		memberIndex = drawIndex + 1;
 	}
 
 	CFont* font = listFont;
-	font->SetMargin(0.0f);
+	font->SetMargin(FLOAT_80333000);
 	font->SetShadow(0);
-	font->SetScaleX(0.875f);
-	font->SetScaleY(1.0f);
+	font->SetScaleX(FLOAT_8033301C);
+	font->SetScaleY(FLOAT_80333000);
 	font->DrawInit();
 
-	GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * globalAlpha)};
+	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80333010 * globalAlpha)).color;
 	font->SetColor(textColor);
 
 	const CompaFlatData* flatData = reinterpret_cast<const CompaFlatData*>(&Game.m_cFlatDataArr[1]);
@@ -602,34 +624,32 @@ void CMenuPcs::CompaDraw()
 		}
 
 		const char* name = GetMenuStr__8CMenuPcsFi(this, drawIndex + 0x16);
-		float y = static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x45 + shown * 0x28) - 8.0f;
+		float y = static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x45 + shown * 0x28) - FLOAT_80333020;
 		font->SetPosX(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x18));
 		font->SetPosY(y);
 		font->Draw(name);
 
 		short food = *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2);
-		if (food >= 0) {
-			const char* value = flatData->table[2].strings[food];
-			font->SetPosX(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x90));
-			font->SetPosY(y);
-			font->Draw(value);
-		}
+		const char* value = flatData->table[2].strings[food];
+		font->SetPosX(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x90));
+		font->SetPosY(y);
+		font->Draw(value);
 
 		shown++;
 		memberIndex = drawIndex + 1;
 	}
 
 	font = listFont;
-	font->SetMargin(0.0f);
+	font->SetMargin(FLOAT_80333000);
 	font->SetShadow(0);
-	font->SetScale(0.75f);
+	font->SetScale(FLOAT_80333024);
 	font->DrawInit();
 	font->SetColor(textColor);
 
 	const char* job = GetJobStr__8CMenuPcsFi(this, *reinterpret_cast<int*>(scriptFood + 0x3AC));
 	font->GetWidth(job);
 	font->SetPosX(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x18));
-	font->SetPosY(static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x20) - 18.0f);
+	font->SetPosY(static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x20) - FLOAT_80333020 - FLOAT_80333028);
 	font->Draw(job);
 
 	DrawInit__8CMenuPcsFv(this);

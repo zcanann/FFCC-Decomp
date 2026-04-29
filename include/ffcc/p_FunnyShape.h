@@ -6,6 +6,7 @@
 #include "ffcc/p_usb.h"
 #include "ffcc/system.h"
 #include "ffcc/FS_USB_Process.h"
+#include "ffcc/p_usb.h"
 
 extern "C" void* __ct__14CUSBStreamDataFv(void*);
 extern "C" void* __ct__11CFunnyShapeFv(void*);

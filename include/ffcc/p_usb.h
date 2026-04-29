@@ -19,7 +19,7 @@ extern CUSBPcsTable m_table__7CUSBPcs;
 class CUSBPcs : public CSamplePcs
 {
 public:
-    struct CDataHeader;
+    class CDataHeader;
 
     CUSBPcs()
     {

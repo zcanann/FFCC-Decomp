@@ -475,9 +475,9 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 	if (p_SeBlockData[bank] != 0) {
 		int bankData = (int)p_SeBlockData[bank];
 		int seNo = no;
-		int playNo = no + (bank << 9);
 
-		playNo |= 0x80000000;
+		no += bank << 9;
+		no |= 0x80000000;
 		if (seNo < *(short*)(bankData + 10)) {
 			int dataBase = bankData + 0x10;
 
@@ -489,7 +489,7 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 				if ((*(unsigned int*)(dataBase + seNo * 4) & 0x80000000) != 0) {
 					*(unsigned char*)seInfo |= 0x80;
 				}
-				if (_SePlayStart(seInfo, seId, playNo, pan, volume) != 0) {
+				if (_SePlayStart(seInfo, seId, no, pan, volume) != 0) {
 					return seNo;
 				}
 			}

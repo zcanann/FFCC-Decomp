@@ -12,7 +12,7 @@ class CMaterial;
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
-extern "C" CMemory::CStage* DAT_8032EC98;
+extern "C" CMemory::CStage* g_hit_lpface_min;
 extern "C" char s_mapmesh_cpp_801D70B0[];
 extern "C" float FLOAT_8032F930;
 extern "C" float FLOAT_8032F934;
@@ -396,7 +396,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     workSize = Align32(workSize);
 
     reader = chunkFile;
-    DAT_8032EC98 = stage;
+    g_hit_lpface_min = stage;
     unsigned char* cursor;
     int offset;
     int dlOffset;
@@ -404,7 +404,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     while (reader.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x56455254:
-            m_meshData = __nwa__FUlPQ27CMemory6CStagePci(workSize, DAT_8032EC98, s_mapmesh_cpp_801D70B0, 0x13A);
+            m_meshData = __nwa__FUlPQ27CMemory6CStagePci(workSize, g_hit_lpface_min, s_mapmesh_cpp_801D70B0, 0x13A);
 
             float maxInit = FLOAT_8032F934;
             float minInit = FLOAT_8032F930;
@@ -499,7 +499,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
         case 0x444C4844:
             m_displayListCount = static_cast<unsigned short>(chunk.m_arg0);
             if (usePreallocated != 0) {
-                m_displayListData = __nwa__FUlPQ27CMemory6CStagePci(workSize, DAT_8032EC98, s_mapmesh_cpp_801D70B0, 0x1D5);
+                m_displayListData = __nwa__FUlPQ27CMemory6CStagePci(workSize, g_hit_lpface_min, s_mapmesh_cpp_801D70B0, 0x1D5);
                 cursor = reinterpret_cast<unsigned char*>(m_displayListData);
             } else {
                 cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));

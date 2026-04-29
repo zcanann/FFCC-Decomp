@@ -98,7 +98,7 @@ struct GbaQueueCMakeInfoView
 	unsigned char m_active;
 	unsigned char m_resultCode;
 	short m_packetCount;
-	short m_crc;
+	unsigned short m_crc;
 	unsigned char m_playerSlot;
 	char m_name[0x11];
 	unsigned char m_charaType;
@@ -585,18 +585,18 @@ int GbaQueue::SetQueue(int channel, unsigned int value)
 	int ret;
 
 	OSWaitSemaphore(semaphore);
-	if (obj[0x440 + channel] == 0) {
-		int* queueCount = reinterpret_cast<int*>(obj + 0x430 + channel * 4);
-		if (*queueCount < 0x40) {
-			ret = 0;
-			reinterpret_cast<unsigned int*>(obj + 0x30 + channel * 0x100)[*queueCount] = value;
-			*queueCount = *queueCount + 1;
-		} else {
+	if (obj[0x440 + channel] != 0) {
+		ret = -1;
+	} else {
+		int* queueCount = reinterpret_cast<int*>(obj + channel * 4);
+		if (queueCount[0x10C] >= 0x40) {
 			ret = -1;
 			obj[0x440 + channel] = 1;
+		} else {
+			ret = 0;
+			*reinterpret_cast<unsigned int*>(obj + 0x30 + channel * 0x100 + queueCount[0x10C] * 4) = value;
+			queueCount[0x10C] = queueCount[0x10C] + 1;
 		}
-	} else {
-		ret = -1;
 	}
 	OSSignalSemaphore(semaphore);
 	return ret;
@@ -3188,20 +3188,17 @@ void GbaQueue::CMakeBarthday(int, unsigned int)
 void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 {
 	char* obj = reinterpret_cast<char*>(this);
-	unsigned char byte0 = static_cast<unsigned char>(value);
-	unsigned char byte1 = static_cast<unsigned char>(value >> 8);
-	unsigned char byte2 = static_cast<unsigned char>(value >> 16);
-	unsigned char cmdType = static_cast<unsigned char>(value >> 24);
+	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&value);
 	int cmakeOffset = channel * 0x20;
 	OSSemaphore* semaphore = accessSemaphores + channel;
 
-	if ((static_cast<int>(value >> 24) >> 6) == 0) {
+	if ((static_cast<int>(valueBytes[0]) >> 6) == 0) {
 		OSWaitSemaphore(semaphore);
-		obj[0x2CB3 + cmakeOffset] = static_cast<char>(cmdType);
+		obj[0x2CB3 + cmakeOffset] = static_cast<char>(valueBytes[0]);
 		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + cmakeOffset) = 1;
-		*reinterpret_cast<short*>(obj + 0x2CB6 + cmakeOffset) = static_cast<short>(value >> 8);
+		*reinterpret_cast<short*>(obj + 0x2CB6 + cmakeOffset) = static_cast<short>((valueBytes[1] << 8) | valueBytes[2]);
 		memset(obj + 0x2CCD + cmakeOffset, 0, 4);
-		obj[0x2CCD + cmakeOffset] = static_cast<char>(byte0);
+		obj[0x2CCD + cmakeOffset] = static_cast<char>(valueBytes[3]);
 		OSSignalSemaphore(semaphore);
 		return;
 	}
@@ -3213,33 +3210,33 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 		int writeOffset = static_cast<int>(*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset)) * 3;
 		*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) =
 			static_cast<short>(*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) + 1);
-		obj[0x2CCB + cmakeOffset + writeOffset] = static_cast<char>(byte2);
-		obj[0x2CCC + cmakeOffset + writeOffset] = static_cast<char>(byte1);
-		obj[0x2CCD + cmakeOffset + writeOffset] = static_cast<char>(byte0);
+		obj[0x2CCB + cmakeOffset + writeOffset] = static_cast<char>(valueBytes[1]);
+		obj[0x2CCC + cmakeOffset + writeOffset] = static_cast<char>(valueBytes[2]);
+		obj[0x2CCD + cmakeOffset + writeOffset] = static_cast<char>(valueBytes[3]);
 
-		if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) > 1) {
+		if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) >= 2) {
 			localInfo = *reinterpret_cast<GbaQueueCMakeInfoView*>(obj + 0x2CB2 + cmakeOffset);
 		}
 	}
 	OSSignalSemaphore(semaphore);
 
-	if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) <= 1) {
+	if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) < 2) {
 		return;
 	}
 
 	unsigned short crc = 0xFFFF;
-	if (Joybus.Crc16(4, localInfo.m_favorite, &crc) == localInfo.m_crc) {
+	if (Joybus.Crc16(4, localInfo.m_favorite, &crc) != localInfo.m_crc) {
+		if (System.m_execParam >= 1) {
+Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_favorite_crc_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0xBDC);
+		}
+		Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
+	} else {
 		Joybus.SendResult(channel, 0, localInfo.m_resultCode, 0);
 		OSWaitSemaphore(semaphore);
 		obj[0x2CB3 + cmakeOffset] = 0;
 		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + cmakeOffset) = 0;
 		*reinterpret_cast<unsigned short*>(obj + 0x2CB6 + cmakeOffset) = 0;
 		OSSignalSemaphore(semaphore);
-	} else {
-		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_favorite_crc_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0xBDC);
-		}
-		Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 	}
 }
 
@@ -3841,76 +3838,75 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 int GbaQueue::MakeSmithData(int channel, char* outData)
 {
 	unsigned char* smithIndices = static_cast<unsigned char*>(
-__nwa__FUlPQ27CMemory6CStagePci(0x40, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xE41));
+__nwa__FUlPQ27CMemory6CStagePci(0x40, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xE41));
 	if (smithIndices == 0) {
-		if (System.m_execParam != 0) {
+		if (System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xE43);
 		}
 		return -1;
 	}
 	memset(smithIndices, 0xFF, 0x40);
 
-	const unsigned int scriptFood = Game.m_scriptFoodBase[channel];
+	unsigned int* scriptFood = Game.m_scriptFoodBase + channel;
 	const unsigned int flatBase = Game.unkCFlatData0[2];
 
-	unsigned char smithCount = 0;
-	unsigned char baseIndex = 0;
+	char smithCount = 0;
+	char baseIndex = 0;
 	for (int i = 0; i < 0x10; i++) {
-		if (*reinterpret_cast<short*>(scriptFood + i * 8 + 0xB6) > 400) {
+		if (*reinterpret_cast<short*>(*scriptFood + i * 8 + 0xB6) >= 401) {
 			smithIndices[smithCount++] = baseIndex;
 		}
-		if (*reinterpret_cast<short*>(scriptFood + i * 8 + 0xB8) > 400) {
+		if (*reinterpret_cast<short*>(*scriptFood + i * 8 + 0xB8) >= 401) {
 			smithIndices[smithCount++] = baseIndex + 1;
 		}
-		if (*reinterpret_cast<short*>(scriptFood + i * 8 + 0xBA) > 400) {
+		if (*reinterpret_cast<short*>(*scriptFood + i * 8 + 0xBA) >= 401) {
 			smithIndices[smithCount++] = baseIndex + 2;
 		}
-		if (*reinterpret_cast<short*>(scriptFood + i * 8 + 0xBC) > 400) {
+		if (*reinterpret_cast<short*>(*scriptFood + i * 8 + 0xBC) >= 401) {
 			smithIndices[smithCount++] = baseIndex + 3;
 		}
 		baseIndex += 4;
 	}
 
-	*outData = static_cast<char>(smithCount);
+	*outData = smithCount;
 	memcpy(outData + 1, smithIndices, smithCount);
 
-	int totalSize = static_cast<int>(smithCount) + 1;
-	if ((totalSize & 3) != 0) {
-		totalSize = ((totalSize >> 2) + 1) * 4;
+	int totalSize = static_cast<int>(smithCount);
+	if (((totalSize + 1) & 3) != 0) {
+		totalSize = (((totalSize + 1) >> 2) + 1) * 4 - 1;
 	}
-	char* writePtr = outData + totalSize;
-
-	const double userRate =
-		static_cast<double>(static_cast<float>(static_cast<float>(*reinterpret_cast<short*>(scriptFood + 0xBE2)) / 100.0f));
+	char* writePtr = outData + 1 + totalSize;
+	totalSize += 1;
 
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xB6);
-		if (itemId > 400) {
+		const int itemId = *reinterpret_cast<short*>(*scriptFood + i * 2 + 0xB6);
+		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
 			memset(itemBuf, 0, sizeof(itemBuf));
 
 			const int itemBase = flatBase + itemId * 0x48;
-			unsigned int price = static_cast<unsigned int>(static_cast<float>(static_cast<unsigned short>(
-				*reinterpret_cast<unsigned short*>(itemBase + 0x24))) * userRate);
+			int price = static_cast<int>(
+				static_cast<float>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x24))) *
+				static_cast<float>(static_cast<float>(*reinterpret_cast<short*>(*scriptFood + 0xBE2)) / 100.0f));
 
 			itemBuf[0] =
-				(price << 24) |
-				(((price >> 8) & 0xFF) << 16) |
-				(((price >> 16) & 0xFF) << 8) |
-				(price >> 24);
+				(static_cast<unsigned int>(price) << 24) |
+				(((static_cast<unsigned int>(price) >> 8) & 0xFF) << 16) |
+				(((static_cast<unsigned int>(price) >> 16) & 0xFF) << 8) |
+				(static_cast<unsigned int>(price) >> 24);
 
-			reinterpret_cast<unsigned short*>(itemBuf)[2] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x26));
-			reinterpret_cast<unsigned short*>(itemBuf)[3] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x28));
-			reinterpret_cast<unsigned short*>(itemBuf)[4] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x2A));
-			reinterpret_cast<unsigned short*>(itemBuf)[5] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x2C));
-			reinterpret_cast<unsigned short*>(itemBuf)[6] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x2E));
-			reinterpret_cast<unsigned short*>(itemBuf)[7] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x30));
+			reinterpret_cast<unsigned short*>(itemBuf)[2] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 0x26));
+			reinterpret_cast<unsigned short*>(itemBuf)[3] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 0x28));
+			reinterpret_cast<unsigned short*>(itemBuf)[4] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 0x2A));
+			reinterpret_cast<unsigned short*>(itemBuf)[5] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 0x2C));
+			reinterpret_cast<unsigned short*>(itemBuf)[6] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 0x2E));
+			reinterpret_cast<unsigned short*>(itemBuf)[7] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 0x30));
 
 			for (int j = 0; j < 2; j++) {
 				const int recipeBase = itemBase + j * 4;
 
-				const unsigned short materialA = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(recipeBase + 0x38));
-				reinterpret_cast<unsigned short*>(itemBuf)[8 + j] = materialA;
+				const unsigned short materialA = *reinterpret_cast<unsigned short*>(recipeBase + 0x38);
+				reinterpret_cast<unsigned short*>(itemBuf)[8 + j] = SwapU16(materialA);
 				if (materialA == 0) {
 					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 2] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 2] = 0;
@@ -3918,15 +3914,15 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 				} else {
 					const int materialBase = flatBase + materialA * 0x48;
 					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 2] =
-						static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(materialBase + 4));
+						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 4));
 					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 2] =
-						static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(materialBase + 6));
+						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 6));
 					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 2] =
-						static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(materialBase + 8));
+						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 8));
 				}
 
-				const unsigned short materialB = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(recipeBase + 0x3A));
-				reinterpret_cast<unsigned short*>(itemBuf)[17 + j] = materialB;
+				const unsigned short materialB = *reinterpret_cast<unsigned short*>(recipeBase + 0x3A);
+				reinterpret_cast<unsigned short*>(itemBuf)[17 + j] = SwapU16(materialB);
 				if (materialB == 0) {
 					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 2] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 2 + 2] = 0;
@@ -3934,11 +3930,11 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 				} else {
 					const int materialBase = flatBase + materialB * 0x48;
 					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 2] =
-						static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(materialBase + 4));
+						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 4));
 					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 2 + 2] =
-						static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(materialBase + 6));
+						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 6));
 					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 2 + 2] =
-						static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(materialBase + 8));
+						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 8));
 				}
 			}
 
@@ -3949,12 +3945,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 	}
 
 	for (int i = 0; i < 4; i++) {
-		const unsigned char* src = reinterpret_cast<unsigned char*>(scriptFood + i * 4 + 0xC08);
-		unsigned int value =
-			(static_cast<unsigned int>(src[3]) << 24) |
-			(static_cast<unsigned int>(src[2]) << 16) |
-			(static_cast<unsigned int>(src[1]) << 8) |
-			static_cast<unsigned int>(src[0]);
+		unsigned int value = SwapU32(*reinterpret_cast<unsigned int*>(*scriptFood + i * 4 + 0xC08));
 		memcpy(writePtr, &value, 4);
 		writePtr += 4;
 		totalSize += 4;

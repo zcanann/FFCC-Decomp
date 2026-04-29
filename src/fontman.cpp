@@ -210,7 +210,7 @@ void CFont::Draw(unsigned short ch)
 	unsigned short* glyph = m_glyphBuckets[ch & 0xFF] + 1;
 	int count = static_cast<int>(m_glyphBuckets[ch & 0xFF][0]);
 
-	for (; count != 0; count--) {
+	for (; count > 0; count--) {
 		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
 			glyph += 4;
 		} else {
@@ -223,7 +223,7 @@ found_glyph:
 	if (glyph == 0) {
 		unsigned short* glyphBucket = m_glyphBuckets[63];
 		glyph = glyphBucket + 1;
-		for (count = static_cast<int>(*glyphBucket); count != 0; count--) {
+		for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
 			if (*reinterpret_cast<unsigned char*>(glyph + 1) != '\0') {
 				glyph += 4;
 			} else {

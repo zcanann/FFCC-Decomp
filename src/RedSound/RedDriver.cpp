@@ -2150,7 +2150,8 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
             int dataSize =
                 (((waveHeader->regionCount * 4) + 0x3fU) & 0xffffffc0) + (waveHeader->sampleCount * 0x60);
             dataSize = waveHeader->dataSize + dataSize;
-            m_WaveSettingData.waveSize = dataSize + 0x20;
+            dataSize += 0x20;
+            m_WaveSettingData.waveSize = dataSize;
         } else {
             m_WaveSettingData.waveSize = 0;
         }

@@ -1074,11 +1074,9 @@ void CSound::loadWaveFrame()
  */
 void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
 {
-    CRedSound* redSound = RedSound(this);
-
     if (waveNo < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
-    } else if (ReentryWaveData__9CRedSoundFi(redSound, waveNo) == -1) {
+    } else if (ReentryWaveData__9CRedSoundFi(RedSound(this), waveNo) == -1) {
         CSoundLayout& sound = SoundData(this);
         CFile::CHandle*& waveFile = sound.m_waveFile;
         if (waveFile != 0) {
@@ -1087,7 +1085,7 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
             Printf__7CSystemFPce(&System, s_soundLoadWaveErrorFmt);
         }
 
-        SetWaveData__9CRedSoundFiPvi(redSound, -1, nullptr, 0);
+        SetWaveData__9CRedSoundFiPvi(RedSound(this), -1, nullptr, 0);
 
         char wavePath[244];
         sprintf(wavePath, s_soundWavePathFmt, waveNo);

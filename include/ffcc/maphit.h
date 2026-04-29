@@ -8,7 +8,7 @@ class CMapCylinder;
 class CMapHit;
 class CBound;
 
-void FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&);
+int FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&);
 void CheckLineCylinder(const Vec&, const Vec&, const CMapCylinder&, float&);
 
 class CMapCylinder
@@ -39,8 +39,8 @@ class CMapHitFace
 public:
     CMapHitFace();
 
-    // TODO: decode concrete fields used by collision and rendering.
-    unsigned char _unk0[0x10]; // 0x00
+    Vec m_normal;               // 0x00
+    float m_planeD;             // 0x0c
     Vec m_boundsMin;            // 0x10
     Vec m_boundsMax;            // 0x1c
     unsigned char _unk28[0x28]; // 0x28

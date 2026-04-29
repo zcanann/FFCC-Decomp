@@ -1154,20 +1154,25 @@ void CGObject::bgNormalCollision()
  */
 void CGObject::bgWorldCollision()
 {
-    Vec radial = m_worldPosition;
-    PSVECAdd(&radial, &m_groundHitOffset, &radial);
+    CMapCylinderRaw bodyCylinder;
+    CVector groundOffset(m_groundHitOffset);
+    CVector worldPosition(m_worldPosition);
+    CVector radialSum;
+    PSVECAdd(reinterpret_cast<Vec*>(&worldPosition), reinterpret_cast<Vec*>(&groundOffset),
+             reinterpret_cast<Vec*>(&radialSum));
+
+    Vec radial = *reinterpret_cast<Vec*>(&radialSum);
 
     if (PSVECMag(&radial) > sZeroFloat) {
-        PSVECNormalize(&radial, &radial);
+        reinterpret_cast<CVector*>(&radial)->Normalize();
     }
     PSVECScale(&radial, &radial, sPushDistance);
 
-    Vec hitMove;
-    hitMove.x = -radial.x * sHitMoveScale;
-    hitMove.y = -radial.y * sHitMoveScale;
-    hitMove.z = -radial.z * sHitMoveScale;
+    CVector reverseRadial(-radial.x, -radial.y, -radial.z);
+    CVector scaledHitMove;
+    PSVECScale(reinterpret_cast<Vec*>(&reverseRadial), reinterpret_cast<Vec*>(&scaledHitMove), sHitMoveScale);
+    Vec hitMove = *reinterpret_cast<Vec*>(&scaledHitMove);
 
-    CMapCylinder bodyCylinder;
     bodyCylinder.m_bottom = radial;
     bodyCylinder.m_direction = hitMove;
     bodyCylinder.m_radius = sHugeCylinderExtent;
@@ -1180,12 +1185,18 @@ void CGObject::bgWorldCollision()
     bodyCylinder.m_height2 = sZeroFloat;
 
     const u32 hitMask = *reinterpret_cast<u32*>(&m_moveVec.x);
-    if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &bodyCylinder, &hitMove, hitMask) == 0) {
+    if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+            &MapMng, reinterpret_cast<CMapCylinder*>(&bodyCylinder), &hitMove, hitMask) == 0) {
         return;
     }
 
     CalcHitPosition__7CMapObjFP3Vec(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &radial);
-    PSVECSubtract(&radial, &m_worldPosition, &m_groundHitOffset);
+    CVector hitWorldPosition(m_worldPosition);
+    CVector newOffset;
+    PSVECSubtract(&radial, reinterpret_cast<Vec*>(&hitWorldPosition), reinterpret_cast<Vec*>(&newOffset));
+    m_groundHitOffset.x = newOffset.x;
+    m_groundHitOffset.y = newOffset.y;
+    m_groundHitOffset.z = newOffset.z;
 
     const unsigned char mapGroup = reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
     u8* mapGroupData = reinterpret_cast<u8*>(&MapMng) + 0x214E8 + (mapGroup * 0x14);
@@ -3217,34 +3228,36 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
     m_worldPosition = *position;
 
     if (((m_weaponNodeFlags & 0x10) != 0) && (Game.m_currentMapId != 0x21)) {
-        CMapCylinder bodyCylinder;
-        bodyCylinder.m_bottom = m_worldPosition;
-        bodyCylinder.m_bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : 0.5f;
-        bodyCylinder.m_direction.x = sZeroFloat;
-        bodyCylinder.m_direction.y = sNegativeOne;
-        bodyCylinder.m_direction.z = sZeroFloat;
-        bodyCylinder.m_radius = 0.3f;
-        bodyCylinder.m_height = 0.3f;
-        bodyCylinder.m_top = bodyCylinder.m_direction;
-        bodyCylinder.m_direction2.x = 0.3f;
-        bodyCylinder.m_direction2.y = 0.6f;
-        bodyCylinder.m_direction2.z = 0.6f;
-        bodyCylinder.m_radius2 = 0.6f;
-        bodyCylinder.m_height2 = 0.0f;
+        {
+            CMapCylinderRaw bodyCylinder;
+            bodyCylinder.m_bottom = m_worldPosition;
+            bodyCylinder.m_bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : 0.5f;
+            bodyCylinder.m_direction.x = sZeroFloat;
+            bodyCylinder.m_direction.y = sNegativeOne;
+            bodyCylinder.m_direction.z = sZeroFloat;
+            bodyCylinder.m_radius = 0.3f;
+            bodyCylinder.m_height = 0.3f;
+            bodyCylinder.m_top = bodyCylinder.m_direction;
+            bodyCylinder.m_direction2.x = 0.3f;
+            bodyCylinder.m_direction2.y = 0.6f;
+            bodyCylinder.m_direction2.z = 0.6f;
+            bodyCylinder.m_radius2 = 0.6f;
+            bodyCylinder.m_height2 = 0.0f;
 
-        u32 hitMask = *reinterpret_cast<u32*>(&m_moveVec.x);
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &bodyCylinder, &bodyCylinder.m_direction, hitMask) != 0) {
-            CalcHitPosition__7CMapObjFP3Vec(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &m_worldPosition);
+            u32 hitMask = *reinterpret_cast<u32*>(&m_moveVec.x);
+            if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+                    &MapMng, reinterpret_cast<CMapCylinder*>(&bodyCylinder), &bodyCylinder.m_direction, hitMask) != 0) {
+                CalcHitPosition__7CMapObjFP3Vec(
+                    *reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &m_worldPosition);
+            }
         }
 
         if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
-            CMapCylinder attrCylinder;
-            attrCylinder.m_bottom.x = m_worldPosition.x;
-            attrCylinder.m_bottom.y = m_worldPosition.y + 1.0f;
-            attrCylinder.m_bottom.z = m_worldPosition.z;
-            attrCylinder.m_direction.x = sZeroFloat;
-            attrCylinder.m_direction.y = -0.5f;
-            attrCylinder.m_direction.z = sZeroFloat;
+            CVector attrDirection(sZeroFloat, -0.5f, sZeroFloat);
+            CVector attrBottom(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
+            CMapCylinderRaw attrCylinder;
+            attrCylinder.m_bottom = *reinterpret_cast<Vec*>(&attrBottom);
+            attrCylinder.m_direction = *reinterpret_cast<Vec*>(&attrDirection);
             attrCylinder.m_radius = 0.3f;
             attrCylinder.m_height = 0.3f;
             attrCylinder.m_top = attrCylinder.m_direction;
@@ -3254,7 +3267,8 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             attrCylinder.m_radius2 = 0.0f;
             attrCylinder.m_height2 = 0.0f;
 
-            if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &attrCylinder, &attrCylinder.m_direction, 0x78000000) == 0) {
+            if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+                    &MapMng, reinterpret_cast<CMapCylinder*>(&attrCylinder), &attrCylinder.m_direction, 0x78000000) == 0) {
                 m_bgAttrValue = sAnimFrameOffset;
             } else {
                 u8* hitObj = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88);

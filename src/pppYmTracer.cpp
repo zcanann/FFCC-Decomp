@@ -16,8 +16,8 @@ extern const f32 FLOAT_803306e8;
 extern const f32 FLOAT_803306ec;
 extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
-extern const f64 DOUBLE_803306f0 = 4503601774854144.0;
-extern const f64 DOUBLE_803306f8 = 4503599627370496.0;
+extern const f64 DOUBLE_80330578 = 4503601774854144.0;
+extern const f64 DOUBLE_80330580 = 4503599627370496.0;
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);

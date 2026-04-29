@@ -152,23 +152,34 @@ def _section_diff(
     ours: list[SectionEntry],
     pal: list[SectionEntry],
     en: Optional[list[SectionEntry]],
-) -> list[str]:
-    """Return human-readable lines for one section."""
+) -> tuple[list[str], dict[str, int]]:
+    """Return (lines, counts) for one section.
+
+    Pairing strategy:
+    * Walk the two lists positionally (sorted live-first, then UNUSED, by VA).
+    * At each row, the entries are considered equivalent when their size and
+      is_unused flag match. If either side has an anonymous name (``<anon>``,
+      ``lbl_*``, ``@N``, ``@etb_*``, ``@eti_*``), the name itself is ignored —
+      that's purely cosmetic.
+    * Only when sizes differ, or one side has no row at all, do we flag
+      MISSING/EXTRA. Two named symbols whose names differ at the same position
+      are reported as ``~ rename`` (still cosmetic but worth noting).
+    """
+    counts = {
+        "missing_unused": 0,
+        "missing_live": 0,
+        "extra_live": 0,
+        "size_delta": 0,
+    }
     lines: list[str] = []
 
-    def _key_set(entries: Iterable[SectionEntry]) -> set[tuple[str, bool]]:
-        return {(e.normalized, e.is_unused) for e in entries}
-
-    ours_keys = _key_set(ours)
-    pal_keys = _key_set(pal)
-    en_keys = _key_set(en) if en is not None else set()
-
     if not ours and not pal and not en:
-        return lines
+        return lines, counts
 
     ours_size = sum(e.size for e in ours)
     pal_size = sum(e.size for e in pal)
     en_size = sum(e.size for e in en) if en is not None else 0
+    counts["size_delta"] = ours_size - pal_size
 
     header = f"[{section}] ours=0x{ours_size:x}  PAL=0x{pal_size:x}"
     if en is not None:
@@ -177,91 +188,71 @@ def _section_diff(
         header += f"  delta_PAL={ours_size - pal_size:+d}b"
     lines.append(header)
 
-    # Side-by-side rows aligned by index. They aren't always positionally
-    # comparable but for a single .o this is usually clear enough.
+    def _is_anon(entry: SectionEntry) -> bool:
+        return entry.normalized == "<anon>"
+
+    def _equivalent(a: SectionEntry, b: SectionEntry) -> bool:
+        # Same slot if size + UNUSED match. Names only matter when both are
+        # named (real symbols).
+        if a.size != b.size or a.is_unused != b.is_unused:
+            return False
+        if _is_anon(a) or _is_anon(b):
+            return True
+        return a.symbol == b.symbol
+
     max_rows = max(len(ours), len(pal), len(en) if en is not None else 0)
     col_w = 44
+    has_real_diff = False
     for i in range(max_rows):
         o = ours[i] if i < len(ours) else None
         p = pal[i] if i < len(pal) else None
         e = en[i] if en is not None and i < len(en) else None
 
         flag = ""
-        if o is not None and (o.normalized, o.is_unused) not in pal_keys:
-            flag = "  *** EXTRA vs PAL"
-        elif p is not None and (p.normalized, p.is_unused) not in ours_keys:
+        if o is None and p is not None:
+            if p.is_unused:
+                counts["missing_unused"] += 1
+            else:
+                counts["missing_live"] += 1
             flag = "  *** MISSING vs PAL"
-        elif o is not None and p is not None and o.normalized != p.normalized:
-            # Same membership counts but ordering differs at this row.
-            flag = "  ~ order"
-        elif o is not None and p is not None and o.size != p.size:
-            flag = f"  ~ size ({o.size - p.size:+d}b)"
+            has_real_diff = True
+        elif p is None and o is not None:
+            if not o.is_unused:
+                counts["extra_live"] += 1
+            flag = "  *** EXTRA vs PAL"
+            has_real_diff = True
+        elif o is not None and p is not None:
+            if o.size != p.size or o.is_unused != p.is_unused:
+                flag = f"  ~ size ({o.size - p.size:+d}b)"
+                has_real_diff = True
+            elif not _is_anon(o) and not _is_anon(p) and o.symbol != p.symbol:
+                flag = "  ~ rename"  # cosmetic, both named, names differ
 
         pieces = [f"  {_fmt_entry(o):<{col_w}}", f"{_fmt_entry(p):<{col_w}}"]
         if en is not None:
             pieces.append(f"{_fmt_entry(e):<{col_w}}")
         lines.append("".join(pieces).rstrip() + flag)
 
-    # Also surface set-level membership deltas (in case the row alignment
-    # masked them).
-    missing = sorted(pal_keys - ours_keys)
-    extra = sorted(ours_keys - pal_keys)
-    if missing:
-        lines.append(
-            "  -> missing vs PAL: "
-            + ", ".join(f"{n}{' (UNUSED)' if u else ''}" for n, u in missing)
-        )
-    if extra:
-        lines.append(
-            "  -> extra vs PAL:   "
-            + ", ".join(f"{n}{' (UNUSED)' if u else ''}" for n, u in extra)
-        )
-    if en is not None:
-        en_missing = sorted(en_keys - ours_keys)
-        en_extra = sorted(ours_keys - en_keys)
-        if en_missing:
-            lines.append(
-                "  -> missing vs EN:  "
-                + ", ".join(f"{n}{' (UNUSED)' if u else ''}" for n, u in en_missing)
-            )
-        if en_extra:
-            lines.append(
-                "  -> extra vs EN:    "
-                + ", ".join(f"{n}{' (UNUSED)' if u else ''}" for n, u in en_extra)
-            )
+    # If pairing showed no real diffs, drop the per-row block; just keep header.
+    if not has_real_diff and ours_size == pal_size:
+        lines = [header + "  (matched)"]
 
-    return lines
+    return lines, counts
 
 
-def _summary_counts(
-    ours_by_sec: dict[str, list[SectionEntry]],
-    pal_by_sec: dict[str, list[SectionEntry]],
-    en_by_sec: dict[str, list[SectionEntry]],
-) -> dict[str, int]:
-    missing_unused = 0
-    missing_live = 0
-    extra_live = 0
-    size_delta_total = 0
-    for sec in set(ours_by_sec) | set(pal_by_sec):
-        ours = ours_by_sec.get(sec, [])
-        pal = pal_by_sec.get(sec, [])
-        ours_keys = {(e.normalized, e.is_unused) for e in ours}
-        pal_keys = {(e.normalized, e.is_unused) for e in pal}
-        for n, unused in pal_keys - ours_keys:
-            if unused:
-                missing_unused += 1
-            else:
-                missing_live += 1
-        for n, unused in ours_keys - pal_keys:
-            if not unused:
-                extra_live += 1
-        size_delta_total += sum(e.size for e in ours) - sum(e.size for e in pal)
-    return {
-        "missing_unused_helpers": missing_unused,
-        "missing_live_symbols": missing_live,
-        "extra_live_symbols": extra_live,
-        "size_delta_total_bytes": size_delta_total,
+def _summary_counts(per_section: list[dict[str, int]]) -> dict[str, int]:
+    totals = {
+        "missing_unused_helpers": 0,
+        "missing_live_symbols": 0,
+        "extra_live_symbols": 0,
+        "size_delta_total_bytes": 0,
     }
+    for c in per_section:
+        totals["missing_unused_helpers"] += c["missing_unused"]
+        totals["missing_live_symbols"] += c["missing_live"]
+        totals["extra_live_symbols"] += c["extra_live"]
+        totals["size_delta_total_bytes"] += c["size_delta"]
+    return totals
 
 
 def normalize_target(target: str) -> str:
@@ -310,8 +301,9 @@ def report(
         print("  EN:   (skipped)")
     print()
 
+    per_section_counts: list[dict[str, int]] = []
     for section in sections:
-        lines = _section_diff(
+        lines, counts = _section_diff(
             section,
             ours_by_sec.get(section, []),
             pal_by_sec.get(section, []),
@@ -321,13 +313,15 @@ def report(
             for line in lines:
                 print(line)
             print()
+        per_section_counts.append(counts)
 
-    counts = _summary_counts(ours_by_sec, pal_by_sec, en_by_sec)
+    counts = _summary_counts(per_section_counts)
     print("SUMMARY (vs PAL):")
     print(f"  missing UNUSED helpers : {counts['missing_unused_helpers']}")
     print(f"  missing live symbols   : {counts['missing_live_symbols']}")
     print(f"  extra live symbols     : {counts['extra_live_symbols']}")
     print(f"  total size delta       : {counts['size_delta_total_bytes']:+d} bytes")
+    print(f"Disclaimer: Some differences are tolerable, as the EN from an old debug build, and the PAL from an old release build.")
 
     has_diff = any(counts.values())
     return 0 if not has_diff else 1

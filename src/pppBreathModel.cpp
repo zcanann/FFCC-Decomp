@@ -1052,7 +1052,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     (*(Mtx*)particleWmat)[1][3] = pos.y;
     (*(Mtx*)particleWmat)[2][3] = pos.z;
 
-    PSMTXConcat(*(Mtx*)particleWmat, pppObject->m_localMatrix.value, *(Mtx*)particleData);
+    PSMTXConcat(*(Mtx*)particleWmat, *(Mtx*)((u8*)pppObject + 0x10), *(Mtx*)particleData);
     PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, cameraMtx);
 
     particle->m_direction.x = kPppBreathModelZero;

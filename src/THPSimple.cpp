@@ -210,6 +210,9 @@ void MixAudio(short* output, short* input, unsigned long samples)
                     return;
                 }
             }
+
+            memcpy(output, input, samples << 2);
+            return;
         }
 
         memcpy(output, input, samples << 2);
@@ -268,6 +271,9 @@ void MixAudio(short* output, short* input, unsigned long samples)
                     return;
                 }
             }
+
+            memset(output, 0, samples << 2);
+            return;
         }
 
         memset(output, 0, samples << 2);
@@ -592,7 +598,7 @@ s32 THPSimplePreLoad(s32 loop)
                 SimpleControl.readIndex = (next >= 8) ? 0 : next;
             }
 
-            if (((SimpleControl.header.mNumFrames - 1) < static_cast<u32>(SimpleControl.curAudioTrack)) &&
+            if ((static_cast<u32>(SimpleControl.curAudioTrack) > (SimpleControl.header.mNumFrames - 1)) &&
                 (SimpleControl.isLooping == 1)) {
                 SimpleControl.curAudioTrack = 0;
                 SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);
@@ -636,7 +642,7 @@ void __THPSimpleDVDCallback(long result, DVDFileInfo*)
 
         if ((SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) && (SimpleControl.readError == 0) &&
             (SimpleControl.isPreLoaded == 1)) {
-            if ((SimpleControl.header.mNumFrames - 1) < static_cast<u32>(SimpleControl.curAudioTrack)) {
+            if (static_cast<u32>(SimpleControl.curAudioTrack) > (SimpleControl.header.mNumFrames - 1)) {
                 if (SimpleControl.isLooping != 1) {
                     return;
                 }

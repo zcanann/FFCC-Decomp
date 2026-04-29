@@ -8,6 +8,9 @@
 
 int s_usbReadPollFrameCounter;
 char s_usbReadPollInitialized;
+extern "C" void* __vt__8CManager[];
+extern "C" void* __vt__10CSamplePcs[];
+extern "C" void* __vt__7CUSBPcs[];
 extern "C" void create__7CUSBPcsFv(CUSBPcs*);
 extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
 extern "C" void func__7CUSBPcsFv(CUSBPcs*);
@@ -38,6 +41,38 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stag
 static inline unsigned int Swap32(unsigned int x)
 {
     return __lwbrx((void*)&x, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800203e4
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_usb_cpp(void)
+{
+    u8* self = reinterpret_cast<u8*>(&USBPcs);
+    unsigned int* dst = reinterpret_cast<unsigned int*>(&m_table__7CUSBPcs);
+    unsigned int* desc0 = m_table_desc0__7CUSBPcs;
+    unsigned int* desc1 = m_table_desc1__7CUSBPcs;
+    unsigned int* desc2 = m_table_desc2__7CUSBPcs;
+
+    *reinterpret_cast<void**>(self) = __vt__8CManager;
+    *reinterpret_cast<void**>(self) = __vt__10CSamplePcs;
+    *reinterpret_cast<void**>(self) = __vt__7CUSBPcs;
+
+    dst[1] = desc0[0];
+    dst[2] = desc0[1];
+    dst[3] = desc0[2];
+    dst[4] = desc1[0];
+    dst[5] = desc1[1];
+    dst[6] = desc1[2];
+    dst[7] = desc2[0];
+    dst[8] = desc2[1];
+    dst[9] = desc2[2];
 }
 
 /*

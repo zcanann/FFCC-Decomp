@@ -6,6 +6,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/monobj.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_graphic.h"
 #include "ffcc/p_minigame.h"
@@ -1522,10 +1523,12 @@ void CFlatRuntime2::Calc()
 				*reinterpret_cast<CTextureSet**>(layer + 4) = 0;
 			}
 
-			textureSet = new (Game.m_mainStage, const_cast<char*>(sCFlatRuntime2FileTag), 0x335) CTextureSet;
+			textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x335) CTextureSet;
 			*reinterpret_cast<CTextureSet**>(layer + 4) = textureSet;
 			if (textureSet != 0) {
-				textureSet->Create(File.m_readBuffer, Game.m_mainStage, 0, 0, 0, 0);
+				textureSet->Create(
+				    File.m_readBuffer, GET_CHARA_ALLOC_STAGE_S(*reinterpret_cast<int*>(layer), Game.m_mainStage),
+				    0, 0, 0, 0);
 			}
 
 			File.Close(fileHandle);
@@ -1931,7 +1934,7 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 		File.ReadASync(fileHandle);
 	}
 
-	*reinterpret_cast<int*>(layer) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0xE4);
+	*reinterpret_cast<int*>(layer) = CharaPcs.m_loadStageMode;
 }
 
 /*

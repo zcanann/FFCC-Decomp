@@ -193,7 +193,9 @@ public:
     int LoadAnim(int, int, char*, int, int, int);
     void GetAnimStage();
 
-    u8 _pad_0x4_to_0x71B[0x71C - sizeof(CProcess)];
+    u8 _pad_0x4_to_0xE4[0xE4 - sizeof(CProcess)];
+    int m_loadStageMode; // 0xE4
+    u8 _pad_0xE8_to_0x71C[0x71C - 0xE8];
 };
 
 extern CCharaPcs CharaPcs;

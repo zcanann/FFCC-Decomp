@@ -547,7 +547,7 @@ config.libs = [
             Object(NonMatching, "p_camera.cpp"),
             Object(NonMatching, "p_chara.cpp"),
             Object(NonMatching, "p_chara_viewer.cpp"),
-            Object(NonMatching, "p_dbgmenu.cpp", extra_cflags=["-RTTI on"]),
+            Object(NonMatching, "p_dbgmenu.cpp"),
             Object(NonMatching, "p_FunnyShape.cpp"),
             Object(NonMatching, "p_game.cpp"),
             Object(NonMatching, "p_gba.cpp"),

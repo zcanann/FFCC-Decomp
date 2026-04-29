@@ -191,11 +191,11 @@ extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtrlTable* data)
 {
 	pppYmLaserWork* work;
-	Vec localA;
 	Vec localB;
-	CMapCylinderRaw cyl;
-	Mtx charaMtx;
+	Vec localA;
 	Mtx tempMtx;
+	Mtx charaMtx;
+	CMapCylinderRaw cyl;
 	int emptyHistory;
 
 	if ((gPppCalcDisabled == 0) && (step->m_stepValue != 0xFFFF)) {
@@ -257,23 +257,26 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		pppSubVector(localA, work->m_points[i], work->m_origin);
 		PSVECScale(&localA, &localA, FLOAT_80330de4);
 
-		cyl.m_top.x = FLOAT_80330de8;
-		cyl.m_top.y = FLOAT_80330de8;
 		cyl.m_top.z = FLOAT_80330de8;
-		cyl.m_direction2.x = FLOAT_80330dec;
-		cyl.m_direction2.y = FLOAT_80330dec;
+		cyl.m_top.y = FLOAT_80330de8;
+		cyl.m_top.x = FLOAT_80330de8;
 		cyl.m_direction2.z = FLOAT_80330dec;
+		cyl.m_direction2.y = FLOAT_80330dec;
+		cyl.m_direction2.x = FLOAT_80330dec;
 		cyl.m_bottom = work->m_origin;
 		cyl.m_direction = localA;
 		cyl.m_radius = kPppYmLaserOne;
 
-		int hit = 0;
+		int hit;
 		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &localA, 0xffffffff) != 0) {
 			hit = 1;
 			CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &work->m_points[i]);
 			work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
-		} else if (i == 0) {
-			work->m_length += work->m_lengthStep;
+		} else {
+			hit = 0;
+			if (i == 0) {
+				work->m_length += work->m_lengthStep;
+			}
 		}
 
 		if (i == 0) {

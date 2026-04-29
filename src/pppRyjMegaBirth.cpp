@@ -417,8 +417,11 @@ void calc(
 	frameCount = *u8_at(particlePayload, 0x5A);
 	if ((frameCount != 0) && ((int)*u16_at(particlePayload, 0x22) <= (int)frameCount))
 	{
-		*f32_at(particlePayload, 0x54) =
-			*f32_at(particlePayload, 0x54) + (float)alpha / (float)(unsigned int)paramPayload[0x29];
+		float fadeAlpha = (float)alpha;
+		float fadeFrameCount = (float)(unsigned int)paramPayload[0x29];
+		float particleAlpha = *f32_at(particlePayload, 0x54);
+
+		*f32_at(particlePayload, 0x54) = particleAlpha + fadeAlpha / fadeFrameCount;
 	}
 }
 

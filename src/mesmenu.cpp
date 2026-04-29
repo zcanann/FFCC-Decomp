@@ -38,7 +38,7 @@ void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void* menuPcs, int fmt);
 void DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(void* menuPcs, float x, float y, float w, float h, int tex, float rot);
 void DrawInit__8CMenuPcsFv(void* menuPcs);
 void Draw__4CMesFv(void* mes);
-void* __ct__6CColorFUcUcUcUc(void* color, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+void* __ct__6CColorFUcUcUcUc(void* color, int r, int g, int b, int a);
 void SetColor__8CMenuPcsFR6CColor(void* menuPcs, void* color);
 void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void* menuPcs, int tex);
 void SetExternalTlut__8CTextureFPvi(void* texture, void* tlut, int enable);
@@ -265,20 +265,20 @@ void CMesMenu::onCalc()
             unsigned int foodCount = (unsigned int)*(unsigned short*)(scriptFood + 0x1C);
             int targetValue = (int)(foodCount * 6);
             if (*(int*)((char*)this + 0x3DAC) < targetValue) {
-                *(int*)((char*)this + 0x3DAC) = targetValue;
+                *(int*)((char*)this + 0x3DAC) += targetValue - *(int*)((char*)this + 0x3DAC);
             } else if (targetValue < *(int*)((char*)this + 0x3DAC)) {
-                *(unsigned int*)((char*)this + 0x3DAC) = foodCount * 6;
+                *(int*)((char*)this + 0x3DAC) -= *(int*)((char*)this + 0x3DAC) - targetValue;
             }
 
             int currentValue = *(int*)((char*)this + 0x3DA8);
             if (currentValue < *(int*)((char*)this + 0x3DAC)) {
-                int idx = currentValue / 0xC + (currentValue >> 0x1F);
-                int slotBase = (int)this + (idx - (idx >> 0x1F)) * 4;
+                int idx = currentValue / 0xC;
+                int slotBase = (int)this + idx * 4;
                 if (*(int*)(slotBase + 0x3DB0) == 0) {
                     *(int*)(slotBase + 0x3DB0) = 0x10;
                 }
 
-                int nextValue = currentValue + 2;
+                int nextValue = *(int*)((char*)this + 0x3DA8) + 2;
                 int maxValue = *(int*)((char*)this + 0x3DAC);
                 if (nextValue < maxValue) {
                     maxValue = nextValue;
@@ -288,8 +288,8 @@ void CMesMenu::onCalc()
                 *(unsigned int*)((char*)this + 0x3DA8) = (currentValue - 2U) & ~((int)(currentValue - 2U) >> 0x1F);
 
                 int decValue = *(int*)((char*)this + 0x3DA8);
-                int idx = decValue / 0xC + (decValue >> 0x1F);
-                int slotBase = (int)this + (idx - (idx >> 0x1F)) * 4;
+                int idx = decValue / 0xC;
+                int slotBase = (int)this + idx * 4;
                 if (*(int*)(slotBase + 0x3DD0) == 0) {
                     *(int*)(slotBase + 0x3DD0) = 0x10;
                 }
@@ -298,10 +298,9 @@ void CMesMenu::onCalc()
                 }
             }
 
-            int i = 2;
             int base = (int)this;
             unsigned int value;
-            do {
+            for (int i = 0; i < 2; i++) {
                 value = *(int*)(base + 0x3DB0) - 1;
                 *(unsigned int*)(base + 0x3DB0) = value & ~((int)value >> 0x1F);
 
@@ -327,8 +326,7 @@ void CMesMenu::onCalc()
                 *(unsigned int*)(base + 0x3DDC) = value & ~((int)value >> 0x1F);
 
                 base += 0x10;
-                i--;
-            } while (i != 0);
+            }
 
             value = *(int*)((char*)this + 0x3DF0) - 1;
             *(unsigned int*)((char*)this + 0x3DF0) = value & ~((int)value >> 0x1F);
@@ -905,20 +903,20 @@ void CMesMenu::CalcHeart()
     unsigned int foodCount = (unsigned int)*(unsigned short*)(scriptFood + 0x1C);
     int targetValue = (int)(foodCount * 6);
     if (*(int*)((char*)this + 0x3DAC) < targetValue) {
-        *(int*)((char*)this + 0x3DAC) = targetValue;
+        *(int*)((char*)this + 0x3DAC) += targetValue - *(int*)((char*)this + 0x3DAC);
     } else if (targetValue < *(int*)((char*)this + 0x3DAC)) {
-        *(unsigned int*)((char*)this + 0x3DAC) = foodCount * 6;
+        *(int*)((char*)this + 0x3DAC) -= *(int*)((char*)this + 0x3DAC) - targetValue;
     }
 
     int currentValue = *(int*)((char*)this + 0x3DA8);
     if (currentValue < *(int*)((char*)this + 0x3DAC)) {
-        int index = currentValue / 0xC + (currentValue >> 0x1F);
-        int base = (int)this + (index - (index >> 0x1F)) * 4;
+        int index = currentValue / 0xC;
+        int base = (int)this + index * 4;
         if (*(int*)(base + 0x3DB0) == 0) {
             *(int*)(base + 0x3DB0) = 0x10;
         }
 
-        int nextValue = currentValue + 2;
+        int nextValue = *(int*)((char*)this + 0x3DA8) + 2;
         int maxValue = *(int*)((char*)this + 0x3DAC);
         if (nextValue < maxValue) {
             maxValue = nextValue;
@@ -928,8 +926,8 @@ void CMesMenu::CalcHeart()
         *(unsigned int*)((char*)this + 0x3DA8) = (currentValue - 2U) & ~((int)(currentValue - 2U) >> 0x1F);
 
         int decValue = *(int*)((char*)this + 0x3DA8);
-        int index = decValue / 0xC + (decValue >> 0x1F);
-        int base = (int)this + (index - (index >> 0x1F)) * 4;
+        int index = decValue / 0xC;
+        int base = (int)this + index * 4;
         if (*(int*)(base + 0x3DD0) == 0) {
             *(int*)(base + 0x3DD0) = 0x10;
         }
@@ -938,9 +936,8 @@ void CMesMenu::CalcHeart()
         }
     }
 
-    int i = 2;
     int base = (int)this;
-    do {
+    for (int i = 0; i < 2; i++) {
         unsigned int value = *(int*)(base + 0x3DB0) - 1;
         *(unsigned int*)(base + 0x3DB0) = value & ~((int)value >> 0x1F);
 
@@ -966,8 +963,7 @@ void CMesMenu::CalcHeart()
         *(unsigned int*)(base + 0x3DDC) = value & ~((int)value >> 0x1F);
 
         base += 0x10;
-        i--;
-    } while (i != 0);
+    }
 
     unsigned int value = *(int*)((char*)this + 0x3DF0) - 1;
     *(unsigned int*)((char*)this + 0x3DF0) = value & ~((int)value >> 0x1F);
@@ -987,7 +983,11 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     (void)z;
 
     unsigned int scriptFood = Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
-    if ((scriptFood == 0) || (alpha <= FLOAT_803308d8)) {
+    if (scriptFood == 0) {
+        return;
+    }
+
+    if (FLOAT_803308d8 >= alpha) {
         return;
     }
 

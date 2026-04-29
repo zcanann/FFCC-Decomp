@@ -262,9 +262,8 @@ draw_loop:
 
     zEnable = (u32)__cntlzw((u32)step->m_zDisable) >> 5;
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((void*)0, &drawMtx,
-                                                               (step->m_useEnvDepth != 0) ? step->m_envDepth : zero, 0,
+                                                               (step->m_useEnvDepth != 0) ? step->m_envDepth : kPppKeShpTail2XZero, 0,
                                                                step->m_drawA, step->m_blendMode, 0, zEnable, 1, 0);
-    GXLoadPosMtxImm(drawMtx.value, 0);
 
     {
         GXColor amb;

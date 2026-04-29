@@ -31,6 +31,33 @@ extern const float kCharaViewerLightTargetX = 4391.0f;
 extern const float kCharaViewerLightTargetY = -1864.0f;
 extern const float kCharaViewerLightTargetZ = 7194.0f;
 }
+
+extern "C" const float kCharaViewerUnitStep = 1.0f;
+extern "C" const float kCharaViewerGridSpacing = 10.0f;
+extern "C" const float kCharaViewerGridMin = 100.0f;
+extern "C" const char kCharaViewerNoName[] = "no name";
+extern "C" const double kCharaViewerColorWhiteBias = 4503599627370496.0;
+extern "C" const char kCharaViewerSpinner[] = "|/-\\";
+extern "C" const char kCharaViewerChoiceFmt[] = "[%c] %s";
+extern "C" const float kCharaViewerFineStep = -1.0f;
+extern "C" const float kCharaViewerLerpScale = 0.25f;
+extern "C" const char kCharaViewerOrg[] = "ORG";
+extern "C" const char kCharaViewerKeep[] = "KEEP";
+extern "C" const char kCharaViewerOn[] = "ON";
+extern "C" const char kCharaViewerOff[] = "OFF";
+extern "C" const char kCharaViewerDefaultModelPath[] = "m1";
+extern "C" const float kCharaViewerLightPosX = -533.0f;
+extern "C" const float kCharaViewerLightPosY = -131.0f;
+extern "C" const float kCharaViewerLightPosZ = -117.0f;
+extern "C" const float kCharaViewerLightTargetX = 4391.0f;
+extern "C" const float kCharaViewerLightTargetY = -1864.0f;
+extern "C" const float kCharaViewerLightTargetZ = 7194.0f;
+extern "C" const char kCharaViewerCRefName[] = "CRef";
+extern "C" const float kCharaSharedZeroF = 0.0f;
+extern "C" const float kCharaSharedOneF = 1.0f;
+extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
+
+
 #include "ffcc/textureman.h"
 #include <dolphin/gx.h>
 #include "dolphin/mtx.h"
@@ -51,8 +78,8 @@ extern "C" void Draw__Q26CChara6CModelFPA4_fii(void*, Mtx, int, int);
 extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void*, Mtx, int);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
-extern "C" void Destroy__6CCharaFv(void*);
-extern "C" void Create__6CCharaFv(void*);
+extern "C" void Destroy__6CCharaFv(CChara*);
+extern "C" void Create__6CCharaFv(CChara*);
 extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
@@ -82,8 +109,8 @@ extern "C" double fmod(double, double);
 
 static inline void destroyRef(int* ref)
 {
-    void (**vtable)(void*, int) = *reinterpret_cast<void (***)(void*, int)>(ref);
-    vtable[2](ref, 1);
+    void (*dtor)(void*, int) = (*reinterpret_cast<void (***)(void*, int)>(ref))[2];
+    dtor(ref, 1);
 }
 
 template <class T>

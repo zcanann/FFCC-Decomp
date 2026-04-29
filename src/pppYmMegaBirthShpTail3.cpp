@@ -257,7 +257,7 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             memset(work->m_wmats, 0, work->m_maxParticles * 0x30);
         }
 
-        work->m_tailScaleDirection = param->m_directionTail;
+        work->m_tailScaleDirection = param->m_velocity;
         tailScale = work->m_tailScaleDirection;
         pppNormalize(work->m_tailScaleDirection, tailScale);
     }

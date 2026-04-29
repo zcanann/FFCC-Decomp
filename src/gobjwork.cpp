@@ -537,6 +537,11 @@ void CCaravanWork::CLetterWork::operator= (const CCaravanWork::CLetterWork&)
  */
 void CCaravanWork::FGLetterOpen(int letterIdx)
 {
+	struct LetterFlags {
+		unsigned char opened : 1;
+		unsigned char rest : 7;
+	};
+
 	CCaravanWork* self = this;
 	unsigned int stack[2];
 	int letterOffset = letterIdx * 0xC;
@@ -571,9 +576,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 
 	CMes::m_tempVar[8] = *reinterpret_cast<int*>(&self->m_saveSlot);
 
-	int isOpened = 1;
-	self->m_letter0[letterOffset] =
-		(unsigned char)((self->m_letter0[letterOffset] & 0x7F) | ((isOpened << 7) & 0x80));
+	reinterpret_cast<LetterFlags*>(&self->m_letter0[letterOffset])->opened = 1;
 }
 
 /*
@@ -587,6 +590,12 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
  */
 void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int param5)
 {
+	struct LetterFlags {
+		unsigned char high : 2;
+		unsigned char replied : 1;
+		unsigned char low : 5;
+	};
+
 	int stack[5];
 	unsigned char* letter = m_letter0 + (letterIdx * 0xC);
 	unsigned short* words16 = reinterpret_cast<unsigned short*>(letter);
@@ -601,8 +610,7 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 		CFlat, Game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
 
-	int replied = 1;
-	letter[0] = (unsigned char)((letter[0] & 0xDF) | ((replied << 5) & 0x20));
+	reinterpret_cast<LetterFlags*>(letter)->replied = 1;
 }
 
 /*

@@ -222,328 +222,342 @@ static inline CharaBreakMeshRef* ModelMeshes(CChara::CModel* model)
     return *reinterpret_cast<CharaBreakMeshRef**>(reinterpret_cast<u8*>(model) + 0xAC);
 }
 
+extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(void*, void*, void*, s32, Mtx);
+extern "C" void CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f(void);
+extern "C" void CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi(void);
+extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32, void*, void*);
+
 /*
  * --INFO--
- * PAL Address: 0x80140F18
- * PAL Size: 708b
+ * PAL Address: 0x8013F9D0
+ * PAL Size: 208b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(void* model, void* modelData, void*,
-                                                                                 s32 meshIndex, Mtx meshMtx)
+void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakUnkC* data)
 {
-    Mtx drawMtx;
-    Mtx cameraMtx;
+    int colorOffset = data->m_serializedDataOffsets[0];
+    u8* work = (u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2];
+    u8* colorWork = (u8*)charaBreak + 0x80 + colorOffset;
 
-    if (*(s32*)((u8*)modelData + 0x44) != 0) {
-        s32 meshArrayBase = *(s32*)((u8*)model + 0xAC) + meshIndex * 0x14;
-        s32 meshData = *(s32*)((u8*)meshArrayBase + 8);
-        s32 materialData = *(s32*)((u8*)meshData + 0x50);
-        s32 materialIndex;
-        s32 materialOffset;
+    if (*(u32*)(work + 0x44) != 0) {
+        void* envColor = colorWork + 8;
+        void* envMtx = (u8*)charaBreak + 0x40;
 
-        PSMTXCopy(CameraMatrix(), cameraMtx);
+        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+        pppInitBlendMode();
+        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+            envColor,
+            envMtx,
+            FLOAT_80332048,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 2, 2, 3);
+        work[0] = 0xFF;
+        work[1] = 0xFF;
+        work[2] = 0xFF;
+        work[3] = colorWork[0xB];
+    }
+}
+/*
+ * --INFO--
+ * PAL Address: 0x8013FAA0
+ * PAL Size: 1140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBreakUnkC* data)
+{
+    CharaBreakStep* stepData;
+    CharaBreakWork* work;
+    u8* model;
+    void* handle;
+    u8* mesh;
+    u32 meshCount;
+    u32 i;
 
-        materialIndex = *(s32*)((u8*)meshData + 0x4C) - 1;
-        materialOffset = materialIndex * 4;
+    if (gPppCalcDisabled != 0) {
+        return;
+    }
 
-        for (; materialIndex >= 0; materialIndex--) {
-            s32 meshTable = *(s32*)((u8*)*(s32*)((u8*)modelData + 0x1C) + meshIndex * 4);
-            s32 displayList = *(s32*)((u8*)meshTable + materialOffset);
-            s32 vertexData = *(s32*)((u8*)displayList + 0xC);
-            s32 faceIndex = 0;
+    stepData = (CharaBreakStep*)step;
+    work = (CharaBreakWork*)((u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2]);
+    if (work->m_enabled == 0) {
+        return;
+    }
 
-            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                &MaterialMan, *(void**)((u8*)*(s32*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)materialData + 8), 0, 0);
+    handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
+    model = (u8*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    work->m_model = model;
 
-            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-            GXSetCullMode(GX_CULL_NONE);
-            GXClearVtxDesc();
-            GXSetVtxDesc((GXAttr)9, GX_DIRECT);
-            GXSetVtxDesc((GXAttr)10, GX_INDEX16);
-            GXSetVtxDesc((GXAttr)11, GX_INDEX16);
-            GXSetVtxDesc((GXAttr)13, GX_INDEX16);
-            GXSetVtxDesc((GXAttr)14, GX_INDEX16);
-            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, GX_POS_XYZ, GX_S16, *(u32*)((u8*)*(s32*)((u8*)model + 0xA4) + 0x34) & 0xFF);
-            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)10, GX_CLR_RGB, GX_RGBA8, *(u32*)((u8*)*(s32*)((u8*)model + 0xA4) + 0x38) & 0xFF);
-            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)11, GX_NRM_XYZ, GX_S16, 0);
-            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)13, GX_TEX_ST, GX_S16, 0xC);
-            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)14, GX_TEX_ST, GX_S16, 0xC);
+    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf((float)stepData->m_dataValIndex,
+                                                 charaBreak,
+                                                 stepData->m_graphId,
+                                                 &work->m_value0,
+                                                 &work->m_value1,
+                                                 &work->m_value2,
+                                                 &stepData->m_graphInit,
+                                                 &stepData->m_graphStep);
 
-            if (*(s32*)((u8*)*(s32*)((u8*)meshArrayBase + 8) + 0x54) == 0) {
-                GXLoadPosMtxImm(cameraMtx, 0);
-            } else {
-                PSMTXConcat(cameraMtx, meshMtx, drawMtx);
-                GXLoadPosMtxImm(drawMtx, 0);
-            }
+    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(stepData->m_payloadGraphInit,
+                                                 charaBreak,
+                                                 stepData->m_graphId,
+                                                 &work->m_value3,
+                                                 &work->m_value4,
+                                                 &work->m_value5,
+                                                 &stepData->m_payloadGraphStep,
+                                                 &stepData->m_payloadGraphStepStep);
 
-            GXBegin((GXPrimitive)0x90, (GXVtxFmt)7, *(u16*)((u8*)displayList + 8) * 3);
-            while (faceIndex < (s32)(u32)*(u16*)((u8*)displayList + 8)) {
-                faceIndex++;
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x10);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x12);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x14);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x28);
-                GXWGFifo.u16 = 0;
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x2E);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x2E);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x16);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x18);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x1A);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x2A);
-                GXWGFifo.u16 = 0;
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x30);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x30);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x1C);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x1E);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x20);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x2C);
-                GXWGFifo.u16 = 0;
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x32);
-                vertexData += 0x34;
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData - 2);
-            }
+    *(u32*)(model + 0xE4) = (u32)work;
+    *(u32*)(model + 0xE8) = (u32)stepData;
+    *(u32*)(model + 0xF4) = (u32)CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi;
+    *(u32*)(model + 0xFC) = (u32)CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f;
+    *(u32*)(model + 0x104) = (u32)CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f;
+    *(u32*)(model + 0xEC) = (u32)CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv;
 
-            materialOffset -= 4;
-            materialData += 0xC;
+    if (stepData->m_graphId == *(s32*)charaBreak) {
+        f32 zero = FLOAT_80332048;
+        if (stepData->m_direction.x == zero && stepData->m_direction.y == zero &&
+            stepData->m_direction.z == zero) {
+            stepData->m_direction.x = FLOAT_8033204c;
+            stepData->m_direction.y = zero;
+            stepData->m_direction.z = zero;
+        } else {
+            PSVECNormalize(&stepData->m_direction, &stepData->m_direction);
         }
     }
-}
 
-/*
- * --INFO--
- * PAL Address: 0x801411DC
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f(void)
-{
-}
+    mesh = reinterpret_cast<u8*>(ModelMeshes(reinterpret_cast<CChara::CModel*>(model)));
+    meshCount = ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount;
 
-/*
- * --INFO--
- * PAL Address: 0x801411E0
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi(void)
-{
-}
+    if (work->m_meshBuffers == NULL) {
+        work->m_miscValue = FLOAT_80332050;
+        work->m_meshBuffers = pppMemAlloc__FUlPQ27CMemory6CStagePci(meshCount << 2, pppEnvStPtr->m_stagePtr,
+                                                                     const_cast<char*>(s_pppCharaBreak_cpp_801dd690),
+                                                                     0x3D0);
+        if (work->m_meshBuffers == NULL) {
+            goto fail;
+        }
 
-/*
- * --INFO--
- * PAL Address: 0x801411E4
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32 value, void* modelData, void* meshData)
-{
-    if (*(u32*)((u8*)modelData + 0x44) == 0) {
-        return value;
-    }
+        for (i = 0; i < ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount; i++) {
+            ((u32*)work->m_meshBuffers)[i] = 0;
+        }
 
-    return (u32)__cntlzw(1 - (u32)*((u8*)meshData + 0x42)) >> 5;
-}
+        for (i = 0; i < meshCount; i++) {
+            CharaBreakMeshData* meshData = *(CharaBreakMeshData**)(mesh + 8);
 
-/*
- * --INFO--
- * PAL Address: 0x80140CC8
- * PAL Size: 592b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
-{
-    CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
-    CharaBreakMeshData* meshData = meshRef->m_data;
-    s32 isRigid = 0;
-    S16Vec* workPositions;
-    u16* stream = (u16*)displayList;
-    u8* polygonBytes = (u8*)polygonData;
-    BOOL transformPositions = FALSE;
-    Mtx meshMtx;
-
-    if (meshData->m_skinCount == 0) {
-        isRigid = 1;
-        PSMTXConcat(ModelDrawMtx(model), *(Mtx*)((u8*)ModelNodes(model) + (meshData->m_nodeIndex * 0xC0) + 0x6C),
-                    meshMtx);
-    }
-    workPositions = meshRef->m_workPositions;
-
-    s32 keepReading = 1;
-    while (keepReading != 0) {
-        u8 drawCmd = *(u8*)stream;
-        u16 drawCount = *(u16*)((u8*)stream + 1);
-        u8 drawMode = drawCmd & 7;
-        u8 primitive = drawCmd & 0xF8;
-        s16 triCount;
-        s32 outVertex;
-        u16* stripRestart;
-
-        stream = (u16*)((u8*)stream + 3);
-        if (IsHasDrawFmtDL__5CUtilFUc(&gUtil, drawCmd) == 0) {
-            keepReading = 0;
-        } else {
-            triCount = (s16)(drawCount - 2);
-            outVertex = 0;
-            stripRestart = 0;
-            s32 keepTri = 1;
-
-            if (primitive == 0x90) {
-                triCount = (s16)((s32)drawCount / 3);
+            if (strcmp(meshData->m_name, "") == 0) {
+                CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
+                    &gUtil,
+                    &work->m_bboxMin,
+                    &work->m_bboxMax,
+                    reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_workPositions,
+                    meshData->m_vertexCount,
+                    ModelData(reinterpret_cast<CChara::CModel*>(model))->m_posQuant);
             }
 
-            while (keepTri != 0) {
-                u16* previousRestart = stripRestart;
-                u16 posIndex = stream[0];
-                u16 nrmIndex = stream[1];
-                u16 texIndex = stream[3];
+            ((u32*)work->m_meshBuffers)[i] = (u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                meshData->m_displayListCount << 2, pppEnvStPtr->m_stagePtr,
+                const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3E9);
+            if (((u32*)work->m_meshBuffers)[i] == 0) {
+                goto fail;
+            }
 
-                stripRestart = stream + 4;
-                if (drawMode == 2) {
-                    stripRestart = stream + 5;
+            {
+                int displayListCount = meshData->m_displayListCount;
+                int* dlEntries = (int*)((u32*)work->m_meshBuffers)[i];
+                for (int dl = displayListCount - 1; dl >= 0; dl--) {
+                    dlEntries[dl] = 0;
                 }
-                stream = stripRestart;
+            }
 
-                if (isRigid != 0) {
-                    S16Vec* sourcePos = workPositions + posIndex;
-                    S16Vec posQuantized = *sourcePos;
-                    Vec posFloat;
-
-                    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &posFloat, posQuantized, ModelData(model)->m_posQuant);
-                    PSMTXMultVec(meshMtx, &posFloat, &posFloat);
-                    ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, (S16Vec*)(polygonBytes + (outVertex * 6) + 0x10), posFloat,
-                                                        ModelData(model)->m_posQuant);
-                } else {
-                    S16Vec* sourcePos = workPositions + posIndex;
-                    s32 positionOffset = outVertex * 6;
-                    *(s16*)(polygonBytes + positionOffset + 0x10) = sourcePos->x;
-                    *(s16*)(polygonBytes + positionOffset + 0x12) = sourcePos->y;
-                    *(s16*)(polygonBytes + positionOffset + 0x14) = sourcePos->z;
-                }
-
-                *(u16*)(polygonBytes + (outVertex * 2) + 0x22) = posIndex;
-                *(u16*)(polygonBytes + (outVertex * 2) + 0x2E) = texIndex;
-                *(u16*)(polygonBytes + (outVertex * 2) + 0x28) = nrmIndex;
-                outVertex++;
-                stripRestart = previousRestart;
-
-                if (primitive == 0x90) {
-                    if (outVertex == 3) {
-                        triCount--;
-                        if (triCount < 1) {
-                            keepTri = 0;
-                        }
-                        outVertex = 0;
-                        polygonBytes += 0x34;
+            {
+                int displayListCount = meshData->m_displayListCount;
+                CharaBreakDisplayList* displayList = meshData->m_displayLists;
+                CharaBreakDisplayListPair** dlEntries =
+                    (CharaBreakDisplayListPair**)(((u32*)work->m_meshBuffers)[i] + ((displayListCount - 1) << 2));
+                for (int dl = displayListCount - 1; dl >= 0; dl--) {
+                    *dlEntries = (CharaBreakDisplayListPair*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                        0x10, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3FC);
+                    CharaBreakDisplayListPair* dlPair = *dlEntries;
+                    if (dlPair == NULL) {
+                        goto fail;
                     }
-                } else if (primitive == 0x98) {
-                    if (outVertex == 1) {
-                        stripRestart = stream;
-                    } else if (outVertex == 3) {
-                        triCount--;
-                        if (triCount < 1) {
-                            keepTri = 0;
-                        }
-                        if ((triCount & 1) == 0) {
-                            stream = previousRestart;
-                        }
-                        outVertex = 0;
-                        polygonBytes += 0x34;
+
+                    dlPair->m_rewrittenDisplayList = NULL;
+                    dlPair->m_displayListSize = 0;
+                    dlPair->m_polygonData = 0;
+                    dlPair->m_displayListSize = displayList->m_size;
+                    dlPair->m_rewrittenDisplayList = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                        dlPair->m_displayListSize, pppEnvStPtr->m_stagePtr,
+                        const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x40B);
+                    if (dlPair->m_rewrittenDisplayList == NULL) {
+                        goto fail;
                     }
+
+                    memcpy(dlPair->m_rewrittenDisplayList, displayList->m_data, dlPair->m_displayListSize);
+                    ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, dlPair->m_rewrittenDisplayList, dlPair->m_displayListSize, 1);
+
+                    u32 polygonCount =
+                        GetNumPolygonFromDL__5CUtilFPvUl(&gUtil, dlPair->m_rewrittenDisplayList, dlPair->m_displayListSize);
+                    dlPair->m_polygonData = (POLYGON_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                        polygonCount * 0x34, pppEnvStPtr->m_stagePtr,
+                        const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x423);
+                    if (dlPair->m_polygonData == NULL) {
+                        goto fail;
+                    }
+                    dlPair->m_polygonCount = (u16)polygonCount;
+
+                    CreatePolygon(dlPair->m_polygonData, displayList->m_data, displayList->m_size, (CChara::CModel*)model,
+                                  (CChara::CMesh*)mesh);
+                    InitPolygonParameter((PCharaBreak*)stepData, (VCharaBreak*)work, dlPair->m_polygonData, dlPair->m_polygonCount,
+                                         (CChara::CModel*)model, (CChara::CMesh*)mesh);
+
+                    dlEntries--;
+                    displayList++;
                 }
             }
+
+            mesh += 0x14;
         }
     }
+
+    if (gPppInConstructor == 0) {
+        UpdatePolygonData((PCharaBreak*)stepData, (VCharaBreak*)work, (CChara::CModel*)model);
+    }
+    return;
+
+fail:
+    work->m_enabled = 0;
+    *(u32*)(model + 0xE4) = 0;
+    *(u32*)(model + 0xE8) = 0;
+    *(u32*)(model + 0xF4) = 0;
+    *(u32*)(model + 0xFC) = 0;
+    *(u32*)(model + 0x104) = 0;
+    *(u32*)(model + 0xEC) = 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8014099C
- * PAL Size: 812b
+ * PAL Address: 0x8013FF14
+ * PAL Size: 364b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* polygonData, unsigned long polygonCount,
-                          CChara::CModel* model, CChara::CMesh* mesh)
+void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
-    CharaBreakStep* stepData = (CharaBreakStep*)charaBreak;
-    CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
-    S16Vec* workNormals = meshRef->m_workNormals;
-    u32 normQuant = ModelData(model)->m_normQuant;
+    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x319);
 
-    for (u32 i = 0; i < polygonCount; i++) {
-        Vec normal;
-        Vec tangent;
-        Vec up = kPppCharaBreakUpVector;
+    CharaBreakWork* work = (CharaBreakWork*)((u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2]);
+    u8* model = work->m_model;
 
-        int alpha = (int)stepData->m_alphaBase + rand() % stepData->m_alphaRange;
-        if (alpha > 0xFF) {
-            alpha = 0xFF;
+    *(u32*)(model + 0xE4) = 0;
+    *(u32*)(model + 0xE8) = 0;
+    *(u32*)(model + 0xF4) = 0;
+    *(u32*)(model + 0xFC) = 0;
+    *(u32*)(model + 0x104) = 0;
+    *(u32*)(model + 0xEC) = 0;
+
+    void** perMeshBuffers = (void**)work->m_meshBuffers;
+    u8* mesh = *(u8**)(model + 0xAC);
+    void** meshBufferSlot = perMeshBuffers;
+
+    if (perMeshBuffers != NULL) {
+        for (u32 meshIndex = 0; meshIndex < *(u32*)(*(u8**)(model + 0xA4) + 0xC); meshIndex++) {
+            u32 dlEntryBase = (u32)*meshBufferSlot;
+            int meshData = *(int*)(mesh + 8);
+            if (dlEntryBase != 0) {
+                int* dlEntries = (int*)dlEntryBase;
+                for (u32 dlIndex = 0; dlIndex < *(u32*)(meshData + 0x4C); dlIndex++) {
+                    if ((void*)*dlEntries != NULL) {
+                        if (*(void**)*dlEntries != NULL) {
+                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
+                            *(u32*)*dlEntries = 0;
+                        }
+                        if (*(void**)(*dlEntries + 0xC) != NULL) {
+                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(*dlEntries + 0xC));
+                            *(u32*)(*dlEntries + 0xC) = 0;
+                        }
+                    }
+                    if ((void*)*dlEntries != NULL) {
+                        pppHeapUseRate__FPQ27CMemory6CStage((void*)*dlEntries);
+                        *dlEntries = 0;
+                    }
+                    dlEntries++;
+                }
+            }
+
+            if (*meshBufferSlot != NULL) {
+                pppHeapUseRate__FPQ27CMemory6CStage(*meshBufferSlot);
+                *meshBufferSlot = NULL;
+            }
+            meshBufferSlot++;
+            mesh += 0x14;
         }
-
-        polygonData->m_alpha = (u8)alpha;
-        polygonData->m_enabled = 0;
-        polygonData->_pad2 = 0;
-
-        if (stepData->m_clipMode == 2) {
-            polygonData->m_enabled = 1;
-        }
-
-        if (meshRef->m_data->m_skinCount == 0) {
-            normal.x = Math.RandF(FLOAT_8033204c);
-            normal.y = Math.RandF(FLOAT_8033204c);
-            normal.z = Math.RandF(FLOAT_8033204c);
-            normal.x *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
-            normal.y *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
-            normal.z *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
-            PSVECNormalize(&normal, &normal);
-            ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygonData->m_normalA, normal, normQuant);
-        } else {
-            polygonData->m_normalA = workNormals[polygonData->m_nrmIndices[0]];
-            ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &normal, polygonData->m_normalA, normQuant);
-        }
-
-        PSVECCrossProduct(&up, &normal, &tangent);
-        float tangentMag = PSVECMag(&tangent);
-        if (tangentMag == FLOAT_80332048) {
-            tangent.x = FLOAT_80332048;
-            tangent.y = FLOAT_80332048;
-            tangent.z = FLOAT_80332048;
-        } else {
-            PSVECScale(&tangent, &tangent, FLOAT_8033204c / tangentMag);
-        }
-
-        if (tangent.x == FLOAT_80332048 && tangent.y == FLOAT_80332048 && tangent.z == FLOAT_80332048) {
-            tangent.x = FLOAT_8033204c;
-            tangent.y = FLOAT_80332048;
-            tangent.z = FLOAT_80332048;
-        }
-
-        if (stepData->m_spinMode == 1) {
-            polygonData->m_normalA.x = 0;
-            polygonData->m_normalA.z = 0;
-            polygonData->m_normalA.y = rand() % 2;
-        }
-
-        ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygonData->m_normalB, tangent, normQuant);
-        polygonData++;
     }
+
+    if (perMeshBuffers != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(perMeshBuffers);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80140080
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
+{
+    float fVar1 = FLOAT_80332048;
+    int dataOffset = data->m_serializedDataOffsets[2];
+    u8* work = (u8*)charaBreak + 0x80 + dataOffset;
+
+    *(float*)(work + 0xC) = FLOAT_80332048;
+    *(float*)(work + 8) = fVar1;
+    *(float*)(work + 4) = fVar1;
+    *(float*)(work + 0x18) = fVar1;
+    *(float*)(work + 0x14) = fVar1;
+    *(float*)(work + 0x10) = fVar1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801400B0
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
+{
+    float fVar1 = FLOAT_80332048;
+    int dataOffset = data->m_serializedDataOffsets[2];
+    u8* work = (u8*)charaBreak + 0x80 + dataOffset;
+
+    *(u32*)(work + 0x1C) = 0;
+    *(float*)(work + 0xC) = fVar1;
+    *(float*)(work + 8) = fVar1;
+    *(float*)(work + 4) = fVar1;
+    *(float*)(work + 0x18) = fVar1;
+    *(float*)(work + 0x14) = fVar1;
+    *(float*)(work + 0x10) = fVar1;
+    *(u32*)(work + 0x44) = 1;
 }
 
 /*
@@ -773,334 +787,324 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
 /*
  * --INFO--
- * PAL Address: 0x801400B0
- * PAL Size: 64b
+ * PAL Address: 0x8014099C
+ * PAL Size: 812b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
+void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* polygonData, unsigned long polygonCount,
+                          CChara::CModel* model, CChara::CMesh* mesh)
 {
-    float fVar1 = FLOAT_80332048;
-    int dataOffset = data->m_serializedDataOffsets[2];
-    u8* work = (u8*)charaBreak + 0x80 + dataOffset;
+    CharaBreakStep* stepData = (CharaBreakStep*)charaBreak;
+    CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
+    S16Vec* workNormals = meshRef->m_workNormals;
+    u32 normQuant = ModelData(model)->m_normQuant;
 
-    *(u32*)(work + 0x1C) = 0;
-    *(float*)(work + 0xC) = fVar1;
-    *(float*)(work + 8) = fVar1;
-    *(float*)(work + 4) = fVar1;
-    *(float*)(work + 0x18) = fVar1;
-    *(float*)(work + 0x14) = fVar1;
-    *(float*)(work + 0x10) = fVar1;
-    *(u32*)(work + 0x44) = 1;
-}
+    for (u32 i = 0; i < polygonCount; i++) {
+        Vec normal;
+        Vec tangent;
+        Vec up = kPppCharaBreakUpVector;
 
-/*
- * --INFO--
- * PAL Address: 0x80140080
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
-{
-    float fVar1 = FLOAT_80332048;
-    int dataOffset = data->m_serializedDataOffsets[2];
-    u8* work = (u8*)charaBreak + 0x80 + dataOffset;
-
-    *(float*)(work + 0xC) = FLOAT_80332048;
-    *(float*)(work + 8) = fVar1;
-    *(float*)(work + 4) = fVar1;
-    *(float*)(work + 0x18) = fVar1;
-    *(float*)(work + 0x14) = fVar1;
-    *(float*)(work + 0x10) = fVar1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013FF14
- * PAL Size: 364b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
-{
-    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x319);
-
-    CharaBreakWork* work = (CharaBreakWork*)((u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2]);
-    u8* model = work->m_model;
-
-    *(u32*)(model + 0xE4) = 0;
-    *(u32*)(model + 0xE8) = 0;
-    *(u32*)(model + 0xF4) = 0;
-    *(u32*)(model + 0xFC) = 0;
-    *(u32*)(model + 0x104) = 0;
-    *(u32*)(model + 0xEC) = 0;
-
-    void** perMeshBuffers = (void**)work->m_meshBuffers;
-    u8* mesh = *(u8**)(model + 0xAC);
-    void** meshBufferSlot = perMeshBuffers;
-
-    if (perMeshBuffers != NULL) {
-        for (u32 meshIndex = 0; meshIndex < *(u32*)(*(u8**)(model + 0xA4) + 0xC); meshIndex++) {
-            u32 dlEntryBase = (u32)*meshBufferSlot;
-            int meshData = *(int*)(mesh + 8);
-            if (dlEntryBase != 0) {
-                int* dlEntries = (int*)dlEntryBase;
-                for (u32 dlIndex = 0; dlIndex < *(u32*)(meshData + 0x4C); dlIndex++) {
-                    if ((void*)*dlEntries != NULL) {
-                        if (*(void**)*dlEntries != NULL) {
-                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
-                            *(u32*)*dlEntries = 0;
-                        }
-                        if (*(void**)(*dlEntries + 0xC) != NULL) {
-                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(*dlEntries + 0xC));
-                            *(u32*)(*dlEntries + 0xC) = 0;
-                        }
-                    }
-                    if ((void*)*dlEntries != NULL) {
-                        pppHeapUseRate__FPQ27CMemory6CStage((void*)*dlEntries);
-                        *dlEntries = 0;
-                    }
-                    dlEntries++;
-                }
-            }
-
-            if (*meshBufferSlot != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(*meshBufferSlot);
-                *meshBufferSlot = NULL;
-            }
-            meshBufferSlot++;
-            mesh += 0x14;
+        int alpha = (int)stepData->m_alphaBase + rand() % stepData->m_alphaRange;
+        if (alpha > 0xFF) {
+            alpha = 0xFF;
         }
-    }
 
-    if (perMeshBuffers != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(perMeshBuffers);
-    }
-}
+        polygonData->m_alpha = (u8)alpha;
+        polygonData->m_enabled = 0;
+        polygonData->_pad2 = 0;
 
-/*
- * --INFO--
- * PAL Address: 0x8013FAA0
- * PAL Size: 1140b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBreakUnkC* data)
-{
-    CharaBreakStep* stepData;
-    CharaBreakWork* work;
-    u8* model;
-    void* handle;
-    u8* mesh;
-    u32 meshCount;
-    u32 i;
+        if (stepData->m_clipMode == 2) {
+            polygonData->m_enabled = 1;
+        }
 
-    if (gPppCalcDisabled != 0) {
-        return;
-    }
-
-    stepData = (CharaBreakStep*)step;
-    work = (CharaBreakWork*)((u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2]);
-    if (work->m_enabled == 0) {
-        return;
-    }
-
-    handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
-    model = (u8*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    work->m_model = model;
-
-    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf((float)stepData->m_dataValIndex,
-                                                 charaBreak,
-                                                 stepData->m_graphId,
-                                                 &work->m_value0,
-                                                 &work->m_value1,
-                                                 &work->m_value2,
-                                                 &stepData->m_graphInit,
-                                                 &stepData->m_graphStep);
-
-    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(stepData->m_payloadGraphInit,
-                                                 charaBreak,
-                                                 stepData->m_graphId,
-                                                 &work->m_value3,
-                                                 &work->m_value4,
-                                                 &work->m_value5,
-                                                 &stepData->m_payloadGraphStep,
-                                                 &stepData->m_payloadGraphStepStep);
-
-    *(u32*)(model + 0xE4) = (u32)work;
-    *(u32*)(model + 0xE8) = (u32)stepData;
-    *(u32*)(model + 0xF4) = (u32)CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi;
-    *(u32*)(model + 0xFC) = (u32)CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f;
-    *(u32*)(model + 0x104) = (u32)CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f;
-    *(u32*)(model + 0xEC) = (u32)CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv;
-
-    if (stepData->m_graphId == *(s32*)charaBreak) {
-        f32 zero = FLOAT_80332048;
-        if (stepData->m_direction.x == zero && stepData->m_direction.y == zero &&
-            stepData->m_direction.z == zero) {
-            stepData->m_direction.x = FLOAT_8033204c;
-            stepData->m_direction.y = zero;
-            stepData->m_direction.z = zero;
+        if (meshRef->m_data->m_skinCount == 0) {
+            normal.x = Math.RandF(FLOAT_8033204c);
+            normal.y = Math.RandF(FLOAT_8033204c);
+            normal.z = Math.RandF(FLOAT_8033204c);
+            normal.x *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
+            normal.y *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
+            normal.z *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
+            PSVECNormalize(&normal, &normal);
+            ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygonData->m_normalA, normal, normQuant);
         } else {
-            PSVECNormalize(&stepData->m_direction, &stepData->m_direction);
+            polygonData->m_normalA = workNormals[polygonData->m_nrmIndices[0]];
+            ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &normal, polygonData->m_normalA, normQuant);
         }
+
+        PSVECCrossProduct(&up, &normal, &tangent);
+        float tangentMag = PSVECMag(&tangent);
+        if (tangentMag == FLOAT_80332048) {
+            tangent.x = FLOAT_80332048;
+            tangent.y = FLOAT_80332048;
+            tangent.z = FLOAT_80332048;
+        } else {
+            PSVECScale(&tangent, &tangent, FLOAT_8033204c / tangentMag);
+        }
+
+        if (tangent.x == FLOAT_80332048 && tangent.y == FLOAT_80332048 && tangent.z == FLOAT_80332048) {
+            tangent.x = FLOAT_8033204c;
+            tangent.y = FLOAT_80332048;
+            tangent.z = FLOAT_80332048;
+        }
+
+        if (stepData->m_spinMode == 1) {
+            polygonData->m_normalA.x = 0;
+            polygonData->m_normalA.z = 0;
+            polygonData->m_normalA.y = rand() % 2;
+        }
+
+        ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygonData->m_normalB, tangent, normQuant);
+        polygonData++;
     }
-
-    mesh = reinterpret_cast<u8*>(ModelMeshes(reinterpret_cast<CChara::CModel*>(model)));
-    meshCount = ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount;
-
-    if (work->m_meshBuffers == NULL) {
-        work->m_miscValue = FLOAT_80332050;
-        work->m_meshBuffers = pppMemAlloc__FUlPQ27CMemory6CStagePci(meshCount << 2, pppEnvStPtr->m_stagePtr,
-                                                                     const_cast<char*>(s_pppCharaBreak_cpp_801dd690),
-                                                                     0x3D0);
-        if (work->m_meshBuffers == NULL) {
-            goto fail;
-        }
-
-        for (i = 0; i < ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount; i++) {
-            ((u32*)work->m_meshBuffers)[i] = 0;
-        }
-
-        for (i = 0; i < meshCount; i++) {
-            CharaBreakMeshData* meshData = *(CharaBreakMeshData**)(mesh + 8);
-
-            if (strcmp(meshData->m_name, "") == 0) {
-                CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
-                    &gUtil,
-                    &work->m_bboxMin,
-                    &work->m_bboxMax,
-                    reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_workPositions,
-                    meshData->m_vertexCount,
-                    ModelData(reinterpret_cast<CChara::CModel*>(model))->m_posQuant);
-            }
-
-            ((u32*)work->m_meshBuffers)[i] = (u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                meshData->m_displayListCount << 2, pppEnvStPtr->m_stagePtr,
-                const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3E9);
-            if (((u32*)work->m_meshBuffers)[i] == 0) {
-                goto fail;
-            }
-
-            {
-                int displayListCount = meshData->m_displayListCount;
-                int* dlEntries = (int*)((u32*)work->m_meshBuffers)[i];
-                for (int dl = displayListCount - 1; dl >= 0; dl--) {
-                    dlEntries[dl] = 0;
-                }
-            }
-
-            {
-                int displayListCount = meshData->m_displayListCount;
-                CharaBreakDisplayList* displayList = meshData->m_displayLists;
-                CharaBreakDisplayListPair** dlEntries =
-                    (CharaBreakDisplayListPair**)(((u32*)work->m_meshBuffers)[i] + ((displayListCount - 1) << 2));
-                for (int dl = displayListCount - 1; dl >= 0; dl--) {
-                    *dlEntries = (CharaBreakDisplayListPair*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                        0x10, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3FC);
-                    CharaBreakDisplayListPair* dlPair = *dlEntries;
-                    if (dlPair == NULL) {
-                        goto fail;
-                    }
-
-                    dlPair->m_rewrittenDisplayList = NULL;
-                    dlPair->m_displayListSize = 0;
-                    dlPair->m_polygonData = 0;
-                    dlPair->m_displayListSize = displayList->m_size;
-                    dlPair->m_rewrittenDisplayList = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                        dlPair->m_displayListSize, pppEnvStPtr->m_stagePtr,
-                        const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x40B);
-                    if (dlPair->m_rewrittenDisplayList == NULL) {
-                        goto fail;
-                    }
-
-                    memcpy(dlPair->m_rewrittenDisplayList, displayList->m_data, dlPair->m_displayListSize);
-                    ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, dlPair->m_rewrittenDisplayList, dlPair->m_displayListSize, 1);
-
-                    u32 polygonCount =
-                        GetNumPolygonFromDL__5CUtilFPvUl(&gUtil, dlPair->m_rewrittenDisplayList, dlPair->m_displayListSize);
-                    dlPair->m_polygonData = (POLYGON_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                        polygonCount * 0x34, pppEnvStPtr->m_stagePtr,
-                        const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x423);
-                    if (dlPair->m_polygonData == NULL) {
-                        goto fail;
-                    }
-                    dlPair->m_polygonCount = (u16)polygonCount;
-
-                    CreatePolygon(dlPair->m_polygonData, displayList->m_data, displayList->m_size, (CChara::CModel*)model,
-                                  (CChara::CMesh*)mesh);
-                    InitPolygonParameter((PCharaBreak*)stepData, (VCharaBreak*)work, dlPair->m_polygonData, dlPair->m_polygonCount,
-                                         (CChara::CModel*)model, (CChara::CMesh*)mesh);
-
-                    dlEntries--;
-                    displayList++;
-                }
-            }
-
-            mesh += 0x14;
-        }
-    }
-
-    if (gPppInConstructor == 0) {
-        UpdatePolygonData((PCharaBreak*)stepData, (VCharaBreak*)work, (CChara::CModel*)model);
-    }
-    return;
-
-fail:
-    work->m_enabled = 0;
-    *(u32*)(model + 0xE4) = 0;
-    *(u32*)(model + 0xE8) = 0;
-    *(u32*)(model + 0xF4) = 0;
-    *(u32*)(model + 0xFC) = 0;
-    *(u32*)(model + 0x104) = 0;
-    *(u32*)(model + 0xEC) = 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8013F9D0
- * PAL Size: 208b
+ * PAL Address: 0x80140CC8
+ * PAL Size: 592b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakUnkC* data)
+void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
-    int colorOffset = data->m_serializedDataOffsets[0];
-    u8* work = (u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2];
-    u8* colorWork = (u8*)charaBreak + 0x80 + colorOffset;
+    CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
+    CharaBreakMeshData* meshData = meshRef->m_data;
+    s32 isRigid = 0;
+    S16Vec* workPositions;
+    u16* stream = (u16*)displayList;
+    u8* polygonBytes = (u8*)polygonData;
+    BOOL transformPositions = FALSE;
+    Mtx meshMtx;
 
-    if (*(u32*)(work + 0x44) != 0) {
-        void* envColor = colorWork + 8;
-        void* envMtx = (u8*)charaBreak + 0x40;
-
-        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-        pppInitBlendMode();
-        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            envColor,
-            envMtx,
-            FLOAT_80332048,
-            0,
-            0,
-            0,
-            0,
-            1,
-            1,
-            0);
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 2, 2, 3);
-        work[0] = 0xFF;
-        work[1] = 0xFF;
-        work[2] = 0xFF;
-        work[3] = colorWork[0xB];
+    if (meshData->m_skinCount == 0) {
+        isRigid = 1;
+        PSMTXConcat(ModelDrawMtx(model), *(Mtx*)((u8*)ModelNodes(model) + (meshData->m_nodeIndex * 0xC0) + 0x6C),
+                    meshMtx);
     }
+    workPositions = meshRef->m_workPositions;
+
+    s32 keepReading = 1;
+    while (keepReading != 0) {
+        u8 drawCmd = *(u8*)stream;
+        u16 drawCount = *(u16*)((u8*)stream + 1);
+        u8 drawMode = drawCmd & 7;
+        u8 primitive = drawCmd & 0xF8;
+        s16 triCount;
+        s32 outVertex;
+        u16* stripRestart;
+
+        stream = (u16*)((u8*)stream + 3);
+        if (IsHasDrawFmtDL__5CUtilFUc(&gUtil, drawCmd) == 0) {
+            keepReading = 0;
+        } else {
+            triCount = (s16)(drawCount - 2);
+            outVertex = 0;
+            stripRestart = 0;
+            s32 keepTri = 1;
+
+            if (primitive == 0x90) {
+                triCount = (s16)((s32)drawCount / 3);
+            }
+
+            while (keepTri != 0) {
+                u16* previousRestart = stripRestart;
+                u16 posIndex = stream[0];
+                u16 nrmIndex = stream[1];
+                u16 texIndex = stream[3];
+
+                stripRestart = stream + 4;
+                if (drawMode == 2) {
+                    stripRestart = stream + 5;
+                }
+                stream = stripRestart;
+
+                if (isRigid != 0) {
+                    S16Vec* sourcePos = workPositions + posIndex;
+                    S16Vec posQuantized = *sourcePos;
+                    Vec posFloat;
+
+                    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, &posFloat, posQuantized, ModelData(model)->m_posQuant);
+                    PSMTXMultVec(meshMtx, &posFloat, &posFloat);
+                    ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, (S16Vec*)(polygonBytes + (outVertex * 6) + 0x10), posFloat,
+                                                        ModelData(model)->m_posQuant);
+                } else {
+                    S16Vec* sourcePos = workPositions + posIndex;
+                    s32 positionOffset = outVertex * 6;
+                    *(s16*)(polygonBytes + positionOffset + 0x10) = sourcePos->x;
+                    *(s16*)(polygonBytes + positionOffset + 0x12) = sourcePos->y;
+                    *(s16*)(polygonBytes + positionOffset + 0x14) = sourcePos->z;
+                }
+
+                *(u16*)(polygonBytes + (outVertex * 2) + 0x22) = posIndex;
+                *(u16*)(polygonBytes + (outVertex * 2) + 0x2E) = texIndex;
+                *(u16*)(polygonBytes + (outVertex * 2) + 0x28) = nrmIndex;
+                outVertex++;
+                stripRestart = previousRestart;
+
+                if (primitive == 0x90) {
+                    if (outVertex == 3) {
+                        triCount--;
+                        if (triCount < 1) {
+                            keepTri = 0;
+                        }
+                        outVertex = 0;
+                        polygonBytes += 0x34;
+                    }
+                } else if (primitive == 0x98) {
+                    if (outVertex == 1) {
+                        stripRestart = stream;
+                    } else if (outVertex == 3) {
+                        triCount--;
+                        if (triCount < 1) {
+                            keepTri = 0;
+                        }
+                        if ((triCount & 1) == 0) {
+                            stream = previousRestart;
+                        }
+                        outVertex = 0;
+                        polygonBytes += 0x34;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80140F18
+ * PAL Size: 708b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(void* model, void* modelData, void*,
+                                                                                 s32 meshIndex, Mtx meshMtx)
+{
+    Mtx drawMtx;
+    Mtx cameraMtx;
+
+    if (*(s32*)((u8*)modelData + 0x44) != 0) {
+        s32 meshArrayBase = *(s32*)((u8*)model + 0xAC) + meshIndex * 0x14;
+        s32 meshData = *(s32*)((u8*)meshArrayBase + 8);
+        s32 materialData = *(s32*)((u8*)meshData + 0x50);
+        s32 materialIndex;
+        s32 materialOffset;
+
+        PSMTXCopy(CameraMatrix(), cameraMtx);
+
+        materialIndex = *(s32*)((u8*)meshData + 0x4C) - 1;
+        materialOffset = materialIndex * 4;
+
+        for (; materialIndex >= 0; materialIndex--) {
+            s32 meshTable = *(s32*)((u8*)*(s32*)((u8*)modelData + 0x1C) + meshIndex * 4);
+            s32 displayList = *(s32*)((u8*)meshTable + materialOffset);
+            s32 vertexData = *(s32*)((u8*)displayList + 0xC);
+            s32 faceIndex = 0;
+
+            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+                &MaterialMan, *(void**)((u8*)*(s32*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)materialData + 8), 0, 0);
+
+            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+            GXSetCullMode(GX_CULL_NONE);
+            GXClearVtxDesc();
+            GXSetVtxDesc((GXAttr)9, GX_DIRECT);
+            GXSetVtxDesc((GXAttr)10, GX_INDEX16);
+            GXSetVtxDesc((GXAttr)11, GX_INDEX16);
+            GXSetVtxDesc((GXAttr)13, GX_INDEX16);
+            GXSetVtxDesc((GXAttr)14, GX_INDEX16);
+            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, GX_POS_XYZ, GX_S16, *(u32*)((u8*)*(s32*)((u8*)model + 0xA4) + 0x34) & 0xFF);
+            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)10, GX_CLR_RGB, GX_RGBA8, *(u32*)((u8*)*(s32*)((u8*)model + 0xA4) + 0x38) & 0xFF);
+            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)11, GX_NRM_XYZ, GX_S16, 0);
+            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)13, GX_TEX_ST, GX_S16, 0xC);
+            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)14, GX_TEX_ST, GX_S16, 0xC);
+
+            if (*(s32*)((u8*)*(s32*)((u8*)meshArrayBase + 8) + 0x54) == 0) {
+                GXLoadPosMtxImm(cameraMtx, 0);
+            } else {
+                PSMTXConcat(cameraMtx, meshMtx, drawMtx);
+                GXLoadPosMtxImm(drawMtx, 0);
+            }
+
+            GXBegin((GXPrimitive)0x90, (GXVtxFmt)7, *(u16*)((u8*)displayList + 8) * 3);
+            while (faceIndex < (s32)(u32)*(u16*)((u8*)displayList + 8)) {
+                faceIndex++;
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x10);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x12);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x14);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x28);
+                GXWGFifo.u16 = 0;
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x2E);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x2E);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x16);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x18);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x1A);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x2A);
+                GXWGFifo.u16 = 0;
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x30);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x30);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x1C);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x1E);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x20);
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x2C);
+                GXWGFifo.u16 = 0;
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x32);
+                vertexData += 0x34;
+                GXWGFifo.u16 = *(u16*)((u8*)vertexData - 2);
+            }
+
+            materialOffset -= 4;
+            materialData += 0xC;
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801411DC
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f(void)
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801411E0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi(void)
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801411E4
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32 value, void* modelData, void* meshData)
+{
+    if (*(u32*)((u8*)modelData + 0x44) == 0) {
+        return value;
+    }
+
+    return (u32)__cntlzw(1 - (u32)*((u8*)meshData + 0x42)) >> 5;
 }

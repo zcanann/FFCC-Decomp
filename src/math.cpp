@@ -876,7 +876,10 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
     outSecondDerivatives[0] = firstDerivative;
     outSecondDerivatives[count] = firstDerivative;
     for (i = 1; i < count; ++i) {
-        outSecondDerivatives[i] = -(firstDerivative * s_wSpline[i] - outSecondDerivatives[i]) / s_dSpline[i];
+        float w = s_wSpline[i];
+        float value = outSecondDerivatives[i];
+        float d = s_dSpline[i];
+        outSecondDerivatives[i] = -(firstDerivative * w - value) / d;
     }
 }
 

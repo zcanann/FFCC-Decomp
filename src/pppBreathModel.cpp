@@ -46,7 +46,9 @@ struct pppBreathModelUnkC {
 };
 
 struct pppBreathModel {
-    unsigned char _pad[8];
+    s32 m_graphId;
+    unsigned char _pad04[0x0C];
+    pppFMATRIX m_localMatrix;
 };
 
 struct BreathParticleGroup {
@@ -1052,7 +1054,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     (*(Mtx*)particleWmat)[1][3] = pos.y;
     (*(Mtx*)particleWmat)[2][3] = pos.z;
 
-    PSMTXConcat(*(Mtx*)particleWmat, pppObject->m_localMatrix.value, *(Mtx*)particleData);
+    PSMTXConcat(*(Mtx*)particleWmat, reinterpret_cast<pppBreathModel*>(pppObject)->m_localMatrix.value, *(Mtx*)particleData);
     PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, cameraMtx);
 
     particle->m_direction.x = kPppBreathModelZero;

@@ -1486,22 +1486,18 @@ int CCaravanWork::ShopRequest(int requestType, int param3, int param4, int param
  */
 void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int arg3)
 {
-	int local18;
-	int local14;
-	int local10;
-	int localC;
-	int local8;
+	int args[5];
 
 	if ((requestType == 0) || (requestType == 1)) {
 		m_shopRequestState = 0;
 	}
-	local18 = requestType;
-	local14 = arg0;
-	local10 = arg1;
-	localC = arg2;
-	local8 = arg3;
+	args[0] = requestType;
+	args[1] = arg0;
+	args[2] = arg1;
+	args[3] = arg2;
+	args[4] = arg3;
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-		&CFlat, m_ownerObj, 2, 0x12, 5, &local18, (void*)0);
+		&CFlat, m_ownerObj, 2, 0x12, 5, args, (void*)0);
 }
 
 /*

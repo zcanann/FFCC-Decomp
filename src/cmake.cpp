@@ -2,6 +2,7 @@
 #include "ffcc/chara.h"
 #include "ffcc/fontman.h"
 #include "ffcc/p_game.h"
+#include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "ffcc/linkage.h"
 #include <dolphin/gx.h>
@@ -597,9 +598,7 @@ void CMenuPcs::CalcSingCMake()
             }
             result = (frame >= 10) ? 1 : 0;
         } else if (openMode == 1) {
-            resultFlag = 0;
-            CmakeJobCtrl();
-            result = static_cast<unsigned short>(resultFlag);
+            result = CmakeJobCtrl();
         } else if (frame < 10) {
             frame = frame + 1;
         } else {
@@ -2309,19 +2308,32 @@ void CMenuPcs::CmakeJobOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CmakeJobCtrl()
+unsigned short CMenuPcs::CmakeJobCtrl()
 {
     int state = MenuS32(this, 0x82C);
     int mcWork = MenuS32(this, 0x848);
     short& job = *reinterpret_cast<short*>(state + 0x26);
-    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short down;
+    unsigned short repeat;
     short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
-    short& resultFlag = *reinterpret_cast<short*>(state + 0x2E);
     short& mcState = *reinterpret_cast<short*>(mcWork + 10);
 
-    if (repeat == 0 && down == 0) {
-        return;
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        down = 0;
+    } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        down = static_cast<unsigned short>(Pad._8_2_);
+    }
+
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        repeat = 0;
+    } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        repeat = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x14);
+    }
+
+    if (repeat == 0) {
+        return 0;
     }
 
     if (mcState == 3) {
@@ -2341,31 +2353,50 @@ void CMenuPcs::CmakeJobCtrl()
         if ((repeat & 0xF) == 0) {
             if ((down & 0x100) != 0) {
                 int duplicateSlot = 8;
-                for (int slot = 0; slot < 8; slot++) {
-                    if (slot == static_cast<int>(MenuS16(this, 0x86A))) {
-                        continue;
-                    }
-
-                    unsigned char* entry = GetCmakeRosterEntry(this, slot);
-                    if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
-                        continue;
-                    }
-                    if (*(entry + 0x1F96) == 1) {
-                        continue;
-                    }
-                    if ((*reinterpret_cast<int*>(entry + 0x179C) & 0xFF) == static_cast<int>(job)) {
+                unsigned char* group = reinterpret_cast<unsigned char*>(&Game);
+                int slot = 0;
+                for (int groupCount = 2; groupCount != 0; groupCount--) {
+                    if ((slot != static_cast<int>(MenuS16(this, 0x86A))) &&
+                        (*reinterpret_cast<int*>(group + 0x1794) != 0) &&
+                        (*(group + 0x1F96) != 1) &&
+                        (*reinterpret_cast<int*>(group + 0x179C) == static_cast<int>(job))) {
                         duplicateSlot = slot;
                         break;
                     }
+
+                    if (((slot + 1) != static_cast<int>(MenuS16(this, 0x86A))) &&
+                        (*reinterpret_cast<int*>(group + 0x23C4) != 0) &&
+                        (*(group + 0x2BC6) != 1) &&
+                        (*reinterpret_cast<int*>(group + 0x23CC) == static_cast<int>(job))) {
+                        duplicateSlot = slot + 1;
+                        break;
+                    }
+
+                    if (((slot + 2) != static_cast<int>(MenuS16(this, 0x86A))) &&
+                        (*reinterpret_cast<int*>(group + 0x2FF4) != 0) &&
+                        (*(group + 0x37F6) != 1) &&
+                        (*reinterpret_cast<int*>(group + 0x2FFC) == static_cast<int>(job))) {
+                        duplicateSlot = slot + 2;
+                        break;
+                    }
+
+                    if (((slot + 3) != static_cast<int>(MenuS16(this, 0x86A))) &&
+                        (*reinterpret_cast<int*>(group + 0x3C24) != 0) &&
+                        (*(group + 0x4426) != 1) &&
+                        (*reinterpret_cast<int*>(group + 0x3C2C) == static_cast<int>(job))) {
+                        duplicateSlot = slot + 3;
+                        break;
+                    }
+
+                    group += 0x30C0;
+                    slot += 4;
                 }
 
                 if (duplicateSlot > 7) {
                     s_CmakeInfo.m_job = static_cast<signed char>(job);
-                    MenuS16(this, 0x864) = job;
-                    SetSingMakeChara();
                     resultDir = 1;
-                    resultFlag = 1;
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
+                    return 1;
                 } else {
                     short winX = 0;
                     short winY = 0;
@@ -2373,18 +2404,21 @@ void CMenuPcs::CmakeJobCtrl()
                     GetWinSize__8CMenuPcsFiPsPsi(this, 0x16, &winX, &winY, 0);
                     SetMcWinInfo__8CMenuPcsFii(this, (int)winX, (int)winY);
                     mcState = 0;
+                    return 0;
                 }
             } else if ((down & 0x200) != 0) {
-                resultDir = -1;
-                resultFlag = 1;
                 ChgModel__8CMenuPcsFiiii(this, static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
+                resultDir = -1;
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
+                return 1;
             }
         }
     } else if (mcState == 1 && (down & 0x300) != 0) {
         Sound.PlaySe(2, 0x40, 0x7F, 0);
         mcState = 2;
     }
+
+    return 0;
 }
 
 /*

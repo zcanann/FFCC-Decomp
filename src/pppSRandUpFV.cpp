@@ -17,6 +17,18 @@ struct PppSRandUpFVParam2 {
     u8 field18;
 };
 
+static float randf(unsigned char flag)
+{
+    float value = Math.RandF();
+    if (flag != 0) {
+        float random = Math.RandF();
+        float blend = value + random;
+        float scale = kPppSRandUpFVDualSampleScale;
+        value = blend * scale;
+    }
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800643a4

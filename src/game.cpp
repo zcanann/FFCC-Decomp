@@ -217,6 +217,17 @@ struct CFlatDataView
     CFlatDataTableEntryView m_tabl[8];
 };
 
+struct GameSoundLayout
+{
+    u8 m_pad[0x22BC];
+    int m_seMaxVolume;
+};
+
+static inline GameSoundLayout& GameSoundData(CSound& sound)
+{
+    return *reinterpret_cast<GameSoundLayout*>(&sound);
+}
+
 CGame Game;
 
 // Uninitialized
@@ -664,7 +675,7 @@ void CGame::clearWork()
     Sound.StopAndFreeAllSe(0);
     Wind.ClearAll();
 
-    *((u8*)&Sound + 0x8892) = 0x7F;
+    GameSoundData(Sound).m_seMaxVolume = 0x7F;
 
     CPtrArray<CMapLightHolder*>* mapLightHolderArr =
         reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<u8*>(&MapMng) + 0x21450);
@@ -727,7 +738,7 @@ void CGame::clearWorkMap()
     Sound.StopAndFreeAllSe(0);
     Wind.ClearAll();
 
-    *((u8*)&Sound + 0x8892) = 0x7F;
+    GameSoundData(Sound).m_seMaxVolume = 0x7F;
 }
 
 /*
@@ -925,7 +936,7 @@ void CGame::ScriptChanged(char*, int)
     Sound.StopAndFreeAllSe(0);
     Wind.ClearAll();
 
-    *((u8*)&Sound + 0x8892) = 0x7F;
+    GameSoundData(Sound).m_seMaxVolume = 0x7F;
 }
 
 /*

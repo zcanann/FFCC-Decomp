@@ -191,11 +191,11 @@ extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtrlTable* data)
 {
 	pppYmLaserWork* work;
-	Vec localA;
 	Vec localB;
-	CMapCylinderRaw cyl;
-	Mtx charaMtx;
+	Vec localA;
 	Mtx tempMtx;
+	Mtx charaMtx;
+	CMapCylinderRaw cyl;
 	int emptyHistory;
 
 	if ((gPppCalcDisabled == 0) && (step->m_stepValue != 0xFFFF)) {

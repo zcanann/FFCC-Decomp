@@ -16,40 +16,24 @@ const char s_CUSBPcs_8032f810[] = "CUSBPcs";
 unsigned int m_table_desc0__7CUSBPcs[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
 unsigned int m_table_desc1__7CUSBPcs[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
 unsigned int m_table_desc2__7CUSBPcs[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
-u32 m_table__7CUSBPcs[0x11C / sizeof(u32)] = {
-    reinterpret_cast<u32>(const_cast<char*>(s_CUSBPcs_8032f810)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x12
+CUSBPcsTable m_table__7CUSBPcs = {
+    const_cast<char*>(s_CUSBPcs_8032f810),
+    {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0x12,
+    },
 };
 static const char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
 static const char s_usbRootPath[16] = "plot/kmitsuru/";
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline CUSBPcs::CUSBPcs()
-{
-    unsigned int* table = reinterpret_cast<unsigned int*>(m_table__7CUSBPcs);
-    const unsigned int* desc0 = m_table_desc0__7CUSBPcs;
-    const unsigned int* desc1 = m_table_desc1__7CUSBPcs;
-    const unsigned int* desc2 = m_table_desc2__7CUSBPcs;
-
-    table[1] = desc0[0];
-    table[2] = desc0[1];
-    table[3] = desc0[2];
-    table[4] = desc1[0];
-    table[5] = desc1[1];
-    table[6] = desc1[2];
-    table[7] = desc2[0];
-    table[8] = desc2[1];
-    table[9] = desc2[2];
-}
-
-static inline unsigned int Align32(unsigned int x)
-{
-    return (x + 0x1F) & ~0x1F;
-}
 
 static inline unsigned int Swap32(unsigned int x)
 {
@@ -135,27 +119,17 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  * JP Size: TODO
  */
 void CUSBPcs::mccReadData()
-{ 
-	if (s_usbReadPollInitialized == '\0')
-	{
-		s_usbReadPollFrameCounter = 0;
-		s_usbReadPollInitialized = '\x01';
-	}
+{
+    if (s_usbReadPollInitialized == '\0') {
+        s_usbReadPollFrameCounter = 0;
+        s_usbReadPollInitialized = '\x01';
+    }
 
-	s_usbReadPollFrameCounter = s_usbReadPollFrameCounter + 1;
-
-	if (4 < s_usbReadPollFrameCounter)
-	{
-		s_usbReadPollFrameCounter = 0;
-		goto read_usb;
-	end:
-		return;
-	read_usb:
-		int connected = USB.IsConnected();
-		if (connected != 0) {
-			goto end;
-		}
-	}
+    s_usbReadPollFrameCounter++;
+    if (4 < s_usbReadPollFrameCounter) {
+        s_usbReadPollFrameCounter = 0;
+        USB.IsConnected();
+    }
 }
 
 /*
@@ -169,7 +143,7 @@ void CUSBPcs::mccReadData()
  */
 void CUSBPcs::messageCallback(unsigned long, void*, MCCChannel)
 {
-	// TODO
+    return;
 }
 
 /*
@@ -244,7 +218,7 @@ void CUSBPcs::IsBigAlloc(int param_2)
  */
 int CUSBPcs::GetTable(unsigned long param)
 {
-    return (int)((char*)m_table__7CUSBPcs + (param * 0x15c));
+    return reinterpret_cast<int>(reinterpret_cast<char*>(&m_table__7CUSBPcs) + (param * 0x15c));
 }
 
 /*

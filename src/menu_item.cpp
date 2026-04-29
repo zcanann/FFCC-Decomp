@@ -470,11 +470,11 @@ bool CMenuPcs::ItemClose()
     int frame = this->itemMenuState->frame;
 
     for (int i = 0; i < count; i++, anim++) {
-        float zero = FLOAT_80332e60;
         if (anim->startFrame <= frame) {
             if (!(frame < anim->startFrame + anim->duration)) {
+                float zero = FLOAT_80332e60;
                 finished++;
-                anim->progress = FLOAT_80332e60;
+                anim->progress = zero;
                 anim->dx = zero;
                 anim->dy = zero;
             } else {
@@ -491,7 +491,10 @@ bool CMenuPcs::ItemClose()
         }
     }
 
-    return count == finished;
+    if (count != finished) {
+        return false;
+    }
+    return true;
 }
 
 /*
@@ -694,7 +697,7 @@ void CMenuPcs::ItemDraw()
             cursorY += (float)(itemState->optionIndex * SingWinMessHeight__8CMenuPcsFv(this));
         }
 
-        int cursorAnim = (int)System.m_frameCounter & 7;
+        int cursorAnim = (int)System.m_frameCounter % 8;
         DrawCursor__8CMenuPcsFiif(this, (int)(cursorX + (float)cursorAnim), (int)cursorY, FLOAT_80332e64);
     }
 

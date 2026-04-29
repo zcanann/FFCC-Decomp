@@ -826,7 +826,7 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
                      *reinterpret_cast<unsigned int*>(texture + 0x64) & 0xFFFF, *reinterpret_cast<unsigned int*>(texture + 0x68) & 0xFFFF,
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
                      static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
-                     (1 - static_cast<int>(texture[0x74])) >> 31);
+                     (static_cast<unsigned int>(1 - texture[0x74])) >> 31);
     }
 
     if (1 < texture[0x74]) {
@@ -872,7 +872,7 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
             } else {
                 GXInitTexObj(&m_texObj, m_imageData, m_width & 0xFFFF, m_height & 0xFFFF,
                              static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                             static_cast<GXTexWrapMode>(m_wrapMode), (1 - static_cast<int>(m_maxLod)) >> 31);
+                             static_cast<GXTexWrapMode>(m_wrapMode), (static_cast<unsigned int>(1 - m_maxLod)) >> 31);
             }
 
             if (1 < m_maxLod) {

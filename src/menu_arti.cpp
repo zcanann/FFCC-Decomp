@@ -447,14 +447,9 @@ void CMenuPcs::ArtiInit1()
  */
 unsigned int CMenuPcs::ArtiOpen()
 {
-	float ratio;
-	double dVar2;
-	double dVar3;
-	short* entry;
 	int finished;
-	unsigned int count;
+	int count;
 	int frame;
-	unsigned int remaining;
 
 	if (*(char*)(GetArtiStateBase(this) + 0xb) == '\0') {
 		ArtiInit();
@@ -462,37 +457,34 @@ unsigned int CMenuPcs::ArtiOpen()
 
 	finished = 0;
 	*(short*)(GetArtiStateBase(this) + 0x22) = *(short*)(GetArtiStateBase(this) + 0x22) + 1;
-	count = (unsigned int)*GetArtiList(this);
-	entry = GetArtiList(this) + 4;
+	count = *GetArtiList(this);
+	ArtiOpenAnim* entry = (ArtiOpenAnim*)((u8*)GetArtiList(this) + 8);
 	frame = (int)*(short*)(GetArtiStateBase(this) + 0x22);
-	remaining = count;
-	if (0 < (int)count) {
-		do {
-			ratio = FLOAT_80332fa8;
-			if (*(int*)(entry + 0x12) <= frame) {
-				if (frame < *(int*)(entry + 0x12) + *(int*)(entry + 0x14)) {
-					*(int*)(entry + 0x10) = *(int*)(entry + 0x10) + 1;
-					dVar2 = DOUBLE_80332fb0;
-					*(float*)(entry + 8) =
-					    (float)((DOUBLE_80332fb0 / (double)*(int*)(entry + 0x14)) * (double)*(int*)(entry + 0x10));
-					if ((*(unsigned int*)(entry + 0x16) & 2) == 0) {
-						ratio = (float)((dVar2 / (double)*(int*)(entry + 0x14)) * (double)*(int*)(entry + 0x10));
-						*(float*)(entry + 0x18) = (*(float*)(entry + 0x1c) - (float)*entry) * ratio;
-						*(float*)(entry + 0x1a) = (*(float*)(entry + 0x1e) - (float)entry[1]) * ratio;
-					}
-				} else {
-					finished = finished + 1;
-					*(float*)(entry + 8) = FLOAT_80332fac;
-					*(float*)(entry + 0x18) = ratio;
-					*(float*)(entry + 0x1a) = ratio;
+
+	for (int i = 0; i < count; i++, entry++) {
+		float zero = FLOAT_80332fa8;
+		if (frame >= entry->startFrame) {
+			if (entry->startFrame + entry->duration <= frame) {
+				finished++;
+				entry->alpha = FLOAT_80332fac;
+				entry->dx = zero;
+				entry->dy = zero;
+			} else {
+				entry->step++;
+				double one = DOUBLE_80332fb0;
+				entry->alpha = (float)((DOUBLE_80332fb0 / (double)entry->duration) * (double)entry->step);
+				if ((entry->flags & 2) == 0) {
+					float ratio = (float)((one / (double)entry->duration) * (double)entry->step);
+					float dx = entry->targetX - (float)entry->x;
+					float dy = entry->targetY - (float)entry->y;
+					entry->dx = dx * ratio;
+					entry->dy = dy * ratio;
 				}
 			}
-			entry = entry + 0x20;
-			remaining = remaining - 1;
-		} while (remaining != 0);
+		}
 	}
 
-	return (unsigned int)(count == finished);
+	return count == finished;
 }
 
 /*
@@ -538,8 +530,8 @@ bool CMenuPcs::ArtiClose()
 
 	for (int i = 0; i < count; i++, anim++) {
 		float zeroF = FLOAT_80332fa8;
-		if (anim->startFrame <= frame) {
-			if (!(frame < anim->startFrame + anim->duration)) {
+		if (frame >= anim->startFrame) {
+			if (anim->startFrame + anim->duration <= frame) {
 				finished++;
 				anim->alpha = FLOAT_80332fa8;
 				anim->dx = zeroF;
@@ -550,8 +542,10 @@ bool CMenuPcs::ArtiClose()
 				anim->alpha = (float)-((DOUBLE_80332fb0 / (double)anim->duration) * (double)anim->step - DOUBLE_80332fb0);
 				if ((anim->flags & 2) == 0) {
 					float ratio = (float)-((oneD / (double)anim->duration) * (double)anim->step - oneD);
-					anim->dx = (anim->targetX - (float)anim->x) * ratio;
-					anim->dy = (anim->targetY - (float)anim->y) * ratio;
+					float dx = anim->targetX - (float)anim->x;
+					float dy = anim->targetY - (float)anim->y;
+					anim->dx = dx * ratio;
+					anim->dy = dy * ratio;
 				}
 			}
 		}

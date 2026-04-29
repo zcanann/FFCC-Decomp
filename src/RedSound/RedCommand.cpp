@@ -182,7 +182,7 @@ int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 		do {
 			track = scan;
 			remaining--;
-			if ((remaining != 0) && (*track == 0) && ((((unsigned char*)track)[0x26] & 2) == 0)) {
+			if ((remaining != 0) && ((u32)*track == 0) && ((((unsigned char*)track)[0x26] & 2) == 0)) {
 				scan = track - 0x55;
 			} else {
 				if (((u32)*track != 0) || ((((unsigned char*)track)[0x26] & 2) != 0)) {

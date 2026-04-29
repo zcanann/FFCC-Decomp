@@ -305,15 +305,15 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, pppYmDeformationMdlUnkC*)
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
 {
-    float value = FLOAT_80330dac;
-    float* state = (float*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+    const float& value = FLOAT_80330dac;
+    YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-    state[3] = FLOAT_80330dac;
-    state[2] = value;
-    state[1] = value;
-    state[6] = value;
-    state[5] = value;
-    state[4] = value;
+    state->m_values[1] = value;
+    state->m_values[0] = value;
+    state->m_scale = value;
+    state->m_values[4] = value;
+    state->m_values[3] = value;
+    state->m_values[2] = value;
 }
 
 /*
@@ -327,18 +327,17 @@ void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pp
  */
 void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, struct pppYmDeformationMdlUnkC* param_2)
 {
-    u8 direction = 1;
-    u16* puVar2 = (u16*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-    float fVar1 = FLOAT_80330dac;
+    const float& zero = FLOAT_80330dac;
+    YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-    *puVar2 = 0;
-    *(u8*)(puVar2 + 1) = direction;
-    *(float*)(puVar2 + 6) = fVar1;
-    *(float*)(puVar2 + 4) = fVar1;
-    *(float*)(puVar2 + 2) = fVar1;
-    *(float*)(puVar2 + 0xc) = fVar1;
-    *(float*)(puVar2 + 10) = fVar1;
-    *(float*)(puVar2 + 8) = fVar1;
+    state->m_angle = 0;
+    state->m_direction = 1;
+    state->m_values[1] = zero;
+    state->m_values[0] = zero;
+    state->m_scale = zero;
+    state->m_values[4] = zero;
+    state->m_values[3] = zero;
+    state->m_values[2] = zero;
 }
 
 extern const double DOUBLE_80330DB0 = 4503601774854144.0;

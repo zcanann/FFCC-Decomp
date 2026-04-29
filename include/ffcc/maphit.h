@@ -65,10 +65,16 @@ public:
     CMapHitFace* m_faces;         // 0x20
 };
 
-extern CMapHitFace* gMapHitFace;
 extern unsigned char gMapHitDrawMode;
-extern unsigned char gMapHitFaceFlag;
 extern int g_hit_edge_idx_min;
+extern float g_hit_t;
 extern float g_hit_t_min;
+extern float g_hit_t_slide_min;
+extern unsigned char g_hit_f;
+extern CMapHitFace* g_hit_lpface;
+extern CMapHitFace* g_hit_lpface_min;
+
+#define gMapHitFace g_hit_lpface_min
+#define gMapHitFaceFlag g_hit_f
 
 #endif // _FFCC_MAPHIT_H_

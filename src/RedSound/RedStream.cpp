@@ -549,8 +549,9 @@ void StreamControl()
 {
 	unsigned int streamData = (unsigned int)p_Stream;
 	do {
+		int voiceData;
 		if (*(int*)(streamData + 0x110) == 1) {
-			int voiceData = *(int*)(streamData + 4);
+			voiceData = *(int*)(streamData + 4);
 			if (*(void**)(voiceData + 0x14) != 0) {
 				if (*(int*)(*(int*)(voiceData + 0x14) + 0xc) == 0) {
 					_StreamStop((RedStreamDATA*)streamData);
@@ -616,7 +617,7 @@ void StreamControl()
 				}
 			}
 		} else if ((*(int*)(streamData + 0x110) == 3) && (RedDmaSearchID(*(int*)(streamData + 0x114)) == 0)) {
-			int voiceData = *(int*)(streamData + 4);
+			voiceData = *(int*)(streamData + 4);
 			*(int*)(streamData + 0x110) = 1;
 			*(unsigned int*)(voiceData + 0x90) |= 0x19;
 			*(unsigned int*)(voiceData + 4) = streamData + 0x30;

@@ -15,6 +15,11 @@ extern const char s_JoyBus__LoadBin___error_801d9de0[];
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
 const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error\n";
 
+unsigned int gGbaStatusWordTriplet0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CGbaPcsFv)};
+unsigned int gGbaStatusWordTriplet1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CGbaPcsFv)};
+unsigned int gGbaStatusWordTriplet2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CGbaPcsFv)};
+unsigned int gGbaStatusWordTriplet3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CGbaPcsFv)};
+
 CGbaPcsTable CGbaPcs::m_table = {
     const_cast<char*>(s_CGbaPcs_80330870),
     {

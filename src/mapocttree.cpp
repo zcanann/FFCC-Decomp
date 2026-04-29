@@ -33,6 +33,11 @@ struct CBoundRaw
         bound[3] = max;
     }
 
+	void operator=(const CBound& other)
+	{
+		*this = *reinterpret_cast<const CBoundRaw*>(&other);
+	}
+
     Vec m_min;
     Vec m_max;
 };
@@ -180,7 +185,7 @@ COctTree::~COctTree()
  * JP Address: TODO
  * JP Size: TODO
  */
-void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
+int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 {
     CChunkFile::CChunk chunk;
 
@@ -250,35 +255,31 @@ void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
                         }
 
                         case 'BOND':
-                            if (node != 0) {
-                                node->m_boundMinX = chunkFile.GetF4();
-                                node->m_boundMinY = chunkFile.GetF4();
-                                node->m_boundMinZ = chunkFile.GetF4();
-                                node->m_boundMaxX = chunkFile.GetF4();
-                                node->m_boundMaxY = chunkFile.GetF4();
-                                node->m_boundMaxZ = chunkFile.GetF4();
-                            }
+                            node->m_boundMinX = chunkFile.GetF4();
+                            node->m_boundMinY = chunkFile.GetF4();
+                            node->m_boundMinZ = chunkFile.GetF4();
+                            node->m_boundMaxX = chunkFile.GetF4();
+                            node->m_boundMaxY = chunkFile.GetF4();
+                            node->m_boundMaxZ = chunkFile.GetF4();
                             break;
 
                         case 'CHLD':
-                            if (node != 0) {
-                                int childCount = 0;
-                                COctNode** childNode = node->m_children;
+                            int childCount = 0;
+                            COctNode** childNode = node->m_children;
 
-                                for (int i = 0; i < 8; i++) {
-                                    unsigned short childIndex = chunkFile.Get2();
+                            for (int i = 0; i < 8; i++) {
+                                unsigned short childIndex = chunkFile.Get2();
 
-                                    if (childIndex != 0xFFFF) {
-                                        *childNode = m_nodePool + childIndex;
-                                        childNode++;
-                                        childCount++;
-                                    }
-                                }
-
-                                for (int i = childCount; i < 8; i++) {
-                                    *childNode = 0;
+                                if (childIndex != 0xFFFF) {
+                                    *childNode = m_nodePool + childIndex;
                                     childNode++;
+                                    childCount++;
                                 }
+                            }
+
+                            for (int i = childCount; i < 8; i++) {
+                                *childNode = 0;
+                                childNode++;
                             }
                             break;
                         }
@@ -292,6 +293,7 @@ void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
     }
 
     chunkFile.PopChunk();
+    return 1;
 }
 
 /*
@@ -420,10 +422,7 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 		} while (iVar5 < 8);
 		iVar2 = iVar2 + 1;
 		octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
-		if (7 < iVar2) {
-			return;
-		}
-	} while (true);
+	} while (iVar2 < 8);
 }
 
 /*
@@ -556,10 +555,7 @@ void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode* octNode)
 		} while (iVar2 < 8);
 		iVar1 = iVar1 + 1;
 		octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
-		if (7 < iVar1) {
-			return;
-		}
-	} while (true);
+	} while (iVar1 < 8);
 }
 
 /*
@@ -863,29 +859,22 @@ void COctTree::Draw(unsigned char drawType)
  */
 void COctTree::DrawCharaShadow(unsigned char drawType)
 {
-	unsigned char* thisBytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* mapObj;
+	void* mapObj;
 
-	if (*thisBytes != 0) {
-		return;
-	}
+	if ((m_type == 0) && (mapObj = m_mapObject, *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) == drawType)) {
+		LightPcs.SetBumpTexMatirx(reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)), 0, reinterpret_cast<Vec*>(Ptr(mapObj, 0x58)),
+		                          *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x1A)));
 
-	mapObj = *reinterpret_cast<unsigned char**>(thisBytes + 8);
-	if (mapObj[0x15] != drawType) {
-		return;
-	}
+		if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40))) {
+			CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(Ptr(m_mapObject, 0x40)));
+		}
 
-	LightPcs.SetBumpTexMatirx(reinterpret_cast<float(*)[4]>(mapObj + 0xB8), 0, reinterpret_cast<Vec*>(mapObj + 0x58), mapObj[0x1A]);
+		reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))->SetRenderArray();
+		DrawCharaShadowTypeMeshFlag_r(m_nodePool);
 
-	if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(mapObj + 0x40)) {
-		CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
-	}
-
-	reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(mapObj + 0xC))->SetRenderArray();
-	DrawCharaShadowTypeMeshFlag_r(*reinterpret_cast<COctNode**>(thisBytes + 4));
-
-	if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(mapObj + 0x40)) {
-		CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
+		if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40))) {
+			CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(Ptr(m_mapObject, 0x40)));
+		}
 	}
 }
 
@@ -1013,10 +1002,7 @@ void ClearLight_r(COctNode* octNode)
 		} while (iVar2 < 8);
 		iVar1 = iVar1 + 1;
 		octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
-		if (7 < iVar1) {
-			return;
-		}
-	} while (true);
+	} while (iVar1 < 8);
 }
 
 /*
@@ -1231,20 +1217,92 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
  */
 void ClearShadow_r(COctNode* node)
 {
-	unsigned char* nodeBytes = (unsigned char*)node;
+	int iVar1;
+	int iVar2;
+	COctNode* pCVar3;
+	COctNode* pCVar4;
+	COctNode* pCVar5;
+	COctNode* pCVar6;
+	COctNode* pCVar7;
+	COctNode* pCVar8;
+	int iVar9;
+	int iVar10;
+	int iVar11;
+	int iVar12;
+	int iVar13;
 
-	if (*(unsigned short*)(nodeBytes + 0x3c) != 0) {
-		*(void**)(nodeBytes + 0x48) = 0;
+	if (*reinterpret_cast<unsigned short*>(Ptr(node, 0x3C)) != 0) {
+		*reinterpret_cast<unsigned long*>(Ptr(node, 0x48)) = 0;
 	}
-
-	COctNode** children = (COctNode**)(nodeBytes + 0x1c);
-	for (int i = 0; i < 8; i++) {
-		COctNode* child = children[i];
-		if (child == 0) {
+	iVar1 = 0;
+	do {
+		pCVar8 = *reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
+		if (pCVar8 == 0) {
 			return;
 		}
-		ClearShadow_r(child);
-	}
+		if (*reinterpret_cast<unsigned short*>(Ptr(pCVar8, 0x3C)) != 0) {
+			*reinterpret_cast<unsigned long*>(Ptr(pCVar8, 0x48)) = 0;
+		}
+		iVar2 = 0;
+		do {
+			pCVar7 = *reinterpret_cast<COctNode**>(Ptr(pCVar8, 0x1C));
+			if (pCVar7 == 0) break;
+			if (*reinterpret_cast<unsigned short*>(Ptr(pCVar7, 0x3C)) != 0) {
+				*reinterpret_cast<unsigned long*>(Ptr(pCVar7, 0x48)) = 0;
+			}
+			iVar13 = 0;
+			do {
+				pCVar6 = *reinterpret_cast<COctNode**>(Ptr(pCVar7, 0x1C));
+				if (pCVar6 == 0) break;
+				if (*reinterpret_cast<unsigned short*>(Ptr(pCVar6, 0x3C)) != 0) {
+					*reinterpret_cast<unsigned long*>(Ptr(pCVar6, 0x48)) = 0;
+				}
+				iVar12 = 0;
+				do {
+					pCVar5 = *reinterpret_cast<COctNode**>(Ptr(pCVar6, 0x1C));
+					if (pCVar5 == 0) break;
+					if (*reinterpret_cast<unsigned short*>(Ptr(pCVar5, 0x3C)) != 0) {
+						*reinterpret_cast<unsigned long*>(Ptr(pCVar5, 0x48)) = 0;
+					}
+					iVar11 = 0;
+					do {
+						pCVar4 = *reinterpret_cast<COctNode**>(Ptr(pCVar5, 0x1C));
+						if (pCVar4 == 0) break;
+						if (*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3C)) != 0) {
+							*reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x48)) = 0;
+						}
+						iVar10 = 0;
+						do {
+							pCVar3 = *reinterpret_cast<COctNode**>(Ptr(pCVar4, 0x1C));
+							if (pCVar3 == 0) break;
+							if (*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3C)) != 0) {
+								*reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x48)) = 0;
+							}
+							iVar9 = 0;
+							do {
+								if (*reinterpret_cast<COctNode**>(Ptr(pCVar3, 0x1C)) == 0) break;
+								ClearShadow_r(*reinterpret_cast<COctNode**>(Ptr(pCVar3, 0x1C)));
+								iVar9 = iVar9 + 1;
+								pCVar3 = reinterpret_cast<COctNode*>(Ptr(pCVar3, 4));
+							} while (iVar9 < 8);
+							iVar10 = iVar10 + 1;
+							pCVar4 = reinterpret_cast<COctNode*>(Ptr(pCVar4, 4));
+						} while (iVar10 < 8);
+						iVar11 = iVar11 + 1;
+						pCVar5 = reinterpret_cast<COctNode*>(Ptr(pCVar5, 4));
+					} while (iVar11 < 8);
+					iVar12 = iVar12 + 1;
+					pCVar6 = reinterpret_cast<COctNode*>(Ptr(pCVar6, 4));
+				} while (iVar12 < 8);
+				iVar13 = iVar13 + 1;
+				pCVar7 = reinterpret_cast<COctNode*>(Ptr(pCVar7, 4));
+			} while (iVar13 < 8);
+			iVar2 = iVar2 + 1;
+			pCVar8 = reinterpret_cast<COctNode*>(Ptr(pCVar8, 4));
+		} while (iVar2 < 8);
+		iVar1 = iVar1 + 1;
+		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
+	} while (iVar1 < 8);
 }
 
 /*
@@ -1442,12 +1500,8 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 		PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
 		PSMTXMultVec(inverseMtx, &position, &localPosition);
 
-		s_bound.m_min.x = bound.m_min.x;
-		s_bound.m_min.y = bound.m_min.y;
-		s_bound.m_min.z = bound.m_min.z;
-		s_bound.m_max.x = bound.m_max.x;
-		s_bound.m_max.y = bound.m_max.y;
-		s_bound.m_max.z = bound.m_max.z;
+		s_bound.m_min = bound.m_min;
+		s_bound.m_max = bound.m_max;
 
 		PSVECAdd(&s_bound.m_min, &localPosition, &s_bound.m_min);
 		PSVECAdd(&s_bound.m_max, &localPosition, &s_bound.m_max);

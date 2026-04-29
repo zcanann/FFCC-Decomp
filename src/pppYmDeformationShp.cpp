@@ -103,9 +103,9 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 	VYmDeformationShp* work =
 		(VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
+	Vec2d uvs[4];
 	float indMtx[2][3];
 	Mtx rotMtx;
-	Vec2d uvs[4];
 	Vec vertices[4];
 	Mtx drawMtx;
 
@@ -116,7 +116,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
 			env->m_mapMeshPtr[param_2->m_dataValIndex], env->m_materialSetPtr, textureIndex);
 
-		PSMTXIdentity(drawMtx);
+		PSMTXIdentity(rotMtx);
 		pppSetBlendMode(1);
 		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 		pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -139,12 +139,12 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			work->m_angle = 1;
 		}
 
-		PSMTXRotRad(rotMtx, 'z', FLOAT_803305f0 * (float)work->m_angle);
-		indMtx[0][0] = rotMtx[0][0] * work->m_scale;
-		indMtx[0][1] = rotMtx[0][1] * work->m_scale;
-		indMtx[1][0] = rotMtx[1][0] * work->m_scale;
-		indMtx[1][1] = rotMtx[1][1] * work->m_scale;
+		PSMTXRotRad(drawMtx, 'z', FLOAT_803305f0 * (float)work->m_angle);
+		indMtx[0][0] = drawMtx[0][0] * work->m_scale;
+		indMtx[0][1] = drawMtx[0][1] * work->m_scale;
 		indMtx[0][2] = kPppYmDeformationShpZero;
+		indMtx[1][0] = drawMtx[1][0] * work->m_scale;
+		indMtx[1][1] = drawMtx[1][1] * work->m_scale;
 		indMtx[1][2] = kPppYmDeformationShpZero;
 		GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 

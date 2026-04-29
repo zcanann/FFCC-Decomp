@@ -61,7 +61,7 @@ class COctTree
 public:
 	COctTree();
 	~COctTree();
-	void ReadOtmOctTree(CChunkFile&);
+	int ReadOtmOctTree(CChunkFile&);
 	void DrawTypeMeshFlag_r(COctNode*);
 	void DrawCharaShadowTypeMeshFlag_r(COctNode*);
 	void DrawTypeMeshFrustumIn_r(COctNode*);

@@ -537,6 +537,11 @@ void CCaravanWork::CLetterWork::operator= (const CCaravanWork::CLetterWork&)
  */
 void CCaravanWork::FGLetterOpen(int letterIdx)
 {
+	struct LetterFlags {
+		unsigned char opened : 1;
+		unsigned char rest : 7;
+	};
+
 	CCaravanWork* self = this;
 	unsigned int stack[2];
 	int letterOffset = letterIdx * 0xC;
@@ -571,9 +576,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 
 	CMes::m_tempVar[8] = *reinterpret_cast<int*>(&self->m_saveSlot);
 
-	int isOpened = 1;
-	self->m_letter0[letterOffset] =
-		(unsigned char)((self->m_letter0[letterOffset] & 0x7F) | ((isOpened << 7) & 0x80));
+	reinterpret_cast<LetterFlags*>(&self->m_letter0[letterOffset])->opened = 1;
 }
 
 /*
@@ -587,6 +590,12 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
  */
 void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int param5)
 {
+	struct LetterFlags {
+		unsigned char high : 2;
+		unsigned char replied : 1;
+		unsigned char low : 5;
+	};
+
 	int stack[5];
 	unsigned char* letter = m_letter0 + (letterIdx * 0xC);
 	unsigned short* words16 = reinterpret_cast<unsigned short*>(letter);
@@ -601,8 +610,7 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 		CFlat, Game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
 
-	int replied = 1;
-	letter[0] = (unsigned char)((letter[0] & 0xDF) | ((replied << 5) & 0x20));
+	reinterpret_cast<LetterFlags*>(letter)->replied = 1;
 }
 
 /*
@@ -660,15 +668,11 @@ void CCaravanWork::FGPutGil(int gilToRemove)
 {
 	int put = putGil__10CGPartyObjFi((CGPartyObj*)m_ownerObj, gilToRemove);
 	if (put != 0) {
-		int gil = m_gil;
-		gil += -gilToRemove;
-		m_gil = gil;
-		if (gil <= 99999999) {
-			if (gil < 0) {
-				m_gil = 0;
-			}
-		} else {
+		m_gil += -gilToRemove;
+		if (99999999 < m_gil) {
 			m_gil -= m_gil - 99999999;
+		} else if (m_gil < 0) {
+			m_gil = 0;
 		}
 	}
 }
@@ -875,43 +879,55 @@ void CCaravanWork::CanAddTmpArtifact(int)
  */
 int CCaravanWork::FindItem(int itemId)
 {
-	int baseIdx = 0;
-	int rowCount = 8;
 	CCaravanWork* cur = this;
+	int itemIdx = 0;
 
-	while (true) {
-		if ((short)cur->m_inventoryItems[0] != -1 && (short)cur->m_inventoryItems[0] == itemId) {
-			return baseIdx;
+	for (int row = 0; row < 8; row++) {
+		short item = cur->m_inventoryItems[0];
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[1] != -1 && (short)cur->m_inventoryItems[1] == itemId) {
-			return baseIdx + 1;
+		item = cur->m_inventoryItems[1];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[2] != -1 && (short)cur->m_inventoryItems[2] == itemId) {
-			return baseIdx + 2;
+		item = cur->m_inventoryItems[2];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[3] != -1 && (short)cur->m_inventoryItems[3] == itemId) {
-			return baseIdx + 3;
+		item = cur->m_inventoryItems[3];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[4] != -1 && (short)cur->m_inventoryItems[4] == itemId) {
-			return baseIdx + 4;
+		item = cur->m_inventoryItems[4];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[5] != -1 && (short)cur->m_inventoryItems[5] == itemId) {
-			return baseIdx + 5;
+		item = cur->m_inventoryItems[5];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[6] != -1 && (short)cur->m_inventoryItems[6] == itemId) {
-			return baseIdx + 6;
+		item = cur->m_inventoryItems[6];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
-		if ((short)cur->m_inventoryItems[7] != -1 && (short)cur->m_inventoryItems[7] == itemId) {
-			return baseIdx + 7;
+		item = cur->m_inventoryItems[7];
+		itemIdx++;
+		if (item != -1 && item == itemId) {
+			return itemIdx;
 		}
 
 		cur = (CCaravanWork*)&cur->m_baseDataIndex;
-		baseIdx += 8;
-		rowCount--;
-		if (rowCount == 0) {
-			return -1;
-		}
+		itemIdx++;
 	}
+
+	return -1;
 }
 
 /*

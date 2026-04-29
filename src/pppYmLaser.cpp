@@ -23,7 +23,6 @@ extern f32 FLOAT_80330de4;
 extern f32 FLOAT_80330de8;
 extern f32 FLOAT_80330dec;
 extern "C" const f64 DOUBLE_80330DD0;
-extern f64 DOUBLE_80330dd8;
 
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
@@ -245,16 +244,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 				continue;
 			}
 
-			pppYmLaserDoubleBits countDouble;
-			pppYmLaserDoubleBits indexDouble;
-
-			countDouble.u[0] = 0x43300000;
-			countDouble.u[1] = (u32)(step->m_payload[0x3a] + 1) ^ 0x80000000;
-			indexDouble.u[0] = 0x43300000;
-			indexDouble.u[1] = (u32)i ^ 0x80000000;
-
-			float t = (FLOAT_80330de0 / (countDouble.d - DOUBLE_80330dd8)) *
-				(indexDouble.d - DOUBLE_80330dd8);
+			float t = (FLOAT_80330de0 / (float)(s32)(step->m_payload[0x3a] + 1)) * (float)i;
 			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(pppMngStPtr, t, charaMtx) == 0) {
 				emptyHistory = 1;
 				continue;
@@ -290,7 +280,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 			localB.x = kPppYmLaserOne;
 			localB.y = kPppYmLaserOne;
 			localB.z = work->m_length;
-			PSMTXMultVec(tempMtx, &localB, work->m_points);
+			PSMTXMultVec(tempMtx, &localB, &work->m_points[i]);
 		}
 
 		if (step->m_payload[0x3b] == 0) {
@@ -412,7 +402,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	halfWidth = work->m_halfWidth;
 
 	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&modelView, &pppMngStPtr->m_matrix, &laser->m_localMatrix);
-	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, (pppFMATRIX*)&ppvCameraMatrix0, &modelView);
+	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, (pppFMATRIX*)&ppvCameraMatrix02, &modelView);
 	GXLoadPosMtxImm(mtxOut.value, 0);
 
 	GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);

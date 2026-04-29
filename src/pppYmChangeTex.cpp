@@ -87,6 +87,7 @@ extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
 extern float DAT_80330e10;
 static const char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.cpp";
+extern const double DOUBLE_80330dd8 = 4503601774854144.0;
 extern float FLOAT_80330df8;
 extern float FLOAT_80330dfc;
 extern float FLOAT_80330e00;

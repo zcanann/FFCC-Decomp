@@ -104,6 +104,7 @@ private:
     int m_growCapacity;
 };
 
+#pragma dont_inline on
 template <>
 CPtrArray<CMaterial*>::CPtrArray()
 {
@@ -114,6 +115,7 @@ CPtrArray<CMaterial*>::CPtrArray()
     m_stage = 0;
     m_growCapacity = 1;
 }
+#pragma dont_inline reset
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -227,7 +229,7 @@ static CMaterial* AllocMaterial()
 
 static void AddTextureIndex(CMaterial* material, unsigned short textureIndex)
 {
-    unsigned short numTexture = *reinterpret_cast<unsigned short*>(Ptr(material, 0x18));
+    const unsigned short numTexture = *reinterpret_cast<unsigned short*>(Ptr(material, 0x18));
     *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) = static_cast<unsigned short>(numTexture + 1);
     *reinterpret_cast<unsigned short*>(Ptr(material, 0x1A + (numTexture << 1))) = textureIndex;
 }
@@ -255,6 +257,7 @@ static void SetMaterialColor(CMaterial* material, unsigned int rgba)
 }
 }
 
+#pragma dont_inline on
 template <>
 CPtrArray<CMaterial*>::~CPtrArray()
 {
@@ -363,17 +366,20 @@ int CPtrArray<CMaterial*>::GetSize()
     return m_numItems;
 }
 
+#pragma dont_inline on
 template <>
 CMaterial* CPtrArray<CMaterial*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
+#pragma dont_inline reset
 
 template <>
 CMaterial* CPtrArray<CMaterial*>::GetAt(unsigned long index)
 {
     return m_items[index];
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -2947,12 +2953,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
     CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
     u32 textureIndex = 0;
 
-    do {
-        u32 textureCount = static_cast<u32>(textureArray->GetSize());
-        if (textureCount <= textureIndex) {
-            return;
-        }
-
+    while (textureIndex < static_cast<u32>(textureArray->GetSize())) {
         if ((*textureArray)[textureIndex] != 0) {
             u32 materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
             u32 materialIndex = textureIndex + 1;
@@ -2995,15 +2996,15 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             *reinterpret_cast<int*>(material + 0x9C) = pdtSlotIndex;
 
             materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
-            if (materialIndex < materialCount) {
-                materialArray->SetAt(materialIndex, reinterpret_cast<CMaterial*>(material));
-            } else {
+            if (materialIndex >= materialCount) {
                 materialArray->Add(reinterpret_cast<CMaterial*>(material));
+            } else {
+                materialArray->SetAt(materialIndex, reinterpret_cast<CMaterial*>(material));
             }
         }
 next:
         textureIndex = textureIndex + 1;
-    } while (true);
+    }
 }
 
 /*
@@ -3195,19 +3196,19 @@ CMaterialSet::CMaterialSet()
  */
 void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
-    int material = reinterpret_cast<int>(
-        (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[static_cast<unsigned long>(materialIndex)]);
+    CMaterial* material =
+        (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[static_cast<unsigned long>(materialIndex)];
     if (material == 0) {
         return;
     }
 
-    int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(reinterpret_cast<void*>(material), 0x18)));
+    const unsigned short numTexture = *reinterpret_cast<unsigned short*>(Ptr(material, 0x18));
     for (int i = 0; i < numTexture; i++) {
-        CTexture* texture = *reinterpret_cast<CTexture**>(Ptr(reinterpret_cast<void*>(material), 0x3C));
+        CTexture* texture = *reinterpret_cast<CTexture**>(Ptr(material, 0x3C));
         if (texture != 0) {
             texture->CacheUnLoadTexture(amemCacheSet);
         }
-        material += 4;
+        material = reinterpret_cast<CMaterial*>(Ptr(material, 4));
     }
 }
 
@@ -3222,19 +3223,19 @@ void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheS
  */
 void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
-    int material = reinterpret_cast<int>(
-        (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[static_cast<unsigned long>(materialIndex)]);
+    CMaterial* material =
+        (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[static_cast<unsigned long>(materialIndex)];
     if (material == 0) {
         return;
     }
 
-    int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(reinterpret_cast<void*>(material), 0x18)));
+    const unsigned short numTexture = *reinterpret_cast<unsigned short*>(Ptr(material, 0x18));
     for (int i = 0; i < numTexture; i++) {
-        CTexture* texture = *reinterpret_cast<CTexture**>(Ptr(reinterpret_cast<void*>(material), 0x3C));
+        CTexture* texture = *reinterpret_cast<CTexture**>(Ptr(material, 0x3C));
         if (texture != 0) {
             texture->CacheLoadTexture(amemCacheSet);
         }
-        material += 4;
+        material = reinterpret_cast<CMaterial*>(Ptr(material, 4));
     }
 }
 

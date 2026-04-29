@@ -58,7 +58,7 @@ const char s_CCameraPcs_MAP_801D7888[] = "CCameraPcs(MAP)";
 const char s_CCameraPcs_MATERIALEDITOR_801D7898[] = "CCameraPcs(MATERIALEDITOR)";
 const char s_CCameraPcs_FUNNYSHAPE_801D78B4[] = "CCameraPcs(FUNNYSHAPE)";
 const char s_CCameraPcs_PART_801D78CC[] = "CCameraPcs(PART)";
-const char s_CCameraPcs_SHADOW_801D78E0[20] = "CCameraPcs(SHADOW)";
+const char s_CCameraPcs_SHADOW_801D78E0[] = "CCameraPcs(SHADOW)";
 
 extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;
@@ -406,18 +406,19 @@ void CCameraPcs::onScriptChanging(char*)
 void CCameraPcs::onScriptChanged(char*, int fromScript)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    float zero = FLOAT_8032fa34;
     MtxPtr mathMtx = reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&Math) + 4);
 
     PSMTXCopy(mathMtx, reinterpret_cast<MtxPtr>(self + 0x34));
     PSMTXInverse(mathMtx, reinterpret_cast<MtxPtr>(self + 0x64));
 
+    float refValue = FLOAT_8032fa88;
+    float zero = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xDC) = zero;
     *reinterpret_cast<float*>(self + 0xD8) = zero;
     *reinterpret_cast<float*>(self + 0xD4) = zero;
     *reinterpret_cast<float*>(self + 0xE0) = zero;
-    *reinterpret_cast<float*>(self + 0xE4) = FLOAT_8032fa88;
-    *reinterpret_cast<float*>(self + 0xE8) = FLOAT_8032fa88;
+    *reinterpret_cast<float*>(self + 0xE4) = refValue;
+    *reinterpret_cast<float*>(self + 0xE8) = refValue;
 
     if (fromScript != 0) {
         *reinterpret_cast<int*>(self + 0x444) = 1;
@@ -910,16 +911,23 @@ void CCameraPcs::SetViewerSRT(const SRT* srt)
 {
     u32* dst = reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x448);
     const u32* src = reinterpret_cast<const u32*>(srt);
-
+    u32 value1 = src[1];
     dst[0] = src[0];
-    dst[1] = src[1];
-    dst[2] = src[2];
-    dst[3] = src[3];
-    dst[4] = src[4];
-    dst[5] = src[5];
-    dst[6] = src[6];
-    dst[7] = src[7];
-    dst[8] = src[8];
+    u32 value2 = src[2];
+    dst[1] = value1;
+    value1 = src[3];
+    dst[2] = value2;
+    value2 = src[4];
+    dst[3] = value1;
+    value1 = src[5];
+    dst[4] = value2;
+    u32 value3 = src[6];
+    dst[5] = value1;
+    value2 = src[7];
+    dst[6] = value3;
+    value1 = src[8];
+    dst[7] = value2;
+    dst[8] = value1;
     *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x46C) = 1;
 }
 

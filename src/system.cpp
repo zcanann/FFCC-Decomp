@@ -443,8 +443,8 @@ void CSystem::ExecScenegraph()
         }
 
         float totalTime = 0.0f;
-        int readGPMetrics = perfTrigger & 1;
-        CStopWatch watch(reinterpret_cast<char*>(-1));
+        CStopWatch watch((char*)-1);
+        int perfEnabled = perfTrigger & 1;
 
         int index = 0;
         for (COrder* order = m_orderSentinel.m_next;
@@ -507,14 +507,14 @@ void CSystem::ExecScenegraph()
                 order->m_lastTime = watch.Get();
 
                 watch.Start();
-                if (readGPMetrics != 0)
+                if (perfEnabled != 0)
                 {
                     Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x2CA);
                     GXReadGP0Metric();
                     GXReadGP1Metric();
                 }
                 watch.Stop();
-                if (readGPMetrics != 0)
+                if (perfEnabled != 0)
                 {
                     order->m_lastTime = watch.Get();
                 }

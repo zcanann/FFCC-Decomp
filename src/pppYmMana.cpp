@@ -4,7 +4,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
 
@@ -1144,8 +1144,8 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     float z;
     float rowUv;
     int indexOffset;
-    int quadIndex;
-    int rowBase;
+    short quadIndex;
+    short rowBase;
     float* positions;
     int rowCount;
     float* normals;
@@ -1190,31 +1190,20 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
         pairCount = 8;
         quadIndex = rowBase;
         do {
-            *(short*)((char*)indicesOut + indexOffset) = (short)quadIndex;
-            indexOffset += 2;
-            *(short*)((char*)indicesOut + indexOffset) = (short)(quadIndex + 1);
-            indexOffset += 2;
-            *(short*)((char*)indicesOut + indexOffset) = (short)(quadIndex + 0x12);
-            indexOffset += 2;
-            *(short*)((char*)indicesOut + indexOffset) = (short)(quadIndex + 0x12);
-            indexOffset += 2;
-            *(short*)((char*)indicesOut + indexOffset) = (short)(quadIndex + 0x11);
-            indexOffset += 2;
-            *(short*)((char*)indicesOut + indexOffset) = (short)quadIndex;
-            indexOffset += 2;
-            *(short*)((char*)indicesOut + indexOffset) = (short)(quadIndex + 1);
-            indexOffset += 2;
-            *(short*)((char*)indicesOut + indexOffset) = (short)(quadIndex + 2);
-            indexOffset += 2;
-            *(short*)((char*)indicesOut + indexOffset) = (short)(quadIndex + 0x13);
-            indexOffset += 2;
-            *(short*)((char*)indicesOut + indexOffset) = (short)(quadIndex + 0x13);
-            indexOffset += 2;
-            *(short*)((char*)indicesOut + indexOffset) = (short)(quadIndex + 0x12);
-            indexOffset += 2;
-            *(short*)((char*)indicesOut + indexOffset) = (short)(quadIndex + 1);
+            *(short*)((char*)indicesOut + indexOffset) = quadIndex;
+            *(short*)((char*)indicesOut + indexOffset + 2) = quadIndex + 1;
+            *(short*)((char*)indicesOut + indexOffset + 4) = quadIndex + 0x12;
+            *(short*)((char*)indicesOut + indexOffset + 6) = quadIndex + 0x12;
+            *(short*)((char*)indicesOut + indexOffset + 8) = quadIndex + 0x11;
+            *(short*)((char*)indicesOut + indexOffset + 10) = quadIndex;
+            *(short*)((char*)indicesOut + indexOffset + 0xC) = quadIndex + 1;
+            *(short*)((char*)indicesOut + indexOffset + 0xE) = quadIndex + 2;
+            *(short*)((char*)indicesOut + indexOffset + 0x10) = quadIndex + 0x13;
+            *(short*)((char*)indicesOut + indexOffset + 0x12) = quadIndex + 0x13;
+            *(short*)((char*)indicesOut + indexOffset + 0x14) = quadIndex + 0x12;
+            *(short*)((char*)indicesOut + indexOffset + 0x16) = quadIndex + 1;
             quadIndex = quadIndex + 2;
-            indexOffset += 2;
+            indexOffset += 0x18;
             pairCount = pairCount + -1;
         } while (pairCount != 0);
         rowCount = rowCount + 1;

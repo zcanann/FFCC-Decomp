@@ -40,17 +40,324 @@ struct Vec4d {
 
 /*
  * --INFO--
- * PAL Address: 0x8001c290
- * PAL Size: 64b
+ * PAL Address: 0x8001a230
+ * PAL Size: 100b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMath::Init()
+extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void* self, register float (*mtx)[4], register Vec* src,
+                                                              register Vec4d* dst) {
+    nofralloc
+    psq_l f0, 0x0(src), 0, 0
+    psq_l f1, 0x8(src), 1, 0
+    psq_l f2, 0x0(mtx), 0, 0
+    psq_l f3, 0x8(mtx), 0, 0
+    ps_mul f12, f0, f2
+    psq_l f4, 0x10(mtx), 0, 0
+    ps_madd f13, f1, f3, f12
+    psq_l f5, 0x18(mtx), 0, 0
+    ps_sum0 f2, f13, f13, f13
+    psq_l f6, 0x20(mtx), 0, 0
+    ps_mul f12, f0, f4
+    psq_l f7, 0x28(mtx), 0, 0
+    ps_madd f13, f1, f5, f12
+    psq_l f8, 0x30(mtx), 0, 0
+    ps_sum1 f2, f13, f2, f13
+    psq_l f9, 0x38(mtx), 0, 0
+    psq_st f2, 0x0(dst), 0, 0
+    ps_mul f12, f0, f6
+    ps_madd f13, f1, f7, f12
+    ps_sum0 f2, f13, f13, f13
+    ps_mul f12, f0, f8
+    ps_madd f13, f1, f9, f12
+    ps_sum1 f2, f13, f2, f13
+    psq_st f2, 0x8(dst), 0, 0
+    blr
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001a294
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" asm void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(register void* self, register float (*mtx)[4],
+                                                                register Vec4d* src, register Vec4d* dst) {
+    nofralloc
+    psq_l f0, 0x0(src), 0, 0
+    psq_l f1, 0x8(src), 0, 0
+    psq_l f2, 0x0(mtx), 0, 0
+    psq_l f3, 0x8(mtx), 0, 0
+    ps_mul f12, f0, f2
+    psq_l f4, 0x10(mtx), 0, 0
+    ps_madd f13, f1, f3, f12
+    psq_l f5, 0x18(mtx), 0, 0
+    ps_sum0 f2, f13, f13, f13
+    psq_l f6, 0x20(mtx), 0, 0
+    ps_mul f12, f0, f4
+    psq_l f7, 0x28(mtx), 0, 0
+    ps_madd f13, f1, f5, f12
+    psq_l f8, 0x30(mtx), 0, 0
+    ps_sum1 f2, f13, f2, f13
+    psq_l f9, 0x38(mtx), 0, 0
+    psq_st f2, 0x0(dst), 0, 0
+    ps_mul f12, f0, f6
+    ps_madd f13, f1, f7, f12
+    ps_sum0 f2, f13, f13, f13
+    ps_mul f12, f0, f8
+    ps_madd f13, f1, f9, f12
+    ps_sum1 f2, f13, f2, f13
+    psq_st f2, 0x8(dst), 0, 0
+    blr
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001a2f8
+ * PAL Size: 236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+float CMath::DstRot(float from, float to)
 {
-	PSMTXIdentity(m_localMtx);
-	memset(m_scratch, 0, sizeof(m_scratch));
+    float s0 = (float)sin((double)from);
+    float c0 = (float)cos((double)from);
+    float s1 = (float)sin((double)to);
+    float c1 = (float)cos((double)to);
+    float dot = s0 * s1 + c0 * c1;
+
+    if (dot == 0.0f) {
+        return 0.0f;
+    }
+
+    if (dot < -1.0f) {
+        dot = -1.0f;
+    } else if (1.0f < dot) {
+        dot = 1.0f;
+    } else {
+        dot = dot;
+    }
+
+    float angle = (float)acos((double)dot);
+    if (s0 * c1 - s1 * c0 < 0.0f) {
+        angle = -angle;
+    }
+
+    return angle;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001a3e4
+ * PAL Size: 412b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
+{
+    int sat = (saturation * 0xFF) / 100;
+    int val = (brightness * 0xFF) / 100;
+
+    unsigned char rgba[4];
+    if ((float)sat == 0.0f) {
+        rgba[0] = val;
+        rgba[1] = val;
+        rgba[2] = val;
+    } else {
+        int sector = hue / 0x3C;
+        int low = ((0xFF - sat) * val) / 0xFF;
+        int delta = ((hue - sector * 0x3C) * (val - low)) / 0x3C;
+
+        if (hue < 60) {
+            rgba[0] = val;
+            rgba[2] = low;
+            rgba[1] = low + delta;
+        } else if (hue < 120) {
+            rgba[1] = val;
+            rgba[2] = low;
+            rgba[0] = val - delta;
+        } else if (hue < 180) {
+            rgba[1] = val;
+            rgba[0] = low;
+            rgba[2] = low + delta;
+        } else if (hue < 240) {
+            rgba[2] = val;
+            rgba[0] = low;
+            rgba[1] = val - delta;
+        } else if (hue < 300) {
+            rgba[2] = val;
+            rgba[1] = low;
+            rgba[0] = low + delta;
+        } else if (hue < 360) {
+            rgba[0] = val;
+            rgba[1] = low;
+            rgba[2] = val - delta;
+        } else {
+            rgba[2] = 0;
+            rgba[1] = 0;
+            rgba[0] = 0;
+        }
+    }
+
+    rgba[3] = 0xFF;
+    return *(unsigned int*)rgba;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001a580
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+float CMath::Line1D(int lastIndex, float x, float* x_arr, float* y_arr)
+{
+    float period = x_arr[lastIndex] - x_arr[0];
+
+    while (x > x_arr[lastIndex]) {
+        x -= period;
+    }
+
+    while (x < x_arr[0]) {
+        x += period;
+    }
+
+    int low = 0;
+    int high = lastIndex;
+    while (low < high) {
+        int mid = (low + high) / 2;
+        if (x_arr[mid] < x) {
+            low = mid + 1;
+        } else {
+            high = mid;
+        }
+    }
+
+    if (low > 0) {
+        low--;
+    }
+
+    return ((x - x_arr[low]) / (x_arr[low + 1] - x_arr[low])) * (y_arr[low + 1] - y_arr[low]) + y_arr[low];
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001a62c
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+float CMath::Spline1D(int lastIndex, float t, float* x, float* y, float* secondDerivatives)
+{
+    float period = x[lastIndex] - x[0];
+
+    while (t > x[lastIndex]) {
+        t -= period;
+    }
+
+    while (t < x[0]) {
+        t += period;
+    }
+
+    int low = 0;
+    int high = lastIndex;
+    while (low < high) {
+        int mid = (low + high) / 2;
+        if (x[mid] < t) {
+            low = mid + 1;
+        }
+        else {
+            high = mid;
+        }
+    }
+
+    if (low > 0) {
+        low--;
+    }
+
+    float x0 = x[low];
+    float sd0 = secondDerivatives[low];
+    float sd1 = secondDerivatives[low + 1];
+    float y0 = y[low];
+    float dt = t - x0;
+    float dx = x[low + 1] - x0;
+    float cubic = 3.0f * sd0 + (dt * (sd1 - sd0)) / dx;
+    float linear = (y[low + 1] - y0) / dx - dx * (2.0f * sd0 + sd1);
+
+    return (dt * cubic + linear) * dt + y0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001a708
+ * PAL Size: 2328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDerivatives)
+{
+    int i;
+    for (i = 0; i < count; ++i) {
+        s_hSpline[i] = x[i + 1] - x[i];
+        s_wSpline[i] = (y[i + 1] - y[i]) / s_hSpline[i];
+    }
+    s_wSpline[count] = s_wSpline[0];
+
+    for (i = 1; i < count; ++i) {
+        s_dSpline[i] = FLOAT_8032F75C * (x[i + 1] - x[i - 1]);
+    }
+    s_dSpline[count] = FLOAT_8032F75C * (s_hSpline[count - 1] + s_hSpline[0]);
+
+    for (i = 1; i <= count; ++i) {
+        outSecondDerivatives[i] = s_wSpline[i] - s_wSpline[i - 1];
+    }
+
+    s_wSpline[1] = s_hSpline[0];
+    s_wSpline[count - 1] = s_hSpline[count - 1];
+    s_wSpline[count] = s_dSpline[count];
+    for (i = 2; i < count - 1; ++i) {
+        s_wSpline[i] = kZeroF;
+    }
+
+    for (i = 1; i < count; ++i) {
+        float r = s_hSpline[i] / s_dSpline[i];
+        outSecondDerivatives[i + 1] = -(r * outSecondDerivatives[i] - outSecondDerivatives[i + 1]);
+        s_dSpline[i + 1] = -(r * s_hSpline[i] - s_dSpline[i + 1]);
+        s_wSpline[i + 1] = -(r * s_wSpline[i] - s_wSpline[i + 1]);
+    }
+
+    s_wSpline[0] = s_wSpline[count];
+    outSecondDerivatives[0] = outSecondDerivatives[count];
+    for (i = count - 2; i >= 0; --i) {
+        float r = s_hSpline[i] / s_dSpline[i + 1];
+        outSecondDerivatives[i] = -(r * outSecondDerivatives[i + 1] - outSecondDerivatives[i]);
+        s_wSpline[i] = -(r * s_wSpline[i + 1] - s_wSpline[i]);
+    }
+
+    float firstDerivative = outSecondDerivatives[0] / s_wSpline[0];
+    outSecondDerivatives[0] = firstDerivative;
+    outSecondDerivatives[count] = firstDerivative;
+    for (i = 1; i < count; ++i) {
+        float w = s_wSpline[i];
+        float value = outSecondDerivatives[i];
+        float d = s_dSpline[i];
+        outSecondDerivatives[i] = -(firstDerivative * w - value) / d;
+    }
 }
 
 /*
@@ -58,225 +365,328 @@ void CMath::Init()
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::Quit()
+void CMath::CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float, float)
 {
 	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001b020
+ * PAL Size: 544b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::rotateToMatrix(float (*) [4], Vec*)
+extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
+    float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outCoeffScalar, Vec* p0,
+    Vec* p1, Vec* p2, Vec* p3)
 {
-	// TODO
+    float radiusSquared = radius * radius;
+    float radiusCubed = radiusSquared * radius;
+    Vec4d coeffs;
+    coeffs.x = FLOAT_8032F748 + ((FLOAT_8032F75C * radiusCubed) - (FLOAT_8032F758 * radiusSquared));
+    coeffs.y = radius + (radiusCubed - (FLOAT_8032F75C * radiusSquared));
+    coeffs.z = (FLOAT_8032F760 * radiusCubed) + (FLOAT_8032F758 * radiusSquared);
+    coeffs.w = radiusCubed - radiusSquared;
+
+    Mtx44 control;
+    control[0][0] = p1->x;
+    control[1][0] = p1->y;
+    control[2][0] = p1->z;
+    control[3][0] = 1.0f;
+    control[0][2] = p2->x;
+    control[1][2] = p2->y;
+    control[2][2] = p2->z;
+    control[3][2] = 1.0f;
+
+    float scaleAB = scaleA + scaleB;
+    float t0 = 0.0f;
+    if (scaleAB != 0.0f) {
+        t0 = scaleA / scaleAB;
+    }
+
+    Vec tangent;
+    Vec tmp;
+    PSVECSubtract(p2, p1, &tangent);
+    PSVECSubtract(p1, p0, &tmp);
+    PSVECAdd(&tangent, &tmp, &tangent);
+    PSVECScale(&tangent, &tangent, t0 * scale);
+    control[0][1] = tangent.x;
+    control[1][1] = tangent.y;
+    control[2][1] = tangent.z;
+    control[3][1] = 1.0f;
+
+    float scaleBC = scaleB + scaleC;
+    float t1 = 0.0f;
+    if (scaleBC != 0.0f) {
+        t1 = scaleB / scaleBC;
+    }
+
+    PSVECSubtract(p3, p2, &tangent);
+    PSVECSubtract(p2, p1, &tmp);
+    PSVECAdd(&tangent, &tmp, &tangent);
+    PSVECScale(&tangent, &tangent, t1 * scale);
+    control[0][3] = tangent.x;
+    control[1][3] = tangent.y;
+    control[2][3] = tangent.z;
+    control[3][3] = 1.0f;
+
+    MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(math, control, &coeffs, &coeffs);
+    outCoeffScalar[0] = coeffs.x;
+    outCoeffScalar[1] = coeffs.y;
+    outCoeffScalar[2] = coeffs.z;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001c124
+ * PAL Address: 0x8001b240
+ * PAL Size: 772b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
+    CMath* math, Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale, float scale,
+    float innerRadius, float outerRadius)
+{
+    (void)math;
+    int hit;
+    float fVar1;
+    float dVar6;
+    float dVar7;
+    float dVar8;
+    float dVar9;
+    float dVar10;
+    Vec local_60;
+    Vec local_6c;
+    Vec local_78;
+    Vec local_84;
+
+    dVar8 = innerRadius + scale;
+    dVar10 = dVar8 / (outerRadius + scale);
+    PSVECSubtract(origin, ellipseScale, &local_60);
+    dVar9 = dVar8 * dVar8;
+    local_60.y = local_60.y * dVar10;
+    local_6c.x = vector->x;
+    local_6c.y = vector->y * dVar10;
+    local_6c.z = vector->z;
+    local_78.x = local_60.x;
+    local_78.y = local_60.y;
+    local_78.z = local_60.z;
+    dVar8 = PSVECDotProduct(&local_78, &local_78);
+    if (dVar8 < dVar9) {
+        if (outT != NULL) {
+            *outT = 0.0f;
+        }
+        if (outPos != NULL) {
+            outPos->x = local_60.x;
+            outPos->y = local_60.y;
+            outPos->z = local_60.z;
+        }
+        hit = 1;
+    } else {
+        dVar6 = PSVECDotProduct(&local_6c, &local_78);
+        if (0.0f < dVar6) {
+            hit = 0;
+        } else {
+            dVar7 = PSVECDotProduct(&local_6c, &local_6c);
+            fVar1 = dVar6 * dVar6 - dVar7 * (dVar8 - dVar9);
+            if (fVar1 < 0.0f) {
+                hit = 0;
+            } else {
+                fVar1 = sqrtf(fVar1);
+                dVar8 = -dVar6 - fVar1;
+                if ((dVar8 <= 0.0f) || (dVar7 < dVar8)) {
+                    hit = 0;
+                } else {
+                    dVar8 = dVar8 / dVar7;
+                    if (outT != NULL) {
+                        *outT = dVar8;
+                    }
+                    if (outPos != NULL) {
+                        PSVECScale(&local_6c, &local_84, dVar8);
+                        PSVECAdd(&local_60, &local_84, outPos);
+                    }
+                    hit = 1;
+                }
+            }
+        }
+    }
+
+    if (hit) {
+        if (outPos != NULL) {
+            PSVECSubtract(outPos, &local_60, outPos);
+            outPos->y = outPos->y / dVar10;
+            PSVECAdd(outPos, origin, outPos);
+        }
+        return 1;
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001b544
  * PAL Size: 360b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
+void CMath::MTXGetScale(float (*mtx)[4], Vec* outScale)
 {
-    float* s = reinterpret_cast<float*>(srt);
-    Mtx rot;
-    float sx;
-    float cx;
-    float sy;
-    float cy;
-    float sz;
-    float cz;
-    float sxsy;
-    float cxsy;
-    float zRotX;
-    float zRotY;
-    float zRotZ;
+    Vec xAxis;
+    Vec yAxis;
+    Vec zAxis;
+    Vec temp;
 
-    PSMTXScale(out, s[6], s[7], s[8]);
-    sx = (float)sin((double)s[3]);
-    cx = (float)cos((double)s[3]);
-    sy = (float)sin((double)s[4]);
-    cy = (float)cos((double)s[4]);
-    sz = (float)sin((double)s[5]);
-    cz = (float)cos((double)s[5]);
+    xAxis.x = mtx[0][0];
+    xAxis.y = mtx[1][0];
+    xAxis.z = mtx[2][0];
+    yAxis.x = mtx[0][1];
+    yAxis.y = mtx[1][1];
+    yAxis.z = mtx[2][1];
+    zAxis.x = mtx[0][2];
+    zAxis.y = mtx[1][2];
+    zAxis.z = mtx[2][2];
 
-    sxsy = sx * sy;
-    cxsy = cx * sy;
-    rot[1][0] = cy * sz;
-    rot[2][0] = -sy;
-    rot[0][0] = cy * cz;
-    rot[0][1] = cz * sxsy - (cx * sz);
-    rot[1][1] = sz * sxsy + (cx * cz);
-    rot[2][1] = sx * cy;
-    zRotZ = cx * cy;
-    zRotX = cz * cxsy + (sx * sz);
-    zRotY = sz * cxsy - (sx * cz);
-    rot[0][2] = zRotX;
-    rot[1][2] = zRotY;
-    rot[2][2] = zRotZ;
-    rot[0][3] = s[0];
-    rot[1][3] = s[1];
-    rot[2][3] = s[2];
+    outScale->x = PSVECMag(&xAxis);
+    PSVECNormalize(&xAxis, &xAxis);
 
-    PSMTXConcat(rot, out, out);
-}
+    PSVECScale(&xAxis, &temp, PSVECDotProduct(&xAxis, &yAxis));
+    PSVECSubtract(&yAxis, &temp, &yAxis);
+    outScale->y = PSVECMag(&yAxis);
+    PSVECNormalize(&yAxis, &yAxis);
 
-/*
- * --INFO--
- * PAL Address: 0x8001bfe0
- * PAL Size: 324b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
-{
-    float sinX;
-    float cosX;
-    float sinY;
-    float cosY;
-    float sinZ;
-    float cosZ;
-    float sinXSinY;
-    float cosXSinY;
-    float* matrix = &out[0][0];
-    float* values = reinterpret_cast<float*>(srt);
+    PSVECScale(&yAxis, &temp, PSVECDotProduct(&yAxis, &zAxis));
+    PSVECSubtract(&zAxis, &temp, &zAxis);
+    PSVECScale(&xAxis, &temp, PSVECDotProduct(&xAxis, &zAxis));
+    PSVECSubtract(&zAxis, &temp, &zAxis);
+    outScale->z = PSVECMag(&zAxis);
+    PSVECNormalize(&zAxis, &zAxis);
 
-    sinX = (float)sin((double)values[3]);
-    cosX = (float)cos((double)values[3]);
-    sinY = (float)sin((double)values[4]);
-    cosY = (float)cos((double)values[4]);
-    sinZ = (float)sin((double)values[5]);
-    cosZ = (float)cos((double)values[5]);
-
-    sinXSinY = sinX * sinY;
-    cosXSinY = cosX * sinY;
-    matrix[0] = cosY * cosZ;
-    matrix[4] = cosY * sinZ;
-    matrix[8] = -sinY;
-    matrix[1] = cosZ * sinXSinY - cosX * sinZ;
-    matrix[5] = sinZ * sinXSinY + cosX * cosZ;
-    matrix[9] = sinX * cosY;
-    matrix[2] = cosZ * cosXSinY + sinX * sinZ;
-    matrix[6] = sinZ * cosXSinY - sinX * cosZ;
-    matrix[10] = cosX * cosY;
-    matrix[3] = values[0];
-    matrix[7] = values[1];
-    matrix[11] = values[2];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001bf9c
- * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMath::Rand(unsigned long max)
-{
-    if (max == 0) {
-        return 0;
+    PSVECCrossProduct(&yAxis, &zAxis, &temp);
+    if ((double)PSVECDotProduct(&xAxis, &temp) < DOUBLE_8032F778) {
+        PSVECScale(outScale, outScale, kNegOneF);
     }
-
-    return rand() % max;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001bf30
- * PAL Size: 108b
+ * PAL Address: 0x8001b6ac
+ * PAL Size: 124b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-float CMath::RandF(float scale)
-{
-    if (kZeroF == scale) {
-        return kZeroF;
-    }
-
-    return scale * ((float)rand() * kRandScaleF);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001beec
- * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-float CMath::RandF()
-{
-    return (float)rand() * kRandScaleF;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001be98
- * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMath::RandPM(unsigned long max)
-{
-    unsigned int value;
-
-    if (max == 0) {
-        return 0;
-    }
-
-    value = (unsigned int)rand() * 0xFFFE - 0x7FFF;
-    unsigned int quotient = value / max;
-    return (int)(value - quotient * max);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001be28
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-float CMath::RandFPM(float scale)
-{
-    if (kZeroF == scale) {
-        return kZeroF;
-    }
-
-    return scale * (((float)rand() * kRandSignedScaleF) + kNegOneF);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001bdd8
- * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CBound::SetFrustum(Vec& viewPos, float (*viewMatrix)[4])
+int CBound::CheckFrustum(Vec& viewPos, float (*viewMatrix)[4], float farPlane)
 {
     s_f_vpos.x = viewPos.x;
     s_f_vpos.y = viewPos.y;
     s_f_vpos.z = viewPos.z;
     PSMTXCopy(viewMatrix, s_f_lvmtx);
+    return CheckFrustum0(farPlane);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001b728
+ * PAL Size: 628b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CBound::CheckFrustum0(float farPlane)
+{
+    unsigned int clipMask;
+    int zIndex;
+    unsigned int insideMask;
+    int yIndex;
+    unsigned int outsideMask;
+    int xIndex;
+    float farthestZ;
+    float zero;
+    float* inBound = reinterpret_cast<float*>(this);
+    Vec vertex;
+    Vec transformed;
+
+    if ((s_f_vpos.x <= inBound[3]) && (s_f_vpos.y <= inBound[4]) && (s_f_vpos.z <= inBound[5]) &&
+        (s_f_vpos.x >= inBound[0]) && (s_f_vpos.y >= inBound[1]) && (s_f_vpos.z >= inBound[2])) {
+        return 1;
+    }
+
+    farthestZ = FLOAT_8032F780;
+    zero = kZeroF;
+    insideMask = 0xF;
+    outsideMask = 0;
+    xIndex = 0;
+    do {
+        if (xIndex == 0) {
+            vertex.x = inBound[0];
+        } else {
+            vertex.x = inBound[3];
+        }
+        yIndex = 0;
+        do {
+            vertex.y = (yIndex == 0) ? inBound[1] : inBound[4];
+            zIndex = 0;
+            do {
+                vertex.z = (zIndex == 0) ? inBound[2] : inBound[5];
+                PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
+                if (farthestZ < transformed.z) {
+                    farthestZ = transformed.z;
+                }
+                if (transformed.z > zero) {
+                    if (transformed.x > -transformed.z) {
+                        clipMask = 0x11;
+                    } else if (transformed.x < transformed.z) {
+                        clipMask = 0x12;
+                    } else {
+                        clipMask = 0x10;
+                    }
+                    if (transformed.y > -transformed.z) {
+                        clipMask = (unsigned char)(clipMask | 0x14);
+                    } else if (transformed.y < transformed.z) {
+                        clipMask = (unsigned char)(clipMask | 0x18);
+                    }
+                } else {
+                    if (transformed.x > -transformed.z) {
+                        clipMask = 1;
+                    } else if (transformed.x < transformed.z) {
+                        clipMask = 2;
+                    } else {
+                        clipMask = 0;
+                    }
+                    if (transformed.y > -transformed.z) {
+                        clipMask = (unsigned char)(clipMask | 4);
+                    } else if (transformed.y < transformed.z) {
+                        clipMask = (unsigned char)(clipMask | 8);
+                    }
+                }
+                zIndex = zIndex + 1;
+                insideMask = insideMask & clipMask;
+                outsideMask = outsideMask | clipMask;
+            } while (zIndex < 2);
+            yIndex = yIndex + 1;
+        } while (yIndex < 2);
+        xIndex = xIndex + 1;
+    } while (xIndex < 2);
+
+    if (farthestZ < farPlane) {
+        return 0;
+    }
+    if ((unsigned char)insideMask != 0) {
+        return 0;
+    }
+
+    insideMask = (unsigned int)__cntlzw((unsigned char)outsideMask);
+    return (int)(insideMask >> 5) + 1;
 }
 
 /*
@@ -418,399 +828,208 @@ int CBound::CheckFrustum0(CBound& outBound)
 
 /*
  * --INFO--
- * PAL Address: 0x8001b728
- * PAL Size: 628b
+ * PAL Address: 0x8001bdd8
+ * PAL Size: 80b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CBound::CheckFrustum0(float farPlane)
-{
-    unsigned int clipMask;
-    int zIndex;
-    unsigned int insideMask;
-    int yIndex;
-    unsigned int outsideMask;
-    int xIndex;
-    float farthestZ;
-    float zero;
-    float* inBound = reinterpret_cast<float*>(this);
-    Vec vertex;
-    Vec transformed;
-
-    if ((s_f_vpos.x <= inBound[3]) && (s_f_vpos.y <= inBound[4]) && (s_f_vpos.z <= inBound[5]) &&
-        (s_f_vpos.x >= inBound[0]) && (s_f_vpos.y >= inBound[1]) && (s_f_vpos.z >= inBound[2])) {
-        return 1;
-    }
-
-    farthestZ = FLOAT_8032F780;
-    zero = kZeroF;
-    insideMask = 0xF;
-    outsideMask = 0;
-    xIndex = 0;
-    do {
-        if (xIndex == 0) {
-            vertex.x = inBound[0];
-        } else {
-            vertex.x = inBound[3];
-        }
-        yIndex = 0;
-        do {
-            vertex.y = (yIndex == 0) ? inBound[1] : inBound[4];
-            zIndex = 0;
-            do {
-                vertex.z = (zIndex == 0) ? inBound[2] : inBound[5];
-                PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
-                if (farthestZ < transformed.z) {
-                    farthestZ = transformed.z;
-                }
-                if (transformed.z > zero) {
-                    if (transformed.x > -transformed.z) {
-                        clipMask = 0x11;
-                    } else if (transformed.x < transformed.z) {
-                        clipMask = 0x12;
-                    } else {
-                        clipMask = 0x10;
-                    }
-                    if (transformed.y > -transformed.z) {
-                        clipMask = (unsigned char)(clipMask | 0x14);
-                    } else if (transformed.y < transformed.z) {
-                        clipMask = (unsigned char)(clipMask | 0x18);
-                    }
-                } else {
-                    if (transformed.x > -transformed.z) {
-                        clipMask = 1;
-                    } else if (transformed.x < transformed.z) {
-                        clipMask = 2;
-                    } else {
-                        clipMask = 0;
-                    }
-                    if (transformed.y > -transformed.z) {
-                        clipMask = (unsigned char)(clipMask | 4);
-                    } else if (transformed.y < transformed.z) {
-                        clipMask = (unsigned char)(clipMask | 8);
-                    }
-                }
-                zIndex = zIndex + 1;
-                insideMask = insideMask & clipMask;
-                outsideMask = outsideMask | clipMask;
-            } while (zIndex < 2);
-            yIndex = yIndex + 1;
-        } while (yIndex < 2);
-        xIndex = xIndex + 1;
-    } while (xIndex < 2);
-
-    if (farthestZ < farPlane) {
-        return 0;
-    }
-    if ((unsigned char)insideMask != 0) {
-        return 0;
-    }
-
-    insideMask = (unsigned int)__cntlzw((unsigned char)outsideMask);
-    return (int)(insideMask >> 5) + 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001b6ac
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CBound::CheckFrustum(Vec& viewPos, float (*viewMatrix)[4], float farPlane)
+void CBound::SetFrustum(Vec& viewPos, float (*viewMatrix)[4])
 {
     s_f_vpos.x = viewPos.x;
     s_f_vpos.y = viewPos.y;
     s_f_vpos.z = viewPos.z;
     PSMTXCopy(viewMatrix, s_f_lvmtx);
-    return CheckFrustum0(farPlane);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001a230
- * PAL Size: 100b
+ * PAL Address: 0x8001be28
+ * PAL Size: 112b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void* self, register float (*mtx)[4], register Vec* src,
-                                                              register Vec4d* dst) {
-    nofralloc
-    psq_l f0, 0x0(src), 0, 0
-    psq_l f1, 0x8(src), 1, 0
-    psq_l f2, 0x0(mtx), 0, 0
-    psq_l f3, 0x8(mtx), 0, 0
-    ps_mul f12, f0, f2
-    psq_l f4, 0x10(mtx), 0, 0
-    ps_madd f13, f1, f3, f12
-    psq_l f5, 0x18(mtx), 0, 0
-    ps_sum0 f2, f13, f13, f13
-    psq_l f6, 0x20(mtx), 0, 0
-    ps_mul f12, f0, f4
-    psq_l f7, 0x28(mtx), 0, 0
-    ps_madd f13, f1, f5, f12
-    psq_l f8, 0x30(mtx), 0, 0
-    ps_sum1 f2, f13, f2, f13
-    psq_l f9, 0x38(mtx), 0, 0
-    psq_st f2, 0x0(dst), 0, 0
-    ps_mul f12, f0, f6
-    ps_madd f13, f1, f7, f12
-    ps_sum0 f2, f13, f13, f13
-    ps_mul f12, f0, f8
-    ps_madd f13, f1, f9, f12
-    ps_sum1 f2, f13, f2, f13
-    psq_st f2, 0x8(dst), 0, 0
-    blr
+float CMath::RandFPM(float scale)
+{
+    if (kZeroF == scale) {
+        return kZeroF;
+    }
+
+    return scale * (((float)rand() * kRandSignedScaleF) + kNegOneF);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001a294
- * PAL Size: 100b
+ * PAL Address: 0x8001be98
+ * PAL Size: 84b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" asm void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(register void* self, register float (*mtx)[4],
-                                                                register Vec4d* src, register Vec4d* dst) {
-    nofralloc
-    psq_l f0, 0x0(src), 0, 0
-    psq_l f1, 0x8(src), 0, 0
-    psq_l f2, 0x0(mtx), 0, 0
-    psq_l f3, 0x8(mtx), 0, 0
-    ps_mul f12, f0, f2
-    psq_l f4, 0x10(mtx), 0, 0
-    ps_madd f13, f1, f3, f12
-    psq_l f5, 0x18(mtx), 0, 0
-    ps_sum0 f2, f13, f13, f13
-    psq_l f6, 0x20(mtx), 0, 0
-    ps_mul f12, f0, f4
-    psq_l f7, 0x28(mtx), 0, 0
-    ps_madd f13, f1, f5, f12
-    psq_l f8, 0x30(mtx), 0, 0
-    ps_sum1 f2, f13, f2, f13
-    psq_l f9, 0x38(mtx), 0, 0
-    psq_st f2, 0x0(dst), 0, 0
-    ps_mul f12, f0, f6
-    ps_madd f13, f1, f7, f12
-    ps_sum0 f2, f13, f13, f13
-    ps_mul f12, f0, f8
-    ps_madd f13, f1, f9, f12
-    ps_sum1 f2, f13, f2, f13
-    psq_st f2, 0x8(dst), 0, 0
-    blr
+int CMath::RandPM(unsigned long max)
+{
+    unsigned int value;
+
+    if (max == 0) {
+        return 0;
+    }
+
+    value = (unsigned int)rand() * 0xFFFE - 0x7FFF;
+    unsigned int quotient = value / max;
+    return (int)(value - quotient * max);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001b544
+ * PAL Address: 0x8001beec
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+float CMath::RandF()
+{
+    return (float)rand() * kRandScaleF;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001bf30
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+float CMath::RandF(float scale)
+{
+    if (kZeroF == scale) {
+        return kZeroF;
+    }
+
+    return scale * ((float)rand() * kRandScaleF);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001bf9c
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMath::Rand(unsigned long max)
+{
+    if (max == 0) {
+        return 0;
+    }
+
+    return rand() % max;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001bfe0
+ * PAL Size: 324b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
+{
+    float sinX;
+    float cosX;
+    float sinY;
+    float cosY;
+    float sinZ;
+    float cosZ;
+    float sinXSinY;
+    float cosXSinY;
+    float* matrix = &out[0][0];
+    float* values = reinterpret_cast<float*>(srt);
+
+    sinX = (float)sin((double)values[3]);
+    cosX = (float)cos((double)values[3]);
+    sinY = (float)sin((double)values[4]);
+    cosY = (float)cos((double)values[4]);
+    sinZ = (float)sin((double)values[5]);
+    cosZ = (float)cos((double)values[5]);
+
+    sinXSinY = sinX * sinY;
+    cosXSinY = cosX * sinY;
+    matrix[0] = cosY * cosZ;
+    matrix[4] = cosY * sinZ;
+    matrix[8] = -sinY;
+    matrix[1] = cosZ * sinXSinY - cosX * sinZ;
+    matrix[5] = sinZ * sinXSinY + cosX * cosZ;
+    matrix[9] = sinX * cosY;
+    matrix[2] = cosZ * cosXSinY + sinX * sinZ;
+    matrix[6] = sinZ * cosXSinY - sinX * cosZ;
+    matrix[10] = cosX * cosY;
+    matrix[3] = values[0];
+    matrix[7] = values[1];
+    matrix[11] = values[2];
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001c124
  * PAL Size: 360b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMath::MTXGetScale(float (*mtx)[4], Vec* outScale)
+void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
 {
-    Vec xAxis;
-    Vec yAxis;
-    Vec zAxis;
-    Vec temp;
+    float* s = reinterpret_cast<float*>(srt);
+    Mtx rot;
+    float sx;
+    float cx;
+    float sy;
+    float cy;
+    float sz;
+    float cz;
+    float sxsy;
+    float cxsy;
+    float zRotX;
+    float zRotY;
+    float zRotZ;
 
-    xAxis.x = mtx[0][0];
-    xAxis.y = mtx[1][0];
-    xAxis.z = mtx[2][0];
-    yAxis.x = mtx[0][1];
-    yAxis.y = mtx[1][1];
-    yAxis.z = mtx[2][1];
-    zAxis.x = mtx[0][2];
-    zAxis.y = mtx[1][2];
-    zAxis.z = mtx[2][2];
+    PSMTXScale(out, s[6], s[7], s[8]);
+    sx = (float)sin((double)s[3]);
+    cx = (float)cos((double)s[3]);
+    sy = (float)sin((double)s[4]);
+    cy = (float)cos((double)s[4]);
+    sz = (float)sin((double)s[5]);
+    cz = (float)cos((double)s[5]);
 
-    outScale->x = PSVECMag(&xAxis);
-    PSVECNormalize(&xAxis, &xAxis);
+    sxsy = sx * sy;
+    cxsy = cx * sy;
+    rot[1][0] = cy * sz;
+    rot[2][0] = -sy;
+    rot[0][0] = cy * cz;
+    rot[0][1] = cz * sxsy - (cx * sz);
+    rot[1][1] = sz * sxsy + (cx * cz);
+    rot[2][1] = sx * cy;
+    zRotZ = cx * cy;
+    zRotX = cz * cxsy + (sx * sz);
+    zRotY = sz * cxsy - (sx * cz);
+    rot[0][2] = zRotX;
+    rot[1][2] = zRotY;
+    rot[2][2] = zRotZ;
+    rot[0][3] = s[0];
+    rot[1][3] = s[1];
+    rot[2][3] = s[2];
 
-    PSVECScale(&xAxis, &temp, PSVECDotProduct(&xAxis, &yAxis));
-    PSVECSubtract(&yAxis, &temp, &yAxis);
-    outScale->y = PSVECMag(&yAxis);
-    PSVECNormalize(&yAxis, &yAxis);
-
-    PSVECScale(&yAxis, &temp, PSVECDotProduct(&yAxis, &zAxis));
-    PSVECSubtract(&zAxis, &temp, &zAxis);
-    PSVECScale(&xAxis, &temp, PSVECDotProduct(&xAxis, &zAxis));
-    PSVECSubtract(&zAxis, &temp, &zAxis);
-    outScale->z = PSVECMag(&zAxis);
-    PSVECNormalize(&zAxis, &zAxis);
-
-    PSVECCrossProduct(&yAxis, &zAxis, &temp);
-    if ((double)PSVECDotProduct(&xAxis, &temp) < DOUBLE_8032F778) {
-        PSVECScale(outScale, outScale, kNegOneF);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001b240
- * PAL Size: 772b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
-    CMath* math, Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale, float scale,
-    float innerRadius, float outerRadius)
-{
-    (void)math;
-    int hit;
-    float fVar1;
-    float dVar6;
-    float dVar7;
-    float dVar8;
-    float dVar9;
-    float dVar10;
-    Vec local_60;
-    Vec local_6c;
-    Vec local_78;
-    Vec local_84;
-
-    dVar8 = innerRadius + scale;
-    dVar10 = dVar8 / (outerRadius + scale);
-    PSVECSubtract(origin, ellipseScale, &local_60);
-    dVar9 = dVar8 * dVar8;
-    local_60.y = local_60.y * dVar10;
-    local_6c.x = vector->x;
-    local_6c.y = vector->y * dVar10;
-    local_6c.z = vector->z;
-    local_78.x = local_60.x;
-    local_78.y = local_60.y;
-    local_78.z = local_60.z;
-    dVar8 = PSVECDotProduct(&local_78, &local_78);
-    if (dVar8 < dVar9) {
-        if (outT != NULL) {
-            *outT = 0.0f;
-        }
-        if (outPos != NULL) {
-            outPos->x = local_60.x;
-            outPos->y = local_60.y;
-            outPos->z = local_60.z;
-        }
-        hit = 1;
-    } else {
-        dVar6 = PSVECDotProduct(&local_6c, &local_78);
-        if (0.0f < dVar6) {
-            hit = 0;
-        } else {
-            dVar7 = PSVECDotProduct(&local_6c, &local_6c);
-            fVar1 = dVar6 * dVar6 - dVar7 * (dVar8 - dVar9);
-            if (fVar1 < 0.0f) {
-                hit = 0;
-            } else {
-                fVar1 = sqrtf(fVar1);
-                dVar8 = -dVar6 - fVar1;
-                if ((dVar8 <= 0.0f) || (dVar7 < dVar8)) {
-                    hit = 0;
-                } else {
-                    dVar8 = dVar8 / dVar7;
-                    if (outT != NULL) {
-                        *outT = dVar8;
-                    }
-                    if (outPos != NULL) {
-                        PSVECScale(&local_6c, &local_84, dVar8);
-                        PSVECAdd(&local_60, &local_84, outPos);
-                    }
-                    hit = 1;
-                }
-            }
-        }
-    }
-
-    if (hit) {
-        if (outPos != NULL) {
-            PSVECSubtract(outPos, &local_60, outPos);
-            outPos->y = outPos->y / dVar10;
-            PSVECAdd(outPos, origin, outPos);
-        }
-        return 1;
-    }
-
-    return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001b020
- * PAL Size: 544b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
-    float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outCoeffScalar, Vec* p0,
-    Vec* p1, Vec* p2, Vec* p3)
-{
-    float radiusSquared = radius * radius;
-    float radiusCubed = radiusSquared * radius;
-    Vec4d coeffs;
-    coeffs.x = FLOAT_8032F748 + ((FLOAT_8032F75C * radiusCubed) - (FLOAT_8032F758 * radiusSquared));
-    coeffs.y = radius + (radiusCubed - (FLOAT_8032F75C * radiusSquared));
-    coeffs.z = (FLOAT_8032F760 * radiusCubed) + (FLOAT_8032F758 * radiusSquared);
-    coeffs.w = radiusCubed - radiusSquared;
-
-    Mtx44 control;
-    control[0][0] = p1->x;
-    control[1][0] = p1->y;
-    control[2][0] = p1->z;
-    control[3][0] = 1.0f;
-    control[0][2] = p2->x;
-    control[1][2] = p2->y;
-    control[2][2] = p2->z;
-    control[3][2] = 1.0f;
-
-    float scaleAB = scaleA + scaleB;
-    float t0 = 0.0f;
-    if (scaleAB != 0.0f) {
-        t0 = scaleA / scaleAB;
-    }
-
-    Vec tangent;
-    Vec tmp;
-    PSVECSubtract(p2, p1, &tangent);
-    PSVECSubtract(p1, p0, &tmp);
-    PSVECAdd(&tangent, &tmp, &tangent);
-    PSVECScale(&tangent, &tangent, t0 * scale);
-    control[0][1] = tangent.x;
-    control[1][1] = tangent.y;
-    control[2][1] = tangent.z;
-    control[3][1] = 1.0f;
-
-    float scaleBC = scaleB + scaleC;
-    float t1 = 0.0f;
-    if (scaleBC != 0.0f) {
-        t1 = scaleB / scaleBC;
-    }
-
-    PSVECSubtract(p3, p2, &tangent);
-    PSVECSubtract(p2, p1, &tmp);
-    PSVECAdd(&tangent, &tmp, &tangent);
-    PSVECScale(&tangent, &tangent, t1 * scale);
-    control[0][3] = tangent.x;
-    control[1][3] = tangent.y;
-    control[2][3] = tangent.z;
-    control[3][3] = 1.0f;
-
-    MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(math, control, &coeffs, &coeffs);
-    outCoeffScalar[0] = coeffs.x;
-    outCoeffScalar[1] = coeffs.y;
-    outCoeffScalar[2] = coeffs.z;
+    PSMTXConcat(rot, out, out);
 }
 
 /*
@@ -818,251 +1037,32 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float, float)
+void CMath::rotateToMatrix(float (*) [4], Vec*)
 {
 	// TODO
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001a708
- * PAL Size: 2328b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * Address:	TODO
+ * Size:	TODO
  */
-void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDerivatives)
+void CMath::Quit()
 {
-    int i;
-    for (i = 0; i < count; ++i) {
-        s_hSpline[i] = x[i + 1] - x[i];
-        s_wSpline[i] = (y[i + 1] - y[i]) / s_hSpline[i];
-    }
-    s_wSpline[count] = s_wSpline[0];
-
-    for (i = 1; i < count; ++i) {
-        s_dSpline[i] = FLOAT_8032F75C * (x[i + 1] - x[i - 1]);
-    }
-    s_dSpline[count] = FLOAT_8032F75C * (s_hSpline[count - 1] + s_hSpline[0]);
-
-    for (i = 1; i <= count; ++i) {
-        outSecondDerivatives[i] = s_wSpline[i] - s_wSpline[i - 1];
-    }
-
-    s_wSpline[1] = s_hSpline[0];
-    s_wSpline[count - 1] = s_hSpline[count - 1];
-    s_wSpline[count] = s_dSpline[count];
-    for (i = 2; i < count - 1; ++i) {
-        s_wSpline[i] = kZeroF;
-    }
-
-    for (i = 1; i < count; ++i) {
-        float r = s_hSpline[i] / s_dSpline[i];
-        outSecondDerivatives[i + 1] = -(r * outSecondDerivatives[i] - outSecondDerivatives[i + 1]);
-        s_dSpline[i + 1] = -(r * s_hSpline[i] - s_dSpline[i + 1]);
-        s_wSpline[i + 1] = -(r * s_wSpline[i] - s_wSpline[i + 1]);
-    }
-
-    s_wSpline[0] = s_wSpline[count];
-    outSecondDerivatives[0] = outSecondDerivatives[count];
-    for (i = count - 2; i >= 0; --i) {
-        float r = s_hSpline[i] / s_dSpline[i + 1];
-        outSecondDerivatives[i] = -(r * outSecondDerivatives[i + 1] - outSecondDerivatives[i]);
-        s_wSpline[i] = -(r * s_wSpline[i + 1] - s_wSpline[i]);
-    }
-
-    float firstDerivative = outSecondDerivatives[0] / s_wSpline[0];
-    outSecondDerivatives[0] = firstDerivative;
-    outSecondDerivatives[count] = firstDerivative;
-    for (i = 1; i < count; ++i) {
-        float w = s_wSpline[i];
-        float value = outSecondDerivatives[i];
-        float d = s_dSpline[i];
-        outSecondDerivatives[i] = -(firstDerivative * w - value) / d;
-    }
+	// TODO
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001a62c
- * PAL Size: 220b
+ * PAL Address: 0x8001c290
+ * PAL Size: 64b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-float CMath::Spline1D(int lastIndex, float t, float* x, float* y, float* secondDerivatives)
+void CMath::Init()
 {
-    float period = x[lastIndex] - x[0];
-
-    while (t > x[lastIndex]) {
-        t -= period;
-    }
-
-    while (t < x[0]) {
-        t += period;
-    }
-
-    int low = 0;
-    int high = lastIndex;
-    while (low < high) {
-        int mid = (low + high) / 2;
-        if (x[mid] < t) {
-            low = mid + 1;
-        }
-        else {
-            high = mid;
-        }
-    }
-
-    if (low > 0) {
-        low--;
-    }
-
-    float x0 = x[low];
-    float sd0 = secondDerivatives[low];
-    float sd1 = secondDerivatives[low + 1];
-    float y0 = y[low];
-    float dt = t - x0;
-    float dx = x[low + 1] - x0;
-    float cubic = 3.0f * sd0 + (dt * (sd1 - sd0)) / dx;
-    float linear = (y[low + 1] - y0) / dx - dx * (2.0f * sd0 + sd1);
-
-    return (dt * cubic + linear) * dt + y0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001a580
- * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-float CMath::Line1D(int lastIndex, float x, float* x_arr, float* y_arr)
-{
-    float period = x_arr[lastIndex] - x_arr[0];
-
-    while (x > x_arr[lastIndex]) {
-        x -= period;
-    }
-
-    while (x < x_arr[0]) {
-        x += period;
-    }
-
-    int low = 0;
-    int high = lastIndex;
-    while (low < high) {
-        int mid = (low + high) / 2;
-        if (x_arr[mid] < x) {
-            low = mid + 1;
-        } else {
-            high = mid;
-        }
-    }
-
-    if (low > 0) {
-        low--;
-    }
-
-    return ((x - x_arr[low]) / (x_arr[low + 1] - x_arr[low])) * (y_arr[low + 1] - y_arr[low]) + y_arr[low];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001a3e4
- * PAL Size: 412b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
-{
-    int sat = (saturation * 0xFF) / 100;
-    int val = (brightness * 0xFF) / 100;
-
-    unsigned char rgba[4];
-    if ((float)sat == 0.0f) {
-        rgba[0] = val;
-        rgba[1] = val;
-        rgba[2] = val;
-    } else {
-        int sector = hue / 0x3C;
-        int low = ((0xFF - sat) * val) / 0xFF;
-        int delta = ((hue - sector * 0x3C) * (val - low)) / 0x3C;
-
-        if (hue < 60) {
-            rgba[0] = val;
-            rgba[2] = low;
-            rgba[1] = low + delta;
-        } else if (hue < 120) {
-            rgba[1] = val;
-            rgba[2] = low;
-            rgba[0] = val - delta;
-        } else if (hue < 180) {
-            rgba[1] = val;
-            rgba[0] = low;
-            rgba[2] = low + delta;
-        } else if (hue < 240) {
-            rgba[2] = val;
-            rgba[0] = low;
-            rgba[1] = val - delta;
-        } else if (hue < 300) {
-            rgba[2] = val;
-            rgba[1] = low;
-            rgba[0] = low + delta;
-        } else if (hue < 360) {
-            rgba[0] = val;
-            rgba[1] = low;
-            rgba[2] = val - delta;
-        } else {
-            rgba[2] = 0;
-            rgba[1] = 0;
-            rgba[0] = 0;
-        }
-    }
-
-    rgba[3] = 0xFF;
-    return *(unsigned int*)rgba;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001a2f8
- * PAL Size: 236b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-float CMath::DstRot(float from, float to)
-{
-    float s0 = (float)sin((double)from);
-    float c0 = (float)cos((double)from);
-    float s1 = (float)sin((double)to);
-    float c1 = (float)cos((double)to);
-    float dot = s0 * s1 + c0 * c1;
-
-    if (dot == 0.0f) {
-        return 0.0f;
-    }
-
-    if (dot < -1.0f) {
-        dot = -1.0f;
-    } else if (1.0f < dot) {
-        dot = 1.0f;
-    } else {
-        dot = dot;
-    }
-
-    float angle = (float)acos((double)dot);
-    if (s0 * c1 - s1 * c0 < 0.0f) {
-        angle = -angle;
-    }
-
-    return angle;
+	PSMTXIdentity(m_localMtx);
+	memset(m_scratch, 0, sizeof(m_scratch));
 }

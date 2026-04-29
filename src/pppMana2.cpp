@@ -4,7 +4,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/util.h"
@@ -1115,8 +1115,8 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     float z;
     float rowUv;
     int indexOffset;
-    int quadIndex;
-    int rowBase;
+    short quadIndex;
+    short rowBase;
     float* positions;
     int rowCount;
     float* normals;
@@ -1139,7 +1139,6 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
             *positions = x;
             param_1 = reinterpret_cast<Vec*>(positions + 3);
             positions[1] = zero;
-            colCount = colCount + 1;
             param_2 = reinterpret_cast<Vec*>(normals + 3);
             param_3 = reinterpret_cast<Vec2d*>(uvs + 2);
             positions[2] = z;
@@ -1148,9 +1147,10 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
             normals[1] = normalY;
             normals[2] = zero;
             normals = normals + 3;
-            *uvs = static_cast<float>(colCount - 1) * uvStep;
+            *uvs = static_cast<float>(colCount) * uvStep;
             uvs[1] = rowUv;
             uvs = uvs + 2;
+            colCount = colCount + 1;
         }
         rowCount = rowCount + 1;
     }
@@ -1161,31 +1161,20 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
         pairCount = 8;
         quadIndex = rowBase;
         do {
-            *(short*)((char*)param_4 + indexOffset) = (short)quadIndex;
-            indexOffset += 2;
-            *(short*)((char*)param_4 + indexOffset) = (short)(quadIndex + 1);
-            indexOffset += 2;
-            *(short*)((char*)param_4 + indexOffset) = (short)(quadIndex + 0x12);
-            indexOffset += 2;
-            *(short*)((char*)param_4 + indexOffset) = (short)(quadIndex + 0x12);
-            indexOffset += 2;
-            *(short*)((char*)param_4 + indexOffset) = (short)(quadIndex + 0x11);
-            indexOffset += 2;
-            *(short*)((char*)param_4 + indexOffset) = (short)quadIndex;
-            indexOffset += 2;
-            *(short*)((char*)param_4 + indexOffset) = (short)(quadIndex + 1);
-            indexOffset += 2;
-            *(short*)((char*)param_4 + indexOffset) = (short)(quadIndex + 2);
-            indexOffset += 2;
-            *(short*)((char*)param_4 + indexOffset) = (short)(quadIndex + 0x13);
-            indexOffset += 2;
-            *(short*)((char*)param_4 + indexOffset) = (short)(quadIndex + 0x13);
-            indexOffset += 2;
-            *(short*)((char*)param_4 + indexOffset) = (short)(quadIndex + 0x12);
-            indexOffset += 2;
-            *(short*)((char*)param_4 + indexOffset) = (short)(quadIndex + 1);
+            *(short*)((char*)param_4 + indexOffset) = quadIndex;
+            *(short*)((char*)param_4 + indexOffset + 2) = quadIndex + 1;
+            *(short*)((char*)param_4 + indexOffset + 4) = quadIndex + 0x12;
+            *(short*)((char*)param_4 + indexOffset + 6) = quadIndex + 0x12;
+            *(short*)((char*)param_4 + indexOffset + 8) = quadIndex + 0x11;
+            *(short*)((char*)param_4 + indexOffset + 10) = quadIndex;
+            *(short*)((char*)param_4 + indexOffset + 0xC) = quadIndex + 1;
+            *(short*)((char*)param_4 + indexOffset + 0xE) = quadIndex + 2;
+            *(short*)((char*)param_4 + indexOffset + 0x10) = quadIndex + 0x13;
+            *(short*)((char*)param_4 + indexOffset + 0x12) = quadIndex + 0x13;
+            *(short*)((char*)param_4 + indexOffset + 0x14) = quadIndex + 0x12;
+            *(short*)((char*)param_4 + indexOffset + 0x16) = quadIndex + 1;
             quadIndex = quadIndex + 2;
-            indexOffset += 2;
+            indexOffset += 0x18;
             pairCount = pairCount + -1;
         } while (pairCount != 0);
         rowCount = rowCount + 1;

@@ -339,7 +339,6 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 {
 	unsigned char* head = (unsigned char*)waveHead;
-	int* entry = (int*)this;
 
 	if ((head[0] != 'W') || (head[1] != 'D')) {
 		if (m_ReportPrint != 0) {
@@ -387,23 +386,23 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 	do {
 		int* historyBank;
 		if (waveBankNo < 0) {
-			historyBank = (int*)(entry[0] + 0x100);
-			while ((historyBank[3] != 0) && (historyBank < (int*)(entry[0] + 0x400U))) {
+			historyBank = (int*)(m_waveBankBase + 0x100);
+			while ((historyBank[3] != 0) && (historyBank < (int*)(m_waveBankBase + 0x400U))) {
 				historyBank += 4;
 			}
 		} else {
 			waveBankNo &= 0xF;
-			historyBank = (int*)(entry[0] + waveBankNo * 0x10);
+			historyBank = (int*)(m_waveBankBase + waveBankNo * 0x10);
 			if (historyBank[3] != 0) {
 				WaveDelete((RedHistoryBANK*)historyBank);
 			}
 		}
 
 		int arAddress;
-		if ((historyBank < (int*)(entry[0] + 0x400U)) &&
+		if ((historyBank < (int*)(m_waveBankBase + 0x400U)) &&
 		    ((arAddress = RedNewA(*(int*)(head + 0x14), minOffset, maxOffset)) != 0)) {
-			int copySize = (((*(int*)(head + 8) * 4) + 0x1F) & 0xFFFFFFE0) + *(int*)(head + 0xC) * 0x60 +
-			               0x20;
+			int copySize = *(int*)(head + 0xC) * 0x60 + 0x20;
+			copySize += ((*(int*)(head + 8) * 4) + 0x1F) & 0xFFFFFFE0;
 			void* copied = (void*)RedNew(copySize);
 			if (copied != 0) {
 				historyBank[2] = (int)copied;

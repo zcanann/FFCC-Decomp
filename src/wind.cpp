@@ -211,9 +211,9 @@ found:
 		return -1;
 	}
 
-	float centerX = pos->x;
 	obj->type = 2;
 	float centerZ = pos->z;
+	float centerX = pos->x;
 	obj->flags = static_cast<u8>(__rlwimi(obj->flags, 1, 7, 24, 24));
 
 	int id = m_nextId;

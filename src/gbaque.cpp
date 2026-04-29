@@ -3383,11 +3383,14 @@ void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
  * JP Address: TODO
  * JP Size: TODO
  */
-void GbaQueue::GetCmdData(int channel, unsigned char* outData)
+int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 {
 	unsigned char localPlayerData[0xDC];
 	unsigned char count;
 	unsigned char* writePtr;
+	unsigned char* itemPtr;
+	unsigned short cmdData[4];
+	int size;
 	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -3396,32 +3399,34 @@ void GbaQueue::GetCmdData(int channel, unsigned char* outData)
 
 	count = 0;
 	writePtr = outData + 4;
+	size = 4;
 
 	outData[0] = 0;
 	outData[1] = 0;
 	outData[2] = 0;
 	outData[3] = 0;
+	itemPtr = localPlayerData;
 
-	for (i = 0; i < 0x40; i++) {
-		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + i * 2);
+	for (i = 0; i < 0x40; i++, itemPtr += 2) {
+		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
 		if ((GetItemType__8CMenuPcsFii(&MenuPcs, itemId, 1) == 1) &&
 		    (GetItemIcon__8CMenuPcsFi(&MenuPcs, itemId) == (localPlayerData[0xDA] & 3))) {
 			int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 
-			*reinterpret_cast<unsigned short*>(writePtr + 0) =
-				SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 4));
-			*reinterpret_cast<unsigned short*>(writePtr + 2) =
-				SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 6));
-			*reinterpret_cast<unsigned short*>(writePtr + 4) =
-				SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 8));
-			*reinterpret_cast<unsigned short*>(writePtr + 6) = 0;
+			cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
+			cmdData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
+			cmdData[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
+			cmdData[3] = 0;
+			memcpy(writePtr, cmdData, sizeof(cmdData));
 
 			writePtr += 8;
+			size += 8;
 			count++;
 		}
 	}
 
 	outData[0] = count;
+	return size;
 }
 
 /*

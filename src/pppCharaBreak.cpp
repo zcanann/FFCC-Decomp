@@ -676,6 +676,11 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         *(S16Vec*)(polygon + 0x1C) = transformed[2];
                     }
                 } else {
+                    Vec center;
+                    center.x = 0.0f;
+                    center.y = 0.0f;
+                    center.z = 0.0f;
+
                     int sumX = (int)*(short*)(polygon + 0x10) + (int)*(short*)(polygon + 0x16) + (int)*(short*)(polygon + 0x1C);
                     int sumY = (int)*(short*)(polygon + 0x12) + (int)*(short*)(polygon + 0x18) + (int)*(short*)(polygon + 0x1E);
                     int sumZ = (int)*(short*)(polygon + 0x14) + (int)*(short*)(polygon + 0x1A) + (int)*(short*)(polygon + 0x20);
@@ -695,10 +700,6 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         Mtx rotMtx;
                         float sinValue = FLOAT_80332048;
                         float cosValue = FLOAT_80332048;
-
-                        center.x = FLOAT_80332048;
-                        center.y = FLOAT_80332048;
-                        center.z = FLOAT_80332048;
 
                         for (int i = 0; i < 3; i++) {
                             S16Vec pos;
@@ -726,11 +727,12 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         PSMTXQuat(rotMtx, &rotQuat);
 
                         if (stepData->m_spinMode == 1) {
-                            int rand10 = (rand() % 10) + 10;
                             short* angleState = (short*)(polygon + 4);
                             if (*(short*)(polygon + 6) == 0) {
+                                int rand10 = (rand() % 10) + 10;
                                 *angleState += (short)rand10;
                             } else {
+                                int rand10 = (rand() % 10) + 10;
                                 *angleState -= (short)rand10;
                             }
 
@@ -824,9 +826,9 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             normal.x = Math.RandF(FLOAT_8033204c);
             normal.y = Math.RandF(FLOAT_8033204c);
             normal.z = Math.RandF(FLOAT_8033204c);
-            normal.x *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
-            normal.y *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
-            normal.z *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
+            normal.x *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078;
+            normal.y *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078;
+            normal.z *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078;
             PSVECNormalize(&normal, &normal);
             ConvF2IVector__5CUtilFR6S16Vec3Vecl(&gUtil, &polygonData->m_normalA, normal, normQuant);
         } else {
@@ -836,21 +838,21 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
 
         PSVECCrossProduct(&up, &normal, &tangent);
         float tangentMag = PSVECMag(&tangent);
-        if (tangentMag == FLOAT_80332048) {
-            tangent.x = FLOAT_80332048;
-            tangent.y = FLOAT_80332048;
-            tangent.z = FLOAT_80332048;
+        if (tangentMag == 0.0f) {
+            tangent.x = 0.0f;
+            tangent.y = 0.0f;
+            tangent.z = 0.0f;
         } else {
             PSVECScale(&tangent, &tangent, FLOAT_8033204c / tangentMag);
         }
 
-        if (tangent.x == FLOAT_80332048 && tangent.y == FLOAT_80332048 && tangent.z == FLOAT_80332048) {
+        if (tangent.x == 0.0f && tangent.y == 0.0f && tangent.z == 0.0f) {
             tangent.x = FLOAT_8033204c;
-            tangent.y = FLOAT_80332048;
-            tangent.z = FLOAT_80332048;
+            tangent.y = 0.0f;
+            tangent.z = 0.0f;
         }
 
-        if (stepData->m_spinMode == 1) {
+        if (stepData->m_spinMode != 0 && stepData->m_spinMode == 1) {
             polygonData->m_normalA.x = 0;
             polygonData->m_normalA.z = 0;
             polygonData->m_normalA.y = rand() % 2;

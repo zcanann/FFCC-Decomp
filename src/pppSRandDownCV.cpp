@@ -8,6 +8,23 @@
 
 const float kPppSRandDownCVDualSampleScale = 0.5f;
 
+static char randchar(char value, float scale)
+{
+    return (char)((f32)value * scale);
+}
+
+static float randf(unsigned char flag)
+{
+    float value = -Math.RandF();
+    if (flag != 0) {
+        float random = Math.RandF();
+        float blend = value - random;
+        float scale = kPppSRandDownCVDualSampleScale;
+        value = blend * scale;
+    }
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800635b0
@@ -90,47 +107,8 @@ void pppSRandDownCV(void* basePtr, void* in, _pppCtrlTable* ctrl)
     u8* target_colors =
         (color_offset == -1) ? gPppDefaultValueBuffer : (u8*)((char*)basePtr + color_offset + 0x80);
 
-    {
-        s8 base = *(s8*)((char*)in + 0x8);
-        s8 delta = (s8)((f32)base * target[0]);
-        target_colors[0] = (u8)(target_colors[0] + delta);
-    }
-
-    {
-        s8 base = *(s8*)((char*)in + 0x9);
-        s8 delta = (s8)((f32)base * target[1]);
-        target_colors[1] = (u8)(target_colors[1] + delta);
-    }
-
-    {
-        s8 base = *(s8*)((char*)in + 0xA);
-        s8 delta = (s8)((f32)base * target[2]);
-        target_colors[2] = (u8)(target_colors[2] + delta);
-    }
-
-    {
-        s8 base = *(s8*)((char*)in + 0xB);
-        s8 delta = (s8)((f32)base * target[3]);
-        target_colors[3] = (u8)(target_colors[3] + delta);
-    }
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void randchar(char, float)
-{
-    // TODO
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void randf(unsigned char)
-{
-    // TODO
+    target_colors[0] = target_colors[0] + randchar(*(s8*)((char*)in + 0x8), target[0]);
+    target_colors[1] = target_colors[1] + randchar(*(s8*)((char*)in + 0x9), target[1]);
+    target_colors[2] = target_colors[2] + randchar(*(s8*)((char*)in + 0xA), target[2]);
+    target_colors[3] = target_colors[3] + randchar(*(s8*)((char*)in + 0xB), target[3]);
 }

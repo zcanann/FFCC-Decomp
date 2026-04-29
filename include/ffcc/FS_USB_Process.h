@@ -4,7 +4,6 @@
 #include "types.h"
 #include "dolphin/gx/GXStruct.h"
 
-class CDataHeader;
 class CFunnyShapePcs;
 
 struct FS_DISPLAY_STATUS
@@ -28,10 +27,10 @@ struct FS_DISPLAY_STATUS
 
 struct OSFS_SHAPE_ST
 {
-    u16 flags;      // 0x00
+    s16 flags;      // 0x00
     s16 count;      // 0x02
     u32 unk04;      // 0x04
-    u16 unk08;      // 0x08
+    s16 unk08;      // 0x08
     u8 unk0A[4];    // 0x0A
     u16 unk0E;      // 0x0E
 };
@@ -39,10 +38,10 @@ struct OSFS_SHAPE_ST
 struct OSFS_ANM_ST
 {
     u32 unk00;       // 0x00
-    u16 unk04;       // 0x04
-    u16 unk06;       // 0x06
-    u16 unk08;       // 0x08
-    u16 unk0A;       // 0x0A
+    s16 unk04;       // 0x04
+    s16 unk06;       // 0x06
+    s16 unk08;       // 0x08
+    s16 unk0A;       // 0x0A
     void* anmData;   // 0x0C
 };
 

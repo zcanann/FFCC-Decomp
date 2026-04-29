@@ -114,10 +114,10 @@ const char DAT_8032f6a4[] = "Tepa";
 const char DAT_8032f6ac[] = "Tipa";
 const char lbl_8032F6B4[] = "Game";
 }
-static const char s_dvd_pctscft_param_cfd_801D6054[] = "dvd/%scft/param.cfd";
-static const char s_dvd_pctscft_c_system_cfd_801D6068[] = "dvd/%scft/c_system.cfd";
-static const char s_dvd_pctscft_mail_tbl_cfd_801D6080[] = "dvd/%scft/mail_tbl.cfd";
-static const char s_dvd_pctscft_newbattle_cfd_801D6098[] = "dvd/%scft/newbattle.cfd";
+extern const char s_dvd_pctscft_param_cfd_801D6054[];
+extern const char s_dvd_pctscft_c_system_cfd_801D6068[];
+extern const char s_dvd_pctscft_mail_tbl_cfd_801D6080[];
+extern const char s_dvd_pctscft_newbattle_cfd_801D6098[];
 static const char DAT_801d60d4[] = {
     0x70, 0x64, 0x74, 0x69, 0x64, 0x3D, 0x25, 0x64, 0x20, 0x66, 0x70, 0x6E, 0x6F, 0x3D, 0x25, 0x64, 0x20, 0x69,
     0x64, 0x3D, 0x25, 0x64, 0x20, 0x66, 0x72, 0x61, 0x6D, 0x65, 0x3D, 0x25, 0x64, 0x20, 0x83, 0x70, 0x81, 0x5B,
@@ -133,6 +133,7 @@ static const char DAT_801d6154[] = {
     0x64, 0x3D, 0x25, 0x64, 0x20, 0x66, 0x72, 0x61, 0x6D, 0x65, 0x3D, 0x25, 0x64, 0x83, 0x70, 0x81, 0x5B, 0x83,
     0x65, 0x83, 0x42, 0x83, 0x4E, 0x83, 0x8B, 0x83, 0x60, 0x83, 0x83, 0x81, 0x5B, 0x83, 0x57, 0x8F, 0x49, 0x97,
     0xB9, 0x6F, 0x6E, 0x0A, 0x00};
+extern const char lbl_801D5FC0[];
 static const char s_game_cpp_801d6190[] = "game.cpp";
 static const char DAT_801d619c[] = {
     0x83, 0x58, 0x83, 0x4E, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x67, 0x82, 0xAA, 0x90, 0xD8, 0x82, 0xE8, 0x91, 0xD6,
@@ -156,26 +157,21 @@ static const char lbl_801D626C[] = {
     0x83, 0x56, 0x81, 0x5B, 0x83, 0x93, 0x82, 0xAA, 0x88, 0xD9, 0x8F, 0xED, 0x82, 0xC5, 0x82, 0xB7,
     0x81, 0x42, 0x25, 0x64, 0x0A, 0x00, 0x00, 0x00};
 static const char s_GameDebug_801D6284[] = "GameDebug";
-static const char s_SN_EXIT[] = "SN_EXIT";
-static const char s_SN_DUMMY_801D600C[] = "SN_DUMMY";
-static const char s_SN_CHARA_801D6018[] = "SN_CHARA";
-static const char s_SN_MAP[] = "SN_MAP";
-static const char s_SN_GAME[] = "SN_GAME";
-static const char s_SN_MATERIALEDITOR_801D6024[] = "SN_MATERIALEDITOR";
-static const char s_SN_FUNNYSHAPE_801D6038[] = "SN_FUNNYSHAPE";
-static const char s_SN_PARTVIEW_801D6048[] = "SN_PARTVIEW";
-static const char s_lang_jp[] = "jp/";
-static const char s_lang_uk[] = "uk/";
-static const char s_lang_gr[] = "gr/";
-static const char s_lang_it[] = "it/";
-static const char s_lang_fr[] = "fr/";
-static const char s_lang_sp[] = "sp/";
+extern const char lbl_8032F630[];
+extern const char s_SN_DUMMY_801D600C[];
+extern const char s_SN_CHARA_801D6018[];
+extern const char lbl_8032F638[];
+extern const char lbl_8032F640[];
+extern const char s_SN_MATERIALEDITOR_801D6024[];
+extern const char s_SN_FUNNYSHAPE_801D6038[];
+extern const char s_SN_PARTVIEW_801D6048[];
+extern const char* s_localLangDirs[];
 static const char* m_tStatus[] = {
-    s_SN_EXIT,
+    lbl_8032F630,
     s_SN_DUMMY_801D600C,
     s_SN_CHARA_801D6018,
-    s_SN_MAP,
-    s_SN_GAME,
+    lbl_8032F638,
+    lbl_8032F640,
     s_SN_MATERIALEDITOR_801D6024,
     s_SN_FUNNYSHAPE_801D6038,
     s_SN_PARTVIEW_801D6048,
@@ -189,14 +185,6 @@ const char* PTR_s_dvd__scft_param_cfd[] = {
     s_dvd_pctscft_newbattle_cfd_801D6098,
 };
 float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
-static const char* s_localLangDirs[] = {
-    s_lang_jp,
-    s_lang_uk,
-    s_lang_gr,
-    s_lang_it,
-    s_lang_fr,
-    s_lang_sp,
-};
 static const char s_numNameFmt[] = "%d %s";
 static const char s_nameJoinFmt[] = "%s%s%s";
 static const char s_nameSep[] = " ";
@@ -1213,25 +1201,26 @@ void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PP
  */
 void CGame::ParticleFrameCallback(int effectIndex, int scriptLine, int scriptStep, int callbackType, int graphFrame, Vec*)
 {
+	char* callbackFmtBase = const_cast<char*>(lbl_801D5FC0);
 	int ifData = pppGetIfDt__8CPartMngFs(&PartMng, (short)effectIndex);
 	*(u8*)(ifData + 7) |= 1 << callbackType;
 
 	if (callbackType == 0) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-			System.Printf(const_cast<char*>(DAT_801d60d4), scriptLine, scriptStep, effectIndex, graphFrame);
+			System.Printf(callbackFmtBase + 0x114, scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	} else if (callbackType == 1) {
 		*(u8*)(ifData + 7) &= ~2;
 		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
 
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-			System.Printf(const_cast<char*>(DAT_801d6114), scriptLine, scriptStep, effectIndex, graphFrame);
+			System.Printf(callbackFmtBase + 0x154, scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	} else if (callbackType == 3) {
 		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
 
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-			System.Printf(const_cast<char*>(DAT_801d6154), scriptLine, scriptStep, effectIndex, graphFrame);
+			System.Printf(callbackFmtBase + 0x194, scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	}
 }

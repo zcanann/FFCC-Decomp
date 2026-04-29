@@ -2011,6 +2011,9 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 {
 	GbaQueuePlayerDataView localPlayerData;
 	unsigned short itemList[0x40];
+	unsigned int artifactData[3];
+	unsigned short tmpArtifactList[4];
+	unsigned short artifactList[8];
 	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -2018,18 +2021,19 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	for (i = 0; i < 0x40; i++) {
-		itemList[i] = SwapU16(localPlayerData.m_items[i]);
+		itemList[i] = __lhbrx(&localPlayerData.m_items[i], 0);
 	}
 	memcpy(outData, itemList, sizeof(itemList));
 
-	*reinterpret_cast<unsigned int*>(outData + 0x80) = SwapU32(localPlayerData.m_artifacts[0]);
-	*reinterpret_cast<unsigned int*>(outData + 0x84) = SwapU32(localPlayerData.m_artifacts[1]);
-	*reinterpret_cast<unsigned int*>(outData + 0x88) = SwapU32(localPlayerData.m_artifacts[2]);
+	artifactData[0] = __lwbrx(&localPlayerData.m_artifacts[0], 0);
+	artifactData[1] = __lwbrx(&localPlayerData.m_artifacts[1], 0);
+	artifactData[2] = __lwbrx(&localPlayerData.m_artifacts[2], 0);
+	memcpy(outData + 0x80, artifactData, sizeof(artifactData));
 
 	for (i = 0; i < 4; i++) {
-		*reinterpret_cast<unsigned short*>(outData + 0x8C + i * 2) =
-			SwapU16(localPlayerData.m_tmpArtifacts[i]);
+		tmpArtifactList[i] = __lhbrx(&localPlayerData.m_tmpArtifacts[i], 0);
 	}
+	memcpy(outData + 0x8C, tmpArtifactList, sizeof(tmpArtifactList));
 
 	outData[0x94] = localPlayerData.m_commandData[0];
 	outData[0x95] = localPlayerData.m_commandData[1];
@@ -2037,9 +2041,9 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 	outData[0x97] = localPlayerData.m_commandData[3];
 
 	for (i = 0; i < 8; i++) {
-		*reinterpret_cast<unsigned short*>(outData + 0x98 + i * 2) =
-			SwapU16(localPlayerData.m_artifactList[i]);
+		artifactList[i] = __lhbrx(&localPlayerData.m_artifactList[i], 0);
 	}
+	memcpy(outData + 0x98, artifactList, sizeof(artifactList));
 
 	outData[0xA8] = localPlayerData.m_artifactCount;
 	return 0xA9;

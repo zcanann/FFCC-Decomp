@@ -7,7 +7,6 @@ struct _pppPObject;
 struct _pppCtrlTable;
 struct RandCVParams;
 #ifdef __cplusplus
-char randchar(char, float);
 
 extern "C" {
 #endif

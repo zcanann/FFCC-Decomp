@@ -4,9 +4,6 @@
 
 struct _pppPObject;
 #ifdef __cplusplus
-void randchar(char, float);
-void randf(unsigned char);
-
 extern "C" {
 #endif
 

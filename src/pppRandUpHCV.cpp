@@ -16,6 +16,11 @@ struct PppRandUpHCVParam2 {
     u8 field10;
 };
 
+static short randshort(short value, float scale)
+{
+    return (short)((f32)value * scale);
+}
+
 /*
  * --INFO--
  * PAL Address: 80062B18
@@ -56,20 +61,8 @@ extern "C" void pppRandUpHCV(_pppPObject* basePtr, PppRandUpHCVParam2* in, _pppC
 
     f32 scale = *valuePtr;
 
-    {
-        s16 baseValue = in->field8;
-        target[0] = (s16)(target[0] + (s32)((f32)baseValue * scale));
-    }
-    {
-        s16 baseValue = in->fieldA;
-        target[1] = (s16)(target[1] + (s32)((f32)baseValue * scale));
-    }
-    {
-        s16 baseValue = in->fieldC;
-        target[2] = (s16)(target[2] + (s32)((f32)baseValue * scale));
-    }
-    {
-        s16 baseValue = in->fieldE;
-        target[3] = (s16)(target[3] + (s32)((f32)baseValue * scale));
-    }
+    target[0] = target[0] + randshort(in->field8, scale);
+    target[1] = target[1] + randshort(in->fieldA, scale);
+    target[2] = target[2] + randshort(in->fieldC, scale);
+    target[3] = target[3] + randshort(in->fieldE, scale);
 }

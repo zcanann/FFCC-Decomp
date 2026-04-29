@@ -10,8 +10,6 @@ struct PppSRandFVParam2;
 extern "C" {
 #endif
 
-void randfloat(float, float);
-void randf(unsigned char);
 void pppSRandFV(struct _pppPObject* basePtr, struct PppSRandFVParam2* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus

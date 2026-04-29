@@ -23,8 +23,6 @@ extern const f32 FLOAT_80333458;
 extern const f32 FLOAT_8033345c;
 extern const f32 FLOAT_8033342c;
 extern const f32 FLOAT_80333430;
-extern const f64 DOUBLE_80333440;
-extern const f64 DOUBLE_80333438;
 
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
@@ -116,11 +114,6 @@ struct LaserBaseObject {
     s32 m_graphId;
     pppFMATRIX m_localMatrix;
     pppFMATRIX m_drawMatrix;
-};
-
-union LaserDoubleBits {
-    double d;
-    u32 u[2];
 };
 
 /*
@@ -302,17 +295,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             if (emptyHistory) {
                 continue;
             }
-            LaserDoubleBits countDouble;
-            LaserDoubleBits indexDouble;
-
-            countDouble.u[0] = 0x43300000;
-            countDouble.u[1] = (u32)(int)(step->m_payload[0x3a] + 1) ^ 0x80000000;
-            indexDouble.u[0] = 0x43300000;
-            indexDouble.u[1] = (u32)(int)i ^ 0x80000000;
-
-            float count = (float)(countDouble.d - DOUBLE_80333440);
-            float index = (float)(indexDouble.d - DOUBLE_80333440);
-            float t = (FLOAT_80333448 / count) * index;
+            float t = (FLOAT_80333448 / (float)(s32)(step->m_payload[0x3a] + 1)) * (float)i;
             if (GetCharaNodeFrameMatrix(pppMngStPtr, t, charaMtx) == 0) {
                 emptyHistory = 1;
                 continue;
@@ -533,11 +516,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             *shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
 
         count = (u32)step->m_payload[0x1e];
-        LaserDoubleBits countDouble;
-
-        countDouble.u[0] = 0x43300000;
-        countDouble.u[1] = count;
-        uvStep = FLOAT_8033342c / (float)(countDouble.d - DOUBLE_80333438);
+        uvStep = FLOAT_8033342c / (float)count;
         if (step->m_initWOrk == 0xFFFF) {
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
             _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);

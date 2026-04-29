@@ -114,10 +114,10 @@ public:
     unsigned long m_amemPrev;
     unsigned long m_amemLock;
     int m_cacheCount;
-    unsigned char (*m_releaseCheck)(unsigned long);
-    unsigned long m_releaseCheckArg;
     unsigned char (*m_releaseAction)(unsigned long);
     unsigned long m_releaseActionArg;
+    unsigned char (*m_releaseCheck)(unsigned long);
+    unsigned long m_releaseCheckArg;
     unsigned char (*m_overflowHook)(unsigned long);
     unsigned long m_overflowHookArg;
     CAmemCache* m_cacheTable;

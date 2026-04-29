@@ -13,6 +13,7 @@ extern const float kUtilHermiteCoeff2;
 extern const float kUtilHermiteCoeff3;
 extern const float kUtilHermiteCoeffNeg2;
 extern "C" const Vec gUtilUpVector = {0.0f, 1.0f, 0.0f};
+static Vec s_zeroVector = {0.0f, 0.0f, 0.0f};
 
 static inline MtxPtr GetCameraMatrix()
 {
@@ -233,6 +234,7 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 		u32 count = *(u16*)(current + 1);
 		u8 primitive = cmd & 0xF8;
 		u8 indexFormat = cmd & 7;
+		bool isPrimitive;
 		current += 3;
 
 		switch (primitive) {
@@ -243,9 +245,15 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 			case 0xA8:
 			case 0xB0:
 			case 0xB8:
+				isPrimitive = true;
 				break;
 			default:
-				goto flush;
+				isPrimitive = false;
+				break;
+		}
+
+		if (!isPrimitive) {
+			break;
 		}
 
 		while (count != 0) {
@@ -254,25 +262,22 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 			if (copyPos != 0) {
 				*(u16*)(current + 4) = value;
 			}
-			current += 6;
-
 			if (copyNrm != 0) {
-				*(u16*)current = value;
+				*(u16*)(current + 6) = value;
 			}
-			current += 2;
 
+			u8* next = current + 8;
 			if (indexFormat == 2) {
 				if (copyNrm != 0) {
-					*(u16*)current = value;
+					*(u16*)next = value;
 				}
-				current += 2;
+				next = current + 10;
 			}
 
+			current = next;
 			count--;
 		}
 	}
-
-flush:
 	DCFlushRange(dlData, dlSize);
 }
 

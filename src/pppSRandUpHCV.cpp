@@ -16,6 +16,23 @@ struct PppSRandUpHCVParam2 {
     u8 field10;
 };
 
+static short randshort(short value, float scale)
+{
+    return (short)((f32)value * scale);
+}
+
+static float randf(unsigned char flag)
+{
+    float value = Math.RandF();
+    if (flag != 0) {
+        float random = Math.RandF();
+        float blend = value + random;
+        float scale = kPppSRandUpHCVDualSampleScale;
+        value = blend * scale;
+    }
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80064550
@@ -94,8 +111,8 @@ void pppSRandUpHCV(_pppPObject* basePtr, PppSRandUpHCVParam2* in, _pppCtrlTable*
 	s32 color_offset = in->field4;
 	s16* target_colors = (color_offset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + color_offset + 0x80);
 
-	target_colors[0] += (s8)((f32)in->field8 * target[0]);
-	target_colors[1] += (s8)((f32)in->fieldA * target[1]);
-	target_colors[2] += (s8)((f32)in->fieldC * target[2]);
-	target_colors[3] += (s8)((f32)in->fieldE * target[3]);
+	target_colors[0] += (s8)randshort(in->field8, target[0]);
+	target_colors[1] += (s8)randshort(in->fieldA, target[1]);
+	target_colors[2] += (s8)randshort(in->fieldC, target[2]);
+	target_colors[3] += (s8)randshort(in->fieldE, target[3]);
 }

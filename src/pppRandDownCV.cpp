@@ -17,7 +17,7 @@ struct PppRandDownCVParam2 {
     u8 fieldC;
 };
 
-inline char randchar(char value, float scale)
+static char randchar(char value, float scale)
 {
     return (char)((f32)value * scale);
 }

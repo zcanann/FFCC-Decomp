@@ -7,8 +7,6 @@ struct _pppPObject;
 extern "C" {
 #endif
 
-void randfloat(float, float);
-void randf(unsigned char);
 void pppSRandDownFV(struct _pppPObject* basePtr, struct PppSRandDownFVParam2* in, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus

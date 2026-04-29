@@ -176,8 +176,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     GXTexObj backI4Tex;
     GXTexObj backRgba8Tex;
     GXTexObj backRgba8Tex2;
-    Mtx scaleMtx;
-    Mtx localMtx;
+    Mtx firstScaleMtx;
+    Mtx firstLocalMtx;
+    Mtx secondScaleMtx;
+    Mtx secondLocalMtx;
     Mtx44 screenMtx;
     GXColor stepColor;
 
@@ -195,9 +197,6 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         param_2->m_payload[0x1E] = 0xFE;
     }
 
-    texWidth = (int)FLOAT_80331928;
-    texHeight = (int)FLOAT_8033192c;
-
     packedColor.bytes[0] = colorData[8];
     packedColor.bytes[1] = colorData[9];
     packedColor.bytes[2] = colorData[10];
@@ -207,7 +206,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     packedWork.bytes[2] = (u8)(work[2] >> 7);
     packedWork.bytes[3] = (u8)(work[3] >> 7);
 
-    i4TexSize = GXGetTexBufferSize(texWidth, texHeight, (GXTexFmt)6, GX_FALSE, 0);
+    i4TexSize = GXGetTexBufferSize((int)FLOAT_80331928, (int)FLOAT_8033192c, (GXTexFmt)6, GX_FALSE, 0);
     rgba8TexSize = GXGetTexBufferSize((int)FLOAT_80331928, (int)FLOAT_8033192c, (GXTexFmt)0x28, GX_FALSE, 0);
 
     managerPos.x = pppMngStPtr->m_matrix.value[0][3];
@@ -248,6 +247,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         inNearZone = 1;
     }
 
+    texHeight = (int)FLOAT_8033192c;
+    texWidth = (int)FLOAT_80331928;
     scissorHeight = (u32)FLOAT_8033192c;
     scissorWidth = (u32)FLOAT_80331928;
 
@@ -299,9 +300,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         GXSetNumTexGens(0);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         GXSetProjection(screenMtx, GX_PERSPECTIVE);
-        PSMTXScale(scaleMtx, FLOAT_80331940, FLOAT_80331940, FLOAT_80331940);
-        PSMTXConcat(scaleMtx, pppMiasma->m_localMatrix.value, localMtx);
-        PSMTXConcat(ppvWorldMatrix, localMtx, pppMiasma->m_drawMatrix.value);
+        PSMTXScale(firstScaleMtx, FLOAT_80331940, FLOAT_80331940, FLOAT_80331940);
+        PSMTXConcat(firstScaleMtx, pppMiasma->m_localMatrix.value, firstLocalMtx);
+        PSMTXConcat(ppvWorldMatrix, firstLocalMtx, pppMiasma->m_drawMatrix.value);
         GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
 
         GXSetTevDirect(GX_TEVSTAGE0);
@@ -376,9 +377,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
             radius = FLOAT_80331940 - param_2->m_stepValue;
-            PSMTXScale(scaleMtx, radius, radius, radius);
-            PSMTXConcat(scaleMtx, pppMiasma->m_localMatrix.value, localMtx);
-            PSMTXConcat(ppvWorldMatrix, localMtx, pppMiasma->m_drawMatrix.value);
+            PSMTXScale(secondScaleMtx, radius, radius, radius);
+            PSMTXConcat(secondScaleMtx, pppMiasma->m_localMatrix.value, secondLocalMtx);
+            PSMTXConcat(ppvWorldMatrix, secondLocalMtx, pppMiasma->m_drawMatrix.value);
             GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
 
             _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(

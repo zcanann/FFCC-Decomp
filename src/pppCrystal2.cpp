@@ -241,23 +241,25 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
  */
 void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3)
 {
+    u32 x;
+    u32 y;
+    u32 yTile;
+    Crystal2Work* work;
+    Crystal2RefractionMap* textureInfo;
+    u32 textureSize;
+    float magnitude;
+    float stepX;
+    float stepY;
+    float yCoord;
+    float xCoord;
+    float ySq;
+
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    Crystal2Work* work = (Crystal2Work*)((u8*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80);
+    work = (Crystal2Work*)((u8*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80);
     if ((param_2->m_payload[0] != 0) && (work->m_refractionMap == 0)) {
-        u32 y;
-        u32 x;
-        Crystal2RefractionMap* textureInfo;
-        u32 textureSize;
-        float magnitude;
-        float stepX;
-        float stepY;
-        float yCoord;
-        float xCoord;
-        float ySq;
-
         work->m_refractionMap = (Crystal2RefractionMap*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             sizeof(Crystal2RefractionMap), pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xA8);
 
@@ -276,7 +278,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         yCoord = FLOAT_80331FE4;
 
         for (y = 0; y < (u32)textureInfo->m_height; y++) {
-            u32 yTile = y >> 2;
+            yTile = y >> 2;
             u32 yFine = (y & 3) * 4;
             ySq = yCoord * yCoord;
             xCoord = FLOAT_80331FE4;

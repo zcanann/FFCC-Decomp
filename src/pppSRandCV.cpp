@@ -16,6 +16,23 @@ struct SRandCVParam {
     u8 _pad[3];
 };
 
+static char randchar(char value, float scale)
+{
+    return (char)((f32)value * scale - (f32)value);
+}
+
+static float randf(unsigned char flag)
+{
+    float value = Math.RandF();
+    if (flag != 0) {
+        value = value + Math.RandF();
+    } else {
+        float scale = kPppSRandCVSingleSampleScale;
+        value = value * scale;
+    }
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 800632d0
@@ -92,27 +109,10 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
     }
 
     s32 color_offset = in->sourceOffset;
-    u8* target_colors;
-    if (color_offset == -1) {
-        target_colors = gPppDefaultValueBuffer;
-    } else {
-        target_colors = base + color_offset + 0x80;
-    }
+    u8* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (base + color_offset + 0x80);
 
-    {
-        u8 color = target_colors[0];
-        target_colors[0] = color + (s8)((f32)in->delta[0] * target[0] - (f32)in->delta[0]);
-    }
-    {
-        u8 color = target_colors[1];
-        target_colors[1] = color + (s8)((f32)in->delta[1] * target[1] - (f32)in->delta[1]);
-    }
-    {
-        u8 color = target_colors[2];
-        target_colors[2] = color + (s8)((f32)in->delta[2] * target[2] - (f32)in->delta[2]);
-    }
-    {
-        u8 color = target_colors[3];
-        target_colors[3] = color + (s8)((f32)in->delta[3] * target[3] - (f32)in->delta[3]);
-    }
+    target_colors[0] = target_colors[0] + randchar(in->delta[0], target[0]);
+    target_colors[1] = target_colors[1] + randchar(in->delta[1], target[1]);
+    target_colors[2] = target_colors[2] + randchar(in->delta[2], target[2]);
+    target_colors[3] = target_colors[3] + randchar(in->delta[3], target[3]);
 }

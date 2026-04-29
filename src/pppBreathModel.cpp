@@ -162,6 +162,12 @@ struct BreathParticleData {
     u8 _pad91[0x07];
 };
 
+struct BreathParticleObject {
+    _pppPObjLink m_link;
+    s32 m_graphId;
+    pppFMATRIX m_localMatrix;
+};
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -895,6 +901,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     _pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor,
     PARTICLE_DATA* particleData, PARTICLE_WMAT* particleWmat, PARTICLE_COLOR* particleColor)
 {
+    BreathParticleObject* object = reinterpret_cast<BreathParticleObject*>(pppObject);
     PBreathModel* params = reinterpret_cast<PBreathModel*>(pBreathModel);
     BreathParticleData* particle = reinterpret_cast<BreathParticleData*>(particleData);
     Mtx workMtx;
@@ -1052,7 +1059,7 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     (*(Mtx*)particleWmat)[1][3] = pos.y;
     (*(Mtx*)particleWmat)[2][3] = pos.z;
 
-    PSMTXConcat(*(Mtx*)particleWmat, pppObject->m_localMatrix.value, *(Mtx*)particleData);
+    PSMTXConcat(*(Mtx*)particleWmat, object->m_localMatrix.value, *(Mtx*)particleData);
     PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, cameraMtx);
 
     particle->m_direction.x = kPppBreathModelZero;

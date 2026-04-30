@@ -160,11 +160,11 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 
 	bufferIndex = bufferIndex & 1;
 	
-	if (*(short*)((int)stream + 0x2a) == 2) {
+	if (stream->m_channelCount == 2) {
 		do {
-			pbVar6 = (unsigned char*)(*(int*)((int)stream + 0xc) + bufferIndex * 0x1000);
-			iVar8 = *(int*)((int)stream + 4);
-			puVar7 = (unsigned int*)(*(int*)((int)stream + 8) + *(int*)((int)stream + 0x120));
+			pbVar6 = (unsigned char*)((int)stream->m_buffer + bufferIndex * 0x1000);
+			iVar8 = stream->m_voiceData;
+			puVar7 = (unsigned int*)(stream->m_fileData + stream->m_readOffset);
 			pbVar4 = pbVar6 + 0x2000;
 			puVar3 = puVar7 + 0x400;
 			pbVar5 = pbVar6;
@@ -179,12 +179,12 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 				pbVar4 = pbVar4 + 8;
 			} while (puVar7 < puVar3);
 			
-			*(int*)((int)stream + 0x120) = *(int*)((int)stream + 0x120) + 0x1000;
-			if (*(int*)((int)stream + 0x120) >= *(int*)((int)stream + 0x118)) {
-				*(int*)((int)stream + 0x120) = 0;
+			stream->m_readOffset = stream->m_readOffset + 0x1000;
+			if (stream->m_readOffset >= stream->m_fileSize) {
+				stream->m_readOffset = 0;
 			}
 			
-			puVar7 = (unsigned int*)(*(int*)((int)stream + 8) + *(int*)((int)stream + 0x120));
+			puVar7 = (unsigned int*)(stream->m_fileData + stream->m_readOffset);
 			puVar3 = puVar7 + 0x400;
 			
 			do {
@@ -197,13 +197,13 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 				pbVar4 = pbVar4 + 8;
 			} while (puVar7 < puVar3);
 			
-			*(int*)((int)stream + 0x120) = *(int*)((int)stream + 0x120) + 0x1000;
-			if (*(int*)((int)stream + 0x120) >= *(int*)((int)stream + 0x118)) {
-				*(int*)((int)stream + 0x120) = 0;
+			stream->m_readOffset = stream->m_readOffset + 0x1000;
+			if (stream->m_readOffset >= stream->m_fileSize) {
+				stream->m_readOffset = 0;
 			}
 			
-			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar6, *(int*)((int)stream + 300) + bufferIndex * 0x1000, 0x1000, 0, 0);
-			dmaID = RedDmaEntry(0x8001, 0, (int)(pbVar6 + 0x2000), *(int*)((int)stream + 300) + (bufferIndex + 2) * 0x1000, 0x1000, 0, 0);
+			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar6, stream->m_aramBuffer + bufferIndex * 0x1000, 0x1000, 0, 0);
+			dmaID = RedDmaEntry(0x8001, 0, (int)(pbVar6 + 0x2000), stream->m_aramBuffer + (bufferIndex + 2) * 0x1000, 0x1000, 0, 0);
 			
 			if ((bufferIndex == 0) && (*(void**)(iVar8 + 0x14) != 0)) {
 				int zero = 0;
@@ -219,25 +219,25 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 			
 			bufferIndex = bufferIndex ^ 1;
 			byteCount = byteCount + -0x1000;
-			*(int*)((int)stream + 0x124) = *(int*)((int)stream + 0x124) + 0x200;
+			stream->m_streamCursor = stream->m_streamCursor + 0x200;
 			
-			if (*(int*)((int)stream + 0x124) >= *(int*)((int)stream + 0x1c)) {
-				*(int*)((int)stream + 0x124) = *(int*)((int)stream + 0x124) - *(int*)((int)stream + 0x1c);
-				*(int*)((int)stream + 0x124) = *(int*)((int)stream + 0x124) + *(int*)((int)stream + 0x20);
+			if (stream->m_streamCursor >= stream->m_loopEnd) {
+				stream->m_streamCursor = stream->m_streamCursor - stream->m_loopEnd;
+				stream->m_streamCursor = stream->m_streamCursor + stream->m_loopStart;
 			}
 		} while (0 < byteCount);
 	} else {
 		do {
-			pbVar5 = (unsigned char*)(*(int*)((int)stream + 0xc) + bufferIndex * 0x1000);
-			iVar8 = *(int*)((int)stream + 4);
-			memcpy(pbVar5, (void*)(*(int*)((int)stream + 8) + *(int*)((int)stream + 0x120)), 0x1000);
-			*(int*)((int)stream + 0x120) = *(int*)((int)stream + 0x120) + 0x1000;
+			pbVar5 = (unsigned char*)((int)stream->m_buffer + bufferIndex * 0x1000);
+			iVar8 = stream->m_voiceData;
+			memcpy(pbVar5, (void*)(stream->m_fileData + stream->m_readOffset), 0x1000);
+			stream->m_readOffset = stream->m_readOffset + 0x1000;
 			
-			if (*(int*)((int)stream + 0x120) >= *(int*)((int)stream + 0x118)) {
-				*(int*)((int)stream + 0x120) = 0;
+			if (stream->m_readOffset >= stream->m_fileSize) {
+				stream->m_readOffset = 0;
 			}
 			
-			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar5, *(int*)((int)stream + 300) + bufferIndex * 0x1000, 0x1000, 0, 0);
+			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar5, stream->m_aramBuffer + bufferIndex * 0x1000, 0x1000, 0, 0);
 			
 			if ((bufferIndex == 0) && (*(void**)(iVar8 + 0x14) != 0)) {
 				int zero = 0;
@@ -249,11 +249,11 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 			
 			bufferIndex = bufferIndex ^ 1;
 			byteCount = byteCount + -0x1000;
-			*(int*)((int)stream + 0x124) = *(int*)((int)stream + 0x124) + 0x200;
+			stream->m_streamCursor = stream->m_streamCursor + 0x200;
 			
-			if (*(int*)((int)stream + 0x124) >= *(int*)((int)stream + 0x1c)) {
-				*(int*)((int)stream + 0x124) = *(int*)((int)stream + 0x124) - *(int*)((int)stream + 0x1c);
-				*(int*)((int)stream + 0x124) = *(int*)((int)stream + 0x124) + *(int*)((int)stream + 0x20);
+			if (stream->m_streamCursor >= stream->m_loopEnd) {
+				stream->m_streamCursor = stream->m_streamCursor - stream->m_loopEnd;
+				stream->m_streamCursor = stream->m_streamCursor + stream->m_loopStart;
 			}
 		} while (0 < byteCount);
 	}

@@ -280,8 +280,8 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 
     const float latStep = kHalfPi / (float)rings;
     const float firstLat = latStep;
-    const float firstRingSin = (float)sin(firstLat);
-    const float firstRingCos = (float)cos(firstLat);
+    const float firstRingSin = kOne * (float)sin(firstLat);
+    const float firstRingCos = kOne * (float)cos(firstLat);
     const float firstNormalZ = kNormalScale * firstRingCos * firstRingCos;
 
     GXPosition3f32(kZero, kZero, kOne);
@@ -305,14 +305,14 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
         const float upperLat = (kHalfPi * (float)(ring - 1)) / (float)rings;
         const float lowerLat = (kHalfPi * (float)ring) / (float)rings;
 
-        const float upperSin = (float)sin(upperLat);
-        const float upperCos = (float)cos(upperLat);
-        const float lowerSin = (float)sin(lowerLat);
-        const float lowerCos = (float)cos(lowerLat);
+        const float upperSin = kOne * (float)sin(upperLat);
+        const float upperCos = kOne * (float)cos(upperLat);
+        const float lowerSin = kOne * (float)sin(lowerLat);
+        const float lowerCos = kOne * (float)cos(lowerLat);
         const float upperNormalZ = kNormalScale * upperCos * upperCos;
         const float lowerNormalZ = kNormalScale * lowerCos * lowerCos;
 
-        if ((float)fabs(upperCos) < 1.0e-6f || (float)fabs(lowerCos) < 1.0e-6f) {
+        if (fabs(upperCos) < 1.0e-6 || fabs(lowerCos) < 1.0e-6) {
             break;
         }
 
@@ -336,7 +336,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     }
 
     *outDisplayListSize = GXEndDisplayList();
-    if (displayListSize < *outDisplayListSize) {
+    if (*outDisplayListSize > displayListSize) {
         OSReport(s_display_list_alloc_error, displayListSize, *outDisplayListSize);
         OSPanic(s_pppYmEnv_cpp, 0x19f, s_exiting);
     }
@@ -570,6 +570,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     int frameInt;
     float modelTime;
     float frame;
+    float modelTime;
     Vec local88;
     Vec local94;
     Vec localA0;
@@ -627,7 +628,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         return 0;
     }
 
-    if (frame != 0.0f) {
+    if (frame != FLOAT_80331180) {
         frame -= 1.0f;
     }
 

@@ -46,11 +46,11 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     int workOffset;
     u8* colorBase;
     RainDrop* drop;
+    float tex1;
     float tex0;
     float baseX;
     float baseY;
     float baseZ;
-    float tex1;
     Vec segment;
 
     colorOffset = param_3->m_serializedDataOffsets[1];
@@ -84,7 +84,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     tex0 = kPppRainTexCoordBase;
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
     tex0 = kPppRainTexCoordBase;
-    tex1 = 1.0f;
+    tex1 = FLOAT_8033101c;
     {
         RainDrop* currentDrop = drop;
         for (i = 0; i < (int)(u32)param_2->m_dataValIndex; i++, currentDrop++) {

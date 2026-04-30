@@ -12,6 +12,7 @@
 extern "C" {
 extern char kAStarGroupDebugFormat[];
 extern char kAStarPortalDebugFormat[];
+extern char kAStarCostDebugFormat[];
 extern const float kPolyGroupBaseXZ;
 extern const float kPolyGroupBaseY;
 extern const float kPolyGroupTopOffsetY;
@@ -32,8 +33,6 @@ extern const float FLOAT_803320C4 = 0.0f;
 #include "ffcc/vector.h"
 
 #include "string.h"
-
-static const char kAStarCostDebugFormat[] = "%d->%d=%.5fm ";
 
 struct CMapCylinderRaw
 {
@@ -845,7 +844,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 		float dist = PSVECMag(reinterpret_cast<Vec*>(&diffForMag));
 
-		if (dot < 0.0)
+		if (dot < FLOAT_803320C4)
 		{
 			if (behindBestDist < dist)
 			{

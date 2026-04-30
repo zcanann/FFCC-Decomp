@@ -22,6 +22,17 @@ void calcWeightMax();
 class CGPartyObj : public CGCharaObj
 {
 public:
+    union ControlFlags
+    {
+        unsigned char value;
+        struct Bits
+        {
+            signed char m_pad0 : 4;
+            signed char m_enabled : 1;
+            signed char m_pad1 : 3;
+        } bits;
+    };
+
     void onCreate();
     void onDestroy();
 
@@ -123,6 +134,8 @@ public:
     void onDraw();
 
     int GetCID();
+
+    ControlFlags m_controlFlags; // 0x6B8
 };
 
 #endif

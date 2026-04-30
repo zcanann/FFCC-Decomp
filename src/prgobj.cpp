@@ -147,7 +147,11 @@ int CGPrgObj::GetClassControl(int classControl)
  */
 void CGPrgObj::ClassControl(int classControl, int value)
 {
-	unsigned char* weaponNodeFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
+	struct PrgControlFlags {
+		signed char m_enabled : 1;
+		signed char m_rest : 7;
+	};
+	PrgControlFlags* weaponNodeFlags = reinterpret_cast<PrgControlFlags*>(&m_weaponNodeFlags);
 
 	switch (classControl) {
 	case 0:
@@ -157,15 +161,13 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		reinterpret_cast<CGPartyObj*>(this)->changeMotionMode(value);
 		break;
 	case 2:
-		if ((*weaponNodeFlags >> 7) != value) {
+		if (weaponNodeFlags->m_enabled != value) {
 			onChangePrg(value);
-			*weaponNodeFlags = (value << 7) | (*weaponNodeFlags & 0x7F);
+			weaponNodeFlags->m_enabled = value;
 		}
 		break;
 	case 3:
-		*(reinterpret_cast<unsigned char*>(this) + 0x6B8) =
-		    (static_cast<signed char>(value) << 3) & 8 |
-		    (*(reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0xF7);
+		reinterpret_cast<CGPartyObj*>(this)->m_controlFlags.bits.m_enabled = value;
 		break;
 	case 4:
 	{

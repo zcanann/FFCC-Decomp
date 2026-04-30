@@ -629,10 +629,10 @@ group_ready:
             *(float*)(groupTable + 0x28) = scaledOwner;
             pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
             PSMTXMultVec(rotMtx.value, &dir, &dir);
-            pppCopyVector(dirNorm, dir);
+            dirNorm = dir;
             pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
-            PSVECScale(&dir, &target, *(float*)(groupTable + 0x24));
-            pppAddVector(target, origin, target);
+            PSVECScale(&dir, &dir, *(float*)(groupTable + 0x24));
+            pppAddVector(target, origin, dir);
             pppSubVector(hitVector, target, origin);
             pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner, pBreathModel->m_groupRadius);
         }

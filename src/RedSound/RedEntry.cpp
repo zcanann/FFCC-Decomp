@@ -309,11 +309,10 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 	unsigned int history = (unsigned int)m_waveBankBase + 0x100;
 
 	do {
-		int bankSize = *(int*)(history + 4);
-		if (maxBankSize < bankSize) {
+		if (maxBankSize < *(int*)(history + 4)) {
 			int arAddress = *(int*)(*(int*)(history + 8) + 0x10);
 			if ((offset <= arAddress) && (arAddress < maxSize)) {
-				maxBankSize = bankSize;
+				maxBankSize = *(int*)(history + 4);
 				selected = history;
 			}
 		}

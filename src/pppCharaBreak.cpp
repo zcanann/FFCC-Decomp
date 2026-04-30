@@ -171,11 +171,11 @@ struct CharaBreakMeshRef {
 };
 
 struct CharaBreakModelData {
-    u8 _pad0[0x12];
-    u16 m_meshCount;
-    u8 _padC[0x14];
+    u8 _pad0[0xC];
+    u32 m_meshCount;
+    u8 _pad10[0x14];
     void* m_materialSet;
-    u8 _pad24[0x8];
+    u8 _pad28[0xC];
     u32 m_posQuant;
     u32 m_normQuant;
 };
@@ -193,8 +193,8 @@ STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_data) == 0xA4);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_nodes) == 0xA8);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_meshes) == 0xAC);
-STATIC_ASSERT(offsetof(CharaBreakModelData, m_meshCount) == 0x12);
-STATIC_ASSERT(offsetof(CharaBreakModelData, m_materialSet) == 0x28);
+STATIC_ASSERT(offsetof(CharaBreakModelData, m_meshCount) == 0xC);
+STATIC_ASSERT(offsetof(CharaBreakModelData, m_materialSet) == 0x24);
 STATIC_ASSERT(offsetof(CharaBreakModelData, m_posQuant) == 0x34);
 STATIC_ASSERT(offsetof(CharaBreakModelData, m_normQuant) == 0x38);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayListCount) == 0x4C);

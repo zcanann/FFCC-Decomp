@@ -25,7 +25,7 @@ extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 extern "C" void* __vt__8CManager[];
-extern "C" void* __vt__8CProcess[];
+extern "C" void* __vt__10CSamplePcs[];
 extern "C" char lbl_8032E648[];
 extern "C" const char s_CMaterialEditorPcs_VIEWER_801D7D18[];
 extern "C" const char s_CMaterialEditorPcs_801D7D34[];
@@ -70,7 +70,7 @@ extern "C" void __sinit_p_MaterialEditor_cpp(void)
     unsigned int* desc3 = m_table_desc3__18CMaterialEditorPcs;
 
     *reinterpret_cast<void**>(self) = __vt__8CManager;
-    *reinterpret_cast<void**>(self) = __vt__8CProcess;
+    *reinterpret_cast<void**>(self) = __vt__10CSamplePcs;
     *reinterpret_cast<void**>(self) = __vt__18CMaterialEditorPcs;
 
     __ct__14CUSBStreamDataFv(self + 0x84);

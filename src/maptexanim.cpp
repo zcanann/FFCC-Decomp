@@ -1,11 +1,17 @@
 #include "ffcc/maptexanim.h"
-#include "ffcc/ptrarray.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/map.h"
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
 
 class CMaterial;
+
+template <class T>
+class CPtrArray
+{
+public:
+    T operator[](unsigned long index);
+};
 
 extern "C" void Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(CMapTexAnim*, CMaterialSet*, CTextureSet*);
 extern "C" void __ct__4CRefFv(void*);

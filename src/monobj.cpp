@@ -1224,61 +1224,45 @@ void CGMonObj::onAnimPoint(int param2, int param3)
  */
 void CGMonObj::enableAttackCol(int enabled, int, int)
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-
-	unsigned int& attack1X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[1].m_localStart.x);
-	unsigned int& attack2X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[2].m_localStart.x);
-	unsigned int& attack3X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[3].m_localStart.x);
-	unsigned int& attack4X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[4].m_localStart.x);
-	unsigned int& attack5X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[5].m_localStart.x);
-	unsigned int& attack6X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[6].m_localStart.x);
-	unsigned int& attack7X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[7].m_localStart.x);
-	unsigned int& damage0X = *reinterpret_cast<unsigned int*>(&object->m_damageColliders[0].m_localPosition.x);
-
-	if (enabled == 0) {
-		attack1X = 0;
-		attack2X = 0;
-		attack3X = 0;
-		attack4X = 0;
-		attack5X = 0;
-		attack6X = 0;
-		attack7X = 0;
-		damage0X = 0;
-		return;
-	}
-
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) +
-		*reinterpret_cast<int*>(mon + 0x560) * 0x48;
-	unsigned int colMask = *reinterpret_cast<unsigned short*>(attackData + 0xC);
-	unsigned int colValue = 1;
-	if (*reinterpret_cast<int*>(mon + 0x560) >= 0x1F5) {
-		colValue = *reinterpret_cast<unsigned short*>(attackData + 2);
-	}
 
-	if ((colMask & 1) != 0) {
-		attack1X = colValue;
-	}
-	if ((colMask & 2) != 0) {
-		attack2X = colValue;
-	}
-	if ((colMask & 4) != 0) {
-		attack3X = colValue;
-	}
-	if ((colMask & 8) != 0) {
-		attack4X = colValue;
-	}
-	if ((colMask & 0x10) != 0) {
-		attack5X = colValue;
-	}
-	if ((colMask & 0x20) != 0) {
-		attack6X = colValue;
-	}
-	if ((colMask & 0x40) != 0) {
-		attack7X = colValue;
-	}
-	if ((colMask & 0x80) != 0) {
-		damage0X = colValue;
+	if (enabled != 0) {
+		int attackKind = *reinterpret_cast<int*>(mon + 0x560);
+		unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) +
+			attackKind * 0x48;
+		unsigned int colMask = *reinterpret_cast<unsigned short*>(attackData + 0xC);
+		unsigned int colValue;
+		if (attackKind >= 0x1F5) {
+			colValue = *reinterpret_cast<unsigned short*>(attackData + 2);
+		} else {
+			colValue = 1;
+		}
+
+		for (int i = 0; i < 8; i++) {
+			if ((((int)colMask >> i) & 1) != 0) {
+				if (i == -1) {
+					*reinterpret_cast<unsigned int*>(mon + 0x20C) = colValue;
+					*reinterpret_cast<unsigned int*>(mon + 0x23C) = colValue;
+					*reinterpret_cast<unsigned int*>(mon + 0x26C) = colValue;
+					*reinterpret_cast<unsigned int*>(mon + 0x29C) = colValue;
+					*reinterpret_cast<unsigned int*>(mon + 0x2CC) = colValue;
+					*reinterpret_cast<unsigned int*>(mon + 0x2FC) = colValue;
+					*reinterpret_cast<unsigned int*>(mon + 0x32C) = colValue;
+					*reinterpret_cast<unsigned int*>(mon + 0x35C) = colValue;
+				} else {
+					*reinterpret_cast<unsigned int*>(mon + 0x20C + i * 0x30) = colValue;
+				}
+			}
+		}
+	} else {
+		*reinterpret_cast<unsigned int*>(mon + 0x20C) = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x23C) = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x26C) = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x29C) = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x2CC) = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x2FC) = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x32C) = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x35C) = 0;
 	}
 }
 

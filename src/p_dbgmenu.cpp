@@ -167,7 +167,7 @@ void CDbgMenuPcs::destroy()
 	return;
 }
 
-CDbgMenuPcs::CDbgMenuPcs()
+inline CDbgMenuPcs::CDbgMenuPcs()
 {
     m_table__11CDbgMenuPcs[1] = m_table_desc0__11CDbgMenuPcs[0];
     m_table__11CDbgMenuPcs[2] = m_table_desc0__11CDbgMenuPcs[1];
@@ -188,7 +188,7 @@ CDbgMenuPcs::CDbgMenuPcs()
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::selectNext()
+inline void CDbgMenuPcs::selectNext()
 {
 	if (m_currentMenu == 0) {
 		return;
@@ -210,7 +210,7 @@ void CDbgMenuPcs::selectNext()
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::selectPrev()
+inline void CDbgMenuPcs::selectPrev()
 {
 	if (m_currentMenu == 0) {
 		return;
@@ -709,7 +709,7 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
  * Address:	TODO
  * Size:	TODO
  */
-CDbgMenuPcs::CDM* CDbgMenuPcs::searchFreeCDM()
+inline CDbgMenuPcs::CDM* CDbgMenuPcs::searchFreeCDM()
 {
 	for (int i = 0; i < 0x80; i++) {
 		if ((s8)m_menuPool[i].m_status >= 0) {
@@ -931,7 +931,7 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::Delete(int id)
+inline void CDbgMenuPcs::Delete(int id)
 {
 	CDM* menu = reinterpret_cast<CDM*>(searchID(id, m_rootMenuNode));
 	if (menu == 0) {

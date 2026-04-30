@@ -2150,8 +2150,9 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
         RedWaveHEAD* const waveHeader = (RedWaveHEAD*)waveData;
 
         if ((waveHeader->magic[0] == 'W') && (waveHeader->magic[1] == 'D')) {
-            int dataSize =
-                (((waveHeader->regionCount * 4) + 0x3fU) & 0xffffffc0) + (waveHeader->sampleCount * 0x60);
+            int dataSize = waveHeader->regionCount * 4;
+            dataSize = (dataSize + 0x3fU) & 0xffffffc0;
+            dataSize += waveHeader->sampleCount * 0x60;
             dataSize = waveHeader->dataSize + dataSize;
             dataSize += 0x20;
             m_WaveSettingData.waveSize = dataSize;

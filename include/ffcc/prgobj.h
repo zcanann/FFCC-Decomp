@@ -12,9 +12,9 @@ public:
     void onCreate();
     void onDestroy();
     void onFrame();
+    virtual void ClassControl(int, int);
+    virtual int GetClassControl(int);
     virtual void bonus(int, int, CGPrgObj*);
-    virtual void onDamaged(CGPrgObj*);
-    virtual void onAttacked(CGPrgObj*);
     virtual int getReplaceStat(int);
     virtual void onCancelStat(int);
     virtual void onChangeStat(int);
@@ -23,6 +23,9 @@ public:
     virtual void onFrameStat();
     virtual void onFrameAlways();
     virtual void onFrameAlwaysAfter();
+    virtual void onChangePrg(int);
+    virtual void onDamaged(CGPrgObj*);
+    virtual void onAttacked(CGPrgObj*);
     void changeStat(int, int, int);
     void changeSubStat(int subState);
     void addSubStat();
@@ -30,7 +33,6 @@ public:
     int isLoopAnim();
     int isLoopAnimDirect();
     int playSe3D(int, int, int, int, Vec*);
-    virtual void onChangePrg(int);
     void putParticle(int, int, Vec*, float, int);
     void putParticle(int, int, CGObject*, float, int);
     void putParticleTrace(int, int, CGObject*, float, int);
@@ -38,8 +40,6 @@ public:
     float getTargetRot(CGPrgObj*);
     void rotTarget(CGPrgObj*);
     void dstTargetRot(CGPrgObj*);
-    void ClassControl(int, int);
-    int GetClassControl(int);
     int GetCID();
 
     int m_stateFrameGate;      // 0x518

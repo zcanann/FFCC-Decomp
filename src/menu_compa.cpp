@@ -99,12 +99,10 @@ void CMenuPcs::CompaInit()
 	float fVar3;
 	int iVar4;
 	int iVar5;
-	short* compaList = this->compaList;
-	int compaState = (int)this->compaMenuState;
 
-	memset(compaList, 0, 0x1008);
+	memset(this->compaList, 0, 0x1008);
 	fVar1 = FLOAT_80333000;
-	iVar4 = (int)compaList + 8;
+	iVar4 = (int)this->compaList + 8;
 	iVar5 = 8;
 	do {
 		*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
@@ -119,7 +117,7 @@ void CMenuPcs::CompaInit()
 		iVar5 += -1;
 	} while (iVar5 != 0);
 
-	iVar4 = (int)compaList;
+	iVar4 = (int)this->compaList;
 	*reinterpret_cast<int*>(iVar4 + 0x24) = 0x52;
 	*reinterpret_cast<int*>(iVar4 + 0x20) = 4;
 	*reinterpret_cast<short*>(iVar4 + 8) = 0x28;
@@ -134,7 +132,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x2c) = 5;
 	*reinterpret_cast<int*>(iVar4 + 0x30) = 5;
 
-	iVar4 = (int)compaList;
+	iVar4 = (int)this->compaList;
 	*reinterpret_cast<int*>(iVar4 + 100) = 0x51;
 	*reinterpret_cast<short*>(iVar4 + 0x48) = 0x28;
 	*reinterpret_cast<short*>(iVar4 + 0x4a) = 0x48;
@@ -146,7 +144,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x6c) = 5;
 	*reinterpret_cast<int*>(iVar4 + 0x70) = 5;
 
-	iVar4 = (int)compaList;
+	iVar4 = (int)this->compaList;
 	*reinterpret_cast<int*>(iVar4 + 0xa4) = 0x52;
 	*reinterpret_cast<short*>(iVar4 + 0x88) = 0x28;
 	*reinterpret_cast<short*>(iVar4 + 0x8a) = 0x110;
@@ -158,7 +156,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0xac) = 5;
 	*reinterpret_cast<int*>(iVar4 + 0xb0) = 5;
 
-	iVar4 = (int)compaList;
+	iVar4 = (int)this->compaList;
 	*reinterpret_cast<int*>(iVar4 + 0xe4) = 0x5e;
 	*reinterpret_cast<short*>(iVar4 + 200) = 0x10;
 	*reinterpret_cast<short*>(iVar4 + 0xca) = 0xe;
@@ -172,7 +170,7 @@ void CMenuPcs::CompaInit()
 
 	fVar3 = FLOAT_8033303C;
 	fVar2 = FLOAT_80333038;
-	iVar4 = (int)compaList;
+	iVar4 = (int)this->compaList;
 	*reinterpret_cast<int*>(iVar4 + 0x124) = 0x5e;
 	*reinterpret_cast<short*>(iVar4 + 0x108) = 0x15;
 	*reinterpret_cast<short*>(iVar4 + 0x10c) = 0x30;
@@ -184,7 +182,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 300) = 0;
 	*reinterpret_cast<int*>(iVar4 + 0x130) = 5;
 
-	iVar4 = (int)compaList;
+	iVar4 = (int)this->compaList;
 	*reinterpret_cast<int*>(iVar4 + 0x174) = 2;
 	*reinterpret_cast<int*>(iVar4 + 0x164) = 0x2e;
 	*reinterpret_cast<short*>(iVar4 + 0x148) = 0x10;
@@ -196,9 +194,9 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x16c) = 0;
 	*reinterpret_cast<int*>(iVar4 + 0x170) = 5;
 
-	*compaList = 6;
-	*reinterpret_cast<short*>(compaState + 0x26) = 0;
-	*reinterpret_cast<char*>(compaState + 0xB) = 1;
+	*this->compaList = 6;
+	this->compaMenuState->selectedIndex = 0;
+	this->compaMenuState->initialized = 1;
 }
 
 /*

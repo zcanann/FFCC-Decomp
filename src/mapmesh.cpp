@@ -16,7 +16,8 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CS
 extern "C" char s_mapmesh_cpp_801D70B0[];
 extern "C" float FLOAT_8032F930;
 extern "C" float FLOAT_8032F934;
-extern CMapHitFace* g_hit_lpface_min;
+
+CMemory::CStage* g_pStage;
 
 extern "C" {
 void SetBlendMode__12CMaterialManFP12CMaterialSeti(void* materialMan, CMaterialSet* materialSet, unsigned int materialIdx);
@@ -101,7 +102,7 @@ static inline unsigned int Align32(unsigned int value)
 
 static inline CMemory::CStage*& MapMeshAllocStage()
 {
-    return reinterpret_cast<CMemory::CStage*&>(g_hit_lpface_min);
+    return g_pStage;
 }
 }
 

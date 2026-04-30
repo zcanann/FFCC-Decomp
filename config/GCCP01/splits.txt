@@ -152,6 +152,7 @@ mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8
 	extabindex  start:0x8000B7C4 end:0x8000B860
 	.text       start:0x80027774 end:0x800287D0
+	.sbss       start:0x8032ECA0 end:0x8032ECA8
 	.sdata2     start:0x8032F930 end:0x8032F938
 
 mapobj.cpp:
@@ -168,7 +169,7 @@ mapocttree.cpp:
 	.ctors      start:0x801D53D4 end:0x801D53D8
 	.rodata     start:0x801D72EC end:0x801D7300
 	.bss        start:0x802456F0 end:0x80245754
-	.sbss       start:0x8032ECA8 end:0x8032ECB8
+	.sbss       start:0x8032ECA8 end:0x8032ECC0
 	.sdata2     start:0x8032F938 end:0x8032F944
 
 map.cpp:
@@ -204,7 +205,7 @@ textureman.cpp:
 	extabindex  start:0x8000BF08 end:0x8000C07C
 	.text       start:0x8003A5FC end:0x8003C1B8
 	.ctors      start:0x801D53E4 end:0x801D53E8
-	.data       start:0x801E9B28 end:0x801E9BB0
+	.data       start:0x801E9B28 end:0x801E9BAC
 	.sbss       start:0x8032ECE8 end:0x8032ECF0
 	.sdata2     start:0x8032FAE0 end:0x8032FAF8
 

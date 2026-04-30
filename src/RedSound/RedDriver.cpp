@@ -1431,10 +1431,10 @@ int CRedDriver::GetSoundMode()
  */
 int CRedDriver::SetMusicData(void* musicData)
 {
+    int result;
     char localHeader[0x20];
     void* copiedHeader;
     int headerSize;
-    int result;
 
     result = -1;
     if (((((char*)musicData)[0] == 'B') && (((char*)musicData)[1] == 'G')) && (((char*)musicData)[2] == 'M')) {
@@ -1625,9 +1625,9 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
  */
 int CRedDriver::SetSeSepData(void* seSepData)
 {
+    int result;
     void* copiedHeader;
     int headerSize;
-    int result;
 
     result = -1;
     if ((((((char*)seSepData)[0] == 'S') && (((char*)seSepData)[1] == 'e')) && (((char*)seSepData)[2] == 'S')) &&

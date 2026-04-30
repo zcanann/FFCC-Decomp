@@ -14,7 +14,7 @@
 CDbgMenuPcs DbgMenuPcs;
 
 extern unsigned char DAT_8032e698;
-extern unsigned char DAT_8032ecd8;
+extern unsigned char g_map_draw_prof;
 
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void __ct__Q211CDbgMenuPcs3CDMFv(void*);
@@ -316,7 +316,7 @@ void CDbgMenuPcs::calc()
 			CheckDriver__6CSoundFi(&Sound, 1);
 			break;
 		case 0x75:
-			DAT_8032ecd8 = 1 - DAT_8032ecd8;
+			g_map_draw_prof = 1 - g_map_draw_prof;
 			break;
 		case 0x76:
 			DAT_8032e698 = 1 - DAT_8032e698;
@@ -465,7 +465,7 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 			menu->m_state = (m_dbgFlags >> 12) & 1;
 			break;
 		case 0x75:
-			menu->m_state = DAT_8032ecd8 != 0;
+			menu->m_state = g_map_draw_prof != 0;
 			break;
 		case 0x76:
 			menu->m_state = DAT_8032e698 != 0;

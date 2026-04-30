@@ -121,6 +121,7 @@ unsigned int m_table__7CMapPcs[3][0x414 / 3 / sizeof(unsigned int)] = {
 
 unsigned int s_loadedStageNo__7CMapPcs;
 unsigned int s_loadedMapNo__7CMapPcs;
+unsigned char g_map_draw_prof;
 CRelProfile s_mapRelProfile0__7CMapPcs;
 CRelProfile s_mapRelProfile1__7CMapPcs;
 CRelProfile s_mapRelProfile2__7CMapPcs;

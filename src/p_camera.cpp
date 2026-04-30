@@ -107,7 +107,8 @@ static const char s_fov_warning_801d7928[] =
     "!!!!!!!!!!!!!!!!!!FOV\x82\xcc\x92\x6c\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81\x42%f"
     "!!!!!!!!!!!!!!!!!!!!\n";
 extern double DOUBLE_8032fa28;
-unsigned char DAT_8032ecd8;
+unsigned char g_IsDbgDrawShadowPos;
+extern unsigned char g_map_draw_prof;
 unsigned int m_table_desc0__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CCameraPcsFv)};
 unsigned int m_table_desc1__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CCameraPcsFv)};
 unsigned int m_table_desc2__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CCameraPcsFv)};
@@ -839,7 +840,7 @@ void CCameraPcs::draw()
                            &drawColor);
     }
 
-    if (DAT_8032ecd8 != 0) {
+    if (g_map_draw_prof != 0) {
         PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), cameraMtx);
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
         GXSetZCompLoc(0);

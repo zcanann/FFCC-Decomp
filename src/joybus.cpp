@@ -3263,19 +3263,21 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
         uVar5 = ((uVar5 << 8) ^ static_cast<unsigned int>(JoyBusCrcTable[(uVar5 >> 8) ^ static_cast<unsigned int>(bVar2)])) & 0xFFFF;
     }
 
+    unsigned short inv = static_cast<unsigned short>(~static_cast<unsigned short>(uVar5));
     chunkCount = (length - 1) / 3;
     param_4[0] = 5;
 
-    if (length - 1 != chunkCount * 3) {
+    if ((length - 1) - (chunkCount * 3) != 0) {
         chunkCount = chunkCount + 1;
     }
 
     iVar3 = chunkCount + 2;
 
-    if (iVar3 < 0x100) {
+    if (iVar3 > 0xFF) {
+        iVar3 = -1;
+    } else {
         param_4[1] = static_cast<unsigned char>(iVar3);
 
-        unsigned short inv = static_cast<unsigned short>(~static_cast<unsigned short>(uVar5));
         *reinterpret_cast<unsigned short*>(param_4 + 2) = __lhbrx(&inv, 0);
 
         puVar6 = param_4 + 8;
@@ -3337,8 +3339,6 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
                 uVar5 = uVar5 - 1;
             } while (uVar5 != 0);
         }
-    } else {
-        iVar3 = -1;
     }
 
     return iVar3;

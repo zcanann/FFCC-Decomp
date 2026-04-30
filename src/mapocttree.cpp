@@ -116,7 +116,7 @@ static inline unsigned char* Ptr(void* ptr, unsigned int offset)
 
 static inline COctNode* GetMapObjByIndex(unsigned short index)
 {
-    return reinterpret_cast<COctNode*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x960 + (index * 0xF0));
+    return reinterpret_cast<COctNode*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x954 + (index * 0xF0));
 }
 
 }
@@ -196,13 +196,13 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
         switch (chunk.m_id) {
         case 'OBJN': {
             unsigned short objIndex = chunkFile.Get2();
-            unsigned char* mapObj;
+            signed char* mapObj;
 
             m_mapObject = GetMapObjByIndex(objIndex);
-            mapObj = reinterpret_cast<unsigned char*>(m_mapObject);
+            mapObj = reinterpret_cast<signed char*>(m_mapObject);
             if (mapObj[0x1E] == 4) {
-                mapObj[0x15] = 0xFF;
-                mapObj[0x14] = 0xFF;
+                mapObj[0x15] = -1;
+                mapObj[0x14] = -1;
                 mapObj[0x22] = 0;
             } else if (mapObj[0x1E] == 3) {
                 mapObj[0x22] = 0;
@@ -211,20 +211,19 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
         }
 
         case 'NODN': {
-            unsigned short nodeCount = chunkFile.Get2();
             void* rootNode;
 
-            m_nodeCount = nodeCount;
-            if ((*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x1E)) != 1) &&
-                (static_cast<unsigned int>(System.m_execParam) > 2U)) {
-                Printf__7CSystemFPce(&System, s_m_node_pctd_m_meshtype_pctd_801D7268, nodeCount);
+            m_nodeCount = chunkFile.Get2();
+            if ((*reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E)) != 1) &&
+                (static_cast<unsigned int>(System.m_execParam) >= 3U)) {
+                Printf__7CSystemFPce(&System, s_m_node_pctd_m_meshtype_pctd_801D7268, m_nodeCount);
             }
 
             rootNode = __nwa__FUlPQ27CMemory6CStagePci(
-                nodeCount * 0x4C + 0x10, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapocttree_cpp),
+                m_nodeCount * 0x4C + 0x10, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapocttree_cpp),
                 0x59);
             m_nodePool = reinterpret_cast<COctNode*>(
-                __construct_new_array(rootNode, reinterpret_cast<void*>(__ct__8COctNodeFv), 0, 0x4C, nodeCount));
+                __construct_new_array(rootNode, reinterpret_cast<void*>(__ct__8COctNodeFv), 0, 0x4C, m_nodeCount));
             break;
         }
 
@@ -268,9 +267,9 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
                             COctNode** childNode = node->m_children;
 
                             for (int i = 0; i < 8; i++) {
-                                unsigned short childIndex = chunkFile.Get2();
+                                short childIndex = chunkFile.Get2();
 
-                                if (childIndex != 0xFFFF) {
+                                if (childIndex != -1) {
                                     *childNode = m_nodePool + childIndex;
                                     childNode++;
                                     childCount++;
@@ -1165,7 +1164,7 @@ void InsertLight_r(COctNode* node)
 					break;
 				}
 
-				if ((reinterpret_cast<CBound*>(&s_bound)->CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
+				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_bound))) != 0) {
 					if (grandChild->m_meshCount != 0) {
 						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x44)), s_light_no);
 					}

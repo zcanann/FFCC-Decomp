@@ -2353,8 +2353,8 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		return 1;
 	}
 
-	s16** listPtr = reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x850);
-	float baseX = static_cast<float>((*listPtr)[4]);
+	int listBase = GetCmdListBase(this);
+	float baseX = static_cast<float>(*reinterpret_cast<s16*>(listBase + 8));
 	int caravanWork = Game.m_scriptFoodBase[0];
 
 	if (topIdx <= 0) {
@@ -2366,14 +2366,18 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 			int k = 3;
 			do {
 				int idx = j + *top;
-				s16* entry = reinterpret_cast<s16*>(reinterpret_cast<u8*>(*listPtr) + idx * 0x40 + 8);
+				int entryOffset = idx * 0x40 + 8;
 				if ((j != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
 					break;
 				}
 
-				*entry = static_cast<s16>(static_cast<double>(*entry) + DOUBLE_80332ab8);
-				if (fabs(static_cast<double>(static_cast<float>(*entry) - baseX)) > DOUBLE_80332ac0) {
-					*entry = static_cast<s16>(targetX);
+				*reinterpret_cast<s16*>(listBase + entryOffset) =
+				    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(listBase + entryOffset)) +
+				                     DOUBLE_80332ab8);
+				if (fabs(static_cast<double>(
+				        static_cast<float>(*reinterpret_cast<s16*>(listBase + entryOffset)) - baseX)) >
+				    DOUBLE_80332ac0) {
+					*reinterpret_cast<s16*>(listBase + entryOffset) = static_cast<s16>(targetX);
 					if (j == 0) {
 						finished++;
 					}
@@ -2392,14 +2396,18 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		int k = 3;
 		do {
 			int idx = i + s_UniteTop[topIdx];
-			s16* entry = reinterpret_cast<s16*>(reinterpret_cast<u8*>(*listPtr) + idx * 0x40 + 8);
+			int entryOffset = idx * 0x40 + 8;
 			if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
 				break;
 			}
 
-			*entry = static_cast<s16>(static_cast<double>(*entry) + DOUBLE_80332ab8);
-			if (fabs(static_cast<double>(static_cast<float>(*entry) - baseX)) > DOUBLE_80332ac0) {
-				*entry = static_cast<s16>(FLOAT_80332ac8 + baseX);
+			*reinterpret_cast<s16*>(listBase + entryOffset) =
+			    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(listBase + entryOffset)) +
+			                     DOUBLE_80332ab8);
+			if (fabs(static_cast<double>(
+			        static_cast<float>(*reinterpret_cast<s16*>(listBase + entryOffset)) - baseX)) >
+			    DOUBLE_80332ac0) {
+				*reinterpret_cast<s16*>(listBase + entryOffset) = static_cast<s16>(FLOAT_80332ac8 + baseX);
 				return 1;
 			}
 
@@ -2426,8 +2434,8 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 		return 1;
 	}
 
-	s16** listPtr = reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x850);
-	float baseX = static_cast<float>((*listPtr)[4]);
+	int listBase = GetCmdListBase(this);
+	float baseX = static_cast<float>(*reinterpret_cast<s16*>(listBase + 8));
 	int caravanWork = Game.m_scriptFoodBase[0];
 
 	if (topIdx < 0) {
@@ -2438,14 +2446,16 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 			int k = 3;
 			do {
 				int idx = j + *top;
-				s16* entry = reinterpret_cast<s16*>(reinterpret_cast<u8*>(*listPtr) + idx * 0x40 + 8);
+				int entryOffset = idx * 0x40 + 8;
 				if ((j != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
 					break;
 				}
 
-				*entry = static_cast<s16>(static_cast<double>(*entry) - DOUBLE_80332ab8);
-				if (static_cast<float>(*entry) <= baseX) {
-					*entry = static_cast<s16>(baseX);
+				*reinterpret_cast<s16*>(listBase + entryOffset) =
+				    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(listBase + entryOffset)) -
+				                     DOUBLE_80332ab8);
+				if (static_cast<float>(*reinterpret_cast<s16*>(listBase + entryOffset)) <= baseX) {
+					*reinterpret_cast<s16*>(listBase + entryOffset) = static_cast<s16>(baseX);
 					if (j == 0) {
 						finished++;
 					}
@@ -2465,15 +2475,17 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 		int k = 3;
 		do {
 			int idx = i + s_UniteTop[topIdx];
-			s16* entry = reinterpret_cast<s16*>(reinterpret_cast<u8*>(*listPtr) + idx * 0x40 + 8);
+			int entryOffset = idx * 0x40 + 8;
 			if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
 				break;
 			}
 
-			*entry = static_cast<s16>(static_cast<double>(*entry) - DOUBLE_80332ab8);
-			if (static_cast<float>(*entry) <= baseX) {
+			*reinterpret_cast<s16*>(listBase + entryOffset) =
+			    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(listBase + entryOffset)) -
+			                     DOUBLE_80332ab8);
+			if (static_cast<float>(*reinterpret_cast<s16*>(listBase + entryOffset)) <= baseX) {
 				finished = true;
-				*entry = static_cast<s16>(baseX);
+				*reinterpret_cast<s16*>(listBase + entryOffset) = static_cast<s16>(baseX);
 			}
 
 			i++;

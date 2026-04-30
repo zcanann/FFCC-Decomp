@@ -569,6 +569,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     u32 animFrameCount;
     int frameInt;
     float frame;
+    float modelTime;
     Vec local88;
     Vec local94;
     Vec localA0;
@@ -612,20 +613,21 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
 
     modelRaw = (CModelRaw*)model;
     node = (CChara::CNode*)(modelRaw->m_nodes + skNodeIndex * 0xC0);
-    if (modelRaw->m_anim == 0) {
-        animFrameCount = 0;
-    } else {
+    modelTime = modelRaw->m_time;
+    if (modelRaw->m_anim != 0) {
         animFrameCount = modelRaw->m_anim->m_frameCount;
+    } else {
+        animFrameCount = 0;
     }
 
     animFrameMax = (int)(float)animFrameCount;
-    frameInt = (int)modelRaw->m_time;
+    frameInt = (int)modelTime;
     frame = (float)(frameInt - (frameInt / animFrameMax) * animFrameMax);
     if (frame < 0.0f) {
         return 0;
     }
 
-    if (frame != 0.0f) {
+    if (frame != FLOAT_80331180) {
         frame -= 1.0f;
     }
 
@@ -760,9 +762,6 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[2][2] = localF4.z;
             }
 
-            localMatrix.value[0][3] += local88.x;
-            localMatrix.value[1][3] += local88.y;
-            localMatrix.value[2][3] += local88.z;
             goto copy_out;
         }
         break;

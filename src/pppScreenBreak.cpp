@@ -72,6 +72,12 @@ struct ScreenBreakModelView {
     ScreenBreakMeshRef* m_meshes;
 };
 
+struct ScreenBreakNode {
+    u8 _pad0[0xBC];
+    u8 _padBC_0 : 7;
+    u8 m_disabled : 1;
+};
+
 struct pppScreenBreakUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
@@ -437,7 +443,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     for (uVar15 = 0; uVar15 < *(u32*)(modelData + 0xC); uVar15++) {
         iVar14 = *(s32*)(iVar16 + 8);
         iVar5 = *(s32*)((u8*)model + 0xA8) + (*(s32*)(iVar14 + 0x5C) * 0xC0);
-        *(u8*)(iVar5 + 0xBC) &= 0x7F;
+        ((ScreenBreakNode*)iVar5)->m_disabled = 0;
         PSMTXIdentity((float(*)[4])(iVar5 + 0x14));
 
         iVar5 = *(s32*)(iVar14 + 0x14);

@@ -27,6 +27,7 @@ extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
@@ -3113,56 +3114,52 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
 
     if (m_asyncState == 2) {
         CLoadModel* loadModel = new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
-        if (loadModel != 0) {
-            loadModel->m_keyTag = reinterpret_cast<void*>(m_asyncCharaKind);
-            loadModel->m_keyId = m_asyncCharaNo;
-            loadModel->m_mergeFileId = -1;
-            loadModel->m_mergeFlags = 0;
-            loadModel->m_model = reinterpret_cast<CChara::CModel*>(
-                __nw__FUlPQ27CMemory6CStagePci(0x124, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1));
-            loadModel->m_streamMode = 0;
-            loadModel->m_streamOffset = 0;
-            loadModel->m_streamSize = 0;
-            if (loadModel->m_model != 0) {
-                loadModel->m_model = reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(loadModel->m_model));
-                Create__Q26CChara6CModelFPvPQ27CMemory6CStage(
-                    loadModel->m_model, File.m_readBuffer, HandleModelStage(m_asyncCharaKind, 0));
-            }
-            LoadModelArray(&CharaPcs)->Add(loadModel);
-            m_modelLoadRef = loadModel;
-            AddSharedRef(m_modelLoadRef);
-            m_model = loadModel->m_model;
-            AddSharedRef(m_model);
-            m_charaKind = m_asyncCharaKind;
-            m_charaNo = m_asyncCharaNo;
+        loadModel->m_keyTag = reinterpret_cast<void*>(m_asyncCharaKind);
+        loadModel->m_keyId = m_asyncCharaNo;
+        loadModel->m_mergeFileId = -1;
+        loadModel->m_mergeFlags = 0;
+        LoadModelArray(&CharaPcs)->Add(loadModel);
+        loadModel->m_model = reinterpret_cast<CChara::CModel*>(
+            __nw__FUlPQ27CMemory6CStagePci(0x124, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1));
+        loadModel->m_streamMode = 0;
+        loadModel->m_streamOffset = 0;
+        loadModel->m_streamSize = 0;
+        if (loadModel->m_model != 0) {
+            loadModel->m_model = reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(loadModel->m_model));
         }
+        Create__Q26CChara6CModelFPvPQ27CMemory6CStage(
+            loadModel->m_model, File.m_readBuffer, HandleModelStage(m_asyncCharaKind, 0));
+        m_modelLoadRef = loadModel;
+        AddSharedRef(m_modelLoadRef);
+        m_model = loadModel->m_model;
+        AddSharedRef(m_model);
+        m_charaKind = m_asyncCharaKind;
+        m_charaNo = m_asyncCharaNo;
     } else if (m_asyncState == 4) {
-        if (m_model != 0) {
-            CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(m_model, File.m_readBuffer, HandleModelStage(m_asyncCharaKind, 0));
-        }
+        CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(m_model, File.m_readBuffer, HandleModelStage(m_asyncCharaKind, 0));
     } else {
         CLoadTexture* loadTexture = new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
-        if (loadTexture != 0) {
-            loadTexture->m_keyTag = reinterpret_cast<void*>(m_asyncCharaKind);
-            loadTexture->m_keyId = m_asyncCharaNo;
-            loadTexture->m_mergeFileId = -1;
-            loadTexture->m_mergeFlags = 0;
-            loadTexture->m_variantTag = reinterpret_cast<void*>(m_asyncTextureVariant);
-            loadTexture->m_textureSet = new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
-            loadTexture->m_streamMode = 0;
-            loadTexture->m_streamOffset = 0;
-            loadTexture->m_streamSize = 0;
-            if (loadTexture->m_textureSet != 0) {
-                loadTexture->m_textureSet->Create(File.m_readBuffer, HandleTextureStage(m_asyncCharaKind), 0, 0, 0, 0);
-            }
-            LoadTextureArray(&CharaPcs)->Add(loadTexture);
-            m_texLoadRef = loadTexture;
-            AddSharedRef(m_texLoadRef);
-            m_textureSet = loadTexture->m_textureSet;
-            AddSharedRef(m_textureSet);
-            AttachTextureSet__Q26CChara6CModelFP11CTextureSet(m_model, m_textureSet);
-            m_textureVariant = m_asyncTextureVariant;
+        loadTexture->m_keyTag = reinterpret_cast<void*>(m_asyncCharaKind);
+        loadTexture->m_keyId = m_asyncCharaNo;
+        loadTexture->m_mergeFileId = -1;
+        loadTexture->m_mergeFlags = 0;
+        loadTexture->m_variantTag = reinterpret_cast<void*>(m_asyncTextureVariant);
+        LoadTextureArray(&CharaPcs)->Add(loadTexture);
+        loadTexture->m_textureSet = reinterpret_cast<CTextureSet*>(
+            __nw__11CTextureSetFUlPQ27CMemory6CStagePci(0x24, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397));
+        loadTexture->m_streamMode = 0;
+        loadTexture->m_streamOffset = 0;
+        loadTexture->m_streamSize = 0;
+        if (loadTexture->m_textureSet != 0) {
+            loadTexture->m_textureSet = ::new (loadTexture->m_textureSet) CTextureSet;
         }
+        loadTexture->m_textureSet->Create(File.m_readBuffer, HandleTextureStage(m_asyncCharaKind), 0, 0, 0, 0);
+        m_texLoadRef = loadTexture;
+        AddSharedRef(m_texLoadRef);
+        m_textureSet = loadTexture->m_textureSet;
+        AddSharedRef(m_textureSet);
+        AttachTextureSet__Q26CChara6CModelFP11CTextureSet(m_model, m_textureSet);
+        m_textureVariant = m_asyncTextureVariant;
     }
 
     File.Close(m_asyncFileHandle);

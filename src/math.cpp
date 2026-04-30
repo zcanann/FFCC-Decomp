@@ -362,16 +362,6 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMath::CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8001b020
  * PAL Size: 544b
  * EN Address: TODO
@@ -402,8 +392,8 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[3][2] = 1.0f;
 
     float scaleAB = scaleA + scaleB;
-    float t0 = 0.0f;
-    if (scaleAB != 0.0f) {
+    float t0 = kZeroF;
+    if (scaleAB != kZeroF) {
         t0 = scaleA / scaleAB;
     }
 
@@ -419,8 +409,8 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[3][1] = 1.0f;
 
     float scaleBC = scaleB + scaleC;
-    float t1 = 0.0f;
-    if (scaleBC != 0.0f) {
+    float t1 = kZeroF;
+    if (scaleBC != kZeroF) {
         t1 = scaleB / scaleBC;
     }
 
@@ -779,27 +769,29 @@ int CBound::CheckFrustum0(CBound& outBound)
 
                 viewZ = transformed.z;
                 if (viewZ > zero) {
-                    if (transformed.x > -viewZ) {
+                    float negViewZ = -viewZ;
+                    if (transformed.x > negViewZ) {
                         clipMask = 0x11;
                     } else if (transformed.x < viewZ) {
                         clipMask = 0x12;
                     } else {
                         clipMask = 0x10;
                     }
-                    if (transformed.y > -viewZ) {
+                    if (transformed.y > negViewZ) {
                         clipMask = clipMask | 0x14;
                     } else if (transformed.y < viewZ) {
                         clipMask = clipMask | 0x18;
                     }
                 } else {
-                    if (transformed.x > -viewZ) {
+                    float negViewZ = -viewZ;
+                    if (transformed.x > negViewZ) {
                         clipMask = 1;
                     } else if (transformed.x < viewZ) {
                         clipMask = 2;
                     } else {
                         clipMask = 0;
                     }
-                    if (transformed.y > -viewZ) {
+                    if (transformed.y > negViewZ) {
                         clipMask = clipMask | 4;
                     } else if (transformed.y < viewZ) {
                         clipMask = clipMask | 8;
@@ -1026,16 +1018,6 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     rot[2][3] = s[2];
 
     PSMTXConcat(rot, out, out);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMath::rotateToMatrix(float (*) [4], Vec*)
-{
-	// TODO
 }
 
 /*

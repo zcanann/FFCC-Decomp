@@ -8,6 +8,8 @@
 #include "ffcc/vector.h"
 
 extern "C" double atan2(double, double);
+extern "C" CVector* __ct__7CVectorFRC3Vec(CVector*, const Vec&);
+extern "C" CVector* __ct__7CVectorFv(CVector*);
 
 extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
 extern "C" void SetParticleWorkScale__13CFlatRuntime2Ff(void*, float);
@@ -224,14 +226,18 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 {
 	CGPrgObj* self = this;
 	float targetRot;
-	CVector targetPos(target->m_worldPosition);
-	CVector basePos(self->m_worldPosition);
-	CVector deltaPos;
+	Vec targetPos;
+	Vec basePos;
+	Vec deltaPos;
+	CVector* baseVec;
 	float deltaX;
 	float zero;
 	float deltaZ;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
+	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), self->m_worldPosition);
+	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
+	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
 	deltaX = deltaPos.x;
 	zero = FLOAT_80331BD4;
 	deltaZ = deltaPos.z;
@@ -255,15 +261,20 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
  */
 void CGPrgObj::rotTarget(CGPrgObj* target)
 {
-	CVector targetPos(target->m_worldPosition);
-	CVector basePos(m_worldPosition);
-	CVector deltaPos;
+	CGPrgObj* self = this;
 	float targetRot;
+	Vec targetPos;
+	Vec basePos;
+	Vec deltaPos;
+	CVector* baseVec;
 	float deltaX;
 	float zero;
 	float deltaZ;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
+	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), self->m_worldPosition);
+	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
+	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
 	deltaX = deltaPos.x;
 	zero = FLOAT_80331BD4;
 	deltaZ = deltaPos.z;
@@ -272,7 +283,7 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
-	m_rotTargetY = targetRot;
+	self->m_rotTargetY = targetRot;
 }
 
 /*
@@ -287,14 +298,18 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 float CGPrgObj::getTargetRot(CGPrgObj* target)
 {
 	float targetRot;
-	CVector targetPos(target->m_worldPosition);
-	CVector basePos(m_worldPosition);
-	CVector deltaPos;
+	Vec basePos;
+	Vec targetPos;
+	Vec deltaPos;
+	CVector* baseVec;
 	float deltaX;
 	float zero;
 	float deltaZ;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
+	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
+	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
+	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
 	deltaX = deltaPos.x;
 	zero = FLOAT_80331BD4;
 	deltaZ = deltaPos.z;

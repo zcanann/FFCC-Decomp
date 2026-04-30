@@ -362,16 +362,6 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMath::CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8001b020
  * PAL Size: 544b
  * EN Address: TODO
@@ -402,8 +392,8 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[3][2] = 1.0f;
 
     float scaleAB = scaleA + scaleB;
-    float t0 = 0.0f;
-    if (scaleAB != 0.0f) {
+    float t0 = kZeroF;
+    if (scaleAB != kZeroF) {
         t0 = scaleA / scaleAB;
     }
 
@@ -419,8 +409,8 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[3][1] = 1.0f;
 
     float scaleBC = scaleB + scaleC;
-    float t1 = 0.0f;
-    if (scaleBC != 0.0f) {
+    float t1 = kZeroF;
+    if (scaleBC != kZeroF) {
         t1 = scaleB / scaleBC;
     }
 
@@ -1027,16 +1017,6 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     rot[2][3] = s[2];
 
     PSMTXConcat(rot, out, out);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMath::rotateToMatrix(float (*) [4], Vec*)
-{
-	// TODO
 }
 
 /*

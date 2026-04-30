@@ -1083,11 +1083,12 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                                 texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
                                 if (texture->m_name[0] != 0) {
+                                    char* textureName = texture->m_name;
                                     unsigned int duplicateIdx;
                                     for (duplicateIdx = 0; duplicateIdx < (unsigned int)GetSize__21CPtrArray_P8CTexture_Fv(TextureArray(m_textureArrayStorage)); duplicateIdx++) {
                                         CTexture* existing = __vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), duplicateIdx);
                                         if ((existing != 0)
-                                            && (strcmp(existing->m_name, texture->m_name) == 0)) {
+                                            && (strcmp(existing->m_name, textureName) == 0)) {
                                             goto found_duplicate;
                                         }
                                     }
@@ -1128,10 +1129,8 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                         chunkFile.PopChunk();
                     }
                 }
-                chunkFile.PopChunk();
             }
         }
-        chunkFile.PopChunk();
     }
 }
 

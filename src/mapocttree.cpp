@@ -846,8 +846,8 @@ void COctTree::Draw(unsigned char drawType)
 				GXSetZMode(1, (GXCompare)3, 1);
 			}
 			float offsetZ = *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40));
-			if (offsetZ != kMapOctTreeDefaultOffsetZ) {
-				CameraPcs.SetOffsetZBuff(offsetZ);
+			if (kMapOctTreeDefaultOffsetZ != offsetZ) {
+				CameraPcs.SetOffsetZBuff(kMapOctTreeDefaultOffsetZ);
 			}
 		}
 	}

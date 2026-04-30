@@ -219,7 +219,6 @@ int SeStopID(int seId)
 	do {
 		if (((u32)*track != 0) && ((seId == -1) || (track[0x3e] == seId))) {
 			int trackNo;
-			int seTrackOffset;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			track[0x3e] = 0;
@@ -228,13 +227,12 @@ int SeStopID(int seId)
 			track[0x16] = 0;
 
 			trackNo = *(char*)((char*)track + 0x14e);
-			seTrackOffset = trackNo * 0xc0;
-			((unsigned char*)p_VoiceData)[seTrackOffset + 0x1a] &= (unsigned char)0xfa;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x94) &= 0xfffffff7;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) &= 0xfffffffe;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) |= 2;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset) = 0;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x8c) = 0;
+			((unsigned char*)p_VoiceData)[trackNo * 0xc0 + 0x1a] &= (unsigned char)0xfa;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x94) &= 0xfffffff7;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) &= 0xfffffffe;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) |= 2;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0) = 0;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
 			if ((u32)track[6] != 0) {
 				c_RedEntry.WaveHistoryManager(0, *(short*)(track[6] + 2));
@@ -271,7 +269,6 @@ int SeStopMG(int bank, int sep, int group, int kind)
 			int id = track[0x3d] / 1000;
 			if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
 				int trackNo;
-				int seTrackOffset;
 
 				KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 				track[0x3e] = 0;
@@ -280,13 +277,12 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				track[0x16] = 0;
 
 				trackNo = *(char*)((char*)track + 0x14e);
-				seTrackOffset = trackNo * 0xc0;
-				((unsigned char*)p_VoiceData)[seTrackOffset + 0x1a] &= (unsigned char)0xfa;
-				*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x94) &= 0xfffffff7;
-				*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) &= 0xfffffffe;
-				*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) |= 2;
-				*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset) = 0;
-				*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x8c) = 0;
+				((unsigned char*)p_VoiceData)[trackNo * 0xc0 + 0x1a] &= (unsigned char)0xfa;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x94) &= 0xfffffff7;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) &= 0xfffffffe;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) |= 2;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0) = 0;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
 				if ((u32)track[6] != 0) {
 					c_RedEntry.WaveHistoryManager(0, *(short*)(track[6] + 2));

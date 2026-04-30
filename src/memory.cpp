@@ -334,7 +334,14 @@ unsigned int CheckSum(void* data, int size)
         unsigned int blockCount = static_cast<unsigned int>(size) >> 3;
         if (blockCount != 0) {
             do {
-                checksum += bytes[0] + bytes[1] + bytes[2] + bytes[3] + bytes[4] + bytes[5] + bytes[6] + bytes[7];
+                checksum += bytes[0];
+                checksum += bytes[1];
+                checksum += bytes[2];
+                checksum += bytes[3];
+                checksum += bytes[4];
+                checksum += bytes[5];
+                checksum += bytes[6];
+                checksum += bytes[7];
                 bytes += 8;
                 blockCount--;
             } while (blockCount != 0);

@@ -67,7 +67,7 @@ void pppRandUpCV(_pppPObject* basePtr, RandUpCVParam* in, _pppCtrlTable* ctrl)
     target = (in->sourceOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + in->sourceOffset + 0x80);
     f32 scale = *valuePtr;
 
-    target[0] = (u8)(target[1] + randchar(in->delta[0], scale));
+    target[0] = (u8)(target[0] + randchar(in->delta[0], scale));
     target[1] = (u8)(target[1] + randchar(in->delta[1], scale));
     target[2] = (u8)(target[2] + randchar(in->delta[2], scale));
     target[3] = (u8)(target[3] + randchar(in->delta[3], scale));

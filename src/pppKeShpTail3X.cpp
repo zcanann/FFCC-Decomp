@@ -189,10 +189,9 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     u32 currentIndex;
     u32 nextIndex;
     u8 zEnable;
-    float zero;
+    const float zero = kPppKeShpTail3XZero;
     s32 dataValIndex;
 
-    zero = kPppKeShpTail3XZero;
     work = (KeShpTail3XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
     dataValIndex = step->m_dataValIndex;
     if (dataValIndex == 0xffff) {

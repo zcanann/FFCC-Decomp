@@ -3038,44 +3038,58 @@ void CMapMng::SetIdGrpMask(int mapIdGrpIndex, unsigned long mask)
  */
 void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
 {
-    unsigned char* mapIdGrp = Ptr(this, 0x214E8 + (mapIdGrpIndex * 0x14));
     unsigned char* colorBytes = reinterpret_cast<unsigned char*>(&color);
 
-    if (channelIndex == 2) {
-        mapIdGrp[0xC] = colorBytes[0];
-        mapIdGrp[0xD] = colorBytes[1];
-        mapIdGrp[0xE] = colorBytes[2];
-        mapIdGrp[0xF] = colorBytes[3];
+    switch (channelIndex) {
+    case 0: {
+        unsigned char red = colorBytes[0];
+        unsigned char green = colorBytes[1];
+        unsigned char* mapIdGrp = Ptr(this, 0x214E8 + (mapIdGrpIndex * 0x14));
+        unsigned char blue = colorBytes[2];
+        mapIdGrp[4] = red;
+        unsigned char alpha = colorBytes[3];
+        mapIdGrp[5] = green;
+        mapIdGrp[6] = blue;
+        mapIdGrp[7] = alpha;
         return;
     }
-
-    if (channelIndex > 1) {
-        if (channelIndex > 3) {
-            return;
-        }
-        mapIdGrp[0x10] = colorBytes[0];
-        mapIdGrp[0x11] = colorBytes[1];
-        mapIdGrp[0x12] = colorBytes[2];
-        mapIdGrp[0x13] = colorBytes[3];
+    case 1: {
+        unsigned char red = colorBytes[0];
+        unsigned char green = colorBytes[1];
+        unsigned char* mapIdGrp = Ptr(this, 0x214E8 + (mapIdGrpIndex * 0x14));
+        unsigned char blue = colorBytes[2];
+        mapIdGrp[8] = red;
+        unsigned char alpha = colorBytes[3];
+        mapIdGrp[9] = green;
+        mapIdGrp[10] = blue;
+        mapIdGrp[11] = alpha;
         return;
     }
-
-    if (channelIndex == 0) {
-        mapIdGrp[4] = colorBytes[0];
-        mapIdGrp[5] = colorBytes[1];
-        mapIdGrp[6] = colorBytes[2];
-        mapIdGrp[7] = colorBytes[3];
+    case 2: {
+        unsigned char red = colorBytes[0];
+        unsigned char green = colorBytes[1];
+        unsigned char* mapIdGrp = Ptr(this, 0x214E8 + (mapIdGrpIndex * 0x14));
+        unsigned char blue = colorBytes[2];
+        mapIdGrp[0xC] = red;
+        unsigned char alpha = colorBytes[3];
+        mapIdGrp[0xD] = green;
+        mapIdGrp[0xE] = blue;
+        mapIdGrp[0xF] = alpha;
         return;
     }
-
-    if (channelIndex < 0) {
+    case 3: {
+        unsigned char red = colorBytes[0];
+        unsigned char green = colorBytes[1];
+        unsigned char* mapIdGrp = Ptr(this, 0x214E8 + (mapIdGrpIndex * 0x14));
+        unsigned char blue = colorBytes[2];
+        mapIdGrp[0x10] = red;
+        unsigned char alpha = colorBytes[3];
+        mapIdGrp[0x11] = green;
+        mapIdGrp[0x12] = blue;
+        mapIdGrp[0x13] = alpha;
         return;
     }
-
-    mapIdGrp[8] = colorBytes[0];
-    mapIdGrp[9] = colorBytes[1];
-    mapIdGrp[10] = colorBytes[2];
-    mapIdGrp[11] = colorBytes[3];
+    }
 }
 
 /*

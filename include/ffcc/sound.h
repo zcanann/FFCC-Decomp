@@ -76,7 +76,7 @@ public:
     void WaitASync();
 
 private:
-    unsigned char m_storage[0x22D4];
+    unsigned char m_storage[0x22D8];
 };
 
 extern CSound Sound;

@@ -94,12 +94,12 @@ static inline float CameraFarZ()
 
 static inline float CameraWorldX()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
+    return CameraPcs._224_4_;
 }
 
 static inline float CameraWorldZ()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x14);
+    return CameraPcs._232_4_;
 }
 
 static inline Mtx& CameraMatrix()
@@ -1630,11 +1630,11 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	farAlpha = 0;
 	hasNearAlpha = false;
 	hasFarAlpha = false;
-	texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
+	texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
 
 	cameraPos.x = CameraWorldX();
-	cameraPos.y = 0.0f;
 	cameraPos.z = CameraWorldZ();
+	cameraPos.y = 0.0f;
 
 	targetPos.y = 0.0f;
 	PSVECSubtract(&targetPos, &cameraPos, &cameraToTarget);
@@ -1648,7 +1648,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		GXProject(cameraPos.x + scaledDir.x, targetPos.y, cameraPos.z + scaledDir.z, cameraMtx, gxProjection,
 		          gxViewport, &projX, &projY, &projZ);
 
-		depthAlphaNear = (unsigned int)(projZ * 255.0f);
+		depthAlphaNear = static_cast<unsigned int>(projZ * 16777215.0f) >> 16;
 		if (depthAlphaNear > 0xFF) {
 			depthAlphaNear = 0xFF;
 		}
@@ -1669,7 +1669,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		GXProject(targetPos.x + scaledDir.x, targetPos.y, targetPos.z + scaledDir.z, cameraMtx, gxProjection,
 		          gxViewport, &projX, &projY, &projZ);
 
-		depthAlphaFar = (unsigned int)(projZ * 255.0f);
+		depthAlphaFar = static_cast<unsigned int>(projZ * 16777215.0f) >> 16;
 		if (depthAlphaFar == 0) {
 			depthAlphaFar = 0xFF;
 		}
@@ -1688,13 +1688,13 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	}
 
 	gUtil.SetVtxFmt_POS_CLR_TEX();
-	CreateSmallBackTexture(gRenderScratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_I8, 0);
+	CreateSmallBackTexture(gRenderScratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8, 0);
 	GetBackBufferRect2(gRenderScratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR, (_GXTexFmt)0x11, 0);
 	gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 	gUtil.SetOrthoEnv();
 
 	xOffset = (float)blurWidth;
-	yOffset = xOffset * (224.0f / 640.0f);
+	yOffset = xOffset * 0.35f;
 
 	for (int pass = 0; pass < 2; pass++) {
 		int kColorSel = 0x0C;
@@ -1853,7 +1853,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     white.b = 0xFF;
     white.a = 0xFF;
 
-    GetBackBufferRect2(PtrAt(this, 0x71E8), &tempTex, 0, 0, 0x140, 0xE0, 0x46000, filter, GX_TF_I8, 0);
+    GetBackBufferRect2(PtrAt(this, 0x71E8), &tempTex, 0, 0, 0x140, 0xE0, 0x46000, filter, GX_TF_RGBA8, 0);
     GXLoadTexObj(&tempTex, GX_TEXMAP0);
     quadMin.x = 0.0f;
     quadMin.y = 0.0f;
@@ -1977,7 +1977,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     int textureOffset = 0;
     for (int i = 0; i < static_cast<int>(m_blurTextureCount); i++) {
         u8* textureBase = reinterpret_cast<u8*>(PtrAt(this, 0x71EC)) + textureOffset;
-        GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
 
@@ -2012,7 +2012,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     if (m_blurDelayCounter < textureDelay) {
         m_blurDelayCounter += 1;
     } else if (System.m_scenegraphStepMode != 2) {
-        CreateSmallBackTexture(PtrAt(this, 0x71EC), &texObj, 0x140, 0xE0, GX_NEAR, GX_TF_I8,
+        CreateSmallBackTexture(PtrAt(this, 0x71EC), &texObj, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8,
                                static_cast<unsigned long>(m_blurBufferIndex) * 0x46000);
         m_blurDelayCounter = 0;
         m_blurTextureCount += 1;

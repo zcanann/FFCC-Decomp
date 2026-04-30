@@ -792,7 +792,7 @@ chara.cpp:
 	extabindex  start:0x8000D4C8 end:0x8000D69C
 	.text       start:0x8006EB04 end:0x80073AF4
 	.ctors      start:0x801D5410 end:0x801D5414
-	.data       start:0x801FCD18 end:0x801FCD38
+	.data       start:0x801FCCD0 end:0x801FCD38
 	.sbss       start:0x8032EDA0 end:0x8032EDA8
 
 p_chara.cpp:
@@ -800,7 +800,7 @@ p_chara.cpp:
 	extabindex  start:0x8000D69C end:0x8000D9A8
 	.text       start:0x80073AF4 end:0x8007BB90
 	.ctors      start:0x801D5414 end:0x801D5418
-	.data       start:0x801FD284 end:0x801FD310
+	.data       start:0x801FCD38 end:0x801FD340
 	.bss        start:0x802E9958 end:0x802EA080
 	.sdata2     start:0x80330140 end:0x80330148
 

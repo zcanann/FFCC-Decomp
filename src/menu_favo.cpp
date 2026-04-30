@@ -70,6 +70,450 @@ struct FavoEntry {
 
 /*
  * --INFO--
+ * PAL Address: 0x80162360
+ * PAL Size: 2488b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::FavoDraw()
+{
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+
+	short* entry = reinterpret_cast<short*>((int)favoList + 8);
+	int count = *favoList;
+	for (int i = 0; i < count; i++) {
+		int tex = *reinterpret_cast<int*>(entry + 0xE);
+		if (tex >= 0) {
+			float x = static_cast<float>(entry[0]);
+			float y = static_cast<float>(entry[1]);
+			float w = static_cast<float>(entry[2]);
+			float h = static_cast<float>(entry[3]);
+			float u = *reinterpret_cast<float*>(entry + 4);
+			float v = *reinterpret_cast<float*>(entry + 6);
+			float alpha = *reinterpret_cast<float*>(entry + 8);
+			float uvScale = *reinterpret_cast<float*>(entry + 10);
+
+			if (i < 3) {
+				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 1);
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+
+				GXColor colors[4] = {
+					{0xFF, 0xFF, 0xFF, 0xFF},
+					{0xFF, 0xFF, 0xFF, 0xFF},
+					{0xFF, 0xFF, 0xFF, 0xFF},
+					{0xFF, 0xFF, 0xFF, 0xFF},
+				};
+				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
+
+				float fillW = alpha * w;
+				if (fillW > FLOAT_80333040) {
+					if (tex == 0x32) {
+						float yStep = y;
+						float end = y + h;
+						while (yStep < end) {
+							float tileH = end - yStep;
+							if (tileH > FLOAT_80333044) {
+								tileH = FLOAT_80333044;
+							}
+							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
+							    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, fillW, tileH, u,
+							    v, colors, uvScale, FLOAT_80333048, FLOAT_80333040);
+							yStep += FLOAT_80333044;
+						}
+					} else {
+						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
+						    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, fillW, h, u, v, colors,
+						    uvScale, FLOAT_80333048, FLOAT_80333040);
+					}
+
+					x += fillW * uvScale;
+				}
+
+				if (fillW > FLOAT_80333040 && fillW < w) {
+					GXColor fadeColors[4] = {
+						{0xFF, 0xFF, 0xFF, 0x00},
+						{0xFF, 0xFF, 0xFF, 0x00},
+						{0xFF, 0xFF, 0xFF, 0x00},
+						{0xFF, 0xFF, 0xFF, 0x00},
+					};
+					float remainW = (static_cast<float>(DOUBLE_80333050) / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14))) * w;
+					if (tex == 0x32) {
+						float yStep = y;
+						float end = y + h;
+						while (yStep < end) {
+							float tileH = end - yStep;
+							if (tileH > FLOAT_80333044) {
+								tileH = FLOAT_80333044;
+							}
+							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
+							    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, remainW, tileH,
+							    u, v, fadeColors, uvScale, FLOAT_80333048, FLOAT_80333040);
+							yStep += FLOAT_80333044;
+						}
+					} else {
+						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
+						    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, remainW, h, u, v,
+						    fadeColors, uvScale, FLOAT_80333048, FLOAT_80333040);
+					}
+				}
+
+				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+			} else {
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+				GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha * FLOAT_80333058)};
+				GXSetChanMatColor(GX_COLOR0A0, color);
+				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80333040);
+			}
+		}
+
+		entry += 0x20;
+	}
+
+	short* rankEntry = reinterpret_cast<short*>((int)favoList + 8);
+	int remaining = count;
+	while (0 < remaining) {
+		if (*reinterpret_cast<int*>(rankEntry + 0xE) == 0x37) {
+			break;
+		}
+		rankEntry += 0x20;
+		remaining--;
+	}
+
+	unsigned char* rank = s_rank;
+	short* drawEntry = rankEntry;
+	for (int i = 0; i < 8; i++) {
+		int barX = drawEntry[0] + drawEntry[2] + 0x18;
+		int barY = static_cast<int>((static_cast<float>(drawEntry[3]) - FLOAT_8033305c) * static_cast<float>(DOUBLE_80333060) +
+		                            static_cast<float>(drawEntry[1]));
+		DrawSingBar(barX, barY, *reinterpret_cast<short*>(rank + 2), *reinterpret_cast<float*>(drawEntry + 8));
+		rank += 4;
+		drawEntry += 0x20;
+	}
+
+	rank = s_rank;
+	drawEntry = rankEntry;
+	for (int i = 0; i < 8; i++) {
+		int iconX = drawEntry[0] + drawEntry[2] - 0x10;
+		int iconY = static_cast<int>((static_cast<float>(drawEntry[3]) - FLOAT_80333044) * static_cast<float>(DOUBLE_80333060) +
+		                             static_cast<float>(drawEntry[1]));
+		DrawSingleIcon__8CMenuPcsFiiifif(this, static_cast<char>(rank[1]) + 0x14, iconX, iconY, *reinterpret_cast<float*>(drawEntry + 8), 1,
+		                                 FLOAT_80333048);
+		rank += 4;
+		drawEntry += 0x20;
+	}
+
+	CFont* rankFont = font22;
+	rankFont->SetShadow(1);
+	rankFont->SetScale(FLOAT_80333048);
+	rankFont->DrawInit();
+
+	char textBuf[0x10];
+	memset(textBuf, 0, sizeof(textBuf));
+	rank = s_rank;
+	drawEntry = rankEntry;
+	for (int i = 0; i < 8; i++) {
+		rankFont->SetTlut(6);
+		GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80333058 * *reinterpret_cast<float*>(drawEntry + 8))};
+		rankFont->SetColor(textColor);
+		rankFont->SetMargin(FLOAT_80333048);
+		sprintf(textBuf, lbl_80333068, static_cast<int>(*rank));
+		rankFont->SetPosX(static_cast<float>(drawEntry[0] - 0xC));
+		rankFont->SetPosY(static_cast<float>(drawEntry[1]) - FLOAT_8033306c);
+		rankFont->Draw(textBuf);
+		rankFont->SetShadow(0);
+		rank += 4;
+		drawEntry += 0x20;
+	}
+
+	CFont* nameFont = font16;
+	nameFont->SetShadow(0);
+	nameFont->SetScale(FLOAT_80333070);
+	nameFont->SetMargin(FLOAT_80333048);
+	nameFont->DrawInit();
+
+	const FavoFlatData* flatData = reinterpret_cast<const FavoFlatData*>(&Game.m_cFlatDataArr[1]);
+	rank = s_rank;
+	drawEntry = rankEntry;
+	for (int i = 0; i < 8; i++) {
+		GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80333058 * *reinterpret_cast<float*>(drawEntry + 8))};
+		nameFont->SetColor(textColor);
+		const char* name = flatData->table[0].strings[(static_cast<char>(rank[1]) + 0x17D) * 5 + 4];
+		nameFont->SetPosX(static_cast<float>(drawEntry[0] + 0x1C));
+		nameFont->SetPosY(static_cast<float>(drawEntry[1]) - FLOAT_8033306c);
+		nameFont->Draw(const_cast<char*>(name));
+		rank += 4;
+		drawEntry += 0x20;
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+}
+/*
+ * --INFO--
+ * PAL Address: 0x80162d18
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+bool CMenuPcs::FavoClose()
+{
+    int finishedCount;
+    int count;
+    int frame;
+    int remaining;
+    FavoEntry* entry;
+
+    finishedCount = 0;
+	singMenuState->frame = singMenuState->frame + 1;
+    count = static_cast<unsigned short>(*favoList);
+    entry = reinterpret_cast<FavoEntry*>(favoList + 4);
+    frame = singMenuState->frame;
+    remaining = count;
+    if (0 < count) {
+        do {
+            float step = FLOAT_80333040;
+            if (entry->startFrame <= frame) {
+                if (frame < entry->startFrame + entry->duration) {
+                    entry->step = entry->step + 1;
+                    entry->alpha =
+                        (float)-((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step - DOUBLE_80333050);
+                    if ((entry->flags & 2) == 0) {
+                        step =
+                            (float)-((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step - DOUBLE_80333050);
+                        entry->dx = (entry->targetX - (float)entry->x) * step;
+                        entry->dy = (entry->targetY - (float)entry->y) * step;
+                    }
+                } else {
+                    finishedCount = finishedCount + 1;
+                    entry->alpha = FLOAT_80333040;
+                    entry->dx = step;
+                    entry->dy = step;
+                }
+            }
+            entry++;
+            remaining = remaining + -1;
+        } while (remaining != 0);
+    }
+
+	return count == finishedCount;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80162e94
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned int CMenuPcs::FavoCtrl()
+{
+	bool activeInput = false;
+	unsigned short press;
+	int doReset;
+
+	if (Pad._452_4_ == 0) {
+		if (Pad._448_4_ != -1) {
+			activeInput = true;
+		}
+	} else {
+		activeInput = true;
+	}
+
+	if (activeInput) {
+		press = 0;
+	} else {
+		unsigned int port = 0;
+
+		__cntlzw((unsigned int)Pad._448_4_);
+		port &= ~((int)~(Pad._448_4_ - (int)port | (int)port - Pad._448_4_) >> 0x1f);
+		press = *(unsigned short*)((unsigned char*)&Pad + port * 0x54 + 8);
+	}
+
+	if (press == 0) {
+		doReset = 0;
+	} else if ((press & 0x20) != 0) {
+		singMenuState->cursorMove = 1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		doReset = 1;
+	} else if ((press & 0x40) != 0) {
+		singMenuState->cursorMove = -1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		doReset = 1;
+	} else if ((press & 0x100) != 0) {
+		Sound.PlaySe(4, 0x40, 0x7f, 0);
+		doReset = 0;
+	} else if ((press & 0x200) != 0) {
+		singMenuState->closeRequested = 1;
+		Sound.PlaySe(3, 0x40, 0x7f, 0);
+		doReset = 1;
+	} else {
+		doReset = 0;
+	}
+
+	if (doReset != 0) {
+		FavoInit0();
+	}
+
+	return doReset;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80163024
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+bool CMenuPcs::FavoOpen()
+{
+    int finishedCount;
+    int count;
+    int frame;
+    int remaining;
+    FavoEntry* entry;
+
+	if (singMenuState->initialized == 0) {
+		FavoInit();
+	}
+
+    finishedCount = 0;
+	singMenuState->frame = singMenuState->frame + 1;
+    count = static_cast<unsigned short>(*favoList);
+    entry = reinterpret_cast<FavoEntry*>(favoList + 4);
+    frame = singMenuState->frame;
+    remaining = count;
+    if (0 < count) {
+        do {
+            float step = FLOAT_80333040;
+            if (entry->startFrame <= frame) {
+                if (frame < entry->startFrame + entry->duration) {
+                    entry->step = entry->step + 1;
+                    entry->alpha = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
+                    if ((entry->flags & 2) == 0) {
+                        step = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
+                        entry->dx = (entry->targetX - (float)entry->x) * step;
+                        entry->dy = (entry->targetY - (float)entry->y) * step;
+                    }
+                } else {
+                    finishedCount = finishedCount + 1;
+                    entry->alpha = FLOAT_80333048;
+                    entry->dx = step;
+                    entry->dy = step;
+                }
+            }
+            entry++;
+            remaining = remaining + -1;
+        } while (remaining != 0);
+    }
+
+	return count == finishedCount;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 801631d4
+ * PAL Size: 616b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::FavoInit0()
+{
+	float alpha;
+	unsigned int count;
+	unsigned int blockCount;
+	FavoEntry* entry;
+
+	entry = reinterpret_cast<FavoEntry*>(favoList + 4);
+	entry[0].startFrame = 2;
+	entry[0].duration = 5;
+	entry[1].startFrame = 2;
+	entry[1].duration = 5;
+	entry[2].startFrame = 2;
+	entry[2].duration = 5;
+	entry[3].startFrame = 7;
+	entry[3].duration = 5;
+	entry[4].startFrame = 7;
+	entry[4].duration = 5;
+	entry[5].flags = 2;
+	entry[5].startFrame = 7;
+	entry[5].duration = 5;
+	entry[6].flags = 2;
+	entry[6].startFrame = 0;
+	entry[6].duration = 5;
+	entry[7].flags = 2;
+	entry[7].startFrame = 0;
+	entry[7].duration = 5;
+	entry[8].flags = 2;
+	entry[8].startFrame = 0;
+	entry[8].duration = 5;
+	entry[9].flags = 2;
+	alpha = FLOAT_80333048;
+	entry[9].startFrame = 0;
+	entry[9].duration = 5;
+	entry[10].flags = 2;
+	entry[10].startFrame = 0;
+	entry[10].duration = 5;
+	entry[11].flags = 2;
+	entry[11].startFrame = 0;
+	entry[11].duration = 5;
+	entry[12].flags = 2;
+	entry[12].startFrame = 0;
+	entry[12].duration = 5;
+	entry[13].flags = 2;
+	entry[13].startFrame = 0;
+	entry[13].duration = 5;
+
+	count = (unsigned int)*favoList;
+	entry = reinterpret_cast<FavoEntry*>(favoList + 4);
+	if (0 < (int)count) {
+		blockCount = count >> 3;
+		if (blockCount != 0) {
+			do {
+				entry[0].step = 0;
+				entry[0].alpha = alpha;
+				entry[1].step = 0;
+				entry[1].alpha = alpha;
+				entry[2].step = 0;
+				entry[2].alpha = alpha;
+				entry[3].step = 0;
+				entry[3].alpha = alpha;
+				entry[4].step = 0;
+				entry[4].alpha = alpha;
+				entry[5].step = 0;
+				entry[5].alpha = alpha;
+				entry[6].step = 0;
+				entry[6].alpha = alpha;
+				entry[7].step = 0;
+				entry[7].alpha = alpha;
+				entry += 8;
+				blockCount = blockCount - 1;
+			} while (blockCount != 0);
+			count = count & 7;
+			if (count == 0) {
+				return;
+			}
+		}
+		do {
+			entry->step = 0;
+			entry->alpha = alpha;
+			entry++;
+			count = count - 1;
+		} while (count != 0);
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8016343c
  * PAL Size: 1296b
  * EN Address: TODO
@@ -301,447 +745,3 @@ void CMenuPcs::FavoInit()
 	singMenuState->initialized = 1;
 }
 
-/*
- * --INFO--
- * PAL Address: 801631d4
- * PAL Size: 616b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::FavoInit0()
-{
-	float alpha;
-	unsigned int count;
-	unsigned int blockCount;
-	FavoEntry* entry;
-
-	entry = reinterpret_cast<FavoEntry*>(favoList + 4);
-	entry[0].startFrame = 2;
-	entry[0].duration = 5;
-	entry[1].startFrame = 2;
-	entry[1].duration = 5;
-	entry[2].startFrame = 2;
-	entry[2].duration = 5;
-	entry[3].startFrame = 7;
-	entry[3].duration = 5;
-	entry[4].startFrame = 7;
-	entry[4].duration = 5;
-	entry[5].flags = 2;
-	entry[5].startFrame = 7;
-	entry[5].duration = 5;
-	entry[6].flags = 2;
-	entry[6].startFrame = 0;
-	entry[6].duration = 5;
-	entry[7].flags = 2;
-	entry[7].startFrame = 0;
-	entry[7].duration = 5;
-	entry[8].flags = 2;
-	entry[8].startFrame = 0;
-	entry[8].duration = 5;
-	entry[9].flags = 2;
-	alpha = FLOAT_80333048;
-	entry[9].startFrame = 0;
-	entry[9].duration = 5;
-	entry[10].flags = 2;
-	entry[10].startFrame = 0;
-	entry[10].duration = 5;
-	entry[11].flags = 2;
-	entry[11].startFrame = 0;
-	entry[11].duration = 5;
-	entry[12].flags = 2;
-	entry[12].startFrame = 0;
-	entry[12].duration = 5;
-	entry[13].flags = 2;
-	entry[13].startFrame = 0;
-	entry[13].duration = 5;
-
-	count = (unsigned int)*favoList;
-	entry = reinterpret_cast<FavoEntry*>(favoList + 4);
-	if (0 < (int)count) {
-		blockCount = count >> 3;
-		if (blockCount != 0) {
-			do {
-				entry[0].step = 0;
-				entry[0].alpha = alpha;
-				entry[1].step = 0;
-				entry[1].alpha = alpha;
-				entry[2].step = 0;
-				entry[2].alpha = alpha;
-				entry[3].step = 0;
-				entry[3].alpha = alpha;
-				entry[4].step = 0;
-				entry[4].alpha = alpha;
-				entry[5].step = 0;
-				entry[5].alpha = alpha;
-				entry[6].step = 0;
-				entry[6].alpha = alpha;
-				entry[7].step = 0;
-				entry[7].alpha = alpha;
-				entry += 8;
-				blockCount = blockCount - 1;
-			} while (blockCount != 0);
-			count = count & 7;
-			if (count == 0) {
-				return;
-			}
-		}
-		do {
-			entry->step = 0;
-			entry->alpha = alpha;
-			entry++;
-			count = count - 1;
-		} while (count != 0);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80163024
- * PAL Size: 432b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-bool CMenuPcs::FavoOpen()
-{
-    int finishedCount;
-    int count;
-    int frame;
-    int remaining;
-    FavoEntry* entry;
-
-	if (singMenuState->initialized == 0) {
-		FavoInit();
-	}
-
-    finishedCount = 0;
-	singMenuState->frame = singMenuState->frame + 1;
-    count = static_cast<unsigned short>(*favoList);
-    entry = reinterpret_cast<FavoEntry*>(favoList + 4);
-    frame = singMenuState->frame;
-    remaining = count;
-    if (0 < count) {
-        do {
-            float step = FLOAT_80333040;
-            if (entry->startFrame <= frame) {
-                if (frame < entry->startFrame + entry->duration) {
-                    entry->step = entry->step + 1;
-                    entry->alpha = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
-                    if ((entry->flags & 2) == 0) {
-                        step = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
-                        entry->dx = (entry->targetX - (float)entry->x) * step;
-                        entry->dy = (entry->targetY - (float)entry->y) * step;
-                    }
-                } else {
-                    finishedCount = finishedCount + 1;
-                    entry->alpha = FLOAT_80333048;
-                    entry->dx = step;
-                    entry->dy = step;
-                }
-            }
-            entry++;
-            remaining = remaining + -1;
-        } while (remaining != 0);
-    }
-
-	return count == finishedCount;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80162e94
- * PAL Size: 400b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned int CMenuPcs::FavoCtrl()
-{
-	bool activeInput = false;
-	unsigned short press;
-	int doReset;
-
-	if (Pad._452_4_ == 0) {
-		if (Pad._448_4_ != -1) {
-			activeInput = true;
-		}
-	} else {
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		press = 0;
-	} else {
-		unsigned int port = 0;
-
-		__cntlzw((unsigned int)Pad._448_4_);
-		port &= ~((int)~(Pad._448_4_ - (int)port | (int)port - Pad._448_4_) >> 0x1f);
-		press = *(unsigned short*)((unsigned char*)&Pad + port * 0x54 + 8);
-	}
-
-	if (press == 0) {
-		doReset = 0;
-	} else if ((press & 0x20) != 0) {
-		singMenuState->cursorMove = 1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = 1;
-	} else if ((press & 0x40) != 0) {
-		singMenuState->cursorMove = -1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = 1;
-	} else if ((press & 0x100) != 0) {
-		Sound.PlaySe(4, 0x40, 0x7f, 0);
-		doReset = 0;
-	} else if ((press & 0x200) != 0) {
-		singMenuState->closeRequested = 1;
-		Sound.PlaySe(3, 0x40, 0x7f, 0);
-		doReset = 1;
-	} else {
-		doReset = 0;
-	}
-
-	if (doReset != 0) {
-		FavoInit0();
-	}
-
-	return doReset;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80162d18
- * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-bool CMenuPcs::FavoClose()
-{
-    int finishedCount;
-    int count;
-    int frame;
-    int remaining;
-    FavoEntry* entry;
-
-    finishedCount = 0;
-	singMenuState->frame = singMenuState->frame + 1;
-    count = static_cast<unsigned short>(*favoList);
-    entry = reinterpret_cast<FavoEntry*>(favoList + 4);
-    frame = singMenuState->frame;
-    remaining = count;
-    if (0 < count) {
-        do {
-            float step = FLOAT_80333040;
-            if (entry->startFrame <= frame) {
-                if (frame < entry->startFrame + entry->duration) {
-                    entry->step = entry->step + 1;
-                    entry->alpha =
-                        (float)-((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step - DOUBLE_80333050);
-                    if ((entry->flags & 2) == 0) {
-                        step =
-                            (float)-((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step - DOUBLE_80333050);
-                        entry->dx = (entry->targetX - (float)entry->x) * step;
-                        entry->dy = (entry->targetY - (float)entry->y) * step;
-                    }
-                } else {
-                    finishedCount = finishedCount + 1;
-                    entry->alpha = FLOAT_80333040;
-                    entry->dx = step;
-                    entry->dy = step;
-                }
-            }
-            entry++;
-            remaining = remaining + -1;
-        } while (remaining != 0);
-    }
-
-	return count == finishedCount;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80162360
- * PAL Size: 2488b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::FavoDraw()
-{
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
-
-	short* entry = reinterpret_cast<short*>((int)favoList + 8);
-	int count = *favoList;
-	for (int i = 0; i < count; i++) {
-		int tex = *reinterpret_cast<int*>(entry + 0xE);
-		if (tex >= 0) {
-			float x = static_cast<float>(entry[0]);
-			float y = static_cast<float>(entry[1]);
-			float w = static_cast<float>(entry[2]);
-			float h = static_cast<float>(entry[3]);
-			float u = *reinterpret_cast<float*>(entry + 4);
-			float v = *reinterpret_cast<float*>(entry + 6);
-			float alpha = *reinterpret_cast<float*>(entry + 8);
-			float uvScale = *reinterpret_cast<float*>(entry + 10);
-
-			if (i < 3) {
-				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 1);
-				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
-
-				GXColor colors[4] = {
-					{0xFF, 0xFF, 0xFF, 0xFF},
-					{0xFF, 0xFF, 0xFF, 0xFF},
-					{0xFF, 0xFF, 0xFF, 0xFF},
-					{0xFF, 0xFF, 0xFF, 0xFF},
-				};
-				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
-
-				float fillW = alpha * w;
-				if (fillW > FLOAT_80333040) {
-					if (tex == 0x32) {
-						float yStep = y;
-						float end = y + h;
-						while (yStep < end) {
-							float tileH = end - yStep;
-							if (tileH > FLOAT_80333044) {
-								tileH = FLOAT_80333044;
-							}
-							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-							    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, fillW, tileH, u,
-							    v, colors, uvScale, FLOAT_80333048, FLOAT_80333040);
-							yStep += FLOAT_80333044;
-						}
-					} else {
-						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-						    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, fillW, h, u, v, colors,
-						    uvScale, FLOAT_80333048, FLOAT_80333040);
-					}
-
-					x += fillW * uvScale;
-				}
-
-				if (fillW > FLOAT_80333040 && fillW < w) {
-					GXColor fadeColors[4] = {
-						{0xFF, 0xFF, 0xFF, 0x00},
-						{0xFF, 0xFF, 0xFF, 0x00},
-						{0xFF, 0xFF, 0xFF, 0x00},
-						{0xFF, 0xFF, 0xFF, 0x00},
-					};
-					float remainW = (static_cast<float>(DOUBLE_80333050) / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14))) * w;
-					if (tex == 0x32) {
-						float yStep = y;
-						float end = y + h;
-						while (yStep < end) {
-							float tileH = end - yStep;
-							if (tileH > FLOAT_80333044) {
-								tileH = FLOAT_80333044;
-							}
-							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-							    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, remainW, tileH,
-							    u, v, fadeColors, uvScale, FLOAT_80333048, FLOAT_80333040);
-							yStep += FLOAT_80333044;
-						}
-					} else {
-						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-						    &MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, remainW, h, u, v,
-						    fadeColors, uvScale, FLOAT_80333048, FLOAT_80333040);
-					}
-				}
-
-				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
-			} else {
-				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
-				GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha * FLOAT_80333058)};
-				GXSetChanMatColor(GX_COLOR0A0, color);
-				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80333040);
-			}
-		}
-
-		entry += 0x20;
-	}
-
-	short* rankEntry = reinterpret_cast<short*>((int)favoList + 8);
-	int remaining = count;
-	while (0 < remaining) {
-		if (*reinterpret_cast<int*>(rankEntry + 0xE) == 0x37) {
-			break;
-		}
-		rankEntry += 0x20;
-		remaining--;
-	}
-
-	unsigned char* rank = s_rank;
-	short* drawEntry = rankEntry;
-	for (int i = 0; i < 8; i++) {
-		int barX = drawEntry[0] + drawEntry[2] + 0x18;
-		int barY = static_cast<int>((static_cast<float>(drawEntry[3]) - FLOAT_8033305c) * static_cast<float>(DOUBLE_80333060) +
-		                            static_cast<float>(drawEntry[1]));
-		DrawSingBar(barX, barY, *reinterpret_cast<short*>(rank + 2), *reinterpret_cast<float*>(drawEntry + 8));
-		rank += 4;
-		drawEntry += 0x20;
-	}
-
-	rank = s_rank;
-	drawEntry = rankEntry;
-	for (int i = 0; i < 8; i++) {
-		int iconX = drawEntry[0] + drawEntry[2] - 0x10;
-		int iconY = static_cast<int>((static_cast<float>(drawEntry[3]) - FLOAT_80333044) * static_cast<float>(DOUBLE_80333060) +
-		                             static_cast<float>(drawEntry[1]));
-		DrawSingleIcon__8CMenuPcsFiiifif(this, static_cast<char>(rank[1]) + 0x14, iconX, iconY, *reinterpret_cast<float*>(drawEntry + 8), 1,
-		                                 FLOAT_80333048);
-		rank += 4;
-		drawEntry += 0x20;
-	}
-
-	CFont* rankFont = font22;
-	rankFont->SetShadow(1);
-	rankFont->SetScale(FLOAT_80333048);
-	rankFont->DrawInit();
-
-	char textBuf[0x10];
-	memset(textBuf, 0, sizeof(textBuf));
-	rank = s_rank;
-	drawEntry = rankEntry;
-	for (int i = 0; i < 8; i++) {
-		rankFont->SetTlut(6);
-		GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80333058 * *reinterpret_cast<float*>(drawEntry + 8))};
-		rankFont->SetColor(textColor);
-		rankFont->SetMargin(FLOAT_80333048);
-		sprintf(textBuf, lbl_80333068, static_cast<int>(*rank));
-		rankFont->SetPosX(static_cast<float>(drawEntry[0] - 0xC));
-		rankFont->SetPosY(static_cast<float>(drawEntry[1]) - FLOAT_8033306c);
-		rankFont->Draw(textBuf);
-		rankFont->SetShadow(0);
-		rank += 4;
-		drawEntry += 0x20;
-	}
-
-	CFont* nameFont = font16;
-	nameFont->SetShadow(0);
-	nameFont->SetScale(FLOAT_80333070);
-	nameFont->SetMargin(FLOAT_80333048);
-	nameFont->DrawInit();
-
-	const FavoFlatData* flatData = reinterpret_cast<const FavoFlatData*>(&Game.m_cFlatDataArr[1]);
-	rank = s_rank;
-	drawEntry = rankEntry;
-	for (int i = 0; i < 8; i++) {
-		GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80333058 * *reinterpret_cast<float*>(drawEntry + 8))};
-		nameFont->SetColor(textColor);
-		const char* name = flatData->table[0].strings[(static_cast<char>(rank[1]) + 0x17D) * 5 + 4];
-		nameFont->SetPosX(static_cast<float>(drawEntry[0] + 0x1C));
-		nameFont->SetPosY(static_cast<float>(drawEntry[1]) - FLOAT_8033306c);
-		nameFont->Draw(const_cast<char*>(name));
-		rank += 4;
-		drawEntry += 0x20;
-	}
-
-	DrawInit__8CMenuPcsFv(this);
-}

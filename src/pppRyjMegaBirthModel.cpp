@@ -215,16 +215,12 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
 
     if (*(void**)(work + 0xC) == 0) {
         hasRequiredMemory = false;
+    } else if ((*(u8*)(payload + 0x136) != 0) && (*(void**)(work + 0x10) == 0)) {
+        hasRequiredMemory = false;
+    } else if ((*(u8*)(payload + 0x131) != 0) && (*(void**)(work + 0x14) == 0)) {
+        hasRequiredMemory = false;
     } else {
-        if ((*(u8*)(payload + 0x136) == 0) || (*(void**)(work + 0x10) != 0)) {
-            if ((*(u8*)(payload + 0x131) == 0) || (*(void**)(work + 0x14) != 0)) {
-                hasRequiredMemory = true;
-            } else {
-                hasRequiredMemory = false;
-            }
-        } else {
-            hasRequiredMemory = false;
-        }
+        hasRequiredMemory = true;
     }
 
     if (hasRequiredMemory) {

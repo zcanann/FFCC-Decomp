@@ -42,6 +42,8 @@ extern "C" void* __register_global_object(void* object, void* destructor, void* 
 extern "C" void AfterFrame__12CFlatRuntimeFi(CFlatRuntime*, int);
 extern "C" void __dt__9CFlatDataFv(void*, int);
 extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, int);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void __dla__FPv(void*);
 extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" CFlatRuntime2* __ct__13CFlatRuntime2Fv(CFlatRuntime2*);
 extern "C" void __dt__13CFlatRuntime2Fv(void*);
@@ -91,12 +93,17 @@ extern "C" void copy__8CGObjectFv(CGObject*);
 
 int gCFlatRuntime2DebugDrawOverflowFrame = 0;
 unsigned char gCFlatRuntime2DebugDrawOverflowInit = 0;
-const char sCFlatRuntime2DebugDrawOverflowMsg[] = "CFlatRuntime2::AddDebugDrawCC overflow\n";
-static const char sCFlatRuntime2FileNameFmt[] = "dvd:/%s.cft";
-static const char sCFlatRuntime2DebugFileNameFmt[] = "dvd:/%s.cft_dbg";
+const char sCFlatRuntime2DebugDrawOverflowMsg[] =
+	"CFlatRuntime2.AddDebugDrawCC: "
+	"\x8e\x8b\x90\xfc\x83\x60\x83\x46\x83\x62\x83\x4e\x83\x66\x83\x6f\x83\x62\x83\x4f"
+	"\x95\x8e\xa6\x82\xf0\x82\xb1\x82\xea\x88\xc8\x8f\xe3\x92\xc7\x89\xc1\x82\xc5"
+	"\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
+static const char sCFlatRuntime2SaveSceneMsg[] = "SAVE SCENE";
+static const char sCFlatRuntime2FileNameFmt[] = "dvd/cft/%s.cft";
+static const char sCFlatRuntime2DebugFileNameFmt[] = "dvd/cft/%s.cft.dbg";
 static const char sCFlatRuntime2LoadMsg[] = "CFlatRuntime2::Load\n";
 static const char sCFlatRuntime2FileTag[] = "cflat_runtime2.cpp";
-static const char sCFlatRuntime2TexturePathFmt[] = "dvd:/%s/%s.tex";
+static const char sCFlatRuntime2TexturePathFmt[] = "dvd/%s%s.tex";
 
 static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
 {
@@ -360,6 +367,16 @@ static inline unsigned int& ParticleWorkNoLo(CFlatRuntime2* runtime)
 	return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(runtime) + 0x173C);
 }
 
+static inline u32 Swap32(u32 value)
+{
+	return __lwbrx(&value, 0);
+}
+
+static inline u32 SwapF32(float value)
+{
+	return __lwbrx(&value, 0);
+}
+
 } // namespace
 
 /*
@@ -488,16 +505,6 @@ CFlatRuntime2::~CFlatRuntime2()
 	AfterFrame__12CFlatRuntimeFi(reinterpret_cast<CFlatRuntime*>(this), 1);
 	__dt__9CFlatDataFv(runtime + 0xCF20, -1);
 	__dt__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this), 0);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CFlatRuntime2::CParticleWork::CParticleWork()
-{
-	// TODO
 }
 
 /*
@@ -1536,6 +1543,75 @@ void CFlatRuntime2::Calc()
 		}
 	}
 
+	u16 button = 0;
+	if (Pad._452_4_ == 0) {
+		const u32 padIndex = static_cast<u32>((1 - Pad._448_4_) | (Pad._448_4_ - 1)) >> 31;
+		button = *reinterpret_cast<u16*>(PadRaw() + padIndex * 0x54 + 0x36);
+	}
+
+	if (((button & 0x400) != 0) && (*reinterpret_cast<int*>(runtime + 0x10418) != 0)) {
+		*reinterpret_cast<int*>(runtime + 0x10418) = 0;
+	}
+
+	if (*reinterpret_cast<int*>(runtime + 0x10418) != 0) {
+		Graphic.Printf(2, 3, const_cast<char*>(sCFlatRuntime2SaveSceneMsg));
+
+		u32* saveData = reinterpret_cast<u32*>(
+			__nwa__FUlPQ27CMemory6CStagePci(0xFFC, getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x36F));
+		u32* objectData = saveData + 8;
+
+		saveData[0] = SwapF32(CameraPcs._224_4_);
+		saveData[1] = SwapF32(CameraPcs._228_4_);
+		saveData[2] = SwapF32(CameraPcs._232_4_);
+		saveData[3] = SwapF32(CameraPcs._212_4_);
+		saveData[4] = SwapF32(CameraPcs._216_4_);
+		saveData[5] = SwapF32(CameraPcs._220_4_);
+		saveData[6] = SwapF32(CameraPcs._252_4_);
+		saveData[7] = SwapF32((180.0f * *reinterpret_cast<float*>(CameraPcsRaw() + 0x108)) / 3.1415927f);
+
+		u32 lastX = 0;
+		u32 lastY = 0;
+		u32 lastZ = 0;
+		u32 lastRotY = 0;
+		u32 lastUnknown188 = 0;
+		u32 lastBodyRadius = 0;
+
+		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+			if (object->m_charaModelHandle == 0) {
+				continue;
+			}
+
+			Vec pos = object->m_worldPosition;
+			if ((object->m_weaponNodeFlags & 1) != 0) {
+				PSVECAdd(&pos, &object->m_attachOwner->m_worldPosition, &pos);
+			}
+
+			objectData[0] = Swap32(static_cast<u32>(static_cast<int>(object->m_particleId)));
+			lastX = SwapF32(pos.x);
+			lastY = SwapF32(pos.y);
+			lastZ = SwapF32(pos.z);
+			lastRotY = SwapF32(object->m_rotBaseY);
+			lastUnknown188 = SwapF32(object->unk_0x188);
+			lastBodyRadius = SwapF32(object->m_bodyEllipsoidRadius);
+			objectData[1] = lastX;
+			objectData[2] = lastY;
+			objectData[3] = lastZ;
+			objectData[4] = lastRotY;
+			objectData[5] = lastUnknown188;
+			objectData[6] = lastBodyRadius;
+			objectData += 7;
+		}
+
+		objectData[0] = Swap32(0xFFFFFFFF);
+		objectData[1] = lastX;
+		objectData[2] = lastY;
+		objectData[3] = lastZ;
+		objectData[4] = lastRotY;
+		objectData[5] = lastUnknown188;
+		objectData[6] = lastBodyRadius;
+		__dla__FPv(saveData);
+	}
+
 	*reinterpret_cast<int*>(runtime + 0xCD1C) = 0;
 	memset(runtime + 0x1338, 0, 0x14);
 }
@@ -2220,53 +2296,7 @@ void CFlatRuntime2::PutParticleWork()
 void CFlatRuntime2::ResetParticleWork(int workNo, int arg)
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
-	float one = 1.0f;
-	u8 clear3[3] = { 0, 0, 0 };
-	int seNo = -1;
-	int sePacked = 0x00000100;
-	int seParam = 0;
-	int seDelay = 0x1E;
-	int seFrame = -1;
-	int paramNo = 0;
-	int paramId = 0;
-	int ex0 = 0;
-	int ex1 = 0;
-	int ex2 = 0;
-	int ex3 = 0;
-	int ex4 = 0;
-	int ex5 = 0;
-	int ex6 = 0;
-	int ex7 = 0;
-
-	ParticleWorkPosPtr(this) = 0;
-	ParticleWorkPosVecPtr(this) = 0;
-	ParticleWorkScalePtr(this) = 0;
-	ParticleWorkTargetPtr(this) = 0;
-	*reinterpret_cast<int*>(runtime + 0x16DC) = 0;
-	ParticleWorkBind(this) = 0;
-	ParticleWorkTrace(this) = 0;
-	ParticleWorkColor0(this) = 0;
-	ParticleWorkColor1(this) = 0;
-	ParticleWorkSpeed(this) = one;
-	ParticleWorkColorLerp(this) = one;
-	runtime[0x16F8] = 0;
-	memcpy(runtime + 0x16F9, clear3, sizeof(clear3));
-
-	*reinterpret_cast<int*>(runtime + 0x16FC) = seNo;
-	*reinterpret_cast<int*>(runtime + 0x1700) = sePacked;
-	*reinterpret_cast<int*>(runtime + 0x1704) = seParam;
-	*reinterpret_cast<int*>(runtime + 0x1708) = seDelay;
-	*reinterpret_cast<int*>(runtime + 0x170C) = seFrame;
-	*reinterpret_cast<int*>(runtime + 0x1710) = paramNo;
-	*reinterpret_cast<int*>(runtime + 0x1714) = paramId;
-	*reinterpret_cast<int*>(runtime + 0x1718) = ex0;
-	*reinterpret_cast<int*>(runtime + 0x171C) = ex1;
-	*reinterpret_cast<int*>(runtime + 0x1720) = ex2;
-	*reinterpret_cast<int*>(runtime + 0x1724) = ex3;
-	*reinterpret_cast<int*>(runtime + 0x1728) = ex4;
-	*reinterpret_cast<int*>(runtime + 0x172C) = ex5;
-	*reinterpret_cast<int*>(runtime + 0x1730) = ex6;
-	*reinterpret_cast<int*>(runtime + 0x1734) = ex7;
+	*reinterpret_cast<CParticleWork*>(runtime + 0x16CC) = CParticleWork();
 
 	runtime[0x16F8] = 1;
 	ParticleWorkNoHi(this) = workNo >> 8;

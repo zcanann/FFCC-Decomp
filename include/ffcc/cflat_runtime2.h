@@ -28,7 +28,57 @@ class CFlatRuntime2
 public:
 	class CParticleWork
 	{
-		CParticleWork();
+	public:
+		CParticleWork()
+		{
+			m_pos = 0;
+			m_posVec = 0;
+			m_scale = 0;
+			m_target = 0;
+			m_arg = 0;
+			m_bind = 0;
+			m_trace = 0;
+			m_color0 = 0;
+			m_color1 = 0;
+			m_speed = 1.0f;
+			m_colorLerp = 1.0f;
+			m_enable = 0;
+			m_seNo = -1;
+			m_seUnk0 = 0;
+			m_seKind = 1;
+			m_seUnk2 = 0;
+			m_seParam = 0;
+			m_seDelay = 0x1E;
+			m_seFrame = -1;
+			m_paramNo = 0;
+			m_paramId = 0;
+		}
+
+		float* m_pos;
+		float* m_posVec;
+		float* m_scale;
+		float* m_target;
+		int m_arg;
+		CFlatRuntime::CObject* m_bind;
+		CFlatRuntime::CObject* m_trace;
+		int m_color0;
+		int m_color1;
+		float m_speed;
+		float m_colorLerp;
+		u8 m_enable;
+		u8 m_pad2D[3];
+		int m_seNo;
+		u8 m_seUnk0;
+		u8 m_seKind;
+		u8 m_seUnk2;
+		u8 m_seUnk3;
+		int m_seParam;
+		int m_seDelay;
+		int m_seFrame;
+		int m_paramNo;
+		short m_paramId;
+		u8 m_pad4A[2];
+		int m_extra[8];
 	};
 	
 	CFlatRuntime2();

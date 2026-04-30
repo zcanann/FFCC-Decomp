@@ -171,9 +171,9 @@ struct CharaBreakMeshRef {
 };
 
 struct CharaBreakModelData {
-    u8 _pad0[0x12];
-    u16 m_meshCount;
-    u8 _padC[0x14];
+    u8 _pad0[0xC];
+    u32 m_meshCount;
+    u8 _pad10[0x18];
     void* m_materialSet;
     u8 _pad24[0x8];
     u32 m_posQuant;
@@ -193,7 +193,7 @@ STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_data) == 0xA4);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_nodes) == 0xA8);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_meshes) == 0xAC);
-STATIC_ASSERT(offsetof(CharaBreakModelData, m_meshCount) == 0x12);
+STATIC_ASSERT(offsetof(CharaBreakModelData, m_meshCount) == 0x0C);
 STATIC_ASSERT(offsetof(CharaBreakModelData, m_materialSet) == 0x28);
 STATIC_ASSERT(offsetof(CharaBreakModelData, m_posQuant) == 0x34);
 STATIC_ASSERT(offsetof(CharaBreakModelData, m_normQuant) == 0x38);
@@ -282,7 +282,6 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     u8* model;
     void* handle;
     u8* mesh;
-    u32 meshCount;
     u32 i;
 
     if (gPppCalcDisabled != 0) {
@@ -324,7 +323,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     *(u32*)(model + 0x104) = (u32)CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f;
     *(u32*)(model + 0xEC) = (u32)CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv;
 
-    if (stepData->m_graphId == *(s32*)charaBreak) {
+    if (stepData->m_graphId == charaBreak->m_graphId) {
         f32 zero = FLOAT_80332048;
         if (stepData->m_direction.x == zero && stepData->m_direction.y == zero &&
             stepData->m_direction.z == zero) {
@@ -337,13 +336,12 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     }
 
     mesh = reinterpret_cast<u8*>(ModelMeshes(reinterpret_cast<CChara::CModel*>(model)));
-    meshCount = ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount;
 
     if (work->m_meshBuffers == NULL) {
         work->m_miscValue = FLOAT_80332050;
-        work->m_meshBuffers = pppMemAlloc__FUlPQ27CMemory6CStagePci(meshCount << 2, pppEnvStPtr->m_stagePtr,
-                                                                     const_cast<char*>(s_pppCharaBreak_cpp_801dd690),
-                                                                     0x3D0);
+        work->m_meshBuffers = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount << 2, pppEnvStPtr->m_stagePtr,
+            const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3D0);
         if (work->m_meshBuffers == NULL) {
             goto fail;
         }
@@ -352,7 +350,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
             ((u32*)work->m_meshBuffers)[i] = 0;
         }
 
-        for (i = 0; i < meshCount; i++) {
+        for (i = 0; i < ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount; i++) {
             CharaBreakMeshData* meshData = *(CharaBreakMeshData**)(mesh + 8);
 
             if (strcmp(meshData->m_name, "") == 0) {

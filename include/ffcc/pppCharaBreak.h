@@ -14,7 +14,9 @@ void InitPolygonParameter(PCharaBreak*, VCharaBreak*, POLYGON_DATA*, unsigned lo
 void UpdatePolygonData(PCharaBreak*, VCharaBreak*, CChara::CModel*);
 
 struct pppCharaBreak {
-    unsigned int m_graphId;
+    unsigned char _pad0[0x0C];
+    int m_graphId;
+    unsigned char _pad10[0x70];
 };
 
 struct CharaBreakUnkB {

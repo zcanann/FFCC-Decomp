@@ -27,8 +27,16 @@ struct VYmMegaBirthShpTail3
     unsigned short m_lifeLimitPadding; // 0x4e
 };
 
-struct PYmMegaBirthShpTail3 : _PARTICLE_DATA
+struct PYmMegaBirthShpTail3
 {
+    Mtx m_matrix;                  // 0x00
+    Vec m_directionTail;           // 0x30
+    float m_colorDeltaAdd[4];      // 0x3c
+    float m_sizeStart;             // 0x4c
+    float m_sizeEnd;               // 0x50
+    float m_sizeVal;               // 0x54
+    float field_0x58;              // 0x58
+    Vec m_velocity;                // 0x5c
 };
 
 struct pppYmMegaBirthShpTail3UnkB;

@@ -15,8 +15,8 @@ extern const float gPppYmMoveParabolaAngleScale;
 extern const float gPppYmMoveParabolaAngleDivisor;
 extern const float gPppYmMoveParabolaGravityScale;
 
-extern float gPppParMoveMatrixZero;
-extern float gPppParMoveMatrixOne;
+extern const float gPppParMoveMatrixZero;
+extern const float gPppParMoveMatrixOne;
 
 extern float gPppYmLookOnZero;
 extern float gPppYmLookOnOne;

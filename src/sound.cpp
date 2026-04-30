@@ -22,12 +22,17 @@
 
 CSound Sound;
 
-extern const float kLineSegmentMinT;
-extern const float kLineSegmentMaxT;
-extern const float kLineBoundsInitMin;
-extern const float kLineBoundsInitMax;
-
-static const char s_soundErrorFmt[] = "Sound\n";
+extern const char s_CSound_80330ce0[] = "CSound";
+extern const float FLOAT_80330ce8 = 127.0f;
+extern const float kLineSegmentMinT = 0.0f;
+extern const float kLineSegmentMaxT = 1.0f;
+extern const float FLOAT_80330cf4 = 5.0f;
+extern const float FLOAT_80330cf8 = 3.0f;
+extern const float FLOAT_80330cfc = 2.5f;
+extern const float FLOAT_80330d00 = 100.0f;
+extern const double DOUBLE_80330d08 = 4503599627370496.0;
+extern const float kLineBoundsInitMin = 10000000.0f;
+extern const double DOUBLE_80330d18 = 0.5;
 static const char s_soundNoFreeWaveWarn[] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeWaev\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
     "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
@@ -61,13 +66,6 @@ static const char s_soundEnvSePlayFmt[] = "\x1B[32mEnvSePlay: %06d\n\x1B[0m";
 static const char s_soundEnvSeStopFmt[] = "\x1B[32mEnvSeStop: %06d\n\x1B[0m";
 static const char s_soundSourceName[] = "sound.cpp";
 
-extern float FLOAT_80330ce8;
-extern float FLOAT_80330cf4;
-extern float FLOAT_80330cf8;
-extern float FLOAT_80330cfc;
-extern float FLOAT_80330d00;
-extern double DOUBLE_80330d08;
-extern double DOUBLE_80330d18;
 extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
 extern "C" void* __vt__6CSound[];
@@ -134,8 +132,6 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 u8 ARRAY_802f26c8[0xC];
-extern char s_CSound_80330ce0[7];
-
 struct CLineSegment {
     Vec delta;
     Vec normal;
@@ -363,9 +359,9 @@ extern "C" void CalcBound__9CLine2(CLine* line)
     line->min.x = kLineBoundsInitMin;
     line->min.y = kLineBoundsInitMin;
     line->min.z = kLineBoundsInitMin;
-    line->max.x = kLineBoundsInitMax;
-    line->max.y = kLineBoundsInitMax;
-    line->max.z = kLineBoundsInitMax;
+    line->max.x = -kLineBoundsInitMin;
+    line->max.y = -kLineBoundsInitMin;
+    line->max.z = -kLineBoundsInitMin;
     line->totalLength = kLineSegmentMinT;
 
     for (u32 i = 0; i < line->pointCount; i++) {
@@ -440,7 +436,7 @@ CSound::~CSound()
  */
 void CSound::Init()
 {
-    SoundData(this).m_stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, s_CSound_80330ce0, 0);
+    SoundData(this).m_stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, const_cast<char*>(s_CSound_80330ce0), 0);
 
     SoundData(this).m_aramBuffer = static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(
         0x80000, SoundData(this).m_stage, const_cast<char*>(s_soundSourceName), 0x2E));
@@ -781,10 +777,8 @@ float CSound::GetPerformance()
 void CSound::PauseDiscError(int pause)
 {
     if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22D0) == 0) {
-        CRedSound* redSound = reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(this) + 8);
-        pause = static_cast<int>((static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 0x1F);
-        SePause__9CRedSoundFii(redSound, -1, pause);
-        StreamPause__9CRedSoundFii(redSound, -1, pause);
+        SePause__9CRedSoundFii(RedSound(this), -1, (static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 0x1F);
+        StreamPause__9CRedSoundFii(RedSound(this), -1, (static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 0x1F);
     }
 }
 
@@ -1350,13 +1344,10 @@ void CSound::LoadBlock()
  */
 void CSound::FreeBlock()
 {
-    int i;
-    u8* self = reinterpret_cast<u8*>(this) + 8;
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(self);
-    ClearWaveBank__9CRedSoundFi(redSound, 500);
-    ClearWaveBank__9CRedSoundFi(redSound, 0);
-    for (i = 0; i < 4; i++) {
-        SetSeBlockData__9CRedSoundFiPv(redSound, i, 0);
+    RedSound(this)->ClearWaveBank(500);
+    RedSound(this)->ClearWaveBank(0);
+    for (int i = 0; i < 4; i++) {
+        RedSound(this)->SetSeBlockData(i, 0);
     }
 }
 

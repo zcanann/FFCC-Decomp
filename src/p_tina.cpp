@@ -79,7 +79,7 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
     unsigned long);
 
 
-extern char DAT_801ead4c[];
+extern char g_MsgFlashy[];
 static const char s_p_tina_rodata_801d7ee0[] = {
     (char)0x64, (char)0x76, (char)0x64, (char)0x2F, (char)0x67, (char)0x62, (char)0x61, (char)0x2F,
     (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x66, (char)0x66, (char)0x63, (char)0x63,
@@ -191,7 +191,7 @@ unsigned int m_table__8CPartPcs[2][0x15C / sizeof(unsigned int)] = {
         0x00000000, 0x00000000, 0x00000000, 0x00000000,
     },
 };
-char DAT_801ead4c[0x38] =
+char g_MsgFlashy[0x36] =
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
@@ -555,7 +555,7 @@ unsigned int pppFreeMngStPrioForData()
 	}
 
 	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(DAT_801ead4c, index);
+		System.Printf(g_MsgFlashy, index);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
 		char* pdtName = reinterpret_cast<char*>(&PartMng) + 0x22E30 + ((int)selectedMngSt->m_kind * 0x38);
@@ -571,7 +571,7 @@ unsigned int pppFreeMngStPrioForData()
 		System.Printf(stringBase + 0x2F4);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(DAT_801ead4c);
+		System.Printf(g_MsgFlashy);
 	}
 
 	Graphic._WaitDrawDone(stringBase + 0x128, 0xfc);

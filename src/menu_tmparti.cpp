@@ -187,8 +187,12 @@ void CMenuPcs::TmpArtiDraw()
 
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 
-			CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332F28 * alpha));
-			GXSetChanMatColor(GX_COLOR0A0, color.color);
+			GXColor color;
+			color.r = 0xFF;
+			color.g = 0xFF;
+			color.b = 0xFF;
+			color.a = (unsigned char)(int)(FLOAT_80332F28 * alpha);
+			GXSetChanMatColor(GX_COLOR0A0, color);
 
 			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, left, top, width, height, s, t, z, z, FLOAT_80332f2c);
 		}

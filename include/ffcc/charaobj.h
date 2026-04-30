@@ -19,7 +19,7 @@ void la(CGObject*);
 void SAFE_CAST_WORK(CGObjWork*);
 
 extern int gCGCharaObjCreateSerial;
-extern unsigned char gCGCharaObjCreateSerialInit;
+extern char gCGCharaObjCreateSerialInit;
 
 class CGCharaObj : public CGPrgObj
 {

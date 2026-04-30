@@ -43,7 +43,7 @@ extern char SoundBuffer[];
 extern "C" char sCharaObjDebugStatFormat[];
 
 int gCGCharaObjCreateSerial = 0;
-unsigned char gCGCharaObjCreateSerialInit = 0;
+char gCGCharaObjCreateSerialInit = 0;
 extern "C" {
 extern const float kOneF32;
 extern const float kHalfF32;
@@ -232,6 +232,12 @@ static bool CharaObjIsBreakStatus(unsigned int staType)
 	return staType == 0x24 || staType == 0x25 || staType == 0x69 || staType == 0x6A;
 }
 
+struct CharaObjIgnoreFlagBits
+{
+	unsigned char m_active : 1;
+	unsigned char m_pad : 7;
+};
+
 static bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
 {
 	Vec delta;
@@ -416,15 +422,16 @@ void CGCharaObj::onCreate()
 		gCGCharaObjCreateSerialInit = 1;
 	}
 
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x54D) = gCGCharaObjCreateSerial;
-	gCGCharaObjCreateSerial += 1;
-
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	self[0x63C] &= 0x7F;
-	self[0x640] &= 0x7F;
-	self[0x648] &= 0x7F;
-	self[0x650] &= 0x7F;
-	self[0x658] &= 0x7F;
+	int createSerial = gCGCharaObjCreateSerial;
+	gCGCharaObjCreateSerial = createSerial + 1;
+	*reinterpret_cast<int*>(self + 0x54C) = createSerial;
+
+	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x63C)->m_active = 0;
+	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x640)->m_active = 0;
+	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x648)->m_active = 0;
+	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x650)->m_active = 0;
+	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x658)->m_active = 0;
 	m_comboFrame = 0;
 	m_comboFramePrev = 0;
 	m_comboState = 0;
@@ -1002,10 +1009,10 @@ void CGCharaObj::onAnimPoint(int, int)
 void CGCharaObj::resetIgnoreHit()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	self[0x640] &= 0x7F;
-	self[0x648] &= 0x7F;
-	self[0x650] &= 0x7F;
-	self[0x658] &= 0x7F;
+	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x640)->m_active = 0;
+	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x648)->m_active = 0;
+	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x650)->m_active = 0;
+	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x658)->m_active = 0;
 }
 
 /*

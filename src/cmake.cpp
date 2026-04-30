@@ -170,7 +170,7 @@ static inline void ReleaseRefObject(void* object)
     int refCount = raw[1] - 1;
     raw[1] = refCount;
     if (refCount == 0) {
-        reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<int*>(raw[0] + 8))(object, 1);
+        delete reinterpret_cast<CRef*>(object);
     }
 }
 

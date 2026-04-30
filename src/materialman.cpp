@@ -108,6 +108,7 @@ private:
 template <>
 CPtrArray<CMaterial*>::CPtrArray()
 {
+    m_vtable = __vt__8CPtrArrayIP9CMaterial;
     m_size = 0;
     m_numItems = 0;
     m_defaultSize = 0x10;
@@ -2313,13 +2314,16 @@ void CMaterialMan::SetStdEnv()
 {
     MaterialManTexState* texState = GetMaterialManTexState(this);
     MaterialManTevState* tevState = GetMaterialManTevState(this);
+    int stdValue = texState->stdTexMapId;
 
-    texState->texMapIdCur = texState->stdTexMapId;
-    texState->texMapIdCurShadow = texState->stdTexMapId;
-    texState->texMtxCur = texState->stdTexMtx;
-    texState->texMtxCurShadow = texState->stdTexMtx;
-    texState->texCoordIdCur = texState->stdTexCoordId;
-    texState->texCoordIdCurShadow = texState->stdTexCoordId;
+    texState->texMapIdCur = stdValue;
+    texState->texMapIdCurShadow = stdValue;
+    stdValue = texState->stdTexMtx;
+    texState->texMtxCur = stdValue;
+    texState->texMtxCurShadow = stdValue;
+    stdValue = texState->stdTexCoordId;
+    texState->texCoordIdCur = stdValue;
+    texState->texCoordIdCurShadow = stdValue;
     tevState->curEnvTevBit = tevState->stdEnvTevBit;
 }
 

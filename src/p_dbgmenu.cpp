@@ -593,14 +593,14 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 	changeVtxFmt(1);
 
 	if ((flags & 1) == 0) {
-		const u32* borderColors = gDbgMenuWindowBorderColors;
-		u32 vertexIndex = 0;
-
 		GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT1, 4);
 
+		const u32* borderColors = gDbgMenuWindowBorderColors;
+		int vertexIndex = 0;
+
 		for (int i = 0; i < 2; i++) {
-			u32 row = vertexIndex >> 1;
-			u32 nextVertexIndex = vertexIndex + 1;
+			int row = vertexIndex >> 1;
+			int nextVertexIndex = vertexIndex + 1;
 			vertexIndex += 2;
 
 			GXPosition3f32((float)x, (float)(y + (height & -(row & 1))), 0.0f);
@@ -615,7 +615,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 		}
 	}
 
-	u32 fillColorIndex = (flags >> 1) & 1;
+	int fillColorIndex = (flags >> 1) & 1;
 
 	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
 	GXPosition3f32((float)(x + width), (float)y, 0.0f);

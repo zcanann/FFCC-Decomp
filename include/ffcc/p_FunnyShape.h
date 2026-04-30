@@ -55,6 +55,10 @@ public:
     u8 m_gxTexObjPtrArrayStorage[0x1C];    // 0x61D8
 };
 
+#ifdef FFCC_DEFINE_FUNNYSHAPEPCS_STORAGE
+extern u8 FunnyShapePcs[sizeof(CFunnyShapePcs)];
+#else
 extern CFunnyShapePcs FunnyShapePcs;
+#endif
 
 #endif // _FFCC_P_FUNNYSHAPE_H_

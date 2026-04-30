@@ -1,3 +1,4 @@
+#define FFCC_DEFINE_FUNNYSHAPEPCS_STORAGE
 #include "ffcc/p_FunnyShape.h"
 #include "ffcc/FunnyShape.h"
 #include "ffcc/USBStreamData.h"
@@ -102,7 +103,8 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
  */
 extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
-    u8* self = reinterpret_cast<u8*>(&FunnyShapePcs);
+    CFunnyShapePcs* pcs = reinterpret_cast<CFunnyShapePcs*>(&FunnyShapePcs);
+    u8* self = reinterpret_cast<u8*>(pcs);
     unsigned int* dst = m_table__14CFunnyShapePcs;
     unsigned int* desc0 = m_table_desc0__14CFunnyShapePcs;
     unsigned int* desc1 = m_table_desc1__14CFunnyShapePcs;
@@ -136,7 +138,6 @@ unsigned int m_table_desc0__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_ca
 unsigned int m_table_desc1__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
 unsigned int m_table_desc2__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
 unsigned int m_table_desc3__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
-CFunnyShapePcs FunnyShapePcs;
 unsigned int m_table__14CFunnyShapePcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(lbl_801D7DD0)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0,
     0x42, 1
@@ -145,6 +146,7 @@ unsigned int lbl_801EA904[4] = {
     reinterpret_cast<unsigned int>(lbl_8032E660), 0, 0, reinterpret_cast<unsigned int>(lbl_8032E660)
 };
 u8 ARRAY_8026D728[0xC];
+u8 FunnyShapePcs[sizeof(CFunnyShapePcs)];
 
 template <class T>
 CPtrArray<T>::CPtrArray()

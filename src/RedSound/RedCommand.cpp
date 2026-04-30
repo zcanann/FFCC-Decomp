@@ -58,7 +58,7 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 			track[0x16] = 0;
 
 			trackNo = *(char*)((char*)track + 0x14e);
-			((unsigned char*)p_VoiceData)[trackNo * 0xc0 + 0x1a] &= (unsigned char)0xfa;
+			((unsigned char*)p_VoiceData)[trackNo * 0xc0 + 0x1a] &= -6;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x94) &= 0xfffffff7;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) &= 0xfffffffe;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) |= 2;
@@ -128,7 +128,7 @@ int _EraseTime(int eraseTrack)
 			track[0x16] = 0;
 
 			trackNo = *(char*)((char*)track + 0x14e);
-			((unsigned char*)p_VoiceData)[trackNo * 0xc0 + 0x1a] &= (unsigned char)0xfa;
+			((unsigned char*)p_VoiceData)[trackNo * 0xc0 + 0x1a] &= -6;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x94) &= 0xfffffff7;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) &= 0xfffffffe;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) |= 2;

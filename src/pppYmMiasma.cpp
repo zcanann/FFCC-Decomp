@@ -380,6 +380,67 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 656b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
+{
+    YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
+    YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)pYmMiasma;
+    long** shape = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+    pppFMATRIX model;
+    pppFMATRIX rotMatrix;
+    Vec worldPos;
+    GXColor amb;
+    float scale;
+    s16 shapeAngle;
+
+    (void)pppPObject;
+
+    if (step->m_dataValIndex == 0xffff) {
+        return;
+    }
+
+    pppUnitMatrix(model);
+    scale = state->m_speed;
+    model.value[0][0] = pppMngStPtr->m_scale.x * scale;
+    model.value[1][1] = pppMngStPtr->m_scale.y * scale;
+    model.value[2][2] = pppMngStPtr->m_scale.z * scale;
+
+    shapeAngle = state->m_shapeAngle;
+    PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)shapeAngle);
+    pppMulMatrix(model, rotMatrix, model);
+
+    pppCopyVector(worldPos, state->m_position);
+    if ((s32)Game.m_currentSceneId == 7) {
+        PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
+    } else {
+        PSMTXMultVec(ppvCameraMatrix, &worldPos, &worldPos);
+    }
+
+    model.value[0][3] = worldPos.x;
+    model.value[1][3] = worldPos.y;
+    model.value[2][3] = worldPos.z;
+
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+        0, &model, FLOAT_80330644, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
+
+    amb.r = state->m_color.m_r;
+    amb.g = state->m_color.m_g;
+    amb.b = state->m_color.m_b;
+    amb.a = state->m_color.m_a;
+    GXSetChanAmbColor(GX_COLOR0A0, amb);
+    pppSetBlendMode(step->m_blendMode);
+    pppDrawShp__FPlsP12CMaterialSetUc(*shape, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr,
+        step->m_blendMode);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80090e3c
  * PAL Size: 1016b
  * EN Address: TODO

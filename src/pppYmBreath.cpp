@@ -607,7 +607,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
 group_ready:
         if (ready) {
             firstParticle = -1;
-            scaledOwner = mngSt->m_ownerScale * params->m_groupOwnerScale;
+            scaledOwner = mngSt->m_previousPosition.z * params->m_groupOwnerScale;
             for (slotIndex = 0; slotCount != 0; slotCount--) {
                 if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
                     firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
@@ -944,9 +944,12 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     baseDir.y = FLOAT_80330c80;
     baseDir.z = FLOAT_80330C90;
 
-    angle[0] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
-    angle[1] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
-    angle[2] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
+    angle[0] = (int)(range * Math.RandF() - spread);
+    angle[0] = (int)((float)(angle[0] << 15) / FLOAT_80330C98);
+    angle[1] = (int)(range * Math.RandF() - spread);
+    angle[1] = (int)((float)(angle[1] << 15) / FLOAT_80330C98);
+    angle[2] = (int)(range * Math.RandF() - spread);
+    angle[2] = (int)((float)(angle[2] << 15) / FLOAT_80330C98);
     angle[3] = 0;
 
     pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);

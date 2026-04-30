@@ -1,7 +1,7 @@
 #ifndef _FFCC_P_MATERIALEDITOR_H_
 #define _FFCC_P_MATERIALEDITOR_H_
 
-#include "ffcc/system.h"
+#include "ffcc/p_sample.h"
 #include "ffcc/memory.h"
 #include "ffcc/USBStreamData.h"
 #include "ffcc/zlist.h"
@@ -38,7 +38,7 @@ struct pppFMATRIX {
     float value[3][4];
 };
 
-class CMaterialEditorPcs : public CProcess
+class CMaterialEditorPcs : public CSamplePcs
 {
 public:
     CMaterialEditorPcs() {}

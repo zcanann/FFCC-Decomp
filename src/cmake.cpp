@@ -162,10 +162,6 @@ static inline unsigned char& MenuU8(CMenuPcs* menu, int offset)
 
 static inline void ReleaseRefObject(void* object)
 {
-    if (object == nullptr) {
-        return;
-    }
-
     int* raw = reinterpret_cast<int*>(object);
     int refCount = raw[1] - 1;
     raw[1] = refCount;
@@ -3368,16 +3364,18 @@ void CMenuPcs::destroyVillageMenu()
     if (MenuS16(this, 0x86C) != 0) {
         if (Game.m_gameWork.m_menuStageMode == 0) {
             void*& font = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x108);
-            ReleaseRefObject(font);
-            font = nullptr;
+            if (font != nullptr) {
+                ReleaseRefObject(font);
+                font = nullptr;
+            }
         }
 
         freeTexture__8CMenuPcsFiiii(this, 8, 1, 0x60, 9);
 
-        int& villageWork = MenuS32(this, 0x830);
-        if (villageWork != 0) {
-            __dl__FPv(reinterpret_cast<void*>(villageWork));
-            villageWork = 0;
+        void*& villageWork = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x830);
+        if (villageWork != nullptr) {
+            __dl__FPv(villageWork);
+            villageWork = nullptr;
         }
 
         MenuS16(this, 0x86C) = 0;
@@ -3395,70 +3393,73 @@ void CMenuPcs::destroyVillageMenu()
  */
 void CMenuPcs::calcVillageMenu()
 {
-    if (MenuU8(this, 0x16) != 0 && MenuS16(this, 0x86C) == 0) {
-        if (Game.m_gameWork.m_menuStageMode == 0) {
-            char path[128];
-            char* language = GetLangString__5CGameFv(&Game);
-            sprintf(path, s_dvd__smenu_subfont_fnt_801e3020, language);
-            loadFont__8CMenuPcsFiPcii(this, 2, path, 4, -1);
+    if (MenuU8(this, 0x16) != 0) {
+        if (MenuS16(this, 0x86C) == 0 && MenuU8(this, 0x16) != 0) {
+            if (Game.m_gameWork.m_menuStageMode == 0) {
+                char path[128];
+                char* language = GetLangString__5CGameFv(&Game);
+                sprintf(path, s_dvd__smenu_subfont_fnt_801e3020, language);
+                loadFont__8CMenuPcsFiPcii(this, 2, path, 4, -1);
+            }
+
+            loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
+                this, PTR_s_world2_802159a4, 8, 1, &DAT_802159c8, 0x60, 9, 3);
+
+            void* stage = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0xEC);
+            int& villageWork = MenuS32(this, 0x830);
+            villageWork =
+                reinterpret_cast<int>(__nw__FUlPQ27CMemory6CStagePci(0x48, stage, const_cast<char*>(s_cmake_cpp_801e3038), 0xCB3));
+            memset(reinterpret_cast<void*>(villageWork), 0, 0x48);
+            LoadCmakeVillageName();
+            MenuS16(this, 0x86C) = 1;
         }
-
-        loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
-            this, PTR_s_world2_802159a4, 8, 1, &DAT_802159c8, 0x60, 9, 3);
-
-        void* stage = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0xEC);
-        int& villageWork = MenuS32(this, 0x830);
-        villageWork =
-            reinterpret_cast<int>(__nw__FUlPQ27CMemory6CStagePci(0x48, stage, const_cast<char*>(s_cmake_cpp_801e3038), 0xCB3));
-        memset(reinterpret_cast<void*>(villageWork), 0, 0x48);
-        LoadCmakeVillageName();
-        MenuS16(this, 0x86C) = 1;
     }
 
     short active = MenuS16(this, 0x86C);
-    if (active == 0) {
-        return;
-    }
+    if (active != 0) {
+        if (MenuU8(this, 0x16) == 0) {
+            if (active != 0) {
+                if (Game.m_gameWork.m_menuStageMode == 0) {
+                    void*& font = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x108);
+                    if (font != nullptr) {
+                        ReleaseRefObject(font);
+                        font = nullptr;
+                    }
+                }
 
-    if (MenuU8(this, 0x16) == 0) {
-        if (Game.m_gameWork.m_menuStageMode == 0) {
-            void*& font = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x108);
-            ReleaseRefObject(font);
-            font = nullptr;
-        }
-
-        freeTexture__8CMenuPcsFiiii(this, 8, 1, 0x60, 9);
-        int& villageWork = MenuS32(this, 0x830);
-        if (villageWork != 0) {
-            __dl__FPv(reinterpret_cast<void*>(villageWork));
-            villageWork = 0;
-        }
-        MenuS16(this, 0x86C) = 0;
-        return;
-    }
-
-    int villageWork = MenuS32(this, 0x830);
-    unsigned short result = 0;
-    short& mode = *reinterpret_cast<short*>(villageWork + 0x10);
-    short& frame = *reinterpret_cast<short*>(villageWork + 0x22);
-
-    if (mode == 0) {
-        if (frame < 10) {
-            frame = frame + 1;
-            result = 0;
+                freeTexture__8CMenuPcsFiiii(this, 8, 1, 0x60, 9);
+                int& villageWork = MenuS32(this, 0x830);
+                if (villageWork != 0) {
+                    __dl__FPv(reinterpret_cast<void*>(villageWork));
+                    villageWork = 0;
+                }
+                MenuS16(this, 0x86C) = 0;
+            }
         } else {
-            result = 1;
-        }
-    } else if (mode == 1) {
-        result = CmakeVillageCtrl__8CMenuPcsFv(this);
-    } else if (frame < 10) {
-        frame = frame + 1;
-        result = 0;
-    } else {
-        result = 1;
-    }
+            int villageWork = MenuS32(this, 0x830);
+            unsigned short result = 0;
+            short& mode = *reinterpret_cast<short*>(villageWork + 0x10);
+            short& frame = *reinterpret_cast<short*>(villageWork + 0x22);
 
-    *reinterpret_cast<unsigned short*>(villageWork + 0x2E) = result;
+            if (mode == 0) {
+                if (frame < 10) {
+                    frame = frame + 1;
+                    result = 0;
+                } else {
+                    result = 1;
+                }
+            } else if (mode == 1) {
+                result = CmakeVillageCtrl__8CMenuPcsFv(this);
+            } else if (frame < 10) {
+                frame = frame + 1;
+                result = 0;
+            } else {
+                result = 1;
+            }
+
+            *reinterpret_cast<unsigned short*>(villageWork + 0x2E) = result;
+        }
+    }
 }
 
 /*

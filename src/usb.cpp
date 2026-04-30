@@ -6,8 +6,8 @@ extern "C" void* __vt__8CManager[];
 
 CUSB USB;
 
-static const char s_usbCallbackMissingFmt[] = "CUSB.AddMessageCallback: イベント関数は登録されていません。\n";
-static const char s_usbCallbackDuplicateFmt[] = "CUSB.AddMessageCallback: 同じイベント関数が既に登録されています。\n";
+static const char s_usbCallbackMissingFmt[64] = "CUSB.AddMessageCallback: イベント関数は登録されていません。\n";
+static const char s_usbCallbackDuplicateFmt[68] = "CUSB.AddMessageCallback: 同じイベント関数が既に登録されています。\n";
 static const char s_usbCallbackFullFmt[56] = {
     0x43, 0x55, 0x53, 0x42, 0x2E, 0x41, 0x64, 0x64, 0x4D, 0x65, 0x73, 0x73, 0x61, 0x67,
     0x65, 0x43, 0x61, 0x6C, 0x6C, 0x62, 0x61, 0x63, 0x6B, 0x3A, 0x20, 0x83, 0x43, 0x83,

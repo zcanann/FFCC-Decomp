@@ -2167,20 +2167,23 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
 {
 	int cmdTopIdx;
 	int itemCmdListIdx;
+	int result = -1;
 
 	if (GetCmdListItemName__12CCaravanWorkFi(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
 		short cmdId = m_commandListExtra[cmdTopIdx];
-		if (cmdId == 0x207) {
-			return 0;
-		}
-		if (cmdId == 0x20B) {
-			return 1;
-		}
-		if (cmdId == 0x20F) {
-			return 2;
+		switch (cmdId) {
+		case 0x207:
+			result = 0;
+			break;
+		case 0x20B:
+			result = 1;
+			break;
+		case 0x20F:
+			result = 2;
+			break;
 		}
 	}
-	return -1;
+	return result;
 }
 
 /*

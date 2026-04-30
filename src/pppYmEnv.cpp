@@ -98,9 +98,9 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     const float s_xAxisAngles[] = {0.0f, 90.0f, 180.0f, 270.0f};
     const unsigned char s_xAxisIds[] = {'x', 'x', 'x', 'x'};
     const float s_yAxisAngles[] = {0.0f, 1.0f};
-    const Vec s_cameraPos = {0.0f, 0.0f, 0.0f};
+    const Vec s_cameraPos = {0.0f, 0.0f, 6.0f};
     const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
-    const Vec s_cameraLook = {0.0f, 0.0f, -1.0f};
+    const Vec s_cameraLook = {0.0f, 0.0f, 0.0f};
 
     const unsigned short texWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned short texHeight = GXGetTexObjHeight(targetTexObj);
@@ -252,9 +252,9 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
  */
 void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize, unsigned short detail, _GXVtxFmt vtxFmt)
 {
+    static const char s_display_list_alloc_error[] = "Error allocating display list (%d, %d)\n";
     static const char s_pppYmEnv_cpp[] = "pppYmEnv.cpp";
     static const char s_exiting[] = "Exiting";
-    static const char s_display_list_alloc_error[] = "Error allocating display list (%d, %d)\n";
     const float kZero = 0.0f;
     const float kOne = 1.0f;
     const float kPi = 3.1415927f;

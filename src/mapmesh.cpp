@@ -18,6 +18,7 @@ extern "C" const float FLOAT_8032F930 = 10000000000.0f;
 extern "C" const float FLOAT_8032F934 = -10000000000.0f;
 
 CMemory::CStage* g_pStage;
+extern CMemory::CStage* g_hit_lpface_min;
 
 extern "C" {
 void SetBlendMode__12CMaterialManFP12CMaterialSeti(void* materialMan, CMaterialSet* materialSet, unsigned int materialIdx);
@@ -102,7 +103,7 @@ static inline unsigned int Align32(unsigned int value)
 
 static inline CMemory::CStage*& MapMeshAllocStage()
 {
-    return g_pStage;
+    return g_hit_lpface_min;
 }
 }
 

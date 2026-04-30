@@ -1057,14 +1057,18 @@ int CCaravanWork::GetFoodRank(int playerIdx)
 	int baseIdx = 0;
 
 	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < 4; j++) {
+		for (int j = 0; j < 3; j++) {
 			if ((playerIdx != baseIdx) && (cur->m_letterMeta[j] > *target)) {
 				rank++;
 			}
 			baseIdx++;
 		}
 
+		if ((playerIdx != baseIdx) && (cur->m_letterMeta[3] > *target)) {
+			rank++;
+		}
 		cur = (CCaravanWork*)&cur->m_saveSlot;
+		baseIdx++;
 	}
 
 	return rank;

@@ -346,16 +346,12 @@ int CGMonObj::calcBranchFuncGolem(int)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	int branch = 0;
 	if (*reinterpret_cast<int*>(mon + 0x6D0) == 1) {
-		branch = 2;
-	} else {
-		unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-		if (script != 0 && ((script[0x1A / 2] >> 1) <= script[0x1C / 2])) {
-			branch = 1;
-		}
+		return 2;
 	}
-	return branch;
+
+	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+	return static_cast<int>(script[0x1C / 2]) < static_cast<int>(script[0x1A / 2] >> 1);
 }
 
 /*

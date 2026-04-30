@@ -6,9 +6,9 @@
 #include "ffcc/math.h"
 
 #include <string.h>
-#include <math.h>
 #include "dolphin/mtx.h"
 
+extern "C" double fmod(double, double);
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);

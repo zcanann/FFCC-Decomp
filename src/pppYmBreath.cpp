@@ -19,15 +19,20 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
-extern float FLOAT_80330c80;
-extern float FLOAT_80330c84;
-extern float FLOAT_80330C90;
-extern float FLOAT_80330C94;
-extern float FLOAT_80330C98;
-extern float FLOAT_80330C9C;
-extern float FLOAT_80330CA8;
-extern double DOUBLE_80330c88;
-extern double DOUBLE_80330CB0;
+extern const float FLOAT_80330c80;
+extern const float FLOAT_80330c84;
+extern const float FLOAT_80330C90;
+extern const float FLOAT_80330C94;
+extern const double DOUBLE_80330c88;
+extern "C" const float FLOAT_80330C98 = 180.0f;
+extern "C" const float FLOAT_80330C9C = -180.0f;
+extern "C" const double DOUBLE_80330CA0 = 4503599627370496.0;
+extern "C" const float FLOAT_80330CA8 = 2.0f;
+extern "C" const double DOUBLE_80330CB0 = 0.5;
+extern "C" const char lbl_80330CB8[] = "FFCC";
+extern "C" const char lbl_80330CC0[] = "GDS";
+extern "C" const char lbl_80330CC4[] = "GC";
+extern "C" const char lbl_80330CC8[] = "1.00";
 extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 
 struct pppYmBreathUnkC {
@@ -582,9 +587,9 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
             }
         }
 
-        work->m_direction.x = 0.0f;
-        work->m_direction.y = 0.0f;
-        work->m_direction.z = 1.0f;
+        work->m_direction.x = FLOAT_80330c80;
+        work->m_direction.y = FLOAT_80330c80;
+        work->m_direction.z = FLOAT_80330C90;
         PSVECNormalize(&work->m_direction, &work->m_direction);
     }
 
@@ -792,9 +797,9 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                 unitVelocity.z = FLOAT_80330C90;
                 groupData->speed = params->m_groupSpeed;
                 pppCopyVector(groupData->direction, unitVelocity);
-                groupData->position.z = 0.0f;
-                groupData->position.y = 0.0f;
-                groupData->position.x = 0.0f;
+                groupData->position.z = FLOAT_80330c80;
+                groupData->position.y = FLOAT_80330c80;
+                groupData->position.x = FLOAT_80330c80;
                 PSMTXCopy(pppMngStPtr->m_matrix.value, groupData->matrix);
                 groupData->active = 1;
             }
@@ -854,11 +859,11 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
         particle->m_angleVelocity += params->m_angleAccel;
     }
 
-    angleRange = 6.2831855f;
+    angleRange = FLOAT_80330C94;
     while (angleRange <= particle->m_angle) {
         particle->m_angle -= angleRange;
     }
-    while (particle->m_angle < 0.0f) {
+    while (particle->m_angle < FLOAT_80330c80) {
         particle->m_angle += angleRange;
     }
 
@@ -1046,7 +1051,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     }
 
     particle->m_scale = params->m_groupSpeed;
-    if (params->m_scaleRandomRange != 0.0f) {
+    if (params->m_scaleRandomRange != FLOAT_80330c80) {
         spread = params->m_scaleRandomRange;
         particle->m_scale += FLOAT_80330CA8 * spread * Math.RandF() - spread;
     }

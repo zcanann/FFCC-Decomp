@@ -263,10 +263,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
 
     if (work->count + 1 < *(u16*)(param_2->m_payload + 4)) {
         for (i = *(u16*)(param_2->m_payload + 4) - 2; i >= 0; i--) {
-            TRACE_POLYGON* current = &entries[i];
-            TRACE_POLYGON* next = &entries[i + 1];
-
-            copyPolygonData(next, current);
+            copyPolygonData(&entries[i + 1], &entries[i]);
         }
 
         entries = work->entries;

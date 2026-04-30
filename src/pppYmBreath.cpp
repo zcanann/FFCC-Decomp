@@ -919,10 +919,9 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
-    int angle[4];
-    pppFMATRIX rotMtx;
     Vec baseDir;
-    Vec directionNorm;
+    int angle[3];
+    pppFMATRIX rotMtx;
     float spread;
     float range;
     u8 flags;
@@ -945,7 +944,6 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     angle[0] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / 180.0f);
     angle[1] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / 180.0f);
     angle[2] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / 180.0f);
-    angle[3] = 0;
 
     pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
     PSMTXMultVecSR(rotMtx.value, &baseDir, &particle->m_direction);
@@ -954,7 +952,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     particle->m_direction.y *= params->m_directionScaleY;
     particle->m_direction.z *= params->m_directionScaleZ;
 
-    directionNorm = particle->m_direction;
+    Vec directionNorm = particle->m_direction;
     pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&particle->m_direction), &directionNorm);
 
     if (0.0f != params->m_spawnOffset) {
@@ -1004,30 +1002,30 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     particle->m_rotationVelocityY = params->m_rotationVelocityY;
 
     if (params->m_rotationFlags != 0) {
-        flags = params->m_rotationFlags;
-        if ((flags & 0x20) != 0) {
-            particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
-            particle->m_rotationAccelY = particle->m_rotationAccelX;
-            if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+        if ((params->m_rotationFlags & 0x20) != 0) {
+            float rotationAccel = params->m_rotationRandomX * Math.RandF();
+            particle->m_rotationAccelY = rotationAccel;
+            particle->m_rotationAccelX = rotationAccel;
+            if (((params->m_rotationFlags & 1) != 0) && ((params->m_rotationFlags & 2) != 0)) {
                 if (0.5 < Math.RandF()) {
                     particle->m_rotationAccelX *= -1.0f;
                     particle->m_rotationAccelY *= -1.0f;
                 }
-            } else if ((flags & 2) != 0) {
+            } else if ((params->m_rotationFlags & 2) != 0) {
                 particle->m_rotationAccelX *= -1.0f;
                 particle->m_rotationAccelY *= -1.0f;
             }
         } else {
             particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
             particle->m_rotationAccelY = params->m_rotationRandomY * Math.RandF();
-            if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+            if (((params->m_rotationFlags & 1) != 0) && ((params->m_rotationFlags & 2) != 0)) {
                 if (0.5 < Math.RandF()) {
                     particle->m_rotationAccelX *= -1.0f;
                 }
                 if (0.5 < Math.RandF()) {
                     particle->m_rotationAccelY *= -1.0f;
                 }
-            } else if ((flags & 2) != 0) {
+            } else if ((params->m_rotationFlags & 2) != 0) {
                 particle->m_rotationAccelX *= -1.0f;
                 particle->m_rotationAccelY *= -1.0f;
             }

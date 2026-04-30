@@ -499,7 +499,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     int groupIndex;
     int firstParticle;
     int groupTable;
-    int slotIndex;
+    short slotIndex;
     unsigned int slotCount;
     bool ready;
     float scaledOwner;
@@ -716,7 +716,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                     found = true;
 
                 group_checked:
-                    if (found) {
+                    if (found == 1) {
                         groupData = &groupTable[(int)foundGroup];
                         for (slot = 0; slot < (int)params->m_slotCount; slot++) {
                             groupData->particleStates[slot] = -1;

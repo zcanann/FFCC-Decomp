@@ -36,6 +36,7 @@ void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GX
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int type, int src, int dst, int op);
 }
 
+extern const float FLOAT_80331180;
 
 struct _pppEnvStYmEnv {
     void* m_stagePtr;
@@ -75,9 +76,10 @@ struct CAnimRaw {
 struct CModelRaw {
     u8 m_pad00[0xA8];
     u8* m_nodes;
-    u8 m_padAC[0x24];
-    CAnimRaw* m_anim;
+    u8 m_padAC[0x8];
     float m_time;
+    u8 m_padB8[0x18];
+    CAnimRaw* m_anim;
 };
 
 /*
@@ -432,12 +434,12 @@ void DisableIndWarp(_GXTevStageID tevStage, _GXIndTexStageID indStage)
     GXSetNumIndStages(0);
     GXSetIndTexCoordScale((GXIndTexStageID)indStage, GX_ITS_1, GX_ITS_1);
 
-    indMtx[0][0] = 0.0f;
-    indMtx[0][1] = 0.0f;
-    indMtx[0][2] = 0.0f;
-    indMtx[1][0] = 0.0f;
-    indMtx[1][1] = 0.0f;
-    indMtx[1][2] = 0.0f;
+    indMtx[0][0] = FLOAT_80331180;
+    indMtx[0][1] = FLOAT_80331180;
+    indMtx[0][2] = FLOAT_80331180;
+    indMtx[1][0] = FLOAT_80331180;
+    indMtx[1][1] = FLOAT_80331180;
+    indMtx[1][2] = FLOAT_80331180;
     GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 }
 

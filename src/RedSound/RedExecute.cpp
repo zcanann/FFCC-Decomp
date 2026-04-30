@@ -2167,6 +2167,7 @@ void _SkipMusicEntry()
 {
     int* src;
     int* dst;
+    u8* soundControl;
     u8 temp[0xC];
 
     if (*(int*)((u8*)p_SoundControlBuffer + 0xD98) >= 0) {
@@ -2208,18 +2209,19 @@ void _SkipMusicEntry()
             src += 2;
         }
 
-        if (*(int*)((u8*)p_SoundControlBuffer + 0x470) != -1) {
-            if (*(int*)((u8*)p_SoundControlBuffer + 0x904) != -1) {
-                MusicStop(*(int*)((u8*)p_SoundControlBuffer + 0x904));
+        soundControl = (u8*)p_SoundControlBuffer;
+        if (*(int*)(soundControl + 0x470) != -1) {
+            if (*(int*)(soundControl + 0x904) != -1) {
+                MusicStop(*(int*)(soundControl + 0x904));
             }
-            memcpy((u8*)p_SoundControlBuffer + 0x494, p_SoundControlBuffer, 0x494);
+            memcpy(soundControl + 0x494, soundControl, 0x494);
         }
 
-        memcpy(p_SoundControlBuffer, (u8*)p_SoundControlBuffer + 0x928, 0x494);
-        memcpy(temp, (u8*)p_SoundControlBuffer + 0x944, 0xC);
-        memset((u8*)p_SoundControlBuffer + 0x928, 0, 0x494);
-        memcpy((u8*)p_SoundControlBuffer + 0x944, temp, 0xC);
-        *(int*)((u8*)p_SoundControlBuffer + 0xD98) = -1;
+        memcpy(soundControl, soundControl + 0x928, 0x494);
+        memcpy(temp, soundControl + 0x944, 0xC);
+        memset(soundControl + 0x928, 0, 0x494);
+        memcpy(soundControl + 0x944, temp, 0xC);
+        *(int*)(soundControl + 0xD98) = -1;
     }
 
     RedDelete(p_SkipKeyOn);

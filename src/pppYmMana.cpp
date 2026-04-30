@@ -272,10 +272,17 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
     s32 meshData = *(s32*)((u8*)model + 0xAC);
     u8 alpha = *(u8*)((u8*)vYmMana + 0x3B);
 
-    *(u8*)((u8*)work + 0xFC) = 0xFF;
-    *(u8*)((u8*)work + 0xFD) = 0xFF;
-    *(u8*)((u8*)work + 0xFE) = 0xFF;
-    *(u8*)((u8*)work + 0xFF) = alpha == 0 ? 0xFF : alpha;
+    if (alpha != 0) {
+        *(u8*)((u8*)work + 0xFC) = 0xFF;
+        *(u8*)((u8*)work + 0xFD) = 0xFF;
+        *(u8*)((u8*)work + 0xFE) = 0xFF;
+        *(u8*)((u8*)work + 0xFF) = alpha;
+    } else {
+        *(u8*)((u8*)work + 0xFC) = 0xFF;
+        *(u8*)((u8*)work + 0xFD) = 0xFF;
+        *(u8*)((u8*)work + 0xFE) = 0xFF;
+        *(u8*)((u8*)work + 0xFF) = 0xFF;
+    }
 
     DCFlushRange((u8*)work + 0xFC, 4);
     GXSetArray((GXAttr)0xB, (u8*)work + 0xFC, 4);

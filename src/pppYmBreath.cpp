@@ -630,10 +630,10 @@ group_ready:
             *(float*)(groupTable + 0x28) = scaledOwner;
             pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
             PSMTXMultVec(rotMtx.value, &dir, &dir);
-            pppCopyVector(dirNorm, dir);
+            dirNorm = dir;
             pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
-            PSVECScale(&dir, &target, *(float*)(groupTable + 0x24));
-            pppAddVector(target, origin, target);
+            PSVECScale(&dir, &dir, *(float*)(groupTable + 0x24));
+            pppAddVector(target, origin, dir);
             pppSubVector(hitVector, target, origin);
             pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner, params->m_groupRadius);
         }
@@ -654,7 +654,7 @@ group_ready:
 void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VColor* vColor)
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
-    int found;
+    bool found;
     int spawnCount;
     int i;
     int j;
@@ -692,11 +692,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                                   *(short*)(particleData + 0x58), *(short*)(particleData + 0x5A),
                                   *(short*)(particleData + 0x56), params->m_shapeFrameArg);
             } else {
-                float zero = FLOAT_80330c80;
-
                 groupTableWork = (int)vYmBreath->m_groups;
-                foundGroup = -1;
-                foundSlot = -1;
                 for (short groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
                     for (short slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
                         if ((int)(short)i == (int)*(signed char*)(*(int*)(groupTableWork + 4) + (int)slotIndex)) {
@@ -709,6 +705,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                     groupTableWork += 0x5C;
                 }
                 found = false;
+                foundSlot = -1;
+                foundGroup = -1;
 
             found_index:
                 if (found) {
@@ -731,6 +729,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
 
                 group_checked:
                     if (found) {
+                        float zero = FLOAT_80330c80;
+
                         groupData = &groupTable[(int)foundGroup];
                         for (slot = 0; slot < (int)params->m_slotCount; slot++) {
                             groupData->particleStates[slot] = -1;

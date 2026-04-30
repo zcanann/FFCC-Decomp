@@ -213,6 +213,7 @@ void CFunnyShapePcs::SetUSBData()
             }
 
             s16* list = reinterpret_cast<s16*>(AnmData(this) + *reinterpret_cast<s16*>(group + 0x10));
+            u8* listData = reinterpret_cast<u8*>(list);
             list[0] = LoadSwap16(list[0]);
             list[1] = LoadSwap16(list[1]);
 
@@ -222,7 +223,7 @@ void CFunnyShapePcs::SetUSBData()
             int dst2c = 0;
             for (int j = 0; j < static_cast<s16>(list[1]); j++) {
                 if ((list[0] & 8) != 0) {
-                    u8* src = reinterpret_cast<u8*>(list) + 0x10 + src2c;
+                    u8* src = listData + 0x10 + src2c;
                     u32* p32 = reinterpret_cast<u32*>(src);
                     StoreSwap32(&p32[0]);
                     StoreSwap32(&p32[1]);
@@ -239,11 +240,11 @@ void CFunnyShapePcs::SetUSBData()
                     *reinterpret_cast<s16*>(src + 0x24) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x24));
                     *reinterpret_cast<s16*>(src + 0x26) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x26));
 
-                    u8* dst = reinterpret_cast<u8*>(list) + 0x10 + dst2c;
+                    u8* dst = listData + 0x10 + dst2c;
                     memcpy(dst, src, 0x2C);
                     DCStoreRange(dst, 0x2C);
                 } else {
-                    u8* src = reinterpret_cast<u8*>(list) + 0x10 + src24;
+                    u8* src = listData + 0x10 + src24;
                     u32* p32 = reinterpret_cast<u32*>(src);
                     StoreSwap32(&p32[0]);
                     StoreSwap32(&p32[1]);
@@ -256,7 +257,7 @@ void CFunnyShapePcs::SetUSBData()
                     *reinterpret_cast<s16*>(src + 0x1C) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1C));
                     *reinterpret_cast<s16*>(src + 0x1E) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1E));
 
-                    u8* dst = reinterpret_cast<u8*>(list) + 0x10 + dst24;
+                    u8* dst = listData + 0x10 + dst24;
                     memcpy(dst, src, 0x24);
                     DCStoreRange(dst, 0x24);
                 }

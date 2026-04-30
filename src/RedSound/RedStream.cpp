@@ -95,24 +95,24 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
 	bufferIndex &= 1;
 
 	do {
-		dstBuffer = (unsigned char*)(*(int*)((int)stream + 0xc) + bufferIndex * 0x1000);
-		streamStruct = *(int*)((int)stream + 4);
+		dstBuffer = (unsigned char*)((int)stream->m_buffer + bufferIndex * 0x1000);
+		streamStruct = stream->m_voiceData;
 
-		memcpy(dstBuffer, (void*)(*(int*)((int)stream + 8) + *(int*)((int)stream + 0x120)), 0x1000);
-		*(int*)((int)stream + 0x120) += 0x1000;
-		if (*(int*)((int)stream + 0x120) >= *(int*)((int)stream + 0x118)) {
-			*(int*)((int)stream + 0x120) = 0;
+		memcpy(dstBuffer, (void*)(stream->m_fileData + stream->m_readOffset), 0x1000);
+		stream->m_readOffset += 0x1000;
+		if (stream->m_readOffset >= stream->m_fileSize) {
+			stream->m_readOffset = 0;
 		}
 
-		if (*(short*)((int)stream + 0x2a) == 2) {
-			memcpy(dstBuffer + 0x2000, (void*)(*(int*)((int)stream + 8) + *(int*)((int)stream + 0x120)), 0x1000);
-			*(int*)((int)stream + 0x120) += 0x1000;
-			if (*(int*)((int)stream + 0x120) >= *(int*)((int)stream + 0x118)) {
-				*(int*)((int)stream + 0x120) = 0;
+		if (stream->m_channelCount == 2) {
+			memcpy(dstBuffer + 0x2000, (void*)(stream->m_fileData + stream->m_readOffset), 0x1000);
+			stream->m_readOffset += 0x1000;
+			if (stream->m_readOffset >= stream->m_fileSize) {
+				stream->m_readOffset = 0;
 			}
 		}
 
-		dmaDstOffset = *(int*)((int)stream + 0x12c) + bufferIndex * 0x1000;
+		dmaDstOffset = stream->m_aramBuffer + bufferIndex * 0x1000;
 		dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
 
 		if ((bufferIndex == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
@@ -122,7 +122,7 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
 			*(unsigned int*)(*(int*)(streamStruct + 0x14) + 0x1c) |= 0x100000;
 		}
 
-		if (*(short*)((int)stream + 0x2a) == 2) {
+		if (stream->m_channelCount == 2) {
 			dstBuffer += 0x2000;
 			dmaDstOffset += 0x2000;
 			streamStruct += 0xc0;
@@ -137,7 +137,7 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
 
 		byteCount -= 0x1000;
 		bufferIndex ^= 1;
-		*(int*)((int)stream + 0x124) += 0x200;
+		stream->m_streamCursor += 0x200;
 	} while (0 < byteCount);
 
 	return dmaID;

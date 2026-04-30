@@ -21,6 +21,8 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 
+extern const float FLOAT_80330c80;
+
 struct pppYmBreathUnkC {
     unsigned char _pad[0xC];
     int* m_serializedDataOffsets;

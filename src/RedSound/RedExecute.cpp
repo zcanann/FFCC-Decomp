@@ -2261,10 +2261,7 @@ void MusicSkipFunction()
     puVar9 = (u32*)((u8*)p_SoundControlBuffer + 0x928);
     memset(p_SkipKeyOn, 0, 0x600);
     iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, (RedKeyOnDATA*)p_SkipKeyOn, 1);
-    while (true) {
-        if ((iVar5 != 0) || ((*(u32*)((u8*)puVar9 + 0x46c) & 1) == 0)) {
-            break;
-        }
+    while ((iVar5 == 0) && ((*(u32*)((u8*)puVar9 + 0x46c) & 1) != 0)) {
         *(s16*)((u8*)puVar9 + 0x48e) = *(s16*)((u8*)puVar9 + 0x434);
         memcpy((void*)((u8*)puVar9 + 0xc), (void*)((u8*)puVar9 + 0x438), 0x10);
         memcpy((void*)((u8*)puVar9 + 0x448), (void*)((u8*)puVar9 + 0x428), 0xc);

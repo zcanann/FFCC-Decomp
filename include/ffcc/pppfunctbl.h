@@ -3,6 +3,7 @@
 
 #include "ffcc/partMng.h"
 
+extern pppProg s_pppSysProgTable[];
 pppProg* pppGetSysProgTable();
 
 #ifdef FFCC_PPPFUNCTBL_IMPLEMENTATION
@@ -164,7 +165,7 @@ struct _pppSysProgTbl
     pppProg* m_progs;
 };
 
-static pppProg s_pppSysProgTable[159] = {
+pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppDummyFunc",
         0,

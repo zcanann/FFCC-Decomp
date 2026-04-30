@@ -26,10 +26,10 @@ extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned lo
 extern "C" {
 OSThread m_thread;
 u8 m_threadStack[0x4000] ATTRIBUTE_ALIGN(8);
-u32 gGraphicDrawDoneRequest = 0;
-u8 gGraphicDrawDoneRequestInit = 0;
-u32 gGraphicDrawDonePartControlRequest = 0;
-u8 gGraphicDrawDonePartControlInit = 0;
+int gGraphicDrawDoneRequest = 0;
+signed char gGraphicDrawDoneRequestInit = 0;
+int gGraphicDrawDonePartControlRequest = 0;
+signed char gGraphicDrawDonePartControlInit = 0;
 _GXColor gGraphicDefaultClearColor = {0, 0, 0, 0};
 const float kGraphicZeroF = 0.0f;
 const float kGraphicOneF = 1.0f;
@@ -537,9 +537,7 @@ void CGraphic::Thread()
     int debugCountdown = 5;
 
     while (true) {
-        if (S32At(this, 0x7364) == 0) {
-            debugCountdown = 5;
-        } else {
+        if (S32At(this, 0x7364) != 0) {
             if (lastCounter != S32At(this, 0x7370)) {
                 debugCountdown = 100;
                 lastCounter = S32At(this, 0x7370);
@@ -547,29 +545,39 @@ void CGraphic::Thread()
             debugCountdown--;
 
             if (debugCountdown == 0) {
-                u16 drawSyncRaw = GXReadDrawSync();
-                u16 drawSyncPart = drawSyncRaw & 0x7FFF;
+                u32 drawSyncRaw = GXReadDrawSync();
+                drawSyncRaw &= 0xFFFF;
+                int drawSyncPart = drawSyncRaw;
                 if ((drawSyncRaw & 0x8000) != 0) {
+                    drawSyncPart &= 0x7FFF;
                     if (drawSyncPart == 0x7FFF) {
                         System.Printf(const_cast<char*>(DAT_801d637c), PtrAt(this, 0x7368), S32At(this, 0x736C));
                     } else if (drawSyncPart == 0x7FFE) {
                         System.Printf(const_cast<char*>(DAT_801d63c0), PtrAt(this, 0x7368), S32At(this, 0x736C));
                     } else {
                         System.Printf(const_cast<char*>(DAT_801d6400), PtrAt(this, 0x7368), S32At(this, 0x736C),
-                                      pppGetSysProgTable()[drawSyncPart].m_pppName);
+                                      s_pppSysProgTable[drawSyncPart].m_pppName);
                     }
                 }
 
                 CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
-                void* orderName = sGraphicUnknownOrderName;
-                int orderIndex = -1;
+                int orderIndex;
+                if (order != nullptr) {
+                    orderIndex = order->m_insertIndex;
+                } else {
+                    orderIndex = -1;
+                }
+                void* orderName;
                 if (order != nullptr) {
                     orderName = order->m_debugName;
-                    orderIndex = order->m_insertIndex;
+                } else {
+                    orderName = sGraphicUnknownOrderName;
                 }
                 System.Printf(const_cast<char*>(DAT_801d643c), PtrAt(this, 0x7368), S32At(this, 0x736C), orderName, orderIndex,
                               static_cast<int>(static_cast<char>(drawSyncPart)));
             }
+        } else {
+            debugCountdown = 5;
         }
 
         if (gGraphicDrawDoneRequestInit == 0) {
@@ -581,16 +589,21 @@ void CGraphic::Thread()
             gGraphicDrawDonePartControlInit = 1;
         }
 
-        if (OSGetResetButtonState() == 0) {
+        if (OSGetResetButtonState() != 0) {
+            gGraphicDrawDoneRequest = 1;
+        } else {
             if (gGraphicDrawDoneRequest != 0) {
                 gGraphicDrawDonePartControlRequest = 1;
             }
-        } else {
-            gGraphicDrawDoneRequest = 1;
         }
 
-        if ((gGraphicDrawDonePartControlRequest != 0) && (File.m_fatalDiskErrorFlag == 0) && (MemoryCardMan.m_currentSlot == 0xFF)) {
-            break;
+        if ((gGraphicDrawDonePartControlRequest != 0) && (File.m_fatalDiskErrorFlag == 0) && (MemoryCardMan.m_currentSlot == -1)) {
+            VISetBlack(TRUE);
+            VIFlush();
+            VIWaitForRetrace();
+            OSCancelAlarms(1);
+            OSResetSystem(FALSE, 0, FALSE);
+            while (true) {}
         }
 
         SleepAlarm sleepAlarm;
@@ -598,17 +611,10 @@ void CGraphic::Thread()
         OSCreateAlarm(&sleepAlarm.alarm);
         OSSetAlarmTag(&sleepAlarm.alarm, 1);
         BOOL interrupts = OSDisableInterrupts();
-        OSSetAlarm(&sleepAlarm.alarm, (OS_BUS_CLOCK / 4000) * 0x32, wakeup);
+        OSSetAlarm(&sleepAlarm.alarm, (OS_TIMER_CLOCK / 1000) * 0x32, wakeup);
         OSSuspendThread(sleepAlarm.thread);
         OSRestoreInterrupts(interrupts);
     }
-
-    VISetBlack(TRUE);
-    VIFlush();
-    VIWaitForRetrace();
-    OSCancelAlarms(1);
-    OSResetSystem(FALSE, 0, FALSE);
-    while (true) {}
 }
 
 /*
@@ -1105,7 +1111,7 @@ void CGraphic::makeSphere()
 
     DCInvalidateRange(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
     GXBeginDisplayList(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
-    GXBegin(GX_QUADS, GX_VTXFMT0, 0xB0);
+    GXBegin(GX_LINES, GX_VTXFMT0, 0xB0);
 
     int ringStart = 1;
     for (int ring = 0; ring < 5; ring++) {
@@ -1552,25 +1558,29 @@ void CGraphic::RenderNoTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXCol
 {
 	GXBegin(GX_QUADS, GX_VTXFMT6, 4);
 
+	float x1 = pos1.x;
+	float y1 = pos1.y;
 	float z1 = pos1.z;
 
-	GXWGFifo.f32 = pos1.x;
-	GXWGFifo.f32 = pos1.y;
+	GXWGFifo.f32 = x1;
+	GXWGFifo.f32 = y1;
 	GXWGFifo.f32 = z1;
 	GXWGFifo.u32 = *(u32*)&color1;
 
-	GXWGFifo.f32 = pos2.x;
-	GXWGFifo.f32 = pos1.y;
+	float x2 = pos2.x;
+	GXWGFifo.f32 = x2;
+	GXWGFifo.f32 = y1;
 	GXWGFifo.f32 = z1;
 	GXWGFifo.u32 = *(u32*)&color2;
 
-	GXWGFifo.f32 = pos2.x;
-	GXWGFifo.f32 = pos2.y;
+	float y2 = pos2.y;
+	GXWGFifo.f32 = x2;
+	GXWGFifo.f32 = y2;
 	GXWGFifo.f32 = z1;
 	GXWGFifo.u32 = *(u32*)&color4;
 
-	GXWGFifo.f32 = pos1.x;
-	GXWGFifo.f32 = pos2.y;
+	GXWGFifo.f32 = x1;
+	GXWGFifo.f32 = y2;
 	GXWGFifo.f32 = z1;
 	GXWGFifo.u32 = *(u32*)&color3;
 }

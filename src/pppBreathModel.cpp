@@ -487,7 +487,6 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     int* dataOffsets;
     VBreathModel* work;
     VColor* color;
-    int* groupData;
     Mtx* particleWMat;
     Mtx* particleMtx;
     int i;
@@ -580,10 +579,9 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     UpdateAllParticle(reinterpret_cast<_pppPObject*>(breathModel), work, pBreathModel, color);
 
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
-    groupData = (int*)work->m_groups;
     for (groupIndex = 0; groupIndex < (int)pBreathModel->m_groupCount; groupIndex++) {
         slotCount = pBreathModel->m_slotCount;
-        groupTable = (int)groupData;
+        groupTable = (int)((unsigned char*)work->m_groups + groupIndex * 0x5C);
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
             if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
                 (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {
@@ -625,8 +623,6 @@ group_ready:
             pppSubVector(hitVector, target, origin);
             pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner, pBreathModel->m_groupRadius);
         }
-
-        groupData += 0x17;
     }
 }
 

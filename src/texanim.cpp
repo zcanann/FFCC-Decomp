@@ -75,13 +75,6 @@ struct CTexAnimSetStorage
     float unk24;
 };
 
-struct CMaterialSetStorage
-{
-    void* vtable;
-    int refCount;
-    CPtrArray<CMaterial*> materials;
-};
-
 struct CTexAnimRefDataStorage
 {
     void* vtable;
@@ -810,6 +803,7 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 {
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
+    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
     unsigned int texAnimIndex;
     unsigned int texAnimCount;
 
@@ -818,24 +812,22 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
          texAnimIndex = texAnimIndex + 1) {
         CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[texAnimIndex]);
         int* material = reinterpret_cast<int*>(*reinterpret_cast<void**>((int)texAnim->refData + 0x108));
-        int materialIndex;
 
         if (material != 0) {
-            materialIndex = material[1] - 1;
-            material[1] = materialIndex;
-            if ((materialIndex == 0) && (material != 0)) {
+            int refCount = material[1] - 1;
+            material[1] = refCount;
+            if ((refCount == 0) && (material != 0)) {
                 (*(void (**)(int*, int))(*material + 8))(material, 1);
             }
             *reinterpret_cast<int*>((int)texAnim->refData + 0x108) = 0;
         }
 
         if (materialSet != 0) {
-            materialIndex = static_cast<int>(materialSet->Find(reinterpret_cast<char*>((int)texAnim->refData + 8)));
-            if (materialIndex < 0) {
+            unsigned long materialIndex = materialSet->Find(reinterpret_cast<char*>((int)texAnim->refData + 8));
+            if (static_cast<int>(materialIndex) < 0) {
                 continue;
             }
-            void* foundMaterial =
-                reinterpret_cast<CMaterialSetStorage*>(materialSet)->materials[static_cast<unsigned long>(materialIndex)];
+            void* foundMaterial = (*materials)[materialIndex];
             *reinterpret_cast<void**>((int)texAnim->refData + 0x108) = foundMaterial;
             material = reinterpret_cast<int*>(*reinterpret_cast<void**>((int)texAnim->refData + 0x108));
             material[1] = material[1] + 1;

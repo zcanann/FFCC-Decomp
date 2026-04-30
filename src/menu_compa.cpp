@@ -41,6 +41,16 @@ extern double DOUBLE_80333030;
 extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[];
 extern "C" const char s_menu_compa_cpp_801DEDE8[];
 
+static const char s_compa_mono_upper[] = "MONO";
+static const char s_compa_normal[] = "Normal";
+static const char s_compa_forza[] = "Forza";
+static const char s_compa_difesa[] = "Difesa";
+static const char s_compa_sonoro[] = "Sonoro";
+static const char s_compa_musica[] = "Musica";
+static const char s_compa_mono[] = "Mono";
+static const char s_compa_contr[] = "Contr.";
+static const char s_compa_norm[] = "Norm.";
+
 struct CompaOpenAnim {
 	s16 x;
 	s16 y;

@@ -185,7 +185,7 @@ struct CSoundLayout {
     int m_waveSyncMode;
     int m_seCount;
     u8 m_seWork[0x1400];
-    u8 m_lineWork[0xE60];
+    CLine m_lines[8];
     u8* m_streamBuffer;
     CFile::CHandle* m_streamFile;
     int m_streamOffset;
@@ -945,7 +945,7 @@ void CSound::Draw()
     GXSetChanMatColor((GXChannelID)4, lineColor);
     GXLoadPosMtxImm(cameraMatrix, 0);
 
-    CLine* line = reinterpret_cast<CLine*>(sound.m_lineWork);
+    CLine* line = sound.m_lines;
     for (u32 i = 0; i < 8; i++) {
         Draw__9CLine(line);
         line = reinterpret_cast<CLine*>(reinterpret_cast<unsigned char*>(line) + 0x1CC);
@@ -1648,7 +1648,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
 
     if (static_cast<s8>(se[3]) >= 0) {
         iVar4 = Calc__9CLine((double)*reinterpret_cast<float*>(se + 0x14),
-                             reinterpret_cast<CLine*>(SoundData(this).m_lineWork + ((int)static_cast<s8>(se[3]) * 0x1CC)),
+                             &SoundData(this).m_lines[(int)static_cast<s8>(se[3])],
                              &nearestPoint, &nearestDistance, (u32*)0, &nearestT,
                              reinterpret_cast<const Vec*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0));
         if (iVar4 == 0) {
@@ -2204,7 +2204,7 @@ void CSound::Clear3DLine(int lineIndex)
         Printf__7CSystemFPce(&System, s_soundLineOutOfRangeFmt);
     }
 
-    reinterpret_cast<CLine*>(reinterpret_cast<u8*>(this) + 0x142C)[lineIndex].pointCount = 0;
+    SoundData(this).m_lines[lineIndex].pointCount = 0;
 }
 
 /*
@@ -2218,13 +2218,13 @@ void CSound::Clear3DLine(int lineIndex)
  */
 void CSound::Add3DLine(int lineIndex, Vec* position)
 {
-    CLine* line = reinterpret_cast<CLine*>(SoundData(this).m_lineWork + lineIndex * sizeof(CLine));
-    const u32 pointCount = line->pointCount;
+    CSoundLayout& sound = SoundData(this);
+    const u32 pointCount = sound.m_lines[lineIndex].pointCount;
 
     if (pointCount < 10) {
-        line->pointCount = pointCount + 1;
-        line->points[pointCount] = *position;
-        CalcBound__9CLine2(line);
+        sound.m_lines[lineIndex].pointCount = pointCount + 1;
+        sound.m_lines[lineIndex].points[pointCount] = *position;
+        CalcBound__9CLine2(&sound.m_lines[lineIndex]);
     } else {
         Printf__7CSystemFPce(&System, s_soundLineTableFullFmt);
     }

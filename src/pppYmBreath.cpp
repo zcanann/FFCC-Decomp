@@ -783,7 +783,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                 unitVelocity.z = -1.0f;
                 groupData->speed = params->m_groupSpeed;
                 pppCopyVector(groupData->direction, unitVelocity);
-                float zero = FLOAT_80330c80;
+                float zero = 0.0f;
 
                 groupData->position.z = zero;
                 groupData->position.y = zero;

@@ -5,6 +5,8 @@ struct RedKeyOnDATA;
 struct RedTrackDATA;
 struct RedSoundCONTROL;
 
+typedef void (*RedMidiControlFunc)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
+
 int DataAddCompute(int*, int, int*);
 void KeyOnReserveClear(RedKeyOnDATA*, RedTrackDATA*);
 void KeyOnReserve(RedKeyOnDATA*, RedTrackDATA*);
@@ -124,5 +126,7 @@ void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
 
 void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
 void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
+
+extern RedMidiControlFunc p_MidiControl_Function[];
 
 #endif // _FFCC_REDSOUND_REDMIDICTRL_H

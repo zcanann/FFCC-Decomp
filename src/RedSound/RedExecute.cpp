@@ -1973,8 +1973,7 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
                 unsigned char* cmd = (unsigned char*)*track;
                 int delta;
                 *track = (int)(cmd + 1);
-                ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))p_MidiControl_Function[*cmd])(
-                    control, keyOnData, (RedTrackDATA*)track);
+                p_MidiControl_Function[*cmd](control, keyOnData, (RedTrackDATA*)track);
                 if ((u32)*track != 0) {
                     if (track[0x42] < 1) {
                         delta = DeltaTimeSumup((unsigned char**)track);
@@ -2501,8 +2500,7 @@ int _SeMidiNoteExecute(
                     *(s16*)(track + 0x51) += 1;
                     cmd = (unsigned char*)*track;
                     *track = (int)(cmd + 1);
-                    ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))p_MidiControl_Function[*cmd])(
-                        control, keyOnData, (RedTrackDATA*)track);
+                    p_MidiControl_Function[*cmd](control, keyOnData, (RedTrackDATA*)track);
                     if ((u32)*track != 0) {
                         delta = DeltaTimeSumup((unsigned char**)track);
                         if (delta != 0) {

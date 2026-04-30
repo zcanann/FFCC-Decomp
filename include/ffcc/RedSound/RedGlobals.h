@@ -3,6 +3,7 @@
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include "dolphin/os.h"
+#include "ffcc/RedSound/RedMidiCtrl.h"
 #include "ffcc/RedSound/RedStream.h"
 #include "types.h"
 
@@ -10,7 +11,7 @@ class CRedDriver;
 class CRedEntry;
 class CRedMemory;
 
-extern int p_MidiControl_Function[];
+extern RedMidiControlFunc p_MidiControl_Function[];
 extern u32 t_TonePitch[];
 extern int t_FinePitch[];
 extern int t_KeySignatureIndex[];

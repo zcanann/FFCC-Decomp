@@ -680,7 +680,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 foundSlot = -1;
                 for (short groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
                     for (short slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
-                        if ((int)(short)i == (int)*(signed char*)(*(int*)(groupTableWork + 4) + (int)slotIndex)) {
+                        signed char* particleIndices = *(signed char**)(groupTableWork + 4);
+                        if ((int)(short)i == (int)particleIndices[(int)slotIndex]) {
                             foundGroup = groupIndex;
                             foundSlot = slotIndex;
                             found = true;
@@ -728,24 +729,26 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 }
 
                 if ((params->m_emitInterval <= *emitFrameCounter) && (spawnCount < (int)params->m_emitCount)) {
+                    bool placing;
+
                     BirthParticle(
                         pppObject, vBreathModel, pBreathModel, vColor, (PARTICLE_DATA*)particleData,
                         (PARTICLE_WMAT*)particleWmat, (PARTICLE_COLOR*)particleColor);
-                    found = true;
+                    placing = true;
                     spawnCount += 1;
                     groupData = groupTable;
                     for (j = 0; j < (int)params->m_groupCount; j++) {
                         for (k = 0; k < (int)params->m_slotCount; k++) {
                             if ((groupData->particleIndices[k] == -1) && (groupData->particleStates[k] == -1)) {
                                 groupData->particleIndices[k] = (signed char)i;
-                                found = false;
+                                placing = false;
                                 groupData->particleStates[k] = 1;
                             }
-                            if (!found) {
+                            if (!placing) {
                                 break;
                             }
                         }
-                        if (!found) {
+                        if (!placing) {
                             break;
                         }
                         groupData += 1;
@@ -783,12 +786,13 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
             groupData += 1;
         }
 
+        groupData = groupTable;
         for (i = 0; i < (int)params->m_groupCount; i++) {
-            if (groupTable->active != 0) {
-                PSVECScale(&groupTable->direction, &stepVelocity, groupTable->speed);
-                PSVECAdd(&stepVelocity, &groupTable->position, &groupTable->position);
+            if (groupData->active != 0) {
+                PSVECScale(&groupData->direction, &stepVelocity, groupData->speed);
+                PSVECAdd(&stepVelocity, &groupData->position, &groupData->position);
             }
-            groupTable += 1;
+            groupData += 1;
         }
     }
 }

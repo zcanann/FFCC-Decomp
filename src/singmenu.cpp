@@ -965,7 +965,7 @@ void CMenuPcs::createSingleMenu()
                 int refCount = raw[1] - 1;
                 raw[1] = refCount;
                 if (refCount == 0) {
-                    reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<int*>(raw[0] + 8))(font, 1);
+                    delete reinterpret_cast<CRef*>(font);
                 }
                 *reinterpret_cast<void**>(self + 0x108) = 0;
             }
@@ -1024,7 +1024,7 @@ void CMenuPcs::destroySingleMenu()
         int refCount = raw[1] - 1;
         raw[1] = refCount;
         if (refCount == 0) {
-            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<int*>(raw[0] + 8))(font, 1);
+            delete reinterpret_cast<CRef*>(font);
         }
         *reinterpret_cast<void**>(self + 0x108) = 0;
     }

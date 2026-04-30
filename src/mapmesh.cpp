@@ -16,6 +16,7 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CS
 extern "C" char s_mapmesh_cpp_801D70B0[];
 
 CMemory::CStage* g_pStage;
+u32 s_insertShadowNo;
 
 extern "C" {
 void SetBlendMode__12CMaterialManFP12CMaterialSeti(void* materialMan, CMaterialSet* materialSet, unsigned int materialIdx);
@@ -418,12 +419,12 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             m_vertices = cursor;
             offset = 0;
             cursor += chunk.m_size;
-            m_bboxMinZ = minInit;
-            m_bboxMinY = minInit;
-            m_bboxMinX = minInit;
-            m_bboxMaxZ = maxInit;
-            m_bboxMaxY = maxInit;
-            m_bboxMaxX = maxInit;
+            m_bboxMinZ = FLOAT_8032F930;
+            m_bboxMinY = FLOAT_8032F930;
+            m_bboxMinX = FLOAT_8032F930;
+            m_bboxMaxZ = FLOAT_8032F934;
+            m_bboxMaxY = FLOAT_8032F934;
+            m_bboxMaxX = FLOAT_8032F934;
 
             for (int i = 0; i < static_cast<int>(m_vertexCount); i++) {
                 float value = reader.GetF4();

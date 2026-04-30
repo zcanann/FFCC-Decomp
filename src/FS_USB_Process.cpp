@@ -353,13 +353,3 @@ void CFunnyShapePcs::SetUSBData()
     }
     }
 }
-
-/*
- * --INFO--
- * PAL Address: UNUSED  
- * PAL Size: 52b
- */
-void CFunnyShapePcs::USBDataCallback(CUSBPcs::CDataHeader* dataHeader)
-{
-    (void)dataHeader;
-}

@@ -41,6 +41,16 @@ extern double DOUBLE_80333030;
 extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[];
 extern "C" const char s_menu_compa_cpp_801DEDE8[];
 
+static const char s_compa_mono_upper[] = "MONO";
+static const char s_compa_normal[] = "Normal";
+static const char s_compa_forza[] = "Forza";
+static const char s_compa_difesa[] = "Difesa";
+static const char s_compa_sonoro[] = "Sonoro";
+static const char s_compa_musica[] = "Musica";
+static const char s_compa_mono[] = "Mono";
+static const char s_compa_contr[] = "Contr.";
+static const char s_compa_norm[] = "Norm.";
+
 struct CompaOpenAnim {
 	s16 x;
 	s16 y;
@@ -99,12 +109,10 @@ void CMenuPcs::CompaInit()
 	float fVar3;
 	int iVar4;
 	int iVar5;
-	short* compaList = this->compaList;
-	int compaState = (int)this->compaMenuState;
 
-	memset(compaList, 0, 0x1008);
+	memset(this->compaList, 0, 0x1008);
 	fVar1 = FLOAT_80333000;
-	iVar4 = (int)compaList + 8;
+	iVar4 = (int)this->compaList + 8;
 	iVar5 = 8;
 	do {
 		*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
@@ -119,7 +127,7 @@ void CMenuPcs::CompaInit()
 		iVar5 += -1;
 	} while (iVar5 != 0);
 
-	iVar4 = (int)compaList;
+	iVar4 = (int)this->compaList;
 	*reinterpret_cast<int*>(iVar4 + 0x24) = 0x52;
 	*reinterpret_cast<int*>(iVar4 + 0x20) = 4;
 	*reinterpret_cast<short*>(iVar4 + 8) = 0x28;
@@ -134,7 +142,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x2c) = 5;
 	*reinterpret_cast<int*>(iVar4 + 0x30) = 5;
 
-	iVar4 = (int)compaList;
+	iVar4 = (int)this->compaList;
 	*reinterpret_cast<int*>(iVar4 + 100) = 0x51;
 	*reinterpret_cast<short*>(iVar4 + 0x48) = 0x28;
 	*reinterpret_cast<short*>(iVar4 + 0x4a) = 0x48;
@@ -146,7 +154,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x6c) = 5;
 	*reinterpret_cast<int*>(iVar4 + 0x70) = 5;
 
-	iVar4 = (int)compaList;
+	iVar4 = (int)this->compaList;
 	*reinterpret_cast<int*>(iVar4 + 0xa4) = 0x52;
 	*reinterpret_cast<short*>(iVar4 + 0x88) = 0x28;
 	*reinterpret_cast<short*>(iVar4 + 0x8a) = 0x110;
@@ -158,7 +166,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0xac) = 5;
 	*reinterpret_cast<int*>(iVar4 + 0xb0) = 5;
 
-	iVar4 = (int)compaList;
+	iVar4 = (int)this->compaList;
 	*reinterpret_cast<int*>(iVar4 + 0xe4) = 0x5e;
 	*reinterpret_cast<short*>(iVar4 + 200) = 0x10;
 	*reinterpret_cast<short*>(iVar4 + 0xca) = 0xe;
@@ -172,7 +180,7 @@ void CMenuPcs::CompaInit()
 
 	fVar3 = FLOAT_8033303C;
 	fVar2 = FLOAT_80333038;
-	iVar4 = (int)compaList;
+	iVar4 = (int)this->compaList;
 	*reinterpret_cast<int*>(iVar4 + 0x124) = 0x5e;
 	*reinterpret_cast<short*>(iVar4 + 0x108) = 0x15;
 	*reinterpret_cast<short*>(iVar4 + 0x10c) = 0x30;
@@ -184,7 +192,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 300) = 0;
 	*reinterpret_cast<int*>(iVar4 + 0x130) = 5;
 
-	iVar4 = (int)compaList;
+	iVar4 = (int)this->compaList;
 	*reinterpret_cast<int*>(iVar4 + 0x174) = 2;
 	*reinterpret_cast<int*>(iVar4 + 0x164) = 0x2e;
 	*reinterpret_cast<short*>(iVar4 + 0x148) = 0x10;
@@ -196,42 +204,9 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x16c) = 0;
 	*reinterpret_cast<int*>(iVar4 + 0x170) = 5;
 
-	*compaList = 6;
-	*reinterpret_cast<short*>(compaState + 0x26) = 0;
-	*reinterpret_cast<char*>(compaState + 0xB) = 1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::CompaInit0()
-{
-	CompaOpenAnimList* compaList = reinterpret_cast<CompaOpenAnimList*>(this->compaList);
-
-	compaList->entries[0].startFrame = 2;
-	compaList->entries[0].duration = 5;
-	compaList->entries[1].startFrame = 2;
-	compaList->entries[1].duration = 5;
-	compaList->entries[2].startFrame = 2;
-	compaList->entries[2].duration = 5;
-	compaList->entries[3].startFrame = 7;
-	compaList->entries[3].duration = 5;
-	compaList->entries[4].startFrame = 7;
-	compaList->entries[4].duration = 5;
-	compaList->entries[5].flags = 2;
-	compaList->entries[5].startFrame = 7;
-	compaList->entries[5].duration = 5;
-
-	unsigned int entryCount = static_cast<unsigned short>(compaList->count);
-	CompaOpenAnim* entry = compaList->entries;
-	while (entryCount != 0) {
-		entry->frame = 0;
-		entry->alpha = 1.0f;
-		entry++;
-		entryCount--;
-	}
+	*this->compaList = 6;
+	this->compaMenuState->selectedIndex = 0;
+	this->compaMenuState->initialized = 1;
 }
 
 /*
@@ -654,63 +629,4 @@ void CMenuPcs::CompaDraw()
 	font->Draw(job);
 
 	DrawInit__8CMenuPcsFv(this);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::CompaCtrlCur()
-{
-	bool activeInput = false;
-	unsigned short press;
-	short hold;
-	bool doReset = false;
-	CompaMenuState* compaState = this->compaMenuState;
-
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		press = 0;
-	} else {
-		press = Pad._8_2_;
-	}
-
-	activeInput = false;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		hold = 0;
-	} else {
-		hold = Pad._20_2_;
-	}
-
-	if (hold == 0) {
-		return;
-	}
-
-	if ((press & 0x20) != 0) {
-		compaState->cursorMove = 1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = true;
-	} else if ((press & 0x40) != 0) {
-		compaState->cursorMove = -1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = true;
-	} else if ((press & 0x100) != 0) {
-		Sound.PlaySe(4, 0x40, 0x7f, 0);
-	} else if ((press & 0x200) != 0) {
-		compaState->closeRequested = 1;
-		Sound.PlaySe(3, 0x40, 0x7f, 0);
-		doReset = true;
-	}
-
-	if (doReset) {
-		CompaInit0();
-	}
 }

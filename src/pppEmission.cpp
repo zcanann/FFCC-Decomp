@@ -405,6 +405,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
         Mtx texMtx1;
 
         if (step->m_payload[9] == 0) {
+            EmissionDisplayList* displayList;
             for (int i = 0; i < step->m_initWOrk; i++) {
                 float scale = FLOAT_803311e4;
                 scale += (float)i * state->m_scale0;
@@ -413,8 +414,8 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 PSMTXCopy(CameraMatrix(), viewMtx0);
                 SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx0, objMtx0);
 
+                displayList = meshData->m_displayLists;
                 int remaining = meshData->m_displayListCount - 1;
-                EmissionDisplayList* displayList = meshData->m_displayLists;
                 while (remaining >= 0) {
                     *(int*)(MaterialManRaw() + 0x48) = drawTevBits;
                     *(int*)(MaterialManRaw() + 0x128) = 0;

@@ -91,16 +91,6 @@ static inline unsigned short& U16At(void* p, unsigned int offset)
     return *reinterpret_cast<unsigned short*>(Ptr(p, offset));
 }
 
-static inline short& S16At(void* p, unsigned int offset)
-{
-    return *reinterpret_cast<short*>(Ptr(p, offset));
-}
-
-static inline void*& PtrAt(void* p, unsigned int offset)
-{
-    return *reinterpret_cast<void**>(Ptr(p, offset));
-}
-
 static inline CTexture* AllocTexture()
 {
     CTexture* texture = static_cast<CTexture*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
@@ -1058,14 +1048,18 @@ CTextureSet::CTextureSet()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003A9AC
+ * PAL Size: 712b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
 {
     CChunkFile::CChunk chunk;
+    CChunkFile::CChunk textureChunk;
     CChunkFile chunkFile(filePtr);
-    CPtrArray<CTexture*>* textures = TextureArray(m_textureArrayStorage);
 
     while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id != 0x54455820) {
@@ -1079,22 +1073,21 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x54534554) {
                         if (append == 0) {
-                            ReleaseAndRemoveAll__21CPtrArray_P8CTexture_Fv(textures);
+                            ReleaseAndRemoveAll__21CPtrArray_P8CTexture_Fv(TextureArray(m_textureArrayStorage));
                         }
 
                         chunkFile.PushChunk();
-                        while (chunkFile.GetNextChunk(chunk)) {
-                            if (chunk.m_id == 0x54585452) {
+                        while (chunkFile.GetNextChunk(textureChunk)) {
+                            if (textureChunk.m_id == 0x54585452) {
                                 CTexture* texture = AllocTexture();
                                 texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
-                                if (*reinterpret_cast<unsigned char*>(Ptr(texture, 8)) != 0) {
+                                if (texture->m_name[0] != 0) {
                                     unsigned int duplicateIdx;
-                                    for (duplicateIdx = 0; duplicateIdx < (unsigned int)GetSize__21CPtrArray_P8CTexture_Fv(textures); duplicateIdx++) {
-                                        CTexture* existing = __vc__21CPtrArray_P8CTexture_FUl(textures, duplicateIdx);
+                                    for (duplicateIdx = 0; duplicateIdx < (unsigned int)GetSize__21CPtrArray_P8CTexture_Fv(TextureArray(m_textureArrayStorage)); duplicateIdx++) {
+                                        CTexture* existing = __vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), duplicateIdx);
                                         if ((existing != 0)
-                                            && (strcmp(reinterpret_cast<char*>(Ptr(existing, 8)), reinterpret_cast<char*>(Ptr(texture, 8)))
-                                                == 0)) {
+                                            && (strcmp(existing->m_name, texture->m_name) == 0)) {
                                             goto found_duplicate;
                                         }
                                     }
@@ -1103,7 +1096,7 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                                 found_duplicate:
                                     if ((int)duplicateIdx >= 0) {
                                         if (amemCacheSet != 0) {
-                                            amemCacheSet->DestroyCache(static_cast<int>(*reinterpret_cast<short*>(Ptr(texture, 0x72))));
+                                            amemCacheSet->DestroyCache(static_cast<int>(texture->m_cacheId));
                                             amemCacheSet->AmemPrev();
                                         }
 
@@ -1114,21 +1107,21 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                                             (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
                                         }
 
-                                        texture = __vc__21CPtrArray_P8CTexture_FUl(textures, duplicateIdx);
+                                        texture = __vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), duplicateIdx);
                                         *reinterpret_cast<int*>(Ptr(texture, 4)) = *reinterpret_cast<int*>(Ptr(texture, 4)) + 1;
                                     }
                                 }
 
                                 if (append != 0) {
-                                    for (unsigned long i = 0; i < static_cast<unsigned long>(GetSize__21CPtrArray_P8CTexture_Fv(textures)); i++) {
-                                        if (__vc__21CPtrArray_P8CTexture_FUl(textures, i) == 0) {
-                                            SetAt__21CPtrArray_P8CTexture_FUlP8CTexture(textures, i, texture);
+                                    for (unsigned long i = 0; i < static_cast<unsigned long>(GetSize__21CPtrArray_P8CTexture_Fv(TextureArray(m_textureArrayStorage))); i++) {
+                                        if (__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), i) == 0) {
+                                            SetAt__21CPtrArray_P8CTexture_FUlP8CTexture(TextureArray(m_textureArrayStorage), i, texture);
                                             goto next_texture;
                                         }
                                     }
                                 }
 
-                                Add__21CPtrArray_P8CTexture_FP8CTexture(textures, texture);
+                                Add__21CPtrArray_P8CTexture_FP8CTexture(TextureArray(m_textureArrayStorage), texture);
                             }
                         next_texture:;
                         }
@@ -1169,12 +1162,11 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
         texture = AllocTexture();
         texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
-        if (*reinterpret_cast<unsigned char*>(Ptr(texture, 8)) != 0) {
+        if (texture->m_name[0] != 0) {
             unsigned int duplicateIdx;
             for (duplicateIdx = 0; duplicateIdx < (unsigned int)GetSize__21CPtrArray_P8CTexture_Fv(TextureArray(m_textureArrayStorage)); duplicateIdx++) {
                 CTexture* existing = __vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), duplicateIdx);
-                if ((existing != 0)
-                    && (strcmp(reinterpret_cast<char*>(Ptr(existing, 8)), reinterpret_cast<char*>(Ptr(texture, 8))) == 0)) {
+                if ((existing != 0) && (strcmp(existing->m_name, texture->m_name) == 0)) {
                     goto found_duplicate;
                 }
             }
@@ -1183,7 +1175,7 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
         found_duplicate:
             if ((int)duplicateIdx >= 0) {
                 if (amemCacheSet != 0) {
-                    amemCacheSet->DestroyCache((int)*reinterpret_cast<short*>(Ptr(texture, 0x72)));
+                    amemCacheSet->DestroyCache(static_cast<int>(texture->m_cacheId));
                     amemCacheSet->AmemPrev();
                 }
 
@@ -1227,7 +1219,7 @@ int CTextureSet::Find(char* name)
 {
     for (unsigned long i = 0; i < static_cast<unsigned long>(GetSize__21CPtrArray_P8CTexture_Fv(TextureArray(m_textureArrayStorage))); i++) {
         CTexture* texture = __vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), i);
-        if ((texture != 0) && (strcmp(reinterpret_cast<char*>(Ptr(texture, 8)), name) == 0)) {
+        if ((texture != 0) && (strcmp(texture->m_name, name) == 0)) {
             return static_cast<int>(i);
         }
     }
@@ -1246,10 +1238,10 @@ int CTextureSet::Find(char* name)
 void CTextureSet::ReleaseTextureIdx(int idx, CAmemCacheSet* amemCacheSet)
 {
     if (__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx) != 0) {
-        if (S16At(__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx), 0x72) != -1) {
+        if (__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx)->m_cacheId != -1) {
             if (*reinterpret_cast<int*>(Ptr(__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx), 4)) <= 1) {
-                amemCacheSet->DestroyCache(S16At(__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx), 0x72));
-                PtrAt(__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx), 0x78) = 0;
+                amemCacheSet->DestroyCache(__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx)->m_cacheId);
+                __vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx)->m_imageData = 0;
             }
         }
 

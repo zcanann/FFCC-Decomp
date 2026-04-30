@@ -1,7 +1,6 @@
 #include "ffcc/pppMiasma.h"
 #include "ffcc/graphic.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/render_buffers.h"
 #include "ffcc/game.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
@@ -160,6 +159,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     Vec managerPos;
     float radius;
     float maxRadius;
+    float scaledRadius;
     int texWidth;
     int texHeight;
     u32 scissorWidth;
@@ -197,7 +197,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         param_2->m_payload[0x1E] = 0xFE;
     }
 
-    packedColor.raw = *(u32*)(colorData + 8);
+    packedColor.bytes[0] = colorData[8];
+    packedColor.bytes[1] = colorData[9];
+    packedColor.bytes[2] = colorData[10];
+    packedColor.bytes[3] = colorData[11];
     packedWork.bytes[0] = (u8)(work[0] >> 7);
     packedWork.bytes[1] = (u8)(work[1] >> 7);
     packedWork.bytes[2] = (u8)(work[2] >> 7);
@@ -234,13 +237,13 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         maxRadius = FLOAT_80331934;
     }
 
-    maxRadius = maxRadius * *(float*)radiusScaleData;
+    scaledRadius = maxRadius * *(float*)radiusScaleData;
     if ((s32)Game.m_currentSceneId != 7) {
-        Game.unkFloat_0xca10 = maxRadius;
+        Game.unkFloat_0xca10 = scaledRadius;
     }
 
     inNearZone = 0;
-    if ((FLOAT_80331938 + maxRadius) > PSVECDistance(&cameraPos, &managerPos)) {
+    if ((FLOAT_80331938 + scaledRadius) > PSVECDistance(&cameraPos, &managerPos)) {
         inNearZone = 1;
     }
 
@@ -253,7 +256,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         yPos = (float)slice * FLOAT_8033192c;
         yOffset = (int)yPos;
 
-        Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backI4Tex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR, GX_TF_I4, 0);
+        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backI4Tex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR,
+                                   GX_TF_I4, 0);
         GXSetScissor(0, (u32)yPos, scissorWidth, scissorHeight);
 
         if (inNearZone) {
@@ -336,8 +340,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         pppDrawMesh__FP10pppModelStP3Veci(model, pppMiasma->m_meshPoints, 0);
         Graphic.SetDrawDoneDebugData(0x35);
 
-        Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize, GX_LINEAR,
-                                   GX_TF_RGBA8, 0);
+        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize,
+                                   GX_LINEAR, GX_TF_RGBA8, 0);
         if (param_2->m_payload[0x1D] != 0) {
             if (inNearZone) {
                 drawColor.rgba[0] = 0xFF;
@@ -408,7 +412,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
             pppDrawMesh__FP10pppModelStP3Veci(model, pppMiasma->m_meshPoints, 0);
             Graphic.SetDrawDoneDebugData(0x39);
 
-            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backRgba8Tex2, 0, yOffset, texWidth, texHeight,
+            Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backRgba8Tex2, 0, yOffset, texWidth, texHeight,
                                        i4TexSize + rgba8TexSize, GX_LINEAR, GX_TF_RGBA8, 0);
         }
 

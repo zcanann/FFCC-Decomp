@@ -28,6 +28,9 @@ extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
 extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
 extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void*, void*, int, int, int, void*, void*);
+extern "C" void moveFrame__8CGMonObjFv(CGMonObj*);
 extern float FLOAT_80331dd0;
 extern float FLOAT_80331cf8;
 extern float FLOAT_80331dcc;
@@ -1616,7 +1619,41 @@ void CGMonObj::frameStatFuncTetsukyojin()
 	
 	#endif
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId >= 100) {
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	u8* self = reinterpret_cast<u8*>(this);
+	const int state = prgObj->m_lastStateId;
+
+	if (state == 0x66) {
+		if (*reinterpret_cast<int*>(CFlat + 4840) < 1) {
+			changeStat__8CGPrgObjFiii(prgObj, 0, 0, 0);
+		} else {
+			if ((*reinterpret_cast<int*>(self + 0x6B4) == 1) && (prgObj->m_stateFrame == 0)) {
+				int stack[3];
+
+				object->m_bgColMask &= 0xFFF3FFFD;
+				*reinterpret_cast<int*>(self + 0x6B4) = 2;
+				*reinterpret_cast<int*>(CFlat + 4844) = 1;
+				stack[0] = 10;
+				stack[1] = 0;
+				stack[2] = 0;
+				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+				    CFlat, 0, 1, 9, 3, stack, 0);
+			}
+
+			if (*reinterpret_cast<int*>(CFlat + 4844) == 0) {
+				*reinterpret_cast<int*>(self + 0x6B4) = 0;
+				*reinterpret_cast<int*>(self + 0x6C8) = 0;
+				changeStat__8CGPrgObjFiii(prgObj, 0, 0, 0);
+			}
+		}
+	} else if (state == 100) {
+		moveFrame__8CGMonObjFv(this);
+	} else if (state > 99) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	} else if (state == 0x67) {
+		if (prgObj->m_stateFrame > 0xF) {
+			moveFrame__8CGMonObjFv(this);
+		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
 	}
 }

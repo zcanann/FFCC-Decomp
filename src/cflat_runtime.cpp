@@ -41,6 +41,26 @@ struct CFlatRuntimeLifecycleProxy
     virtual void Quit();
 };
 
+struct CFlatRuntimeStageProxy
+{
+    virtual void _00();
+    virtual void _01();
+    virtual void _02();
+    virtual void _03();
+    virtual void _04();
+    virtual void _05();
+    virtual void _06();
+    virtual void _07();
+    virtual void _08();
+    virtual void _09();
+    virtual void _10();
+    virtual void _11();
+    virtual void _12();
+    virtual void _13();
+    virtual void _14();
+    virtual void* GetStage();
+};
+
 
 /*
  * --INFO--
@@ -85,15 +105,13 @@ CFlatRuntime::~CFlatRuntime()
  */
 void CFlatRuntime::Init()
 {
-	typedef void* (*GetStageFn)(CFlatRuntime*);
+	CFlatRuntimeStageProxy* proxy = reinterpret_cast<CFlatRuntimeStageProxy*>(this);
 
 	m_permanentVarValues = static_cast<u8*>(
 	    __nwa__FUlPQ27CMemory6CStagePci(
-	        0x3000, reinterpret_cast<GetStageFn>((*reinterpret_cast<void***>(this))[0x11])(this),
-	        const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x2A));
+	        0x3000, proxy->GetStage(), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x2A));
 	m_initScratchA = __nwa__FUlPQ27CMemory6CStagePci(
-	    0x14880, reinterpret_cast<GetStageFn>((*reinterpret_cast<void***>(this))[0x11])(this),
-	    const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x2B);
+	    0x14880, proxy->GetStage(), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x2B);
 }
 
 /*

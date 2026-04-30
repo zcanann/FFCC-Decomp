@@ -2245,7 +2245,6 @@ void MusicSkipFunction()
     int iVar1;
     int iVar2;
     int iVar3;
-    int iVar4;
     int iVar5;
     u32 uVar6;
     int iVar7;
@@ -2257,22 +2256,21 @@ void MusicSkipFunction()
         if (p_SkipKeyOn == 0) {
             RedSleep(10000);
         }
-        iVar4 = (int)p_SoundControlBuffer;
     } while (p_SkipKeyOn == 0);
 
     puVar9 = (u32*)((u8*)p_SoundControlBuffer + 0x928);
     memset(p_SkipKeyOn, 0, 0x600);
     iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, (RedKeyOnDATA*)p_SkipKeyOn, 1);
     while (true) {
-        if ((iVar5 != 0) || ((*(u32*)(iVar4 + 0xd94) & 1) == 0)) {
+        if ((iVar5 != 0) || ((*(u32*)((u8*)puVar9 + 0x46c) & 1) == 0)) {
             break;
         }
-        *(s16*)(iVar4 + 0xdb6) = *(s16*)(iVar4 + 0xd5c);
-        memcpy((void*)(iVar4 + 0x934), (void*)(iVar4 + 0xd60), 0x10);
-        memcpy((void*)(iVar4 + 0xd70), (void*)(iVar4 + 0xd50), 0xc);
+        *(s16*)((u8*)puVar9 + 0x48e) = *(s16*)((u8*)puVar9 + 0x434);
+        memcpy((void*)((u8*)puVar9 + 0xc), (void*)((u8*)puVar9 + 0x438), 0x10);
+        memcpy((void*)((u8*)puVar9 + 0x448), (void*)((u8*)puVar9 + 0x428), 0xc);
         puVar8 = (u32*)*puVar9;
-        iVar7 = iVar4 + 0x950;
-        uVar6 = (u32)*(u8*)(iVar4 + 0xdb9);
+        iVar7 = (int)puVar9 + 0x28;
+        uVar6 = (u32)*(u8*)((u8*)puVar9 + 0x491);
         iVar5 = 0;
         do {
             iVar1 = iVar5 * 4;

@@ -60,13 +60,9 @@ extern "C" const float kOptionVolumeScale = 10.583333f;
 extern "C" const float FLOAT_80333654 = 25.0f;
 extern "C" const char DAT_80333658[4] = "";
 extern "C" const char DAT_8033365c[] = "%s";
-static const unsigned char gap_8033365f[] = {0};
 extern "C" const char DAT_80333660[] = "+1";
-static const unsigned char gap_80333663[] = {0};
 extern "C" const char DAT_80333664[] = "%c%d";
-static const unsigned char gap_80333669[] = {0, 0, 0};
 extern "C" const char DAT_8033366c[] = " ";
-static const unsigned char gap_8033366e[] = {0, 0};
 extern "C" const char DAT_80333670[] = " %d";
 
 STATIC_ASSERT(offsetof(CMenuPcs, listFont) == 0x108);

@@ -257,153 +257,152 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             memset(work->m_wmats, 0, work->m_maxParticles * 0x30);
         }
 
-        work->m_tailScaleDirection = param->m_velocity;
+        work->m_tailScaleDirection = param->m_directionTail;
         tailScale = work->m_tailScaleDirection;
         pppNormalize(work->m_tailScaleDirection, tailScale);
     }
 
-    hasRequiredMemory = false;
-    if (work->m_particles != 0) {
-        hasRequiredMemory = work->m_wmats != 0;
+    if (work->m_particles == 0) {
+        hasRequiredMemory = false;
+    } else if (work->m_wmats == 0) {
+        hasRequiredMemory = false;
+    } else {
+        hasRequiredMemory = true;
     }
-    if (!hasRequiredMemory) {
-        return;
-    }
+    if (hasRequiredMemory) {
+        *(s16*)work[1].m_emitterMatrix.value[1] += *(s16*)(work[1].m_emitterMatrix.value[1] + 2);
+        *(s16*)work[1].m_emitterMatrix.value[0] += *(s16*)work[1].m_emitterMatrix.value[1];
 
-    *(s16*)work[1].m_emitterMatrix.value[1] += *(s16*)(work[1].m_emitterMatrix.value[1] + 2);
-    *(s16*)work[1].m_emitterMatrix.value[0] += *(s16*)work[1].m_emitterMatrix.value[1];
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 2) += *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 0xa);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 2) += *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 2);
 
-    *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 2) += *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 0xa);
-    *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 2) += *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 2);
+        *(s16*)(work[1].m_emitterMatrix.value[1] + 1) += *(s16*)(work[1].m_emitterMatrix.value[1] + 3);
+        *(s16*)(work[1].m_emitterMatrix.value[0] + 1) += *(s16*)(work[1].m_emitterMatrix.value[1] + 1);
 
-    *(s16*)(work[1].m_emitterMatrix.value[1] + 1) += *(s16*)(work[1].m_emitterMatrix.value[1] + 3);
-    *(s16*)(work[1].m_emitterMatrix.value[0] + 1) += *(s16*)(work[1].m_emitterMatrix.value[1] + 1);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 6) += *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 0xe);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 6) += *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 6);
 
-    *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 6) += *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 0xe);
-    *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 6) += *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 6);
+        *(s16*)work[1].m_emitterMatrix.value[2] += *(s16*)(work[1].m_emitterMatrix.value[2] + 2);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 8) += *(s16*)work[1].m_emitterMatrix.value[2];
 
-    *(s16*)work[1].m_emitterMatrix.value[2] += *(s16*)(work[1].m_emitterMatrix.value[2] + 2);
-    *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 8) += *(s16*)work[1].m_emitterMatrix.value[2];
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 2) += *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 0xa);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xa) += *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 2);
 
-    *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 2) += *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 0xa);
-    *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xa) += *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 2);
+        *(s16*)(work[1].m_emitterMatrix.value[2] + 1) += *(s16*)(work[1].m_emitterMatrix.value[2] + 3);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xc) += *(s16*)(work[1].m_emitterMatrix.value[2] + 1);
 
-    *(s16*)(work[1].m_emitterMatrix.value[2] + 1) += *(s16*)(work[1].m_emitterMatrix.value[2] + 3);
-    *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xc) += *(s16*)(work[1].m_emitterMatrix.value[2] + 1);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 6) += *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 0xe);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xe) += *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 6);
 
-    *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 6) += *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 0xe);
-    *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xe) += *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 6);
+        if (object->field0_0x0.m_graphId == *(s32*)paramPayload) {
+            *(s16*)work[1].m_emitterMatrix.value[0] += *(s16*)(paramPayload + 0x88);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 2) += *(s16*)(paramPayload + 0x8a);
+            *(s16*)(work[1].m_emitterMatrix.value[0] + 1) += *(s16*)(paramPayload + 0x8c);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 6) += *(s16*)(paramPayload + 0x8e);
 
-    if ((float)object->field0_0x0.m_graphId == *(float*)paramPayload) {
-        *(s16*)work[1].m_emitterMatrix.value[0] += *(s16*)(paramPayload + 0x88);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 2) += *(s16*)(paramPayload + 0x8a);
-        *(s16*)(work[1].m_emitterMatrix.value[0] + 1) += *(s16*)(paramPayload + 0x8c);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 6) += *(s16*)(paramPayload + 0x8e);
+            *(s16*)work[1].m_emitterMatrix.value[1] += *(s16*)(paramPayload + 0x88);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 2) += *(s16*)(paramPayload + 0x8a);
+            *(s16*)(work[1].m_emitterMatrix.value[1] + 1) += *(s16*)(paramPayload + 0x8c);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 6) += *(s16*)(paramPayload + 0x8e);
 
-        *(s16*)work[1].m_emitterMatrix.value[1] += *(s16*)(paramPayload + 0x88);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 2) += *(s16*)(paramPayload + 0x8a);
-        *(s16*)(work[1].m_emitterMatrix.value[1] + 1) += *(s16*)(paramPayload + 0x8c);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 6) += *(s16*)(paramPayload + 0x8e);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 2) += *(s16*)(paramPayload + 0x90);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 0xa) += *(s16*)(paramPayload + 0x92);
+            *(s16*)(work[1].m_emitterMatrix.value[1] + 3) += *(s16*)(paramPayload + 0x94);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 0xe) += *(s16*)(paramPayload + 0x96);
 
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 2) += *(s16*)(paramPayload + 0x90);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 0xa) += *(s16*)(paramPayload + 0x92);
-        *(s16*)(work[1].m_emitterMatrix.value[1] + 3) += *(s16*)(paramPayload + 0x94);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 0xe) += *(s16*)(paramPayload + 0x96);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 2) += *(s16*)(paramPayload + 0x84);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xa) += *(s16*)(paramPayload + 0x86);
+            *(s16*)(work[1].m_emitterMatrix.value[0] + 3) += *(s16*)(paramPayload + 0x88);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xe) += *(s16*)(paramPayload + 0x8a);
 
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 2) += *(s16*)(paramPayload + 0x84);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xa) += *(s16*)(paramPayload + 0x86);
-        *(s16*)(work[1].m_emitterMatrix.value[0] + 3) += *(s16*)(paramPayload + 0x88);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xe) += *(s16*)(paramPayload + 0x8a);
+            *(s16*)work[1].m_emitterMatrix.value[2] += *(s16*)(paramPayload + 0x98);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 2) += *(s16*)(paramPayload + 0x9a);
+            *(s16*)(work[1].m_emitterMatrix.value[2] + 1) += *(s16*)(paramPayload + 0x9c);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 6) += *(s16*)(paramPayload + 0x9e);
 
-        *(s16*)work[1].m_emitterMatrix.value[2] += *(s16*)(paramPayload + 0x98);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 2) += *(s16*)(paramPayload + 0x9a);
-        *(s16*)(work[1].m_emitterMatrix.value[2] + 1) += *(s16*)(paramPayload + 0x9c);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 6) += *(s16*)(paramPayload + 0x9e);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 2) += *(s16*)(paramPayload + 0xa0);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 0xa) += *(s16*)(paramPayload + 0xa2);
+            *(s16*)(work[1].m_emitterMatrix.value[2] + 3) += *(s16*)(paramPayload + 0xa4);
+            *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 0xe) += *(s16*)(paramPayload + 0xa6);
+        }
 
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 2) += *(s16*)(paramPayload + 0xa0);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 0xa) += *(s16*)(paramPayload + 0xa2);
-        *(s16*)(work[1].m_emitterMatrix.value[2] + 3) += *(s16*)(paramPayload + 0xa4);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 0xe) += *(s16*)(paramPayload + 0xa6);
-    }
+        switch (*(paramPayload + 0x12)) {
+        case 1:
+        case 3:
+        case 5:
+        case 7:
+        case 9:
+        {
+            Vec firstCol;
+            Vec secondCol;
+            Vec thirdCol;
 
-    switch (*(paramPayload + 0x12)) {
-    default:
-        pppCopyMatrix(work->m_emitterMatrix, pppMngStPtr->m_matrix);
-        break;
-    case 1:
-    case 3:
-    case 5:
-    case 7:
-    case 9:
-    {
-        Vec firstCol;
-        Vec secondCol;
-        Vec thirdCol;
+            PSMTXIdentity(work->m_emitterMatrix.value);
+            firstCol.x = work->m_emitterMatrix.value[0][0];
+            firstCol.y = work->m_emitterMatrix.value[1][0];
+            firstCol.z = work->m_emitterMatrix.value[2][0];
+            PSVECScale(&firstCol, &firstCol, pppMngStPtr->m_scale.x);
+            work->m_emitterMatrix.value[0][0] = firstCol.x;
+            work->m_emitterMatrix.value[1][0] = firstCol.y;
+            work->m_emitterMatrix.value[2][0] = firstCol.z;
 
-        PSMTXIdentity(work->m_emitterMatrix.value);
-        firstCol.x = work->m_emitterMatrix.value[0][0];
-        firstCol.y = work->m_emitterMatrix.value[1][0];
-        firstCol.z = work->m_emitterMatrix.value[2][0];
-        PSVECScale(&firstCol, &firstCol, pppMngStPtr->m_scale.x);
-        work->m_emitterMatrix.value[0][0] = firstCol.x;
-        work->m_emitterMatrix.value[1][0] = firstCol.y;
-        work->m_emitterMatrix.value[2][0] = firstCol.z;
+            secondCol.x = work->m_emitterMatrix.value[0][1];
+            secondCol.y = work->m_emitterMatrix.value[1][1];
+            secondCol.z = work->m_emitterMatrix.value[2][1];
+            PSVECScale(&secondCol, &secondCol, pppMngStPtr->m_scale.x);
+            work->m_emitterMatrix.value[0][1] = secondCol.x;
+            work->m_emitterMatrix.value[1][1] = secondCol.y;
+            work->m_emitterMatrix.value[2][1] = secondCol.z;
 
-        secondCol.x = work->m_emitterMatrix.value[0][1];
-        secondCol.y = work->m_emitterMatrix.value[1][1];
-        secondCol.z = work->m_emitterMatrix.value[2][1];
-        PSVECScale(&secondCol, &secondCol, pppMngStPtr->m_scale.x);
-        work->m_emitterMatrix.value[0][1] = secondCol.x;
-        work->m_emitterMatrix.value[1][1] = secondCol.y;
-        work->m_emitterMatrix.value[2][1] = secondCol.z;
+            thirdCol.x = work->m_emitterMatrix.value[0][2];
+            thirdCol.y = work->m_emitterMatrix.value[1][2];
+            thirdCol.z = work->m_emitterMatrix.value[2][2];
+            PSVECScale(&thirdCol, &thirdCol, pppMngStPtr->m_scale.x);
+            work->m_emitterMatrix.value[0][2] = thirdCol.x;
+            work->m_emitterMatrix.value[1][2] = thirdCol.y;
+            work->m_emitterMatrix.value[2][2] = thirdCol.z;
 
-        thirdCol.x = work->m_emitterMatrix.value[0][2];
-        thirdCol.y = work->m_emitterMatrix.value[1][2];
-        thirdCol.z = work->m_emitterMatrix.value[2][2];
-        PSVECScale(&thirdCol, &thirdCol, pppMngStPtr->m_scale.x);
-        work->m_emitterMatrix.value[0][2] = thirdCol.x;
-        work->m_emitterMatrix.value[1][2] = thirdCol.y;
-        work->m_emitterMatrix.value[2][2] = thirdCol.z;
+            work->m_emitterMatrix.value[0][3] = pppMngStPtr->m_position.x;
+            work->m_emitterMatrix.value[1][3] = pppMngStPtr->m_position.y;
+            work->m_emitterMatrix.value[2][3] = pppMngStPtr->m_position.z;
+            break;
+        }
+        default:
+            pppCopyMatrix(work->m_emitterMatrix, pppMngStPtr->m_matrix);
+            break;
+        }
 
-        work->m_emitterMatrix.value[0][3] = pppMngStPtr->m_position.x;
-        work->m_emitterMatrix.value[1][3] = pppMngStPtr->m_position.y;
-        work->m_emitterMatrix.value[2][3] = pppMngStPtr->m_position.z;
-        break;
-    }
-    }
+        worldMat = work->m_wmats;
+        particleColor = work->m_colors;
+        particleData = (u8*)work->m_particles;
 
-    worldMat = work->m_wmats;
-    particleColor = work->m_colors;
-    particleData = (u8*)work->m_particles;
+        if ((gPppCalcDisabled == 0) && (*(float*)(paramPayload + 4) != 9.18341e-41f)) {
+            work->m_lifeLimit = work->m_lifeLimit + 1;
+            for (i = 0; i < work->m_maxParticles; i++) {
+                if (*(u16*)(particleData + 0x22) == 0) {
+                    if ((*(u16*)(paramPayload + 0x12) <= work->m_lifeLimit) && (spawnCount < *(u16*)(paramPayload + 0x10))) {
+                        birth(&object->field0_0x0, work, param, (VColor*)((u8*)object + 8 + colorOffset),
+                              (_PARTICLE_DATA*)particleData, worldMat, particleColor);
+                        spawnCount = spawnCount + 1;
+                    }
+                } else {
+                    calc(&object->field0_0x0, work, param, (_PARTICLE_DATA*)particleData,
+                         (VColor*)((u8*)object + 8 + colorOffset), particleColor);
+                }
 
-    if ((gPppCalcDisabled != 0) || (*(float*)(paramPayload + 4) == 9.18341e-41f)) {
-        return;
-    }
-
-    work->m_lifeLimit = work->m_lifeLimit + 1;
-    for (i = 0; i < work->m_maxParticles; i++) {
-        if (*(s16*)(particleData + 0x22) == 0) {
-            if ((*(u16*)(paramPayload + 0x12) <= work->m_lifeLimit) && (spawnCount < *(u16*)(paramPayload + 0x10))) {
-                birth(&object->field0_0x0, work, param, (VColor*)((u8*)object + 8 + colorOffset),
-                      (_PARTICLE_DATA*)particleData, worldMat, particleColor);
-                spawnCount = spawnCount + 1;
+                if (worldMat != 0) {
+                    worldMat = worldMat + 1;
+                }
+                if (particleColor != 0) {
+                    particleColor = particleColor + 1;
+                }
+                particleData = particleData + 0x1f8;
             }
-        } else {
-            calc(&object->field0_0x0, work, param, (_PARTICLE_DATA*)particleData,
-                 (VColor*)((u8*)object + 8 + colorOffset), particleColor);
-        }
 
-        if (worldMat != 0) {
-            worldMat = worldMat + 1;
+            if (spawnCount > 0) {
+                work->m_lifeLimit = 0;
+            }
         }
-        if (particleColor != 0) {
-            particleColor = particleColor + 1;
-        }
-        particleData = particleData + 0x1f8;
-    }
-
-    if (spawnCount > 0) {
-        work->m_lifeLimit = 0;
     }
 }
 

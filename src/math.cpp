@@ -1,19 +1,3 @@
-extern "C" const float kZeroF = 0.0f;
-extern "C" const float kNegOneF = -1.0f;
-extern "C" const float FLOAT_8032F748 = 1.0f;
-extern "C" const double DOUBLE_8032F750 = 4503601774854144.0;
-extern "C" const float FLOAT_8032F758 = 3.0f;
-extern "C" const float FLOAT_8032F75C = 2.0f;
-extern "C" const float FLOAT_8032F760 = -2.0f;
-extern "C" const double DOUBLE_8032F768 = 0.5;
-extern "C" const double DOUBLE_8032F770 = 3.0;
-extern "C" const double DOUBLE_8032F778 = 0.0;
-extern "C" const float FLOAT_8032F780 = -999999995904.0f;
-extern "C" const float FLOAT_8032F784 = 10000000000.0f;
-extern "C" const float FLOAT_8032F788 = -10000000000.0f;
-extern "C" const float kRandSignedScaleF = 6.103701889514923e-05f;
-extern "C" const float kRandScaleF = 3.0518509447574615e-05f;
-
 #include "ffcc/math.h"
 
 #include "dolphin/mtx.h"
@@ -319,9 +303,9 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
     s_wSpline[count] = s_wSpline[0];
 
     for (i = 1; i < count; ++i) {
-        s_dSpline[i] = FLOAT_8032F75C * (x[i + 1] - x[i - 1]);
+        s_dSpline[i] = 2.0f * (x[i + 1] - x[i - 1]);
     }
-    s_dSpline[count] = FLOAT_8032F75C * (s_hSpline[count - 1] + s_hSpline[0]);
+    s_dSpline[count] = 2.0f * (s_hSpline[count - 1] + s_hSpline[0]);
 
     for (i = 1; i <= count; ++i) {
         outSecondDerivatives[i] = s_wSpline[i] - s_wSpline[i - 1];
@@ -331,7 +315,7 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
     s_wSpline[count - 1] = s_hSpline[count - 1];
     s_wSpline[count] = s_dSpline[count];
     for (i = 2; i < count - 1; ++i) {
-        s_wSpline[i] = kZeroF;
+        s_wSpline[i] = 0.0f;
     }
 
     for (i = 1; i < count; ++i) {
@@ -376,9 +360,9 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     float radiusSquared = radius * radius;
     float radiusCubed = radiusSquared * radius;
     Vec4d coeffs;
-    coeffs.x = FLOAT_8032F748 + ((FLOAT_8032F75C * radiusCubed) - (FLOAT_8032F758 * radiusSquared));
-    coeffs.y = radius + (radiusCubed - (FLOAT_8032F75C * radiusSquared));
-    coeffs.z = (FLOAT_8032F760 * radiusCubed) + (FLOAT_8032F758 * radiusSquared);
+    coeffs.x = 1.0f + ((2.0f * radiusCubed) - (3.0f * radiusSquared));
+    coeffs.y = radius + (radiusCubed - (2.0f * radiusSquared));
+    coeffs.z = (-2.0f * radiusCubed) + (3.0f * radiusSquared);
     coeffs.w = radiusCubed - radiusSquared;
 
     Mtx44 control;
@@ -392,8 +376,8 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[3][2] = 1.0f;
 
     float scaleAB = scaleA + scaleB;
-    float t0 = kZeroF;
-    if (scaleAB != kZeroF) {
+    float t0 = 0.0f;
+    if (scaleAB != 0.0f) {
         t0 = scaleA / scaleAB;
     }
 
@@ -409,8 +393,8 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[3][1] = 1.0f;
 
     float scaleBC = scaleB + scaleC;
-    float t1 = kZeroF;
-    if (scaleBC != kZeroF) {
+    float t1 = 0.0f;
+    if (scaleBC != 0.0f) {
         t1 = scaleB / scaleBC;
     }
 
@@ -559,8 +543,8 @@ void CMath::MTXGetScale(float (*mtx)[4], Vec* outScale)
     PSVECNormalize(&zAxis, &zAxis);
 
     PSVECCrossProduct(&yAxis, &zAxis, &temp);
-    if ((double)PSVECDotProduct(&xAxis, &temp) < DOUBLE_8032F778) {
-        PSVECScale(outScale, outScale, kNegOneF);
+    if ((double)PSVECDotProduct(&xAxis, &temp) < 0.0) {
+        PSVECScale(outScale, outScale, -1.0f);
     }
 }
 
@@ -609,8 +593,8 @@ int CBound::CheckFrustum0(float farPlane)
         return 1;
     }
 
-    farthestZ = FLOAT_8032F780;
-    zero = kZeroF;
+    farthestZ = -999999995904.0f;
+    zero = 0.0f;
     insideMask = 0xF;
     outsideMask = 0;
     xIndex = 0;
@@ -701,8 +685,8 @@ int CBound::CheckFrustum0(CBound& outBound)
     Vec vertex;
     Vec transformed;
 
-    maxInit = FLOAT_8032F784;
-    minInit = FLOAT_8032F788;
+    maxInit = 10000000000.0f;
+    minInit = -10000000000.0f;
     outBound.m_min.z = maxInit;
     outBound.m_min.y = maxInit;
     outBound.m_min.x = maxInit;
@@ -842,11 +826,11 @@ void CBound::SetFrustum(Vec& viewPos, float (*viewMatrix)[4])
  */
 float CMath::RandFPM(float scale)
 {
-    if (kZeroF == scale) {
-        return kZeroF;
+    if (0.0f == scale) {
+        return 0.0f;
     }
 
-    return scale * (((float)rand() * kRandSignedScaleF) + kNegOneF);
+    return scale * (((float)rand() * 6.103701889514923e-05f) + -1.0f);
 }
 
 /*
@@ -882,7 +866,7 @@ int CMath::RandPM(unsigned long max)
  */
 float CMath::RandF()
 {
-    return (float)rand() * kRandScaleF;
+    return (float)rand() * 3.0518509447574615e-05f;
 }
 
 /*
@@ -896,11 +880,11 @@ float CMath::RandF()
  */
 float CMath::RandF(float scale)
 {
-    if (kZeroF == scale) {
-        return kZeroF;
+    if (0.0f == scale) {
+        return 0.0f;
     }
 
-    return scale * ((float)rand() * kRandScaleF);
+    return scale * ((float)rand() * 3.0518509447574615e-05f);
 }
 
 /*

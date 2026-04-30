@@ -17,6 +17,12 @@ struct GbaCMakeInfo
     GbaCMakeInfo &operator=(const GbaCMakeInfo&);
 };
 
+struct GbaQueueHitInfo
+{
+    short m_enemyId;
+    short m_enemyType;
+};
+
 class GbaQueue
 {
 public:
@@ -163,7 +169,8 @@ private:
     unsigned char m_letterFlags;      // 0x2C89
     unsigned char _pad2C8A[0x28];     // 0x2C8A
     char cmakeInfo[4][0x20];          // 0x2CB2
-    unsigned char _pad2D32[0x22];     // 0x2D32
+    unsigned char _pad2D32[0x12];     // 0x2D32
+    GbaQueueHitInfo m_hitInfo[4];      // 0x2D44
     unsigned char m_chgHitFlags;      // 0x2D54
     unsigned char m_chgScouFlags;     // 0x2D55
     unsigned char _pad2D56[0x1];      // 0x2D56

@@ -2180,7 +2180,6 @@ char* subjectNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
 		if (System.m_execParam != 0) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B3);
 		}
-		__dla__FPv(npcNameBuf);
 		return -1;
 	}
 	memset(subjectNameBuf, 0, 0x1800);
@@ -2191,8 +2190,6 @@ unsigned int* letterEntryBuf = static_cast<unsigned int*>(__nwa__FUlPQ27CMemory6
 		if (System.m_execParam != 0) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7BD);
 		}
-		__dla__FPv(subjectNameBuf);
-		__dla__FPv(npcNameBuf);
 		return -1;
 	}
 	memset(letterEntryBuf, 0, 0x800);
@@ -2217,13 +2214,14 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 
 		const unsigned int* cur = reinterpret_cast<const unsigned int*>(scriptFood + 0x3EC + i * 0xC);
 		const unsigned int curWord = cur[0];
+		const unsigned short curHalf = *reinterpret_cast<const unsigned short*>(cur);
 
 		for (int j = 0; j < i; j++) {
 			const unsigned int* prev = reinterpret_cast<const unsigned int*>(scriptFood + 0x3EC + j * 0xC);
 			if (((curWord >> 9) & 0x1FF) == ((prev[0] >> 9) & 0x1FF)) {
 				matchedNpc = j;
 			}
-			if (((curWord >> 2) & 0x1FF) == ((prev[0] >> 2) & 0x1FF)) {
+			if (((curHalf >> 2) & 0x1FF) == ((*reinterpret_cast<const unsigned short*>(prev) >> 2) & 0x1FF)) {
 				matchedSubject = j;
 			}
 			if (matchedSubject != -1 && matchedNpc != -1) {
@@ -2255,7 +2253,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<
 
 			char tempSubject[0x20];
 			memset(tempSubject, 0, sizeof(tempSubject));
-			strcpy(tempSubject, subjectTable[(curWord >> 2) & 0x1FF]);
+			strcpy(tempSubject, subjectTable[(curHalf >> 2) & 0x1FF]);
 			memcpy(subjectWrite, tempSubject, 0x18);
 			subjectWrite += 0x18;
 			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount);
@@ -4573,8 +4571,6 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 			if (scouterEntry[0] != 0) {
 				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
 				const int enemyDataBase = Game.unkCFlatData0[1] + static_cast<unsigned char>(enemyEntry[3]) * 0x1D0;
-				const unsigned short enemyFlags = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10E);
-				const short form0 = *reinterpret_cast<short*>(enemyDataBase + 0xF0);
 
 				*reinterpret_cast<unsigned short*>(scouterEntry + 4) = SwapU16(enemyWork->m_maxHp);
 
@@ -4591,56 +4587,58 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 					scouterEntry[7] = 0xFF;
 				}
 
+				const unsigned short enemyFlags = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10E);
 				if ((enemyFlags & 5) == 5) {
 					scouterEntry[1] = 0;
 				} else if ((enemyFlags & 4) == 0) {
 					if ((enemyFlags & 1) == 0) {
-						if ((form0 == 0) && (*reinterpret_cast<short*>(enemyDataBase + 0xF2) == 0) &&
-						    (*reinterpret_cast<short*>(enemyDataBase + 0xF4) == 0)) {
+						const unsigned short form0 = *reinterpret_cast<unsigned short*>(enemyDataBase + 0xF0);
+						if ((form0 == 0) && (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF2) == 0) &&
+						    (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF4) == 0)) {
 							scouterEntry[1] = 3;
-						} else if ((form0 == 3) && (*reinterpret_cast<short*>(enemyDataBase + 0xF2) == 3) &&
-						           (*reinterpret_cast<short*>(enemyDataBase + 0xF4) == 3)) {
-							if (*reinterpret_cast<short*>(enemyDataBase + 0xC) == 0x10) {
+						} else if ((form0 == 3) && (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF2) == 3) &&
+						           (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF4) == 3)) {
+							if (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xC) == 0x10) {
 								scouterEntry[1] = 0xE;
 							} else {
 								scouterEntry[1] = 4;
 							}
 						} else {
-							unsigned int statusCount = 0;
+							int statusCount = 0;
 
 							if (form0 == 0) {
 								scouterEntry[1] = 5;
 								statusCount = 1;
 							}
-							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF0) == 3) && (statusCount < 3)) {
+							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF0) == 3) && (statusCount < 3)) {
 								scouterEntry[statusCount + 1] = 6;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF2) == 0) && (statusCount < 3)) {
+							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF2) == 0) && (statusCount < 3)) {
 								scouterEntry[statusCount + 1] = 7;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF2) == 3) && (statusCount < 3)) {
+							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF2) == 3) && (statusCount < 3)) {
 								scouterEntry[statusCount + 1] = 8;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF4) == 0) && (statusCount < 3)) {
+							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF4) == 0) && (statusCount < 3)) {
 								scouterEntry[statusCount + 1] = 9;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF4) == 3) && (statusCount < 3)) {
+							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF4) == 3) && (statusCount < 3)) {
 								scouterEntry[statusCount + 1] = 10;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF6) == 0) && (statusCount < 3)) {
+							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF6) == 0) && (statusCount < 3)) {
 								scouterEntry[statusCount + 1] = 11;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF8) == 0) && (statusCount < 3)) {
+							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF8) == 0) && (statusCount < 3)) {
 								scouterEntry[statusCount + 1] = 12;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<short*>(enemyDataBase + 0xFA) == 3) && (statusCount < 3)) {
+							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xFA) == 3) && (statusCount < 3)) {
 								scouterEntry[statusCount + 1] = 13;
 							}
 						}
@@ -4746,24 +4744,22 @@ void GbaQueue::ClrChgScouFlg(int channel)
  */
 void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
 {
-	unsigned short enemyId;
-	unsigned short enemyType;
-	unsigned short* hitInfo = reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(this) + 0x2CDE);
-	char* obj = reinterpret_cast<char*>(this);
+	short enemyId;
+	short enemyType;
 
-	if (enemyIdx < 0) {
-		enemyId = 0xFFFF;
-		enemyType = 0xFFFF;
+	if (enemyIdx >= 0) {
+		enemyId = static_cast<short>(enemyIdx);
+		enemyType = static_cast<short>(*reinterpret_cast<unsigned short*>(Game.m_scriptWork[2][0][enemyIdx] + 0x1C));
 	} else {
-		enemyId = static_cast<unsigned short>(enemyIdx);
-		enemyType = *reinterpret_cast<unsigned short*>(Game.m_scriptWork[2][0][enemyIdx] + 0x1C);
+		enemyType = enemyId = -1;
 	}
 
-	OSWaitSemaphore(accessSemaphores + channel);
-	hitInfo[channel * 2] = enemyId;
-	hitInfo[channel * 2 + 1] = enemyType;
-	obj[0x2D54] = static_cast<char>(obj[0x2D54] | (1 << channel));
-	OSSignalSemaphore(accessSemaphores + channel);
+	OSSemaphore* semaphore = accessSemaphores + channel;
+	OSWaitSemaphore(semaphore);
+	m_hitInfo[channel].m_enemyId = enemyId;
+	m_hitInfo[channel].m_enemyType = enemyType;
+	m_chgHitFlags = static_cast<unsigned char>(m_chgHitFlags | (1 << channel));
+	OSSignalSemaphore(semaphore);
 }
 
 /*
@@ -4777,9 +4773,10 @@ int GbaQueue::GetHitEInfo(int channel)
 	                             ~static_cast<unsigned int>((-reinterpret_cast<char*>(this)[0x2D56] |
 	                                                        reinterpret_cast<char*>(this)[0x2D56]) >>
 	                                                       31);
-	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + actualChannel);
-	int hitInfo = *reinterpret_cast<int*>(obj + 0x2CDE + (actualChannel * 4));
+	int hitInfo;
+	*reinterpret_cast<short*>(&hitInfo) = m_hitInfo[actualChannel].m_enemyId;
+	*reinterpret_cast<short*>(reinterpret_cast<char*>(&hitInfo) + 2) = m_hitInfo[actualChannel].m_enemyType;
 	OSSignalSemaphore(accessSemaphores + actualChannel);
 	return hitInfo;
 }

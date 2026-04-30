@@ -83,9 +83,8 @@ template <class T>
 class CPtrArray
 {
 public:
-    void** m_vtable;
     CPtrArray();
-    ~CPtrArray();
+    virtual ~CPtrArray();
     int GetSize();
     int Add(T item);
     void RemoveAll();
@@ -108,6 +107,7 @@ private:
 template <>
 CPtrArray<CMaterial*>::CPtrArray()
 {
+    m_vtable = __vt__8CPtrArrayIP9CMaterial;
     m_size = 0;
     m_numItems = 0;
     m_defaultSize = 0x10;
@@ -261,7 +261,6 @@ static void SetMaterialColor(CMaterial* material, unsigned int rgba)
 template <>
 CPtrArray<CMaterial*>::~CPtrArray()
 {
-    m_vtable = __vt__8CPtrArrayIP9CMaterial;
     RemoveAll();
 }
 
@@ -277,7 +276,6 @@ CPtrArray<CMaterial*>::~CPtrArray()
 extern "C" CPtrArray<CMaterial*>* dtor_80043AAC(CPtrArray<CMaterial*>* ptrArray, short shouldDelete)
 {
     if (ptrArray != 0) {
-        ptrArray->m_vtable = __vt__8CPtrArrayIP9CMaterial;
         ptrArray->RemoveAll();
         if (shouldDelete > 0) {
             __dl__FPv(ptrArray);
@@ -2313,16 +2311,16 @@ void CMaterialMan::SetStdEnv()
 {
     MaterialManTexState* texState = GetMaterialManTexState(this);
     MaterialManTevState* tevState = GetMaterialManTevState(this);
+    int stdValue = texState->stdTexMapId;
 
-    int value = texState->stdTexMapId;
-    texState->texMapIdCur = value;
-    texState->texMapIdCurShadow = value;
-    value = texState->stdTexMtx;
-    texState->texMtxCur = value;
-    texState->texMtxCurShadow = value;
-    value = texState->stdTexCoordId;
-    texState->texCoordIdCur = value;
-    texState->texCoordIdCurShadow = value;
+    texState->texMapIdCur = stdValue;
+    texState->texMapIdCurShadow = stdValue;
+    stdValue = texState->stdTexMtx;
+    texState->texMtxCur = stdValue;
+    texState->texMtxCurShadow = stdValue;
+    stdValue = texState->stdTexCoordId;
+    texState->texCoordIdCur = stdValue;
+    texState->texCoordIdCurShadow = stdValue;
     tevState->curEnvTevBit = tevState->stdEnvTevBit;
 }
 

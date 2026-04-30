@@ -69,6 +69,7 @@ extern double DOUBLE_80331dc0;
 extern char SoundBuffer[];
 extern char SoundBuffer_1260_[];
 extern "C" unsigned char m_boss__8CGMonObj[];
+extern "C" Vec DAT_802127f0[];
 
 /*
  * --INFO--
@@ -1388,76 +1389,51 @@ void CGMonObj::cancelStatFuncLich()
  */
 void CGMonObj::frameStatFuncLich()
 {
-	#if 0
-	// Function: frameStatFuncLich__8CGMonObjFv
-	// Entry: 80131294
-	// Size: 652 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void frameStatFuncLich__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  CRef *pCVar2;
-	  undefined4 local_20;
-	  undefined4 local_1c;
-	  undefined4 local_18;
-	  
-	  if (((CFlat._4840_4_ & 1) == 0) && ((int)((uint)SoundBuffer[0x4fc] << 0x18) < 0)) {
-	    SoundBuffer[0x4fc] = SoundBuffer[0x4fc] & 0x3f | 0x40;
-	    *(undefined4 *)&gMonObj->field_0x6c8 = 0;
-	    playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,0x1157c,0x32,0x96,0,0);
-	  }
-	  else if (((CFlat._4840_4_ & 1) != 0) && (-1 < (int)((uint)SoundBuffer[0x4fc] << 0x18))) {
-	    SoundBuffer[0x4fc] = SoundBuffer[0x4fc] & 0x3f | 0xc0;
-	    *(undefined4 *)&gMonObj->field_0x6c8 = 0;
-	    playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,0x1157d,0x32,0x96,0,0);
-	  }
-	  if ((int)((uint)SoundBuffer[0x4fc] << 0x19 | (uint)(SoundBuffer[0x4fc] >> 7)) < 0) {
-	    endPSlotBit__10CGCharaObjFi(gMonObj,0x800);
-	    if ((int)((uint)SoundBuffer[0x4fc] << 0x18) < 0) {
-	      pCVar2 = ((gMonObj->gObject).m_charaModelHandle)->m_pdtLoadRef;
-	      if (pCVar2 == (CRef *)0x0) {
-	        iVar1 = -1;
-	      }
-	      else {
-	        iVar1 = pCVar2[2].refCount;
-	      }
-	      putParticle__8CGPrgObjFiiP8CGObjectfi
-	                ((double)FLOAT_80331d18,(CGPrgObj *)gMonObj,iVar1 << 8 | 0x1d,
-	                 *(int *)&gMonObj->field_0x590,&gMonObj->gObject,0);
-	    }
-	    SoundBuffer[0x4fc] = SoundBuffer[0x4fc] & 0xbf;
-	  }
-	  iVar1 = *(int *)&gMonObj->field_0x520;
-	  if (iVar1 == 0x65) {
-	    if ((*(int *)&gMonObj->field_0x528 == 0) && (CFlat._4840_4_ == 3)) {
-	      changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,0,0,0);
-	    }
-	    else {
-	      _statAttack__10CGCharaObjFv((CGCharaObj *)gMonObj);
-	      if (*(int *)&gMonObj->field_0x528 == 0x29) {
-	        local_20 = 10;
-	        local_1c = 1;
-	        local_18 = 0;
-	        SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack
-	                  (&CFlat,0,1,9,3,&local_20,(CStack *)0x0);
-	      }
-	    }
-	  }
-	  else if ((iVar1 < 0x65) && (99 < iVar1)) {
-	    teleport__8CGMonObjFiiiiiiiiiP3VecRiR3Vec
-	              (gMonObj,1,0xe,0x29,100,0x11578,0x11579,0x2d,0x2b,0x2c,&DAT_802127f0,0x8030014c,
-	               0x80300150);
-	  }
-	  return;
-	}
-	
-	#endif
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId >= 100) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
+	u8& lichFlags = *reinterpret_cast<u8*>(SoundBuffer + 0x4FC);
+	const int flatFlags = *reinterpret_cast<int*>(CFlat + 4840);
+
+	if (((flatFlags & 1) == 0) && (static_cast<s8>(lichFlags) < 0)) {
+		lichFlags = (lichFlags & 0x3F) | 0x40;
+		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x6C8) = 0;
+		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x1157C, 0x32, 0x96, 0, 0);
+	} else if (((flatFlags & 1) != 0) && (static_cast<s8>(lichFlags) >= 0)) {
+		lichFlags = (lichFlags & 0x3F) | 0xC0;
+		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x6C8) = 0;
+		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x1157D, 0x32, 0x96, 0, 0);
+	}
+
+	if ((lichFlags & 0x40) != 0) {
+		chara->endPSlotBit(0x800);
+		if (static_cast<s8>(lichFlags) < 0) {
+			int pdtNo = -1;
+			if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+				pdtNo = *reinterpret_cast<int*>(reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
+			}
+			putParticle__8CGPrgObjFiiP8CGObjectfi(prgObj, (pdtNo << 8) | 0x1D,
+			                                      *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x590), object,
+			                                      FLOAT_80331d18, 0);
+		}
+		lichFlags &= 0xBF;
+	}
+
+	const int stat = prgObj->m_lastStateId;
+	if (stat == 0x65) {
+		if (prgObj->m_stateFrame == 0 && flatFlags == 3) {
+			changeStat__8CGPrgObjFiii(prgObj, 0, 0, 0);
+		} else {
+			chara->statAttack();
+			if (prgObj->m_stateFrame == 0x29) {
+				int stack[3] = {10, 1, 0};
+				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+				    CFlat, 0, 1, 9, 3, stack, 0);
+			}
+		}
+	} else if (stat < 0x65 && stat > 99) {
+		teleport(1, 0x0E, 0x29, 100, 0x11578, 0x11579, 0x2D, 0x2B, 0x2C, DAT_802127f0,
+		         *reinterpret_cast<int*>(SoundBuffer_1260_), *reinterpret_cast<Vec*>(SoundBuffer_1260_ + 4));
 	}
 }
 
@@ -2334,7 +2310,18 @@ int CGMonObj::attackCheckFuncMeteoParasiteC(int)
  */
 void CGMonObj::initFinishedFuncMeteoParasite()
 {
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	initFinishedFuncDefault__8CGMonObjFv(this);
+
+	const int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
+	CGMonObj** bossObjArr = reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj + 0x48);
+	bossObjArr[scriptKind - 0x85] = this;
+
+	if ((m_boss__8CGMonObj[0x5C] & 0x40) != 0) {
+		object->SetAnimSlot(scriptKind == 0x87 ? 0x0D : 0x0E, 0);
+		prgObj->reqAnim(0, 1, 0);
+	}
 }
 
 /*
@@ -2365,106 +2352,38 @@ void CGMonObj::changeStatFuncMeteoParasite(int stat)
  */
 void CGMonObj::alwaysFuncMeteoParasite()
 {
-	#if 0
-	// Function: alwaysFuncMeteoParasite__8CGMonObjFv
-	// Entry: 8012fcc8
-	// Size: 796 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void alwaysFuncMeteoParasite__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int *piVar1;
-	  float fVar2;
-	  double dVar3;
-	  float fVar4;
-	  float fVar5;
-	  uint uVar6;
-	  uint uVar7;
-	  uint uVar8;
-	  uint uVar9;
-	  uint uVar10;
-	  uint uVar11;
-	  int iVar12;
-	  int iVar13;
-	  void *pvVar14;
-	  int iVar15;
-	  
-	  pvVar14 = (gMonObj->gObject).m_scriptHandle[4];
-	  if ((pvVar14 == (void *)0x85) &&
-	     (-1 < (int)((uint)(byte)m_boss__8CGMonObj._92_1_ << 0x19 |
-	                (uint)((byte)m_boss__8CGMonObj._92_1_ >> 7)))) {
-	    if (DAT_8032eea4 == '\0') {
-	      DAT_8032eea4 = '\x01';
-	      FLOAT_8032eea0 = FLOAT_80331cf8;
-	    }
-	    PSMTXRotRad(FLOAT_8032eea0,SoundBuffer._1260_4_ + 0x14,0x78);
-	    PSMTXRotRad(-FLOAT_8032eea0,SoundBuffer._1264_4_ + 0x14,0x78);
-	    fVar5 = FLOAT_80331d5c;
-	    fVar4 = FLOAT_80331d58;
-	    dVar3 = DOUBLE_80331d38;
-	    fVar2 = FLOAT_80331d2c;
-	    iVar12 = -0x7fcffeb4;
-	    iVar13 = 0;
-	    iVar15 = 2;
-	    do {
-	      uVar6 = iVar13 + 3;
-	      uVar10 = iVar13 + 4;
-	      uVar7 = iVar13 + 5;
-	      uVar11 = iVar13 + 7;
-	      uVar8 = iVar13 + 6;
-	      uVar9 = iVar13 + 8;
-	      iVar13 = iVar13 + 6;
-	      *(float *)(*(int *)(iVar12 + 0x38) + 0x1b4) =
-	           (fVar4 * fVar2 * (float)((double)CONCAT44(0x43300000,uVar6 ^ 0x80000000) - dVar3)) /
-	           fVar5 + FLOAT_8032eea0;
-	      *(float *)(*(int *)(iVar12 + 0x3c) + 0x1b4) =
-	           (fVar4 * fVar2 * (float)((double)CONCAT44(0x43300000,uVar10 ^ 0x80000000) - dVar3)) /
-	           fVar5 + FLOAT_8032eea0;
-	      *(float *)(*(int *)(iVar12 + 0x40) + 0x1b4) =
-	           (fVar4 * fVar2 * (float)((double)CONCAT44(0x43300000,uVar7 ^ 0x80000000) - dVar3)) /
-	           fVar5 + FLOAT_8032eea0;
-	      *(float *)(*(int *)(iVar12 + 0x44) + 0x1b4) =
-	           (fVar4 * fVar2 * (float)((double)CONCAT44(0x43300000,uVar8 ^ 0x80000000) - dVar3)) /
-	           fVar5 + FLOAT_8032eea0;
-	      *(float *)(*(int *)(iVar12 + 0x48) + 0x1b4) =
-	           (fVar4 * fVar2 * (float)((double)CONCAT44(0x43300000,uVar11 ^ 0x80000000) - dVar3)) /
-	           fVar5 + FLOAT_8032eea0;
-	      piVar1 = (int *)(iVar12 + 0x4c);
-	      iVar12 = iVar12 + 0x18;
-	      *(float *)(*piVar1 + 0x1b4) =
-	           (fVar4 * fVar2 * (float)((double)CONCAT44(0x43300000,uVar9 ^ 0x80000000) - dVar3)) /
-	           fVar5 + FLOAT_8032eea0;
-	      iVar15 = iVar15 + -1;
-	    } while (iVar15 != 0);
-	    FLOAT_8032eea0 = FLOAT_8032eea0 + FLOAT_80331d60;
-	  }
-	  if (((((int)pvVar14 < 0x88) && (0x84 < (int)pvVar14)) &&
-	      (m_boss__8CGMonObj._88_4_ == (int)pvVar14 + -0x85)) &&
-	     (((int)((uint)(byte)m_boss__8CGMonObj._92_1_ << 0x18) < 0 &&
-	      (iVar12 = _getItemPdt__10CGCharaObjFiiRiRiRi(gMonObj), iVar12 != 0)))) {
-	    if (m_boss__8CGMonObj._96_4_ == 0) {
-	      changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,100,0,0);
-	      gMonObj->_bossBranchRelated = 0;
-	    }
-	    if (m_boss__8CGMonObj._96_4_ == 2) {
-	      changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,0x65,0,0);
-	      gMonObj->_bossBranchRelated = 2;
-	    }
-	    if (m_boss__8CGMonObj._96_4_ == 1) {
-	      changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,0x66,0,0);
-	      gMonObj->_bossBranchRelated = 1;
-	    }
-	    m_boss__8CGMonObj._92_1_ = m_boss__8CGMonObj._92_1_ & 0x7f;
-	  }
-	  return;
-	}
-	
-	#endif
 	CGObject* object = reinterpret_cast<CGObject*>(this);
+	CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	u8* bossFlags = m_boss__8CGMonObj + 0x5C;
+	int* bossIndex = reinterpret_cast<int*>(m_boss__8CGMonObj + 0x58);
+	int* bossMode = reinterpret_cast<int*>(m_boss__8CGMonObj + 0x60);
+	u8* mon = reinterpret_cast<u8*>(this);
+	const int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
+
 	if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x85) && ((*reinterpret_cast<unsigned char*>(SoundBuffer + 1356) & 0x40) == 0)) {
 		*reinterpret_cast<float*>(SoundBuffer + 1260) += FLOAT_80331d60;
+	}
+
+	if (scriptKind < 0x88 && scriptKind > 0x84 && *bossIndex == scriptKind - 0x85 && (*bossFlags & 0x80) != 0) {
+		int effect;
+		int arg0;
+		int arg1;
+		if (chara->getItemPdt(0, 0, effect, arg0, arg1) != 0) {
+			if (*bossMode == 0) {
+				changeStat__8CGPrgObjFiii(prgObj, 100, 0, 0);
+				*reinterpret_cast<int*>(mon + 0x6B4) = 0;
+			}
+			if (*bossMode == 2) {
+				changeStat__8CGPrgObjFiii(prgObj, 0x65, 0, 0);
+				*reinterpret_cast<int*>(mon + 0x6B4) = 2;
+			}
+			if (*bossMode == 1) {
+				changeStat__8CGPrgObjFiii(prgObj, 0x66, 0, 0);
+				*reinterpret_cast<int*>(mon + 0x6B4) = 1;
+			}
+			*bossFlags &= 0x7F;
+		}
 	}
 }
 

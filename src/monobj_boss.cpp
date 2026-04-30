@@ -33,6 +33,7 @@ extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFla
     void*, void*, int, int, int, void*, void*);
 extern "C" void moveFrame__8CGMonObjFv(CGMonObj*);
 extern "C" void rotTarget__8CGMonObjFif(CGMonObj*, int, float);
+extern "C" void CGMonObj_ResetActionState(CGMonObj*);
 extern float FLOAT_80331dd0;
 extern float FLOAT_80331cf8;
 extern float FLOAT_80331dcc;
@@ -1514,9 +1515,19 @@ void CGMonObj::cancelStatFuncTetsukyojin()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	const int state = prgObj->m_lastStateId;
-	if (state == 0x66) {
+	if (state != 0x66) {
+		if (state < 0x66) {
+			if (state != 100) {
+				return;
+			}
+		} else if (state >= 0x68) {
+			return;
+		}
+	} else {
 		object->m_bgColMask |= 0xC0002;
+		return;
 	}
+	CGMonObj_ResetActionState(this);
 }
 
 /*

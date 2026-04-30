@@ -5,7 +5,10 @@
 extern "C" void create__10CSystemPcsFv(CSystemPcs*);
 extern "C" void destroy__10CSystemPcsFv(CSystemPcs*);
 extern "C" void calc__10CSystemPcsFv(CSystemPcs*);
-extern const char s_CSystemPcs_801D7C48[];
+
+const char s_CSystemPcs_801D7C48[] = "CSystemPcs";
+const char s_CManager_801D7C54[] = "CManager";
+const char s_CProcess_801D7C60[] = "CProcess";
 
 CSystemPcs SystemPcs;
 unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {

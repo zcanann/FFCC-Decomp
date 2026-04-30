@@ -231,22 +231,22 @@ int RedNewA(int size, int offset, int maxSize)
 		bestBlock = blockPtr;
 	}
 
-	if ((bestBlock == 0) || ((unsigned int)(rangeStart + maxSize) < result + alignedSize)) {
+	if ((bestBlock != 0) && ((unsigned int)(result + alignedSize) <= (unsigned int)(rangeStart + maxSize))) {
+		blockPtr = bestBlock;
+		if (blockPtr[1] > 0) {
+			moveCount = ((int)(m_AMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
+			if ((int)moveCount > 0) {
+				memmove(blockPtr + 2, blockPtr, moveCount * 8);
+			}
+		}
+		*blockPtr = result;
+		blockPtr[1] = alignedSize;
 		OSRestoreInterrupts(interrupts);
-		return 0;
+		return result;
 	}
 
-	blockPtr = bestBlock;
-	if (blockPtr[1] > 0) {
-		moveCount = ((int)(m_AMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
-		if ((int)moveCount > 0) {
-			memmove(blockPtr + 2, blockPtr, moveCount * 8);
-		}
-	}
-	*blockPtr = result;
-	blockPtr[1] = alignedSize;
 	OSRestoreInterrupts(interrupts);
-	return result;
+	return 0;
 }
 /*
  * --INFO--

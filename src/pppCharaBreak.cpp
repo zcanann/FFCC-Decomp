@@ -282,7 +282,6 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     u8* model;
     void* handle;
     u8* mesh;
-    u32 meshCount;
     u32 i;
 
     if (gPppCalcDisabled != 0) {
@@ -337,12 +336,12 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     }
 
     mesh = reinterpret_cast<u8*>(ModelMeshes(reinterpret_cast<CChara::CModel*>(model)));
-    meshCount = ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount;
 
     if (work->m_meshBuffers == NULL) {
         work->m_miscValue = FLOAT_80332050;
-        work->m_meshBuffers = pppMemFree__FPv(meshCount << 2, pppEnvStPtr->m_stagePtr,
-                                              const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3D0);
+        work->m_meshBuffers =
+            pppMemFree__FPv(ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount << 2,
+                            pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3D0);
         if (work->m_meshBuffers == NULL) {
             goto fail;
         }
@@ -351,28 +350,30 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
             ((u32*)work->m_meshBuffers)[i] = 0;
         }
 
-        for (i = 0; i < meshCount; i++) {
-            CharaBreakMeshData* meshData = *(CharaBreakMeshData**)(mesh + 8);
+        for (i = 0; i < ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount; i++) {
+            {
+                CharaBreakMeshData* meshData = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data;
 
-            if (strcmp(meshData->m_name, "") == 0) {
-                CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
-                    &gUtil,
-                    &work->m_bboxMin,
-                    &work->m_bboxMax,
-                    reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_workPositions,
-                    meshData->m_vertexCount,
-                    ModelData(reinterpret_cast<CChara::CModel*>(model))->m_posQuant);
+                if (strcmp(meshData->m_name, "") == 0) {
+                    CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
+                        &gUtil,
+                        &work->m_bboxMin,
+                        &work->m_bboxMax,
+                        reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_workPositions,
+                        meshData->m_vertexCount,
+                        ModelData(reinterpret_cast<CChara::CModel*>(model))->m_posQuant);
+                }
             }
 
             ((u32*)work->m_meshBuffers)[i] = (u32)pppMemFree__FPv(
-                meshData->m_displayListCount << 2, pppEnvStPtr->m_stagePtr,
+                reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayListCount << 2, pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3E9);
             if (((u32*)work->m_meshBuffers)[i] == 0) {
                 goto fail;
             }
 
             {
-                int displayListCount = meshData->m_displayListCount;
+                int displayListCount = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayListCount;
                 int* dlEntries = (int*)((u32*)work->m_meshBuffers)[i];
                 for (int dl = displayListCount - 1; dl >= 0; dl--) {
                     dlEntries[dl] = 0;
@@ -380,8 +381,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
             }
 
             {
-                int displayListCount = meshData->m_displayListCount;
-                CharaBreakDisplayList* displayList = meshData->m_displayLists;
+                int displayListCount = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayListCount;
+                CharaBreakDisplayList* displayList = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayLists;
                 CharaBreakDisplayListPair** dlEntries =
                     (CharaBreakDisplayListPair**)(((u32*)work->m_meshBuffers)[i] + ((displayListCount - 1) << 2));
                 for (int dl = displayListCount - 1; dl >= 0; dl--) {

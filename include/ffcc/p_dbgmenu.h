@@ -60,8 +60,6 @@ public:
     int GetTable(unsigned long);
     void create();
     void destroy();
-    void selectNext();
-    void selectPrev();
     void calc();
     void draw();
     void calcMenu(CDM*);
@@ -73,7 +71,6 @@ public:
     int searchID(int, CDM&);
     void Add();
     void Add(int, int, CDMParam&);
-    void Delete(int);
     int GetDbgFlag();
     inline u32 GetDbgFlagsRaw() const { return m_dbgFlags; }
 

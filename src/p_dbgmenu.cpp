@@ -167,7 +167,7 @@ void CDbgMenuPcs::destroy()
 	return;
 }
 
-CDbgMenuPcs::CDbgMenuPcs()
+inline CDbgMenuPcs::CDbgMenuPcs()
 {
     m_table__11CDbgMenuPcs[1] = m_table_desc0__11CDbgMenuPcs[0];
     m_table__11CDbgMenuPcs[2] = m_table_desc0__11CDbgMenuPcs[1];
@@ -181,50 +181,6 @@ CDbgMenuPcs::CDbgMenuPcs()
     m_table__11CDbgMenuPcs[12] = m_table_desc3__11CDbgMenuPcs[0];
     m_table__11CDbgMenuPcs[13] = m_table_desc3__11CDbgMenuPcs[1];
     m_table__11CDbgMenuPcs[14] = m_table_desc3__11CDbgMenuPcs[2];
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CDbgMenuPcs::selectNext()
-{
-	if (m_currentMenu == 0) {
-		return;
-	}
-
-	CDM* start = m_currentMenu;
-	m_currentMenu->m_status &= 0xBF;
-	do {
-		m_currentMenu = m_currentMenu->m_next;
-		if ((m_currentMenu->m_flags & 1) != 0) {
-			break;
-		}
-	} while (m_currentMenu != start);
-	m_currentMenu->m_status = (m_currentMenu->m_status & 0xBF) | 0x40;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CDbgMenuPcs::selectPrev()
-{
-	if (m_currentMenu == 0) {
-		return;
-	}
-
-	CDM* start = m_currentMenu;
-	m_currentMenu->m_status &= 0xBF;
-	do {
-		m_currentMenu = m_currentMenu->m_prev;
-		if ((m_currentMenu->m_flags & 1) != 0) {
-			break;
-		}
-	} while (m_currentMenu != start);
-	m_currentMenu->m_status = (m_currentMenu->m_status & 0xBF) | 0x40;
 }
 
 /*
@@ -253,7 +209,7 @@ void CDbgMenuPcs::calc()
 	}
 
 	if ((padInput & 0x100) != 0) {
-		switch (m_currentMenu->m_id) {
+		switch (m_selectedMenu->m_id) {
 		case 100:
 			*(unsigned int*)(CFlat + 0x12A4) = ~*(unsigned int*)(CFlat + 0x12A4);
 			break;
@@ -345,7 +301,15 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	}
 	if ((padInput & 4) != 0) {
-		selectNext();
+		CDM* start = m_selectedMenu;
+		m_selectedMenu->m_status &= 0xBF;
+		do {
+			m_selectedMenu = m_selectedMenu->m_next;
+			if ((m_selectedMenu->m_flags & 1) != 0) {
+				break;
+			}
+		} while (m_selectedMenu != start);
+		m_selectedMenu->m_status = (m_selectedMenu->m_status & 0xBF) | 0x40;
 	}
 
 	if (Pad._452_4_ == 0) {
@@ -356,7 +320,15 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	}
 	if ((padInput & 8) != 0) {
-		selectPrev();
+		CDM* start = m_selectedMenu;
+		m_selectedMenu->m_status &= 0xBF;
+		do {
+			m_selectedMenu = m_selectedMenu->m_prev;
+			if ((m_selectedMenu->m_flags & 1) != 0) {
+				break;
+			}
+		} while (m_selectedMenu != start);
+		m_selectedMenu->m_status = (m_selectedMenu->m_status & 0xBF) | 0x40;
 	}
 
 	if (m_rootMenuNode.m_firstChild != 0) {
@@ -924,35 +896,6 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 			m_defaultMenu = menu;
 		}
 	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CDbgMenuPcs::Delete(int id)
-{
-	CDM* menu = reinterpret_cast<CDM*>(searchID(id, m_rootMenuNode));
-	if (menu == 0) {
-		return;
-	}
-
-	if (m_selectedMenu == menu) {
-		m_selectedMenu = 0;
-	}
-	if (m_defaultMenu == menu) {
-		m_defaultMenu = 0;
-	}
-
-	CDM* parent = menu->m_parent;
-	if (parent != 0 && parent->m_firstChild == menu) {
-		parent->m_firstChild = (menu->m_next != menu) ? menu->m_next : 0;
-	}
-
-	menu->m_prev->m_next = menu->m_next;
-	menu->m_next->m_prev = menu->m_prev;
-	memset(&menu->m_status, 0, 0x20);
 }
 
 /*

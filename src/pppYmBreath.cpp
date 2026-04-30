@@ -20,13 +20,6 @@ extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSe
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
-extern const float FLOAT_80330c80;
-
-extern const float FLOAT_80330c80;
-
-extern const float FLOAT_80330c80;
-
-extern const float FLOAT_80330c80;
 
 struct pppYmBreathUnkC {
     unsigned char _pad[0xC];
@@ -498,12 +491,12 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     PARTICLE_WMAT* particleWMat;
     Mtx* particleMtx;
     int i;
-    int groupIndex;
+    short groupIndex;
     int firstParticle;
     int groupTable;
-    int slotIndex;
+    short slotIndex;
     unsigned int slotCount;
-    bool ready;
+    int ready;
     float scaledOwner;
     Mtx scaleMtx;
     Mtx worldMtx;
@@ -597,11 +590,11 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
             if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
                 (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {
-                ready = false;
+                ready = 0;
                 goto group_ready;
             }
         }
-        ready = true;
+        ready = 1;
 group_ready:
         if (ready) {
             firstParticle = -1;
@@ -652,7 +645,7 @@ group_ready:
 void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VColor* vColor)
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
-    bool found;
+    int found;
     int spawnCount;
     int i;
     int j;
@@ -691,7 +684,11 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                                   *(short*)(particleData + 0x58), *(short*)(particleData + 0x5A),
                                   *(short*)(particleData + 0x56), params->m_shapeFrameArg);
             } else {
+                float zero = 0.0f;
+
                 groupTableWork = (int)vYmBreath->m_groups;
+                foundGroup = -1;
+                foundSlot = -1;
                 for (short groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
                     for (short slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
                         if ((int)(short)i == (int)*(signed char*)(*(int*)(groupTableWork + 4) + (int)slotIndex)) {
@@ -704,8 +701,6 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                     groupTableWork += 0x5C;
                 }
                 found = false;
-                foundSlot = -1;
-                foundGroup = -1;
 
             found_index:
                 if (found) {
@@ -727,9 +722,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                     found = true;
 
                 group_checked:
-                    if (found) {
-                        float zero = 0.0f;
-
+                    if (found == 1) {
                         groupData = &groupTable[(int)foundGroup];
                         for (slot = 0; slot < (int)params->m_slotCount; slot++) {
                             groupData->particleStates[slot] = -1;

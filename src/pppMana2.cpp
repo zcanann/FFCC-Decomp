@@ -222,8 +222,12 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80108c80
+ * PAL Size: 304b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 {
@@ -246,8 +250,8 @@ void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 
     work[0] = 0;
     work[1] = 0;
-    work[8] = 0;
     work[9] = 0;
+    work[8] = 0;
     work[15] = 0;
     work[16] = 0;
     work[18] = 0;

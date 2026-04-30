@@ -265,7 +265,8 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 
     const unsigned int rings = detail;
     const int ringVertexCount = rings + 1;
-    const unsigned int displayListSize = ((ringVertexCount + (rings - 2) * ringVertexCount * 2) * 0x18 + 0x1F) & ~0x1F;
+    const unsigned int displayListFloats = (ringVertexCount + (rings - 2) * ringVertexCount * 2) * 6;
+    const unsigned int displayListSize = (displayListFloats * sizeof(float) + 0x1F) & ~0x1F;
 
     DCInvalidateRange(displayListBuffer, displayListSize);
     GXBeginDisplayList(displayListBuffer, displayListSize);
@@ -567,6 +568,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     int animFrameMax;
     u32 animFrameCount;
     int frameInt;
+    float modelTime;
     float frame;
     Vec local88;
     Vec local94;
@@ -611,14 +613,15 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
 
     modelRaw = (CModelRaw*)model;
     node = (CChara::CNode*)(modelRaw->m_nodes + skNodeIndex * 0xC0);
-    if (modelRaw->m_anim == 0) {
-        animFrameCount = 0;
-    } else {
+    modelTime = modelRaw->m_time;
+    if (modelRaw->m_anim != 0) {
         animFrameCount = modelRaw->m_anim->m_frameCount;
+    } else {
+        animFrameCount = 0;
     }
 
     animFrameMax = (int)(float)animFrameCount;
-    frameInt = (int)modelRaw->m_time;
+    frameInt = (int)modelTime;
     frame = (float)(frameInt - (frameInt / animFrameMax) * animFrameMax);
     if (frame < 0.0f) {
         return 0;
@@ -758,10 +761,6 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][2] = localF4.y;
                 localMatrix.value[2][2] = localF4.z;
             }
-
-            localMatrix.value[0][3] += local88.x;
-            localMatrix.value[1][3] += local88.y;
-            localMatrix.value[2][3] += local88.z;
             goto copy_out;
         }
         break;

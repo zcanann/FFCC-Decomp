@@ -21,7 +21,7 @@ extern "C" const char DAT_801d669c[] =
     "                          GetData  TimeOut\n"
     "===================================================================\n"
     "===================================================================\n";
-extern "C" const char DAT_801d67d8[] =
+extern "C" const char DAT_801d67d8[40] =
     "\x83\x71\x81\x5b\x83\x76\x82\xaa\x88\xd9\x8f\xed\x82\xc8\x82\xcc"
     "\x82\xc5\x95\x60\x89\xe6\x82\xf0\x92\x86\x8e\x7e\x82\xb5\x82\xdc"
     "\x82\xb7\x81\x42\n";

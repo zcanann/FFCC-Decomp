@@ -353,8 +353,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 		track = SearchSeEmptyTrack((int)remaining, ((unsigned char*)info)[3], attrMask);
 		attrMask = 0;
 		if (track == 0) {
-			SeStopID(seId);
-			return 0;
+			break;
 		}
 
 		seTrack = (int*)((unsigned char*)p_VoiceData + *(char*)((char*)track + 0x14e) * 0xc0);
@@ -449,6 +448,9 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			return seId;
 		}
 	} while (true);
+
+	SeStopID(seId);
+	return 0;
 }
 
 /*

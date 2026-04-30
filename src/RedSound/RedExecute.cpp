@@ -830,7 +830,7 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
         }
     }
 
-    SetVoiceVolumeMix(voice, pan, voiceMix);
+    SetVoiceVolumeMix((RedVoiceDATA*)voiceData, pan, voiceMix);
     voiceData[0x24] |= 8;
 }
 

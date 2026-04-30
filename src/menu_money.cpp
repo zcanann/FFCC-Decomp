@@ -41,6 +41,8 @@ extern double DOUBLE_80332F90;
 extern double DOUBLE_80332F98;
 extern double DOUBLE_80332FA0;
 
+extern CMenuPcs MenuPcs;
+
 namespace {
 static void UpdateDigits(unsigned int value, signed char* outDigits) {
     int div = 10000000;
@@ -67,7 +69,7 @@ static void UpdateDigits(unsigned int value, signed char* outDigits) {
 }
 } // namespace
 
-unsigned int gMenuMoneyTransferAmount = 0;
+unsigned int s_Money = 0;
 signed char s_place[16];
 
 STATIC_ASSERT(offsetof(CMenuPcs, moneyFont) == 0x108);
@@ -154,13 +156,14 @@ void CMenuPcs::MoneyInit()
 	*(int *)(iVar4 + 0x30) = 10;
 	this->moneyPanel->count = 1;
 
-	gMenuMoneyTransferAmount = 0;
+	unsigned int scriptFood = Game.m_scriptFoodBase[0];
+	s_Money = 0;
 	puVar10 = s_place;
 	iVar5 = 0;
 	do {
 		iVar4 = 10000000;
 		if (iVar5 == 0) {
-			iVar8 = *(int *)(Game.m_scriptFoodBase[0] + 0x200);
+			iVar8 = *(int *)(scriptFood + 0x200);
 		} else {
 			iVar8 = 0;
 		}
@@ -250,13 +253,14 @@ bool CMenuPcs::MoneyOpen()
 		*(int *)(iVar8 + 0x30) = 10;
 		this->moneyPanel->count = 1;
 
-		gMenuMoneyTransferAmount = 0;
+		unsigned int scriptFood = Game.m_scriptFoodBase[0];
+		s_Money = 0;
 		puVar9 = s_place;
 		iVar15 = 0;
 		do {
 			iVar8 = 10000000;
 			if (iVar15 == 0) {
-				iVar12 = *(int *)(Game.m_scriptFoodBase[0] + 0x200);
+				iVar12 = *(int *)(scriptFood + 0x200);
 			} else {
 				iVar12 = 0;
 			}
@@ -436,7 +440,7 @@ bool CMenuPcs::MoneyClose()
 void CMenuPcs::MoneyDraw()
 {
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
 	MoneyMenuState* moneyState = this->moneyState;
 	MoneyMenuAnimList* moneyPanel = this->moneyPanel;
@@ -451,16 +455,21 @@ void CMenuPcs::MoneyDraw()
 			continue;
 		}
 
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+		float x = (float)entry[0];
+		float y = (float)entry[1];
+		float w = (float)entry[2];
+		float h = (float)entry[3];
+		float u = *(float*)(entry + 4);
+		float v = *(float*)(entry + 6);
+		float uvScale = *(float*)(entry + 10);
+		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 		GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * *(float*)(entry + 8))};
 		GXSetChanMatColor(GX_COLOR0A0, color);
-		DrawRect__8CMenuPcsFUlfffffffff(this, 0, (float)entry[0], (float)entry[1], (float)entry[2], (float)entry[3],
-		                                *(float*)(entry + 4), *(float*)(entry + 6), *(float*)(entry + 10),
-		                                *(float*)(entry + 10), 0.0f);
+		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332f64);
 	}
 
 	s16* drawBase = reinterpret_cast<s16*>(moneyPanel->anims);
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x5D);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x5D);
 	{
 		GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8))};
 		GXSetChanMatColor(GX_COLOR0A0, color);
@@ -472,24 +481,24 @@ void CMenuPcs::MoneyDraw()
 		for (int j = 0; j < 8; j++) {
 			signed char digit = s_place[i * 8 + j];
 			if (digit >= 0) {
-				DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, FLOAT_80332f6c, FLOAT_80332f68,
+				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, FLOAT_80332f6c, FLOAT_80332f68,
 				                                FLOAT_80332f6c * (float)digit, FLOAT_80332f68 * (float)i,
-				                                FLOAT_80332f70, FLOAT_80332f70, 0.0f);
+				                                FLOAT_80332f70, FLOAT_80332f70, FLOAT_80332f64);
 			}
 			x += FLOAT_80332f74;
 		}
 	}
 
 	if ((mode == 0) && (selectionState == 1)) {
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x48);
+		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x48);
 		{
 			GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8))};
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 
-		DrawRect__8CMenuPcsFUlfffffffff(this, 0, (float)(drawBase[0] + (7 - moneyState->selectedIndex) * 0x12 + 0x24),
+		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, (float)(drawBase[0] + (7 - moneyState->selectedIndex) * 0x12 + 0x24),
 		                                (float)(drawBase[1] + 0x5C), FLOAT_80332f78, FLOAT_80332f6c, FLOAT_80332f64,
-		                                FLOAT_80332f64, FLOAT_80332f70, FLOAT_80332f70, 0.0f);
+		                                FLOAT_80332f64, FLOAT_80332f70, FLOAT_80332f70, FLOAT_80332f64);
 	}
 
 	CFont* font = this->moneyFont;
@@ -554,8 +563,9 @@ int CMenuPcs::MoneyCtrlCur()
 	if (blocked) {
 		press = 0;
 	} else {
-		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
-		press = Pad._8_2_;
+		int padIndex = blocked;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		press = *(u16*)((u8*)&Pad + padIndex * 0x54 + 8);
 	}
 
 	blocked = false;
@@ -565,8 +575,9 @@ int CMenuPcs::MoneyCtrlCur()
 	if (blocked) {
 		hold = 0;
 	} else {
-		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
-		hold = Pad._20_2_;
+		int padIndex = blocked;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		hold = *(u16*)((u8*)&Pad + padIndex * 0x54 + 0x14);
 	}
 
 	if (hold == 0) {
@@ -599,15 +610,15 @@ int CMenuPcs::MoneyCtrlCur()
 				if (gil == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					if (-1 < (int)(gMenuMoneyTransferAmount - placeValue)) {
-						gil = gMenuMoneyTransferAmount - placeValue;
+					if (-1 < (int)(s_Money - placeValue)) {
+						gil = s_Money - placeValue;
 					}
 					int iVar9 = 0;
 					int iVar8 = 10000000;
 					signed char* puVar10 = s_place + 8;
 					int iVar11 = 8;
 					bool started = false;
-					gMenuMoneyTransferAmount = gil;
+					s_Money = gil;
 					do {
 						if ((!started) && (iVar8 <= (int)gil)) {
 							started = true;
@@ -633,7 +644,7 @@ int CMenuPcs::MoneyCtrlCur()
 		} else if (*(int*)(caravanWork + 0x200) == 0) {
 			Sound.PlaySe(4, 0x40, 0x7F, 0);
 		} else {
-			unsigned int gil = gMenuMoneyTransferAmount + placeValue;
+			unsigned int gil = s_Money + placeValue;
 			if ((unsigned int)*(int*)(caravanWork + 0x200) < gil) {
 				gil = *(int*)(caravanWork + 0x200);
 			}
@@ -642,7 +653,7 @@ int CMenuPcs::MoneyCtrlCur()
 			signed char* puVar10 = s_place + 8;
 			int iVar11 = 8;
 			bool started = false;
-			gMenuMoneyTransferAmount = gil;
+			s_Money = gil;
 			do {
 				if ((!started) && (iVar8 <= (int)gil)) {
 					started = true;
@@ -694,7 +705,7 @@ int CMenuPcs::MoneyCtrlCur()
 				*(u8*)(menuState + 0xD) = 1;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 			} else if ((press & 0x100) != 0) {
-				if (gMenuMoneyTransferAmount < 1) {
+				if (s_Money < 1) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
 					*(u8*)(menuState + 9) = 2;
@@ -733,8 +744,8 @@ int CMenuPcs::MoneyCtrlCur()
 					return 0;
 				}
 				if (*(s16*)(optBase + 0x26) == 0) {
-					FGPutGil__12CCaravanWorkFi((void*)caravanWork, (int)gMenuMoneyTransferAmount);
-					gMenuMoneyTransferAmount = 0;
+					FGPutGil__12CCaravanWorkFi((void*)caravanWork, (int)s_Money);
+					s_Money = 0;
 					int iVar8 = *(int*)(Game.m_scriptFoodBase[0] + 0x200);
 					int iVar9 = 0;
 					int iVar11 = 10000000;

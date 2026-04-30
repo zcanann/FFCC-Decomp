@@ -62,8 +62,6 @@ extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" void __ct__21CPtrArray_P8CTexture_Fv(void*);
 extern "C" void __dt__21CPtrArray_P8CTexture_Fv(void*, int);
 extern "C" bool Add__21CPtrArray_P8CTexture_FP8CTexture(void*, CTexture*);
-extern "C" void SetDefaultSize__21CPtrArray_P8CTexture_FUl(void*, unsigned long);
-extern "C" void SetStage__21CPtrArray_P8CTexture_FPQ27CMemory6CStage(void*, CMemory::CStage*);
 extern "C" int GetSize__21CPtrArray_P8CTexture_Fv(void*);
 extern "C" CTexture* __vc__21CPtrArray_P8CTexture_FUl(void*, unsigned long);
 extern "C" void SetAt__21CPtrArray_P8CTexture_FUlP8CTexture(void*, unsigned long, CTexture*);
@@ -203,6 +201,7 @@ bool CPtrArray<CTexture*>::Add(CTexture* item)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 void CPtrArray<CTexture*>::SetAt(unsigned long index, CTexture* item)
 {
@@ -323,6 +322,7 @@ void CPtrArray<CTexture*>::SetDefaultSize(unsigned long defaultSize)
 {
     m_defaultSize = defaultSize;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -590,7 +590,7 @@ CTexture::~CTexture()
  */
 CTextureSet::~CTextureSet()
 {
-    ReleaseAndRemoveAll__21CPtrArray_P8CTexture_Fv(TextureArray(m_textureArrayStorage));
+    TextureArray(m_textureArrayStorage)->ReleaseAndRemoveAll();
     __dt__21CPtrArray_P8CTexture_Fv(TextureArray(m_textureArrayStorage), -1);
 }
 
@@ -1031,8 +1031,8 @@ void CTexture::FlushExternalTlut(void* tlutData)
 CTextureSet::CTextureSet()
 {
     __ct__21CPtrArray_P8CTexture_Fv(TextureArray(m_textureArrayStorage));
-    SetDefaultSize__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), 0x10);
-    SetStage__21CPtrArray_P8CTexture_FPQ27CMemory6CStage(TextureArray(m_textureArrayStorage), TextureMan.m_memoryStage);
+    TextureArray(m_textureArrayStorage)->SetDefaultSize(0x10);
+    TextureArray(m_textureArrayStorage)->SetStage(TextureMan.m_memoryStage);
 }
 
 /*
@@ -1205,8 +1205,8 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
  */
 int CTextureSet::Find(char* name)
 {
-    for (unsigned long i = 0; i < static_cast<unsigned long>(GetSize__21CPtrArray_P8CTexture_Fv(TextureArray(m_textureArrayStorage))); i++) {
-        CTexture* texture = __vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), i);
+    for (unsigned long i = 0; i < static_cast<unsigned long>(TextureArray(m_textureArrayStorage)->GetSize()); i++) {
+        CTexture* texture = (*TextureArray(m_textureArrayStorage))[i];
         if ((texture != 0) && (strcmp(texture->m_name, name) == 0)) {
             return static_cast<int>(i);
         }
@@ -1225,22 +1225,22 @@ int CTextureSet::Find(char* name)
  */
 void CTextureSet::ReleaseTextureIdx(int idx, CAmemCacheSet* amemCacheSet)
 {
-    if (__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx) != 0) {
-        if (__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx)->m_cacheId != -1) {
-            if (*reinterpret_cast<int*>(Ptr(__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx), 4)) <= 1) {
-                amemCacheSet->DestroyCache(__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx)->m_cacheId);
-                __vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx)->m_imageData = 0;
+    if ((*TextureArray(m_textureArrayStorage))[idx] != 0) {
+        if ((*TextureArray(m_textureArrayStorage))[idx]->m_cacheId != -1) {
+            if (*reinterpret_cast<int*>(Ptr((*TextureArray(m_textureArrayStorage))[idx], 4)) <= 1) {
+                amemCacheSet->DestroyCache((*TextureArray(m_textureArrayStorage))[idx]->m_cacheId);
+                (*TextureArray(m_textureArrayStorage))[idx]->m_imageData = 0;
             }
         }
 
-        int* refObj = reinterpret_cast<int*>(__vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), idx));
+        int* refObj = reinterpret_cast<int*>((*TextureArray(m_textureArrayStorage))[idx]);
         int refCount = refObj[1] - 1;
         refObj[1] = refCount;
         if ((refCount == 0) && (refObj != 0)) {
             (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
         }
 
-        SetAt__21CPtrArray_P8CTexture_FUlP8CTexture(TextureArray(m_textureArrayStorage), idx, 0);
+        TextureArray(m_textureArrayStorage)->SetAt(idx, 0);
     }
 }
 

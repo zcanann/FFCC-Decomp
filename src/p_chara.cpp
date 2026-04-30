@@ -710,22 +710,18 @@ extern "C" CPtrArray<CCharaPcs::CLoadModel*>* dtor_8007BB14(CPtrArray<CCharaPcs:
  */
 CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int stageIndex, CMemory::CStage* stage)
 {
-    if (stageIndex == 3) {
+    switch (stageIndex) {
+    case 1:
+        return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MapMng));
+    case 2:
+        return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+    case 3:
         return PartMng.m_pppEnvSt.m_stagePtr;
-    }
-
-    if (stageIndex < 3) {
-        if (stageIndex == 1) {
-            return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MapMng));
-        }
-        if (stageIndex > 0) {
-            return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x20);
-        }
-    } else if (stageIndex < 5) {
+    case 4:
         return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&CharaPcs) + 0xd4);
+    default:
+        return stage;
     }
-
-    return stage;
 }
 
 /*

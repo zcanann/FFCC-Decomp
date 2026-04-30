@@ -874,7 +874,7 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
 
     particle->m_scale += params->m_scaleAccel;
     if (params->m_disableScaleClamp == 0) {
-        float zero = 0.0f;
+        float zero = FLOAT_80330c80;
         if (zero < params->m_scaleClampStart) {
             if (params->m_scaleAccel < zero) {
                 if (particle->m_scale < zero) {

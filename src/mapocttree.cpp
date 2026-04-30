@@ -17,7 +17,6 @@ extern const float kMapOctTreeDefaultOffsetZ;
 const float kOctTreeBoundMinInit = 10000000000.0f;
 const float kOctTreeBoundMaxInit = -10000000000.0f;
 const float kOctTreeCylinderPad = 1.0f;
-unsigned long s_clearFlagMask;
 struct CBoundRaw
 {
     CBoundRaw()
@@ -93,10 +92,11 @@ struct CMaterialManEnvRaw
 CBoundRaw s_bound;
 CMapCylinderRaw s_cyl;
 Vec s_mvec;
-static unsigned long s_checkHitCylinderMask;
-static unsigned long s_insertLightBitIndex;
-static unsigned long s_insertShadowBitIndex;
-static int s_insertShadowDepth;
+unsigned long s_light_no = 0;
+unsigned long s_shadow_no = 0;
+int InsertShadow_level = 0;
+unsigned long clear_flag_mask = 0;
+unsigned long s_bitMask = 0;
 
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
@@ -1089,9 +1089,9 @@ void InsertLight_r(COctNode* node)
 	}
 
 	if (node->m_meshCount != 0) {
-		unsigned long byteOffset = (s_insertLightBitIndex >> 3) & 0x1ffffffc;
+		unsigned long byteOffset = (s_light_no >> 3) & 0x1ffffffc;
 		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&node->m_lightFlags, byteOffset));
-		*bits |= 1UL << (s_insertLightBitIndex & 0x1f);
+		*bits |= 1UL << (s_light_no & 0x1f);
 	}
 
 	for (int i = 0; i < 8; i++) {
@@ -1148,9 +1148,9 @@ void InsertLight_r(COctNode* node)
 
 		if (childOverlap) {
 			if (child->m_meshCount != 0) {
-				unsigned long byteOffset = (s_insertLightBitIndex >> 3) & 0x1ffffffc;
+				unsigned long byteOffset = (s_light_no >> 3) & 0x1ffffffc;
 				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&child->m_lightFlags, byteOffset));
-				*bits |= 1UL << (s_insertLightBitIndex & 0x1f);
+				*bits |= 1UL << (s_light_no & 0x1f);
 			}
 
 			for (int j = 0; j < 8; j++) {
@@ -1161,7 +1161,7 @@ void InsertLight_r(COctNode* node)
 
 				if ((reinterpret_cast<CBound*>(&s_bound)->CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
 					if (grandChild->m_meshCount != 0) {
-						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x44)), s_insertLightBitIndex);
+						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x44)), s_light_no);
 					}
 
 					for (int k = 0; k < 8; k++) {
@@ -1204,7 +1204,7 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
 		return;
 	}
 
-	s_insertLightBitIndex = bitIndex;
+	s_light_no = bitIndex;
 	PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
 	PSMTXMultVec(inverseMtx, &position, &localPosition);
 
@@ -1393,10 +1393,10 @@ void InsertShadow_r(COctNode* node)
 		return;
 	}
 
-	if ((s_insertShadowDepth >= 3) && (node->m_meshCount != 0)) {
-		unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
+	if ((InsertShadow_level >= 3) && (node->m_meshCount != 0)) {
+		unsigned long byteOffset = (s_shadow_no >> 3) & 0x1ffffffc;
 		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&node->m_shadowFlags, byteOffset));
-		*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
+		*bits |= 1UL << (s_shadow_no & 0x1f);
 	}
 
 	for (int i = 0; i < 8; i++) {
@@ -1405,7 +1405,7 @@ void InsertShadow_r(COctNode* node)
 			return;
 		}
 
-		s_insertShadowDepth++;
+		InsertShadow_level++;
 
 		float childBoundMinX = child->m_boundMinX;
 		bool childXOverlap = false;
@@ -1454,10 +1454,10 @@ void InsertShadow_r(COctNode* node)
 		}
 
 		if (childOverlap) {
-			if ((s_insertShadowDepth >= 3) && (child->m_meshCount != 0)) {
-				unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
+			if ((InsertShadow_level >= 3) && (child->m_meshCount != 0)) {
+				unsigned long byteOffset = (s_shadow_no >> 3) & 0x1ffffffc;
 				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&child->m_shadowFlags, byteOffset));
-				*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
+				*bits |= 1UL << (s_shadow_no & 0x1f);
 			}
 
 			for (int j = 0; j < 8; j++) {
@@ -1466,11 +1466,11 @@ void InsertShadow_r(COctNode* node)
 					break;
 				}
 
-				s_insertShadowDepth++;
+				InsertShadow_level++;
 
 				if ((reinterpret_cast<CBound*>(&s_bound)->CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
-					if ((s_insertShadowDepth >= 3) && (grandChild->m_meshCount != 0)) {
-						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x48)), s_insertShadowBitIndex);
+					if ((InsertShadow_level >= 3) && (grandChild->m_meshCount != 0)) {
+						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x48)), s_shadow_no);
 					}
 
 					for (int k = 0; k < 8; k++) {
@@ -1478,18 +1478,18 @@ void InsertShadow_r(COctNode* node)
 						if (greatGrandChild == 0) {
 							break;
 						}
-						s_insertShadowDepth++;
+						InsertShadow_level++;
 						InsertShadow_r(greatGrandChild);
 						grandChild = reinterpret_cast<COctNode*>(Ptr(grandChild, 4));
-						s_insertShadowDepth--;
+						InsertShadow_level--;
 					}
 				}
 				child = reinterpret_cast<COctNode*>(Ptr(child, 4));
-				s_insertShadowDepth--;
+				InsertShadow_level--;
 			}
 		}
 		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
-		s_insertShadowDepth--;
+		InsertShadow_level--;
 	}
 }
 
@@ -1508,7 +1508,7 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 	Mtx inverseMtx;
 
 	if (m_type == 0) {
-		s_insertShadowBitIndex = bitIndex;
+		s_shadow_no = bitIndex;
 		PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
 		PSMTXMultVec(inverseMtx, &position, &localPosition);
 
@@ -1517,7 +1517,7 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 		PSVECAdd(&s_bound.m_min, &localPosition, &s_bound.m_min);
 		PSVECAdd(&s_bound.m_max, &localPosition, &s_bound.m_max);
 
-		s_insertShadowDepth = 0;
+		InsertShadow_level = 0;
 		InsertShadow_r(m_nodePool);
 	}
 }
@@ -1543,7 +1543,7 @@ void ClearFlag_r(COctNode* node)
 	COctNode* child8;
 
 	if (node->m_meshCount != 0) {
-		node->m_drawFlags &= s_clearFlagMask;
+		node->m_drawFlags &= clear_flag_mask;
 	}
 
 	COctNode* nodeIter = node;
@@ -1553,7 +1553,7 @@ void ClearFlag_r(COctNode* node)
 			return;
 		}
 		if (child1->m_meshCount != 0) {
-			child1->m_drawFlags &= s_clearFlagMask;
+			child1->m_drawFlags &= clear_flag_mask;
 		}
 
 		for (int j = 0; j < 8; j++) {
@@ -1562,7 +1562,7 @@ void ClearFlag_r(COctNode* node)
 				break;
 			}
 			if (child2->m_meshCount != 0) {
-				child2->m_drawFlags &= s_clearFlagMask;
+				child2->m_drawFlags &= clear_flag_mask;
 			}
 
 			for (int k = 0; k < 8; k++) {
@@ -1571,7 +1571,7 @@ void ClearFlag_r(COctNode* node)
 					break;
 				}
 				if (child3->m_meshCount != 0) {
-					child3->m_drawFlags &= s_clearFlagMask;
+					child3->m_drawFlags &= clear_flag_mask;
 				}
 
 				for (int m = 0; m < 8; m++) {
@@ -1580,7 +1580,7 @@ void ClearFlag_r(COctNode* node)
 						break;
 					}
 					if (child4->m_meshCount != 0) {
-						child4->m_drawFlags &= s_clearFlagMask;
+						child4->m_drawFlags &= clear_flag_mask;
 					}
 
 					for (int n = 0; n < 8; n++) {
@@ -1589,7 +1589,7 @@ void ClearFlag_r(COctNode* node)
 							break;
 						}
 						if (child5->m_meshCount != 0) {
-							child5->m_drawFlags &= s_clearFlagMask;
+							child5->m_drawFlags &= clear_flag_mask;
 						}
 
 						for (int o = 0; o < 8; o++) {
@@ -1598,7 +1598,7 @@ void ClearFlag_r(COctNode* node)
 								break;
 							}
 							if (child6->m_meshCount != 0) {
-								child6->m_drawFlags &= s_clearFlagMask;
+								child6->m_drawFlags &= clear_flag_mask;
 							}
 
 							for (int p = 0; p < 8; p++) {
@@ -1607,7 +1607,7 @@ void ClearFlag_r(COctNode* node)
 									break;
 								}
 								if (child7->m_meshCount != 0) {
-									child7->m_drawFlags &= s_clearFlagMask;
+									child7->m_drawFlags &= clear_flag_mask;
 								}
 
 								for (int q = 0; q < 8; q++) {
@@ -1616,7 +1616,7 @@ void ClearFlag_r(COctNode* node)
 										break;
 									}
 									if (child8->m_meshCount != 0) {
-										child8->m_drawFlags &= s_clearFlagMask;
+										child8->m_drawFlags &= clear_flag_mask;
 									}
 
 									for (int r = 0; r < 8; r++) {
@@ -1663,7 +1663,7 @@ void ClearFlag_r(COctNode* node)
  */
 void COctTree::ClearFlag(unsigned long flag)
 {
-	s_clearFlagMask = ~flag;
+	clear_flag_mask = ~flag;
 	ClearFlag_r(m_nodePool);
 }
 
@@ -1734,7 +1734,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 	         ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
 	                            *reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)),
 	                            *reinterpret_cast<unsigned short*>(Ptr(node, 0x3C)),
-	                            s_checkHitCylinderMask) != 0)) {
+	                            s_bitMask) != 0)) {
 		return 1;
 	}
 
@@ -1796,7 +1796,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 			         ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
 			                            *reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)),
 			                            *reinterpret_cast<unsigned short*>(Ptr(child, 0x3C)),
-			                            s_checkHitCylinderMask) != 0)) {
+			                            s_bitMask) != 0)) {
 				return 1;
 			}
 
@@ -1812,7 +1812,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 					         ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
 					                            *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)),
 					                            *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3C)),
-					                            s_checkHitCylinderMask) != 0)) {
+					                            s_bitMask) != 0)) {
 						return 1;
 					}
 
@@ -1888,7 +1888,7 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 				s_cyl.m_direction2.y = s_cyl.m_direction.z - radiusPad;
 				s_cyl.m_height2 = s_cyl.m_bottom.z + radiusPad;
 			}
-			s_checkHitCylinderMask = flag;
+			s_bitMask = flag;
 			if (CheckHitCylinder_r(m_nodePool) != 0) {
 				return 1;
 			}
@@ -1965,7 +1965,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 		    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
 		                           *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)),
 		                           *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)),
-		                           s_checkHitCylinderMask);
+		                           s_bitMask);
 	}
 
 	for (int i = 0; i < 8; i++) {
@@ -2026,7 +2026,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 				    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
 				                           *reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)),
 				                           *reinterpret_cast<unsigned short*>(Ptr(child, 0x3C)),
-				                           s_checkHitCylinderMask);
+				                           s_bitMask);
 			}
 
 			for (int j = 0; j < 8; j++) {
@@ -2041,7 +2041,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 						    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
 						                           *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)),
 						                           *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3C)),
-						                           s_checkHitCylinderMask);
+						                           s_bitMask);
 					}
 
 					for (int k = 0; k < 8; k++) {
@@ -2111,7 +2111,7 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
 				s_cyl.m_direction2.y = s_cyl.m_direction.z - radiusPad;
 				s_cyl.m_height2 = s_cyl.m_bottom.z + radiusPad;
 			}
-			s_checkHitCylinderMask = flag;
+			s_bitMask = flag;
 			CheckHitCylinderNear_r(m_nodePool);
 		}
 	}

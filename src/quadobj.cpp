@@ -92,6 +92,7 @@ bool CGQuadObj::isInner(Vec* vec)
 	return false;
 }
 
+extern const float FLOAT_8033195C = 0.0f;
 extern const float FLOAT_80331960 = 20.0f;
 extern const float kOneF32 = 1.0f;
 

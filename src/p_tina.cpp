@@ -200,10 +200,6 @@ unsigned int lbl_801EAD84[3] = {reinterpret_cast<unsigned int>(lbl_8032E69C), 0x
 unsigned int lbl_801EAD90 = reinterpret_cast<unsigned int>(lbl_8032E69C);
 int DAT_8032ed38;
 int DAT_8032ed3c;
-static const char* s_drawAfterViewerFan;
-static char s_drawAfterViewerFanInitialized;
-static int s_drawAfterViewerAlive;
-static char s_drawAfterViewerAliveInitialized;
 CPartPcs PartPcs;
 CProfile g_par_calc_prof(const_cast<char*>(s_no_name_8032fdcc));
 CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
@@ -1258,18 +1254,12 @@ void CPartPcs::drawAfterViewer()
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 
-	if (s_drawAfterViewerFanInitialized == 0) {
-		s_drawAfterViewerFan = sDebugSpinnerText;
-		s_drawAfterViewerFanInitialized = 1;
-	}
-	if (s_drawAfterViewerAliveInitialized == 0) {
-		s_drawAfterViewerAlive = 0;
-		s_drawAfterViewerAliveInitialized = 1;
-	}
+	static const char* pFan = sDebugSpinnerText;
+	static int alive = 0;
 
-	s_drawAfterViewerAlive++;
+	alive++;
 	Graphic.Printf(
-		const_cast<char*>(s_tina_title_fmt_801d8014), s_drawAfterViewerFan[(s_drawAfterViewerAlive >> 4) % 4]);
+		const_cast<char*>(s_tina_title_fmt_801d8014), pFan[(alive >> 4) % 4]);
 
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();

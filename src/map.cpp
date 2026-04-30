@@ -2617,17 +2617,17 @@ void CMapMng::Calc()
 
     const int octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
     for (int i = 0; i < octTreeCount; i++) {
-        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x38)));
+        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)));
         LightPcs.InsertOctTree(static_cast<CLightPcs::TARGET>(1), *octTree);
     }
 
     for (int i = 0; i < octTreeCount; i++) {
-        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x38)));
+        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)));
         CMapShadowInsertOctTree(static_cast<CMapShadow::TARGET>(1), *octTree);
     }
 
     for (int i = 0; i < octTreeCount; i++) {
-        SetDrawFlag__8COctTreeFv(Ptr(this, 0x14 + (i * 0x38)));
+        SetDrawFlag__8COctTreeFv(Ptr(this, 0x14 + (i * 0x4C)));
     }
 
     for (int i = 0; i < mapObjCount; i++) {
@@ -2694,7 +2694,7 @@ void CMapMng::DrawBefore()
         void* octTree = Ptr(this, 0x14);
         for (int i = 0; i < octTreeCount; i++) {
             Draw__8COctTreeFUc(octTree, 0xFF);
-            octTree = Ptr(octTree, 0x38);
+            octTree = Ptr(octTree, 0x4C);
         }
     }
 }
@@ -2732,7 +2732,7 @@ void CMapMng::Draw()
         void* octTree = Ptr(this, 0x14);
         for (int i = 0; i < octTreeCount; i++) {
             Draw__8COctTreeFUc(octTree, 0);
-            octTree = Ptr(octTree, 0x38);
+            octTree = Ptr(octTree, 0x4C);
         }
 
         CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
@@ -2758,7 +2758,7 @@ void CMapMng::Draw()
         octTree = Ptr(this, 0x14);
         for (int i = 0; i < octTreeCount; i++) {
             Draw__8COctTreeFUc(octTree, 1);
-            octTree = Ptr(octTree, 0x38);
+            octTree = Ptr(octTree, 0x4C);
         }
     }
 
@@ -2894,7 +2894,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 8)); i++) {
-        unsigned char* octTree = Ptr(this, 0x14 + (i * 0x38));
+        unsigned char* octTree = Ptr(this, 0x14 + (i * 0x4C));
         if (CheckHitCylinder__8COctTreeFP12CMapCylinderP3VecUl(octTree, cylinder, move, mask) != 0) {
             *reinterpret_cast<void**>(Ptr(this, 0x22A78)) = *reinterpret_cast<void**>(octTree + 8);
             return 1;
@@ -2948,7 +2948,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 8)); i++) {
-        unsigned char* octTree = Ptr(this, 0x14 + (i * 0x38));
+        unsigned char* octTree = Ptr(this, 0x14 + (i * 0x4C));
         DAT_8032ec88 = 0;
         CheckHitCylinderNear__8COctTreeFP12CMapCylinderP3VecUl(octTree, cylinder, move, mask);
         if (DAT_8032ec88 != 0) {

@@ -271,24 +271,12 @@ void CMiniGamePcs::create()
     self[0x649C] = 0;
     self[0x134C] = 0;
 
-    if ((self[0x134B] & 1) != 0)
+    for (int playerBit = 0; playerBit < 4; playerBit++)
     {
-        self[0x134C] += 1;
-    }
-
-    if ((self[0x134B] & 2) != 0)
-    {
-        self[0x134C] += 1;
-    }
-
-    if ((self[0x134B] & 4) != 0)
-    {
-        self[0x134C] += 1;
-    }
-
-    if ((self[0x134B] & 8) != 0)
-    {
-        self[0x134C] += 1;
+        if ((self[0x134B] & (1 << playerBit)) != 0)
+        {
+            self[0x134C] += 1;
+        }
     }
 }
 
@@ -1472,19 +1460,13 @@ void CMiniGamePcs::calc(void)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (self[0x1348] == 0)
-    {
+    switch (self[0x1348]) {
+    case 0:
         return;
-    }
-
-    if (self[0x1348] == 1)
-    {
+    case 1:
         Joybus.ExitThread();
         self[0x1348] = 2;
-    }
-
-    if (self[0x1348] == 2)
-    {
+    case 2:
         if (!Joybus.IsThreadRunning())
         {
             char managerFile[260];
@@ -1503,10 +1485,9 @@ void CMiniGamePcs::calc(void)
         }
 
         return;
-    }
-
-    if (self[0x1348] != 3)
-    {
+    case 3:
+        break;
+    default:
         return;
     }
 

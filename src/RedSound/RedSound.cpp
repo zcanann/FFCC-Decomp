@@ -746,14 +746,14 @@ void CRedSound::StreamStop(int streamID)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedSound::StreamPlay(void* data, int volume, int pan, int loopMode)
+int CRedSound::StreamPlay(void* data, int fileSize, int pan, int volume)
 {
 	int id = 0;
 	char* streamData = (char*)data;
 
 	if (streamData[0] == 'S' && streamData[1] == 'T' && streamData[2] == 'R') {
 		id = GetAutoID();
-		c_Driver.StreamPlay(id, data, volume, pan, loopMode);
+		c_Driver.StreamPlay(id, data, fileSize, pan, volume);
 	} else if (m_ReportPrint != 0) {
 		OSReport(sRedSoundInvalidStreamData,
 		         sRedSoundLogPrefix, sRedSoundLogErrorColor,

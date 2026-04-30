@@ -2051,9 +2051,9 @@ void CRedDriver::StreamStop(int streamID)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::StreamPlay(int streamID, void* streamData, int volume, int pan, int loopMode)
+int CRedDriver::StreamPlay(int streamID, void* streamData, int fileSize, int pan, int volume)
 {
-	_EntryExecCommand(_StreamPlay, streamID, (int)streamData, volume, pan, loopMode, 0, 0);
+	_EntryExecCommand(_StreamPlay, streamID, (int)streamData, fileSize, pan, volume, 0, 0);
 	return streamID;
 }
 

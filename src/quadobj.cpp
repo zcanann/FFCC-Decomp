@@ -111,14 +111,15 @@ void CGQuadObj::onDraw()
         GXLoadPosMtxImm(CameraPcs.m_cameraMatrix, GX_PNMTX0);
         GXBegin(GX_LINES, GX_VTXFMT0, ((u32)m_vertexCount << 1) + ((u32)m_vertexCount << 2));
 
-        int i = 0;
-        CGQuadObj* current = this;
+        int next;
         QuadVertex* vertex;
+        CGQuadObj* current = this;
+        int i = 0;
 
         while (i < (int)(u32)m_vertexCount) {
-            int next = i + 1;
             u32 count;
 
+            next = i + 1;
             i = i + 1;
             GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
             count = m_vertexCount;

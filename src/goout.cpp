@@ -688,12 +688,12 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
     switch (mode) {
     case 1: {
         field_0x46 = 1;
-        if (prevMainMode != '\x03') {
+        if (prevMainMode != 3U) {
             field_0x46 = 0;
         }
         MenuPcs.ChgAllModel();
-        CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
         if (field_0x36 >= 0) {
+            CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
             MenuMcWinState(menuPcsLayout).m_mode = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
@@ -705,7 +705,7 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
         break;
     }
     case 2:
-        if (Game.m_gameWork.m_mcHasSerial != 1) {
+        if (static_cast<signed char>(Game.m_gameWork.m_mcHasSerial) != 1) {
             int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
             SetMenuStr(0, 4,
                        GetGoOutMessageLine(languageId, 5),
@@ -718,7 +718,7 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
         i = 0;
         do {
             if (Game.m_caravanWorkArr[i].m_shopState != 0 &&
-                Game.m_caravanWorkArr[i].m_caravanLocalFlags != 1) {
+                static_cast<signed char>(Game.m_caravanWorkArr[i].unk_0xc1e) != 1) {
                 int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
                 SetMenuStr(0, 5,
                            GetGoOutMessageLine(languageId, 9),

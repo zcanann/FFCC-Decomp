@@ -780,27 +780,29 @@ int CBound::CheckFrustum0(CBound& outBound)
 
                 viewZ = transformed.z;
                 if (viewZ > zero) {
-                    if (transformed.x > -viewZ) {
+                    float negViewZ = -viewZ;
+                    if (transformed.x > negViewZ) {
                         clipMask = 0x11;
                     } else if (transformed.x < viewZ) {
                         clipMask = 0x12;
                     } else {
                         clipMask = 0x10;
                     }
-                    if (transformed.y > -viewZ) {
+                    if (transformed.y > negViewZ) {
                         clipMask = clipMask | 0x14;
                     } else if (transformed.y < viewZ) {
                         clipMask = clipMask | 0x18;
                     }
                 } else {
-                    if (transformed.x > -viewZ) {
+                    float negViewZ = -viewZ;
+                    if (transformed.x > negViewZ) {
                         clipMask = 1;
                     } else if (transformed.x < viewZ) {
                         clipMask = 2;
                     } else {
                         clipMask = 0;
                     }
-                    if (transformed.y > -viewZ) {
+                    if (transformed.y > negViewZ) {
                         clipMask = clipMask | 4;
                     } else if (transformed.y < viewZ) {
                         clipMask = clipMask | 8;

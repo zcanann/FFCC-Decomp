@@ -5,7 +5,8 @@
 
 struct pppYmMegaBirthShpTail3
 {
-    _pppPObject field0_0x0;    // 0x0
+    _pppPObjLink m_link;       // 0x0
+    _pppPObjectHead field0_0x0; // 0xc
     pppFMATRIX field_0x40;     // 0x40
     char field_0x70[0x4c];     // 0x70 - padding/other fields
     unsigned int field_0xbc;   // 0xbc

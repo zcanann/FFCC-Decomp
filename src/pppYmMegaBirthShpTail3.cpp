@@ -36,14 +36,21 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     u8* payload = step + 0x14;
     const u16 dataValIndex = *(u16*)step;
     const s32 particleDataOffset = offsets->m_serializedDataOffsets[2];
-    _PARTICLE_DATA* particles = *(_PARTICLE_DATA**)((u8*)&object->field_0xbc + particleDataOffset);
-    _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)((u8*)&object->field_0xc0 + particleDataOffset);
-    _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)((u8*)&object->field_0xc4 + particleDataOffset);
-    const u32 maxParticles = *(u32*)((u8*)&object->field_0xc8 + particleDataOffset);
+    const s32 colorOffset = offsets->m_serializedDataOffsets[1];
+    u8* colorWork = (u8*)object + 0x80 + colorOffset;
+    VYmMegaBirthShpTail3* work = (VYmMegaBirthShpTail3*)((u8*)object + 0x80 + particleDataOffset);
+    _PARTICLE_DATA* particles = work->m_particles;
+    _PARTICLE_WMAT* wmats = work->m_wmats;
+    _PARTICLE_COLOR* colors = work->m_colors;
+    const u32 maxParticles = work->m_maxParticles;
     bool hasRequiredMemory = false;
 
-    if (particles != 0 && wmats != 0) {
-        hasRequiredMemory = (payload[0x55] == 0) || (colors != 0);
+    if (particles == 0) {
+        hasRequiredMemory = false;
+    } else if (wmats == 0) {
+        hasRequiredMemory = false;
+    } else {
+        hasRequiredMemory = true;
     }
     if (!hasRequiredMemory || dataValIndex == 0xFFFF) {
         return;
@@ -52,8 +59,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     int shapeTable = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (void*)(payload + 0xA0), &object->field_0x40, *(float*)(payload + 0xA4), step[0x10], payload[0x58],
-        payload[0x58], 0, zEnable, 1, 0);
+        0, &object->field_0x40, *(float*)(payload + 0xA0), payload[0xA4], step[0x10], payload[0x58], 0,
+        zEnable, 1, 0);
     pppSetBlendMode(payload[0x58]);
 
     for (u32 i = 0; i < maxParticles; i++) {
@@ -74,10 +81,11 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 float drawScale = *(float*)(payload + 0x5C);
                 const float drawScaleStep =
                     (drawScale - *(float*)(payload + 0x60)) / ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : 1.0f);
+                const float alphaScale = (float)*(s16*)(colorWork + 6) / 16384.0f;
                 float fadeR = (float)*(s16*)((u8*)&object->m_data[4] + particleDataOffset) / 128.0f;
                 float fadeG = (float)*(s16*)((u8*)&object->m_data[6] + particleDataOffset) / 128.0f;
                 float fadeB = (float)*(s16*)((u8*)&object->m_data[8] + particleDataOffset) / 128.0f;
-                float fadeA = (float)*(s16*)((u8*)&object->m_data[10] + particleDataOffset) / 128.0f;
+                float fadeA = ((float)*(s16*)((u8*)&object->m_data[10] + particleDataOffset) / 128.0f) * alphaScale;
                 const float fadeRStep =
                     (fadeR - (float)*(s16*)((u8*)&object->m_data[16] + particleDataOffset) / 128.0f) /
                     ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : 1.0f);
@@ -88,7 +96,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     (fadeB - (float)*(s16*)((u8*)&object->m_data[20] + particleDataOffset) / 128.0f) /
                     ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : 1.0f);
                 const float fadeAStep =
-                    (fadeA - (float)*(s16*)((u8*)&object->m_data[22] + particleDataOffset) / 128.0f) /
+                    (fadeA - ((float)*(s16*)((u8*)&object->m_data[22] + particleDataOffset) / 128.0f) * alphaScale) /
                     ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : 1.0f);
                 const float spacing = *(float*)(payload + 0x98);
                 Vec* history = (Vec*)(particle + 0x80);
@@ -384,13 +392,13 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     for (i = 0; i < work->m_maxParticles; i++) {
         if (*(s16*)(particleData + 0x22) == 0) {
             if ((*(u16*)(paramPayload + 0x12) <= work->m_lifeLimit) && (spawnCount < *(u16*)(paramPayload + 0x10))) {
-                birth(&object->field0_0x0, work, param, (VColor*)((u8*)object + 8 + colorOffset),
+                birth((_pppPObject*)object, work, param, (VColor*)((u8*)object + 0x80 + colorOffset),
                       (_PARTICLE_DATA*)particleData, worldMat, particleColor);
                 spawnCount = spawnCount + 1;
             }
         } else {
-            calc(&object->field0_0x0, work, param, (_PARTICLE_DATA*)particleData,
-                 (VColor*)((u8*)object + 8 + colorOffset), particleColor);
+            calc((_pppPObject*)object, work, param, (_PARTICLE_DATA*)particleData,
+                 (VColor*)((u8*)object + 0x80 + colorOffset), particleColor);
         }
 
         if (worldMat != 0) {

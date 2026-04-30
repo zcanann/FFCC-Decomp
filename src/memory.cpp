@@ -73,6 +73,13 @@ extern char DAT_801d6bec[];
 extern char DAT_8032f7d4[4];
 extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
+static const char s_amemTypeTexture[] = "TEXTURE";
+static const char s_amemTypeModel[] = "MODEL  ";
+static const char s_amemTypePdt[] = "PDT    ";
+static const char* amem_typeName[] = {s_amemTypeTexture, s_amemTypeModel, s_amemTypePdt};
+static const char s_amemStateUse[] = "USE  ";
+static const char s_amemStateNoUse[] = "NOUSE";
+static const char* amem_stateName[] = {s_amemStateUse, s_amemStateNoUse};
 extern float FLOAT_8032f7d8;
 extern float FLOAT_8032f7dc;
 extern float FLOAT_8032f7fc;
@@ -137,6 +144,16 @@ static CAmemCache& cacheEntryAt(CAmemCacheSet* cacheSet, int index)
 static const CAmemCache& cacheEntryAt(const CAmemCacheSet* cacheSet, int index)
 {
     return cacheSet->m_cacheTable[index];
+}
+
+static const char* cacheStateName(const CAmemCache& entry)
+{
+    return amem_stateName[entry.m_inUse == 0];
+}
+
+static const char* cacheTypeName(const CAmemCache& entry)
+{
+    return amem_typeName[entry.m_type];
 }
 
 static bool stageHasUnfreedBlocks(CMemory::CStage* stage)
@@ -1980,10 +1997,9 @@ void CAmemCacheSet::AddRef(short index)
             int data = reinterpret_cast<int>(current.m_cacheData);
             if ((current.m_inUse != 0) || (data != 0)) {
                 if (System.m_execParam > 2) {
-                    const char* useType = (current.m_inUse == 0) ? "FREE" : "USE";
                     Printf__7CSystemFPce(
-                        &System, s_amemCacheEntryFmt, i, useType,
-                        static_cast<int>(current.m_type), current.m_refCount, current.m_priority, data);
+                        &System, s_amemCacheEntryFmt, i, cacheStateName(current),
+                        cacheTypeName(current), current.m_refCount, current.m_priority, data);
                 }
             }
         }
@@ -2017,16 +2033,15 @@ void CAmemCacheSet::Release(short index)
 
     if (entry.m_refCount == -1) {
         if (System.m_execParam > 2) {
-            Printf__7CSystemFPce(&System, s_amemCacheSeparator);
+            Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt);
         }
 
         for (int i = 0; i < m_cacheCount; i++) {
             CAmemCache& cache = cacheEntryAt(this, i);
             if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) && (System.m_execParam > 2)) {
-                const char* useType = (cache.m_inUse != 0) ? "USE" : "FREE";
                 Printf__7CSystemFPce(
-                    &System, s_amemCacheEntryPaddedFmt, i, useType,
-                    static_cast<int>(cache.m_type), cache.m_refCount,
+                    &System, s_amemCacheEntryPaddedFmt, i, cacheStateName(cache),
+                    cacheTypeName(cache), cache.m_refCount,
                     cache.m_priority, reinterpret_cast<int>(cache.m_cacheData));
             }
         }
@@ -2091,13 +2106,31 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
             continue;
         }
 
-        if (bestPriority == 0xFFFFFFFF) {
-            if (m_releaseCheck != 0 && m_releaseCheck(m_releaseCheckArg) != 0) {
-                continue;
-            }
-            m_releaseAction(m_releaseActionArg);
+        if (bestPriority != 0xFFFFFFFF) {
             bestPriority = 0xFFFFFFFF;
             continue;
+        }
+
+        if (m_releaseCheck == 0 || m_releaseCheck(m_releaseCheckArg) == 0) {
+            m_releaseAction(m_releaseActionArg);
+            if (System.m_execParam > 2) {
+                Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt);
+            }
+
+            for (int i = 0; i < m_cacheCount; i++) {
+                CAmemCache& entry = cacheEntryAt(this, i);
+                int data = reinterpret_cast<int>(entry.m_cacheData);
+                if (((entry.m_inUse != 0) || (data != 0)) && (System.m_execParam > 2)) {
+                    Printf__7CSystemFPce(
+                        &System, s_amemCacheEntryFmt, i, cacheStateName(entry),
+                        cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);
+                }
+            }
+
+            if (System.m_execParam > 2) {
+                Printf__7CSystemFPce(&System, s_amemCacheSeparator);
+            }
+            m_stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
         }
     }
 }
@@ -2215,9 +2248,8 @@ void CAmemCacheSet::RefCnt0Compare()
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
         if ((entry.m_inUse != 0 && entry.m_refCount != 0) && System.m_execParam > 2) {
-            const char* useType = (entry.m_inUse == 0) ? "FREE" : "USE";
             Printf__7CSystemFPce(
-                &System, s_amemCacheEntryFmt, i, useType, static_cast<int>(entry.m_type),
+                &System, s_amemCacheEntryFmt, i, cacheStateName(entry), cacheTypeName(entry),
                 entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
         }
     }
@@ -2239,17 +2271,16 @@ void CAmemCacheSet::RefCnt0Compare()
 void CAmemCacheSet::AssertCache()
 {
     if (System.m_execParam > 2) {
-        Printf__7CSystemFPce(&System, s_amemCacheSeparator);
+        Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt);
     }
 
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
         int data = reinterpret_cast<int>(entry.m_cacheData);
         if ((entry.m_inUse != 0 || data != 0) && System.m_execParam > 2) {
-            const char* useType = (entry.m_inUse == 0) ? "FREE" : "USE";
             Printf__7CSystemFPce(
-                &System, s_amemCacheEntryFmt, i, useType,
-                static_cast<int>(entry.m_type), entry.m_refCount, entry.m_priority, data);
+                &System, s_amemCacheEntryFmt, i, cacheStateName(entry),
+                cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);
         }
     }
 

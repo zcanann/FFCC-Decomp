@@ -187,8 +187,12 @@ void CMenuPcs::TmpArtiDraw()
 
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 
-			CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332F28 * alpha));
-			GXSetChanMatColor(GX_COLOR0A0, color.color);
+			GXColor color;
+			color.r = 0xFF;
+			color.g = 0xFF;
+			color.b = 0xFF;
+			color.a = (unsigned char)(int)(FLOAT_80332F28 * alpha);
+			GXSetChanMatColor(GX_COLOR0A0, color);
 
 			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, left, top, width, height, s, t, z, z, FLOAT_80332f2c);
 		}
@@ -373,7 +377,7 @@ void CMenuPcs::TmpArtiCtrl()
 	if (hasInput) {
 		uVar3 = 0;
 	} else {
-		int padIndex = hasInput;
+		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
 		uVar3 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
 	}

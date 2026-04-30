@@ -260,10 +260,10 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 	float yCoord;
 	float xCoord;
 	float ySq;
-	float maxMagnitude;
-	float modulationScale;
-	float coordScale;
 	float coordOffset;
+	float coordScale;
+	float modulationScale;
+	float maxMagnitude;
 	CMapMesh* mapMesh;
 	int textureIndex;
 

@@ -258,23 +258,24 @@ static inline int ViewerModelFrameShift(void* model)
     return *reinterpret_cast<int*>(modelData + 0x34);
 }
 
-static const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
-static const char s_gpu_profile_fmt[] = "GPU = %f.5%%(C = %.5f%% G = %.5f%%)";
-static const char s_no_texture[] = "no texture...";
-static const char s_calc_viewer_fmt[] = "CCharaPcs.calcViewer: %s\n";
-static const char s_anim_path_fmt[] = "%splot%d.cha";
-static const char s_frame_speed_fmt[] = "FRAME = %.2f SPEED=%.2f";
-static const char s_iframe_fmt[] = "I = %s IFRAME = %.2f %s";
-static const char s_cont_fmt[] = "CONT = %d";
-static const char s_cpu_profile_fmt[] = "CPU = %.5f%%(M = %.5f%% S = %.5f%%) %dNODES";
-static const char s_load_model[] = "CCharaPcs LoadModel";
-static const char s_load_texture[] = "CCharaPcs LoadTexture";
-static const char s_load_anim[] = "CCharaPcs LoadAnim";
-static const char s_default_chm_path[] = "plot/kmitsuru/plot.chm";
-static const char s_default_chd_path[] = "plot/kmitsuru/plot.chd";
-static const char s_default_cha_path[] = "plot/kmitsuru/plot.cha";
-static const char s_default_tex_path[] = "plot/kmitsuru/plot.tex";
-static const char s_back_tex_fmt[] = "%sback.tex";
+extern "C" const char s_no_texture____801da7e8[];
+#define s_no_texture (viewerStrings + 0x0)
+#define s_p_chara_viewer_cpp (viewerStrings + 0x10)
+#define s_gpu_profile_fmt (viewerStrings + 0x24)
+#define s_calc_viewer_fmt (viewerStrings + 0x48)
+#define s_anim_path_fmt (viewerStrings + 0x64)
+#define s_frame_speed_fmt (viewerStrings + 0x74)
+#define s_iframe_fmt (viewerStrings + 0x8C)
+#define s_cont_fmt (viewerStrings + 0xA4)
+#define s_cpu_profile_fmt (viewerStrings + 0xB0)
+#define s_load_model (viewerStrings + 0xDC)
+#define s_load_texture (viewerStrings + 0xF0)
+#define s_load_anim (viewerStrings + 0x108)
+#define s_default_chm_path (viewerStrings + 0x11C)
+#define s_default_chd_path (viewerStrings + 0x134)
+#define s_default_cha_path (viewerStrings + 0x14C)
+#define s_default_tex_path (viewerStrings + 0x164)
+#define s_back_tex_fmt (viewerStrings + 0x17C)
 
 /*
  * --INFO--
@@ -288,6 +289,7 @@ static const char s_back_tex_fmt[] = "%sback.tex";
 extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
 {
     unsigned char* p = (unsigned char*)param_1;
+    register const char* viewerStrings = s_no_texture____801da7e8;
     Mtx cameraMtx;
     Mtx scratchMtx;
     Mtx44 projMtx;
@@ -424,6 +426,7 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
 extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
 {
     unsigned char* p = (unsigned char*)param_1;
+    register const char* viewerStrings = s_no_texture____801da7e8;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
 
@@ -770,11 +773,9 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
 {
     CCharaPcs* self = reinterpret_cast<CCharaPcs*>(param_1);
     unsigned char* p = reinterpret_cast<unsigned char*>(self);
+    register const char* viewerStrings = s_no_texture____801da7e8;
     unsigned int i;
     unsigned int x;
-    CColor colorTmp;
-    CColor colorCopy;
-    CColor white;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
     unsigned char bumpLight[0x138];
@@ -810,6 +811,9 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(float*)(p + 0x128) = kCharaViewerFineStep;
 
     for (i = 0; i < 5; i++) {
+        CColor colorTmp;
+        CColor colorCopy;
+        CColor white;
         unsigned char* whiteChannels =
             reinterpret_cast<unsigned char*>(__ct__6CColorFUcUcUcUc(&white, 0xFF, 0xFF, 0xFF, 0xFF));
         __ct__6CColorFv(&colorTmp);
@@ -831,12 +835,12 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     SetCopyClear__8CGraphicF8_GXColori(&Graphic, &clearColor, 0xFFFF);
 
     *(int*)(p + 0x190) = 0;
-    *(int*)(p + 0x194) = 0;
     *(int*)(p + 0x198) = 0;
-    *(int*)(p + 0x19C) = 0;
-    *(int*)(p + 0x1A0) = 0;
     *(int*)(p + 0x2B0) = 0;
+    *(int*)(p + 0x194) = 0;
+    *(int*)(p + 0x19C) = 0;
     *(int*)(p + 0x2B4) = 0;
+    *(int*)(p + 0x1A0) = 0;
     *(int*)(p + 0x2B8) = 0;
     *(int*)(p + 0x2BC) = 0;
     *(int*)(p + 0x3C0) = 0;

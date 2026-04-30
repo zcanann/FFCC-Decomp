@@ -1889,11 +1889,11 @@ void CCameraPcs::drawShadowEndAll()
     *reinterpret_cast<unsigned int*>(self + 0xEC) = *reinterpret_cast<unsigned int*>(self + 0x1F4);
     *reinterpret_cast<unsigned int*>(self + 0xF0) = *reinterpret_cast<unsigned int*>(self + 0x1F8);
     *reinterpret_cast<unsigned int*>(self + 0xF4) = *reinterpret_cast<unsigned int*>(self + 0x1FC);
-    *reinterpret_cast<unsigned int*>(self + 0xF8) = *reinterpret_cast<unsigned int*>(self + 0x200);
-    *reinterpret_cast<unsigned int*>(self + 0xFC) = *reinterpret_cast<unsigned int*>(self + 0x204);
-    *reinterpret_cast<unsigned int*>(self + 0x100) = *reinterpret_cast<unsigned int*>(self + 0x208);
-    *reinterpret_cast<unsigned int*>(self + 0x104) = *reinterpret_cast<unsigned int*>(self + 0x20C);
-    *reinterpret_cast<unsigned int*>(self + 0x108) = *reinterpret_cast<unsigned int*>(self + 0x210);
+    *reinterpret_cast<float*>(self + 0xF8) = *reinterpret_cast<float*>(self + 0x200);
+    *reinterpret_cast<float*>(self + 0xFC) = *reinterpret_cast<float*>(self + 0x204);
+    *reinterpret_cast<float*>(self + 0x100) = *reinterpret_cast<float*>(self + 0x208);
+    *reinterpret_cast<float*>(self + 0x104) = *reinterpret_cast<float*>(self + 0x20C);
+    *reinterpret_cast<float*>(self + 0x108) = *reinterpret_cast<float*>(self + 0x210);
 }
 
 /*

@@ -437,8 +437,10 @@ void CFunnyShape::Render()
 
     GXColor chanColor = DAT_8032fd60;
     GXSetChanAmbColor(GX_COLOR0, chanColor);
-    GXSetChanMatColor(GX_COLOR0, chanColor);
+    GXColor matColor = chanColor;
+    GXSetChanMatColor(GX_COLOR0, matColor);
 
+    CFunnyShape* work;
     s32 count;
     if ((ShapeFlags(this) & 0x80) != 0) {
         count = ShapeCount(this);
@@ -446,7 +448,7 @@ void CFunnyShape::Render()
         count = 1;
     }
 
-    CFunnyShape* work = this;
+    work = this;
 
     for (s32 i = 0; i < count; i++) {
         Vec2d pos;

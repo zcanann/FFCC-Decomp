@@ -109,13 +109,6 @@ struct LaserColorData {
     pppCVECTOR m_color;
 };
 
-struct LaserBaseObject {
-    u8 m_pad0[0x0C];
-    s32 m_graphId;
-    pppFMATRIX m_localMatrix;
-    pppFMATRIX m_drawMatrix;
-};
-
 /*
  * --INFO--
  * PAL Address: 801766ec
@@ -235,13 +228,12 @@ void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
-    LaserBaseObject* baseObj = (LaserBaseObject*)pppLaser;
     LaserWork* work;
-    Vec localA;
     Vec localB;
-    CMapCylinderRaw cyl;
-    Mtx charaMtx;
+    Vec localA;
     Mtx tempMtx;
+    Mtx charaMtx;
+    CMapCylinderRaw cyl;
 
     int emptyHistory;
 
@@ -265,9 +257,9 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         emptyHistory = 1;
     }
 
-    CalcGraphValue((_pppPObject*)baseObj, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
+    CalcGraphValue((_pppPObject*)pppLaser, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
         *(float*)(step->m_payload + 0x10), *(float*)(step->m_payload + 0x14), *(float*)(step->m_payload + 0x18));
-    CalcGraphValue((_pppPObject*)baseObj, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
+    CalcGraphValue((_pppPObject*)pppLaser, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
         *(float*)(step->m_payload + 4), *(float*)(step->m_payload + 8), *(float*)(step->m_payload + 0xc));
 
     pppCalcFrameShape(
@@ -286,7 +278,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         localB.z = work->m_length;
 
         if (i == 0) {
-            PSMTXConcat(pppMngStPtr->m_matrix.value, baseObj->m_localMatrix.value, tempMtx);
+            PSMTXConcat(pppMngStPtr->m_matrix.value, pppLaser->m_localMatrix.value, tempMtx);
             work->m_origin.x = tempMtx[0][3];
             work->m_origin.y = tempMtx[1][3];
             work->m_origin.z = tempMtx[2][3];
@@ -300,7 +292,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
                 emptyHistory = 1;
                 continue;
             } else {
-                PSMTXConcat(charaMtx, baseObj->m_localMatrix.value, charaMtx);
+                PSMTXConcat(charaMtx, pppLaser->m_localMatrix.value, charaMtx);
                 PSMTXMultVec(charaMtx, &localB, &work->m_points[i]);
             }
         }
@@ -331,7 +323,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
                 work->m_length = work->m_maxLength - FLOAT_80333458;
                 ParticleFrameCallback__5CGameFiiiiiP3Vec(
                     &Game, partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3,
-                    baseObj->m_graphId / 0x1000, work->m_points);
+                    pppLaser->m_graphId / 0x1000, work->m_points);
                 work->m_spawnEnabled = 0;
             }
             if (work->m_spawnEnabled != 0) {
@@ -376,7 +368,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
                     created = 0;
                 } else {
                     created = pppCreatePObject(pppMngStPtr, dataVal);
-                    *(_pppPObject**)((u8*)created + 4) = (_pppPObject*)baseObj;
+                    *(_pppPObject**)((u8*)created + 4) = (_pppPObject*)pppLaser;
                 }
 
                 Vec* createdPos = (Vec*)((u8*)created + *(int*)step->m_payload + 0x80);
@@ -406,7 +398,6 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
-    LaserBaseObject* baseObj = (LaserBaseObject*)pppLaser;
     Vec* points;
     int colorOffset = param_3->m_serializedDataOffsets[1];
     LaserColorData* colorData = (LaserColorData*)((u8*)pppLaser + 0x80 + colorOffset);
@@ -443,7 +434,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     pppSetBlendMode(step->m_payload[0x1c]);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        &colorData->m_color, &baseObj->m_localMatrix, kPppLaserZero, step->m_payload[0x39], step->m_payload[0x38],
+        &colorData->m_color, &pppLaser->m_localMatrix, kPppLaserZero, step->m_payload[0x39], step->m_payload[0x38],
         step->m_payload[0x1c], 0, 1, 1, 0);
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);
@@ -465,7 +456,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     halfWidth = work->m_halfWidth;
     length = work->m_length;
 
-    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&modelView, &pppMngStPtr->m_matrix, &baseObj->m_localMatrix);
+    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&modelView, &pppMngStPtr->m_matrix, &pppLaser->m_localMatrix);
     pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, (pppFMATRIX*)&ppvCameraMatrix, &modelView);
     GXLoadPosMtxImm(mtxOut.value, 0);
 
@@ -603,7 +594,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
                 tempMtx[0][0] = pppMngStPtr->m_previousPosition.z * *(float*)(step->m_payload + 0x24);
                 tempMtx[1][1] = tempMtx[0][0];
                 tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
-                PSMTXConcat(baseObj->m_localMatrix.value, tempMtx, tempMtx);
+                PSMTXConcat(pppLaser->m_localMatrix.value, tempMtx, tempMtx);
                 PSMTXConcat(pppMngStPtr->m_matrix.value, tempMtx, tempMtx);
                 PSMTXConcat(ppvCameraMatrix, tempMtx, tempMtx);
                 shapePos.x = kPppLaserZero;

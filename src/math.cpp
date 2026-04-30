@@ -362,16 +362,6 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMath::CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8001b020
  * PAL Size: 544b
  * EN Address: TODO
@@ -402,8 +392,8 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[3][2] = 1.0f;
 
     float scaleAB = scaleA + scaleB;
-    float t0 = 0.0f;
-    if (scaleAB != 0.0f) {
+    float t0 = kZeroF;
+    if (scaleAB != kZeroF) {
         t0 = scaleA / scaleAB;
     }
 
@@ -419,8 +409,8 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[3][1] = 1.0f;
 
     float scaleBC = scaleB + scaleC;
-    float t1 = 0.0f;
-    if (scaleBC != 0.0f) {
+    float t1 = kZeroF;
+    if (scaleBC != kZeroF) {
         t1 = scaleB / scaleBC;
     }
 
@@ -454,7 +444,6 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
 {
     (void)math;
     int hit;
-    float fVar1;
     float dVar6;
     float dVar7;
     float dVar8;
@@ -468,7 +457,7 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     dVar8 = innerRadius + scale;
     dVar10 = dVar8 / (outerRadius + scale);
     PSVECSubtract(origin, ellipseScale, &local_60);
-    dVar9 = dVar8 * dVar8;
+    dVar8 = dVar8 * dVar8;
     local_60.y = local_60.y * dVar10;
     local_6c.x = vector->x;
     local_6c.y = vector->y * dVar10;
@@ -476,8 +465,8 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     local_78.x = local_60.x;
     local_78.y = local_60.y;
     local_78.z = local_60.z;
-    dVar8 = PSVECDotProduct(&local_78, &local_78);
-    if (dVar8 < dVar9) {
+    dVar9 = PSVECDotProduct(&local_78, &local_78);
+    if (dVar9 < dVar8) {
         if (outT != NULL) {
             *outT = 0.0f;
         }
@@ -493,12 +482,12 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
             hit = 0;
         } else {
             dVar7 = PSVECDotProduct(&local_6c, &local_6c);
-            fVar1 = dVar6 * dVar6 - dVar7 * (dVar8 - dVar9);
-            if (fVar1 < 0.0f) {
+            dVar8 = dVar6 * dVar6 - dVar7 * (dVar9 - dVar8);
+            if (dVar8 < 0.0f) {
                 hit = 0;
             } else {
-                fVar1 = sqrtf(fVar1);
-                dVar8 = -dVar6 - fVar1;
+                dVar8 = sqrtf(dVar8);
+                dVar8 = -dVar6 - dVar8;
                 if ((dVar8 <= 0.0f) || (dVar7 < dVar8)) {
                     hit = 0;
                 } else {
@@ -780,27 +769,29 @@ int CBound::CheckFrustum0(CBound& outBound)
 
                 viewZ = transformed.z;
                 if (viewZ > zero) {
-                    if (transformed.x > -viewZ) {
+                    float negViewZ = -viewZ;
+                    if (transformed.x > negViewZ) {
                         clipMask = 0x11;
                     } else if (transformed.x < viewZ) {
                         clipMask = 0x12;
                     } else {
                         clipMask = 0x10;
                     }
-                    if (transformed.y > -viewZ) {
+                    if (transformed.y > negViewZ) {
                         clipMask = clipMask | 0x14;
                     } else if (transformed.y < viewZ) {
                         clipMask = clipMask | 0x18;
                     }
                 } else {
-                    if (transformed.x > -viewZ) {
+                    float negViewZ = -viewZ;
+                    if (transformed.x > negViewZ) {
                         clipMask = 1;
                     } else if (transformed.x < viewZ) {
                         clipMask = 2;
                     } else {
                         clipMask = 0;
                     }
-                    if (transformed.y > -viewZ) {
+                    if (transformed.y > negViewZ) {
                         clipMask = clipMask | 4;
                     } else if (transformed.y < viewZ) {
                         clipMask = clipMask | 8;
@@ -1027,16 +1018,6 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     rot[2][3] = s[2];
 
     PSMTXConcat(rot, out, out);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMath::rotateToMatrix(float (*) [4], Vec*)
-{
-	// TODO
 }
 
 /*

@@ -521,7 +521,7 @@ void CWind::Draw()
                                        (Vec*)&CVector(obj->centerX, FLOAT_80330ef0, obj->centerZ),
                                        obj->radius, &CColor(0xff, 0xff, 0, 0xff).color);
                 } else {
-                    int alpha = (int)(FLOAT_80330f1c * (FLOAT_80330ef8 - obj->lifeRatio));
+                    u8 alpha = (u8)(FLOAT_80330f1c * (FLOAT_80330ef8 - obj->lifeRatio));
                     Graphic.DrawSphere(viewMtx,
                                        (Vec*)&CVector(obj->centerX, FLOAT_80330ef0, obj->centerZ),
                                        obj->radius, &CColor(0xff, 0xff, 0x80, alpha).color);

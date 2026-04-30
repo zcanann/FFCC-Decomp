@@ -84,13 +84,13 @@ void _EraseAttribute(int eraseTrack, int attrMask)
  */
 int _EraseTime(int eraseTrack)
 {
-	unsigned int minTrack = 0x100;
+	int minTrack = 0x100;
 	int* trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
 	int* track = (int*)*trackBasePtr;
 
 	do {
 		if (((u32)*track != 0) && (*(unsigned char*)(track + 0x54) == 0) &&
-		    ((unsigned int)*(unsigned char*)((char*)track + 0x14f) < minTrack)) {
+		    ((int)*(unsigned char*)((char*)track + 0x14f) < minTrack)) {
 			minTrack = *(unsigned char*)((char*)track + 0x14f);
 		}
 		track += 0x55;

@@ -113,15 +113,15 @@ extern "C" float FLOAT_8032FCDC;
 extern "C" double DOUBLE_8032FCC0;
 extern "C" double DOUBLE_8032FCD0;
 
-static void WriteU8(void* base, unsigned int offset, unsigned char value) {
+static inline void WriteU8(void* base, unsigned int offset, unsigned char value) {
     reinterpret_cast<unsigned char*>(base)[offset] = value;
 }
 
-static void WriteU32(void* base, unsigned int offset, unsigned int value) {
+static inline void WriteU32(void* base, unsigned int offset, unsigned int value) {
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(base) + offset) = value;
 }
 
-static void WriteF32(void* base, unsigned int offset, float value) {
+static inline void WriteF32(void* base, unsigned int offset, float value) {
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(base) + offset) = value;
 }
 

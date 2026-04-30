@@ -401,8 +401,9 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     }
 
     if ((*(u32*)(CFlat + 0x129C) & 0x200000) != 0) {
+        int* debugGroupData = groupData;
         for (i = 0; i < (int)pBreathModel->m_groupCount; i++) {
-            if (groupData[0] == 1) {
+            if (debugGroupData[0] == 1) {
                 _GXColor debugColor;
                 int firstParticle;
                 int j;
@@ -413,7 +414,6 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
 
                 switch (i) {
                 case 0:
-                case 2:
                     debugColor.r = 0x80;
                     debugColor.g = 0x00;
                     debugColor.b = 0x00;
@@ -423,6 +423,12 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                     debugColor.r = 0x80;
                     debugColor.g = 0x80;
                     debugColor.b = 0xFF;
+                    debugColor.a = 0xFF;
+                    break;
+                case 2:
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x00;
+                    debugColor.b = 0x00;
                     debugColor.a = 0xFF;
                     break;
                 case 3:
@@ -440,10 +446,10 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 }
 
                 firstParticle = -1;
-                groupScale = *(float*)(groupData + 10);
+                groupScale = *(float*)(debugGroupData + 10);
                 for (j = 0; j < (int)pBreathModel->m_slotCount; j++) {
-                    if (*(signed char*)(groupData[2] + j) != -1) {
-                        firstParticle = (int)*(signed char*)(groupData[1] + j);
+                    if (*(signed char*)(debugGroupData[2] + j) != -1) {
+                        firstParticle = (int)*(signed char*)(debugGroupData[1] + j);
                         break;
                     }
                 }
@@ -454,7 +460,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 sphereMtx[2][2] = groupScale;
                 PSMTXConcat(*reinterpret_cast<Mtx*>(&work->m_particleWmats[firstParticle]), object->m_localMatrix.value, tempMtx);
                 PSMTXConcat(ppvCameraMatrix, tempMtx, tempMtx);
-                PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &pos);
+                PSMTXMultVec(tempMtx, (Vec*)(debugGroupData + 3), &pos);
                 sphereMtx[0][3] = pos.x;
                 sphereMtx[1][3] = pos.y;
                 sphereMtx[2][3] = pos.z;
@@ -462,7 +468,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 pppSetBlendMode(1);
                 DrawSphere__8CGraphicFPA4_f8_GXColor(&Graphic, sphereMtx, debugColor);
             }
-            groupData += 0x17;
+            debugGroupData += 0x17;
         }
 
         pppInitBlendMode();

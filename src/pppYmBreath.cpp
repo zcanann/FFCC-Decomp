@@ -683,7 +683,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
         *emitFrameCounter = *emitFrameCounter + 1;
 
         for (i = 0; i < maxParticleCount; i++) {
-            if (*(short*)(particleData + 0x50) > 0) {
+            YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
+            if (particle->m_life > 0) {
                 UpdateParticle(vYmBreath, pYmBreath, (PARTICLE_DATA*)particleData, vColor, (PARTICLE_COLOR*)particleColor);
                 pppCalcFrameShape(**(long***)(*(int*)((unsigned char*)pppEnvStPtr + 0xC) +
                                              params->m_shapeStepValue * 4),

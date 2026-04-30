@@ -14,33 +14,33 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* container)
+void pppPObjPoint(_pppPObject* pObject, pppPObjPointStep* step, _pppCtrlTable* ctrlTable)
 {
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    s32 objOffset = *(s32*)container->ptrData;
-    PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + objOffset + 0x80);
+    s32 objOffset = ctrlTable->m_serializedDataOffsets[0];
+    pppPObjPointWork* objPtr = (pppPObjPointWork*)((u8*)pObject + objOffset + 0x80);
 
-    if (objData->id == pointData->id) {
+    if (step->m_graphId == pObject->m_graphId) {
         u8* vecPtr;
 
-        if (objData->field_4 == -1) {
+        if (step->m_createProgramIndex == -1) {
             vecPtr = gPppDefaultValueBuffer;
         } else {
-            u8* data = objData->data;
+            u8* data = step->m_sourceObject;
             _pppPDataVal* pDataVal = pppMngStPtr->m_pppPDataVals;
-            pDataVal = &pDataVal[objData->field_4];
+            pDataVal = &pDataVal[step->m_createProgramIndex];
             s32 vecOffset = pDataVal->m_nextSpawnTime;
             vecPtr = data + 0x80;
             vecPtr += vecOffset;
         }
 
-        objPtr->vecPtr = vecPtr;
+        objPtr->m_source = vecPtr;
     }
 
-    objPtr->x = ((f32*)objPtr->vecPtr)[0];
-    objPtr->y = ((f32*)objPtr->vecPtr)[1];
-    objPtr->z = ((f32*)objPtr->vecPtr)[2];
+    objPtr->m_x = ((f32*)objPtr->m_source)[0];
+    objPtr->m_y = ((f32*)objPtr->m_source)[1];
+    objPtr->m_z = ((f32*)objPtr->m_source)[2];
 }

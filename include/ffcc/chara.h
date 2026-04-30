@@ -26,6 +26,7 @@ class CChara : public CManager
 {
 public:
 	class CModel;
+	class CMesh;
 
 	class CSkin
 	{
@@ -114,6 +115,7 @@ public:
 		void CalcSafeNodeWorldMatrix(float (*)[4], CChara::CNode*);
 		void AttachAnim(CChara::CAnim*, int, int, int);
 		void AttachTextureSet(CTextureSet*);
+		CMesh* GetMesh();
 		void AddFrame(float);
 		void SetFrame(float);
 		void CalcFurColor();
@@ -121,17 +123,34 @@ public:
 		int GetDispIndex(CChara::CNode*);
 		void GetMatrix();
 		void GetMatrix(float(*)[4]);
+		void GetMatrixT(float (*)[4]);
+		void SetBeforeMeshLockEnvCallback(void (*)(CChara::CModel*, void*, void*, int));
+		void SetDrawMeshDLCallback(void (*)(CChara::CModel*, void*, void*, int, int, float (*)[4]));
+		void SetAfterDrawMeshCallback(void (*)(CChara::CModel*, void*, void*, int, float (*)[4]));
+		void SetCallbackContext(void*, void*);
 
 	private:
-		u8 _pad0[0xA4];
+		u8 _pad0[0x68];
+		Mtx m_matrix;
+		u8 _pad98[0xC];
 		CCharaModelData* m_data;
-		u8 _padA8[8];
+		u8 _padA8[4];
+		CMesh* m_meshes;
 		CTextureSet* m_texSet;
 		float m_curFrame;
 		CAnim* m_anim;
 		float m_time;
 		float m_animStart;
 		float m_animEnd;
+		u8 _padC8[0x1C];
+		void* m_callbackContext;
+		void* m_callbackParam;
+		u8 _padEC[0x8];
+		void (*m_beforeMeshLockEnvCallback)(CChara::CModel*, void*, void*, int);
+		u8 _padF8[4];
+		void (*m_drawMeshDLCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+		u8 _pad100[4];
+		void (*m_afterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
 	};
 
 	class CMesh : public CRef
@@ -155,6 +174,8 @@ public:
 		void Duplicate(CChara::CMesh*, CMemory::CStage*);
 		void skin(int, int, int, CChara::CSkin*, void*, void*, void*, S16Vec*, S16Vec*, S16Vec*, S16Vec*);
 		void Calc(CChara::CModel*);
+		CRefData* GetRefData();
+		S16Vec* GetVertex();
 
 		CRefData* m_data;
 		S16Vec* m_workPositions;

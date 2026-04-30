@@ -118,7 +118,7 @@ system.cpp:
 	.text       start:0x800214B4 end:0x8002244C
 	.ctors      start:0x801D53C4 end:0x801D53C8
 	.data       start:0x801E8838 end:0x801E8898
-	.bss        start:0x80244340 end:0x802455C0
+	.bss        start:0x80244340 end:0x802455BC
 	.sdata2     start:0x8032F868 end:0x8032F874
 
 usb.cpp:

@@ -329,7 +329,11 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	}
 
 	flag = ((unsigned char*)info)[0];
-	isMulti = (flag & 0x80) != 0;
+	if ((flag & 0x80) != 0) {
+		isMulti = 1;
+	} else {
+		isMulti = 0;
+	}
 	seq = (unsigned char*)info + 5;
 	attrMask = ((unsigned char*)info)[4];
 	count = ((unsigned char*)info)[0] & 0x7f;

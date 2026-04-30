@@ -86,11 +86,12 @@ struct ChangeTexModelRaw {
 extern _pppMngStYmChangeTex* pppMngStPtr;
 extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
-extern float DAT_80330e10;
 extern const char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.cpp";
-extern float FLOAT_80330df8;
-extern float FLOAT_80330dfc;
-extern float FLOAT_80330e00;
+extern const float FLOAT_80330df8 = 0.0f;
+extern const float FLOAT_80330dfc = 0.0f;
+extern const float FLOAT_80330e00 = 1.0f;
+extern const double DOUBLE_80330E08 = 1.038459631686463e34;
+extern const float DAT_80330e10 = 0.5f;
 
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_data) == 0xA4);
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_meshes) == 0xAC);
@@ -109,6 +110,7 @@ STATIC_ASSERT(offsetof(ChangeTexModelData, m_materialSet) == 0x24);
 STATIC_ASSERT(offsetof(ChangeTexModelData, m_frameShift) == 0x34);
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
+static inline float ChangeTexConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
 CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle*);
 CCharaPcs::CHandle* GetCharaHandlePtr(CGObject*, long);
@@ -280,9 +282,9 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 			int delta = (int)frameShort - (int)*(short*)((char*)curMesh->m_points + pointOffset + 2);
 			if (delta >= 0) {
 				int level = 0;
-				float threshold = FLOAT_80330df8;
+				float threshold = ChangeTexConst(FLOAT_80330df8);
 				for (int tries = 7; tries != 0; tries--) {
-					if ((float)delta > FLOAT_80330dfc * threshold) {
+					if ((float)delta > ChangeTexConst(FLOAT_80330dfc) * threshold) {
 						if (negativeRamp == 0xFF) {
 							*(u8*)(vertColors + 3) = negativeRamp - (level << 4);
 						} else {
@@ -290,7 +292,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 						}
 						break;
 					}
-					threshold = threshold - FLOAT_80330e00;
+					threshold = threshold - ChangeTexConst(FLOAT_80330e00);
 					level = level + 1;
 				}
 			} else {
@@ -403,7 +405,7 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
  */
 void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* data)
 {
-	float init = DAT_80330e10;
+	float init = ChangeTexConst(DAT_80330e10);
 	pppYmChangeTexState* state =
 	    (pppYmChangeTexState*)((char*)ymChangeTex + data->m_serializedDataOffsets[2] + 0x80);
 

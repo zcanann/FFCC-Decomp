@@ -340,7 +340,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             TRACE_POLYGON* splineEntry = entries;
             for (i = 0; i < splineCount; i++) {
                 s32 idx = i + 2;
-                entries[idx].alpha = param_2->m_payload[8] - idx * splineEntry[2].decay;
+                splineEntry[2].alpha = param_2->m_payload[8] - idx * splineEntry[2].decay;
                 pppCopyVector(entries[idx].from, splineFrom[i]);
                 pppCopyVector(entries[idx].to, splineTo[i]);
                 splineEntry++;

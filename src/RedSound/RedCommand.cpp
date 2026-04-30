@@ -164,6 +164,7 @@ int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 	int* scan;
 	int* track;
 	int remaining;
+	int erasedCount = 0;
 
 	if (attrMask != 0) {
 		_EraseAttribute(eraseTrack, attrMask);
@@ -186,7 +187,7 @@ int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 				scan = scan - 0x55;
 			}
 		} while ((remaining != 0) && ((int*)*trackBasePtr <= track));
-	} while ((track < (int*)*trackBasePtr) && (_EraseTime(eraseTrack) != 0));
+	} while ((track < (int*)*trackBasePtr) && ((erasedCount = _EraseTime(eraseTrack)) != 0));
 
 	if (track < (int*)*trackBasePtr) {
 		track = 0;

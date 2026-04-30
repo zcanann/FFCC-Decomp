@@ -21,7 +21,7 @@ class CUSBPcs : public CSamplePcs
 public:
     class CDataHeader;
 
-    CUSBPcs();
+    CUSBPcs() {}
 
     void Init();
     void Quit();
@@ -42,7 +42,11 @@ public:
     CMemory::CStage* m_smallStage; // 0x110
 };
 
+#ifdef FFCC_DEFINE_USBPcs_STORAGE
+extern unsigned char USBPcs[sizeof(CUSBPcs)];
+#else
 extern CUSBPcs USBPcs;
+#endif
 extern int s_usbReadPollFrameCounter;
 extern char s_usbReadPollInitialized;
 

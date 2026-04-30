@@ -1,3 +1,4 @@
+#define FFCC_DEFINE_USBPcs_STORAGE
 #include "ffcc/p_usb.h"
 
 #include "ffcc/usb.h"
@@ -11,6 +12,9 @@ char s_usbReadPollInitialized;
 extern "C" void create__7CUSBPcsFv(CUSBPcs*);
 extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
 extern "C" void func__7CUSBPcsFv(CUSBPcs*);
+extern "C" void* __vt__8CManager[];
+extern "C" void* __vt__10CSamplePcs[];
+extern "C" void* __vt__7CUSBPcs[];
 
 extern const char s_CUSBPcs_8032f810[] = "CUSBPcs";
 unsigned int m_table_desc0__7CUSBPcs[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
@@ -39,15 +43,24 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stag
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x800203E4
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-inline CUSBPcs::CUSBPcs()
+extern "C" void __sinit_p_usb_cpp(void)
 {
+    unsigned char* self = USBPcs;
     unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__7CUSBPcs);
     const unsigned int* desc0 = m_table_desc0__7CUSBPcs;
     const unsigned int* desc1 = m_table_desc1__7CUSBPcs;
     const unsigned int* desc2 = m_table_desc2__7CUSBPcs;
+
+    *reinterpret_cast<void**>(self) = __vt__8CManager;
+    *reinterpret_cast<void**>(self) = __vt__10CSamplePcs;
+    *reinterpret_cast<void**>(self) = __vt__7CUSBPcs;
 
     table[1] = desc0[0];
     table[2] = desc0[1];
@@ -294,4 +307,4 @@ void CUSBPcs::Init()
 	USB.Connect();
 }
 
-CUSBPcs USBPcs;
+unsigned char USBPcs[sizeof(CUSBPcs)];

@@ -776,7 +776,8 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
 			 itemObj != 0;
 			 itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-			if (*(int*)(itemObj + 0x44) == 0 && (itemObj[0x50] & 8) != 0 &&
+			if (*(int*)(itemObj + 0x44) == 0 &&
+				(int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0 &&
 				(((int)(char)itemObj[0x53] & deleteMask) != 0) && *(int*)(itemObj + 0x48) < bestScriptObjectPos) {
 				bestScriptObjectPos = *(int*)(itemObj + 0x48);
 				bestItemObj = itemObj;
@@ -1475,7 +1476,7 @@ void CGItemObj::DispAllFieldItem(int show)
 	     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
 		void* owner = *(void**)(itemObj + 0x550);
 
-		if (owner == 0 && (itemObj[0x50] & 8) != 0) {
+		if (owner == 0 && (int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0) {
 			if (show != 0) {
 				*(unsigned int*)(itemObj + 0x60) &= 0xffbfffff;
 			} else {

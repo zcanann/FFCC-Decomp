@@ -160,7 +160,6 @@ mapobj.cpp:
 	extabindex  start:0x8000B860 end:0x8000B9BC
 	.text       start:0x800287D0 end:0x8002C704
 	.data       start:0x801E88E4 end:0x801E8950
-	.sdata      start:0x8032E8B8 end:0x8032E8BC
 
 mapocttree.cpp:
 	extab       start:0x80005FB0 end:0x80006068
@@ -794,7 +793,6 @@ chara.cpp:
 	.text       start:0x8006EB04 end:0x80073AF4
 	.ctors      start:0x801D5410 end:0x801D5414
 	.data       start:0x801FCD18 end:0x801FCD38
-	.sdata      start:0x8032E8BC end:0x8032E8C0
 	.sbss       start:0x8032EDA0 end:0x8032EDA8
 
 p_chara.cpp:
@@ -1085,6 +1083,7 @@ memorycard.cpp:
 	.rodata     start:0x801DAA0C end:0x801DAF40
 	.data       start:0x8021054C end:0x8021056C
 	.bss        start:0x802F2628 end:0x802F26C4
+	.sdata      start:0x8032E850 end:0x8032E880
 
 pppWDrawMatrixLoop.cpp:
 	extab       start:0x800084E0 end:0x800084E8
@@ -1112,6 +1111,7 @@ sound.cpp:
 	.rodata     start:0x801DB0BC end:0x801DB2E0
 	.data       start:0x8021056C end:0x80210580
 	.bss        start:0x802F26C4 end:0x802F49B0
+	.sdata      start:0x8032E880 end:0x8032E890
 	.sdata2     start:0x80330CE0 end:0x80330D20
 
 gbaque.cpp:
@@ -1202,6 +1202,7 @@ p_sound.cpp:
 	.ctors      start:0x801D5434 end:0x801D5438
 	.rodata     start:0x801DB4E8 end:0x801DB4F4
 	.data       start:0x80210580 end:0x80210750
+	.sdata      start:0x8032E890 end:0x8032E8A8
 	.sbss       start:0x8032EDE0 end:0x8032EDE4
 
 pppYmLookOn.cpp:
@@ -1324,6 +1325,7 @@ wm_menu.cpp:
 	.rodata     start:0x801DC418 end:0x801DC448
 	.data       start:0x80210FDC end:0x802111E8
 	.bss        start:0x802FF408 end:0x802FF450
+	.sdata      start:0x8032E8A8 end:0x8032E920
 	.sbss       start:0x8032EE1C end:0x8032EE34
 	.sdata2     start:0x80331134 end:0x803311BC
 	.sbss2      start:0x80333DF8 end:0x80333E00
@@ -1353,7 +1355,6 @@ THPSimple.cpp:
 	.text       start:0x801040C8 end:0x8010597C
 	.data       start:0x802111E8 end:0x802112E8
 	.bss        start:0x802FFA80 end:0x80300140
-	.sdata      start:0x8032E8C0 end:0x8032E8C4
 	.sbss       start:0x8032EE48 end:0x8032EE60
 
 THPDraw.cpp:

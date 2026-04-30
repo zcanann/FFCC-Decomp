@@ -792,10 +792,10 @@ void CDbgMenuPcs::Add()
     param.m_unk18 = rootParam.m_unk18;
     param.m_unk1C = rootParam.m_unk1C;
     param.m_unk20 = rootParam.m_unk20;
-    param.m_text = const_cast<char*>(s_Debug_80331c90);
     param.m_unk28 = rootParam.m_unk28;
     param.m_unk2C = rootParam.m_unk2C;
     param.m_unk30 = rootParam.m_unk30;
+    param.m_text = const_cast<char*>(s_Debug_80331c90);
     Add(0, 10, param);
 
     y = 10;
@@ -821,10 +821,10 @@ void CDbgMenuPcs::Add()
         param.m_unk18 = nodeParam.m_unk18;
         param.m_unk1C = nodeParam.m_unk1C;
         param.m_unk20 = nodeParam.m_unk20;
-        param.m_text = const_cast<char*>(menuDefs->text);
         param.m_unk28 = nodeParam.m_unk28;
         param.m_unk2C = nodeParam.m_unk2C;
         param.m_unk30 = nodeParam.m_unk30;
+        param.m_text = const_cast<char*>(menuDefs->text);
         Add(10, 1, param);
 
         u32 actionType = menuDefs->actionType;

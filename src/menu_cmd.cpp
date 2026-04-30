@@ -2427,7 +2427,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 	}
 
 	s16** listPtr = reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x850);
-	double baseX = static_cast<double>((*listPtr)[4]);
+	float baseX = static_cast<float>((*listPtr)[4]);
 	int caravanWork = Game.m_scriptFoodBase[0];
 
 	if (topIdx < 0) {
@@ -2444,7 +2444,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 				}
 
 				*entry = static_cast<s16>(static_cast<double>(*entry) - DOUBLE_80332ab8);
-				if (static_cast<double>(*entry) <= baseX) {
+				if (static_cast<float>(*entry) <= baseX) {
 					*entry = static_cast<s16>(baseX);
 					if (j == 0) {
 						finished++;
@@ -2471,7 +2471,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 			}
 
 			*entry = static_cast<s16>(static_cast<double>(*entry) - DOUBLE_80332ab8);
-			if (static_cast<double>(*entry) <= baseX) {
+			if (static_cast<float>(*entry) <= baseX) {
 				finished = true;
 				*entry = static_cast<s16>(baseX);
 			}

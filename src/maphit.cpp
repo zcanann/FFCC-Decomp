@@ -448,6 +448,10 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     g_hit_edge_idx_min = -1;
     g_hit_lpface_min = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;
+    PSVECScale(hitDirection, &g_hit_hpv, hitT);
+    PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
+    g_hit_mvec_min = g_hit_mvec;
+    g_hit_hpv_min = g_hit_hpv;
     g_hit_f = 1;
     return 1;
 }

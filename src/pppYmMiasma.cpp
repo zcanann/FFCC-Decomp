@@ -225,8 +225,8 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
     YmMiasmaFrameStep* step = (YmMiasmaFrameStep*)param_2;
     PARTICLE_DATA* particle;
     int i;
-    Vec matrixPos;
     Vec delta;
+    Vec matrixPos;
     float zero;
 
     if (gPppCalcDisabled != 0) {

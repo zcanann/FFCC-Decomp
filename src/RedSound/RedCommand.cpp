@@ -89,7 +89,7 @@ int _EraseTime(int eraseTrack)
 	int* track = (int*)*trackBasePtr;
 
 	do {
-		if (((u32)*track != 0) && (*(char*)(track + 0x54) == '\0') &&
+		if (((u32)*track != 0) && (*(unsigned char*)(track + 0x54) == 0) &&
 		    ((unsigned int)*(unsigned char*)((char*)track + 0x14f) < minTrack)) {
 			minTrack = *(unsigned char*)((char*)track + 0x14f);
 		}
@@ -104,7 +104,7 @@ int _EraseTime(int eraseTrack)
 	int maxWait = 0;
 	int sepId = 0;
 	do {
-		if (((u32)*track != 0) && (*(char*)(track + 0x54) == '\0') &&
+		if (((u32)*track != 0) && (*(unsigned char*)(track + 0x54) == 0) &&
 		    ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
 		    (maxWait < track[0x43])) {
 			maxWait = track[0x43];
@@ -116,7 +116,7 @@ int _EraseTime(int eraseTrack)
 	track = (int*)*trackBasePtr;
 	int erasedCount = 0;
 	do {
-		if (((u32)*track != 0) && (*(char*)(track + 0x54) == '\0') &&
+		if (((u32)*track != 0) && (*(unsigned char*)(track + 0x54) == 0) &&
 		    ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
 		    (track[0x43] == maxWait)) {
 			int trackNo;

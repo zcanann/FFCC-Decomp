@@ -152,11 +152,11 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         memcpy(rsdItem->ptr10, usb.m_data, dataSize);
 
         xyzData = reinterpret_cast<u32*>(rsdItem->ptr10);
-        for (u32 i = size; i != 0; i--) {
-            xyzData[0] = BSWAP32(xyzData[0]);
-            *reinterpret_cast<float*>(xyzData + 1) = -static_cast<float>(BSWAP32(xyzData[1]));
-            *reinterpret_cast<float*>(xyzData + 2) = -static_cast<float>(BSWAP32(xyzData[2]));
-            xyzData += 3;
+        for (u32 i = 0, offset = 0; i < size; i++, offset += 0xC) {
+            u32* item = reinterpret_cast<u32*>(reinterpret_cast<u8*>(xyzData) + offset);
+            item[0] = BSWAP32(item[0]);
+            *reinterpret_cast<float*>(item + 1) = -static_cast<float>(BSWAP32(item[1]));
+            *reinterpret_cast<float*>(item + 2) = -static_cast<float>(BSWAP32(item[2]));
         }
         DCStoreRange(rsdItem->ptr10, dataSize);
 
@@ -255,11 +255,11 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         memcpy(rsdItem->ptr14, usb.m_data, dataSize);
 
         xyzData = reinterpret_cast<u32*>(rsdItem->ptr14);
-        for (u32 i = size; i != 0; i--) {
-            xyzData[0] = BSWAP32(xyzData[0]);
-            *reinterpret_cast<float*>(xyzData + 1) = -static_cast<float>(BSWAP32(xyzData[1]));
-            *reinterpret_cast<float*>(xyzData + 2) = -static_cast<float>(BSWAP32(xyzData[2]));
-            xyzData += 3;
+        for (u32 i = 0, offset = 0; i < size; i++, offset += 0xC) {
+            u32* item = reinterpret_cast<u32*>(reinterpret_cast<u8*>(xyzData) + offset);
+            item[0] = BSWAP32(item[0]);
+            *reinterpret_cast<float*>(item + 1) = -static_cast<float>(BSWAP32(item[1]));
+            *reinterpret_cast<float*>(item + 2) = -static_cast<float>(BSWAP32(item[2]));
         }
         DCStoreRange(rsdItem->ptr14, dataSize);
         break;

@@ -2,6 +2,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/materialman.h"
 #include "ffcc/util.h"
 #include <string.h>
 #include <dolphin/os/OSCache.h>
@@ -559,4 +560,65 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 	if ((step->m_payload[0] == 1) || (step->m_payload[0] == 0)) {
 		GXCallDisplayList(displayList->m_data, displayList->m_size);
 	}
+}
+
+CChara::CMesh::CRefData* CChara::CMesh::GetRefData()
+{
+	return m_data;
+}
+
+CChara::CMesh* CChara::CModel::GetMesh()
+{
+	return m_meshes;
+}
+
+S16Vec* CChara::CMesh::GetVertex()
+{
+	return m_workPositions;
+}
+
+void CChara::CModel::GetMatrixT(float (*mtx)[4])
+{
+	u32* dst = reinterpret_cast<u32*>(mtx);
+	u32* src = reinterpret_cast<u32*>(m_matrix);
+
+	dst[0] = src[0];
+	dst[1] = src[1];
+	dst[2] = src[2];
+	dst[3] = src[3];
+	dst[4] = src[4];
+	dst[5] = src[5];
+	dst[6] = src[6];
+	dst[7] = src[7];
+	dst[8] = src[8];
+	dst[9] = src[9];
+	dst[10] = src[10];
+	dst[11] = src[11];
+}
+
+void CChara::CModel::SetAfterDrawMeshCallback(void (*callback)(CChara::CModel*, void*, void*, int, float (*)[4]))
+{
+	m_afterDrawMeshCallback = callback;
+}
+
+void CChara::CModel::SetDrawMeshDLCallback(
+    void (*callback)(CChara::CModel*, void*, void*, int, int, float (*)[4]))
+{
+	m_drawMeshDLCallback = callback;
+}
+
+void CChara::CModel::SetBeforeMeshLockEnvCallback(void (*callback)(CChara::CModel*, void*, void*, int))
+{
+	m_beforeMeshLockEnvCallback = callback;
+}
+
+void CChara::CModel::SetCallbackContext(void* context, void* param)
+{
+	m_callbackContext = context;
+	m_callbackParam = param;
+}
+
+void CMaterialMan::SetStoneTexObj(_GXTexObj* texObj)
+{
+	*reinterpret_cast<_GXTexObj**>(reinterpret_cast<u8*>(this) + 0xD0) = texObj;
 }

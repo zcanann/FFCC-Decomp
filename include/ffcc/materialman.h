@@ -65,6 +65,7 @@ public:
     void SetMaterialCharaShadow(CMaterial*);
     void SetMaterialPart(CMaterialSet*, int, int);
     void SetMaterialMenu(CMaterialSet*, int, int);
+    void SetStoneTexObj(_GXTexObj*);
     void SetObjMatrix(float(*)[4], float(*)[4]);
     void SetTexScroll(float, float, float, float);
     void SetFullScreenShadow(CFullScreenShadow&, float(*)[4], long);

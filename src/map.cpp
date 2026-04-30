@@ -1796,24 +1796,45 @@ found:
 int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
 {
     unsigned char* mapObj = Ptr(this, 0x954);
-    unsigned char* mapObjEnd = mapObj + (*reinterpret_cast<short*>(Ptr(this, 0xC)) * 0xF0);
 
-    while (mapObj < mapObjEnd) {
+    goto search;
+    while (true) {
         unsigned char* mapObjAtr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
-        if (mapObjAtr != 0 && *reinterpret_cast<int*>(mapObjAtr + 4) == CMapObjAtr::PLAY_STA &&
-            *(mapObjAtr + 8) == static_cast<unsigned char>(playStaNo)) {
+        if (*(mapObjAtr + 8) == playStaNo) {
             vec->x = *reinterpret_cast<float*>(mapObj + 0xC4);
             vec->y = *reinterpret_cast<float*>(mapObj + 0xD4);
             vec->z = *reinterpret_cast<float*>(mapObj + 0xE4);
             return 1;
         }
         mapObj += 0xF0;
-    }
 
-    vec->x = FLOAT_8032f9a0;
-    vec->y = FLOAT_8032f9a0;
-    vec->z = FLOAT_8032f9a0;
-    return 0;
+search:
+        unsigned int stride = 0xF0;
+        unsigned char* mapObjEnd = Ptr(this, 0x954 + *reinterpret_cast<short*>(Ptr(this, 0xC)) * 0xF0);
+        unsigned int remaining =
+            (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
+            stride;
+
+        if (mapObj < mapObjEnd) {
+            do {
+                unsigned char* mapObjAtr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
+                if (mapObjAtr != 0 && *reinterpret_cast<int*>(mapObjAtr + 4) == CMapObjAtr::PLAY_STA) {
+                    goto found;
+                }
+                mapObj += 0xF0;
+                remaining--;
+            } while (remaining != 0);
+        }
+
+        mapObj = 0;
+found:
+        if (mapObj == 0) {
+            vec->z = FLOAT_8032f9a0;
+            vec->y = FLOAT_8032f9a0;
+            vec->x = FLOAT_8032f9a0;
+            return 0;
+        }
+    }
 }
 
 /*

@@ -13,6 +13,10 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMiniGamePcs MiniGamePcs;
+extern "C" {
+int MG_GBA_THREAD_MSG_SETPORT_ct = 0;
+int g_errCt = 0;
+}
 extern "C" void create__12CMiniGamePcsFv(CMiniGamePcs*);
 extern "C" void destroy__12CMiniGamePcsFv(CMiniGamePcs*);
 extern "C" void calc__12CMiniGamePcsFv(CMiniGamePcs*);

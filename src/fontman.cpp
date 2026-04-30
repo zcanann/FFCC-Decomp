@@ -317,17 +317,22 @@ found_fallback:
  */
 void CFont::Draw(char* text)
 {
-	unsigned short ch = 0;
+	char* textPtr = text;
+	unsigned short ch;
+	int hasChar;
 
 	goto read_char;
 
-	while (ch != '\0') {
+	while (hasChar != 0) {
 		Draw(ch);
 
 read_char:
-		ch = static_cast<unsigned char>(*text);
-		if (ch != '\0') {
-			text++;
+		if (static_cast<unsigned char>(*textPtr) == 0) {
+			hasChar = 0;
+		} else {
+			ch = static_cast<unsigned char>(*textPtr);
+			hasChar = 1;
+			textPtr++;
 		}
 	}
 }

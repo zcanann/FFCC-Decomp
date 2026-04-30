@@ -630,11 +630,11 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     Vec lightDir;
     GXLightObj lightObj;
     u8* camera = reinterpret_cast<u8*>(&CameraPcs);
-    const float& cameraOffset = FLOAT_80331ce8;
-    const float& zero = FLOAT_80331cc4;
-    const float& one = FLOAT_80331cd0;
-    const float& attnA = FLOAT_80331cec;
-    const float& attnB = FLOAT_80331cf0;
+    float cameraOffset = FLOAT_80331ce8;
+    float zero = FLOAT_80331cc4;
+    float one = FLOAT_80331cd0;
+    float attnA = FLOAT_80331cec;
+    float attnB = FLOAT_80331cf0;
 
     lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
     lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));

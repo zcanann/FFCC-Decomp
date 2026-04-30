@@ -51,19 +51,19 @@ CRedMemory::~CRedMemory()
  */
 int RedNew(int size)
 {
-	unsigned int interrupts;
-	int address;
 	int entryCount;
+	unsigned int interrupts;
 	int* slot;
+	int address;
 
 	if ((size < 1) || (m_MemoryBank == 0) || ((unsigned int)m_DataBuffer == 0)) {
 		return 0;
 	}
 
 	interrupts = OSDisableInterrupts();
-	address = m_DataBuffer;
 	size = (size + 0x1F) & 0xFFFFFFE0;
 	slot = m_MemoryBank;
+	address = m_DataBuffer;
 
 	do {
 		if ((slot[1] == 0) || ((address + size) <= *slot)) {

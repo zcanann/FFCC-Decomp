@@ -25,6 +25,7 @@ extern "C" int calcCastTime__10CGCharaObjFi(CGCharaObj*, int);
 extern "C" void aiAddDuct__8CGMonObjFRi(CGMonObj*, int&);
 extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
+extern "C" int IsDispRader__8CGObjectFv(CGObject*);
 extern "C" int getNearParty__8CGMonObjFiiffi(CGMonObj*, int, int, float, float, int);
 extern "C" void onDestroy__10CGCharaObjFv(CGCharaObj*);
 extern "C" void SetHitEnemy__8GbaQueueFii(void*, int, int);
@@ -2241,10 +2242,15 @@ void CGMonObj::setUndeadEffect(int, int)
 unsigned int CGMonObj::IsDispRader()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	if (object->IsDispRader() == 0) {
-		return 0;
+	unsigned char result = 0;
+	if (IsDispRader__8CGObjectFv(object) != 0 &&
+	    static_cast<signed char>(
+	        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) &
+	                         0xC0000000) >>
+	        31) != 0) {
+		result = 1;
 	}
-	return static_cast<int>(static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) < 0;
+	return result;
 }
 
 /*

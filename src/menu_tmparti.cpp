@@ -330,17 +330,16 @@ unsigned int CMenuPcs::TmpArtiClose()
 					uVar8 = uVar8 - 1;
 				} while (uVar8 != 0);
 				uVar6 = uVar6 & 7;
-				if (uVar6 == 0) {
-					return 1;
-				}
 			}
-			do {
-				*(int *)(psVar4 + 0x12) = 0;
-				*(int *)(psVar4 + 0x14) = 1;
-				*(float *)(psVar4 + 8) = fVar1;
-				psVar4 = psVar4 + 0x20;
-				uVar6 = uVar6 - 1;
-			} while (uVar6 != 0);
+			if (uVar6 != 0) {
+				do {
+					*(int *)(psVar4 + 0x12) = 0;
+					*(int *)(psVar4 + 0x14) = 1;
+					*(float *)(psVar4 + 8) = fVar1;
+					psVar4 = psVar4 + 0x20;
+					uVar6 = uVar6 - 1;
+				} while (uVar6 != 0);
+			}
 		}
 		return 1;
 	}
@@ -597,17 +596,16 @@ unsigned int CMenuPcs::TmpArtiOpen()
 					uVar11 = uVar11 - 1;
 				} while (uVar11 != 0);
 				uVar8 = uVar8 & 7;
-				if (uVar8 == 0) {
-					return 1;
-				}
 			}
-			do {
-				*(int *)(psVar7 + 0x12) = 0;
-				*(int *)(psVar7 + 0x14) = 1;
-				*(float *)(psVar7 + 8) = fVar3;
-				psVar7 = psVar7 + 0x20;
-				uVar8 = uVar8 - 1;
-			} while (uVar8 != 0);
+			if (uVar8 != 0) {
+				do {
+					*(int *)(psVar7 + 0x12) = 0;
+					*(int *)(psVar7 + 0x14) = 1;
+					*(float *)(psVar7 + 8) = fVar3;
+					psVar7 = psVar7 + 0x20;
+					uVar8 = uVar8 - 1;
+				} while (uVar8 != 0);
+			}
 		}
 		return 1;
 	}

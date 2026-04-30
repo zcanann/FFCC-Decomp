@@ -1076,6 +1076,7 @@ pppYmBreath.cpp:
 	extabindex  start:0x8000EA88 end:0x8000EADC
 	.text       start:0x800BFE78 end:0x800C17B8
 	.rodata     start:0x801DA9B0 end:0x801DA9C0
+	.sdata2     start:0x80330C98 end:0x80330CD0
 
 memorycard.cpp:
 	extab       start:0x800083F8 end:0x800084E0

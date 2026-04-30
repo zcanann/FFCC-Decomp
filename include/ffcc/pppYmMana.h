@@ -13,6 +13,7 @@ struct CGObject;
 struct Vec2d;
 struct pppYmManaUnkB;
 struct pppYmManaUnkC {
+    u8 _pad0[0x0c];
     s32* m_serializedDataOffsets;
 };
 

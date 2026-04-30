@@ -72,12 +72,12 @@ struct Vec2d {
 
 extern "C" const char s_pppYmMana_cpp_801DB4D8[] = "pppYmMana.cpp";
 
-struct pppYmManaOffsetsRaw {
-    u8 _pad0[0xc];
-    s32* m_serializedDataOffsets;
-};
-
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
+
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
 
 extern "C" {
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -432,7 +432,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
  */
 void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 {
-    s32* offsets = ((pppYmManaOffsetsRaw*)param_2)->m_serializedDataOffsets;
+    s32* offsets = param_2->m_serializedDataOffsets;
     s32 workOffset = offsets[2];
     u32* work = (u32*)((u8*)ymMana + workOffset + 0x80);
     CGObject* gObject = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
@@ -444,7 +444,7 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     }
 
     if (Game.m_currentMapId != 0x21) {
-        gObject->m_stepSlopeLimit = FLOAT_80330eb8;
+        gObject->m_stepSlopeLimit = LoadFloat(FLOAT_80330eb8);
     }
 
     handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
@@ -517,7 +517,7 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
  */
 void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 {
-    u32* work = (u32*)((u8*)ymMana + 8 + param_2->m_serializedDataOffsets[2]);
+    u32* work = (u32*)((u8*)ymMana + 0x80 + param_2->m_serializedDataOffsets[2]);
     CGObject* gObject = (CGObject*)work[0];
     void* handle;
     s32 model;
@@ -534,8 +534,8 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     *(u32*)(model + 0xF0) = 0;
     *(u32*)(model + 0xFC) = 0;
     _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x2CE);
-    *(u32*)(MaterialManRaw() + 0x208) = 0;
-    *(u32*)(MaterialManRaw() + 0x220) = 0;
+    *(u32*)(MaterialManRaw() + 0xD0) = 0;
+    *(u32*)(MaterialManRaw() + 0xDC) = 0;
 
     if (work[10] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[10]);
@@ -696,7 +696,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
 
     gObject = *(CGObject**)((u8*)pppMngStPtr + 0xDC);
     setupOffset = param_3->m_serializedDataOffsets[1];
-    work = (u32*)((u8*)pppYmMana + 8 + param_3->m_serializedDataOffsets[2]);
+    work = (u32*)((u8*)pppYmMana + 0x80 + param_3->m_serializedDataOffsets[2]);
     if (gObject == NULL) {
         return;
     }

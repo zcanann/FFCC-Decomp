@@ -513,7 +513,7 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 		if (type != 2) {
 			if (type >= 2) {
 				if (type < 4) {
-					drawWindow(((-menu->m_state | menu->m_state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
+					drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
 				}
 			} else if (type == 0) {
 				drawWindow(menu->m_y, 0, 0, menu->m_unk18, menu->m_unk1C, menu->m_text);
@@ -521,7 +521,7 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 				drawFont(menu->m_y, 0, 0, menu->m_text);
 			}
 		} else {
-			drawWindow(((-menu->m_state | menu->m_state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
+			drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
 
 			const char* stateText;
 			if (menu->m_state == 1) {

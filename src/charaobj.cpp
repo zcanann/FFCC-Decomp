@@ -47,6 +47,7 @@ unsigned char gCGCharaObjCreateSerialInit = 0;
 extern "C" {
 extern const float kOneF32;
 extern const float kHalfF32;
+extern const float FLOAT_80331988;
 }
 
 static float& CharaObjTargetAngle(CGCharaObj* charaObj)
@@ -2166,33 +2167,38 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int, int, Vec* hitPos
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, int& outArg1)
+int CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, int& outArg1)
 {
-	outEffect = m_itemId;
-	outArg0 = 1;
-	outArg1 = 0;
-
+	bool hasMotion = false;
+	int result;
 	CCharaPcs::CHandle* model = m_charaModelHandle;
-	if (model != 0 && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(model) + 0x168) != 0) {
-		unsigned char* motion = reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(model) + 0x168));
-		if (*reinterpret_cast<int*>(motion + 0xD0) != 0) {
-			unsigned int period = static_cast<unsigned int>(1.0f + (*reinterpret_cast<float*>(motion + 0xC0) -
+	if (model != 0 && *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x168) != 0) {
+		hasMotion = true;
+	}
+
+	if (!hasMotion) {
+		result = 1;
+	} else {
+		unsigned char* motion = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x168));
+		if (*reinterpret_cast<void**>(motion + 0xD0) != 0) {
+			int period = static_cast<int>(kOneF32 + (*reinterpret_cast<float*>(motion + 0xC0) -
 				*reinterpret_cast<float*>(motion + 0xBC)));
-			if (period == 0) {
-				period = 1;
-			}
-			unsigned int frame = static_cast<unsigned int>(m_turnSpeed);
-			if (m_radiusCtrl.x >= 1.0f) {
-				outArg0 = (period <= frame) ? 1 : 0;
+			if (period == 1) {
+				result = 1;
 			} else {
-				outArg0 = ((frame % period) == 0) ? 1 : 0;
+				int frame = static_cast<int>(m_turnSpeed);
+				if (*reinterpret_cast<float*>(m_lastBgAttr) < FLOAT_80331988) {
+					result = ((frame % period) == 0) ? 1 : 0;
+				} else {
+					result = (period <= frame) ? 1 : 0;
+				}
 			}
+		} else {
+			result = 1;
 		}
 	}
 
-	if (itemId >= 0) {
-		outArg1 = level;
-	}
+	return result;
 }
 
 /*

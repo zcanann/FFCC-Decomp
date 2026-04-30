@@ -60,7 +60,7 @@ public:
 	void addHp(int, CGPrgObj*);
 	void calcRegist(int, int, int&, int&, int&, int);
 	void onDamage(CGPrgObj*, int, int, int, Vec*);
-	void getItemPdt(int, int, int&, int&, int&);
+	int getItemPdt(int, int, int&, int&, int&);
 	void putParticleFromItem(int, int, int, Vec*);
 	void statShield();
 	void statAttack();

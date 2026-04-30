@@ -351,7 +351,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
 
             pppUnitMatrix(viewMtx);
             PSMTXConcat(matrixList->m_matrix, ymBreath->m_localMatrix.value, viewMtx.value);
-            PSMTXConcat(ppvCameraMatrix0, viewMtx.value, viewMtx.value);
+            PSMTXConcat(ppvCameraMatrix, viewMtx.value, viewMtx.value);
             PSMTXMultVec(viewMtx.value, source, &pos);
             drawMtx[0][3] = pos.x;
             drawMtx[1][3] = pos.y;
@@ -409,7 +409,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
         source += 8;
     }
 
-    if ((CFlatFlags & 0x200000) != 0) {
+    if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x200000) != 0) {
         for (i = 0; i < (int)params->m_groupCount; i++) {
             if (groupData[0] == 1) {
                 _GXColor debugColor;
@@ -463,7 +463,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                 sphereMtx[2][2] = scale;
 
                 PSMTXConcat(work->m_particleWmats[firstParticle].m_matrix, ymBreath->m_localMatrix.value, tempMtx);
-                PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
+                PSMTXConcat(ppvCameraMatrix, tempMtx, tempMtx);
                 PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &debugPos);
                 sphereMtx[0][3] = debugPos.x;
                 sphereMtx[1][3] = debugPos.y;
@@ -792,9 +792,11 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                 unitVelocity.z = FLOAT_80330C90;
                 groupData->speed = params->m_groupSpeed;
                 pppCopyVector(groupData->direction, unitVelocity);
-                groupData->position.z = 0.0f;
-                groupData->position.y = 0.0f;
-                groupData->position.x = 0.0f;
+                float zero = FLOAT_80330c80;
+
+                groupData->position.z = zero;
+                groupData->position.y = zero;
+                groupData->position.x = zero;
                 PSMTXCopy(pppMngStPtr->m_matrix.value, groupData->matrix);
                 groupData->active = 1;
             }

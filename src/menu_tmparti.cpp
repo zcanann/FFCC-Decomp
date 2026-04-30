@@ -299,9 +299,9 @@ unsigned int CMenuPcs::TmpArtiClose()
 	if (*this->m_tmpArtiList == iVar5) {
 		psVar4 = this->m_tmpArtiList + 4;
 		if (0 < (int)uVar6) {
-			uVar8 = uVar6 >> 3;
-			if (uVar8 != 0) {
-				do {
+			unsigned int groups = uVar6 >> 3;
+			if (groups != 0) {
+				for (; groups != 0; groups--) {
 					*(int *)(psVar4 + 0x12) = 0;
 					*(int *)(psVar4 + 0x14) = 1;
 					*(float *)(psVar4 + 8) = fVar1;
@@ -327,8 +327,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 					*(int *)(psVar4 + 0xf4) = 1;
 					*(float *)(psVar4 + 0xe8) = fVar1;
 					psVar4 = psVar4 + 0x100;
-					uVar8 = uVar8 - 1;
-				} while (uVar8 != 0);
+				}
 				uVar6 = uVar6 & 7;
 				if (uVar6 == 0) {
 					return 1;
@@ -566,9 +565,9 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	if (*this->m_tmpArtiList == iVar6) {
 		psVar7 = this->m_tmpArtiList + 4;
 		if (0 < (int)uVar8) {
-			uVar11 = uVar8 >> 3;
-			if (uVar11 != 0) {
-				do {
+			unsigned int groups = uVar8 >> 3;
+			if (groups != 0) {
+				for (; groups != 0; groups--) {
 					*(int *)(psVar7 + 0x12) = 0;
 					*(int *)(psVar7 + 0x14) = 1;
 					*(float *)(psVar7 + 8) = fVar3;
@@ -594,8 +593,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 					*(int *)(psVar7 + 0xf4) = 1;
 					*(float *)(psVar7 + 0xe8) = fVar3;
 					psVar7 = psVar7 + 0x100;
-					uVar11 = uVar11 - 1;
-				} while (uVar11 != 0);
+				}
 				uVar8 = uVar8 & 7;
 				if (uVar8 == 0) {
 					return 1;

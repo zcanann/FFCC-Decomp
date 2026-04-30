@@ -46,27 +46,27 @@ extern const float FLOAT_80331904 = -1.5707964f;
 
 static inline float CameraWorldX()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
+    return CameraPcs._224_4_;
 }
 
 static inline float CameraWorldY()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x10);
+    return CameraPcs._228_4_;
 }
 
 static inline float CameraWorldZ()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x14);
+    return CameraPcs._232_4_;
 }
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
+    return CameraPcs.m_cameraMatrix;
 }
 
 static inline Mtx44& CameraScreenMatrix()
 {
-    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48);
+    return CameraPcs.m_screenMatrix;
 }
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
@@ -103,7 +103,7 @@ void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXCol
 }
 
 static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5);
-static void UpdateWaterMesh(VMana2* mana2);
+static int UpdateWaterMesh(VMana2* mana2);
 static void RenderWaterMesh(VMana2* mana2);
 static void CalculateNormal(VMana2* mana2);
 static void CalcWaterReflectionVector(
@@ -1193,22 +1193,26 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
  * JP Address: TODO
  * JP Size: TODO
  */
-static void UpdateWaterMesh(VMana2* mana2)
+static int UpdateWaterMesh(VMana2* mana2)
 {
     u8* work;
     float* waterHeightA;
     float* waterHeightB;
     Vec* positions;
     Vec origin;
+    float currentScale;
+    float neighborScale;
 
     work = (u8*)mana2;
     waterHeightA = *(float**)(work + 0x48);
     positions = *(Vec**)(work + 0x3C);
     waterHeightB = *(float**)(work + 0x4C);
     if (waterHeightA == NULL) {
-        return;
+        return 0;
     }
 
+    currentScale = FLOAT_80331898;
+    neighborScale = FLOAT_803318a4;
     for (int row = 1; row < 0x10; row++) {
         int rowBase = row * 0x11;
         for (int colBlock = 0; colBlock < 3; colBlock++) {
@@ -1216,32 +1220,32 @@ static void UpdateWaterMesh(VMana2* mana2)
             int idx = rowBase + col;
 
             waterHeightB[idx + 0] =
-                FLOAT_80331898 * waterHeightA[idx + 0] +
-                FLOAT_803318a4 *
+                currentScale * waterHeightA[idx + 0] +
+                neighborScale *
                     (waterHeightA[idx + 1] + waterHeightA[idx - 1] + waterHeightA[idx - 0x11] + waterHeightA[idx + 0x11]) -
                 waterHeightB[idx + 0];
 
             waterHeightB[idx + 1] =
-                FLOAT_80331898 * waterHeightA[idx + 1] +
-                FLOAT_803318a4 *
+                currentScale * waterHeightA[idx + 1] +
+                neighborScale *
                     (waterHeightA[idx + 2] + waterHeightA[idx + 0] + waterHeightA[idx - 0x10] + waterHeightA[idx + 0x12]) -
                 waterHeightB[idx + 1];
 
             waterHeightB[idx + 2] =
-                FLOAT_80331898 * waterHeightA[idx + 2] +
-                FLOAT_803318a4 *
+                currentScale * waterHeightA[idx + 2] +
+                neighborScale *
                     (waterHeightA[idx + 3] + waterHeightA[idx + 1] + waterHeightA[idx - 0x0F] + waterHeightA[idx + 0x13]) -
                 waterHeightB[idx + 2];
 
             waterHeightB[idx + 3] =
-                FLOAT_80331898 * waterHeightA[idx + 3] +
-                FLOAT_803318a4 *
+                currentScale * waterHeightA[idx + 3] +
+                neighborScale *
                     (waterHeightA[idx + 4] + waterHeightA[idx + 2] + waterHeightA[idx - 0x0E] + waterHeightA[idx + 0x14]) -
                 waterHeightB[idx + 3];
 
             waterHeightB[idx + 4] =
-                FLOAT_80331898 * waterHeightA[idx + 4] +
-                FLOAT_803318a4 *
+                currentScale * waterHeightA[idx + 4] +
+                neighborScale *
                     (waterHeightA[idx + 5] + waterHeightA[idx + 3] + waterHeightA[idx - 0x0D] + waterHeightA[idx + 0x15]) -
                 waterHeightB[idx + 4];
         }
@@ -1262,6 +1266,7 @@ static void UpdateWaterMesh(VMana2* mana2)
     origin.z = *(float*)(work + 0xAC);
     CalcWaterReflectionVector(*(Vec**)(work + 0x44), *(Vec**)(work + 0x3C), *(Vec**)(work + 0x40), 0x121, origin,
                               (float(*)[4])(work + 0x80), *(_GXColor**)(work + 0x5C), *(Vec2d**)(work + 0x58));
+    return 1;
 }
 
 /*

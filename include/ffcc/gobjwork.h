@@ -109,7 +109,7 @@ public:
     void SetIdxCmdList(int);
     void IsUseCmdList(int);
     int IsSelectedCmdList(int);
-    void GetMagicCharge(int, int&, int&);
+    unsigned int GetMagicCharge(int, int&, int&);
     void GetCmdListItemName(int);
     int GetWeaponAttrib(int);
     int GetCmdListItem(int);

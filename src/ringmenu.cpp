@@ -798,10 +798,10 @@ void CRingMenu::onDraw()
 						for (int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
 							int maxCharge;
 							int curCharge;
-							caravanWork->GetMagicCharge(i, maxCharge, curCharge);
+							int charge = caravanWork->GetMagicCharge(i, maxCharge, curCharge);
 
 							float blink = FLOAT_803309c0;
-							if (maxCharge == 0) {
+							if (charge == 0) {
 								if (!caravanWork->IsSelectedCmdList(i)) {
 									unsigned int color[1];
 									__ct__6CColorFUcUcUcUc(color, 0x80, 0x80, 0x80, static_cast<unsigned char>(static_cast<int>(dimAlpha)));

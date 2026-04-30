@@ -1989,7 +1989,7 @@ int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSelected)
+unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 {
 	unsigned int isInvalid = 0;
 	short slotRef = m_commandListInventorySlotRef[cmdListIdx];
@@ -1998,9 +1998,7 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 	}
 
 	if ((((unsigned int)__cntlzw((unsigned char)isInvalid)) >> 5) == 0) {
-		groupedCount = 0;
-		isSelected = 0;
-		return;
+		return 0;
 	}
 
 	int groupedCountLocal = 1;
@@ -2040,9 +2038,8 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 		}
 	}
 
-	groupedCount = groupedCountLocal;
 	if (groupedCountLocal == 1) {
-		isSelected = (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
+		return (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
 	} else {
 		int scanCount = cmdListIdx + 1;
 		short* slotRef = m_commandListExtra + cmdListIdx;
@@ -2062,7 +2059,7 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 			(static_cast<short>(m_currentCmdListIndex) <= (cmdListIdx + groupedCountLocal - 1))) {
 			selected = 1;
 		}
-		isSelected = selected;
+		return selected & 0xFF;
 	}
 }
 

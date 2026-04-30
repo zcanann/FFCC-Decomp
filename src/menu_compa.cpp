@@ -24,7 +24,7 @@ extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
 
 extern float FLOAT_80333000;
-extern float FLOAT_80332ff8;
+extern float FLOAT_80332FF8;
 extern float FLOAT_80332FFC;
 extern float FLOAT_80333010;
 extern float FLOAT_80333014;
@@ -124,7 +124,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x20) = 4;
 	*reinterpret_cast<short*>(iVar4 + 8) = 0x28;
 	*reinterpret_cast<short*>(iVar4 + 10) = 0x30;
-	fVar1 = FLOAT_80332ff8;
+	fVar1 = FLOAT_80332FF8;
 	*reinterpret_cast<short*>(iVar4 + 0xc) = 0x198;
 	fVar2 = FLOAT_80333000;
 	*reinterpret_cast<short*>(iVar4 + 0xe) = 0x18;
@@ -263,7 +263,7 @@ bool CMenuPcs::CompaOpen()
     remaining = count;
     if (0 < count) {
         do {
-            float step = FLOAT_80332ff8;
+            float step = FLOAT_80332FF8;
             if (entry->startFrame <= frame) {
                 if (frame < entry->startFrame + entry->duration) {
                     entry->frame = entry->frame + 1;
@@ -398,7 +398,7 @@ bool CMenuPcs::CompaClose()
     remaining = count;
     if (0 < count) {
         do {
-            float step = FLOAT_80332ff8;
+            float step = FLOAT_80332FF8;
             if (entry->startFrame <= frame) {
                 if (frame < entry->startFrame + entry->duration) {
                     entry->frame = entry->frame + 1;
@@ -412,7 +412,7 @@ bool CMenuPcs::CompaClose()
                     }
                 } else {
                     finishedCount = finishedCount + 1;
-                    entry->alpha = FLOAT_80332ff8;
+                    entry->alpha = FLOAT_80332FF8;
                     entry->dx = step;
                     entry->dy = step;
                 }
@@ -468,7 +468,7 @@ void CMenuPcs::CompaDraw()
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 				float fillW = alpha * w;
-				if (fillW > FLOAT_80332ff8) {
+				if (fillW > FLOAT_80332FF8) {
 					if (tex == 0x51) {
 						float yStep = y;
 						float end = y + h;
@@ -479,19 +479,20 @@ void CMenuPcs::CompaDraw()
 							}
 							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
 								&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, fillW, tileH, u, v,
-								colors, uvScale, FLOAT_80333000, FLOAT_80332ff8);
+								colors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 							yStep += FLOAT_80332FFC;
 						}
 					} else {
 						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
 							&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, fillW, h, u, v,
-							colors, uvScale, FLOAT_80333000, FLOAT_80332ff8);
+							colors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 					}
 
+					u += fillW;
 					x += fillW * uvScale;
 				}
 
-				if (fillW > FLOAT_80332ff8 && fillW < w) {
+				if (fillW > FLOAT_80332FF8 && fillW < w) {
 					GXColor fadeColors[4] = {
 						{0xFF, 0xFF, 0xFF, 0x00},
 						{0xFF, 0xFF, 0xFF, 0x00},
@@ -509,13 +510,13 @@ void CMenuPcs::CompaDraw()
 							}
 							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
 								&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, remainW, tileH, u, v,
-								fadeColors, uvScale, FLOAT_80333000, FLOAT_80332ff8);
+								fadeColors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 							yStep += FLOAT_80332FFC;
 						}
 					} else {
 						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
 							&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, remainW, h, u, v,
-							fadeColors, uvScale, FLOAT_80333000, FLOAT_80332ff8);
+							fadeColors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 					}
 				}
 
@@ -524,7 +525,7 @@ void CMenuPcs::CompaDraw()
 				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 				GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha * FLOAT_80333010)};
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332ff8);
+				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332FF8);
 			}
 		}
 
@@ -556,8 +557,8 @@ void CMenuPcs::CompaDraw()
 			&MenuPcs, 0,
 			static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x10),
 			static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x40 + i * 0x28),
-			FLOAT_80333014, FLOAT_80333018, FLOAT_80332ff8, FLOAT_80332ff8, FLOAT_80333000,
-			FLOAT_80333000, FLOAT_80332ff8);
+			FLOAT_80333014, FLOAT_80333018, FLOAT_80332FF8, FLOAT_80332FF8, FLOAT_80333000,
+			FLOAT_80333000, FLOAT_80332FF8);
 	}
 
 	int memberIndex = 0;

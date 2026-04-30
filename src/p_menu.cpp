@@ -1516,15 +1516,15 @@ void CMenuPcs::SetColor(CColor& color)
 void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
 {
     char path[0x108];
-    int slot = fontNo * 4 + 0x100;
-    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<u8*>(this) + slot);
+    u8* fontSlot = reinterpret_cast<u8*>(this) + fontNo * 4;
+    CFont* font = *reinterpret_cast<CFont**>(fontSlot + 0x100);
 
     if (font != 0) {
         u32* raw = reinterpret_cast<u32*>(font);
         if (--raw[1] == 0) {
             delete reinterpret_cast<CRef*>(font);
         }
-        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + slot) = 0;
+        *reinterpret_cast<u32*>(fontSlot + 0x100) = 0;
     }
 
     sprintf(path, const_cast<char*>(s_dvd__smenu__s_fnt_801d9da0), Game.GetLangString(), fileName);

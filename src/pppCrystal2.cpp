@@ -14,20 +14,6 @@
 extern int __float_nan[];
 extern const double DOUBLE_80331FC0 = 2.4;
 static const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
-static const float FLOAT_80331fd0 = -0.5f;
-static const float FLOAT_80331fd4 = 25.0f;
-static const float FLOAT_80331fd8 = 1.3333334f;
-static const float FLOAT_80331fdc = 0.5f;
-static const float FLOAT_80331FE0 = 2.0f;
-static const float FLOAT_80331FE4 = -1.0f;
-static const float FLOAT_80331FE8 = 0.0f;
-static const double DOUBLE_80331FF0 = 0.5;
-static const double DOUBLE_80331FF8 = 3.0;
-static const double DOUBLE_80332000 = 0.0;
-static const float FLOAT_80332008 = 1.0f;
-static const float FLOAT_8033200C = 128.0f;
-static const float FLOAT_80332010 = 127.0f;
-static const double DOUBLE_80332018 = 4503599627370496.0;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
@@ -109,9 +95,9 @@ static inline float Crystal2SqrtPositive(float value)
 {
     double guess = __frsqrte((double)value);
 
-    guess = DOUBLE_80331FF0 * guess * (DOUBLE_80331FF8 - guess * guess * value);
-    guess = DOUBLE_80331FF0 * guess * (DOUBLE_80331FF8 - guess * guess * value);
-    guess = DOUBLE_80331FF0 * guess * (DOUBLE_80331FF8 - guess * guess * value);
+    guess = 0.5 * guess * (3.0 - guess * guess * value);
+    guess = 0.5 * guess * (3.0 - guess * guess * value);
+    guess = 0.5 * guess * (3.0 - guess * guess * value);
 
     return (float)(value * guess);
 }
@@ -168,7 +154,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 
         indTexMtx = s_crystal2IndTexMtxBase;
-        indTexMtx.value[0][0] = FLOAT_80331fd0 * param_2->m_stepValue;
+        indTexMtx.value[0][0] = -0.5f * param_2->m_stepValue;
         indTexMtx.value[1][1] = indTexMtx.value[0][0];
         texMtx = s_crystal2TexMtxBase;
 
@@ -177,13 +163,12 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         PSMTXConcat(pppMngStPtr->m_matrix.value, object->m_localMatrix.value, cameraMtx);
         if ((int)Game.m_currentSceneId == 7) {
             f32 perspectiveScale = param_2->m_perspectiveScale;
-            C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, perspectiveScale, -perspectiveScale,
-                                  FLOAT_80331fdc, FLOAT_80331fdc);
+            C_MTXLightPerspective(lightMtx, 25.0f, 1.3333334f, perspectiveScale, -perspectiveScale, 0.5f, 0.5f);
             PSMTXConcat(ppvCameraMatrix02, cameraMtx, tmpMtx);
         } else {
             f32 perspectiveScale = param_2->m_perspectiveScale;
-            C_MTXLightPerspective(lightMtx, CameraPcs._252_4_, FLOAT_80331fd8, perspectiveScale, -perspectiveScale,
-                                  FLOAT_80331fdc, FLOAT_80331fdc);
+            C_MTXLightPerspective(lightMtx, CameraPcs._252_4_, 1.3333334f, perspectiveScale, -perspectiveScale, 0.5f,
+                                  0.5f);
             PSMTXConcat(CameraPcs.m_cameraMatrix, cameraMtx, tmpMtx);
         }
         PSMTXConcat(lightMtx, tmpMtx, drawMtx);
@@ -273,40 +258,40 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         textureInfo->m_imageCount = 0x100;
         textureInfo->m_bufferSize = textureSize;
 
-        stepX = FLOAT_80331FE0 / (float)(textureInfo->m_width - 1);
-        stepY = FLOAT_80331FE0 / (float)(textureInfo->m_height - 1);
-        yCoord = FLOAT_80331FE4;
+        stepX = 2.0f / (float)(textureInfo->m_width - 1);
+        stepY = 2.0f / (float)(textureInfo->m_height - 1);
+        yCoord = -1.0f;
 
         for (y = 0; y < (u32)textureInfo->m_height; y++) {
             yTile = y >> 2;
             u32 yFine = (y & 3) * 4;
             ySq = yCoord * yCoord;
-            xCoord = FLOAT_80331FE4;
+            xCoord = -1.0f;
 
             for (x = 0; x < (u32)textureInfo->m_width; x++) {
                 u32 xFine = x & 3;
                 magnitude = xCoord * xCoord + ySq;
 
-                if (magnitude > FLOAT_80331FE8) {
+                if (magnitude > 0.0f) {
                     magnitude = Crystal2SqrtPositive(magnitude);
-                } else if ((double)magnitude < DOUBLE_80332000) {
+                } else if ((double)magnitude < 0.0) {
                     magnitude = *(float*)__float_nan;
                 } else if (Crystal2FpClassify(magnitude) == 1) {
                     magnitude = *(float*)__float_nan;
                 }
 
-                if (magnitude > FLOAT_80332008) {
-                    magnitude = FLOAT_80332008;
+                if (magnitude > 1.0f) {
+                    magnitude = 1.0f;
                 }
 
-                u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80332010 + FLOAT_8033200C));
+                u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * 127.0f + 128.0f));
                 u8* pixel = textureInfo->m_imageData +
                     yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +
                     (x & 0x1FFFFFFC) * 8 +
                     (xFine + yFine) * 2;
 
                 pixel[0] = nx;
-                u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * FLOAT_80332010 + FLOAT_8033200C));
+                u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * 127.0f + 128.0f));
                 xCoord += stepX;
                 pixel[1] = ny;
             }

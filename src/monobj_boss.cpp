@@ -967,8 +967,8 @@ void CGMonObj::attackedFuncSaw()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	if (prgObj->m_lastStateId == 100) {
 		prgObj->addSubStat();
-		*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) |= 0x80;
-		*reinterpret_cast<int*>(SoundBuffer + 1268) = 0xFA;
+		*reinterpret_cast<unsigned char*>(SoundBuffer_1260_ + 0x14) |= 0x80;
+		*reinterpret_cast<int*>(SoundBuffer_1260_ + 0x8) = 0xFA;
 	}
 }
 

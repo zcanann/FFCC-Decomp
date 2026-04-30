@@ -2840,7 +2840,7 @@ unsigned int CMenuPcs::CmdClose2()
  */
 const char* CMenuPcs::GetSkillStr(int index)
 {
-	const s8 languageId = Game.m_gameWork.m_languageId;
+	const int languageId = static_cast<signed char>(Game.m_gameWork.m_languageId);
 
 	if (languageId == '\x03') {
 		return s_SkillStr_it[index];

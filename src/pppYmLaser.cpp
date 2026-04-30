@@ -51,8 +51,6 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
 	int, int, int, int, int);
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(
 	int, int, int, int, int, int);
-void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
-void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
 }
 
@@ -359,15 +357,18 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	u8 alpha0;
 	u8 alphaStep;
 	u8 alphaMax;
-	float halfWidth;
 	float length;
+	float halfWidth;
 	float u0;
 	float u1;
 	float uvStep;
+	pppYmLaserDoubleBits countDouble;
 	pppFMATRIX modelView;
-	pppFMATRIX mtxOut;
+	pppFMATRIX unitMtx;
 	pppFMATRIX shapeMtx;
-	Mtx tempMtx;
+	Mtx rotMtx;
+	Mtx debugMtx;
+	Mtx scaleMtx;
 	Mtx sphereMtx;
 	Vec shapePos;
 	Vec spherePos;
@@ -402,12 +403,13 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 	GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 
-	length = work->m_length;
 	halfWidth = work->m_halfWidth;
+	length = work->m_length;
 
-	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&modelView, &pppMngStPtr->m_matrix, &laser->m_localMatrix);
-	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, (pppFMATRIX*)&ppvCameraMatrix02, &modelView);
-	GXLoadPosMtxImm(mtxOut.value, 0);
+	pppUnitMatrix(unitMtx);
+	pppMulMatrix(modelView, pppMngStPtr->m_matrix, laser->m_localMatrix);
+	pppMulMatrix(modelView, *(pppFMATRIX*)&ppvCameraMatrix02, modelView);
+	GXLoadPosMtxImm(modelView.value, 0);
 
 	GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
 	GXPosition3f32(-halfWidth, kPppYmLaserOne, kPppYmLaserOne);
@@ -444,8 +446,8 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		shapeMtx.value[1][1] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.y;
 		shapeMtx.value[2][2] = shapeMtx.value[0][0];
 		if (kPppYmLaserOne != work->m_shapeRotation) {
-			PSMTXRotRad(tempMtx, 'z', work->m_shapeRotation);
-			PSMTXConcat(shapeMtx.value, tempMtx, shapeMtx.value);
+			PSMTXRotRad(rotMtx, 'z', work->m_shapeRotation);
+			PSMTXConcat(shapeMtx.value, rotMtx, shapeMtx.value);
 		}
 		PSMTXMultVec(ppvCameraMatrix02, work->m_points, &shapePos);
 		shapeMtx.value[0][3] = shapePos.x;
@@ -455,7 +457,6 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		pppDrawShp__FPlsP12CMaterialSetUc(*shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
 
 		count = (u32)step->m_payload[0x1e];
-		pppYmLaserDoubleBits countDouble;
 
 		countDouble.u[0] = 0x43300000;
 		countDouble.u[1] = count;
@@ -537,25 +538,27 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			GXSetPointSize(8, GX_TO_ZERO);
 			GXSetZMode(1, GX_LEQUAL, 0);
 
-			PSMTXIdentity(tempMtx);
-			tempMtx[0][0] = pppMngStPtr->m_previousPosition.z * *(float*)(step->m_payload + 0x24);
-			tempMtx[1][1] = tempMtx[0][0];
-			tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
-			PSMTXConcat(laser->m_localMatrix.value, tempMtx, tempMtx);
-			PSMTXConcat(pppMngStPtr->m_matrix.value, tempMtx, tempMtx);
-			PSMTXConcat(ppvCameraMatrix02, tempMtx, tempMtx);
-			shapePos.x = kPppYmLaserOne;
-			shapePos.y = kPppYmLaserOne;
-			shapePos.z = FLOAT_80330DC4;
-			PSMTXMultVec(tempMtx, &shapePos, &spherePos);
-			tempMtx[0][3] = spherePos.x;
-			tempMtx[1][3] = spherePos.y;
-			tempMtx[2][3] = spherePos.z;
-			debugColor.r = 0xFF;
-			debugColor.g = 0xFF;
-			debugColor.b = 0xFF;
-			debugColor.a = 0xFF;
-			Graphic.DrawSphere(tempMtx, debugColor);
+			if ((CFlatFlags & 0x200000) != 0) {
+				PSMTXIdentity(debugMtx);
+				debugMtx[0][0] = pppMngStPtr->m_previousPosition.z * *(float*)(step->m_payload + 0x24);
+				debugMtx[1][1] = debugMtx[0][0];
+				debugMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
+				PSMTXConcat(laser->m_localMatrix.value, debugMtx, debugMtx);
+				PSMTXConcat(pppMngStPtr->m_matrix.value, debugMtx, debugMtx);
+				PSMTXConcat(ppvCameraMatrix02, debugMtx, debugMtx);
+				shapePos.x = kPppYmLaserOne;
+				shapePos.y = kPppYmLaserOne;
+				shapePos.z = FLOAT_80330DC4;
+				PSMTXMultVec(debugMtx, &shapePos, &spherePos);
+				debugMtx[0][3] = spherePos.x;
+				debugMtx[1][3] = spherePos.y;
+				debugMtx[2][3] = spherePos.z;
+				debugColor.r = 0xFF;
+				debugColor.g = 0xFF;
+				debugColor.b = 0xFF;
+				debugColor.a = 0xFF;
+				Graphic.DrawSphere(debugMtx, debugColor);
+			}
 
 			GXLoadPosMtxImm(laser->m_drawMatrix.value, GX_PNMTX0);
 			for (i = 0; (int)i < (int)(u32)step->m_payload[0x1e]; i++) {
@@ -563,18 +566,18 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 					(points[i].z == kPppYmLaserOne)) {
 					continue;
 				}
-				PSMTXScale(tempMtx, FLOAT_80330DC8, FLOAT_80330DC8, FLOAT_80330DC8);
-				tempMtx[0][3] = points[i].x;
-				tempMtx[1][3] = points[i].y;
-				tempMtx[2][3] = points[i].z;
-				PSMTXConcat(ppvCameraMatrix02, tempMtx, sphereMtx);
+				PSMTXScale(scaleMtx, FLOAT_80330DC8, FLOAT_80330DC8, FLOAT_80330DC8);
+				scaleMtx[0][3] = points[i].x;
+				scaleMtx[1][3] = points[i].y;
+				scaleMtx[2][3] = points[i].z;
+				PSMTXConcat(ppvCameraMatrix02, scaleMtx, sphereMtx);
 				Graphic.DrawSphere(sphereMtx, debugColor);
 			}
 
-			tempMtx[0][3] = work->m_origin.x;
-			tempMtx[1][3] = work->m_origin.y;
-			tempMtx[2][3] = work->m_origin.z;
-			PSMTXConcat(ppvCameraMatrix02, tempMtx, sphereMtx);
+			scaleMtx[0][3] = work->m_origin.x;
+			scaleMtx[1][3] = work->m_origin.y;
+			scaleMtx[2][3] = work->m_origin.z;
+			PSMTXConcat(ppvCameraMatrix02, scaleMtx, sphereMtx);
 			Graphic.DrawSphere(sphereMtx, debugColor);
 			pppInitBlendMode();
 		}

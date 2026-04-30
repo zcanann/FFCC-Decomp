@@ -9,7 +9,7 @@ public:
 };
 } // namespace std
 
-__declspec(weak) void operator delete(void* arg0) throw()
+inline void operator delete(void* arg0) throw()
 {
     if (arg0 != 0) {
         free(arg0);

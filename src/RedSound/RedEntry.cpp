@@ -256,8 +256,8 @@ int CRedEntry::SearchUseWave(int waveNo)
 int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 {
 	int* bankEntry = reinterpret_cast<int*>(bank);
-	int iVar2;
 	int sequenceNo = -1;
+	int iVar2;
 
 	if (bankEntry[0] >= 0) {
 		WaveHistoryDelete(bankEntry[1]);
@@ -309,11 +309,10 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 	unsigned int history = (unsigned int)m_waveBankBase + 0x100;
 
 	do {
-		int bankSize = *(int*)(history + 4);
-		if (maxBankSize < bankSize) {
+		if (maxBankSize < *(int*)(history + 4)) {
 			int arAddress = *(int*)(*(int*)(history + 8) + 0x10);
 			if ((offset <= arAddress) && (arAddress < maxSize)) {
-				maxBankSize = bankSize;
+				maxBankSize = *(int*)(history + 4);
 				selected = history;
 			}
 		}

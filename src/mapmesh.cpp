@@ -14,8 +14,8 @@ extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
 extern "C" char s_mapmesh_cpp_801D70B0[];
-extern "C" float FLOAT_8032F930;
-extern "C" float FLOAT_8032F934;
+extern "C" const float FLOAT_8032F930 = 10000000000.0f;
+extern "C" const float FLOAT_8032F934 = -10000000000.0f;
 
 CMemory::CStage* g_pStage;
 

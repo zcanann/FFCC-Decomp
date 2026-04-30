@@ -73,57 +73,57 @@ static int m_SignDataTable[] = {
     3216, 2814, 2412, 2010, 1608, 1206, 804, 402,
 };
 
-int SwingEntryFunction[] = {
-    (int)SineSwing, (int)TriangleSwing, (int)SawSwing, (int)DutySwing,
-    (int)RandomSwing, (int)DutySwing,     (int)DutySwing, (int)DutySwing,
-    (int)SineSwingR, (int)TriangleSwingR, (int)SawSwingR, (int)DutySwingR,
-    (int)RandomSwingR, (int)DutySwingR,   (int)DutySwingR, (int)DutySwingR,
+RedSwingFunc SwingEntryFunction[] = {
+    SineSwing, TriangleSwing, SawSwing, DutySwing,
+    RandomSwing, DutySwing,   DutySwing, DutySwing,
+    SineSwingR, TriangleSwingR, SawSwingR, DutySwingR,
+    RandomSwingR, DutySwingR, DutySwingR, DutySwingR,
 };
 
-int p_MidiControl_Function[] = {
-    (int)__MidiCtrl_Stop,             (int)__MidiCtrl_Sleep,           (int)__MidiCtrl_WholeLoopStart,
-    (int)__MidiCtrl_WholeLoopEnd,     (int)__MidiCtrl_LoopStart,       (int)__MidiCtrl_LoopEnd,
-    (int)__MidiCtrl_LoopRepeat,       (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_TempoDirect,
-    (int)__MidiCtrl_TempoChange,      (int)__MidiCtrl_ReverbDepthDirect, (int)__MidiCtrl_ReverbDepthChange,
-    (int)__MidiCtrl_TimeSignature,    (int)__MidiCtrl_KeySignature,    (int)__MidiCtrl_PhraseSignature,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_KeyOnSame,       (int)__MidiCtrl_KeyOnNoteVelocity,
-    (int)__MidiCtrl_KeyOnNote,        (int)__MidiCtrl_KeyOnVelocity,   (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_KeyOffSame,       (int)__MidiCtrl_KeyOffNoteVelocity, (int)__MidiCtrl_KeyOffNote,
-    (int)__MidiCtrl_KeyOffVelocity,   (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_Wave,
-    (int)__MidiCtrl_WaveWithBank,     (int)__MidiCtrl_VolumeDirect,    (int)__MidiCtrl_VolumeChange,
-    (int)__MidiCtrl_ExpressionDirect, (int)__MidiCtrl_ExpressionChange, (int)__MidiCtrl_PanDirect,
-    (int)__MidiCtrl_PanChange,        (int)__MidiCtrl_PortamentOn,     (int)__MidiCtrl_PortamentOff,
-    (int)__MidiCtrl_SlurOn,           (int)__MidiCtrl_SlurOff,         (int)__MidiCtrl_Sweep,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_TenutoOn,        (int)__MidiCtrl_TenutoOff,
-    (int)__MidiCtrl_ADSR_AL,          (int)__MidiCtrl_ADSR_AR,         (int)__MidiCtrl_ADSR_DL,
-    (int)__MidiCtrl_ADSR_DR,          (int)__MidiCtrl_ADSR_SL,         (int)__MidiCtrl_ADSR_SR,
-    (int)__MidiCtrl_ADSR_RL,          (int)__MidiCtrl_ADSR_RR,         (int)__MidiCtrl_ADSR_Default,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_SustainPedal,     (int)__MidiCtrl_ChannelAlloc,    (int)__MidiCtrl_ChannelPriority,
-    (int)__MidiCtrl_ChannelFix,       (int)__MidiCtrl_VibrateOn,       (int)__MidiCtrl_VibrateOff,
-    (int)__MidiCtrl_VibrateDepthDirect, (int)__MidiCtrl_VibrateDepthChange, (int)__MidiCtrl_VibrateRateDirect,
-    (int)__MidiCtrl_VibrateRateChange, (int)__MidiCtrl_VibrateType,    (int)__MidiCtrl_VibrateDelay,
-    (int)__MidiCtrl_TremoloOn,        (int)__MidiCtrl_TremoloOff,      (int)__MidiCtrl_TremoloDepthDirect,
-    (int)__MidiCtrl_TremoloDepthChange, (int)__MidiCtrl_TremoloRateDirect, (int)__MidiCtrl_TremoloRateChange,
-    (int)__MidiCtrl_TremoloType,      (int)__MidiCtrl_TremoloDelay,    (int)__MidiCtrl_ShakeOn,
-    (int)__MidiCtrl_ShakeOff,         (int)__MidiCtrl_ShakeDepthDirect, (int)__MidiCtrl_ShakeDepthChange,
-    (int)__MidiCtrl_ShakeRateDirect,  (int)__MidiCtrl_ShakeRateChange, (int)__MidiCtrl_ShakeType,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_FineTuneAbsolute, (int)__MidiCtrl_FineTuneRelative,
-    (int)__MidiCtrl_KeyTransposeAbsolute, (int)__MidiCtrl_KeyTransposeRelative, (int)__MidiCtrl_PitchBend,
-    (int)__MidiCtrl_PitchBendRange,   (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_ReverbOn,         (int)__MidiCtrl_ReverbOff,       (int)__MidiCtrl_ReverbMix,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_StepRelative,    (int)__MidiCtrl_StepRelative2,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_FuzzyOn,          (int)__MidiCtrl_FuzzyOff,        (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_NoSupport,       (int)__MidiCtrl_NoSupport,
-    (int)__MidiCtrl_NoSupport,        (int)__MidiCtrl_Pass,
+RedMidiControlFunc p_MidiControl_Function[] = {
+    __MidiCtrl_Stop,             __MidiCtrl_Sleep,           __MidiCtrl_WholeLoopStart,
+    __MidiCtrl_WholeLoopEnd,     __MidiCtrl_LoopStart,       __MidiCtrl_LoopEnd,
+    __MidiCtrl_LoopRepeat,       __MidiCtrl_NoSupport,       __MidiCtrl_TempoDirect,
+    __MidiCtrl_TempoChange,      __MidiCtrl_ReverbDepthDirect, __MidiCtrl_ReverbDepthChange,
+    __MidiCtrl_TimeSignature,    __MidiCtrl_KeySignature,    __MidiCtrl_PhraseSignature,
+    __MidiCtrl_NoSupport,        __MidiCtrl_KeyOnSame,       __MidiCtrl_KeyOnNoteVelocity,
+    __MidiCtrl_KeyOnNote,        __MidiCtrl_KeyOnVelocity,   __MidiCtrl_NoSupport,
+    __MidiCtrl_NoSupport,        __MidiCtrl_NoSupport,       __MidiCtrl_NoSupport,
+    __MidiCtrl_KeyOffSame,       __MidiCtrl_KeyOffNoteVelocity, __MidiCtrl_KeyOffNote,
+    __MidiCtrl_KeyOffVelocity,   __MidiCtrl_NoSupport,       __MidiCtrl_NoSupport,
+    __MidiCtrl_NoSupport,        __MidiCtrl_NoSupport,       __MidiCtrl_Wave,
+    __MidiCtrl_WaveWithBank,     __MidiCtrl_VolumeDirect,    __MidiCtrl_VolumeChange,
+    __MidiCtrl_ExpressionDirect, __MidiCtrl_ExpressionChange, __MidiCtrl_PanDirect,
+    __MidiCtrl_PanChange,        __MidiCtrl_PortamentOn,     __MidiCtrl_PortamentOff,
+    __MidiCtrl_SlurOn,           __MidiCtrl_SlurOff,         __MidiCtrl_Sweep,
+    __MidiCtrl_NoSupport,        __MidiCtrl_TenutoOn,        __MidiCtrl_TenutoOff,
+    __MidiCtrl_ADSR_AL,          __MidiCtrl_ADSR_AR,         __MidiCtrl_ADSR_DL,
+    __MidiCtrl_ADSR_DR,          __MidiCtrl_ADSR_SL,         __MidiCtrl_ADSR_SR,
+    __MidiCtrl_ADSR_RL,          __MidiCtrl_ADSR_RR,         __MidiCtrl_ADSR_Default,
+    __MidiCtrl_NoSupport,        __MidiCtrl_NoSupport,       __MidiCtrl_NoSupport,
+    __MidiCtrl_SustainPedal,     __MidiCtrl_ChannelAlloc,    __MidiCtrl_ChannelPriority,
+    __MidiCtrl_ChannelFix,       __MidiCtrl_VibrateOn,       __MidiCtrl_VibrateOff,
+    __MidiCtrl_VibrateDepthDirect, __MidiCtrl_VibrateDepthChange, __MidiCtrl_VibrateRateDirect,
+    __MidiCtrl_VibrateRateChange, __MidiCtrl_VibrateType,    __MidiCtrl_VibrateDelay,
+    __MidiCtrl_TremoloOn,        __MidiCtrl_TremoloOff,      __MidiCtrl_TremoloDepthDirect,
+    __MidiCtrl_TremoloDepthChange, __MidiCtrl_TremoloRateDirect, __MidiCtrl_TremoloRateChange,
+    __MidiCtrl_TremoloType,      __MidiCtrl_TremoloDelay,    __MidiCtrl_ShakeOn,
+    __MidiCtrl_ShakeOff,         __MidiCtrl_ShakeDepthDirect, __MidiCtrl_ShakeDepthChange,
+    __MidiCtrl_ShakeRateDirect,  __MidiCtrl_ShakeRateChange, __MidiCtrl_ShakeType,
+    __MidiCtrl_NoSupport,        __MidiCtrl_FineTuneAbsolute, __MidiCtrl_FineTuneRelative,
+    __MidiCtrl_KeyTransposeAbsolute, __MidiCtrl_KeyTransposeRelative, __MidiCtrl_PitchBend,
+    __MidiCtrl_PitchBendRange,   __MidiCtrl_NoSupport,       __MidiCtrl_NoSupport,
+    __MidiCtrl_ReverbOn,         __MidiCtrl_ReverbOff,       __MidiCtrl_ReverbMix,
+    __MidiCtrl_NoSupport,        __MidiCtrl_NoSupport,       __MidiCtrl_NoSupport,
+    __MidiCtrl_NoSupport,        __MidiCtrl_NoSupport,       __MidiCtrl_NoSupport,
+    __MidiCtrl_NoSupport,        __MidiCtrl_NoSupport,       __MidiCtrl_NoSupport,
+    __MidiCtrl_NoSupport,        __MidiCtrl_NoSupport,       __MidiCtrl_NoSupport,
+    __MidiCtrl_NoSupport,        __MidiCtrl_StepRelative,    __MidiCtrl_StepRelative2,
+    __MidiCtrl_NoSupport,        __MidiCtrl_NoSupport,       __MidiCtrl_NoSupport,
+    __MidiCtrl_NoSupport,        __MidiCtrl_NoSupport,       __MidiCtrl_NoSupport,
+    __MidiCtrl_FuzzyOn,          __MidiCtrl_FuzzyOff,        __MidiCtrl_NoSupport,
+    __MidiCtrl_NoSupport,        __MidiCtrl_NoSupport,       __MidiCtrl_NoSupport,
+    __MidiCtrl_NoSupport,        __MidiCtrl_Pass,
 };
 
 /*
@@ -592,11 +592,12 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
     }
 
     {
-        unsigned char* command = (unsigned char*)*scan;
-        int delta = DeltaTimeSumup(&command);
+        int command[3];
         int* nextTrack = scan + 0x55;
+        command[0] = *scan;
+        int delta = DeltaTimeSumup((unsigned char**)command);
 
-        controlData[slot + 10] = (int)command;
+        controlData[slot + 10] = command[0];
         controlData[slot + 0x4a] = scan[0x42] + delta + deltaAdjust;
         controlData[slot + 0x8a] = scan[0x41];
         controlData[slot + 0xca] = scan[9];
@@ -609,8 +610,7 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
                 while ((currentDelta < 1) && ((u32)*nextTrack != 0)) {
                     unsigned char* cmd = (unsigned char*)*nextTrack;
                     *nextTrack = (int)(cmd + 1);
-                    ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))p_MidiControl_Function[*cmd])(
-                        control, keyOnData, (RedTrackDATA*)nextTrack);
+                    p_MidiControl_Function[*cmd](control, keyOnData, (RedTrackDATA*)nextTrack);
 
                     if ((u32)*nextTrack != 0) {
                         int step = DeltaTimeSumup((unsigned char**)nextTrack);
@@ -1690,7 +1690,7 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
 
     divisor = depth;
     ((int*)track)[0x1e] = 0x100000 / divisor;
-    ((int*)track)[0x1d] = SwingEntryFunction[*(unsigned char*)(((int*)track)[0] + 2) & 0xf];
+    ((int*)track)[0x1d] = (int)SwingEntryFunction[*(unsigned char*)(((int*)track)[0] + 2) & 0xf];
     *(short*)((int)track + 0x8e) = 0;
     *(short*)((int)track + 0x8c) = 0;
     ((int*)track)[0] = ((int*)track)[0] + 3;
@@ -1833,7 +1833,7 @@ void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
 {
 	u32 type = *(u8*)(((u32*)track)[0]++);
 
-	((u32*)track)[0x1d] = SwingEntryFunction[type & 0xf];
+	((u32*)track)[0x1d] = (u32)SwingEntryFunction[type & 0xf];
 }
 
 /*
@@ -1876,7 +1876,7 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 	}
 	divisor = rateDivisor;
 	((int*)track)[0x26] = 0x100000 / divisor;
-	((int*)track)[0x25] = SwingEntryFunction[*(unsigned char*)(((int*)track)[0] + 2) & 0xf];
+	((int*)track)[0x25] = (int)SwingEntryFunction[*(unsigned char*)(((int*)track)[0] + 2) & 0xf];
 	*(short*)((int)track + 0xae) = 0;
 	*(short*)((int)track + 0xac) = 0;
 	((int*)track)[0] += 3;
@@ -2021,7 +2021,7 @@ void __MidiCtrl_TremoloType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
 {
 	u32 type = *(u8*)(((u32*)track)[0]++);
 
-	((u32*)track)[0x25] = SwingEntryFunction[type & 0xf];
+	((u32*)track)[0x25] = (u32)SwingEntryFunction[type & 0xf];
 }
 
 /*
@@ -2062,7 +2062,7 @@ void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 	}
 	divisor = rate;
 	((int*)track)[0x2e] = 0x100000 / divisor;
-	((int*)track)[0x2d] = SwingEntryFunction[*(u8*)(((int*)track)[0] + 2) & 0xf];
+	((int*)track)[0x2d] = (int)SwingEntryFunction[*(u8*)(((int*)track)[0] + 2) & 0xf];
 	*(u16*)((u8*)track + 0xd2) = 0;
 	*(u16*)((u8*)track + 0xd0) = 0;
 	((int*)track)[0x32] = 0;
@@ -2185,7 +2185,7 @@ void __MidiCtrl_ShakeType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	u32 type = *(u8*)(((u32*)track)[0]++);
 
-	((u32*)track)[0x2d] = SwingEntryFunction[type & 0xf];
+	((u32*)track)[0x2d] = (u32)SwingEntryFunction[type & 0xf];
 }
 
 /*

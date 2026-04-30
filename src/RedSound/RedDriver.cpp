@@ -1431,18 +1431,20 @@ int CRedDriver::GetSoundMode()
  */
 int CRedDriver::SetMusicData(void* musicData)
 {
+    int result;
     char localHeader[0x20];
+    char* header;
     void* copiedHeader;
     int headerSize;
-    int result;
 
     result = -1;
-    if (((((char*)musicData)[0] == 'B') && (((char*)musicData)[1] == 'G')) && (((char*)musicData)[2] == 'M')) {
-        memcpy(localHeader, musicData, sizeof(localHeader));
+    header = (char*)musicData;
+    if (((header[0] == 'B') && (header[1] == 'G')) && (header[2] == 'M')) {
+        memcpy(localHeader, header, sizeof(localHeader));
         headerSize = *(int*)(localHeader + 0x10);
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
-            memcpy(copiedHeader, musicData, headerSize);
+            memcpy(copiedHeader, header, headerSize);
             result = *(short*)(localHeader + 4);
             _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
@@ -1625,17 +1627,19 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
  */
 int CRedDriver::SetSeSepData(void* seSepData)
 {
+    int result;
+    char* header;
     void* copiedHeader;
     int headerSize;
-    int result;
 
     result = -1;
-    if ((((((char*)seSepData)[0] == 'S') && (((char*)seSepData)[1] == 'e')) && (((char*)seSepData)[2] == 'S')) &&
-        ((((char*)seSepData)[3] == 'e' && (((char*)seSepData)[4] == 'p')))) {
-        headerSize = *(int*)((char*)seSepData + 0xc) & 0x7fffffff;
+    header = (char*)seSepData;
+    if (((((header[0] == 'S') && (header[1] == 'e')) && (header[2] == 'S')) &&
+        ((header[3] == 'e' && (header[4] == 'p'))))) {
+        headerSize = *(int*)(header + 0xc) & 0x7fffffff;
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
-            memcpy(copiedHeader, seSepData, headerSize);
+            memcpy(copiedHeader, header, headerSize);
             result = *(int*)((int)copiedHeader + 8);
             _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
@@ -1951,21 +1955,21 @@ int CRedDriver::StreamPlayState(int streamID)
 {
 	void* commandNow;
 	unsigned int interrupts;
-	unsigned int streamData;
+	RedStreamDATA* streamData;
 	int result;
 	unsigned int* command;
 
 	interrupts = OSDisableInterrupts();
 	result = 0;
-	streamData = (unsigned int)p_Stream;
+	streamData = p_Stream;
 	do {
-		if ((*(int*)(streamData + 0x10C) != 0) &&
-		    ((streamID == -1) || (*(int*)(streamData + 0x10C) == streamID))) {
+		if ((streamData->m_streamId != 0) &&
+		    ((streamID == -1) || (streamData->m_streamId == streamID))) {
 			result = 1;
 			break;
 		}
-		streamData += 0x130;
-	} while (streamData < (unsigned int)p_Stream + 0x4C0);
+		streamData++;
+	} while (streamData < p_Stream + 4);
 
 	if (result == 0) {
 		commandNow = p_ExecCommandNow;
@@ -1997,7 +2001,7 @@ int CRedDriver::StreamPlayState(int streamID)
  */
 int CRedDriver::GetStreamPlayPoint(int streamID, int* outPoint1, int* outPoint2)
 {
-	unsigned int streamData;
+	RedStreamDATA* streamData;
 	int found;
 
 	found = 0;
@@ -2007,20 +2011,20 @@ int CRedDriver::GetStreamPlayPoint(int streamID, int* outPoint1, int* outPoint2)
 	if (outPoint2 != 0) {
 		*outPoint2 = 0;
 	}
-	streamData = (unsigned int)p_Stream;
+	streamData = p_Stream;
 	do {
-		if ((*(int*)(streamData + 0x10C) != 0) && (*(int*)(streamData + 0x10C) == streamID)) {
+		if ((streamData->m_streamId != 0) && (streamData->m_streamId == streamID)) {
 			if (outPoint1 != 0) {
-				*outPoint1 = *(int*)(streamData + 0x11C);
+				*outPoint1 = streamData->m_fileCursor;
 			}
 			if (outPoint2 != 0) {
-				*outPoint2 = *(int*)(streamData + 0x120);
+				*outPoint2 = streamData->m_readOffset;
 			}
 			found = 1;
 			break;
 		}
-		streamData += 0x130;
-	} while (streamData < (unsigned int)p_Stream + 0x4C0);
+		streamData++;
+	} while (streamData < p_Stream + 4);
 	return found;
 }
 
@@ -2047,9 +2051,9 @@ void CRedDriver::StreamStop(int streamID)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::StreamPlay(int streamID, void* streamData, int volume, int pan, int loopMode)
+int CRedDriver::StreamPlay(int streamID, void* streamData, int fileSize, int pan, int volume)
 {
-	_EntryExecCommand(_StreamPlay, streamID, (int)streamData, volume, pan, loopMode, 0, 0);
+	_EntryExecCommand(_StreamPlay, streamID, (int)streamData, fileSize, pan, volume, 0, 0);
 	return streamID;
 }
 
@@ -2150,8 +2154,9 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
         RedWaveHEAD* const waveHeader = (RedWaveHEAD*)waveData;
 
         if ((waveHeader->magic[0] == 'W') && (waveHeader->magic[1] == 'D')) {
-            int dataSize =
-                (((waveHeader->regionCount * 4) + 0x3fU) & 0xffffffc0) + (waveHeader->sampleCount * 0x60);
+            int dataSize = waveHeader->regionCount * 4;
+            dataSize = (dataSize + 0x3fU) & 0xffffffc0;
+            dataSize += waveHeader->sampleCount * 0x60;
             dataSize = waveHeader->dataSize + dataSize;
             dataSize += 0x20;
             m_WaveSettingData.waveSize = dataSize;
@@ -2204,8 +2209,7 @@ void CRedDriver::DisplayWaveInfo()
  */
 void CRedDriver::SetReverb(int bank, int kind)
 {
-    ::SetReverb(bank, *(int*)((char*)t_ReverbModeData + kind * 0x1c),
-                (int*)((char*)t_ReverbModeData + kind * 0x1c + 4));
+    ::SetReverb(bank, t_ReverbModeData[kind].kind, t_ReverbModeData[kind].params);
 }
 
 /*

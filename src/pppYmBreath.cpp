@@ -491,10 +491,10 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     PARTICLE_WMAT* particleWMat;
     Mtx* particleMtx;
     int i;
-    int groupIndex;
+    short groupIndex;
     int firstParticle;
     int groupTable;
-    int slotIndex;
+    short slotIndex;
     unsigned int slotCount;
     int ready;
     float scaledOwner;

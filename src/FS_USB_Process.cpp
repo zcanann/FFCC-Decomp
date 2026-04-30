@@ -50,8 +50,9 @@ static inline void StoreSwap32(u32* value) {
 }
 
 static inline void StoreSwap32(f32* value) {
+    u32 swapped;
     f32 raw = *value;
-    u32 swapped = __lwbrx(&raw, 0);
+    swapped = __lwbrx(&raw, 0);
     *value = *reinterpret_cast<f32*>(&swapped);
 }
 

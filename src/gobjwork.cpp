@@ -2726,7 +2726,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 {
 	unsigned short* romData = reinterpret_cast<unsigned short*>(romWork);
 	int stageRank;
-	unsigned int memberCount;
+	int memberCount;
 
 	m_baseDataIndex = baseDataIndex;
 	m_id = romData[0];
@@ -2740,7 +2740,22 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 
 	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
 	memset(m_statusTimers + 3, 0, 0x4E);
-	memset(m_statusValues, 0xFF, sizeof(m_statusValues));
+	m_statusValues[0] = 0xFFFF;
+	m_statusValues[1] = 0xFFFF;
+	m_statusValues[2] = 0xFFFF;
+	m_statusValues[3] = 0xFFFF;
+	m_statusValues[4] = 0xFFFF;
+	m_statusValues[5] = 0xFFFF;
+	m_statusValues[6] = 0xFFFF;
+	m_statusValues[7] = 0xFFFF;
+	m_statusValues[8] = 0xFFFF;
+	m_statusValues[9] = 0xFFFF;
+	m_statusValues[10] = 0xFFFF;
+	m_statusValues[11] = 0xFFFF;
+	m_statusValues[12] = 0xFFFF;
+	m_statusValues[13] = 0xFFFF;
+	m_statusValues[14] = 0xFFFF;
+	m_statusValues[15] = 0xFFFF;
 	m_hp = m_maxHp;
 
 	memcpy(unk_0xac, romData + 0x56, 8);
@@ -2749,9 +2764,10 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 	memset(unk_0xf0, 0, 0x20);
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-		stageRank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
-		if (stageRank > 2) {
-			stageRank = 2;
+		int rank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
+		stageRank = 2;
+		if (rank < stageRank) {
+			stageRank = rank;
 		}
 	} else {
 		stageRank = 0;
@@ -2761,28 +2777,39 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier(stageRank * 2 + 0x44));
 	}
 
-	memberCount = (unsigned int)(Game.m_gameWork.m_wmBackupParams[0] >= 0);
-	if (Game.m_gameWork.m_wmBackupParams[1] >= 0) {
-		memberCount++;
-	}
-	if (Game.m_gameWork.m_wmBackupParams[2] >= 0) {
-		memberCount++;
-	}
-	if (Game.m_gameWork.m_wmBackupParams[3] >= 0) {
-		memberCount++;
-	}
-
-	if (Game.m_gameWork.m_menuStageMode != 0) {
+	int* backupParam = Game.m_gameWork.m_wmBackupParams;
+	memberCount = 0;
+	if (*backupParam >= 0) {
 		memberCount = 1;
 	}
-
-	if (memberCount > 1) {
-		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier((int)(memberCount * 2 + 0x5E)));
+	backupParam++;
+	if (*backupParam >= 0) {
+		memberCount++;
+	}
+	backupParam++;
+	if (*backupParam >= 0) {
+		memberCount++;
+	}
+	backupParam++;
+	if (*backupParam >= 0) {
+		memberCount++;
 	}
 
-	if ((Game.m_gameWork.m_scriptSysVal0 == 1) && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
-		m_maxHp = (unsigned short)((float)m_maxHp * ((((float)(*(unsigned short*)(Game.m_bossArtifactBase +
-			Game.m_gameWork.m_bossArtifactStageIndex * 0x168 + 0x60))) * 0.01f) + 1.0f));
+	int scaledMemberCount = memberCount;
+	if (Game.m_gameWork.m_menuStageMode != 0) {
+		scaledMemberCount = 1;
+	}
+
+	if (scaledMemberCount > 1) {
+		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier((int)(scaledMemberCount * 2 + 0x5E)));
+	}
+
+	if ((*reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) == 1) &&
+		(Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
+		unsigned int bossArtifact = Game.m_bossArtifactBase;
+		bossArtifact += Game.m_gameWork.m_bossArtifactStageIndex * 0x168;
+		unsigned short artifactScale = *(unsigned short*)(bossArtifact + 0x60);
+		m_maxHp = (unsigned short)((float)m_maxHp * ((((float)artifactScale) * 0.01f) + 1.0f));
 	}
 
 	m_hp = m_maxHp;
@@ -2807,12 +2834,15 @@ void CMonWork::CalcStatus()
 	m_magic = baseData[5];
 	m_defense = baseData[6];
 
-	int stageRank = 0;
+	int stageRank;
 	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-		stageRank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
-		if (stageRank > 2) {
-			stageRank = 2;
+		int rank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
+		stageRank = 2;
+		if (rank < stageRank) {
+			stageRank = rank;
 		}
+	} else {
+		stageRank = 0;
 	}
 
 	if (stageRank > 0) {
@@ -2823,10 +2853,9 @@ void CMonWork::CalcStatus()
 	}
 
 	if (m_statusTimers[9] != 0) {
-		const float mul = GetStatusMultiplier(0x38);
-		m_strength = (unsigned short)((float)m_strength * mul);
-		m_magic = (unsigned short)((float)m_magic * mul);
-		m_defense = (unsigned short)((float)m_defense * mul);
+		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x38));
+		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x38));
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x38));
 	}
 
 	if (m_statusTimers[4] != 0) {

@@ -165,7 +165,6 @@ void RedDelete(void* address)
 int RedNewA(int size, int offset, int maxSize)
 {
 	unsigned int alignedSize;
-	unsigned int moveCount;
 	unsigned int interrupts;
 	int result;
 	int rangeStart;
@@ -232,8 +231,8 @@ int RedNewA(int size, int offset, int maxSize)
 	if ((bestBlock != 0) && ((unsigned int)(result + alignedSize) <= (unsigned int)(rangeStart + maxSize))) {
 		blockPtr = bestBlock;
 		if (blockPtr[1] > 0) {
-			moveCount = ((int)(m_AMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
-			if ((int)moveCount > 0) {
+			int moveCount = ((int)(m_AMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
+			if (moveCount > 0) {
 				memmove(blockPtr + 2, blockPtr, moveCount * 8);
 			}
 		}

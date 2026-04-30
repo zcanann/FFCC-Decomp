@@ -79,7 +79,7 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
     unsigned long);
 
 
-extern char DAT_801ead4c[];
+extern char g_MsgFlashy[];
 static const char s_p_tina_rodata_801d7ee0[] = {
     (char)0x64, (char)0x76, (char)0x64, (char)0x2F, (char)0x67, (char)0x62, (char)0x61, (char)0x2F,
     (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x66, (char)0x66, (char)0x63, (char)0x63,
@@ -191,7 +191,7 @@ unsigned int m_table__8CPartPcs[2][0x15C / sizeof(unsigned int)] = {
         0x00000000, 0x00000000, 0x00000000, 0x00000000,
     },
 };
-char DAT_801ead4c[0x38] =
+char g_MsgFlashy[0x36] =
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
@@ -200,10 +200,6 @@ unsigned int lbl_801EAD84[3] = {reinterpret_cast<unsigned int>(lbl_8032E69C), 0x
 unsigned int lbl_801EAD90 = reinterpret_cast<unsigned int>(lbl_8032E69C);
 int DAT_8032ed38;
 int DAT_8032ed3c;
-static const char* s_drawAfterViewerFan;
-static char s_drawAfterViewerFanInitialized;
-static int s_drawAfterViewerAlive;
-static char s_drawAfterViewerAliveInitialized;
 CPartPcs PartPcs;
 CProfile g_par_calc_prof(const_cast<char*>(s_no_name_8032fdcc));
 CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
@@ -485,29 +481,17 @@ unsigned int pppNotAllocAmemCacheRmem(unsigned long)
  */
 unsigned int pppFreeMngStPrioForData()
 {
-	struct pppMngStPrioData {
-		char pad0[0x14];
-		int m_baseTime;
-		char pad18[0x5c];
-		short m_kind;
-		short m_nodeIndex;
-		char pad78[0x80];
-		unsigned char m_prio;
-		unsigned char padF9;
-		unsigned short m_prioTime;
-		char padFC[0x5c];
-	};
-
 	char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
-	pppMngStPrioData* selectedMngSt = 0;
+	_pppMngSt* selectedMngSt = 0;
 	char* partMngBase = reinterpret_cast<char*>(&PartMng);
 	_pppMngSt* currentMngSt = pppMngStPtr;
 	int selectedPrio = 1;
 	unsigned int selectedPrioTime;
 	int index = 0;
 	for (int i = 0xc0; i != 0; i--) {
-		pppMngStPrioData* candidateA = reinterpret_cast<pppMngStPrioData*>(partMngBase + 0x2A18);
-		if (reinterpret_cast<_pppMngSt*>(candidateA) != currentMngSt && candidateA->m_baseTime != -0x1000 &&
+		CPartMng* partMng = reinterpret_cast<CPartMng*>(partMngBase);
+		_pppMngSt* candidateA = partMng->m_pppMng;
+		if (candidateA != currentMngSt && candidateA->m_baseTime != -0x1000 &&
 		    candidateA->m_kind != 0) {
 			unsigned char prioA = candidateA->m_prio;
 			if (prioA > 1) {
@@ -525,10 +509,10 @@ unsigned int pppFreeMngStPrioForData()
 			}
 		}
 
-		char* nextPartMngBase = partMngBase + 0x158;
-		pppMngStPrioData* candidateB = reinterpret_cast<pppMngStPrioData*>(nextPartMngBase + 0x2A18);
+		char* nextPartMngBase = partMngBase + sizeof(_pppMngSt);
+		_pppMngSt* candidateB = &partMng->m_pppMng[1];
 		partMngBase = nextPartMngBase;
-		if (reinterpret_cast<_pppMngSt*>(candidateB) != currentMngSt && candidateB->m_baseTime != -0x1000 &&
+		if (candidateB != currentMngSt && candidateB->m_baseTime != -0x1000 &&
 		    candidateB->m_kind != 0) {
 			unsigned char prioB = candidateB->m_prio;
 			if (prioB > 1) {
@@ -546,7 +530,7 @@ unsigned int pppFreeMngStPrioForData()
 			}
 		}
 
-		partMngBase += 0x158;
+		partMngBase += sizeof(_pppMngSt);
 		index++;
 	}
 
@@ -555,10 +539,10 @@ unsigned int pppFreeMngStPrioForData()
 	}
 
 	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(DAT_801ead4c, index);
+		System.Printf(g_MsgFlashy, index);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
-		char* pdtName = reinterpret_cast<char*>(&PartMng) + 0x22E30 + ((int)selectedMngSt->m_kind * 0x38);
+		char* pdtName = PartMng.m_pdtSlots[selectedMngSt->m_kind].m_name;
 		System.Printf(
 			stringBase + 0x2C0,
 			(unsigned int)selectedMngSt->m_prioTime,
@@ -571,7 +555,7 @@ unsigned int pppFreeMngStPrioForData()
 		System.Printf(stringBase + 0x2F4);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(DAT_801ead4c);
+		System.Printf(g_MsgFlashy);
 	}
 
 	Graphic._WaitDrawDone(stringBase + 0x128, 0xfc);
@@ -1258,18 +1242,12 @@ void CPartPcs::drawAfterViewer()
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 
-	if (s_drawAfterViewerFanInitialized == 0) {
-		s_drawAfterViewerFan = sDebugSpinnerText;
-		s_drawAfterViewerFanInitialized = 1;
-	}
-	if (s_drawAfterViewerAliveInitialized == 0) {
-		s_drawAfterViewerAlive = 0;
-		s_drawAfterViewerAliveInitialized = 1;
-	}
+	static const char* pFan = sDebugSpinnerText;
+	static int alive = 0;
 
-	s_drawAfterViewerAlive++;
+	alive++;
 	Graphic.Printf(
-		const_cast<char*>(s_tina_title_fmt_801d8014), s_drawAfterViewerFan[(s_drawAfterViewerAlive >> 4) % 4]);
+		const_cast<char*>(s_tina_title_fmt_801d8014), pFan[(alive >> 4) % 4]);
 
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();

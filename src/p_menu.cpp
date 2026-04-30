@@ -1522,7 +1522,7 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
     if (font != 0) {
         u32* raw = reinterpret_cast<u32*>(font);
         if (--raw[1] == 0) {
-            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(raw[0] + 8))(font, 1);
+            delete reinterpret_cast<CRef*>(font);
         }
         *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + slot) = 0;
     }

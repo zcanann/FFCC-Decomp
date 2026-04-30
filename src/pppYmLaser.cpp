@@ -347,9 +347,11 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
  */
 extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtrlTable* data)
 {
-	int colorOffset = data->m_serializedDataOffsets[1];
+	int* serializedDataOffsets = data->m_serializedDataOffsets;
+	pppYmLaserWork* work = (pppYmLaserWork*)((u8*)laser + 0x80 + serializedDataOffsets[2]);
+	int colorOffset = serializedDataOffsets[1];
 	pppYmLaserColorData* colorData = (pppYmLaserColorData*)((u8*)laser + 0x80 + colorOffset);
-	pppYmLaserWork* work = (pppYmLaserWork*)((u8*)laser + 0x80 + data->m_serializedDataOffsets[2]);
+	s32 dataValIndex = step->m_dataValIndex;
 	Vec* points;
 	u32 count;
 	u32 i;
@@ -375,11 +377,11 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	_GXColor debugColor;
 	int tex;
 
-	if (step->m_dataValIndex == 0xFFFF) {
+	if (dataValIndex == 0xFFFF) {
 		return;
 	}
 
-	tex = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
+	tex = GetTextureFromRSD__FiP9_pppEnvSt(dataValIndex, pppEnvStPtr);
 	pppSetBlendMode(step->m_payload[0x1c]);
 	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 	pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(

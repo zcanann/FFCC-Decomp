@@ -3265,11 +3265,11 @@ int CMapMng::GetMapObjEffectIdx(unsigned short effectId)
  */
 void CMapMng::SetMapObjLMtx(int mapObjIndex, float (*source)[4])
 {
-    CMapObj* mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954);
-    PSMTXCopy(source, *reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(mapObj) + 0x88));
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(mapObj) + 0x1C) = 1;
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(mapObj) + 0x1B) = 1;
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(mapObj) + 0x1C) = 0;
+    CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(this, 0x954)) + mapObjIndex;
+    PSMTXCopy(source, mapObj->m_localMtx);
+    mapObj->m_localMtxDirty = 1;
+    mapObj->m_calcMtxPending = 1;
+    mapObj->m_localMtxDirty = 0;
 }
 
 /*

@@ -148,5 +148,20 @@ public:
     void CalcHitPosition(Vec*);
     void SetMime(int, int, int);
     void SetCalcMtx();
+
+    char m_pad00[0x18];
+    unsigned char m_showFlags;      // 0x18
+    char m_pad19[2];
+    unsigned char m_calcMtxPending; // 0x1B
+    unsigned char m_localMtxDirty;  // 0x1C
+    char m_pad1D[0x11];
+    unsigned short m_objId;         // 0x2E
+    char m_pad30[4];
+    unsigned short m_meshId;        // 0x34
+    char m_pad36[0x52];
+    float m_localMtx[3][4];         // 0x88
+    char m_padB8[0x38];
 };
+
+typedef char CMapObj_size_check[(sizeof(CMapObj) == 0xF0) ? 1 : -1];
 #endif // _FFCC_MAPOBJ_H_

@@ -18,25 +18,27 @@ extern float FLOAT_80330e48;
 extern float FLOAT_80330e4c;
 extern float FLOAT_80330e58;
 extern float FLOAT_80330e5c;
-extern float FLOAT_80330e60;
-extern float FLOAT_80330e64;
-extern float FLOAT_80330e6c;
-extern float FLOAT_80330e68;
-extern float FLOAT_80330E78;
-extern float FLOAT_80330E7C;
-extern float FLOAT_80330E80;
-extern float FLOAT_80330E84;
-extern float FLOAT_80330eb8;
-extern float FLOAT_80330ec0;
-extern double DOUBLE_80330e70;
 extern char DAT_80330e50[];
-extern char DAT_80330e88[];
-extern char DAT_80330e90[];
-extern char DAT_80330e98[];
-extern char DAT_80330ea0[];
-extern char DAT_80330ea8[];
-extern char DAT_80330ebc[];
 extern char gUtil[];
+
+extern const float FLOAT_80330e60 = 2.0f;
+extern const float FLOAT_80330e64 = 0.015625f;
+extern const float FLOAT_80330e68 = -1.0f;
+extern const float FLOAT_80330e6c = 0.0625f;
+extern const double DOUBLE_80330e70 = 4503601774854144.0;
+extern const float FLOAT_80330E78 = 5.0f;
+extern const float FLOAT_80330E7C = 90.0f;
+extern const float FLOAT_80330E80 = 100000.0f;
+extern const float FLOAT_80330E84 = 128.0f;
+extern const char DAT_80330e88[] = "obj5";
+extern const char DAT_80330e90[] = "obj3";
+extern const char DAT_80330e98[] = "obj1";
+extern const char DAT_80330ea0[] = "obj4";
+extern const char DAT_80330ea8[] = "obj2";
+extern const double DOUBLE_80330EB0 = 4503599627370496.0;
+extern const float FLOAT_80330eb8 = 0.99999f;
+extern const char DAT_80330ebc[] = "obj";
+extern const float FLOAT_80330ec0 = 255.0f;
 
 static inline float CameraWorldX()
 {

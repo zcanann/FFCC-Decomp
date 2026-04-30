@@ -102,401 +102,196 @@ struct ItemFlatData {
 
 /*
  * --INFO--
- * PAL Address: 0x8015aeb0
- * PAL Size: 680b
+ * PAL Address: 0x80159654
+ * PAL Size: 1952b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::ItemInit()
+int CMenuPcs::ItemCtrlCur()
 {
-    short sVar1;
-    float fVar2;
-    float fVar3;
-    float fVar4;
-    int iVar5;
-    short sVar6;
-    short sVar7;
-    short* psVar8;
-    int iVar9;
-    int iVar10;
-    int iVar11;
+    bool blocked = false;
+    u16 press;
+    u16 hold;
+    int caravanWork = Game.m_scriptFoodBase[0];
 
-    memset(this->itemList, 0, 0x1008);
-    fVar2 = FLOAT_80332e64;
-    iVar5 = (int)this->itemList + 8;
-    iVar10 = 8;
-    do {
-        *(float*)(iVar5 + 0x14) = fVar2;
-        *(float*)(iVar5 + 0x54) = fVar2;
-        *(float*)(iVar5 + 0x94) = fVar2;
-        *(float*)(iVar5 + 0xD4) = fVar2;
-        *(float*)(iVar5 + 0x114) = fVar2;
-        *(float*)(iVar5 + 0x154) = fVar2;
-        *(float*)(iVar5 + 0x194) = fVar2;
-        *(float*)(iVar5 + 0x1D4) = fVar2;
-        iVar5 = iVar5 + 0x200;
-        iVar10 = iVar10 + -1;
-    } while (iVar10 != 0);
-    iVar5 = (int)this->itemList;
-    *(int*)(iVar5 + 0x24) = 0x2E;
-    *(s16*)(iVar5 + 8) = 0x68;
-    *(s16*)(iVar5 + 0xA) = 0x28;
-    *(s16*)(iVar5 + 0xC) = 0x78;
-    fVar2 = FLOAT_80332EA8;
-    *(s16*)(iVar5 + 0xE) = 0x108;
-    fVar4 = FLOAT_80332EAC;
-    *(float*)(iVar5 + 0x10) = fVar2;
-    fVar3 = FLOAT_80332e64;
-    *(float*)(iVar5 + 0x14) = fVar4;
-    fVar2 = FLOAT_80332e60;
-    sVar6 = 0;
-    *(float*)(iVar5 + 0x1C) = fVar3;
-    fVar4 = FLOAT_80332EB0;
-    sVar7 = 4;
-    *(int*)(iVar5 + 0x2C) = 5;
-    *(int*)(iVar5 + 0x30) = 5;
-    iVar5 = 0x100;
-    iVar10 = (int)this->itemList;
-    *(int*)(iVar10 + 0x64) = 0x47;
-    *(s16*)(iVar10 + 0x48) = 0x50;
-    *(s16*)(iVar10 + 0x4A) = 0xE;
-    *(s16*)(iVar10 + 0x4C) = 0x30;
-    *(s16*)(iVar10 + 0x4E) = 0x30;
-    *(float*)(iVar10 + 0x50) = fVar2;
-    *(float*)(iVar10 + 0x54) = fVar2;
-    *(float*)(iVar10 + 0x5C) = fVar3;
-    *(int*)(iVar10 + 0x6C) = 0;
-    *(int*)(iVar10 + 0x70) = 5;
-    iVar10 = (int)this->itemList;
-    *(int*)(iVar10 + 0xA4) = 0x47;
-    *(s16*)(iVar10 + 0x88) = 0x55;
-    *(s16*)(iVar10 + 0x8C) = 0x30;
-    *(s16*)(iVar10 + 0x8E) = 0x30;
-    *(s16*)(iVar10 + 0x8A) = (s16)(0x150 - *(s16*)(iVar10 + 0x8E));
-    *(float*)(iVar10 + 0x90) = fVar2;
-    *(float*)(iVar10 + 0x94) = fVar2;
-    *(float*)(iVar10 + 0x9C) = fVar4;
-    *(int*)(iVar10 + 0xAC) = 0;
-    *(int*)(iVar10 + 0xB0) = 5;
-    iVar10 = (int)this->itemList;
-    *(int*)(iVar10 + 0xF4) = 2;
-    *(int*)(iVar10 + 0xE4) = 0x2E;
-    *(s16*)(iVar10 + 0xC8) = 0x50;
-    *(s16*)(iVar10 + 0xCA) = 8;
-    *(s16*)(iVar10 + 0xCC) = 0x48;
-    *(s16*)(iVar10 + 0xCE) = 0x140;
-    *(float*)(iVar10 + 0xD0) = fVar2;
-    *(float*)(iVar10 + 0xD4) = fVar2;
-    *(int*)(iVar10 + 0xEC) = 0;
-    *(int*)(iVar10 + 0xF0) = 5;
-    iVar10 = (int)this->itemList;
-    iVar11 = 4;
-    do {
-        psVar8 = (short*)((int)this->itemList + iVar5 + 8);
-        psVar8[0x16] = 0;
-        psVar8[0x17] = 2;
-        psVar8[0xE] = 0;
-        psVar8[0xF] = 0x37;
-        sVar7 = sVar7 + 2;
-        *psVar8 = *(s16*)(iVar10 + 8) + 0x24;
-        sVar1 = sVar6 + 0x20;
-        psVar8[1] = *(s16*)(iVar10 + 0xA) + sVar6;
-        psVar8[2] = 200;
-        psVar8[3] = 0x28;
-        *(float*)(psVar8 + 4) = fVar2;
-        *(float*)(psVar8 + 6) = fVar2;
-        psVar8[0x12] = 0;
-        psVar8[0x13] = 7;
-        psVar8[0x14] = 0;
-        psVar8[0x15] = 5;
-        iVar9 = iVar5 + 0x48;
-        iVar5 = iVar5 + 0x80;
-        psVar8 = (short*)((int)this->itemList + iVar9);
-        psVar8[0x16] = 0;
-        psVar8[0x17] = 2;
-        psVar8[0xE] = 0;
-        psVar8[0xF] = 0x37;
-        *psVar8 = *(s16*)(iVar10 + 8) + 0x24;
-        sVar6 = sVar6 + 0x40;
-        psVar8[1] = *(s16*)(iVar10 + 0xA) + sVar1;
-        psVar8[2] = 200;
-        psVar8[3] = 0x28;
-        *(float*)(psVar8 + 4) = fVar2;
-        *(float*)(psVar8 + 6) = fVar2;
-        psVar8[0x12] = 0;
-        psVar8[0x13] = 7;
-        psVar8[0x14] = 0;
-        psVar8[0x15] = 5;
-        iVar11 = iVar11 + -1;
-    } while (iVar11 != 0);
-    this->itemList->count = sVar7;
-    this->itemMenuState->selectedIndex = 0;
-    this->itemMenuState->initialized = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8015ac54
- * PAL Size: 604b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::ItemInit1()
-{
-    float progress;
-    int listBase;
-    short* entry;
-    unsigned int count;
-    unsigned int blocks;
-
-    listBase = (int)this->itemList;
-    *(int*)(listBase + 0x24) = 0x2E;
-    *(int*)(listBase + 0x2C) = 2;
-    *(int*)(listBase + 0x30) = 5;
-    listBase = (int)this->itemList;
-    *(int*)(listBase + 100) = 0x47;
-    *(int*)(listBase + 0x6C) = 7;
-    *(int*)(listBase + 0x70) = 5;
-    listBase = (int)this->itemList;
-    *(int*)(listBase + 0xA4) = 0x47;
-    *(int*)(listBase + 0xAC) = 7;
-    *(int*)(listBase + 0xB0) = 5;
-    listBase = (int)this->itemList;
-    *(int*)(listBase + 0xF4) = 2;
-    *(int*)(listBase + 0xE4) = 0x2E;
-    *(int*)(listBase + 0xEC) = 7;
-    *(int*)(listBase + 0xF0) = 5;
-    listBase = (int)this->itemList;
-    *(int*)(listBase + 0x134) = 2;
-    *(int*)(listBase + 0x124) = 0x37;
-    *(int*)(listBase + 300) = 0;
-    *(int*)(listBase + 0x130) = 5;
-    listBase = (int)this->itemList;
-    *(int*)(listBase + 0x174) = 2;
-    *(int*)(listBase + 0x164) = 0x37;
-    *(int*)(listBase + 0x16C) = 0;
-    *(int*)(listBase + 0x170) = 5;
-    listBase = (int)this->itemList;
-    *(int*)(listBase + 0x1B4) = 2;
-    *(int*)(listBase + 0x1A4) = 0x37;
-    *(int*)(listBase + 0x1AC) = 0;
-    *(int*)(listBase + 0x1B0) = 5;
-    listBase = (int)this->itemList;
-    *(int*)(listBase + 500) = 2;
-    *(int*)(listBase + 0x1E4) = 0x37;
-    progress = FLOAT_80332e64;
-    *(int*)(listBase + 0x1EC) = 0;
-    *(int*)(listBase + 0x1F0) = 5;
-    listBase = (int)this->itemList;
-    *(int*)(listBase + 0x234) = 2;
-    *(int*)(listBase + 0x224) = 0x37;
-    *(int*)(listBase + 0x22C) = 0;
-    *(int*)(listBase + 0x230) = 5;
-    listBase = (int)this->itemList;
-    *(int*)(listBase + 0x274) = 2;
-    *(int*)(listBase + 0x264) = 0x37;
-    *(int*)(listBase + 0x26C) = 0;
-    *(int*)(listBase + 0x270) = 5;
-    listBase = (int)this->itemList;
-    *(int*)(listBase + 0x2B4) = 2;
-    *(int*)(listBase + 0x2A4) = 0x37;
-    *(int*)(listBase + 0x2AC) = 0;
-    *(int*)(listBase + 0x2B0) = 5;
-    listBase = (int)this->itemList;
-    *(int*)(listBase + 0x2F4) = 2;
-    *(int*)(listBase + 0x2E4) = 0x37;
-    *(int*)(listBase + 0x2EC) = 0;
-    *(int*)(listBase + 0x2F0) = 5;
-    count = (unsigned int)this->itemList->count;
-    entry = (short*)this->itemList + 4;
-    if (0 < (int)count) {
-        blocks = count >> 3;
-        if (blocks != 0) {
-            do {
-                *(int*)(entry + 0x10) = 0;
-                *(float*)(entry + 8) = progress;
-                *(int*)(entry + 0x30) = 0;
-                *(float*)(entry + 0x28) = progress;
-                *(int*)(entry + 0x50) = 0;
-                *(float*)(entry + 0x48) = progress;
-                *(int*)(entry + 0x70) = 0;
-                *(float*)(entry + 0x68) = progress;
-                *(int*)(entry + 0x90) = 0;
-                *(float*)(entry + 0x88) = progress;
-                *(int*)(entry + 0xB0) = 0;
-                *(float*)(entry + 0xA8) = progress;
-                *(int*)(entry + 0xD0) = 0;
-                *(float*)(entry + 200) = progress;
-                *(int*)(entry + 0xF0) = 0;
-                *(float*)(entry + 0xE8) = progress;
-                entry = entry + 0x100;
-                blocks--;
-            } while (blocks != 0);
-            count &= 7;
-            if (count == 0) {
-                return;
-            }
-        }
-        do {
-            *(int*)(entry + 0x10) = 0;
-            *(float*)(entry + 8) = progress;
-            entry = entry + 0x20;
-            count--;
-        } while (count != 0);
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        blocked = true;
     }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8015aa98
- * PAL Size: 444b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-bool CMenuPcs::ItemOpen()
-{
-    float fVar1;
-    double dVar2;
-    double dVar3;
-    short* psVar4;
-    int iVar5;
-    int iVar6;
-    int iVar7;
-    int iVar8;
-
-    if (*(char*)((int)this->itemMenuState + 0xB) == '\0') {
-        SingLifeInit(-1);
-        ItemInit();
+    if (blocked) {
+        press = 0;
+    } else {
+        int padIndex = blocked;
+        padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+        press = *(u16*)((u8*)&Pad + padIndex * 0x54 + 8);
     }
 
-    iVar5 = 0;
-    *(short*)((int)this->itemMenuState + 0x22) = *(short*)((int)this->itemMenuState + 0x22) + 1;
-    iVar6 = (int)this->itemList->count;
-    psVar4 = (short*)this->itemList + 4;
-    iVar7 = (int)*(short*)((int)this->itemMenuState + 0x22);
-    iVar8 = iVar6;
-    if (0 < iVar6) {
-        do {
-            dVar3 = DOUBLE_80332ea0;
-            fVar1 = FLOAT_80332e60;
-            if (*(int*)(psVar4 + 0x12) <= iVar7) {
-                if (*(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14) <= iVar7) {
-                    iVar5 = iVar5 + 1;
-                    *(float*)(psVar4 + 8) = FLOAT_80332e64;
-                    *(float*)(psVar4 + 0x18) = fVar1;
-                    *(float*)(psVar4 + 0x1A) = fVar1;
+    blocked = false;
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        blocked = true;
+    }
+    if (blocked) {
+        hold = 0;
+    } else {
+        int padIndex = blocked;
+        padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+        hold = *(u16*)((u8*)&Pad + padIndex * 0x54 + 0x14);
+    }
+
+    if (hold == 0) {
+        return 0;
+    }
+
+    int menuState = (int)itemMenuState;
+    int mode = (int)*(s16*)(menuState + 0x30);
+    s16 letterAttachFlg = SingGetLetterAttachflg__8CMenuPcsFv(this);
+
+    if (mode == 0) {
+        if ((hold & 8) == 0) {
+            if ((hold & 4) != 0) {
+                if (*(s16*)(menuState + 0x26) < 7) {
+                    *(s16*)(menuState + 0x26) = *(s16*)(menuState + 0x26) + 1;
                 } else {
-                    *(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
-                    dVar2 = DOUBLE_80332e68;
-                    *(float*)(psVar4 + 8) =
-                        (float)((DOUBLE_80332e68 / ((double)*(int*)(psVar4 + 0x14))) * (double)*(int*)(psVar4 + 0x10));
-                    if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
-                        fVar1 = (float)((dVar2 / ((double)*(int*)(psVar4 + 0x14))) * (double)*(int*)(psVar4 + 0x10));
-                        *(float*)(psVar4 + 0x18) = (*(float*)(psVar4 + 0x1C) - (float)*psVar4) * fVar1;
-                        *(float*)(psVar4 + 0x1A) = (*(float*)(psVar4 + 0x1E) - (float)psVar4[1]) * fVar1;
+                    s16 scroll = *(s16*)(menuState + 0x34);
+                    if (scroll > 0x3E) {
+                        *(s16*)(menuState + 0x34) = 0;
+                    } else {
+                        *(s16*)(menuState + 0x34) = scroll + 1;
                     }
                 }
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
             }
-            psVar4 = psVar4 + 0x20;
-            iVar8 = iVar8 + -1;
-        } while (iVar8 != 0);
-    }
-    return iVar6 == iVar5;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8015a994
- * PAL Size: 260b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMenuPcs::ItemCtrl()
-{
-    int sVar1;
-    int iVar2;
-    int iVar3;
-
-    iVar3 = 0;
-    *(s16*)((int)itemMenuState + 0x32) = *(s16*)((int)itemMenuState + 0x30);
-    iVar2 = (int)itemMenuState;
-    sVar1 = *(s16*)(iVar2 + 0x30);
-
-    if ((sVar1 == 0) || ((sVar1 != 0) && (*(s16*)(iVar2 + 0x12) == 1))) {
-        iVar3 = ItemCtrlCur();
-    } else if ((sVar1 == 1) && ((int)*(s16*)(iVar2 + 0x12) == 0)) {
-        if (*(s16*)((int)singWindowInfo + 10) == 1) {
-            iVar3 = 0;
-            *(s16*)(iVar2 + 0x12) = *(s16*)(iVar2 + 0x12) + 1;
-        }
-    } else if (((sVar1 == 1) && (*(s16*)(iVar2 + 0x12) == 2)) &&
-               (*(s16*)((int)singWindowInfo + 10) == 3)) {
-        iVar3 = 0;
-        *(s16*)(iVar2 + 0x12) = 0;
-        *(s16*)((int)itemMenuState + 0x30) = 0;
-        *(s16*)((int)itemMenuState + 0x22) = 0;
-    }
-
-    if (iVar3 != 0) {
-        SingLifeInit(-1);
-        ItemInit1();
-    }
-
-    return iVar3;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8015a818
- * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-bool CMenuPcs::ItemClose()
-{
-    int finished = 0;
-    this->itemMenuState->frame++;
-
-    int count = this->itemList->count;
-    MenuItemOpenAnim* anim = (MenuItemOpenAnim*)((u8*)this->itemList + 8);
-    int frame = this->itemMenuState->frame;
-
-    for (int i = 0; i < count; i++, anim++) {
-        if (anim->startFrame <= frame) {
-            if (!(frame < anim->startFrame + anim->duration)) {
-                float zero = FLOAT_80332e60;
-                finished++;
-                anim->progress = zero;
-                anim->dx = zero;
-                anim->dy = zero;
+        } else if (*(s16*)(menuState + 0x26) == 0) {
+            if (*(s16*)(menuState + 0x34) == 0) {
+                *(s16*)(menuState + 0x34) = 0x3F;
             } else {
-                anim->frame++;
-                double one = DOUBLE_80332e68;
-                anim->progress =
-                    (float)-((DOUBLE_80332e68 / (double)anim->duration) * (double)anim->frame - DOUBLE_80332e68);
-                if ((anim->flags & 2) == 0) {
-                    float ratio = (float)-((one / (double)anim->duration) * (double)anim->frame - one);
-                    anim->dx = (anim->targetX - (float)anim->x) * ratio;
-                    anim->dy = (anim->targetY - (float)anim->y) * ratio;
+                *(s16*)(menuState + 0x34) = *(s16*)(menuState + 0x34) - 1;
+            }
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        } else {
+            *(s16*)(menuState + 0x26) = *(s16*)(menuState + 0x26) - 1;
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        }
+
+        if ((hold & 0xC) == 0) {
+            if ((press & 0x20) != 0) {
+                if (letterAttachFlg < 0) {
+                    *(s16*)(menuState + 0x1E) = 1;
+                    Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+                    return 1;
                 }
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
+            } else if ((press & 0x40) != 0) {
+                if (letterAttachFlg < 0) {
+                    *(s16*)(menuState + 0x1E) = -1;
+                    Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+                    return 1;
+                }
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
+            } else if ((press & 0x100) != 0) {
+                int idx = (int)*(s16*)(menuState + 0x34) + (int)*(s16*)(menuState + 0x26);
+                if (idx > 0x3F) {
+                    idx -= 0x40;
+                }
+
+                int itemEntry = caravanWork + idx * 2;
+                s16 itemId = *(s16*)(itemEntry + 0xB6);
+
+                if ((itemId < 1) || (EquipChk__8CMenuPcsFi(this, idx) != 0) ||
+                    ((letterAttachFlg >= 0) && (itemId < 0x125))) {
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
+                } else if (letterAttachFlg >= 0) {
+                    LetterSetAttachItem__8CMenuPcsFUii(this, (unsigned int)idx, 1);
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                    return 1;
+                } else {
+                    *(u8*)(menuState + 9) = 0xC;
+                    int itemType = GetItemType__8CMenuPcsFii(this, idx, 0);
+
+                    if ((itemType == 7) && (CanPlayerUseItem__12CCaravanWorkFv((void*)caravanWork) != 0)) {
+                        *(u8*)(menuState + 9) = *(u8*)(menuState + 9) | 1;
+                    }
+                    if ((itemType != 1) && (CanPlayerPutItem__12CCaravanWorkFv((void*)caravanWork) != 0)) {
+                        *(u8*)(menuState + 9) = *(u8*)(menuState + 9) | 2;
+                    }
+
+                    s16 winW;
+                    s16 winH;
+                    GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 0);
+                    SetSingWinInfo__8CMenuPcsFiiii(this, 0xF0, 0xA0, winW, winH);
+
+                    this->singWindowInfo[5] = 0;
+                    *(s16*)(menuState + 0x12) = 0;
+                    *(s16*)(menuState + 0x30) = 1;
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                }
+            } else if ((press & 0x200) != 0) {
+                if (letterAttachFlg >= 0) {
+                    LetterSetAttachItem__8CMenuPcsFUii(this, 0, 0xFFFFFFFF);
+                    Sound.PlaySe(3, 0x40, 0x7F, 0);
+                    return 1;
+                }
+                *(u8*)(menuState + 0xD) = 1;
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+                return 1;
+            }
+        }
+    } else {
+        int optBase = menuState + mode * 2;
+
+        if ((hold & 8) == 0) {
+            if ((hold & 4) != 0) {
+                if (*(s16*)(optBase + 0x26) < 3) {
+                    *(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) + 1;
+                } else {
+                    *(s16*)(optBase + 0x26) = 0;
+                }
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
+            }
+        } else {
+            if (*(s16*)(optBase + 0x26) == 0) {
+                *(s16*)(optBase + 0x26) = 3;
+            } else {
+                *(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) - 1;
+            }
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        }
+
+        if ((hold & 0xC) == 0) {
+            if ((press & 0x100) != 0) {
+                int option = (int)*(s16*)(optBase + 0x26);
+                if (((int)*(char*)(menuState + 9) & (1 << option)) == 0) {
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
+                } else {
+                    int idx = (int)*(s16*)(menuState + 0x34) + (int)*(s16*)(menuState + 0x26);
+                    if (idx > 0x3F) {
+                        idx -= 0x40;
+                    }
+
+                    if (option == 0) {
+                        FGUseItem__12CCaravanWorkFii((void*)caravanWork, idx, 0);
+                        SingLifeInit__8CMenuPcsFi(this, 0);
+                        CalcStatus__12CCaravanWorkFv((void*)caravanWork);
+                    } else if (option == 1) {
+                        FGPutItem__12CCaravanWorkFii((void*)caravanWork, idx, 0);
+                    } else if (option == 2) {
+                        DeleteItemIdx__12CCaravanWorkFii((void*)caravanWork, idx, 0);
+                    }
+
+                    this->singWindowInfo[5] = 2;
+                    *(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                }
+            } else if ((press & 0x200) != 0) {
+                this->singWindowInfo[5] = 2;
+                *(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
             }
         }
     }
 
-    if (count != finished) {
-        return false;
-    }
-    return true;
+    return 0;
 }
 
 /*
@@ -752,194 +547,396 @@ void CMenuPcs::ItemDraw()
 
 /*
  * --INFO--
- * PAL Address: 0x80159654
- * PAL Size: 1952b
+ * PAL Address: 0x8015a818
+ * PAL Size: 380b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMenuPcs::ItemCtrlCur()
+bool CMenuPcs::ItemClose()
 {
-    bool blocked = false;
-    u16 press;
-    u16 hold;
-    int caravanWork = Game.m_scriptFoodBase[0];
+    int finished = 0;
+    this->itemMenuState->frame++;
 
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-        blocked = true;
-    }
-    if (blocked) {
-        press = 0;
-    } else {
-        int padIndex = blocked;
-        padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-        press = *(u16*)((u8*)&Pad + padIndex * 0x54 + 8);
-    }
+    int count = this->itemList->count;
+    MenuItemOpenAnim* anim = (MenuItemOpenAnim*)((u8*)this->itemList + 8);
+    int frame = this->itemMenuState->frame;
 
-    blocked = false;
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-        blocked = true;
-    }
-    if (blocked) {
-        hold = 0;
-    } else {
-        int padIndex = blocked;
-        padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-        hold = *(u16*)((u8*)&Pad + padIndex * 0x54 + 0x14);
-    }
-
-    if (hold == 0) {
-        return 0;
-    }
-
-    int menuState = (int)itemMenuState;
-    int mode = (int)*(s16*)(menuState + 0x30);
-    s16 letterAttachFlg = SingGetLetterAttachflg__8CMenuPcsFv(this);
-
-    if (mode == 0) {
-        if ((hold & 8) == 0) {
-            if ((hold & 4) != 0) {
-                if (*(s16*)(menuState + 0x26) < 7) {
-                    *(s16*)(menuState + 0x26) = *(s16*)(menuState + 0x26) + 1;
-                } else {
-                    s16 scroll = *(s16*)(menuState + 0x34);
-                    if (scroll > 0x3E) {
-                        *(s16*)(menuState + 0x34) = 0;
-                    } else {
-                        *(s16*)(menuState + 0x34) = scroll + 1;
-                    }
-                }
-                Sound.PlaySe(1, 0x40, 0x7F, 0);
-            }
-        } else if (*(s16*)(menuState + 0x26) == 0) {
-            if (*(s16*)(menuState + 0x34) == 0) {
-                *(s16*)(menuState + 0x34) = 0x3F;
+    for (int i = 0; i < count; i++, anim++) {
+        if (anim->startFrame <= frame) {
+            if (!(frame < anim->startFrame + anim->duration)) {
+                float zero = FLOAT_80332e60;
+                finished++;
+                anim->progress = zero;
+                anim->dx = zero;
+                anim->dy = zero;
             } else {
-                *(s16*)(menuState + 0x34) = *(s16*)(menuState + 0x34) - 1;
-            }
-            Sound.PlaySe(1, 0x40, 0x7F, 0);
-        } else {
-            *(s16*)(menuState + 0x26) = *(s16*)(menuState + 0x26) - 1;
-            Sound.PlaySe(1, 0x40, 0x7F, 0);
-        }
-
-        if ((hold & 0xC) == 0) {
-            if ((press & 0x20) != 0) {
-                if (letterAttachFlg < 0) {
-                    *(s16*)(menuState + 0x1E) = 1;
-                    Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
-                    return 1;
+                anim->frame++;
+                double one = DOUBLE_80332e68;
+                anim->progress =
+                    (float)-((DOUBLE_80332e68 / (double)anim->duration) * (double)anim->frame - DOUBLE_80332e68);
+                if ((anim->flags & 2) == 0) {
+                    float ratio = (float)-((one / (double)anim->duration) * (double)anim->frame - one);
+                    anim->dx = (anim->targetX - (float)anim->x) * ratio;
+                    anim->dy = (anim->targetY - (float)anim->y) * ratio;
                 }
-                Sound.PlaySe(4, 0x40, 0x7F, 0);
-            } else if ((press & 0x40) != 0) {
-                if (letterAttachFlg < 0) {
-                    *(s16*)(menuState + 0x1E) = -1;
-                    Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
-                    return 1;
-                }
-                Sound.PlaySe(4, 0x40, 0x7F, 0);
-            } else if ((press & 0x100) != 0) {
-                int idx = (int)*(s16*)(menuState + 0x34) + (int)*(s16*)(menuState + 0x26);
-                if (idx > 0x3F) {
-                    idx -= 0x40;
-                }
-
-                int itemEntry = caravanWork + idx * 2;
-                s16 itemId = *(s16*)(itemEntry + 0xB6);
-
-                if ((itemId < 1) || (EquipChk__8CMenuPcsFi(this, idx) != 0) ||
-                    ((letterAttachFlg >= 0) && (itemId < 0x125))) {
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
-                } else if (letterAttachFlg >= 0) {
-                    LetterSetAttachItem__8CMenuPcsFUii(this, (unsigned int)idx, 1);
-                    Sound.PlaySe(2, 0x40, 0x7F, 0);
-                    return 1;
-                } else {
-                    *(u8*)(menuState + 9) = 0xC;
-                    int itemType = GetItemType__8CMenuPcsFii(this, idx, 0);
-
-                    if ((itemType == 7) && (CanPlayerUseItem__12CCaravanWorkFv((void*)caravanWork) != 0)) {
-                        *(u8*)(menuState + 9) = *(u8*)(menuState + 9) | 1;
-                    }
-                    if ((itemType != 1) && (CanPlayerPutItem__12CCaravanWorkFv((void*)caravanWork) != 0)) {
-                        *(u8*)(menuState + 9) = *(u8*)(menuState + 9) | 2;
-                    }
-
-                    s16 winW;
-                    s16 winH;
-                    GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 0);
-                    SetSingWinInfo__8CMenuPcsFiiii(this, 0xF0, 0xA0, winW, winH);
-
-                    this->singWindowInfo[5] = 0;
-                    *(s16*)(menuState + 0x12) = 0;
-                    *(s16*)(menuState + 0x30) = 1;
-                    Sound.PlaySe(2, 0x40, 0x7F, 0);
-                }
-            } else if ((press & 0x200) != 0) {
-                if (letterAttachFlg >= 0) {
-                    LetterSetAttachItem__8CMenuPcsFUii(this, 0, 0xFFFFFFFF);
-                    Sound.PlaySe(3, 0x40, 0x7F, 0);
-                    return 1;
-                }
-                *(u8*)(menuState + 0xD) = 1;
-                Sound.PlaySe(3, 0x40, 0x7F, 0);
-                return 1;
-            }
-        }
-    } else {
-        int optBase = menuState + mode * 2;
-
-        if ((hold & 8) == 0) {
-            if ((hold & 4) != 0) {
-                if (*(s16*)(optBase + 0x26) < 3) {
-                    *(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) + 1;
-                } else {
-                    *(s16*)(optBase + 0x26) = 0;
-                }
-                Sound.PlaySe(1, 0x40, 0x7F, 0);
-            }
-        } else {
-            if (*(s16*)(optBase + 0x26) == 0) {
-                *(s16*)(optBase + 0x26) = 3;
-            } else {
-                *(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) - 1;
-            }
-            Sound.PlaySe(1, 0x40, 0x7F, 0);
-        }
-
-        if ((hold & 0xC) == 0) {
-            if ((press & 0x100) != 0) {
-                int option = (int)*(s16*)(optBase + 0x26);
-                if (((int)*(char*)(menuState + 9) & (1 << option)) == 0) {
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
-                } else {
-                    int idx = (int)*(s16*)(menuState + 0x34) + (int)*(s16*)(menuState + 0x26);
-                    if (idx > 0x3F) {
-                        idx -= 0x40;
-                    }
-
-                    if (option == 0) {
-                        FGUseItem__12CCaravanWorkFii((void*)caravanWork, idx, 0);
-                        SingLifeInit__8CMenuPcsFi(this, 0);
-                        CalcStatus__12CCaravanWorkFv((void*)caravanWork);
-                    } else if (option == 1) {
-                        FGPutItem__12CCaravanWorkFii((void*)caravanWork, idx, 0);
-                    } else if (option == 2) {
-                        DeleteItemIdx__12CCaravanWorkFii((void*)caravanWork, idx, 0);
-                    }
-
-                    this->singWindowInfo[5] = 2;
-                    *(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
-                    Sound.PlaySe(2, 0x40, 0x7F, 0);
-                }
-            } else if ((press & 0x200) != 0) {
-                this->singWindowInfo[5] = 2;
-                *(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
-                Sound.PlaySe(3, 0x40, 0x7F, 0);
             }
         }
     }
 
-    return 0;
+    return count == finished;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8015a994
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMenuPcs::ItemCtrl()
+{
+    int sVar1;
+    int iVar2;
+    int iVar3;
+
+    iVar3 = 0;
+    *(s16*)((int)itemMenuState + 0x32) = *(s16*)((int)itemMenuState + 0x30);
+    iVar2 = (int)itemMenuState;
+    sVar1 = *(s16*)(iVar2 + 0x30);
+
+    if ((sVar1 == 0) || ((sVar1 != 0) && (*(s16*)(iVar2 + 0x12) == 1))) {
+        iVar3 = ItemCtrlCur();
+    } else if ((sVar1 == 1) && ((int)*(s16*)(iVar2 + 0x12) == 0)) {
+        if (*(s16*)((int)singWindowInfo + 10) == 1) {
+            iVar3 = 0;
+            *(s16*)(iVar2 + 0x12) = *(s16*)(iVar2 + 0x12) + 1;
+        }
+    } else if (((sVar1 == 1) && (*(s16*)(iVar2 + 0x12) == 2)) &&
+               (*(s16*)((int)singWindowInfo + 10) == 3)) {
+        iVar3 = 0;
+        *(s16*)(iVar2 + 0x12) = 0;
+        *(s16*)((int)itemMenuState + 0x30) = 0;
+        *(s16*)((int)itemMenuState + 0x22) = 0;
+    }
+
+    if (iVar3 != 0) {
+        SingLifeInit(-1);
+        ItemInit1();
+    }
+
+    return iVar3;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8015aa98
+ * PAL Size: 444b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+bool CMenuPcs::ItemOpen()
+{
+    float fVar1;
+    double dVar2;
+    double dVar3;
+    short* psVar4;
+    int iVar5;
+    int iVar6;
+    int iVar7;
+    int iVar8;
+
+    if (*(char*)((int)this->itemMenuState + 0xB) == '\0') {
+        SingLifeInit(-1);
+        ItemInit();
+    }
+
+    iVar5 = 0;
+    *(short*)((int)this->itemMenuState + 0x22) = *(short*)((int)this->itemMenuState + 0x22) + 1;
+    iVar6 = (int)this->itemList->count;
+    psVar4 = (short*)this->itemList + 4;
+    iVar7 = (int)*(short*)((int)this->itemMenuState + 0x22);
+    iVar8 = iVar6;
+    if (0 < iVar6) {
+        do {
+            dVar3 = DOUBLE_80332ea0;
+            fVar1 = FLOAT_80332e60;
+            if (*(int*)(psVar4 + 0x12) <= iVar7) {
+                if (*(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14) <= iVar7) {
+                    iVar5 = iVar5 + 1;
+                    *(float*)(psVar4 + 8) = FLOAT_80332e64;
+                    *(float*)(psVar4 + 0x18) = fVar1;
+                    *(float*)(psVar4 + 0x1A) = fVar1;
+                } else {
+                    *(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
+                    dVar2 = DOUBLE_80332e68;
+                    *(float*)(psVar4 + 8) =
+                        (float)((DOUBLE_80332e68 / ((double)*(int*)(psVar4 + 0x14))) * (double)*(int*)(psVar4 + 0x10));
+                    if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
+                        fVar1 = (float)((dVar2 / ((double)*(int*)(psVar4 + 0x14))) * (double)*(int*)(psVar4 + 0x10));
+                        *(float*)(psVar4 + 0x18) = (*(float*)(psVar4 + 0x1C) - (float)*psVar4) * fVar1;
+                        *(float*)(psVar4 + 0x1A) = (*(float*)(psVar4 + 0x1E) - (float)psVar4[1]) * fVar1;
+                    }
+                }
+            }
+            psVar4 = psVar4 + 0x20;
+            iVar8 = iVar8 + -1;
+        } while (iVar8 != 0);
+    }
+    return iVar6 == iVar5;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8015ac54
+ * PAL Size: 604b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::ItemInit1()
+{
+    float progress;
+    int listBase;
+    short* entry;
+    unsigned int count;
+    unsigned int blocks;
+
+    listBase = (int)this->itemList;
+    *(int*)(listBase + 0x24) = 0x2E;
+    *(int*)(listBase + 0x2C) = 2;
+    *(int*)(listBase + 0x30) = 5;
+    listBase = (int)this->itemList;
+    *(int*)(listBase + 100) = 0x47;
+    *(int*)(listBase + 0x6C) = 7;
+    *(int*)(listBase + 0x70) = 5;
+    listBase = (int)this->itemList;
+    *(int*)(listBase + 0xA4) = 0x47;
+    *(int*)(listBase + 0xAC) = 7;
+    *(int*)(listBase + 0xB0) = 5;
+    listBase = (int)this->itemList;
+    *(int*)(listBase + 0xF4) = 2;
+    *(int*)(listBase + 0xE4) = 0x2E;
+    *(int*)(listBase + 0xEC) = 7;
+    *(int*)(listBase + 0xF0) = 5;
+    listBase = (int)this->itemList;
+    *(int*)(listBase + 0x134) = 2;
+    *(int*)(listBase + 0x124) = 0x37;
+    *(int*)(listBase + 300) = 0;
+    *(int*)(listBase + 0x130) = 5;
+    listBase = (int)this->itemList;
+    *(int*)(listBase + 0x174) = 2;
+    *(int*)(listBase + 0x164) = 0x37;
+    *(int*)(listBase + 0x16C) = 0;
+    *(int*)(listBase + 0x170) = 5;
+    listBase = (int)this->itemList;
+    *(int*)(listBase + 0x1B4) = 2;
+    *(int*)(listBase + 0x1A4) = 0x37;
+    *(int*)(listBase + 0x1AC) = 0;
+    *(int*)(listBase + 0x1B0) = 5;
+    listBase = (int)this->itemList;
+    *(int*)(listBase + 500) = 2;
+    *(int*)(listBase + 0x1E4) = 0x37;
+    progress = FLOAT_80332e64;
+    *(int*)(listBase + 0x1EC) = 0;
+    *(int*)(listBase + 0x1F0) = 5;
+    listBase = (int)this->itemList;
+    *(int*)(listBase + 0x234) = 2;
+    *(int*)(listBase + 0x224) = 0x37;
+    *(int*)(listBase + 0x22C) = 0;
+    *(int*)(listBase + 0x230) = 5;
+    listBase = (int)this->itemList;
+    *(int*)(listBase + 0x274) = 2;
+    *(int*)(listBase + 0x264) = 0x37;
+    *(int*)(listBase + 0x26C) = 0;
+    *(int*)(listBase + 0x270) = 5;
+    listBase = (int)this->itemList;
+    *(int*)(listBase + 0x2B4) = 2;
+    *(int*)(listBase + 0x2A4) = 0x37;
+    *(int*)(listBase + 0x2AC) = 0;
+    *(int*)(listBase + 0x2B0) = 5;
+    listBase = (int)this->itemList;
+    *(int*)(listBase + 0x2F4) = 2;
+    *(int*)(listBase + 0x2E4) = 0x37;
+    *(int*)(listBase + 0x2EC) = 0;
+    *(int*)(listBase + 0x2F0) = 5;
+    count = (unsigned int)this->itemList->count;
+    entry = (short*)this->itemList + 4;
+    if (0 < (int)count) {
+        blocks = count >> 3;
+        if (blocks != 0) {
+            do {
+                *(int*)(entry + 0x10) = 0;
+                *(float*)(entry + 8) = progress;
+                *(int*)(entry + 0x30) = 0;
+                *(float*)(entry + 0x28) = progress;
+                *(int*)(entry + 0x50) = 0;
+                *(float*)(entry + 0x48) = progress;
+                *(int*)(entry + 0x70) = 0;
+                *(float*)(entry + 0x68) = progress;
+                *(int*)(entry + 0x90) = 0;
+                *(float*)(entry + 0x88) = progress;
+                *(int*)(entry + 0xB0) = 0;
+                *(float*)(entry + 0xA8) = progress;
+                *(int*)(entry + 0xD0) = 0;
+                *(float*)(entry + 200) = progress;
+                *(int*)(entry + 0xF0) = 0;
+                *(float*)(entry + 0xE8) = progress;
+                entry = entry + 0x100;
+                blocks--;
+            } while (blocks != 0);
+            count &= 7;
+            if (count == 0) {
+                return;
+            }
+        }
+        do {
+            *(int*)(entry + 0x10) = 0;
+            *(float*)(entry + 8) = progress;
+            entry = entry + 0x20;
+            count--;
+        } while (count != 0);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8015aeb0
+ * PAL Size: 680b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::ItemInit()
+{
+    short sVar1;
+    float fVar2;
+    float fVar3;
+    float fVar4;
+    int iVar5;
+    short sVar6;
+    short sVar7;
+    short* psVar8;
+    int iVar9;
+    int iVar10;
+    int iVar11;
+
+    memset(this->itemList, 0, 0x1008);
+    fVar2 = FLOAT_80332e64;
+    iVar5 = (int)this->itemList + 8;
+    iVar10 = 8;
+    do {
+        *(float*)(iVar5 + 0x14) = fVar2;
+        *(float*)(iVar5 + 0x54) = fVar2;
+        *(float*)(iVar5 + 0x94) = fVar2;
+        *(float*)(iVar5 + 0xD4) = fVar2;
+        *(float*)(iVar5 + 0x114) = fVar2;
+        *(float*)(iVar5 + 0x154) = fVar2;
+        *(float*)(iVar5 + 0x194) = fVar2;
+        *(float*)(iVar5 + 0x1D4) = fVar2;
+        iVar5 = iVar5 + 0x200;
+        iVar10 = iVar10 + -1;
+    } while (iVar10 != 0);
+    iVar5 = (int)this->itemList;
+    *(int*)(iVar5 + 0x24) = 0x2E;
+    *(s16*)(iVar5 + 8) = 0x68;
+    *(s16*)(iVar5 + 0xA) = 0x28;
+    *(s16*)(iVar5 + 0xC) = 0x78;
+    fVar2 = FLOAT_80332EA8;
+    *(s16*)(iVar5 + 0xE) = 0x108;
+    fVar4 = FLOAT_80332EAC;
+    *(float*)(iVar5 + 0x10) = fVar2;
+    fVar3 = FLOAT_80332e64;
+    *(float*)(iVar5 + 0x14) = fVar4;
+    fVar2 = FLOAT_80332e60;
+    sVar6 = 0;
+    *(float*)(iVar5 + 0x1C) = fVar3;
+    fVar4 = FLOAT_80332EB0;
+    sVar7 = 4;
+    *(int*)(iVar5 + 0x2C) = 5;
+    *(int*)(iVar5 + 0x30) = 5;
+    iVar5 = 0x100;
+    iVar10 = (int)this->itemList;
+    *(int*)(iVar10 + 0x64) = 0x47;
+    *(s16*)(iVar10 + 0x48) = 0x50;
+    *(s16*)(iVar10 + 0x4A) = 0xE;
+    *(s16*)(iVar10 + 0x4C) = 0x30;
+    *(s16*)(iVar10 + 0x4E) = 0x30;
+    *(float*)(iVar10 + 0x50) = fVar2;
+    *(float*)(iVar10 + 0x54) = fVar2;
+    *(float*)(iVar10 + 0x5C) = fVar3;
+    *(int*)(iVar10 + 0x6C) = 0;
+    *(int*)(iVar10 + 0x70) = 5;
+    iVar10 = (int)this->itemList;
+    *(int*)(iVar10 + 0xA4) = 0x47;
+    *(s16*)(iVar10 + 0x88) = 0x55;
+    *(s16*)(iVar10 + 0x8C) = 0x30;
+    *(s16*)(iVar10 + 0x8E) = 0x30;
+    *(s16*)(iVar10 + 0x8A) = (s16)(0x150 - *(s16*)(iVar10 + 0x8E));
+    *(float*)(iVar10 + 0x90) = fVar2;
+    *(float*)(iVar10 + 0x94) = fVar2;
+    *(float*)(iVar10 + 0x9C) = fVar4;
+    *(int*)(iVar10 + 0xAC) = 0;
+    *(int*)(iVar10 + 0xB0) = 5;
+    iVar10 = (int)this->itemList;
+    *(int*)(iVar10 + 0xF4) = 2;
+    *(int*)(iVar10 + 0xE4) = 0x2E;
+    *(s16*)(iVar10 + 0xC8) = 0x50;
+    *(s16*)(iVar10 + 0xCA) = 8;
+    *(s16*)(iVar10 + 0xCC) = 0x48;
+    *(s16*)(iVar10 + 0xCE) = 0x140;
+    *(float*)(iVar10 + 0xD0) = fVar2;
+    *(float*)(iVar10 + 0xD4) = fVar2;
+    *(int*)(iVar10 + 0xEC) = 0;
+    *(int*)(iVar10 + 0xF0) = 5;
+    iVar10 = (int)this->itemList;
+    iVar11 = 4;
+    do {
+        psVar8 = (short*)((int)this->itemList + iVar5 + 8);
+        psVar8[0x16] = 0;
+        psVar8[0x17] = 2;
+        psVar8[0xE] = 0;
+        psVar8[0xF] = 0x37;
+        sVar7 = sVar7 + 2;
+        *psVar8 = *(s16*)(iVar10 + 8) + 0x24;
+        sVar1 = sVar6 + 0x20;
+        psVar8[1] = *(s16*)(iVar10 + 0xA) + sVar6;
+        psVar8[2] = 200;
+        psVar8[3] = 0x28;
+        *(float*)(psVar8 + 4) = fVar2;
+        *(float*)(psVar8 + 6) = fVar2;
+        psVar8[0x12] = 0;
+        psVar8[0x13] = 7;
+        psVar8[0x14] = 0;
+        psVar8[0x15] = 5;
+        iVar9 = iVar5 + 0x48;
+        iVar5 = iVar5 + 0x80;
+        psVar8 = (short*)((int)this->itemList + iVar9);
+        psVar8[0x16] = 0;
+        psVar8[0x17] = 2;
+        psVar8[0xE] = 0;
+        psVar8[0xF] = 0x37;
+        *psVar8 = *(s16*)(iVar10 + 8) + 0x24;
+        sVar6 = sVar6 + 0x40;
+        psVar8[1] = *(s16*)(iVar10 + 0xA) + sVar1;
+        psVar8[2] = 200;
+        psVar8[3] = 0x28;
+        *(float*)(psVar8 + 4) = fVar2;
+        *(float*)(psVar8 + 6) = fVar2;
+        psVar8[0x12] = 0;
+        psVar8[0x13] = 7;
+        psVar8[0x14] = 0;
+        psVar8[0x15] = 5;
+        iVar11 = iVar11 + -1;
+    } while (iVar11 != 0);
+    this->itemList->count = sVar7;
+    this->itemMenuState->selectedIndex = 0;
+    this->itemMenuState->initialized = 1;
 }

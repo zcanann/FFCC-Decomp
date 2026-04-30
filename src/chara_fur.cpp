@@ -43,7 +43,7 @@ extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
 extern "C" char sMogFurTextureName[];
 extern "C" {
-unsigned char m_mogWork[0x30];
+extern unsigned char m_mogWork[0x2C];
 void* gMogFurTexBuffer;
 }
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
@@ -691,6 +691,9 @@ static Vec s_mogFurVelocity;
 static Vec s_mogFurVelocityRand;
 static Vec s_mogFurAccel;
 static Vec s_mogFurAccelRand;
+extern "C" {
+unsigned char m_mogWork[0x2C];
+}
 static unsigned int s_mogFurRand;
 static float s_mogFurMaxY;
 

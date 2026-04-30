@@ -454,7 +454,6 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
 {
     (void)math;
     int hit;
-    float fVar1;
     float dVar6;
     float dVar7;
     float dVar8;
@@ -468,7 +467,7 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     dVar8 = innerRadius + scale;
     dVar10 = dVar8 / (outerRadius + scale);
     PSVECSubtract(origin, ellipseScale, &local_60);
-    dVar9 = dVar8 * dVar8;
+    dVar8 = dVar8 * dVar8;
     local_60.y = local_60.y * dVar10;
     local_6c.x = vector->x;
     local_6c.y = vector->y * dVar10;
@@ -476,8 +475,8 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     local_78.x = local_60.x;
     local_78.y = local_60.y;
     local_78.z = local_60.z;
-    dVar8 = PSVECDotProduct(&local_78, &local_78);
-    if (dVar8 < dVar9) {
+    dVar9 = PSVECDotProduct(&local_78, &local_78);
+    if (dVar9 < dVar8) {
         if (outT != NULL) {
             *outT = 0.0f;
         }
@@ -493,12 +492,12 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
             hit = 0;
         } else {
             dVar7 = PSVECDotProduct(&local_6c, &local_6c);
-            fVar1 = dVar6 * dVar6 - dVar7 * (dVar8 - dVar9);
-            if (fVar1 < 0.0f) {
+            dVar8 = dVar6 * dVar6 - dVar7 * (dVar9 - dVar8);
+            if (dVar8 < 0.0f) {
                 hit = 0;
             } else {
-                fVar1 = sqrtf(fVar1);
-                dVar8 = -dVar6 - fVar1;
+                dVar8 = sqrtf(dVar8);
+                dVar8 = -dVar6 - dVar8;
                 if ((dVar8 <= 0.0f) || (dVar7 < dVar8)) {
                     hit = 0;
                 } else {

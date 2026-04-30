@@ -134,7 +134,7 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 u8 ARRAY_802f26c8[0xC];
-extern char s_CSound_80330ce0[];
+extern char s_CSound_80330ce0[7];
 
 struct CLineSegment {
     Vec delta;
@@ -440,47 +440,40 @@ CSound::~CSound()
  */
 void CSound::Init()
 {
-    CRedSound* redSound = RedSound(this);
-    CSoundLayout& sound = SoundData(this);
-    CMemory::CStage* stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, s_CSound_80330ce0, 0);
-    sound.m_stage = stage;
+    SoundData(this).m_stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, s_CSound_80330ce0, 0);
 
-    sound.m_aramBuffer =
-        static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(0x80000, stage, const_cast<char*>(s_soundSourceName), 0x2E));
-    sound.m_streamBuffer =
-        static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(0x20000, stage, const_cast<char*>(s_soundSourceName), 0x2F));
+    SoundData(this).m_aramBuffer = static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(
+        0x80000, SoundData(this).m_stage, const_cast<char*>(s_soundSourceName), 0x2E));
+    SoundData(this).m_streamBuffer = static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(
+        0x20000, SoundData(this).m_stage, const_cast<char*>(s_soundSourceName), 0x2F));
 
-    sound.m_bgmMasterVolume = 0x7F;
-    sound.m_seMasterVolume = 0x7F;
-    sound.m_seMaxVolume = 0x7F;
-    sound.m_curMusicVolume = 0x7F;
-    sound.m_debugPrint = 0;
+    SoundData(this).m_bgmMasterVolume = 0x7F;
+    SoundData(this).m_seMasterVolume = 0x7F;
+    SoundData(this).m_seMaxVolume = 0x7F;
+    SoundData(this).m_curMusicVolume = 0x7F;
+    SoundData(this).m_debugPrint = 0;
 
     ARInit(0, 0);
     ARQInit();
 
-    Init__9CRedSoundFPviii(redSound, sound.m_aramBuffer, 0x80000, 0x800000, 0x800000);
-    {
-        u32 debugPrint = sound.m_debugPrint;
-        ReportPrint__9CRedSoundFi(redSound, (-debugPrint | debugPrint) >> 31);
-    }
+    Init__9CRedSoundFPviii(RedSound(this), SoundData(this).m_aramBuffer, 0x80000, 0x800000, 0x800000);
+    ReportPrint__9CRedSoundFi(
+        RedSound(this), (-SoundData(this).m_debugPrint | SoundData(this).m_debugPrint) >> 31);
 
-    {
-        u32 soundMode = GetSoundMode__9CRedSoundFv(redSound);
-        SetSoundMode__9CRedSoundFi(redSound, (u32)__cntlzw((u32)__cntlzw(soundMode) >> 5) >> 5);
-    }
+    u32 soundMode = GetSoundMode__9CRedSoundFv(RedSound(this));
+    SetSoundMode__9CRedSoundFi(RedSound(this), (u32)__cntlzw((u32)__cntlzw(soundMode) >> 5) >> 5);
 
-    MusicMasterVolume__9CRedSoundFi(redSound, sound.m_bgmMasterVolume);
-    SeMasterVolume__9CRedSoundFi(redSound, sound.m_seMasterVolume);
-    SetReverb__9CRedSoundFii(redSound, 1, 4);
-    SetReverbDepth__9CRedSoundFiii(redSound, 1, 0x40, 0xF);
+    MusicMasterVolume__9CRedSoundFi(RedSound(this), SoundData(this).m_bgmMasterVolume);
+    SeMasterVolume__9CRedSoundFi(RedSound(this), SoundData(this).m_seMasterVolume);
+    SetReverb__9CRedSoundFii(RedSound(this), 1, 4);
+    SetReverbDepth__9CRedSoundFiii(RedSound(this), 1, 0x40, 0xF);
 
-    sound.m_waveLoadMode = 0;
-    sound.m_streamFile = 0;
-    sound.m_streamPlaying = 0;
-    memset(sound.m_noFreeSeGroups, 0xFF, sizeof(sound.m_noFreeSeGroups));
-    memset(sound.m_noFreeWaves, 0xFF, sizeof(sound.m_noFreeWaves));
-    sound.m_pauseAllSe = 0;
+    SoundData(this).m_waveLoadMode = 0;
+    SoundData(this).m_streamFile = 0;
+    SoundData(this).m_streamPlaying = 0;
+    memset(SoundData(this).m_noFreeSeGroups, 0xFF, sizeof(SoundData(this).m_noFreeSeGroups));
+    memset(SoundData(this).m_noFreeWaves, 0xFF, sizeof(SoundData(this).m_noFreeWaves));
+    SoundData(this).m_pauseAllSe = 0;
 }
 
 /*

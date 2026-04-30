@@ -240,50 +240,57 @@ static int FindFreeCaravanIdx(Mc::SaveDat* saveData)
  */
 void DrawGoOutMenu()
 {
-    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
-    g_pGoOutMenu = &g_GoOutMenu;
+    CGoOutMenu& goOutMenu = g_GoOutMenu;
+    g_pGoOutMenu = &goOutMenu;
+    signed char mode = ReadGoOutS8(goOutMenu, 0x2C);
 
-    if (ReadGoOutU8(g_GoOutMenu, 0x44) == 3) {
+    if (mode != 3) {
+        if (mode < 3 && mode > 1) {
+            if (ReadGoOutU8(goOutMenu, 0x1D) != 0) {
+                MenuPcs.DrawInit();
+                MenuPcs.DrawCMakeMenu();
+            }
+            if (ReadGoOutS8(goOutMenu, 0x18) > 0xD && ReadGoOutS8(goOutMenu, 0x18) < 0xF) {
+                MenuPcs.DrawLoadMenu();
+            }
+            if (ReadGoOutU8(goOutMenu, 0x18) == 1 &&
+                MenuGoOutState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_resultSelect != 0) {
+                MenuGoOutState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_closeMode = 8;
+                goOutMenu.SetMainMode(1);
+                MenuGoOutState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_resultSelect = 0;
+            }
+        }
+    } else {
         MenuPcs.DrawInit();
         MenuPcs.DrawCMakeMenu();
-        if (ReadGoOutS16(g_GoOutMenu, 0x36) == 1 && MenuGoOutState(menuPcsLayout).m_resultSelect != 0) {
-            MenuGoOutState(menuPcsLayout).m_closeMode = 8;
-            g_GoOutMenu.SetMainMode(1);
-            MenuGoOutState(menuPcsLayout).m_resultSelect = 0;
-        }
-    } else if (ReadGoOutU8(g_GoOutMenu, 0x44) == 2) {
-        if (ReadGoOutU8(g_GoOutMenu, 0x29) != 0) {
-            MenuPcs.DrawInit();
-            MenuPcs.DrawCMakeMenu();
-        }
-        if (ReadGoOutS8(g_GoOutMenu, 0x24) > 0xD && ReadGoOutS8(g_GoOutMenu, 0x24) < 0xF) {
-            MenuPcs.DrawLoadMenu();
-        }
-        if (ReadGoOutS8(g_GoOutMenu, 0x24) == 1 && MenuGoOutState(menuPcsLayout).m_resultSelect != 0) {
-            MenuGoOutState(menuPcsLayout).m_closeMode = 8;
-            g_GoOutMenu.SetMainMode(1);
-            MenuGoOutState(menuPcsLayout).m_resultSelect = 0;
+        if (ReadGoOutU8(goOutMenu, 0x24) == 1 &&
+            MenuGoOutState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_resultSelect != 0) {
+            MenuGoOutState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_closeMode = 8;
+            goOutMenu.SetMainMode(1);
+            MenuGoOutState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_resultSelect = 0;
         }
     }
 
-    if (ReadGoOutS16(g_GoOutMenu, 0x54) != -1) {
+    if (ReadGoOutS16(goOutMenu, 0x36) != -1) {
         MenuPcs.DrawMcWin(-1, 0);
-        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
-            const int message = static_cast<int>(ReadGoOutS16(g_GoOutMenu, 0x54));
+        if (MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_mode == 1) {
+            const int message = static_cast<int>(ReadGoOutS16(goOutMenu, 0x36));
             MenuPcs.DrawMcWinMess(message, (message >= 0x1E) ? 2 : 0);
         }
     }
 
-    if (MenuMcWinState(menuPcsLayout).m_mode == 1 && ReadGoOutU8(g_GoOutMenu, 0x71) != 0) {
-        const int cursorY = MenuMcWinState(menuPcsLayout).m_y + MenuMcWinState(menuPcsLayout).m_height - 0x3E;
+    if (MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_mode == 1 && ReadGoOutU8(goOutMenu, 0x47) != 0) {
+        const float cursorY = (float)(MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_y +
+            MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_height - 0x3E);
+        const float cursorX = (float)(MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_x + 0x20);
+        const unsigned char cursorMode = ReadGoOutU8(goOutMenu, 0x49);
 
-        if (ReadGoOutU8(g_GoOutMenu, 0x73) == 0) {
-            const int cursorX = GetYesNoXPos__8CMenuPcsFi(&MenuPcs, ReadGoOutU8(g_GoOutMenu, 0x70));
-            MenuPcs.DrawCursor(cursorX, cursorY, 1.0f);
+        if (cursorMode == 0) {
+            const int cursorX = GetYesNoXPos__8CMenuPcsFi(&MenuPcs, ReadGoOutU8(goOutMenu, 0x46));
+            MenuPcs.DrawCursor(cursorX, (int)cursorY, 1.0f);
         } else {
-            const int cursorX = MenuMcWinState(menuPcsLayout).m_x + 0x20;
-            const int localY = ReadGoOutS16(g_GoOutMenu, 0x76) + ReadGoOutU8(g_GoOutMenu, 0x70) * 0x1E;
-            MenuPcs.DrawCursor(cursorX, localY, 1.0f);
+            const int localY = ReadGoOutS16(goOutMenu, 0x4C) + ReadGoOutU8(goOutMenu, 0x46) * 0x1E;
+            MenuPcs.DrawCursor((int)cursorX, localY, 1.0f);
         }
     }
 }

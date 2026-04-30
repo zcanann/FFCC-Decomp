@@ -18,6 +18,8 @@ extern "C" float FLOAT_8032F930;
 extern "C" float FLOAT_8032F934;
 extern CMapHitFace* g_hit_lpface_min;
 
+CMemory::CStage* g_pStage = 0;
+
 extern "C" {
 void SetBlendMode__12CMaterialManFP12CMaterialSeti(void* materialMan, CMaterialSet* materialSet, unsigned int materialIdx);
 void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, CMaterialSet* materialSet,
@@ -101,7 +103,7 @@ static inline unsigned int Align32(unsigned int value)
 
 static inline CMemory::CStage*& MapMeshAllocStage()
 {
-    return reinterpret_cast<CMemory::CStage*&>(g_hit_lpface_min);
+    return g_pStage;
 }
 }
 

@@ -491,6 +491,7 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
  */
 void StreamPause(int streamID, int pause)
 {
+	unsigned int voiceData;
 	RedStreamDATA* streamData;
 	int volume;
 	int pan;
@@ -506,7 +507,7 @@ void StreamPause(int streamID, int pause)
 	streamData = p_Stream;
 	do {
 		if ((streamData->m_streamId != 0) && ((streamID == -1) || (streamID == streamData->m_streamId))) {
-			unsigned int voiceData = (unsigned int)streamData->m_voiceData;
+			voiceData = (unsigned int)streamData->m_voiceData;
 			if (pause == 1) {
 				if (*(void**)(voiceData + 0x14) != 0) {
 					*(int*)(voiceData + 0x9c) = 0;

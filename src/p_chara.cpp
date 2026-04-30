@@ -14,7 +14,7 @@ extern "C" {
 extern u8* gCharaPartWorkPtr;
 }
 
-#include <string.h>
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CCharaPcs CharaPcs;
@@ -103,7 +103,7 @@ static const char s_charaAmemCompactFailed[] =
     "\x83\x4b\x83\x78\x81\x5b\x83\x57\x83\x52\x83\x8c\x83\x4e\x83\x56\x83\x87"
     "\x83\x93\x82\xc9\x8e\xb8\x94\x73\x82\xb5\x82\xbd\x82\xcc\x82\xc5\x81\x41"
     "\x91\x53\x82\xc4\x8f\xc1\x8b\x8e\x82\xb5\x82\xdc\x82\xb7\x81\x42\n";
-static const char s_charaBasePathFmt[] = "dvd/char/k%02d/chara%03d/chara%03d";
+static const char s_charaBasePathFmt[] = "dvd/char/%s/%s%03d/%s%03d%s";
 static const char s_charaAnimPathFmt[] = "dvd/char/k%02d/chara%03d/%s.cha";
 static const char s_charaModelSuffix[] = ".mdl";
 static const char s_charaDynamicsSuffix[] = ".dyn";
@@ -129,6 +129,22 @@ static const char s_charaDumpAnimHdr2[] = " no t num name lv mask addr banksz su
 static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %-14s %3d %08x %08x %d %08x\n";
 static char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_p_chara_ptrarray_grow_error[] = "CPtrArray grow error";
+static const char s_charaKindPath0[] = "k00";
+static const char s_charaKindPath1[] = "k01";
+static const char s_charaKindPath2[] = "k02";
+static const char s_charaKindPath3[] = "k03";
+static const char s_charaKindPath4[] = "k04";
+static const char s_charaKindPath5[] = "k05";
+static const char s_charaKindFile[] = "chara";
+static const char s_charaKindSuffix[] = "";
+static const char* s_charaKindPathParts[][3] = {
+    {s_charaKindPath0, s_charaKindFile, s_charaKindSuffix},
+    {s_charaKindPath1, s_charaKindFile, s_charaKindSuffix},
+    {s_charaKindPath2, s_charaKindFile, s_charaKindSuffix},
+    {s_charaKindPath3, s_charaKindFile, s_charaKindSuffix},
+    {s_charaKindPath4, s_charaKindFile, s_charaKindSuffix},
+    {s_charaKindPath5, s_charaKindFile, s_charaKindSuffix},
+};
 
 template <class T>
 class CPtrArray
@@ -527,7 +543,9 @@ static inline void PruneUnsharedAnimRefs(CCharaPcs* self, CCharaPcs::CLoadAnim* 
 
 static inline void BuildCharaBasePath(int charaKind, unsigned long charaNo, char* outPath)
 {
-    sprintf(outPath, s_charaBasePathFmt, charaKind, static_cast<int>(charaNo), static_cast<int>(charaNo));
+    const char** pathParts = s_charaKindPathParts[charaKind];
+    sprintf(outPath, s_charaBasePathFmt, pathParts[0], pathParts[1], static_cast<int>(charaNo), pathParts[1],
+            static_cast<int>(charaNo), pathParts[2]);
 }
 
 static inline CMemory::CStage* HandleModelStage(int charaKind, int specialModelStage)
@@ -3065,17 +3083,17 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
         BuildCharaBasePath(m_asyncCharaKind, static_cast<unsigned long>(m_asyncCharaNo), basePath);
         if (m_asyncState == 1) {
             strcpy(path, basePath);
-            strcpy(path + strlen(path), s_charaModelSuffix);
+            strcat(path, s_charaModelSuffix);
         } else if (m_asyncState == 3) {
             strcpy(path, basePath);
-            strcpy(path + strlen(path), s_charaDynamicsSuffix);
+            strcat(path, s_charaDynamicsSuffix);
         } else {
             if (m_asyncTextureVariant < 1) {
                 strcpy(path, basePath);
             } else {
                 sprintf(path, s_charaTextureVariantFmt, basePath, m_asyncTextureVariant + 0x61);
             }
-            strcpy(path + strlen(path), s_charaTextureSuffix);
+            strcat(path, s_charaTextureSuffix);
         }
 
         m_asyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
@@ -3084,15 +3102,12 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
             loadModelASyncFrame();
             return;
         }
-        if (m_asyncFileHandle != 0) {
-            File.ReadASync(m_asyncFileHandle);
-        }
+        File.ReadASync(m_asyncFileHandle);
         m_asyncState++;
         return;
     }
 
-    if ((asyncState != 2 && asyncState != 4 && asyncState != 6) || m_asyncFileHandle == 0 ||
-        !File.IsCompleted(m_asyncFileHandle)) {
+    if ((asyncState != 2 && asyncState != 4 && asyncState != 6) || !File.IsCompleted(m_asyncFileHandle)) {
         return;
     }
 

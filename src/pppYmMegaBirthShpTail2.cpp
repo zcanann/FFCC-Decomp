@@ -277,90 +277,86 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
         hasRequiredMemory = false;
     }
 
-    if (!hasRequiredMemory) {
-        return;
-    }
+    if (hasRequiredMemory) {
+        switch (paramPayload[0x18]) {
+        case 1:
+        case 3:
+        case 5:
+        case 7:
+        case 9:
+        {
+            Vec firstCol;
+            Vec secondCol;
+            Vec thirdCol;
 
-    switch (paramPayload[0x18]) {
-    case 1:
-    case 3:
-    case 5:
-    case 7:
-    case 9:
-    {
-        Vec firstCol;
-        Vec secondCol;
-        Vec thirdCol;
+            PSMTXIdentity(work->m_emitterMatrix.value);
+            firstCol.x = work->m_emitterMatrix.value[0][0];
+            firstCol.y = work->m_emitterMatrix.value[1][0];
+            firstCol.z = work->m_emitterMatrix.value[2][0];
+            PSVECScale(&firstCol, &firstCol, pppMngStPtr->m_scale.x);
+            work->m_emitterMatrix.value[0][0] = firstCol.x;
+            work->m_emitterMatrix.value[1][0] = firstCol.y;
+            work->m_emitterMatrix.value[2][0] = firstCol.z;
 
-        PSMTXIdentity(work->m_emitterMatrix.value);
-        firstCol.x = work->m_emitterMatrix.value[0][0];
-        firstCol.y = work->m_emitterMatrix.value[1][0];
-        firstCol.z = work->m_emitterMatrix.value[2][0];
-        PSVECScale(&firstCol, &firstCol, pppMngStPtr->m_scale.x);
-        work->m_emitterMatrix.value[0][0] = firstCol.x;
-        work->m_emitterMatrix.value[1][0] = firstCol.y;
-        work->m_emitterMatrix.value[2][0] = firstCol.z;
+            secondCol.x = work->m_emitterMatrix.value[0][1];
+            secondCol.y = work->m_emitterMatrix.value[1][1];
+            secondCol.z = work->m_emitterMatrix.value[2][1];
+            PSVECScale(&secondCol, &secondCol, pppMngStPtr->m_scale.x);
+            work->m_emitterMatrix.value[0][1] = secondCol.x;
+            work->m_emitterMatrix.value[1][1] = secondCol.y;
+            work->m_emitterMatrix.value[2][1] = secondCol.z;
 
-        secondCol.x = work->m_emitterMatrix.value[0][1];
-        secondCol.y = work->m_emitterMatrix.value[1][1];
-        secondCol.z = work->m_emitterMatrix.value[2][1];
-        PSVECScale(&secondCol, &secondCol, pppMngStPtr->m_scale.x);
-        work->m_emitterMatrix.value[0][1] = secondCol.x;
-        work->m_emitterMatrix.value[1][1] = secondCol.y;
-        work->m_emitterMatrix.value[2][1] = secondCol.z;
+            thirdCol.x = work->m_emitterMatrix.value[0][2];
+            thirdCol.y = work->m_emitterMatrix.value[1][2];
+            thirdCol.z = work->m_emitterMatrix.value[2][2];
+            PSVECScale(&thirdCol, &thirdCol, pppMngStPtr->m_scale.x);
+            work->m_emitterMatrix.value[0][2] = thirdCol.x;
+            work->m_emitterMatrix.value[1][2] = thirdCol.y;
+            work->m_emitterMatrix.value[2][2] = thirdCol.z;
 
-        thirdCol.x = work->m_emitterMatrix.value[0][2];
-        thirdCol.y = work->m_emitterMatrix.value[1][2];
-        thirdCol.z = work->m_emitterMatrix.value[2][2];
-        PSVECScale(&thirdCol, &thirdCol, pppMngStPtr->m_scale.x);
-        work->m_emitterMatrix.value[0][2] = thirdCol.x;
-        work->m_emitterMatrix.value[1][2] = thirdCol.y;
-        work->m_emitterMatrix.value[2][2] = thirdCol.z;
+            work->m_emitterMatrix.value[0][3] = pppMngStPtr->m_position.x;
+            work->m_emitterMatrix.value[1][3] = pppMngStPtr->m_position.y;
+            work->m_emitterMatrix.value[2][3] = pppMngStPtr->m_position.z;
+            break;
+        }
+        default:
+            pppCopyMatrix(work->m_emitterMatrix, pppMngStPtr->m_matrix);
+            break;
+        }
 
-        work->m_emitterMatrix.value[0][3] = pppMngStPtr->m_position.x;
-        work->m_emitterMatrix.value[1][3] = pppMngStPtr->m_position.y;
-        work->m_emitterMatrix.value[2][3] = pppMngStPtr->m_position.z;
-        break;
-    }
-    default:
-        pppCopyMatrix(work->m_emitterMatrix, pppMngStPtr->m_matrix);
-        break;
-    }
+        worldMat = work->m_wmats;
+        particleColor = work->m_colors;
+        particleData = (u8*)work->m_particles;
 
-    worldMat = work->m_wmats;
-    particleColor = work->m_colors;
-    particleData = (u8*)work->m_particles;
+        if ((gPppCalcDisabled == 0) && (*(u32*)((u8*)&param->m_matrix + 4) != 0xFFFF)) {
+            work->m_lifeLimit = work->m_lifeLimit + 1;
 
-    if ((gPppCalcDisabled != 0) || (*(u32*)((u8*)&param->m_matrix + 4) == 0xFFFF)) {
-        return;
-    }
+            for (i = 0; i < work->m_maxParticles; i++) {
+                if (*(u16*)(particleData + 0x22) != 0) {
+                    calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
+                        &object->field0_0x0, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
+                } else {
+                    if ((*(u16*)((u8*)&param->m_matrix + 0x12) <= work->m_lifeLimit) &&
+                        (spawnCount < *(u16*)((u8*)&param->m_matrix + 0x10))) {
+                        birth(&object->field0_0x0, work, param, colorWork, (_PARTICLE_DATA*)particleData, worldMat,
+                            particleColor);
+                        spawnCount = spawnCount + 1;
+                    }
+                }
 
-    work->m_lifeLimit = work->m_lifeLimit + 1;
+                if (worldMat != 0) {
+                    worldMat = (_PARTICLE_WMAT*)((u8*)worldMat + 0x30);
+                }
+                if (particleColor != 0) {
+                    particleColor = particleColor + 1;
+                }
+                particleData = particleData + 0x1b8;
+            }
 
-    for (i = 0; i < work->m_maxParticles; i++) {
-        if (*(u16*)(particleData + 0x22) != 0) {
-            calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
-                &object->field0_0x0, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
-        } else {
-            if ((*(u16*)((u8*)&param->m_matrix + 0x12) <= work->m_lifeLimit) &&
-                (spawnCount < *(u16*)((u8*)&param->m_matrix + 0x10))) {
-                birth(&object->field0_0x0, work, param, colorWork, (_PARTICLE_DATA*)particleData, worldMat,
-                    particleColor);
-                spawnCount = spawnCount + 1;
+            if (spawnCount > 0) {
+                work->m_lifeLimit = 0;
             }
         }
-
-        if (worldMat != 0) {
-            worldMat = (_PARTICLE_WMAT*)((u8*)worldMat + 0x30);
-        }
-        if (particleColor != 0) {
-            particleColor = particleColor + 1;
-        }
-        particleData = particleData + 0x1b8;
-    }
-
-    if (spawnCount > 0) {
-        work->m_lifeLimit = 0;
     }
 }
 

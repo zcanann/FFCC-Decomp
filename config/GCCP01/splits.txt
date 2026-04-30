@@ -196,7 +196,7 @@ p_camera.cpp:
 	.rodata     start:0x801D7860 end:0x801D78F4
 	.data       start:0x801E9030 end:0x801E9B24
 	.bss        start:0x80268790 end:0x80268C70
-	.sbss       start:0x8032ECD8 end:0x8032ECD9
+	.sbss       start:0x8032ECE0 end:0x8032ECE1
 	.sbss2      start:0x80333DE8 end:0x80333DEC
 
 textureman.cpp:
@@ -205,7 +205,7 @@ textureman.cpp:
 	.text       start:0x8003A5FC end:0x8003C1B8
 	.ctors      start:0x801D53E4 end:0x801D53E8
 	.data       start:0x801E9B28 end:0x801E9BB0
-	.sbss       start:0x8032ECE0 end:0x8032ECE8
+	.sbss       start:0x8032ECE8 end:0x8032ECF0
 	.sdata2     start:0x8032FAE0 end:0x8032FAF8
 
 materialman.cpp:

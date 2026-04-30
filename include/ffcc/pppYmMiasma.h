@@ -16,8 +16,12 @@ struct VYmMiasma;
 struct PYmMiasma;
 struct _pppPObject;
 struct _pppCtrlTable;
+#if defined(PPP_YMMIASMA_CUSTOM_PARTICLE_TYPES)
+struct PARTICLE_DATA;
+#else
 struct _PARTICLE_DATA;
 typedef _PARTICLE_DATA PARTICLE_DATA;
+#endif
 
 void InitParticleData(VYmMiasma*, _pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 void UpdateParticleData(_pppPObject*, _pppCtrlTable*, PYmMiasma*, PARTICLE_DATA*);

@@ -34,7 +34,7 @@ extern "C" void drawCopy__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void setViewport__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void preDrawEnvInit__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void stdDrawEnvInit__11CGraphicPcsFv(CGraphicPcs*);
-const char s_CGraphicPcs_801D7B80[] = "CGraphicPcs";
+extern const char s_CGraphicPcs_801D7B80[];
 
 u32 m_table_desc0__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CGraphicPcsFv)};
 u32 m_table_desc1__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CGraphicPcsFv)};
@@ -55,10 +55,10 @@ extern "C" float FLOAT_8032fb78;
 extern "C" float FLOAT_8032fbfc;
 extern "C" float FLOAT_8032fc00;
 
-static const char s_p_graphic_cpp_801d7c10[] = "p_graphic.cpp";
-static const char s__s__d____3f___801d7ba4[] = "%s(%d) %.3f%%";
-static const char s_MOVE___1f___BG___1f___OBJ___1f___801d7bb4[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
-static const char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[] = "%c%c%c%c%c%c%c%c%c%c";
+extern const char s_p_graphic_cpp_801d7c10[];
+extern const char s_pcts_pctd_pct_3fpctpct_801D7BA4[];
+extern const char s_MOVE_pct_1fpctpct_BG_pct_1fpctpct_OBJ_pct_1fpctpct_UP_pct_1fpctpct_HIT_pct_1fpctpct_SCR_pct_1fpctpct_801D7BB4[];
+extern const char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[];
 static const char s_debug_pad_port_fmt[] = "%dP";
 static const char s_debug_frame_fmt[] = "%d";
 static const u32 s_debug_bar_color = 0x808080FF;
@@ -748,11 +748,11 @@ void CGraphicPcs::drawBar()
 
             if (order->m_priority != 0x27) {
                 char debugString[260];
-                sprintf(debugString, const_cast<char*>(s__s__d____3f___801d7ba4), order->m_debugName, order->m_insertIndex, order->m_lastTime);
+                sprintf(debugString, const_cast<char*>(s_pcts_pctd_pct_3fpctpct_801D7BA4), order->m_debugName, order->m_insertIndex, order->m_lastTime);
 
                 if (order->m_priority == 0x17) {
                     char extraString[256];
-                    sprintf(extraString, const_cast<char*>(s_MOVE___1f___BG___1f___OBJ___1f___801d7bb4),
+                    sprintf(extraString, const_cast<char*>(s_MOVE_pct_1fpctpct_BG_pct_1fpctpct_OBJ_pct_1fpctpct_UP_pct_1fpctpct_HIT_pct_1fpctpct_SCR_pct_1fpctpct_801D7BB4),
                             *reinterpret_cast<float*>(&CFlat[4920]), *reinterpret_cast<float*>(&CFlat[4924]),
                             *reinterpret_cast<float*>(&CFlat[4928]), *reinterpret_cast<float*>(&CFlat[4932]),
                             *reinterpret_cast<float*>(&CFlat[4936]), *reinterpret_cast<float*>(&CFlat[72]));

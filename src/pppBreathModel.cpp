@@ -490,7 +490,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     int groupTable;
     short slotIndex;
     unsigned int slotCount;
-    bool ready;
+    int ready;
     float scaledOwner;
     Mtx scaleMtx;
     Mtx worldMtx;
@@ -581,11 +581,11 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
             if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
                 (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {
-                ready = false;
+                ready = 0;
                 goto group_ready;
             }
         }
-        ready = true;
+        ready = 1;
 group_ready:
         if (ready) {
             firstParticle = -1;

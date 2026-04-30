@@ -54,7 +54,7 @@ int rand(void);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
-void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+void* pppMemFree__FPv(unsigned long, CMemory::CStage*, char*, int);
 void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(CUtil*, Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
 void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
 int GetNumPolygonFromDL__5CUtilFPvUl(CUtil*, void*, unsigned long);
@@ -363,7 +363,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     ModelData(reinterpret_cast<CChara::CModel*>(model))->m_posQuant);
             }
 
-            ((u32*)work->m_meshBuffers)[i] = (u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            ((u32*)work->m_meshBuffers)[i] = (u32)pppMemFree__FPv(
                 meshData->m_displayListCount << 2, pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3E9);
             if (((u32*)work->m_meshBuffers)[i] == 0) {
@@ -384,7 +384,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                 CharaBreakDisplayListPair** dlEntries =
                     (CharaBreakDisplayListPair**)(((u32*)work->m_meshBuffers)[i] + ((displayListCount - 1) << 2));
                 for (int dl = displayListCount - 1; dl >= 0; dl--) {
-                    *dlEntries = (CharaBreakDisplayListPair*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                    *dlEntries = (CharaBreakDisplayListPair*)pppMemFree__FPv(
                         0x10, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3FC);
                     CharaBreakDisplayListPair* dlPair = *dlEntries;
                     if (dlPair == NULL) {
@@ -395,7 +395,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     dlPair->m_displayListSize = 0;
                     dlPair->m_polygonData = 0;
                     dlPair->m_displayListSize = displayList->m_size;
-                    dlPair->m_rewrittenDisplayList = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                    dlPair->m_rewrittenDisplayList = pppMemFree__FPv(
                         dlPair->m_displayListSize, pppEnvStPtr->m_stagePtr,
                         const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x40B);
                     if (dlPair->m_rewrittenDisplayList == NULL) {
@@ -407,7 +407,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
 
                     u32 polygonCount =
                         GetNumPolygonFromDL__5CUtilFPvUl(&gUtil, dlPair->m_rewrittenDisplayList, dlPair->m_displayListSize);
-                    dlPair->m_polygonData = (POLYGON_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                    dlPair->m_polygonData = (POLYGON_DATA*)pppMemFree__FPv(
                         polygonCount * 0x34, pppEnvStPtr->m_stagePtr,
                         const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x423);
                     if (dlPair->m_polygonData == NULL) {

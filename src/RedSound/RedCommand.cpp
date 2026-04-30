@@ -96,8 +96,8 @@ int _EraseTime(int eraseTrack)
 		track += 0x55;
 	} while (track < (int*)(*trackBasePtr + 0x2a80));
 
-	if ((int)minTrack < eraseTrack) {
-		eraseTrack = (int)minTrack;
+	if (eraseTrack > minTrack) {
+		eraseTrack = minTrack;
 	}
 
 	track = (int*)*trackBasePtr;

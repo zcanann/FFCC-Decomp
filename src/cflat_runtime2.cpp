@@ -716,189 +716,71 @@ void CFlatRuntime2::onDeleteObject(CFlatRuntime::CObject* object)
 unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 {
 	unsigned int count = 0;
-	if (classType == 3) {
-		signed char* obj = reinterpret_cast<signed char*>(m_objParty);
-		if (obj[0x4C] >= 0) {
-			count++;
-		}
-		if (obj[0x744] >= 0) {
-			count++;
-		}
-		if (obj[0xE3C] >= 0) {
-			count++;
-		}
-		if (obj[0x1534] >= 0) {
-			count++;
-		}
-		return count;
-	}
 
-	if (classType < 3) {
-		if (classType == 1) {
-			signed char* obj = reinterpret_cast<signed char*>(m_gObjQuadArr);
-			for (int i = 0; i < 3; i++) {
-				if (obj[0x4C] >= 0) {
-					count++;
-				}
-				if (obj[0xF8] >= 0) {
-					count++;
-				}
-				if (obj[0x1A4] >= 0) {
-					count++;
-				}
-				if (obj[0x250] >= 0) {
-					count++;
-				}
-				if (obj[0x2FC] >= 0) {
-					count++;
-				}
-				if (obj[0x3A8] >= 0) {
-					count++;
-				}
-				if (obj[0x454] >= 0) {
-					count++;
-				}
-				if (obj[0x500] >= 0) {
-					count++;
-				}
-				obj += 0x560;
-			}
-			return count;
-		}
-
-		if (classType < 1) {
-			if (classType < 0) {
-				return count;
-			}
-
-			signed char* obj = reinterpret_cast<signed char*>(m_gBaseObjArr);
-			for (int i = 0; i < 5; i++) {
-				if (obj[0x4C] >= 0) {
-					count++;
-				}
-				if (obj[0x9C] >= 0) {
-					count++;
-				}
-				if (obj[0xEC] >= 0) {
-					count++;
-				}
-				if (obj[0x13C] >= 0) {
-					count++;
-				}
-				if (obj[0x18C] >= 0) {
-					count++;
-				}
-				if (obj[0x1DC] >= 0) {
-					count++;
-				}
-				if (obj[0x22C] >= 0) {
-					count++;
-				}
-				if (obj[0x27C] >= 0) {
-					count++;
-				}
-				obj += 0x280;
-			}
-			return count;
-		}
-
-		signed char* obj = reinterpret_cast<signed char*>(m_gObjArr);
-		for (int i = 0; i < 7; i++) {
+	switch (classType) {
+	case 0: {
+		signed char* obj = reinterpret_cast<signed char*>(m_gBaseObjArr);
+		for (int i = 0; i < 40; i++) {
 			if (obj[0x4C] >= 0) {
 				count++;
 			}
-			if (obj[0x564] >= 0) {
-				count++;
-			}
-			if (obj[0xA7C] >= 0) {
-				count++;
-			}
-			if (obj[0xF94] >= 0) {
-				count++;
-			}
-			if (obj[0x14AC] >= 0) {
-				count++;
-			}
-			if (obj[0x19C4] >= 0) {
-				count++;
-			}
-			if (obj[0x1EDC] >= 0) {
-				count++;
-			}
-			if (obj[0x23F4] >= 0) {
-				count++;
-			}
-			obj += 0x28C0;
+			obj += 0x50;
 		}
 		return count;
 	}
-
-	if (classType == 5) {
-		signed char* obj = reinterpret_cast<signed char*>(m_objItem);
+	case 1: {
+		signed char* obj = reinterpret_cast<signed char*>(m_gObjQuadArr);
+		for (int i = 0; i < 24; i++) {
+			if (obj[0x4C] >= 0) {
+				count++;
+			}
+			obj += 0xAC;
+		}
+		return count;
+	}
+	case 2: {
+		signed char* obj = reinterpret_cast<signed char*>(m_gObjArr);
+		for (int i = 0; i < 56; i++) {
+			if (obj[0x4C] >= 0) {
+				count++;
+			}
+			obj += 0x518;
+		}
+		return count;
+	}
+	case 3: {
+		signed char* obj = reinterpret_cast<signed char*>(m_objParty);
 		for (int i = 0; i < 4; i++) {
 			if (obj[0x4C] >= 0) {
 				count++;
 			}
-			if (obj[0x5C8] >= 0) {
-				count++;
-			}
-			if (obj[0xB44] >= 0) {
-				count++;
-			}
-			if (obj[0x10C0] >= 0) {
-				count++;
-			}
-			if (obj[0x163C] >= 0) {
-				count++;
-			}
-			if (obj[0x1BB8] >= 0) {
-				count++;
-			}
-			if (obj[0x2134] >= 0) {
-				count++;
-			}
-			if (obj[0x26B0] >= 0) {
-				count++;
-			}
-			obj += 0x2BE0;
+			obj += 0x6F8;
 		}
 		return count;
 	}
-
-	if (classType > 4) {
+	case 4: {
+		signed char* obj = reinterpret_cast<signed char*>(m_objMon);
+		for (int i = 0; i < 64; i++) {
+			if (obj[0x4C] >= 0) {
+				count++;
+			}
+			obj += 0x740;
+		}
 		return count;
 	}
-
-	signed char* obj = reinterpret_cast<signed char*>(m_objMon);
-	for (int i = 0; i < 8; i++) {
-		if (obj[0x4C] >= 0) {
-			count++;
+	case 5: {
+		signed char* obj = reinterpret_cast<signed char*>(m_objItem);
+		for (int i = 0; i < 32; i++) {
+			if (obj[0x4C] >= 0) {
+				count++;
+			}
+			obj += 0x57C;
 		}
-		if (obj[0x78C] >= 0) {
-			count++;
-		}
-		if (obj[0xECC] >= 0) {
-			count++;
-		}
-		if (obj[0x160C] >= 0) {
-			count++;
-		}
-		if (obj[0x1D4C] >= 0) {
-			count++;
-		}
-		if (obj[0x248C] >= 0) {
-			count++;
-		}
-		if (obj[0x2BCC] >= 0) {
-			count++;
-		}
-		if (obj[0x330C] >= 0) {
-			count++;
-		}
-		obj += 0x3A00;
+		return count;
 	}
-
-	return count;
+	default:
+		return count;
+	}
 }
 
 /*
@@ -912,88 +794,70 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
  */
 CGObject* CFlatRuntime2::getFreeObject(int classType)
 {
-	if (classType == 3) {
+	switch (classType) {
+	case 0: {
+		unsigned char* obj = m_gBaseObjArr;
+		for (int i = 0; i < 0x28; i++) {
+			if (static_cast<signed char>(obj[0x4C]) >= 0) {
+				return reinterpret_cast<CGObject*>(m_gBaseObjArr + i * 0x50);
+			}
+			obj += 0x50;
+		}
+		return 0;
+	}
+	case 1: {
+		unsigned char* obj = m_gObjQuadArr;
+		for (int i = 0; i < 0x18; i++) {
+			if (static_cast<signed char>(obj[0x4C]) >= 0) {
+				return reinterpret_cast<CGObject*>(m_gObjQuadArr + i * 0xAC);
+			}
+			obj += 0xAC;
+		}
+		return 0;
+	}
+	case 2: {
+		unsigned char* obj = m_gObjArr;
+		for (int i = 0; i < 0x38; i++) {
+			if (static_cast<signed char>(obj[0x4C]) >= 0) {
+				return reinterpret_cast<CGObject*>(m_gObjArr + i * 0x518);
+			}
+			obj += 0x518;
+		}
+		return 0;
+	}
+	case 3: {
 		unsigned char* obj = m_objParty;
-		int i = 0;
-		int count = 4;
-		do {
+		for (int i = 0; i < 4; i++) {
 			if (static_cast<signed char>(obj[0x4C]) >= 0) {
 				return reinterpret_cast<CGObject*>(m_objParty + i * 0x6F8);
 			}
 			obj += 0x6F8;
-			i++;
-			count--;
-		} while (count != 0);
-	} else if (classType < 3) {
-		if (classType == 1) {
-			unsigned char* obj = m_gObjQuadArr;
-			int i = 0;
-			int count = 0x18;
-			do {
-				if (static_cast<signed char>(obj[0x4C]) >= 0) {
-					return reinterpret_cast<CGObject*>(m_gObjQuadArr + i * 0xAC);
-				}
-				obj += 0xAC;
-				i++;
-				count--;
-			} while (count != 0);
-		} else if (classType < 1) {
-			if (classType < 0) {
-				return 0;
-			}
-			unsigned char* obj = m_gBaseObjArr;
-			int i = 0;
-			int count = 0x28;
-			do {
-				if (static_cast<signed char>(obj[0x4C]) >= 0) {
-					return reinterpret_cast<CGObject*>(m_gBaseObjArr + i * 0x50);
-				}
-				obj += 0x50;
-				i++;
-				count--;
-			} while (count != 0);
-		} else {
-			unsigned char* obj = m_gObjArr;
-			int i = 0;
-			int count = 0x38;
-			do {
-				if (static_cast<signed char>(obj[0x4C]) >= 0) {
-					return reinterpret_cast<CGObject*>(m_gObjArr + i * 0x518);
-				}
-				obj += 0x518;
-				i++;
-				count--;
-			} while (count != 0);
 		}
-	} else if (classType == 5) {
-		unsigned char* obj = m_objItem;
-		int i = 0;
-		int count = 0x20;
-		do {
-			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(m_objItem + i * 0x57C);
-			}
-			obj += 0x57C;
-			i++;
-			count--;
-		} while (count != 0);
-	} else if (classType < 5) {
+		return 0;
+	}
+	case 4: {
 		unsigned char* obj = m_objMon;
-		int i = 0;
-		int count = 0x40;
-		do {
+		for (int i = 0; i < 0x40; i++) {
 			if (static_cast<signed char>(obj[0x4C]) >= 0) {
 				return reinterpret_cast<CGObject*>(m_objMon + i * 0x740);
 			}
 			obj += 0x740;
-			i++;
-			count--;
-		} while (count != 0);
-	} else {
+		}
 		return 0;
 	}
-
-	return 0;
+	case 5: {
+		unsigned char* obj = m_objItem;
+		for (int i = 0; i < 0x20; i++) {
+			if (static_cast<signed char>(obj[0x4C]) >= 0) {
+				return reinterpret_cast<CGObject*>(m_objItem + i * 0x57C);
+			}
+			obj += 0x57C;
+		}
+		return 0;
+	}
+	default:
+		return 0;
+	}
 }
 
 /*
@@ -1010,32 +874,22 @@ void* CFlatRuntime2::intToClass(int classId)
 	int classType = classId >> 8;
 	unsigned int slot = static_cast<unsigned int>(classId) & 0xFF;
 
-	if (classType == 3) {
-		return m_objParty + (slot - 1) * 0x6F8;
-	}
-
-	if (classType > 2) {
-		if (classType == 5) {
-			return m_objItem + (slot - 1) * 0x57C;
-		}
-		if (classType > 4) {
-			return this;
-		}
-		return m_objMon + (slot - 1) * 0x740;
-	}
-
-	if (classType == 1) {
-		return m_gObjQuadArr + (slot - 1) * 0xAC;
-	}
-
-	if (classType < 1) {
-		if (classType < 0) {
-			return this;
-		}
+	switch (classType) {
+	case 0:
 		return m_gBaseObjArr + (slot - 1) * 0x50;
+	case 1:
+		return m_gObjQuadArr + (slot - 1) * 0xAC;
+	case 2:
+		return m_gObjArr + (slot - 1) * 0x518;
+	case 3:
+		return m_objParty + (slot - 1) * 0x6F8;
+	case 4:
+		return m_objMon + (slot - 1) * 0x740;
+	case 5:
+		return m_objItem + (slot - 1) * 0x57C;
+	default:
+		return this;
 	}
-
-	return m_gObjArr + (slot - 1) * 0x518;
 }
 
 /*

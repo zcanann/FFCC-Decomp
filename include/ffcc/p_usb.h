@@ -8,7 +8,7 @@
 struct CUSBPcsTable
 {
     char* m_name;
-    unsigned int m_words[0x46];
+    unsigned int m_words[0x56];
 };
 
 extern unsigned int m_table_desc0__7CUSBPcs[];

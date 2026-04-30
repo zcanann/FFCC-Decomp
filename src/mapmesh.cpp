@@ -104,6 +104,11 @@ static inline CMemory::CStage*& MapMeshAllocStage()
 {
     return g_pStage;
 }
+
+static inline float LoadMapMeshFloat(const float& value)
+{
+    return value;
+}
 }
 
 /*
@@ -413,8 +418,8 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
         case 0x56455254:
             m_meshData = __nwa__FUlPQ27CMemory6CStagePci(workSize, MapMeshAllocStage(), s_mapmesh_cpp_801D70B0, 0x13A);
 
-            float maxInit = FLOAT_8032F934;
-            float minInit = FLOAT_8032F930;
+            float maxInit = LoadMapMeshFloat(FLOAT_8032F934);
+            float minInit = LoadMapMeshFloat(FLOAT_8032F930);
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(m_meshData)));
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
             m_vertices = cursor;
@@ -707,8 +712,8 @@ void CMapMesh::Destroy()
  */
 CMapMesh::CMapMesh()
 {
-    const float minInit = 10000000000.0f;
-    const float maxInit = -10000000000.0f;
+    float maxInit = LoadMapMeshFloat(FLOAT_8032F934);
+    float minInit = LoadMapMeshFloat(FLOAT_8032F930);
 
     F32At(this, 0x14) = minInit;
     F32At(this, 0x10) = minInit;

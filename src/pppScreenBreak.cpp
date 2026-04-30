@@ -74,8 +74,8 @@ struct ScreenBreakModelView {
 
 struct ScreenBreakNode {
     u8 _pad0[0xBC];
-    u8 _padBC_0 : 7;
     u8 m_disabled : 1;
+    u8 _padBC_1 : 7;
 };
 
 struct pppScreenBreakUnkB {

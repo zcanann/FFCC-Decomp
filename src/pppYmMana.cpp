@@ -270,17 +270,26 @@ void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int)
 void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYmMana, int meshIndex, int dlIndex, float (*) [4])
 {
     s32 meshData = *(s32*)((u8*)model + 0xAC);
-    u8 alpha = *(u8*)((u8*)vYmMana + 0x3B);
+    u8* workBytes = (u8*)work;
 
-    *(u8*)((u8*)work + 0xFC) = 0xFF;
-    *(u8*)((u8*)work + 0xFD) = 0xFF;
-    *(u8*)((u8*)work + 0xFE) = 0xFF;
-    *(u8*)((u8*)work + 0xFF) = alpha == 0 ? 0xFF : alpha;
+    if (*(u8*)((u8*)vYmMana + 0x3B) != 0) {
+        workBytes[0xFC] = 0xFF;
+        workBytes[0xFD] = 0xFF;
+        workBytes[0xFE] = 0xFF;
+        workBytes[0xFF] = *(u8*)((u8*)vYmMana + 0x3B);
+    } else {
+        workBytes[0xFC] = 0xFF;
+        workBytes[0xFD] = 0xFF;
+        workBytes[0xFE] = 0xFF;
+        workBytes[0xFF] = 0xFF;
+    }
 
-    DCFlushRange((u8*)work + 0xFC, 4);
-    GXSetArray((GXAttr)0xB, (u8*)work + 0xFC, 4);
+    DCFlushRange(workBytes + 0xFC, 4);
+    GXSetArray((GXAttr)0xB, workBytes + 0xFC, 4);
 
-    u32* dl = (u32*)(*(s32*)(*(s32*)(meshData + meshIndex * 0x14 + 8) + 0x50) + dlIndex * 0xC);
+    s32 meshEntry = meshData + meshIndex * 0x14;
+    s32 mesh = *(s32*)(meshEntry + 8);
+    u32* dl = (u32*)(*(s32*)(mesh + 0x50) + dlIndex * 0xC);
     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
         &MaterialMan, *(void**)(*(s32*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
     GXCallDisplayList((void*)dl[1], dl[0]);

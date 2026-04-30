@@ -757,14 +757,14 @@ CFont::CFont()
 {
 	m_glyphData = 0;
 	texturePtr = 0;
-	margin = 0.0f;
-	posZ = 0.0f;
-	posY = 0.0f;
-	posX = 0.0f;
+	margin = FLOAT_803306B8;
+	posZ = FLOAT_803306B8;
+	posY = FLOAT_803306B8;
+	posX = FLOAT_803306B8;
 	CFontRenderFlagBits& bits = GetRenderFlagBits(renderFlags);
 	bits.shadow = 0;
-	scaleY = 1.0f;
-	scaleX = 1.0f;
+	scaleY = FLOAT_803306C8;
+	scaleX = FLOAT_803306C8;
 	bits.fixedWidth = 0;
 	m_color.r = 0xFF;
 	m_color.g = 0xFF;

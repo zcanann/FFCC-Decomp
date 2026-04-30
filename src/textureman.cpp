@@ -114,6 +114,25 @@ static inline CTexture* AllocTexture()
     }
     return texture;
 }
+
+static inline void InitTlutObjs(CTexture* texture, void* tlutData)
+{
+    int numEntries;
+    int offset;
+
+    if (tlutData == 0) {
+        tlutData = texture->m_tlutData;
+    }
+
+    numEntries = (texture->m_format == 9) ? 0x100 : 0x10;
+    GXInitTlutObj(&texture->m_tlutObj0, tlutData, GX_TL_IA8, numEntries);
+
+    numEntries = (texture->m_format == 9) ? 0x100 : 0x10;
+    offset = (texture->m_format == 9) ? 0x100 : 0x10;
+    GXInitTlutObj(&texture->m_tlutObj1,
+                  reinterpret_cast<void*>(reinterpret_cast<unsigned int>(tlutData) + offset * 2), GX_TL_IA8,
+                  numEntries);
+}
 }
 
 /*
@@ -588,8 +607,6 @@ void CTexture::InitTexObj()
 {
     unsigned int format;
     void* tlutData;
-    int numEntries;
-    int offset;
 
     format = m_format;
     if ((format == 9) || (format == 8)) {
@@ -598,13 +615,7 @@ void CTexture::InitTexObj()
                        static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
 
         tlutData = m_tlutData;
-        numEntries = (m_format == 9) ? 0x100 : 0x10;
-        GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8, numEntries);
-
-        numEntries = (m_format == 9) ? 0x100 : 0x10;
-        offset = (m_format == 9) ? 0x100 : 0x10;
-        GXInitTlutObj(&m_tlutObj1, reinterpret_cast<void*>(reinterpret_cast<unsigned int>(tlutData) + offset * 2), GX_TL_IA8,
-                      numEntries);
+        InitTlutObjs(this, tlutData);
     } else {
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
@@ -754,25 +765,13 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
 
     format = *reinterpret_cast<unsigned int*>(texture + 0x60);
     if ((format == 9) || (format == 8)) {
-        int tlutBase;
-        unsigned int numEntries;
-        int offset;
-
         GXInitTexObjCI(reinterpret_cast<GXTexObj*>(texture + 0x28), *reinterpret_cast<void**>(texture + 0x78),
                        static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x64)),
                        static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x68)),
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
                        static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)), 0, 0);
 
-        tlutBase = reinterpret_cast<int>(*reinterpret_cast<void**>(texture + 0x7C));
-        numEntries = (*reinterpret_cast<unsigned int*>(texture + 0x60) == 9) ? 0x100 : 0x10;
-        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x48), reinterpret_cast<void*>(tlutBase), GX_TL_IA8,
-                      static_cast<u16>(numEntries));
-
-        numEntries = (*reinterpret_cast<unsigned int*>(texture + 0x60) == 9) ? 0x100 : 0x10;
-        offset = (*reinterpret_cast<unsigned int*>(texture + 0x60) == 9) ? 0x100 : 0x10;
-        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x54), reinterpret_cast<void*>(tlutBase + offset * 2), GX_TL_IA8,
-                      static_cast<u16>(numEntries));
+        InitTlutObjs(this, *reinterpret_cast<void**>(texture + 0x7C));
     } else {
         GXInitTexObj(reinterpret_cast<GXTexObj*>(texture + 0x28), *reinterpret_cast<void**>(texture + 0x78),
                      static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x64)),
@@ -802,10 +801,6 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
     if (m_cacheId != -1) {
         if (IsEnable__13CAmemCacheSetFs(amemCacheSet, m_cacheId) == 0) {
             unsigned int format;
-            int tlutBase;
-            int numEntries;
-            int offset;
-
             m_imageData = reinterpret_cast<void*>(
                 GetData__13CAmemCacheSetFsPci(amemCacheSet, m_cacheId, const_cast<char*>(s_textureman_cpp_801D7974), 0x1DD));
 
@@ -815,13 +810,7 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
                                static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                                static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
 
-                tlutBase = reinterpret_cast<int>(m_tlutData);
-                numEntries = (m_format == 9) ? 0x100 : 0x10;
-                GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutBase), GX_TL_IA8, numEntries);
-
-                numEntries = (m_format == 9) ? 0x100 : 0x10;
-                offset = (m_format == 9) ? 0x100 : 0x10;
-                GXInitTlutObj(&m_tlutObj1, reinterpret_cast<void*>(tlutBase + offset * 2), GX_TL_IA8, numEntries);
+                InitTlutObjs(this, m_tlutData);
             } else {
                 GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                              static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),

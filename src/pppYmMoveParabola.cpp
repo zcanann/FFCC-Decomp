@@ -7,6 +7,9 @@
 #include "dolphin/mtx.h"
 
 extern CGame Game;
+extern const float kPppYmTraceMoveZero;
+extern const float kPppYmTraceMoveOne;
+
 struct pppYmMoveParabolaWork {
     f32 m_distance;
     f32 m_velocity;
@@ -47,7 +50,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     Vec newPosition;
     Vec direction;
     if ((s32)Game.m_currentSceneId == 7) {
-        f32 zero = 0.0f;
+        f32 zero = gPppYmMoveParabolaZero;
         f32 yOffset = gPppYmMoveParabolaYOffsetStep;
 
         direction.x = yOffset;
@@ -122,3 +125,10 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
         pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + gPppYmMoveParabolaYOffsetStep;
     }
 }
+
+extern const float gPppParMoveMatrixZero = 0.0f;
+extern const float gPppParMoveMatrixOne = 1.0f;
+extern const float kPppYmTraceMoveZero = 0.0f;
+extern const float kPppYmTraceMoveOne = 1.0f;
+extern const float FLOAT_80330e48 = -1.5707964f;
+extern const float FLOAT_80330e4c = 0.0f;

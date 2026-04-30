@@ -2183,6 +2183,7 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
 			break;
 		}
 	}
+
 	return result;
 }
 
@@ -2198,7 +2199,7 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
 int CCaravanWork::DelCmdListAndItem(int cmdListIdx, int)
 {
 	int result;
-	short* cmdListSlot = reinterpret_cast<short*>(m_commandListInventorySlotRef) + cmdListIdx;
+	short inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
 
 	if (cmdListIdx == 0) {
 		if (m_equipment[0] < 0) {
@@ -2214,6 +2215,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx, int)
 		}
 	} else {
 		int numGrouped;
+		short* cmdListSlot = m_commandListExtra + cmdListIdx;
 		if (Game.m_gameWork.m_menuStageMode == 0 || cmdListSlot[0] == 0) {
 			numGrouped = 1;
 		} else {
@@ -2245,15 +2247,15 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx, int)
 			}
 		}
 
-		if (numGrouped < 2) {
-			if (*cmdListSlot < 0) {
+		if (numGrouped <= 1) {
+			if (inventorySlot < 0) {
 				result = 0;
 			} else {
-				result = (short)m_inventoryItems[*cmdListSlot];
+				result = (short)m_inventoryItems[inventorySlot];
 			}
 		} else {
 			int scanCount = cmdListIdx + 1;
-			cmdListSlot = reinterpret_cast<short*>(m_commandListInventorySlotRef) + cmdListIdx;
+			cmdListSlot = m_commandListExtra + cmdListIdx;
 			if (cmdListIdx >= 0) {
 				do {
 					if (cmdListSlot[0] != -1) {

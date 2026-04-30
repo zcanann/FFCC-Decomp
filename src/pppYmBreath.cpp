@@ -22,6 +22,12 @@ extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u
 extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern const float FLOAT_80330c80;
 
+extern const float FLOAT_80330c80;
+
+extern const float FLOAT_80330c80;
+
+extern const float FLOAT_80330c80;
+
 struct pppYmBreathUnkC {
     unsigned char _pad[0xC];
     int* m_serializedDataOffsets;

@@ -25,6 +25,8 @@ extern "C" void __dt__21CPtrArray_P8CTexAnim_Fv(void*, int);
 extern "C" void __dt__25CPtrArray_P11CTexAnimSeq_Fv(void*, int);
 extern "C" int GetSize__21CPtrArray_P8CTexAnim_Fv(void*);
 extern "C" int GetSize__25CPtrArray_P11CTexAnimSeq_Fv(void*);
+extern "C" int Add__21CPtrArray_P8CTexAnim_FP8CTexAnim(void*, CTexAnim*);
+extern "C" int Add__25CPtrArray_P11CTexAnimSeq_FP11CTexAnimSeq(void*, CTexAnimSeq*);
 extern "C" void* __vc__21CPtrArray_P8CTexAnim_FUl(void*, unsigned long);
 extern "C" void* __vc__25CPtrArray_P11CTexAnimSeq_FUl(void*, unsigned long);
 extern "C" void SetStage__25CPtrArray_P11CTexAnimSeq_Fv(void*, CMemory::CStage*);
@@ -729,7 +731,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                         }
                     }
                     chunkFile.PopChunk();
-                    refData->texAnimSeqs.Add(seq);
+                    Add__25CPtrArray_P11CTexAnimSeq_FP11CTexAnimSeq(&refData->texAnimSeqs, seq);
                 } else if (((int)middleChunkData[0] < 0x53455120) && (middleChunkData[0] == 0x4E414D45)) {
                     middleChunkArg0 = middleChunkData[1];
                     refData->texSrtIndex = middleChunkArg0;
@@ -737,7 +739,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                 }
             }
             chunkFile.PopChunk();
-            self->texAnims.Add(texAnim);
+            Add__21CPtrArray_P8CTexAnim_FP8CTexAnim(&self->texAnims, texAnim);
         }
     }
     chunkFile.PopChunk();

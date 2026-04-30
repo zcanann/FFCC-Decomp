@@ -556,7 +556,7 @@ config.libs = [
             Object(NonMatching, "p_chara_viewer.cpp"),
             Object(NonMatching, "p_dbgmenu.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "p_FunnyShape.cpp", extra_cflags=["-sdata 8"]),
-            Object(NonMatching, "p_game.cpp", extra_cflags=["-RTTI on", "-sdata 8"]),
+            Object(NonMatching, "p_game.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "p_gba.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "p_graphic.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "p_light.cpp", extra_cflags=["-sdata 8"]),

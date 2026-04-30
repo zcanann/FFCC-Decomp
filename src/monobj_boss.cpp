@@ -1515,19 +1515,17 @@ void CGMonObj::cancelStatFuncTetsukyojin()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	const int state = prgObj->m_lastStateId;
-	if (state != 0x66) {
-		if (state < 0x66) {
-			if (state != 100) {
-				return;
-			}
-		} else if (state >= 0x68) {
-			return;
-		}
-	} else {
+	switch (state) {
+	case 0x66:
 		object->m_bgColMask |= 0xC0002;
 		return;
+	case 100:
+	case 0x67:
+		CGMonObj_ResetActionState(this);
+		return;
+	default:
+		return;
 	}
-	CGMonObj_ResetActionState(this);
 }
 
 /*

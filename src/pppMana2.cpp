@@ -915,16 +915,6 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801071b0
  * PAL Size: 1428b
  * EN Address: TODO
@@ -1096,7 +1086,7 @@ void CalcReflectionVector2(
  * Address:	TODO
  * Size:	TODO
  */
-void MakeWave(Vec*, unsigned short*, float*, Vec*, float, float)
+void MakeWave(Vec*, unsigned short*, float*, Vec, float, float)
 {
 	// TODO
 }

@@ -236,16 +236,6 @@ void SetEnvMap(PYmMana*, VYmMana* vYmMana)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800d7fcc
  * PAL Size: 44b
  * EN Address: TODO
@@ -1119,17 +1109,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
  * Address:	TODO
  * Size:	TODO
  */
-void GXSetViewportv(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void MakeWave(Vec*, unsigned short*, float*, Vec&, float, float)
+void MakeWave(Vec*, unsigned short*, float*, Vec, float, float)
 {
 	// TODO
 }

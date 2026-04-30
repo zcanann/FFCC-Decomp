@@ -103,7 +103,7 @@ void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXCol
 }
 
 static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5);
-static void UpdateWaterMesh(VMana2* mana2);
+static int UpdateWaterMesh(VMana2* mana2);
 static void RenderWaterMesh(VMana2* mana2);
 static void CalculateNormal(VMana2* mana2);
 static void CalcWaterReflectionVector(
@@ -222,8 +222,12 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80108c80
+ * PAL Size: 304b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 {
@@ -246,8 +250,8 @@ void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 
     work[0] = 0;
     work[1] = 0;
-    work[8] = 0;
     work[9] = 0;
+    work[8] = 0;
     work[15] = 0;
     work[16] = 0;
     work[18] = 0;
@@ -1193,7 +1197,7 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
  * JP Address: TODO
  * JP Size: TODO
  */
-static void UpdateWaterMesh(VMana2* mana2)
+static int UpdateWaterMesh(VMana2* mana2)
 {
     u8* work;
     float* waterHeightA;
@@ -1206,7 +1210,7 @@ static void UpdateWaterMesh(VMana2* mana2)
     positions = *(Vec**)(work + 0x3C);
     waterHeightB = *(float**)(work + 0x4C);
     if (waterHeightA == NULL) {
-        return;
+        return 0;
     }
 
     for (int row = 1; row < 0x10; row++) {
@@ -1262,6 +1266,7 @@ static void UpdateWaterMesh(VMana2* mana2)
     origin.z = *(float*)(work + 0xAC);
     CalcWaterReflectionVector(*(Vec**)(work + 0x44), *(Vec**)(work + 0x3C), *(Vec**)(work + 0x40), 0x121, origin,
                               (float(*)[4])(work + 0x80), *(_GXColor**)(work + 0x5C), *(Vec2d**)(work + 0x58));
+    return 1;
 }
 
 /*

@@ -18,6 +18,7 @@ extern "C" const float FLOAT_8032F930 = 10000000000.0f;
 extern "C" const float FLOAT_8032F934 = -10000000000.0f;
 
 CMemory::CStage* g_pStage;
+u32 s_insertShadowNo;
 
 extern "C" {
 void SetBlendMode__12CMaterialManFP12CMaterialSeti(void* materialMan, CMaterialSet* materialSet, unsigned int materialIdx);

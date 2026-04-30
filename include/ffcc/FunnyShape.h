@@ -21,7 +21,6 @@ public:
 	void ClearAnmData();
 	void ClearTextureData();
 	void RenderShape(FS_tagOAN3_SHAPE*, Vec2d, float);
-	void SetDefaultStage();
 };
 
 #endif // _FFCC_FUNNYSHAPE_H_

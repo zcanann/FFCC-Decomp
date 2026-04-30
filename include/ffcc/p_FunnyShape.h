@@ -34,7 +34,6 @@ public:
     void drawViewer();
 
     void SetUSBData();
-    void USBDataCallback(CUSBPcs::CDataHeader*);
 
     CMemory::CStage* m_viewerStage;        // 0x04
     u8 m_viewerState[0x34];                // 0x08

@@ -4,6 +4,7 @@
 #include "ffcc/system.h"
 
 #include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
 extern u32 m_table_desc0__11CGraphicPcs[];
 extern u32 m_table_desc1__11CGraphicPcs[];
@@ -109,9 +110,7 @@ public:
     float m_dofNearZ;               // 0x0C8
     float m_dofFarZ;                // 0x0CC
     int m_dofMode;                  // 0x0D0
-    float m_dofFocus;               // 0x0D4
-    float m_dofBlurNear;            // 0x0D8
-    float m_dofBlurFar;             // 0x0DC
+    Vec m_dofTarget;                // 0x0D4
     signed char m_dofFlagA;         // 0x0E0
     unsigned char _padE1[3];        // 0x0E1
     int m_blurMode;                 // 0x0E4

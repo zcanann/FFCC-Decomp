@@ -1560,29 +1560,32 @@ void CGraphic::RenderNoTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXCol
 
 	float x1 = pos1.x;
 	float y1 = pos1.y;
-	float z1 = pos1.z;
 
 	GXWGFifo.f32 = x1;
+	float z1 = pos1.z;
 	GXWGFifo.f32 = y1;
+	u32 rgba1 = *(u32*)&color1;
 	GXWGFifo.f32 = z1;
-	GXWGFifo.u32 = *(u32*)&color1;
 
 	float x2 = pos2.x;
+	GXWGFifo.u32 = rgba1;
+	u32 rgba2 = *(u32*)&color2;
 	GXWGFifo.f32 = x2;
-	GXWGFifo.f32 = y1;
-	GXWGFifo.f32 = z1;
-	GXWGFifo.u32 = *(u32*)&color2;
-
 	float y2 = pos2.y;
+	GXWGFifo.f32 = y1;
+	u32 rgba4 = *(u32*)&color4;
+	GXWGFifo.f32 = z1;
+	u32 rgba3 = *(u32*)&color3;
+	GXWGFifo.u32 = rgba2;
 	GXWGFifo.f32 = x2;
 	GXWGFifo.f32 = y2;
 	GXWGFifo.f32 = z1;
-	GXWGFifo.u32 = *(u32*)&color4;
 
+	GXWGFifo.u32 = rgba4;
 	GXWGFifo.f32 = x1;
 	GXWGFifo.f32 = y2;
 	GXWGFifo.f32 = z1;
-	GXWGFifo.u32 = *(u32*)&color3;
+	GXWGFifo.u32 = rgba3;
 }
 
 /*

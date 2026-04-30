@@ -111,9 +111,9 @@ void CGQuadObj::onDraw()
         GXLoadPosMtxImm(CameraPcs.m_cameraMatrix, GX_PNMTX0);
         GXBegin(GX_LINES, GX_VTXFMT0, ((u32)m_vertexCount << 1) + ((u32)m_vertexCount << 2));
 
-        QuadVertex* vertex;
-        CGQuadObj* current = this;
         int i = 0;
+        CGQuadObj* current = this;
+        QuadVertex* vertex;
 
         while (i < (int)(u32)m_vertexCount) {
             int next = i + 1;

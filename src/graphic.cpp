@@ -891,16 +891,17 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
         return;
     }
 
+    char* lineStart = text;
+
     GXClearVtxDesc();
     GXSetVtxDesc((GXAttr)9, (GXAttrType)1);
     GXSetVtxDesc((GXAttr)0xD, (GXAttrType)1);
     GXSetVtxAttrFmt((GXVtxFmt)0, (GXAttr)9, (GXCompCnt)1, (GXCompType)3, 0);
     GXSetVtxAttrFmt((GXVtxFmt)0, (GXAttr)0xD, (GXCompCnt)1, (GXCompType)3, 1);
 
-    u32 count = 0;
-    char* lineStart = text;
+    int count = 0;
     while (true) {
-        char ch;
+        int ch;
         while (true) {
             ch = *text++;
             if (ch < ' ' || ch > 0x7F) {
@@ -911,12 +912,12 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
 
         if (count > 0) {
             GXBegin((GXPrimitive)0x80, (GXVtxFmt)0, (u16)((count & 0x3FFF) << 2));
-            s16 i = 0;
+            int i = 0;
             while (count > 0) {
-                s16 px = (s16)(x + i * charSize);
-                u32 glyph = (u32)(*lineStart - 0x20);
-                s16 tx = (s16)((glyph & 7) * 16);
-                s16 ty = (s16)((glyph >> 3) * 16);
+                int px = x + i * charSize;
+                int glyph = *lineStart - 0x20;
+                int tx = (glyph % 8) * 16;
+                int ty = (glyph / 8) * 16;
 
                 i++;
                 lineStart++;
@@ -950,11 +951,11 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
             count = 0;
         }
 
+        lineStart = text;
         if (ch != '\n') {
             break;
         }
         y += charSize;
-        lineStart = text;
     }
 }
 

@@ -53,7 +53,7 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
         sphereMtx[0][0] = radius;
         sphereMtx[1][1] = radius;
         sphereMtx[2][2] = radius;
-        PSMTXConcat(ppvCameraMatrix02, cameraMtx, cameraMtx);
+        PSMTXConcat(ppvCameraMatrix, cameraMtx, cameraMtx);
         PSMTXMultVec(cameraMtx, &local_94, &local_a0);
         sphereMtx[0][3] = local_a0.x;
         sphereMtx[1][3] = local_a0.y;

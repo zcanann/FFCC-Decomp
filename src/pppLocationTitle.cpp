@@ -92,7 +92,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         model[1][1] = pppMngStPtr->m_scale.y * particle->m_frame;
         model[2][2] = pppMngStPtr->m_scale.z * particle->m_frame;
 
-        PSMTXMultVec(ppvCameraMatrix02, &particle->m_pos, &worldPos);
+        PSMTXMultVec(ppvCameraMatrix, &particle->m_pos, &worldPos);
         model[0][3] = worldPos.x;
         model[1][3] = worldPos.y;
         model[2][3] = worldPos.z;

@@ -43,8 +43,8 @@ extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 extern "C" void _pppAllFreePObject__FP9_pppMngSt(_pppMngSt*);
 extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*);
 extern "C" {
-extern Mtx ppvCameraMatrix02;
-extern float ppvChrScl[4];
+extern Mtx ppvCameraMatrix;
+extern float ppvChrScl[3];
 extern Mtx ppvUnitMatrix;
 extern Vec ppvZeroVector;
 }
@@ -2145,12 +2145,12 @@ void CPartMng::pppEditBeforeCalc()
         *reinterpret_cast<float*>(self + 0x6c) = -*reinterpret_cast<float*>(self + 0x6c);
         *reinterpret_cast<float*>(self + 0x6c) *= *reinterpret_cast<float*>(self + 0x70);
 
-        PSMTXCopy(reinterpret_cast<float(*)[4]>(self + 0x40), ppvCameraMatrix02);
+        PSMTXCopy(reinterpret_cast<float(*)[4]>(self + 0x40), ppvCameraMatrix);
         C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe4c, FLOAT_8032fe50, FLOAT_8032fe54, FLOAT_8032fe58);
         gPartScreenMatrixRow2X = ppvScreenMatrix[2][0];
         gPartScreenMatrixRow2Y = ppvScreenMatrix[2][1];
         gPartScreenMatrixRow2W = ppvScreenMatrix[2][3];
-        PSMTXCopy(ppvCameraMatrix02, ppvCameraMatrix0);
+        PSMTXCopy(ppvCameraMatrix, ppvCameraMatrix0);
         PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
 
         _GXColor clearColor;
@@ -2718,7 +2718,7 @@ void pppSetProjection()
 void CPartMng::pppSetRendMatrix()
 {
     PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x94), ppvScreenMatrix);
-    PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), ppvCameraMatrix02);
+    PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), ppvCameraMatrix);
     gPartScreenMatrixRow2X = ppvScreenMatrix[2][0];
     gPartScreenMatrixRow2Y = ppvScreenMatrix[2][1];
     gPartScreenMatrixRow2W = ppvScreenMatrix[2][3];
@@ -3073,7 +3073,7 @@ void CPartMng::pppDrawIdx(int partIndex)
     Vec cameraDelta;
     Vec viewPos;
 
-    PSMTXInverse(ppvCameraMatrix02, invCamera);
+    PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
@@ -3106,12 +3106,12 @@ void CPartMng::pppDrawIdx(int partIndex)
         min.x = partPos.x - mng->m_cullRadius;
         min.y = partPos.y;
         min.z = partPos.z - mng->m_cullRadius;
-        if (bound.CheckFrustum(min, ppvCameraMatrix02, partPos.y + mng->m_cullYOffset) == 0) {
+        if (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + mng->m_cullYOffset) == 0) {
             return;
         }
     }
 
-    PSMTXMultVec(ppvCameraMatrix02, &partPos, &viewPos);
+    PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
     mng->m_sortDepth = viewPos.z;
     pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
     pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);

@@ -124,7 +124,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     shape = *(pppShapeSt**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        &colorWork->m_color, &ppvCameraMatrix02, kPppYmMeltZero, ctrl->m_payload[0x19],
+        &colorWork->m_color, &ppvCameraMatrix, kPppYmMeltZero, ctrl->m_payload[0x19],
         ctrl->m_payload[0x18], *(u8*)&ctrl->m_arg3, 2, 1, 1, 0);
     pppSetBlendMode(*(u8*)&ctrl->m_arg3);
 

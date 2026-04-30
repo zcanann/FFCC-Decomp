@@ -310,9 +310,9 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 			}
 
 			if ((s32)Game.m_currentSceneId == 7) {
-				cameraX = ppvCameraMatrix02[0][3];
-				cameraY = ppvCameraMatrix02[1][3];
-				cameraZ = ppvCameraMatrix02[2][3];
+				cameraX = ppvCameraMatrix[0][3];
+				cameraY = ppvCameraMatrix[1][3];
+				cameraZ = ppvCameraMatrix[2][3];
 			} else {
 				cameraX = CameraPcs._212_4_;
 				cameraY = CameraPcs._216_4_;

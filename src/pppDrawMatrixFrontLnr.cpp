@@ -29,7 +29,7 @@ void pppDrawMatrixFrontLnr(_pppPObject* object, void*, _pppCtrlTable*)
     local_18.y = *(float*)((char*)object + 0x2c);
     local_18.z = *(float*)((char*)object + 0x3c);
     
-    PSMTXMultVec(ppvCameraMatrix02, &local_18, &local_18);
+    PSMTXMultVec(ppvCameraMatrix, &local_18, &local_18);
     
     *(float*)((char*)object + 0x4c) = local_18.x;
     *(float*)((char*)object + 0x5c) = local_18.y;

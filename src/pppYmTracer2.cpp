@@ -124,7 +124,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_payload[10]);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            colorData + 8, (void*)&ppvCameraMatrix02, FLOAT_80331840,
+            colorData + 8, (void*)&ppvCameraMatrix, FLOAT_80331840,
             param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
         SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 

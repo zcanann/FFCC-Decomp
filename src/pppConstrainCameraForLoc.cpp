@@ -158,7 +158,7 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     local_a4.y = fVar3 * local_b0.y;
     local_a4.z = fVar3 * local_b0.z;
     if ((s32)Game.m_currentSceneId == 7) {
-        PSMTXInverse(ppvCameraMatrix02, local_98);
+        PSMTXInverse(ppvCameraMatrix, local_98);
     } else {
         PSMTXInverse(local_68, local_98);
     }

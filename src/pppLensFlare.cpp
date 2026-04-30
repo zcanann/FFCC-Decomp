@@ -73,7 +73,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 			local_60.y = pppMngStPtr->m_matrix.value[1][3];
 			local_60.z = pppMngStPtr->m_matrix.value[2][3];
 
-			PSMTXMultVec(ppvCameraMatrix02, &local_60, &local_60);
+			PSMTXMultVec(ppvCameraMatrix, &local_60, &local_60);
 
 			local_54[0][3] = local_60.x;
 			local_54[1][3] = local_60.y;

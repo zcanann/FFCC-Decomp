@@ -342,8 +342,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                        *(float*)((u8*)pppMngStPtr + 0x2C) * particleData[0x1A],
                        *(float*)((u8*)pppMngStPtr + 0x30) * particleData[0x1B]);
             PSMTXConcat(*(Mtx*)particleData, drawMtx, tempMtx);
-            PSMTXConcat(ppvCameraMatrix02, tempMtx, tempMtx);
-            PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, drawMtx);
+            PSMTXConcat(ppvCameraMatrix, tempMtx, tempMtx);
+            PSMTXConcat(ppvCameraMatrix, *(Mtx*)particleData, drawMtx);
             PSMTXMultVec(drawMtx, (Vec*)(particleData + 0xC), &pos);
             tempMtx[0][3] = pos.x;
             tempMtx[1][3] = pos.y;
@@ -453,7 +453,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 sphereMtx[1][1] = groupScale;
                 sphereMtx[2][2] = groupScale;
                 PSMTXConcat(*reinterpret_cast<Mtx*>(&work->m_particleWmats[firstParticle]), object->m_localMatrix.value, tempMtx);
-                PSMTXConcat(ppvCameraMatrix02, tempMtx, tempMtx);
+                PSMTXConcat(ppvCameraMatrix, tempMtx, tempMtx);
                 PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &pos);
                 sphereMtx[0][3] = pos.x;
                 sphereMtx[1][3] = pos.y;
@@ -1055,7 +1055,7 @@ void BirthParticle(
 
     BreathModelObject* object = reinterpret_cast<BreathModelObject*>(pppObject);
     PSMTXConcat(*(Mtx*)particleWmat, object->m_localMatrix.value, *(Mtx*)particleData);
-    PSMTXConcat(ppvCameraMatrix02, *(Mtx*)particleData, cameraMtx);
+    PSMTXConcat(ppvCameraMatrix, *(Mtx*)particleData, cameraMtx);
 
     particle->m_direction.x = 0.0f;
     particle->m_direction.y = 0.0f;

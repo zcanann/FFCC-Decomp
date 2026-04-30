@@ -50,6 +50,17 @@ static inline double TmpArtiIntToDouble(int value)
     return conv.value - DOUBLE_80332f40;
 }
 
+static inline float TmpArtiIntToFloat(int value)
+{
+    union {
+        unsigned long long bits;
+        double value;
+    } conv;
+
+    conv.bits = 0x4330000000000000ULL | (unsigned int)(value ^ 0x80000000U);
+    return conv.value - DOUBLE_80332f40;
+}
+
 namespace {
 struct TmpArtiState {
     unsigned char pad_0000[0xB];
@@ -172,10 +183,10 @@ void CMenuPcs::TmpArtiDraw()
 		int tex = *(int*)(entry + 0xE);
 		if (tex >= 0) {
 			float alpha = *(float*)(entry + 8);
-			float left = (float)entry[0];
-			float top = (float)entry[1];
-			float width = (float)entry[2];
-			float height = (float)entry[3];
+			float left = TmpArtiIntToFloat(entry[0]);
+			float top = TmpArtiIntToFloat(entry[1]);
+			float width = TmpArtiIntToFloat(entry[2]);
+			float height = TmpArtiIntToFloat(entry[3]);
 			float s = *(float*)(entry + 4);
 			float t = *(float*)(entry + 6);
 
@@ -205,8 +216,8 @@ void CMenuPcs::TmpArtiDraw()
 	for (int i = 0; i < 4; i++) {
 		short icon = *(short*)(foodPtr + 0x1F6);
 		if (icon >= 0) {
-			int posX = (int)((double)(entry[0] + entry[2] - 0x10));
-			int posY = (int)((float)((double)(entry[1] + 6)) - FLOAT_80332f30);
+			int posX = (int)TmpArtiIntToDouble(entry[0] + entry[2] - 0x10);
+			int posY = (int)((float)TmpArtiIntToDouble(entry[1] + 6) - FLOAT_80332f30);
 			DrawSingleIcon__8CMenuPcsFiiifif(this, icon, posX, posY, *(float*)(entry + 8), 0, FLOAT_80332f2c);
 		}
 		entry += 0x20;
@@ -286,9 +297,8 @@ unsigned int CMenuPcs::TmpArtiClose()
 					dVar3 = DOUBLE_80332f50;
 					*(float *)(psVar4 + 8) =
 					    (float)(DOUBLE_80332f48 -
-					            (DOUBLE_80332f48 /
-					             ((double)*(int *)(psVar4 + 0x14) - dVar2)) *
-					                ((double)*(int *)(psVar4 + 0x10) - dVar2));
+					            (DOUBLE_80332f48 / TmpArtiIntToDouble(*(int *)(psVar4 + 0x14))) *
+					                TmpArtiIntToDouble(*(int *)(psVar4 + 0x10)));
 					if ((double)*(float *)(psVar4 + 8) < dVar3) {
 						*(float *)(psVar4 + 8) = FLOAT_80332f2c;
 					}
@@ -516,7 +526,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			*(int *)(psVar7 + 0xe) = 0x37;
 			psVar7[2] = 200;
 			psVar7[3] = 0x28;
-			psVar7[0] = (short)(int)-(((double)psVar7[2] * dVar1) - dVar5);
+			psVar7[0] = (short)(int)-((TmpArtiIntToDouble(psVar7[2]) * dVar1) - dVar5);
 			psVar7[1] = (short)iVar6 * (psVar7[3] + -8) + 0x60;
 			*(float *)(psVar7 + 4) = fVar2;
 			*(float *)(psVar7 + 6) = fVar2;
@@ -525,7 +535,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			*(int *)(psVar7 + 0x2e) = 0x37;
 			psVar7[0x22] = 200;
 			psVar7[0x23] = 0x28;
-			psVar7[0x20] = (short)(int)-(((double)psVar7[0x22] * dVar1) - dVar5);
+			psVar7[0x20] = (short)(int)-((TmpArtiIntToDouble(psVar7[0x22]) * dVar1) - dVar5);
 			psVar7[0x21] = (short)(iVar6 + 1) * (psVar7[0x23] + -8) + 0x60;
 			*(float *)(psVar7 + 0x24) = fVar2;
 			*(float *)(psVar7 + 0x26) = fVar2;
@@ -556,8 +566,8 @@ unsigned int CMenuPcs::TmpArtiOpen()
 				else {
 					*(int *)(psVar7 + 0x10) = *(int *)(psVar7 + 0x10) + 1;
 					*(float *)(psVar7 + 8) =
-					    (float)((DOUBLE_80332f48 / (double)*(int *)(psVar7 + 0x14)) *
-					            (double)*(int *)(psVar7 + 0x10));
+					    (float)((DOUBLE_80332f48 / TmpArtiIntToDouble(*(int *)(psVar7 + 0x14))) *
+					            TmpArtiIntToDouble(*(int *)(psVar7 + 0x10)));
 				}
 			}
 			psVar7 = psVar7 + 0x20;

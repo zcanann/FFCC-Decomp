@@ -122,12 +122,12 @@ void CGQuadObj::onDraw()
             i = i + 1;
             GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
             count = m_vertexCount;
-            next %= (int)count;
-            GXPosition3f32(m_vertices[next].x, m_yBase, m_vertices[next].z);
+            int nextBase = next % (int)count;
+            GXPosition3f32(m_vertices[nextBase].x, m_yBase, m_vertices[nextBase].z);
             GXPosition3f32(current->m_vertices[0].x, m_yBase + m_yHeight, current->m_vertices[0].z);
             count = m_vertexCount;
-            next %= (int)count;
-            GXPosition3f32(m_vertices[next].x, m_yBase + m_yHeight, m_vertices[next].z);
+            int nextTop = next % (int)count;
+            GXPosition3f32(m_vertices[nextTop].x, m_yBase + m_yHeight, m_vertices[nextTop].z);
             GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
             vertex = current->m_vertices;
             current = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(current) + sizeof(QuadVertex));

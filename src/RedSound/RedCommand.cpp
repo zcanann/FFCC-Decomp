@@ -50,7 +50,6 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 		if (((u32)*track != 0) && ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
 		    ((((unsigned int)*(unsigned char*)(track + 0x54)) & (unsigned int)attrMask) != 0)) {
 			int trackNo;
-			int seTrackOffset;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			track[0x3e] = 0;
@@ -59,12 +58,11 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 			track[0x16] = 0;
 
 			trackNo = *(char*)((char*)track + 0x14e);
-			seTrackOffset = trackNo * 0xc0;
-			((unsigned char*)p_VoiceData)[seTrackOffset + 0x1a] &= (unsigned char)0xfa;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x94) &= 0xfffffff7;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) &= 0xfffffffe;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) |= 2;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x8c) = 0;
+			((unsigned char*)p_VoiceData)[trackNo * 0xc0 + 0x1a] &= (unsigned char)0xfa;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x94) &= 0xfffffff7;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) &= 0xfffffffe;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) |= 2;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
 			c_RedEntry.SeSepHistoryManager(0, track[0x3d]);
 			if ((u32)track[6] != 0) {

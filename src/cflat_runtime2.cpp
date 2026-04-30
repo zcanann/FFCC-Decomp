@@ -716,189 +716,71 @@ void CFlatRuntime2::onDeleteObject(CFlatRuntime::CObject* object)
 unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 {
 	unsigned int count = 0;
-	if (classType == 3) {
-		signed char* obj = reinterpret_cast<signed char*>(m_objParty);
-		if (obj[0x4C] >= 0) {
-			count++;
-		}
-		if (obj[0x744] >= 0) {
-			count++;
-		}
-		if (obj[0xE3C] >= 0) {
-			count++;
-		}
-		if (obj[0x1534] >= 0) {
-			count++;
-		}
-		return count;
-	}
 
-	if (classType < 3) {
-		if (classType == 1) {
-			signed char* obj = reinterpret_cast<signed char*>(m_gObjQuadArr);
-			for (int i = 0; i < 3; i++) {
-				if (obj[0x4C] >= 0) {
-					count++;
-				}
-				if (obj[0xF8] >= 0) {
-					count++;
-				}
-				if (obj[0x1A4] >= 0) {
-					count++;
-				}
-				if (obj[0x250] >= 0) {
-					count++;
-				}
-				if (obj[0x2FC] >= 0) {
-					count++;
-				}
-				if (obj[0x3A8] >= 0) {
-					count++;
-				}
-				if (obj[0x454] >= 0) {
-					count++;
-				}
-				if (obj[0x500] >= 0) {
-					count++;
-				}
-				obj += 0x560;
-			}
-			return count;
-		}
-
-		if (classType < 1) {
-			if (classType < 0) {
-				return count;
-			}
-
-			signed char* obj = reinterpret_cast<signed char*>(m_gBaseObjArr);
-			for (int i = 0; i < 5; i++) {
-				if (obj[0x4C] >= 0) {
-					count++;
-				}
-				if (obj[0x9C] >= 0) {
-					count++;
-				}
-				if (obj[0xEC] >= 0) {
-					count++;
-				}
-				if (obj[0x13C] >= 0) {
-					count++;
-				}
-				if (obj[0x18C] >= 0) {
-					count++;
-				}
-				if (obj[0x1DC] >= 0) {
-					count++;
-				}
-				if (obj[0x22C] >= 0) {
-					count++;
-				}
-				if (obj[0x27C] >= 0) {
-					count++;
-				}
-				obj += 0x280;
-			}
-			return count;
-		}
-
-		signed char* obj = reinterpret_cast<signed char*>(m_gObjArr);
-		for (int i = 0; i < 7; i++) {
+	switch (classType) {
+	case 0: {
+		signed char* obj = reinterpret_cast<signed char*>(m_gBaseObjArr);
+		for (int i = 0; i < 40; i++) {
 			if (obj[0x4C] >= 0) {
 				count++;
 			}
-			if (obj[0x564] >= 0) {
-				count++;
-			}
-			if (obj[0xA7C] >= 0) {
-				count++;
-			}
-			if (obj[0xF94] >= 0) {
-				count++;
-			}
-			if (obj[0x14AC] >= 0) {
-				count++;
-			}
-			if (obj[0x19C4] >= 0) {
-				count++;
-			}
-			if (obj[0x1EDC] >= 0) {
-				count++;
-			}
-			if (obj[0x23F4] >= 0) {
-				count++;
-			}
-			obj += 0x28C0;
+			obj += 0x50;
 		}
 		return count;
 	}
-
-	if (classType == 5) {
-		signed char* obj = reinterpret_cast<signed char*>(m_objItem);
+	case 1: {
+		signed char* obj = reinterpret_cast<signed char*>(m_gObjQuadArr);
+		for (int i = 0; i < 24; i++) {
+			if (obj[0x4C] >= 0) {
+				count++;
+			}
+			obj += 0xAC;
+		}
+		return count;
+	}
+	case 2: {
+		signed char* obj = reinterpret_cast<signed char*>(m_gObjArr);
+		for (int i = 0; i < 56; i++) {
+			if (obj[0x4C] >= 0) {
+				count++;
+			}
+			obj += 0x518;
+		}
+		return count;
+	}
+	case 3: {
+		signed char* obj = reinterpret_cast<signed char*>(m_objParty);
 		for (int i = 0; i < 4; i++) {
 			if (obj[0x4C] >= 0) {
 				count++;
 			}
-			if (obj[0x5C8] >= 0) {
-				count++;
-			}
-			if (obj[0xB44] >= 0) {
-				count++;
-			}
-			if (obj[0x10C0] >= 0) {
-				count++;
-			}
-			if (obj[0x163C] >= 0) {
-				count++;
-			}
-			if (obj[0x1BB8] >= 0) {
-				count++;
-			}
-			if (obj[0x2134] >= 0) {
-				count++;
-			}
-			if (obj[0x26B0] >= 0) {
-				count++;
-			}
-			obj += 0x2BE0;
+			obj += 0x6F8;
 		}
 		return count;
 	}
-
-	if (classType > 4) {
+	case 4: {
+		signed char* obj = reinterpret_cast<signed char*>(m_objMon);
+		for (int i = 0; i < 64; i++) {
+			if (obj[0x4C] >= 0) {
+				count++;
+			}
+			obj += 0x740;
+		}
 		return count;
 	}
-
-	signed char* obj = reinterpret_cast<signed char*>(m_objMon);
-	for (int i = 0; i < 8; i++) {
-		if (obj[0x4C] >= 0) {
-			count++;
+	case 5: {
+		signed char* obj = reinterpret_cast<signed char*>(m_objItem);
+		for (int i = 0; i < 32; i++) {
+			if (obj[0x4C] >= 0) {
+				count++;
+			}
+			obj += 0x57C;
 		}
-		if (obj[0x78C] >= 0) {
-			count++;
-		}
-		if (obj[0xECC] >= 0) {
-			count++;
-		}
-		if (obj[0x160C] >= 0) {
-			count++;
-		}
-		if (obj[0x1D4C] >= 0) {
-			count++;
-		}
-		if (obj[0x248C] >= 0) {
-			count++;
-		}
-		if (obj[0x2BCC] >= 0) {
-			count++;
-		}
-		if (obj[0x330C] >= 0) {
-			count++;
-		}
-		obj += 0x3A00;
+		return count;
 	}
-
-	return count;
+	default:
+		return count;
+	}
 }
 
 /*

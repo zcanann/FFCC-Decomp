@@ -62,9 +62,14 @@ static const char lbl_80331C80[] = "CHARA";
 extern const u32 DAT_80331C88 = 0x00000080;
 extern const u32 DAT_80331C8C = 0xFFFFFFFF;
 static const char s_Debug_80331c90[] = "Debug";
-static const char s_dbgMenuStateOn[] = "ON";
-static const char s_dbgMenuStateOff[] = "OFF";
-static const char s_dbgMenuStateUnknown[] = "?";
+extern const float FLOAT_80331C98 = 0.0f;
+extern const double DOUBLE_80331CA0 = 4503601774854144.0;
+extern const float FLOAT_80331CA8 = 640.0f;
+extern const float FLOAT_80331CAC = 448.0f;
+extern const float FLOAT_80331CB0 = 1.0f;
+static const char lbl_80331CB4[] = "ON";
+static const char lbl_80331CB8[] = "OFF";
+static const char lbl_80331CBC[] = "?";
 
 static u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
 static u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
@@ -502,7 +507,7 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 
 	do {
 		m_currentMenu = menu;
-		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, 640.0f, 480.0f, 0.0f, 1.0f);
+		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, FLOAT_80331CA8, FLOAT_80331CAC, FLOAT_80331C98, FLOAT_80331CB0);
 
 		int type = menu->m_type;
 		if (type != 2) {
@@ -520,11 +525,11 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 
 			const char* stateText;
 			if (menu->m_state == 1) {
-				stateText = s_dbgMenuStateOn;
+				stateText = lbl_80331CB4;
 			} else {
-				stateText = s_dbgMenuStateUnknown;
+				stateText = lbl_80331CBC;
 				if (menu->m_state == 0) {
-					stateText = s_dbgMenuStateOff;
+					stateText = lbl_80331CB8;
 				}
 			}
 

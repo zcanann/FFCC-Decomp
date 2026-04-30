@@ -83,9 +83,8 @@ template <class T>
 class CPtrArray
 {
 public:
-    void** m_vtable;
     CPtrArray();
-    ~CPtrArray();
+    virtual ~CPtrArray();
     int GetSize();
     int Add(T item);
     void RemoveAll();
@@ -261,7 +260,6 @@ static void SetMaterialColor(CMaterial* material, unsigned int rgba)
 template <>
 CPtrArray<CMaterial*>::~CPtrArray()
 {
-    m_vtable = __vt__8CPtrArrayIP9CMaterial;
     RemoveAll();
 }
 
@@ -277,7 +275,6 @@ CPtrArray<CMaterial*>::~CPtrArray()
 extern "C" CPtrArray<CMaterial*>* dtor_80043AAC(CPtrArray<CMaterial*>* ptrArray, short shouldDelete)
 {
     if (ptrArray != 0) {
-        ptrArray->m_vtable = __vt__8CPtrArrayIP9CMaterial;
         ptrArray->RemoveAll();
         if (shouldDelete > 0) {
             __dl__FPv(ptrArray);

@@ -20,6 +20,7 @@ extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSe
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
+extern const float FLOAT_80330c80;
 
 extern const float FLOAT_80330c80;
 
@@ -785,7 +786,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                 unitVelocity.z = -1.0f;
                 groupData->speed = params->m_groupSpeed;
                 pppCopyVector(groupData->direction, unitVelocity);
-                float zero = FLOAT_80330c80;
+                float zero = 0.0f;
 
                 groupData->position.z = zero;
                 groupData->position.y = zero;

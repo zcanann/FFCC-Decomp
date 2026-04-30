@@ -481,29 +481,17 @@ unsigned int pppNotAllocAmemCacheRmem(unsigned long)
  */
 unsigned int pppFreeMngStPrioForData()
 {
-	struct pppMngStPrioData {
-		char pad0[0x14];
-		int m_baseTime;
-		char pad18[0x5c];
-		short m_kind;
-		short m_nodeIndex;
-		char pad78[0x80];
-		unsigned char m_prio;
-		unsigned char padF9;
-		unsigned short m_prioTime;
-		char padFC[0x5c];
-	};
-
 	char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
-	pppMngStPrioData* selectedMngSt = 0;
+	_pppMngSt* selectedMngSt = 0;
 	char* partMngBase = reinterpret_cast<char*>(&PartMng);
 	_pppMngSt* currentMngSt = pppMngStPtr;
 	int selectedPrio = 1;
 	unsigned int selectedPrioTime;
 	int index = 0;
 	for (int i = 0xc0; i != 0; i--) {
-		pppMngStPrioData* candidateA = reinterpret_cast<pppMngStPrioData*>(partMngBase + 0x2A18);
-		if (reinterpret_cast<_pppMngSt*>(candidateA) != currentMngSt && candidateA->m_baseTime != -0x1000 &&
+		CPartMng* partMng = reinterpret_cast<CPartMng*>(partMngBase);
+		_pppMngSt* candidateA = partMng->m_pppMng;
+		if (candidateA != currentMngSt && candidateA->m_baseTime != -0x1000 &&
 		    candidateA->m_kind != 0) {
 			unsigned char prioA = candidateA->m_prio;
 			if (prioA > 1) {
@@ -521,10 +509,10 @@ unsigned int pppFreeMngStPrioForData()
 			}
 		}
 
-		char* nextPartMngBase = partMngBase + 0x158;
-		pppMngStPrioData* candidateB = reinterpret_cast<pppMngStPrioData*>(nextPartMngBase + 0x2A18);
+		char* nextPartMngBase = partMngBase + sizeof(_pppMngSt);
+		_pppMngSt* candidateB = &partMng->m_pppMng[1];
 		partMngBase = nextPartMngBase;
-		if (reinterpret_cast<_pppMngSt*>(candidateB) != currentMngSt && candidateB->m_baseTime != -0x1000 &&
+		if (candidateB != currentMngSt && candidateB->m_baseTime != -0x1000 &&
 		    candidateB->m_kind != 0) {
 			unsigned char prioB = candidateB->m_prio;
 			if (prioB > 1) {
@@ -542,7 +530,7 @@ unsigned int pppFreeMngStPrioForData()
 			}
 		}
 
-		partMngBase += 0x158;
+		partMngBase += sizeof(_pppMngSt);
 		index++;
 	}
 
@@ -554,7 +542,7 @@ unsigned int pppFreeMngStPrioForData()
 		System.Printf(g_MsgFlashy, index);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
-		char* pdtName = reinterpret_cast<char*>(&PartMng) + 0x22E30 + ((int)selectedMngSt->m_kind * 0x38);
+		char* pdtName = PartMng.m_pdtSlots[selectedMngSt->m_kind].m_name;
 		System.Printf(
 			stringBase + 0x2C0,
 			(unsigned int)selectedMngSt->m_prioTime,

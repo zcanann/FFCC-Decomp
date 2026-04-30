@@ -592,11 +592,12 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
     }
 
     {
-        unsigned char* command = (unsigned char*)*scan;
-        int delta = DeltaTimeSumup(&command);
+        int command[3];
         int* nextTrack = scan + 0x55;
+        command[0] = *scan;
+        int delta = DeltaTimeSumup((unsigned char**)command);
 
-        controlData[slot + 10] = (int)command;
+        controlData[slot + 10] = command[0];
         controlData[slot + 0x4a] = scan[0x42] + delta + deltaAdjust;
         controlData[slot + 0x8a] = scan[0x41];
         controlData[slot + 0xca] = scan[9];

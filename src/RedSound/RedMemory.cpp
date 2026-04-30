@@ -51,20 +51,19 @@ CRedMemory::~CRedMemory()
  */
 int RedNew(int size)
 {
-	unsigned int interrupts;
-	int address;
 	int entryCount;
-	int moveCount;
+	unsigned int interrupts;
 	int* slot;
+	int address;
 
 	if ((size < 1) || (m_MemoryBank == 0) || ((unsigned int)m_DataBuffer == 0)) {
 		return 0;
 	}
 
 	interrupts = OSDisableInterrupts();
-	address = m_DataBuffer;
 	size = (size + 0x1F) & 0xFFFFFFE0;
 	slot = m_MemoryBank;
+	address = m_DataBuffer;
 
 	do {
 		if ((slot[1] == 0) || ((address + size) <= *slot)) {
@@ -80,8 +79,7 @@ int RedNew(int size)
 			if ((unsigned int)(address + size) <=
 			    (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
 				if (slot[1] > 0) {
-					moveCount = (int)(m_MemoryBank + 0x800) - (int)(slot + 2);
-					entryCount = moveCount / 8;
+					entryCount = ((int)(m_MemoryBank + 0x800) - (int)(slot + 2)) / 8;
 					if (entryCount > 0) {
 						memmove(slot + 2, slot, entryCount * 8);
 					}
@@ -167,7 +165,6 @@ void RedDelete(void* address)
 int RedNewA(int size, int offset, int maxSize)
 {
 	unsigned int alignedSize;
-	unsigned int moveCount;
 	unsigned int interrupts;
 	int result;
 	int rangeStart;
@@ -231,22 +228,22 @@ int RedNewA(int size, int offset, int maxSize)
 		bestBlock = blockPtr;
 	}
 
-	if ((bestBlock == 0) || ((unsigned int)(rangeStart + maxSize) < result + alignedSize)) {
+	if ((bestBlock != 0) && ((unsigned int)(result + alignedSize) <= (unsigned int)(rangeStart + maxSize))) {
+		blockPtr = bestBlock;
+		if (blockPtr[1] > 0) {
+			int moveCount = ((int)(m_AMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
+			if (moveCount > 0) {
+				memmove(blockPtr + 2, blockPtr, moveCount * 8);
+			}
+		}
+		*blockPtr = result;
+		blockPtr[1] = alignedSize;
 		OSRestoreInterrupts(interrupts);
-		return 0;
+		return result;
 	}
 
-	blockPtr = bestBlock;
-	if (blockPtr[1] > 0) {
-		moveCount = ((int)(m_AMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
-		if ((int)moveCount > 0) {
-			memmove(blockPtr + 2, blockPtr, moveCount * 8);
-		}
-	}
-	*blockPtr = result;
-	blockPtr[1] = alignedSize;
 	OSRestoreInterrupts(interrupts);
-	return result;
+	return 0;
 }
 /*
  * --INFO--

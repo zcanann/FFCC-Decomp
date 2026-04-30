@@ -830,7 +830,7 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
         }
     }
 
-    SetVoiceVolumeMix(voice, pan, voiceMix);
+    SetVoiceVolumeMix((RedVoiceDATA*)voiceData, pan, voiceMix);
     voiceData[0x24] |= 8;
 }
 
@@ -2076,24 +2076,20 @@ void _MusicNoteExecute()
     u32* track;
     int status = _MusicMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData, 1);
 
-    while (status == 0) {
-        if ((m_MusicPhraseStop != 0) || ((((u32*)p_SoundControl)[0x11B] & 1) == 0)) {
-            break;
-        }
-
-        *(s16*)((u8*)p_SoundControl + 0x48E) = *(s16*)((u8*)p_SoundControl + 0x434);
+    while ((status == 0) && (m_MusicPhraseStop == 0) && ((((u32*)p_SoundControl)[0x11B] & 1) != 0)) {
+        *(s16*)((u8*)p_SoundControl + 0x48E) = *(int*)((u8*)p_SoundControl + 0x434);
         memcpy((u8*)p_SoundControl + 0xC, (u8*)p_SoundControl + 0x438, 0x10);
         memcpy((u8*)p_SoundControl + 0x448, (u8*)p_SoundControl + 0x428, 0xC);
 
-        sound = (u32*)p_SoundControl;
+        sound = (u32*)((u8*)p_SoundControl + 0x28);
         track = (u32*)*(u32*)p_SoundControl;
         trackCount = (u8)*((u8*)p_SoundControl + 0x491);
         i = 0;
         do {
-            track[0] = sound[i + 0xA];
-            track[0x42] = sound[i + 0x4A];
-            track[0x41] = sound[i + 0x8A];
-            track[9] = sound[i + 0xCA];
+            track[0] = sound[i];
+            track[0x42] = sound[i + 0x40];
+            track[0x41] = sound[i + 0x80];
+            track[9] = sound[i + 0xC0];
             track += 0x55;
             i++;
         } while (--trackCount != 0);
@@ -2171,6 +2167,7 @@ void _SkipMusicEntry()
 {
     int* src;
     int* dst;
+    u8* soundControl;
     u8 temp[0xC];
 
     if (*(int*)((u8*)p_SoundControlBuffer + 0xD98) >= 0) {
@@ -2212,18 +2209,19 @@ void _SkipMusicEntry()
             src += 2;
         }
 
-        if (*(int*)((u8*)p_SoundControlBuffer + 0x470) != -1) {
-            if (*(int*)((u8*)p_SoundControlBuffer + 0x904) != -1) {
-                MusicStop(*(int*)((u8*)p_SoundControlBuffer + 0x904));
+        soundControl = (u8*)p_SoundControlBuffer;
+        if (*(int*)(soundControl + 0x470) != -1) {
+            if (*(int*)(soundControl + 0x904) != -1) {
+                MusicStop(*(int*)(soundControl + 0x904));
             }
-            memcpy((u8*)p_SoundControlBuffer + 0x494, p_SoundControlBuffer, 0x494);
+            memcpy(soundControl + 0x494, soundControl, 0x494);
         }
 
-        memcpy(p_SoundControlBuffer, (u8*)p_SoundControlBuffer + 0x928, 0x494);
-        memcpy(temp, (u8*)p_SoundControlBuffer + 0x944, 0xC);
-        memset((u8*)p_SoundControlBuffer + 0x928, 0, 0x494);
-        memcpy((u8*)p_SoundControlBuffer + 0x944, temp, 0xC);
-        *(int*)((u8*)p_SoundControlBuffer + 0xD98) = -1;
+        memcpy(soundControl, soundControl + 0x928, 0x494);
+        memcpy(temp, soundControl + 0x944, 0xC);
+        memset(soundControl + 0x928, 0, 0x494);
+        memcpy(soundControl + 0x944, temp, 0xC);
+        *(int*)(soundControl + 0xD98) = -1;
     }
 
     RedDelete(p_SkipKeyOn);
@@ -2245,7 +2243,6 @@ void MusicSkipFunction()
     int iVar1;
     int iVar2;
     int iVar3;
-    int iVar4;
     int iVar5;
     u32 uVar6;
     int iVar7;
@@ -2257,22 +2254,18 @@ void MusicSkipFunction()
         if (p_SkipKeyOn == 0) {
             RedSleep(10000);
         }
-        iVar4 = (int)p_SoundControlBuffer;
     } while (p_SkipKeyOn == 0);
 
     puVar9 = (u32*)((u8*)p_SoundControlBuffer + 0x928);
     memset(p_SkipKeyOn, 0, 0x600);
     iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, (RedKeyOnDATA*)p_SkipKeyOn, 1);
-    while (true) {
-        if ((iVar5 != 0) || ((*(u32*)(iVar4 + 0xd94) & 1) == 0)) {
-            break;
-        }
-        *(s16*)(iVar4 + 0xdb6) = *(s16*)(iVar4 + 0xd5c);
-        memcpy((void*)(iVar4 + 0x934), (void*)(iVar4 + 0xd60), 0x10);
-        memcpy((void*)(iVar4 + 0xd70), (void*)(iVar4 + 0xd50), 0xc);
+    while ((iVar5 == 0) && ((*(u32*)((u8*)puVar9 + 0x46c) & 1) != 0)) {
+        *(s16*)((u8*)puVar9 + 0x48e) = *(int*)((u8*)puVar9 + 0x434);
+        memcpy((void*)((u8*)puVar9 + 0xc), (void*)((u8*)puVar9 + 0x438), 0x10);
+        memcpy((void*)((u8*)puVar9 + 0x448), (void*)((u8*)puVar9 + 0x428), 0xc);
         puVar8 = (u32*)*puVar9;
-        iVar7 = iVar4 + 0x950;
-        uVar6 = (u32)*(u8*)(iVar4 + 0xdb9);
+        iVar7 = (int)puVar9 + 0x28;
+        uVar6 = (u32)*(u8*)((u8*)puVar9 + 0x491);
         iVar5 = 0;
         do {
             iVar1 = iVar5 * 4;

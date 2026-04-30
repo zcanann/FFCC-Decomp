@@ -1431,18 +1431,20 @@ int CRedDriver::GetSoundMode()
  */
 int CRedDriver::SetMusicData(void* musicData)
 {
+    int result;
     char localHeader[0x20];
+    char* header;
     void* copiedHeader;
     int headerSize;
-    int result;
 
     result = -1;
-    if (((((char*)musicData)[0] == 'B') && (((char*)musicData)[1] == 'G')) && (((char*)musicData)[2] == 'M')) {
-        memcpy(localHeader, musicData, sizeof(localHeader));
+    header = (char*)musicData;
+    if (((header[0] == 'B') && (header[1] == 'G')) && (header[2] == 'M')) {
+        memcpy(localHeader, header, sizeof(localHeader));
         headerSize = *(int*)(localHeader + 0x10);
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
-            memcpy(copiedHeader, musicData, headerSize);
+            memcpy(copiedHeader, header, headerSize);
             result = *(short*)(localHeader + 4);
             _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
@@ -1625,17 +1627,19 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
  */
 int CRedDriver::SetSeSepData(void* seSepData)
 {
+    int result;
+    char* header;
     void* copiedHeader;
     int headerSize;
-    int result;
 
     result = -1;
-    if ((((((char*)seSepData)[0] == 'S') && (((char*)seSepData)[1] == 'e')) && (((char*)seSepData)[2] == 'S')) &&
-        ((((char*)seSepData)[3] == 'e' && (((char*)seSepData)[4] == 'p')))) {
-        headerSize = *(int*)((char*)seSepData + 0xc) & 0x7fffffff;
+    header = (char*)seSepData;
+    if (((((header[0] == 'S') && (header[1] == 'e')) && (header[2] == 'S')) &&
+        ((header[3] == 'e' && (header[4] == 'p'))))) {
+        headerSize = *(int*)(header + 0xc) & 0x7fffffff;
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
-            memcpy(copiedHeader, seSepData, headerSize);
+            memcpy(copiedHeader, header, headerSize);
             result = *(int*)((int)copiedHeader + 8);
             _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
@@ -2150,8 +2154,9 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
         RedWaveHEAD* const waveHeader = (RedWaveHEAD*)waveData;
 
         if ((waveHeader->magic[0] == 'W') && (waveHeader->magic[1] == 'D')) {
-            int dataSize =
-                (((waveHeader->regionCount * 4) + 0x3fU) & 0xffffffc0) + (waveHeader->sampleCount * 0x60);
+            int dataSize = waveHeader->regionCount * 4;
+            dataSize = (dataSize + 0x3fU) & 0xffffffc0;
+            dataSize += waveHeader->sampleCount * 0x60;
             dataSize = waveHeader->dataSize + dataSize;
             dataSize += 0x20;
             m_WaveSettingData.waveSize = dataSize;

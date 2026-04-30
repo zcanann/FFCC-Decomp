@@ -50,7 +50,6 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 		if (((u32)*track != 0) && ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
 		    ((((unsigned int)*(unsigned char*)(track + 0x54)) & (unsigned int)attrMask) != 0)) {
 			int trackNo;
-			int seTrackOffset;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			track[0x3e] = 0;
@@ -59,12 +58,11 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 			track[0x16] = 0;
 
 			trackNo = *(char*)((char*)track + 0x14e);
-			seTrackOffset = trackNo * 0xc0;
-			((unsigned char*)p_VoiceData)[seTrackOffset + 0x1a] &= (unsigned char)0xfa;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x94) &= 0xfffffff7;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) &= 0xfffffffe;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) |= 2;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x8c) = 0;
+			*(unsigned char*)((int)p_VoiceData + trackNo * 0xc0 + 0x1a) &= -6;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x94) &= 0xfffffff7;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) &= 0xfffffffe;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) |= 2;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
 			c_RedEntry.SeSepHistoryManager(0, track[0x3d]);
 			if ((u32)track[6] != 0) {
@@ -86,29 +84,29 @@ void _EraseAttribute(int eraseTrack, int attrMask)
  */
 int _EraseTime(int eraseTrack)
 {
-	unsigned int minTrack = 0x100;
+	int minTrack = 0x100;
 	int* trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
 	int* track = (int*)*trackBasePtr;
 
 	do {
-		if (((u32)*track != 0) && (*(char*)(track + 0x54) == '\0') &&
-		    ((unsigned int)*(unsigned char*)((char*)track + 0x14f) < minTrack)) {
+		if (((u32)*track != 0) && (*(unsigned char*)(track + 0x54) == 0) &&
+		    ((int)*(unsigned char*)((char*)track + 0x14f) < minTrack)) {
 			minTrack = *(unsigned char*)((char*)track + 0x14f);
 		}
 		track += 0x55;
 	} while (track < (int*)(*trackBasePtr + 0x2a80));
 
-	if ((int)minTrack < eraseTrack) {
-		eraseTrack = (int)minTrack;
+	if (eraseTrack > minTrack) {
+		eraseTrack = minTrack;
 	}
 
 	track = (int*)*trackBasePtr;
 	int maxWait = 0;
 	int sepId = 0;
 	do {
-		if (((u32)*track != 0) && (*(char*)(track + 0x54) == '\0') &&
+		if (((u32)*track != 0) && (*(unsigned char*)(track + 0x54) == 0) &&
 		    ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
-		    (maxWait < track[0x43])) {
+		    (track[0x43] > maxWait)) {
 			maxWait = track[0x43];
 			sepId = track[0x3d];
 		}
@@ -118,11 +116,10 @@ int _EraseTime(int eraseTrack)
 	track = (int*)*trackBasePtr;
 	int erasedCount = 0;
 	do {
-		if (((u32)*track != 0) && (*(char*)(track + 0x54) == '\0') &&
+		if (((u32)*track != 0) && (*(unsigned char*)(track + 0x54) == 0) &&
 		    ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
 		    (track[0x43] == maxWait)) {
 			int trackNo;
-			int seTrackOffset;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			track[0x3e] = 0;
@@ -131,12 +128,11 @@ int _EraseTime(int eraseTrack)
 			track[0x16] = 0;
 
 			trackNo = *(char*)((char*)track + 0x14e);
-			seTrackOffset = trackNo * 0xc0;
-			((unsigned char*)p_VoiceData)[seTrackOffset + 0x1a] &= (unsigned char)0xfa;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x94) &= 0xfffffff7;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) &= 0xfffffffe;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) |= 2;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x8c) = 0;
+			*(unsigned char*)((int)p_VoiceData + trackNo * 0xc0 + 0x1a) &= -6;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x94) &= 0xfffffff7;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) &= 0xfffffffe;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) |= 2;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
 			if ((u32)track[6] != 0) {
 				c_RedEntry.WaveHistoryManager(0, *(short*)(track[6] + 2));
@@ -168,13 +164,12 @@ int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 	int* scan;
 	int* track;
 	int remaining;
-	int* minTrack;
+	int erasedCount = 0;
 
 	if (attrMask != 0) {
 		_EraseAttribute(eraseTrack, attrMask);
 	}
 
-	minTrack = (int*)*trackBasePtr;
 	do {
 		track = (int*)(*trackBasePtr + 0x292c);
 		scan = track;
@@ -191,10 +186,10 @@ int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 				}
 				scan = scan - 0x55;
 			}
-		} while ((remaining != 0) && (minTrack <= track));
-	} while ((track < minTrack) && (_EraseTime(eraseTrack) != 0));
+		} while ((remaining != 0) && ((int*)*trackBasePtr <= track));
+	} while ((track < (int*)*trackBasePtr) && ((erasedCount = _EraseTime(eraseTrack)) != 0));
 
-	if (track < minTrack) {
+	if (track < (int*)*trackBasePtr) {
 		track = 0;
 	}
 
@@ -212,18 +207,15 @@ int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
  */
 int SeStopID(int seId)
 {
-	int soundBase;
 	int* trackBasePtr;
 	int* track;
 
-	soundBase = (int)p_SoundControlBuffer;
-	trackBasePtr = (int*)(soundBase + 0xdbc);
-	*(unsigned int*)(soundBase + 0x1244) = 0;
-	track = *(int**)(soundBase + 0xdbc);
+	trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
+	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
+	track = (int*)*trackBasePtr;
 	do {
 		if (((u32)*track != 0) && ((seId == -1) || (track[0x3e] == seId))) {
 			int trackNo;
-			int seTrackOffset;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			track[0x3e] = 0;
@@ -232,13 +224,12 @@ int SeStopID(int seId)
 			track[0x16] = 0;
 
 			trackNo = *(char*)((char*)track + 0x14e);
-			seTrackOffset = trackNo * 0xc0;
-			((unsigned char*)p_VoiceData)[seTrackOffset + 0x1a] &= (unsigned char)0xfa;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x94) &= 0xfffffff7;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) &= 0xfffffffe;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) |= 2;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset) = 0;
-			*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x8c) = 0;
+			*(unsigned char*)((int)p_VoiceData + trackNo * 0xc0 + 0x1a) &= -6;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x94) &= 0xfffffff7;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) &= 0xfffffffe;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) |= 2;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0) = 0;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
 			if ((u32)track[6] != 0) {
 				c_RedEntry.WaveHistoryManager(0, *(short*)(track[6] + 2));
@@ -262,20 +253,17 @@ int SeStopID(int seId)
  */
 int SeStopMG(int bank, int sep, int group, int kind)
 {
-	int soundBase;
 	int* trackBasePtr;
 	int* track;
 
-	soundBase = (int)p_SoundControlBuffer;
-	trackBasePtr = (int*)(soundBase + 0xdbc);
-	*(unsigned int*)(soundBase + 0x1244) = 0;
-	track = *(int**)(soundBase + 0xdbc);
+	trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
+	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
+	track = (int*)*trackBasePtr;
 	do {
 		if (((u32)*track != 0) && ((track[0x3d] & 0x80000000U) == 0)) {
 			int id = track[0x3d] / 1000;
 			if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
 				int trackNo;
-				int seTrackOffset;
 
 				KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 				track[0x3e] = 0;
@@ -284,13 +272,12 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				track[0x16] = 0;
 
 				trackNo = *(char*)((char*)track + 0x14e);
-				seTrackOffset = trackNo * 0xc0;
-				((unsigned char*)p_VoiceData)[seTrackOffset + 0x1a] &= (unsigned char)0xfa;
-				*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x94) &= 0xfffffff7;
-				*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) &= 0xfffffffe;
-				*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x90) |= 2;
-				*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset) = 0;
-				*(unsigned int*)((unsigned char*)p_VoiceData + seTrackOffset + 0x8c) = 0;
+				*(unsigned char*)((int)p_VoiceData + trackNo * 0xc0 + 0x1a) &= -6;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x94) &= 0xfffffff7;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) &= 0xfffffffe;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) |= 2;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0) = 0;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
 				if ((u32)track[6] != 0) {
 					c_RedEntry.WaveHistoryManager(0, *(short*)(track[6] + 2));
@@ -326,6 +313,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	unsigned char* current;
 	unsigned int remaining;
 	int* seTrack;
+	int isMulti;
 
 	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
 	deltaTime = (unsigned int)((unsigned char*)info)[2] * 0x100 + (unsigned int)((unsigned char*)info)[1];
@@ -341,6 +329,11 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	}
 
 	flag = ((unsigned char*)info)[0];
+	if ((flag & 0x80) != 0) {
+		isMulti = 1;
+	} else {
+		isMulti = 0;
+	}
 	seq = (unsigned char*)info + 5;
 	attrMask = ((unsigned char*)info)[4];
 	count = ((unsigned char*)info)[0] & 0x7f;
@@ -360,8 +353,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 		track = SearchSeEmptyTrack((int)remaining, ((unsigned char*)info)[3], attrMask);
 		attrMask = 0;
 		if (track == 0) {
-			SeStopID(seId);
-			return 0;
+			break;
 		}
 
 		seTrack = (int*)((unsigned char*)p_VoiceData + *(char*)((char*)track + 0x14e) * 0xc0);
@@ -394,7 +386,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				track[0x16] = 0;
 				track[0x19] = 0;
 				track[0x17] = 0;
-				track[0x40] = (unsigned int)((flag & 0x80) != 0);
+				track[0x40] = isMulti;
 				track[10] = 0x7fff000;
 				track[0xd] = 0x7f000;
 				track[0x10] = pan << 0xc;
@@ -456,6 +448,9 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			return seId;
 		}
 	} while (true);
+
+	SeStopID(seId);
+	return 0;
 }
 
 /*

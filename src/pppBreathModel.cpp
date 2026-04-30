@@ -422,38 +422,32 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 Mtx tempMtx;
                 Vec pos;
 
-                if (i == 2) {
+                switch (i) {
+                case 0:
+                case 2:
                     debugColor.r = 0x80;
                     debugColor.g = 0x00;
                     debugColor.b = 0x00;
                     debugColor.a = 0xFF;
-                } else if (i < 2) {
-                    if (i == 0) {
-                        debugColor.r = 0x80;
-                        debugColor.g = 0x00;
-                        debugColor.b = 0x00;
-                        debugColor.a = 0xFF;
-                    } else if (i < 0) {
-                        debugColor.r = 0x00;
-                        debugColor.g = 0x60;
-                        debugColor.b = 0x80;
-                        debugColor.a = 0xFF;
-                    } else {
-                        debugColor.r = 0x80;
-                        debugColor.g = 0x80;
-                        debugColor.b = 0xFF;
-                        debugColor.a = 0xFF;
-                    }
-                } else if (i < 4) {
+                    break;
+                case 1:
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x80;
+                    debugColor.b = 0xFF;
+                    debugColor.a = 0xFF;
+                    break;
+                case 3:
                     debugColor.r = 0x80;
                     debugColor.g = 0x80;
                     debugColor.b = 0x80;
                     debugColor.a = 0xFF;
-                } else {
+                    break;
+                default:
                     debugColor.r = 0x00;
                     debugColor.g = 0x60;
                     debugColor.b = 0x80;
                     debugColor.a = 0xFF;
+                    break;
                 }
 
                 firstParticle = -1;
@@ -505,7 +499,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     int groupIndex;
     int firstParticle;
     int groupTable;
-    int slotIndex;
+    short slotIndex;
     unsigned int slotCount;
     bool ready;
     float scaledOwner;
@@ -722,7 +716,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                     found = true;
 
                 group_checked:
-                    if (found) {
+                    if (found == 1) {
                         groupData = &groupTable[(int)foundGroup];
                         for (slot = 0; slot < (int)params->m_slotCount; slot++) {
                             groupData->particleStates[slot] = -1;

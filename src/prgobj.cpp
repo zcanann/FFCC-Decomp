@@ -380,9 +380,11 @@ void CGPrgObj::putParticle(int no, int dataNo, CGObject* traceObj, float scale, 
  */
 void CGPrgObj::putParticle(int no, int dataNo, Vec* pos, float scale, int seNo)
 {
+	const float* zero = &FLOAT_80331BD4;
+
 	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
 	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
-	SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, FLOAT_80331BD4);
+	SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, *zero);
 	if (seNo != 0) {
 		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
 	}

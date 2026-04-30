@@ -115,7 +115,8 @@ struct _PARTICLE_DATA
     int m_age;             // 0x68 - 0x6c
     char m_padding[0x140 - 0x6c]; // Pad to 0x140 bytes total
 };
-#if !defined(PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES) && !defined(PPP_YMBREATH_CUSTOM_PARTICLE_TYPES)
+#if !defined(PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES) && !defined(PPP_YMBREATH_CUSTOM_PARTICLE_TYPES) && \
+    !defined(PPP_YMMIASMA_CUSTOM_PARTICLE_TYPES)
 typedef _PARTICLE_DATA PARTICLE_DATA;
 #endif
 

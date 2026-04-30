@@ -1,3 +1,5 @@
+#define PPP_YMMIASMA_CUSTOM_PARTICLE_TYPES
+
 #include "ffcc/pppYmMiasma.h"
 #include "ffcc/math.h"
 #include "ffcc/game.h"
@@ -14,14 +16,14 @@ extern "C" int rand(void);
 extern CGame Game;
 extern float FLOAT_80330640;
 extern float FLOAT_80330644;
-extern float FLOAT_80330650;
-extern float FLOAT_80330654;
-extern float FLOAT_8033065c;
-extern float FLOAT_80330660;
-extern float FLOAT_80330664;
-extern float FLOAT_80330668;
-extern float FLOAT_80330658;
 extern double DOUBLE_80330648;
+extern const float FLOAT_80330650;
+extern const float FLOAT_80330654;
+extern const float FLOAT_80330658;
+extern const float FLOAT_8033065c;
+extern const float FLOAT_80330660;
+extern const float FLOAT_80330664;
+extern const float FLOAT_80330668;
 extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -31,6 +33,8 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" const char s_pppYmMiasma_cpp_801D9CA8[] = "pppYmMiasma.cpp";
+
+struct PARTICLE_DATA : _PARTICLE_DATA {};
 
 struct VYmMiasma {
     PARTICLE_DATA* m_particles;
@@ -586,3 +590,8 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     state->m_colorDecayFrames = (u16)pYmMiasma->m_colorDecayFrames;
     state->m_hasImpulse = 0;
 }
+
+extern const float FLOAT_8033066c = 0.0f;
+extern const float FLOAT_80330670 = 0.0f;
+extern const float FLOAT_80330674 = 0.0031250000465661287f;
+extern const float FLOAT_80330678 = -0.0044639999978244305f;

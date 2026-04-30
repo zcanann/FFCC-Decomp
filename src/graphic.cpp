@@ -1510,37 +1510,41 @@ void CGraphic::RenderTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor
 
 	float x1 = pos1.x;
 	float y1 = pos1.y;
-	float z1 = pos1.z;
-	float tex0 = kGraphicZeroF;
 
 	GXWGFifo.f32 = x1;
+	float z1 = pos1.z;
 	GXWGFifo.f32 = y1;
+	u32 rgba1 = *(u32*)&color1;
 	GXWGFifo.f32 = z1;
-	GXWGFifo.u32 = *(u32*)&color1;
+	float tex0 = kGraphicZeroF;
+	GXWGFifo.u32 = rgba1;
 	float x2 = pos2.x;
 	GXWGFifo.f32 = tex0;
+	u32 rgba2 = *(u32*)&color2;
 	GXWGFifo.f32 = tex0;
 
 	float tex1 = kGraphicOneF;
 	GXWGFifo.f32 = x2;
 	float y2 = pos2.y;
 	GXWGFifo.f32 = y1;
+	u32 rgba4 = *(u32*)&color4;
 	GXWGFifo.f32 = z1;
-	GXWGFifo.u32 = *(u32*)&color2;
+	u32 rgba3 = *(u32*)&color3;
+	GXWGFifo.u32 = rgba2;
 	GXWGFifo.f32 = tex1;
 	GXWGFifo.f32 = tex0;
 
 	GXWGFifo.f32 = x2;
 	GXWGFifo.f32 = y2;
 	GXWGFifo.f32 = z1;
-	GXWGFifo.u32 = *(u32*)&color4;
+	GXWGFifo.u32 = rgba4;
 	GXWGFifo.f32 = tex1;
 	GXWGFifo.f32 = tex1;
 
 	GXWGFifo.f32 = x1;
 	GXWGFifo.f32 = y2;
 	GXWGFifo.f32 = z1;
-	GXWGFifo.u32 = *(u32*)&color3;
+	GXWGFifo.u32 = rgba3;
 	GXWGFifo.f32 = tex0;
 	GXWGFifo.f32 = tex1;
 }

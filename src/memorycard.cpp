@@ -112,6 +112,7 @@ static const unsigned int crcTable[256] = {
     0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
 };
 static const char sMemoryCardManagerName[] = "CMemoryCardMan";
+static const char sCManagerName[] = "CManager";
 static const char sMcOdekakeFmt[] = {
     0x43, 0x4D, 0x65, 0x6D, 0x6F, 0x72, 0x79, 0x43, 0x61, 0x72, 0x64, 0x4D,
     0x61, 0x6E, 0x2E, 0x4F, 0x64, 0x65, 0x6B, 0x61, 0x6B, 0x65, 0x3A, 0x20,
@@ -126,6 +127,8 @@ static const char sMcOdekakeOut[] = {
     (char)0x82, (char)0xA8, (char)0x8F, 0x6F, (char)0x82, (char)0xA9, (char)0x82,
     (char)0xAF, 0x00,
 };
+static const char sMcMountErrorFmt[] = "McMount(%d) error(%d)\n";
+static const char sMcOpenErrorFmt[] = "McOpen(%d) error(%d)\n";
 static const char sMemoryCardSourceFile[] = "memorycard.cpp";
 static const char sMemoryAllocationError[] = {
     0x25, 0x73, 0x28, 0x25, 0x64, 0x29, 0x3A, 0x20, 0x45, 0x72, 0x72, 0x6F,
@@ -175,7 +178,6 @@ static const char sMcMountErrorFmt[] = "McMount(%d) error(%d)";
 static const char sMcGetStatErrorFmt[] = "McGetStat(%d) error(%d)";
 static const char sMcWriteErrorFmt[] = "McWrite(%d) error(%d)";
 static const char sMcSetStatErrorFmt[] = "McSetStat(%d) error(%d)";
-static const char sMcOpenErrorFmt[] = "McOpen(%d) error(%d)";
 
 static inline CChara* GetCharaGlobal()
 {

@@ -127,6 +127,15 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
  */
 void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3)
 {
+    pppFMATRIX resultMatrix;
+    Vec subVec;
+    Vec interp[50];
+    Vec scaled;
+    Vec* startPos;
+    Vec* interpWrite;
+    Vec* interpRead;
+    int startIndex;
+    LocationTitleParticle* dst;
     int serializedOffset;
     int colorOffset;
     s32* serializedOffsets;
@@ -140,19 +149,10 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     int randomValue;
     s16 shapeCount;
     s16 shape;
-    pppFMATRIX resultMatrix;
-    Vec subVec;
-    Vec interp[50];
-    int startIndex;
     int inserted;
     float stepScale;
-    Vec* startPos;
-    Vec* interpRead;
-    Vec* interpWrite;
-    Vec scaled;
     float t;
     int nextCount;
-    LocationTitleParticle* dst;
 
     if (gPppCalcDisabled != 0) {
         return;

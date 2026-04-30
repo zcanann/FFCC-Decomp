@@ -463,11 +463,15 @@ public:
 };
 
 extern Mtx ppvCameraMatrix0;
-extern Mtx ppvCameraMatrix02;
+extern Mtx ppvCameraMatrix;
 extern Mtx ppvWorldMatrix;
-extern float ppvWorldMatrixWood[6][4];
-extern float ppvScreenMatrix[10][4];
+extern Mtx ppvWorldMatrixWood;
+extern Mtx ppvFpCameraMatrixWood;
+extern Mtx44 ppvScreenMatrix;
 extern float ppvScreenMatrix0[4][4];
+extern Mtx ppvLightMatrix;
+extern Mtx ppvColorMatrix;
+extern float ppvChrScl[3];
 extern float ppvSinTbl[];
 extern CPartMng PartMng;
 

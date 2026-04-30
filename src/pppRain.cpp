@@ -59,7 +59,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     pppSetBlendMode(param_2->m_blendMode);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (pppCVECTOR*)(colorBase + 8),
-        ppvCameraMatrix02,
+        ppvCameraMatrix,
         kPppRainTexCoordBase,
         param_2->m_lightTarget,
         param_2->m_fogIndex,
@@ -251,9 +251,9 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         float posZ;
 
         if ((int)Game.m_currentSceneId == 7) {
-            posX = ppvCameraMatrix02[0][3];
-            posY = ppvCameraMatrix02[1][3];
-            posZ = ppvCameraMatrix02[2][3];
+            posX = ppvCameraMatrix[0][3];
+            posY = ppvCameraMatrix[1][3];
+            posZ = ppvCameraMatrix[2][3];
         } else {
             posX = CameraPcs._212_4_;
             posY = CameraPcs._216_4_;

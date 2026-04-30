@@ -306,7 +306,7 @@ draw_loop:
                 tmpMtx = drawMtx;
                 pppMulMatrix(drawMtx, rotMtx, tmpMtx);
             }
-            PSMTXMultVec(ppvCameraMatrix02, &pos, &pos);
+            PSMTXMultVec(ppvCameraMatrix, &pos, &pos);
         }
 
         drawMtx.value[0][3] = pos.x;

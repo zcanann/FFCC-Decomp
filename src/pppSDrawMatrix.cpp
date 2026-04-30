@@ -17,7 +17,7 @@ extern "C" {
  */
 void pppSDrawMatrix(_pppPObject* object, void*, _pppCtrlTable*)
 {
-	PSMTXConcat(ppvCameraMatrix02,
+	PSMTXConcat(ppvCameraMatrix,
 	           *(Mtx*)((u8*)object + 0x10),
 	           *(Mtx*)((u8*)object + 0x40));
 }

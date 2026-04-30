@@ -137,7 +137,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                             managerPos.y = pppMngStPtr->m_matrix.value[1][3];
                             managerPos.z = pppMngStPtr->m_matrix.value[2][3];
                             PSVECAdd(&trailPos, &managerPos, &trailPos);
-                            PSMTXMultVec(ppvCameraMatrix02, &trailPos, &cameraPos);
+                            PSMTXMultVec(ppvCameraMatrix, &trailPos, &cameraPos);
                         } else {
                             cameraPos = trailPos;
                         }

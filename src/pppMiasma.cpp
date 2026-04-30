@@ -217,9 +217,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         float* radiusArray;
         u16 meshCount;
 
-        cameraPos.x = ppvCameraMatrix02[0][3];
-        cameraPos.y = ppvCameraMatrix02[1][3];
-        cameraPos.z = ppvCameraMatrix02[2][3];
+        cameraPos.x = ppvCameraMatrix[0][3];
+        cameraPos.y = ppvCameraMatrix[1][3];
+        cameraPos.z = ppvCameraMatrix[2][3];
         maxRadius = FLOAT_80331930;
 
         meshCount = model->m_vertexCount;

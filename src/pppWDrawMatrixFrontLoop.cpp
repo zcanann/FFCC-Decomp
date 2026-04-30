@@ -27,7 +27,7 @@ void pppWDrawMatrixFrontLoop(struct _pppPObject* object, void*, struct _pppCtrlT
     localPos.y = *(float*)((char*)object + 0x2C);
     localPos.z = *(float*)((char*)object + 0x3C);
 
-    PSMTXMultVec(ppvCameraMatrix02, &localPos, &localPos);
+    PSMTXMultVec(ppvCameraMatrix, &localPos, &localPos);
 
     *(float*)((char*)object + 0x4C) = localPos.x;
     *(float*)((char*)object + 0x5C) = localPos.y;

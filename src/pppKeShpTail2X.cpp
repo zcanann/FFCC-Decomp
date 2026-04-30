@@ -250,7 +250,7 @@ draw_loop:
         drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);
         drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y);
         drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z);
-        PSMTXMultVec(ppvCameraMatrix02, &pos, &pos);
+        PSMTXMultVec(ppvCameraMatrix, &pos, &pos);
     }
 
     drawMtx.value[0][3] = pos.x;

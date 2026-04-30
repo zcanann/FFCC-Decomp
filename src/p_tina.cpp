@@ -335,12 +335,14 @@ static PppPdtSlotRaw* GetPartMngPdtSlots()
     return reinterpret_cast<PppPdtSlotRaw*>(reinterpret_cast<char*>(&PartMng) + 0x22E18);
 }
 
+#pragma inline_max_size(1000)
+
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-CPartPcs::CPartPcs()
+inline CPartPcs::CPartPcs()
 {
 	unsigned int* table = reinterpret_cast<unsigned int*>(m_table__8CPartPcs);
 
@@ -402,6 +404,8 @@ CPartPcs::CPartPcs()
 	table[125] = m_table_desc18__8CPartPcs[1];
 	table[126] = m_table_desc18__8CPartPcs[2];
 }
+
+#pragma inline_max_size reset
 
 /*
  * --INFO--

@@ -431,7 +431,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 
 		pppMngStRaw* selectedMngSt = 0;
 		u8 selectedPrio = 1;
-		u16 selectedPrioTime = 0;
+		u32 selectedPrioTime = 0;
 
 		for (s32 i = 0; i < 0x180; i += 2)
 		{
@@ -675,8 +675,6 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 	}
 	while (canRetry);
 
-	pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
-	PartMng.pppDumpMngSt();
 	DAT_8032ED64 = 1;
 	return 0;
 }
@@ -755,7 +753,7 @@ void pppMngStHeapCheck(CMemory::CStage* stage)
  */
 void callCon2Prog(_pppPObject* pObject)
 {
-	_pppPDataVal* owner = (_pppPDataVal*)*(_pppPObjLink**)(((u8*)pObject) + 8);
+	_pppPDataVal* owner = pObject->m_link.m_owner;
 	_pppProgSetDef* progSet = owner->m_programSetDef;
 	_pppCtrlTable* stage = progSet->m_stages;
 	int stageIdx = 0;
@@ -783,7 +781,7 @@ void callCon2Prog(_pppPObject* pObject)
 		stage++;
 	}
 
-	*(u32*)(((u8*)pObject) + 0x0C) = 0;
+	pObject->m_graphId = 0;
 	while (true)
 	{
 		stage = progSet->m_stages;
@@ -794,7 +792,7 @@ void callCon2Prog(_pppPObject* pObject)
 			pppProg* prog = stage->m_prog;
 			u32* nextSlot = (u32*)(((u8*)stageSlot) + stage->m_workOffset);
 
-			if (*nextSlot == *(u32*)(((u8*)pObject) + 0x0C))
+			if (*nextSlot == static_cast<u32>(pObject->m_graphId))
 			{
 				*(u32**)(((u8*)pObject) + stageSlotOffset) = nextSlot;
 				if (prog != 0 && prog->m_pppFunctionOperation != 0 && prog->m_pppFunctionConstructor2 != 0)
@@ -806,8 +804,8 @@ void callCon2Prog(_pppPObject* pObject)
 			stage++;
 		}
 
-		*(u32*)(((u8*)pObject) + 0x0C) += 0x1000;
-		if (*(u32*)(((u8*)pObject) + 0x0C) > progSet->m_endFrame)
+		pObject->m_graphId += 0x1000;
+		if (pObject->m_graphId > progSet->m_endFrame)
 		{
 			break;
 		}
@@ -881,7 +879,8 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	struct pppPObjectRaw
 	{
 		_pppPObjLink m_link;
-		u8 m_pad0C[0x70 - 0x0C];
+		s32 m_graphId;
+		u8 m_pad10[0x70 - 0x10];
 		void* m_field70;
 		void* m_field74;
 		u8 m_pad78[4];
@@ -919,7 +918,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 
 		pppMngStRaw* selectedMngSt = 0;
 		u8 selectedPrio = 1;
-		s16 selectedPrioTime = 0;
+		u32 selectedPrioTime = 0;
 
 		for (s32 i = 0; i < 0x180; i += 2)
 		{
@@ -1009,7 +1008,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	}
 
 	pppPObjectRaw* newObjectRaw = (pppPObjectRaw*)newObj;
-	newObjectRaw->m_pad0C[0] = 0;
+	newObjectRaw->m_graphId = 0;
 	newObjectRaw->m_field70 = 0;
 	newObjectRaw->m_field74 = 0;
 	newObjectRaw->m_link.m_owner = pppPDataVal;
@@ -1691,12 +1690,13 @@ void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 	short i = 0;
 	short* shapeIndices = shapeList + 1;
 	short shapeCount = *shapeList;
-	CMaterialSet* materialSet =
-	    *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4);
 
 	while (i < shapeCount) {
-		pppCacheLoadShapeTexture(*(pppShapeSt**)(pppDataHead->m_shapeNames + *shapeIndices * 4), materialSet);
+		short shapeIndex = *shapeIndices;
 		shapeIndices = shapeIndices + 1;
+		pppCacheLoadShapeTexture(
+		    *(pppShapeSt**)(pppDataHead->m_shapeNames + shapeIndex * 4),
+		    *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4));
 		i = i + 1;
 	}
 }
@@ -2015,20 +2015,17 @@ DataValsAllocated:
 	mngRaw->m_pppPObjLinkHead.m_next = 0;
 	pppMngSt->m_spawnedCount = 0;
 
-	if (mngRaw->m_pppPDataVals != 0)
+	u8 index = 0;
+	pppPDataValRaw* pDataVals = mngRaw->m_pppPDataVals;
+	for (pppProgramSetDefRaw* programSetIt = programSet; programSetIt != 0; programSetIt = programSetIt->m_next)
 	{
-		u8 index = 0;
-		pppPDataValRaw* pDataVals = mngRaw->m_pppPDataVals;
-		for (pppProgramSetDefRaw* programSetIt = programSet; programSetIt != 0; programSetIt = programSetIt->m_next)
-		{
-			pDataVals->m_programSetDef = programSetIt;
-			pDataVals->m_nextSpawnTime = programSetIt->m_startFrame;
-			pDataVals->m_pppPObjLink = 0;
-			pDataVals->m_activeCount = 0;
-			pDataVals->m_index = index;
-			index++;
-			pDataVals++;
-		}
+		pDataVals->m_programSetDef = programSetIt;
+		pDataVals->m_nextSpawnTime = programSetIt->m_startFrame;
+		pDataVals->m_pppPObjLink = 0;
+		pDataVals->m_activeCount = 0;
+		pDataVals->m_index = index;
+		index++;
+		pDataVals++;
 	}
 
 	if (runControlPrograms != 0)

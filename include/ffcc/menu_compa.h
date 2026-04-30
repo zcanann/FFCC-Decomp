@@ -21,12 +21,10 @@ class CMenuPcs
 {
 public:
     void CompaInit();
-    void CompaInit0();
     bool CompaOpen();
     void CompaCtrl();
     bool CompaClose();
     void CompaDraw();
-    void CompaCtrlCur();
 
     char pad_00[0x108];
     CFont* listFont;

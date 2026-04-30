@@ -16,12 +16,9 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 
-extern "C" void* __vt__9CRingMenu[];
 extern "C" int _GetIdxCmdList__12CCaravanWorkFv(CCaravanWork*);
 extern "C" int _GetWeaponAttrib__12CCaravanWorkFi(CCaravanWork*, int);
 extern "C" int GetNextCmdListIdx__12CCaravanWorkFii(CCaravanWork*, int, int);
-extern "C" CMenu* __dt__5CMenuFv(CMenu*, short);
-extern "C" void __dl__FPv(void*);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
@@ -202,22 +199,7 @@ CRingMenu::CRingMenu()
  */
 CRingMenu::~CRingMenu()
 {
-	typedef void (*VFunc)(void*);
-	register short shouldDelete;
-	asm {
-		mr shouldDelete, r4
-	}
-
-	if (this == 0) {
-		return;
-	}
-
-	*reinterpret_cast<void***>(this) = __vt__9CRingMenu;
-	(*(VFunc*)((unsigned char*)*(void***)this + 0x10))(this);
-	__dt__5CMenuFv(this, 0);
-	if (0 < shouldDelete) {
-		__dl__FPv(this);
-	}
+	Destroy();
 }
 
 /*
@@ -231,43 +213,42 @@ CRingMenu::~CRingMenu()
  */
 void CRingMenu::Create()
 {
-	reinterpret_cast<void (*)(CRingMenu*)>(reinterpret_cast<void**>(this)[4])(this);
+	Destroy();
 	CMenu::Create();
 
-	char* self = reinterpret_cast<char*>(this);
-	*reinterpret_cast<int*>(self + 0x504) = 0;
-	*reinterpret_cast<int*>(self + 0x500) = 0;
-	*reinterpret_cast<int*>(self + 0x0C) = -1;
-	*reinterpret_cast<int*>(self + 0x14) = 0x10;
-	*reinterpret_cast<int*>(self + 0x10) = 1;
-	*reinterpret_cast<int*>(self + 0x18) = 0;
-	*reinterpret_cast<int*>(self + 0x20) = -1;
-	*reinterpret_cast<int*>(self + 0x24) = -1;
-	*reinterpret_cast<int*>(self + 0x38) = 0;
-	*reinterpret_cast<int*>(self + 0x3C) = 0;
-	*reinterpret_cast<int*>(self + 0x40) = 0;
-	*reinterpret_cast<int*>(self + 0x1C) = 0;
-	*reinterpret_cast<int*>(self + 0x28) = -1;
-	*reinterpret_cast<int*>(self + 0x2C) = -1;
-	*reinterpret_cast<int*>(self + 0x44) = 0;
-	*reinterpret_cast<int*>(self + 0x48) = 0;
-	*reinterpret_cast<int*>(self + 0x4C) = 0;
-	*reinterpret_cast<int*>(self + 0x20) = 0;
-	*reinterpret_cast<int*>(self + 0x30) = -1;
-	*reinterpret_cast<int*>(self + 0x34) = -1;
-	*reinterpret_cast<int*>(self + 0x50) = 0;
-	*reinterpret_cast<int*>(self + 0x54) = 0;
-	*reinterpret_cast<int*>(self + 0x58) = 0;
-	*reinterpret_cast<int*>(self + 0x5C) = -1;
-	*reinterpret_cast<int*>(self + 0x60) = -1;
-	*reinterpret_cast<float*>(self + 0x64) = 0.0f;
-	*reinterpret_cast<int*>(self + 0x4EC) = 0;
-	*reinterpret_cast<int*>(self + 0x4F0) = 0;
-	*reinterpret_cast<int*>(self + 0x4F4) = 0;
-	*reinterpret_cast<int*>(self + 0x4F8) = 0;
-	*reinterpret_cast<int*>(self + 0x4FC) = 0;
-	*reinterpret_cast<int*>(self + 0x508) = 0;
-	*reinterpret_cast<float*>(self + 0x50C) = 0.0f;
+	m_displayDirection = 0;
+	m_displayCounter = 0;
+	m_stateFlag = -1;
+	m_transitionCounter = 0x10;
+	m_animDirection = 1;
+	m_battleButtons[0] = 0;
+	m_battleButtons[2] = -1;
+	m_battleButtons[3] = -1;
+	m_buttonTimers[0] = 0;
+	m_buttonTimers[1] = 0;
+	m_buttonTimers[2] = 0;
+	m_battleButtons[1] = 0;
+	m_battleButtons[4] = -1;
+	m_battleButtons[5] = -1;
+	m_buttonTimers[3] = 0;
+	m_buttonTimers[4] = 0;
+	m_buttonTimers[5] = 0;
+	m_battleButtons[2] = 0;
+	m_battleButtons[6] = -1;
+	m_battleButtons[7] = -1;
+	m_buttonTimers[6] = 0;
+	m_buttonTimers[7] = 0;
+	m_buttonTimers[8] = 0;
+	m_ringRotation = -1;
+	m_rotationPhase = -1;
+	m_spinPhase = 0.0f;
+	m_gbaConnectedFlag = 0;
+	m_gbaAnimCounter = 0;
+	m_commonFrameCounter = 0;
+	m_unk4f8 = 0;
+	m_timerB = 0;
+	m_currentCommandIndex = 0;
+	m_spinAccumulator = 0.0f;
 }
 
 /*

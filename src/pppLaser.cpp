@@ -236,6 +236,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
     CMapCylinderRaw cyl;
 
     int emptyHistory;
+    int fillIndex;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -287,7 +288,9 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             if (emptyHistory) {
                 continue;
             }
-            float t = (FLOAT_80333448 / (float)(s32)(step->m_payload[0x3a] + 1)) * (float)i;
+            s32 frameCount = step->m_payload[0x3a] + 1;
+            float t = FLOAT_80333448 / (float)frameCount;
+            t *= (float)i;
             if (GetCharaNodeFrameMatrix(pppMngStPtr, t, charaMtx) == 0) {
                 emptyHistory = 1;
                 continue;
@@ -300,12 +303,12 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         pppSubVector(localA, work->m_points[i], work->m_origin);
         PSVECScale(&localA, &localA, FLOAT_8033344c);
 
-        cyl.m_top.x = FLOAT_80333450;
-        cyl.m_top.y = FLOAT_80333450;
         cyl.m_top.z = FLOAT_80333450;
-        cyl.m_direction2.x = FLOAT_80333454;
-        cyl.m_direction2.y = FLOAT_80333454;
+        cyl.m_top.y = FLOAT_80333450;
+        cyl.m_top.x = FLOAT_80333450;
         cyl.m_direction2.z = FLOAT_80333454;
+        cyl.m_direction2.y = FLOAT_80333454;
+        cyl.m_direction2.x = FLOAT_80333454;
         cyl.m_bottom = work->m_origin;
         cyl.m_direction = localA;
         cyl.m_radius = kPppLaserZero;
@@ -380,8 +383,8 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
     }
 
     if (emptyHistory) {
-        for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
-            pppCopyVector(work->m_points[i], work->m_points[0]);
+        for (fillIndex = 0; fillIndex < (int)(u32)step->m_payload[0x1e]; fillIndex++) {
+            pppCopyVector(work->m_points[fillIndex], work->m_points[0]);
         }
     }
 }

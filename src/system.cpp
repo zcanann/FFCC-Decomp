@@ -25,13 +25,6 @@
 
 CSystem System;
 
-class CScenegraphProcessProxy {
-public:
-    virtual void Init();
-    virtual void Quit();
-    virtual int GetTable(unsigned long);
-};
-
 typedef void (CProcess::*ScenegraphCallback)();
 
 struct CScenegraphEntry {
@@ -197,7 +190,7 @@ void CSystem::ScriptChanging(char* script)
  */
 void CSystem::RemoveScenegraph(CProcess* process, int arg)
 {
-    CScenegraphDesc* descBlock = (CScenegraphDesc*)((CScenegraphProcessProxy*)process)->GetTable(arg);
+    CScenegraphDesc* descBlock = (CScenegraphDesc*)process->GetTable(arg);
     COrder* current = m_orderSentinel.m_next;
 
     do
@@ -226,7 +219,7 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
  */
 unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
 {
-    CScenegraphDesc* description = (CScenegraphDesc*)((CScenegraphProcessProxy*)process)->GetTable(arg);
+    CScenegraphDesc* description = (CScenegraphDesc*)process->GetTable(arg);
 
     if (description->m_createCallback)
     {

@@ -16,11 +16,20 @@ extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
 extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
+struct FloatPair {
+	float value;
+	float pad;
+};
+
 extern "C" const float FLOAT_80331BD0 = 1.0f;
 extern "C" const float FLOAT_80331BD4 = 0.0f;
 extern "C" const float FLOAT_80331BD8 = 3.1415927f;
 extern "C" const double DOUBLE_80331BE0 = 4503601774854144.0;
-extern "C" const float FLOAT_80331BE8 = -1.0f;
+extern "C" const FloatPair FLOAT_80331BE8 = {-1.0f, 0.0f};
+extern "C" const char DAT_80331bf0[] = "GMGR";
+extern "C" const float FLOAT_80331bf8 = 0.0f;
+extern "C" const float FLOAT_80331bfc = 1.0f;
+extern "C" const double DOUBLE_80331C00 = 4503599627370496.0;
 
 /*
  * --INFO--
@@ -147,7 +156,17 @@ int CGPrgObj::GetClassControl(int classControl)
  */
 void CGPrgObj::ClassControl(int classControl, int value)
 {
-	unsigned char* weaponNodeFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
+	struct WeaponNodeFlagBits {
+		signed char m_prg : 1;
+		signed char m_unk40 : 1;
+		signed char m_unk20 : 1;
+		signed char m_unk10 : 1;
+		signed char m_control3 : 1;
+		signed char m_unk04 : 1;
+		signed char m_unk02 : 1;
+		signed char m_unk01 : 1;
+	};
+	WeaponNodeFlagBits* weaponNodeFlags = reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags);
 
 	switch (classControl) {
 	case 0:
@@ -157,15 +176,13 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		reinterpret_cast<CGPartyObj*>(this)->changeMotionMode(value);
 		break;
 	case 2:
-		if ((*weaponNodeFlags >> 7) != value) {
+		if (weaponNodeFlags->m_prg != value) {
 			onChangePrg(value);
-			*weaponNodeFlags = (value << 7) | (*weaponNodeFlags & 0x7F);
+			weaponNodeFlags->m_prg = value;
 		}
 		break;
 	case 3:
-		*(reinterpret_cast<unsigned char*>(this) + 0x6B8) =
-		    (static_cast<signed char>(value) << 3) & 8 |
-		    (*(reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0xF7);
+		reinterpret_cast<WeaponNodeFlagBits*>(reinterpret_cast<unsigned char*>(this) + 0x6B8)->m_control3 = value;
 		break;
 	case 4:
 	{
@@ -557,7 +574,7 @@ void CGPrgObj::onFrame()
 					CancelAnim(0);
 				}
 			} else if (m_animFlagBits.bits.m_animDirect != 0) {
-				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BE8;
+				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BE8.value;
 				PlayAnim(m_reqAnimId, m_animFlagBits.bits.m_animLoop, 0, -1, -1, 0);
 			} else {
 				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BD0;

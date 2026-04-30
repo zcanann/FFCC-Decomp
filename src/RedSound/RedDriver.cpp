@@ -1955,21 +1955,21 @@ int CRedDriver::StreamPlayState(int streamID)
 {
 	void* commandNow;
 	unsigned int interrupts;
-	unsigned int streamData;
+	RedStreamDATA* streamData;
 	int result;
 	unsigned int* command;
 
 	interrupts = OSDisableInterrupts();
 	result = 0;
-	streamData = (unsigned int)p_Stream;
+	streamData = p_Stream;
 	do {
-		if ((*(int*)(streamData + 0x10C) != 0) &&
-		    ((streamID == -1) || (*(int*)(streamData + 0x10C) == streamID))) {
+		if ((streamData->m_streamId != 0) &&
+		    ((streamID == -1) || (streamData->m_streamId == streamID))) {
 			result = 1;
 			break;
 		}
-		streamData += 0x130;
-	} while (streamData < (unsigned int)p_Stream + 0x4C0);
+		streamData++;
+	} while (streamData < p_Stream + 4);
 
 	if (result == 0) {
 		commandNow = p_ExecCommandNow;
@@ -2001,7 +2001,7 @@ int CRedDriver::StreamPlayState(int streamID)
  */
 int CRedDriver::GetStreamPlayPoint(int streamID, int* outPoint1, int* outPoint2)
 {
-	unsigned int streamData;
+	RedStreamDATA* streamData;
 	int found;
 
 	found = 0;
@@ -2011,20 +2011,20 @@ int CRedDriver::GetStreamPlayPoint(int streamID, int* outPoint1, int* outPoint2)
 	if (outPoint2 != 0) {
 		*outPoint2 = 0;
 	}
-	streamData = (unsigned int)p_Stream;
+	streamData = p_Stream;
 	do {
-		if ((*(int*)(streamData + 0x10C) != 0) && (*(int*)(streamData + 0x10C) == streamID)) {
+		if ((streamData->m_streamId != 0) && (streamData->m_streamId == streamID)) {
 			if (outPoint1 != 0) {
-				*outPoint1 = *(int*)(streamData + 0x11C);
+				*outPoint1 = streamData->m_fileCursor;
 			}
 			if (outPoint2 != 0) {
-				*outPoint2 = *(int*)(streamData + 0x120);
+				*outPoint2 = streamData->m_readOffset;
 			}
 			found = 1;
 			break;
 		}
-		streamData += 0x130;
-	} while (streamData < (unsigned int)p_Stream + 0x4C0);
+		streamData++;
+	} while (streamData < p_Stream + 4);
 	return found;
 }
 

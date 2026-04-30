@@ -2076,24 +2076,20 @@ void _MusicNoteExecute()
     u32* track;
     int status = _MusicMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData, 1);
 
-    while (status == 0) {
-        if ((m_MusicPhraseStop != 0) || ((((u32*)p_SoundControl)[0x11B] & 1) == 0)) {
-            break;
-        }
-
-        *(s16*)((u8*)p_SoundControl + 0x48E) = *(s16*)((u8*)p_SoundControl + 0x434);
+    while ((status == 0) && (m_MusicPhraseStop == 0) && ((((u32*)p_SoundControl)[0x11B] & 1) != 0)) {
+        *(s16*)((u8*)p_SoundControl + 0x48E) = *(int*)((u8*)p_SoundControl + 0x434);
         memcpy((u8*)p_SoundControl + 0xC, (u8*)p_SoundControl + 0x438, 0x10);
         memcpy((u8*)p_SoundControl + 0x448, (u8*)p_SoundControl + 0x428, 0xC);
 
-        sound = (u32*)p_SoundControl;
+        sound = (u32*)((u8*)p_SoundControl + 0x28);
         track = (u32*)*(u32*)p_SoundControl;
         trackCount = (u8)*((u8*)p_SoundControl + 0x491);
         i = 0;
         do {
-            track[0] = sound[i + 0xA];
-            track[0x42] = sound[i + 0x4A];
-            track[0x41] = sound[i + 0x8A];
-            track[9] = sound[i + 0xCA];
+            track[0] = sound[i];
+            track[0x42] = sound[i + 0x40];
+            track[0x41] = sound[i + 0x80];
+            track[9] = sound[i + 0xC0];
             track += 0x55;
             i++;
         } while (--trackCount != 0);

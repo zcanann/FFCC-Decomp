@@ -6601,18 +6601,18 @@ void DEBPRINT(char*, ...)
  */
 unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 {
-    unsigned int hi;
     unsigned int idx;
+    unsigned int hi;
 
     goto check_len;
 
 loop:
-    hi = *crc;
-    idx = (unsigned int)((int)hi >> 8);
+    idx = *crc;
+    hi = idx << 8;
+    idx = (unsigned int)((int)idx >> 8);
     idx = (unsigned char)idx;
     idx = idx ^ (unsigned int)*data;
     data = data + 1;
-    hi = hi << 8;
     *crc = (unsigned short)(hi ^ JoyBusCrcTable[idx]);
 
 check_len:

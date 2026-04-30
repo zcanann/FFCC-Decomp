@@ -170,7 +170,7 @@ void CMenuPcs::TmpArtiDraw()
 
 	for (int i = 0; i < *GetTmpArtiList(this); i++) {
 		int tex = *(int*)(entry + 0xE);
-		if (-1 < tex) {
+		if (tex >= 0) {
 			float alpha = *(float*)(entry + 8);
 			float left = (float)entry[0];
 			float top = (float)entry[1];
@@ -178,7 +178,6 @@ void CMenuPcs::TmpArtiDraw()
 			float height = (float)entry[3];
 			float s = *(float*)(entry + 4);
 			float t = *(float*)(entry + 6);
-			float z = *(float*)(entry + 10);
 
 			if (*(short*)(foodPtr + 0x1F6) < 0) {
 				tex = 0x34;
@@ -194,6 +193,7 @@ void CMenuPcs::TmpArtiDraw()
 			color.a = (unsigned char)(int)(FLOAT_80332F28 * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
+			float z = *(float*)(entry + 10);
 			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, left, top, width, height, s, t, z, z, FLOAT_80332f2c);
 		}
 		foodPtr += 2;
@@ -204,9 +204,9 @@ void CMenuPcs::TmpArtiDraw()
 	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
 		short icon = *(short*)(foodPtr + 0x1F6);
-		if (-1 < icon) {
-			int posX = (int)entry[0] + (int)entry[2] - 0x10;
-			int posY = (int)((float)TmpArtiIntToDouble(entry[1] + 6) - FLOAT_80332f30);
+		if (icon >= 0) {
+			int posX = (int)((double)(entry[0] + entry[2] - 0x10));
+			int posY = (int)((float)((double)(entry[1] + 6)) - FLOAT_80332f30);
 			DrawSingleIcon__8CMenuPcsFiiifif(this, icon, posX, posY, *(float*)(entry + 8), 0, FLOAT_80332f2c);
 		}
 		entry += 0x20;
@@ -224,7 +224,7 @@ void CMenuPcs::TmpArtiDraw()
 	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
 		short itemId = *(short*)(foodPtr + 0x1F6);
-		if (-1 < itemId) {
+		if (itemId >= 0) {
 			float alpha = *(float*)(entry + 8);
 			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332F28 * alpha));
 			SetColor__5CFontF8_GXColor(font, &textColor.color);

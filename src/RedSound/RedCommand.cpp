@@ -313,6 +313,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	unsigned char* current;
 	unsigned int remaining;
 	int* seTrack;
+	int isMulti;
 
 	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
 	deltaTime = (unsigned int)((unsigned char*)info)[2] * 0x100 + (unsigned int)((unsigned char*)info)[1];
@@ -328,6 +329,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	}
 
 	flag = ((unsigned char*)info)[0];
+	isMulti = (flag & 0x80) != 0;
 	seq = (unsigned char*)info + 5;
 	attrMask = ((unsigned char*)info)[4];
 	count = ((unsigned char*)info)[0] & 0x7f;
@@ -381,7 +383,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				track[0x16] = 0;
 				track[0x19] = 0;
 				track[0x17] = 0;
-				track[0x40] = (unsigned int)((flag & 0x80) != 0);
+				track[0x40] = isMulti;
 				track[10] = 0x7fff000;
 				track[0xd] = 0x7f000;
 				track[0x10] = pan << 0xc;

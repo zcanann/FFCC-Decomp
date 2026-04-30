@@ -22,7 +22,6 @@ class CMath : public CManager
 public:
     void Init();
     void Quit();
-    void rotateToMatrix(float(*)[4], Vec*);
     void SRTToMatrix(float(*)[4], SRT*);
     void SRTToMatrixRT(float(*)[4], SRT*);
     int Rand(unsigned long);
@@ -35,7 +34,6 @@ public:
     void MTXGetScale(float(*)[4], Vec*);
     int CrossCheckSphereVector(Vec*, float*, Vec*, Vec*, Vec*, float);
     void CrossCheckEllipseCapsule(Vec*, float*, Vec*, Vec*, float, Vec*, float, float);
-    void CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float, float);
     void MakeSpline1Dtable(int, float*, float*, float*);
     float Spline1D(int, float, float*, float*, float*);
     float Line1D(int, float, float*, float*);

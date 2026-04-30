@@ -23,7 +23,8 @@ struct VYmMegaBirthShpTail3
     _PARTICLE_WMAT* m_wmats;      // 0x40
     _PARTICLE_COLOR* m_colors;    // 0x44
     unsigned int m_maxParticles;  // 0x48
-    unsigned int m_lifeLimit;     // 0x4c
+    unsigned short m_lifeLimit;        // 0x4c
+    unsigned short m_lifeLimitPadding; // 0x4e
 };
 
 struct PYmMegaBirthShpTail3 : _PARTICLE_DATA

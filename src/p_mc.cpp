@@ -48,56 +48,6 @@ struct MenuPcsMcLayout
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMcPcs::Init()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMcPcs::Quit()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CMcPcs::GetTable(unsigned long index)
-{
-	return (int)(reinterpret_cast<unsigned char*>(m_table__6CMcPcs) + (index * 0x15c));
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMcPcs::create()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMcPcs::destroy()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80124998
  * PAL Size: 312b
  * EN Address: TODO
@@ -164,4 +114,74 @@ void CMcPcs::calc()
             reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 = 0;
         }
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124AD0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMcPcs::destroy()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124AD4
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMcPcs::create()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124AD8
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMcPcs::GetTable(unsigned long index)
+{
+	return (int)(reinterpret_cast<unsigned char*>(m_table__6CMcPcs) + (index * 0x15c));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124AEC
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMcPcs::Quit()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124AF0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMcPcs::Init()
+{
+	// TODO
 }

@@ -165,23 +165,21 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
     float posX;
     float posY;
     float posZ;
-    bool hasRequiredMemory;
-    s32 colorOffset = offsets->m_serializedDataOffsets[1];
+    s8 hasRequiredMemory;
     u8* work = pObject->m_workArea + offsets->m_serializedDataOffsets[2];
+    VColor* color = (VColor*)((u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[1]);
     u8* payload = (u8*)params;
 
     if (*(void**)(work + 0xC) == 0) {
         ((VRyjMegaBirthModel*)work)->m_numParticles = *(u16*)(payload + 0x20);
-        if (((VRyjMegaBirthModel*)work)->m_particleBlock == NULL) {
-            ((VRyjMegaBirthModel*)work)->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                ((VRyjMegaBirthModel*)work)->m_numParticles * 0xA0, pppEnvStPtr->m_stagePtr,
-                const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x8D);
-            if (((VRyjMegaBirthModel*)work)->m_particleBlock != NULL) {
-                memset(((VRyjMegaBirthModel*)work)->m_particleBlock, 0, ((VRyjMegaBirthModel*)work)->m_numParticles * 0xA0);
-            }
+        ((VRyjMegaBirthModel*)work)->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            ((VRyjMegaBirthModel*)work)->m_numParticles * 0xA0, pppEnvStPtr->m_stagePtr,
+            const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x8D);
+        if (((VRyjMegaBirthModel*)work)->m_particleBlock != NULL) {
+            memset(((VRyjMegaBirthModel*)work)->m_particleBlock, 0, ((VRyjMegaBirthModel*)work)->m_numParticles * 0xA0);
         }
 
-        if ((payload[0x136] != 0) && (((VRyjMegaBirthModel*)work)->m_worldMatrixBlock == NULL)) {
+        if (payload[0x136] != 0) {
             ((VRyjMegaBirthModel*)work)->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 ((VRyjMegaBirthModel*)work)->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x97);
@@ -190,7 +188,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
             }
         }
 
-        if ((payload[0x131] != 0) && (((VRyjMegaBirthModel*)work)->m_colorBlock == NULL)) {
+        if (payload[0x131] != 0) {
             ((VRyjMegaBirthModel*)work)->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 ((VRyjMegaBirthModel*)work)->m_numParticles << 5, pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0xA2);
@@ -230,7 +228,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
     }
 
     if (hasRequiredMemory) {
-        calc_particle(pObject, (VRyjMegaBirthModel*)work, params, (VColor*)((u8*)pObject + 0x80 + colorOffset));
+        calc_particle(pObject, (VRyjMegaBirthModel*)work, params, color);
     }
 }
 

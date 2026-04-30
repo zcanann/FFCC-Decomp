@@ -221,7 +221,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     Mtx nodeMtx;
     int nextCount;
     Vec stepDir;
-    Vec interp[21];
+    Vec interp[20];
     int startIndex;
     int inserted;
     float stepScale;

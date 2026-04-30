@@ -220,13 +220,13 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
  */
 void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
-    bool useFallback;
+    s32 useFallback;
     float fVar2;
     s16 alpha;
     s32 iVar4;
     float* pfVar6;
     s32 iVar8;
-    s16 visibleCount;
+    s32 visibleCount;
     TracerWork* work;
     TRACE_POLYGON* entries;
     TRACE_POLYGON* entry;
@@ -239,7 +239,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         return;
     }
 
-    useFallback = false;
+    useFallback = 0;
     work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_3->m_serializedDataOffsets);
     colorData = pppYmTracer2->m_serializedData + param_3->m_serializedDataOffsets[1];
 
@@ -262,7 +262,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     work->arg3Work = pfVar6;
 
     if (work->entries == nullptr) {
-        useFallback = true;
+        useFallback = 1;
         work->alphaStep = (u16)param_2->m_payload[8] / *(u16*)(param_2->m_payload + 6);
         work->entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)*(u16*)(param_2->m_payload + 4) * 0x28, pppEnvStPtr->m_stagePtr,
@@ -322,7 +322,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         } else if (!useFallback) {
             frameT = (-1.0f / (f32)((s32)param_2->m_payload[9] + 1)) * (f32)(s32)i;
             if (GetCharaNodeFrameMatrix(pppMngStPtr, frameT, MStack_78) == 0) {
-                useFallback = true;
+                useFallback = 1;
             } else {
                 PSMTXConcat(MStack_78, pppYmTracer2->m_localMatrix.value, MStack_78);
                 PSMTXMultVec(MStack_78, &entry->pos, &entry->pos);
@@ -344,17 +344,18 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     }
 
     visibleCount = 0;
+    TRACE_POLYGON* cursor = entries;
     for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar4++) {
         alpha = (u16)param_2->m_payload[8] - iVar4 * work->alphaStep;
-        if ((alpha < 0) || (entries->active == 0)) {
-            entries->alpha = 0;
-        } else if (entries->active != 0) {
-            entries->alpha = (u8)alpha;
+        if ((alpha < 0) || (cursor->active == 0)) {
+            cursor->alpha = 0;
+        } else if (cursor->active != 0) {
+            cursor->alpha = (u8)alpha;
             visibleCount++;
         }
-        entries++;
+        cursor++;
     }
-    work->visibleCount = visibleCount;
+    work->visibleCount = (s16)visibleCount;
 }
 
 

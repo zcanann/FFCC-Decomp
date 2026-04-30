@@ -54,7 +54,6 @@ int RedNew(int size)
 	unsigned int interrupts;
 	int address;
 	int entryCount;
-	int moveCount;
 	int* slot;
 
 	if ((size < 1) || (m_MemoryBank == 0) || ((unsigned int)m_DataBuffer == 0)) {
@@ -80,8 +79,7 @@ int RedNew(int size)
 			if ((unsigned int)(address + size) <=
 			    (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
 				if (slot[1] > 0) {
-					moveCount = (int)(m_MemoryBank + 0x800) - (int)(slot + 2);
-					entryCount = moveCount / 8;
+					entryCount = ((int)(m_MemoryBank + 0x800) - (int)(slot + 2)) / 8;
 					if (entryCount > 0) {
 						memmove(slot + 2, slot, entryCount * 8);
 					}

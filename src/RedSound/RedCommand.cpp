@@ -106,7 +106,7 @@ int _EraseTime(int eraseTrack)
 	do {
 		if (((u32)*track != 0) && (*(unsigned char*)(track + 0x54) == 0) &&
 		    ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
-		    (maxWait < track[0x43])) {
+		    (track[0x43] > maxWait)) {
 			maxWait = track[0x43];
 			sepId = track[0x3d];
 		}

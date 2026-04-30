@@ -542,9 +542,9 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     trigSin = gPppTrigTable[(s32)(angle & 0xffff) >> 2];
     *(short*)((u8*)&particleData->m_velocity.x + 8) = (short)(randomValue % 0x168);
     radiusJitter = randomScale * pYmMiasma->m_radiusJitter;
-    trigCos = trigCos * (vYmMiasma->m_radius + radiusJitter);
-    particleData->m_matrix[0][0] = trigCos;
-    particleData->m_matrix[1][0] = trigCos;
+    float posX = trigCos * (vYmMiasma->m_radius + radiusJitter);
+    particleData->m_matrix[0][0] = posX;
+    particleData->m_matrix[1][0] = posX;
     randomHeight = Math.RandF(pYmMiasma->m_spawnHeightJitter);
     particleData->m_matrix[0][1] = randomHeight;
     particleData->m_matrix[1][1] = randomHeight;

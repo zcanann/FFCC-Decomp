@@ -98,6 +98,7 @@ extern double DOUBLE_80331b60;
 extern double DOUBLE_80331b70;
 u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
+extern char SoundBuffer_1260_[];
 extern char DAT_80331b7c[];
 extern char DAT_80331b84[];
 extern char DAT_80331bc8[];
@@ -340,7 +341,7 @@ void CGItemObj::onFrame()
 	void* handle = *(void**)(self + 0x564);
 
 	if (handle != 0 && IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(handle) != 0) {
-		if ((unsigned int)System.m_execParam > 2U) {
+		if ((unsigned int)System.m_execParam >= 3U) {
 			Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dd010));
 		}
 
@@ -353,21 +354,19 @@ void CGItemObj::onFrame()
 			SetAnimSlot__8CGObjectFii(this, 0, 0);
 			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
 
-			int soundEntry = *(int*)(*(int*)(SoundBuffer + 0x1260 + 0xF8) + 0x178);
+			unsigned int soundEntry = *(unsigned int*)(*(int*)(*(int*)SoundBuffer_1260_ + 0xF8) + 0x178);
 			if (soundEntry != 0) {
 				soundEntry = *(int*)(soundEntry + 0x14);
 			} else {
-				soundEntry = -1;
+				soundEntry = (unsigned int)-1;
 			}
 
+			unsigned char* itemRow = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48);
+			float particleScale = FLOAT_80331b50 * (float)*reinterpret_cast<unsigned short*>(itemRow + 0x10) +
+			                      FLOAT_80331b4c;
 			putParticle__8CGPrgObjFiiP8CGObjectfi(
 			    this, (soundEntry << 8) | *(int*)(*(int*)(*(int*)(self + 0x550) + 0x58) + 0x3B4),
-			    *(int*)(self + 0x558), this,
-			    FLOAT_80331b50 *
-			            (float)(unsigned short)*(unsigned short*)(Game.unkCFlatData0[2] +
-			                                                       *(int*)(self + 0x504) * 0x48 + 0x10) +
-			        FLOAT_80331b4c,
-			    0x12909);
+			    *(int*)(self + 0x558), this, particleScale, 0x12909);
 
 			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			SetDamageCol__8CGObjectFiPcffP3Vec(this, 0, DAT_80331bc8, FLOAT_80331bb8, FLOAT_80331bb8,
@@ -1179,14 +1178,14 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 {
 	unsigned char* self = (unsigned char*)this;
 	int worldParamA = *(int*)(self + 0x500);
-	unsigned int particleAttr = (unsigned int)*(unsigned short*)(Game.unkCFlatData0[2] +
-	                                                             *(int*)((unsigned char*)hitParam + 0x0) * 0x48 + 8);
+	unsigned char* particleRow = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + hitParam->m_particleIndex * 0x48);
+	int particleAttr = (int)*reinterpret_cast<unsigned short*>(particleRow + 8);
 
 	if (worldParamA == 0xD || worldParamA == 0xE) {
 		if (((particleAttr == 0 || particleAttr == 4) && worldParamA == 0xD) ||
 		    (particleAttr == 1 && worldParamA == 0xE)) {
-			int particleNo = 0;
-			int classControl = 0;
+			int particleNo;
+			int classControl;
 
 			if (particleAttr == 1) {
 				particleNo = 0x20;
@@ -1209,32 +1208,32 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 			addSubStat__8CGPrgObjFv(this);
 		}
 	} else {
-		if (!(((worldParamA != 0xCB) || (*(int*)(self + 0x520) != 0x24)) && *(int*)(self + 0x520) != 0x25)) {
-			if ((particleAttr >= 0x65 && particleAttr <= 0x67)) {
-				unsigned char* classObj = 0;
-
-				if (*(short*)((unsigned char*)hitParam + 4) != 0) {
-					classObj =
-					    (unsigned char*)intToClass__13CFlatRuntime2Fi(CFlat, (int)*(short*)((unsigned char*)hitParam + 4));
-				}
-
-				if (classObj != 0) {
-					void* objectBehavior = *(void**)(classObj + 0x48);
-					unsigned int cid =
-					    reinterpret_cast<unsigned int (*)(void*)>((*reinterpret_cast<void***>(objectBehavior))[3])(
-					        objectBehavior);
-
-					if ((cid & 0x6D) == 0x6D && *(void**)(self + 0x550) == classObj) {
-						changeStat__8CGPrgObjFiii(this, 0x26, 0, 0);
-					}
-				}
-			}
-		} else {
+		if (((worldParamA != 0xCB) || (*(int*)(self + 0x520) != 0x24)) && *(int*)(self + 0x520) != 0x25) {
 			return;
+		}
+
+		if ((static_cast<unsigned int>(particleAttr - 0x66) <= 1U) || (particleAttr == 0x65)) {
+			int classId = hitParam->m_classId;
+			unsigned char* classObj;
+
+			if (classId != 0) {
+				classObj = (unsigned char*)intToClass__13CFlatRuntime2Fi(CFlat, classId);
+			} else {
+				classObj = 0;
+			}
+
+			void* objectBehavior = *(void**)(classObj + 0x48);
+			unsigned int cid =
+			    reinterpret_cast<unsigned int (*)(void*)>((*reinterpret_cast<void***>(objectBehavior))[3])(
+			        objectBehavior);
+
+			if ((cid & 0x6D) == 0x6D && *(void**)(self + 0x550) == classObj) {
+				changeStat__8CGPrgObjFiii(this, 0x26, 0, 0);
+			}
 		}
 	}
 
-	IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, (short)effectIndex, this);
+	IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, effectIndex, this);
 }
 
 /*

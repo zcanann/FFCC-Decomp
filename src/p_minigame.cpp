@@ -53,7 +53,7 @@ extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" int memcmp(const void* lhs, const void* rhs, unsigned long count);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void* flatRuntime, int object, int a, int b, int c, void* inStack, void* outStack);
-extern char DAT_801ead4c[];
+extern char g_MsgFlashy[];
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
@@ -1613,9 +1613,9 @@ void CMiniGamePcs::calc(void)
     if (System.m_execParam != 0)
     {
         Printf__7CSystemFPce(&System, s_miniGameEnd2222Text);
-        Printf__7CSystemFPce(&System, DAT_801ead4c);
+        Printf__7CSystemFPce(&System, g_MsgFlashy);
         Printf__7CSystemFPce(&System, s_miniGameEndBannerText);
-        Printf__7CSystemFPce(&System, DAT_801ead4c);
+        Printf__7CSystemFPce(&System, g_MsgFlashy);
     }
 
     self[0x6495] = 0;
@@ -1639,49 +1639,49 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
     switch (codeType) {
     case 0x1000:
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, DAT_801ead4c);
+            Printf__7CSystemFPce(&System, g_MsgFlashy);
         }
         if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_miniGamePadRaceResultFmt, player, padCode & 0xFF);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, DAT_801ead4c);
+            Printf__7CSystemFPce(&System, g_MsgFlashy);
         }
         self[0x6498 + player] = static_cast<unsigned char>(padCode);
         break;
     case 0x1100:
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, DAT_801ead4c);
+            Printf__7CSystemFPce(&System, g_MsgFlashy);
         }
         if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_miniGamePadRaceEndText);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, DAT_801ead4c);
+            Printf__7CSystemFPce(&System, g_MsgFlashy);
         }
         self[0x6496] = 1;
         break;
     case 0x1200:
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, DAT_801ead4c);
+            Printf__7CSystemFPce(&System, g_MsgFlashy);
         }
         if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_miniGamePadMgrEndText);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, DAT_801ead4c);
+            Printf__7CSystemFPce(&System, g_MsgFlashy);
         }
         self[0x6495] = 1;
         break;
     case 0x1300:
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, DAT_801ead4c);
+            Printf__7CSystemFPce(&System, g_MsgFlashy);
         }
         if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_miniGamePadMgrContinueText);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, DAT_801ead4c);
+            Printf__7CSystemFPce(&System, g_MsgFlashy);
         }
         self[0x6497] = 1;
         break;

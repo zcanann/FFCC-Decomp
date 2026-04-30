@@ -30,13 +30,6 @@ extern "C" char lbl_8032E648[];
 extern "C" const char s_CMaterialEditorPcs_VIEWER_801D7D18[];
 extern "C" const char s_CMaterialEditorPcs_801D7D34[];
 extern "C" const char s_MaterialEditor_pctc_801D7D60[];
-extern "C" {
-const char* gDebugSpinnerText_addr;
-char gDebugSpinnerTextInitialized_addr;
-int gDebugSpinnerFrame_addr;
-char gDebugSpinnerFrameInitialized_addr;
-}
-
 unsigned int m_table_desc0__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
 unsigned int m_table_desc1__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
 unsigned int m_table_desc2__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
@@ -544,18 +537,12 @@ void CMaterialEditorPcs::drawViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (gDebugSpinnerTextInitialized_addr == 0) {
-        gDebugSpinnerText_addr = sMaterialEditorSpinnerText;
-        gDebugSpinnerTextInitialized_addr = 1;
-    }
-    if (gDebugSpinnerFrameInitialized_addr == 0) {
-        gDebugSpinnerFrame_addr = 0;
-        gDebugSpinnerFrameInitialized_addr = 1;
-    }
+    static const char* pFan = sMaterialEditorSpinnerText;
+    static int alive = 0;
 
-    gDebugSpinnerFrame_addr = gDebugSpinnerFrame_addr + 1;
-    int idx = (gDebugSpinnerFrame_addr >> 4) % 4;
-    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)(char)gDebugSpinnerText_addr[idx]);
+    alive = alive + 1;
+    int idx = (alive >> 4) % 4;
+    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)(char)pFan[idx]);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
         return;

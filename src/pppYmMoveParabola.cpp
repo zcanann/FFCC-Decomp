@@ -50,12 +50,11 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     Vec newPosition;
     Vec direction;
     if ((s32)Game.m_currentSceneId == 7) {
-        f32 zero = gPppYmMoveParabolaZero;
         f32 yOffset = gPppYmMoveParabolaYOffsetStep;
+        f32 zero = gPppYmMoveParabolaZero;
 
         direction.x = yOffset;
-        direction.y = zero;
-        direction.z = zero;
+        direction.z = direction.y = zero;
     } else {
         PSVECSubtract(&pppMngSt->m_paramVec0, (Vec*)((u8*)pppMngSt + 0x58), &direction);
     }

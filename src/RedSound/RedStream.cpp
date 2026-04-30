@@ -36,9 +36,9 @@ RedStreamDATA* _SearchEmptyStreamData()
 			return streamData;
 		}
 
-		streamData = (RedStreamDATA*)((u8*)streamData + 0x130);
+		streamData++;
 
-		if (!((u8*)streamData < (u8*)p_Stream + 0x4C0)) {
+		if (!(streamData < p_Stream + 4)) {
 			return 0;
 		}
 	}
@@ -518,7 +518,7 @@ void StreamPause(int streamID, int pause)
 					}
 				}
 			} else if (*(void**)(voiceData + 0x14) != 0) {
-				unsigned int pitch = PitchCompute(0x3c00000, 0, *(int*)((u8*)streamData + 0x24), 0);
+				unsigned int pitch = PitchCompute(0x3c00000, 0, streamData->m_pitch, 0);
 				short channelCount = streamData->m_channelCount;
 				volume = streamData->m_volume >> 0xc;
 				if (channelCount == 2) {

@@ -548,89 +548,89 @@ void StreamPause(int streamID, int pause)
  */
 void StreamControl()
 {
-	unsigned int streamData = (unsigned int)p_Stream;
+	RedStreamDATA* streamData = p_Stream;
 	do {
 		int voiceData;
-		if (*(int*)(streamData + 0x110) == 1) {
-			voiceData = *(int*)(streamData + 4);
+		if (streamData->m_state == 1) {
+			voiceData = streamData->m_voiceData;
 			if (*(void**)(voiceData + 0x14) != 0) {
 				if (*(int*)(*(int*)(voiceData + 0x14) + 0xc) == 0) {
-					_StreamStop((RedStreamDATA*)streamData);
+					_StreamStop(streamData);
 				} else {
 					int samplePos = *(unsigned short*)(*(int*)(voiceData + 0x14) + 0x1b2);
-					int sampleStart = (*(int*)(streamData + 0x12c) + *(int*)(streamData + 0x128)) * 2;
+					int sampleStart = (streamData->m_aramBuffer + streamData->m_streamCursorBase) * 2;
 					samplePos <<= 16;
 					samplePos |= *(unsigned short*)(*(int*)(voiceData + 0x14) + 0x1b4);
 					if ((samplePos >= sampleStart) && (samplePos < sampleStart + 0x2000)) {
 						int stopped = 0;
-						if (*(int*)(streamData + 0x20) < 0) {
-							*(int*)(streamData + 0x1c) = *(int*)(streamData + 0x1c) - 0x200;
-							if (*(int*)(streamData + 0x1c) < 1) {
-								_StreamStop((RedStreamDATA*)streamData);
+						if (streamData->m_loopStart < 0) {
+							streamData->m_loopEnd = streamData->m_loopEnd - 0x200;
+							if (streamData->m_loopEnd < 1) {
+								_StreamStop(streamData);
 								stopped = 1;
 							}
 						}
-						*(int*)(streamData + 0x11c) += *(short*)(streamData + 0x2a) * 0x1000;
-						if (*(int*)(streamData + 0x11c) >= *(int*)(streamData + 0x118)) {
-							*(int*)(streamData + 0x11c) -= *(int*)(streamData + 0x118);
+						streamData->m_fileCursor += streamData->m_channelCount * 0x1000;
+						if (streamData->m_fileCursor >= streamData->m_fileSize) {
+							streamData->m_fileCursor -= streamData->m_fileSize;
 						}
 
 						if (!stopped) {
 							int side;
 							int dmaID;
-							if (*(int*)(streamData + 0x128) != 0) {
+							if (streamData->m_streamCursorBase != 0) {
 								side = 0;
-								*(int*)(streamData + 0x128) = 0;
+								streamData->m_streamCursorBase = 0;
 							} else {
 								side = 1;
-								*(int*)(streamData + 0x128) = 0x1000;
+								streamData->m_streamCursorBase = 0x1000;
 							}
 
-							if (*(int*)(streamData + 0x20) < 0) {
-								dmaID = _ArrangeStreamDataNoLoop((RedStreamDATA*)streamData, side, 0x1000);
+							if (streamData->m_loopStart < 0) {
+								dmaID = _ArrangeStreamDataNoLoop(streamData, side, 0x1000);
 							} else {
-								dmaID = _ArrangeStreamDataLoop((RedStreamDATA*)streamData, side, 0x1000);
+								dmaID = _ArrangeStreamDataLoop(streamData, side, 0x1000);
 							}
-							*(int*)(streamData + 0x114) = dmaID;
+							streamData->m_dmaId = dmaID;
 						}
 					}
 
 					int changed = 0;
-					if (*(int*)(streamData + 0x108) != 0) {
+					if (streamData->m_panStepCount != 0) {
 						changed += 1;
-						*(int*)(streamData + 0x108) -= 1;
-						*(int*)(streamData + 0x100) += *(int*)(streamData + 0x104);
+						streamData->m_panStepCount -= 1;
+						streamData->m_pan += streamData->m_panStep;
 					}
-					if (*(int*)(streamData + 0xf8) != 0) {
+					if (streamData->m_volumeStepCount != 0) {
 						changed += 1;
-						*(int*)(streamData + 0xf8) -= 1;
-						*(int*)(streamData + 0xf0) += *(int*)(streamData + 0xf4);
+						streamData->m_volumeStepCount -= 1;
+						streamData->m_volume += streamData->m_volumeStep;
 					}
 					if (changed != 0) {
-						if (*(short*)(streamData + 0x2a) == 2) {
-							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0, *(int*)(streamData + 0xf0) >> 0xc);
+						if (streamData->m_channelCount == 2) {
+							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0, streamData->m_volume >> 0xc);
 							voiceData += 0xc0;
-							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0x7f, *(int*)(streamData + 0xf0) >> 0xc);
+							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0x7f, streamData->m_volume >> 0xc);
 						} else {
-							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, *(int*)(streamData + 0x100) >> 0xc,
-								*(int*)(streamData + 0xf0) >> 0xc);
+							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, streamData->m_pan >> 0xc,
+								streamData->m_volume >> 0xc);
 						}
 					}
 				}
 			}
-		} else if ((*(int*)(streamData + 0x110) == 3) && (RedDmaSearchID(*(int*)(streamData + 0x114)) == 0)) {
-			voiceData = *(int*)(streamData + 4);
-			*(int*)(streamData + 0x110) = 1;
+		} else if ((streamData->m_state == 3) && (RedDmaSearchID(streamData->m_dmaId) == 0)) {
+			voiceData = streamData->m_voiceData;
+			streamData->m_state = 1;
 			*(unsigned int*)(voiceData + 0x90) |= 0x19;
-			*(unsigned int*)(voiceData + 4) = streamData + 0x30;
+			*(unsigned int*)(voiceData + 4) = (unsigned int)streamData->m_trackData;
 			*(int*)(voiceData + 0x8c) = 1;
-			if (*(short*)(streamData + 0x2a) == 2) {
+			if (streamData->m_channelCount == 2) {
 				*(unsigned int*)(voiceData + 0x150) |= 0x19;
-				*(unsigned int*)(voiceData + 0xc4) = streamData + 0x90;
+				*(unsigned int*)(voiceData + 0xc4) = (unsigned int)streamData->m_trackData[1];
 				*(int*)(voiceData + 0x14c) = 1;
 			}
 		}
 
-		streamData += 0x130;
-	} while (streamData < (unsigned int)p_Stream + 0x4c0);
+		streamData++;
+	} while (streamData < p_Stream + 4);
 }

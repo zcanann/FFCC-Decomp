@@ -2501,18 +2501,18 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xB2:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicsPcs) + 64) = 0;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicsPcs) + 48) = 1;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicsPcs) + 52) = 1;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicsPcs) + 68) = *object->m_localBase;
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 56) = static_cast<u8>(object->m_localBase[1]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 57) = static_cast<u8>(object->m_localBase[2]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 58) = static_cast<u8>(object->m_localBase[3]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 59) = static_cast<u8>(object->m_localBase[4]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 60) = static_cast<u8>(object->m_localBase[5]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 61) = static_cast<u8>(object->m_localBase[6]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 62) = static_cast<u8>(object->m_localBase[7]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicsPcs) + 63) = static_cast<u8>(object->m_localBase[8]);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicPcs) + 64) = 0;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicPcs) + 48) = 1;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicPcs) + 52) = 1;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicPcs) + 68) = *object->m_localBase;
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 56) = static_cast<u8>(object->m_localBase[1]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 57) = static_cast<u8>(object->m_localBase[2]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 58) = static_cast<u8>(object->m_localBase[3]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 59) = static_cast<u8>(object->m_localBase[4]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 60) = static_cast<u8>(object->m_localBase[5]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 61) = static_cast<u8>(object->m_localBase[6]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 62) = static_cast<u8>(object->m_localBase[7]);
+        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 63) = static_cast<u8>(object->m_localBase[8]);
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -3055,7 +3055,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         const int alpha = static_cast<int>(FLOAT_80330b74 * static_cast<float>(object->m_localBase[3])) & 0xFF;
         const unsigned int blurA = (static_cast<unsigned int>(__cntlzw(object->m_localBase[4])) >> 5) & 0xFF;
         const unsigned int blurB = (static_cast<unsigned int>(__cntlzw(object->m_localBase[5])) >> 5) & 0xFF;
-        GraphicsPcs.SetBlurParameter(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]),
+        GraphicPcs.SetBlurParameter(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]),
             static_cast<unsigned char>(object->m_localBase[2]), static_cast<unsigned char>(alpha),
             static_cast<unsigned char>(blurA), static_cast<unsigned char>(blurB),
             static_cast<short>(object->m_localBase[6]));
@@ -3149,8 +3149,8 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0x52: {
         const int enabled = (((-*object->m_localBase) | *object->m_localBase) >> 31);
-        SetUseDOF__11CGraphicPcsFi(&GraphicsPcs, enabled);
-        GraphicsPcs.SetDOFParameter(
+        SetUseDOF__11CGraphicPcsFi(&GraphicPcs, enabled);
+        GraphicPcs.SetDOFParameter(
             static_cast<signed char>(static_cast<char>(*object->m_localBase) - 1),
             static_cast<signed char>(object->m_localBase[1]), static_cast<float>(object->m_localBase[2]),
             static_cast<float>(object->m_localBase[3]), static_cast<float>(object->m_localBase[4]),
@@ -3161,7 +3161,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0x50: {
-        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicsPcs);
+        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicPcs);
         *reinterpret_cast<int*>(graphicsPcs + 0x24) = 2;
         graphicsPcs[0x12] = 0xFF;
         graphicsPcs[0x13] = 0xFF;
@@ -3173,7 +3173,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         *reinterpret_cast<int*>(graphicsPcs + 0x36) = object->m_localBase[2];
         *reinterpret_cast<int*>(graphicsPcs + 0x40) = object->m_localBase[3];
         *reinterpret_cast<int*>(graphicsPcs + 0x8) = *reinterpret_cast<int*>(graphicsPcs + 0x4);
-        ReqScreenCapture__11CGraphicPcsFv(&GraphicsPcs);
+        ReqScreenCapture__11CGraphicPcsFv(&GraphicPcs);
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -3462,7 +3462,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0x33: {
-        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicsPcs);
+        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicPcs);
         *reinterpret_cast<int*>(graphicsPcs + 0x6C) = *object->m_localBase;
         *reinterpret_cast<int*>(graphicsPcs + 0x70) = 0;
         graphicsPcs[0x64] = static_cast<u8>(object->m_localBase[1]);
@@ -3476,7 +3476,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0x32: {
-        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicsPcs);
+        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicPcs);
         *reinterpret_cast<int*>(graphicsPcs + 0x98) = *object->m_localBase;
         *reinterpret_cast<int*>(graphicsPcs + 0x88) = object->m_localBase[1];
         *reinterpret_cast<int*>(graphicsPcs + 0x8C) = *reinterpret_cast<int*>(graphicsPcs + 0x88);
@@ -3490,7 +3490,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x30:
-        runtime->push(object, GraphicsPcs.GetScreenFadeExecutingBit());
+        runtime->push(object, GraphicPcs.GetScreenFadeExecutingBit());
         outResult = 0;
         return;
     case -0x2F:

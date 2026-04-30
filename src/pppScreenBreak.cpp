@@ -190,7 +190,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     }
 
     if (GraphicScreenBreakBlurEnabled() != 0) {
-        SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(&GraphicsPcs, 0, 0, 0, 0, 0, 0, 0);
+        SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(&GraphicPcs, 0, 0, 0, 0, 0, 0, 0);
     }
 
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;

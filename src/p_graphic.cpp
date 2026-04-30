@@ -18,7 +18,7 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-CGraphicPcs GraphicsPcs;
+CGraphicPcs GraphicPcs;
 extern "C" double sin(double);
 extern "C" double cos(double);
 extern "C" int GetPadType__6JoyBusFi(void*, int);

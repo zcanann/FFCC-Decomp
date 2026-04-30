@@ -1767,7 +1767,7 @@ void CCameraPcs::drawShadowEnd()
 
     memcpy(self + 0x4, self + 0x10C, 0x108);
     GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
-    setViewport__11CGraphicPcsFv(&GraphicsPcs);
+    setViewport__11CGraphicPcsFv(&GraphicPcs);
 }
 
 /*

@@ -308,7 +308,7 @@ void CGame::Init()
     }
 
     Init__10CCameraPcsFv(&CameraPcs);
-    Init__11CGraphicPcsFv(&GraphicsPcs);
+    Init__11CGraphicPcsFv(&GraphicPcs);
     Init__6CCharaFv(&gChara);
     Init__9CLightPcsFv(&LightPcs);
     Init__9CCharaPcsFv(&CharaPcs);
@@ -365,7 +365,7 @@ void CGame::Quit()
 	Quit__7CMapPcsFv(&MapPcs);
 	Quit__18CMaterialEditorPcsFv(&MaterialEditorPcs);
 	Quit__14CFunnyShapePcsFv(&FunnyShapePcs);
-	Quit__11CGraphicPcsFv(&GraphicsPcs);
+	Quit__11CGraphicPcsFv(&GraphicPcs);
 	Quit__10CCameraPcsFv(&CameraPcs);
 }
 
@@ -401,7 +401,7 @@ void CGame::LoadLogoWaitingData()
 void CGame::Exec()
 {
 	AddScenegraph__7CSystemFP8CProcessi(&System, &SystemPcs, 0);
-	AddScenegraph__7CSystemFP8CProcessi(&System, &GraphicsPcs, 0);
+	AddScenegraph__7CSystemFP8CProcessi(&System, &GraphicPcs, 0);
 	AddScenegraph__7CSystemFP8CProcessi(&System, &LightPcs, 0);
 	AddScenegraph__7CSystemFP8CProcessi(&System, &MiniGamePcs, 0);
 
@@ -512,7 +512,7 @@ void CGame::Exec()
 
 	RemoveScenegraph__7CSystemFP8CProcessi(&System, &MiniGamePcs, 0);
 	RemoveScenegraph__7CSystemFP8CProcessi(&System, &LightPcs, 0);
-	RemoveScenegraph__7CSystemFP8CProcessi(&System, &GraphicsPcs, 0);
+	RemoveScenegraph__7CSystemFP8CProcessi(&System, &GraphicPcs, 0);
 	RemoveScenegraph__7CSystemFP8CProcessi(&System, &SystemPcs, 0);
 }
 

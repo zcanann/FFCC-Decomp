@@ -1192,7 +1192,7 @@ void CLightPcs::MakeLightMap()
     }
 
     Graphic.SetStdPixelFmt();
-    setViewport__11CGraphicPcsFv(&GraphicsPcs);
+    setViewport__11CGraphicPcsFv(&GraphicPcs);
     GXSetCullMode(GX_CULL_FRONT);
     GXSetAlphaUpdate(GX_FALSE);
     GXSetTexCopySrc(0, 0, 0x40, 0x40);

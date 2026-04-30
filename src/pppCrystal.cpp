@@ -307,9 +307,9 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		stepY = 2.0f / (float)(textureInfo->m_height - 1);
 		yCoord = FLOAT_80330FD4;
 		maxMagnitude = FLOAT_80330FF8;
+		coordOffset = FLOAT_8033100C;
 		modulationScale = FLOAT_80331008;
 		coordScale = FLOAT_80331010;
-		coordOffset = FLOAT_8033100C;
 
 		for (y = 0; y < (u32)textureInfo->m_height; y++) {
 			yTile = y >> 2;

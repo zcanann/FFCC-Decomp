@@ -9,6 +9,9 @@
 CMapCylinder g_hit_cyl;
 CMapCylinder g_hit_cyl_min;
 Vec g_hit_mvec;
+Vec g_hit_mvec_min;
+Vec g_hit_hpv;
+Vec g_hit_hpv_min;
 
 namespace {
 static const char s_maphit_cpp[] = "maphit.cpp";

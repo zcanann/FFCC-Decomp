@@ -1823,8 +1823,6 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     _GXColor white;
     Mtx cameraMtx;
     Mtx44 projection;
-    long halfWidth = width / 2;
-    long halfHeight = height / 2;
 
     gUtil.SetOrthoEnv();
     gUtil.SetVtxFmt_POS_CLR_TEX();
@@ -1834,7 +1832,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     GXSetZCompLoc(0);
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(GX_ALWAYS, 1, GX_AOP_OR, GX_ALWAYS, 0);
     GXSetCullMode(GX_CULL_NONE);
-    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 1);
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(GX_ALWAYS, 1, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetNumTevStages(1);
@@ -1848,49 +1846,52 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     GXSetColorUpdate(GX_TRUE);
     GXSetAlphaUpdate(GX_FALSE);
 
+    long halfWidth = width / 2;
+    long halfHeight = height / 2;
+
     white.r = 0xFF;
     white.g = 0xFF;
     white.b = 0xFF;
     white.a = 0xFF;
 
     GetBackBufferRect2(PtrAt(this, 0x71E8), &tempTex, 0, 0, 0x140, 0xE0, 0x46000, filter, GX_TF_RGBA8, 0);
-    GXLoadTexObj(&tempTex, GX_TEXMAP0);
     quadMin.x = 0.0f;
     quadMin.y = 0.0f;
     quadMin.z = 0.0f;
     quadMax.x = static_cast<float>(halfWidth);
     quadMax.y = static_cast<float>(halfHeight);
     quadMax.z = 0.0f;
+    GXLoadTexObj(&tempTex, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(PtrAt(this, 0x71E8), texObj, 0x140, 0, 0x140, 0xE0, 0, filter, format, 0);
-    GXLoadTexObj(texObj, GX_TEXMAP0);
     quadMin.x = static_cast<float>(halfWidth);
     quadMin.y = 0.0f;
     quadMin.z = 0.0f;
     quadMax.x = static_cast<float>(width);
     quadMax.y = static_cast<float>(halfHeight);
     quadMax.z = 0.0f;
+    GXLoadTexObj(texObj, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(PtrAt(this, 0x71E8), texObj, 0, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
-    GXLoadTexObj(texObj, GX_TEXMAP0);
     quadMin.x = 0.0f;
     quadMin.y = static_cast<float>(halfHeight);
     quadMin.z = 0.0f;
     quadMax.x = static_cast<float>(halfWidth);
     quadMax.y = static_cast<float>(height);
     quadMax.z = 0.0f;
+    GXLoadTexObj(texObj, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(PtrAt(this, 0x71E8), texObj, 0x140, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
-    GXLoadTexObj(texObj, GX_TEXMAP0);
     quadMin.x = static_cast<float>(halfWidth);
     quadMin.y = static_cast<float>(halfHeight);
     quadMin.z = 0.0f;
     quadMax.x = static_cast<float>(width);
     quadMax.y = static_cast<float>(height);
     quadMax.z = 0.0f;
+    GXLoadTexObj(texObj, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(src, texObj, 0, 0, static_cast<int>(width), static_cast<int>(height), textureSize, filter, format, 0);
@@ -1927,8 +1928,12 @@ void CGraphic::InitBlurParameter()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800164c4
+ * PAL Size: 1164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2, unsigned char textureDelay,
                           unsigned char alpha, short offset)
@@ -1946,11 +1951,11 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     gUtil.SetOrthoEnv();
     gUtil.SetVtxFmt_POS_CLR_TEX();
     GXSetZCompLoc(GX_FALSE);
-    GXSetAlphaCompare(GX_ALWAYS, 1, GX_AOP_OR, GX_ALWAYS, 0);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(GX_ALWAYS, 1, GX_AOP_OR, GX_ALWAYS, 0);
     GXSetCullMode(GX_CULL_NONE);
     GXSetColorUpdate(GX_TRUE);
     GXSetAlphaUpdate(GX_FALSE);
-    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
 
     blurColor.r = 0x80;
     blurColor.g = 0x80;
@@ -1974,11 +1979,13 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);
 
+    int blurOffsetInt = offset;
+    int negativeBlurOffset = -blurOffsetInt;
     int textureOffset = 0;
     for (int i = 0; i < static_cast<int>(m_blurTextureCount); i++) {
         u8* textureBase = reinterpret_cast<u8*>(PtrAt(this, 0x71EC)) + textureOffset;
         GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
 
         if (mode == 1) {
@@ -1990,19 +1997,18 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
             quadMax.z = 0.0f;
             gUtil.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
         } else if (mode == 0) {
-            float blurOffset = static_cast<float>(offset);
-            quadMin.x = -blurOffset;
-            quadMin.y = -blurOffset;
+            quadMin.x = static_cast<float>(negativeBlurOffset);
+            quadMin.y = static_cast<float>(negativeBlurOffset);
             quadMin.z = 0.0f;
-            quadMax.x = 640.0f + blurOffset;
-            quadMax.y = 448.0f + blurOffset;
+            quadMax.x = static_cast<float>(640 - negativeBlurOffset);
+            quadMax.y = static_cast<float>(448 - negativeBlurOffset);
             quadMax.z = 0.0f;
             gUtil.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
         }
         textureOffset += 0x46000;
     }
 
-    GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     PSMTXIdentity(identity);
     GXLoadPosMtxImm(CameraMatrix(), 0);
     GXSetCurrentMtx(0);
@@ -2012,7 +2018,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     if (m_blurDelayCounter < textureDelay) {
         m_blurDelayCounter += 1;
     } else if (System.m_scenegraphStepMode != 2) {
-        CreateSmallBackTexture(PtrAt(this, 0x71EC), &texObj, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8,
+        CreateSmallBackTexture(PtrAt(this, 0x71EC), &texObj, 0x140, 0xE0, GX_LINEAR, GX_TF_RGBA8,
                                static_cast<unsigned long>(m_blurBufferIndex) * 0x46000);
         m_blurDelayCounter = 0;
         m_blurTextureCount += 1;

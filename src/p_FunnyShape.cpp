@@ -68,12 +68,6 @@ extern u8 ARRAY_8026D728[];
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 extern const char s_CFunnyShapePcs[];
 extern "C" const char lbl_8032FD1C[] = "|/-\\";
-extern "C" {
-char* gFunnyShapeSpinnerText;
-s8 gFunnyShapeSpinnerTextInitialized;
-int gFunnyShapeSpinnerFrame;
-s8 gFunnyShapeSpinnerFrameInitialized;
-}
 
 namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
@@ -430,24 +424,18 @@ void CFunnyShapePcs::drawViewer()
         FunnyShape(this)->Render();
     }
 
-    if (!gFunnyShapeSpinnerTextInitialized) {
-        gFunnyShapeSpinnerText = const_cast<char*>(lbl_8032FD1C);
-        gFunnyShapeSpinnerTextInitialized = true;
-    }
-    if (!gFunnyShapeSpinnerFrameInitialized) {
-        gFunnyShapeSpinnerFrame = 0;
-        gFunnyShapeSpinnerFrameInitialized = true;
-    }
+    static char* pFan = const_cast<char*>(lbl_8032FD1C);
+    static int alive = 0;
 
-    gFunnyShapeSpinnerFrame++;
-    if (gFunnyShapeSpinnerFrame > 100000) {
-        gFunnyShapeSpinnerFrame = 0;
+    alive++;
+    if (alive > 100000) {
+        alive = 0;
     }
 
     GXSetViewport(kFunnyShapeViewportOrigin, kFunnyShapeViewportOrigin, kFunnyShapeViewportWidth, kFunnyShapeViewportHeight, kFunnyShapeViewportOrigin, kFunnyShapeNdcMax);
     {
-        int frame = gFunnyShapeSpinnerFrame >> 4;
-        Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), gFunnyShapeSpinnerText[frame % 4]);
+        int frame = alive >> 4;
+        Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), pFan[frame % 4]);
     }
 }
 

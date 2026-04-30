@@ -89,17 +89,16 @@ extern double DOUBLE_80333100;
 extern double DOUBLE_80333118;
 extern double DOUBLE_80333120;
 
-static short DAT_8032eee8 = 0;
-static unsigned char DAT_8032eeea = 0;
-static unsigned char DAT_8032eeeb = 0;
-static unsigned char DAT_8032eeec = 0;
-static signed char DAT_8032eeed = 0;
-static unsigned char DAT_8032eeee = 0;
-static int DAT_8032eef0 = 0;
-static int DAT_8032eef4 = 0;
-static int DAT_8032eef8 = 0;
-static int DAT_8032eefc = 0;
-static int DAT_8032ef00 = 0;
+static short s_SelLetter = 0;
+static unsigned char s_OpenClose = 0;
+static unsigned char s_ReplyMax = 0;
+static unsigned char s_ReplyPos = 0;
+static signed char s_Attach = 0;
+static unsigned char s_AttachItemIdx = 0;
+static int s_AttachItem = 0;
+static int s_AttachMode = 0;
+static int s_BackUpCur[2];
+static int s_BackUpTopPos = 0;
 static char s_ReplyStr[0x80];
 
 namespace {
@@ -198,13 +197,13 @@ void CMenuPcs::LetterInit()
 	*reinterpret_cast<s16*>(state + 0x34) = 0;
 	*reinterpret_cast<char*>(state + 0xB) = 1;
 
-	DAT_8032eef0 = 0;
-	DAT_8032eef4 = 0;
-	DAT_8032eeed = 2;
-	DAT_8032eee8 = 0;
-	DAT_8032eef8 = 0;
-	DAT_8032eefc = 0;
-	DAT_8032ef00 = 0;
+	s_AttachItem = 0;
+	s_AttachMode = 0;
+	s_Attach = 2;
+	s_SelLetter = 0;
+	s_BackUpCur[0] = 0;
+	s_BackUpCur[1] = 0;
+	s_BackUpTopPos = 0;
 
 	SetSingWinScl__8CMenuPcsFf(this, FLOAT_803330f8);
 }
@@ -226,14 +225,14 @@ void CMenuPcs::LetterInit0()
 	**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 1;
 
 	*reinterpret_cast<s16*>(state + 0x22) = 0;
-	*reinterpret_cast<s16*>(state + 0x26) = static_cast<s16>(DAT_8032eef8);
-	*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(DAT_8032eefc);
-	*reinterpret_cast<s16*>(state + 0x34) = static_cast<s16>(DAT_8032ef00);
-	DAT_8032eee8 = static_cast<s16>(DAT_8032eef8 + DAT_8032ef00);
+	*reinterpret_cast<s16*>(state + 0x26) = static_cast<s16>(s_BackUpCur[0]);
+	*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(s_BackUpCur[1]);
+	*reinterpret_cast<s16*>(state + 0x34) = static_cast<s16>(s_BackUpTopPos);
+	s_SelLetter = static_cast<s16>(s_BackUpCur[0] + s_BackUpTopPos);
 
-	DAT_8032eef8 = 0;
-	DAT_8032eefc = 0;
-	DAT_8032ef00 = 0;
+	s_BackUpCur[0] = 0;
+	s_BackUpCur[1] = 0;
+	s_BackUpTopPos = 0;
 
 	SetSingWinScl__8CMenuPcsFf(this, FLOAT_803330f8);
 }
@@ -316,7 +315,7 @@ void CMenuPcs::LetterInit2()
 	s16 winW;
 	s16 winH;
 
-	int letter = Game.m_scriptFoodBase[0] + DAT_8032eee8 * 0xC;
+	int letter = Game.m_scriptFoodBase[0] + s_SelLetter * 0xC;
 	if (((*reinterpret_cast<unsigned char*>(letter + 0x3EC) >> 3) & 1) == 0) {
 		FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
 		int itemId = (*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 5 + 4;
@@ -381,12 +380,12 @@ void CMenuPcs::LetterInit3()
 	memset(srcText, 0, 0x400);
 	memset(workText, 0, 0x400);
 
-	unsigned short msgIndex = *reinterpret_cast<unsigned short*>(caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
+	unsigned short msgIndex = *reinterpret_cast<unsigned short*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 	strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
 	MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
 
-	DAT_8032eeeb = 0;
+	s_ReplyMax = 0;
 	char* curLine = workText;
 	for (int i = 0; i < 8; ++i) {
 		char* newline = strchr(curLine, '\n');
@@ -395,7 +394,7 @@ void CMenuPcs::LetterInit3()
 		}
 
 		sprintf(lines[i], "%s%s%s", GetMenuStr__8CMenuPcsFi(this, 0x23), curLine, GetMenuStr__8CMenuPcsFi(this, 0x24));
-		DAT_8032eeeb = static_cast<unsigned char>(DAT_8032eeeb + 1);
+		s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
 		if (newline == 0) {
 			break;
 		}
@@ -405,11 +404,11 @@ void CMenuPcs::LetterInit3()
 	__dla__FPv(srcText);
 	__dla__FPv(workText);
 
-	int closeLine = DAT_8032eeeb;
-	DAT_8032eeeb = static_cast<unsigned char>(DAT_8032eeeb + 1);
+	int closeLine = s_ReplyMax;
+	s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
 	strcat(lines[closeLine], GetMenuStr__8CMenuPcsFi(this, 3), 0x80);
 	SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
-	    this, DAT_8032eeeb, lines[0], unused0, unused1, unused2, unused3, unused4, unused5, unused6);
+	    this, s_ReplyMax, lines[0], unused0, unused1, unused2, unused3, unused4, unused5, unused6);
 
 	s16 winW;
 	s16 winH;
@@ -438,7 +437,7 @@ void CMenuPcs::LetterInit4()
 	memset(lines, 0, sizeof(lines));
 
 	FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
-	unsigned int letterWord = *reinterpret_cast<unsigned int*>(caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
+	unsigned int letterWord = *reinterpret_cast<unsigned int*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 	char** subjectTable = flatData->m_tabl[2].m_strings;
 	char** itemTable = flatData->m_tabl[0].m_strings;
 
@@ -458,23 +457,23 @@ void CMenuPcs::LetterInit4()
 	sprintf(lines[1], "%s%s%s", GetMenuStr__8CMenuPcsFi(this, 0x23), s_ReplyStr, GetMenuStr__8CMenuPcsFi(this, 0x24));
 
 	int lineCount = 2;
-	if (DAT_8032eeed != 2) {
+	if (s_Attach != 2) {
 		if (languageId == 2) {
-			if (DAT_8032eeed == 0) {
+			if (s_Attach == 0) {
 				sprintf(lines[2], "%s%d%s", GetMenuStr__8CMenuPcsFi(this, 0x23),
-				        reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[DAT_8032eef0 * 5 + 4],
+				        reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[s_AttachItem * 5 + 4],
 				        GetMenuStr__8CMenuPcsFi(this, 0x24));
-			} else if (DAT_8032eeed == 1) {
-				sprintf(lines[2], "%d%s", DAT_8032eef0, GetMenuStr__8CMenuPcsFi(this, 4));
+			} else if (s_Attach == 1) {
+				sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr__8CMenuPcsFi(this, 4));
 			}
 			strcat(lines[2], GetMenuStr__8CMenuPcsFi(this, 0x28), 0x80);
 		} else {
 			strcpy(lines[2], GetMenuStr__8CMenuPcsFi(this, 0x28));
-			if (DAT_8032eeed == 0) {
-				strcat(lines[2], itemTable[DAT_8032eef0 * 5 + 4], 0x80);
-			} else if (DAT_8032eeed == 1) {
+			if (s_Attach == 0) {
+				strcat(lines[2], itemTable[s_AttachItem * 5 + 4], 0x80);
+			} else if (s_Attach == 1) {
 				int offs = strlen(lines[2]);
-				sprintf(lines[2] + offs, "%d%s", DAT_8032eef0, GetMenuStr__8CMenuPcsFi(this, 4));
+				sprintf(lines[2] + offs, "%d%s", s_AttachItem, GetMenuStr__8CMenuPcsFi(this, 4));
 			}
 		}
 		lineCount = 3;
@@ -516,7 +515,7 @@ bool CMenuPcs::LetterOpen()
 	float fVar1;
 	s16* psVar7;
 
-	DAT_8032eeea = 1;
+	s_OpenClose = 1;
 	if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) == '\0') {
 		memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
 		iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
@@ -553,10 +552,10 @@ bool CMenuPcs::LetterOpen()
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26) = 0;
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = 0;
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) = 0;
-			DAT_8032eef0 = 0;
-			DAT_8032eef4 = 0;
-			DAT_8032eeed = 2;
-			DAT_8032eee8 = 0;
+			s_AttachItem = 0;
+			s_AttachMode = 0;
+			s_Attach = 2;
+			s_SelLetter = 0;
 		} else {
 			memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
 			iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
@@ -579,14 +578,14 @@ bool CMenuPcs::LetterOpen()
 			*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
 			**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 1;
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26) = static_cast<s16>(DAT_8032eef8);
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = static_cast<s16>(DAT_8032eefc);
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) = static_cast<s16>(DAT_8032ef00);
-			DAT_8032eee8 = static_cast<s16>(DAT_8032eef8 + DAT_8032ef00);
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26) = static_cast<s16>(s_BackUpCur[0]);
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = static_cast<s16>(s_BackUpCur[1]);
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) = static_cast<s16>(s_BackUpTopPos);
+			s_SelLetter = static_cast<s16>(s_BackUpCur[0] + s_BackUpTopPos);
 		}
-		DAT_8032eef8 = 0;
-		DAT_8032eefc = 0;
-		DAT_8032ef00 = 0;
+		s_BackUpCur[0] = 0;
+		s_BackUpCur[1] = 0;
+		s_BackUpTopPos = 0;
 		SetSingWinScl__8CMenuPcsFf(this, FLOAT_803330f8);
 	}
 	iVar6 = 0;
@@ -650,7 +649,7 @@ int CMenuPcs::LetterCtrl()
 	int ret = 0;
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
 	*reinterpret_cast<s16*>(state + 0x32) = *reinterpret_cast<s16*>(state + 0x30);
-	DAT_8032eeea = 0;
+	s_OpenClose = 0;
 
 	s16 phase = *reinterpret_cast<s16*>(state + 0x12);
 	if (phase == 0) {
@@ -697,7 +696,7 @@ int CMenuPcs::LetterCtrl()
 
 	int anim = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
 	*reinterpret_cast<int*>(anim + 0x24) = 0;
-	if (DAT_8032eeed == 2) {
+	if (s_Attach == 2) {
 		*reinterpret_cast<int*>(anim + 0x2C) = 10;
 		*reinterpret_cast<int*>(anim + 0x30) = 10;
 		*reinterpret_cast<int*>(anim + 0x64) = 0;
@@ -731,7 +730,7 @@ int CMenuPcs::LetterCtrl()
  */
 bool CMenuPcs::LetterClose()
 {
-	DAT_8032eeea = 1;
+	s_OpenClose = 1;
 	int finished = 0;
 
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
@@ -765,9 +764,9 @@ bool CMenuPcs::LetterClose()
 	}
 
 	if (panelCount == finished && SingGetLetterAttachflg__8CMenuPcsFv(this) >= 0) {
-		DAT_8032eef8 = *reinterpret_cast<s16*>(state + 0x26);
-		DAT_8032ef00 = static_cast<s16>(DAT_8032eee8 - DAT_8032eef8);
-		DAT_8032eefc = *reinterpret_cast<s16*>(state + 0x28);
+		s_BackUpCur[0] = *reinterpret_cast<s16*>(state + 0x26);
+		s_BackUpTopPos = static_cast<s16>(s_SelLetter - s_BackUpCur[0]);
+		s_BackUpCur[1] = *reinterpret_cast<s16*>(state + 0x28);
 	}
 
 	return panelCount == finished;
@@ -812,7 +811,7 @@ void CMenuPcs::LetterLstOpen()
 	}
 
 	if (panelCount == done) {
-		*reinterpret_cast<s16*>(state + 0x34) = DAT_8032eee8 - *reinterpret_cast<s16*>(state + 0x26);
+		*reinterpret_cast<s16*>(state + 0x34) = s_SelLetter - *reinterpret_cast<s16*>(state + 0x26);
 		*reinterpret_cast<s16*>(state + 0x12) = 1;
 	}
 }
@@ -870,7 +869,7 @@ void CMenuPcs::LetterLstClose()
 void CMenuPcs::LetterMessOpen()
 {
 	int state = GetLetterStateBase(this);
-	int letterOffs = DAT_8032eee8 * 0xC + 0x3EC;
+	int letterOffs = s_SelLetter * 0xC + 0x3EC;
 	signed char letterFlags = *reinterpret_cast<signed char*>(Game.m_scriptFoodBase[0] + letterOffs);
 	if (letterFlags >= 0) {
 		*reinterpret_cast<unsigned char*>(Game.m_scriptFoodBase[0] + letterOffs) =
@@ -910,10 +909,10 @@ void CMenuPcs::LetterMessOpen()
 		if (SingGetLetterAttachflg__8CMenuPcsFv(this) < 0) {
 			*reinterpret_cast<s16*>(state + 0x12) = 1;
 		} else {
-			if (DAT_8032eef4 < 1) {
-				DAT_8032eeed = 2;
+			if (s_AttachMode < 1) {
+				s_Attach = 2;
 				*reinterpret_cast<s16*>(state + 0x30) = 3;
-				*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(DAT_8032eeec);
+				*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(s_ReplyPos);
 			} else {
 				*reinterpret_cast<s16*>(state + 0x30) = 5;
 			}
@@ -966,7 +965,7 @@ int CMenuPcs::LetterMessClose()
 		}
 
 		if (panelCount == done) {
-			if (DAT_8032eeed == 2) {
+			if (s_Attach == 2) {
 				memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
 				int anim = GetLetterAnimBase(this) + 8;
 				for (int i = 0; i < 8; ++i) {
@@ -1032,7 +1031,7 @@ void CMenuPcs::LetterItemWinOpen()
 		s16 winW;
 		s16 winH;
 
-		int letter = Game.m_scriptFoodBase[0] + DAT_8032eee8 * 0xC;
+		int letter = Game.m_scriptFoodBase[0] + s_SelLetter * 0xC;
 		if (((*reinterpret_cast<unsigned char*>(letter + 0x3EC) >> 3) & 1) == 0) {
 			FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
 			int itemId = (*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 5 + 4;
@@ -1138,12 +1137,12 @@ bool CMenuPcs::LetterReplyWinOpen()
 		memset(workText, 0, 0x400);
 
 		unsigned short msgIndex = *reinterpret_cast<unsigned short*>(
-			caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
+			caravanWork + s_SelLetter * 0xC + 0x3EC);
 		char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 		strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
 		MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
 
-		DAT_8032eeeb = 0;
+		s_ReplyMax = 0;
 		char* curLine = workText;
 		for (int i = 0; i < 8; ++i) {
 			char* newline = strchr(curLine, '\n');
@@ -1159,7 +1158,7 @@ bool CMenuPcs::LetterReplyWinOpen()
 				sprintf(lines[i], "%s%s%s", left, curLine, right);
 			}
 
-			DAT_8032eeeb = static_cast<unsigned char>(DAT_8032eeeb + 1);
+			s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
 			if (newline == 0) {
 				break;
 			}
@@ -1170,13 +1169,13 @@ bool CMenuPcs::LetterReplyWinOpen()
 		__dla__FPv(workText);
 
 		const char* closeText = GetMenuStr__8CMenuPcsFi(this, 3);
-		int lineIndex = DAT_8032eeeb;
-		DAT_8032eeeb = static_cast<unsigned char>(DAT_8032eeeb + 1);
+		int lineIndex = s_ReplyMax;
+		s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
 		strcat(lines[lineIndex], closeText, 0x80);
 
 		SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
 			this,
-			DAT_8032eeeb,
+			s_ReplyMax,
 			lines[0],
 			unused0,
 			unused1,
@@ -1256,13 +1255,13 @@ void CMenuPcs::LetterAttachWinClose()
 			*reinterpret_cast<s16*>(state + 0x30) = 3;
 			*reinterpret_cast<s16*>(state + 0x12) = 0;
 			*reinterpret_cast<char*>(state + 0xC) = 0;
-			*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(DAT_8032eeec);
+			*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(s_ReplyPos);
 		} else {
-			if (DAT_8032eeed == 2) {
+			if (s_Attach == 2) {
 				*reinterpret_cast<s16*>(state + 0x30) = 5;
 				*reinterpret_cast<s16*>(state + 0x12) = 0;
 			} else {
-				if (DAT_8032eeed == 0) {
+				if (s_Attach == 0) {
 					SingSetLetterAttachflg__8CMenuPcsFi(this, 1);
 				} else {
 					SingSetLetterAttachflg__8CMenuPcsFi(this, 5);
@@ -1299,7 +1298,7 @@ bool CMenuPcs::LetterConfirmOpen()
 		memset(lines, 0, sizeof(lines));
 
 		FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
-		unsigned int letterWord = *reinterpret_cast<unsigned int*>(caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
+		unsigned int letterWord = *reinterpret_cast<unsigned int*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 		char** subjectTable = flatData->m_tabl[2].m_strings;
 		char** itemTable = flatData->m_tabl[0].m_strings;
 
@@ -1326,24 +1325,24 @@ bool CMenuPcs::LetterConfirmOpen()
 		}
 
 		int lineCount = 2;
-		if (DAT_8032eeed != 2) {
+		if (s_Attach != 2) {
 			if (languageId == 2) {
-				if (DAT_8032eeed == 0) {
-					int itemValue = flatData->m_tabl[0].m_numEntries > DAT_8032eef0 * 5 + 4
-									 ? DAT_8032eef0 * 5 + 4
+				if (s_Attach == 0) {
+					int itemValue = flatData->m_tabl[0].m_numEntries > s_AttachItem * 5 + 4
+									 ? s_AttachItem * 5 + 4
 									 : 0;
 					sprintf(lines[2], "%s%d%s", left, itemValue, right);
-				} else if (DAT_8032eeed == 1) {
-					sprintf(lines[2], "%d%s", DAT_8032eef0, GetMenuStr__8CMenuPcsFi(this, 4));
+				} else if (s_Attach == 1) {
+					sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr__8CMenuPcsFi(this, 4));
 				}
 				strcat(lines[2], GetMenuStr__8CMenuPcsFi(this, 0x28), 0x80);
 			} else {
 				strcpy(lines[2], GetMenuStr__8CMenuPcsFi(this, 0x28));
-				if (DAT_8032eeed == 0) {
-					strcat(lines[2], itemTable[DAT_8032eef0 * 5 + 4], 0x80);
-				} else if (DAT_8032eeed == 1) {
+				if (s_Attach == 0) {
+					strcat(lines[2], itemTable[s_AttachItem * 5 + 4], 0x80);
+				} else if (s_Attach == 1) {
 					int offs = strlen(lines[2]);
-					sprintf(lines[2] + offs, "%d%s", DAT_8032eef0, GetMenuStr__8CMenuPcsFi(this, 4));
+					sprintf(lines[2] + offs, "%d%s", s_AttachItem, GetMenuStr__8CMenuPcsFi(this, 4));
 				}
 			}
 			lineCount = 3;
@@ -1385,9 +1384,9 @@ void CMenuPcs::LetterConfirmClose()
 			*reinterpret_cast<s16*>(state + 0x30) = 3;
 			*reinterpret_cast<s16*>(state + 0x12) = 0;
 			*reinterpret_cast<char*>(state + 0xC) = 0;
-			*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(DAT_8032eeec);
+			*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(s_ReplyPos);
 		} else {
-			DAT_8032eeed = 2;
+			s_Attach = 2;
 			*reinterpret_cast<s16*>(state + 0x30) = 1;
 			*reinterpret_cast<s16*>(state + 0x12) = 2;
 			*reinterpret_cast<unsigned char*>(state + 8) = 0xFF;
@@ -1434,7 +1433,7 @@ void CMenuPcs::LetterListDraw()
 {
 	int menuDataBase = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
 
-	if ((DAT_8032eeea != 0) && (*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872) == '\0')) {
+	if ((s_OpenClose != 0) && (*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872) == '\0')) {
 		float anim = static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18)));
 		DrawSingleCrescent__8CMenuPcsFff(this, FLOAT_803330f8, anim);
 		DrawSingleStat__8CMenuPcsFf(this, anim);
@@ -1602,7 +1601,7 @@ void CMenuPcs::LetterMessDraw()
 	memset(srcText, 0, 0x400);
 	memset(workText, 0, 0x400);
 
-	u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
+	u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 	strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
 	MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
@@ -1634,7 +1633,7 @@ void CMenuPcs::LetterMessDraw()
 
 	DrawInit__8CMenuPcsFv(this);
 
-	int letterEntry = caravanWork + DAT_8032eee8 * 0xC;
+	int letterEntry = caravanWork + s_SelLetter * 0xC;
 	if ((*reinterpret_cast<u16*>(letterEntry + 0x3EE) & 0x1FF) != 0) {
 		int icon = 0x26 + ((*reinterpret_cast<u8*>(letterEntry + 0x3EC) >> 6) & 1);
 		DrawSingleIcon__8CMenuPcsFiiifif(
@@ -1664,7 +1663,7 @@ void CMenuPcs::LetterMessDraw()
 			if (mode == 2) {
 				itemSel += 1;
 			} else {
-				itemSel += ((DAT_8032eeed == 2) ? 1 : 0) + 4;
+				itemSel += ((s_Attach == 2) ? 1 : 0) + 4;
 			}
 			cursorX = static_cast<float>(singWin[0] + 0x14);
 			cursorY = static_cast<float>(singWin[1] + itemSel * SingWinMessHeight__8CMenuPcsFv(this) + 0x20);
@@ -1726,7 +1725,7 @@ int CMenuPcs::LetterCtrlCur()
 	if (menuMode != 0) {
 		if (menuMode == 1) {
 			if ((press & 0x100) != 0) {
-				int entry = caravanWork + DAT_8032eee8 * 0xC;
+				int entry = caravanWork + s_SelLetter * 0xC;
 				if (((*reinterpret_cast<u16*>(entry + 0x3EE) & 0x1FF) != 0) &&
 				    (((*reinterpret_cast<u8*>(entry + 0x3EC) >> 6) & 1) == 0)) {
 					*reinterpret_cast<u8*>(state + 8) = 1;
@@ -1796,7 +1795,7 @@ int CMenuPcs::LetterCtrlCur()
 				if ((press & 0x200) == 0) {
 					return 0;
 				}
-				u8 letterFlags = *reinterpret_cast<u8*>(caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
+				u8 letterFlags = *reinterpret_cast<u8*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 				if ((*reinterpret_cast<int*>(CFlat + 0x10408) == 0) || (((letterFlags >> 4) & 1) == 0) ||
 				    (((letterFlags >> 5) & 1) != 0)) {
 					*reinterpret_cast<u8*>(state + 8) = 0xFF;
@@ -1812,7 +1811,7 @@ int CMenuPcs::LetterCtrlCur()
 			s16 sel = *reinterpret_cast<s16*>(state + 0x28);
 			if ((static_cast<int>(static_cast<signed char>(*reinterpret_cast<char*>(state + 9))) & (1 << (sel + 1))) != 0) {
 				if (sel == 0) {
-					int entry = caravanWork + DAT_8032eee8 * 0xC;
+					int entry = caravanWork + s_SelLetter * 0xC;
 					unsigned int value = *reinterpret_cast<u16*>(entry + 0x3EE) & 0x1FF;
 					if (((*reinterpret_cast<u8*>(entry + 0x3EC) >> 3) & 1) == 0) {
 						AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), static_cast<int>(value), 0);
@@ -1822,7 +1821,7 @@ int CMenuPcs::LetterCtrlCur()
 					*reinterpret_cast<u8*>(entry + 0x3EC) = (*reinterpret_cast<u8*>(entry + 0x3EC) & 0xBF) | 0x40;
 				}
 
-				u8 letterFlags = *reinterpret_cast<u8*>(caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
+				u8 letterFlags = *reinterpret_cast<u8*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 				if ((*reinterpret_cast<int*>(CFlat + 0x10408) == 0) || (((letterFlags >> 4) & 1) == 0) ||
 				    (((letterFlags >> 5) & 1) != 0)) {
 					*reinterpret_cast<u8*>(state + 8) = 0xFF;
@@ -1840,7 +1839,7 @@ int CMenuPcs::LetterCtrlCur()
 		}
 
 		if (menuMode == 3) {
-			int maxReply = static_cast<int>(DAT_8032eeeb);
+			int maxReply = static_cast<int>(s_ReplyMax);
 			if ((hold & 8) == 0) {
 				if ((hold & 4) != 0) {
 					if (static_cast<int>(*reinterpret_cast<s16*>(state + 0x28)) < maxReply - 1) {
@@ -1852,7 +1851,7 @@ int CMenuPcs::LetterCtrlCur()
 				}
 			} else {
 				if (*reinterpret_cast<s16*>(state + 0x28) == 0) {
-					*reinterpret_cast<s16*>(state + 0x28) = DAT_8032eeeb - 1;
+					*reinterpret_cast<s16*>(state + 0x28) = s_ReplyMax - 1;
 				} else {
 					*reinterpret_cast<s16*>(state + 0x28) = *reinterpret_cast<s16*>(state + 0x28) - 1;
 				}
@@ -1875,7 +1874,7 @@ int CMenuPcs::LetterCtrlCur()
 
 			s16 curReply = *reinterpret_cast<s16*>(state + 0x28);
 			if (static_cast<int>(curReply) < maxReply - 1) {
-				DAT_8032eeec = static_cast<u8>(curReply);
+				s_ReplyPos = static_cast<u8>(curReply);
 				CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
 				    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 				char* srcText = reinterpret_cast<char*>(
@@ -1887,7 +1886,7 @@ int CMenuPcs::LetterCtrlCur()
 				memset(srcText, 0, 0x400);
 				memset(workText, 0, 0x400);
 
-				u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
+				u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 				char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 				strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
 				MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
@@ -1898,7 +1897,7 @@ int CMenuPcs::LetterCtrlCur()
 					if (newline != 0) {
 						*newline = '\0';
 					}
-					if (i == DAT_8032eeec) {
+					if (i == s_ReplyPos) {
 						strcpy(s_ReplyStr, line);
 					}
 					if (newline == 0) {
@@ -1945,15 +1944,15 @@ int CMenuPcs::LetterCtrlCur()
 			if ((press & 0x100) != 0) {
 				s16 choice = *reinterpret_cast<s16*>(state + 0x28);
 				if (choice < 3) {
-					DAT_8032eeed = static_cast<signed char>(choice);
+					s_Attach = static_cast<signed char>(choice);
 					*reinterpret_cast<u8*>(state + 8) = 1;
 				} else {
-					DAT_8032eeed = 2;
+					s_Attach = 2;
 					*reinterpret_cast<u8*>(state + 8) = 0xFF;
 				}
 				*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
-				DAT_8032eef4 = 0;
-				DAT_8032eef0 = 0;
+				s_AttachMode = 0;
+				s_AttachItem = 0;
 				*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 2;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 				return 0;
@@ -1979,23 +1978,23 @@ int CMenuPcs::LetterCtrlCur()
 		}
 		if ((press & 0x100) != 0) {
 			if (*reinterpret_cast<s16*>(state + 0x28) == 0) {
-				int itemValue = DAT_8032eef0;
+				int itemValue = s_AttachItem;
 				int gilValue = 0;
-				if (DAT_8032eeed != 0) {
+				if (s_Attach != 0) {
 					itemValue = 0;
-					if (DAT_8032eeed == 1) {
-						gilValue = DAT_8032eef0;
+					if (s_Attach == 1) {
+						gilValue = s_AttachItem;
 					}
 				}
 				FGLetterReply__12CCaravanWorkFiiii(
 				    reinterpret_cast<void*>(caravanWork),
-				    static_cast<int>(DAT_8032eee8),
-				    static_cast<int>(DAT_8032eeec),
+				    static_cast<int>(s_SelLetter),
+				    static_cast<int>(s_ReplyPos),
 				    itemValue,
 				    gilValue);
-				if (DAT_8032eeed == 0) {
+				if (s_Attach == 0) {
 					DeleteItemIdx__12CCaravanWorkFii(
-					    reinterpret_cast<void*>(caravanWork), static_cast<int>(DAT_8032eeee), 0);
+					    reinterpret_cast<void*>(caravanWork), static_cast<int>(s_AttachItemIdx), 0);
 				} else {
 					AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), -gilValue);
 				}
@@ -2078,8 +2077,8 @@ int CMenuPcs::LetterCtrlCur()
 	}
 
 	*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
-	DAT_8032eee8 = *reinterpret_cast<s16*>(state + 0x34) + *reinterpret_cast<s16*>(state + 0x26);
-	int entry = caravanWork + DAT_8032eee8 * 0xC;
+	s_SelLetter = *reinterpret_cast<s16*>(state + 0x34) + *reinterpret_cast<s16*>(state + 0x26);
+	int entry = caravanWork + s_SelLetter * 0xC;
 	CMes::m_tempVar[0] = *reinterpret_cast<u16*>(entry + 0x3F0);
 	CMes::m_tempVar[1] = *reinterpret_cast<u16*>(entry + 0x3F2);
 	CMes::m_tempVar[2] = *reinterpret_cast<u16*>(entry + 0x3F4);
@@ -2303,12 +2302,12 @@ void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
 {
 	unsigned int caravanWork = Game.m_scriptFoodBase[0];
 
-	if (DAT_8032eeed == 0) {
-		DAT_8032eeee = static_cast<unsigned char>(itemIndex);
+	if (s_Attach == 0) {
+		s_AttachItemIdx = static_cast<unsigned char>(itemIndex);
 		caravanWork += itemIndex * 2;
-		DAT_8032eef0 = *reinterpret_cast<short*>(caravanWork + 0xB6);
+		s_AttachItem = *reinterpret_cast<short*>(caravanWork + 0xB6);
 	} else {
-		DAT_8032eef0 = itemIndex;
+		s_AttachItem = itemIndex;
 	}
-	DAT_8032eef4 = flag;
+	s_AttachMode = flag;
 }

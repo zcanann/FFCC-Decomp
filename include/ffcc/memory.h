@@ -90,7 +90,9 @@ public:
 
     enum TYPE
     {
-        TODO,
+        TEXTURE,
+        MODEL,
+        PDT,
     };
 
     CAmemCache();

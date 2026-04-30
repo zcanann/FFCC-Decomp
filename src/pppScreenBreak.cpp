@@ -72,6 +72,12 @@ struct ScreenBreakModelView {
     ScreenBreakMeshRef* m_meshes;
 };
 
+struct ScreenBreakNode {
+    u8 _pad0[0xBC];
+    u8 _padBC_0 : 7;
+    u8 m_disabled : 1;
+};
+
 struct pppScreenBreakUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
@@ -437,7 +443,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     for (uVar15 = 0; uVar15 < *(u32*)(modelData + 0xC); uVar15++) {
         iVar14 = *(s32*)(iVar16 + 8);
         iVar5 = *(s32*)((u8*)model + 0xA8) + (*(s32*)(iVar14 + 0x5C) * 0xC0);
-        *(u8*)(iVar5 + 0xBC) &= 0x7F;
+        ((ScreenBreakNode*)iVar5)->m_disabled = 0;
         PSMTXIdentity((float(*)[4])(iVar5 + 0x14));
 
         iVar5 = *(s32*)(iVar14 + 0x14);
@@ -531,8 +537,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec->y = dVar20;
         inVec->z = dVar21;
         PSVECNormalize(inVec, inVec);
-        Vec local_c8 = DAT_801dd4bc;
-        PSVECCrossProduct(inVec, &local_c8, inVec + 2);
+        PSVECCrossProduct(inVec, const_cast<Vec*>(&DAT_801dd4bc), inVec + 2);
 
         dVar17 = Math.RandF(*(float*)((u8*)step + 0x3C));
         PSVECScale(inVec, inVec, *(float*)((u8*)step + 0x38) + dVar17);
@@ -630,11 +635,11 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     Vec lightDir;
     GXLightObj lightObj;
     u8* camera = reinterpret_cast<u8*>(&CameraPcs);
-    const float& cameraOffset = FLOAT_80331ce8;
-    const float& zero = FLOAT_80331cc4;
-    const float& one = FLOAT_80331cd0;
-    const float& attnA = FLOAT_80331cec;
-    const float& attnB = FLOAT_80331cf0;
+    float cameraOffset = FLOAT_80331ce8;
+    float zero = FLOAT_80331cc4;
+    float one = FLOAT_80331cd0;
+    float attnA = FLOAT_80331cec;
+    float attnB = FLOAT_80331cf0;
 
     lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
     lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));

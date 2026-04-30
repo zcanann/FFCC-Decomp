@@ -90,7 +90,7 @@ extern const float FLOAT_8032F9B0 = 100000.0f;
 extern const float FLOAT_8032F9B4 = 360.0f;
 extern const float FLOAT_8032F9B8 = 5.0e-6f;
 extern const float FLOAT_8032f9bc = -0.1f;
-extern char DAT_801ead4c[];
+extern char g_MsgFlashy[];
 extern const char DAT_8032f984[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
@@ -2878,14 +2878,14 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     if ((move->x <= FLOAT_8032f9a4) && (FLOAT_8032f9a8 <= move->x) && (move->y <= FLOAT_8032f9a4) &&
         (FLOAT_8032f9a8 <= move->y) && (move->z <= FLOAT_8032f9a4) && (FLOAT_8032f9a8 <= move->z)) {
         if (static_cast<unsigned int>(System.m_execParam) > 1) {
-            System.Printf(DAT_801ead4c);
+            System.Printf(g_MsgFlashy);
         }
         if (static_cast<unsigned int>(System.m_execParam) > 1) {
             System.Printf(const_cast<char*>(s_check_hit_cylinder_small_vec_fmt), static_cast<double>(move->x),
                 static_cast<double>(move->y), static_cast<double>(move->z));
         }
         if (static_cast<unsigned int>(System.m_execParam) > 1) {
-            System.Printf(DAT_801ead4c);
+            System.Printf(g_MsgFlashy);
         }
     }
 
@@ -2932,14 +2932,14 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     if ((move->x <= FLOAT_8032f9a4) && (FLOAT_8032f9a8 <= move->x) && (move->y <= FLOAT_8032f9a4) &&
         (FLOAT_8032f9a8 <= move->y) && (move->z <= FLOAT_8032f9a4) && (FLOAT_8032f9a8 <= move->z)) {
         if (static_cast<unsigned int>(System.m_execParam) > 1) {
-            System.Printf(DAT_801ead4c);
+            System.Printf(g_MsgFlashy);
         }
         if (static_cast<unsigned int>(System.m_execParam) > 1) {
             System.Printf(const_cast<char*>(s_check_hit_cylinder_near_small_vec_fmt), static_cast<double>(move->x),
                 static_cast<double>(move->y), static_cast<double>(move->z));
         }
         if (static_cast<unsigned int>(System.m_execParam) > 1) {
-            System.Printf(DAT_801ead4c);
+            System.Printf(g_MsgFlashy);
         }
     }
 
@@ -3130,13 +3130,13 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
 
     if (!found) {
         if (System.m_execParam >= 1) {
-            System.Printf(DAT_801ead4c);
+            System.Printf(g_MsgFlashy);
         }
         if (System.m_execParam >= 1) {
             System.Printf(const_cast<char*>(s_set_bg_transparent_missing_fmt), id);
         }
         if (System.m_execParam >= 1) {
-            System.Printf(DAT_801ead4c);
+            System.Printf(g_MsgFlashy);
         }
         if (System.m_execParam >= 1) {
             System.Printf(const_cast<char*>(DAT_8032f984));
@@ -3172,13 +3172,13 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
 
     if (!found) {
         if (System.m_execParam >= 1) {
-            System.Printf(DAT_801ead4c);
+            System.Printf(g_MsgFlashy);
         }
         if (System.m_execParam >= 1) {
             System.Printf(const_cast<char*>(s_set_bg_camera_semi_trans_missing_fmt), id);
         }
         if (System.m_execParam >= 1) {
-            System.Printf(DAT_801ead4c);
+            System.Printf(g_MsgFlashy);
         }
         if (System.m_execParam >= 1) {
             System.Printf(const_cast<char*>(DAT_8032f984));

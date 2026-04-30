@@ -776,9 +776,14 @@ float CSound::GetPerformance()
  */
 void CSound::PauseDiscError(int pause)
 {
-    if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22D0) == 0) {
-        SePause__9CRedSoundFii(RedSound(this), -1, (static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 0x1F);
-        StreamPause__9CRedSoundFii(RedSound(this), -1, (static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 0x1F);
+    u8* sound = reinterpret_cast<u8*>(this);
+
+    if (*reinterpret_cast<int*>(sound + 0x22D0) == 0) {
+        SePause__9CRedSoundFii(
+            reinterpret_cast<CRedSound*>(sound + 8), -1, (static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 0x1F);
+        StreamPause__9CRedSoundFii(
+            reinterpret_cast<CRedSound*>(sound + 8), -1,
+            (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 0x1F);
     }
 }
 
@@ -1344,10 +1349,12 @@ void CSound::LoadBlock()
  */
 void CSound::FreeBlock()
 {
-    RedSound(this)->ClearWaveBank(500);
-    RedSound(this)->ClearWaveBank(0);
+    u8* sound = reinterpret_cast<u8*>(this);
+
+    ClearWaveBank__9CRedSoundFi(reinterpret_cast<CRedSound*>(sound + 8), 500);
+    ClearWaveBank__9CRedSoundFi(reinterpret_cast<CRedSound*>(sound + 8), 0);
     for (int i = 0; i < 4; i++) {
-        RedSound(this)->SetSeBlockData(i, 0);
+        SetSeBlockData__9CRedSoundFiPv(reinterpret_cast<CRedSound*>(sound + 8), i, 0);
     }
 }
 
@@ -1764,7 +1771,8 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
         return -1;
     }
 
-    CSoundLayout& sound = SoundData(this);
+    u8* soundObj = reinterpret_cast<u8*>(this);
+    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(soundObj);
     se = reinterpret_cast<CSe3D*>(sound.m_seWork);
 
     for (loopCount = 0x80; loopCount != 0; loopCount--, se++) {
@@ -1794,16 +1802,16 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
             slot = -1;
         } else if (soundId < 4000) {
             int bank = soundId / 1000;
-            slot = SePlay__9CRedSoundFiiiii(RedSound(this), bank, soundId - bank * 1000, pan,
+            slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), bank, soundId - bank * 1000, pan,
                                             volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
-                SeVolume__9CRedSoundFiii(RedSound(this), slot, volume, fadeFrames);
+                SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(soundObj + 8), slot, volume, fadeFrames);
             }
         } else {
-            slot = SePlay__9CRedSoundFiiiii(RedSound(this), -1, soundId, pan,
+            slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), -1, soundId, pan,
                                             volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
-                SeVolume__9CRedSoundFiii(RedSound(this), slot, volume, fadeFrames);
+                SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(soundObj + 8), slot, volume, fadeFrames);
             }
         }
 
@@ -1836,7 +1844,8 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
         return -1;
     }
 
-    CSoundLayout& sound = SoundData(this);
+    u8* soundObj = reinterpret_cast<u8*>(this);
+    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(soundObj);
     se = reinterpret_cast<CSe3D*>(sound.m_seWork);
 
     for (loopCount = 0x80; loopCount != 0; loopCount--, se++) {
@@ -1865,16 +1874,16 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
             slot = -1;
         } else if (soundId < 4000) {
             int bank = soundId / 1000;
-            slot = SePlay__9CRedSoundFiiiii(RedSound(this), bank, soundId - bank * 1000, pan,
+            slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), bank, soundId - bank * 1000, pan,
                                             volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
-                SeVolume__9CRedSoundFiii(RedSound(this), slot, volume, fadeFrames);
+                SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(soundObj + 8), slot, volume, fadeFrames);
             }
         } else {
-            slot = SePlay__9CRedSoundFiiiii(RedSound(this), -1, soundId, pan,
+            slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), -1, soundId, pan,
                                             volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
-                SeVolume__9CRedSoundFiii(RedSound(this), slot, volume, fadeFrames);
+                SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(soundObj + 8), slot, volume, fadeFrames);
             }
         }
 

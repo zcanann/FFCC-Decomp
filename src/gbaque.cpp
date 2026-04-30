@@ -1129,7 +1129,7 @@ unsigned int GbaQueue::GetStageFlg(int channel)
 	OSWaitSemaphore(accessSemaphores + channel);
 	stageFlg = *(reinterpret_cast<char*>(this) + 0x44C);
 	flag = static_cast<int>(stageFlg) & (1 << channel);
-	flag = (-flag | flag) >> 31;
+	flag = static_cast<unsigned int>(-flag | flag) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	return static_cast<unsigned int>(flag);
@@ -3289,7 +3289,7 @@ unsigned int GbaQueue::GetCompatibilityFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<char>(flags->m_compatibilityFlg[channel]);
-	value = (-value | value) >> 31;
+	value = static_cast<unsigned int>(-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
 	return static_cast<unsigned int>(value);
 }
@@ -4174,7 +4174,7 @@ unsigned int GbaQueue::GetArtifactFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(obj[0x2D36])) & (1 << channel);
-	value = (-value | value) >> 31;
+	value = static_cast<unsigned int>(-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
 	return static_cast<unsigned int>(value);
 }
@@ -4292,7 +4292,7 @@ unsigned int GbaQueue::GetStrengthFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(obj[0x2D3E])) & (1 << channel);
-	value = (-value | value) >> 31;
+	value = static_cast<unsigned int>(-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
 	return static_cast<unsigned int>(value);
 }

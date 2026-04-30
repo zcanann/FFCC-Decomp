@@ -11,6 +11,11 @@ class CRedDriver;
 class CRedEntry;
 class CRedMemory;
 
+struct RedReverbModeData {
+	int kind;
+	int params[6];
+};
+
 extern RedMidiControlFunc p_MidiControl_Function[];
 extern u32 t_TonePitch[];
 extern int t_FinePitch[];
@@ -19,7 +24,7 @@ extern signed char t_KeySignatureData[];
 extern signed char t_RandomData[];
 extern s16 t_PanningData[];
 extern s16 t_PanningDataR[];
-extern int t_ReverbModeData[];
+extern RedReverbModeData t_ReverbModeData[];
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;
 extern void* volatile p_SeBlockData[];

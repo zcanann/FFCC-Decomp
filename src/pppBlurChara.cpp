@@ -301,12 +301,15 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         outVec.z = outVec.z / outVec.w;
     }
 
-    quadA.x = -(FLOAT_80331044 * param_2->m_arg3);
-    quadA.y = -param_2->m_arg3;
-    quadA.z = outVec.z;
-    quadB.x = FLOAT_80331048 + (FLOAT_80331044 * param_2->m_arg3);
-    quadB.y = FLOAT_8033104c + param_2->m_arg3;
-    quadB.z = outVec.z;
+    float arg = param_2->m_arg3;
+    float quadZ = outVec.z;
+    float scaledArg = FLOAT_80331044 * arg;
+    quadA.y = -arg;
+    quadA.z = quadZ;
+    quadA.x = -scaledArg;
+    quadB.x = FLOAT_80331048 + scaledArg;
+    quadB.y = FLOAT_8033104c + arg;
+    quadB.z = quadZ;
 
     gUtil.RenderQuad(quadA, quadB, drawColor, 0, 0);
 

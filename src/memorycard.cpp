@@ -41,6 +41,7 @@ char* CardConst::MCDAT_VERSION = const_cast<char*>(lbl_80330CC8);
 CMemoryCardMan MemoryCardMan;
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" unsigned int GetSoundMode__9CRedSoundFv(void*);
 extern "C" int memcmp(const void* lhs, const void* rhs, unsigned long count);
 extern const char sMcOdekakeReturn[];
 // CRC32 lookup table
@@ -143,6 +144,18 @@ static const char sMemoryAllocationError[] = {
 static const char sMemoryCardIconPathFmt[] = "dvd/%smenu/%s";
 static const char sMemoryCardOpenErrorFmt[] = "%s(%d): Error: %s open error";
 static const char sMemoryCardDataErrorFmt[] = "%s(%d): Error: [%s] data error";
+static const char sBrokenLoadData[] = "Bloken load data!!\n";
+static const char sLoadDataVersionDiff[] = "The version of load data is different.\n";
+static const char sLoadDataNumItemError[] = {
+    0x0A, 0x0A, 0x0A, 0x45, 0x72, 0x72, 0x6F, 0x72, 0x3A, 0x6C, 0x6F, 0x61,
+    0x64, 0x20, 0x64, 0x61, 0x74, 0x61, (char)0x82, (char)0xCC, 0x4E, 0x75,
+    0x6D, 0x49, 0x74, 0x65, 0x6D, (char)0x82, (char)0xCC, (char)0x90,
+    (char)0xAE, (char)0x8D, (char)0x87, (char)0x90, (char)0xAB, (char)0x82,
+    (char)0xAA, (char)0x8D, (char)0x87, (char)0x82, (char)0xC1, (char)0x82,
+    (char)0xC4, (char)0x82, (char)0xA2, (char)0x82, (char)0xDC, (char)0x82,
+    (char)0xB9, (char)0x82, (char)0xF1, 0x21, 0x21, 0x28, 0x25, 0x64, 0x29,
+    0x0A, 0x0A, 0x0A, 0x00,
+};
 static const char DAT_801db044[] = {
     0x43, 0x4D, 0x65, 0x6D, 0x6F, 0x72, 0x79, 0x43, 0x61, 0x72, 0x64, 0x4D,
     0x61, 0x6E, 0x2E, 0x44, 0x65, 0x62, 0x75, 0x67, 0x52, 0x65, 0x61, 0x64,
@@ -167,6 +180,22 @@ static const char sMcOpenErrorFmt[] = "McOpen(%d) error(%d)";
 static inline CChara* GetCharaGlobal()
 {
     return &gChara;
+}
+
+struct MemoryCardSoundLayout {
+    u8 _pad0[0x22B0];
+    int m_bgmMasterVolume;
+    int m_seMasterVolume;
+};
+
+static inline MemoryCardSoundLayout& GetSoundSaveData()
+{
+    return *reinterpret_cast<MemoryCardSoundLayout*>(&Sound);
+}
+
+static inline void* GetRedSound()
+{
+    return reinterpret_cast<u8*>(&Sound) + 8;
 }
 
 /*
@@ -850,14 +879,12 @@ void CMemoryCardMan::MakeSaveData()
 {
     if (m_saveBuffer == (char*)nullptr)
     {
-        m_saveBuffer = new char[0xA000];
-        if (m_saveBuffer == (char*)nullptr)
+        m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+            0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
+
+        if (m_saveBuffer == (char*)nullptr && System.m_execParam != 0)
         {
-            if (System.m_execParam != 0)
-            {
-                System.Printf("%s", 0);
-            }
-            return;
+            System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
     }
 
@@ -875,9 +902,9 @@ void CMemoryCardMan::MakeSaveData()
     memcpy(save + 0x08, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE));
     memcpy(save + 0x0C, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION));
     save[0x10] = 'E';
-    save[0x11] = static_cast<u8>(*reinterpret_cast<u32*>(gameWork + 0x13D8) & 0xFF);
+    *reinterpret_cast<u32*>(save + 0x18) = Math.Rand(0x7FFFFFFF);
+    save[0x11] = static_cast<u8>(Math.Rand(0xFF));
     save[0x12] = 0;
-    *reinterpret_cast<u32*>(save + 0x18) = *reinterpret_cast<u32*>(gameWork + 0x13D8);
 
     for (int i = 0; i < 4; i++)
     {
@@ -913,9 +940,9 @@ void CMemoryCardMan::MakeSaveData()
     *reinterpret_cast<u32*>(save + 0x13D4) = *reinterpret_cast<u32*>(gameWork + 0x13E4);
     *reinterpret_cast<u32*>(save + 0x13D8) = *reinterpret_cast<u32*>(gameWork + 0x13D8);
     save[0x13DC] = gameWork[0x13D6];
-    save[0x13DD] = gameWork[0x13DD];
-    save[0x13DE] = gameWork[0x13DE];
-    save[0x13DF] = gameWork[0x13DF];
+    save[0x13DD] = static_cast<u8>(GetSoundSaveData().m_bgmMasterVolume);
+    save[0x13DE] = static_cast<u8>(GetSoundSaveData().m_seMasterVolume);
+    save[0x13DF] = static_cast<u8>((u32)__cntlzw(GetSoundMode__9CRedSoundFv(GetRedSound())) >> 5);
     save[0x13E0] = gameWork[0x01] ? 1 : 0;
     save[0x13E1] = gameWork[0x02] ? 1 : 0;
     save[0x13E2] = gameWork[0x03] ? 1 : 0;
@@ -934,7 +961,7 @@ void CMemoryCardMan::MakeSaveData()
         }
         else if (cv[0xC1E] == 0)
         {
-            *reinterpret_cast<int*>(cv + 0xC20) = *reinterpret_cast<int*>(gameWork + 0x13D8);
+            *reinterpret_cast<int*>(cv + 0xC20) = Math.Rand(0x7FFFFFFF);
             cv[0xC1E] = 1;
         }
 
@@ -1001,33 +1028,48 @@ void CMemoryCardMan::MakeSaveData()
  */
 void CMemoryCardMan::SetLoadData()
 {
-    if (m_saveBuffer == (char*)nullptr)
-    {
-        return;
-    }
-
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
     u8* game = reinterpret_cast<u8*>(&Game);
     u8* gameWork = game + 0x08;
 
     if (memcmp(save + 0x00, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
     {
+        if (System.m_execParam != 0)
+        {
+            System.Printf(const_cast<char*>(sBrokenLoadData));
+        }
         return;
     }
     if (memcmp(save + 0x04, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE)) != 0)
     {
+        if (System.m_execParam != 0)
+        {
+            System.Printf(const_cast<char*>(sBrokenLoadData));
+        }
         return;
     }
     if (memcmp(save + 0x08, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE)) != 0)
     {
+        if (System.m_execParam != 0)
+        {
+            System.Printf(const_cast<char*>(sBrokenLoadData));
+        }
         return;
     }
     if (memcmp(save + 0x0C, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION)) != 0)
     {
+        if (System.m_execParam != 0)
+        {
+            System.Printf(const_cast<char*>(sLoadDataVersionDiff));
+        }
         return;
     }
     if (save[0x10] != 'E')
     {
+        if (System.m_execParam != 0)
+        {
+            System.Printf(const_cast<char*>(sBrokenLoadData));
+        }
         return;
     }
 
@@ -1052,7 +1094,7 @@ void CMemoryCardMan::SetLoadData()
     gameWork[0x13D6] = save[0x13DC];
     Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));
     Sound.SetSeMasterVolume(static_cast<s8>(save[0x13DE]));
-    Sound.SetStereo(static_cast<s8>(save[0x13DF]));
+    Sound.SetStereo(static_cast<int>((u32)__cntlzw(GetSoundMode__9CRedSoundFv(GetRedSound())) >> 5));
     gameWork[0x01] = (save[0x13E0] != 0);
     gameWork[0x02] = (save[0x13E1] != 0);
     gameWork[0x03] = (save[0x13E2] != 0);
@@ -1074,6 +1116,10 @@ void CMemoryCardMan::SetLoadData()
         }
         if (itemCount != *reinterpret_cast<u16*>(src + 0x2A))
         {
+            if (System.m_execParam != 0)
+            {
+                System.Printf(const_cast<char*>(sLoadDataNumItemError), c);
+            }
             *reinterpret_cast<u16*>(src + 0x2A) = static_cast<u16>(itemCount);
         }
 

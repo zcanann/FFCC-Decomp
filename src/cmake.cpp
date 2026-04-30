@@ -268,11 +268,6 @@ static inline void DrawCmakeSelectionBackdrop(CMenuPcs* menu)
 static inline void DrawCmakePopupPanel(CMenuPcs* menu, float alpha, float x, float y, float w, float h, float scaleX, float scaleY)
 {
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
-    if (a < 0) {
-        a = 0;
-    } else if (a > 0xFF) {
-        a = 0xFF;
-    }
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
@@ -1724,12 +1719,6 @@ void CMenuPcs::CmakeNameDraw()
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
-    if (a < 0) {
-        a = 0;
-    } else if (a > 0xFF) {
-        a = 0xFF;
-    }
-
     GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
     GXSetChanMatColor(GX_COLOR0A0, col);
 
@@ -2765,12 +2754,6 @@ void CMenuPcs::CmakeResultDraw()
     labelFont->DrawInit();
 
     int textColor = static_cast<int>(static_cast<double>(FLOAT_80333240) * textAlpha);
-    if (textColor < 0) {
-        textColor = 0;
-    } else if (textColor > 0xFF) {
-        textColor = 0xFF;
-    }
-
     GXColor color;
     __ct__6CColorFUcUcUcUc(&color, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
     labelFont->SetColor(color);
@@ -3004,12 +2987,6 @@ void CMenuPcs::CmakeResultDraw1()
     labelFont->DrawInit();
 
     int textColor = static_cast<int>(static_cast<double>(FLOAT_80333240) * textAlpha);
-    if (textColor < 0) {
-        textColor = 0;
-    } else if (textColor > 0xFF) {
-        textColor = 0xFF;
-    }
-
     GXColor color;
     __ct__6CColorFUcUcUcUc(&color, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
     labelFont->SetColor(color);
@@ -3275,12 +3252,6 @@ void CMenuPcs::CmakeVillageDraw()
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
-    if (a < 0) {
-        a = 0;
-    } else if (a > 0xFF) {
-        a = 0xFF;
-    }
-
     GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
     GXSetChanMatColor(GX_COLOR0A0, col);
     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), (MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A);

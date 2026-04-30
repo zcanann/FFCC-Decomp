@@ -1350,11 +1350,13 @@ void CSound::LoadBlock()
  */
 void CSound::FreeBlock()
 {
-    CRedSound* redSound = RedSound(this);
-    redSound->ClearWaveBank(500);
-    redSound->ClearWaveBank(0);
-    for (int i = 0; i < 4; i++) {
-        redSound->SetSeBlockData(i, 0);
+    int i;
+    u8* self = reinterpret_cast<u8*>(this) + 8;
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(self);
+    ClearWaveBank__9CRedSoundFi(redSound, 500);
+    ClearWaveBank__9CRedSoundFi(redSound, 0);
+    for (i = 0; i < 4; i++) {
+        SetSeBlockData__9CRedSoundFiPv(redSound, i, 0);
     }
 }
 

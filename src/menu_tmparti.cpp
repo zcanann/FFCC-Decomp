@@ -373,7 +373,7 @@ void CMenuPcs::TmpArtiCtrl()
 	if (hasInput) {
 		uVar3 = 0;
 	} else {
-		int padIndex = hasInput;
+		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
 		uVar3 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
 	}

@@ -7,6 +7,7 @@
 #include "ffcc/vector.h"
 
 #include <math.h>
+#include <string.h>
 
 extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
 extern "C" void setAttackAfter__8CGMonObjFi(CGMonObj*, int);
@@ -31,6 +32,7 @@ extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, void*, int, int, int, void*, void*);
 extern "C" void moveFrame__8CGMonObjFv(CGMonObj*);
+extern "C" void rotTarget__8CGMonObjFif(CGMonObj*, int, float);
 extern float FLOAT_80331dd0;
 extern float FLOAT_80331cf8;
 extern float FLOAT_80331dcc;
@@ -49,6 +51,9 @@ extern float FLOAT_80331d90;
 extern float FLOAT_80331d94;
 extern float FLOAT_80331d98;
 extern float FLOAT_80331d9c;
+extern float FLOAT_80331da0;
+extern float FLOAT_80331da4;
+extern float FLOAT_80331da8;
 extern float FLOAT_80331dac;
 extern float FLOAT_80331db0;
 extern float FLOAT_80331db4;
@@ -1049,9 +1054,76 @@ void CGMonObj::frameStatFuncLKShooter()
 	}
 	
 	#endif
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId >= 100) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	u8* self = reinterpret_cast<u8*>(this);
+
+	int cooldown0 = *reinterpret_cast<int*>(SoundBuffer_1260_ + 0xC) - 1;
+	int cooldown1 = *reinterpret_cast<int*>(SoundBuffer_1260_ + 0x10) - 1;
+	*reinterpret_cast<int*>(SoundBuffer_1260_ + 0xC) = cooldown0 & ~(cooldown0 >> 31);
+	*reinterpret_cast<int*>(SoundBuffer_1260_ + 0x10) = cooldown1 & ~(cooldown1 >> 31);
+
+	const int state = *reinterpret_cast<int*>(self + 0x520);
+	if (state == 0x65) {
+		goto state101;
+	}
+	if (state >= 0x65) {
+		goto resetBranch;
+	}
+	if (state >= 100) {
+		goto state100;
+	}
+	goto resetBranch;
+
+state100:
+	self[0x63C] = (self[0x63C] & 0x7F) | 0x80;
+	if (*reinterpret_cast<int*>(self + 0x528) == 0) {
+		memset(self + 0x70C, 0, 0x34);
+		*reinterpret_cast<int*>(self + 0x70C) = 0x322;
+
+		if (*reinterpret_cast<int*>(self + 0x6D0) == 1) {
+			CVector targetPos(FLOAT_80331d9c, FLOAT_80331cf8, FLOAT_80331d9c);
+			*reinterpret_cast<float*>(self + 0x718) = targetPos.x;
+			*reinterpret_cast<float*>(self + 0x71C) = targetPos.y;
+			*reinterpret_cast<float*>(self + 0x720) = targetPos.z;
+		} else {
+			CVector targetPos(FLOAT_80331d90, FLOAT_80331cf8, FLOAT_80331d94);
+			*reinterpret_cast<float*>(self + 0x718) = targetPos.x;
+			*reinterpret_cast<float*>(self + 0x71C) = targetPos.y;
+			*reinterpret_cast<float*>(self + 0x720) = targetPos.z;
+		}
+		*reinterpret_cast<float*>(self + 0x728) = FLOAT_80331da0;
+		*reinterpret_cast<int*>(self + 0x738) = 0x65;
+	}
+
+	moveFrame__8CGMonObjFv(this);
+	const int branch = *reinterpret_cast<int*>(self + 0x6D0);
+	const int flatFlags = *reinterpret_cast<int*>(CFlat + 0x12E8);
+	if ((*reinterpret_cast<volatile signed char*>(SoundBuffer_1260_ + 0x14) < 0) ||
+	    ((branch == 1) && ((flatFlags & 1) != 0)) || ((branch == 2) && ((flatFlags & 2) != 0))) {
+		changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+	}
+	return;
+
+state101:
+	if (*reinterpret_cast<int*>(self + 0x528) == 0) {
+		reqAnim__8CGPrgObjFiii(this, -1, 0, 0);
+		rotTarget__8CGMonObjFif(this, *reinterpret_cast<int*>(self + 0x6C4), FLOAT_80331da4);
+	}
+	if ((*reinterpret_cast<volatile signed char*>(SoundBuffer_1260_ + 0x14) < 0) ||
+	    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < FLOAT_80331da8)) {
+		changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+	}
+	return;
+
+resetBranch:
+	if (*reinterpret_cast<int*>(self + 0x6D0) == 1) {
+		*reinterpret_cast<int*>(self + 0x6D0) = 0;
+		*reinterpret_cast<volatile unsigned char*>(SoundBuffer_1260_ + 0x14) &= 0xDF;
+		*reinterpret_cast<int*>(SoundBuffer_1260_ + 0x10) = 0xFA;
+	}
+	if (*reinterpret_cast<int*>(self + 0x6D0) == 2) {
+		*reinterpret_cast<int*>(self + 0x6D0) = 0;
+		*reinterpret_cast<volatile unsigned char*>(SoundBuffer_1260_ + 0x14) &= 0xBF;
+		*reinterpret_cast<int*>(SoundBuffer_1260_ + 0xC) = 0xFA;
 	}
 }
 

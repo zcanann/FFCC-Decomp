@@ -1,10 +1,45 @@
 #ifndef _FFCC_REDSOUND_REDENTRY_H
 #define _FFCC_REDSOUND_REDENTRY_H
 
-struct RedHistoryBANK;
-struct RedMusicHEAD;
-struct RedSeSepHEAD;
-struct RedWaveHeadWD;
+struct RedHistoryBANK
+{
+	int m_id;
+	int m_historyNo;
+	int m_data;
+	int m_size;
+};
+
+struct RedMusicHEAD
+{
+	char m_signature[4];
+	short m_musicNo;
+	short m_waveNo;
+	int m_unk08;
+	int m_unk0c;
+	int m_size;
+};
+
+struct RedSeSepHEAD
+{
+	char m_signature[8];
+	int m_seNo;
+	unsigned int m_sizeAndFlags;
+	unsigned char m_unk10;
+	unsigned char m_waveNoLo;
+	unsigned char m_waveNoHi;
+	unsigned char m_unk13;
+};
+
+struct RedWaveHeadWD
+{
+	char m_signature[2];
+	short m_waveNo;
+	int m_waveSize;
+	int m_tableCount;
+	int m_toneCount;
+	int m_aramAddress;
+	int m_loadSize;
+};
 
 class CRedEntry
 {

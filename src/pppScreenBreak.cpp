@@ -44,7 +44,12 @@ struct ScreenBreakDisplayList {
 };
 
 struct ScreenBreakMeshData {
-    u8 _pad0[0x50];
+    char m_name[0x10];
+    u8 m_flags;
+    u8 _pad11[3];
+    s32 m_vertexCount;
+    S16Vec* m_vertices;
+    u8 _pad1C[0x34];
     ScreenBreakDisplayList* m_displayLists;
     u8 _pad54[0x8];
     s32 m_nodeIndex;
@@ -61,6 +66,8 @@ struct ScreenBreakModelData {
     u32 m_meshCount;
     u8 _pad10[0x14];
     CMaterialSet* m_materialSet;
+    u8 _pad28[0xC];
+    u32 m_posQuant;
 };
 
 struct ScreenBreakModelView {
@@ -101,6 +108,7 @@ extern const float FLOAT_80331cd0 = 1.0f;
 extern const float FLOAT_80331cd4 = -1.0f;
 extern const float FLOAT_80331cd8 = 0.017453292f;
 extern const double DOUBLE_80331CE0 = 4503599627370496.0;
+extern const float FLOAT_80331ce8 = 30.0f;
 extern const float FLOAT_80331cec = 4.0f;
 extern const float FLOAT_80331cf0 = -3.0f;
 extern const float FLOAT_80331cf4 = 0.5f;
@@ -639,9 +647,9 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     const float& attnA = FLOAT_80331cec;
     const float& attnB = FLOAT_80331cf0;
 
-    lightDir.x = *(float*)(camera + 0xEC) - (30.0f + *(float*)(camera + 0xE0));
-    lightDir.y = *(float*)(camera + 0xF0) - (30.0f + *(float*)(camera + 0xE4));
-    lightDir.z = *(float*)(camera + 0xF4) - (30.0f + *(float*)(camera + 0xE8));
+    lightDir.x = *(float*)(camera + 0xEC) - (FLOAT_80331ce8 + *(float*)(camera + 0xE0));
+    lightDir.y = *(float*)(camera + 0xF0) - (FLOAT_80331ce8 + *(float*)(camera + 0xE4));
+    lightDir.z = *(float*)(camera + 0xF4) - (FLOAT_80331ce8 + *(float*)(camera + 0xE8));
     PSVECNormalize(&lightDir, &lightDir);
 
     GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, one, zero);

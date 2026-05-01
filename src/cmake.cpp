@@ -1,9 +1,10 @@
 #include "ffcc/cmake.h"
 #include "ffcc/chara.h"
 #include "ffcc/fontman.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
+#include "ffcc/system.h"
 #include "ffcc/linkage.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>

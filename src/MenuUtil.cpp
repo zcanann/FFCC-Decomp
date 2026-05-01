@@ -1,6 +1,6 @@
 #include "ffcc/MenuUtil.h"
 #include "ffcc/partMng.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include <string.h>

@@ -25,7 +25,7 @@ void _MngThreadMain(void*);
 extern unsigned int m_table_desc0__12CMiniGamePcs[];
 extern unsigned int m_table_desc1__12CMiniGamePcs[];
 extern unsigned int m_table_desc2__12CMiniGamePcs[];
-extern unsigned char m_table__12CMiniGamePcs[];
+extern unsigned int m_table__12CMiniGamePcs[];
 
 class CMiniGamePcs : public CProcess
 {

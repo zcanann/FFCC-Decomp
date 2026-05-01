@@ -7,7 +7,7 @@
 #include "ffcc/menu.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_chara.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
 #include "ffcc/sound.h"

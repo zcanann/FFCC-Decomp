@@ -793,19 +793,29 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     p[0xE9] = 0x3F;
     p[0xEA] = 0x3F;
     p[0xEB] = 0xFF;
-    for (i = 0; i < 3; i++) {
-        unsigned char c = (unsigned char)(-((__cntlzw(i) >> 5) & 1) & 0x3F);
-        p[0xF0 + i * 4 + 0] = c;
-        p[0xF0 + i * 4 + 1] = c;
-        p[0xF0 + i * 4 + 2] = c;
-        p[0xF0 + i * 4 + 3] = 0xFF;
-    }
+    unsigned char c = (unsigned char)(-((__cntlzw(0) >> 5) & 1) & 0x3F);
+    p[0xF0] = c;
+    p[0xF1] = c;
+    p[0xF2] = c;
+    p[0xF3] = 0xFF;
     *(float*)(p + 0x108) = kCharaViewerZero;
     *(float*)(p + 0x10C) = kCharaViewerZero;
     *(float*)(p + 0x110) = kCharaViewerFineStep;
+
+    c = (unsigned char)(-((__cntlzw(1) >> 5) & 1) & 0x3F);
+    p[0xF4] = c;
+    p[0xF5] = c;
+    p[0xF6] = c;
+    p[0xF7] = 0xFF;
     *(float*)(p + 0x114) = kCharaViewerZero;
     *(float*)(p + 0x118) = kCharaViewerZero;
     *(float*)(p + 0x11C) = kCharaViewerFineStep;
+
+    c = (unsigned char)(-((__cntlzw(2) >> 5) & 1) & 0x3F);
+    p[0xF8] = c;
+    p[0xF9] = c;
+    p[0xFA] = c;
+    p[0xFB] = 0xFF;
     *(float*)(p + 0x120) = kCharaViewerZero;
     *(float*)(p + 0x124) = kCharaViewerZero;
     *(float*)(p + 0x128) = kCharaViewerFineStep;

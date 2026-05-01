@@ -67,6 +67,8 @@ static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 
 static const char s_CLightPcs_801D7C70[] = "CLightPcs";
+extern const char s_CManager_801D7C7C[] = "CManager";
+extern const char s_CProcess_801D7C88[] = "CProcess";
 
 unsigned int m_table_desc0__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
 unsigned int m_table_desc1__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};
@@ -344,8 +346,8 @@ void CLightPcs::draw()
     Vec vec;
 
     PSMTXCopy(CameraMatrix(), mtx);
-    for (u32 i = 0; i < m_sceneLightCount; i++) {
-        CLight* light = &m_sceneLights[i];
+    CLight* light = m_sceneLights;
+    for (u32 i = 0; i < m_sceneLightCount; i++, light++) {
         if (light->m_specularMode == 0) {
             PSMTXMultVec(mtx, reinterpret_cast<Vec*>(&light->m_position), &vec);
             GXInitLightPos(&light->m_gxLightObj, vec.x, vec.y, vec.z);
@@ -842,18 +844,12 @@ void CLightPcs::SetBit32(CLightPcs::TARGET target, unsigned long* bits)
 {
     char* lightPcs = (char*)this;
     char* bumpSlot = lightPcs + 0x63c;
-    u32 i;
     _GXColor lightColor;
 
     *(u32*)(lightPcs + 0xb0) = 0;
     *(u32*)(lightPcs + 0xb4) = 0;
-    i = 0;
 
-    do {
-        if (*(u32*)(lightPcs + 0xb8) <= i) {
-            return;
-        }
-
+    for (u32 i = 0; i < *(u32*)(lightPcs + 0xb8); i++, bumpSlot += 0xb0) {
         if ((*(char*)((int)target + (int)bumpSlot + 0x60) != '\0') &&
             (((1 << (i & 0x1f)) & *(u32*)((char*)bits + ((i >> 3) & 0x1ffffffc))) != 0))
         {
@@ -867,10 +863,7 @@ void CLightPcs::SetBit32(CLightPcs::TARGET target, unsigned long* bits)
                 return;
             }
         }
-
-        i += 1;
-        bumpSlot += 0xb0;
-    } while (true);
+    }
 }
 
 /*
@@ -939,9 +932,9 @@ void CLightPcs::SetPart(CLightPcs::TARGET target, void* part, unsigned char mode
 void CLightPcs::InsertOctTree(CLightPcs::TARGET target, COctTree& octTree)
 {
     octTree.ClearLight();
-    for (u32 i = 0; i < m_sceneLightCount; i++) {
-        CLight* light = &m_sceneLights[i];
-        if (((light->m_targetEnableMask >> (target * 8)) & 0xFF) != 0) {
+    CLight* light = m_sceneLights;
+    for (u32 i = 0; i < m_sceneLightCount; i++, light++) {
+        if (reinterpret_cast<u8*>(&light->m_targetEnableMask)[target] != 0) {
             octTree.InsertLight(i, *reinterpret_cast<Vec*>(&light->m_position), light->m_range, light->m_partMask);
         }
     }
@@ -1368,9 +1361,10 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
  */
 CLightPcs::CLight::CLight()
 {
+    float radius = FLOAT_8032fc1c;
     float f2 = FLOAT_8032fc14;
 
-    m_radius = FLOAT_8032fc1c;
+    m_radius = radius;
     float f1 = FLOAT_8032fc10;
     m_offsetZ = f2;
     m_offsetX = f2;
@@ -1399,7 +1393,9 @@ CLightPcs::CLight::CLight()
 CLightPcs::CBumpLight::CBumpLight()
     : CLight()
 {
-    m_radius = FLOAT_8032fc1c;
+    float radius = FLOAT_8032fc1c;
+
+    m_radius = radius;
     m_hasTexture = 0;
 }
 

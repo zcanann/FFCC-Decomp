@@ -403,10 +403,12 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
-    Vec* points;
-    int colorOffset = param_3->m_serializedDataOffsets[1];
+    int* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + serializedDataOffsets[2]);
+    int colorOffset = serializedDataOffsets[1];
     LaserColorData* colorData = (LaserColorData*)((u8*)pppLaser + 0x80 + colorOffset);
-    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_3->m_serializedDataOffsets[2]);
+    s32 dataValIndex = step->m_dataValIndex;
+    Vec* points;
     u32 count;
     u32 i;
     u32 colorBase;
@@ -431,11 +433,11 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     _GXColor debugColor;
     int tex;
 
-    if (step->m_dataValIndex == 0xFFFF) {
+    if (dataValIndex == 0xFFFF) {
         return;
     }
 
-    tex = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
+    tex = GetTextureFromRSD__FiP9_pppEnvSt(dataValIndex, pppEnvStPtr);
     pppSetBlendMode(step->m_payload[0x1c]);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -458,8 +460,8 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
     GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 
-    halfWidth = work->m_halfWidth;
     length = work->m_length;
+    halfWidth = work->m_halfWidth;
 
     pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&modelView, &pppMngStPtr->m_matrix, &pppLaser->m_localMatrix);
     pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, (pppFMATRIX*)&ppvCameraMatrix, &modelView);
@@ -499,7 +501,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         shapeMtx.value[0][0] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.x;
         shapeMtx.value[1][1] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.y;
         shapeMtx.value[2][2] = shapeMtx.value[0][0];
-        if (work->m_shapeRotation != kPppLaserZero) {
+        if (kPppLaserZero != work->m_shapeRotation) {
             PSMTXRotRad(tempMtx, 'z', work->m_shapeRotation);
             PSMTXConcat(shapeMtx.value, tempMtx, shapeMtx.value);
         }

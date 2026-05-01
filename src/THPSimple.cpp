@@ -551,12 +551,12 @@ void THPSimpleAudioStart(void)
  */
 s32 THPSimplePreLoad(s32 loop)
 {
-    s32 status;
-    s32 readOffset;
+    u8* readPtr;
     s32 readSize;
+    s32 readOffset;
     u32 i;
     u32 readCount;
-    u8* readPtr;
+    s32 status;
 
     if ((SimpleControl.isOpen != 0) && (SimpleControl.isPreLoaded == 0)) {
         readCount = 8;
@@ -702,9 +702,10 @@ s32 THPSimpleSetBuffer(u8* buffer)
         DCInvalidateRange(SimpleControl.vImage, chromaSize);
         cursor += chromaSize;
 
-        frameBufferSize = (SimpleControl.header.mBufferSize + 0x1F) & ~0x1F;
         SimpleControl.readBuffer[0].mPtr = cursor;
+        frameBufferSize = (SimpleControl.header.mBufferSize + 0x1F) & ~0x1F;
         cursor += frameBufferSize;
+        SimpleControl.readBuffer[0].mIsValid = 0;
 
         SimpleControl.readBuffer[1].mPtr = cursor;
         cursor += frameBufferSize;
@@ -727,7 +728,6 @@ s32 THPSimpleSetBuffer(u8* buffer)
         SimpleControl.readBuffer[7].mPtr = cursor;
         cursor += frameBufferSize;
 
-        SimpleControl.readBuffer[0].mIsValid = 0;
         SimpleControl.readBuffer[1].mIsValid = 0;
         SimpleControl.readBuffer[2].mIsValid = 0;
         SimpleControl.readBuffer[3].mIsValid = 0;
@@ -773,8 +773,8 @@ s32 THPSimpleSetBuffer(u8* buffer)
 s32 THPSimpleCalcNeedMemory(void)
 {
     if (SimpleControl.isOpen != 0) {
-        s32 frameSize = SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize;
         s32 need = ((SimpleControl.header.mBufferSize + 0x1F) * 8) & ~0xFF;
+        s32 frameSize = SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize;
         need += (frameSize + 0x1F) & ~0x1F;
         frameSize = (((u32)frameSize >> 2) + 0x1F) & ~0x1F;
         need += frameSize;

@@ -34,24 +34,9 @@ extern const float FLOAT_8032fda4;
 extern const float FLOAT_8032fda8;
 
 namespace {
-static inline u8* Ptr(CFunnyShape* self, u32 offset)
+static inline u8* Ptr(void* self, u32 offset)
 {
     return reinterpret_cast<u8*>(self) + offset;
-}
-
-static inline void*& PtrAt(CFunnyShape* self, u32 offset)
-{
-    return *reinterpret_cast<void**>(Ptr(self, offset));
-}
-
-static inline u32& U32At(CFunnyShape* self, u32 offset)
-{
-    return *reinterpret_cast<u32*>(Ptr(self, offset));
-}
-
-static inline u8& U8At(CFunnyShape* self, u32 offset)
-{
-    return *reinterpret_cast<u8*>(Ptr(self, offset));
 }
 
 static inline s16 S16At(const u8* p, u32 offset)
@@ -86,44 +71,24 @@ static inline GXColor ToGXColor(u32 color)
     return out;
 }
 
-struct CFunnyShapeAnmWork {
-    s32 index;
-    void* animData;
-    f32 x;
-    f32 y;
-    f32 z;
-    s16 frame;
-    s16 delay;
-    u8 unk18[8];
-    f32 viewportX;
-    f32 viewportY;
-    f32 angle;
-    u8 unk2C[4];
-};
-
-static inline CFunnyShapeAnmWork* AnmWork(CFunnyShape* self)
-{
-    return reinterpret_cast<CFunnyShapeAnmWork*>(self);
-}
-
 static inline void* AnimData(CFunnyShape* self)
 {
-    return PtrAt(self, 0x60E4);
+    return self->m_anm.anmData;
 }
 
 static inline u32 ShapeFlags(CFunnyShape* self)
 {
-    return U32At(self, 0x60E8);
+    return self->m_displayCurrent.flags;
 }
 
 static inline s16 ShapeCount(CFunnyShape* self)
 {
-    return *reinterpret_cast<s16*>(Ptr(self, 0x6110));
+    return self->m_displayCurrent.unk28;
 }
 
 static inline s16 ShapeRange(CFunnyShape* self)
 {
-    return *reinterpret_cast<s16*>(Ptr(self, 0x6112));
+    return self->m_displayCurrent.unk2A;
 }
 }
 
@@ -138,42 +103,42 @@ static inline s16 ShapeRange(CFunnyShape* self)
  */
 CFunnyShape::CFunnyShape()
 {
-    PtrAt(this, 0x6010) = 0;
+    m_meshData = 0;
     memset(this, 0, 0x6000);
-    memset(Ptr(this, 0x60D8), 0, 0x10);
-    memset(Ptr(this, 0x6000), 0, 0x10);
-    memset(Ptr(this, 0x60E8), 0, 0x40);
+    memset(&m_anm, 0, 0x10);
+    memset(&m_shape, 0, 0x10);
+    memset(&m_displayCurrent, 0, 0x40);
 
     CFunnyShape* p = this;
     for (s32 i = 2; i != 0; i--) {
-        PtrAt(p, 0x6094) = 0;
-        PtrAt(p, 0x6014) = 0;
-        PtrAt(p, 0x6054) = 0;
-        PtrAt(p, 0x6098) = 0;
-        PtrAt(p, 0x6018) = 0;
-        PtrAt(p, 0x6058) = 0;
-        PtrAt(p, 0x609C) = 0;
-        PtrAt(p, 0x601C) = 0;
-        PtrAt(p, 0x605C) = 0;
-        PtrAt(p, 0x60A0) = 0;
-        PtrAt(p, 0x6020) = 0;
-        PtrAt(p, 0x6060) = 0;
-        PtrAt(p, 0x60A4) = 0;
-        PtrAt(p, 0x6024) = 0;
-        PtrAt(p, 0x6064) = 0;
-        PtrAt(p, 0x60A8) = 0;
-        PtrAt(p, 0x6028) = 0;
-        PtrAt(p, 0x6068) = 0;
-        PtrAt(p, 0x60AC) = 0;
-        PtrAt(p, 0x602C) = 0;
-        PtrAt(p, 0x606C) = 0;
-        PtrAt(p, 0x60B0) = 0;
-        PtrAt(p, 0x6030) = 0;
-        PtrAt(p, 0x6070) = 0;
+        p->m_textureData[0] = 0;
+        p->m_texObjData[0] = 0;
+        p->m_textureHeaders[0] = 0;
+        p->m_textureData[1] = 0;
+        p->m_texObjData[1] = 0;
+        p->m_textureHeaders[1] = 0;
+        p->m_textureData[2] = 0;
+        p->m_texObjData[2] = 0;
+        p->m_textureHeaders[2] = 0;
+        p->m_textureData[3] = 0;
+        p->m_texObjData[3] = 0;
+        p->m_textureHeaders[3] = 0;
+        p->m_textureData[4] = 0;
+        p->m_texObjData[4] = 0;
+        p->m_textureHeaders[4] = 0;
+        p->m_textureData[5] = 0;
+        p->m_texObjData[5] = 0;
+        p->m_textureHeaders[5] = 0;
+        p->m_textureData[6] = 0;
+        p->m_texObjData[6] = 0;
+        p->m_textureHeaders[6] = 0;
+        p->m_textureData[7] = 0;
+        p->m_texObjData[7] = 0;
+        p->m_textureHeaders[7] = 0;
         p = reinterpret_cast<CFunnyShape*>(Ptr(p, 0x20));
     }
 
-    U8At(this, 0x60D4) = 0;
+    m_textureCount = 0;
 }
 
 /*
@@ -187,31 +152,30 @@ CFunnyShape::CFunnyShape()
  */
 CFunnyShape::~CFunnyShape()
 {
-    if (PtrAt(this, 0x6010) != 0) {
-        __dla__FPv(PtrAt(this, 0x6010));
-        PtrAt(this, 0x6010) = 0;
+    if (m_meshData != 0) {
+        __dla__FPv(m_meshData);
+        m_meshData = 0;
     }
 
-    if (PtrAt(this, 0x60E4) != 0) {
-        __dla__FPv(PtrAt(this, 0x60E4));
-        PtrAt(this, 0x60E4) = 0;
+    if (m_anm.anmData != 0) {
+        __dla__FPv(m_anm.anmData);
+        m_anm.anmData = 0;
     }
 
     for (s32 i = 0; i < 0x10; i++) {
-        u32 offs = static_cast<u32>(i) * 4;
-        if (PtrAt(this, 0x6094 + offs) != 0) {
-            __dla__FPv(PtrAt(this, 0x6094 + offs));
-            PtrAt(this, 0x6094 + offs) = 0;
+        if (m_textureData[i] != 0) {
+            __dla__FPv(m_textureData[i]);
+            m_textureData[i] = 0;
         }
 
-        if (PtrAt(this, 0x6014 + offs) != 0) {
-            __dl__FPv(PtrAt(this, 0x6014 + offs));
-            PtrAt(this, 0x6014 + offs) = 0;
+        if (m_texObjData[i] != 0) {
+            __dl__FPv(m_texObjData[i]);
+            m_texObjData[i] = 0;
         }
 
-        if (PtrAt(this, 0x6054 + offs) != 0) {
-            __dl__FPv(PtrAt(this, 0x6054 + offs));
-            PtrAt(this, 0x6054 + offs) = 0;
+        if (m_textureHeaders[i] != 0) {
+            __dl__FPv(m_textureHeaders[i]);
+            m_textureHeaders[i] = 0;
         }
     }
 }
@@ -228,32 +192,32 @@ CFunnyShape::~CFunnyShape()
 extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape* funnyShape, short shouldDelete)
 {
     if (funnyShape != 0) {
-        if (PtrAt(funnyShape, 0x6010) != 0) {
-            __dla__FPv(PtrAt(funnyShape, 0x6010));
-            PtrAt(funnyShape, 0x6010) = 0;
+        if (funnyShape->m_meshData != 0) {
+            __dla__FPv(funnyShape->m_meshData);
+            funnyShape->m_meshData = 0;
         }
 
-        if (PtrAt(funnyShape, 0x60E4) != 0) {
-            __dla__FPv(PtrAt(funnyShape, 0x60E4));
-            PtrAt(funnyShape, 0x60E4) = 0;
+        if (funnyShape->m_anm.anmData != 0) {
+            __dla__FPv(funnyShape->m_anm.anmData);
+            funnyShape->m_anm.anmData = 0;
         }
 
         CFunnyShape* iter = funnyShape;
         s32 i = 0;
         do {
-            if (PtrAt(iter, 0x6094) != 0) {
-                __dla__FPv(PtrAt(iter, 0x6094));
-                PtrAt(iter, 0x6094) = 0;
+            if (iter->m_textureData[0] != 0) {
+                __dla__FPv(iter->m_textureData[0]);
+                iter->m_textureData[0] = 0;
             }
 
-            if (PtrAt(iter, 0x6014) != 0) {
-                __dl__FPv(PtrAt(iter, 0x6014));
-                PtrAt(iter, 0x6014) = 0;
+            if (iter->m_texObjData[0] != 0) {
+                __dl__FPv(iter->m_texObjData[0]);
+                iter->m_texObjData[0] = 0;
             }
 
-            if (PtrAt(iter, 0x6054) != 0) {
-                __dl__FPv(PtrAt(iter, 0x6054));
-                PtrAt(iter, 0x6054) = 0;
+            if (iter->m_textureHeaders[0] != 0) {
+                __dl__FPv(iter->m_textureHeaders[0]);
+                iter->m_textureHeaders[0] = 0;
             }
 
             i++;
@@ -283,7 +247,7 @@ void CFunnyShape::InitAnmWork()
     const u8 noSpread = (u8)((((ShapeFlags(this) >> 7) & 1) ^ 1));
     const float angleMul = 3.14f;
     const float angleDiv = 180.0f;
-    CFunnyShapeAnmWork* work = AnmWork(this);
+    CFunnyShapeAnmWork* work = m_anmWork;
 
     for (s32 i = 0; i < 0x200; i++) {
         work->index = i;
@@ -338,11 +302,11 @@ void CFunnyShape::InitAnmWork()
  */
 void CFunnyShape::Update()
 {
-    if ((*reinterpret_cast<s8*>(Ptr(this, 0x60D4)) == 0) || (AnimData(this) == 0)) {
+    if ((m_textureCount == 0) || (AnimData(this) == 0)) {
         return;
     }
 
-    CFunnyShapeAnmWork* work = AnmWork(this);
+    CFunnyShapeAnmWork* work = m_anmWork;
     const float zero = 0.0f;
     const bool noSpread = ((ShapeFlags(this) & 0x80) == 0);
     for (s32 i = 0; i < ShapeCount(this); i++) {
@@ -406,7 +370,7 @@ void CFunnyShape::Update()
  */
 void CFunnyShape::Render()
 {
-    if ((*reinterpret_cast<s8*>(Ptr(this, 0x60D4)) == 0) || (AnimData(this) == 0)) {
+    if ((m_textureCount == 0) || (AnimData(this) == 0)) {
         return;
     }
 
@@ -422,7 +386,7 @@ void CFunnyShape::Render()
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x6014)), GX_TEXMAP0);
+    GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -440,7 +404,7 @@ void CFunnyShape::Render()
     GXColor matColor = chanColor;
     GXSetChanMatColor(GX_COLOR0, matColor);
 
-    CFunnyShape* work;
+    CFunnyShapeAnmWork* work;
     s32 count;
     if ((ShapeFlags(this) & 0x80) != 0) {
         count = ShapeCount(this);
@@ -448,19 +412,20 @@ void CFunnyShape::Render()
         count = 1;
     }
 
-    work = this;
+    work = m_anmWork;
 
     for (s32 i = 0; i < count; i++) {
         Vec2d pos;
-        pos.x = FLOAT_8032fd9c + *reinterpret_cast<float*>(Ptr(work, 8));
-        pos.y = FLOAT_8032fda0 + *reinterpret_cast<float*>(Ptr(work, 0xC));
+        pos.x = FLOAT_8032fd9c;
+        pos.y = FLOAT_8032fda0;
+        pos.x += work->x;
+        pos.y += work->y;
 
         u8* animData = reinterpret_cast<u8*>(AnimData(this));
-        s16 frame = *reinterpret_cast<s16*>(Ptr(work, 0x14));
-        FS_tagOAN3_SHAPE* shape =
-            reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + *reinterpret_cast<s16*>(animData + 0x10 + frame * 8));
-        RenderShape(shape, pos, *reinterpret_cast<float*>(Ptr(work, 0x28)));
-        work = reinterpret_cast<CFunnyShape*>(Ptr(work, 0x30));
+        s16 frame = work->frame;
+        FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + *reinterpret_cast<s16*>(animData + 0x10 + frame * 8));
+        RenderShape(shape, pos, work->angle);
+        work++;
     }
 }
 
@@ -475,7 +440,7 @@ void CFunnyShape::Render()
  */
 void CFunnyShape::RenderTexture()
 {
-    if (*reinterpret_cast<s8*>(Ptr(this, 0x60D4)) == 0) {
+    if (m_textureCount == 0) {
         return;
     }
 
@@ -498,9 +463,9 @@ void CFunnyShape::RenderTexture()
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     GXColor color = DAT_8032fd5c;
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x6014)), GX_TEXMAP0);
+    GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
 
-    const u8* texData = reinterpret_cast<const u8*>(PtrAt(this, 0x6054));
+    const u8* texData = reinterpret_cast<const u8*>(m_textureHeaders[0]);
     const s16 width = *reinterpret_cast<const s16*>(texData + 4);
     const s16 height = *reinterpret_cast<const s16*>(texData + 6);
     GXSetViewport(FLOAT_8032fd98, FLOAT_8032fd98, static_cast<float>(width), static_cast<float>(height),
@@ -553,7 +518,7 @@ void CFunnyShape::RenderTexture()
  */
 void CFunnyShape::RenderShape()
 {
-    if ((*reinterpret_cast<s8*>(Ptr(this, 0x60D4)) == 0) || (PtrAt(this, 0x6010) == 0)) {
+    if ((m_textureCount == 0) || (m_meshData == 0)) {
         return;
     }
 
@@ -569,7 +534,7 @@ void CFunnyShape::RenderShape()
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x6014)), GX_TEXMAP0);
+    GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -593,7 +558,7 @@ void CFunnyShape::RenderShape()
     offsetCopy.y = FLOAT_8032fd94;
     offset.x = offsetCopy.x;
     offset.y = offsetCopy.y;
-    FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(PtrAt(this, 0x6010));
+    FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(m_meshData);
     RenderShape(shape, offset, FLOAT_8032fd6c);
 }
 
@@ -608,13 +573,13 @@ void CFunnyShape::RenderShape()
  */
 void CFunnyShape::ClearAnmData()
 {
-    if (PtrAt(this, 0x60E4) != 0) {
-        __dla__FPv(PtrAt(this, 0x60E4));
-        PtrAt(this, 0x60E4) = 0;
+    if (m_anm.anmData != 0) {
+        __dla__FPv(m_anm.anmData);
+        m_anm.anmData = 0;
     }
 
     memset(this, 0, 0x30);
-    memset(Ptr(this, 0x60D8), 0, 0x10);
+    memset(&m_anm, 0, 0x10);
 }
 
 /*
@@ -628,27 +593,24 @@ void CFunnyShape::ClearAnmData()
  */
 void CFunnyShape::ClearTextureData()
 {
-    Ptr(this, 0x60D4)[0] = 0;
-    u8* iter = reinterpret_cast<u8*>(this);
+    m_textureCount = 0;
+    CFunnyShape* iter = this;
     for (s32 i = 0; i < 0x10; i++) {
-        void** texData = reinterpret_cast<void**>(iter + 0x6094);
-        if (*texData != 0) {
-            __dla__FPv(*texData);
-            *texData = 0;
+        if (iter->m_textureData[0] != 0) {
+            __dla__FPv(iter->m_textureData[0]);
+            iter->m_textureData[0] = 0;
         }
 
-        void** texObj = reinterpret_cast<void**>(iter + 0x6014);
-        if (*texObj != 0) {
-            __dl__FPv(*texObj);
-            *texObj = 0;
+        if (iter->m_texObjData[0] != 0) {
+            __dl__FPv(iter->m_texObjData[0]);
+            iter->m_texObjData[0] = 0;
         }
 
-        void** rawData = reinterpret_cast<void**>(iter + 0x6054);
-        if (*rawData != 0) {
-            __dl__FPv(*rawData);
-            *rawData = 0;
+        if (iter->m_textureHeaders[0] != 0) {
+            __dl__FPv(iter->m_textureHeaders[0]);
+            iter->m_textureHeaders[0] = 0;
         }
-        iter += 4;
+        iter = reinterpret_cast<CFunnyShape*>(Ptr(iter, 4));
     }
 }
 
@@ -692,14 +654,14 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         if ((flags & 8) != 0) {
             const u8* entry = shapeData + rotatedStride;
             const u32 texIndex = entry[0x38];
-            const s8 numTex = *reinterpret_cast<s8*>(Ptr(this, 0x60D4));
+            const s8 numTex = m_textureCount;
             float minX = FLOAT_8032fd64;
             float maxX = FLOAT_8032fd68;
             float minY = FLOAT_8032fd64;
             float maxY = FLOAT_8032fd68;
             float drawAngle = angle;
             if ((s32)texIndex < (s32)numTex) {
-                GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x14 + texIndex * 4)), GX_TEXMAP0);
+                GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[texIndex]), GX_TEXMAP0);
             }
 
             const s8 blendMode = *reinterpret_cast<const s8*>(entry + 0x1C);
@@ -711,7 +673,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 3);
             }
 
-            if ((U32At(this, 0) & 0x100) == 0) {
+            if ((ShapeFlags(this) & 0x100) == 0) {
                 drawAngle = FLOAT_8032fd6c;
             }
 
@@ -819,9 +781,9 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         } else {
             const u8* entry = shapeData + packedStride;
             const u32 texIndex = entry[0x30];
-            const s8 numTex = *reinterpret_cast<s8*>(Ptr(this, 0x60D4));
+            const s8 numTex = m_textureCount;
             if ((s32)texIndex < (s32)numTex) {
-                GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x14 + texIndex * 4)), GX_TEXMAP0);
+                GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[texIndex]), GX_TEXMAP0);
             }
 
             const s8 blendMode = *reinterpret_cast<const s8*>(entry + 0x1C);

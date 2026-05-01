@@ -398,7 +398,8 @@ void CLightPcs::Clear()
  */
 void CLightPcs::Add(CLightPcs::CLight* light)
 {
-    CLight sceneLight = *light;
+    CLight sceneLight;
+    sceneLight = *light;
     float attenRadius = sceneLight.m_attenRadius;
     u8* targetEnable = reinterpret_cast<u8*>(&sceneLight.m_targetEnableMask);
 
@@ -411,7 +412,10 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     }
     sceneLight.m_range = attenRadius * FLOAT_8032fc18 * sceneLight.m_radius;
 
-    sceneLight.m_targetEnableMask = 0x01010101;
+    targetEnable[3] = 1;
+    targetEnable[2] = 1;
+    targetEnable[1] = 1;
+    targetEnable[0] = 1;
     if (*(u32*)&sceneLight.m_targetColor[0] == 0) {
         targetEnable[0] = 0;
     }

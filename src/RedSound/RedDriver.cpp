@@ -14,16 +14,6 @@
 
 // Global objects that need initialization
 
-struct RedMusicHEAD;
-struct RedSeSepHEAD;
-struct RedWaveHEAD {
-    char magic[2];
-    short waveID;
-    int dataSize;
-    int regionCount;
-    int sampleCount;
-};
-
 extern "C" {
     int __OSReadROM();
 }
@@ -1628,19 +1618,19 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
 int CRedDriver::SetSeSepData(void* seSepData)
 {
     int result;
-    char* header;
+    RedSeSepHEAD* header;
     void* copiedHeader;
     int headerSize;
 
     result = -1;
-    header = (char*)seSepData;
-    if (((((header[0] == 'S') && (header[1] == 'e')) && (header[2] == 'S')) &&
-        ((header[3] == 'e' && (header[4] == 'p'))))) {
-        headerSize = *(int*)(header + 0xc) & 0x7fffffff;
+    header = (RedSeSepHEAD*)seSepData;
+    if (((((header->m_signature[0] == 'S') && (header->m_signature[1] == 'e')) && (header->m_signature[2] == 'S')) &&
+        ((header->m_signature[3] == 'e' && (header->m_signature[4] == 'p'))))) {
+        headerSize = header->m_sizeAndFlags & 0x7fffffff;
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
             memcpy(copiedHeader, header, headerSize);
-            result = *(int*)((int)copiedHeader + 8);
+            result = reinterpret_cast<RedSeSepHEAD*>(copiedHeader)->m_seNo;
             _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
     } else if (m_ReportPrint != 0) {
@@ -2151,13 +2141,13 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
     m_WaveSettingData.waveData = waveData;
 
     if (waveSize == -1) {
-        RedWaveHEAD* const waveHeader = (RedWaveHEAD*)waveData;
+        RedWaveHeadWD* const waveHeader = (RedWaveHeadWD*)waveData;
 
-        if ((waveHeader->magic[0] == 'W') && (waveHeader->magic[1] == 'D')) {
-            int dataSize = waveHeader->regionCount * 4;
+        if ((waveHeader->m_signature[0] == 'W') && (waveHeader->m_signature[1] == 'D')) {
+            int dataSize = waveHeader->m_tableCount * 4;
             dataSize = (dataSize += 0x3f) & 0xffffffc0;
-            dataSize += waveHeader->sampleCount * 0x60;
-            dataSize = waveHeader->dataSize + dataSize;
+            dataSize += waveHeader->m_toneCount * 0x60;
+            dataSize = waveHeader->m_waveSize + dataSize;
             dataSize += 0x20;
             m_WaveSettingData.waveSize = dataSize;
         } else {

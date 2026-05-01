@@ -225,7 +225,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
  */
 void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShpTail2* param, pppYmMegaBirthShpTail2UnkC* offsets)
 {
-    bool hasRequiredMemory;
+    char hasRequiredMemory;
     int spawnCount = 0;
     u8* paramPayload;
     u8* particleData;
@@ -271,10 +271,10 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
         hasRequiredMemory = false;
     } else if (work->m_wmats == 0) {
         hasRequiredMemory = false;
-    } else if ((paramPayload[0x69] == 0) || (work->m_colors != 0)) {
-        hasRequiredMemory = true;
-    } else {
+    } else if ((paramPayload[0x69] != 0) && (work->m_colors == 0)) {
         hasRequiredMemory = false;
+    } else {
+        hasRequiredMemory = true;
     }
 
     if (hasRequiredMemory) {
@@ -393,9 +393,7 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     *velocityScale = *velocityScale + pYmMegaBirthShpTail2->m_colorDeltaAdd[2];
     *tailScale = *tailScale + pYmMegaBirthShpTail2->m_sizeVal;
 
-    local.x = *(float*)(color + 0x10);
-    local.y = *(float*)(color + 0x14);
-    local.z = *(float*)(color + 0x18);
+    local = *(Vec*)(color + 0x10);
     pppScaleVectorXYZ(scaled, local, *velocityScale);
     pppAddVector(*(Vec*)(color + 0x0), *(Vec*)(color + 0x0), scaled);
 

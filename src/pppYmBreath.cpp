@@ -651,6 +651,12 @@ group_ready:
 void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VColor* vColor)
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
+    unsigned char* particleData;
+    unsigned char* particleWmat;
+    unsigned char* particleColor;
+    YmBreathParticleGroup* groupTable;
+    int maxParticleCount;
+    unsigned short* emitFrameCounter;
     int found;
     int spawnCount;
     int i;
@@ -658,24 +664,18 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     int k;
     int group;
     int groupTableWork;
-    YmBreathParticleGroup* groupTable;
     YmBreathParticleGroup* groupData;
-    unsigned char* particleData;
-    unsigned char* particleWmat;
-    unsigned char* particleColor;
-    int maxParticleCount;
     short foundSlot;
     short foundGroup;
     Vec stepVelocity;
     Vec unitVelocity;
-    unsigned short* emitFrameCounter;
 
-    spawnCount = 0;
     particleData = (unsigned char*)vYmBreath->m_particleData;
     particleWmat = (unsigned char*)vYmBreath->m_particleWmats;
     particleColor = (unsigned char*)vYmBreath->m_particleColors;
     groupTable = vYmBreath->m_groups;
     maxParticleCount = vYmBreath->m_particleCount;
+    spawnCount = 0;
     emitFrameCounter = &vYmBreath->m_emitFrameCounter;
 
     if ((gPppCalcDisabled == 0) && (params->m_shapeStepValue != 0xFFFF)) {

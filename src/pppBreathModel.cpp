@@ -637,6 +637,12 @@ group_ready:
 void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor)
 {
     PBreathModel* params = reinterpret_cast<PBreathModel*>(pBreathModel);
+    BreathParticleData* particleData;
+    PARTICLE_WMAT* particleWmat;
+    PARTICLE_COLOR* particleColor;
+    BreathParticleGroup* groupTable;
+    int maxParticleCount;
+    unsigned short* emitFrameCounter;
     int found;
     int spawnCount;
     int i;
@@ -644,24 +650,18 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     int k;
     int group;
     int groupTableWork;
-    BreathParticleGroup* groupTable;
     BreathParticleGroup* groupData;
-    BreathParticleData* particleData;
-    PARTICLE_WMAT* particleWmat;
-    PARTICLE_COLOR* particleColor;
-    int maxParticleCount;
     short foundSlot;
     short foundGroup;
     Vec unitVelocity;
     Vec stepVelocity;
-    unsigned short* emitFrameCounter;
 
-    spawnCount = 0;
     particleData = reinterpret_cast<BreathParticleData*>(vBreathModel->m_particleData);
     particleWmat = vBreathModel->m_particleWmats;
     particleColor = vBreathModel->m_particleColors;
     groupTable = vBreathModel->m_groups;
     maxParticleCount = vBreathModel->m_particleCount;
+    spawnCount = 0;
     emitFrameCounter = &vBreathModel->m_emitFrameCounter;
 
     if ((gPppCalcDisabled == 0) && (params->m_stepValue != 0xFFFF)) {

@@ -301,8 +301,8 @@ void CMenuPcs::MLstCtrl()
 {
 	bool blocked;
 	float one;
-	unsigned short press;
-	unsigned short hold;
+	unsigned int press;
+	unsigned int hold;
 	unsigned int itemCount;
 	unsigned int chunkCount;
 	int i;
@@ -320,7 +320,7 @@ void CMenuPcs::MLstCtrl()
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		press = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * 0x54 + 0x8);
+		press = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 
 	blocked = false;
@@ -332,17 +332,17 @@ void CMenuPcs::MLstCtrl()
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * 0x54 + 0x14);
+		hold = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
 
 	if (hold == 0) {
 		blocked = false;
 	} else {
 		if ((hold & 0x48) != 0) {
-			if (this->lstState->cursor == 0) {
-				this->lstState->cursor = 8;
-			} else {
+			if (this->lstState->cursor != 0) {
 				this->lstState->cursor = this->lstState->cursor - 1;
+			} else {
+				this->lstState->cursor = 8;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else if ((hold & 0x24) != 0) {

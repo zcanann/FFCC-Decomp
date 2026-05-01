@@ -233,7 +233,8 @@ int CRedEntry::SearchUseWave(int waveNo)
 	soundBase = (int)p_SoundControlBuffer + 0xdbc;
 	int* track = (int*)*(int*)soundBase;
 	do {
-		if (((u32)*track != 0) && ((u32)track[6] != 0) && (*(short*)(track[6] + 2) == waveNo)) {
+		if (((u32)*track != 0) && ((u32)track[6] != 0) &&
+		    (reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo == waveNo)) {
 			found = 1;
 			SeStopID(track[0x3e]);
 		}
@@ -718,7 +719,7 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 			track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 			do {
 				if (((*reinterpret_cast<unsigned int*>(track) != 0) && (*reinterpret_cast<unsigned int*>(track + 6) != 0)) &&
-				    (*(short*)(track[6] + 2) == waveNo)) {
+				    (reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo == waveNo)) {
 					used++;
 					break;
 				}

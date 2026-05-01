@@ -91,7 +91,7 @@ extern const float FLOAT_80330df8 = 0.0f;
 extern const float FLOAT_80330dfc = 0.0f;
 extern const float FLOAT_80330e00 = 1.0f;
 extern const double DOUBLE_80330E08 = 1.038459631686463e34;
-extern const float DAT_80330e10 = 0.5f;
+extern const float DAT_80330e10[2] = {0.0f, 0.0f};
 
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_data) == 0xA4);
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_meshes) == 0xAC);
@@ -405,7 +405,7 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
  */
 void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* data)
 {
-	float init = ChangeTexConst(DAT_80330e10);
+	float init = ChangeTexConst(DAT_80330e10[0]);
 	pppYmChangeTexState* state =
 	    (pppYmChangeTexState*)((char*)ymChangeTex + data->m_serializedDataOffsets[2] + 0x80);
 

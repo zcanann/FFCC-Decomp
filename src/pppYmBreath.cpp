@@ -25,10 +25,11 @@ extern const float FLOAT_80330c80;
 extern const float FLOAT_80330c84;
 extern const float FLOAT_80330C90;
 extern const float FLOAT_80330C94;
-extern const float FLOAT_80330C98;
-extern const float FLOAT_80330C9C;
-extern const float FLOAT_80330CA8;
-extern const double DOUBLE_80330CB0;
+extern const float FLOAT_80330C98 = 180.0f;
+extern const float FLOAT_80330C9C = -180.0f;
+extern const double DOUBLE_80330CA0 = 4503599627370496.0;
+extern const float FLOAT_80330CA8 = 2.0f;
+extern const double DOUBLE_80330CB0 = 0.5;
 }
 
 struct pppYmBreathUnkC {

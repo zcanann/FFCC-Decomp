@@ -1961,25 +1961,25 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
         if ((u32)*track != 0) {
             int step = frames;
             m_ChangeStatus = 0;
-            if (track[0x42] < frames) {
-                step = track[0x42];
+            if (((RedTrackDATA*)track)->m_deltaTime < frames) {
+                step = ((RedTrackDATA*)track)->m_deltaTime;
             }
-            track[0x42] -= frames;
+            ((RedTrackDATA*)track)->m_deltaTime -= frames;
             _MusicTrackDataExecute((RedTrackDATA*)track, step);
-            if (((track[0x41] & 0x200000) == 0) && (track[0x42] == 1)) {
+            if (((track[0x41] & 0x200000) == 0) && (((RedTrackDATA*)track)->m_deltaTime == 1)) {
                 KeyOffSet(control, keyOnData, (RedTrackDATA*)track);
             }
-            while (((u32)*track != 0) && (track[0x42] < 1)) {
+            while (((u32)*track != 0) && (((RedTrackDATA*)track)->m_deltaTime < 1)) {
                 unsigned char* cmd = (unsigned char*)*track;
                 int delta;
                 *track = (int)(cmd + 1);
                 p_MidiControl_Function[*cmd](control, keyOnData, (RedTrackDATA*)track);
                 if ((u32)*track != 0) {
-                    if (track[0x42] < 1) {
+                    if (((RedTrackDATA*)track)->m_deltaTime < 1) {
                         delta = DeltaTimeSumup((unsigned char**)track);
                     } else {
-                        delta = track[0x42];
-                        track[0x42] = 0;
+                        delta = ((RedTrackDATA*)track)->m_deltaTime;
+                        ((RedTrackDATA*)track)->m_deltaTime = 0;
                     }
 
                     if (delta != 0) {
@@ -1994,14 +1994,14 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
                         }
                     }
 
-                    if (track[0x42] < -1) {
+                    if (((RedTrackDATA*)track)->m_deltaTime < -1) {
                         int execStep = delta;
-                        if (track[0x42] + delta > 0) {
-                            execStep = -track[0x42];
+                        if (((RedTrackDATA*)track)->m_deltaTime + delta > 0) {
+                            execStep = -((RedTrackDATA*)track)->m_deltaTime;
                         }
                         _MusicTrackDataExecute((RedTrackDATA*)track, execStep);
                     }
-                    track[0x42] += delta;
+                    ((RedTrackDATA*)track)->m_deltaTime += delta;
                 }
             }
 
@@ -2484,17 +2484,17 @@ int _SeMidiNoteExecute(
             while (*(s16*)((u8*)track + 0x146) < 1) {
                 int step = frames;
                 *(s16*)((u8*)track + 0x146) += 0xFA;
-                if (track[0x42] < frames) {
-                    step = track[0x42];
+                if (((RedTrackDATA*)track)->m_deltaTime < frames) {
+                    step = ((RedTrackDATA*)track)->m_deltaTime;
                 }
-                track[0x42] -= frames;
+                ((RedTrackDATA*)track)->m_deltaTime -= frames;
                 _SeTrackDataExecute((RedTrackDATA*)track, step);
-                if (((track[0x41] & 0x200000) == 0) && (track[0x42] == 1)) {
+                if (((track[0x41] & 0x200000) == 0) && (((RedTrackDATA*)track)->m_deltaTime == 1)) {
                     KeyOffSet(control, keyOnData, (RedTrackDATA*)track);
                 }
 
                 m_ChangeStatus = 0;
-                while (((u32)*track != 0) && (track[0x42] < 1)) {
+                while (((u32)*track != 0) && (((RedTrackDATA*)track)->m_deltaTime < 1)) {
                     int delta;
                     unsigned char* cmd;
                     *(s16*)(track + 0x51) += 1;
@@ -2515,14 +2515,14 @@ int _SeMidiNoteExecute(
                             }
                         }
 
-                        if (track[0x42] < -1) {
+                        if (((RedTrackDATA*)track)->m_deltaTime < -1) {
                             int execStep = delta;
-                            if (track[0x42] + delta > 0) {
-                                execStep = -track[0x42];
+                            if (((RedTrackDATA*)track)->m_deltaTime + delta > 0) {
+                                execStep = -((RedTrackDATA*)track)->m_deltaTime;
                             }
                             _SeTrackDataExecute((RedTrackDATA*)track, execStep);
                         }
-                        track[0x42] += delta;
+                        ((RedTrackDATA*)track)->m_deltaTime += delta;
                     }
                 }
 

@@ -1697,11 +1697,11 @@ int CRedDriver::ReentrySeSepData(int id)
  */
 int CRedDriver::SePlayState(int seID)
 {
+    int* commandNow;
     unsigned int uVar1;
-    int result;
     int* seInfo;
     int** seInfoBase;
-    int* commandNow;
+    int result;
     int* command;
 
     uVar1 = OSDisableInterrupts();

@@ -1,7 +1,7 @@
 #include "ffcc/p_tina.h"
 #include "ffcc/graphic.h"
 #include "ffcc/partMng.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/pppPart.h"

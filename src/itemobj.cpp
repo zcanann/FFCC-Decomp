@@ -6,7 +6,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/prgobj.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/vector.h"
 
 #include <math.h>

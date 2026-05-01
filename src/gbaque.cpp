@@ -7,7 +7,7 @@
 #include "ffcc/joybus.h"
 #include "ffcc/linkage.h"
 #include "ffcc/mes.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_gba.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/partyobj.h"

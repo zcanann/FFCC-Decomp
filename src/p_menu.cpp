@@ -10,7 +10,7 @@
 #include "ffcc/mesmenu.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/pad.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/ref.h"

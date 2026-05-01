@@ -9,7 +9,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/graphic.h"
 #include "ffcc/p_graphic.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/math.h"
 

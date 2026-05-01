@@ -5,7 +5,7 @@
 #include "ffcc/p_menu.h"
 #include "ffcc/sound.h"
 #include "ffcc/pad.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 
 class CGoOutMenu;
 class CCaravanWork;

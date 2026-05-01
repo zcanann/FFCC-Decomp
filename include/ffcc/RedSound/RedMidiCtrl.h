@@ -2,8 +2,20 @@
 #define _FFCC_REDSOUND_REDMIDICTRL_H
 
 struct RedKeyOnDATA;
-struct RedTrackDATA;
 struct RedSoundCONTROL;
+
+struct RedTrackDATA {
+	unsigned char* m_command;
+	unsigned char m_pad04[0x1C - 0x04];
+	int m_waveData;
+	unsigned char m_pad20[0x11C - 0x20];
+	int m_waveBase;
+	unsigned char m_pad120[0x124 - 0x120];
+	int m_waveNo;
+	unsigned char m_pad128[0x14D - 0x128];
+	unsigned char m_waveBankNo;
+	unsigned char m_pad14E[0x154 - 0x14E];
+};
 
 typedef void (*RedMidiControlFunc)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
 typedef int (*RedSwingFunc)(int);

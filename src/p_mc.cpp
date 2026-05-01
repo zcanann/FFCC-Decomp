@@ -11,6 +11,9 @@ unsigned int m_table__6CMcPcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMcPcs_80331B10)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1B
 };
 
+static unsigned int s_CMcPcsTablePad0[3] = {0, 0, 0};
+static unsigned int s_CMcPcsTablePad1[5] = {0, 0, 0, 0, 0};
+
 CMcPcs McPcs;
 
 class McCtrl;

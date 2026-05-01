@@ -546,11 +546,11 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
             controlData[0] = 0;
         }
     } else {
-        if ((u32)((int*)track)[6] != 0) {
-            c_RedEntry.WaveHistoryManager(0, *(short*)(((int*)track)[6] + 2));
+        if ((u32)track->m_waveBankData != 0) {
+            c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
         }
-        c_RedEntry.SeSepHistoryManager(0, ((int*)track)[0x3d]);
-        ((int*)track)[0x3e] = 0;
+        c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
+        track->m_seId = 0;
     }
 }
 

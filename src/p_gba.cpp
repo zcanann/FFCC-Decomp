@@ -68,9 +68,6 @@ CGbaPcsTable CGbaPcs::m_table = {
     },
 };
 
-static unsigned int s_CGbaPcsTablePad0[3] = {0, 0, 0};
-static unsigned int s_CGbaPcsTablePad1[5] = {0, 0, 0, 0, 0};
-
 CGbaPcs GbaPcs;
 
 /*

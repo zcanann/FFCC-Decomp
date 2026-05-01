@@ -220,46 +220,44 @@ void CMenuPcs::CompaInit()
  */
 bool CMenuPcs::CompaOpen()
 {
-    int finishedCount;
-    int count;
-    int frame;
-    int remaining;
-    CompaOpenAnim* entry;
+	int finished;
+	int count;
+	int frame;
+	CompaOpenAnim* anim;
 
-    if (this->compaMenuState->initialized == '\0') {
-        CompaInit();
-    }
+	if (this->compaMenuState->initialized == '\0') {
+		CompaInit();
+	}
 
-    finishedCount = 0;
-    this->compaMenuState->frame = this->compaMenuState->frame + 1;
-    count = static_cast<unsigned short>(*this->compaList);
-    entry = reinterpret_cast<CompaOpenAnim*>(this->compaList + 4);
-    frame = this->compaMenuState->frame;
-    remaining = count;
-    if (0 < count) {
-        do {
-            float step = FLOAT_80332FF8;
-            if (entry->startFrame <= frame) {
-                if (frame < entry->startFrame + entry->duration) {
-                    entry->frame = entry->frame + 1;
-                    entry->alpha = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
-                    if ((entry->flags & 2) == 0) {
-                        step = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
-                        entry->dx = (entry->targetX - (float)entry->x) * step;
-                        entry->dy = (entry->targetY - (float)entry->y) * step;
-                    }
-                } else {
-                    finishedCount = finishedCount + 1;
-                    entry->alpha = FLOAT_80333000;
-                    entry->dx = step;
-                    entry->dy = step;
-                }
-            }
-            entry++;
-            remaining = remaining + -1;
-        } while (remaining != 0);
-    }
-    return count == finishedCount;
+	finished = 0;
+	this->compaMenuState->frame++;
+
+	count = static_cast<unsigned short>(*this->compaList);
+	anim = reinterpret_cast<CompaOpenAnim*>(this->compaList + 4);
+	frame = this->compaMenuState->frame;
+
+	for (int i = 0; i < count; i++, anim++) {
+		float zero = FLOAT_80332FF8;
+		if (anim->startFrame <= frame) {
+			if (!(frame < anim->startFrame + anim->duration)) {
+				finished++;
+				anim->alpha = FLOAT_80333000;
+				anim->dx = zero;
+				anim->dy = zero;
+			} else {
+				anim->frame++;
+				double one = DOUBLE_80333008;
+				anim->alpha = (float)((DOUBLE_80333008 / (double)anim->duration) * (double)anim->frame);
+				if ((anim->flags & 2) == 0) {
+					float ratio = (float)((one / (double)anim->duration) * (double)anim->frame);
+					anim->dx = (anim->targetX - (float)anim->x) * ratio;
+					anim->dy = (anim->targetY - (float)anim->y) * ratio;
+				}
+			}
+		}
+	}
+
+	return count == finished;
 }
 
 /*
@@ -358,45 +356,41 @@ void CMenuPcs::CompaCtrl()
  */
 bool CMenuPcs::CompaClose()
 {
-    int finishedCount;
-    int count;
-    int frame;
-    int remaining;
-    CompaOpenAnim* entry;
+	int finished;
+	int count;
+	int frame;
+	CompaOpenAnim* anim;
 
-    finishedCount = 0;
-    this->compaMenuState->frame = this->compaMenuState->frame + 1;
-    count = static_cast<unsigned short>(*this->compaList);
-    entry = reinterpret_cast<CompaOpenAnim*>(this->compaList + 4);
-    frame = this->compaMenuState->frame;
-    remaining = count;
-    if (0 < count) {
-        do {
-            float step = FLOAT_80332FF8;
-            if (entry->startFrame <= frame) {
-                if (frame < entry->startFrame + entry->duration) {
-                    entry->frame = entry->frame + 1;
-                    entry->alpha =
-                        (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame - DOUBLE_80333008);
-                    if ((entry->flags & 2) == 0) {
-                        step =
-                            (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame - DOUBLE_80333008);
-                        entry->dx = (entry->targetX - (float)entry->x) * step;
-                        entry->dy = (entry->targetY - (float)entry->y) * step;
-                    }
-                } else {
-                    finishedCount = finishedCount + 1;
-                    entry->alpha = FLOAT_80332FF8;
-                    entry->dx = step;
-                    entry->dy = step;
-                }
-            }
-            entry++;
-            remaining = remaining + -1;
-        } while (remaining != 0);
-    }
+	finished = 0;
+	this->compaMenuState->frame++;
 
-    return count == finishedCount;
+	count = static_cast<unsigned short>(*this->compaList);
+	anim = reinterpret_cast<CompaOpenAnim*>(this->compaList + 4);
+	frame = this->compaMenuState->frame;
+
+	for (int i = 0; i < count; i++, anim++) {
+		float zero = FLOAT_80332FF8;
+		if (anim->startFrame <= frame) {
+			if (!(frame < anim->startFrame + anim->duration)) {
+				finished++;
+				anim->alpha = FLOAT_80332FF8;
+				anim->dx = zero;
+				anim->dy = zero;
+			} else {
+				anim->frame++;
+				double one = DOUBLE_80333008;
+				anim->alpha =
+					(float)-((DOUBLE_80333008 / (double)anim->duration) * (double)anim->frame - DOUBLE_80333008);
+				if ((anim->flags & 2) == 0) {
+					float ratio = (float)-((one / (double)anim->duration) * (double)anim->frame - one);
+					anim->dx = (anim->targetX - (float)anim->x) * ratio;
+					anim->dy = (anim->targetY - (float)anim->y) * ratio;
+				}
+			}
+		}
+	}
+
+	return count == finished;
 }
 
 /*

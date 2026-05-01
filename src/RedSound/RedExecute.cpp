@@ -1973,9 +1973,9 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
                 KeyOffSet(control, keyOnData, (RedTrackDATA*)track);
             }
             while (((u32)*track != 0) && (((RedTrackDATA*)track)->m_deltaTime < 1)) {
-                unsigned char* cmd = (unsigned char*)*track;
+                unsigned char* cmd = ((RedTrackDATA*)track)->m_command;
                 int delta;
-                *track = (int)(cmd + 1);
+                ((RedTrackDATA*)track)->m_command = cmd + 1;
                 p_MidiControl_Function[*cmd](control, keyOnData, (RedTrackDATA*)track);
                 if ((u32)*track != 0) {
                     if (((RedTrackDATA*)track)->m_deltaTime < 1) {
@@ -1986,11 +1986,13 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
                     }
 
                     if (delta != 0) {
-                        delta += *(s16*)(track + 0x4E);
+                        delta += ((RedTrackDATA*)track)->m_step;
                         if (delta < 1) {
                             delta = 1;
-                        } else if ((track[0x3F] & 0x20000) != 0) {
-                            delta += ((delta * track[0x3B] >> 8) * (int)GetRandomData()) >> 7;
+                        } else if ((((RedTrackDATA*)track)->m_voiceSwitch & 0x20000) != 0) {
+                            delta += ((delta * ((RedTrackDATA*)track)->m_fuzzyDeltaTimeDepth >> 8) *
+                                         (int)GetRandomData()) >>
+                                7;
                             if (delta < 1) {
                                 delta = 1;
                             }
@@ -2485,7 +2487,7 @@ int _SeMidiNoteExecute(
 {
     int* track = (int*)trackData;
     do {
-        if (((u32)*track != 0) && ((track[0x3F] & 8) == 0)) {
+        if (((u32)*track != 0) && ((((RedTrackDATA*)track)->m_voiceSwitch & 8) == 0)) {
             ((RedTrackDATA*)track)->m_seTickCounter += (s16)(tickStep * -0x78);
             while (((RedTrackDATA*)track)->m_seTickCounter < 1) {
                 int step = frames;
@@ -2503,18 +2505,20 @@ int _SeMidiNoteExecute(
                 while (((u32)*track != 0) && (((RedTrackDATA*)track)->m_deltaTime < 1)) {
                     int delta;
                     unsigned char* cmd;
-                    *(s16*)(track + 0x51) += 1;
-                    cmd = (unsigned char*)*track;
-                    *track = (int)(cmd + 1);
+                    ((RedTrackDATA*)track)->m_loopStepCurrent += 1;
+                    cmd = ((RedTrackDATA*)track)->m_command;
+                    ((RedTrackDATA*)track)->m_command = cmd + 1;
                     p_MidiControl_Function[*cmd](control, keyOnData, (RedTrackDATA*)track);
                     if ((u32)*track != 0) {
                         delta = DeltaTimeSumup((unsigned char**)track);
                         if (delta != 0) {
-                            delta += *(s16*)(track + 0x4E);
+                            delta += ((RedTrackDATA*)track)->m_step;
                             if (delta < 1) {
                                 delta = 1;
-                            } else if ((track[0x3F] & 0x20000) != 0) {
-                                delta += ((delta * track[0x3B] >> 8) * (int)GetRandomData()) >> 7;
+                            } else if ((((RedTrackDATA*)track)->m_voiceSwitch & 0x20000) != 0) {
+                                delta += ((delta * ((RedTrackDATA*)track)->m_fuzzyDeltaTimeDepth >> 8) *
+                                             (int)GetRandomData()) >>
+                                    7;
                                 if (delta < 1) {
                                     delta = 1;
                                 }

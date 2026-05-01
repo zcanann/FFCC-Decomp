@@ -1445,14 +1445,22 @@ int CGMonObj::calcBranchFuncLich(int)
  */
 void CGMonObj::changeStatFuncTetsukyojin(int stat)
 {
-	if (stat == 0x65) {
+	if (stat != 0x65) {
+		if (stat < 0x65) {
+			if (stat != -0xD) {
+				return;
+			}
+		} else if (stat == 0x67) {
+			setActionParam__8CGMonObjFi(this, -12);
+			return;
+		} else {
+			return;
+		}
+	} else {
 		setActionParam__8CGMonObjFi(this, -14);
-		*reinterpret_cast<int*>(SoundBuffer + 1260) += 1;
-	} else if (stat == -0xD) {
-		*reinterpret_cast<int*>(SoundBuffer + 1260) += 1;
-	} else if (stat == 0x67) {
-		setActionParam__8CGMonObjFi(this, -12);
 	}
+
+	*reinterpret_cast<int*>(SoundBuffer_1260_) += 1;
 }
 
 /*
@@ -1705,7 +1713,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
 int CGMonObj::calcBranchFuncTetsukyojin(int)
 {
 	const int branch = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0);
-	return (branch >> 31) + (static_cast<unsigned int>(branch) >= 1);
+	int positive = 1 <= branch;
+	return positive + (branch >> 31);
 }
 
 /*

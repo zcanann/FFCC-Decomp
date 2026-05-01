@@ -509,9 +509,7 @@ void CAStar::drawAStar()
 {
 	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x400) != 0)
 	{
-		int frameGroup = System.m_frameCounter / 0x1e + (System.m_frameCounter >> 31);
-
-		if (System.m_frameCounter == (frameGroup - (frameGroup >> 31)) * 0x1e)
+		if ((System.m_frameCounter % 0x1e) == 0)
 		{
 			for (int group = 0; group < 64; ++group)
 			{

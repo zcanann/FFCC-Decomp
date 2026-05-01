@@ -13,6 +13,7 @@ class CMapHitFace;
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
+extern "C" CMemory::CStage* g_hit_lpface_min;
 extern "C" char s_mapmesh_cpp_801D70B0[];
 extern "C" const float FLOAT_8032F930;
 extern "C" const float FLOAT_8032F934;
@@ -103,7 +104,7 @@ static inline unsigned int Align32(unsigned int value)
 
 static inline CMemory::CStage*& MapMeshAllocStage()
 {
-    return g_pStage;
+    return g_hit_lpface_min;
 }
 }
 

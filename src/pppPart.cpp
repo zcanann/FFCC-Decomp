@@ -912,7 +912,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			firstFailure = false;
 			memset(denied, 0, sizeof(denied));
 
-			s32 currentIdx = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x1D4))) / 0x158;
+			s32 currentIdx = ((s32)((u8*)pppMngStPtr - ((u8*)&PartMng + 0x1D4))) / 0x158;
 			denied[currentIdx] = 1;
 		}
 

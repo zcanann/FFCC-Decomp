@@ -375,7 +375,7 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     _PARTICLE_COLOR* particleColor)
 {
     u8* color = (u8*)particleData;
-    u32 alpha = ((u8*)particleColor)[0xb];
+    u32 alpha = ((u8*)vColor)[0xb];
     float* blend = (float*)(color + 0x30);
     float* velocityScale = (float*)(color + 0x28);
     float* tailScale = (float*)(color + 0x2c);
@@ -403,8 +403,8 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     pppScaleVectorXYZ(scaled, local, *tailScale);
     pppAddVector(*(Vec*)(color + 0x0), *(Vec*)(color + 0x0), scaled);
 
-    if (*(s16*)((u8*)&pYmMegaBirthShpTail2->m_matrix[1] + 0x4) != 0) {
-        *(s16*)(color + 0x22) = *(s16*)(color + 0x22) - 1;
+    if (*(u16*)((u8*)&pYmMegaBirthShpTail2->m_matrix[1] + 0x4) != 0) {
+        *(u16*)(color + 0x22) = *(u16*)(color + 0x22) - 1;
     }
 
     frameState[4] = frameState[4] + 1;
@@ -418,11 +418,9 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
 
     if ((frameState[6] != 0) && (*(u16*)(color + 0x22) <= frameState[6])) {
         fadeInFrames = *((u8*)&pYmMegaBirthShpTail2->m_matrix[1] + 7);
-        if (fadeInFrames != 0) {
-            *blend = *blend + ((float)alpha / (float)fadeInFrames);
-            if (*blend > 1.0f) {
-                *blend = 1.0f;
-            }
+        *blend = *blend + ((float)alpha / (float)fadeInFrames);
+        if (*blend > FLOAT_80330570) {
+            *blend = FLOAT_80330570;
         }
     }
 
@@ -441,7 +439,7 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     *(u16*)(color + 0x20) = frameIndex;
 
     frameEntry = colorTable + (u32)frameIndex * 8 + 0x10;
-    *(s16*)(color + 0x1c) = *(s16*)(color + 0x1c) + *(s16*)((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 8);
+    *(u16*)(color + 0x1c) = *(u16*)(color + 0x1c) + *(s16*)((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 8);
     frameDuration = *(s16*)(frameEntry + 2);
     if ((int)frameDuration <= *(u16*)(color + 0x1c)) {
         *(u16*)(color + 0x1c) = *(u16*)(color + 0x1c) - frameDuration;

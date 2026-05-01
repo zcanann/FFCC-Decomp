@@ -6,11 +6,30 @@
 class AXFX_BUFFERUPDATE;
 struct RedReverbDATA;
 struct RedTrackDATA;
-struct RedVoiceDATA;
 struct RedWaveDATA;
 struct RedNoteDATA;
 struct RedSoundCONTROL;
 struct RedKeyOnDATA;
+
+struct RedVoiceDATA {
+	RedTrackDATA* m_track;
+	RedNoteDATA* m_note;
+	RedWaveDATA* m_waveData;
+	void* m_axVoice;
+	unsigned char m_pad10[0x1A - 0x10];
+	unsigned char m_stateFlags;
+	unsigned char m_pad1B[0x90 - 0x1B];
+	unsigned int m_flags;
+	unsigned int m_voiceSwitch;
+	int m_pitch;
+	int m_targetPitch;
+	int m_basePitch;
+	unsigned char m_padA4[0xB0 - 0xA4];
+	int m_envelopeLevel;
+	unsigned char m_padB4[0xB8 - 0xB4];
+	unsigned int m_updateFlags;
+	unsigned char m_padBC[0xC0 - 0xBC];
+};
 
 u8 GetRandomData();
 int PitchCompute(int, int, int, int);

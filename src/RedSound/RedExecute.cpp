@@ -606,13 +606,13 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
  */
 void _VoiceEnvelopeCheck()
 {
-    unsigned int* voiceData = p_VoiceData;
+    RedVoiceDATA* voiceData = (RedVoiceDATA*)p_VoiceData;
     do {
-        if ((((u8*)voiceData)[0x1A] & 7) != 0) {
-            voiceData[0x2C] = 0x8000;
+        if ((voiceData->m_stateFlags & 7) != 0) {
+            voiceData->m_envelopeLevel = 0x8000;
         }
-        voiceData += 0x30;
-    } while (voiceData < p_VoiceData + 0xC00);
+        voiceData++;
+    } while (voiceData < (RedVoiceDATA*)(p_VoiceData + 0xC00));
 }
 
 /*

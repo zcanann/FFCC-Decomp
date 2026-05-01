@@ -160,7 +160,7 @@ struct RedSoundCONTROL {
 	unsigned int m_updateFlags;
 	short m_tickCounter;
 	short m_activeTrackCount;
-	unsigned char m_pad490[0x491 - 0x490];
+	unsigned char m_channelAlloc;
 	unsigned char m_trackCount;
 };
 

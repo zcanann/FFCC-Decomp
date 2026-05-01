@@ -883,7 +883,7 @@ void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDA
  */
 void __MidiCtrl_PhraseSignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int command = *(*(u8**)track)++;
+    int command = *track->m_command++;
 }
 
 /*
@@ -1628,7 +1628,7 @@ void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_ChannelAlloc(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    *((unsigned char*)control + 0x490) = (int)*(*(unsigned char**)track)++;
+    control->m_channelAlloc = (int)*track->m_command++;
 }
 
 /*
@@ -1644,11 +1644,11 @@ void __MidiCtrl_ChannelPriority(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
 {
     int command;
 
-    command = *(*(u8**)track)++;
+    command = *track->m_command++;
     if (command != 0) {
-        *(u8*)((char*)track + 0x26) |= 8;
+        track->m_note.m_allocFlags |= 8;
     } else {
-        *(u8*)((char*)track + 0x26) &= ~8;
+        track->m_note.m_allocFlags &= ~8;
     }
 }
 
@@ -1665,11 +1665,11 @@ void __MidiCtrl_ChannelFix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int command;
 
-    command = *(*(u8**)track)++;
+    command = *track->m_command++;
     if (command != 0) {
-        *(u8*)((char*)track + 0x26) |= 4;
+        track->m_note.m_allocFlags |= 4;
     } else {
-        *(u8*)((char*)track + 0x26) &= ~4;
+        track->m_note.m_allocFlags &= ~4;
     }
 }
 
@@ -2300,14 +2300,13 @@ void _PitchBendCompute(RedTrackDATA* track, int bend)
  */
 void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int bend = (unsigned int)*(unsigned char*)(((int*)track)[0] + 1) * 0x80 +
-        ((unsigned int)*(unsigned char*)((int*)track)[0] - 0x2000);
+    int bend = (unsigned int)track->m_command[1] * 0x80 + ((unsigned int)track->m_command[0] - 0x2000);
 
     track->m_pitchBendRaw = bend;
     bend *= track->m_pitchBendRange;
     bend >>= 5;
     track->m_pitchBend = bend;
-    ((int*)track)[0] += 2;
+    track->m_command += 2;
     _PitchBendCompute(track, track->m_pitchBend);
 }
 
@@ -2417,7 +2416,7 @@ void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
     int value;
     short step;
 
-    value = (s8)*(*(u8**)track)++;
+    value = (s8)*track->m_command++;
     if (value != 0) {
         step = track->m_step + value;
     } else {
@@ -2447,7 +2446,7 @@ void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tra
     int value;
     short step;
 
-    value = *(*(unsigned char**)track)++;
+    value = *track->m_command++;
     track->m_step = 0;
 
     if (value != 0) {
@@ -2479,8 +2478,8 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     int value;
     int fuzzyValue;
 
-    mode = *(*(u8**)track)++;
-    value = *(*(u8**)track)++;
+    mode = *track->m_command++;
+    value = *track->m_command++;
     if (value != 0) {
         fuzzyValue = value + 1;
     } else {
@@ -2525,7 +2524,7 @@ void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int mode;
 
-    mode = *(*(u8**)track)++;
+    mode = *track->m_command++;
 
     switch (mode) {
     case 1:

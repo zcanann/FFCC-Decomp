@@ -848,8 +848,8 @@ void _PitchExecute(RedVoiceDATA* voice)
     int pitchDelta = 0;
     int* voiceData = (int*)voice;
 
-    if (((u32)*(int*)(voiceData[0] + 0x74) != 0) && (voice->m_pitchModDelay == 0)) {
-        int pitchLfo = *(int*)(voiceData[0] + 0x80) >> 0xC;
+    if (((u32)voice->m_track->m_vibrateFunc != 0) && (voice->m_pitchModDelay == 0)) {
+        int pitchLfo = voice->m_track->m_vibrateDepth >> 0xC;
         if (pitchLfo < 0x80) {
             pitchDelta = (pitchLfo + 1) * 2;
         } else {
@@ -861,7 +861,7 @@ void _PitchExecute(RedVoiceDATA* voice)
 
         if ((((u8*)voiceData)[0x1A] & 3) != 0) {
             pitchDelta = PitchCompute(
-                voiceData[0x28] + *(int*)(voiceData[0] + 0x5C),
+                voiceData[0x28] + voice->m_track->m_pitch,
                 pitchDelta,
                 ((int*)voiceData[1])[5],
                 ((RedTrackDATA*)voiceData[0])->m_fineTune);
@@ -875,7 +875,7 @@ void _PitchExecute(RedVoiceDATA* voice)
 
         {
             int currentPitch = voice->m_pitch;
-            int (*pitchWaveFunc)(u32) = *(int (**)(u32))(voiceData[0] + 0x74);
+            int (*pitchWaveFunc)(u32) = (int (*)(u32))voice->m_track->m_vibrateFunc;
             int pitchWave = pitchWaveFunc((u32)voice->m_pitchModPhase >> 0xC);
             pitchDelta = ((pitchDelta - currentPitch) * (pitchWave >> 4)) >> 0xC;
         }
@@ -894,7 +894,7 @@ void _PitchExecute(RedVoiceDATA* voice)
             pitchDelta >>= 1;
         }
 
-        voice->m_pitchModPhase += *(int*)(voiceData[0] + 0x78);
+        voice->m_pitchModPhase += voice->m_track->m_vibrateRate;
     }
 
     voice->m_targetPitch = pitchDelta + voice->m_pitch + voice->m_randomPitch;

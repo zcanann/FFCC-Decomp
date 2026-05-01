@@ -51,7 +51,7 @@ struct RedVoiceDATA {
 	int m_adsrStage;
 	int m_adsrStepFrames;
 	int m_adsrStepAdd;
-	unsigned char m_pad68[0x8C - 0x68];
+	unsigned short m_axMix[0x12];
 	int m_active;
 	unsigned int m_flags;
 	unsigned int m_voiceSwitch;

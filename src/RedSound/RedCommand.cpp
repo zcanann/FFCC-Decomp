@@ -809,8 +809,8 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 
 	music[0x11d] = 1;
 	*(unsigned char*)((char*)music + 0x490) = 0;
-	music[0x120] = 0;
-	music[2] = (int)(t_KeySignatureData + 0xb);
+	((RedSoundCONTROL*)music)->m_keySignature = 0;
+	((RedSoundCONTROL*)music)->m_keySignatureData = t_KeySignatureData + 0xb;
 	*(unsigned char*)((char*)music + 0x491) = musicHead->m_trackCount;
 	*(short*)((char*)music + 0x48e) = (short)musicHead->m_trackCount;
 	*(unsigned char*)((char*)music + 0x492) = (unsigned char)(musicHead->m_flags & 0x7f);

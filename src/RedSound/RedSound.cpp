@@ -372,9 +372,9 @@ void CRedSound::SetMusicData(void* musicData)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::ReentryMusicData(int bank)
+int CRedSound::ReentryMusicData(int bank)
 {
-	c_Driver.ReentryMusicData(bank);
+	return c_Driver.ReentryMusicData(bank);
 }
 
 /*
@@ -514,9 +514,9 @@ void CRedSound::ClearSeSepDataMG(int bank, int sep, int group, int kind)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::ReentrySeSepData(int id)
+int CRedSound::ReentrySeSepData(int id)
 {
-	c_Driver.ReentrySeSepData(id);
+	return c_Driver.ReentrySeSepData(id);
 }
 
 /*
@@ -676,9 +676,9 @@ int CRedSound::GetSeVolume(int seID, int outVolume)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::ReportSeLoop(int mode)
+int CRedSound::ReportSeLoop(int mode)
 {
-	c_Driver.ReportSeLoop(mode);
+	return c_Driver.ReportSeLoop(mode);
 }
 
 /*
@@ -850,9 +850,9 @@ void CRedSound::ClearWaveBank(int id)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::ReentryWaveData(int id)
+int CRedSound::ReentryWaveData(int id)
 {
-	c_Driver.ReentryWaveData(id);
+	return c_Driver.ReentryWaveData(id);
 }
 
 /*

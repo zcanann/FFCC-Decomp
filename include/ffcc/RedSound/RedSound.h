@@ -26,7 +26,7 @@ public:
 	void SetReverbDepth(int, int, int);
 
 	void SetMusicData(void*);
-	void ReentryMusicData(int);
+	int ReentryMusicData(int);
 	void MusicStop(int);
 	void MusicPlay(int, int, int);
 	void MusicCrossPlay(int, int, int);
@@ -40,7 +40,7 @@ public:
 	void SetSeSepData(void*);
 	void ClearSeSepData(int);
 	void ClearSeSepDataMG(int, int, int, int);
-	void ReentrySeSepData(int);
+	int ReentrySeSepData(int);
 
 	int SePlayState(int);
 	void SeStop(int);
@@ -53,7 +53,7 @@ public:
 	void SePitch(int, int, int);
 	void SePause(int, int);
 	int GetSeVolume(int, int);
-	void ReportSeLoop(int);
+	int ReportSeLoop(int);
 	void DisplaySePlayInfo();
 
 	int StreamPlayState(int);
@@ -67,7 +67,7 @@ public:
 	void ClearWaveData(int);
 	void ClearWaveDataM(int, int, int, int);
 	void ClearWaveBank(int);
-	void ReentryWaveData(int);
+	int ReentryWaveData(int);
 	void DisplayWaveInfo();
 
 	void TestProcess(int);

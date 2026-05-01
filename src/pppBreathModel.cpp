@@ -528,21 +528,21 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
 
         work->m_particleData =
             (PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x98), pppEnvStPtr->m_stagePtr,
-                                                  const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x257);
+                                                                 const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x257);
         if (work->m_particleData != NULL) {
             memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * 0x98));
         }
 
         work->m_particleWmats =
             (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x30), pppEnvStPtr->m_stagePtr,
-                                                  const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x25d);
+                                                                  const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x25d);
         if (work->m_particleWmats != NULL) {
             memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * 0x30));
         }
 
         work->m_particleColors =
             (PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount << 5), pppEnvStPtr->m_stagePtr,
-                                                  const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x263);
+                                                                  const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x263);
         if (work->m_particleColors != NULL) {
             memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount << 5));
         }
@@ -637,9 +637,9 @@ group_ready:
 void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor)
 {
     PBreathModel* params = reinterpret_cast<PBreathModel*>(pBreathModel);
-    BreathParticleData* particleData;
-    PARTICLE_WMAT* particleWmat;
-    PARTICLE_COLOR* particleColor;
+    unsigned char* particleData;
+    unsigned char* particleWmat;
+    unsigned char* particleColor;
     BreathParticleGroup* groupTable;
     int maxParticleCount;
     unsigned short* emitFrameCounter;
@@ -653,12 +653,12 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     BreathParticleGroup* groupData;
     short foundSlot;
     short foundGroup;
-    Vec unitVelocity;
     Vec stepVelocity;
+    Vec unitVelocity;
 
-    particleData = reinterpret_cast<BreathParticleData*>(vBreathModel->m_particleData);
-    particleWmat = vBreathModel->m_particleWmats;
-    particleColor = vBreathModel->m_particleColors;
+    particleData = reinterpret_cast<unsigned char*>(vBreathModel->m_particleData);
+    particleWmat = reinterpret_cast<unsigned char*>(vBreathModel->m_particleWmats);
+    particleColor = reinterpret_cast<unsigned char*>(vBreathModel->m_particleColors);
     groupTable = vBreathModel->m_groups;
     maxParticleCount = vBreathModel->m_particleCount;
     spawnCount = 0;
@@ -668,9 +668,11 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
         *emitFrameCounter = *emitFrameCounter + 1;
 
         for (i = 0; i < maxParticleCount; i++) {
-            if (particleData->m_life > 0) {
+            BreathParticleData* particle = reinterpret_cast<BreathParticleData*>(particleData);
+            if (particle->m_life > 0) {
                 UpdateParticle(
-                    vBreathModel, pBreathModel, (PARTICLE_DATA*)particleData, vColor, particleColor);
+                    vBreathModel, pBreathModel, reinterpret_cast<PARTICLE_DATA*>(particleData), vColor,
+                    reinterpret_cast<PARTICLE_COLOR*>(particleColor));
             } else {
                 float zero = 0.0f;
 
@@ -731,8 +733,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                     bool placing;
 
                     BirthParticle(
-                        pppObject, vBreathModel, pBreathModel, vColor, (PARTICLE_DATA*)particleData,
-                        particleWmat, particleColor);
+                        pppObject, vBreathModel, pBreathModel, vColor, reinterpret_cast<PARTICLE_DATA*>(particleData),
+                        reinterpret_cast<PARTICLE_WMAT*>(particleWmat), reinterpret_cast<PARTICLE_COLOR*>(particleColor));
                     placing = true;
                     spawnCount += 1;
                     groupData = groupTable;
@@ -756,12 +758,12 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
             }
 
             if (particleWmat != NULL) {
-                particleWmat += 1;
+                particleWmat += 0x30;
             }
             if (particleColor != NULL) {
-                particleColor += 1;
+                particleColor += 0x20;
             }
-            particleData += 1;
+            particleData += 0x98;
         }
 
         if (spawnCount > 0) {

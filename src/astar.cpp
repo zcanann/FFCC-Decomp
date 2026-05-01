@@ -972,90 +972,88 @@ float CAStar::CAPos::CalcLength(CAStar::CAPos& other)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80142a80
+ * PAL Size: 276b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CAStar::CATemp::CATemp(const CAStar::CATemp& other)
 {
 	u32 v0;
 	u32 v1;
-	u32 v2;
 
-	u32* dstV = reinterpret_cast<u32*>(m_visited);
-	const u32* srcV = reinterpret_cast<const u32*>(other.m_visited);
+	u32* dst = reinterpret_cast<u32*>(this);
+	const u32* src = reinterpret_cast<const u32*>(&other);
 
-	v2 = srcV[1];
-	v0 = srcV[0];
-	dstV[0] = v0;
-	v1 = srcV[2];
-	dstV[1] = v2;
-	v2 = srcV[3];
-	dstV[2] = v1;
-	v1 = srcV[4];
-	dstV[3] = v2;
-	v2 = srcV[5];
-	dstV[4] = v1;
-	v1 = srcV[6];
-	dstV[5] = v2;
-	v2 = srcV[7];
-	dstV[6] = v1;
-	v1 = srcV[8];
-	dstV[7] = v2;
-	v2 = srcV[9];
-	dstV[8] = v1;
-	v1 = srcV[10];
-	dstV[9] = v2;
-	v2 = srcV[11];
-	dstV[10] = v1;
-	v1 = srcV[12];
-	dstV[11] = v2;
-	v2 = srcV[13];
-	dstV[12] = v1;
-	v1 = srcV[14];
-	dstV[13] = v2;
-	v2 = srcV[15];
-	dstV[14] = v1;
-
-	u32* dstP = reinterpret_cast<u32*>(m_path);
-	const u32* srcP = reinterpret_cast<const u32*>(other.m_path);
-
-	v0 = srcP[0];
-	dstV[15] = v2;
-	v1 = srcP[1];
-	dstP[0] = v0;
-	v0 = srcP[2];
-	dstP[1] = v1;
-	v1 = srcP[3];
-	dstP[2] = v0;
-	v0 = srcP[4];
-	dstP[3] = v1;
-	v1 = srcP[5];
-	dstP[4] = v0;
-	v0 = srcP[6];
-	dstP[5] = v1;
-	v1 = srcP[7];
-	dstP[6] = v0;
-	v0 = srcP[8];
-	dstP[7] = v1;
-	v1 = srcP[9];
-	dstP[8] = v0;
-	v0 = srcP[10];
-	dstP[9] = v1;
-	v1 = srcP[11];
-	dstP[10] = v0;
-	v0 = srcP[12];
-	dstP[11] = v1;
-	v1 = srcP[13];
-	dstP[12] = v0;
-	v0 = srcP[14];
-	dstP[13] = v1;
-	v1 = srcP[15];
-	dstP[14] = v0;
-
-	int pathLength = other.m_pathLength;
-	dstP[15] = v1;
+	v0 = src[0];
+	v1 = src[1];
+	dst[0] = v0;
+	v0 = src[2];
+	dst[1] = v1;
+	v1 = src[3];
+	dst[2] = v0;
+	v0 = src[4];
+	dst[3] = v1;
+	v1 = src[5];
+	dst[4] = v0;
+	v0 = src[6];
+	dst[5] = v1;
+	v1 = src[7];
+	dst[6] = v0;
+	v0 = src[8];
+	dst[7] = v1;
+	v1 = src[9];
+	dst[8] = v0;
+	v0 = src[10];
+	dst[9] = v1;
+	v1 = src[11];
+	dst[10] = v0;
+	v0 = src[12];
+	dst[11] = v1;
+	v1 = src[13];
+	dst[12] = v0;
+	v0 = src[14];
+	dst[13] = v1;
+	v1 = src[15];
+	dst[14] = v0;
+	v0 = src[16];
+	dst[15] = v1;
+	v1 = src[17];
+	dst[16] = v0;
+	v0 = src[18];
+	dst[17] = v1;
+	v1 = src[19];
+	dst[18] = v0;
+	v0 = src[20];
+	dst[19] = v1;
+	v1 = src[21];
+	dst[20] = v0;
+	v0 = src[22];
+	dst[21] = v1;
+	v1 = src[23];
+	dst[22] = v0;
+	v0 = src[24];
+	dst[23] = v1;
+	v1 = src[25];
+	dst[24] = v0;
+	v0 = src[26];
+	dst[25] = v1;
+	v1 = src[27];
+	dst[26] = v0;
+	v0 = src[28];
+	dst[27] = v1;
+	v1 = src[29];
+	dst[28] = v0;
+	v0 = src[30];
+	dst[29] = v1;
+	v1 = src[31];
+	dst[30] = v0;
+	v0 = src[32];
+	dst[31] = v1;
 	float cost = other.m_cost;
-	m_pathLength = pathLength;
+	dst[32] = v0;
 	m_cost = cost;
 }
 
@@ -1090,89 +1088,87 @@ int CAStar::CAPos::IsExist(int group)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80142bd4
+ * PAL Size: 276b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAStar::CATemp::operator= (const CAStar::CATemp& other)
 {
 	u32 v0;
 	u32 v1;
-	u32 v2;
 
-	u32* dstV = reinterpret_cast<u32*>(m_visited);
-	const u32* srcV = reinterpret_cast<const u32*>(other.m_visited);
+	u32* dst = reinterpret_cast<u32*>(this);
+	const u32* src = reinterpret_cast<const u32*>(&other);
 
-	v2 = srcV[1];
-	v0 = srcV[0];
-	dstV[0] = v0;
-	v1 = srcV[2];
-	dstV[1] = v2;
-	v2 = srcV[3];
-	dstV[2] = v1;
-	v1 = srcV[4];
-	dstV[3] = v2;
-	v2 = srcV[5];
-	dstV[4] = v1;
-	v1 = srcV[6];
-	dstV[5] = v2;
-	v2 = srcV[7];
-	dstV[6] = v1;
-	v1 = srcV[8];
-	dstV[7] = v2;
-	v2 = srcV[9];
-	dstV[8] = v1;
-	v1 = srcV[10];
-	dstV[9] = v2;
-	v2 = srcV[11];
-	dstV[10] = v1;
-	v1 = srcV[12];
-	dstV[11] = v2;
-	v2 = srcV[13];
-	dstV[12] = v1;
-	v1 = srcV[14];
-	dstV[13] = v2;
-	v2 = srcV[15];
-	dstV[14] = v1;
-
-	u32* dstP = reinterpret_cast<u32*>(m_path);
-	const u32* srcP = reinterpret_cast<const u32*>(other.m_path);
-
-	v0 = srcP[0];
-	dstV[15] = v2;
-	v1 = srcP[1];
-	dstP[0] = v0;
-	v0 = srcP[2];
-	dstP[1] = v1;
-	v1 = srcP[3];
-	dstP[2] = v0;
-	v0 = srcP[4];
-	dstP[3] = v1;
-	v1 = srcP[5];
-	dstP[4] = v0;
-	v0 = srcP[6];
-	dstP[5] = v1;
-	v1 = srcP[7];
-	dstP[6] = v0;
-	v0 = srcP[8];
-	dstP[7] = v1;
-	v1 = srcP[9];
-	dstP[8] = v0;
-	v0 = srcP[10];
-	dstP[9] = v1;
-	v1 = srcP[11];
-	dstP[10] = v0;
-	v0 = srcP[12];
-	dstP[11] = v1;
-	v1 = srcP[13];
-	dstP[12] = v0;
-	v0 = srcP[14];
-	dstP[13] = v1;
-	v1 = srcP[15];
-	dstP[14] = v0;
-
-	int pathLength = other.m_pathLength;
-	dstP[15] = v1;
+	v0 = src[0];
+	v1 = src[1];
+	dst[0] = v0;
+	v0 = src[2];
+	dst[1] = v1;
+	v1 = src[3];
+	dst[2] = v0;
+	v0 = src[4];
+	dst[3] = v1;
+	v1 = src[5];
+	dst[4] = v0;
+	v0 = src[6];
+	dst[5] = v1;
+	v1 = src[7];
+	dst[6] = v0;
+	v0 = src[8];
+	dst[7] = v1;
+	v1 = src[9];
+	dst[8] = v0;
+	v0 = src[10];
+	dst[9] = v1;
+	v1 = src[11];
+	dst[10] = v0;
+	v0 = src[12];
+	dst[11] = v1;
+	v1 = src[13];
+	dst[12] = v0;
+	v0 = src[14];
+	dst[13] = v1;
+	v1 = src[15];
+	dst[14] = v0;
+	v0 = src[16];
+	dst[15] = v1;
+	v1 = src[17];
+	dst[16] = v0;
+	v0 = src[18];
+	dst[17] = v1;
+	v1 = src[19];
+	dst[18] = v0;
+	v0 = src[20];
+	dst[19] = v1;
+	v1 = src[21];
+	dst[20] = v0;
+	v0 = src[22];
+	dst[21] = v1;
+	v1 = src[23];
+	dst[22] = v0;
+	v0 = src[24];
+	dst[23] = v1;
+	v1 = src[25];
+	dst[24] = v0;
+	v0 = src[26];
+	dst[25] = v1;
+	v1 = src[27];
+	dst[26] = v0;
+	v0 = src[28];
+	dst[27] = v1;
+	v1 = src[29];
+	dst[28] = v0;
+	v0 = src[30];
+	dst[29] = v1;
+	v1 = src[31];
+	dst[30] = v0;
+	v0 = src[32];
+	dst[31] = v1;
 	float cost = other.m_cost;
-	m_pathLength = pathLength;
+	dst[32] = v0;
 	m_cost = cost;
 }

@@ -255,16 +255,15 @@ int CRedEntry::SearchUseWave(int waveNo)
  */
 int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 {
-	int* bankEntry = reinterpret_cast<int*>(bank);
 	int sequenceNo = -1;
 	int iVar2;
 
-	if (bankEntry[0] >= 0) {
-		WaveHistoryDelete(bankEntry[1]);
-		iVar2 = bankEntry[0];
+	if (bank->m_id >= 0) {
+		WaveHistoryDelete(bank->m_historyNo);
+		iVar2 = bank->m_id;
 
-		bankEntry[0] = -1;
-		bankEntry[3] = 0;
+		bank->m_id = -1;
+		bank->m_size = 0;
 
 		sequenceNo = SearchWaveSequence(iVar2);
 		if (sequenceNo < 0) {
@@ -279,12 +278,12 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
 				fflush(__files + 1);
 			}
-			RedDeleteA(*reinterpret_cast<int*>(bankEntry[2] + 0x10));
-			RedDelete(bankEntry[2]);
+			RedDeleteA(reinterpret_cast<RedWaveHeadWD*>(bank->m_data)->m_aramAddress);
+			RedDelete(bank->m_data);
 		}
 
-		bankEntry[2] = 0;
-		bankEntry[1] = 0;
+		bank->m_data = 0;
+		bank->m_historyNo = 0;
 	}
 
 	return sequenceNo;

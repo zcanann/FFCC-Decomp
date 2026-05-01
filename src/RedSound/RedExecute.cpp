@@ -859,7 +859,7 @@ void _PitchExecute(RedVoiceDATA* voice)
         pitchDelta = voice->m_track->m_pitchBend + pitchDelta;
         pitchDelta = voice->m_track->m_keyTranspose + pitchDelta;
 
-        if ((((u8*)voiceData)[0x1A] & 3) != 0) {
+        if ((voice->m_stateFlags & 3) != 0) {
             pitchDelta = PitchCompute(
                 voice->m_basePitch + voice->m_track->m_pitch,
                 pitchDelta,
@@ -875,7 +875,7 @@ void _PitchExecute(RedVoiceDATA* voice)
 
         {
             int currentPitch = voice->m_pitch;
-            int (*pitchWaveFunc)(u32) = (int (*)(u32))voice->m_track->m_vibrateFunc;
+            RedSwingFunc pitchWaveFunc = (RedSwingFunc)voice->m_track->m_vibrateFunc;
             int pitchWave = pitchWaveFunc((u32)voice->m_pitchModPhase >> 0xC);
             pitchDelta = ((pitchDelta - currentPitch) * (pitchWave >> 4)) >> 0xC;
         }
@@ -1800,7 +1800,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
     int* trackData = (int*)track;
     int* voiceData;
 
-    trackData[0x43] += frames;
+    track->m_playTime += frames;
 
     if (trackData[0x0C] != 0) {
         int step = frames;

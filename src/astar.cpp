@@ -80,8 +80,12 @@ void CAStar::reset()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80142ce8
+ * PAL Size: 668b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 {
@@ -133,8 +137,8 @@ void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 	portal.m_position.x = pos.x;
 	portal.m_position.y = pos.y;
 	portal.m_position.z = pos.z;
-	portal.m_groupA = static_cast<unsigned char>(groupA);
-	portal.m_groupB = static_cast<unsigned char>(groupB);
+	m_portals[index].m_groupA = static_cast<unsigned char>(groupA);
+	m_portals[index].m_groupB = static_cast<unsigned char>(groupB);
 }
 
 

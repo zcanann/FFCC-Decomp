@@ -731,8 +731,8 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 
 	*music = trackBase;
 
-	if (*(char*)((char*)musicHead + 9) != 0) {
-		unsigned int reverbKind = ((int)*(char*)((char*)musicHead + 9) - 1U) & 7;
+	if (musicHead->m_reverbKind != 0) {
+		unsigned int reverbKind = ((int)musicHead->m_reverbKind - 1U) & 7;
 		SetReverb(0, t_ReverbModeData[reverbKind].kind, t_ReverbModeData[reverbKind].params);
 	}
 

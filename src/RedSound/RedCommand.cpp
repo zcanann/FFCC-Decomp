@@ -179,10 +179,10 @@ int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 		do {
 			track = scan;
 			remaining--;
-			if ((remaining != 0) && ((u32)*track == 0) && ((((unsigned char*)track)[0x26] & 2) == 0)) {
+			if ((remaining != 0) && ((u32)*track == 0) && ((((RedTrackDATA*)track)->m_note.m_allocFlags & 2) == 0)) {
 				scan = track - 0x55;
 			} else {
-				if (((u32)*track != 0) || ((((unsigned char*)track)[0x26] & 2) != 0)) {
+				if (((u32)*track != 0) || ((((RedTrackDATA*)track)->m_note.m_allocFlags & 2) != 0)) {
 					remaining = 1;
 					scan = track;
 				}
@@ -428,7 +428,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				track[0x48] = 0xffffffff;
 				((RedTrackDATA*)track)->m_voiceSwitch = 0xc00;
 				memset(track + 0x35, 0xff, 0xc);
-				*(unsigned char*)((char*)track + 0x26) = 5;
+				((RedTrackDATA*)track)->m_note.m_allocFlags = 5;
 				((RedTrackDATA*)track)->m_seTickCounter = 1;
 				*seTrack = (int)track;
 				*(unsigned char*)((char*)seTrack + 0x1a) = 5;
@@ -796,7 +796,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		((RedTrackDATA*)track)->m_fuzzyVolumeDepth = 0;
 		((RedTrackDATA*)track)->m_fuzzyPitchDepth = 0;
 		track[0x48] = 0xffffffff;
-		*(unsigned char*)((char*)track + 0x26) = 0;
+		((RedTrackDATA*)track)->m_note.m_allocFlags = 0;
 		((RedTrackDATA*)track)->m_voiceSwitch = 0xc02;
 		memset(track + 0x35, 0xff, 0xc);
 

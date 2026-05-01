@@ -19,7 +19,16 @@ struct RedTrackDATA {
 	int m_pan;
 	int m_panAdd;
 	int m_panDelta;
-	unsigned char m_pad4C[0x74 - 0x4C];
+	int m_mixVolume;
+	int m_mixVolumeAdd;
+	int m_mixVolumeDelta;
+	int m_mixVolumeMode;
+	int m_pitch;
+	int m_pitchAdd;
+	int m_pitchDelta;
+	int m_reverbDepth;
+	int m_reverbDepthAdd;
+	int m_reverbDepthDelta;
 	int m_vibrateFunc;
 	int m_vibrateRate;
 	int m_vibrateRateAdd;

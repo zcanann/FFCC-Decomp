@@ -385,20 +385,20 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			if (*(char*)*track != '\0') {
 				((RedTrackDATA*)track)->m_eraseTrack = info->m_eraseTrack;
 				((RedTrackDATA*)track)->m_attrMask = info->m_attrMask;
-				track[0x13] = volume << 0xc;
-				track[0x15] = 0;
-				track[0x16] = 0;
-				track[0x19] = 0;
-				track[0x17] = 0;
+				((RedTrackDATA*)track)->m_mixVolume = volume << 0xc;
+				((RedTrackDATA*)track)->m_mixVolumeDelta = 0;
+				((RedTrackDATA*)track)->m_mixVolumeMode = 0;
+				((RedTrackDATA*)track)->m_pitchDelta = 0;
+				((RedTrackDATA*)track)->m_pitch = 0;
 				track[0x40] = isMulti;
 				((RedTrackDATA*)track)->m_volume = 0x7fff000;
 				((RedTrackDATA*)track)->m_expression = 0x7f000;
 				((RedTrackDATA*)track)->m_pan = pan << 0xc;
-				track[0x1a] = *(int*)((char*)p_ReverbDepth + 0xc);
-				track[0x1c] = 0;
-				track[0x12] = 0;
-				track[0xf] = 0;
-				track[0xc] = 0;
+				((RedTrackDATA*)track)->m_reverbDepth = *(int*)((char*)p_ReverbDepth + 0xc);
+				((RedTrackDATA*)track)->m_reverbDepthDelta = 0;
+				((RedTrackDATA*)track)->m_panDelta = 0;
+				((RedTrackDATA*)track)->m_expressionDelta = 0;
+				((RedTrackDATA*)track)->m_volumeDelta = 0;
 				track[0x45] = 0;
 				track[0x44] = 0;
 				track[0x46] = 0;
@@ -553,11 +553,11 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 
 	do {
 		if (((u32)*track != 0) && ((seId < 0) || (((RedTrackDATA*)track)->m_seId == seId))) {
-			int delta = volume - track[0x13];
+			int delta = volume - ((RedTrackDATA*)track)->m_mixVolume;
 			delta /= frameCount;
-			track[0x14] = delta;
-			track[0x15] = frameCount;
-			track[0x16] = mode;
+			((RedTrackDATA*)track)->m_mixVolumeAdd = delta;
+			((RedTrackDATA*)track)->m_mixVolumeDelta = frameCount;
+			((RedTrackDATA*)track)->m_mixVolumeMode = mode;
 		}
 		track += 0x55;
 	} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
@@ -590,8 +590,8 @@ void SetSePan(int seId, int pan, int frameCount)
 		if (((u32)*track != 0) && ((seId < 0) || (((RedTrackDATA*)track)->m_seId == seId))) {
 			int delta = pan - ((RedTrackDATA*)track)->m_pan;
 			delta /= frameCount;
-			track[0x11] = delta;
-			track[0x12] = frameCount;
+			((RedTrackDATA*)track)->m_panAdd = delta;
+			((RedTrackDATA*)track)->m_panDelta = frameCount;
 		}
 		track += 0x55;
 	} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
@@ -622,9 +622,9 @@ void SetSePitch(int seId, int pitch, int frameCount)
 
 	do {
 		if (((u32)*track != 0) && ((seId < 0) || (((RedTrackDATA*)track)->m_seId == seId))) {
-			int delta = pitch - track[0x17];
-			track[0x18] = delta / frameCount;
-			track[0x19] = frameCount;
+			int delta = pitch - ((RedTrackDATA*)track)->m_pitch;
+			((RedTrackDATA*)track)->m_pitchAdd = delta / frameCount;
+			((RedTrackDATA*)track)->m_pitchDelta = frameCount;
 		}
 		track += 0x55;
 	} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
@@ -759,16 +759,16 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		track[0x42] = DeltaTimeSumup((unsigned char**)track) + 1;
 		((RedTrackDATA*)track)->m_seSepId = 0;
 		track[8] = (m_MusicKeySignature == 0) ? 0 : (int)(t_KeySignatureData + 0xb);
-		track[0x13] = 0x7f000;
-		track[0x15] = 0;
+		((RedTrackDATA*)track)->m_mixVolume = 0x7f000;
+		((RedTrackDATA*)track)->m_mixVolumeDelta = 0;
 		((RedTrackDATA*)track)->m_volume = 0x7fff000;
 		((RedTrackDATA*)track)->m_expression = 0x7f000;
 		((RedTrackDATA*)track)->m_pan = 0x40000;
-		track[0x1a] = *(int*)p_ReverbDepth;
-		track[0x1c] = 0;
-		track[0x12] = 0;
-		track[0xf] = 0;
-		track[0xc] = 0;
+		((RedTrackDATA*)track)->m_reverbDepth = *(int*)p_ReverbDepth;
+		((RedTrackDATA*)track)->m_reverbDepthDelta = 0;
+		((RedTrackDATA*)track)->m_panDelta = 0;
+		((RedTrackDATA*)track)->m_expressionDelta = 0;
+		((RedTrackDATA*)track)->m_volumeDelta = 0;
 		track[0x45] = 0;
 		track[0x44] = 0;
 		track[0x46] = 0;

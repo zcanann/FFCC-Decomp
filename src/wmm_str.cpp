@@ -1,6 +1,6 @@
 #include "ffcc/wmm_str.h"
 #include "ffcc/fontman.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 
 extern const char lbl_803336B4[];
 extern const char lbl_803336B8[];

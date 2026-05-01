@@ -131,6 +131,8 @@ static inline double LoadDouble(const double& value)
 void pppInitBlendMode(void);
 CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle*);
 CCharaPcs::CHandle* GetCharaHandlePtr(CGObject*, long);
+static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
 extern "C" {
 		int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
@@ -203,8 +205,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	work->m_context = pppEnvStPtr;
 	model0Raw->m_state = work;
 	model0Raw->m_step = step;
-	model0Raw->m_drawMeshDlCallback = ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
-	model0Raw->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
+	model0Raw->m_drawMeshDlCallback = ChangeTex_DrawMeshDLCallback;
+	model0Raw->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback;
 
 	work->m_texture = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
 
@@ -216,16 +218,16 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		ChangeTexModelRaw* modelRaw = (ChangeTexModelRaw*)model;
 		modelRaw->m_state = work;
 		modelRaw->m_step = step;
-		modelRaw->m_drawMeshDlCallback = ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
-		modelRaw->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
+		modelRaw->m_drawMeshDlCallback = ChangeTex_DrawMeshDLCallback;
+		modelRaw->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback;
 	}
 
 	if ((handle2 != 0) && ((model = GetCharaModelPtr(handle2)), model != 0)) {
 		ChangeTexModelRaw* modelRaw = (ChangeTexModelRaw*)model;
 		modelRaw->m_state = work;
 		modelRaw->m_step = step;
-		modelRaw->m_drawMeshDlCallback = ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
-		modelRaw->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
+		modelRaw->m_drawMeshDlCallback = ChangeTex_DrawMeshDLCallback;
+		modelRaw->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback;
 	}
 
 	if (step->m_payload[0] == 0) {
@@ -483,7 +485,7 @@ void pppConstructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
+static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
 {
 	ChangeTexModelRaw* modelRaw = (ChangeTexModelRaw*)model;
 	ChangeTexWork* work = (ChangeTexWork*)param_2;
@@ -562,7 +564,7 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
+static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
 {
 	ChangeTexModelRaw* modelRaw = (ChangeTexModelRaw*)model;
 	ChangeTexWork* work = (ChangeTexWork*)param_2;

@@ -1,8 +1,9 @@
 #include "ffcc/menu_equip.h"
 #include "ffcc/joybus.h"
 #include "ffcc/pad.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/sound.h"
+#include "ffcc/system.h"
 #include <string.h>
 #include "ffcc/fontman.h"
 

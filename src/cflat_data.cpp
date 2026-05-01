@@ -1,6 +1,6 @@
 #include "ffcc/cflat_data.h"
 #include "ffcc/chunkfile.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 
 #include <dolphin/types.h>
 #include <string.h>

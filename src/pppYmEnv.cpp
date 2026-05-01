@@ -106,13 +106,15 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
 
     const unsigned short texWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned short texHeight = GXGetTexObjHeight(targetTexObj);
+
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+
     const unsigned short modeOffset = (unsigned short)mode * 5;
 
     _GXColor clearColor = {0, 0, 0, 0xFF};
     _GXColor whiteColor = {0xFF, 0xFF, 0xFF, 0xFF};
     _GXColor blackColor = {0, 0, 0, 0};
 
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     gUtil.RenderColorQuad(0.0f, 0.0f, texWidth, texHeight, clearColor);
 
     const unsigned short rtWidth = GXGetTexObjWidth(targetTexObj);
@@ -135,11 +137,11 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     GXSetTexCopyDst(rtWidth, rtHeight, targetFmt, GX_FALSE);
 
     GXSetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT1, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanMatColor(GX_COLOR0A0, whiteColor);
-    GXSetChanAmbColor(GX_COLOR0A0, blackColor);
 
     GXLightObj lightObj;
     GXInitLightColor(&lightObj, whiteColor);
+    GXSetChanMatColor(GX_COLOR0A0, whiteColor);
+    GXSetChanAmbColor(GX_COLOR0A0, blackColor);
     GXInitLightAttnA(&lightObj, 0.0f, 1.0f, 0.0f);
     GXInitLightAttnK(&lightObj, 0.0f, 0.0f, 0.0f);
     GXInitLightPos(&lightObj, 0.0f, 0.0f, 1.0f);

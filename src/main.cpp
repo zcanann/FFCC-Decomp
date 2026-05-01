@@ -1,5 +1,5 @@
 #include "ffcc/main.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/pad.h"
 #include "ffcc/system.h"
 

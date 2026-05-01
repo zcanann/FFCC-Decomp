@@ -415,7 +415,8 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
         case 0x56455254:
             m_meshData = __nwa__FUlPQ27CMemory6CStagePci(workSize, MapMeshAllocStage(), s_mapmesh_cpp_801D70B0, 0x13A);
 
-            cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(m_meshData)));
+            cursor = reinterpret_cast<unsigned char*>(m_meshData);
+            cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
             m_vertices = cursor;
             offset = 0;

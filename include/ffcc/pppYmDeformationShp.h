@@ -18,7 +18,7 @@ struct pppYmDeformationShpUnkB {
     s16 m_payload3;
     s8 m_splitMode;
     u8 m_splitSize;
-    s8 m_orientation;
+    u8 m_orientation;
     u8 m_pad_0x29[3];
     f32 m_drawZ;
     u8 m_pad_0x30;

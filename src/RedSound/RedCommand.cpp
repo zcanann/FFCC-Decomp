@@ -52,7 +52,7 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 			int trackNo;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
-			track[0x3e] = 0;
+			((RedTrackDATA*)track)->m_seId = 0;
 			track[0x41] = 0;
 			*track = 0;
 			track[0x16] = 0;
@@ -64,7 +64,7 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) |= 2;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
-			c_RedEntry.SeSepHistoryManager(0, track[0x3d]);
+			c_RedEntry.SeSepHistoryManager(0, ((RedTrackDATA*)track)->m_seSepId);
 			if ((u32)track[6] != 0) {
 				c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo);
 			}
@@ -108,7 +108,7 @@ int _EraseTime(int eraseTrack)
 		    ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
 		    (track[0x43] > maxWait)) {
 			maxWait = track[0x43];
-			sepId = track[0x3d];
+			sepId = ((RedTrackDATA*)track)->m_seSepId;
 		}
 		track += 0x55;
 	} while (track < (int*)(*trackBasePtr + 0x2a80));
@@ -122,7 +122,7 @@ int _EraseTime(int eraseTrack)
 			int trackNo;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
-			track[0x3e] = 0;
+			((RedTrackDATA*)track)->m_seId = 0;
 			track[0x41] = 0;
 			*track = 0;
 			track[0x16] = 0;
@@ -214,11 +214,11 @@ int SeStopID(int seId)
 	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
 	track = (int*)*trackBasePtr;
 	do {
-		if (((u32)*track != 0) && ((seId == -1) || (track[0x3e] == seId))) {
+		if (((u32)*track != 0) && ((seId == -1) || (((RedTrackDATA*)track)->m_seId == seId))) {
 			int trackNo;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
-			track[0x3e] = 0;
+			((RedTrackDATA*)track)->m_seId = 0;
 			track[0x41] = 0;
 			*track = 0;
 			track[0x16] = 0;
@@ -234,7 +234,7 @@ int SeStopID(int seId)
 			if ((u32)track[6] != 0) {
 				c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo);
 			}
-			c_RedEntry.SeSepHistoryManager(0, track[0x3d]);
+			c_RedEntry.SeSepHistoryManager(0, ((RedTrackDATA*)track)->m_seSepId);
 		}
 		track += 0x55;
 	} while (track < (int*)(*trackBasePtr + 0x2a80));
@@ -260,13 +260,13 @@ int SeStopMG(int bank, int sep, int group, int kind)
 	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
 	track = (int*)*trackBasePtr;
 	do {
-		if (((u32)*track != 0) && ((track[0x3d] & 0x80000000U) == 0)) {
-			int id = track[0x3d] / 1000;
+		if (((u32)*track != 0) && ((((RedTrackDATA*)track)->m_seSepId & 0x80000000U) == 0)) {
+			int id = ((RedTrackDATA*)track)->m_seSepId / 1000;
 			if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
 				int trackNo;
 
 				KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
-				track[0x3e] = 0;
+				((RedTrackDATA*)track)->m_seId = 0;
 				track[0x41] = 0;
 				*track = 0;
 				track[0x16] = 0;
@@ -282,7 +282,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				if ((u32)track[6] != 0) {
 					c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo);
 				}
-				c_RedEntry.SeSepHistoryManager(0, track[0x3d]);
+				c_RedEntry.SeSepHistoryManager(0, ((RedTrackDATA*)track)->m_seSepId);
 			}
 		}
 		track += 0x55;

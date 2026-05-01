@@ -2014,7 +2014,7 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
                 int* voice = (int*)p_VoiceData;
                 do {
                     if ((int*)*voice == track) {
-                        voice[0x2E] = m_ChangeStatus;
+                        ((RedVoiceDATA*)voice)->m_updateFlags = m_ChangeStatus;
                     }
                     voice += 0x30;
                 } while (voice < (int*)p_VoiceData + 0xC00);
@@ -2537,7 +2537,8 @@ int _SeMidiNoteExecute(
                 }
 
                 if (m_ChangeStatus != 0) {
-                    ((int*)((u8*)p_VoiceData + (s8)((u8*)track)[0x14E] * 0xC0))[0x2E] = m_ChangeStatus;
+                    ((RedVoiceDATA*)((u8*)p_VoiceData + ((RedTrackDATA*)track)->m_trackNo * 0xC0))->m_updateFlags =
+                        m_ChangeStatus;
                 }
             }
         }

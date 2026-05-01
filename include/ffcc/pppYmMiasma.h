@@ -12,6 +12,8 @@ struct pppYmMiasmaUnkC {
     u8 m_pad_0x0[0xc];
     s32* m_serializedDataOffsets;
 };
+struct YmMiasmaRenderStep;
+struct YmMiasmaFrameStep;
 struct VYmMiasma;
 struct PYmMiasma;
 struct _pppPObject;
@@ -34,8 +36,8 @@ extern "C" {
 void pppConstructYmMiasma(pppYmMiasma*, pppYmMiasmaUnkC*);
 void pppConstruct2YmMiasma(pppYmMiasma*, pppYmMiasmaUnkC*);
 void pppDestructYmMiasma(pppYmMiasma*, pppYmMiasmaUnkC*);
-void pppFrameYmMiasma(pppYmMiasma*, pppYmMiasmaUnkB*, pppYmMiasmaUnkC*);
-void pppRenderYmMiasma(pppYmMiasma*, pppYmMiasmaUnkB*, pppYmMiasmaUnkC*);
+void pppFrameYmMiasma(pppYmMiasma*, YmMiasmaFrameStep*, pppYmMiasmaUnkC*);
+void pppRenderYmMiasma(pppYmMiasma*, YmMiasmaRenderStep*, pppYmMiasmaUnkC*);
 
 #ifdef __cplusplus
 }

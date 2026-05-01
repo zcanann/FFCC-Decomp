@@ -156,11 +156,10 @@ struct YmMiasmaFrameStep : PYmMiasma {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
+void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppYmMiasmaUnkC* param_3)
 {
     VYmMiasma* work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
     PARTICLE_DATA* particleData = work->m_particles;
-    YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)param_2;
     int i;
 
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
@@ -216,13 +215,16 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
 
 /*
  * --INFO--
- * Address:	80090aa4
- * Size:	748b
+ * PAL Address: 0x80090aa4
+ * PAL Size: 748b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
+void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmMiasmaUnkC* param_3)
 {
     VYmMiasma* work;
-    YmMiasmaFrameStep* step = (YmMiasmaFrameStep*)param_2;
     PARTICLE_DATA* particle;
     int i;
     Vec delta;

@@ -59,13 +59,11 @@ struct MoneyMenuState
 class CMenuPcs
 {
 public:
-    void MoneyInit();
     bool MoneyOpen();
     int MoneyCtrl();
     bool MoneyClose();
     void MoneyDraw();
     int MoneyCtrlCur();
-    void MoneySetPlace(int);
 
     char pad_00[0x108];
     CFont* moneyFont;

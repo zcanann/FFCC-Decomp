@@ -19,7 +19,16 @@ struct RedTrackDATA {
 	int m_pan;
 	int m_panAdd;
 	int m_panDelta;
-	unsigned char m_pad4C[0xFC - 0x4C];
+	unsigned char m_pad4C[0xD4 - 0x4C];
+	unsigned short m_adsrAR;
+	unsigned short m_adsrDR;
+	unsigned short m_adsrSR;
+	unsigned short m_adsrRR;
+	unsigned char m_adsrAL;
+	unsigned char m_adsrDL;
+	unsigned char m_adsrSL;
+	unsigned char m_adsrRL;
+	unsigned char m_padE0[0xFC - 0xE0];
 	int m_voiceSwitch;
 	unsigned char m_pad100[0x104 - 0x100];
 	unsigned int m_flags;

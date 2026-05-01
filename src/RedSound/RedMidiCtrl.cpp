@@ -1382,8 +1382,8 @@ void __MidiCtrl_ADSR_AL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     int value;
     int* voice;
 
-    value = *(*(u8**)track)++;
-    *((u8*)track + 0xDC) = value;
+    value = *track->m_command++;
+    track->m_adsrAL = value;
 
     voice = (int*)p_VoiceData;
     do {
@@ -1410,7 +1410,7 @@ void __MidiCtrl_ADSR_AR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     int delta;
 
     delta = DeltaTimeSumup((unsigned char**)track);
-    *(unsigned short*)((int)track + 0xD4) = delta;
+    track->m_adsrAR = delta;
 
     voice = (int*)p_VoiceData;
     do {
@@ -1436,8 +1436,8 @@ void __MidiCtrl_ADSR_DL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     int value;
     int* voice;
 
-    value = *(*(u8**)track)++;
-    *((u8*)track + 0xDD) = value;
+    value = *track->m_command++;
+    track->m_adsrDL = value;
 
     voice = (int*)p_VoiceData;
     do {
@@ -1464,7 +1464,7 @@ void __MidiCtrl_ADSR_DR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     int delta;
 
     delta = DeltaTimeSumup((unsigned char**)track);
-    *(unsigned short*)((int)track + 0xD6) = delta;
+    track->m_adsrDR = delta;
 
     voice = (int*)p_VoiceData;
     do {
@@ -1490,8 +1490,8 @@ void __MidiCtrl_ADSR_SL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     int value;
     int* voice;
 
-    value = *(*(u8**)track)++;
-    *((u8*)track + 0xDE) = value;
+    value = *track->m_command++;
+    track->m_adsrSL = value;
 
     voice = (int*)p_VoiceData;
     do {
@@ -1518,7 +1518,7 @@ void __MidiCtrl_ADSR_SR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     int delta;
 
     delta = DeltaTimeSumup((unsigned char**)track);
-    *(unsigned short*)((int)track + 0xD8) = delta;
+    track->m_adsrSR = delta;
 
     voice = (int*)p_VoiceData;
     do {
@@ -1544,8 +1544,8 @@ void __MidiCtrl_ADSR_RL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     int value;
     int* voice;
 
-    value = *(*(u8**)track)++;
-    *((u8*)track + 0xDF) = value;
+    value = *track->m_command++;
+    track->m_adsrRL = value;
 
     voice = (int*)p_VoiceData;
     do {
@@ -1572,7 +1572,7 @@ void __MidiCtrl_ADSR_RR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 	int delta;
 
 	delta = DeltaTimeSumup((unsigned char**)track);
-	*(unsigned short*)((int)track + 0xDA) = delta;
+	track->m_adsrRR = delta;
 
 	voice = (int*)p_VoiceData;
 	do {

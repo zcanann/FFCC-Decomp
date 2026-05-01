@@ -14,11 +14,6 @@ struct RandDownFVParams {
     u8 useNormalDistribution;
 };
 
-static float randf(float value, float scale)
-{
-    return value * scale;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80061664
@@ -60,7 +55,7 @@ void pppRandDownFV(_pppPObject* basePtr, RandDownFVParams* in, _pppCtrlTable* ct
     f32* target = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
     f32 scale = *valuePtr;
 
-    target[0] += randf(in->blend[0], scale);
-    target[1] += randf(in->blend[1], scale);
-    target[2] += randf(in->blend[2], scale);
+    target[0] += in->blend[0] * scale;
+    target[1] += in->blend[1] * scale;
+    target[2] += in->blend[2] * scale;
 }

@@ -81,22 +81,6 @@ static inline int TextureIndex(CMaterialEditorPcs* self)
 
 /*
  * --INFO--
- * PAL Address: 80051d2c
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void MemFree__18CMaterialEditorPcsFPv(CMaterialEditorPcs* materialEditorPcs, void* ptr)
-{
-    if (ptr != nullptr) {
-        Memory.Free(ptr);
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: 80050a7c
  * PAL Size: 4784b
  * EN Address: TODO
@@ -442,5 +426,21 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         S8At(materialEditorPcs, 0x3BC) = S8At(materialEditorPcs, 0x3BC) + 1;
         break;
     }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 80051d2c
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void MemFree__18CMaterialEditorPcsFPv(CMaterialEditorPcs* materialEditorPcs, void* ptr)
+{
+    if (ptr != nullptr) {
+        Memory.Free(ptr);
     }
 }

@@ -357,7 +357,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			*(unsigned char*)(*voice + 0x26) |= 2;
 			*(unsigned char*)((int)voice + 0x1a) |= 2;
 			voice[0x25] = 0xc01;
-			if (*(short*)(streamData + 0xb) != 0) {
+			if (*(short*)((int*)streamData + 0xb) != 0) {
 				voice[0x25] |= 0x3000;
 			}
 			*(int*)(*voice + 0xfc) = 1;

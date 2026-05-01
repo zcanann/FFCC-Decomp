@@ -1010,13 +1010,13 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		}
 	}
 
-	if (AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), smithItem, 0) != 0) {
+	if (AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), smithItem, 0) == 0) {
 		Joybus.SendResult(channel, 1, static_cast<unsigned char>(value >> 24), static_cast<unsigned char>(value >> 16));
 	}
 
 	const float smithRate = static_cast<float>(caravanWork->m_shopParam) / 100.0f;
 	const int gilCost = -static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(itemTableBase + 0x24)) * smithRate);
-	if (AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), gilCost) != 0) {
+	if (AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), gilCost) == 0) {
 		Joybus.SendResult(channel, 1, static_cast<unsigned char>(value >> 24), static_cast<unsigned char>(value >> 16));
 	}
 

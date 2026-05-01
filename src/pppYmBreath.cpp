@@ -494,11 +494,9 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     int colorOffset;
     int* dataOffsets;
-    _pppMngSt* mngSt;
     VYmBreath* work;
     VColor* color;
-    int* groupData;
-    PARTICLE_WMAT* particleWMat;
+    Mtx* particleWMat;
     Mtx* particleMtx;
     int i;
     short groupIndex;
@@ -522,7 +520,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     }
 
     dataOffsets = offsets->m_serializedDataOffsets;
-    mngSt = pppMngStPtr;
+    _pppMngSt* mngSt = pppMngStPtr;
     colorOffset = dataOffsets[1];
     work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[0]);
     color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
@@ -589,14 +587,13 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         PSVECNormalize(&work->m_direction, &work->m_direction);
     }
 
-    PSMTXCopy(mngSt->m_matrix.value, work->m_matrix);
+    PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_matrix);
     UpdateAllParticle(reinterpret_cast<_pppPObject*>(ymBreath), work, pYmBreath, color);
 
-    particleWMat = work->m_particleWmats;
-    groupData = (int*)work->m_groups;
+    particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
         slotCount = params->m_slotCount;
-        groupTable = (int)groupData;
+        groupTable = (int)((unsigned char*)work->m_groups + groupIndex * 0x5C);
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
             if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
                 (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {
@@ -621,7 +618,7 @@ group_ready:
             scaleMtx[0][0] = scaledOwner;
             scaleMtx[1][1] = scaledOwner;
             scaleMtx[2][2] = scaledOwner;
-            particleMtx = &particleWMat[firstParticle].m_matrix;
+            particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
             PSMTXConcat(*particleMtx, ymBreath->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
@@ -638,8 +635,6 @@ group_ready:
             pppSubVector(hitVector, target, origin);
             pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner, params->m_groupRadius);
         }
-
-        groupData += 0x17;
     }
 }
 

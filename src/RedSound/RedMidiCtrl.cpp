@@ -703,15 +703,13 @@ void __MidiCtrl_LoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int loopCount;
-    int counterOffset;
 
     loopCount = *(*(u8**)track)++;
     if (loopCount == 0) {
         loopCount = 0x100;
     }
 
-    counterOffset = track->m_loopDepth * 2 + 0x128;
-    *(short*)((char*)track + counterOffset) = *(short*)((char*)track + counterOffset) + 1;
+    track->m_loopCount[track->m_loopDepth]++;
     if (track->m_loopCount[track->m_loopDepth] != loopCount) {
         track->m_command = track->m_loopCommand[track->m_loopDepth];
         *(short*)((char*)track + 0x144) = track->m_loopStep[track->m_loopDepth];

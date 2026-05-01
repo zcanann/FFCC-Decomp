@@ -25,8 +25,9 @@ extern float FLOAT_803308b0;
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 // PAL map: CMes::m_tempVar in mes.o, .bss size 0x50.
 int CMes::m_tempVar[0x14];
-extern "C" int toupper(int);
-extern "C" int tolower(int);
+extern "C" void toupper(char*);
+extern "C" void tolower_name_conflict(char*);
+extern "C" int toupperLatin1(unsigned char);
 
 static const char s_mesTagUnknown[] = "Not corresponding TAG is used. %02x\n";
 static const char s_mesTagMissing[] = "This TAG is not created. %02x\n";
@@ -93,21 +94,15 @@ static void ApplyCaseMode(char* text, int& caseMode)
 
 	if (caseMode == 1)
 	{
-		for (char* p = text; *p != '\0'; ++p)
-		{
-			*p = (char)toupper((unsigned char)*p);
-		}
+		toupper(text);
 	}
 	else if (caseMode == 2)
 	{
-		text[0] = (char)toupper((unsigned char)text[0]);
+		text[0] = (char)toupperLatin1((unsigned char)text[0]);
 	}
 	else
 	{
-		for (char* p = text; *p != '\0'; ++p)
-		{
-			*p = (char)tolower((unsigned char)*p);
-		}
+		tolower_name_conflict(text);
 	}
 
 	caseMode = 0;

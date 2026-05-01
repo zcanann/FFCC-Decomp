@@ -809,7 +809,7 @@ int _MainThread(void*)
             iVar3 = m_RedMasterTime;
             uVar4 = (unsigned int)(m_RedMasterTime - m_MainThreadTime);
             if (*(short*)(iVar1 + 0x48e) != 0) {
-                *(unsigned int*)(iVar1 + 0x478) = *(unsigned int*)(iVar1 + 0x478) + uVar4;
+                ((RedSoundCONTROL*)iVar1)->m_elapsedTime = ((RedSoundCONTROL*)iVar1)->m_elapsedTime + uVar4;
             }
             m_MainThreadTime = iVar3;
             if (4 < uVar4) {

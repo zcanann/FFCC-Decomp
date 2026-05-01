@@ -819,7 +819,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	((RedSoundCONTROL*)music)->m_ticksPerMeasure = 10000;
 	((RedSoundCONTROL*)music)->m_tick = -1;
 	((RedSoundCONTROL*)music)->m_measure = 1;
-	music[0x11e] = 0;
+	((RedSoundCONTROL*)music)->m_elapsedTime = 0;
 	if (volume != 0) {
 		volume = (((volume + 1) * 4) - 1) * 0x1000;
 	}

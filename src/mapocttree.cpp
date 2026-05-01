@@ -130,6 +130,7 @@ static inline COctNode* GetMapObjByIndex(unsigned short index)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void setbit32(unsigned long* arg0, unsigned long arg1)
 {
 	unsigned long* bits;
@@ -141,6 +142,7 @@ void setbit32(unsigned long* arg0, unsigned long arg1)
 	mask = 1UL << offset;
 	*bits |= mask;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

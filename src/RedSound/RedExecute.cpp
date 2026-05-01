@@ -861,13 +861,13 @@ void _PitchExecute(RedVoiceDATA* voice)
 
         if ((((u8*)voiceData)[0x1A] & 3) != 0) {
             pitchDelta = PitchCompute(
-                voiceData[0x28] + voice->m_track->m_pitch,
+                voice->m_basePitch + voice->m_track->m_pitch,
                 pitchDelta,
                 voice->m_waveData->m_pitch,
                 voice->m_track->m_fineTune);
         } else {
             pitchDelta = PitchCompute(
-                voiceData[0x28] + *p_MusicPitchControl,
+                voice->m_basePitch + *p_MusicPitchControl,
                 pitchDelta,
                 voice->m_waveData->m_pitch,
                 voice->m_track->m_fineTune);

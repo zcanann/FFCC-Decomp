@@ -89,7 +89,7 @@ static inline void ReplaceRef(void** slot, void* ref)
 
 static inline void SetMaterialTextureSlot(void* material, unsigned long slotIndex, void* texture)
 {
-    void** slot = reinterpret_cast<void**>(Ptr(material, 0x3C + (slotIndex * 4)));
+    void** slot = reinterpret_cast<void**>(Ptr(material, 0x3C) + (slotIndex * 4));
     ReplaceRef(slot, texture);
 
     unsigned short& numTexture = *reinterpret_cast<unsigned short*>(Ptr(material, 0x18));

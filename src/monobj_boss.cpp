@@ -34,6 +34,8 @@ extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFla
 extern "C" void moveFrame__8CGMonObjFv(CGMonObj*);
 extern "C" void rotTarget__8CGMonObjFif(CGMonObj*, int, float);
 extern "C" void CGMonObj_ResetActionState(CGMonObj*);
+extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
+extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
 extern float FLOAT_80331dd0;
 extern float FLOAT_80331cf8;
 extern float FLOAT_80331dcc;
@@ -549,101 +551,81 @@ void CGMonObj::cancelStatFuncOrcKing()
  */
 void CGMonObj::frameStatFuncOrcKing()
 {
-	#if 0
-	// Function: frameStatFuncOrcKing__8CGMonObjFv
-	// Entry: 801322dc
-	// Size: 604 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void frameStatFuncOrcKing__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  CRef *pCVar2;
-	  CGMonObj *monObj;
-	  
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    iVar1 = gMonObj->_bossBranchRelated;
-	    if (iVar1 == 0) {
-	      pCVar2 = ((gMonObj->gObject).m_charaModelHandle)->m_pdtLoadRef;
-	      if (pCVar2 == (CRef *)0x0) {
-	        iVar1 = -1;
-	      }
-	      else {
-	        iVar1 = pCVar2[2].refCount;
-	      }
-	      putParticle__8CGPrgObjFiiP8CGObjectfi
-	                ((double)FLOAT_80331d18,(CGPrgObj *)gMonObj,iVar1 << 8 | 0x18,
-	                 *(int *)&gMonObj->field_0x58c,&gMonObj->gObject,0x8cc0);
-	      reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0xf,0,0);
-	      SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0x10,0);
-	      SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0x15,4);
-	    }
-	    else if (iVar1 == 0x96) {
-	      pCVar2 = ((gMonObj->gObject).m_charaModelHandle)->m_pdtLoadRef;
-	      if (pCVar2 == (CRef *)0x0) {
-	        iVar1 = -1;
-	      }
-	      else {
-	        iVar1 = pCVar2[2].refCount;
-	      }
-	      putParticle__8CGPrgObjFiiP8CGObjectfi
-	                ((double)FLOAT_80331d18,(CGPrgObj *)gMonObj,iVar1 << 8 | 0x19,
-	                 *(int *)&gMonObj->field_0x590,&gMonObj->gObject,0x8cc1);
-	    }
-	    else if (iVar1 == 300) {
-	      pCVar2 = ((gMonObj->gObject).m_charaModelHandle)->m_pdtLoadRef;
-	      if (pCVar2 == (CRef *)0x0) {
-	        iVar1 = -1;
-	      }
-	      else {
-	        iVar1 = pCVar2[2].refCount;
-	      }
-	      putParticle__8CGPrgObjFiiP8CGObjectfi
-	                ((double)FLOAT_80331d18,(CGPrgObj *)gMonObj,iVar1 << 8 | 0x1a,
-	                 *(int *)&gMonObj->field_0x590,&gMonObj->gObject,0x8cc2);
-	    }
-	    else if (iVar1 == 0x1c2) {
-	      pCVar2 = ((gMonObj->gObject).m_charaModelHandle)->m_pdtLoadRef;
-	      if (pCVar2 == (CRef *)0x0) {
-	        iVar1 = -1;
-	      }
-	      else {
-	        iVar1 = pCVar2[2].refCount;
-	      }
-	      putParticle__8CGPrgObjFiiP8CGObjectfi
-	                ((double)FLOAT_80331d18,(CGPrgObj *)gMonObj,iVar1 << 8 | 0x1b,
-	                 *(int *)&gMonObj->field_0x590,&gMonObj->gObject,0x8cc3);
-	    }
-	    else if (iVar1 == 600) {
-	      endPSlotBit__10CGCharaObjFi(gMonObj,0xc00);
-	      (gMonObj->gObject).m_bgColMask = (gMonObj->gObject).m_bgColMask & 0xfff7ffff;
-	      changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,0xfffffff7,0,0);
-	      SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0,0);
-	      for (monObj = (CGMonObj *)FindGMonObjFirst__13CFlatRuntime2Fv((CFlatRuntime2 *)&CFlat);
-	          monObj != (CGMonObj *)0x0;
-	          monObj = (CGMonObj *)
-	                   FindGMonObjNext__13CFlatRuntime2FP8CGMonObj((CFlatRuntime2 *)&CFlat,monObj)) {
-	        if (monObj != gMonObj) {
-	          addHp__10CGCharaObjFiP8CGPrgObj
-	                    ((CGCharaObj *)monObj,
-	                     -(uint)*(ushort *)((int)(monObj->gObject).m_scriptHandle + 0x1a),
-	                     (CGPrgObj *)0x0);
-	        }
-	      }
-	      SoundBuffer._1260_4_ = 1;
-	    }
-	    gMonObj->_bossBranchRelated = gMonObj->_bossBranchRelated + 1;
-	  }
-	  return;
-	}
-	
-	#endif
+	u8* self = reinterpret_cast<u8*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId >= 100) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+
+	if (prgObj->m_lastStateId != 100) {
+		return;
 	}
+
+	int branch = *reinterpret_cast<int*>(self + 0x6D0);
+	if (branch == 0) {
+		int pdtNo;
+		u8* pdtRef = reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef);
+		if (pdtRef != 0) {
+			pdtNo = *reinterpret_cast<int*>(pdtRef + 0x14);
+		} else {
+			pdtNo = -1;
+		}
+
+		putParticle__8CGPrgObjFiiP8CGObjectfi(
+			prgObj, (pdtNo << 8) | 0x18, *reinterpret_cast<int*>(self + 0x58C), object, FLOAT_80331d18, 0x8CC0);
+		reqAnim__8CGPrgObjFiii(prgObj, 0xF, 0, 0);
+		object->SetAnimSlot(0x10, 0);
+		object->SetAnimSlot(0x15, 4);
+	} else if (branch == 0x96) {
+		int pdtNo;
+		u8* pdtRef = reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef);
+		if (pdtRef != 0) {
+			pdtNo = *reinterpret_cast<int*>(pdtRef + 0x14);
+		} else {
+			pdtNo = -1;
+		}
+
+		putParticle__8CGPrgObjFiiP8CGObjectfi(
+			prgObj, (pdtNo << 8) | 0x19, *reinterpret_cast<int*>(self + 0x590), object, FLOAT_80331d18, 0x8CC1);
+	} else if (branch == 300) {
+		int pdtNo;
+		u8* pdtRef = reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef);
+		if (pdtRef != 0) {
+			pdtNo = *reinterpret_cast<int*>(pdtRef + 0x14);
+		} else {
+			pdtNo = -1;
+		}
+
+		putParticle__8CGPrgObjFiiP8CGObjectfi(
+			prgObj, (pdtNo << 8) | 0x1A, *reinterpret_cast<int*>(self + 0x590), object, FLOAT_80331d18, 0x8CC2);
+	} else if (branch == 0x1C2) {
+		int pdtNo;
+		u8* pdtRef = reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef);
+		if (pdtRef != 0) {
+			pdtNo = *reinterpret_cast<int*>(pdtRef + 0x14);
+		} else {
+			pdtNo = -1;
+		}
+
+		putParticle__8CGPrgObjFiiP8CGObjectfi(
+			prgObj, (pdtNo << 8) | 0x1B, *reinterpret_cast<int*>(self + 0x590), object, FLOAT_80331d18, 0x8CC3);
+	} else if (branch == 600) {
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
+		object->m_bgColMask &= 0xFFF7FFFF;
+		changeStat__8CGPrgObjFiii(prgObj, -9, 0, 0);
+		object->SetAnimSlot(0, 0);
+
+		CGMonObj* monObj = FindGMonObjFirst__13CFlatRuntime2Fv(CFlat);
+		while (monObj != 0) {
+			if (monObj != this) {
+				u8* monBytes = reinterpret_cast<u8*>(monObj);
+				u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
+				reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
+			}
+			monObj = FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(CFlat, monObj);
+		}
+		*reinterpret_cast<int*>(SoundBuffer + 1260) = 1;
+	}
+
+	*reinterpret_cast<int*>(self + 0x6D0) = branch + 1;
 }
 
 /*

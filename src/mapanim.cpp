@@ -13,6 +13,9 @@ extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*,
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void Calc__8CMapAnimFl(CMapAnim*, long);
+extern "C" CMapAnim* __vc__21CPtrArray_P8CMapAnim_FUl(void*, unsigned long);
+extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
+extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void*, unsigned long);
 
 static const char s_mapanim_cpp[] = "mapanim.cpp";
 static const char s_ptrarray_grow_error[] =
@@ -118,7 +121,7 @@ void CMapAnimRun::Calc(long frame)
 runFrame:
     CPtrArray<CMapAnim*>* mapAnimArray =
         reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213FC);
-    CMapAnim* mapAnim = (*mapAnimArray)[run->mapAnimIndex];
+    CMapAnim* mapAnim = __vc__21CPtrArray_P8CMapAnim_FUl(mapAnimArray, run->mapAnimIndex);
     Calc__8CMapAnimFl(mapAnim, run->currentFrame);
     if (++run->currentFrame > run->endFrame) {
         if (run->loop != 0) {
@@ -153,9 +156,9 @@ void CMapAnim::Calc(long frame)
 
     CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
 
-    nodeCount = nodeArray->GetSize();
+    nodeCount = GetSize__26CPtrArray_P12CMapAnimNode_Fv(nodeArray);
     for (i = 0; i < nodeCount; i = i + 1) {
-        CMapAnimNode* node = (*nodeArray)[i];
+        CMapAnimNode* node = __vc__26CPtrArray_P12CMapAnimNode_FUl(nodeArray, i);
         node->Interp(frame);
     }
 }
@@ -262,9 +265,9 @@ CMapAnim::~CMapAnim()
 {
     unsigned int i = 0;
 
-    while (static_cast<unsigned int>(mapAnimNodes.GetSize()) > i) {
-        CMapAnimNode* node = mapAnimNodes[i];
-        if (node != 0 && (node = mapAnimNodes[i], node != 0)) {
+    while (static_cast<unsigned int>(GetSize__26CPtrArray_P12CMapAnimNode_Fv(&mapAnimNodes)) > i) {
+        CMapAnimNode* node = __vc__26CPtrArray_P12CMapAnimNode_FUl(&mapAnimNodes, i);
+        if (node != 0 && (node = __vc__26CPtrArray_P12CMapAnimNode_FUl(&mapAnimNodes, i), node != 0)) {
             reinterpret_cast<int*>(node)[1] = 0;
             __dl__FPv(node);
         }

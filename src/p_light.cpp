@@ -102,10 +102,6 @@ static inline double U32ToDouble(unsigned int value)
  */
 CLightPcs::CLightPcs()
 {
-    __construct_array(m_diffuseLights, (ConstructorDestructor)__ct__Q29CLightPcs6CLightFv, 0, sizeof(CLight), 8);
-    __construct_array(m_sceneLights, (ConstructorDestructor)__ct__Q29CLightPcs6CLightFv, 0, sizeof(CLight), 0x20);
-    __construct_array(m_bumpLights, (ConstructorDestructor)__ct__Q29CLightPcs10CBumpLightFv, 0, sizeof(CBumpLight), 0x20);
-
     unsigned int* table = m_table__9CLightPcs;
 
     table[0x004 / 4] = m_table_desc0__9CLightPcs[0];

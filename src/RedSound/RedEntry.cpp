@@ -1,6 +1,7 @@
 #include "ffcc/RedSound/RedEntry.h"
 #include "ffcc/RedSound/RedCommand.h"
 #include "ffcc/RedSound/RedDriver.h"
+#include "ffcc/RedSound/RedMidiCtrl.h"
 #include "ffcc/RedSound/RedGlobals.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include <dolphin/os.h>
@@ -231,15 +232,15 @@ int CRedEntry::SearchUseWave(int waveNo)
 	} while ((unsigned int)soundBase >= (unsigned int)p_SoundControlBuffer);
 
 	soundBase = (int)p_SoundControlBuffer + 0xdbc;
-	int* track = (int*)*(int*)soundBase;
+	RedTrackDATA* track = *(RedTrackDATA**)soundBase;
 	do {
-		if (((u32)*track != 0) && ((u32)track[6] != 0) &&
-		    (reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo == waveNo)) {
+		if (((u32)track->m_command != 0) && ((u32)track->m_waveBankData != 0) &&
+		    (reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo == waveNo)) {
 			found = 1;
-			SeStopID(track[0x3e]);
+			SeStopID(track->m_seId);
 		}
-		track += 0x55;
-	} while (track < (int*)(*(int*)soundBase + 0x2a80));
+		track += 1;
+	} while (track < reinterpret_cast<RedTrackDATA*>(*(int*)soundBase + 0x2a80));
 
 	OSRestoreInterrupts(interruptLevel);
 	return found;

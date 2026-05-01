@@ -28,7 +28,7 @@ extern const char s_replay_dat[12];
 extern const char s_replay_host_msg[64];
 
 extern "C" {
-unsigned char g_pad[0x30];
+PADStatus g_pad[4];
 }
 
 namespace {
@@ -84,13 +84,13 @@ void CPad::Frame()
 
 	PADRead(local_88);
 	PADClamp(local_88);
-	memcpy(g_pad, local_88, sizeof(local_88));
+	memcpy(g_pad, local_88, sizeof(g_pad));
 	*reinterpret_cast<u32*>(self + 0x1C4) = 0;
 	uVar17 = 0;
-	CPad::Gba* gba = local_98;
 	puVar18 = reinterpret_cast<u16*>(local_98);
 	do
 	{
+		CPad::Gba* gba = &local_98[uVar17];
 		iVar6 = SIProbe(uVar17);
 		gba->connected = (0x40000 - iVar6) == 0;
 		gba->ctrlMode = Joybus.GetCtrlMode(uVar17);
@@ -101,7 +101,6 @@ void CPad::Frame()
 			gba->button = Joybus.GetPadData(uVar17);
 		}
 		uVar17 = uVar17 + 1;
-		gba++;
 	} while (uVar17 < 4);
 
 	if ((_1b0_4_ != 0) && ((iVar14 = _1bc_4_), iVar14 >= 0))

@@ -3,18 +3,23 @@
 
 #include "types.h"
 
+struct RedStreamHEAD {
+    u8 m_unk00[0x0C];
+    int m_loopEnd;
+    int m_loopStart;
+    int m_pitch;
+    s16 m_unk18;
+    s16 m_channelCount;
+    s16 m_flags;
+    s16 m_unk1E;
+};
+
 struct RedStreamDATA {
     int m_track;
     int m_voiceData;
     int m_fileData;
     void* m_buffer;
-    u8 m_header[0x0C];
-    int m_loopEnd;
-    int m_loopStart;
-    int m_pitch;
-    u8 m_pad28[0x2A - 0x28];
-    s16 m_channelCount;
-    u8 m_pad2C[0x30 - 0x2C];
+    RedStreamHEAD m_header;
     u8 m_trackData[2][0x60];
     int m_volume;
     int m_volumeStep;

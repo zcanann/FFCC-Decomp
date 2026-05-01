@@ -856,21 +856,21 @@ void _PitchExecute(RedVoiceDATA* voice)
             pitchDelta = ((pitchLfo & 0x7F) + 1) * 0x18;
         }
 
-        pitchDelta = *(s16*)(voiceData[0] + 0x13E) + pitchDelta;
-        pitchDelta = *(s16*)(voiceData[0] + 0x142) + pitchDelta;
+        pitchDelta = ((RedTrackDATA*)voiceData[0])->m_pitchBend + pitchDelta;
+        pitchDelta = ((RedTrackDATA*)voiceData[0])->m_keyTranspose + pitchDelta;
 
         if ((((u8*)voiceData)[0x1A] & 3) != 0) {
             pitchDelta = PitchCompute(
                 voiceData[0x28] + *(int*)(voiceData[0] + 0x5C),
                 pitchDelta,
                 ((int*)voiceData[1])[5],
-                *(s8*)(voiceData[0] + 0x148));
+                ((RedTrackDATA*)voiceData[0])->m_fineTune);
         } else {
             pitchDelta = PitchCompute(
                 voiceData[0x28] + *p_MusicPitchControl,
                 pitchDelta,
                 ((int*)voiceData[1])[5],
-                *(s8*)(voiceData[0] + 0x148));
+                ((RedTrackDATA*)voiceData[0])->m_fineTune);
         }
 
         {
@@ -1751,9 +1751,9 @@ void _ExecuteExtraData()
             if ((((u8*)voice)[0x1A] & 3) == 0) {
                 voice[0x26] = PitchCompute(
                     voice[0x28] + p_MusicPitchControl[0],
-                    (int)*(s16*)(*voice + 0x142) + (int)*(s16*)(*voice + 0x13E),
+                    (int)((RedTrackDATA*)*voice)->m_keyTranspose + (int)((RedTrackDATA*)*voice)->m_pitchBend,
                     *(int*)(voice[1] + 0x14),
-                    (s8)*(u8*)(*voice + 0x148));
+                    ((RedTrackDATA*)*voice)->m_fineTune);
                 voice[0x2E] |= 1;
             }
             voice += 0x30;

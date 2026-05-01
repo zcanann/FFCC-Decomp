@@ -16,7 +16,7 @@ public:
 	void ReportPrint(int);
 	int ReportStandby(int);
 
-	void DMAEntry(int, int, int, int, int, void (*)(void*), void*);
+	int DMAEntry(int, int, int, int, int, void (*)(void*), void*);
 	int DMACheck(int);
 
 	void SetSoundMode(int);

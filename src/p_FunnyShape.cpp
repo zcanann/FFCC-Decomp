@@ -48,6 +48,7 @@ inline void SetPtrArrayDtorVtable(CPtrArray<T>*)
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
+extern "C" void __ct__10CSamplePcsFv(void*);
 extern "C" void CreateBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void DeleteBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void createViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
@@ -86,28 +87,54 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
 }
 } // namespace
 
+/*
+ * --INFO--
+ * PAL Address: 0x8004e844
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_FunnyShape_cpp(void)
+{
+    CFunnyShapePcs* pcs = reinterpret_cast<CFunnyShapePcs*>(&FunnyShapePcs);
+    u8* self = reinterpret_cast<u8*>(pcs);
+    unsigned int* dst = m_table__14CFunnyShapePcs;
+    unsigned int* desc0 = m_table_desc0__14CFunnyShapePcs;
+    unsigned int* desc1 = m_table_desc1__14CFunnyShapePcs;
+    unsigned int* desc2 = m_table_desc2__14CFunnyShapePcs;
+    unsigned int* desc3 = m_table_desc3__14CFunnyShapePcs;
+
+    __ct__10CSamplePcsFv(self);
+    *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
+
+    __ct__14CUSBStreamDataFv(self + 0x3C);
+    __ct__11CFunnyShapeFv(self + 0x50);
+    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
+    __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
+    __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
+    dst[1] = desc0[0];
+    dst[2] = desc0[1];
+    dst[3] = desc0[2];
+    dst[4] = desc1[0];
+    dst[5] = desc1[1];
+    dst[6] = desc1[2];
+    dst[7] = desc2[0];
+    dst[8] = desc2[1];
+    dst[9] = desc2[2];
+    dst[12] = desc3[0];
+    dst[13] = desc3[1];
+    dst[14] = desc3[2];
+}
+
 unsigned int m_table_desc0__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
 unsigned int m_table_desc1__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
 unsigned int m_table_desc2__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
 unsigned int m_table_desc3__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
 unsigned int m_table__14CFunnyShapePcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(lbl_801D7DD0)),
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv),
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv),
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv),
-    0x21,
-    0,
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv),
-    0x42,
-    1
+    reinterpret_cast<unsigned int>(const_cast<char*>(lbl_801D7DD0)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0,
+    0x42, 1
 };
 unsigned int lbl_801EA904[4] = {
     reinterpret_cast<unsigned int>(lbl_8032E660), 0, 0, reinterpret_cast<unsigned int>(lbl_8032E660)

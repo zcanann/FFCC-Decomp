@@ -19,9 +19,16 @@ struct RedTrackDATA {
 	int m_pan;
 	int m_panAdd;
 	int m_panDelta;
-	unsigned char m_pad4C[0x11C - 0x4C];
+	unsigned char m_pad4C[0xFC - 0x4C];
+	int m_voiceSwitch;
+	unsigned char m_pad100[0x104 - 0x100];
+	unsigned int m_flags;
+	unsigned char m_pad108[0x110 - 0x108];
+	int m_sweepDelta;
+	int m_sweepAdd;
+	int m_portamentTime;
 	int m_waveBase;
-	unsigned char m_pad120[0x124 - 0x120];
+	int m_portamentPitch;
 	int m_waveNo;
 	unsigned char m_pad128[0x14D - 0x128];
 	unsigned char m_waveBankNo;

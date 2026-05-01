@@ -1237,7 +1237,7 @@ void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_PortamentOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	((int*)track)[0x46] = DeltaTimeSumup((unsigned char**)track);
+	track->m_portamentTime = DeltaTimeSumup((unsigned char**)track);
 }
 
 /*
@@ -1251,8 +1251,8 @@ void __MidiCtrl_PortamentOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
  */
 void __MidiCtrl_PortamentOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    ((int*)track)[0x46] = 0;
-    ((int*)track)[0x48] = -1;
+    track->m_portamentTime = 0;
+    track->m_portamentPitch = -1;
 }
 
 /*
@@ -1266,8 +1266,8 @@ void __MidiCtrl_PortamentOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_SlurOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    ((unsigned int*)track)[0x41] |= 0x80000;
-    ((unsigned int*)track)[0x41] &= 0xFFEFFFFF;
+    track->m_flags |= 0x80000;
+    track->m_flags &= 0xFFEFFFFF;
 }
 
 /*
@@ -1281,7 +1281,7 @@ void __MidiCtrl_SlurOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_SlurOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    ((unsigned int*)track)[0x41] &= 0xFFF7FFFF;
+    track->m_flags &= 0xFFF7FFFF;
 }
 
 /*
@@ -1305,12 +1305,12 @@ void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
         delta += 1;
     }
 
-    command = *(*(s8**)track)++;
+    command = *(s8*)track->m_command++;
     value = 0;
     command <<= 8;
-    ((int*)track)[0x45] = DataAddCompute(&value, command, &delta);
-    ((int*)track)[0x44] = delta;
-    ((int*)track)[0x48] &= 0xfffff000;
+    track->m_sweepAdd = DataAddCompute(&value, command, &delta);
+    track->m_sweepDelta = delta;
+    track->m_portamentPitch &= 0xfffff000;
 
     voiceData = (int*)p_VoiceData;
     do {
@@ -1328,7 +1328,7 @@ void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_TenutoOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    ((unsigned int*)track)[0x41] |= 0x00200000;
+    track->m_flags |= 0x00200000;
 }
 
 /*
@@ -1338,7 +1338,7 @@ void __MidiCtrl_TenutoOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_TenutoOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    ((unsigned int*)track)[0x41] &= ~0x00200000;
+    track->m_flags &= ~0x00200000;
 }
 
 /*

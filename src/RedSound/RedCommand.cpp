@@ -107,8 +107,8 @@ int _EraseTime(int eraseTrack)
 	do {
 		if (((u32)*track != 0) && (((RedTrackDATA*)track)->m_attrMask == 0) &&
 		    ((int)((RedTrackDATA*)track)->m_eraseTrack <= eraseTrack) &&
-		    (track[0x43] > maxWait)) {
-			maxWait = track[0x43];
+		    (((RedTrackDATA*)track)->m_playTime > maxWait)) {
+			maxWait = ((RedTrackDATA*)track)->m_playTime;
 			sepId = ((RedTrackDATA*)track)->m_seSepId;
 		}
 		track += 0x55;
@@ -119,7 +119,7 @@ int _EraseTime(int eraseTrack)
 	do {
 		if (((u32)*track != 0) && (((RedTrackDATA*)track)->m_attrMask == 0) &&
 		    ((int)((RedTrackDATA*)track)->m_eraseTrack <= eraseTrack) &&
-		    (track[0x43] == maxWait)) {
+		    (((RedTrackDATA*)track)->m_playTime == maxWait)) {
 			int trackNo;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
@@ -367,9 +367,9 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			current = current +
 			          (((unsigned int)seq[1] * 0x100 + (unsigned int)*seq) & 0x7fff);
 			deltaTime = (int)DeltaTimeSumup((unsigned char**)track);
-			track[0x42] = deltaTime + 1;
+			((RedTrackDATA*)track)->m_deltaTime = deltaTime + 1;
 			if (m_SeSkipStep != 0) {
-				track[0x42] = track[0x42] - m_SeSkipStep;
+				((RedTrackDATA*)track)->m_deltaTime = ((RedTrackDATA*)track)->m_deltaTime - m_SeSkipStep;
 			}
 
 			((RedTrackDATA*)track)->m_seSepId = sepId;
@@ -380,7 +380,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			} else {
 				state = 0;
 			}
-			track[0x43] = state;
+			((RedTrackDATA*)track)->m_playTime = state;
 
 			if (*(char*)*track != '\0') {
 				((RedTrackDATA*)track)->m_eraseTrack = info->m_eraseTrack;
@@ -756,7 +756,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		((RedTrackDATA*)track)->m_waveBankData = (int)waveHead;
 		((RedTrackDATA*)track)->m_command = current + 4;
 		current = current + 4 + blockSize;
-		track[0x42] = DeltaTimeSumup((unsigned char**)track) + 1;
+		((RedTrackDATA*)track)->m_deltaTime = DeltaTimeSumup((unsigned char**)track) + 1;
 		((RedTrackDATA*)track)->m_seSepId = 0;
 		track[8] = (m_MusicKeySignature == 0) ? 0 : (int)(t_KeySignatureData + 0xb);
 		((RedTrackDATA*)track)->m_mixVolume = 0x7f000;

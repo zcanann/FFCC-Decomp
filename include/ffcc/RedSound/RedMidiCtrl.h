@@ -73,7 +73,8 @@ struct RedTrackDATA {
 	int m_voiceSwitch;
 	unsigned char m_pad100[0x104 - 0x100];
 	unsigned int m_flags;
-	unsigned char m_pad108[0x110 - 0x108];
+	int m_deltaTime;
+	int m_playTime;
 	int m_sweepDelta;
 	int m_sweepAdd;
 	int m_portamentTime;

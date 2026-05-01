@@ -684,7 +684,7 @@ void SePause(int seId, int pause)
  */
 void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume, int mode)
 {
-	int waveBase = c_RedEntry.SearchWaveBase((int)*(short*)((char*)musicHead + 6));
+	int waveBase = c_RedEntry.SearchWaveBase(musicHead->m_waveNo);
 	if (waveBase == 0) {
 		return;
 	}
@@ -718,7 +718,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 			fflush(__files + 1);
 			OSReport(sRedCommandMusicNeedMemoryFmt,
 			         sRedCommandLogPrefix, sRedCommandLogErrorColor,
-			         (int)*(short*)((char*)musicHead + 4), *(char*)((char*)musicHead + 8) * 0x154, sRedCommandLogReset);
+			         (int)musicHead->m_musicNo, *(char*)((char*)musicHead + 8) * 0x154, sRedCommandLogReset);
 			fflush(__files + 1);
 		}
 		c_RedEntry.DisplayMMemoryInfo();
@@ -732,14 +732,14 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		SetReverb(0, t_ReverbModeData[reverbKind].kind, t_ReverbModeData[reverbKind].params);
 	}
 
-	*(int*)p_ReverbDepth = (int)*(short*)((char*)musicHead + 10);
+	*(int*)p_ReverbDepth = (int)musicHead->m_reverbDepth;
 	if (*(int*)p_ReverbDepth != 0) {
 		*(int*)p_ReverbDepth = (*(int*)p_ReverbDepth + 1) << 8;
 		*(int*)p_ReverbDepth = (*(int*)p_ReverbDepth - 1) << 0xc;
 	}
 	((int*)p_ReverbDepth)[1] = 0;
 	((int*)p_ReverbDepth)[2] = 0;
-	music[0x11f] = (int)*(short*)((char*)musicHead + 6);
+	music[0x11f] = musicHead->m_waveNo;
 
 	unsigned char* current = (unsigned char*)musicHead + 0x20;
 	int* track = (int*)*music;
@@ -783,7 +783,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		*(short*)((char*)track + 0xb2) = 0;
 		*(short*)((char*)track + 0x92) = 0;
 		track[7] = 0;
-		track[0x41] = ((*(unsigned int*)((char*)musicHead + 0x14) & 0x40000) == 0) ? 0x200000 : 0;
+		track[0x41] = ((musicHead->m_playFlags & 0x40000) == 0) ? 0x200000 : 0;
 		*(short*)((char*)track + 0x13a) = 0;
 		*(short*)(track + 0x4e) = 0;
 		track[0x3c] = 0;
@@ -809,7 +809,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	music[2] = (int)(t_KeySignatureData + 0xb);
 	*(unsigned char*)((char*)music + 0x491) = *(unsigned char*)((char*)musicHead + 8);
 	*(short*)((char*)music + 0x48e) = (short)*(char*)((char*)musicHead + 8);
-	*(unsigned char*)((char*)music + 0x492) = (unsigned char)(*(unsigned short*)((char*)musicHead + 0xc) & 0x7f);
+	*(unsigned char*)((char*)music + 0x492) = (unsigned char)(musicHead->m_flags & 0x7f);
 	*(short*)(music + 0x123) = 1;
 	music[0x112] = 0x1000;
 	music[5] = 10000;
@@ -823,7 +823,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	music[9] = 0;
 	music[0x122] = 0;
 	music[0x11b] &= 0x10;
-	if ((*(unsigned int*)((char*)musicHead + 0x14) & 0x40000) != 0) {
+	if ((musicHead->m_playFlags & 0x40000) != 0) {
 		music[0x11b] |= 0x40000;
 	}
 

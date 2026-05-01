@@ -1193,8 +1193,8 @@ void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     track->m_pan = pan << 0xc;
     track->m_panAdd = 0;
     track->m_panDelta = 0;
-    if ((u32)reinterpret_cast<int*>(track)[0x2d] == 0) {
-        reinterpret_cast<int*>(track)[0x33] = 0;
+    if ((u32)track->m_shakeFunc == 0) {
+        track->m_shakePan = 0;
     }
     m_ChangeStatus |= 2;
 }
@@ -1217,9 +1217,9 @@ void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 	if (delta[0] == 0) {
 		delta[0]++;
 	}
-	if ((u32)((int*)track)[0x2d] == 0) {
-		((int*)track)[0x10] += ((int*)track)[0x33] * 0x1000;
-		((int*)track)[0x33] = 0;
+	if ((u32)track->m_shakeFunc == 0) {
+		track->m_pan += track->m_shakePan * 0x1000;
+		track->m_shakePan = 0;
 	}
 	pan = *track->m_command++;
 	track->m_panAdd = DataAddCompute(&track->m_pan, pan, delta);

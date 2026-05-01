@@ -1424,20 +1424,19 @@ int CRedDriver::GetSoundMode()
 int CRedDriver::SetMusicData(void* musicData)
 {
     int result;
-    char localHeader[0x20];
-    char* header;
+    RedMusicHEAD localHeader;
+    RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
     void* copiedHeader;
     int headerSize;
 
     result = -1;
-    header = (char*)musicData;
-    if (((header[0] == 'B') && (header[1] == 'G')) && (header[2] == 'M')) {
-        memcpy(localHeader, header, sizeof(localHeader));
-        headerSize = *(int*)(localHeader + 0x10);
+    if (((header->m_signature[0] == 'B') && (header->m_signature[1] == 'G')) && (header->m_signature[2] == 'M')) {
+        memcpy(&localHeader, header, sizeof(localHeader));
+        headerSize = localHeader.m_size;
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
             memcpy(copiedHeader, header, headerSize);
-            result = *(short*)(localHeader + 4);
+            result = localHeader.m_musicNo;
             _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
     } else if (m_ReportPrint != 0) {

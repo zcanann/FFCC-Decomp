@@ -2069,13 +2069,15 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 
 extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
 {
-	int groupedCount = 1;
+	int groupedCount;
 
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		groupedCount = 1;
 	} else {
 		short* slotRef = caravanWork->m_commandListExtra + cmdListIdx;
-		if (slotRef[0] != 0) {
+		if (slotRef[0] == 0) {
+			groupedCount = 1;
+		} else {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
 			if (cmdListIdx >= 0) {

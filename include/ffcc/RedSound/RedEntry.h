@@ -14,9 +14,15 @@ struct RedMusicHEAD
 	char m_signature[4];
 	short m_musicNo;
 	short m_waveNo;
-	int m_unk08;
-	int m_unk0c;
+	unsigned char m_trackCount;
+	unsigned char m_unk09;
+	short m_reverbDepth;
+	unsigned short m_flags;
+	unsigned short m_unk0e;
 	int m_size;
+	unsigned int m_playFlags;
+	int m_unk18;
+	int m_unk1c;
 };
 
 struct RedSeSepHEAD

@@ -919,7 +919,7 @@ int MusicPlay(int musicId, int volume, int mode)
 	if (musicBank != 0) {
 		RedMusicHEAD* musicHead = (RedMusicHEAD*)musicBank[2];
 		RedWaveHeadWD* waveHead =
-		    (RedWaveHeadWD*)c_RedEntry.SearchWaveBase(*(short*)((char*)musicHead + 6));
+		    (RedWaveHeadWD*)c_RedEntry.SearchWaveBase(musicHead->m_waveNo);
 
 		if (waveHead == 0) {
 			return -1;

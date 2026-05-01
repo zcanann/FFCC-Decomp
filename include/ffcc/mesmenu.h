@@ -19,7 +19,6 @@ public:
     void onScriptChanged(char*, int);
     void Open(char*, int, int, int, int, int, int);
     void CloseRequest(int);
-    void close(int);
     void SetPos(float, float);
 };
 

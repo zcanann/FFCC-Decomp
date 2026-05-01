@@ -1245,13 +1245,3 @@ void CMesMenu::SetPos(float x, float y)
 	*(float*)((char*)this + 0x3d74) = x;
 	*(float*)((char*)this + 0x3d78) = y;
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMesMenu::close(int closeReason)
-{
-    CloseRequest(closeReason);
-}

@@ -13,6 +13,13 @@ struct RandDownFloatParam {
     u8 useNormalDistribution;
 };
 
+extern const float kPppRandDownFloatDualSampleScale = 0.5f;
+
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8006155c
@@ -36,7 +43,7 @@ void pppRandDownFloat(_pppPObject* basePtr, RandDownFloatParam* in, _pppCtrlTabl
         f32 value = -Math.RandF();
         if (in->useNormalDistribution != 0) {
             f32 randomValue = value - Math.RandF();
-            f32 scale = 0.5f;
+            f32 scale = LoadFloat(kPppRandDownFloatDualSampleScale);
             value = randomValue * scale;
         }
 

@@ -13,6 +13,13 @@ struct RandDownCVParams {
     u8 useNormalDistribution;
 };
 
+extern const float kPppRandDownCVDualSampleScale = 0.5f;
+
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -51,7 +58,7 @@ void pppRandDownCV(_pppPObject* basePtr, RandDownCVParams* in, _pppCtrlTable* ct
         if (in->useNormalDistribution != 0) {
             f32 random = Math.RandF();
             f32 blend = value - random;
-            f32 scale = 0.5f;
+            f32 scale = LoadFloat(kPppRandDownCVDualSampleScale);
             value = blend * scale;
         }
 

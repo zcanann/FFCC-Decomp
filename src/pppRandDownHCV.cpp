@@ -13,6 +13,13 @@ struct RandDownHCVParams {
     u8 useNormalDistribution;
 };
 
+extern const float kPppRandDownHCVDualSampleScale = 0.5f;
+
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 static inline short randshort(short value, float scale)
 {
     return (short)((f32)value * scale);
@@ -42,7 +49,7 @@ void pppRandDownHCV(_pppPObject* basePtr, RandDownHCVParams* in, _pppCtrlTable* 
         if (in->useNormalDistribution != 0) {
             f32 random = Math.RandF();
             f32 blend = value - random;
-            f32 scale = 0.5f;
+            f32 scale = LoadFloat(kPppRandDownHCVDualSampleScale);
             value = blend * scale;
         }
 

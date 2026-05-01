@@ -14,6 +14,13 @@ struct RandDownIVParams {
     u8 useNormalDistribution;
 };
 
+extern const float kPppRandDownIVDualSampleScale = 0.5f;
+
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -51,7 +58,7 @@ void pppRandDownIV(_pppPObject* basePtr, RandDownIVParams* in, _pppCtrlTable* ct
         value = -Math.RandF();
         if (in->useNormalDistribution != 0) {
             f32 randValue = value - Math.RandF();
-            f32 scale = 0.5f;
+            f32 scale = LoadFloat(kPppRandDownIVDualSampleScale);
             value = randValue * scale;
         }
 

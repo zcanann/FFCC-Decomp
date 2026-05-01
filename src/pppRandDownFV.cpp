@@ -14,6 +14,13 @@ struct RandDownFVParams {
     u8 useNormalDistribution;
 };
 
+extern const float kPppRandDownFVDualSampleScale = 0.5f;
+
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 static inline float randf(float value, float scale)
 {
     return value * scale;
@@ -42,7 +49,7 @@ void pppRandDownFV(_pppPObject* basePtr, RandDownFVParams* in, _pppCtrlTable* ct
         f32 value = -Math.RandF();
         if (in->useNormalDistribution != 0) {
             f32 randomValue = value - Math.RandF();
-            f32 scale = 0.5f;
+            f32 scale = LoadFloat(kPppRandDownFVDualSampleScale);
             value = randomValue * scale;
         }
 

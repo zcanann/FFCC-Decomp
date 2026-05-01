@@ -66,7 +66,7 @@ extern char lbl_8032E660[];
 extern u8 ARRAY_8026D728[];
 
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
-extern const char s_CFunnyShapePcs[];
+static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 extern "C" const char lbl_8032FD1C[] = "|/-\\";
 
 namespace {
@@ -438,8 +438,6 @@ void CFunnyShapePcs::drawViewer()
         Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), pFan[frame % 4]);
     }
 }
-
-const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 
 /*
  * --INFO--

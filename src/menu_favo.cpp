@@ -2,7 +2,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/pad.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/sound.h"
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>

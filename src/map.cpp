@@ -9,7 +9,7 @@
 #include "ffcc/maptexanim.h"
 #include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_light.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/file.h"

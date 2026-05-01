@@ -225,12 +225,12 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
  */
 void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShpTail2* param, pppYmMegaBirthShpTail2UnkC* offsets)
 {
-    bool hasRequiredMemory;
+    s8 hasRequiredMemory;
+    u32 i;
     int spawnCount = 0;
     u8* paramPayload;
     u8* particleData;
     int colorOffset;
-    u32 i;
     _PARTICLE_WMAT* worldMat;
     _PARTICLE_COLOR* particleColor;
     VYmMegaBirthShpTail2* work;
@@ -271,10 +271,10 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
         hasRequiredMemory = false;
     } else if (work->m_wmats == 0) {
         hasRequiredMemory = false;
-    } else if ((paramPayload[0x69] == 0) || (work->m_colors != 0)) {
-        hasRequiredMemory = true;
-    } else {
+    } else if ((paramPayload[0x69] != 0) && (work->m_colors == 0)) {
         hasRequiredMemory = false;
+    } else {
+        hasRequiredMemory = true;
     }
 
     if (hasRequiredMemory) {

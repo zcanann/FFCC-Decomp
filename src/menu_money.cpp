@@ -1,7 +1,7 @@
 #include "ffcc/menu_money.h"
 #include "ffcc/fontman.h"
 #include "ffcc/gobjwork.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"

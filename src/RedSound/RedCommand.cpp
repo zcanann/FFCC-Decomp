@@ -965,7 +965,8 @@ void SetMusicVolume(int seId, int volume, int duration, int mode)
 
 	music = (int*)p_SoundControlBuffer;
 	do {
-		if ((seId == -1) || (seId == music[0x11c]) || (music[0x11c] < 0)) {
+		if ((seId == -1) || (seId == ((RedSoundCONTROL*)music)->m_musicId) ||
+		    (((RedSoundCONTROL*)music)->m_musicId < 0)) {
 			if (mode == 1) {
 				((RedSoundCONTROL*)music)->m_masterVolumeAdd = -((RedSoundCONTROL*)music)->m_masterVolume / duration;
 				((RedSoundCONTROL*)music)->m_masterVolumeDelta = duration;

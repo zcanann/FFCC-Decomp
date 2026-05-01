@@ -495,7 +495,6 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     int colorOffset;
     int* dataOffsets;
-    _pppMngSt* mngSt;
     VYmBreath* work;
     VColor* color;
     Mtx* particleWMat;
@@ -522,7 +521,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     }
 
     dataOffsets = offsets->m_serializedDataOffsets;
-    mngSt = pppMngStPtr;
+    _pppMngSt* mngSt = pppMngStPtr;
     colorOffset = dataOffsets[1];
     work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[0]);
     color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
@@ -589,7 +588,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         PSVECNormalize(&work->m_direction, &work->m_direction);
     }
 
-    PSMTXCopy(mngSt->m_matrix.value, work->m_matrix);
+    PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_matrix);
     UpdateAllParticle(reinterpret_cast<_pppPObject*>(ymBreath), work, pYmBreath, color);
 
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);

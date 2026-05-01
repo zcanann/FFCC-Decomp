@@ -33,7 +33,7 @@ extern const f32 FLOAT_80330808;
 static unsigned char ARRAY_802ea1a0[0xC];
 CMenuPcs MenuPcs ATTRIBUTE_ALIGN(32);
 static const char kMenuPcsStageName[] = "CMenuPcs";
-static const char kPMenuSourceFile[] = "p_menu.cpp";
+static const char s_p_menu_cpp_801d9d80[] = "p_menu.cpp";
 
 struct Vec4d
 {
@@ -438,7 +438,7 @@ void CMenuPcs::create()
             void* stage = *reinterpret_cast<int*>(self + 0x740) == 1 ? *reinterpret_cast<void**>(&MapMng)
                                                                      : m_menuStage;
 
-            CTextureSet* textureSet = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0x182) CTextureSet;
+            CTextureSet* textureSet = new (Game.m_mainStage, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x182) CTextureSet;
             *reinterpret_cast<CTextureSet**>(self + 0x14C + i * 4) = textureSet;
             if (textureSet != 0) {
                 textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
@@ -529,14 +529,14 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
     }
 
     if ((slot == 0) && (FontMan.m_font != 0)) {
-        m_fonts[slot] = FontMan.m_font;
-        reinterpret_cast<u32*>(m_fonts[slot])[1] = reinterpret_cast<u32*>(m_fonts[slot])[1] + 1;
+        m_fonts[0] = FontMan.m_font;
+        reinterpret_cast<u32*>(m_fonts[0])[1] = reinterpret_cast<u32*>(m_fonts[0])[1] + 1;
     } else {
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
-        m_fonts[slot] = new (MenuPcs.m_menuStage, const_cast<char*>(kPMenuSourceFile), 0xF8) CFont;
+        m_fonts[slot] = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp_801d9d80), 0xF8) CFont;
         m_fonts[slot]->Create(File.m_readBuffer, stage);
 
         File.Close(fileHandle);
@@ -623,7 +623,7 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
                 }
             }
 
-            CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(kPMenuSourceFile), 0x182) CTextureSet;
+            CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x182) CTextureSet;
             *reinterpret_cast<CTextureSet**>(self + 0x14C + (textureSetStart + i) * 4) = textureSet;
 
             textureSet->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
@@ -689,7 +689,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
     CMenuPcs* slotMenu;
 
     if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740) != static_cast<int>(mode)) {
-        _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(kPMenuSourceFile), 0x1B0);
+        _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x1B0);
         currentMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
         if (currentMode == 1) {
             destroyWorld();
@@ -1644,7 +1644,7 @@ void CMenuPcs::createBattle()
 
             void* stage = m_mode == 1 ? *reinterpret_cast<void**>(&MapMng) : m_menuStage;
 
-            CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(kPMenuSourceFile), 0x182) CTextureSet;
+            CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x182) CTextureSet;
             m_textureSets[kBattleTextureSetStart + i] = textureSet;
             textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
 
@@ -1663,7 +1663,7 @@ void CMenuPcs::createBattle()
     }
 
     for (int i = 0; i < 12; i++) {
-        CMesMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(kPMenuSourceFile), 0x48B) CMesMenu;
+        CMesMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x48B) CMesMenu;
         m_battleMesMenus[i] = menu;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x18) = i;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x1C) = i;
@@ -1671,7 +1671,7 @@ void CMenuPcs::createBattle()
     }
 
     for (int i = 0; i < 4; i++) {
-        CRingMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(kPMenuSourceFile), 0x492) CRingMenu;
+        CRingMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x492) CRingMenu;
         m_battleRingMenus[i] = menu;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 8) = i;
         menu->Create();

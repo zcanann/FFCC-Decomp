@@ -337,9 +337,7 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
  */
 int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 {
-	unsigned char* head = (unsigned char*)waveHead;
-
-	if ((head[0] != 'W') || (head[1] != 'D')) {
+	if ((waveHead->m_signature[0] != 'W') || (waveHead->m_signature[1] != 'D')) {
 		if (m_ReportPrint != 0) {
 			OSReport(s__s_sWave_Header_was_broken__s_801e7972, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
 			fflush(__files + 1);
@@ -348,24 +346,24 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		return -1;
 	}
 
-	if (*(int*)(head + 0x14) < *(int*)(head + 4)) {
-		*(int*)(head + 0x14) = *(int*)(head + 4);
+	if (waveHead->m_loadSize < waveHead->m_waveSize) {
+		waveHead->m_loadSize = waveHead->m_waveSize;
 	}
 
 	if ((waveNo >= 100) && (waveNo < 300)) {
-		if (*(int*)(head + 0x14) <= 0x200000) {
-			*(int*)(head + 0x14) = 0x200000;
-		} else if (*(int*)(head + 0x14) <= 0x400000) {
-			*(int*)(head + 0x14) = 0x400000;
+		if (waveHead->m_loadSize <= 0x200000) {
+			waveHead->m_loadSize = 0x200000;
+		} else if (waveHead->m_loadSize <= 0x400000) {
+			waveHead->m_loadSize = 0x400000;
 		}
 	} else if ((waveNo >= 10) && (waveNo < 70)) {
-		*(int*)(head + 0x14) += 0x27FFF;
-		int blocks = *(int*)(head + 0x14) / 0x28000 + (*(int*)(head + 0x14) >> 0x1F);
+		waveHead->m_loadSize += 0x27FFF;
+		int blocks = waveHead->m_loadSize / 0x28000 + (waveHead->m_loadSize >> 0x1F);
 		blocks = blocks - (blocks >> 0x1F);
-		*(int*)(head + 0x14) = blocks * 0x28000;
+		waveHead->m_loadSize = blocks * 0x28000;
 	} else if (((waveNo >= 0x154) && (waveNo < 0x17a)) || ((waveNo >= 0x17f) && (waveNo < 0x182)) ||
 	           (waveNo == 0x183)) {
-		*(int*)(head + 0x14) = 0x100000;
+		waveHead->m_loadSize = 0x100000;
 	}
 
 	int minOffset;
@@ -383,39 +381,40 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 	}
 
 	do {
-		int* historyBank;
+		RedHistoryBANK* historyBank;
 		if (waveBankNo < 0) {
-			historyBank = (int*)(m_waveBankBase + 0x100);
-			while ((historyBank[3] != 0) && (historyBank < (int*)(m_waveBankBase + 0x400U))) {
-				historyBank += 4;
+			historyBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x100);
+			while ((historyBank->m_size != 0) &&
+			       (historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x400U))) {
+				historyBank += 1;
 			}
 		} else {
 			waveBankNo &= 0xF;
-			historyBank = (int*)(m_waveBankBase + waveBankNo * 0x10);
-			if (historyBank[3] != 0) {
-				WaveDelete((RedHistoryBANK*)historyBank);
+			historyBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + waveBankNo * 0x10);
+			if (historyBank->m_size != 0) {
+				WaveDelete(historyBank);
 			}
 		}
 
 		int arAddress;
-		if ((historyBank < (int*)(m_waveBankBase + 0x400U)) &&
-		    ((arAddress = RedNewA(*(int*)(head + 0x14), minOffset, maxOffset)) != 0)) {
-			int copySize = *(int*)(head + 0xC) * 0x60 + 0x20;
-			copySize += ((*(int*)(head + 8) * 4) + 0x1F) & 0xFFFFFFE0;
+		if ((historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x400U)) &&
+		    ((arAddress = RedNewA(waveHead->m_loadSize, minOffset, maxOffset)) != 0)) {
+			int copySize = waveHead->m_toneCount * 0x60 + 0x20;
+			copySize += ((waveHead->m_tableCount * 4) + 0x1F) & 0xFFFFFFE0;
 			void* copied = (void*)RedNew(copySize);
 			if (copied != 0) {
-				historyBank[2] = (int)copied;
-				historyBank[3] = copySize;
-				*(int*)(head + 0x10) = arAddress;
-				historyBank[0] = waveNo;
-				*(short*)(head + 2) = (short)waveNo;
+				historyBank->m_data = (int)copied;
+				historyBank->m_size = copySize;
+				waveHead->m_aramAddress = arAddress;
+				historyBank->m_id = waveNo;
+				waveHead->m_waveNo = (short)waveNo;
 				if (waveBankNo < 0) {
 					WaveHistoryAdd(1);
-					historyBank[1] = 1;
+					historyBank->m_historyNo = 1;
 				} else {
-					historyBank[1] = 0;
+					historyBank->m_historyNo = 0;
 				}
-				memcpy(copied, head, copySize);
+				memcpy(copied, waveHead, copySize);
 				return arAddress;
 			}
 			RedDeleteA((void*)arAddress);
@@ -423,8 +422,8 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 	} while (WaveOldClear(minOffset, maxOffset) != 0);
 
 	if (m_ReportPrint != 0) {
-		OSReport(s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991, sRedEntryLogPrefix, sRedEntryErrorColor, (int)*(short*)(head + 2),
-		         *(int*)(head + 4), sRedEntryResetColor);
+		OSReport(s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991, sRedEntryLogPrefix, sRedEntryErrorColor, (int)waveHead->m_waveNo,
+		         waveHead->m_waveSize, sRedEntryResetColor);
 		fflush(__files + 1);
 	}
 
@@ -456,7 +455,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 	waveAddress = 0;
 	if (m_waveLoadNo < 0) {
 		RedWaveHeadWD* waveHead = (RedWaveHeadWD*)waveData;
-		waveNo = *(short*)((unsigned char*)waveHead + 2);
+		waveNo = waveHead->m_waveNo;
 
 		if ((waveBankNo >= 0) && (waveNo != *(int*)(entry[0] + waveBankNo * 0x10))) {
 			WaveDelete((RedHistoryBANK*)(entry[0] + waveBankNo * 0x10));
@@ -483,10 +482,10 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 			}
 
 			int waveHeadSize =
-			    ((((*(int*)((unsigned char*)waveHead + 8) * 4) + 0x1F) & 0xFFFFFFE0) +
-			     *(int*)((unsigned char*)waveHead + 0xC) * 0x60) +
+			    ((((waveHead->m_tableCount * 4) + 0x1F) & 0xFFFFFFE0) +
+			     waveHead->m_toneCount * 0x60) +
 			    0x20;
-			waveSize = *(int*)((unsigned char*)waveHead + 4);
+			waveSize = waveHead->m_waveSize;
 			waveDataSize -= waveHeadSize;
 			waveDataTop = (void*)((unsigned char*)waveData + waveHeadSize);
 		}

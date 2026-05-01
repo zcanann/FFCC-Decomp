@@ -654,8 +654,3 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     state->m_colorDecayFrames = (u16)pYmMiasma->m_colorDecayFrames;
     state->m_hasImpulse = 0;
 }
-
-extern const float FLOAT_8033066c = 0.0f;
-extern const float FLOAT_80330670 = 0.0f;
-extern const float FLOAT_80330674 = 0.0031250000465661287f;
-extern const float FLOAT_80330678 = -0.0044639999978244305f;

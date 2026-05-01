@@ -973,10 +973,10 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
         if (voiceData[1] != 0) {
             if ((((unsigned int*)voiceData[1])[0] & 0x20000) == 0) {
                 voiceData[0x28] = note << 0x14;
-                if (trackData[8] != 0) {
+                if (param_1->m_keySignatureData != 0) {
                     iVar5 = voiceData[0x28] >> 0x14;
                     iVar1 = iVar5 / 0xc + (voiceData[0x28] >> 0x1f);
-                    local_38[0] = ((s8*)trackData[8])[iVar5 + (iVar1 - (iVar1 >> 0x1f)) * -0xc];
+                    local_38[0] = param_1->m_keySignatureData[iVar5 + (iVar1 - (iVar1 >> 0x1f)) * -0xc];
                     voiceData[0x28] += local_38[0] * 0x100000;
                 }
             } else {

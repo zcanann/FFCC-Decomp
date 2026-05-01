@@ -509,7 +509,7 @@ void CAStar::drawAStar()
 {
 	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x400) != 0)
 	{
-		if ((System.m_frameCounter % 0x1e) == 0)
+		if ((static_cast<int>(System.m_frameCounter) % 0x1e) == 0)
 		{
 			for (int group = 0; group < 64; ++group)
 			{
@@ -657,11 +657,11 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		return;
 	}
 
-	unsigned char prev = m_previousGroup;
-	unsigned char curr = m_currentGroup;
+	int prev = m_previousGroup;
+	int curr = m_currentGroup;
 
-	unsigned char groupLow  = curr;
-	unsigned char groupHigh = prev;
+	int groupLow  = curr;
+	int groupHigh = prev;
 
 	if (prev < curr)
 	{

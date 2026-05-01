@@ -57,8 +57,8 @@ public:
 	int m_portalCount;                      // 0x8
 	CAPos m_portals[64];                    // 0xc
 	unsigned char m_routeTable[64][64][2];  // 0x40c
-	unsigned int m_lastSeenGroup;           // 0x240c
-	// Unused                               // 0x240d-0x240f
+	unsigned char m_lastSeenGroup;          // 0x240c
+	unsigned char m_pad240D[3];             // 0x240d-0x240f
 	Vec m_lastGroupPos;                     // 0x2410
 	unsigned char m_currentGroup;           // 0x241c
 	unsigned char m_previousGroup;          // 0x241d

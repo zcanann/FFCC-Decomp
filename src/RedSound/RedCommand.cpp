@@ -374,7 +374,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 
 			((RedTrackDATA*)track)->m_seSepId = sepId;
 			((RedTrackDATA*)track)->m_seId = seId;
-			*(short*)(track + 0x51) = 0;
+			((RedTrackDATA*)track)->m_loopStepCurrent = 0;
 			if (m_SeSkipStep == 0) {
 				state = 0xffffffff;
 			} else {

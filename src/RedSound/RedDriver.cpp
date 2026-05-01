@@ -4,6 +4,7 @@
 #include "ffcc/RedSound/RedStream.h"
 #include "ffcc/RedSound/RedCommand.h"
 #include "ffcc/RedSound/RedExecute.h"
+#include "ffcc/RedSound/RedMidiCtrl.h"
 #include "ffcc/RedSound/RedGlobals.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
@@ -1707,7 +1708,7 @@ int CRedDriver::SePlayState(int seID)
     seInfoBase = (int**)((int)p_SoundControlBuffer + 0xdbc);
     seInfo = *seInfoBase;
     do {
-        if (((u32)*seInfo != 0) && ((seID == -1 || (seInfo[0x3e] == seID)))) {
+        if (((u32)*seInfo != 0) && ((seID == -1 || (((RedTrackDATA*)seInfo)->m_seId == seID)))) {
             result = (int)seInfo;
             break;
         }
@@ -1879,7 +1880,7 @@ int CRedDriver::GetSeVolume(int seID, int mode)
 
     seInfo = *(unsigned int**)((int)p_SoundControlBuffer + 0xdbc);
     while (1) {
-        if ((*seInfo != 0) && ((seID == -1) || (seID == (int)seInfo[0x3e]))) {
+        if ((*seInfo != 0) && ((seID == -1) || (seID == ((RedTrackDATA*)seInfo)->m_seId))) {
             if (*seInfo != 0) {
                 if (mode == 1) {
                     return seInfo[0x15];
@@ -1911,7 +1912,7 @@ int CRedDriver::ReportSeLoop(int seID)
     seInfo = *(unsigned int**)((int)p_SoundControlBuffer + 0xdbc);
     while (1) {
         if ((*seInfo != 0) &&
-            (((seID == -1) || (seID == (int)seInfo[0x3e])) && ((seInfo[0x40] & 1U) != 0))) {
+            (((seID == -1) || (seID == ((RedTrackDATA*)seInfo)->m_seId)) && ((seInfo[0x40] & 1U) != 0))) {
             return 1;
         }
         seInfo += 0x55;

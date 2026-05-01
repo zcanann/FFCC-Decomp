@@ -511,6 +511,8 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         return;
     }
 
+    _pppPObject* object = reinterpret_cast<_pppPObject*>(breathModel);
+
     dataOffsets = offsets->m_serializedDataOffsets;
     _pppMngSt* mngSt = pppMngStPtr;
     colorOffset = dataOffsets[1];
@@ -608,7 +610,7 @@ group_ready:
             scaleMtx[1][1] = scaledOwner;
             scaleMtx[2][2] = scaledOwner;
             particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
-            PSMTXConcat(*particleMtx, reinterpret_cast<_pppPObject*>(breathModel)->m_localMatrix.value, worldMtx);
+            PSMTXConcat(*particleMtx, object->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
             rotMtx.value[0][3] = 0.0f;

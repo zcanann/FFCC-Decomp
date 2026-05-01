@@ -1291,27 +1291,26 @@ void __MidiCtrl_SlurOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int delta;
+    int delta[1];
     int command;
     int value;
     int* voiceData;
 
-    delta = DeltaTimeSumup((unsigned char**)track);
-    if (delta == 0) {
-        delta += 1;
+    delta[0] = DeltaTimeSumup((unsigned char**)track);
+    if (delta[0] == 0) {
+        delta[0] += 1;
     }
 
-    command = *(s8*)track->m_command++;
+    command = *(s8*)track->m_command++ << 8;
     value = 0;
-    command <<= 8;
-    track->m_sweepAdd = DataAddCompute(&value, command, &delta);
-    track->m_sweepDelta = delta;
-    track->m_portamentPitch &= 0xfffff000;
+    track->m_sweepAdd = DataAddCompute(&value, command, delta);
+    track->m_sweepDelta = delta[0];
+    track->m_portamentPitch &= ~0xfff;
 
     voiceData = (int*)p_VoiceData;
     do {
         if ((RedTrackDATA*)voiceData[0] == track) {
-            voiceData[0x28] &= 0xfffff000;
+            ((RedVoiceDATA*)voiceData)->m_basePitch &= ~0xfff;
         }
         voiceData += 0x30;
     } while (voiceData < (int*)(p_VoiceData + 0xc00));

@@ -697,7 +697,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                 foundSlot = -1;
                 for (short groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
                     for (short slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
-                        if ((int)(short)i == (int)*(signed char*)(*(int*)(groupTableWork + 4) + (int)slotIndex)) {
+                        signed char* particleIndices = *(signed char**)(groupTableWork + 4);
+                        if ((short)i == *(signed char*)(particleIndices + (short)slotIndex)) {
                             foundGroup = groupIndex;
                             foundSlot = slotIndex;
                             found = true;

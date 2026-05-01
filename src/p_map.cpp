@@ -170,6 +170,91 @@ struct CBoundHack {
 
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CMapPcs::CMapPcs()
+{
+    unsigned int* table = &m_table__7CMapPcs[0][0];
+
+    table[0x004 / 4] = m_table_desc0__7CMapPcs[0];
+    table[0x008 / 4] = m_table_desc0__7CMapPcs[1];
+    table[0x00C / 4] = m_table_desc0__7CMapPcs[2];
+    table[0x010 / 4] = m_table_desc1__7CMapPcs[0];
+    table[0x014 / 4] = m_table_desc1__7CMapPcs[1];
+    table[0x018 / 4] = m_table_desc1__7CMapPcs[2];
+    table[0x01C / 4] = m_table_desc2__7CMapPcs[0];
+    table[0x020 / 4] = m_table_desc2__7CMapPcs[1];
+    table[0x024 / 4] = m_table_desc2__7CMapPcs[2];
+    table[0x030 / 4] = m_table_desc3__7CMapPcs[0];
+    table[0x034 / 4] = m_table_desc3__7CMapPcs[1];
+    table[0x038 / 4] = m_table_desc3__7CMapPcs[2];
+    table[0x044 / 4] = m_table_desc4__7CMapPcs[0];
+    table[0x048 / 4] = m_table_desc4__7CMapPcs[1];
+    table[0x04C / 4] = m_table_desc4__7CMapPcs[2];
+    table[0x058 / 4] = m_table_desc5__7CMapPcs[0];
+    table[0x05C / 4] = m_table_desc5__7CMapPcs[1];
+    table[0x060 / 4] = m_table_desc5__7CMapPcs[2];
+    table[0x06C / 4] = m_table_desc6__7CMapPcs[0];
+    table[0x070 / 4] = m_table_desc6__7CMapPcs[1];
+    table[0x074 / 4] = m_table_desc6__7CMapPcs[2];
+    table[0x080 / 4] = m_table_desc7__7CMapPcs[0];
+    table[0x084 / 4] = m_table_desc7__7CMapPcs[1];
+    table[0x088 / 4] = m_table_desc7__7CMapPcs[2];
+
+    table[0x160 / 4] = m_table_desc8__7CMapPcs[0];
+    table[0x164 / 4] = m_table_desc8__7CMapPcs[1];
+    table[0x168 / 4] = m_table_desc8__7CMapPcs[2];
+    table[0x16C / 4] = m_table_desc9__7CMapPcs[0];
+    table[0x170 / 4] = m_table_desc9__7CMapPcs[1];
+    table[0x174 / 4] = m_table_desc9__7CMapPcs[2];
+    table[0x178 / 4] = m_table_desc10__7CMapPcs[0];
+    table[0x17C / 4] = m_table_desc10__7CMapPcs[1];
+    table[0x180 / 4] = m_table_desc10__7CMapPcs[2];
+    table[0x18C / 4] = m_table_desc11__7CMapPcs[0];
+    table[0x190 / 4] = m_table_desc11__7CMapPcs[1];
+    table[0x194 / 4] = m_table_desc11__7CMapPcs[2];
+    table[0x1A0 / 4] = m_table_desc12__7CMapPcs[0];
+    table[0x1A4 / 4] = m_table_desc12__7CMapPcs[1];
+    table[0x1A8 / 4] = m_table_desc12__7CMapPcs[2];
+    table[0x1B4 / 4] = m_table_desc13__7CMapPcs[0];
+    table[0x1B8 / 4] = m_table_desc13__7CMapPcs[1];
+    table[0x1BC / 4] = m_table_desc13__7CMapPcs[2];
+    table[0x1C8 / 4] = m_table_desc14__7CMapPcs[0];
+    table[0x1CC / 4] = m_table_desc14__7CMapPcs[1];
+    table[0x1D0 / 4] = m_table_desc14__7CMapPcs[2];
+    table[0x1DC / 4] = m_table_desc15__7CMapPcs[0];
+    table[0x1E0 / 4] = m_table_desc15__7CMapPcs[1];
+    table[0x1E4 / 4] = m_table_desc15__7CMapPcs[2];
+
+    table[0x2BC / 4] = m_table_desc16__7CMapPcs[0];
+    table[0x2C0 / 4] = m_table_desc16__7CMapPcs[1];
+    table[0x2C4 / 4] = m_table_desc16__7CMapPcs[2];
+    table[0x2C8 / 4] = m_table_desc17__7CMapPcs[0];
+    table[0x2CC / 4] = m_table_desc17__7CMapPcs[1];
+    table[0x2D0 / 4] = m_table_desc17__7CMapPcs[2];
+    table[0x2D4 / 4] = m_table_desc18__7CMapPcs[0];
+    table[0x2D8 / 4] = m_table_desc18__7CMapPcs[1];
+    table[0x2DC / 4] = m_table_desc18__7CMapPcs[2];
+    table[0x2E8 / 4] = m_table_desc19__7CMapPcs[0];
+    table[0x2EC / 4] = m_table_desc19__7CMapPcs[1];
+    table[0x2F0 / 4] = m_table_desc19__7CMapPcs[2];
+    table[0x2FC / 4] = m_table_desc20__7CMapPcs[0];
+    table[0x300 / 4] = m_table_desc20__7CMapPcs[1];
+    table[0x304 / 4] = m_table_desc20__7CMapPcs[2];
+    table[0x310 / 4] = m_table_desc21__7CMapPcs[0];
+    table[0x314 / 4] = m_table_desc21__7CMapPcs[1];
+    table[0x318 / 4] = m_table_desc21__7CMapPcs[2];
+    table[0x324 / 4] = m_table_desc22__7CMapPcs[0];
+    table[0x328 / 4] = m_table_desc22__7CMapPcs[1];
+    table[0x32C / 4] = m_table_desc22__7CMapPcs[2];
+    table[0x338 / 4] = m_table_desc23__7CMapPcs[0];
+    table[0x33C / 4] = m_table_desc23__7CMapPcs[1];
+    table[0x340 / 4] = m_table_desc23__7CMapPcs[2];
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80036254
  * PAL Size: 60b
  * EN Address: TODO

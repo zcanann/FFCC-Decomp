@@ -15,6 +15,7 @@ extern const float kMapCameraCenterYOffset;
 class CMapPcs : public CSamplePcs
 {
 public:
+    CMapPcs();
     void Init();
     void Quit();
     int GetTable(unsigned long);

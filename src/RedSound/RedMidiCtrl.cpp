@@ -1598,7 +1598,7 @@ void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
     unsigned int* voice;
 
     if (*(u8*)((int*)track)[0] != 0) {
-        ((int*)track)[0x3f] |= 4;
+        track->m_voiceSwitch |= 4;
         voice = p_VoiceData;
         do {
             if ((RedTrackDATA*)voice[0] == track) {
@@ -1607,7 +1607,7 @@ void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
             voice += 0x30;
         } while (voice < p_VoiceData + 0xc00);
     } else {
-        ((int*)track)[0x3f] &= ~4;
+        track->m_voiceSwitch &= ~4;
         voice = p_VoiceData;
         do {
             if ((RedTrackDATA*)voice[0] == track) {
@@ -1618,7 +1618,7 @@ void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
     }
 
     ((int*)track)[0] += 1;
-    SetVoiceSwitch(track, ((int*)track)[0x3f]);
+    SetVoiceSwitch(track, track->m_voiceSwitch);
 }
 
 /*
@@ -2211,7 +2211,7 @@ void __MidiCtrl_ShakeType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_FineTuneAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	((u8*)track)[0x148] = (int)*(*(u8**)track)++;
+	track->m_fineTune = (int)*track->m_command++;
 	m_ChangeStatus |= 1;
 }
 
@@ -2226,7 +2226,7 @@ void __MidiCtrl_FineTuneAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  */
 void __MidiCtrl_FineTuneRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	((s8*)track)[0x148] = ((s8*)track)[0x148] + *(*(s8**)track)++;
+	track->m_fineTune = track->m_fineTune + *(s8*)track->m_command++;
 	m_ChangeStatus |= 1;
 }
 
@@ -2241,7 +2241,7 @@ void __MidiCtrl_FineTuneRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  */
 void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	*(short*)((char*)track + 0x142) = (short)(*(*(s8**)track)++ << 8);
+	track->m_keyTranspose = (short)(*(s8*)track->m_command++ << 8);
 	m_ChangeStatus |= 1;
 }
 
@@ -2256,7 +2256,7 @@ void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
  */
 void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	*(short*)((char*)track + 0x142) += *(*(s8**)track)++ << 8;
+	track->m_keyTranspose += *(s8*)track->m_command++ << 8;
 	m_ChangeStatus |= 1;
 }
 
@@ -2284,8 +2284,8 @@ void _PitchBendCompute(RedTrackDATA* track, int bend)
                     pitch = voiceData[0x28] + *p_MusicPitchControl;
                 }
                 computedPitch = pitch;
-                voiceData[0x26] = PitchCompute(computedPitch, *(short*)((char*)track + 0x142) + bend,
-                                               ((int*)voiceData[1])[5], *(char*)((char*)track + 0x148));
+                voiceData[0x26] =
+                    PitchCompute(computedPitch, track->m_keyTranspose + bend, ((int*)voiceData[1])[5], track->m_fineTune);
                 voiceData[0x2e] |= 1;
             }
         }
@@ -2307,12 +2307,12 @@ void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     int bend = (unsigned int)*(unsigned char*)(((int*)track)[0] + 1) * 0x80 +
         ((unsigned int)*(unsigned char*)((int*)track)[0] - 0x2000);
 
-    *(short*)((int*)track + 0x50) = bend;
-    bend *= *(char*)((char*)track + 0x14b);
+    track->m_pitchBendRaw = bend;
+    bend *= track->m_pitchBendRange;
     bend >>= 5;
-    *(short*)((char*)track + 0x13e) = bend;
+    track->m_pitchBend = bend;
     ((int*)track)[0] += 2;
-    _PitchBendCompute(track, *(short*)((char*)track + 0x13e));
+    _PitchBendCompute(track, track->m_pitchBend);
 }
 
 /*
@@ -2328,11 +2328,11 @@ void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 {
     int bend;
 
-    *(char*)((char*)track + 0x14b) = *(*(unsigned char**)track)++;
-    bend = *(short*)((int*)track + 0x50) * *(char*)((char*)track + 0x14b);
+    track->m_pitchBendRange = *track->m_command++;
+    bend = track->m_pitchBendRaw * track->m_pitchBendRange;
     bend >>= 5;
-    *(short*)((char*)track + 0x13e) = bend;
-    _PitchBendCompute(track, *(short*)((char*)track + 0x13e));
+    track->m_pitchBend = bend;
+    _PitchBendCompute(track, track->m_pitchBend);
 }
 
 /*
@@ -2346,8 +2346,8 @@ void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
  */
 void __MidiCtrl_ReverbOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    ((int*)track)[0x3f] |= 0x3c00;
-    SetVoiceSwitch(track, ((int*)track)[0x3f]);
+    track->m_voiceSwitch |= 0x3c00;
+    SetVoiceSwitch(track, track->m_voiceSwitch);
     m_ChangeStatus |= 2;
 }
 
@@ -2362,9 +2362,9 @@ void __MidiCtrl_ReverbOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    ((int*)track)[0x3f] &= 0xffffcfff;
-    ((int*)track)[0x3f] |= 0xc00;
-    SetVoiceSwitch(track, ((int*)track)[0x3f]);
+    track->m_voiceSwitch &= 0xffffcfff;
+    track->m_voiceSwitch |= 0xc00;
+    SetVoiceSwitch(track, track->m_voiceSwitch);
     m_ChangeStatus |= 2;
 }
 
@@ -2379,31 +2379,31 @@ void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    ((int*)track)[0x3f] &= 0xFFFFC3FF;
+    track->m_voiceSwitch &= 0xFFFFC3FF;
 
     switch (**(unsigned char**)track) {
     case 1:
-        ((int*)track)[0x3f] |= 0x1000;
+        track->m_voiceSwitch |= 0x1000;
         break;
     case 2:
-        ((int*)track)[0x3f] |= 0x1000;
+        track->m_voiceSwitch |= 0x1000;
     default:
-        ((int*)track)[0x3f] |= 0x400;
+        track->m_voiceSwitch |= 0x400;
         break;
     }
 
     switch ((*(unsigned char**)track)[1]) {
     case 1:
-        ((int*)track)[0x3f] |= 0x2000;
+        track->m_voiceSwitch |= 0x2000;
         break;
     case 2:
-        ((int*)track)[0x3f] |= 0x2000;
+        track->m_voiceSwitch |= 0x2000;
     default:
-        ((int*)track)[0x3f] |= 0x800;
+        track->m_voiceSwitch |= 0x800;
         break;
     }
     *(unsigned char**)track += 2;
-    SetVoiceSwitch(track, ((int*)track)[0x3f]);
+    SetVoiceSwitch(track, track->m_voiceSwitch);
     m_ChangeStatus |= 2;
 }
 
@@ -2423,17 +2423,17 @@ void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 
     value = (s8)*(*(u8**)track)++;
     if (value != 0) {
-        step = *(short*)((int*)track + 0x4e) + value;
+        step = track->m_step + value;
     } else {
         step = 0;
     }
-    *(short*)((int*)track + 0x4e) = step;
-    *(short*)((char*)track + 0x13a) = 0;
+    track->m_step = step;
+    track->m_step2 = 0;
 
-    if (*(short*)((int*)track + 0x4e) < -9999) {
-        *(short*)((int*)track + 0x4e) = -9999;
-    } else if (*(short*)((int*)track + 0x4e) > 9999) {
-        *(short*)((int*)track + 0x4e) = 9999;
+    if (track->m_step < -9999) {
+        track->m_step = -9999;
+    } else if (track->m_step > 9999) {
+        track->m_step = 9999;
     }
 }
 
@@ -2452,19 +2452,19 @@ void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tra
     short step;
 
     value = *(*(unsigned char**)track)++;
-    *(short*)((int*)track + 0x4e) = 0;
+    track->m_step = 0;
 
     if (value != 0) {
-        step = *(short*)((char*)track + 0x13a) + value;
+        step = track->m_step2 + value;
     } else {
         step = 0;
     }
-    *(short*)((char*)track + 0x13a) = step;
+    track->m_step2 = step;
 
-    if (*(short*)((char*)track + 0x13a) < -9999) {
-        *(short*)((char*)track + 0x13a) = -9999;
-    } else if (*(short*)((char*)track + 0x13a) > 9999) {
-        *(short*)((char*)track + 0x13a) = 9999;
+    if (track->m_step2 < -9999) {
+        track->m_step2 = -9999;
+    } else if (track->m_step2 > 9999) {
+        track->m_step2 = 9999;
     }
 }
 
@@ -2495,23 +2495,23 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     switch (mode) {
     case 1:
         ((int*)track)[0x39] = value;
-        ((int*)track)[0x3f] |= 0x8000;
+        track->m_voiceSwitch |= 0x8000;
         return;
     case 2:
         ((int*)track)[0x3a] = value;
-        ((int*)track)[0x3f] |= 0x10000;
+        track->m_voiceSwitch |= 0x10000;
         return;
     case 3:
         ((int*)track)[0x3b] = value;
-        ((int*)track)[0x3f] |= 0x20000;
+        track->m_voiceSwitch |= 0x20000;
         return;
     case 4:
         ((int*)track)[0x3c] = value;
-        ((int*)track)[0x3f] |= 0x40000;
+        track->m_voiceSwitch |= 0x40000;
         return;
     default:
         ((int*)track)[0x38] = value;
-        ((int*)track)[0x3f] |= 0x4000;
+        track->m_voiceSwitch |= 0x4000;
         return;
     }
 }
@@ -2533,19 +2533,19 @@ void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
     switch (mode) {
     case 1:
-        ((int*)track)[0x3f] &= 0xFFFF7FFF;
+        track->m_voiceSwitch &= 0xFFFF7FFF;
         return;
     case 2:
-        ((int*)track)[0x3f] &= 0xFFFEFFFF;
+        track->m_voiceSwitch &= 0xFFFEFFFF;
         return;
     case 3:
-        ((int*)track)[0x3f] &= 0xFFFDFFFF;
+        track->m_voiceSwitch &= 0xFFFDFFFF;
         return;
     case 4:
-        ((int*)track)[0x3f] &= 0xFFFBFFFF;
+        track->m_voiceSwitch &= 0xFFFBFFFF;
         return;
     default:
-        ((int*)track)[0x3f] &= 0xFFFFBFFF;
+        track->m_voiceSwitch &= 0xFFFFBFFF;
         return;
     }
 }

@@ -67,7 +67,6 @@ extern char lbl_8032E660[];
 extern u8 ARRAY_8026D728[];
 
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
-static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 extern "C" const char lbl_8032FD1C[] = "|/-\\";
 
 namespace {

@@ -704,7 +704,7 @@ void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int loopCount;
 
-    loopCount = *(*(u8**)track)++;
+    loopCount = *track->m_command++;
     if (loopCount == 0) {
         loopCount = 0x100;
     }
@@ -745,9 +745,9 @@ void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_TempoDirect(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    *(u32*)((u8*)control + 0x448) = ((u32)*(*(u8**)track)++) << 0xc;
-    *(u32*)((u8*)control + 0x44C) = 0;
-    *(u32*)((u8*)control + 0x450) = 0;
+    control->m_tempo = ((u32)*track->m_command++) << 0xc;
+    control->m_tempoAdd = 0;
+    control->m_tempoDelta = 0;
 }
 
 /*
@@ -763,11 +763,11 @@ void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDAT
 {
     unsigned int delta;
 
-    delta = (*(u8*)*(int*)track != 0) ? *(u8*)*(int*)track : 0x100;
+    delta = (*track->m_command != 0) ? *track->m_command : 0x100;
 
-    ((int*)control)[0x113] = DataAddCompute((int*)control + 0x112, *(unsigned char*)(*(int*)track + 1), (int*)&delta);
-    ((int*)control)[0x114] = delta;
-    *(int*)track += 2;
+    control->m_tempoAdd = DataAddCompute(&control->m_tempo, track->m_command[1], (int*)&delta);
+    control->m_tempoDelta = delta;
+    track->m_command += 2;
 }
 
 /*

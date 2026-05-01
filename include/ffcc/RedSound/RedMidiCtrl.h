@@ -100,6 +100,14 @@ struct RedTrackDATA {
 	unsigned char m_pad151[0x154 - 0x151];
 };
 
+struct RedSoundCONTROL {
+	RedTrackDATA* m_tracks;
+	unsigned char m_pad04[0x448 - 0x04];
+	int m_tempo;
+	int m_tempoAdd;
+	int m_tempoDelta;
+};
+
 typedef void (*RedMidiControlFunc)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
 typedef int (*RedSwingFunc)(int);
 

@@ -1,6 +1,6 @@
 #include "ffcc/mes.h"
 #include "ffcc/fontman.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/joybus.h"
 #include <string.h>

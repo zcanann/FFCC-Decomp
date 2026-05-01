@@ -2,7 +2,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/materialman.h"
 #include "ffcc/pad.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"

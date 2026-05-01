@@ -4,7 +4,7 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/gobject.h"
 #include "ffcc/joybus.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/pad.h"
 #include "ffcc/partMng.h"

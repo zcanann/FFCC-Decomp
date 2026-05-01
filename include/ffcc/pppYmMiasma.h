@@ -27,7 +27,6 @@ typedef _PARTICLE_DATA PARTICLE_DATA;
 
 void InitParticleData(VYmMiasma*, _pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 void UpdateParticleData(_pppPObject*, _pppCtrlTable*, PYmMiasma*, PARTICLE_DATA*);
-void RenderParticle(_pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 
 #ifdef __cplusplus
 extern "C" {

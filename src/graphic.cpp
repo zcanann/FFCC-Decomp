@@ -170,7 +170,7 @@ void CGraphic::Init()
     U8At(this, 0x7362) = U8At(this, 0x7203);
     memset(reinterpret_cast<u8*>(this) + 0x7364, 0, 0x10);
 
-    OSCreateThread(&m_thread, reinterpret_cast<void* (*)(void*)>(checkThread), nullptr, m_threadStack, 0x4000, 1, 1);
+    OSCreateThread(&m_thread, reinterpret_cast<void* (*)(void*)>(checkThread), nullptr, m_threadStack + 0x4000, 0x4000, 1, 1);
     OSResumeThread(&m_thread);
 
     VIInit();

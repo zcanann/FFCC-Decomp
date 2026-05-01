@@ -3,7 +3,7 @@
 #include "ffcc/chara.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/RedSound/RedSound.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"

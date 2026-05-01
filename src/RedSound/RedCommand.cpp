@@ -53,7 +53,7 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			((RedTrackDATA*)track)->m_seId = 0;
-			track[0x41] = 0;
+			((RedTrackDATA*)track)->m_flags = 0;
 			*track = 0;
 			((RedTrackDATA*)track)->m_mixVolumeMode = 0;
 
@@ -124,7 +124,7 @@ int _EraseTime(int eraseTrack)
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			((RedTrackDATA*)track)->m_seId = 0;
-			track[0x41] = 0;
+			((RedTrackDATA*)track)->m_flags = 0;
 			*track = 0;
 			((RedTrackDATA*)track)->m_mixVolumeMode = 0;
 
@@ -221,7 +221,7 @@ int SeStopID(int seId)
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			((RedTrackDATA*)track)->m_seId = 0;
-			track[0x41] = 0;
+			((RedTrackDATA*)track)->m_flags = 0;
 			*track = 0;
 			((RedTrackDATA*)track)->m_mixVolumeMode = 0;
 
@@ -270,7 +270,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 
 				KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 				((RedTrackDATA*)track)->m_seId = 0;
-				track[0x41] = 0;
+				((RedTrackDATA*)track)->m_flags = 0;
 				*track = 0;
 				((RedTrackDATA*)track)->m_mixVolumeMode = 0;
 

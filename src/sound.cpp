@@ -7,7 +7,6 @@
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/p_game.h"
 #include "ffcc/system.h"
 #include "ffcc/line_constants.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
@@ -19,8 +18,6 @@
 #include <math.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
-
-CSound Sound;
 
 extern const char s_CSound_80330ce0[] = "CSound";
 extern const float FLOAT_80330ce8 = 127.0f;
@@ -132,6 +129,8 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 u8 ARRAY_802f26c8[0xC];
+CSound Sound;
+
 struct CLineSegment {
     Vec delta;
     Vec normal;

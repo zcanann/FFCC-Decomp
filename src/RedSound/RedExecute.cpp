@@ -576,8 +576,8 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
         if (voice == voiceEnd) {
             int* selectedVoice;
-            u32* soundControl = (u32*)p_SoundControl;
-            soundControl[0x122] = soundControl[0x122] | 2;
+            RedSoundCONTROL* soundControl = (RedSoundCONTROL*)p_SoundControl;
+            soundControl->m_updateFlags = soundControl->m_updateFlags | 2;
             if (bestEnvelope == 0x8000) {
                 selectedVoice = 0;
             } else {
@@ -2574,9 +2574,9 @@ void MainControl(int frames)
                     step += *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
                 }
             }
-            *(s16*)((u8*)p_SoundControl + 0x48C) -= step * frames;
-            while (*(s16*)((u8*)p_SoundControl + 0x48C) < 1) {
-                *(s16*)((u8*)p_SoundControl + 0x48C) += 0xFA;
+            ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter -= step * frames;
+            while (((RedSoundCONTROL*)p_SoundControl)->m_tickCounter < 1) {
+                ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter += 0xFA;
                 _MusicNoteExecute();
             }
         }
@@ -2585,9 +2585,9 @@ void MainControl(int frames)
     if (*(s16*)((u8*)p_SoundControlBuffer + 0x922) != 0) {
         p_SoundControl = (void*)((u8*)p_SoundControlBuffer + 0x494);
         step = *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
-        *(s16*)((u8*)p_SoundControl + 0x48C) -= step * frames;
-        while (*(s16*)((u8*)p_SoundControl + 0x48C) < 1) {
-            *(s16*)((u8*)p_SoundControl + 0x48C) += 0xFA;
+        ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter -= step * frames;
+        while (((RedSoundCONTROL*)p_SoundControl)->m_tickCounter < 1) {
+            ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter += 0xFA;
             _MusicNoteExecute();
         }
         if (*(s16*)((u8*)p_SoundControlBuffer + 0x48E) == 0) {

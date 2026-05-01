@@ -1064,7 +1064,7 @@ void CRingMenu::DrawIcon()
 
 	int menuIndex = m_menuIndex;
 	CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
-	if (partyObj == 0 || static_cast<signed char>(*reinterpret_cast<unsigned char*>(&partyObj->m_weaponNodeFlags + 1)) >= 0) {
+	if (partyObj == 0 || static_cast<signed char>(partyObj->m_weaponNodeFlags >> 8) >= 0) {
 		return;
 	}
 

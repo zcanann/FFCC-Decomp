@@ -805,17 +805,30 @@ void CMenuPcs::calc()
     u8* self = reinterpret_cast<u8*>(this);
     int mode = *reinterpret_cast<int*>(self + 0x740);
 
-    if (mode == 1) {
-        CalcDiaryMenu__8CMenuPcsFv(this);
-    } else if (mode < 1) {
-        if (mode >= 0) {
-            for (int i = 0; i < 4; i++) {
-                Calc__5CMenuFv(*reinterpret_cast<CMenu**>(self + 0x13c + i * 4));
+    if (mode != 1) {
+        if (mode >= 1) {
+            if (mode < 3) {
+                calcBonus__8CMenuPcsFv(this);
             }
+            return;
+        }
 
-            for (int i = 0; i < 0xc; i++) {
-                Calc__5CMenuFv(*reinterpret_cast<CMenu**>(self + 0x10c + i * 4));
-            }
+        if (mode >= 0) {
+            CMenuPcs* menu = this;
+            int i = 0;
+            do {
+                Calc__5CMenuFv(*reinterpret_cast<CMenu**>(reinterpret_cast<u8*>(menu) + 0x13c));
+                i++;
+                menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
+            } while (i < 4);
+
+            menu = this;
+            i = 0;
+            do {
+                Calc__5CMenuFv(*reinterpret_cast<CMenu**>(reinterpret_cast<u8*>(menu) + 0x10c));
+                i++;
+                menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
+            } while (i < 0xc);
 
             int limit = *reinterpret_cast<int*>(self + 0x68);
             int value = *reinterpret_cast<int*>(self + 0x6c) - 1;
@@ -835,9 +848,10 @@ void CMenuPcs::calc()
 
             calcVillageMenu__8CMenuPcsFv(this);
         }
-    } else if (mode < 3) {
-        calcBonus__8CMenuPcsFv(this);
+        return;
     }
+
+    CalcDiaryMenu__8CMenuPcsFv(this);
 }
 
 /*

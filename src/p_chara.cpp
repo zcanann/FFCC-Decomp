@@ -2309,9 +2309,9 @@ CCharaPcs::CHandle::CHandle()
 	m_asyncState = 0;
 	m_asyncFileHandle = (CFile::CHandle*)nullptr;
 
-	m_fogBlend = m_sortZ;
+	m_fogBlend = 0.0f;
 	m_unk0x158 = 0;
-	m_drawListFlags &= 0x80;
+	m_drawListFlags |= 0x80;
 }
 
 /*

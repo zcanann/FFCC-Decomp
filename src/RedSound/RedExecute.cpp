@@ -856,21 +856,21 @@ void _PitchExecute(RedVoiceDATA* voice)
             pitchDelta = ((pitchLfo & 0x7F) + 1) * 0x18;
         }
 
-        pitchDelta = ((RedTrackDATA*)voiceData[0])->m_pitchBend + pitchDelta;
-        pitchDelta = ((RedTrackDATA*)voiceData[0])->m_keyTranspose + pitchDelta;
+        pitchDelta = voice->m_track->m_pitchBend + pitchDelta;
+        pitchDelta = voice->m_track->m_keyTranspose + pitchDelta;
 
         if ((((u8*)voiceData)[0x1A] & 3) != 0) {
             pitchDelta = PitchCompute(
                 voiceData[0x28] + voice->m_track->m_pitch,
                 pitchDelta,
-                ((int*)voiceData[1])[5],
-                ((RedTrackDATA*)voiceData[0])->m_fineTune);
+                voice->m_waveData->m_pitch,
+                voice->m_track->m_fineTune);
         } else {
             pitchDelta = PitchCompute(
                 voiceData[0x28] + *p_MusicPitchControl,
                 pitchDelta,
-                ((int*)voiceData[1])[5],
-                ((RedTrackDATA*)voiceData[0])->m_fineTune);
+                voice->m_waveData->m_pitch,
+                voice->m_track->m_fineTune);
         }
 
         {

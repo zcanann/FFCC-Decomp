@@ -1033,7 +1033,7 @@ void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
         waveTable = track->m_waveBankData + 0x20;
         track->m_waveData = track->m_waveBankData + *(int*)(waveTable + waveNo * 4);
         track->m_waveBase = *(int*)(track->m_waveBankData + 0x10);
-        memset((int*)track + 0x35, 0xffffffff, 0xc);
+        memset(&track->m_adsrAR, 0xffffffff, 0xc);
     }
     track->m_waveBankNo = 0x10;
     track->m_waveNo = waveNo;
@@ -1066,7 +1066,7 @@ void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 		waveTable = waveBankData + 0x20;
 		track->m_waveData = waveBankData + *(int*)(waveTable + waveNo * 4);
 		track->m_waveBase = *(int*)(waveBankData + 0x10);
-		memset((int*)track + 0x35, 0xffffffff, 0xc);
+		memset(&track->m_adsrAR, 0xffffffff, 0xc);
 	}
 	track->m_waveBankNo = bankNo;
 	track->m_waveNo = waveNo;

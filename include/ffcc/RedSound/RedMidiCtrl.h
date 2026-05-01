@@ -6,7 +6,8 @@ struct RedSoundCONTROL;
 
 struct RedTrackDATA {
 	unsigned char* m_command;
-	unsigned char m_pad04[0x1C - 0x04];
+	unsigned char m_pad04[0x18 - 0x04];
+	int m_waveBankData;
 	int m_waveData;
 	unsigned char m_pad20[0x11C - 0x20];
 	int m_waveBase;

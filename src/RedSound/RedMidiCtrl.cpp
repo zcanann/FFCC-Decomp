@@ -1030,17 +1030,17 @@ void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     int waveNo;
     int waveTable;
 
-    ((int*)track)[7] = 0;
-    ((int*)track)[0x47] = 0;
-    waveNo = *(*(u8**)track)++;
-    if ((((u32*)track)[6] != 0) && (waveNo < *(int*)(((int*)track)[6] + 8))) {
-        waveTable = ((int*)track)[6] + 0x20;
-        ((int*)track)[7] = ((int*)track)[6] + *(int*)(waveTable + waveNo * 4);
-        ((int*)track)[0x47] = *(int*)(((int*)track)[6] + 0x10);
+    track->m_waveData = 0;
+    track->m_waveBase = 0;
+    waveNo = *track->m_command++;
+    if (((u32)track->m_waveBankData != 0) && (waveNo < *(int*)(track->m_waveBankData + 8))) {
+        waveTable = track->m_waveBankData + 0x20;
+        track->m_waveData = track->m_waveBankData + *(int*)(waveTable + waveNo * 4);
+        track->m_waveBase = *(int*)(track->m_waveBankData + 0x10);
         memset((int*)track + 0x35, 0xffffffff, 0xc);
     }
-    *(unsigned char*)((int)track + 0x14d) = 0x10;
-    ((int*)track)[0x49] = waveNo;
+    track->m_waveBankNo = 0x10;
+    track->m_waveNo = waveNo;
 }
 
 /*

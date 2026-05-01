@@ -117,7 +117,14 @@ struct RedSoundCONTROL {
 	int m_savedDelta[0x40];
 	unsigned int m_savedFlags[0x40];
 	int m_savedNote[0x40];
-	unsigned char m_pad428[0x448 - 0x428];
+	int m_savedTempo;
+	int m_savedTempoAdd;
+	int m_savedTempoDelta;
+	int m_savedTickCounter;
+	int m_savedMeasure;
+	int m_savedTick;
+	int m_savedTicksPerMeasure;
+	int m_savedTimeSignature;
 	int m_tempo;
 	int m_tempoAdd;
 	int m_tempoDelta;

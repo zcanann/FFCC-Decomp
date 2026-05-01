@@ -1,3 +1,4 @@
+#define FFCC_DEFINE_MATERIALEDITORPCS_STORAGE
 #include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/ME_USB_process.h"
@@ -41,7 +42,7 @@ unsigned int m_table__18CMaterialEditorPcs[0x15C / sizeof(unsigned int)] = {
 };
 unsigned int lbl_801EA624[3] = {reinterpret_cast<unsigned int>(lbl_8032E648), 0, 0};
 unsigned int lbl_801EA630 = reinterpret_cast<unsigned int>(lbl_8032E648);
-CMaterialEditorPcs MaterialEditorPcs;
+u8 MaterialEditorPcs[sizeof(CMaterialEditorPcs)];
 u8 lbl_8026D338[0xC];
 
 /*

@@ -86,7 +86,12 @@ struct ChangeTexModelRaw {
 extern _pppMngStYmChangeTex* pppMngStPtr;
 extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
-extern float DAT_80330e10;
+extern const float DAT_80330e10[2] = { 0.0f, 0.0f };
+extern const float gPppYmMoveParabolaYOffsetStep = 1.0f;
+extern const float gPppYmMoveParabolaZero = 0.0f;
+extern const float gPppYmMoveParabolaAngleScale = 32768.0f;
+extern const float gPppYmMoveParabolaAngleDivisor = 180.0f;
+extern const float gPppYmMoveParabolaGravityScale = 0.5f;
 extern const char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.cpp";
 extern float FLOAT_80330df8;
 extern float FLOAT_80330dfc;
@@ -403,7 +408,7 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
  */
 void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* data)
 {
-	float init = DAT_80330e10;
+	float init = DAT_80330e10[0];
 	pppYmChangeTexState* state =
 	    (pppYmChangeTexState*)((char*)ymChangeTex + data->m_serializedDataOffsets[2] + 0x80);
 

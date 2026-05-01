@@ -561,3 +561,9 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 		GXCallDisplayList(displayList->m_data, displayList->m_size);
 	}
 }
+
+extern const float gPppYmMoveParabolaYOffsetStep = 1.0f;
+extern const float gPppYmMoveParabolaZero = 0.0f;
+extern const float gPppYmMoveParabolaAngleScale = 32768.0f;
+extern const float gPppYmMoveParabolaAngleDivisor = 180.0f;
+extern const float gPppYmMoveParabolaGravityScale = 0.5f;

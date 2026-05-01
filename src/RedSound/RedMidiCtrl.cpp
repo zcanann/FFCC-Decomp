@@ -509,7 +509,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
     unsigned int* seTrack;
     unsigned int* controlData;
 
-    ((int*)track)[0x41] = 0;
+    track->m_flags = 0;
     KeyOffSet(control, keyOnData, track);
 
     seTrack = p_VoiceData;
@@ -520,7 +520,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
         seTrack += 0x30;
     } while (seTrack < p_VoiceData + 0xc00);
 
-    *((int*)track) = 0;
+    track->m_command = 0;
     if ((int*)control < (int*)((int)p_SoundControlBuffer + 0xdbc)) {
         control->m_activeTrackCount--;
         if ((control->m_activeTrackCount == 0) &&
@@ -590,14 +590,14 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
     int* controlData = (int*)control;
     int* trackData = (int*)track;
     int loopBase = control->m_loopBase;
-    int deltaAdjust = 1 - trackData[0x42];
+    int deltaAdjust = 1 - track->m_deltaTime;
     int slot = 0;
     int* scan;
 
     control->m_flags |= 1;
     for (scan = (int*)control->m_tracks; scan < trackData; scan += 0x55) {
         controlData[slot + 10] = *scan;
-        controlData[slot + 0x4a] = scan[0x42] + deltaAdjust;
+        controlData[slot + 0x4a] = ((RedTrackDATA*)scan)->m_deltaTime + deltaAdjust;
         controlData[slot + 0x8a] = scan[0x41];
         controlData[slot + 0xca] = scan[9];
         slot++;
@@ -610,14 +610,14 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
         int delta = DeltaTimeSumup((unsigned char**)command);
 
         controlData[slot + 10] = command[0];
-        controlData[slot + 0x4a] = scan[0x42] + delta + deltaAdjust;
+        controlData[slot + 0x4a] = ((RedTrackDATA*)scan)->m_deltaTime + delta + deltaAdjust;
         controlData[slot + 0x8a] = scan[0x41];
         controlData[slot + 0xca] = scan[9];
 
         if (nextTrack < (int*)(control->m_tracks + control->m_trackCount)) {
             for (; nextTrack < (int*)(control->m_tracks + control->m_trackCount);
                  nextTrack += 0x55) {
-                int currentDelta = deltaAdjust + (nextTrack[0x42] - loopBase);
+                int currentDelta = deltaAdjust + (((RedTrackDATA*)nextTrack)->m_deltaTime - loopBase);
 
                 while ((currentDelta < 1) && ((u32)*nextTrack != 0)) {
                     unsigned char* cmd = (unsigned char*)*nextTrack;
@@ -627,7 +627,7 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
                     if ((u32)*nextTrack != 0) {
                         int step = DeltaTimeSumup((unsigned char**)nextTrack);
                         currentDelta += step;
-                        nextTrack[0x42] += step;
+                        ((RedTrackDATA*)nextTrack)->m_deltaTime += step;
                     }
                 }
 
@@ -1052,7 +1052,7 @@ void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 {
 	int waveBank;
 	int bankNo;
-	int waveNo;
+	unsigned int waveNo;
 	int waveBankData;
 	int waveTable;
 

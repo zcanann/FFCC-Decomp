@@ -4246,14 +4246,14 @@ int CPartMng::pppCreate(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam,
  */
 void CPartMng::pppGetFreeSlot()
 {
-    char* self = reinterpret_cast<char*>(this);
-    unsigned long slot = *reinterpret_cast<unsigned long*>(self + 0x34);
-    slot++;
-    *reinterpret_cast<unsigned long*>(self + 0x34) = slot;
+    _pppEnvSt* env = &m_pppEnvSt;
+    int slot = env->m_mngStCount + 1;
+    env->m_mngStCount = slot;
 
-    if ((long)slot >= 0x7fffffff) {
-        *reinterpret_cast<unsigned long*>(self + 0x34) = 0x10;
+    if (slot < 0x7fffffff) {
+        return;
     }
+    env->m_mngStCount = 0x10;
 }
 
 /*

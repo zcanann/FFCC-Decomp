@@ -7,16 +7,15 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
-#include "ffcc/goout.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/system.h"
 
 CWind Wind;
 
 extern int __float_nan[];
-double cos(double);
-double sin(double);
+extern "C" double cos(double);
+extern "C" double sin(double);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" void* __ct__7CVectorFfff(void*, float, float, float);
 

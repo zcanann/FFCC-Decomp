@@ -848,7 +848,7 @@ void _PitchExecute(RedVoiceDATA* voice)
     int pitchDelta = 0;
     int* voiceData = (int*)voice;
 
-    if (((u32)*(int*)(voiceData[0] + 0x74) != 0) && (*(s16*)(voiceData + 10) == 0)) {
+    if (((u32)*(int*)(voiceData[0] + 0x74) != 0) && (voice->m_pitchModDelay == 0)) {
         int pitchLfo = *(int*)(voiceData[0] + 0x80) >> 0xC;
         if (pitchLfo < 0x80) {
             pitchDelta = (pitchLfo + 1) * 2;
@@ -874,19 +874,19 @@ void _PitchExecute(RedVoiceDATA* voice)
         }
 
         {
-            int currentPitch = voiceData[0x26];
+            int currentPitch = voice->m_pitch;
             int (*pitchWaveFunc)(u32) = *(int (**)(u32))(voiceData[0] + 0x74);
-            int pitchWave = pitchWaveFunc((u32)voiceData[7] >> 0xC);
+            int pitchWave = pitchWaveFunc((u32)voice->m_pitchModPhase >> 0xC);
             pitchDelta = ((pitchDelta - currentPitch) * (pitchWave >> 4)) >> 0xC;
         }
 
-        if (voiceData[8] != 0) {
-            int frame = voiceData[9];
+        if (voice->m_pitchModFrames != 0) {
+            int frame = voice->m_pitchModFrame;
             int rampedPitch = pitchDelta * frame;
-            voiceData[9] = voiceData[9] + 1;
-            pitchDelta = rampedPitch / voiceData[8];
-            if (voiceData[8] <= voiceData[9]) {
-                voiceData[8] = 0;
+            voice->m_pitchModFrame = voice->m_pitchModFrame + 1;
+            pitchDelta = rampedPitch / voice->m_pitchModFrames;
+            if (voice->m_pitchModFrames <= voice->m_pitchModFrame) {
+                voice->m_pitchModFrames = 0;
             }
         }
 
@@ -894,11 +894,11 @@ void _PitchExecute(RedVoiceDATA* voice)
             pitchDelta >>= 1;
         }
 
-        voiceData[7] += *(int*)(voiceData[0] + 0x78);
+        voice->m_pitchModPhase += *(int*)(voiceData[0] + 0x78);
     }
 
-    voiceData[0x27] = pitchDelta + voiceData[0x26] + voiceData[0xF];
-    voiceData[0x24] |= 0x10;
+    voice->m_targetPitch = pitchDelta + voice->m_pitch + voice->m_randomPitch;
+    voice->m_flags |= 0x10;
 }
 
 /*

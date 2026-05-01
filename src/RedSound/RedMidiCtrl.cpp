@@ -2490,23 +2490,23 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
     switch (mode) {
     case 1:
-        ((int*)track)[0x39] = value;
+        track->m_fuzzyVolumeDepth = value;
         track->m_voiceSwitch |= 0x8000;
         return;
     case 2:
-        ((int*)track)[0x3a] = value;
+        track->m_fuzzyPanDepth = value;
         track->m_voiceSwitch |= 0x10000;
         return;
     case 3:
-        ((int*)track)[0x3b] = value;
+        track->m_fuzzyDeltaTimeDepth = value;
         track->m_voiceSwitch |= 0x20000;
         return;
     case 4:
-        ((int*)track)[0x3c] = value;
+        track->m_fuzzyAdsrDepth = value;
         track->m_voiceSwitch |= 0x40000;
         return;
     default:
-        ((int*)track)[0x38] = value;
+        track->m_fuzzyPitchDepth = value;
         track->m_voiceSwitch |= 0x4000;
         return;
     }

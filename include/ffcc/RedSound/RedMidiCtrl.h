@@ -70,7 +70,11 @@ struct RedTrackDATA {
 	unsigned char m_adsrDL;
 	unsigned char m_adsrSL;
 	unsigned char m_adsrRL;
-	unsigned char m_padE0[0xF4 - 0xE0];
+	int m_fuzzyPitchDepth;
+	int m_fuzzyVolumeDepth;
+	int m_fuzzyPanDepth;
+	int m_fuzzyDeltaTimeDepth;
+	int m_fuzzyAdsrDepth;
 	int m_seSepId;
 	int m_seId;
 	int m_voiceSwitch;

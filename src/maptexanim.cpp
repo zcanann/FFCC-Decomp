@@ -1,5 +1,4 @@
 #include "ffcc/maptexanim.h"
-#include "ffcc/ptrarray.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/map.h"
 #include "ffcc/memory.h"
@@ -11,6 +10,8 @@ extern "C" void Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(CMapTexAnim*, 
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim*, short);
+extern "C" void* __vc__21CPtrArray_P8CTexture_FUl(void*, unsigned long);
+extern "C" void* __vc__22CPtrArray_P9CMaterial_FUl(void*, unsigned long);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
@@ -63,12 +64,12 @@ static inline unsigned char& U8At(void* p, unsigned int offset)
 
 static inline void* MaterialAt(CMaterialSet* materialSet, unsigned long index)
 {
-    return (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8)))[index];
+    return __vc__22CPtrArray_P9CMaterial_FUl(Ptr(materialSet, 8), index);
 }
 
 static inline void* TextureAt(CTextureSet* textureSet, unsigned long index)
 {
-    return (*reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8)))[index];
+    return __vc__21CPtrArray_P8CTexture_FUl(Ptr(textureSet, 8), index);
 }
 
 static inline void ReplaceRef(void** slot, void* ref)
@@ -152,8 +153,8 @@ void CMapTexAnimSet::Calc()
 void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
 {
     float frame;
-    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
-    CPtrArray<CTexture*>* textures = reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8));
+    void* materials = Ptr(materialSet, 8);
+    void* textures = Ptr(textureSet, 8);
 
     if (m_usesKeyFrame != 0) {
         if (m_keyFrame.IsRun() != 0) {
@@ -163,32 +164,32 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
 
             if (reachedFrame != 0) {
                 const unsigned short textureIndex = m_frameTable[keyFrameIndex];
-                void* texture = (*textures)[textureIndex];
-                SetMaterialTextureSlot((*materials)[static_cast<unsigned long>(m_materialIndex)],
+                void* texture = __vc__21CPtrArray_P8CTexture_FUl(textures, textureIndex);
+                SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex)),
                     static_cast<unsigned long>(m_textureSlot), texture);
 
                 if (m_usesBlendTexture != 0) {
                     const unsigned short nextTextureIndex = m_frameTable[keyFrameIndexNext];
-                    void* nextTexture = (*textures)[nextTextureIndex];
-                    SetMaterialTextureSlot((*materials)[static_cast<unsigned long>(m_materialIndex)],
+                    void* nextTexture = __vc__21CPtrArray_P8CTexture_FUl(textures, nextTextureIndex);
+                    SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex)),
                         static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
                     char blendValue = static_cast<char>(FLOAT_8032fd38 * frame);
-                    void* material = (*materials)[static_cast<unsigned long>(m_materialIndex)];
+                    void* material = __vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex));
                     *reinterpret_cast<char*>(Ptr(material, 0xA4)) = blendValue;
                     *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
                 }
             } else {
                 const unsigned short textureIndex = m_frameTable[keyFrameIndex];
-                void* texture = (*textures)[textureIndex];
-                SetMaterialTextureSlot((*materials)[static_cast<unsigned long>(m_materialIndex)],
+                void* texture = __vc__21CPtrArray_P8CTexture_FUl(textures, textureIndex);
+                SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex)),
                     static_cast<unsigned long>(m_textureSlot), texture);
 
                 if (m_usesBlendTexture != 0) {
                     const unsigned short nextTextureIndex = m_frameTable[keyFrameIndexNext];
-                    void* nextTexture = (*textures)[nextTextureIndex];
-                    SetMaterialTextureSlot((*materials)[static_cast<unsigned long>(m_materialIndex)],
+                    void* nextTexture = __vc__21CPtrArray_P8CTexture_FUl(textures, nextTextureIndex);
+                    SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex)),
                         static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
-                    void* material = (*materials)[static_cast<unsigned long>(m_materialIndex)];
+                    void* material = __vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex));
                     *reinterpret_cast<char*>(Ptr(material, 0xA4)) = 0;
                     *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
                 }
@@ -202,8 +203,8 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
     frame = m_currentFrame;
     const int frameIndex = static_cast<int>(frame);
     const unsigned short textureIndex = m_frameTable[frameIndex & 0xFFFF];
-    SetMaterialTextureSlot((*materials)[static_cast<unsigned long>(m_materialIndex)],
-        static_cast<unsigned long>(m_textureSlot), (*textures)[textureIndex]);
+    SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex)),
+        static_cast<unsigned long>(m_textureSlot), __vc__21CPtrArray_P8CTexture_FUl(textures, textureIndex));
 
     m_currentFrame = m_currentFrame + m_frameStep;
     if (m_currentFrame >= static_cast<float>(m_endFrame)) {
@@ -221,9 +222,9 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
         }
 
         const unsigned short nextTextureIndex = m_frameTable[static_cast<unsigned short>(nextFrame)];
-        SetMaterialTextureSlot((*materials)[static_cast<unsigned long>(m_materialIndex)],
-            static_cast<unsigned long>(m_textureSlot + 1), (*textures)[nextTextureIndex]);
-        void* material = (*materials)[static_cast<unsigned long>(m_materialIndex)];
+        SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex)),
+            static_cast<unsigned long>(m_textureSlot + 1), __vc__21CPtrArray_P8CTexture_FUl(textures, nextTextureIndex));
+        void* material = __vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex));
         *reinterpret_cast<char*>(Ptr(material, 0xA4)) =
             static_cast<char>(FLOAT_8032fd38 * (frame - static_cast<float>(static_cast<unsigned short>(frameIndex))));
         *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;

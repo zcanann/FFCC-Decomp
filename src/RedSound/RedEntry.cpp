@@ -131,14 +131,14 @@ void CRedEntry::Init()
  */
 void CRedEntry::WaveHistoryAdd(int historyNo)
 {
-	unsigned int history = static_cast<unsigned int>(*reinterpret_cast<int*>(this) + 0x100);
+	RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x100);
 
 	do {
-		if (*reinterpret_cast<int*>(history + 4) >= historyNo) {
-			*reinterpret_cast<int*>(history + 4) = *reinterpret_cast<int*>(history + 4) + 1;
+		if (history->m_historyNo >= historyNo) {
+			history->m_historyNo = history->m_historyNo + 1;
 		}
-		history += 0x10;
-	} while (history < static_cast<unsigned int>(*reinterpret_cast<int*>(this) + 0x400));
+		history += 1;
+	} while (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x400));
 }
 
 /*
@@ -153,13 +153,13 @@ void CRedEntry::WaveHistoryAdd(int historyNo)
 void CRedEntry::WaveHistoryDelete(int historyNo)
 {
 	if (historyNo != 0) {
-		unsigned int history = static_cast<unsigned int>(*reinterpret_cast<int*>(this));
+		RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase);
 		do {
-			if ((*reinterpret_cast<int*>(history + 4) != 0) && (*reinterpret_cast<int*>(history + 4) > historyNo)) {
-				*reinterpret_cast<int*>(history + 4) = *reinterpret_cast<int*>(history + 4) - 1;
+			if ((history->m_historyNo != 0) && (history->m_historyNo > historyNo)) {
+				history->m_historyNo = history->m_historyNo - 1;
 			}
-			history += 0x10;
-		} while (history < static_cast<unsigned int>(*reinterpret_cast<int*>(this)) + 0x400);
+			history += 1;
+		} while (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x400));
 	}
 }
 
@@ -174,17 +174,17 @@ void CRedEntry::WaveHistoryDelete(int historyNo)
  */
 void CRedEntry::WaveHistoryChoice(RedHistoryBANK* bank)
 {
-	if (reinterpret_cast<int*>(bank)[1] != 0) {
-		unsigned int history = static_cast<unsigned int>(*reinterpret_cast<int*>(this));
+	if (bank->m_historyNo != 0) {
+		RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase);
 		do {
-			if ((*reinterpret_cast<int*>(history + 4) != 0) &&
-			    (*reinterpret_cast<int*>(history + 4) < reinterpret_cast<int*>(bank)[1])) {
-				*reinterpret_cast<int*>(history + 4) = *reinterpret_cast<int*>(history + 4) + 1;
+			if ((history->m_historyNo != 0) &&
+			    (history->m_historyNo < bank->m_historyNo)) {
+				history->m_historyNo = history->m_historyNo + 1;
 			}
-			history += 0x10;
-		} while (history < static_cast<unsigned int>(*reinterpret_cast<int*>(this)) + 0x400);
+			history += 1;
+		} while (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x400));
 
-		reinterpret_cast<int*>(bank)[1] = 1;
+		bank->m_historyNo = 1;
 	}
 }
 
@@ -195,13 +195,13 @@ void CRedEntry::WaveHistoryChoice(RedHistoryBANK* bank)
  */
 int CRedEntry::SearchWaveSequence(int waveNo)
 {
-	int* waveBank = (int*)*(int*)this;
+	RedHistoryBANK* waveBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase);
 
-	while (waveBank < (int*)(*(int*)this + 0x400)) {
-		if ((waveBank[3] != 0) && (*waveBank == waveNo)) {
-			return ((int)waveBank - *(int*)this) / 0x10;
+	while (waveBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x400)) {
+		if ((waveBank->m_size != 0) && (waveBank->m_id == waveNo)) {
+			return (reinterpret_cast<int>(waveBank) - m_waveBankBase) / 0x10;
 		}
-		waveBank += 4;
+		waveBank += 1;
 	}
 
 	return -1;
@@ -306,18 +306,18 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 	int maxBankSize = 0;
 	offset += aBase;
 	maxSize += aBase;
-	unsigned int history = (unsigned int)m_waveBankBase + 0x100;
+	RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x100);
 
 	do {
-		if (*(int*)(history + 4) > maxBankSize) {
-			int arAddress = *(int*)(*(int*)(history + 8) + 0x10);
+		if (history->m_historyNo > maxBankSize) {
+			int arAddress = reinterpret_cast<RedWaveHeadWD*>(history->m_data)->m_aramAddress;
 			if ((arAddress >= offset) && (arAddress < maxSize)) {
-				maxBankSize = *(int*)(history + 4);
-				selected = history;
+				maxBankSize = history->m_historyNo;
+				selected = reinterpret_cast<unsigned int>(history);
 			}
 		}
-		history += 0x10;
-	} while (history < (unsigned int)m_waveBankBase + 0x400);
+		history += 1;
+	} while (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x400));
 
 	if (maxBankSize != 0) {
 		WaveDelete((RedHistoryBANK*)selected);
@@ -662,14 +662,14 @@ int CRedEntry::GetWaveBank(int waveNo)
  */
 int CRedEntry::SearchWaveBase(int waveNo)
 {
-	int* waveBank = (int*)*(int*)this;
+	RedHistoryBANK* waveBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase);
 
 	do {
-		if (waveNo == *waveBank) {
-			return waveBank[2];
+		if (waveNo == waveBank->m_id) {
+			return waveBank->m_data;
 		}
-		waveBank += 4;
-	} while (waveBank < (int*)(*(int*)this + 0x400));
+		waveBank += 1;
+	} while (waveBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x400));
 
 	return 0;
 }

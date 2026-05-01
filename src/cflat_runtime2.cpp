@@ -105,6 +105,13 @@ static const char sCFlatRuntime2LoadMsg[] = "CFlatRuntime2::Load\n";
 static const char sCFlatRuntime2FileTag[] = "cflat_runtime2.cpp";
 static const char sCFlatRuntime2TexturePathFmt[] = "dvd/%s%s.tex";
 
+struct CFlatObjectFlagBits {
+	u8 m_pad[0x38];
+	u8 m_unk0 : 3;
+	u8 m_constructFlag : 1;
+	u8 m_unk1 : 4;
+};
+
 static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
 {
 	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
@@ -546,7 +553,7 @@ extern "C" void __ct__8CGMonObjFv(CGMonObj* obj)
 {
 	u8* self = reinterpret_cast<u8*>(obj);
 	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	self[0x38] &= 0xEF;
+	reinterpret_cast<CFlatObjectFlagBits*>(obj)->m_constructFlag = 0;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGPrgObj;
@@ -567,7 +574,7 @@ extern "C" void __ct__10CGPartyObjFv(CGPartyObj* obj)
 {
 	u8* self = reinterpret_cast<u8*>(obj);
 	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	self[0x38] &= 0xEF;
+	reinterpret_cast<CFlatObjectFlagBits*>(obj)->m_constructFlag = 0;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGPrgObj;
@@ -588,7 +595,7 @@ extern "C" void __ct__9CGItemObjFv(CGItemObj* obj)
 {
 	u8* self = reinterpret_cast<u8*>(obj);
 	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	self[0x38] &= 0xEF;
+	reinterpret_cast<CFlatObjectFlagBits*>(obj)->m_constructFlag = 0;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGPrgObj;
@@ -608,7 +615,7 @@ extern "C" void __ct__8CGObjectFv(CGObject* obj)
 {
 	u8* self = reinterpret_cast<u8*>(obj);
 	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	self[0x38] &= 0xEF;
+	reinterpret_cast<CFlatObjectFlagBits*>(obj)->m_constructFlag = 0;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
 }
@@ -626,7 +633,7 @@ extern "C" void __ct__9CGQuadObjFv(CGQuadObj* obj)
 {
 	u8* self = reinterpret_cast<u8*>(obj);
 	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	self[0x38] &= 0xEF;
+	reinterpret_cast<CFlatObjectFlagBits*>(obj)->m_constructFlag = 0;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGQuadObj;
 }
@@ -648,7 +655,7 @@ extern "C" void __ct__9CGBaseObjFv(CGBaseObj* obj)
 {
 	u8* self = reinterpret_cast<u8*>(obj);
 	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	self[0x38] = self[0x38] & 0xEF;
+	reinterpret_cast<CFlatObjectFlagBits*>(obj)->m_constructFlag = 0;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
 }
 

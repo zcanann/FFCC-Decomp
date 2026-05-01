@@ -43,13 +43,11 @@ static inline CUSBStreamData* UsbStream(CPartPcs* self)
 struct CMapCylinderRaw
 {
     Vec m_bottom;
-    Vec m_direction;
-    float m_radius;
-    float m_height;
+    u8 m_pad0C[0x0C];
     Vec m_top;
+    float m_radius;
+    Vec m_direction;
     Vec m_direction2;
-    float m_radius2;
-    float m_height2;
 };
 
 extern "C" {
@@ -359,19 +357,16 @@ extern "C" int CheckHitCylinderNear__7CMapPcsFP3VecP3VecfUl(
 {
     CMapCylinderRaw cylinder;
 
-    cylinder.m_direction.x = 0.0f;
-    cylinder.m_direction.y = 0.0f;
     cylinder.m_direction.z = 0.0f;
-    cylinder.m_direction2.x = 1.0f;
-    cylinder.m_direction2.y = 1.0f;
+    cylinder.m_direction.y = 0.0f;
+    cylinder.m_direction.x = 0.0f;
     cylinder.m_direction2.z = 1.0f;
+    cylinder.m_direction2.y = 1.0f;
+    cylinder.m_direction2.x = 1.0f;
 
     cylinder.m_bottom = *cylinderBottom;
     cylinder.m_top = *direction;
     cylinder.m_radius = radius;
-    cylinder.m_height = 0.0f;
-    cylinder.m_radius2 = 0.0f;
-    cylinder.m_height2 = 0.0f;
 
     return CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
         &MapMng, reinterpret_cast<CMapCylinder*>(&cylinder), direction, hitMask);
@@ -427,28 +422,20 @@ int CMiniGamePcs::GetMiniGameParam(int id)
  */
 void CMiniGamePcs::SetMiniGameParam(int id, int value)
 {
-    if ((unsigned int)System.m_execParam > 2U) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         Printf__7CSystemFPce(&System, s_setMiniGameParamFmt, id, value);
     }
 
     if (id == 0x1202) {
-        *(unsigned char*)((char*)this + 0x134B) |= (unsigned char)(1 << value);
-        return;
-    }
-
-    if (id < 0x1202) {
+        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x134B) |= 1 << value;
+    } else if (id < 0x1202) {
         if (id == 0x1102) {
-            *(unsigned char*)((char*)this + 0x1348) = 1;
-            return;
+            *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x1348) = 1;
+        } else if (id < 0x1102 && id >= 0x1101) {
+            *reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x1350) = static_cast<char>(value);
         }
-        if (id < 0x1102 && 0x1100 < id) {
-            *(char*)((char*)this + 0x1350) = (char)value;
-        }
-        return;
-    }
-
-    if (id < 0x1204) {
-        *(unsigned char*)((char*)this + 0x134B) &= (unsigned char)~(1 << value);
+    } else if (id < 0x1204) {
+        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x134B) &= ~(1 << value);
     }
 }
 
@@ -906,17 +893,17 @@ done_check:
  */
 extern "C" void SetMapShadeColor__9CCharaPcsFi6CColor(void* charaPcs, int shadeIndex, const unsigned char* color)
 {
-    unsigned int self = (unsigned int)charaPcs + shadeIndex * 4;
-    unsigned char value1;
-    unsigned char value2;
+    unsigned int offset = shadeIndex * 4;
+    unsigned char value1 = color[0];
+    unsigned int self = reinterpret_cast<unsigned int>(charaPcs) + offset;
+    unsigned char value2 = color[1];
 
-    value1 = color[1];
-    *(unsigned char*)(self + 0x12C) = color[0];
-    value2 = color[2];
-    *(unsigned char*)(self + 0x12D) = value1;
-    value1 = color[3];
-    *(unsigned char*)(self + 0x12E) = value2;
-    *(unsigned char*)(self + 0x12F) = value1;
+    *reinterpret_cast<unsigned char*>(self + 0x12C) = value1;
+    value1 = color[2];
+    *reinterpret_cast<unsigned char*>(self + 0x12D) = value2;
+    value2 = color[3];
+    *reinterpret_cast<unsigned char*>(self + 0x12E) = value1;
+    *reinterpret_cast<unsigned char*>(self + 0x12F) = value2;
 }
 
 /*

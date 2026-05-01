@@ -1711,23 +1711,25 @@ void _ExecuteExtraData()
 {
     u32* sound = (u32*)p_SoundControlBuffer;
     u32* soundBase;
+    RedSoundCONTROL* soundControl;
     unsigned int* voice;
     int* track;
     u32 musicBase;
 
     do {
-        if ((sound[0x117] != 0) && (*sound != 0)) {
-            sound[0x117]--;
-            sound[0x115] += sound[0x116];
-            if ((sound[0x117] == 0) && ((int)sound[0x116] < 0)) {
-                MusicStop(sound[0x11C]);
+        soundControl = (RedSoundCONTROL*)sound;
+        if ((soundControl->m_masterVolumeDelta != 0) && (*sound != 0)) {
+            soundControl->m_masterVolumeDelta--;
+            soundControl->m_masterVolume += soundControl->m_masterVolumeAdd;
+            if ((soundControl->m_masterVolumeDelta == 0) && (soundControl->m_masterVolumeAdd < 0)) {
+                MusicStop(soundControl->m_musicId);
             }
 
             if (*sound != 0) {
                 musicBase = *sound;
                 voice = p_VoiceData;
                 do {
-                    if ((musicBase <= *voice) && (*voice < musicBase + (u32)*((u8*)sound + 0x491) * 0x154)) {
+                    if ((musicBase <= *voice) && (*voice < musicBase + (u32)soundControl->m_trackCount * 0x154)) {
                         voice[0x2E] |= 2;
                     }
                     voice += 0x30;
@@ -1761,11 +1763,12 @@ void _ExecuteExtraData()
     }
 
     do {
-        if ((*(s16*)((u8*)soundBase + 0x48E) != 0) && (soundBase[9] != 0)) {
-            soundBase[9]--;
-            soundBase[7] += soundBase[8];
-            if ((soundBase[0x11B] & 0x10000) == 0) {
-                track = (int*)*soundBase;
+        soundControl = (RedSoundCONTROL*)soundBase;
+        if ((soundControl->m_tickCounter != 0) && (soundControl->m_volumeDelta != 0)) {
+            soundControl->m_volumeDelta--;
+            soundControl->m_volume += soundControl->m_volumeAdd;
+            if ((soundControl->m_flags & 0x10000) == 0) {
+                track = (int*)soundControl->m_tracks;
                 do {
                     voice = p_VoiceData;
                     if (*track != 0) {
@@ -1777,9 +1780,9 @@ void _ExecuteExtraData()
                         } while (voice < p_VoiceData + 0xC00);
                     }
                     track += 0x55;
-                } while (track < (int*)(*soundBase + (u32)*((u8*)soundBase + 0x491) * 0x154));
-            } else if ((soundBase[9] == 0) && (-1 < (int)soundBase[0x11C])) {
-                MusicStop(soundBase[0x11C]);
+                } while (track < (int*)((u32)soundControl->m_tracks + (u32)soundControl->m_trackCount * 0x154));
+            } else if ((soundControl->m_volumeDelta == 0) && (-1 < soundControl->m_musicId)) {
+                MusicStop(soundControl->m_musicId);
             }
         }
         soundBase += 0x125;

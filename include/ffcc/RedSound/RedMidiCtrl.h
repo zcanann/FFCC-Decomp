@@ -110,7 +110,9 @@ struct RedSoundCONTROL {
 	int m_ticksPerMeasure;
 	unsigned short m_timeNumerator;
 	unsigned short m_timeDenominator;
-	unsigned char m_pad1C[0x28 - 0x1C];
+	int m_volume;
+	int m_volumeAdd;
+	int m_volumeDelta;
 	unsigned char* m_savedCommand[0x40];
 	int m_savedDelta[0x40];
 	unsigned int m_savedFlags[0x40];
@@ -119,7 +121,10 @@ struct RedSoundCONTROL {
 	int m_tempo;
 	int m_tempoAdd;
 	int m_tempoDelta;
-	unsigned char m_pad454[0x46C - 0x454];
+	int m_masterVolume;
+	int m_masterVolumeAdd;
+	int m_masterVolumeDelta;
+	unsigned char m_pad460[0x46C - 0x460];
 	unsigned int m_flags;
 	int m_musicId;
 	int m_skipFrames;

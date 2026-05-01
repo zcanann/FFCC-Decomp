@@ -704,13 +704,13 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	((RedSoundCONTROL*)music)->m_updateFlags = 0;
 
 	if (m_CrossTime == 0) {
-		music[0x115] = 0x1ff000;
-		music[0x117] = 0;
+		((RedSoundCONTROL*)music)->m_masterVolume = 0x1ff000;
+		((RedSoundCONTROL*)music)->m_masterVolumeDelta = 0;
 	} else {
-		music[0x115] = 0;
-		music[0x116] = 0x1ff800;
-		music[0x116] = music[0x116] / m_CrossTime;
-		music[0x117] = m_CrossTime;
+		((RedSoundCONTROL*)music)->m_masterVolume = 0;
+		((RedSoundCONTROL*)music)->m_masterVolumeAdd = 0x1ff800;
+		((RedSoundCONTROL*)music)->m_masterVolumeAdd = ((RedSoundCONTROL*)music)->m_masterVolumeAdd / m_CrossTime;
+		((RedSoundCONTROL*)music)->m_masterVolumeDelta = m_CrossTime;
 		m_CrossTime = 0;
 	}
 
@@ -823,8 +823,8 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	if (volume != 0) {
 		volume = (((volume + 1) * 4) - 1) * 0x1000;
 	}
-	music[7] = volume;
-	music[9] = 0;
+	((RedSoundCONTROL*)music)->m_volume = volume;
+	((RedSoundCONTROL*)music)->m_volumeDelta = 0;
 	((RedSoundCONTROL*)music)->m_updateFlags = 0;
 	music[0x11b] &= 0x10;
 	if ((musicHead->m_playFlags & 0x40000) != 0) {
@@ -968,11 +968,11 @@ void SetMusicVolume(int seId, int volume, int duration, int mode)
 	do {
 		if ((seId == -1) || (seId == music[0x11c]) || (music[0x11c] < 0)) {
 			if (mode == 1) {
-				music[0x116] = -music[0x115] / duration;
-				music[0x117] = duration;
+				((RedSoundCONTROL*)music)->m_masterVolumeAdd = -((RedSoundCONTROL*)music)->m_masterVolume / duration;
+				((RedSoundCONTROL*)music)->m_masterVolumeDelta = duration;
 			} else {
-				music[8] = (volume - music[7]) / duration;
-				music[9] = duration;
+				((RedSoundCONTROL*)music)->m_volumeAdd = (volume - ((RedSoundCONTROL*)music)->m_volume) / duration;
+				((RedSoundCONTROL*)music)->m_volumeDelta = duration;
 			}
 		}
 		music += 0x125;

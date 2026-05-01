@@ -13,6 +13,7 @@ extern int gPppCalcDisabled;
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern float FLOAT_80330458;
+extern float FLOAT_8033044C;
 extern float FLOAT_8033045c;
 extern float FLOAT_80330460;
 extern float FLOAT_80330470;
@@ -55,6 +56,28 @@ static inline unsigned char clamp_u8(float value)
 		return 0xFF;
 	}
 	return (unsigned char)ivalue;
+}
+
+static inline unsigned char clamp_u8_int(int value)
+{
+	if (value < 0) {
+		return 0;
+	}
+	if (value > 0xFF) {
+		return 0xFF;
+	}
+	return (unsigned char)value;
+}
+
+static inline unsigned char clamp_alpha_7f(int value)
+{
+	if (value < 0) {
+		return 0;
+	}
+	if (value > 0x7F) {
+		return 0x7F;
+	}
+	return (unsigned char)value;
 }
 
 static inline float calc_spawn_speed(float speed, u8 mode)
@@ -695,58 +718,146 @@ static inline void set_matrix(
 void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
 {
 	PRyjMegaBirth* params = (PRyjMegaBirth*)stepData;
-	VRyjMegaBirth* work = (VRyjMegaBirth*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 	u8* payload = (u8*)params;
-	int dataValIndex = *(int*)(payload + 4);
+	int* offsets = ctrlTable->m_serializedDataOffsets;
+	VRyjMegaBirth* work = (VRyjMegaBirth*)(obj->m_workArea + offsets[2]);
+	VColor* baseColor = (VColor*)(obj->m_workArea + offsets[1]);
+	_PARTICLE_DATA* particle = work->m_particleBlock;
+	PARTICLE_WMAT* particleWorldMat = work->m_worldMatrixBlock;
+	_PARTICLE_COLOR* colorData = work->m_colorBlock;
+	s32 numParticles = work->m_numParticles;
+	s32 dataValIndex;
+	pppFMATRIX baseViewMatrix;
 
-	if ((dataValIndex == 0xFFFF) || (work->m_particleBlock == 0)) {
+	if (particle == NULL) {
 		return;
 	}
 
-	if (((payload[0xEC] == 1) || (payload[0xEC] == 2)) && (work->m_worldMatrixBlock == 0)) {
+	if (((payload[0xEC] == 1) || (payload[0xEC] == 2)) && (particleWorldMat == NULL)) {
 		return;
 	}
 
-	if ((payload[0xE9] != 0) && (work->m_colorBlock == 0)) {
+	if ((payload[0xE9] != 0) && (colorData == NULL)) {
 		return;
 	}
 
-	long* animData = **(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
-	if (animData == 0) {
+	dataValIndex = *(s32*)(payload + 4);
+	if (dataValIndex == 0xFFFF) {
 		return;
 	}
 
-	pppInitBlendMode();
-	pppSetBlendMode(0);
+	if (payload[0xEC] == 0) {
+		PSMTXConcat(work->m_worldMatrix, obj->m_localMatrix.value, baseViewMatrix.value);
+		PSMTXConcat(ppvCameraMatrix, baseViewMatrix.value, baseViewMatrix.value);
+	}
 
-	for (int i = 0; i < work->m_numParticles; i++) {
-		_PARTICLE_DATA* particle = (_PARTICLE_DATA*)((u8*)work->m_particleBlock + i * 0x60);
-		_PARTICLE_WMAT* particleWorldMat = 0;
-		_PARTICLE_COLOR* colorData = 0;
+	long** animDataSet = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
 
-		if (*s16_at(particle, 0x22) == 0) {
-			continue;
+	pppSetDrawEnv(
+		(pppCVECTOR*)0, (pppFMATRIX*)0, payload[0x0E] != 0 ? *(float*)(payload + 0x18) : kPppRyjMegaBirthZero,
+		payload[0xF3], payload[0x0C], payload[0xF2], 0, (u8)(payload[0xED] == 0), 1, 0);
+
+	long* animData = *animDataSet;
+	int baseRed = baseColor->m_red;
+	int baseGreen = baseColor->m_green;
+	int baseBlue = baseColor->m_blue;
+	int baseAlpha = baseColor->m_alpha;
+
+	for (int i = 0; i < numParticles; i++) {
+		if (*u16_at(particle, 0x22) != 0) {
+			Mtx drawMatrix;
+			Vec drawPos;
+			pppCVECTOR drawColor;
+			short frame = *s16_at(particle, 0x20);
+			tagOAN3_SHAPE* shape = (tagOAN3_SHAPE*)((u8*)animData + *(s16*)((u8*)animData + frame * 8 + 0x10));
+			int red;
+			int green;
+			int blue;
+			int alpha;
+
+			PSMTXIdentity(drawMatrix);
+			drawMatrix[0][0] = *f32_at(particle, 0x34) * pppMngStPtr->m_scale.x;
+			drawMatrix[1][1] = *f32_at(particle, 0x38) * pppMngStPtr->m_scale.y;
+			drawMatrix[2][2] = drawMatrix[0][0];
+
+			if (*f32_at(particle, 0x28) != kPppRyjMegaBirthZero) {
+				Mtx rotMatrix;
+
+				PSMTXRotRad(rotMatrix, 'Z', FLOAT_8033044C * *f32_at(particle, 0x28));
+				PSMTXConcat(drawMatrix, rotMatrix, drawMatrix);
+			}
+
+			drawPos.x = drawMatrix[0][3];
+			drawPos.y = drawMatrix[1][3];
+			drawPos.z = drawMatrix[2][3];
+			PSVECAdd(&drawPos, (Vec*)particle, &drawPos);
+			drawMatrix[0][3] = drawPos.x;
+			drawMatrix[1][3] = drawPos.y;
+			drawMatrix[2][3] = drawPos.z;
+
+			drawPos.x = drawMatrix[0][3];
+			drawPos.y = drawMatrix[1][3];
+			drawPos.z = drawMatrix[2][3];
+
+			switch (payload[0xEC]) {
+			case 0:
+				PSMTXMultVec(baseViewMatrix.value, &drawPos, &drawPos);
+				break;
+			case 1: {
+				pppFMATRIX viewMatrix;
+
+				PSMTXConcat(*(Mtx*)particleWorldMat, obj->m_localMatrix.value, viewMatrix.value);
+				PSMTXConcat(ppvCameraMatrix, viewMatrix.value, viewMatrix.value);
+				PSMTXMultVec(viewMatrix.value, &drawPos, &drawPos);
+				break;
+			}
+			case 2: {
+				pppFMATRIX viewMatrix;
+
+				PSMTXConcat(work->m_worldMatrix, *(Mtx*)particleWorldMat, viewMatrix.value);
+				PSMTXConcat(ppvCameraMatrix, viewMatrix.value, viewMatrix.value);
+				PSMTXMultVec(viewMatrix.value, &drawPos, &drawPos);
+				break;
+			}
+			default:
+				break;
+			}
+
+			drawMatrix[0][3] = drawPos.x;
+			drawMatrix[1][3] = drawPos.y;
+			drawMatrix[2][3] = drawPos.z;
+
+			GXLoadPosMtxImm(drawMatrix, 0);
+
+			red = baseRed + (int)*(s8*)((u8*)particle + 0x24);
+			green = baseGreen + (int)*(s8*)((u8*)particle + 0x25);
+			blue = baseBlue + (int)*(s8*)((u8*)particle + 0x26);
+			alpha = baseAlpha + (int)*(s8*)((u8*)particle + 0x27) - (int)*f32_at(particle, 0x54);
+
+			if (colorData != NULL) {
+				red += (int)colorData->m_color[0];
+				green += (int)colorData->m_color[1];
+				blue += (int)colorData->m_color[2];
+				alpha += (int)colorData->m_color[3];
+			}
+
+			drawColor.rgba[0] = clamp_u8_int(red);
+			drawColor.rgba[1] = clamp_u8_int(green);
+			drawColor.rgba[2] = clamp_u8_int(blue);
+			drawColor.rgba[3] = clamp_alpha_7f(alpha);
+
+			GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)drawColor.rgba);
+			pppSetBlendMode(payload[0xF2]);
+			pppDrawShp(shape, pppEnvStPtr->m_materialSetPtr, payload[0xF2]);
 		}
 
-		if (work->m_worldMatrixBlock != 0) {
-			particleWorldMat = (_PARTICLE_WMAT*)(work->m_worldMatrixBlock + i);
+		if (particleWorldMat != NULL) {
+			particleWorldMat = particleWorldMat + 1;
 		}
-		if (work->m_colorBlock != 0) {
-			colorData = work->m_colorBlock + i;
+		if (colorData != NULL) {
+			colorData = colorData + 1;
 		}
-
-		pppFMATRIX drawMatrix;
-		pppCVECTOR drawColor = {{0xFF, 0xFF, 0xFF, clamp_u8(*f32_at(particle, 0x54))}};
-
-		if (colorData != 0) {
-			drawColor.rgba[0] = clamp_u8(colorData->m_color[0]);
-			drawColor.rgba[1] = clamp_u8(colorData->m_color[1]);
-			drawColor.rgba[2] = clamp_u8(colorData->m_color[2]);
-		}
-
-		set_matrix(obj, drawMatrix, params, work, particle, particleWorldMat);
-		pppSetDrawEnv(&drawColor, &drawMatrix, 0.0f, 0, 0, 0, 0, 1, 1, 0);
-		pppDrawShp(animData, *s16_at(particle, 0x20), pppEnvStPtr->m_materialSetPtr, 0);
+		particle = (_PARTICLE_DATA*)((u8*)particle + 0x60);
 	}
 }
 

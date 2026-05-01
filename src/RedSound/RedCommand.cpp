@@ -549,7 +549,7 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 
 	frameCount *= 0x60;
 	frameCount /= 0x3c;
-	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
+	track = (int*)((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 
 	do {
 		if (((u32)*track != 0) && ((seId < 0) || (((RedTrackDATA*)track)->m_seId == seId))) {
@@ -560,7 +560,7 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 			((RedTrackDATA*)track)->m_mixVolumeMode = mode;
 		}
 		track += 0x55;
-	} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
+	} while (track < (int*)((int)((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks + 0x2a80));
 }
 
 /*
@@ -584,7 +584,7 @@ void SetSePan(int seId, int pan, int frameCount)
 
 	frameCount *= 0x60;
 	frameCount /= 0x3c;
-	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
+	track = (int*)((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 
 	do {
 		if (((u32)*track != 0) && ((seId < 0) || (((RedTrackDATA*)track)->m_seId == seId))) {
@@ -594,7 +594,7 @@ void SetSePan(int seId, int pan, int frameCount)
 			((RedTrackDATA*)track)->m_panDelta = frameCount;
 		}
 		track += 0x55;
-	} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
+	} while (track < (int*)((int)((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks + 0x2a80));
 }
 
 /*
@@ -618,7 +618,7 @@ void SetSePitch(int seId, int pitch, int frameCount)
 
 	frameCount *= 0x60;
 	frameCount /= 0x3c;
-	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
+	track = (int*)((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 
 	do {
 		if (((u32)*track != 0) && ((seId < 0) || (((RedTrackDATA*)track)->m_seId == seId))) {
@@ -627,7 +627,7 @@ void SetSePitch(int seId, int pitch, int frameCount)
 			((RedTrackDATA*)track)->m_pitchDelta = frameCount;
 		}
 		track += 0x55;
-	} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
+	} while (track < (int*)((int)((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks + 0x2a80));
 }
 
 /*

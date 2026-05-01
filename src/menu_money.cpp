@@ -1,4 +1,5 @@
 #include "ffcc/menu_money.h"
+#include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/p_game.h"
@@ -421,13 +422,11 @@ void CMenuPcs::MoneyDraw()
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
-	MoneyMenuState* moneyState = this->moneyState;
-	MoneyMenuAnimList* moneyPanel = this->moneyPanel;
-	s16 selectionState = moneyState->listState;
-	s16 mode = moneyState->mode;
-	s16* entry = reinterpret_cast<s16*>(moneyPanel->anims);
+	s16 selectionState = this->moneyState->listState;
+	s16 mode = this->moneyState->mode;
+	s16* entry = reinterpret_cast<s16*>(this->moneyPanel->anims);
 
-	for (int i = 0; i < moneyPanel->count; i++, entry += 0x20) {
+	for (int i = 0; i < this->moneyPanel->count; i++, entry += 0x20) {
 		int tex = *(int*)(entry + 0xE);
 		if (tex < 0) {
 			continue;
@@ -439,7 +438,6 @@ void CMenuPcs::MoneyDraw()
 		float h = (float)entry[3];
 		float u = *(float*)(entry + 4);
 		float v = *(float*)(entry + 6);
-		float uvScale = *(float*)(entry + 10);
 		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 		GXColor color;
 		color.r = 0xFF;
@@ -447,10 +445,11 @@ void CMenuPcs::MoneyDraw()
 		color.b = 0xFF;
 		color.a = (u8)(FLOAT_80332f60 * *(float*)(entry + 8));
 		GXSetChanMatColor(GX_COLOR0A0, color);
+		float uvScale = *(float*)(entry + 10);
 		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332f64);
 	}
 
-	s16* drawBase = reinterpret_cast<s16*>(moneyPanel->anims);
+	s16* drawBase = reinterpret_cast<s16*>(this->moneyPanel->anims);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x5D);
 	{
 		GXColor color;
@@ -486,7 +485,7 @@ void CMenuPcs::MoneyDraw()
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 
-		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, (float)(drawBase[0] + (7 - moneyState->selectedIndex) * 0x12 + 0x24),
+		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, (float)(drawBase[0] + (7 - this->moneyState->selectedIndex) * 0x12 + 0x24),
 		                                (float)(drawBase[1] + 0x5C), FLOAT_80332f78, FLOAT_80332f6c, FLOAT_80332f64,
 		                                FLOAT_80332f64, FLOAT_80332f70, FLOAT_80332f70, FLOAT_80332f64);
 	}
@@ -498,12 +497,8 @@ void CMenuPcs::MoneyDraw()
 	font->DrawInit();
 
 	{
-		GXColor color;
-		color.r = 0xFF;
-		color.g = 0xFF;
-		color.b = 0xFF;
-		color.a = (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8));
-		font->SetColor(color);
+		CColor color(0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8)));
+		font->SetColor(color.color);
 	}
 
 	const char* label = GetMenuStr__8CMenuPcsFi(this, 0x15);
@@ -517,15 +512,15 @@ void CMenuPcs::MoneyDraw()
 	DrawInit__8CMenuPcsFv(this);
 	if (mode == 1) {
 		DrawSingWin__8CMenuPcsFs(this, -1);
-		if (moneyState->optionState == 1) {
-			DrawSingWinMess__8CMenuPcsFiii(this, 1, (int)moneyState->messageMask, 0);
+		if (this->moneyState->optionState == 1) {
+			DrawSingWinMess__8CMenuPcsFiii(this, 1, (int)this->moneyState->messageMask, 0);
 		}
 	}
 
-	if ((mode != 0) && (moneyState->optionState == 1)) {
+	if ((mode != 0) && (this->moneyState->optionState == 1)) {
 		s16* singWindow = this->singWindowInfo;
 		float cursorY = (float)(singWindow[1] + 0x20);
-		cursorY += (float)(moneyState->subMenuIndex * SingWinMessHeight__8CMenuPcsFv(this));
+		cursorY += (float)(this->moneyState->subMenuIndex * SingWinMessHeight__8CMenuPcsFv(this));
 
 		int frame = (int)System.m_frameCounter;
 		int frameSign = frame >> 31;

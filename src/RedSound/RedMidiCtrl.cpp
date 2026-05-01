@@ -541,7 +541,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
             c_RedEntry.MusicHistoryManager(0, controlData[0x11c]);
             c_RedEntry.WaveHistoryManager(0, controlData[0x11f]);
             controlData[0x11c] = 0xffffffff;
-            controlData[0x122] = 0;
+            control->m_updateFlags = 0;
             RedDelete((int)controlData[0]);
             controlData[0] = 0;
         }

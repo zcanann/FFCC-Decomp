@@ -701,7 +701,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	m_MusicSkipLine = mode;
 	music[0x11c] = musicId;
 	music[0x11b] &= 0xfffeffff;
-	music[0x122] = 0;
+	((RedSoundCONTROL*)music)->m_updateFlags = 0;
 
 	if (m_CrossTime == 0) {
 		music[0x115] = 0x1ff000;
@@ -814,7 +814,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	((RedSoundCONTROL*)music)->m_trackCount = musicHead->m_trackCount;
 	((RedSoundCONTROL*)music)->m_activeTrackCount = (short)musicHead->m_trackCount;
 	*(unsigned char*)((char*)music + 0x492) = (unsigned char)(musicHead->m_flags & 0x7f);
-	*(short*)(music + 0x123) = 1;
+	((RedSoundCONTROL*)music)->m_tickCounter = 1;
 	((RedSoundCONTROL*)music)->m_tempo = 0x1000;
 	((RedSoundCONTROL*)music)->m_ticksPerMeasure = 10000;
 	((RedSoundCONTROL*)music)->m_tick = -1;
@@ -825,7 +825,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	}
 	music[7] = volume;
 	music[9] = 0;
-	music[0x122] = 0;
+	((RedSoundCONTROL*)music)->m_updateFlags = 0;
 	music[0x11b] &= 0x10;
 	if ((musicHead->m_playFlags & 0x40000) != 0) {
 		music[0x11b] |= 0x40000;
@@ -854,7 +854,7 @@ int MusicStop(int seId)
 	do {
 		if ((seId == -1) || (((int)music[0x11c] >= 0) && ((int)music[0x11c] == seId))) {
 			unsigned int musicId = music[0x11c];
-			music[0x122] = 0;
+			((RedSoundCONTROL*)music)->m_updateFlags = 0;
 			music[0x11c] = -1;
 			if (*(short*)((char*)music + 0x48e) != 0) {
 				unsigned int* seTrack = p_VoiceData;

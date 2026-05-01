@@ -3227,13 +3227,12 @@ CCharaPcs::CLoadModel::~CLoadModel()
         int* refData = reinterpret_cast<int*>(model);
         int refCount = refData[1] - 1;
         refData[1] = refCount;
-        if (refCount == 0) {
-            (*(void (**)(void*, int))(*refData + 8))(model, 1);
+        if (refCount == 0 && model != 0) {
+            void (**vtable)(void*, int) = *reinterpret_cast<void (***)(void*, int)>(model);
+            vtable[2](model, 1);
         }
         *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x18) = 0;
     }
-
-    __dt__4CRefFv(this, 0);
 }
 
 /*
@@ -3259,13 +3258,12 @@ CCharaPcs::CLoadAnim::~CLoadAnim()
         int* refData = reinterpret_cast<int*>(anim);
         int refCount = refData[1] - 1;
         refData[1] = refCount;
-        if (refCount == 0) {
-            (*(void (**)(void*, int))(*refData + 8))(anim, 1);
+        if (refCount == 0 && anim != 0) {
+            void (**vtable)(void*, int) = *reinterpret_cast<void (***)(void*, int)>(anim);
+            vtable[2](anim, 1);
         }
         *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x28) = 0;
     }
-
-    __dt__4CRefFv(this, 0);
 }
 
 /*
@@ -3298,13 +3296,12 @@ CCharaPcs::CLoadTexture::~CLoadTexture()
         int* refData = reinterpret_cast<int*>(texture);
         int refCount = refData[1] - 1;
         refData[1] = refCount;
-        if (refCount == 0) {
-            (*(void (**)(void*, int))(*refData + 8))(texture, 1);
+        if (refCount == 0 && texture != 0) {
+            void (**vtable)(void*, int) = *reinterpret_cast<void (***)(void*, int)>(texture);
+            vtable[2](texture, 1);
         }
         *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x1C) = 0;
     }
-
-    __dt__4CRefFv(this, 0);
 }
 
 /*
@@ -3334,8 +3331,6 @@ CCharaPcs::CLoadPdt::~CLoadPdt()
         ReleasePdt__8CPartPcsFi(&PartPcs, pdtSlot);
         pdtSlot = -1;
     }
-
-    __dt__4CRefFv(this, 0);
 }
 
 /*

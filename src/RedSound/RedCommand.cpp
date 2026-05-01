@@ -429,7 +429,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				((RedTrackDATA*)track)->m_voiceSwitch = 0xc00;
 				memset(track + 0x35, 0xff, 0xc);
 				*(unsigned char*)((char*)track + 0x26) = 5;
-				*(short*)((char*)track + 0x146) = 1;
+				((RedTrackDATA*)track)->m_seTickCounter = 1;
 				*seTrack = (int)track;
 				*(unsigned char*)((char*)seTrack + 0x1a) = 5;
 				seTrack[0x24] = 2;

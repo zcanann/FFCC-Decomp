@@ -2486,10 +2486,10 @@ int _SeMidiNoteExecute(
     int* track = (int*)trackData;
     do {
         if (((u32)*track != 0) && ((track[0x3F] & 8) == 0)) {
-            *(s16*)((u8*)track + 0x146) += (s16)(tickStep * -0x78);
-            while (*(s16*)((u8*)track + 0x146) < 1) {
+            ((RedTrackDATA*)track)->m_seTickCounter += (s16)(tickStep * -0x78);
+            while (((RedTrackDATA*)track)->m_seTickCounter < 1) {
                 int step = frames;
-                *(s16*)((u8*)track + 0x146) += 0xFA;
+                ((RedTrackDATA*)track)->m_seTickCounter += 0xFA;
                 if (((RedTrackDATA*)track)->m_deltaTime < frames) {
                     step = ((RedTrackDATA*)track)->m_deltaTime;
                 }

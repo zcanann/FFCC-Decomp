@@ -684,12 +684,11 @@ void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, 
  */
 void __MidiCtrl_LoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    ++*(short*)((char*)track + 0x13C);
-    *(short*)((char*)track + 0x13C) &= 3;
-    *(int*)((char*)track + *(short*)((char*)track + 0x13C) * 4 + 8) = *(int*)track;
-    *(short*)((char*)track + *(short*)((char*)track + 0x13C) * 2 + 0x130) =
-        *(short*)((char*)track + 0x144);
-    *(short*)((char*)track + *(short*)((char*)track + 0x13C) * 2 + 0x128) = 0;
+    ++track->m_loopDepth;
+    track->m_loopDepth &= 3;
+    track->m_loopCommand[track->m_loopDepth] = track->m_command;
+    track->m_loopStep[track->m_loopDepth] = *(short*)((char*)track + 0x144);
+    track->m_loopCount[track->m_loopDepth] = 0;
 }
 
 /*
@@ -711,14 +710,14 @@ void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
         loopCount = 0x100;
     }
 
-    counterOffset = *(short*)((char*)track + 0x13c) * 2 + 0x128;
+    counterOffset = track->m_loopDepth * 2 + 0x128;
     *(short*)((char*)track + counterOffset) = *(short*)((char*)track + counterOffset) + 1;
-    if (*(short*)((char*)track + *(short*)((char*)track + 0x13c) * 2 + 0x128) != loopCount) {
-        *(u8**)track = *(u8**)((char*)track + *(short*)((char*)track + 0x13c) * 4 + 8);
-        *(short*)((char*)track + 0x144) = *(short*)((char*)track + *(short*)((char*)track + 0x13c) * 2 + 0x130);
+    if (track->m_loopCount[track->m_loopDepth] != loopCount) {
+        track->m_command = track->m_loopCommand[track->m_loopDepth];
+        *(short*)((char*)track + 0x144) = track->m_loopStep[track->m_loopDepth];
     } else {
-        *(short*)((char*)track + 0x13c) = *(short*)((char*)track + 0x13c) - 1;
-        *(short*)((char*)track + 0x13c) &= 3;
+        track->m_loopDepth = track->m_loopDepth - 1;
+        track->m_loopDepth &= 3;
     }
 }
 
@@ -733,9 +732,8 @@ void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    *(int*)track = *(int*)((char*)track + (*(short*)((char*)track + 0x13c) * 4) + 8);
-    *(short*)((char*)track + 0x144) =
-        *(short*)((char*)track + *(short*)((char*)track + 0x13c) * 2 + 0x130);
+    track->m_command = track->m_loopCommand[track->m_loopDepth];
+    *(short*)((char*)track + 0x144) = track->m_loopStep[track->m_loopDepth];
 }
 
 /*

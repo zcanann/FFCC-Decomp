@@ -6,7 +6,8 @@ struct RedSoundCONTROL;
 
 struct RedTrackDATA {
 	unsigned char* m_command;
-	unsigned char m_pad04[0x18 - 0x04];
+	unsigned char m_pad04[0x08 - 0x04];
+	unsigned char* m_loopCommand[4];
 	int m_waveBankData;
 	int m_waveData;
 	unsigned char m_pad20[0x28 - 0x20];
@@ -79,10 +80,11 @@ struct RedTrackDATA {
 	int m_waveBase;
 	int m_portamentPitch;
 	int m_waveNo;
-	unsigned char m_pad128[0x138 - 0x128];
+	short m_loopCount[4];
+	short m_loopStep[4];
 	short m_step;
 	short m_step2;
-	unsigned char m_pad13C[0x13E - 0x13C];
+	short m_loopDepth;
 	short m_pitchBend;
 	short m_pitchBendRaw;
 	short m_keyTranspose;

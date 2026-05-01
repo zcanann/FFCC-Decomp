@@ -908,33 +908,33 @@ void _PitchExecute(RedVoiceDATA* voice)
  */
 RedWaveDATA* _WaveSplitSelect(RedWaveDATA* wave, RedNoteDATA* note)
 {
-    if ((wave != 0) && ((((u32*)wave)[0] & 0x30000) != 0)) {
+    if ((wave != 0) && ((wave->m_flags & 0x30000) != 0)) {
         for (;;) {
-            if ((((u32*)wave)[0] & 0x200) != 0) {
+            if ((wave->m_flags & 0x200) != 0) {
                 break;
             }
-            if (*(char*)note <= *(char*)((u32*)wave + 6)) {
+            if (note->m_key <= wave->m_splitKey) {
                 break;
             }
-            if ((((u32*)wave)[0] & 1) != 0) {
-                wave = (RedWaveDATA*)((u32*)wave + 0x18);
+            if ((wave->m_flags & 1) != 0) {
+                wave++;
             }
-            wave = (RedWaveDATA*)((u32*)wave + 0x18);
+            wave++;
         }
 
-        int splitKey = *(char*)((u32*)wave + 6);
+        int splitKey = wave->m_splitKey;
         for (;;) {
-            if ((((u32*)wave)[0] & 0x200) != 0) {
+            if ((wave->m_flags & 0x200) != 0) {
                 break;
             }
-            if (((char*)note)[1] <= *(u8*)((int)wave + 0x19)) {
+            if (note->m_velocity <= wave->m_splitVelocity) {
                 break;
             }
-            if (splitKey == *(char*)((u32*)wave + 6)) {
-                if ((((u32*)wave)[0] & 1) != 0) {
-                    wave = (RedWaveDATA*)((u32*)wave + 0x18);
+            if (splitKey == wave->m_splitKey) {
+                if ((wave->m_flags & 1) != 0) {
+                    wave++;
                 }
-                wave = (RedWaveDATA*)((u32*)wave + 0x18);
+                wave++;
             } else {
                 return wave;
             }

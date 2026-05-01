@@ -6,6 +6,7 @@
 
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
+#include <string.h>
 
 class CGPartyObj;
 
@@ -28,7 +29,10 @@ public:
 	class CATemp
 	{
 	public:
-		CATemp();
+		CATemp()
+		{
+			memset(this, 0, sizeof(*this));
+		}
 		CATemp(const CATemp&);
 
 		void operator=(const CATemp& other);
@@ -39,7 +43,10 @@ public:
 		float m_cost;                // 0x84
 	}; // Size 0x88
 	
-	CAStar();
+	CAStar()
+	{
+		reset();
+	}
 	~CAStar();
 
 	void reset();

@@ -48,100 +48,525 @@ CAStar AStar;
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CAStar::CAStar()
-{
-	reset();
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CAStar::~CAStar()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CAStar::reset()
-{ 
-	m_portalCount = 0;
-	memset(m_portals, 0, sizeof(m_portals));
-	memset(m_routeTable, 0, sizeof(m_routeTable));
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80142ce8
- * PAL Size: 668b
+ * PAL Address: 0x80141550
+ * PAL Size: 468b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
+unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
-	CVector pos(x, y, z);
-
-	if (groupB < groupA)
+	if ((AStar.m_flags & 1) != 0)
 	{
-		int tmp = groupA;
+		unsigned int mask = m_hitAttributeMask;
+		Vec* base = reinterpret_cast<Vec*>(&CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ));
+		Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z));
+		CMapCylinderRaw cyl;
 
-		groupA  = groupB;
-		groupB  = tmp;
+		cyl.m_top.z = kPolyGroupAabbMax;
+		cyl.m_top.y = kPolyGroupAabbMax;
+		cyl.m_top.x = kPolyGroupAabbMax;
+		cyl.m_direction2.z = kPolyGroupAabbMin;
+		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_direction2.x = kPolyGroupAabbMin;
+		cyl.m_bottom = *top;
+		cyl.m_direction = *base;
+		cyl.m_radius = kPolyGroupBaseXZ;
+
+		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
+		                                base, mask) != 0)
+		{
+			return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
+		}
+	}
+	else
+	{
+		Vec* base = reinterpret_cast<Vec*>(&CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ));
+		Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z));
+		CMapCylinderRaw cyl;
+
+		cyl.m_top.z = kPolyGroupAabbMax;
+		cyl.m_top.y = kPolyGroupAabbMax;
+		cyl.m_top.x = kPolyGroupAabbMax;
+		cyl.m_direction2.z = kPolyGroupAabbMin;
+		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_direction2.x = kPolyGroupAabbMin;
+		cyl.m_bottom = *top;
+		cyl.m_direction = *base;
+		cyl.m_radius = kPolyGroupBaseXZ;
+
+		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
+		                                base, hitAttributeMask) != 0)
+		{
+			return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
+		}
 	}
 
-	int index = 0;
+	return 0;
+}
+/*
+ * --INFO--
+ * PAL Address: 0x80141724
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
+{
+	unsigned int mask = m_hitAttributeMask;
+	Vec* base = reinterpret_cast<Vec*>(&CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ));
+	Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z));
+	CMapCylinderRaw cyl;
 
-	for (; index < 64; ++index)
+	cyl.m_top.z = kPolyGroupAabbMax;
+	cyl.m_top.y = kPolyGroupAabbMax;
+	cyl.m_top.x = kPolyGroupAabbMax;
+	cyl.m_direction2.z = kPolyGroupAabbMin;
+	cyl.m_direction2.y = kPolyGroupAabbMin;
+	cyl.m_direction2.x = kPolyGroupAabbMin;
+	cyl.m_bottom = *top;
+	cyl.m_direction = *base;
+	cyl.m_radius = kPolyGroupBaseXZ;
+
+	if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
+	                                base, mask) != 0)
 	{
-		CAPos& p = m_portals[index];
+		return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
+	}
 
-		if (p.m_groupA == groupA && p.m_groupB == groupB)
+	return 0;
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int forbiddenGroup)
+{
+	CVector baseVec(base);
+	CVector fromVec(from);
+	CVector diffBaseToFrom;
+
+	PSVECSubtract(reinterpret_cast<Vec*>(&fromVec),
+	              reinterpret_cast<Vec*>(&baseVec),
+	              reinterpret_cast<Vec*>(&diffBaseToFrom));
+
+	CVector escapeDir;
+	escapeDir.x = diffBaseToFrom.x;
+	escapeDir.y = diffBaseToFrom.y;
+	escapeDir.z = diffBaseToFrom.z;
+
+	escapeDir.Normalize();
+
+	float behindBestDist = kAStarEscapeInitialBestDist;
+	float aheadBestDist  = kAStarEscapeInitialBestDist;
+
+	CAPos* behindBest = (CAPos*)nullptr;
+	CAPos* aheadBest  = (CAPos*)nullptr;
+
+	for (int i = 0; i < 64; ++i)
+	{
+		CAPos& portal = m_portals[i];
+
+		bool exists = false;
+
+		if (portal.m_groupA != 0 && portal.m_groupB != 0)
 		{
+			exists = true;
+		}
+
+		if (!exists)
+		{
+			continue;
+		}
+
+		bool connected = false;
+
+		if (portal.m_groupA == startGroup || portal.m_groupB == startGroup)
+		{
+			connected = true;
+		}
+
+		if (!connected)
+		{
+			continue;
+		}
+
+		unsigned int otherGroup = portal.m_groupA;
+
+		if (otherGroup == startGroup)
+		{
+			otherGroup = portal.m_groupB;
+		}
+
+		if (otherGroup == forbiddenGroup)
+		{
+			continue;
+		}
+
+		CVector baseVec1(base);
+		CVector portalPos1(portal.m_position);
+
+		Vec diffBaseToPortalNormSrc;
+		CVector dirToPortal;
+
+		PSVECSubtract(reinterpret_cast<Vec*>(&portalPos1),
+		              reinterpret_cast<Vec*>(&baseVec1),
+		              &diffBaseToPortalNormSrc);
+
+		dirToPortal.x = diffBaseToPortalNormSrc.x;
+		dirToPortal.y = diffBaseToPortalNormSrc.y;
+		dirToPortal.z = diffBaseToPortalNormSrc.z;
+
+		dirToPortal.Normalize();
+
+		float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&escapeDir),
+		                            reinterpret_cast<Vec*>(&dirToPortal));
+
+		CVector baseVec2(base);
+		CVector portalPos2(portal.m_position);
+
+		Vec diffBaseToPortalMagSrc;
+		CVector diffForMag;
+
+		// diffBaseToPortalMagSrc = portalPos2 - baseVec2;
+		PSVECSubtract(reinterpret_cast<Vec*>(&portalPos2),
+		              reinterpret_cast<Vec*>(&baseVec2),
+		              &diffBaseToPortalMagSrc);
+
+		diffForMag.x = diffBaseToPortalMagSrc.x;
+		diffForMag.y = diffBaseToPortalMagSrc.y;
+		diffForMag.z = diffBaseToPortalMagSrc.z;
+
+		float dist = PSVECMag(reinterpret_cast<Vec*>(&diffForMag));
+
+		if (dot < FLOAT_803320C4)
+		{
+			if (behindBestDist < dist)
+			{
+				behindBest    = &portal;
+				behindBestDist = dist;
+			}
+		}
+		else
+		{
+			if (aheadBestDist < dist)
+			{
+				aheadBest    = &portal;
+				aheadBestDist = dist;
+			}
+		}
+	}
+
+	if (aheadBest != nullptr)
+	{
+		return aheadBest;
+	}
+
+	return behindBest;
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CAStar::addRealTime(CGPartyObj* gPartyObj)
+{
+	if (static_cast<unsigned short>(m_lastSeenGroup) != gPartyObj->m_aStarGroupId)
+	{
+		m_lastGroupPos.x = gPartyObj->m_worldPosition.x;
+		m_lastGroupPos.y = gPartyObj->m_worldPosition.y;
+		m_lastGroupPos.z = gPartyObj->m_worldPosition.z;
+
+		m_currentGroup    = static_cast<unsigned char>(gPartyObj->m_aStarGroupId);
+		m_previousGroup   = m_lastSeenGroup;
+		m_lastSeenGroup   = static_cast<unsigned char>(gPartyObj->m_aStarGroupId);
+	}
+
+	Graphic.Printf(10, 10, kAStarGroupDebugFormat, static_cast<int>(gPartyObj->m_aStarGroupId));
+
+	bool padBusy = false;
+
+	if (Pad._452_4_ != 0 || Pad._448_4_ != -1)
+	{
+		padBusy = true;
+	}
+
+	u16 trig1;
+	if (padBusy)
+	{
+		trig1 = 0;
+	}
+	else
+	{
+		int padIndex = padBusy;
+		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+		trig1 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
+	}
+
+	if ((trig1 & 0x20) == 0)
+	{
+		return;
+	}
+
+	padBusy = false;
+	if (Pad._452_4_ != 0 || Pad._448_4_ != -1)
+	{
+		padBusy = true;
+	}
+
+	u16 trig2;
+	if (padBusy)
+	{
+		trig2 = 0;
+	}
+	else
+	{
+		int padIndex = padBusy;
+		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+		trig2 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 4);
+	}
+
+	if ((trig2 & 0x40) == 0)
+	{
+		return;
+	}
+
+	int prev = m_previousGroup;
+	int curr = m_currentGroup;
+
+	int groupLow  = curr;
+	int groupHigh = prev;
+
+	if (prev < curr)
+	{
+		groupHigh = curr;
+		groupLow  = prev;
+	}
+
+	int portalIndex = 64;
+
+	// Look for an existing portal (groupLow, groupHigh)
+	for (int i = 0; i < 64; ++i)
+	{
+		CAPos& p = m_portals[i];
+
+		if (p.m_groupA == groupLow && p.m_groupB == groupHigh)
+		{
+			portalIndex = i;
 			break;
 		}
 	}
 
-	if (index == 64)
+	// If none, find a free slot
+	if (portalIndex == 64)
 	{
-		index = 0;
-
-		for (; index < 64; ++index)
+		for (int i = 0; i < 64; ++i)
 		{
-			bool used = false;
+			CAPos& p = m_portals[i];
 
-			if (m_portals[index].m_groupA != 0 && m_portals[index].m_groupB != 0)
+			bool used = false;
+			if (p.m_groupA != 0 && p.m_groupB != 0)
 			{
 				used = true;
 			}
 
 			if (!used)
 			{
+				portalIndex = i;
 				m_portalCount++;
 				break;
 			}
 		}
 	}
 
-	CAPos& portal = m_portals[index];
+	CAPos& portal = m_portals[portalIndex];
 
-	portal.m_position.x = pos.x;
-	portal.m_position.y = pos.y;
-	portal.m_position.z = pos.z;
-	m_portals[index].m_groupA = static_cast<unsigned char>(groupA);
-	m_portals[index].m_groupB = static_cast<unsigned char>(groupB);
+	portal.m_position.x = m_lastGroupPos.x;
+	portal.m_position.y = m_lastGroupPos.y;
+	portal.m_position.z = m_lastGroupPos.z;
+
+	portal.m_groupA = groupLow;
+	portal.m_groupB = groupHigh;
+
+	System.Printf(const_cast<char*>(kAStarGroupDebugLabel));
+
+	for (int i = 0; i < 64; ++i)
+	{
+		CAPos& p = m_portals[i];
+
+		bool used = false;
+		if (p.m_groupA != 0 && p.m_groupB != 0)
+		{
+			used = true;
+		}
+
+		if (used)
+		{
+			System.Printf(
+				kAStarPortalDebugFormat,
+				static_cast<double>(p.m_position.x),
+				static_cast<double>(p.m_position.y),
+				static_cast<double>(p.m_position.z),
+				p.m_groupA,
+				p.m_groupB
+			);
+		}
+	}
+
+	calcAStar();
 }
+/*
+ * --INFO--
+ * PAL Address: 0x80141eb4
+ * PAL Size: 700b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CAStar::drawAStar()
+{
+	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x400) != 0)
+	{
+		if ((static_cast<int>(System.m_frameCounter) % 0x1e) == 0)
+		{
+			for (int group = 0; group < 64; ++group)
+			{
+				unsigned char b = static_cast<unsigned char>(Math.Rand(0xff));
+				unsigned char g = static_cast<unsigned char>(Math.Rand(0xff));
+				unsigned char r = static_cast<unsigned char>(Math.Rand(0xff));
+				CColor color(r, g, b, 0xFF);
+				MapMng.SetIdGrpColor(group, 0, color.color);
+			}
+		}
 
+		bool hasGroups = false;
+		if (m_currentGroup != 0 && m_previousGroup != 0)
+		{
+			hasGroups = true;
+		}
 
+		if (hasGroups)
+		{
+			CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+			Graphic.DrawSphere(gFlatPosMtx, &m_lastGroupPos, kDrawAStarSphereRadius, &white.color);
+		}
+
+		for (int i = 0; i < 64; ++i)
+		{
+			CAPos& portal = m_portals[i];
+
+			if (portal.m_groupA == 0 || portal.m_groupB == 0)
+			{
+				continue;
+			}
+
+			CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
+			Graphic.DrawSphere(gFlatPosMtx, &portal.m_position, kDrawAStarSphereRadius, &yellow.color);
+
+			unsigned char* groupPtr = &portal.m_groupA;
+			for (int side = 0; side < 2; ++side, ++groupPtr)
+			{
+				unsigned char group = *groupPtr;
+
+				if (group == 0)
+				{
+					continue;
+				}
+
+				for (int j = 0; j < 64; ++j)
+				{
+					if (i == j)
+					{
+						continue;
+					}
+
+					CAPos& other = m_portals[j];
+
+					if (other.m_groupA == 0 || other.m_groupB == 0)
+					{
+						continue;
+					}
+
+					if (other.m_groupA != group && other.m_groupB != group)
+					{
+						continue;
+					}
+
+					GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
+					GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 2);
+					GXPosition3f32(
+						portal.m_position.x,
+						portal.m_position.y + kPolyGroupTopOffsetY,
+						portal.m_position.z);
+					GXPosition3f32(
+						other.m_position.x,
+						other.m_position.y + kPolyGroupTopOffsetY,
+						other.m_position.z);
+				}
+			}
+		}
+	}
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CAStar::calcAStar()
+{
+	memset(m_routeTable, 0, sizeof(m_routeTable));
+
+	for (int to = 0; to < 64; ++to)
+	{
+		for (int from = 0; from < 64; ++from)
+		{
+			if (from == to)
+			{
+				continue;
+			}
+
+			m_bestPath.m_cost = kInfiniteCost;
+
+			CATemp temp;
+
+			check(from, to, temp);
+
+			if (m_bestPath.m_cost < kInfiniteCost)
+			{
+				System.Printf(const_cast<char*>(kAStarCostDebugFormat), from, to, m_bestPath.m_cost);
+
+				int current = from;
+
+				for (int i = 0; i < m_bestPath.m_pathLength; ++i)
+				{
+					int portalIndex = m_bestPath.m_path[i];
+
+					m_routeTable[current][to][1] = portalIndex;
+
+					int next = m_portals[portalIndex].m_groupA;
+
+					if (next == current)
+					{
+						next = m_portals[portalIndex].m_groupB;
+					}
+
+					m_routeTable[current][to][0] = static_cast<unsigned char>(next);
+
+					current = static_cast<unsigned char>(next);
+
+					System.Printf(const_cast<char*>(kAStarStepDebugFormat), current);
+				}
+
+				System.Printf(const_cast<char*>(kAStarNewLine));
+			}
+		}
+	}
+}
 /*
  * --INFO--
  * Address:	TODO
@@ -429,549 +854,10 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 		++pos0;
 	} while (idx0 < 64);
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CAStar::CATemp::CATemp()
-{
-	memset(this, 0, sizeof(*this));
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CAStar::calcAStar()
-{
-	memset(m_routeTable, 0, sizeof(m_routeTable));
-
-	for (int to = 0; to < 64; ++to)
-	{
-		for (int from = 0; from < 64; ++from)
-		{
-			if (from == to)
-			{
-				continue;
-			}
-
-			m_bestPath.m_cost = kInfiniteCost;
-
-			CATemp temp;
-
-			check(from, to, temp);
-
-			if (m_bestPath.m_cost < kInfiniteCost)
-			{
-				System.Printf(const_cast<char*>(kAStarCostDebugFormat), from, to, m_bestPath.m_cost);
-
-				int current = from;
-
-				for (int i = 0; i < m_bestPath.m_pathLength; ++i)
-				{
-					int portalIndex = m_bestPath.m_path[i];
-
-					m_routeTable[current][to][1] = portalIndex;
-
-					int next = m_portals[portalIndex].m_groupA;
-
-					if (next == current)
-					{
-						next = m_portals[portalIndex].m_groupB;
-					}
-
-					m_routeTable[current][to][0] = static_cast<unsigned char>(next);
-
-					current = static_cast<unsigned char>(next);
-
-					System.Printf(const_cast<char*>(kAStarStepDebugFormat), current);
-				}
-
-				System.Printf(const_cast<char*>(kAStarNewLine));
-			}
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80141eb4
- * PAL Size: 700b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CAStar::drawAStar()
-{
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x400) != 0)
-	{
-		if ((static_cast<int>(System.m_frameCounter) % 0x1e) == 0)
-		{
-			for (int group = 0; group < 64; ++group)
-			{
-				unsigned char b = static_cast<unsigned char>(Math.Rand(0xff));
-				unsigned char g = static_cast<unsigned char>(Math.Rand(0xff));
-				unsigned char r = static_cast<unsigned char>(Math.Rand(0xff));
-				CColor color(r, g, b, 0xFF);
-				MapMng.SetIdGrpColor(group, 0, color.color);
-			}
-		}
-
-		bool hasGroups = false;
-		if (m_currentGroup != 0 && m_previousGroup != 0)
-		{
-			hasGroups = true;
-		}
-
-		if (hasGroups)
-		{
-			CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-			Graphic.DrawSphere(gFlatPosMtx, &m_lastGroupPos, kDrawAStarSphereRadius, &white.color);
-		}
-
-		for (int i = 0; i < 64; ++i)
-		{
-			CAPos& portal = m_portals[i];
-
-			if (portal.m_groupA == 0 || portal.m_groupB == 0)
-			{
-				continue;
-			}
-
-			CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
-			Graphic.DrawSphere(gFlatPosMtx, &portal.m_position, kDrawAStarSphereRadius, &yellow.color);
-
-			unsigned char* groupPtr = &portal.m_groupA;
-			for (int side = 0; side < 2; ++side, ++groupPtr)
-			{
-				unsigned char group = *groupPtr;
-
-				if (group == 0)
-				{
-					continue;
-				}
-
-				for (int j = 0; j < 64; ++j)
-				{
-					if (i == j)
-					{
-						continue;
-					}
-
-					CAPos& other = m_portals[j];
-
-					if (other.m_groupA == 0 || other.m_groupB == 0)
-					{
-						continue;
-					}
-
-					if (other.m_groupA != group && other.m_groupB != group)
-					{
-						continue;
-					}
-
-					GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
-					GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 2);
-					GXPosition3f32(
-						portal.m_position.x,
-						portal.m_position.y + kPolyGroupTopOffsetY,
-						portal.m_position.z);
-					GXPosition3f32(
-						other.m_position.x,
-						other.m_position.y + kPolyGroupTopOffsetY,
-						other.m_position.z);
-				}
-			}
-		}
-	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CAStar::addRealTime(CGPartyObj* gPartyObj)
-{
-	if (static_cast<unsigned short>(m_lastSeenGroup) != gPartyObj->m_aStarGroupId)
-	{
-		m_lastGroupPos.x = gPartyObj->m_worldPosition.x;
-		m_lastGroupPos.y = gPartyObj->m_worldPosition.y;
-		m_lastGroupPos.z = gPartyObj->m_worldPosition.z;
-
-		m_currentGroup    = static_cast<unsigned char>(gPartyObj->m_aStarGroupId);
-		m_previousGroup   = m_lastSeenGroup;
-		m_lastSeenGroup   = static_cast<unsigned char>(gPartyObj->m_aStarGroupId);
-	}
-
-	Graphic.Printf(10, 10, kAStarGroupDebugFormat, static_cast<int>(gPartyObj->m_aStarGroupId));
-
-	bool padBusy = false;
-
-	if (Pad._452_4_ != 0 || Pad._448_4_ != -1)
-	{
-		padBusy = true;
-	}
-
-	u16 trig1;
-	if (padBusy)
-	{
-		trig1 = 0;
-	}
-	else
-	{
-		int padIndex = padBusy;
-		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
-		trig1 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
-	}
-
-	if ((trig1 & 0x20) == 0)
-	{
-		return;
-	}
-
-	padBusy = false;
-	if (Pad._452_4_ != 0 || Pad._448_4_ != -1)
-	{
-		padBusy = true;
-	}
-
-	u16 trig2;
-	if (padBusy)
-	{
-		trig2 = 0;
-	}
-	else
-	{
-		int padIndex = padBusy;
-		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
-		trig2 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 4);
-	}
-
-	if ((trig2 & 0x40) == 0)
-	{
-		return;
-	}
-
-	int prev = m_previousGroup;
-	int curr = m_currentGroup;
-
-	int groupLow  = curr;
-	int groupHigh = prev;
-
-	if (prev < curr)
-	{
-		groupHigh = curr;
-		groupLow  = prev;
-	}
-
-	int portalIndex = 64;
-
-	// Look for an existing portal (groupLow, groupHigh)
-	for (int i = 0; i < 64; ++i)
-	{
-		CAPos& p = m_portals[i];
-
-		if (p.m_groupA == groupLow && p.m_groupB == groupHigh)
-		{
-			portalIndex = i;
-			break;
-		}
-	}
-
-	// If none, find a free slot
-	if (portalIndex == 64)
-	{
-		for (int i = 0; i < 64; ++i)
-		{
-			CAPos& p = m_portals[i];
-
-			bool used = false;
-			if (p.m_groupA != 0 && p.m_groupB != 0)
-			{
-				used = true;
-			}
-
-			if (!used)
-			{
-				portalIndex = i;
-				m_portalCount++;
-				break;
-			}
-		}
-	}
-
-	CAPos& portal = m_portals[portalIndex];
-
-	portal.m_position.x = m_lastGroupPos.x;
-	portal.m_position.y = m_lastGroupPos.y;
-	portal.m_position.z = m_lastGroupPos.z;
-
-	portal.m_groupA = groupLow;
-	portal.m_groupB = groupHigh;
-
-	System.Printf(const_cast<char*>(kAStarGroupDebugLabel));
-
-	for (int i = 0; i < 64; ++i)
-	{
-		CAPos& p = m_portals[i];
-
-		bool used = false;
-		if (p.m_groupA != 0 && p.m_groupB != 0)
-		{
-			used = true;
-		}
-
-		if (used)
-		{
-			System.Printf(
-				kAStarPortalDebugFormat,
-				static_cast<double>(p.m_position.x),
-				static_cast<double>(p.m_position.y),
-				static_cast<double>(p.m_position.z),
-				p.m_groupA,
-				p.m_groupB
-			);
-		}
-	}
-
-	calcAStar();
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int forbiddenGroup)
-{
-	CVector baseVec(base);
-	CVector fromVec(from);
-	CVector diffBaseToFrom;
-
-	PSVECSubtract(reinterpret_cast<Vec*>(&fromVec),
-	              reinterpret_cast<Vec*>(&baseVec),
-	              reinterpret_cast<Vec*>(&diffBaseToFrom));
-
-	CVector escapeDir;
-	escapeDir.x = diffBaseToFrom.x;
-	escapeDir.y = diffBaseToFrom.y;
-	escapeDir.z = diffBaseToFrom.z;
-
-	escapeDir.Normalize();
-
-	float behindBestDist = kAStarEscapeInitialBestDist;
-	float aheadBestDist  = kAStarEscapeInitialBestDist;
-
-	CAPos* behindBest = (CAPos*)nullptr;
-	CAPos* aheadBest  = (CAPos*)nullptr;
-
-	for (int i = 0; i < 64; ++i)
-	{
-		CAPos& portal = m_portals[i];
-
-		bool exists = false;
-
-		if (portal.m_groupA != 0 && portal.m_groupB != 0)
-		{
-			exists = true;
-		}
-
-		if (!exists)
-		{
-			continue;
-		}
-
-		bool connected = false;
-
-		if (portal.m_groupA == startGroup || portal.m_groupB == startGroup)
-		{
-			connected = true;
-		}
-
-		if (!connected)
-		{
-			continue;
-		}
-
-		unsigned int otherGroup = portal.m_groupA;
-
-		if (otherGroup == startGroup)
-		{
-			otherGroup = portal.m_groupB;
-		}
-
-		if (otherGroup == forbiddenGroup)
-		{
-			continue;
-		}
-
-		CVector baseVec1(base);
-		CVector portalPos1(portal.m_position);
-
-		Vec diffBaseToPortalNormSrc;
-		CVector dirToPortal;
-
-		PSVECSubtract(reinterpret_cast<Vec*>(&portalPos1),
-		              reinterpret_cast<Vec*>(&baseVec1),
-		              &diffBaseToPortalNormSrc);
-
-		dirToPortal.x = diffBaseToPortalNormSrc.x;
-		dirToPortal.y = diffBaseToPortalNormSrc.y;
-		dirToPortal.z = diffBaseToPortalNormSrc.z;
-
-		dirToPortal.Normalize();
-
-		float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&escapeDir),
-		                            reinterpret_cast<Vec*>(&dirToPortal));
-
-		CVector baseVec2(base);
-		CVector portalPos2(portal.m_position);
-
-		Vec diffBaseToPortalMagSrc;
-		CVector diffForMag;
-
-		// diffBaseToPortalMagSrc = portalPos2 - baseVec2;
-		PSVECSubtract(reinterpret_cast<Vec*>(&portalPos2),
-		              reinterpret_cast<Vec*>(&baseVec2),
-		              &diffBaseToPortalMagSrc);
-
-		diffForMag.x = diffBaseToPortalMagSrc.x;
-		diffForMag.y = diffBaseToPortalMagSrc.y;
-		diffForMag.z = diffBaseToPortalMagSrc.z;
-
-		float dist = PSVECMag(reinterpret_cast<Vec*>(&diffForMag));
-
-		if (dot < FLOAT_803320C4)
-		{
-			if (behindBestDist < dist)
-			{
-				behindBest    = &portal;
-				behindBestDist = dist;
-			}
-		}
-		else
-		{
-			if (aheadBestDist < dist)
-			{
-				aheadBest    = &portal;
-				aheadBestDist = dist;
-			}
-		}
-	}
-
-	if (aheadBest != nullptr)
-	{
-		return aheadBest;
-	}
-
-	return behindBest;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80141724
- * PAL Size: 252b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
-{
-	unsigned int mask = m_hitAttributeMask;
-	Vec* base = reinterpret_cast<Vec*>(&CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ));
-	Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z));
-	CMapCylinderRaw cyl;
-
-	cyl.m_top.z = kPolyGroupAabbMax;
-	cyl.m_top.y = kPolyGroupAabbMax;
-	cyl.m_top.x = kPolyGroupAabbMax;
-	cyl.m_direction2.z = kPolyGroupAabbMin;
-	cyl.m_direction2.y = kPolyGroupAabbMin;
-	cyl.m_direction2.x = kPolyGroupAabbMin;
-	cyl.m_bottom = *top;
-	cyl.m_direction = *base;
-	cyl.m_radius = kPolyGroupBaseXZ;
-
-	if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
-	                                base, mask) != 0)
-	{
-		return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
-	}
-
-	return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80141550
- * PAL Size: 468b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
-{
-	if ((AStar.m_flags & 1) != 0)
-	{
-		unsigned int mask = m_hitAttributeMask;
-		Vec* base = reinterpret_cast<Vec*>(&CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ));
-		Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z));
-		CMapCylinderRaw cyl;
-
-		cyl.m_top.z = kPolyGroupAabbMax;
-		cyl.m_top.y = kPolyGroupAabbMax;
-		cyl.m_top.x = kPolyGroupAabbMax;
-		cyl.m_direction2.z = kPolyGroupAabbMin;
-		cyl.m_direction2.y = kPolyGroupAabbMin;
-		cyl.m_direction2.x = kPolyGroupAabbMin;
-		cyl.m_bottom = *top;
-		cyl.m_direction = *base;
-		cyl.m_radius = kPolyGroupBaseXZ;
-
-		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
-		                                base, mask) != 0)
-		{
-			return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
-		}
-	}
-	else
-	{
-		Vec* base = reinterpret_cast<Vec*>(&CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ));
-		Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z));
-		CMapCylinderRaw cyl;
-
-		cyl.m_top.z = kPolyGroupAabbMax;
-		cyl.m_top.y = kPolyGroupAabbMax;
-		cyl.m_top.x = kPolyGroupAabbMax;
-		cyl.m_direction2.z = kPolyGroupAabbMin;
-		cyl.m_direction2.y = kPolyGroupAabbMin;
-		cyl.m_direction2.x = kPolyGroupAabbMin;
-		cyl.m_bottom = *top;
-		cyl.m_direction = *base;
-		cyl.m_radius = kPolyGroupBaseXZ;
-
-		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
-		                                base, hitAttributeMask) != 0)
-		{
-			return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
-		}
-	}
-
-	return 0;
-}
-
 float CAStar::CAPos::CalcLength(CAStar::CAPos& other)
 {
 	return PSVECDistance(&this->m_position, &other.m_position);
 }
-
 /*
  * --INFO--
  * PAL Address: 0x80142a80
@@ -1058,7 +944,6 @@ CAStar::CATemp::CATemp(const CAStar::CATemp& other)
 	dst[32] = v0;
 	m_cost = cost;
 }
-
 unsigned char CAStar::CAPos::GetOthers(int group)
 {
 	unsigned char others = m_groupA;
@@ -1070,7 +955,6 @@ unsigned char CAStar::CAPos::GetOthers(int group)
 
 	return (unsigned char)others;
 }
-
 /*
  * --INFO--
  * Address:	TODO
@@ -1087,7 +971,6 @@ int CAStar::CAPos::IsExist(int group)
 
 	return result;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x80142bd4
@@ -1173,4 +1056,87 @@ void CAStar::CATemp::operator= (const CAStar::CATemp& other)
 	float cost = other.m_cost;
 	dst[32] = v0;
 	m_cost = cost;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80142ce8
+ * PAL Size: 668b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
+{
+	CVector pos(x, y, z);
+
+	if (groupB < groupA)
+	{
+		int tmp = groupA;
+
+		groupA  = groupB;
+		groupB  = tmp;
+	}
+
+	int index = 0;
+
+	for (; index < 64; ++index)
+	{
+		CAPos& p = m_portals[index];
+
+		if (p.m_groupA == groupA && p.m_groupB == groupB)
+		{
+			break;
+		}
+	}
+
+	if (index == 64)
+	{
+		index = 0;
+
+		for (; index < 64; ++index)
+		{
+			bool used = false;
+
+			if (m_portals[index].m_groupA != 0 && m_portals[index].m_groupB != 0)
+			{
+				used = true;
+			}
+
+			if (!used)
+			{
+				m_portalCount++;
+				break;
+			}
+		}
+	}
+
+	CAPos& portal = m_portals[index];
+
+	portal.m_position.x = pos.x;
+	portal.m_position.y = pos.y;
+	portal.m_position.z = pos.z;
+	m_portals[index].m_groupA = static_cast<unsigned char>(groupA);
+	m_portals[index].m_groupB = static_cast<unsigned char>(groupB);
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CAStar::reset()
+{
+	m_portalCount = 0;
+	memset(m_portals, 0, sizeof(m_portals));
+	memset(m_routeTable, 0, sizeof(m_routeTable));
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CAStar::~CAStar()
+{
+	// TODO
 }

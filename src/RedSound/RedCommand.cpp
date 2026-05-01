@@ -55,7 +55,7 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 			((RedTrackDATA*)track)->m_seId = 0;
 			track[0x41] = 0;
 			*track = 0;
-			track[0x16] = 0;
+			((RedTrackDATA*)track)->m_mixVolumeMode = 0;
 
 			trackNo = ((RedTrackDATA*)track)->m_trackNo;
 			*(unsigned char*)((int)p_VoiceData + trackNo * 0xc0 + 0x1a) &= -6;
@@ -126,7 +126,7 @@ int _EraseTime(int eraseTrack)
 			((RedTrackDATA*)track)->m_seId = 0;
 			track[0x41] = 0;
 			*track = 0;
-			track[0x16] = 0;
+			((RedTrackDATA*)track)->m_mixVolumeMode = 0;
 
 			trackNo = ((RedTrackDATA*)track)->m_trackNo;
 			*(unsigned char*)((int)p_VoiceData + trackNo * 0xc0 + 0x1a) &= -6;
@@ -223,7 +223,7 @@ int SeStopID(int seId)
 			((RedTrackDATA*)track)->m_seId = 0;
 			track[0x41] = 0;
 			*track = 0;
-			track[0x16] = 0;
+			((RedTrackDATA*)track)->m_mixVolumeMode = 0;
 
 			trackNo = ((RedTrackDATA*)track)->m_trackNo;
 			*(unsigned char*)((int)p_VoiceData + trackNo * 0xc0 + 0x1a) &= -6;
@@ -272,7 +272,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				((RedTrackDATA*)track)->m_seId = 0;
 				track[0x41] = 0;
 				*track = 0;
-				track[0x16] = 0;
+				((RedTrackDATA*)track)->m_mixVolumeMode = 0;
 
 				trackNo = ((RedTrackDATA*)track)->m_trackNo;
 				*(unsigned char*)((int)p_VoiceData + trackNo * 0xc0 + 0x1a) &= -6;

@@ -12,7 +12,7 @@ struct RedTrackDATA {
 	unsigned char* m_loopCommand[4];
 	int m_waveBankData;
 	int m_waveData;
-	unsigned char m_pad20[0x24 - 0x20];
+	signed char* m_keySignatureData;
 	RedNoteDATA m_note;
 	int m_volume;
 	int m_volumeAdd;

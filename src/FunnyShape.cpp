@@ -628,7 +628,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
     const u8* shapeData = reinterpret_cast<const u8*>(shape);
     const float* offsetXY = reinterpret_cast<const float*>(&offset);
     const u16 flags = *reinterpret_cast<const u16*>(shapeData);
-    const s16 count = *reinterpret_cast<const s16*>(shapeData + 2);
+    const bool rotated = (flags & 8) != 0;
+    const s32 count = *reinterpret_cast<const s16*>(shapeData + 2);
     s32 packedStride = 0;
     s32 rotatedStride = 0;
 
@@ -651,7 +652,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         float u1;
         float v1;
 
-        if ((flags & 8) != 0) {
+        if (rotated) {
             const u8* entry = shapeData + rotatedStride;
             const u32 texIndex = entry[0x38];
             const s8 numTex = m_textureCount;

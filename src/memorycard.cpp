@@ -1035,13 +1035,29 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<u32*>(dst + 0xD8) = caravanWork->m_letterCount;
         memcpy(dst + 0x104, caravanWork->m_letter0, 100 * 0x0C);
 
-        for (int artifact = 0; artifact < 96; artifact++)
+        for (int artifact = 0; artifact < 96; artifact += 3)
         {
             const int slot = artifact >> 5;
             const u32 bit = 1u << (artifact & 31);
             if (static_cast<s16>(caravanWork->m_artifacts[artifact]) > 0)
             {
                 *reinterpret_cast<u32*>(dst + 0xBC + slot * 4) |= bit;
+            }
+
+            const int artifact1 = artifact + 1;
+            const int slot1 = artifact1 >> 5;
+            const u32 bit1 = 1u << (artifact1 & 31);
+            if (static_cast<s16>(caravanWork->m_artifacts[artifact1]) > 0)
+            {
+                *reinterpret_cast<u32*>(dst + 0xBC + slot1 * 4) |= bit1;
+            }
+
+            const int artifact2 = artifact + 2;
+            const int slot2 = artifact2 >> 5;
+            const u32 bit2 = 1u << (artifact2 & 31);
+            if (static_cast<s16>(caravanWork->m_artifacts[artifact2]) > 0)
+            {
+                *reinterpret_cast<u32*>(dst + 0xBC + slot2 * 4) |= bit2;
             }
         }
 
@@ -1192,7 +1208,7 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->m_letterCount = *reinterpret_cast<int*>(src + 0xD8);
         memcpy(caravanWork->m_letter0, src + 0x104, 100 * 0x0C);
 
-        for (int artifact = 0; artifact < 96; artifact++)
+        for (int artifact = 0; artifact < 96; artifact += 2)
         {
             const int slot = artifact >> 5;
             const u32 bit = 1u << (artifact & 31);
@@ -1203,6 +1219,18 @@ void CMemoryCardMan::SetLoadData()
             else
             {
                 caravanWork->m_artifacts[artifact] = static_cast<u16>(0x9F + artifact);
+            }
+
+            const int nextArtifact = artifact + 1;
+            const int nextSlot = nextArtifact >> 5;
+            const u32 nextBit = 1u << (nextArtifact & 31);
+            if ((*reinterpret_cast<u32*>(src + 0xBC + nextSlot * 4) & nextBit) == 0)
+            {
+                caravanWork->m_artifacts[nextArtifact] = 0xFFFF;
+            }
+            else
+            {
+                caravanWork->m_artifacts[nextArtifact] = static_cast<u16>(0x9F + nextArtifact);
             }
         }
 

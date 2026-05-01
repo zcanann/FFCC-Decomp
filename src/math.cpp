@@ -376,10 +376,7 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[3][2] = 1.0f;
 
     float scaleAB = scaleA + scaleB;
-    float t0 = 0.0f;
-    if (scaleAB != 0.0f) {
-        t0 = scaleA / scaleAB;
-    }
+    float t0 = (scaleAB == 0.0f) ? 0.0f : scaleA / scaleAB;
 
     Vec tangent;
     Vec tmp;
@@ -393,10 +390,7 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[3][1] = 1.0f;
 
     float scaleBC = scaleB + scaleC;
-    float t1 = 0.0f;
-    if (scaleBC != 0.0f) {
-        t1 = scaleB / scaleBC;
-    }
+    float t1 = (scaleBC == 0.0f) ? 0.0f : scaleB / scaleBC;
 
     PSVECSubtract(p3, p2, &tangent);
     PSVECSubtract(p2, p1, &tmp);

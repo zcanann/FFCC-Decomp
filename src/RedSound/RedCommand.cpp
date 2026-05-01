@@ -815,10 +815,10 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	((RedSoundCONTROL*)music)->m_activeTrackCount = (short)musicHead->m_trackCount;
 	*(unsigned char*)((char*)music + 0x492) = (unsigned char)(musicHead->m_flags & 0x7f);
 	*(short*)(music + 0x123) = 1;
-	music[0x112] = 0x1000;
-	music[5] = 10000;
-	music[4] = -1;
-	music[3] = 1;
+	((RedSoundCONTROL*)music)->m_tempo = 0x1000;
+	((RedSoundCONTROL*)music)->m_ticksPerMeasure = 10000;
+	((RedSoundCONTROL*)music)->m_tick = -1;
+	((RedSoundCONTROL*)music)->m_measure = 1;
 	music[0x11e] = 0;
 	if (volume != 0) {
 		volume = (((volume + 1) * 4) - 1) * 0x1000;

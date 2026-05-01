@@ -104,7 +104,12 @@ struct RedSoundCONTROL {
 	RedTrackDATA* m_tracks;
 	unsigned char m_pad04[0x08 - 0x04];
 	signed char* m_keySignatureData;
-	unsigned char m_pad0C[0x28 - 0x0C];
+	int m_measure;
+	int m_tick;
+	int m_ticksPerMeasure;
+	unsigned short m_timeNumerator;
+	unsigned short m_timeDenominator;
+	unsigned char m_pad1C[0x28 - 0x1C];
 	unsigned char* m_savedCommand[0x40];
 	int m_savedDelta[0x40];
 	unsigned int m_savedFlags[0x40];

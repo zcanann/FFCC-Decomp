@@ -614,7 +614,7 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
         controlData[slot + 0x8a] = scan[0x41];
         controlData[slot + 0xca] = scan[9];
 
-        if (nextTrack < (int*)(control->m_tracks + control->m_trackCount)) {
+        if (((RedTrackDATA*)nextTrack - control->m_tracks) < control->m_trackCount) {
             for (; nextTrack < (int*)(control->m_tracks + control->m_trackCount);
                  nextTrack += 0x55) {
                 int currentDelta = deltaAdjust + (((RedTrackDATA*)nextTrack)->m_deltaTime - loopBase);

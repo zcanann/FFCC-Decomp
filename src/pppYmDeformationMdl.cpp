@@ -52,7 +52,12 @@ extern float FLOAT_80330DA0;
 extern float FLOAT_80330DA4;
 extern float FLOAT_80330DA8;
 extern const float FLOAT_80330dac = 0.0f;
-extern const double DOUBLE_80330DB0 = 4503601774854144.0;
+struct DoubleWords {
+    u32 u[2];
+};
+
+extern const DoubleWords DOUBLE_80330DB0 = {{0x43300000, 0x80000000}};
+extern const DoubleWords kPppYmSharedDoubleBias = {{0x43300000, 0x80000000}};
 
 static inline Mtx& CameraMatrix()
 {

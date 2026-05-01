@@ -757,7 +757,7 @@ extern "C" SingMenuStaticMessageInfo DAT_80214a50[] = {
     {4, {30, 31, 32, 3, 0, 0, 0, 0}},
 };
 
-extern "C" SingMenuSoloNameTable PTR_s_solo2_80214a8c = {
+extern "C" SingMenuSoloNameTable PTR_s_solo2 = {
     {lbl_80332718, 0, 0, 0, 0, 0, 0, 0, 0},
 };
 
@@ -956,7 +956,7 @@ void CMenuPcs::createSingleMenu()
     *reinterpret_cast<s16*>(self + 0x866) = 0;
     gSingMenuAsyncLoadCompleted = 0;
     if (Game.m_gameWork.m_menuStageMode == 0) {
-        if (self[0x859] != 0) {
+        if (static_cast<s8>(self[0x859]) != 0) {
             *reinterpret_cast<int*>(self + 0xF0) = 0;
 
             void* font = *reinterpret_cast<void**>(self + 0x108);
@@ -974,8 +974,8 @@ void CMenuPcs::createSingleMenu()
             self[0x85A] = 0;
         }
     } else {
-        if (self[0x859] == 0) {
-            *reinterpret_cast<int*>(self + 0xF0) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0x212);
+        if (static_cast<s8>(self[0x859]) == 0) {
+            *reinterpret_cast<int*>(self + 0xF0) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0xD4);
             self[0x859] = 1;
         }
 
@@ -990,12 +990,12 @@ void CMenuPcs::createSingleMenu()
 
         if (Game.m_gameWork.m_menuStageMode != 0) {
             loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
-                this, PTR_s_solo2_80214a8c.entries, 4, 1, &DAT_80214ab0, 0x20, 0xD, 1);
+                this, PTR_s_solo2.entries, 4, 1, &DAT_80214ab0, 0x20, 0xD, 1);
             *reinterpret_cast<int*>(self + 0x814) = 0;
             *reinterpret_cast<int*>(self + 0x850) = 0;
             *reinterpret_cast<int*>(self + 0x82C) = 0;
             *reinterpret_cast<int*>(self + 0x848) = 0;
-            *reinterpret_cast<void**>(self + 0x868) = 0;
+            *reinterpret_cast<void**>(self + 0x878) = 0;
         }
     }
 }
@@ -1227,11 +1227,11 @@ void CMenuPcs::drawSingleMenu()
 
         u8 menuType = *reinterpret_cast<u8*>(Game.m_scriptFoodBase[0] + 0xBE0);
         if (menuType == 1) {
-            if (*reinterpret_cast<void**>(self + 0x868) != 0) {
-                Draw__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x868));
+            if (*reinterpret_cast<void**>(self + 0x878) != 0) {
+                Draw__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
             }
-        } else if ((menuType == 2) && (*reinterpret_cast<void**>(self + 0x868) != 0)) {
-            Draw__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x868));
+        } else if ((menuType == 2) && (*reinterpret_cast<void**>(self + 0x878) != 0)) {
+            Draw__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
         }
 
         if ((gSingMenuHasScriptFoodBase != 0) && (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) != 0)) {
@@ -1513,16 +1513,16 @@ post_texture_load:
 
     char menuKind = *reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0);
     if (menuKind == 1) {
-        if (*reinterpret_cast<void**>(self + 0x868) == 0) {
+        if (*reinterpret_cast<void**>(self + 0x878) == 0) {
             CreateShopMenu__8CMenuPcsFv(this);
         } else {
-            Calc__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x868));
+            Calc__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
         }
     } else if (menuKind == 2) {
-        if (*reinterpret_cast<void**>(self + 0x868) == 0) {
+        if (*reinterpret_cast<void**>(self + 0x878) == 0) {
             CreateSmithMenu__8CMenuPcsFv(this);
         } else {
-            Calc__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x868));
+            Calc__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
         }
     }
 
@@ -3359,31 +3359,6 @@ void CMenuPcs::SingLifeResetWait()
     SingLifeInit(0);
 }
 
-static inline char* GetLanguageTableString(int index, char** englishTable, char** germanTable, char** italianTable,
-                                           char** frenchTable, char** spanishTable)
-{
-    u8 languageId = Game.m_gameWork.m_languageId;
-    if (languageId == 3) {
-        return italianTable[index];
-    }
-    if (languageId >= 3) {
-        if (languageId == 5) {
-            return spanishTable[index];
-        }
-        if (languageId >= 5) {
-            return englishTable[index];
-        }
-        return frenchTable[index];
-    }
-    if (languageId == 1) {
-        return englishTable[index];
-    }
-    if (languageId >= 1) {
-        return germanTable[index];
-    }
-    return englishTable[index];
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80145674
@@ -3395,8 +3370,28 @@ static inline char* GetLanguageTableString(int index, char** englishTable, char*
  */
 char* CMenuPcs::GetTribeStr(int index)
 {
-    return GetLanguageTableString(index, PTR_s_Clavat_802140f0, PTR_s_Clavat_80214100, PTR_s_Clavat_80214110,
-                                  PTR_s_Clavat_80214120, PTR_s_Clavate);
+    u8 languageId = Game.m_gameWork.m_languageId;
+    char** table = PTR_s_Clavat_802140f0;
+
+    if (languageId == 3) {
+        return table[index + 8];
+    }
+    if (languageId >= 3) {
+        if (languageId == 5) {
+            return table[index + 16];
+        }
+        if (languageId >= 5) {
+            return table[index];
+        }
+        return table[index + 12];
+    }
+    if (languageId == 1) {
+        return table[index];
+    }
+    if (languageId >= 1) {
+        return table[index + 4];
+    }
+    return table[index];
 }
 
 /*
@@ -3410,7 +3405,28 @@ char* CMenuPcs::GetTribeStr(int index)
  */
 char* CMenuPcs::GetJobStr(int index)
 {
-    return GetLanguageTableString(index, PTR_s_Blacksmith, PTR_s_Schmied, PTR_s_Fabbri, PTR_s_Forgeron, PTR_s_Herrero);
+    u8 languageId = Game.m_gameWork.m_languageId;
+    char** table = PTR_s_Blacksmith;
+
+    if (languageId == 3) {
+        return table[index + 16];
+    }
+    if (languageId >= 3) {
+        if (languageId == 5) {
+            return table[index + 32];
+        }
+        if (languageId >= 5) {
+            return table[index];
+        }
+        return table[index + 24];
+    }
+    if (languageId == 1) {
+        return table[index];
+    }
+    if (languageId >= 1) {
+        return table[index + 8];
+    }
+    return table[index];
 }
 
 /*
@@ -3424,7 +3440,28 @@ char* CMenuPcs::GetJobStr(int index)
  */
 char* CMenuPcs::GetHairStr(int index)
 {
-    return GetLanguageTableString(index, PTR_s_Cowlick, PTR_s_Spitzschopf, PTR_s_Ciuffo_ribelle, gSingMenuHairTableFr, PTR_s_Remolino);
+    u8 languageId = Game.m_gameWork.m_languageId;
+    char** table = PTR_s_Cowlick;
+
+    if (languageId == 3) {
+        return table[index + 64];
+    }
+    if (languageId >= 3) {
+        if (languageId == 5) {
+            return table[index + 128];
+        }
+        if (languageId >= 5) {
+            return table[index];
+        }
+        return table[index + 96];
+    }
+    if (languageId == 1) {
+        return table[index];
+    }
+    if (languageId >= 1) {
+        return table[index + 32];
+    }
+    return table[index];
 }
 
 /*
@@ -3439,26 +3476,27 @@ char* CMenuPcs::GetHairStr(int index)
 char* CMenuPcs::GetMenuStr(int index)
 {
     u8 languageId = Game.m_gameWork.m_languageId;
+    char** table = gSingMenuTextTableEn;
 
     if (languageId == 3) {
-        return gSingMenuTextTableIt[index];
+        return table[index + 112];
     }
     if (languageId >= 3) {
         if (languageId == 5) {
-            return gSingMenuTextTableEs[index];
+            return table[index + 224];
         }
         if (languageId >= 5) {
-            return gSingMenuTextTableEn[index];
+            return table[index];
         }
-        return gSingMenuTextTableFr[index];
+        return table[index + 168];
     }
     if (languageId == 1) {
-        return gSingMenuTextTableEn[index];
+        return table[index];
     }
     if (languageId >= 1) {
-        return gSingMenuTextTableDe[index];
+        return table[index + 56];
     }
-    return gSingMenuTextTableEn[index];
+    return table[index];
 }
 
 /*
@@ -3472,7 +3510,28 @@ char* CMenuPcs::GetMenuStr(int index)
  */
 char* CMenuPcs::GetAttrStr(int index)
 {
-    return GetLanguageTableString(index, gSingMenuAttrTableEn, gSingMenuAttrTableDe, gSingMenuAttrTableIt, gSingMenuAttrTableFr, gSingMenuAttrTableEs);
+    u8 languageId = Game.m_gameWork.m_languageId;
+    char** table = gSingMenuAttrTableEn;
+
+    if (languageId == 3) {
+        return table[index + 40];
+    }
+    if (languageId >= 3) {
+        if (languageId == 5) {
+            return table[index + 80];
+        }
+        if (languageId >= 5) {
+            return table[index];
+        }
+        return table[index + 60];
+    }
+    if (languageId == 1) {
+        return table[index];
+    }
+    if (languageId >= 1) {
+        return table[index + 20];
+    }
+    return table[index];
 }
 
 /*

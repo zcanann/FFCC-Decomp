@@ -3,7 +3,6 @@
 
 #include "ffcc/RedSound/RedExecute.h"
 
-struct RedKeyOnDATA;
 struct RedSoundCONTROL;
 
 struct RedTrackDATA {
@@ -106,6 +105,17 @@ struct RedTrackDATA {
 	unsigned char m_eraseTrack;
 	unsigned char m_attrMask;
 	unsigned char m_pad151[0x154 - 0x151];
+};
+
+struct RedKeyOnSlot {
+	RedTrackDATA* m_track;
+	RedNoteDATA m_note;
+};
+
+struct RedKeyOnDATA {
+	RedKeyOnSlot m_fixed[0x40];
+	RedKeyOnSlot m_priority[0x40];
+	RedKeyOnSlot m_normal[0x40];
 };
 
 struct RedSoundCONTROL {

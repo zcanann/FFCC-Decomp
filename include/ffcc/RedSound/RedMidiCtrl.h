@@ -95,7 +95,8 @@ struct RedTrackDATA {
 	short m_pitchBend;
 	short m_pitchBendRaw;
 	short m_keyTranspose;
-	unsigned char m_pad144[0x148 - 0x144];
+	short m_loopStepCurrent;
+	short m_seTickCounter;
 	signed char m_fineTune;
 	unsigned char m_pad149[0x14B - 0x149];
 	signed char m_pitchBendRange;

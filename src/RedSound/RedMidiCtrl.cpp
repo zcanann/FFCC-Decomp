@@ -687,7 +687,7 @@ void __MidiCtrl_LoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     ++track->m_loopDepth;
     track->m_loopDepth &= 3;
     track->m_loopCommand[track->m_loopDepth] = track->m_command;
-    track->m_loopStep[track->m_loopDepth] = *(short*)((char*)track + 0x144);
+    track->m_loopStep[track->m_loopDepth] = track->m_loopStepCurrent;
     track->m_loopCount[track->m_loopDepth] = 0;
 }
 
@@ -712,7 +712,7 @@ void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     track->m_loopCount[track->m_loopDepth]++;
     if (track->m_loopCount[track->m_loopDepth] != loopCount) {
         track->m_command = track->m_loopCommand[track->m_loopDepth];
-        *(short*)((char*)track + 0x144) = track->m_loopStep[track->m_loopDepth];
+        track->m_loopStepCurrent = track->m_loopStep[track->m_loopDepth];
     } else {
         track->m_loopDepth--;
         track->m_loopDepth &= 3;
@@ -731,7 +731,7 @@ void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     track->m_command = track->m_loopCommand[track->m_loopDepth];
-    *(short*)((char*)track + 0x144) = track->m_loopStep[track->m_loopDepth];
+    track->m_loopStepCurrent = track->m_loopStep[track->m_loopDepth];
 }
 
 /*

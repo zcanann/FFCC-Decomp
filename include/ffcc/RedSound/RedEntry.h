@@ -36,6 +36,16 @@ struct RedSeSepHEAD
 	unsigned char m_unk13;
 };
 
+struct RedSeINFO
+{
+	unsigned char m_flagsAndCount;
+	unsigned char m_waveNoLo;
+	unsigned char m_waveNoHi;
+	unsigned char m_eraseTrack;
+	unsigned char m_attrMask;
+	unsigned char m_sequence[1];
+};
+
 struct RedWaveHeadWD
 {
 	char m_signature[2];

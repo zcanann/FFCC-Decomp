@@ -316,7 +316,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	int isMulti;
 
 	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
-	deltaTime = (unsigned int)((unsigned char*)info)[2] * 0x100 + (unsigned int)((unsigned char*)info)[1];
+	deltaTime = (unsigned int)info->m_waveNoHi * 0x100 + (unsigned int)info->m_waveNoLo;
 	waveBase = c_RedEntry.SearchWaveBase(deltaTime);
 	if (waveBase != 0) {
 		c_RedEntry.WaveHistoryManager(1, reinterpret_cast<RedWaveHeadWD*>(waveBase)->m_waveNo);
@@ -328,15 +328,15 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 		}
 	}
 
-	flag = ((unsigned char*)info)[0];
+	flag = info->m_flagsAndCount;
 	if ((flag & 0x80) != 0) {
 		isMulti = 1;
 	} else {
 		isMulti = 0;
 	}
-	seq = (unsigned char*)info + 5;
-	attrMask = ((unsigned char*)info)[4];
-	count = ((unsigned char*)info)[0] & 0x7f;
+	seq = info->m_sequence;
+	attrMask = info->m_attrMask;
+	count = info->m_flagsAndCount & 0x7f;
 	current = seq + count * 2;
 	do {
 		remaining = count;
@@ -350,7 +350,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			} while ((int)remaining < (int)count);
 		}
 
-		track = SearchSeEmptyTrack((int)remaining, ((unsigned char*)info)[3], attrMask);
+		track = SearchSeEmptyTrack((int)remaining, info->m_eraseTrack, attrMask);
 		attrMask = 0;
 		if (track == 0) {
 			break;
@@ -379,8 +379,8 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			track[0x43] = state;
 
 			if (*(char*)*track != '\0') {
-				*(unsigned char*)((char*)track + 0x14f) = ((unsigned char*)info)[3];
-				*(unsigned char*)(track + 0x54) = ((unsigned char*)info)[4];
+				*(unsigned char*)((char*)track + 0x14f) = info->m_eraseTrack;
+				*(unsigned char*)(track + 0x54) = info->m_attrMask;
 				track[0x13] = volume << 0xc;
 				track[0x15] = 0;
 				track[0x16] = 0;

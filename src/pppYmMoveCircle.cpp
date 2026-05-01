@@ -33,11 +33,14 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
 {
     pppYmMoveCircleWork* work;
     int* serializedDataOffsets;
-    _pppMngSt* pppMngSt;
+    u8* pppMngSt;
     Vec nextPos;
     s32 tableIndex;
     f32 sinAngle;
     f32 cosAngle;
+    f32 radiusX;
+    f32 radiusZ;
+    f32 turnSpan;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -45,7 +48,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
 
     serializedDataOffsets = offsetData->m_serializedDataOffsets;
     work = (pppYmMoveCircleWork*)((u8*)basePtr + serializedDataOffsets[0] + 0x80);
-    pppMngSt = pppMngStPtr;
+    pppMngSt = (u8*)pppMngStPtr;
 
     work->m_radiusStep += work->m_radiusStepStep;
     work->m_radius += work->m_radiusStep;
@@ -60,32 +63,35 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
         work->m_angleStepStep += stepData->m_angleStepStep;
         work->m_angleStepStepStep += stepData->m_angleStepStepStep;
     }
+    turnSpan = 360.0f;
     work->m_angle += work->m_angleStep;
 
-    if (work->m_angle > 360.0f) {
-        work->m_angle -= 360.0f;
+    if (work->m_angle > turnSpan) {
+        work->m_angle -= turnSpan;
     }
     if (work->m_angle < 0.0f) {
-        work->m_angle += 360.0f;
+        work->m_angle += turnSpan;
     }
 
+    nextPos.y = 0.0f;
     {
         f32 tableAngle =
             (32768.0f * (0.017453292f * work->m_angle)) /
             3.1415927f;
         tableIndex = (s32)tableAngle;
     }
-    nextPos.y = 0.0f;
     sinAngle = *(f32*)((u8*)gPppTrigTable + (tableIndex & 0xFFFC));
     cosAngle = *(f32*)((u8*)gPppTrigTable + ((tableIndex + 0x4000) & 0xFFFC));
-    nextPos.x = work->m_radius * cosAngle;
-    nextPos.z = work->m_radius * -sinAngle;
+    radiusX = work->m_radius * cosAngle;
+    radiusZ = work->m_radius * -sinAngle;
+    nextPos.x = radiusX;
+    nextPos.z = radiusZ;
     nextPos.x += work->m_center.x;
-    nextPos.y = pppMngSt->m_position.y;
+    nextPos.y = *(f32*)(pppMngSt + 0xC);
     nextPos.z += work->m_center.z;
 
-    pppCopyVector(*(Vec*)&pppMngSt->m_userFloat0, pppMngSt->m_position);
-    pppCopyVector(pppMngSt->m_position, nextPos);
+    pppCopyVector(*(Vec*)(pppMngSt + 0x48), *(Vec*)(pppMngSt + 0x8));
+    pppCopyVector(*(Vec*)(pppMngSt + 0x8), nextPos);
 
     *(f32*)((u8*)pppMngStPtr + 0x84) = nextPos.x;
     *(f32*)((u8*)pppMngStPtr + 0x94) = nextPos.y;

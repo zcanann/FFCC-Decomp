@@ -110,7 +110,7 @@ void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned lon
 
 static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, unsigned short* indicesOut, float size);
 static int UpdateWaterMesh(VYmMana* mana);
-static void RenderWaterMesh(VYmMana* mana);
+static int RenderWaterMesh(VYmMana* mana);
 static void CalculateNormal(VYmMana* mana);
 static void CalcWaterReflectionVector(
     Vec* reflectionVec, Vec* positions, Vec* normals, long count, Vec waterOrigin, float (*matrix)[4], _GXColor* color,
@@ -1295,15 +1295,19 @@ static int UpdateWaterMesh(VYmMana* mana)
  * JP Address: TODO
  * JP Size: TODO
  */
-static void RenderWaterMesh(VYmMana* mana)
+static int RenderWaterMesh(VYmMana* mana)
 {
     u8* work = (u8*)mana;
+    void* texObj0;
+    void* positions = *(void**)(work + 0x3C);
+    void* normals = *(void**)(work + 0x40);
+    void* texCoord0 = *(void**)(work + 0x54);
+    void* texCoord1 = *(void**)(work + 0x58);
     u16* indices = *(u16**)(work + 0x50);
-    void* texObj0 = *(void**)(work + 0x28);
-    void* texObj1 = *(void**)(work + 0x2C);
-    void* texObj2 = (u8*)*(void**)(work + 0x80) + 0x28;
+    void* colors = *(void**)(work + 0x5C);
+    texObj0 = *(void**)(work + 0x28);
+    _GXColor blendColor;
     _GXColor modulateColor;
-    _GXColor blendColor = {0x80, 0x80, 0x80, 0x80};
 
     GXClearVtxDesc();
     GXSetVtxDesc((GXAttr)9, GX_INDEX16);
@@ -1319,27 +1323,37 @@ static void RenderWaterMesh(VYmMana* mana)
     GXSetNumTexGens(2);
     GXSetCullMode((GXCullMode)0);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 0xF);
-    GXSetChanCtrl((GXChannelID)4, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPOT);
+    GXSetChanCtrl((GXChannelID)4, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
     GXSetNumChans(1);
+    blendColor.r = 0xFF;
+    blendColor.g = 0xFF;
+    blendColor.b = 0xFF;
+    blendColor.a = 0xFF;
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
-    GXSetArray((GXAttr)9, *(void**)(work + 0x3C), 0xC);
-    GXSetArray((GXAttr)10, *(void**)(work + 0x40), 0xC);
-    GXSetArray((GXAttr)0xB, *(void**)(work + 0x5C), 4);
-    GXSetArray((GXAttr)0xD, *(void**)(work + 0x54), 8);
-    GXSetArray((GXAttr)0xE, *(void**)(work + 0x58), 8);
+    GXSetArray((GXAttr)9, positions, 0xC);
+    GXSetArray((GXAttr)10, normals, 0xC);
+    GXSetArray((GXAttr)0xB, colors, 4);
+    GXSetArray((GXAttr)0xD, texCoord0, 8);
+    GXSetArray((GXAttr)0xE, texCoord1, 8);
+    void* texObj2 = *(void**)(work + 0x80);
     GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
     GXSetTexCoordGen2((GXTexCoordID)1, (GXTexGenType)1, (GXTexGenSrc)5, 0x3C, GX_FALSE, 0x7D);
-    modulateColor.r = *(u8*)(work + 0xE8);
-    modulateColor.g = modulateColor.r;
-    modulateColor.b = modulateColor.r;
-    modulateColor.a = modulateColor.r;
+    u8 alpha = *(u8*)(work + 0xE8);
+    blendColor.r = 0x80;
+    blendColor.g = 0x80;
+    blendColor.b = 0x80;
+    blendColor.a = 0x80;
+    modulateColor.r = alpha;
+    modulateColor.g = alpha;
+    modulateColor.b = alpha;
+    modulateColor.a = alpha;
 
     GXSetTevDirect((GXTevStageID)0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-    GXLoadTexObj((GXTexObj*)texObj2, GX_TEXMAP0);
+    GXLoadTexObj((GXTexObj*)((u8*)texObj2 + 0x28), GX_TEXMAP0);
     GXSetTevKColor((GXTevKColorID)1, modulateColor);
     GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xD);
     GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1D);
@@ -1352,7 +1366,7 @@ static void RenderWaterMesh(VYmMana* mana)
     GXSetTevDirect((GXTevStageID)1);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 1, 1, 4);
-    GXLoadTexObj((GXTexObj*)texObj0, GX_TEXMAP1);
+    GXLoadTexObj(*(GXTexObj**)(work + 0x28), GX_TEXMAP1);
     GXSetTevKColor((GXTevKColorID)0, blendColor);
     GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xC);
     GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1C);
@@ -1365,7 +1379,7 @@ static void RenderWaterMesh(VYmMana* mana)
     GXSetTevDirect((GXTevStageID)2);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(2, 0, 0);
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(2, 1, 2, 4);
-    GXLoadTexObj((GXTexObj*)texObj1, GX_TEXMAP2);
+    GXLoadTexObj(*(GXTexObj**)(work + 0x2C), GX_TEXMAP2);
     GXSetTevKColor((GXTevKColorID)0, blendColor);
     GXSetTevKColorSel((GXTevStageID)2, (GXTevKColorSel)0xC);
     GXSetTevKAlphaSel((GXTevStageID)2, (GXTevKAlphaSel)0x1C);
@@ -1377,28 +1391,29 @@ static void RenderWaterMesh(VYmMana* mana)
 
     GXSetNumTevStages(3);
     GXBegin((GXPrimitive)0x90, GX_VTXFMT7, 0x600);
+    u16* indexIt = indices;
     for (int i = 0; i < 0x180; i++) {
-        GXPosition1x16(indices[0]);
-        GXNormal1x16(indices[0]);
-        GXColor1x16(indices[0]);
-        GXTexCoord1x16(indices[0]);
-        GXTexCoord1x16(indices[0]);
-        GXPosition1x16(indices[1]);
-        GXNormal1x16(indices[1]);
-        GXColor1x16(indices[1]);
-        GXTexCoord1x16(indices[1]);
-        GXTexCoord1x16(indices[1]);
-        GXPosition1x16(indices[2]);
-        GXNormal1x16(indices[2]);
-        GXColor1x16(indices[2]);
-        GXTexCoord1x16(indices[2]);
-        GXTexCoord1x16(indices[2]);
-        GXPosition1x16(indices[3]);
-        GXNormal1x16(indices[3]);
-        GXColor1x16(indices[3]);
-        GXTexCoord1x16(indices[3]);
-        GXTexCoord1x16(indices[3]);
-        indices += 4;
+        GXPosition1x16(indexIt[0]);
+        GXNormal1x16(indexIt[0]);
+        GXColor1x16(indexIt[0]);
+        GXTexCoord1x16(indexIt[0]);
+        GXTexCoord1x16(indexIt[0]);
+        GXPosition1x16(indexIt[1]);
+        GXNormal1x16(indexIt[1]);
+        GXColor1x16(indexIt[1]);
+        GXTexCoord1x16(indexIt[1]);
+        GXTexCoord1x16(indexIt[1]);
+        GXPosition1x16(indexIt[2]);
+        GXNormal1x16(indexIt[2]);
+        GXColor1x16(indexIt[2]);
+        GXTexCoord1x16(indexIt[2]);
+        GXTexCoord1x16(indexIt[2]);
+        GXPosition1x16(indexIt[3]);
+        GXNormal1x16(indexIt[3]);
+        GXColor1x16(indexIt[3]);
+        GXTexCoord1x16(indexIt[3]);
+        GXTexCoord1x16(indexIt[3]);
+        indexIt += 4;
     }
 
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0xFF, 4);
@@ -1406,6 +1421,7 @@ static void RenderWaterMesh(VYmMana* mana)
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 0xF);
     GXSetNumTevStages(1);
     GXLoadTexObj((GXTexObj*)texObj0, GX_TEXMAP0);
+    return 1;
 }
 
 /*

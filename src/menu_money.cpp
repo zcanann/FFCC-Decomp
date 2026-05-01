@@ -25,6 +25,10 @@ extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void FGPutGil__12CCaravanWorkFi(void*, int);
 extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
+extern "C" void LetterSetAttachItem__8CMenuPcsFUii(CMenuPcs*, unsigned int, int);
+extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
+extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, short*, short*, int);
+extern "C" void SetSingWinInfo__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 
 
 extern float FLOAT_80332f60;
@@ -578,7 +582,7 @@ int CMenuPcs::MoneyCtrlCur()
 	int mode = (int)*(s16*)(menuState + 0x30);
 	int maxDigits = 1;
 	int maxGil = *(int*)(Game.m_scriptFoodBase[0] + 0x200);
-	SingGetLetterAttachflg__8CMenuPcsFv(this);
+	int attachFlag = SingGetLetterAttachflg__8CMenuPcsFv(this);
 
 	if ((((((0 < maxGil / 10) && (maxDigits = 2, 0 < maxGil / 100)) && (maxDigits = 3, 0 < maxGil / 1000)) &&
 	      ((maxDigits = 4, 0 < maxGil / 10000 && (maxDigits = 5, 0 < maxGil / 100000)))) &&
@@ -683,21 +687,44 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((hold & 0xF) == 0) {
 			if ((press & 0x20) != 0) {
-				*(s16*)(menuState + 0x1E) = 1;
-				Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
-				return 1;
+				if (attachFlag < 0) {
+					*(s16*)(menuState + 0x1E) = 1;
+					Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+					return 1;
+				}
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else if ((press & 0x40) != 0) {
-				*(s16*)(menuState + 0x1E) = -1;
-				Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
-				return -1;
+				if (attachFlag < 0) {
+					*(s16*)(menuState + 0x1E) = -1;
+					Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+					return 1;
+				}
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else if ((press & 0x200) != 0) {
-				*(u8*)(menuState + 0xD) = 1;
+				if (attachFlag < 0) {
+					*(u8*)(menuState + 0xD) = 1;
+					Sound.PlaySe(3, 0x40, 0x7F, 0);
+					return 1;
+				}
+				LetterSetAttachItem__8CMenuPcsFUii(this, 0, -1);
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
+				return 1;
 			} else if ((press & 0x100) != 0) {
 				if (s_Money < 1) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				} else if (attachFlag >= 0) {
+					LetterSetAttachItem__8CMenuPcsFUii(this, s_Money, 1);
+					Sound.PlaySe(2, 0x40, 0x7F, 0);
+					return 1;
 				} else {
 					*(u8*)(menuState + 9) = 2;
+					if (CanPlayerPutItem__12CCaravanWorkFv((void*)caravanWork) != 0) {
+						*(u8*)(menuState + 9) = *(u8*)(menuState + 9) | 1;
+					}
+					short winW;
+					short winH;
+					GetSingWinSize__8CMenuPcsFiPsPsi(this, 1, &winW, &winH, 0);
+					SetSingWinInfo__8CMenuPcsFiiii(this, 0xF0, 0xD0, winW, winH);
 					*(s16*)((int)singWindowInfo + 10) = 0;
 					*(s16*)(menuState + 0x12) = 0;
 					*(s16*)(menuState + 0x30) = 1;

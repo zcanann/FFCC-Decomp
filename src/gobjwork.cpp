@@ -707,22 +707,24 @@ void CCaravanWork::ChgEquipPos(int idx, int equip)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a20b0
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CCaravanWork::CanAddComList(int count)
 {
+	int remaining = (short)m_numCmdListSlots - 2;
 	short* slot = m_commandListInventorySlotRef;
-	int remaining = (short)m_numCmdListSlots;
 
-	if (2 < remaining) {
-		remaining = remaining - 2;
-		while (remaining != 0) {
+	if (2 < (short)m_numCmdListSlots) {
+		for (; remaining != 0; remaining--) {
 			if ((*slot == -1) && (--count == 0)) {
 				break;
 			}
 			slot++;
-			remaining--;
 		}
 	}
 

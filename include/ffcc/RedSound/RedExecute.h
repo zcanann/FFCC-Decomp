@@ -18,7 +18,8 @@ struct RedVoiceDATA {
 	void* m_axVoice;
 	unsigned char m_pad10[0x1A - 0x10];
 	unsigned char m_stateFlags;
-	unsigned char m_pad1B[0x90 - 0x1B];
+	unsigned char m_pad1B[0x8C - 0x1B];
+	int m_active;
 	unsigned int m_flags;
 	unsigned int m_voiceSwitch;
 	int m_pitch;

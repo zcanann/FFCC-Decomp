@@ -430,12 +430,12 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				memset(track + 0x35, 0xff, 0xc);
 				((RedTrackDATA*)track)->m_note.m_allocFlags = 5;
 				((RedTrackDATA*)track)->m_seTickCounter = 1;
-				*seTrack = (int)track;
-				*(unsigned char*)((char*)seTrack + 0x1a) = 5;
+				((RedVoiceDATA*)seTrack)->m_track = (RedTrackDATA*)track;
+				((RedVoiceDATA*)seTrack)->m_stateFlags = 5;
 				seTrack[0x24] = 2;
 				seTrack[0xc] = 0;
 				seTrack[8] = 0;
-				seTrack[0x2e] = 0;
+				((RedVoiceDATA*)seTrack)->m_updateFlags = 0;
 			}
 
 			remaining = remaining - 1;

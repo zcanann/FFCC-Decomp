@@ -62,6 +62,7 @@ extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
 extern "C" void* __vt__14CFunnyShapePcs[];
 static const char lbl_801D7DD0[] = "CFunnyShapePcs(VIEWER)";
+const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 extern char lbl_8032E660[];
 extern u8 ARRAY_8026D728[];
 
@@ -438,8 +439,6 @@ void CFunnyShapePcs::drawViewer()
         Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), pFan[frame % 4]);
     }
 }
-
-const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 
 /*
  * --INFO--

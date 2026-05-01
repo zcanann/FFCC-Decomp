@@ -1043,9 +1043,9 @@ void COctTree::ClearLight()
 void InsertLight_r(COctNode* node)
 {
 	float boundMinX = node->m_boundMinX;
-	bool xOverlap = false;
-	bool xyOverlap = false;
-	bool overlap = false;
+	int xOverlap = false;
+	int xyOverlap = false;
+	int overlap = false;
 
 	if (boundMinX < s_bound.m_min.x) {
 		xOverlap = s_bound.m_min.x <= node->m_boundMaxX;
@@ -1106,9 +1106,9 @@ void InsertLight_r(COctNode* node)
 		}
 
 		float childBoundMinX = child->m_boundMinX;
-		bool childXOverlap = false;
-		bool childXYOverlap = false;
-		bool childOverlap = false;
+		int childXOverlap = false;
+		int childXYOverlap = false;
+		int childOverlap = false;
 		if (childBoundMinX < s_bound.m_min.x) {
 			childXOverlap = s_bound.m_min.x <= child->m_boundMaxX;
 		} else {
@@ -1348,9 +1348,9 @@ void COctTree::ClearShadow()
 void InsertShadow_r(COctNode* node)
 {
 	float boundMinX = node->m_boundMinX;
-	bool xOverlap = false;
-	bool xyOverlap = false;
-	bool overlap = false;
+	int xOverlap = false;
+	int xyOverlap = false;
+	int overlap = false;
 
 	if (boundMinX < s_bound.m_min.x) {
 		xOverlap = s_bound.m_min.x <= node->m_boundMaxX;
@@ -1413,9 +1413,9 @@ void InsertShadow_r(COctNode* node)
 		InsertShadow_level++;
 
 		float childBoundMinX = child->m_boundMinX;
-		bool childXOverlap = false;
-		bool childXYOverlap = false;
-		bool childOverlap = false;
+		int childXOverlap = false;
+		int childXYOverlap = false;
+		int childOverlap = false;
 		if (childBoundMinX < s_bound.m_min.x) {
 			childXOverlap = s_bound.m_min.x <= child->m_boundMaxX;
 		} else {
@@ -1684,9 +1684,9 @@ void COctTree::ClearFlag(unsigned long flag)
 int COctTree::CheckHitCylinder_r(COctNode* node)
 {
 	float boundMinX = *reinterpret_cast<float*>(Ptr(node, 0x0));
-	bool xOverlap = false;
-	bool xyOverlap = false;
-	bool overlap = false;
+	int xOverlap = false;
+	int xyOverlap = false;
+	int overlap = false;
 
 	if (boundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
 		xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= *reinterpret_cast<float*>(Ptr(node, 0xC));
@@ -1750,9 +1750,9 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 		}
 
 		float childBoundMinX = *reinterpret_cast<float*>(Ptr(child, 0x0));
-		bool childXOverlap = false;
-		bool childXYOverlap = false;
-		bool childOverlap = false;
+		int childXOverlap = false;
+		int childXYOverlap = false;
+		int childOverlap = false;
 		if (childBoundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
 			childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= *reinterpret_cast<float*>(Ptr(child, 0xC));
 		} else {
@@ -1915,9 +1915,9 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 {
 	float boundMinX = *reinterpret_cast<float*>(Ptr(octNode, 0x0));
-	bool xOverlap = false;
-	bool xyOverlap = false;
-	bool overlap = false;
+	int xOverlap = false;
+	int xyOverlap = false;
+	int overlap = false;
 
 	if (boundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
 		xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= *reinterpret_cast<float*>(Ptr(octNode, 0xC));
@@ -1980,9 +1980,9 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 		}
 
 		float childBoundMinX = *reinterpret_cast<float*>(Ptr(child, 0x0));
-		bool childXOverlap = false;
-		bool childXYOverlap = false;
-		bool childOverlap = false;
+		int childXOverlap = false;
+		int childXYOverlap = false;
+		int childOverlap = false;
 		if (childBoundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
 			childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= *reinterpret_cast<float*>(Ptr(child, 0xC));
 		} else {

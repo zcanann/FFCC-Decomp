@@ -66,7 +66,7 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 
 			c_RedEntry.SeSepHistoryManager(0, track[0x3d]);
 			if ((u32)track[6] != 0) {
-				c_RedEntry.WaveHistoryManager(0, *(short*)(track[6] + 2));
+				c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo);
 			}
 		}
 		track += 0x55;
@@ -135,7 +135,7 @@ int _EraseTime(int eraseTrack)
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
 			if ((u32)track[6] != 0) {
-				c_RedEntry.WaveHistoryManager(0, *(short*)(track[6] + 2));
+				c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo);
 			}
 			erasedCount++;
 		}
@@ -232,7 +232,7 @@ int SeStopID(int seId)
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
 			if ((u32)track[6] != 0) {
-				c_RedEntry.WaveHistoryManager(0, *(short*)(track[6] + 2));
+				c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo);
 			}
 			c_RedEntry.SeSepHistoryManager(0, track[0x3d]);
 		}
@@ -280,7 +280,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
 				if ((u32)track[6] != 0) {
-					c_RedEntry.WaveHistoryManager(0, *(short*)(track[6] + 2));
+					c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo);
 				}
 				c_RedEntry.SeSepHistoryManager(0, track[0x3d]);
 			}
@@ -319,7 +319,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	deltaTime = (unsigned int)((unsigned char*)info)[2] * 0x100 + (unsigned int)((unsigned char*)info)[1];
 	waveBase = c_RedEntry.SearchWaveBase(deltaTime);
 	if (waveBase != 0) {
-		c_RedEntry.WaveHistoryManager(1, *(short*)(waveBase + 2));
+		c_RedEntry.WaveHistoryManager(1, reinterpret_cast<RedWaveHeadWD*>(waveBase)->m_waveNo);
 	} else {
 		if (m_ReportPrint != 0) {
 			OSReport(sRedCommandWaveNotEntryFmt, sRedCommandLogPrefix, sRedCommandLogWarnColor,

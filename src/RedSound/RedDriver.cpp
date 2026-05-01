@@ -176,10 +176,10 @@ void _SetSoundMode(int* command)
  */
 void _SetReverbDepth(int* command)
 {
+    int fadeDepth;
     int reverbBank;
     int reverbDepth;
     int fadeStep;
-    int fadeDepth;
     int* seInfo;
 
     reverbBank = command[0] & 1;
@@ -202,7 +202,8 @@ void _SetReverbDepth(int* command)
         seInfo = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
         do {
             if ((u32)*seInfo != 0) {
-                fadeDepth = reverbDepth - (seInfo[0x1a] & 0xfffff000U);
+                fadeDepth = seInfo[0x1a] & 0xfffff000U;
+                fadeDepth = reverbDepth - fadeDepth;
                 seInfo[0x1b] = fadeDepth / fadeStep;
                 seInfo[0x1c] = fadeStep;
             }

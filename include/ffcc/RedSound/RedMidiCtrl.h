@@ -83,7 +83,10 @@ struct RedTrackDATA {
 	signed char m_pitchBendRange;
 	unsigned char m_pad14C[0x14D - 0x14C];
 	unsigned char m_waveBankNo;
-	unsigned char m_pad14E[0x154 - 0x14E];
+	signed char m_trackNo;
+	unsigned char m_eraseTrack;
+	unsigned char m_attrMask;
+	unsigned char m_pad151[0x154 - 0x151];
 };
 
 typedef void (*RedMidiControlFunc)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);

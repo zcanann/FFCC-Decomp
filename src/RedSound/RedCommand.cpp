@@ -54,7 +54,7 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			((RedTrackDATA*)track)->m_seId = 0;
 			((RedTrackDATA*)track)->m_flags = 0;
-			*track = 0;
+			((RedTrackDATA*)track)->m_command = 0;
 			((RedTrackDATA*)track)->m_mixVolumeMode = 0;
 
 			trackNo = ((RedTrackDATA*)track)->m_trackNo;
@@ -125,7 +125,7 @@ int _EraseTime(int eraseTrack)
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			((RedTrackDATA*)track)->m_seId = 0;
 			((RedTrackDATA*)track)->m_flags = 0;
-			*track = 0;
+			((RedTrackDATA*)track)->m_command = 0;
 			((RedTrackDATA*)track)->m_mixVolumeMode = 0;
 
 			trackNo = ((RedTrackDATA*)track)->m_trackNo;
@@ -222,7 +222,7 @@ int SeStopID(int seId)
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 			((RedTrackDATA*)track)->m_seId = 0;
 			((RedTrackDATA*)track)->m_flags = 0;
-			*track = 0;
+			((RedTrackDATA*)track)->m_command = 0;
 			((RedTrackDATA*)track)->m_mixVolumeMode = 0;
 
 			trackNo = ((RedTrackDATA*)track)->m_trackNo;
@@ -271,7 +271,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 				((RedTrackDATA*)track)->m_seId = 0;
 				((RedTrackDATA*)track)->m_flags = 0;
-				*track = 0;
+				((RedTrackDATA*)track)->m_command = 0;
 				((RedTrackDATA*)track)->m_mixVolumeMode = 0;
 
 				trackNo = ((RedTrackDATA*)track)->m_trackNo;
@@ -877,7 +877,7 @@ int MusicStop(int seId)
 				do {
 					if ((u32)*track != 0) {
 						KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
-						*track = 0;
+						((RedTrackDATA*)track)->m_command = 0;
 					}
 					track += 0x55;
 				} while (track < (int*)(*music +

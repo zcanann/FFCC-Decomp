@@ -855,20 +855,20 @@ void __MidiCtrl_TimeSignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackD
  */
 void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command = (unsigned char*)((int*)track)[0];
+    unsigned char* command = track->m_command;
     unsigned int value;
 
-    ((int*)track)[0] = (int)(command + 1);
+    track->m_command = command + 1;
     value = command[0] & 0x1f;
-    ((unsigned int*)control)[0x120] = value;
-    ((unsigned int*)control)[2] = t_KeySignatureIndex[value] + (int)t_KeySignatureData;
+    control->m_keySignature = value;
+    control->m_keySignatureData = t_KeySignatureIndex[value] + t_KeySignatureData;
 
     if (m_MusicKeySignature != 0) {
-        value = ((unsigned int*)control)[0];
+        value = (unsigned int)control->m_tracks;
         do {
             ((RedTrackDATA*)value)->m_keySignatureData = control->m_keySignatureData;
             value += 0x154;
-        } while (value < ((unsigned int*)control)[0] + (unsigned int)*(unsigned char*)((int)control + 0x491) * 0x154);
+        } while (value < (unsigned int)control->m_tracks + (unsigned int)control->m_trackCount * 0x154);
     }
 }
 

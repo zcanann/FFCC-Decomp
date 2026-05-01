@@ -368,8 +368,8 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				track[0x42] = track[0x42] - m_SeSkipStep;
 			}
 
-			track[0x3d] = sepId;
-			track[0x3e] = seId;
+			((RedTrackDATA*)track)->m_seSepId = sepId;
+			((RedTrackDATA*)track)->m_seId = seId;
 			*(short*)(track + 0x51) = 0;
 			if (m_SeSkipStep == 0) {
 				state = 0xffffffff;
@@ -548,7 +548,7 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 
 	do {
-		if (((u32)*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
+		if (((u32)*track != 0) && ((seId < 0) || (((RedTrackDATA*)track)->m_seId == seId))) {
 			int delta = volume - track[0x13];
 			delta /= frameCount;
 			track[0x14] = delta;
@@ -583,7 +583,7 @@ void SetSePan(int seId, int pan, int frameCount)
 	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 
 	do {
-		if (((u32)*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
+		if (((u32)*track != 0) && ((seId < 0) || (((RedTrackDATA*)track)->m_seId == seId))) {
 			int delta = pan - track[0x10];
 			delta /= frameCount;
 			track[0x11] = delta;
@@ -617,7 +617,7 @@ void SetSePitch(int seId, int pitch, int frameCount)
 	track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 
 	do {
-		if (((u32)*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
+		if (((u32)*track != 0) && ((seId < 0) || (((RedTrackDATA*)track)->m_seId == seId))) {
 			int delta = pitch - track[0x17];
 			track[0x18] = delta / frameCount;
 			track[0x19] = frameCount;
@@ -654,7 +654,7 @@ void SePause(int seId, int pause)
 	track = *trackBasePtr;
 	voice = (unsigned int)p_VoiceData + 0x1800;
 	do {
-		if ((*(int*)(track + 0xf8) != 0) && ((seId == -1) || (seId == *(int*)(track + 0xf8)))) {
+		if ((((RedTrackDATA*)track)->m_seId != 0) && ((seId == -1) || (seId == ((RedTrackDATA*)track)->m_seId))) {
 			if (pause == 1) {
 				if (*(void**)(voice + 0x14) != 0) {
 					*(unsigned int*)(voice + 0x9c) = 0;
@@ -753,7 +753,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		*(unsigned char**)track = current + 4;
 		current = current + 4 + blockSize;
 		track[0x42] = DeltaTimeSumup((unsigned char**)track) + 1;
-		track[0x3d] = 0;
+		((RedTrackDATA*)track)->m_seSepId = 0;
 		track[8] = (m_MusicKeySignature == 0) ? 0 : (int)(t_KeySignatureData + 0xb);
 		track[0x13] = 0x7f000;
 		track[0x15] = 0;

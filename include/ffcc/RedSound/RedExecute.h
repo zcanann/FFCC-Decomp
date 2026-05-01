@@ -15,8 +15,10 @@ struct RedVoiceDATA {
 	RedTrackDATA* m_track;
 	RedNoteDATA* m_note;
 	RedWaveDATA* m_waveData;
+	void* m_unk0C;
+	void* m_unk10;
 	void* m_axVoice;
-	unsigned char m_pad10[0x1A - 0x10];
+	unsigned char m_pad18[0x1A - 0x18];
 	unsigned char m_stateFlags;
 	unsigned char m_pad1B[0x8C - 0x1B];
 	int m_active;

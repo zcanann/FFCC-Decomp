@@ -1364,17 +1364,17 @@ u32 _AdsrDataExecute(RedVoiceDATA* voice)
  */
 void _VoiceDropedCallback(void* dropped)
 {
-    unsigned int* puVar1;
+    RedVoiceDATA* voiceData;
     
-    puVar1 = p_VoiceData;
+    voiceData = (RedVoiceDATA*)p_VoiceData;
     do {
-        if ((puVar1[5] != 0) && ((void*)puVar1[5] == dropped)) {
-            puVar1[0x23] = 0;
-            *puVar1 = 0;
-            puVar1[5] = 0;
+        if ((voiceData->m_axVoice != 0) && (voiceData->m_axVoice == dropped)) {
+            voiceData->m_active = 0;
+            voiceData->m_track = 0;
+            voiceData->m_axVoice = 0;
         }
-        puVar1 = puVar1 + 0x30;
-    } while (puVar1 < p_VoiceData + 0xc00);
+        voiceData++;
+    } while (voiceData < (RedVoiceDATA*)(p_VoiceData + 0xc00));
 }
 
 /*

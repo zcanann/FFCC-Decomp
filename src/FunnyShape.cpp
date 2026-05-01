@@ -715,6 +715,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 drawAngle = FLOAT_8032fd6c;
             }
 
+            const float sinA = static_cast<float>(sin(drawAngle));
+            const float cosA = static_cast<float>(cos(drawAngle));
             const float x0 = static_cast<float>(Div16Floor(S16At(entry, 0x20)));
             const float y0 = static_cast<float>(Div16Floor(S16At(entry, 0x22)));
             const float x1 = static_cast<float>(Div16Floor(S16At(entry, 0x24)));
@@ -723,8 +725,6 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const float y2 = static_cast<float>(Div16Floor(S16At(entry, 0x2A)));
             const float x3 = static_cast<float>(Div16Floor(S16At(entry, 0x2C)));
             const float y3 = static_cast<float>(Div16Floor(S16At(entry, 0x2E)));
-            const float sinA = static_cast<float>(sin(drawAngle));
-            const float cosA = static_cast<float>(cos(drawAngle));
             const float rx0 = x0 * cosA - y0 * sinA;
             const float ry0 = x0 * sinA + y0 * cosA;
             const float rx1 = x1 * cosA - y1 * sinA;

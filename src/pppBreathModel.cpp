@@ -643,20 +643,20 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     int groupTableWork;
     BreathParticleGroup* groupTable;
     BreathParticleGroup* groupData;
-    unsigned char* particleData;
-    unsigned char* particleWmat;
-    unsigned char* particleColor;
+    BreathParticleData* particleData;
+    PARTICLE_WMAT* particleWmat;
+    PARTICLE_COLOR* particleColor;
     int maxParticleCount;
     short foundSlot;
     short foundGroup;
-    Vec stepVelocity;
     Vec unitVelocity;
+    Vec stepVelocity;
     unsigned short* emitFrameCounter;
 
     spawnCount = 0;
-    particleData = (unsigned char*)vBreathModel->m_particleData;
-    particleWmat = (unsigned char*)vBreathModel->m_particleWmats;
-    particleColor = (unsigned char*)vBreathModel->m_particleColors;
+    particleData = reinterpret_cast<BreathParticleData*>(vBreathModel->m_particleData);
+    particleWmat = vBreathModel->m_particleWmats;
+    particleColor = vBreathModel->m_particleColors;
     groupTable = vBreathModel->m_groups;
     maxParticleCount = vBreathModel->m_particleCount;
     emitFrameCounter = &vBreathModel->m_emitFrameCounter;
@@ -665,9 +665,9 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
         *emitFrameCounter = *emitFrameCounter + 1;
 
         for (i = 0; i < maxParticleCount; i++) {
-            if (*(short*)(particleData + 0x50) > 0) {
+            if (particleData->m_life > 0) {
                 UpdateParticle(
-                    vBreathModel, pBreathModel, (PARTICLE_DATA*)particleData, vColor, (PARTICLE_COLOR*)particleColor);
+                    vBreathModel, pBreathModel, (PARTICLE_DATA*)particleData, vColor, particleColor);
             } else {
                 float zero = 0.0f;
 
@@ -677,7 +677,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 for (short groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
                     for (short slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
                         signed char* particleIndices = *(signed char**)(groupTableWork + 4);
-                        if ((int)(short)i == (int)particleIndices[(int)slotIndex]) {
+                        if ((short)i == *(signed char*)(particleIndices + (short)slotIndex)) {
                             foundGroup = groupIndex;
                             foundSlot = slotIndex;
                             found = true;
@@ -729,7 +729,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
 
                     BirthParticle(
                         pppObject, vBreathModel, pBreathModel, vColor, (PARTICLE_DATA*)particleData,
-                        (PARTICLE_WMAT*)particleWmat, (PARTICLE_COLOR*)particleColor);
+                        particleWmat, particleColor);
                     placing = true;
                     spawnCount += 1;
                     groupData = groupTable;
@@ -753,12 +753,12 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
             }
 
             if (particleWmat != NULL) {
-                particleWmat += 0x30;
+                particleWmat += 1;
             }
             if (particleColor != NULL) {
-                particleColor += 0x20;
+                particleColor += 1;
             }
-            particleData += 0x98;
+            particleData += 1;
         }
 
         if (spawnCount > 0) {

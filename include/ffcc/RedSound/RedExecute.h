@@ -25,7 +25,8 @@ struct RedWaveDATA {
 	int m_pitch;
 	signed char m_splitKey;
 	unsigned char m_splitVelocity;
-	unsigned char m_pad1A[0x1C - 0x1A];
+	unsigned char m_volume;
+	unsigned char m_pan;
 	signed char m_reverbMix;
 	unsigned char m_pad1D[0x22 - 0x1D];
 	unsigned char m_adpcmData[0x4A - 0x22];

@@ -122,7 +122,8 @@ struct RedSoundCONTROL {
 	unsigned int m_flags;
 	int m_musicId;
 	int m_skipFrames;
-	unsigned char m_pad478[0x480 - 0x478];
+	int m_unknown478;
+	int m_waveNo;
 	int m_keySignature;
 	int m_loopBase;
 	unsigned char m_pad488[0x48E - 0x488];

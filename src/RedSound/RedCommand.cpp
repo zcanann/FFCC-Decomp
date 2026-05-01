@@ -743,7 +743,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	}
 	((int*)p_ReverbDepth)[1] = 0;
 	((int*)p_ReverbDepth)[2] = 0;
-	music[0x11f] = musicHead->m_waveNo;
+	((RedSoundCONTROL*)music)->m_waveNo = musicHead->m_waveNo;
 
 	unsigned char* current = (unsigned char*)musicHead + 0x20;
 	int* track = (int*)*music;
@@ -831,7 +831,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		music[0x11b] |= 0x40000;
 	}
 
-	c_RedEntry.WaveHistoryManager(1, music[0x11f]);
+	c_RedEntry.WaveHistoryManager(1, ((RedSoundCONTROL*)music)->m_waveNo);
 	c_RedEntry.MusicHistoryManager(1, musicId);
 	if (m_MusicSkipLine != 0) {
 		OSSignalSemaphore(&m_MusicSkipSemaphore);
@@ -888,7 +888,7 @@ int MusicStop(int seId)
 				*(unsigned char*)((char*)music + 0x491) = 0;
 				RedDelete((void*)*music);
 				*music = 0;
-				c_RedEntry.WaveHistoryManager(0, music[0x11f]);
+				c_RedEntry.WaveHistoryManager(0, ((RedSoundCONTROL*)music)->m_waveNo);
 				c_RedEntry.MusicHistoryManager(0, musicId);
 			}
 		}

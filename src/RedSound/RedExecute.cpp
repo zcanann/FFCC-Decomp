@@ -1331,23 +1331,23 @@ u32 _AdsrDataExecute(RedVoiceDATA* voice)
 {
     u32 changed = 0;
 
-    if (((int*)voice)[0x17] < 4) {
-        if ((((int*)voice)[0x24] & 4U) != 0 || ((int*)voice)[0x17] < 3) {
+    if (voice->m_adsrStage < 4) {
+        if ((voice->m_flags & 4U) != 0 || voice->m_adsrStage < 3) {
             changed += 1;
-            ((int*)voice)[0x18] -= 1;
-            ((int*)voice)[0x2B] += ((int*)voice)[0x19];
-            if (((int*)voice)[0x18] == 0 && ((int*)voice)[0x17] < 3) {
-                ((int*)voice)[0x17] += 1;
+            voice->m_adsrStepFrames -= 1;
+            voice->m_adsrCurrentLevel += voice->m_adsrStepAdd;
+            if (voice->m_adsrStepFrames == 0 && voice->m_adsrStage < 3) {
+                voice->m_adsrStage += 1;
                 _AdsrDataCompute(voice);
             }
         }
     } else {
-        ((int*)voice)[0x2B] = 0;
+        voice->m_adsrCurrentLevel = 0;
     }
 
-    if ((((int*)voice)[0x2B] >> 0xC) < 1) {
-        ((int*)voice)[0x17] = 4;
-        ((int*)voice)[0x2B] = 0;
+    if ((voice->m_adsrCurrentLevel >> 0xC) < 1) {
+        voice->m_adsrStage = 4;
+        voice->m_adsrCurrentLevel = 0;
     }
 
     return changed;

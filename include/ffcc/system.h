@@ -15,6 +15,8 @@ class CProcess : public CManager
 {
 public:
     CProcess() {}
+    virtual void Init();
+    virtual void Quit();
     virtual int GetTable(unsigned long) = 0;
     virtual void onScriptChanging(char*);
     virtual void onScriptChanged(char*, int);

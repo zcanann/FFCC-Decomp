@@ -1174,15 +1174,14 @@ void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 	};
 	PartMngColorView* pppMngSt =
 	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
-	float* colorValues = reinterpret_cast<float*>(&color);
 	float one = kPartColorIdentityOne;
 
-	pppMngSt->r = colorValues[0];
-	pppMngSt->g = colorValues[1];
-	pppMngSt->b = colorValues[2];
-	pppMngSt->a = colorValues[3];
+	pppMngSt->r = color.x;
+	pppMngSt->g = color.y;
+	pppMngSt->b = color.z;
+	pppMngSt->a = color.w;
 
-	if (one == colorValues[0] && one == colorValues[1] && one == colorValues[2] && one == colorValues[3]) {
+	if (one == color.x && one == color.y && one == color.z && one == color.w) {
 		PartMng.m_pppMng[index].m_useOwnerScaleSign = 0;
 		return;
 	}
@@ -1211,12 +1210,10 @@ void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
 	};
 	PartMngColorView* pppMngSt =
 	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
-	float* colorValues = reinterpret_cast<float*>(&color);
-
-	colorValues[0] = pppMngSt->r;
-	colorValues[1] = pppMngSt->g;
-	colorValues[2] = pppMngSt->b;
-	colorValues[3] = pppMngSt->a;
+	color.x = pppMngSt->r;
+	color.y = pppMngSt->g;
+	color.z = pppMngSt->b;
+	color.w = pppMngSt->a;
 }
 
 /*

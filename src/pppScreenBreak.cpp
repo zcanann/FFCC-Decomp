@@ -1,6 +1,7 @@
 #include "ffcc/pppScreenBreak.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/color.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/ptrarray.h"
@@ -638,7 +639,6 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
  */
 void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 {
-    GXColor colorStorage;
     Vec lightDir;
     GXLightObj lightObj;
     u8* camera = reinterpret_cast<u8*>(&CameraPcs);
@@ -655,8 +655,7 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, one, zero);
     GXInitLightAttn(&lightObj, zero, zero, one, attnA, zero, attnB);
 
-    GXInitLightColor(&lightObj,
-                     *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(&colorStorage, 0xFF, 0xFF, 0xFF, 0xFF)));
+    GXInitLightColor(&lightObj, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     GXLoadLightObjImm(&lightObj, (GXLightID)1);
     GXSetChanCtrl((GXChannelID)0, 1, (GXColorSrc)0, (GXColorSrc)1, 1, (GXDiffuseFn)2, (GXAttnFn)0);
     GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);

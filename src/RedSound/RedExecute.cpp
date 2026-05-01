@@ -534,10 +534,10 @@ int* SetReverb(int bank, int kind, int* params)
  */
 RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 {
-    int* bestVoice = 0;
-    int* voice;
+    RedVoiceDATA* bestVoice = 0;
+    RedVoiceDATA* voice;
     int bestEnvelope;
-    int* voiceEnd;
+    RedVoiceDATA* voiceEnd;
 
     if ((*(s8*)((u8*)track + 0x26) & 5) != 0) {
         if (((((u8*)track)[0x26] & 1) == 0) &&
@@ -546,36 +546,36 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
             voice = 0;
         }
         else {
-            voice = (int*)((u8*)p_VoiceData + *(s8*)((u8*)track + 0x14E) * 0xC0);
+            voice = (RedVoiceDATA*)((u8*)p_VoiceData + *(s8*)((u8*)track + 0x14E) * 0xC0);
         }
     } else {
         if ((((u8*)track)[0x26] & 8) != 0) {
-            voice = (int*)p_VoiceData;
+            voice = (RedVoiceDATA*)p_VoiceData;
         } else {
-            voice = (int*)((u8*)p_VoiceData + *(s8*)((u8*)p_SoundControl + 0x490) * 0xC0);
+            voice = (RedVoiceDATA*)((u8*)p_VoiceData + *(s8*)((u8*)p_SoundControl + 0x490) * 0xC0);
         }
 
         bestEnvelope = 0x8000;
-        voiceEnd = (int*)p_VoiceData + 0xC00;
+        voiceEnd = (RedVoiceDATA*)(p_VoiceData + 0xC00);
         do {
-            if ((((u8*)voice)[0x1A] & 3) == 0) {
-                if (voice[0x2C] < 1) {
-                    if (*voice != 0) {
-                        *voice = 0;
+            if ((voice->m_stateFlags & 3) == 0) {
+                if (voice->m_envelopeLevel < 1) {
+                    if (voice->m_track != 0) {
+                        voice->m_track = 0;
                     }
                     break;
                 }
 
-                if (voice[0x2C] < bestEnvelope) {
-                    bestEnvelope = voice[0x2C];
+                if (voice->m_envelopeLevel < bestEnvelope) {
+                    bestEnvelope = voice->m_envelopeLevel;
                     bestVoice = voice;
                 }
             }
-            voice += 0x30;
+            voice++;
         } while (voice < voiceEnd);
 
         if (voice == voiceEnd) {
-            int* selectedVoice;
+            RedVoiceDATA* selectedVoice;
             RedSoundCONTROL* soundControl = (RedSoundCONTROL*)p_SoundControl;
             soundControl->m_updateFlags = soundControl->m_updateFlags | 2;
             if (bestEnvelope == 0x8000) {
@@ -588,11 +588,11 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
     }
 
     if (voice != 0) {
-        voice[0x24] = voice[0x24] & 0xFFFFFFFD;
-        voice[0x2C] = 0x8000;
+        voice->m_flags = voice->m_flags & 0xFFFFFFFD;
+        voice->m_envelopeLevel = 0x8000;
     }
 
-    return (RedVoiceDATA*)voice;
+    return voice;
 }
 
 /*

@@ -566,13 +566,13 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
 void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA*)
 {
     if ((m_MusicPhraseStop == 1) && ((void*)control == p_SoundControlBuffer)) {
-        int* track = (int*)*(int*)control;
+        RedTrackDATA* track = control->m_tracks;
         do {
-            if ((u32)*track != 0) {
-                __MidiCtrl_Stop(control, keyOnData, (RedTrackDATA*)track);
+            if ((u32)track->m_command != 0) {
+                __MidiCtrl_Stop(control, keyOnData, track);
             }
-            track += 0x55;
-        } while (track < (int*)(*(int*)control + (unsigned int)*(unsigned char*)((char*)control + 0x491) * 0x154));
+            track++;
+        } while (track < control->m_tracks + control->m_trackCount);
     }
 }
 
@@ -661,15 +661,15 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
  */
 void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA*)
 {
-    ((int*)control)[0x11b] |= 2;
+    control->m_flags |= 2;
     if ((m_MusicPhraseStop == 1) && ((void*)control == p_SoundControlBuffer)) {
-        int* track = (int*)((int*)control)[0];
+        RedTrackDATA* track = control->m_tracks;
         do {
-            if ((u32)*track != 0) {
-                __MidiCtrl_Stop(control, keyOnData, (RedTrackDATA*)track);
+            if ((u32)track->m_command != 0) {
+                __MidiCtrl_Stop(control, keyOnData, track);
             }
-            track += 0x55;
-        } while (track < (int*)(((int*)control)[0] + (unsigned int)*(unsigned char*)((char*)control + 0x491) * 0x154));
+            track++;
+        } while (track < control->m_tracks + control->m_trackCount);
     }
 }
 

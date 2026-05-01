@@ -106,6 +106,13 @@ struct RedSoundCONTROL {
 	int m_tempo;
 	int m_tempoAdd;
 	int m_tempoDelta;
+	unsigned char m_pad454[0x46C - 0x454];
+	unsigned int m_flags;
+	int m_musicId;
+	unsigned char m_pad474[0x48E - 0x474];
+	short m_step;
+	unsigned char m_pad490[0x491 - 0x490];
+	unsigned char m_trackCount;
 };
 
 typedef void (*RedMidiControlFunc)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);

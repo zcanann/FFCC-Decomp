@@ -72,7 +72,8 @@ struct RedVoiceDATA {
 	int m_pitch;
 	int m_targetPitch;
 	int m_basePitch;
-	unsigned char m_padA4[0xAC - 0xA4];
+	unsigned char m_padA4[0xA8 - 0xA4];
+	int m_voiceIndex;
 	int m_adsrCurrentLevel;
 	int m_envelopeLevel;
 	unsigned char m_padB4[0xB8 - 0xB4];

@@ -197,6 +197,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	Mtx charaMtx;
 	CMapCylinderRaw cyl;
 	int emptyHistory;
+	int fillIndex;
 
 	if ((gPppCalcDisabled == 0) && (step->m_stepValue != 0xFFFF)) {
 	work = (pppYmLaserWork*)((u8*)laser + 0x80 + data->m_serializedDataOffsets[2]);
@@ -245,7 +246,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 			}
 
 			s32 frameCount = step->m_payload[0x3a] + 1;
-			float t = (FLOAT_80330de0 / (float)frameCount) * (float)i;
+			float t = FLOAT_80330de0 / (float)frameCount;
+			t *= (float)i;
 			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(pppMngStPtr, t, charaMtx) == 0) {
 				emptyHistory = 1;
 				continue;
@@ -329,8 +331,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	}
 
 	if (emptyHistory) {
-		for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
-			pppCopyVector(work->m_points[i], work->m_points[0]);
+		for (fillIndex = 0; fillIndex < (int)(u32)step->m_payload[0x1e]; fillIndex++) {
+			pppCopyVector(work->m_points[fillIndex], work->m_points[0]);
 		}
 	}
 }

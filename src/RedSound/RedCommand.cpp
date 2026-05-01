@@ -427,7 +427,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				((RedTrackDATA*)track)->m_fuzzyPitchDepth = 0;
 				((RedTrackDATA*)track)->m_portamentPitch = -1;
 				((RedTrackDATA*)track)->m_voiceSwitch = 0xc00;
-				memset(track + 0x35, 0xff, 0xc);
+				memset(&((RedTrackDATA*)track)->m_adsrAR, 0xff, 0xc);
 				((RedTrackDATA*)track)->m_note.m_allocFlags = 5;
 				((RedTrackDATA*)track)->m_seTickCounter = 1;
 				((RedVoiceDATA*)seTrack)->m_track = (RedTrackDATA*)track;
@@ -798,7 +798,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		((RedTrackDATA*)track)->m_portamentPitch = -1;
 		((RedTrackDATA*)track)->m_note.m_allocFlags = 0;
 		((RedTrackDATA*)track)->m_voiceSwitch = 0xc02;
-		memset(track + 0x35, 0xff, 0xc);
+		memset(&((RedTrackDATA*)track)->m_adsrAR, 0xff, 0xc);
 
 		count--;
 		trackNo++;

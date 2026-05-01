@@ -1688,7 +1688,7 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
     int output;
     unsigned int* entry;
 
-    ((int*)track)[0x20] = (unsigned int)track->m_command[0] << 0xc;
+    track->m_vibrateDepth = (unsigned int)track->m_command[0] << 0xc;
     if (track->m_command[1] != 0) {
         depth = (unsigned int)track->m_command[1];
     } else {
@@ -1696,10 +1696,10 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
     }
 
     divisor = depth;
-    ((int*)track)[0x1e] = 0x100000 / divisor;
-    ((int*)track)[0x1d] = (int)SwingEntryFunction[track->m_command[2] & 0xf];
-    *(short*)((int)track + 0x8e) = 0;
-    *(short*)((int)track + 0x8c) = 0;
+    track->m_vibrateRate = 0x100000 / divisor;
+    track->m_vibrateFunc = (int)SwingEntryFunction[track->m_command[2] & 0xf];
+    track->m_vibrateDepthDelta = 0;
+    track->m_vibrateRateDelta = 0;
     track->m_command += 3;
 
     entry = p_VoiceData;
@@ -1875,17 +1875,17 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 	int output;
 	unsigned int* voice;
 
-	((int*)track)[0x28] = (unsigned int)track->m_command[0] << 0xc;
+	track->m_tremoloDepth = (unsigned int)track->m_command[0] << 0xc;
 	if (track->m_command[1] != 0) {
 		rateDivisor = (unsigned int)track->m_command[1];
 	} else {
 		rateDivisor = 0x100;
 	}
 	divisor = rateDivisor;
-	((int*)track)[0x26] = 0x100000 / divisor;
-	((int*)track)[0x25] = (int)SwingEntryFunction[track->m_command[2] & 0xf];
-	*(short*)((int)track + 0xae) = 0;
-	*(short*)((int)track + 0xac) = 0;
+	track->m_tremoloRate = 0x100000 / divisor;
+	track->m_tremoloFunc = (int)SwingEntryFunction[track->m_command[2] & 0xf];
+	track->m_tremoloDepthDelta = 0;
+	track->m_tremoloRateDelta = 0;
 	track->m_command += 3;
 
 	voice = p_VoiceData;

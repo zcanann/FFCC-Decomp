@@ -1735,7 +1735,7 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
  */
 void __MidiCtrl_VibrateOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    *(u32*)((u8*)track + 0x74) = 0;
+    track->m_vibrateFunc = 0;
 }
 
 /*
@@ -1749,8 +1749,8 @@ void __MidiCtrl_VibrateOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_VibrateDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	((int*)track)[0x20] = (unsigned int)*(*(u8**)track)++ << 0xc;
-	*(short*)((int)track + 0x8e) = 0;
+	track->m_vibrateDepth = (unsigned int)*track->m_command++ << 0xc;
+	track->m_vibrateDepthDelta = 0;
 }
 
 /*
@@ -1788,15 +1788,15 @@ void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 {
 	int rate;
 
-	if (*(u8*)((int*)track)[0] != 0) {
-		rate = *(u8*)((int*)track)[0];
+	if (*track->m_command != 0) {
+		rate = *track->m_command;
 	} else {
 		rate = 0x100;
 	}
 	int divisor = rate;
-	((int*)track)[0x1e] = 0x100000 / divisor;
-	*(short*)((int*)track + 0x23) = 0;
-	((int*)track)[0] += 1;
+	track->m_vibrateRate = 0x100000 / divisor;
+	track->m_vibrateRateDelta = 0;
+	track->m_command += 1;
 }
 
 /*
@@ -1843,9 +1843,9 @@ void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  */
 void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	u32 type = *(u8*)(((u32*)track)[0]++);
+	u32 type = *track->m_command++;
 
-	((u32*)track)[0x1d] = (u32)SwingEntryFunction[type & 0xf];
+	track->m_vibrateFunc = (u32)SwingEntryFunction[type & 0xf];
 }
 
 /*
@@ -1859,9 +1859,9 @@ void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
  */
 void __MidiCtrl_VibrateDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	*(unsigned short*)((int*)track + 0x24) = (unsigned short)*(u8*)((int*)track)[0];
-	*(unsigned short*)((int)track + 0x92) = (unsigned short)*(u8*)(((int*)track)[0] + 1);
-	((int*)track)[0] += 2;
+	track->m_vibrateDelay = (unsigned short)track->m_command[0];
+	track->m_vibrateDelayDepth = (unsigned short)track->m_command[1];
+	track->m_command += 2;
 }
 
 /*

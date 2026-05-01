@@ -1192,13 +1192,13 @@ RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voic
  */
 void SetVoiceAccess(RedTrackDATA* track, int mask)
 {
-    u32* voiceData = (u32*)p_VoiceData;
+    RedVoiceDATA* voiceData = (RedVoiceDATA*)p_VoiceData;
     do {
-        if ((voiceData[0] != 0) && (voiceData[0] == (u32)track)) {
-            voiceData[0x24] |= mask;
+        if ((voiceData->m_track != 0) && (voiceData->m_track == track)) {
+            voiceData->m_flags |= mask;
         }
-        voiceData += 0x30;
-    } while (voiceData < (u32*)p_VoiceData + 0xC00);
+        voiceData++;
+    } while (voiceData < (RedVoiceDATA*)(p_VoiceData + 0xC00));
 }
 
 /*
@@ -1212,13 +1212,13 @@ void SetVoiceAccess(RedTrackDATA* track, int mask)
  */
 void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 {
-    u32* voiceData = (u32*)p_VoiceData;
+    RedVoiceDATA* voiceData = (RedVoiceDATA*)p_VoiceData;
     do {
-        if ((voiceData[0] != 0) && (voiceData[0] == (u32)track)) {
-            voiceData[0x25] = voiceSwitch;
+        if ((voiceData->m_track != 0) && (voiceData->m_track == track)) {
+            voiceData->m_voiceSwitch = voiceSwitch;
         }
-        voiceData += 0x30;
-    } while (voiceData < (u32*)p_VoiceData + 0xC00);
+        voiceData++;
+    } while (voiceData < (RedVoiceDATA*)(p_VoiceData + 0xC00));
 }
 
 /*

@@ -1283,7 +1283,7 @@ void CRedDriver::Init()
         iVar4 = iVar5 * 0x154;
         cVar1 = (char)iVar5;
         iVar5 = iVar5 + 1;
-        *(char*)(iVar6 + iVar4 + 0x14e) = (char)(cVar1 + ' ');
+        ((RedTrackDATA*)(iVar6 + iVar4))->m_trackNo = (char)(cVar1 + ' ');
     } while (iVar5 < 0x20);
     p_EditorTrack = (void*)RedNew(0x154);
     memset(p_EditorTrack, 0, 0x154);

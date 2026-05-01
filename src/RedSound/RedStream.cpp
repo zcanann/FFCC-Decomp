@@ -4,6 +4,7 @@
 #include "ffcc/RedSound/RedEntry.h"
 #include "ffcc/RedSound/RedExecute.h"
 #include "ffcc/RedSound/RedMemory.h"
+#include "ffcc/RedSound/RedMidiCtrl.h"
 #include "ffcc/RedSound/RedGlobals.h"
 #include <dolphin/os.h>
 #include <string.h>
@@ -341,7 +342,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		streamData->m_fileCursor = 0;
 		streamData->m_readOffset = 0x1000;
 		streamData->m_streamCursor = 0;
-		streamData->m_voiceData = (int)p_VoiceData + *(char*)(streamData->m_track + 0x14e) * 0xc0;
+		streamData->m_voiceData = (int)p_VoiceData + ((RedTrackDATA*)streamData->m_track)->m_trackNo * 0xc0;
 		streamData->m_fileData = (int)streamHeader;
 		streamData->m_fileSize = fileSize;
 		if (volume != 0) {

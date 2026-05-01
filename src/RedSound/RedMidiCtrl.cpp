@@ -183,7 +183,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
     unsigned int* slot;
 
     if ((((signed char*)track)[0x26] & 5) != 0) {
-        slot = (unsigned int*)((int)keyOnData + ((signed char*)track)[0x14e] * 8);
+        slot = (unsigned int*)((int)keyOnData + track->m_trackNo * 8);
         if ((*slot == 0) || (*slot == (unsigned int)track)) {
             *slot = (unsigned int)track;
             slot[1] = ((unsigned int*)track)[9];

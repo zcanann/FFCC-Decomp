@@ -164,7 +164,7 @@ void RedDelete(void* address)
  */
 int RedNewA(int size, int offset, int maxSize)
 {
-	unsigned int alignedSize;
+	int alignedSize;
 	unsigned int interrupts;
 	int result;
 	int rangeStart;

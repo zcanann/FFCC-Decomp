@@ -18,7 +18,9 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 CMapPcs MapPcs;
 extern void* __vt__8CManager;
+extern "C" void* __vt__10CSamplePcs[];
 extern "C" void* __vt__7CMapPcs[];
+extern "C" void* __register_global_object(void*, void*, void*);
 extern "C" void create__7CMapPcsFv(CMapPcs*);
 extern "C" void destroy__7CMapPcsFv(CMapPcs*);
 extern "C" void calcInit__7CMapPcsFv(CMapPcs*);
@@ -41,6 +43,8 @@ public:
 private:
     unsigned int m_data;
 };
+
+extern "C" void __dt__11CRelProfileFv(void*);
 
 unsigned int m_table_desc0__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
 unsigned int m_table_desc1__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
@@ -74,48 +78,18 @@ const char s_CMapPcs_PART_801D7700[] = "CMapPcs_PART";
 unsigned int m_table__7CMapPcs[3][0x414 / 3 / sizeof(unsigned int)] = {
     {
         reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_GAME_801D76E0)),
-        m_table_desc0__7CMapPcs[0],  m_table_desc0__7CMapPcs[1],  m_table_desc0__7CMapPcs[2],
-        m_table_desc1__7CMapPcs[0],  m_table_desc1__7CMapPcs[1],  m_table_desc1__7CMapPcs[2],
-        m_table_desc2__7CMapPcs[0],  m_table_desc2__7CMapPcs[1],  m_table_desc2__7CMapPcs[2],
-        0x14,                        0,                           m_table_desc3__7CMapPcs[0],
-        m_table_desc3__7CMapPcs[1],  m_table_desc3__7CMapPcs[2],  0x1E,
-        0,                           m_table_desc4__7CMapPcs[0],  m_table_desc4__7CMapPcs[1],
-        m_table_desc4__7CMapPcs[2],  0x2F,                        1,
-        m_table_desc5__7CMapPcs[0],  m_table_desc5__7CMapPcs[1],  m_table_desc5__7CMapPcs[2],
-        0x35,                        1,                           m_table_desc6__7CMapPcs[0],
-        m_table_desc6__7CMapPcs[1],  m_table_desc6__7CMapPcs[2],  0x37,
-        1,                           m_table_desc7__7CMapPcs[0],  m_table_desc7__7CMapPcs[1],
-        m_table_desc7__7CMapPcs[2],  0x3F,                        1,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0x14, 0, 0, 0, 0, 0x1E, 0, 0, 0, 0, 0x2F, 1, 0, 0, 0, 0x35, 1, 0, 0, 0,
+        0x37, 1, 0, 0, 0, 0x3F, 1,
     },
     {
         reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_VIEWER_801D76F0)),
-        m_table_desc8__7CMapPcs[0],  m_table_desc8__7CMapPcs[1],  m_table_desc8__7CMapPcs[2],
-        m_table_desc9__7CMapPcs[0],  m_table_desc9__7CMapPcs[1],  m_table_desc9__7CMapPcs[2],
-        m_table_desc10__7CMapPcs[0], m_table_desc10__7CMapPcs[1], m_table_desc10__7CMapPcs[2],
-        0x14,                        0,                           m_table_desc11__7CMapPcs[0],
-        m_table_desc11__7CMapPcs[1], m_table_desc11__7CMapPcs[2], 0x1E,
-        0,                           m_table_desc12__7CMapPcs[0], m_table_desc12__7CMapPcs[1],
-        m_table_desc12__7CMapPcs[2], 0x2F,                        1,
-        m_table_desc13__7CMapPcs[0], m_table_desc13__7CMapPcs[1], m_table_desc13__7CMapPcs[2],
-        0x35,                        1,                           m_table_desc14__7CMapPcs[0],
-        m_table_desc14__7CMapPcs[1], m_table_desc14__7CMapPcs[2], 0x37,
-        1,                           m_table_desc15__7CMapPcs[0], m_table_desc15__7CMapPcs[1],
-        m_table_desc15__7CMapPcs[2], 0x3F,                        1,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0x14, 0, 0, 0, 0, 0x1E, 0, 0, 0, 0, 0x2F, 1, 0, 0, 0, 0x35, 1, 0, 0, 0,
+        0x37, 1, 0, 0, 0, 0x3F, 1,
     },
     {
         reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_PART_801D7700)),
-        m_table_desc16__7CMapPcs[0], m_table_desc16__7CMapPcs[1], m_table_desc16__7CMapPcs[2],
-        m_table_desc17__7CMapPcs[0], m_table_desc17__7CMapPcs[1], m_table_desc17__7CMapPcs[2],
-        m_table_desc18__7CMapPcs[0], m_table_desc18__7CMapPcs[1], m_table_desc18__7CMapPcs[2],
-        0x14,                        0,                           m_table_desc19__7CMapPcs[0],
-        m_table_desc19__7CMapPcs[1], m_table_desc19__7CMapPcs[2], 0x1E,
-        0,                           m_table_desc20__7CMapPcs[0], m_table_desc20__7CMapPcs[1],
-        m_table_desc20__7CMapPcs[2], 0x2F,                        1,
-        m_table_desc21__7CMapPcs[0], m_table_desc21__7CMapPcs[1], m_table_desc21__7CMapPcs[2],
-        0x35,                        1,                           m_table_desc22__7CMapPcs[0],
-        m_table_desc22__7CMapPcs[1], m_table_desc22__7CMapPcs[2], 0x37,
-        1,                           m_table_desc23__7CMapPcs[0], m_table_desc23__7CMapPcs[1],
-        m_table_desc23__7CMapPcs[2], 0x3F,                        1,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0x14, 0, 0, 0, 0, 0x1E, 0, 0, 0, 0, 0x2F, 1, 0, 0, 0, 0x35, 1, 0, 0, 0,
+        0x37, 1, 0, 0, 0, 0x3F, 1,
     },
 };
 
@@ -129,6 +103,9 @@ unsigned char g_map_draw_prof;
 CRelProfile s_mapRelProfile0__7CMapPcs;
 CRelProfile s_mapRelProfile1__7CMapPcs;
 CRelProfile s_mapRelProfile2__7CMapPcs;
+u8 lbl_80268768[0xC];
+u8 lbl_80268774[0xC];
+u8 lbl_80268780[0xC];
 extern const float DrawRangeDefault;
 extern const float kPMapBoundMinInit;
 extern const float kPMapBoundMaxInit;
@@ -167,6 +144,106 @@ struct CBoundHack {
         m_max.x = max;
     }
 };
+
+/*
+ * --INFO--
+ * PAL Address: 0x80035e84
+ * PAL Size: 976b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_map_cpp(void)
+{
+    u8* self = reinterpret_cast<u8*>(&MapPcs);
+    unsigned int* gameTable = m_table__7CMapPcs[0];
+    unsigned int* viewerTable = m_table__7CMapPcs[1];
+    unsigned int* partTable = m_table__7CMapPcs[2];
+
+    *reinterpret_cast<void**>(self) = __vt__8CManager;
+    *reinterpret_cast<void**>(self) = __vt__10CSamplePcs;
+    *reinterpret_cast<void**>(self) = __vt__7CMapPcs;
+
+    gameTable[1] = m_table_desc0__7CMapPcs[0];
+    gameTable[2] = m_table_desc0__7CMapPcs[1];
+    gameTable[3] = m_table_desc0__7CMapPcs[2];
+    gameTable[4] = m_table_desc1__7CMapPcs[0];
+    gameTable[5] = m_table_desc1__7CMapPcs[1];
+    gameTable[6] = m_table_desc1__7CMapPcs[2];
+    gameTable[7] = m_table_desc2__7CMapPcs[0];
+    gameTable[8] = m_table_desc2__7CMapPcs[1];
+    gameTable[9] = m_table_desc2__7CMapPcs[2];
+    gameTable[12] = m_table_desc3__7CMapPcs[0];
+    gameTable[13] = m_table_desc3__7CMapPcs[1];
+    gameTable[14] = m_table_desc3__7CMapPcs[2];
+    gameTable[17] = m_table_desc4__7CMapPcs[0];
+    gameTable[18] = m_table_desc4__7CMapPcs[1];
+    gameTable[19] = m_table_desc4__7CMapPcs[2];
+    gameTable[22] = m_table_desc5__7CMapPcs[0];
+    gameTable[23] = m_table_desc5__7CMapPcs[1];
+    gameTable[24] = m_table_desc5__7CMapPcs[2];
+    gameTable[27] = m_table_desc6__7CMapPcs[0];
+    gameTable[28] = m_table_desc6__7CMapPcs[1];
+    gameTable[29] = m_table_desc6__7CMapPcs[2];
+    gameTable[32] = m_table_desc7__7CMapPcs[0];
+    gameTable[33] = m_table_desc7__7CMapPcs[1];
+    gameTable[34] = m_table_desc7__7CMapPcs[2];
+
+    viewerTable[1] = m_table_desc8__7CMapPcs[0];
+    viewerTable[2] = m_table_desc8__7CMapPcs[1];
+    viewerTable[3] = m_table_desc8__7CMapPcs[2];
+    viewerTable[4] = m_table_desc9__7CMapPcs[0];
+    viewerTable[5] = m_table_desc9__7CMapPcs[1];
+    viewerTable[6] = m_table_desc9__7CMapPcs[2];
+    viewerTable[7] = m_table_desc10__7CMapPcs[0];
+    viewerTable[8] = m_table_desc10__7CMapPcs[1];
+    viewerTable[9] = m_table_desc10__7CMapPcs[2];
+    viewerTable[12] = m_table_desc11__7CMapPcs[0];
+    viewerTable[13] = m_table_desc11__7CMapPcs[1];
+    viewerTable[14] = m_table_desc11__7CMapPcs[2];
+    viewerTable[17] = m_table_desc12__7CMapPcs[0];
+    viewerTable[18] = m_table_desc12__7CMapPcs[1];
+    viewerTable[19] = m_table_desc12__7CMapPcs[2];
+    viewerTable[22] = m_table_desc13__7CMapPcs[0];
+    viewerTable[23] = m_table_desc13__7CMapPcs[1];
+    viewerTable[24] = m_table_desc13__7CMapPcs[2];
+    viewerTable[27] = m_table_desc14__7CMapPcs[0];
+    viewerTable[28] = m_table_desc14__7CMapPcs[1];
+    viewerTable[29] = m_table_desc14__7CMapPcs[2];
+    viewerTable[32] = m_table_desc15__7CMapPcs[0];
+    viewerTable[33] = m_table_desc15__7CMapPcs[1];
+    viewerTable[34] = m_table_desc15__7CMapPcs[2];
+
+    partTable[1] = m_table_desc16__7CMapPcs[0];
+    partTable[2] = m_table_desc16__7CMapPcs[1];
+    partTable[3] = m_table_desc16__7CMapPcs[2];
+    partTable[4] = m_table_desc17__7CMapPcs[0];
+    partTable[5] = m_table_desc17__7CMapPcs[1];
+    partTable[6] = m_table_desc17__7CMapPcs[2];
+    partTable[7] = m_table_desc18__7CMapPcs[0];
+    partTable[8] = m_table_desc18__7CMapPcs[1];
+    partTable[9] = m_table_desc18__7CMapPcs[2];
+    partTable[12] = m_table_desc19__7CMapPcs[0];
+    partTable[13] = m_table_desc19__7CMapPcs[1];
+    partTable[14] = m_table_desc19__7CMapPcs[2];
+    partTable[17] = m_table_desc20__7CMapPcs[0];
+    partTable[18] = m_table_desc20__7CMapPcs[1];
+    partTable[19] = m_table_desc20__7CMapPcs[2];
+    partTable[22] = m_table_desc21__7CMapPcs[0];
+    partTable[23] = m_table_desc21__7CMapPcs[1];
+    partTable[24] = m_table_desc21__7CMapPcs[2];
+    partTable[27] = m_table_desc22__7CMapPcs[0];
+    partTable[28] = m_table_desc22__7CMapPcs[1];
+    partTable[29] = m_table_desc22__7CMapPcs[2];
+    partTable[32] = m_table_desc23__7CMapPcs[0];
+    partTable[33] = m_table_desc23__7CMapPcs[1];
+    partTable[34] = m_table_desc23__7CMapPcs[2];
+
+    __register_global_object(&s_mapRelProfile0__7CMapPcs, __dt__11CRelProfileFv, lbl_80268768);
+    __register_global_object(&s_mapRelProfile1__7CMapPcs, __dt__11CRelProfileFv, lbl_80268774);
+    __register_global_object(&s_mapRelProfile2__7CMapPcs, __dt__11CRelProfileFv, lbl_80268780);
+}
 
 /*
  * --INFO--

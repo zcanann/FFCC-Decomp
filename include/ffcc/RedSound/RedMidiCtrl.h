@@ -102,14 +102,23 @@ struct RedTrackDATA {
 
 struct RedSoundCONTROL {
 	RedTrackDATA* m_tracks;
-	unsigned char m_pad04[0x448 - 0x04];
+	unsigned char m_pad04[0x28 - 0x04];
+	unsigned char* m_savedCommand[0x40];
+	int m_savedDelta[0x40];
+	unsigned int m_savedFlags[0x40];
+	int m_savedNote[0x40];
+	unsigned char m_pad428[0x448 - 0x428];
 	int m_tempo;
 	int m_tempoAdd;
 	int m_tempoDelta;
 	unsigned char m_pad454[0x46C - 0x454];
 	unsigned int m_flags;
 	int m_musicId;
-	unsigned char m_pad474[0x48E - 0x474];
+	int m_skipFrames;
+	unsigned char m_pad478[0x480 - 0x478];
+	int m_unknown480;
+	int m_loopBase;
+	unsigned char m_pad488[0x48E - 0x488];
 	short m_step;
 	unsigned char m_pad490[0x491 - 0x490];
 	unsigned char m_trackCount;

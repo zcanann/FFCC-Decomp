@@ -16,7 +16,6 @@ extern "C" int rand(void);
 extern CGame Game;
 extern float FLOAT_80330640;
 extern float FLOAT_80330644;
-extern double DOUBLE_80330648;
 extern const float FLOAT_80330650;
 extern const float FLOAT_80330654;
 extern const float FLOAT_80330658;

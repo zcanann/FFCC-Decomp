@@ -482,7 +482,7 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 				                 (*(unsigned int*)(dataBase + seNo * 4) & 0x7FFFFFFF));
 
 				if ((*(unsigned int*)(dataBase + seNo * 4) & 0x80000000) != 0) {
-					*(unsigned char*)seInfo |= 0x80;
+					seInfo->m_flagsAndCount |= 0x80;
 				}
 				if (_SePlayStart(seInfo, seId, no, pan, volume) != 0) {
 					return seNo;
@@ -507,16 +507,16 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 {
 	int* sepBank;
 	int sepBase;
-	unsigned char* sepInfo;
+	RedSeINFO* sepInfo;
 
 	sepBank = c_RedEntry.SearchSeSepBank(sepId);
 	if (sepBank != 0) {
 		sepBase = sepBank[2];
-		sepInfo = (unsigned char*)(sepBase + 0x10);
+		sepInfo = reinterpret_cast<RedSeINFO*>(sepBase + 0x10);
 		if ((*(unsigned int*)(sepBase + 0xc) & 0x80000000) != 0) {
-			*sepInfo |= 0x80;
+			sepInfo->m_flagsAndCount |= 0x80;
 		}
-		if (_SePlayStart((RedSeINFO*)sepInfo, seId, sepId, pan, volume) != 0) {
+		if (_SePlayStart(sepInfo, seId, sepId, pan, volume) != 0) {
 			c_RedEntry.SeSepHistoryManager(1, sepId);
 			return sepId;
 		}

@@ -1620,7 +1620,8 @@ void _KeyOnControl()
         unsigned int* voice = p_VoiceData;
         do {
             if ((voice[0x23] != 0) && (*voice != 0) && ((((RedTrackDATA*)*voice)->m_voiceSwitch & 9) == 0)) {
-                if (((voice[0x2E] & 2) != 0) || (*(int*)(*voice + 0x94) != 0) || (*(int*)(*voice + 0xB4) != 0)) {
+                if ((((RedVoiceDATA*)voice)->m_updateFlags & 2) != 0 || (*(int*)(*voice + 0x94) != 0) ||
+                    (*(int*)(*voice + 0xB4) != 0)) {
                     int volume;
                     if ((*voice < *(u32*)p_SoundControlBuffer) ||
                         (*(u32*)p_SoundControlBuffer + (u32)*((u8*)p_SoundControlBuffer + 0x491) * 0x154 <= *voice)) {
@@ -1662,10 +1663,10 @@ void _KeyOnControl()
                     _VolumeExecute((RedVoiceDATA*)voice, volume);
                 }
 
-                if (((voice[0x2E] & 1) != 0) || (*(int*)(*voice + 0x74) != 0)) {
+                if ((((RedVoiceDATA*)voice)->m_updateFlags & 1) != 0 || (*(int*)(*voice + 0x74) != 0)) {
                     _PitchExecute((RedVoiceDATA*)voice);
                 }
-                voice[0x2E] = 0;
+                ((RedVoiceDATA*)voice)->m_updateFlags = 0;
             }
             voice += 0x30;
         } while (voice < p_VoiceData + 0xC00);
@@ -1730,7 +1731,7 @@ void _ExecuteExtraData()
                 voice = p_VoiceData;
                 do {
                     if ((musicBase <= *voice) && (*voice < musicBase + (u32)soundControl->m_trackCount * 0x154)) {
-                        voice[0x2E] |= 2;
+                        ((RedVoiceDATA*)voice)->m_updateFlags |= 2;
                     }
                     voice += 0x30;
                 } while (voice < p_VoiceData + 0xC00);
@@ -1756,7 +1757,7 @@ void _ExecuteExtraData()
                     (int)((RedTrackDATA*)*voice)->m_keyTranspose + (int)((RedTrackDATA*)*voice)->m_pitchBend,
                     *(int*)(voice[1] + 0x14),
                     ((RedTrackDATA*)*voice)->m_fineTune);
-                voice[0x2E] |= 1;
+                ((RedVoiceDATA*)voice)->m_updateFlags |= 1;
             }
             voice += 0x30;
         } while (voice < p_VoiceData + 0xC00);
@@ -1774,7 +1775,7 @@ void _ExecuteExtraData()
                     if (*track != 0) {
                         do {
                             if ((int*)*voice == track) {
-                                voice[0x2E] |= 2;
+                                ((RedVoiceDATA*)voice)->m_updateFlags |= 2;
                             }
                             voice += 0x30;
                         } while (voice < p_VoiceData + 0xC00);

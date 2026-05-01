@@ -138,7 +138,7 @@ struct RedSoundCONTROL {
 	int m_savedTempo;
 	int m_savedTempoAdd;
 	int m_savedTempoDelta;
-	int m_savedTickCounter;
+	int m_savedActiveTrackCount;
 	int m_savedMeasure;
 	int m_savedTick;
 	int m_savedTicksPerMeasure;

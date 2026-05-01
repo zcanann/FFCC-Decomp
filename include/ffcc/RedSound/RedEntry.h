@@ -46,6 +46,14 @@ struct RedSeINFO
 	unsigned char m_sequence[1];
 };
 
+struct RedSeBlockHEAD
+{
+	unsigned char m_unk00[0x0A];
+	short m_seCount;
+	int m_size;
+	int m_entries[1];
+};
+
 struct RedWaveHeadWD
 {
 	char m_signature[2];

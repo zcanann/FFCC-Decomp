@@ -468,17 +468,17 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 	no = no & 0x1FF;
 
 	if (p_SeBlockData[bank] != 0) {
-		int bankData = (int)p_SeBlockData[bank];
+		RedSeBlockHEAD* bankData = reinterpret_cast<RedSeBlockHEAD*>(p_SeBlockData[bank]);
 		int seNo = no;
 
 		no += bank << 9;
 		no |= 0x80000000;
-		if (seNo < *(short*)(bankData + 10)) {
-			int dataBase = bankData + 0x10;
+		if (seNo < bankData->m_seCount) {
+			int dataBase = reinterpret_cast<int>(bankData->m_entries);
 
 			if (*(int*)(dataBase + seNo * 4) != -1) {
 				RedSeINFO* seInfo =
-				    (RedSeINFO*)(dataBase + *(short*)(bankData + 10) * 4 +
+				    (RedSeINFO*)(dataBase + bankData->m_seCount * 4 +
 				                 (*(unsigned int*)(dataBase + seNo * 4) & 0x7FFFFFFF));
 
 				if ((*(unsigned int*)(dataBase + seNo * 4) & 0x80000000) != 0) {

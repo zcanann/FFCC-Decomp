@@ -15,6 +15,7 @@
 #include "ffcc/system.h"
 #include "ffcc/util.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
+#include "dolphin/gx/GXFrameBuffer.h"
 #include "dolphin/vi.h"
 #include "dolphin/vi/vifuncs.h"
 
@@ -150,10 +151,8 @@ int checkThread(void*)
  */
 void CGraphic::Init()
 {
-    CMemory::CStage* stageMain = Memory.CreateStage(0x19C000, const_cast<char*>(s_CGraphic_801d6330), 0);
-    CMemory::CStage* stageTemp = Memory.CreateStage(0xD6000, const_cast<char*>(sGraphicMemoryStageName), 0);
-    PtrAt(this, 0x4) = stageMain;
-    PtrAt(this, 0x8) = stageTemp;
+    PtrAt(this, 0x4) = Memory.CreateStage(0x19C000, const_cast<char*>(s_CGraphic_801d6330), 0);
+    PtrAt(this, 0x8) = Memory.CreateStage(0xD6000, const_cast<char*>(sGraphicMemoryStageName), 0);
 
     S32At(this, 0x14) = 0;
     U8At(this, 0x7200) = 0;
@@ -161,8 +160,8 @@ void CGraphic::Init()
     U8At(this, 0x7202) = 0;
     U8At(this, 0x7203) = 0;
 
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204) = 0.0f;
     *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208) = 0.0f;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204) = 0.0f;
 
     U8At(this, 0x735F) = U8At(this, 0x7200);
     U8At(this, 0x7360) = U8At(this, 0x7201);
@@ -170,29 +169,29 @@ void CGraphic::Init()
     U8At(this, 0x7362) = U8At(this, 0x7203);
     memset(reinterpret_cast<u8*>(this) + 0x7364, 0, 0x10);
 
-    OSCreateThread(&m_thread, reinterpret_cast<void* (*)(void*)>(checkThread), nullptr, m_threadStack, 0x4000, 1, 1);
+    OSCreateThread(&m_thread, reinterpret_cast<void* (*)(void*)>(checkThread), nullptr, m_threadStack + sizeof(m_threadStack),
+                   0x4000, 1, 1);
     OSResumeThread(&m_thread);
 
     VIInit();
     PtrAt(this, 0x71E0) = &gDefaultGXRenderMode;
     S32At(this, 0x71F0) = 1;
 
-    void* renderMode = PtrAt(this, 0x71E0);
-    u32 alignedWidth = (U16At(renderMode, 4) + 0xF) & 0xFFF0;
-    u16 efbHeight = U16At(renderMode, 6);
-    u16 xfbHeight = U16At(renderMode, 8);
+    u32 alignedWidth = (U16At(PtrAt(this, 0x71E0), 4) + 0xF) & 0xFFF0;
+    u32 efbBufferSize = alignedWidth * U16At(PtrAt(this, 0x71E0), 6) * 2;
+    u32 xfbBufferSize = alignedWidth * U16At(PtrAt(this, 0x71E0), 8) * 2;
 
     PtrAt(this, 0x71E4) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), const_cast<char*>(s_graphic_cpp_801d6348), 0x86)
-        u8[alignedWidth * xfbHeight * 2];
+        u8[xfbBufferSize];
     memset(PtrAt(this, 0x71E4), 0, 4);
 
     PtrAt(this, 0x71EC) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), const_cast<char*>(s_graphic_cpp_801d6348), 0x88)
-        u8[alignedWidth * efbHeight * 2];
+        u8[efbBufferSize];
     memset(PtrAt(this, 0x71EC), 0, 4);
 
-    PtrAt(this, 0x71E8) = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, alignedWidth * efbHeight * 2 + 0x46000,
-                                                                     reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
-                                                                     const_cast<char*>(s_graphic_cpp_801d6348), 0xB53, 0);
+    PtrAt(this, 0x71E8) = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+        &Memory, (((U16At(PtrAt(this, 0x71E0), 4) + 0xF) & 0xFFF0) * U16At(PtrAt(this, 0x71E0), 6) * 2) + 0x46000,
+        reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)), const_cast<char*>(s_graphic_cpp_801d6348), 0xB53, 0);
     memset(PtrAt(this, 0x71E8), 0, 0x46004);
 
     PtrAt(this, 0x10) =
@@ -201,28 +200,29 @@ void CGraphic::Init()
     VIConfigure(reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0)));
     GXInit(PtrAt(this, 0x10), 0x60000);
 
-    GXSetViewport(0.0f, 0.0f, static_cast<f32>(U16At(renderMode, 4)), static_cast<f32>(U16At(renderMode, 6)), 0.0f, 1.0f);
-    GXSetScissor(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
-    GXSetDispCopyYScale(GXGetYScaleFactor(U16At(renderMode, 6), U16At(renderMode, 8)));
-    GXSetDispCopySrc(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
-    GXSetDispCopyDst(U16At(renderMode, 4), U16At(renderMode, 6));
-    GXSetCopyFilter(reinterpret_cast<GXRenderModeObj*>(renderMode)->aa,
-                    reinterpret_cast<GXRenderModeObj*>(renderMode)->sample_pattern, GX_TRUE, DAT_801E83F2);
+    GXSetViewport(0.0f, 0.0f, static_cast<f32>(U16At(PtrAt(this, 0x71E0), 4)),
+                  static_cast<f32>(U16At(PtrAt(this, 0x71E0), 6)), 0.0f, 1.0f);
+    GXSetScissor(0, 0, U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
+    GXSetDispCopyYScale(GXGetYScaleFactor(U16At(PtrAt(this, 0x71E0), 6), U16At(PtrAt(this, 0x71E0), 8)));
+    GXSetDispCopySrc(0, 0, U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
+    GXSetDispCopyDst(U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
+    GXSetCopyFilter(reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0))->aa,
+                    reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0))->sample_pattern, GX_TRUE, GXNtsc480IntDf.vfilter);
 
-    if (reinterpret_cast<GXRenderModeObj*>(renderMode)->aa == 0) {
-        GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
+    if (reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0))->aa != 0) {
+        GXSetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
     } else {
-        GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
+        GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
     }
 
-    GXSetDispCopySrc(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
-    GXSetDispCopyDst(U16At(renderMode, 4), U16At(renderMode, 6));
+    GXSetDispCopySrc(0, 0, U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
+    GXSetDispCopyDst(U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
     GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
     GXSetDispCopyGamma(GX_GM_1_0);
     VISetNextFrameBuffer(PtrAt(this, 0x71E4));
     VIFlush();
     VIWaitForRetrace();
-    if ((*reinterpret_cast<u32*>(renderMode) & 1) != 0) {
+    if ((*reinterpret_cast<u32*>(PtrAt(this, 0x71E0)) & 1) != 0) {
         VIWaitForRetrace();
     }
 

@@ -2035,10 +2035,11 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
  */
 int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
 {
+    int* tick = (int*)((u8*)control + 0xc);
+
     frames <<= m_MusicFastSpeed;
     *(int*)((u8*)control + 0x484) = frames;
 
-    int* tick = (int*)((u8*)control + 0xc);
     tick[1] += frames;
 
     while (tick[1] >= tick[2]) {
@@ -2051,10 +2052,12 @@ int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int
     }
 
     *(int*)((u8*)control + 0x474) = 1;
-    if ((m_MusicPhraseStop == 0) && ((*(int*)((u8*)control + 0x46C) & 2) != 0)) {
-        *(int*)((u8*)control + 0x46C) &= ~2;
-        if ((*(int*)((u8*)control + 0x46C) & 1) != 0) {
-            *(s16*)((u8*)control + 0x48E) = 0;
+    if (m_MusicPhraseStop == 0) {
+        if ((*(int*)((u8*)control + 0x46C) & 2) != 0) {
+            *(int*)((u8*)control + 0x46C) &= ~2;
+            if ((*(int*)((u8*)control + 0x46C) & 1) != 0) {
+                *(s16*)((u8*)control + 0x48E) = 0;
+            }
         }
     }
 

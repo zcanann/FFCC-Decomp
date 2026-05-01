@@ -4,13 +4,21 @@
 struct RedKeyOnDATA;
 struct RedSoundCONTROL;
 
+struct RedNoteDATA {
+	signed char m_key;
+	signed char m_velocity;
+	unsigned char m_allocFlags;
+	unsigned char m_pad03;
+};
+
 struct RedTrackDATA {
 	unsigned char* m_command;
 	unsigned char m_pad04[0x08 - 0x04];
 	unsigned char* m_loopCommand[4];
 	int m_waveBankData;
 	int m_waveData;
-	unsigned char m_pad20[0x28 - 0x20];
+	unsigned char m_pad20[0x24 - 0x20];
+	RedNoteDATA m_note;
 	int m_volume;
 	int m_volumeAdd;
 	int m_volumeDelta;

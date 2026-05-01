@@ -1089,7 +1089,7 @@ void __MidiCtrl_VolumeDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 {
     int volume;
 
-    volume = *(*(unsigned char**)track)++;
+    volume = *track->m_command++;
     if (volume != 0) {
         volume++;
         volume <<= 8;
@@ -1097,9 +1097,9 @@ void __MidiCtrl_VolumeDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
         volume <<= 12;
     }
 
-    ((int*)track)[10] = volume;
-    ((int*)track)[0xb] = 0;
-    ((int*)track)[0xc] = 0;
+    track->m_volume = volume;
+    track->m_volumeAdd = 0;
+    track->m_volumeDelta = 0;
     m_ChangeStatus |= 2;
 }
 
@@ -1122,15 +1122,15 @@ void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
         delta[0]++;
     }
 
-    volume = *(*(unsigned char**)track)++;
+    volume = *track->m_command++;
     if (volume != 0) {
         volume++;
         volume <<= 8;
         volume--;
     }
 
-    ((int*)track)[0xb] = DataAddCompute((int*)track + 10, volume, delta);
-    ((int*)track)[0xc] = delta[0];
+    track->m_volumeAdd = DataAddCompute(&track->m_volume, volume, delta);
+    track->m_volumeDelta = delta[0];
 }
 
 /*
@@ -1144,11 +1144,11 @@ void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int value = ((int)(char)*(*(unsigned char**)track)++) << 0xc;
+    int value = ((int)(char)*track->m_command++) << 0xc;
 
-    ((int*)track)[0xd] = value;
-    ((int*)track)[0xe] = 0;
-    ((int*)track)[0xf] = 0;
+    track->m_expression = value;
+    track->m_expressionAdd = 0;
+    track->m_expressionDelta = 0;
     m_ChangeStatus |= 2;
 }
 
@@ -1171,9 +1171,9 @@ void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
         delta[0]++;
     }
 
-    expression = (char)*(*(unsigned char**)track)++;
-    ((int*)track)[0xe] = DataAddCompute((int*)track + 0xd, expression, delta);
-    ((int*)track)[0xf] = delta[0];
+    expression = (char)*track->m_command++;
+    track->m_expressionAdd = DataAddCompute(&track->m_expression, expression, delta);
+    track->m_expressionDelta = delta[0];
 }
 
 /*
@@ -1189,10 +1189,10 @@ void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     u32 pan;
 
-    pan = *(*reinterpret_cast<u8**>(track))++;
-    reinterpret_cast<int*>(track)[0x10] = pan << 0xc;
-    reinterpret_cast<int*>(track)[0x11] = 0;
-    reinterpret_cast<int*>(track)[0x12] = 0;
+    pan = *track->m_command++;
+    track->m_pan = pan << 0xc;
+    track->m_panAdd = 0;
+    track->m_panDelta = 0;
     if ((u32)reinterpret_cast<int*>(track)[0x2d] == 0) {
         reinterpret_cast<int*>(track)[0x33] = 0;
     }
@@ -1221,9 +1221,9 @@ void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 		((int*)track)[0x10] += ((int*)track)[0x33] * 0x1000;
 		((int*)track)[0x33] = 0;
 	}
-	pan = *(*(u8**)track)++;
-	((int*)track)[0x11] = DataAddCompute((int*)track + 0x10, pan, delta);
-	((int*)track)[0x12] = delta[0];
+	pan = *track->m_command++;
+	track->m_panAdd = DataAddCompute(&track->m_pan, pan, delta);
+	track->m_panDelta = delta[0];
 }
 
 /*

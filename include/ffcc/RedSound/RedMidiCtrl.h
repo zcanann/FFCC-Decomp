@@ -9,7 +9,17 @@ struct RedTrackDATA {
 	unsigned char m_pad04[0x18 - 0x04];
 	int m_waveBankData;
 	int m_waveData;
-	unsigned char m_pad20[0x11C - 0x20];
+	unsigned char m_pad20[0x28 - 0x20];
+	int m_volume;
+	int m_volumeAdd;
+	int m_volumeDelta;
+	int m_expression;
+	int m_expressionAdd;
+	int m_expressionDelta;
+	int m_pan;
+	int m_panAdd;
+	int m_panDelta;
+	unsigned char m_pad4C[0x11C - 0x4C];
 	int m_waveBase;
 	unsigned char m_pad120[0x124 - 0x120];
 	int m_waveNo;

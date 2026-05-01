@@ -1064,6 +1064,11 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     }
 }
 
+extern "C" const char lbl_80330CB8[] = "FFCC";
+extern "C" const char lbl_80330CC0[] = "GDS";
+extern "C" const char lbl_80330CC4[] = "GC";
+extern "C" const char lbl_80330CC8[] = "1.00";
+
 /*
  * --INFO--
  * PAL Address: UNUSED

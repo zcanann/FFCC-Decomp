@@ -67,6 +67,8 @@ static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 
 static const char s_CLightPcs_801D7C70[] = "CLightPcs";
+extern const char s_CManager_801D7C7C[] = "CManager";
+extern const char s_CProcess_801D7C88[] = "CProcess";
 
 unsigned int m_table_desc0__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
 unsigned int m_table_desc1__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};

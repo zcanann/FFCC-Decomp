@@ -62,6 +62,7 @@ unsigned short GetButtonDown__4CPadFl(void*, long);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 int sprintf(char*, const char*, ...);
 unsigned char gMapHitDrawMode;
+extern unsigned char s_bitMask;
 }
 extern unsigned char CFlat[0x10440];
 extern int gWmMenuWorkA;
@@ -606,15 +607,15 @@ extern "C" void SetEvtFlag__12CCaravanWorkFii(CCaravanWork* caravanWork, int evt
 {
     if (value != 0) {
         int byteIndex = evtFlagIndex / 8;
-        unsigned char bit = (unsigned char)(1 << (evtFlagIndex % 8));
+        int bit = 1 << (evtFlagIndex % 8);
         reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr)[byteIndex] |= bit;
         return;
     }
 
     {
         int byteIndex = evtFlagIndex / 8;
-        unsigned char bit = (unsigned char)(1 << (evtFlagIndex % 8));
-        reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr)[byteIndex] &= (unsigned char)~bit;
+        int bit = 1 << (evtFlagIndex % 8);
+        reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr)[byteIndex] &= ~bit;
     }
 }
 
@@ -630,11 +631,11 @@ extern "C" void SetEvtFlag__12CCaravanWorkFii(CCaravanWork* caravanWork, int evt
 extern "C" int GetEvtFlag__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtFlagIndex)
 {
     unsigned char* evtFlags = reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr);
-    int byteIndex = evtFlagIndex >> 3;
-    int bitIndex = evtFlagIndex & 7;
-    unsigned char mask = (unsigned char)(1u << bitIndex);
+    int byteIndex = evtFlagIndex / 8;
+    unsigned char value = evtFlags[byteIndex];
+    int mask = 1 << (evtFlagIndex % 8);
 
-    return (evtFlags[byteIndex] & mask) != 0;
+    return (value & mask) != 0;
 }
 
 /*
@@ -1266,7 +1267,7 @@ void CCameraPcs::GetWorldMapMatrix(float (*matrix)[4])
  */
 extern "C" void IsHitDrawMode__7CMapPcsFc(CMapPcs*, unsigned char drawMode)
 {
-    gMapHitDrawMode = drawMode;
+    s_bitMask = drawMode;
 }
 
 /*

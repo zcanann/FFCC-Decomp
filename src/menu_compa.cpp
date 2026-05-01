@@ -7,7 +7,6 @@
 #include "ffcc/system.h"
 #include <string.h>
 
-typedef signed short s16;
 typedef unsigned char u8;
 
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -50,35 +49,6 @@ static const char s_compa_musica[] = "Musica";
 static const char s_compa_mono[] = "Mono";
 static const char s_compa_contr[] = "Contr.";
 static const char s_compa_norm[] = "Norm.";
-
-struct CompaOpenAnim {
-	s16 x;
-	s16 y;
-	s16 w;
-	s16 h;
-	float u;
-	float v;
-	float alpha;
-	float uvScale;
-	int drawFlags;
-	int tex;
-	int frame;
-	int startFrame;
-	int duration;
-	unsigned int flags;
-	float dx;
-	float dy;
-	float targetX;
-	float targetY;
-};
-
-struct CompaOpenAnimList
-{
-	s16 count;
-	s16 pad_02;
-	int pad_04;
-	CompaOpenAnim entries[64];
-};
 
 struct CompaFlatTableEntry
 {
@@ -204,7 +174,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x16c) = 0;
 	*reinterpret_cast<int*>(iVar4 + 0x170) = 5;
 
-	*this->compaList = 6;
+	this->compaList->count = 6;
 	this->compaMenuState->selectedIndex = 0;
 	this->compaMenuState->initialized = 1;
 }
@@ -232,8 +202,8 @@ bool CMenuPcs::CompaOpen()
 
     finishedCount = 0;
     this->compaMenuState->frame = this->compaMenuState->frame + 1;
-    count = static_cast<unsigned short>(*this->compaList);
-    entry = reinterpret_cast<CompaOpenAnim*>(this->compaList + 4);
+    count = static_cast<unsigned short>(this->compaList->count);
+    entry = this->compaList->entries;
     frame = this->compaMenuState->frame;
     remaining = count;
     if (0 < count) {
@@ -276,8 +246,7 @@ void CMenuPcs::CompaCtrl()
 	bool activeInput = false;
 	unsigned short press;
 	short hold;
-	bool doReset = false;
-	CompaMenuState* compaState = this->compaMenuState;
+	int doReset = 0;
 
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		activeInput = true;
@@ -286,7 +255,9 @@ void CMenuPcs::CompaCtrl()
 	if (activeInput) {
 		press = 0;
 	} else {
-		press = Pad._8_2_;
+		int padIndex = activeInput;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		press = *reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
 	}
 
 	activeInput = false;
@@ -297,24 +268,26 @@ void CMenuPcs::CompaCtrl()
 	if (activeInput) {
 		hold = 0;
 	} else {
-		hold = Pad._20_2_;
+		int padIndex = activeInput;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		hold = *reinterpret_cast<short*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 0x14);
 	}
 
 	if (hold == 0) {
 		doReset = false;
 	} else if ((press & 0x20) != 0) {
-		compaState->cursorMove = 1;
+		this->compaMenuState->cursorMove = 1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = true;
 	} else if ((press & 0x40) != 0) {
-		compaState->cursorMove = -1;
+		this->compaMenuState->cursorMove = -1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = true;
 	} else if ((press & 0x100) != 0) {
 		Sound.PlaySe(4, 0x40, 0x7f, 0);
 		doReset = false;
 	} else if ((press & 0x200) != 0) {
-		compaState->closeRequested = 1;
+		this->compaMenuState->closeRequested = 1;
 		Sound.PlaySe(3, 0x40, 0x7f, 0);
 		doReset = true;
 	} else {
@@ -322,22 +295,22 @@ void CMenuPcs::CompaCtrl()
 	}
 
 	if (doReset) {
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[0].startFrame = 2;
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[0].duration = 5;
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[1].startFrame = 2;
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[1].duration = 5;
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[2].startFrame = 2;
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[2].duration = 5;
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[3].startFrame = 7;
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[3].duration = 5;
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[4].startFrame = 7;
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[4].duration = 5;
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[5].flags = 2;
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[5].startFrame = 7;
-		reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries[5].duration = 5;
+		this->compaList->entries[0].startFrame = 2;
+		this->compaList->entries[0].duration = 5;
+		this->compaList->entries[1].startFrame = 2;
+		this->compaList->entries[1].duration = 5;
+		this->compaList->entries[2].startFrame = 2;
+		this->compaList->entries[2].duration = 5;
+		this->compaList->entries[3].startFrame = 7;
+		this->compaList->entries[3].duration = 5;
+		this->compaList->entries[4].startFrame = 7;
+		this->compaList->entries[4].duration = 5;
+		this->compaList->entries[5].flags = 2;
+		this->compaList->entries[5].startFrame = 7;
+		this->compaList->entries[5].duration = 5;
 
-		unsigned int entryCount = *this->compaList;
-		CompaOpenAnim* entry = reinterpret_cast<CompaOpenAnimList*>(this->compaList)->entries;
+		unsigned int entryCount = this->compaList->count;
+		CompaOpenAnim* entry = this->compaList->entries;
 		while (entryCount != 0) {
 			entry->frame = 0;
 			entry->alpha = 1.0f;
@@ -366,8 +339,8 @@ bool CMenuPcs::CompaClose()
 
     finishedCount = 0;
     this->compaMenuState->frame = this->compaMenuState->frame + 1;
-    count = static_cast<unsigned short>(*this->compaList);
-    entry = reinterpret_cast<CompaOpenAnim*>(this->compaList + 4);
+    count = static_cast<unsigned short>(this->compaList->count);
+    entry = this->compaList->entries;
     frame = this->compaMenuState->frame;
     remaining = count;
     if (0 < count) {
@@ -414,7 +387,7 @@ void CMenuPcs::CompaDraw()
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
 	unsigned int scriptFood = Game.m_scriptFoodBase[0];
-	short* compaList = this->compaList;
+	short* compaList = reinterpret_cast<short*>(this->compaList);
 	short* entry = reinterpret_cast<short*>((int)compaList + 8);
 	int count = *compaList;
 	for (int i = 0; i < count; i++) {

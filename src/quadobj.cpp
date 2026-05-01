@@ -108,30 +108,30 @@ extern const float kOneF32 = 1.0f;
 void CGQuadObj::onDraw()
 {
     if (m_vertexCount != 0 && (*(u32*)(CFlat + 0x129C) & 0x10000) != 0) {
-        GXSetChanMatColor(GX_COLOR0A0, CColor(0xff, 0xff, 0xff, 0xff).color);
+        CColor color(0xff, 0xff, 0xff, 0xff);
+        GXColor drawColor = color.color;
+        GXSetChanMatColor(GX_COLOR0A0, drawColor);
         GXLoadPosMtxImm(CameraPcs.m_cameraMatrix, GX_PNMTX0);
         GXBegin(GX_LINES, GX_VTXFMT0, ((u32)m_vertexCount << 1) + ((u32)m_vertexCount << 2));
 
-        int next;
-        QuadVertex* vertex;
-        CGQuadObj* current = this;
         int i = 0;
+        CGQuadObj* current = this;
 
         while (i < (int)(u32)m_vertexCount) {
             u32 count;
+            QuadVertex* vertex = current->m_vertices;
+            int next = i + 1;
 
-            next = i + 1;
             i = i + 1;
             GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
             count = m_vertexCount;
-            int nextIndex = next % (int)count;
-            GXPosition3f32(m_vertices[nextIndex].x, m_yBase, m_vertices[nextIndex].z);
+            int nextBase = next % (int)count;
+            GXPosition3f32(m_vertices[nextBase].x, m_yBase, m_vertices[nextBase].z);
             GXPosition3f32(current->m_vertices[0].x, m_yBase + m_yHeight, current->m_vertices[0].z);
             count = m_vertexCount;
-            nextIndex = next % (int)count;
-            GXPosition3f32(m_vertices[nextIndex].x, m_yBase + m_yHeight, m_vertices[nextIndex].z);
+            int nextTop = next % (int)count;
+            GXPosition3f32(m_vertices[nextTop].x, m_yBase + m_yHeight, m_vertices[nextTop].z);
             GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
-            vertex = current->m_vertices;
             current = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(current) + sizeof(QuadVertex));
             GXPosition3f32(vertex->x, m_yBase + m_yHeight, vertex->z);
         }

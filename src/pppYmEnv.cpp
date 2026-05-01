@@ -100,9 +100,6 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     const float s_xAxisAngles[] = {0.0f, 90.0f, 180.0f, 270.0f};
     const unsigned char s_xAxisIds[] = {'x', 'x', 'x', 'x'};
     const float s_yAxisAngles[] = {0.0f, 1.0f};
-    const Vec s_cameraPos = {0.0f, 0.0f, 6.0f};
-    const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
-    const Vec s_cameraLook = {0.0f, 0.0f, 0.0f};
 
     const unsigned short texWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned short texHeight = GXGetTexObjHeight(targetTexObj);
@@ -111,9 +108,14 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
 
     const unsigned short modeOffset = (unsigned short)mode * 5;
 
-    _GXColor clearColor = {0, 0, 0, 0xFF};
-    _GXColor whiteColor = {0xFF, 0xFF, 0xFF, 0xFF};
-    _GXColor blackColor = {0, 0, 0, 0};
+    _GXColor clearColor;
+    clearColor.r = 0;
+    clearColor.g = 0;
+    clearColor.b = 0;
+    clearColor.a = 0xFF;
+    const Vec s_cameraPos = {0.0f, 0.0f, 6.0f};
+    const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
+    const Vec s_cameraLook = {0.0f, 0.0f, 0.0f};
 
     gUtil.RenderColorQuad(0.0f, 0.0f, texWidth, texHeight, clearColor);
 
@@ -138,6 +140,16 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
 
     GXSetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT1, GX_DF_NONE, GX_AF_NONE);
 
+    _GXColor whiteColor;
+    _GXColor blackColor;
+    whiteColor.r = 0xFF;
+    whiteColor.g = 0xFF;
+    whiteColor.b = 0xFF;
+    whiteColor.a = 0xFF;
+    blackColor.r = 0;
+    blackColor.g = 0;
+    blackColor.b = 0;
+    blackColor.a = 0;
     GXLightObj lightObj;
     GXInitLightColor(&lightObj, whiteColor);
     GXSetChanMatColor(GX_COLOR0A0, whiteColor);

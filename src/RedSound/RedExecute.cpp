@@ -1619,7 +1619,7 @@ void _KeyOnControl()
     {
         unsigned int* voice = p_VoiceData;
         do {
-            if ((voice[0x23] != 0) && (*voice != 0) && ((*(u32*)(*voice + 0xFC) & 9) == 0)) {
+            if ((voice[0x23] != 0) && (*voice != 0) && ((((RedTrackDATA*)*voice)->m_voiceSwitch & 9) == 0)) {
                 if (((voice[0x2E] & 2) != 0) || (*(int*)(*voice + 0x94) != 0) || (*(int*)(*voice + 0xB4) != 0)) {
                     int volume;
                     if ((*voice < *(u32*)p_SoundControlBuffer) ||

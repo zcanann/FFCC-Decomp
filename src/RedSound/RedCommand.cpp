@@ -758,7 +758,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		current = current + 4 + blockSize;
 		((RedTrackDATA*)track)->m_deltaTime = DeltaTimeSumup((unsigned char**)track) + 1;
 		((RedTrackDATA*)track)->m_seSepId = 0;
-		track[8] = (m_MusicKeySignature == 0) ? 0 : (int)(t_KeySignatureData + 0xb);
+		((RedTrackDATA*)track)->m_keySignatureData = (m_MusicKeySignature == 0) ? 0 : t_KeySignatureData + 0xb;
 		((RedTrackDATA*)track)->m_mixVolume = 0x7f000;
 		((RedTrackDATA*)track)->m_mixVolumeDelta = 0;
 		((RedTrackDATA*)track)->m_volume = 0x7fff000;

@@ -2267,9 +2267,9 @@ void CCharaPcs::drawOverlap()
  * JP Address: TODO
  * JP Size: TODO
  */
-void* CCharaPcs::CHandle::operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
+void* CCharaPcs::CHandle::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
 {
-    return ::operator new(size, stage, file, line);
+    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, StageAt(&CharaPcs, 0xC0), file, line, 0);
 }
 
 /*

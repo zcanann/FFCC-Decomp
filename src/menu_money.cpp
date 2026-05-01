@@ -43,32 +43,6 @@ extern double DOUBLE_80332FA0;
 
 extern CMenuPcs MenuPcs;
 
-namespace {
-static void UpdateDigits(unsigned int value, signed char* outDigits) {
-    int div = 10000000;
-    bool started = false;
-
-    for (int i = 0; i < 8; ++i) {
-        if (!started && div <= static_cast<int>(value)) {
-            started = true;
-        }
-
-        if (started || div <= static_cast<int>(value) || i > 6) {
-            int digit = static_cast<int>(value) / div;
-            if (digit > 9) {
-                digit = 9;
-            }
-            outDigits[i] = static_cast<signed char>(digit);
-            value -= digit * static_cast<unsigned int>(div);
-        } else {
-            outDigits[i] = -1;
-        }
-
-        div /= 10;
-    }
-}
-} // namespace
-
 unsigned int s_Money = 0;
 signed char s_place[16];
 
@@ -404,9 +378,9 @@ bool CMenuPcs::MoneyClose()
 	frame = this->moneyState->frame;
 
 	for (int i = 0; i < count; i++, anim++) {
-		float zero = FLOAT_80332f64;
 		if (anim->startFrame <= frame) {
 			if (!(frame < anim->startFrame + anim->duration)) {
+				float zero = FLOAT_80332f64;
 				finished++;
 				anim->progress = FLOAT_80332f64;
 				anim->dx = zero;
@@ -418,14 +392,19 @@ bool CMenuPcs::MoneyClose()
 					(float)-((DOUBLE_80332F90 / (double)anim->duration) * (double)anim->frame - DOUBLE_80332F90);
 				if ((anim->flags & 2) == 0) {
 					float ratio = (float)-((one / (double)anim->duration) * (double)anim->frame - one);
-					anim->dx = (anim->targetX - (float)anim->x) * ratio;
-					anim->dy = (anim->targetY - (float)anim->y) * ratio;
+					float dx = (anim->targetX - (float)anim->x) * ratio;
+					float dy = (anim->targetY - (float)anim->y) * ratio;
+					anim->dx = dx;
+					anim->dy = dy;
 				}
 			}
 		}
 	}
 
-	return count == finished;
+	if (count == finished) {
+		return true;
+	}
+	return false;
 }
 
 /*
@@ -447,9 +426,8 @@ void CMenuPcs::MoneyDraw()
 	s16 selectionState = moneyState->listState;
 	s16 mode = moneyState->mode;
 	s16* entry = reinterpret_cast<s16*>(moneyPanel->anims);
-	int count = moneyPanel->count;
 
-	for (int i = 0; i < count; i++, entry += 0x20) {
+	for (int i = 0; i < moneyPanel->count; i++, entry += 0x20) {
 		int tex = *(int*)(entry + 0xE);
 		if (tex < 0) {
 			continue;
@@ -463,7 +441,11 @@ void CMenuPcs::MoneyDraw()
 		float v = *(float*)(entry + 6);
 		float uvScale = *(float*)(entry + 10);
 		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
-		GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * *(float*)(entry + 8))};
+		GXColor color;
+		color.r = 0xFF;
+		color.g = 0xFF;
+		color.b = 0xFF;
+		color.a = (u8)(FLOAT_80332f60 * *(float*)(entry + 8));
 		GXSetChanMatColor(GX_COLOR0A0, color);
 		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332f64);
 	}
@@ -471,7 +453,11 @@ void CMenuPcs::MoneyDraw()
 	s16* drawBase = reinterpret_cast<s16*>(moneyPanel->anims);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x5D);
 	{
-		GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8))};
+		GXColor color;
+		color.r = 0xFF;
+		color.g = 0xFF;
+		color.b = 0xFF;
+		color.a = (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8));
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
 
@@ -492,7 +478,11 @@ void CMenuPcs::MoneyDraw()
 	if ((mode == 0) && (selectionState == 1)) {
 		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x48);
 		{
-			GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8))};
+			GXColor color;
+			color.r = 0xFF;
+			color.g = 0xFF;
+			color.b = 0xFF;
+			color.a = (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8));
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 
@@ -508,7 +498,11 @@ void CMenuPcs::MoneyDraw()
 	font->DrawInit();
 
 	{
-		GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8))};
+		GXColor color;
+		color.r = 0xFF;
+		color.g = 0xFF;
+		color.b = 0xFF;
+		color.a = (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8));
 		font->SetColor(color);
 	}
 

@@ -522,14 +522,14 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
 
     *((int*)track) = 0;
     if ((int*)control < (int*)((int)p_SoundControlBuffer + 0xdbc)) {
-        *(short*)((int)control + 0x48e) = *(short*)((int)control + 0x48e) - 1;
-        if ((*(short*)((int)control + 0x48e) == 0) &&
-            ((m_MusicPhraseStop == 1) || ((((int*)control)[0x11b] & 1) == 0))) {
+        control->m_activeTrackCount--;
+        if ((control->m_activeTrackCount == 0) &&
+            ((m_MusicPhraseStop == 1) || ((control->m_flags & 1) == 0))) {
             controlData = (unsigned int*)control;
             seTrack = p_VoiceData;
             do {
                 if ((controlData[0] <= seTrack[0]) &&
-                    (seTrack[0] < controlData[0] + (unsigned int)((unsigned char*)control)[0x491] * 0x154)) {
+                    (seTrack[0] < controlData[0] + (unsigned int)control->m_trackCount * 0x154)) {
                     seTrack[0x25] &= 0xfffffff3;
                     seTrack[0x24] &= 0xfffffffe;
                     seTrack[0x24] |= 2;
@@ -538,9 +538,9 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
                 seTrack += 0x30;
             } while (seTrack < p_VoiceData + 0xc00);
 
-            c_RedEntry.MusicHistoryManager(0, controlData[0x11c]);
-            c_RedEntry.WaveHistoryManager(0, controlData[0x11f]);
-            controlData[0x11c] = 0xffffffff;
+            c_RedEntry.MusicHistoryManager(0, control->m_musicId);
+            c_RedEntry.WaveHistoryManager(0, control->m_waveNo);
+            control->m_musicId = 0xffffffff;
             controlData[0x122] = 0;
             RedDelete((int)controlData[0]);
             controlData[0] = 0;

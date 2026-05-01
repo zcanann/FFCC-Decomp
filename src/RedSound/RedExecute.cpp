@@ -962,7 +962,7 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
     int* voiceData = (int*)param_2;
     s8* trackS8 = (s8*)param_1;
     s16* trackS16 = (s16*)param_1;
-    s8 note = *(s8*)param_3;
+    s8 note = param_3->m_key;
     unsigned int* voiceMask = (unsigned int*)param_4;
 
     voiceData[0] = (int)param_1;

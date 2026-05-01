@@ -7,20 +7,28 @@ class AXFX_BUFFERUPDATE;
 struct RedReverbDATA;
 struct RedTrackDATA;
 struct RedWaveDATA;
-struct RedNoteDATA;
 struct RedSoundCONTROL;
 struct RedKeyOnDATA;
 
+struct RedNoteDATA {
+	signed char m_key;
+	signed char m_velocity;
+	unsigned char m_allocFlags;
+	unsigned char m_pad03;
+};
+
 struct RedVoiceDATA {
 	RedTrackDATA* m_track;
-	RedNoteDATA* m_note;
 	RedWaveDATA* m_waveData;
-	void* m_unk0C;
-	void* m_unk10;
+	int* m_trackVolume;
+	int* m_trackExpression;
+	int* m_trackPan;
 	void* m_axVoice;
-	unsigned char m_pad18[0x1A - 0x18];
+	signed char m_key;
+	signed char m_velocity;
 	unsigned char m_stateFlags;
-	unsigned char m_pad1B[0x50 - 0x1B];
+	unsigned char m_notePad;
+	unsigned char m_pad1C[0x50 - 0x1C];
 	unsigned short m_adsrTime[4];
 	unsigned char m_adsrLevel[4];
 	int m_adsrStage;

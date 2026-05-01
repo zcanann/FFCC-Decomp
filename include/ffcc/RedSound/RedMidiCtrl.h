@@ -1,15 +1,10 @@
 #ifndef _FFCC_REDSOUND_REDMIDICTRL_H
 #define _FFCC_REDSOUND_REDMIDICTRL_H
 
+#include "ffcc/RedSound/RedExecute.h"
+
 struct RedKeyOnDATA;
 struct RedSoundCONTROL;
-
-struct RedNoteDATA {
-	signed char m_key;
-	signed char m_velocity;
-	unsigned char m_allocFlags;
-	unsigned char m_pad03;
-};
 
 struct RedTrackDATA {
 	unsigned char* m_command;

@@ -945,9 +945,12 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     baseDir.y = FLOAT_80330c80;
     baseDir.z = FLOAT_80330C90;
 
-    angle[0] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
-    angle[1] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
-    angle[2] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
+    angle[0] = (int)(range * Math.RandF() - spread);
+    angle[0] = (int)((float)(angle[0] << 15) / FLOAT_80330C98);
+    angle[1] = (int)(range * Math.RandF() - spread);
+    angle[1] = (int)((float)(angle[1] << 15) / FLOAT_80330C98);
+    angle[2] = (int)(range * Math.RandF() - spread);
+    angle[2] = (int)((float)(angle[2] << 15) / FLOAT_80330C98);
 
     pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
     PSMTXMultVecSR(rotMtx.value, &baseDir, &particle->m_direction);

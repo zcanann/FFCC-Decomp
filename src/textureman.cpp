@@ -255,19 +255,16 @@ void CPtrArray<CTexture*>::RemoveAll()
 template <>
 void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
 {
-    int offset = 0;
-
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        int* item = *(int**)((int)m_items + offset);
+        int* item = reinterpret_cast<int*>(m_items[i]);
         if (item != 0) {
             int refCount = item[1] - 1;
             item[1] = refCount;
             if (refCount == 0) {
                 delete reinterpret_cast<CTexture*>(item);
             }
-            *(unsigned int*)((int)m_items + offset) = 0;
+            m_items[i] = 0;
         }
-        offset += 4;
     }
 
     if (m_items != 0) {

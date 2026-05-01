@@ -850,13 +850,13 @@ void CRedEntry::DisplayWaveInfo()
  */
 void CRedEntry::SeSepHistoryAdd()
 {
-	unsigned int history = *(unsigned int*)((int)this + 4);
+	RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase);
 	do {
-		if (*(int*)(history + 4) != 0) {
-			*(int*)(history + 4) = *(int*)(history + 4) + 1;
+		if (history->m_historyNo != 0) {
+			history->m_historyNo = history->m_historyNo + 1;
 		}
-		history += 0x10;
-	} while (history < *(unsigned int*)((int)this + 4) + 0x1000);
+		history += 1;
+	} while (history < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + 0x1000));
 }
 
 /*
@@ -871,13 +871,13 @@ void CRedEntry::SeSepHistoryAdd()
 void CRedEntry::SeSepHistoryDelete(int historyNo)
 {
 	if (historyNo != 0) {
-		unsigned int history = *(unsigned int*)((int)this + 4);
+		RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase);
 		do {
-			if (*(int*)(history + 4) > historyNo) {
-				*(int*)(history + 4) = *(int*)(history + 4) - 1;
+			if (history->m_historyNo > historyNo) {
+				history->m_historyNo = history->m_historyNo - 1;
 			}
-			history += 0x10;
-		} while (history < *(unsigned int*)((int)this + 4) + 0x1000);
+			history += 1;
+		} while (history < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + 0x1000));
 	}
 }
 
@@ -892,15 +892,15 @@ void CRedEntry::SeSepHistoryDelete(int historyNo)
  */
 void CRedEntry::SeSepHistoryChoice(RedHistoryBANK* bank)
 {
-	if (((int*)bank)[1] != 0) {
-		unsigned int history = *(unsigned int*)((int)this + 4);
+	if (bank->m_historyNo != 0) {
+		RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase);
 		do {
-			if ((*(int*)(history + 4) != 0) && (*(int*)(history + 4) < ((int*)bank)[1])) {
-				*(int*)(history + 4) = *(int*)(history + 4) + 1;
+			if ((history->m_historyNo != 0) && (history->m_historyNo < bank->m_historyNo)) {
+				history->m_historyNo = history->m_historyNo + 1;
 			}
-			history += 0x10;
-		} while (history < *(unsigned int*)((int)this + 4) + 0x1000);
-		((int*)bank)[1] = 1;
+			history += 1;
+		} while (history < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + 0x1000));
+		bank->m_historyNo = 1;
 	}
 }
 
@@ -915,22 +915,22 @@ void CRedEntry::SeSepHistoryChoice(RedHistoryBANK* bank)
  */
 int CRedEntry::SearchSeSepSequence(int seNo)
 {
-	int* seSepBank = *(int**)((int)this + 4);
+	RedHistoryBANK* seSepBank = reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase);
 
 	if (seNo == -1) {
 		do {
-			if (seSepBank[3] != 0) {
-				return ((int)seSepBank - *(int*)((int)this + 4)) / 0x10;
+			if (seSepBank->m_size != 0) {
+				return (reinterpret_cast<int>(seSepBank) - m_seSepBankBase) / 0x10;
 			}
-			seSepBank += 4;
-		} while (seSepBank < (int*)(*(int*)((int)this + 4) + 0x1000));
+			seSepBank += 1;
+		} while (seSepBank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + 0x1000));
 	} else {
 		do {
-			if ((seSepBank[3] != 0) && (seSepBank[0] == seNo)) {
-				return ((int)seSepBank - *(int*)((int)this + 4)) / 0x10;
+			if ((seSepBank->m_size != 0) && (seSepBank->m_id == seNo)) {
+				return (reinterpret_cast<int>(seSepBank) - m_seSepBankBase) / 0x10;
 			}
-			seSepBank += 4;
-		} while (seSepBank < (int*)(*(int*)((int)this + 4) + 0x1000));
+			seSepBank += 1;
+		} while (seSepBank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + 0x1000));
 	}
 
 	return -1;
@@ -1118,13 +1118,13 @@ int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
  */
 int* CRedEntry::SearchSeSepBank(int seNo)
 {
-	int* seSepBank = (int*)*(int*)((int)this + 4);
+	RedHistoryBANK* seSepBank = reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase);
 	do {
-		if (seSepBank[0] == seNo) {
-			return seSepBank;
+		if (seSepBank->m_id == seNo) {
+			return reinterpret_cast<int*>(seSepBank);
 		}
-		seSepBank += 4;
-	} while ((unsigned int)seSepBank < (unsigned int)*(int*)((int)this + 4) + 0x1000);
+		seSepBank += 1;
+	} while (seSepBank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + 0x1000));
 
 	return 0;
 }
@@ -1248,14 +1248,14 @@ void CRedEntry::DisplaySePlayInfo()
  */
 void CRedEntry::MusicHistoryAdd()
 {
-	unsigned int history = static_cast<unsigned int>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8));
+	RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_musicBankBase);
 
 	do {
-		if (*reinterpret_cast<int*>(history + 4) != 0) {
-			*reinterpret_cast<int*>(history + 4) = *reinterpret_cast<int*>(history + 4) + 1;
+		if (history->m_historyNo != 0) {
+			history->m_historyNo = history->m_historyNo + 1;
 		}
-		history += 0x10;
-	} while (history < static_cast<unsigned int>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8)) + 0x40);
+		history += 1;
+	} while (history < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + 0x40));
 }
 
 /*
@@ -1266,13 +1266,13 @@ void CRedEntry::MusicHistoryAdd()
 void CRedEntry::MusicHistoryDelete(int historyNo)
 {
 	if (historyNo != 0) {
-		unsigned int history = (unsigned int)*(int*)((int)this + 8);
+		RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_musicBankBase);
 		do {
-			if (*(int*)(history + 4) > historyNo) {
-				*(int*)(history + 4) = *(int*)(history + 4) - 1;
+			if (history->m_historyNo > historyNo) {
+				history->m_historyNo = history->m_historyNo - 1;
 			}
-			history += 0x10;
-		} while (history < (unsigned int)*(int*)((int)this + 8) + 0x40);
+			history += 1;
+		} while (history < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + 0x40));
 	}
 }
 
@@ -1283,15 +1283,15 @@ void CRedEntry::MusicHistoryDelete(int historyNo)
  */
 void CRedEntry::MusicHistoryChoice(RedHistoryBANK* bank)
 {
-	if (((int*)bank)[1] != 0) {
-		unsigned int history = (unsigned int)*(int*)((int)this + 8);
+	if (bank->m_historyNo != 0) {
+		RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_musicBankBase);
 		do {
-			if ((*(int*)(history + 4) != 0) && (*(int*)(history + 4) < ((int*)bank)[1])) {
-				*(int*)(history + 4) = *(int*)(history + 4) + 1;
+			if ((history->m_historyNo != 0) && (history->m_historyNo < bank->m_historyNo)) {
+				history->m_historyNo = history->m_historyNo + 1;
 			}
-			history += 0x10;
-		} while (history < (unsigned int)*(int*)((int)this + 8) + 0x40);
-		((int*)bank)[1] = 1;
+			history += 1;
+		} while (history < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + 0x40));
+		bank->m_historyNo = 1;
 	}
 }
 
@@ -1306,14 +1306,14 @@ void CRedEntry::MusicHistoryChoice(RedHistoryBANK* bank)
  */
 int CRedEntry::SearchMusicSequence(int musicNo)
 {
-	int* musicBank = *(int**)((int)this + 8);
+	RedHistoryBANK* musicBank = reinterpret_cast<RedHistoryBANK*>(m_musicBankBase);
 
 	do {
-		if ((musicBank[3] != 0) && (*musicBank == musicNo)) {
-			return ((int)musicBank - *(int*)((int)this + 8)) / 0x10;
+		if ((musicBank->m_size != 0) && (musicBank->m_id == musicNo)) {
+			return (reinterpret_cast<int>(musicBank) - m_musicBankBase) / 0x10;
 		}
-		musicBank += 4;
-	} while (musicBank < (int*)(*(int*)((int)this + 8) + 0x40));
+		musicBank += 1;
+	} while (musicBank < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + 0x40));
 
 	return -1;
 }
@@ -1396,13 +1396,13 @@ unsigned int CRedEntry::MusicOldChoice()
  */
 int* CRedEntry::SearchMusicBank(int musicNo)
 {
-	int* musicBank = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8));
+	RedHistoryBANK* musicBank = reinterpret_cast<RedHistoryBANK*>(m_musicBankBase);
 	do {
-		if (musicBank[0] == musicNo) {
-			return musicBank;
+		if (musicBank->m_id == musicNo) {
+			return reinterpret_cast<int*>(musicBank);
 		}
-		musicBank += 4;
-	} while (musicBank < reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + 0x40));
+		musicBank += 1;
+	} while (musicBank < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + 0x40));
 
 	return 0;
 }

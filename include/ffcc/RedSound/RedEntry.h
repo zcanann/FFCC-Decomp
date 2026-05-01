@@ -14,7 +14,7 @@ struct RedMusicHEAD
 	char m_signature[4];
 	short m_musicNo;
 	short m_waveNo;
-	unsigned char m_trackCount;
+	char m_trackCount;
 	unsigned char m_unk09;
 	short m_reverbDepth;
 	unsigned short m_flags;

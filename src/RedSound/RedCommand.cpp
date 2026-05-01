@@ -710,7 +710,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		m_CrossTime = 0;
 	}
 
-	int trackBase = RedNew(*(char*)((char*)musicHead + 8) * 0x154);
+	int trackBase = RedNew(musicHead->m_trackCount * 0x154);
 	if (trackBase == 0) {
 		if (m_ReportPrint != 0) {
 			OSReport(sRedCommandMusicTrackCreateErrorFmt,
@@ -718,7 +718,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 			fflush(__files + 1);
 			OSReport(sRedCommandMusicNeedMemoryFmt,
 			         sRedCommandLogPrefix, sRedCommandLogErrorColor,
-			         (int)musicHead->m_musicNo, *(char*)((char*)musicHead + 8) * 0x154, sRedCommandLogReset);
+			         (int)musicHead->m_musicNo, musicHead->m_trackCount * 0x154, sRedCommandLogReset);
 			fflush(__files + 1);
 		}
 		c_RedEntry.DisplayMMemoryInfo();
@@ -743,7 +743,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 
 	unsigned char* current = (unsigned char*)musicHead + 0x20;
 	int* track = (int*)*music;
-	int count = *(char*)((char*)musicHead + 8);
+	int count = musicHead->m_trackCount;
 	char trackNo = 0;
 	while (count != 0) {
 		unsigned int blockSize = ((unsigned int)current[3] << 24) | ((unsigned int)current[2] << 16) |
@@ -807,8 +807,8 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	*(unsigned char*)((char*)music + 0x490) = 0;
 	music[0x120] = 0;
 	music[2] = (int)(t_KeySignatureData + 0xb);
-	*(unsigned char*)((char*)music + 0x491) = *(unsigned char*)((char*)musicHead + 8);
-	*(short*)((char*)music + 0x48e) = (short)*(char*)((char*)musicHead + 8);
+	*(unsigned char*)((char*)music + 0x491) = musicHead->m_trackCount;
+	*(short*)((char*)music + 0x48e) = (short)musicHead->m_trackCount;
 	*(unsigned char*)((char*)music + 0x492) = (unsigned char)(musicHead->m_flags & 0x7f);
 	*(short*)(music + 0x123) = 1;
 	music[0x112] = 0x1000;

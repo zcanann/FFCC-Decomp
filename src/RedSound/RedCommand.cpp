@@ -699,8 +699,8 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	}
 
 	m_MusicSkipLine = mode;
-	music[0x11c] = musicId;
-	music[0x11b] &= 0xfffeffff;
+	((RedSoundCONTROL*)music)->m_musicId = musicId;
+	((RedSoundCONTROL*)music)->m_flags &= 0xfffeffff;
 	((RedSoundCONTROL*)music)->m_updateFlags = 0;
 
 	if (m_CrossTime == 0) {
@@ -807,8 +807,8 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		}
 	}
 
-	music[0x11d] = 1;
-	*(unsigned char*)((char*)music + 0x490) = 0;
+	((RedSoundCONTROL*)music)->m_skipFrames = 1;
+	((RedSoundCONTROL*)music)->m_channelAlloc = 0;
 	((RedSoundCONTROL*)music)->m_keySignature = 0;
 	((RedSoundCONTROL*)music)->m_keySignatureData = t_KeySignatureData + 0xb;
 	((RedSoundCONTROL*)music)->m_trackCount = musicHead->m_trackCount;
@@ -826,9 +826,9 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	((RedSoundCONTROL*)music)->m_volume = volume;
 	((RedSoundCONTROL*)music)->m_volumeDelta = 0;
 	((RedSoundCONTROL*)music)->m_updateFlags = 0;
-	music[0x11b] &= 0x10;
+	((RedSoundCONTROL*)music)->m_flags &= 0x10;
 	if ((musicHead->m_playFlags & 0x40000) != 0) {
-		music[0x11b] |= 0x40000;
+		((RedSoundCONTROL*)music)->m_flags |= 0x40000;
 	}
 
 	c_RedEntry.WaveHistoryManager(1, ((RedSoundCONTROL*)music)->m_waveNo);
@@ -852,17 +852,17 @@ int MusicStop(int seId)
 	unsigned int* music = (unsigned int*)p_SoundControlBuffer;
 
 	do {
-		if ((seId == -1) || (((int)music[0x11c] >= 0) && ((int)music[0x11c] == seId))) {
-			unsigned int musicId = music[0x11c];
+		if ((seId == -1) || ((((RedSoundCONTROL*)music)->m_musicId >= 0) &&
+		                     (((RedSoundCONTROL*)music)->m_musicId == seId))) {
+			unsigned int musicId = ((RedSoundCONTROL*)music)->m_musicId;
 			((RedSoundCONTROL*)music)->m_updateFlags = 0;
-			music[0x11c] = -1;
-			if (*(short*)((char*)music + 0x48e) != 0) {
+			((RedSoundCONTROL*)music)->m_musicId = -1;
+			if (((RedSoundCONTROL*)music)->m_activeTrackCount != 0) {
 				unsigned int* seTrack = p_VoiceData;
 				do {
 					if ((*seTrack >= *music) &&
 					    (*seTrack <
-					     *music + (unsigned int)*(unsigned char*)((char*)music + 0x491) *
-					                   0x154)) {
+					     *music + (unsigned int)((RedSoundCONTROL*)music)->m_trackCount * 0x154)) {
 						seTrack[0x25] &= 0xfffffff3;
 						seTrack[0x24] &= 0xfffffffe;
 						seTrack[0x24] |= 2;
@@ -881,11 +881,10 @@ int MusicStop(int seId)
 					}
 					track += 0x55;
 				} while (track < (int*)(*music +
-				                        (unsigned int)*(unsigned char*)((char*)music + 0x491) *
-				                            0x154));
+				                        (unsigned int)((RedSoundCONTROL*)music)->m_trackCount * 0x154));
 
-				*(short*)((char*)music + 0x48e) = 0;
-				*(unsigned char*)((char*)music + 0x491) = 0;
+				((RedSoundCONTROL*)music)->m_activeTrackCount = 0;
+				((RedSoundCONTROL*)music)->m_trackCount = 0;
 				RedDelete((void*)*music);
 				*music = 0;
 				c_RedEntry.WaveHistoryManager(0, ((RedSoundCONTROL*)music)->m_waveNo);
@@ -896,12 +895,12 @@ int MusicStop(int seId)
 	} while (music < (unsigned int*)p_SoundControlBuffer + 0x24a);
 
 	music = (unsigned int*)p_SoundControlBuffer;
-	if (((int)music[0x11c] < 0) && ((int)music[0x241] >= 0)) {
-		memcpy((void*)p_SoundControlBuffer, (unsigned int*)p_SoundControlBuffer + 0x125, 0x494);
-		*(short*)((char*)music + 0x922) = 0;
-		*(unsigned char*)((char*)music + 0x925) = 0;
-		music[0x241] = -1;
-		music[0x125] = 0;
+	if ((((RedSoundCONTROL*)music)->m_musicId < 0) && (((RedSoundCONTROL*)music)[1].m_musicId >= 0)) {
+		memcpy((void*)p_SoundControlBuffer, (RedSoundCONTROL*)p_SoundControlBuffer + 1, 0x494);
+		((RedSoundCONTROL*)music)[1].m_activeTrackCount = 0;
+		((RedSoundCONTROL*)music)[1].m_trackCount = 0;
+		((RedSoundCONTROL*)music)[1].m_musicId = -1;
+		((RedSoundCONTROL*)music)[1].m_tracks = 0;
 	}
 
 	return seId;

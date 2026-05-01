@@ -4,7 +4,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/math.h"
 #include "ffcc/astar.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/sound.h"
 #include "ffcc/gbaque.h"

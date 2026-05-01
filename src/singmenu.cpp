@@ -8,7 +8,7 @@
 #include "ffcc/memory.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/pad.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/linkage.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/sound.h"

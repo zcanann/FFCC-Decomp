@@ -5,6 +5,7 @@
 
 CGoOutMenu g_GoOutMenu;
 CGoOutMenu* g_pGoOutMenu;
+int g_freeCaravanIdx;
 
 extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
@@ -306,7 +307,8 @@ void DrawGoOutMenu()
  */
 int getFreeCaravanIdx(Mc::SaveDat* saveData)
 {
-    return FindFreeCaravanIdx(saveData);
+    g_freeCaravanIdx = FindFreeCaravanIdx(saveData);
+    return g_freeCaravanIdx;
 }
 
 

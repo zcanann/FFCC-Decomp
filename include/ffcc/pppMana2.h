@@ -12,6 +12,7 @@ struct VMana2;
 struct pppMana2;
 struct pppMana2UnkB;
 struct pppMana2UnkC {
+    u8 _pad0[0xC];
     s32* m_serializedDataOffsets;
 };
 

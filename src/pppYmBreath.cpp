@@ -25,10 +25,11 @@ extern const float FLOAT_80330c80;
 extern const float FLOAT_80330c84;
 extern const float FLOAT_80330C90;
 extern const float FLOAT_80330C94;
-extern const float FLOAT_80330C98;
-extern const float FLOAT_80330C9C;
-extern const float FLOAT_80330CA8;
-extern const double DOUBLE_80330CB0;
+extern const float FLOAT_80330C98 = 180.0f;
+extern const float FLOAT_80330C9C = -180.0f;
+extern const double DOUBLE_80330CA0 = 4503599627370496.0;
+extern const float FLOAT_80330CA8 = 2.0f;
+extern const double DOUBLE_80330CB0 = 0.5;
 }
 
 struct pppYmBreathUnkC {
@@ -497,8 +498,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     _pppMngSt* mngSt;
     VYmBreath* work;
     VColor* color;
-    int* groupData;
-    PARTICLE_WMAT* particleWMat;
+    Mtx* particleWMat;
     Mtx* particleMtx;
     int i;
     short groupIndex;
@@ -592,11 +592,10 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     PSMTXCopy(mngSt->m_matrix.value, work->m_matrix);
     UpdateAllParticle(reinterpret_cast<_pppPObject*>(ymBreath), work, pYmBreath, color);
 
-    particleWMat = work->m_particleWmats;
-    groupData = (int*)work->m_groups;
+    particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
         slotCount = params->m_slotCount;
-        groupTable = (int)groupData;
+        groupTable = (int)((unsigned char*)work->m_groups + groupIndex * 0x5C);
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
             if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
                 (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {
@@ -621,7 +620,7 @@ group_ready:
             scaleMtx[0][0] = scaledOwner;
             scaleMtx[1][1] = scaledOwner;
             scaleMtx[2][2] = scaledOwner;
-            particleMtx = &particleWMat[firstParticle].m_matrix;
+            particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
             PSMTXConcat(*particleMtx, ymBreath->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
@@ -638,8 +637,6 @@ group_ready:
             pppSubVector(hitVector, target, origin);
             pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner, params->m_groupRadius);
         }
-
-        groupData += 0x17;
     }
 }
 
@@ -749,23 +746,25 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                 }
 
                 if ((params->m_emitInterval <= *emitFrameCounter) && (spawnCount < (int)params->m_emitCount)) {
+                    bool placing;
+
                     BirthParticle(pppObject, vYmBreath, pYmBreath, vColor, (PARTICLE_DATA*)particleData,
                                   (PARTICLE_WMAT*)particleWmat, (PARTICLE_COLOR*)particleColor);
-                    found = true;
+                    placing = true;
                     spawnCount += 1;
                     groupData = groupTable;
                     for (j = 0; j < (int)params->m_groupCount; j++) {
                         for (k = 0; k < (int)params->m_slotCount; k++) {
                             if ((groupData->particleIndices[k] == -1) && (groupData->particleStates[k] == -1)) {
                                 groupData->particleIndices[k] = (signed char)i;
-                                found = false;
+                                placing = false;
                                 groupData->particleStates[k] = 1;
                             }
-                            if (!found) {
+                            if (!placing) {
                                 break;
                             }
                         }
-                        if (!found) {
+                        if (!placing) {
                             break;
                         }
                         groupData += 1;
@@ -789,13 +788,13 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
         groupData = groupTable;
         for (i = 0; i < (int)params->m_groupCount; i++) {
             if ((groupData->active != 1) && (*groupData->particleIndices != -1) && (*groupData->particleStates == 1)) {
+                float zero = 0.0f;
+
                 unitVelocity.x = FLOAT_80330c80;
                 unitVelocity.y = FLOAT_80330c80;
                 unitVelocity.z = FLOAT_80330C90;
                 groupData->speed = params->m_groupSpeed;
                 pppCopyVector(groupData->direction, unitVelocity);
-                float zero = 0.0f;
-
                 groupData->position.z = zero;
                 groupData->position.y = zero;
                 groupData->position.x = zero;
@@ -805,12 +804,13 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             groupData += 1;
         }
 
+        groupData = groupTable;
         for (i = 0; i < (int)params->m_groupCount; i++) {
-            if (groupTable->active != 0) {
-                PSVECScale(&groupTable->direction, &stepVelocity, groupTable->speed);
-                PSVECAdd(&stepVelocity, &groupTable->position, &groupTable->position);
+            if (groupData->active != 0) {
+                PSVECScale(&groupData->direction, &stepVelocity, groupData->speed);
+                PSVECAdd(&stepVelocity, &groupData->position, &groupData->position);
             }
-            groupTable += 1;
+            groupData += 1;
         }
     }
 }
@@ -945,9 +945,12 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     baseDir.y = FLOAT_80330c80;
     baseDir.z = FLOAT_80330C90;
 
-    angle[0] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
-    angle[1] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
-    angle[2] = (int)((float)((int)(range * Math.RandF() - spread) << 15) / FLOAT_80330C98);
+    angle[0] = (int)(range * Math.RandF() - spread);
+    angle[0] = (int)((float)(angle[0] << 15) / FLOAT_80330C98);
+    angle[1] = (int)(range * Math.RandF() - spread);
+    angle[1] = (int)((float)(angle[1] << 15) / FLOAT_80330C98);
+    angle[2] = (int)(range * Math.RandF() - spread);
+    angle[2] = (int)((float)(angle[2] << 15) / FLOAT_80330C98);
 
     pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
     PSMTXMultVecSR(rotMtx.value, &baseDir, &particle->m_direction);

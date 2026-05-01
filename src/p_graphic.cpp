@@ -559,16 +559,13 @@ void CGraphicPcs::drawCopy()
 		Graphic.RenderBlur(initBlur, m_blurMode2, m_blurA, m_blurG, m_blurB, m_blurScale);
 
 		if (m_blurFadeOutFlag != 0) {
-			int blur = m_blurB;
-			int step = m_blurStep;
-			int remaining = blur - step;
-			if (remaining <= 0) {
+			if (m_blurB - m_blurStep <= 0) {
 				m_blurB = 0;
 				m_blurFadeOutFlag = 0;
 				m_blurMode = 0;
 				Graphic.m_blurActive = 0;
 			} else {
-				m_blurB = blur - step;
+				m_blurB -= m_blurStep;
 			}
 		}
 	}

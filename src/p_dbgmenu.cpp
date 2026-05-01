@@ -192,6 +192,7 @@ void CDbgMenuPcs::calc()
 {
 	unsigned short padInput;
 	unsigned int flags;
+	unsigned int padOffset;
 	int menuPtr;
 	int cursorPtr;
 	int stackData[3];
@@ -200,12 +201,12 @@ void CDbgMenuPcs::calc()
 		return;
 	}
 
-	if (Pad._452_4_ == 0) {
-		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ +
-		                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) *
-		                               0x54));
-	} else {
+	if (Pad._452_4_ != 0) {
 		padInput = 0;
+	} else {
+		padOffset = 4U;
+		padOffset &= ~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f);
+		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ + padOffset * 0x54);
 	}
 
 	if ((padInput & 0x100) != 0) {
@@ -263,7 +264,7 @@ void CDbgMenuPcs::calc()
 		case 0x72:
 			m_dbgFlags ^= 0x800;
 			flags = (unsigned int)__cntlzw(m_dbgFlags & 0x800);
-			reinterpret_cast<unsigned char*>(&PartPcs)[0x34] = (unsigned char)(flags >> 5);
+			PartPcs.m_usbStreamData.m_disableShokiDraw = (unsigned char)(flags >> 5);
 			break;
 		case 0x73:
 			m_dbgFlags ^= 0x1000;
@@ -293,12 +294,12 @@ void CDbgMenuPcs::calc()
 		}
 	}
 
-	if (Pad._452_4_ == 0) {
-		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ +
-		                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) *
-		                               0x54));
-	} else {
+	if (Pad._452_4_ != 0) {
 		padInput = 0;
+	} else {
+		padOffset = 4U;
+		padOffset &= ~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f);
+		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ + padOffset * 0x54);
 	}
 	if ((padInput & 4) != 0) {
 		CDM* start = m_selectedMenu;
@@ -312,12 +313,12 @@ void CDbgMenuPcs::calc()
 		m_selectedMenu->m_status = (m_selectedMenu->m_status & 0xBF) | 0x40;
 	}
 
-	if (Pad._452_4_ == 0) {
-		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ +
-		                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) *
-		                               0x54));
-	} else {
+	if (Pad._452_4_ != 0) {
 		padInput = 0;
+	} else {
+		padOffset = 4U;
+		padOffset &= ~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f);
+		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ + padOffset * 0x54);
 	}
 	if ((padInput & 8) != 0) {
 		CDM* start = m_selectedMenu;
@@ -335,18 +336,18 @@ void CDbgMenuPcs::calc()
 		calcMenu(m_rootMenuNode.m_firstChild);
 	}
 
-	if (Pad._452_4_ == 0) {
-		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ +
-		                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) *
-		                               0x54));
-	} else {
+	if (Pad._452_4_ != 0) {
 		padInput = 0;
+	} else {
+		padOffset = 4U;
+		padOffset &= ~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f);
+		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ + padOffset * 0x54);
 	}
 	if ((padInput & 0x200) != 0) {
 		memset(m_menuPool, 0, sizeof(m_menuPool));
 		m_rootMenuNode.m_firstChild = 0;
 		m_defaultMenu = 0;
-		m_currentMenu = 0;
+		m_selectedMenu = 0;
 	}
 
 	Pad._452_4_ = 1;

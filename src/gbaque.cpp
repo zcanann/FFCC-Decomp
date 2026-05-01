@@ -941,14 +941,17 @@ void GbaQueue::SetBuyData(int, unsigned int)
  */
 void GbaQueue::SetSmithData(int channel, unsigned int value)
 {
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
-	const unsigned int itemSlot = (value >> 8) & 0xFF;
+	unsigned int stackValue = value;
+	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
+	unsigned int* scriptFoodBase = Game.m_scriptFoodBase + channel;
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
+	const unsigned int itemSlot = valueBytes[2];
 	const unsigned short baseItem = caravanWork->m_inventoryItems[itemSlot];
 
 	caravanWork->DeleteItemIdx(itemSlot, 1);
 
 	const unsigned int itemTableBase = Game.unkCFlatData0[2] + static_cast<int>(baseItem) * 0x48;
-	const unsigned short smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + (value & 0xFF) * 2 + 0x38);
+	const unsigned short smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + valueBytes[3] * 2 + 0x38);
 
 	for (int i = 0; i < 3; i++) {
 		const unsigned short materialId = *reinterpret_cast<unsigned short*>(itemTableBase + i * 2 + 0x26);
@@ -964,7 +967,6 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		for (int materialIdx = 0; materialIdx < materialCount; materialIdx++) {
 			int foundSlot = 0;
 			int rowBase = 0;
-			int row = 0;
 			int remainingRows = 8;
 
 			do {
@@ -972,37 +974,36 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 					break;
 				}
 				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 1]) == static_cast<int>(materialId)) {
-					foundSlot += 1;
+					foundSlot = rowBase + 1;
 					break;
 				}
 				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 2]) == static_cast<int>(materialId)) {
-					foundSlot += 2;
+					foundSlot = rowBase + 2;
 					break;
 				}
 				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 3]) == static_cast<int>(materialId)) {
-					foundSlot += 3;
+					foundSlot = rowBase + 3;
 					break;
 				}
 				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 4]) == static_cast<int>(materialId)) {
-					foundSlot += 4;
+					foundSlot = rowBase + 4;
 					break;
 				}
 				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 5]) == static_cast<int>(materialId)) {
-					foundSlot += 5;
+					foundSlot = rowBase + 5;
 					break;
 				}
 				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 6]) == static_cast<int>(materialId)) {
-					foundSlot += 6;
+					foundSlot = rowBase + 6;
 					break;
 				}
 				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 7]) == static_cast<int>(materialId)) {
-					foundSlot += 7;
+					foundSlot = rowBase + 7;
 					break;
 				}
 
-				row++;
 				rowBase += 8;
-				foundSlot = row * 8;
+				foundSlot = rowBase;
 				remainingRows--;
 			} while (remainingRows != 0);
 
@@ -1010,17 +1011,17 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		}
 	}
 
-	if (AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), smithItem, 0) != 0) {
-		Joybus.SendResult(channel, 1, static_cast<unsigned char>(value >> 24), static_cast<unsigned char>(value >> 16));
+	if (AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(*scriptFoodBase), smithItem, 0) == 0) {
+		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 
-	const float smithRate = static_cast<float>(caravanWork->m_shopParam) / 100.0f;
+	const float smithRate = static_cast<float>(static_cast<double>(caravanWork->m_shopParam) / 100.0);
 	const int gilCost = -static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(itemTableBase + 0x24)) * smithRate);
-	if (AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), gilCost) != 0) {
-		Joybus.SendResult(channel, 1, static_cast<unsigned char>(value >> 24), static_cast<unsigned char>(value >> 16));
+	if (AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(*scriptFoodBase), gilCost) == 0) {
+		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 
-	Joybus.SendResult(channel, 0, static_cast<unsigned char>(value >> 24), static_cast<unsigned char>(value >> 16));
+	Joybus.SendResult(channel, 0, valueBytes[0], valueBytes[1]);
 }
 
 /*

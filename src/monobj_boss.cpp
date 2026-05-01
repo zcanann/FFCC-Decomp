@@ -1445,14 +1445,22 @@ int CGMonObj::calcBranchFuncLich(int)
  */
 void CGMonObj::changeStatFuncTetsukyojin(int stat)
 {
-	if (stat == 0x65) {
+	if (stat != 0x65) {
+		if (stat < 0x65) {
+			if (stat != -0xD) {
+				return;
+			}
+		} else if (stat == 0x67) {
+			setActionParam__8CGMonObjFi(this, -12);
+			return;
+		} else {
+			return;
+		}
+	} else {
 		setActionParam__8CGMonObjFi(this, -14);
-		*reinterpret_cast<int*>(SoundBuffer + 1260) += 1;
-	} else if (stat == -0xD) {
-		*reinterpret_cast<int*>(SoundBuffer + 1260) += 1;
-	} else if (stat == 0x67) {
-		setActionParam__8CGMonObjFi(this, -12);
 	}
+
+	*reinterpret_cast<int*>(SoundBuffer_1260_) += 1;
 }
 
 /*

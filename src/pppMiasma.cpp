@@ -197,10 +197,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         param_2->m_payload[0x1E] = 0xFE;
     }
 
-    packedColor.bytes[0] = colorData[8];
-    packedColor.bytes[1] = colorData[9];
-    packedColor.bytes[2] = colorData[10];
-    packedColor.bytes[3] = colorData[11];
+    packedColor.raw = *reinterpret_cast<u32*>(colorData + 8);
     packedWork.bytes[0] = (u8)(work[0] >> 7);
     packedWork.bytes[1] = (u8)(work[1] >> 7);
     packedWork.bytes[2] = (u8)(work[2] >> 7);

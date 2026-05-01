@@ -2216,9 +2216,11 @@ void CCameraPcs::calcPart()
 
     PSMTXInverse(reinterpret_cast<MtxPtr>(self + 0x4), invCamera);
 
-    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
+    float directionZ = FLOAT_8032fa38;
+    float directionXY = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xEC) = directionXY;
+    *reinterpret_cast<float*>(self + 0xF0) = directionXY;
+    *reinterpret_cast<float*>(self + 0xF4) = directionZ;
 
     PSMTXMultVecSR(invCamera, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
     PSVECAdd(reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xD4));

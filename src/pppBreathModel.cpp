@@ -144,8 +144,8 @@ struct BreathParticleData {
     u8 _pad48[0x08];
     s16 m_life;
     u8 _pad52[0x02];
-    u8 m_fadeOutFrames;
-    u8 m_fadeInFrames;
+    char m_fadeOutFrames;
+    char m_fadeInFrames;
     float m_angle;
     float m_angleVelocity;
     float m_angleRandom;
@@ -808,7 +808,6 @@ void UpdateParticle(
     PBreathModel* params = reinterpret_cast<PBreathModel*>(pBreathModel);
     BreathParticleData* particle = reinterpret_cast<BreathParticleData*>(particleData);
     int alpha = vColor->m_alpha;
-    char frameCount;
     Vec step;
 
     if (particleColor != NULL) {
@@ -857,11 +856,9 @@ void UpdateParticle(
     particle->m_scale += params->m_scaleAccel;
     if (params->m_disableScaleClamp == 0) {
         float zero = 0.0f;
-        if (zero < params->m_scaleClampStart) {
-            if (params->m_scaleAccel < zero) {
-                if (particle->m_scale < zero) {
-                    particle->m_scale = zero;
-                }
+        if ((zero < params->m_scaleClampStart) && (params->m_scaleAccel < zero)) {
+            if (particle->m_scale < zero) {
+                particle->m_scale = zero;
             }
         } else if (params->m_scaleClampStart < zero) {
             if ((zero < params->m_scaleAccel) && (zero < particle->m_scale)) {
@@ -878,13 +875,12 @@ void UpdateParticle(
     }
     particle->m_age = particle->m_age + 1;
 
-    frameCount = particle->m_fadeOutFrames;
-    if ((frameCount != '\0') && ((int)(unsigned int)particle->m_age <= (int)frameCount)) {
-        particle->m_alpha -= (float)alpha / (float)(int)frameCount;
+    if ((particle->m_fadeOutFrames != '\0') &&
+        ((int)(unsigned int)particle->m_age <= (int)particle->m_fadeOutFrames)) {
+        particle->m_alpha -= (float)alpha / (float)(int)particle->m_fadeOutFrames;
     }
 
-    frameCount = particle->m_fadeInFrames;
-    if ((frameCount != '\0') && ((int)particle->m_life <= (int)frameCount)) {
+    if ((particle->m_fadeInFrames != '\0') && ((int)particle->m_life <= (int)particle->m_fadeInFrames)) {
         particle->m_alpha += (float)alpha / (float)(unsigned int)params->m_fadeInFrames;
     }
 }

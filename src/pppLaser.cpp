@@ -319,15 +319,17 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             hit = 1;
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &work->m_points[i]);
             work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
-        } else if (i == 0 && work->m_spawnEnabled != 0) {
-            if (work->m_maxLength - FLOAT_80333458 < work->m_length) {
-                _pppMngSt* mngSt = pppMngStPtr;
-                s32 partIndex = ((s32)((u8*)mngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
-                work->m_length = work->m_maxLength - FLOAT_80333458;
-                ParticleFrameCallback__5CGameFiiiiiP3Vec(
-                    &Game, partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3,
-                    pppLaser->m_graphId / 0x1000, work->m_points);
-                work->m_spawnEnabled = 0;
+        } else if (i == 0) {
+            if (work->m_spawnEnabled != 0) {
+                if (work->m_maxLength - FLOAT_80333458 < work->m_length) {
+                    _pppMngSt* mngSt = pppMngStPtr;
+                    s32 partIndex = ((s32)((u8*)mngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
+                    work->m_length = work->m_maxLength - FLOAT_80333458;
+                    ParticleFrameCallback__5CGameFiiiiiP3Vec(
+                        &Game, partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3,
+                        pppLaser->m_graphId / 0x1000, work->m_points);
+                    work->m_spawnEnabled = 0;
+                }
             }
             if (work->m_spawnEnabled != 0) {
                 work->m_length += work->m_lengthStep;

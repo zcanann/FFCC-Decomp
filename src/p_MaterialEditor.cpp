@@ -537,12 +537,15 @@ void CMaterialEditorPcs::drawViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    static const char* pFan = sMaterialEditorSpinnerText;
+    static char* pFan = const_cast<char*>(sMaterialEditorSpinnerText);
     static int alive = 0;
 
     alive = alive + 1;
-    int idx = (alive >> 4) % 4;
-    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)(char)pFan[idx]);
+    int sign = alive >> 0x1f;
+    Printf__8CGraphicFPce(
+        &Graphic,
+        s_MaterialEditor_pctc_801D7D60,
+        (int)(char)pFan[(sign * 4 | (u32)((alive >> 4) * 0x40000000 + sign) >> 0x1e) - sign]);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
         return;
@@ -565,9 +568,11 @@ void CMaterialEditorPcs::drawViewer()
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
+        GXColor ambColor;
         GXColor matColor;
-        *reinterpret_cast<u32*>(&matColor) = kMaterialEditorDefaultColorRgba;
-        GXSetChanAmbColor(GX_COLOR0, matColor);
+        *reinterpret_cast<u32*>(&ambColor) = kMaterialEditorDefaultColorRgba;
+        *reinterpret_cast<u32*>(&matColor) = *reinterpret_cast<u32*>(&ambColor);
+        GXSetChanAmbColor(GX_COLOR0, ambColor);
         GXSetChanMatColor(GX_COLOR0, matColor);
 
         GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -741,11 +746,14 @@ void CMaterialEditorPcs::drawViewer()
                 GXSetArray(GX_VA_CLR0, polygon->_30, 4);
                 GXSetArray(GX_VA_TEX0, polygon->texCoord, 8);
 
-                u32 vertexIndex[8];
+                u32 vertexIndex[5];
+                u32 quadIndex2;
+                u32 quadIndex3;
+                u32 quadColorIndex;
                 u8 vertexCount = 3;
                 vertexIndex[4] = polygon->index0;
-                vertexIndex[5] = polygon->index1;
-                vertexIndex[6] = polygon->index2;
+                quadIndex2 = polygon->index1;
+                quadIndex3 = polygon->index2;
                 vertexIndex[0] = 0;
                 vertexIndex[1] = 1;
                 vertexIndex[2] = 2;
@@ -756,15 +764,16 @@ void CMaterialEditorPcs::drawViewer()
                 if ((polygon->flags & 0xf) == 1) {
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                     vertexCount = 4;
-                    vertexIndex[6] = polygon->index3;
-                    vertexIndex[7] = polygon->index2;
+                    quadIndex3 = polygon->index3;
+                    quadColorIndex = polygon->index2;
                     vertexIndex[2] = 3;
                     vertexIndex[3] = 2;
                 }
 
                 for (u8 i = 0; i < vertexCount; i++) {
-                    GXWGFifo.u16 = static_cast<u16>(vertexIndex[i + 4]);
-                    GXWGFifo.u16 = static_cast<u16>(vertexIndex[i + 4]);
+                    u32 index = (&vertexIndex[4])[i];
+                    GXWGFifo.u16 = static_cast<u16>(index);
+                    GXWGFifo.u16 = static_cast<u16>(index);
                     GXWGFifo.u8 = static_cast<u8>(vertexIndex[i]);
                     GXWGFifo.u16 = static_cast<u16>(vertexIndex[i]);
                 }

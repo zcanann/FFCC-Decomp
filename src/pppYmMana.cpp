@@ -109,7 +109,7 @@ void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned lon
 }
 
 static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, unsigned short* indicesOut, float size);
-static void UpdateWaterMesh(VYmMana* mana);
+static int UpdateWaterMesh(VYmMana* mana);
 static void RenderWaterMesh(VYmMana* mana);
 static void CalculateNormal(VYmMana* mana);
 static void CalcWaterReflectionVector(
@@ -1210,52 +1210,61 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
  * JP Address: TODO
  * JP Size: TODO
  */
-static void UpdateWaterMesh(VYmMana* mana)
+static int UpdateWaterMesh(VYmMana* mana)
 {
     u8* work;
     float* waterHeightA;
     float* waterHeightB;
     Vec* positions;
     Vec origin;
+    float currentScale;
+    float neighborScale;
 
     work = (u8*)mana;
     waterHeightA = *(float**)(work + 0x48);
     positions = *(Vec**)(work + 0x3C);
     waterHeightB = *(float**)(work + 0x4C);
     if (waterHeightA == NULL) {
-        return;
+        return 0;
     }
 
+    currentScale = FLOAT_80330e4c;
+    neighborScale = FLOAT_80330e5c;
     for (int row = 1; row < 0x10; row++) {
         int rowBase = row * 0x11;
         for (int colBlock = 0; colBlock < 3; colBlock++) {
             int col = colBlock * 5 + 1;
             int idx = rowBase + col;
 
-            waterHeightB[idx + 0] = FLOAT_80330e5c * waterHeightA[idx + 0] +
-                                    FLOAT_80330e4c * (waterHeightA[idx + 1] + waterHeightA[idx - 1] +
-                                                      waterHeightA[idx - 0x11] + waterHeightA[idx + 0x11]) -
-                                    waterHeightB[idx + 0];
+            waterHeightB[idx + 0] =
+                currentScale * waterHeightA[idx + 0] +
+                neighborScale *
+                    (waterHeightA[idx + 1] + waterHeightA[idx - 1] + waterHeightA[idx - 0x11] + waterHeightA[idx + 0x11]) -
+                waterHeightB[idx + 0];
 
-            waterHeightB[idx + 1] = FLOAT_80330e5c * waterHeightA[idx + 1] +
-                                    FLOAT_80330e4c * (waterHeightA[idx + 2] + waterHeightA[idx + 0] +
-                                                      waterHeightA[idx - 0x10] + waterHeightA[idx + 0x12]) -
-                                    waterHeightB[idx + 1];
+            waterHeightB[idx + 1] =
+                currentScale * waterHeightA[idx + 1] +
+                neighborScale *
+                    (waterHeightA[idx + 2] + waterHeightA[idx + 0] + waterHeightA[idx - 0x10] + waterHeightA[idx + 0x12]) -
+                waterHeightB[idx + 1];
 
-            waterHeightB[idx + 2] = FLOAT_80330e5c * waterHeightA[idx + 2] +
-                                    FLOAT_80330e4c * (waterHeightA[idx + 3] + waterHeightA[idx + 1] +
-                                                      waterHeightA[idx - 0x0F] + waterHeightA[idx + 0x13]) -
-                                    waterHeightB[idx + 2];
+            waterHeightB[idx + 2] =
+                currentScale * waterHeightA[idx + 2] +
+                neighborScale *
+                    (waterHeightA[idx + 3] + waterHeightA[idx + 1] + waterHeightA[idx - 0x0F] + waterHeightA[idx + 0x13]) -
+                waterHeightB[idx + 2];
 
-            waterHeightB[idx + 3] = FLOAT_80330e5c * waterHeightA[idx + 3] +
-                                    FLOAT_80330e4c * (waterHeightA[idx + 4] + waterHeightA[idx + 2] +
-                                                      waterHeightA[idx - 0x0E] + waterHeightA[idx + 0x14]) -
-                                    waterHeightB[idx + 3];
+            waterHeightB[idx + 3] =
+                currentScale * waterHeightA[idx + 3] +
+                neighborScale *
+                    (waterHeightA[idx + 4] + waterHeightA[idx + 2] + waterHeightA[idx - 0x0E] + waterHeightA[idx + 0x14]) -
+                waterHeightB[idx + 3];
 
-            waterHeightB[idx + 4] = FLOAT_80330e5c * waterHeightA[idx + 4] +
-                                    FLOAT_80330e4c * (waterHeightA[idx + 5] + waterHeightA[idx + 3] +
-                                                      waterHeightA[idx - 0x0D] + waterHeightA[idx + 0x15]) -
-                                    waterHeightB[idx + 4];
+            waterHeightB[idx + 4] =
+                currentScale * waterHeightA[idx + 4] +
+                neighborScale *
+                    (waterHeightA[idx + 5] + waterHeightA[idx + 3] + waterHeightA[idx - 0x0D] + waterHeightA[idx + 0x15]) -
+                waterHeightB[idx + 4];
         }
     }
 
@@ -1274,6 +1283,7 @@ static void UpdateWaterMesh(VYmMana* mana)
     origin.z = *(float*)(work + 0xB4);
     CalcWaterReflectionVector(*(Vec**)(work + 0x44), *(Vec**)(work + 0x3C), *(Vec**)(work + 0x40), 0x121, origin,
                               (float(*)[4])(work + 0x88), *(_GXColor**)(work + 0x5C), *(Vec2d**)(work + 0x58));
+    return 1;
 }
 
 /*
@@ -1556,6 +1566,7 @@ static void CalcWaterReflectionVector(
     Vec reflected;
     Mtx inverseMtx;
     Mtx matrixNoTranslate;
+    Vec* reflectionIt;
     float* texCoordFloat;
     unsigned char* colorBytes;
     double zero;
@@ -1593,33 +1604,34 @@ static void CalcWaterReflectionVector(
 
     texCoordFloat = (float*)texCoord;
     colorBytes = (unsigned char*)color;
+    reflectionIt = reflectionVec;
     zero = (double)FLOAT_80330e4c;
     half = (double)FLOAT_80330e5c;
 
     for (i = 0; i < count; i++) {
         PSVECSubtract(positions, &transformedCameraPos, &reflected);
-        C_VECReflect(&reflected, normals, reflectionVec);
-        PSMTXMultVec(matrixNoTranslate, reflectionVec, reflectionVec);
-        PSVECNormalize(reflectionVec, reflectionVec);
+        C_VECReflect(&reflected, normals, reflectionIt);
+        PSMTXMultVec(matrixNoTranslate, reflectionIt, reflectionIt);
+        PSVECNormalize(reflectionIt, reflectionIt);
 
-        if ((double)reflectionVec->z < zero) {
-            colorBytes[0] = 0x80;
-            colorBytes[1] = 0xff;
-            colorBytes[2] = 0x80;
-            colorBytes[3] = 0x7f;
-            *texCoordFloat = -reflectionVec->x / (FLOAT_80330e58 - reflectionVec->z);
-            texCoordFloat[1] = -reflectionVec->y / (FLOAT_80330e58 - reflectionVec->z);
-        } else {
+        if (zero <= (double)reflectionIt->z) {
             colorBytes[0] = 0x80;
             colorBytes[1] = 0x80;
             colorBytes[2] = 0xff;
             colorBytes[3] = 0xbc;
-            *texCoordFloat = -reflectionVec->x / (FLOAT_80330e58 + reflectionVec->z);
-            texCoordFloat[1] = -reflectionVec->y / (FLOAT_80330e58 + reflectionVec->z);
+            *texCoordFloat = -reflectionIt->x / (FLOAT_80330e58 + reflectionIt->z);
+            texCoordFloat[1] = -reflectionIt->y / (FLOAT_80330e58 + reflectionIt->z);
+        } else {
+            colorBytes[0] = 0x80;
+            colorBytes[1] = 0xff;
+            colorBytes[2] = 0x80;
+            colorBytes[3] = 0x7f;
+            *texCoordFloat = -reflectionIt->x / (FLOAT_80330e58 - reflectionIt->z);
+            texCoordFloat[1] = -reflectionIt->y / (FLOAT_80330e58 - reflectionIt->z);
         }
 
         positions++;
-        reflectionVec++;
+        reflectionIt++;
         normals++;
         colorBytes += 4;
         *texCoordFloat = (float)((double)*texCoordFloat * half);
@@ -1629,7 +1641,7 @@ static void CalcWaterReflectionVector(
         texCoordFloat += 2;
     }
 
-    DCFlushRange(reflectionVec - count, count * sizeof(Vec));
+    DCFlushRange(reflectionVec, count * sizeof(Vec));
     DCFlushRange(texCoord, count * sizeof(Vec2d));
 }
 

@@ -2518,7 +2518,6 @@ CMaterial::~CMaterial()
  */
 CMaterial::CMaterial()
 {
-    *reinterpret_cast<void**>(this) = __vt__9CMaterial;
     __construct_array(Ptr(this, 0x4C), __ct__10CTexScrollFv, __dt__10CTexScrollFv, 0x14, 4);
     memset(Ptr(this, 0x8), 0, 0x10);
     *reinterpret_cast<int*>(Ptr(this, 0x9C)) = -1;
@@ -3176,11 +3175,8 @@ CMaterialSet::~CMaterialSet()
  */
 CMaterialSet::CMaterialSet()
 {
-    CPtrArray<CMaterial*>* const materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
-
-    *reinterpret_cast<void**>(this) = __vt__12CMaterialSet;
-    __ct__22CPtrArray_P9CMaterial_Fv(materials);
-    materials->SetStage(MaterialMan.GetMemoryStage());
+    __ct__22CPtrArray_P9CMaterial_Fv(Ptr(this, 8));
+    reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8))->SetStage(MaterialMan.GetMemoryStage());
 }
 
 /*

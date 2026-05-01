@@ -2153,21 +2153,22 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
  */
 int GbaQueue::MakeLetterList(int channel, char* outData)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	GbaQueueFlagView* flags = GetFlagView(this);
 	const unsigned int scriptFood = Game.m_scriptFoodBase[channel];
-	const unsigned char channelMask = static_cast<unsigned char>(1U << channel);
 
 	if (scriptFood == 0) {
-		self[0x2C8A] = static_cast<unsigned char>(self[0x2C8A] | channelMask);
+		const unsigned char channelMask = static_cast<unsigned char>(1U << channel);
+
+		flags->m_letterDatFlg = static_cast<unsigned char>(flags->m_letterDatFlg | channelMask);
 		Joybus.SetLetterSize(channel, 0);
-		self[0x2C89] = static_cast<unsigned char>(self[0x2C89] & ~channelMask);
+		m_letterFlags = static_cast<unsigned char>(m_letterFlags & ~channelMask);
 		return 0;
 	}
 
 char* npcNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x800, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7A7));
+0x800, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7A7));
 	if (npcNameBuf == 0) {
-		if (System.m_execParam != 0) {
+		if (System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7A9);
 		}
 		return -1;
@@ -2175,9 +2176,9 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 	memset(npcNameBuf, 0, 0x800);
 
 char* subjectNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x1800, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B1));
+0x1800, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B1));
 	if (subjectNameBuf == 0) {
-		if (System.m_execParam != 0) {
+		if (System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B3);
 		}
 		return -1;
@@ -2185,9 +2186,9 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 	memset(subjectNameBuf, 0, 0x1800);
 
 unsigned int* letterEntryBuf = static_cast<unsigned int*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x4000, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7BB));
+0x4000, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7BB));
 	if (letterEntryBuf == 0) {
-		if (System.m_execParam != 0) {
+		if (System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7BD);
 		}
 		return -1;
@@ -2207,6 +2208,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
 	char** npcTable = flatData->m_tabl[2].m_strings;
 	char** subjectTable = flatData->m_tabl[5].m_strings;
+	char tempName[0x20];
 
 	for (int i = 0; i < static_cast<int>(letterCount); i++) {
 		int matchedSubject = -1;
@@ -2230,12 +2232,11 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 		}
 
 		if (matchedNpc == -1) {
-			if (npcCount > 0x7F && System.m_execParam != 0) {
+			if (npcCount > 0x7F && System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7DC);
 			}
 
-			char tempName[0x20];
-			memset(tempName, 0, sizeof(tempName));
+			memset(tempName, 0, 0x20);
 			strcpy(tempName, npcTable[(curWord >> 9) & 0x1FF]);
 			memcpy(npcWrite, tempName, 0x10);
 			npcWrite += 0x10;
@@ -2247,14 +2248,13 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_npc_max_over), const_cast<char
 		}
 
 		if (matchedSubject == -1) {
-			if (subjectCount > 0xFF && System.m_execParam != 0) {
+			if (subjectCount > 0xFF && System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7F0);
 			}
 
-			char tempSubject[0x20];
-			memset(tempSubject, 0, sizeof(tempSubject));
-			strcpy(tempSubject, subjectTable[(curHalf >> 2) & 0x1FF]);
-			memcpy(subjectWrite, tempSubject, 0x18);
+			memset(tempName, 0, 0x20);
+			strcpy(tempName, subjectTable[(curHalf >> 2) & 0x1FF]);
+			memcpy(subjectWrite, tempName, 0x18);
 			subjectWrite += 0x18;
 			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount);
 			subjectCount++;
@@ -2283,7 +2283,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<
 				if (value < 0x100 || value > 0x124) {
 					flags |= 0x10;
 					entryWrite[0] = (value << 24) | ((value >> 8) << 16);
-				} else if (System.m_execParam != 0) {
+				} else if (System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0x810, channel, i);
 				}
 			}
@@ -2321,9 +2321,11 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast
 	__dla__FPv(subjectNameBuf);
 	__dla__FPv(npcNameBuf);
 
-	self[0x2C8A] = static_cast<unsigned char>(self[0x2C8A] | channelMask);
+	const unsigned char channelMask = static_cast<unsigned char>(1U << channel);
+
+	flags->m_letterDatFlg = static_cast<unsigned char>(flags->m_letterDatFlg | channelMask);
 	Joybus.SetLetterSize(channel, totalSize);
-	self[0x2C89] = static_cast<unsigned char>(self[0x2C89] & ~channelMask);
+	m_letterFlags = static_cast<unsigned char>(m_letterFlags & ~channelMask);
 	return totalSize;
 }
 
@@ -2335,9 +2337,9 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast
 int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 {
 char* srcText = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x859));
+0x400, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x859));
     if (srcText == 0) {
-        if (System.m_execParam != 0) {
+        if ((unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x85B);
         }
         return -1;
@@ -2345,12 +2347,11 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
     memset(srcText, 0, 0x400);
 
 char* workText = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x862));
+0x400, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x862));
     if (workText == 0) {
-        if (System.m_execParam != 0) {
+        if ((unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x864);
         }
-        __dla__FPv(srcText);
         return -1;
     }
     memset(workText, 0, 0x400);
@@ -2382,7 +2383,8 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
     __dla__FPv(workText);
     __dla__FPv(srcText);
 
-    reinterpret_cast<unsigned char*>(this)[0x2C89] |= static_cast<unsigned char>(0x10 << channel);
+    GetFlagView(this)->m_letterDatFlg =
+        static_cast<unsigned char>(GetFlagView(this)->m_letterDatFlg | static_cast<unsigned char>(0x10 << channel));
     Joybus.SetLetterSize(channel, totalSize);
     return totalSize;
 }
@@ -3663,9 +3665,9 @@ void GbaQueue::SmithEnd(int channel)
 void GbaQueue::MakeBuyData(int channel, char* outData)
 {
 char* itemNameScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xD79));
+0x400, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xD79));
 	if (itemNameScratch == 0) {
-		if (System.m_execParam != 0) {
+		if (System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xD7B);
 		}
 		return;
@@ -3673,12 +3675,11 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 	memset(itemNameScratch, 0, 0x400);
 
 char* agbStringScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xD82));
+0x400, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xD82));
 	if (agbStringScratch == 0) {
-		if (System.m_execParam != 0) {
+		if (System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xD84);
 		}
-		__dla__FPv(itemNameScratch);
 		return;
 	}
 	memset(agbStringScratch, 0, 0x400);
@@ -3766,9 +3767,9 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 void GbaQueue::MakeSellData(int channel, char* outData)
 {
 char* itemNameScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xDD5));
+0x400, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xDD5));
 	if (itemNameScratch == 0) {
-		if (System.m_execParam != 0) {
+		if ((unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xDD7);
 		}
 		return;
@@ -3776,12 +3777,11 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 	memset(itemNameScratch, 0, 0x400);
 
 char* agbStringScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xDDE));
+0x400, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xDDE));
 	if (agbStringScratch == 0) {
-		if (System.m_execParam != 0) {
+		if ((unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xDE0);
 		}
-		__dla__FPv(itemNameScratch);
 		return;
 	}
 	memset(agbStringScratch, 0, 0x400);

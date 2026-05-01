@@ -262,8 +262,8 @@ void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
         if (item != 0) {
             int refCount = item[1] - 1;
             item[1] = refCount;
-            if ((refCount == 0) && (item != 0)) {
-                (*(void (**)(int*, int))(*item + 8))(item, 1);
+            if (refCount == 0) {
+                delete reinterpret_cast<CTexture*>(item);
             }
             *(unsigned int*)((int)m_items + offset) = 0;
         }
@@ -1093,8 +1093,8 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                                         int* refObj = reinterpret_cast<int*>(texture);
                                         int refCount = refObj[1] - 1;
                                         refObj[1] = refCount;
-                                        if ((refCount == 0) && (refObj != 0)) {
-                                            (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
+                                        if (refCount == 0) {
+                                            delete reinterpret_cast<CTexture*>(refObj);
                                         }
 
                                         texture = __vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), duplicateIdx);
@@ -1170,8 +1170,8 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
                 int* refObj = reinterpret_cast<int*>(texture);
                 int refCount = refObj[1] - 1;
                 refObj[1] = refCount;
-                if ((refCount == 0) && (refObj != 0)) {
-                    (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
+                if (refCount == 0) {
+                    delete reinterpret_cast<CTexture*>(refObj);
                 }
 
                 texture = __vc__21CPtrArray_P8CTexture_FUl(TextureArray(m_textureArrayStorage), duplicateIdx);
@@ -1236,8 +1236,8 @@ void CTextureSet::ReleaseTextureIdx(int idx, CAmemCacheSet* amemCacheSet)
         int* refObj = reinterpret_cast<int*>((*TextureArray(m_textureArrayStorage))[idx]);
         int refCount = refObj[1] - 1;
         refObj[1] = refCount;
-        if ((refCount == 0) && (refObj != 0)) {
-            (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
+        if (refCount == 0) {
+            delete reinterpret_cast<CTexture*>(refObj);
         }
 
         TextureArray(m_textureArrayStorage)->SetAt(idx, 0);

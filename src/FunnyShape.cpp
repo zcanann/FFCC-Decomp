@@ -689,54 +689,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         float u1;
         float v1;
 
-        if ((flags & 8) == 0) {
-            const u8* entry = shapeData + packedStride;
-            const u32 texIndex = entry[0x30];
-            const s8 numTex = *reinterpret_cast<s8*>(Ptr(this, 0x60D4));
-            if ((s32)texIndex < (s32)numTex) {
-                GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x14 + texIndex * 4)), GX_TEXMAP0);
-            }
-
-            const s8 blendMode = *reinterpret_cast<const s8*>(entry + 0x1C);
-            if (blendMode == 'H') {
-                _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 1, 3);
-            } else if (blendMode == 'B') {
-                _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 4, 1, 3);
-            } else if (blendMode == -0x78) {
-                _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 3);
-            }
-
-            const s32 x0 = Div16Floor(S16At(entry, 0x20));
-            const s32 y0 = Div16Floor(S16At(entry, 0x22));
-            const s32 x1 = Div16Floor(S16At(entry, 0x24));
-            const s32 y1 = Div16Floor(S16At(entry, 0x26));
-            GXSetViewport(offsetXY[0] + static_cast<float>(x0 * 2), offsetXY[1] + static_cast<float>(y0 * 2),
-                          static_cast<float>((x1 - x0) * 2), static_cast<float>((y1 - y0) * 2),
-                          FLOAT_8032fd6c, FLOAT_8032fd74);
-
-            const s16 texX = S16At(entry, 0x28);
-            const s16 texY = S16At(entry, 0x2A);
-            const s16 texW = S16At(entry, 0x2C);
-            const s16 texH = S16At(entry, 0x2E);
-            u0 = static_cast<float>(texX) / FLOAT_8032fd78;
-            v0 = FLOAT_8032fd74 - static_cast<float>(texY) / FLOAT_8032fd78;
-            u1 = u0 + static_cast<float>(texW) / FLOAT_8032fd78;
-            v1 = v0 - static_cast<float>(texH) / FLOAT_8032fd78;
-
-            p0x = FLOAT_8032fd80;
-            p0y = FLOAT_8032fd74;
-            p0z = FLOAT_8032fd6c;
-            p1x = FLOAT_8032fd6c;
-            p1y = FLOAT_8032fd74;
-            p1z = FLOAT_8032fd6c;
-            p2x = FLOAT_8032fd6c;
-            p2y = FLOAT_8032fd6c;
-            p2z = FLOAT_8032fd80;
-            p3x = FLOAT_8032fd80;
-            p3y = FLOAT_8032fd6c;
-            p3z = FLOAT_8032fd80;
-            color = U32At(entry, 0x18);
-        } else {
+        if ((flags & 8) != 0) {
             const u8* entry = shapeData + rotatedStride;
             const u32 texIndex = entry[0x38];
             const s8 numTex = *reinterpret_cast<s8*>(Ptr(this, 0x60D4));
@@ -762,6 +715,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 drawAngle = FLOAT_8032fd6c;
             }
 
+            const float sinA = static_cast<float>(sin(drawAngle));
+            const float cosA = static_cast<float>(cos(drawAngle));
             const float x0 = static_cast<float>(Div16Floor(S16At(entry, 0x20)));
             const float y0 = static_cast<float>(Div16Floor(S16At(entry, 0x22)));
             const float x1 = static_cast<float>(Div16Floor(S16At(entry, 0x24)));
@@ -770,8 +725,6 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const float y2 = static_cast<float>(Div16Floor(S16At(entry, 0x2A)));
             const float x3 = static_cast<float>(Div16Floor(S16At(entry, 0x2C)));
             const float y3 = static_cast<float>(Div16Floor(S16At(entry, 0x2E)));
-            const float sinA = static_cast<float>(sin(drawAngle));
-            const float cosA = static_cast<float>(cos(drawAngle));
             const float rx0 = x0 * cosA - y0 * sinA;
             const float ry0 = x0 * sinA + y0 * cosA;
             const float rx1 = x1 * cosA - y1 * sinA;
@@ -862,6 +815,53 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             p3x = invPadW * (rx2 - viewMaxX);
             p3y = invPadH * (ry2 - viewMaxY);
             p3z = FLOAT_8032fd6c;
+            color = U32At(entry, 0x18);
+        } else {
+            const u8* entry = shapeData + packedStride;
+            const u32 texIndex = entry[0x30];
+            const s8 numTex = *reinterpret_cast<s8*>(Ptr(this, 0x60D4));
+            if ((s32)texIndex < (s32)numTex) {
+                GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x14 + texIndex * 4)), GX_TEXMAP0);
+            }
+
+            const s8 blendMode = *reinterpret_cast<const s8*>(entry + 0x1C);
+            if (blendMode == 'H') {
+                _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 1, 3);
+            } else if (blendMode == 'B') {
+                _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 4, 1, 3);
+            } else if (blendMode == -0x78) {
+                _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 3);
+            }
+
+            const s32 x0 = Div16Floor(S16At(entry, 0x20));
+            const s32 y0 = Div16Floor(S16At(entry, 0x22));
+            const s32 x1 = Div16Floor(S16At(entry, 0x24));
+            const s32 y1 = Div16Floor(S16At(entry, 0x26));
+            GXSetViewport(offsetXY[0] + static_cast<float>(x0 * 2), offsetXY[1] + static_cast<float>(y0 * 2),
+                          static_cast<float>((x1 - x0) * 2), static_cast<float>((y1 - y0) * 2),
+                          FLOAT_8032fd6c, FLOAT_8032fd74);
+
+            const s16 texX = S16At(entry, 0x28);
+            const s16 texY = S16At(entry, 0x2A);
+            const s16 texW = S16At(entry, 0x2C);
+            const s16 texH = S16At(entry, 0x2E);
+            u0 = static_cast<float>(texX) / FLOAT_8032fd78;
+            v0 = FLOAT_8032fd74 - static_cast<float>(texY) / FLOAT_8032fd78;
+            u1 = u0 + static_cast<float>(texW) / FLOAT_8032fd78;
+            v1 = v0 - static_cast<float>(texH) / FLOAT_8032fd78;
+
+            p0x = FLOAT_8032fd80;
+            p0y = FLOAT_8032fd74;
+            p0z = FLOAT_8032fd6c;
+            p1x = FLOAT_8032fd6c;
+            p1y = FLOAT_8032fd74;
+            p1z = FLOAT_8032fd6c;
+            p2x = FLOAT_8032fd6c;
+            p2y = FLOAT_8032fd6c;
+            p2z = FLOAT_8032fd80;
+            p3x = FLOAT_8032fd80;
+            p3y = FLOAT_8032fd6c;
+            p3z = FLOAT_8032fd80;
             color = U32At(entry, 0x18);
         }
 

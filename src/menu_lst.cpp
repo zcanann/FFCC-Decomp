@@ -384,44 +384,9 @@ void CMenuPcs::MLstCtrl()
 
 	startFrame = 0;
 	duration = 4;
-	if (-1 < (int)(itemCount - 1)) {
-		entry = &this->lstData->entries[itemCount - 1];
-		chunkCount = itemCount >> 3;
-		if (chunkCount != 0) {
-			do {
-				entry[0].startFrame = startFrame++;
-				entry[0].duration = duration;
-				entry[-1].startFrame = startFrame++;
-				entry[-1].duration = duration;
-				entry[-2].startFrame = startFrame++;
-				entry[-2].duration = duration;
-				entry[-3].startFrame = startFrame++;
-				entry[-3].duration = duration;
-				entry[-4].startFrame = startFrame++;
-				entry[-4].duration = duration;
-				entry[-5].startFrame = startFrame++;
-				entry[-5].duration = duration;
-				entry[-6].startFrame = startFrame++;
-				entry[-6].duration = duration;
-				entry[-7].startFrame = startFrame++;
-				entry[-7].duration = duration;
-				entry -= 8;
-				chunkCount--;
-			} while (chunkCount != 0);
-
-			itemCount &= 7;
-			if (itemCount == 0) {
-				this->lstState->frame = 0;
-				return;
-			}
-		}
-
-		do {
-			entry->startFrame = startFrame++;
-			entry->duration = duration;
-			entry--;
-			itemCount--;
-		} while (itemCount != 0);
+	for (int idx = this->lstData->count - 1; idx >= 0; idx--) {
+		this->lstData->entries[idx].startFrame = startFrame++;
+		this->lstData->entries[idx].duration = duration;
 	}
 
 	this->lstState->frame = 0;
@@ -470,10 +435,9 @@ int CMenuPcs::MLstOpen()
 
 		zero = FLOAT_803333D0;
 		initializedCount = 0;
-		entry = this->lstData->entries;
-		i = 0;
 		yPos = 0x18;
-		do {
+		for (int i = 0; i < 9; i++) {
+			entry = &this->lstData->entries[i];
 			entry->unk_2C = 2;
 			initializedCount++;
 			entry->tex = 0x5B;
@@ -485,10 +449,8 @@ int CMenuPcs::MLstOpen()
 			entry->s = zero;
 			entry->t = zero;
 			entry->startFrame = i;
-			i++;
 			entry->duration = 4;
-			entry++;
-		} while (i < 9);
+		}
 		this->lstData->count = initializedCount;
 		this->lstState->initialized = 1;
 	}

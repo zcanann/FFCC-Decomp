@@ -13,6 +13,7 @@
 #include "ffcc/ptrarray.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
+#include "ffcc/texanim.h"
 extern "C" {
 extern u8* gCharaPartWorkPtr;
 extern const double kCharaViewerColorCenterBias;
@@ -81,7 +82,6 @@ extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(void*, Mtx);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(void*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(void*);
 extern "C" void SRTToMatrix__5CMathFPA4_fP3SRT(void*, Mtx, void*);
-extern "C" void Change__11CTexAnimSetFPcfQ211CTexAnimSet9ANIM_TYPE(void*, char*, float, int);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 extern "C" void Destroy__6CCharaFv(CChara*);
@@ -685,9 +685,9 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
                 if (texAnimFrame >= 0) {
                     animType = -3;
                 }
-                Change__11CTexAnimSetFPcfQ211CTexAnimSet9ANIM_TYPE(
-                    texAnimSet, reinterpret_cast<char*>(p + 0x5CC),
-                    static_cast<float>((texAnimFrame < 0) ? 0 : texAnimFrame), animType);
+                texAnimSet->Change(
+                    reinterpret_cast<char*>(p + 0x5CC), static_cast<float>((texAnimFrame < 0) ? 0 : texAnimFrame),
+                    static_cast<CTexAnimSet::ANIM_TYPE>(animType));
             }
         }
 

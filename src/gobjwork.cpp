@@ -2069,52 +2069,56 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 
 extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
 {
-	int groupedCount = 1;
+	int groupedCount;
 
-	if (Game.m_gameWork.m_menuStageMode != 0) {
-		short* slotRef = caravanWork->m_commandListInventorySlotRef + cmdListIdx;
-		if (slotRef[0] != 0) {
+	if (Game.m_gameWork.m_menuStageMode == 0) {
+		groupedCount = 1;
+	} else {
+		short* slotRef = caravanWork->m_commandListExtra + cmdListIdx;
+		if (slotRef[0] == 0) {
+			groupedCount = 1;
+		} else {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
 			if (cmdListIdx >= 0) {
-				do {
+				while (scanCount != 0) {
 					if (slotRef[0] != -1) {
 						break;
 					}
 					slotRef--;
 					topIdx--;
 					scanCount--;
-				} while (scanCount != 0);
+				}
 			}
 
 			groupedCount = 1;
 			scanCount = caravanWork->m_numCmdListSlots - (topIdx + 1);
-			slotRef = caravanWork->m_commandListInventorySlotRef + topIdx + 1;
+			slotRef = caravanWork->m_commandListExtra + topIdx + 1;
 			if ((topIdx + 1) < caravanWork->m_numCmdListSlots) {
-				do {
+				while (scanCount != 0) {
 					if (slotRef[0] != -1) {
 						break;
 					}
 					groupedCount++;
 					slotRef++;
 					scanCount--;
-				} while (scanCount != 0);
+				}
 			}
 		}
 	}
 
 	if (groupedCount > 1) {
 		int scanCount = cmdListIdx + 1;
-		short* slotRef = caravanWork->m_commandListInventorySlotRef + cmdListIdx;
+		short* slotRef = caravanWork->m_commandListExtra + cmdListIdx;
 		if (cmdListIdx >= 0) {
-			do {
+			while (scanCount != 0) {
 				if (slotRef[0] != -1) {
 					break;
 				}
 				slotRef--;
 				cmdListIdx--;
 				scanCount--;
-			} while (scanCount != 0);
+			}
 		}
 
 		short cmdId = caravanWork->m_commandListExtra[cmdListIdx];
@@ -2217,34 +2221,36 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx, int)
 	} else {
 		int numGrouped;
 		short* cmdListSlot = m_commandListExtra + cmdListIdx;
-		if (Game.m_gameWork.m_menuStageMode == 0 || cmdListSlot[0] == 0) {
+		if (Game.m_gameWork.m_menuStageMode == 0) {
+			numGrouped = 1;
+		} else if (cmdListSlot[0] == 0) {
 			numGrouped = 1;
 		} else {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
 			if (cmdListIdx >= 0) {
-				do {
+				while (scanCount != 0) {
 					if (cmdListSlot[0] != -1) {
 						break;
 					}
 					cmdListSlot--;
 					topIdx--;
 					scanCount--;
-				} while (scanCount != 0);
+				}
 			}
 
 			numGrouped = 1;
 			scanCount = (short)m_numCmdListSlots - (topIdx + 1);
-			cmdListSlot = reinterpret_cast<short*>(m_commandListInventorySlotRef) + topIdx + 1;
+			cmdListSlot = m_commandListExtra + topIdx + 1;
 			if ((topIdx + 1) < (short)m_numCmdListSlots) {
-				do {
+				while (scanCount != 0) {
 					if (cmdListSlot[0] != -1) {
 						break;
 					}
 					numGrouped++;
 					cmdListSlot++;
 					scanCount--;
-				} while (scanCount != 0);
+				}
 			}
 		}
 
@@ -2258,14 +2264,14 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx, int)
 			int scanCount = cmdListIdx + 1;
 			cmdListSlot = m_commandListExtra + cmdListIdx;
 			if (cmdListIdx >= 0) {
-				do {
+				while (scanCount != 0) {
 					if (cmdListSlot[0] != -1) {
 						break;
 					}
 					cmdListSlot--;
 					cmdListIdx--;
 					scanCount--;
-				} while (scanCount != 0);
+				}
 			}
 
 			short cmdResult = m_commandListExtra[cmdListIdx];

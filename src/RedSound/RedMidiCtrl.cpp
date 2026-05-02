@@ -1348,20 +1348,20 @@ void __MidiCtrl_TenutoOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* voice;
+    RedVoiceDATA* voice;
 
     ((int*)track)[0x35] = -1;
     ((int*)track)[0x36] = -1;
     memset((int*)track + 0x35, 0xffffffff, 0xc);
 
-    voice = (int*)p_VoiceData;
+    voice = p_VoiceData;
     do {
-        if (((unsigned int)voice[0] == (unsigned int)track) && ((unsigned int)voice[1] != 0)) {
-            memcpy(voice + 0x14, (void*)(voice[1] + 0x50), 0xc);
-            voice[0x24] |= 0x3c0;
+        if (((unsigned int)voice->m_track == (unsigned int)track) && ((unsigned int)voice->m_waveData != 0)) {
+            memcpy(voice->m_adsrTime, voice->m_waveData->m_adsr, 0xc);
+            voice->m_flags |= 0x3c0;
         }
-        voice += 0x30;
-    } while (voice < (int*)(p_VoiceData + 0x40));
+        voice++;
+    } while (voice < p_VoiceData + 0x40);
 }
 
 /*
@@ -1376,19 +1376,19 @@ void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 void __MidiCtrl_ADSR_AL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int value;
-    int* voice;
+    RedVoiceDATA* voice;
 
     value = *track->m_command++;
     track->m_adsrAL = value;
 
-    voice = (int*)p_VoiceData;
+    voice = p_VoiceData;
     do {
-        if ((RedTrackDATA*)*voice == track) {
-            *((u8*)voice + 0x58) = value;
-            voice[0x24] |= 0x3C0;
+        if (voice->m_track == track) {
+            voice->m_adsrLevel[0] = value;
+            voice->m_flags |= 0x3C0;
         }
-        voice += 0x30;
-    } while (voice < (int*)(p_VoiceData + 0x40));
+        voice++;
+    } while (voice < p_VoiceData + 0x40);
 }
 
 /*
@@ -1402,20 +1402,20 @@ void __MidiCtrl_ADSR_AL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ADSR_AR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* voice;
+    RedVoiceDATA* voice;
     int delta;
 
     delta = DeltaTimeSumup((unsigned char**)track);
     track->m_adsrAR = delta;
 
-    voice = (int*)p_VoiceData;
+    voice = p_VoiceData;
     do {
-        if ((RedTrackDATA*)*voice == track) {
-            *(unsigned short*)(voice + 0x14) = delta;
-            voice[0x24] |= 0x3C0;
+        if (voice->m_track == track) {
+            voice->m_adsrTime[0] = delta;
+            voice->m_flags |= 0x3C0;
         }
-        voice += 0x30;
-    } while (voice < (int*)(p_VoiceData + 0x40));
+        voice++;
+    } while (voice < p_VoiceData + 0x40);
 }
 
 /*
@@ -1430,19 +1430,19 @@ void __MidiCtrl_ADSR_AR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_ADSR_DL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int value;
-    int* voice;
+    RedVoiceDATA* voice;
 
     value = *track->m_command++;
     track->m_adsrDL = value;
 
-    voice = (int*)p_VoiceData;
+    voice = p_VoiceData;
     do {
-        if ((RedTrackDATA*)*voice == track) {
-            *((u8*)voice + 0x59) = value;
-            voice[0x24] |= 0x3C0;
+        if (voice->m_track == track) {
+            voice->m_adsrLevel[1] = value;
+            voice->m_flags |= 0x3C0;
         }
-        voice += 0x30;
-    } while (voice < (int*)(p_VoiceData + 0x40));
+        voice++;
+    } while (voice < p_VoiceData + 0x40);
 }
 
 /*
@@ -1456,20 +1456,20 @@ void __MidiCtrl_ADSR_DL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ADSR_DR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* voice;
+    RedVoiceDATA* voice;
     int delta;
 
     delta = DeltaTimeSumup((unsigned char**)track);
     track->m_adsrDR = delta;
 
-    voice = (int*)p_VoiceData;
+    voice = p_VoiceData;
     do {
-        if ((RedTrackDATA*)*voice == track) {
-            *(unsigned short*)((int)voice + 0x52) = delta;
-            voice[0x24] |= 0x3C0;
+        if (voice->m_track == track) {
+            voice->m_adsrTime[1] = delta;
+            voice->m_flags |= 0x3C0;
         }
-        voice += 0x30;
-    } while (voice < (int*)(p_VoiceData + 0x40));
+        voice++;
+    } while (voice < p_VoiceData + 0x40);
 }
 
 /*
@@ -1484,19 +1484,19 @@ void __MidiCtrl_ADSR_DR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_ADSR_SL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int value;
-    int* voice;
+    RedVoiceDATA* voice;
 
     value = *track->m_command++;
     track->m_adsrSL = value;
 
-    voice = (int*)p_VoiceData;
+    voice = p_VoiceData;
     do {
-        if ((RedTrackDATA*)*voice == track) {
-            *((u8*)voice + 0x5A) = value;
-            voice[0x24] |= 0x3C0;
+        if (voice->m_track == track) {
+            voice->m_adsrLevel[2] = value;
+            voice->m_flags |= 0x3C0;
         }
-        voice += 0x30;
-    } while (voice < (int*)(p_VoiceData + 0x40));
+        voice++;
+    } while (voice < p_VoiceData + 0x40);
 }
 
 /*
@@ -1510,20 +1510,20 @@ void __MidiCtrl_ADSR_SL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ADSR_SR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* voice;
+    RedVoiceDATA* voice;
     int delta;
 
     delta = DeltaTimeSumup((unsigned char**)track);
     track->m_adsrSR = delta;
 
-    voice = (int*)p_VoiceData;
+    voice = p_VoiceData;
     do {
-        if ((RedTrackDATA*)*voice == track) {
-            *(unsigned short*)(voice + 0x15) = delta;
-            voice[0x24] |= 0x3C0;
+        if (voice->m_track == track) {
+            voice->m_adsrTime[2] = delta;
+            voice->m_flags |= 0x3C0;
         }
-        voice += 0x30;
-    } while (voice < (int*)(p_VoiceData + 0x40));
+        voice++;
+    } while (voice < p_VoiceData + 0x40);
 }
 
 /*
@@ -1538,19 +1538,19 @@ void __MidiCtrl_ADSR_SR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_ADSR_RL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int value;
-    int* voice;
+    RedVoiceDATA* voice;
 
     value = *track->m_command++;
     track->m_adsrRL = value;
 
-    voice = (int*)p_VoiceData;
+    voice = p_VoiceData;
     do {
-        if ((RedTrackDATA*)*voice == track) {
-            *((u8*)voice + 0x5B) = value;
-            voice[0x24] |= 0x3C0;
+        if (voice->m_track == track) {
+            voice->m_adsrLevel[3] = value;
+            voice->m_flags |= 0x3C0;
         }
-        voice += 0x30;
-    } while (voice < (int*)(p_VoiceData + 0x40));
+        voice++;
+    } while (voice < p_VoiceData + 0x40);
 }
 
 /*
@@ -1564,20 +1564,20 @@ void __MidiCtrl_ADSR_RL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ADSR_RR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int* voice;
+	RedVoiceDATA* voice;
 	int delta;
 
 	delta = DeltaTimeSumup((unsigned char**)track);
 	track->m_adsrRR = delta;
 
-	voice = (int*)p_VoiceData;
+	voice = p_VoiceData;
 	do {
-		if ((RedTrackDATA*)*voice == track) {
-			*(unsigned short*)((int)voice + 0x56) = delta;
-			voice[0x24] |= 0x3C0;
+		if (voice->m_track == track) {
+			voice->m_adsrTime[3] = delta;
+			voice->m_flags |= 0x3C0;
 		}
-		voice += 0x30;
-	} while (voice < (int*)(p_VoiceData + 0x40));
+		voice++;
+	} while (voice < p_VoiceData + 0x40);
 }
 
 /*

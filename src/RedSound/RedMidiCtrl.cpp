@@ -1699,8 +1699,7 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
     divisor = depth;
     track->m_vibrateRate = 0x100000 / divisor;
     track->m_vibrateFunc = (int)SwingEntryFunction[track->m_command[2] & 0xf];
-    track->m_vibrateDepthDelta = 0;
-    track->m_vibrateRateDelta = 0;
+    track->m_vibrateRateDelta = track->m_vibrateDepthDelta = 0;
     track->m_command += 3;
 
     entry = p_VoiceData;
@@ -1709,7 +1708,7 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
             divisor = 0x100;
             *(short*)((unsigned int*)entry + 10) = *(short*)((int*)track + 0x24);
             if (((int*)track)[0x1e] >> 0xc != 0) {
-                divisor = 0x100 / (((int*)track)[0x1e] >> 0xc);
+                divisor /= ((int*)track)[0x1e] >> 0xc;
             }
             if (*(short*)((int)track + 0x92) != 0) {
                 output = (int)*(short*)((int)track + 0x92) * (divisor * 4);
@@ -1885,8 +1884,7 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 	divisor = rateDivisor;
 	track->m_tremoloRate = 0x100000 / divisor;
 	track->m_tremoloFunc = (int)SwingEntryFunction[track->m_command[2] & 0xf];
-	track->m_tremoloDepthDelta = 0;
-	track->m_tremoloRateDelta = 0;
+	track->m_tremoloRateDelta = track->m_tremoloDepthDelta = 0;
 	track->m_command += 3;
 
 	voice = p_VoiceData;
@@ -1895,7 +1893,7 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 			divisor = 0x100;
 			*(short*)((unsigned int*)voice + 0xe) = *(short*)((int*)track + 0x2c);
 			if (((int*)track)[0x26] >> 0xc != 0) {
-				divisor = 0x100 / (((int*)track)[0x26] >> 0xc);
+				divisor /= ((int*)track)[0x26] >> 0xc;
 			}
 			if (*(short*)((int)track + 0xb2) != 0) {
 				output = *(short*)((int)track + 0xb2) * (divisor * 4);

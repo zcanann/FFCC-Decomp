@@ -1905,7 +1905,7 @@ int CRedDriver::GetSeVolume(int seID, int mode)
 {
     unsigned int* seInfo;
 
-    seInfo = *(unsigned int**)((int)p_SoundControlBuffer + 0xdbc);
+    seInfo = (unsigned int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     while (1) {
         if ((*seInfo != 0) && ((seID == -1) || (seID == ((RedTrackDATA*)seInfo)->m_seId))) {
             if (*seInfo != 0) {
@@ -1916,7 +1916,7 @@ int CRedDriver::GetSeVolume(int seID, int mode)
             }
         }
         seInfo += 0x55;
-        if (seInfo < (unsigned int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80)) {
+        if (seInfo < (unsigned int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + 0x2a80)) {
             continue;
         }
         return 0;
@@ -1936,14 +1936,14 @@ int CRedDriver::ReportSeLoop(int seID)
 {
     unsigned int* seInfo;
 
-    seInfo = *(unsigned int**)((int)p_SoundControlBuffer + 0xdbc);
+    seInfo = (unsigned int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     while (1) {
         if ((*seInfo != 0) &&
             (((seID == -1) || (seID == ((RedTrackDATA*)seInfo)->m_seId)) && ((seInfo[0x40] & 1U) != 0))) {
             return 1;
         }
         seInfo += 0x55;
-        if (seInfo < (unsigned int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80)) {
+        if (seInfo < (unsigned int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + 0x2a80)) {
             continue;
         }
         return 0;

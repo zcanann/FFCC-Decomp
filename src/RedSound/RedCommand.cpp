@@ -935,7 +935,7 @@ int MusicPlay(int musicId, int volume, int mode)
  */
 void SetMusicVolume(int seId, int volume, int duration, int mode)
 {
-	int* music;
+	RedSoundCONTROL* music;
 
 	if (volume != 0) {
 		volume++;
@@ -952,18 +952,17 @@ void SetMusicVolume(int seId, int volume, int duration, int mode)
 		duration /= 0x3c;
 	}
 
-	music = (int*)p_SoundControlBuffer;
+	music = p_SoundControlBuffer;
 	do {
-		if ((seId == -1) || (seId == ((RedSoundCONTROL*)music)->m_musicId) ||
-		    (((RedSoundCONTROL*)music)->m_musicId < 0)) {
+		if ((seId == -1) || (seId == music->m_musicId) || (music->m_musicId < 0)) {
 			if (mode == 1) {
-				((RedSoundCONTROL*)music)->m_masterVolumeAdd = -((RedSoundCONTROL*)music)->m_masterVolume / duration;
-				((RedSoundCONTROL*)music)->m_masterVolumeDelta = duration;
+				music->m_masterVolumeAdd = -music->m_masterVolume / duration;
+				music->m_masterVolumeDelta = duration;
 			} else {
-				((RedSoundCONTROL*)music)->m_volumeAdd = (volume - ((RedSoundCONTROL*)music)->m_volume) / duration;
-				((RedSoundCONTROL*)music)->m_volumeDelta = duration;
+				music->m_volumeAdd = (volume - music->m_volume) / duration;
+				music->m_volumeDelta = duration;
 			}
 		}
-		music += 0x125;
-	} while ((unsigned int)music < (unsigned int)p_SoundControlBuffer + 0xdbc);
+		music++;
+	} while (music < p_SoundControlBuffer + 3);
 }

@@ -80,24 +80,6 @@ void CProcess::onMapChanged(int, int, int)
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void CProcess::Quit()
-{
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void CProcess::Init()
-{
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8001FE84
  * PAL Size: 4b
  * EN Address: TODO

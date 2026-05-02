@@ -408,31 +408,13 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     int colorOffset = serializedDataOffsets[1];
     LaserColorData* colorData = (LaserColorData*)((u8*)pppLaser + 0x80 + colorOffset);
     s32 dataValIndex = step->m_dataValIndex;
-    Vec* points;
-    u32 count;
-    u32 i;
-    u32 colorBase;
-    u32 color0;
-    u32 color1;
-    u8 alpha0;
-    u8 alphaStep;
-    u8 alphaMax;
     float halfWidth;
     float negHalfWidth;
     float length;
-    float u0;
-    float u1;
-    float uvStep;
     pppFMATRIX unitMtx;
     pppFMATRIX modelView;
     pppFMATRIX mtxOut;
-    pppFMATRIX shapeMtx;
-    Mtx tempMtx;
-    Mtx sphereMtx;
-    Vec shapePos;
-    Vec spherePos;
     _GXColor color;
-    _GXColor debugColor;
     int tex;
 
     if (dataValIndex == 0xFFFF) {
@@ -504,7 +486,18 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     GXTexCoord2f32(FLOAT_8033342c, work->m_length);
 
     if (step->m_stepValue != 0xFFFF) {
+        u32 count;
+        u32 i;
+        u32 colorBase;
+        u8 alphaStep;
+        u8 alphaMax;
+        float uvStep;
+        Vec* points;
+        pppFMATRIX shapeMtx;
+        Mtx tempMtx;
         long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
+        Vec shapePos;
+
         PSMTXIdentity(shapeMtx.value);
         shapeMtx.value[0][0] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.x;
         shapeMtx.value[1][1] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.y;
@@ -540,6 +533,12 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
 
         GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 3));
         for (i = 0; (int)i < (int)(step->m_payload[0x1e] - 1); i++) {
+            u32 color0;
+            u32 color1;
+            u8 alpha0;
+            float u0;
+            float u1;
+
             alpha0 = (u8)(alphaMax - (u8)(alphaStep * i));
             color0 = colorBase | alpha0;
             color1 = colorBase | (u8)(alphaMax - (u8)(alphaStep * (i + 1)));
@@ -560,6 +559,10 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         }
 
         if ((CFlatFlags & 0x200000) != 0) {
+            _GXColor debugColor;
+            Mtx sphereMtx;
+            Vec spherePos;
+
             SetVtxFmt_POS_CLR__5CUtilFv(&gUtil);
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
             _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);

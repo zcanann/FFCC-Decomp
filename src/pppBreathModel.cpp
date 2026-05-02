@@ -654,8 +654,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     BreathParticleGroup* groupData;
     short foundSlot;
     short foundGroup;
-    Vec unitVelocity;
     Vec stepVelocity;
+    Vec unitVelocity;
 
     particleData = (unsigned char*)vBreathModel->m_particleData;
     particleWmat = (unsigned char*)vBreathModel->m_particleWmats;

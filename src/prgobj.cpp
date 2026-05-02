@@ -224,30 +224,22 @@ void CGPrgObj::ClassControl(int classControl, int value)
  */
 void CGPrgObj::dstTargetRot(CGPrgObj* target)
 {
-	CGPrgObj* self = this;
 	float targetRot;
 	Vec targetPos;
 	Vec basePos;
 	Vec deltaPos;
 	CVector* baseVec;
-	float deltaX;
-	float zero;
-	float deltaZ;
 
 	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
-	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), self->m_worldPosition);
+	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
 	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
-	deltaX = deltaPos.x;
-	zero = FLOAT_80331BD4;
-	deltaZ = deltaPos.z;
-	if (zero == deltaX || zero == deltaZ) {
-		targetRot = zero;
-	} else {
-		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
+	targetRot = FLOAT_80331BD4;
+	if (((double)FLOAT_80331BD4 != (double)deltaPos.x) && ((double)FLOAT_80331BD4 != (double)deltaPos.z)) {
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
 
-	Math.DstRot(self->m_rotBaseY, FLOAT_80331BD8 + targetRot);
+	Math.DstRot(m_rotBaseY, FLOAT_80331BD8 + targetRot);
 }
 
 /*
@@ -261,29 +253,21 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
  */
 void CGPrgObj::rotTarget(CGPrgObj* target)
 {
-	CGPrgObj* self = this;
 	float targetRot;
 	Vec targetPos;
 	Vec basePos;
 	Vec deltaPos;
 	CVector* baseVec;
-	float deltaX;
-	float zero;
-	float deltaZ;
 
 	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
-	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), self->m_worldPosition);
+	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
 	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
-	deltaX = deltaPos.x;
-	zero = FLOAT_80331BD4;
-	deltaZ = deltaPos.z;
-	if (zero == deltaX || zero == deltaZ) {
-		targetRot = zero;
-	} else {
-		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
+	targetRot = FLOAT_80331BD4;
+	if (((double)FLOAT_80331BD4 != (double)deltaPos.x) && ((double)FLOAT_80331BD4 != (double)deltaPos.z)) {
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
-	self->m_rotTargetY = targetRot;
+	m_rotTargetY = targetRot;
 }
 
 /*
@@ -302,21 +286,14 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	Vec targetPos;
 	Vec deltaPos;
 	CVector* baseVec;
-	float deltaX;
-	float zero;
-	float deltaZ;
 
 	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
 	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
 	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
-	deltaX = deltaPos.x;
-	zero = FLOAT_80331BD4;
-	deltaZ = deltaPos.z;
-	if (zero == deltaX || zero == deltaZ) {
-		targetRot = zero;
-	} else {
-		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
+	targetRot = FLOAT_80331BD4;
+	if (((double)FLOAT_80331BD4 != (double)deltaPos.x) && ((double)FLOAT_80331BD4 != (double)deltaPos.z)) {
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
 
 	return targetRot;

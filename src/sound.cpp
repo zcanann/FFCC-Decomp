@@ -138,6 +138,15 @@ struct CLineSegment {
     float startLength;
 };
 
+struct SoundGameLayout {
+    u8 m_pad0[0x13E0];
+    s16 m_stageId;
+    u8 m_pad13e2[2];
+    u8 m_stageSerialValid;
+    u8 m_pad13e5[0xC7F4 - 0x13E5];
+    char m_currentScriptName[256];
+};
+
 struct CLine {
     Vec min;
     Vec max;
@@ -217,6 +226,11 @@ static inline const CSoundLayout& SoundData(const CSound* self)
 static inline CRedSound* RedSound(CSound* self)
 {
     return reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(self) + 8);
+}
+
+static inline SoundGameLayout& SoundGameData()
+{
+    return *reinterpret_cast<SoundGameLayout*>(&Game);
 }
 
 extern "C" void __ct__9CLine(CLine* line)
@@ -1806,8 +1820,8 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
             slot = -1;
         } else if (soundId < 4000) {
             int bank = soundId / 1000;
-            slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), bank, soundId - bank * 1000, pan,
-                                            volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+            slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), bank, soundId - bank * 1000,
+                                            pan, volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
                 SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(soundObj + 8), slot, volume, fadeFrames);
             }
@@ -1847,7 +1861,6 @@ void CSound::searchSe3D(int)
  */
 void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
 {
-    u8* se = reinterpret_cast<u8*>(se3D);
     float fVar1;
     float fVar2;
     float fVar3;
@@ -1857,20 +1870,18 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
     float nearestT;
     Vec nearestPoint;
 
-    if (static_cast<s8>(se[3]) >= 0) {
-        iVar4 = Calc__9CLine((double)*reinterpret_cast<float*>(se + 0x14),
-                             &SoundData(this).m_lines[(int)static_cast<s8>(se[3])],
-                             &nearestPoint, &nearestDistance, (u32*)0, &nearestT,
-                             reinterpret_cast<const Vec*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0));
+    if (se3D->m_lineIndex >= 0) {
+        iVar4 = Calc__9CLine(
+            (double)se3D->m_farDistance, &SoundData(this).m_lines[se3D->m_lineIndex], &nearestPoint, &nearestDistance,
+            (u32*)0, &nearestT, reinterpret_cast<const Vec*>(&CameraPcs._236_4_));
         if (iVar4 == 0) {
             outVolume = 0;
             outPan = 0x40;
         } else {
-            PSMTXMultVec(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), &nearestPoint,
-                         &nearestPoint);
-            fVar3 = *reinterpret_cast<float*>(se + 0x10);
+            PSMTXMultVec(CameraPcs.m_cameraMatrix, &nearestPoint, &nearestPoint);
+            fVar3 = se3D->m_nearDistance;
             if (fVar3 <= nearestDistance) {
-                outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((nearestDistance - fVar3) / (*reinterpret_cast<float*>(se + 0x14) - fVar3)));
+                outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((nearestDistance - fVar3) / (se3D->m_farDistance - fVar3)));
             } else {
                 outVolume = 0x7F;
             }
@@ -1886,14 +1897,13 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             }
             outPan = iVar5 + 0x40;
         }
-    } else if ((kLineSegmentMinT == *reinterpret_cast<float*>(se + 0x10)) &&
-               (kLineSegmentMinT == *reinterpret_cast<float*>(se + 0x14))) {
+    } else if ((kLineSegmentMinT == se3D->m_nearDistance) && (kLineSegmentMinT == se3D->m_farDistance)) {
         outVolume = 0x7F;
         outPan = 0x40;
     } else {
         fVar1 = kLineSegmentMaxT;
-        if (*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&Game) + 0x13E4) != '\0') {
-            const short stageId = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(&Game) + 0x13E0);
+        if (SoundGameData().m_stageSerialValid != 0) {
+            const short stageId = SoundGameData().m_stageId;
             if (stageId == 0xE) {
                 fVar1 = FLOAT_80330cf4;
             } else if (stageId == 8) {
@@ -1903,18 +1913,16 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             }
         }
 
-        PSMTXMultVec(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4),
-                     reinterpret_cast<Vec*>(se + 0x18), &nearestPoint);
-        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xD4),
-                                            reinterpret_cast<Vec*>(se + 0x18));
-        fVar2 = *reinterpret_cast<float*>(se + 0x14) * fVar1;
-        fVar2 = *reinterpret_cast<float*>(se + 0x14) * fVar2;
+        PSMTXMultVec(CameraPcs.m_cameraMatrix, &se3D->m_position, &nearestPoint);
+        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs._224_4_), &se3D->m_position);
+        fVar2 = se3D->m_farDistance * fVar1;
+        fVar2 = se3D->m_farDistance * fVar2;
         fVar2 = fVar1 * fVar2;
         if (fVar2 <= fVar3) {
             outVolume = 0;
         } else {
-            float nearScaled = *reinterpret_cast<float*>(se + 0x10) * fVar1;
-            nearScaled = *reinterpret_cast<float*>(se + 0x10) * nearScaled;
+            float nearScaled = se3D->m_nearDistance * fVar1;
+            nearScaled = se3D->m_nearDistance * nearScaled;
             if (nearScaled <= fVar3) {
                 outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((fVar3 - nearScaled) / (fVar2 - nearScaled)));
             } else {
@@ -1922,7 +1930,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             }
         }
 
-        if (*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Game) + 0xC7F4) == 0x21) {
+        if (*reinterpret_cast<unsigned int*>(SoundGameData().m_currentScriptName) == 0x21) {
             iVar4 = (int)(nearestPoint.x / FLOAT_80330cfc);
         } else {
             iVar4 = (int)nearestPoint.x;

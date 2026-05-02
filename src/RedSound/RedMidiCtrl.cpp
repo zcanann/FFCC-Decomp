@@ -1687,7 +1687,7 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
     int depth;
     int divisor;
     int output;
-    unsigned int* entry;
+    RedVoiceDATA* entry;
 
     track->m_vibrateDepth = (unsigned int)track->m_command[0] << 0xc;
     if (track->m_command[1] != 0) {
@@ -1703,25 +1703,25 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
     track->m_vibrateRateDelta = 0;
     track->m_command += 3;
 
-    entry = (unsigned int*)p_VoiceData;
+    entry = p_VoiceData;
     do {
-        if ((RedTrackDATA*)*entry == track) {
+        if (entry->m_track == track) {
             divisor = 0x100;
-            *(short*)(entry + 10) = *(short*)((int*)track + 0x24);
-            if (((int*)track)[0x1e] >> 0xc != 0) {
-                divisor = 0x100 / (((int*)track)[0x1e] >> 0xc);
+            entry->m_pitchModDelay = track->m_vibrateDelay;
+            if (track->m_vibrateDepth >> 0xc != 0) {
+                divisor = 0x100 / (track->m_vibrateDepth >> 0xc);
             }
-            if (*(short*)((int)track + 0x92) != 0) {
-                output = (int)*(short*)((int)track + 0x92) * (divisor * 4);
+            if (track->m_vibrateDelayDepth != 0) {
+                output = (int)track->m_vibrateDelayDepth * (divisor * 4);
             } else {
                 output = 0;
             }
-            entry[8] = output;
-            entry[9] = 0;
-            entry[7] = 0;
+            entry->m_pitchModFrames = output;
+            entry->m_pitchModFrame = 0;
+            entry->m_pitchModPhase = 0;
         }
-        entry = entry + 0x30;
-    } while (entry < (unsigned int*)(p_VoiceData + 0x40));
+        entry++;
+    } while (entry < p_VoiceData + 0x40);
 }
 
 /*
@@ -1874,7 +1874,7 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 	int rateDivisor;
 	int divisor;
 	int output;
-	unsigned int* voice;
+	RedVoiceDATA* voice;
 
 	track->m_tremoloDepth = (unsigned int)track->m_command[0] << 0xc;
 	if (track->m_command[1] != 0) {
@@ -1889,25 +1889,25 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 	track->m_tremoloRateDelta = 0;
 	track->m_command += 3;
 
-	voice = (unsigned int*)p_VoiceData;
+	voice = p_VoiceData;
 	do {
-		if ((RedTrackDATA*)*voice == track) {
+		if (voice->m_track == track) {
 			divisor = 0x100;
-			*(short*)(voice + 0xe) = *(short*)((int*)track + 0x2c);
-			if (((int*)track)[0x26] >> 0xc != 0) {
-				divisor = 0x100 / (((int*)track)[0x26] >> 0xc);
+			voice->m_volumeModDelay = track->m_tremoloDelay;
+			if (track->m_tremoloDepth >> 0xc != 0) {
+				divisor = 0x100 / (track->m_tremoloDepth >> 0xc);
 			}
-			if (*(short*)((int)track + 0xb2) != 0) {
-				output = *(short*)((int)track + 0xb2) * (divisor * 4);
+			if (track->m_tremoloDelayDepth != 0) {
+				output = track->m_tremoloDelayDepth * (divisor * 4);
 			} else {
 				output = 0;
 			}
-			voice[0xc] = output;
-			voice[0xd] = 0;
-			voice[0xb] = 0;
+			voice->m_volumeModFrames = output;
+			voice->m_volumeModFrame = 0;
+			voice->m_volumeModPhase = 0;
 		}
-		voice += 0x30;
-	} while (voice < (unsigned int*)(p_VoiceData + 0x40));
+		voice++;
+	} while (voice < p_VoiceData + 0x40);
 }
 
 /*

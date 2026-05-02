@@ -2596,7 +2596,7 @@ void MainControl(int frames)
             _MusicNoteExecute();
         }
         if (*(s16*)((u8*)p_SoundControlBuffer + 0x48E) == 0) {
-            memcpy(p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY, 0x494);
+            memcpy(p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY, REDSOUND_CONTROL_SIZE);
             *(s16*)((u8*)p_SoundControl + 0x48E) = 0;
             *(u8*)((u8*)p_SoundControl + 0x491) = 0;
             *(int*)((u8*)p_SoundControl + 0x470) = -1;

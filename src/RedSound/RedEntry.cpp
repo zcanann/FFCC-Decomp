@@ -228,7 +228,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 			found = 1;
 			MusicStop(*(int*)(soundBase + 0x470));
 		}
-		soundBase -= 0x494;
+		soundBase -= REDSOUND_CONTROL_SIZE;
 	} while ((unsigned int)soundBase >= (unsigned int)p_SoundControlBuffer);
 
 	soundBase = (int)(p_SoundControlBuffer + REDSOUND_CONTROL_SE);
@@ -240,7 +240,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 			SeStopID(track->m_seId);
 		}
 		track += 1;
-	} while (track < reinterpret_cast<RedTrackDATA*>(*(int*)soundBase + 0x2a80));
+	} while (track < reinterpret_cast<RedTrackDATA*>(*(int*)soundBase + REDSOUND_SE_TRACK_ARENA_SIZE));
 
 	OSRestoreInterrupts(interruptLevel);
 	return found;

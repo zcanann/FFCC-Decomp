@@ -30,6 +30,12 @@ enum RedSoundControlIndex {
 	REDSOUND_CONTROL_SE = 3,
 };
 
+enum RedSoundLayoutSize {
+	REDSOUND_CONTROL_SIZE = 0x494,
+	REDSOUND_SE_TRACK_COUNT = 0x20,
+	REDSOUND_SE_TRACK_ARENA_SIZE = 0x2A80,
+};
+
 struct RedSeBlockHEAD;
 
 extern RedMidiControlFunc p_MidiControl_Function[];

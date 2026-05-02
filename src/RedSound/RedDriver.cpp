@@ -234,7 +234,7 @@ void _SetReverbDepth(int* command)
                 seInfo[0x1c] = fadeStep;
             }
             seInfo += 0x55;
-        } while (seInfo < (int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + 0x2a80));
+        } while (seInfo < (int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE));
     }
 }
 
@@ -295,7 +295,7 @@ void _MusicPlaySequence(int* command)
                 p_MusicReplayPoint[*command] = 0;
             }
             if (iVar1 == 0) {
-                memcpy((void*)(srcBuffer + 0x494), (void*)srcBuffer, 0x494);
+                memcpy((void*)(srcBuffer + REDSOUND_CONTROL_SIZE), (void*)srcBuffer, REDSOUND_CONTROL_SIZE);
                 *(int*)(srcBuffer + 0x470) = -1;
             }
         }
@@ -334,10 +334,10 @@ void _MusicCrossPlaySequence(int* command)
         *(int*)((int)pvVar2 + 0x8ec) =
              (0x1ff800 - *(int*)((int)pvVar2 + 0x8e8)) / command[2];
         *(int*)((int)pvVar2 + 0x8f0) = command[2];
-        pvVar2 = (void*)RedNew(0x494);
-        memcpy(pvVar2, (void*)((int)p_SoundControlBuffer + 0x494), 0x494);
-        memcpy((void*)((int)p_SoundControlBuffer + 0x494), p_SoundControlBuffer, 0x494);
-        memcpy(p_SoundControlBuffer, pvVar2, 0x494);
+        pvVar2 = (void*)RedNew(REDSOUND_CONTROL_SIZE);
+        memcpy(pvVar2, (void*)((int)p_SoundControlBuffer + REDSOUND_CONTROL_SIZE), REDSOUND_CONTROL_SIZE);
+        memcpy((void*)((int)p_SoundControlBuffer + REDSOUND_CONTROL_SIZE), p_SoundControlBuffer, REDSOUND_CONTROL_SIZE);
+        memcpy(p_SoundControlBuffer, pvVar2, REDSOUND_CONTROL_SIZE);
         RedDelete(pvVar2);
     } else {
         if (c_RedEntry.SearchMusicSequence(*command) >= 0) {
@@ -352,7 +352,7 @@ void _MusicCrossPlaySequence(int* command)
                 iVar1 = p_MusicReplayPoint[*command];
                 p_MusicReplayPoint[*command] = 0;
                 if (iVar1 == 0) {
-                    memcpy((void*)((int)pvVar2 + 0x494), pvVar2, 0x494);
+                    memcpy((void*)((int)pvVar2 + REDSOUND_CONTROL_SIZE), pvVar2, REDSOUND_CONTROL_SIZE);
                     *(int*)((int)pvVar2 + 0x470) = 0xffffffff;
                 }
             }
@@ -1302,9 +1302,9 @@ void CRedDriver::Init()
     } while (iVar6 < 0x40);
     p_EditorVoice[1] = 0;
     p_EditorVoice[0] = 0;
-    uVar3 = (void*)RedNew(0x2a80);
+    uVar3 = (void*)RedNew(REDSOUND_SE_TRACK_ARENA_SIZE);
     p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks = (RedTrackDATA*)uVar3;
-    memset(p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks, 0, 0x2a80);
+    memset(p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks, 0, REDSOUND_SE_TRACK_ARENA_SIZE);
     iVar5 = 0;
     iVar6 = (int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     do {
@@ -1312,7 +1312,7 @@ void CRedDriver::Init()
         cVar1 = (char)iVar5;
         iVar5 = iVar5 + 1;
         ((RedTrackDATA*)(iVar6 + iVar4))->m_trackNo = (char)(cVar1 + ' ');
-    } while (iVar5 < 0x20);
+    } while (iVar5 < REDSOUND_SE_TRACK_COUNT);
     p_EditorTrack = (RedTrackDATA*)RedNew(0x154);
     memset(p_EditorTrack, 0, 0x154);
     p_ReverbDepth = (RedReverbDepth*)RedNew(0x18);
@@ -1916,7 +1916,7 @@ int CRedDriver::GetSeVolume(int seID, int mode)
             }
         }
         seInfo += 0x55;
-        if (seInfo < (unsigned int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + 0x2a80)) {
+        if (seInfo < (unsigned int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE)) {
             continue;
         }
         return 0;
@@ -1943,7 +1943,7 @@ int CRedDriver::ReportSeLoop(int seID)
             return 1;
         }
         seInfo += 0x55;
-        if (seInfo < (unsigned int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + 0x2a80)) {
+        if (seInfo < (unsigned int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE)) {
             continue;
         }
         return 0;

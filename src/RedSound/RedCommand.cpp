@@ -706,7 +706,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		m_CrossTime = 0;
 	}
 
-	int trackBase = RedNew(musicHead->m_trackCount * 0x154);
+	int trackBase = RedNew(musicHead->m_trackCount * REDSOUND_TRACK_SIZE);
 	if (trackBase == 0) {
 		if (m_ReportPrint != 0) {
 			OSReport(sRedCommandMusicTrackCreateErrorFmt,
@@ -714,7 +714,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 			fflush(__files + 1);
 			OSReport(sRedCommandMusicNeedMemoryFmt,
 			         sRedCommandLogPrefix, sRedCommandLogErrorColor,
-			         (int)musicHead->m_musicNo, musicHead->m_trackCount * 0x154, sRedCommandLogReset);
+			         (int)musicHead->m_musicNo, musicHead->m_trackCount * REDSOUND_TRACK_SIZE, sRedCommandLogReset);
 			fflush(__files + 1);
 		}
 		c_RedEntry.DisplayMMemoryInfo();
@@ -853,7 +853,7 @@ int MusicStop(int seId)
 				do {
 					if ((seTrack->m_track >= music->m_tracks) &&
 					    (seTrack->m_track <
-					     (RedTrackDATA*)((u32)music->m_tracks + (unsigned int)music->m_trackCount * 0x154))) {
+					     (RedTrackDATA*)((u32)music->m_tracks + (unsigned int)music->m_trackCount * REDSOUND_TRACK_SIZE))) {
 						seTrack->m_voiceSwitch &= 0xfffffff3;
 						seTrack->m_flags &= 0xfffffffe;
 						seTrack->m_flags |= 2;
@@ -871,7 +871,7 @@ int MusicStop(int seId)
 						((RedTrackDATA*)track)->m_command = 0;
 					}
 					track += 0x55;
-				} while (track < (int*)((u32)music->m_tracks + (unsigned int)music->m_trackCount * 0x154));
+				} while (track < (int*)((u32)music->m_tracks + (unsigned int)music->m_trackCount * REDSOUND_TRACK_SIZE));
 
 				music->m_activeTrackCount = 0;
 				music->m_trackCount = 0;

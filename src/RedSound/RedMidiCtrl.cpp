@@ -1313,7 +1313,7 @@ void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
             ((RedVoiceDATA*)voiceData)->m_basePitch &= ~0xfff;
         }
         voiceData += 0x30;
-    } while (voiceData < (int*)((unsigned int*)p_VoiceData + 0xc00));
+    } while (voiceData < (int*)(p_VoiceData + 0x40));
 }
 
 /*
@@ -1600,7 +1600,7 @@ void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
                 voice[0x25] |= 4;
             }
             voice += 0x30;
-        } while (voice < (unsigned int*)p_VoiceData + 0xc00);
+        } while (voice < (unsigned int*)(p_VoiceData + 0x40));
     } else {
         track->m_voiceSwitch &= ~4;
         voice = (unsigned int*)p_VoiceData;
@@ -1609,7 +1609,7 @@ void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
                 voice[0x25] &= ~4;
             }
             voice += 0x30;
-        } while (voice < (unsigned int*)p_VoiceData + 0xc00);
+        } while (voice < (unsigned int*)(p_VoiceData + 0x40));
     }
 
     track->m_command += 1;

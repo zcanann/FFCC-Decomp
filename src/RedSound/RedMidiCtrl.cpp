@@ -1360,7 +1360,7 @@ void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
             voice[0x24] |= 0x3c0;
         }
         voice += 0x30;
-    } while (voice < (int*)((unsigned int*)p_VoiceData + 0xc00));
+    } while (voice < (int*)(p_VoiceData + 0x40));
 }
 
 /*
@@ -1387,7 +1387,7 @@ void __MidiCtrl_ADSR_AL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
             voice[0x24] |= 0x3C0;
         }
         voice += 0x30;
-    } while (voice < (int*)((unsigned int*)p_VoiceData + 0xC00));
+    } while (voice < (int*)(p_VoiceData + 0x40));
 }
 
 /*
@@ -1414,7 +1414,7 @@ void __MidiCtrl_ADSR_AR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
             voice[0x24] |= 0x3C0;
         }
         voice += 0x30;
-    } while (voice < (int*)((unsigned int*)p_VoiceData + 0xC00));
+    } while (voice < (int*)(p_VoiceData + 0x40));
 }
 
 /*
@@ -1441,7 +1441,7 @@ void __MidiCtrl_ADSR_DL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
             voice[0x24] |= 0x3C0;
         }
         voice += 0x30;
-    } while (voice < (int*)((unsigned int*)p_VoiceData + 0xC00));
+    } while (voice < (int*)(p_VoiceData + 0x40));
 }
 
 /*
@@ -1468,7 +1468,7 @@ void __MidiCtrl_ADSR_DR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
             voice[0x24] |= 0x3C0;
         }
         voice += 0x30;
-    } while (voice < (int*)((unsigned int*)p_VoiceData + 0xC00));
+    } while (voice < (int*)(p_VoiceData + 0x40));
 }
 
 /*
@@ -1495,7 +1495,7 @@ void __MidiCtrl_ADSR_SL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
             voice[0x24] |= 0x3C0;
         }
         voice += 0x30;
-    } while (voice < (int*)((unsigned int*)p_VoiceData + 0xC00));
+    } while (voice < (int*)(p_VoiceData + 0x40));
 }
 
 /*
@@ -1522,7 +1522,7 @@ void __MidiCtrl_ADSR_SR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
             voice[0x24] |= 0x3C0;
         }
         voice += 0x30;
-    } while (voice < (int*)((unsigned int*)p_VoiceData + 0xC00));
+    } while (voice < (int*)(p_VoiceData + 0x40));
 }
 
 /*
@@ -1549,7 +1549,7 @@ void __MidiCtrl_ADSR_RL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
             voice[0x24] |= 0x3C0;
         }
         voice += 0x30;
-    } while (voice < (int*)((unsigned int*)p_VoiceData + 0xC00));
+    } while (voice < (int*)(p_VoiceData + 0x40));
 }
 
 /*
@@ -1576,7 +1576,7 @@ void __MidiCtrl_ADSR_RR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 			voice[0x24] |= 0x3C0;
 		}
 		voice += 0x30;
-	} while (voice < (int*)((unsigned int*)p_VoiceData + 0xC00));
+	} while (voice < (int*)(p_VoiceData + 0x40));
 }
 
 /*

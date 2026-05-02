@@ -151,17 +151,6 @@ s16 t_PanningDataR[] = {
     48, 42, 36, 30, 24, 18, 12, 6,
 };
 
-struct RedReverbDATA {
-    int callback;
-    void* context;
-    int kind;
-};
-
-struct RedReverbSize {
-    u32 m_requested;
-    u32 m_aligned;
-};
-
 static volatile u8 m_RandomIndex;
 static RedReverbDATA* volatile p_ReverbData;
 static RedReverbSize* p_ReverbSize;

@@ -307,7 +307,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 {
 	unsigned char flag;
-	int waveBase;
+	RedWaveHeadWD* waveBase;
 	int* track;
 	unsigned int state;
 	unsigned char attrMask;
@@ -323,7 +323,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	deltaTime = (unsigned int)info->m_waveNoHi * 0x100 + (unsigned int)info->m_waveNoLo;
 	waveBase = c_RedEntry.SearchWaveBase(deltaTime);
 	if (waveBase != 0) {
-		c_RedEntry.WaveHistoryManager(1, reinterpret_cast<RedWaveHeadWD*>(waveBase)->m_waveNo);
+		c_RedEntry.WaveHistoryManager(1, waveBase->m_waveNo);
 	} else {
 		if (m_ReportPrint != 0) {
 			OSReport(sRedCommandWaveNotEntryFmt, sRedCommandLogPrefix, sRedCommandLogWarnColor,
@@ -362,7 +362,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 
 		seTrack = (int*)((unsigned char*)p_VoiceData + ((RedTrackDATA*)track)->m_trackNo * 0xc0);
 		while (true) {
-			((RedTrackDATA*)track)->m_waveBankData = waveBase;
+			((RedTrackDATA*)track)->m_waveBankData = (int)waveBase;
 			((RedTrackDATA*)track)->m_command = current;
 			current = current +
 			          (((unsigned int)seq[1] * 0x100 + (unsigned int)*seq) & 0x7fff);
@@ -688,7 +688,7 @@ void SePause(int seId, int pause)
  */
 void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume, int mode)
 {
-	int waveBase = c_RedEntry.SearchWaveBase(musicHead->m_waveNo);
+	RedWaveHeadWD* waveBase = c_RedEntry.SearchWaveBase(musicHead->m_waveNo);
 	if (waveBase == 0) {
 		return;
 	}
@@ -922,8 +922,7 @@ int MusicPlay(int musicId, int volume, int mode)
 
 	if (musicBank != 0) {
 		musicHead = (RedMusicHEAD*)musicBank->m_data;
-		RedWaveHeadWD* waveHead =
-		    (RedWaveHeadWD*)c_RedEntry.SearchWaveBase(musicHead->m_waveNo);
+		RedWaveHeadWD* waveHead = c_RedEntry.SearchWaveBase(musicHead->m_waveNo);
 
 		if (waveHead == 0) {
 			return -1;

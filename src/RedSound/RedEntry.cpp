@@ -661,13 +661,13 @@ int CRedEntry::GetWaveBank(int waveNo)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedEntry::SearchWaveBase(int waveNo)
+RedWaveHeadWD* CRedEntry::SearchWaveBase(int waveNo)
 {
 	RedHistoryBANK* waveBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase);
 
 	do {
 		if (waveNo == waveBank->m_id) {
-			return waveBank->m_data;
+			return reinterpret_cast<RedWaveHeadWD*>(waveBank->m_data);
 		}
 		waveBank += 1;
 	} while (waveBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x400));

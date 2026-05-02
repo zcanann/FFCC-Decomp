@@ -1052,10 +1052,10 @@ void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	RedHistoryBANK* waveBank;
+	int* waveTable;
 	int bankNo;
 	unsigned int waveNo;
 	RedWaveHeadWD* waveBankData;
-	int* waveTable;
 
 	bankNo = *track->m_command++;
 	waveNo = *track->m_command++;

@@ -1151,7 +1151,7 @@ RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voic
 {
     int* voiceData;
 
-    if ((((u32*)track)[0x41] & 0x80000U) != 0) {
+    if ((track->m_flags & 0x80000U) != 0) {
         voiceData = (int*)p_VoiceData;
         do {
             if ((u32)*voiceData == (u32)track) {

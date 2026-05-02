@@ -3,6 +3,9 @@
 
 #include "types.h"
 
+struct RedTrackDATA;
+struct RedVoiceDATA;
+
 struct RedStreamHEAD {
     u8 m_unk00[0x0C];
     int m_loopEnd;
@@ -15,8 +18,8 @@ struct RedStreamHEAD {
 };
 
 struct RedStreamDATA {
-    int m_track;
-    int m_voiceData;
+    RedTrackDATA* m_track;
+    RedVoiceDATA* m_voiceData;
     u8* m_fileData;
     void* m_buffer;
     RedStreamHEAD m_header;

@@ -506,44 +506,43 @@ void __MidiCtrl_Pass(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
  */
 void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    unsigned int* seTrack;
-    unsigned int* controlData;
+    RedVoiceDATA* voice;
 
     track->m_flags = 0;
     KeyOffSet(control, keyOnData, track);
 
-    seTrack = (unsigned int*)p_VoiceData;
+    voice = p_VoiceData;
     do {
-        if ((RedTrackDATA*)*seTrack == track) {
-            ((unsigned char*)seTrack)[0x1a] &= -6;
+        if (voice->m_track == track) {
+            ((unsigned char*)voice)[0x1a] &= -6;
         }
-        seTrack += 0x30;
-    } while (seTrack < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
+        voice++;
+    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
 
     track->m_command = 0;
     if (control < p_SoundControlBuffer + REDSOUND_CONTROL_SE) {
         control->m_activeTrackCount--;
         if ((control->m_activeTrackCount == 0) &&
             ((m_MusicPhraseStop == 1) || ((control->m_flags & 1) == 0))) {
-            controlData = (unsigned int*)control;
-            seTrack = (unsigned int*)p_VoiceData;
+            voice = p_VoiceData;
             do {
-                if ((controlData[0] <= seTrack[0]) &&
-                    (seTrack[0] < controlData[0] + (unsigned int)control->m_trackCount * 0x154)) {
-                    seTrack[0x25] &= 0xfffffff3;
-                    seTrack[0x24] &= 0xfffffffe;
-                    seTrack[0x24] |= 2;
-                    seTrack[0] = 0;
+                if ((((unsigned int*)control)[0] <= (unsigned int)voice->m_track) &&
+                    ((unsigned int)voice->m_track <
+                     ((unsigned int*)control)[0] + (unsigned int)control->m_trackCount * 0x154)) {
+                    ((unsigned int*)voice)[0x25] &= 0xfffffff3;
+                    ((unsigned int*)voice)[0x24] &= 0xfffffffe;
+                    ((unsigned int*)voice)[0x24] |= 2;
+                    voice->m_track = 0;
                 }
-                seTrack += 0x30;
-            } while (seTrack < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
+                voice++;
+            } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
 
-            c_RedEntry.MusicHistoryManager(0, controlData[0x11c]);
-            c_RedEntry.WaveHistoryManager(0, controlData[0x11f]);
-            controlData[0x11c] = 0xffffffff;
+            c_RedEntry.MusicHistoryManager(0, ((unsigned int*)control)[0x11c]);
+            c_RedEntry.WaveHistoryManager(0, ((unsigned int*)control)[0x11f]);
+            ((unsigned int*)control)[0x11c] = 0xffffffff;
             control->m_updateFlags = 0;
-            RedDelete((int)controlData[0]);
-            controlData[0] = 0;
+            RedDelete((int)((unsigned int*)control)[0]);
+            ((unsigned int*)control)[0] = 0;
         }
     } else {
         if ((u32)track->m_waveBankData != 0) {

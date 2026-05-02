@@ -762,8 +762,6 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
  */
 void CRedEntry::DisplayWaveInfo()
 {
-	int* entry = (int*)this;
-
 	if (m_ReportPrint != 0) {
 		OSReport(sRedEntryNewline);
 		fflush(__files + 1);
@@ -789,17 +787,17 @@ void CRedEntry::DisplayWaveInfo()
 					freeSize = bank[1].m_address - (bank->m_address + bank->m_size);
 				}
 
-				RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(entry[0]);
+				RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase);
 				do {
 					if ((history->m_size != 0) && (((RedWaveHeadWD*)history->m_data)->m_aramAddress == bank->m_address)) {
 						break;
 					}
 					history += 1;
-				} while (history < reinterpret_cast<RedHistoryBANK*>(entry[0] + 0x400));
+				} while (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x400));
 
-				if (history < reinterpret_cast<RedHistoryBANK*>(entry[0] + 0x400)) {
-					if (history < reinterpret_cast<RedHistoryBANK*>(entry[0] + 0x100)) {
-						unsigned int index = reinterpret_cast<unsigned int>(history) - (unsigned int)entry[0];
+				if (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x400)) {
+					if (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x100)) {
+						unsigned int index = reinterpret_cast<unsigned int>(history) - (unsigned int)m_waveBankBase;
 						OSReport(s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53, sRedEntryLogPrefix, (int)(index >> 4),
 						         (int)((RedWaveHeadWD*)history->m_data)->m_waveNo, ((RedWaveHeadWD*)history->m_data)->m_aramAddress, bank->m_size,
 						         freeSize, history->m_historyNo);

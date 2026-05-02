@@ -225,7 +225,7 @@ void _SetReverbDepth(int* command)
             fadeStep++;
         }
         reverbDepth |= 0x800;
-        seInfo = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
+        seInfo = (int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
         do {
             if ((u32)*seInfo != 0) {
                 fadeDepth = seInfo[0x1a] & 0xfffff000U;
@@ -234,7 +234,7 @@ void _SetReverbDepth(int* command)
                 seInfo[0x1c] = fadeStep;
             }
             seInfo += 0x55;
-        } while (seInfo < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
+        } while (seInfo < (int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + 0x2a80));
     }
 }
 
@@ -1303,10 +1303,10 @@ void CRedDriver::Init()
     p_EditorVoice[1] = 0;
     p_EditorVoice[0] = 0;
     uVar3 = (void*)RedNew(0x2a80);
-    *(void**)((char*)p_SoundControlBuffer + 0xdbc) = uVar3;
-    memset(*(void**)((char*)p_SoundControlBuffer + 0xdbc), 0, 0x2a80);
+    p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks = (RedTrackDATA*)uVar3;
+    memset(p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks, 0, 0x2a80);
     iVar5 = 0;
-    iVar6 = (int)*(void**)((char*)p_SoundControlBuffer + 0xdbc);
+    iVar6 = (int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     do {
         iVar4 = iVar5 * 0x154;
         cVar1 = (char)iVar5;
@@ -1732,7 +1732,7 @@ int CRedDriver::SePlayState(int seID)
 
     uVar1 = OSDisableInterrupts();
     result = 0;
-    seInfoBase = (int**)((int)p_SoundControlBuffer + 0xdbc);
+    seInfoBase = (int**)&p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     seInfo = *seInfoBase;
     do {
         if (((u32)*seInfo != 0) && ((seID == -1 || (((RedTrackDATA*)seInfo)->m_seId == seID)))) {

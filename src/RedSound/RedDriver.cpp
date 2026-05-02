@@ -88,7 +88,7 @@ volatile int m_MasterSEVolume;
 RedStreamDATA* volatile p_Stream;
 static int m_DMAMode;
 volatile int m_SeSkipStep;
-unsigned int* volatile p_VoiceData;
+RedVoiceDATA* volatile p_VoiceData;
 int p_EditorVoice[2];
 RedTrackDATA* p_EditorTrack;
 static u8* volatile p_MainThreadStack;
@@ -387,11 +387,11 @@ void _MusicMasterVolume(int* command)
         m_MasterMusicVolume = m_MasterMusicVolume * 4;
         m_MasterMusicVolume = m_MasterMusicVolume - 1;
     }
-    puVar1 = p_VoiceData;
+    puVar1 = (unsigned int*)p_VoiceData;
     do {
         puVar1[0x2e] = puVar1[0x2e] | 2;
         puVar1 += 0x30;
-    } while (puVar1 < p_VoiceData + 0xc00);
+    } while (puVar1 < (unsigned int*)p_VoiceData + 0xc00);
 }
 
 /*
@@ -551,11 +551,11 @@ void _SeMasterVolume(int* command)
         m_MasterSEVolume = m_MasterSEVolume * 4;
         m_MasterSEVolume = m_MasterSEVolume - 1;
     }
-    puVar1 = p_VoiceData;
+    puVar1 = (unsigned int*)p_VoiceData;
     do {
         puVar1[0x2e] = puVar1[0x2e] | 2;
         puVar1 += 0x30;
-    } while (puVar1 < p_VoiceData + 0xc00);
+    } while (puVar1 < (unsigned int*)p_VoiceData + 0xc00);
 }
 
 /*
@@ -1278,7 +1278,7 @@ void CRedDriver::Init()
     *(int*)((char*)p_SoundControl + 0x470) = -1;
     p_KeyOnData = (RedKeyOnDATA*)RedNew(0x600);
     memset(p_KeyOnData, 0, 0x600);
-    p_VoiceData = (unsigned int*)RedNew(0x3000);
+    p_VoiceData = (RedVoiceDATA*)RedNew(0x3000);
     memset(p_VoiceData, 0, 0x3000);
     iVar6 = 0;
     do {

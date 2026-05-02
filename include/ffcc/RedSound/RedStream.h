@@ -17,7 +17,7 @@ struct RedStreamHEAD {
 struct RedStreamDATA {
     int m_track;
     int m_voiceData;
-    int m_fileData;
+    u8* m_fileData;
     void* m_buffer;
     RedStreamHEAD m_header;
     u8 m_trackData[2][0x60];

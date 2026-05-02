@@ -99,14 +99,14 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
 		dstBuffer = (unsigned char*)((int)stream->m_buffer + bufferIndex * 0x1000);
 		streamStruct = stream->m_voiceData;
 
-		memcpy(dstBuffer, (void*)(stream->m_fileData + stream->m_readOffset), 0x1000);
+		memcpy(dstBuffer, stream->m_fileData + stream->m_readOffset, 0x1000);
 		stream->m_readOffset += 0x1000;
 		if (stream->m_readOffset >= stream->m_fileSize) {
 			stream->m_readOffset = 0;
 		}
 
 		if (stream->m_header.m_channelCount == 2) {
-			memcpy(dstBuffer + 0x2000, (void*)(stream->m_fileData + stream->m_readOffset), 0x1000);
+			memcpy(dstBuffer + 0x2000, stream->m_fileData + stream->m_readOffset, 0x1000);
 			stream->m_readOffset += 0x1000;
 			if (stream->m_readOffset >= stream->m_fileSize) {
 				stream->m_readOffset = 0;
@@ -231,7 +231,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 		do {
 			pbVar5 = (unsigned char*)((int)stream->m_buffer + bufferIndex * 0x1000);
 			iVar8 = stream->m_voiceData;
-			memcpy(pbVar5, (void*)(stream->m_fileData + stream->m_readOffset), 0x1000);
+			memcpy(pbVar5, stream->m_fileData + stream->m_readOffset, 0x1000);
 			stream->m_readOffset = stream->m_readOffset + 0x1000;
 			
 			if (stream->m_readOffset >= stream->m_fileSize) {
@@ -343,7 +343,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		streamData->m_readOffset = 0x1000;
 		streamData->m_streamCursor = 0;
 		streamData->m_voiceData = (int)p_VoiceData + ((RedTrackDATA*)streamData->m_track)->m_trackNo * 0xc0;
-		streamData->m_fileData = (int)streamHeader;
+		streamData->m_fileData = (u8*)streamHeader;
 		streamData->m_fileSize = fileSize;
 		if (volume != 0) {
 			volume = ((volume + 1) * 0x100 - 1) * 0x1000;

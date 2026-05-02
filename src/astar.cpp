@@ -148,122 +148,109 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 {
 	CVector baseVec(base);
 	CVector fromVec(from);
-	CVector diffBaseToFrom;
+	CVector escapeDirSource;
+	CVector escapeDir;
 
 	PSVECSubtract(reinterpret_cast<Vec*>(&fromVec),
 	              reinterpret_cast<Vec*>(&baseVec),
-	              reinterpret_cast<Vec*>(&diffBaseToFrom));
+	              reinterpret_cast<Vec*>(&escapeDirSource));
 
-	CVector escapeDir;
-	escapeDir.x = diffBaseToFrom.x;
-	escapeDir.y = diffBaseToFrom.y;
-	escapeDir.z = diffBaseToFrom.z;
-
+	escapeDir.x = escapeDirSource.x;
+	escapeDir.y = escapeDirSource.y;
+	escapeDir.z = escapeDirSource.z;
 	escapeDir.Normalize();
 
 	float behindBestDist = kAStarEscapeInitialBestDist;
-	float aheadBestDist  = kAStarEscapeInitialBestDist;
+	CAPos* behindBest = (CAPos*)0;
+	CAPos* aheadBest = (CAPos*)0;
+	int i = 0;
+	float aheadBestDist = behindBestDist;
+	CAPos* portal = m_portals;
 
-	CAPos* behindBest = (CAPos*)nullptr;
-	CAPos* aheadBest  = (CAPos*)nullptr;
-
-	for (int i = 0; i < 64; ++i)
+	do
 	{
-		CAPos& portal = m_portals[i];
-
+		unsigned int otherGroup = portal->m_groupA;
 		bool exists = false;
 
-		if (portal.m_groupA != 0 && portal.m_groupB != 0)
+		if (otherGroup != 0 && portal->m_groupB != 0)
 		{
 			exists = true;
 		}
 
-		if (!exists)
+		if (exists)
 		{
-			continue;
-		}
+			bool connected = false;
 
-		bool connected = false;
-
-		if (portal.m_groupA == startGroup || portal.m_groupB == startGroup)
-		{
-			connected = true;
-		}
-
-		if (!connected)
-		{
-			continue;
-		}
-
-		unsigned int otherGroup = portal.m_groupA;
-
-		if (otherGroup == startGroup)
-		{
-			otherGroup = portal.m_groupB;
-		}
-
-		if (otherGroup == forbiddenGroup)
-		{
-			continue;
-		}
-
-		CVector baseVec1(base);
-		CVector portalPos1(portal.m_position);
-
-		Vec diffBaseToPortalNormSrc;
-		CVector dirToPortal;
-
-		PSVECSubtract(reinterpret_cast<Vec*>(&portalPos1),
-		              reinterpret_cast<Vec*>(&baseVec1),
-		              &diffBaseToPortalNormSrc);
-
-		dirToPortal.x = diffBaseToPortalNormSrc.x;
-		dirToPortal.y = diffBaseToPortalNormSrc.y;
-		dirToPortal.z = diffBaseToPortalNormSrc.z;
-
-		dirToPortal.Normalize();
-
-		float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&escapeDir),
-		                            reinterpret_cast<Vec*>(&dirToPortal));
-
-		CVector baseVec2(base);
-		CVector portalPos2(portal.m_position);
-
-		Vec diffBaseToPortalMagSrc;
-		CVector diffForMag;
-
-		// diffBaseToPortalMagSrc = portalPos2 - baseVec2;
-		PSVECSubtract(reinterpret_cast<Vec*>(&portalPos2),
-		              reinterpret_cast<Vec*>(&baseVec2),
-		              &diffBaseToPortalMagSrc);
-
-		diffForMag.x = diffBaseToPortalMagSrc.x;
-		diffForMag.y = diffBaseToPortalMagSrc.y;
-		diffForMag.z = diffBaseToPortalMagSrc.z;
-
-		float dist = PSVECMag(reinterpret_cast<Vec*>(&diffForMag));
-
-		if (dot < FLOAT_803320C4)
-		{
-			if (behindBestDist < dist)
+			if (otherGroup == static_cast<unsigned int>(startGroup) || portal->m_groupB == startGroup)
 			{
-				behindBest    = &portal;
-				behindBestDist = dist;
+				connected = true;
+			}
+
+			if (connected)
+			{
+				if (otherGroup == static_cast<unsigned int>(startGroup))
+				{
+					otherGroup = portal->m_groupB;
+				}
+
+				if (forbiddenGroup != static_cast<int>(otherGroup))
+				{
+					CVector portalDirBase(base);
+					CVector portalDirPos(portal->m_position);
+					CVector dirToPortalSource;
+					CVector dirToPortal;
+
+					PSVECSubtract(reinterpret_cast<Vec*>(&portalDirPos),
+					              reinterpret_cast<Vec*>(&portalDirBase),
+					              reinterpret_cast<Vec*>(&dirToPortalSource));
+
+					dirToPortal.x = dirToPortalSource.x;
+					dirToPortal.y = dirToPortalSource.y;
+					dirToPortal.z = dirToPortalSource.z;
+					dirToPortal.Normalize();
+
+					float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&escapeDir),
+					                            reinterpret_cast<Vec*>(&dirToPortal));
+
+					CVector distBase(base);
+					CVector distPortal(portal->m_position);
+					CVector distVecSource;
+					CVector distVec;
+
+					PSVECSubtract(reinterpret_cast<Vec*>(&distPortal),
+					              reinterpret_cast<Vec*>(&distBase),
+					              reinterpret_cast<Vec*>(&distVecSource));
+
+					distVec.x = distVecSource.x;
+					distVec.y = distVecSource.y;
+					distVec.z = distVecSource.z;
+
+					float dist = PSVECMag(reinterpret_cast<Vec*>(&distVec));
+
+					if (dot < FLOAT_803320C4)
+					{
+						if (behindBestDist < dist)
+						{
+							behindBest = portal;
+							behindBestDist = dist;
+						}
+					}
+					else if (aheadBestDist < dist)
+					{
+						aheadBest = portal;
+						aheadBestDist = dist;
+					}
+				}
 			}
 		}
-		else
-		{
-			if (aheadBestDist < dist)
-			{
-				aheadBest    = &portal;
-				aheadBestDist = dist;
-			}
-		}
-	}
 
-	if (aheadBest != nullptr)
+		++i;
+		++portal;
+	} while (i < 64);
+
+	if (aheadBest != (CAPos*)0)
 	{
-		return aheadBest;
+		behindBest = aheadBest;
 	}
 
 	return behindBest;
@@ -432,19 +419,26 @@ void CAStar::drawAStar()
 {
 	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x400) != 0)
 	{
-		if ((static_cast<int>(System.m_frameCounter) % 0x1e) == 0)
+		int frameBucket = static_cast<int>(System.m_frameCounter) / 0x1e +
+		                  (static_cast<int>(System.m_frameCounter) >> 0x1f);
+
+		if (System.m_frameCounter == static_cast<unsigned int>((frameBucket - (frameBucket >> 0x1f)) * 0x1e))
 		{
-			for (int group = 0; group < 64; ++group)
+			int group = 0;
+
+			do
 			{
 				unsigned char b = static_cast<unsigned char>(Math.Rand(0xff));
 				unsigned char g = static_cast<unsigned char>(Math.Rand(0xff));
 				unsigned char r = static_cast<unsigned char>(Math.Rand(0xff));
 				CColor color(r, g, b, 0xFF);
 				MapMng.SetIdGrpColor(group, 0, color.color);
-			}
+				++group;
+			} while (group < 64);
 		}
 
 		bool hasGroups = false;
+
 		if (m_currentGroup != 0 && m_previousGroup != 0)
 		{
 			hasGroups = true;
@@ -456,60 +450,84 @@ void CAStar::drawAStar()
 			Graphic.DrawSphere(gFlatPosMtx, &m_lastGroupPos, kDrawAStarSphereRadius, &white.color);
 		}
 
-		for (int i = 0; i < 64; ++i)
+		int i = 0;
+		CAPos* portal = m_portals;
+
+		do
 		{
-			CAPos& portal = m_portals[i];
+			bool exists = false;
 
-			if (portal.m_groupA == 0 || portal.m_groupB == 0)
+			if (portal->m_groupA != 0 && portal->m_groupB != 0)
 			{
-				continue;
+				exists = true;
 			}
 
-			CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
-			Graphic.DrawSphere(gFlatPosMtx, &portal.m_position, kDrawAStarSphereRadius, &yellow.color);
-
-			unsigned char* groupPtr = &portal.m_groupA;
-			for (int side = 0; side < 2; ++side, ++groupPtr)
+			if (exists)
 			{
-				unsigned char group = *groupPtr;
+				CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
+				Graphic.DrawSphere(gFlatPosMtx, &portal->m_position, kDrawAStarSphereRadius, &yellow.color);
 
-				if (group == 0)
+				int side = 0;
+				unsigned char* group = &portal->m_groupA;
+
+				do
 				{
-					continue;
-				}
+					unsigned char groupId = *group;
 
-				for (int j = 0; j < 64; ++j)
-				{
-					if (i == j)
+					if (groupId != 0)
 					{
-						continue;
+						int j = 0;
+						CAPos* other = m_portals;
+
+						do
+						{
+							if (i != j)
+							{
+								bool otherExists = false;
+
+								if (other->m_groupA != 0 && other->m_groupB != 0)
+								{
+									otherExists = true;
+								}
+
+								if (otherExists)
+								{
+									bool matches = false;
+
+									if (other->m_groupA == groupId || other->m_groupB == groupId)
+									{
+										matches = true;
+									}
+
+									if (matches)
+									{
+										GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
+										GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 2);
+										GXPosition3f32(
+											portal->m_position.x,
+											portal->m_position.y + kPolyGroupTopOffsetY,
+											portal->m_position.z);
+										GXPosition3f32(
+											other->m_position.x,
+											other->m_position.y + kPolyGroupTopOffsetY,
+											other->m_position.z);
+									}
+								}
+							}
+
+							++j;
+							++other;
+						} while (j < 64);
 					}
 
-					CAPos& other = m_portals[j];
-
-					if (other.m_groupA == 0 || other.m_groupB == 0)
-					{
-						continue;
-					}
-
-					if (other.m_groupA != group && other.m_groupB != group)
-					{
-						continue;
-					}
-
-					GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
-					GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 2);
-					GXPosition3f32(
-						portal.m_position.x,
-						portal.m_position.y + kPolyGroupTopOffsetY,
-						portal.m_position.z);
-					GXPosition3f32(
-						other.m_position.x,
-						other.m_position.y + kPolyGroupTopOffsetY,
-						other.m_position.z);
-				}
+					++side;
+					++group;
+				} while (side < 2);
 			}
-		}
+
+			++i;
+			++portal;
+		} while (i < 64);
 	}
 }
 /*

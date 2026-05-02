@@ -1236,7 +1236,8 @@ void CRedEntry::DisplaySePlayInfo()
 
 				OSReport(s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2, sRedEntryLogPrefix,
 				         trackIndex, songNo, seDataNo & 0x1FF,
-				         ((int)*(unsigned char*)(seqInfo + 2) << 8) | *(unsigned char*)(seqInfo + 1));
+				         ((int)reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoHi << 8) |
+				             reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoLo);
 				fflush(__files + 1);
 			}
 			track += 0x55;

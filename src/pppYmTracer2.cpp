@@ -72,8 +72,8 @@ union PackedColor {
     u8 bytes[4];
 };
 
-static PackedColor g_pppYmTracer2_1;
-static PackedColor g_pppYmTracer2_2;
+extern PackedColor g_pppYmTracer2_1;
+extern PackedColor g_pppYmTracer2_2;
 
 static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 {

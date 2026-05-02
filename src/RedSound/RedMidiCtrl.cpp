@@ -232,7 +232,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
     int* slot;
     int* voice;
 
-    if (((void*)control == (void*)((int)p_SoundControlBuffer + 0x928)) || ((track->m_flags & 0x80000) == 0)) {
+    if ((control == p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP) || ((track->m_flags & 0x80000) == 0)) {
         ((int*)track)[0x44] = 0;
         key = ((char*)track)[0x24];
         slot = (int*)keyOnData;
@@ -521,7 +521,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
     } while (seTrack < (unsigned int*)(p_VoiceData + 0x40));
 
     track->m_command = 0;
-    if ((int*)control < (int*)((int)p_SoundControlBuffer + 0xdbc)) {
+    if (control < p_SoundControlBuffer + REDSOUND_CONTROL_SE) {
         control->m_activeTrackCount--;
         if ((control->m_activeTrackCount == 0) &&
             ((m_MusicPhraseStop == 1) || ((((int*)control)[0x11b] & 1) == 0))) {

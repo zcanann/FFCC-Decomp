@@ -11,11 +11,6 @@ class CRedDriver;
 class CRedEntry;
 class CRedMemory;
 
-struct RedReverbModeData {
-	int kind;
-	int params[6];
-};
-
 struct RedControlRamp {
 	int m_value;
 	int m_step;
@@ -38,7 +33,6 @@ extern signed char t_KeySignatureData[];
 extern signed char t_RandomData[];
 extern s16 t_PanningData[];
 extern s16 t_PanningDataR[];
-extern RedReverbModeData t_ReverbModeData[];
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;
 extern RedSeBlockHEAD* volatile p_SeBlockData[];

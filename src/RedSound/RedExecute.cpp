@@ -160,6 +160,11 @@ static RedKeyOnDATA* volatile p_SkipKeyOn;
 static const float s_ReverbTimeScale = 1000.0f;
 static const float s_ReverbEffectScale = 100.0f;
 
+enum RedExecuteLayoutSize {
+    REDSOUND_REVERB_DATA_COUNT = 2,
+    REDSOUND_REVERB_DATA_BUFFER_SIZE = sizeof(RedReverbDATA) * REDSOUND_REVERB_DATA_COUNT,
+};
+
 /*
  * --INFO--
  * PAL Address: 0x801c2fc4
@@ -271,8 +276,8 @@ void ReverbAreaFree(void* area)
  */
 void InitReverb()
 {
-    p_ReverbData = (RedReverbDATA*)RedNew(0x18);
-    memset(p_ReverbData, 0, 0x18);
+    p_ReverbData = (RedReverbDATA*)RedNew(REDSOUND_REVERB_DATA_BUFFER_SIZE);
+    memset(p_ReverbData, 0, REDSOUND_REVERB_DATA_BUFFER_SIZE);
     p_ReverbSize = (RedReverbSize*)RedNew(4);
 }
 

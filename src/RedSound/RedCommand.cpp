@@ -862,7 +862,7 @@ int MusicStop(int seId)
 						seTrack->m_active = 0;
 					}
 					seTrack++;
-				} while (seTrack < (RedVoiceDATA*)p_VoiceData + 0x40);
+				} while (seTrack < (RedVoiceDATA*)p_VoiceData + REDSOUND_VOICE_COUNT);
 
 				int* track = (int*)music->m_tracks;
 				do {

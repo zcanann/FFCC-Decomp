@@ -412,19 +412,19 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     }
 
     if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x200000) != 0) {
+        int* debugGroupData = groupData;
         for (i = 0; i < (int)params->m_groupCount; i++) {
-            if (groupData[0] == 1) {
+            if (debugGroupData[0] == 1) {
                 _GXColor debugColor;
                 int firstParticle;
                 int j;
-                float scale;
+                float groupScale;
                 Mtx sphereMtx;
                 Mtx tempMtx;
                 Vec debugPos;
 
                 switch (i) {
                 case 0:
-                case 2:
                     debugColor.r = 0x80;
                     debugColor.g = 0x00;
                     debugColor.b = 0x00;
@@ -434,6 +434,12 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                     debugColor.r = 0x80;
                     debugColor.g = 0x80;
                     debugColor.b = 0xFF;
+                    debugColor.a = 0xFF;
+                    break;
+                case 2:
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x00;
+                    debugColor.b = 0x00;
                     debugColor.a = 0xFF;
                     break;
                 case 3:
@@ -452,27 +458,27 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
 
                 firstParticle = -1;
                 for (j = 0; j < (int)params->m_slotCount; j++) {
-                    if (*(signed char*)(groupData[2] + j) != -1) {
-                        firstParticle = (int)*(signed char*)(groupData[1] + j);
+                    if (*(signed char*)(debugGroupData[2] + j) != -1) {
+                        firstParticle = (int)*(signed char*)(debugGroupData[1] + j);
                         break;
                     }
                 }
 
-                scale = *(float*)(groupData + 10);
+                groupScale = *(float*)(debugGroupData + 10);
                 PSMTXIdentity(sphereMtx);
-                sphereMtx[0][0] = scale;
-                sphereMtx[1][1] = scale;
-                sphereMtx[2][2] = scale;
+                sphereMtx[0][0] = groupScale;
+                sphereMtx[1][1] = groupScale;
+                sphereMtx[2][2] = groupScale;
 
                 PSMTXConcat(work->m_particleWmats[firstParticle].m_matrix, ymBreath->m_localMatrix.value, tempMtx);
                 PSMTXConcat(ppvCameraMatrix, tempMtx, tempMtx);
-                PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &debugPos);
+                PSMTXMultVec(tempMtx, (Vec*)(debugGroupData + 3), &debugPos);
                 sphereMtx[0][3] = debugPos.x;
                 sphereMtx[1][3] = debugPos.y;
                 sphereMtx[2][3] = debugPos.z;
                 Graphic.DrawSphere(sphereMtx, debugColor);
             }
-            groupData += 0x17;
+            debugGroupData += 0x17;
         }
 
         pppSetBlendMode(1);

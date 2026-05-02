@@ -368,12 +368,12 @@ void _MusicCrossPlaySequence(int* command)
  */
 void _MusicNextPlaySequence(int* command)
 {
-    int srcBuffer;
+    RedSoundCONTROL* soundControl;
 
-    srcBuffer = (int)p_SoundControlBuffer;
-    if ((*command == *(int*)(srcBuffer + 0x470)) ||
-        (*command == *(int*)(srcBuffer + 0x904)) ||
-        (*command == *(int*)(srcBuffer + 0xd98))) {
+    soundControl = p_SoundControlBuffer;
+    if ((*command == soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
+        (*command == soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) ||
+        (*command == soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
         return;
     }
     if (c_RedEntry.SearchMusicSequence(*command) >= 0) {

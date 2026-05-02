@@ -13,9 +13,6 @@ extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*,
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void Calc__8CMapAnimFl(CMapAnim*, long);
-extern "C" CMapAnim* __vc__21CPtrArray_P8CMapAnim_FUl(void*, unsigned long);
-extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
-extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void*, unsigned long);
 
 static const char s_mapanim_cpp[] = "mapanim.cpp";
 static const char s_ptrarray_grow_error[] =
@@ -121,7 +118,7 @@ void CMapAnimRun::Calc(long frame)
 runFrame:
     CPtrArray<CMapAnim*>* mapAnimArray =
         reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213FC);
-    CMapAnim* mapAnim = __vc__21CPtrArray_P8CMapAnim_FUl(mapAnimArray, run->mapAnimIndex);
+    CMapAnim* mapAnim = (*mapAnimArray)[run->mapAnimIndex];
     Calc__8CMapAnimFl(mapAnim, run->currentFrame);
     if (++run->currentFrame > run->endFrame) {
         if (run->loop != 0) {
@@ -156,9 +153,9 @@ void CMapAnim::Calc(long frame)
 
     CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
 
-    nodeCount = GetSize__26CPtrArray_P12CMapAnimNode_Fv(nodeArray);
+    nodeCount = nodeArray->GetSize();
     for (i = 0; i < nodeCount; i = i + 1) {
-        CMapAnimNode* node = __vc__26CPtrArray_P12CMapAnimNode_FUl(nodeArray, i);
+        CMapAnimNode* node = (*nodeArray)[i];
         node->Interp(frame);
     }
 }
@@ -265,9 +262,9 @@ CMapAnim::~CMapAnim()
 {
     unsigned int i = 0;
 
-    while (static_cast<unsigned int>(GetSize__26CPtrArray_P12CMapAnimNode_Fv(&mapAnimNodes)) > i) {
-        CMapAnimNode* node = __vc__26CPtrArray_P12CMapAnimNode_FUl(&mapAnimNodes, i);
-        if (node != 0 && (node = __vc__26CPtrArray_P12CMapAnimNode_FUl(&mapAnimNodes, i), node != 0)) {
+    while (static_cast<unsigned int>(mapAnimNodes.GetSize()) > i) {
+        CMapAnimNode* node = mapAnimNodes[i];
+        if (node != 0 && (node = mapAnimNodes[i], node != 0)) {
             reinterpret_cast<int*>(node)[1] = 0;
             __dl__FPv(node);
         }
@@ -305,16 +302,23 @@ CMapAnim::CMapAnim()
 void CMapAnimNode::Interp(int frame)
 {
     CMapAnimNodeData* nodeData = reinterpret_cast<CMapAnimNodeData*>(this);
-    int startFrame = nodeData->mapAnim->startFrame;
-    unsigned int loopFrameCount = static_cast<unsigned int>((nodeData->mapAnim->endFrame - startFrame) + 1);
-    CMapAnimNodeTrackKey* keys = nodeData->tracks->position.keys;
-    int trackCount = nodeData->tracks->position.count;
-    Vec* out = &nodeData->node->position;
+    CMapAnimData* mapAnim = nodeData->mapAnim;
+    CMapAnimNodeTracks* tracks = nodeData->tracks;
+    CMapAnimTargetNode* node = nodeData->node;
+    int startFrame = mapAnim->startFrame;
+    unsigned int loopFrameCount = static_cast<unsigned int>((mapAnim->endFrame - startFrame) + 1);
     unsigned int frameInLoop = startFrame + (frame % loopFrameCount);
 
     {
+        CMapAnimNodeTrack* track = &tracks->position;
+        CMapAnimNodeTrackKey* keys = track->keys;
+        int trackCount = track->count;
+        Vec* out = &node->position;
+
         if (trackCount == 1) {
-            *out = keys[0].value;
+            out->x = keys[0].value.x;
+            out->y = keys[0].value.y;
+            out->z = keys[0].value.z;
         } else {
             unsigned int i = 0;
             CMapAnimNodeTrackKey* current = keys;
@@ -357,12 +361,15 @@ void CMapAnimNode::Interp(int frame)
     }
 
     {
-        CMapAnimNodeTrackKey* keys = nodeData->tracks->rotation.keys;
-        int trackCount = nodeData->tracks->rotation.count;
-        Vec* out = &nodeData->node->rotation;
+        CMapAnimNodeTrack* track = &tracks->rotation;
+        CMapAnimNodeTrackKey* keys = track->keys;
+        int trackCount = track->count;
+        Vec* out = &node->rotation;
 
         if (trackCount == 1) {
-            *out = keys[0].value;
+            out->x = keys[0].value.x;
+            out->y = keys[0].value.y;
+            out->z = keys[0].value.z;
         } else {
             unsigned int i = 0;
             CMapAnimNodeTrackKey* current = keys;
@@ -376,9 +383,7 @@ void CMapAnimNode::Interp(int frame)
                 if (nextIndex != 0) {
                     endFrame = next->frame;
                 } else {
-                    endFrame =
-                        next->frame +
-                        static_cast<unsigned int>((nodeData->mapAnim->endFrame - nodeData->mapAnim->startFrame) + 1);
+                    endFrame = next->frame + loopFrameCount;
                 }
 
                 unsigned int currentFrame = current->frame;
@@ -407,12 +412,15 @@ void CMapAnimNode::Interp(int frame)
     }
 
     {
-        CMapAnimNodeTrackKey* keys = nodeData->tracks->scale.keys;
-        int trackCount = nodeData->tracks->scale.count;
-        Vec* out = &nodeData->node->scale;
+        CMapAnimNodeTrack* track = &tracks->scale;
+        CMapAnimNodeTrackKey* keys = track->keys;
+        int trackCount = track->count;
+        Vec* out = &node->scale;
 
         if (trackCount == 1) {
-            *out = keys[0].value;
+            out->x = keys[0].value.x;
+            out->y = keys[0].value.y;
+            out->z = keys[0].value.z;
         } else {
             unsigned int i = 0;
             CMapAnimNodeTrackKey* current = keys;
@@ -426,9 +434,7 @@ void CMapAnimNode::Interp(int frame)
                 if (nextIndex != 0) {
                     endFrame = next->frame;
                 } else {
-                    endFrame =
-                        next->frame +
-                        static_cast<unsigned int>((nodeData->mapAnim->endFrame - nodeData->mapAnim->startFrame) + 1);
+                    endFrame = next->frame + loopFrameCount;
                 }
 
                 unsigned int currentFrame = current->frame;
@@ -456,7 +462,7 @@ void CMapAnimNode::Interp(int frame)
         }
     }
 
-    nodeData->node->dirty = 1;
+    node->dirty = 1;
 }
 
 /*

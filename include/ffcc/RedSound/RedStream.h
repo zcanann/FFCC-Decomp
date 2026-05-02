@@ -1,6 +1,7 @@
 #ifndef _FFCC_REDSOUND_REDSTREAM_H
 #define _FFCC_REDSOUND_REDSTREAM_H
 
+#include "ffcc/RedSound/RedExecute.h"
 #include "types.h"
 
 struct RedTrackDATA;
@@ -23,7 +24,7 @@ struct RedStreamDATA {
     u8* m_fileData;
     u8* m_buffer;
     RedStreamHEAD m_header;
-    u8 m_trackData[2][0x60];
+    RedWaveDATA m_trackData[2];
     int m_volume;
     int m_volumeStep;
     int m_volumeStepCount;

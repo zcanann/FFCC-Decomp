@@ -363,7 +363,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			}
 			*(int*)(*voice + 0xfc) = 1;
 			voice[0x2c] = 0x8000;
-			voice[1] = (int)streamData->m_trackData[iVar2];
+			voice[1] = (int)&streamData->m_trackData[iVar2];
 			voice[0x27] = pitch;
 			*(int*)(*voice + 0x68) = *(int*)((int)p_ReverbDepth + 0xc);
 			*(int*)(*voice + 0x70) = 0;
@@ -381,8 +381,8 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			}
 			SetVoiceVolumeMix((RedVoiceDATA*)((int)streamData->m_voiceData + iVar2 * 0xc0), streamData->m_pan >> 0xc, streamData->m_volume >> 0xc);
 			*(int*)((int)streamData->m_track + iVar2 * 0x154 + 0x11c) = streamData->m_aramBuffer + iVar2 * 0x2000;
-			memset(streamData->m_trackData[iVar2], 0, 0x60);
-			memcpy(streamData->m_trackData[iVar2] + 0x22, headerData + iVar2 * 0x2e, 0x2e);
+			memset(&streamData->m_trackData[iVar2], 0, 0x60);
+			memcpy(streamData->m_trackData[iVar2].m_adpcmData, headerData + iVar2 * 0x2e, 0x2e);
 			*(unsigned char*)((int)voice + 0x5a) = 0;
 			*(unsigned char*)((int)voice + 0x59) = 0;
 			*(unsigned char*)(voice + 0x16) = 0;
@@ -391,9 +391,9 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			*(unsigned short*)((int)voice + 0x52) = 0;
 			*(unsigned short*)(voice + 0x14) = 0;
 			*(unsigned short*)((int)voice + 0x56) = 10;
-			*(int*)(streamData->m_trackData[iVar2] + 4) = 0;
-			*(int*)(streamData->m_trackData[iVar2] + 0xc) = 0x3fff;
-			*(int*)(streamData->m_trackData[iVar2] + 8) = 2;
+			streamData->m_trackData[iVar2].m_sampleStart = 0;
+			streamData->m_trackData[iVar2].m_loopEnd = 0x3fff;
+			streamData->m_trackData[iVar2].m_loopStart = 2;
 			iVar2 += 1;
 		} while (iVar2 < streamData->m_header.m_channelCount);
 
@@ -627,7 +627,7 @@ void StreamControl()
 			*(int*)(voiceData + 0x8c) = 1;
 			if (streamData->m_header.m_channelCount == 2) {
 				*(unsigned int*)(voiceData + 0x150) |= 0x19;
-				*(unsigned int*)(voiceData + 0xc4) = (unsigned int)streamData->m_trackData[1];
+				*(unsigned int*)(voiceData + 0xc4) = (unsigned int)&streamData->m_trackData[1];
 				*(int*)(voiceData + 0x14c) = 1;
 			}
 		}

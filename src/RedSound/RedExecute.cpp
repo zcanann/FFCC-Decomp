@@ -2560,7 +2560,7 @@ void MainControl(int frames)
     m_KeyOnEntry = 0;
     memset(p_KeyOnData, 0, 0x600);
 
-    p_SoundControl = (RedSoundCONTROL*)((u8*)p_SoundControlBuffer + 0xDBC);
+    p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
     _SeMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData,
                        *(RedTrackDATA**)p_SoundControl, *(int*)((u8*)p_SoundControl + 0x474), frames);
     p_SoundControl = p_SoundControlBuffer;
@@ -2588,7 +2588,7 @@ void MainControl(int frames)
     }
 
     if (*(s16*)((u8*)p_SoundControlBuffer + 0x922) != 0) {
-        p_SoundControl = (RedSoundCONTROL*)((u8*)p_SoundControlBuffer + 0x494);
+        p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
         step = *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
         ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter -= step * frames;
         while (((RedSoundCONTROL*)p_SoundControl)->m_tickCounter < 1) {
@@ -2596,7 +2596,7 @@ void MainControl(int frames)
             _MusicNoteExecute();
         }
         if (*(s16*)((u8*)p_SoundControlBuffer + 0x48E) == 0) {
-            memcpy(p_SoundControlBuffer, (u8*)p_SoundControlBuffer + 0x494, 0x494);
+            memcpy(p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY, 0x494);
             *(s16*)((u8*)p_SoundControl + 0x48E) = 0;
             *(u8*)((u8*)p_SoundControl + 0x491) = 0;
             *(int*)((u8*)p_SoundControl + 0x470) = -1;

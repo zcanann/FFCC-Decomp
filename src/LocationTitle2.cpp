@@ -208,7 +208,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     s32* serializedOffsets;
     LocationTitle2Work* work;
     LocationTitle2ColorBlock* colorData;
-    Vec interp[20];
+    Vec interp[21];
 
     if (gPppCalcDisabled != 0) {
         return;

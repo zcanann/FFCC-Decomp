@@ -73,6 +73,8 @@ extern char SoundBuffer_1260_[];
 extern "C" unsigned char m_boss__8CGMonObj[];
 extern "C" Vec DAT_802127f0[];
 
+typedef void (*MonObjSawCallback)(CGMonObj*, int, int, int);
+
 /*
  * --INFO--
  * PAL Address: 0x80132f68
@@ -807,84 +809,61 @@ void CGMonObj::cancelStatFuncSaw()
  */
 void CGMonObj::frameStatFuncSaw()
 {
-	#if 0
-	// Function: frameStatFuncSaw__8CGMonObjFv
-	// Entry: 80131dd8
-	// Size: 560 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void frameStatFuncSaw__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  CRef *pCVar2;
-	  
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    gMonObj->field_0x63c = gMonObj->field_0x63c & 0x7f | 0x80;
-	    iVar1 = *(int *)&gMonObj->field_0x52c;
-	    if (iVar1 == 0) {
-	      if (*(int *)&gMonObj->field_0x530 == 0) {
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,10,0,0);
-	        pCVar2 = ((gMonObj->gObject).m_charaModelHandle)->m_pdtLoadRef;
-	        if (pCVar2 == (CRef *)0x0) {
-	          iVar1 = -1;
-	        }
-	        else {
-	          iVar1 = pCVar2[2].refCount;
-	        }
-	        putParticle__8CGPrgObjFiiP8CGObjectfi
-	                  ((double)FLOAT_80331d18,(CGPrgObj *)gMonObj,iVar1 << 8,
-	                   *(int *)&gMonObj->field_0x564,&gMonObj->gObject,0x1c52c);
-	        playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,0x1c52b,0x32,0x96,0,0);
-	        memset(&gMonObj->field_0x70c,0,0x34);
-	        *(undefined4 *)&gMonObj->field_0x70c = 0x1402;
-	      }
-	      else {
-	        iVar1 = isLoopAnim__8CGPrgObjFv((CGPrgObj *)gMonObj);
-	        if (iVar1 != 0) {
-	          addSubStat__8CGPrgObjFv((CGPrgObj *)gMonObj);
-	        }
-	      }
-	    }
-	    else if (iVar1 == 1) {
-	      if (*(int *)&gMonObj->field_0x530 == 0) {
-	        *(undefined4 *)&gMonObj->field_0x560 = 0x495;
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,1,1,0);
-	      }
-	      if (*(int *)&gMonObj->field_0x530 == 0x19) {
-	        resetIgnoreHit__10CGCharaObjFv(gMonObj);
-	        (**(code **)((int)(gMonObj->gObject).base_object.object.m_vtable + 0x90))(gMonObj,1,0,0);
-	        gMonObj->field_0x6c0 = 0;
-	      }
-	      if ((0x19 < *(int *)&gMonObj->field_0x530) && (gMonObj->field_0x6c0 != '\0')) {
-	        addSubStat__8CGPrgObjFv((CGPrgObj *)gMonObj);
-	      }
-	    }
-	    else if (iVar1 == 2) {
-	      if (*(int *)&gMonObj->field_0x530 == 0) {
-	        (**(code **)((int)(gMonObj->gObject).base_object.object.m_vtable + 0x90))(gMonObj,0,0,0);
-	        gMonObj->field_0x6c0 = 0;
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0xb,0,0);
-	        endPSlotBit__10CGCharaObjFi(gMonObj,1);
-	        playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,0x1c52d,0x32,0x96,0,0);
-	      }
-	      else {
-	        iVar1 = isLoopAnim__8CGPrgObjFv((CGPrgObj *)gMonObj);
-	        if (iVar1 != 0) {
-	          changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,0,0,0);
-	        }
-	      }
-	    }
-	    moveFrame__8CGMonObjFv(gMonObj);
-	  }
-	  return;
-	}
-	
-	#endif
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId >= 100) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	if (prgObj->m_lastStateId == 100) {
+		mon[0x63C] = mon[0x63C] & 0x7F | 0x80;
+
+		if (prgObj->m_subState == 0) {
+			if (prgObj->m_subFrame == 0) {
+				reqAnim__8CGPrgObjFiii(prgObj, 10, 0, 0);
+
+				CRef* pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+				int pdtNo;
+				if (pdtLoadRef == 0) {
+					pdtNo = -1;
+				} else {
+					pdtNo = reinterpret_cast<int*>(pdtLoadRef)[5];
+				}
+
+				putParticle__8CGPrgObjFiiP8CGObjectfi(
+				    prgObj, pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), object, FLOAT_80331d18, 0x1C52C);
+				playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x1C52B, 0x32, 0x96, 0, 0);
+				memset(mon + 0x70C, 0, 0x34);
+				*reinterpret_cast<int*>(mon + 0x70C) = 0x1402;
+			} else if (isLoopAnim__8CGPrgObjFv(prgObj) != 0) {
+				prgObj->addSubStat();
+			}
+		} else if (prgObj->m_subState == 1) {
+			if (prgObj->m_subFrame == 0) {
+				*reinterpret_cast<int*>(mon + 0x560) = 0x495;
+				reqAnim__8CGPrgObjFiii(prgObj, 1, 1, 0);
+			}
+
+			if (prgObj->m_subFrame == 0x19) {
+				reinterpret_cast<CGCharaObj*>(this)->resetIgnoreHit();
+				(*reinterpret_cast<MonObjSawCallback*>(*reinterpret_cast<int*>(this) + 0x90))(this, 1, 0, 0);
+				mon[0x6C0] = 0;
+			}
+
+			if (prgObj->m_subFrame > 0x19 && mon[0x6C0] != 0) {
+				prgObj->addSubStat();
+			}
+		} else if (prgObj->m_subState == 2) {
+			if (prgObj->m_subFrame == 0) {
+				(*reinterpret_cast<MonObjSawCallback*>(*reinterpret_cast<int*>(this) + 0x90))(this, 0, 0, 0);
+				mon[0x6C0] = 0;
+				reqAnim__8CGPrgObjFiii(prgObj, 0xB, 0, 0);
+				reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
+				playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x1C52D, 0x32, 0x96, 0, 0);
+			} else if (isLoopAnim__8CGPrgObjFv(prgObj) != 0) {
+				changeStat__8CGPrgObjFiii(prgObj, 0, 0, 0);
+			}
+		}
+
+		moveFrame__8CGMonObjFv(this);
 	}
 }
 
@@ -900,7 +879,15 @@ void CGMonObj::frameStatFuncSaw()
 void CGMonObj::logicFuncSaw()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if ((*reinterpret_cast<int*>(CFlat + 4840) == 0) || (*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) & 0x80)) {
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int& bossState = *reinterpret_cast<int*>(CFlat + 4840);
+	unsigned char& aiWork = mon[0x6D4];
+
+	if (bossState == 0 && (aiWork & 0x80) != 0) {
+		aiWork &= 0x7F;
+	}
+
+	if ((bossState == 0) || ((aiWork & 0x80) != 0)) {
 		if (prgObj->m_lastStateId == 100 && prgObj->m_subState == 1) {
 			prgObj->addSubStat();
 		}

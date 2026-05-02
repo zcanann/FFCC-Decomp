@@ -6,6 +6,11 @@ struct RedSeINFO;
 struct RedTrackDATA;
 struct RedWaveHeadWD;
 
+struct RedReverbModeData {
+	int kind;
+	int params[6];
+};
+
 void _EraseAttribute(int, int);
 int _EraseTime(int);
 RedTrackDATA* SearchSeEmptyTrack(int, int, int);
@@ -22,5 +27,7 @@ void _MusicPlayStart(RedMusicHEAD*, RedWaveHeadWD*, int, int, int);
 int MusicStop(int);
 int MusicPlay(int, int, int);
 void SetMusicVolume(int, int, int, int);
+
+extern RedReverbModeData t_ReverbModeData[];
 
 #endif // _FFCC_REDSOUND_REDCOMMAND_H

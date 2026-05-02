@@ -5,10 +5,20 @@
 #include "types.h"
 
 class AXFX_BUFFERUPDATE;
-struct RedReverbDATA;
 struct RedTrackDATA;
 struct RedSoundCONTROL;
 struct RedKeyOnDATA;
+
+struct RedReverbDATA {
+	int callback;
+	void* context;
+	int kind;
+};
+
+struct RedReverbSize {
+	u32 m_requested;
+	u32 m_aligned;
+};
 
 struct RedNoteDATA {
 	signed char m_key;

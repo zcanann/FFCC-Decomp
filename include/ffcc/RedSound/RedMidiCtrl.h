@@ -5,6 +5,11 @@
 
 struct RedSoundCONTROL;
 
+enum RedMidiLayoutSize {
+	REDSOUND_KEY_ON_SLOT_COUNT = 0x40,
+	REDSOUND_MUSIC_TRACK_SAVE_COUNT = 0x40,
+};
+
 struct RedTrackDATA {
 	unsigned char* m_command;
 	unsigned char m_pad04[0x08 - 0x04];
@@ -114,9 +119,15 @@ struct RedKeyOnSlot {
 };
 
 struct RedKeyOnDATA {
-	RedKeyOnSlot m_fixed[0x40];
-	RedKeyOnSlot m_priority[0x40];
-	RedKeyOnSlot m_normal[0x40];
+	RedKeyOnSlot m_fixed[REDSOUND_KEY_ON_SLOT_COUNT];
+	RedKeyOnSlot m_priority[REDSOUND_KEY_ON_SLOT_COUNT];
+	RedKeyOnSlot m_normal[REDSOUND_KEY_ON_SLOT_COUNT];
+};
+
+enum RedKeyOnWordOffset {
+	REDSOUND_KEY_ON_PRIORITY_WORD_OFFSET = 0x80,
+	REDSOUND_KEY_ON_NORMAL_WORD_OFFSET = 0x100,
+	REDSOUND_KEY_ON_TOTAL_WORD_COUNT = 0x180,
 };
 
 struct RedSoundCONTROL {
@@ -131,10 +142,10 @@ struct RedSoundCONTROL {
 	int m_volume;
 	int m_volumeAdd;
 	int m_volumeDelta;
-	unsigned char* m_savedCommand[0x40];
-	int m_savedDelta[0x40];
-	unsigned int m_savedFlags[0x40];
-	int m_savedNote[0x40];
+	unsigned char* m_savedCommand[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+	int m_savedDelta[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+	unsigned int m_savedFlags[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+	int m_savedNote[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
 	int m_savedTempo;
 	int m_savedTempoAdd;
 	int m_savedTempoDelta;

@@ -11,11 +11,6 @@ class CRedDriver;
 class CRedEntry;
 class CRedMemory;
 
-struct RedReverbModeData {
-	int kind;
-	int params[6];
-};
-
 struct RedControlRamp {
 	int m_value;
 	int m_step;
@@ -28,6 +23,33 @@ struct RedReverbDepth {
 	int m_count;
 };
 
+enum RedSoundControlIndex {
+	REDSOUND_CONTROL_MUSIC_PRIMARY = 0,
+	REDSOUND_CONTROL_MUSIC_SECONDARY = 1,
+	REDSOUND_CONTROL_MUSIC_SKIP = 2,
+	REDSOUND_CONTROL_SE = 3,
+};
+
+enum RedSoundLayoutSize {
+	REDSOUND_TRACK_SIZE = sizeof(RedTrackDATA),
+	REDSOUND_CONTROL_SIZE = 0x494,
+	REDSOUND_CONTROL_COUNT = 4,
+	REDSOUND_CONTROL_BUFFER_SIZE = REDSOUND_CONTROL_SIZE * REDSOUND_CONTROL_COUNT,
+	REDSOUND_CONTROL_SECONDARY_OFFSET = REDSOUND_CONTROL_SIZE * REDSOUND_CONTROL_MUSIC_SECONDARY,
+	REDSOUND_CONTROL_SKIP_OFFSET = REDSOUND_CONTROL_SIZE * REDSOUND_CONTROL_MUSIC_SKIP,
+	REDSOUND_SE_TRACK_COUNT = 0x20,
+	REDSOUND_SE_TRACK_ARENA_SIZE = REDSOUND_TRACK_SIZE * REDSOUND_SE_TRACK_COUNT,
+	REDSOUND_VOICE_COUNT = 0x40,
+	REDSOUND_VOICE_SIZE = sizeof(RedVoiceDATA),
+	REDSOUND_VOICE_BUFFER_SIZE = REDSOUND_VOICE_SIZE * REDSOUND_VOICE_COUNT,
+	REDSOUND_KEY_ON_BUFFER_SIZE = sizeof(RedKeyOnDATA),
+	REDSOUND_CONTROL_RAMP_SIZE = sizeof(RedControlRamp),
+	REDSOUND_REVERB_DEPTH_COUNT = 2,
+	REDSOUND_REVERB_DEPTH_BUFFER_SIZE = sizeof(RedReverbDepth) * REDSOUND_REVERB_DEPTH_COUNT,
+	REDSOUND_STREAM_COUNT = 4,
+	REDSOUND_STREAM_BUFFER_SIZE = sizeof(RedStreamDATA) * REDSOUND_STREAM_COUNT,
+};
+
 struct RedSeBlockHEAD;
 
 extern RedMidiControlFunc p_MidiControl_Function[];
@@ -38,7 +60,6 @@ extern signed char t_KeySignatureData[];
 extern signed char t_RandomData[];
 extern s16 t_PanningData[];
 extern s16 t_PanningDataR[];
-extern RedReverbModeData t_ReverbModeData[];
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;
 extern RedSeBlockHEAD* volatile p_SeBlockData[];

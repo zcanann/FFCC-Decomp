@@ -49,6 +49,11 @@ struct RedDmaRequest {
     void* m_callbackData;
 };
 
+struct RedExecCommand {
+    void (*m_func)(int*);
+    int m_args[7];
+};
+
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 static int m_RedMasterTime;
 static volatile int m_SequencialID;
@@ -57,9 +62,9 @@ static volatile int m_ThreadExecute;
 static int m_SoundMode;
 static int* volatile p_Tick;
 void* volatile p_ZeroData;
-static void* volatile p_ExecCommand;
-static void* volatile p_ExecCommandNow;
-static void* volatile p_ExecCommandOld;
+static RedExecCommand* volatile p_ExecCommand;
+static RedExecCommand* volatile p_ExecCommandNow;
+static RedExecCommand* volatile p_ExecCommandOld;
 static RedDmaRequest* p_DmaControlNow[2];
 static RedDmaRequest* p_DmaControlOld[2];
 void* volatile p_SoundControlBuffer;
@@ -662,25 +667,25 @@ int* _EntryExecCommand(void (*func)(int*), int arg1, int arg2, int arg3, int arg
                        int arg5, int arg6, int arg7)
 {
     unsigned int interruptLevel;
-    int* writePos;
+    RedExecCommand* writePos;
 
     interruptLevel = OSDisableInterrupts();
-    writePos = (int*)p_ExecCommandNow;
-    writePos[0] = (int)func;
-    writePos[1] = arg1;
-    writePos[2] = arg2;
-    writePos[3] = arg3;
-    writePos[4] = arg4;
-    writePos[5] = arg5;
-    writePos[6] = arg6;
-    writePos[7] = arg7;
-    writePos += 8;
-    if (writePos == (int*)p_ExecCommand + 0x800) {
-        writePos = (int*)p_ExecCommand;
+    writePos = p_ExecCommandNow;
+    writePos->m_func = func;
+    writePos->m_args[0] = arg1;
+    writePos->m_args[1] = arg2;
+    writePos->m_args[2] = arg3;
+    writePos->m_args[3] = arg4;
+    writePos->m_args[4] = arg5;
+    writePos->m_args[5] = arg6;
+    writePos->m_args[6] = arg7;
+    writePos++;
+    if (writePos == p_ExecCommand + 0x100) {
+        writePos = p_ExecCommand;
     }
     p_ExecCommandNow = writePos;
     OSRestoreInterrupts(interruptLevel);
-    return writePos;
+    return (int*)writePos;
 }
 
 /*
@@ -694,23 +699,23 @@ int* _EntryExecCommand(void (*func)(int*), int arg1, int arg2, int arg3, int arg
  */
 void _ExecuteCommand()
 {
-	volatile unsigned int* readPos;
-	volatile unsigned int* executePos;
+	volatile RedExecCommand* readPos;
+	volatile RedExecCommand* executePos;
 
-	executePos = (volatile unsigned int*)p_ExecCommandNow;
-	readPos = (volatile unsigned int*)p_ExecCommandOld;
+	executePos = p_ExecCommandNow;
+	readPos = p_ExecCommandOld;
 
 	while (executePos != readPos) {
-		if (*readPos != 0) {
-			((void (*)(int*))(*readPos))((int*)(readPos + 1));
+		if (readPos->m_func != 0) {
+			readPos->m_func((int*)readPos->m_args);
 		}
-		readPos += 8;
-		if (readPos == (volatile unsigned int*)p_ExecCommand + 0x800) {
-			readPos = (volatile unsigned int*)p_ExecCommand;
+		readPos++;
+		if (readPos == p_ExecCommand + 0x100) {
+			readPos = p_ExecCommand;
 		}
 	}
 
-	p_ExecCommandOld = (void*)readPos;
+	p_ExecCommandOld = (RedExecCommand*)readPos;
 }
 
 /*
@@ -1253,7 +1258,7 @@ void CRedDriver::Init()
     memset(p_MusicTempoControl, 0, 0xc);
     p_MusicPitchControl = (int*)RedNew(0xc);
     memset(p_MusicPitchControl, 0, 0xc);
-    p_ExecCommand = (void*)RedNew(0x2000);
+    p_ExecCommand = (RedExecCommand*)RedNew(0x2000);
     p_ExecCommandNow = p_ExecCommand;
     p_ExecCommandOld = p_ExecCommand;
     memset(p_ExecCommand, 0, 0x2000);

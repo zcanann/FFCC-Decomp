@@ -546,12 +546,12 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
     if ((*(s8*)((u8*)track + 0x26) & 5) != 0) {
         if (((((u8*)track)[0x26] & 1) == 0) &&
-            (*(u32*)((u8*)p_VoiceData + *(s8*)((u8*)track + 0x14E) * 0xC0) != 0) &&
-            (*(u32*)((u8*)p_VoiceData + *(s8*)((u8*)track + 0x14E) * 0xC0) != (u32)track)) {
+            (*(u32*)((u8*)p_VoiceData + track->m_trackNo * 0xC0) != 0) &&
+            (*(u32*)((u8*)p_VoiceData + track->m_trackNo * 0xC0) != (u32)track)) {
             voice = 0;
         }
         else {
-            voice = (RedVoiceDATA*)((u8*)p_VoiceData + *(s8*)((u8*)track + 0x14E) * 0xC0);
+            voice = (RedVoiceDATA*)((u8*)p_VoiceData + track->m_trackNo * 0xC0);
         }
     } else {
         if ((((u8*)track)[0x26] & 8) != 0) {

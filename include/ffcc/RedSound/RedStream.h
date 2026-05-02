@@ -21,7 +21,7 @@ struct RedStreamDATA {
     RedTrackDATA* m_track;
     RedVoiceDATA* m_voiceData;
     u8* m_fileData;
-    void* m_buffer;
+    u8* m_buffer;
     RedStreamHEAD m_header;
     u8 m_trackData[2][0x60];
     int m_volume;

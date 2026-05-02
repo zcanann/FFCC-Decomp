@@ -96,7 +96,7 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
 	bufferIndex &= 1;
 
 	do {
-		dstBuffer = (unsigned char*)((int)stream->m_buffer + bufferIndex * 0x1000);
+		dstBuffer = stream->m_buffer + bufferIndex * 0x1000;
 		streamStruct = (int)stream->m_voiceData;
 
 		memcpy(dstBuffer, stream->m_fileData + stream->m_readOffset, 0x1000);
@@ -163,7 +163,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 	
 	if (stream->m_header.m_channelCount == 2) {
 		do {
-			pbVar6 = (unsigned char*)((int)stream->m_buffer + bufferIndex * 0x1000);
+			pbVar6 = stream->m_buffer + bufferIndex * 0x1000;
 			iVar8 = (int)stream->m_voiceData;
 			puVar7 = (unsigned int*)(stream->m_fileData + stream->m_readOffset);
 			pbVar4 = pbVar6 + 0x2000;
@@ -229,7 +229,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 		} while (0 < byteCount);
 	} else {
 		do {
-			pbVar5 = (unsigned char*)((int)stream->m_buffer + bufferIndex * 0x1000);
+			pbVar5 = stream->m_buffer + bufferIndex * 0x1000;
 			iVar8 = (int)stream->m_voiceData;
 			memcpy(pbVar5, stream->m_fileData + stream->m_readOffset, 0x1000);
 			stream->m_readOffset = stream->m_readOffset + 0x1000;
@@ -308,7 +308,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 
 	memcpy(&streamData->m_header, streamHeader, 0x20);
 	streamData->m_track = SearchSeEmptyTrack(streamData->m_header.m_channelCount, 0xff, 0);
-	streamData->m_buffer = (void*)RedNew(0x4000);
+	streamData->m_buffer = (u8*)RedNew(0x4000);
 	amemSize = streamData->m_header.m_channelCount << 0xd;
 	if (c_RedMemory.GetABufferSize() < 0x800000) {
 		arOffset = 0;

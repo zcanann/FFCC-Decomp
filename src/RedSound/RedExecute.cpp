@@ -540,18 +540,18 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
     if ((*(s8*)((u8*)track + 0x26) & 5) != 0) {
         if (((((u8*)track)[0x26] & 1) == 0) &&
-            (*(u32*)((u8*)p_VoiceData + track->m_trackNo * 0xC0) != 0) &&
-            (*(u32*)((u8*)p_VoiceData + track->m_trackNo * 0xC0) != (u32)track)) {
+            (*(u32*)((u8*)p_VoiceData + track->m_trackNo * REDSOUND_VOICE_SIZE) != 0) &&
+            (*(u32*)((u8*)p_VoiceData + track->m_trackNo * REDSOUND_VOICE_SIZE) != (u32)track)) {
             voice = 0;
         }
         else {
-            voice = (RedVoiceDATA*)((u8*)p_VoiceData + track->m_trackNo * 0xC0);
+            voice = (RedVoiceDATA*)((u8*)p_VoiceData + track->m_trackNo * REDSOUND_VOICE_SIZE);
         }
     } else {
         if ((((u8*)track)[0x26] & 8) != 0) {
             voice = (RedVoiceDATA*)p_VoiceData;
         } else {
-            voice = (RedVoiceDATA*)((u8*)p_VoiceData + *(s8*)((u8*)p_SoundControl + 0x490) * 0xC0);
+            voice = (RedVoiceDATA*)((u8*)p_VoiceData + *(s8*)((u8*)p_SoundControl + 0x490) * REDSOUND_VOICE_SIZE);
         }
 
         bestEnvelope = 0x8000;
@@ -1124,7 +1124,7 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
         }
     }
 
-    iVar5 = ((int)voiceData - (int)p_VoiceData) / 0xc0 + (((int)voiceData - (int)p_VoiceData) >> 0x1f);
+    iVar5 = ((int)voiceData - (int)p_VoiceData) / REDSOUND_VOICE_SIZE + (((int)voiceData - (int)p_VoiceData) >> 0x1f);
     if (0x1f < iVar5 - (iVar5 >> 0x1f)) {
         voiceMask += 1;
     }
@@ -1415,7 +1415,7 @@ void EnvelopeKeyExecute()
                 }
 
                 if ((((u8*)voiceData)[0x1A] & 3) == 0) {
-                    int prio = ((int)voiceData - (int)p_VoiceData) / 0xC0 +
+                    int prio = ((int)voiceData - (int)p_VoiceData) / REDSOUND_VOICE_SIZE +
                                (((int)voiceData - (int)p_VoiceData) >> 0x1F);
                     prio = (0x40 - (prio - (prio >> 0x1F)) >> 1) - 1;
                     if (prio < 1) {

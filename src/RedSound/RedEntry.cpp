@@ -1217,27 +1217,29 @@ void CRedEntry::DisplaySePlayInfo()
 			int trackOffset = (int)track - *trackHead;
 			int trackIndex = trackOffset / REDSOUND_TRACK_SIZE + (trackOffset >> 0x1F);
 			trackIndex = (trackIndex - (trackIndex >> 0x1F)) + 0x20;
-			if (track[0] == 0) {
-				OSReport(s__s__2d_____801e7c01, sRedEntryLogPrefix, trackIndex);
-				fflush(__files + 1);
-			} else if ((track[0x3D] & 0x80000000) == 0) {
-				RedHistoryBANK* seSepBank = SearchSeSepBank(track[0x3D]);
-				OSReport(s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc, sRedEntryLogPrefix,
-				         trackIndex, track[0x3D],
-				         ((int)reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoHi << 8) |
-				             reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoLo);
-				fflush(__files + 1);
-			} else {
-				unsigned int seDataNo = (unsigned int)track[0x3D];
-				int songNo = (int)(seDataNo & 0x7FFFFFFF) >> 9;
-				int seqBase = ((int*)&p_SeBlockData)[songNo] + 0x10;
-				int seqInfo = seqBase + *(short*)(((int*)&p_SeBlockData)[songNo] + 10) * 4;
-				seqInfo += (*(unsigned int*)(seqBase + (seDataNo & 0x1FF) * 4) & 0x7FFFFFFF);
+			if (track[0] != 0) {
+				if ((track[0x3D] & 0x80000000) == 0) {
+					RedHistoryBANK* seSepBank = SearchSeSepBank(track[0x3D]);
+					OSReport(s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc, sRedEntryLogPrefix,
+					         trackIndex, track[0x3D],
+					         ((int)reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoHi << 8) |
+					             reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoLo);
+					fflush(__files + 1);
+				} else {
+					unsigned int seDataNo = (unsigned int)track[0x3D];
+					int songNo = (int)(seDataNo & 0x7FFFFFFF) >> 9;
+					int seqBase = ((int*)&p_SeBlockData)[songNo] + 0x10;
+					int seqInfo = seqBase + *(short*)(((int*)&p_SeBlockData)[songNo] + 10) * 4;
+					seqInfo += (*(unsigned int*)(seqBase + (seDataNo & 0x1FF) * 4) & 0x7FFFFFFF);
 
-				OSReport(s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2, sRedEntryLogPrefix,
-				         trackIndex, songNo, seDataNo & 0x1FF,
-				         ((int)reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoHi << 8) |
-				             reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoLo);
+					OSReport(s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2, sRedEntryLogPrefix,
+					         trackIndex, songNo, seDataNo & 0x1FF,
+					         ((int)reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoHi << 8) |
+					             reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoLo);
+					fflush(__files + 1);
+				}
+			} else {
+				OSReport(s__s__2d_____801e7c01, sRedEntryLogPrefix, trackIndex);
 				fflush(__files + 1);
 			}
 			track += REDSOUND_TRACK_SIZE / sizeof(*track);

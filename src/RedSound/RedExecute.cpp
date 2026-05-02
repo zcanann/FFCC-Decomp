@@ -1158,9 +1158,9 @@ RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voic
                 break;
             }
             voiceData += 0x30;
-        } while (voiceData < (int*)((unsigned int*)p_VoiceData + 0xC00));
+        } while (voiceData < (int*)(p_VoiceData + 0x40));
 
-        if (!(voiceData < (int*)((unsigned int*)p_VoiceData + 0xC00))) {
+        if (!(voiceData < (int*)(p_VoiceData + 0x40))) {
             voiceData = (int*)EntryVoiceSearch(track);
         }
     } else {

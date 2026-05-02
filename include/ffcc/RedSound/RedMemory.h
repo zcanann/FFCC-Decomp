@@ -8,6 +8,11 @@ int RedNewA(int, int, int);
 void RedDeleteA(int);
 void RedDeleteA(void*);
 
+struct RedMemoryBlock {
+	int m_address;
+	int m_size;
+};
+
 class CRedMemory
 {
 public:
@@ -17,10 +22,10 @@ public:
 	void Init(int, int, int, int);
 	int GetMainBufferAddress();
 	int GetMainBufferSize();
-	int* GetMainBankAddress();
+	RedMemoryBlock* GetMainBankAddress();
 	int GetABufferAddress();
 	int GetABufferSize();
-	int* GetABankAddress();
+	RedMemoryBlock* GetABankAddress();
 };
 
 #endif // _FFCC_REDSOUND_REDMEMORY_H

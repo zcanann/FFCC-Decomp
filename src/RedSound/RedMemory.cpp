@@ -9,12 +9,6 @@ static int m_ADataBuffer;
 static int m_DataBufferSize;
 static int m_ADataBufferSize;
 
-struct RedMemoryBlock
-{
-	int m_address;
-	int m_size;
-};
-
 static RedMemoryBlock* m_MemoryBank;
 static RedMemoryBlock* m_AMemoryBank;
 
@@ -368,9 +362,9 @@ int CRedMemory::GetMainBufferSize()
  * JP Address: TODO
  * JP Size: TODO
  */
-int* CRedMemory::GetMainBankAddress()
+RedMemoryBlock* CRedMemory::GetMainBankAddress()
 {
-	return (int*)m_MemoryBank;
+	return m_MemoryBank;
 }
 
 /*
@@ -410,7 +404,7 @@ int CRedMemory::GetABufferSize()
  * JP Address: TODO
  * JP Size: TODO
  */
-int* CRedMemory::GetABankAddress()
+RedMemoryBlock* CRedMemory::GetABankAddress()
 {
-	return (int*)m_AMemoryBank;
+	return m_AMemoryBank;
 }

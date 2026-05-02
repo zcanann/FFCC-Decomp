@@ -1050,22 +1050,22 @@ void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int waveBank;
+	RedHistoryBANK* waveBank;
 	int bankNo;
 	unsigned int waveNo;
-	int waveBankData;
-	int waveTable;
+	RedWaveHeadWD* waveBankData;
+	int* waveTable;
 
 	bankNo = *track->m_command++;
 	waveNo = *track->m_command++;
 	track->m_waveData = 0;
 	track->m_waveBase = 0;
-	waveBank = c_RedEntry.GetWaveBank(bankNo);
+	waveBank = (RedHistoryBANK*)c_RedEntry.GetWaveBank(bankNo);
 	if (waveBank != 0) {
-		waveBankData = *(int*)(waveBank + 8);
-		waveTable = waveBankData + 0x20;
-		track->m_waveData = waveBankData + *(int*)(waveTable + waveNo * 4);
-		track->m_waveBase = *(int*)(waveBankData + 0x10);
+		waveBankData = (RedWaveHeadWD*)waveBank->m_data;
+		waveTable = (int*)((int)waveBankData + 0x20);
+		track->m_waveData = (int)waveBankData + waveTable[waveNo];
+		track->m_waveBase = waveBankData->m_aramAddress;
 		memset(&track->m_adsrAR, 0xffffffff, 0xc);
 	}
 	track->m_waveBankNo = bankNo;

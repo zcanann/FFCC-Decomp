@@ -807,9 +807,9 @@ void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  */
 void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned int stepCount;
-    int* reverbDepth = &track->m_reverbDepth;
     int targetDepth;
+    unsigned int stepCount;
+    int* reverbDepth;
 
     stepCount = (*track->m_command != 0) ? *track->m_command : 0x100;
 
@@ -820,6 +820,7 @@ void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
         targetDepth -= 1;
     }
 
+    reverbDepth = &track->m_reverbDepth;
     track->m_reverbDepthAdd = DataAddCompute(reverbDepth, (s8)targetDepth, (int*)&stepCount);
     track->m_reverbDepthDelta = stepCount;
     track->m_command += 2;

@@ -166,7 +166,7 @@ void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
             slot->m_track = 0;
         }
         slot++;
-    } while (slot < keyOnData->m_normal + 0x40);
+    } while (slot < keyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT);
 }
 
 /*

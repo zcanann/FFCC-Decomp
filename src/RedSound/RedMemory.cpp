@@ -58,6 +58,7 @@ CRedMemory::~CRedMemory()
  */
 int RedNew(int size)
 {
+	unsigned int alignedSize;
 	int entryCount;
 	unsigned int interrupts;
 	RedMemoryBlock* slot;
@@ -68,12 +69,12 @@ int RedNew(int size)
 	}
 
 	interrupts = OSDisableInterrupts();
-	size = (size + 0x1F) & 0xFFFFFFE0;
+	alignedSize = (size + 0x1F) & 0xFFFFFFE0;
 	slot = m_MemoryBank;
 	address = m_DataBuffer;
 
 	do {
-		if ((slot->m_size == 0) || ((address + size) <= slot->m_address)) {
+		if ((slot->m_size == 0) || ((address + alignedSize) <= slot->m_address)) {
 			if (m_MemoryBank[0x3FF].m_size > 0) {
 				if (m_ReportPrint != 0) {
 					OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA,
@@ -83,7 +84,7 @@ int RedNew(int size)
 				break;
 			}
 
-			if ((unsigned int)(address + size) <=
+			if ((unsigned int)(address + alignedSize) <=
 			    (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
 				if (slot->m_size > 0) {
 					entryCount = ((int)(m_MemoryBank + 0x400) - (int)(slot + 1)) / 8;
@@ -93,7 +94,7 @@ int RedNew(int size)
 				}
 
 				slot->m_address = address;
-				slot->m_size = size;
+				slot->m_size = alignedSize;
 				OSRestoreInterrupts(interrupts);
 				return address;
 			}

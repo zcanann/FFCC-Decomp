@@ -1633,11 +1633,11 @@ void _KeyOnControl()
                         volume = m_MasterSEVolume;
                         if ((((u32*)p_SoundControlBuffer)[0x125] <= *voice) &&
                             (*voice < ((u32*)p_SoundControlBuffer)[0x125] + (u32)*((u8*)p_SoundControlBuffer + 0x925) * 0x154)) {
-                            u32 idx = (u32)*(s8*)(*voice + 0x14E);
-                            int idxSign = (int)*(s8*)(*voice + 0x14E) >> 0x1F;
+                            u32 idx = (u32)((RedTrackDATA*)*voice)->m_trackNo;
+                            int idxSign = (int)((RedTrackDATA*)*voice)->m_trackNo >> 0x1F;
 
                             if ((1U << (((idxSign * 0x20 |
-                                          (u32)(*(s8*)(*voice + 0x14E) * 0x8000000 + idxSign) >> 0x1B) -
+                                          (u32)(((RedTrackDATA*)*voice)->m_trackNo * 0x8000000 + idxSign) >> 0x1B) -
                                          idxSign) &
                                         m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
                                 volume = ((*(s8*)((u8*)p_SoundControlBuffer + 0x926) + 1) * (((int*)((u32*)p_SoundControlBuffer)[300])[0] >> 0xC)) >> 7;
@@ -1650,10 +1650,10 @@ void _KeyOnControl()
                             }
                         }
                     } else {
-                        u32 idx = (u32)*(s8*)(*voice + 0x14E);
-                        int idxSign = (int)*(s8*)(*voice + 0x14E) >> 0x1F;
+                        u32 idx = (u32)((RedTrackDATA*)*voice)->m_trackNo;
+                        int idxSign = (int)((RedTrackDATA*)*voice)->m_trackNo >> 0x1F;
                         if ((1U << (((idxSign * 0x20 |
-                                      (u32)(*(s8*)(*voice + 0x14E) * 0x8000000 + idxSign) >> 0x1B) -
+                                      (u32)(((RedTrackDATA*)*voice)->m_trackNo * 0x8000000 + idxSign) >> 0x1B) -
                                      idxSign) &
                                     m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
                             volume = ((*(s8*)((u8*)p_SoundControlBuffer + 0x492) + 1) * (((int*)((u32*)p_SoundControlBuffer)[7])[0] >> 0xC)) >> 7;

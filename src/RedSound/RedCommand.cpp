@@ -302,7 +302,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 {
 	unsigned char flag;
 	RedWaveHeadWD* waveBase;
-	int* track;
+	RedTrackDATA* track;
 	unsigned int state;
 	unsigned char attrMask;
 	unsigned char* seq;
@@ -348,83 +348,83 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			} while ((int)remaining < (int)count);
 		}
 
-		track = (int*)SearchSeEmptyTrack((int)remaining, info->m_eraseTrack, attrMask);
+		track = SearchSeEmptyTrack((int)remaining, info->m_eraseTrack, attrMask);
 		attrMask = 0;
 		if (track == 0) {
 			break;
 		}
 
-		seTrack = (int*)((unsigned char*)p_VoiceData + ((RedTrackDATA*)track)->m_trackNo * 0xc0);
+		seTrack = (int*)((unsigned char*)p_VoiceData + track->m_trackNo * 0xc0);
 		while (true) {
-			((RedTrackDATA*)track)->m_waveBankData = (int)waveBase;
-			((RedTrackDATA*)track)->m_command = current;
+			track->m_waveBankData = (int)waveBase;
+			track->m_command = current;
 			current = current +
 			          (((unsigned int)seq[1] * 0x100 + (unsigned int)*seq) & 0x7fff);
 			deltaTime = (int)DeltaTimeSumup((unsigned char**)track);
-			((RedTrackDATA*)track)->m_deltaTime = deltaTime + 1;
+			track->m_deltaTime = deltaTime + 1;
 			if (m_SeSkipStep != 0) {
-				((RedTrackDATA*)track)->m_deltaTime = ((RedTrackDATA*)track)->m_deltaTime - m_SeSkipStep;
+				track->m_deltaTime = track->m_deltaTime - m_SeSkipStep;
 			}
 
-			((RedTrackDATA*)track)->m_seSepId = sepId;
-			((RedTrackDATA*)track)->m_seId = seId;
-			((RedTrackDATA*)track)->m_loopStepCurrent = 0;
+			track->m_seSepId = sepId;
+			track->m_seId = seId;
+			track->m_loopStepCurrent = 0;
 			if (m_SeSkipStep == 0) {
 				state = 0xffffffff;
 			} else {
 				state = 0;
 			}
-			((RedTrackDATA*)track)->m_playTime = state;
+			track->m_playTime = state;
 
-			if (*(char*)*track != '\0') {
-				((RedTrackDATA*)track)->m_eraseTrack = info->m_eraseTrack;
-				((RedTrackDATA*)track)->m_attrMask = info->m_attrMask;
-				((RedTrackDATA*)track)->m_mixVolume = volume << 0xc;
-				((RedTrackDATA*)track)->m_mixVolumeDelta = 0;
-				((RedTrackDATA*)track)->m_mixVolumeMode = 0;
-				((RedTrackDATA*)track)->m_pitchDelta = 0;
-				((RedTrackDATA*)track)->m_pitch = 0;
-				track[0x40] = isMulti;
-				((RedTrackDATA*)track)->m_volume = 0x7fff000;
-				((RedTrackDATA*)track)->m_expression = 0x7f000;
-				((RedTrackDATA*)track)->m_pan = pan << 0xc;
-				((RedTrackDATA*)track)->m_reverbDepth = p_ReverbDepth[1].m_depth;
-				((RedTrackDATA*)track)->m_reverbDepthDelta = 0;
-				((RedTrackDATA*)track)->m_panDelta = 0;
-				((RedTrackDATA*)track)->m_expressionDelta = 0;
-				((RedTrackDATA*)track)->m_volumeDelta = 0;
-				((RedTrackDATA*)track)->m_sweepAdd = 0;
-				((RedTrackDATA*)track)->m_sweepDelta = 0;
-				((RedTrackDATA*)track)->m_portamentTime = 0;
-				((RedTrackDATA*)track)->m_loopDepth = 0;
-				((RedTrackDATA*)track)->m_keyTranspose = 0;
-				((RedTrackDATA*)track)->m_pitchBendRange = 2;
-				((RedTrackDATA*)track)->m_pitchBend = 0;
-				((RedTrackDATA*)track)->m_pitchBendRaw = 0;
-				((RedTrackDATA*)track)->m_fineTune = 0;
-				((RedTrackDATA*)track)->m_shakeFunc = 0;
-				((RedTrackDATA*)track)->m_tremoloFunc = 0;
-				((RedTrackDATA*)track)->m_vibrateFunc = 0;
-				((RedTrackDATA*)track)->m_shakePan = 0;
-				((RedTrackDATA*)track)->m_tremoloDelay = 0;
-				((RedTrackDATA*)track)->m_vibrateDelay = 0;
-				((RedTrackDATA*)track)->m_tremoloDelayDepth = 0;
-				((RedTrackDATA*)track)->m_vibrateDelayDepth = 0;
-				((RedTrackDATA*)track)->m_waveData = 0;
-				((RedTrackDATA*)track)->m_flags = 0;
-				((RedTrackDATA*)track)->m_step2 = 0;
-				((RedTrackDATA*)track)->m_step = 0;
-				((RedTrackDATA*)track)->m_fuzzyAdsrDepth = 0;
-				((RedTrackDATA*)track)->m_fuzzyDeltaTimeDepth = 0;
-				((RedTrackDATA*)track)->m_fuzzyPanDepth = 0;
-				((RedTrackDATA*)track)->m_fuzzyVolumeDepth = 0;
-				((RedTrackDATA*)track)->m_fuzzyPitchDepth = 0;
-				((RedTrackDATA*)track)->m_portamentPitch = -1;
-				((RedTrackDATA*)track)->m_voiceSwitch = 0xc00;
-				memset(&((RedTrackDATA*)track)->m_adsrAR, 0xff, 0xc);
-				((RedTrackDATA*)track)->m_note.m_allocFlags = 5;
-				((RedTrackDATA*)track)->m_seTickCounter = 1;
-				((RedVoiceDATA*)seTrack)->m_track = (RedTrackDATA*)track;
+			if (*(char*)track->m_command != '\0') {
+				track->m_eraseTrack = info->m_eraseTrack;
+				track->m_attrMask = info->m_attrMask;
+				track->m_mixVolume = volume << 0xc;
+				track->m_mixVolumeDelta = 0;
+				track->m_mixVolumeMode = 0;
+				track->m_pitchDelta = 0;
+				track->m_pitch = 0;
+				track->m_voiceSwitch = isMulti;
+				track->m_volume = 0x7fff000;
+				track->m_expression = 0x7f000;
+				track->m_pan = pan << 0xc;
+				track->m_reverbDepth = p_ReverbDepth[1].m_depth;
+				track->m_reverbDepthDelta = 0;
+				track->m_panDelta = 0;
+				track->m_expressionDelta = 0;
+				track->m_volumeDelta = 0;
+				track->m_sweepAdd = 0;
+				track->m_sweepDelta = 0;
+				track->m_portamentTime = 0;
+				track->m_loopDepth = 0;
+				track->m_keyTranspose = 0;
+				track->m_pitchBendRange = 2;
+				track->m_pitchBend = 0;
+				track->m_pitchBendRaw = 0;
+				track->m_fineTune = 0;
+				track->m_shakeFunc = 0;
+				track->m_tremoloFunc = 0;
+				track->m_vibrateFunc = 0;
+				track->m_shakePan = 0;
+				track->m_tremoloDelay = 0;
+				track->m_vibrateDelay = 0;
+				track->m_tremoloDelayDepth = 0;
+				track->m_vibrateDelayDepth = 0;
+				track->m_waveData = 0;
+				track->m_flags = 0;
+				track->m_step2 = 0;
+				track->m_step = 0;
+				track->m_fuzzyAdsrDepth = 0;
+				track->m_fuzzyDeltaTimeDepth = 0;
+				track->m_fuzzyPanDepth = 0;
+				track->m_fuzzyVolumeDepth = 0;
+				track->m_fuzzyPitchDepth = 0;
+				track->m_portamentPitch = -1;
+				track->m_voiceSwitch = 0xc00;
+				memset(&track->m_adsrAR, 0xff, 0xc);
+				track->m_note.m_allocFlags = 5;
+				track->m_seTickCounter = 1;
+				((RedVoiceDATA*)seTrack)->m_track = track;
 				((RedVoiceDATA*)seTrack)->m_stateFlags = 5;
 				seTrack[0x24] = 2;
 				seTrack[0xc] = 0;
@@ -438,7 +438,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			if (remaining == 0) {
 				break;
 			}
-			track = track + 0x55;
+			track++;
 			seTrack = seTrack + 0x30;
 		}
 

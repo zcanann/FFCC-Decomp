@@ -390,7 +390,7 @@ void _MusicNextPlaySequence(int* command)
  */
 void _MusicMasterVolume(int* command)
 {
-    unsigned int* puVar1;
+    RedVoiceDATA* voice;
 
     m_MasterMusicVolume = *command & 0x7f;
     if (m_MasterMusicVolume != 0) {
@@ -398,11 +398,11 @@ void _MusicMasterVolume(int* command)
         m_MasterMusicVolume = m_MasterMusicVolume * 4;
         m_MasterMusicVolume = m_MasterMusicVolume - 1;
     }
-    puVar1 = (unsigned int*)p_VoiceData;
+    voice = p_VoiceData;
     do {
-        puVar1[0x2e] = puVar1[0x2e] | 2;
-        puVar1 += 0x30;
-    } while (puVar1 < (unsigned int*)p_VoiceData + 0xc00);
+        voice->m_updateFlags = voice->m_updateFlags | 2;
+        voice++;
+    } while (voice < p_VoiceData + 0x40);
 }
 
 /*
@@ -554,7 +554,7 @@ void _SeSepPlaySequence(int* command)
  */
 void _SeMasterVolume(int* command)
 {
-    unsigned int* puVar1;
+    RedVoiceDATA* voice;
 
     m_MasterSEVolume = *command & 0x7f;
     if (m_MasterSEVolume != 0) {
@@ -562,11 +562,11 @@ void _SeMasterVolume(int* command)
         m_MasterSEVolume = m_MasterSEVolume * 4;
         m_MasterSEVolume = m_MasterSEVolume - 1;
     }
-    puVar1 = (unsigned int*)p_VoiceData;
+    voice = p_VoiceData;
     do {
-        puVar1[0x2e] = puVar1[0x2e] | 2;
-        puVar1 += 0x30;
-    } while (puVar1 < (unsigned int*)p_VoiceData + 0xc00);
+        voice->m_updateFlags = voice->m_updateFlags | 2;
+        voice++;
+    } while (voice < p_VoiceData + 0x40);
 }
 
 /*

@@ -19,8 +19,6 @@ static const char sRedCommandMusicNeedMemoryFmt[] = "%s%s            : music%3.3
 static const char sRedCommandMusicPauseOnFmt[] = "%sPause : Music  : ON  %d\n";
 static const char sRedCommandMusicPauseOffFmt[] = "%sPause : Music  : OFF %d\n";
 
-int* SetReverb(int, int, int*);
-
 RedReverbModeData t_ReverbModeData[] = {
     {0x2, {0xA, 0x578, 0x1E, 0x46, 0x64, 0x0}},
     {0x2, {0x14, 0x708, 0x1E, 0x50, 0x64, 0x0}},

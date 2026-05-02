@@ -41,7 +41,7 @@ extern volatile int m_ReportPrint;
 extern int m_MusicFastSpeed;
 extern volatile int m_MusicSkipLine;
 extern int m_MusicKeySignature;
-extern void* volatile p_MusicReplayPoint;
+extern int* volatile p_MusicReplayPoint;
 extern int* volatile p_MusicTempoControl;
 extern int* volatile p_MusicPitchControl;
 extern int m_MusicPhraseStop;

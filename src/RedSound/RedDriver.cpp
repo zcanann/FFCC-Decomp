@@ -77,7 +77,7 @@ volatile int m_ReportPrint;
 int m_MusicFastSpeed;
 volatile int m_MusicSkipLine;
 int m_MusicKeySignature;
-void* volatile p_MusicReplayPoint;
+int* volatile p_MusicReplayPoint;
 int* volatile p_MusicTempoControl;
 int* volatile p_MusicPitchControl;
 int m_MusicPhraseStop;
@@ -280,8 +280,8 @@ void _MusicPlaySequence(int* command)
                 MusicStop(*(int*)(srcBuffer + 0x904));
             }
             if (iVar1 == 0) {
-                iVar1 = *(int*)((int)p_MusicReplayPoint + *command * 4);
-                *(int*)((int)p_MusicReplayPoint + *command * 4) = 0;
+                iVar1 = p_MusicReplayPoint[*command];
+                p_MusicReplayPoint[*command] = 0;
             }
             if (iVar1 == 0) {
                 memcpy((void*)(srcBuffer + 0x494), (void*)srcBuffer, 0x494);
@@ -338,8 +338,8 @@ void _MusicCrossPlaySequence(int* command)
                 }
                 *(int*)((int)pvVar2 + 0x458) = -*(int*)((int)pvVar2 + 0x454) / command[2];
                 *(int*)((int)pvVar2 + 0x45c) = command[2];
-                iVar1 = *(int*)((char*)p_MusicReplayPoint + *command * 4);
-                *(int*)((char*)p_MusicReplayPoint + *command * 4) = 0;
+                iVar1 = p_MusicReplayPoint[*command];
+                p_MusicReplayPoint[*command] = 0;
                 if (iVar1 == 0) {
                     memcpy((void*)((int)pvVar2 + 0x494), pvVar2, 0x494);
                     *(int*)((int)pvVar2 + 0x470) = 0xffffffff;
@@ -1252,7 +1252,7 @@ void CRedDriver::Init()
     } while (iVar5 < 4);
     p_ZeroData = (void*)RedNew(0x1000);
     memset(p_ZeroData, 0, 0x1000);
-    p_MusicReplayPoint = (void*)RedNew(0x400);
+    p_MusicReplayPoint = (int*)RedNew(0x400);
     memset(p_MusicReplayPoint, 0, 0x400);
     p_MusicTempoControl = (int*)RedNew(0xc);
     memset(p_MusicTempoControl, 0, 0xc);

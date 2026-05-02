@@ -39,7 +39,7 @@ RedStreamDATA* _SearchEmptyStreamData()
 
 		streamData++;
 
-		if (!(streamData < p_Stream + 4)) {
+		if (!(streamData < p_Stream + REDSOUND_STREAM_COUNT)) {
 			return 0;
 		}
 	}
@@ -275,7 +275,7 @@ void StreamStop(int streamID)
 			_StreamStop((RedStreamDATA*)streamData);
 		}
 		streamData++;
-	} while (streamData < p_Stream + 4);
+	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
 }
 
 /*
@@ -473,7 +473,7 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 			}
 		}
 		streamData++;
-	} while (streamData < p_Stream + 4);
+	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
 }
 
 /*
@@ -530,7 +530,7 @@ void StreamPause(int streamID, int pause)
 			}
 		}
 		streamData++;
-	} while (streamData < p_Stream + 4);
+	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
 }
 
 /*
@@ -627,5 +627,5 @@ void StreamControl()
 		}
 
 		streamData++;
-	} while (streamData < p_Stream + 4);
+	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
 }

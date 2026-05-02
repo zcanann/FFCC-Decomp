@@ -67,10 +67,13 @@ struct RedTickHistory {
 
 enum RedDriverBufferSize {
     REDSOUND_ZERO_BUFFER_SIZE = 0x1000,
+    REDSOUND_THREAD_STACK_SIZE = 0x1000,
     REDSOUND_MUSIC_REPLAY_POINT_COUNT = 0x100,
     REDSOUND_MUSIC_REPLAY_POINT_SIZE = sizeof(int) * REDSOUND_MUSIC_REPLAY_POINT_COUNT,
     REDSOUND_EXEC_COMMAND_COUNT = 0x100,
     REDSOUND_EXEC_COMMAND_BUFFER_SIZE = sizeof(RedExecCommand) * REDSOUND_EXEC_COMMAND_COUNT,
+    REDSOUND_EXEC_COMMAND_WORD_COUNT = REDSOUND_EXEC_COMMAND_BUFFER_SIZE / sizeof(int),
+    REDSOUND_MUSIC_NEXT_PLAY_BUFFER_SIZE = sizeof(RedMusicPlayCommand),
 };
 
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
@@ -1274,10 +1277,10 @@ void CRedDriver::Init()
     memset(p_ZeroData, 0, REDSOUND_ZERO_BUFFER_SIZE);
     p_MusicReplayPoint = (int*)RedNew(REDSOUND_MUSIC_REPLAY_POINT_SIZE);
     memset(p_MusicReplayPoint, 0, REDSOUND_MUSIC_REPLAY_POINT_SIZE);
-    p_MusicTempoControl = (RedControlRamp*)RedNew(0xc);
-    memset(p_MusicTempoControl, 0, 0xc);
-    p_MusicPitchControl = (RedControlRamp*)RedNew(0xc);
-    memset(p_MusicPitchControl, 0, 0xc);
+    p_MusicTempoControl = (RedControlRamp*)RedNew(REDSOUND_CONTROL_RAMP_SIZE);
+    memset(p_MusicTempoControl, 0, REDSOUND_CONTROL_RAMP_SIZE);
+    p_MusicPitchControl = (RedControlRamp*)RedNew(REDSOUND_CONTROL_RAMP_SIZE);
+    memset(p_MusicPitchControl, 0, REDSOUND_CONTROL_RAMP_SIZE);
     p_ExecCommand = (RedExecCommand*)RedNew(REDSOUND_EXEC_COMMAND_BUFFER_SIZE);
     p_ExecCommandNow = p_ExecCommand;
     p_ExecCommandOld = p_ExecCommand;
@@ -1317,22 +1320,22 @@ void CRedDriver::Init()
     iVar5 = 0;
     iVar6 = (int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     do {
-        iVar4 = iVar5 * 0x154;
+        iVar4 = iVar5 * REDSOUND_TRACK_SIZE;
         cVar1 = (char)iVar5;
         iVar5 = iVar5 + 1;
         ((RedTrackDATA*)(iVar6 + iVar4))->m_trackNo = (char)(cVar1 + ' ');
     } while (iVar5 < REDSOUND_SE_TRACK_COUNT);
-    p_EditorTrack = (RedTrackDATA*)RedNew(0x154);
-    memset(p_EditorTrack, 0, 0x154);
-    p_ReverbDepth = (RedReverbDepth*)RedNew(0x18);
-    memset(p_ReverbDepth, 0, 0x18);
+    p_EditorTrack = (RedTrackDATA*)RedNew(REDSOUND_TRACK_SIZE);
+    memset(p_EditorTrack, 0, REDSOUND_TRACK_SIZE);
+    p_ReverbDepth = (RedReverbDepth*)RedNew(REDSOUND_REVERB_DEPTH_BUFFER_SIZE);
+    memset(p_ReverbDepth, 0, REDSOUND_REVERB_DEPTH_BUFFER_SIZE);
     m_Mute[1] = 0;
     m_Mute[0] = 0;
-    p_MusicNextPlay = (RedMusicPlayCommand*)RedNew(0x10);
+    p_MusicNextPlay = (RedMusicPlayCommand*)RedNew(REDSOUND_MUSIC_NEXT_PLAY_BUFFER_SIZE);
     p_MusicNextPlay->m_musicId = -1;
     m_MusicPhraseStop = 0;
-    p_Stream = (RedStreamDATA*)RedNew(0x4c0);
-    memset(p_Stream, 0, 0x4c0);
+    p_Stream = (RedStreamDATA*)RedNew(REDSOUND_STREAM_BUFFER_SIZE);
+    memset(p_Stream, 0, REDSOUND_STREAM_BUFFER_SIZE);
     m_DMAMode = 0;
     memset(m_DmaControl, 0, sizeof(m_DmaControl));
     p_DmaControlNow[0] = RedDriverMainDmaQueue();
@@ -1344,25 +1347,25 @@ void CRedDriver::Init()
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);
     InitReverb();
     OSInitSemaphore(&m_DmaExecuteSemaphore, 0);
-    p_DmaExecuteThreadStack = (u8*)RedNew(0x1000);
-    OSCreateThread(&m_DmaExecuteThread, (void* (*)(void*))_DmaExecuteThread, 0, p_DmaExecuteThreadStack + 0x1000, 0x1000,
-                   3, 1);
+    p_DmaExecuteThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
+    OSCreateThread(&m_DmaExecuteThread, (void* (*)(void*))_DmaExecuteThread, 0,
+                   p_DmaExecuteThreadStack + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE, 3, 1);
     OSResumeThread(&m_DmaExecuteThread);
     OSInitSemaphore(&m_WaveSettingSemaphore, 0);
-    p_WaveSettingThreadStack = (u8*)RedNew(0x1000);
+    p_WaveSettingThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
     OSCreateThread(&m_WaveSettingThread, (void* (*)(void*))_WaveSettingThread, &m_WaveSettingData,
-                   p_WaveSettingThreadStack + 0x1000, 0x1000, 4, 1);
+                   p_WaveSettingThreadStack + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE, 4, 1);
     OSResumeThread(&m_WaveSettingThread);
     OSInitSemaphore(&m_MusicSkipSemaphore, 0);
-    p_MusicSkipThreadStack = (u8*)RedNew(0x1000);
-    OSCreateThread(&m_MusicSkipThread, (void* (*)(void*))_MusicSkipThread, 0, p_MusicSkipThreadStack + 0x1000, 0x1000,
-                   4, 1);
+    p_MusicSkipThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
+    OSCreateThread(&m_MusicSkipThread, (void* (*)(void*))_MusicSkipThread, 0,
+                   p_MusicSkipThreadStack + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE, 4, 1);
     OSResumeThread(&m_MusicSkipThread);
     OSInitSemaphore(&m_MainSemaphore, 0);
     m_MainThreadTime = 0;
-    p_MainThreadStack = (u8*)RedNew(0x1000);
-    OSCreateThread(&RedDriverMainThread(), (void* (*)(void*))_MainThread, 0, p_MainThreadStack + 0x1000, 0x1000,
-                   4, 1);
+    p_MainThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
+    OSCreateThread(&RedDriverMainThread(), (void* (*)(void*))_MainThread, 0,
+                   p_MainThreadStack + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE, 4, 1);
     OSResumeThread(&RedDriverMainThread());
 }
 
@@ -1763,7 +1766,7 @@ int CRedDriver::SePlayState(int seID)
                 break;
             }
             command += 8;
-            if (command == (int*)p_ExecCommand + 0x800) {
+            if (command == (int*)p_ExecCommand + REDSOUND_EXEC_COMMAND_WORD_COUNT) {
                 command = (int*)p_ExecCommand;
             }
         }
@@ -1996,7 +1999,7 @@ int CRedDriver::StreamPlayState(int streamID)
 			break;
 		}
 		streamData++;
-	} while (streamData < p_Stream + 4);
+	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
 
 	if (result == 0) {
 		commandNow = p_ExecCommandNow;
@@ -2008,7 +2011,7 @@ int CRedDriver::StreamPlayState(int streamID)
 				break;
 			}
 			command += 8;
-			if (command == (unsigned int*)p_ExecCommand + 0x800) {
+			if (command == (unsigned int*)p_ExecCommand + REDSOUND_EXEC_COMMAND_WORD_COUNT) {
 				command = (unsigned int*)p_ExecCommand;
 			}
 		}
@@ -2051,7 +2054,7 @@ int CRedDriver::GetStreamPlayPoint(int streamID, int* outPoint1, int* outPoint2)
 			break;
 		}
 		streamData++;
-	} while (streamData < p_Stream + 4);
+	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
 	return found;
 }
 

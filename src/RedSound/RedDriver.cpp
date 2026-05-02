@@ -280,15 +280,15 @@ void _MusicPlaySequence(int* command)
 
     srcBuffer = (int)p_SoundControlBuffer;
     if ((*command == *(int*)(srcBuffer + 0x470)) ||
-        (*command == *(int*)(srcBuffer + 0x904)) ||
-        (*command == *(int*)(srcBuffer + 0xd98))) {
+        (*command == *(int*)(srcBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470)) ||
+        (*command == *(int*)(srcBuffer + REDSOUND_CONTROL_SKIP_OFFSET + 0x470))) {
         return;
     }
     if (c_RedEntry.SearchMusicSequence(*command) >= 0) {
         iVar1 = command[2];
         if (*(int*)(srcBuffer + 0x470) != -1) {
-            if (*(int*)(srcBuffer + 0x904) != -1) {
-                MusicStop(*(int*)(srcBuffer + 0x904));
+            if (*(int*)(srcBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470) != -1) {
+                MusicStop(*(int*)(srcBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470));
             }
             if (iVar1 == 0) {
                 iVar1 = p_MusicReplayPoint[*command];
@@ -324,10 +324,10 @@ void _MusicCrossPlaySequence(int* command)
     }
     pvVar2 = p_SoundControlBuffer;
     if ((*command == *(int*)((int)pvVar2 + 0x470)) ||
-       (*command == *(int*)((int)pvVar2 + 0xd98))) {
+        (*command == *(int*)((int)pvVar2 + REDSOUND_CONTROL_SKIP_OFFSET + 0x470))) {
         return;
     }
-    if (*command == *(int*)((int)pvVar2 + 0x904)) {
+    if (*command == *(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470)) {
         *(int*)((int)pvVar2 + 0x458) = -*(int*)((int)pvVar2 + 0x454) / command[2];
         *(int*)((int)pvVar2 + 0x45c) = command[2];
         pvVar2 = p_SoundControlBuffer;
@@ -335,8 +335,9 @@ void _MusicCrossPlaySequence(int* command)
              (0x1ff800 - *(int*)((int)pvVar2 + 0x8e8)) / command[2];
         *(int*)((int)pvVar2 + 0x8f0) = command[2];
         pvVar2 = (void*)RedNew(REDSOUND_CONTROL_SIZE);
-        memcpy(pvVar2, (void*)((int)p_SoundControlBuffer + REDSOUND_CONTROL_SIZE), REDSOUND_CONTROL_SIZE);
-        memcpy((void*)((int)p_SoundControlBuffer + REDSOUND_CONTROL_SIZE), p_SoundControlBuffer, REDSOUND_CONTROL_SIZE);
+        memcpy(pvVar2, (void*)((int)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET), REDSOUND_CONTROL_SIZE);
+        memcpy((void*)((int)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET), p_SoundControlBuffer,
+               REDSOUND_CONTROL_SIZE);
         memcpy(p_SoundControlBuffer, pvVar2, REDSOUND_CONTROL_SIZE);
         RedDelete(pvVar2);
     } else {
@@ -344,8 +345,8 @@ void _MusicCrossPlaySequence(int* command)
             m_CrossTime = command[2];
             iVar1 = 0;
             if (*(int*)((int)pvVar2 + 0x470) != -1) {
-                if (*(int*)((int)pvVar2 + 0x904) != -1) {
-                    MusicStop(*(int*)((int)pvVar2 + 0x904));
+                if (*(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470) != -1) {
+                    MusicStop(*(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470));
                 }
                 *(int*)((int)pvVar2 + 0x458) = -*(int*)((int)pvVar2 + 0x454) / command[2];
                 *(int*)((int)pvVar2 + 0x45c) = command[2];

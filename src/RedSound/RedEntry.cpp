@@ -717,10 +717,12 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 
 	if (mode == 0) {
 		used = 0;
-		if ((*(short*)((char*)p_SoundControlBuffer + 0x48e) != 0) && (*(int*)((char*)p_SoundControlBuffer + 0x47c) == waveNo)) {
+		if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0) &&
+		    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_waveNo == waveNo)) {
 			used |= 1;
 		}
-		if ((*(short*)((char*)p_SoundControlBuffer + 0x922) != 0) && (*(int*)((char*)p_SoundControlBuffer + 0x910) == waveNo)) {
+		if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) &&
+		    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_waveNo == waveNo)) {
 			used |= 1;
 		}
 		if (used == 0) {
@@ -1449,12 +1451,12 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 
 	if (mode == 0) {
 		musicSeq = 0;
-		if ((*reinterpret_cast<short*>((int)p_SoundControlBuffer + 0x48E) != 0)
-		    && (*reinterpret_cast<int*>((int)p_SoundControlBuffer + 0x470) == musicNo)) {
+		if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0)
+		    && (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == musicNo)) {
 			musicSeq |= 1;
 		}
-		if ((*reinterpret_cast<short*>((int)p_SoundControlBuffer + 0x922) != 0)
-		    && (*reinterpret_cast<int*>((int)p_SoundControlBuffer + 0x904) == musicNo)) {
+		if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0)
+		    && (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId == musicNo)) {
 			musicSeq |= 1;
 		}
 

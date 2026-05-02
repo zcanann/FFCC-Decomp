@@ -303,15 +303,15 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 int CRedEntry::WaveOldClear(int offset, int maxSize)
 {
 	RedHistoryBANK* selected = 0;
-	int aBase = c_RedMemory.GetABufferAddress();
+	int arAddress = c_RedMemory.GetABufferAddress();
 	int maxBankSize = 0;
-	offset += aBase;
-	maxSize += aBase;
+	offset += arAddress;
+	maxSize += arAddress;
 	RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x100);
 
 	do {
 		if (history->m_historyNo > maxBankSize) {
-			int arAddress = reinterpret_cast<RedWaveHeadWD*>(history->m_data)->m_aramAddress;
+			arAddress = reinterpret_cast<RedWaveHeadWD*>(history->m_data)->m_aramAddress;
 			if ((arAddress >= offset) && (arAddress < maxSize)) {
 				maxBankSize = history->m_historyNo;
 				selected = history;

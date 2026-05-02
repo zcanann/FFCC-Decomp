@@ -557,7 +557,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
         if ((((u8*)track)[0x26] & 8) != 0) {
             voice = (RedVoiceDATA*)p_VoiceData;
         } else {
-            voice = (RedVoiceDATA*)((u8*)p_VoiceData + *(s8*)((u8*)p_SoundControl + 0x490) * 0xC0);
+            voice = p_VoiceData + ((RedSoundCONTROL*)p_SoundControl)->m_channelAlloc;
         }
 
         bestEnvelope = 0x8000;

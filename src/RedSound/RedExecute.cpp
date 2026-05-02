@@ -546,12 +546,12 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
     if ((*(s8*)((u8*)track + 0x26) & 5) != 0) {
         if (((((u8*)track)[0x26] & 1) == 0) &&
-            (*(u32*)((u8*)p_VoiceData + track->m_trackNo * 0xC0) != 0) &&
-            (*(u32*)((u8*)p_VoiceData + track->m_trackNo * 0xC0) != (u32)track)) {
+            ((p_VoiceData + track->m_trackNo)->m_track != 0) &&
+            ((u32)(p_VoiceData + track->m_trackNo)->m_track != (u32)track)) {
             voice = 0;
         }
         else {
-            voice = (RedVoiceDATA*)((u8*)p_VoiceData + track->m_trackNo * 0xC0);
+            voice = p_VoiceData + track->m_trackNo;
         }
     } else {
         if ((((u8*)track)[0x26] & 8) != 0) {
@@ -2311,7 +2311,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 {
 	int* trackData = (int*)track;
 	unsigned char* trackBytes = (unsigned char*)trackData;
-	int voiceBase;
+	RedVoiceDATA* voice;
 	int step;
 	short* trackShorts = (short*)trackData;
 
@@ -2319,7 +2319,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		return;
 	}
 
-	voiceBase = (int)(p_VoiceData + track->m_trackNo);
+	voice = p_VoiceData + track->m_trackNo;
 	if (0 < frames) {
 		trackData[0x43] += frames;
 	}
@@ -2331,7 +2331,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x0C] -= step;
 		trackData[0x0A] += trackData[0x0B] * step;
-		*(unsigned int*)(voiceBase + 0xB8) |= 2;
+		voice->m_updateFlags |= 2;
 	}
 
 	if (trackData[0x0F] != 0) {
@@ -2341,7 +2341,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x0F] -= step;
 		trackData[0x0D] += trackData[0x0E] * step;
-		*(unsigned int*)(voiceBase + 0xB8) |= 2;
+		voice->m_updateFlags |= 2;
 	}
 
 	if (trackData[0x12] != 0) {
@@ -2351,7 +2351,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x12] -= step;
 		trackData[0x10] += trackData[0x11] * step;
-		*(unsigned int*)(voiceBase + 0xB8) |= 2;
+		voice->m_updateFlags |= 2;
 	}
 
 	if (trackData[0x1C] != 0) {
@@ -2361,7 +2361,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x1C] -= step;
 		trackData[0x1A] += trackData[0x1B] * step;
-		*(unsigned int*)(voiceBase + 0xB8) |= 2;
+		voice->m_updateFlags |= 2;
 	}
 
 	if (trackData[0x15] != 0) {
@@ -2375,7 +2375,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			trackData[0x42] = 1;
 		}
 		trackData[0x13] += trackData[0x14] * step;
-		*(unsigned int*)(voiceBase + 0xB8) |= 2;
+		voice->m_updateFlags |= 2;
 	}
 
 	if (trackData[0x19] != 0) {
@@ -2385,7 +2385,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x19] -= step;
 		trackData[0x17] += trackData[0x18] * step;
-		*(unsigned int*)(voiceBase + 0xB8) |= 1;
+		voice->m_updateFlags |= 1;
 	}
 
 	if (trackData[0x44] != 0) {
@@ -2395,14 +2395,14 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x44] -= step;
 		trackData[0x48] += step * trackData[0x45];
-		*(unsigned int*)(voiceBase + 0xB8) |= 1;
-		*(int*)(voiceBase + 0xA0) += step * trackData[0x45];
+		voice->m_updateFlags |= 1;
+		voice->m_basePitch += step * trackData[0x45];
 	}
 
-	if (((*(unsigned int*)(voiceBase + 0xB8) & 1) != 0) && (*(int*)(voiceBase + 4) != 0)) {
-		*(int*)(voiceBase + 0x98) = PitchCompute(
-			*(int*)(voiceBase + 0xA0) + trackData[0x17], (int)trackShorts[0xA1] + (int)trackShorts[0x9F],
-			*(int*)(*(int*)(voiceBase + 4) + 0x14), (int)(s8)trackBytes[0x148]);
+	if (((voice->m_updateFlags & 1) != 0) && (voice->m_waveData != 0)) {
+		voice->m_pitch = PitchCompute(
+			voice->m_basePitch + trackData[0x17], (int)trackShorts[0xA1] + (int)trackShorts[0x9F],
+			voice->m_waveData->m_pitch, (int)(s8)trackBytes[0x148]);
 	}
 
 	if (trackData[0x1D] != 0) {
@@ -2462,20 +2462,20 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 	}
 
-	if (*(short*)(voiceBase + 0x28) != 0) {
+	if (voice->m_pitchModDelay != 0) {
 		step = frames;
-		if (*(short*)(voiceBase + 0x28) <= frames) {
-			step = *(short*)(voiceBase + 0x28);
+		if (voice->m_pitchModDelay <= frames) {
+			step = voice->m_pitchModDelay;
 		}
-		*(short*)(voiceBase + 0x28) = *(short*)(voiceBase + 0x28) - (short)step;
+		voice->m_pitchModDelay -= (short)step;
 	}
 
-	if (*(short*)(voiceBase + 0x38) != 0) {
+	if (voice->m_volumeModDelay != 0) {
 		step = frames;
-		if (*(short*)(voiceBase + 0x38) <= frames) {
-			step = *(short*)(voiceBase + 0x38);
+		if (voice->m_volumeModDelay <= frames) {
+			step = voice->m_volumeModDelay;
 		}
-		*(short*)(voiceBase + 0x38) = *(short*)(voiceBase + 0x38) - (short)step;
+		voice->m_volumeModDelay -= (short)step;
 	}
 }
 

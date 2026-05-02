@@ -221,7 +221,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 {
 	unsigned int interruptLevel = OSDisableInterrupts();
 	int found = 0;
-	int soundBase = (int)p_SoundControlBuffer + 0x494;
+	int soundBase = (int)(p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY);
 
 	do {
 		if ((*(int*)(soundBase + 0x470) >= 0) && (*(int*)(soundBase + 0x47c) == waveNo)) {
@@ -231,7 +231,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 		soundBase -= 0x494;
 	} while ((unsigned int)soundBase >= (unsigned int)p_SoundControlBuffer);
 
-	soundBase = (int)p_SoundControlBuffer + 0xdbc;
+	soundBase = (int)(p_SoundControlBuffer + REDSOUND_CONTROL_SE);
 	RedTrackDATA* track = *(RedTrackDATA**)soundBase;
 	do {
 		if (((u32)track->m_command != 0) && ((u32)track->m_waveBankData != 0) &&

@@ -112,7 +112,7 @@ static OSSemaphore m_DmaExecuteSemaphore;
 static ARQRequest m_DMARequest;
 OSThread m_MusicSkipThread;
 OSSemaphore m_MusicSkipSemaphore;
-void* volatile p_SeBlockData[4];
+RedSeBlockHEAD* volatile p_SeBlockData[4];
 CRedMemory c_RedMemory;
 static volatile int m_DMAExecute;
 static volatile int m_DMAInThread;
@@ -438,7 +438,7 @@ void _SetSeBlockData(int* command)
         if ((*seBlockData = 'S') && (seBlockData[1] = 'e') && (seBlockData[2] = 'B') &&
             (seBlockData[3] = 'l') && (seBlockData[4] = 'o') && (seBlockData[5] = 'c') &&
             (seBlockData[6] = 'k')) {
-            p_SeBlockData[index] = seBlockData;
+            p_SeBlockData[index] = (RedSeBlockHEAD*)seBlockData;
         } else {
             RedDelete(seBlockData);
         }

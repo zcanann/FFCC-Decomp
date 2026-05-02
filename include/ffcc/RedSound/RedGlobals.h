@@ -16,6 +16,8 @@ struct RedReverbModeData {
 	int params[6];
 };
 
+struct RedSeBlockHEAD;
+
 extern RedMidiControlFunc p_MidiControl_Function[];
 extern u32 t_TonePitch[];
 extern int t_FinePitch[];
@@ -27,7 +29,7 @@ extern s16 t_PanningDataR[];
 extern RedReverbModeData t_ReverbModeData[];
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;
-extern void* volatile p_SeBlockData[];
+extern RedSeBlockHEAD* volatile p_SeBlockData[];
 extern void* volatile p_ZeroData;
 extern RedSoundCONTROL* volatile p_SoundControlBuffer;
 extern RedSoundCONTROL* volatile p_SoundControl;

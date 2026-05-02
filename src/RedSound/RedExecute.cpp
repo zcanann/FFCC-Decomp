@@ -2543,8 +2543,7 @@ int _SeMidiNoteExecute(
                 }
 
                 if (m_ChangeStatus != 0) {
-                    ((RedVoiceDATA*)((u8*)p_VoiceData + ((RedTrackDATA*)track)->m_trackNo * 0xC0))->m_updateFlags =
-                        m_ChangeStatus;
+                    (p_VoiceData + ((RedTrackDATA*)track)->m_trackNo)->m_updateFlags = m_ChangeStatus;
                 }
             }
         }

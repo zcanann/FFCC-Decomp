@@ -232,7 +232,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
     int* slot;
     int* voice;
 
-    if (((void*)control == (void*)((int)p_SoundControlBuffer + 0x928)) || ((((unsigned int*)track)[0x41] & 0x80000) == 0)) {
+    if (((void*)control == (void*)((int)p_SoundControlBuffer + 0x928)) || ((track->m_flags & 0x80000) == 0)) {
         ((int*)track)[0x44] = 0;
         key = ((char*)track)[0x24];
         slot = (int*)keyOnData;

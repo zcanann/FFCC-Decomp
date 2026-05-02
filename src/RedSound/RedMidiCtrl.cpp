@@ -1294,7 +1294,7 @@ void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     int delta[1];
     int command;
     int value;
-    int* voiceData;
+    RedVoiceDATA* voiceData;
 
     delta[0] = DeltaTimeSumup((unsigned char**)track);
     if (delta[0] == 0) {
@@ -1307,13 +1307,13 @@ void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     track->m_sweepDelta = delta[0];
     track->m_portamentPitch &= ~0xfff;
 
-    voiceData = (int*)p_VoiceData;
+    voiceData = p_VoiceData;
     do {
-        if ((RedTrackDATA*)voiceData[0] == track) {
-            ((RedVoiceDATA*)voiceData)->m_basePitch &= ~0xfff;
+        if (voiceData->m_track == track) {
+            voiceData->m_basePitch &= ~0xfff;
         }
-        voiceData += 0x30;
-    } while (voiceData < (int*)(p_VoiceData + 0x40));
+        voiceData++;
+    } while (voiceData < p_VoiceData + 0x40);
 }
 
 /*

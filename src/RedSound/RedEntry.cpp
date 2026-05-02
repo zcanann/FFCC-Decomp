@@ -1214,7 +1214,8 @@ void CRedEntry::DisplaySePlayInfo()
 		int* trackHead = (int*)&p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 		int* track = (int*)*trackHead;
 		do {
-			int trackIndex = ((int)track - *trackHead) / REDSOUND_TRACK_SIZE + (((int)track - *trackHead) >> 0x1F);
+			int trackOffset = (int)track - *trackHead;
+			int trackIndex = trackOffset / REDSOUND_TRACK_SIZE + (trackOffset >> 0x1F);
 			trackIndex = (trackIndex - (trackIndex >> 0x1F)) + 0x20;
 			if (track[0] == 0) {
 				OSReport(s__s__2d_____801e7c01, sRedEntryLogPrefix, trackIndex);

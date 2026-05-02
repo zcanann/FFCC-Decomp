@@ -296,7 +296,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	int sampleOffset;
 	u8* headerData;
 	RedStreamDATA* streamData;
-	int* voice;
+	RedVoiceDATA* voice;
 
 	streamData = _SearchEmptyStreamData();
 	if (streamData != 0) {
@@ -348,20 +348,20 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		pitch = PitchCompute(0x3c00000, 0, streamData->m_header.m_pitch, 0);
 		iVar2 = 0;
 		do {
-			voice = (int*)(streamData->m_voiceData + iVar2);
-			*voice = (int)(streamData->m_track + iVar2);
-			*(unsigned char*)(*voice + 0x26) |= 2;
-			*(unsigned char*)((int)voice + 0x1a) |= 2;
-			voice[0x25] = 0xc01;
+			voice = streamData->m_voiceData + iVar2;
+			voice->m_track = streamData->m_track + iVar2;
+			voice->m_track->m_note.m_allocFlags |= 2;
+			voice->m_stateFlags |= 2;
+			voice->m_voiceSwitch = 0xc01;
 			if (streamData->m_header.m_flags != 0) {
-				voice[0x25] |= 0x3000;
+				voice->m_voiceSwitch |= 0x3000;
 			}
-			*(int*)(*voice + 0xfc) = 1;
-			voice[0x2c] = 0x8000;
-			voice[1] = (int)&streamData->m_trackData[iVar2];
-			voice[0x27] = pitch;
-			*(int*)(*voice + 0x68) = p_ReverbDepth[1].m_depth;
-			*(int*)(*voice + 0x70) = 0;
+			voice->m_track->m_seId = 1;
+			voice->m_adsrCurrentLevel = 0x8000;
+			voice->m_waveData = &streamData->m_trackData[iVar2];
+			voice->m_pitch = pitch;
+			voice->m_track->m_reverbDepth = p_ReverbDepth[1].m_depth;
+			voice->m_track->m_reverbDepthDelta = 0;
 			if (streamData->m_header.m_channelCount == 2) {
 				if (iVar2 == 0) {
 					streamData->m_pan = 0;
@@ -378,14 +378,14 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			(streamData->m_track + iVar2)->m_waveBase = streamData->m_aramBuffer + iVar2 * 0x2000;
 			memset(&streamData->m_trackData[iVar2], 0, 0x60);
 			memcpy(streamData->m_trackData[iVar2].m_adpcmData, headerData + iVar2 * 0x2e, 0x2e);
-			*(unsigned char*)((int)voice + 0x5a) = 0;
-			*(unsigned char*)((int)voice + 0x59) = 0;
-			*(unsigned char*)(voice + 0x16) = 0;
-			*(unsigned char*)((int)voice + 0x5b) = 0x7f;
-			*(unsigned short*)(voice + 0x15) = 0;
-			*(unsigned short*)((int)voice + 0x52) = 0;
-			*(unsigned short*)(voice + 0x14) = 0;
-			*(unsigned short*)((int)voice + 0x56) = 10;
+			voice->m_adsrLevel[2] = 0;
+			voice->m_adsrLevel[1] = 0;
+			voice->m_adsrLevel[0] = 0;
+			voice->m_adsrLevel[3] = 0x7f;
+			voice->m_adsrTime[2] = 0;
+			voice->m_adsrTime[1] = 0;
+			voice->m_adsrTime[0] = 0;
+			voice->m_adsrTime[3] = 10;
 			streamData->m_trackData[iVar2].m_sampleStart = 0;
 			streamData->m_trackData[iVar2].m_loopEnd = 0x3fff;
 			streamData->m_trackData[iVar2].m_loopStart = 2;

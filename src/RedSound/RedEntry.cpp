@@ -1160,34 +1160,33 @@ int CRedEntry::ReentrySeSepData(int seNo)
  */
 void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 {
-	int* track;
+	RedTrackDATA* track;
 	int sequenceNo;
 
 	if (mode == 0) {
 		sequenceNo = 0;
-		track = (int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+		track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 
 		do {
-			if ((*reinterpret_cast<unsigned int*>(track) != 0) && (track[0x3D] == seNo)) {
+			if (((unsigned int)track->m_command != 0) && (track->m_seSepId == seNo)) {
 				sequenceNo |= 1;
 				break;
 			}
-			track += REDSOUND_TRACK_SIZE / sizeof(*track);
-		} while (track < (int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE));
+			track += 1;
+		} while (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT);
 
 		if (sequenceNo == 0) {
 			sequenceNo = SearchSeSepSequence(seNo);
-			if ((sequenceNo >= 0) &&
-			    (*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) == 0)) {
+			if ((sequenceNo >= 0) && (reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase)[sequenceNo].m_historyNo == 0)) {
 				SeSepHistoryAdd();
-				*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) = 1;
+				reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase)[sequenceNo].m_historyNo = 1;
 			}
 		}
 	} else {
 		sequenceNo = SearchSeSepSequence(seNo);
-		if (*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) != 0) {
-			SeSepHistoryDelete(*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4));
-			*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) = 0;
+		if (reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase)[sequenceNo].m_historyNo != 0) {
+			SeSepHistoryDelete(reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase)[sequenceNo].m_historyNo);
+			reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase)[sequenceNo].m_historyNo = 0;
 		}
 	}
 }

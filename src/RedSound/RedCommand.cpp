@@ -882,15 +882,15 @@ int MusicStop(int seId)
 			}
 		}
 		music++;
-	} while (music < p_SoundControlBuffer + 2);
+	} while (music < p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP);
 
 	music = p_SoundControlBuffer;
-	if ((music->m_musicId < 0) && (music[1].m_musicId >= 0)) {
-		memcpy((void*)p_SoundControlBuffer, (RedSoundCONTROL*)p_SoundControlBuffer + 1, 0x494);
-		music[1].m_activeTrackCount = 0;
-		music[1].m_trackCount = 0;
-		music[1].m_musicId = -1;
-		music[1].m_tracks = 0;
+	if ((music->m_musicId < 0) && (music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId >= 0)) {
+		memcpy((void*)p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY, 0x494);
+		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount = 0;
+		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount = 0;
+		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId = -1;
+		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks = 0;
 	}
 
 	return seId;
@@ -964,5 +964,5 @@ void SetMusicVolume(int seId, int volume, int duration, int mode)
 			}
 		}
 		music++;
-	} while (music < p_SoundControlBuffer + 3);
+	} while (music < p_SoundControlBuffer + REDSOUND_CONTROL_SE);
 }

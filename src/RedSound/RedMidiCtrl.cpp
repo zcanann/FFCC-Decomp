@@ -861,7 +861,8 @@ void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDA
     value = *track->m_command++;
     value &= 0x1f;
     control->m_keySignature = value;
-    control->m_keySignatureData = t_KeySignatureIndex[value] + t_KeySignatureData;
+    value = t_KeySignatureIndex[value];
+    control->m_keySignatureData = value + t_KeySignatureData;
 
     if (m_MusicKeySignature != 0) {
         scan = control->m_tracks;

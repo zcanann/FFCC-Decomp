@@ -561,7 +561,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
         }
 
         bestEnvelope = 0x8000;
-        voiceEnd = (RedVoiceDATA*)((unsigned int*)p_VoiceData + 0xC00);
+        voiceEnd = p_VoiceData + 0x40;
         do {
             if ((voice->m_stateFlags & 3) == 0) {
                 if (voice->m_envelopeLevel < 1) {

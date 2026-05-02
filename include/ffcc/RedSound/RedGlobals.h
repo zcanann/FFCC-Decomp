@@ -30,7 +30,7 @@ extern RedReverbModeData t_ReverbModeData[];
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;
 extern RedSeBlockHEAD* volatile p_SeBlockData[];
-extern void* volatile p_ZeroData;
+extern u8* volatile p_ZeroData;
 extern RedSoundCONTROL* volatile p_SoundControlBuffer;
 extern RedSoundCONTROL* volatile p_SoundControl;
 extern volatile int m_KeyOnEntry;

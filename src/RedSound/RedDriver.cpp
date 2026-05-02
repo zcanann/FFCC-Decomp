@@ -61,7 +61,7 @@ static volatile int m_ThreadControl;
 static volatile int m_ThreadExecute;
 static int m_SoundMode;
 static int* volatile p_Tick;
-void* volatile p_ZeroData;
+u8* volatile p_ZeroData;
 static RedExecCommand* volatile p_ExecCommand;
 static RedExecCommand* volatile p_ExecCommandNow;
 static RedExecCommand* volatile p_ExecCommandOld;
@@ -1250,7 +1250,7 @@ void CRedDriver::Init()
         p_SeBlockData[iVar6] = 0;
         iVar6 = iVar5;
     } while (iVar5 < 4);
-    p_ZeroData = (void*)RedNew(0x1000);
+    p_ZeroData = (u8*)RedNew(0x1000);
     memset(p_ZeroData, 0, 0x1000);
     p_MusicReplayPoint = (int*)RedNew(0x400);
     memset(p_MusicReplayPoint, 0, 0x400);

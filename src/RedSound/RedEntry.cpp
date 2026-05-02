@@ -1560,7 +1560,6 @@ void CRedEntry::DisplayMMemoryInfo()
 	RedMemoryBlock* bankEntry;
 	unsigned int history;
 	int* seBlockBase;
-	int* entry = (int*)this;
 
 	if (m_ReportPrint == 0) {
 		return;
@@ -1592,7 +1591,7 @@ void CRedEntry::DisplayMMemoryInfo()
 				freeSize = bankEntry[1].m_address - (bankEntry->m_address + bankEntry->m_size);
 			}
 
-			history = (unsigned int)entry[2];
+			history = (unsigned int)m_musicBankBase;
 			do {
 				if ((*(int*)(history + 0xC) != 0) && (*(int*)(history + 8) == bankEntry->m_address)) {
 					OSReport(s__s_MUSIC_3_3d___0x_8_8X___0x_8_8_801e7d24, sRedEntryLogPrefix,
@@ -1602,7 +1601,7 @@ void CRedEntry::DisplayMMemoryInfo()
 					break;
 				}
 				history += 0x10;
-			} while (history < (unsigned int)entry[2] + 0x40);
+			} while (history < (unsigned int)m_musicBankBase + 0x40);
 
 			if (matched == 0) {
 				i = 0;
@@ -1619,7 +1618,7 @@ void CRedEntry::DisplayMMemoryInfo()
 			}
 
 			if (matched == 0) {
-				history = (unsigned int)entry[0];
+				history = (unsigned int)m_waveBankBase;
 				do {
 					if ((*(int*)(history + 0xC) != 0) && (*(int*)(history + 8) == bankEntry->m_address)) {
 						OSReport(s__s_WAVE_4_4d___0x_8_8X___0x_8_8X_801e7d7c, sRedEntryLogPrefix,
@@ -1629,11 +1628,11 @@ void CRedEntry::DisplayMMemoryInfo()
 						break;
 					}
 					history += 0x10;
-				} while (history < (unsigned int)entry[0] + 0x400);
+				} while (history < (unsigned int)m_waveBankBase + 0x400);
 			}
 
 			if (matched == 0) {
-				history = (unsigned int)entry[1];
+				history = (unsigned int)m_seSepBankBase;
 				do {
 					if ((*(int*)(history + 0xC) != 0) && (*(int*)(history + 8) == bankEntry->m_address)) {
 						OSReport(s__s_SE_6_6d___0x_8_8X___0x_8_8X___801e7da8, sRedEntryLogPrefix,
@@ -1643,7 +1642,7 @@ void CRedEntry::DisplayMMemoryInfo()
 						break;
 					}
 					history += 0x10;
-				} while (history < (unsigned int)entry[1] + 0x1000);
+				} while (history < (unsigned int)m_seSepBankBase + 0x1000);
 			}
 
 			if (matched == 0) {

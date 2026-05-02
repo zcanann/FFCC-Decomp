@@ -56,11 +56,9 @@ void pppRandDownFV(_pppPObject* basePtr, RandDownFVParams* in, _pppCtrlTable* ct
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    s32 sourceOffset = in->sourceOffset;
-    f32* target = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
-    f32 scale = *valuePtr;
+    f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + in->sourceOffset + 0x80);
 
-    target[0] += randf(in->blend[0], scale);
-    target[1] += randf(in->blend[1], scale);
-    target[2] += randf(in->blend[2], scale);
+    target[0] += randf(in->blend[0], *valuePtr);
+    target[1] += randf(in->blend[1], *valuePtr);
+    target[2] += randf(in->blend[2], *valuePtr);
 }

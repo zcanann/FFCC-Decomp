@@ -124,6 +124,12 @@ struct RedKeyOnDATA {
 	RedKeyOnSlot m_normal[REDSOUND_KEY_ON_SLOT_COUNT];
 };
 
+enum RedKeyOnWordOffset {
+	REDSOUND_KEY_ON_PRIORITY_WORD_OFFSET = 0x80,
+	REDSOUND_KEY_ON_NORMAL_WORD_OFFSET = 0x100,
+	REDSOUND_KEY_ON_TOTAL_WORD_COUNT = 0x180,
+};
+
 struct RedSoundCONTROL {
 	RedTrackDATA* m_tracks;
 	unsigned char m_pad04[0x08 - 0x04];

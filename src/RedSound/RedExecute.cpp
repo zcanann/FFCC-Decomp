@@ -2183,12 +2183,14 @@ void _SkipMusicEntry()
             }
             src += 2;
             dst += 2;
-        } while (src < (int*)p_SkipKeyOn + 0x80);
+        } while (src < (int*)p_SkipKeyOn + REDSOUND_KEY_ON_PRIORITY_WORD_OFFSET);
 
-        src = (int*)p_SkipKeyOn + 0x80;
-        for (dst = (int*)p_KeyOnData + 0x80; (dst < (int*)p_KeyOnData + 0x100) && (*dst != 0); dst += 2) {
+        src = (int*)p_SkipKeyOn + REDSOUND_KEY_ON_PRIORITY_WORD_OFFSET;
+        for (dst = (int*)p_KeyOnData + REDSOUND_KEY_ON_PRIORITY_WORD_OFFSET;
+             (dst < (int*)p_KeyOnData + REDSOUND_KEY_ON_NORMAL_WORD_OFFSET) && (*dst != 0); dst += 2) {
         }
-        while ((dst < (int*)p_KeyOnData + 0x100) && (src < (int*)p_SkipKeyOn + 0x100)) {
+        while ((dst < (int*)p_KeyOnData + REDSOUND_KEY_ON_NORMAL_WORD_OFFSET) &&
+               (src < (int*)p_SkipKeyOn + REDSOUND_KEY_ON_NORMAL_WORD_OFFSET)) {
             if (*src != 0) {
                 *dst = *src;
                 dst[1] = src[1];
@@ -2198,10 +2200,12 @@ void _SkipMusicEntry()
             src += 2;
         }
 
-        src = (int*)p_SkipKeyOn + 0x100;
-        for (dst = (int*)p_KeyOnData + 0x100; (dst < (int*)p_KeyOnData + 0x180) && (*dst != 0); dst += 2) {
+        src = (int*)p_SkipKeyOn + REDSOUND_KEY_ON_NORMAL_WORD_OFFSET;
+        for (dst = (int*)p_KeyOnData + REDSOUND_KEY_ON_NORMAL_WORD_OFFSET;
+             (dst < (int*)p_KeyOnData + REDSOUND_KEY_ON_TOTAL_WORD_COUNT) && (*dst != 0); dst += 2) {
         }
-        while ((dst < (int*)p_KeyOnData + 0x180) && (src < (int*)p_SkipKeyOn + 0x180)) {
+        while ((dst < (int*)p_KeyOnData + REDSOUND_KEY_ON_TOTAL_WORD_COUNT) &&
+               (src < (int*)p_SkipKeyOn + REDSOUND_KEY_ON_TOTAL_WORD_COUNT)) {
             if (*src != 0) {
                 *dst = *src;
                 dst[1] = src[1];

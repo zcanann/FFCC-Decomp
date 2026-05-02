@@ -250,7 +250,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
                 voice[0x24] &= 0xfffffffe;
                 voice[0x24] |= 2;
             }
-            voice += 0x30;
+            voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
         } while (voice < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
     }
 }
@@ -2281,7 +2281,7 @@ void _PitchBendCompute(RedTrackDATA* track, int bend)
                 voiceData[0x2e] |= 1;
             }
         }
-        voiceData += 0x30;
+        voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);
     } while (voiceData < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
 }
 

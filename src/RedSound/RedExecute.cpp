@@ -1151,7 +1151,7 @@ RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voic
             if ((u32)*voiceData == (u32)track) {
                 break;
             }
-            voiceData += 0x30;
+            voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);
         } while (voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
 
         if (!(voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT))) {
@@ -1546,7 +1546,7 @@ void EnvelopeKeyExecute()
         }
 
         voiceData[0x24] &= 0xFFFFFC24;
-        voiceData += 0x30;
+        voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);
         if ((int*)(p_VoiceData + REDSOUND_VOICE_COUNT) <= voiceData) {
             return;
         }
@@ -1668,7 +1668,7 @@ void _KeyOnControl()
                 }
                 ((RedVoiceDATA*)voice)->m_updateFlags = 0;
             }
-            voice += 0x30;
+            voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
         } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
     }
 
@@ -1681,7 +1681,7 @@ void _KeyOnControl()
                 voice[0x24] |= 1;
             }
             bit <<= 1;
-            voice += 0x30;
+            voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
         } while (local_28 != 0);
     }
 
@@ -1694,7 +1694,7 @@ void _KeyOnControl()
                 voice[0x24] |= 1;
             }
             bit <<= 1;
-            voice += 0x30;
+            voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
         } while (local_24 != 0);
     }
 }
@@ -1733,7 +1733,7 @@ void _ExecuteExtraData()
                     if ((musicBase <= *voice) && (*voice < musicBase + (u32)soundControl->m_trackCount * REDSOUND_TRACK_SIZE)) {
                         ((RedVoiceDATA*)voice)->m_updateFlags |= 2;
                     }
-                    voice += 0x30;
+                    voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
                 } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
             }
         }
@@ -1759,7 +1759,7 @@ void _ExecuteExtraData()
                     ((RedTrackDATA*)*voice)->m_fineTune);
                 ((RedVoiceDATA*)voice)->m_updateFlags |= 1;
             }
-            voice += 0x30;
+            voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
         } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
     }
 
@@ -1777,7 +1777,7 @@ void _ExecuteExtraData()
                             if ((int*)*voice == track) {
                                 ((RedVoiceDATA*)voice)->m_updateFlags |= 2;
                             }
-                            voice += 0x30;
+                            voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
                         } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
                     }
                     track += REDSOUND_TRACK_SIZE / sizeof(*track);
@@ -1865,7 +1865,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
                                                    *(int*)((u8*)voiceData[1] + 0x14), (s8)((u8*)track)[0x148]);
                 }
             }
-            voiceData += 0x30;
+            voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);
         } while (voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
     }
 
@@ -1945,7 +1945,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
             }
             voiceData[0x2E] |= flags;
         }
-        voiceData += 0x30;
+        voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);
     } while (voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
 }
 
@@ -2017,7 +2017,7 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
                     if ((int*)*voice == track) {
                         ((RedVoiceDATA*)voice)->m_updateFlags = m_ChangeStatus;
                     }
-                    voice += 0x30;
+                    voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
                 } while (voice < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
             }
         }

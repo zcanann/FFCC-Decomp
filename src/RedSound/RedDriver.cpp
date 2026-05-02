@@ -54,6 +54,13 @@ struct RedExecCommand {
     int m_args[7];
 };
 
+struct RedMusicPlayCommand {
+    int m_musicId;
+    int m_volume;
+    int m_mode;
+    int m_pad;
+};
+
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 static int m_RedMasterTime;
 static volatile int m_SequencialID;
@@ -81,7 +88,7 @@ int* volatile p_MusicReplayPoint;
 RedControlRamp* volatile p_MusicTempoControl;
 RedControlRamp* volatile p_MusicPitchControl;
 int m_MusicPhraseStop;
-static int* volatile p_MusicNextPlay;
+static RedMusicPlayCommand* volatile p_MusicNextPlay;
 int m_CrossTime;
 volatile int m_MasterMusicVolume;
 volatile int m_MasterSEVolume;
@@ -245,10 +252,10 @@ void _SetMusicData(int* command)
 void _MusicStop(int* command)
 {
     MusicStop(*command);
-    if ((*command == -1) || (p_MusicNextPlay[0] == *command)) {
-        p_MusicNextPlay[0] = -1;
+    if ((*command == -1) || (p_MusicNextPlay->m_musicId == *command)) {
+        p_MusicNextPlay->m_musicId = -1;
     }
-    if (p_MusicNextPlay[0] < 0) {
+    if (p_MusicNextPlay->m_musicId < 0) {
         m_MusicPhraseStop = 0;
     }
 }
@@ -366,9 +373,9 @@ void _MusicNextPlaySequence(int* command)
         return;
     }
     if (c_RedEntry.SearchMusicSequence(*command) >= 0) {
-        p_MusicNextPlay[0] = *command;
-        p_MusicNextPlay[1] = command[1];
-        p_MusicNextPlay[2] = command[2];
+        p_MusicNextPlay->m_musicId = *command;
+        p_MusicNextPlay->m_volume = command[1];
+        p_MusicNextPlay->m_mode = command[2];
     }
 }
 
@@ -402,7 +409,7 @@ void _MusicMasterVolume(int* command)
 void _MusicVolume(int* command)
 {
     if (command[3] == 1) {
-        p_MusicNextPlay[0] = -1;
+        p_MusicNextPlay->m_musicId = -1;
         m_MusicPhraseStop = 0;
     }
     SetMusicVolume(command[0], command[1], command[2], command[3]);
@@ -833,9 +840,9 @@ int _MainThread(void*)
             MainControl(uVar4);
             StreamControl();
             _ExecuteCommand();
-            if ((-1 < p_MusicNextPlay[0]) && (*(int*)(iVar1 + 0x470) < 0)) {
-                _MusicPlaySequence(p_MusicNextPlay);
-                p_MusicNextPlay[0] = -1;
+            if ((-1 < p_MusicNextPlay->m_musicId) && (*(int*)(iVar1 + 0x470) < 0)) {
+                _MusicPlaySequence((int*)p_MusicNextPlay);
+                p_MusicNextPlay->m_musicId = -1;
                 m_MusicPhraseStop = 0;
             }
             do {
@@ -1308,8 +1315,8 @@ void CRedDriver::Init()
     memset(p_ReverbDepth, 0, 0x18);
     m_Mute[1] = 0;
     m_Mute[0] = 0;
-    p_MusicNextPlay = (int*)RedNew(0x10);
-    p_MusicNextPlay[0] = -1;
+    p_MusicNextPlay = (RedMusicPlayCommand*)RedNew(0x10);
+    p_MusicNextPlay->m_musicId = -1;
     m_MusicPhraseStop = 0;
     p_Stream = (RedStreamDATA*)RedNew(0x4c0);
     memset(p_Stream, 0, 0x4c0);

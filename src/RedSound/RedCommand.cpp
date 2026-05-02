@@ -354,7 +354,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			break;
 		}
 
-		seTrack = (RedVoiceDATA*)((unsigned char*)p_VoiceData + track->m_trackNo * 0xc0);
+		seTrack = p_VoiceData + track->m_trackNo;
 		while (true) {
 			track->m_waveBankData = (int)waveBase;
 			track->m_command = current;
@@ -439,7 +439,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				break;
 			}
 			track++;
-			seTrack = (RedVoiceDATA*)((unsigned char*)seTrack + 0xc0);
+			seTrack++;
 		}
 
 		if (count == 0) {

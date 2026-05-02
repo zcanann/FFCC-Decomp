@@ -474,7 +474,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 
 			WaveHistoryChoice((RedHistoryBANK*)(entry[0] + historyNo * 0x10));
 		} else {
-			m_waveLoadNo = waveNo;
+			m_waveLoadNo = waveHead->m_waveNo;
 			waveAddress = WaveHeadAdd(waveBankNo, waveHead, waveNo);
 			if (waveAddress < 0) {
 				m_waveLoadSize = 0;

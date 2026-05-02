@@ -39,6 +39,16 @@ struct RedDriverSyncState {
     OSSemaphore m_musicSemaphore;
 };
 
+struct RedDmaRequest {
+    int m_id;
+    int m_direction;
+    int m_mainMemory;
+    int m_aramMemory;
+    int m_size;
+    void (*m_callback)(void*);
+    void* m_callbackData;
+};
+
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 static int m_RedMasterTime;
 static volatile int m_SequencialID;
@@ -50,8 +60,8 @@ void* volatile p_ZeroData;
 static void* volatile p_ExecCommand;
 static void* volatile p_ExecCommandNow;
 static void* volatile p_ExecCommandOld;
-static void* p_DmaControlNow[2];
-static void* p_DmaControlOld[2];
+static RedDmaRequest* p_DmaControlNow[2];
+static RedDmaRequest* p_DmaControlOld[2];
 void* volatile p_SoundControlBuffer;
 void* volatile p_SoundControl;
 volatile int m_KeyOnEntry;
@@ -108,19 +118,19 @@ static inline RedDriverSyncState& RedDriverSync()
     return *reinterpret_cast<RedDriverSyncState*>(m_DmaControl);
 }
 
-static inline int* RedDriverMainDmaQueue()
+static inline RedDmaRequest* RedDriverMainDmaQueue()
 {
-    return m_DmaControl;
+    return reinterpret_cast<RedDmaRequest*>(m_DmaControl);
 }
 
-static inline int* RedDriverStreamDmaQueue()
+static inline RedDmaRequest* RedDriverStreamDmaQueue()
 {
-    return m_DmaControl + 0x380;
+    return reinterpret_cast<RedDmaRequest*>(m_DmaControl + 0x380);
 }
 
-static inline int* RedDriverStreamDmaQueueEnd()
+static inline RedDmaRequest* RedDriverStreamDmaQueueEnd()
 {
-    return m_DmaControl + 0x700;
+    return reinterpret_cast<RedDmaRequest*>(m_DmaControl + 0x700);
 }
 
 static inline OSThread& RedDriverMainThread()
@@ -875,7 +885,7 @@ int _WaveSettingThread(void* threadArg)
  */
 void _DMACheckProcess()
 {
-    int* dmaInfo;
+    RedDmaRequest* dmaInfo;
 
     if (m_ReportPrint != 0) {
         OSReport(s_redDriverDmaCheckHeaderFmt, sRedDriverLogPrefix);
@@ -888,12 +898,13 @@ void _DMACheckProcess()
 
     dmaInfo = RedDriverMainDmaQueue();
     do {
-        if ((*dmaInfo != 0) && (m_ReportPrint != 0)) {
+        if ((dmaInfo->m_id != 0) && (m_ReportPrint != 0)) {
             OSReport(sRedDriverDmaEntryFmt, sRedDriverLogPrefix,
-                     dmaInfo[0], dmaInfo[2], dmaInfo[3], dmaInfo[4], dmaInfo[5]);
+                     dmaInfo->m_id, dmaInfo->m_mainMemory, dmaInfo->m_aramMemory,
+                     dmaInfo->m_size, dmaInfo->m_callback);
             fflush(__files + 1);
         }
-        dmaInfo += 7;
+        dmaInfo++;
     } while (dmaInfo < RedDriverStreamDmaQueueEnd());
 
     fflush(__files + 1);
@@ -925,63 +936,63 @@ void _DmaCallback(unsigned long)
 int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5, void (*param_6)(void*), void* param_7)
 {
     unsigned int interrupt;
-    int* queueBase;
-    int** queuePtr;
+    RedDmaRequest* queueBase;
+    RedDmaRequest** queuePtr;
     unsigned int entryID;
     unsigned int size;
     unsigned int chunkSize;
-    int* queueEntry;
-    int* queueEnd;
-    int* nextEntry;
+    RedDmaRequest* queueEntry;
+    RedDmaRequest* queueEnd;
+    RedDmaRequest* nextEntry;
 
     interrupt = OSDisableInterrupts();
     if ((param_1 & 0xffff7fff) != 0) {
-        queuePtr = (int**)&p_DmaControlNow[0];
+        queuePtr = &p_DmaControlNow[0];
         queueBase = RedDriverMainDmaQueue();
     } else {
         queueBase = RedDriverStreamDmaQueue();
-        queuePtr = (int**)&p_DmaControlNow[1];
+        queuePtr = &p_DmaControlNow[1];
     }
     queueEntry = *queuePtr;
     entryID = GetMyEntryID();
     size = (unsigned int)(param_5 + 0x1f) & 0xffffffe0;
     if ((m_DMAMode != 0) || ((param_1 & 0x8000) != 0)) {
-        queueEnd = queueBase + 0x380;
+        queueEnd = queueBase + 0x80;
         do {
             chunkSize = size;
             if ((int)size > 0x40000) {
                 chunkSize = 0x40000;
             }
-            queueEntry[0] = entryID;
+            queueEntry->m_id = entryID;
             size -= chunkSize;
-            queueEntry[1] = param_2;
-            queueEntry[2] = param_3;
+            queueEntry->m_direction = param_2;
+            queueEntry->m_mainMemory = param_3;
             param_3 += chunkSize;
-            queueEntry[3] = param_4;
+            queueEntry->m_aramMemory = param_4;
             param_4 += chunkSize;
-            queueEntry[4] = chunkSize;
-            queueEntry[6] = (int)param_7;
+            queueEntry->m_size = chunkSize;
+            queueEntry->m_callbackData = param_7;
             if ((int)size < 1) {
-                queueEntry[5] = (int)param_6;
+                queueEntry->m_callback = param_6;
             } else {
-                queueEntry[5] = 0;
+                queueEntry->m_callback = 0;
             }
-            queueEntry += 7;
+            queueEntry++;
             if (queueEnd <= queueEntry) {
                 queueEntry = queueBase;
             }
         } while ((int)size > 0);
         *queuePtr = queueEntry;
     } else {
-        nextEntry = queueEntry + 7;
-        queueEnd = queueBase + 0x380;
-        queueEntry[0] = entryID;
-        queueEntry[1] = param_2;
-        queueEntry[2] = param_3;
-        queueEntry[3] = param_4;
-        queueEntry[4] = size;
-        queueEntry[5] = (int)param_6;
-        queueEntry[6] = (int)param_7;
+        nextEntry = queueEntry + 1;
+        queueEnd = queueBase + 0x80;
+        queueEntry->m_id = entryID;
+        queueEntry->m_direction = param_2;
+        queueEntry->m_mainMemory = param_3;
+        queueEntry->m_aramMemory = param_4;
+        queueEntry->m_size = size;
+        queueEntry->m_callback = param_6;
+        queueEntry->m_callbackData = param_7;
         if (queueEnd <= nextEntry) {
             nextEntry = queueBase;
         }
@@ -1005,18 +1016,18 @@ int RedDmaSearchID(int id)
 {
     unsigned int interruptLevel;
     int found;
-    int* queueEntry;
+    RedDmaRequest* queueEntry;
 
     found = 0;
     interruptLevel = OSDisableInterrupts();
     if (id != 0) {
         queueEntry = RedDriverMainDmaQueue();
         do {
-            if ((*queueEntry != 0) && ((id == 0) || (*queueEntry == id))) {
+            if ((queueEntry->m_id != 0) && ((id == 0) || (queueEntry->m_id == id))) {
                 found = 1;
                 break;
             }
-            queueEntry += 7;
+            queueEntry++;
         } while (queueEntry < RedDriverStreamDmaQueueEnd());
     }
     OSRestoreInterrupts(interruptLevel);
@@ -1037,45 +1048,45 @@ void _DmaExecute()
     unsigned int uVar1;
     int iVar2;
     int iVar3;
-    int* piVar4;
-    int** ppiVar5;
-    int* piVar6;
-    int* piVar7;
-    int* piVar8;
+    RedDmaRequest* piVar4;
+    RedDmaRequest** ppiVar5;
+    RedDmaRequest* piVar6;
+    RedDmaRequest* piVar7;
+    RedDmaRequest* piVar8;
 
     while ((p_DmaControlNow[0] != p_DmaControlOld[0]) || (p_DmaControlNow[1] != p_DmaControlOld[1])) {
         m_DMAInThread = 1;
         if (p_DmaControlNow[0] == p_DmaControlOld[0]) {
-            ppiVar5 = (int**)&p_DmaControlOld[1];
+            ppiVar5 = &p_DmaControlOld[1];
             piVar4 = RedDriverStreamDmaQueue();
         } else {
-            ppiVar5 = (int**)&p_DmaControlOld[0];
+            ppiVar5 = &p_DmaControlOld[0];
             piVar4 = RedDriverMainDmaQueue();
         }
         piVar7 = *ppiVar5;
         m_DMAInThread = 2;
         piVar6 = 0;
-        if (*piVar7 != 0) {
+        if (piVar7->m_id != 0) {
             m_DMAStatus = 1;
-            if (piVar7[1] == 0) {
-                DCFlushRange((void*)piVar7[2], (u32)piVar7[4]);
-                iVar3 = piVar7[2];
-                iVar2 = piVar7[3];
+            if (piVar7->m_direction == 0) {
+                DCFlushRange((void*)piVar7->m_mainMemory, (u32)piVar7->m_size);
+                iVar3 = piVar7->m_mainMemory;
+                iVar2 = piVar7->m_aramMemory;
             } else {
-                DCInvalidateRange((void*)piVar7[2], (u32)piVar7[4]);
-                iVar3 = piVar7[3];
-                iVar2 = piVar7[2];
+                DCInvalidateRange((void*)piVar7->m_mainMemory, (u32)piVar7->m_size);
+                iVar3 = piVar7->m_aramMemory;
+                iVar2 = piVar7->m_mainMemory;
             }
             m_DMAInThread = 3;
-            ARQSetChunkSize((u32)piVar7[4]);
-            ARQPostRequest(&m_DMARequest, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
-                           (u32)piVar7[4], _DmaCallback);
+            ARQSetChunkSize((u32)piVar7->m_size);
+            ARQPostRequest(&m_DMARequest, 0x469, (u32)piVar7->m_direction, 1, (u32)iVar3, (u32)iVar2,
+                           (u32)piVar7->m_size, _DmaCallback);
             m_DMAInThread = 4;
             piVar6 = piVar7;
         }
-        piVar8 = piVar7 + 7;
+        piVar8 = piVar7 + 1;
         m_DMAInThread = 5;
-        if (piVar4 + 0x380 <= piVar7 + 7) {
+        if (piVar4 + 0x80 <= piVar7 + 1) {
             piVar8 = piVar4;
         }
         *ppiVar5 = piVar8;
@@ -1085,16 +1096,16 @@ void _DmaExecute()
             m_DMAInThread = 7;
             if (m_DMAStatus == 0) {
                 m_DMAInThread = 8;
-                if ((u32)piVar6[5] != 0) {
+                if ((u32)piVar6->m_callback != 0) {
                     uVar1 = OSDisableInterrupts();
-                    ((void (*)(void*))piVar6[5])((void*)piVar6[6]);
+                    piVar6->m_callback(piVar6->m_callbackData);
                     OSRestoreInterrupts(uVar1);
                 }
                 m_DMAInThread = 9;
-                if (piVar6[1] == 1) {
-                    DCFlushRange((void*)piVar6[2], (u32)piVar6[4]);
+                if (piVar6->m_direction == 1) {
+                    DCFlushRange((void*)piVar6->m_mainMemory, (u32)piVar6->m_size);
                 }
-                *piVar6 = 0;
+                piVar6->m_id = 0;
                 break;
             }
             RedSleep(0);

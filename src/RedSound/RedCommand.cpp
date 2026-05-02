@@ -162,9 +162,9 @@ int _EraseTime(int eraseTrack)
  */
 RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 {
-	int* trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
-	int* scan;
-	int* track;
+	RedTrackDATA** trackBasePtr = (RedTrackDATA**)((char*)p_SoundControlBuffer + 0xdbc);
+	RedTrackDATA* scan;
+	RedTrackDATA* track;
 	int remaining;
 	int erasedCount = 0;
 
@@ -173,29 +173,29 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 	}
 
 	do {
-		track = (int*)(*trackBasePtr + 0x292c);
+		track = *trackBasePtr + 0x1f;
 		scan = track;
 		remaining = trackCount;
 		do {
 			track = scan;
 			remaining--;
-			if ((remaining != 0) && ((u32)*track == 0) && ((((RedTrackDATA*)track)->m_note.m_allocFlags & 2) == 0)) {
-				scan = track - 0x55;
+			if ((remaining != 0) && ((u32)track->m_command == 0) && ((track->m_note.m_allocFlags & 2) == 0)) {
+				scan = track - 1;
 			} else {
-				if (((u32)*track != 0) || ((((RedTrackDATA*)track)->m_note.m_allocFlags & 2) != 0)) {
+				if (((u32)track->m_command != 0) || ((track->m_note.m_allocFlags & 2) != 0)) {
 					remaining = 1;
 					scan = track;
 				}
-				scan = scan - 0x55;
+				scan = scan - 1;
 			}
-		} while ((remaining != 0) && ((int*)*trackBasePtr <= track));
-	} while ((track < (int*)*trackBasePtr) && ((erasedCount = _EraseTime(eraseTrack)) != 0));
+		} while ((remaining != 0) && (*trackBasePtr <= track));
+	} while ((track < *trackBasePtr) && ((erasedCount = _EraseTime(eraseTrack)) != 0));
 
-	if (track < (int*)*trackBasePtr) {
+	if (track < *trackBasePtr) {
 		track = 0;
 	}
 
-	return (RedTrackDATA*)track;
+	return track;
 }
 
 /*

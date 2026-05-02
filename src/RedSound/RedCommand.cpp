@@ -251,25 +251,25 @@ int SeStopID(int seId)
  */
 int SeStopMG(int bank, int sep, int group, int kind)
 {
-	int* trackBasePtr;
-	int* track;
+	RedTrackDATA** trackBasePtr;
+	RedTrackDATA* track;
 
-	trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
+	trackBasePtr = (RedTrackDATA**)((char*)p_SoundControlBuffer + 0xdbc);
 	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
-	track = (int*)*trackBasePtr;
+	track = *trackBasePtr;
 	do {
-		if (((u32)*track != 0) && ((((RedTrackDATA*)track)->m_seSepId & 0x80000000U) == 0)) {
-			int id = ((RedTrackDATA*)track)->m_seSepId / 1000;
+		if (((u32)track->m_command != 0) && ((track->m_seSepId & 0x80000000U) == 0)) {
+			int id = track->m_seSepId / 1000;
 			if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
 				int trackNo;
 
-				KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
-				((RedTrackDATA*)track)->m_seId = 0;
-				((RedTrackDATA*)track)->m_flags = 0;
-				((RedTrackDATA*)track)->m_command = 0;
-				((RedTrackDATA*)track)->m_mixVolumeMode = 0;
+				KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, track);
+				track->m_seId = 0;
+				track->m_flags = 0;
+				track->m_command = 0;
+				track->m_mixVolumeMode = 0;
 
-				trackNo = ((RedTrackDATA*)track)->m_trackNo;
+				trackNo = track->m_trackNo;
 				*(unsigned char*)((int)p_VoiceData + trackNo * 0xc0 + 0x1a) &= -6;
 				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x94) &= 0xfffffff7;
 				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) &= 0xfffffffe;
@@ -277,15 +277,14 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0) = 0;
 				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
-				if ((u32)((RedTrackDATA*)track)->m_waveBankData != 0) {
-					c_RedEntry.WaveHistoryManager(
-					    0, reinterpret_cast<RedWaveHeadWD*>(((RedTrackDATA*)track)->m_waveBankData)->m_waveNo);
+				if ((u32)track->m_waveBankData != 0) {
+					c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
 				}
-				c_RedEntry.SeSepHistoryManager(0, ((RedTrackDATA*)track)->m_seSepId);
+				c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
 			}
 		}
-		track += 0x55;
-	} while (track < (int*)(*trackBasePtr + 0x2a80));
+		track++;
+	} while (track < *trackBasePtr + 0x20);
 
 	return 0;
 }

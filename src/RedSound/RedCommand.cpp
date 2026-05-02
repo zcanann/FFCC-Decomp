@@ -43,35 +43,35 @@ RedReverbModeData t_ReverbModeData[] = {
  */
 void _EraseAttribute(int eraseTrack, int attrMask)
 {
-	int* trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
-	int* track = (int*)*trackBasePtr;
+	RedTrackDATA** trackBasePtr = (RedTrackDATA**)((char*)p_SoundControlBuffer + 0xdbc);
+	RedTrackDATA* track = *trackBasePtr;
 
 	do {
-		if (((u32)*track != 0) && ((int)((RedTrackDATA*)track)->m_eraseTrack <= eraseTrack) &&
-		    ((((unsigned int)((RedTrackDATA*)track)->m_attrMask) & (unsigned int)attrMask) != 0)) {
+		if (((u32)track->m_command != 0) && ((int)track->m_eraseTrack <= eraseTrack) &&
+		    ((((unsigned int)track->m_attrMask) & (unsigned int)attrMask) != 0)) {
 			int trackNo;
 
-			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
-			((RedTrackDATA*)track)->m_seId = 0;
-			((RedTrackDATA*)track)->m_flags = 0;
-			((RedTrackDATA*)track)->m_command = 0;
-			((RedTrackDATA*)track)->m_mixVolumeMode = 0;
+			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, track);
+			track->m_seId = 0;
+			track->m_flags = 0;
+			track->m_command = 0;
+			track->m_mixVolumeMode = 0;
 
-			trackNo = ((RedTrackDATA*)track)->m_trackNo;
+			trackNo = track->m_trackNo;
 			*(unsigned char*)((int)p_VoiceData + trackNo * 0xc0 + 0x1a) &= -6;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x94) &= 0xfffffff7;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) &= 0xfffffffe;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x90) |= 2;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * 0xc0 + 0x8c) = 0;
 
-			c_RedEntry.SeSepHistoryManager(0, ((RedTrackDATA*)track)->m_seSepId);
-			if ((u32)((RedTrackDATA*)track)->m_waveBankData != 0) {
+			c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
+			if ((u32)track->m_waveBankData != 0) {
 				c_RedEntry.WaveHistoryManager(
-				    0, reinterpret_cast<RedWaveHeadWD*>(((RedTrackDATA*)track)->m_waveBankData)->m_waveNo);
+				    0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
 			}
 		}
-		track += 0x55;
-	} while (track < (int*)(*trackBasePtr + 0x2a80));
+		track++;
+	} while (track < *trackBasePtr + 0x20);
 }
 
 /*

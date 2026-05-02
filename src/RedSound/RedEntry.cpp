@@ -956,8 +956,8 @@ int CRedEntry::SearchSeSepSequence(int seNo)
 int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
 {
 	int freedSize;
-	int waveNo = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(bank->m_data + 0x11)) +
-	             static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(bank->m_data + 0x12)) * 0x100;
+	int waveNo = static_cast<unsigned int>(reinterpret_cast<RedSeSepHEAD*>(bank->m_data)->m_waveNoLo) +
+	             static_cast<unsigned int>(reinterpret_cast<RedSeSepHEAD*>(bank->m_data)->m_waveNoHi) * 0x100;
 
 	RedDelete(bank->m_data);
 	SeSepHistoryDelete(bank->m_historyNo);

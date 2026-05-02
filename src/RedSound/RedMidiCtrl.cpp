@@ -1720,7 +1720,7 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
             entry[7] = 0;
         }
         entry = entry + 0x30;
-    } while (entry < (unsigned int*)p_VoiceData + 0xc00);
+    } while (entry < (unsigned int*)(p_VoiceData + 0x40));
 }
 
 /*
@@ -1906,7 +1906,7 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 			voice[0xb] = 0;
 		}
 		voice += 0x30;
-	} while (voice < (unsigned int*)p_VoiceData + 0xc00);
+	} while (voice < (unsigned int*)(p_VoiceData + 0x40));
 }
 
 /*
@@ -2285,7 +2285,7 @@ void _PitchBendCompute(RedTrackDATA* track, int bend)
             }
         }
         voiceData += 0x30;
-    } while (voiceData < (unsigned int*)((unsigned int*)p_VoiceData + 0xc00));
+    } while (voiceData < (unsigned int*)(p_VoiceData + 0x40));
 }
 
 /*

@@ -1149,7 +1149,7 @@ int CRedEntry::ReentrySeSepData(int seNo)
 {
 	seNo = SearchSeSepSequence(seNo);
 	if (seNo >= 0) {
-		SeSepHistoryChoice((RedHistoryBANK*)(((int*)this)[1] + seNo * 0x10));
+		SeSepHistoryChoice(reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + seNo * 0x10));
 	}
 	return seNo;
 }
@@ -1349,19 +1349,19 @@ int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
 int CRedEntry::MusicOldClear()
 {
 	int historyNo = 0;
-	unsigned int selected = 0;
-	unsigned int history = (unsigned int)m_musicBankBase;
+	RedHistoryBANK* selected = 0;
+	RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_musicBankBase);
 
 	do {
-		if (*(int*)(history + 4) > historyNo) {
-			historyNo = *(int*)(history + 4);
+		if (history->m_historyNo > historyNo) {
+			historyNo = history->m_historyNo;
 			selected = history;
 		}
-		history += 0x10;
-	} while (history < (unsigned int)m_musicBankBase + 0x40);
+		history += 1;
+	} while (history < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + 0x40));
 
 	if (historyNo != 0) {
-		MusicMemoryFree((RedHistoryBANK*)selected);
+		MusicMemoryFree(selected);
 	}
 
 	return historyNo;
@@ -1374,22 +1374,22 @@ int CRedEntry::MusicOldClear()
  */
 RedHistoryBANK* CRedEntry::MusicOldChoice()
 {
-	unsigned int selected = 0;
+	RedHistoryBANK* selected = 0;
 	int historyNo = 0;
-	unsigned int history = (unsigned int)*(int*)((int)this + 8);
+	RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_musicBankBase);
 
 	do {
-		if (*(int*)(history + 0xc) == 0) {
-			return reinterpret_cast<RedHistoryBANK*>(history);
+		if (history->m_size == 0) {
+			return history;
 		}
-		if (*(int*)(history + 4) > historyNo) {
-			historyNo = *(int*)(history + 4);
+		if (history->m_historyNo > historyNo) {
+			historyNo = history->m_historyNo;
 			selected = history;
 		}
-		history += 0x10;
-	} while (history < (unsigned int)*(int*)((int)this + 8) + 0x40);
+		history += 1;
+	} while (history < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + 0x40));
 
-	return reinterpret_cast<RedHistoryBANK*>(selected);
+	return selected;
 }
 
 /*
@@ -1427,7 +1427,7 @@ int CRedEntry::ReentryMusicData(int musicNo)
 {
 	musicNo = SearchMusicSequence(musicNo);
 	if (musicNo >= 0) {
-		MusicHistoryChoice((RedHistoryBANK*)(((int*)this)[2] + musicNo * 0x10));
+		MusicHistoryChoice(reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + musicNo * 0x10));
 	}
 	return musicNo;
 }

@@ -2099,8 +2099,9 @@ void _MusicNoteExecute()
         status = _MusicMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData, 1);
     }
 
-    if ((*(int*)((u8*)p_SoundControlBuffer + 0x470) < 0) && (*(int*)((u8*)p_SoundControlBuffer + 0x904) < 0) &&
-        (*(int*)((u8*)p_SoundControlBuffer + 0xD98) < 0)) {
+    if ((*(int*)((u8*)p_SoundControlBuffer + 0x470) < 0) &&
+        (*(int*)((u8*)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470) < 0) &&
+        (*(int*)((u8*)p_SoundControlBuffer + REDSOUND_CONTROL_SKIP_OFFSET + 0x470) < 0)) {
         m_MusicPhraseStop = 0;
     }
 }
@@ -2172,7 +2173,7 @@ void _SkipMusicEntry()
     u8* soundControl;
     u8 temp[0xC];
 
-    if (*(int*)((u8*)p_SoundControlBuffer + 0xD98) >= 0) {
+    if (*(int*)((u8*)p_SoundControlBuffer + REDSOUND_CONTROL_SKIP_OFFSET + 0x470) >= 0) {
         src = (int*)p_SkipKeyOn;
         dst = (int*)p_KeyOnData;
         do {
@@ -2217,17 +2218,17 @@ void _SkipMusicEntry()
 
         soundControl = (u8*)p_SoundControlBuffer;
         if (*(int*)(soundControl + 0x470) != -1) {
-            if (*(int*)(soundControl + 0x904) != -1) {
-                MusicStop(*(int*)(soundControl + 0x904));
+            if (*(int*)(soundControl + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470) != -1) {
+                MusicStop(*(int*)(soundControl + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470));
             }
-            memcpy(soundControl + 0x494, soundControl, 0x494);
+            memcpy(soundControl + REDSOUND_CONTROL_SECONDARY_OFFSET, soundControl, REDSOUND_CONTROL_SIZE);
         }
 
-        memcpy(soundControl, soundControl + 0x928, 0x494);
-        memcpy(temp, soundControl + 0x944, 0xC);
-        memset(soundControl + 0x928, 0, 0x494);
-        memcpy(soundControl + 0x944, temp, 0xC);
-        *(int*)(soundControl + 0xD98) = -1;
+        memcpy(soundControl, soundControl + REDSOUND_CONTROL_SKIP_OFFSET, REDSOUND_CONTROL_SIZE);
+        memcpy(temp, soundControl + REDSOUND_CONTROL_SKIP_OFFSET + 0x1C, 0xC);
+        memset(soundControl + REDSOUND_CONTROL_SKIP_OFFSET, 0, REDSOUND_CONTROL_SIZE);
+        memcpy(soundControl + REDSOUND_CONTROL_SKIP_OFFSET + 0x1C, temp, 0xC);
+        *(int*)(soundControl + REDSOUND_CONTROL_SKIP_OFFSET + 0x470) = -1;
     }
 
     RedDelete(p_SkipKeyOn);
@@ -2262,7 +2263,7 @@ void MusicSkipFunction()
         }
     } while (p_SkipKeyOn == 0);
 
-    puVar9 = (u32*)((u8*)p_SoundControlBuffer + 0x928);
+    puVar9 = (u32*)((u8*)p_SoundControlBuffer + REDSOUND_CONTROL_SKIP_OFFSET);
     memset(p_SkipKeyOn, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
     iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, p_SkipKeyOn, 1);
     while ((iVar5 == 0) && ((*(u32*)((u8*)puVar9 + 0x46c) & 1) != 0)) {

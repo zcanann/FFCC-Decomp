@@ -65,6 +65,14 @@ struct RedTickHistory {
     int m_ticks[100];
 };
 
+enum RedDriverBufferSize {
+    REDSOUND_ZERO_BUFFER_SIZE = 0x1000,
+    REDSOUND_MUSIC_REPLAY_POINT_COUNT = 0x100,
+    REDSOUND_MUSIC_REPLAY_POINT_SIZE = sizeof(int) * REDSOUND_MUSIC_REPLAY_POINT_COUNT,
+    REDSOUND_EXEC_COMMAND_COUNT = 0x100,
+    REDSOUND_EXEC_COMMAND_BUFFER_SIZE = sizeof(RedExecCommand) * REDSOUND_EXEC_COMMAND_COUNT,
+};
+
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 static int m_RedMasterTime;
 static volatile int m_SequencialID;
@@ -692,7 +700,7 @@ int* _EntryExecCommand(void (*func)(int*), int arg1, int arg2, int arg3, int arg
     writePos->m_args[5] = arg6;
     writePos->m_args[6] = arg7;
     writePos++;
-    if (writePos == p_ExecCommand + 0x100) {
+    if (writePos == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
         writePos = p_ExecCommand;
     }
     p_ExecCommandNow = writePos;
@@ -722,7 +730,7 @@ void _ExecuteCommand()
 			readPos->m_func((int*)readPos->m_args);
 		}
 		readPos++;
-		if (readPos == p_ExecCommand + 0x100) {
+		if (readPos == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
 			readPos = p_ExecCommand;
 		}
 	}
@@ -1245,8 +1253,8 @@ void CRedDriver::Init()
     } else {
         AXSetMode(0);
     }
-    p_Tick = (RedTickHistory*)RedNew(400);
-    memset(p_Tick, 0, 400);
+    p_Tick = (RedTickHistory*)RedNew(sizeof(RedTickHistory));
+    memset(p_Tick, 0, sizeof(RedTickHistory));
     AXSetCompressor(0);
     m_MusicKeySignature = 0;
     m_SoundMasterControl = 0;
@@ -1262,18 +1270,18 @@ void CRedDriver::Init()
         p_SeBlockData[iVar6] = 0;
         iVar6 = iVar5;
     } while (iVar5 < 4);
-    p_ZeroData = (u8*)RedNew(0x1000);
-    memset(p_ZeroData, 0, 0x1000);
-    p_MusicReplayPoint = (int*)RedNew(0x400);
-    memset(p_MusicReplayPoint, 0, 0x400);
+    p_ZeroData = (u8*)RedNew(REDSOUND_ZERO_BUFFER_SIZE);
+    memset(p_ZeroData, 0, REDSOUND_ZERO_BUFFER_SIZE);
+    p_MusicReplayPoint = (int*)RedNew(REDSOUND_MUSIC_REPLAY_POINT_SIZE);
+    memset(p_MusicReplayPoint, 0, REDSOUND_MUSIC_REPLAY_POINT_SIZE);
     p_MusicTempoControl = (RedControlRamp*)RedNew(0xc);
     memset(p_MusicTempoControl, 0, 0xc);
     p_MusicPitchControl = (RedControlRamp*)RedNew(0xc);
     memset(p_MusicPitchControl, 0, 0xc);
-    p_ExecCommand = (RedExecCommand*)RedNew(0x2000);
+    p_ExecCommand = (RedExecCommand*)RedNew(REDSOUND_EXEC_COMMAND_BUFFER_SIZE);
     p_ExecCommandNow = p_ExecCommand;
     p_ExecCommandOld = p_ExecCommand;
-    memset(p_ExecCommand, 0, 0x2000);
+    memset(p_ExecCommand, 0, REDSOUND_EXEC_COMMAND_BUFFER_SIZE);
     p_SoundControlBuffer = (RedSoundCONTROL*)RedNew(REDSOUND_CONTROL_BUFFER_SIZE);
     p_SoundControl = p_SoundControlBuffer;
     memset(p_SoundControlBuffer, 0, REDSOUND_CONTROL_BUFFER_SIZE);

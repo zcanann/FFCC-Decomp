@@ -554,12 +554,12 @@ void StreamControl()
 					samplePos <<= 16;
 					samplePos |= voiceData->m_axVoice->pb.addr.currentAddressLo;
 					if ((samplePos >= sampleStart) && (samplePos < sampleStart + 0x2000)) {
-						int stopped = 0;
+						bool stopped = false;
 						if (streamData->m_header.m_loopStart < 0) {
 							streamData->m_header.m_loopEnd = streamData->m_header.m_loopEnd - 0x200;
 							if (streamData->m_header.m_loopEnd < 1) {
 								_StreamStop(streamData);
-								stopped = 1;
+								stopped = true;
 							}
 						}
 						streamData->m_fileCursor += streamData->m_header.m_channelCount * 0x1000;
@@ -568,13 +568,13 @@ void StreamControl()
 						}
 
 						if (!stopped) {
-							int side;
+							bool side;
 							int dmaID;
 							if (streamData->m_streamCursorBase != 0) {
-								side = 0;
+								side = false;
 								streamData->m_streamCursorBase = 0;
 							} else {
-								side = 1;
+								side = true;
 								streamData->m_streamCursorBase = 0x1000;
 							}
 
@@ -587,7 +587,7 @@ void StreamControl()
 						}
 					}
 
-					int changed = 0;
+					char changed = 0;
 					if (streamData->m_panStepCount != 0) {
 						changed += 1;
 						streamData->m_panStepCount -= 1;

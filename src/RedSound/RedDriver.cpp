@@ -1305,7 +1305,7 @@ void CRedDriver::Init()
     memset(p_VoiceData, 0, REDSOUND_VOICE_BUFFER_SIZE);
     iVar6 = 0;
     do {
-        iVar2 = iVar6 * 0xc0;
+        iVar2 = iVar6 * REDSOUND_VOICE_SIZE;
         iVar5 = iVar6 * 0x8000000;
         iVar4 = iVar6 >> 0x1f;
         iVar6 = iVar6 + 1;

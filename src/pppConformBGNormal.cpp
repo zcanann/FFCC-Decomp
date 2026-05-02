@@ -230,16 +230,16 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
                 } else if (((WeaponNodeFlagBits*)&owner->m_weaponNodeFlags)->m_unk01 &&
                     (owner->m_attachOwner != NULL)) {
+                    ownerX = owner->m_worldPosition.x;
                     ownerY = owner->m_attachOwner->m_worldPosition.y;
                     ownerZ = owner->m_worldPosition.z;
-                    ownerX = owner->m_worldPosition.x;
                     pppMngStPtr->m_matrix.value[0][3] = ownerX;
                     pppMngStPtr->m_matrix.value[1][3] = ownerY;
                     pppMngStPtr->m_matrix.value[2][3] = ownerZ;
                 } else {
+                    ownerX = owner->m_worldPosition.x;
                     ownerY = owner->m_worldPosition.y;
                     ownerZ = owner->m_worldPosition.z;
-                    ownerX = owner->m_worldPosition.x;
                     secondRayDirection.x = kPppConformBgNormalZero;
                     secondRayDirection.y = -2000.0f;
                     secondRayDirection.z = kPppConformBgNormalZero;
@@ -250,9 +250,9 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     secondCylinder.m_direction2.z = -10000000000.0f;
                     secondCylinder.m_direction2.y = -10000000000.0f;
                     secondCylinder.m_direction2.x = -10000000000.0f;
+                    secondCylinder.m_bottom.x = ownerX;
                     secondCylinder.m_bottom.y = ownerY;
                     secondCylinder.m_bottom.z = ownerZ;
-                    secondCylinder.m_bottom.x = ownerX;
                     secondCylinder.m_direction.x = kPppConformBgNormalZero;
                     secondCylinder.m_direction.y = -2000.0f;
                     secondCylinder.m_direction.z = kPppConformBgNormalZero;

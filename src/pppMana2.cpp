@@ -71,6 +71,11 @@ static inline Mtx44& CameraScreenMatrix()
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
@@ -1100,7 +1105,7 @@ void MakeWave(Vec*, unsigned short*, float*, Vec, float, float)
  * JP Address: TODO
  * JP Size: TODO
  */
-static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5)
+static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, unsigned short* indicesOut, float size)
 {
     float zero;
     float normalY;
@@ -1119,23 +1124,23 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     int colCount;
     int pairCount;
 
-    normalY = FLOAT_803318a0;
-    zero = FLOAT_80331898;
     rowCount = 0;
-    uvStep = FLOAT_803318A8;
-    radius = param_5 * FLOAT_803318a4;
-    for (z = radius; -radius <= z; z -= param_5 * uvStep) {
+    radius = size * FLOAT_803318a4;
+    uvStep = LoadFloat(FLOAT_803318A8);
+    zero = FLOAT_80331898;
+    normalY = FLOAT_803318a0;
+    for (z = radius; -radius <= z; z -= size * uvStep) {
         colCount = 0;
         rowUv = static_cast<float>(rowCount) * uvStep;
-        positions = reinterpret_cast<float*>(param_1);
-        normals = reinterpret_cast<float*>(param_2);
-        uvs = reinterpret_cast<float*>(param_3);
-        for (x = -radius; x <= radius; x += param_5 * uvStep) {
+        positions = reinterpret_cast<float*>(positionsInOut);
+        normals = reinterpret_cast<float*>(normalsOut);
+        uvs = reinterpret_cast<float*>(uvOut);
+        for (x = -radius; x <= radius; x += size * uvStep) {
             *positions = x;
-            param_1 = reinterpret_cast<Vec*>(positions + 3);
+            positionsInOut = reinterpret_cast<Vec*>(positions + 3);
             positions[1] = zero;
-            param_2 = reinterpret_cast<Vec*>(normals + 3);
-            param_3 = reinterpret_cast<Vec2d*>(uvs + 2);
+            normalsOut = reinterpret_cast<Vec*>(normals + 3);
+            uvOut = reinterpret_cast<Vec2d*>(uvs + 2);
             positions[2] = z;
             positions = positions + 3;
             *normals = zero;
@@ -1156,18 +1161,18 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
         pairCount = 8;
         quadIndex = rowBase;
         do {
-            *(short*)((char*)param_4 + indexOffset) = quadIndex;
-            *(short*)((char*)param_4 + indexOffset + 2) = quadIndex + 1;
-            *(short*)((char*)param_4 + indexOffset + 4) = quadIndex + 0x12;
-            *(short*)((char*)param_4 + indexOffset + 6) = quadIndex + 0x12;
-            *(short*)((char*)param_4 + indexOffset + 8) = quadIndex + 0x11;
-            *(short*)((char*)param_4 + indexOffset + 10) = quadIndex;
-            *(short*)((char*)param_4 + indexOffset + 0xC) = quadIndex + 1;
-            *(short*)((char*)param_4 + indexOffset + 0xE) = quadIndex + 2;
-            *(short*)((char*)param_4 + indexOffset + 0x10) = quadIndex + 0x13;
-            *(short*)((char*)param_4 + indexOffset + 0x12) = quadIndex + 0x13;
-            *(short*)((char*)param_4 + indexOffset + 0x14) = quadIndex + 0x12;
-            *(short*)((char*)param_4 + indexOffset + 0x16) = quadIndex + 1;
+            *(short*)((char*)indicesOut + indexOffset) = quadIndex;
+            *(short*)((char*)indicesOut + indexOffset + 2) = quadIndex + 1;
+            *(short*)((char*)indicesOut + indexOffset + 4) = quadIndex + 0x12;
+            *(short*)((char*)indicesOut + indexOffset + 6) = quadIndex + 0x12;
+            *(short*)((char*)indicesOut + indexOffset + 8) = quadIndex + 0x11;
+            *(short*)((char*)indicesOut + indexOffset + 10) = quadIndex;
+            *(short*)((char*)indicesOut + indexOffset + 0xC) = quadIndex + 1;
+            *(short*)((char*)indicesOut + indexOffset + 0xE) = quadIndex + 2;
+            *(short*)((char*)indicesOut + indexOffset + 0x10) = quadIndex + 0x13;
+            *(short*)((char*)indicesOut + indexOffset + 0x12) = quadIndex + 0x13;
+            *(short*)((char*)indicesOut + indexOffset + 0x14) = quadIndex + 0x12;
+            *(short*)((char*)indicesOut + indexOffset + 0x16) = quadIndex + 1;
             quadIndex = quadIndex + 2;
             indexOffset += 0x18;
             pairCount = pairCount + -1;
@@ -1275,9 +1280,9 @@ static int UpdateWaterMesh(VMana2* mana2)
 static void RenderWaterMesh(VMana2* mana2)
 {
     u8* work = (u8*)mana2;
+    void* texObj1 = *(void**)(work + 0x2C);
     u16* indices = *(u16**)(work + 0x50);
     void* texObj0 = *(void**)(work + 0x28);
-    void* texObj1 = *(void**)(work + 0x2C);
     void* texObj2 = (u8*)*(void**)(work + 0x7C) + 0x28;
     _GXColor modulateColor;
     _GXColor blendColor = {0x80, 0x80, 0x80, 0x80};

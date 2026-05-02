@@ -23,6 +23,13 @@ struct RedReverbDepth {
 	int m_count;
 };
 
+enum RedSoundControlIndex {
+	REDSOUND_CONTROL_MUSIC_PRIMARY = 0,
+	REDSOUND_CONTROL_MUSIC_SECONDARY = 1,
+	REDSOUND_CONTROL_MUSIC_SKIP = 2,
+	REDSOUND_CONTROL_SE = 3,
+};
+
 struct RedSeBlockHEAD;
 
 extern RedMidiControlFunc p_MidiControl_Function[];

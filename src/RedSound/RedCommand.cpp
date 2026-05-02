@@ -637,7 +637,7 @@ void SePause(int seId, int pause)
 {
 	unsigned int* trackBasePtr;
 	unsigned int track;
-	unsigned int voice;
+	RedVoiceDATA* voice;
 
 	if (m_ReportPrint != 0) {
 		if (pause == 1) {
@@ -650,24 +650,24 @@ void SePause(int seId, int pause)
 
 	trackBasePtr = (unsigned int*)((char*)p_SoundControlBuffer + 0xdbc);
 	track = *trackBasePtr;
-	voice = (unsigned int)p_VoiceData + 0x1800;
+	voice = (RedVoiceDATA*)((unsigned int)p_VoiceData + 0x1800);
 	do {
 		if ((((RedTrackDATA*)track)->m_seId != 0) && ((seId == -1) || (seId == ((RedTrackDATA*)track)->m_seId))) {
 			if (pause == 1) {
-				if (*(void**)(voice + 0x14) != 0) {
-					*(unsigned int*)(voice + 0x9c) = 0;
-					*(unsigned int*)(voice + 0x90) |= 0x18;
+				if (voice->m_axVoice != 0) {
+					voice->m_targetPitch = 0;
+					voice->m_flags |= 0x18;
 				}
 				*(unsigned int*)(track + 0xfc) |= 8;
-				*(unsigned int*)(voice + 0x94) |= 8;
+				voice->m_voiceSwitch |= 8;
 			} else {
-				*(unsigned int*)(voice + 0xb8) |= 3;
+				voice->m_updateFlags |= 3;
 				*(unsigned int*)(track + 0xfc) &= 0xfffffff7;
-				*(unsigned int*)(voice + 0x94) &= 0xfffffff7;
+				voice->m_voiceSwitch &= 0xfffffff7;
 			}
 		}
 		track += 0x154;
-		voice += 0xc0;
+		voice++;
 	} while (track < *trackBasePtr + 0x2a80);
 }
 

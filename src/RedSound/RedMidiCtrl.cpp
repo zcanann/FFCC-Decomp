@@ -524,12 +524,12 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
     if (control < p_SoundControlBuffer + REDSOUND_CONTROL_SE) {
         control->m_activeTrackCount--;
         if ((control->m_activeTrackCount == 0) &&
-            ((m_MusicPhraseStop == 1) || ((((int*)control)[0x11b] & 1) == 0))) {
+            ((m_MusicPhraseStop == 1) || ((control->m_flags & 1) == 0))) {
             controlData = (unsigned int*)control;
             seTrack = (unsigned int*)p_VoiceData;
             do {
                 if ((controlData[0] <= seTrack[0]) &&
-                    (seTrack[0] < controlData[0] + (unsigned int)((unsigned char*)control)[0x491] * 0x154)) {
+                    (seTrack[0] < controlData[0] + (unsigned int)control->m_trackCount * 0x154)) {
                     seTrack[0x25] &= 0xfffffff3;
                     seTrack[0x24] &= 0xfffffffe;
                     seTrack[0x24] |= 2;

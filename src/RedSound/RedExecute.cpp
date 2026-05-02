@@ -2252,14 +2252,14 @@ void MusicSkipFunction()
     u32* puVar9;
 
     do {
-        p_SkipKeyOn = (RedKeyOnDATA*)RedNew(0x600);
+        p_SkipKeyOn = (RedKeyOnDATA*)RedNew(REDSOUND_KEY_ON_BUFFER_SIZE);
         if (p_SkipKeyOn == 0) {
             RedSleep(10000);
         }
     } while (p_SkipKeyOn == 0);
 
     puVar9 = (u32*)((u8*)p_SoundControlBuffer + 0x928);
-    memset(p_SkipKeyOn, 0, 0x600);
+    memset(p_SkipKeyOn, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
     iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, p_SkipKeyOn, 1);
     while ((iVar5 == 0) && ((*(u32*)((u8*)puVar9 + 0x46c) & 1) != 0)) {
         *(s16*)((u8*)puVar9 + 0x48e) = *(int*)((u8*)puVar9 + 0x434);
@@ -2558,7 +2558,7 @@ void MainControl(int frames)
 
     _KeyOnControl();
     m_KeyOnEntry = 0;
-    memset(p_KeyOnData, 0, 0x600);
+    memset(p_KeyOnData, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
 
     p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
     _SeMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData,

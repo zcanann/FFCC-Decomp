@@ -41,7 +41,7 @@ RedReverbModeData t_ReverbModeData[] = {
  */
 void _EraseAttribute(int eraseTrack, int attrMask)
 {
-	RedTrackDATA** trackBasePtr = (RedTrackDATA**)((char*)p_SoundControlBuffer + 0xdbc);
+	RedTrackDATA** trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 	RedTrackDATA* track = *trackBasePtr;
 
 	do {
@@ -84,7 +84,7 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 int _EraseTime(int eraseTrack)
 {
 	int minTrack = 0x100;
-	RedTrackDATA** trackBasePtr = (RedTrackDATA**)((char*)p_SoundControlBuffer + 0xdbc);
+	RedTrackDATA** trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 	RedTrackDATA* track = *trackBasePtr;
 
 	do {
@@ -156,7 +156,7 @@ int _EraseTime(int eraseTrack)
  */
 RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 {
-	RedTrackDATA** trackBasePtr = (RedTrackDATA**)((char*)p_SoundControlBuffer + 0xdbc);
+	RedTrackDATA** trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 	RedTrackDATA* scan;
 	RedTrackDATA* track;
 	int remaining;
@@ -206,7 +206,7 @@ int SeStopID(int seId)
 	RedTrackDATA** trackBasePtr;
 	RedTrackDATA* track;
 
-	trackBasePtr = (RedTrackDATA**)((char*)p_SoundControlBuffer + 0xdbc);
+	trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
 	track = *trackBasePtr;
 	do {
@@ -252,7 +252,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 	RedTrackDATA** trackBasePtr;
 	RedTrackDATA* track;
 
-	trackBasePtr = (RedTrackDATA**)((char*)p_SoundControlBuffer + 0xdbc);
+	trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
 	track = *trackBasePtr;
 	do {
@@ -646,7 +646,7 @@ void SePause(int seId, int pause)
 		fflush(__files + 1);
 	}
 
-	trackBasePtr = (RedTrackDATA**)((char*)p_SoundControlBuffer + 0xdbc);
+	trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 	track = *trackBasePtr;
 	voice = (RedVoiceDATA*)((unsigned int)p_VoiceData + 0x1800);
 	do {

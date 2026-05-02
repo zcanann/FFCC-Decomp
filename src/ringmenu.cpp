@@ -132,16 +132,6 @@ static inline unsigned char* MenuPcsRaw()
     return reinterpret_cast<unsigned char*>(&MenuPcs);
 }
 
-static inline int& RingMenuInt(CRingMenu* ringMenu, int offset)
-{
-	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(ringMenu) + offset);
-}
-
-static inline float& RingMenuFloat(CRingMenu* ringMenu, int offset)
-{
-	return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(ringMenu) + offset);
-}
-
 static inline int clampDecToZero(int value)
 {
 	unsigned int next = static_cast<unsigned int>(value - 1);
@@ -532,7 +522,7 @@ void CRingMenu::onDraw()
 		return;
 	}
 
-	double showScale = static_cast<double>(static_cast<float>(RingMenuInt(this, 0x500)) * FLOAT_80330a08);
+	double showScale = static_cast<double>(static_cast<float>(m_displayCounter) * FLOAT_80330a08);
 	if (m_displayDirection != 0) {
 		showScale = static_cast<double>(FLOAT_803309cc) - showScale;
 	}
@@ -550,8 +540,8 @@ void CRingMenu::onDraw()
 	sin(static_cast<double>(FLOAT_80330a0c * static_cast<float>(m_gbaAnimCounter)) / static_cast<double>(FLOAT_80330a10));
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
-	float cycle = static_cast<float>(
-		fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(RingMenuInt(this, 0x4F4))), DOUBLE_80330a20));
+	float cycle = static_cast<float>(fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(m_gbaAnimCounter)),
+	                                      DOUBLE_80330a20));
 	if (cycle > FLOAT_803309cc) {
 		cycle = FLOAT_80330a28 - cycle;
 	}
@@ -598,8 +588,8 @@ void CRingMenu::onDraw()
 			posY = FLOAT_80330a74 + sideY;
 		}
 
-		double buttonAlpha = static_cast<double>(static_cast<float>(RingMenuInt(this, 0x40 + group * 0x0C)) * FLOAT_80330a78);
-		if (RingMenuInt(this, 0x20 + group * 0x08) >= 0) {
+		double buttonAlpha = static_cast<double>(static_cast<float>(m_buttonTimers[group * 3 + 2]) * FLOAT_80330a78);
+		if (m_battleButtons[group * 2 + 2] >= 0) {
 			buttonAlpha = static_cast<double>(FLOAT_803309cc) - buttonAlpha;
 		}
 
@@ -658,7 +648,7 @@ void CRingMenu::onDraw()
 				font->SetShadow(1);
 				font->SetTlut(4);
 
-				double scroll = static_cast<double>(RingMenuFloat(this, 0x50C));
+				double scroll = static_cast<double>(m_spinAccumulator);
 				while (scroll >= static_cast<double>(FLOAT_803309cc)) {
 					if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 						cmdIndex = (cmdIndex + 1) % 5;
@@ -677,8 +667,8 @@ void CRingMenu::onDraw()
 				}
 
 				double labelAlphaScale = DOUBLE_80330a98;
-				if (fabs(static_cast<double>(RingMenuFloat(this, 0x50C))) < DOUBLE_80330aa0) {
-					labelAlphaScale = DOUBLE_80330a90 * fabs(static_cast<double>(RingMenuFloat(this, 0x50C)));
+				if (fabs(static_cast<double>(m_spinAccumulator)) < DOUBLE_80330aa0) {
+					labelAlphaScale = DOUBLE_80330a90 * fabs(static_cast<double>(m_spinAccumulator));
 				}
 				labelAlphaScale = static_cast<double>(static_cast<float>(labelAlphaScale * static_cast<double>(iconAlphaScale)));
 
@@ -710,7 +700,7 @@ void CRingMenu::onDraw()
 
 		CFont* font = reinterpret_cast<CFont*>(*reinterpret_cast<int*>(MenuPcsRaw() + 0xFC));
 		for (int button = 1; button >= 0; button--) {
-			const int buttonValue = RingMenuInt(this, 0x18 + group * 0x0C + button * 4);
+			const int buttonValue = m_battleButtons[group * 3 + button];
 			if (buttonValue < 0) {
 				continue;
 			}
@@ -722,7 +712,7 @@ void CRingMenu::onDraw()
 				labelId = reinterpret_cast<const int*>(flatData->table[0].strings)[(buttonValue & 0x7FFF) * 5 + 4];
 			}
 
-			double fade = static_cast<double>(static_cast<float>(RingMenuInt(this, 0x3C + group * 0x0C + button * 4) * FLOAT_80330a78));
+			double fade = static_cast<double>(static_cast<float>(m_buttonTimers[group * 3 + button + 1]) * FLOAT_80330a78);
 			if (button == 0) {
 				fade = static_cast<double>(FLOAT_803309cc) - fade;
 			}
@@ -749,7 +739,7 @@ void CRingMenu::onDraw()
 
 			const float width = static_cast<float>(font->GetWidth(labelId));
 			int alpha = static_cast<int>(showScale * static_cast<double>(static_cast<float>(FLOAT_80330a34 * fade) * static_cast<float>(transitionScale)));
-			if ((group == 2) && (RingMenuInt(this, 0x30) >= 0)) {
+			if ((group == 2) && (m_battleButtons[6] >= 0)) {
 				alpha = static_cast<int>(FLOAT_80330ac0 * static_cast<float>(alpha));
 			}
 
@@ -852,7 +842,7 @@ void CRingMenu::drawGBA()
 		return;
 	}
 
-	double showScale = static_cast<double>(static_cast<float>(static_cast<float>(RingMenuInt(this, 0x500)) * FLOAT_80330a08));
+	double showScale = static_cast<double>(static_cast<float>(m_displayCounter) * FLOAT_80330a08);
 	if (m_displayDirection != 0) {
 		showScale = static_cast<double>(FLOAT_803309cc) - showScale;
 	}
@@ -882,8 +872,8 @@ void CRingMenu::drawGBA()
 
 	const double sizePulse = static_cast<double>(FLOAT_80330a14 * static_cast<float>(static_cast<double>(FLOAT_803309cc) - gbaAnim) +
 	                                             FLOAT_803309cc);
-	float cycle = static_cast<float>(
-	    fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(RingMenuInt(this, 0x4F4))), DOUBLE_80330a20));
+	float cycle = static_cast<float>(fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(m_gbaAnimCounter)),
+	                                      DOUBLE_80330a20));
 	if (cycle > FLOAT_803309cc) {
 		cycle = FLOAT_80330a28 - cycle;
 	}
@@ -921,7 +911,7 @@ void CRingMenu::drawGBA()
 	if (((flatFlags & 8) != 0) && (GetGBAStart__6JoyBusFi(&Joybus, menuIndex) == 0)) {
 		if (IsInitSend__6JoyBusFi(&Joybus, menuIndex) == 0) {
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1D);
-			const double blink = static_cast<double>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(RingMenuInt(this, 0x4F4)))));
+			const double blink = static_cast<double>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(m_gbaAnimCounter))));
 			const unsigned int sendAlpha = static_cast<unsigned int>(
 			    static_cast<int>(static_cast<double>(FLOAT_803309c4) * (alphaLit * static_cast<double>(FLOAT_803309cc + static_cast<float>(blink)))));
 			unsigned int sendColor[1];

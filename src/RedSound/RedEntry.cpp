@@ -1224,7 +1224,8 @@ void CRedEntry::DisplaySePlayInfo()
 				RedHistoryBANK* seSepBank = SearchSeSepBank(track[0x3D]);
 				OSReport(s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc, sRedEntryLogPrefix,
 				         trackIndex, track[0x3D],
-				         ((int)*(unsigned char*)(seSepBank->m_data + 0x12) << 8) | *(unsigned char*)(seSepBank->m_data + 0x11));
+				         ((int)reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoHi << 8) |
+				             reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoLo);
 				fflush(__files + 1);
 			} else {
 				unsigned int seDataNo = (unsigned int)track[0x3D];

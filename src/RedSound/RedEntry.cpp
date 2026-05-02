@@ -1117,12 +1117,12 @@ int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
  * JP Address: TODO
  * JP Size: TODO
  */
-int* CRedEntry::SearchSeSepBank(int seNo)
+RedHistoryBANK* CRedEntry::SearchSeSepBank(int seNo)
 {
 	RedHistoryBANK* seSepBank = reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase);
 	do {
 		if (seSepBank->m_id == seNo) {
-			return reinterpret_cast<int*>(seSepBank);
+			return seSepBank;
 		}
 		seSepBank += 1;
 	} while (seSepBank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + 0x1000));
@@ -1215,10 +1215,10 @@ void CRedEntry::DisplaySePlayInfo()
 				OSReport(s__s__2d_____801e7c01, sRedEntryLogPrefix, trackIndex);
 				fflush(__files + 1);
 			} else if ((track[0x3D] & 0x80000000) == 0) {
-				int* seSepBank = SearchSeSepBank(track[0x3D]);
+				RedHistoryBANK* seSepBank = SearchSeSepBank(track[0x3D]);
 				OSReport(s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc, sRedEntryLogPrefix,
 				         trackIndex, track[0x3D],
-				         ((int)*(unsigned char*)(seSepBank[2] + 0x12) << 8) | *(unsigned char*)(seSepBank[2] + 0x11));
+				         ((int)*(unsigned char*)(seSepBank->m_data + 0x12) << 8) | *(unsigned char*)(seSepBank->m_data + 0x11));
 				fflush(__files + 1);
 			} else {
 				unsigned int seDataNo = (unsigned int)track[0x3D];
@@ -1395,12 +1395,12 @@ unsigned int CRedEntry::MusicOldChoice()
  * JP Address: TODO
  * JP Size: TODO
  */
-int* CRedEntry::SearchMusicBank(int musicNo)
+RedHistoryBANK* CRedEntry::SearchMusicBank(int musicNo)
 {
 	RedHistoryBANK* musicBank = reinterpret_cast<RedHistoryBANK*>(m_musicBankBase);
 	do {
 		if (musicBank->m_id == musicNo) {
-			return reinterpret_cast<int*>(musicBank);
+			return musicBank;
 		}
 		musicBank += 1;
 	} while (musicBank < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + 0x40));

@@ -509,13 +509,13 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
  */
 int SeSepPlay(int seId, int sepId, int pan, int volume)
 {
-	int* sepBank;
+	RedHistoryBANK* sepBank;
 	int sepBase;
 	RedSeINFO* sepInfo;
 
 	sepBank = c_RedEntry.SearchSeSepBank(sepId);
 	if (sepBank != 0) {
-		sepBase = sepBank[2];
+		sepBase = sepBank->m_data;
 		sepInfo = reinterpret_cast<RedSeINFO*>(sepBase + 0x10);
 		if ((*(unsigned int*)(sepBase + 0xc) & 0x80000000) != 0) {
 			sepInfo->m_flagsAndCount |= 0x80;
@@ -918,10 +918,10 @@ int MusicStop(int seId)
 int MusicPlay(int musicId, int volume, int mode)
 {
 	RedMusicHEAD* musicHead;
-	int* musicBank = c_RedEntry.SearchMusicBank(musicId);
+	RedHistoryBANK* musicBank = c_RedEntry.SearchMusicBank(musicId);
 
 	if (musicBank != 0) {
-		musicHead = (RedMusicHEAD*)musicBank[2];
+		musicHead = (RedMusicHEAD*)musicBank->m_data;
 		RedWaveHeadWD* waveHead =
 		    (RedWaveHeadWD*)c_RedEntry.SearchWaveBase(musicHead->m_waveNo);
 

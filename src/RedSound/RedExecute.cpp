@@ -2319,7 +2319,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		return;
 	}
 
-	voiceBase = (int)((unsigned char*)p_VoiceData + track->m_trackNo * 0xC0);
+	voiceBase = (int)(p_VoiceData + track->m_trackNo);
 	if (0 < frames) {
 		trackData[0x43] += frames;
 	}

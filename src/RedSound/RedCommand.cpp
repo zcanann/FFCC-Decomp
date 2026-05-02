@@ -795,7 +795,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		count--;
 		trackNo++;
 		if (count != 0) {
-			track += 0x55;
+			track += REDSOUND_TRACK_SIZE / sizeof(*track);
 		}
 	}
 
@@ -870,7 +870,7 @@ int MusicStop(int seId)
 						KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
 						((RedTrackDATA*)track)->m_command = 0;
 					}
-					track += 0x55;
+					track += REDSOUND_TRACK_SIZE / sizeof(*track);
 				} while (track < (int*)((u32)music->m_tracks + (unsigned int)music->m_trackCount * REDSOUND_TRACK_SIZE));
 
 				music->m_activeTrackCount = 0;

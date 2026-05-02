@@ -528,7 +528,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
             do {
                 if ((((unsigned int*)control)[0] <= (unsigned int)voice->m_track) &&
                     ((unsigned int)voice->m_track <
-                     ((unsigned int*)control)[0] + (unsigned int)control->m_trackCount * 0x154)) {
+                     ((unsigned int*)control)[0] + (unsigned int)control->m_trackCount * REDSOUND_TRACK_SIZE)) {
                     ((unsigned int*)voice)[0x25] &= 0xfffffff3;
                     ((unsigned int*)voice)[0x24] &= 0xfffffffe;
                     ((unsigned int*)voice)[0x24] |= 2;
@@ -594,7 +594,7 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
     int* scan;
 
     control->m_flags |= 1;
-    for (scan = (int*)control->m_tracks; scan < trackData; scan += 0x55) {
+    for (scan = (int*)control->m_tracks; scan < trackData; scan += REDSOUND_TRACK_SIZE / sizeof(*scan)) {
         controlData[slot + 10] = *scan;
         controlData[slot + 0x4a] = ((RedTrackDATA*)scan)->m_deltaTime + deltaAdjust;
         controlData[slot + 0x8a] = scan[0x41];
@@ -615,7 +615,7 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
 
         if (((RedTrackDATA*)nextTrack - control->m_tracks) < control->m_trackCount) {
             for (; nextTrack < (int*)(control->m_tracks + control->m_trackCount);
-                 nextTrack += 0x55) {
+                 nextTrack += REDSOUND_TRACK_SIZE / sizeof(*nextTrack)) {
                 int currentDelta = deltaAdjust + (((RedTrackDATA*)nextTrack)->m_deltaTime - loopBase);
 
                 while ((currentDelta < 1) && ((u32)*nextTrack != 0)) {

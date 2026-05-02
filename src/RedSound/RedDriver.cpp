@@ -244,7 +244,7 @@ void _SetReverbDepth(int* command)
                 seInfo[0x1b] = fadeDepth / fadeStep;
                 seInfo[0x1c] = fadeStep;
             }
-            seInfo += 0x55;
+            seInfo += REDSOUND_TRACK_SIZE / sizeof(*seInfo);
         } while (seInfo < (int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE));
     }
 }
@@ -1751,7 +1751,7 @@ int CRedDriver::SePlayState(int seID)
             result = (int)seInfo;
             break;
         }
-        seInfo += 0x55;
+        seInfo += REDSOUND_TRACK_SIZE / sizeof(*seInfo);
     } while (seInfo < (int*)((int)*seInfoBase + REDSOUND_SE_TRACK_ARENA_SIZE));
     if (result == 0) {
         commandNow = (int*)p_ExecCommandNow;
@@ -1927,7 +1927,7 @@ int CRedDriver::GetSeVolume(int seID, int mode)
                 return (int)seInfo[0x13] >> 0xc;
             }
         }
-        seInfo += 0x55;
+        seInfo += REDSOUND_TRACK_SIZE / sizeof(*seInfo);
         if (seInfo < (unsigned int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE)) {
             continue;
         }
@@ -1954,7 +1954,7 @@ int CRedDriver::ReportSeLoop(int seID)
             (((seID == -1) || (seID == ((RedTrackDATA*)seInfo)->m_seId)) && ((seInfo[0x40] & 1U) != 0))) {
             return 1;
         }
-        seInfo += 0x55;
+        seInfo += REDSOUND_TRACK_SIZE / sizeof(*seInfo);
         if (seInfo < (unsigned int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE)) {
             continue;
         }

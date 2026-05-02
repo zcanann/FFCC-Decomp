@@ -1585,7 +1585,7 @@ void _KeyOnControl()
                 track[0x33] = (((track[0x30] >> 0xC) + 1) * waveFunc((u32)track[0x32] >> 0xC)) >> 0x10;
                 track[0x32] += track[0x2E];
             }
-            track += 0x55;
+            track += REDSOUND_TRACK_SIZE / sizeof(*track);
         } while (track <
                  (int*)((u32)p_SoundControlBuffer->m_tracks + (u32)p_SoundControlBuffer->m_trackCount * REDSOUND_TRACK_SIZE));
     }
@@ -1599,8 +1599,8 @@ void _KeyOnControl()
                 track[0x33] = (((track[0x30] >> 0xC) + 1) * waveFunc((u32)track[0x32] >> 0xC)) >> 0x10;
                 track[0x32] += track[0x2E];
             }
-            track += 0x55;
-        } while (track < (int*)(*trackBase + (u32)*((u8*)p_SoundControlBuffer + 0x925) * 0x154));
+            track += REDSOUND_TRACK_SIZE / sizeof(*track);
+        } while (track < (int*)(*trackBase + (u32)*((u8*)p_SoundControlBuffer + 0x925) * REDSOUND_TRACK_SIZE));
     }
 
     {
@@ -1612,7 +1612,7 @@ void _KeyOnControl()
                 track[0x33] = (((track[0x30] >> 0xC) + 1) * waveFunc((u32)track[0x32] >> 0xC)) >> 0x10;
                 track[0x32] += track[0x2E];
             }
-            track += 0x55;
+            track += REDSOUND_TRACK_SIZE / sizeof(*track);
         } while (track < (int*)(*seTrackBase + REDSOUND_SE_TRACK_ARENA_SIZE));
     }
 
@@ -1624,10 +1624,10 @@ void _KeyOnControl()
                     (*(int*)(*voice + 0xB4) != 0)) {
                     int volume;
                     if ((*voice < *(u32*)p_SoundControlBuffer) ||
-                        (*(u32*)p_SoundControlBuffer + (u32)*((u8*)p_SoundControlBuffer + 0x491) * 0x154 <= *voice)) {
+                        (*(u32*)p_SoundControlBuffer + (u32)*((u8*)p_SoundControlBuffer + 0x491) * REDSOUND_TRACK_SIZE <= *voice)) {
                         volume = m_MasterSEVolume;
                         if ((((u32*)p_SoundControlBuffer)[0x125] <= *voice) &&
-                            (*voice < ((u32*)p_SoundControlBuffer)[0x125] + (u32)*((u8*)p_SoundControlBuffer + 0x925) * 0x154)) {
+                            (*voice < ((u32*)p_SoundControlBuffer)[0x125] + (u32)*((u8*)p_SoundControlBuffer + 0x925) * REDSOUND_TRACK_SIZE)) {
                             u32 idx = (u32)((RedTrackDATA*)*voice)->m_trackNo;
                             int idxSign = (int)((RedTrackDATA*)*voice)->m_trackNo >> 0x1F;
 
@@ -1730,7 +1730,7 @@ void _ExecuteExtraData()
                 musicBase = *sound;
                 voice = (unsigned int*)p_VoiceData;
                 do {
-                    if ((musicBase <= *voice) && (*voice < musicBase + (u32)soundControl->m_trackCount * 0x154)) {
+                    if ((musicBase <= *voice) && (*voice < musicBase + (u32)soundControl->m_trackCount * REDSOUND_TRACK_SIZE)) {
                         ((RedVoiceDATA*)voice)->m_updateFlags |= 2;
                     }
                     voice += 0x30;
@@ -1780,8 +1780,8 @@ void _ExecuteExtraData()
                             voice += 0x30;
                         } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
                     }
-                    track += 0x55;
-                } while (track < (int*)((u32)soundControl->m_tracks + (u32)soundControl->m_trackCount * 0x154));
+                    track += REDSOUND_TRACK_SIZE / sizeof(*track);
+                } while (track < (int*)((u32)soundControl->m_tracks + (u32)soundControl->m_trackCount * REDSOUND_TRACK_SIZE));
             } else if ((soundControl->m_volumeDelta == 0) && (-1 < soundControl->m_musicId)) {
                 MusicStop(soundControl->m_musicId);
             }
@@ -2021,7 +2021,7 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
                 } while (voice < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
             }
         }
-        track += 0x55;
+        track += REDSOUND_TRACK_SIZE / sizeof(*track);
     } while ((control->m_activeTrackCount != 0) &&
              (track < (int*)(control->m_tracks + control->m_trackCount)));
 }
@@ -2098,7 +2098,7 @@ void _MusicNoteExecute()
             track[0x42] = sound[i + 0x40];
             ((RedTrackDATA*)track)->m_flags = sound[i + 0x80];
             track[9] = sound[i + 0xC0];
-            track += 0x55;
+            track += REDSOUND_TRACK_SIZE / sizeof(*track);
             i++;
         } while (--trackCount != 0);
 
@@ -2290,7 +2290,7 @@ void MusicSkipFunction()
             puVar8[0x42] = *(u32*)(iVar7 + iVar1 + 0x100);
             puVar8[0x41] = *(u32*)(iVar7 + iVar2 + 0x200);
             puVar8[9] = *(u32*)(iVar7 + iVar3 + 0x300);
-            puVar8 += 0x55;
+            puVar8 += REDSOUND_TRACK_SIZE / sizeof(*puVar8);
         } while (uVar6 != 0);
         iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, p_SkipKeyOn, 1);
     }
@@ -2547,8 +2547,8 @@ int _SeMidiNoteExecute(
                 }
             }
         }
-        track += 0x55;
-    } while (track < (int*)(*(int*)control + 0x2A80));
+        track += REDSOUND_TRACK_SIZE / sizeof(*track);
+    } while (track < (int*)(*(int*)control + REDSOUND_SE_TRACK_ARENA_SIZE));
     ((int*)control)[0x11D] = 1;
     return *(s16*)((u8*)control + 0x48E);
 }

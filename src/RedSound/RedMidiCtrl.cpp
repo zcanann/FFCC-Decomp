@@ -855,12 +855,11 @@ void __MidiCtrl_TimeSignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackD
  */
 void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command = track->m_command;
-    unsigned int value;
     RedTrackDATA* scan;
+    unsigned int value;
 
-    track->m_command = command + 1;
-    value = command[0] & 0x1f;
+    value = *track->m_command++;
+    value &= 0x1f;
     control->m_keySignature = value;
     control->m_keySignatureData = t_KeySignatureIndex[value] + t_KeySignatureData;
 

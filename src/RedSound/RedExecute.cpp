@@ -2016,8 +2016,8 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
             }
         }
         track += 0x55;
-    } while ((*(s16*)((u8*)control + 0x48E) != 0) &&
-             (track < (int*)(*(int*)control + (u32)*(u8*)((u8*)control + 0x491) * 0x154)));
+    } while ((control->m_activeTrackCount != 0) &&
+             (track < (int*)(control->m_tracks + control->m_trackCount)));
 }
 
 

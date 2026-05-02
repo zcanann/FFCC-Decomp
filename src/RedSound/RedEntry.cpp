@@ -789,25 +789,25 @@ void CRedEntry::DisplayWaveInfo()
 					freeSize = bank[1].m_address - (bank->m_address + bank->m_size);
 				}
 
-				unsigned int history = (unsigned int)entry[0];
+				RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(entry[0]);
 				do {
-					if ((*(int*)(history + 0xC) != 0) && (*(int*)(*(int*)(history + 8) + 0x10) == bank->m_address)) {
+					if ((history->m_size != 0) && (((RedWaveHeadWD*)history->m_data)->m_aramAddress == bank->m_address)) {
 						break;
 					}
-					history += 0x10;
-				} while (history < (unsigned int)entry[0] + 0x400);
+					history += 1;
+				} while (history < reinterpret_cast<RedHistoryBANK*>(entry[0] + 0x400));
 
-				if (history < (unsigned int)entry[0] + 0x400) {
-					if (history < (unsigned int)entry[0] + 0x100) {
-						unsigned int index = history - (unsigned int)entry[0];
+				if (history < reinterpret_cast<RedHistoryBANK*>(entry[0] + 0x400)) {
+					if (history < reinterpret_cast<RedHistoryBANK*>(entry[0] + 0x100)) {
+						unsigned int index = reinterpret_cast<unsigned int>(history) - (unsigned int)entry[0];
 						OSReport(s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53, sRedEntryLogPrefix, (int)(index >> 4),
-						         (int)*(short*)(*(int*)(history + 8) + 2), *(int*)(*(int*)(history + 8) + 0x10), bank->m_size,
-						         freeSize, *(int*)(history + 4));
+						         (int)((RedWaveHeadWD*)history->m_data)->m_waveNo, ((RedWaveHeadWD*)history->m_data)->m_aramAddress, bank->m_size,
+						         freeSize, history->m_historyNo);
 						fflush(__files + 1);
 					} else {
 						OSReport(s__s______WAVE_4_4d___0x_8_8X___0x_801e7a8f, sRedEntryLogPrefix,
-						         (int)*(short*)(*(int*)(history + 8) + 2), *(int*)(*(int*)(history + 8) + 0x10), bank->m_size,
-						         freeSize, *(int*)(history + 4));
+						         (int)((RedWaveHeadWD*)history->m_data)->m_waveNo, ((RedWaveHeadWD*)history->m_data)->m_aramAddress, bank->m_size,
+						         freeSize, history->m_historyNo);
 						fflush(__files + 1);
 					}
 					entryWave += 1;

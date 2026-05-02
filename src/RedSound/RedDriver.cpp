@@ -61,13 +61,17 @@ struct RedMusicPlayCommand {
     int m_pad;
 };
 
+struct RedTickHistory {
+    int m_ticks[100];
+};
+
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 static int m_RedMasterTime;
 static volatile int m_SequencialID;
 static volatile int m_ThreadControl;
 static volatile int m_ThreadExecute;
 static int m_SoundMode;
-static int* volatile p_Tick;
+static RedTickHistory* volatile p_Tick;
 u8* volatile p_ZeroData;
 static RedExecCommand* volatile p_ExecCommand;
 static RedExecCommand* volatile p_ExecCommandNow;
@@ -848,9 +852,9 @@ int _MainThread(void*)
             do {
                 iVar3 = OSTryWaitSemaphore(&m_MainSemaphore);
             } while (0 < iVar3);
-            memmove((int*)p_Tick + 1, p_Tick, 0x18c);
+            memmove(p_Tick->m_ticks + 1, p_Tick->m_ticks, 0x18c);
             iVar3 = OSGetTick();
-            *(int*)p_Tick = iVar3 - iVar2;
+            p_Tick->m_ticks[0] = iVar3 - iVar2;
         }
     }
     m_ThreadExecute = m_ThreadExecute & ~1;
@@ -1240,7 +1244,7 @@ void CRedDriver::Init()
     } else {
         AXSetMode(0);
     }
-    p_Tick = (int*)RedNew(400);
+    p_Tick = (RedTickHistory*)RedNew(400);
     memset(p_Tick, 0, 400);
     AXSetCompressor(0);
     m_MusicKeySignature = 0;
@@ -1391,12 +1395,12 @@ void CRedDriver::End()
 int CRedDriver::GetProgramTime()
 {
     int sum = 0;
-    int* p = p_Tick;
+    int* p = p_Tick->m_ticks;
 
     do {
         sum += *p;
         p++;
-    } while (p < p_Tick + 100);
+    } while (p < p_Tick->m_ticks + 100);
     return sum;
 }
 

@@ -2069,8 +2069,7 @@ void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 	divisor = rate;
 	track->m_shakeRate = 0x100000 / divisor;
 	track->m_shakeFunc = (int)SwingEntryFunction[track->m_command[2] & 0xf];
-	track->m_shakeDepthDelta = 0;
-	track->m_shakeRateDelta = 0;
+	track->m_shakeRateDelta = track->m_shakeDepthDelta = 0;
 	track->m_shakeOutput = 0;
 	track->m_shakePan = 0;
 	track->m_command += 3;

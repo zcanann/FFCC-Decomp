@@ -857,6 +857,7 @@ void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDA
 {
     unsigned char* command = track->m_command;
     unsigned int value;
+    RedTrackDATA* scan;
 
     track->m_command = command + 1;
     value = command[0] & 0x1f;
@@ -864,11 +865,11 @@ void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDA
     control->m_keySignatureData = t_KeySignatureIndex[value] + t_KeySignatureData;
 
     if (m_MusicKeySignature != 0) {
-        value = (unsigned int)control->m_tracks;
+        scan = control->m_tracks;
         do {
-            ((RedTrackDATA*)value)->m_keySignatureData = control->m_keySignatureData;
-            value += 0x154;
-        } while (value < (unsigned int)control->m_tracks + (unsigned int)control->m_trackCount * 0x154);
+            scan->m_keySignatureData = control->m_keySignatureData;
+            scan++;
+        } while (scan < control->m_tracks + control->m_trackCount);
     }
 }
 

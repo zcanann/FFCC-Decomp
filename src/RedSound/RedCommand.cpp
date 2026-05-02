@@ -207,7 +207,7 @@ int SeStopID(int seId)
 	RedTrackDATA* track;
 
 	trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
-	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
+	((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_updateFlags = 0;
 	track = *trackBasePtr;
 	do {
 		if (((u32)track->m_command != 0) && ((seId == -1) || (track->m_seId == seId))) {
@@ -253,7 +253,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 	RedTrackDATA* track;
 
 	trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
-	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
+	((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_updateFlags = 0;
 	track = *trackBasePtr;
 	do {
 		if (((u32)track->m_command != 0) && ((track->m_seSepId & 0x80000000U) == 0)) {
@@ -311,7 +311,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	RedVoiceDATA* seTrack;
 	int isMulti;
 
-	*(unsigned int*)((char*)p_SoundControlBuffer + 0x1244) = 0;
+	((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_updateFlags = 0;
 	deltaTime = (unsigned int)info->m_waveNoHi * 0x100 + (unsigned int)info->m_waveNoLo;
 	waveBase = c_RedEntry.SearchWaveBase(deltaTime);
 	if (waveBase != 0) {

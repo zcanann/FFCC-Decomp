@@ -1273,9 +1273,9 @@ void CRedDriver::Init()
     p_ExecCommandNow = p_ExecCommand;
     p_ExecCommandOld = p_ExecCommand;
     memset(p_ExecCommand, 0, 0x2000);
-    p_SoundControlBuffer = (RedSoundCONTROL*)RedNew(0x1250);
+    p_SoundControlBuffer = (RedSoundCONTROL*)RedNew(REDSOUND_CONTROL_BUFFER_SIZE);
     p_SoundControl = p_SoundControlBuffer;
-    memset(p_SoundControlBuffer, 0, 0x1250);
+    memset(p_SoundControlBuffer, 0, REDSOUND_CONTROL_BUFFER_SIZE);
     *(int*)((char*)p_SoundControl + 0xdd8) = 0x1ff000;
     *(int*)((char*)p_SoundControl + 0x944) = 0x1ff000;
     *(int*)((char*)p_SoundControl + 0x4b0) = 0x1ff000;
@@ -1284,9 +1284,9 @@ void CRedDriver::Init()
     *(int*)((char*)p_SoundControl + 0xd7c) = 0x1ff000;
     *(int*)((char*)p_SoundControl + 0x8e8) = 0x1ff000;
     *(int*)((char*)p_SoundControl + 0x454) = 0x1ff000;
-    *(int*)((char*)p_SoundControl + 0xd98) = -1;
-    *(int*)((char*)p_SoundControl + 0x904) = -1;
-    *(int*)((char*)p_SoundControl + 0x470) = -1;
+    p_SoundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId = -1;
+    p_SoundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId = -1;
+    p_SoundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId = -1;
     p_KeyOnData = (RedKeyOnDATA*)RedNew(0x600);
     memset(p_KeyOnData, 0, 0x600);
     p_VoiceData = (RedVoiceDATA*)RedNew(0x3000);

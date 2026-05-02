@@ -90,7 +90,7 @@ static int m_DMAMode;
 volatile int m_SeSkipStep;
 unsigned int* volatile p_VoiceData;
 int p_EditorVoice[2];
-void* p_EditorTrack;
+RedTrackDATA* p_EditorTrack;
 static void* volatile p_MainThreadStack;
 static int m_MainThreadTime;
 static void* volatile p_WaveSettingThreadStack;
@@ -1302,7 +1302,7 @@ void CRedDriver::Init()
         iVar5 = iVar5 + 1;
         ((RedTrackDATA*)(iVar6 + iVar4))->m_trackNo = (char)(cVar1 + ' ');
     } while (iVar5 < 0x20);
-    p_EditorTrack = (void*)RedNew(0x154);
+    p_EditorTrack = (RedTrackDATA*)RedNew(0x154);
     memset(p_EditorTrack, 0, 0x154);
     p_ReverbDepth = (void*)RedNew(0x18);
     memset(p_ReverbDepth, 0, 0x18);

@@ -157,9 +157,14 @@ struct RedReverbDATA {
     int kind;
 };
 
+struct RedReverbSize {
+    u32 m_requested;
+    u32 m_aligned;
+};
+
 static volatile u8 m_RandomIndex;
 static RedReverbDATA* volatile p_ReverbData;
-static u32* p_ReverbSize;
+static RedReverbSize* p_ReverbSize;
 volatile u32 m_ChangeStatus;
 u32 m_TerminateNote[1] = { 0 };
 static RedKeyOnDATA* volatile p_SkipKeyOn;
@@ -247,8 +252,8 @@ void _ReverbNullCallback(AXFX_BUFFERUPDATE* update, void*)
  */
 void* ReverbAreaAlloc(unsigned long size)
 {
-    p_ReverbSize[0] += (u32)size;
-    p_ReverbSize[1] += ((u32)size + 0x1F) & ~0x1F;
+    p_ReverbSize->m_requested += (u32)size;
+    p_ReverbSize->m_aligned += ((u32)size + 0x1F) & ~0x1F;
     return (void*)RedNew((int)size);
 }
 
@@ -279,7 +284,7 @@ void InitReverb()
 {
     p_ReverbData = (RedReverbDATA*)RedNew(0x18);
     memset(p_ReverbData, 0, 0x18);
-    p_ReverbSize = (u32*)RedNew(4);
+    p_ReverbSize = (RedReverbSize*)RedNew(4);
 }
 
 /*
@@ -354,8 +359,8 @@ void _SetReverbData(RedReverbDATA* reverb, int* params)
     }
 
     if (result != 1) {
-        p_ReverbSize[0] = 0;
-        p_ReverbSize[1] = 0;
+        p_ReverbSize->m_requested = 0;
+        p_ReverbSize->m_aligned = 0;
     }
 }
 
@@ -417,8 +422,8 @@ int* SetReverb(int bank, int kind, int* params)
     RedReverbDATA* reverb;
     int result;
 
-    p_ReverbSize[0] = 0;
-    p_ReverbSize[1] = 0;
+    p_ReverbSize->m_requested = 0;
+    p_ReverbSize->m_aligned = 0;
 
     if (kind == 0) {
         _ClearReverb(bank);
@@ -520,8 +525,8 @@ int* SetReverb(int bank, int kind, int* params)
         }
     }
     else {
-        p_ReverbSize[0] = 0;
-        p_ReverbSize[1] = 0;
+        p_ReverbSize->m_requested = 0;
+        p_ReverbSize->m_aligned = 0;
     }
 
     return (int*)p_ReverbSize;

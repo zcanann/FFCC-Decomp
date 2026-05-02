@@ -337,7 +337,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		streamData->m_fileCursor = 0;
 		streamData->m_readOffset = 0x1000;
 		streamData->m_streamCursor = 0;
-		streamData->m_voiceData = (RedVoiceDATA*)((int)p_VoiceData + streamData->m_track->m_trackNo * 0xc0);
+		streamData->m_voiceData = p_VoiceData + streamData->m_track->m_trackNo;
 		streamData->m_fileData = (u8*)streamHeader;
 		streamData->m_fileSize = fileSize;
 		if (volume != 0) {
@@ -348,8 +348,8 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		pitch = PitchCompute(0x3c00000, 0, streamData->m_header.m_pitch, 0);
 		iVar2 = 0;
 		do {
-			voice = (int*)((int)streamData->m_voiceData + iVar2 * 0xc0);
-			*voice = (int)streamData->m_track + iVar2 * 0x154;
+			voice = (int*)(streamData->m_voiceData + iVar2);
+			*voice = (int)(streamData->m_track + iVar2);
 			*(unsigned char*)(*voice + 0x26) |= 2;
 			*(unsigned char*)((int)voice + 0x1a) |= 2;
 			voice[0x25] = 0xc01;
@@ -374,8 +374,8 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 				streamData->m_pan = pan << 0xc;
 				streamData->m_panStepCount = 0;
 			}
-			SetVoiceVolumeMix((RedVoiceDATA*)((int)streamData->m_voiceData + iVar2 * 0xc0), streamData->m_pan >> 0xc, streamData->m_volume >> 0xc);
-			*(int*)((int)streamData->m_track + iVar2 * 0x154 + 0x11c) = streamData->m_aramBuffer + iVar2 * 0x2000;
+			SetVoiceVolumeMix(streamData->m_voiceData + iVar2, streamData->m_pan >> 0xc, streamData->m_volume >> 0xc);
+			(streamData->m_track + iVar2)->m_waveBase = streamData->m_aramBuffer + iVar2 * 0x2000;
 			memset(&streamData->m_trackData[iVar2], 0, 0x60);
 			memcpy(streamData->m_trackData[iVar2].m_adpcmData, headerData + iVar2 * 0x2e, 0x2e);
 			*(unsigned char*)((int)voice + 0x5a) = 0;

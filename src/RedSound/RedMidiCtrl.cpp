@@ -160,13 +160,13 @@ int DataAddCompute(int* current, int target, int* delta)
  */
 void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    unsigned int* slot = (unsigned int*)keyOnData;
+    RedKeyOnSlot* slot = keyOnData->m_fixed;
     do {
-        if (*slot == (unsigned int)track) {
-            *slot = 0;
+        if (slot->m_track == track) {
+            slot->m_track = 0;
         }
-        slot += 2;
-    } while (slot < (unsigned int*)((int)keyOnData + 0x600));
+        slot++;
+    } while (slot < keyOnData->m_normal + 0x40);
 }
 
 /*

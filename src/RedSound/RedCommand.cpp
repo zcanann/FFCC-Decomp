@@ -203,12 +203,12 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
  */
 int SeStopID(int seId)
 {
-	RedTrackDATA** trackBasePtr;
+	RedSoundCONTROL* soundControl;
 	RedTrackDATA* track;
 
-	trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks;
-	((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_updateFlags = 0;
-	track = *trackBasePtr;
+	soundControl = &((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE];
+	soundControl->m_updateFlags = 0;
+	track = soundControl->m_tracks;
 	do {
 		if (((u32)track->m_command != 0) && ((seId == -1) || (track->m_seId == seId))) {
 			int trackNo;
@@ -233,7 +233,7 @@ int SeStopID(int seId)
 			c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
 		}
 		track++;
-	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
+	} while (track < soundControl->m_tracks + REDSOUND_SE_TRACK_COUNT);
 
 	return 0;
 }
@@ -249,12 +249,12 @@ int SeStopID(int seId)
  */
 int SeStopMG(int bank, int sep, int group, int kind)
 {
-	RedTrackDATA** trackBasePtr;
+	RedSoundCONTROL* soundControl;
 	RedTrackDATA* track;
 
-	trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks;
-	((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_updateFlags = 0;
-	track = *trackBasePtr;
+	soundControl = &((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE];
+	soundControl->m_updateFlags = 0;
+	track = soundControl->m_tracks;
 	do {
 		if (((u32)track->m_command != 0) && ((track->m_seSepId & 0x80000000U) == 0)) {
 			int id = track->m_seSepId / 1000;
@@ -282,7 +282,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 			}
 		}
 		track++;
-	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
+	} while (track < soundControl->m_tracks + REDSOUND_SE_TRACK_COUNT);
 
 	return 0;
 }

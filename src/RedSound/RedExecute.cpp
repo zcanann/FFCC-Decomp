@@ -1674,7 +1674,7 @@ void _KeyOnControl()
                 ((RedVoiceDATA*)voice)->m_updateFlags = 0;
             }
             voice += 0x30;
-        } while (voice < (unsigned int*)p_VoiceData + 0xC00);
+        } while (voice < (unsigned int*)(p_VoiceData + 0x40));
     }
 
     {
@@ -1739,7 +1739,7 @@ void _ExecuteExtraData()
                         ((RedVoiceDATA*)voice)->m_updateFlags |= 2;
                     }
                     voice += 0x30;
-                } while (voice < (unsigned int*)p_VoiceData + 0xC00);
+                } while (voice < (unsigned int*)(p_VoiceData + 0x40));
             }
         }
         soundBase = (u32*)p_SoundControlBuffer;
@@ -1765,7 +1765,7 @@ void _ExecuteExtraData()
                 ((RedVoiceDATA*)voice)->m_updateFlags |= 1;
             }
             voice += 0x30;
-        } while (voice < (unsigned int*)p_VoiceData + 0xC00);
+        } while (voice < (unsigned int*)(p_VoiceData + 0x40));
     }
 
     do {
@@ -1783,7 +1783,7 @@ void _ExecuteExtraData()
                                 ((RedVoiceDATA*)voice)->m_updateFlags |= 2;
                             }
                             voice += 0x30;
-                        } while (voice < (unsigned int*)p_VoiceData + 0xC00);
+                        } while (voice < (unsigned int*)(p_VoiceData + 0x40));
                     }
                     track += 0x55;
                 } while (track < (int*)((u32)soundControl->m_tracks + (u32)soundControl->m_trackCount * 0x154));

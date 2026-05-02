@@ -213,8 +213,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 color.rgba[2] = *((u8*)&param_2->m_stepValue + 2) + values->m_colorB;
                 color.rgba[3] = alpha;
 
+                const float depth = FLOAT_80331084;
                 pppSetDrawEnv(
-                    &color, (pppFMATRIX*)0, zero, (u8)param_2->m_payload[0x15],
+                    &color, (pppFMATRIX*)0, depth, (u8)param_2->m_payload[0x15],
                     (u8)param_2->m_payload[0x14],
                     param_2->m_arg3, 0, 0, 1, 0);
 

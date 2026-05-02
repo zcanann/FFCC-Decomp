@@ -69,7 +69,7 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 			}
 		}
 		track++;
-	} while (track < *trackBasePtr + 0x20);
+	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
 }
 
 /*
@@ -92,7 +92,7 @@ int _EraseTime(int eraseTrack)
 			minTrack = track->m_eraseTrack;
 		}
 		track++;
-	} while (track < *trackBasePtr + 0x20);
+	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
 
 	if (eraseTrack > minTrack) {
 		eraseTrack = minTrack;
@@ -108,7 +108,7 @@ int _EraseTime(int eraseTrack)
 			sepId = track->m_seSepId;
 		}
 		track++;
-	} while (track < *trackBasePtr + 0x20);
+	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
 
 	track = *trackBasePtr;
 	int erasedCount = 0;

@@ -355,23 +355,24 @@ void CGItemObj::onFrame()
 			SetAnimSlot__8CGObjectFii(this, 0, 0);
 			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
 
-			unsigned int soundEntry = *(unsigned int*)(*(int*)(*(int*)SoundBuffer_1260_ + 0xF8) + 0x178);
-			if (soundEntry != 0) {
-				soundEntry = *(int*)(soundEntry + 0x14);
+			int soundEntry = *(int*)(*(int*)(*(int*)SoundBuffer_1260_ + 0xF8) + 0x178);
+			if (soundEntry == 0) {
+				soundEntry = -1;
 			} else {
-				soundEntry = (unsigned int)-1;
+				soundEntry = *(int*)(soundEntry + 0x14);
 			}
 
-			unsigned char* itemRow = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48);
-			float particleScale = FLOAT_80331b50 * (float)*reinterpret_cast<unsigned short*>(itemRow + 0x10) +
-			                      FLOAT_80331b4c;
+			unsigned char* itemRow =
+			    reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48);
+			double particleValue = (double)*reinterpret_cast<unsigned short*>(itemRow + 0x10);
+			float particleScale = FLOAT_80331b50 * (float)particleValue + FLOAT_80331b4c;
 			putParticle__8CGPrgObjFiiP8CGObjectfi(
 			    this, (soundEntry << 8) | *(int*)(*(int*)(*(int*)(self + 0x550) + 0x58) + 0x3B4),
 			    *(int*)(self + 0x558), this, particleScale, 0x12909);
 
 			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
-			SetDamageCol__8CGObjectFiPcffP3Vec(this, 0, DAT_80331bc8, FLOAT_80331bb8, FLOAT_80331bb8,
-			                                   reinterpret_cast<Vec*>(&zero));
+			SetDamageCol__8CGObjectFiPcffP3Vec(
+			    this, 0, DAT_80331bc8, FLOAT_80331bb8, FLOAT_80331bb8, reinterpret_cast<Vec*>(&zero));
 			*(int*)(self + 0x384) = 8;
 			addSubStat__8CGPrgObjFv(this);
 		}
@@ -944,17 +945,16 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		*(void**)(itemSelf + 0x564) = handle;
 		Add__Q29CCharaPcs7CHandleFv(*(void**)(itemSelf + 0x564));
 
-		if (ccfs != 0) {
-			unsigned int* ccfsData = (unsigned int*)ccfs;
-			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(*(void**)(itemSelf + 0x564), 2, ccfsData[1], ccfsData[2]);
-			*(int*)(itemSelf + 0x56C) = (int)ccfsData[3];
-			*(int*)(itemSelf + 0x570) = (int)ccfsData[4];
-			*(int*)(itemSelf + 0x574) = (int)ccfsData[0];
-		}
+		unsigned int* ccfsData = (unsigned int*)ccfs;
+		LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(*(void**)(itemSelf + 0x564), 2, ccfsData[1], ccfsData[2]);
 
 		if ((unsigned int)System.m_execParam > 2U) {
 			Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf64));
 		}
+
+		*(int*)(itemSelf + 0x56C) = (int)ccfsData[3];
+		*(int*)(itemSelf + 0x570) = (int)ccfsData[4];
+		*(int*)(itemSelf + 0x574) = (int)ccfsData[0];
 	}
 
 	(void)ownerParticleId;

@@ -1591,26 +1591,26 @@ void __MidiCtrl_ADSR_RR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned int* voice;
+    RedVoiceDATA* voice;
 
     if (*track->m_command != 0) {
         track->m_voiceSwitch |= 4;
-        voice = (unsigned int*)p_VoiceData;
+        voice = p_VoiceData;
         do {
-            if ((RedTrackDATA*)voice[0] == track) {
-                voice[0x25] |= 4;
+            if (voice->m_track == track) {
+                voice->m_voiceSwitch |= 4;
             }
-            voice += 0x30;
-        } while (voice < (unsigned int*)(p_VoiceData + 0x40));
+            voice++;
+        } while (voice < p_VoiceData + 0x40);
     } else {
         track->m_voiceSwitch &= ~4;
-        voice = (unsigned int*)p_VoiceData;
+        voice = p_VoiceData;
         do {
-            if ((RedTrackDATA*)voice[0] == track) {
-                voice[0x25] &= ~4;
+            if (voice->m_track == track) {
+                voice->m_voiceSwitch &= ~4;
             }
-            voice += 0x30;
-        } while (voice < (unsigned int*)(p_VoiceData + 0x40));
+            voice++;
+        } while (voice < p_VoiceData + 0x40);
     }
 
     track->m_command += 1;

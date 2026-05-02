@@ -70,7 +70,7 @@ static RedDmaRequest* p_DmaControlOld[2];
 void* volatile p_SoundControlBuffer;
 void* volatile p_SoundControl;
 volatile int m_KeyOnEntry;
-void* volatile p_KeyOnData;
+RedKeyOnDATA* volatile p_KeyOnData;
 int m_SoundPlayMode;
 int m_SoundMasterControl;
 volatile int m_ReportPrint;
@@ -1276,7 +1276,7 @@ void CRedDriver::Init()
     *(int*)((char*)p_SoundControl + 0xd98) = -1;
     *(int*)((char*)p_SoundControl + 0x904) = -1;
     *(int*)((char*)p_SoundControl + 0x470) = -1;
-    p_KeyOnData = (void*)RedNew(0x600);
+    p_KeyOnData = (RedKeyOnDATA*)RedNew(0x600);
     memset(p_KeyOnData, 0, 0x600);
     p_VoiceData = (unsigned int*)RedNew(0x3000);
     memset(p_VoiceData, 0, 0x3000);

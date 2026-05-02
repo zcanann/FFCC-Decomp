@@ -617,7 +617,7 @@ void _VoiceEnvelopeCheck()
             voiceData->m_envelopeLevel = 0x8000;
         }
         voiceData++;
-    } while (voiceData < (RedVoiceDATA*)((unsigned int*)p_VoiceData + 0xC00));
+    } while (voiceData < p_VoiceData + 0x40);
 }
 
 /*
@@ -1203,7 +1203,7 @@ void SetVoiceAccess(RedTrackDATA* track, int mask)
             voiceData->m_flags |= mask;
         }
         voiceData++;
-    } while (voiceData < (RedVoiceDATA*)((unsigned int*)p_VoiceData + 0xC00));
+    } while (voiceData < p_VoiceData + 0x40);
 }
 
 /*
@@ -1223,7 +1223,7 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
             voiceData->m_voiceSwitch = voiceSwitch;
         }
         voiceData++;
-    } while (voiceData < (RedVoiceDATA*)((unsigned int*)p_VoiceData + 0xC00));
+    } while (voiceData < p_VoiceData + 0x40);
 }
 
 /*
@@ -1379,7 +1379,7 @@ void _VoiceDropedCallback(void* dropped)
             voiceData->m_axVoice = 0;
         }
         voiceData++;
-    } while (voiceData < (RedVoiceDATA*)((unsigned int*)p_VoiceData + 0xc00));
+    } while (voiceData < p_VoiceData + 0x40);
 }
 
 /*

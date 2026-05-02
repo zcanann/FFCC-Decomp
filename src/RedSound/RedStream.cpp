@@ -489,6 +489,8 @@ void StreamPause(int streamID, int pause)
 {
 	RedVoiceDATA* voiceData;
 	RedStreamDATA* streamData;
+	int volume;
+	int pan;
 
 	if (m_ReportPrint != 0) {
 		if (pause == 1) {
@@ -514,12 +516,14 @@ void StreamPause(int streamID, int pause)
 			} else if (voiceData->m_axVoice != 0) {
 				unsigned int pitch = PitchCompute(0x3c00000, 0, streamData->m_header.m_pitch, 0);
 				short channelCount = streamData->m_header.m_channelCount;
+				volume = streamData->m_volume >> 0xc;
 				if (channelCount == 2) {
 					voiceData->m_targetPitch = pitch;
 					voiceData->m_flags |= 0x10;
 					voiceData[1].m_targetPitch = pitch;
 					voiceData[1].m_flags |= 0x10;
 				} else {
+					pan = streamData->m_pan >> 0xc;
 					voiceData->m_targetPitch = pitch;
 					voiceData->m_flags |= 0x10;
 				}
@@ -554,12 +558,12 @@ void StreamControl()
 					samplePos <<= 16;
 					samplePos |= voiceData->m_axVoice->pb.addr.currentAddressLo;
 					if ((samplePos >= sampleStart) && (samplePos < sampleStart + 0x2000)) {
-						bool stopped = false;
+						int stopped = 0;
 						if (streamData->m_header.m_loopStart < 0) {
 							streamData->m_header.m_loopEnd = streamData->m_header.m_loopEnd - 0x200;
 							if (streamData->m_header.m_loopEnd < 1) {
 								_StreamStop(streamData);
-								stopped = true;
+								stopped = 1;
 							}
 						}
 						streamData->m_fileCursor += streamData->m_header.m_channelCount * 0x1000;
@@ -568,13 +572,13 @@ void StreamControl()
 						}
 
 						if (!stopped) {
-							bool side;
+							int side;
 							int dmaID;
 							if (streamData->m_streamCursorBase != 0) {
-								side = false;
+								side = 0;
 								streamData->m_streamCursorBase = 0;
 							} else {
-								side = true;
+								side = 1;
 								streamData->m_streamCursorBase = 0x1000;
 							}
 
@@ -587,7 +591,7 @@ void StreamControl()
 						}
 					}
 
-					char changed = 0;
+					int changed = 0;
 					if (streamData->m_panStepCount != 0) {
 						changed += 1;
 						streamData->m_panStepCount -= 1;

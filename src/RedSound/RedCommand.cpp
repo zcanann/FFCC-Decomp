@@ -136,7 +136,7 @@ int _EraseTime(int eraseTrack)
 			erasedCount++;
 		}
 		track++;
-	} while (track < *trackBasePtr + 0x20);
+	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
 
 	if (erasedCount != 0) {
 		c_RedEntry.SeSepHistoryManager(0, sepId);
@@ -233,7 +233,7 @@ int SeStopID(int seId)
 			c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
 		}
 		track++;
-	} while (track < *trackBasePtr + 0x20);
+	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
 
 	return 0;
 }
@@ -282,7 +282,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 			}
 		}
 		track++;
-	} while (track < *trackBasePtr + 0x20);
+	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
 
 	return 0;
 }
@@ -552,7 +552,7 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 			track->m_mixVolumeMode = mode;
 		}
 		track++;
-	} while (track < ((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks + 0x20);
+	} while (track < ((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT);
 }
 
 /*
@@ -586,7 +586,7 @@ void SetSePan(int seId, int pan, int frameCount)
 			track->m_panDelta = frameCount;
 		}
 		track++;
-	} while (track < ((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks + 0x20);
+	} while (track < ((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT);
 }
 
 /*
@@ -619,7 +619,7 @@ void SetSePitch(int seId, int pitch, int frameCount)
 			track->m_pitchDelta = frameCount;
 		}
 		track++;
-	} while (track < ((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks + 0x20);
+	} while (track < ((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT);
 }
 
 /*
@@ -666,7 +666,7 @@ void SePause(int seId, int pause)
 		}
 		track++;
 		voice++;
-	} while (track < *trackBasePtr + 0x20);
+	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
 }
 
 /*

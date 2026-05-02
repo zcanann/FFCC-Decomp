@@ -91,13 +91,13 @@ volatile int m_SeSkipStep;
 unsigned int* volatile p_VoiceData;
 int p_EditorVoice[2];
 RedTrackDATA* p_EditorTrack;
-static void* volatile p_MainThreadStack;
+static u8* volatile p_MainThreadStack;
 static int m_MainThreadTime;
-static void* volatile p_WaveSettingThreadStack;
+static u8* volatile p_WaveSettingThreadStack;
 static int m_WaveSettingStatus;
-static void* volatile p_DmaExecuteThreadStack;
+static u8* volatile p_DmaExecuteThreadStack;
 static volatile int m_DMAStatus;
-void* volatile p_MusicSkipThreadStack;
+u8* volatile p_MusicSkipThreadStack;
 volatile int m_MusicSkipComplete;
 void* volatile p_ReverbDepth;
 int m_Mute[2];
@@ -1324,24 +1324,24 @@ void CRedDriver::Init()
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);
     InitReverb();
     OSInitSemaphore(&m_DmaExecuteSemaphore, 0);
-    p_DmaExecuteThreadStack = (void*)RedNew(0x1000);
-    OSCreateThread(&m_DmaExecuteThread, (void* (*)(void*))_DmaExecuteThread, 0, (char*)p_DmaExecuteThreadStack + 0x1000, 0x1000,
+    p_DmaExecuteThreadStack = (u8*)RedNew(0x1000);
+    OSCreateThread(&m_DmaExecuteThread, (void* (*)(void*))_DmaExecuteThread, 0, p_DmaExecuteThreadStack + 0x1000, 0x1000,
                    3, 1);
     OSResumeThread(&m_DmaExecuteThread);
     OSInitSemaphore(&m_WaveSettingSemaphore, 0);
-    p_WaveSettingThreadStack = (void*)RedNew(0x1000);
+    p_WaveSettingThreadStack = (u8*)RedNew(0x1000);
     OSCreateThread(&m_WaveSettingThread, (void* (*)(void*))_WaveSettingThread, &m_WaveSettingData,
-                   (char*)p_WaveSettingThreadStack + 0x1000, 0x1000, 4, 1);
+                   p_WaveSettingThreadStack + 0x1000, 0x1000, 4, 1);
     OSResumeThread(&m_WaveSettingThread);
     OSInitSemaphore(&m_MusicSkipSemaphore, 0);
-    p_MusicSkipThreadStack = (void*)RedNew(0x1000);
-    OSCreateThread(&m_MusicSkipThread, (void* (*)(void*))_MusicSkipThread, 0, (char*)p_MusicSkipThreadStack + 0x1000, 0x1000,
+    p_MusicSkipThreadStack = (u8*)RedNew(0x1000);
+    OSCreateThread(&m_MusicSkipThread, (void* (*)(void*))_MusicSkipThread, 0, p_MusicSkipThreadStack + 0x1000, 0x1000,
                    4, 1);
     OSResumeThread(&m_MusicSkipThread);
     OSInitSemaphore(&m_MainSemaphore, 0);
     m_MainThreadTime = 0;
-    p_MainThreadStack = (void*)RedNew(0x1000);
-    OSCreateThread(&RedDriverMainThread(), (void* (*)(void*))_MainThread, 0, (char*)p_MainThreadStack + 0x1000, 0x1000,
+    p_MainThreadStack = (u8*)RedNew(0x1000);
+    OSCreateThread(&RedDriverMainThread(), (void* (*)(void*))_MainThread, 0, p_MainThreadStack + 0x1000, 0x1000,
                    4, 1);
     OSResumeThread(&RedDriverMainThread());
 }

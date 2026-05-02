@@ -53,7 +53,7 @@ extern volatile int m_SeSkipStep;
 extern unsigned int* volatile p_VoiceData;
 extern int p_EditorVoice[2];
 extern RedTrackDATA* p_EditorTrack;
-extern void* volatile p_MusicSkipThreadStack;
+extern u8* volatile p_MusicSkipThreadStack;
 extern volatile int m_MusicSkipComplete;
 extern void* volatile p_ReverbDepth;
 extern int m_Mute[2];

@@ -968,7 +968,7 @@ int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
  * Address:	TODO
  * Size:	TODO
  */
-unsigned int CRedEntry::SeSepOldDelete()
+RedHistoryBANK* CRedEntry::SeSepOldDelete()
 {
 	unsigned int selected = 0;
 	int historyNo = 0;
@@ -986,7 +986,7 @@ unsigned int CRedEntry::SeSepOldDelete()
 		SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(selected));
 	}
 
-	return selected;
+	return reinterpret_cast<RedHistoryBANK*>(selected);
 }
 
 /*
@@ -1005,7 +1005,7 @@ int CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 	}
 	if (bank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + 0x1000U)) {
 	} else {
-		bank = reinterpret_cast<RedHistoryBANK*>(SeSepOldDelete());
+		bank = SeSepOldDelete();
 	}
 
 	if ((bank != 0) &&
@@ -1366,7 +1366,7 @@ int CRedEntry::MusicOldClear()
  * Address:	TODO
  * Size:	TODO
  */
-unsigned int CRedEntry::MusicOldChoice()
+RedHistoryBANK* CRedEntry::MusicOldChoice()
 {
 	unsigned int selected = 0;
 	int historyNo = 0;
@@ -1374,7 +1374,7 @@ unsigned int CRedEntry::MusicOldChoice()
 
 	do {
 		if (*(int*)(history + 0xc) == 0) {
-			return history;
+			return reinterpret_cast<RedHistoryBANK*>(history);
 		}
 		if (*(int*)(history + 4) > historyNo) {
 			historyNo = *(int*)(history + 4);
@@ -1383,7 +1383,7 @@ unsigned int CRedEntry::MusicOldChoice()
 		history += 0x10;
 	} while (history < (unsigned int)*(int*)((int)this + 8) + 0x40);
 
-	return selected;
+	return reinterpret_cast<RedHistoryBANK*>(selected);
 }
 
 /*
@@ -1478,10 +1478,10 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 int CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 {
 	int result = 0;
-	RedHistoryBANK* bank = reinterpret_cast<RedHistoryBANK*>(MusicOldChoice());
+	RedHistoryBANK* bank = MusicOldChoice();
 	if ((bank != 0) && (bank->m_size != 0)) {
 		MusicOldClear();
-		bank = reinterpret_cast<RedHistoryBANK*>(MusicOldChoice());
+		bank = MusicOldChoice();
 	}
 
 	if (bank != 0) {

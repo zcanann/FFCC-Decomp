@@ -96,7 +96,7 @@ public:
 	void SeSepHistoryChoice(RedHistoryBANK*);
 	int SearchSeSepSequence(int);
 	int SeSepMemoryFree(RedHistoryBANK*);
-	unsigned int SeSepOldDelete();
+	RedHistoryBANK* SeSepOldDelete();
 	int SeSepHeadAdd(RedSeSepHEAD*);
 	int SetSeSepData(RedSeSepHEAD*);
 	int ClearSeSepData(int);
@@ -112,7 +112,7 @@ public:
 	int SearchMusicSequence(int);
 	int MusicMemoryFree(RedHistoryBANK*);
 	int MusicOldClear();
-	unsigned int MusicOldChoice();
+	RedHistoryBANK* MusicOldChoice();
 	RedHistoryBANK* SearchMusicBank(int);
 	int ReentryMusicData(int);
 	void MusicHistoryManager(int, int);

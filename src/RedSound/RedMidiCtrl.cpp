@@ -251,7 +251,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
                 voice[0x24] |= 2;
             }
             voice += 0x30;
-        } while (voice < (int*)((unsigned int*)p_VoiceData + 0xc00));
+        } while (voice < (int*)(p_VoiceData + 0x40));
     }
 }
 
@@ -518,7 +518,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
             ((unsigned char*)seTrack)[0x1a] &= -6;
         }
         seTrack += 0x30;
-    } while (seTrack < (unsigned int*)p_VoiceData + 0xc00);
+    } while (seTrack < (unsigned int*)(p_VoiceData + 0x40));
 
     track->m_command = 0;
     if ((int*)control < (int*)((int)p_SoundControlBuffer + 0xdbc)) {
@@ -536,7 +536,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
                     seTrack[0] = 0;
                 }
                 seTrack += 0x30;
-            } while (seTrack < (unsigned int*)p_VoiceData + 0xc00);
+            } while (seTrack < (unsigned int*)(p_VoiceData + 0x40));
 
             c_RedEntry.MusicHistoryManager(0, controlData[0x11c]);
             c_RedEntry.WaveHistoryManager(0, controlData[0x11f]);

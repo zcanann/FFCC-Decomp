@@ -695,7 +695,7 @@ int CRedEntry::ReentryWaveData(int waveNo)
 {
 	waveNo = SearchWaveSequence(waveNo);
 	if (waveNo >= 0) {
-		WaveHistoryChoice((RedHistoryBANK*)(((int*)this)[0] + waveNo * 0x10));
+		WaveHistoryChoice(reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + waveNo * 0x10));
 	}
 	return waveNo;
 }

@@ -2035,7 +2035,7 @@ int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int
     int* tick = (int*)((u8*)control + 0xc);
 
     frames <<= m_MusicFastSpeed;
-    *(int*)((u8*)control + 0x484) = frames;
+    control->m_loopBase = frames;
 
     tick[1] += frames;
 
@@ -2044,21 +2044,21 @@ int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int
         tick[1] -= tick[2];
     }
 
-    if (*(s16*)((u8*)control + 0x48E) != 0) {
+    if (control->m_activeTrackCount != 0) {
         _MidiTrackExecute(control, keyOnData, frames);
     }
 
-    *(int*)((u8*)control + 0x474) = 1;
+    control->m_skipFrames = 1;
     if (m_MusicPhraseStop == 0) {
-        if ((*(int*)((u8*)control + 0x46C) & 2) != 0) {
-            *(int*)((u8*)control + 0x46C) &= ~2;
-            if ((*(int*)((u8*)control + 0x46C) & 1) != 0) {
-                *(s16*)((u8*)control + 0x48E) = 0;
+        if ((control->m_flags & 2) != 0) {
+            control->m_flags &= ~2;
+            if ((control->m_flags & 1) != 0) {
+                control->m_activeTrackCount = 0;
             }
         }
     }
 
-    return *(s16*)((u8*)control + 0x48E);
+    return control->m_activeTrackCount;
 }
 
 /*
@@ -2119,8 +2119,8 @@ int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
 {
     int* tick = (int*)((u8*)control + 0xc);
     do {
-        *(int*)((u8*)control + 0x474) = frames;
-        *(int*)((u8*)control + 0x484) = frames;
+        control->m_skipFrames = frames;
+        control->m_loopBase = frames;
         tick[1] += frames;
 
         while (tick[1] >= tick[2]) {
@@ -2128,12 +2128,12 @@ int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
             tick[1] -= tick[2];
         }
 
-        if (*(s16*)((u8*)control + 0x48E) != 0) {
+        if (control->m_activeTrackCount != 0) {
             _MidiTrackExecute(control, keyOnData, frames);
         }
 
         if (m_MusicSkipLine != 0) {
-            if ((*(s16*)((u8*)control + 0x48E) != 0) && ((*(int*)((u8*)control + 0x46C) & 2) == 0)) {
+            if ((control->m_activeTrackCount != 0) && ((control->m_flags & 2) == 0)) {
                 m_MusicSkipLine--;
                 frames = tick[2];
                 RedSleep(1000);
@@ -2143,17 +2143,17 @@ int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
         if (m_MusicSkipLine <= 0) {
             break;
         }
-    } while (*(s16*)((u8*)control + 0x48E) != 0);
+    } while (control->m_activeTrackCount != 0);
 
-    *(int*)((u8*)control + 0x474) = 1;
-    if ((*(int*)((u8*)control + 0x46C) & 2) != 0) {
-        *(int*)((u8*)control + 0x46C) &= ~2;
-        if ((*(int*)((u8*)control + 0x46C) & 1) != 0) {
-            *(s16*)((u8*)control + 0x48E) = 0;
+    control->m_skipFrames = 1;
+    if ((control->m_flags & 2) != 0) {
+        control->m_flags &= ~2;
+        if ((control->m_flags & 1) != 0) {
+            control->m_activeTrackCount = 0;
         }
     }
 
-    return *(s16*)((u8*)control + 0x48E);
+    return control->m_activeTrackCount;
 }
 
 /*

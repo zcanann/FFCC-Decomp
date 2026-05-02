@@ -733,7 +733,7 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 					used++;
 					break;
 				}
-				track += 0x55;
+				track += REDSOUND_TRACK_SIZE / sizeof(*track);
 			} while (track < (int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE));
 		}
 		if (used == 0) {
@@ -1175,7 +1175,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 				sequenceNo |= 1;
 				break;
 			}
-			track += 0x55;
+			track += REDSOUND_TRACK_SIZE / sizeof(*track);
 		} while (track < (int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE));
 
 		if (sequenceNo == 0) {
@@ -1217,7 +1217,7 @@ void CRedEntry::DisplaySePlayInfo()
 		int* trackHead = (int*)&p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 		int* track = (int*)*trackHead;
 		do {
-			int trackIndex = ((int)track - *trackHead) / 0x154 + (((int)track - *trackHead) >> 0x1F);
+			int trackIndex = ((int)track - *trackHead) / REDSOUND_TRACK_SIZE + (((int)track - *trackHead) >> 0x1F);
 			trackIndex = (trackIndex - (trackIndex >> 0x1F)) + 0x20;
 			if (track[0] == 0) {
 				OSReport(s__s__2d_____801e7c01, sRedEntryLogPrefix, trackIndex);
@@ -1242,8 +1242,8 @@ void CRedEntry::DisplaySePlayInfo()
 				             reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoLo);
 				fflush(__files + 1);
 			}
-			track += 0x55;
-		} while (track < (int*)(*trackHead + 0x2A80));
+			track += REDSOUND_TRACK_SIZE / sizeof(*track);
+		} while (track < (int*)(*trackHead + REDSOUND_SE_TRACK_ARENA_SIZE));
 
 		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);

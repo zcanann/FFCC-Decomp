@@ -418,10 +418,12 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     u8 alphaStep;
     u8 alphaMax;
     float halfWidth;
+    float negHalfWidth;
     float length;
     float u0;
     float u1;
     float uvStep;
+    pppFMATRIX unitMtx;
     pppFMATRIX modelView;
     pppFMATRIX mtxOut;
     pppFMATRIX shapeMtx;
@@ -462,16 +464,22 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
 
     length = work->m_length;
     halfWidth = work->m_halfWidth;
+    negHalfWidth = -halfWidth;
 
-    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&modelView, &pppMngStPtr->m_matrix, &pppLaser->m_localMatrix);
-    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, (pppFMATRIX*)&ppvCameraMatrix, &modelView);
+    pppUnitMatrix__FR10pppFMATRIX(&unitMtx);
+    modelView = pppMngStPtr->m_matrix;
+    mtxOut = pppLaser->m_localMatrix;
+    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&unitMtx, &modelView, &mtxOut);
+    modelView = *(pppFMATRIX*)&ppvCameraMatrix;
+    mtxOut = unitMtx;
+    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, &modelView, &unitMtx);
     GXLoadPosMtxImm(mtxOut.value, 0);
 
     GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(-halfWidth, kPppLaserZero, kPppLaserZero);
+    GXPosition3f32(negHalfWidth, kPppLaserZero, kPppLaserZero);
     GXColor1u32(*(u32*)&color);
     GXTexCoord2f32(kPppLaserZero, kPppLaserZero);
-    GXPosition3f32(-halfWidth, kPppLaserZero, length);
+    GXPosition3f32(negHalfWidth, kPppLaserZero, length);
     GXColor1u32(*(u32*)&color);
     GXTexCoord2f32(kPppLaserZero, work->m_length);
     GXPosition3f32(halfWidth, kPppLaserZero, kPppLaserZero);

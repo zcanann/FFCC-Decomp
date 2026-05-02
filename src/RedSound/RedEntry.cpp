@@ -371,14 +371,14 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 	int maxOffset;
 	if ((waveNo >= 100) && (waveNo < 300)) {
 		minOffset = 0x400000;
-		maxOffset = 0x800000;
+		maxOffset = minOffset + 0x400000;
 	} else if (((waveNo >= 0x154) && (waveNo < 0x17a)) || ((waveNo >= 0x17f) && (waveNo < 0x182)) ||
 	           (waveNo == 0x183)) {
 		minOffset = 0x300000;
-		maxOffset = 0x400000;
+		maxOffset = minOffset + 0x100000;
 	} else {
 		minOffset = 0;
-		maxOffset = 0x300000;
+		maxOffset = minOffset + 0x300000;
 	}
 
 	do {

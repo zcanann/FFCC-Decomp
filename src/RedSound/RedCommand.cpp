@@ -635,8 +635,8 @@ void SetSePitch(int seId, int pitch, int frameCount)
  */
 void SePause(int seId, int pause)
 {
-	unsigned int* trackBasePtr;
-	unsigned int track;
+	RedTrackDATA** trackBasePtr;
+	RedTrackDATA* track;
 	RedVoiceDATA* voice;
 
 	if (m_ReportPrint != 0) {
@@ -648,27 +648,27 @@ void SePause(int seId, int pause)
 		fflush(__files + 1);
 	}
 
-	trackBasePtr = (unsigned int*)((char*)p_SoundControlBuffer + 0xdbc);
+	trackBasePtr = (RedTrackDATA**)((char*)p_SoundControlBuffer + 0xdbc);
 	track = *trackBasePtr;
 	voice = (RedVoiceDATA*)((unsigned int)p_VoiceData + 0x1800);
 	do {
-		if ((((RedTrackDATA*)track)->m_seId != 0) && ((seId == -1) || (seId == ((RedTrackDATA*)track)->m_seId))) {
+		if ((track->m_seId != 0) && ((seId == -1) || (seId == track->m_seId))) {
 			if (pause == 1) {
 				if (voice->m_axVoice != 0) {
 					voice->m_targetPitch = 0;
 					voice->m_flags |= 0x18;
 				}
-				*(unsigned int*)(track + 0xfc) |= 8;
+				track->m_voiceSwitch |= 8;
 				voice->m_voiceSwitch |= 8;
 			} else {
 				voice->m_updateFlags |= 3;
-				*(unsigned int*)(track + 0xfc) &= 0xfffffff7;
+				track->m_voiceSwitch &= 0xfffffff7;
 				voice->m_voiceSwitch &= 0xfffffff7;
 			}
 		}
-		track += 0x154;
+		track++;
 		voice++;
-	} while (track < *trackBasePtr + 0x2a80);
+	} while (track < *trackBasePtr + 0x20);
 }
 
 /*

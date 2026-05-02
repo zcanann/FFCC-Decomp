@@ -2062,9 +2062,9 @@ void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 	int rate;
 	int divisor;
 
-	track->m_shakeDepth = *track->m_command << 0xc;
+	track->m_shakeDepth = (unsigned int)*track->m_command << 0xc;
 	if (track->m_command[1] != 0) {
-		rate = track->m_command[1];
+		rate = (unsigned int)track->m_command[1];
 	} else {
 		rate = 0x100;
 	}

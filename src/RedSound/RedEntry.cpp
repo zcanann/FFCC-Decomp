@@ -724,7 +724,7 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 			used |= 1;
 		}
 		if (used == 0) {
-			track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
+			track = (int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 			do {
 				if (((*reinterpret_cast<unsigned int*>(track) != 0) && (*reinterpret_cast<unsigned int*>(track + 6) != 0)) &&
 				    (reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo == waveNo)) {
@@ -732,7 +732,7 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 					break;
 				}
 				track += 0x55;
-			} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
+			} while (track < (int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE));
 		}
 		if (used == 0) {
 			seq = SearchWaveSequence(waveNo);
@@ -1166,7 +1166,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 
 	if (mode == 0) {
 		sequenceNo = 0;
-		track = *(int**)((int)p_SoundControlBuffer + 0xdbc);
+		track = (int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 
 		do {
 			if ((*reinterpret_cast<unsigned int*>(track) != 0) && (track[0x3D] == seNo)) {
@@ -1174,7 +1174,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 				break;
 			}
 			track += 0x55;
-		} while (track < (int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80));
+		} while (track < (int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE));
 
 		if (sequenceNo == 0) {
 			sequenceNo = SearchSeSepSequence(seNo);
@@ -1212,7 +1212,7 @@ void CRedEntry::DisplaySePlayInfo()
 		OSReport(s__s_Track___Name___Wave_801e7b92, sRedEntryLogPrefix);
 		fflush(__files + 1);
 
-		int* trackHead = (int*)((int)p_SoundControlBuffer + 0xdbc);
+		int* trackHead = (int*)&p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 		int* track = (int*)*trackHead;
 		do {
 			int trackIndex = ((int)track - *trackHead) / 0x154 + (((int)track - *trackHead) >> 0x1F);

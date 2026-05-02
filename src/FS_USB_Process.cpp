@@ -46,13 +46,15 @@ static inline u32 LoadSwap32(u32 value) {
 }
 
 static inline void StoreSwap32(u32* value) {
-    *value = LoadSwap32(*value);
+    u32 raw = *value;
+
+    *value = __lwbrx(&raw, 0);
 }
 
 static inline void StoreSwap32(f32* value) {
-    u32 swapped;
     f32 raw = *value;
-    swapped = __lwbrx(&raw, 0);
+    u32 swapped = __lwbrx(&raw, 0);
+
     *value = *reinterpret_cast<f32*>(&swapped);
 }
 

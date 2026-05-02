@@ -22,6 +22,12 @@ struct RedControlRamp {
 	int m_count;
 };
 
+struct RedReverbDepth {
+	int m_depth;
+	int m_step;
+	int m_count;
+};
+
 struct RedSeBlockHEAD;
 
 extern RedMidiControlFunc p_MidiControl_Function[];
@@ -61,7 +67,7 @@ extern int p_EditorVoice[2];
 extern RedTrackDATA* p_EditorTrack;
 extern u8* volatile p_MusicSkipThreadStack;
 extern volatile int m_MusicSkipComplete;
-extern void* volatile p_ReverbDepth;
+extern RedReverbDepth* volatile p_ReverbDepth;
 extern int m_Mute[2];
 extern CRedMemory c_RedMemory;
 extern volatile u32 m_ChangeStatus;

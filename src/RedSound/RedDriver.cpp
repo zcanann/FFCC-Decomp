@@ -99,7 +99,7 @@ static u8* volatile p_DmaExecuteThreadStack;
 static volatile int m_DMAStatus;
 u8* volatile p_MusicSkipThreadStack;
 volatile int m_MusicSkipComplete;
-void* volatile p_ReverbDepth;
+RedReverbDepth* volatile p_ReverbDepth;
 int m_Mute[2];
 static int m_DmaControl[0x700];
 static OSThread m_MainThread;
@@ -206,7 +206,7 @@ void _SetReverbDepth(int* command)
         reverbDepth -= 1;
         reverbDepth <<= 12;
     }
-    *(unsigned int*)((char*)p_ReverbDepth + reverbBank * 0xc) = reverbDepth;
+    p_ReverbDepth[reverbBank].m_depth = reverbDepth;
     if (reverbBank != 0) {
         fadeStep = fadeStep * 0x60;
         fadeStep = fadeStep / 0x3c;
@@ -1304,7 +1304,7 @@ void CRedDriver::Init()
     } while (iVar5 < 0x20);
     p_EditorTrack = (RedTrackDATA*)RedNew(0x154);
     memset(p_EditorTrack, 0, 0x154);
-    p_ReverbDepth = (void*)RedNew(0x18);
+    p_ReverbDepth = (RedReverbDepth*)RedNew(0x18);
     memset(p_ReverbDepth, 0, 0x18);
     m_Mute[1] = 0;
     m_Mute[0] = 0;

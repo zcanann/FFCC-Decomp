@@ -394,7 +394,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				((RedTrackDATA*)track)->m_volume = 0x7fff000;
 				((RedTrackDATA*)track)->m_expression = 0x7f000;
 				((RedTrackDATA*)track)->m_pan = pan << 0xc;
-				((RedTrackDATA*)track)->m_reverbDepth = *(int*)((char*)p_ReverbDepth + 0xc);
+				((RedTrackDATA*)track)->m_reverbDepth = p_ReverbDepth[1].m_depth;
 				((RedTrackDATA*)track)->m_reverbDepthDelta = 0;
 				((RedTrackDATA*)track)->m_panDelta = 0;
 				((RedTrackDATA*)track)->m_expressionDelta = 0;
@@ -736,13 +736,13 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		SetReverb(0, t_ReverbModeData[reverbKind].kind, t_ReverbModeData[reverbKind].params);
 	}
 
-	*(int*)p_ReverbDepth = (int)musicHead->m_reverbDepth;
-	if (*(int*)p_ReverbDepth != 0) {
-		*(int*)p_ReverbDepth = (*(int*)p_ReverbDepth + 1) << 8;
-		*(int*)p_ReverbDepth = (*(int*)p_ReverbDepth - 1) << 0xc;
+	p_ReverbDepth[0].m_depth = (int)musicHead->m_reverbDepth;
+	if (p_ReverbDepth[0].m_depth != 0) {
+		p_ReverbDepth[0].m_depth = (p_ReverbDepth[0].m_depth + 1) << 8;
+		p_ReverbDepth[0].m_depth = (p_ReverbDepth[0].m_depth - 1) << 0xc;
 	}
-	((int*)p_ReverbDepth)[1] = 0;
-	((int*)p_ReverbDepth)[2] = 0;
+	p_ReverbDepth[0].m_step = 0;
+	p_ReverbDepth[0].m_count = 0;
 	((RedSoundCONTROL*)music)->m_waveNo = musicHead->m_waveNo;
 
 	unsigned char* current = (unsigned char*)musicHead + 0x20;
@@ -764,7 +764,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		((RedTrackDATA*)track)->m_volume = 0x7fff000;
 		((RedTrackDATA*)track)->m_expression = 0x7f000;
 		((RedTrackDATA*)track)->m_pan = 0x40000;
-		((RedTrackDATA*)track)->m_reverbDepth = *(int*)p_ReverbDepth;
+		((RedTrackDATA*)track)->m_reverbDepth = p_ReverbDepth[0].m_depth;
 		((RedTrackDATA*)track)->m_reverbDepthDelta = 0;
 		((RedTrackDATA*)track)->m_panDelta = 0;
 		((RedTrackDATA*)track)->m_expressionDelta = 0;

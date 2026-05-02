@@ -365,7 +365,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			voice[0x2c] = 0x8000;
 			voice[1] = (int)&streamData->m_trackData[iVar2];
 			voice[0x27] = pitch;
-			*(int*)(*voice + 0x68) = *(int*)((int)p_ReverbDepth + 0xc);
+			*(int*)(*voice + 0x68) = p_ReverbDepth[1].m_depth;
 			*(int*)(*voice + 0x70) = 0;
 			if (streamData->m_header.m_channelCount == 2) {
 				if (iVar2 == 0) {

@@ -438,7 +438,6 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
  */
 int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 {
-	int* entry = (int*)this;
 	int waveNo;
 	int waveAddress;
 	int waveSize;
@@ -446,7 +445,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 
 	if (waveDataSize == 0) {
 		if ((m_waveLoadNo >= 0) && ((waveNo = SearchWaveSequence(m_waveLoadNo)) >= 0)) {
-			WaveDelete((RedHistoryBANK*)(entry[0] + waveNo * 0x10));
+			WaveDelete((RedHistoryBANK*)(m_waveBankBase + waveNo * 0x10));
 		}
 
 		m_waveLoadNo = -1;
@@ -458,21 +457,21 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		RedWaveHeadWD* waveHead = (RedWaveHeadWD*)waveData;
 		waveNo = waveHead->m_waveNo;
 
-		if ((waveBankNo >= 0) && (waveNo != *(int*)(entry[0] + waveBankNo * 0x10))) {
-			WaveDelete((RedHistoryBANK*)(entry[0] + waveBankNo * 0x10));
+		if ((waveBankNo >= 0) && (waveNo != *(int*)(m_waveBankBase + waveBankNo * 0x10))) {
+			WaveDelete((RedHistoryBANK*)(m_waveBankBase + waveBankNo * 0x10));
 		}
 
 		int historyNo = SearchWaveSequence(waveNo);
 		if (historyNo >= 0) {
 			if ((waveBankNo >= 0) && (historyNo != waveBankNo)) {
-				*(int*)(entry[0] + waveBankNo * 0x10 + 0x0) = *(int*)(entry[0] + historyNo * 0x10 + 0x0);
-				*(int*)(entry[0] + waveBankNo * 0x10 + 0x4) = *(int*)(entry[0] + historyNo * 0x10 + 0x4);
-				*(int*)(entry[0] + waveBankNo * 0x10 + 0x8) = *(int*)(entry[0] + historyNo * 0x10 + 0x8);
-				*(int*)(entry[0] + waveBankNo * 0x10 + 0xC) = *(int*)(entry[0] + historyNo * 0x10 + 0xC);
+				*(int*)(m_waveBankBase + waveBankNo * 0x10 + 0x0) = *(int*)(m_waveBankBase + historyNo * 0x10 + 0x0);
+				*(int*)(m_waveBankBase + waveBankNo * 0x10 + 0x4) = *(int*)(m_waveBankBase + historyNo * 0x10 + 0x4);
+				*(int*)(m_waveBankBase + waveBankNo * 0x10 + 0x8) = *(int*)(m_waveBankBase + historyNo * 0x10 + 0x8);
+				*(int*)(m_waveBankBase + waveBankNo * 0x10 + 0xC) = *(int*)(m_waveBankBase + historyNo * 0x10 + 0xC);
 				historyNo = waveBankNo;
 			}
 
-			WaveHistoryChoice((RedHistoryBANK*)(entry[0] + historyNo * 0x10));
+			WaveHistoryChoice((RedHistoryBANK*)(m_waveBankBase + historyNo * 0x10));
 		} else {
 			m_waveLoadNo = waveHead->m_waveNo;
 			waveAddress = WaveHeadAdd(waveBankNo, waveHead, waveNo);

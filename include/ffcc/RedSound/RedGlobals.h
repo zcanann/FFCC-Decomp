@@ -16,6 +16,12 @@ struct RedReverbModeData {
 	int params[6];
 };
 
+struct RedControlRamp {
+	int m_value;
+	int m_step;
+	int m_count;
+};
+
 struct RedSeBlockHEAD;
 
 extern RedMidiControlFunc p_MidiControl_Function[];
@@ -42,8 +48,8 @@ extern int m_MusicFastSpeed;
 extern volatile int m_MusicSkipLine;
 extern int m_MusicKeySignature;
 extern int* volatile p_MusicReplayPoint;
-extern int* volatile p_MusicTempoControl;
-extern int* volatile p_MusicPitchControl;
+extern RedControlRamp* volatile p_MusicTempoControl;
+extern RedControlRamp* volatile p_MusicPitchControl;
 extern int m_MusicPhraseStop;
 extern int m_CrossTime;
 extern volatile int m_MasterMusicVolume;

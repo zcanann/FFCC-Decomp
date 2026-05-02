@@ -867,7 +867,7 @@ void _PitchExecute(RedVoiceDATA* voice)
                 voice->m_track->m_fineTune);
         } else {
             pitchDelta = PitchCompute(
-                voice->m_basePitch + *p_MusicPitchControl,
+                voice->m_basePitch + p_MusicPitchControl->m_value,
                 pitchDelta,
                 voice->m_waveData->m_pitch,
                 voice->m_track->m_fineTune);
@@ -1016,7 +1016,7 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
 
     local_38[0] = trackS16[0xa1] + trackS16[0x9f];
     if ((((u8*)voiceData)[0x1a] & 3) == 0) {
-        iVar5 = voiceData[0x28] + *p_MusicPitchControl;
+        iVar5 = voiceData[0x28] + p_MusicPitchControl->m_value;
     } else {
         iVar5 = voiceData[0x28] + trackData[0x17];
     }
@@ -1741,19 +1741,19 @@ void _ExecuteExtraData()
         sound += 0x125;
     } while (sound < (u32*)p_SoundControlBuffer + 0x24A);
 
-    if (p_MusicTempoControl[2] != 0) {
-        p_MusicTempoControl[2]--;
-        p_MusicTempoControl[0] += p_MusicTempoControl[1];
+    if (p_MusicTempoControl->m_count != 0) {
+        p_MusicTempoControl->m_count--;
+        p_MusicTempoControl->m_value += p_MusicTempoControl->m_step;
     }
 
-    if (p_MusicPitchControl[2] != 0) {
-        p_MusicPitchControl[2]--;
-        p_MusicPitchControl[0] += p_MusicPitchControl[1];
+    if (p_MusicPitchControl->m_count != 0) {
+        p_MusicPitchControl->m_count--;
+        p_MusicPitchControl->m_value += p_MusicPitchControl->m_step;
         voice = p_VoiceData;
         do {
             if ((((u8*)voice)[0x1A] & 3) == 0) {
                 voice[0x26] = PitchCompute(
-                    voice[0x28] + p_MusicPitchControl[0],
+                    voice[0x28] + p_MusicPitchControl->m_value,
                     (int)((RedTrackDATA*)*voice)->m_keyTranspose + (int)((RedTrackDATA*)*voice)->m_pitchBend,
                     *(int*)(voice[1] + 0x14),
                     ((RedTrackDATA*)*voice)->m_fineTune);
@@ -1860,7 +1860,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
             if (*voiceData == (int)track) {
                 voiceData[0x28] += addPitch;
                 if (voiceData[1] != 0) {
-                    voiceData[0x26] = PitchCompute(voiceData[0x28] + *p_MusicPitchControl,
+                    voiceData[0x26] = PitchCompute(voiceData[0x28] + p_MusicPitchControl->m_value,
                                                    (int)*(s16*)((u8*)track + 0x142) + (int)*(s16*)((u8*)track + 0x13E),
                                                    *(int*)((u8*)voiceData[1] + 0x14), (s8)((u8*)track)[0x148]);
                 }
@@ -2574,10 +2574,10 @@ void MainControl(int frames)
 
     if (*(s16*)((u8*)p_SoundControl + 0x48E) != 0) {
         if ((((u32*)p_SoundControl)[0x11B] & 0x10) == 0) {
-            mul = ((u32)*p_MusicTempoControl >> 0xC) & 0xFFFF;
+            mul = ((u32)p_MusicTempoControl->m_value >> 0xC) & 0xFFFF;
             step = *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
             if (mul != 0) {
-                if (*p_MusicTempoControl < 0) {
+                if (p_MusicTempoControl->m_value < 0) {
                     step *= (int)mul;
                     step >>= 0x10;
                 } else {

@@ -2276,7 +2276,7 @@ void _PitchBendCompute(RedTrackDATA* track, int bend)
                 if ((((unsigned char*)voiceData)[0x1a] & 3) != 0) {
                     pitch = voiceData[0x28] + ((int*)track)[0x17];
                 } else {
-                    pitch = voiceData[0x28] + *p_MusicPitchControl;
+                    pitch = voiceData[0x28] + p_MusicPitchControl->m_value;
                 }
                 computedPitch = pitch;
                 voiceData[0x26] =

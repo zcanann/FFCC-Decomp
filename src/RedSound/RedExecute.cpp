@@ -2567,7 +2567,7 @@ void MainControl(int frames)
     m_KeyOnEntry = 0;
     memset(p_KeyOnData, 0, 0x600);
 
-    p_SoundControl = (void*)((u8*)p_SoundControlBuffer + 0xDBC);
+    p_SoundControl = (RedSoundCONTROL*)((u8*)p_SoundControlBuffer + 0xDBC);
     _SeMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData,
                        *(RedTrackDATA**)p_SoundControl, *(int*)((u8*)p_SoundControl + 0x474), frames);
     p_SoundControl = p_SoundControlBuffer;
@@ -2595,7 +2595,7 @@ void MainControl(int frames)
     }
 
     if (*(s16*)((u8*)p_SoundControlBuffer + 0x922) != 0) {
-        p_SoundControl = (void*)((u8*)p_SoundControlBuffer + 0x494);
+        p_SoundControl = (RedSoundCONTROL*)((u8*)p_SoundControlBuffer + 0x494);
         step = *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
         ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter -= step * frames;
         while (((RedSoundCONTROL*)p_SoundControl)->m_tickCounter < 1) {

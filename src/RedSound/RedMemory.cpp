@@ -225,11 +225,12 @@ int RedNewA(int size, int offset, int maxSize)
 			currentAddress = blockPtr->m_address + blockPtr->m_size;
 		}
 
-		if (((blockPtr->m_size == 0) && (blockPtr < m_AMemoryBank + 0x400)) &&
-		    (gap = (rangeStart + maxSize) - currentAddress, (int)alignedSize <= gap) &&
-		    (maxGap > gap)) {
-			result = currentAddress;
-			bestBlock = blockPtr;
+		if ((blockPtr->m_size == 0) && (blockPtr < m_AMemoryBank + 0x400)) {
+			gap = (rangeStart + maxSize) - currentAddress;
+			if ((alignedSize <= gap) && (maxGap > gap)) {
+				result = currentAddress;
+				bestBlock = blockPtr;
+			}
 		}
 	} else {
 		bestBlock = blockPtr;

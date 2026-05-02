@@ -489,8 +489,6 @@ void StreamPause(int streamID, int pause)
 {
 	RedVoiceDATA* voiceData;
 	RedStreamDATA* streamData;
-	int volume;
-	int pan;
 
 	if (m_ReportPrint != 0) {
 		if (pause == 1) {
@@ -516,14 +514,12 @@ void StreamPause(int streamID, int pause)
 			} else if (voiceData->m_axVoice != 0) {
 				unsigned int pitch = PitchCompute(0x3c00000, 0, streamData->m_header.m_pitch, 0);
 				short channelCount = streamData->m_header.m_channelCount;
-				volume = streamData->m_volume >> 0xc;
 				if (channelCount == 2) {
 					voiceData->m_targetPitch = pitch;
 					voiceData->m_flags |= 0x10;
 					voiceData[1].m_targetPitch = pitch;
 					voiceData[1].m_flags |= 0x10;
 				} else {
-					pan = streamData->m_pan >> 0xc;
 					voiceData->m_targetPitch = pitch;
 					voiceData->m_flags |= 0x10;
 				}

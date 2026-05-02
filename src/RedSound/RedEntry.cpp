@@ -1067,18 +1067,17 @@ int CRedEntry::ClearSeSepData(int seNo)
 	int result = 0;
 
 	if (seNo == -1) {
-		unsigned int history = *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(this) + 4);
+		RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase);
 		do {
-			if (*reinterpret_cast<int*>(history + 0xC) != 0) {
-				SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(history));
+			if (history->m_size != 0) {
+				SeSepMemoryFree(history);
 			}
-			history += 0x10;
-		} while (history < *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(this) + 4) + 0x1000);
+			history += 1;
+		} while (history < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + 0x1000));
 	} else {
 		result = SearchSeSepSequence(seNo);
 		if (result >= 0) {
-			result = SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(
-			    *reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + result * 0x10));
+			result = SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + result * 0x10));
 		}
 	}
 
@@ -1093,17 +1092,17 @@ int CRedEntry::ClearSeSepData(int seNo)
 int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
 {
 	int result = 0;
-	int* bank = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4));
+	RedHistoryBANK* bank = reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase);
 
 	do {
-		if (bank[3] != 0) {
-			int seNo = bank[0] / 1000;
+		if (bank->m_size != 0) {
+			int seNo = bank->m_id / 1000;
 			if ((bankNo != seNo) && (sepNo != seNo) && (groupNo != seNo) && (kindNo != seNo)) {
-				SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(bank));
+				SeSepMemoryFree(bank);
 			}
 		}
-		bank += 4;
-	} while (bank < reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + 0x1000));
+		bank += 1;
+	} while (bank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + 0x1000));
 
 	return result;
 }

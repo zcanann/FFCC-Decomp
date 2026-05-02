@@ -160,7 +160,7 @@ int _EraseTime(int eraseTrack)
  * JP Address: TODO
  * JP Size: TODO
  */
-int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
+RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 {
 	int* trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
 	int* scan;
@@ -195,7 +195,7 @@ int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 		track = 0;
 	}
 
-	return track;
+	return (RedTrackDATA*)track;
 }
 
 /*
@@ -354,7 +354,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			} while ((int)remaining < (int)count);
 		}
 
-		track = SearchSeEmptyTrack((int)remaining, info->m_eraseTrack, attrMask);
+		track = (int*)SearchSeEmptyTrack((int)remaining, info->m_eraseTrack, attrMask);
 		attrMask = 0;
 		if (track == 0) {
 			break;

@@ -3,11 +3,12 @@
 
 struct RedMusicHEAD;
 struct RedSeINFO;
+struct RedTrackDATA;
 struct RedWaveHeadWD;
 
 void _EraseAttribute(int, int);
 int _EraseTime(int);
-int* SearchSeEmptyTrack(int, int, int);
+RedTrackDATA* SearchSeEmptyTrack(int, int, int);
 int SeStopID(int);
 int SeStopMG(int, int, int, int);
 int _SePlayStart(RedSeINFO*, int, int, int, int);

@@ -648,7 +648,7 @@ void SePause(int seId, int pause)
 
 	trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 	track = *trackBasePtr;
-	voice = (RedVoiceDATA*)((unsigned int)p_VoiceData + 0x1800);
+	voice = p_VoiceData + 0x20;
 	do {
 		if ((track->m_seId != 0) && ((seId == -1) || (seId == track->m_seId))) {
 			if (pause == 1) {

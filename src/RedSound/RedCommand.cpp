@@ -852,20 +852,20 @@ int MusicStop(int seId)
 			((RedSoundCONTROL*)music)->m_updateFlags = 0;
 			((RedSoundCONTROL*)music)->m_musicId = -1;
 			if (((RedSoundCONTROL*)music)->m_activeTrackCount != 0) {
-				unsigned int* seTrack = (unsigned int*)p_VoiceData;
+				RedVoiceDATA* seTrack = (RedVoiceDATA*)p_VoiceData;
 				do {
-					if ((*seTrack >= *music) &&
-					    (*seTrack <
-					     *music + (unsigned int)((RedSoundCONTROL*)music)->m_trackCount * 0x154)) {
-						seTrack[0x25] &= 0xfffffff3;
-						seTrack[0x24] &= 0xfffffffe;
-						seTrack[0x24] |= 2;
-						*((unsigned char*)seTrack + 0x1a) &= ~4;
-						*seTrack = 0;
-						seTrack[0x23] = 0;
+					if ((seTrack->m_track >= (RedTrackDATA*)*music) &&
+					    (seTrack->m_track <
+					     (RedTrackDATA*)(*music + (unsigned int)((RedSoundCONTROL*)music)->m_trackCount * 0x154))) {
+						seTrack->m_voiceSwitch &= 0xfffffff3;
+						seTrack->m_flags &= 0xfffffffe;
+						seTrack->m_flags |= 2;
+						seTrack->m_stateFlags &= ~4;
+						seTrack->m_track = 0;
+						seTrack->m_active = 0;
 					}
-					seTrack += 0x30;
-				} while (seTrack < (unsigned int*)p_VoiceData + 0xc00);
+					seTrack++;
+				} while (seTrack < (RedVoiceDATA*)p_VoiceData + 0x40);
 
 				int* track = (int*)*music;
 				do {

@@ -255,6 +255,14 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             memset(work->m_wmats, 0, work->m_maxParticles * 0x30);
         }
 
+        if (paramPayload[0x69] != 0) {
+            work->m_colors = (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                work->m_maxParticles << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail3_cpp), 0x2eb);
+            if (work->m_colors != 0) {
+                memset(work->m_colors, 0, work->m_maxParticles << 5);
+            }
+        }
+
         work->m_tailScaleDirection = param->m_directionTail;
         pppNormalize(work->m_tailScaleDirection, work->m_tailScaleDirection);
     }
@@ -262,6 +270,8 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     if (work->m_particles == 0) {
         hasRequiredMemory = false;
     } else if (work->m_wmats == 0) {
+        hasRequiredMemory = false;
+    } else if ((paramPayload[0x69] != 0) && (work->m_colors == 0)) {
         hasRequiredMemory = false;
     } else {
         hasRequiredMemory = true;

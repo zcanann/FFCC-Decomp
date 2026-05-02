@@ -1740,7 +1740,7 @@ int CRedDriver::SePlayState(int seID)
             break;
         }
         seInfo += 0x55;
-    } while (seInfo < (int*)((int)*seInfoBase + 0x2a80));
+    } while (seInfo < (int*)((int)*seInfoBase + REDSOUND_SE_TRACK_ARENA_SIZE));
     if (result == 0) {
         commandNow = (int*)p_ExecCommandNow;
         command = (int*)p_ExecCommandOld;

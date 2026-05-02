@@ -533,7 +533,7 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
  */
 void SetSeVolume(int seId, int volume, int frameCount, int mode)
 {
-	int* track;
+	RedTrackDATA* track;
 	volume <<= 12;
 	volume |= 0x800;
 
@@ -543,18 +543,18 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 
 	frameCount *= 0x60;
 	frameCount /= 0x3c;
-	track = (int*)((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
+	track = ((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 
 	do {
-		if (((u32)*track != 0) && ((seId < 0) || (((RedTrackDATA*)track)->m_seId == seId))) {
-			int delta = volume - ((RedTrackDATA*)track)->m_mixVolume;
+		if (((u32)track->m_command != 0) && ((seId < 0) || (track->m_seId == seId))) {
+			int delta = volume - track->m_mixVolume;
 			delta /= frameCount;
-			((RedTrackDATA*)track)->m_mixVolumeAdd = delta;
-			((RedTrackDATA*)track)->m_mixVolumeDelta = frameCount;
-			((RedTrackDATA*)track)->m_mixVolumeMode = mode;
+			track->m_mixVolumeAdd = delta;
+			track->m_mixVolumeDelta = frameCount;
+			track->m_mixVolumeMode = mode;
 		}
-		track += 0x55;
-	} while (track < (int*)((int)((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks + 0x2a80));
+		track++;
+	} while (track < ((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks + 0x20);
 }
 
 /*
@@ -568,7 +568,7 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
  */
 void SetSePan(int seId, int pan, int frameCount)
 {
-	int* track;
+	RedTrackDATA* track;
 	pan <<= 12;
 	pan |= 0x800;
 
@@ -578,17 +578,17 @@ void SetSePan(int seId, int pan, int frameCount)
 
 	frameCount *= 0x60;
 	frameCount /= 0x3c;
-	track = (int*)((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
+	track = ((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 
 	do {
-		if (((u32)*track != 0) && ((seId < 0) || (((RedTrackDATA*)track)->m_seId == seId))) {
-			int delta = pan - ((RedTrackDATA*)track)->m_pan;
+		if (((u32)track->m_command != 0) && ((seId < 0) || (track->m_seId == seId))) {
+			int delta = pan - track->m_pan;
 			delta /= frameCount;
-			((RedTrackDATA*)track)->m_panAdd = delta;
-			((RedTrackDATA*)track)->m_panDelta = frameCount;
+			track->m_panAdd = delta;
+			track->m_panDelta = frameCount;
 		}
-		track += 0x55;
-	} while (track < (int*)((int)((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks + 0x2a80));
+		track++;
+	} while (track < ((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks + 0x20);
 }
 
 /*
@@ -602,7 +602,7 @@ void SetSePan(int seId, int pan, int frameCount)
  */
 void SetSePitch(int seId, int pitch, int frameCount)
 {
-	int* track;
+	RedTrackDATA* track;
 	pitch <<= 12;
 	pitch |= 0x800;
 
@@ -612,16 +612,16 @@ void SetSePitch(int seId, int pitch, int frameCount)
 
 	frameCount *= 0x60;
 	frameCount /= 0x3c;
-	track = (int*)((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
+	track = ((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks;
 
 	do {
-		if (((u32)*track != 0) && ((seId < 0) || (((RedTrackDATA*)track)->m_seId == seId))) {
-			int delta = pitch - ((RedTrackDATA*)track)->m_pitch;
-			((RedTrackDATA*)track)->m_pitchAdd = delta / frameCount;
-			((RedTrackDATA*)track)->m_pitchDelta = frameCount;
+		if (((u32)track->m_command != 0) && ((seId < 0) || (track->m_seId == seId))) {
+			int delta = pitch - track->m_pitch;
+			track->m_pitchAdd = delta / frameCount;
+			track->m_pitchDelta = frameCount;
 		}
-		track += 0x55;
-	} while (track < (int*)((int)((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks + 0x2a80));
+		track++;
+	} while (track < ((RedSoundCONTROL*)p_SoundControlBuffer)[3].m_tracks + 0x20);
 }
 
 /*

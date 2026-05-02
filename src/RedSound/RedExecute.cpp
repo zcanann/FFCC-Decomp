@@ -2572,13 +2572,13 @@ void MainControl(int frames)
 
     p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
     _SeMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData,
-                       *(RedTrackDATA**)p_SoundControl, *(int*)((u8*)p_SoundControl + 0x474), frames);
+                       p_SoundControl->m_tracks, p_SoundControl->m_skipFrames, frames);
     p_SoundControl = p_SoundControlBuffer;
 
     if (p_SoundControl->m_activeTrackCount != 0) {
-        if ((((u32*)p_SoundControl)[0x11B] & 0x10) == 0) {
+        if ((p_SoundControl->m_flags & 0x10) == 0) {
             mul = ((u32)p_MusicTempoControl->m_value >> 0xC) & 0xFFFF;
-            step = *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
+            step = p_SoundControl->m_tempo >> 0xC;
             if (mul != 0) {
                 if (p_MusicTempoControl->m_value < 0) {
                     step *= (int)mul;
@@ -2586,7 +2586,7 @@ void MainControl(int frames)
                 } else {
                     step *= (int)mul + 1;
                     step >>= 0xF;
-                    step += *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
+                    step += p_SoundControl->m_tempo >> 0xC;
                 }
             }
             ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter -= step * frames;
@@ -2599,7 +2599,7 @@ void MainControl(int frames)
 
     if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) {
         p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
-        step = *(int*)((u8*)p_SoundControl + 0x448) >> 0xC;
+        step = p_SoundControl->m_tempo >> 0xC;
         ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter -= step * frames;
         while (((RedSoundCONTROL*)p_SoundControl)->m_tickCounter < 1) {
             ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter += 0xFA;

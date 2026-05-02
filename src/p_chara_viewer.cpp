@@ -71,11 +71,6 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int,
                                                                                 unsigned char);
-extern "C" void SetFog__8CGraphicFii(void*, int, int);
-extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
-extern "C" void SetNumDiffuse__9CLightPcsFUl(void*, unsigned long);
-extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
-extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
 extern "C" void Draw__Q26CChara6CModelFPA4_fii(void*, Mtx, int, int);
 extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void*, Mtx, int);
 extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(void*, Mtx);
@@ -83,7 +78,6 @@ extern "C" void CalcMatrix__Q26CChara6CModelFv(void*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(void*);
 extern "C" void SRTToMatrix__5CMathFPA4_fP3SRT(void*, Mtx, void*);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
-extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 extern "C" void Destroy__6CCharaFv(CChara*);
 extern "C" void Create__6CCharaFv(CChara*);
 extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
@@ -381,13 +375,13 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
                 CStopWatch watch(reinterpret_cast<char*>(-1));
                 watch.Reset();
                 watch.Start();
-                SetFog__8CGraphicFii(&Graphic, 0, 0);
-                SetAmbient__9CLightPcsF8_GXColor(&LightPcs, p + 0xE8);
-                SetNumDiffuse__9CLightPcsFUl(&LightPcs, 3);
+                Graphic.SetFog(0, 0);
+                LightPcs.SetAmbient(*reinterpret_cast<_GXColor*>(p + 0xE8));
+                LightPcs.SetNumDiffuse(3);
                 for (unsigned int lightIndex = 0; lightIndex < 3; lightIndex++) {
-                    SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, lightIndex, p + 0xF0 + lightIndex * 4,
-                                                             p + 0x108 + lightIndex * 12,
-                                                             (__cntlzw(2 - lightIndex) >> 5) & 0xFF);
+                    LightPcs.SetDiffuse(lightIndex, *reinterpret_cast<_GXColor*>(p + 0xF0 + lightIndex * 4),
+                                        reinterpret_cast<Vec*>(p + 0x108 + lightIndex * 12),
+                                        (__cntlzw(2 - lightIndex) >> 5) & 0xFF);
                 }
 
                 Vec lightPos;
@@ -395,14 +389,14 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
                 lightPos.x = scratchMtx[0][3];
                 lightPos.y = scratchMtx[1][3];
                 lightPos.z = scratchMtx[2][3];
-                SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, &lightPos, 0xFFFFFFFF);
+                LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), &lightPos, 0xFFFFFFFF);
 
                 Draw__Q26CChara6CModelFPA4_fii(model, cameraMtx, 0, 0);
                 DrawFur__Q26CChara6CModelFPA4_fi(model, cameraMtx, 0);
                 watch.Stop();
                 float cpuTime = watch.Get();
                 watch.Start();
-                _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_chara_viewer_cpp, 0x2A7);
+                Graphic._WaitDrawDone(const_cast<char*>(s_p_chara_viewer_cpp), 0x2A7);
                 watch.Stop();
                 if (i == 0) {
                     float totalTime = watch.Get();

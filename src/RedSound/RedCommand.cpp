@@ -502,14 +502,14 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 int SeSepPlay(int seId, int sepId, int pan, int volume)
 {
 	RedHistoryBANK* sepBank;
-	int sepBase;
+	RedSeSepHEAD* sepHead;
 	RedSeINFO* sepInfo;
 
 	sepBank = c_RedEntry.SearchSeSepBank(sepId);
 	if (sepBank != 0) {
-		sepBase = sepBank->m_data;
-		sepInfo = reinterpret_cast<RedSeINFO*>(sepBase + 0x10);
-		if ((*(unsigned int*)(sepBase + 0xc) & 0x80000000) != 0) {
+		sepHead = reinterpret_cast<RedSeSepHEAD*>(sepBank->m_data);
+		sepInfo = reinterpret_cast<RedSeINFO*>((int)sepHead + 0x10);
+		if ((sepHead->m_sizeAndFlags & 0x80000000) != 0) {
 			sepInfo->m_flagsAndCount |= 0x80;
 		}
 		if (_SePlayStart(sepInfo, seId, sepId, pan, volume) != 0) {

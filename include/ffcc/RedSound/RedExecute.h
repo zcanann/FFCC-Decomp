@@ -1,6 +1,7 @@
 #ifndef _FFCC_REDSOUND_REDEXECUTE_H
 #define _FFCC_REDSOUND_REDEXECUTE_H
 
+#include <dolphin/ax.h>
 #include "types.h"
 
 class AXFX_BUFFERUPDATE;
@@ -41,7 +42,7 @@ struct RedVoiceDATA {
 	int* m_trackVolume;
 	int* m_trackExpression;
 	int* m_trackPan;
-	void* m_axVoice;
+	AXVPB* m_axVoice;
 	signed char m_key;
 	signed char m_velocity;
 	unsigned char m_stateFlags;

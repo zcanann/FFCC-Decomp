@@ -68,15 +68,15 @@ void _StreamStop(RedStreamDATA* streamData)
 			RedDeleteA(streamData->m_aramBuffer);
 			streamData->m_aramBuffer = 0;
 		}
-		*(unsigned int*)((int)streamData->m_voiceData + 0x90) |= 2;
-		*(unsigned char*)((int)streamData->m_track + 0x26) &= -3;
-		*(unsigned char*)((int)streamData->m_voiceData + 0x1a) &= -3;
-		*(int*)((int)streamData->m_voiceData + 0x8c) = 0;
+		streamData->m_voiceData->m_flags |= 2;
+		streamData->m_track->m_note.m_allocFlags &= -3;
+		streamData->m_voiceData->m_stateFlags &= -3;
+		streamData->m_voiceData->m_active = 0;
 		if (streamData->m_header.m_channelCount == 2) {
-			*(unsigned int*)((int)streamData->m_voiceData + 0x150) |= 2;
-			*(unsigned char*)((int)streamData->m_track + 0x17a) &= -3;
-			*(unsigned char*)((int)streamData->m_voiceData + 0xda) &= -3;
-			*(int*)((int)streamData->m_voiceData + 0x14c) = 0;
+			streamData->m_voiceData[1].m_flags |= 2;
+			streamData->m_track[1].m_note.m_allocFlags &= -3;
+			streamData->m_voiceData[1].m_stateFlags &= -3;
+			streamData->m_voiceData[1].m_active = 0;
 		}
 	}
 }
@@ -89,7 +89,7 @@ void _StreamStop(RedStreamDATA* streamData)
 int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCount)
 {
 	unsigned char* dstBuffer;
-	int streamStruct;
+	RedVoiceDATA* voiceData;
 	int dmaDstOffset;
 	int dmaID;
 
@@ -97,7 +97,7 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
 
 	do {
 		dstBuffer = stream->m_buffer + bufferIndex * 0x1000;
-		streamStruct = (int)stream->m_voiceData;
+		voiceData = stream->m_voiceData;
 
 		memcpy(dstBuffer, stream->m_fileData + stream->m_readOffset, 0x1000);
 		stream->m_readOffset += 0x1000;
@@ -116,23 +116,21 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
 		dmaDstOffset = stream->m_aramBuffer + bufferIndex * 0x1000;
 		dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
 
-		if ((bufferIndex == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
-			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ec) = (unsigned short)*dstBuffer;
-			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) =
-			    *(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = 0;
-			*(unsigned int*)(*(int*)(streamStruct + 0x14) + 0x1c) |= 0x100000;
+		if ((bufferIndex == 0) && (voiceData->m_axVoice != 0)) {
+			voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*dstBuffer;
+			voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
+			voiceData->m_axVoice->sync |= 0x100000;
 		}
 
 		if (stream->m_header.m_channelCount == 2) {
 			dstBuffer += 0x2000;
 			dmaDstOffset += 0x2000;
-			streamStruct += 0xc0;
+			voiceData += 1;
 			dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
-			if ((bufferIndex == 0) && (*(void**)(streamStruct + 0x14) != 0)) {
-				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ec) = (unsigned short)*dstBuffer;
-				*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) =
-				    *(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = 0;
-				*(unsigned int*)(*(int*)(streamStruct + 0x14) + 0x1c) |= 0x100000;
+			if ((bufferIndex == 0) && (voiceData->m_axVoice != 0)) {
+				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*dstBuffer;
+				voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
+				voiceData->m_axVoice->sync |= 0x100000;
 			}
 		}
 
@@ -156,7 +154,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 	unsigned char* pbVar5;
 	unsigned char* pbVar6;
 	unsigned int* puVar7;
-	int iVar8;
+	RedVoiceDATA* voiceData;
 	int dmaID;
 
 	bufferIndex = bufferIndex & 1;
@@ -164,7 +162,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 	if (stream->m_header.m_channelCount == 2) {
 		do {
 			pbVar6 = stream->m_buffer + bufferIndex * 0x1000;
-			iVar8 = (int)stream->m_voiceData;
+			voiceData = stream->m_voiceData;
 			puVar7 = (unsigned int*)(stream->m_fileData + stream->m_readOffset);
 			pbVar4 = pbVar6 + 0x2000;
 			puVar3 = puVar7 + 0x400;
@@ -206,16 +204,16 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar6, stream->m_aramBuffer + bufferIndex * 0x1000, 0x1000, 0, 0);
 			dmaID = RedDmaEntry(0x8001, 0, (int)(pbVar6 + 0x2000), stream->m_aramBuffer + (bufferIndex + 2) * 0x1000, 0x1000, 0, 0);
 			
-			if ((bufferIndex == 0) && (*(void**)(iVar8 + 0x14) != 0)) {
+			if ((bufferIndex == 0) && (voiceData->m_axVoice != 0)) {
 				int zero = 0;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ec) = (unsigned short)*pbVar6;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1f0) = zero;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ee) = zero;
-				*(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) = *(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) | 0x100000;
-				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1ec) = (unsigned short)pbVar6[0x2000];
-				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1f0) = zero;
-				*(unsigned short*)(*(int*)(iVar8 + 0xd4) + 0x1ee) = zero;
-				*(unsigned int*)(*(int*)(iVar8 + 0xd4) + 0x1c) = *(unsigned int*)(*(int*)(iVar8 + 0xd4) + 0x1c) | 0x100000;
+				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*pbVar6;
+				voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = zero;
+				voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = zero;
+				voiceData->m_axVoice->sync = voiceData->m_axVoice->sync | 0x100000;
+				voiceData[1].m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)pbVar6[0x2000];
+				voiceData[1].m_axVoice->pb.adpcmLoop.loop_yn2 = zero;
+				voiceData[1].m_axVoice->pb.adpcmLoop.loop_yn1 = zero;
+				voiceData[1].m_axVoice->sync = voiceData[1].m_axVoice->sync | 0x100000;
 			}
 			
 			bufferIndex = bufferIndex ^ 1;
@@ -230,7 +228,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 	} else {
 		do {
 			pbVar5 = stream->m_buffer + bufferIndex * 0x1000;
-			iVar8 = (int)stream->m_voiceData;
+			voiceData = stream->m_voiceData;
 			memcpy(pbVar5, stream->m_fileData + stream->m_readOffset, 0x1000);
 			stream->m_readOffset = stream->m_readOffset + 0x1000;
 			
@@ -240,12 +238,12 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 			
 			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar5, stream->m_aramBuffer + bufferIndex * 0x1000, 0x1000, 0, 0);
 			
-			if ((bufferIndex == 0) && (*(void**)(iVar8 + 0x14) != 0)) {
+			if ((bufferIndex == 0) && (voiceData->m_axVoice != 0)) {
 				int zero = 0;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ec) = (unsigned short)*pbVar5;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1f0) = zero;
-				*(unsigned short*)(*(int*)(iVar8 + 0x14) + 0x1ee) = zero;
-				*(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) = *(unsigned int*)(*(int*)(iVar8 + 0x14) + 0x1c) | 0x100000;
+				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*pbVar5;
+				voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = zero;
+				voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = zero;
+				voiceData->m_axVoice->sync = voiceData->m_axVoice->sync | 0x100000;
 			}
 			
 			bufferIndex = bufferIndex ^ 1;
@@ -492,7 +490,7 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
  */
 void StreamPause(int streamID, int pause)
 {
-	unsigned int voiceData;
+	RedVoiceDATA* voiceData;
 	RedStreamDATA* streamData;
 	int volume;
 	int pan;
@@ -508,29 +506,29 @@ void StreamPause(int streamID, int pause)
 	streamData = p_Stream;
 	do {
 		if ((streamData->m_streamId != 0) && ((streamID == -1) || (streamID == streamData->m_streamId))) {
-			voiceData = (unsigned int)streamData->m_voiceData;
+			voiceData = streamData->m_voiceData;
 			if (pause == 1) {
-				if (*(void**)(voiceData + 0x14) != 0) {
-					*(int*)(voiceData + 0x9c) = 0;
-					*(unsigned int*)(voiceData + 0x90) |= 0x10;
+				if (voiceData->m_axVoice != 0) {
+					voiceData->m_targetPitch = 0;
+					voiceData->m_flags |= 0x10;
 					if (streamData->m_header.m_channelCount == 2) {
-						*(int*)(voiceData + 0x15c) = 0;
-						*(unsigned int*)(voiceData + 0x150) |= 0x10;
+						voiceData[1].m_targetPitch = 0;
+						voiceData[1].m_flags |= 0x10;
 					}
 				}
-			} else if (*(void**)(voiceData + 0x14) != 0) {
+			} else if (voiceData->m_axVoice != 0) {
 				unsigned int pitch = PitchCompute(0x3c00000, 0, streamData->m_header.m_pitch, 0);
 				short channelCount = streamData->m_header.m_channelCount;
 				volume = streamData->m_volume >> 0xc;
 				if (channelCount == 2) {
-					*(int*)(voiceData + 0x9c) = pitch;
-					*(unsigned int*)(voiceData + 0x90) |= 0x10;
-					*(int*)(voiceData + 0x15c) = pitch;
-					*(unsigned int*)(voiceData + 0x150) |= 0x10;
+					voiceData->m_targetPitch = pitch;
+					voiceData->m_flags |= 0x10;
+					voiceData[1].m_targetPitch = pitch;
+					voiceData[1].m_flags |= 0x10;
 				} else {
 					pan = streamData->m_pan >> 0xc;
-					*(int*)(voiceData + 0x9c) = pitch;
-					*(unsigned int*)(voiceData + 0x90) |= 0x10;
+					voiceData->m_targetPitch = pitch;
+					voiceData->m_flags |= 0x10;
 				}
 			}
 		}
@@ -551,17 +549,17 @@ void StreamControl()
 {
 	RedStreamDATA* streamData = p_Stream;
 	do {
-		int voiceData;
+		RedVoiceDATA* voiceData;
 		if (streamData->m_state == 1) {
-			voiceData = (int)streamData->m_voiceData;
-			if (*(void**)(voiceData + 0x14) != 0) {
-				if (*(int*)(*(int*)(voiceData + 0x14) + 0xc) == 0) {
+			voiceData = streamData->m_voiceData;
+			if (voiceData->m_axVoice != 0) {
+				if (voiceData->m_axVoice->priority == 0) {
 					_StreamStop(streamData);
 				} else {
-					int samplePos = *(unsigned short*)(*(int*)(voiceData + 0x14) + 0x1b2);
+					int samplePos = voiceData->m_axVoice->pb.addr.currentAddressHi;
 					int sampleStart = (streamData->m_aramBuffer + streamData->m_streamCursorBase) * 2;
 					samplePos <<= 16;
-					samplePos |= *(unsigned short*)(*(int*)(voiceData + 0x14) + 0x1b4);
+					samplePos |= voiceData->m_axVoice->pb.addr.currentAddressLo;
 					if ((samplePos >= sampleStart) && (samplePos < sampleStart + 0x2000)) {
 						int stopped = 0;
 						if (streamData->m_header.m_loopStart < 0) {
@@ -609,26 +607,25 @@ void StreamControl()
 					}
 					if (changed != 0) {
 						if (streamData->m_header.m_channelCount == 2) {
-							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0, streamData->m_volume >> 0xc);
-							voiceData += 0xc0;
-							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, 0x7f, streamData->m_volume >> 0xc);
+							SetVoiceVolumeMix(voiceData, 0, streamData->m_volume >> 0xc);
+							voiceData += 1;
+							SetVoiceVolumeMix(voiceData, 0x7f, streamData->m_volume >> 0xc);
 						} else {
-							SetVoiceVolumeMix((RedVoiceDATA*)voiceData, streamData->m_pan >> 0xc,
-								streamData->m_volume >> 0xc);
+							SetVoiceVolumeMix(voiceData, streamData->m_pan >> 0xc, streamData->m_volume >> 0xc);
 						}
 					}
 				}
 			}
 		} else if ((streamData->m_state == 3) && (RedDmaSearchID(streamData->m_dmaId) == 0)) {
-			voiceData = (int)streamData->m_voiceData;
+			voiceData = streamData->m_voiceData;
 			streamData->m_state = 1;
-			*(unsigned int*)(voiceData + 0x90) |= 0x19;
-			*(unsigned int*)(voiceData + 4) = (unsigned int)streamData->m_trackData;
-			*(int*)(voiceData + 0x8c) = 1;
+			voiceData->m_flags |= 0x19;
+			voiceData->m_waveData = streamData->m_trackData;
+			voiceData->m_active = 1;
 			if (streamData->m_header.m_channelCount == 2) {
-				*(unsigned int*)(voiceData + 0x150) |= 0x19;
-				*(unsigned int*)(voiceData + 0xc4) = (unsigned int)&streamData->m_trackData[1];
-				*(int*)(voiceData + 0x14c) = 1;
+				voiceData[1].m_flags |= 0x19;
+				voiceData[1].m_waveData = &streamData->m_trackData[1];
+				voiceData[1].m_active = 1;
 			}
 		}
 

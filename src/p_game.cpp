@@ -11,6 +11,8 @@ extern "C" void draw1__8CGamePcsFv(CGamePcs*);
 extern "C" void draw2__8CGamePcsFv(CGamePcs*);
 
 extern const char s_CGamePcs_801D7C20[] = "CGamePcs";
+extern const char s_CManager_801D7C2C[] = "CManager";
+extern const char s_CProcess_801D7C38[] = "CProcess";
 
 unsigned int m_table__8CGamePcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CGamePcs_801D7C20)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,

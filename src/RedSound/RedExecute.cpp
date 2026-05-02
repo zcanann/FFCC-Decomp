@@ -1607,7 +1607,7 @@ void _KeyOnControl()
                 track[0x32] += track[0x2E];
             }
             track += 0x55;
-        } while (track < (int*)(*seTrackBase + 0x2A80));
+        } while (track < (int*)(*seTrackBase + REDSOUND_SE_TRACK_ARENA_SIZE));
     }
 
     {

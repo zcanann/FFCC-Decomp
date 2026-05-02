@@ -1287,10 +1287,10 @@ void CRedDriver::Init()
     p_SoundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId = -1;
     p_SoundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId = -1;
     p_SoundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId = -1;
-    p_KeyOnData = (RedKeyOnDATA*)RedNew(0x600);
-    memset(p_KeyOnData, 0, 0x600);
-    p_VoiceData = (RedVoiceDATA*)RedNew(0x3000);
-    memset(p_VoiceData, 0, 0x3000);
+    p_KeyOnData = (RedKeyOnDATA*)RedNew(REDSOUND_KEY_ON_BUFFER_SIZE);
+    memset(p_KeyOnData, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
+    p_VoiceData = (RedVoiceDATA*)RedNew(REDSOUND_VOICE_BUFFER_SIZE);
+    memset(p_VoiceData, 0, REDSOUND_VOICE_BUFFER_SIZE);
     iVar6 = 0;
     do {
         iVar2 = iVar6 * 0xc0;
@@ -1299,7 +1299,7 @@ void CRedDriver::Init()
         iVar6 = iVar6 + 1;
         *(unsigned int*)((char*)p_VoiceData + iVar2 + 0xa8) =
             (iVar4 * 0x20 | (unsigned int)(iVar5 + iVar4) >> 0x1b) - iVar4;
-    } while (iVar6 < 0x40);
+    } while (iVar6 < REDSOUND_VOICE_COUNT);
     p_EditorVoice[1] = 0;
     p_EditorVoice[0] = 0;
     uVar3 = (void*)RedNew(REDSOUND_SE_TRACK_ARENA_SIZE);

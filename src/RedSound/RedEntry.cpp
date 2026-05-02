@@ -712,7 +712,6 @@ int CRedEntry::ReentryWaveData(int waveNo)
 void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 {
 	int used;
-	int seq;
 	int* track;
 
 	if (mode == 0) {
@@ -726,7 +725,8 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 			used |= 1;
 		}
 		if (used == 0) {
-			track = (int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+			int* trackHead = (int*)&p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+			track = (int*)*trackHead;
 			do {
 				if (((*reinterpret_cast<unsigned int*>(track) != 0) && (*reinterpret_cast<unsigned int*>(track + 6) != 0)) &&
 				    (reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo == waveNo)) {
@@ -734,20 +734,20 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 					break;
 				}
 				track += REDSOUND_TRACK_SIZE / sizeof(*track);
-			} while (track < (int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE));
+			} while (track < (int*)(*trackHead + REDSOUND_SE_TRACK_ARENA_SIZE));
 		}
 		if (used == 0) {
-			seq = SearchWaveSequence(waveNo);
-			if ((seq >= 0x10) && (*(int*)(*(int*)this + seq * 0x10 + 4) == 0)) {
+			used = SearchWaveSequence(waveNo);
+			if ((used >= 0x10) && (*(int*)(*(int*)this + used * 0x10 + 4) == 0)) {
 				WaveHistoryAdd(0x14);
-				*(int*)(*(int*)this + seq * 0x10 + 4) = 0x14;
+				*(int*)(*(int*)this + used * 0x10 + 4) = 0x14;
 			}
 		}
 	} else {
-		seq = SearchWaveSequence(waveNo);
-		if ((seq >= 0x10) && (*(int*)(*(int*)this + seq * 0x10 + 4) != 0)) {
-			WaveHistoryDelete(*(int*)(*(int*)this + seq * 0x10 + 4));
-			*(int*)(*(int*)this + seq * 0x10 + 4) = 0;
+		used = SearchWaveSequence(waveNo);
+		if ((used >= 0x10) && (*(int*)(*(int*)this + used * 0x10 + 4) != 0)) {
+			WaveHistoryDelete(*(int*)(*(int*)this + used * 0x10 + 4));
+			*(int*)(*(int*)this + used * 0x10 + 4) = 0;
 		}
 	}
 }

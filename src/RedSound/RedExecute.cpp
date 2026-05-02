@@ -1553,7 +1553,7 @@ void EnvelopeKeyExecute()
 
         voiceData[0x24] &= 0xFFFFFC24;
         voiceData += 0x30;
-        if ((int*)((unsigned int*)p_VoiceData + 0xC00) <= voiceData) {
+        if ((int*)(p_VoiceData + 0x40) <= voiceData) {
             return;
         }
     }

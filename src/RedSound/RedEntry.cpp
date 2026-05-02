@@ -359,8 +359,8 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		}
 	} else if ((waveNo >= 10) && (waveNo < 70)) {
 		waveHead->m_loadSize += 0x27FFF;
-		int blocks = waveHead->m_loadSize / 0x28000 + (waveHead->m_loadSize >> 0x1F);
-		blocks = blocks - (blocks >> 0x1F);
+		int blocks = waveHead->m_loadSize / 0x28000;
+		blocks += blocks >> 0x1F;
 		waveHead->m_loadSize = blocks * 0x28000;
 	} else if (((waveNo >= 0x154) && (waveNo < 0x17a)) || ((waveNo >= 0x17f) && (waveNo < 0x182)) ||
 	           (waveNo == 0x183)) {

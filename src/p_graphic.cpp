@@ -764,6 +764,9 @@ void CGraphicPcs::drawBar()
             y += 8;
         }
     }
+
+    PSMTX44Copy(CameraPcs.m_screenMatrix, ortho);
+    GXSetProjection(ortho, GX_PERSPECTIVE);
 }
 
 /*

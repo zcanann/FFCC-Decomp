@@ -503,7 +503,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 			transferSize = waveSize;
 		}
 
-		int dmaID = RedDmaEntry(0x8000, 0, (int)waveDataTop, waveAddress, transferSize, 0, 0);
+		int dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_WAVE_LOAD, 0, (int)waveDataTop, waveAddress, transferSize, 0, 0);
 		waveSize -= transferSize;
 		waveAddress += transferSize;
 		m_waveLoadSize = waveSize;

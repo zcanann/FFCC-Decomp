@@ -995,7 +995,7 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
     RedDmaRequest* nextEntry;
 
     interrupt = OSDisableInterrupts();
-    if ((flags & 0xffff7fff) != 0) {
+    if ((flags & REDSOUND_DMA_FLAG_QUEUE_MASK) != 0) {
         queuePtr = &p_DmaControlNow[0];
         queueBase = RedDriverMainDmaQueue();
     } else {
@@ -1005,7 +1005,7 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
     queueEntry = *queuePtr;
     entryID = GetMyEntryID();
     size = (unsigned int)(sizeBytes + REDSOUND_DMA_TRANSFER_ALIGN - 1) & REDSOUND_DMA_TRANSFER_ALIGN_MASK;
-    if ((m_DMAMode != 0) || ((flags & 0x8000) != 0)) {
+    if ((m_DMAMode != 0) || ((flags & REDSOUND_DMA_FLAG_CHUNKED_TRANSFER) != 0)) {
         queueEnd = queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
         do {
             chunkSize = size;

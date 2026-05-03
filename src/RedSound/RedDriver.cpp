@@ -556,13 +556,13 @@ void _SeBlockPlay(int* command)
  */
 void _SeSepPlay(int* command)
 {
-    int iVar1;
+    RedHistoryBANK* bank;
 
-    iVar1 = c_RedEntry.SetSeSepData((RedSeSepHEAD*)command[1]);
-    if (iVar1 != 0) {
+    bank = (RedHistoryBANK*)c_RedEntry.SetSeSepData((RedSeSepHEAD*)command[1]);
+    if (bank != 0) {
         m_SeSkipStep = command[4];
         int seID = command[0];
-        SeSepPlay(seID, *(int*)(iVar1 + 8), command[2], command[3]);
+        SeSepPlay(seID, bank->m_data, command[2], command[3]);
     }
 }
 

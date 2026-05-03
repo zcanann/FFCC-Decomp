@@ -683,24 +683,24 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		return;
 	}
 
-	int* music = (int*)p_SoundControlBuffer;
+	RedSoundCONTROL* music = p_SoundControlBuffer;
 	if (mode != 0) {
-		music += 0x24a;
+		music += REDSOUND_CONTROL_MUSIC_SKIP;
 	}
 
 	m_MusicSkipLine = mode;
-	((RedSoundCONTROL*)music)->m_musicId = musicId;
-	((RedSoundCONTROL*)music)->m_flags &= 0xfffeffff;
-	((RedSoundCONTROL*)music)->m_updateFlags = 0;
+	music->m_musicId = musicId;
+	music->m_flags &= 0xfffeffff;
+	music->m_updateFlags = 0;
 
 	if (m_CrossTime == 0) {
-		((RedSoundCONTROL*)music)->m_masterVolume = 0x1ff000;
-		((RedSoundCONTROL*)music)->m_masterVolumeDelta = 0;
+		music->m_masterVolume = 0x1ff000;
+		music->m_masterVolumeDelta = 0;
 	} else {
-		((RedSoundCONTROL*)music)->m_masterVolume = 0;
-		((RedSoundCONTROL*)music)->m_masterVolumeAdd = 0x1ff800;
-		((RedSoundCONTROL*)music)->m_masterVolumeAdd = ((RedSoundCONTROL*)music)->m_masterVolumeAdd / m_CrossTime;
-		((RedSoundCONTROL*)music)->m_masterVolumeDelta = m_CrossTime;
+		music->m_masterVolume = 0;
+		music->m_masterVolumeAdd = 0x1ff800;
+		music->m_masterVolumeAdd = music->m_masterVolumeAdd / m_CrossTime;
+		music->m_masterVolumeDelta = m_CrossTime;
 		m_CrossTime = 0;
 	}
 
@@ -719,7 +719,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		return;
 	}
 
-	*music = trackBase;
+	music->m_tracks = (RedTrackDATA*)trackBase;
 
 	if (musicHead->m_reverbKind != 0) {
 		unsigned int reverbKind = ((int)musicHead->m_reverbKind - 1U) & 7;
@@ -733,10 +733,10 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	}
 	p_ReverbDepth[0].m_step = 0;
 	p_ReverbDepth[0].m_count = 0;
-	((RedSoundCONTROL*)music)->m_waveNo = musicHead->m_waveNo;
+	music->m_waveNo = musicHead->m_waveNo;
 
 	unsigned char* current = (unsigned char*)musicHead + 0x20;
-	int* track = (int*)*music;
+	int* track = (int*)music->m_tracks;
 	int count = musicHead->m_trackCount;
 	char trackNo = 0;
 	while (count != 0) {

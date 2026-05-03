@@ -103,6 +103,8 @@ struct RedTickHistory {
 enum RedDriverBufferSize {
     REDSOUND_ZERO_BUFFER_SIZE = 0x1000,
     REDSOUND_THREAD_STACK_SIZE = 0x1000,
+    REDSOUND_WAVE_SETTING_TABLE_ALIGN = 0x40,
+    REDSOUND_WAVE_SETTING_TABLE_ALIGN_MASK = ~(REDSOUND_WAVE_SETTING_TABLE_ALIGN - 1),
     REDSOUND_MUSIC_REPLAY_POINT_COUNT = 0x100,
     REDSOUND_MUSIC_REPLAY_POINT_SIZE = sizeof(int) * REDSOUND_MUSIC_REPLAY_POINT_COUNT,
     REDSOUND_EXEC_COMMAND_COUNT = 0x100,
@@ -2280,11 +2282,11 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
 
         if ((waveHeader->m_signature[0] == REDSOUND_WAVE_SIGNATURE_0) &&
             (waveHeader->m_signature[1] == REDSOUND_WAVE_SIGNATURE_1)) {
-            int dataSize = waveHeader->m_tableCount * 4;
-            dataSize = (dataSize += 0x3f) & 0xffffffc0;
-            dataSize += waveHeader->m_toneCount * 0x60;
+            int dataSize = waveHeader->m_tableCount * REDSOUND_WAVE_TABLE_ENTRY_SIZE;
+            dataSize = (dataSize += REDSOUND_WAVE_SETTING_TABLE_ALIGN - 1) & REDSOUND_WAVE_SETTING_TABLE_ALIGN_MASK;
+            dataSize += waveHeader->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE;
             dataSize = waveHeader->m_waveSize + dataSize;
-            dataSize += 0x20;
+            dataSize += REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
             m_WaveSettingData.waveSize = dataSize;
         } else {
             m_WaveSettingData.waveSize = 0;

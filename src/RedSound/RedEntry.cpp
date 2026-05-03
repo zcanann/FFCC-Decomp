@@ -400,8 +400,8 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		int arAddress;
 		if ((historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + 0x400U)) &&
 		    ((arAddress = RedNewA(waveHead->m_loadSize, minOffset, maxOffset)) != 0)) {
-			int copySize = waveHead->m_toneCount * 0x60 + 0x20;
-			copySize += ((waveHead->m_tableCount * 4) + 0x1F) & 0xFFFFFFE0;
+			int copySize = ((waveHead->m_tableCount * 4) + 0x1F) & 0xFFFFFFE0;
+			copySize += waveHead->m_toneCount * 0x60 + 0x20;
 			void* copied = (void*)RedNew(copySize);
 			if (copied != 0) {
 				historyBank->m_data = (int)copied;

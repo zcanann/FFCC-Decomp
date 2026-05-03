@@ -392,7 +392,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 				historyBank += 1;
 			}
 		} else {
-			waveBankNo &= 0xF;
+			waveBankNo &= REDSOUND_WAVE_PRIMARY_BANK_MASK;
 			historyBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + waveBankNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE);
 			if (historyBank->m_size != 0) {
 				WaveDelete(historyBank);

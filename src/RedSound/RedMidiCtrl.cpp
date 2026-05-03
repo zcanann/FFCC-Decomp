@@ -1358,9 +1358,9 @@ void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 {
     RedVoiceDATA* voice;
 
-    ((int*)track)[0x35] = -1;
-    ((int*)track)[0x36] = -1;
-    memset((int*)track + 0x35, 0xffffffff, 0xc);
+    *(int*)&track->m_adsrAR = -1;
+    *(int*)&track->m_adsrSR = -1;
+    memset(&track->m_adsrAR, 0xffffffff, 0xc);
 
     voice = p_VoiceData;
     do {

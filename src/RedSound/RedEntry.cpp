@@ -933,14 +933,14 @@ int CRedEntry::SearchSeSepSequence(int seNo)
 	if (seNo == -1) {
 		do {
 			if (seSepBank->m_size != 0) {
-				return (reinterpret_cast<int>(seSepBank) - m_seSepBankBase) / 0x10;
+				return (reinterpret_cast<int>(seSepBank) - m_seSepBankBase) / REDSOUND_HISTORY_BANK_ENTRY_SIZE;
 			}
 			seSepBank += 1;
 		} while (seSepBank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE));
 	} else {
 		do {
 			if ((seSepBank->m_size != 0) && (seSepBank->m_id == seNo)) {
-				return (reinterpret_cast<int>(seSepBank) - m_seSepBankBase) / 0x10;
+				return (reinterpret_cast<int>(seSepBank) - m_seSepBankBase) / REDSOUND_HISTORY_BANK_ENTRY_SIZE;
 			}
 			seSepBank += 1;
 		} while (seSepBank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE));
@@ -1057,8 +1057,8 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 	if (result >= 0) {
 		RedDelete(seSepHead);
 		SeSepHistoryChoice(reinterpret_cast<RedHistoryBANK*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) +
-		                                                   result * 0x10));
-		result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + result * 0x10 + 8);
+		                                                   result * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
+		result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + result * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 8);
 	} else {
 		result = reinterpret_cast<int>(SeSepHeadAdd(seSepHead));
 		if (result == 0) {
@@ -1089,7 +1089,7 @@ int CRedEntry::ClearSeSepData(int seNo)
 	} else {
 		result = SearchSeSepSequence(seNo);
 		if (result >= 0) {
-			result = SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + result * 0x10));
+			result = SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + result * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
 		}
 	}
 
@@ -1154,7 +1154,7 @@ int CRedEntry::ReentrySeSepData(int seNo)
 {
 	seNo = SearchSeSepSequence(seNo);
 	if (seNo >= 0) {
-		SeSepHistoryChoice(reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + seNo * 0x10));
+		SeSepHistoryChoice(reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + seNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
 	}
 	return seNo;
 }
@@ -1334,7 +1334,7 @@ int CRedEntry::SearchMusicSequence(int musicNo)
 
 	do {
 		if ((musicBank->m_size != 0) && (musicBank->m_id == musicNo)) {
-			return (reinterpret_cast<int>(musicBank) - m_musicBankBase) / 0x10;
+			return (reinterpret_cast<int>(musicBank) - m_musicBankBase) / REDSOUND_HISTORY_BANK_ENTRY_SIZE;
 		}
 		musicBank += 1;
 	} while (musicBank < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + REDSOUND_MUSIC_BANK_SIZE));
@@ -1444,7 +1444,7 @@ int CRedEntry::ReentryMusicData(int musicNo)
 {
 	musicNo = SearchMusicSequence(musicNo);
 	if (musicNo >= 0) {
-		MusicHistoryChoice(reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + musicNo * 0x10));
+		MusicHistoryChoice(reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + musicNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
 	}
 	return musicNo;
 }
@@ -1476,18 +1476,18 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 		if (musicSeq == 0) {
 			musicSeq = SearchMusicSequence(musicNo);
 			if (musicSeq >= 0) {
-				if (*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * 0x10 + 4) == 0) {
+				if (*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4) == 0) {
 					MusicHistoryAdd();
-					*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * 0x10 + 4) = 1;
+					*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4) = 1;
 				}
 			}
 		}
 	} else {
 		musicSeq = SearchMusicSequence(musicNo);
 		if (musicSeq >= 0) {
-			if (*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * 0x10 + 4) != 0) {
-				MusicHistoryDelete(*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * 0x10 + 4));
-				*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * 0x10 + 4) = 0;
+			if (*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4) != 0) {
+				MusicHistoryDelete(*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4));
+				*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4) = 0;
 			}
 		}
 	}
@@ -1542,8 +1542,8 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 	if (result >= 0) {
 		RedDelete(musicHead);
 		MusicHistoryChoice(reinterpret_cast<RedHistoryBANK*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) +
-		                                                    result * 0x10));
-		result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + result * 0x10 + 8);
+		                                                    result * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
+		result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + result * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 8);
 	} else {
 		result = reinterpret_cast<int>(MusicHeadAdd(musicHead));
 		if (result == 0) {

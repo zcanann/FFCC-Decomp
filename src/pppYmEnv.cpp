@@ -37,6 +37,12 @@ void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicO
 }
 
 extern const float FLOAT_80331180;
+extern const float FLOAT_80331184;
+extern const float FLOAT_80331190;
+extern const float FLOAT_803311B0;
+extern const float FLOAT_803311B8;
+extern const double DOUBLE_803311C0;
+extern const float FLOAT_803311C8;
 
 struct _pppEnvStYmEnv {
     void* m_stagePtr;
@@ -271,11 +277,10 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     static const char s_display_list_alloc_error[] = "Error allocating display list (%d, %d)\n";
     static const char s_pppYmEnv_cpp[] = "pppYmEnv.cpp";
     static const char s_exiting[] = "Exiting";
-    const float kZero = 0.0f;
-    const float kOne = 1.0f;
-    const float kPi = 3.1415927f;
-    const float kHalfPi = 1.5707964f;
-    const float kNormalScale = 0.5f;
+    const float kZero = FLOAT_80331180;
+    const float kOne = FLOAT_80331184;
+    const float kHalfPi = FLOAT_803311B0;
+    const float kNormalScale = FLOAT_80331190;
 
     const unsigned int rings = detail;
     const int ringVertexCount = rings + 1;
@@ -312,7 +317,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
         GXNormal3f32(kNormalScale * x * z, kNormalScale * y * z, firstNormalZ);
 
         i++;
-        lon = (2.0f * kPi * (float)i) / (float)rings;
+        lon = (FLOAT_803311B8 * (float)i) / (float)rings;
     }
 
     for (int ring = 2; ring < (int)rings; ring++) {
@@ -326,7 +331,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
         const float upperNormalZ = kNormalScale * upperCos * upperCos;
         const float lowerNormalZ = kNormalScale * lowerCos * lowerCos;
 
-        if (fabs(upperCos) < 1.0e-6 || fabs(lowerCos) < 1.0e-6) {
+        if (fabs(upperCos) < DOUBLE_803311C0 || fabs(lowerCos) < DOUBLE_803311C0) {
             break;
         }
 
@@ -345,7 +350,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
             GXNormal3f32(kNormalScale * ux * upperCos, kNormalScale * uy * upperCos, upperNormalZ);
 
             i++;
-            lon = (2.0f * kPi * (float)i) / (float)rings;
+            lon = (FLOAT_803311C8 * (float)i) / (float)rings;
         }
     }
 

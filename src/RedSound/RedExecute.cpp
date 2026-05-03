@@ -721,7 +721,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         break;
     }
 
-    voiceData[0x24] |= 8;
+    voiceData[0x24] |= REDSOUND_VOICE_FLAGS_ADPCM_DIRTY;
 }
 
 /*
@@ -832,7 +832,7 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
     }
 
     SetVoiceVolumeMix((RedVoiceDATA*)voiceData, pan, voiceMix);
-    voiceData[0x24] |= 8;
+    voiceData[0x24] |= REDSOUND_VOICE_FLAGS_ADPCM_DIRTY;
 }
 
 /*

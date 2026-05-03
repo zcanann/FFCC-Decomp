@@ -85,6 +85,13 @@ enum RedDriverBufferSize {
     REDSOUND_MUSIC_NEXT_PLAY_BUFFER_SIZE = sizeof(RedMusicPlayCommand),
 };
 
+enum RedDriverThreadFlag {
+    REDSOUND_THREAD_FLAG_MAIN = 1,
+    REDSOUND_THREAD_FLAG_DMA = 2,
+    REDSOUND_THREAD_FLAG_WAVE_SETTING = 4,
+    REDSOUND_THREAD_FLAG_MUSIC_SKIP = 8,
+};
+
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 static int m_RedMasterTime;
 static volatile int m_SequencialID;
@@ -847,7 +854,7 @@ int _MainThread(void*)
     int iVar3;
     unsigned int uVar4;
 
-    m_ThreadExecute = m_ThreadExecute | 1;
+    m_ThreadExecute = m_ThreadExecute | REDSOUND_THREAD_FLAG_MAIN;
     while (m_ThreadControl != 0) {
         OSWaitSemaphore(&m_MainSemaphore);
         if (m_ThreadControl != 0) {
@@ -878,7 +885,7 @@ int _MainThread(void*)
             p_Tick->m_ticks[0] = iVar3 - iVar2;
         }
     }
-    m_ThreadExecute = m_ThreadExecute & ~1;
+    m_ThreadExecute = m_ThreadExecute & ~REDSOUND_THREAD_FLAG_MAIN;
     return 0;
 }
 
@@ -893,7 +900,7 @@ int _MainThread(void*)
  */
 int _WaveSettingThread(void* threadArg)
 {
-    m_ThreadExecute = m_ThreadExecute | 4;
+    m_ThreadExecute = m_ThreadExecute | REDSOUND_THREAD_FLAG_WAVE_SETTING;
     m_WaveSettingStatus = 0;
     while (m_ThreadControl != 0) {
         OSWaitSemaphore(&m_WaveSettingSemaphore);
@@ -907,7 +914,7 @@ int _WaveSettingThread(void* threadArg)
             m_WaveSettingStatus = 0;
         }
     }
-    m_ThreadExecute = m_ThreadExecute & ~4;
+    m_ThreadExecute = m_ThreadExecute & ~REDSOUND_THREAD_FLAG_WAVE_SETTING;
     return 0;
 }
 
@@ -1162,7 +1169,7 @@ void _DmaExecute()
  */
 int _DmaExecuteThread(void*)
 {
-    m_ThreadExecute |= 2;
+    m_ThreadExecute |= REDSOUND_THREAD_FLAG_DMA;
     m_DMAExecute = 0;
     m_DMAInThread = 0;
     while (m_ThreadControl != 0) {
@@ -1173,7 +1180,7 @@ int _DmaExecuteThread(void*)
         }
         m_DMAExecute = 0;
     }
-    m_ThreadExecute &= ~2;
+    m_ThreadExecute &= ~REDSOUND_THREAD_FLAG_DMA;
     return 0;
 }
 
@@ -1188,7 +1195,7 @@ int _DmaExecuteThread(void*)
  */
 int _MusicSkipThread(void*)
 {
-    m_ThreadExecute |= 8;
+    m_ThreadExecute |= REDSOUND_THREAD_FLAG_MUSIC_SKIP;
     m_MusicSkipComplete = 0;
     while (m_ThreadControl != 0) {
         OSWaitSemaphore(&m_MusicSkipSemaphore);
@@ -1198,7 +1205,7 @@ int _MusicSkipThread(void*)
         while (OSTryWaitSemaphore(&m_MusicSkipSemaphore) > 0) {
         }
     }
-    m_ThreadExecute &= ~8;
+    m_ThreadExecute &= ~REDSOUND_THREAD_FLAG_MUSIC_SKIP;
     return 0;
 }
 

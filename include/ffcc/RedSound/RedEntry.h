@@ -63,6 +63,13 @@ struct RedSeINFO
 	unsigned char m_sequence[1];
 };
 
+enum RedSeInfoLayout {
+	REDSOUND_SE_INFO_MULTI_FLAG = 0x80,
+	REDSOUND_SE_INFO_COUNT_MASK = 0x7F,
+	REDSOUND_SE_INFO_SEQUENCE_CONTINUE_FLAG = 0x80,
+	REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK = 0x7FFF,
+};
+
 struct RedSeBlockHEAD
 {
 	unsigned char m_unk00[0x0A];

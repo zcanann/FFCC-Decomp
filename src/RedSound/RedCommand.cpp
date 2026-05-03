@@ -325,14 +325,14 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	}
 
 	flag = info->m_flagsAndCount;
-	if ((flag & 0x80) != 0) {
+	if ((flag & REDSOUND_SE_INFO_MULTI_FLAG) != 0) {
 		isMulti = 1;
 	} else {
 		isMulti = 0;
 	}
 	seq = info->m_sequence;
 	attrMask = info->m_attrMask;
-	count = info->m_flagsAndCount & 0x7f;
+	count = info->m_flagsAndCount & REDSOUND_SE_INFO_COUNT_MASK;
 	current = seq + count * 2;
 	do {
 		remaining = count;
@@ -340,7 +340,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			remaining = 0;
 			do {
 				remaining = remaining + 1;
-				if ((seq[remaining * 2 + 1] & 0x80) == 0) {
+				if ((seq[remaining * 2 + 1] & REDSOUND_SE_INFO_SEQUENCE_CONTINUE_FLAG) == 0) {
 					break;
 				}
 			} while ((int)remaining < (int)count);
@@ -357,7 +357,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			track->m_waveBankData = (int)waveBase;
 			track->m_command = current;
 			current = current +
-			          (((unsigned int)seq[1] * 0x100 + (unsigned int)*seq) & 0x7fff);
+			          (((unsigned int)seq[1] * 0x100 + (unsigned int)*seq) & REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK);
 			deltaTime = (int)DeltaTimeSumup((unsigned char**)track);
 			track->m_deltaTime = deltaTime + 1;
 			if (m_SeSkipStep != 0) {
@@ -477,7 +477,7 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 				    (RedSeINFO*)((int)(entries + bankData->m_seCount) + ((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK));
 
 				if (((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
-					seInfo->m_flagsAndCount |= 0x80;
+					seInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
 				}
 				if (_SePlayStart(seInfo, seId, no, pan, volume) != 0) {
 					return seNo;
@@ -509,7 +509,7 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 		sepHead = reinterpret_cast<RedSeSepHEAD*>(sepBank->m_data);
 		sepInfo = reinterpret_cast<RedSeINFO*>((int)sepHead + 0x10);
 		if ((sepHead->m_sizeAndFlags & REDSOUND_SESEP_FLAGS_MASK) != 0) {
-			sepInfo->m_flagsAndCount |= 0x80;
+			sepInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
 		}
 		if (_SePlayStart(sepInfo, seId, sepId, pan, volume) != 0) {
 			c_RedEntry.SeSepHistoryManager(1, sepId);

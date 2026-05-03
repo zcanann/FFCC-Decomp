@@ -90,6 +90,12 @@ enum RedMidiSwingConst {
     REDSOUND_SWING_RANDOM_REVERSE_PHASE = 0x40,
 };
 
+enum RedMidiCommandConst {
+    REDSOUND_MIDI_DEFAULT_STEP_COUNT = 0x100,
+    REDSOUND_MIDI_PITCH_BEND_HIGH_SCALE = 0x80,
+    REDSOUND_MIDI_PITCH_BEND_CENTER = 0x2000,
+};
+
 RedMidiControlFunc p_MidiControl_Function[] = {
     __MidiCtrl_Stop,             __MidiCtrl_Sleep,           __MidiCtrl_WholeLoopStart,
     __MidiCtrl_WholeLoopEnd,     __MidiCtrl_LoopStart,       __MidiCtrl_LoopEnd,
@@ -751,7 +757,7 @@ void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_TempoDirect(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    control->m_tempo = ((u32)*track->m_command++) << 0xc;
+    control->m_tempo = ((u32)*track->m_command++) << REDSOUND_FIXED_SHIFT;
     control->m_tempoAdd = 0;
     control->m_tempoDelta = 0;
 }
@@ -795,7 +801,7 @@ void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
         *reverbDepth += 1;
         *reverbDepth <<= 8;
         *reverbDepth -= 1;
-        *reverbDepth <<= 0xc;
+        *reverbDepth <<= REDSOUND_FIXED_SHIFT;
     }
 
     reverbDepth[1] = 0;
@@ -818,7 +824,7 @@ void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
     unsigned int stepCount;
     int* reverbDepth;
 
-    stepCount = (*track->m_command != 0) ? *track->m_command : 0x100;
+    stepCount = (*track->m_command != 0) ? *track->m_command : REDSOUND_MIDI_DEFAULT_STEP_COUNT;
 
     targetDepth = (s8)*track->m_command++;
     if (targetDepth != 0) {
@@ -2305,7 +2311,8 @@ void _PitchBendCompute(RedTrackDATA* track, int bend)
  */
 void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int bend = (unsigned int)track->m_command[1] * 0x80 + ((unsigned int)track->m_command[0] - 0x2000);
+    int bend = (unsigned int)track->m_command[1] * REDSOUND_MIDI_PITCH_BEND_HIGH_SCALE +
+               ((unsigned int)track->m_command[0] - REDSOUND_MIDI_PITCH_BEND_CENTER);
 
     track->m_pitchBendRaw = bend;
     bend *= track->m_pitchBendRange;

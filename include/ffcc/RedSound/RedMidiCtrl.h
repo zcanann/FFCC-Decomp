@@ -173,6 +173,8 @@ struct RedSoundCONTROL {
 	short m_activeTrackCount;
 	unsigned char m_channelAlloc;
 	unsigned char m_trackCount;
+	signed char m_volumeScale;
+	unsigned char m_pad493;
 };
 
 typedef void (*RedMidiControlFunc)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);

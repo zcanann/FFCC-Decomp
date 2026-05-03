@@ -797,31 +797,31 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		}
 	}
 
-	((RedSoundCONTROL*)music)->m_skipFrames = 1;
-	((RedSoundCONTROL*)music)->m_channelAlloc = 0;
-	((RedSoundCONTROL*)music)->m_keySignature = 0;
-	((RedSoundCONTROL*)music)->m_keySignatureData = t_KeySignatureData + 0xb;
-	((RedSoundCONTROL*)music)->m_trackCount = musicHead->m_trackCount;
-	((RedSoundCONTROL*)music)->m_activeTrackCount = (short)musicHead->m_trackCount;
-	*(unsigned char*)((char*)music + 0x492) = (unsigned char)(musicHead->m_flags & 0x7f);
-	((RedSoundCONTROL*)music)->m_tickCounter = 1;
-	((RedSoundCONTROL*)music)->m_tempo = 0x1000;
-	((RedSoundCONTROL*)music)->m_ticksPerMeasure = 10000;
-	((RedSoundCONTROL*)music)->m_tick = -1;
-	((RedSoundCONTROL*)music)->m_measure = 1;
-	((RedSoundCONTROL*)music)->m_elapsedTime = 0;
+	music->m_skipFrames = 1;
+	music->m_channelAlloc = 0;
+	music->m_keySignature = 0;
+	music->m_keySignatureData = t_KeySignatureData + 0xb;
+	music->m_trackCount = musicHead->m_trackCount;
+	music->m_activeTrackCount = (short)musicHead->m_trackCount;
+	music->m_volumeScale = (unsigned char)(musicHead->m_flags & 0x7f);
+	music->m_tickCounter = 1;
+	music->m_tempo = 0x1000;
+	music->m_ticksPerMeasure = 10000;
+	music->m_tick = -1;
+	music->m_measure = 1;
+	music->m_elapsedTime = 0;
 	if (volume != 0) {
 		volume = (((volume + 1) * 4) - 1) * 0x1000;
 	}
-	((RedSoundCONTROL*)music)->m_volume = volume;
-	((RedSoundCONTROL*)music)->m_volumeDelta = 0;
-	((RedSoundCONTROL*)music)->m_updateFlags = 0;
-	((RedSoundCONTROL*)music)->m_flags &= 0x10;
+	music->m_volume = volume;
+	music->m_volumeDelta = 0;
+	music->m_updateFlags = 0;
+	music->m_flags &= 0x10;
 	if ((musicHead->m_playFlags & 0x40000) != 0) {
-		((RedSoundCONTROL*)music)->m_flags |= 0x40000;
+		music->m_flags |= 0x40000;
 	}
 
-	c_RedEntry.WaveHistoryManager(1, ((RedSoundCONTROL*)music)->m_waveNo);
+	c_RedEntry.WaveHistoryManager(1, music->m_waveNo);
 	c_RedEntry.MusicHistoryManager(1, musicId);
 	if (m_MusicSkipLine != 0) {
 		OSSignalSemaphore(&m_MusicSkipSemaphore);

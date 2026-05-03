@@ -1651,7 +1651,7 @@ void _KeyOnControl()
                                       (u32)(((RedTrackDATA*)*voice)->m_trackNo * 0x8000000 + idxSign) >> 0x1B) -
                                      idxSign) &
                                     m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
-                            volume = ((*(s8*)((u8*)p_SoundControlBuffer + 0x492) + 1) * (((int*)((u32*)p_SoundControlBuffer)[7])[0] >> 0xC)) >> 7;
+                            volume = ((p_SoundControlBuffer->m_volumeScale + 1) * (((int*)((u32*)p_SoundControlBuffer)[7])[0] >> 0xC)) >> 7;
                             if (((u32*)p_SoundControlBuffer)[0x117] != 0) {
                                 volume = (volume * (((int*)((u32*)p_SoundControlBuffer)[0x115])[0] >> 0xC)) >> 9;
                             }

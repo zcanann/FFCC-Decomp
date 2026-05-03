@@ -801,7 +801,8 @@ void CRedEntry::DisplayWaveInfo()
 				if (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE)) {
 					if (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_HISTORY_BANK_OFFSET)) {
 						unsigned int index = reinterpret_cast<unsigned int>(history) - (unsigned int)m_waveBankBase;
-						OSReport(s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53, sRedEntryLogPrefix, (int)(index >> 4),
+						OSReport(s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53, sRedEntryLogPrefix,
+						         (int)(index / REDSOUND_HISTORY_BANK_ENTRY_SIZE),
 						         (int)((RedWaveHeadWD*)history->m_data)->m_waveNo, ((RedWaveHeadWD*)history->m_data)->m_aramAddress, bank->m_size,
 						         freeSize, history->m_historyNo);
 						fflush(__files + 1);
@@ -826,7 +827,7 @@ void CRedEntry::DisplayWaveInfo()
 				aBufferAddress = bank->m_address + bank->m_size;
 			}
 			bank++;
-		} while (bank < aBankAddress + 0x400);
+		} while (bank < aBankAddress + REDSOUND_MEMORY_BANK_BLOCK_COUNT);
 
         int aBase = c_RedMemory.GetABufferAddress();
         int aSize = c_RedMemory.GetABufferSize();

@@ -287,8 +287,8 @@ void StreamStop(int streamID)
  */
 int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volume)
 {
-	int amemSize;
-	int arOffset;
+	u32 amemSize;
+	u32 arOffset;
 	int pitch;
 	int iVar2;
 	int sampleOffset;
@@ -316,10 +316,9 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 
 	if ((streamData->m_track != 0) && (streamData->m_buffer != 0) && (streamData->m_aramBuffer != 0)) {
 		sampleOffset = 0x1000;
-		*(short*)((int)streamHeader + 0x42) = (short)*(char*)((int)streamHeader + sampleOffset);
-		*(unsigned short*)((int)streamHeader + 0x46) = 0;
-		*(unsigned short*)((int)streamHeader + 0x44) = 0;
 		headerData = (u8*)streamHeader + 0x20;
+		*(short*)((int)streamHeader + 0x42) = (short)*(char*)((int)streamHeader + sampleOffset);
+		*(unsigned short*)((int)streamHeader + 0x44) = *(unsigned short*)((int)streamHeader + 0x46) = 0;
 		if (streamData->m_header.m_channelCount == 2) {
 			if (streamData->m_header.m_loopStart < 0) {
 				sampleOffset += 0x1000;
@@ -327,8 +326,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 				sampleOffset += 8;
 			}
 			*(short*)(headerData + 0x50) = (short)*(char*)((int)streamHeader + sampleOffset);
-			*(unsigned short*)(headerData + 0x54) = 0;
-			*(unsigned short*)(headerData + 0x52) = 0;
+			*(unsigned short*)(headerData + 0x52) = *(unsigned short*)(headerData + 0x54) = 0;
 		}
 
 		streamData->m_streamId = streamID;

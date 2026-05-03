@@ -204,7 +204,7 @@ u8 GetRandomData()
  * JP Address: TODO
  * JP Size: TODO
  */
-int PitchCompute(int param_1, int param_2, int param_3, int param_4)
+int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
 {
     int value;
     int pitch;
@@ -212,7 +212,7 @@ int PitchCompute(int param_1, int param_2, int param_3, int param_4)
     int noteBand;
 
     octaveAdjust = 0;
-    pitch = param_2 + (param_3 >> 16) + (param_1 >> REDSOUND_FIXED_SHIFT);
+    pitch = pitchOffset + (wavePitch >> 16) + (basePitch >> REDSOUND_FIXED_SHIFT);
     while (pitch < 0) {
         pitch += REDSOUND_PITCH_OCTAVE_UNITS;
         octaveAdjust -= 1;
@@ -224,11 +224,11 @@ int PitchCompute(int param_1, int param_2, int param_3, int param_4)
                   t_FinePitch[pitch & REDSOUND_PITCH_FINE_MASK]) >>
         REDSOUND_FIXED_SHIFT;
 
-    if (param_4 != 0) {
-        if (param_4 > 0) {
-            value = value + ((int)(value * (param_4 + 1)) >> 7);
+    if (fineTune != 0) {
+        if (fineTune > 0) {
+            value = value + ((int)(value * (fineTune + 1)) >> 7);
         } else {
-            value = (int)(value * (param_4 & 0xFF)) >> 8;
+            value = (int)(value * (fineTune & REDSOUND_PITCH_FINE_MASK)) >> 8;
         }
     }
 

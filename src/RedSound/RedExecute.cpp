@@ -1130,29 +1130,37 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         memcpy(voiceData + REDSOUND_VOICE_ADSR_TIME_WORD,
                (void*)(voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] + REDSOUND_WAVE_ADSR_OFFSET),
                REDSOUND_TRACK_ADSR_SIZE);
-        if (trackS8[0xdc] != -1) {
-            ((u8*)voiceData)[REDSOUND_VOICE_ADSR_LEVEL_ATTACK_OFFSET] = trackS8[0xdc];
+        if (trackS8[REDSOUND_TRACK_ADSR_LEVEL_ATTACK_OFFSET] != -1) {
+            ((u8*)voiceData)[REDSOUND_VOICE_ADSR_LEVEL_ATTACK_OFFSET] =
+                trackS8[REDSOUND_TRACK_ADSR_LEVEL_ATTACK_OFFSET];
         }
-        if (trackS16[0x6a] != -1) {
-            ((s16*)voiceData)[REDSOUND_VOICE_ADSR_TIME_ATTACK_HALFWORD] = trackS16[0x6a];
+        if (trackS16[REDSOUND_TRACK_ADSR_TIME_ATTACK_HALFWORD] != -1) {
+            ((s16*)voiceData)[REDSOUND_VOICE_ADSR_TIME_ATTACK_HALFWORD] =
+                trackS16[REDSOUND_TRACK_ADSR_TIME_ATTACK_HALFWORD];
         }
-        if (trackS8[0xdd] != -1) {
-            ((u8*)voiceData)[REDSOUND_VOICE_ADSR_LEVEL_DECAY_OFFSET] = trackS8[0xdd];
+        if (trackS8[REDSOUND_TRACK_ADSR_LEVEL_DECAY_OFFSET] != -1) {
+            ((u8*)voiceData)[REDSOUND_VOICE_ADSR_LEVEL_DECAY_OFFSET] =
+                trackS8[REDSOUND_TRACK_ADSR_LEVEL_DECAY_OFFSET];
         }
-        if (trackS16[0x6b] != -1) {
-            ((s16*)voiceData)[REDSOUND_VOICE_ADSR_TIME_DECAY_HALFWORD] = trackS16[0x6b];
+        if (trackS16[REDSOUND_TRACK_ADSR_TIME_DECAY_HALFWORD] != -1) {
+            ((s16*)voiceData)[REDSOUND_VOICE_ADSR_TIME_DECAY_HALFWORD] =
+                trackS16[REDSOUND_TRACK_ADSR_TIME_DECAY_HALFWORD];
         }
-        if (trackS8[0xde] != -1) {
-            ((u8*)voiceData)[REDSOUND_VOICE_ADSR_LEVEL_SUSTAIN_OFFSET] = trackS8[0xde];
+        if (trackS8[REDSOUND_TRACK_ADSR_LEVEL_SUSTAIN_OFFSET] != -1) {
+            ((u8*)voiceData)[REDSOUND_VOICE_ADSR_LEVEL_SUSTAIN_OFFSET] =
+                trackS8[REDSOUND_TRACK_ADSR_LEVEL_SUSTAIN_OFFSET];
         }
-        if (trackS16[0x6c] != -1) {
-            ((s16*)voiceData)[REDSOUND_VOICE_ADSR_TIME_SUSTAIN_HALFWORD] = trackS16[0x6c];
+        if (trackS16[REDSOUND_TRACK_ADSR_TIME_SUSTAIN_HALFWORD] != -1) {
+            ((s16*)voiceData)[REDSOUND_VOICE_ADSR_TIME_SUSTAIN_HALFWORD] =
+                trackS16[REDSOUND_TRACK_ADSR_TIME_SUSTAIN_HALFWORD];
         }
-        if (trackS8[0xdf] != -1) {
-            ((u8*)voiceData)[REDSOUND_VOICE_ADSR_LEVEL_RELEASE_OFFSET] = trackS8[0xdf];
+        if (trackS8[REDSOUND_TRACK_ADSR_LEVEL_RELEASE_OFFSET] != -1) {
+            ((u8*)voiceData)[REDSOUND_VOICE_ADSR_LEVEL_RELEASE_OFFSET] =
+                trackS8[REDSOUND_TRACK_ADSR_LEVEL_RELEASE_OFFSET];
         }
-        if (trackS16[0x6d] != -1) {
-            ((s16*)voiceData)[REDSOUND_VOICE_ADSR_TIME_RELEASE_HALFWORD] = trackS16[0x6d];
+        if (trackS16[REDSOUND_TRACK_ADSR_TIME_RELEASE_HALFWORD] != -1) {
+            ((s16*)voiceData)[REDSOUND_VOICE_ADSR_TIME_RELEASE_HALFWORD] =
+                trackS16[REDSOUND_TRACK_ADSR_TIME_RELEASE_HALFWORD];
         }
         if (((unsigned int)voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
             u16 random = GetRandomData();

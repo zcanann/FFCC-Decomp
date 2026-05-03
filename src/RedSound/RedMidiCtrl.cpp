@@ -539,9 +539,9 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
                 if (((unsigned int)voice->m_track >= (u32)control->m_tracks) &&
                     ((unsigned int)voice->m_track <
                      (u32)control->m_tracks + (unsigned int)control->m_trackCount * REDSOUND_TRACK_SIZE)) {
-                    ((unsigned int*)voice)[0x25] &= REDSOUND_VOICE_SWITCH_CLEAR_SUSTAIN_PAUSE_MASK;
-                    ((unsigned int*)voice)[0x24] &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-                    ((unsigned int*)voice)[0x24] |= REDSOUND_VOICE_FLAGS_RELEASED;
+                    voice->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SUSTAIN_PAUSE_MASK;
+                    voice->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+                    voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
                     voice->m_track = 0;
                 }
                 voice++;

@@ -425,7 +425,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				track->m_seTickCounter = 1;
 				seTrack->m_track = track;
 				seTrack->m_stateFlags = REDSOUND_VOICE_STATE_PLAYING | REDSOUND_VOICE_STATE_SE;
-				seTrack->m_flags = 2;
+				seTrack->m_flags = REDSOUND_VOICE_FLAGS_RELEASED;
 				seTrack->m_volumeModPhase = 0;
 				seTrack->m_pitchModPhase = 0;
 				seTrack->m_updateFlags = 0;

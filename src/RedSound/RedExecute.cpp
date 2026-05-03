@@ -2508,7 +2508,7 @@ int _SeMidiNoteExecute(
 {
     int* track = (int*)trackData;
     do {
-        if (((u32)*track != 0) && ((((RedTrackDATA*)track)->m_voiceSwitch & 8) == 0)) {
+        if (((u32)*track != 0) && ((((RedTrackDATA*)track)->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAUSE) == 0)) {
             ((RedTrackDATA*)track)->m_seTickCounter += (s16)(tickStep * -0x78);
             while (((RedTrackDATA*)track)->m_seTickCounter < 1) {
                 int step = frames;

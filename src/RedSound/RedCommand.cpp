@@ -655,12 +655,12 @@ void SePause(int seId, int pause)
 					voice->m_targetPitch = 0;
 					voice->m_flags |= REDSOUND_VOICE_FLAGS_PAUSE_DIRTY;
 				}
-				track->m_voiceSwitch |= 8;
-				voice->m_voiceSwitch |= 8;
+				track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAUSE;
+				voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAUSE;
 			} else {
 				voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_ALL;
-				track->m_voiceSwitch &= 0xfffffff7;
-				voice->m_voiceSwitch &= 0xfffffff7;
+				track->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_PAUSE_MASK;
+				voice->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_PAUSE_MASK;
 			}
 		}
 		track++;

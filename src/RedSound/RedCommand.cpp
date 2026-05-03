@@ -838,13 +838,13 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
  * JP Address: TODO
  * JP Size: TODO
  */
-int MusicStop(int seId)
+int MusicStop(int musicId)
 {
 	RedSoundCONTROL* music = p_SoundControlBuffer;
 
 	do {
-		if ((seId == -1) || ((music->m_musicId >= 0) && (music->m_musicId == seId))) {
-			unsigned int musicId = music->m_musicId;
+		if ((musicId == -1) || ((music->m_musicId >= 0) && (music->m_musicId == musicId))) {
+			unsigned int stoppedMusicId = music->m_musicId;
 			music->m_updateFlags = 0;
 			music->m_musicId = -1;
 			if (music->m_activeTrackCount != 0) {
@@ -863,21 +863,21 @@ int MusicStop(int seId)
 					seTrack++;
 				} while (seTrack < (RedVoiceDATA*)p_VoiceData + REDSOUND_VOICE_COUNT);
 
-				int* track = (int*)music->m_tracks;
+				RedTrackDATA* track = music->m_tracks;
 				do {
-					if ((u32)*track != 0) {
-						KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, (RedTrackDATA*)track);
-						((RedTrackDATA*)track)->m_command = 0;
+					if ((u32)track->m_command != 0) {
+						KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, track);
+						track->m_command = 0;
 					}
-					track += REDSOUND_TRACK_SIZE / sizeof(*track);
-				} while (track < (int*)((u32)music->m_tracks + (unsigned int)music->m_trackCount * REDSOUND_TRACK_SIZE));
+					track++;
+				} while (track < music->m_tracks + music->m_trackCount);
 
 				music->m_activeTrackCount = 0;
 				music->m_trackCount = 0;
 				RedDelete(music->m_tracks);
 				music->m_tracks = 0;
 				c_RedEntry.WaveHistoryManager(0, music->m_waveNo);
-				c_RedEntry.MusicHistoryManager(0, musicId);
+				c_RedEntry.MusicHistoryManager(0, stoppedMusicId);
 			}
 		}
 		music++;
@@ -892,7 +892,7 @@ int MusicStop(int seId)
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks = 0;
 	}
 
-	return seId;
+	return musicId;
 }
 
 /*

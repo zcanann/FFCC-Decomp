@@ -26,9 +26,15 @@ struct RedWaveSettingState {
     int waveSize;
 };
 
+enum RedDriverDmaLayoutSize {
+    REDSOUND_DMA_QUEUE_WORD_COUNT = 0x380,
+    REDSOUND_DMA_CONTROL_WORD_COUNT = REDSOUND_DMA_QUEUE_WORD_COUNT * 2,
+    REDSOUND_DMA_QUEUE_ENTRY_COUNT = 0x80,
+};
+
 struct RedDriverSyncState {
-    int m_dmaQueue[0x380];
-    int m_streamDmaQueue[0x380];
+    int m_dmaQueue[REDSOUND_DMA_QUEUE_WORD_COUNT];
+    int m_streamDmaQueue[REDSOUND_DMA_QUEUE_WORD_COUNT];
     OSThread m_mainThread;
     OSSemaphore m_mainSemaphore;
     u8 m_pad2240[0x2240 - 0x1F18 - sizeof(OSSemaphore)];
@@ -123,7 +129,7 @@ u8* volatile p_MusicSkipThreadStack;
 volatile int m_MusicSkipComplete;
 RedReverbDepth* volatile p_ReverbDepth;
 int m_Mute[2];
-static int m_DmaControl[0x700];
+static int m_DmaControl[REDSOUND_DMA_CONTROL_WORD_COUNT];
 static OSThread m_MainThread;
 static OSSemaphore m_MainSemaphore;
 static OSThread m_WaveSettingThread;
@@ -152,12 +158,12 @@ static inline RedDmaRequest* RedDriverMainDmaQueue()
 
 static inline RedDmaRequest* RedDriverStreamDmaQueue()
 {
-    return reinterpret_cast<RedDmaRequest*>(m_DmaControl + 0x380);
+    return reinterpret_cast<RedDmaRequest*>(m_DmaControl + REDSOUND_DMA_QUEUE_WORD_COUNT);
 }
 
 static inline RedDmaRequest* RedDriverStreamDmaQueueEnd()
 {
-    return reinterpret_cast<RedDmaRequest*>(m_DmaControl + 0x700);
+    return reinterpret_cast<RedDmaRequest*>(m_DmaControl + REDSOUND_DMA_CONTROL_WORD_COUNT);
 }
 
 static inline OSThread& RedDriverMainThread()
@@ -985,7 +991,7 @@ int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5,
     entryID = GetMyEntryID();
     size = (unsigned int)(param_5 + 0x1f) & ~0x1f;
     if ((m_DMAMode != 0) || ((param_1 & 0x8000) != 0)) {
-        queueEnd = queueBase + 0x80;
+        queueEnd = queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
         do {
             chunkSize = size;
             if ((int)size > 0x40000) {
@@ -1013,7 +1019,7 @@ int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5,
         *queuePtr = queueEntry;
     } else {
         nextEntry = queueEntry + 1;
-        queueEnd = queueBase + 0x80;
+        queueEnd = queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
         queueEntry->m_id = entryID;
         queueEntry->m_direction = param_2;
         queueEntry->m_mainMemory = param_3;
@@ -1114,7 +1120,7 @@ void _DmaExecute()
         }
         piVar8 = piVar7 + 1;
         m_DMAInThread = 5;
-        if (piVar4 + 0x80 <= piVar7 + 1) {
+        if (piVar4 + REDSOUND_DMA_QUEUE_ENTRY_COUNT <= piVar7 + 1) {
             piVar8 = piVar4;
         }
         *ppiVar5 = piVar8;

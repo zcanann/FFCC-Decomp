@@ -424,7 +424,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				track->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_DIRECT_MASK;
 				track->m_seTickCounter = 1;
 				seTrack->m_track = track;
-				seTrack->m_stateFlags = 5;
+				seTrack->m_stateFlags = REDSOUND_VOICE_STATE_PLAYING | REDSOUND_VOICE_STATE_SE;
 				seTrack->m_flags = 2;
 				seTrack->m_volumeModPhase = 0;
 				seTrack->m_pitchModPhase = 0;
@@ -856,7 +856,7 @@ int MusicStop(int seId)
 						seTrack->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SUSTAIN_PAUSE_MASK;
 						seTrack->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 						seTrack->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-						seTrack->m_stateFlags &= ~4;
+						seTrack->m_stateFlags &= ~REDSOUND_VOICE_STATE_SE;
 						seTrack->m_track = 0;
 						seTrack->m_active = 0;
 					}

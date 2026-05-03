@@ -1687,7 +1687,7 @@ int CRedDriver::SetSeSepData(void* seSepData)
     header = (RedSeSepHEAD*)seSepData;
     if (((((header->m_signature[0] == 'S') && (header->m_signature[1] == 'e')) && (header->m_signature[2] == 'S')) &&
         ((header->m_signature[3] == 'e' && (header->m_signature[4] == 'p'))))) {
-        headerSize = header->m_sizeAndFlags & 0x7fffffff;
+        headerSize = header->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
             memcpy(copiedHeader, header, headerSize);

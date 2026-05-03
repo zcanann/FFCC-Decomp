@@ -89,6 +89,13 @@ struct RedMusicPlayCommand {
     int m_pad;
 };
 
+enum RedMusicCommandWord {
+    REDSOUND_MUSIC_COMMAND_ID = 0,
+    REDSOUND_MUSIC_COMMAND_VOLUME = 1,
+    REDSOUND_MUSIC_COMMAND_MODE = 2,
+    REDSOUND_MUSIC_COMMAND_FADE_TIME = 2,
+};
+
 struct RedTickHistory {
     int m_ticks[100];
 };
@@ -345,27 +352,27 @@ void _MusicPlaySequence(int* command)
     int srcBuffer;
 
     srcBuffer = (int)p_SoundControlBuffer;
-    if ((*command == *(int*)(srcBuffer + 0x470)) ||
-        (*command == *(int*)(srcBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470)) ||
-        (*command == *(int*)(srcBuffer + REDSOUND_CONTROL_SKIP_OFFSET + 0x470))) {
+    if ((command[REDSOUND_MUSIC_COMMAND_ID] == *(int*)(srcBuffer + 0x470)) ||
+        (command[REDSOUND_MUSIC_COMMAND_ID] == *(int*)(srcBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470)) ||
+        (command[REDSOUND_MUSIC_COMMAND_ID] == *(int*)(srcBuffer + REDSOUND_CONTROL_SKIP_OFFSET + 0x470))) {
         return;
     }
-    if (c_RedEntry.SearchMusicSequence(*command) >= 0) {
-        iVar1 = command[2];
+    if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
+        iVar1 = command[REDSOUND_MUSIC_COMMAND_MODE];
         if (*(int*)(srcBuffer + 0x470) != -1) {
             if (*(int*)(srcBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470) != -1) {
                 MusicStop(*(int*)(srcBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470));
             }
             if (iVar1 == 0) {
-                iVar1 = p_MusicReplayPoint[*command];
-                p_MusicReplayPoint[*command] = 0;
+                iVar1 = p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]];
+                p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]] = 0;
             }
             if (iVar1 == 0) {
                 memcpy((void*)(srcBuffer + REDSOUND_CONTROL_SIZE), (void*)srcBuffer, REDSOUND_CONTROL_SIZE);
                 *(int*)(srcBuffer + 0x470) = -1;
             }
         }
-        MusicPlay(*command, command[1], iVar1);
+        MusicPlay(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME], iVar1);
     }
 }
 
@@ -383,26 +390,28 @@ void _MusicCrossPlaySequence(int* command)
     int iVar1;
     void* pvVar2;
     
-    command[2] = command[2] * REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
-    command[2] = command[2] / REDSOUND_FRAMES_PER_SECOND;
-    if (command[2] == 0) {
-        command[2] = command[2] + 1;
+    command[REDSOUND_MUSIC_COMMAND_FADE_TIME] =
+        command[REDSOUND_MUSIC_COMMAND_FADE_TIME] * REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
+    command[REDSOUND_MUSIC_COMMAND_FADE_TIME] =
+        command[REDSOUND_MUSIC_COMMAND_FADE_TIME] / REDSOUND_FRAMES_PER_SECOND;
+    if (command[REDSOUND_MUSIC_COMMAND_FADE_TIME] == 0) {
+        command[REDSOUND_MUSIC_COMMAND_FADE_TIME] = command[REDSOUND_MUSIC_COMMAND_FADE_TIME] + 1;
     }
     pvVar2 = p_SoundControlBuffer;
-    if ((*command == *(int*)((int)pvVar2 + REDSOUND_CONTROL_MUSIC_ID_OFFSET)) ||
-        (*command == *(int*)((int)pvVar2 + REDSOUND_CONTROL_SKIP_OFFSET + REDSOUND_CONTROL_MUSIC_ID_OFFSET))) {
+    if ((command[REDSOUND_MUSIC_COMMAND_ID] == *(int*)((int)pvVar2 + REDSOUND_CONTROL_MUSIC_ID_OFFSET)) ||
+        (command[REDSOUND_MUSIC_COMMAND_ID] == *(int*)((int)pvVar2 + REDSOUND_CONTROL_SKIP_OFFSET + REDSOUND_CONTROL_MUSIC_ID_OFFSET))) {
         return;
     }
-    if (*command == *(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MUSIC_ID_OFFSET)) {
+    if (command[REDSOUND_MUSIC_COMMAND_ID] == *(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MUSIC_ID_OFFSET)) {
         *(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_ADD_OFFSET) =
-            -*(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_OFFSET) / command[2];
-        *(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_DELTA_OFFSET) = command[2];
+            -*(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_OFFSET) / command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+        *(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_DELTA_OFFSET) = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
         pvVar2 = p_SoundControlBuffer;
         *(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MASTER_VOLUME_ADD_OFFSET) =
              (REDSOUND_MASTER_VOLUME_FULL_FIXED_HALF -
               *(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MASTER_VOLUME_OFFSET)) /
-             command[2];
-        *(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MASTER_VOLUME_DELTA_OFFSET) = command[2];
+             command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+        *(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MASTER_VOLUME_DELTA_OFFSET) = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
         pvVar2 = (void*)RedNew(REDSOUND_CONTROL_SIZE);
         memcpy(pvVar2, (void*)((int)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET), REDSOUND_CONTROL_SIZE);
         memcpy((void*)((int)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET), p_SoundControlBuffer,
@@ -410,24 +419,24 @@ void _MusicCrossPlaySequence(int* command)
         memcpy(p_SoundControlBuffer, pvVar2, REDSOUND_CONTROL_SIZE);
         RedDelete(pvVar2);
     } else {
-        if (c_RedEntry.SearchMusicSequence(*command) >= 0) {
-            m_CrossTime = command[2];
+        if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
+            m_CrossTime = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
             iVar1 = 0;
             if (*(int*)((int)pvVar2 + REDSOUND_CONTROL_MUSIC_ID_OFFSET) != -1) {
                 if (*(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MUSIC_ID_OFFSET) != -1) {
                     MusicStop(*(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MUSIC_ID_OFFSET));
                 }
                 *(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_ADD_OFFSET) =
-                    -*(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_OFFSET) / command[2];
-                *(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_DELTA_OFFSET) = command[2];
-                iVar1 = p_MusicReplayPoint[*command];
-                p_MusicReplayPoint[*command] = 0;
+                    -*(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_OFFSET) / command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+                *(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_DELTA_OFFSET) = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+                iVar1 = p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]];
+                p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]] = 0;
                 if (iVar1 == 0) {
                     memcpy((void*)((int)pvVar2 + REDSOUND_CONTROL_SIZE), pvVar2, REDSOUND_CONTROL_SIZE);
                     *(int*)((int)pvVar2 + REDSOUND_CONTROL_MUSIC_ID_OFFSET) = 0xffffffff;
                 }
             }
-            MusicPlay(*command, command[1], iVar1);
+            MusicPlay(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME], iVar1);
         }
     }
 }
@@ -442,15 +451,15 @@ void _MusicNextPlaySequence(int* command)
     RedSoundCONTROL* soundControl;
 
     soundControl = p_SoundControlBuffer;
-    if ((*command == soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
-        (*command == soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) ||
-        (*command == soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
+    if ((command[REDSOUND_MUSIC_COMMAND_ID] == soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
+        (command[REDSOUND_MUSIC_COMMAND_ID] == soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) ||
+        (command[REDSOUND_MUSIC_COMMAND_ID] == soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
         return;
     }
-    if (c_RedEntry.SearchMusicSequence(*command) >= 0) {
-        p_MusicNextPlay->m_musicId = *command;
-        p_MusicNextPlay->m_volume = command[1];
-        p_MusicNextPlay->m_mode = command[2];
+    if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
+        p_MusicNextPlay->m_musicId = command[REDSOUND_MUSIC_COMMAND_ID];
+        p_MusicNextPlay->m_volume = command[REDSOUND_MUSIC_COMMAND_VOLUME];
+        p_MusicNextPlay->m_mode = command[REDSOUND_MUSIC_COMMAND_MODE];
     }
 }
 

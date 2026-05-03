@@ -1018,7 +1018,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
                        &trackData[0x44]);
     }
 
-    voiceData[6] = *(int*)param_3;
+    voiceData[REDSOUND_VOICE_NOTE_WORD] = *(int*)param_3;
     voiceData[REDSOUND_VOICE_TRACK_VOLUME_WORD] = (int)((u8*)param_1 + REDSOUND_TRACK_VOLUME_OFFSET);
     voiceData[REDSOUND_VOICE_TRACK_EXPRESSION_WORD] =
         (int)((u8*)param_1 + REDSOUND_TRACK_EXPRESSION_OFFSET);
@@ -1030,7 +1030,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         memcpy(voiceData + REDSOUND_VOICE_ADSR_TIME_WORD, (void*)(trackData[7] + REDSOUND_WAVE_ADSR_OFFSET), REDSOUND_TRACK_ADSR_SIZE);
     }
 
-    voiceData[0x25] = trackData[0x3f];
+    voiceData[REDSOUND_VOICE_SWITCH_WORD] = trackData[REDSOUND_TRACK_VOICE_SWITCH_WORD_OFFSET];
     if (voiceData[1] != 0 && ((s8*)voiceData[1])[0x1c] != 0) {
         unsigned int maskBits;
         voiceData[0x25] &= REDSOUND_VOICE_SWITCH_CLEAR_MIX_MASK;

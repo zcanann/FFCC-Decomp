@@ -70,6 +70,10 @@ enum RedWaveFlag {
 	REDSOUND_WAVE_FLAG_USE_WAVE_KEY = 0x20000,
 };
 
+enum RedWaveLayoutOffset {
+	REDSOUND_WAVE_REVERB_MIX_OFFSET = 0x1C,
+};
+
 struct RedVoiceDATA {
 	RedTrackDATA* m_track;
 	RedWaveDATA* m_waveData;

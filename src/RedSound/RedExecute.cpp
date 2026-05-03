@@ -629,7 +629,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 {
     int iVar1;
     int iVar2;
-    int waveData;
+    RedTrackDATA* trackData;
     s16 leftPan;
     s16 rightPan;
     u16 uVar3;
@@ -637,12 +637,12 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
     u16* mixData;
     int* voiceData = (int*)voice;
 
-    waveData = voiceData[0];
-    if (waveData == 0) {
+    trackData = voice->m_track;
+    if (trackData == 0) {
         return;
     }
 
-    mixData = (u16*)(voiceData + 0x1a);
+    mixData = voice->m_axMix;
     memset(mixData, 0, 0x24);
 
     switch (m_SoundPlayMode) {
@@ -657,7 +657,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         }
 
         if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
-            u16 monoMix = (u16)((monoBase * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
+            u16 monoMix = (u16)((monoBase * ((trackData->m_reverbDepth >> 0xc) + 1)) >> 0xf);
             if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
                 *(u16*)(voiceData + 0x1c) = monoMix;
                 *(u16*)(voiceData + 0x1d) = monoMix;
@@ -674,13 +674,13 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         *(s16*)(voiceData + 0x1f) = (s16)((volume * t_PanningDataR[pan ^ REDSOUND_PAN_BYTE_MASK]) >> 8);
 
         if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_LEFT) != 0) {
-            *(s16*)(voiceData + 0x1c) = (s16)((int)((u32)*mixData * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
-            *(s16*)(voiceData + 0x22) = (s16)((int)((u32)*(u16*)(voiceData + 0x1e) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
+            *(s16*)(voiceData + 0x1c) = (s16)((int)((u32)*mixData * ((trackData->m_reverbDepth >> 0xc) + 1)) >> 0xf);
+            *(s16*)(voiceData + 0x22) = (s16)((int)((u32)*(u16*)(voiceData + 0x1e) * ((trackData->m_reverbDepth >> 0xc) + 1)) >> 0xf);
         }
 
         if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_RIGHT) != 0) {
-            *(s16*)(voiceData + 0x1d) = (s16)((int)((u32)*(u16*)(voiceData + 0x1b) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
-            *(s16*)(voiceData + 0x20) = (s16)((int)((u32)*(u16*)(voiceData + 0x1f) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
+            *(s16*)(voiceData + 0x1d) = (s16)((int)((u32)*(u16*)(voiceData + 0x1b) * ((trackData->m_reverbDepth >> 0xc) + 1)) >> 0xf);
+            *(s16*)(voiceData + 0x20) = (s16)((int)((u32)*(u16*)(voiceData + 0x1f) * ((trackData->m_reverbDepth >> 0xc) + 1)) >> 0xf);
         }
         break;
     default:
@@ -702,7 +702,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         }
 
         if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_LEFT) != 0) {
-            iVar1 = (leftMix * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
+            iVar1 = (leftMix * ((trackData->m_reverbDepth >> 0xc) + 1)) >> 0xf;
             if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
                 *(u16*)(voiceData + 0x1c) = (u16)iVar1;
             } else {
@@ -711,7 +711,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         }
 
         if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_RIGHT) != 0) {
-            iVar2 = (rightMix * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
+            iVar2 = (rightMix * ((trackData->m_reverbDepth >> 0xc) + 1)) >> 0xf;
             if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
                 *(u16*)(voiceData + 0x1d) = (u16)iVar2;
             } else {
@@ -721,7 +721,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         break;
     }
 
-    voiceData[0x24] |= REDSOUND_VOICE_FLAGS_ADPCM_DIRTY;
+    voice->m_flags |= REDSOUND_VOICE_FLAGS_ADPCM_DIRTY;
 }
 
 /*

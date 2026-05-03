@@ -103,6 +103,8 @@ enum RedMidiSwingConst {
 
 enum RedMidiCommandConst {
     REDSOUND_MIDI_DEFAULT_STEP_COUNT = 0x100,
+    REDSOUND_MIDI_DEFAULT_RATE_DIVISOR = 0x100,
+    REDSOUND_MIDI_RATE_FIXED_NUMERATOR = 0x100000,
     REDSOUND_MIDI_PITCH_BEND_HIGH_SCALE = 0x80,
     REDSOUND_MIDI_PITCH_BEND_CENTER = 0x2000,
 };
@@ -1807,11 +1809,11 @@ static void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, 
     if (track->m_command[1] != 0) {
         depth = (unsigned int)track->m_command[1];
     } else {
-        depth = 0x100;
+        depth = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
     }
 
     divisor = depth;
-    track->m_vibrateRate = 0x100000 / divisor;
+    track->m_vibrateRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
     track->m_vibrateFunc = (int)SwingEntryFunction[track->m_command[2] & 0xf];
     track->m_vibrateRateDelta = track->m_vibrateDepthDelta = 0;
     track->m_command += 3;
@@ -1819,7 +1821,7 @@ static void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, 
     entry = p_VoiceData;
     do {
         if (entry->m_track == track) {
-            divisor = 0x100;
+            divisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
             entry->m_pitchModDelay = track->m_vibrateDelay;
             if (track->m_vibrateRate >> REDSOUND_FIXED_SHIFT != 0) {
                 divisor /= track->m_vibrateRate >> REDSOUND_FIXED_SHIFT;
@@ -1900,10 +1902,10 @@ static void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 	if (*track->m_command != 0) {
 		rate = *track->m_command;
 	} else {
-		rate = 0x100;
+		rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
 	}
 	int divisor = rate;
-	track->m_vibrateRate = 0x100000 / divisor;
+	track->m_vibrateRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
 	track->m_vibrateRateDelta = 0;
 	track->m_command += 1;
 }
@@ -1931,11 +1933,11 @@ static void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
     if (*track->m_command != 0) {
         divisor = *track->m_command;
     } else {
-        divisor = 0x100;
+        divisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
     }
 
     rate = divisor;
-    rate = 0x100 / rate;
+    rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR / rate;
     ((int*)track)[0x1f] = DataAddCompute((int*)track + 0x1e, rate, trackDelta);
     *(short*)((int*)track + 0x23) = (short)trackDelta[0];
     track->m_command += 1;
@@ -1993,10 +1995,10 @@ static void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 	if (track->m_command[1] != 0) {
 		rateDivisor = (unsigned int)track->m_command[1];
 	} else {
-		rateDivisor = 0x100;
+		rateDivisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
 	}
 	divisor = rateDivisor;
-	track->m_tremoloRate = 0x100000 / divisor;
+	track->m_tremoloRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
 	track->m_tremoloFunc = (int)SwingEntryFunction[track->m_command[2] & 0xf];
 	track->m_tremoloRateDelta = track->m_tremoloDepthDelta = 0;
 	track->m_command += 3;
@@ -2004,7 +2006,7 @@ static void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 	voice = p_VoiceData;
 	do {
 		if (voice->m_track == track) {
-			divisor = 0x100;
+			divisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
 			voice->m_volumeModDelay = track->m_tremoloDelay;
 			if (track->m_tremoloRate >> REDSOUND_FIXED_SHIFT != 0) {
 				divisor /= track->m_tremoloRate >> REDSOUND_FIXED_SHIFT;
@@ -2089,10 +2091,10 @@ static void __MidiCtrl_TremoloRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 	if (*track->m_command != 0) {
 		rate = *track->m_command;
 	} else {
-		rate = 0x100;
+		rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
 	}
 	int divisor = rate;
-	track->m_tremoloRate = 0x100000 / divisor;
+	track->m_tremoloRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
 	track->m_tremoloRateDelta = 0;
 	track->m_command += 1;
 }
@@ -2119,10 +2121,10 @@ static void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 	if (*track->m_command != 0) {
 		divisor = *track->m_command;
 	} else {
-		divisor = 0x100;
+		divisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
 	}
 	rate = divisor;
-	rate = 0x100 / rate;
+	rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR / rate;
 	((int*)track)[0x27] = DataAddCompute((int*)track + 0x26, rate, delta);
 	*(short*)((int*)track + 0x2b) = (short)delta[0];
 	track->m_command += 1;
@@ -2178,10 +2180,10 @@ static void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 	if (track->m_command[1] != 0) {
 		rate = (unsigned int)track->m_command[1];
 	} else {
-		rate = 0x100;
+		rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
 	}
 	divisor = rate;
-	track->m_shakeRate = 0x100000 / divisor;
+	track->m_shakeRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
 	track->m_shakeFunc = (int)SwingEntryFunction[track->m_command[2] & 0xf];
 	track->m_shakeRateDelta = track->m_shakeDepthDelta = 0;
 	track->m_shakeOutput = 0;
@@ -2252,10 +2254,10 @@ static void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrack
 	if (*track->m_command != 0) {
 		rate = *track->m_command;
 	} else {
-		rate = 0x100;
+		rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
 	}
 	int divisor = rate;
-	track->m_shakeRate = 0x100000 / divisor;
+	track->m_shakeRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
 	track->m_shakeRateDelta = 0;
 	track->m_command += 1;
 }
@@ -2282,10 +2284,10 @@ static void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrack
 	if (*track->m_command != 0) {
 		divisor = *track->m_command;
 	} else {
-		divisor = 0x100;
+		divisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
 	}
 	rate = divisor;
-	rate = 0x100 / rate;
+	rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR / rate;
 	((int*)track)[0x2f] = DataAddCompute((int*)track + 0x2e, rate, delta);
 	*(short*)((int*)track + 0x34) = (short)delta[0];
 	track->m_command += 1;

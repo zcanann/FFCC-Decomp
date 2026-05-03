@@ -982,23 +982,23 @@ int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
  */
 RedHistoryBANK* CRedEntry::SeSepOldDelete()
 {
-	unsigned int selected = 0;
+	RedHistoryBANK* selected = 0;
 	int historyNo = 0;
-	unsigned int history = static_cast<unsigned int>(m_seSepBankBase);
+	RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase);
 
 	do {
-		if ((*reinterpret_cast<int*>(history + 0xC) != 0) && (historyNo < *reinterpret_cast<int*>(history + 4))) {
-			historyNo = *reinterpret_cast<int*>(history + 4);
+		if ((history->m_size != 0) && (historyNo < history->m_historyNo)) {
+			historyNo = history->m_historyNo;
 			selected = history;
 		}
-		history += 0x10;
-	} while (history < static_cast<unsigned int>(m_seSepBankBase) + REDSOUND_SESEP_BANK_SIZE);
+		history++;
+	} while (history < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE));
 
 	if (selected != 0) {
-		SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(selected));
+		SeSepMemoryFree(selected);
 	}
 
-	return reinterpret_cast<RedHistoryBANK*>(selected);
+	return selected;
 }
 
 /*

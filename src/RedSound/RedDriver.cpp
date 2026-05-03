@@ -229,7 +229,7 @@ void _SetReverbDepth(int* command)
     int* seInfo;
 
     reverbBank = command[0] & 1;
-    reverbDepth = command[1] & 0x7f;
+    reverbDepth = command[1] & REDSOUND_COMMAND_VALUE_MASK;
     fadeStep = command[2];
     if (reverbDepth != 0) {
         reverbDepth += 1;
@@ -413,10 +413,10 @@ void _MusicMasterVolume(int* command)
 {
     RedVoiceDATA* voice;
 
-    m_MasterMusicVolume = *command & 0x7f;
+    m_MasterMusicVolume = *command & REDSOUND_COMMAND_VALUE_MASK;
     if (m_MasterMusicVolume != 0) {
         m_MasterMusicVolume = m_MasterMusicVolume + 1;
-        m_MasterMusicVolume = m_MasterMusicVolume * 4;
+        m_MasterMusicVolume = m_MasterMusicVolume * REDSOUND_MASTER_VOLUME_SCALE;
         m_MasterMusicVolume = m_MasterMusicVolume - 1;
     }
     voice = p_VoiceData;
@@ -577,10 +577,10 @@ void _SeMasterVolume(int* command)
 {
     RedVoiceDATA* voice;
 
-    m_MasterSEVolume = *command & 0x7f;
+    m_MasterSEVolume = *command & REDSOUND_COMMAND_VALUE_MASK;
     if (m_MasterSEVolume != 0) {
         m_MasterSEVolume = m_MasterSEVolume + 1;
-        m_MasterSEVolume = m_MasterSEVolume * 4;
+        m_MasterSEVolume = m_MasterSEVolume * REDSOUND_MASTER_VOLUME_SCALE;
         m_MasterSEVolume = m_MasterSEVolume - 1;
     }
     voice = p_VoiceData;
@@ -1274,8 +1274,8 @@ void CRedDriver::Init()
     m_MusicFastSpeed = 0;
     m_DMAStatus = 0;
     m_CrossTime = 0;
-    m_MasterSEVolume = 0x1ff;
-    m_MasterMusicVolume = 0x1ff;
+    m_MasterSEVolume = REDSOUND_MASTER_VOLUME_FULL;
+    m_MasterMusicVolume = REDSOUND_MASTER_VOLUME_FULL;
     iVar6 = 0;
     do {
         iVar5 = iVar6 + 1;

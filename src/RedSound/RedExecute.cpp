@@ -163,6 +163,9 @@ static const float s_ReverbEffectScale = 100.0f;
 enum RedExecuteLayoutSize {
     REDSOUND_REVERB_DATA_COUNT = 2,
     REDSOUND_REVERB_DATA_BUFFER_SIZE = sizeof(RedReverbDATA) * REDSOUND_REVERB_DATA_COUNT,
+    REDSOUND_REVERB_AUX_BUFFER_SIZE = 0x280,
+    REDSOUND_REVERB_ALLOC_ALIGN = 0x20,
+    REDSOUND_REVERB_ALLOC_ALIGN_MASK = REDSOUND_REVERB_ALLOC_ALIGN - 1,
 };
 
 /*
@@ -232,9 +235,9 @@ int PitchCompute(int param_1, int param_2, int param_3, int param_4)
  */
 void _ReverbNullCallback(AXFX_BUFFERUPDATE* update, void*)
 {
-    memset((void*)((u32*)update)[0], 0, 0x280);
-    memset((void*)((u32*)update)[1], 0, 0x280);
-    memset((void*)((u32*)update)[2], 0, 0x280);
+    memset((void*)((u32*)update)[0], 0, REDSOUND_REVERB_AUX_BUFFER_SIZE);
+    memset((void*)((u32*)update)[1], 0, REDSOUND_REVERB_AUX_BUFFER_SIZE);
+    memset((void*)((u32*)update)[2], 0, REDSOUND_REVERB_AUX_BUFFER_SIZE);
 }
 
 /*
@@ -249,7 +252,7 @@ void _ReverbNullCallback(AXFX_BUFFERUPDATE* update, void*)
 void* ReverbAreaAlloc(unsigned long size)
 {
     p_ReverbSize->m_requested += (u32)size;
-    p_ReverbSize->m_aligned += ((u32)size + 0x1F) & ~0x1F;
+    p_ReverbSize->m_aligned += ((u32)size + REDSOUND_REVERB_ALLOC_ALIGN_MASK) & ~REDSOUND_REVERB_ALLOC_ALIGN_MASK;
     return (void*)RedNew((int)size);
 }
 

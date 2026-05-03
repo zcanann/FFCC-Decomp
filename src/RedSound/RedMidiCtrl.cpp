@@ -87,6 +87,7 @@ enum RedMidiSwingConst {
     REDSOUND_SWING_PHASE_MASK = 0xFF,
     REDSOUND_SWING_QUADRANT_MASK = 3,
     REDSOUND_SWING_LEVEL_FULL = 0x10000,
+    REDSOUND_SWING_RANDOM_REVERSE_PHASE = 0x40,
 };
 
 RedMidiControlFunc p_MidiControl_Function[] = {
@@ -472,10 +473,10 @@ int SawSwingR(int phase)
  */
 int RandomSwingR(int phase)
 {
-    phase >>= 8;
-    phase &= 0xff;
-    phase ^= 0x40;
-    int result = (int)t_RandomData[phase] << 8;
+    phase >>= REDSOUND_SWING_PHASE_SHIFT;
+    phase &= REDSOUND_SWING_PHASE_MASK;
+    phase ^= REDSOUND_SWING_RANDOM_REVERSE_PHASE;
+    int result = (int)t_RandomData[phase] << REDSOUND_SWING_PHASE_SHIFT;
 
     return result;
 }

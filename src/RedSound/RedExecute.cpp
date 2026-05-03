@@ -1891,17 +1891,17 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         trackData[0x1A] += trackData[0x1B] * step;
     }
 
-    if (trackData[0x44] != 0) {
+    if (track->m_sweepDelta != 0) {
         int step = frames;
         int addPitch;
 
-        if (trackData[0x44] <= frames) {
-            step = trackData[0x44];
+        if (track->m_sweepDelta <= frames) {
+            step = track->m_sweepDelta;
         }
         updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
-        trackData[0x44] -= step;
-        addPitch = step * trackData[0x45];
-        trackData[0x48] += addPitch;
+        track->m_sweepDelta -= step;
+        addPitch = step * track->m_sweepAdd;
+        track->m_portamentPitch += addPitch;
 
         voiceData = (int*)p_VoiceData;
         do {

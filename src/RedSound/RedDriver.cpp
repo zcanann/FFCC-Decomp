@@ -1143,68 +1143,68 @@ int RedDmaSearchID(int id)
  */
 void _DmaExecute()
 {
-    unsigned int uVar1;
-    int iVar2;
-    int iVar3;
-    RedDmaRequest* piVar4;
-    RedDmaRequest** ppiVar5;
-    RedDmaRequest* piVar6;
-    RedDmaRequest* piVar7;
-    RedDmaRequest* piVar8;
+    unsigned int interrupt;
+    int dstAddress;
+    int srcAddress;
+    RedDmaRequest* queueBase;
+    RedDmaRequest** oldQueuePtr;
+    RedDmaRequest* activeRequest;
+    RedDmaRequest* queueEntry;
+    RedDmaRequest* nextEntry;
 
     while ((p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) ||
            (p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX])) {
         m_DMAInThread = REDSOUND_DMA_THREAD_SELECT_QUEUE;
         if (p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] == p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) {
-            ppiVar5 = &p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX];
-            piVar4 = RedDriverStreamDmaQueue();
+            oldQueuePtr = &p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX];
+            queueBase = RedDriverStreamDmaQueue();
         } else {
-            ppiVar5 = &p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX];
-            piVar4 = RedDriverMainDmaQueue();
+            oldQueuePtr = &p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX];
+            queueBase = RedDriverMainDmaQueue();
         }
-        piVar7 = *ppiVar5;
+        queueEntry = *oldQueuePtr;
         m_DMAInThread = REDSOUND_DMA_THREAD_LOAD_ENTRY;
-        piVar6 = 0;
-        if (piVar7->m_id != 0) {
+        activeRequest = 0;
+        if (queueEntry->m_id != 0) {
             m_DMAStatus = 1;
-            if (piVar7->m_direction == REDSOUND_DMA_DIRECTION_TO_ARAM) {
-                DCFlushRange((void*)piVar7->m_mainMemory, (u32)piVar7->m_size);
-                iVar3 = piVar7->m_mainMemory;
-                iVar2 = piVar7->m_aramMemory;
+            if (queueEntry->m_direction == REDSOUND_DMA_DIRECTION_TO_ARAM) {
+                DCFlushRange((void*)queueEntry->m_mainMemory, (u32)queueEntry->m_size);
+                srcAddress = queueEntry->m_mainMemory;
+                dstAddress = queueEntry->m_aramMemory;
             } else {
-                DCInvalidateRange((void*)piVar7->m_mainMemory, (u32)piVar7->m_size);
-                iVar3 = piVar7->m_aramMemory;
-                iVar2 = piVar7->m_mainMemory;
+                DCInvalidateRange((void*)queueEntry->m_mainMemory, (u32)queueEntry->m_size);
+                srcAddress = queueEntry->m_aramMemory;
+                dstAddress = queueEntry->m_mainMemory;
             }
             m_DMAInThread = REDSOUND_DMA_THREAD_POST_REQUEST;
-            ARQSetChunkSize((u32)piVar7->m_size);
-            ARQPostRequest(&m_DMARequest, REDSOUND_DMA_ARQ_OWNER_ID, (u32)piVar7->m_direction, REDSOUND_DMA_ARQ_PRIORITY, (u32)iVar3, (u32)iVar2,
-                           (u32)piVar7->m_size, _DmaCallback);
+            ARQSetChunkSize((u32)queueEntry->m_size);
+            ARQPostRequest(&m_DMARequest, REDSOUND_DMA_ARQ_OWNER_ID, (u32)queueEntry->m_direction, REDSOUND_DMA_ARQ_PRIORITY, (u32)srcAddress, (u32)dstAddress,
+                           (u32)queueEntry->m_size, _DmaCallback);
             m_DMAInThread = REDSOUND_DMA_THREAD_WAIT_REQUEST;
-            piVar6 = piVar7;
+            activeRequest = queueEntry;
         }
-        piVar8 = piVar7 + 1;
+        nextEntry = queueEntry + 1;
         m_DMAInThread = REDSOUND_DMA_THREAD_ADVANCE_QUEUE;
-        if (piVar4 + REDSOUND_DMA_QUEUE_ENTRY_COUNT <= piVar7 + 1) {
-            piVar8 = piVar4;
+        if (queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT <= queueEntry + 1) {
+            nextEntry = queueBase;
         }
-        *ppiVar5 = piVar8;
+        *oldQueuePtr = nextEntry;
         m_DMAInThread = REDSOUND_DMA_THREAD_STORE_QUEUE;
 
-        while (piVar6 != 0) {
+        while (activeRequest != 0) {
             m_DMAInThread = REDSOUND_DMA_THREAD_POLL_STATUS;
             if (m_DMAStatus == 0) {
                 m_DMAInThread = REDSOUND_DMA_THREAD_RUN_CALLBACK;
-                if ((u32)piVar6->m_callback != 0) {
-                    uVar1 = OSDisableInterrupts();
-                    piVar6->m_callback(piVar6->m_callbackData);
-                    OSRestoreInterrupts(uVar1);
+                if ((u32)activeRequest->m_callback != 0) {
+                    interrupt = OSDisableInterrupts();
+                    activeRequest->m_callback(activeRequest->m_callbackData);
+                    OSRestoreInterrupts(interrupt);
                 }
                 m_DMAInThread = REDSOUND_DMA_THREAD_FINISH_ENTRY;
-                if (piVar6->m_direction == REDSOUND_DMA_DIRECTION_FROM_ARAM) {
-                    DCFlushRange((void*)piVar6->m_mainMemory, (u32)piVar6->m_size);
+                if (activeRequest->m_direction == REDSOUND_DMA_DIRECTION_FROM_ARAM) {
+                    DCFlushRange((void*)activeRequest->m_mainMemory, (u32)activeRequest->m_size);
                 }
-                piVar6->m_id = 0;
+                activeRequest->m_id = 0;
                 break;
             }
             RedSleep(0);

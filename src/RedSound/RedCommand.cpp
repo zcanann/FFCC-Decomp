@@ -508,7 +508,7 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 	if (sepBank != 0) {
 		sepHead = reinterpret_cast<RedSeSepHEAD*>(sepBank->m_data);
 		sepInfo = reinterpret_cast<RedSeINFO*>((int)sepHead + 0x10);
-		if ((sepHead->m_sizeAndFlags & 0x80000000) != 0) {
+		if ((sepHead->m_sizeAndFlags & REDSOUND_SESEP_FLAGS_MASK) != 0) {
 			sepInfo->m_flagsAndCount |= 0x80;
 		}
 		if (_SePlayStart(sepInfo, seId, sepId, pan, volume) != 0) {

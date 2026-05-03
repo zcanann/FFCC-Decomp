@@ -1018,7 +1018,7 @@ int CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 	    (bank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE))) {
 		bank->m_data = reinterpret_cast<int>(seSepHead);
 		result = reinterpret_cast<int>(seSepHead);
-		bank->m_size = seSepHead->m_sizeAndFlags & 0x7FFFFFFF;
+		bank->m_size = seSepHead->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
 		bank->m_id = seSepHead->m_seNo;
 		SeSepHistoryAdd();
 		bank->m_historyNo = 1;

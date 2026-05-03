@@ -48,6 +48,11 @@ struct RedSeSepHEAD
 	unsigned char m_unk13;
 };
 
+enum RedSeSepHeadLayout {
+	REDSOUND_SESEP_SIZE_MASK = 0x7FFFFFFF,
+	REDSOUND_SESEP_FLAGS_MASK = 0x80000000,
+};
+
 struct RedSeINFO
 {
 	unsigned char m_flagsAndCount;

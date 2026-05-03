@@ -656,7 +656,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 
         if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
             u16 monoMix = (u16)((monoBase * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
-            if ((voiceData[0x25] & 2U) != 0) {
+            if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
                 *(u16*)(voiceData + 0x1c) = monoMix;
                 *(u16*)(voiceData + 0x1d) = monoMix;
             } else {
@@ -701,7 +701,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 
         if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_LEFT) != 0) {
             iVar1 = (leftMix * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
-            if ((voiceData[0x25] & 2U) != 0) {
+            if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
                 *(u16*)(voiceData + 0x1c) = (u16)iVar1;
             } else {
                 *(u16*)(voiceData + 0x1e) = (u16)iVar1;
@@ -710,7 +710,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 
         if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_RIGHT) != 0) {
             iVar2 = (rightMix * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
-            if ((voiceData[0x25] & 2U) != 0) {
+            if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
                 *(u16*)(voiceData + 0x1d) = (u16)iVar2;
             } else {
                 *(u16*)(voiceData + 0x1f) = (u16)iVar2;
@@ -1454,7 +1454,7 @@ void EnvelopeKeyExecute()
 
                 *(u16*)(voice + 0x144) = 3;
                 if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
-                    if ((voiceData[0x25] & 2U) == 0) {
+                    if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) == 0) {
                         *(u16*)(voice + 0x144) |= 0x600;
                     } else {
                         *(u16*)(voice + 0x144) |= 0x30;
@@ -1501,7 +1501,7 @@ void EnvelopeKeyExecute()
                     int key = (*(int*)(trackData + 0x11C) + *(int*)(waveData + 4) + 1) * 2;
                     int keyBase = key - 2;
 
-                    *(u16*)(voice + 0x148) = (u16)((voiceData[0x25] & 1U) != 0);
+                    *(u16*)(voice + 0x148) = (u16)((voiceData[0x25] & REDSOUND_VOICE_SWITCH_LOOP) != 0);
                     *(u16*)(voice + 0x140) = 1;
                     *(u16*)(voice + 0x146) = 1;
 

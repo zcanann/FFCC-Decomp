@@ -357,11 +357,11 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			voice->m_track = streamData->m_track + iVar2;
 			voice->m_track->m_note.m_allocFlags |= 2;
 			voice->m_stateFlags |= 2;
-			voice->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO | REDSOUND_VOICE_FLAGS_START;
+			voice->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO | REDSOUND_VOICE_SWITCH_LOOP;
 			if (streamData->m_header.m_flags != 0) {
 				voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_STEREO;
 			}
-			voice->m_track->m_voiceSwitch = 1;
+			voice->m_track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_LOOP;
 			voice->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
 			voice->m_waveData = &streamData->m_trackData[iVar2];
 			voice->m_targetPitch = pitch;

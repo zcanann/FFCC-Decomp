@@ -351,29 +351,31 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		waveHead->m_loadSize = waveHead->m_waveSize;
 	}
 
-	if ((waveNo >= 100) && (waveNo < 300)) {
+	if ((waveNo >= REDSOUND_WAVE_LARGE_RANGE_BEGIN) && (waveNo < REDSOUND_WAVE_LARGE_RANGE_END)) {
 		if (waveHead->m_loadSize <= REDSOUND_WAVE_LARGE_LOAD_STEP) {
 			waveHead->m_loadSize = REDSOUND_WAVE_LARGE_LOAD_STEP;
 		} else if (waveHead->m_loadSize <= REDSOUND_WAVE_LARGE_REGION_SIZE) {
 			waveHead->m_loadSize = REDSOUND_WAVE_LARGE_REGION_SIZE;
 		}
-	} else if ((waveNo >= 10) && (waveNo < 70)) {
+	} else if ((waveNo >= REDSOUND_WAVE_STAGE_RANGE_BEGIN) && (waveNo < REDSOUND_WAVE_STAGE_RANGE_END)) {
 		waveHead->m_loadSize += REDSOUND_WAVE_STAGE_LOAD_BLOCK_ROUND;
 		int blocks = waveHead->m_loadSize / REDSOUND_WAVE_STAGE_LOAD_BLOCK_SIZE;
 		blocks += blocks >> 0x1F;
 		waveHead->m_loadSize = blocks * REDSOUND_WAVE_STAGE_LOAD_BLOCK_SIZE;
-	} else if (((waveNo >= 0x154) && (waveNo < 0x17a)) || ((waveNo >= 0x17f) && (waveNo < 0x182)) ||
-	           (waveNo == 0x183)) {
+	} else if (((waveNo >= REDSOUND_WAVE_FIXED_RANGE0_BEGIN) && (waveNo < REDSOUND_WAVE_FIXED_RANGE0_END)) ||
+	           ((waveNo >= REDSOUND_WAVE_FIXED_RANGE1_BEGIN) && (waveNo < REDSOUND_WAVE_FIXED_RANGE1_END)) ||
+	           (waveNo == REDSOUND_WAVE_FIXED_SINGLE)) {
 		waveHead->m_loadSize = REDSOUND_WAVE_FIXED_REGION_SIZE;
 	}
 
 	int minOffset;
 	int maxOffset;
-	if ((waveNo >= 100) && (waveNo < 300)) {
+	if ((waveNo >= REDSOUND_WAVE_LARGE_RANGE_BEGIN) && (waveNo < REDSOUND_WAVE_LARGE_RANGE_END)) {
 		minOffset = REDSOUND_WAVE_LARGE_REGION_OFFSET;
 		maxOffset = minOffset + REDSOUND_WAVE_LARGE_REGION_SIZE;
-	} else if (((waveNo >= 0x154) && (waveNo < 0x17a)) || ((waveNo >= 0x17f) && (waveNo < 0x182)) ||
-	           (waveNo == 0x183)) {
+	} else if (((waveNo >= REDSOUND_WAVE_FIXED_RANGE0_BEGIN) && (waveNo < REDSOUND_WAVE_FIXED_RANGE0_END)) ||
+	           ((waveNo >= REDSOUND_WAVE_FIXED_RANGE1_BEGIN) && (waveNo < REDSOUND_WAVE_FIXED_RANGE1_END)) ||
+	           (waveNo == REDSOUND_WAVE_FIXED_SINGLE)) {
 		minOffset = REDSOUND_WAVE_FIXED_REGION_OFFSET;
 		maxOffset = minOffset + REDSOUND_WAVE_FIXED_REGION_SIZE;
 	} else {

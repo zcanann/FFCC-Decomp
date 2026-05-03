@@ -1,23 +1,27 @@
 #include "ffcc/pppRandDownFV.h"
-#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
+#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
+
+extern "C" {
+f32 RandF__5CMathFv(CMath*);
+}
 
 struct RandDownFVParams {
     s32 targetId;
     s32 sourceOffset;
     f32 blend[3];
-    u8 _pad[4];
+    u8 _pad[0x18 - 0x14];
     u8 useNormalDistribution;
 };
 
-static inline float randf(float value, float scale)
-{
-    return value * scale;
-}
+struct RandDownFVControl {
+    u8 _pad0[0xC];
+    s32* serializedDataOffsets;
+};
 
 /*
  * --INFO--
@@ -35,32 +39,38 @@ void pppRandDownFV(_pppPObject* basePtr, RandDownFVParams* in, _pppCtrlTable* ct
     }
 
     u8* base = (u8*)basePtr;
+    RandDownFVControl* out = (RandDownFVControl*)ctrl;
     f32* valuePtr;
 
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
-        f32 value = -Math.RandF();
+        f32 value = -RandF__5CMathFv(&Math);
         if (in->useNormalDistribution != 0) {
-            f32 randomValue = value - Math.RandF();
-            f32 scale = 0.5f;
-            value = randomValue * scale;
+            f32 randomValue = value - RandF__5CMathFv(&Math);
+            value = randomValue * 0.5f;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(base + *out->serializedDataOffsets + 0x80);
         *valuePtr = value;
     } else {
         if (in->targetId != baseState) {
             return;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(base + *out->serializedDataOffsets + 0x80);
     }
 
     s32 sourceOffset = in->sourceOffset;
     f32* target = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
-    f32 scale = *valuePtr;
 
-    target[0] += randf(in->blend[0], scale);
-    target[1] += randf(in->blend[1], scale);
-    target[2] += randf(in->blend[2], scale);
+    f32 base0 = target[0];
+    f32 value = in->blend[0];
+    f32 scale = *valuePtr;
+    f32 delta0 = value * scale;
+    target[0] = base0 + delta0;
+
+    value = in->blend[1] * scale;
+    target[1] = target[1] + value;
+    value = in->blend[2] * scale;
+    target[2] = target[2] + value;
 }

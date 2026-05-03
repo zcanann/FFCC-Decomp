@@ -2,7 +2,7 @@
 #define _FFCC_P_USB_H_
 
 #include "ffcc/memory.h"
-#include "ffcc/p_sample.h"
+#include "ffcc/system.h"
 #include "ffcc/usb.h"
 
 struct CUSBPcsTable
@@ -16,7 +16,7 @@ extern unsigned int m_table_desc1__7CUSBPcs[];
 extern unsigned int m_table_desc2__7CUSBPcs[];
 extern CUSBPcsTable m_table__7CUSBPcs;
 
-class CUSBPcs : public CSamplePcs
+class CUSBPcs : public CProcess
 {
 public:
     class CDataHeader;

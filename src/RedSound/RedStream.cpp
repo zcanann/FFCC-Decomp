@@ -356,10 +356,10 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			if (streamData->m_header.m_flags != 0) {
 				voice->m_voiceSwitch |= 0x3000;
 			}
-			voice->m_track->m_seId = 1;
-			voice->m_adsrCurrentLevel = 0x8000;
+			voice->m_track->m_voiceSwitch = 1;
+			voice->m_envelopeLevel = 0x8000;
 			voice->m_waveData = &streamData->m_trackData[iVar2];
-			voice->m_pitch = pitch;
+			voice->m_targetPitch = pitch;
 			voice->m_track->m_reverbDepth = p_ReverbDepth[1].m_depth;
 			voice->m_track->m_reverbDepthDelta = 0;
 			if (streamData->m_header.m_channelCount == 2) {

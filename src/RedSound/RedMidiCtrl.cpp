@@ -1593,20 +1593,20 @@ void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
     RedVoiceDATA* voice;
 
     if (*track->m_command != 0) {
-        track->m_voiceSwitch |= 4;
+        track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_SUSTAIN;
         voice = p_VoiceData;
         do {
             if (voice->m_track == track) {
-                voice->m_voiceSwitch |= 4;
+                voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_SUSTAIN;
             }
             voice++;
         } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
     } else {
-        track->m_voiceSwitch &= ~4;
+        track->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_SUSTAIN;
         voice = p_VoiceData;
         do {
             if (voice->m_track == track) {
-                voice->m_voiceSwitch &= ~4;
+                voice->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_SUSTAIN;
             }
             voice++;
         } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);

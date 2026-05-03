@@ -1269,7 +1269,7 @@ void _AdsrStart(RedVoiceDATA* voice)
             prevLevel <<= 0xc;
         }
         *(int*)((u8*)voice + 0xac) = prevLevel;
-        nextLevel |= 0x800;
+        nextLevel |= REDSOUND_FIXED_HALF;
         stage[2] = (nextLevel - prevLevel) / stepFrames;
     } else {
         *(int*)((u8*)voice + 0xac) = nextLevel;
@@ -1314,7 +1314,7 @@ void _AdsrDataCompute(RedVoiceDATA* voice)
     stage[1] = stepCount;
     if (stepCount != 0) {
         *(int*)((int)voice + 0xac) = prevValue;
-        level |= 0x800;
+        level |= REDSOUND_FIXED_HALF;
         stage[2] = (level - prevValue) / stepCount;
     } else {
         *(int*)((int)voice + 0xac) = level;
@@ -1442,7 +1442,7 @@ void EnvelopeKeyExecute()
 
             if ((voiceData[0x24] & REDSOUND_VOICE_FLAGS_PITCH_DIRTY) != 0) {
                 int pitch = voiceData[0x27];
-                voiceFlags = REDSOUND_TRACK_FLAG_SLUR;
+                voiceFlags = AX_SYNC_FLAG_COPYRATIO;
                 *(u16*)(voice + 0x1DE) = (u16)(((u32)pitch >> 0x10) & 3);
                 *(s16*)(voice + 0x1E0) = (s16)pitch;
             }
@@ -1462,7 +1462,7 @@ void EnvelopeKeyExecute()
                         *(u16*)(voice + 0x144) |= 0x30;
                     }
                 }
-                voiceFlags |= 0x12;
+                voiceFlags |= AX_SYNC_FLAG_COPYAXPBMIX | AX_SYNC_FLAG_COPYMXRCTRL;
             }
 
             if (((voiceData[0x25] & REDSOUND_VOICE_SWITCH_PAUSE) == 0) &&
@@ -1473,10 +1473,10 @@ void EnvelopeKeyExecute()
 
             if ((voiceData[0x24] & REDSOUND_VOICE_FLAGS_START) == 0) {
                 if ((voiceData[0x24] & REDSOUND_VOICE_FLAGS_RELEASED) == 0) {
-                    if ((voiceData[0x25] & 8U) == 0) {
+                    if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_PAUSE) == 0) {
                         if ((voiceData[0x24] & REDSOUND_VOICE_FLAGS_ADSR_START) == 0) {
                             envChanged |= _AdsrDataExecute((RedVoiceDATA*)voiceData);
-                            voiceData[0x2C] = voiceData[0x2B] >> 0xC;
+                            voiceData[0x2C] = voiceData[0x2B] >> REDSOUND_FIXED_SHIFT;
                         }
                         voiceData[0x24] &= ~REDSOUND_VOICE_FLAGS_ADSR_START;
                     }
@@ -1490,7 +1490,7 @@ void EnvelopeKeyExecute()
                         voiceData[0x19] = -voiceData[0x2B];
                         voiceData[0x19] = voiceData[0x19] / voiceData[0x18];
                     }
-                    voiceData[0x2C] = voiceData[0x2B] >> 0xC;
+                    voiceData[0x2C] = voiceData[0x2B] >> REDSOUND_FIXED_SHIFT;
                 }
             } else {
                 voiceData[0x24] &= REDSOUND_VOICE_FLAGS_CLEAR_RELEASE_ACTIVE_MASK;
@@ -1525,7 +1525,9 @@ void EnvelopeKeyExecute()
                     *(s16*)(voice + 0x1AC) = (s16)key;
                     *(int*)(voice + 0x1AE) = keyBase + *(int*)(waveData + 0xC);
 
-                    voiceFlags |= 0x16100D;
+                    voiceFlags |= AX_SYNC_FLAG_COPYADPCMLOOP | AX_SYNC_FLAG_COPYSRC | AX_SYNC_FLAG_COPYADPCM |
+                                  AX_SYNC_FLAG_COPYCURADDR | AX_SYNC_FLAG_COPYADDR | AX_SYNC_FLAG_COPYTYPE |
+                                  AX_SYNC_FLAG_COPYSTATE | AX_SYNC_FLAG_COPYSELECT;
                     voiceData[0x24] |= REDSOUND_VOICE_FLAGS_ADSR_START;
                     voiceData[0x2C] = REDSOUND_ENVELOPE_LEVEL_FULL;
                     voiceData[0x2B] = 0;
@@ -1535,17 +1537,18 @@ void EnvelopeKeyExecute()
             if (voiceData[0x2C] < 1) {
                 voiceData[0x24] &= REDSOUND_VOICE_FLAGS_CLEAR_RELEASE_ACTIVE_MASK;
                 voiceData[0x23] = 0;
-                voiceFlags |= 0x204;
+                voiceFlags |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
                 *voiceData = 0;
                 *(u16*)(voice + 0x146) = 0;
                 voiceData[0x2B] = 0;
                 voiceData[0x2C] = 0;
                 *(u16*)(voice + 0x19C) = 0;
                 *(u16*)(voice + 0x19E) = 0;
-            } else if ((envChanged != 0) && ((u32)*(u16*)(voice + 0x19C) != ((voiceData[0x2B] >> 0xC) & 0xFFFFU))) {
-                voiceFlags |= 0x200;
+            } else if ((envChanged != 0) &&
+                       ((u32)*(u16*)(voice + 0x19C) != ((voiceData[0x2B] >> REDSOUND_FIXED_SHIFT) & 0xFFFFU))) {
+                voiceFlags |= AX_SYNC_FLAG_COPYVOL;
                 *(u16*)(voice + 0x19E) = 0;
-                *(s16*)(voice + 0x19C) = (s16)(voiceData[0x2B] >> 0xC);
+                *(s16*)(voice + 0x19C) = (s16)(voiceData[0x2B] >> REDSOUND_FIXED_SHIFT);
             }
 
             *(u32*)(voice + 0x1C) |= voiceFlags;

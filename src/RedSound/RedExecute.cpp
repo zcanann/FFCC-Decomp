@@ -897,7 +897,7 @@ void _PitchExecute(RedVoiceDATA* voice)
     }
 
     voice->m_targetPitch = pitchDelta + voice->m_pitch + voice->m_randomPitch;
-    voice->m_flags |= 0x10;
+    voice->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 }
 
 /*

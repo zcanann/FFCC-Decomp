@@ -509,10 +509,10 @@ void StreamPause(int streamID, int pause)
 			if (pause == 1) {
 				if (voiceData->m_axVoice != 0) {
 					voiceData->m_targetPitch = 0;
-					voiceData->m_flags |= 0x10;
+					voiceData->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 					if (streamData->m_header.m_channelCount == 2) {
 						voiceData[1].m_targetPitch = 0;
-						voiceData[1].m_flags |= 0x10;
+						voiceData[1].m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 					}
 				}
 			} else if (voiceData->m_axVoice != 0) {
@@ -521,13 +521,13 @@ void StreamPause(int streamID, int pause)
 				volume = streamData->m_volume >> REDSOUND_FIXED_SHIFT;
 				if (channelCount == 2) {
 					voiceData->m_targetPitch = pitch;
-					voiceData->m_flags |= 0x10;
+					voiceData->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 					voiceData[1].m_targetPitch = pitch;
-					voiceData[1].m_flags |= 0x10;
+					voiceData[1].m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 				} else {
 					pan = streamData->m_pan >> REDSOUND_FIXED_SHIFT;
 					voiceData->m_targetPitch = pitch;
-					voiceData->m_flags |= 0x10;
+					voiceData->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 				}
 			}
 		}

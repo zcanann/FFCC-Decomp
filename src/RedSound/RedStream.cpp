@@ -412,7 +412,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			memset(&streamData->m_trackData[iVar2], 0, sizeof(RedWaveDATA));
 			memcpy(streamData->m_trackData[iVar2].m_adpcmData, headerData + iVar2 * REDSOUND_STREAM_ADPCM_HEADER_SIZE, REDSOUND_STREAM_ADPCM_HEADER_SIZE);
 			voice->m_adsrLevel[0] = voice->m_adsrLevel[1] = voice->m_adsrLevel[2] = 0;
-			voice->m_adsrLevel[3] = 0x7f;
+			voice->m_adsrLevel[3] = REDSOUND_VOLUME_MAX;
 			voice->m_adsrTime[0] = voice->m_adsrTime[1] = voice->m_adsrTime[2] = 0;
 			voice->m_adsrTime[3] = 10;
 			streamData->m_trackData[iVar2].m_sampleStart = 0;

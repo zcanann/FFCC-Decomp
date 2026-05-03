@@ -144,6 +144,13 @@ enum RedDriverHeaderSignature {
     REDSOUND_WAVE_SIGNATURE_1 = 'D',
 };
 
+enum RedDriverCommandParse {
+    REDSOUND_DELTA_TIME_VALUE_MASK = 0x7F,
+    REDSOUND_DELTA_TIME_CONTINUE_FLAG = 0x80,
+    REDSOUND_DELTA_TIME_SHIFT = 7,
+    REDSOUND_ENTRY_ID_MASK = 0x7fffffff,
+};
+
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 static int m_RedMasterTime;
 static volatile int m_SequencialID;
@@ -830,11 +837,11 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
 	unsigned int deltaTime = 0;
 
 	if (buffer != 0) {
-		deltaTime = **buffer & 0x7f;
-		while ((**buffer & 0x80) != 0) {
+		deltaTime = **buffer & REDSOUND_DELTA_TIME_VALUE_MASK;
+		while ((**buffer & REDSOUND_DELTA_TIME_CONTINUE_FLAG) != 0) {
 			*buffer += 1;
-			deltaTime <<= 7;
-			deltaTime |= **buffer & 0x7f;
+			deltaTime <<= REDSOUND_DELTA_TIME_SHIFT;
+			deltaTime |= **buffer & REDSOUND_DELTA_TIME_VALUE_MASK;
 		}
 		*buffer += 1;
 	}
@@ -850,7 +857,7 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
 unsigned int GetMyEntryID()
 {
     m_SequencialID++;
-    m_SequencialID &= 0x7fffffff;
+    m_SequencialID &= REDSOUND_ENTRY_ID_MASK;
     if (m_SequencialID == 0) {
         m_SequencialID++;
     }
@@ -2011,7 +2018,7 @@ int CRedDriver::GetSeVolume(int seID, int mode)
                 if (mode == 1) {
                     return seInfo[0x15];
                 }
-                return (int)seInfo[0x13] >> 0xc;
+                return (int)seInfo[0x13] >> REDSOUND_FIXED_SHIFT;
             }
         }
         seInfo += REDSOUND_TRACK_SIZE / sizeof(*seInfo);

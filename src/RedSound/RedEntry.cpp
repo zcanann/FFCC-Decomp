@@ -742,16 +742,18 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 		}
 		if (used == 0) {
 			used = SearchWaveSequence(waveNo);
-			if ((used >= REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) && (*(int*)(*(int*)this + used * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4) == 0)) {
-				WaveHistoryAdd(0x14);
-				*(int*)(*(int*)this + used * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4) = 0x14;
+			if ((used >= REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) &&
+			    (reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[used].m_historyNo == 0)) {
+				WaveHistoryAdd(REDSOUND_WAVE_RELEASE_HISTORY_NO);
+				reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[used].m_historyNo = REDSOUND_WAVE_RELEASE_HISTORY_NO;
 			}
 		}
 	} else {
 		used = SearchWaveSequence(waveNo);
-		if ((used >= REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) && (*(int*)(*(int*)this + used * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4) != 0)) {
-			WaveHistoryDelete(*(int*)(*(int*)this + used * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4));
-			*(int*)(*(int*)this + used * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4) = 0;
+		if ((used >= REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) &&
+		    (reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[used].m_historyNo != 0)) {
+			WaveHistoryDelete(reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[used].m_historyNo);
+			reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[used].m_historyNo = 0;
 		}
 	}
 }

@@ -168,6 +168,17 @@ enum RedExecuteLayoutSize {
     REDSOUND_REVERB_ALLOC_ALIGN_MASK = REDSOUND_REVERB_ALLOC_ALIGN - 1,
 };
 
+enum RedExecuteAxVoiceLayout {
+    REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET = 0x1C,
+    REDSOUND_AX_VOICE_MIX_CTRL_OFFSET = 0x144,
+    REDSOUND_AX_VOICE_RUNNING_OFFSET = 0x146,
+    REDSOUND_AX_VOICE_LOOP_OFFSET = 0x148,
+    REDSOUND_AX_VOICE_VOLUME_OFFSET = 0x19C,
+    REDSOUND_AX_VOICE_VOLUME_DELTA_OFFSET = 0x19E,
+    REDSOUND_AX_VOICE_RATIO_HIGH_OFFSET = 0x1DE,
+    REDSOUND_AX_VOICE_RATIO_LOW_OFFSET = 0x1E0,
+};
+
 /*
  * --INFO--
  * PAL Address: 0x801c2fc4
@@ -1398,20 +1409,20 @@ void EnvelopeKeyExecute()
 
     while (true) {
         if (voiceData[REDSOUND_VOICE_ACTIVE_WORD] == 0) {
-            voiceData[0x2C] = 0;
+            voiceData[REDSOUND_VOICE_ENVELOPE_WORD] = 0;
             voiceData[1] = 0;
             int voice = voiceData[5];
             if (voice != 0) {
-                if (*(s16*)(voice + 0x146) == 0) {
+                if (*(s16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) == 0) {
                     if (*(int*)(voice + 0xC) != 0) {
                         AXFreeVoice((AXVPB*)voice);
                     }
                     voiceData[5] = 0;
                     *voiceData = 0;
                 } else {
-                    *(u16*)(voice + 0x146) = 0;
-                    *(u16*)(voice + 0x19C) = 0;
-                    *(u32*)(voice + 0x1C) |= 0x204;
+                    *(u16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) = 0;
+                    *(u16*)(voice + REDSOUND_AX_VOICE_VOLUME_OFFSET) = 0;
+                    *(u32*)(voice + REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET) |= 0x204;
                 }
             }
         } else {
@@ -1450,8 +1461,8 @@ void EnvelopeKeyExecute()
             if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_PITCH_DIRTY) != 0) {
                 int pitch = voiceData[0x27];
                 voiceFlags = AX_SYNC_FLAG_COPYRATIO;
-                *(u16*)(voice + 0x1DE) = (u16)(((u32)pitch >> 0x10) & 3);
-                *(s16*)(voice + 0x1E0) = (s16)pitch;
+                *(u16*)(voice + REDSOUND_AX_VOICE_RATIO_HIGH_OFFSET) = (u16)(((u32)pitch >> 0x10) & 3);
+                *(s16*)(voice + REDSOUND_AX_VOICE_RATIO_LOW_OFFSET) = (s16)pitch;
             }
 
             if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_ADPCM_DIRTY) != 0) {
@@ -1461,12 +1472,12 @@ void EnvelopeKeyExecute()
                     memset((void*)(voice + 0x14A), 0, REDSOUND_VOICE_AX_MIX_SIZE);
                 }
 
-                *(u16*)(voice + 0x144) = 3;
+                *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) = 3;
                 if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
                     if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) == 0) {
-                        *(u16*)(voice + 0x144) |= 0x600;
+                        *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) |= 0x600;
                     } else {
-                        *(u16*)(voice + 0x144) |= 0x30;
+                        *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) |= 0x30;
                     }
                 }
                 voiceFlags |= AX_SYNC_FLAG_COPYAXPBMIX | AX_SYNC_FLAG_COPYMXRCTRL;
@@ -1483,7 +1494,8 @@ void EnvelopeKeyExecute()
                     if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_PAUSE) == 0) {
                         if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_ADSR_START) == 0) {
                             envChanged |= _AdsrDataExecute((RedVoiceDATA*)voiceData);
-                            voiceData[0x2C] = voiceData[0x2B] >> REDSOUND_FIXED_SHIFT;
+                            voiceData[REDSOUND_VOICE_ENVELOPE_WORD] =
+                                voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT;
                         }
                         voiceData[REDSOUND_VOICE_FLAGS_WORD] &= ~REDSOUND_VOICE_FLAGS_ADSR_START;
                     }
@@ -1492,12 +1504,13 @@ void EnvelopeKeyExecute()
                     voiceData[0x17] = 3;
                     voiceData[0x18] = (u16)((u8*)voiceData)[0x56];
                     if (voiceData[0x18] == 0) {
-                        voiceData[0x2B] = 0;
+                        voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] = 0;
                     } else {
-                        voiceData[0x19] = -voiceData[0x2B];
+                        voiceData[0x19] = -voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD];
                         voiceData[0x19] = voiceData[0x19] / voiceData[0x18];
                     }
-                    voiceData[0x2C] = voiceData[0x2B] >> REDSOUND_FIXED_SHIFT;
+                    voiceData[REDSOUND_VOICE_ENVELOPE_WORD] =
+                        voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT;
                 }
             } else {
                 voiceData[REDSOUND_VOICE_FLAGS_WORD] &= REDSOUND_VOICE_FLAGS_CLEAR_RELEASE_ACTIVE_MASK;
@@ -1510,9 +1523,10 @@ void EnvelopeKeyExecute()
                     int key = (*(int*)(trackData + 0x11C) + *(int*)(waveData + 4) + 1) * 2;
                     int keyBase = key - 2;
 
-                    *(u16*)(voice + 0x148) = (u16)((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_LOOP) != 0);
+                    *(u16*)(voice + REDSOUND_AX_VOICE_LOOP_OFFSET) =
+                        (u16)((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_LOOP) != 0);
                     *(u16*)(voice + 0x140) = 1;
-                    *(u16*)(voice + 0x146) = 1;
+                    *(u16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) = 1;
 
                     memcpy((void*)(voice + 0x1B6), (void*)(waveData + 0x22), 0x28);
                     memcpy((void*)(voice + 0x1EC), (void*)(waveData + 0x4A), 6);
@@ -1536,32 +1550,34 @@ void EnvelopeKeyExecute()
                                   AX_SYNC_FLAG_COPYCURADDR | AX_SYNC_FLAG_COPYADDR | AX_SYNC_FLAG_COPYTYPE |
                                   AX_SYNC_FLAG_COPYSTATE | AX_SYNC_FLAG_COPYSELECT;
                     voiceData[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_ADSR_START;
-                    voiceData[0x2C] = REDSOUND_ENVELOPE_LEVEL_FULL;
-                    voiceData[0x2B] = 0;
+                    voiceData[REDSOUND_VOICE_ENVELOPE_WORD] = REDSOUND_ENVELOPE_LEVEL_FULL;
+                    voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] = 0;
                 }
             }
 
-            if (voiceData[0x2C] < 1) {
+            if (voiceData[REDSOUND_VOICE_ENVELOPE_WORD] < 1) {
                 voiceData[REDSOUND_VOICE_FLAGS_WORD] &= REDSOUND_VOICE_FLAGS_CLEAR_RELEASE_ACTIVE_MASK;
                 voiceData[REDSOUND_VOICE_ACTIVE_WORD] = 0;
                 voiceFlags |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
                 *voiceData = 0;
-                *(u16*)(voice + 0x146) = 0;
-                voiceData[0x2B] = 0;
-                voiceData[0x2C] = 0;
-                *(u16*)(voice + 0x19C) = 0;
-                *(u16*)(voice + 0x19E) = 0;
+                *(u16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) = 0;
+                voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] = 0;
+                voiceData[REDSOUND_VOICE_ENVELOPE_WORD] = 0;
+                *(u16*)(voice + REDSOUND_AX_VOICE_VOLUME_OFFSET) = 0;
+                *(u16*)(voice + REDSOUND_AX_VOICE_VOLUME_DELTA_OFFSET) = 0;
             } else if ((envChanged != 0) &&
-                       ((u32)*(u16*)(voice + 0x19C) != ((voiceData[0x2B] >> REDSOUND_FIXED_SHIFT) & 0xFFFFU))) {
+                       ((u32)*(u16*)(voice + REDSOUND_AX_VOICE_VOLUME_OFFSET) !=
+                        ((voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT) & 0xFFFFU))) {
                 voiceFlags |= AX_SYNC_FLAG_COPYVOL;
-                *(u16*)(voice + 0x19E) = 0;
-                *(s16*)(voice + 0x19C) = (s16)(voiceData[0x2B] >> REDSOUND_FIXED_SHIFT);
+                *(u16*)(voice + REDSOUND_AX_VOICE_VOLUME_DELTA_OFFSET) = 0;
+                *(s16*)(voice + REDSOUND_AX_VOICE_VOLUME_OFFSET) =
+                    (s16)(voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT);
             }
 
-            *(u32*)(voice + 0x1C) |= voiceFlags;
+            *(u32*)(voice + REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET) |= voiceFlags;
         }
 
-        voiceData[REDSOUND_VOICE_FLAGS_WORD] &= 0xFFFFFC24;
+        voiceData[REDSOUND_VOICE_FLAGS_WORD] &= REDSOUND_VOICE_FLAGS_EXECUTE_KEEP_MASK;
         voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);
         if ((int*)(p_VoiceData + REDSOUND_VOICE_COUNT) <= voiceData) {
             return;

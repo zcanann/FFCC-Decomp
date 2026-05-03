@@ -256,7 +256,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 	soundControl->m_updateFlags = 0;
 	track = soundControl->m_tracks;
 	do {
-		if (((u32)track->m_command != 0) && ((track->m_seSepId & 0x80000000U) == 0)) {
+		if (((u32)track->m_command != 0) && ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) == 0)) {
 			int id = track->m_seSepId / 1000;
 			if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
 				int trackNo;
@@ -461,22 +461,22 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 {
 	bank = bank & 3;
-	no = no & 0x1FF;
+	no = no & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
 
 	if (p_SeBlockData[bank] != 0) {
 		RedSeBlockHEAD* bankData = reinterpret_cast<RedSeBlockHEAD*>(p_SeBlockData[bank]);
 		int seNo = no;
 
-		no += bank << 9;
-		no |= 0x80000000;
+		no += bank << REDSOUND_SE_BLOCK_BANK_SHIFT;
+		no |= REDSOUND_SE_BLOCK_DATA_FLAG;
 		if (seNo < bankData->m_seCount) {
 			int* entries = reinterpret_cast<int*>(bankData->m_entries);
 
 			if (entries[seNo] != -1) {
 				RedSeINFO* seInfo =
-				    (RedSeINFO*)((int)(entries + bankData->m_seCount) + ((unsigned int)entries[seNo] & 0x7FFFFFFF));
+				    (RedSeINFO*)((int)(entries + bankData->m_seCount) + ((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK));
 
-				if (((unsigned int)entries[seNo] & 0x80000000) != 0) {
+				if (((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
 					seInfo->m_flagsAndCount |= 0x80;
 				}
 				if (_SePlayStart(seInfo, seId, no, pan, volume) != 0) {

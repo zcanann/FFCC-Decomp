@@ -1215,19 +1215,21 @@ void CRedEntry::DisplaySePlayInfo()
 		do {
 			unsigned char* trackCommand = track->m_command;
 			if (trackCommand != 0) {
-				if ((track->m_seSepId & 0x80000000) != 0) {
+				if ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
 					unsigned int seDataNo = (unsigned int)track->m_seSepId;
-					int songNo = (int)(seDataNo & 0x7FFFFFFF) >> 9;
+					int songNo = (int)(seDataNo & REDSOUND_SE_BLOCK_ENTRY_MASK) >> REDSOUND_SE_BLOCK_BANK_SHIFT;
 					int seqBase = ((int*)p_SeBlockData)[songNo] + 0x10;
 					int seqInfo = seqBase + *(short*)(((int*)p_SeBlockData)[songNo] + 10) * 4;
-					seqInfo += (*(unsigned int*)(seqBase + (seDataNo & 0x1FF) * 4) & 0x7FFFFFFF);
+					seqInfo += (*(unsigned int*)(seqBase + (seDataNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK) * 4) &
+					            REDSOUND_SE_BLOCK_ENTRY_MASK);
 					int waveNo = (reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoHi << 8) +
 					             reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoLo;
 					int trackOffset = reinterpret_cast<int>(track) - reinterpret_cast<int>(*trackHead);
 					int trackIndex = trackOffset / REDSOUND_TRACK_SIZE + (trackOffset >> 0x1F);
 
 					OSReport(s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2, sRedEntryLogPrefix,
-					         (trackIndex - (trackIndex >> 0x1F)) + 0x20, songNo, seDataNo & 0x1FF, waveNo);
+					         (trackIndex - (trackIndex >> 0x1F)) + 0x20, songNo,
+					         seDataNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK, waveNo);
 					fflush(__files + 1);
 				} else {
 					RedHistoryBANK* seSepBank = SearchSeSepBank(track->m_seSepId);

@@ -66,6 +66,13 @@ struct RedSeBlockHEAD
 	int m_entries[1];
 };
 
+enum RedSeBlockEntryLayout {
+	REDSOUND_SE_BLOCK_DATA_FLAG = 0x80000000,
+	REDSOUND_SE_BLOCK_ENTRY_MASK = 0x7FFFFFFF,
+	REDSOUND_SE_BLOCK_BANK_SHIFT = 9,
+	REDSOUND_SE_BLOCK_SEQUENCE_MASK = 0x1FF,
+};
+
 struct RedWaveHeadWD
 {
 	char m_signature[2];

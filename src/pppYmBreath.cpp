@@ -23,6 +23,7 @@ extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" {
 extern const float FLOAT_80330c80;
 extern const float FLOAT_80330c84;
+extern const double DOUBLE_80330c88;
 extern const float FLOAT_80330C90;
 extern const float FLOAT_80330C94;
 extern const float FLOAT_80330C98 = 180.0f;

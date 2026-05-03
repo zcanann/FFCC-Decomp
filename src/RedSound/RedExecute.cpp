@@ -1239,23 +1239,23 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
  */
 void _AdsrStart(RedVoiceDATA* voice)
 {
-    u8* adsrData = (u8*)voice + 0x50;
-    int* stage = (int*)((u8*)voice + 0x5c);
+    u8* adsrData = (u8*)voice + REDSOUND_VOICE_ADSR_TIME_OFFSET;
+    int* stage = (int*)((u8*)voice + REDSOUND_VOICE_ADSR_STAGE_OFFSET);
     int prevLevel;
     int nextLevel;
     int stepFrames;
 
-    nextLevel = *(u8*)((u8*)voice + 0x58);
+    nextLevel = *(u8*)((u8*)voice + REDSOUND_VOICE_ADSR_LEVEL_OFFSET);
     *stage    = 0;
     do {
         prevLevel = nextLevel;
         stepFrames = *(u16*)(adsrData + *stage * 2);
-        nextLevel = *(u8*)(adsrData + *stage + 9);
+        nextLevel = *(u8*)(adsrData + *stage + REDSOUND_VOICE_ADSR_LEVEL_BASE);
         if (stepFrames != 0) {
             break;
         }
         *stage = *stage + 1;
-    } while (*stage < 3);
+    } while (*stage < REDSOUND_VOICE_ADSR_STAGE_COUNT);
 
     stage[1] = stepFrames;
     if (nextLevel != 0) {
@@ -1291,17 +1291,17 @@ void _AdsrStart(RedVoiceDATA* voice)
  */
 void _AdsrDataCompute(RedVoiceDATA* voice)
 {
-    u8* adsrData = (u8*)voice + 0x50;
+    u8* adsrData = (u8*)voice + REDSOUND_VOICE_ADSR_TIME_OFFSET;
     int prevValue;
     int stepCount;
     int level;
-    int* stage = (int*)((u8*)voice + 0x5c);
+    int* stage = (int*)((u8*)voice + REDSOUND_VOICE_ADSR_STAGE_OFFSET);
 
     level = voice->m_adsrCurrentLevel;
     stepCount = 0;
-    while (*stage < 3) {
+    while (*stage < REDSOUND_VOICE_ADSR_STAGE_COUNT) {
         prevValue = level;
-        level = (u32)*(u8*)(adsrData + *stage + 9);
+        level = (u32)*(u8*)(adsrData + *stage + REDSOUND_VOICE_ADSR_LEVEL_BASE);
         stepCount = (u32)*(u16*)(adsrData + *stage * 2);
         if (level != 0) {
             level += 1;

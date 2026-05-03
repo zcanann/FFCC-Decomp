@@ -2486,23 +2486,23 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     switch (mode) {
     case 1:
         track->m_fuzzyVolumeDepth = value;
-        track->m_voiceSwitch |= 0x8000;
+        track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_VOLUME;
         return;
     case 2:
         track->m_fuzzyPanDepth = value;
-        track->m_voiceSwitch |= 0x10000;
+        track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_PAN;
         return;
     case 3:
         track->m_fuzzyDeltaTimeDepth = value;
-        track->m_voiceSwitch |= 0x20000;
+        track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME;
         return;
     case 4:
         track->m_fuzzyAdsrDepth = value;
-        track->m_voiceSwitch |= 0x40000;
+        track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_ADSR;
         return;
     default:
         track->m_fuzzyPitchDepth = value;
-        track->m_voiceSwitch |= 0x4000;
+        track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_PITCH;
         return;
     }
 }
@@ -2524,19 +2524,19 @@ void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
     switch (mode) {
     case 1:
-        track->m_voiceSwitch &= 0xFFFF7FFF;
+        track->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_FUZZY_VOLUME;
         return;
     case 2:
-        track->m_voiceSwitch &= 0xFFFEFFFF;
+        track->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_FUZZY_PAN;
         return;
     case 3:
-        track->m_voiceSwitch &= 0xFFFDFFFF;
+        track->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME;
         return;
     case 4:
-        track->m_voiceSwitch &= 0xFFFBFFFF;
+        track->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_FUZZY_ADSR;
         return;
     default:
-        track->m_voiceSwitch &= 0xFFFFBFFF;
+        track->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_FUZZY_PITCH;
         return;
     }
 }

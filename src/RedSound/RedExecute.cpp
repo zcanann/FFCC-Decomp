@@ -1064,7 +1064,7 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
         }
     }
 
-    if (((unsigned int)voiceData[0x25] & 0x4000U) == 0) {
+    if (((unsigned int)voiceData[0x25] & REDSOUND_VOICE_SWITCH_FUZZY_PITCH) == 0) {
         voiceData[0xf] = 0;
     } else {
         unsigned int random = GetRandomData();
@@ -1077,14 +1077,14 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
         }
     }
 
-    if (((unsigned int)voiceData[0x25] & 0x8000U) == 0) {
+    if (((unsigned int)voiceData[0x25] & REDSOUND_VOICE_SWITCH_FUZZY_VOLUME) == 0) {
         voiceData[0x10] = 0;
     } else {
         s8 random = (s8)GetRandomData();
         voiceData[0x10] = (trackData[0x39] * random) >> 8;
     }
 
-    if (((unsigned int)voiceData[0x25] & 0x10000U) == 0) {
+    if (((unsigned int)voiceData[0x25] & REDSOUND_VOICE_SWITCH_FUZZY_PAN) == 0) {
         voiceData[0x11] = 0;
     } else {
         s8 random = (s8)GetRandomData();
@@ -1119,7 +1119,7 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
         if (trackS16[0x6d] != -1) {
             ((s16*)voiceData)[0x2b] = trackS16[0x6d];
         }
-        if (((unsigned int)voiceData[0x25] & 0x40000U) != 0) {
+        if (((unsigned int)voiceData[0x25] & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
             u16 random = GetRandomData();
             ((u16*)voiceData)[0x28] = (u16)(trackData[0x3c] * (random & 0xff));
         }
@@ -2004,7 +2004,7 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
                         delta += ((RedTrackDATA*)track)->m_step;
                         if (delta < 1) {
                             delta = 1;
-                        } else if ((((RedTrackDATA*)track)->m_voiceSwitch & 0x20000) != 0) {
+                        } else if ((((RedTrackDATA*)track)->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME) != 0) {
                             delta += ((delta * ((RedTrackDATA*)track)->m_fuzzyDeltaTimeDepth >> 8) *
                                          (int)GetRandomData()) >>
                                 7;
@@ -2536,7 +2536,7 @@ int _SeMidiNoteExecute(
                             delta += ((RedTrackDATA*)track)->m_step;
                             if (delta < 1) {
                                 delta = 1;
-                            } else if ((((RedTrackDATA*)track)->m_voiceSwitch & 0x20000) != 0) {
+                            } else if ((((RedTrackDATA*)track)->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME) != 0) {
                                 delta += ((delta * ((RedTrackDATA*)track)->m_fuzzyDeltaTimeDepth >> 8) *
                                              (int)GetRandomData()) >>
                                     7;

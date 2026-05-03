@@ -211,6 +211,11 @@ enum RedSoundControlWordOffset {
 	REDSOUND_CONTROL_TEMPO_WORD_OFFSET = 0x112,
 };
 
+enum RedSoundControlSaveSize {
+	REDSOUND_CONTROL_SAVED_POSITION_SIZE = sizeof(int) * 4,
+	REDSOUND_CONTROL_SAVED_TEMPO_SIZE = sizeof(int) * 3,
+};
+
 typedef void (*RedMidiControlFunc)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
 typedef int (*RedSwingFunc)(int);
 

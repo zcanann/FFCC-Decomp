@@ -2310,8 +2310,8 @@ void MusicSkipFunction()
     iVar5 = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
     while ((iVar5 == 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
-        memcpy(&control->m_measure, &control->m_savedMeasure, 0x10);
-        memcpy(&control->m_tempo, &control->m_savedTempo, 0xc);
+        memcpy(&control->m_measure, &control->m_savedMeasure, REDSOUND_CONTROL_SAVED_POSITION_SIZE);
+        memcpy(&control->m_tempo, &control->m_savedTempo, REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
         puVar8 = (u32*)control->m_tracks;
         iVar7 = (int)control + 0x28;
         uVar6 = control->m_trackCount;

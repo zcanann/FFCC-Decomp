@@ -21,7 +21,7 @@ class CUSBPcs : public CProcess
 public:
     class CDataHeader;
 
-    CUSBPcs();
+    CUSBPcs() {}
 
     void Init();
     void Quit();

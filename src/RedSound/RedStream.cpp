@@ -68,7 +68,7 @@ void _StreamStop(RedStreamDATA* streamData)
 	fflush(__files + 1);
 	if (streamData->m_streamId != 0) {
 		streamData->m_streamId = 0;
-		streamData->m_state = 0;
+		streamData->m_state = REDSOUND_STREAM_STATE_STOPPED;
 		if (streamData->m_buffer != 0) {
 			RedDelete(streamData->m_buffer);
 			streamData->m_buffer = 0;
@@ -402,7 +402,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		}
 		streamData->m_dmaId = dmaID;
 		streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
-		streamData->m_state = 3;
+		streamData->m_state = REDSOUND_STREAM_STATE_LOADING;
 	} else {
 		if (m_ReportPrint != 0) {
 			OSReport(sRedStreamBufferDidntSecureFmt, sRedStreamLogPrefix, sRedStreamLogErrorColor, sRedStreamLogReset);
@@ -549,7 +549,7 @@ void StreamControl()
 	RedStreamDATA* streamData = p_Stream;
 	do {
 		RedVoiceDATA* voiceData;
-		if (streamData->m_state == 1) {
+		if (streamData->m_state == REDSOUND_STREAM_STATE_PLAYING) {
 			voiceData = streamData->m_voiceData;
 			if (voiceData->m_axVoice != 0) {
 				if (voiceData->m_axVoice->priority == 0) {
@@ -616,9 +616,9 @@ void StreamControl()
 					}
 				}
 			}
-		} else if ((streamData->m_state == 3) && (RedDmaSearchID(streamData->m_dmaId) == 0)) {
+		} else if ((streamData->m_state == REDSOUND_STREAM_STATE_LOADING) && (RedDmaSearchID(streamData->m_dmaId) == 0)) {
 			voiceData = streamData->m_voiceData;
-			streamData->m_state = 1;
+			streamData->m_state = REDSOUND_STREAM_STATE_PLAYING;
 			voiceData->m_flags |= REDSOUND_VOICE_FLAGS_STREAM_START;
 			voiceData->m_waveData = streamData->m_trackData;
 			voiceData->m_active = 1;

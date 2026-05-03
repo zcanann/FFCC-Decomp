@@ -18,6 +18,12 @@ struct RedStreamHEAD {
     s16 m_unk1E;
 };
 
+enum RedStreamState {
+    REDSOUND_STREAM_STATE_STOPPED = 0,
+    REDSOUND_STREAM_STATE_PLAYING = 1,
+    REDSOUND_STREAM_STATE_LOADING = 3,
+};
+
 struct RedStreamDATA {
     RedTrackDATA* m_track;
     RedVoiceDATA* m_voiceData;

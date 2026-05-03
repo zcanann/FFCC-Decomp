@@ -629,6 +629,27 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
             continue;
         }
 
+        float translateX = kCharaViewerZero;
+        if ((i != 0) && (*(void**)(p + 0x190) != 0)) {
+            int frameShift = ViewerModelFrameShift(*(void**)(p + 0x190));
+            translateX = static_cast<float>((1 << (15 - frameShift)) / 8);
+        }
+
+        if ((i == 0) && (*(int*)(p + 0x5C8) != 0)) {
+            *(int*)(p + 0x5C8) = 0;
+            CTexAnimSet* texAnimSet = ViewerModelTexAnimSet(model);
+            if (texAnimSet != 0) {
+                int texAnimFrame = *(int*)(p + 0x5EC);
+                int animType = -2;
+                if (texAnimFrame >= 0) {
+                    animType = -3;
+                }
+                texAnimSet->Change(
+                    reinterpret_cast<char*>(p + 0x5CC), static_cast<float>((texAnimFrame < 0) ? 0 : texAnimFrame),
+                    static_cast<CTexAnimSet::ANIM_TYPE>(animType));
+            }
+        }
+
         unsigned char* anim = *(unsigned char**)(p + 0x198 + i * 4);
         if (anim != 0) {
             if ((i == 0) && (*(int*)(p + 0x1A4) != 0)) {
@@ -661,27 +682,6 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
                 SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
             } else {
                 SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
-            }
-        }
-
-        float translateX = kCharaViewerZero;
-        if ((i != 0) && (*(void**)(p + 0x190) != 0)) {
-            int frameShift = ViewerModelFrameShift(*(void**)(p + 0x190));
-            translateX = static_cast<float>((1 << (15 - frameShift)) / 8);
-        }
-
-        if ((i == 0) && (*(int*)(p + 0x5C8) != 0)) {
-            *(int*)(p + 0x5C8) = 0;
-            CTexAnimSet* texAnimSet = ViewerModelTexAnimSet(model);
-            if (texAnimSet != 0) {
-                int texAnimFrame = *(int*)(p + 0x5EC);
-                int animType = -2;
-                if (texAnimFrame >= 0) {
-                    animType = -3;
-                }
-                texAnimSet->Change(
-                    reinterpret_cast<char*>(p + 0x5CC), static_cast<float>((texAnimFrame < 0) ? 0 : texAnimFrame),
-                    static_cast<CTexAnimSet::ANIM_TYPE>(animType));
             }
         }
 
@@ -770,6 +770,9 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     register const char* viewerStrings = s_no_texture____801da7e8;
     unsigned int i;
     unsigned int x;
+    CColor colorTmp;
+    CColor colorCopy;
+    CColor white;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
     unsigned char bumpLight[0x138];
@@ -815,9 +818,6 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(float*)(p + 0x128) = kCharaViewerFineStep;
 
     for (i = 0; i < 5; i++) {
-        CColor colorTmp;
-        CColor colorCopy;
-        CColor white;
         unsigned char* whiteChannels =
             reinterpret_cast<unsigned char*>(__ct__6CColorFUcUcUcUc(&white, 0xFF, 0xFF, 0xFF, 0xFF));
         __ct__6CColorFv(&colorTmp);

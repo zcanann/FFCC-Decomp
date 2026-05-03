@@ -105,6 +105,7 @@ enum RedMidiCommandConst {
     REDSOUND_MIDI_DEFAULT_STEP_COUNT = 0x100,
     REDSOUND_MIDI_DEFAULT_RATE_DIVISOR = 0x100,
     REDSOUND_MIDI_RATE_FIXED_NUMERATOR = 0x100000,
+    REDSOUND_MIDI_TICKS_PER_WHOLE_NOTE = 0xC0,
     REDSOUND_MIDI_MOD_DELAY_SCALE = 4,
     REDSOUND_MIDI_SWING_FUNC_MASK = 0xF,
     REDSOUND_MIDI_FUZZY_DEFAULT_DEPTH = 0x100,
@@ -964,7 +965,8 @@ static void __MidiCtrl_TimeSignature(RedSoundCONTROL* control, RedKeyOnDATA*, Re
 {
     control->m_timeNumerator = *track->m_command;
     control->m_timeDenominator = track->m_command[1];
-    control->m_ticksPerMeasure = (0xc0 / control->m_timeDenominator) * control->m_timeNumerator;
+    control->m_ticksPerMeasure =
+        (REDSOUND_MIDI_TICKS_PER_WHOLE_NOTE / control->m_timeDenominator) * control->m_timeNumerator;
     track->m_command += 2;
 }
 

@@ -2355,7 +2355,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x0C] -= step;
 		trackData[0x0A] += trackData[0x0B] * step;
-		*(unsigned int*)(voiceBase + 0xB8) |= 2;
+		*(unsigned int*)(voiceBase + 0xB8) |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
 	if (trackData[0x0F] != 0) {
@@ -2365,7 +2365,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x0F] -= step;
 		trackData[0x0D] += trackData[0x0E] * step;
-		*(unsigned int*)(voiceBase + 0xB8) |= 2;
+		*(unsigned int*)(voiceBase + 0xB8) |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
 	if (trackData[0x12] != 0) {
@@ -2375,7 +2375,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x12] -= step;
 		trackData[0x10] += trackData[0x11] * step;
-		*(unsigned int*)(voiceBase + 0xB8) |= 2;
+		*(unsigned int*)(voiceBase + 0xB8) |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
 	if (trackData[0x1C] != 0) {
@@ -2385,7 +2385,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x1C] -= step;
 		trackData[0x1A] += trackData[0x1B] * step;
-		*(unsigned int*)(voiceBase + 0xB8) |= 2;
+		*(unsigned int*)(voiceBase + 0xB8) |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
 	if (trackData[0x15] != 0) {
@@ -2399,7 +2399,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			trackData[0x42] = 1;
 		}
 		trackData[0x13] += trackData[0x14] * step;
-		*(unsigned int*)(voiceBase + 0xB8) |= 2;
+		*(unsigned int*)(voiceBase + 0xB8) |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
 	if (trackData[0x19] != 0) {
@@ -2409,7 +2409,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x19] -= step;
 		trackData[0x17] += trackData[0x18] * step;
-		*(unsigned int*)(voiceBase + 0xB8) |= 1;
+		*(unsigned int*)(voiceBase + 0xB8) |= REDSOUND_VOICE_UPDATE_PITCH;
 	}
 
 	if (trackData[0x44] != 0) {
@@ -2419,11 +2419,11 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		trackData[0x44] -= step;
 		trackData[0x48] += step * trackData[0x45];
-		*(unsigned int*)(voiceBase + 0xB8) |= 1;
+		*(unsigned int*)(voiceBase + 0xB8) |= REDSOUND_VOICE_UPDATE_PITCH;
 		*(int*)(voiceBase + 0xA0) += step * trackData[0x45];
 	}
 
-	if (((*(unsigned int*)(voiceBase + 0xB8) & 1) != 0) && (*(int*)(voiceBase + 4) != 0)) {
+	if (((*(unsigned int*)(voiceBase + 0xB8) & REDSOUND_VOICE_UPDATE_PITCH) != 0) && (*(int*)(voiceBase + 4) != 0)) {
 		*(int*)(voiceBase + 0x98) = PitchCompute(
 			*(int*)(voiceBase + 0xA0) + trackData[0x17], (int)trackShorts[0xA1] + (int)trackShorts[0x9F],
 			*(int*)(*(int*)(voiceBase + 4) + 0x14), (int)(s8)trackBytes[0x148]);

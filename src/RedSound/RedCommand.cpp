@@ -470,14 +470,13 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 		no += bank << 9;
 		no |= 0x80000000;
 		if (seNo < bankData->m_seCount) {
-			int dataBase = reinterpret_cast<int>(bankData->m_entries);
+			int* entries = reinterpret_cast<int*>(bankData->m_entries);
 
-			if (*(int*)(dataBase + seNo * 4) != -1) {
+			if (entries[seNo] != -1) {
 				RedSeINFO* seInfo =
-				    (RedSeINFO*)(dataBase + bankData->m_seCount * 4 +
-				                 (*(unsigned int*)(dataBase + seNo * 4) & 0x7FFFFFFF));
+				    (RedSeINFO*)((int)(entries + bankData->m_seCount) + ((unsigned int)entries[seNo] & 0x7FFFFFFF));
 
-				if ((*(unsigned int*)(dataBase + seNo * 4) & 0x80000000) != 0) {
+				if (((unsigned int)entries[seNo] & 0x80000000) != 0) {
 					seInfo->m_flagsAndCount |= 0x80;
 				}
 				if (_SePlayStart(seInfo, seId, no, pan, volume) != 0) {

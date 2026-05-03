@@ -376,13 +376,9 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			(streamData->m_track + iVar2)->m_waveBase = streamData->m_aramBuffer + iVar2 * 0x2000;
 			memset(&streamData->m_trackData[iVar2], 0, 0x60);
 			memcpy(streamData->m_trackData[iVar2].m_adpcmData, headerData + iVar2 * 0x2e, 0x2e);
-			voice->m_adsrLevel[2] = 0;
-			voice->m_adsrLevel[1] = 0;
-			voice->m_adsrLevel[0] = 0;
+			voice->m_adsrLevel[2] = voice->m_adsrLevel[1] = voice->m_adsrLevel[0] = 0;
 			voice->m_adsrLevel[3] = 0x7f;
-			voice->m_adsrTime[2] = 0;
-			voice->m_adsrTime[1] = 0;
-			voice->m_adsrTime[0] = 0;
+			voice->m_adsrTime[2] = voice->m_adsrTime[1] = voice->m_adsrTime[0] = 0;
 			voice->m_adsrTime[3] = 10;
 			streamData->m_trackData[iVar2].m_sampleStart = 0;
 			streamData->m_trackData[iVar2].m_loopEnd = 0x3fff;

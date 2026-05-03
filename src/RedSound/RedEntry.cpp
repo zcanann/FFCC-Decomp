@@ -1490,7 +1490,7 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
  * Address:	TODO
  * Size:	TODO
  */
-int CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
+RedMusicHEAD* CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 {
 	int result = 0;
 	RedHistoryBANK* bank = MusicOldChoice();
@@ -1508,7 +1508,7 @@ int CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 		bank->m_historyNo = 1;
 	}
 
-	return result;
+	return reinterpret_cast<RedMusicHEAD*>(result);
 }
 
 /*
@@ -1516,7 +1516,7 @@ int CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
  * Address:	TODO
  * Size:	TODO
  */
-int CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
+RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 {
 	int result;
 
@@ -1537,13 +1537,13 @@ int CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 		                                                    result * 0x10));
 		result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + result * 0x10 + 8);
 	} else {
-		result = MusicHeadAdd(musicHead);
+		result = reinterpret_cast<int>(MusicHeadAdd(musicHead));
 		if (result == 0) {
 			RedDelete(musicHead);
 		}
 	}
 
-	return result;
+	return reinterpret_cast<RedMusicHEAD*>(result);
 }
 
 /*

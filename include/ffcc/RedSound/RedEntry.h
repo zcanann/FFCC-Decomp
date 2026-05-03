@@ -166,8 +166,8 @@ public:
 	RedHistoryBANK* SearchMusicBank(int);
 	int ReentryMusicData(int);
 	void MusicHistoryManager(int, int);
-	int MusicHeadAdd(RedMusicHEAD*);
-	int SetMusicData(RedMusicHEAD*);
+	RedMusicHEAD* MusicHeadAdd(RedMusicHEAD*);
+	RedMusicHEAD* SetMusicData(RedMusicHEAD*);
 	void DisplayMMemoryInfo();
 
 	int m_waveBankBase;

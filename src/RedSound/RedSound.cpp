@@ -13,9 +13,15 @@
 #include "dolphin/ax.h"
 #include "dolphin/axart.h"
 
+enum RedSoundLocalSize {
+	REDSOUND_STANDBY_STATUS_COUNT = 0x40,
+	REDSOUND_STANDBY_STATUS_SIZE = REDSOUND_STANDBY_STATUS_COUNT * sizeof(int),
+	REDSOUND_STREAM_BANK_SIZE = 0x100,
+};
+
 // RedSound global linkage that is shared across Red* units.
 CRedDriver c_Driver;
-static int m_StandbyStatus[0x40];
+static int m_StandbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
 volatile unsigned int m_AutoID;
 static void* p_StreamBank;
 static const char sRedSoundMemorySettingError[] = "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
@@ -91,7 +97,7 @@ int* CRedSound::EntryStandbyID(int id)
 			return slot;
 		}
 		slot++;
-	} while (slot < (m_StandbyStatus + 0x40));
+	} while (slot < (m_StandbyStatus + REDSOUND_STANDBY_STATUS_COUNT));
 
 	return 0;
 }
@@ -107,10 +113,11 @@ int* CRedSound::EntryStandbyID(int id)
  */
 int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int aramBufferSize)
 {
-	memset(m_StandbyStatus, 0, 0x100);
+	memset(m_StandbyStatus, 0, REDSOUND_STANDBY_STATUS_SIZE);
 
 	if (mainBufferSize > 0 && aramBufferSize > 0) {
-		if ((((u32)mainBuffer & 0x1F) != 0) || (((u32)mainBufferSize & 0x1F) != 0)) {
+		if ((((u32)mainBuffer & REDSOUND_MEMORY_BANK_ALIGN_MASK) != 0) ||
+		    (((u32)mainBufferSize & REDSOUND_MEMORY_BANK_ALIGN_MASK) != 0)) {
 			if (m_ReportPrint != 0) {
 				OSReport(sRedSoundMemorySettingError, sRedSoundLogPrefix, sRedSoundLogErrorColor, (u32)mainBuffer,
 				         mainBufferSize, sRedSoundLogReset);
@@ -119,7 +126,8 @@ int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int ar
 			return 0;
 		}
 
-		if ((((u32)aramBuffer & 0x1F) != 0) || (((u32)aramBufferSize & 0x1F) != 0)) {
+		if ((((u32)aramBuffer & REDSOUND_MEMORY_BANK_ALIGN_MASK) != 0) ||
+		    (((u32)aramBufferSize & REDSOUND_MEMORY_BANK_ALIGN_MASK) != 0)) {
 			if (m_ReportPrint != 0) {
 				OSReport(sRedSoundAMemorySettingError,
 				         sRedSoundLogPrefix, sRedSoundLogErrorColor, aramBuffer,
@@ -179,8 +187,8 @@ int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int ar
 void CRedSound::Start()
 {
 #define redSoundStreamBank (*(void* volatile*)&p_StreamBank)
-	redSoundStreamBank = (void*)RedNew(0x100);
-	memset((void*)redSoundStreamBank, 0, 0x100);
+	redSoundStreamBank = (void*)RedNew(REDSOUND_STREAM_BANK_SIZE);
+	memset((void*)redSoundStreamBank, 0, REDSOUND_STREAM_BANK_SIZE);
 #undef redSoundStreamBank
 }
 
@@ -250,7 +258,7 @@ int CRedSound::ReportStandby(int id)
 				break;
 			}
 			i++;
-		} while (i < 0x40);
+	} while (i < REDSOUND_STANDBY_STATUS_COUNT);
 	} else {
 		i = 0;
 		do {
@@ -259,7 +267,7 @@ int CRedSound::ReportStandby(int id)
 				break;
 			}
 			i++;
-		} while (i < 0x40);
+		} while (i < REDSOUND_STANDBY_STATUS_COUNT);
 	}
 
 	return result;

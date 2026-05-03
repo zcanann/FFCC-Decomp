@@ -19,6 +19,12 @@ enum RedSoundLocalSize {
 	REDSOUND_STREAM_BANK_SIZE = 0x100,
 };
 
+enum RedSoundStreamSignature {
+	REDSOUND_STREAM_SIGNATURE_0 = 'S',
+	REDSOUND_STREAM_SIGNATURE_1 = 'T',
+	REDSOUND_STREAM_SIGNATURE_2 = 'R',
+};
+
 // RedSound global linkage that is shared across Red* units.
 CRedDriver c_Driver;
 static int m_StandbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
@@ -759,7 +765,8 @@ int CRedSound::StreamPlay(void* data, int fileSize, int pan, int volume)
 	int id = 0;
 	char* streamData = (char*)data;
 
-	if (streamData[0] == 'S' && streamData[1] == 'T' && streamData[2] == 'R') {
+	if (streamData[0] == REDSOUND_STREAM_SIGNATURE_0 && streamData[1] == REDSOUND_STREAM_SIGNATURE_1 &&
+	    streamData[2] == REDSOUND_STREAM_SIGNATURE_2) {
 		id = GetAutoID();
 		c_Driver.StreamPlay(id, data, fileSize, pan, volume);
 	} else if (m_ReportPrint != 0) {

@@ -694,11 +694,11 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	music->m_updateFlags = 0;
 
 	if (m_CrossTime == 0) {
-		music->m_masterVolume = 0x1ff000;
+		music->m_masterVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
 		music->m_masterVolumeDelta = 0;
 	} else {
 		music->m_masterVolume = 0;
-		music->m_masterVolumeAdd = 0x1ff800;
+		music->m_masterVolumeAdd = REDSOUND_MASTER_VOLUME_FULL_FIXED_HALF;
 		music->m_masterVolumeAdd = music->m_masterVolumeAdd / m_CrossTime;
 		music->m_masterVolumeDelta = m_CrossTime;
 		m_CrossTime = 0;
@@ -811,7 +811,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	music->m_measure = 1;
 	music->m_elapsedTime = 0;
 	if (volume != 0) {
-		volume = (((volume + 1) * 4) - 1) * REDSOUND_FIXED_ONE;
+		volume = (((volume + 1) * REDSOUND_MASTER_VOLUME_SCALE) - 1) * REDSOUND_FIXED_ONE;
 	}
 	music->m_volume = volume;
 	music->m_volumeDelta = 0;

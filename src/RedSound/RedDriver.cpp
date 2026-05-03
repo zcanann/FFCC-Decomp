@@ -358,8 +358,8 @@ void _MusicCrossPlaySequence(int* command)
         *(int*)((int)pvVar2 + 0x458) = -*(int*)((int)pvVar2 + 0x454) / command[2];
         *(int*)((int)pvVar2 + 0x45c) = command[2];
         pvVar2 = p_SoundControlBuffer;
-        *(int*)((int)pvVar2 + 0x8ec) =
-             (0x1ff800 - *(int*)((int)pvVar2 + 0x8e8)) / command[2];
+            *(int*)((int)pvVar2 + 0x8ec) =
+                 (REDSOUND_MASTER_VOLUME_FULL_FIXED_HALF - *(int*)((int)pvVar2 + 0x8e8)) / command[2];
         *(int*)((int)pvVar2 + 0x8f0) = command[2];
         pvVar2 = (void*)RedNew(REDSOUND_CONTROL_SIZE);
         memcpy(pvVar2, (void*)((int)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET), REDSOUND_CONTROL_SIZE);
@@ -1305,14 +1305,14 @@ void CRedDriver::Init()
     p_SoundControlBuffer = (RedSoundCONTROL*)RedNew(REDSOUND_CONTROL_BUFFER_SIZE);
     p_SoundControl = p_SoundControlBuffer;
     memset(p_SoundControlBuffer, 0, REDSOUND_CONTROL_BUFFER_SIZE);
-    p_SoundControl[REDSOUND_CONTROL_SE].m_volume = 0x1ff000;
-    p_SoundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_volume = 0x1ff000;
-    p_SoundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volume = 0x1ff000;
-    p_SoundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_volume = 0x1ff000;
-    p_SoundControl[REDSOUND_CONTROL_SE].m_masterVolume = 0x1ff000;
-    p_SoundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_masterVolume = 0x1ff000;
-    p_SoundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolume = 0x1ff000;
-    p_SoundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolume = 0x1ff000;
+    p_SoundControl[REDSOUND_CONTROL_SE].m_volume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
+    p_SoundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_volume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
+    p_SoundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
+    p_SoundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_volume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
+    p_SoundControl[REDSOUND_CONTROL_SE].m_masterVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
+    p_SoundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_masterVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
+    p_SoundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
+    p_SoundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
     p_SoundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId = -1;
     p_SoundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId = -1;
     p_SoundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId = -1;

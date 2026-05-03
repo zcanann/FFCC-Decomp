@@ -653,7 +653,7 @@ void SePause(int seId, int pause)
 			if (pause == 1) {
 				if (voice->m_axVoice != 0) {
 					voice->m_targetPitch = 0;
-					voice->m_flags |= 0x18;
+					voice->m_flags |= REDSOUND_VOICE_FLAGS_PAUSE_DIRTY;
 				}
 				track->m_voiceSwitch |= 8;
 				voice->m_voiceSwitch |= 8;

@@ -619,11 +619,11 @@ void StreamControl()
 		} else if ((streamData->m_state == 3) && (RedDmaSearchID(streamData->m_dmaId) == 0)) {
 			voiceData = streamData->m_voiceData;
 			streamData->m_state = 1;
-			voiceData->m_flags |= 0x19;
+			voiceData->m_flags |= REDSOUND_VOICE_FLAGS_STREAM_START;
 			voiceData->m_waveData = streamData->m_trackData;
 			voiceData->m_active = 1;
 			if (streamData->m_header.m_channelCount == 2) {
-				voiceData[1].m_flags |= 0x19;
+				voiceData[1].m_flags |= REDSOUND_VOICE_FLAGS_STREAM_START;
 				voiceData[1].m_waveData = &streamData->m_trackData[1];
 				voiceData[1].m_active = 1;
 			}

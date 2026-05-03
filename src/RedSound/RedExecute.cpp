@@ -1664,8 +1664,9 @@ void _KeyOnControl()
         do {
             if ((voice[REDSOUND_VOICE_ACTIVE_WORD] != 0) && (voice[REDSOUND_VOICE_TRACK_WORD] != 0) &&
                 ((((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_voiceSwitch & 9) == 0)) {
-                if ((((RedVoiceDATA*)voice)->m_updateFlags & REDSOUND_VOICE_UPDATE_VOLUME) != 0 || (*(int*)(*voice + 0x94) != 0) ||
-                    (*(int*)(*voice + 0xB4) != 0)) {
+                if ((((RedVoiceDATA*)voice)->m_updateFlags & REDSOUND_VOICE_UPDATE_VOLUME) != 0 ||
+                    (((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_tremoloFunc != 0) ||
+                    (((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_shakeFunc != 0)) {
                     int volume;
                     if ((*voice < (u32)p_SoundControlBuffer->m_tracks) ||
                         ((u32)p_SoundControlBuffer->m_tracks +
@@ -1712,7 +1713,8 @@ void _KeyOnControl()
                     _VolumeExecute((RedVoiceDATA*)voice, volume);
                 }
 
-                if ((((RedVoiceDATA*)voice)->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0 || (*(int*)(*voice + 0x74) != 0)) {
+                if ((((RedVoiceDATA*)voice)->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0 ||
+                    (((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_vibrateFunc != 0)) {
                     _PitchExecute((RedVoiceDATA*)voice);
                 }
                 ((RedVoiceDATA*)voice)->m_updateFlags = 0;

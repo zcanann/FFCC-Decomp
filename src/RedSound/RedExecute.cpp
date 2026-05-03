@@ -1635,9 +1635,14 @@ void _KeyOnControl()
                                           (u32)(((RedTrackDATA*)*voice)->m_trackNo * 0x8000000 + idxSign) >> 0x1B) -
                                          idxSign) &
                                         m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
-                                volume = ((*(s8*)((u8*)p_SoundControlBuffer + 0x926) + 1) * (((int*)((u32*)p_SoundControlBuffer)[300])[0] >> 0xC)) >> 7;
-                                if (((u32*)p_SoundControlBuffer)[0x23C] != 0) {
-                                    volume = (volume * (((int*)((u32*)p_SoundControlBuffer)[0x23A])[0] >> 0xC)) >> 9;
+                                volume = ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volumeScale + 1) *
+                                          (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volume >> 0xC)) >>
+                                         7;
+                                if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolumeDelta != 0) {
+                                    volume = (volume *
+                                              (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolume >>
+                                               0xC)) >>
+                                             9;
                                 }
                                 volume = (volume * m_MasterMusicVolume) >> 9;
                             } else {
@@ -1651,9 +1656,11 @@ void _KeyOnControl()
                                       (u32)(((RedTrackDATA*)*voice)->m_trackNo * 0x8000000 + idxSign) >> 0x1B) -
                                      idxSign) &
                                     m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
-                            volume = ((p_SoundControlBuffer->m_volumeScale + 1) * (((int*)((u32*)p_SoundControlBuffer)[7])[0] >> 0xC)) >> 7;
-                            if (((u32*)p_SoundControlBuffer)[0x117] != 0) {
-                                volume = (volume * (((int*)((u32*)p_SoundControlBuffer)[0x115])[0] >> 0xC)) >> 9;
+                            volume = ((p_SoundControlBuffer->m_volumeScale + 1) *
+                                      (p_SoundControlBuffer->m_volume >> 0xC)) >>
+                                     7;
+                            if (p_SoundControlBuffer->m_masterVolumeDelta != 0) {
+                                volume = (volume * (p_SoundControlBuffer->m_masterVolume >> 0xC)) >> 9;
                             }
                             volume = (volume * m_MasterMusicVolume) >> 9;
                         } else {

@@ -62,7 +62,7 @@ int RedNew(int size)
 	}
 
 	interrupts = OSDisableInterrupts();
-	size = (size + 0x1F) & ~0x1F;
+	size = (size + REDSOUND_MEMORY_BANK_ALIGN_MASK) & ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
 	slot = m_MemoryBank;
 	address = m_DataBuffer;
 
@@ -79,9 +79,10 @@ int RedNew(int size)
 
 			if ((u32)(address + size) <= (u32)(m_DataBuffer + m_DataBufferSize)) {
 				if (slot->m_size > 0) {
-					entryCount = ((int)(m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (int)(slot + 1)) / 8;
+					entryCount = ((int)(m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (int)(slot + 1)) /
+					             REDSOUND_MEMORY_BLOCK_SIZE;
 					if (entryCount > 0) {
-						memmove(slot + 1, slot, entryCount * 8);
+						memmove(slot + 1, slot, entryCount * REDSOUND_MEMORY_BLOCK_SIZE);
 					}
 				}
 
@@ -123,11 +124,12 @@ void RedDelete(int address)
 
 		while ((blockPtr->m_size != 0) && (blockPtr < m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT)) {
 			if (blockPtr->m_address == address) {
-				int entryCount = ((int)(m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (int)(blockPtr + 1)) / 8;
+				int entryCount = ((int)(m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (int)(blockPtr + 1)) /
+				                 REDSOUND_MEMORY_BLOCK_SIZE;
 
 				if (entryCount > 0) {
-					memcpy(blockPtr, blockPtr + 1, entryCount * 8);
-					memset(m_MemoryBank + REDSOUND_MEMORY_BANK_LAST_INDEX, 0, 8);
+					memcpy(blockPtr, blockPtr + 1, entryCount * REDSOUND_MEMORY_BLOCK_SIZE);
+					memset(m_MemoryBank + REDSOUND_MEMORY_BANK_LAST_INDEX, 0, REDSOUND_MEMORY_BLOCK_SIZE);
 				}
 				break;
 			}
@@ -190,7 +192,7 @@ int RedNewA(int size, int offset, int maxSize)
 		maxSize = m_ADataBufferSize;
 	}
 	maxSize -= offset;
-	size = (size + 0x1F) & ~0x1F;
+	size = (size + REDSOUND_MEMORY_BANK_ALIGN_MASK) & ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
 	currentAddress = rangeStart;
 	result = -1;
 	maxGap = maxSize;
@@ -230,9 +232,10 @@ int RedNewA(int size, int offset, int maxSize)
 
 	if ((bestBlock != 0) && ((u32)(result + size) <= (u32)(rangeStart + maxSize))) {
 		if (bestBlock->m_size > 0) {
-			int moveCount = ((int)(m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (int)(bestBlock + 1)) / 8;
+			int moveCount = ((int)(m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (int)(bestBlock + 1)) /
+			                REDSOUND_MEMORY_BLOCK_SIZE;
 			if (moveCount > 0) {
-				memmove(bestBlock + 1, bestBlock, moveCount * 8);
+				memmove(bestBlock + 1, bestBlock, moveCount * REDSOUND_MEMORY_BLOCK_SIZE);
 			}
 		}
 		bestBlock->m_address = result;
@@ -266,11 +269,12 @@ void RedDeleteA(int address)
 
 		while ((blockPtr->m_size != 0) && (blockPtr < m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT)) {
 			if (blockPtr->m_address == address) {
-				int entryCount = ((int)(m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (int)(blockPtr + 1)) / 8;
+				int entryCount = ((int)(m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (int)(blockPtr + 1)) /
+				                 REDSOUND_MEMORY_BLOCK_SIZE;
 
 				if (entryCount > 0) {
-					memcpy(blockPtr, blockPtr + 1, entryCount * 8);
-					memset(m_AMemoryBank + REDSOUND_MEMORY_BANK_LAST_INDEX, 0, 8);
+					memcpy(blockPtr, blockPtr + 1, entryCount * REDSOUND_MEMORY_BLOCK_SIZE);
+					memset(m_AMemoryBank + REDSOUND_MEMORY_BANK_LAST_INDEX, 0, REDSOUND_MEMORY_BLOCK_SIZE);
 				}
 				break;
 			}
@@ -308,8 +312,8 @@ void RedDeleteA(void* address)
 void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
 	int bankSize = REDSOUND_MEMORY_BANK_SIZE;
-	bankSize += 0x1F;
-	bankSize &= ~0x1F;
+	bankSize += REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	bankSize &= ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
 
 	m_MemoryBank = (RedMemoryBlock*)param1;
 	m_AMemoryBank = (RedMemoryBlock*)((int)m_MemoryBank + bankSize);

@@ -37,6 +37,11 @@ RedReverbModeData t_ReverbModeData[] = {
     {0x2, {0x28, 0x9C4, 0x32, 0x50, 0x64, 0x0}},
 };
 
+static void _EraseAttribute(int, int);
+static int _EraseTime(int);
+static int _SePlayStart(RedSeINFO*, int, int, int, int);
+static void _MusicPlayStart(RedMusicHEAD*, RedWaveHeadWD*, int, int, int);
+
 /*
  * --INFO--
  * PAL Address: 0x801ca038
@@ -46,7 +51,7 @@ RedReverbModeData t_ReverbModeData[] = {
  * JP Address: TODO
  * JP Size: TODO
  */
-void _EraseAttribute(int eraseTrack, int attrMask)
+static void _EraseAttribute(int eraseTrack, int attrMask)
 {
 	RedTrackDATA** trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks;
 	RedTrackDATA* track = *trackBasePtr;
@@ -92,7 +97,7 @@ void _EraseAttribute(int eraseTrack, int attrMask)
  * JP Address: TODO
  * JP Size: TODO
  */
-int _EraseTime(int eraseTrack)
+static int _EraseTime(int eraseTrack)
 {
 	int minTrack = REDSOUND_ERASE_TRACK_SENTINEL;
 	RedTrackDATA** trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks;
@@ -320,7 +325,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
  * JP Address: TODO
  * JP Size: TODO
  */
-int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
+static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 {
 	unsigned char flag;
 	RedWaveHeadWD* waveBase;
@@ -703,7 +708,7 @@ void SePause(int seId, int pause)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume, int mode)
+static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume, int mode)
 {
 	if (c_RedEntry.SearchWaveBase(musicHead->m_waveNo) == 0) {
 		return;

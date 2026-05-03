@@ -2337,7 +2337,7 @@ void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
  */
 void __MidiCtrl_ReverbOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    track->m_voiceSwitch |= 0x3c00;
+    track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_MIX_ALL;
     SetVoiceSwitch(track, track->m_voiceSwitch);
     m_ChangeStatus |= 2;
 }
@@ -2353,8 +2353,8 @@ void __MidiCtrl_ReverbOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    track->m_voiceSwitch &= 0xffffcfff;
-    track->m_voiceSwitch |= 0xc00;
+    track->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_REVERB_MASK;
+    track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_DRY_STEREO;
     SetVoiceSwitch(track, track->m_voiceSwitch);
     m_ChangeStatus |= 2;
 }
@@ -2370,27 +2370,27 @@ void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    track->m_voiceSwitch &= 0xFFFFC3FF;
+    track->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_MIX_MASK;
 
     switch (**(unsigned char**)track) {
     case 1:
-        track->m_voiceSwitch |= 0x1000;
+        track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_LEFT;
         break;
     case 2:
-        track->m_voiceSwitch |= 0x1000;
+        track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_LEFT;
     default:
-        track->m_voiceSwitch |= 0x400;
+        track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_DRY_LEFT;
         break;
     }
 
     switch ((*(unsigned char**)track)[1]) {
     case 1:
-        track->m_voiceSwitch |= 0x2000;
+        track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_RIGHT;
         break;
     case 2:
-        track->m_voiceSwitch |= 0x2000;
+        track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_RIGHT;
     default:
-        track->m_voiceSwitch |= 0x800;
+        track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_DRY_RIGHT;
         break;
     }
     *(unsigned char**)track += 2;

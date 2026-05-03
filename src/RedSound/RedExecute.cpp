@@ -648,13 +648,13 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         volFactor = (int)t_PanningData[0x40];
         int monoBase = (volume * volFactor) >> 8;
 
-        if ((voiceData[0x25] & 0xc00U) != 0) {
+        if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_DRY_STEREO) != 0) {
             uVar3 = (u16)monoBase;
             *mixData = uVar3;
             *(u16*)(voiceData + 0x1b) = uVar3;
         }
 
-        if ((voiceData[0x25] & 0x3000U) != 0) {
+        if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
             u16 monoMix = (u16)((monoBase * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
             if ((voiceData[0x25] & 2U) != 0) {
                 *(u16*)(voiceData + 0x1c) = monoMix;
@@ -671,12 +671,12 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         *(s16*)(voiceData + 0x1b) = (s16)((volume * t_PanningData[pan ^ 0x7f]) >> 8);
         *(s16*)(voiceData + 0x1f) = (s16)((volume * t_PanningDataR[pan ^ 0x7f]) >> 8);
 
-        if ((voiceData[0x25] & 0x1000U) != 0) {
+        if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_LEFT) != 0) {
             *(s16*)(voiceData + 0x1c) = (s16)((int)((u32)*mixData * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
             *(s16*)(voiceData + 0x22) = (s16)((int)((u32)*(u16*)(voiceData + 0x1e) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
         }
 
-        if ((voiceData[0x25] & 0x2000U) != 0) {
+        if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_RIGHT) != 0) {
             *(s16*)(voiceData + 0x1d) = (s16)((int)((u32)*(u16*)(voiceData + 0x1b) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
             *(s16*)(voiceData + 0x20) = (s16)((int)((u32)*(u16*)(voiceData + 0x1f) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
         }
@@ -691,15 +691,15 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         int leftMix = (volume * leftPan) >> 8;
         int rightMix = (volume * rightPan) >> 8;
 
-        if ((voiceData[0x25] & 0x400U) != 0) {
+        if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_DRY_LEFT) != 0) {
             *mixData = (u16)leftMix;
         }
 
-        if ((voiceData[0x25] & 0x800U) != 0) {
+        if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_DRY_RIGHT) != 0) {
             *(s16*)(voiceData + 0x1b) = (s16)rightMix;
         }
 
-        if ((voiceData[0x25] & 0x1000U) != 0) {
+        if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_LEFT) != 0) {
             iVar1 = (leftMix * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
             if ((voiceData[0x25] & 2U) != 0) {
                 *(u16*)(voiceData + 0x1c) = (u16)iVar1;
@@ -708,7 +708,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
             }
         }
 
-        if ((voiceData[0x25] & 0x2000U) != 0) {
+        if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_RIGHT) != 0) {
             iVar2 = (rightMix * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
             if ((voiceData[0x25] & 2U) != 0) {
                 *(u16*)(voiceData + 0x1d) = (u16)iVar2;
@@ -1004,11 +1004,11 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
     voiceData[0x25] = trackData[0x3f];
     if (voiceData[1] != 0 && ((s8*)voiceData[1])[0x1c] != 0) {
         unsigned int maskBits;
-        voiceData[0x25] &= 0xffffc3ff;
+        voiceData[0x25] &= REDSOUND_VOICE_SWITCH_CLEAR_MIX_MASK;
         if (((s8*)voiceData[1])[0x1c] == 1) {
-            maskBits = 0x3c00;
+            maskBits = REDSOUND_VOICE_SWITCH_MIX_ALL;
         } else {
-            maskBits = 0xc00;
+            maskBits = REDSOUND_VOICE_SWITCH_DRY_STEREO;
         }
         voiceData[0x25] |= maskBits;
     }
@@ -1453,7 +1453,7 @@ void EnvelopeKeyExecute()
                 }
 
                 *(u16*)(voice + 0x144) = 3;
-                if ((voiceData[0x25] & 0x3000U) != 0) {
+                if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
                     if ((voiceData[0x25] & 2U) == 0) {
                         *(u16*)(voice + 0x144) |= 0x600;
                     } else {

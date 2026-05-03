@@ -418,7 +418,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				track->m_fuzzyVolumeDepth = 0;
 				track->m_fuzzyPitchDepth = 0;
 				track->m_portamentPitch = -1;
-				track->m_voiceSwitch = 0xc00;
+				track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO;
 				memset(&track->m_adsrAR, 0xff, 0xc);
 				track->m_note.m_allocFlags = 5;
 				track->m_seTickCounter = 1;

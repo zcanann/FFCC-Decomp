@@ -1845,7 +1845,7 @@ void _ExecuteExtraData()
  */
 void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
 {
-    u32 flags = 0;
+    u32 updateFlags = 0;
     int* trackData = (int*)track;
     int* voiceData;
 
@@ -1856,7 +1856,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         if (trackData[0x0C] <= frames) {
             step = trackData[0x0C];
         }
-        flags = 2;
+        updateFlags = REDSOUND_VOICE_UPDATE_VOLUME;
         trackData[0x0C] -= step;
         trackData[0x0A] += trackData[0x0B] * step;
     }
@@ -1866,7 +1866,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         if (trackData[0x0F] <= frames) {
             step = trackData[0x0F];
         }
-        flags = 2;
+        updateFlags = REDSOUND_VOICE_UPDATE_VOLUME;
         trackData[0x0F] -= step;
         trackData[0x0D] += trackData[0x0E] * step;
     }
@@ -1876,7 +1876,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         if (trackData[0x12] <= frames) {
             step = trackData[0x12];
         }
-        flags = 2;
+        updateFlags = REDSOUND_VOICE_UPDATE_VOLUME;
         trackData[0x12] -= step;
         trackData[0x10] += trackData[0x11] * step;
     }
@@ -1886,7 +1886,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         if (trackData[0x1C] <= frames) {
             step = trackData[0x1C];
         }
-        flags = 2;
+        updateFlags = REDSOUND_VOICE_UPDATE_VOLUME;
         trackData[0x1C] -= step;
         trackData[0x1A] += trackData[0x1B] * step;
     }
@@ -1898,7 +1898,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         if (trackData[0x44] <= frames) {
             step = trackData[0x44];
         }
-        flags |= 1;
+        updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
         trackData[0x44] -= step;
         addPitch = step * trackData[0x45];
         trackData[0x48] += addPitch;
@@ -1991,7 +1991,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
                 }
                 *(s16*)(voiceData + 0x0E) -= (s16)step;
             }
-            voiceData[0x2E] |= flags;
+            voiceData[REDSOUND_VOICE_UPDATE_FLAGS_WORD] |= updateFlags;
         }
         voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);
     } while (voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));

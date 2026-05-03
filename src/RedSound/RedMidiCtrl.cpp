@@ -105,6 +105,9 @@ enum RedMidiCommandConst {
     REDSOUND_MIDI_DEFAULT_STEP_COUNT = 0x100,
     REDSOUND_MIDI_DEFAULT_RATE_DIVISOR = 0x100,
     REDSOUND_MIDI_RATE_FIXED_NUMERATOR = 0x100000,
+    REDSOUND_MIDI_MOD_DELAY_SCALE = 4,
+    REDSOUND_MIDI_SWING_FUNC_MASK = 0xF,
+    REDSOUND_MIDI_FUZZY_DEFAULT_DEPTH = 0x100,
     REDSOUND_MIDI_PITCH_BEND_HIGH_SCALE = 0x80,
     REDSOUND_MIDI_PITCH_BEND_CENTER = 0x2000,
 };
@@ -658,7 +661,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
 
             c_RedEntry.MusicHistoryManager(0, control->m_musicId);
             c_RedEntry.WaveHistoryManager(0, control->m_waveNo);
-            control->m_musicId = 0xffffffff;
+            control->m_musicId = -1;
             control->m_updateFlags = 0;
             RedDelete((int)control->m_tracks);
             control->m_tracks = 0;
@@ -1814,7 +1817,7 @@ static void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, 
 
     divisor = depth;
     track->m_vibrateRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
-    track->m_vibrateFunc = (int)SwingEntryFunction[track->m_command[2] & 0xf];
+    track->m_vibrateFunc = (int)SwingEntryFunction[track->m_command[2] & REDSOUND_MIDI_SWING_FUNC_MASK];
     track->m_vibrateRateDelta = track->m_vibrateDepthDelta = 0;
     track->m_command += 3;
 
@@ -1827,7 +1830,7 @@ static void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, 
                 divisor /= track->m_vibrateRate >> REDSOUND_FIXED_SHIFT;
             }
             if (track->m_vibrateDelayDepth != 0) {
-                output = (int)track->m_vibrateDelayDepth * (divisor * 4);
+                output = (int)track->m_vibrateDelayDepth * (divisor * REDSOUND_MIDI_MOD_DELAY_SCALE);
             } else {
                 output = 0;
             }
@@ -1956,7 +1959,7 @@ static void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
 {
 	u32 type = *track->m_command++;
 
-	track->m_vibrateFunc = (u32)SwingEntryFunction[type & 0xf];
+	track->m_vibrateFunc = (u32)SwingEntryFunction[type & REDSOUND_MIDI_SWING_FUNC_MASK];
 }
 
 /*
@@ -1999,7 +2002,7 @@ static void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 	}
 	divisor = rateDivisor;
 	track->m_tremoloRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
-	track->m_tremoloFunc = (int)SwingEntryFunction[track->m_command[2] & 0xf];
+	track->m_tremoloFunc = (int)SwingEntryFunction[track->m_command[2] & REDSOUND_MIDI_SWING_FUNC_MASK];
 	track->m_tremoloRateDelta = track->m_tremoloDepthDelta = 0;
 	track->m_command += 3;
 
@@ -2012,7 +2015,7 @@ static void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 				divisor /= track->m_tremoloRate >> REDSOUND_FIXED_SHIFT;
 			}
 			if (track->m_tremoloDelayDepth != 0) {
-				output = track->m_tremoloDelayDepth * (divisor * 4);
+				output = track->m_tremoloDelayDepth * (divisor * REDSOUND_MIDI_MOD_DELAY_SCALE);
 			} else {
 				output = 0;
 			}
@@ -2143,7 +2146,7 @@ static void __MidiCtrl_TremoloType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
 {
 	u32 type = *track->m_command++;
 
-	track->m_tremoloFunc = (u32)SwingEntryFunction[type & 0xf];
+	track->m_tremoloFunc = (u32)SwingEntryFunction[type & REDSOUND_MIDI_SWING_FUNC_MASK];
 }
 
 /*
@@ -2184,7 +2187,7 @@ static void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 	}
 	divisor = rate;
 	track->m_shakeRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
-	track->m_shakeFunc = (int)SwingEntryFunction[track->m_command[2] & 0xf];
+	track->m_shakeFunc = (int)SwingEntryFunction[track->m_command[2] & REDSOUND_MIDI_SWING_FUNC_MASK];
 	track->m_shakeRateDelta = track->m_shakeDepthDelta = 0;
 	track->m_shakeOutput = 0;
 	track->m_shakePan = 0;
@@ -2306,7 +2309,7 @@ static void __MidiCtrl_ShakeType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 {
 	u32 type = *track->m_command++;
 
-	track->m_shakeFunc = (u32)SwingEntryFunction[type & 0xf];
+	track->m_shakeFunc = (u32)SwingEntryFunction[type & REDSOUND_MIDI_SWING_FUNC_MASK];
 }
 
 /*
@@ -2598,7 +2601,7 @@ static void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     if (value != 0) {
         fuzzyValue = value + 1;
     } else {
-        fuzzyValue = 0x100;
+        fuzzyValue = REDSOUND_MIDI_FUZZY_DEFAULT_DEPTH;
     }
     value = fuzzyValue;
 

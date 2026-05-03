@@ -587,14 +587,13 @@ void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrac
 void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     int* controlData = (int*)control;
-    int* trackData = (int*)track;
     int loopBase = control->m_loopBase;
     int deltaAdjust = 1 - track->m_deltaTime;
     int slot = 0;
     int* scan;
 
     control->m_flags |= 1;
-    for (scan = (int*)control->m_tracks; scan < trackData; scan += REDSOUND_TRACK_SIZE / sizeof(*scan)) {
+    for (scan = (int*)control->m_tracks; scan < (int*)track; scan += REDSOUND_TRACK_SIZE / sizeof(*scan)) {
         controlData[slot + 10] = *scan;
         controlData[slot + 0x4a] = ((RedTrackDATA*)scan)->m_deltaTime + deltaAdjust;
         controlData[slot + 0x8a] = scan[0x41];

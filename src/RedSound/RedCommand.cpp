@@ -501,11 +501,12 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 		no += bank << REDSOUND_SE_BLOCK_BANK_SHIFT;
 		no |= REDSOUND_SE_BLOCK_DATA_FLAG;
 		if (seNo < bankData->m_seCount) {
-			int* entries = reinterpret_cast<int*>(bankData->m_entries);
+			int* entries = bankData->m_entries;
 
 			if (entries[seNo] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
-				RedSeINFO* seInfo =
-				    (RedSeINFO*)((int)(entries + bankData->m_seCount) + ((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK));
+				RedSeINFO* seInfo = reinterpret_cast<RedSeINFO*>(
+				    reinterpret_cast<unsigned char*>(entries + bankData->m_seCount) +
+				    ((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK));
 
 				if (((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
 					seInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;

@@ -50,6 +50,15 @@ enum RedSoundLayoutSize {
 	REDSOUND_STREAM_BUFFER_SIZE = sizeof(RedStreamDATA) * REDSOUND_STREAM_COUNT,
 };
 
+enum RedSoundFixedPoint {
+	REDSOUND_FIXED_SHIFT = 12,
+	REDSOUND_FIXED_HALF = 0x800,
+	REDSOUND_FIXED_ONE = 0x1000,
+	REDSOUND_VOLUME_FULL = 0x7FFF000,
+	REDSOUND_VOLUME_DEFAULT = 0x7F000,
+	REDSOUND_PAN_CENTER = 0x40000,
+};
+
 struct RedSeBlockHEAD;
 
 extern RedMidiControlFunc p_MidiControl_Function[];

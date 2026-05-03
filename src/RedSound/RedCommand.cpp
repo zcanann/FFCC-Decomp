@@ -377,15 +377,15 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			if (*(char*)track->m_command != '\0') {
 				track->m_eraseTrack = info->m_eraseTrack;
 				track->m_attrMask = info->m_attrMask;
-				track->m_mixVolume = volume << 0xc;
+				track->m_mixVolume = volume << REDSOUND_FIXED_SHIFT;
 				track->m_mixVolumeDelta = 0;
 				track->m_mixVolumeMode = 0;
 				track->m_pitchDelta = 0;
 				track->m_pitch = 0;
 				track->m_voiceSwitch = isMulti;
-				track->m_volume = 0x7fff000;
-				track->m_expression = 0x7f000;
-				track->m_pan = pan << 0xc;
+				track->m_volume = REDSOUND_VOLUME_FULL;
+				track->m_expression = REDSOUND_VOLUME_DEFAULT;
+				track->m_pan = pan << REDSOUND_FIXED_SHIFT;
 				track->m_reverbDepth = p_ReverbDepth[1].m_depth;
 				track->m_reverbDepthDelta = 0;
 				track->m_panDelta = 0;
@@ -531,8 +531,8 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 void SetSeVolume(int seId, int volume, int frameCount, int mode)
 {
 	RedTrackDATA* track;
-	volume <<= 12;
-	volume |= 0x800;
+	volume <<= REDSOUND_FIXED_SHIFT;
+	volume |= REDSOUND_FIXED_HALF;
 
 	if (frameCount < 1) {
 		frameCount = 1;
@@ -566,8 +566,8 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 void SetSePan(int seId, int pan, int frameCount)
 {
 	RedTrackDATA* track;
-	pan <<= 12;
-	pan |= 0x800;
+	pan <<= REDSOUND_FIXED_SHIFT;
+	pan |= REDSOUND_FIXED_HALF;
 
 	if (frameCount < 1) {
 		frameCount = 1;
@@ -600,8 +600,8 @@ void SetSePan(int seId, int pan, int frameCount)
 void SetSePitch(int seId, int pitch, int frameCount)
 {
 	RedTrackDATA* track;
-	pitch <<= 12;
-	pitch |= 0x800;
+	pitch <<= REDSOUND_FIXED_SHIFT;
+	pitch |= REDSOUND_FIXED_HALF;
 
 	if (frameCount < 1) {
 		frameCount = 1;
@@ -729,7 +729,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	p_ReverbDepth[0].m_depth = (int)musicHead->m_reverbDepth;
 	if (p_ReverbDepth[0].m_depth != 0) {
 		p_ReverbDepth[0].m_depth = (p_ReverbDepth[0].m_depth + 1) << 8;
-		p_ReverbDepth[0].m_depth = (p_ReverbDepth[0].m_depth - 1) << 0xc;
+		p_ReverbDepth[0].m_depth = (p_ReverbDepth[0].m_depth - 1) << REDSOUND_FIXED_SHIFT;
 	}
 	p_ReverbDepth[0].m_step = 0;
 	p_ReverbDepth[0].m_count = 0;
@@ -749,11 +749,11 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)track) + 1;
 		track->m_seSepId = 0;
 		track->m_keySignatureData = (m_MusicKeySignature == 0) ? 0 : t_KeySignatureData + 0xb;
-		track->m_mixVolume = 0x7f000;
+		track->m_mixVolume = REDSOUND_VOLUME_DEFAULT;
 		track->m_mixVolumeDelta = 0;
-		track->m_volume = 0x7fff000;
-		track->m_expression = 0x7f000;
-		track->m_pan = 0x40000;
+		track->m_volume = REDSOUND_VOLUME_FULL;
+		track->m_expression = REDSOUND_VOLUME_DEFAULT;
+		track->m_pan = REDSOUND_PAN_CENTER;
 		track->m_reverbDepth = p_ReverbDepth[0].m_depth;
 		track->m_reverbDepthDelta = 0;
 		track->m_panDelta = 0;
@@ -805,13 +805,13 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	music->m_activeTrackCount = (short)musicHead->m_trackCount;
 	music->m_volumeScale = (unsigned char)(musicHead->m_flags & 0x7f);
 	music->m_tickCounter = 1;
-	music->m_tempo = 0x1000;
+	music->m_tempo = REDSOUND_FIXED_ONE;
 	music->m_ticksPerMeasure = 10000;
 	music->m_tick = -1;
 	music->m_measure = 1;
 	music->m_elapsedTime = 0;
 	if (volume != 0) {
-		volume = (((volume + 1) * 4) - 1) * 0x1000;
+		volume = (((volume + 1) * 4) - 1) * REDSOUND_FIXED_ONE;
 	}
 	music->m_volume = volume;
 	music->m_volumeDelta = 0;
@@ -941,7 +941,7 @@ void SetMusicVolume(int seId, int volume, int duration, int mode)
 		volume--;
 		volume <<= 12;
 	}
-	volume |= 0x800;
+	volume |= REDSOUND_FIXED_HALF;
 
 	if (duration < 1) {
 		duration = 1;

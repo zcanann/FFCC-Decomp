@@ -1000,7 +1000,7 @@ RedHistoryBANK* CRedEntry::SeSepOldDelete()
  * Address:	TODO
  * Size:	TODO
  */
-int CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
+RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 {
 	RedHistoryBANK* bank = reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase);
 	int result = 0;
@@ -1024,7 +1024,7 @@ int CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 		bank->m_historyNo = 1;
 	}
 
-	return result;
+	return reinterpret_cast<RedSeSepHEAD*>(result);
 }
 
 /*
@@ -1054,7 +1054,7 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 		                                                   result * 0x10));
 		result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + result * 0x10 + 8);
 	} else {
-		result = SeSepHeadAdd(seSepHead);
+		result = reinterpret_cast<int>(SeSepHeadAdd(seSepHead));
 		if (result == 0) {
 			RedDelete(seSepHead);
 		}

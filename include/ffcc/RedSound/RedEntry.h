@@ -147,7 +147,7 @@ public:
 	int SearchSeSepSequence(int);
 	int SeSepMemoryFree(RedHistoryBANK*);
 	RedHistoryBANK* SeSepOldDelete();
-	int SeSepHeadAdd(RedSeSepHEAD*);
+	RedSeSepHEAD* SeSepHeadAdd(RedSeSepHEAD*);
 	RedSeSepHEAD* SetSeSepData(RedSeSepHEAD*);
 	int ClearSeSepData(int);
 	int ClearSeSepDataMG(int, int, int, int);

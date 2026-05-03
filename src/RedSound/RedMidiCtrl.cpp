@@ -247,8 +247,8 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
         voice = (int*)p_VoiceData;
         do {
             if (((u32)*voice == (u32)track) && (*(char*)(voice + 6) == key)) {
-                voice[0x24] &= 0xfffffffe;
-                voice[0x24] |= 2;
+                voice[0x24] &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+                voice[0x24] |= REDSOUND_VOICE_FLAGS_RELEASED;
             }
             voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
         } while (voice < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
@@ -529,9 +529,9 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
                 if (((unsigned int)voice->m_track >= (u32)control->m_tracks) &&
                     ((unsigned int)voice->m_track <
                      (u32)control->m_tracks + (unsigned int)control->m_trackCount * REDSOUND_TRACK_SIZE)) {
-                    ((unsigned int*)voice)[0x25] &= 0xfffffff3;
-                    ((unsigned int*)voice)[0x24] &= 0xfffffffe;
-                    ((unsigned int*)voice)[0x24] |= 2;
+                    ((unsigned int*)voice)[0x25] &= REDSOUND_VOICE_SWITCH_CLEAR_SUSTAIN_PAUSE_MASK;
+                    ((unsigned int*)voice)[0x24] &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+                    ((unsigned int*)voice)[0x24] |= REDSOUND_VOICE_FLAGS_RELEASED;
                     voice->m_track = 0;
                 }
                 voice++;

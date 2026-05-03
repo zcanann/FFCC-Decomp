@@ -305,38 +305,38 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     unsigned int* slot;
 
-    if ((((signed char*)track)[0x26] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
+    if ((((signed char*)track)[REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
         slot = (unsigned int*)((int)keyOnData + track->m_trackNo * 8);
         if ((*slot == 0) || (*slot == (unsigned int)track)) {
             *slot = (unsigned int)track;
-            slot[1] = ((unsigned int*)track)[9];
+            slot[1] = ((unsigned int*)track)[REDSOUND_TRACK_NOTE_WORD_OFFSET];
             m_KeyOnEntry++;
         }
         return;
     }
 
-    if ((((unsigned char*)track)[0x26] & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
-        slot = (unsigned int*)((int)keyOnData + 0x200);
+    if ((((unsigned char*)track)[REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET] & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
+        slot = (unsigned int*)((int)keyOnData + REDSOUND_KEY_ON_PRIORITY_BYTE_OFFSET);
         do {
             if (*slot == 0) {
                 *slot = (unsigned int)track;
-                slot[1] = ((unsigned int*)track)[9];
+                slot[1] = ((unsigned int*)track)[REDSOUND_TRACK_NOTE_WORD_OFFSET];
                 m_KeyOnEntry++;
                 break;
             }
             slot += 2;
-        } while (slot < (unsigned int*)((int)keyOnData + 0x400));
+        } while (slot < (unsigned int*)((int)keyOnData + REDSOUND_KEY_ON_NORMAL_BYTE_OFFSET));
     } else {
-        slot = (unsigned int*)((int)keyOnData + 0x400);
+        slot = (unsigned int*)((int)keyOnData + REDSOUND_KEY_ON_NORMAL_BYTE_OFFSET);
         do {
             if (*slot == 0) {
                 *slot = (unsigned int)track;
-                slot[1] = ((unsigned int*)track)[9];
+                slot[1] = ((unsigned int*)track)[REDSOUND_TRACK_NOTE_WORD_OFFSET];
                 m_KeyOnEntry++;
                 break;
             }
             slot += 2;
-        } while (slot < (unsigned int*)((int)keyOnData + 0x600));
+        } while (slot < (unsigned int*)((int)keyOnData + REDSOUND_KEY_ON_END_BYTE_OFFSET));
     }
 }
 
@@ -357,16 +357,16 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
 
     if ((control == p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP) || ((track->m_flags & 0x80000) == 0)) {
         track->m_sweepDelta = 0;
-        key = ((char*)track)[0x24];
+        key = ((char*)track)[REDSOUND_TRACK_NOTE_KEY_OFFSET];
         slot = (int*)keyOnData;
         do {
             if (((u32)*slot == (u32)track) && (*(char*)(slot + 1) == key)) {
                 *slot = 0;
             }
             slot += 2;
-        } while (slot < (int*)((int)keyOnData + 0x600));
+        } while (slot < (int*)((int)keyOnData + REDSOUND_KEY_ON_END_BYTE_OFFSET));
 
-        key = ((char*)track)[0x24];
+        key = ((char*)track)[REDSOUND_TRACK_NOTE_KEY_OFFSET];
         voice = p_VoiceData;
         do {
             if ((voice->m_track == track) && (voice->m_key == key)) {

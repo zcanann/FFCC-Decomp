@@ -198,15 +198,17 @@ int PitchCompute(int param_1, int param_2, int param_3, int param_4)
     int noteBand;
 
     octaveAdjust = 0;
-    pitch = param_2 + (param_3 >> 16) + (param_1 >> 12);
+    pitch = param_2 + (param_3 >> 16) + (param_1 >> REDSOUND_FIXED_SHIFT);
     while (pitch < 0) {
-        pitch += 0xC00;
+        pitch += REDSOUND_PITCH_OCTAVE_UNITS;
         octaveAdjust -= 1;
     }
 
-    noteBand = (pitch >> 8) & 0x7F;
-    octaveAdjust += noteBand / 12;
-    value = (int)((t_TonePitch[noteBand % 12] >> (10 - octaveAdjust)) * t_FinePitch[pitch & 0xFF]) >> 12;
+    noteBand = (pitch >> REDSOUND_PITCH_NOTE_SHIFT) & REDSOUND_PITCH_NOTE_MASK;
+    octaveAdjust += noteBand / REDSOUND_NOTES_PER_OCTAVE;
+    value = (int)((t_TonePitch[noteBand % REDSOUND_NOTES_PER_OCTAVE] >> (REDSOUND_PITCH_TONE_SHIFT - octaveAdjust)) *
+                  t_FinePitch[pitch & REDSOUND_PITCH_FINE_MASK]) >>
+        REDSOUND_FIXED_SHIFT;
 
     if (param_4 != 0) {
         if (param_4 > 0) {
@@ -2511,7 +2513,7 @@ int _SeMidiNoteExecute(
     int* track = (int*)trackData;
     do {
         if (((u32)*track != 0) && ((((RedTrackDATA*)track)->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAUSE) == 0)) {
-            ((RedTrackDATA*)track)->m_seTickCounter += (s16)(tickStep * -0x78);
+            ((RedTrackDATA*)track)->m_seTickCounter += (s16)(tickStep * -REDSOUND_SE_TICK_STEP);
             while (((RedTrackDATA*)track)->m_seTickCounter < 1) {
                 int step = frames;
                 ((RedTrackDATA*)track)->m_seTickCounter += REDSOUND_CONTROL_TICK_PERIOD;
@@ -2595,8 +2597,8 @@ void MainControl(int frames)
 
     if (p_SoundControl->m_activeTrackCount != 0) {
         if ((p_SoundControl->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0) {
-            mul = ((u32)p_MusicTempoControl->m_value >> 0xC) & 0xFFFF;
-            step = p_SoundControl->m_tempo >> 0xC;
+            mul = ((u32)p_MusicTempoControl->m_value >> REDSOUND_FIXED_SHIFT) & REDSOUND_TEMPO_SCALE_MASK;
+            step = p_SoundControl->m_tempo >> REDSOUND_FIXED_SHIFT;
             if (mul != 0) {
                 if (p_MusicTempoControl->m_value < 0) {
                     step *= (int)mul;
@@ -2604,7 +2606,7 @@ void MainControl(int frames)
                 } else {
                     step *= (int)mul + 1;
                     step >>= 0xF;
-                    step += p_SoundControl->m_tempo >> 0xC;
+                    step += p_SoundControl->m_tempo >> REDSOUND_FIXED_SHIFT;
                 }
             }
             ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter -= step * frames;
@@ -2617,7 +2619,7 @@ void MainControl(int frames)
 
     if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) {
         p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
-        step = p_SoundControl->m_tempo >> 0xC;
+        step = p_SoundControl->m_tempo >> REDSOUND_FIXED_SHIFT;
         ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter -= step * frames;
         while (((RedSoundCONTROL*)p_SoundControl)->m_tickCounter < 1) {
             ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter += REDSOUND_CONTROL_TICK_PERIOD;

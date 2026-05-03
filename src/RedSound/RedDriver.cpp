@@ -915,40 +915,39 @@ void RedSleep(int microseconds)
  */
 static int _MainThread(void*)
 {
-    int iVar1;
-    int iVar2;
-    int iVar3;
-    unsigned int uVar4;
+    RedSoundCONTROL* control;
+    int startTick;
+    int result;
+    unsigned int elapsed;
 
     m_ThreadExecute = m_ThreadExecute | REDSOUND_THREAD_FLAG_MAIN;
     while (m_ThreadControl != 0) {
         OSWaitSemaphore(&m_MainSemaphore);
         if (m_ThreadControl != 0) {
-            iVar2 = OSGetTick();
-            iVar1 = (int)p_SoundControlBuffer;
-            iVar3 = m_RedMasterTime;
-            uVar4 = (unsigned int)(m_RedMasterTime - m_MainThreadTime);
-            if (*(short*)(iVar1 + 0x48e) != 0) {
-                ((RedSoundCONTROL*)iVar1)->m_elapsedTime = ((RedSoundCONTROL*)iVar1)->m_elapsedTime + uVar4;
+            startTick = OSGetTick();
+            control = p_SoundControlBuffer;
+            elapsed = (unsigned int)(m_RedMasterTime - m_MainThreadTime);
+            if (control->m_activeTrackCount != 0) {
+                control->m_elapsedTime += elapsed;
             }
-            m_MainThreadTime = iVar3;
-            if (4 < uVar4) {
-                uVar4 = 4;
+            m_MainThreadTime = m_RedMasterTime;
+            if (4 < elapsed) {
+                elapsed = 4;
             }
-            MainControl(uVar4);
+            MainControl(elapsed);
             StreamControl();
             _ExecuteCommand();
-            if ((-1 < p_MusicNextPlay->m_musicId) && (*(int*)(iVar1 + 0x470) < 0)) {
+            if ((p_MusicNextPlay->m_musicId > -1) && (control->m_musicId < 0)) {
                 _MusicPlaySequence((int*)p_MusicNextPlay);
                 p_MusicNextPlay->m_musicId = -1;
                 m_MusicPhraseStop = 0;
             }
             do {
-                iVar3 = OSTryWaitSemaphore(&m_MainSemaphore);
-            } while (0 < iVar3);
+                result = OSTryWaitSemaphore(&m_MainSemaphore);
+            } while (0 < result);
             memmove(p_Tick->m_ticks + 1, p_Tick->m_ticks, 0x18c);
-            iVar3 = OSGetTick();
-            p_Tick->m_ticks[0] = iVar3 - iVar2;
+            result = OSGetTick();
+            p_Tick->m_ticks[0] = result - startTick;
         }
     }
     m_ThreadExecute = m_ThreadExecute & ~REDSOUND_THREAD_FLAG_MAIN;

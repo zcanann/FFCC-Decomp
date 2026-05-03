@@ -362,7 +362,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			voice->m_track->m_note.m_allocFlags |= REDSOUND_NOTE_ALLOC_STREAM;
 			voice->m_stateFlags |= REDSOUND_VOICE_STATE_STREAM;
 			voice->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO | REDSOUND_VOICE_SWITCH_LOOP;
-			if (streamData->m_header.m_flags != 0) {
+			if (streamData->m_header.m_flags != REDSOUND_STREAM_HEADER_REVERB_NONE) {
 				voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_STEREO;
 			}
 			voice->m_track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_LOOP;

@@ -24,6 +24,10 @@ enum RedStreamState {
     REDSOUND_STREAM_STATE_LOADING = 3,
 };
 
+enum RedStreamHeaderFlag {
+    REDSOUND_STREAM_HEADER_REVERB_NONE = 0,
+};
+
 struct RedStreamDATA {
     RedTrackDATA* m_track;
     RedVoiceDATA* m_voiceData;

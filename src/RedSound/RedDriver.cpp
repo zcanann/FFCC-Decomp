@@ -1483,28 +1483,27 @@ int CRedDriver::GetSoundMode()
  */
 int CRedDriver::SetMusicData(void* musicData)
 {
+    int result;
     RedMusicHEAD localHeader;
-    RedMusicHEAD* header = (RedMusicHEAD*)musicData;
+    RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
     void* copiedHeader;
     int headerSize;
 
+    result = -1;
     if (((header->m_signature[0] == 'B') && (header->m_signature[1] == 'G')) && (header->m_signature[2] == 'M')) {
         memcpy(&localHeader, header, sizeof(localHeader));
         headerSize = localHeader.m_size;
         copiedHeader = (void*)RedNew(headerSize);
-        if (copiedHeader == 0) {
-            return -1;
+        if (copiedHeader != 0) {
+            memcpy(copiedHeader, header, headerSize);
+            result = localHeader.m_musicNo;
+            _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
-
-        memcpy(copiedHeader, header, headerSize);
-        _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
-        return localHeader.m_musicNo;
     } else if (m_ReportPrint != 0) {
         OSReport(sRedDriverMusicHeaderErrorFmt, sRedDriverLogPrefix, sRedDriverLogWarnColor, sRedDriverLogReset);
         fflush(__files + 1);
     }
-
-    return -1;
+    return result;
 }
 
 /*

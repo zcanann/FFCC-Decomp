@@ -1839,7 +1839,8 @@ int CRedDriver::SePlay(int bank, int sep, int autoID, int unk, int volume, int p
 		if (sep >= 0) {
 			_EntryExecCommand(_SeSepPlaySequence, autoID, sep, unk, volume, pitch, 0, 0);
 		}
-	} else if ((bank >= 0) && (bank < 4) && (sep >= 0) && (sep < 0x200)) {
+	} else if ((bank >= 0) && (bank < REDSOUND_SE_BLOCK_BANK_COUNT) && (sep >= 0) &&
+	           (sep < REDSOUND_SE_BLOCK_SEQUENCE_COUNT)) {
 		_EntryExecCommand(_SeBlockPlay, autoID, bank, sep, unk, volume, pitch, 0);
 	}
     return autoID;

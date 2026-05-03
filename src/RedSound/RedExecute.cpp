@@ -183,6 +183,7 @@ enum RedExecutePitchModConst {
     REDSOUND_PITCH_MOD_DEPTH_SPLIT = 0x80,
     REDSOUND_PITCH_MOD_SHALLOW_SCALE = 2,
     REDSOUND_PITCH_MOD_DEEP_SCALE = 0x18,
+    REDSOUND_PITCH_MOD_WAVE_SHIFT = 4,
 };
 
 /*
@@ -870,7 +871,7 @@ void _PitchExecute(RedVoiceDATA* voice)
     int* voiceData = (int*)voice;
 
     if (((u32)voice->m_track->m_vibrateFunc != 0) && (voice->m_pitchModDelay == 0)) {
-        int pitchLfo = voice->m_track->m_vibrateDepth >> 0xC;
+        int pitchLfo = voice->m_track->m_vibrateDepth >> REDSOUND_FIXED_SHIFT;
         if (pitchLfo < REDSOUND_PITCH_MOD_DEPTH_SPLIT) {
             pitchDelta = (pitchLfo + 1) * REDSOUND_PITCH_MOD_SHALLOW_SCALE;
         } else {
@@ -889,8 +890,9 @@ void _PitchExecute(RedVoiceDATA* voice)
         {
             int currentPitch = voice->m_pitch;
             RedSwingFunc pitchWaveFunc = (RedSwingFunc)voice->m_track->m_vibrateFunc;
-            int pitchWave = pitchWaveFunc((u32)voice->m_pitchModPhase >> 0xC);
-            pitchDelta = ((pitchDelta - currentPitch) * (pitchWave >> 4)) >> 0xC;
+            int pitchWave = pitchWaveFunc((u32)voice->m_pitchModPhase >> REDSOUND_FIXED_SHIFT);
+            pitchDelta = ((pitchDelta - currentPitch) * (pitchWave >> REDSOUND_PITCH_MOD_WAVE_SHIFT)) >>
+                         REDSOUND_FIXED_SHIFT;
         }
 
         if (voice->m_pitchModFrames != 0) {

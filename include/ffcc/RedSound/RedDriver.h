@@ -1,9 +1,6 @@
 #ifndef _FFCC_REDSOUND_REDDRIVER_H
 #define _FFCC_REDSOUND_REDDRIVER_H
 
-struct OSAlarm;
-struct OSContext;
-
 enum RedDmaEntryFlag {
 	REDSOUND_DMA_FLAG_MAIN_QUEUE = 1,
 	REDSOUND_DMA_FLAG_CHUNKED_TRANSFER = 0x8000,
@@ -12,50 +9,11 @@ enum RedDmaEntryFlag {
 	REDSOUND_DMA_FLAGS_STREAM_LOAD = REDSOUND_DMA_FLAG_CHUNKED_TRANSFER | REDSOUND_DMA_FLAG_MAIN_QUEUE,
 };
 
-void _SetSoundMode(int*);
-void _SetReverbDepth(int*);
-void _SetMusicData(int*);
-void _MusicStop(int*);
-void _MusicPlaySequence(int*);
-void _MusicCrossPlaySequence(int*);
-void _MusicNextPlaySequence(int*);
-void _MusicMasterVolume(int*);
-void _MusicVolume(int*);
-void _SetMusicPhraseStop(int*);
-void _SetSeBlockData(int*);
-void _SetSeSepData(int*);
-void _ClearSeSepData(int*);
-void _ClearSeSepDataMG(int*);
-void _SeStop(int*);
-void _SeStopMG(int*);
-void _SeBlockPlay(int*);
-void _SeSepPlay(int*);
-void _SeSepPlaySequence(int*);
-void _SeMasterVolume(int*);
-void _SeVolume(int*);
-void _SePan(int*);
-void _SePitch(int*);
-void _SePause(int*);
-void _StreamStop(int*);
-void _StreamPlay(int*);
-void _StreamVolume(int*);
-void _StreamPause(int*);
-int* _EntryExecCommand(void (*)(int*), int, int, int, int, int, int, int);
-void _ExecuteCommand();
 unsigned int DeltaTimeSumup(unsigned char**);
 unsigned int GetMyEntryID();
-void _MyAlarmHandler(OSAlarm*, OSContext*);
 void RedSleep(int);
-int _MainThread(void*);
-int _WaveSettingThread(void*);
-void _DMACheckProcess();
-void _DmaCallback(unsigned long);
 int RedDmaEntry(int, int, int, int, int, void (*)(void*), void*);
 int RedDmaSearchID(int);
-void _DmaExecute();
-int _DmaExecuteThread(void*);
-int _MusicSkipThread(void*);
-void _RedAXCallback();
 
 class CRedDriver
 {

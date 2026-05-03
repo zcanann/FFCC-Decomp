@@ -251,7 +251,7 @@ static const char sRedDriverLogReset[] = "\x1B[0m";
  * JP Address: TODO
  * JP Size: TODO
  */
-void _SetSoundMode(int* command)
+static void _SetSoundMode(int* command)
 {
     m_SoundMode = *command;
     if (*command == 1) {
@@ -279,7 +279,7 @@ void _SetSoundMode(int* command)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _SetReverbDepth(int* command)
+static void _SetReverbDepth(int* command)
 {
     int fadeDepth;
     int reverbBank;
@@ -322,7 +322,7 @@ void _SetReverbDepth(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetMusicData(int* command)
+static void _SetMusicData(int* command)
 {
     c_RedEntry.SetMusicData((RedMusicHEAD*)*command);
 }
@@ -332,7 +332,7 @@ void _SetMusicData(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicStop(int* command)
+static void _MusicStop(int* command)
 {
     MusicStop(*command);
     if ((*command == -1) || (p_MusicNextPlay->m_musicId == *command)) {
@@ -352,7 +352,7 @@ void _MusicStop(int* command)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _MusicPlaySequence(int* command)
+static void _MusicPlaySequence(int* command)
 {
     int iVar1;
     int srcBuffer;
@@ -391,7 +391,7 @@ void _MusicPlaySequence(int* command)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _MusicCrossPlaySequence(int* command)
+static void _MusicCrossPlaySequence(int* command)
 {
     int iVar1;
     void* pvVar2;
@@ -452,7 +452,7 @@ void _MusicCrossPlaySequence(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicNextPlaySequence(int* command)
+static void _MusicNextPlaySequence(int* command)
 {
     RedSoundCONTROL* soundControl;
 
@@ -474,7 +474,7 @@ void _MusicNextPlaySequence(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicMasterVolume(int* command)
+static void _MusicMasterVolume(int* command)
 {
     RedVoiceDATA* voice;
 
@@ -496,7 +496,7 @@ void _MusicMasterVolume(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicVolume(int* command)
+static void _MusicVolume(int* command)
 {
     if (command[3] == 1) {
         p_MusicNextPlay->m_musicId = -1;
@@ -510,7 +510,7 @@ void _MusicVolume(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetMusicPhraseStop(int* command)
+static void _SetMusicPhraseStop(int* command)
 {
     m_MusicPhraseStop = *command;
 }
@@ -520,7 +520,7 @@ void _SetMusicPhraseStop(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetSeBlockData(int* command)
+static void _SetSeBlockData(int* command)
 {
     u32 index = (u32)*command & 3;
     char* seBlockData;
@@ -548,7 +548,7 @@ void _SetSeBlockData(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetSeSepData(int* command)
+static void _SetSeSepData(int* command)
 {
     c_RedEntry.SetSeSepData((RedSeSepHEAD*)*command);
 }
@@ -558,7 +558,7 @@ void _SetSeSepData(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _ClearSeSepData(int* command)
+static void _ClearSeSepData(int* command)
 {
     c_RedEntry.ClearSeSepData(*command);
 }
@@ -568,7 +568,7 @@ void _ClearSeSepData(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _ClearSeSepDataMG(int* command)
+static void _ClearSeSepDataMG(int* command)
 {
     c_RedEntry.ClearSeSepDataMG(command[0], command[1], command[2], command[3]);
 }
@@ -578,7 +578,7 @@ void _ClearSeSepDataMG(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeStop(int* command)
+static void _SeStop(int* command)
 {
     SeStopID(command[0]);
 }
@@ -588,7 +588,7 @@ void _SeStop(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeStopMG(int* command)
+static void _SeStopMG(int* command)
 {
     SeStopMG(command[0], command[1], command[2], command[3]);
 }
@@ -598,7 +598,7 @@ void _SeStopMG(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeBlockPlay(int* command)
+static void _SeBlockPlay(int* command)
 {
     m_SeSkipStep = command[5];
     SeBlockPlay(command[0], command[1], command[2], command[3], command[4]);
@@ -609,7 +609,7 @@ void _SeBlockPlay(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeSepPlay(int* command)
+static void _SeSepPlay(int* command)
 {
     RedSeSepHEAD* seSepHead;
 
@@ -626,7 +626,7 @@ void _SeSepPlay(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeSepPlaySequence(int* command)
+static void _SeSepPlaySequence(int* command)
 {
     if (c_RedEntry.SearchSeSepSequence(command[1]) >= 0) {
         m_SeSkipStep = command[4];
@@ -639,7 +639,7 @@ void _SeSepPlaySequence(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeMasterVolume(int* command)
+static void _SeMasterVolume(int* command)
 {
     RedVoiceDATA* voice;
 
@@ -661,7 +661,7 @@ void _SeMasterVolume(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeVolume(int* command)
+static void _SeVolume(int* command)
 {
     SetSeVolume(command[0], command[1], command[2], command[3]);
 }
@@ -671,7 +671,7 @@ void _SeVolume(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePan(int* command)
+static void _SePan(int* command)
 {
     SetSePan(command[0], command[1], command[2]);
 }
@@ -681,7 +681,7 @@ void _SePan(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePitch(int* command)
+static void _SePitch(int* command)
 {
     SetSePitch(command[0], command[1], command[2]);
 }
@@ -691,7 +691,7 @@ void _SePitch(int* command)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePause(int* command)
+static void _SePause(int* command)
 {
     SePause(command[0], command[1]);
 }
@@ -705,7 +705,7 @@ void _SePause(int* command)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _StreamStop(int* command)
+static void _StreamStop(int* command)
 {
 	StreamStop(*command);
 }
@@ -719,7 +719,7 @@ void _StreamStop(int* command)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _StreamPlay(int* command)
+static void _StreamPlay(int* command)
 {
 	StreamPlay(command[0], (void*)command[1], command[2], command[3], command[4]);
 }
@@ -733,7 +733,7 @@ void _StreamPlay(int* command)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _StreamVolume(int* command)
+static void _StreamVolume(int* command)
 {
 	SetStreamVolume(command[0], command[1], command[2]);
 }
@@ -747,7 +747,7 @@ void _StreamVolume(int* command)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _StreamPause(int* command)
+static void _StreamPause(int* command)
 {
 	StreamPause(command[0], command[1]);
 }
@@ -761,7 +761,7 @@ void _StreamPause(int* command)
  * JP Address: TODO
  * JP Size: TODO
  */
-int* _EntryExecCommand(void (*func)(int*), int arg1, int arg2, int arg3, int arg4,
+static int* _EntryExecCommand(void (*func)(int*), int arg1, int arg2, int arg3, int arg4,
                        int arg5, int arg6, int arg7)
 {
     unsigned int interruptLevel;
@@ -795,7 +795,7 @@ int* _EntryExecCommand(void (*func)(int*), int arg1, int arg2, int arg3, int arg
  * JP Address: TODO
  * JP Size: TODO
  */
-void _ExecuteCommand()
+static void _ExecuteCommand()
 {
 	volatile RedExecCommand* readPos;
 	volatile RedExecCommand* executePos;
@@ -871,7 +871,7 @@ struct RedSleepAlarm {
  * JP Address: TODO
  * JP Size: TODO
  */
-void _MyAlarmHandler(OSAlarm* alarm, OSContext*)
+static void _MyAlarmHandler(OSAlarm* alarm, OSContext*)
 {
     OSResumeThread(((RedSleepAlarm*)alarm)->thread);
 }
@@ -906,7 +906,7 @@ void RedSleep(int microseconds)
  * Address:	TODO
  * Size:	TODO
  */
-int _MainThread(void*)
+static int _MainThread(void*)
 {
     int iVar1;
     int iVar2;
@@ -957,7 +957,7 @@ int _MainThread(void*)
  * JP Address: TODO
  * JP Size: TODO
  */
-int _WaveSettingThread(void* threadArg)
+static int _WaveSettingThread(void* threadArg)
 {
     m_ThreadExecute = m_ThreadExecute | REDSOUND_THREAD_FLAG_WAVE_SETTING;
     m_WaveSettingStatus = 0;
@@ -986,7 +986,7 @@ int _WaveSettingThread(void* threadArg)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _DMACheckProcess()
+static void _DMACheckProcess()
 {
     RedDmaRequest* dmaInfo;
 
@@ -1022,7 +1022,7 @@ void _DMACheckProcess()
  * JP Address: TODO
  * JP Size: TODO
  */
-void _DmaCallback(unsigned long)
+static void _DmaCallback(unsigned long)
 {
     m_DMAStatus = 0;
 }
@@ -1147,7 +1147,7 @@ int RedDmaSearchID(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _DmaExecute()
+static void _DmaExecute()
 {
     unsigned int interrupt;
     int dstAddress;
@@ -1228,7 +1228,7 @@ void _DmaExecute()
  * JP Address: TODO
  * JP Size: TODO
  */
-int _DmaExecuteThread(void*)
+static int _DmaExecuteThread(void*)
 {
     m_ThreadExecute |= REDSOUND_THREAD_FLAG_DMA;
     m_DMAExecute = 0;
@@ -1254,7 +1254,7 @@ int _DmaExecuteThread(void*)
  * JP Address: TODO
  * JP Size: TODO
  */
-int _MusicSkipThread(void*)
+static int _MusicSkipThread(void*)
 {
     m_ThreadExecute |= REDSOUND_THREAD_FLAG_MUSIC_SKIP;
     m_MusicSkipComplete = 0;
@@ -1275,7 +1275,7 @@ int _MusicSkipThread(void*)
  * Address:	TODO
  * Size:	TODO
  */
-void _RedAXCallback()
+static void _RedAXCallback()
 {
     m_RedMasterTime = m_RedMasterTime + 1;
     EnvelopeKeyExecute();

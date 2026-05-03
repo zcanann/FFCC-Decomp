@@ -78,12 +78,12 @@ void _StreamStop(RedStreamDATA* streamData)
 			streamData->m_aramBuffer = 0;
 		}
 		streamData->m_voiceData->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-		streamData->m_track->m_note.m_allocFlags &= -3;
+		streamData->m_track->m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_STREAM;
 		streamData->m_voiceData->m_stateFlags &= -3;
 		streamData->m_voiceData->m_active = 0;
 		if (streamData->m_header.m_channelCount == 2) {
 			streamData->m_voiceData[1].m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-			streamData->m_track[1].m_note.m_allocFlags &= -3;
+			streamData->m_track[1].m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_STREAM;
 			streamData->m_voiceData[1].m_stateFlags &= -3;
 			streamData->m_voiceData[1].m_active = 0;
 		}
@@ -355,7 +355,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		do {
 			voice = streamData->m_voiceData + iVar2;
 			voice->m_track = streamData->m_track + iVar2;
-			voice->m_track->m_note.m_allocFlags |= 2;
+			voice->m_track->m_note.m_allocFlags |= REDSOUND_NOTE_ALLOC_STREAM;
 			voice->m_stateFlags |= 2;
 			voice->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO | REDSOUND_VOICE_SWITCH_LOOP;
 			if (streamData->m_header.m_flags != 0) {

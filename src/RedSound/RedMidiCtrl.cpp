@@ -182,7 +182,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     unsigned int* slot;
 
-    if ((((signed char*)track)[0x26] & 5) != 0) {
+    if ((((signed char*)track)[0x26] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
         slot = (unsigned int*)((int)keyOnData + track->m_trackNo * 8);
         if ((*slot == 0) || (*slot == (unsigned int)track)) {
             *slot = (unsigned int)track;
@@ -192,7 +192,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
         return;
     }
 
-    if ((((unsigned char*)track)[0x26] & 8) != 0) {
+    if ((((unsigned char*)track)[0x26] & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
         slot = (unsigned int*)((int)keyOnData + 0x200);
         do {
             if (*slot == 0) {
@@ -1645,9 +1645,9 @@ void __MidiCtrl_ChannelPriority(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
 
     command = *track->m_command++;
     if (command != 0) {
-        track->m_note.m_allocFlags |= 8;
+        track->m_note.m_allocFlags |= REDSOUND_NOTE_ALLOC_PRIORITY;
     } else {
-        track->m_note.m_allocFlags &= ~8;
+        track->m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_PRIORITY;
     }
 }
 
@@ -1666,9 +1666,9 @@ void __MidiCtrl_ChannelFix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
     command = *track->m_command++;
     if (command != 0) {
-        track->m_note.m_allocFlags |= 4;
+        track->m_note.m_allocFlags |= REDSOUND_NOTE_ALLOC_RESERVED;
     } else {
-        track->m_note.m_allocFlags &= ~4;
+        track->m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_RESERVED;
     }
 }
 

@@ -27,6 +27,14 @@ struct RedNoteDATA {
 	unsigned char m_pad03;
 };
 
+enum RedNoteAllocFlag {
+	REDSOUND_NOTE_ALLOC_DIRECT = 1,
+	REDSOUND_NOTE_ALLOC_STREAM = 2,
+	REDSOUND_NOTE_ALLOC_RESERVED = 4,
+	REDSOUND_NOTE_ALLOC_PRIORITY = 8,
+	REDSOUND_NOTE_ALLOC_DIRECT_MASK = REDSOUND_NOTE_ALLOC_DIRECT | REDSOUND_NOTE_ALLOC_RESERVED,
+};
+
 struct RedWaveDATA {
 	unsigned int m_flags;
 	int m_sampleStart;

@@ -540,8 +540,8 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
     int bestEnvelope;
     RedVoiceDATA* voiceEnd;
 
-    if ((*(s8*)((u8*)track + 0x26) & 5) != 0) {
-        if (((((u8*)track)[0x26] & 1) == 0) &&
+    if ((*(s8*)((u8*)track + 0x26) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
+        if (((((u8*)track)[0x26] & REDSOUND_NOTE_ALLOC_DIRECT) == 0) &&
             (*(u32*)((u8*)p_VoiceData + track->m_trackNo * REDSOUND_VOICE_SIZE) != 0) &&
             (*(u32*)((u8*)p_VoiceData + track->m_trackNo * REDSOUND_VOICE_SIZE) != (u32)track)) {
             voice = 0;
@@ -550,7 +550,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
             voice = (RedVoiceDATA*)((u8*)p_VoiceData + track->m_trackNo * REDSOUND_VOICE_SIZE);
         }
     } else {
-        if ((((u8*)track)[0x26] & 8) != 0) {
+        if ((((u8*)track)[0x26] & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
             voice = (RedVoiceDATA*)p_VoiceData;
         } else {
             voice = (RedVoiceDATA*)((u8*)p_VoiceData + (s8)p_SoundControl->m_channelAlloc * REDSOUND_VOICE_SIZE);
@@ -1030,9 +1030,10 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
     voiceData[0x26] = iVar5;
 
     if ((((unsigned int)trackData[0x41] & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0) ||
-        ((((trackS8[0x26] & 5) == 0) &&
+        ((((trackS8[0x26] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0) &&
           (((unsigned int)trackData[0x41] & (REDSOUND_TRACK_FLAG_SLUR | REDSOUND_TRACK_FLAG_TENUTO)) == 0)) ||
-         (((trackS8[0x26] & 5) != 0) && (((unsigned int)trackData[0x41] & REDSOUND_TRACK_FLAG_SLUR) == 0)))) {
+         (((trackS8[0x26] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) &&
+          (((unsigned int)trackData[0x41] & REDSOUND_TRACK_FLAG_SLUR) == 0)))) {
         if (trackData[0x1d] != 0) {
             ((s16*)voiceData)[10] = trackS16[0x48];
             local_38[0] = 0x100;
@@ -1169,7 +1170,8 @@ RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voic
         voiceData[1] = (int)_WaveSplitSelect((RedWaveDATA*)((int*)track)[7], note);
         _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
 
-        if (((*(u32*)voiceData[1] & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) && ((*(s8*)((u8*)track + 0x26) & 5) == 0)) {
+        if (((*(u32*)voiceData[1] & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) &&
+            ((*(s8*)((u8*)track + 0x26) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0)) {
             int wave = voiceData[1];
             voiceData[0x25] |= REDSOUND_VOICE_SWITCH_PAIRED_LEFT;
             voiceData = (int*)EntryVoiceSearch(track);
@@ -2337,7 +2339,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	int step;
 	short* trackShorts = (short*)trackData;
 
-	if ((trackBytes[0x26] & 2) != 0) {
+	if ((trackBytes[0x26] & REDSOUND_NOTE_ALLOC_STREAM) != 0) {
 		return;
 	}
 

@@ -173,10 +173,11 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 		do {
 			track = scan;
 			remaining--;
-			if ((remaining != 0) && ((u32)track->m_command == 0) && ((track->m_note.m_allocFlags & 2) == 0)) {
+			if ((remaining != 0) && ((u32)track->m_command == 0) &&
+			    ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) == 0)) {
 				scan = track - 1;
 			} else {
-				if (((u32)track->m_command != 0) || ((track->m_note.m_allocFlags & 2) != 0)) {
+				if (((u32)track->m_command != 0) || ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
 					remaining = 1;
 					scan = track;
 				}
@@ -420,7 +421,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				track->m_portamentPitch = -1;
 				track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO;
 				memset(&track->m_adsrAR, 0xff, 0xc);
-				track->m_note.m_allocFlags = 5;
+				track->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_DIRECT_MASK;
 				track->m_seTickCounter = 1;
 				seTrack->m_track = track;
 				seTrack->m_stateFlags = 5;

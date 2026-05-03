@@ -819,7 +819,7 @@ static void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 
     loopCount = *track->m_command++;
     if (loopCount == 0) {
-        loopCount = 0x100;
+        loopCount = REDSOUND_MIDI_DEFAULT_STEP_COUNT;
     }
 
     track->m_loopCount[track->m_loopDepth]++;
@@ -876,7 +876,7 @@ static void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedT
 {
     unsigned int delta;
 
-    delta = (*track->m_command != 0) ? *track->m_command : 0x100;
+    delta = (*track->m_command != 0) ? *track->m_command : REDSOUND_MIDI_DEFAULT_STEP_COUNT;
 
     control->m_tempoAdd = DataAddCompute(&control->m_tempo, track->m_command[1], (int*)&delta);
     control->m_tempoDelta = delta;

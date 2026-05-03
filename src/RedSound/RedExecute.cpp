@@ -2260,7 +2260,7 @@ void MusicSkipFunction()
     u32 uVar6;
     int iVar7;
     u32* puVar8;
-    u32* puVar9;
+    RedSoundCONTROL* control;
 
     do {
         p_SkipKeyOn = (RedKeyOnDATA*)RedNew(REDSOUND_KEY_ON_BUFFER_SIZE);
@@ -2269,16 +2269,16 @@ void MusicSkipFunction()
         }
     } while (p_SkipKeyOn == 0);
 
-    puVar9 = (u32*)((u8*)p_SoundControlBuffer + REDSOUND_CONTROL_SKIP_OFFSET);
+    control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP;
     memset(p_SkipKeyOn, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
-    iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, p_SkipKeyOn, 1);
-    while ((iVar5 == 0) && ((*(u32*)((u8*)puVar9 + 0x46c) & 1) != 0)) {
-        *(s16*)((u8*)puVar9 + 0x48e) = *(int*)((u8*)puVar9 + 0x434);
-        memcpy((void*)((u8*)puVar9 + 0xc), (void*)((u8*)puVar9 + 0x438), 0x10);
-        memcpy((void*)((u8*)puVar9 + 0x448), (void*)((u8*)puVar9 + 0x428), 0xc);
-        puVar8 = (u32*)*puVar9;
-        iVar7 = (int)puVar9 + 0x28;
-        uVar6 = (u32)*(u8*)((u8*)puVar9 + 0x491);
+    iVar5 = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
+    while ((iVar5 == 0) && ((control->m_flags & 1) != 0)) {
+        control->m_activeTrackCount = control->m_savedActiveTrackCount;
+        memcpy(&control->m_measure, &control->m_savedMeasure, 0x10);
+        memcpy(&control->m_tempo, &control->m_savedTempo, 0xc);
+        puVar8 = (u32*)control->m_tracks;
+        iVar7 = (int)control + 0x28;
+        uVar6 = control->m_trackCount;
         iVar5 = 0;
         do {
             iVar1 = iVar5 * 4;
@@ -2292,7 +2292,7 @@ void MusicSkipFunction()
             puVar8[9] = *(u32*)(iVar7 + iVar3 + 0x300);
             puVar8 += REDSOUND_TRACK_SIZE / sizeof(*puVar8);
         } while (uVar6 != 0);
-        iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, p_SkipKeyOn, 1);
+        iVar5 = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
     }
     m_MusicSkipComplete = 1;
 }

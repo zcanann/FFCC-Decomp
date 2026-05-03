@@ -2229,10 +2229,10 @@ static void _SkipMusicEntry()
 {
     int* src;
     int* dst;
-    u8* soundControl;
-    u8 temp[0xC];
+    RedSoundCONTROL* soundControl;
+    RedControlRamp volume;
 
-    if (*(int*)((u8*)p_SoundControlBuffer + REDSOUND_CONTROL_SKIP_OFFSET + 0x470) >= 0) {
+    if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId >= 0) {
         src = (int*)p_SkipKeyOn;
         dst = (int*)p_KeyOnData;
         do {
@@ -2275,19 +2275,19 @@ static void _SkipMusicEntry()
             src += 2;
         }
 
-        soundControl = (u8*)p_SoundControlBuffer;
-        if (*(int*)(soundControl + 0x470) != -1) {
-            if (*(int*)(soundControl + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470) != -1) {
-                MusicStop(*(int*)(soundControl + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470));
+        soundControl = p_SoundControlBuffer;
+        if (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId != -1) {
+            if (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId != -1) {
+                MusicStop(soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId);
             }
-            memcpy(soundControl + REDSOUND_CONTROL_SECONDARY_OFFSET, soundControl, REDSOUND_CONTROL_SIZE);
+            memcpy(&soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY], soundControl, REDSOUND_CONTROL_SIZE);
         }
 
-        memcpy(soundControl, soundControl + REDSOUND_CONTROL_SKIP_OFFSET, REDSOUND_CONTROL_SIZE);
-        memcpy(temp, soundControl + REDSOUND_CONTROL_SKIP_OFFSET + 0x1C, 0xC);
-        memset(soundControl + REDSOUND_CONTROL_SKIP_OFFSET, 0, REDSOUND_CONTROL_SIZE);
-        memcpy(soundControl + REDSOUND_CONTROL_SKIP_OFFSET + 0x1C, temp, 0xC);
-        *(int*)(soundControl + REDSOUND_CONTROL_SKIP_OFFSET + 0x470) = -1;
+        memcpy(soundControl, &soundControl[REDSOUND_CONTROL_MUSIC_SKIP], REDSOUND_CONTROL_SIZE);
+        memcpy(&volume, &soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_volume, sizeof(volume));
+        memset(&soundControl[REDSOUND_CONTROL_MUSIC_SKIP], 0, REDSOUND_CONTROL_SIZE);
+        memcpy(&soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_volume, &volume, sizeof(volume));
+        soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId = -1;
     }
 
     RedDelete(p_SkipKeyOn);

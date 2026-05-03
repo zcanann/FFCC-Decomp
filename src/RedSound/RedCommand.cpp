@@ -777,7 +777,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		track->m_tremoloDelayDepth = 0;
 		track->m_vibrateDelayDepth = 0;
 		track->m_waveData = 0;
-		track->m_flags = ((musicHead->m_playFlags & 0x40000) == 0) ? 0x200000 : 0;
+		track->m_flags = ((musicHead->m_playFlags & 0x40000) == 0) ? REDSOUND_TRACK_FLAG_TENUTO : 0;
 		track->m_step2 = 0;
 		track->m_step = 0;
 		track->m_fuzzyAdsrDepth = 0;

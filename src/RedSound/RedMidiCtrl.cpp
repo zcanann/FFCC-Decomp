@@ -1262,8 +1262,8 @@ void __MidiCtrl_PortamentOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_SlurOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    track->m_flags |= 0x80000;
-    track->m_flags &= 0xFFEFFFFF;
+    track->m_flags |= REDSOUND_TRACK_FLAG_SLUR;
+    track->m_flags &= ~REDSOUND_TRACK_FLAG_SLUR_RELEASE;
 }
 
 /*
@@ -1277,7 +1277,7 @@ void __MidiCtrl_SlurOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_SlurOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    track->m_flags &= 0xFFF7FFFF;
+    track->m_flags &= ~REDSOUND_TRACK_FLAG_SLUR;
 }
 
 /*
@@ -1323,7 +1323,7 @@ void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_TenutoOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    track->m_flags |= 0x00200000;
+    track->m_flags |= REDSOUND_TRACK_FLAG_TENUTO;
 }
 
 /*
@@ -1333,7 +1333,7 @@ void __MidiCtrl_TenutoOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_TenutoOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    track->m_flags &= ~0x00200000;
+    track->m_flags &= ~REDSOUND_TRACK_FLAG_TENUTO;
 }
 
 /*

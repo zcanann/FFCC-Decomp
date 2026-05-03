@@ -1982,7 +1982,7 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
             }
             ((RedTrackDATA*)track)->m_deltaTime -= frames;
             _MusicTrackDataExecute((RedTrackDATA*)track, step);
-            if ((((RedTrackDATA*)track)->m_flags & 0x200000) == 0 && (((RedTrackDATA*)track)->m_deltaTime == 1)) {
+            if ((((RedTrackDATA*)track)->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0 && (((RedTrackDATA*)track)->m_deltaTime == 1)) {
                 KeyOffSet(control, keyOnData, (RedTrackDATA*)track);
             }
             while (((u32)*track != 0) && (((RedTrackDATA*)track)->m_deltaTime < 1)) {
@@ -2515,7 +2515,7 @@ int _SeMidiNoteExecute(
                 }
                 ((RedTrackDATA*)track)->m_deltaTime -= frames;
                 _SeTrackDataExecute((RedTrackDATA*)track, step);
-                if ((((RedTrackDATA*)track)->m_flags & 0x200000) == 0 && (((RedTrackDATA*)track)->m_deltaTime == 1)) {
+                if ((((RedTrackDATA*)track)->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0 && (((RedTrackDATA*)track)->m_deltaTime == 1)) {
                     KeyOffSet(control, keyOnData, (RedTrackDATA*)track);
                 }
 

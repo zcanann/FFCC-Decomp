@@ -113,6 +113,12 @@ struct RedTrackDATA {
 	unsigned char m_pad151[0x154 - 0x151];
 };
 
+enum RedTrackFlag {
+	REDSOUND_TRACK_FLAG_SLUR = 0x80000,
+	REDSOUND_TRACK_FLAG_SLUR_RELEASE = 0x100000,
+	REDSOUND_TRACK_FLAG_TENUTO = 0x200000,
+};
+
 struct RedKeyOnSlot {
 	RedTrackDATA* m_track;
 	RedNoteDATA m_note;

@@ -27,6 +27,9 @@ enum RedStreamLayoutSize {
 	REDSOUND_STREAM_ADPCM_HEADER_SIZE = 0x2e,
 	REDSOUND_STREAM_INITIAL_LOOP_END = 0x3fff,
 	REDSOUND_STREAM_STEREO_CHANNEL_COUNT = 2,
+	REDSOUND_STREAM_BUFFER_SIDE_A = 0,
+	REDSOUND_STREAM_BUFFER_SIDE_B = 1,
+	REDSOUND_STREAM_BUFFER_SIDE_MASK = 1,
 };
 
 /*
@@ -103,7 +106,7 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
 	int dmaDstOffset;
 	int dmaID;
 
-	bufferIndex &= 1;
+	bufferIndex &= REDSOUND_STREAM_BUFFER_SIDE_MASK;
 
 	do {
 		dstBuffer = stream->m_buffer + bufferIndex * REDSOUND_STREAM_PAGE_SIZE;
@@ -145,7 +148,7 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
 		}
 
 		byteCount -= REDSOUND_STREAM_PAGE_SIZE;
-		bufferIndex ^= 1;
+		bufferIndex ^= REDSOUND_STREAM_BUFFER_SIDE_MASK;
 		stream->m_streamCursor += REDSOUND_STREAM_SAMPLE_ADVANCE;
 	} while (0 < byteCount);
 
@@ -578,10 +581,10 @@ void StreamControl()
 							int side;
 							int dmaID;
 							if (streamData->m_streamCursorBase != 0) {
-								side = 0;
+								side = REDSOUND_STREAM_BUFFER_SIDE_A;
 								streamData->m_streamCursorBase = 0;
 							} else {
-								side = 1;
+								side = REDSOUND_STREAM_BUFFER_SIDE_B;
 								streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
 							}
 

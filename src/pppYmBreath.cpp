@@ -169,7 +169,11 @@ struct YmBreathParticleData {
     float m_alpha;
     float m_scale;
     u8 m_age;
-    unsigned char _pad55[0x0B];
+    u8 _pad55;
+    s16 m_shapeFrame0;
+    s16 m_shapeFrame1;
+    s16 m_shapeFrame2;
+    unsigned char _pad5C[0x04];
 };
 
 extern "C" const char s_pppYmBreath_cpp_801DA9B0[] = "pppYmBreath.cpp";
@@ -301,6 +305,15 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     unsigned char colorB;
     unsigned char colorA;
     int i;
+    _GXColor drawColor;
+    _GXColor debugColor;
+    Vec debugPos;
+    Vec pos;
+    Mtx drawMtx;
+    Mtx rotMtx;
+    Mtx sphereMtx;
+    Mtx tempMtx;
+    pppFMATRIX viewMtx;
 
     step = (YmBreathRenderStep*)pYmBreath;
     workOffset = offsets->m_serializedDataOffsets[0];
@@ -332,11 +345,6 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
 
     for (i = 0; i < groupCount; i++) {
         if (*(short*)&source[2].z > 0) {
-            _GXColor amb;
-            Mtx drawMtx;
-            Mtx rotMtx;
-            Vec pos;
-            pppFMATRIX viewMtx;
             int r;
             int g;
             int b;
@@ -392,12 +400,12 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                 a = 0x7F;
             }
 
-            amb.r = (unsigned char)r;
-            amb.g = (unsigned char)g;
-            amb.b = (unsigned char)b;
-            amb.a = (unsigned char)a;
-            GXSetChanAmbColor(GX_COLOR0A0, amb);
-            pppDrawShp__FPlsP12CMaterialSetUc(*shape, *(short*)((unsigned char*)&source[7].y + 2),
+            drawColor.r = (unsigned char)r;
+            drawColor.g = (unsigned char)g;
+            drawColor.b = (unsigned char)b;
+            drawColor.a = (unsigned char)a;
+            GXSetChanAmbColor(GX_COLOR0A0, drawColor);
+            pppDrawShp__FPlsP12CMaterialSetUc(*shape, reinterpret_cast<YmBreathParticleData*>(source)->m_shapeFrame2,
                                               pppEnvStPtr->m_materialSetPtr,
                                               step->m_payload[8]);
         }
@@ -415,13 +423,9 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
         int* debugGroupData = groupData;
         for (i = 0; i < (int)params->m_groupCount; i++) {
             if (debugGroupData[0] == 1) {
-                _GXColor debugColor;
                 int firstParticle;
                 int j;
                 float groupScale;
-                Mtx sphereMtx;
-                Mtx tempMtx;
-                Vec debugPos;
 
                 switch (i) {
                 case 0:
@@ -457,6 +461,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                 }
 
                 firstParticle = -1;
+                groupScale = *(float*)(debugGroupData + 10);
                 for (j = 0; j < (int)params->m_slotCount; j++) {
                     if (*(signed char*)(debugGroupData[2] + j) != -1) {
                         firstParticle = (int)*(signed char*)(debugGroupData[1] + j);
@@ -464,7 +469,6 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                     }
                 }
 
-                groupScale = *(float*)(debugGroupData + 10);
                 PSMTXIdentity(sphereMtx);
                 sphereMtx[0][0] = groupScale;
                 sphereMtx[1][1] = groupScale;
@@ -526,6 +530,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         return;
     }
 
+    _pppPObject* object = reinterpret_cast<_pppPObject*>(ymBreath);
     dataOffsets = offsets->m_serializedDataOffsets;
     _pppMngSt* mngSt = pppMngStPtr;
     colorOffset = dataOffsets[1];
@@ -595,7 +600,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     }
 
     PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_matrix);
-    UpdateAllParticle(reinterpret_cast<_pppPObject*>(ymBreath), work, pYmBreath, color);
+    UpdateAllParticle(object, work, pYmBreath, color);
 
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
@@ -612,7 +617,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
 group_ready:
         if (ready) {
             firstParticle = -1;
-            scaledOwner = mngSt->m_ownerScale * params->m_groupOwnerScale;
+            scaledOwner = mngSt->m_previousPosition.z * params->m_groupOwnerScale;
             for (slotIndex = 0; slotCount != 0; slotCount--) {
                 if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
                     firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
@@ -657,9 +662,9 @@ group_ready:
 void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VColor* vColor)
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
-    unsigned char* particleData;
-    unsigned char* particleWmat;
-    unsigned char* particleColor;
+    YmBreathParticleData* particleData;
+    PARTICLE_WMAT* particleWmat;
+    PARTICLE_COLOR* particleColor;
     YmBreathParticleGroup* groupTable;
     int maxParticleCount;
     unsigned short* emitFrameCounter;
@@ -676,9 +681,9 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     Vec stepVelocity;
     Vec unitVelocity;
 
-    particleData = (unsigned char*)vYmBreath->m_particleData;
-    particleWmat = (unsigned char*)vYmBreath->m_particleWmats;
-    particleColor = (unsigned char*)vYmBreath->m_particleColors;
+    particleData = reinterpret_cast<YmBreathParticleData*>(vYmBreath->m_particleData);
+    particleWmat = vYmBreath->m_particleWmats;
+    particleColor = vYmBreath->m_particleColors;
     groupTable = vYmBreath->m_groups;
     maxParticleCount = vYmBreath->m_particleCount;
     spawnCount = 0;
@@ -688,13 +693,12 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
         *emitFrameCounter = *emitFrameCounter + 1;
 
         for (i = 0; i < maxParticleCount; i++) {
-            YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
-            if (particle->m_life > 0) {
-                UpdateParticle(vYmBreath, pYmBreath, (PARTICLE_DATA*)particleData, vColor, (PARTICLE_COLOR*)particleColor);
+            if (particleData->m_life > 0) {
+                UpdateParticle(vYmBreath, pYmBreath, (PARTICLE_DATA*)particleData, vColor, particleColor);
                 pppCalcFrameShape(**(long***)(*(int*)((unsigned char*)pppEnvStPtr + 0xC) +
                                              params->m_shapeStepValue * 4),
-                                  *(short*)(particleData + 0x58), *(short*)(particleData + 0x5A),
-                                  *(short*)(particleData + 0x56), params->m_shapeFrameArg);
+                                  particleData->m_shapeFrame1, particleData->m_shapeFrame2,
+                                  particleData->m_shapeFrame0, params->m_shapeFrameArg);
             } else {
                 float zero = 0.0f;
 
@@ -755,7 +759,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                     bool placing;
 
                     BirthParticle(pppObject, vYmBreath, pYmBreath, vColor, (PARTICLE_DATA*)particleData,
-                                  (PARTICLE_WMAT*)particleWmat, (PARTICLE_COLOR*)particleColor);
+                                  particleWmat, particleColor);
                     placing = true;
                     spawnCount += 1;
                     groupData = groupTable;
@@ -779,12 +783,12 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             }
 
             if (particleWmat != NULL) {
-                particleWmat += 0x30;
+                particleWmat += 1;
             }
             if (particleColor != NULL) {
-                particleColor += 0x20;
+                particleColor += 1;
             }
-            particleData += 0x60;
+            particleData += 1;
         }
 
         if (spawnCount > 0) {

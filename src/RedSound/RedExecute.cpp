@@ -1648,14 +1648,11 @@ void _KeyOnControl()
                         if (((u32)p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks <= *voice) &&
                             (*voice < (u32)p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks +
                                           (u32)p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount *
-                                              REDSOUND_TRACK_SIZE)) {
+                            REDSOUND_TRACK_SIZE)) {
                             u32 idx = (u32)((RedTrackDATA*)*voice)->m_trackNo;
-                            int idxSign = (int)((RedTrackDATA*)*voice)->m_trackNo >> 0x1F;
 
-                            if ((1U << (((idxSign * 0x20 |
-                                          (u32)(((RedTrackDATA*)*voice)->m_trackNo * 0x8000000 + idxSign) >> 0x1B) -
-                                         idxSign) &
-                                        m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
+                            if (((1U << (idx & REDSOUND_VOICE_INDEX_MASK)) &
+                                 m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)]) == 0) {
                                 volume = ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volumeScale + 1) *
                                           (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volume >> 0xC)) >>
                                          7;
@@ -1672,11 +1669,8 @@ void _KeyOnControl()
                         }
                     } else {
                         u32 idx = (u32)((RedTrackDATA*)*voice)->m_trackNo;
-                        int idxSign = (int)((RedTrackDATA*)*voice)->m_trackNo >> 0x1F;
-                        if ((1U << (((idxSign * 0x20 |
-                                      (u32)(((RedTrackDATA*)*voice)->m_trackNo * 0x8000000 + idxSign) >> 0x1B) -
-                                     idxSign) &
-                                    m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
+                        if (((1U << (idx & REDSOUND_VOICE_INDEX_MASK)) &
+                             m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)]) == 0) {
                             volume = ((p_SoundControlBuffer->m_volumeScale + 1) *
                                       (p_SoundControlBuffer->m_volume >> 0xC)) >>
                                      7;

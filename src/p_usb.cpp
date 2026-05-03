@@ -76,23 +76,25 @@ static inline unsigned int Swap32(unsigned int x)
  */
 int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
-    unsigned int count;
     unsigned int* ptr;
-    unsigned int* alloc;
     int connected;
     unsigned int* dstBuffer;
+    unsigned int value;
     CMemory::CStage* stage;
     int result;
+    unsigned int count;
 
-    count = (unsigned int)(elemSize * elemCount);
-    unsigned int value = (count + 0x5F) & ~0x1F;
-    stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
+    count = elemSize * elemCount;
+    value = (count + 0x5F) & ~0x1F;
+    stage = m_bigStage;
+    if (stage == (CMemory::CStage*)nullptr) {
+        stage = m_smallStage;
+    }
 
-    ptr = alloc = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
+    ptr = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
         value, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x1ca);
-    unsigned int type = 4;
-    alloc[1] = value;
-    ptr[0] = type;
+    ptr[1] = value;
+    ptr[0] = 4;
     ptr[9] = Swap32((unsigned int)code);
     ptr[10] = Swap32((unsigned int)elemCount);
     ptr[12] = Swap32(count);
@@ -104,7 +106,10 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     if (connected == 0) {
         result = 0;
     } else {
-        stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
+        stage = m_bigStage;
+        if (stage == (CMemory::CStage*)nullptr) {
+            stage = m_smallStage;
+        }
 
         dstBuffer = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
             (ptr[1] + 0x1F) & ~0x1F, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x19e);

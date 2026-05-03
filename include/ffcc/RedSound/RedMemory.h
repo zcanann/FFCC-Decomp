@@ -13,6 +13,12 @@ struct RedMemoryBlock {
 	int m_size;
 };
 
+enum RedMemoryLayoutSize {
+	REDSOUND_MEMORY_BANK_BLOCK_COUNT = 0x400,
+	REDSOUND_MEMORY_BANK_LAST_INDEX = REDSOUND_MEMORY_BANK_BLOCK_COUNT - 1,
+	REDSOUND_MEMORY_BANK_SIZE = sizeof(RedMemoryBlock) * REDSOUND_MEMORY_BANK_BLOCK_COUNT,
+};
+
 class CRedMemory
 {
 public:

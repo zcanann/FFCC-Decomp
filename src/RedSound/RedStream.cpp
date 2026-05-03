@@ -26,6 +26,7 @@ enum RedStreamLayoutSize {
 	REDSOUND_STREAM_SAMPLE_ADVANCE = 0x200,
 	REDSOUND_STREAM_ADPCM_HEADER_SIZE = 0x2e,
 	REDSOUND_STREAM_INITIAL_LOOP_END = 0x3fff,
+	REDSOUND_STREAM_BASE_PITCH = 0x3c00000,
 	REDSOUND_STREAM_STEREO_CHANNEL_COUNT = 2,
 	REDSOUND_STREAM_BUFFER_SIDE_A = 0,
 	REDSOUND_STREAM_BUFFER_SIDE_B = 1,
@@ -354,7 +355,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		}
 		streamData->m_volume = volume;
 		streamData->m_volumeStepCount = 0;
-		pitch = PitchCompute(0x3c00000, 0, streamData->m_header.m_pitch, 0);
+		pitch = PitchCompute(REDSOUND_STREAM_BASE_PITCH, 0, streamData->m_header.m_pitch, 0);
 		iVar2 = 0;
 		do {
 			voice = streamData->m_voiceData + iVar2;
@@ -520,7 +521,7 @@ void StreamPause(int streamID, int pause)
 					}
 				}
 			} else if (voiceData->m_axVoice != 0) {
-				unsigned int pitch = PitchCompute(0x3c00000, 0, streamData->m_header.m_pitch, 0);
+				unsigned int pitch = PitchCompute(REDSOUND_STREAM_BASE_PITCH, 0, streamData->m_header.m_pitch, 0);
 				short channelCount = streamData->m_header.m_channelCount;
 				volume = streamData->m_volume >> REDSOUND_FIXED_SHIFT;
 				if (channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {

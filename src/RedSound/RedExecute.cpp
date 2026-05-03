@@ -551,7 +551,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
         if ((((u8*)track)[0x26] & 8) != 0) {
             voice = (RedVoiceDATA*)p_VoiceData;
         } else {
-            voice = (RedVoiceDATA*)((u8*)p_VoiceData + *(s8*)((u8*)p_SoundControl + 0x490) * REDSOUND_VOICE_SIZE);
+            voice = (RedVoiceDATA*)((u8*)p_VoiceData + (s8)p_SoundControl->m_channelAlloc * REDSOUND_VOICE_SIZE);
         }
 
         bestEnvelope = 0x8000;
@@ -2560,8 +2560,8 @@ int _SeMidiNoteExecute(
         }
         track += REDSOUND_TRACK_SIZE / sizeof(*track);
     } while (track < (int*)(*(int*)control + REDSOUND_SE_TRACK_ARENA_SIZE));
-    ((int*)control)[0x11D] = 1;
-    return *(s16*)((u8*)control + 0x48E);
+    control->m_updateFlags = 1;
+    return control->m_tickCounter;
 }
 
 /*

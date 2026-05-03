@@ -20,7 +20,7 @@ extern "C" {
 }
 
 struct RedWaveSettingState {
-    int slot;
+    int* slot;
     int waveID;
     void* waveData;
     int waveSize;
@@ -912,7 +912,7 @@ int _WaveSettingThread(void* threadArg)
             RedWaveSettingState* waveSetting = (RedWaveSettingState*)threadArg;
             m_WaveSettingStatus = m_WaveSettingStatus + 1;
             c_RedEntry.SetWaveData(waveSetting->waveID, waveSetting->waveData, waveSetting->waveSize);
-            *(int*)waveSetting->slot = 0;
+            *waveSetting->slot = 0;
             do {
             } while (OSTryWaitSemaphore(&m_WaveSettingSemaphore) > 0);
             m_WaveSettingStatus = 0;
@@ -2198,7 +2198,7 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
         RedSleep(0);
     }
 
-    m_WaveSettingData.slot = slot;
+    m_WaveSettingData.slot = reinterpret_cast<int*>(slot);
     m_WaveSettingData.waveID = waveID;
     m_WaveSettingData.waveData = waveData;
 

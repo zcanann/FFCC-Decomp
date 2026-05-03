@@ -1604,8 +1604,8 @@ void _KeyOnControl()
     }
 
     {
-        u32* seTrackBase = (u32*)p_SoundControlBuffer + 0x36F;
-        int* track = (int*)((u32*)p_SoundControlBuffer)[0x36F];
+        u32* seTrackBase = (u32*)&p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+        int* track = (int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
         do {
             if (((u32)*track != 0) && (track[0x2D] != 0)) {
                 waveFunc = (int (*)(int))track[0x2D];
@@ -2559,7 +2559,7 @@ int _SeMidiNoteExecute(
             }
         }
         track += REDSOUND_TRACK_SIZE / sizeof(*track);
-    } while (track < (int*)(*(int*)control + REDSOUND_SE_TRACK_ARENA_SIZE));
+    } while (track < (int*)((int)control->m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE));
     control->m_updateFlags = 1;
     return control->m_tickCounter;
 }

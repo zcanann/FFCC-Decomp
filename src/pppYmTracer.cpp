@@ -16,8 +16,8 @@ extern const f32 FLOAT_803306e8;
 extern const f32 FLOAT_803306ec;
 extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
-extern const f64 DOUBLE_80330578 = 4503601774854144.0;
-extern const f64 DOUBLE_80330580 = 4503599627370496.0;
+extern const f64 DOUBLE_803306F0;
+extern const f64 DOUBLE_803306f8;
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -103,14 +103,14 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     TracerWork* work;
     CMapMesh* mapMesh;
     u8* colorData;
-    TRACE_POLYGON* poly;
+    float* polyData;
     CTexture* texture;
-    s32 i;
     s32 dataOffset;
     s32 colorOffset;
     s32 dataValIndex;
-    PackedColor colorTop;
-    PackedColor colorBottom;
+    u32 i;
+    u32 colorTop;
+    u32 colorBottom;
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
@@ -120,7 +120,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     dataOffset = *param_3->m_serializedDataOffsets;
     work = (TracerWork*)(pppYmTracer->m_serializedData + dataOffset);
     colorOffset = param_3->m_serializedDataOffsets[1];
-    poly = work->entries;
+    polyData = reinterpret_cast<float*>(work->entries);
     mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
     colorData = pppYmTracer->m_serializedData + colorOffset;
 
@@ -150,43 +150,41 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
                 SetUpPaletteEnv(texture);
             }
 
-            uvStep = FLOAT_803306ec / (f32)(u32)work->count;
+            uvStep = FLOAT_803306ec / (f32)(u16)work->count;
             GXSetCullMode(GX_CULL_NONE);
 
-            for (i = 0; i < (s32)(work->count - 1); i++) {
-                TRACE_POLYGON* next = poly + 1;
-
-                if ((next->life > 0) && (FLOAT_803306e8 != poly->to.x) && (FLOAT_803306e8 != poly->to.y) &&
-                    (FLOAT_803306e8 != poly->to.z) && (FLOAT_803306e8 != poly->from.x) &&
-                    (FLOAT_803306e8 != poly->from.y) && (FLOAT_803306e8 != poly->from.z) &&
-                    (FLOAT_803306e8 != next->to.x) && (FLOAT_803306e8 != next->to.y) &&
-                    (FLOAT_803306e8 != next->to.z) && (FLOAT_803306e8 != next->from.x) &&
-                    (FLOAT_803306e8 != next->from.y) && (FLOAT_803306e8 != next->from.z)) {
+            for (i = 0; (s32)i < (s32)((u16)work->count - 1); i++) {
+                if ((*(s16*)(polyData + 18) > 0) && (FLOAT_803306e8 != polyData[4]) && (FLOAT_803306e8 != polyData[5]) &&
+                    (FLOAT_803306e8 != polyData[6]) && (FLOAT_803306e8 != polyData[0]) &&
+                    (FLOAT_803306e8 != polyData[1]) && (FLOAT_803306e8 != polyData[2]) &&
+                    (FLOAT_803306e8 != polyData[14]) && (FLOAT_803306e8 != polyData[15]) &&
+                    (FLOAT_803306e8 != polyData[16]) && (FLOAT_803306e8 != polyData[10]) &&
+                    (FLOAT_803306e8 != polyData[11]) && (FLOAT_803306e8 != polyData[12])) {
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
-                    colorTop.value = DAT_803306e0;
-                    colorTop.bytes[3] = poly->alpha;
-                    colorBottom.value = DAT_803306e4;
-                    colorBottom.bytes[3] = next->alpha;
+                    colorTop = DAT_803306e0;
+                    colorBottom = DAT_803306e4;
+                    reinterpret_cast<u8*>(&colorTop)[3] = *(reinterpret_cast<u8*>(polyData) + 0x1F);
+                    reinterpret_cast<u8*>(&colorBottom)[3] = *(reinterpret_cast<u8*>(polyData) + 0x47);
 
                     GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
-                    GXPosition3f32(poly->to.x, poly->to.y, poly->to.z);
-                    GXColor1u32(colorTop.value);
+                    GXPosition3f32(polyData[4], polyData[5], polyData[6]);
+                    GXColor1u32(colorTop);
                     GXTexCoord2f32(uTop, FLOAT_803306ec);
 
-                    GXPosition3f32(poly->from.x, poly->from.y, poly->from.z);
-                    GXColor1u32(colorTop.value);
+                    GXPosition3f32(polyData[0], polyData[1], polyData[2]);
+                    GXColor1u32(colorTop);
                     GXTexCoord2f32(uTop, FLOAT_803306e8);
 
-                    GXPosition3f32(next->to.x, next->to.y, next->to.z);
-                    GXColor1u32(colorBottom.value);
+                    GXPosition3f32(polyData[14], polyData[15], polyData[16]);
+                    GXColor1u32(colorBottom);
                     GXTexCoord2f32(uBottom, FLOAT_803306ec);
 
-                    GXPosition3f32(next->from.x, next->from.y, next->from.z);
-                    GXColor1u32(colorBottom.value);
+                    GXPosition3f32(polyData[10], polyData[11], polyData[12]);
+                    GXColor1u32(colorBottom);
                     GXTexCoord2f32(uBottom, FLOAT_803306e8);
                 }
-                poly++;
+                polyData += 10;
             }
         }
     }

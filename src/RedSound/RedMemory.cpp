@@ -62,7 +62,7 @@ int RedNew(int size)
 	}
 
 	interrupts = OSDisableInterrupts();
-	size = (size + 0x1F) & 0xFFFFFFE0;
+	size = (size + 0x1F) & ~0x1F;
 	slot = m_MemoryBank;
 	address = m_DataBuffer;
 
@@ -190,7 +190,7 @@ int RedNewA(int size, int offset, int maxSize)
 		maxSize = m_ADataBufferSize;
 	}
 	maxSize -= offset;
-	size = (size + 0x1F) & 0xFFFFFFE0;
+	size = (size + 0x1F) & ~0x1F;
 	result = rangeStart;
 	maxGap = maxSize;
 	bestBlock = 0;

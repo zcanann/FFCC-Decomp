@@ -781,10 +781,10 @@ void CRedEntry::DisplayWaveInfo()
 		do {
 			if (bank->m_size != 0) {
 				int freeSize;
-				if (bank[1].m_size < 1) {
-					freeSize = aBufferEnd - (bank->m_address + bank->m_size);
-				} else {
+				if (bank[1].m_size >= 1) {
 					freeSize = bank[1].m_address - (bank->m_address + bank->m_size);
+				} else {
+					freeSize = aBufferEnd - (bank->m_address + bank->m_size);
 				}
 
 				RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase);

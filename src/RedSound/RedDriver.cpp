@@ -2012,20 +2012,20 @@ void CRedDriver::SePause(int seID, int pause)
  */
 int CRedDriver::GetSeVolume(int seID, int mode)
 {
-    unsigned int* seInfo;
+    RedTrackDATA* track;
 
-    seInfo = (unsigned int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+    track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     while (1) {
-        if ((*seInfo != 0) && ((seID == -1) || (seID == ((RedTrackDATA*)seInfo)->m_seId))) {
-            if (*seInfo != 0) {
+        if (((u32)track->m_command != 0) && ((seID == -1) || (seID == track->m_seId))) {
+            if ((u32)track->m_command != 0) {
                 if (mode == 1) {
-                    return seInfo[0x15];
+                    return track->m_mixVolumeDelta;
                 }
-                return (int)seInfo[0x13] >> REDSOUND_FIXED_SHIFT;
+                return track->m_mixVolume >> REDSOUND_FIXED_SHIFT;
             }
         }
-        seInfo += REDSOUND_TRACK_SIZE / sizeof(*seInfo);
-        if (seInfo < (unsigned int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE)) {
+        track++;
+        if (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT) {
             continue;
         }
         return 0;

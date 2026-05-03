@@ -1064,20 +1064,22 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
             (REDSOUND_TRACK_FLAG_SLUR | REDSOUND_TRACK_FLAG_TENUTO)) == 0)) ||
          (((trackS8[REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) &&
           (((unsigned int)trackData[REDSOUND_TRACK_FLAGS_WORD_OFFSET] & REDSOUND_TRACK_FLAG_SLUR) == 0)))) {
-        if (trackData[0x1d] != 0) {
-            ((s16*)voiceData)[10] = trackS16[0x48];
+        if (trackData[REDSOUND_TRACK_VIBRATE_FUNC_WORD_OFFSET] != 0) {
+            ((s16*)voiceData)[REDSOUND_VOICE_PITCH_MOD_DELAY_HALFWORD] =
+                trackS16[REDSOUND_TRACK_VIBRATE_DELAY_HALFWORD];
             local_38[0] = 0x100;
-            if ((trackData[0x1e] >> REDSOUND_FIXED_SHIFT) != 0) {
-                local_38[0] = 0x100 / (trackData[0x1e] >> REDSOUND_FIXED_SHIFT);
+            if ((trackData[REDSOUND_TRACK_VIBRATE_RATE_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT) != 0) {
+                local_38[0] =
+                    0x100 / (trackData[REDSOUND_TRACK_VIBRATE_RATE_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT);
             }
-            if (trackS16[0x49] == 0) {
+            if (trackS16[REDSOUND_TRACK_VIBRATE_DELAY_DEPTH_HALFWORD] == 0) {
                 iVar5 = 0;
             } else {
-                iVar5 = trackS16[0x49] * local_38[0] * 4;
+                iVar5 = trackS16[REDSOUND_TRACK_VIBRATE_DELAY_DEPTH_HALFWORD] * local_38[0] * 4;
             }
-            voiceData[8] = iVar5;
-            voiceData[9] = 0;
-            voiceData[7] = 0;
+            voiceData[REDSOUND_VOICE_PITCH_MOD_FRAMES_WORD] = iVar5;
+            voiceData[REDSOUND_VOICE_PITCH_MOD_FRAME_WORD] = 0;
+            voiceData[REDSOUND_VOICE_PITCH_MOD_PHASE_WORD] = 0;
         }
 
         if (trackData[0x25] != 0) {

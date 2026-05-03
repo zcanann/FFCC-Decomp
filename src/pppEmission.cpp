@@ -32,8 +32,6 @@ extern const float FLOAT_803311e4;
 extern const float FLOAT_803311f8;
 extern const float FLOAT_8033111C = 15.0f;
 extern const float FLOAT_80331120 = 7.0f;
-extern const double DOUBLE_803311e8 = 4503599627370496.0;
-extern const double DOUBLE_803311f0 = 4503601774854144.0;
 static const char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }

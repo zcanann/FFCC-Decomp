@@ -46,6 +46,11 @@ enum RedStreamAdpcmHeaderOffset {
 	REDSOUND_STREAM_ADPCM_STEREO_LOOP_YN2_OFFSET = 0x54,
 };
 
+static RedStreamDATA* _SearchEmptyStreamData();
+static void _StreamStop(RedStreamDATA*);
+static int _ArrangeStreamDataNoLoop(RedStreamDATA*, int, int);
+static int _ArrangeStreamDataLoop(RedStreamDATA*, int, int);
+
 /*
  * --INFO--
  * PAL Address: 0x801cb93c
@@ -55,7 +60,7 @@ enum RedStreamAdpcmHeaderOffset {
  * JP Address: TODO
  * JP Size: TODO
  */
-RedStreamDATA* _SearchEmptyStreamData()
+static RedStreamDATA* _SearchEmptyStreamData()
 {
 	RedStreamDATA* streamData = p_Stream;
 
@@ -81,7 +86,7 @@ RedStreamDATA* _SearchEmptyStreamData()
  * JP Address: TODO
  * JP Size: TODO
  */
-void _StreamStop(RedStreamDATA* streamData)
+static void _StreamStop(RedStreamDATA* streamData)
 {
 	fflush(__files + 1);
 	if (streamData->m_streamId != 0) {
@@ -113,7 +118,7 @@ void _StreamStop(RedStreamDATA* streamData)
  * Address:	TODO
  * Size:	TODO
  */
-int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCount)
+static int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCount)
 {
 	unsigned char* dstBuffer;
 	RedVoiceDATA* voiceData;
@@ -174,7 +179,7 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
  * Address:	801cbc6c
  * Size:	856b
  */
-int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount)
+static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount)
 {
 	unsigned int* srcEnd;
 	unsigned char* rightDst;

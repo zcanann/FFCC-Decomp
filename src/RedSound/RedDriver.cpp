@@ -41,6 +41,19 @@ enum RedDriverDmaLayoutSize {
     REDSOUND_DMA_ARQ_PRIORITY = 1,
 };
 
+enum RedDriverDmaThreadStage {
+    REDSOUND_DMA_THREAD_IDLE = 0,
+    REDSOUND_DMA_THREAD_SELECT_QUEUE = 1,
+    REDSOUND_DMA_THREAD_LOAD_ENTRY = 2,
+    REDSOUND_DMA_THREAD_POST_REQUEST = 3,
+    REDSOUND_DMA_THREAD_WAIT_REQUEST = 4,
+    REDSOUND_DMA_THREAD_ADVANCE_QUEUE = 5,
+    REDSOUND_DMA_THREAD_STORE_QUEUE = 6,
+    REDSOUND_DMA_THREAD_POLL_STATUS = 7,
+    REDSOUND_DMA_THREAD_RUN_CALLBACK = 8,
+    REDSOUND_DMA_THREAD_FINISH_ENTRY = 9,
+};
+
 struct RedDriverSyncState {
     int m_dmaQueue[REDSOUND_DMA_QUEUE_WORD_COUNT];
     int m_streamDmaQueue[REDSOUND_DMA_QUEUE_WORD_COUNT];
@@ -1132,7 +1145,7 @@ void _DmaExecute()
 
     while ((p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) ||
            (p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX])) {
-        m_DMAInThread = 1;
+        m_DMAInThread = REDSOUND_DMA_THREAD_SELECT_QUEUE;
         if (p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] == p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) {
             ppiVar5 = &p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX];
             piVar4 = RedDriverStreamDmaQueue();
@@ -1141,7 +1154,7 @@ void _DmaExecute()
             piVar4 = RedDriverMainDmaQueue();
         }
         piVar7 = *ppiVar5;
-        m_DMAInThread = 2;
+        m_DMAInThread = REDSOUND_DMA_THREAD_LOAD_ENTRY;
         piVar6 = 0;
         if (piVar7->m_id != 0) {
             m_DMAStatus = 1;
@@ -1154,31 +1167,31 @@ void _DmaExecute()
                 iVar3 = piVar7->m_aramMemory;
                 iVar2 = piVar7->m_mainMemory;
             }
-            m_DMAInThread = 3;
+            m_DMAInThread = REDSOUND_DMA_THREAD_POST_REQUEST;
             ARQSetChunkSize((u32)piVar7->m_size);
             ARQPostRequest(&m_DMARequest, REDSOUND_DMA_ARQ_OWNER_ID, (u32)piVar7->m_direction, REDSOUND_DMA_ARQ_PRIORITY, (u32)iVar3, (u32)iVar2,
                            (u32)piVar7->m_size, _DmaCallback);
-            m_DMAInThread = 4;
+            m_DMAInThread = REDSOUND_DMA_THREAD_WAIT_REQUEST;
             piVar6 = piVar7;
         }
         piVar8 = piVar7 + 1;
-        m_DMAInThread = 5;
+        m_DMAInThread = REDSOUND_DMA_THREAD_ADVANCE_QUEUE;
         if (piVar4 + REDSOUND_DMA_QUEUE_ENTRY_COUNT <= piVar7 + 1) {
             piVar8 = piVar4;
         }
         *ppiVar5 = piVar8;
-        m_DMAInThread = 6;
+        m_DMAInThread = REDSOUND_DMA_THREAD_STORE_QUEUE;
 
         while (piVar6 != 0) {
-            m_DMAInThread = 7;
+            m_DMAInThread = REDSOUND_DMA_THREAD_POLL_STATUS;
             if (m_DMAStatus == 0) {
-                m_DMAInThread = 8;
+                m_DMAInThread = REDSOUND_DMA_THREAD_RUN_CALLBACK;
                 if ((u32)piVar6->m_callback != 0) {
                     uVar1 = OSDisableInterrupts();
                     piVar6->m_callback(piVar6->m_callbackData);
                     OSRestoreInterrupts(uVar1);
                 }
-                m_DMAInThread = 9;
+                m_DMAInThread = REDSOUND_DMA_THREAD_FINISH_ENTRY;
                 if (piVar6->m_direction == REDSOUND_DMA_DIRECTION_FROM_ARAM) {
                     DCFlushRange((void*)piVar6->m_mainMemory, (u32)piVar6->m_size);
                 }
@@ -1188,7 +1201,7 @@ void _DmaExecute()
             RedSleep(0);
         }
     }
-    m_DMAInThread = 0;
+    m_DMAInThread = REDSOUND_DMA_THREAD_IDLE;
 }
 
 /*

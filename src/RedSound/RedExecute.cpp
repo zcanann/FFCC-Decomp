@@ -1488,17 +1488,16 @@ void EnvelopeKeyExecute()
                     voiceData[0x2C] = voiceData[0x2B] >> 0xC;
                 }
             } else {
+                voiceData[0x24] &= 0xFFFFFFFB;
                 int waveData = voiceData[1];
                 int trackData = voiceData[0];
-
-                voiceData[0x24] &= 0xFFFFFFFB;
                 if ((waveData == 0) || (trackData == 0)) {
                     voiceData[0x23] = 0;
                 } else {
+                    envChanged += 1;
                     int key = (*(int*)(trackData + 0x11C) + *(int*)(waveData + 4) + 1) * 2;
                     int keyBase = key - 2;
 
-                    envChanged += 1;
                     *(u16*)(voice + 0x148) = (u16)((voiceData[0x25] & 1U) != 0);
                     *(u16*)(voice + 0x140) = 1;
                     *(u16*)(voice + 0x146) = 1;

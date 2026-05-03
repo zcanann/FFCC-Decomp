@@ -118,6 +118,12 @@ enum RedDriverThreadFlag {
     REDSOUND_THREAD_FLAG_MUSIC_SKIP = 8,
 };
 
+enum RedDriverThreadConfig {
+    REDSOUND_DMA_THREAD_PRIORITY = 3,
+    REDSOUND_WORKER_THREAD_PRIORITY = 4,
+    REDSOUND_THREAD_DETACHED = 1,
+};
+
 enum RedDriverHeaderSignature {
     REDSOUND_MUSIC_SIGNATURE_0 = 'B',
     REDSOUND_MUSIC_SIGNATURE_1 = 'G',
@@ -1343,7 +1349,7 @@ void CRedDriver::Init()
         iVar5 = iVar6 + 1;
         p_SeBlockData[iVar6] = 0;
         iVar6 = iVar5;
-    } while (iVar5 < 4);
+    } while (iVar5 < REDSOUND_SE_BLOCK_BANK_COUNT);
     p_ZeroData = (u8*)RedNew(REDSOUND_ZERO_BUFFER_SIZE);
     memset(p_ZeroData, 0, REDSOUND_ZERO_BUFFER_SIZE);
     p_MusicReplayPoint = (int*)RedNew(REDSOUND_MUSIC_REPLAY_POINT_SIZE);
@@ -1420,23 +1426,27 @@ void CRedDriver::Init()
     OSInitSemaphore(&m_DmaExecuteSemaphore, 0);
     p_DmaExecuteThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
     OSCreateThread(&m_DmaExecuteThread, (void* (*)(void*))_DmaExecuteThread, 0,
-                   p_DmaExecuteThreadStack + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE, 3, 1);
+                   p_DmaExecuteThreadStack + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
+                   REDSOUND_DMA_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);
     OSResumeThread(&m_DmaExecuteThread);
     OSInitSemaphore(&m_WaveSettingSemaphore, 0);
     p_WaveSettingThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
     OSCreateThread(&m_WaveSettingThread, (void* (*)(void*))_WaveSettingThread, &m_WaveSettingData,
-                   p_WaveSettingThreadStack + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE, 4, 1);
+                   p_WaveSettingThreadStack + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
+                   REDSOUND_WORKER_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);
     OSResumeThread(&m_WaveSettingThread);
     OSInitSemaphore(&m_MusicSkipSemaphore, 0);
     p_MusicSkipThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
     OSCreateThread(&m_MusicSkipThread, (void* (*)(void*))_MusicSkipThread, 0,
-                   p_MusicSkipThreadStack + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE, 4, 1);
+                   p_MusicSkipThreadStack + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
+                   REDSOUND_WORKER_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);
     OSResumeThread(&m_MusicSkipThread);
     OSInitSemaphore(&m_MainSemaphore, 0);
     m_MainThreadTime = 0;
     p_MainThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
     OSCreateThread(&RedDriverMainThread(), (void* (*)(void*))_MainThread, 0,
-                   p_MainThreadStack + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE, 4, 1);
+                   p_MainThreadStack + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
+                   REDSOUND_WORKER_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);
     OSResumeThread(&RedDriverMainThread());
 }
 

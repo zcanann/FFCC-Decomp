@@ -207,10 +207,10 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 			if ((bufferIndex == 0) && (voiceData->m_axVoice != 0)) {
 				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*pbVar6;
 				voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
-				voiceData->m_axVoice->sync = voiceData->m_axVoice->sync | 0x100000;
+				voiceData->m_axVoice->sync |= 0x100000;
 				voiceData[1].m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)pbVar6[0x2000];
 				voiceData[1].m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData[1].m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
-				voiceData[1].m_axVoice->sync = voiceData[1].m_axVoice->sync | 0x100000;
+				voiceData[1].m_axVoice->sync |= 0x100000;
 			}
 			
 			bufferIndex = bufferIndex ^ 1;
@@ -238,7 +238,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 			if ((bufferIndex == 0) && (voiceData->m_axVoice != 0)) {
 				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*pbVar5;
 				voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
-				voiceData->m_axVoice->sync = voiceData->m_axVoice->sync | 0x100000;
+				voiceData->m_axVoice->sync |= 0x100000;
 			}
 			
 			bufferIndex = bufferIndex ^ 1;

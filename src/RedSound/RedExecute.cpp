@@ -179,6 +179,12 @@ enum RedExecuteAxVoiceLayout {
     REDSOUND_AX_VOICE_RATIO_LOW_OFFSET = 0x1E0,
 };
 
+enum RedExecutePitchModConst {
+    REDSOUND_PITCH_MOD_DEPTH_SPLIT = 0x80,
+    REDSOUND_PITCH_MOD_SHALLOW_SCALE = 2,
+    REDSOUND_PITCH_MOD_DEEP_SCALE = 0x18,
+};
+
 /*
  * --INFO--
  * PAL Address: 0x801c2fc4
@@ -865,10 +871,10 @@ void _PitchExecute(RedVoiceDATA* voice)
 
     if (((u32)voice->m_track->m_vibrateFunc != 0) && (voice->m_pitchModDelay == 0)) {
         int pitchLfo = voice->m_track->m_vibrateDepth >> 0xC;
-        if (pitchLfo < 0x80) {
-            pitchDelta = (pitchLfo + 1) * 2;
+        if (pitchLfo < REDSOUND_PITCH_MOD_DEPTH_SPLIT) {
+            pitchDelta = (pitchLfo + 1) * REDSOUND_PITCH_MOD_SHALLOW_SCALE;
         } else {
-            pitchDelta = ((pitchLfo & 0x7F) + 1) * 0x18;
+            pitchDelta = ((pitchLfo & REDSOUND_PAN_BYTE_MASK) + 1) * REDSOUND_PITCH_MOD_DEEP_SCALE;
         }
 
         pitchDelta = voice->m_track->m_pitchBend + pitchDelta;

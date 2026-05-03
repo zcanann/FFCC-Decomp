@@ -554,7 +554,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
             voice = (RedVoiceDATA*)((u8*)p_VoiceData + (s8)p_SoundControl->m_channelAlloc * REDSOUND_VOICE_SIZE);
         }
 
-        bestEnvelope = 0x8000;
+        bestEnvelope = REDSOUND_ENVELOPE_LEVEL_FULL;
         voiceEnd = p_VoiceData + REDSOUND_VOICE_COUNT;
         do {
             if ((voice->m_stateFlags & 3) == 0) {
@@ -577,7 +577,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
             RedVoiceDATA* selectedVoice;
             RedSoundCONTROL* soundControl = (RedSoundCONTROL*)p_SoundControl;
             soundControl->m_updateFlags = soundControl->m_updateFlags | 2;
-            if (bestEnvelope == 0x8000) {
+            if (bestEnvelope == REDSOUND_ENVELOPE_LEVEL_FULL) {
                 selectedVoice = 0;
             } else {
                 selectedVoice = bestVoice;
@@ -588,7 +588,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
     if (voice != 0) {
         voice->m_flags = voice->m_flags & 0xFFFFFFFD;
-        voice->m_envelopeLevel = 0x8000;
+        voice->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
     }
 
     return voice;
@@ -608,7 +608,7 @@ void _VoiceEnvelopeCheck()
     RedVoiceDATA* voiceData = (RedVoiceDATA*)p_VoiceData;
     do {
         if ((voiceData->m_stateFlags & 7) != 0) {
-            voiceData->m_envelopeLevel = 0x8000;
+            voiceData->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
         }
         voiceData++;
     } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
@@ -789,8 +789,8 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
             voiceMix = voiceMix + modVolume;
             voiceData[0xb] = voiceData[0xb] + *(int*)(*voiceData + 0x98);
 
-            if (voiceMix >= 0x8000) {
-                voiceMix = 0x7fff;
+            if (voiceMix >= REDSOUND_ENVELOPE_LEVEL_FULL) {
+                voiceMix = REDSOUND_AX_MIX_MAX;
             } else if (voiceMix < 0) {
                 voiceMix = 0;
             }
@@ -822,8 +822,8 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
 
     if (voiceData[0x10] != 0) {
         voiceMix = voiceMix + (voiceMix * voiceData[0x10] >> 7);
-        if (voiceMix >= 0x8000) {
-            voiceMix = 0x7fff;
+        if (voiceMix >= REDSOUND_ENVELOPE_LEVEL_FULL) {
+            voiceMix = REDSOUND_AX_MIX_MAX;
         } else if (voiceMix < 0) {
             voiceMix = 0;
         }
@@ -1524,7 +1524,7 @@ void EnvelopeKeyExecute()
 
                     voiceFlags |= 0x16100D;
                     voiceData[0x24] |= 0x20;
-                    voiceData[0x2C] = 0x8000;
+                    voiceData[0x2C] = REDSOUND_ENVELOPE_LEVEL_FULL;
                     voiceData[0x2B] = 0;
                 }
             }

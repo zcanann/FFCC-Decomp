@@ -362,7 +362,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 				voice->m_voiceSwitch |= 0x3000;
 			}
 			voice->m_track->m_voiceSwitch = 1;
-			voice->m_envelopeLevel = 0x8000;
+			voice->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
 			voice->m_waveData = &streamData->m_trackData[iVar2];
 			voice->m_targetPitch = pitch;
 			voice->m_track->m_reverbDepth = p_ReverbDepth[1].m_depth;

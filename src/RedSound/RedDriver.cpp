@@ -428,7 +428,7 @@ void _MusicMasterVolume(int* command)
     }
     voice = p_VoiceData;
     do {
-        voice->m_updateFlags = voice->m_updateFlags | 2;
+        voice->m_updateFlags = voice->m_updateFlags | REDSOUND_VOICE_UPDATE_VOLUME;
         voice++;
     } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
 }
@@ -592,7 +592,7 @@ void _SeMasterVolume(int* command)
     }
     voice = p_VoiceData;
     do {
-        voice->m_updateFlags = voice->m_updateFlags | 2;
+        voice->m_updateFlags = voice->m_updateFlags | REDSOUND_VOICE_UPDATE_VOLUME;
         voice++;
     } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
 }

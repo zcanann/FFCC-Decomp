@@ -1623,7 +1623,7 @@ void _KeyOnControl()
         unsigned int* voice = (unsigned int*)p_VoiceData;
         do {
             if ((voice[0x23] != 0) && (*voice != 0) && ((((RedTrackDATA*)*voice)->m_voiceSwitch & 9) == 0)) {
-                if ((((RedVoiceDATA*)voice)->m_updateFlags & 2) != 0 || (*(int*)(*voice + 0x94) != 0) ||
+                if ((((RedVoiceDATA*)voice)->m_updateFlags & REDSOUND_VOICE_UPDATE_VOLUME) != 0 || (*(int*)(*voice + 0x94) != 0) ||
                     (*(int*)(*voice + 0xB4) != 0)) {
                     int volume;
                     if ((*voice < (u32)p_SoundControlBuffer->m_tracks) ||
@@ -1677,7 +1677,7 @@ void _KeyOnControl()
                     _VolumeExecute((RedVoiceDATA*)voice, volume);
                 }
 
-                if ((((RedVoiceDATA*)voice)->m_updateFlags & 1) != 0 || (*(int*)(*voice + 0x74) != 0)) {
+                if ((((RedVoiceDATA*)voice)->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0 || (*(int*)(*voice + 0x74) != 0)) {
                     _PitchExecute((RedVoiceDATA*)voice);
                 }
                 ((RedVoiceDATA*)voice)->m_updateFlags = 0;
@@ -1745,7 +1745,7 @@ void _ExecuteExtraData()
                 voice = (unsigned int*)p_VoiceData;
                 do {
                     if ((musicBase <= *voice) && (*voice < musicBase + (u32)soundControl->m_trackCount * REDSOUND_TRACK_SIZE)) {
-                        ((RedVoiceDATA*)voice)->m_updateFlags |= 2;
+                        ((RedVoiceDATA*)voice)->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
                     }
                     voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
                 } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
@@ -1771,7 +1771,7 @@ void _ExecuteExtraData()
                     (int)((RedTrackDATA*)*voice)->m_keyTranspose + (int)((RedTrackDATA*)*voice)->m_pitchBend,
                     *(int*)(voice[1] + 0x14),
                     ((RedTrackDATA*)*voice)->m_fineTune);
-                ((RedVoiceDATA*)voice)->m_updateFlags |= 1;
+                ((RedVoiceDATA*)voice)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
             }
             voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
         } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
@@ -1789,7 +1789,7 @@ void _ExecuteExtraData()
                     if (*track != 0) {
                         do {
                             if ((int*)*voice == track) {
-                                ((RedVoiceDATA*)voice)->m_updateFlags |= 2;
+                                ((RedVoiceDATA*)voice)->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
                             }
                             voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
                         } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));

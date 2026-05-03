@@ -658,7 +658,7 @@ void SePause(int seId, int pause)
 				track->m_voiceSwitch |= 8;
 				voice->m_voiceSwitch |= 8;
 			} else {
-				voice->m_updateFlags |= 3;
+				voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_ALL;
 				track->m_voiceSwitch &= 0xfffffff7;
 				voice->m_voiceSwitch &= 0xfffffff7;
 			}

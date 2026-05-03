@@ -294,7 +294,7 @@ static void _SetReverbDepth(int* command)
     int reverbBank;
     int reverbDepth;
     int fadeStep;
-    int* seInfo;
+    RedTrackDATA* track;
 
     reverbBank = command[0] & 1;
     reverbDepth = command[1] & REDSOUND_COMMAND_VALUE_MASK;
@@ -313,16 +313,16 @@ static void _SetReverbDepth(int* command)
             fadeStep++;
         }
         reverbDepth |= REDSOUND_FIXED_HALF;
-        seInfo = (int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+        track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
         do {
-            if ((u32)*seInfo != 0) {
-                fadeDepth = seInfo[0x1a] & REDSOUND_FIXED_WHOLE_MASK;
+            if ((u32)track->m_command != 0) {
+                fadeDepth = track->m_reverbDepth & REDSOUND_FIXED_WHOLE_MASK;
                 fadeDepth = reverbDepth - fadeDepth;
-                seInfo[0x1b] = fadeDepth / fadeStep;
-                seInfo[0x1c] = fadeStep;
+                track->m_reverbDepthAdd = fadeDepth / fadeStep;
+                track->m_reverbDepthDelta = fadeStep;
             }
-            seInfo += REDSOUND_TRACK_SIZE / sizeof(*seInfo);
-        } while (seInfo < (int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE));
+            track++;
+        } while (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT);
     }
 }
 

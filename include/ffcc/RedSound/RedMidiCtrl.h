@@ -143,8 +143,8 @@ struct RedSoundCONTROL {
 	int m_measure;
 	int m_tick;
 	int m_ticksPerMeasure;
-	unsigned short m_timeNumerator;
-	unsigned short m_timeDenominator;
+	short m_timeNumerator;
+	short m_timeDenominator;
 	int m_volume;
 	int m_volumeAdd;
 	int m_volumeDelta;

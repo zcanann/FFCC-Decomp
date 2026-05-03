@@ -985,7 +985,7 @@ static void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, Red
     unsigned int value;
 
     value = *track->m_command++;
-    value &= 0x1f;
+    value &= REDSOUND_KEY_SIGNATURE_INDEX_MASK;
     control->m_keySignature = value;
     value = t_KeySignatureIndex[value];
     control->m_keySignatureData = value + t_KeySignatureData;

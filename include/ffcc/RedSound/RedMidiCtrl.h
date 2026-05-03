@@ -120,6 +120,7 @@ enum RedTrackAdsrLayout {
 };
 
 enum RedKeySignatureLayout {
+	REDSOUND_KEY_SIGNATURE_INDEX_MASK = 0x1F,
 	REDSOUND_KEY_SIGNATURE_DEFAULT_OFFSET = 0x0B,
 };
 

@@ -19,6 +19,15 @@ static const char sRedStreamLogErrorColor[] = "\x1B[7;31m";
 static const char sRedStreamLogReset[] = "\x1B[0m";
 static const char sRedStreamLogWarnColor[] = "\x1B[4;31m";
 
+enum RedStreamLayoutSize {
+	REDSOUND_STREAM_PAGE_SIZE = 0x1000,
+	REDSOUND_STREAM_STEREO_PLANE_SIZE = 0x2000,
+	REDSOUND_STREAM_TRANSFER_BUFFER_SIZE = 0x4000,
+	REDSOUND_STREAM_SAMPLE_ADVANCE = 0x200,
+	REDSOUND_STREAM_ADPCM_HEADER_SIZE = 0x2e,
+	REDSOUND_STREAM_INITIAL_LOOP_END = 0x3fff,
+};
+
 /*
  * --INFO--
  * PAL Address: 0x801cb93c
@@ -96,25 +105,25 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
 	bufferIndex &= 1;
 
 	do {
-		dstBuffer = stream->m_buffer + bufferIndex * 0x1000;
+		dstBuffer = stream->m_buffer + bufferIndex * REDSOUND_STREAM_PAGE_SIZE;
 		voiceData = stream->m_voiceData;
 
-		memcpy(dstBuffer, stream->m_fileData + stream->m_readOffset, 0x1000);
-		stream->m_readOffset += 0x1000;
+		memcpy(dstBuffer, stream->m_fileData + stream->m_readOffset, REDSOUND_STREAM_PAGE_SIZE);
+		stream->m_readOffset += REDSOUND_STREAM_PAGE_SIZE;
 		if (stream->m_readOffset >= stream->m_fileSize) {
 			stream->m_readOffset = 0;
 		}
 
 		if (stream->m_header.m_channelCount == 2) {
-			memcpy(dstBuffer + 0x2000, stream->m_fileData + stream->m_readOffset, 0x1000);
-			stream->m_readOffset += 0x1000;
+			memcpy(dstBuffer + REDSOUND_STREAM_STEREO_PLANE_SIZE, stream->m_fileData + stream->m_readOffset, REDSOUND_STREAM_PAGE_SIZE);
+			stream->m_readOffset += REDSOUND_STREAM_PAGE_SIZE;
 			if (stream->m_readOffset >= stream->m_fileSize) {
 				stream->m_readOffset = 0;
 			}
 		}
 
-		dmaDstOffset = stream->m_aramBuffer + bufferIndex * 0x1000;
-		dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
+		dmaDstOffset = stream->m_aramBuffer + bufferIndex * REDSOUND_STREAM_PAGE_SIZE;
+		dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, REDSOUND_STREAM_PAGE_SIZE, 0, 0);
 
 		if ((bufferIndex == 0) && (voiceData->m_axVoice != 0)) {
 			voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*dstBuffer;
@@ -123,10 +132,10 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
 		}
 
 		if (stream->m_header.m_channelCount == 2) {
-			dstBuffer += 0x2000;
-			dmaDstOffset += 0x2000;
+			dstBuffer += REDSOUND_STREAM_STEREO_PLANE_SIZE;
+			dmaDstOffset += REDSOUND_STREAM_STEREO_PLANE_SIZE;
 			voiceData += 1;
-			dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
+			dmaID = RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, REDSOUND_STREAM_PAGE_SIZE, 0, 0);
 			if ((bufferIndex == 0) && (voiceData->m_axVoice != 0)) {
 				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*dstBuffer;
 				voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
@@ -134,9 +143,9 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCou
 			}
 		}
 
-		byteCount -= 0x1000;
+		byteCount -= REDSOUND_STREAM_PAGE_SIZE;
 		bufferIndex ^= 1;
-		stream->m_streamCursor += 0x200;
+		stream->m_streamCursor += REDSOUND_STREAM_SAMPLE_ADVANCE;
 	} while (0 < byteCount);
 
 	return dmaID;
@@ -161,10 +170,10 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 	
 	if (stream->m_header.m_channelCount == 2) {
 		do {
-			pbVar6 = stream->m_buffer + bufferIndex * 0x1000;
+			pbVar6 = stream->m_buffer + bufferIndex * REDSOUND_STREAM_PAGE_SIZE;
 			voiceData = stream->m_voiceData;
 			puVar7 = (unsigned int*)(stream->m_fileData + stream->m_readOffset);
-			pbVar4 = pbVar6 + 0x2000;
+			pbVar4 = pbVar6 + REDSOUND_STREAM_STEREO_PLANE_SIZE;
 			puVar3 = puVar7 + 0x400;
 			pbVar5 = pbVar6;
 			
@@ -178,7 +187,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 				pbVar4 = pbVar4 + 8;
 			} while (puVar7 < puVar3);
 			
-			stream->m_readOffset = stream->m_readOffset + 0x1000;
+			stream->m_readOffset = stream->m_readOffset + REDSOUND_STREAM_PAGE_SIZE;
 			if (stream->m_readOffset >= stream->m_fileSize) {
 				stream->m_readOffset = 0;
 			}
@@ -196,26 +205,26 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 				pbVar4 = pbVar4 + 8;
 			} while (puVar7 < puVar3);
 			
-			stream->m_readOffset = stream->m_readOffset + 0x1000;
+			stream->m_readOffset = stream->m_readOffset + REDSOUND_STREAM_PAGE_SIZE;
 			if (stream->m_readOffset >= stream->m_fileSize) {
 				stream->m_readOffset = 0;
 			}
 			
-			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar6, stream->m_aramBuffer + bufferIndex * 0x1000, 0x1000, 0, 0);
-			dmaID = RedDmaEntry(0x8001, 0, (int)(pbVar6 + 0x2000), stream->m_aramBuffer + (bufferIndex + 2) * 0x1000, 0x1000, 0, 0);
+			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar6, stream->m_aramBuffer + bufferIndex * REDSOUND_STREAM_PAGE_SIZE, REDSOUND_STREAM_PAGE_SIZE, 0, 0);
+			dmaID = RedDmaEntry(0x8001, 0, (int)(pbVar6 + REDSOUND_STREAM_STEREO_PLANE_SIZE), stream->m_aramBuffer + (bufferIndex + 2) * REDSOUND_STREAM_PAGE_SIZE, REDSOUND_STREAM_PAGE_SIZE, 0, 0);
 			
 			if ((bufferIndex == 0) && (voiceData->m_axVoice != 0)) {
 				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*pbVar6;
 				voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
 				voiceData->m_axVoice->sync |= 0x100000;
-				voiceData[1].m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)pbVar6[0x2000];
+				voiceData[1].m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)pbVar6[REDSOUND_STREAM_STEREO_PLANE_SIZE];
 				voiceData[1].m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData[1].m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
 				voiceData[1].m_axVoice->sync |= 0x100000;
 			}
 			
 			bufferIndex = bufferIndex ^ 1;
-			byteCount = byteCount + -0x1000;
-			stream->m_streamCursor = stream->m_streamCursor + 0x200;
+			byteCount = byteCount + -REDSOUND_STREAM_PAGE_SIZE;
+			stream->m_streamCursor = stream->m_streamCursor + REDSOUND_STREAM_SAMPLE_ADVANCE;
 			
 			if (stream->m_streamCursor >= stream->m_header.m_loopEnd) {
 				stream->m_streamCursor = stream->m_streamCursor - stream->m_header.m_loopEnd;
@@ -224,16 +233,16 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 		} while (0 < byteCount);
 	} else {
 		do {
-			pbVar5 = stream->m_buffer + bufferIndex * 0x1000;
+			pbVar5 = stream->m_buffer + bufferIndex * REDSOUND_STREAM_PAGE_SIZE;
 			voiceData = stream->m_voiceData;
-			memcpy(pbVar5, stream->m_fileData + stream->m_readOffset, 0x1000);
-			stream->m_readOffset = stream->m_readOffset + 0x1000;
+			memcpy(pbVar5, stream->m_fileData + stream->m_readOffset, REDSOUND_STREAM_PAGE_SIZE);
+			stream->m_readOffset = stream->m_readOffset + REDSOUND_STREAM_PAGE_SIZE;
 			
 			if (stream->m_readOffset >= stream->m_fileSize) {
 				stream->m_readOffset = 0;
 			}
 			
-			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar5, stream->m_aramBuffer + bufferIndex * 0x1000, 0x1000, 0, 0);
+			dmaID = RedDmaEntry(0x8001, 0, (int)pbVar5, stream->m_aramBuffer + bufferIndex * REDSOUND_STREAM_PAGE_SIZE, REDSOUND_STREAM_PAGE_SIZE, 0, 0);
 			
 			if ((bufferIndex == 0) && (voiceData->m_axVoice != 0)) {
 				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*pbVar5;
@@ -242,8 +251,8 @@ int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount
 			}
 			
 			bufferIndex = bufferIndex ^ 1;
-			byteCount = byteCount + -0x1000;
-			stream->m_streamCursor = stream->m_streamCursor + 0x200;
+			byteCount = byteCount + -REDSOUND_STREAM_PAGE_SIZE;
+			stream->m_streamCursor = stream->m_streamCursor + REDSOUND_STREAM_SAMPLE_ADVANCE;
 			
 			if (stream->m_streamCursor >= stream->m_header.m_loopEnd) {
 				stream->m_streamCursor = stream->m_streamCursor - stream->m_header.m_loopEnd;
@@ -301,7 +310,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 
 	memcpy(&streamData->m_header, streamHeader, 0x20);
 	streamData->m_track = SearchSeEmptyTrack(streamData->m_header.m_channelCount, 0xff, 0);
-	streamData->m_buffer = (u8*)RedNew(0x4000);
+	streamData->m_buffer = (u8*)RedNew(REDSOUND_STREAM_TRANSFER_BUFFER_SIZE);
 	amemSize = streamData->m_header.m_channelCount << 0xd;
 	if (c_RedMemory.GetABufferSize() < 0x800000) {
 		arOffset = 0;
@@ -315,13 +324,13 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	}
 
 	if ((streamData->m_track != 0) && (streamData->m_buffer != 0) && (streamData->m_aramBuffer != 0)) {
-		sampleOffset = 0x1000;
+		sampleOffset = REDSOUND_STREAM_PAGE_SIZE;
 		headerData = (u8*)streamHeader + 0x20;
 		*(short*)((int)streamHeader + 0x42) = (short)*(char*)((int)streamHeader + sampleOffset);
 		*(unsigned short*)((int)streamHeader + 0x44) = *(unsigned short*)((int)streamHeader + 0x46) = 0;
 		if (streamData->m_header.m_channelCount == 2) {
 			if (streamData->m_header.m_loopStart < 0) {
-				sampleOffset += 0x1000;
+				sampleOffset += REDSOUND_STREAM_PAGE_SIZE;
 			} else {
 				sampleOffset += 8;
 			}
@@ -331,7 +340,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 
 		streamData->m_streamId = streamID;
 		streamData->m_fileCursor = 0;
-		streamData->m_readOffset = 0x1000;
+		streamData->m_readOffset = REDSOUND_STREAM_PAGE_SIZE;
 		streamData->m_streamCursor = 0;
 		streamData->m_voiceData = p_VoiceData + streamData->m_track->m_trackNo;
 		streamData->m_fileData = (u8*)streamHeader;
@@ -371,27 +380,27 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 				streamData->m_panStepCount = 0;
 			}
 			SetVoiceVolumeMix(streamData->m_voiceData + iVar2, streamData->m_pan >> 0xc, streamData->m_volume >> 0xc);
-			(streamData->m_track + iVar2)->m_waveBase = streamData->m_aramBuffer + iVar2 * 0x2000;
-			memset(&streamData->m_trackData[iVar2], 0, 0x60);
-			memcpy(streamData->m_trackData[iVar2].m_adpcmData, headerData + iVar2 * 0x2e, 0x2e);
+			(streamData->m_track + iVar2)->m_waveBase = streamData->m_aramBuffer + iVar2 * REDSOUND_STREAM_STEREO_PLANE_SIZE;
+			memset(&streamData->m_trackData[iVar2], 0, sizeof(RedWaveDATA));
+			memcpy(streamData->m_trackData[iVar2].m_adpcmData, headerData + iVar2 * REDSOUND_STREAM_ADPCM_HEADER_SIZE, REDSOUND_STREAM_ADPCM_HEADER_SIZE);
 			voice->m_adsrLevel[0] = voice->m_adsrLevel[1] = voice->m_adsrLevel[2] = 0;
 			voice->m_adsrLevel[3] = 0x7f;
 			voice->m_adsrTime[0] = voice->m_adsrTime[1] = voice->m_adsrTime[2] = 0;
 			voice->m_adsrTime[3] = 10;
 			streamData->m_trackData[iVar2].m_sampleStart = 0;
-			streamData->m_trackData[iVar2].m_loopEnd = 0x3fff;
+			streamData->m_trackData[iVar2].m_loopEnd = REDSOUND_STREAM_INITIAL_LOOP_END;
 			streamData->m_trackData[iVar2].m_loopStart = 2;
 			iVar2 += 1;
 		} while (iVar2 < streamData->m_header.m_channelCount);
 
 		int dmaID;
 		if (streamData->m_header.m_loopStart < 0) {
-			dmaID = _ArrangeStreamDataNoLoop(streamData, 0, 0x2000);
+			dmaID = _ArrangeStreamDataNoLoop(streamData, 0, REDSOUND_STREAM_STEREO_PLANE_SIZE);
 		} else {
-			dmaID = _ArrangeStreamDataLoop(streamData, 0, 0x2000);
+			dmaID = _ArrangeStreamDataLoop(streamData, 0, REDSOUND_STREAM_STEREO_PLANE_SIZE);
 		}
 		streamData->m_dmaId = dmaID;
-		streamData->m_streamCursorBase = 0x1000;
+		streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
 		streamData->m_state = 3;
 	} else {
 		if (m_ReportPrint != 0) {
@@ -403,7 +412,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		} else {
 			if (m_ReportPrint != 0) {
 				OSReport(sRedStreamMainMemoryDidntCreateFmt,
-				         sRedStreamLogPrefix, sRedStreamLogWarnColor, 0x4000,
+				         sRedStreamLogPrefix, sRedStreamLogWarnColor, REDSOUND_STREAM_TRANSFER_BUFFER_SIZE,
 				         sRedStreamLogReset);
 				fflush(__files + 1);
 			}
@@ -549,16 +558,16 @@ void StreamControl()
 					int sampleStart = (streamData->m_aramBuffer + streamData->m_streamCursorBase) * 2;
 					samplePos <<= 16;
 					samplePos |= voiceData->m_axVoice->pb.addr.currentAddressLo;
-					if ((samplePos >= sampleStart) && (samplePos < sampleStart + 0x2000)) {
+					if ((samplePos >= sampleStart) && (samplePos < sampleStart + REDSOUND_STREAM_STEREO_PLANE_SIZE)) {
 						int stopped = 0;
 						if (streamData->m_header.m_loopStart < 0) {
-							streamData->m_header.m_loopEnd = streamData->m_header.m_loopEnd - 0x200;
+							streamData->m_header.m_loopEnd = streamData->m_header.m_loopEnd - REDSOUND_STREAM_SAMPLE_ADVANCE;
 							if (streamData->m_header.m_loopEnd < 1) {
 								_StreamStop(streamData);
 								stopped = 1;
 							}
 						}
-						streamData->m_fileCursor += streamData->m_header.m_channelCount * 0x1000;
+						streamData->m_fileCursor += streamData->m_header.m_channelCount * REDSOUND_STREAM_PAGE_SIZE;
 						if (streamData->m_fileCursor >= streamData->m_fileSize) {
 							streamData->m_fileCursor -= streamData->m_fileSize;
 						}
@@ -571,13 +580,13 @@ void StreamControl()
 								streamData->m_streamCursorBase = 0;
 							} else {
 								side = 1;
-								streamData->m_streamCursorBase = 0x1000;
+								streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
 							}
 
 							if (streamData->m_header.m_loopStart < 0) {
-								dmaID = _ArrangeStreamDataNoLoop(streamData, side, 0x1000);
+								dmaID = _ArrangeStreamDataNoLoop(streamData, side, REDSOUND_STREAM_PAGE_SIZE);
 							} else {
-								dmaID = _ArrangeStreamDataLoop(streamData, side, 0x1000);
+								dmaID = _ArrangeStreamDataLoop(streamData, side, REDSOUND_STREAM_PAGE_SIZE);
 							}
 							streamData->m_dmaId = dmaID;
 						}

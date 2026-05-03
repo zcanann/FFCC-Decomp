@@ -252,8 +252,8 @@ void _SetReverbDepth(int* command)
     }
     p_ReverbDepth[reverbBank].m_depth = reverbDepth;
     if (reverbBank != 0) {
-        fadeStep = fadeStep * 0x60;
-        fadeStep = fadeStep / 0x3c;
+        fadeStep = fadeStep * REDSOUND_SE_FADE_TICKS_PER_SECOND;
+        fadeStep = fadeStep / REDSOUND_FRAMES_PER_SECOND;
         if (fadeStep == 0) {
             fadeStep++;
         }
@@ -350,8 +350,8 @@ void _MusicCrossPlaySequence(int* command)
     int iVar1;
     void* pvVar2;
     
-    command[2] = command[2] * 200;
-    command[2] = command[2] / 0x3c;
+    command[2] = command[2] * REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
+    command[2] = command[2] / REDSOUND_FRAMES_PER_SECOND;
     if (command[2] == 0) {
         command[2] = command[2] + 1;
     }

@@ -453,8 +453,8 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 	if (frameCount < 1) {
 		frameCount = 1;
 	} else {
-		frameCount *= 200;
-		frameCount /= 60;
+		frameCount *= REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
+		frameCount /= REDSOUND_FRAMES_PER_SECOND;
 	}
 
 	volume &= REDSOUND_VOLUME_MAX;

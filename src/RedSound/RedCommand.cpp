@@ -539,8 +539,8 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 		frameCount = 1;
 	}
 
-	frameCount *= 0x60;
-	frameCount /= 0x3c;
+	frameCount *= REDSOUND_SE_FADE_TICKS_PER_SECOND;
+	frameCount /= REDSOUND_FRAMES_PER_SECOND;
 	track = ((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks;
 
 	do {
@@ -574,8 +574,8 @@ void SetSePan(int seId, int pan, int frameCount)
 		frameCount = 1;
 	}
 
-	frameCount *= 0x60;
-	frameCount /= 0x3c;
+	frameCount *= REDSOUND_SE_FADE_TICKS_PER_SECOND;
+	frameCount /= REDSOUND_FRAMES_PER_SECOND;
 	track = ((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks;
 
 	do {
@@ -608,8 +608,8 @@ void SetSePitch(int seId, int pitch, int frameCount)
 		frameCount = 1;
 	}
 
-	frameCount *= 0x60;
-	frameCount /= 0x3c;
+	frameCount *= REDSOUND_SE_FADE_TICKS_PER_SECOND;
+	frameCount /= REDSOUND_FRAMES_PER_SECOND;
 	track = ((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks;
 
 	do {
@@ -947,8 +947,8 @@ void SetMusicVolume(int seId, int volume, int duration, int mode)
 	if (duration < 1) {
 		duration = 1;
 	} else {
-		duration *= 200;
-		duration /= 0x3c;
+		duration *= REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
+		duration /= REDSOUND_FRAMES_PER_SECOND;
 	}
 
 	music = p_SoundControlBuffer;

@@ -77,7 +77,7 @@ int RedNew(int size)
 				break;
 			}
 
-			if ((address + size) <= (m_DataBuffer + m_DataBufferSize)) {
+			if ((u32)(address + size) <= (u32)(m_DataBuffer + m_DataBufferSize)) {
 				if (slot->m_size > 0) {
 					entryCount = ((int)(m_MemoryBank + 0x400) - (int)(slot + 1)) / 8;
 					if (entryCount > 0) {

@@ -1626,8 +1626,10 @@ void _KeyOnControl()
                     if ((*voice < *(u32*)p_SoundControlBuffer) ||
                         (*(u32*)p_SoundControlBuffer + (u32)*((u8*)p_SoundControlBuffer + 0x491) * REDSOUND_TRACK_SIZE <= *voice)) {
                         volume = m_MasterSEVolume;
-                        if ((((u32*)p_SoundControlBuffer)[0x125] <= *voice) &&
-                            (*voice < ((u32*)p_SoundControlBuffer)[0x125] + (u32)*((u8*)p_SoundControlBuffer + 0x925) * REDSOUND_TRACK_SIZE)) {
+                        if (((u32)p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks <= *voice) &&
+                            (*voice < (u32)p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks +
+                                          (u32)p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount *
+                                              REDSOUND_TRACK_SIZE)) {
                             u32 idx = (u32)((RedTrackDATA*)*voice)->m_trackNo;
                             int idxSign = (int)((RedTrackDATA*)*voice)->m_trackNo >> 0x1F;
 

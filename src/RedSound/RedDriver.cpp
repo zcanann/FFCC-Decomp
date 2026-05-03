@@ -30,6 +30,9 @@ enum RedDriverDmaLayoutSize {
     REDSOUND_DMA_QUEUE_WORD_COUNT = 0x380,
     REDSOUND_DMA_CONTROL_WORD_COUNT = REDSOUND_DMA_QUEUE_WORD_COUNT * 2,
     REDSOUND_DMA_QUEUE_ENTRY_COUNT = 0x80,
+    REDSOUND_DMA_TRANSFER_ALIGN = 0x20,
+    REDSOUND_DMA_TRANSFER_ALIGN_MASK = ~(REDSOUND_DMA_TRANSFER_ALIGN - 1),
+    REDSOUND_DMA_MAX_CHUNK_SIZE = 0x40000,
 };
 
 struct RedDriverSyncState {
@@ -989,13 +992,13 @@ int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5,
     }
     queueEntry = *queuePtr;
     entryID = GetMyEntryID();
-    size = (unsigned int)(param_5 + 0x1f) & ~0x1f;
+    size = (unsigned int)(param_5 + REDSOUND_DMA_TRANSFER_ALIGN - 1) & REDSOUND_DMA_TRANSFER_ALIGN_MASK;
     if ((m_DMAMode != 0) || ((param_1 & 0x8000) != 0)) {
         queueEnd = queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
         do {
             chunkSize = size;
-            if ((int)size > 0x40000) {
-                chunkSize = 0x40000;
+            if ((int)size > REDSOUND_DMA_MAX_CHUNK_SIZE) {
+                chunkSize = REDSOUND_DMA_MAX_CHUNK_SIZE;
             }
             queueEntry->m_id = entryID;
             size -= chunkSize;

@@ -86,6 +86,10 @@ enum RedSoundFixedPoint {
 	REDSOUND_PAN_CENTER = 0x40000,
 };
 
+enum RedSoundPauseState {
+	REDSOUND_PAUSE_ON = 1,
+};
+
 struct RedSeBlockHEAD;
 
 extern RedMidiControlFunc p_MidiControl_Function[];

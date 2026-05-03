@@ -499,7 +499,7 @@ void StreamPause(int streamID, int pause)
 	int pan;
 
 	if (m_ReportPrint != 0) {
-		if (pause == 1) {
+		if (pause == REDSOUND_PAUSE_ON) {
 			OSReport(sRedStreamPauseOnFmt, sRedStreamLogPrefix, streamID);
 		} else {
 			OSReport(sRedStreamPauseOffFmt, sRedStreamLogPrefix, streamID);
@@ -510,7 +510,7 @@ void StreamPause(int streamID, int pause)
 	do {
 		if ((streamData->m_streamId != 0) && ((streamID == -1) || (streamID == streamData->m_streamId))) {
 			voiceData = streamData->m_voiceData;
-			if (pause == 1) {
+			if (pause == REDSOUND_PAUSE_ON) {
 				if (voiceData->m_axVoice != 0) {
 					voiceData->m_targetPitch = 0;
 					voiceData->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;

@@ -638,7 +638,7 @@ void SePause(int seId, int pause)
 	RedVoiceDATA* voice;
 
 	if (m_ReportPrint != 0) {
-		if (pause == 1) {
+		if (pause == REDSOUND_PAUSE_ON) {
 			OSReport(sRedCommandSePauseOnFmt, sRedCommandLogPrefix, seId);
 		} else {
 			OSReport(sRedCommandSePauseOffFmt, sRedCommandLogPrefix, seId);
@@ -651,7 +651,7 @@ void SePause(int seId, int pause)
 	voice = p_VoiceData + REDSOUND_SE_VOICE_BASE_INDEX;
 	do {
 		if ((track->m_seId != 0) && ((seId == -1) || (seId == track->m_seId))) {
-			if (pause == 1) {
+			if (pause == REDSOUND_PAUSE_ON) {
 				if (voice->m_axVoice != 0) {
 					voice->m_targetPitch = 0;
 					voice->m_flags |= REDSOUND_VOICE_FLAGS_PAUSE_DIRTY;

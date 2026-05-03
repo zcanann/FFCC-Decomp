@@ -6,6 +6,9 @@
 
 #include <math.h>
 
+extern "C" const float FLOAT_8032F8EC;
+extern "C" const float FLOAT_8032F8F0;
+
 CMapCylinder g_hit_cyl;
 CMapCylinder g_hit_cyl_min;
 Vec g_hit_mvec;
@@ -949,11 +952,11 @@ void CMapHit::DrawNormal()
  */
 CMapHitFace::CMapHitFace()
 {
-    m_boundsMin.z = 0.0f;
-    m_boundsMin.y = 0.0f;
-    m_boundsMin.x = 0.0f;
+    m_boundsMin.z = FLOAT_8032F8EC;
+    m_boundsMin.y = FLOAT_8032F8EC;
+    m_boundsMin.x = FLOAT_8032F8EC;
 
-    m_boundsMax.z = 1.0f;
-    m_boundsMax.y = 1.0f;
-    m_boundsMax.x = 1.0f;
+    m_boundsMax.z = FLOAT_8032F8F0;
+    m_boundsMax.y = FLOAT_8032F8F0;
+    m_boundsMax.x = FLOAT_8032F8F0;
 }

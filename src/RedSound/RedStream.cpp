@@ -21,6 +21,7 @@ static const char sRedStreamLogWarnColor[] = "\x1B[4;31m";
 
 enum RedStreamLayoutSize {
 	REDSOUND_STREAM_PAGE_SIZE = 0x1000,
+	REDSOUND_STREAM_PAGE_WORD_COUNT = REDSOUND_STREAM_PAGE_SIZE / sizeof(unsigned int),
 	REDSOUND_STREAM_STEREO_PLANE_SIZE = 0x2000,
 	REDSOUND_STREAM_TRANSFER_BUFFER_SIZE = 0x4000,
 	REDSOUND_STREAM_SAMPLE_ADVANCE = 0x200,
@@ -197,7 +198,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			voiceData = stream->m_voiceData;
 			srcWords = (unsigned int*)(stream->m_fileData + stream->m_readOffset);
 			rightDst = dstBase + REDSOUND_STREAM_STEREO_PLANE_SIZE;
-			srcEnd = srcWords + 0x400;
+			srcEnd = srcWords + REDSOUND_STREAM_PAGE_WORD_COUNT;
 			leftDst = dstBase;
 			
 			do {
@@ -216,7 +217,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			}
 			
 			srcWords = (unsigned int*)(stream->m_fileData + stream->m_readOffset);
-			srcEnd = srcWords + 0x400;
+			srcEnd = srcWords + REDSOUND_STREAM_PAGE_WORD_COUNT;
 			
 			do {
 				*(unsigned int*)leftDst = *srcWords;

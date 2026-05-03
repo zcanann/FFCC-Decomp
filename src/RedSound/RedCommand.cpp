@@ -56,10 +56,10 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 			track->m_mixVolumeMode = 0;
 
 			trackNo = track->m_trackNo;
-			*(unsigned char*)((int)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x1a) &= -6;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x94) &= 0xfffffff7;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) &= 0xfffffffe;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) |= 2;
+			*(unsigned char*)((int)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x1a) &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x94) &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) |= REDSOUND_VOICE_FLAGS_RELEASED;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x8c) = 0;
 
 			c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
@@ -124,10 +124,10 @@ int _EraseTime(int eraseTrack)
 			track->m_mixVolumeMode = 0;
 
 			trackNo = track->m_trackNo;
-			*(unsigned char*)((int)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x1a) &= -6;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x94) &= 0xfffffff7;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) &= 0xfffffffe;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) |= 2;
+			*(unsigned char*)((int)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x1a) &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x94) &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) |= REDSOUND_VOICE_FLAGS_RELEASED;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x8c) = 0;
 
 			if ((u32)track->m_waveBankData != 0) {
@@ -220,10 +220,10 @@ int SeStopID(int seId)
 			track->m_mixVolumeMode = 0;
 
 			trackNo = track->m_trackNo;
-			*(unsigned char*)((int)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x1a) &= -6;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x94) &= 0xfffffff7;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) &= 0xfffffffe;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) |= 2;
+			*(unsigned char*)((int)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x1a) &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x94) &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) |= REDSOUND_VOICE_FLAGS_RELEASED;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE) = 0;
 			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x8c) = 0;
 
@@ -268,10 +268,10 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				track->m_mixVolumeMode = 0;
 
 				trackNo = track->m_trackNo;
-				*(unsigned char*)((int)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x1a) &= -6;
-				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x94) &= 0xfffffff7;
-				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) &= 0xfffffffe;
-				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) |= 2;
+				*(unsigned char*)((int)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x1a) &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x94) &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x90) |= REDSOUND_VOICE_FLAGS_RELEASED;
 				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE) = 0;
 				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + 0x8c) = 0;
 

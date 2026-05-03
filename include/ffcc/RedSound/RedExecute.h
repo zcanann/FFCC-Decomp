@@ -92,6 +92,13 @@ struct RedVoiceDATA {
 	unsigned char m_padBC[0xC0 - 0xBC];
 };
 
+enum RedVoiceCleanupMask {
+	REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK = -6,
+	REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK = 0xfffffff7,
+	REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK = 0xfffffffe,
+	REDSOUND_VOICE_FLAGS_RELEASED = 2,
+};
+
 u8 GetRandomData();
 int PitchCompute(int, int, int, int);
 void _ReverbNullCallback(AXFX_BUFFERUPDATE*, void*);

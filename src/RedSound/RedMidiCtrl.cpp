@@ -355,7 +355,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
     int* slot;
     RedVoiceDATA* voice;
 
-    if ((control == p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP) || ((track->m_flags & 0x80000) == 0)) {
+    if ((control == p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP) || ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) == 0)) {
         track->m_sweepDelta = 0;
         key = ((char*)track)[REDSOUND_TRACK_NOTE_KEY_OFFSET];
         slot = (int*)keyOnData;

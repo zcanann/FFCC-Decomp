@@ -400,8 +400,10 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		int arAddress;
 		if ((historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE)) &&
 		    ((arAddress = RedNewA(waveHead->m_loadSize, minOffset, maxOffset)) != 0)) {
-			int copySize = ((waveHead->m_tableCount * 4) + 0x1F) & 0xFFFFFFE0;
-			copySize += waveHead->m_toneCount * 0x60 + 0x20;
+			int copySize = ((waveHead->m_tableCount * REDSOUND_WAVE_TABLE_ENTRY_SIZE) +
+			                (REDSOUND_WAVE_TABLE_ALIGN - 1)) &
+			               REDSOUND_WAVE_TABLE_ALIGN_MASK;
+			copySize += waveHead->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE + REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
 			void* copied = (void*)RedNew(copySize);
 			if (copied != 0) {
 				historyBank->m_data = (int)copied;
@@ -482,9 +484,10 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 			}
 
 			int waveHeadSize =
-			    ((((waveHead->m_tableCount * 4) + 0x1F) & 0xFFFFFFE0) +
-			     waveHead->m_toneCount * 0x60) +
-			    0x20;
+			    ((((waveHead->m_tableCount * REDSOUND_WAVE_TABLE_ENTRY_SIZE) + (REDSOUND_WAVE_TABLE_ALIGN - 1)) &
+			      REDSOUND_WAVE_TABLE_ALIGN_MASK) +
+			     waveHead->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE) +
+			    REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
 			waveSize = waveHead->m_waveSize;
 			waveDataSize -= waveHeadSize;
 			waveDataTop = (void*)((unsigned char*)waveData + waveHeadSize);

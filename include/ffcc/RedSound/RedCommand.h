@@ -6,9 +6,13 @@ struct RedSeINFO;
 struct RedTrackDATA;
 struct RedWaveHeadWD;
 
+enum RedReverbModeLayout {
+	REDSOUND_REVERB_MODE_PARAM_COUNT = 6,
+};
+
 struct RedReverbModeData {
 	int kind;
-	int params[6];
+	int params[REDSOUND_REVERB_MODE_PARAM_COUNT];
 };
 
 RedTrackDATA* SearchSeEmptyTrack(int, int, int);

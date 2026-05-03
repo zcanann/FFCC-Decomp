@@ -228,7 +228,7 @@ int RedNewA(int size, int offset, int maxSize)
 		}
 	}
 
-	if ((bestBlock != 0) && ((result + size) <= (rangeStart + maxSize))) {
+	if ((bestBlock != 0) && ((u32)(result + size) <= (u32)(rangeStart + maxSize))) {
 		blockPtr = bestBlock;
 		if (blockPtr->m_size > 0) {
 			int moveCount = ((int)(m_AMemoryBank + 0x400) - (int)(blockPtr + 1)) / 8;

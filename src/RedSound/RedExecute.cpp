@@ -1905,12 +1905,14 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
 
         voiceData = (int*)p_VoiceData;
         do {
-            if (*voiceData == (int)track) {
-                voiceData[0x28] += addPitch;
-                if (voiceData[1] != 0) {
-                    voiceData[0x26] = PitchCompute(voiceData[0x28] + p_MusicPitchControl->m_value,
-                                                   (int)*(s16*)((u8*)track + 0x142) + (int)*(s16*)((u8*)track + 0x13E),
-                                                   *(int*)((u8*)voiceData[1] + 0x14), (s8)((u8*)track)[0x148]);
+            if ((RedTrackDATA*)voiceData[REDSOUND_VOICE_TRACK_WORD] == track) {
+                voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] += addPitch;
+                if (voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] != 0) {
+                    voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] =
+                        PitchCompute(voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] + p_MusicPitchControl->m_value,
+                                     (int)*(s16*)((u8*)track + 0x142) + (int)*(s16*)((u8*)track + 0x13E),
+                                     *(int*)((u8*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] + 0x14),
+                                     (s8)((u8*)track)[0x148]);
                 }
             }
             voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);

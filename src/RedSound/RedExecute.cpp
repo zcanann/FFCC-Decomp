@@ -970,18 +970,19 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
     voiceData[0x23] = 1;
 
     if ((trackData[0x46] == 0) || (trackData[0x48] < 0)) {
-        trackData[0x48] = note << 0x14;
+        trackData[0x48] = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
         if (voiceData[1] != 0) {
             if ((((unsigned int*)voiceData[1])[0] & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) == 0) {
-                voiceData[0x28] = note << 0x14;
+                voiceData[0x28] = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
                 if (param_1->m_keySignatureData != 0) {
-                    iVar5 = voiceData[0x28] >> 0x14;
-                    iVar1 = iVar5 / 0xc + (voiceData[0x28] >> 0x1f);
-                    local_38[0] = param_1->m_keySignatureData[iVar5 + (iVar1 - (iVar1 >> 0x1f)) * -0xc];
-                    voiceData[0x28] += local_38[0] * 0x100000;
+                    iVar5 = voiceData[0x28] >> REDSOUND_PITCH_BASE_NOTE_SHIFT;
+                    iVar1 = iVar5 / REDSOUND_NOTES_PER_OCTAVE + (voiceData[0x28] >> 0x1f);
+                    local_38[0] =
+                        param_1->m_keySignatureData[iVar5 + (iVar1 - (iVar1 >> 0x1f)) * -REDSOUND_NOTES_PER_OCTAVE];
+                    voiceData[0x28] += local_38[0] * REDSOUND_PITCH_KEY_SIGNATURE_UNIT;
                 }
             } else {
-                voiceData[0x28] = ((s8*)voiceData[1])[0x18] << 0x14;
+                voiceData[0x28] = ((s8*)voiceData[1])[0x18] << REDSOUND_PITCH_BASE_NOTE_SHIFT;
             }
         }
     } else {
@@ -989,7 +990,8 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
         voiceData[0x28] = trackData[0x48];
         trackData[0x44] = trackData[0x46];
         local_38[0] = 0;
-        DataAddCompute(local_38, note * 0x100 - (trackData[0x48] >> 0xc), &trackData[0x44]);
+        DataAddCompute(local_38, note * REDSOUND_PITCH_NOTE_UNIT - (trackData[0x48] >> REDSOUND_FIXED_SHIFT),
+                       &trackData[0x44]);
     }
 
     voiceData[6] = *(int*)param_3;

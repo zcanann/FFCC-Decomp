@@ -1032,7 +1032,7 @@ int CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
  * Address:	TODO
  * Size:	TODO
  */
-int CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
+RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 {
 	int result;
 
@@ -1060,7 +1060,7 @@ int CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 		}
 	}
 
-	return result;
+	return reinterpret_cast<RedSeSepHEAD*>(result);
 }
 
 /*

@@ -558,7 +558,7 @@ void _SeSepPlay(int* command)
 {
     RedSeSepHEAD* seSepHead;
 
-    seSepHead = (RedSeSepHEAD*)c_RedEntry.SetSeSepData((RedSeSepHEAD*)command[1]);
+    seSepHead = c_RedEntry.SetSeSepData((RedSeSepHEAD*)command[1]);
     if (seSepHead != 0) {
         m_SeSkipStep = command[4];
         int seID = command[0];

@@ -2369,7 +2369,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 
 	voice = p_VoiceData + track->m_trackNo;
 	if (0 < frames) {
-		trackData[0x43] += frames;
+		track->m_playTime += frames;
 	}
 
 	if (trackData[0x0C] != 0) {
@@ -2436,15 +2436,15 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
 	}
 
-	if (trackData[0x44] != 0) {
+	if (track->m_sweepDelta != 0) {
 		step = frames;
-		if (trackData[0x44] <= frames) {
-			step = trackData[0x44];
+		if (track->m_sweepDelta <= frames) {
+			step = track->m_sweepDelta;
 		}
-		trackData[0x44] -= step;
-		trackData[0x48] += step * trackData[0x45];
+		track->m_sweepDelta -= step;
+		track->m_portamentPitch += step * track->m_sweepAdd;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
-		voice->m_basePitch += step * trackData[0x45];
+		voice->m_basePitch += step * track->m_sweepAdd;
 	}
 
 	if (((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0) && (voice->m_waveData != 0)) {

@@ -526,7 +526,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
             ((m_MusicPhraseStop == 1) || ((control->m_flags & 1) == 0))) {
             voice = p_VoiceData;
             do {
-                if (((u32)control->m_tracks <= (unsigned int)voice->m_track) &&
+                if (((unsigned int)voice->m_track >= (u32)control->m_tracks) &&
                     ((unsigned int)voice->m_track <
                      (u32)control->m_tracks + (unsigned int)control->m_trackCount * REDSOUND_TRACK_SIZE)) {
                     ((unsigned int*)voice)[0x25] &= 0xfffffff3;

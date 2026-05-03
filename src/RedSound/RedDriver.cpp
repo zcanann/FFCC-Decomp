@@ -1334,11 +1334,11 @@ void CRedDriver::Init()
     iVar6 = 0;
     do {
         iVar2 = iVar6 * REDSOUND_VOICE_SIZE;
-        iVar5 = iVar6 * 0x8000000;
+        iVar5 = iVar6 & (REDSOUND_SE_VOICE_BASE_INDEX - 1);
         iVar4 = iVar6 >> 0x1f;
         iVar6 = iVar6 + 1;
-        *(unsigned int*)((char*)p_VoiceData + iVar2 + 0xa8) =
-            (iVar4 * 0x20 | (unsigned int)(iVar5 + iVar4) >> 0x1b) - iVar4;
+        *(unsigned int*)((char*)p_VoiceData + iVar2 + REDSOUND_VOICE_INDEX_OFFSET) =
+            iVar5;
     } while (iVar6 < REDSOUND_VOICE_COUNT);
     p_EditorVoice[1] = 0;
     p_EditorVoice[0] = 0;
@@ -1351,7 +1351,7 @@ void CRedDriver::Init()
         iVar4 = iVar5 * REDSOUND_TRACK_SIZE;
         cVar1 = (char)iVar5;
         iVar5 = iVar5 + 1;
-        ((RedTrackDATA*)(iVar6 + iVar4))->m_trackNo = (char)(cVar1 + ' ');
+        ((RedTrackDATA*)(iVar6 + iVar4))->m_trackNo = (char)(cVar1 + REDSOUND_SE_VOICE_BASE_INDEX);
     } while (iVar5 < REDSOUND_SE_TRACK_COUNT);
     p_EditorTrack = (RedTrackDATA*)RedNew(REDSOUND_TRACK_SIZE);
     memset(p_EditorTrack, 0, REDSOUND_TRACK_SIZE);

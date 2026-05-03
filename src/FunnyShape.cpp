@@ -415,11 +415,12 @@ void CFunnyShape::Render()
     work = m_anmWork;
 
     for (s32 i = 0; i < count; i++) {
+        Vec2d posCopy;
         Vec2d pos;
-        pos.x = FLOAT_8032fd9c;
-        pos.y = FLOAT_8032fda0;
-        pos.x += work->x;
-        pos.y += work->y;
+        posCopy.x = FLOAT_8032fd9c;
+        posCopy.y = FLOAT_8032fda0;
+        pos.x = posCopy.x + work->x;
+        pos.y = posCopy.y + work->y;
 
         u8* animData = reinterpret_cast<u8*>(AnimData(this));
         s16 frame = work->frame;

@@ -400,8 +400,9 @@ static void _MusicPlaySequence(int* command)
  */
 static void _MusicCrossPlaySequence(int* command)
 {
-    int iVar1;
-    void* pvVar2;
+    int replayPoint;
+    RedSoundCONTROL* control;
+    void* temp;
     
     command[REDSOUND_MUSIC_COMMAND_FADE_TIME] =
         command[REDSOUND_MUSIC_COMMAND_FADE_TIME] * REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
@@ -410,46 +411,47 @@ static void _MusicCrossPlaySequence(int* command)
     if (command[REDSOUND_MUSIC_COMMAND_FADE_TIME] == 0) {
         command[REDSOUND_MUSIC_COMMAND_FADE_TIME] = command[REDSOUND_MUSIC_COMMAND_FADE_TIME] + 1;
     }
-    pvVar2 = p_SoundControlBuffer;
-    if ((command[REDSOUND_MUSIC_COMMAND_ID] == *(int*)((int)pvVar2 + REDSOUND_CONTROL_MUSIC_ID_OFFSET)) ||
-        (command[REDSOUND_MUSIC_COMMAND_ID] == *(int*)((int)pvVar2 + REDSOUND_CONTROL_SKIP_OFFSET + REDSOUND_CONTROL_MUSIC_ID_OFFSET))) {
+    control = p_SoundControlBuffer;
+    if ((command[REDSOUND_MUSIC_COMMAND_ID] == control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
+        (command[REDSOUND_MUSIC_COMMAND_ID] == control[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
         return;
     }
-    if (command[REDSOUND_MUSIC_COMMAND_ID] == *(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MUSIC_ID_OFFSET)) {
-        *(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_ADD_OFFSET) =
-            -*(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_OFFSET) / command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
-        *(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_DELTA_OFFSET) = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
-        pvVar2 = p_SoundControlBuffer;
-        *(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MASTER_VOLUME_ADD_OFFSET) =
-             (REDSOUND_MASTER_VOLUME_FULL_FIXED_HALF -
-              *(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MASTER_VOLUME_OFFSET)) /
-             command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
-        *(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MASTER_VOLUME_DELTA_OFFSET) = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
-        pvVar2 = (void*)RedNew(REDSOUND_CONTROL_SIZE);
-        memcpy(pvVar2, (void*)((int)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET), REDSOUND_CONTROL_SIZE);
-        memcpy((void*)((int)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET), p_SoundControlBuffer,
+    if (command[REDSOUND_MUSIC_COMMAND_ID] == control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) {
+        control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolumeAdd =
+            -control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolume / command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+        control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolumeDelta = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+        control = p_SoundControlBuffer;
+        control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolumeAdd =
+            (REDSOUND_MASTER_VOLUME_FULL_FIXED_HALF -
+             control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolume) /
+            command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+        control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolumeDelta = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+        temp = (void*)RedNew(REDSOUND_CONTROL_SIZE);
+        memcpy(temp, &p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], REDSOUND_CONTROL_SIZE);
+        memcpy(&p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], p_SoundControlBuffer,
                REDSOUND_CONTROL_SIZE);
-        memcpy(p_SoundControlBuffer, pvVar2, REDSOUND_CONTROL_SIZE);
-        RedDelete(pvVar2);
+        memcpy(p_SoundControlBuffer, temp, REDSOUND_CONTROL_SIZE);
+        RedDelete(temp);
     } else {
         if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
             m_CrossTime = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
-            iVar1 = 0;
-            if (*(int*)((int)pvVar2 + REDSOUND_CONTROL_MUSIC_ID_OFFSET) != -1) {
-                if (*(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MUSIC_ID_OFFSET) != -1) {
-                    MusicStop(*(int*)((int)pvVar2 + REDSOUND_CONTROL_SECONDARY_OFFSET + REDSOUND_CONTROL_MUSIC_ID_OFFSET));
+            replayPoint = 0;
+            if (control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId != -1) {
+                if (control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId != -1) {
+                    MusicStop(control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId);
                 }
-                *(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_ADD_OFFSET) =
-                    -*(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_OFFSET) / command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
-                *(int*)((int)pvVar2 + REDSOUND_CONTROL_MASTER_VOLUME_DELTA_OFFSET) = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
-                iVar1 = p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]];
+                control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolumeAdd =
+                    -control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolume /
+                    command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+                control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolumeDelta = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+                replayPoint = p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]];
                 p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]] = 0;
-                if (iVar1 == 0) {
-                    memcpy((void*)((int)pvVar2 + REDSOUND_CONTROL_SIZE), pvVar2, REDSOUND_CONTROL_SIZE);
-                    *(int*)((int)pvVar2 + REDSOUND_CONTROL_MUSIC_ID_OFFSET) = 0xffffffff;
+                if (replayPoint == 0) {
+                    memcpy(&control[REDSOUND_CONTROL_MUSIC_SECONDARY], control, REDSOUND_CONTROL_SIZE);
+                    control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId = -1;
                 }
             }
-            MusicPlay(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME], iVar1);
+            MusicPlay(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME], replayPoint);
         }
     }
 }

@@ -221,18 +221,18 @@ int CRedEntry::SearchUseWave(int waveNo)
 {
 	unsigned int interruptLevel = OSDisableInterrupts();
 	int found = 0;
-	int soundBase = (int)(p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY);
+	RedSoundCONTROL* control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
 
 	do {
-		if ((*(int*)(soundBase + 0x470) >= 0) && (*(int*)(soundBase + 0x47c) == waveNo)) {
+		if ((control->m_musicId >= 0) && (control->m_waveNo == waveNo)) {
 			found = 1;
-			MusicStop(*(int*)(soundBase + 0x470));
+			MusicStop(control->m_musicId);
 		}
-		soundBase -= REDSOUND_CONTROL_SIZE;
-	} while ((unsigned int)soundBase >= (unsigned int)p_SoundControlBuffer);
+		control--;
+	} while ((u32)control >= (u32)p_SoundControlBuffer);
 
-	soundBase = (int)(p_SoundControlBuffer + REDSOUND_CONTROL_SE);
-	RedTrackDATA* track = *(RedTrackDATA**)soundBase;
+	control = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
+	RedTrackDATA* track = control->m_tracks;
 	do {
 		if (((u32)track->m_command != 0) && ((u32)track->m_waveBankData != 0) &&
 		    (reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo == waveNo)) {
@@ -240,7 +240,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 			SeStopID(track->m_seId);
 		}
 		track += 1;
-	} while (track < reinterpret_cast<RedTrackDATA*>(*(int*)soundBase + REDSOUND_SE_TRACK_ARENA_SIZE));
+	} while (track < control->m_tracks + REDSOUND_SE_TRACK_COUNT);
 
 	OSRestoreInterrupts(interruptLevel);
 	return found;

@@ -2080,7 +2080,7 @@ void _MusicNoteExecute()
 {
     int i;
     u32 trackCount;
-    u32* sound;
+    u32* soundControl;
     u32* track;
     int status = _MusicMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData, 1);
 
@@ -2089,15 +2089,15 @@ void _MusicNoteExecute()
         memcpy((u8*)p_SoundControl + 0xC, (u8*)p_SoundControl + 0x438, 0x10);
         memcpy((u8*)p_SoundControl + 0x448, (u8*)p_SoundControl + 0x428, 0xC);
 
-        sound = (u32*)((u8*)p_SoundControl + 0x28);
-        track = (u32*)*(u32*)p_SoundControl;
+        soundControl = (u32*)p_SoundControl;
+        track = (u32*)*soundControl;
         trackCount = (u8)*((u8*)p_SoundControl + 0x491);
         i = 0;
         do {
-            track[0] = sound[i];
-            track[0x42] = sound[i + 0x40];
-            ((RedTrackDATA*)track)->m_flags = sound[i + 0x80];
-            track[9] = sound[i + 0xC0];
+            track[0] = soundControl[i + 0xA];
+            track[0x42] = soundControl[i + 0x4A];
+            ((RedTrackDATA*)track)->m_flags = soundControl[i + 0x8A];
+            track[9] = soundControl[i + 0xCA];
             track += REDSOUND_TRACK_SIZE / sizeof(*track);
             i++;
         } while (--trackCount != 0);

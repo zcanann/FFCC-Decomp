@@ -223,17 +223,6 @@ int DataAddCompute(int*, int, int*);
 void KeyOnReserveClear(RedKeyOnDATA*, RedTrackDATA*);
 void KeyOnReserve(RedKeyOnDATA*, RedTrackDATA*);
 void KeyOffSet(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
-int SineSwing(int);
-int TriangleSwing(int);
-int SawSwing(int);
-int DutySwing(int);
-int RandomSwing(int);
-int SineSwingR(int);
-int TriangleSwingR(int);
-int DutySwingR(int);
-int SawSwingR(int);
-int RandomSwingR(int);
-
 void __MidiCtrl_NoSupport(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
 void __MidiCtrl_Pass(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
 void __MidiCtrl_Stop(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);

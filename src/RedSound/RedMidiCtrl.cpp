@@ -73,6 +73,17 @@ static int m_SignDataTable[] = {
     3216, 2814, 2412, 2010, 1608, 1206, 804, 402,
 };
 
+static int SineSwing(int);
+static int TriangleSwing(int);
+static int SawSwing(int);
+static int DutySwing(int);
+static int RandomSwing(int);
+static int SineSwingR(int);
+static int TriangleSwingR(int);
+static int DutySwingR(int);
+static int SawSwingR(int);
+static int RandomSwingR(int);
+
 RedSwingFunc SwingEntryFunction[] = {
     SineSwing, TriangleSwing, SawSwing, DutySwing,
     RandomSwing, DutySwing,   DutySwing, DutySwing,
@@ -280,7 +291,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
  * JP Address: TODO
  * JP Size: TODO
  */
-int SineSwing(int phase)
+static int SineSwing(int phase)
 {
     int value = phase & REDSOUND_SWING_SINE_MASK;
     value = m_SignDataTable[value];
@@ -300,7 +311,7 @@ int SineSwing(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-int TriangleSwing(int phase)
+static int TriangleSwing(int phase)
 {
     int result = (phase & REDSOUND_SWING_PHASE_MASK) << REDSOUND_SWING_PHASE_SHIFT;
 
@@ -328,7 +339,7 @@ int TriangleSwing(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-int SawSwing(int phase)
+static int SawSwing(int phase)
 {
     int result = (int)(char)(phase >> 2) << REDSOUND_SWING_PHASE_SHIFT;
 
@@ -344,7 +355,7 @@ int SawSwing(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-int DutySwing(int phase)
+static int DutySwing(int phase)
 {
     int value;
     int result;
@@ -367,7 +378,7 @@ int DutySwing(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-int RandomSwing(int phase)
+static int RandomSwing(int phase)
 {
     phase >>= REDSOUND_SWING_PHASE_SHIFT;
     phase &= REDSOUND_SWING_PHASE_MASK;
@@ -385,7 +396,7 @@ int RandomSwing(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-int SineSwingR(int phase)
+static int SineSwingR(int phase)
 {
     phase ^= REDSOUND_SWING_PHASE_SIGN;
     int value = phase & REDSOUND_SWING_SINE_MASK;
@@ -405,7 +416,7 @@ int SineSwingR(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-int TriangleSwingR(int phase)
+static int TriangleSwingR(int phase)
 {
     int result;
 
@@ -436,7 +447,7 @@ int TriangleSwingR(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-int DutySwingR(int phase)
+static int DutySwingR(int phase)
 {
     int value;
     int result;
@@ -461,7 +472,7 @@ int DutySwingR(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-int SawSwingR(int phase)
+static int SawSwingR(int phase)
 {
     int result = (int)(char)((phase ^ -1) >> 2) << REDSOUND_SWING_PHASE_SHIFT;
 
@@ -477,7 +488,7 @@ int SawSwingR(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-int RandomSwingR(int phase)
+static int RandomSwingR(int phase)
 {
     phase >>= REDSOUND_SWING_PHASE_SHIFT;
     phase &= REDSOUND_SWING_PHASE_MASK;

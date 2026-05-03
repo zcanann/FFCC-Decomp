@@ -98,6 +98,26 @@ enum RedDriverThreadFlag {
     REDSOUND_THREAD_FLAG_MUSIC_SKIP = 8,
 };
 
+enum RedDriverHeaderSignature {
+    REDSOUND_MUSIC_SIGNATURE_0 = 'B',
+    REDSOUND_MUSIC_SIGNATURE_1 = 'G',
+    REDSOUND_MUSIC_SIGNATURE_2 = 'M',
+    REDSOUND_SE_BLOCK_SIGNATURE_0 = 'S',
+    REDSOUND_SE_BLOCK_SIGNATURE_1 = 'e',
+    REDSOUND_SE_BLOCK_SIGNATURE_2 = 'B',
+    REDSOUND_SE_BLOCK_SIGNATURE_3 = 'l',
+    REDSOUND_SE_BLOCK_SIGNATURE_4 = 'o',
+    REDSOUND_SE_BLOCK_SIGNATURE_5 = 'c',
+    REDSOUND_SE_BLOCK_SIGNATURE_6 = 'k',
+    REDSOUND_SESEP_SIGNATURE_0 = 'S',
+    REDSOUND_SESEP_SIGNATURE_1 = 'e',
+    REDSOUND_SESEP_SIGNATURE_2 = 'S',
+    REDSOUND_SESEP_SIGNATURE_3 = 'e',
+    REDSOUND_SESEP_SIGNATURE_4 = 'p',
+    REDSOUND_WAVE_SIGNATURE_0 = 'W',
+    REDSOUND_WAVE_SIGNATURE_1 = 'D',
+};
+
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 static int m_RedMasterTime;
 static volatile int m_SequencialID;
@@ -484,9 +504,10 @@ void _SetSeBlockData(int* command)
 
     if (command[1] != 0) {
         seBlockData = (char*)command[1];
-        if ((*seBlockData = 'S') && (seBlockData[1] = 'e') && (seBlockData[2] = 'B') &&
-            (seBlockData[3] = 'l') && (seBlockData[4] = 'o') && (seBlockData[5] = 'c') &&
-            (seBlockData[6] = 'k')) {
+        if ((*seBlockData = REDSOUND_SE_BLOCK_SIGNATURE_0) && (seBlockData[1] = REDSOUND_SE_BLOCK_SIGNATURE_1) &&
+            (seBlockData[2] = REDSOUND_SE_BLOCK_SIGNATURE_2) && (seBlockData[3] = REDSOUND_SE_BLOCK_SIGNATURE_3) &&
+            (seBlockData[4] = REDSOUND_SE_BLOCK_SIGNATURE_4) && (seBlockData[5] = REDSOUND_SE_BLOCK_SIGNATURE_5) &&
+            (seBlockData[6] = REDSOUND_SE_BLOCK_SIGNATURE_6)) {
             p_SeBlockData[index] = (RedSeBlockHEAD*)seBlockData;
         } else {
             RedDelete(seBlockData);
@@ -1497,7 +1518,9 @@ int CRedDriver::SetMusicData(void* musicData)
     int headerSize;
 
     result = -1;
-    if (((header->m_signature[0] == 'B') && (header->m_signature[1] == 'G')) && (header->m_signature[2] == 'M')) {
+    if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
+         (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
+        (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
         memcpy(&localHeader, header, sizeof(localHeader));
         headerSize = localHeader.m_size;
         copiedHeader = (void*)RedNew(headerSize);
@@ -1692,8 +1715,11 @@ int CRedDriver::SetSeSepData(void* seSepData)
 
     result = -1;
     header = (RedSeSepHEAD*)seSepData;
-    if (((((header->m_signature[0] == 'S') && (header->m_signature[1] == 'e')) && (header->m_signature[2] == 'S')) &&
-        ((header->m_signature[3] == 'e' && (header->m_signature[4] == 'p'))))) {
+    if (((((header->m_signature[0] == REDSOUND_SESEP_SIGNATURE_0) &&
+           (header->m_signature[1] == REDSOUND_SESEP_SIGNATURE_1)) &&
+          (header->m_signature[2] == REDSOUND_SESEP_SIGNATURE_2)) &&
+         ((header->m_signature[3] == REDSOUND_SESEP_SIGNATURE_3 &&
+           (header->m_signature[4] == REDSOUND_SESEP_SIGNATURE_4))))) {
         headerSize = header->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {
@@ -2212,7 +2238,8 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
     if (waveSize == -1) {
         RedWaveHeadWD* const waveHeader = (RedWaveHeadWD*)waveData;
 
-        if ((waveHeader->m_signature[0] == 'W') && (waveHeader->m_signature[1] == 'D')) {
+        if ((waveHeader->m_signature[0] == REDSOUND_WAVE_SIGNATURE_0) &&
+            (waveHeader->m_signature[1] == REDSOUND_WAVE_SIGNATURE_1)) {
             int dataSize = waveHeader->m_tableCount * 4;
             dataSize = (dataSize += 0x3f) & 0xffffffc0;
             dataSize += waveHeader->m_toneCount * 0x60;

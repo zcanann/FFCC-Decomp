@@ -324,7 +324,7 @@ int TriangleSwing(int phase)
  */
 int SawSwing(int phase)
 {
-    int result = (int)(char)(phase >> 2) << 8;
+    int result = (int)(char)(phase >> 2) << REDSOUND_SWING_PHASE_SHIFT;
 
     return result;
 }
@@ -457,7 +457,7 @@ int DutySwingR(int phase)
  */
 int SawSwingR(int phase)
 {
-    int result = (int)(char)((phase ^ -1) >> 2) << 8;
+    int result = (int)(char)((phase ^ -1) >> 2) << REDSOUND_SWING_PHASE_SHIFT;
 
     return result;
 }

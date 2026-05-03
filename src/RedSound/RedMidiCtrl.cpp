@@ -596,66 +596,64 @@ void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrac
  */
 void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* controlData = (int*)control;
     int loopBase = control->m_loopBase;
     int deltaAdjust = 1 - track->m_deltaTime;
     int slot = 0;
-    int* scan;
+    RedTrackDATA* scan;
 
     control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE;
-    for (scan = (int*)control->m_tracks; scan < (int*)track; scan += REDSOUND_TRACK_SIZE / sizeof(*scan)) {
-        controlData[slot + REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET] = *scan;
-        controlData[slot + REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET] = ((RedTrackDATA*)scan)->m_deltaTime + deltaAdjust;
-        controlData[slot + REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET] = scan[0x41];
-        controlData[slot + REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET] = scan[9];
+    for (scan = control->m_tracks; scan < track; scan++) {
+        control->m_savedCommand[slot] = scan->m_command;
+        control->m_savedDelta[slot] = scan->m_deltaTime + deltaAdjust;
+        control->m_savedFlags[slot] = scan->m_flags;
+        control->m_savedNote[slot] = *(int*)&scan->m_note;
         slot++;
     }
 
     {
-        int command[3];
-        int* nextTrack = scan + 0x55;
-        command[0] = *scan;
-        int delta = DeltaTimeSumup((unsigned char**)command);
+        unsigned char* command[3];
+        RedTrackDATA* nextTrack = scan + 1;
+        command[0] = scan->m_command;
+        int delta = DeltaTimeSumup(command);
 
-        controlData[slot + REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET] = command[0];
-        controlData[slot + REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET] = ((RedTrackDATA*)scan)->m_deltaTime + delta + deltaAdjust;
-        controlData[slot + REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET] = scan[0x41];
-        controlData[slot + REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET] = scan[9];
+        control->m_savedCommand[slot] = command[0];
+        control->m_savedDelta[slot] = scan->m_deltaTime + delta + deltaAdjust;
+        control->m_savedFlags[slot] = scan->m_flags;
+        control->m_savedNote[slot] = *(int*)&scan->m_note;
 
-        if (((RedTrackDATA*)nextTrack - control->m_tracks) < control->m_trackCount) {
-            for (; nextTrack < (int*)(control->m_tracks + control->m_trackCount);
-                 nextTrack += REDSOUND_TRACK_SIZE / sizeof(*nextTrack)) {
-                int currentDelta = deltaAdjust + (((RedTrackDATA*)nextTrack)->m_deltaTime - loopBase);
+        if ((nextTrack - control->m_tracks) < control->m_trackCount) {
+            for (; nextTrack < control->m_tracks + control->m_trackCount; nextTrack++) {
+                int currentDelta = deltaAdjust + (nextTrack->m_deltaTime - loopBase);
 
-                while ((currentDelta < 1) && ((u32)*nextTrack != 0)) {
-                    unsigned char* cmd = (unsigned char*)*nextTrack;
-                    *nextTrack = (int)(cmd + 1);
-                    p_MidiControl_Function[*cmd](control, keyOnData, (RedTrackDATA*)nextTrack);
+                while ((currentDelta < 1) && ((u32)nextTrack->m_command != 0)) {
+                    unsigned char* cmd = nextTrack->m_command;
+                    nextTrack->m_command = cmd + 1;
+                    p_MidiControl_Function[*cmd](control, keyOnData, nextTrack);
 
-                    if ((u32)*nextTrack != 0) {
+                    if ((u32)nextTrack->m_command != 0) {
                         int step = DeltaTimeSumup((unsigned char**)nextTrack);
                         currentDelta += step;
-                        ((RedTrackDATA*)nextTrack)->m_deltaTime += step;
+                        nextTrack->m_deltaTime += step;
                     }
                 }
 
-                controlData[slot + REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET + 1] = *nextTrack;
-                controlData[slot + REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET + 1] = currentDelta;
-                controlData[slot + REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET + 1] = nextTrack[0x41];
-                controlData[slot + REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET + 1] = nextTrack[9];
+                control->m_savedCommand[slot + 1] = nextTrack->m_command;
+                control->m_savedDelta[slot + 1] = currentDelta;
+                control->m_savedFlags[slot + 1] = nextTrack->m_flags;
+                control->m_savedNote[slot + 1] = *(int*)&nextTrack->m_note;
                 slot++;
             }
         }
     }
 
-    controlData[REDSOUND_CONTROL_SAVED_ACTIVE_TRACK_COUNT_WORD_OFFSET] = (int)*(short*)((char*)control + 0x48e);
-    memmove(controlData + REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET, controlData + REDSOUND_CONTROL_MEASURE_WORD_OFFSET, 0x10);
-    controlData[REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET] = controlData[REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET] - deltaAdjust;
-    if (controlData[REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET] < 0) {
-        controlData[REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET] += controlData[REDSOUND_CONTROL_SAVED_TICKS_PER_MEASURE_WORD_OFFSET];
-        controlData[REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET] = controlData[REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET] - 1;
+    control->m_savedActiveTrackCount = control->m_activeTrackCount;
+    memmove(&control->m_savedMeasure, &control->m_measure, 0x10);
+    control->m_savedTick -= deltaAdjust;
+    if (control->m_savedTick < 0) {
+        control->m_savedTick += control->m_savedTicksPerMeasure;
+        control->m_savedMeasure--;
     }
-    memmove(controlData + REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET, controlData + REDSOUND_CONTROL_TEMPO_WORD_OFFSET, 0xc);
+    memmove(&control->m_savedTempo, &control->m_tempo, 0xc);
 }
 
 /*
@@ -1311,7 +1309,8 @@ void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
         delta[0] += 1;
     }
 
-    command = *(s8*)track->m_command++ << 8;
+    command = *(s8*)track->m_command++;
+    command <<= 8;
     value = 0;
     track->m_sweepAdd = DataAddCompute(&value, command, delta);
     track->m_sweepDelta = delta[0];

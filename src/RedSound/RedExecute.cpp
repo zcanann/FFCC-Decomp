@@ -540,20 +540,20 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
     int bestEnvelope;
     RedVoiceDATA* voiceEnd;
 
-    if ((*(s8*)((u8*)track + 0x26) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
-        if (((((u8*)track)[0x26] & REDSOUND_NOTE_ALLOC_DIRECT) == 0) &&
-            (*(u32*)((u8*)p_VoiceData + track->m_trackNo * REDSOUND_VOICE_SIZE) != 0) &&
-            (*(u32*)((u8*)p_VoiceData + track->m_trackNo * REDSOUND_VOICE_SIZE) != (u32)track)) {
+    if ((static_cast<s8>(track->m_note.m_allocFlags) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
+        if (((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT) == 0) &&
+            ((p_VoiceData + track->m_trackNo)->m_track != 0) &&
+            ((p_VoiceData + track->m_trackNo)->m_track != track)) {
             voice = 0;
         }
         else {
-            voice = (RedVoiceDATA*)((u8*)p_VoiceData + track->m_trackNo * REDSOUND_VOICE_SIZE);
+            voice = p_VoiceData + track->m_trackNo;
         }
     } else {
-        if ((((u8*)track)[0x26] & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
+        if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
             voice = (RedVoiceDATA*)p_VoiceData;
         } else {
-            voice = (RedVoiceDATA*)((u8*)p_VoiceData + (s8)p_SoundControl->m_channelAlloc * REDSOUND_VOICE_SIZE);
+            voice = p_VoiceData + (s8)p_SoundControl->m_channelAlloc;
         }
 
         bestEnvelope = REDSOUND_ENVELOPE_LEVEL_FULL;
@@ -589,7 +589,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
     }
 
     if (voice != 0) {
-        voice->m_flags = voice->m_flags & 0xFFFFFFFD;
+        voice->m_flags &= ~REDSOUND_VOICE_FLAGS_RELEASED;
         voice->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
     }
 

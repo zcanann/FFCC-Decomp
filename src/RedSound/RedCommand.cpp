@@ -853,7 +853,7 @@ int MusicStop(int seId)
 					    (seTrack->m_track <
 					     (RedTrackDATA*)((u32)music->m_tracks + (unsigned int)music->m_trackCount * REDSOUND_TRACK_SIZE))) {
 						seTrack->m_voiceSwitch &= 0xfffffff3;
-						seTrack->m_flags &= 0xfffffffe;
+						seTrack->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 						seTrack->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 						seTrack->m_stateFlags &= ~4;
 						seTrack->m_track = 0;

@@ -1662,7 +1662,8 @@ void _KeyOnControl()
     {
         unsigned int* voice = (unsigned int*)p_VoiceData;
         do {
-            if ((voice[0x23] != 0) && (*voice != 0) && ((((RedTrackDATA*)*voice)->m_voiceSwitch & 9) == 0)) {
+            if ((voice[REDSOUND_VOICE_ACTIVE_WORD] != 0) && (voice[REDSOUND_VOICE_TRACK_WORD] != 0) &&
+                ((((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_voiceSwitch & 9) == 0)) {
                 if ((((RedVoiceDATA*)voice)->m_updateFlags & REDSOUND_VOICE_UPDATE_VOLUME) != 0 || (*(int*)(*voice + 0x94) != 0) ||
                     (*(int*)(*voice + 0xB4) != 0)) {
                     int volume;
@@ -1726,7 +1727,7 @@ void _KeyOnControl()
         do {
             if ((local_28 & bit) != 0) {
                 local_28 &= ~bit;
-                voice[0x24] |= REDSOUND_VOICE_FLAGS_START;
+                voice[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
             voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
@@ -1739,7 +1740,7 @@ void _KeyOnControl()
         do {
             if ((local_24 & bit) != 0) {
                 local_24 &= ~bit;
-                voice[0x24] |= REDSOUND_VOICE_FLAGS_START;
+                voice[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
             voice += REDSOUND_VOICE_SIZE / sizeof(*voice);

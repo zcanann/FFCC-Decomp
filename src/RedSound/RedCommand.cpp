@@ -461,7 +461,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
  */
 int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 {
-	bank = bank & 3;
+	bank = bank & REDSOUND_SE_BLOCK_BANK_MASK;
 	no = no & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
 
 	if (p_SeBlockData[bank] != 0) {

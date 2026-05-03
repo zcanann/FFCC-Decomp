@@ -96,8 +96,13 @@ enum RedMusicCommandWord {
     REDSOUND_MUSIC_COMMAND_FADE_TIME = 2,
 };
 
+enum RedDriverTickHistoryLayout {
+    REDSOUND_TICK_HISTORY_COUNT = 100,
+    REDSOUND_TICK_HISTORY_SHIFT_SIZE = sizeof(int) * (REDSOUND_TICK_HISTORY_COUNT - 1),
+};
+
 struct RedTickHistory {
-    int m_ticks[100];
+    int m_ticks[REDSOUND_TICK_HISTORY_COUNT];
 };
 
 enum RedDriverBufferSize {
@@ -901,8 +906,8 @@ void RedSleep(int microseconds)
     unsigned int interruptLevel;
     RedSleepAlarm alarm;
 
-    if (microseconds < 0xfa) {
-        microseconds = 0xfa;
+    if (microseconds < REDSOUND_CONTROL_TICK_PERIOD) {
+        microseconds = REDSOUND_CONTROL_TICK_PERIOD;
     }
     interruptLevel = OSDisableInterrupts();
     alarm.thread = OSGetCurrentThread();
@@ -949,7 +954,7 @@ static int _MainThread(void*)
             do {
                 result = OSTryWaitSemaphore(&m_MainSemaphore);
             } while (0 < result);
-            memmove(p_Tick->m_ticks + 1, p_Tick->m_ticks, 0x18c);
+            memmove(p_Tick->m_ticks + 1, p_Tick->m_ticks, REDSOUND_TICK_HISTORY_SHIFT_SIZE);
             result = OSGetTick();
             p_Tick->m_ticks[0] = result - startTick;
         }

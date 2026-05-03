@@ -1027,9 +1027,10 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
     }
     voiceData[0x26] = iVar5;
 
-    if ((((unsigned int)trackData[0x41] & 0x100000) == 0) ||
-        ((((trackS8[0x26] & 5) == 0) && (((unsigned int)trackData[0x41] & 0x280000) == 0)) ||
-         (((trackS8[0x26] & 5) != 0) && (((unsigned int)trackData[0x41] & 0x80000) == 0)))) {
+    if ((((unsigned int)trackData[0x41] & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0) ||
+        ((((trackS8[0x26] & 5) == 0) &&
+          (((unsigned int)trackData[0x41] & (REDSOUND_TRACK_FLAG_SLUR | REDSOUND_TRACK_FLAG_TENUTO)) == 0)) ||
+         (((trackS8[0x26] & 5) != 0) && (((unsigned int)trackData[0x41] & REDSOUND_TRACK_FLAG_SLUR) == 0)))) {
         if (trackData[0x1d] != 0) {
             ((s16*)voiceData)[10] = trackS16[0x48];
             local_38[0] = 0x100;
@@ -1129,8 +1130,9 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
         voiceMask += 1;
     }
 
-    if ((((unsigned int)trackData[0x41] & 0x80000) == 0) || (((unsigned int)trackData[0x41] & 0x100000) == 0)) {
-        trackData[0x41] = (int)((unsigned int)trackData[0x41] | 0x100000);
+    if ((((unsigned int)trackData[0x41] & REDSOUND_TRACK_FLAG_SLUR) == 0) ||
+        (((unsigned int)trackData[0x41] & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0)) {
+        trackData[0x41] = (int)((unsigned int)trackData[0x41] | REDSOUND_TRACK_FLAG_SLUR_RELEASE);
         *voiceMask |= 1u << voiceData[0x2a];
     }
     voiceData[0x2e] |= 3;
@@ -1145,7 +1147,7 @@ RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voic
 {
     int* voiceData;
 
-    if ((track->m_flags & 0x80000U) != 0) {
+    if ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) != 0) {
         voiceData = (int*)p_VoiceData;
         do {
             if ((u32)*voiceData == (u32)track) {
@@ -1438,7 +1440,7 @@ void EnvelopeKeyExecute()
 
             if ((voiceData[0x24] & 0x10U) != 0) {
                 int pitch = voiceData[0x27];
-                voiceFlags = 0x80000;
+                voiceFlags = REDSOUND_TRACK_FLAG_SLUR;
                 *(u16*)(voice + 0x1DE) = (u16)(((u32)pitch >> 0x10) & 3);
                 *(s16*)(voice + 0x1E0) = (s16)pitch;
             }

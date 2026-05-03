@@ -627,7 +627,7 @@ group_ready:
             scaleMtx[1][1] = scaledOwner;
             scaleMtx[2][2] = scaledOwner;
             particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
-            PSMTXConcat(*particleMtx, object->m_localMatrix.value, worldMtx);
+            PSMTXConcat(*particleMtx, ymBreath->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
             rotMtx.value[0][3] = FLOAT_80330c80;

@@ -26,6 +26,10 @@ enum RedCommandEraseTrack {
 	REDSOUND_SE_DEFAULT_PITCH_BEND_RANGE = 2,
 };
 
+enum RedCommandMusicTrackBlock {
+	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE = sizeof(u32),
+};
+
 RedReverbModeData t_ReverbModeData[] = {
     {REDSOUND_REVERB_KIND_HI, {0xA, 0x578, 0x1E, 0x46, 0x64, 0x0}},
     {REDSOUND_REVERB_KIND_HI, {0x14, 0x708, 0x1E, 0x50, 0x64, 0x0}},
@@ -776,8 +780,8 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 		                         ((unsigned int)current[1] << 8) | (unsigned int)current[0];
 		track->m_trackNo = trackNo - 1;
 		track->m_waveBankData = (int)waveHead;
-		track->m_command = current + 4;
-		current = current + 4 + blockSize;
+		track->m_command = current + REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE;
+		current = current + REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE + blockSize;
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)track) + 1;
 		track->m_seSepId = 0;
 		track->m_keySignatureData =

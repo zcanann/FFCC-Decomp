@@ -77,12 +77,12 @@ void _StreamStop(RedStreamDATA* streamData)
 			RedDeleteA(streamData->m_aramBuffer);
 			streamData->m_aramBuffer = 0;
 		}
-		streamData->m_voiceData->m_flags |= 2;
+		streamData->m_voiceData->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 		streamData->m_track->m_note.m_allocFlags &= -3;
 		streamData->m_voiceData->m_stateFlags &= -3;
 		streamData->m_voiceData->m_active = 0;
 		if (streamData->m_header.m_channelCount == 2) {
-			streamData->m_voiceData[1].m_flags |= 2;
+			streamData->m_voiceData[1].m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 			streamData->m_track[1].m_note.m_allocFlags &= -3;
 			streamData->m_voiceData[1].m_stateFlags &= -3;
 			streamData->m_voiceData[1].m_active = 0;

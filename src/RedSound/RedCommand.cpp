@@ -690,7 +690,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 
 	m_MusicSkipLine = mode;
 	music->m_musicId = musicId;
-	music->m_flags &= 0xfffeffff;
+	music->m_flags &= REDSOUND_CONTROL_FLAG_CLEAR_STOP_ON_VOLUME_ZERO_MASK;
 	music->m_updateFlags = 0;
 
 	if (m_CrossTime == 0) {
@@ -816,7 +816,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	music->m_volume = volume;
 	music->m_volumeDelta = 0;
 	music->m_updateFlags = 0;
-	music->m_flags &= 0x10;
+	music->m_flags &= REDSOUND_CONTROL_FLAG_PAUSE;
 	if ((musicHead->m_playFlags & 0x40000) != 0) {
 		music->m_flags |= 0x40000;
 	}

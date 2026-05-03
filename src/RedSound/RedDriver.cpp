@@ -27,12 +27,18 @@ struct RedWaveSettingState {
 };
 
 enum RedDriverDmaLayoutSize {
+    REDSOUND_DMA_MAIN_QUEUE_INDEX = 0,
+    REDSOUND_DMA_STREAM_QUEUE_INDEX = 1,
     REDSOUND_DMA_QUEUE_WORD_COUNT = 0x380,
     REDSOUND_DMA_CONTROL_WORD_COUNT = REDSOUND_DMA_QUEUE_WORD_COUNT * 2,
     REDSOUND_DMA_QUEUE_ENTRY_COUNT = 0x80,
     REDSOUND_DMA_TRANSFER_ALIGN = 0x20,
     REDSOUND_DMA_TRANSFER_ALIGN_MASK = ~(REDSOUND_DMA_TRANSFER_ALIGN - 1),
     REDSOUND_DMA_MAX_CHUNK_SIZE = 0x40000,
+    REDSOUND_DMA_DIRECTION_TO_ARAM = 0,
+    REDSOUND_DMA_DIRECTION_FROM_ARAM = 1,
+    REDSOUND_DMA_ARQ_OWNER_ID = 0x469,
+    REDSOUND_DMA_ARQ_PRIORITY = 1,
 };
 
 struct RedDriverSyncState {
@@ -996,11 +1002,11 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
 
     interrupt = OSDisableInterrupts();
     if ((flags & REDSOUND_DMA_FLAG_QUEUE_MASK) != 0) {
-        queuePtr = &p_DmaControlNow[0];
+        queuePtr = &p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX];
         queueBase = RedDriverMainDmaQueue();
     } else {
         queueBase = RedDriverStreamDmaQueue();
-        queuePtr = &p_DmaControlNow[1];
+        queuePtr = &p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX];
     }
     queueEntry = *queuePtr;
     entryID = GetMyEntryID();
@@ -1103,13 +1109,14 @@ void _DmaExecute()
     RedDmaRequest* piVar7;
     RedDmaRequest* piVar8;
 
-    while ((p_DmaControlNow[0] != p_DmaControlOld[0]) || (p_DmaControlNow[1] != p_DmaControlOld[1])) {
+    while ((p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) ||
+           (p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX])) {
         m_DMAInThread = 1;
-        if (p_DmaControlNow[0] == p_DmaControlOld[0]) {
-            ppiVar5 = &p_DmaControlOld[1];
+        if (p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] == p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) {
+            ppiVar5 = &p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX];
             piVar4 = RedDriverStreamDmaQueue();
         } else {
-            ppiVar5 = &p_DmaControlOld[0];
+            ppiVar5 = &p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX];
             piVar4 = RedDriverMainDmaQueue();
         }
         piVar7 = *ppiVar5;
@@ -1117,7 +1124,7 @@ void _DmaExecute()
         piVar6 = 0;
         if (piVar7->m_id != 0) {
             m_DMAStatus = 1;
-            if (piVar7->m_direction == 0) {
+            if (piVar7->m_direction == REDSOUND_DMA_DIRECTION_TO_ARAM) {
                 DCFlushRange((void*)piVar7->m_mainMemory, (u32)piVar7->m_size);
                 iVar3 = piVar7->m_mainMemory;
                 iVar2 = piVar7->m_aramMemory;
@@ -1128,7 +1135,7 @@ void _DmaExecute()
             }
             m_DMAInThread = 3;
             ARQSetChunkSize((u32)piVar7->m_size);
-            ARQPostRequest(&m_DMARequest, 0x469, (u32)piVar7->m_direction, 1, (u32)iVar3, (u32)iVar2,
+            ARQPostRequest(&m_DMARequest, REDSOUND_DMA_ARQ_OWNER_ID, (u32)piVar7->m_direction, REDSOUND_DMA_ARQ_PRIORITY, (u32)iVar3, (u32)iVar2,
                            (u32)piVar7->m_size, _DmaCallback);
             m_DMAInThread = 4;
             piVar6 = piVar7;
@@ -1151,7 +1158,7 @@ void _DmaExecute()
                     OSRestoreInterrupts(uVar1);
                 }
                 m_DMAInThread = 9;
-                if (piVar6->m_direction == 1) {
+                if (piVar6->m_direction == REDSOUND_DMA_DIRECTION_FROM_ARAM) {
                     DCFlushRange((void*)piVar6->m_mainMemory, (u32)piVar6->m_size);
                 }
                 piVar6->m_id = 0;
@@ -1359,10 +1366,10 @@ void CRedDriver::Init()
     memset(p_Stream, 0, REDSOUND_STREAM_BUFFER_SIZE);
     m_DMAMode = 0;
     memset(m_DmaControl, 0, sizeof(m_DmaControl));
-    p_DmaControlNow[0] = RedDriverMainDmaQueue();
-    p_DmaControlOld[0] = RedDriverMainDmaQueue();
-    p_DmaControlNow[1] = RedDriverStreamDmaQueue();
-    p_DmaControlOld[1] = RedDriverStreamDmaQueue();
+    p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] = RedDriverMainDmaQueue();
+    p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX] = RedDriverMainDmaQueue();
+    p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] = RedDriverStreamDmaQueue();
+    p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX] = RedDriverStreamDmaQueue();
     m_RedMasterTime = 0;
     AXRegisterCallback(_RedAXCallback);
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);

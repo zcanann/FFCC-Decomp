@@ -26,6 +26,8 @@ const char s_no_name_8032fdcc[] = "no name";
 
 extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
 extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
+extern "C" void* __register_global_object(void* object, void* destructor, void* registration);
+extern "C" void* __ct__14CUSBStreamDataFv(void* self);
 extern "C" void create__8CPartPcsFv(CPartPcs*);
 extern "C" void destroy__8CPartPcsFv(CPartPcs*);
 extern "C" void calcInit__8CPartPcsFv(CPartPcs*);
@@ -65,6 +67,10 @@ extern "C" void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
 extern "C" void SetFog__8CGraphicFii(void*, int, int);
 extern "C" void pppSetRendMatrix__8CPartMngFv(CPartMng*);
 extern "C" void pppDraw__8CPartMngFv(CPartMng*);
+extern "C" void __dt__8CPartPcsFv(void* self);
+extern "C" void* __vt__8CManager[];
+extern "C" void* __vt__10CSamplePcs[];
+extern "C" void* __vt__8CPartPcs[];
 extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
     void*,
     char*,
@@ -200,6 +206,7 @@ unsigned int lbl_801EAD84[3] = {reinterpret_cast<unsigned int>(lbl_8032E69C), 0x
 unsigned int lbl_801EAD90 = reinterpret_cast<unsigned int>(lbl_8032E69C);
 int DAT_8032ed38;
 int DAT_8032ed3c;
+unsigned char ARRAY_80273928[0xC];
 CPartPcs PartPcs;
 CProfile g_par_calc_prof(const_cast<char*>(s_no_name_8032fdcc));
 CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
@@ -333,70 +340,91 @@ static PppPdtSlotRaw* GetPartMngPdtSlots()
 
 /*
  * --INFO--
+ * PAL Address: 0x80053960
+ * PAL Size: 832b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_tina_cpp(void)
+{
+    unsigned char* self = reinterpret_cast<unsigned char*>(&PartPcs);
+    unsigned int* table = reinterpret_cast<unsigned int*>(m_table__8CPartPcs);
+
+    *reinterpret_cast<void**>(self) = __vt__8CManager;
+    *reinterpret_cast<void**>(self) = __vt__10CSamplePcs;
+    *reinterpret_cast<void**>(self) = __vt__8CPartPcs;
+
+    __ct__14CUSBStreamDataFv(self + 0x4);
+    __register_global_object(self, __dt__8CPartPcsFv, ARRAY_80273928);
+
+    table[1] = m_table_desc0__8CPartPcs[0];
+    table[2] = m_table_desc0__8CPartPcs[1];
+    table[3] = m_table_desc0__8CPartPcs[2];
+    table[4] = m_table_desc1__8CPartPcs[0];
+    table[5] = m_table_desc1__8CPartPcs[1];
+    table[6] = m_table_desc1__8CPartPcs[2];
+    table[7] = m_table_desc2__8CPartPcs[0];
+    table[8] = m_table_desc2__8CPartPcs[1];
+    table[9] = m_table_desc2__8CPartPcs[2];
+    table[12] = m_table_desc3__8CPartPcs[0];
+    table[13] = m_table_desc3__8CPartPcs[1];
+    table[14] = m_table_desc3__8CPartPcs[2];
+    table[17] = m_table_desc4__8CPartPcs[0];
+    table[18] = m_table_desc4__8CPartPcs[1];
+    table[19] = m_table_desc4__8CPartPcs[2];
+    table[22] = m_table_desc5__8CPartPcs[0];
+    table[23] = m_table_desc5__8CPartPcs[1];
+    table[24] = m_table_desc5__8CPartPcs[2];
+    table[27] = m_table_desc6__8CPartPcs[0];
+    table[28] = m_table_desc6__8CPartPcs[1];
+    table[29] = m_table_desc6__8CPartPcs[2];
+    table[32] = m_table_desc7__8CPartPcs[0];
+    table[33] = m_table_desc7__8CPartPcs[1];
+    table[35] = m_table_desc7__8CPartPcs[2];
+    table[37] = m_table_desc8__8CPartPcs[1];
+    table[38] = m_table_desc8__8CPartPcs[2];
+    table[39] = m_table_desc8__8CPartPcs[0];
+    table[44] = m_table_desc9__8CPartPcs[1];
+    table[45] = m_table_desc9__8CPartPcs[2];
+    table[46] = m_table_desc9__8CPartPcs[0];
+    table[88] = m_table_desc10__8CPartPcs[0];
+    table[89] = m_table_desc10__8CPartPcs[1];
+    table[90] = m_table_desc10__8CPartPcs[2];
+    table[93] = m_table_desc11__8CPartPcs[0];
+    table[94] = m_table_desc11__8CPartPcs[1];
+    table[95] = m_table_desc11__8CPartPcs[2];
+    table[96] = m_table_desc12__8CPartPcs[0];
+    table[97] = m_table_desc12__8CPartPcs[1];
+    table[98] = m_table_desc12__8CPartPcs[2];
+    table[101] = m_table_desc13__8CPartPcs[0];
+    table[102] = m_table_desc13__8CPartPcs[1];
+    table[103] = m_table_desc13__8CPartPcs[2];
+    table[106] = m_table_desc14__8CPartPcs[0];
+    table[107] = m_table_desc14__8CPartPcs[1];
+    table[108] = m_table_desc14__8CPartPcs[2];
+    table[111] = m_table_desc15__8CPartPcs[0];
+    table[112] = m_table_desc15__8CPartPcs[1];
+    table[113] = m_table_desc15__8CPartPcs[2];
+    table[114] = m_table_desc16__8CPartPcs[0];
+    table[117] = m_table_desc17__8CPartPcs[0];
+    table[118] = m_table_desc17__8CPartPcs[1];
+    table[119] = m_table_desc17__8CPartPcs[2];
+    table[120] = m_table_desc16__8CPartPcs[1];
+    table[121] = m_table_desc16__8CPartPcs[2];
+    table[124] = m_table_desc18__8CPartPcs[0];
+    table[125] = m_table_desc18__8CPartPcs[1];
+    table[126] = m_table_desc18__8CPartPcs[2];
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
 CPartPcs::CPartPcs()
 {
-	unsigned int* table = reinterpret_cast<unsigned int*>(m_table__8CPartPcs);
-
-	table[1] = m_table_desc0__8CPartPcs[0];
-	table[2] = m_table_desc0__8CPartPcs[1];
-	table[3] = m_table_desc0__8CPartPcs[2];
-	table[4] = m_table_desc1__8CPartPcs[0];
-	table[5] = m_table_desc1__8CPartPcs[1];
-	table[6] = m_table_desc1__8CPartPcs[2];
-	table[7] = m_table_desc2__8CPartPcs[0];
-	table[8] = m_table_desc2__8CPartPcs[1];
-	table[9] = m_table_desc2__8CPartPcs[2];
-	table[12] = m_table_desc3__8CPartPcs[0];
-	table[13] = m_table_desc3__8CPartPcs[1];
-	table[14] = m_table_desc3__8CPartPcs[2];
-	table[17] = m_table_desc4__8CPartPcs[0];
-	table[18] = m_table_desc4__8CPartPcs[1];
-	table[19] = m_table_desc4__8CPartPcs[2];
-	table[22] = m_table_desc5__8CPartPcs[0];
-	table[23] = m_table_desc5__8CPartPcs[1];
-	table[24] = m_table_desc5__8CPartPcs[2];
-	table[27] = m_table_desc6__8CPartPcs[0];
-	table[28] = m_table_desc6__8CPartPcs[1];
-	table[29] = m_table_desc6__8CPartPcs[2];
-	table[32] = m_table_desc7__8CPartPcs[0];
-	table[33] = m_table_desc7__8CPartPcs[1];
-	table[37] = m_table_desc8__8CPartPcs[1];
-	table[38] = m_table_desc8__8CPartPcs[2];
-	table[35] = m_table_desc7__8CPartPcs[2];
-	table[39] = m_table_desc8__8CPartPcs[0];
-	table[44] = m_table_desc9__8CPartPcs[1];
-	table[45] = m_table_desc9__8CPartPcs[2];
-	table[46] = m_table_desc9__8CPartPcs[0];
-	table[88] = m_table_desc10__8CPartPcs[0];
-	table[89] = m_table_desc10__8CPartPcs[1];
-	table[90] = m_table_desc10__8CPartPcs[2];
-	table[93] = m_table_desc11__8CPartPcs[0];
-	table[94] = m_table_desc11__8CPartPcs[1];
-	table[95] = m_table_desc11__8CPartPcs[2];
-	table[96] = m_table_desc12__8CPartPcs[0];
-	table[97] = m_table_desc12__8CPartPcs[1];
-	table[98] = m_table_desc12__8CPartPcs[2];
-	table[101] = m_table_desc13__8CPartPcs[0];
-	table[102] = m_table_desc13__8CPartPcs[1];
-	table[103] = m_table_desc13__8CPartPcs[2];
-	table[106] = m_table_desc14__8CPartPcs[0];
-	table[107] = m_table_desc14__8CPartPcs[1];
-	table[108] = m_table_desc14__8CPartPcs[2];
-	table[111] = m_table_desc15__8CPartPcs[0];
-	table[112] = m_table_desc15__8CPartPcs[1];
-	table[113] = m_table_desc15__8CPartPcs[2];
-	table[114] = m_table_desc16__8CPartPcs[0];
-	table[117] = m_table_desc17__8CPartPcs[0];
-	table[118] = m_table_desc17__8CPartPcs[1];
-	table[119] = m_table_desc17__8CPartPcs[2];
-	table[120] = m_table_desc16__8CPartPcs[1];
-	table[121] = m_table_desc16__8CPartPcs[2];
-	table[124] = m_table_desc18__8CPartPcs[0];
-	table[125] = m_table_desc18__8CPartPcs[1];
-	table[126] = m_table_desc18__8CPartPcs[2];
 }
 
 /*

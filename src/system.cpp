@@ -630,15 +630,7 @@ void CSystem::Quit()
  */
 void CSystem::Init()
 {
-    unsigned int count;
     CFile::CHandle* fileHandle;
-    int mapSize;
-    unsigned int mapSizeValue;
-    unsigned int offset;
-    const unsigned char* debugResources = s_systemDebugResources;
-    const char* systemCpp = reinterpret_cast<const char*>(debugResources + 0x1A0);
-    const char* gamePalMMap = reinterpret_cast<const char*>(debugResources + 0x1AC);
-    const char* compilerMapLoaded = reinterpret_cast<const char*>(debugResources + 0x1BC);
 
     m_initialized = 1;
     m_currentOrder = (COrder*)0;
@@ -688,17 +680,19 @@ void CSystem::Init()
     if (OSGetConsoleSimulatedMemSize() == 0x3000000)
     {
         m_mapStage = (CStage*)Memory.CreateStage(0x400000, const_cast<char*>(s_cSystem), 1);
-        fileHandle = File.Open(const_cast<char*>(gamePalMMap), 0, CFile::PRI_LOW);
+        fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)
         {
-            mapSizeValue = File.GetLength(fileHandle);
-            m_mapSize = mapSizeValue;
-            mapSize = mapSizeValue;
-            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(systemCpp), 0x123) unsigned char[mapSizeValue];
-            for (offset = 0; (int)mapSize != 0; mapSize -= count)
+            unsigned int mapSize;
+            unsigned int count;
+            unsigned int offset;
+
+            m_mapSize = mapSize = File.GetLength(fileHandle);
+            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(s_system_cpp), 0x123) unsigned char[mapSize];
+            for (offset = 0; mapSize != 0; mapSize -= count)
             {
                 count = 0x100000;
-                if ((unsigned int)mapSize < 0x100000)
+                if (mapSize < 0x100000)
                 {
                     count = mapSize;
                 }
@@ -712,7 +706,7 @@ void CSystem::Init()
                 offset += count;
             }
             File.Close(fileHandle);
-            Printf(const_cast<char*>(compilerMapLoaded));
+            Printf(const_cast<char*>(s_compilerMapLoaded));
         }
     }
 }

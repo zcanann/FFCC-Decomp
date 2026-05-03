@@ -240,10 +240,10 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
 {
     char key;
     int* slot;
-    int* voice;
+    RedVoiceDATA* voice;
 
     if ((control == p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP) || ((track->m_flags & 0x80000) == 0)) {
-        ((int*)track)[0x44] = 0;
+        track->m_sweepDelta = 0;
         key = ((char*)track)[0x24];
         slot = (int*)keyOnData;
         do {
@@ -254,14 +254,14 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
         } while (slot < (int*)((int)keyOnData + 0x600));
 
         key = ((char*)track)[0x24];
-        voice = (int*)p_VoiceData;
+        voice = p_VoiceData;
         do {
-            if (((u32)*voice == (u32)track) && (*(char*)(voice + 6) == key)) {
-                voice[0x24] &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-                voice[0x24] |= REDSOUND_VOICE_FLAGS_RELEASED;
+            if ((voice->m_track == track) && (voice->m_key == key)) {
+                voice->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+                voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
             }
-            voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
-        } while (voice < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
+            voice++;
+        } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
     }
 }
 

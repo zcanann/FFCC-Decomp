@@ -296,10 +296,10 @@ void CGPartyObj::onCreate()
  */
 void CGPartyObj::onDestroy()
 {
-	unsigned char* partyFlags = &PartyData(this).partyFlags;
-	if ((*partyFlags & 0x04) != 0) {
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if ((int)(((unsigned int)self[0x6B8] << 0x1D) | ((unsigned int)self[0x6B8] >> 3)) < 0) {
 		addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
-		*partyFlags &= ~0x04;
+		self[0x6B8] = self[0x6B8] & 0xFB;
 	}
 
 	CGCharaObj::onDestroy();

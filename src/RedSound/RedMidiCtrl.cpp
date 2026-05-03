@@ -523,7 +523,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
     if (control < p_SoundControlBuffer + REDSOUND_CONTROL_SE) {
         control->m_activeTrackCount--;
         if ((control->m_activeTrackCount == 0) &&
-            ((m_MusicPhraseStop == 1) || ((control->m_flags & 1) == 0))) {
+            ((m_MusicPhraseStop == 1) || ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) == 0))) {
             voice = p_VoiceData;
             do {
                 if (((unsigned int)voice->m_track >= (u32)control->m_tracks) &&
@@ -592,12 +592,12 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
     int slot = 0;
     int* scan;
 
-    control->m_flags |= 1;
+    control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE;
     for (scan = (int*)control->m_tracks; scan < (int*)track; scan += REDSOUND_TRACK_SIZE / sizeof(*scan)) {
-        controlData[slot + 10] = *scan;
-        controlData[slot + 0x4a] = ((RedTrackDATA*)scan)->m_deltaTime + deltaAdjust;
-        controlData[slot + 0x8a] = scan[0x41];
-        controlData[slot + 0xca] = scan[9];
+        controlData[slot + REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET] = *scan;
+        controlData[slot + REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET] = ((RedTrackDATA*)scan)->m_deltaTime + deltaAdjust;
+        controlData[slot + REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET] = scan[0x41];
+        controlData[slot + REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET] = scan[9];
         slot++;
     }
 
@@ -607,10 +607,10 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
         command[0] = *scan;
         int delta = DeltaTimeSumup((unsigned char**)command);
 
-        controlData[slot + 10] = command[0];
-        controlData[slot + 0x4a] = ((RedTrackDATA*)scan)->m_deltaTime + delta + deltaAdjust;
-        controlData[slot + 0x8a] = scan[0x41];
-        controlData[slot + 0xca] = scan[9];
+        controlData[slot + REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET] = command[0];
+        controlData[slot + REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET] = ((RedTrackDATA*)scan)->m_deltaTime + delta + deltaAdjust;
+        controlData[slot + REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET] = scan[0x41];
+        controlData[slot + REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET] = scan[9];
 
         if (((RedTrackDATA*)nextTrack - control->m_tracks) < control->m_trackCount) {
             for (; nextTrack < (int*)(control->m_tracks + control->m_trackCount);
@@ -629,23 +629,23 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
                     }
                 }
 
-                controlData[slot + 0xb] = *nextTrack;
-                controlData[slot + 0x4b] = currentDelta;
-                controlData[slot + 0x8b] = nextTrack[0x41];
-                controlData[slot + 0xcb] = nextTrack[9];
+                controlData[slot + REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET + 1] = *nextTrack;
+                controlData[slot + REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET + 1] = currentDelta;
+                controlData[slot + REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET + 1] = nextTrack[0x41];
+                controlData[slot + REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET + 1] = nextTrack[9];
                 slot++;
             }
         }
     }
 
-    controlData[0x10d] = (int)*(short*)((char*)control + 0x48e);
-    memmove(controlData + 0x10e, controlData + 3, 0x10);
-    controlData[0x10f] = controlData[0x10f] - deltaAdjust;
-    if (controlData[0x10f] < 0) {
-        controlData[0x10f] += controlData[0x110];
-        controlData[0x10e] = controlData[0x10e] - 1;
+    controlData[REDSOUND_CONTROL_SAVED_ACTIVE_TRACK_COUNT_WORD_OFFSET] = (int)*(short*)((char*)control + 0x48e);
+    memmove(controlData + REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET, controlData + REDSOUND_CONTROL_MEASURE_WORD_OFFSET, 0x10);
+    controlData[REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET] = controlData[REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET] - deltaAdjust;
+    if (controlData[REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET] < 0) {
+        controlData[REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET] += controlData[REDSOUND_CONTROL_SAVED_TICKS_PER_MEASURE_WORD_OFFSET];
+        controlData[REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET] = controlData[REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET] - 1;
     }
-    memmove(controlData + 0x10a, controlData + 0x112, 0xc);
+    memmove(controlData + REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET, controlData + REDSOUND_CONTROL_TEMPO_WORD_OFFSET, 0xc);
 }
 
 /*
@@ -659,7 +659,7 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
  */
 void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA*)
 {
-    control->m_flags |= 2;
+    control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END;
     if ((m_MusicPhraseStop == 1) && ((void*)control == p_SoundControlBuffer)) {
         RedTrackDATA* track = control->m_tracks;
         do {

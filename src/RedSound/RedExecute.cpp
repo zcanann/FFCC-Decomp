@@ -2070,9 +2070,9 @@ int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int
 
     control->m_skipFrames = 1;
     if (m_MusicPhraseStop == 0) {
-        if ((control->m_flags & 2) != 0) {
-            control->m_flags &= ~2;
-            if ((control->m_flags & 1) != 0) {
+        if ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END) != 0) {
+            control->m_flags &= ~REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END;
+            if ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0) {
                 control->m_activeTrackCount = 0;
             }
         }
@@ -2098,7 +2098,8 @@ void _MusicNoteExecute()
     u32* track;
     int status = _MusicMidiNoteExecute(p_SoundControl, (RedKeyOnDATA*)p_KeyOnData, 1);
 
-    while ((status == 0) && (m_MusicPhraseStop == 0) && ((p_SoundControl->m_flags & 1) != 0)) {
+    while ((status == 0) && (m_MusicPhraseStop == 0) &&
+           ((p_SoundControl->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         *(s16*)((u8*)p_SoundControl + 0x48E) = *(int*)((u8*)p_SoundControl + 0x434);
         memcpy((u8*)p_SoundControl + 0xC, (u8*)p_SoundControl + 0x438, 0x10);
         memcpy((u8*)p_SoundControl + 0x448, (u8*)p_SoundControl + 0x428, 0xC);
@@ -2154,7 +2155,7 @@ int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
         }
 
         if (m_MusicSkipLine != 0) {
-            if ((control->m_activeTrackCount != 0) && ((control->m_flags & 2) == 0)) {
+            if ((control->m_activeTrackCount != 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END) == 0)) {
                 m_MusicSkipLine--;
                 frames = tick[2];
                 RedSleep(1000);
@@ -2167,9 +2168,9 @@ int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
     } while (control->m_activeTrackCount != 0);
 
     control->m_skipFrames = 1;
-    if ((control->m_flags & 2) != 0) {
-        control->m_flags &= ~2;
-        if ((control->m_flags & 1) != 0) {
+    if ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END) != 0) {
+        control->m_flags &= ~REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END;
+        if ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0) {
             control->m_activeTrackCount = 0;
         }
     }
@@ -2286,7 +2287,7 @@ void MusicSkipFunction()
     control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP;
     memset(p_SkipKeyOn, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
     iVar5 = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
-    while ((iVar5 == 0) && ((control->m_flags & 1) != 0)) {
+    while ((iVar5 == 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
         memcpy(&control->m_measure, &control->m_savedMeasure, 0x10);
         memcpy(&control->m_tempo, &control->m_savedTempo, 0xc);

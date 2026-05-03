@@ -1056,13 +1056,14 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     } else {
         iVar5 = PitchCompute(iVar5, local_38[0], ((int*)voiceData[1])[5], trackS8[0x148]);
     }
-    voiceData[0x26] = iVar5;
+    voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] = iVar5;
 
-    if ((((unsigned int)trackData[0x41] & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0) ||
-        ((((trackS8[0x26] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0) &&
-          (((unsigned int)trackData[0x41] & (REDSOUND_TRACK_FLAG_SLUR | REDSOUND_TRACK_FLAG_TENUTO)) == 0)) ||
-         (((trackS8[0x26] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) &&
-          (((unsigned int)trackData[0x41] & REDSOUND_TRACK_FLAG_SLUR) == 0)))) {
+    if ((((unsigned int)trackData[REDSOUND_TRACK_FLAGS_WORD_OFFSET] & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0) ||
+        ((((trackS8[REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0) &&
+          (((unsigned int)trackData[REDSOUND_TRACK_FLAGS_WORD_OFFSET] &
+            (REDSOUND_TRACK_FLAG_SLUR | REDSOUND_TRACK_FLAG_TENUTO)) == 0)) ||
+         (((trackS8[REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) &&
+          (((unsigned int)trackData[REDSOUND_TRACK_FLAGS_WORD_OFFSET] & REDSOUND_TRACK_FLAG_SLUR) == 0)))) {
         if (trackData[0x1d] != 0) {
             ((s16*)voiceData)[10] = trackS16[0x48];
             local_38[0] = 0x100;

@@ -679,8 +679,7 @@ void SePause(int seId, int pause)
  */
 void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume, int mode)
 {
-	RedWaveHeadWD* waveBase = c_RedEntry.SearchWaveBase(musicHead->m_waveNo);
-	if (waveBase == 0) {
+	if (c_RedEntry.SearchWaveBase(musicHead->m_waveNo) == 0) {
 		return;
 	}
 

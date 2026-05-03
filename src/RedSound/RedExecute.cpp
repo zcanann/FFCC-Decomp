@@ -1124,10 +1124,12 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         voiceData[REDSOUND_VOICE_RANDOM_PAN_WORD] = (trackData[0x3a] * random) >> 8;
     }
 
-    if (voiceData[1] == 0) {
+    if (voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] == 0) {
         memset(voiceData + REDSOUND_VOICE_ADSR_TIME_WORD, 0, REDSOUND_TRACK_ADSR_SIZE);
     } else {
-        memcpy(voiceData + REDSOUND_VOICE_ADSR_TIME_WORD, (void*)(voiceData[1] + REDSOUND_WAVE_ADSR_OFFSET), REDSOUND_TRACK_ADSR_SIZE);
+        memcpy(voiceData + REDSOUND_VOICE_ADSR_TIME_WORD,
+               (void*)(voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] + REDSOUND_WAVE_ADSR_OFFSET),
+               REDSOUND_TRACK_ADSR_SIZE);
         if (trackS8[0xdc] != -1) {
             ((u8*)voiceData)[0x58] = trackS8[0xdc];
         }
@@ -1152,9 +1154,10 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         if (trackS16[0x6d] != -1) {
             ((s16*)voiceData)[0x2b] = trackS16[0x6d];
         }
-        if (((unsigned int)voiceData[0x25] & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
+        if (((unsigned int)voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
             u16 random = GetRandomData();
-            ((u16*)voiceData)[0x28] = (u16)(trackData[0x3c] * (random & REDSOUND_RANDOM_BYTE_MASK));
+            ((u16*)voiceData)[REDSOUND_VOICE_ADSR_TIME_HALFWORD] =
+                (u16)(trackData[0x3c] * (random & REDSOUND_RANDOM_BYTE_MASK));
         }
     }
 

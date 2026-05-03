@@ -1082,20 +1082,22 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
             voiceData[REDSOUND_VOICE_PITCH_MOD_PHASE_WORD] = 0;
         }
 
-        if (trackData[0x25] != 0) {
-            ((s16*)voiceData)[0xe] = trackS16[0x58];
+        if (trackData[REDSOUND_TRACK_TREMOLO_FUNC_WORD_OFFSET] != 0) {
+            ((s16*)voiceData)[REDSOUND_VOICE_VOLUME_MOD_DELAY_HALFWORD] =
+                trackS16[REDSOUND_TRACK_TREMOLO_DELAY_HALFWORD];
             local_38[0] = 0x100;
-            if ((trackData[0x26] >> REDSOUND_FIXED_SHIFT) != 0) {
-                local_38[0] = 0x100 / (trackData[0x26] >> REDSOUND_FIXED_SHIFT);
+            if ((trackData[REDSOUND_TRACK_TREMOLO_RATE_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT) != 0) {
+                local_38[0] =
+                    0x100 / (trackData[REDSOUND_TRACK_TREMOLO_RATE_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT);
             }
-            if (trackS16[0x59] == 0) {
+            if (trackS16[REDSOUND_TRACK_TREMOLO_DELAY_DEPTH_HALFWORD] == 0) {
                 iVar5 = 0;
             } else {
-                iVar5 = trackS16[0x59] * local_38[0] * 4;
+                iVar5 = trackS16[REDSOUND_TRACK_TREMOLO_DELAY_DEPTH_HALFWORD] * local_38[0] * 4;
             }
-            voiceData[0xc] = iVar5;
-            voiceData[0xd] = 0;
-            voiceData[0xb] = 0;
+            voiceData[REDSOUND_VOICE_VOLUME_MOD_FRAMES_WORD] = iVar5;
+            voiceData[REDSOUND_VOICE_VOLUME_MOD_FRAME_WORD] = 0;
+            voiceData[REDSOUND_VOICE_VOLUME_MOD_PHASE_WORD] = 0;
         }
     }
 

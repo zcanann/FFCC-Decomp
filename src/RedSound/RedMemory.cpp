@@ -229,15 +229,14 @@ int RedNewA(int size, int offset, int maxSize)
 	}
 
 	if ((bestBlock != 0) && ((u32)(result + size) <= (u32)(rangeStart + maxSize))) {
-		blockPtr = bestBlock;
-		if (blockPtr->m_size > 0) {
-			int moveCount = ((int)(m_AMemoryBank + 0x400) - (int)(blockPtr + 1)) / 8;
+		if (bestBlock->m_size > 0) {
+			int moveCount = ((int)(m_AMemoryBank + 0x400) - (int)(bestBlock + 1)) / 8;
 			if (moveCount > 0) {
-				memmove(blockPtr + 1, blockPtr, moveCount * 8);
+				memmove(bestBlock + 1, bestBlock, moveCount * 8);
 			}
 		}
-		blockPtr->m_address = result;
-		blockPtr->m_size = size;
+		bestBlock->m_address = result;
+		bestBlock->m_size = size;
 		OSRestoreInterrupts(interrupts);
 		return result;
 	}

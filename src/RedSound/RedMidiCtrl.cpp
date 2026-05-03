@@ -80,6 +80,15 @@ RedSwingFunc SwingEntryFunction[] = {
     RandomSwingR, DutySwingR, DutySwingR, DutySwingR,
 };
 
+enum RedMidiSwingConst {
+    REDSOUND_SWING_SINE_MASK = 0x1FF,
+    REDSOUND_SWING_PHASE_SIGN = 0x200,
+    REDSOUND_SWING_PHASE_SHIFT = 8,
+    REDSOUND_SWING_PHASE_MASK = 0xFF,
+    REDSOUND_SWING_QUADRANT_MASK = 3,
+    REDSOUND_SWING_LEVEL_FULL = 0x10000,
+};
+
 RedMidiControlFunc p_MidiControl_Function[] = {
     __MidiCtrl_Stop,             __MidiCtrl_Sleep,           __MidiCtrl_WholeLoopStart,
     __MidiCtrl_WholeLoopEnd,     __MidiCtrl_LoopStart,       __MidiCtrl_LoopEnd,
@@ -266,10 +275,10 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
  */
 int SineSwing(int phase)
 {
-    int value = phase & 0x1FF;
+    int value = phase & REDSOUND_SWING_SINE_MASK;
     value = m_SignDataTable[value];
 
-    if (((u32)phase & 0x200) != 0) {
+    if (((u32)phase & REDSOUND_SWING_PHASE_SIGN) != 0) {
         value = -value;
     }
     return value;
@@ -286,17 +295,17 @@ int SineSwing(int phase)
  */
 int TriangleSwing(int phase)
 {
-    int result = (phase & 0xFF) << 8;
+    int result = (phase & REDSOUND_SWING_PHASE_MASK) << REDSOUND_SWING_PHASE_SHIFT;
 
-    switch (((u32)phase >> 8) & 3) {
+    switch (((u32)phase >> REDSOUND_SWING_PHASE_SHIFT) & REDSOUND_SWING_QUADRANT_MASK) {
     case 3:
-        result -= 0x10000;
+        result -= REDSOUND_SWING_LEVEL_FULL;
         break;
     case 2:
         result = -result;
         break;
     case 1:
-        result = 0x10000 - result;
+        result = REDSOUND_SWING_LEVEL_FULL - result;
         break;
     }
 
@@ -333,10 +342,10 @@ int DutySwing(int phase)
     int value;
     int result;
 
-    if ((phase & 0x200) != 0) {
-        value = -0x10000;
+    if ((phase & REDSOUND_SWING_PHASE_SIGN) != 0) {
+        value = -REDSOUND_SWING_LEVEL_FULL;
     } else {
-        value = 0x10000;
+        value = REDSOUND_SWING_LEVEL_FULL;
     }
     result = value;
     return result;
@@ -353,9 +362,9 @@ int DutySwing(int phase)
  */
 int RandomSwing(int phase)
 {
-    phase >>= 8;
-    phase &= 0xff;
-    int result = (int)t_RandomData[phase] << 8;
+    phase >>= REDSOUND_SWING_PHASE_SHIFT;
+    phase &= REDSOUND_SWING_PHASE_MASK;
+    int result = (int)t_RandomData[phase] << REDSOUND_SWING_PHASE_SHIFT;
 
     return result;
 }
@@ -371,10 +380,10 @@ int RandomSwing(int phase)
  */
 int SineSwingR(int phase)
 {
-    phase ^= 0x200;
-    int value = phase & 0x1FF;
+    phase ^= REDSOUND_SWING_PHASE_SIGN;
+    int value = phase & REDSOUND_SWING_SINE_MASK;
     value = m_SignDataTable[value];
-    if ((phase & 0x200) != 0) {
+    if ((phase & REDSOUND_SWING_PHASE_SIGN) != 0) {
         value = -value;
     }
     return value;
@@ -393,18 +402,18 @@ int TriangleSwingR(int phase)
 {
     int result;
 
-    phase ^= 0x200;
-    result = (phase & 0xFF) << 8;
+    phase ^= REDSOUND_SWING_PHASE_SIGN;
+    result = (phase & REDSOUND_SWING_PHASE_MASK) << REDSOUND_SWING_PHASE_SHIFT;
 
-    switch (((u32)phase >> 8) & 3) {
+    switch (((u32)phase >> REDSOUND_SWING_PHASE_SHIFT) & REDSOUND_SWING_QUADRANT_MASK) {
     case 3:
-        result -= 0x10000;
+        result -= REDSOUND_SWING_LEVEL_FULL;
         break;
     case 2:
         result = -result;
         break;
     case 1:
-        result = 0x10000 - result;
+        result = REDSOUND_SWING_LEVEL_FULL - result;
         break;
     }
 
@@ -425,11 +434,11 @@ int DutySwingR(int phase)
     int value;
     int result;
 
-    phase ^= 0x200;
-    if ((phase & 0x200) != 0) {
-        value = -0x10000;
+    phase ^= REDSOUND_SWING_PHASE_SIGN;
+    if ((phase & REDSOUND_SWING_PHASE_SIGN) != 0) {
+        value = -REDSOUND_SWING_LEVEL_FULL;
     } else {
-        value = 0x10000;
+        value = REDSOUND_SWING_LEVEL_FULL;
     }
 
     result = value;

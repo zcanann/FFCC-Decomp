@@ -877,22 +877,14 @@ void _PitchExecute(RedVoiceDATA* voice)
             pitchDelta = ((pitchLfo & REDSOUND_PAN_BYTE_MASK) + 1) * REDSOUND_PITCH_MOD_DEEP_SCALE;
         }
 
-        pitchDelta = voice->m_track->m_pitchBend + pitchDelta;
-        pitchDelta = voice->m_track->m_keyTranspose + pitchDelta;
-
+        int pitchBend = voice->m_track->m_pitchBend + voice->m_track->m_keyTranspose + pitchDelta;
+        int basePitch;
         if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
-            pitchDelta = PitchCompute(
-                voice->m_basePitch + voice->m_track->m_pitch,
-                pitchDelta,
-                voice->m_waveData->m_pitch,
-                voice->m_track->m_fineTune);
+            basePitch = voice->m_basePitch + voice->m_track->m_pitch;
         } else {
-            pitchDelta = PitchCompute(
-                voice->m_basePitch + p_MusicPitchControl->m_value,
-                pitchDelta,
-                voice->m_waveData->m_pitch,
-                voice->m_track->m_fineTune);
+            basePitch = voice->m_basePitch + p_MusicPitchControl->m_value;
         }
+        pitchDelta = PitchCompute(basePitch, pitchBend, voice->m_waveData->m_pitch, voice->m_track->m_fineTune);
 
         {
             int currentPitch = voice->m_pitch;

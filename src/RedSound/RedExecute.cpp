@@ -257,7 +257,7 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _ReverbNullCallback(AXFX_BUFFERUPDATE* update, void*)
+static void _ReverbNullCallback(AXFX_BUFFERUPDATE* update, void*)
 {
     memset((void*)((u32*)update)[0], 0, REDSOUND_REVERB_AUX_BUFFER_SIZE);
     memset((void*)((u32*)update)[1], 0, REDSOUND_REVERB_AUX_BUFFER_SIZE);
@@ -319,7 +319,7 @@ void InitReverb()
  * JP Address: TODO
  * JP Size: TODO
  */
-void _SetReverbData(RedReverbDATA* reverb, int* params)
+static void _SetReverbData(RedReverbDATA* reverb, int* params)
 {
     int result = 0;
     switch (reverb->kind) {
@@ -396,7 +396,7 @@ void _SetReverbData(RedReverbDATA* reverb, int* params)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _ClearReverb(int bank)
+static void _ClearReverb(int bank)
 {
     RedReverbDATA* reverb = p_ReverbData + (bank & 1);
     if (reverb->callback == 0) {
@@ -632,7 +632,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _VoiceEnvelopeCheck()
+static void _VoiceEnvelopeCheck()
 {
     RedVoiceDATA* voiceData = (RedVoiceDATA*)p_VoiceData;
     do {
@@ -760,7 +760,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _VolumeExecute(RedVoiceDATA* voice, int volume)
+static void _VolumeExecute(RedVoiceDATA* voice, int volume)
 {
     int modVolume;
     int iVar1;
@@ -875,7 +875,7 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _PitchExecute(RedVoiceDATA* voice)
+static void _PitchExecute(RedVoiceDATA* voice)
 {
     int pitchDelta = 0;
     int* voiceData = (int*)voice;
@@ -931,7 +931,7 @@ void _PitchExecute(RedVoiceDATA* voice)
  * Address:	TODO
  * Size:	TODO
  */
-RedWaveDATA* _WaveSplitSelect(RedWaveDATA* wave, RedNoteDATA* note)
+static RedWaveDATA* _WaveSplitSelect(RedWaveDATA* wave, RedNoteDATA* note)
 {
     if ((wave != 0) && ((wave->m_flags & REDSOUND_WAVE_FLAG_SPLIT_TABLE) != 0)) {
         for (;;) {
@@ -978,7 +978,7 @@ RedWaveDATA* _WaveSplitSelect(RedWaveDATA* wave, RedNoteDATA* note)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* param_3, int* param_4)
+static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* param_3, int* param_4)
 {
     int iVar1;
     int iVar5;
@@ -1172,7 +1172,7 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
  * Address:	TODO
  * Size:	TODO
  */
-RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voiceMask)
+static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voiceMask)
 {
     int* voiceData;
 
@@ -1261,7 +1261,7 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _AdsrStart(RedVoiceDATA* voice)
+static void _AdsrStart(RedVoiceDATA* voice)
 {
     u8* adsrData = (u8*)voice + REDSOUND_VOICE_ADSR_TIME_OFFSET;
     int* stage = (int*)((u8*)voice + REDSOUND_VOICE_ADSR_STAGE_OFFSET);
@@ -1313,7 +1313,7 @@ void _AdsrStart(RedVoiceDATA* voice)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _AdsrDataCompute(RedVoiceDATA* voice)
+static void _AdsrDataCompute(RedVoiceDATA* voice)
 {
     u8* adsrData = (u8*)voice + REDSOUND_VOICE_ADSR_TIME_OFFSET;
     int prevValue;
@@ -1358,7 +1358,7 @@ void _AdsrDataCompute(RedVoiceDATA* voice)
  * JP Address: TODO
  * JP Size: TODO
  */
-u32 _AdsrDataExecute(RedVoiceDATA* voice)
+static u32 _AdsrDataExecute(RedVoiceDATA* voice)
 {
     u32 changed = 0;
 
@@ -1393,7 +1393,7 @@ u32 _AdsrDataExecute(RedVoiceDATA* voice)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _VoiceDropedCallback(void* dropped)
+static void _VoiceDropedCallback(void* dropped)
 {
     RedVoiceDATA* voiceData;
     
@@ -1600,7 +1600,7 @@ void EnvelopeKeyExecute()
  * Address:	TODO
  * Size:	TODO
  */
-void _KeyOnControl()
+static void _KeyOnControl()
 {
     u32 local_24 = 0;
     u32 local_28 = 0;
@@ -1761,7 +1761,7 @@ void _KeyOnControl()
  * JP Address: TODO
  * JP Size: TODO
  */
-void _ExecuteExtraData()
+static void _ExecuteExtraData()
 {
     u32* sound = (u32*)p_SoundControlBuffer;
     u32* soundBase;
@@ -1848,7 +1848,7 @@ void _ExecuteExtraData()
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
+static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
 {
     u32 updateFlags = 0;
     int* trackData = (int*)track;
@@ -2013,7 +2013,7 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
+static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
 {
     RedTrackDATA* track = control->m_tracks;
     do {
@@ -2088,7 +2088,7 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
  * JP Address: TODO
  * JP Size: TODO
  */
-int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
+static int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
 {
     int* tick = (int*)((u8*)control + 0xc);
 
@@ -2128,7 +2128,7 @@ int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int
  * JP Address: TODO
  * JP Size: TODO
  */
-void _MusicNoteExecute()
+static void _MusicNoteExecute()
 {
     int i;
     u32 trackCount;
@@ -2175,7 +2175,7 @@ void _MusicNoteExecute()
  * JP Address: TODO
  * JP Size: TODO
  */
-int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
+static int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
 {
     int* tick = (int*)((u8*)control + 0xc);
     do {
@@ -2225,7 +2225,7 @@ int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
  * JP Address: TODO
  * JP Size: TODO
  */
-void _SkipMusicEntry()
+static void _SkipMusicEntry()
 {
     int* src;
     int* dst;
@@ -2360,7 +2360,7 @@ void MusicSkipFunction()
  * JP Address: TODO
  * JP Size: TODO
  */
-void _SeTrackDataExecute(RedTrackDATA* track, int frames)
+static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 {
 	int* trackData = (int*)track;
 	unsigned char* trackBytes = (unsigned char*)trackData;
@@ -2541,7 +2541,7 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
  * JP Address: TODO
  * JP Size: TODO
  */
-int _SeMidiNoteExecute(
+static int _SeMidiNoteExecute(
     RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* trackData, int frames, int tickStep)
 {
     int* track = (int*)trackData;

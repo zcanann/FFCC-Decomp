@@ -962,7 +962,7 @@ int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
 {
 	int freedSize;
 	int waveNo = static_cast<unsigned int>(reinterpret_cast<RedSeSepHEAD*>(bank->m_data)->m_waveNoLo) +
-	             static_cast<unsigned int>(reinterpret_cast<RedSeSepHEAD*>(bank->m_data)->m_waveNoHi) * 0x100;
+	             static_cast<unsigned int>(reinterpret_cast<RedSeSepHEAD*>(bank->m_data)->m_waveNoHi) * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE;
 
 	RedDelete(bank->m_data);
 	SeSepHistoryDelete(bank->m_historyNo);

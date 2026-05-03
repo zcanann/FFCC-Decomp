@@ -1543,7 +1543,7 @@ int CRedDriver::SetMusicData(void* musicData)
     if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
-        memcpy(&localHeader, header, sizeof(localHeader));
+        memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
         headerSize = localHeader.m_size;
         copiedHeader = (void*)RedNew(headerSize);
         if (copiedHeader != 0) {

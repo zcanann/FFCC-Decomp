@@ -801,7 +801,7 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
 
     if (m_SoundPlayMode == 1) {
         pan = REDSOUND_PAN_BYTE_CENTER;
-    } else if ((voiceData[0x25] & 0xc0U) == 0) {
+    } else if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_PAIRED_PAN) == 0) {
         if ((*(u8*)(voiceData[1] + 0x1b) & REDSOUND_PAN_BYTE_SIGN_BIT) == 0) {
             pan = *(int*)voiceData[4] >> 0xc;
         } else {
@@ -816,7 +816,7 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
         }
 
         pan = (pan + *(int*)(*voiceData + 0xcc)) & 0xff;
-    } else if ((voiceData[0x25] & 0x40U) == 0) {
+    } else if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_PAIRED_LEFT) == 0) {
         pan = 0x7f;
     } else {
         pan = 0;
@@ -1169,12 +1169,12 @@ RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voic
         voiceData[1] = (int)_WaveSplitSelect((RedWaveDATA*)((int*)track)[7], note);
         _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
 
-        if (((*(u32*)voiceData[1] & 1) != 0) && ((*(s8*)((u8*)track + 0x26) & 5) == 0)) {
+        if (((*(u32*)voiceData[1] & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) && ((*(s8*)((u8*)track + 0x26) & 5) == 0)) {
             int wave = voiceData[1];
-            voiceData[0x25] |= 0x40;
+            voiceData[0x25] |= REDSOUND_VOICE_SWITCH_PAIRED_LEFT;
             voiceData = (int*)EntryVoiceSearch(track);
             if (voiceData != 0) {
-                voiceData[0x25] |= 0x80;
+                voiceData[0x25] |= REDSOUND_VOICE_SWITCH_PAIRED_RIGHT;
                 voiceData[1] = wave + 0x60;
                 _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
             }

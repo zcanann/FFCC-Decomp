@@ -787,7 +787,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		track->m_fuzzyPitchDepth = 0;
 		track->m_portamentPitch = -1;
 		track->m_note.m_allocFlags = 0;
-		track->m_voiceSwitch = 0xc02;
+		track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO | REDSOUND_VOICE_SWITCH_REVERB_AUX_A;
 		memset(&track->m_adsrAR, 0xff, 0xc);
 
 		count--;

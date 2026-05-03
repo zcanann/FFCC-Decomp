@@ -1016,7 +1016,7 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
     }
 
     local_38[0] = trackS16[0xa1] + trackS16[0x9f];
-    if ((((u8*)voiceData)[0x1a] & 3) == 0) {
+    if ((((u8*)voiceData)[0x1a] & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
         iVar5 = voiceData[0x28] + p_MusicPitchControl->m_value;
     } else {
         iVar5 = voiceData[0x28] + trackData[0x17];
@@ -1419,7 +1419,7 @@ void EnvelopeKeyExecute()
                     voiceData[5] = 0;
                 }
 
-                if ((((u8*)voiceData)[0x1A] & 3) == 0) {
+                if ((((u8*)voiceData)[0x1A] & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
                     int prio = ((int)voiceData - (int)p_VoiceData) / REDSOUND_VOICE_SIZE +
                                (((int)voiceData - (int)p_VoiceData) >> 0x1F);
                     prio = (0x40 - (prio - (prio >> 0x1F)) >> 1) - 1;
@@ -1774,7 +1774,7 @@ void _ExecuteExtraData()
         p_MusicPitchControl->m_value += p_MusicPitchControl->m_step;
         voice = (unsigned int*)p_VoiceData;
         do {
-            if ((((u8*)voice)[0x1A] & 3) == 0) {
+            if ((((u8*)voice)[0x1A] & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
                 voice[0x26] = PitchCompute(
                     voice[0x28] + p_MusicPitchControl->m_value,
                     (int)((RedTrackDATA*)*voice)->m_keyTranspose + (int)((RedTrackDATA*)*voice)->m_pitchBend,

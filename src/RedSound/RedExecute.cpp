@@ -1138,7 +1138,7 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
         trackData[0x41] = (int)((unsigned int)trackData[0x41] | REDSOUND_TRACK_FLAG_SLUR_RELEASE);
         *voiceMask |= 1u << voiceData[0x2a];
     }
-    voiceData[0x2e] |= 3;
+    voiceData[0x2e] |= REDSOUND_VOICE_UPDATE_ALL;
 }
 
 /*
@@ -1450,7 +1450,7 @@ void EnvelopeKeyExecute()
             }
 
             if ((voiceData[0x24] & REDSOUND_VOICE_FLAGS_ADPCM_DIRTY) != 0) {
-                if ((voiceData[0x25] & 8U) == 0) {
+                if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_PAUSE) == 0) {
                     memcpy((void*)(voice + 0x14A), voiceData + 0x1A, 0x24);
                 } else {
                     memset((void*)(voice + 0x14A), 0, 0x24);
@@ -1701,7 +1701,7 @@ void _KeyOnControl()
         do {
             if ((local_28 & bit) != 0) {
                 local_28 &= ~bit;
-                voice[0x24] |= 1;
+                voice[0x24] |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
             voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
@@ -1714,7 +1714,7 @@ void _KeyOnControl()
         do {
             if ((local_24 & bit) != 0) {
                 local_24 &= ~bit;
-                voice[0x24] |= 1;
+                voice[0x24] |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
             voice += REDSOUND_VOICE_SIZE / sizeof(*voice);

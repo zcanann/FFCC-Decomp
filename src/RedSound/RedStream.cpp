@@ -31,6 +31,7 @@ enum RedStreamLayoutSize {
 	REDSOUND_STREAM_BASE_PITCH = 0x3c00000,
 	REDSOUND_STREAM_ARAM_HIGH_THRESHOLD = 0x800000,
 	REDSOUND_STREAM_ARAM_HIGH_OFFSET = 0x300000,
+	REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE = 2,
 	REDSOUND_STREAM_ERASE_TRACK = 0xff,
 	REDSOUND_STREAM_STEREO_CHANNEL_COUNT = 2,
 	REDSOUND_STREAM_BUFFER_SIDE_A = 0,
@@ -585,7 +586,9 @@ void StreamControl()
 					_StreamStop(streamData);
 				} else {
 					int samplePos = voiceData->m_axVoice->pb.addr.currentAddressHi;
-					int sampleStart = (streamData->m_aramBuffer + streamData->m_streamCursorBase) * 2;
+					int sampleStart =
+					    (streamData->m_aramBuffer + streamData->m_streamCursorBase) *
+					    REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE;
 					samplePos <<= 16;
 					samplePos |= voiceData->m_axVoice->pb.addr.currentAddressLo;
 					if ((samplePos >= sampleStart) && (samplePos < sampleStart + REDSOUND_STREAM_STEREO_PLANE_SIZE)) {

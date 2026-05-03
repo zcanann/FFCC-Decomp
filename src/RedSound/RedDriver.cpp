@@ -277,11 +277,11 @@ void _SetReverbDepth(int* command)
         if (fadeStep == 0) {
             fadeStep++;
         }
-        reverbDepth |= 0x800;
+        reverbDepth |= REDSOUND_FIXED_HALF;
         seInfo = (int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
         do {
             if ((u32)*seInfo != 0) {
-                fadeDepth = seInfo[0x1a] & 0xfffff000U;
+                fadeDepth = seInfo[0x1a] & REDSOUND_FIXED_WHOLE_MASK;
                 fadeDepth = reverbDepth - fadeDepth;
                 seInfo[0x1b] = fadeDepth / fadeStep;
                 seInfo[0x1c] = fadeStep;

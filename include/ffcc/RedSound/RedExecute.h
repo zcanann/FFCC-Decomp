@@ -15,6 +15,15 @@ struct RedReverbDATA {
 	int kind;
 };
 
+enum RedReverbKind {
+	REDSOUND_REVERB_KIND_NONE = 0,
+	REDSOUND_REVERB_KIND_STD = 1,
+	REDSOUND_REVERB_KIND_HI = 2,
+	REDSOUND_REVERB_KIND_DELAY = 3,
+	REDSOUND_REVERB_KIND_CHORUS = 4,
+	REDSOUND_REVERB_KIND_HI_DPL2 = 5,
+};
+
 struct RedReverbSize {
 	u32 m_requested;
 	u32 m_aligned;

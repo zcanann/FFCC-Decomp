@@ -2274,19 +2274,20 @@ void _PitchBendCompute(RedTrackDATA* track, int bend)
     unsigned int* voiceData = (unsigned int*)p_VoiceData;
 
     do {
-        if (voiceData[0] == (unsigned int)track) {
-            if (voiceData[1] != 0) {
+        if (voiceData[REDSOUND_VOICE_TRACK_WORD] == (unsigned int)track) {
+            if (voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] != 0) {
                 int pitch;
                 int computedPitch;
-                if ((((unsigned char*)voiceData)[0x1a] & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
-                    pitch = voiceData[0x28] + ((int*)track)[0x17];
+                if ((((unsigned char*)voiceData)[REDSOUND_VOICE_STATE_FLAGS_OFFSET] & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
+                    pitch = voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] + track->m_pitch;
                 } else {
-                    pitch = voiceData[0x28] + p_MusicPitchControl->m_value;
+                    pitch = voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] + p_MusicPitchControl->m_value;
                 }
                 computedPitch = pitch;
-                voiceData[0x26] =
-                    PitchCompute(computedPitch, track->m_keyTranspose + bend, ((int*)voiceData[1])[5], track->m_fineTune);
-                voiceData[0x2e] |= REDSOUND_VOICE_UPDATE_PITCH;
+                voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] = PitchCompute(
+                    computedPitch, track->m_keyTranspose + bend, ((int*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])[5],
+                    track->m_fineTune);
+                voiceData[REDSOUND_VOICE_UPDATE_FLAGS_WORD] |= REDSOUND_VOICE_UPDATE_PITCH;
             }
         }
         voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);

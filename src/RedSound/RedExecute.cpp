@@ -2093,16 +2093,16 @@ void _MusicNoteExecute()
     u32 trackCount;
     u32* soundControl;
     u32* track;
-    int status = _MusicMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData, 1);
+    int status = _MusicMidiNoteExecute(p_SoundControl, (RedKeyOnDATA*)p_KeyOnData, 1);
 
-    while ((status == 0) && (m_MusicPhraseStop == 0) && ((((u32*)p_SoundControl)[0x11B] & 1) != 0)) {
+    while ((status == 0) && (m_MusicPhraseStop == 0) && ((p_SoundControl->m_flags & 1) != 0)) {
         *(s16*)((u8*)p_SoundControl + 0x48E) = *(int*)((u8*)p_SoundControl + 0x434);
         memcpy((u8*)p_SoundControl + 0xC, (u8*)p_SoundControl + 0x438, 0x10);
         memcpy((u8*)p_SoundControl + 0x448, (u8*)p_SoundControl + 0x428, 0xC);
 
         soundControl = (u32*)p_SoundControl;
         track = (u32*)*soundControl;
-        trackCount = (u8)*((u8*)p_SoundControl + 0x491);
+        trackCount = p_SoundControl->m_trackCount;
         i = 0;
         do {
             track[0] = soundControl[i + 0xA];
@@ -2113,12 +2113,12 @@ void _MusicNoteExecute()
             i++;
         } while (--trackCount != 0);
 
-        status = _MusicMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData, 1);
+        status = _MusicMidiNoteExecute(p_SoundControl, (RedKeyOnDATA*)p_KeyOnData, 1);
     }
 
-    if ((*(int*)((u8*)p_SoundControlBuffer + 0x470) < 0) &&
-        (*(int*)((u8*)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_OFFSET + 0x470) < 0) &&
-        (*(int*)((u8*)p_SoundControlBuffer + REDSOUND_CONTROL_SKIP_OFFSET + 0x470) < 0)) {
+    if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId < 0) &&
+        (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId < 0) &&
+        (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId < 0)) {
         m_MusicPhraseStop = 0;
     }
 }

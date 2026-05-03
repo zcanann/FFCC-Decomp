@@ -909,15 +909,15 @@ void _PitchExecute(RedVoiceDATA* voice)
  */
 RedWaveDATA* _WaveSplitSelect(RedWaveDATA* wave, RedNoteDATA* note)
 {
-    if ((wave != 0) && ((wave->m_flags & 0x30000) != 0)) {
+    if ((wave != 0) && ((wave->m_flags & REDSOUND_WAVE_FLAG_SPLIT_TABLE) != 0)) {
         for (;;) {
-            if ((wave->m_flags & 0x200) != 0) {
+            if ((wave->m_flags & REDSOUND_WAVE_FLAG_SPLIT_END) != 0) {
                 break;
             }
             if (note->m_key <= wave->m_splitKey) {
                 break;
             }
-            if ((wave->m_flags & 1) != 0) {
+            if ((wave->m_flags & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) {
                 wave++;
             }
             wave++;
@@ -925,14 +925,14 @@ RedWaveDATA* _WaveSplitSelect(RedWaveDATA* wave, RedNoteDATA* note)
 
         int splitKey = wave->m_splitKey;
         for (;;) {
-            if ((wave->m_flags & 0x200) != 0) {
+            if ((wave->m_flags & REDSOUND_WAVE_FLAG_SPLIT_END) != 0) {
                 break;
             }
             if (note->m_velocity <= wave->m_splitVelocity) {
                 break;
             }
             if (splitKey == wave->m_splitKey) {
-                if ((wave->m_flags & 1) != 0) {
+                if ((wave->m_flags & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) {
                     wave++;
                 }
                 wave++;
@@ -972,7 +972,7 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
     if ((trackData[0x46] == 0) || (trackData[0x48] < 0)) {
         trackData[0x48] = note << 0x14;
         if (voiceData[1] != 0) {
-            if ((((unsigned int*)voiceData[1])[0] & 0x20000) == 0) {
+            if ((((unsigned int*)voiceData[1])[0] & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) == 0) {
                 voiceData[0x28] = note << 0x14;
                 if (param_1->m_keySignatureData != 0) {
                     iVar5 = voiceData[0x28] >> 0x14;

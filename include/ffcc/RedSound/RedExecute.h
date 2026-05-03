@@ -46,6 +46,13 @@ struct RedWaveDATA {
 	unsigned char m_pad5C[0x60 - 0x5C];
 };
 
+enum RedWaveFlag {
+	REDSOUND_WAVE_FLAG_PAIRED_ENTRY = 1,
+	REDSOUND_WAVE_FLAG_SPLIT_END = 0x200,
+	REDSOUND_WAVE_FLAG_SPLIT_TABLE = 0x30000,
+	REDSOUND_WAVE_FLAG_USE_WAVE_KEY = 0x20000,
+};
+
 struct RedVoiceDATA {
 	RedTrackDATA* m_track;
 	RedWaveDATA* m_waveData;

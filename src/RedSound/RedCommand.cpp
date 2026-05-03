@@ -766,7 +766,7 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 	p_ReverbDepth[0].m_count = 0;
 	music->m_waveNo = musicHead->m_waveNo;
 
-	unsigned char* current = (unsigned char*)musicHead + 0x20;
+	unsigned char* current = (unsigned char*)musicHead + REDSOUND_MUSIC_HEADER_SIZE;
 	RedTrackDATA* track = music->m_tracks;
 	int count = musicHead->m_trackCount;
 	char trackNo = 0;
@@ -779,7 +779,8 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 		current = current + 4 + blockSize;
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)track) + 1;
 		track->m_seSepId = 0;
-		track->m_keySignatureData = (m_MusicKeySignature == 0) ? 0 : t_KeySignatureData + 0xb;
+		track->m_keySignatureData =
+		    (m_MusicKeySignature == 0) ? 0 : t_KeySignatureData + REDSOUND_KEY_SIGNATURE_DEFAULT_OFFSET;
 		track->m_mixVolume = REDSOUND_VOLUME_DEFAULT;
 		track->m_mixVolumeDelta = 0;
 		track->m_volume = REDSOUND_VOLUME_FULL;
@@ -831,7 +832,7 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 	music->m_skipFrames = 1;
 	music->m_channelAlloc = 0;
 	music->m_keySignature = 0;
-	music->m_keySignatureData = t_KeySignatureData + 0xb;
+	music->m_keySignatureData = t_KeySignatureData + REDSOUND_KEY_SIGNATURE_DEFAULT_OFFSET;
 	music->m_trackCount = musicHead->m_trackCount;
 	music->m_activeTrackCount = (short)musicHead->m_trackCount;
 	music->m_volumeScale = (unsigned char)(musicHead->m_flags & REDSOUND_MUSIC_HEADER_VOLUME_SCALE_MASK);

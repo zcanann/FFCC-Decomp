@@ -358,14 +358,14 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	seq = info->m_sequence;
 	attrMask = info->m_attrMask;
 	count = info->m_flagsAndCount & REDSOUND_SE_INFO_COUNT_MASK;
-	current = seq + count * 2;
+	current = seq + count * REDSOUND_SE_INFO_SEQUENCE_ENTRY_SIZE;
 	do {
 		remaining = count;
 		if (sepId != REDSOUND_SEP_DIRECT_PLAY_ID) {
 			remaining = 0;
 			do {
 				remaining = remaining + 1;
-				if ((seq[remaining * 2 + 1] & REDSOUND_SE_INFO_SEQUENCE_CONTINUE_FLAG) == 0) {
+				if ((seq[remaining * REDSOUND_SE_INFO_SEQUENCE_ENTRY_SIZE + 1] & REDSOUND_SE_INFO_SEQUENCE_CONTINUE_FLAG) == 0) {
 					break;
 				}
 			} while ((int)remaining < (int)count);
@@ -457,7 +457,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			}
 
 			remaining = remaining - 1;
-			seq = seq + 2;
+			seq = seq + REDSOUND_SE_INFO_SEQUENCE_ENTRY_SIZE;
 			count = count - 1;
 			if (remaining == 0) {
 				break;
@@ -498,7 +498,7 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 		if (seNo < bankData->m_seCount) {
 			int* entries = reinterpret_cast<int*>(bankData->m_entries);
 
-			if (entries[seNo] != -1) {
+			if (entries[seNo] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
 				RedSeINFO* seInfo =
 				    (RedSeINFO*)((int)(entries + bankData->m_seCount) + ((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK));
 

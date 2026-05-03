@@ -412,25 +412,25 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			OSReport(sRedStreamBufferDidntSecureFmt, sRedStreamLogPrefix, sRedStreamLogErrorColor, sRedStreamLogReset);
 			fflush(__files + 1);
 		}
-		if (streamData->m_buffer != 0) {
-			RedDelete(streamData->m_buffer);
-		} else {
+		if (streamData->m_buffer == 0) {
 			if (m_ReportPrint != 0) {
 				OSReport(sRedStreamMainMemoryDidntCreateFmt,
 				         sRedStreamLogPrefix, sRedStreamLogWarnColor, REDSOUND_STREAM_TRANSFER_BUFFER_SIZE,
 				         sRedStreamLogReset);
 				fflush(__files + 1);
 			}
-		}
-		if (streamData->m_aramBuffer != 0) {
-			RedDeleteA(streamData->m_aramBuffer);
 		} else {
+			RedDelete(streamData->m_buffer);
+		}
+		if (streamData->m_aramBuffer == 0) {
 			if (m_ReportPrint != 0) {
 				OSReport(sRedStreamAramMemoryDidntCreateFmt,
 				         sRedStreamLogPrefix, sRedStreamLogWarnColor, streamData->m_header.m_channelCount << 0xd,
 				         sRedStreamLogReset);
 				fflush(__files + 1);
 			}
+		} else {
+			RedDeleteA(streamData->m_aramBuffer);
 		}
 	}
 	}

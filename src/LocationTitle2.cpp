@@ -235,27 +235,23 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     }
 
     if (work->m_particles == 0) {
+        CGObject* owner;
+        CCharaPcs::CHandle* handle;
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
             0x70);
         memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
         LocationTitle2Particle* particles = (LocationTitle2Particle*)work->m_particles;
+        CChara::CModel* model;
 
-        CChara::CModel* model = 0;
-        {
-            CGObject* owner = ((pppMngStLocationTitle2Raw*)pppMngStPtr)->m_charaObj;
-            CCharaPcs::CHandle* handle = 0;
-            CCharaPcs::CHandle* ownerHandle = owner->m_charaModelHandle;
-            if (ownerHandle != 0) {
-                handle = ownerHandle;
-            }
-
-            {
-                CChara::CModel* handleModel = handle->m_model;
-                if (handleModel != 0) {
-                    model = handleModel;
-                }
-            }
+        owner = (CGObject*)pppMngStPtr->m_owner;
+        handle = 0;
+        if (owner->m_charaModelHandle != 0) {
+            handle = owner->m_charaModelHandle;
+        }
+        model = 0;
+        if (handle != 0) {
+            model = handle->m_model;
         }
 
         LocationTitle2ModelRaw* modelRaw = (LocationTitle2ModelRaw*)model;

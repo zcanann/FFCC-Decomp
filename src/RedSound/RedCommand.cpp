@@ -21,6 +21,9 @@ static const char sRedCommandMusicPauseOffFmt[] = "%sPause : Music  : OFF %d\n";
 
 enum RedCommandEraseTrack {
 	REDSOUND_ERASE_TRACK_SENTINEL = 0x100,
+	REDSOUND_SEP_DIRECT_PLAY_ID = 1000000,
+	REDSOUND_TRACK_PLAY_TIME_SENTINEL = -1,
+	REDSOUND_SE_DEFAULT_PITCH_BEND_RANGE = 2,
 };
 
 RedReverbModeData t_ReverbModeData[] = {
@@ -333,7 +336,8 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	int isMulti;
 
 	((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_updateFlags = 0;
-	deltaTime = (unsigned int)info->m_waveNoHi * 0x100 + (unsigned int)info->m_waveNoLo;
+	deltaTime = (unsigned int)info->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE +
+	            (unsigned int)info->m_waveNoLo;
 	waveBase = c_RedEntry.SearchWaveBase(deltaTime);
 	if (waveBase != 0) {
 		c_RedEntry.WaveHistoryManager(1, waveBase->m_waveNo);
@@ -357,7 +361,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	current = seq + count * 2;
 	do {
 		remaining = count;
-		if (sepId != 1000000) {
+		if (sepId != REDSOUND_SEP_DIRECT_PLAY_ID) {
 			remaining = 0;
 			do {
 				remaining = remaining + 1;
@@ -378,7 +382,8 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			track->m_waveBankData = (int)waveBase;
 			track->m_command = current;
 			current = current +
-			          (((unsigned int)seq[1] * 0x100 + (unsigned int)*seq) & REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK);
+			          (((unsigned int)seq[1] * REDSOUND_SE_INFO_U16_HIGH_SCALE + (unsigned int)*seq) &
+			           REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK);
 			deltaTime = (int)DeltaTimeSumup((unsigned char**)track);
 			track->m_deltaTime = deltaTime + 1;
 			if (m_SeSkipStep != 0) {
@@ -389,7 +394,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 			track->m_seId = seId;
 			track->m_loopStepCurrent = 0;
 			if (m_SeSkipStep == 0) {
-				state = 0xffffffff;
+				state = REDSOUND_TRACK_PLAY_TIME_SENTINEL;
 			} else {
 				state = 0;
 			}
@@ -417,7 +422,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				track->m_portamentTime = 0;
 				track->m_loopDepth = 0;
 				track->m_keyTranspose = 0;
-				track->m_pitchBendRange = 2;
+				track->m_pitchBendRange = REDSOUND_SE_DEFAULT_PITCH_BEND_RANGE;
 				track->m_pitchBend = 0;
 				track->m_pitchBendRaw = 0;
 				track->m_fineTune = 0;
@@ -528,7 +533,7 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 	sepBank = c_RedEntry.SearchSeSepBank(sepId);
 	if (sepBank != 0) {
 		sepHead = reinterpret_cast<RedSeSepHEAD*>(sepBank->m_data);
-		sepInfo = reinterpret_cast<RedSeINFO*>((int)sepHead + 0x10);
+		sepInfo = reinterpret_cast<RedSeINFO*>((int)sepHead + REDSOUND_SESEP_HEADER_SIZE);
 		if ((sepHead->m_sizeAndFlags & REDSOUND_SESEP_FLAGS_MASK) != 0) {
 			sepInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
 		}

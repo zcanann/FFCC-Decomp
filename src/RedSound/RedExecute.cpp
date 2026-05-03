@@ -998,9 +998,9 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
     voiceData[4] = (int)((u8*)param_1 + 0x40);
 
     if (voiceData[1] == 0) {
-        memset(voiceData + 0x14, 0, 0xc);
+        memset(voiceData + 0x14, 0, REDSOUND_TRACK_ADSR_SIZE);
     } else {
-        memcpy(voiceData + 0x14, (void*)(trackData[7] + 0x50), 0xc);
+        memcpy(voiceData + 0x14, (void*)(trackData[7] + 0x50), REDSOUND_TRACK_ADSR_SIZE);
     }
 
     voiceData[0x25] = trackData[0x3f];
@@ -1095,9 +1095,9 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
     }
 
     if (voiceData[1] == 0) {
-        memset(voiceData + 0x14, 0, 0xc);
+        memset(voiceData + 0x14, 0, REDSOUND_TRACK_ADSR_SIZE);
     } else {
-        memcpy(voiceData + 0x14, (void*)(voiceData[1] + 0x50), 0xc);
+        memcpy(voiceData + 0x14, (void*)(voiceData[1] + 0x50), REDSOUND_TRACK_ADSR_SIZE);
         if (trackS8[0xdc] != -1) {
             ((u8*)voiceData)[0x58] = trackS8[0xdc];
         }

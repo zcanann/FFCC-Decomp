@@ -1040,7 +1040,7 @@ void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
         waveTable = track->m_waveBankData + 0x20;
         track->m_waveData = track->m_waveBankData + *(int*)(waveTable + waveNo * 4);
         track->m_waveBase = *(int*)(track->m_waveBankData + 0x10);
-        memset(&track->m_adsrAR, 0xffffffff, 0xc);
+        memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
     }
     track->m_waveBankNo = 0x10;
     track->m_waveNo = waveNo;
@@ -1073,7 +1073,7 @@ void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 		waveTable = (int*)((int)waveBankData + 0x20);
 		track->m_waveData = (int)waveBankData + waveTable[waveNo];
 		track->m_waveBase = waveBankData->m_aramAddress;
-		memset(&track->m_adsrAR, 0xffffffff, 0xc);
+		memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
 	}
 	track->m_waveBankNo = bankNo;
 	track->m_waveNo = waveNo;
@@ -1357,14 +1357,14 @@ void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 {
     RedVoiceDATA* voice;
 
-    *(int*)&track->m_adsrAR = -1;
-    *(int*)&track->m_adsrSR = -1;
-    memset(&track->m_adsrAR, 0xffffffff, 0xc);
+    *(int*)&track->m_adsrAR = REDSOUND_TRACK_ADSR_DEFAULT_WORD;
+    *(int*)&track->m_adsrSR = REDSOUND_TRACK_ADSR_DEFAULT_WORD;
+    memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
 
     voice = p_VoiceData;
     do {
         if (((unsigned int)voice->m_track == (unsigned int)track) && ((unsigned int)voice->m_waveData != 0)) {
-            memcpy(voice->m_adsrTime, voice->m_waveData->m_adsr, 0xc);
+            memcpy(voice->m_adsrTime, voice->m_waveData->m_adsr, REDSOUND_TRACK_ADSR_SIZE);
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;

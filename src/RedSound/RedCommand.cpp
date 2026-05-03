@@ -19,6 +19,10 @@ static const char sRedCommandMusicNeedMemoryFmt[] = "%s%s            : music%3.3
 static const char sRedCommandMusicPauseOnFmt[] = "%sPause : Music  : ON  %d\n";
 static const char sRedCommandMusicPauseOffFmt[] = "%sPause : Music  : OFF %d\n";
 
+enum RedCommandEraseTrack {
+	REDSOUND_ERASE_TRACK_SENTINEL = 0x100,
+};
+
 RedReverbModeData t_ReverbModeData[] = {
     {0x2, {0xA, 0x578, 0x1E, 0x46, 0x64, 0x0}},
     {0x2, {0x14, 0x708, 0x1E, 0x50, 0x64, 0x0}},
@@ -83,7 +87,7 @@ void _EraseAttribute(int eraseTrack, int attrMask)
  */
 int _EraseTime(int eraseTrack)
 {
-	int minTrack = 0x100;
+	int minTrack = REDSOUND_ERASE_TRACK_SENTINEL;
 	RedTrackDATA** trackBasePtr = &((RedSoundCONTROL*)p_SoundControlBuffer)[REDSOUND_CONTROL_SE].m_tracks;
 	RedTrackDATA* track = *trackBasePtr;
 
@@ -420,7 +424,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 				track->m_fuzzyPitchDepth = 0;
 				track->m_portamentPitch = -1;
 				track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO;
-				memset(&track->m_adsrAR, 0xff, 0xc);
+				memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_BYTE, REDSOUND_TRACK_ADSR_SIZE);
 				track->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_DIRECT_MASK;
 				track->m_seTickCounter = 1;
 				seTrack->m_track = track;
@@ -789,7 +793,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		track->m_portamentPitch = -1;
 		track->m_note.m_allocFlags = 0;
 		track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO | REDSOUND_VOICE_SWITCH_REVERB_AUX_A;
-		memset(&track->m_adsrAR, 0xff, 0xc);
+		memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_BYTE, REDSOUND_TRACK_ADSR_SIZE);
 
 		count--;
 		trackNo++;

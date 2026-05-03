@@ -2147,10 +2147,10 @@ static void _MusicNoteExecute()
         trackCount = p_SoundControl->m_trackCount;
         i = 0;
         do {
-            track[0] = soundControl[i + 0xA];
-            track[0x42] = soundControl[i + 0x4A];
-            ((RedTrackDATA*)track)->m_flags = soundControl[i + 0x8A];
-            track[9] = soundControl[i + 0xCA];
+            track[0] = soundControl[i + REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET];
+            track[0x42] = soundControl[i + REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET];
+            ((RedTrackDATA*)track)->m_flags = soundControl[i + REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET];
+            track[9] = soundControl[i + REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET];
             track += REDSOUND_TRACK_SIZE / sizeof(*track);
             i++;
         } while (--trackCount != 0);

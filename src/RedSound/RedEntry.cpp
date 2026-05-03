@@ -1570,7 +1570,7 @@ void CRedEntry::DisplayMMemoryInfo()
 	int freeSize;
 	RedMemoryBlock* memoryBank;
 	RedMemoryBlock* bankEntry;
-	unsigned int history;
+	RedHistoryBANK* history;
 	int* seBlockBase;
 
 	if (m_ReportPrint == 0) {
@@ -1603,17 +1603,17 @@ void CRedEntry::DisplayMMemoryInfo()
 				freeSize = bankEntry[1].m_address - (bankEntry->m_address + bankEntry->m_size);
 			}
 
-			history = (unsigned int)m_musicBankBase;
+			history = reinterpret_cast<RedHistoryBANK*>(m_musicBankBase);
 			do {
-				if ((*(int*)(history + 0xC) != 0) && (*(int*)(history + 8) == bankEntry->m_address)) {
+				if ((history->m_size != 0) && (history->m_data == bankEntry->m_address)) {
 					OSReport(s__s_MUSIC_3_3d___0x_8_8X___0x_8_8_801e7d24, sRedEntryLogPrefix,
 					         (int)*(short*)(bankEntry->m_address + 4), bankEntry->m_address, bankEntry->m_size, freeSize);
 					fflush(__files + 1);
 					matched = 1;
 					break;
 				}
-				history += 0x10;
-			} while (history < (unsigned int)m_musicBankBase + REDSOUND_MUSIC_BANK_SIZE);
+				history += 1;
+			} while (history < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + REDSOUND_MUSIC_BANK_SIZE));
 
 			if (matched == 0) {
 				i = 0;
@@ -1626,35 +1626,35 @@ void CRedEntry::DisplayMMemoryInfo()
 						break;
 					}
 					i++;
-				} while (i < 4);
+				} while (i < REDSOUND_SE_BLOCK_BANK_COUNT);
 			}
 
 			if (matched == 0) {
-				history = (unsigned int)m_waveBankBase;
+				history = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase);
 				do {
-					if ((*(int*)(history + 0xC) != 0) && (*(int*)(history + 8) == bankEntry->m_address)) {
+					if ((history->m_size != 0) && (history->m_data == bankEntry->m_address)) {
 						OSReport(s__s_WAVE_4_4d___0x_8_8X___0x_8_8X_801e7d7c, sRedEntryLogPrefix,
 						         (int)*(short*)(bankEntry->m_address + 2), bankEntry->m_address, bankEntry->m_size, freeSize);
 						fflush(__files + 1);
 						matched = 1;
 						break;
 					}
-					history += 0x10;
-				} while (history < (unsigned int)m_waveBankBase + REDSOUND_WAVE_BANK_SIZE);
+					history += 1;
+				} while (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE));
 			}
 
 			if (matched == 0) {
-				history = (unsigned int)m_seSepBankBase;
+				history = reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase);
 				do {
-					if ((*(int*)(history + 0xC) != 0) && (*(int*)(history + 8) == bankEntry->m_address)) {
+					if ((history->m_size != 0) && (history->m_data == bankEntry->m_address)) {
 						OSReport(s__s_SE_6_6d___0x_8_8X___0x_8_8X___801e7da8, sRedEntryLogPrefix,
 						         *(int*)(bankEntry->m_address + 8), bankEntry->m_address, bankEntry->m_size, freeSize);
 						fflush(__files + 1);
 						matched = 1;
 						break;
 					}
-					history += 0x10;
-				} while (history < (unsigned int)m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE);
+					history += 1;
+				} while (history < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE));
 			}
 
 			if (matched == 0) {

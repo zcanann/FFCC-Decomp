@@ -346,7 +346,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		streamData->m_fileData = (u8*)streamHeader;
 		streamData->m_fileSize = fileSize;
 		if (volume != 0) {
-			volume = ((volume + 1) * 0x100 - 1) * 0x1000;
+			volume = ((volume + 1) * REDSOUND_VOLUME_BYTE_SCALE - 1) * REDSOUND_FIXED_ONE;
 		}
 		streamData->m_volume = volume;
 		streamData->m_volumeStepCount = 0;
@@ -372,14 +372,15 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 					streamData->m_pan = 0;
 					streamData->m_panStepCount = 0;
 				} else {
-					streamData->m_pan = 0x7f000;
+					streamData->m_pan = REDSOUND_VOLUME_DEFAULT;
 					streamData->m_panStepCount = 0;
 				}
 			} else {
-				streamData->m_pan = pan << 0xc;
+				streamData->m_pan = pan << REDSOUND_FIXED_SHIFT;
 				streamData->m_panStepCount = 0;
 			}
-			SetVoiceVolumeMix(streamData->m_voiceData + iVar2, streamData->m_pan >> 0xc, streamData->m_volume >> 0xc);
+			SetVoiceVolumeMix(streamData->m_voiceData + iVar2, streamData->m_pan >> REDSOUND_FIXED_SHIFT,
+			                  streamData->m_volume >> REDSOUND_FIXED_SHIFT);
 			(streamData->m_track + iVar2)->m_waveBase = streamData->m_aramBuffer + iVar2 * REDSOUND_STREAM_STEREO_PLANE_SIZE;
 			memset(&streamData->m_trackData[iVar2], 0, sizeof(RedWaveDATA));
 			memcpy(streamData->m_trackData[iVar2].m_adpcmData, headerData + iVar2 * REDSOUND_STREAM_ADPCM_HEADER_SIZE, REDSOUND_STREAM_ADPCM_HEADER_SIZE);
@@ -452,13 +453,13 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 		frameCount /= 60;
 	}
 
-	volume &= 0x7f;
+	volume &= REDSOUND_VOLUME_MAX;
 	if (volume != 0) {
 		volume++;
 		volume <<= 8;
 		volume--;
-		volume <<= 12;
-		volume |= 0x800;
+		volume <<= REDSOUND_FIXED_SHIFT;
+		volume |= REDSOUND_FIXED_HALF;
 	}
 
 	streamData = p_Stream;
@@ -517,14 +518,14 @@ void StreamPause(int streamID, int pause)
 			} else if (voiceData->m_axVoice != 0) {
 				unsigned int pitch = PitchCompute(0x3c00000, 0, streamData->m_header.m_pitch, 0);
 				short channelCount = streamData->m_header.m_channelCount;
-				volume = streamData->m_volume >> 0xc;
+				volume = streamData->m_volume >> REDSOUND_FIXED_SHIFT;
 				if (channelCount == 2) {
 					voiceData->m_targetPitch = pitch;
 					voiceData->m_flags |= 0x10;
 					voiceData[1].m_targetPitch = pitch;
 					voiceData[1].m_flags |= 0x10;
 				} else {
-					pan = streamData->m_pan >> 0xc;
+					pan = streamData->m_pan >> REDSOUND_FIXED_SHIFT;
 					voiceData->m_targetPitch = pitch;
 					voiceData->m_flags |= 0x10;
 				}
@@ -605,11 +606,12 @@ void StreamControl()
 					}
 					if (changed != 0) {
 						if (streamData->m_header.m_channelCount == 2) {
-							SetVoiceVolumeMix(voiceData, 0, streamData->m_volume >> 0xc);
+							SetVoiceVolumeMix(voiceData, 0, streamData->m_volume >> REDSOUND_FIXED_SHIFT);
 							voiceData += 1;
-							SetVoiceVolumeMix(voiceData, 0x7f, streamData->m_volume >> 0xc);
+							SetVoiceVolumeMix(voiceData, REDSOUND_VOLUME_MAX, streamData->m_volume >> REDSOUND_FIXED_SHIFT);
 						} else {
-							SetVoiceVolumeMix(voiceData, streamData->m_pan >> 0xc, streamData->m_volume >> 0xc);
+							SetVoiceVolumeMix(voiceData, streamData->m_pan >> REDSOUND_FIXED_SHIFT,
+							                  streamData->m_volume >> REDSOUND_FIXED_SHIFT);
 						}
 					}
 				}

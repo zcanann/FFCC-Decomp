@@ -1,4 +1,4 @@
-#include "ffcc/p_chara_viewer.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/chara.h"
 #include "ffcc/color.h"
 #include "ffcc/file.h"
@@ -180,51 +180,6 @@ static void addRef(unsigned char* p, int offset)
     }
 }
 
-static inline CMemory::CStage*& ViewerModelStage(CCharaPcs* self)
-{
-    return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(self) + 0xCC);
-}
-
-static inline CMemory::CStage*& ViewerTextureStage(CCharaPcs* self)
-{
-    return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(self) + 0xD0);
-}
-
-static inline CMemory::CStage*& ViewerAnimStage(CCharaPcs* self)
-{
-    return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(self) + 0xD4);
-}
-
-static inline CChara::CModel*& ViewerModel(CCharaPcs* self, int index)
-{
-    return reinterpret_cast<CChara::CModel**>(reinterpret_cast<unsigned char*>(self) + 0x190)[index];
-}
-
-static inline CChara::CAnim*& ViewerAnim(CCharaPcs* self, int index)
-{
-    return reinterpret_cast<CChara::CAnim**>(reinterpret_cast<unsigned char*>(self) + 0x198)[index];
-}
-
-static inline CTextureSet*& ViewerTextureSet(CCharaPcs* self, int index)
-{
-    return reinterpret_cast<CTextureSet**>(reinterpret_cast<unsigned char*>(self) + 0x2B0)[index];
-}
-
-static inline CChara::CAnim*& ViewerSavedAnim(CCharaPcs* self)
-{
-    return *reinterpret_cast<CChara::CAnim**>(reinterpret_cast<unsigned char*>(self) + 0x1A0);
-}
-
-static inline CChara::CAnim*& ViewerAnimBank(CCharaPcs* self, int index)
-{
-    return reinterpret_cast<CChara::CAnim**>(reinterpret_cast<unsigned char*>(self) + 0x1B0)[index];
-}
-
-static inline CTextureSet*& ViewerBackTextureSet(CCharaPcs* self)
-{
-    return *reinterpret_cast<CTextureSet**>(reinterpret_cast<unsigned char*>(self) + 0x2B8);
-}
-
 static inline float& ViewerModelTime(void* model)
 {
     return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4);
@@ -282,17 +237,18 @@ extern "C" const char s_no_texture____801da7e8[];
  */
 extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
 {
-    unsigned char* p = (unsigned char*)param_1;
+    CCharaPcs* self = reinterpret_cast<CCharaPcs*>(param_1);
+    unsigned char* p = reinterpret_cast<unsigned char*>(self);
     register const char* viewerStrings = s_no_texture____801da7e8;
     Mtx cameraMtx;
     Mtx scratchMtx;
     Mtx44 projMtx;
     Mtx texMtx;
 
-    if ((*(int*)(p + 0x2B8) != 0) &&
-        (reinterpret_cast<CPtrArray<CTexture*>*>(*(unsigned char**)(p + 0x2B8) + 8)->GetSize() != 0)) {
+    if ((self->m_viewerBackTextureSet != 0) &&
+        (reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8)->GetSize() != 0)) {
         CTexture* texture =
-            (*reinterpret_cast<CPtrArray<CTexture*>*>(*(unsigned char**)(p + 0x2B8) + 8))[0];
+            (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8))[0];
 
         C_MTXOrtho(projMtx, kCharaViewerZero, FLOAT_80330BEC, kCharaViewerZero, FLOAT_80330BF0, kCharaViewerZero,
                    FLOAT_80330BF4);
@@ -337,7 +293,7 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
     PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx);
     GXSetProjection(projMtx, GX_PERSPECTIVE);
 
-    if (*(int*)(p + 0x6F8) != 0) {
+    if (self->m_viewerDrawGrid != 0) {
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
         GXSetZCompLoc(GX_FALSE);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
@@ -367,7 +323,7 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
     }
 
     for (unsigned int i = 0; i < 2; i++) {
-        unsigned char* model = *(unsigned char**)(p + 0x190 + i * 4);
+        unsigned char* model = reinterpret_cast<unsigned char*>(self->m_viewerModel[i]);
         if (model != 0) {
             if (*(int*)(model + 0xB0) == 0) {
                 Printf__8CGraphicFPce(&Graphic, s_no_texture);
@@ -376,11 +332,11 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
                 watch.Reset();
                 watch.Start();
                 Graphic.SetFog(0, 0);
-                LightPcs.SetAmbient(*reinterpret_cast<_GXColor*>(p + 0xE8));
+                LightPcs.SetAmbient(self->m_viewerAmbientColor);
                 LightPcs.SetNumDiffuse(3);
                 for (unsigned int lightIndex = 0; lightIndex < 3; lightIndex++) {
-                    LightPcs.SetDiffuse(lightIndex, *reinterpret_cast<_GXColor*>(p + 0xF0 + lightIndex * 4),
-                                        reinterpret_cast<Vec*>(p + 0x108 + lightIndex * 12),
+                    LightPcs.SetDiffuse(lightIndex, self->m_viewerDiffuseColor[lightIndex],
+                                        &self->m_viewerDiffusePos[lightIndex],
                                         (__cntlzw(2 - lightIndex) >> 5) & 0xFF);
                 }
 
@@ -419,131 +375,143 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
  */
 extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
 {
-    unsigned char* p = (unsigned char*)param_1;
+    CCharaPcs* self = reinterpret_cast<CCharaPcs*>(param_1);
+    unsigned char* p = reinterpret_cast<unsigned char*>(self);
     register const char* viewerStrings = s_no_texture____801da7e8;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
 
-    if (*(int*)(p + 0x6FC) != 0) {
-        releaseRef(p, 0x1A0);
-        *(void**)(p + 0x1A0) = *(void**)(p + 0x198);
-        addRef(p, 0x1A0);
-        *(int*)(p + 0x6FC) = 0;
+    if (self->m_viewerStoreSavedAnim != 0) {
+        ReleaseShared(self->m_viewerSavedAnim);
+        self->m_viewerSavedAnim = self->m_viewerAnim[0];
+        AddSharedRef(self->m_viewerSavedAnim);
+        self->m_viewerStoreSavedAnim = 0;
     }
 
-    if ((*(int*)(p + 0x2BC) != 0) || (*(int*)(p + 0x3C0) != 0) || (*(int*)(p + 0x4C4) != 0) || (*(int*)(p + 0x710) != 0)) {
-        if (*(int*)(p + 0x2BC) != 0) {
-            Printf__7CSystemFPce(&System, s_calc_viewer_fmt, p + 0x2C0);
-            fileHandle = File.Open((char*)(p + 0x2C0), 0, CFile::PRI_LOW);
+    if ((self->m_viewerLoadModel != 0) || (self->m_viewerLoadAnim != 0) || (self->m_viewerLoadTexture != 0) ||
+        (self->m_viewerLoadAnimContinuous != 0)) {
+        if (self->m_viewerLoadModel != 0) {
+            Printf__7CSystemFPce(&System, s_calc_viewer_fmt, self->m_viewerModelPath);
+            fileHandle = File.Open(self->m_viewerModelPath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
-                releaseRef(p, 0x194);
-                releaseRef(p, 0x19C);
-                releaseRef(p, 0x2B4);
+                ReleaseShared(self->m_viewerModel[1]);
+                ReleaseShared(self->m_viewerAnim[1]);
+                ReleaseShared(self->m_viewerTextureSet[1]);
 
-                *(void**)(p + 0x194) = *(void**)(p + 0x190);
-                *(void**)(p + 0x19C) = *(void**)(p + 0x198);
-                *(void**)(p + 0x2B4) = *(void**)(p + 0x2B0);
-                *(void**)(p + 0x190) = 0;
-                *(void**)(p + 0x198) = 0;
-                *(void**)(p + 0x2B0) = 0;
+                self->m_viewerModel[1] = self->m_viewerModel[0];
+                self->m_viewerAnim[1] = self->m_viewerAnim[0];
+                self->m_viewerTextureSet[1] = self->m_viewerTextureSet[0];
+                self->m_viewerModel[0] = 0;
+                self->m_viewerAnim[0] = 0;
+                self->m_viewerTextureSet[0] = 0;
 
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                *(void**)(p + 0x190) = __nw__FUlPQ27CMemory6CStagePci(
+                self->m_viewerModel[0] = reinterpret_cast<CChara::CModel*>(__nw__FUlPQ27CMemory6CStagePci(
                     0x124, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058),
-                    const_cast<char*>(s_p_chara_viewer_cpp), 0xEA);
-                if (*(void**)(p + 0x190) != 0) {
-                    *(void**)(p + 0x190) = __ct__Q26CChara6CModelFv(*(void**)(p + 0x190));
+                    const_cast<char*>(s_p_chara_viewer_cpp), 0xEA));
+                if (self->m_viewerModel[0] != 0) {
+                    self->m_viewerModel[0] =
+                        reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(self->m_viewerModel[0]));
                 }
-                Create__Q26CChara6CModelFPvPQ27CMemory6CStage(*(void**)(p + 0x190), File.m_readBuffer, *(void**)(p + 0xCC));
-                *(unsigned char*)(*(unsigned char**)(p + 0x190) + 0x10C) = (*(unsigned char*)(*(unsigned char**)(p + 0x190) + 0x10C) & 0xBF) | 0x40;
+                Create__Q26CChara6CModelFPvPQ27CMemory6CStage(
+                    self->m_viewerModel[0], File.m_readBuffer, self->m_viewerModelStage);
+                *(reinterpret_cast<unsigned char*>(self->m_viewerModel[0]) + 0x10C) =
+                    (*(reinterpret_cast<unsigned char*>(self->m_viewerModel[0]) + 0x10C) & 0xBF) | 0x40;
                 File.Close(fileHandle);
             }
-            *(int*)(p + 0x2BC) = 0;
+            self->m_viewerLoadModel = 0;
         }
 
-        if ((*(int*)(p + 0x5F0) != 0) && (*(void**)(p + 0x190) != 0)) {
-            Printf__7CSystemFPce(&System, s_calc_viewer_fmt, p + 0x5F4);
-            fileHandle = File.Open((char*)(p + 0x5F4), 0, CFile::PRI_LOW);
+        if ((self->m_viewerLoadDynamics != 0) && (self->m_viewerModel[0] != 0)) {
+            Printf__7CSystemFPce(&System, s_calc_viewer_fmt, self->m_viewerDynamicsPath);
+            fileHandle = File.Open(self->m_viewerDynamicsPath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(*(void**)(p + 0x190), File.m_readBuffer, *(void**)(p + 0xCC));
+                CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(
+                    self->m_viewerModel[0], File.m_readBuffer, self->m_viewerModelStage);
                 File.Close(fileHandle);
             }
-            *(int*)(p + 0x5F0) = 0;
+            self->m_viewerLoadDynamics = 0;
         }
 
-        if ((*(int*)(p + 0x3C0) != 0) || (*(int*)(p + 0x710) != 0)) {
+        if ((self->m_viewerLoadAnim != 0) || (self->m_viewerLoadAnimContinuous != 0)) {
             unsigned int i;
-            releaseRef(p, 0x198);
+            ReleaseShared(self->m_viewerAnim[0]);
             for (i = 0; i < 0x40; i++) {
-                releaseRef(p, 0x1B0 + i * 4);
+                ReleaseShared(self->m_viewerAnimBank[i]);
             }
-            *(int*)(p + 0x1AC) = 0;
-            *(int*)(p + 0x1A4) = 0;
+            self->m_viewerAnimLoopIndex = 0;
+            self->m_viewerAnimLoadedCount = 0;
 
-            if (*(int*)(p + 0x3C0) == 0) {
-                for (i = 0; i < *(unsigned int*)(p + 0x1A8); i++) {
-                    unsigned int idx = *(unsigned int*)(p + 0x1A4);
-                    sprintf(pathBuf, s_anim_path_fmt, p + 0x3C4, idx);
+            if (self->m_viewerLoadAnim == 0) {
+                for (i = 0; i < static_cast<unsigned int>(self->m_viewerAnimRequestedCount); i++) {
+                    unsigned int idx = static_cast<unsigned int>(self->m_viewerAnimLoadedCount);
+                    sprintf(pathBuf, s_anim_path_fmt, self->m_viewerAnimPath, idx);
                     Printf__7CSystemFPce(&System, s_calc_viewer_fmt, pathBuf);
                     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
                     if (fileHandle != 0) {
-                        releaseRef(p, 0x1B0 + idx * 4);
                         File.Read(fileHandle);
                         File.SyncCompleted(fileHandle);
-                        *(void**)(p + 0x1B0 + idx * 4) = __nw__FUlPQ27CMemory6CStagePci(
+                        self->m_viewerAnimBank[idx] = reinterpret_cast<CChara::CAnim*>(__nw__FUlPQ27CMemory6CStagePci(
                             0x30, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058),
-                            const_cast<char*>(s_p_chara_viewer_cpp), 0x124);
-                        if (*(void**)(p + 0x1B0 + idx * 4) != 0) {
-                            *(void**)(p + 0x1B0 + idx * 4) = __ct__Q26CChara5CAnimFv(*(void**)(p + 0x1B0 + idx * 4));
+                            const_cast<char*>(s_p_chara_viewer_cpp), 0x124));
+                        if (self->m_viewerAnimBank[idx] != 0) {
+                            self->m_viewerAnimBank[idx] =
+                                reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(self->m_viewerAnimBank[idx]));
                         }
-                        Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(*(void**)(p + 0x1B0 + idx * 4), File.m_readBuffer, *(void**)(p + 0xD4));
+                        Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
+                            self->m_viewerAnimBank[idx], File.m_readBuffer, self->m_viewerAnimStage);
                         File.Close(fileHandle);
                         if (idx == 0) {
-                            *(void**)(p + 0x198) = *(void**)(p + 0x1B0);
-                            addRef(p, 0x198);
+                            self->m_viewerAnim[0] = self->m_viewerAnimBank[0];
+                            AddSharedRef(self->m_viewerAnim[0]);
                         }
-                        *(int*)(p + 0x1A4) = *(int*)(p + 0x1A4) + 1;
+                        self->m_viewerAnimLoadedCount = self->m_viewerAnimLoadedCount + 1;
                     }
                 }
-                *(int*)(p + 0x710) = 0;
+                self->m_viewerLoadAnimContinuous = 0;
             } else {
-                Printf__7CSystemFPce(&System, s_calc_viewer_fmt, p + 0x3C4);
-                fileHandle = File.Open((char*)(p + 0x3C4), 0, CFile::PRI_LOW);
+                Printf__7CSystemFPce(&System, s_calc_viewer_fmt, self->m_viewerAnimPath);
+                fileHandle = File.Open(self->m_viewerAnimPath, 0, CFile::PRI_LOW);
                 if (fileHandle != 0) {
                     File.Read(fileHandle);
                     File.SyncCompleted(fileHandle);
-                    *(void**)(p + 0x198) = __nw__FUlPQ27CMemory6CStagePci(
+                    self->m_viewerAnim[0] = reinterpret_cast<CChara::CAnim*>(__nw__FUlPQ27CMemory6CStagePci(
                         0x30, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058),
-                        const_cast<char*>(s_p_chara_viewer_cpp), 0x111);
-                    if (*(void**)(p + 0x198) != 0) {
-                        *(void**)(p + 0x198) = __ct__Q26CChara5CAnimFv(*(void**)(p + 0x198));
+                        const_cast<char*>(s_p_chara_viewer_cpp), 0x111));
+                    if (self->m_viewerAnim[0] != 0) {
+                        self->m_viewerAnim[0] =
+                            reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(self->m_viewerAnim[0]));
                     }
-                    Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(*(void**)(p + 0x198), File.m_readBuffer, *(void**)(p + 0xD4));
+                    Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
+                        self->m_viewerAnim[0], File.m_readBuffer, self->m_viewerAnimStage);
                     File.Close(fileHandle);
                 }
-                *(int*)(p + 0x3C0) = 0;
+                self->m_viewerLoadAnim = 0;
             }
         }
 
-        if (*(int*)(p + 0x4C4) != 0) {
-            Printf__7CSystemFPce(&System, s_calc_viewer_fmt, p + 0x4C8);
-            fileHandle = File.Open((char*)(p + 0x4C8), 0, CFile::PRI_LOW);
+        if (self->m_viewerLoadTexture != 0) {
+            Printf__7CSystemFPce(&System, s_calc_viewer_fmt, self->m_viewerTexturePath);
+            fileHandle = File.Open(self->m_viewerTexturePath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
-                releaseRef(p, 0x2B0);
+                ReleaseShared(self->m_viewerTextureSet[0]);
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                *(void**)(p + 0x2B0) = createTextureSet__9CCharaPcsFPvi(p, File.m_readBuffer, 0);
+                self->m_viewerTextureSet[0] =
+                    reinterpret_cast<CTextureSet*>(createTextureSet__9CCharaPcsFPvi(self, File.m_readBuffer, 0));
                 File.Close(fileHandle);
             }
-            *(int*)(p + 0x4C4) = 0;
+            self->m_viewerLoadTexture = 0;
         }
 
-        if (*(void**)(p + 0x190) != 0) {
-            AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190), *(void**)(p + 0x198), -1, -1, -1);
-            AttachTextureSet__Q26CChara6CModelFP11CTextureSet(*(void**)(p + 0x190), *(void**)(p + 0x2B0));
+        if (self->m_viewerModel[0] != 0) {
+            AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
+                self->m_viewerModel[0], self->m_viewerAnim[0], -1, -1, -1);
+            AttachTextureSet__Q26CChara6CModelFP11CTextureSet(
+                self->m_viewerModel[0], self->m_viewerTextureSet[0]);
         }
     }
 
@@ -575,33 +543,37 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         triggerButtons = Pad._8_2_;
     }
 
-    if ((*(void**)(p + 0x190) != 0) && (*(int*)(p + 0x70C) != 0)) {
-        if (*(int*)(p + 0x708) == 0) {
-            *(int*)(p + 0x704) = 0;
-            AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190), *(void**)(p + 0x198), -1, -1, 0);
+    if ((self->m_viewerModel[0] != 0) && (self->m_viewerResetIFrame != 0)) {
+        if (self->m_viewerIFrameEnabled == 0) {
+            self->m_viewerSavedAnimState = 0;
+            AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
+                self->m_viewerModel[0], self->m_viewerAnim[0], -1, -1, 0);
         } else {
-            *(int*)(p + 0x704) = 0;
-            float frame = *(float*)(*(unsigned char**)(p + 0x190) + 0xB4);
-            float animFrames = (float)*(unsigned short*)(*(unsigned char**)(p + 0x198) + 0x10);
-            *(float*)(p + 0x700) = (float)fmod((double)frame, (double)animFrames);
-            AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190), *(void**)(p + 0x198), -1, -1, 0);
+            self->m_viewerSavedAnimState = 0;
+            float frame = ViewerModelTime(self->m_viewerModel[0]);
+            float animFrames = static_cast<float>(*reinterpret_cast<unsigned short*>(
+                reinterpret_cast<unsigned char*>(self->m_viewerAnim[0]) + 0x10));
+            self->m_viewerSavedFrame = static_cast<float>(fmod(static_cast<double>(frame), static_cast<double>(animFrames)));
+            AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
+                self->m_viewerModel[0], self->m_viewerAnim[0], -1, -1, 0);
         }
-        *(int*)(p + 0x70C) = 0;
+        self->m_viewerResetIFrame = 0;
     }
 
-    if (((triggerButtons & 0x1000) != 0) && (*(void**)(p + 0x1A0) == 0) && (*(void**)(p + 0x190) != 0)) {
-        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190), *(void**)(p + 0x198), -1, -1, -1);
+    if (((triggerButtons & 0x1000) != 0) && (self->m_viewerSavedAnim == 0) && (self->m_viewerModel[0] != 0)) {
+        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
+            self->m_viewerModel[0], self->m_viewerAnim[0], -1, -1, -1);
     }
 
     if ((triggerButtons & 0x800) != 0) {
-        *(unsigned int*)(p + 0x6F8) = (__cntlzw(*(unsigned int*)(p + 0x6F8)) >> 5) & 0xFF;
+        self->m_viewerDrawGrid = (__cntlzw(self->m_viewerDrawGrid) >> 5) & 0xFF;
     }
     if ((triggerButtons & 0x400) != 0) {
-        *(unsigned int*)(p + 0x6F4) = (__cntlzw(*(unsigned int*)(p + 0x6F4)) >> 5) & 0xFF;
+        self->m_viewerStepMode = (__cntlzw(self->m_viewerStepMode) >> 5) & 0xFF;
     }
 
     float frameAdvance;
-    if (*(int*)(p + 0x6F4) == 0) {
+    if (self->m_viewerStepMode == 0) {
         float deltaY = kCharaViewerUnitStep;
         if ((heldButtons & 0x200) != 0) {
             deltaY = kCharaViewerFineStep;
@@ -624,59 +596,61 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
     }
 
     for (unsigned int i = 0; i < 2; i++) {
-        unsigned char* model = *(unsigned char**)(p + 0x190 + i * 4);
+        unsigned char* model = reinterpret_cast<unsigned char*>(self->m_viewerModel[i]);
         if (model == 0) {
             continue;
         }
 
         float translateX = kCharaViewerZero;
-        if ((i != 0) && (*(void**)(p + 0x190) != 0)) {
-            int frameShift = ViewerModelFrameShift(*(void**)(p + 0x190));
+        if ((i != 0) && (self->m_viewerModel[0] != 0)) {
+            int frameShift = ViewerModelFrameShift(self->m_viewerModel[0]);
             translateX = static_cast<float>((1 << (15 - frameShift)) / 8);
         }
 
-        if ((i == 0) && (*(int*)(p + 0x5C8) != 0)) {
-            *(int*)(p + 0x5C8) = 0;
+        if ((i == 0) && (self->m_viewerTexAnimDirty != 0)) {
+            self->m_viewerTexAnimDirty = 0;
             CTexAnimSet* texAnimSet = ViewerModelTexAnimSet(model);
             if (texAnimSet != 0) {
-                int texAnimFrame = *(int*)(p + 0x5EC);
+                int texAnimFrame = self->m_viewerTexAnimFrame;
                 int animType = -2;
                 if (texAnimFrame >= 0) {
                     animType = -3;
                 }
                 texAnimSet->Change(
-                    reinterpret_cast<char*>(p + 0x5CC), static_cast<float>((texAnimFrame < 0) ? 0 : texAnimFrame),
+                    self->m_viewerTexAnimName, static_cast<float>((texAnimFrame < 0) ? 0 : texAnimFrame),
                     static_cast<CTexAnimSet::ANIM_TYPE>(animType));
             }
         }
 
-        unsigned char* anim = *(unsigned char**)(p + 0x198 + i * 4);
+        unsigned char* anim = reinterpret_cast<unsigned char*>(self->m_viewerAnim[i]);
         if (anim != 0) {
-            if ((i == 0) && (*(int*)(p + 0x1A4) != 0)) {
+            if ((i == 0) && (self->m_viewerAnimLoadedCount != 0)) {
                 SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
                 float animFrames = (float)*(unsigned short*)(anim + 0x10);
-                if (animFrames <= *(float*)(*(unsigned char**)(p + 0x190) + 0xB4)) {
-                    int nextIndex = *(int*)(p + 0x1AC) + 1;
-                    int animCount = *(int*)(p + 0x1A4);
-                    *(int*)(p + 0x1AC) = nextIndex - (nextIndex / animCount) * animCount;
-                    AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190),
-                                                                      *(void**)(p + 0x1B0 + *(int*)(p + 0x1AC) * 4),
-                                                                      -1, -1, 0);
-                    releaseRef(p, 0x198);
-                    *(void**)(p + 0x198) = *(void**)(p + 0x1B0 + *(int*)(p + 0x1AC) * 4);
-                    addRef(p, 0x198);
+                if (animFrames <= ViewerModelTime(self->m_viewerModel[0])) {
+                    int nextIndex = self->m_viewerAnimLoopIndex + 1;
+                    int animCount = self->m_viewerAnimLoadedCount;
+                    self->m_viewerAnimLoopIndex = nextIndex - (nextIndex / animCount) * animCount;
+                    AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
+                        self->m_viewerModel[0], self->m_viewerAnimBank[self->m_viewerAnimLoopIndex], -1, -1, 0);
+                    ReleaseShared(self->m_viewerAnim[0]);
+                    self->m_viewerAnim[0] = self->m_viewerAnimBank[self->m_viewerAnimLoopIndex];
+                    AddSharedRef(self->m_viewerAnim[0]);
                 }
-            } else if ((i == 0) && (*(int*)(p + 0x708) != 0)) {
-                float animFrames = (float)*(unsigned short*)(*(unsigned char**)(p + 0x198) + 0x10);
-                if (*(int*)(p + 0x704) == 0) {
-                    if (*(float*)(p + 0x700) + animFrames <= *(float*)(model + 0xB4)) {
-                        *(int*)(p + 0x704) = 1;
-                        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(model, *(void**)(p + 0x1A0), -1, -1, -1);
+            } else if ((i == 0) && (self->m_viewerIFrameEnabled != 0)) {
+                float animFrames = static_cast<float>(*reinterpret_cast<unsigned short*>(
+                    reinterpret_cast<unsigned char*>(self->m_viewerAnim[0]) + 0x10));
+                if (self->m_viewerSavedAnimState == 0) {
+                    if (self->m_viewerSavedFrame + animFrames <= *(float*)(model + 0xB4)) {
+                        self->m_viewerSavedAnimState = 1;
+                        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
+                            model, self->m_viewerSavedAnim, -1, -1, -1);
                     }
                 } else {
                     if (animFrames <= *(float*)(model + 0xB4)) {
-                        *(int*)(p + 0x704) = 0;
-                        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(model, *(void**)(p + 0x198), -1, -1, 0);
+                        self->m_viewerSavedAnimState = 0;
+                        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
+                            model, self->m_viewerAnim[0], -1, -1, 0);
                     }
                 }
                 SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
@@ -734,19 +708,19 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
                 float frame = (float)fmod((double)ViewerModelTime(model), (double)(frameAdvance + animFrames));
                 Printf__8CGraphicFPce(&Graphic, s_frame_speed_fmt, frame, frameAdvance);
             }
-            if (*(void**)(p + 0x1A0) != 0) {
+            if (self->m_viewerSavedAnim != 0) {
                 const char* iframeMode = kCharaViewerOff;
-                if (*(int*)(p + 0x708) != 0) {
+                if (self->m_viewerIFrameEnabled != 0) {
                     iframeMode = kCharaViewerOn;
                 }
                 const char* iframeState = kCharaViewerKeep;
-                if (*(int*)(p + 0x704) == 0) {
+                if (self->m_viewerSavedAnimState == 0) {
                     iframeState = kCharaViewerOrg;
                 }
-                Printf__8CGraphicFPce(&Graphic, s_iframe_fmt, iframeMode, *(float*)(p + 0x700), iframeState);
+                Printf__8CGraphicFPce(&Graphic, s_iframe_fmt, iframeMode, self->m_viewerSavedFrame, iframeState);
             }
-            if (*(int*)(p + 0x1A4) != 0) {
-                Printf__8CGraphicFPce(&Graphic, s_cont_fmt, *(int*)(p + 0x1AC));
+            if (self->m_viewerAnimLoadedCount != 0) {
+                Printf__8CGraphicFPce(&Graphic, s_cont_fmt, self->m_viewerAnimLoopIndex);
             }
             Printf__8CGraphicFPce(&Graphic, s_cpu_profile_fmt, matrixTime + skinTime, matrixTime, skinTime,
                                   ViewerModelNodeCount(model));
@@ -780,11 +754,13 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     Vec lightTarget;
     Vec lightDir;
 
-    memset(p + 0xCC, 0, 0x18);
-    ViewerModelStage(self) = reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x177000, s_load_model, 0));
-    ViewerTextureStage(self) =
+    memset(&self->m_viewerModelStage, 0, 0x18);
+    self->m_viewerModelStage =
+        reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x177000, s_load_model, 0));
+    self->m_viewerTextureStage =
         reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x200000, s_load_texture, 0));
-    ViewerAnimStage(self) = reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x190000, s_load_anim, 0));
+    self->m_viewerAnimStage =
+        reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x190000, s_load_anim, 0));
 
     p[0xE8] = 0x3F;
     p[0xE9] = 0x3F;
@@ -838,51 +814,52 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(unsigned int*)(p + 0x0C) = 0x404040FF;
     SetCopyClear__8CGraphicF8_GXColori(&Graphic, &clearColor, 0xFFFF);
 
-    *(int*)(p + 0x190) = 0;
-    *(int*)(p + 0x198) = 0;
-    *(int*)(p + 0x2B0) = 0;
-    *(int*)(p + 0x194) = 0;
-    *(int*)(p + 0x19C) = 0;
-    *(int*)(p + 0x2B4) = 0;
-    *(int*)(p + 0x1A0) = 0;
-    *(int*)(p + 0x2B8) = 0;
-    *(int*)(p + 0x2BC) = 0;
-    *(int*)(p + 0x3C0) = 0;
-    *(int*)(p + 0x4C4) = 0;
-    *(int*)(p + 0x5C8) = 0;
-    *(int*)(p + 0x6F4) = 0;
-    *(int*)(p + 0x6F8) = 1;
-    *(int*)(p + 0x6FC) = 0;
-    *(float*)(p + 0x700) = kCharaViewerZero;
-    *(int*)(p + 0x704) = 0;
-    *(int*)(p + 0x708) = 0;
-    *(int*)(p + 0x70C) = 0;
-    *(int*)(p + 0x710) = 0;
-    *(int*)(p + 0x1A4) = 0;
-    *(int*)(p + 0x1A8) = 0;
-    *(int*)(p + 0x1AC) = 0;
+    self->m_viewerModel[0] = 0;
+    self->m_viewerAnim[0] = 0;
+    self->m_viewerTextureSet[0] = 0;
+    self->m_viewerModel[1] = 0;
+    self->m_viewerAnim[1] = 0;
+    self->m_viewerTextureSet[1] = 0;
+    self->m_viewerSavedAnim = 0;
+    self->m_viewerBackTextureSet = 0;
+    self->m_viewerLoadModel = 0;
+    self->m_viewerLoadAnim = 0;
+    self->m_viewerLoadTexture = 0;
+    self->m_viewerTexAnimDirty = 0;
+    self->m_viewerStepMode = 0;
+    self->m_viewerDrawGrid = 1;
+    self->m_viewerStoreSavedAnim = 0;
+    self->m_viewerSavedFrame = kCharaViewerZero;
+    self->m_viewerSavedAnimState = 0;
+    self->m_viewerIFrameEnabled = 0;
+    self->m_viewerResetIFrame = 0;
+    self->m_viewerLoadAnimContinuous = 0;
+    self->m_viewerAnimLoadedCount = 0;
+    self->m_viewerAnimRequestedCount = 0;
+    self->m_viewerAnimLoopIndex = 0;
     for (i = 0; i < 0x40; i++) {
-        *(int*)(p + 0x1B0 + i * 4) = 0;
+        self->m_viewerAnimBank[i] = 0;
     }
 
-    strcpy((char*)(p + 0x2C0), s_default_chm_path);
-    *(int*)(p + 0x2BC) = 1;
-    strcpy((char*)(p + 0x5F4), s_default_chd_path);
-    *(int*)(p + 0x5F0) = 1;
-    strcpy((char*)(p + 0x3C4), s_default_cha_path);
-    *(int*)(p + 0x3C0) = 1;
-    strcpy((char*)(p + 0x4C8), s_default_tex_path);
-    *(int*)(p + 0x4C4) = 1;
-    strcpy((char*)(p + 0x5CC), kCharaViewerDefaultModelPath);
-    *(int*)(p + 0x5EC) = -1;
-    *(int*)(p + 0x5C8) = 1;
+    strcpy(self->m_viewerModelPath, s_default_chm_path);
+    self->m_viewerLoadModel = 1;
+    strcpy(self->m_viewerDynamicsPath, s_default_chd_path);
+    self->m_viewerLoadDynamics = 1;
+    strcpy(self->m_viewerAnimPath, s_default_cha_path);
+    self->m_viewerLoadAnim = 1;
+    strcpy(self->m_viewerTexturePath, s_default_tex_path);
+    self->m_viewerLoadTexture = 1;
+    strcpy(self->m_viewerTexAnimName, kCharaViewerDefaultModelPath);
+    self->m_viewerTexAnimFrame = -1;
+    self->m_viewerTexAnimDirty = 1;
 
     sprintf(pathBuf, s_back_tex_fmt, USBPcs.m_rootPath);
     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
     if (fileHandle != 0) {
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
-        ViewerBackTextureSet(self) = reinterpret_cast<CTextureSet*>(createTextureSet__9CCharaPcsFPvi(p, File.m_readBuffer, 0));
+        self->m_viewerBackTextureSet =
+            reinterpret_cast<CTextureSet*>(createTextureSet__9CCharaPcsFPvi(self, File.m_readBuffer, 0));
         File.Close(fileHandle);
     }
 

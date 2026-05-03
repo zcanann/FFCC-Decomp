@@ -2,6 +2,7 @@
 #define _FFCC_P_CHARA_H_
 
 #include "ffcc/chara.h"
+#include "ffcc/color.h"
 #include "ffcc/file.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara_viewer.h"
@@ -193,7 +194,46 @@ public:
     int LoadAnim(int, int, char*, int, int, int);
     void GetAnimStage();
 
-    u8 _pad_0x4_to_0x71B[0x71C - sizeof(CProcess)];
+    CMemory::CStage* m_viewerModelStage;      // 0x0CC
+    CMemory::CStage* m_viewerTextureStage;    // 0x0D0
+    CMemory::CStage* m_viewerAnimStage;       // 0x0D4
+    u8 _pad0D8[0x10];                         // 0x0D8
+    GXColor m_viewerAmbientColor;             // 0x0E8
+    u8 _pad0EC[4];                            // 0x0EC
+    GXColor m_viewerDiffuseColor[3];          // 0x0F0
+    u8 _pad0FC[0xC];                          // 0x0FC
+    Vec m_viewerDiffusePos[3];                // 0x108
+    CColor m_viewerChoiceColor[5];            // 0x12C
+    u8 _pad140[0x50];                         // 0x140
+    CChara::CModel* m_viewerModel[2];         // 0x190
+    CChara::CAnim* m_viewerAnim[2];           // 0x198
+    CChara::CAnim* m_viewerSavedAnim;         // 0x1A0
+    int m_viewerAnimLoadedCount;              // 0x1A4
+    int m_viewerAnimRequestedCount;           // 0x1A8
+    int m_viewerAnimLoopIndex;                // 0x1AC
+    CChara::CAnim* m_viewerAnimBank[64];      // 0x1B0
+    CTextureSet* m_viewerTextureSet[2];       // 0x2B0
+    CTextureSet* m_viewerBackTextureSet;      // 0x2B8
+    int m_viewerLoadModel;                    // 0x2BC
+    char m_viewerModelPath[0x100];            // 0x2C0
+    int m_viewerLoadAnim;                     // 0x3C0
+    char m_viewerAnimPath[0x100];             // 0x3C4
+    int m_viewerLoadTexture;                  // 0x4C4
+    char m_viewerTexturePath[0x100];          // 0x4C8
+    int m_viewerTexAnimDirty;                 // 0x5C8
+    char m_viewerTexAnimName[0x20];           // 0x5CC
+    int m_viewerTexAnimFrame;                 // 0x5EC
+    int m_viewerLoadDynamics;                 // 0x5F0
+    char m_viewerDynamicsPath[0x100];         // 0x5F4
+    int m_viewerStepMode;                     // 0x6F4
+    int m_viewerDrawGrid;                     // 0x6F8
+    int m_viewerStoreSavedAnim;               // 0x6FC
+    float m_viewerSavedFrame;                 // 0x700
+    int m_viewerSavedAnimState;               // 0x704
+    int m_viewerIFrameEnabled;                // 0x708
+    int m_viewerResetIFrame;                  // 0x70C
+    int m_viewerLoadAnimContinuous;           // 0x710
+    u8 _pad714[8];                            // 0x714
 };
 
 extern CCharaPcs CharaPcs;

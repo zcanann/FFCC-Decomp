@@ -983,7 +983,7 @@ int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5,
     }
     queueEntry = *queuePtr;
     entryID = GetMyEntryID();
-    size = (unsigned int)(param_5 + 0x1f) & 0xffffffe0;
+    size = (unsigned int)(param_5 + 0x1f) & ~0x1f;
     if ((m_DMAMode != 0) || ((param_1 & 0x8000) != 0)) {
         queueEnd = queueBase + 0x80;
         do {

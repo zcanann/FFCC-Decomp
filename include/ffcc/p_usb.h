@@ -21,7 +21,7 @@ class CUSBPcs : public CSamplePcs
 public:
     class CDataHeader;
 
-    CUSBPcs();
+    CUSBPcs() {}
 
     void Init();
     void Quit();

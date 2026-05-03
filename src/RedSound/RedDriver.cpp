@@ -2053,7 +2053,8 @@ int CRedDriver::ReportSeLoop(int seID)
     seInfo = (unsigned int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     while (1) {
         if ((*seInfo != 0) &&
-            (((seID == -1) || (seID == ((RedTrackDATA*)seInfo)->m_seId)) && ((seInfo[0x40] & 1U) != 0))) {
+            (((seID == -1) || (seID == ((RedTrackDATA*)seInfo)->m_seId)) &&
+             ((seInfo[REDSOUND_TRACK_LOOP_REPORT_WORD_OFFSET] & REDSOUND_TRACK_LOOP_REPORT_ACTIVE) != 0))) {
             return 1;
         }
         seInfo += REDSOUND_TRACK_SIZE / sizeof(*seInfo);

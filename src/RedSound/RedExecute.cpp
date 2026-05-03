@@ -1387,9 +1387,9 @@ void EnvelopeKeyExecute()
 
     while (true) {
         if (voiceData[0x23] == 0) {
-            int voice = voiceData[5];
             voiceData[0x2C] = 0;
             voiceData[1] = 0;
+            int voice = voiceData[5];
             if (voice != 0) {
                 if (*(s16*)(voice + 0x146) == 0) {
                     if (*(int*)(voice + 0xC) != 0) {
@@ -1404,11 +1404,10 @@ void EnvelopeKeyExecute()
                 }
             }
         } else {
-            int voice = voiceData[5];
-            u32 voiceFlags = 0;
-            u32 envChanged = 0;
+            int voice;
 
             if ((voiceData[0x24] & 1U) != 0) {
+                voice = voiceData[5];
                 if ((voice != 0) && (*(int*)(voice + 0xC) != 0)) {
                     AXFreeVoice((AXVPB*)voice);
                     voiceData[5] = 0;
@@ -1433,6 +1432,9 @@ void EnvelopeKeyExecute()
                 voiceData[0x23] = 0;
                 return;
             }
+
+            u32 voiceFlags = 0;
+            u32 envChanged = 0;
 
             if ((voiceData[0x24] & 0x10U) != 0) {
                 int pitch = voiceData[0x27];

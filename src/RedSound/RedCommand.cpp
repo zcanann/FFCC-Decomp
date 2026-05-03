@@ -191,7 +191,7 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 	}
 
 	do {
-		track = *trackBasePtr + REDSOUND_SE_TRACK_COUNT - 1;
+		track = *trackBasePtr + REDSOUND_SE_TRACK_LAST_INDEX;
 		scan = track;
 		remaining = trackCount;
 		do {

@@ -48,6 +48,11 @@ struct RedMusicHEAD
 	int m_unk1c;
 };
 
+enum RedMusicHeaderFlag {
+	REDSOUND_MUSIC_HEADER_VOLUME_SCALE_MASK = 0x7F,
+	REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES = 0x40000,
+};
+
 struct RedSeSepHEAD
 {
 	char m_signature[8];

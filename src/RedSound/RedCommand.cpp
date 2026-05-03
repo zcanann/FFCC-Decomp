@@ -777,7 +777,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 		track->m_tremoloDelayDepth = 0;
 		track->m_vibrateDelayDepth = 0;
 		track->m_waveData = 0;
-		track->m_flags = ((musicHead->m_playFlags & 0x40000) == 0) ? REDSOUND_TRACK_FLAG_TENUTO : 0;
+		track->m_flags = ((musicHead->m_playFlags & REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES) == 0) ? REDSOUND_TRACK_FLAG_TENUTO : 0;
 		track->m_step2 = 0;
 		track->m_step = 0;
 		track->m_fuzzyAdsrDepth = 0;
@@ -803,7 +803,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	music->m_keySignatureData = t_KeySignatureData + 0xb;
 	music->m_trackCount = musicHead->m_trackCount;
 	music->m_activeTrackCount = (short)musicHead->m_trackCount;
-	music->m_volumeScale = (unsigned char)(musicHead->m_flags & 0x7f);
+	music->m_volumeScale = (unsigned char)(musicHead->m_flags & REDSOUND_MUSIC_HEADER_VOLUME_SCALE_MASK);
 	music->m_tickCounter = 1;
 	music->m_tempo = REDSOUND_FIXED_ONE;
 	music->m_ticksPerMeasure = 10000;
@@ -817,8 +817,8 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 	music->m_volumeDelta = 0;
 	music->m_updateFlags = 0;
 	music->m_flags &= REDSOUND_CONTROL_FLAG_PAUSE;
-	if ((musicHead->m_playFlags & 0x40000) != 0) {
-		music->m_flags |= 0x40000;
+	if ((musicHead->m_playFlags & REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES) != 0) {
+		music->m_flags |= REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES;
 	}
 
 	c_RedEntry.WaveHistoryManager(1, music->m_waveNo);

@@ -670,8 +670,8 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
     case 2:
         *mixData = (u16)((volume * t_PanningData[pan]) >> 8);
         *(s16*)(voiceData + 0x1e) = (s16)((volume * t_PanningDataR[pan]) >> 8);
-        *(s16*)(voiceData + 0x1b) = (s16)((volume * t_PanningData[pan ^ 0x7f]) >> 8);
-        *(s16*)(voiceData + 0x1f) = (s16)((volume * t_PanningDataR[pan ^ 0x7f]) >> 8);
+        *(s16*)(voiceData + 0x1b) = (s16)((volume * t_PanningData[pan ^ REDSOUND_PAN_BYTE_MASK]) >> 8);
+        *(s16*)(voiceData + 0x1f) = (s16)((volume * t_PanningDataR[pan ^ REDSOUND_PAN_BYTE_MASK]) >> 8);
 
         if ((voiceData[0x25] & REDSOUND_VOICE_SWITCH_REVERB_LEFT) != 0) {
             *(s16*)(voiceData + 0x1c) = (s16)((int)((u32)*mixData * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
@@ -684,12 +684,12 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         }
         break;
     default:
-        if (0x80 < pan) {
-            pan = 0x100 - pan;
+        if (REDSOUND_PAN_BYTE_SIGN_BIT < pan) {
+            pan = REDSOUND_PAN_BYTE_WRAP - pan;
         }
 
         leftPan = t_PanningData[pan];
-        rightPan = t_PanningData[pan ^ 0x7f];
+        rightPan = t_PanningData[pan ^ REDSOUND_PAN_BYTE_MASK];
         int leftMix = (volume * leftPan) >> 8;
         int rightMix = (volume * rightPan) >> 8;
 
@@ -762,7 +762,7 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
         envelopeMul = envelopeMul + 1;
     }
 
-    pan = *(u8*)(voiceData[1] + 0x1a) & 0x7f;
+    pan = *(u8*)(voiceData[1] + 0x1a) & REDSOUND_PAN_BYTE_MASK;
     if (pan != 0) {
         pan = pan + 1;
     }
@@ -800,14 +800,14 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
     }
 
     if (m_SoundPlayMode == 1) {
-        pan = 0x40;
+        pan = REDSOUND_PAN_BYTE_CENTER;
     } else if ((voiceData[0x25] & 0xc0U) == 0) {
-        if ((*(u8*)(voiceData[1] + 0x1b) & 0x80) == 0) {
+        if ((*(u8*)(voiceData[1] + 0x1b) & REDSOUND_PAN_BYTE_SIGN_BIT) == 0) {
             pan = *(int*)voiceData[4] >> 0xc;
         } else {
-            pan = *(u8*)(voiceData[1] + 0x1b) & 0x7f;
+            pan = *(u8*)(voiceData[1] + 0x1b) & REDSOUND_PAN_BYTE_MASK;
             if (pan == 0) {
-                pan = 0x40;
+                pan = REDSOUND_PAN_BYTE_CENTER;
             }
         }
 

@@ -514,7 +514,7 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
     voice = p_VoiceData;
     do {
         if (voice->m_track == track) {
-            ((unsigned char*)voice)[0x1a] &= -6;
+            voice->m_stateFlags &= -6;
         }
         voice++;
     } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);

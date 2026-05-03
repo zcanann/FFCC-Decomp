@@ -69,8 +69,12 @@ static inline u16 LoadSwapU16(u16 value) {
 
 /*
  * --INFO--
- * PAL Address: 80052bc0
+ * PAL Address: 0x80052bc0
  * PAL Size: 3524b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFunnyShapePcs::SetUSBData()
 {
@@ -133,31 +137,20 @@ void CFunnyShapePcs::SetUSBData()
     case 5: {
         s16* tmp = static_cast<s16*>(__nwa__FUlPQ27CMemory6CStagePci(
             usb->m_sizeBytes, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x55));
-        void* textureHeader = __nw__FUlPQ27CMemory6CStagePci(
-            0x30, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x57);
-        m_textureHeaders[m_textureCount] = textureHeader;
+        m_textureHeaders[m_textureCount] =
+            __nw__FUlPQ27CMemory6CStagePci(0x30, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x57);
 
         memcpy(tmp, usb->m_data, usb->m_sizeBytes);
-        s16 header0 = tmp[0];
-        tmp[0] = LoadSwap16(header0);
-        s16 header1 = tmp[1];
-        tmp[1] = LoadSwap16(header1);
-        s16 header2 = tmp[2];
-        tmp[2] = LoadSwap16(header2);
-        s16 header3 = tmp[3];
-        tmp[3] = LoadSwap16(header3);
-        s16 header4 = tmp[4];
-        tmp[4] = LoadSwap16(header4);
-        s16 header5 = tmp[5];
-        tmp[5] = LoadSwap16(header5);
-        s16 header6 = tmp[6];
-        tmp[6] = LoadSwap16(header6);
-        s16 header7 = tmp[7];
-        tmp[7] = LoadSwap16(header7);
-        u16 header10 = reinterpret_cast<u16*>(tmp)[0x10];
-        reinterpret_cast<u16*>(tmp)[0x10] = LoadSwapU16(header10);
-        u16 header11 = reinterpret_cast<u16*>(tmp)[0x11];
-        reinterpret_cast<u16*>(tmp)[0x11] = LoadSwapU16(header11);
+        tmp[0] = LoadSwap16(tmp[0]);
+        tmp[1] = LoadSwap16(tmp[1]);
+        tmp[2] = LoadSwap16(tmp[2]);
+        tmp[3] = LoadSwap16(tmp[3]);
+        tmp[4] = LoadSwap16(tmp[4]);
+        tmp[5] = LoadSwap16(tmp[5]);
+        tmp[6] = LoadSwap16(tmp[6]);
+        tmp[7] = LoadSwap16(tmp[7]);
+        reinterpret_cast<u16*>(tmp)[0x10] = LoadSwapU16(reinterpret_cast<u16*>(tmp)[0x10]);
+        reinterpret_cast<u16*>(tmp)[0x11] = LoadSwapU16(reinterpret_cast<u16*>(tmp)[0x11]);
 
         DCFlushRange(tmp, 0x30);
         memcpy(m_textureHeaders[m_textureCount], tmp, 0x30);

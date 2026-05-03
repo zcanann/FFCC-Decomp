@@ -760,7 +760,10 @@ void CMenuPcs::CalcOptionMenu()
 		}
 	}
 
-	if ((animPhase == 0) || (animPhase == 1)) {
+	if (animPhase == 0) {
+		return;
+	}
+	if (animPhase == 1) {
 		return;
 	}
 
@@ -778,7 +781,7 @@ void CMenuPcs::CalcOptionMenu()
 				if (gameInitMode < 0) {
 					gameInitMode = 1;
 				}
-			} else if (optionIndex == 1) {
+			} else if (-1 < optionIndex) {
 				stereoMode--;
 				if (stereoMode < 0) {
 					stereoMode = 1;
@@ -816,7 +819,7 @@ void CMenuPcs::CalcOptionMenu()
 				if (gameInitMode > 1) {
 					gameInitMode = 0;
 				}
-			} else if (optionIndex == 1) {
+			} else if (-1 < optionIndex) {
 				stereoMode++;
 				if (stereoMode > 1) {
 					stereoMode = 0;
@@ -856,54 +859,54 @@ void CMenuPcs::CalcOptionMenu()
 			press3 = static_cast<unsigned short>(Pad._8_2_);
 		}
 
-		if ((press3 & 0x100) != 0) {
-			if (specialModeEdit == 0) {
-				specialModeCursor = 0;
-				specialModeEdit = 1;
-				Sound.PlaySe(2, 0x40, 0x7F, 0);
-			}
-		} else if (specialModeEdit != 0) {
-			unsigned short press4;
-			bool padBlocked4 = false;
+		if ((press3 & 0x100) == 0) {
+			if (specialModeEdit != 0) {
+				unsigned short press4;
+				bool padBlocked4 = false;
 
-			if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-				padBlocked4 = true;
-			}
-			if (padBlocked4) {
-				press4 = 0;
-			} else {
-				__cntlzw(static_cast<unsigned int>(Pad._448_4_));
-				press4 = static_cast<unsigned short>(Pad._8_2_);
-			}
-
-			if ((press4 & 0x200) != 0) {
-				specialModeCursor = 0;
-				specialModeEdit = 0;
-				Sound.PlaySe(3, 0x40, 0x7F, 0);
-
-				Game.m_gameWork.m_spModeFlags[0] = static_cast<unsigned char>(specialModeFlags[0]);
-				Game.m_gameWork.m_spModeFlags[1] = static_cast<unsigned char>(specialModeFlags[1]);
-				Game.m_gameWork.m_spModeFlags[2] = static_cast<unsigned char>(specialModeFlags[2]);
-				Game.m_gameWork.m_spModeFlags[3] = static_cast<unsigned char>(specialModeFlags[3]);
-			} else if ((press & 8) != 0) {
-				specialModeCursor--;
-				if (specialModeCursor < 0) {
-					specialModeCursor = 3;
+				if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+					padBlocked4 = true;
 				}
-				Sound.PlaySe(1, 0x40, 0x7F, 0);
-			} else if ((press & 4) != 0) {
-				specialModeCursor++;
-				if (specialModeCursor > 3) {
+				if (padBlocked4) {
+					press4 = 0;
+				} else {
+					__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+					press4 = static_cast<unsigned short>(Pad._8_2_);
+				}
+
+				if ((press4 & 0x200) != 0) {
 					specialModeCursor = 0;
+					specialModeEdit = 0;
+					Sound.PlaySe(3, 0x40, 0x7F, 0);
+
+					Game.m_gameWork.m_spModeFlags[0] = static_cast<unsigned char>(__cntlzw(1 - static_cast<int>(specialModeFlags[0])) >> 5);
+					Game.m_gameWork.m_spModeFlags[1] = static_cast<unsigned char>(__cntlzw(1 - static_cast<int>(specialModeFlags[1])) >> 5);
+					Game.m_gameWork.m_spModeFlags[2] = static_cast<unsigned char>(__cntlzw(1 - static_cast<int>(specialModeFlags[2])) >> 5);
+					Game.m_gameWork.m_spModeFlags[3] = static_cast<unsigned char>(__cntlzw(1 - static_cast<int>(specialModeFlags[3])) >> 5);
+				} else if ((press & 8) != 0) {
+					specialModeCursor--;
+					if (specialModeCursor < 0) {
+						specialModeCursor = 3;
+					}
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else if ((press & 4) != 0) {
+					specialModeCursor++;
+					if (specialModeCursor > 3) {
+						specialModeCursor = 0;
+					}
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
-				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
+		} else if (specialModeEdit == 0) {
+			specialModeCursor = 0;
+			specialModeEdit = 1;
+			Sound.PlaySe(2, 0x40, 0x7F, 0);
 		}
 	}
 
 	if (optionChanged) {
-		Game.m_gameWork.m_gameInitFlag = static_cast<unsigned char>(gameInitMode == 0);
-		Sound.SetStereo(stereoMode == 0);
+		Game.m_gameWork.m_gameInitFlag = static_cast<unsigned char>(__cntlzw(static_cast<int>(gameInitMode)) >> 5);
+		Sound.SetStereo(__cntlzw(static_cast<int>(stereoMode)) >> 5);
 		Sound.SetSeMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(seVolume)));
 		Sound.SetBgmMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(bgmVolume)));
 	}

@@ -1031,7 +1031,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
             }
         }
     } else {
-        trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] &= 0xfffff000;
+        trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] &= REDSOUND_FIXED_WHOLE_MASK;
         voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] = trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET];
         trackData[REDSOUND_TRACK_SWEEP_DELTA_WORD_OFFSET] = trackData[REDSOUND_TRACK_PORTAMENT_TIME_WORD_OFFSET];
         local_38[0] = 0;

@@ -2397,8 +2397,8 @@ static void _PitchBendCompute(RedTrackDATA* track, int bend)
     unsigned int* voiceData = (unsigned int*)p_VoiceData;
 
     do {
-        if (voiceData[REDSOUND_VOICE_TRACK_WORD] == (unsigned int)track) {
-            if (voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] != 0) {
+        if (((RedVoiceDATA*)voiceData)->m_track == track) {
+            if (((RedVoiceDATA*)voiceData)->m_waveData != 0) {
                 int pitch;
                 int computedPitch;
                 if ((((RedVoiceDATA*)voiceData)->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {

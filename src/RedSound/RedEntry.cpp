@@ -1617,7 +1617,8 @@ void CRedEntry::DisplayMMemoryInfo()
 			do {
 				if ((history->m_size != 0) && (history->m_data == bankEntry->m_address)) {
 					OSReport(s__s_MUSIC_3_3d___0x_8_8X___0x_8_8_801e7d24, sRedEntryLogPrefix,
-					         (int)*(short*)(bankEntry->m_address + 4), bankEntry->m_address, bankEntry->m_size, freeSize);
+					         reinterpret_cast<RedMusicHEAD*>(bankEntry->m_address)->m_musicNo, bankEntry->m_address,
+					         bankEntry->m_size, freeSize);
 					fflush(__files + 1);
 					matched = 1;
 					break;
@@ -1644,7 +1645,8 @@ void CRedEntry::DisplayMMemoryInfo()
 				do {
 					if ((history->m_size != 0) && (history->m_data == bankEntry->m_address)) {
 						OSReport(s__s_WAVE_4_4d___0x_8_8X___0x_8_8X_801e7d7c, sRedEntryLogPrefix,
-						         (int)*(short*)(bankEntry->m_address + 2), bankEntry->m_address, bankEntry->m_size, freeSize);
+						         reinterpret_cast<RedWaveHeadWD*>(bankEntry->m_address)->m_waveNo, bankEntry->m_address,
+						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);
 						matched = 1;
 						break;
@@ -1658,7 +1660,8 @@ void CRedEntry::DisplayMMemoryInfo()
 				do {
 					if ((history->m_size != 0) && (history->m_data == bankEntry->m_address)) {
 						OSReport(s__s_SE_6_6d___0x_8_8X___0x_8_8X___801e7da8, sRedEntryLogPrefix,
-						         *(int*)(bankEntry->m_address + 8), bankEntry->m_address, bankEntry->m_size, freeSize);
+						         reinterpret_cast<RedSeSepHEAD*>(bankEntry->m_address)->m_seNo, bankEntry->m_address,
+						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);
 						matched = 1;
 						break;

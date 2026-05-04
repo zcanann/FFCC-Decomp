@@ -2630,39 +2630,38 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 static int _SeMidiNoteExecute(
     RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* trackData, int frames, int tickStep)
 {
-    int* track = (int*)trackData;
+    RedTrackDATA* track = trackData;
     do {
-        if (((u32)*track != 0) && ((((RedTrackDATA*)track)->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAUSE) == 0)) {
-            ((RedTrackDATA*)track)->m_seTickCounter += (s16)(tickStep * -REDSOUND_SE_TICK_STEP);
-            while (((RedTrackDATA*)track)->m_seTickCounter < 1) {
+        if ((track->m_command != 0) && ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAUSE) == 0)) {
+            track->m_seTickCounter += (s16)(tickStep * -REDSOUND_SE_TICK_STEP);
+            while (track->m_seTickCounter < 1) {
                 int step = frames;
-                ((RedTrackDATA*)track)->m_seTickCounter += REDSOUND_CONTROL_TICK_PERIOD;
-                if (((RedTrackDATA*)track)->m_deltaTime < frames) {
-                    step = ((RedTrackDATA*)track)->m_deltaTime;
+                track->m_seTickCounter += REDSOUND_CONTROL_TICK_PERIOD;
+                if (track->m_deltaTime < frames) {
+                    step = track->m_deltaTime;
                 }
-                ((RedTrackDATA*)track)->m_deltaTime -= frames;
-                _SeTrackDataExecute((RedTrackDATA*)track, step);
-                if ((((RedTrackDATA*)track)->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0 && (((RedTrackDATA*)track)->m_deltaTime == 1)) {
-                    KeyOffSet(control, keyOnData, (RedTrackDATA*)track);
+                track->m_deltaTime -= frames;
+                _SeTrackDataExecute(track, step);
+                if (((track->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0) && (track->m_deltaTime == 1)) {
+                    KeyOffSet(control, keyOnData, track);
                 }
 
                 m_ChangeStatus = 0;
-                while (((u32)*track != 0) && (((RedTrackDATA*)track)->m_deltaTime < 1)) {
+                while ((track->m_command != 0) && (track->m_deltaTime < 1)) {
                     int delta;
                     unsigned char* cmd;
-                    ((RedTrackDATA*)track)->m_loopStepCurrent += 1;
-                    cmd = ((RedTrackDATA*)track)->m_command;
-                    ((RedTrackDATA*)track)->m_command = cmd + 1;
-                    p_MidiControl_Function[*cmd](control, keyOnData, (RedTrackDATA*)track);
-                    if ((u32)*track != 0) {
-                        delta = DeltaTimeSumup((unsigned char**)track);
+                    track->m_loopStepCurrent += 1;
+                    cmd = track->m_command;
+                    track->m_command = cmd + 1;
+                    p_MidiControl_Function[*cmd](control, keyOnData, track);
+                    if (track->m_command != 0) {
+                        delta = DeltaTimeSumup((unsigned char**)&track->m_command);
                         if (delta != 0) {
-                            delta += ((RedTrackDATA*)track)->m_step;
+                            delta += track->m_step;
                             if (delta < 1) {
                                 delta = 1;
-                            } else if ((((RedTrackDATA*)track)->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME) != 0) {
-                                delta += ((delta * ((RedTrackDATA*)track)->m_fuzzyDeltaTimeDepth >> 8) *
-                                             (int)GetRandomData()) >>
+                            } else if ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME) != 0) {
+                                delta += ((delta * track->m_fuzzyDeltaTimeDepth >> 8) * (int)GetRandomData()) >>
                                     7;
                                 if (delta < 1) {
                                     delta = 1;
@@ -2670,24 +2669,24 @@ static int _SeMidiNoteExecute(
                             }
                         }
 
-                        if (((RedTrackDATA*)track)->m_deltaTime < -1) {
+                        if (track->m_deltaTime < -1) {
                             int execStep = delta;
-                            if (((RedTrackDATA*)track)->m_deltaTime + delta > 0) {
-                                execStep = -((RedTrackDATA*)track)->m_deltaTime;
+                            if (track->m_deltaTime + delta > 0) {
+                                execStep = -track->m_deltaTime;
                             }
-                            _SeTrackDataExecute((RedTrackDATA*)track, execStep);
+                            _SeTrackDataExecute(track, execStep);
                         }
-                        ((RedTrackDATA*)track)->m_deltaTime += delta;
+                        track->m_deltaTime += delta;
                     }
                 }
 
                 if (m_ChangeStatus != 0) {
-                    (p_VoiceData + ((RedTrackDATA*)track)->m_trackNo)->m_updateFlags = m_ChangeStatus;
+                    (p_VoiceData + track->m_trackNo)->m_updateFlags = m_ChangeStatus;
                 }
             }
         }
-        track += REDSOUND_TRACK_SIZE / sizeof(*track);
-    } while (track < (int*)((int)control->m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE));
+        track++;
+    } while (track < control->m_tracks + REDSOUND_SE_TRACK_COUNT);
     control->m_updateFlags = 1;
     return control->m_tickCounter;
 }

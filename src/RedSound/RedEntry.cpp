@@ -1683,7 +1683,7 @@ void CRedEntry::DisplayMMemoryInfo()
 		}
 
 		bankEntry++;
-	} while (bankEntry < memoryBank + 0x400);
+	} while (bankEntry < memoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT);
 
     freeSize = (c_RedMemory.GetMainBufferAddress() + c_RedMemory.GetMainBufferSize()) - nextAddress;
 	if (maxFreeSize < freeSize) {

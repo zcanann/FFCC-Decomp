@@ -1175,12 +1175,12 @@ static void _DmaExecute()
            (p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX])) {
         activeRequest = 0;
         m_DMAInThread = REDSOUND_DMA_THREAD_SELECT_QUEUE;
-        if (p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] == p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) {
-            oldQueuePtr = &p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX];
-            queueBase = RedDriverStreamDmaQueue();
-        } else {
+        if (p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) {
             oldQueuePtr = &p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX];
             queueBase = RedDriverMainDmaQueue();
+        } else {
+            oldQueuePtr = &p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX];
+            queueBase = RedDriverStreamDmaQueue();
         }
         queueEntry = *oldQueuePtr;
         m_DMAInThread = REDSOUND_DMA_THREAD_LOAD_ENTRY;

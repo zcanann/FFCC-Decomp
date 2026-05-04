@@ -245,7 +245,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 	control = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
 	RedTrackDATA* track = control->m_tracks;
 	do {
-		if (((u32)track->m_command != 0) && ((u32)track->m_waveBankData != 0) &&
+		if (((u32)track->m_command != 0) && (track->m_waveBankData != 0) &&
 		    (track->m_waveBankData->m_waveNo == waveNo)) {
 			found = 1;
 			SeStopID(track->m_seId);

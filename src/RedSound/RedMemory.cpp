@@ -80,8 +80,7 @@ int RedNew(int size)
 
 			if ((u32)(address + size) <= (u32)(m_DataBuffer + m_DataBufferSize)) {
 				if (slot->m_size > 0) {
-					entryCount = ((int)(m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (int)(slot + 1)) /
-					             REDSOUND_MEMORY_BLOCK_SIZE;
+					entryCount = (m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (slot + 1);
 					if (entryCount > 0) {
 						memmove(slot + 1, slot, entryCount * REDSOUND_MEMORY_BLOCK_SIZE);
 					}
@@ -125,8 +124,7 @@ void RedDelete(int address)
 
 		while ((blockPtr->m_size != 0) && (blockPtr < m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT)) {
 			if (blockPtr->m_address == address) {
-				int entryCount = ((int)(m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (int)(blockPtr + 1)) /
-				                 REDSOUND_MEMORY_BLOCK_SIZE;
+				int entryCount = (m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (blockPtr + 1);
 
 				if (entryCount > 0) {
 					memcpy(blockPtr, blockPtr + 1, entryCount * REDSOUND_MEMORY_BLOCK_SIZE);
@@ -233,8 +231,7 @@ int RedNewA(int size, int offset, int maxSize)
 
 	if ((bestBlock != 0) && ((u32)(result + size) <= (u32)(rangeStart + maxSize))) {
 		if (bestBlock->m_size > 0) {
-			int moveCount = ((int)(m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (int)(bestBlock + 1)) /
-			                REDSOUND_MEMORY_BLOCK_SIZE;
+			int moveCount = (m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (bestBlock + 1);
 			if (moveCount > 0) {
 				memmove(bestBlock + 1, bestBlock, moveCount * REDSOUND_MEMORY_BLOCK_SIZE);
 			}
@@ -270,8 +267,7 @@ void RedDeleteA(int address)
 
 		while ((blockPtr->m_size != 0) && (blockPtr < m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT)) {
 			if (blockPtr->m_address == address) {
-				int entryCount = ((int)(m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (int)(blockPtr + 1)) /
-				                 REDSOUND_MEMORY_BLOCK_SIZE;
+				int entryCount = (m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (blockPtr + 1);
 
 				if (entryCount > 0) {
 					memcpy(blockPtr, blockPtr + 1, entryCount * REDSOUND_MEMORY_BLOCK_SIZE);

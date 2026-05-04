@@ -1844,7 +1844,7 @@ static void _ExecuteExtraData()
     RedSoundCONTROL* soundControl;
     unsigned int* voice;
     int* track;
-    u32 musicBase;
+    RedTrackDATA* musicBase;
 
     do {
         soundControl = (RedSoundCONTROL*)sound;
@@ -1856,10 +1856,11 @@ static void _ExecuteExtraData()
             }
 
             if (*sound != 0) {
-                musicBase = *sound;
+                musicBase = (RedTrackDATA*)*sound;
                 voice = (unsigned int*)p_VoiceData;
                 do {
-                    if ((musicBase <= *voice) && (*voice < musicBase + (u32)soundControl->m_trackCount * REDSOUND_TRACK_SIZE)) {
+                    if ((musicBase <= (RedTrackDATA*)*voice) &&
+                        ((RedTrackDATA*)*voice < musicBase + soundControl->m_trackCount)) {
                         ((RedVoiceDATA*)voice)->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
                     }
                     voice += REDSOUND_VOICE_SIZE / sizeof(*voice);

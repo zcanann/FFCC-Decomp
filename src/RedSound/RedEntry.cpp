@@ -586,7 +586,7 @@ void CRedEntry::ClearWaveData(int waveNo)
 	} else {
 		waveNo = SearchWaveSequence(waveNo);
 		if (waveNo >= 0) {
-			WaveDelete(reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + waveNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
+			WaveDelete(&reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[waveNo]);
 		}
 	}
 }
@@ -655,7 +655,7 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
 			}
 		}
 	} else if ((waveBankNo >= 0) && (waveBankNo < REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT)) {
-		WaveDelete(reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + waveBankNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
+		WaveDelete(&reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[waveBankNo]);
 	}
 }
 
@@ -1107,7 +1107,7 @@ int CRedEntry::ClearSeSepData(int seNo)
 	} else {
 		result = SearchSeSepSequence(seNo);
 		if (result >= 0) {
-			result = SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + result * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
+			result = SeSepMemoryFree(&reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase)[result]);
 		}
 	}
 

@@ -1057,7 +1057,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         memset(param_2->m_adsrTime, 0, REDSOUND_TRACK_ADSR_SIZE);
     } else {
         memcpy(param_2->m_adsrTime,
-               param_2->m_waveData->m_adsr,
+               ((RedWaveDATA*)param_1->m_waveData)->m_adsr,
                REDSOUND_TRACK_ADSR_SIZE);
     }
 

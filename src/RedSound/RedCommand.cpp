@@ -61,7 +61,7 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 	RedTrackDATA* track = *trackBasePtr;
 
 	do {
-		if (((u32)track->m_command != 0) && ((int)track->m_eraseTrack <= eraseTrack) &&
+		if ((track->m_command != 0) && ((int)track->m_eraseTrack <= eraseTrack) &&
 		    ((((unsigned int)track->m_attrMask) & (unsigned int)attrMask) != 0)) {
 			int trackNo;
 
@@ -79,7 +79,7 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 			(p_VoiceData + trackNo)->m_active = 0;
 
 			c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
-			if ((u32)track->m_waveBankData != 0) {
+			if (track->m_waveBankData != 0) {
 				c_RedEntry.WaveHistoryManager(
 				    0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
 			}
@@ -104,7 +104,7 @@ static int _EraseTime(int eraseTrack)
 	RedTrackDATA* track = *trackBasePtr;
 
 	do {
-		if (((u32)track->m_command != 0) && (track->m_attrMask == 0) && ((int)track->m_eraseTrack < minTrack)) {
+		if ((track->m_command != 0) && (track->m_attrMask == 0) && ((int)track->m_eraseTrack < minTrack)) {
 			minTrack = track->m_eraseTrack;
 		}
 		track++;
@@ -118,7 +118,7 @@ static int _EraseTime(int eraseTrack)
 	int maxWait = 0;
 	int sepId = 0;
 	do {
-		if (((u32)track->m_command != 0) && (track->m_attrMask == 0) && ((int)track->m_eraseTrack <= eraseTrack) &&
+		if ((track->m_command != 0) && (track->m_attrMask == 0) && ((int)track->m_eraseTrack <= eraseTrack) &&
 		    (track->m_playTime > maxWait)) {
 			maxWait = track->m_playTime;
 			sepId = track->m_seSepId;
@@ -129,7 +129,7 @@ static int _EraseTime(int eraseTrack)
 	track = *trackBasePtr;
 	int erasedCount = 0;
 	do {
-		if (((u32)track->m_command != 0) && (track->m_attrMask == 0) && ((int)track->m_eraseTrack <= eraseTrack) &&
+		if ((track->m_command != 0) && (track->m_attrMask == 0) && ((int)track->m_eraseTrack <= eraseTrack) &&
 		    (track->m_playTime == maxWait)) {
 			int trackNo;
 
@@ -146,7 +146,7 @@ static int _EraseTime(int eraseTrack)
 			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 			(p_VoiceData + trackNo)->m_active = 0;
 
-			if ((u32)track->m_waveBankData != 0) {
+			if (track->m_waveBankData != 0) {
 				c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
 			}
 			erasedCount++;
@@ -189,11 +189,11 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 		do {
 			track = scan;
 			remaining--;
-			if ((remaining != 0) && ((u32)track->m_command == 0) &&
+			if ((remaining != 0) && (track->m_command == 0) &&
 			    ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) == 0)) {
 				scan = track - 1;
 			} else {
-				if (((u32)track->m_command != 0) || ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
+				if ((track->m_command != 0) || ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
 					remaining = 1;
 					scan = track;
 				}
@@ -227,7 +227,7 @@ int SeStopID(int seId)
 	soundControl->m_updateFlags = 0;
 	track = soundControl->m_tracks;
 	do {
-		if (((u32)track->m_command != 0) && ((seId == -1) || (track->m_seId == seId))) {
+		if ((track->m_command != 0) && ((seId == -1) || (track->m_seId == seId))) {
 			int trackNo;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, track);
@@ -244,7 +244,7 @@ int SeStopID(int seId)
 			(p_VoiceData + trackNo)->m_track = 0;
 			(p_VoiceData + trackNo)->m_active = 0;
 
-			if ((u32)track->m_waveBankData != 0) {
+			if (track->m_waveBankData != 0) {
 				c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
 			}
 			c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
@@ -273,7 +273,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 	soundControl->m_updateFlags = 0;
 	track = soundControl->m_tracks;
 	do {
-		if (((u32)track->m_command != 0) && ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) == 0)) {
+		if ((track->m_command != 0) && ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) == 0)) {
 			int id = track->m_seSepId / 1000;
 			if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
 				int trackNo;
@@ -292,7 +292,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				(p_VoiceData + trackNo)->m_track = 0;
 				(p_VoiceData + trackNo)->m_active = 0;
 
-				if ((u32)track->m_waveBankData != 0) {
+				if (track->m_waveBankData != 0) {
 					c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
 				}
 				c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
@@ -886,7 +886,7 @@ int MusicStop(int musicId)
 
 				RedTrackDATA* track = music->m_tracks;
 				do {
-					if ((u32)track->m_command != 0) {
+					if (track->m_command != 0) {
 						KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, track);
 						track->m_command = 0;
 					}

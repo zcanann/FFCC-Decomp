@@ -1057,7 +1057,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         memset(param_2->m_adsrTime, 0, REDSOUND_TRACK_ADSR_SIZE);
     } else {
         memcpy(param_2->m_adsrTime,
-               ((RedWaveDATA*)param_1->m_waveData)->m_adsr,
+               param_1->m_waveData->m_adsr,
                REDSOUND_TRACK_ADSR_SIZE);
     }
 
@@ -1244,7 +1244,7 @@ static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, in
     }
 
     if (voiceData != 0) {
-        ((RedVoiceDATA*)voiceData)->m_waveData = _WaveSplitSelect((RedWaveDATA*)track->m_waveData, note);
+        ((RedVoiceDATA*)voiceData)->m_waveData = _WaveSplitSelect(track->m_waveData, note);
         _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
 
         if (((((RedVoiceDATA*)voiceData)->m_waveData->m_flags & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) &&

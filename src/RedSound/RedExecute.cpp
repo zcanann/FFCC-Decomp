@@ -1052,10 +1052,9 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     }
 
     voiceData[REDSOUND_VOICE_NOTE_WORD] = *(int*)param_3;
-    voiceData[REDSOUND_VOICE_TRACK_VOLUME_WORD] = (int)((u8*)param_1 + REDSOUND_TRACK_VOLUME_OFFSET);
-    voiceData[REDSOUND_VOICE_TRACK_EXPRESSION_WORD] =
-        (int)((u8*)param_1 + REDSOUND_TRACK_EXPRESSION_OFFSET);
-    voiceData[REDSOUND_VOICE_TRACK_PAN_WORD] = (int)((u8*)param_1 + REDSOUND_TRACK_PAN_OFFSET);
+    param_2->m_trackVolume = &param_1->m_volume;
+    param_2->m_trackExpression = &param_1->m_expression;
+    param_2->m_trackPan = &param_1->m_pan;
 
     if (param_2->m_waveData == 0) {
         memset(param_2->m_adsrTime, 0, REDSOUND_TRACK_ADSR_SIZE);

@@ -1745,17 +1745,15 @@ static void _KeyOnControl()
                     (((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_tremoloFunc != 0) ||
                     (((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_shakeFunc != 0)) {
                     int volume;
-                    if ((voice[REDSOUND_VOICE_TRACK_WORD] < (u32)p_SoundControlBuffer->m_tracks) ||
-                        ((u32)p_SoundControlBuffer->m_tracks +
-                             (u32)p_SoundControlBuffer->m_trackCount * REDSOUND_TRACK_SIZE <=
-                         voice[REDSOUND_VOICE_TRACK_WORD])) {
+                    if (((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD] < p_SoundControlBuffer->m_tracks) ||
+                        (p_SoundControlBuffer->m_tracks + p_SoundControlBuffer->m_trackCount <=
+                         (RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])) {
                         volume = m_MasterSEVolume;
-                        if (((u32)p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks <=
-                             voice[REDSOUND_VOICE_TRACK_WORD]) &&
-                            (voice[REDSOUND_VOICE_TRACK_WORD] <
-                             (u32)p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks +
-                                 (u32)p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount *
-                                     REDSOUND_TRACK_SIZE)) {
+                        if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks <=
+                             (RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD]) &&
+                            ((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD] <
+                             p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks +
+                                 p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount)) {
                             u32 idx = (u32)((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_trackNo;
 
                             if (((1U << (idx & REDSOUND_VOICE_INDEX_MASK)) &

@@ -61,6 +61,17 @@ static const char sRedEntryInfoColor[] = "\x1B[4;34m";
 static const char sRedEntryNewline[] = "\n";
 static const char sRedEntryPrefixedNewlineFmt[] = "%s\n";
 
+enum RedEntryHeaderSignature {
+	REDSOUND_ENTRY_MUSIC_SIGNATURE_0 = 'B',
+	REDSOUND_ENTRY_MUSIC_SIGNATURE_1 = 'G',
+	REDSOUND_ENTRY_MUSIC_SIGNATURE_2 = 'M',
+	REDSOUND_ENTRY_SESEP_SIGNATURE_0 = 'S',
+	REDSOUND_ENTRY_SESEP_SIGNATURE_1 = 'e',
+	REDSOUND_ENTRY_SESEP_SIGNATURE_2 = 'S',
+	REDSOUND_ENTRY_SESEP_SIGNATURE_3 = 'e',
+	REDSOUND_ENTRY_SESEP_SIGNATURE_4 = 'p',
+};
+
 /*
  * --INFO--
  * Address:	TODO
@@ -1048,9 +1059,11 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 {
 	int result;
 
-	if ((seSepHead->m_signature[0] != 'S') || (seSepHead->m_signature[1] != 'e') ||
-	    (seSepHead->m_signature[2] != 'S') || (seSepHead->m_signature[3] != 'e') ||
-	    (seSepHead->m_signature[4] != 'p')) {
+	if ((seSepHead->m_signature[0] != REDSOUND_ENTRY_SESEP_SIGNATURE_0) ||
+	    (seSepHead->m_signature[1] != REDSOUND_ENTRY_SESEP_SIGNATURE_1) ||
+	    (seSepHead->m_signature[2] != REDSOUND_ENTRY_SESEP_SIGNATURE_2) ||
+	    (seSepHead->m_signature[3] != REDSOUND_ENTRY_SESEP_SIGNATURE_3) ||
+	    (seSepHead->m_signature[4] != REDSOUND_ENTRY_SESEP_SIGNATURE_4)) {
 		RedDelete(seSepHead);
 		if (m_ReportPrint != 0) {
 			OSReport(s__s_sSE_Sep_Header_was_broken__s_801e7b50, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
@@ -1062,9 +1075,10 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 	result = SearchSeSepSequence(seSepHead->m_seNo);
 	if (result >= 0) {
 		RedDelete(seSepHead);
-		SeSepHistoryChoice(reinterpret_cast<RedHistoryBANK*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) +
-		                                                   result * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
-		result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + result * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 8);
+		SeSepHistoryChoice(reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase +
+		                                                     result * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
+		result = *reinterpret_cast<int*>(m_seSepBankBase + result * REDSOUND_HISTORY_BANK_ENTRY_SIZE +
+		                                 REDSOUND_HISTORY_BANK_DATA_OFFSET);
 	} else {
 		result = reinterpret_cast<int>(SeSepHeadAdd(seSepHead));
 		if (result == 0) {
@@ -1534,8 +1548,9 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 {
 	int result;
 
-	if ((musicHead->m_signature[0] != 'B') || (musicHead->m_signature[1] != 'G') ||
-	    (musicHead->m_signature[2] != 'M')) {
+	if ((musicHead->m_signature[0] != REDSOUND_ENTRY_MUSIC_SIGNATURE_0) ||
+	    (musicHead->m_signature[1] != REDSOUND_ENTRY_MUSIC_SIGNATURE_1) ||
+	    (musicHead->m_signature[2] != REDSOUND_ENTRY_MUSIC_SIGNATURE_2)) {
 		RedDelete(musicHead);
 		if (m_ReportPrint != 0) {
 			OSReport(s__s_sMusic_Header_was_broken__s_801e7c1d, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);

@@ -334,7 +334,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	int pitch;
 	int iVar2;
 	int sampleOffset;
-	u8* headerData;
+	RedStreamADPCMHeader* headerData;
 	RedStreamDATA* streamData;
 	RedVoiceDATA* voice;
 
@@ -358,17 +358,17 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 
 	if ((streamData->m_track != 0) && (streamData->m_buffer != 0) && (streamData->m_aramBuffer != 0)) {
 		sampleOffset = REDSOUND_STREAM_PAGE_SIZE;
-		headerData = (u8*)streamHeader + REDSOUND_STREAM_FILE_HEADER_SIZE;
-		((RedStreamADPCMHeader*)headerData)->m_loopPredScale = (short)*(char*)((int)streamHeader + sampleOffset);
-		((RedStreamADPCMHeader*)headerData)->m_loopYn1 = ((RedStreamADPCMHeader*)headerData)->m_loopYn2 = 0;
+		headerData = reinterpret_cast<RedStreamADPCMHeader*>((u8*)streamHeader + REDSOUND_STREAM_FILE_HEADER_SIZE);
+		headerData->m_loopPredScale = (short)((s8*)streamHeader)[sampleOffset];
+		headerData->m_loopYn1 = headerData->m_loopYn2 = 0;
 		if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 			if (streamData->m_header.m_loopStart < 0) {
 				sampleOffset += REDSOUND_STREAM_PAGE_SIZE;
 			} else {
 				sampleOffset += 8;
 			}
-			((RedStreamADPCMHeader*)headerData)[1].m_loopPredScale = (short)*(char*)((int)streamHeader + sampleOffset);
-			((RedStreamADPCMHeader*)headerData)[1].m_loopYn1 = ((RedStreamADPCMHeader*)headerData)[1].m_loopYn2 = 0;
+			headerData[1].m_loopPredScale = (short)((s8*)streamHeader)[sampleOffset];
+			headerData[1].m_loopYn1 = headerData[1].m_loopYn2 = 0;
 		}
 
 		streamData->m_streamId = streamID;
@@ -416,7 +416,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			                  streamData->m_volume >> REDSOUND_FIXED_SHIFT);
 			(streamData->m_track + iVar2)->m_waveBase = streamData->m_aramBuffer + iVar2 * REDSOUND_STREAM_STEREO_PLANE_SIZE;
 			memset(&streamData->m_trackData[iVar2], 0, sizeof(RedWaveDATA));
-			memcpy(streamData->m_trackData[iVar2].m_adpcmData, &((RedStreamADPCMHeader*)headerData)[iVar2], sizeof(RedStreamADPCMHeader));
+			memcpy(streamData->m_trackData[iVar2].m_adpcmData, &headerData[iVar2], sizeof(RedStreamADPCMHeader));
 			voice->m_adsrLevel[0] = voice->m_adsrLevel[1] = voice->m_adsrLevel[2] = 0;
 			voice->m_adsrLevel[3] = REDSOUND_VOLUME_MAX;
 			voice->m_adsrTime[0] = voice->m_adsrTime[1] = voice->m_adsrTime[2] = 0;

@@ -1023,9 +1023,9 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     voiceData[0] = (int)param_1;
     voiceData[0x23] = 1;
 
-    if ((trackData[REDSOUND_TRACK_PORTAMENT_TIME_WORD_OFFSET] == 0) ||
-        (trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] < 0)) {
-        trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+    if ((param_1->m_portamentTime == 0) ||
+        (param_1->m_portamentPitch < 0)) {
+        param_1->m_portamentPitch = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
         if (param_2->m_waveData != 0) {
             if ((param_2->m_waveData->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) == 0) {
                 param_2->m_basePitch = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
@@ -1042,13 +1042,13 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
             }
         }
     } else {
-        trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] &= REDSOUND_FIXED_WHOLE_MASK;
-        param_2->m_basePitch = trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET];
-        trackData[REDSOUND_TRACK_SWEEP_DELTA_WORD_OFFSET] = trackData[REDSOUND_TRACK_PORTAMENT_TIME_WORD_OFFSET];
+        param_1->m_portamentPitch &= REDSOUND_FIXED_WHOLE_MASK;
+        param_2->m_basePitch = param_1->m_portamentPitch;
+        param_1->m_sweepDelta = param_1->m_portamentTime;
         local_38[0] = 0;
         DataAddCompute(local_38, note * REDSOUND_PITCH_NOTE_UNIT -
-                                     (trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT),
-                       &trackData[REDSOUND_TRACK_SWEEP_DELTA_WORD_OFFSET]);
+                                     (param_1->m_portamentPitch >> REDSOUND_FIXED_SHIFT),
+                       &param_1->m_sweepDelta);
     }
 
     voiceData[REDSOUND_VOICE_NOTE_WORD] = *(int*)param_3;
@@ -1077,17 +1077,17 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         param_2->m_voiceSwitch |= maskBits;
     }
 
-    local_38[0] = trackS16[REDSOUND_TRACK_KEY_TRANSPOSE_HALFWORD] + trackS16[REDSOUND_TRACK_PITCH_BEND_HALFWORD];
+    local_38[0] = param_1->m_keyTranspose + param_1->m_pitchBend;
     if ((((u8*)voiceData)[REDSOUND_VOICE_STATE_FLAGS_OFFSET] & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
         iVar5 = param_2->m_basePitch + p_MusicPitchControl->m_value;
     } else {
-        iVar5 = param_2->m_basePitch + trackData[REDSOUND_TRACK_PITCH_WORD_OFFSET];
+        iVar5 = param_2->m_basePitch + param_1->m_pitch;
     }
 
     if (param_2->m_waveData == 0) {
         iVar5 = 0;
     } else {
-        iVar5 = PitchCompute(iVar5, local_38[0], param_2->m_waveData->m_pitch, trackS8[REDSOUND_TRACK_FINE_TUNE_BYTE]);
+        iVar5 = PitchCompute(iVar5, local_38[0], param_2->m_waveData->m_pitch, param_1->m_fineTune);
     }
     param_2->m_targetPitch = iVar5;
 

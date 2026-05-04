@@ -1849,10 +1849,10 @@ static void _ExecuteExtraData()
         voice = (unsigned int*)p_VoiceData;
         do {
             if ((((u8*)voice)[0x1A] & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
-                voice[0x26] = PitchCompute(
-                    voice[0x28] + p_MusicPitchControl->m_value,
+                voice[REDSOUND_VOICE_TARGET_PITCH_WORD] = PitchCompute(
+                    voice[REDSOUND_VOICE_BASE_PITCH_WORD] + p_MusicPitchControl->m_value,
                     (int)((RedTrackDATA*)*voice)->m_keyTranspose + (int)((RedTrackDATA*)*voice)->m_pitchBend,
-                    *(int*)(voice[1] + 0x14),
+                    *(int*)(voice[REDSOUND_VOICE_WAVE_DATA_WORD] + REDSOUND_WAVE_PITCH_OFFSET),
                     ((RedTrackDATA*)*voice)->m_fineTune);
                 ((RedVoiceDATA*)voice)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
             }

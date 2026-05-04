@@ -65,315 +65,6 @@ struct CompaFlatData
 
 /*
  * --INFO--
- * PAL Address: 801620f8
- * PAL Size: 616b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::CompaInit()
-{
-	float fVar1;
-	float fVar2;
-	float fVar3;
-	int iVar4;
-	int iVar5;
-
-	memset(this->compaList, 0, 0x1008);
-	fVar1 = FLOAT_80333000;
-	iVar4 = (int)this->compaList + 8;
-	iVar5 = 8;
-	do {
-		*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0x94) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0xd4) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0x114) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0x154) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0x194) = fVar1;
-		*reinterpret_cast<float*>(iVar4 + 0x1d4) = fVar1;
-		iVar4 += 0x200;
-		iVar5 += -1;
-	} while (iVar5 != 0);
-
-	iVar4 = (int)this->compaList;
-	*reinterpret_cast<int*>(iVar4 + 0x24) = 0x52;
-	*reinterpret_cast<int*>(iVar4 + 0x20) = 4;
-	*reinterpret_cast<short*>(iVar4 + 8) = 0x28;
-	*reinterpret_cast<short*>(iVar4 + 10) = 0x30;
-	fVar1 = FLOAT_80332FF8;
-	*reinterpret_cast<short*>(iVar4 + 0xc) = 0x198;
-	fVar2 = FLOAT_80333000;
-	*reinterpret_cast<short*>(iVar4 + 0xe) = 0x18;
-	*reinterpret_cast<float*>(iVar4 + 0x10) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0x1c) = fVar2;
-	*reinterpret_cast<int*>(iVar4 + 0x2c) = 5;
-	*reinterpret_cast<int*>(iVar4 + 0x30) = 5;
-
-	iVar4 = (int)this->compaList;
-	*reinterpret_cast<int*>(iVar4 + 100) = 0x51;
-	*reinterpret_cast<short*>(iVar4 + 0x48) = 0x28;
-	*reinterpret_cast<short*>(iVar4 + 0x4a) = 0x48;
-	*reinterpret_cast<short*>(iVar4 + 0x4c) = 0x198;
-	*reinterpret_cast<short*>(iVar4 + 0x4e) = 200;
-	*reinterpret_cast<float*>(iVar4 + 0x50) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0x5c) = fVar2;
-	*reinterpret_cast<int*>(iVar4 + 0x6c) = 5;
-	*reinterpret_cast<int*>(iVar4 + 0x70) = 5;
-
-	iVar4 = (int)this->compaList;
-	*reinterpret_cast<int*>(iVar4 + 0xa4) = 0x52;
-	*reinterpret_cast<short*>(iVar4 + 0x88) = 0x28;
-	*reinterpret_cast<short*>(iVar4 + 0x8a) = 0x110;
-	*reinterpret_cast<short*>(iVar4 + 0x8c) = 0x198;
-	*reinterpret_cast<short*>(iVar4 + 0x8e) = 0x18;
-	*reinterpret_cast<float*>(iVar4 + 0x90) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0x94) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0x9c) = fVar2;
-	*reinterpret_cast<int*>(iVar4 + 0xac) = 5;
-	*reinterpret_cast<int*>(iVar4 + 0xb0) = 5;
-
-	iVar4 = (int)this->compaList;
-	*reinterpret_cast<int*>(iVar4 + 0xe4) = 0x5e;
-	*reinterpret_cast<short*>(iVar4 + 200) = 0x10;
-	*reinterpret_cast<short*>(iVar4 + 0xca) = 0xe;
-	*reinterpret_cast<short*>(iVar4 + 0xcc) = 0x30;
-	*reinterpret_cast<short*>(iVar4 + 0xce) = 0x30;
-	*reinterpret_cast<float*>(iVar4 + 0xd0) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0xd4) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0xdc) = fVar2;
-	*reinterpret_cast<int*>(iVar4 + 0xec) = 0;
-	*reinterpret_cast<int*>(iVar4 + 0xf0) = 5;
-
-	fVar3 = FLOAT_8033303C;
-	fVar2 = FLOAT_80333038;
-	iVar4 = (int)this->compaList;
-	*reinterpret_cast<int*>(iVar4 + 0x124) = 0x5e;
-	*reinterpret_cast<short*>(iVar4 + 0x108) = 0x15;
-	*reinterpret_cast<short*>(iVar4 + 0x10c) = 0x30;
-	*reinterpret_cast<short*>(iVar4 + 0x10e) = 0x30;
-	*reinterpret_cast<short*>(iVar4 + 0x10a) = static_cast<short>(0x150 - *reinterpret_cast<short*>(iVar4 + 0x10e));
-	*reinterpret_cast<float*>(iVar4 + 0x110) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0x114) = fVar1;
-	*reinterpret_cast<float*>(iVar4 + 0x11c) = fVar2;
-	*reinterpret_cast<int*>(iVar4 + 300) = 0;
-	*reinterpret_cast<int*>(iVar4 + 0x130) = 5;
-
-	iVar4 = (int)this->compaList;
-	*reinterpret_cast<int*>(iVar4 + 0x174) = 2;
-	*reinterpret_cast<int*>(iVar4 + 0x164) = 0x2e;
-	*reinterpret_cast<short*>(iVar4 + 0x148) = 0x10;
-	*reinterpret_cast<short*>(iVar4 + 0x14a) = 8;
-	*reinterpret_cast<short*>(iVar4 + 0x14c) = 0x30;
-	*reinterpret_cast<short*>(iVar4 + 0x14e) = 0x140;
-	*reinterpret_cast<float*>(iVar4 + 0x150) = fVar3;
-	*reinterpret_cast<float*>(iVar4 + 0x154) = fVar1;
-	*reinterpret_cast<int*>(iVar4 + 0x16c) = 0;
-	*reinterpret_cast<int*>(iVar4 + 0x170) = 5;
-
-	this->compaList->count = 6;
-	this->compaMenuState->selectedIndex = 0;
-	this->compaMenuState->initialized = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 80161f48
- * PAL Size: 432b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-bool CMenuPcs::CompaOpen()
-{
-    int finishedCount;
-    int count;
-    int frame;
-    int remaining;
-    CompaOpenAnim* entry;
-
-    if (this->compaMenuState->initialized == '\0') {
-        CompaInit();
-    }
-
-    finishedCount = 0;
-    this->compaMenuState->frame = this->compaMenuState->frame + 1;
-    count = static_cast<unsigned short>(this->compaList->count);
-    entry = this->compaList->entries;
-    frame = this->compaMenuState->frame;
-    remaining = count;
-    if (0 < count) {
-        do {
-            float step = FLOAT_80332FF8;
-            if (entry->startFrame <= frame) {
-                if (frame < entry->startFrame + entry->duration) {
-                    entry->frame = entry->frame + 1;
-                    entry->alpha = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
-                    if ((entry->flags & 2) == 0) {
-                        step = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
-                        entry->dx = (entry->targetX - (float)entry->x) * step;
-                        entry->dy = (entry->targetY - (float)entry->y) * step;
-                    }
-                } else {
-                    finishedCount = finishedCount + 1;
-                    entry->alpha = FLOAT_80333000;
-                    entry->dx = step;
-                    entry->dy = step;
-                }
-            }
-            entry++;
-            remaining = remaining + -1;
-        } while (remaining != 0);
-    }
-    return count == finishedCount;
-}
-
-/*
- * --INFO--
- * PAL Address: 80161c28
- * PAL Size: 800b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::CompaCtrl()
-{
-	bool activeInput = false;
-	unsigned short press;
-	short hold;
-	int doReset = 0;
-
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		press = 0;
-	} else {
-		int padIndex = activeInput;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		press = *reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
-	}
-
-	activeInput = false;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		hold = 0;
-	} else {
-		int padIndex = activeInput;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		hold = *reinterpret_cast<short*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 0x14);
-	}
-
-	if (hold == 0) {
-		doReset = false;
-	} else if ((press & 0x20) != 0) {
-		this->compaMenuState->cursorMove = 1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = true;
-	} else if ((press & 0x40) != 0) {
-		this->compaMenuState->cursorMove = -1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = true;
-	} else if ((press & 0x100) != 0) {
-		Sound.PlaySe(4, 0x40, 0x7f, 0);
-		doReset = false;
-	} else if ((press & 0x200) != 0) {
-		this->compaMenuState->closeRequested = 1;
-		Sound.PlaySe(3, 0x40, 0x7f, 0);
-		doReset = true;
-	} else {
-		doReset = false;
-	}
-
-	if (doReset) {
-		this->compaList->entries[0].startFrame = 2;
-		this->compaList->entries[0].duration = 5;
-		this->compaList->entries[1].startFrame = 2;
-		this->compaList->entries[1].duration = 5;
-		this->compaList->entries[2].startFrame = 2;
-		this->compaList->entries[2].duration = 5;
-		this->compaList->entries[3].startFrame = 7;
-		this->compaList->entries[3].duration = 5;
-		this->compaList->entries[4].startFrame = 7;
-		this->compaList->entries[4].duration = 5;
-		this->compaList->entries[5].flags = 2;
-		this->compaList->entries[5].startFrame = 7;
-		this->compaList->entries[5].duration = 5;
-
-		unsigned int entryCount = this->compaList->count;
-		CompaOpenAnim* entry = this->compaList->entries;
-		while (entryCount != 0) {
-			entry->frame = 0;
-			entry->alpha = 1.0f;
-			entry++;
-			entryCount--;
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 80161aac
- * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-bool CMenuPcs::CompaClose()
-{
-    int finishedCount;
-    int count;
-    int frame;
-    int remaining;
-    CompaOpenAnim* entry;
-
-    finishedCount = 0;
-    this->compaMenuState->frame = this->compaMenuState->frame + 1;
-    count = static_cast<unsigned short>(this->compaList->count);
-    entry = this->compaList->entries;
-    frame = this->compaMenuState->frame;
-    remaining = count;
-    if (0 < count) {
-        do {
-            float step = FLOAT_80332FF8;
-            if (entry->startFrame <= frame) {
-                if (frame < entry->startFrame + entry->duration) {
-                    entry->frame = entry->frame + 1;
-                    entry->alpha =
-                        (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame - DOUBLE_80333008);
-                    if ((entry->flags & 2) == 0) {
-                        step =
-                            (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame - DOUBLE_80333008);
-                        entry->dx = (entry->targetX - (float)entry->x) * step;
-                        entry->dy = (entry->targetY - (float)entry->y) * step;
-                    }
-                } else {
-                    finishedCount = finishedCount + 1;
-                    entry->alpha = FLOAT_80332FF8;
-                    entry->dx = step;
-                    entry->dy = step;
-                }
-            }
-            entry++;
-            remaining = remaining + -1;
-        } while (remaining != 0);
-    }
-
-    return count == finishedCount;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80160edc
  * PAL Size: 3024b
  * EN Address: TODO
@@ -601,4 +292,312 @@ void CMenuPcs::CompaDraw()
 	font->Draw(job);
 
 	DrawInit__8CMenuPcsFv(this);
+}
+/*
+ * --INFO--
+ * PAL Address: 80161aac
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+bool CMenuPcs::CompaClose()
+{
+    int finishedCount;
+    int count;
+    int frame;
+    int remaining;
+    CompaOpenAnim* entry;
+
+    finishedCount = 0;
+    this->compaMenuState->frame = this->compaMenuState->frame + 1;
+    count = static_cast<unsigned short>(this->compaList->count);
+    entry = this->compaList->entries;
+    frame = this->compaMenuState->frame;
+    remaining = count;
+    if (0 < count) {
+        do {
+            float step = FLOAT_80332FF8;
+            if (entry->startFrame <= frame) {
+                if (frame < entry->startFrame + entry->duration) {
+                    entry->frame = entry->frame + 1;
+                    entry->alpha =
+                        (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame - DOUBLE_80333008);
+                    if ((entry->flags & 2) == 0) {
+                        step =
+                            (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame - DOUBLE_80333008);
+                        entry->dx = (entry->targetX - (float)entry->x) * step;
+                        entry->dy = (entry->targetY - (float)entry->y) * step;
+                    }
+                } else {
+                    finishedCount = finishedCount + 1;
+                    entry->alpha = FLOAT_80332FF8;
+                    entry->dx = step;
+                    entry->dy = step;
+                }
+            }
+            entry++;
+            remaining = remaining + -1;
+        } while (remaining != 0);
+    }
+
+    return count == finishedCount;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 80161c28
+ * PAL Size: 800b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::CompaCtrl()
+{
+	bool activeInput = false;
+	unsigned short press;
+	short hold;
+	int doReset = 0;
+
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		activeInput = true;
+	}
+
+	if (activeInput) {
+		press = 0;
+	} else {
+		int padIndex = activeInput;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		press = *reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
+	}
+
+	activeInput = false;
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		activeInput = true;
+	}
+
+	if (activeInput) {
+		hold = 0;
+	} else {
+		int padIndex = activeInput;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		hold = *reinterpret_cast<short*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 0x14);
+	}
+
+	if (hold == 0) {
+		doReset = false;
+	} else if ((press & 0x20) != 0) {
+		this->compaMenuState->cursorMove = 1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		doReset = true;
+	} else if ((press & 0x40) != 0) {
+		this->compaMenuState->cursorMove = -1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		doReset = true;
+	} else if ((press & 0x100) != 0) {
+		Sound.PlaySe(4, 0x40, 0x7f, 0);
+		doReset = false;
+	} else if ((press & 0x200) != 0) {
+		this->compaMenuState->closeRequested = 1;
+		Sound.PlaySe(3, 0x40, 0x7f, 0);
+		doReset = true;
+	} else {
+		doReset = false;
+	}
+
+	if (doReset) {
+		this->compaList->entries[0].startFrame = 2;
+		this->compaList->entries[0].duration = 5;
+		this->compaList->entries[1].startFrame = 2;
+		this->compaList->entries[1].duration = 5;
+		this->compaList->entries[2].startFrame = 2;
+		this->compaList->entries[2].duration = 5;
+		this->compaList->entries[3].startFrame = 7;
+		this->compaList->entries[3].duration = 5;
+		this->compaList->entries[4].startFrame = 7;
+		this->compaList->entries[4].duration = 5;
+		this->compaList->entries[5].flags = 2;
+		this->compaList->entries[5].startFrame = 7;
+		this->compaList->entries[5].duration = 5;
+
+		unsigned int entryCount = this->compaList->count;
+		CompaOpenAnim* entry = this->compaList->entries;
+		while (entryCount != 0) {
+			entry->frame = 0;
+			entry->alpha = 1.0f;
+			entry++;
+			entryCount--;
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 80161f48
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+bool CMenuPcs::CompaOpen()
+{
+    int finishedCount;
+    int count;
+    int frame;
+    int remaining;
+    CompaOpenAnim* entry;
+
+    if (this->compaMenuState->initialized == '\0') {
+        CompaInit();
+    }
+
+    finishedCount = 0;
+    this->compaMenuState->frame = this->compaMenuState->frame + 1;
+    count = static_cast<unsigned short>(this->compaList->count);
+    entry = this->compaList->entries;
+    frame = this->compaMenuState->frame;
+    remaining = count;
+    if (0 < count) {
+        do {
+            float step = FLOAT_80332FF8;
+            if (entry->startFrame <= frame) {
+                if (frame < entry->startFrame + entry->duration) {
+                    entry->frame = entry->frame + 1;
+                    entry->alpha = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
+                    if ((entry->flags & 2) == 0) {
+                        step = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
+                        entry->dx = (entry->targetX - (float)entry->x) * step;
+                        entry->dy = (entry->targetY - (float)entry->y) * step;
+                    }
+                } else {
+                    finishedCount = finishedCount + 1;
+                    entry->alpha = FLOAT_80333000;
+                    entry->dx = step;
+                    entry->dy = step;
+                }
+            }
+            entry++;
+            remaining = remaining + -1;
+        } while (remaining != 0);
+    }
+    return count == finishedCount;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 801620f8
+ * PAL Size: 616b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::CompaInit()
+{
+	float fVar1;
+	float fVar2;
+	float fVar3;
+	int iVar4;
+	int iVar5;
+
+	memset(this->compaList, 0, 0x1008);
+	fVar1 = FLOAT_80333000;
+	iVar4 = (int)this->compaList + 8;
+	iVar5 = 8;
+	do {
+		*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0x94) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0xd4) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0x114) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0x154) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0x194) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0x1d4) = fVar1;
+		iVar4 += 0x200;
+		iVar5 += -1;
+	} while (iVar5 != 0);
+
+	iVar4 = (int)this->compaList;
+	*reinterpret_cast<int*>(iVar4 + 0x24) = 0x52;
+	*reinterpret_cast<int*>(iVar4 + 0x20) = 4;
+	*reinterpret_cast<short*>(iVar4 + 8) = 0x28;
+	*reinterpret_cast<short*>(iVar4 + 10) = 0x30;
+	fVar1 = FLOAT_80332FF8;
+	*reinterpret_cast<short*>(iVar4 + 0xc) = 0x198;
+	fVar2 = FLOAT_80333000;
+	*reinterpret_cast<short*>(iVar4 + 0xe) = 0x18;
+	*reinterpret_cast<float*>(iVar4 + 0x10) = fVar1;
+	*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
+	*reinterpret_cast<float*>(iVar4 + 0x1c) = fVar2;
+	*reinterpret_cast<int*>(iVar4 + 0x2c) = 5;
+	*reinterpret_cast<int*>(iVar4 + 0x30) = 5;
+
+	iVar4 = (int)this->compaList;
+	*reinterpret_cast<int*>(iVar4 + 100) = 0x51;
+	*reinterpret_cast<short*>(iVar4 + 0x48) = 0x28;
+	*reinterpret_cast<short*>(iVar4 + 0x4a) = 0x48;
+	*reinterpret_cast<short*>(iVar4 + 0x4c) = 0x198;
+	*reinterpret_cast<short*>(iVar4 + 0x4e) = 200;
+	*reinterpret_cast<float*>(iVar4 + 0x50) = fVar1;
+	*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
+	*reinterpret_cast<float*>(iVar4 + 0x5c) = fVar2;
+	*reinterpret_cast<int*>(iVar4 + 0x6c) = 5;
+	*reinterpret_cast<int*>(iVar4 + 0x70) = 5;
+
+	iVar4 = (int)this->compaList;
+	*reinterpret_cast<int*>(iVar4 + 0xa4) = 0x52;
+	*reinterpret_cast<short*>(iVar4 + 0x88) = 0x28;
+	*reinterpret_cast<short*>(iVar4 + 0x8a) = 0x110;
+	*reinterpret_cast<short*>(iVar4 + 0x8c) = 0x198;
+	*reinterpret_cast<short*>(iVar4 + 0x8e) = 0x18;
+	*reinterpret_cast<float*>(iVar4 + 0x90) = fVar1;
+	*reinterpret_cast<float*>(iVar4 + 0x94) = fVar1;
+	*reinterpret_cast<float*>(iVar4 + 0x9c) = fVar2;
+	*reinterpret_cast<int*>(iVar4 + 0xac) = 5;
+	*reinterpret_cast<int*>(iVar4 + 0xb0) = 5;
+
+	iVar4 = (int)this->compaList;
+	*reinterpret_cast<int*>(iVar4 + 0xe4) = 0x5e;
+	*reinterpret_cast<short*>(iVar4 + 200) = 0x10;
+	*reinterpret_cast<short*>(iVar4 + 0xca) = 0xe;
+	*reinterpret_cast<short*>(iVar4 + 0xcc) = 0x30;
+	*reinterpret_cast<short*>(iVar4 + 0xce) = 0x30;
+	*reinterpret_cast<float*>(iVar4 + 0xd0) = fVar1;
+	*reinterpret_cast<float*>(iVar4 + 0xd4) = fVar1;
+	*reinterpret_cast<float*>(iVar4 + 0xdc) = fVar2;
+	*reinterpret_cast<int*>(iVar4 + 0xec) = 0;
+	*reinterpret_cast<int*>(iVar4 + 0xf0) = 5;
+
+	fVar3 = FLOAT_8033303C;
+	fVar2 = FLOAT_80333038;
+	iVar4 = (int)this->compaList;
+	*reinterpret_cast<int*>(iVar4 + 0x124) = 0x5e;
+	*reinterpret_cast<short*>(iVar4 + 0x108) = 0x15;
+	*reinterpret_cast<short*>(iVar4 + 0x10c) = 0x30;
+	*reinterpret_cast<short*>(iVar4 + 0x10e) = 0x30;
+	*reinterpret_cast<short*>(iVar4 + 0x10a) = static_cast<short>(0x150 - *reinterpret_cast<short*>(iVar4 + 0x10e));
+	*reinterpret_cast<float*>(iVar4 + 0x110) = fVar1;
+	*reinterpret_cast<float*>(iVar4 + 0x114) = fVar1;
+	*reinterpret_cast<float*>(iVar4 + 0x11c) = fVar2;
+	*reinterpret_cast<int*>(iVar4 + 300) = 0;
+	*reinterpret_cast<int*>(iVar4 + 0x130) = 5;
+
+	iVar4 = (int)this->compaList;
+	*reinterpret_cast<int*>(iVar4 + 0x174) = 2;
+	*reinterpret_cast<int*>(iVar4 + 0x164) = 0x2e;
+	*reinterpret_cast<short*>(iVar4 + 0x148) = 0x10;
+	*reinterpret_cast<short*>(iVar4 + 0x14a) = 8;
+	*reinterpret_cast<short*>(iVar4 + 0x14c) = 0x30;
+	*reinterpret_cast<short*>(iVar4 + 0x14e) = 0x140;
+	*reinterpret_cast<float*>(iVar4 + 0x150) = fVar3;
+	*reinterpret_cast<float*>(iVar4 + 0x154) = fVar1;
+	*reinterpret_cast<int*>(iVar4 + 0x16c) = 0;
+	*reinterpret_cast<int*>(iVar4 + 0x170) = 5;
+
+	this->compaList->count = 6;
+	this->compaMenuState->selectedIndex = 0;
+	this->compaMenuState->initialized = 1;
 }

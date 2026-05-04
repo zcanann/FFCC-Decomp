@@ -1335,7 +1335,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
         nextLevel += 1;
         nextLevel <<= 8;
         nextLevel -= 1;
-        nextLevel <<= 0xc;
+        nextLevel <<= REDSOUND_FIXED_SHIFT;
     }
 
     if (stepFrames != 0) {
@@ -1343,7 +1343,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
             prevLevel += 1;
             prevLevel <<= 8;
             prevLevel -= 1;
-            prevLevel <<= 0xc;
+            prevLevel <<= REDSOUND_FIXED_SHIFT;
         }
         voice->m_adsrCurrentLevel = prevLevel;
         nextLevel |= REDSOUND_FIXED_HALF;
@@ -1380,7 +1380,7 @@ static void _AdsrDataCompute(RedVoiceDATA* voice)
             level += 1;
             level <<= 8;
             level -= 1;
-            level <<= 0xc;
+            level <<= REDSOUND_FIXED_SHIFT;
         }
         if (stepCount != 0) {
             break;
@@ -1425,7 +1425,7 @@ static u32 _AdsrDataExecute(RedVoiceDATA* voice)
         voice->m_adsrCurrentLevel = 0;
     }
 
-    if ((voice->m_adsrCurrentLevel >> 0xC) < 1) {
+    if ((voice->m_adsrCurrentLevel >> REDSOUND_FIXED_SHIFT) < 1) {
         voice->m_adsrStage = 4;
         voice->m_adsrCurrentLevel = 0;
     }

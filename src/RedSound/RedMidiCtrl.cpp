@@ -305,22 +305,22 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     unsigned int* slot;
 
-    if ((((signed char*)track)[REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
+    if (((signed char)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
         slot = (unsigned int*)((int)keyOnData + track->m_trackNo * 8);
         if ((*slot == 0) || (*slot == (unsigned int)track)) {
             *slot = (unsigned int)track;
-            slot[1] = ((unsigned int*)track)[REDSOUND_TRACK_NOTE_WORD_OFFSET];
+            slot[1] = *(unsigned int*)&track->m_note;
             m_KeyOnEntry++;
         }
         return;
     }
 
-    if ((((unsigned char*)track)[REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET] & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
+    if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
         slot = (unsigned int*)((int)keyOnData + REDSOUND_KEY_ON_PRIORITY_BYTE_OFFSET);
         do {
             if (*slot == 0) {
                 *slot = (unsigned int)track;
-                slot[1] = ((unsigned int*)track)[REDSOUND_TRACK_NOTE_WORD_OFFSET];
+                slot[1] = *(unsigned int*)&track->m_note;
                 m_KeyOnEntry++;
                 break;
             }
@@ -331,7 +331,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
         do {
             if (*slot == 0) {
                 *slot = (unsigned int)track;
-                slot[1] = ((unsigned int*)track)[REDSOUND_TRACK_NOTE_WORD_OFFSET];
+                slot[1] = *(unsigned int*)&track->m_note;
                 m_KeyOnEntry++;
                 break;
             }

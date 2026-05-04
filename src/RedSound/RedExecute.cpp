@@ -697,17 +697,17 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_DRY_STEREO) != 0) {
             uVar3 = (u16)monoBase;
             *mixData = uVar3;
-            *(u16*)(voiceData + REDSOUND_VOICE_AX_MIX_VR_WORD) = uVar3;
+            mixData[REDSOUND_VOICE_AX_MIX_VR_INDEX] = uVar3;
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
             u16 monoMix = (u16)((monoBase * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT);
             if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
-                *(u16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_A_L_WORD) = monoMix;
-                *(u16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_A_R_WORD) = monoMix;
+                mixData[REDSOUND_VOICE_AX_MIX_AUX_A_L_INDEX] = monoMix;
+                mixData[REDSOUND_VOICE_AX_MIX_AUX_A_R_INDEX] = monoMix;
             } else {
-                *(u16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_B_L_WORD) = monoMix;
-                *(u16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_B_R_WORD) = monoMix;
+                mixData[REDSOUND_VOICE_AX_MIX_AUX_B_L_INDEX] = monoMix;
+                mixData[REDSOUND_VOICE_AX_MIX_AUX_B_R_INDEX] = monoMix;
             }
         }
         break;

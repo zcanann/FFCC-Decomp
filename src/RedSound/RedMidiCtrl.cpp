@@ -1945,9 +1945,8 @@ static void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 
     rate = divisor;
     rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR / rate;
-    ((int*)track)[REDSOUND_TRACK_VIBRATE_RATE_ADD_WORD_OFFSET] =
-        DataAddCompute((int*)track + REDSOUND_TRACK_VIBRATE_RATE_WORD_OFFSET, rate, trackDelta);
-    ((short*)track)[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD] = (short)trackDelta[0];
+    track->m_vibrateRateAdd = DataAddCompute(&track->m_vibrateRate, rate, trackDelta);
+    track->m_vibrateRateDelta = (short)trackDelta[0];
     track->m_command += 1;
 }
 
@@ -2133,9 +2132,8 @@ static void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 	}
 	rate = divisor;
 	rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR / rate;
-	((int*)track)[REDSOUND_TRACK_TREMOLO_RATE_ADD_WORD_OFFSET] =
-		DataAddCompute((int*)track + REDSOUND_TRACK_TREMOLO_RATE_WORD_OFFSET, rate, delta);
-	((short*)track)[REDSOUND_TRACK_TREMOLO_RATE_DELTA_HALFWORD] = (short)delta[0];
+	track->m_tremoloRateAdd = DataAddCompute(&track->m_tremoloRate, rate, delta);
+	track->m_tremoloRateDelta = (short)delta[0];
 	track->m_command += 1;
 }
 
@@ -2297,9 +2295,8 @@ static void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrack
 	}
 	rate = divisor;
 	rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR / rate;
-	((int*)track)[REDSOUND_TRACK_SHAKE_RATE_ADD_WORD_OFFSET] =
-		DataAddCompute((int*)track + REDSOUND_TRACK_SHAKE_RATE_WORD_OFFSET, rate, delta);
-	((short*)track)[REDSOUND_TRACK_SHAKE_RATE_DELTA_HALFWORD] = (short)delta[0];
+	track->m_shakeRateAdd = DataAddCompute(&track->m_shakeRate, rate, delta);
+	track->m_shakeRateDelta = (short)delta[0];
 	track->m_command += 1;
 }
 

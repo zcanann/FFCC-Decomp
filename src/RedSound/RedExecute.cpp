@@ -2212,9 +2212,9 @@ static void _MusicNoteExecute()
 
     while ((status == 0) && (m_MusicPhraseStop == 0) &&
            ((p_SoundControl->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
-        *(s16*)((u8*)p_SoundControl + 0x48E) = *(int*)((u8*)p_SoundControl + 0x434);
-        memcpy((u8*)p_SoundControl + 0xC, (u8*)p_SoundControl + 0x438, 0x10);
-        memcpy((u8*)p_SoundControl + 0x448, (u8*)p_SoundControl + 0x428, 0xC);
+        p_SoundControl->m_activeTrackCount = p_SoundControl->m_savedActiveTrackCount;
+        memcpy(&p_SoundControl->m_measure, &p_SoundControl->m_savedMeasure, REDSOUND_CONTROL_SAVED_POSITION_SIZE);
+        memcpy(&p_SoundControl->m_tempo, &p_SoundControl->m_savedTempo, REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
 
         soundControl = (u32*)p_SoundControl;
         track = (u32*)*soundControl;

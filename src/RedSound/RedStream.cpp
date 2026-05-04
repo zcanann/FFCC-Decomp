@@ -48,6 +48,14 @@ enum RedStreamAdpcmHeaderOffset {
 	REDSOUND_STREAM_ADPCM_STEREO_LOOP_YN2_OFFSET = 0x54,
 };
 
+struct RedStreamADPCMHeader {
+	u8 m_adpcmData[REDSOUND_STREAM_ADPCM_LOOP_PRED_SCALE_OFFSET];
+	s16 m_loopPredScale;
+	u16 m_loopYn1;
+	u16 m_loopYn2;
+	u8 m_pad28[REDSOUND_STREAM_ADPCM_HEADER_SIZE - REDSOUND_STREAM_ADPCM_LOOP_YN2_OFFSET - sizeof(u16)];
+};
+
 static RedStreamDATA* _SearchEmptyStreamData();
 static void _StreamStop(RedStreamDATA*);
 static int _ArrangeStreamDataNoLoop(RedStreamDATA*, int, int);
@@ -351,20 +359,16 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	if ((streamData->m_track != 0) && (streamData->m_buffer != 0) && (streamData->m_aramBuffer != 0)) {
 		sampleOffset = REDSOUND_STREAM_PAGE_SIZE;
 		headerData = (u8*)streamHeader + REDSOUND_STREAM_FILE_HEADER_SIZE;
-		*(short*)(headerData + REDSOUND_STREAM_ADPCM_LOOP_PRED_SCALE_OFFSET) =
-		    (short)*(char*)((int)streamHeader + sampleOffset);
-		*(unsigned short*)(headerData + REDSOUND_STREAM_ADPCM_LOOP_YN1_OFFSET) =
-		    *(unsigned short*)(headerData + REDSOUND_STREAM_ADPCM_LOOP_YN2_OFFSET) = 0;
+		((RedStreamADPCMHeader*)headerData)->m_loopPredScale = (short)*(char*)((int)streamHeader + sampleOffset);
+		((RedStreamADPCMHeader*)headerData)->m_loopYn1 = ((RedStreamADPCMHeader*)headerData)->m_loopYn2 = 0;
 		if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 			if (streamData->m_header.m_loopStart < 0) {
 				sampleOffset += REDSOUND_STREAM_PAGE_SIZE;
 			} else {
 				sampleOffset += 8;
 			}
-			*(short*)(headerData + REDSOUND_STREAM_ADPCM_STEREO_LOOP_PRED_SCALE_OFFSET) =
-			    (short)*(char*)((int)streamHeader + sampleOffset);
-			*(unsigned short*)(headerData + REDSOUND_STREAM_ADPCM_STEREO_LOOP_YN1_OFFSET) =
-			    *(unsigned short*)(headerData + REDSOUND_STREAM_ADPCM_STEREO_LOOP_YN2_OFFSET) = 0;
+			((RedStreamADPCMHeader*)headerData)[1].m_loopPredScale = (short)*(char*)((int)streamHeader + sampleOffset);
+			((RedStreamADPCMHeader*)headerData)[1].m_loopYn1 = ((RedStreamADPCMHeader*)headerData)[1].m_loopYn2 = 0;
 		}
 
 		streamData->m_streamId = streamID;

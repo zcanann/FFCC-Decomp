@@ -1954,61 +1954,67 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         } while (voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
     }
 
-    if ((u32)trackData[0x1D] != 0) {
-        if (*(s16*)((u8*)track + 0x8C) != 0) {
+    if ((u32)trackData[REDSOUND_TRACK_VIBRATE_FUNC_WORD_OFFSET] != 0) {
+        if (((s16*)track)[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD] != 0) {
             int step = frames;
-            if (*(s16*)((u8*)track + 0x8C) <= frames) {
-                step = *(s16*)((u8*)track + 0x8C);
+            if (((s16*)track)[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD] <= frames) {
+                step = ((s16*)track)[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD];
             }
-            *(s16*)((u8*)track + 0x8C) -= (s16)step;
-            trackData[0x1E] += trackData[0x1F] * step;
+            ((s16*)track)[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD] -= (s16)step;
+            trackData[REDSOUND_TRACK_VIBRATE_RATE_WORD_OFFSET] +=
+                trackData[REDSOUND_TRACK_VIBRATE_RATE_ADD_WORD_OFFSET] * step;
         }
-        if (*(s16*)((u8*)track + 0x8E) != 0) {
+        if (((s16*)track)[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD] != 0) {
             int step = frames;
-            if (*(s16*)((u8*)track + 0x8E) <= frames) {
-                step = *(s16*)((u8*)track + 0x8E);
+            if (((s16*)track)[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD] <= frames) {
+                step = ((s16*)track)[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD];
             }
-            *(s16*)((u8*)track + 0x8E) -= (s16)step;
-            trackData[0x20] += trackData[0x21] * step;
+            ((s16*)track)[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD] -= (s16)step;
+            trackData[REDSOUND_TRACK_VIBRATE_DEPTH_WORD_OFFSET] +=
+                trackData[REDSOUND_TRACK_VIBRATE_DEPTH_ADD_WORD_OFFSET] * step;
         }
     }
 
-    if ((u32)trackData[0x25] != 0) {
-        if (*(s16*)((u8*)track + 0xAC) != 0) {
+    if ((u32)trackData[REDSOUND_TRACK_TREMOLO_FUNC_WORD_OFFSET] != 0) {
+        if (((s16*)track)[REDSOUND_TRACK_TREMOLO_RATE_DELTA_HALFWORD] != 0) {
             int step = frames;
-            if (*(s16*)((u8*)track + 0xAC) <= frames) {
-                step = *(s16*)((u8*)track + 0xAC);
+            if (((s16*)track)[REDSOUND_TRACK_TREMOLO_RATE_DELTA_HALFWORD] <= frames) {
+                step = ((s16*)track)[REDSOUND_TRACK_TREMOLO_RATE_DELTA_HALFWORD];
             }
-            *(s16*)((u8*)track + 0xAC) -= (s16)step;
-            trackData[0x26] += trackData[0x27] * step;
+            ((s16*)track)[REDSOUND_TRACK_TREMOLO_RATE_DELTA_HALFWORD] -= (s16)step;
+            trackData[REDSOUND_TRACK_TREMOLO_RATE_WORD_OFFSET] +=
+                trackData[REDSOUND_TRACK_TREMOLO_RATE_ADD_WORD_OFFSET] * step;
         }
-        if (*(s16*)((u8*)track + 0xAE) != 0) {
+        if (((s16*)track)[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD] != 0) {
             int step = frames;
-            if (*(s16*)((u8*)track + 0xAE) <= frames) {
-                step = *(s16*)((u8*)track + 0xAE);
+            if (((s16*)track)[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD] <= frames) {
+                step = ((s16*)track)[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD];
             }
-            *(s16*)((u8*)track + 0xAE) -= (s16)step;
-            trackData[0x28] += trackData[0x29] * step;
+            ((s16*)track)[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD] -= (s16)step;
+            trackData[REDSOUND_TRACK_TREMOLO_DEPTH_WORD_OFFSET] +=
+                trackData[REDSOUND_TRACK_TREMOLO_DEPTH_ADD_WORD_OFFSET] * step;
         }
     }
 
     voiceData = (int*)p_VoiceData;
-    if ((u32)trackData[0x2D] != 0) {
-        if (*(s16*)((u8*)track + 0xD0) != 0) {
+    if ((u32)trackData[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET] != 0) {
+        if (((s16*)track)[REDSOUND_TRACK_SHAKE_RATE_DELTA_HALFWORD] != 0) {
             int step = frames;
-            if (*(s16*)((u8*)track + 0xD0) <= frames) {
-                step = *(s16*)((u8*)track + 0xD0);
+            if (((s16*)track)[REDSOUND_TRACK_SHAKE_RATE_DELTA_HALFWORD] <= frames) {
+                step = ((s16*)track)[REDSOUND_TRACK_SHAKE_RATE_DELTA_HALFWORD];
             }
-            *(s16*)((u8*)track + 0xD0) -= (s16)step;
-            trackData[0x2E] += trackData[0x2F] * step;
+            ((s16*)track)[REDSOUND_TRACK_SHAKE_RATE_DELTA_HALFWORD] -= (s16)step;
+            trackData[REDSOUND_TRACK_SHAKE_RATE_WORD_OFFSET] +=
+                trackData[REDSOUND_TRACK_SHAKE_RATE_ADD_WORD_OFFSET] * step;
         }
-        if (*(s16*)((u8*)track + 0xD2) != 0) {
+        if (((s16*)track)[REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD] != 0) {
             int step = frames;
-            if (*(s16*)((u8*)track + 0xD2) <= frames) {
-                step = *(s16*)((u8*)track + 0xD2);
+            if (((s16*)track)[REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD] <= frames) {
+                step = ((s16*)track)[REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD];
             }
-            *(s16*)((u8*)track + 0xD2) -= (s16)step;
-            trackData[0x30] += trackData[0x31] * step;
+            ((s16*)track)[REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD] -= (s16)step;
+            trackData[REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET] +=
+                trackData[REDSOUND_TRACK_SHAKE_DEPTH_ADD_WORD_OFFSET] * step;
         }
     }
 

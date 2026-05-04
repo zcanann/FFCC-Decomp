@@ -2510,13 +2510,15 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			trackData[REDSOUND_TRACK_VIBRATE_RATE_WORD_OFFSET] +=
 			    trackData[REDSOUND_TRACK_VIBRATE_RATE_ADD_WORD_OFFSET] * step;
 		}
-		if (*(short*)(trackBytes + 0x8E) != 0) {
+		if (trackShorts[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD] != 0) {
 			step = frames;
-			if (*(short*)(trackBytes + 0x8E) <= frames) {
-				step = *(short*)(trackBytes + 0x8E);
+			if (trackShorts[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD] <= frames) {
+				step = trackShorts[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD];
 			}
-			*(short*)(trackBytes + 0x8E) = *(short*)(trackBytes + 0x8E) - (short)step;
-			trackData[0x20] += trackData[0x21] * step;
+			trackShorts[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD] =
+			    trackShorts[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD] - (short)step;
+			trackData[REDSOUND_TRACK_VIBRATE_DEPTH_WORD_OFFSET] +=
+			    trackData[REDSOUND_TRACK_VIBRATE_DEPTH_ADD_WORD_OFFSET] * step;
 		}
 	}
 

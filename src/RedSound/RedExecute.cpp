@@ -2005,7 +2005,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         } while (voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
     }
 
-    if ((u32)track->m_vibrateFunc != 0) {
+    if (track->m_vibrateFunc != 0) {
         if (track->m_vibrateRateDelta != 0) {
             int step = frames;
             if (track->m_vibrateRateDelta <= frames) {
@@ -2024,7 +2024,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         }
     }
 
-    if ((u32)track->m_tremoloFunc != 0) {
+    if (track->m_tremoloFunc != 0) {
         if (track->m_tremoloRateDelta != 0) {
             int step = frames;
             if (track->m_tremoloRateDelta <= frames) {
@@ -2044,7 +2044,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
     }
 
     voiceData = (int*)p_VoiceData;
-    if ((u32)track->m_shakeFunc != 0) {
+    if (track->m_shakeFunc != 0) {
         if (track->m_shakeRateDelta != 0) {
             int step = frames;
             if (track->m_shakeRateDelta <= frames) {
@@ -2098,7 +2098,7 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
 {
     RedTrackDATA* track = control->m_tracks;
     do {
-        if ((u32)track->m_command != 0) {
+        if (track->m_command != 0) {
             int step = frames;
             m_ChangeStatus = 0;
             if (track->m_deltaTime < frames) {
@@ -2109,12 +2109,12 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
             if (((track->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0) && (track->m_deltaTime == 1)) {
                 KeyOffSet(control, keyOnData, track);
             }
-            while (((u32)track->m_command != 0) && (track->m_deltaTime < 1)) {
+            while ((track->m_command != 0) && (track->m_deltaTime < 1)) {
                 unsigned char* cmd = track->m_command;
                 int delta;
                 track->m_command = cmd + 1;
                 p_MidiControl_Function[*cmd](control, keyOnData, track);
-                if ((u32)track->m_command != 0) {
+                if (track->m_command != 0) {
                     if (track->m_deltaTime < 1) {
                         delta = DeltaTimeSumup((unsigned char**)&track->m_command);
                     } else {

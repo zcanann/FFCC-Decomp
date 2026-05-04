@@ -1027,7 +1027,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         (trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] < 0)) {
         trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
         if (voiceData[1] != 0) {
-            if ((((unsigned int*)voiceData[1])[0] & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) == 0) {
+            if ((((RedWaveDATA*)voiceData[1])->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) == 0) {
                 voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
                 if (param_1->m_keySignatureData != 0) {
                     iVar5 = voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] >> REDSOUND_PITCH_BASE_NOTE_SHIFT;
@@ -1038,7 +1038,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
                 }
             } else {
                 voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] =
-                    ((s8*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])[REDSOUND_WAVE_SPLIT_KEY_OFFSET] << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+                    ((RedWaveDATA*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])->m_splitKey << REDSOUND_PITCH_BASE_NOTE_SHIFT;
             }
         }
     } else {
@@ -1067,10 +1067,10 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
 
     voiceData[REDSOUND_VOICE_SWITCH_WORD] = trackData[REDSOUND_TRACK_VOICE_SWITCH_WORD_OFFSET];
     if (voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] != 0 &&
-        ((s8*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])[REDSOUND_WAVE_REVERB_MIX_OFFSET] != 0) {
+        ((RedWaveDATA*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])->m_reverbMix != 0) {
         unsigned int maskBits;
         voiceData[REDSOUND_VOICE_SWITCH_WORD] &= REDSOUND_VOICE_SWITCH_CLEAR_MIX_MASK;
-        if (((s8*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])[REDSOUND_WAVE_REVERB_MIX_OFFSET] == 1) {
+        if (((RedWaveDATA*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])->m_reverbMix == 1) {
             maskBits = REDSOUND_VOICE_SWITCH_MIX_ALL;
         } else {
             maskBits = REDSOUND_VOICE_SWITCH_DRY_STEREO;
@@ -1088,7 +1088,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     if (voiceData[1] == 0) {
         iVar5 = 0;
     } else {
-        iVar5 = PitchCompute(iVar5, local_38[0], ((int*)voiceData[1])[5], trackS8[REDSOUND_TRACK_FINE_TUNE_BYTE]);
+        iVar5 = PitchCompute(iVar5, local_38[0], ((RedWaveDATA*)voiceData[1])->m_pitch, trackS8[REDSOUND_TRACK_FINE_TUNE_BYTE]);
     }
     voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] = iVar5;
 

@@ -1496,18 +1496,18 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 		if (musicSeq == 0) {
 			musicSeq = SearchMusicSequence(musicNo);
 			if (musicSeq >= 0) {
-				if (*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4) == 0) {
+				if (reinterpret_cast<RedHistoryBANK*>(m_musicBankBase)[musicSeq].m_historyNo == 0) {
 					MusicHistoryAdd();
-					*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4) = 1;
+					reinterpret_cast<RedHistoryBANK*>(m_musicBankBase)[musicSeq].m_historyNo = 1;
 				}
 			}
 		}
 	} else {
 		musicSeq = SearchMusicSequence(musicNo);
 		if (musicSeq >= 0) {
-			if (*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4) != 0) {
-				MusicHistoryDelete(*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4));
-				*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + musicSeq * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 4) = 0;
+			if (reinterpret_cast<RedHistoryBANK*>(m_musicBankBase)[musicSeq].m_historyNo != 0) {
+				MusicHistoryDelete(reinterpret_cast<RedHistoryBANK*>(m_musicBankBase)[musicSeq].m_historyNo);
+				reinterpret_cast<RedHistoryBANK*>(m_musicBankBase)[musicSeq].m_historyNo = 0;
 			}
 		}
 	}

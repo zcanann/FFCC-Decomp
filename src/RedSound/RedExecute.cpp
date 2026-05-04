@@ -1677,7 +1677,7 @@ static void _KeyOnControl()
 
     if (m_KeyOnEntry != 0) {
         do {
-            if (((u32)*reserve != 0) && (((int*)*reserve)[REDSOUND_TRACK_WAVE_DATA_WORD_OFFSET] != 0)) {
+            if (((u32)*reserve != 0) && (((RedTrackDATA*)*reserve)->m_waveData != 0)) {
                 voiceData = (unsigned int*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)&local_28);
             }
             reserve += 2;

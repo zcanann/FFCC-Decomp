@@ -1843,7 +1843,7 @@ static void _ExecuteExtraData()
     u32* soundBase;
     RedSoundCONTROL* soundControl;
     unsigned int* voice;
-    int* track;
+    RedTrackDATA* track;
     RedTrackDATA* musicBase;
 
     do {
@@ -1899,19 +1899,19 @@ static void _ExecuteExtraData()
             soundControl->m_volumeDelta--;
             soundControl->m_volume += soundControl->m_volumeAdd;
             if ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_STOP_ON_VOLUME_ZERO) == 0) {
-                track = (int*)soundControl->m_tracks;
+                track = soundControl->m_tracks;
                 do {
                     voice = (unsigned int*)p_VoiceData;
-                    if (*track != 0) {
+                    if (track->m_command != 0) {
                         do {
-                            if ((int*)*voice == track) {
+                            if ((RedTrackDATA*)*voice == track) {
                                 ((RedVoiceDATA*)voice)->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
                             }
                             voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
                         } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
                     }
-                    track += REDSOUND_TRACK_SIZE / sizeof(*track);
-                } while (track < (int*)((u32)soundControl->m_tracks + (u32)soundControl->m_trackCount * REDSOUND_TRACK_SIZE));
+                    track++;
+                } while (track < soundControl->m_tracks + soundControl->m_trackCount);
             } else if ((soundControl->m_volumeDelta == 0) && (-1 < soundControl->m_musicId)) {
                 MusicStop(soundControl->m_musicId);
             }

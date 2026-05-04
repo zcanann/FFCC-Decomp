@@ -1842,7 +1842,7 @@ static void _ExecuteExtraData()
     u32* sound = (u32*)p_SoundControlBuffer;
     u32* soundBase;
     RedSoundCONTROL* soundControl;
-    unsigned int* voice;
+    RedVoiceDATA* voice;
     RedTrackDATA* track;
     RedTrackDATA* musicBase;
 
@@ -1857,14 +1857,14 @@ static void _ExecuteExtraData()
 
             if (*sound != 0) {
                 musicBase = (RedTrackDATA*)*sound;
-                voice = (unsigned int*)p_VoiceData;
+                voice = p_VoiceData;
                 do {
-                    if ((musicBase <= (RedTrackDATA*)*voice) &&
-                        ((RedTrackDATA*)*voice < musicBase + soundControl->m_trackCount)) {
-                        ((RedVoiceDATA*)voice)->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
+                    if ((musicBase <= voice->m_track) &&
+                        (voice->m_track < musicBase + soundControl->m_trackCount)) {
+                        voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
                     }
-                    voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
-                } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
+                    voice++;
+                } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
             }
         }
         soundBase = (u32*)p_SoundControlBuffer;
@@ -1879,18 +1879,18 @@ static void _ExecuteExtraData()
     if (p_MusicPitchControl->m_count != 0) {
         p_MusicPitchControl->m_count--;
         p_MusicPitchControl->m_value += p_MusicPitchControl->m_step;
-        voice = (unsigned int*)p_VoiceData;
+        voice = p_VoiceData;
         do {
-            if ((((RedVoiceDATA*)voice)->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
-                ((RedVoiceDATA*)voice)->m_targetPitch = PitchCompute(
-                    ((RedVoiceDATA*)voice)->m_basePitch + p_MusicPitchControl->m_value,
-                    (int)((RedTrackDATA*)*voice)->m_keyTranspose + (int)((RedTrackDATA*)*voice)->m_pitchBend,
-                    ((RedVoiceDATA*)voice)->m_waveData->m_pitch,
-                    ((RedTrackDATA*)*voice)->m_fineTune);
-                ((RedVoiceDATA*)voice)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
+            if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
+                voice->m_targetPitch = PitchCompute(
+                    voice->m_basePitch + p_MusicPitchControl->m_value,
+                    (int)voice->m_track->m_keyTranspose + (int)voice->m_track->m_pitchBend,
+                    voice->m_waveData->m_pitch,
+                    voice->m_track->m_fineTune);
+                voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
             }
-            voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
-        } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
+            voice++;
+        } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
     }
 
     do {
@@ -1901,14 +1901,14 @@ static void _ExecuteExtraData()
             if ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_STOP_ON_VOLUME_ZERO) == 0) {
                 track = soundControl->m_tracks;
                 do {
-                    voice = (unsigned int*)p_VoiceData;
+                    voice = p_VoiceData;
                     if (track->m_command != 0) {
                         do {
-                            if ((RedTrackDATA*)*voice == track) {
-                                ((RedVoiceDATA*)voice)->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
+                            if (voice->m_track == track) {
+                                voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
                             }
-                            voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
-                        } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
+                            voice++;
+                        } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
                     }
                     track++;
                 } while (track < soundControl->m_tracks + soundControl->m_trackCount);

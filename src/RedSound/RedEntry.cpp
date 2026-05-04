@@ -824,7 +824,7 @@ void CRedEntry::DisplayWaveInfo()
 				} else {
 					unsigned int bankIndex = (unsigned int)((int)bank - (int)aBankAddress);
 					OSReport(s__s______________0x_8_8X___0x_8_8_801e7aca, sRedEntryLogPrefix, bank->m_address, bank->m_size, freeSize,
-					         (int)(bankIndex >> 3));
+					         (int)(bankIndex >> REDSOUND_MEMORY_BLOCK_INDEX_SHIFT));
 					fflush(__files + 1);
 				}
 

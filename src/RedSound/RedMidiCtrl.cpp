@@ -709,7 +709,6 @@ static void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, 
  */
 static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* controlWords = (int*)control;
     int loopBase = control->m_loopBase;
     int deltaAdjust = 1 - track->m_deltaTime;
     int slot = 0;
@@ -717,10 +716,10 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
 
     control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE;
     for (scan = control->m_tracks; scan < track; scan++) {
-        controlWords[REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET + slot] = (int)scan->m_command;
-        controlWords[REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET + slot] = scan->m_deltaTime + deltaAdjust;
-        controlWords[REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET + slot] = scan->m_flags;
-        controlWords[REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET + slot] = *(int*)&scan->m_note;
+        control->m_savedCommand[slot] = scan->m_command;
+        control->m_savedDelta[slot] = scan->m_deltaTime + deltaAdjust;
+        control->m_savedFlags[slot] = scan->m_flags;
+        control->m_savedNote[slot] = *(int*)&scan->m_note;
         slot++;
     }
 
@@ -730,10 +729,10 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
         command[0] = scan->m_command;
         int delta = DeltaTimeSumup(command);
 
-        controlWords[REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET + slot] = (int)command[0];
-        controlWords[REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET + slot] = scan->m_deltaTime + delta + deltaAdjust;
-        controlWords[REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET + slot] = scan->m_flags;
-        controlWords[REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET + slot] = *(int*)&scan->m_note;
+        control->m_savedCommand[slot] = command[0];
+        control->m_savedDelta[slot] = scan->m_deltaTime + delta + deltaAdjust;
+        control->m_savedFlags[slot] = scan->m_flags;
+        control->m_savedNote[slot] = *(int*)&scan->m_note;
 
         if ((nextTrack - control->m_tracks) < control->m_trackCount) {
             for (; nextTrack < control->m_tracks + control->m_trackCount; nextTrack++) {
@@ -751,27 +750,26 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
                     }
                 }
 
-                controlWords[REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET + slot + 1] = (int)nextTrack->m_command;
-                controlWords[REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET + slot + 1] = currentDelta;
-                controlWords[REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET + slot + 1] = nextTrack->m_flags;
-                controlWords[REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET + slot + 1] = *(int*)&nextTrack->m_note;
+                control->m_savedCommand[slot + 1] = nextTrack->m_command;
+                control->m_savedDelta[slot + 1] = currentDelta;
+                control->m_savedFlags[slot + 1] = nextTrack->m_flags;
+                control->m_savedNote[slot + 1] = *(int*)&nextTrack->m_note;
                 slot++;
             }
         }
     }
 
-    controlWords[REDSOUND_CONTROL_SAVED_ACTIVE_TRACK_COUNT_WORD_OFFSET] = control->m_activeTrackCount;
-    memmove(controlWords + REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET,
-            controlWords + REDSOUND_CONTROL_MEASURE_WORD_OFFSET,
+    control->m_savedActiveTrackCount = control->m_activeTrackCount;
+    memmove(&control->m_savedMeasure,
+            &control->m_measure,
             REDSOUND_CONTROL_SAVED_POSITION_SIZE);
-    controlWords[REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET] -= deltaAdjust;
-    if (controlWords[REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET] < 0) {
-        controlWords[REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET] +=
-            controlWords[REDSOUND_CONTROL_SAVED_TICKS_PER_MEASURE_WORD_OFFSET];
-        controlWords[REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET]--;
+    control->m_savedTick -= deltaAdjust;
+    if (control->m_savedTick < 0) {
+        control->m_savedTick += control->m_savedTicksPerMeasure;
+        control->m_savedMeasure--;
     }
-    memmove(controlWords + REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET,
-            controlWords + REDSOUND_CONTROL_TEMPO_WORD_OFFSET,
+    memmove(&control->m_savedTempo,
+            &control->m_tempo,
             REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
 }
 

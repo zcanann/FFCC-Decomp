@@ -43,8 +43,8 @@ struct RedTrackDATA {
 	int m_vibrateDepth;
 	int m_vibrateDepthAdd;
 	unsigned char m_pad88[0x8C - 0x88];
-	unsigned short m_vibrateRateDelta;
-	unsigned short m_vibrateDepthDelta;
+	short m_vibrateRateDelta;
+	short m_vibrateDepthDelta;
 	short m_vibrateDelay;
 	short m_vibrateDelayDepth;
 	int m_tremoloFunc;
@@ -53,8 +53,8 @@ struct RedTrackDATA {
 	int m_tremoloDepth;
 	int m_tremoloDepthAdd;
 	unsigned char m_padA8[0xAC - 0xA8];
-	unsigned short m_tremoloRateDelta;
-	unsigned short m_tremoloDepthDelta;
+	short m_tremoloRateDelta;
+	short m_tremoloDepthDelta;
 	short m_tremoloDelay;
 	short m_tremoloDelayDepth;
 	int m_shakeFunc;
@@ -64,8 +64,8 @@ struct RedTrackDATA {
 	int m_shakeDepthAdd;
 	int m_shakeOutput;
 	int m_shakePan;
-	unsigned short m_shakeRateDelta;
-	unsigned short m_shakeDepthDelta;
+	short m_shakeRateDelta;
+	short m_shakeDepthDelta;
 	unsigned short m_adsrAR;
 	unsigned short m_adsrDR;
 	unsigned short m_adsrSR;

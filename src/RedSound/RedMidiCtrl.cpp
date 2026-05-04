@@ -667,7 +667,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
             control->m_tracks = 0;
         }
     } else {
-        if ((u32)track->m_waveBankData != 0) {
+        if (track->m_waveBankData != 0) {
             c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
         }
         c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
@@ -689,7 +689,7 @@ static void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, 
     if ((m_MusicPhraseStop == 1) && ((void*)control == p_SoundControlBuffer)) {
         RedTrackDATA* track = control->m_tracks;
         do {
-            if ((u32)track->m_command != 0) {
+            if (track->m_command != 0) {
                 __MidiCtrl_Stop(control, keyOnData, track);
             }
             track++;
@@ -737,12 +737,12 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
             for (; nextTrack < control->m_tracks + control->m_trackCount; nextTrack++) {
                 int currentDelta = deltaAdjust + (nextTrack->m_deltaTime - loopBase);
 
-                while ((currentDelta < 1) && ((u32)nextTrack->m_command != 0)) {
+                while ((currentDelta < 1) && (nextTrack->m_command != 0)) {
                     unsigned char* cmd = nextTrack->m_command;
                     nextTrack->m_command = cmd + 1;
                     p_MidiControl_Function[*cmd](control, keyOnData, nextTrack);
 
-                    if ((u32)nextTrack->m_command != 0) {
+                    if (nextTrack->m_command != 0) {
                         int step = DeltaTimeSumup((unsigned char**)nextTrack);
                         currentDelta += step;
                         nextTrack->m_deltaTime += step;
@@ -787,7 +787,7 @@ static void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyO
     if ((m_MusicPhraseStop == 1) && ((void*)control == p_SoundControlBuffer)) {
         RedTrackDATA* track = control->m_tracks;
         do {
-            if ((u32)track->m_command != 0) {
+            if (track->m_command != 0) {
                 __MidiCtrl_Stop(control, keyOnData, track);
             }
             track++;

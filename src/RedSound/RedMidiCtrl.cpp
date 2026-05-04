@@ -1217,7 +1217,7 @@ static void __MidiCtrl_VolumeDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
         volume++;
         volume <<= 8;
         volume--;
-        volume <<= 12;
+        volume <<= REDSOUND_FIXED_SHIFT;
     }
 
     track->m_volume = volume;

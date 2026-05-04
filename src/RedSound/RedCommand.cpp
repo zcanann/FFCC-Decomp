@@ -976,7 +976,7 @@ void SetMusicVolume(int seId, int volume, int duration, int mode)
 		volume++;
 		volume <<= 2;
 		volume--;
-		volume <<= 12;
+		volume <<= REDSOUND_FIXED_SHIFT;
 	}
 	volume |= REDSOUND_FIXED_HALF;
 

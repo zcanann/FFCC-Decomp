@@ -3,6 +3,7 @@
 #include "ffcc/system.h"
 
 extern "C" void* __vt__8CManager[];
+extern "C" void* __RTTI__8CManager[];
 
 CUSB USB;
 

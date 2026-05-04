@@ -794,7 +794,6 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
     unsigned int pan;
     int voiceMix;
     int envelopeMul;
-    int* voiceData = (int*)voice;
 
     if (volume != 0) {
         volume = volume + 1;

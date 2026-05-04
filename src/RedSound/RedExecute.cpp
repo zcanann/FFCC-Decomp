@@ -2499,14 +2499,16 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			             voice->m_waveData->m_pitch, (int)(s8)trackBytes[REDSOUND_TRACK_FINE_TUNE_BYTE]);
 	}
 
-	if (trackData[0x1D] != 0) {
-		if (trackShorts[0x46] != 0) {
+	if (trackData[REDSOUND_TRACK_VIBRATE_FUNC_WORD_OFFSET] != 0) {
+		if (trackShorts[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD] != 0) {
 			step = frames;
-			if (trackShorts[0x46] <= frames) {
-				step = trackShorts[0x46];
+			if (trackShorts[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD] <= frames) {
+				step = trackShorts[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD];
 			}
-			trackShorts[0x46] = trackShorts[0x46] - (short)step;
-			trackData[0x1E] += trackData[0x1F] * step;
+			trackShorts[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD] =
+			    trackShorts[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD] - (short)step;
+			trackData[REDSOUND_TRACK_VIBRATE_RATE_WORD_OFFSET] +=
+			    trackData[REDSOUND_TRACK_VIBRATE_RATE_ADD_WORD_OFFSET] * step;
 		}
 		if (*(short*)(trackBytes + 0x8E) != 0) {
 			step = frames;

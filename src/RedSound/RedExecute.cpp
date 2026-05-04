@@ -2458,43 +2458,43 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		track->m_playTime += frames;
 	}
 
-	if (trackData[REDSOUND_TRACK_VOLUME_DELTA_WORD_OFFSET] != 0) {
+	if (track->m_volumeDelta != 0) {
 		step = frames;
-		if (trackData[REDSOUND_TRACK_VOLUME_DELTA_WORD_OFFSET] <= frames) {
-			step = trackData[REDSOUND_TRACK_VOLUME_DELTA_WORD_OFFSET];
+		if (track->m_volumeDelta <= frames) {
+			step = track->m_volumeDelta;
 		}
-		trackData[REDSOUND_TRACK_VOLUME_DELTA_WORD_OFFSET] -= step;
-		trackData[REDSOUND_TRACK_VOLUME_WORD_OFFSET] += trackData[REDSOUND_TRACK_VOLUME_ADD_WORD_OFFSET] * step;
+		track->m_volumeDelta -= step;
+		track->m_volume += track->m_volumeAdd * step;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
-	if (trackData[REDSOUND_TRACK_EXPRESSION_DELTA_WORD_OFFSET] != 0) {
+	if (track->m_expressionDelta != 0) {
 		step = frames;
-		if (trackData[REDSOUND_TRACK_EXPRESSION_DELTA_WORD_OFFSET] <= frames) {
-			step = trackData[REDSOUND_TRACK_EXPRESSION_DELTA_WORD_OFFSET];
+		if (track->m_expressionDelta <= frames) {
+			step = track->m_expressionDelta;
 		}
-		trackData[REDSOUND_TRACK_EXPRESSION_DELTA_WORD_OFFSET] -= step;
-		trackData[REDSOUND_TRACK_EXPRESSION_WORD_OFFSET] += trackData[REDSOUND_TRACK_EXPRESSION_ADD_WORD_OFFSET] * step;
+		track->m_expressionDelta -= step;
+		track->m_expression += track->m_expressionAdd * step;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
-	if (trackData[REDSOUND_TRACK_PAN_DELTA_WORD_OFFSET] != 0) {
+	if (track->m_panDelta != 0) {
 		step = frames;
-		if (trackData[REDSOUND_TRACK_PAN_DELTA_WORD_OFFSET] <= frames) {
-			step = trackData[REDSOUND_TRACK_PAN_DELTA_WORD_OFFSET];
+		if (track->m_panDelta <= frames) {
+			step = track->m_panDelta;
 		}
-		trackData[REDSOUND_TRACK_PAN_DELTA_WORD_OFFSET] -= step;
-		trackData[REDSOUND_TRACK_PAN_WORD_OFFSET] += trackData[REDSOUND_TRACK_PAN_ADD_WORD_OFFSET] * step;
+		track->m_panDelta -= step;
+		track->m_pan += track->m_panAdd * step;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
-	if (trackData[REDSOUND_TRACK_REVERB_DEPTH_DELTA_WORD_OFFSET] != 0) {
+	if (track->m_reverbDepthDelta != 0) {
 		step = frames;
-		if (trackData[REDSOUND_TRACK_REVERB_DEPTH_DELTA_WORD_OFFSET] <= frames) {
-			step = trackData[REDSOUND_TRACK_REVERB_DEPTH_DELTA_WORD_OFFSET];
+		if (track->m_reverbDepthDelta <= frames) {
+			step = track->m_reverbDepthDelta;
 		}
-		trackData[REDSOUND_TRACK_REVERB_DEPTH_DELTA_WORD_OFFSET] -= step;
-		trackData[REDSOUND_TRACK_REVERB_DEPTH_WORD_OFFSET] += trackData[REDSOUND_TRACK_REVERB_DEPTH_ADD_WORD_OFFSET] * step;
+		track->m_reverbDepthDelta -= step;
+		track->m_reverbDepth += track->m_reverbDepthAdd * step;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
@@ -2513,13 +2513,13 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
-	if (trackData[REDSOUND_TRACK_PITCH_DELTA_WORD_OFFSET] != 0) {
+	if (track->m_pitchDelta != 0) {
 		step = frames;
-		if (trackData[REDSOUND_TRACK_PITCH_DELTA_WORD_OFFSET] <= frames) {
-			step = trackData[REDSOUND_TRACK_PITCH_DELTA_WORD_OFFSET];
+		if (track->m_pitchDelta <= frames) {
+			step = track->m_pitchDelta;
 		}
-		trackData[REDSOUND_TRACK_PITCH_DELTA_WORD_OFFSET] -= step;
-		trackData[REDSOUND_TRACK_PITCH_WORD_OFFSET] += trackData[REDSOUND_TRACK_PITCH_ADD_WORD_OFFSET] * step;
+		track->m_pitchDelta -= step;
+		track->m_pitch += track->m_pitchAdd * step;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
 	}
 
@@ -2536,7 +2536,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 
 	if (((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0) && (voice->m_waveData != 0)) {
 		voice->m_targetPitch =
-			PitchCompute(voice->m_basePitch + trackData[REDSOUND_TRACK_PITCH_WORD_OFFSET],
+			PitchCompute(voice->m_basePitch + track->m_pitch,
 			             (int)trackShorts[REDSOUND_TRACK_KEY_TRANSPOSE_HALFWORD] +
 			                 (int)trackShorts[REDSOUND_TRACK_PITCH_BEND_HALFWORD],
 			             voice->m_waveData->m_pitch, (int)(s8)trackBytes[REDSOUND_TRACK_FINE_TUNE_BYTE]);

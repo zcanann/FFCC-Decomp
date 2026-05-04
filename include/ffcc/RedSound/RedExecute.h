@@ -75,7 +75,12 @@ enum RedWaveFlag {
 };
 
 enum RedWaveLayoutOffset {
+	REDSOUND_WAVE_PITCH_OFFSET = 0x14,
 	REDSOUND_WAVE_REVERB_MIX_OFFSET = 0x1C,
+};
+
+enum RedWaveLayoutWord {
+	REDSOUND_WAVE_PITCH_WORD_OFFSET = REDSOUND_WAVE_PITCH_OFFSET / sizeof(int),
 };
 
 struct RedVoiceDATA {

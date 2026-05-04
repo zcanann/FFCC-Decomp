@@ -1013,15 +1013,14 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     int iVar1;
     int iVar5;
     int local_38[4];
-    int* trackData = (int*)param_1;
     int* voiceData = (int*)param_2;
     s8* trackS8 = (s8*)param_1;
     s16* trackS16 = (s16*)param_1;
     s8 note = param_3->m_key;
     unsigned int* voiceMask = (unsigned int*)param_4;
 
-    voiceData[0] = (int)param_1;
-    voiceData[0x23] = 1;
+    param_2->m_track = param_1;
+    param_2->m_active = 1;
 
     if ((param_1->m_portamentTime == 0) ||
         (param_1->m_portamentPitch < 0)) {
@@ -1078,7 +1077,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     }
 
     local_38[0] = param_1->m_keyTranspose + param_1->m_pitchBend;
-    if ((((u8*)voiceData)[REDSOUND_VOICE_STATE_FLAGS_OFFSET] & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
+    if ((param_2->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
         iVar5 = param_2->m_basePitch + p_MusicPitchControl->m_value;
     } else {
         iVar5 = param_2->m_basePitch + param_1->m_pitch;

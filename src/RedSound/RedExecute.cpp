@@ -2493,8 +2493,10 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 
 	if (((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0) && (voice->m_waveData != 0)) {
 		voice->m_targetPitch =
-			PitchCompute(voice->m_basePitch + trackData[0x17], (int)trackShorts[0xA1] + (int)trackShorts[0x9F],
-			             voice->m_waveData->m_pitch, (int)(s8)trackBytes[0x148]);
+			PitchCompute(voice->m_basePitch + trackData[REDSOUND_TRACK_PITCH_WORD_OFFSET],
+			             (int)trackShorts[REDSOUND_TRACK_KEY_TRANSPOSE_HALFWORD] +
+			                 (int)trackShorts[REDSOUND_TRACK_PITCH_BEND_HALFWORD],
+			             voice->m_waveData->m_pitch, (int)(s8)trackBytes[REDSOUND_TRACK_FINE_TUNE_BYTE]);
 	}
 
 	if (trackData[0x1D] != 0) {

@@ -1480,7 +1480,7 @@ static void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
 
     voice = p_VoiceData;
     do {
-        if (((unsigned int)voice->m_track == (unsigned int)track) && ((unsigned int)voice->m_waveData != 0)) {
+        if ((voice->m_track == track) && (voice->m_waveData != 0)) {
             memcpy(voice->m_adsrTime, voice->m_waveData->m_adsr, REDSOUND_TRACK_ADSR_SIZE);
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }

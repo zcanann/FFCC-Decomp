@@ -850,7 +850,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
 
     if (m_SoundPlayMode == 1) {
         pan = REDSOUND_PAN_BYTE_CENTER;
-    } else if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_PAIRED_PAN) == 0) {
+    } else if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAIRED_PAN) == 0) {
         if ((*(u8*)(voiceData[1] + REDSOUND_WAVE_PAN_OFFSET) & REDSOUND_PAN_BYTE_SIGN_BIT) == 0) {
             pan = *(int*)voiceData[REDSOUND_VOICE_TRACK_PAN_WORD] >> REDSOUND_FIXED_SHIFT;
         } else {
@@ -865,7 +865,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         }
 
         pan = (pan + *(int*)(*voiceData + 0xcc)) & 0xff;
-    } else if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_PAIRED_LEFT) == 0) {
+    } else if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAIRED_LEFT) == 0) {
         pan = REDSOUND_PAN_BYTE_MASK;
     } else {
         pan = 0;
@@ -881,8 +881,8 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         }
     }
 
-    SetVoiceVolumeMix((RedVoiceDATA*)voiceData, pan, voiceMix);
-    voiceData[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_ADPCM_DIRTY;
+    SetVoiceVolumeMix(voice, pan, voiceMix);
+    voice->m_flags |= REDSOUND_VOICE_FLAGS_ADPCM_DIRTY;
 }
 
 /*

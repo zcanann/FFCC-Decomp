@@ -99,6 +99,8 @@ extern "C" void SetLink__7CMapObjFv();
 extern "C" int ReadOtmOctTree__8COctTreeFR10CChunkFile(void*, CChunkFile&);
 extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>*, short);
 
+static const char s_mapMidPathFmt[] = "%s.mid";
+static const char s_mapOtmPathFmt[] = "%s.otm";
 static const char s_map_cpp[] = "map.cpp";
 static const char s_set_bg_camera_semi_trans_missing_fmt[] =
     "SET_BG_CAMERA_SEMI_TRANS  mesh_id=%d  "
@@ -117,6 +119,11 @@ static const char s_check_hit_cylinder_small_vec_fmt[] =
 static const char s_read_mid_fmt[] = "ReadMid fn=%s\n";
 static const char s_mapReadErrorFmt[] = "CAN NOT READ %s !!!!!!\n";
 static const char s_error_root_mapobj_not_found[] = "Error root mapobj not found\n";
+static const char s_read_mid_mapobj_error[] = "Error CMapMng::ReadMid m_mapobj\n";
+static const char s_read_mid_octtree_error[] = "Error CMapMng::ReadMid octtree\n";
+static const char s_read_mid_hit_error[] = "Error CMapMng::ReadMid hit\n";
+static const char s_read_mid_ok[] = "ReadMid OK\n";
+static const char s_read_mid_error[] = "ReadMid Error\n";
 static const char s_mapMplPathFmt[] = "%s_%d.mpl";
 static const char s_mapReadOpenErrorFmt[] = "CAN NOT READ OPEN %s !!!!!!\n";
 static const char s_mapReadMplFmt[] = "ReadMpl fn=%s\n";
@@ -2263,7 +2270,7 @@ void CMapMng::ReadOtm(char* mapName)
     void* filePtr = File.m_readBuffer;
 
     *reinterpret_cast<unsigned char*>(self + 0x2298B) = 1;
-    sprintf(g_StrTmp, "%s", mapName);
+    sprintf(g_StrTmp, const_cast<char*>(s_mapOtmPathFmt), mapName);
     *reinterpret_cast<int*>(self + 0x22A6C) = 0;
 
     const int readMode = asyncLoadState.m_mapReadMode;
@@ -2548,10 +2555,189 @@ void CMapMng::ReadOtm(char* mapName)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::ReadMid(char* mapName)
+int CMapMng::ReadMid(char* mapName)
 {
-    (void)mapName;
-    // TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
+    void* filePtr = File.m_readBuffer;
+
+    sprintf(g_StrTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
+    bool ok = true;
+
+    if (static_cast<unsigned int>(System.m_execParam) > 2) {
+        System.Printf(const_cast<char*>(s_read_mid_fmt), g_StrTmp);
+    }
+
+    const int readMode = asyncLoadState.m_mapReadMode;
+    if (readMode == 1) {
+        int& readIndex = asyncLoadState.m_asyncReadIndex;
+        const int size = asyncLoadState.m_fileSizes[readIndex];
+        void* amemCursor = asyncLoadState.m_mapLoadCursor;
+
+        Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
+        asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
+        CheckSum__FPvi(filePtr, size);
+        readIndex += 1;
+    } else {
+        CFile::CHandle* fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+        if (fileHandle == 0) {
+            filePtr = 0;
+        } else {
+            const int size = File.GetLength(fileHandle);
+            if (readMode == 3) {
+                File.ReadASync(fileHandle);
+                filePtr = reinterpret_cast<void*>(1);
+                int& openIndex = asyncLoadState.m_asyncOpenIndex;
+                asyncLoadState.m_asyncHandles[openIndex] = fileHandle;
+                openIndex += 1;
+            } else {
+                File.Read(fileHandle);
+                File.SyncCompleted(fileHandle);
+                filePtr = File.m_readBuffer;
+                File.Close(fileHandle);
+
+                if (readMode == 2) {
+                    int& readIndex = asyncLoadState.m_asyncReadIndex;
+                    void* amemCursor = asyncLoadState.m_mapLoadCursor;
+                    Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
+                    asyncLoadState.m_fileSizes[readIndex] = size;
+                    asyncLoadState.m_fileChecksums[readIndex] = CheckSum__FPvi(filePtr, size);
+                    readIndex += 1;
+                    asyncLoadState.m_mapLoadCursor =
+                        reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
+                }
+            }
+        }
+    }
+
+    if (filePtr == 0) {
+        if (System.m_execParam != 0) {
+            System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
+        }
+        return 0;
+    }
+
+    if (readMode == 2 || readMode == 3) {
+        return 1;
+    }
+
+    CChunkFile chunkFile;
+    chunkFile.SetBuf(filePtr);
+
+    CMapObj* nextMapObj = reinterpret_cast<CMapObj*>(self + 0x954);
+    CChunkFile::CChunk chunk;
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id != 0x4D494420) {
+            continue;
+        }
+
+        chunkFile.PushChunk();
+        while (chunkFile.GetNextChunk(chunk)) {
+            if (chunk.m_id == 0x5343454E) {
+                chunkFile.PushChunk();
+                while (chunkFile.GetNextChunk(chunk)) {
+                    if (chunk.m_id != 0x48495420) {
+                        continue;
+                    }
+
+                    short& hitCount = *reinterpret_cast<short*>(self + 0xA);
+                    if (hitCount > 0x1F) {
+                        return 0;
+                    }
+                    CMapHit* hit = reinterpret_cast<CMapHit*>(self + 0x4D4 + (hitCount * 0x24));
+                    hit->ReadOtmHit(chunkFile);
+                    hitCount += 1;
+                }
+                chunkFile.PopChunk();
+                continue;
+            }
+
+            if (chunk.m_id != 0x4F43544D) {
+                continue;
+            }
+
+            CMapObj* mapObj = nextMapObj;
+            int mapObjIndex = 0;
+            while (mapObjIndex < *reinterpret_cast<short*>(self + 0xC)) {
+                unsigned char* objRaw = reinterpret_cast<unsigned char*>(mapObj);
+                if (objRaw[0x1E] == 1 || objRaw[0x1E] == 2) {
+                    short& octTreeCount = *reinterpret_cast<short*>(self + 0x8);
+                    if (octTreeCount > 0xF) {
+                        return 0;
+                    }
+
+                    unsigned char* octTree = self + 0x14 + (octTreeCount * 0x4C);
+                    ReadOtmOctTree__8COctTreeFR10CChunkFile(octTree, chunkFile);
+                    *reinterpret_cast<CMapObj**>(octTree + 8) = mapObj;
+
+                    if (*reinterpret_cast<int*>(objRaw + 0xC) == 0) {
+                        if (System.m_execParam != 0) {
+                            System.Printf(const_cast<char*>(s_read_mid_mapobj_error));
+                        }
+                    } else if (objRaw[0x1E] == 1 || objRaw[0x1E] == 2) {
+                        nextMapObj = reinterpret_cast<CMapObj*>(objRaw + 0xF0);
+                        octTreeCount += 1;
+                        break;
+                    }
+
+                    if (System.m_execParam != 0) {
+                        System.Printf(const_cast<char*>(s_read_mid_octtree_error));
+                    }
+                    ok = false;
+                    nextMapObj = reinterpret_cast<CMapObj*>(objRaw + 0xF0);
+                    octTreeCount += 1;
+                    break;
+                }
+
+                mapObj = reinterpret_cast<CMapObj*>(objRaw + 0xF0);
+                mapObjIndex += 1;
+            }
+
+            if (mapObjIndex >= *reinterpret_cast<short*>(self + 0xC)) {
+                if (System.m_execParam != 0) {
+                    System.Printf(const_cast<char*>(s_error_root_mapobj_not_found));
+                    System.Printf(const_cast<char*>(s_read_mid_octtree_error));
+                }
+                ok = false;
+            }
+        }
+        chunkFile.PopChunk();
+    }
+
+    const int mapObjCount = *reinterpret_cast<short*>(self + 0xC);
+    for (int i = 0; i < mapObjCount; i++) {
+        unsigned char* obj = self + 0x954 + (i * 0xF0);
+        unsigned char type = obj[0x1D];
+        CMapHit* hit = *reinterpret_cast<CMapHit**>(obj + 0xC);
+        if ((type == 2 || type == 3) && hit != 0) {
+            int hitIndex = (reinterpret_cast<unsigned char*>(hit) - (self + 0x4D4)) / 0x24;
+            if (*reinterpret_cast<short*>(self + 0xA) <= hitIndex) {
+                if (System.m_execParam != 0) {
+                    System.Printf(const_cast<char*>(s_read_mid_hit_error));
+                }
+                *reinterpret_cast<CMapHit**>(obj + 0xC) = 0;
+            }
+        }
+    }
+
+    if (ok) {
+        if (static_cast<unsigned int>(System.m_execParam) > 2) {
+            System.Printf(const_cast<char*>(s_read_mid_ok));
+        }
+    } else if (System.m_execParam != 0) {
+        System.Printf(const_cast<char*>(s_read_mid_error));
+    }
+
+    const short octTreeCount = *reinterpret_cast<short*>(self + 0x8);
+    for (int i = 0; i < octTreeCount; i++) {
+        unsigned char* octTree = self + 0x14 + (i * 0x4C);
+        unsigned char* obj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(octTree + 8));
+        if (obj != 0) {
+            obj[0x1F] = static_cast<unsigned char>(i);
+        }
+    }
+
+    return 1;
 }
 
 /*

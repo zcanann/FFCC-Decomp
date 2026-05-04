@@ -112,7 +112,7 @@ public:
     void ReadMtx(char*);
     void ReadMpl(char*);
     void ReadOtm(char*);
-    void ReadMid(char*);
+    int ReadMid(char*);
     void Calc();
     void DrawMapShadow();
     void DrawBefore();

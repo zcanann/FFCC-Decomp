@@ -1170,7 +1170,6 @@ static void _DmaExecute()
     RedDmaRequest** oldQueuePtr;
     RedDmaRequest* activeRequest;
     RedDmaRequest* queueEntry;
-    RedDmaRequest* nextEntry;
 
     while ((p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) ||
            (p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX])) {
@@ -1203,12 +1202,12 @@ static void _DmaExecute()
             m_DMAInThread = REDSOUND_DMA_THREAD_WAIT_REQUEST;
             activeRequest = queueEntry;
         }
-        nextEntry = queueEntry + 1;
+        queueEntry++;
         m_DMAInThread = REDSOUND_DMA_THREAD_ADVANCE_QUEUE;
-        if (queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT <= queueEntry + 1) {
-            nextEntry = queueBase;
+        if (queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT <= queueEntry) {
+            queueEntry = queueBase;
         }
-        *oldQueuePtr = nextEntry;
+        *oldQueuePtr = queueEntry;
         m_DMAInThread = REDSOUND_DMA_THREAD_STORE_QUEUE;
 
         while (activeRequest != 0) {

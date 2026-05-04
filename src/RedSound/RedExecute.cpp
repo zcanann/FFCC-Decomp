@@ -1826,8 +1826,8 @@ static void _ExecuteExtraData()
             }
         }
         soundBase = (u32*)p_SoundControlBuffer;
-        sound += 0x125;
-    } while (sound < (u32*)p_SoundControlBuffer + 0x24A);
+        sound += REDSOUND_CONTROL_WORD_COUNT;
+    } while (sound < (u32*)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_END_WORD_OFFSET);
 
     if (p_MusicTempoControl->m_count != 0) {
         p_MusicTempoControl->m_count--;
@@ -1874,8 +1874,8 @@ static void _ExecuteExtraData()
                 MusicStop(soundControl->m_musicId);
             }
         }
-        soundBase += 0x125;
-    } while (soundBase < (u32*)p_SoundControlBuffer + 0x36F);
+        soundBase += REDSOUND_CONTROL_WORD_COUNT;
+    } while (soundBase < (u32*)p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_END_WORD_OFFSET);
 }
 
 /*

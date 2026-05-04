@@ -1318,7 +1318,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
     int nextLevel;
     int stepFrames;
 
-    nextLevel = *(u8*)((u8*)voice + REDSOUND_VOICE_ADSR_LEVEL_OFFSET);
+    nextLevel = voice->m_adsrLevel[0];
     *stage    = 0;
     do {
         prevLevel = nextLevel;

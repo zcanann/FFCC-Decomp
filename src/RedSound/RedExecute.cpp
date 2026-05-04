@@ -265,9 +265,9 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
  */
 static void _ReverbNullCallback(AXFX_BUFFERUPDATE* update, void*)
 {
-    memset((void*)((u32*)update)[0], 0, REDSOUND_REVERB_AUX_BUFFER_SIZE);
-    memset((void*)((u32*)update)[1], 0, REDSOUND_REVERB_AUX_BUFFER_SIZE);
-    memset((void*)((u32*)update)[2], 0, REDSOUND_REVERB_AUX_BUFFER_SIZE);
+    memset(update->left, 0, REDSOUND_REVERB_AUX_BUFFER_SIZE);
+    memset(update->right, 0, REDSOUND_REVERB_AUX_BUFFER_SIZE);
+    memset(update->surround, 0, REDSOUND_REVERB_AUX_BUFFER_SIZE);
 }
 
 /*

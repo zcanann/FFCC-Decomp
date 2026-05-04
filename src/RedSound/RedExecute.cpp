@@ -1014,8 +1014,6 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     int iVar5;
     int local_38[4];
     int* voiceData = (int*)param_2;
-    s8* trackS8 = (s8*)param_1;
-    s16* trackS16 = (s16*)param_1;
     s8 note = param_3->m_key;
     unsigned int* voiceMask = (unsigned int*)param_4;
 
@@ -1167,37 +1165,37 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         memcpy(param_2->m_adsrTime,
                param_2->m_waveData->m_adsr,
                REDSOUND_TRACK_ADSR_SIZE);
-        if (trackS8[REDSOUND_TRACK_ADSR_LEVEL_ATTACK_OFFSET] != -1) {
+        if ((s8)param_1->m_adsrAL != -1) {
             param_2->m_adsrLevel[0] =
-                trackS8[REDSOUND_TRACK_ADSR_LEVEL_ATTACK_OFFSET];
+                param_1->m_adsrAL;
         }
-        if (trackS16[REDSOUND_TRACK_ADSR_TIME_ATTACK_HALFWORD] != -1) {
+        if ((s16)param_1->m_adsrAR != -1) {
             param_2->m_adsrTime[0] =
-                trackS16[REDSOUND_TRACK_ADSR_TIME_ATTACK_HALFWORD];
+                param_1->m_adsrAR;
         }
-        if (trackS8[REDSOUND_TRACK_ADSR_LEVEL_DECAY_OFFSET] != -1) {
+        if ((s8)param_1->m_adsrDL != -1) {
             param_2->m_adsrLevel[1] =
-                trackS8[REDSOUND_TRACK_ADSR_LEVEL_DECAY_OFFSET];
+                param_1->m_adsrDL;
         }
-        if (trackS16[REDSOUND_TRACK_ADSR_TIME_DECAY_HALFWORD] != -1) {
+        if ((s16)param_1->m_adsrDR != -1) {
             param_2->m_adsrTime[1] =
-                trackS16[REDSOUND_TRACK_ADSR_TIME_DECAY_HALFWORD];
+                param_1->m_adsrDR;
         }
-        if (trackS8[REDSOUND_TRACK_ADSR_LEVEL_SUSTAIN_OFFSET] != -1) {
+        if ((s8)param_1->m_adsrSL != -1) {
             param_2->m_adsrLevel[2] =
-                trackS8[REDSOUND_TRACK_ADSR_LEVEL_SUSTAIN_OFFSET];
+                param_1->m_adsrSL;
         }
-        if (trackS16[REDSOUND_TRACK_ADSR_TIME_SUSTAIN_HALFWORD] != -1) {
+        if ((s16)param_1->m_adsrSR != -1) {
             param_2->m_adsrTime[2] =
-                trackS16[REDSOUND_TRACK_ADSR_TIME_SUSTAIN_HALFWORD];
+                param_1->m_adsrSR;
         }
-        if (trackS8[REDSOUND_TRACK_ADSR_LEVEL_RELEASE_OFFSET] != -1) {
+        if ((s8)param_1->m_adsrRL != -1) {
             param_2->m_adsrLevel[3] =
-                trackS8[REDSOUND_TRACK_ADSR_LEVEL_RELEASE_OFFSET];
+                param_1->m_adsrRL;
         }
-        if (trackS16[REDSOUND_TRACK_ADSR_TIME_RELEASE_HALFWORD] != -1) {
+        if ((s16)param_1->m_adsrRR != -1) {
             param_2->m_adsrTime[3] =
-                trackS16[REDSOUND_TRACK_ADSR_TIME_RELEASE_HALFWORD];
+                param_1->m_adsrRR;
         }
         if ((param_2->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
             u16 random = GetRandomData();

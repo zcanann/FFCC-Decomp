@@ -1646,7 +1646,7 @@ static void _KeyOnControl()
                 voiceData = (unsigned int*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)&local_28);
             }
             reserve += 2;
-        } while ((voiceData != 0) && (reserve < (int*)p_KeyOnData + 0x180));
+        } while ((voiceData != 0) && (reserve < (int*)p_KeyOnData + REDSOUND_KEY_ON_TOTAL_WORD_COUNT));
     }
 
     if ((p_SoundControlBuffer->m_activeTrackCount != 0) &&
@@ -1775,7 +1775,7 @@ static void _KeyOnControl()
 
     {
         u32 bit = 1;
-        unsigned int* voice = (unsigned int*)p_VoiceData + 0x600;
+        unsigned int* voice = (unsigned int*)p_VoiceData + REDSOUND_VOICE_SECOND_MASK_WORD_OFFSET;
         do {
             if ((local_24 & bit) != 0) {
                 local_24 &= ~bit;

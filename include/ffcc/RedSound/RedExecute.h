@@ -190,6 +190,10 @@ enum RedVoiceLayoutWord {
 	REDSOUND_VOICE_UPDATE_FLAGS_WORD = 0x2E,
 };
 
+enum RedVoiceBufferWordOffset {
+	REDSOUND_VOICE_SECOND_MASK_WORD_OFFSET = 0x600,
+};
+
 enum RedRandomByteLayout {
 	REDSOUND_RANDOM_BYTE_MASK = 0xFF,
 	REDSOUND_RANDOM_BYTE_SIGN_BIT = 0x80,

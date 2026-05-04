@@ -1103,7 +1103,7 @@ int CRedEntry::ClearSeSepData(int seNo)
 				SeSepMemoryFree(history);
 			}
 			history += 1;
-		} while (history < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE));
+		} while (history < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase) + REDSOUND_SESEP_BANK_ENTRY_COUNT);
 	} else {
 		result = SearchSeSepSequence(seNo);
 		if (result >= 0) {
@@ -1393,7 +1393,7 @@ int CRedEntry::MusicOldClear()
 			selected = history;
 		}
 		history += 1;
-	} while (history < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + REDSOUND_MUSIC_BANK_SIZE));
+	} while (history < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase) + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
 
 	if (historyNo != 0) {
 		MusicMemoryFree(selected);
@@ -1422,7 +1422,7 @@ RedHistoryBANK* CRedEntry::MusicOldChoice()
 			selected = history;
 		}
 		history += 1;
-	} while (history < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + REDSOUND_MUSIC_BANK_SIZE));
+	} while (history < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase) + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
 
 	return selected;
 }

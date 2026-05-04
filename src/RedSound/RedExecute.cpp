@@ -2533,13 +2533,15 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			trackData[REDSOUND_TRACK_TREMOLO_RATE_WORD_OFFSET] +=
 			    trackData[REDSOUND_TRACK_TREMOLO_RATE_ADD_WORD_OFFSET] * step;
 		}
-		if (*(short*)(trackBytes + 0xAE) != 0) {
+		if (trackShorts[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD] != 0) {
 			step = frames;
-			if (*(short*)(trackBytes + 0xAE) <= frames) {
-				step = *(short*)(trackBytes + 0xAE);
+			if (trackShorts[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD] <= frames) {
+				step = trackShorts[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD];
 			}
-			*(short*)(trackBytes + 0xAE) = *(short*)(trackBytes + 0xAE) - (short)step;
-			trackData[0x28] += trackData[0x29] * step;
+			trackShorts[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD] =
+			    trackShorts[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD] - (short)step;
+			trackData[REDSOUND_TRACK_TREMOLO_DEPTH_WORD_OFFSET] +=
+			    trackData[REDSOUND_TRACK_TREMOLO_DEPTH_ADD_WORD_OFFSET] * step;
 		}
 	}
 

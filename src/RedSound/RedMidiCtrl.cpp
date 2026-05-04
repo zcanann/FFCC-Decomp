@@ -2394,27 +2394,27 @@ static void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, Red
  */
 static void _PitchBendCompute(RedTrackDATA* track, int bend)
 {
-    unsigned int* voiceData = (unsigned int*)p_VoiceData;
+    RedVoiceDATA* voiceData = p_VoiceData;
 
     do {
-        if (((RedVoiceDATA*)voiceData)->m_track == track) {
-            if (((RedVoiceDATA*)voiceData)->m_waveData != 0) {
+        if (voiceData->m_track == track) {
+            if (voiceData->m_waveData != 0) {
                 int pitch;
                 int computedPitch;
-                if ((((RedVoiceDATA*)voiceData)->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
-                    pitch = ((RedVoiceDATA*)voiceData)->m_basePitch + track->m_pitch;
+                if ((voiceData->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
+                    pitch = voiceData->m_basePitch + track->m_pitch;
                 } else {
-                    pitch = ((RedVoiceDATA*)voiceData)->m_basePitch + p_MusicPitchControl->m_value;
+                    pitch = voiceData->m_basePitch + p_MusicPitchControl->m_value;
                 }
                 computedPitch = pitch;
-                voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] = PitchCompute(
-                    computedPitch, track->m_keyTranspose + bend, ((RedVoiceDATA*)voiceData)->m_waveData->m_pitch,
+                ((unsigned int*)voiceData)[REDSOUND_VOICE_TARGET_PITCH_WORD] = PitchCompute(
+                    computedPitch, track->m_keyTranspose + bend, voiceData->m_waveData->m_pitch,
                     track->m_fineTune);
-                ((RedVoiceDATA*)voiceData)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
+                voiceData->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
             }
         }
-        voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);
-    } while (voiceData < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
+        voiceData++;
+    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
 }
 
 /*

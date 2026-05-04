@@ -1232,8 +1232,8 @@ void CRedEntry::DisplaySePlayInfo()
 					int songNo = (int)(seDataNo & REDSOUND_SE_BLOCK_ENTRY_MASK) >> REDSOUND_SE_BLOCK_BANK_SHIFT;
 					RedSeBlockHEAD* seBlock = p_SeBlockData[songNo];
 					int seqBase = reinterpret_cast<int>(seBlock->m_entries);
-					int seqInfo = seqBase + seBlock->m_seCount * sizeof(int);
-					seqInfo += (*(unsigned int*)(seqBase + (seDataNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK) * 4) &
+					int seqInfo = seqBase + seBlock->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE;
+					seqInfo += (*(unsigned int*)(seqBase + (seDataNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK) * REDSOUND_SE_BLOCK_ENTRY_SIZE) &
 					            REDSOUND_SE_BLOCK_ENTRY_MASK);
 					int waveNo = reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE +
 					             reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoLo;

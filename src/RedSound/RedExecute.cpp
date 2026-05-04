@@ -1092,12 +1092,12 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     }
     voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] = iVar5;
 
-    if ((((unsigned int)trackData[REDSOUND_TRACK_FLAGS_WORD_OFFSET] & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0) ||
-        ((((trackS8[REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0) &&
+    if (((param_1->m_flags & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0) ||
+        ((((s8)param_1->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0) &&
           (((unsigned int)trackData[REDSOUND_TRACK_FLAGS_WORD_OFFSET] &
             (REDSOUND_TRACK_FLAG_SLUR | REDSOUND_TRACK_FLAG_TENUTO)) == 0)) ||
-         (((trackS8[REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET] & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) &&
-          (((unsigned int)trackData[REDSOUND_TRACK_FLAGS_WORD_OFFSET] & REDSOUND_TRACK_FLAG_SLUR) == 0)))) {
+         ((((s8)param_1->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) &&
+          (((unsigned int)trackData[REDSOUND_TRACK_FLAGS_WORD_OFFSET] & REDSOUND_TRACK_FLAG_SLUR) == 0))) {
         if (trackData[REDSOUND_TRACK_VIBRATE_FUNC_WORD_OFFSET] != 0) {
             ((s16*)voiceData)[REDSOUND_VOICE_PITCH_MOD_DELAY_HALFWORD] =
                 trackS16[REDSOUND_TRACK_VIBRATE_DELAY_HALFWORD];

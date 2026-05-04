@@ -1217,10 +1217,9 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         voiceMask += 1;
     }
 
-    if ((((unsigned int)trackData[REDSOUND_TRACK_FLAGS_WORD_OFFSET] & REDSOUND_TRACK_FLAG_SLUR) == 0) ||
-        (((unsigned int)trackData[REDSOUND_TRACK_FLAGS_WORD_OFFSET] & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0)) {
-        trackData[REDSOUND_TRACK_FLAGS_WORD_OFFSET] =
-            (int)((unsigned int)trackData[REDSOUND_TRACK_FLAGS_WORD_OFFSET] | REDSOUND_TRACK_FLAG_SLUR_RELEASE);
+    if (((param_1->m_flags & REDSOUND_TRACK_FLAG_SLUR) == 0) ||
+        ((param_1->m_flags & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0)) {
+        param_1->m_flags |= REDSOUND_TRACK_FLAG_SLUR_RELEASE;
         *voiceMask |= 1u << voiceData[REDSOUND_VOICE_INDEX_WORD];
     }
     voiceData[REDSOUND_VOICE_UPDATE_FLAGS_WORD] |= REDSOUND_VOICE_UPDATE_ALL;

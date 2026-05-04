@@ -1026,24 +1026,24 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     if ((trackData[REDSOUND_TRACK_PORTAMENT_TIME_WORD_OFFSET] == 0) ||
         (trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] < 0)) {
         trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
-        if (voiceData[1] != 0) {
-            if ((((RedWaveDATA*)voiceData[1])->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) == 0) {
-                voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+        if (param_2->m_waveData != 0) {
+            if ((param_2->m_waveData->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) == 0) {
+                param_2->m_basePitch = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
                 if (param_1->m_keySignatureData != 0) {
-                    iVar5 = voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] >> REDSOUND_PITCH_BASE_NOTE_SHIFT;
-                    iVar1 = iVar5 / REDSOUND_NOTES_PER_OCTAVE + (voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] >> 0x1f);
+                    iVar5 = param_2->m_basePitch >> REDSOUND_PITCH_BASE_NOTE_SHIFT;
+                    iVar1 = iVar5 / REDSOUND_NOTES_PER_OCTAVE + (param_2->m_basePitch >> 0x1f);
                     local_38[0] =
                         param_1->m_keySignatureData[iVar5 + (iVar1 - (iVar1 >> 0x1f)) * -REDSOUND_NOTES_PER_OCTAVE];
-                    voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] += local_38[0] * REDSOUND_PITCH_KEY_SIGNATURE_UNIT;
+                    param_2->m_basePitch += local_38[0] * REDSOUND_PITCH_KEY_SIGNATURE_UNIT;
                 }
             } else {
-                voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] =
-                    ((RedWaveDATA*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])->m_splitKey << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+                param_2->m_basePitch =
+                    param_2->m_waveData->m_splitKey << REDSOUND_PITCH_BASE_NOTE_SHIFT;
             }
         }
     } else {
         trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] &= REDSOUND_FIXED_WHOLE_MASK;
-        voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] = trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET];
+        param_2->m_basePitch = trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET];
         trackData[REDSOUND_TRACK_SWEEP_DELTA_WORD_OFFSET] = trackData[REDSOUND_TRACK_PORTAMENT_TIME_WORD_OFFSET];
         local_38[0] = 0;
         DataAddCompute(local_38, note * REDSOUND_PITCH_NOTE_UNIT -
@@ -1057,7 +1057,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         (int)((u8*)param_1 + REDSOUND_TRACK_EXPRESSION_OFFSET);
     voiceData[REDSOUND_VOICE_TRACK_PAN_WORD] = (int)((u8*)param_1 + REDSOUND_TRACK_PAN_OFFSET);
 
-    if (voiceData[1] == 0) {
+    if (param_2->m_waveData == 0) {
         memset(voiceData + REDSOUND_VOICE_ADSR_TIME_WORD, 0, REDSOUND_TRACK_ADSR_SIZE);
     } else {
         memcpy(voiceData + REDSOUND_VOICE_ADSR_TIME_WORD,
@@ -1080,15 +1080,15 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
 
     local_38[0] = trackS16[REDSOUND_TRACK_KEY_TRANSPOSE_HALFWORD] + trackS16[REDSOUND_TRACK_PITCH_BEND_HALFWORD];
     if ((((u8*)voiceData)[REDSOUND_VOICE_STATE_FLAGS_OFFSET] & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
-        iVar5 = voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] + p_MusicPitchControl->m_value;
+        iVar5 = param_2->m_basePitch + p_MusicPitchControl->m_value;
     } else {
-        iVar5 = voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] + trackData[REDSOUND_TRACK_PITCH_WORD_OFFSET];
+        iVar5 = param_2->m_basePitch + trackData[REDSOUND_TRACK_PITCH_WORD_OFFSET];
     }
 
-    if (voiceData[1] == 0) {
+    if (param_2->m_waveData == 0) {
         iVar5 = 0;
     } else {
-        iVar5 = PitchCompute(iVar5, local_38[0], ((RedWaveDATA*)voiceData[1])->m_pitch, trackS8[REDSOUND_TRACK_FINE_TUNE_BYTE]);
+        iVar5 = PitchCompute(iVar5, local_38[0], param_2->m_waveData->m_pitch, trackS8[REDSOUND_TRACK_FINE_TUNE_BYTE]);
     }
     param_2->m_targetPitch = iVar5;
 

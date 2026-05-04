@@ -185,6 +185,8 @@ enum RedExecuteAxVoiceLayout {
 
 enum RedExecutePitchModConst {
     REDSOUND_PITCH_MOD_DEPTH_SPLIT = 0x80,
+    REDSOUND_MOD_DELAY_PHASE_SCALE = 0x100,
+    REDSOUND_MOD_DELAY_FRAME_SCALE = 4,
     REDSOUND_PITCH_MOD_SHALLOW_SCALE = 2,
     REDSOUND_PITCH_MOD_DEEP_SCALE = 0x18,
     REDSOUND_PITCH_MOD_WAVE_SHIFT = 4,
@@ -1088,15 +1090,15 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         if (trackData[REDSOUND_TRACK_VIBRATE_FUNC_WORD_OFFSET] != 0) {
             ((s16*)voiceData)[REDSOUND_VOICE_PITCH_MOD_DELAY_HALFWORD] =
                 trackS16[REDSOUND_TRACK_VIBRATE_DELAY_HALFWORD];
-            local_38[0] = 0x100;
+            local_38[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
             if ((trackData[REDSOUND_TRACK_VIBRATE_RATE_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT) != 0) {
                 local_38[0] =
-                    0x100 / (trackData[REDSOUND_TRACK_VIBRATE_RATE_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT);
+                    REDSOUND_MOD_DELAY_PHASE_SCALE / (trackData[REDSOUND_TRACK_VIBRATE_RATE_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT);
             }
             if (trackS16[REDSOUND_TRACK_VIBRATE_DELAY_DEPTH_HALFWORD] == 0) {
                 iVar5 = 0;
             } else {
-                iVar5 = trackS16[REDSOUND_TRACK_VIBRATE_DELAY_DEPTH_HALFWORD] * local_38[0] * 4;
+                iVar5 = trackS16[REDSOUND_TRACK_VIBRATE_DELAY_DEPTH_HALFWORD] * local_38[0] * REDSOUND_MOD_DELAY_FRAME_SCALE;
             }
             voiceData[REDSOUND_VOICE_PITCH_MOD_FRAMES_WORD] = iVar5;
             voiceData[REDSOUND_VOICE_PITCH_MOD_FRAME_WORD] = 0;
@@ -1106,15 +1108,15 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         if (trackData[REDSOUND_TRACK_TREMOLO_FUNC_WORD_OFFSET] != 0) {
             ((s16*)voiceData)[REDSOUND_VOICE_VOLUME_MOD_DELAY_HALFWORD] =
                 trackS16[REDSOUND_TRACK_TREMOLO_DELAY_HALFWORD];
-            local_38[0] = 0x100;
+            local_38[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
             if ((trackData[REDSOUND_TRACK_TREMOLO_RATE_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT) != 0) {
                 local_38[0] =
-                    0x100 / (trackData[REDSOUND_TRACK_TREMOLO_RATE_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT);
+                    REDSOUND_MOD_DELAY_PHASE_SCALE / (trackData[REDSOUND_TRACK_TREMOLO_RATE_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT);
             }
             if (trackS16[REDSOUND_TRACK_TREMOLO_DELAY_DEPTH_HALFWORD] == 0) {
                 iVar5 = 0;
             } else {
-                iVar5 = trackS16[REDSOUND_TRACK_TREMOLO_DELAY_DEPTH_HALFWORD] * local_38[0] * 4;
+                iVar5 = trackS16[REDSOUND_TRACK_TREMOLO_DELAY_DEPTH_HALFWORD] * local_38[0] * REDSOUND_MOD_DELAY_FRAME_SCALE;
             }
             voiceData[REDSOUND_VOICE_VOLUME_MOD_FRAMES_WORD] = iVar5;
             voiceData[REDSOUND_VOICE_VOLUME_MOD_FRAME_WORD] = 0;

@@ -2498,18 +2498,17 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
-	if (trackData[REDSOUND_TRACK_MIX_VOLUME_DELTA_WORD_OFFSET] != 0) {
+	if (track->m_mixVolumeDelta != 0) {
 		step = frames;
-		if (trackData[REDSOUND_TRACK_MIX_VOLUME_DELTA_WORD_OFFSET] <= frames) {
-			step = trackData[REDSOUND_TRACK_MIX_VOLUME_DELTA_WORD_OFFSET];
+		if (track->m_mixVolumeDelta <= frames) {
+			step = track->m_mixVolumeDelta;
 		}
-		trackData[REDSOUND_TRACK_MIX_VOLUME_DELTA_WORD_OFFSET] -= step;
-		if ((trackData[REDSOUND_TRACK_MIX_VOLUME_DELTA_WORD_OFFSET] == 0) &&
-		    (trackData[REDSOUND_TRACK_MIX_VOLUME_MODE_WORD_OFFSET] == 1)) {
-			trackData[0] = (int)m_TerminateNote;
-			trackData[0x42] = 1;
+		track->m_mixVolumeDelta -= step;
+		if ((track->m_mixVolumeDelta == 0) && (track->m_mixVolumeMode == 1)) {
+			track->m_command = (u8*)m_TerminateNote;
+			track->m_deltaTime = 1;
 		}
-		trackData[REDSOUND_TRACK_MIX_VOLUME_WORD_OFFSET] += trackData[REDSOUND_TRACK_MIX_VOLUME_ADD_WORD_OFFSET] * step;
+		track->m_mixVolume += track->m_mixVolumeAdd * step;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 

@@ -2248,8 +2248,9 @@ static void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	((int*)track)[0x31] = DataAddCompute((int*)track + 0x30, *track->m_command, delta);
-	*(short*)((int)track + 0xd2) = (short)delta[0];
+	((int*)track)[REDSOUND_TRACK_SHAKE_DEPTH_ADD_WORD_OFFSET] =
+		DataAddCompute((int*)track + REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET, *track->m_command, delta);
+	((short*)track)[REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD] = (short)delta[0];
 	track->m_command += 1;
 }
 
@@ -2303,8 +2304,9 @@ static void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrack
 	}
 	rate = divisor;
 	rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR / rate;
-	((int*)track)[0x2f] = DataAddCompute((int*)track + 0x2e, rate, delta);
-	*(short*)((int*)track + 0x34) = (short)delta[0];
+	((int*)track)[REDSOUND_TRACK_SHAKE_RATE_ADD_WORD_OFFSET] =
+		DataAddCompute((int*)track + REDSOUND_TRACK_SHAKE_RATE_WORD_OFFSET, rate, delta);
+	((short*)track)[REDSOUND_TRACK_SHAKE_RATE_DELTA_HALFWORD] = (short)delta[0];
 	track->m_command += 1;
 }
 

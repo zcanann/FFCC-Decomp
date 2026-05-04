@@ -1133,7 +1133,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         }
     }
 
-    if (((unsigned int)voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_FUZZY_PITCH) == 0) {
+    if ((param_2->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_PITCH) == 0) {
         param_2->m_randomPitch = 0;
     } else {
         unsigned int random = GetRandomData();
@@ -1148,7 +1148,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         }
     }
 
-    if (((unsigned int)voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_FUZZY_VOLUME) == 0) {
+    if ((param_2->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_VOLUME) == 0) {
         param_2->m_randomVolume = 0;
     } else {
         s8 random = (s8)GetRandomData();
@@ -1156,7 +1156,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
             (param_1->m_fuzzyVolumeDepth * random) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
     }
 
-    if (((unsigned int)voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_FUZZY_PAN) == 0) {
+    if ((param_2->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_PAN) == 0) {
         param_2->m_randomPan = 0;
     } else {
         s8 random = (s8)GetRandomData();
@@ -1164,7 +1164,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
             (param_1->m_fuzzyPanDepth * random) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
     }
 
-    if (voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] == 0) {
+    if (param_2->m_waveData == 0) {
         memset(param_2->m_adsrTime, 0, REDSOUND_TRACK_ADSR_SIZE);
     } else {
         memcpy(param_2->m_adsrTime,
@@ -1202,7 +1202,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
             param_2->m_adsrTime[3] =
                 trackS16[REDSOUND_TRACK_ADSR_TIME_RELEASE_HALFWORD];
         }
-        if (((unsigned int)voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
+        if ((param_2->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
             u16 random = GetRandomData();
             param_2->m_adsrTime[0] =
                 (u16)(param_1->m_fuzzyAdsrDepth *

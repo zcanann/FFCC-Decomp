@@ -173,6 +173,7 @@ enum RedExecuteAxVoiceLayout {
     REDSOUND_AX_VOICE_MIX_CTRL_OFFSET = 0x144,
     REDSOUND_AX_VOICE_RUNNING_OFFSET = 0x146,
     REDSOUND_AX_VOICE_LOOP_OFFSET = 0x148,
+    REDSOUND_AX_VOICE_MIX_OFFSET = 0x14A,
     REDSOUND_AX_VOICE_VOLUME_OFFSET = 0x19C,
     REDSOUND_AX_VOICE_VOLUME_DELTA_OFFSET = 0x19E,
     REDSOUND_AX_VOICE_RATIO_HIGH_OFFSET = 0x1DE,
@@ -1475,7 +1476,7 @@ void EnvelopeKeyExecute()
                 } else {
                     *(u16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) = 0;
                     *(u16*)(voice + REDSOUND_AX_VOICE_VOLUME_OFFSET) = 0;
-                    *(u32*)(voice + REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET) |= 0x204;
+                    *(u32*)(voice + REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET) |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
                 }
             }
         } else {
@@ -1520,9 +1521,10 @@ void EnvelopeKeyExecute()
 
             if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_ADPCM_DIRTY) != 0) {
                 if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_PAUSE) == 0) {
-                    memcpy((void*)(voice + 0x14A), voiceData + REDSOUND_VOICE_AX_MIX_WORD, REDSOUND_VOICE_AX_MIX_SIZE);
+                    memcpy((void*)(voice + REDSOUND_AX_VOICE_MIX_OFFSET), voiceData + REDSOUND_VOICE_AX_MIX_WORD,
+                           REDSOUND_VOICE_AX_MIX_SIZE);
                 } else {
-                    memset((void*)(voice + 0x14A), 0, REDSOUND_VOICE_AX_MIX_SIZE);
+                    memset((void*)(voice + REDSOUND_AX_VOICE_MIX_OFFSET), 0, REDSOUND_VOICE_AX_MIX_SIZE);
                 }
 
                 *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) = 3;

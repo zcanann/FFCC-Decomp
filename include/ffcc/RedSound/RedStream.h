@@ -8,7 +8,8 @@ struct RedTrackDATA;
 struct RedVoiceDATA;
 
 struct RedStreamHEAD {
-    u8 m_unk00[0x0C];
+    char m_signature[4];
+    u8 m_pad04[0x0C - 0x04];
     int m_loopEnd;
     int m_loopStart;
     int m_pitch;

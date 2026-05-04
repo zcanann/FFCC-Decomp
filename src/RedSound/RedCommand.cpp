@@ -61,7 +61,7 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 	RedTrackDATA* track = *trackBasePtr;
 
 	do {
-		if ((track->m_command != 0) && ((int)track->m_eraseTrack <= eraseTrack) &&
+		if ((track->m_command != 0) && (track->m_eraseTrack <= eraseTrack) &&
 		    ((((unsigned int)track->m_attrMask) & (unsigned int)attrMask) != 0)) {
 			int trackNo;
 
@@ -104,7 +104,7 @@ static int _EraseTime(int eraseTrack)
 	RedTrackDATA* track = *trackBasePtr;
 
 	do {
-		if ((track->m_command != 0) && (track->m_attrMask == 0) && ((int)track->m_eraseTrack < minTrack)) {
+		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack < minTrack)) {
 			minTrack = track->m_eraseTrack;
 		}
 		track++;
@@ -118,7 +118,7 @@ static int _EraseTime(int eraseTrack)
 	int maxWait = 0;
 	int sepId = 0;
 	do {
-		if ((track->m_command != 0) && (track->m_attrMask == 0) && ((int)track->m_eraseTrack <= eraseTrack) &&
+		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
 		    (track->m_playTime > maxWait)) {
 			maxWait = track->m_playTime;
 			sepId = track->m_seSepId;
@@ -129,7 +129,7 @@ static int _EraseTime(int eraseTrack)
 	track = *trackBasePtr;
 	int erasedCount = 0;
 	do {
-		if ((track->m_command != 0) && (track->m_attrMask == 0) && ((int)track->m_eraseTrack <= eraseTrack) &&
+		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
 		    (track->m_playTime == maxWait)) {
 			int trackNo;
 

@@ -2164,7 +2164,7 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
  */
 static int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
 {
-    int* tick = (int*)((u8*)control + 0xc);
+    int* tick = &control->m_measure;
 
     frames <<= m_MusicFastSpeed;
     control->m_loopBase = frames;
@@ -2251,7 +2251,7 @@ static void _MusicNoteExecute()
  */
 static int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
 {
-    int* tick = (int*)((u8*)control + 0xc);
+    int* tick = &control->m_measure;
     do {
         control->m_skipFrames = frames;
         control->m_loopBase = frames;

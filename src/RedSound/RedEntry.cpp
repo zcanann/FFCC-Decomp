@@ -819,9 +819,9 @@ void CRedEntry::DisplayWaveInfo()
 
 				if (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_BANK_ENTRY_COUNT) {
 					if (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) {
-						unsigned int index = reinterpret_cast<unsigned int>(history) - (unsigned int)m_waveBankBase;
+						int index = reinterpret_cast<int>(history) - m_waveBankBase;
 						OSReport(s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53, sRedEntryLogPrefix,
-						         (int)(index / REDSOUND_HISTORY_BANK_ENTRY_SIZE),
+						         index / REDSOUND_HISTORY_BANK_ENTRY_SIZE,
 						         (int)((RedWaveHeadWD*)history->m_data)->m_waveNo, ((RedWaveHeadWD*)history->m_data)->m_aramAddress, bank->m_size,
 						         freeSize, history->m_historyNo);
 						fflush(__files + 1);
@@ -833,9 +833,9 @@ void CRedEntry::DisplayWaveInfo()
 					}
 					entryWave += 1;
 				} else {
-					unsigned int bankIndex = (unsigned int)((int)bank - (int)aBankAddress);
+					int bankIndex = (int)bank - (int)aBankAddress;
 					OSReport(s__s______________0x_8_8X___0x_8_8_801e7aca, sRedEntryLogPrefix, bank->m_address, bank->m_size, freeSize,
-					         (int)(bankIndex >> REDSOUND_MEMORY_BLOCK_INDEX_SHIFT));
+					         bankIndex / REDSOUND_MEMORY_BLOCK_SIZE);
 					fflush(__files + 1);
 				}
 

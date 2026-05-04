@@ -1096,7 +1096,7 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
                 queueEntry->m_callback = 0;
             }
             queueEntry++;
-            if (queueEnd <= queueEntry) {
+            if (!(queueEntry < queueEnd)) {
                 queueEntry = queueBase;
             }
         } while (sizeBytes > 0);
@@ -1111,7 +1111,7 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
         queueEntry->m_callback = callback;
         queueEntry->m_callbackData = callbackData;
         queueEntry++;
-        if (queueEnd <= queueEntry) {
+        if (!(queueEntry < queueEnd)) {
             queueEntry = queueBase;
         }
         *queuePtr = queueEntry;

@@ -2408,9 +2408,9 @@ static void _PitchBendCompute(RedTrackDATA* track, int bend)
                 }
                 computedPitch = pitch;
                 voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] = PitchCompute(
-                    computedPitch, track->m_keyTranspose + bend, ((int*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])[5],
+                    computedPitch, track->m_keyTranspose + bend, ((RedVoiceDATA*)voiceData)->m_waveData->m_pitch,
                     track->m_fineTune);
-                voiceData[REDSOUND_VOICE_UPDATE_FLAGS_WORD] |= REDSOUND_VOICE_UPDATE_PITCH;
+                ((RedVoiceDATA*)voiceData)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
             }
         }
         voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);

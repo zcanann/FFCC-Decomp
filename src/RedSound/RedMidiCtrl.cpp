@@ -1312,7 +1312,7 @@ static void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
     track->m_pan = pan << REDSOUND_FIXED_SHIFT;
     track->m_panAdd = 0;
     track->m_panDelta = 0;
-    if ((u32)track->m_shakeFunc == 0) {
+    if (track->m_shakeFunc == 0) {
         track->m_shakePan = 0;
     }
     m_ChangeStatus |= 2;
@@ -1336,7 +1336,7 @@ static void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 	if (delta[0] == 0) {
 		delta[0]++;
 	}
-	if ((u32)track->m_shakeFunc == 0) {
+	if (track->m_shakeFunc == 0) {
 		track->m_pan += track->m_shakePan * REDSOUND_FIXED_ONE;
 		track->m_shakePan = 0;
 	}

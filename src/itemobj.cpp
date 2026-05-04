@@ -339,19 +339,18 @@ void CGItemObj::onCancelStat(int)
 void CGItemObj::onFrame()
 {
 	unsigned char* self = (unsigned char*)this;
-	void* handle = *(void**)(self + 0x564);
+	void* handle = m_pendingModelHandle;
 
 	if (handle != 0 && IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(handle) != 0) {
 		if ((unsigned int)System.m_execParam >= 3U) {
 			Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dd010));
 		}
 
-		*(void**)(self + 0xF8) = *(void**)(self + 0x564);
-		*(void**)(self + 0x564) = 0;
+		m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle*>(m_pendingModelHandle);
+		m_pendingModelHandle = 0;
 
-		if (*(int*)(self + 0x500) == 0xCB) {
-			LoadAnim__8CGObjectFPciiiUl(
-			    this, *(char**)(self + 0x578), 0, 0, 2, *(unsigned long*)(self + 0x574));
+		if (m_worldParamA == 0xCB) {
+			LoadAnim__8CGObjectFPciiiUl(this, m_pendingAnimName, 0, 0, 2, m_pendingAnimFlags);
 			SetAnimSlot__8CGObjectFii(this, 0, 0);
 			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
 
@@ -363,12 +362,12 @@ void CGItemObj::onFrame()
 			}
 
 			unsigned char* itemRow =
-			    reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48);
+			    reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + m_worldParamB * 0x48);
 			double particleValue = (double)*reinterpret_cast<unsigned short*>(itemRow + 0x10);
 			float particleScale = FLOAT_80331b50 * (float)particleValue + FLOAT_80331b4c;
 			putParticle__8CGPrgObjFiiP8CGObjectfi(
 			    this, (soundEntry << 8) | *(int*)(*(int*)(*(int*)(self + 0x550) + 0x58) + 0x3B4),
-			    *(int*)(self + 0x558), this, particleScale, 0x12909);
+			    m_particleSlot, this, particleScale, 0x12909);
 
 			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			SetDamageCol__8CGObjectFiPcffP3Vec(
@@ -431,7 +430,7 @@ void CGItemObj::onFrameStat()
 	}
 	case 9:
 		if (*(int*)(self + 0x528) == 8) {
-			self[0x54d] = (self[0x54d] & 0x7f) | 0x80;
+			self[0x38] = (self[0x38] & 0x7f) | 0x80;
 		}
 		break;
 	case 0xB:
@@ -534,7 +533,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			EndParticle__13CFlatRuntime2FPQ29CCharaPcs7CHandle(CFlat, prgObj->m_charaModelHandle);
 		} else if (*(int*)(self + 0x528) == 0xC) {
-			self[0x54D] = (self[0x54D] & 0x7F) | 0x80;
+			self[0x38] = (self[0x38] & 0x7F) | 0x80;
 		}
 
 		if (7 < *(int*)(self + 0x528)) {
@@ -744,7 +743,7 @@ void CGItemObj::onFrameStat()
 				    &CFlat, *(int*)(self + 0x550), 2, 0x16, 1, &stack, 0);
 			}
 
-			self[0x54D] = (self[0x54D] & 0x7F) | 0x80;
+			self[0x38] = (self[0x38] & 0x7F) | 0x80;
 		}
 		break;
 	}

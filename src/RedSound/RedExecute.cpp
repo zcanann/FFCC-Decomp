@@ -2064,21 +2064,21 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
 
     do {
         if (*voiceData == (int)track) {
-            if (*(s16*)(voiceData + 0x0A) != 0) {
+            if (((RedVoiceDATA*)voiceData)->m_pitchModDelay != 0) {
                 int step = frames;
-                if (*(s16*)(voiceData + 0x0A) <= frames) {
-                    step = *(s16*)(voiceData + 0x0A);
+                if (((RedVoiceDATA*)voiceData)->m_pitchModDelay <= frames) {
+                    step = ((RedVoiceDATA*)voiceData)->m_pitchModDelay;
                 }
-                *(s16*)(voiceData + 0x0A) -= (s16)step;
+                ((RedVoiceDATA*)voiceData)->m_pitchModDelay -= (s16)step;
             }
-            if (*(s16*)(voiceData + 0x0E) != 0) {
+            if (((RedVoiceDATA*)voiceData)->m_volumeModDelay != 0) {
                 int step = frames;
-                if (*(s16*)(voiceData + 0x0E) <= frames) {
-                    step = *(s16*)(voiceData + 0x0E);
+                if (((RedVoiceDATA*)voiceData)->m_volumeModDelay <= frames) {
+                    step = ((RedVoiceDATA*)voiceData)->m_volumeModDelay;
                 }
-                *(s16*)(voiceData + 0x0E) -= (s16)step;
+                ((RedVoiceDATA*)voiceData)->m_volumeModDelay -= (s16)step;
             }
-            voiceData[REDSOUND_VOICE_UPDATE_FLAGS_WORD] |= updateFlags;
+            ((RedVoiceDATA*)voiceData)->m_updateFlags |= updateFlags;
         }
         voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);
     } while (voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));

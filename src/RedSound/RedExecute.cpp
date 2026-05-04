@@ -2407,7 +2407,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	int step;
 	short* trackShorts = (short*)trackData;
 
-	if ((trackBytes[0x26] & REDSOUND_NOTE_ALLOC_STREAM) != 0) {
+	if ((trackBytes[REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET] & REDSOUND_NOTE_ALLOC_STREAM) != 0) {
 		return;
 	}
 

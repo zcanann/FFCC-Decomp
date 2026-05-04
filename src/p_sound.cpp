@@ -7,9 +7,8 @@ extern "C" void destroy__9CSoundPcsFv(CSoundPcs*);
 extern "C" void calc__9CSoundPcsFv(CSoundPcs*);
 extern "C" void draw__9CSoundPcsFv(CSoundPcs*);
 
-extern "C" const char s_CSoundPcs_801DB4E8[] = "CSoundPcs";
 unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CSoundPcs_801DB4E8)),
+    reinterpret_cast<unsigned int>("CSoundPcs"),
     0,
     0,
     0,

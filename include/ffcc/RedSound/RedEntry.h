@@ -119,13 +119,15 @@ enum RedSeInfoLayout {
 
 struct RedSeBlockHEAD
 {
-	unsigned char m_unk00[0x0A];
+	char m_signature[8];
+	unsigned char m_pad08[0x0A - 0x08];
 	short m_seCount;
 	int m_size;
 	int m_entries[1];
 };
 
 enum RedSeBlockEntryLayout {
+	REDSOUND_SE_BLOCK_HEADER_SIZE = 0x10,
 	REDSOUND_SE_BLOCK_DATA_FLAG = 0x80000000,
 	REDSOUND_SE_BLOCK_ENTRY_MASK = 0x7FFFFFFF,
 	REDSOUND_SE_BLOCK_ENTRY_EMPTY = -1,

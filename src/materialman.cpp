@@ -3196,8 +3196,9 @@ void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheS
         return;
     }
 
+    int i = 0;
     CMaterial* textureSlot = material;
-    for (int i = 0; i < *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)); i++) {
+    for (; i < *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)); i++) {
         CTexture* texture = *reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C));
         if (texture != 0) {
             texture->CacheUnLoadTexture(amemCacheSet);
@@ -3223,8 +3224,9 @@ void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheS
         return;
     }
 
+    int i = 0;
     CMaterial* textureSlot = material;
-    for (int i = 0; i < *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)); i++) {
+    for (; i < *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)); i++) {
         CTexture* texture = *reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C));
         if (texture != 0) {
             texture->CacheLoadTexture(amemCacheSet);

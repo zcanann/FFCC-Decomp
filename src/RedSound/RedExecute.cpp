@@ -1676,8 +1676,8 @@ static void _KeyOnControl()
             if (((u32)*track != 0) && (track[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET] != 0)) {
                 waveFunc = (int (*)(int))track[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET];
                 track[REDSOUND_TRACK_SHAKE_PAN_WORD_OFFSET] =
-                    (((track[REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET] >> 0xC) + 1) *
-                     waveFunc((u32)track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] >> 0xC)) >>
+                    (((track[REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT) + 1) *
+                     waveFunc((u32)track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT)) >>
                     0x10;
                 track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] += track[REDSOUND_TRACK_SHAKE_RATE_WORD_OFFSET];
             }
@@ -1695,8 +1695,8 @@ static void _KeyOnControl()
             if (((u32)*track != 0) && (track[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET] != 0)) {
                 waveFunc = (int (*)(int))track[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET];
                 track[REDSOUND_TRACK_SHAKE_PAN_WORD_OFFSET] =
-                    (((track[REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET] >> 0xC) + 1) *
-                     waveFunc((u32)track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] >> 0xC)) >>
+                    (((track[REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT) + 1) *
+                     waveFunc((u32)track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT)) >>
                     0x10;
                 track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] += track[REDSOUND_TRACK_SHAKE_RATE_WORD_OFFSET];
             }
@@ -1714,8 +1714,8 @@ static void _KeyOnControl()
             if (((u32)*track != 0) && (track[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET] != 0)) {
                 waveFunc = (int (*)(int))track[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET];
                 track[REDSOUND_TRACK_SHAKE_PAN_WORD_OFFSET] =
-                    (((track[REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET] >> 0xC) + 1) *
-                     waveFunc((u32)track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] >> 0xC)) >>
+                    (((track[REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT) + 1) *
+                     waveFunc((u32)track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT)) >>
                     0x10;
                 track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] += track[REDSOUND_TRACK_SHAKE_RATE_WORD_OFFSET];
             }
@@ -1748,12 +1748,13 @@ static void _KeyOnControl()
                             if (((1U << (idx & REDSOUND_VOICE_INDEX_MASK)) &
                                  m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)]) == 0) {
                                 volume = ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volumeScale + 1) *
-                                          (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volume >> 0xC)) >>
+                                          (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volume >>
+                                           REDSOUND_FIXED_SHIFT)) >>
                                          7;
                                 if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolumeDelta != 0) {
                                     volume = (volume *
                                               (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolume >>
-                                               0xC)) >>
+                                               REDSOUND_FIXED_SHIFT)) >>
                                              9;
                                 }
                                 volume = (volume * m_MasterMusicVolume) >> 9;
@@ -1766,10 +1767,10 @@ static void _KeyOnControl()
                         if (((1U << (idx & REDSOUND_VOICE_INDEX_MASK)) &
                              m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)]) == 0) {
                             volume = ((p_SoundControlBuffer->m_volumeScale + 1) *
-                                      (p_SoundControlBuffer->m_volume >> 0xC)) >>
+                                      (p_SoundControlBuffer->m_volume >> REDSOUND_FIXED_SHIFT)) >>
                                      7;
                             if (p_SoundControlBuffer->m_masterVolumeDelta != 0) {
-                                volume = (volume * (p_SoundControlBuffer->m_masterVolume >> 0xC)) >> 9;
+                                volume = (volume * (p_SoundControlBuffer->m_masterVolume >> REDSOUND_FIXED_SHIFT)) >> 9;
                             }
                             volume = (volume * m_MasterMusicVolume) >> 9;
                         } else {

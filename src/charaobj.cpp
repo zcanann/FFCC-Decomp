@@ -1921,7 +1921,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 	if ((cid & 0x6D) == 0x6D) {
 		CCaravanWork* caravan = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 		for (int i = 2; i < *reinterpret_cast<short*>(script + 0xBAA); i++) {
-			if (caravan->DelCmdListAndItem(i, 0) == 0x125) {
+			if (caravan->DelCmdListAndItem(i) == 0x125) {
 				caravan->GetNumCombi(i, 1);
 				unsigned char& flags = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x6B8);
 				flags = (flags & 0xFB) | 4;

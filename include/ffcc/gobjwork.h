@@ -113,7 +113,7 @@ public:
     void GetCmdListItemName(int);
     int GetWeaponAttrib(int);
     int GetCmdListItem(int);
-    int DelCmdListAndItem(int, int);
+    int DelCmdListAndItem(int);
     void SearchCombiTop(int);
     void GetNumCombi(int, int);
     int GetNextCmdListIdx(int, int);

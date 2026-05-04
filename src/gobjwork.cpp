@@ -2156,7 +2156,7 @@ int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 		return GetSkillStr__8CMenuPcsFi(&MenuPcs, weaponType);
 	}
 
-	int itemId = DelCmdListAndItem(cmdListIdx, 0);
+	int itemId = DelCmdListAndItem(cmdListIdx);
 	const GobjworkFlatData* flatData = reinterpret_cast<const GobjworkFlatData*>(&Game.m_cFlatDataArr[1]);
 	return reinterpret_cast<int>(flatData->table[0].index[itemId * 5 + 4]);
 }
@@ -2203,7 +2203,7 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::DelCmdListAndItem(int cmdListIdx, int)
+int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 {
 	int result;
 	short inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
@@ -2366,7 +2366,7 @@ int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 			}
 		}
 
-		int item = DelCmdListAndItem(cmdListIdx, 0);
+		int item = DelCmdListAndItem(cmdListIdx);
 		if (cmdListIdx < 2 || item > 0) {
 			return cmdListIdx;
 		}
@@ -2414,7 +2414,7 @@ void CCaravanWork::GetCurrentWeaponItem(int& weaponItem, int& weaponRef)
 	if (weaponIdx != 1) {
 		weaponItem = weaponIdx;
 		CCaravanWork* ownerWork = *reinterpret_cast<CCaravanWork**>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x58);
-		weaponRef = ownerWork->DelCmdListAndItem(weaponIdx, 0);
+		weaponRef = ownerWork->DelCmdListAndItem(weaponIdx);
 	}
 }
 
@@ -2445,7 +2445,7 @@ void CCaravanWork::SetCurrentWeaponIdx(int weaponIdx)
 void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
 {
 	int reset = 0;
-	int weaponItem = DelCmdListAndItem(weaponIdx, reset);
+	int weaponItem = DelCmdListAndItem(weaponIdx);
 	if ((0 < weaponItem) && (*GetItemDataPtr(weaponItem) == 1)) {
 		return;
 	}

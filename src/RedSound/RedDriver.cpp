@@ -927,7 +927,8 @@ static int _MainThread(void*)
 {
     RedSoundCONTROL* control;
     int startTick;
-    int result;
+    int endTick;
+    int masterTime;
     unsigned int elapsed;
 
     m_ThreadExecute = m_ThreadExecute | REDSOUND_THREAD_FLAG_MAIN;
@@ -936,28 +937,28 @@ static int _MainThread(void*)
         if (m_ThreadControl != 0) {
             startTick = OSGetTick();
             control = p_SoundControlBuffer;
-            elapsed = (unsigned int)(m_RedMasterTime - m_MainThreadTime);
+            masterTime = m_RedMasterTime;
+            elapsed = (unsigned int)(masterTime - m_MainThreadTime);
             if (control->m_activeTrackCount != 0) {
                 control->m_elapsedTime += elapsed;
             }
-            m_MainThreadTime = m_RedMasterTime;
+            m_MainThreadTime = masterTime;
             if (4 < elapsed) {
                 elapsed = 4;
             }
             MainControl(elapsed);
             StreamControl();
             _ExecuteCommand();
-            if ((p_MusicNextPlay->m_musicId > -1) && (control->m_musicId < 0)) {
+            if ((p_MusicNextPlay->m_musicId >= 0) && (control->m_musicId < 0)) {
                 _MusicPlaySequence((int*)p_MusicNextPlay);
                 p_MusicNextPlay->m_musicId = -1;
                 m_MusicPhraseStop = 0;
             }
-            do {
-                result = OSTryWaitSemaphore(&m_MainSemaphore);
-            } while (0 < result);
+            while (OSTryWaitSemaphore(&m_MainSemaphore) > 0) {
+            }
             memmove(p_Tick->m_ticks + 1, p_Tick->m_ticks, REDSOUND_TICK_HISTORY_SHIFT_SIZE);
-            result = OSGetTick();
-            p_Tick->m_ticks[0] = result - startTick;
+            endTick = OSGetTick();
+            p_Tick->m_ticks[0] = endTick - startTick;
         }
     }
     m_ThreadExecute = m_ThreadExecute & ~REDSOUND_THREAD_FLAG_MAIN;

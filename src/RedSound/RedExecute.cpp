@@ -1090,7 +1090,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     } else {
         iVar5 = PitchCompute(iVar5, local_38[0], ((RedWaveDATA*)voiceData[1])->m_pitch, trackS8[REDSOUND_TRACK_FINE_TUNE_BYTE]);
     }
-    voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] = iVar5;
+    param_2->m_targetPitch = iVar5;
 
     if (((param_1->m_flags & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0) ||
         ((((s8)param_1->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0) &&
@@ -1139,7 +1139,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     } else {
         unsigned int random = GetRandomData();
         iVar5 = ((int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1) *
-                voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] *
+                param_2->m_targetPitch *
                 param_1->m_fuzzyPitchDepth;
         local_38[0] = iVar5 >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
         if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) == 0) {

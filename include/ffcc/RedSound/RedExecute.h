@@ -63,6 +63,10 @@ struct RedWaveDATA {
 	unsigned char m_pad5C[0x60 - 0x5C];
 };
 
+enum RedWaveLayoutSize {
+	REDSOUND_WAVE_DATA_SIZE = sizeof(RedWaveDATA),
+};
+
 enum RedWaveFlag {
 	REDSOUND_WAVE_FLAG_PAIRED_ENTRY = 1,
 	REDSOUND_WAVE_FLAG_SPLIT_END = 0x200,

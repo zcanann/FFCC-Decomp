@@ -1214,17 +1214,18 @@ static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, in
     }
 
     if (voiceData != 0) {
-        voiceData[1] = (int)_WaveSplitSelect((RedWaveDATA*)((int*)track)[7], note);
+        voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] =
+            (int)_WaveSplitSelect((RedWaveDATA*)((int*)track)[REDSOUND_TRACK_WAVE_DATA_WORD_OFFSET], note);
         _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
 
-        if (((*(u32*)voiceData[1] & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) &&
-            ((*(s8*)((u8*)track + 0x26) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0)) {
-            int wave = voiceData[1];
-            voiceData[0x25] |= REDSOUND_VOICE_SWITCH_PAIRED_LEFT;
+        if (((*(u32*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) &&
+            ((*(s8*)((u8*)track + REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0)) {
+            int wave = voiceData[REDSOUND_VOICE_WAVE_DATA_WORD];
+            voiceData[REDSOUND_VOICE_SWITCH_WORD] |= REDSOUND_VOICE_SWITCH_PAIRED_LEFT;
             voiceData = (int*)EntryVoiceSearch(track);
             if (voiceData != 0) {
-                voiceData[0x25] |= REDSOUND_VOICE_SWITCH_PAIRED_RIGHT;
-                voiceData[1] = wave + 0x60;
+                voiceData[REDSOUND_VOICE_SWITCH_WORD] |= REDSOUND_VOICE_SWITCH_PAIRED_RIGHT;
+                voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] = wave + REDSOUND_WAVE_DATA_SIZE;
                 _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
             }
         }

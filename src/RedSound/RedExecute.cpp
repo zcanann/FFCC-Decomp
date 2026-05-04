@@ -1252,8 +1252,7 @@ static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, in
     }
 
     if (voiceData != 0) {
-        voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] =
-            (int)_WaveSplitSelect((RedWaveDATA*)track->m_waveData, note);
+        ((RedVoiceDATA*)voiceData)->m_waveData = _WaveSplitSelect((RedWaveDATA*)track->m_waveData, note);
         _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
 
         if (((((RedWaveDATA*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])->m_flags & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) &&

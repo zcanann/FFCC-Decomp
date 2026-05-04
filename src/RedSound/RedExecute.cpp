@@ -842,8 +842,8 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
             }
         }
 
-        if (voiceData[0x11] != 0) {
-            pan = pan + ((int)(pan * voiceData[0x11]) >> REDSOUND_VOLUME_MOD_SCALE_SHIFT);
+        if (voiceData[REDSOUND_VOICE_RANDOM_PAN_WORD] != 0) {
+            pan = pan + ((int)(pan * voiceData[REDSOUND_VOICE_RANDOM_PAN_WORD]) >> REDSOUND_VOLUME_MOD_SCALE_SHIFT);
         }
 
         pan = (pan + *(int*)(*voiceData + 0xcc)) & 0xff;
@@ -853,8 +853,9 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         pan = 0;
     }
 
-    if (voiceData[0x10] != 0) {
-        voiceMix = voiceMix + (voiceMix * voiceData[0x10] >> REDSOUND_VOLUME_MOD_SCALE_SHIFT);
+    if (voiceData[REDSOUND_VOICE_RANDOM_VOLUME_WORD] != 0) {
+        voiceMix =
+            voiceMix + (voiceMix * voiceData[REDSOUND_VOICE_RANDOM_VOLUME_WORD] >> REDSOUND_VOLUME_MOD_SCALE_SHIFT);
         if (voiceMix >= REDSOUND_ENVELOPE_LEVEL_FULL) {
             voiceMix = REDSOUND_AX_MIX_MAX;
         } else if (voiceMix < 0) {

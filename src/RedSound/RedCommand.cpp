@@ -72,15 +72,11 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 			track->m_mixVolumeMode = 0;
 
 			trackNo = track->m_trackNo;
-			*(unsigned char*)((int)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_STATE_FLAGS_OFFSET) &=
-			    REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_SWITCH_OFFSET) &=
-			    REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_FLAGS_OFFSET) &=
-			    REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_FLAGS_OFFSET) |=
-			    REDSOUND_VOICE_FLAGS_RELEASED;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_ACTIVE_OFFSET) = 0;
+			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+			(p_VoiceData + trackNo)->m_active = 0;
 
 			c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
 			if ((u32)track->m_waveBankData != 0) {
@@ -144,15 +140,11 @@ static int _EraseTime(int eraseTrack)
 			track->m_mixVolumeMode = 0;
 
 			trackNo = track->m_trackNo;
-			*(unsigned char*)((int)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_STATE_FLAGS_OFFSET) &=
-			    REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_SWITCH_OFFSET) &=
-			    REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_FLAGS_OFFSET) &=
-			    REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_FLAGS_OFFSET) |=
-			    REDSOUND_VOICE_FLAGS_RELEASED;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_ACTIVE_OFFSET) = 0;
+			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+			(p_VoiceData + trackNo)->m_active = 0;
 
 			if ((u32)track->m_waveBankData != 0) {
 				c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
@@ -245,16 +237,12 @@ int SeStopID(int seId)
 			track->m_mixVolumeMode = 0;
 
 			trackNo = track->m_trackNo;
-			*(unsigned char*)((int)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_STATE_FLAGS_OFFSET) &=
-			    REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_SWITCH_OFFSET) &=
-			    REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_FLAGS_OFFSET) &=
-			    REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_FLAGS_OFFSET) |=
-			    REDSOUND_VOICE_FLAGS_RELEASED;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_TRACK_OFFSET) = 0;
-			*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_ACTIVE_OFFSET) = 0;
+			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+			(p_VoiceData + trackNo)->m_track = 0;
+			(p_VoiceData + trackNo)->m_active = 0;
 
 			if ((u32)track->m_waveBankData != 0) {
 				c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
@@ -297,16 +285,12 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				track->m_mixVolumeMode = 0;
 
 				trackNo = track->m_trackNo;
-				*(unsigned char*)((int)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_STATE_FLAGS_OFFSET) &=
-				    REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_SWITCH_OFFSET) &=
-				    REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
-				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_FLAGS_OFFSET) &=
-				    REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_FLAGS_OFFSET) |=
-				    REDSOUND_VOICE_FLAGS_RELEASED;
-				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_TRACK_OFFSET) = 0;
-				*(unsigned int*)((unsigned char*)p_VoiceData + trackNo * REDSOUND_VOICE_SIZE + REDSOUND_VOICE_ACTIVE_OFFSET) = 0;
+				(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+				(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+				(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+				(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+				(p_VoiceData + trackNo)->m_track = 0;
+				(p_VoiceData + trackNo)->m_active = 0;
 
 				if ((u32)track->m_waveBankData != 0) {
 					c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);

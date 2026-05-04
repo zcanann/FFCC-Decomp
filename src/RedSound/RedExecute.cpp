@@ -1663,9 +1663,11 @@ static void _KeyOnControl()
                  (int*)((u32)p_SoundControlBuffer->m_tracks + (u32)p_SoundControlBuffer->m_trackCount * REDSOUND_TRACK_SIZE));
     }
 
-    if ((*(s16*)((u8*)p_SoundControlBuffer + 0x922) != 0) && ((((u32*)p_SoundControlBuffer)[0x240] & 0x10) == 0)) {
-        int* track = (int*)((u32*)p_SoundControlBuffer)[0x125];
-        u32* trackBase = (u32*)p_SoundControlBuffer + 0x125;
+    if ((*(s16*)((u8*)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_ACTIVE_TRACK_COUNT_OFFSET) != 0) &&
+        ((((u32*)p_SoundControlBuffer)[REDSOUND_CONTROL_SECONDARY_FLAGS_WORD_OFFSET] &
+          REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
+        int* track = (int*)((u32*)p_SoundControlBuffer)[REDSOUND_CONTROL_SECONDARY_TRACKS_WORD_OFFSET];
+        u32* trackBase = (u32*)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_TRACKS_WORD_OFFSET;
         do {
             if (((u32)*track != 0) && (track[0x2D] != 0)) {
                 waveFunc = (int (*)(int))track[0x2D];
@@ -1673,7 +1675,10 @@ static void _KeyOnControl()
                 track[0x32] += track[0x2E];
             }
             track += REDSOUND_TRACK_SIZE / sizeof(*track);
-        } while (track < (int*)(*trackBase + (u32)*((u8*)p_SoundControlBuffer + 0x925) * REDSOUND_TRACK_SIZE));
+        } while (track < (int*)(*trackBase + (u32) *
+                                             ((u8*)p_SoundControlBuffer +
+                                              REDSOUND_CONTROL_SECONDARY_TRACK_COUNT_OFFSET) *
+                                             REDSOUND_TRACK_SIZE));
     }
 
     {

@@ -393,7 +393,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			}
 			track->m_playTime = state;
 
-			if (*(char*)track->m_command != '\0') {
+			if (*track->m_command != '\0') {
 				track->m_eraseTrack = info->m_eraseTrack;
 				track->m_attrMask = info->m_attrMask;
 				track->m_mixVolume = volume << REDSOUND_FIXED_SHIFT;

@@ -170,8 +170,8 @@ u8* volatile p_ZeroData;
 static RedExecCommand* volatile p_ExecCommand;
 static RedExecCommand* volatile p_ExecCommandNow;
 static RedExecCommand* volatile p_ExecCommandOld;
-static RedDmaRequest* p_DmaControlNow[2];
-static RedDmaRequest* p_DmaControlOld[2];
+static RedDmaRequest* volatile p_DmaControlNow[2];
+static RedDmaRequest* volatile p_DmaControlOld[2];
 RedSoundCONTROL* volatile p_SoundControlBuffer;
 RedSoundCONTROL* volatile p_SoundControl;
 volatile int m_KeyOnEntry;
@@ -1057,7 +1057,7 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
 {
     unsigned int interrupt;
     RedDmaRequest* queueBase;
-    RedDmaRequest** queuePtr;
+    RedDmaRequest* volatile* queuePtr;
     unsigned int entryID;
     int chunkSize;
     RedDmaRequest* queueEntry;
@@ -1167,7 +1167,7 @@ static void _DmaExecute()
     int srcAddress;
     int dstAddress;
     RedDmaRequest* queueBase;
-    RedDmaRequest** oldQueuePtr;
+    RedDmaRequest* volatile* oldQueuePtr;
     RedDmaRequest* activeRequest;
     RedDmaRequest* queueEntry;
 
@@ -1204,11 +1204,15 @@ static void _DmaExecute()
         }
         queueEntry++;
         m_DMAInThread = REDSOUND_DMA_THREAD_ADVANCE_QUEUE;
-        if (queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT <= queueEntry) {
+        if (!(queueEntry < queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT)) {
             queueEntry = queueBase;
         }
         *oldQueuePtr = queueEntry;
         m_DMAInThread = REDSOUND_DMA_THREAD_STORE_QUEUE;
+
+        if (activeRequest == 0) {
+            continue;
+        }
 
         while (activeRequest != 0) {
             m_DMAInThread = REDSOUND_DMA_THREAD_POLL_STATUS;

@@ -56,18 +56,19 @@ static inline unsigned int Swap32(unsigned int x)
  */
 int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
+    unsigned int count;
     unsigned int* ptr;
     int connected;
     unsigned int* dstBuffer;
-    unsigned int value;
     CMemory::CStage* stage;
+    unsigned int value;
     int result;
-    unsigned int count;
 
     count = elemSize * elemCount;
     value = (count + 0x5F) & ~0x1F;
-    stage = m_bigStage;
-    if (stage == (CMemory::CStage*)nullptr) {
+    if (m_bigStage != (CMemory::CStage*)nullptr) {
+        stage = m_bigStage;
+    } else {
         stage = m_smallStage;
     }
 
@@ -86,8 +87,9 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     if (connected == 0) {
         result = 0;
     } else {
-        stage = m_bigStage;
-        if (stage == (CMemory::CStage*)nullptr) {
+        if (m_bigStage != (CMemory::CStage*)nullptr) {
+            stage = m_bigStage;
+        } else {
             stage = m_smallStage;
         }
 

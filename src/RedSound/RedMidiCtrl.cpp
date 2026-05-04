@@ -2402,9 +2402,9 @@ static void _PitchBendCompute(RedTrackDATA* track, int bend)
                 int pitch;
                 int computedPitch;
                 if ((((RedVoiceDATA*)voiceData)->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
-                    pitch = voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] + track->m_pitch;
+                    pitch = ((RedVoiceDATA*)voiceData)->m_basePitch + track->m_pitch;
                 } else {
-                    pitch = voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] + p_MusicPitchControl->m_value;
+                    pitch = ((RedVoiceDATA*)voiceData)->m_basePitch + p_MusicPitchControl->m_value;
                 }
                 computedPitch = pitch;
                 voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] = PitchCompute(

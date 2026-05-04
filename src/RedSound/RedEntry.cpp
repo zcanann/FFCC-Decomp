@@ -468,10 +468,14 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		int historyNo = SearchWaveSequence(waveNo);
 		if (historyNo >= 0) {
 			if ((waveBankNo >= 0) && (historyNo != waveBankNo)) {
-				*(int*)(m_waveBankBase + waveBankNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 0x0) = *(int*)(m_waveBankBase + historyNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 0x0);
-				*(int*)(m_waveBankBase + waveBankNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 0x4) = *(int*)(m_waveBankBase + historyNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 0x4);
-				*(int*)(m_waveBankBase + waveBankNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 0x8) = *(int*)(m_waveBankBase + historyNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 0x8);
-				*(int*)(m_waveBankBase + waveBankNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 0xC) = *(int*)(m_waveBankBase + historyNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 0xC);
+				*(int*)(m_waveBankBase + waveBankNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + REDSOUND_HISTORY_BANK_ID_OFFSET) =
+				    *(int*)(m_waveBankBase + historyNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + REDSOUND_HISTORY_BANK_ID_OFFSET);
+				*(int*)(m_waveBankBase + waveBankNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + REDSOUND_HISTORY_BANK_HISTORY_NO_OFFSET) =
+				    *(int*)(m_waveBankBase + historyNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + REDSOUND_HISTORY_BANK_HISTORY_NO_OFFSET);
+				*(int*)(m_waveBankBase + waveBankNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + REDSOUND_HISTORY_BANK_DATA_OFFSET) =
+				    *(int*)(m_waveBankBase + historyNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + REDSOUND_HISTORY_BANK_DATA_OFFSET);
+				*(int*)(m_waveBankBase + waveBankNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + REDSOUND_HISTORY_BANK_SIZE_OFFSET) =
+				    *(int*)(m_waveBankBase + historyNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE + REDSOUND_HISTORY_BANK_SIZE_OFFSET);
 				historyNo = waveBankNo;
 			}
 

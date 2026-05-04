@@ -1892,8 +1892,9 @@ static void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTr
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	((int*)track)[0x21] = DataAddCompute((int*)track + 0x20, *track->m_command, delta);
-	*(short*)((int)track + 0x8e) = (short)delta[0];
+	((int*)track)[REDSOUND_TRACK_VIBRATE_DEPTH_ADD_WORD_OFFSET] =
+		DataAddCompute((int*)track + REDSOUND_TRACK_VIBRATE_DEPTH_WORD_OFFSET, *track->m_command, delta);
+	((short*)track)[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD] = (short)delta[0];
 	track->m_command += 1;
 }
 
@@ -1949,8 +1950,9 @@ static void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 
     rate = divisor;
     rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR / rate;
-    ((int*)track)[0x1f] = DataAddCompute((int*)track + 0x1e, rate, trackDelta);
-    *(short*)((int*)track + 0x23) = (short)trackDelta[0];
+    ((int*)track)[REDSOUND_TRACK_VIBRATE_RATE_ADD_WORD_OFFSET] =
+        DataAddCompute((int*)track + REDSOUND_TRACK_VIBRATE_RATE_WORD_OFFSET, rate, trackDelta);
+    ((short*)track)[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD] = (short)trackDelta[0];
     track->m_command += 1;
 }
 
@@ -2081,8 +2083,9 @@ static void __MidiCtrl_TremoloDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTr
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	((int*)track)[0x29] = DataAddCompute((int*)track + 0x28, *track->m_command, delta);
-	*(short*)((int)track + 0xae) = (short)delta[0];
+	((int*)track)[REDSOUND_TRACK_TREMOLO_DEPTH_ADD_WORD_OFFSET] =
+		DataAddCompute((int*)track + REDSOUND_TRACK_TREMOLO_DEPTH_WORD_OFFSET, *track->m_command, delta);
+	((short*)track)[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD] = (short)delta[0];
 	track->m_command += 1;
 }
 
@@ -2136,8 +2139,9 @@ static void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 	}
 	rate = divisor;
 	rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR / rate;
-	((int*)track)[0x27] = DataAddCompute((int*)track + 0x26, rate, delta);
-	*(short*)((int*)track + 0x2b) = (short)delta[0];
+	((int*)track)[REDSOUND_TRACK_TREMOLO_RATE_ADD_WORD_OFFSET] =
+		DataAddCompute((int*)track + REDSOUND_TRACK_TREMOLO_RATE_WORD_OFFSET, rate, delta);
+	((short*)track)[REDSOUND_TRACK_TREMOLO_RATE_DELTA_HALFWORD] = (short)delta[0];
 	track->m_command += 1;
 }
 

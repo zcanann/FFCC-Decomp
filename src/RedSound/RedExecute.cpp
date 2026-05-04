@@ -1064,17 +1064,17 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
                REDSOUND_TRACK_ADSR_SIZE);
     }
 
-    voiceData[REDSOUND_VOICE_SWITCH_WORD] = trackData[REDSOUND_TRACK_VOICE_SWITCH_WORD_OFFSET];
-    if (voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] != 0 &&
-        ((RedWaveDATA*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])->m_reverbMix != 0) {
+    param_2->m_voiceSwitch = param_1->m_voiceSwitch;
+    if (param_2->m_waveData != 0 &&
+        param_2->m_waveData->m_reverbMix != 0) {
         unsigned int maskBits;
-        voiceData[REDSOUND_VOICE_SWITCH_WORD] &= REDSOUND_VOICE_SWITCH_CLEAR_MIX_MASK;
-        if (((RedWaveDATA*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])->m_reverbMix == 1) {
+        param_2->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_MIX_MASK;
+        if (param_2->m_waveData->m_reverbMix == 1) {
             maskBits = REDSOUND_VOICE_SWITCH_MIX_ALL;
         } else {
             maskBits = REDSOUND_VOICE_SWITCH_DRY_STEREO;
         }
-        voiceData[REDSOUND_VOICE_SWITCH_WORD] |= maskBits;
+        param_2->m_voiceSwitch |= maskBits;
     }
 
     local_38[0] = trackS16[REDSOUND_TRACK_KEY_TRANSPOSE_HALFWORD] + trackS16[REDSOUND_TRACK_PITCH_BEND_HALFWORD];

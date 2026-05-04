@@ -245,9 +245,9 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
 
     if (fineTune != 0) {
         if (fineTune > 0) {
-            value = value + ((int)(value * (fineTune + 1)) >> 7);
+            value = value + ((int)(value * (fineTune + 1)) >> REDSOUND_PITCH_FINE_TUNE_POSITIVE_SHIFT);
         } else {
-            value = (int)(value * (fineTune & REDSOUND_PITCH_FINE_MASK)) >> 8;
+            value = (int)(value * (fineTune & REDSOUND_PITCH_FINE_MASK)) >> REDSOUND_PITCH_FINE_TUNE_NEGATIVE_SHIFT;
         }
     }
 

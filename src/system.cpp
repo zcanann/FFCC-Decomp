@@ -689,7 +689,7 @@ void CSystem::Init()
 
             m_mapSize = mapSize = File.GetLength(fileHandle);
             m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(s_system_cpp), 0x123) unsigned char[mapSize];
-            for (offset = 0; mapSize != 0; mapSize -= count)
+            for (offset = 0; (int)mapSize != 0; mapSize -= count)
             {
                 count = 0x100000;
                 if (mapSize < 0x100000)

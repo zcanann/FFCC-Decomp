@@ -1562,9 +1562,8 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 	result = SearchMusicSequence(static_cast<int>(musicHead->m_musicNo));
 	if (result >= 0) {
 		RedDelete(musicHead);
-		MusicHistoryChoice(reinterpret_cast<RedHistoryBANK*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) +
-		                                                    result * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
-		result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + result * REDSOUND_HISTORY_BANK_ENTRY_SIZE + 8);
+		MusicHistoryChoice(&reinterpret_cast<RedHistoryBANK*>(m_musicBankBase)[result]);
+		result = reinterpret_cast<RedHistoryBANK*>(m_musicBankBase)[result].m_data;
 	} else {
 		result = reinterpret_cast<int>(MusicHeadAdd(musicHead));
 		if (result == 0) {

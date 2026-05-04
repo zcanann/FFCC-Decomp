@@ -318,7 +318,7 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 	int maxBankSize = 0;
 	offset += arAddress;
 	maxSize += arAddress;
-	RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_HISTORY_BANK_OFFSET);
+	RedHistoryBANK* history = &reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
 
 	do {
 		if (history->m_historyNo > maxBankSize) {
@@ -329,7 +329,7 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 			}
 		}
 		history += 1;
-	} while (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE));
+	} while (history < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_BANK_ENTRY_COUNT);
 
 	if (maxBankSize != 0) {
 		WaveDelete(selected);
@@ -563,21 +563,21 @@ void CRedEntry::ClearWaveData(int waveNo)
 	if (waveNo < 0) {
 		if (waveNo == -1) {
 			for (historyBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase);
-			     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE); historyBank += 1) {
+			     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_BANK_ENTRY_COUNT; historyBank += 1) {
 				if (historyBank->m_id >= 0) {
 					WaveDelete(historyBank);
 				}
 			}
 		} else if (waveNo == -2) {
-			for (historyBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_HISTORY_BANK_OFFSET);
-			     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE); historyBank += 1) {
+			for (historyBank = &reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
+			     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_BANK_ENTRY_COUNT; historyBank += 1) {
 				if (historyBank->m_id >= 0) {
 					WaveDelete(historyBank);
 				}
 			}
 		} else if (waveNo == -3) {
-			for (historyBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_HISTORY_BANK_OFFSET);
-			     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE); historyBank += 1) {
+			for (historyBank = &reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
+			     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_BANK_ENTRY_COUNT; historyBank += 1) {
 				if ((historyBank->m_id >= 0) && (0 < historyBank->m_historyNo)) {
 					WaveDelete(historyBank);
 				}
@@ -608,8 +608,8 @@ void CRedEntry::ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo
 		return;
 	}
 
-	for (historyBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_HISTORY_BANK_OFFSET);
-	     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE); historyBank += 1) {
+	for (historyBank = &reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
+	     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_BANK_ENTRY_COUNT; historyBank += 1) {
 		if (((historyBank->m_id >= 0) && (0 < historyBank->m_historyNo)) &&
 		    (historyBank->m_id != waveNo0) && (historyBank->m_id != waveNo1) &&
 		    (historyBank->m_id != waveNo2) && (historyBank->m_id != waveNo3)) {
@@ -634,21 +634,21 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
 	if (waveBankNo < 0) {
 		if (waveBankNo == -1) {
 			for (historyBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase);
-			     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE); historyBank += 1) {
+			     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_BANK_ENTRY_COUNT; historyBank += 1) {
 				if (!(historyBank->m_id < 0)) {
 					WaveDelete(historyBank);
 				}
 			}
 		} else if (waveBankNo == -2) {
-			for (historyBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_HISTORY_BANK_OFFSET);
-			     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE); historyBank += 1) {
+			for (historyBank = &reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
+			     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_BANK_ENTRY_COUNT; historyBank += 1) {
 				if (!(historyBank->m_id < 0)) {
 					WaveDelete(historyBank);
 				}
 			}
 		} else if (waveBankNo == -3) {
-			for (historyBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_HISTORY_BANK_OFFSET);
-			     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE); historyBank += 1) {
+			for (historyBank = &reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
+			     historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_BANK_ENTRY_COUNT; historyBank += 1) {
 				if (!(historyBank->m_id < 0) && (0 < historyBank->m_historyNo)) {
 					WaveDelete(historyBank);
 				}
@@ -1009,7 +1009,7 @@ RedHistoryBANK* CRedEntry::SeSepOldDelete()
 			selected = history;
 		}
 		history++;
-	} while (history < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE));
+	} while (history < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase) + REDSOUND_SESEP_BANK_ENTRY_COUNT);
 
 	if (selected != 0) {
 		SeSepMemoryFree(selected);
@@ -1029,16 +1029,16 @@ RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 	int result = 0;
 
 	while ((bank->m_size != 0) &&
-	       (bank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE))) {
+	       (bank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase) + REDSOUND_SESEP_BANK_ENTRY_COUNT)) {
 		bank += 1;
 	}
-	if (bank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE)) {
+	if (bank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase) + REDSOUND_SESEP_BANK_ENTRY_COUNT) {
 	} else {
 		bank = SeSepOldDelete();
 	}
 
 	if ((bank != 0) &&
-	    (bank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE))) {
+	    (bank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase) + REDSOUND_SESEP_BANK_ENTRY_COUNT)) {
 		bank->m_data = reinterpret_cast<int>(seSepHead);
 		result = reinterpret_cast<int>(seSepHead);
 		bank->m_size = seSepHead->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;

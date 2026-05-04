@@ -672,7 +672,7 @@ int CRedEntry::GetWaveBank(int waveNo)
 {
 	if ((waveNo >= 0) && (waveNo < REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT))
 	{
-		return m_waveBankBase + (waveNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE);
+		return reinterpret_cast<int>(&reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[waveNo]);
 	}
 
 	return 0;
@@ -696,7 +696,7 @@ RedWaveHeadWD* CRedEntry::SearchWaveBase(int waveNo)
 			return reinterpret_cast<RedWaveHeadWD*>(waveBank->m_data);
 		}
 		waveBank += 1;
-	} while (waveBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE));
+	} while (waveBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_BANK_ENTRY_COUNT);
 
 	return 0;
 }
@@ -1132,7 +1132,7 @@ int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
 			}
 		}
 		bank += 1;
-	} while (bank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE));
+	} while (bank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase) + REDSOUND_SESEP_BANK_ENTRY_COUNT);
 
 	return result;
 }
@@ -1154,7 +1154,7 @@ RedHistoryBANK* CRedEntry::SearchSeSepBank(int seNo)
 			return seSepBank;
 		}
 		seSepBank += 1;
-	} while (seSepBank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + REDSOUND_SESEP_BANK_SIZE));
+	} while (seSepBank < reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase) + REDSOUND_SESEP_BANK_ENTRY_COUNT);
 
 	return 0;
 }
@@ -1444,7 +1444,7 @@ RedHistoryBANK* CRedEntry::SearchMusicBank(int musicNo)
 			return musicBank;
 		}
 		musicBank += 1;
-	} while (musicBank < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + REDSOUND_MUSIC_BANK_SIZE));
+	} while (musicBank < reinterpret_cast<RedHistoryBANK*>(m_musicBankBase) + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
 
 	return 0;
 }

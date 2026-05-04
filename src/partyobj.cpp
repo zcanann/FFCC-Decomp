@@ -725,7 +725,7 @@ void CGPartyObj::command()
 		} else if (cmdIdx == 1) {
 			ringCommand = 9;
 		} else {
-			const int itemId = caravan->DelCmdListAndItem(cmdIdx, 0);
+			const int itemId = caravan->DelCmdListAndItem(cmdIdx);
 			const unsigned short itemKind = getItemKindFromCfd(itemId);
 			if (itemKind == 1 || itemKind == 0xDF || itemKind == 0x100 ||
 			    itemKind == 0x125 || itemKind == 0x17D || itemKind == 0x186 ||
@@ -921,7 +921,7 @@ void CGPartyObj::command()
 			return;
 		}
 
-		const int itemId = caravan->DelCmdListAndItem(cmdIdx, 0);
+		const int itemId = caravan->DelCmdListAndItem(cmdIdx);
 		const unsigned short itemKind = getItemKindFromCfd(itemId);
 		if (itemKind == 1) {
 			int weaponItem = 0;

@@ -2109,7 +2109,7 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
                 p_MidiControl_Function[*cmd](control, keyOnData, track);
                 if ((u32)track->m_command != 0) {
                     if (track->m_deltaTime < 1) {
-                        delta = DeltaTimeSumup((unsigned char**)track);
+                        delta = DeltaTimeSumup((unsigned char**)&track->m_command);
                     } else {
                         delta = track->m_deltaTime;
                         track->m_deltaTime = 0;

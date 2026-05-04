@@ -511,11 +511,12 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 				RedSeINFO* seInfo = reinterpret_cast<RedSeINFO*>(
 				    reinterpret_cast<unsigned char*>(entries + bankData->m_seCount) +
 				    ((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK));
+				RedSeINFO* playInfo = seInfo;
 
 				if (((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
-					seInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
+					playInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
 				}
-				if (_SePlayStart(seInfo, seId, no, pan, volume) != 0) {
+				if (_SePlayStart(playInfo, seId, no, pan, volume) != 0) {
 					return seNo;
 				}
 			}
@@ -921,7 +922,7 @@ int MusicStop(int musicId)
 
 	music = p_SoundControlBuffer;
 	if ((music->m_musicId < 0) && (music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId >= 0)) {
-		memcpy((void*)p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY, REDSOUND_CONTROL_SIZE);
+		memcpy(p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY, REDSOUND_CONTROL_SIZE);
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount = 0;
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount = 0;
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId = -1;

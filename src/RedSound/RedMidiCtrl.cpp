@@ -1888,9 +1888,8 @@ static void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTr
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	((int*)track)[REDSOUND_TRACK_VIBRATE_DEPTH_ADD_WORD_OFFSET] =
-		DataAddCompute((int*)track + REDSOUND_TRACK_VIBRATE_DEPTH_WORD_OFFSET, *track->m_command, delta);
-	((short*)track)[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD] = (short)delta[0];
+	track->m_vibrateDepthAdd = DataAddCompute(&track->m_vibrateDepth, *track->m_command, delta);
+	track->m_vibrateDepthDelta = (short)delta[0];
 	track->m_command += 1;
 }
 
@@ -2079,9 +2078,8 @@ static void __MidiCtrl_TremoloDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTr
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	((int*)track)[REDSOUND_TRACK_TREMOLO_DEPTH_ADD_WORD_OFFSET] =
-		DataAddCompute((int*)track + REDSOUND_TRACK_TREMOLO_DEPTH_WORD_OFFSET, *track->m_command, delta);
-	((short*)track)[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD] = (short)delta[0];
+	track->m_tremoloDepthAdd = DataAddCompute(&track->m_tremoloDepth, *track->m_command, delta);
+	track->m_tremoloDepthDelta = (short)delta[0];
 	track->m_command += 1;
 }
 
@@ -2244,9 +2242,8 @@ static void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	((int*)track)[REDSOUND_TRACK_SHAKE_DEPTH_ADD_WORD_OFFSET] =
-		DataAddCompute((int*)track + REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET, *track->m_command, delta);
-	((short*)track)[REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD] = (short)delta[0];
+	track->m_shakeDepthAdd = DataAddCompute(&track->m_shakeDepth, *track->m_command, delta);
+	track->m_shakeDepthDelta = (short)delta[0];
 	track->m_command += 1;
 }
 

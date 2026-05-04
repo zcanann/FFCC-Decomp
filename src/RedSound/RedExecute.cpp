@@ -1206,7 +1206,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         if (((unsigned int)voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
             u16 random = GetRandomData();
             ((u16*)voiceData)[REDSOUND_VOICE_ADSR_TIME_HALFWORD] =
-                (u16)(trackData[REDSOUND_TRACK_FUZZY_ADSR_DEPTH_WORD_OFFSET] *
+                (u16)(param_1->m_fuzzyAdsrDepth *
                       (random & REDSOUND_RANDOM_BYTE_MASK));
         }
     }

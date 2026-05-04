@@ -2207,7 +2207,7 @@ static void _MusicNoteExecute()
     int i;
     u32 trackCount;
     u32* soundControl;
-    u32* track;
+    RedTrackDATA* track;
     int status = _MusicMidiNoteExecute(p_SoundControl, (RedKeyOnDATA*)p_KeyOnData, 1);
 
     while ((status == 0) && (m_MusicPhraseStop == 0) &&
@@ -2217,15 +2217,15 @@ static void _MusicNoteExecute()
         memcpy(&p_SoundControl->m_tempo, &p_SoundControl->m_savedTempo, REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
 
         soundControl = (u32*)p_SoundControl;
-        track = (u32*)*soundControl;
+        track = p_SoundControl->m_tracks;
         trackCount = p_SoundControl->m_trackCount;
         i = 0;
         do {
-            track[0] = soundControl[i + REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET];
-            track[0x42] = soundControl[i + REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET];
-            ((RedTrackDATA*)track)->m_flags = soundControl[i + REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET];
-            track[9] = soundControl[i + REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET];
-            track += REDSOUND_TRACK_SIZE / sizeof(*track);
+            track->m_command = (u8*)soundControl[i + REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET];
+            track->m_deltaTime = soundControl[i + REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET];
+            track->m_flags = soundControl[i + REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET];
+            *(int*)&track->m_note = soundControl[i + REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET];
+            track++;
             i++;
         } while (--trackCount != 0);
 

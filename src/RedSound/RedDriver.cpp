@@ -1335,7 +1335,6 @@ CRedDriver::~CRedDriver()
 void CRedDriver::Init()
 {
     char cVar1;
-    int iVar2;
     int iVar4;
     int iVar5;
     int iVar6;
@@ -1404,12 +1403,9 @@ void CRedDriver::Init()
     memset(p_VoiceData, 0, REDSOUND_VOICE_BUFFER_SIZE);
     iVar6 = 0;
     do {
-        iVar2 = iVar6 * REDSOUND_VOICE_SIZE;
-        iVar5 = iVar6 & (REDSOUND_SE_VOICE_BASE_INDEX - 1);
-        iVar4 = iVar6 >> 0x1f;
+        iVar5 = iVar6 % REDSOUND_SE_VOICE_BASE_INDEX;
+        p_VoiceData[iVar6].m_voiceIndex = iVar5;
         iVar6 = iVar6 + 1;
-        *(unsigned int*)((char*)p_VoiceData + iVar2 + REDSOUND_VOICE_INDEX_OFFSET) =
-            iVar5;
     } while (iVar6 < REDSOUND_VOICE_COUNT);
     p_EditorVoice[1] = 0;
     p_EditorVoice[0] = 0;

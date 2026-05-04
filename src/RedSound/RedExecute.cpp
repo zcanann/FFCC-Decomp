@@ -1995,10 +1995,9 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
                 if (voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] != 0) {
                     voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] =
                         PitchCompute(voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] + p_MusicPitchControl->m_value,
-                                     (int)((s16*)track)[REDSOUND_TRACK_KEY_TRANSPOSE_HALFWORD] +
-                                         (int)((s16*)track)[REDSOUND_TRACK_PITCH_BEND_HALFWORD],
-                                     ((int*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])[REDSOUND_WAVE_PITCH_WORD_OFFSET],
-                                     (s8)((u8*)track)[REDSOUND_TRACK_FINE_TUNE_BYTE]);
+                                     (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend,
+                                     ((RedWaveDATA*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])->m_pitch,
+                                     (s8)track->m_fineTune);
                 }
             }
             voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);

@@ -929,7 +929,7 @@ static void _PitchExecute(RedVoiceDATA* voice)
 
         {
             int currentPitch = voice->m_pitch;
-            RedSwingFunc pitchWaveFunc = (RedSwingFunc)voice->m_track->m_vibrateFunc;
+            RedSwingFunc pitchWaveFunc = voice->m_track->m_vibrateFunc;
             int pitchWave = pitchWaveFunc((u32)voice->m_pitchModPhase >> REDSOUND_FIXED_SHIFT);
             pitchDelta = ((pitchDelta - currentPitch) * (pitchWave >> REDSOUND_PITCH_MOD_WAVE_SHIFT)) >>
                          REDSOUND_FIXED_SHIFT;

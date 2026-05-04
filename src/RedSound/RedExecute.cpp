@@ -1686,19 +1686,19 @@ static void _KeyOnControl()
 
     if ((p_SoundControlBuffer->m_activeTrackCount != 0) &&
         ((p_SoundControlBuffer->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
-        int* track = (int*)p_SoundControlBuffer->m_tracks;
+        RedTrackDATA* track = p_SoundControlBuffer->m_tracks;
         do {
-            if (((u32)*track != 0) && (track[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET] != 0)) {
-                waveFunc = (int (*)(int))track[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET];
-                track[REDSOUND_TRACK_SHAKE_PAN_WORD_OFFSET] =
-                    (((track[REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT) + 1) *
-                     waveFunc((u32)track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT)) >>
+            if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
+                waveFunc = track->m_shakeFunc;
+                track->m_shakePan =
+                    (((track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1) *
+                     waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
                     0x10;
-                track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] += track[REDSOUND_TRACK_SHAKE_RATE_WORD_OFFSET];
+                track->m_shakeOutput += track->m_shakeRate;
             }
-            track += REDSOUND_TRACK_SIZE / sizeof(*track);
+            track++;
         } while (track <
-                 (int*)((u32)p_SoundControlBuffer->m_tracks + (u32)p_SoundControlBuffer->m_trackCount * REDSOUND_TRACK_SIZE));
+                 p_SoundControlBuffer->m_tracks + p_SoundControlBuffer->m_trackCount);
     }
 
     if ((*(s16*)((u8*)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_ACTIVE_TRACK_COUNT_OFFSET) != 0) &&
@@ -1723,19 +1723,18 @@ static void _KeyOnControl()
     }
 
     {
-        u32* seTrackBase = (u32*)&p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
-        int* track = (int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+        RedTrackDATA* track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
         do {
-            if (((u32)*track != 0) && (track[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET] != 0)) {
-                waveFunc = (int (*)(int))track[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET];
-                track[REDSOUND_TRACK_SHAKE_PAN_WORD_OFFSET] =
-                    (((track[REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT) + 1) *
-                     waveFunc((u32)track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT)) >>
+            if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
+                waveFunc = track->m_shakeFunc;
+                track->m_shakePan =
+                    (((track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1) *
+                     waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
                     0x10;
-                track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] += track[REDSOUND_TRACK_SHAKE_RATE_WORD_OFFSET];
+                track->m_shakeOutput += track->m_shakeRate;
             }
-            track += REDSOUND_TRACK_SIZE / sizeof(*track);
-        } while (track < (int*)(*seTrackBase + REDSOUND_SE_TRACK_ARENA_SIZE));
+            track++;
+        } while (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT);
     }
 
     {

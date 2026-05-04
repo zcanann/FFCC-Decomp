@@ -4,6 +4,7 @@
 #include "ffcc/RedSound/RedExecute.h"
 
 struct RedSoundCONTROL;
+struct RedWaveHeadWD;
 
 enum RedMidiLayoutSize {
 	REDSOUND_KEY_ON_SLOT_COUNT = 0x40,
@@ -16,7 +17,7 @@ struct RedTrackDATA {
 	unsigned char* m_command;
 	unsigned char m_pad04[0x08 - 0x04];
 	unsigned char* m_loopCommand[4];
-	int m_waveBankData;
+	RedWaveHeadWD* m_waveBankData;
 	RedWaveDATA* m_waveData;
 	signed char* m_keySignatureData;
 	RedNoteDATA m_note;

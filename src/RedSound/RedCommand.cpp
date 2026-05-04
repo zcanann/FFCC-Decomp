@@ -81,7 +81,7 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 			c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
 			if (track->m_waveBankData != 0) {
 				c_RedEntry.WaveHistoryManager(
-				    0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
+				    0, track->m_waveBankData->m_waveNo);
 			}
 		}
 		track++;
@@ -147,7 +147,7 @@ static int _EraseTime(int eraseTrack)
 			(p_VoiceData + trackNo)->m_active = 0;
 
 			if (track->m_waveBankData != 0) {
-				c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
+				c_RedEntry.WaveHistoryManager(0, track->m_waveBankData->m_waveNo);
 			}
 			erasedCount++;
 		}
@@ -245,7 +245,7 @@ int SeStopID(int seId)
 			(p_VoiceData + trackNo)->m_active = 0;
 
 			if (track->m_waveBankData != 0) {
-				c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
+				c_RedEntry.WaveHistoryManager(0, track->m_waveBankData->m_waveNo);
 			}
 			c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
 		}
@@ -293,7 +293,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				(p_VoiceData + trackNo)->m_active = 0;
 
 				if (track->m_waveBankData != 0) {
-					c_RedEntry.WaveHistoryManager(0, reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo);
+					c_RedEntry.WaveHistoryManager(0, track->m_waveBankData->m_waveNo);
 				}
 				c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
 			}
@@ -372,7 +372,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 
 		seTrack = p_VoiceData + track->m_trackNo;
 		while (true) {
-			track->m_waveBankData = (int)waveBase;
+			track->m_waveBankData = waveBase;
 			track->m_command = current;
 			current = current +
 			          (((unsigned int)seq[1] * REDSOUND_SE_INFO_U16_HIGH_SCALE + (unsigned int)*seq) &
@@ -764,7 +764,7 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 		unsigned int blockSize = ((unsigned int)current[3] << 24) | ((unsigned int)current[2] << 16) |
 		                         ((unsigned int)current[1] << 8) | (unsigned int)current[0];
 		track->m_trackNo = trackNo - 1;
-		track->m_waveBankData = (int)waveHead;
+		track->m_waveBankData = waveHead;
 		track->m_command = current + REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE;
 		current = current + REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE + blockSize;
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)track) + 1;

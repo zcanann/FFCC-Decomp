@@ -246,7 +246,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 	RedTrackDATA* track = control->m_tracks;
 	do {
 		if (((u32)track->m_command != 0) && ((u32)track->m_waveBankData != 0) &&
-		    (reinterpret_cast<RedWaveHeadWD*>(track->m_waveBankData)->m_waveNo == waveNo)) {
+		    (track->m_waveBankData->m_waveNo == waveNo)) {
 			found = 1;
 			SeStopID(track->m_seId);
 		}

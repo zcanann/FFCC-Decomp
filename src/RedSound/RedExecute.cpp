@@ -673,7 +673,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 {
     int iVar1;
     int iVar2;
-    RedTrackDATA* trackData;
+    RedTrackDATA* trackData = voice->m_track;
     s16 leftPan;
     s16 rightPan;
     u16 uVar3;
@@ -681,7 +681,6 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
     u16* mixData;
     int* voiceData = (int*)voice;
 
-    trackData = voice->m_track;
     if (trackData == 0) {
         return;
     }

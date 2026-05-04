@@ -78,12 +78,14 @@ enum RedMusicHeaderFlag {
 	REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES = 0x40000,
 };
 
+struct RedSeINFO;
+
 struct RedSeSepHEAD
 {
 	char m_signature[8];
 	int m_seNo;
 	unsigned int m_sizeAndFlags;
-	unsigned char m_unk10;
+	unsigned char m_seInfoFlags;
 	unsigned char m_waveNoLo;
 	unsigned char m_waveNoHi;
 	unsigned char m_unk13;

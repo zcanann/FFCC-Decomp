@@ -544,7 +544,7 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 	sepBank = c_RedEntry.SearchSeSepBank(sepId);
 	if (sepBank != 0) {
 		sepHead = reinterpret_cast<RedSeSepHEAD*>(sepBank->m_data);
-		sepInfo = reinterpret_cast<RedSeINFO*>((int)sepHead + REDSOUND_SESEP_HEADER_SIZE);
+		sepInfo = reinterpret_cast<RedSeINFO*>(&sepHead->m_seInfoFlags);
 		if ((sepHead->m_sizeAndFlags & REDSOUND_SESEP_FLAGS_MASK) != 0) {
 			sepInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
 		}

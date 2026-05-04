@@ -1075,10 +1075,8 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 	result = SearchSeSepSequence(seSepHead->m_seNo);
 	if (result >= 0) {
 		RedDelete(seSepHead);
-		SeSepHistoryChoice(reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase +
-		                                                     result * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
-		result = *reinterpret_cast<int*>(m_seSepBankBase + result * REDSOUND_HISTORY_BANK_ENTRY_SIZE +
-		                                 REDSOUND_HISTORY_BANK_DATA_OFFSET);
+		SeSepHistoryChoice(&reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase)[result]);
+		result = reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase)[result].m_data;
 	} else {
 		result = reinterpret_cast<int>(SeSepHeadAdd(seSepHead));
 		if (result == 0) {

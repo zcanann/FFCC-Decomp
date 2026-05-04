@@ -397,21 +397,21 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 	do {
 		RedHistoryBANK* historyBank;
 		if (waveBankNo < 0) {
-			historyBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_HISTORY_BANK_OFFSET);
+			historyBank = &reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
 			while ((historyBank->m_size != 0) &&
-			       (historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE))) {
+			       (historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_BANK_ENTRY_COUNT)) {
 				historyBank += 1;
 			}
 		} else {
 			waveBankNo &= REDSOUND_WAVE_PRIMARY_BANK_MASK;
-			historyBank = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + waveBankNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE);
+			historyBank = &reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[waveBankNo];
 			if (historyBank->m_size != 0) {
 				WaveDelete(historyBank);
 			}
 		}
 
 		int arAddress;
-		if ((historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + REDSOUND_WAVE_BANK_SIZE)) &&
+		if ((historyBank < reinterpret_cast<RedHistoryBANK*>(m_waveBankBase) + REDSOUND_WAVE_BANK_ENTRY_COUNT) &&
 		    ((arAddress = RedNewA(waveHead->m_loadSize, minOffset, maxOffset)) != 0)) {
 			int copySize = ((waveHead->m_tableCount * REDSOUND_WAVE_TABLE_ENTRY_SIZE) +
 			                (REDSOUND_WAVE_TABLE_ALIGN - 1)) &

@@ -1140,7 +1140,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         unsigned int random = GetRandomData();
         iVar5 = ((int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1) *
                 voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] *
-                trackData[REDSOUND_TRACK_FUZZY_PITCH_DEPTH_WORD_OFFSET];
+                param_1->m_fuzzyPitchDepth;
         local_38[0] = iVar5 >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
         if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) == 0) {
             voiceData[REDSOUND_VOICE_RANDOM_PITCH_WORD] = local_38[0];

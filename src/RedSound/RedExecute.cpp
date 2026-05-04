@@ -178,6 +178,9 @@ enum RedExecuteAxVoiceLayout {
     REDSOUND_AX_VOICE_VOLUME_DELTA_OFFSET = 0x19E,
     REDSOUND_AX_VOICE_RATIO_HIGH_OFFSET = 0x1DE,
     REDSOUND_AX_VOICE_RATIO_LOW_OFFSET = 0x1E0,
+    REDSOUND_AX_MIX_CTRL_DRY_STEREO = 0x3,
+    REDSOUND_AX_MIX_CTRL_AUX_A_STEREO = 0x30,
+    REDSOUND_AX_MIX_CTRL_AUX_B_STEREO = 0x600,
 };
 
 enum RedExecutePitchModConst {
@@ -1527,12 +1530,12 @@ void EnvelopeKeyExecute()
                     memset((void*)(voice + REDSOUND_AX_VOICE_MIX_OFFSET), 0, REDSOUND_VOICE_AX_MIX_SIZE);
                 }
 
-                *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) = 3;
+                *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) = REDSOUND_AX_MIX_CTRL_DRY_STEREO;
                 if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
                     if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) == 0) {
-                        *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) |= 0x600;
+                        *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) |= REDSOUND_AX_MIX_CTRL_AUX_B_STEREO;
                     } else {
-                        *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) |= 0x30;
+                        *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) |= REDSOUND_AX_MIX_CTRL_AUX_A_STEREO;
                     }
                 }
                 voiceFlags |= AX_SYNC_FLAG_COPYAXPBMIX | AX_SYNC_FLAG_COPYMXRCTRL;

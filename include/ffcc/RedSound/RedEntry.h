@@ -144,6 +144,8 @@ struct RedWaveHeadWD
 	int m_toneCount;
 	int m_aramAddress;
 	int m_loadSize;
+	unsigned char m_pad18[0x20 - 0x18];
+	int m_waveOffsets[1];
 };
 
 class CRedEntry

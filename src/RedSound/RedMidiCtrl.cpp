@@ -1153,10 +1153,10 @@ static void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
     track->m_waveData = 0;
     track->m_waveBase = 0;
     waveNo = *track->m_command++;
-    if (((u32)track->m_waveBankData != 0) && (waveNo < *(int*)(track->m_waveBankData + 8))) {
-        waveTable = track->m_waveBankData + 0x20;
+    if (((u32)track->m_waveBankData != 0) && (waveNo < ((RedWaveHeadWD*)track->m_waveBankData)->m_tableCount)) {
+        waveTable = (int)((RedWaveHeadWD*)track->m_waveBankData)->m_waveOffsets;
         track->m_waveData = track->m_waveBankData + *(int*)(waveTable + waveNo * 4);
-        track->m_waveBase = *(int*)(track->m_waveBankData + 0x10);
+        track->m_waveBase = ((RedWaveHeadWD*)track->m_waveBankData)->m_aramAddress;
         memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
     }
     track->m_waveBankNo = 0x10;
@@ -1187,7 +1187,7 @@ static void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
 	waveBank = (RedHistoryBANK*)c_RedEntry.GetWaveBank(bankNo);
 	if (waveBank != 0) {
 		waveBankData = (RedWaveHeadWD*)waveBank->m_data;
-		waveTable = (int*)((int)waveBankData + 0x20);
+		waveTable = waveBankData->m_waveOffsets;
 		track->m_waveData = (int)waveBankData + waveTable[waveNo];
 		track->m_waveBase = waveBankData->m_aramAddress;
 		memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);

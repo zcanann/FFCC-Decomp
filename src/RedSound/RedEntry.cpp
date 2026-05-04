@@ -714,7 +714,7 @@ int CRedEntry::ReentryWaveData(int waveNo)
 {
 	waveNo = SearchWaveSequence(waveNo);
 	if (waveNo >= 0) {
-		WaveHistoryChoice(reinterpret_cast<RedHistoryBANK*>(m_waveBankBase + waveNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
+		WaveHistoryChoice(&reinterpret_cast<RedHistoryBANK*>(m_waveBankBase)[waveNo]);
 	}
 	return waveNo;
 }
@@ -1172,7 +1172,7 @@ int CRedEntry::ReentrySeSepData(int seNo)
 {
 	seNo = SearchSeSepSequence(seNo);
 	if (seNo >= 0) {
-		SeSepHistoryChoice(reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase + seNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
+		SeSepHistoryChoice(&reinterpret_cast<RedHistoryBANK*>(m_seSepBankBase)[seNo]);
 	}
 	return seNo;
 }
@@ -1462,7 +1462,7 @@ int CRedEntry::ReentryMusicData(int musicNo)
 {
 	musicNo = SearchMusicSequence(musicNo);
 	if (musicNo >= 0) {
-		MusicHistoryChoice(reinterpret_cast<RedHistoryBANK*>(m_musicBankBase + musicNo * REDSOUND_HISTORY_BANK_ENTRY_SIZE));
+		MusicHistoryChoice(&reinterpret_cast<RedHistoryBANK*>(m_musicBankBase)[musicNo]);
 	}
 	return musicNo;
 }

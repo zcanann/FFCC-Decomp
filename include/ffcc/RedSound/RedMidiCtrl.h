@@ -10,6 +10,8 @@ enum RedMidiLayoutSize {
 	REDSOUND_MUSIC_TRACK_SAVE_COUNT = 0x40,
 };
 
+typedef int (*RedSwingFunc)(int);
+
 struct RedTrackDATA {
 	unsigned char* m_command;
 	unsigned char m_pad04[0x08 - 0x04];
@@ -37,7 +39,7 @@ struct RedTrackDATA {
 	int m_reverbDepth;
 	int m_reverbDepthAdd;
 	int m_reverbDepthDelta;
-	int m_vibrateFunc;
+	RedSwingFunc m_vibrateFunc;
 	int m_vibrateRate;
 	int m_vibrateRateAdd;
 	int m_vibrateDepth;
@@ -47,7 +49,7 @@ struct RedTrackDATA {
 	short m_vibrateDepthDelta;
 	short m_vibrateDelay;
 	short m_vibrateDelayDepth;
-	int m_tremoloFunc;
+	RedSwingFunc m_tremoloFunc;
 	int m_tremoloRate;
 	int m_tremoloRateAdd;
 	int m_tremoloDepth;
@@ -57,7 +59,7 @@ struct RedTrackDATA {
 	short m_tremoloDepthDelta;
 	short m_tremoloDelay;
 	short m_tremoloDelayDepth;
-	int m_shakeFunc;
+	RedSwingFunc m_shakeFunc;
 	int m_shakeRate;
 	int m_shakeRateAdd;
 	int m_shakeDepth;
@@ -325,8 +327,6 @@ enum RedSoundControlSaveSize {
 };
 
 typedef void (*RedMidiControlFunc)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
-typedef int (*RedSwingFunc)(int);
-
 int DataAddCompute(int*, int, int*);
 void KeyOnReserveClear(RedKeyOnDATA*, RedTrackDATA*);
 void KeyOnReserve(RedKeyOnDATA*, RedTrackDATA*);

@@ -1561,7 +1561,7 @@ int CRedDriver::SetMusicData(void* musicData)
     int result;
     RedMusicHEAD localHeader;
     RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
-    void* copiedHeader;
+    RedMusicHEAD* copiedHeader;
     int headerSize;
 
     result = -1;
@@ -1570,7 +1570,7 @@ int CRedDriver::SetMusicData(void* musicData)
         (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
         memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
         headerSize = localHeader.m_size;
-        copiedHeader = (void*)RedNew(headerSize);
+        copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader != 0) {
             memcpy(copiedHeader, header, headerSize);
             result = localHeader.m_musicNo;
@@ -1755,23 +1755,21 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
  */
 int CRedDriver::SetSeSepData(void* seSepData)
 {
-    int result;
-    RedSeSepHEAD* header;
-    void* copiedHeader;
+    int result = -1;
+    RedSeSepHEAD* const header = (RedSeSepHEAD*)seSepData;
+    RedSeSepHEAD* copiedHeader;
     int headerSize;
 
-    result = -1;
-    header = (RedSeSepHEAD*)seSepData;
     if (((((header->m_signature[0] == REDSOUND_SESEP_SIGNATURE_0) &&
            (header->m_signature[1] == REDSOUND_SESEP_SIGNATURE_1)) &&
           (header->m_signature[2] == REDSOUND_SESEP_SIGNATURE_2)) &&
          ((header->m_signature[3] == REDSOUND_SESEP_SIGNATURE_3 &&
            (header->m_signature[4] == REDSOUND_SESEP_SIGNATURE_4))))) {
         headerSize = header->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
-        copiedHeader = (void*)RedNew(headerSize);
+        copiedHeader = (RedSeSepHEAD*)RedNew(headerSize);
         if (copiedHeader != 0) {
             memcpy(copiedHeader, header, headerSize);
-            result = reinterpret_cast<RedSeSepHEAD*>(copiedHeader)->m_seNo;
+            result = copiedHeader->m_seNo;
             _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
     } else if (m_ReportPrint != 0) {

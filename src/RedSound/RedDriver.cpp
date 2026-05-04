@@ -1164,8 +1164,8 @@ int RedDmaSearchID(int id)
 static void _DmaExecute()
 {
     unsigned int interrupt;
-    int dstAddress;
     int srcAddress;
+    int dstAddress;
     RedDmaRequest* queueBase;
     RedDmaRequest** oldQueuePtr;
     RedDmaRequest* activeRequest;
@@ -1173,6 +1173,7 @@ static void _DmaExecute()
 
     while ((p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) ||
            (p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX])) {
+        activeRequest = 0;
         m_DMAInThread = REDSOUND_DMA_THREAD_SELECT_QUEUE;
         if (p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] == p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) {
             oldQueuePtr = &p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX];
@@ -1183,7 +1184,6 @@ static void _DmaExecute()
         }
         queueEntry = *oldQueuePtr;
         m_DMAInThread = REDSOUND_DMA_THREAD_LOAD_ENTRY;
-        activeRequest = 0;
         if (queueEntry->m_id != 0) {
             m_DMAStatus = 1;
             if (queueEntry->m_direction == REDSOUND_DMA_DIRECTION_TO_ARAM) {

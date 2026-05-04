@@ -867,7 +867,7 @@ static void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  */
 static void __MidiCtrl_TempoDirect(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    control->m_tempo = ((u32)*track->m_command++) << REDSOUND_FIXED_SHIFT;
+    control->m_tempo = *track->m_command++ << REDSOUND_FIXED_SHIFT;
     control->m_tempoAdd = 0;
     control->m_tempoDelta = 0;
 }
@@ -2056,7 +2056,7 @@ static void __MidiCtrl_TremoloOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  */
 static void __MidiCtrl_TremoloDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	track->m_tremoloDepth = (u32)*track->m_command++ << REDSOUND_FIXED_SHIFT;
+	track->m_tremoloDepth = *track->m_command++ << REDSOUND_FIXED_SHIFT;
 	track->m_tremoloDepthDelta = 0;
 }
 

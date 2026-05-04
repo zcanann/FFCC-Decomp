@@ -993,8 +993,9 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     voiceData[0] = (int)param_1;
     voiceData[0x23] = 1;
 
-    if ((trackData[0x46] == 0) || (trackData[0x48] < 0)) {
-        trackData[0x48] = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+    if ((trackData[REDSOUND_TRACK_PORTAMENT_TIME_WORD_OFFSET] == 0) ||
+        (trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] < 0)) {
+        trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
         if (voiceData[1] != 0) {
             if ((((unsigned int*)voiceData[1])[0] & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) == 0) {
                 voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
@@ -1011,12 +1012,13 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
             }
         }
     } else {
-        trackData[0x48] &= 0xfffff000;
-        voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] = trackData[0x48];
-        trackData[0x44] = trackData[0x46];
+        trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] &= 0xfffff000;
+        voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] = trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET];
+        trackData[REDSOUND_TRACK_SWEEP_DELTA_WORD_OFFSET] = trackData[REDSOUND_TRACK_PORTAMENT_TIME_WORD_OFFSET];
         local_38[0] = 0;
-        DataAddCompute(local_38, note * REDSOUND_PITCH_NOTE_UNIT - (trackData[0x48] >> REDSOUND_FIXED_SHIFT),
-                       &trackData[0x44]);
+        DataAddCompute(local_38, note * REDSOUND_PITCH_NOTE_UNIT -
+                                     (trackData[REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT),
+                       &trackData[REDSOUND_TRACK_SWEEP_DELTA_WORD_OFFSET]);
     }
 
     voiceData[REDSOUND_VOICE_NOTE_WORD] = *(int*)param_3;
@@ -1028,7 +1030,9 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     if (voiceData[1] == 0) {
         memset(voiceData + REDSOUND_VOICE_ADSR_TIME_WORD, 0, REDSOUND_TRACK_ADSR_SIZE);
     } else {
-        memcpy(voiceData + REDSOUND_VOICE_ADSR_TIME_WORD, (void*)(trackData[7] + REDSOUND_WAVE_ADSR_OFFSET), REDSOUND_TRACK_ADSR_SIZE);
+        memcpy(voiceData + REDSOUND_VOICE_ADSR_TIME_WORD,
+               (void*)(trackData[REDSOUND_TRACK_WAVE_DATA_WORD_OFFSET] + REDSOUND_WAVE_ADSR_OFFSET),
+               REDSOUND_TRACK_ADSR_SIZE);
     }
 
     voiceData[REDSOUND_VOICE_SWITCH_WORD] = trackData[REDSOUND_TRACK_VOICE_SWITCH_WORD_OFFSET];
@@ -1044,17 +1048,17 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         voiceData[REDSOUND_VOICE_SWITCH_WORD] |= maskBits;
     }
 
-    local_38[0] = trackS16[0xa1] + trackS16[0x9f];
+    local_38[0] = trackS16[REDSOUND_TRACK_KEY_TRANSPOSE_HALFWORD] + trackS16[REDSOUND_TRACK_PITCH_BEND_HALFWORD];
     if ((((u8*)voiceData)[REDSOUND_VOICE_STATE_FLAGS_OFFSET] & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
         iVar5 = voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] + p_MusicPitchControl->m_value;
     } else {
-        iVar5 = voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] + trackData[0x17];
+        iVar5 = voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] + trackData[REDSOUND_TRACK_PITCH_WORD_OFFSET];
     }
 
     if (voiceData[1] == 0) {
         iVar5 = 0;
     } else {
-        iVar5 = PitchCompute(iVar5, local_38[0], ((int*)voiceData[1])[5], trackS8[0x148]);
+        iVar5 = PitchCompute(iVar5, local_38[0], ((int*)voiceData[1])[5], trackS8[REDSOUND_TRACK_FINE_TUNE_BYTE]);
     }
     voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] = iVar5;
 
@@ -1106,7 +1110,8 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     } else {
         unsigned int random = GetRandomData();
         iVar5 = ((int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1) *
-                voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] * trackData[0x38];
+                voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] *
+                trackData[REDSOUND_TRACK_FUZZY_PITCH_DEPTH_WORD_OFFSET];
         local_38[0] = iVar5 >> 0xf;
         if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) == 0) {
             voiceData[REDSOUND_VOICE_RANDOM_PITCH_WORD] = local_38[0];
@@ -1119,14 +1124,16 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         voiceData[REDSOUND_VOICE_RANDOM_VOLUME_WORD] = 0;
     } else {
         s8 random = (s8)GetRandomData();
-        voiceData[REDSOUND_VOICE_RANDOM_VOLUME_WORD] = (trackData[0x39] * random) >> 8;
+        voiceData[REDSOUND_VOICE_RANDOM_VOLUME_WORD] =
+            (trackData[REDSOUND_TRACK_FUZZY_VOLUME_DEPTH_WORD_OFFSET] * random) >> 8;
     }
 
     if (((unsigned int)voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_FUZZY_PAN) == 0) {
         voiceData[REDSOUND_VOICE_RANDOM_PAN_WORD] = 0;
     } else {
         s8 random = (s8)GetRandomData();
-        voiceData[REDSOUND_VOICE_RANDOM_PAN_WORD] = (trackData[0x3a] * random) >> 8;
+        voiceData[REDSOUND_VOICE_RANDOM_PAN_WORD] =
+            (trackData[REDSOUND_TRACK_FUZZY_PAN_DEPTH_WORD_OFFSET] * random) >> 8;
     }
 
     if (voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] == 0) {
@@ -1170,7 +1177,8 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         if (((unsigned int)voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
             u16 random = GetRandomData();
             ((u16*)voiceData)[REDSOUND_VOICE_ADSR_TIME_HALFWORD] =
-                (u16)(trackData[0x3c] * (random & REDSOUND_RANDOM_BYTE_MASK));
+                (u16)(trackData[REDSOUND_TRACK_FUZZY_ADSR_DEPTH_WORD_OFFSET] *
+                      (random & REDSOUND_RANDOM_BYTE_MASK));
         }
     }
 

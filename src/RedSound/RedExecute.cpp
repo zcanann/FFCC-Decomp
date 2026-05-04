@@ -800,7 +800,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         volume = volume + 1;
     }
 
-    voiceMix = volume * ((*(int*)voiceData[REDSOUND_VOICE_TRACK_EXPRESSION_WORD] >> REDSOUND_FIXED_SHIFT) + 1) >>
+    voiceMix = volume * ((*voice->m_trackExpression >> REDSOUND_FIXED_SHIFT) + 1) >>
                REDSOUND_VOLUME_MOD_SCALE_SHIFT;
 
     if (voice->m_velocity != 0) {
@@ -812,44 +812,44 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         voiceMix = voiceMix * envelopeMul >> 7;
     }
 
-    envelopeMul = *(int*)(*voiceData + 0x4c) >> REDSOUND_FIXED_SHIFT;
+    envelopeMul = voice->m_track->m_mixVolume >> REDSOUND_FIXED_SHIFT;
     if (envelopeMul != 0) {
         envelopeMul = envelopeMul + 1;
     }
 
-    pan = *(u8*)(voiceData[1] + REDSOUND_WAVE_VOLUME_OFFSET) & REDSOUND_PAN_BYTE_MASK;
+    pan = voice->m_waveData->m_volume & REDSOUND_PAN_BYTE_MASK;
     if (pan != 0) {
         pan = pan + 1;
     }
 
     voiceMix = (int)(((voiceMix * envelopeMul >> REDSOUND_VOLUME_MOD_SCALE_SHIFT) *
-                      (*(int*)voiceData[REDSOUND_VOICE_TRACK_VOLUME_WORD] >> REDSOUND_FIXED_SHIFT) >>
+                      (*voice->m_trackVolume >> REDSOUND_FIXED_SHIFT) >>
                       REDSOUND_VOLUME_TRACK_SCALE_SHIFT) *
                      pan) >>
                REDSOUND_VOLUME_MOD_SCALE_SHIFT;
 
-    if (*(int*)(*voiceData + 0x94) != 0) {
-        if (*(s16*)(voiceData + 0xe) == 0) {
-            envelopeMul = *(int*)(*voiceData + 0xa0) >> REDSOUND_FIXED_SHIFT;
+    if (voice->m_track->m_tremoloFunc != 0) {
+        if (voice->m_volumeModDelay == 0) {
+            envelopeMul = voice->m_track->m_tremoloDepth >> REDSOUND_FIXED_SHIFT;
             if (envelopeMul != 0) {
                 envelopeMul = envelopeMul + 1;
             }
 
-            iVar1 = (**(int (**)(unsigned int))(*((int*)*voiceData + 0x25)))((unsigned int)voiceData[0xb] >> REDSOUND_FIXED_SHIFT);
+            iVar1 = voice->m_track->m_tremoloFunc((unsigned int)voice->m_volumeModPhase >> REDSOUND_FIXED_SHIFT);
             modVolume = (voiceMix * envelopeMul >> 8) * (iVar1 >> REDSOUND_VOLUME_MOD_WAVE_SHIFT) >>
                         REDSOUND_FIXED_SHIFT;
 
-            if (voiceData[0xc] != 0) {
-                iVar1 = voiceData[0xd];
-                voiceData[0xd] = voiceData[0xd] + 1;
-                modVolume = (modVolume * iVar1) / voiceData[0xc];
-                if (voiceData[0xc] <= voiceData[0xd]) {
-                    voiceData[0xc] = 0;
+            if (voice->m_volumeModFrames != 0) {
+                iVar1 = voice->m_volumeModFrame;
+                voice->m_volumeModFrame = voice->m_volumeModFrame + 1;
+                modVolume = (modVolume * iVar1) / voice->m_volumeModFrames;
+                if (voice->m_volumeModFrames <= voice->m_volumeModFrame) {
+                    voice->m_volumeModFrames = 0;
                 }
             }
 
             voiceMix = voiceMix + modVolume;
-            voiceData[0xb] = voiceData[0xb] + *(int*)(*voiceData + 0x98);
+            voice->m_volumeModPhase = voice->m_volumeModPhase + voice->m_track->m_tremoloRate;
 
             if (voiceMix >= REDSOUND_ENVELOPE_LEVEL_FULL) {
                 voiceMix = REDSOUND_AX_MIX_MAX;
@@ -862,29 +862,29 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
     if (m_SoundPlayMode == 1) {
         pan = REDSOUND_PAN_BYTE_CENTER;
     } else if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAIRED_PAN) == 0) {
-        if ((*(u8*)(voiceData[1] + REDSOUND_WAVE_PAN_OFFSET) & REDSOUND_PAN_BYTE_SIGN_BIT) == 0) {
-            pan = *(int*)voiceData[REDSOUND_VOICE_TRACK_PAN_WORD] >> REDSOUND_FIXED_SHIFT;
+        if ((voice->m_waveData->m_pan & REDSOUND_PAN_BYTE_SIGN_BIT) == 0) {
+            pan = *voice->m_trackPan >> REDSOUND_FIXED_SHIFT;
         } else {
-            pan = *(u8*)(voiceData[1] + REDSOUND_WAVE_PAN_OFFSET) & REDSOUND_PAN_BYTE_MASK;
+            pan = voice->m_waveData->m_pan & REDSOUND_PAN_BYTE_MASK;
             if (pan == 0) {
                 pan = REDSOUND_PAN_BYTE_CENTER;
             }
         }
 
-        if (voiceData[REDSOUND_VOICE_RANDOM_PAN_WORD] != 0) {
-            pan = pan + ((int)(pan * voiceData[REDSOUND_VOICE_RANDOM_PAN_WORD]) >> REDSOUND_VOLUME_MOD_SCALE_SHIFT);
+        if (voice->m_randomPan != 0) {
+            pan = pan + ((int)(pan * voice->m_randomPan) >> REDSOUND_VOLUME_MOD_SCALE_SHIFT);
         }
 
-        pan = (pan + *(int*)(*voiceData + 0xcc)) & 0xff;
+        pan = (pan + voice->m_track->m_shakePan) & 0xff;
     } else if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAIRED_LEFT) == 0) {
         pan = REDSOUND_PAN_BYTE_MASK;
     } else {
         pan = 0;
     }
 
-    if (voiceData[REDSOUND_VOICE_RANDOM_VOLUME_WORD] != 0) {
+    if (voice->m_randomVolume != 0) {
         voiceMix =
-            voiceMix + (voiceMix * voiceData[REDSOUND_VOICE_RANDOM_VOLUME_WORD] >> REDSOUND_VOLUME_MOD_SCALE_SHIFT);
+            voiceMix + (voiceMix * voice->m_randomVolume >> REDSOUND_VOLUME_MOD_SCALE_SHIFT);
         if (voiceMix >= REDSOUND_ENVELOPE_LEVEL_FULL) {
             voiceMix = REDSOUND_AX_MIX_MAX;
         } else if (voiceMix < 0) {

@@ -1154,7 +1154,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     } else {
         s8 random = (s8)GetRandomData();
         voiceData[REDSOUND_VOICE_RANDOM_VOLUME_WORD] =
-            (trackData[REDSOUND_TRACK_FUZZY_VOLUME_DEPTH_WORD_OFFSET] * random) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
+            (param_1->m_fuzzyVolumeDepth * random) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
     }
 
     if (((unsigned int)voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_FUZZY_PAN) == 0) {
@@ -1162,7 +1162,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     } else {
         s8 random = (s8)GetRandomData();
         voiceData[REDSOUND_VOICE_RANDOM_PAN_WORD] =
-            (trackData[REDSOUND_TRACK_FUZZY_PAN_DEPTH_WORD_OFFSET] * random) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
+            (param_1->m_fuzzyPanDepth * random) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
     }
 
     if (voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] == 0) {

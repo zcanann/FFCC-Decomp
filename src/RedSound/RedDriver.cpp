@@ -32,6 +32,7 @@ enum RedDriverDmaLayoutSize {
     REDSOUND_DMA_QUEUE_WORD_COUNT = 0x380,
     REDSOUND_DMA_CONTROL_WORD_COUNT = REDSOUND_DMA_QUEUE_WORD_COUNT * 2,
     REDSOUND_DMA_QUEUE_ENTRY_COUNT = 0x80,
+    REDSOUND_DMA_CONTROL_ENTRY_COUNT = REDSOUND_DMA_QUEUE_ENTRY_COUNT * 2,
     REDSOUND_DMA_TRANSFER_ALIGN = 0x20,
     REDSOUND_DMA_TRANSFER_ALIGN_MASK = ~(REDSOUND_DMA_TRANSFER_ALIGN - 1),
     REDSOUND_DMA_MAX_CHUNK_SIZE = 0x40000,
@@ -54,19 +55,6 @@ enum RedDriverDmaThreadStage {
     REDSOUND_DMA_THREAD_FINISH_ENTRY = 9,
 };
 
-struct RedDriverSyncState {
-    int m_dmaQueue[REDSOUND_DMA_QUEUE_WORD_COUNT];
-    int m_streamDmaQueue[REDSOUND_DMA_QUEUE_WORD_COUNT];
-    OSThread m_mainThread;
-    OSSemaphore m_mainSemaphore;
-    u8 m_pad2240[0x2240 - 0x1F18 - sizeof(OSSemaphore)];
-    OSSemaphore m_waveSemaphore;
-    u8 m_pad2578[0x2578 - 0x2240 - sizeof(OSSemaphore)];
-    OSSemaphore m_dmaSemaphore;
-    u8 m_pad28c0[0x28C0 - 0x2578 - sizeof(OSSemaphore)];
-    OSSemaphore m_musicSemaphore;
-};
-
 struct RedDmaRequest {
     int m_id;
     int m_direction;
@@ -75,6 +63,19 @@ struct RedDmaRequest {
     int m_size;
     void (*m_callback)(void*);
     void* m_callbackData;
+};
+
+struct RedDriverSyncState {
+    RedDmaRequest m_dmaQueue[REDSOUND_DMA_QUEUE_ENTRY_COUNT];
+    RedDmaRequest m_streamDmaQueue[REDSOUND_DMA_QUEUE_ENTRY_COUNT];
+    OSThread m_mainThread;
+    OSSemaphore m_mainSemaphore;
+    u8 m_pad2240[0x2240 - 0x1F18 - sizeof(OSSemaphore)];
+    OSSemaphore m_waveSemaphore;
+    u8 m_pad2578[0x2578 - 0x2240 - sizeof(OSSemaphore)];
+    OSSemaphore m_dmaSemaphore;
+    u8 m_pad28c0[0x28C0 - 0x2578 - sizeof(OSSemaphore)];
+    OSSemaphore m_musicSemaphore;
 };
 
 struct RedExecCommand {
@@ -205,7 +206,7 @@ u8* volatile p_MusicSkipThreadStack;
 volatile int m_MusicSkipComplete;
 RedReverbDepth* volatile p_ReverbDepth;
 int m_Mute[2];
-static int m_DmaControl[REDSOUND_DMA_CONTROL_WORD_COUNT];
+static RedDmaRequest m_DmaControl[REDSOUND_DMA_CONTROL_ENTRY_COUNT];
 static OSThread m_MainThread;
 static OSSemaphore m_MainSemaphore;
 static OSThread m_WaveSettingThread;
@@ -229,17 +230,17 @@ static inline RedDriverSyncState& RedDriverSync()
 
 static inline RedDmaRequest* RedDriverMainDmaQueue()
 {
-    return reinterpret_cast<RedDmaRequest*>(m_DmaControl);
+    return m_DmaControl;
 }
 
 static inline RedDmaRequest* RedDriverStreamDmaQueue()
 {
-    return reinterpret_cast<RedDmaRequest*>(m_DmaControl + REDSOUND_DMA_QUEUE_WORD_COUNT);
+    return m_DmaControl + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
 }
 
 static inline RedDmaRequest* RedDriverStreamDmaQueueEnd()
 {
-    return reinterpret_cast<RedDmaRequest*>(m_DmaControl + REDSOUND_DMA_CONTROL_WORD_COUNT);
+    return m_DmaControl + REDSOUND_DMA_CONTROL_ENTRY_COUNT;
 }
 
 static inline OSThread& RedDriverMainThread()

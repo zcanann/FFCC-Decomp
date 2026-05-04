@@ -1210,7 +1210,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         }
     }
 
-    iVar5 = ((int)voiceData - (int)p_VoiceData) / REDSOUND_VOICE_SIZE + (((int)voiceData - (int)p_VoiceData) >> 0x1f);
+    iVar5 = ((int)param_2 - (int)p_VoiceData) / REDSOUND_VOICE_SIZE + (((int)param_2 - (int)p_VoiceData) >> 0x1f);
     if (REDSOUND_VOICE_INDEX_MASK < iVar5 - (iVar5 >> 0x1f)) {
         voiceMask += 1;
     }
@@ -1218,9 +1218,9 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     if (((param_1->m_flags & REDSOUND_TRACK_FLAG_SLUR) == 0) ||
         ((param_1->m_flags & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0)) {
         param_1->m_flags |= REDSOUND_TRACK_FLAG_SLUR_RELEASE;
-        *voiceMask |= 1u << voiceData[REDSOUND_VOICE_INDEX_WORD];
+        *voiceMask |= 1u << param_2->m_voiceIndex;
     }
-    voiceData[REDSOUND_VOICE_UPDATE_FLAGS_WORD] |= REDSOUND_VOICE_UPDATE_ALL;
+    param_2->m_updateFlags |= REDSOUND_VOICE_UPDATE_ALL;
 }
 
 /*

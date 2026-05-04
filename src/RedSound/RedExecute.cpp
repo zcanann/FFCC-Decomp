@@ -169,15 +169,26 @@ enum RedExecuteLayoutSize {
 };
 
 enum RedExecuteAxVoiceLayout {
+    REDSOUND_AX_VOICE_PRIORITY_OFFSET = 0x0C,
     REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET = 0x1C,
+    REDSOUND_AX_VOICE_SRC_SELECT_OFFSET = 0x140,
     REDSOUND_AX_VOICE_MIX_CTRL_OFFSET = 0x144,
     REDSOUND_AX_VOICE_RUNNING_OFFSET = 0x146,
     REDSOUND_AX_VOICE_LOOP_OFFSET = 0x148,
     REDSOUND_AX_VOICE_MIX_OFFSET = 0x14A,
     REDSOUND_AX_VOICE_VOLUME_OFFSET = 0x19C,
     REDSOUND_AX_VOICE_VOLUME_DELTA_OFFSET = 0x19E,
+    REDSOUND_AX_VOICE_ADDR_LOOP_FLAG_OFFSET = 0x1A6,
+    REDSOUND_AX_VOICE_ADDR_FORMAT_OFFSET = 0x1A8,
+    REDSOUND_AX_VOICE_ADDR_LOOP_HI_OFFSET = 0x1AA,
+    REDSOUND_AX_VOICE_ADDR_LOOP_LO_OFFSET = 0x1AC,
+    REDSOUND_AX_VOICE_ADDR_END_OFFSET = 0x1AE,
+    REDSOUND_AX_VOICE_ADDR_CURRENT_OFFSET = 0x1B2,
+    REDSOUND_AX_VOICE_ADPCM_DATA_OFFSET = 0x1B6,
     REDSOUND_AX_VOICE_RATIO_HIGH_OFFSET = 0x1DE,
     REDSOUND_AX_VOICE_RATIO_LOW_OFFSET = 0x1E0,
+    REDSOUND_AX_VOICE_SRC_LAST_SAMPLES_OFFSET = 0x1E4,
+    REDSOUND_AX_VOICE_ADPCM_LOOP_OFFSET = 0x1EC,
     REDSOUND_AX_MIX_CTRL_DRY_STEREO = 0x3,
     REDSOUND_AX_MIX_CTRL_AUX_A_STEREO = 0x30,
     REDSOUND_AX_MIX_CTRL_AUX_B_STEREO = 0x600,
@@ -1470,13 +1481,13 @@ void EnvelopeKeyExecute()
         if (voiceData[REDSOUND_VOICE_ACTIVE_WORD] == 0) {
             voiceData[REDSOUND_VOICE_ENVELOPE_WORD] = 0;
             voiceData[1] = 0;
-            int voice = voiceData[5];
+            int voice = voiceData[REDSOUND_VOICE_AX_VOICE_WORD];
             if (voice != 0) {
                 if (*(s16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) == 0) {
-                    if (*(int*)(voice + 0xC) != 0) {
+                    if (*(int*)(voice + REDSOUND_AX_VOICE_PRIORITY_OFFSET) != 0) {
                         AXFreeVoice((AXVPB*)voice);
                     }
-                    voiceData[5] = 0;
+                    voiceData[REDSOUND_VOICE_AX_VOICE_WORD] = 0;
                     *voiceData = 0;
                 } else {
                     *(u16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) = 0;
@@ -1488,10 +1499,10 @@ void EnvelopeKeyExecute()
             int voice;
 
             if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_START) != 0) {
-                voice = voiceData[5];
-                if ((voice != 0) && (*(int*)(voice + 0xC) != 0)) {
+                voice = voiceData[REDSOUND_VOICE_AX_VOICE_WORD];
+                if ((voice != 0) && (*(int*)(voice + REDSOUND_AX_VOICE_PRIORITY_OFFSET) != 0)) {
                     AXFreeVoice((AXVPB*)voice);
-                    voiceData[5] = 0;
+                    voiceData[REDSOUND_VOICE_AX_VOICE_WORD] = 0;
                 }
 
                 if ((((u8*)voiceData)[0x1A] & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
@@ -1501,13 +1512,13 @@ void EnvelopeKeyExecute()
                     if (prio < 1) {
                         prio = 1;
                     }
-                    voiceData[5] = (int)AXAcquireVoice(prio, _VoiceDropedCallback, 0);
+                    voiceData[REDSOUND_VOICE_AX_VOICE_WORD] = (int)AXAcquireVoice(prio, _VoiceDropedCallback, 0);
                 } else {
-                    voiceData[5] = (int)AXAcquireVoice(0x1F, _VoiceDropedCallback, 0);
+                    voiceData[REDSOUND_VOICE_AX_VOICE_WORD] = (int)AXAcquireVoice(0x1F, _VoiceDropedCallback, 0);
                 }
             }
 
-            voice = voiceData[5];
+            voice = voiceData[REDSOUND_VOICE_AX_VOICE_WORD];
             if (voice == 0) {
                 voiceData[REDSOUND_VOICE_FLAGS_WORD] = 0;
                 voiceData[REDSOUND_VOICE_ACTIVE_WORD] = 0;
@@ -1561,13 +1572,14 @@ void EnvelopeKeyExecute()
                     }
                 } else {
                     voiceData[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_RELEASE_ACTIVE;
-                    voiceData[0x17] = 3;
-                    voiceData[0x18] = (u16)((u8*)voiceData)[0x56];
-                    if (voiceData[0x18] == 0) {
+                    voiceData[REDSOUND_VOICE_ADSR_STAGE_WORD] = 3;
+                    voiceData[REDSOUND_VOICE_ADSR_STEP_FRAMES_WORD] = (u16)((u8*)voiceData)[0x56];
+                    if (voiceData[REDSOUND_VOICE_ADSR_STEP_FRAMES_WORD] == 0) {
                         voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] = 0;
                     } else {
-                        voiceData[0x19] = -voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD];
-                        voiceData[0x19] = voiceData[0x19] / voiceData[0x18];
+                        voiceData[REDSOUND_VOICE_ADSR_STEP_ADD_WORD] = -voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD];
+                        voiceData[REDSOUND_VOICE_ADSR_STEP_ADD_WORD] =
+                            voiceData[REDSOUND_VOICE_ADSR_STEP_ADD_WORD] / voiceData[REDSOUND_VOICE_ADSR_STEP_FRAMES_WORD];
                     }
                     voiceData[REDSOUND_VOICE_ENVELOPE_WORD] =
                         voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT;
@@ -1580,31 +1592,34 @@ void EnvelopeKeyExecute()
                     voiceData[REDSOUND_VOICE_ACTIVE_WORD] = 0;
                 } else {
                     envChanged += 1;
-                    int key = (*(int*)(trackData + 0x11C) + *(int*)(waveData + 4) + 1) * 2;
+                    int key = (*(int*)(trackData + 0x11C) + *(int*)(waveData + REDSOUND_WAVE_SAMPLE_START_OFFSET) + 1) * 2;
                     int keyBase = key - 2;
 
                     *(u16*)(voice + REDSOUND_AX_VOICE_LOOP_OFFSET) =
                         (u16)((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_LOOP) != 0);
-                    *(u16*)(voice + 0x140) = 1;
+                    *(u16*)(voice + REDSOUND_AX_VOICE_SRC_SELECT_OFFSET) = 1;
                     *(u16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) = 1;
 
-                    memcpy((void*)(voice + 0x1B6), (void*)(waveData + 0x22), 0x28);
-                    memcpy((void*)(voice + 0x1EC), (void*)(waveData + 0x4A), 6);
-                    memset((void*)(voice + 0x1E4), 0, 8);
-                    *(u16*)(voice + 0x1A8) = 0;
-                    *(int*)(voice + 0x1B2) = key;
+                    memcpy((void*)(voice + REDSOUND_AX_VOICE_ADPCM_DATA_OFFSET),
+                           (void*)(waveData + REDSOUND_WAVE_ADPCM_DATA_OFFSET), 0x28);
+                    memcpy((void*)(voice + REDSOUND_AX_VOICE_ADPCM_LOOP_OFFSET),
+                           (void*)(waveData + REDSOUND_WAVE_ADPCM_LOOP_OFFSET), 6);
+                    memset((void*)(voice + REDSOUND_AX_VOICE_SRC_LAST_SAMPLES_OFFSET), 0, 8);
+                    *(u16*)(voice + REDSOUND_AX_VOICE_ADDR_FORMAT_OFFSET) = 0;
+                    *(int*)(voice + REDSOUND_AX_VOICE_ADDR_CURRENT_OFFSET) = key;
 
-                    if (*(int*)(waveData + 8) < 0) {
-                        *(u16*)(voice + 0x1A6) = 0;
+                    if (*(int*)(waveData + REDSOUND_WAVE_LOOP_START_OFFSET) < 0) {
+                        *(u16*)(voice + REDSOUND_AX_VOICE_ADDR_LOOP_FLAG_OFFSET) = 0;
                         key = keyBase;
                     } else {
-                        *(u16*)(voice + 0x1A6) = 1;
-                        key = keyBase + *(int*)(waveData + 8);
+                        *(u16*)(voice + REDSOUND_AX_VOICE_ADDR_LOOP_FLAG_OFFSET) = 1;
+                        key = keyBase + *(int*)(waveData + REDSOUND_WAVE_LOOP_START_OFFSET);
                     }
 
-                    *(s16*)(voice + 0x1AA) = (s16)((u32)key >> 0x10);
-                    *(s16*)(voice + 0x1AC) = (s16)key;
-                    *(int*)(voice + 0x1AE) = keyBase + *(int*)(waveData + 0xC);
+                    *(s16*)(voice + REDSOUND_AX_VOICE_ADDR_LOOP_HI_OFFSET) = (s16)((u32)key >> 0x10);
+                    *(s16*)(voice + REDSOUND_AX_VOICE_ADDR_LOOP_LO_OFFSET) = (s16)key;
+                    *(int*)(voice + REDSOUND_AX_VOICE_ADDR_END_OFFSET) =
+                        keyBase + *(int*)(waveData + REDSOUND_WAVE_LOOP_END_OFFSET);
 
                     voiceFlags |= AX_SYNC_FLAG_COPYADPCMLOOP | AX_SYNC_FLAG_COPYSRC | AX_SYNC_FLAG_COPYADPCM |
                                   AX_SYNC_FLAG_COPYCURADDR | AX_SYNC_FLAG_COPYADDR | AX_SYNC_FLAG_COPYTYPE |

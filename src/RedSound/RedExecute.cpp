@@ -1936,46 +1936,44 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
 
     track->m_playTime += frames;
 
-    if (trackData[REDSOUND_TRACK_VOLUME_DELTA_WORD_OFFSET] != 0) {
+    if (track->m_volumeDelta != 0) {
         int step = frames;
-        if (trackData[REDSOUND_TRACK_VOLUME_DELTA_WORD_OFFSET] <= frames) {
-            step = trackData[REDSOUND_TRACK_VOLUME_DELTA_WORD_OFFSET];
+        if (track->m_volumeDelta <= frames) {
+            step = track->m_volumeDelta;
         }
         updateFlags = REDSOUND_VOICE_UPDATE_VOLUME;
-        trackData[REDSOUND_TRACK_VOLUME_DELTA_WORD_OFFSET] -= step;
-        trackData[REDSOUND_TRACK_VOLUME_WORD_OFFSET] += trackData[REDSOUND_TRACK_VOLUME_ADD_WORD_OFFSET] * step;
+        track->m_volumeDelta -= step;
+        track->m_volume += track->m_volumeAdd * step;
     }
 
-    if (trackData[REDSOUND_TRACK_EXPRESSION_DELTA_WORD_OFFSET] != 0) {
+    if (track->m_expressionDelta != 0) {
         int step = frames;
-        if (trackData[REDSOUND_TRACK_EXPRESSION_DELTA_WORD_OFFSET] <= frames) {
-            step = trackData[REDSOUND_TRACK_EXPRESSION_DELTA_WORD_OFFSET];
+        if (track->m_expressionDelta <= frames) {
+            step = track->m_expressionDelta;
         }
         updateFlags = REDSOUND_VOICE_UPDATE_VOLUME;
-        trackData[REDSOUND_TRACK_EXPRESSION_DELTA_WORD_OFFSET] -= step;
-        trackData[REDSOUND_TRACK_EXPRESSION_WORD_OFFSET] +=
-            trackData[REDSOUND_TRACK_EXPRESSION_ADD_WORD_OFFSET] * step;
+        track->m_expressionDelta -= step;
+        track->m_expression += track->m_expressionAdd * step;
     }
 
-    if (trackData[REDSOUND_TRACK_PAN_DELTA_WORD_OFFSET] != 0) {
+    if (track->m_panDelta != 0) {
         int step = frames;
-        if (trackData[REDSOUND_TRACK_PAN_DELTA_WORD_OFFSET] <= frames) {
-            step = trackData[REDSOUND_TRACK_PAN_DELTA_WORD_OFFSET];
+        if (track->m_panDelta <= frames) {
+            step = track->m_panDelta;
         }
         updateFlags = REDSOUND_VOICE_UPDATE_VOLUME;
-        trackData[REDSOUND_TRACK_PAN_DELTA_WORD_OFFSET] -= step;
-        trackData[REDSOUND_TRACK_PAN_WORD_OFFSET] += trackData[REDSOUND_TRACK_PAN_ADD_WORD_OFFSET] * step;
+        track->m_panDelta -= step;
+        track->m_pan += track->m_panAdd * step;
     }
 
-    if (trackData[REDSOUND_TRACK_REVERB_DEPTH_DELTA_WORD_OFFSET] != 0) {
+    if (track->m_reverbDepthDelta != 0) {
         int step = frames;
-        if (trackData[REDSOUND_TRACK_REVERB_DEPTH_DELTA_WORD_OFFSET] <= frames) {
-            step = trackData[REDSOUND_TRACK_REVERB_DEPTH_DELTA_WORD_OFFSET];
+        if (track->m_reverbDepthDelta <= frames) {
+            step = track->m_reverbDepthDelta;
         }
         updateFlags = REDSOUND_VOICE_UPDATE_VOLUME;
-        trackData[REDSOUND_TRACK_REVERB_DEPTH_DELTA_WORD_OFFSET] -= step;
-        trackData[REDSOUND_TRACK_REVERB_DEPTH_WORD_OFFSET] +=
-            trackData[REDSOUND_TRACK_REVERB_DEPTH_ADD_WORD_OFFSET] * step;
+        track->m_reverbDepthDelta -= step;
+        track->m_reverbDepth += track->m_reverbDepthAdd * step;
     }
 
     if (track->m_sweepDelta != 0) {
@@ -2007,67 +2005,61 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         } while (voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
     }
 
-    if ((u32)trackData[REDSOUND_TRACK_VIBRATE_FUNC_WORD_OFFSET] != 0) {
-        if (((s16*)track)[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD] != 0) {
+    if ((u32)track->m_vibrateFunc != 0) {
+        if (track->m_vibrateRateDelta != 0) {
             int step = frames;
-            if (((s16*)track)[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD] <= frames) {
-                step = ((s16*)track)[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD];
+            if (track->m_vibrateRateDelta <= frames) {
+                step = track->m_vibrateRateDelta;
             }
-            ((s16*)track)[REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD] -= (s16)step;
-            trackData[REDSOUND_TRACK_VIBRATE_RATE_WORD_OFFSET] +=
-                trackData[REDSOUND_TRACK_VIBRATE_RATE_ADD_WORD_OFFSET] * step;
+            track->m_vibrateRateDelta -= (s16)step;
+            track->m_vibrateRate += track->m_vibrateRateAdd * step;
         }
-        if (((s16*)track)[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD] != 0) {
+        if (track->m_vibrateDepthDelta != 0) {
             int step = frames;
-            if (((s16*)track)[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD] <= frames) {
-                step = ((s16*)track)[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD];
+            if (track->m_vibrateDepthDelta <= frames) {
+                step = track->m_vibrateDepthDelta;
             }
-            ((s16*)track)[REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD] -= (s16)step;
-            trackData[REDSOUND_TRACK_VIBRATE_DEPTH_WORD_OFFSET] +=
-                trackData[REDSOUND_TRACK_VIBRATE_DEPTH_ADD_WORD_OFFSET] * step;
+            track->m_vibrateDepthDelta -= (s16)step;
+            track->m_vibrateDepth += track->m_vibrateDepthAdd * step;
         }
     }
 
-    if ((u32)trackData[REDSOUND_TRACK_TREMOLO_FUNC_WORD_OFFSET] != 0) {
-        if (((s16*)track)[REDSOUND_TRACK_TREMOLO_RATE_DELTA_HALFWORD] != 0) {
+    if ((u32)track->m_tremoloFunc != 0) {
+        if (track->m_tremoloRateDelta != 0) {
             int step = frames;
-            if (((s16*)track)[REDSOUND_TRACK_TREMOLO_RATE_DELTA_HALFWORD] <= frames) {
-                step = ((s16*)track)[REDSOUND_TRACK_TREMOLO_RATE_DELTA_HALFWORD];
+            if (track->m_tremoloRateDelta <= frames) {
+                step = track->m_tremoloRateDelta;
             }
-            ((s16*)track)[REDSOUND_TRACK_TREMOLO_RATE_DELTA_HALFWORD] -= (s16)step;
-            trackData[REDSOUND_TRACK_TREMOLO_RATE_WORD_OFFSET] +=
-                trackData[REDSOUND_TRACK_TREMOLO_RATE_ADD_WORD_OFFSET] * step;
+            track->m_tremoloRateDelta -= (s16)step;
+            track->m_tremoloRate += track->m_tremoloRateAdd * step;
         }
-        if (((s16*)track)[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD] != 0) {
+        if (track->m_tremoloDepthDelta != 0) {
             int step = frames;
-            if (((s16*)track)[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD] <= frames) {
-                step = ((s16*)track)[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD];
+            if (track->m_tremoloDepthDelta <= frames) {
+                step = track->m_tremoloDepthDelta;
             }
-            ((s16*)track)[REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD] -= (s16)step;
-            trackData[REDSOUND_TRACK_TREMOLO_DEPTH_WORD_OFFSET] +=
-                trackData[REDSOUND_TRACK_TREMOLO_DEPTH_ADD_WORD_OFFSET] * step;
+            track->m_tremoloDepthDelta -= (s16)step;
+            track->m_tremoloDepth += track->m_tremoloDepthAdd * step;
         }
     }
 
     voiceData = (int*)p_VoiceData;
-    if ((u32)trackData[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET] != 0) {
-        if (((s16*)track)[REDSOUND_TRACK_SHAKE_RATE_DELTA_HALFWORD] != 0) {
+    if ((u32)track->m_shakeFunc != 0) {
+        if (track->m_shakeRateDelta != 0) {
             int step = frames;
-            if (((s16*)track)[REDSOUND_TRACK_SHAKE_RATE_DELTA_HALFWORD] <= frames) {
-                step = ((s16*)track)[REDSOUND_TRACK_SHAKE_RATE_DELTA_HALFWORD];
+            if (track->m_shakeRateDelta <= frames) {
+                step = track->m_shakeRateDelta;
             }
-            ((s16*)track)[REDSOUND_TRACK_SHAKE_RATE_DELTA_HALFWORD] -= (s16)step;
-            trackData[REDSOUND_TRACK_SHAKE_RATE_WORD_OFFSET] +=
-                trackData[REDSOUND_TRACK_SHAKE_RATE_ADD_WORD_OFFSET] * step;
+            track->m_shakeRateDelta -= (s16)step;
+            track->m_shakeRate += track->m_shakeRateAdd * step;
         }
-        if (((s16*)track)[REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD] != 0) {
+        if (track->m_shakeDepthDelta != 0) {
             int step = frames;
-            if (((s16*)track)[REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD] <= frames) {
-                step = ((s16*)track)[REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD];
+            if (track->m_shakeDepthDelta <= frames) {
+                step = track->m_shakeDepthDelta;
             }
-            ((s16*)track)[REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD] -= (s16)step;
-            trackData[REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET] +=
-                trackData[REDSOUND_TRACK_SHAKE_DEPTH_ADD_WORD_OFFSET] * step;
+            track->m_shakeDepthDelta -= (s16)step;
+            track->m_shakeDepth += track->m_shakeDepthAdd * step;
         }
     }
 

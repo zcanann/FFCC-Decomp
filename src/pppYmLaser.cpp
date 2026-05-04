@@ -15,13 +15,13 @@ extern int gPppCalcDisabled;
 
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 
-extern const f32 FLOAT_80330df0;
+extern const f32 FLOAT_80330df0[2];
 extern const f32 FLOAT_80330DC4;
 extern const f32 FLOAT_80330DC8;
-extern f32 FLOAT_80330de0;
-extern f32 FLOAT_80330de4;
-extern f32 FLOAT_80330de8;
-extern f32 FLOAT_80330dec;
+extern const f32 FLOAT_80330de0;
+extern const f32 FLOAT_80330de4;
+extern const f32 FLOAT_80330de8;
+extern const f32 FLOAT_80330dec;
 extern "C" const f64 DOUBLE_80330DD0;
 
 void pppInitBlendMode(void);
@@ -57,6 +57,16 @@ void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
 }
 
 extern "C" const char s_pppYmLaser_cpp_801DB4B0[] = "pppYmLaser.cpp";
+extern const f64 DOUBLE_80330dd8 = 4503601774854144.0;
+extern const f32 FLOAT_80330de0 = -1.0f;
+extern const f32 FLOAT_80330de4 = 1.2f;
+extern const f32 FLOAT_80330de8 = 10000000000.0f;
+extern const f32 FLOAT_80330dec = -10000000000.0f;
+extern const f32 FLOAT_80330df0[2] = {6.2831855f, 0.0f};
+extern const f32 FLOAT_80330df8 = 2.0f;
+extern const f32 FLOAT_80330dfc = 0.5f;
+extern const f32 FLOAT_80330e00 = 0.25f;
+extern const f64 DOUBLE_80330E08 = 4503601774854144.0;
 
 struct CMapCylinderRaw {
 	Vec m_bottom;
@@ -93,11 +103,6 @@ struct pppYmLaserColorData {
 	pppCVECTOR m_color;
 };
 
-union pppYmLaserDoubleBits {
-	double d;
-	u32 u[2];
-};
-
 /*
  * --INFO--
  * PAL Address: 0x800d3780
@@ -110,7 +115,7 @@ union pppYmLaserDoubleBits {
 extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
 	f32 one = kPppYmLaserOne;
-	f32 randArg = FLOAT_80330df0;
+	f32 randArg = FLOAT_80330df0[0];
 	pppYmLaserWork* work = (pppYmLaserWork*)((u8*)laser + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
 
 	work->m_length = one;
@@ -356,7 +361,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	s32 dataValIndex = step->m_dataValIndex;
 	Vec* points;
 	u32 count;
-	u32 i;
+	s32 i;
 	u32 colorBase;
 	u32 color0;
 	u32 color1;
@@ -470,11 +475,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		pppDrawShp__FPlsP12CMaterialSetUc(*shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
 
 		count = (u32)step->m_payload[0x1e];
-		pppYmLaserDoubleBits countDouble;
-
-		countDouble.u[0] = 0x43300000;
-		countDouble.u[1] = count;
-		uvStep = FLOAT_80330DC4 / (float)(countDouble.d - DOUBLE_80330DD0);
+		uvStep = FLOAT_80330DC4 / (float)count;
 		if (step->m_initWOrk == 0xFFFF) {
 			_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
 			_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
@@ -500,7 +501,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 
 			GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
 			GXColor1u32(color0);
-			GXTexCoord2f32(u0, FLOAT_80330de0);
+			GXTexCoord2f32(u0, FLOAT_80330DC4);
 
 			GXPosition3f32(points[i].x, points[i].y, points[i].z);
 			GXColor1u32(color0);

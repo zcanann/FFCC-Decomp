@@ -1131,11 +1131,11 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         iVar5 = ((int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1) *
                 voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] *
                 trackData[REDSOUND_TRACK_FUZZY_PITCH_DEPTH_WORD_OFFSET];
-        local_38[0] = iVar5 >> 0xf;
+        local_38[0] = iVar5 >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
         if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) == 0) {
             voiceData[REDSOUND_VOICE_RANDOM_PITCH_WORD] = local_38[0];
         } else {
-            voiceData[REDSOUND_VOICE_RANDOM_PITCH_WORD] = -(iVar5 >> 0x10);
+            voiceData[REDSOUND_VOICE_RANDOM_PITCH_WORD] = -(iVar5 >> REDSOUND_RANDOM_FUZZY_PITCH_NEGATIVE_SHIFT);
         }
     }
 
@@ -1144,7 +1144,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     } else {
         s8 random = (s8)GetRandomData();
         voiceData[REDSOUND_VOICE_RANDOM_VOLUME_WORD] =
-            (trackData[REDSOUND_TRACK_FUZZY_VOLUME_DEPTH_WORD_OFFSET] * random) >> 8;
+            (trackData[REDSOUND_TRACK_FUZZY_VOLUME_DEPTH_WORD_OFFSET] * random) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
     }
 
     if (((unsigned int)voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_FUZZY_PAN) == 0) {
@@ -1152,7 +1152,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     } else {
         s8 random = (s8)GetRandomData();
         voiceData[REDSOUND_VOICE_RANDOM_PAN_WORD] =
-            (trackData[REDSOUND_TRACK_FUZZY_PAN_DEPTH_WORD_OFFSET] * random) >> 8;
+            (trackData[REDSOUND_TRACK_FUZZY_PAN_DEPTH_WORD_OFFSET] * random) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
     }
 
     if (voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] == 0) {

@@ -1978,13 +1978,12 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         voiceData = (int*)p_VoiceData;
         do {
             if ((RedTrackDATA*)voiceData[REDSOUND_VOICE_TRACK_WORD] == track) {
-                voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] += addPitch;
-                if (voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] != 0) {
-                    voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD] =
-                        PitchCompute(voiceData[REDSOUND_VOICE_BASE_PITCH_WORD] + p_MusicPitchControl->m_value,
+                ((RedVoiceDATA*)voiceData)->m_basePitch += addPitch;
+                if (((RedVoiceDATA*)voiceData)->m_waveData != 0) {
+                    ((RedVoiceDATA*)voiceData)->m_pitch =
+                        PitchCompute(((RedVoiceDATA*)voiceData)->m_basePitch + p_MusicPitchControl->m_value,
                                      (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend,
-                                     ((RedWaveDATA*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])->m_pitch,
-                                     (s8)track->m_fineTune);
+                                     ((RedVoiceDATA*)voiceData)->m_waveData->m_pitch, (s8)track->m_fineTune);
                 }
             }
             voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);

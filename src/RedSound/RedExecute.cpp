@@ -2443,13 +2443,10 @@ void MusicSkipFunction()
  */
 static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 {
-	int* trackData = (int*)track;
-	unsigned char* trackBytes = (unsigned char*)trackData;
 	RedVoiceDATA* voice;
 	int step;
-	short* trackShorts = (short*)trackData;
 
-	if ((trackBytes[REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET] & REDSOUND_NOTE_ALLOC_STREAM) != 0) {
+	if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0) {
 		return;
 	}
 
@@ -2536,9 +2533,8 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	if (((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0) && (voice->m_waveData != 0)) {
 		voice->m_targetPitch =
 			PitchCompute(voice->m_basePitch + track->m_pitch,
-			             (int)trackShorts[REDSOUND_TRACK_KEY_TRANSPOSE_HALFWORD] +
-			                 (int)trackShorts[REDSOUND_TRACK_PITCH_BEND_HALFWORD],
-			             voice->m_waveData->m_pitch, (int)(s8)trackBytes[REDSOUND_TRACK_FINE_TUNE_BYTE]);
+			             (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend,
+			             voice->m_waveData->m_pitch, (int)(s8)track->m_fineTune);
 	}
 
 	if (track->m_vibrateFunc != 0) {

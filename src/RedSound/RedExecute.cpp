@@ -1256,7 +1256,7 @@ static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, in
             (int)_WaveSplitSelect((RedWaveDATA*)track->m_waveData, note);
         _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
 
-        if (((*(u32*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) &&
+        if (((((RedWaveDATA*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD])->m_flags & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) &&
             ((*(s8*)((u8*)track + REDSOUND_TRACK_NOTE_ALLOC_FLAGS_OFFSET) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0)) {
             int wave = voiceData[REDSOUND_VOICE_WAVE_DATA_WORD];
             voiceData[REDSOUND_VOICE_SWITCH_WORD] |= REDSOUND_VOICE_SWITCH_PAIRED_LEFT;

@@ -228,14 +228,16 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	Vec targetPos;
 	Vec basePos;
 	Vec deltaPos;
-	CVector* baseVec;
+	Vec* baseVec;
 
 	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
-	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
+	baseVec = reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition));
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
-	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
+	PSVECSubtract(baseVec, &targetPos, &deltaPos);
 	targetRot = FLOAT_80331BD4;
-	if (((double)FLOAT_80331BD4 != (double)deltaPos.x) && ((double)FLOAT_80331BD4 != (double)deltaPos.z)) {
+	if (((double)targetRot == (double)deltaPos.x) || ((double)targetRot == (double)deltaPos.z)) {
+		targetRot = FLOAT_80331BD4;
+	} else {
 		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
 
@@ -257,14 +259,16 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	Vec targetPos;
 	Vec basePos;
 	Vec deltaPos;
-	CVector* baseVec;
+	Vec* baseVec;
 
 	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
-	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
+	baseVec = reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition));
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
-	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
+	PSVECSubtract(baseVec, &targetPos, &deltaPos);
 	targetRot = FLOAT_80331BD4;
-	if (((double)FLOAT_80331BD4 != (double)deltaPos.x) && ((double)FLOAT_80331BD4 != (double)deltaPos.z)) {
+	if (((double)targetRot == (double)deltaPos.x) || ((double)targetRot == (double)deltaPos.z)) {
+		targetRot = FLOAT_80331BD4;
+	} else {
 		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
 	m_rotTargetY = targetRot;
@@ -285,18 +289,18 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	Vec basePos;
 	Vec targetPos;
 	Vec deltaPos;
-	CVector* baseVec;
+	Vec* baseVec;
 
 	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
-	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
+	baseVec = reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition));
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
-	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
+	PSVECSubtract(baseVec, &targetPos, &deltaPos);
 	targetRot = FLOAT_80331BD4;
-	if (((double)FLOAT_80331BD4 != (double)deltaPos.x) && ((double)FLOAT_80331BD4 != (double)deltaPos.z)) {
-		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+	if (((double)targetRot == (double)deltaPos.x) || ((double)targetRot == (double)deltaPos.z)) {
+		return targetRot;
 	}
 
-	return targetRot;
+	return (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 }
 
 /*

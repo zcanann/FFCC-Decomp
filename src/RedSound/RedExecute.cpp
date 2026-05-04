@@ -803,11 +803,11 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
     voiceMix = volume * ((*(int*)voiceData[REDSOUND_VOICE_TRACK_EXPRESSION_WORD] >> REDSOUND_FIXED_SHIFT) + 1) >>
                REDSOUND_VOLUME_MOD_SCALE_SHIFT;
 
-    if (*(s8*)((int)voiceData + 0x19) != 0) {
-        if (*(s8*)((int)voiceData + 0x19) == 0) {
+    if (voice->m_velocity != 0) {
+        if (voice->m_velocity == 0) {
             envelopeMul = 0;
         } else {
-            envelopeMul = *(s8*)((int)voiceData + 0x19) + 1;
+            envelopeMul = voice->m_velocity + 1;
         }
         voiceMix = voiceMix * envelopeMul >> 7;
     }

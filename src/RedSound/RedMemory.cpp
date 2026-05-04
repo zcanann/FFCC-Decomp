@@ -62,7 +62,8 @@ int RedNew(int size)
 	}
 
 	interrupts = OSDisableInterrupts();
-	size = (size + REDSOUND_MEMORY_BANK_ALIGN_MASK) & ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	size += REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	size &= ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
 	slot = m_MemoryBank;
 	address = m_DataBuffer;
 

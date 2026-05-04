@@ -1238,7 +1238,7 @@ static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, in
     if ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) != 0) {
         voiceData = (int*)p_VoiceData;
         do {
-            if ((u32)*voiceData == (u32)track) {
+            if ((RedTrackDATA*)*voiceData == track) {
                 break;
             }
             voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);

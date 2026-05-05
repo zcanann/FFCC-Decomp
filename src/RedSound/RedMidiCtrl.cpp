@@ -903,19 +903,19 @@ static void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedT
  */
 static void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* reverbDepth = &track->m_reverbDepth;
+    RedControlRamp* reverbDepth = (RedControlRamp*)&track->m_reverbDepth;
 
-    *reverbDepth = *(s8*)track->m_command++;
+    reverbDepth->m_value = *(s8*)track->m_command++;
 
-    if (*reverbDepth != 0) {
-        *reverbDepth += 1;
-        *reverbDepth <<= 8;
-        *reverbDepth -= 1;
-        *reverbDepth <<= REDSOUND_FIXED_SHIFT;
+    if (reverbDepth->m_value != 0) {
+        reverbDepth->m_value += 1;
+        reverbDepth->m_value <<= 8;
+        reverbDepth->m_value -= 1;
+        reverbDepth->m_value <<= REDSOUND_FIXED_SHIFT;
     }
 
-    reverbDepth[1] = 0;
-    reverbDepth[2] = 0;
+    reverbDepth->m_step = 0;
+    reverbDepth->m_count = 0;
     SetVoiceAccess(track, 8);
 }
 
@@ -931,7 +931,7 @@ static void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 static void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int targetDepth;
-    int* reverbDepth = &track->m_reverbDepth;
+    RedControlRamp* reverbDepth = (RedControlRamp*)&track->m_reverbDepth;
     unsigned int stepCount;
 
     stepCount = (*track->m_command != 0) ? *track->m_command : REDSOUND_MIDI_DEFAULT_STEP_COUNT;
@@ -943,8 +943,8 @@ static void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
         targetDepth -= 1;
     }
 
-    reverbDepth[1] = DataAddCompute(reverbDepth, (s8)targetDepth, (int*)&stepCount);
-    reverbDepth[2] = stepCount;
+    reverbDepth->m_step = DataAddCompute(&reverbDepth->m_value, (s8)targetDepth, (int*)&stepCount);
+    reverbDepth->m_count = stepCount;
     track->m_command += 2;
 }
 

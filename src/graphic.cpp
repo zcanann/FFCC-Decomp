@@ -1466,30 +1466,28 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
     GXPixModeSync();
     GXInvalidateTexAll();
 
-    int initFormat = format;
     switch (format) {
     case GX_CTF_R4:
     case GX_CTF_RA4:
-        initFormat = 0;
+        format = GX_TF_I4;
         break;
     case GX_CTF_RA8:
     case GX_CTF_A8:
     case GX_CTF_R8:
     case GX_CTF_G8:
     case GX_CTF_B8:
-        initFormat = 1;
+        format = GX_TF_I8;
         break;
     case GX_CTF_RG8:
     case GX_CTF_GB8:
-        initFormat = 3;
+        format = GX_TF_IA8;
         break;
     default:
         break;
     }
 
     if (texObj != nullptr) {
-        GXInitTexObj(texObj, textureBase, width & 0xFFFF, height & 0xFFFF, static_cast<_GXTexFmt>(initFormat), GX_CLAMP,
-                     GX_CLAMP, GX_FALSE);
+        GXInitTexObj(texObj, textureBase, width & 0xFFFF, height & 0xFFFF, format, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(texObj, filter, filter, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE,
                         GX_ANISO_1);
     }

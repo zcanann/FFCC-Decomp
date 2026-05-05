@@ -31,7 +31,7 @@ public:
 	CRedMemory();
 	~CRedMemory();
 
-	void Init(int, int, int, int);
+	void Init(int mainBuffer, int mainBufferSize, int auxBuffer, int auxBufferSize);
 	int GetMainBufferAddress();
 	int GetMainBufferSize();
 	RedMemoryBlock* GetMainBankAddress();

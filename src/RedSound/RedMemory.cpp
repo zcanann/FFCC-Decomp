@@ -306,20 +306,20 @@ void RedDeleteA(void* address)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedMemory::Init(int param1, int param2, int param3, int param4)
+void CRedMemory::Init(int mainBuffer, int mainBufferSize, int auxBuffer, int auxBufferSize)
 {
 	int bankSize = REDSOUND_MEMORY_BANK_SIZE;
 	bankSize += REDSOUND_MEMORY_BANK_ALIGN_MASK;
 	bankSize &= ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
 
-	m_MemoryBank = (RedMemoryBlock*)param1;
+	m_MemoryBank = (RedMemoryBlock*)mainBuffer;
 	m_AMemoryBank = (RedMemoryBlock*)((int)m_MemoryBank + bankSize);
-	m_DataBufferSize = param2 - bankSize * REDSOUND_MEMORY_BANK_TABLE_COUNT;
+	m_DataBufferSize = mainBufferSize - bankSize * REDSOUND_MEMORY_BANK_TABLE_COUNT;
 	m_DataBuffer = (int)m_AMemoryBank + bankSize;
 	memset(m_MemoryBank, 0, bankSize);
 	memset(m_AMemoryBank, 0, bankSize);
-	m_ADataBuffer = param3;
-	m_ADataBufferSize = param4;
+	m_ADataBuffer = auxBuffer;
+	m_ADataBufferSize = auxBufferSize;
 }
 
 /*

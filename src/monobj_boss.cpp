@@ -1,6 +1,7 @@
 #include "ffcc/monobj_boss.h"
 #include "ffcc/prgobj.h"
 #include "ffcc/charaobj.h"
+#include "ffcc/partyobj.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/game.h"
@@ -10,6 +11,7 @@
 #include <string.h>
 
 extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
+extern "C" float RandFPM__5CMathFf(float, CMath*);
 extern "C" void setAttackAfter__8CGMonObjFi(CGMonObj*, int);
 extern "C" void setActionParam__8CGMonObjFi(CGMonObj*, int);
 extern "C" void logicFuncDefault__8CGMonObjFv(CGMonObj*);
@@ -1703,13 +1705,14 @@ void CGMonObj::damagedFuncGigasLoad()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::tgtFuncGigasLoad(int)
+int CGMonObj::tgtFuncGigasLoad(int)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	aiTargetAttackRomMon__8CGMonObjFi(this, 0x3B);
 	if (*reinterpret_cast<int*>(mon + 0x6C4) < 0) {
 		aiTarget__8CGMonObjFv(this);
 	}
+	return *reinterpret_cast<int*>(mon + 0x6C4);
 }
 
 /*
@@ -1871,63 +1874,27 @@ void CGMonObj::cancelStatFuncMolbol()
  */
 void CGMonObj::frameStatFuncMolbol()
 {
-	#if 0
-	// Function: frameStatFuncMolbol__8CGMonObjFv
-	// Entry: 80130898
-	// Size: 336 bytes
-	
-	/* WARNING: Type propagation algorithm not settling */
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void frameStatFuncMolbol__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  uint uVar2;
-	  double dVar3;
-	  CVector local_28;
-	  undefined4 local_18;
-	  uint uStack_14;
-	  undefined4 local_10;
-	  uint uStack_c;
-	  
-	  iVar1 = *(int *)&gMonObj->field_0x520;
-	  if (iVar1 == 0x65) {
-	    iVar1 = *(int *)&gMonObj->field_0x528;
-	    if (((iVar1 == 0) || (iVar1 == 5)) || (iVar1 == 10)) {
-	      __ct__7CVectorFRC3Vec
-	                (&local_28,
-	                 &(Game.m_partyObjArr[*(int *)&gMonObj->field_0x6c4]->gCharaObj).gPrgObj.object
-	                  .m_worldPosition);
-	      local_18 = 0x43300000;
-	      uVar2 = countLeadingZeros(*(undefined4 *)&gMonObj->field_0x528);
-	      uStack_14 = ~-(uVar2 >> 5 & 1) & 0x28 ^ 0x80000000;
-	      dVar3 = (double)RandFPM__5CMathFf((double)(float)((double)CONCAT44(0x43300000,uStack_14) -
-	                                                       DOUBLE_80331d38),&Math);
-	      local_10 = 0x43300000;
-	      local_28.x = (float)((double)local_28.x + dVar3);
-	      uVar2 = countLeadingZeros(*(undefined4 *)&gMonObj->field_0x528);
-	      uStack_c = ~-(uVar2 >> 5 & 1) & 0x28 ^ 0x80000000;
-	      dVar3 = (double)RandFPM__5CMathFf((double)(float)((double)CONCAT44(0x43300000,uStack_c) -
-	                                                       DOUBLE_80331d38),&Math);
-	      local_28.z = (float)((double)local_28.z + dVar3);
-	      putParticleFromItem__10CGCharaObjFiiiP3Vec
-	                (gMonObj,*(undefined4 *)&gMonObj->field_0x560,3,*(undefined4 *)&gMonObj->field_0x564
-	                 ,&local_28);
-	    }
-	    _statAttack__10CGCharaObjFv((CGCharaObj *)gMonObj);
-	  }
-	  else if ((iVar1 < 0x65) && (99 < iVar1)) {
-	    suikomi__8CGMonObjFif((double)FLOAT_80331cf8,gMonObj,0x53);
-	  }
-	  return;
-	}
-	
-	#endif
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId >= 100) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
+	u8* self = reinterpret_cast<u8*>(this);
+	int state = prgObj->m_lastStateId;
+
+	if (state != 0x65) {
+		if (state < 0x65) {
+			if (state > 99) {
+				suikomi(0x53, FLOAT_80331cf8);
+			}
+		}
+		return;
 	}
+
+	if (prgObj->m_stateFrame == 0 || prgObj->m_stateFrame == 5 || prgObj->m_stateFrame == 10) {
+		CVector pos(Game.m_partyObjArr[*reinterpret_cast<int*>(self + 0x6C4)]->m_worldPosition);
+		pos.x += RandFPM__5CMathFf(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40), &Math);
+		pos.z += RandFPM__5CMathFf(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40), &Math);
+		charaObj->putParticleFromItem(charaObj->m_itemId, 3, charaObj->m_particleSlots[0], reinterpret_cast<Vec*>(&pos));
+	}
+	charaObj->statAttack();
 }
 
 /*

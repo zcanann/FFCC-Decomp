@@ -479,7 +479,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
     CMaterial* material = (*materials)[materialIndex];
 
     unsigned char fogEnable = *Ptr(material, 0xA1);
-    if ((*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Game) + 0xC7F0) == 3) && (*Ptr(&MapMng, 0x141704) == 0)) {
+    if ((*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Game) + 0xC7F0) == 3) && (*Ptr(&MapMng, 0x22988) == 0)) {
         fogEnable = 0;
     }
 
@@ -500,15 +500,6 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
     m_fogEnable = fogEnable;
 
     switch (m_blendMode) {
-    case 3:
-        _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-            0, 3, 3, 3, 3);
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 4, 1, 5);
-        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
-        GXSetZCompLoc(1);
-        Graphic.SetFog(m_fogEnable, 1);
-        return;
-
     case 0:
         _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
             0, 0, 1, 2, 3);
@@ -531,6 +522,15 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
             0, 0, 1, 2, 3);
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 1, 5);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+        GXSetZCompLoc(1);
+        Graphic.SetFog(m_fogEnable, 1);
+        return;
+
+    case 3:
+        _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+            0, 3, 3, 3, 3);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 4, 1, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
         GXSetZCompLoc(1);
         Graphic.SetFog(m_fogEnable, 1);

@@ -1214,7 +1214,7 @@ void CChara::CModel::InitMogFurTex()
 
 		texture->InitTexObj();
 		unsigned char flags = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0xA0);
-		*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0xA0) = flags | 0x40;
+		*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0xA0) = (flags & 0xBF) | 0x40;
 	}
 }
 

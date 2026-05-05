@@ -456,7 +456,10 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
     GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
 
-    *reinterpret_cast<u32*>(&white) = 0xFFFFFFFF;
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
     GXSetChanAmbColor(GX_COLOR0A0, white);
     GXSetChanMatColor(GX_COLOR0A0, white);
     _GXSetBlendMode(GX_BM_BLEND, srcBlend, dstBlend, GX_LO_NOOP);
@@ -471,66 +474,97 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
 
     x2 = x + width;
     y2 = y + height;
+    float pos0[3] = {x, y, kUtilZero};
+    float pos1[3] = {x2, y2, kUtilZero};
 
-    if (color == 0) {
-        float u1 = kUtilZero;
-        float v1 = kUtilZero;
-        float u2 = kUtilOne;
-        float v2 = kUtilOne;
-
-        if (uv1 != 0 && uv2 != 0) {
-            u1 = uv1->x;
-            v1 = uv1->y;
-            u2 = uv2->x;
-            v2 = uv2->y;
-        }
-
-        GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-        GXPosition3f32(x, y, kUtilZero);
-        GXColor1u32(0xFFFFFFFF);
-        GXTexCoord2f32(u1, v1);
-
-        GXPosition3f32(x2, y, kUtilZero);
-        GXColor1u32(0xFFFFFFFF);
-        GXTexCoord2f32(u2, v1);
-
-        GXPosition3f32(x2, y2, kUtilZero);
-        GXColor1u32(0xFFFFFFFF);
-        GXTexCoord2f32(u2, v2);
-
-        GXPosition3f32(x, y2, kUtilZero);
-        GXColor1u32(0xFFFFFFFF);
-        GXTexCoord2f32(u1, v2);
-    } else {
-        float u1 = kUtilZero;
-        float v1 = kUtilZero;
-        float u2 = kUtilOne;
-        float v2 = kUtilOne;
+    if (color != 0) {
         u32 colorValue = *reinterpret_cast<u32*>(color);
+        float v0[3] = {pos1[0], pos1[1], pos1[2]};
+        float v1[3] = {pos0[0], pos0[1], pos0[2]};
+        float u1 = kUtilZero;
+        float v = kUtilZero;
+        float u2 = kUtilOne;
+        float v2 = kUtilOne;
 
         if (uv1 != 0 && uv2 != 0) {
             u1 = uv1->x;
-            v1 = uv1->y;
+            v = uv1->y;
             u2 = uv2->x;
             v2 = uv2->y;
         }
 
         GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-        GXPosition3f32(x, y, kUtilZero);
-        GXColor1u32(colorValue);
-        GXTexCoord2f32(u1, v1);
+        GXWGFifo.f32 = v1[0];
+        GXWGFifo.f32 = v1[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u1;
+        GXWGFifo.f32 = v;
 
-        GXPosition3f32(x2, y, kUtilZero);
-        GXColor1u32(colorValue);
-        GXTexCoord2f32(u2, v1);
+        GXWGFifo.f32 = v0[0];
+        GXWGFifo.f32 = v1[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u2;
+        GXWGFifo.f32 = v;
 
-        GXPosition3f32(x2, y2, kUtilZero);
-        GXColor1u32(colorValue);
-        GXTexCoord2f32(u2, v2);
+        GXWGFifo.f32 = v0[0];
+        GXWGFifo.f32 = v0[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u2;
+        GXWGFifo.f32 = v2;
 
-        GXPosition3f32(x, y2, kUtilZero);
-        GXColor1u32(colorValue);
-        GXTexCoord2f32(u1, v2);
+        GXWGFifo.f32 = v1[0];
+        GXWGFifo.f32 = v0[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u1;
+        GXWGFifo.f32 = v2;
+    } else {
+        u32 colorValue = *reinterpret_cast<u32*>(&white);
+        float v0[3] = {pos1[0], pos1[1], pos1[2]};
+        float v1[3] = {pos0[0], pos0[1], pos0[2]};
+        float u1 = kUtilZero;
+        float v = kUtilZero;
+        float u2 = kUtilOne;
+        float v2 = kUtilOne;
+
+        if (uv1 != 0 && uv2 != 0) {
+            u1 = uv1->x;
+            v = uv1->y;
+            u2 = uv2->x;
+            v2 = uv2->y;
+        }
+
+        GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+        GXWGFifo.f32 = v1[0];
+        GXWGFifo.f32 = v1[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u1;
+        GXWGFifo.f32 = v;
+
+        GXWGFifo.f32 = v0[0];
+        GXWGFifo.f32 = v1[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u2;
+        GXWGFifo.f32 = v;
+
+        GXWGFifo.f32 = v0[0];
+        GXWGFifo.f32 = v0[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u2;
+        GXWGFifo.f32 = v2;
+
+        GXWGFifo.f32 = v1[0];
+        GXWGFifo.f32 = v0[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u1;
+        GXWGFifo.f32 = v2;
     }
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);
@@ -601,7 +635,10 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
     GXLoadTexObj(texObj, GX_TEXMAP0);
 
-    *reinterpret_cast<u32*>(&white) = 0xFFFFFFFF;
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
     GXSetChanAmbColor(GX_COLOR0A0, white);
     GXSetChanMatColor(GX_COLOR0A0, white);
     _GXSetBlendMode(GX_BM_BLEND, srcBlend, dstBlend, GX_LO_NOOP);
@@ -613,66 +650,97 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
 
     x2 = x + width;
     y2 = y + height;
+    float pos0[3] = {x, y, kUtilZero};
+    float pos1[3] = {x2, y2, kUtilZero};
 
-    if (color == 0) {
-        float u1 = kUtilZero;
-        float v1 = kUtilZero;
-        float u2 = kUtilOne;
-        float v2 = kUtilOne;
-
-        if (uv1 != 0 && uv2 != 0) {
-            u1 = uv1->x;
-            v1 = uv1->y;
-            u2 = uv2->x;
-            v2 = uv2->y;
-        }
-
-        GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-        GXPosition3f32(x, y, kUtilZero);
-        GXColor1u32(0xFFFFFFFF);
-        GXTexCoord2f32(u1, v1);
-
-        GXPosition3f32(x2, y, kUtilZero);
-        GXColor1u32(0xFFFFFFFF);
-        GXTexCoord2f32(u2, v1);
-
-        GXPosition3f32(x2, y2, kUtilZero);
-        GXColor1u32(0xFFFFFFFF);
-        GXTexCoord2f32(u2, v2);
-
-        GXPosition3f32(x, y2, kUtilZero);
-        GXColor1u32(0xFFFFFFFF);
-        GXTexCoord2f32(u1, v2);
-    } else {
-        float u1 = kUtilZero;
-        float v1 = kUtilZero;
-        float u2 = kUtilOne;
-        float v2 = kUtilOne;
+    if (color != 0) {
         u32 colorValue = *reinterpret_cast<u32*>(color);
+        float v0[3] = {pos1[0], pos1[1], pos1[2]};
+        float v1[3] = {pos0[0], pos0[1], pos0[2]};
+        float u1 = kUtilZero;
+        float v = kUtilZero;
+        float u2 = kUtilOne;
+        float v2 = kUtilOne;
 
         if (uv1 != 0 && uv2 != 0) {
             u1 = uv1->x;
-            v1 = uv1->y;
+            v = uv1->y;
             u2 = uv2->x;
             v2 = uv2->y;
         }
 
         GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-        GXPosition3f32(x, y, kUtilZero);
-        GXColor1u32(colorValue);
-        GXTexCoord2f32(u1, v1);
+        GXWGFifo.f32 = v1[0];
+        GXWGFifo.f32 = v1[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u1;
+        GXWGFifo.f32 = v;
 
-        GXPosition3f32(x2, y, kUtilZero);
-        GXColor1u32(colorValue);
-        GXTexCoord2f32(u2, v1);
+        GXWGFifo.f32 = v0[0];
+        GXWGFifo.f32 = v1[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u2;
+        GXWGFifo.f32 = v;
 
-        GXPosition3f32(x2, y2, kUtilZero);
-        GXColor1u32(colorValue);
-        GXTexCoord2f32(u2, v2);
+        GXWGFifo.f32 = v0[0];
+        GXWGFifo.f32 = v0[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u2;
+        GXWGFifo.f32 = v2;
 
-        GXPosition3f32(x, y2, kUtilZero);
-        GXColor1u32(colorValue);
-        GXTexCoord2f32(u1, v2);
+        GXWGFifo.f32 = v1[0];
+        GXWGFifo.f32 = v0[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u1;
+        GXWGFifo.f32 = v2;
+    } else {
+        u32 colorValue = *reinterpret_cast<u32*>(&white);
+        float v0[3] = {pos1[0], pos1[1], pos1[2]};
+        float v1[3] = {pos0[0], pos0[1], pos0[2]};
+        float u1 = kUtilZero;
+        float v = kUtilZero;
+        float u2 = kUtilOne;
+        float v2 = kUtilOne;
+
+        if (uv1 != 0 && uv2 != 0) {
+            u1 = uv1->x;
+            v = uv1->y;
+            u2 = uv2->x;
+            v2 = uv2->y;
+        }
+
+        GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+        GXWGFifo.f32 = v1[0];
+        GXWGFifo.f32 = v1[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u1;
+        GXWGFifo.f32 = v;
+
+        GXWGFifo.f32 = v0[0];
+        GXWGFifo.f32 = v1[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u2;
+        GXWGFifo.f32 = v;
+
+        GXWGFifo.f32 = v0[0];
+        GXWGFifo.f32 = v0[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u2;
+        GXWGFifo.f32 = v2;
+
+        GXWGFifo.f32 = v1[0];
+        GXWGFifo.f32 = v0[1];
+        GXWGFifo.f32 = v1[2];
+        GXWGFifo.u32 = colorValue;
+        GXWGFifo.f32 = u1;
+        GXWGFifo.f32 = v2;
     }
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);

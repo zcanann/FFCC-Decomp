@@ -855,7 +855,7 @@ void CSound::Frame()
                         seNo = -1;
                     } else if (seNo < 4000) {
                         int bank = seNo / 1000;
-                        seNo = SePlay__9CRedSoundFiiiii(redSound, bank, seNo - (bank * 1000), pan, 0, 0);
+                        seNo = SePlay__9CRedSoundFiiiii(redSound, bank, seNo % 1000, pan, 0, 0);
                         SeVolume__9CRedSoundFiii(redSound, seNo, vol, 0x1E);
                     } else {
                         seNo = SePlay__9CRedSoundFiiiii(redSound, -1, seNo, pan, 0, 0);
@@ -1748,7 +1748,7 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
             slot = -1;
         } else if (soundId < 4000) {
             int bank = soundId / 1000;
-            slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), bank, soundId - bank * 1000, panValue,
+            slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), bank, soundId % 1000, panValue,
                                             volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
                 SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(soundObj + 8), slot, volumeValue, fadeFrames);
@@ -1821,7 +1821,7 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
             slot = -1;
         } else if (soundId < 4000) {
             int bank = soundId / 1000;
-            slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), bank, soundId - bank * 1000,
+            slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), bank, soundId % 1000,
                                             pan, volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
                 SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(soundObj + 8), slot, volume, fadeFrames);
@@ -1963,31 +1963,30 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
  */
 void CSound::StopSe3DGroup(int group)
 {
-    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+    char* se = reinterpret_cast<char*>(this) + 0x2C;
     u32 i = 0;
 
     while (i < 0x80) {
-        if (((*se & 0x80) != 0) && (-1 < *reinterpret_cast<int*>(se + 0x24)) &&
+        if ((*se < 0) && (*reinterpret_cast<int*>(se + 0x24) >= 0) &&
             (*reinterpret_cast<int*>(se + 0x24) == group)) {
             int se3dHandle = *reinterpret_cast<int*>(se + 4);
             if (se3dHandle < 0) {
                 Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
             } else {
-                u8* search = reinterpret_cast<u8*>(this) + 0x2C;
+                char* search = reinterpret_cast<char*>(this) + 0x2C;
                 int count = 0x20;
-                u8* found;
+                char* found;
                 do {
-                    if ((((search[0] & 0x80) != 0 &&
-                          (found = search, *reinterpret_cast<int*>(search + 4) == se3dHandle)) ||
-                         ((*(search += 0x28) & 0x80) != 0 &&
-                          (found = search, *reinterpret_cast<int*>(search + 4) == se3dHandle)) ||
-                         ((*(search += 0x28) & 0x80) != 0 &&
-                          (found = search, *reinterpret_cast<int*>(search + 4) == se3dHandle)) ||
-                         ((*(search += 0x28) & 0x80) != 0 &&
-                          (found = search, *reinterpret_cast<int*>(search + 4) == se3dHandle)))) {
+                    if ((((*search < 0) && (found = search, *reinterpret_cast<int*>(search + 4) == se3dHandle)) ||
+                         ((found = search + 0x28, *found < 0) &&
+                          (*reinterpret_cast<int*>(search + 0x2C) == se3dHandle)) ||
+                         ((found = search + 0x50, *found < 0) &&
+                          (*reinterpret_cast<int*>(search + 0x54) == se3dHandle)) ||
+                         ((search[0x78] < 0) &&
+                          (found = search + 0x78, *reinterpret_cast<int*>(search + 0x7C) == se3dHandle)))) {
                         goto found_se;
                     }
-                    search += 0x28;
+                    search += 0xA0;
                     count--;
                 } while (count != 0);
                 found = 0;

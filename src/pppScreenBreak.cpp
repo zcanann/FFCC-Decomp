@@ -432,9 +432,8 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     const float dVar22 = FLOAT_80331cc4;
     const float dVar24 = FLOAT_80331cc0;
     const float dVar25 = FLOAT_80331cd8;
-    S16Vec local_e8;
-    S16Vec local_e0;
-    S16Vec local_d8;
+    S16Vec meshCenter;
+    S16Vec globalMax;
     u32 uStack_b4;
     s16 sVar8;
     s16 sVar10;
@@ -444,9 +443,9 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     memset(*(void**)((u8*)work + 0xC), 0, *(s32*)(modelData + 0xC) * 0x3C);
     iVar16 = *(s32*)((u8*)model + 0xAC);
     inVec = *(Vec**)((u8*)work + 0xC);
-    local_e8.x = -0x7FFF;
-    local_e8.y = -0x7FFF;
-    local_e8.z = -0x7FFF;
+    globalMax.x = -0x7FFF;
+    globalMax.y = -0x7FFF;
+    globalMax.z = -0x7FFF;
 
     for (uVar15 = 0; uVar15 < *(u32*)(modelData + 0xC); uVar15++) {
         iVar14 = *(s32*)(iVar16 + 8);
@@ -456,28 +455,28 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 
         iVar5 = *(s32*)(iVar14 + 0x14);
         iVar6 = 0;
-        local_d8.x = -0x7FFF;
-        local_d8.y = -0x7FFF;
-        local_d8.z = -0x7FFF;
+        s16 meshMaxX = -0x7FFF;
+        s16 meshMaxY = -0x7FFF;
+        s16 meshMaxZ = -0x7FFF;
         sVar2 = 0x7FFF;
         sVar3 = 0x7FFF;
-        local_e0.z = 0x7FFF;
+        s16 minZ = 0x7FFF;
         sVar12 = 0x7FFF;
         sVar9 = 0x7FFF;
         sVar4 = 0x7FFF;
 
         for (; iVar5 != 0; iVar5--) {
             s16 sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
-            if (local_e8.x < sVar1) {
-                local_e8.x = sVar1;
+            if (globalMax.x < sVar1) {
+                globalMax.x = sVar1;
             }
             sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 2);
-            if (local_e8.y < sVar1) {
-                local_e8.y = sVar1;
+            if (globalMax.y < sVar1) {
+                globalMax.y = sVar1;
             }
             sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 4);
-            if (local_e8.z < sVar1) {
-                local_e8.z = sVar1;
+            if (globalMax.z < sVar1) {
+                globalMax.z = sVar1;
             }
 
             psVar11 = (s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
@@ -499,38 +498,35 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
             sVar9 = psVar11[2];
             sVar10 = sVar9;
             if (sVar4 < sVar9) {
-                sVar9 = local_e0.z;
+                sVar9 = minZ;
                 sVar10 = sVar4;
             }
 
-            if (local_d8.x < sVar1) {
-                local_d8.x = sVar1;
+            if (meshMaxX < sVar1) {
+                meshMaxX = sVar1;
             }
             sVar2 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 2);
-            if (local_d8.y < sVar2) {
-                local_d8.y = sVar2;
+            if (meshMaxY < sVar2) {
+                meshMaxY = sVar2;
             }
             sVar2 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 4);
-            if (local_d8.z < sVar2) {
-                local_d8.z = sVar2;
+            if (meshMaxZ < sVar2) {
+                meshMaxZ = sVar2;
             }
 
             iVar6 += 6;
             sVar2 = sVar7;
             sVar3 = sVar12;
-            local_e0.z = sVar9;
+            minZ = sVar9;
             sVar12 = sVar8;
             sVar9 = sVar13;
             sVar4 = sVar10;
         }
 
-        local_e0.z = local_d8.z + local_e0.z;
-        local_d8.x = local_d8.x + sVar2;
-        local_d8.y = local_d8.y + sVar3;
-        local_e0.x = local_d8.x;
-        local_e0.y = local_d8.y;
-        local_d8.z = local_e0.z;
-        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, local_e0, *(u32*)(modelData + 0x34));
+        meshCenter.x = meshMaxX + sVar2;
+        meshCenter.y = meshMaxY + sVar3;
+        meshCenter.z = meshMaxZ + minZ;
+        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, meshCenter, *(u32*)(modelData + 0x34));
         PSVECScale(inVec + 3, inVec + 3, FLOAT_80331ccc);
 
         dVar17 = inVec[3].x;
@@ -545,7 +541,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec->y = dVar20;
         inVec->z = dVar21;
         PSVECNormalize(inVec, inVec);
-        PSVECCrossProduct(inVec, const_cast<Vec*>(&DAT_801dd4bc), inVec + 2);
+        PSVECCrossProduct(inVec, &DAT_801dd4bc, inVec + 2);
 
         dVar17 = Math.RandF(*(float*)((u8*)step + 0x3C));
         PSVECScale(inVec, inVec, *(float*)((u8*)step + 0x38) + dVar17);
@@ -563,7 +559,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec += 5;
     }
 
-    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, (Vec*)((u8*)work + 0x18), local_e8, *(u32*)(modelData + 0x34));
+    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, (Vec*)((u8*)work + 0x18), globalMax, *(u32*)(modelData + 0x34));
 }
 
 /*

@@ -704,19 +704,21 @@ void CLightPcs::SetDiffuseColor(unsigned long idx, _GXColor color)
  */
 void CLightPcs::EnableLight(int param_1, int param_2)
 {
+    int enabled = param_1;
+    int colorSrcParam = param_2;
     unsigned int light_mask;
 
-    if (param_1 == 0) {
-        light_mask = 0;
-    } else {
+    if (enabled != 0) {
         light_mask = m_loadedLightMask;
+    } else {
+        light_mask = 0;
     }
 
-    GXSetChanCtrl((GXChannelID)0, (u8)(((unsigned int)(-param_1 | param_1)) >> 0x1f), (GXColorSrc)0,
-                  (GXColorSrc)(__cntlzw((unsigned int)param_2) >> 5), light_mask, (GXDiffuseFn)2,
+    GXSetChanCtrl((GXChannelID)0, (u8)(((unsigned int)(-enabled | enabled)) >> 0x1f), (GXColorSrc)0,
+                  (GXColorSrc)(__cntlzw((unsigned int)colorSrcParam) >> 5), light_mask, (GXDiffuseFn)2,
                   (GXAttnFn)1);
-    GXSetChanCtrl((GXChannelID)2, (u8)(((unsigned int)(-param_1 | param_1)) >> 0x1f), (GXColorSrc)0,
-                  (GXColorSrc)(__cntlzw((unsigned int)param_2) >> 5), 0, (GXDiffuseFn)0,
+    GXSetChanCtrl((GXChannelID)2, (u8)(((unsigned int)(-enabled | enabled)) >> 0x1f), (GXColorSrc)0,
+                  (GXColorSrc)(__cntlzw((unsigned int)colorSrcParam) >> 5), 0, (GXDiffuseFn)0,
                   (GXAttnFn)2);
 }
 

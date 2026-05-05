@@ -447,15 +447,18 @@ void CCaravanWork::SetBonusCondition(int bonusCondition)
 int CCaravanWork::IsOutOfShouki()
 {
 	unsigned char result = 0;
+	void* ownerObj = m_ownerObj;
 
-	if (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x5BC) >
+	if (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(ownerObj) + 0x5BC) >
 		FLOAT_803309a8 * Game.unkFloat_0xca10) {
 		if (m_hp != 0) {
-			if ((((int)((unsigned int)(unsigned char)CFlat[4836] << 24) < 0) ||
-				 ((int)(((unsigned int)(unsigned char)CFlat[4836] << 27) |
-					   ((unsigned int)(unsigned char)CFlat[4836] >> 5)) < 0)) &&
-				((int)((unsigned int) * (unsigned char*)(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x9B)
-					  << 24) < 0)) {
+			unsigned char cflatFlag = CFlat[4836];
+			if (((char)(((int)(((unsigned int)cflatFlag << 24) & 0xC0000000)) >> 31) != 0 ||
+				 (char)(((int)(((unsigned int)cflatFlag << 27) & 0xC0000000)) >> 31) != 0) &&
+				(char)(((int)((((unsigned int) * (unsigned char*)(reinterpret_cast<unsigned char*>(ownerObj) + 0x9B))
+							   << 24) &
+							  0xC0000000)) >>
+					   31) != 0) {
 				result = 1;
 			}
 		}

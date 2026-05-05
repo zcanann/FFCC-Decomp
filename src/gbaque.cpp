@@ -4693,9 +4693,19 @@ static inline OSSemaphore* AccessSemaphoreAt(GbaQueue* self, unsigned int channe
 }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x800C9838
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 unsigned int GbaQueue::GetChgHitFlg(int channel)
 {
-	int singleMode = m_singleMode;
+	signed char singleModeByte = m_singleMode;
+	int singleMode = singleModeByte;
 	unsigned int actualChannel = static_cast<unsigned int>(channel) &
 	                             ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;
@@ -4784,12 +4794,17 @@ void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C95BC
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int GbaQueue::GetHitEInfo(int channel)
 {
-	int singleMode = m_singleMode;
+	signed char singleModeByte = m_singleMode;
+	int singleMode = singleModeByte;
 	unsigned int actualChannel = static_cast<unsigned int>(channel) &
 	                             ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;

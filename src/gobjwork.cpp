@@ -948,16 +948,20 @@ int CCaravanWork::FindItem(int itemId)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1d0c
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::DeleteItemIdx(int itemSlot, int updateJoybus)
 {
-	if (m_inventoryItems[itemSlot] != 0xFFFF) {
+	if ((short)m_inventoryItems[itemSlot] != -1) {
 		m_inventoryItems[itemSlot] = 0xFFFF;
 		m_inventoryItemCount = m_inventoryItemCount - 1;
 		if (updateJoybus != 0) {
-			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (char)itemSlot);
+			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (unsigned char)itemSlot);
 		}
 	}
 }
@@ -2035,31 +2039,30 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 		if (slotRef[0] == 0) {
 			groupedCountLocal = 1;
 		} else {
-			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
+			int scanCount = cmdListIdx + 1;
 			if (cmdListIdx >= 0) {
-				do {
+				for (; scanCount != 0; scanCount--) {
 					if (slotRef[0] != -1) {
 						break;
 					}
 					slotRef--;
 					topIdx--;
-					scanCount--;
-				} while (scanCount != 0);
+				}
 			}
 
 			groupedCountLocal = 1;
-			scanCount = static_cast<short>(m_numCmdListSlots) - (topIdx + 1);
-			slotRef = m_commandListExtra + topIdx + 1;
-			if ((topIdx + 1) < static_cast<short>(m_numCmdListSlots)) {
-				do {
+			int nextIdx = topIdx + 1;
+			slotRef = m_commandListExtra + nextIdx;
+			scanCount = static_cast<short>(m_numCmdListSlots) - nextIdx;
+			if (nextIdx < static_cast<short>(m_numCmdListSlots)) {
+				for (; scanCount != 0; scanCount--) {
 					if (slotRef[0] != -1) {
 						break;
 					}
 					groupedCountLocal++;
 					slotRef++;
-					scanCount--;
-				} while (scanCount != 0);
+				}
 			}
 		}
 	}
@@ -2067,22 +2070,21 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 	if (groupedCountLocal == 1) {
 		return (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
 	} else {
-		int scanCount = cmdListIdx + 1;
 		short* slotRef = m_commandListExtra + cmdListIdx;
+		int scanCount = cmdListIdx + 1;
 		if (cmdListIdx >= 0) {
-			do {
+			for (; scanCount != 0; scanCount--) {
 				if (slotRef[0] != -1) {
 					break;
 				}
 				slotRef--;
 				cmdListIdx--;
-				scanCount--;
-			} while (scanCount != 0);
+			}
 		}
 
 		unsigned int selected = 0;
-		if ((cmdListIdx <= static_cast<short>(m_currentCmdListIndex)) &&
-			(static_cast<short>(m_currentCmdListIndex) <= (cmdListIdx + groupedCountLocal - 1))) {
+		short currentCmdListIndex = m_currentCmdListIndex;
+		if ((currentCmdListIndex >= cmdListIdx) && (currentCmdListIndex <= (cmdListIdx + groupedCountLocal - 1))) {
 			selected = 1;
 		}
 		return selected & 0xFF;

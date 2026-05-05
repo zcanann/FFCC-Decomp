@@ -1764,12 +1764,13 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                 entry.m_cacheData = entry.m_workData;
                 data = reinterpret_cast<int>(entry.m_cacheData);
             } else {
-                if (source == 0) {
-                    source = DAT_8032f7d4;
+                char* allocSource = source;
+                if (allocSource == 0) {
+                    allocSource = DAT_8032f7d4;
                 }
 
                 data = reinterpret_cast<int>(
-                    m_rStage->alloc(static_cast<unsigned long>(entry.m_size), source, static_cast<unsigned long>(line), 1));
+                    m_rStage->alloc(static_cast<unsigned long>(entry.m_size), allocSource, static_cast<unsigned long>(line), 1));
                 entry.m_cacheData = reinterpret_cast<void*>(data);
                 if (data != 0) {
                     int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(

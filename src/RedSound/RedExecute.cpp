@@ -1590,9 +1590,9 @@ void EnvelopeKeyExecute()
                     *(u16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) = 1;
 
                     memcpy((void*)(voice + REDSOUND_AX_VOICE_ADPCM_DATA_OFFSET),
-                           (void*)(waveData + REDSOUND_WAVE_ADPCM_DATA_OFFSET), 0x28);
+                           (void*)(waveData + REDSOUND_WAVE_ADPCM_DATA_OFFSET), REDSOUND_WAVE_ADPCM_DATA_SIZE);
                     memcpy((void*)(voice + REDSOUND_AX_VOICE_ADPCM_LOOP_OFFSET),
-                           (void*)(waveData + REDSOUND_WAVE_ADPCM_LOOP_OFFSET), 6);
+                           (void*)(waveData + REDSOUND_WAVE_ADPCM_LOOP_OFFSET), REDSOUND_WAVE_ADPCM_LOOP_SIZE);
                     memset((void*)(voice + REDSOUND_AX_VOICE_SRC_LAST_SAMPLES_OFFSET), 0, 8);
                     *(u16*)(voice + REDSOUND_AX_VOICE_ADDR_FORMAT_OFFSET) = 0;
                     *(int*)(voice + REDSOUND_AX_VOICE_ADDR_CURRENT_OFFSET) = key;

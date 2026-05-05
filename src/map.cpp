@@ -2831,16 +2831,18 @@ void CMapMng::Calc()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma dont_inline on
 void CMapMng::DrawMapShadow()
 {
-    if (*reinterpret_cast<short*>(Ptr(this, 0xC)) != 0) {
-        CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(this, 0x21434));
-        for (unsigned int i = 0; i < mapShadowArray->GetSize(); i++) {
-            CMapShadow* mapShadow = (*mapShadowArray)[i];
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    if (*reinterpret_cast<short*>(self + 0xC) != 0) {
+        for (unsigned int i = 0; i < reinterpret_cast<CPtrArray<CMapShadow*>*>(self + 0x21434)->GetSize(); i++) {
+            CMapShadow* mapShadow = (*reinterpret_cast<CPtrArray<CMapShadow*>*>(self + 0x21434))[i];
             mapShadow->Draw();
         }
     }
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

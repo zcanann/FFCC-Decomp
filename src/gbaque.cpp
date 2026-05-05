@@ -4691,13 +4691,12 @@ static inline OSSemaphore* AccessSemaphoreAt(GbaQueue* self, unsigned int channe
 
 unsigned int GbaQueue::GetChgHitFlg(int channel)
 {
+	int singleMode = m_singleMode;
 	unsigned int actualChannel = static_cast<unsigned int>(channel) &
-	                             ~static_cast<unsigned int>((-reinterpret_cast<signed char*>(this)[0x2D56] |
-	                                                        reinterpret_cast<signed char*>(this)[0x2D56]) >>
-	                                                       31);
-	OSSemaphore* semaphore = AccessSemaphoreAt(this, actualChannel);
+	                             ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
+	OSSemaphore* semaphore = accessSemaphores + actualChannel;
 	OSWaitSemaphore(semaphore);
-	signed char flag = reinterpret_cast<signed char*>(this)[0x2D54];
+	signed char flag = m_chgHitFlags;
 	OSSignalSemaphore(semaphore);
 	unsigned int value = static_cast<unsigned int>(flag) & (1U << actualChannel);
 	return (-value | value) >> 31U;
@@ -4786,7 +4785,7 @@ void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
  */
 int GbaQueue::GetHitEInfo(int channel)
 {
-	int singleMode = reinterpret_cast<signed char*>(this)[0x2D56];
+	int singleMode = m_singleMode;
 	unsigned int actualChannel = static_cast<unsigned int>(channel) &
 	                             ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;

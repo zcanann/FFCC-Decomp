@@ -637,18 +637,18 @@ bool CMenuPcs::MoneyOpen()
 			iVar15 = iVar15 + -1;
 		} while (iVar15 != 0);
 
-		iVar8 = (int)this->moneyPanel;
-		*(int *)(iVar8 + 0x24) = 0x3b;
-		*(short *)(iVar8 + 10) = 0x68;
-		*(short *)(iVar8 + 0xc) = 0xf8;
-		*(short *)(iVar8 + 0xe) = 0x88;
-		*(short *)(iVar8 + 8) =
-			static_cast<short>(static_cast<int>(DOUBLE_80332F98 - (double)*(short *)(iVar8 + 0xc) * DOUBLE_80332FA0));
-		*(float *)(iVar8 + 0x10) = FLOAT_80332f64;
-		*(float *)(iVar8 + 0x14) = FLOAT_80332f64;
-		*(float *)(iVar8 + 0x1c) = FLOAT_80332f70;
-		*(int *)(iVar8 + 0x2c) = 0;
-		*(int *)(iVar8 + 0x30) = 10;
+		MoneyMenuAnim* firstAnim = &this->moneyPanel->anims[0];
+		firstAnim->tex = 0x3b;
+		firstAnim->y = 0x68;
+		firstAnim->w = 0xf8;
+		firstAnim->h = 0x88;
+		firstAnim->x =
+			static_cast<short>(static_cast<int>(DOUBLE_80332F98 - (double)firstAnim->w * DOUBLE_80332FA0));
+		firstAnim->alpha = FLOAT_80332f64;
+		firstAnim->scale = FLOAT_80332f64;
+		firstAnim->uvScale = FLOAT_80332f70;
+		firstAnim->flags = 0;
+		firstAnim->duration = 10;
 		this->moneyPanel->count = 1;
 
 		unsigned int scriptFood = Game.m_scriptFoodBase[0];

@@ -684,17 +684,20 @@ void CSystem::Init()
         if (fileHandle != (CFile::CHandle*)0)
         {
             unsigned int mapSize;
+            unsigned int remainingSize;
             unsigned int count;
             unsigned int offset;
 
-            m_mapSize = mapSize = File.GetLength(fileHandle);
+            mapSize = File.GetLength(fileHandle);
+            m_mapSize = mapSize;
+            remainingSize = mapSize;
             m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(s_system_cpp), 0x123) unsigned char[mapSize];
-            for (offset = 0; (int)mapSize != 0; mapSize -= count)
+            for (offset = 0; (int)remainingSize != 0; remainingSize -= count)
             {
                 count = 0x100000;
-                if (mapSize < 0x100000)
+                if (remainingSize < 0x100000)
                 {
-                    count = mapSize;
+                    count = remainingSize;
                 }
 
                 fileHandle->m_chunkSize = count;

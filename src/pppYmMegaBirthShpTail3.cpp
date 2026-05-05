@@ -227,7 +227,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
  */
 void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShpTail3* param, pppYmMegaBirthShpTail3UnkC* offsets)
 {
-    bool hasRequiredMemory;
+    s8 hasRequiredMemory;
     int spawnCount;
     int colorOffset;
     u8* paramPayload;
@@ -236,9 +236,11 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     _PARTICLE_WMAT* worldMat;
     _PARTICLE_COLOR* particleColor;
     VYmMegaBirthShpTail3* work;
+    VColor* colorWork;
 
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = (VYmMegaBirthShpTail3*)((u8*)object + 0x80 + offsets->m_serializedDataOffsets[2]);
+    colorWork = (VColor*)((u8*)object + 0x80 + colorOffset);
     paramPayload = (u8*)param;
 
     if (work->m_particles == 0) {
@@ -378,12 +380,10 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             work->m_lifeLimit = work->m_lifeLimit + 1;
             for (i = 0; i < work->m_maxParticles; i++) {
                 if (*(u16*)(particleData + 0x22) != 0) {
-                    calc(&object->field0_0x0, work, param, (_PARTICLE_DATA*)particleData,
-                         (VColor*)((u8*)object + 8 + colorOffset), particleColor);
+                    calc(&object->field0_0x0, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
                 } else {
                     if ((*(u16*)(paramPayload + 0x12) <= work->m_lifeLimit) && (spawnCount < *(u16*)(paramPayload + 0x10))) {
-                        birth(&object->field0_0x0, work, param, (VColor*)((u8*)object + 8 + colorOffset),
-                              (_PARTICLE_DATA*)particleData, worldMat, particleColor);
+                        birth(&object->field0_0x0, work, param, colorWork, (_PARTICLE_DATA*)particleData, worldMat, particleColor);
                         spawnCount = spawnCount + 1;
                     }
                 }
@@ -701,14 +701,30 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
         }
     }
 
-    particleData->m_colorDeltaAdd[0] = 0.0f;
-    particleData->m_colorDeltaAdd[1] = 0.0f;
-    particleData->m_colorDeltaAdd[2] = 0.0f;
-    particleData->m_colorDeltaAdd[3] = 0.0f;
-    *(((u8*)&particleData->m_directionTail.z) + 2) = 0;
+    *(u16*)(((u8*)&particleData->m_directionTail.z) + 2) = 0;
+    *(u16*)particleData->m_colorDeltaAdd = 0;
+    *(u16*)(((u8*)particleData->m_colorDeltaAdd) + 2) = 0;
     *((u8*)&particleData->m_directionTail.z) = 0;
     *(((u8*)&particleData->m_directionTail.y) + 3) = 0x1f;
-    *((u8*)&particleData->m_directionTail.z) = *(((u8*)&particleData->m_directionTail.y) + 3) - 1;
+
+    Vec zeroVec;
+    zeroVec.x = 0.0f;
+    zeroVec.y = 0.0f;
+    zeroVec.z = 0.0f;
+    Vec* history = (Vec*)((u8*)particleData + 0x80);
+    u8* anglePtr = (u8*)particleData + 0x4c;
+    for (int i = 0; i < 0x1f; i++) {
+        pppCopyVector(*history, zeroVec);
+        history++;
+
+        int value = rand();
+        *(s16*)anglePtr = (s16)(value - (value / 0x168) * 0x168);
+        anglePtr += 2;
+    }
+
+    *((u8*)&particleData->m_directionTail.z) = *(((u8*)&particleData->m_directionTail.y) + 3);
+    *((u8*)&particleData->m_directionTail.z) = *((u8*)&particleData->m_directionTail.z) - 1;
+    *(u16*)(particleData->m_matrix[1] + 3) = 0;
 }
 
 /*

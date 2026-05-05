@@ -2218,17 +2218,17 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
 int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 {
 	int result;
-	short inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
+	int inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
 
 	if (cmdListIdx == 0) {
-		short equipmentSlot = m_equipment[0];
+		int equipmentSlot = m_equipment[0];
 		if (equipmentSlot < 0) {
 			result = 0;
 		} else {
 			result = (short)m_inventoryItems[equipmentSlot];
 		}
 	} else if (cmdListIdx == 1) {
-		short equipmentSlot = m_equipment[2];
+		int equipmentSlot = m_equipment[2];
 		if (equipmentSlot < 0) {
 			result = 0;
 		} else {
@@ -2270,13 +2270,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 			}
 		}
 
-		if (numGrouped <= 1) {
-			if (inventorySlot < 0) {
-				result = 0;
-			} else {
-				result = (short)m_inventoryItems[inventorySlot];
-			}
-		} else {
+		if (numGrouped > 1) {
 			int scanCount = cmdListIdx + 1;
 			cmdListSlot = m_commandListExtra + cmdListIdx;
 			if (cmdListIdx >= 0) {
@@ -2290,13 +2284,19 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 				}
 			}
 
-			short cmdResult = m_commandListExtra[cmdListIdx];
+			int cmdResult = m_commandListExtra[cmdListIdx];
 			int cmdTopIdx;
 			int itemCmdListIdx;
 			if (GetCmdListItemName__12CCaravanWorkFi(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
 				cmdResult = (short)m_inventoryItems[(short)m_commandListInventorySlotRef[itemCmdListIdx]];
 			}
 			result = cmdResult;
+		} else {
+			if (inventorySlot < 0) {
+				result = 0;
+			} else {
+				result = (short)m_inventoryItems[inventorySlot];
+			}
 		}
 	}
 

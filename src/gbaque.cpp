@@ -4769,15 +4769,15 @@ void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
  */
 int GbaQueue::GetHitEInfo(int channel)
 {
+	int singleMode = reinterpret_cast<signed char*>(this)[0x2D56];
 	unsigned int actualChannel = static_cast<unsigned int>(channel) &
-	                             ~static_cast<unsigned int>((-reinterpret_cast<char*>(this)[0x2D56] |
-	                                                        reinterpret_cast<char*>(this)[0x2D56]) >>
-	                                                       31);
-	OSWaitSemaphore(accessSemaphores + actualChannel);
+	                             ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
+	OSSemaphore* semaphore = accessSemaphores + actualChannel;
+	OSWaitSemaphore(semaphore);
 	int hitInfo;
 	*reinterpret_cast<short*>(&hitInfo) = m_hitInfo[actualChannel].m_enemyId;
 	*reinterpret_cast<short*>(reinterpret_cast<char*>(&hitInfo) + 2) = m_hitInfo[actualChannel].m_enemyType;
-	OSSignalSemaphore(accessSemaphores + actualChannel);
+	OSSignalSemaphore(semaphore);
 	return hitInfo;
 }
 

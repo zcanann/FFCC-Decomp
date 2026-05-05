@@ -157,9 +157,10 @@ void CFile::CHandle::Reset()
 void CFile::DrawError(DVDFileInfo& info, int errorCode)
 {
     _GXTexObj backupTexObj;
+    int status;
     m_isDiskError = 1;
 
-    while (true)
+    do
     {
         if ((unsigned int)System.m_execParam >= 1)
         {
@@ -292,7 +293,6 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
         VISetBlack(FALSE);
         VIFlush();
 
-        int status;
         while (true)
         {
             status = DVDGetCommandBlockStatus(&info.cb);
@@ -325,14 +325,8 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             status = DVDGetCommandBlockStatus(&info.cb);
         }
 
-        if (status == 0x0B || ((u32)(status - 4) <= 2U) || status == -1)
-        {
-            errorCode = status;
-            continue;
-        }
-
-        break;
-    }
+        errorCode = status;
+    } while (status == 0x0B || ((u32)(status - 4) <= 2U) || status == -1);
 
     Sound.PauseDiscError(0);
     m_isDiskError = 0;

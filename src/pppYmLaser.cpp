@@ -119,8 +119,8 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	int colorOffset = serializedDataOffsets[1];
 	pppYmLaserColorData* colorData = (pppYmLaserColorData*)((u8*)laser + 0x80 + colorOffset);
 	s32 dataValIndex = step->m_dataValIndex;
+	int count;
 	Vec* points;
-	u32 count;
 	s32 i;
 	u8 alphaStep;
 	u8 alphaMax;
@@ -234,7 +234,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		GXLoadPosMtxImm(shapeMtx, GX_PNMTX0);
 		pppDrawShp__FPlsP12CMaterialSetUc(*shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
 
-		count = (u32)step->m_payload[0x1e];
+		count = (int)step->m_payload[0x1e];
 		uvStep = FLOAT_80330DC4 / (float)count;
 		if (step->m_initWOrk == 0xFFFF) {
 			_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
@@ -347,7 +347,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			debugColor.g = 0xFF;
 			debugColor.b = 0xFF;
 			debugColor.a = 0xFF;
-			for (i = 0; (int)i < (int)(u32)step->m_payload[0x1e]; i++) {
+			for (i = 0; (int)i < (int)step->m_payload[0x1e]; i++) {
 				if ((work->m_points[i].x == kPppYmLaserOne) && (work->m_points[i].y == kPppYmLaserOne) &&
 					(work->m_points[i].z == kPppYmLaserOne)) {
 					continue;

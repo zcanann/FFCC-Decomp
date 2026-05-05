@@ -2,11 +2,12 @@
 #define _FFCC_PPP_SOUND_H_
 
 #include "ffcc/file.h"
+#include "ffcc/manager.h"
 
 struct _pppMngSt;
 struct Vec;
 
-class CSound
+class CSound : public CManager
 {
 public:
     class CSe3D;
@@ -76,7 +77,7 @@ public:
     void WaitASync();
 
 private:
-    unsigned char m_storage[0x22D8];
+    unsigned char m_storage[0x22D4];
 };
 
 extern CSound Sound;

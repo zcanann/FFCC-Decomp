@@ -65,7 +65,6 @@ static const char s_soundSourceName[] = "sound.cpp";
 
 extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
-extern "C" void* __vt__6CSound[];
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(CRedSound*);
@@ -422,7 +421,6 @@ CSound::CSound()
 {
     unsigned char* sound = reinterpret_cast<unsigned char*>(this);
 
-    *reinterpret_cast<void**>(sound) = __vt__6CSound;
     __ct__9CRedSoundFv(sound + 8);
     __construct_array(sound + 0x142C, (ConstructorDestructor)__ct__9CLine, 0, 0x1cc, 8);
 }
@@ -434,7 +432,6 @@ CSound::CSound()
  */
 CSound::~CSound()
 {
-    *reinterpret_cast<void**>(this) = __vt__6CSound;
     RedSound(this)->~CRedSound();
 }
 

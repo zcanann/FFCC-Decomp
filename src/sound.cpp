@@ -2,6 +2,7 @@
 
 #include "ffcc/RedSound/RedSound.h"
 #include "ffcc/color.h"
+#include "ffcc/game.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
@@ -137,15 +138,6 @@ struct CLineSegment {
     float startLength;
 };
 
-struct SoundGameLayout {
-    u8 m_pad0[0x13E0];
-    s16 m_stageId;
-    u8 m_pad13e2[2];
-    u8 m_stageSerialValid;
-    u8 m_pad13e5[0xC7F4 - 0x13E5];
-    char m_currentScriptName[256];
-};
-
 struct CLine {
     Vec min;
     Vec max;
@@ -225,11 +217,6 @@ static inline const CSoundLayout& SoundData(const CSound* self)
 static inline CRedSound* RedSound(CSound* self)
 {
     return reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(self) + 8);
-}
-
-static inline SoundGameLayout& SoundGameData()
-{
-    return *reinterpret_cast<SoundGameLayout*>(&Game);
 }
 
 extern "C" void __ct__9CLine(CLine* line)
@@ -1776,11 +1763,13 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
  */
 int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistance, int fadeFrames)
 {
+    int volumeValue;
     CSe3D* se;
     int loopCount;
     int slot;
     int volume;
     int pan;
+    int panValue;
 
     if (soundId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
@@ -1812,6 +1801,8 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
         se->m_volume = static_cast<u8>(volume);
         se->m_pan = static_cast<u8>(pan);
         se->m_group = -1;
+        volumeValue = volume;
+        panValue = pan;
 
         if (soundId < 0) {
             Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
@@ -1819,15 +1810,15 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
         } else if (soundId < 4000) {
             int bank = soundId / 1000;
             slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), bank, soundId % 1000,
-                                            pan, volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+                                            panValue, volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
-                SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(soundObj + 8), slot, volume, fadeFrames);
+                SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(soundObj + 8), slot, volumeValue, fadeFrames);
             }
         } else {
-            slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), -1, soundId, pan,
-                                            volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+            slot = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(soundObj + 8), -1, soundId, panValue,
+                                            volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
-                SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(soundObj + 8), slot, volume, fadeFrames);
+                SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(soundObj + 8), slot, volumeValue, fadeFrames);
             }
         }
 
@@ -1872,16 +1863,13 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
         iVar4 = Calc__9CLine(
             (double)se3D->m_farDistance, &SoundData(this).m_lines[se3D->m_lineIndex], &nearestPoint, &nearestDistance,
             (u32*)0, &nearestT, reinterpret_cast<const Vec*>(&CameraPcs._236_4_));
-        if (iVar4 == 0) {
-            outVolume = 0;
-            outPan = 0x40;
-        } else {
+        if (iVar4 != 0) {
             PSMTXMultVec(CameraPcs.m_cameraMatrix, &nearestPoint, &nearestPoint);
             fVar3 = se3D->m_nearDistance;
-            if (fVar3 <= nearestDistance) {
-                outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((nearestDistance - fVar3) / (se3D->m_farDistance - fVar3)));
-            } else {
+            if (nearestDistance < fVar3) {
                 outVolume = 0x7F;
+            } else {
+                outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((nearestDistance - fVar3) / (se3D->m_farDistance - fVar3)));
             }
 
             iVar4 = (int)nearestPoint.x;
@@ -1889,25 +1877,29 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
                 iVar5 = -0x38;
             } else {
                 iVar5 = 0x38;
-                if (iVar4 < 0x39) {
+                if (iVar4 <= 0x38) {
                     iVar5 = iVar4;
                 }
             }
             outPan = iVar5 + 0x40;
+        } else {
+            outVolume = 0;
+            outPan = 0x40;
         }
     } else if ((kLineSegmentMinT == se3D->m_nearDistance) && (kLineSegmentMinT == se3D->m_farDistance)) {
         outVolume = 0x7F;
         outPan = 0x40;
     } else {
         fVar1 = kLineSegmentMaxT;
-        if (SoundGameData().m_stageSerialValid != 0) {
-            const short stageId = SoundGameData().m_stageId;
-            if (stageId == 0xE) {
+        if (Game.m_gameWork.m_soundOptionFlag != 0) {
+            switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+            case 8:
+            case 0xE:
                 fVar1 = FLOAT_80330cf4;
-            } else if (stageId == 8) {
-                fVar1 = FLOAT_80330cf4;
-            } else {
+                break;
+            default:
                 fVar1 = FLOAT_80330cf8;
+                break;
             }
         }
 
@@ -1916,35 +1908,45 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
         fVar2 = se3D->m_farDistance * fVar1;
         fVar2 = se3D->m_farDistance * fVar2;
         fVar2 = fVar1 * fVar2;
-        if (fVar2 <= fVar3) {
-            outVolume = 0;
-        } else {
+        if (fVar3 < fVar2) {
             float nearScaled = se3D->m_nearDistance * fVar1;
             nearScaled = se3D->m_nearDistance * nearScaled;
-            if (nearScaled <= fVar3) {
-                outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((fVar3 - nearScaled) / (fVar2 - nearScaled)));
-            } else {
+            nearScaled = fVar1 * nearScaled;
+            if (fVar3 < nearScaled) {
                 outVolume = 0x7F;
+            } else {
+                outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((fVar3 - nearScaled) / (fVar2 - nearScaled)));
             }
+        } else {
+            outVolume = 0;
         }
 
-        if (*reinterpret_cast<unsigned int*>(SoundGameData().m_currentScriptName) == 0x21) {
+        if (Game.m_currentMapId == 0x21) {
             iVar4 = (int)(nearestPoint.x / FLOAT_80330cfc);
+            if (iVar4 < -0x38) {
+                iVar5 = -0x38;
+            } else {
+                iVar5 = 0x38;
+                if (iVar4 <= 0x38) {
+                    iVar5 = iVar4;
+                }
+            }
+            outPan = iVar5 + 0x40;
         } else {
             iVar4 = (int)nearestPoint.x;
-        }
-        if (iVar4 < -0x38) {
-            iVar5 = -0x38;
-        } else {
-            iVar5 = 0x38;
-            if (iVar4 < 0x39) {
-                iVar5 = iVar4;
+            if (iVar4 < -0x38) {
+                iVar5 = -0x38;
+            } else {
+                iVar5 = 0x38;
+                if (iVar4 <= 0x38) {
+                    iVar5 = iVar4;
+                }
             }
+            outPan = iVar5 + 0x40;
         }
-        outPan = iVar5 + 0x40;
     }
 
-    if (SoundData(this).m_curMusicVolume < outVolume) {
+    if (outVolume > SoundData(this).m_curMusicVolume) {
         outVolume = SoundData(this).m_curMusicVolume;
     }
 }

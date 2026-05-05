@@ -134,7 +134,6 @@ static inline CMapObj* MapObjArrayStart()
 }
 
 extern "C" void __dl__FPv(void*);
-extern "C" void* __vt__10CMapObjAtr[];
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
@@ -1708,7 +1707,6 @@ void CMapObj::SetMime(int mode, int target, int type)
  */
 CMapObjAtr::~CMapObjAtr()
 {
-    *(void**)this = __vt__10CMapObjAtr;
 }
 
 static inline void FreeAndClear(void* base, unsigned int offset)

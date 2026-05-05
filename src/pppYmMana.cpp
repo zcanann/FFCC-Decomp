@@ -1143,10 +1143,10 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     int pairCount;
 
     rowCount = 0;
-    radius = size * FLOAT_80330e5c;
+    radius = size * LoadFloat(FLOAT_80330e5c);
     uvStep = LoadFloat(FLOAT_80330e6c);
-    zero = FLOAT_80330e4c;
-    normalY = FLOAT_80330e58;
+    zero = LoadFloat(FLOAT_80330e4c);
+    normalY = LoadFloat(FLOAT_80330e58);
     for (z = radius; -radius <= z; z -= size * uvStep) {
         colCount = 0;
         rowUv = static_cast<float>(rowCount) * uvStep;

@@ -62,7 +62,7 @@ extern const char s_MOVE_pct_1fpctpct_BG_pct_1fpctpct_OBJ_pct_1fpctpct_UP_pct_1f
 extern const char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[];
 static const char s_debug_pad_port_fmt[] = "%dP";
 static const char s_debug_frame_fmt[] = "%d";
-static const u32 s_debug_bar_color = 0x808080FF;
+static const GXColor s_debug_bar_color = {0x80, 0x80, 0x80, 0xFF};
 static const char s_scenegraph_step_none[] = "";
 static const char s_scenegraph_step_x8[] = "x8";
 static const char s_scenegraph_step_x0[] = "x0";
@@ -593,13 +593,13 @@ void CGraphicPcs::drawBar()
     _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)1);
     GXSetZCompLoc((GXBool)0);
     _GXSetAlphaCompare((GXCompare)6, 1, (GXAlphaOp)0, (GXCompare)7, 0);
-    GXSetZMode((GXBool)0, GX_ALWAYS, (GXBool)0);
+    GXSetZMode((GXBool)0, GX_LEQUAL, (GXBool)0);
     GXSetCullMode(GX_CULL_NONE);
     GXSetNumTevStages(1);
     GXSetTevDirect(GX_TEVSTAGE0);
     GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0A0, (GXBool)0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-    GXSetChanCtrl(GX_COLOR1A1, (GXBool)0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+    GXSetChanCtrl(GX_COLOR0, (GXBool)0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_ALPHA0, (GXBool)0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     GXClearVtxDesc();
@@ -608,7 +608,7 @@ void CGraphicPcs::drawBar()
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 1);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 1);
     PSMTXIdentity(identity);
     GXLoadPosMtxImm(identity, GX_PNMTX0);
     GXLoadTexMtxImm(identity, GX_TEXMTX0, GX_MTX2x4);
@@ -623,19 +623,19 @@ void CGraphicPcs::drawBar()
     }
     const bool drawText = (padState != 0) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40000);
 
-    const u32 backColor = s_debug_bar_color;
+    GXColor backColor = s_debug_bar_color;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(0.0f, 448.0f, 0.0f);
-    GXColor1u32(backColor);
+    GXColor1u32(*reinterpret_cast<u32*>(&backColor));
     GXTexCoord2u16(0, 0);
     GXPosition3f32(640.0f, 448.0f, 0.0f);
-    GXColor1u32(backColor);
+    GXColor1u32(*reinterpret_cast<u32*>(&backColor));
     GXTexCoord2u16(2, 0);
     GXPosition3f32(640.0f, 480.0f, 0.0f);
-    GXColor1u32(backColor);
+    GXColor1u32(*reinterpret_cast<u32*>(&backColor));
     GXTexCoord2u16(2, 2);
     GXPosition3f32(0.0f, 480.0f, 0.0f);
-    GXColor1u32(backColor);
+    GXColor1u32(*reinterpret_cast<u32*>(&backColor));
     GXTexCoord2u16(0, 2);
 
     const int orderCount = System.m_orderCount;

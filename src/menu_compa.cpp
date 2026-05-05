@@ -108,17 +108,18 @@ void CMenuPcs::CompaDraw()
 				float fillW = alpha * w;
 				if (fillW > FLOAT_80332FF8) {
 					if (tex == 0x51) {
-						float yStep = y;
+						int yStep = static_cast<int>(y);
 						float end = y + h;
-						while (yStep < end) {
-							float tileH = end - yStep;
-							if (tileH > FLOAT_80332FFC) {
-								tileH = FLOAT_80332FFC;
+						while (static_cast<float>(yStep) < end) {
+							int tileH = static_cast<int>(end - static_cast<float>(yStep));
+							if (static_cast<float>(tileH) > FLOAT_80332FFC) {
+								tileH = 0x18;
 							}
 							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-								&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, fillW, tileH, u, v,
+								&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, static_cast<float>(yStep),
+								fillW, static_cast<float>(tileH), u, v,
 								colors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
-							yStep += FLOAT_80332FFC;
+							yStep += 0x18;
 						}
 					} else {
 						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
@@ -139,17 +140,18 @@ void CMenuPcs::CompaDraw()
 					};
 					float remainW = (static_cast<float>(DOUBLE_80333008) / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14))) * w;
 					if (tex == 0x51) {
-						float yStep = y;
+						int yStep = static_cast<int>(y);
 						float end = y + h;
-						while (yStep < end) {
-							float tileH = end - yStep;
-							if (tileH > FLOAT_80332FFC) {
-								tileH = FLOAT_80332FFC;
+						while (static_cast<float>(yStep) < end) {
+							int tileH = static_cast<int>(end - static_cast<float>(yStep));
+							if (static_cast<float>(tileH) > FLOAT_80332FFC) {
+								tileH = 0x18;
 							}
 							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-								&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, remainW, tileH, u, v,
+								&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, static_cast<float>(yStep),
+								remainW, static_cast<float>(tileH), u, v,
 								fadeColors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
-							yStep += FLOAT_80332FFC;
+							yStep += 0x18;
 						}
 					} else {
 						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(

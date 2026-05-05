@@ -948,16 +948,20 @@ int CCaravanWork::FindItem(int itemId)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1d0c
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::DeleteItemIdx(int itemSlot, int updateJoybus)
 {
-	if (m_inventoryItems[itemSlot] != 0xFFFF) {
-		m_inventoryItems[itemSlot] = 0xFFFF;
+	if (m_inventoryItems[itemSlot] != -1) {
+		m_inventoryItems[itemSlot] = -1;
 		m_inventoryItemCount = m_inventoryItemCount - 1;
 		if (updateJoybus != 0) {
-			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (char)itemSlot);
+			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (unsigned char)itemSlot);
 		}
 	}
 }

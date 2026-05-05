@@ -1603,7 +1603,7 @@ menu_cmd.cpp:
 	extabindex  start:0x80011050 end:0x80011128
 	.text       start:0x8014A940 end:0x801503C8
 	.rodata     start:0x801DE910 end:0x801DEAD4
-	.data       start:0x80214D58 end:0x80214E28
+	.data       start:0x80214D58 end:0x80214D90
 	.bss        start:0x8030BA48 end:0x8030BA54
 	.sbss       start:0x8032EEC8 end:0x8032EECC
 	.sdata2     start:0x80333278 end:0x80333338
@@ -1612,7 +1612,7 @@ shopmenu.cpp:
 	extab       start:0x80009D94 end:0x80009E54
 	extabindex  start:0x80011128 end:0x80011248
 	.text       start:0x801503C8 end:0x80159654
-	.data       start:0x8021589C end:0x80215914
+	.data       start:0x80214D90 end:0x80214FE0
 	.sbss       start:0x8032EED0 end:0x8032EED4
 	.sdata2     start:0x80333338 end:0x80333388
 
@@ -1679,7 +1679,7 @@ goout.cpp:
 	extabindex  start:0x800114F4 end:0x8001156C
 	.text       start:0x80168130 end:0x8016C9E8
 	.rodata     start:0x801DF264 end:0x801DF9B0
-	.data       start:0x80215B0C end:0x80215BD8
+	.data       start:0x80214FE0 end:0x80215968
 	.bss        start:0x8030BB08 end:0x8030BB58
 	.sbss       start:0x8032EF08 end:0x8032EF10
 	.sdata2     start:0x8033355C end:0x80333574
@@ -1703,6 +1703,7 @@ cmake.cpp:
 	extabindex  start:0x80011584 end:0x8001168C
 	.text       start:0x8016CD3C end:0x8017474C
 	.rodata     start:0x801E3038 end:0x801E3048
+	.data       start:0x80215968 end:0x80215A48
 	.bss        start:0x8030BB58 end:0x8030BB80
 	.sdata2     start:0x80333580 end:0x80333614
 
@@ -1722,6 +1723,7 @@ MenuUtil.cpp:
 	extab       start:0x8000A16C end:0x8000A1CC
 	extabindex  start:0x800116EC end:0x8001177C
 	.text       start:0x8017683C end:0x8017AF14
+	.data       start:0x80215A48 end:0x80215BD8
 	.sdata2     start:0x80333690 end:0x803336A0
 
 wmm_str.cpp:

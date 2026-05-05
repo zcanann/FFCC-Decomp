@@ -3370,28 +3370,22 @@ void CMenuPcs::SingLifeResetWait()
  */
 char* CMenuPcs::GetTribeStr(int index)
 {
-    u8 languageId = Game.m_gameWork.m_languageId;
-    char** table = PTR_s_Clavat_802140f0;
-
-    if (languageId == 3) {
-        return table[index + 8];
+    if (Game.m_gameWork.m_languageId == 3) {
+        return PTR_s_Clavat_80214110[index];
     }
-    if (languageId >= 3) {
-        if (languageId == 5) {
-            return table[index + 16];
+    if (Game.m_gameWork.m_languageId < 3) {
+        if (Game.m_gameWork.m_languageId != 1 && Game.m_gameWork.m_languageId != 0) {
+            return PTR_s_Clavat_80214100[index];
         }
-        if (languageId >= 5) {
-            return table[index];
+    } else {
+        if (Game.m_gameWork.m_languageId == 5) {
+            return PTR_s_Clavat_80214120[index];
         }
-        return table[index + 12];
+        if (Game.m_gameWork.m_languageId < 5) {
+            return PTR_s_Clavate[index];
+        }
     }
-    if (languageId == 1) {
-        return table[index];
-    }
-    if (languageId >= 1) {
-        return table[index + 4];
-    }
-    return table[index];
+    return PTR_s_Clavat_802140f0[index];
 }
 
 /*
@@ -3405,28 +3399,22 @@ char* CMenuPcs::GetTribeStr(int index)
  */
 char* CMenuPcs::GetJobStr(int index)
 {
-    u8 languageId = Game.m_gameWork.m_languageId;
-    char** table = PTR_s_Blacksmith;
-
-    if (languageId == 3) {
-        return table[index + 16];
+    if (Game.m_gameWork.m_languageId == 3) {
+        return PTR_s_Fabbri[index];
     }
-    if (languageId >= 3) {
-        if (languageId == 5) {
-            return table[index + 32];
+    if (Game.m_gameWork.m_languageId < 3) {
+        if (Game.m_gameWork.m_languageId != 1 && Game.m_gameWork.m_languageId != 0) {
+            return PTR_s_Schmied[index];
         }
-        if (languageId >= 5) {
-            return table[index];
+    } else {
+        if (Game.m_gameWork.m_languageId == 5) {
+            return PTR_s_Herrero[index];
         }
-        return table[index + 24];
+        if (Game.m_gameWork.m_languageId < 5) {
+            return PTR_s_Forgeron[index];
+        }
     }
-    if (languageId == 1) {
-        return table[index];
-    }
-    if (languageId >= 1) {
-        return table[index + 8];
-    }
-    return table[index];
+    return PTR_s_Blacksmith[index];
 }
 
 /*
@@ -3440,28 +3428,22 @@ char* CMenuPcs::GetJobStr(int index)
  */
 char* CMenuPcs::GetHairStr(int index)
 {
-    u8 languageId = Game.m_gameWork.m_languageId;
-    char** table = PTR_s_Cowlick;
-
-    if (languageId == 3) {
-        return table[index + 64];
+    if (Game.m_gameWork.m_languageId == 3) {
+        return PTR_s_Ciuffo_ribelle[index];
     }
-    if (languageId >= 3) {
-        if (languageId == 5) {
-            return table[index + 128];
+    if (Game.m_gameWork.m_languageId < 3) {
+        if (Game.m_gameWork.m_languageId != 1 && Game.m_gameWork.m_languageId != 0) {
+            return PTR_s_Spitzschopf[index];
         }
-        if (languageId >= 5) {
-            return table[index];
+    } else {
+        if (Game.m_gameWork.m_languageId == 5) {
+            return PTR_s_Remolino[index];
         }
-        return table[index + 96];
+        if (Game.m_gameWork.m_languageId < 5) {
+            return gSingMenuHairTableFr[index];
+        }
     }
-    if (languageId == 1) {
-        return table[index];
-    }
-    if (languageId >= 1) {
-        return table[index + 32];
-    }
-    return table[index];
+    return PTR_s_Cowlick[index];
 }
 
 /*
@@ -3475,28 +3457,22 @@ char* CMenuPcs::GetHairStr(int index)
  */
 char* CMenuPcs::GetMenuStr(int index)
 {
-    u8 languageId = Game.m_gameWork.m_languageId;
-    char** table = gSingMenuTextTableEn;
-
-    if (languageId == 3) {
-        return table[index + 112];
+    if (Game.m_gameWork.m_languageId == 3) {
+        return gSingMenuTextTableIt[index];
     }
-    if (languageId >= 3) {
-        if (languageId == 5) {
-            return table[index + 224];
+    if (Game.m_gameWork.m_languageId < 3) {
+        if (Game.m_gameWork.m_languageId != 1 && Game.m_gameWork.m_languageId != 0) {
+            return gSingMenuTextTableDe[index];
         }
-        if (languageId >= 5) {
-            return table[index];
+    } else {
+        if (Game.m_gameWork.m_languageId == 5) {
+            return gSingMenuTextTableEs[index];
         }
-        return table[index + 168];
+        if (Game.m_gameWork.m_languageId < 5) {
+            return gSingMenuTextTableFr[index];
+        }
     }
-    if (languageId == 1) {
-        return table[index];
-    }
-    if (languageId >= 1) {
-        return table[index + 56];
-    }
-    return table[index];
+    return gSingMenuTextTableEn[index];
 }
 
 /*
@@ -3510,28 +3486,22 @@ char* CMenuPcs::GetMenuStr(int index)
  */
 char* CMenuPcs::GetAttrStr(int index)
 {
-    u8 languageId = Game.m_gameWork.m_languageId;
-    char** table = gSingMenuAttrTableEn;
-
-    if (languageId == 3) {
-        return table[index + 40];
+    if (Game.m_gameWork.m_languageId == 3) {
+        return gSingMenuAttrTableIt[index];
     }
-    if (languageId >= 3) {
-        if (languageId == 5) {
-            return table[index + 80];
+    if (Game.m_gameWork.m_languageId < 3) {
+        if (Game.m_gameWork.m_languageId != 1 && Game.m_gameWork.m_languageId != 0) {
+            return gSingMenuAttrTableDe[index];
         }
-        if (languageId >= 5) {
-            return table[index];
+    } else {
+        if (Game.m_gameWork.m_languageId == 5) {
+            return gSingMenuAttrTableEs[index];
         }
-        return table[index + 60];
+        if (Game.m_gameWork.m_languageId < 5) {
+            return gSingMenuAttrTableFr[index];
+        }
     }
-    if (languageId == 1) {
-        return table[index];
-    }
-    if (languageId >= 1) {
-        return table[index + 20];
-    }
-    return table[index];
+    return gSingMenuAttrTableEn[index];
 }
 
 /*

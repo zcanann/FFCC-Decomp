@@ -473,8 +473,8 @@ int CCaravanWork::IsOutOfShouki()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::AddLetter(int letterType, int senderId, int placeId, int moneyValue, int hasMoneyFlag,
-							 int hasReplyFlag, int itemA, int itemB, int itemC)
+void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int hasMoneyFlag, int hasReplyFlag,
+							 int itemA, int itemB, int itemC, int itemD)
 {
 	struct LetterSlot
 	{
@@ -494,8 +494,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int placeId, int mone
 	letterWords32[0] = (letterWords32[0] & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
 	m_letter0[0] = (unsigned char)((m_letter0[0] & 0xF7) | ((hasMoneyFlag << 3) & 8));
 	if (((m_letter0[0] >> 3) & 1) != 0) {
-		int divValue = (moneyValue / 100) + (moneyValue >> 31);
-		moneyValue = divValue - (divValue >> 31);
+		moneyValue /= 100;
 	}
 	letterWords16[1] = (unsigned short)((letterWords16[1] & 0xFE00) | (moneyValue & 0x1FF));
 	m_letter0[0] = (unsigned char)(m_letter0[0] & 0x7F);
@@ -505,13 +504,14 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int placeId, int mone
 	letterWords16[2] = (unsigned short)itemA;
 	letterWords16[3] = (unsigned short)itemB;
 	letterWords16[4] = (unsigned short)itemC;
-	letterWords16[5] = 0;
+	letterWords16[5] = (unsigned short)itemD;
 
 	int nextCount = m_letterCount + 1;
-	if (nextCount > 100) {
-		nextCount = 100;
+	int cappedCount = 100;
+	if (nextCount < 100) {
+		cappedCount = nextCount;
 	}
-	m_letterCount = nextCount;
+	m_letterCount = cappedCount;
 
 	GbaQue.SetAddLetter(m_joybusCaravanId);
 }

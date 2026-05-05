@@ -9,6 +9,7 @@ struct RedWaveHeadWD;
 enum RedMidiLayoutSize {
 	REDSOUND_KEY_ON_SLOT_COUNT = 0x40,
 	REDSOUND_MUSIC_TRACK_SAVE_COUNT = 0x40,
+	REDSOUND_TRACK_LOOP_STACK_COUNT = 4,
 };
 
 typedef int (*RedSwingFunc)(int);
@@ -16,7 +17,7 @@ typedef int (*RedSwingFunc)(int);
 struct RedTrackDATA {
 	unsigned char* m_command;
 	unsigned char m_pad04[0x08 - 0x04];
-	unsigned char* m_loopCommand[4];
+	unsigned char* m_loopCommand[REDSOUND_TRACK_LOOP_STACK_COUNT];
 	RedWaveHeadWD* m_waveBankData;
 	RedWaveDATA* m_waveData;
 	signed char* m_keySignatureData;
@@ -95,8 +96,8 @@ struct RedTrackDATA {
 	int m_waveBase;
 	int m_portamentPitch;
 	int m_waveNo;
-	short m_loopCount[4];
-	short m_loopStep[4];
+	short m_loopCount[REDSOUND_TRACK_LOOP_STACK_COUNT];
+	short m_loopStep[REDSOUND_TRACK_LOOP_STACK_COUNT];
 	short m_step;
 	short m_step2;
 	short m_loopDepth;

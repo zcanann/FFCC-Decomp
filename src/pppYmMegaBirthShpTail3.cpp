@@ -20,6 +20,7 @@ extern "C" int rand(void);
 static pppFMATRIX g_matUnit;
 
 static const char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
+static const float kPppYmMegaBirthShpTail3DegToRad = 0.0000958738f;
 
 /*
  * --INFO--
@@ -50,6 +51,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     }
 
     int shapeTable = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+    u16 workRand = *(u16*)((u8*)object + 0x80 + particleDataOffset + 0x78);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (void*)(payload + 0xA0), &object->field_0x40, *(float*)(payload + 0xA4), step[0x10], payload[0x58],
@@ -96,6 +98,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 float segLen;
                 float segProgress = 0.0f;
                 u16 frameCount = frameCountRaw;
+                u16 particleShapeFrame = *(u16*)(particle + 0x1C);
+                const u16 shapeFrameStep = *(u16*)(shapeTable + 0x12);
+                const s16 shapeFrameCount = *(s16*)(shapeTable + 6);
 
                 if (trailReadIndex == trailMaxIndex) {
                     trailNextIndex = 0;
@@ -119,10 +124,24 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     Vec trailPos = drawPos;
                     bool canDraw = (trailPos.x != 0.0f) || (trailPos.y != 0.0f) || (trailPos.z != 0.0f);
                     if (canDraw) {
+                        workRand = (u16)((u32)workRand * 0x80d + 7);
+                        const u32 shapeFrame = (u32)(particleShapeFrame + workRand) / shapeFrameStep;
+                        const s16 shapeOffset = *(s16*)(shapeTable + (shapeFrame % (u32)shapeFrameCount) * 8 + 0x10);
+
                         pppUnitMatrix(drawMtx);
                         drawMtx.value[0][0] = drawScale * pppMngStPtr->m_scale.x;
                         drawMtx.value[1][1] = drawScale * pppMngStPtr->m_scale.y;
                         drawMtx.value[2][2] = drawScale * pppMngStPtr->m_scale.z;
+
+                        if (*(s16*)(payload + 0x94) != 0) {
+                            pppFMATRIX rotMtx;
+                            pppFMATRIX tmpMtx;
+                            PSMTXRotRad(rotMtx.value, 'z',
+                                        kPppYmMegaBirthShpTail3DegToRad *
+                                            (float)*(u16*)(particle + frameCount * sizeof(u16) + 0x40));
+                            tmpMtx = drawMtx;
+                            pppMulMatrix(drawMtx, rotMtx, tmpMtx);
+                        }
 
                         if (payload[0xA5] == 0) {
                             PSMTXMultVec(ppvWorldMatrix, &trailPos, &cameraPos);
@@ -213,6 +232,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         if (colors != 0) {
             colors = colors + 1;
         }
+        *(s16*)(particle + 0x1C) += *(s16*)(step + 0xA);
     }
 }
 
@@ -701,14 +721,24 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
         }
     }
 
-    particleData->m_colorDeltaAdd[0] = 0.0f;
-    particleData->m_colorDeltaAdd[1] = 0.0f;
-    particleData->m_colorDeltaAdd[2] = 0.0f;
-    particleData->m_colorDeltaAdd[3] = 0.0f;
-    *(((u8*)&particleData->m_directionTail.z) + 2) = 0;
+    *(u16*)particleData->m_colorDeltaAdd = 0;
+    *(u16*)((u8*)particleData->m_colorDeltaAdd + 2) = 0;
+    *(u16*)((u8*)&particleData->m_directionTail.z + 2) = 0;
     *((u8*)&particleData->m_directionTail.z) = 0;
     *(((u8*)&particleData->m_directionTail.y) + 3) = 0x1f;
+
+    Vec zeroVec;
+    zeroVec.x = 0.0f;
+    zeroVec.y = 0.0f;
+    zeroVec.z = 0.0f;
+    Vec* history = (Vec*)((u8*)particleData + 0x80);
+    for (int i = 0; i < 0x1f; i++) {
+        pppCopyVector(history[i], zeroVec);
+        *(s16*)((u8*)particleData + 0x4c + i * sizeof(u16)) = (s16)(rand() % 360);
+    }
+
     *((u8*)&particleData->m_directionTail.z) = *(((u8*)&particleData->m_directionTail.y) + 3) - 1;
+    *(u16*)(particleData->m_matrix[1] + 3) = 0;
 }
 
 /*

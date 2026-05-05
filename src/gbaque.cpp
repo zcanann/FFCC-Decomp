@@ -4786,7 +4786,8 @@ void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
  */
 int GbaQueue::GetHitEInfo(int channel)
 {
-	int singleMode = reinterpret_cast<signed char*>(this)[0x2D56];
+	unsigned char singleModeByte = reinterpret_cast<unsigned char*>(this)[0x2D56];
+	int singleMode = static_cast<signed char>(singleModeByte);
 	unsigned int actualChannel = static_cast<unsigned int>(channel) &
 	                             ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;

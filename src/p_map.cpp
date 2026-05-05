@@ -439,7 +439,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         }
 
         CPtrArray<CMapLightHolder*>& mapLightHolderArr =
-            reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450)[1];
+            *reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x2146C);
         if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) > 0) {
             mapLightHolderArr[0]->GetLightHolder(
                 reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C), static_cast<Vec*>(0));

@@ -386,9 +386,11 @@ void CMenuPcs::MLstCtrl()
 
 	startFrame = 0;
 	duration = 4;
+	MenuLstEntry* closeEntry = &this->lstData->entries[this->lstData->count - 1];
 	for (int idx = this->lstData->count - 1; idx >= 0; idx--) {
-		this->lstData->entries[idx].startFrame = startFrame++;
-		this->lstData->entries[idx].duration = duration;
+		closeEntry->startFrame = startFrame++;
+		closeEntry->duration = duration;
+		closeEntry--;
 	}
 
 	this->lstState->frame = 0;

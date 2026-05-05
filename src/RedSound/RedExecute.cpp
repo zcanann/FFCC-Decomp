@@ -188,6 +188,7 @@ enum RedExecuteAxVoiceLayout {
     REDSOUND_AX_VOICE_RATIO_HIGH_OFFSET = 0x1DE,
     REDSOUND_AX_VOICE_RATIO_LOW_OFFSET = 0x1E0,
     REDSOUND_AX_VOICE_SRC_LAST_SAMPLES_OFFSET = 0x1E4,
+    REDSOUND_AX_VOICE_SRC_LAST_SAMPLES_SIZE = sizeof(((AXPBSRC*)0)->last_samples),
     REDSOUND_AX_VOICE_ADPCM_LOOP_OFFSET = 0x1EC,
     REDSOUND_AX_MIX_CTRL_DRY_STEREO = 0x3,
     REDSOUND_AX_MIX_CTRL_AUX_A_STEREO = 0x30,
@@ -1593,7 +1594,7 @@ void EnvelopeKeyExecute()
                            (void*)(waveData + REDSOUND_WAVE_ADPCM_DATA_OFFSET), REDSOUND_WAVE_ADPCM_DATA_SIZE);
                     memcpy((void*)(voice + REDSOUND_AX_VOICE_ADPCM_LOOP_OFFSET),
                            (void*)(waveData + REDSOUND_WAVE_ADPCM_LOOP_OFFSET), REDSOUND_WAVE_ADPCM_LOOP_SIZE);
-                    memset((void*)(voice + REDSOUND_AX_VOICE_SRC_LAST_SAMPLES_OFFSET), 0, 8);
+                    memset((void*)(voice + REDSOUND_AX_VOICE_SRC_LAST_SAMPLES_OFFSET), 0, REDSOUND_AX_VOICE_SRC_LAST_SAMPLES_SIZE);
                     *(u16*)(voice + REDSOUND_AX_VOICE_ADDR_FORMAT_OFFSET) = 0;
                     *(int*)(voice + REDSOUND_AX_VOICE_ADDR_CURRENT_OFFSET) = key;
 

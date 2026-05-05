@@ -138,12 +138,12 @@ struct CLineSegment {
 };
 
 struct SoundGameLayout {
-    u8 m_pad0[0x13E0];
-    s16 m_stageId;
-    u8 m_pad13e2[2];
-    u8 m_stageSerialValid;
-    u8 m_pad13e5[0xC7F4 - 0x13E5];
-    char m_currentScriptName[256];
+    u8 m_pad0[0x13D4];
+    s16 m_bossArtifactStageIndex;
+    u8 m_pad13d6[2];
+    u8 m_soundOptionFlag;
+    u8 m_pad13d9[0xC7E8 - 0x13D9];
+    u32 m_currentMapId;
 };
 
 struct CLine {
@@ -1871,14 +1871,11 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
     if (se3D->m_lineIndex >= 0) {
         iVar4 = Calc__9CLine(
             (double)se3D->m_farDistance, &SoundData(this).m_lines[se3D->m_lineIndex], &nearestPoint, &nearestDistance,
-            (u32*)0, &nearestT, reinterpret_cast<const Vec*>(&CameraPcs._236_4_));
-        if (iVar4 == 0) {
-            outVolume = 0;
-            outPan = 0x40;
-        } else {
+            (u32*)0, &nearestT, reinterpret_cast<const Vec*>(&CameraPcs._212_4_));
+        if (iVar4 != 0) {
             PSMTXMultVec(CameraPcs.m_cameraMatrix, &nearestPoint, &nearestPoint);
             fVar3 = se3D->m_nearDistance;
-            if (fVar3 <= nearestDistance) {
+            if (nearestDistance >= fVar3) {
                 outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((nearestDistance - fVar3) / (se3D->m_farDistance - fVar3)));
             } else {
                 outVolume = 0x7F;
@@ -1889,22 +1886,23 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
                 iVar5 = -0x38;
             } else {
                 iVar5 = 0x38;
-                if (iVar4 < 0x39) {
+                if (iVar4 <= 0x38) {
                     iVar5 = iVar4;
                 }
             }
             outPan = iVar5 + 0x40;
+        } else {
+            outVolume = 0;
+            outPan = 0x40;
         }
     } else if ((kLineSegmentMinT == se3D->m_nearDistance) && (kLineSegmentMinT == se3D->m_farDistance)) {
         outVolume = 0x7F;
         outPan = 0x40;
     } else {
         fVar1 = kLineSegmentMaxT;
-        if (SoundGameData().m_stageSerialValid != 0) {
-            const short stageId = SoundGameData().m_stageId;
-            if (stageId == 0xE) {
-                fVar1 = FLOAT_80330cf4;
-            } else if (stageId == 8) {
+        if (SoundGameData().m_soundOptionFlag != 0) {
+            const short stageId = SoundGameData().m_bossArtifactStageIndex;
+            if (stageId == 0xE || (stageId < 0xE && stageId == 8)) {
                 fVar1 = FLOAT_80330cf4;
             } else {
                 fVar1 = FLOAT_80330cf8;
@@ -1912,7 +1910,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
         }
 
         PSMTXMultVec(CameraPcs.m_cameraMatrix, &se3D->m_position, &nearestPoint);
-        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs._224_4_), &se3D->m_position);
+        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs._212_4_), &se3D->m_position);
         fVar2 = se3D->m_farDistance * fVar1;
         fVar2 = se3D->m_farDistance * fVar2;
         fVar2 = fVar1 * fVar2;
@@ -1928,7 +1926,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             }
         }
 
-        if (*reinterpret_cast<unsigned int*>(SoundGameData().m_currentScriptName) == 0x21) {
+        if (SoundGameData().m_currentMapId == 0x21) {
             iVar4 = (int)(nearestPoint.x / FLOAT_80330cfc);
         } else {
             iVar4 = (int)nearestPoint.x;
@@ -1937,7 +1935,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             iVar5 = -0x38;
         } else {
             iVar5 = 0x38;
-            if (iVar4 < 0x39) {
+            if (iVar4 <= 0x38) {
                 iVar5 = iVar4;
             }
         }

@@ -500,10 +500,10 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;
-    Vec origin;
-    Vec dir;
-    Vec target;
     Vec hitVector;
+    Vec dir;
+    Vec origin;
+    Vec target;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -650,8 +650,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     BreathParticleGroup* groupData;
     short foundSlot;
     short foundGroup;
-    Vec stepVelocity;
     Vec unitVelocity;
+    Vec stepVelocity;
 
     particleData = reinterpret_cast<BreathParticleData*>(vBreathModel->m_particleData);
     particleWmat = vBreathModel->m_particleWmats;

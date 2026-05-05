@@ -4,7 +4,6 @@
 #include "ffcc/color.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
-#include "ffcc/ptrarray.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/linkage.h"
@@ -101,6 +100,13 @@ struct pppScreenBreakUnkC {
     s32* m_serializedDataOffsets;
 };
 
+template <class T>
+class CPtrArray
+{
+public:
+    T operator[](unsigned long);
+};
+
 extern const float FLOAT_80331cc0 = 2.0f;
 extern const float FLOAT_80331cc4 = 0.0f;
 extern const float FLOAT_80331cc8 = 0.3f;
@@ -109,7 +115,7 @@ extern const float FLOAT_80331cd0 = 1.0f;
 extern const float FLOAT_80331cd4 = -1.0f;
 extern const float FLOAT_80331cd8 = 0.017453292f;
 extern const double DOUBLE_80331CE0 = 4503599627370496.0;
-extern const float FLOAT_80331ce8 = 30.0f;
+static const float FLOAT_80331ce8 = 30.0f;
 extern const float FLOAT_80331cec = 4.0f;
 extern const float FLOAT_80331cf0 = -3.0f;
 extern const float FLOAT_80331cf4 = 0.5f;
@@ -118,6 +124,7 @@ extern const Vec DAT_801dd4b0;
 static const Vec DAT_801dd4bc = { 0.0f, 1.0f, 0.0f };
 static const char s_f999_root_801dd4c8[] = "f999_root";
 static const char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
+
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
 static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
 static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
@@ -575,7 +582,9 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
 {
     u8* work = (u8*)param_2;
     ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
-    ScreenBreakMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
+    ScreenBreakMeshRef* mesh = modelView->m_meshes;
+    mesh += meshIndex;
+    ScreenBreakMeshData* meshData = mesh->m_data;
     ScreenBreakDisplayList* displayList = meshData->m_displayLists;
 
     displayList += drawListIndex;

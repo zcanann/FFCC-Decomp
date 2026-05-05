@@ -1,5 +1,6 @@
 #include "ffcc/p_graphic.h"
 #include "ffcc/color.h"
+#include "ffcc/p_dbgmenu.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
@@ -10,7 +11,7 @@
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/p_minigame.h"
+#include "ffcc/p_dbgmenu.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "types.h"
@@ -780,19 +781,18 @@ void CGraphicPcs::drawBar()
  */
 void CGraphicPcs::drawEnd()
 {
-	const u32 miniGameFlags = *(u32*)((u8*)&MiniGamePcs + 0x6484);
-	char debugInputString[256];
 	char debugPadString[256];
+	char debugInputString[256];
 
-	if ((miniGameFlags & 0x10) != 0) {
+	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x10) != 0) {
 		Graphic.DrawDebugString();
 	}
 
-	if ((miniGameFlags & 1) != 0) {
+	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) != 0) {
 		drawBar();
 	}
 
-	if ((miniGameFlags & 0x10) != 0) {
+	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x10) != 0) {
 		Graphic.InitDebugString();
 
 		if (System.m_scenegraphStepMode != 0) {
@@ -804,36 +804,39 @@ void CGraphicPcs::drawEnd()
 			Graphic.DrawDebugStringDirect(0x10, 0x11, debugPadString, 0xC);
 		}
 
-		short x = 0x10;
-		for (u32 port = 0; port < 4; port++) {
+		int x = 0x10;
+		int port = 0;
+		for (; port < 4; port++) {
 			bool suppress = false;
 			if (Pad._452_4_ == 0) {
-				if ((port == 0) && (Pad._448_4_ != -1)) {
-					suppress = true;
+				if (port == 0) {
+					if (Pad._448_4_ != -1) {
+						suppress = true;
+					}
 				}
 			} else {
 				suppress = true;
 			}
 
-			u16 buttons = 0;
-			if (!suppress) {
-				u32 portIndex = port;
-				if ((int)port == Pad._448_4_) {
-					portIndex = 0;
-				}
+			u16 buttons;
+			if (suppress) {
+				buttons = 0;
+			} else {
+				int selectedPort = Pad._448_4_;
+				u32 portIndex = port & ~((int)~((selectedPort - port) | (port - selectedPort)) >> 31);
 				buttons = *(u16*)((u8*)&Pad + 4 + portIndex * 0x54);
 			}
 
-			const char down = ((buttons & 8) != 0) ? 'U' : ' ';
-			const char left = ((buttons & 4) != 0) ? 'D' : ' ';
-			const char l = ((buttons & 1) != 0) ? 'L' : ' ';
-			const char r = ((buttons & 2) != 0) ? 'R' : ' ';
-			const char b = ((buttons & 0x200) != 0) ? 'B' : ' ';
-			const char a = ((buttons & 0x100) != 0) ? 'A' : ' ';
-			const char start = ((buttons & 0x1000) != 0) ? 'S' : ' ';
-			const char s = ((buttons & 0x10) != 0) ? 's' : ' ';
-			const char z = ((buttons & 0x40) != 0) ? 'l' : ' ';
 			const char c = ((buttons & 0x20) != 0) ? 'r' : ' ';
+			const char z = ((buttons & 0x40) != 0) ? 'l' : ' ';
+			const char s = ((buttons & 0x10) != 0) ? 's' : ' ';
+			const char start = ((buttons & 0x1000) != 0) ? 'S' : ' ';
+			const char a = ((buttons & 0x100) != 0) ? 'A' : ' ';
+			const char b = ((buttons & 0x200) != 0) ? 'B' : ' ';
+			const char r = ((buttons & 2) != 0) ? 'R' : ' ';
+			const char l = ((buttons & 1) != 0) ? 'L' : ' ';
+			const char left = ((buttons & 4) != 0) ? 'D' : ' ';
+			const char down = ((buttons & 8) != 0) ? 'U' : ' ';
 
 			sprintf(debugInputString, s__c_c_c_c_c_c_c_c_c_c_801d7bf8, down, left, l, r, b, a, start, s, z, c);
 			Graphic.DrawDebugStringDirect(x, 0x1A8, debugInputString, 8);
@@ -841,7 +844,7 @@ void CGraphicPcs::drawEnd()
 		}
 
 		sprintf(debugInputString, s_debug_frame_fmt, System.m_frameCounter);
-		Graphic.DrawDebugStringDirect(x, 0x1A8, debugInputString, 8);
+		Graphic.DrawDebugStringDirect(port * 0x60 + 0x10, 0x1A8, debugInputString, 8);
 	}
 
 	Memory.Draw();

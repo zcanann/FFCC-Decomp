@@ -5,10 +5,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 extern "C" {
-extern const float kPppLightZero = 0.0f;
-extern const float kPppLightOne = 1.0f;
-extern const float kPppLightDefaultCosAtten = 0.7853982f;
-extern const float kPppLightSpotScale = 0.017453292f;
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 extern u8 gPppDefaultValueBuffer[];
@@ -86,7 +82,7 @@ void pppLightCon3(void* param1, void* param2)
 	void** ptr2 = (void**)*ptr1;
 	void* ptr3 = *ptr2;
 	char* base = (char*)param1 + (int)ptr3 + 0x80;
-	float zero = kPppLightZero;
+	float zero = 0.0f;
 	
 	// Clear some integer values
 	*(int*)((char*)base + 0x10) = 0;
@@ -115,7 +111,7 @@ void pppLightCon(void* param1, void* param2)
 	void** ptr2 = (void**)*ptr1;
 	void* ptr3 = *ptr2;
 	char* base = (char*)param1 + (int)ptr3 + 0x80;
-	float zero = kPppLightZero;
+	float zero = 0.0f;
 	
 	// Clear integer values
 	*(int*)((char*)base + 0x0) = 0;
@@ -226,7 +222,7 @@ void pppLight(_pppPObject* param1, void* param2, void* param3)
 		light.m_targetColor[0].g = (u8)(work->color0G >> 7);
 		light.m_targetColor[0].b = (u8)(work->color0B >> 7);
 		light.m_targetColor[0].a = (u8)(work->color0A >> 7);
-		light.m_radius = kPppLightOne;
+		light.m_radius = 1.0f;
 		*(u32*)&light.m_bumpShade[0] = 0;
 		light.m_part = pppMngStPtr;
 
@@ -249,10 +245,10 @@ void pppLight(_pppPObject* param1, void* param2, void* param3)
 		if (gPppInConstructor == 0 && gPppInSubFrameCalc == 0) {
 			if (step->type == 0) {
 				light.m_type = 0;
-				light.m_direction.x = kPppLightZero;
-				light.m_direction.y = kPppLightZero;
-				light.m_direction.z = kPppLightOne;
-				light.m_spotScale = kPppLightDefaultCosAtten;
+				light.m_direction.x = 0.0f;
+				light.m_direction.y = 0.0f;
+				light.m_direction.z = 1.0f;
+				light.m_spotScale = 0.7853982f;
 				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &light);
 			} else {
 				unsigned char* obj;
@@ -269,7 +265,7 @@ void pppLight(_pppPObject* param1, void* param2, void* param3)
 
 					PSVECSubtract((Vec*)&light.m_targetPosition, (Vec*)&light.m_position, (Vec*)&light.m_direction);
 					PSVECNormalize((Vec*)&light.m_direction, (Vec*)&light.m_direction);
-					light.m_spotScale = kPppLightSpotScale * work->spotScale;
+					light.m_spotScale = 0.017453292f * work->spotScale;
 
 					if (step->type == 2) {
 						light.m_specularScale = work->specularScale;

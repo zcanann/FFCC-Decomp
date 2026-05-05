@@ -650,8 +650,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     BreathParticleGroup* groupData;
     short foundSlot;
     short foundGroup;
-    Vec stepVelocity;
     Vec unitVelocity;
+    Vec stepVelocity;
 
     particleData = reinterpret_cast<BreathParticleData*>(vBreathModel->m_particleData);
     particleWmat = vBreathModel->m_particleWmats;

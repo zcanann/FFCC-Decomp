@@ -2,6 +2,9 @@
 #include "ffcc/graphic_symbols.h"
 #include "ffcc/render_buffers.h"
 
+extern "C" double sin(double);
+extern "C" double cos(double);
+
 #include <math.h>
 #include <stdarg.h>
 #include <string.h>
@@ -207,12 +210,13 @@ void CGraphic::Init()
     GXSetDispCopySrc(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
     GXSetDispCopyDst(U16At(renderMode, 4), U16At(renderMode, 6));
     GXSetCopyFilter(reinterpret_cast<GXRenderModeObj*>(renderMode)->aa,
-                    reinterpret_cast<GXRenderModeObj*>(renderMode)->sample_pattern, GX_TRUE, DAT_801E83F2);
+                    reinterpret_cast<GXRenderModeObj*>(renderMode)->sample_pattern, GX_TRUE,
+                    reinterpret_cast<GXRenderModeObj*>(renderMode)->vfilter);
 
     if (reinterpret_cast<GXRenderModeObj*>(renderMode)->aa == 0) {
         GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
     } else {
-        GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
+        GXSetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
     }
 
     GXSetDispCopySrc(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
@@ -1082,27 +1086,27 @@ void CGraphic::makeSphere()
     float vertices[126];
     int vertexCount = 1;
 
-    vertices[0] = 1.0f;
-    vertices[1] = 0.0f;
-    vertices[2] = 0.0f;
+    vertices[0] = FLOAT_8032F6D0;
+    vertices[1] = kGraphicZeroF;
+    vertices[2] = kGraphicZeroF;
 
     for (int ring = 0; ring < 5; ring++) {
-        float pitch = (3.1415927f * (float)(ring + 1)) / 6.0f;
-        float x = cos(pitch);
-        float radius = sin(pitch);
+        float pitch = (FLOAT_8032F6E0 * (float)(ring + 1)) / FLOAT_8032F700;
+        float x = FLOAT_8032F6D0 * (float)cos(pitch);
+        float radius = FLOAT_8032F6D0 * (float)sin(pitch);
 
         for (int seg = 0; seg < 8; seg++) {
-            float yaw = (6.2831855f * (float)seg) / 8.0f;
+            float yaw = FLOAT_8032F704 * (float)seg;
             vertices[vertexCount * 3 + 0] = x;
-            vertices[vertexCount * 3 + 1] = radius * sin(yaw);
-            vertices[vertexCount * 3 + 2] = radius * cos(yaw);
+            vertices[vertexCount * 3 + 1] = radius * (float)sin(yaw);
+            vertices[vertexCount * 3 + 2] = radius * (float)cos(yaw);
             vertexCount++;
         }
     }
 
-    vertices[vertexCount * 3 + 0] = -1.0f;
-    vertices[vertexCount * 3 + 1] = 0.0f;
-    vertices[vertexCount * 3 + 2] = 0.0f;
+    vertices[vertexCount * 3 + 0] = kGraphicOneF;
+    vertices[vertexCount * 3 + 1] = kGraphicZeroF;
+    vertices[vertexCount * 3 + 2] = kGraphicZeroF;
 
     S32At(this, 0x71F8) = 0x880;
     PtrAt(this, 0x71FC) =
@@ -1336,10 +1340,8 @@ void CGraphic::CopySaveFrameBuffer()
     GXSetTexCopyDst(0x280, 0x1C0, GX_TF_I8, GX_FALSE);
     GXCopyTex(PtrAt(this, 0x71EC), GX_FALSE);
     GXPixModeSync();
-    GXInitTexObj(reinterpret_cast<GXTexObj*>(reinterpret_cast<u8*>(this) + 0x722C),
-                 PtrAt(this, 0x71EC), 0x280, 0x1C0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(reinterpret_cast<u8*>(this) + 0x722C),
-                    GX_NEAR, GX_NEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF,
+    GXInitTexObj(&m_smallBackTexObj, PtrAt(this, 0x71EC), 0x280, 0x1C0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(&m_smallBackTexObj, GX_NEAR, GX_NEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF,
                     GX_FALSE, GX_FALSE, GX_ANISO_1);
 }
 
@@ -1352,7 +1354,7 @@ void CGraphic::CopySaveFrameBuffer()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int doClear)
+_GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int doClear)
 {
     if (((x & 1) ^ (x >> 31)) != (x >> 31)) {
         x -= 1;
@@ -1374,7 +1376,7 @@ void CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int do
     }
 
     if ((xEnd < 0) || (yEnd < 0)) {
-        return;
+        return 0;
     }
 
     void* renderMode = PtrAt(this, 0x71E0);
@@ -1382,7 +1384,7 @@ void CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int do
     int efbHeight = static_cast<int>(U16At(renderMode, 6));
 
     if ((x > efbWidth) || (y > efbHeight) || (width <= 0) || (height <= 0)) {
-        return;
+        return 0;
     }
 
     if (xEnd > efbWidth) {
@@ -1406,7 +1408,7 @@ void CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int do
     }
 
     if ((xEnd == x) || (yEnd == y)) {
-        return;
+        return 0;
     }
 
     int texFormat = 6;
@@ -1423,10 +1425,11 @@ void CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int do
     GXCopyTex(PtrAt(this, 0x71E8), doClear);
     GXPixModeSync();
     GXInvalidateTexAll();
-    GXInitTexObj(reinterpret_cast<_GXTexObj*>(reinterpret_cast<u8*>(this) + 0x720C), PtrAt(this, 0x71E8), width & 0xFFFF,
-                 height & 0xFFFF, static_cast<_GXTexFmt>(texFormat), GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(reinterpret_cast<_GXTexObj*>(reinterpret_cast<u8*>(this) + 0x720C), GX_LINEAR, GX_LINEAR, kGraphicZeroF,
-                    kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObj(&m_backBufferTexObj, PtrAt(this, 0x71E8), width & 0xFFFF, height & 0xFFFF,
+                 static_cast<_GXTexFmt>(texFormat), GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(&m_backBufferTexObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF,
+                    GX_FALSE, GX_FALSE, GX_ANISO_1);
+    return &m_backBufferTexObj;
 }
 
 /*

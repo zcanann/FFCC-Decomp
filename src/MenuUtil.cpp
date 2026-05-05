@@ -38,8 +38,133 @@ extern char DAT_8033366c[];
 extern char DAT_80333670[];
 extern char lbl_80333674[];
 extern char lbl_8033367C[];
-extern char* PTR_s_Strength__80215a48[];
-extern char* PTR_s_Defence__80215a4c[];
+extern char s_Strength_801E30A4[];
+extern char s_Defence_801E30B0[];
+extern char s_Position_Markers_801E30BC[];
+extern char s_Sound_Mode_801E30D0[];
+extern char s_Sound_Effects_801E30DC[];
+extern char s_GBA_Colour_Balance_801E30EC[];
+extern char s_Show_or_hide_position_marker_under_each_character_s_feet_801E3100[];
+extern char s_Select_stereo_or_monaural_sound_801E313C[];
+extern char s_Adjust_volume_of_background_music_801E3160[];
+extern char s_Adjust_volume_of_sound_effects_801E3184[];
+extern char s_Adjust_colour_balance_of_Game_Boy_Advance_801E31A4[];
+extern char s_Monaural_801E31D0[];
+extern char s_Enhanced_801E31DC[];
+extern char s_Standard_801E31E8[];
+extern char s_Erkennungskreisel_801E31F4[];
+extern char s_Tonausgabe_801E3208[];
+extern char lbl_801E3214[];
+extern char s_Farbeinstellung_801E3224[];
+extern char s_Erkennungskreisel_des_Charakters_AN_AUS_schalten_801E3234[];
+extern char s_Tonausgabe_auf_Stereo_oder_Mono_schalten_801E3268[];
+extern char lbl_801E3294[];
+extern char lbl_801E32B4[];
+extern char lbl_801E32DC[];
+extern char s_Erweitert_801E330C[];
+extern char s_Indicatori_di_posizione_801E3318[];
+extern char s_Effetti_sonori_801E3330[];
+extern char s_Bilanc_colore_GBA_801E3340[];
+extern char s_Attiva_o_disattiva_l_indicatore_ai_piedi_dei_personaggi_801E3354[];
+extern char s_Scegli_tra_sonoro_mono_o_stereo_801E3390[];
+extern char s_Regola_il_volume_della_musica_801E33B4[];
+extern char s_Regola_il_volume_degli_effetti_sonori_801E33D4[];
+extern char s_Regola_il_colore_sul_Game_Boy_Advance_801E33FC[];
+extern char lbl_801E3424[];
+extern char s_Sceau_de_position_801E3430[];
+extern char s_Signal_sonore_801E3444[];
+extern char s_Effets_sonores_801E3454[];
+extern char s_Affichage_du_GBA_801E3464[];
+extern char s_Affichage_du_sceau_de_position_aux_pieds_des_personnages_801E3478[];
+extern char lbl_801E34B4[];
+extern char lbl_801E34E0[];
+extern char lbl_801E3500[];
+extern char lbl_801E3524[];
+extern char lbl_801E355C[];
+extern char lbl_801E3568[];
+extern char lbl_801E3574[];
+extern char s_Tipo_de_sonido_801E3584[];
+extern char s_Efectos_de_sonido_801E3594[];
+extern char s_Color_de_la_GBA_801E35A8[];
+extern char lbl_801E35B8[];
+extern char lbl_801E35EC[];
+extern char lbl_801E3614[];
+extern char s_Ajusta_el_volumen_de_los_efectos_de_sonido_801E3640[];
+extern char s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C[];
+extern char s_Encendido_801E36A0[];
+extern char s_Monoaural_801E36AC[];
+extern char s_Mejorado_801E36B8[];
+extern char lbl_801E36C4[];
+extern char lbl_80333460[];
+extern char lbl_80333468[];
+extern char lbl_8033346C[];
+extern char lbl_80333470[];
+extern char lbl_80333478[];
+extern char lbl_8033347C[];
+extern char lbl_80333480[];
+extern char lbl_80333488[];
+extern char lbl_80333490[];
+extern char lbl_80333498[];
+extern char lbl_8033349C[];
+extern char lbl_803334A0[];
+extern char lbl_803334A8[];
+extern char lbl_803334B0[];
+extern char lbl_803334B8[];
+extern char lbl_803334C0[];
+extern char lbl_803334C8[];
+extern char lbl_803334D0[];
+extern char lbl_803334D8[];
+extern char lbl_803334E0[];
+extern char lbl_803334E8[];
+extern char s_Force_803334F0[];
+extern char s_Musique_803334F8[];
+extern char s_Active_80333500[];
+extern char s_Stereo_80333508[];
+extern char s_Fuerza_80333510[];
+extern char s_Defensa_80333518[];
+extern char s_Musica_80333520[];
+extern char s_Apagado_80333528[];
+extern char lbl_80333530[];
+extern char lbl_80333538[];
+extern char lbl_80333540[];
+
+extern "C" char* g_strMenuUtilMes[] = {
+	s_Strength_801E30A4, s_Defence_801E30B0, s_Position_Markers_801E30BC, s_Sound_Mode_801E30D0,
+	lbl_80333460, s_Sound_Effects_801E30DC, s_GBA_Colour_Balance_801E30EC,
+	s_Show_or_hide_position_marker_under_each_character_s_feet_801E3100,
+	s_Select_stereo_or_monaural_sound_801E313C, s_Adjust_volume_of_background_music_801E3160,
+	s_Adjust_volume_of_sound_effects_801E3184, s_Adjust_colour_balance_of_Game_Boy_Advance_801E31A4,
+	lbl_80333468, lbl_8033346C, lbl_80333470, s_Monaural_801E31D0,
+	lbl_80333478, lbl_8033347C, s_Enhanced_801E31DC, s_Standard_801E31E8,
+	lbl_80333480, lbl_80333488, s_Erkennungskreisel_801E31F4, s_Tonausgabe_801E3208,
+	lbl_80333490, lbl_801E3214, s_Farbeinstellung_801E3224,
+	s_Erkennungskreisel_des_Charakters_AN_AUS_schalten_801E3234,
+	s_Tonausgabe_auf_Stereo_oder_Mono_schalten_801E3268, lbl_801E3294, lbl_801E32B4,
+	lbl_801E32DC, lbl_80333498, lbl_8033349C, lbl_803334A0, lbl_803334A8,
+	lbl_80333478, lbl_8033347C, s_Erweitert_801E330C, lbl_803334B0,
+	lbl_803334B8, lbl_803334C0, s_Indicatori_di_posizione_801E3318, lbl_803334C8,
+	lbl_803334D0, s_Effetti_sonori_801E3330, s_Bilanc_colore_GBA_801E3340,
+	s_Attiva_o_disattiva_l_indicatore_ai_piedi_dei_personaggi_801E3354,
+	s_Scegli_tra_sonoro_mono_o_stereo_801E3390, s_Regola_il_volume_della_musica_801E33B4,
+	s_Regola_il_volume_degli_effetti_sonori_801E33D4, s_Regola_il_colore_sul_Game_Boy_Advance_801E33FC,
+	lbl_80333468, lbl_8033346C, lbl_80333470, lbl_803334D8, lbl_80333478, lbl_8033347C,
+	lbl_803334E0, lbl_803334E8,
+	s_Force_803334F0, lbl_801E3424, s_Sceau_de_position_801E3430, s_Signal_sonore_801E3444,
+	s_Musique_803334F8, s_Effets_sonores_801E3454, s_Affichage_du_GBA_801E3464,
+	s_Affichage_du_sceau_de_position_aux_pieds_des_personnages_801E3478,
+	lbl_801E34B4, lbl_801E34E0, lbl_801E3500, lbl_801E3524, s_Active_80333500,
+	lbl_801E355C, s_Stereo_80333508, lbl_803334D8, lbl_80333478, lbl_8033347C,
+	lbl_801E3568, s_Standard_801E31E8,
+	s_Fuerza_80333510, s_Defensa_80333518, lbl_801E3574, s_Tipo_de_sonido_801E3584,
+	s_Musica_80333520, s_Efectos_de_sonido_801E3594, s_Color_de_la_GBA_801E35A8,
+	lbl_801E35B8, lbl_801E35EC, lbl_801E3614, s_Ajusta_el_volumen_de_los_efectos_de_sonido_801E3640,
+	s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C, s_Encendido_801E36A0,
+	s_Apagado_80333528, lbl_80333530, s_Monoaural_801E36AC, lbl_80333538, lbl_80333540,
+	s_Mejorado_801E36B8, lbl_801E36C4,
+};
+
+#define PTR_s_Strength__80215a48 g_strMenuUtilMes
+#define PTR_s_Defence__80215a4c (g_strMenuUtilMes + 1)
 
 // Constants defined externally, placed in .sdata2 by the linker.
 extern const float kMenuCenteringHalfWidth;
@@ -198,7 +323,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	lineBaseY[2] = DAT_801e36d8;
 	lineBaseY[3] = DAT_801e36dc;
 
-	int languageIndex = Game.m_gameWork.m_languageId - 1;
+	int languageIndex = (Game.m_gameWork.m_languageId - 1) * 20;
 	int drawPrefix = 1;
 	int firstLine = 500;
 	int maxWidth = -1;

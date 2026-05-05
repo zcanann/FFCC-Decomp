@@ -126,12 +126,14 @@ found_fallback_glyph:
  */
 float CFont::GetWidth(char* text)
 {
+	char* textPtr = text;
 	float width = 0.0f;
-	unsigned short ch = 0;
+	unsigned short ch;
+	int hasChar;
 
 	goto read_char;
 
-	while (ch != '\0') {
+	while (hasChar != 0) {
 		unsigned short* currentBucket = m_glyphBuckets[ch & 0xFF];
 		unsigned short* glyph = currentBucket + 1;
 		int count = static_cast<int>(*currentBucket);
@@ -144,8 +146,12 @@ float CFont::GetWidth(char* text)
 				goto use_glyph;
 			}
 		}
+		glyph = 0;
 
-		goto find_fallback;
+found_glyph:
+		if (glyph == 0) {
+			goto find_fallback;
+		}
 
 use_glyph:
 		unsigned char flags = renderFlags;
@@ -175,7 +181,8 @@ add_width:
 find_fallback:
 		unsigned short* glyphBucket = m_glyphBuckets[63];
 		unsigned short* fallbackGlyph = glyphBucket + 1;
-		for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
+		count = static_cast<int>(*glyphBucket);
+		for (; count > 0; count--) {
 			if (*reinterpret_cast<unsigned char*>(fallbackGlyph + 1) != 0) {
 				fallbackGlyph += 4;
 			} else {
@@ -186,15 +193,18 @@ find_fallback:
 use_fallback_glyph:
 		glyph = fallbackGlyph;
 		if (glyph != 0) {
-			goto use_glyph;
+			goto found_glyph;
 		}
 		charWidth = FLOAT_803306B8;
 		goto add_width;
 
 read_char:
-		ch = static_cast<unsigned char>(*text);
-		if (ch != '\0') {
-			text++;
+		if (static_cast<unsigned char>(*textPtr) == 0) {
+			hasChar = 0;
+		} else {
+			ch = static_cast<unsigned char>(*textPtr);
+			hasChar = 1;
+			textPtr++;
 		}
 	}
 

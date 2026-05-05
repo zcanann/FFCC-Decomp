@@ -144,9 +144,9 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	Vec shapePos;
 	Vec debugSource;
 	Vec spherePos;
-	_GXColor color;
-	_GXColor trailColor;
 	_GXColor debugColor;
+	_GXColor trailColor;
+	_GXColor color;
 	int tex;
 
 	if (dataValIndex == 0xFFFF) {

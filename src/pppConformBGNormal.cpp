@@ -198,9 +198,9 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 PSVECCrossProduct(&local_158, &local_140, &local_14c);
                 PSVECNormalize(&local_14c, &local_14c);
             } else {
-                local_140.x = kPppConformBgNormalOne;
                 local_140.y = kPppConformBgNormalZero;
                 local_140.z = kPppConformBgNormalZero;
+                local_140.x = kPppConformBgNormalOne;
                 PSVECCrossProduct(&local_158, &local_140, &local_14c);
                 PSVECNormalize(&local_14c, &local_14c);
                 PSVECCrossProduct(&local_14c, &local_158, &local_140);

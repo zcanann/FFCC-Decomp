@@ -154,13 +154,14 @@ void CMaterialEditorPcs::Init()
     self[0x9] = 0x7f;
     self[0xa] = 0x7f;
     clz1 = static_cast<u32>(__cntlzw(1));
-    level = static_cast<u8>(-((u8)(clz0 >> 5) & 1)) & 0x3f;
+    level = -clz0;
+    level &= 0x3f;
     self[0xb] = 0xff;
     self[0xc] = level;
     clz0 = static_cast<u32>(__cntlzw(2));
     self[0xd] = level;
     self[0xe] = level;
-    level = static_cast<u8>(-((u8)(clz1 >> 5) & 1)) & 0x3f;
+    level = -((clz1 >> 5) & 1) & 0x3f;
     self[0xf] = 0xff;
     *reinterpret_cast<float*>(self + 0x18) = 0.0f;
     *reinterpret_cast<float*>(self + 0x1c) = 0.0f;
@@ -168,7 +169,7 @@ void CMaterialEditorPcs::Init()
     self[0x10] = level;
     self[0x11] = level;
     self[0x12] = level;
-    level = static_cast<u8>(-((u8)(clz0 >> 5) & 1)) & 0x3f;
+    level = -((clz0 >> 5) & 1) & 0x3f;
     self[0x13] = 0xff;
     *reinterpret_cast<float*>(self + 0x24) = 0.0f;
     *reinterpret_cast<float*>(self + 0x28) = 0.0f;
@@ -192,7 +193,7 @@ void CMaterialEditorPcs::Init()
     *reinterpret_cast<u32*>(self + 0xbc) = 0;
 
     remaining = 2;
-    do {
+    while (remaining != 0) {
         *reinterpret_cast<u32*>(self + 0x2bc) = 0;
         *reinterpret_cast<u32*>(self + 0x2fc) = 0;
         *reinterpret_cast<u32*>(self + 0x23c) = 0;
@@ -242,8 +243,8 @@ void CMaterialEditorPcs::Init()
         *reinterpret_cast<u32*>(self + 0x398) = 0;
         *reinterpret_cast<u32*>(self + 0x298) = 0;
         self += 0x20;
-        remaining += -1;
-    } while (remaining != 0);
+        remaining--;
+    }
 
     reinterpret_cast<unsigned char*>(this)[0x3bc] = 0;
 }

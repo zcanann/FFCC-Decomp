@@ -3190,15 +3190,15 @@ CMaterialSet::CMaterialSet()
  */
 void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
+    int i;
     CMaterial* material =
         (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[static_cast<unsigned long>(materialIndex)];
     if (material == 0) {
         return;
     }
 
-    int i = 0;
     CMaterial* textureSlot = material;
-    for (; i < *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)); i++) {
+    for (i = 0; i < *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)); i++) {
         CTexture* texture = *reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C));
         if (texture != 0) {
             texture->CacheUnLoadTexture(amemCacheSet);
@@ -3218,15 +3218,15 @@ void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheS
  */
 void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
+    int i;
     CMaterial* material =
         (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[static_cast<unsigned long>(materialIndex)];
     if (material == 0) {
         return;
     }
 
-    int i = 0;
     CMaterial* textureSlot = material;
-    for (; i < *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)); i++) {
+    for (i = 0; i < *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)); i++) {
         CTexture* texture = *reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C));
         if (texture != 0) {
             texture->CacheLoadTexture(amemCacheSet);

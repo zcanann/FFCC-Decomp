@@ -96,7 +96,6 @@ int CMenuPcs::MoneyCtrlCur()
 	bool blocked;
 	u16 press;
 	u16 hold;
-	int caravanWork = Game.m_scriptFoodBase[0];
 
 	blocked = false;
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -126,23 +125,24 @@ int CMenuPcs::MoneyCtrlCur()
 		return 0;
 	}
 
+	int caravanWork = Game.m_scriptFoodBase[0];
 	int menuState = (int)this->moneyState;
 	s16* singWindowInfo = this->singWindowInfo;
 	int mode = (int)*(s16*)(menuState + 0x30);
 	int maxDigits = 1;
-	int maxGil = *(int*)(Game.m_scriptFoodBase[0] + 0x200);
+	int maxGil = *(int*)(caravanWork + 0x200);
+	int digitPlace = 10;
 
-	if ((((((0 < maxGil / 10) && (maxDigits = 2, 0 < maxGil / 100)) && (maxDigits = 3, 0 < maxGil / 1000)) &&
-	      ((maxDigits = 4, 0 < maxGil / 10000 && (maxDigits = 5, 0 < maxGil / 100000)))) &&
-	     (maxDigits = 6, 0 < maxGil / 1000000)) && (maxDigits = 7, 0 < maxGil / 10000000)) {
-		maxDigits = 8;
+	while ((maxDigits < 8) && (0 < maxGil / digitPlace)) {
+		digitPlace *= 10;
+		maxDigits++;
 	}
 	int attachFlag = SingGetLetterAttachflg__8CMenuPcsFv(this);
 
 	if (mode == 0) {
-		s16 cursor = *(s16*)(menuState + 0x26);
+		int cursor = *(s16*)(menuState + 0x26);
 		unsigned int placeValue = 1;
-		for (int i = 0; i < (int)cursor; i++) {
+		for (int i = 0; i < cursor; i++) {
 			placeValue *= 10;
 		}
 

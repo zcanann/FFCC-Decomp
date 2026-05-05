@@ -228,6 +228,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
     int i;
     Vec delta;
     Vec matrixPos;
+    float distance;
     float zero;
 
     if (gPppCalcDisabled != 0) {
@@ -303,7 +304,8 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
     matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
 
     pppSubVector(delta, matrixPos, work->m_prevPosition);
-    if (PSVECDistance(&matrixPos, &work->m_prevPosition) != FLOAT_80330644) {
+    distance = PSVECDistance(&matrixPos, &work->m_prevPosition);
+    if (distance != FLOAT_80330644) {
         work->m_prevPositionChanged = 0xff;
     } else {
         work->m_prevPositionChanged = 0;

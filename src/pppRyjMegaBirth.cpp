@@ -254,19 +254,21 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 	int* offsets = ctrlTable->m_serializedDataOffsets;
 	VRyjMegaBirth* work = (VRyjMegaBirth*)(obj->m_workArea + offsets[2]);
 	VColor* baseColor = (VColor*)(obj->m_workArea + offsets[1]);
-	_PARTICLE_DATA* particle = work->m_particleBlock;
-	PARTICLE_WMAT* particleWorldMat = work->m_worldMatrixBlock;
-	_PARTICLE_COLOR* colorData = work->m_colorBlock;
+	_PARTICLE_DATA* particleBlock = work->m_particleBlock;
+	PARTICLE_WMAT* particleWorldMatBlock = work->m_worldMatrixBlock;
+	_PARTICLE_COLOR* colorBlock = work->m_colorBlock;
+	_PARTICLE_DATA* particle = particleBlock;
+	PARTICLE_WMAT* particleWorldMat = particleWorldMatBlock;
+	_PARTICLE_COLOR* colorData = colorBlock;
 	s32 numParticles = work->m_numParticles;
 	s8 hasRequiredMemory;
-	s32 dataValIndex;
 	pppFMATRIX baseViewMatrix;
 
-	if (particle == NULL) {
+	if (particleBlock == NULL) {
 		hasRequiredMemory = 0;
-	} else if (((payload[0xEC] == 1) || (payload[0xEC] == 2)) && (particleWorldMat == NULL)) {
+	} else if (((payload[0xEC] == 1) || (payload[0xEC] == 2)) && (particleWorldMatBlock == NULL)) {
 		hasRequiredMemory = 0;
-	} else if ((payload[0xE9] != 0) && (colorData == NULL)) {
+	} else if ((payload[0xE9] != 0) && (colorBlock == NULL)) {
 		hasRequiredMemory = 0;
 	} else {
 		hasRequiredMemory = 1;
@@ -276,21 +278,26 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 		return;
 	}
 
-	dataValIndex = *(s32*)(payload + 4);
-	if (dataValIndex == 0xFFFF) {
+	if (*(s32*)(payload + 4) == 0xFFFF) {
 		return;
 	}
 
-	if (payload[0xEC] == 0) {
+	switch (payload[0xEC]) {
+	case 0:
 		PSMTXConcat(work->m_worldMatrix, obj->m_localMatrix.value, baseViewMatrix.value);
 		PSMTXConcat(ppvCameraMatrix, baseViewMatrix.value, baseViewMatrix.value);
+		break;
+	default:
+		break;
 	}
 
-	long** animDataSet = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+	long** animDataSet = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + *(s32*)(payload + 4) * 4);
+	int useTexture = payload[0xED] == 0;
+	float drawScale = payload[0x0E] != 0 ? *(float*)(payload + 0x18) : kPppRyjMegaBirthZero;
 
 	pppSetDrawEnv(
-		(pppCVECTOR*)0, (pppFMATRIX*)0, payload[0x0E] != 0 ? *(float*)(payload + 0x18) : kPppRyjMegaBirthZero,
-		payload[0xF3], payload[0x0C], payload[0xF2], 0, (u8)(payload[0xED] == 0), 1, 0);
+		(pppCVECTOR*)0, (pppFMATRIX*)0, drawScale, payload[0xF3], payload[0x0C], payload[0xF2], 0, useTexture, 1,
+		0);
 
 	long* animData = *animDataSet;
 	int baseRed = baseColor->m_red;
@@ -329,10 +336,6 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 			drawMatrix[0][3] = drawPos.x;
 			drawMatrix[1][3] = drawPos.y;
 			drawMatrix[2][3] = drawPos.z;
-
-			drawPos.x = drawMatrix[0][3];
-			drawPos.y = drawMatrix[1][3];
-			drawPos.z = drawMatrix[2][3];
 
 			switch (payload[0xEC]) {
 			case 0:

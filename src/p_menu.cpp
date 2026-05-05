@@ -256,9 +256,9 @@ static inline void ReleaseRefObject(void* object)
     }
 
     u32* raw = reinterpret_cast<u32*>(object);
-    int refCount = static_cast<int>(raw[1]);
-    raw[1] = static_cast<u32>(refCount - 1);
-    if (refCount - 1 == 0) {
+    int refCount = static_cast<int>(raw[1]) - 1;
+    raw[1] = static_cast<u32>(refCount);
+    if (refCount == 0) {
         delete reinterpret_cast<CRef*>(object);
     }
 }

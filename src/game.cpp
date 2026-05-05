@@ -840,32 +840,24 @@ void CGame::CheckScriptChange()
  */
 void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
 {
-    u32 hasParamMask;
-
     if (param5 != 0) {
         Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp_801d6190), 0x24E);
         System.MapChanging(mapId, mapVariant);
 
         m_currentMapId = mapId;
         m_currentMapVariantId = mapVariant;
-        hasParamMask = (u32)((-param4 | param4) >> 31);
 
         MapPcs.LoadMap(
-            mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, 0);
-
-        hasParamMask = (u32)((-param4 | param4) >> 31);
+            mapId, mapVariant, (void*)(param4 ? 0x800000 : 0), param4 ? 0x580000 : 0, 0);
         PartPcs.LoadFieldPdt(
-            mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, 0);
+            mapId, mapVariant, (void*)(param4 ? 0xD80000 : 0), param4 ? 0x80000 : 0, 0);
 
         System.MapChanged(mapId, mapVariant, 1);
     } else {
-        hasParamMask = (u32)((-param4 | param4) >> 31);
         MapPcs.LoadMap(
-            mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, param4 & 0xFF);
-
-        hasParamMask = (u32)((-param4 | param4) >> 31);
+            mapId, mapVariant, (void*)(param4 ? 0x800000 : 0), param4 ? 0x580000 : 0, param4 & 0xFF);
         PartPcs.LoadFieldPdt(
-            mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, (u8)param4);
+            mapId, mapVariant, (void*)(param4 ? 0xD80000 : 0), param4 ? 0x80000 : 0, (u8)param4);
     }
 }
 

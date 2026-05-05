@@ -30,9 +30,12 @@ struct PYmMeltDataOffsets {
 struct YmMeltCtrl {
     s32 m_graphId;
     s32 m_dataValIndex;
-    s32 m_initWOrk;
+    s16 m_shapeFrameStep;
+    u16 m_gridSize;
     f32 m_stepValue;
-    s32 m_arg3;
+    u8 m_blendMode;
+    u8 _pad11;
+    s16 m_phasePeriod;
     u8 m_payload[0x20];
 };
 

@@ -125,8 +125,8 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         &colorWork->m_color, &ppvCameraMatrix, kPppYmMeltZero, ctrl->m_payload[0x19],
-        ctrl->m_payload[0x18], *(u8*)&ctrl->m_arg3, 2, 1, 1, 0);
-    pppSetBlendMode(*(u8*)&ctrl->m_arg3);
+        ctrl->m_payload[0x18], ctrl->m_blendMode, 2, 1, 1, 0);
+    pppSetBlendMode(ctrl->m_blendMode);
 
     GXClearVtxDesc();
     GXSetVtxDesc((GXAttr)9, (GXAttrType)1);
@@ -172,16 +172,16 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
     uStep = uvMax.x - uvMin.x;
     vStep = uvMax.y - uvMin.y;
-    grid = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
+    grid = ctrl->m_gridSize;
     uStep = uStep / (f32)grid;
     vStep = vStep / (f32)grid;
     GXBegin((GXPrimitive)0x80, GX_VTXFMT7, (u16)((grid * grid * 4) & 0xFFFC));
 
-    for (int z = 0; z < *(u16*)((u8*)&ctrl->m_initWOrk + 2); z++) {
+    for (int z = 0; z < ctrl->m_gridSize; z++) {
         float v0 = (f32)z * vStep;
         float v1 = (f32)(z + 1) * vStep;
-        for (int x = 0; x < *(u16*)((u8*)&ctrl->m_initWOrk + 2); x++) {
-            int gridWork = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
+        for (int x = 0; x < ctrl->m_gridSize; x++) {
+            int gridWork = ctrl->m_gridSize;
             int idx0 = x + z * (gridWork + 1);
             int idx1 = x + (z + 1) * (gridWork + 1);
             YmMeltVertex* p0Data = &vertexData[idx1];
@@ -296,7 +296,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
     colorOffset = offsets->m_serializedDataOffsets[1];
     colorWork = (YmMeltColorWork*)((u8*)ymMelt + colorOffset + 0x80);
-    gridCount = *(u16*)((u8*)&ctrl->m_initWOrk + 2) + 1;
+    gridCount = ctrl->m_gridSize + 1;
     vertexCount = gridCount * gridCount;
     matrixY = pppMngStPtr->m_matrix.value[1][3];
 
@@ -308,12 +308,12 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
 
         vertexBase = work->m_vertexData;
         angleSeed = rand();
-        phaseWork = *(s16*)((u8*)&ctrl->m_arg3 + 2);
+        phaseWork = ctrl->m_phasePeriod;
         int phaseQuotient = angleSeed / phaseWork;
         work->m_phaseOffset = angleSeed - phaseQuotient * phaseWork;
         halfWidth = ctrl->m_stepValue * FLOAT_80330b08;
         phaseWork = work->m_phaseOffset;
-        step = ctrl->m_stepValue / (f32)*(u16*)((u8*)&ctrl->m_initWOrk + 2);
+        step = ctrl->m_stepValue / (f32)ctrl->m_gridSize;
         rot = FLOAT_80330b0c * (f32)phaseWork;
         vertex = vertexBase;
 
@@ -349,7 +349,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     if (ctrl->m_dataValIndex != 0xFFFF) {
         long* animData = **(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
         pppCalcFrameShape(animData, work->m_shapeCurrentFrame, work->m_shapeDrawFrame,
-                                      work->m_shapeFrameTime, *(s16*)&ctrl->m_initWOrk);
+                                      work->m_shapeFrameTime, ctrl->m_shapeFrameStep);
     }
 }
 

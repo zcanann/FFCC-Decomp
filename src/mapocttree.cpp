@@ -104,9 +104,11 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*
 extern "C" void __ct__8COctNodeFv(void*);
 extern "C" void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
-extern "C" const char s_m_node_pctd_m_meshtype_pctd_801D7268[];
 extern unsigned long s_insertShadowNo;
 
+extern "C" const char s_m_node_pctd_m_meshtype_pctd_801D7268[] =
+    "\n\n===============================================\n\n\t\t\tm_node=%d   m_meshtype=%d\n\n\n"
+    "===============================================\n\n";
 extern "C" const char s_mapocttree_cpp_801D72EC[] = "mapocttree.cpp";
 
 namespace {

@@ -714,7 +714,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 				++pathLen1;
 				visited1Bytes[other0] = 1;
 
-				if (other0 == static_cast<unsigned char>(goalGroup))
+				if (other0 == goalGroup)
 				{
 					if (cost1 < m_bestPath.m_cost)
 					{
@@ -830,7 +830,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 								++level2.m_pathLength;
 								level2.m_visited[other1] = 1;
 
-								if (other1 == static_cast<unsigned char>(goalGroup))
+								if (other1 == goalGroup)
 								{
 									if (level2.m_cost < m_bestPath.m_cost)
 									{

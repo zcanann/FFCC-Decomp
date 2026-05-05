@@ -286,8 +286,10 @@ draw_loop:
         pos.z = segBaseZ;
 
         if (step->m_worldSpaceMode == 0) {
-            PSMTXScaleApply(obj->pppPObject.m_localMatrix.value, obj->field_0x40.value, drawScale * pppMngStPtr->m_scale.x,
-                            drawScale * pppMngStPtr->m_scale.y, drawScale * pppMngStPtr->m_scale.z);
+            PSMTXScaleApply(obj->pppPObject.m_localMatrix.value, obj->field_0x40.value,
+                            drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x),
+                            drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y),
+                            drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z));
             if ((step->m_rotateEnabled != 0) && (count != 0)) {
                 PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
                 tmpMtx = obj->field_0x40;

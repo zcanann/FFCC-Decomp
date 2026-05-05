@@ -4786,7 +4786,7 @@ void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
  */
 int GbaQueue::GetHitEInfo(int channel)
 {
-	int singleMode = reinterpret_cast<signed char*>(this)[0x2D56];
+	signed char singleMode = m_singleMode;
 	unsigned int actualChannel = static_cast<unsigned int>(channel) &
 	                             ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;
@@ -4806,7 +4806,7 @@ int GbaQueue::GetHitEInfo(int channel)
 bool GbaQueue::IsSingleMode(int channel)
 {
 	OSWaitSemaphore(accessSemaphores + channel);
-	bool isSingle = reinterpret_cast<signed char*>(this)[0x2D56] == 1;
+	bool isSingle = m_singleMode == 1;
 	OSSignalSemaphore(accessSemaphores + channel);
 	return isSingle;
 }

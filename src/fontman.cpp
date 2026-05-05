@@ -19,6 +19,8 @@ extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(in
 extern "C" void* __vt__5CFont[];
 extern "C" const float FLOAT_803306B8;
 extern "C" const float FLOAT_803306C8;
+extern "C" const float FLOAT_803306D8;
+extern "C" const float FLOAT_803306DC;
 
 static const char s_fontman_cpp[] = "fontman.cpp";
 static const char s_CFontMan[] = "CFontMan";
@@ -284,14 +286,14 @@ found_fallback:
 	posX += advance;
 
 	if (glyphInfo[0] == 0) {
-		u0 += 1.0f;
+		u0 += FLOAT_803306C8;
 	}
 	if (m_glyphWidth == static_cast<unsigned short>(glyphInfo[0] + glyphInfo[1])) {
-		u1 -= 1.0f;
+		u1 -= FLOAT_803306C8;
 	}
 
-	v0 += 1.0f;
-	v1 -= 1.0f;
+	v0 += FLOAT_803306C8;
+	v1 -= FLOAT_803306C8;
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	GXPosition3f32(x0, y0, posZ);
@@ -379,11 +381,13 @@ void CFont::DrawInit()
 
     CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
     if (renderFlagBits.zCompare != 0 || renderFlagBits.zUpdate != 0) {
-        C_MTXOrtho(projMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
-        projMtx[2][2] = 1.0f;
-        projMtx[2][3] = 0.0f;
+        C_MTXOrtho(projMtx, FLOAT_803306B8, FLOAT_803306D8, FLOAT_803306B8, FLOAT_803306DC, FLOAT_803306B8,
+                   FLOAT_803306C8);
+        projMtx[2][2] = FLOAT_803306C8;
+        projMtx[2][3] = FLOAT_803306B8;
     } else {
-        C_MTXOrtho(projMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+        C_MTXOrtho(projMtx, FLOAT_803306B8, FLOAT_803306D8, FLOAT_803306B8, FLOAT_803306DC, FLOAT_803306B8,
+                   FLOAT_803306C8);
     }
     GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
 

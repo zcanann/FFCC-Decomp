@@ -490,11 +490,12 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     Mtx* particleWMat;
     Mtx* particleMtx;
     int i;
-    short groupIndex;
+    int groupIndex;
     int firstParticle;
     int groupTable;
     short slotIndex;
-    unsigned int slotCount;
+    int particleSlot;
+    int slotCount;
     int ready;
     float scaledOwner;
     Mtx scaleMtx;
@@ -595,12 +596,12 @@ group_ready:
         if (ready) {
             firstParticle = -1;
             scaledOwner = mngSt->m_previousPosition.z * pBreathModel->m_groupOwnerScale;
-            for (slotIndex = 0; slotCount != 0; slotCount--) {
-                if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
-                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
+            for (particleSlot = 0; slotCount != 0; slotCount--) {
+                if (*(signed char*)(*(int*)(groupTable + 8) + particleSlot) != -1) {
+                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + particleSlot);
                     break;
                 }
-                slotIndex++;
+                particleSlot++;
             }
 
             PSMTXIdentity(scaleMtx);

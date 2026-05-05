@@ -266,21 +266,21 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 
                         case 'CHLD':
                             int childCount = 0;
-                            COctNode** childNode = node->m_children;
+                            COctNode* childNode = node;
 
                             for (int i = 0; i < 8; i++) {
                                 short childIndex = chunkFile.Get2();
 
                                 if (childIndex != -1) {
-                                    *childNode = m_nodePool + childIndex;
-                                    childNode++;
+                                    childNode->m_children[0] = m_nodePool + childIndex;
+                                    childNode = reinterpret_cast<COctNode*>(Ptr(childNode, 4));
                                     childCount++;
                                 }
                             }
 
                             for (int i = childCount; i < 8; i++) {
-                                *childNode = 0;
-                                childNode++;
+                                childNode->m_children[0] = 0;
+                                childNode = reinterpret_cast<COctNode*>(Ptr(childNode, 4));
                             }
                             break;
                         }

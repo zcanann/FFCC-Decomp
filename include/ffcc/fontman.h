@@ -72,7 +72,7 @@ public:
 	float posY;
 	float posZ;
 	float margin;
-	unsigned char renderFlags;
+	signed char renderFlags;
 	unsigned char m_pad25[3];
 	float scaleX;
 	float scaleY;

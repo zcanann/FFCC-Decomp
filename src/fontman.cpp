@@ -38,7 +38,7 @@ struct CFontRenderFlagBits
 	signed char pad : 3;
 };
 
-static CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
+static CFontRenderFlagBits& GetRenderFlagBits(signed char& flags)
 {
 	return reinterpret_cast<CFontRenderFlagBits&>(flags);
 }
@@ -74,7 +74,7 @@ found_glyph:
 	}
 
 found_fallback:
-	unsigned char flags = renderFlags;
+	signed char flags = renderFlags;
 	int drawWidth;
 	float localMargin = margin;
 	float localScaleX = scaleX;
@@ -148,7 +148,7 @@ float CFont::GetWidth(char* text)
 		goto find_fallback;
 
 use_glyph:
-		unsigned char flags = renderFlags;
+		signed char flags = renderFlags;
 		int drawWidth;
 		float localMargin = margin;
 		float localScaleX = scaleX;
@@ -241,7 +241,7 @@ found_fallback:
 		}
 	}
 
-	unsigned char flags = renderFlags;
+	signed char flags = renderFlags;
 	signed char sign = static_cast<signed char>(flags) >> 7;
 	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) +
 	                           ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 3);

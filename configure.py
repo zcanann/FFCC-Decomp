@@ -520,7 +520,7 @@ config.libs = [
             Object(NonMatching, "main.cpp"),
             Object(Matching, "manager.cpp"),
             Object(NonMatching, "map.cpp"),
-            Object(NonMatching, "mapanim.cpp", extra_cflags=["-RTTI on"]),
+            Object(NonMatching, "mapanim.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),
             Object(NonMatching, "maphit.cpp"),
             Object(Matching, "maplight.cpp"),
             Object(NonMatching, "mapmesh.cpp", extra_cflags=["-sdata 8"]),

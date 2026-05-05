@@ -12,7 +12,6 @@ extern "C" {
 extern int gPppHeapUseRateWords[3];
 extern const char sDebugSpinnerText[5];
 extern const float kPppHeapUseRateDivisor;
-extern const float kPartColorIdentityOne;
 }
 #include "ffcc/linkage.h"
 #include "ffcc/USBStreamData.h"
@@ -21,6 +20,7 @@ extern const float kPartColorIdentityOne;
 
 extern "C" const char s_no_name_8032fdcc[];
 extern "C" {
+extern const float kPartColorIdentityOne = 1.0f;
 const char s_no_name_8032fdcc[] = "no name";
 }
 
@@ -1174,7 +1174,7 @@ void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 	};
 	PartMngColorView* pppMngSt =
 	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
-	float one = kPartColorIdentityOne;
+	float one = 1.0f;
 
 	pppMngSt->r = color.x;
 	pppMngSt->g = color.y;

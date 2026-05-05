@@ -236,9 +236,9 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     pppMngStPtr->m_matrix.value[1][3] = ownerY;
                     pppMngStPtr->m_matrix.value[2][3] = ownerZ;
                 } else {
-                    ownerX = owner->m_worldPosition.x;
                     ownerY = owner->m_worldPosition.y;
                     ownerZ = owner->m_worldPosition.z;
+                    ownerX = owner->m_worldPosition.x;
                     secondRayDirection.x = kPppConformBgNormalZero;
                     secondRayDirection.y = -2000.0f;
                     secondRayDirection.z = kPppConformBgNormalZero;

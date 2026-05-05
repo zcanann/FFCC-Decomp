@@ -351,8 +351,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     *reinterpret_cast<unsigned short*>(self + 0x134E) = 0;
     self[0x6494] = 0;
 
-    CMemory::CStage* stageLoad =
-        reinterpret_cast<CMemory::CStage*>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x20);
+    CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
     *reinterpret_cast<void**>(self + 0x1354) =
         __nwa__FUlPQ27CMemory6CStagePci(0x40000, stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1);
     *reinterpret_cast<void**>(self + 0x135C) =

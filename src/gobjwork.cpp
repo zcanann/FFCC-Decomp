@@ -473,12 +473,21 @@ int CCaravanWork::IsOutOfShouki()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::AddLetter(int letterType, int senderId, int placeId, int moneyValue, int hasMoneyFlag,
-							 int hasReplyFlag, int itemA, int itemB, int itemC)
+void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int hasMoneyFlag, int hasReplyFlag,
+							 int itemA, int itemB, int itemC, int itemD)
 {
 	struct LetterSlot
 	{
 		unsigned int words[3];
+	};
+	struct LetterFlags
+	{
+		unsigned char opened : 1;
+		unsigned char flag6 : 1;
+		unsigned char flag5 : 1;
+		unsigned char hasReply : 1;
+		unsigned char hasMoney : 1;
+		unsigned char low : 3;
 	};
 
 	LetterSlot* slots = reinterpret_cast<LetterSlot*>(m_letter0);
@@ -488,30 +497,32 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int placeId, int mone
 
 	memset(m_letter0, 0, sizeof(m_letter0));
 
+	LetterFlags* letterFlags = reinterpret_cast<LetterFlags*>(m_letter0);
 	unsigned short* letterWords16 = reinterpret_cast<unsigned short*>(m_letter0);
 	unsigned int* letterWords32 = reinterpret_cast<unsigned int*>(m_letter0);
 	letterWords16[0] = (unsigned short)((letterWords16[0] & 0xF803) | ((letterType << 2) & 0x7FC));
 	letterWords32[0] = (letterWords32[0] & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
-	m_letter0[0] = (unsigned char)((m_letter0[0] & 0xF7) | ((hasMoneyFlag << 3) & 8));
-	if (((m_letter0[0] >> 3) & 1) != 0) {
+	letterFlags->hasMoney = hasMoneyFlag;
+	if (letterFlags->hasMoney != 0) {
 		int divValue = (moneyValue / 100) + (moneyValue >> 31);
 		moneyValue = divValue - (divValue >> 31);
 	}
 	letterWords16[1] = (unsigned short)((letterWords16[1] & 0xFE00) | (moneyValue & 0x1FF));
-	m_letter0[0] = (unsigned char)(m_letter0[0] & 0x7F);
-	m_letter0[0] = (unsigned char)(m_letter0[0] & 0xBF);
-	m_letter0[0] = (unsigned char)(m_letter0[0] & 0xDF);
-	m_letter0[0] = (unsigned char)((m_letter0[0] & 0xEF) | ((hasReplyFlag << 4) & 0x10));
+	letterFlags->opened = 0;
+	letterFlags->flag6 = 0;
+	letterFlags->flag5 = 0;
+	letterFlags->hasReply = hasReplyFlag;
 	letterWords16[2] = (unsigned short)itemA;
 	letterWords16[3] = (unsigned short)itemB;
 	letterWords16[4] = (unsigned short)itemC;
-	letterWords16[5] = 0;
+	letterWords16[5] = (unsigned short)itemD;
 
 	int nextCount = m_letterCount + 1;
-	if (nextCount > 100) {
-		nextCount = 100;
+	int letterCount = 100;
+	if (nextCount < 100) {
+		letterCount = nextCount;
 	}
-	m_letterCount = nextCount;
+	m_letterCount = letterCount;
 
 	GbaQue.SetAddLetter(m_joybusCaravanId);
 }
@@ -2209,16 +2220,18 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 	short inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
 
 	if (cmdListIdx == 0) {
-		if (m_equipment[0] < 0) {
+		short equipmentSlot = m_equipment[0];
+		if (equipmentSlot < 0) {
 			result = 0;
 		} else {
-			result = (short)m_inventoryItems[m_equipment[0]];
+			result = (short)m_inventoryItems[equipmentSlot];
 		}
 	} else if (cmdListIdx == 1) {
-		if (m_equipment[2] < 0) {
+		short equipmentSlot = m_equipment[2];
+		if (equipmentSlot < 0) {
 			result = 0;
 		} else {
-			result = (short)m_inventoryItems[m_equipment[2]];
+			result = (short)m_inventoryItems[equipmentSlot];
 		}
 	} else {
 		int numGrouped;

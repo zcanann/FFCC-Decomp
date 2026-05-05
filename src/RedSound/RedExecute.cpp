@@ -1498,7 +1498,7 @@ void EnvelopeKeyExecute()
                 if ((((u8*)voiceData)[0x1A] & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
                     int prio = ((int)voiceData - (int)p_VoiceData) / REDSOUND_VOICE_SIZE +
                                (((int)voiceData - (int)p_VoiceData) >> 0x1F);
-                    prio = (0x40 - (prio - (prio >> 0x1F)) >> 1) - 1;
+                    prio = (REDSOUND_VOICE_COUNT - (prio - (prio >> 0x1F)) >> 1) - 1;
                     if (prio < 1) {
                         prio = 1;
                     }

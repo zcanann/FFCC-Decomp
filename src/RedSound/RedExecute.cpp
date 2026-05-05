@@ -168,6 +168,12 @@ enum RedExecuteLayoutSize {
     REDSOUND_REVERB_ALLOC_ALIGN_MASK = REDSOUND_REVERB_ALLOC_ALIGN - 1,
 };
 
+enum RedReverbDelayChannelIndex {
+    REDSOUND_REVERB_DELAY_LEFT = 0,
+    REDSOUND_REVERB_DELAY_RIGHT = 1,
+    REDSOUND_REVERB_DELAY_SURROUND = 2,
+};
+
 enum RedExecuteAxVoiceLayout {
     REDSOUND_AX_VOICE_PRIORITY_OFFSET = 0x0C,
     REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET = 0x1C,
@@ -366,15 +372,15 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
     }
     case REDSOUND_REVERB_KIND_DELAY: {
         AXFX_DELAY* delay = (AXFX_DELAY*)reverb->context;
-        delay->delay[2] = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
-        delay->delay[1] = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
-        delay->delay[0] = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
-        delay->feedback[2] = (u32)params[REDSOUND_REVERB_PARAM_FEEDBACK];
-        delay->feedback[1] = (u32)params[REDSOUND_REVERB_PARAM_FEEDBACK];
-        delay->feedback[0] = (u32)params[REDSOUND_REVERB_PARAM_FEEDBACK];
-        delay->output[2] = (u32)params[REDSOUND_REVERB_PARAM_OUTPUT];
-        delay->output[1] = (u32)params[REDSOUND_REVERB_PARAM_OUTPUT];
-        delay->output[0] = (u32)params[REDSOUND_REVERB_PARAM_OUTPUT];
+        delay->delay[REDSOUND_REVERB_DELAY_SURROUND] = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
+        delay->delay[REDSOUND_REVERB_DELAY_RIGHT] = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
+        delay->delay[REDSOUND_REVERB_DELAY_LEFT] = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
+        delay->feedback[REDSOUND_REVERB_DELAY_SURROUND] = (u32)params[REDSOUND_REVERB_PARAM_FEEDBACK];
+        delay->feedback[REDSOUND_REVERB_DELAY_RIGHT] = (u32)params[REDSOUND_REVERB_PARAM_FEEDBACK];
+        delay->feedback[REDSOUND_REVERB_DELAY_LEFT] = (u32)params[REDSOUND_REVERB_PARAM_FEEDBACK];
+        delay->output[REDSOUND_REVERB_DELAY_SURROUND] = (u32)params[REDSOUND_REVERB_PARAM_OUTPUT];
+        delay->output[REDSOUND_REVERB_DELAY_RIGHT] = (u32)params[REDSOUND_REVERB_PARAM_OUTPUT];
+        delay->output[REDSOUND_REVERB_DELAY_LEFT] = (u32)params[REDSOUND_REVERB_PARAM_OUTPUT];
         result = AXFXDelaySettings(delay);
         break;
     }
@@ -520,15 +526,15 @@ int* SetReverb(int bank, int kind, int* params)
         AXFX_DELAY* delay = (AXFX_DELAY*)RedNew(sizeof(AXFX_DELAY));
         reverb->context = delay;
         reverb->callback = (int)AXFXDelayCallback;
-        delay->delay[2] = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
-        delay->delay[1] = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
-        delay->delay[0] = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
-        delay->feedback[2] = (u32)params[REDSOUND_REVERB_PARAM_FEEDBACK];
-        delay->feedback[1] = (u32)params[REDSOUND_REVERB_PARAM_FEEDBACK];
-        delay->feedback[0] = (u32)params[REDSOUND_REVERB_PARAM_FEEDBACK];
-        delay->output[2] = (u32)params[REDSOUND_REVERB_PARAM_OUTPUT];
-        delay->output[1] = (u32)params[REDSOUND_REVERB_PARAM_OUTPUT];
-        delay->output[0] = (u32)params[REDSOUND_REVERB_PARAM_OUTPUT];
+        delay->delay[REDSOUND_REVERB_DELAY_SURROUND] = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
+        delay->delay[REDSOUND_REVERB_DELAY_RIGHT] = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
+        delay->delay[REDSOUND_REVERB_DELAY_LEFT] = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
+        delay->feedback[REDSOUND_REVERB_DELAY_SURROUND] = (u32)params[REDSOUND_REVERB_PARAM_FEEDBACK];
+        delay->feedback[REDSOUND_REVERB_DELAY_RIGHT] = (u32)params[REDSOUND_REVERB_PARAM_FEEDBACK];
+        delay->feedback[REDSOUND_REVERB_DELAY_LEFT] = (u32)params[REDSOUND_REVERB_PARAM_FEEDBACK];
+        delay->output[REDSOUND_REVERB_DELAY_SURROUND] = (u32)params[REDSOUND_REVERB_PARAM_OUTPUT];
+        delay->output[REDSOUND_REVERB_DELAY_RIGHT] = (u32)params[REDSOUND_REVERB_PARAM_OUTPUT];
+        delay->output[REDSOUND_REVERB_DELAY_LEFT] = (u32)params[REDSOUND_REVERB_PARAM_OUTPUT];
         result = AXFXDelayInit(delay);
         break;
     }

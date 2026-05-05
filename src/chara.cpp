@@ -673,7 +673,7 @@ void CChara::Quit()
 		__dla__FPv(*buf1);
 		*buf1 = 0;
 	}
-	*(void**)((u8*)this + 0x2058) = 0;
+	Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>((u8*)this + 0x2058));
 }
 
 /*

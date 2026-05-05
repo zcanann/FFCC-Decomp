@@ -69,7 +69,7 @@ extern float FLOAT_80331b1c;
 extern float FLOAT_80331b24;
 extern float FLOAT_80331b28;
 extern float FLOAT_80331b2c;
-extern float FLOAT_80331b18;
+extern const float FLOAT_80331b18;
 extern float FLOAT_80331b30;
 extern float FLOAT_80331b34;
 extern float FLOAT_80331b38;
@@ -223,18 +223,16 @@ int CGPrgObj::getReplaceStat(int state)
  */
 void CGItemObj::onCreate()
 {
-	unsigned char* self = (unsigned char*)this;
-
-	onCreate__8CGPrgObjFv(self);
-	self[0x54c] &= 0x7f;
-	*(int*)(self + 0x550) = 0;
-	*(int*)(self + 0x558) = 0;
-	*(unsigned short*)(self + 0x560) = 0;
-	*(unsigned short*)(self + 0x562) = 0;
-	*(int*)(self + 0x564) = 0;
-	*(int*)(self + 0x56c) = 0;
-	memset(self + 0x570, 0, 0xc);
-	*(int*)(self + 0x55c) = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
+	onCreate__8CGPrgObjFv(this);
+	m_flagBits.bits.unk0 = 0;
+	m_owner = 0;
+	m_scriptArg = 0;
+	m_createFlags = 0;
+	unk_0x562 = 0;
+	m_pendingModelHandle = 0;
+	m_itemJumpCountdown = 0;
+	memset(&m_memoryCapsuleNameIndex, 0, 0xc);
+	m_particleSlot = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
 }
 
 /*
@@ -280,11 +278,8 @@ void CGItemObj::onFramePreCalc()
  */
 void CGItemObj::onFramePostCalc()
 {
-	unsigned char* self = (unsigned char*)this;
-	unsigned int stateBits = ((unsigned int)self[0x50] << 0x1c) | ((unsigned int)self[0x50] >> 4);
-
-	if ((int)stateBits < 0 && *(int*)(self + 0x550) == 0) {
-		*(int*)(self + 0x94) = *(int*)(self + 0x94) - 1;
+	if (m_stateFlags0Bits.unk4 != 0 && m_owner == 0) {
+		*(int*)((u8*)this + 0x94) = *(int*)((u8*)this + 0x94) - 1;
 	}
 }
 
@@ -321,9 +316,9 @@ void CGItemObj::onCancelStat(int)
 
 	if (*(int*)(self + 0x520) == 0x1b) {
 		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) | 2;
-		*(float*)(self + 0x17c) = 1.0f;
-		*(float*)(self + 0x178) = 1.0f;
-		*(float*)(self + 0x174) = 1.0f;
+		*(float*)(self + 0x17c) = FLOAT_80331b18;
+		*(float*)(self + 0x178) = FLOAT_80331b18;
+		*(float*)(self + 0x174) = FLOAT_80331b18;
 	}
 }
 

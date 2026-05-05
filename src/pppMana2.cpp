@@ -1218,38 +1218,14 @@ static int UpdateWaterMesh(VMana2* mana2)
     for (int row = 1; row < 0x10; row++) {
         int rowBase = row * 0x11;
         for (int colBlock = 0; colBlock < 3; colBlock++) {
-            int col = colBlock * 5 + 1;
-            int idx = rowBase + col;
+            float* src = &waterHeightA[rowBase + colBlock * 5 + 1];
+            float* dst = &waterHeightB[rowBase + colBlock * 5 + 1];
 
-            waterHeightB[idx + 0] =
-                currentScale * waterHeightA[idx + 0] +
-                neighborScale *
-                    (waterHeightA[idx + 1] + waterHeightA[idx - 1] + waterHeightA[idx - 0x11] + waterHeightA[idx + 0x11]) -
-                waterHeightB[idx + 0];
-
-            waterHeightB[idx + 1] =
-                currentScale * waterHeightA[idx + 1] +
-                neighborScale *
-                    (waterHeightA[idx + 2] + waterHeightA[idx + 0] + waterHeightA[idx - 0x10] + waterHeightA[idx + 0x12]) -
-                waterHeightB[idx + 1];
-
-            waterHeightB[idx + 2] =
-                currentScale * waterHeightA[idx + 2] +
-                neighborScale *
-                    (waterHeightA[idx + 3] + waterHeightA[idx + 1] + waterHeightA[idx - 0x0F] + waterHeightA[idx + 0x13]) -
-                waterHeightB[idx + 2];
-
-            waterHeightB[idx + 3] =
-                currentScale * waterHeightA[idx + 3] +
-                neighborScale *
-                    (waterHeightA[idx + 4] + waterHeightA[idx + 2] + waterHeightA[idx - 0x0E] + waterHeightA[idx + 0x14]) -
-                waterHeightB[idx + 3];
-
-            waterHeightB[idx + 4] =
-                currentScale * waterHeightA[idx + 4] +
-                neighborScale *
-                    (waterHeightA[idx + 5] + waterHeightA[idx + 3] + waterHeightA[idx - 0x0D] + waterHeightA[idx + 0x15]) -
-                waterHeightB[idx + 4];
+            dst[0] = currentScale * src[0] + neighborScale * (src[1] + src[-1] + src[-0x11] + src[0x11]) - dst[0];
+            dst[1] = currentScale * src[1] + neighborScale * (src[2] + src[0] + src[-0x10] + src[0x12]) - dst[1];
+            dst[2] = currentScale * src[2] + neighborScale * (src[3] + src[1] + src[-0x0F] + src[0x13]) - dst[2];
+            dst[3] = currentScale * src[3] + neighborScale * (src[4] + src[2] + src[-0x0E] + src[0x14]) - dst[3];
+            dst[4] = currentScale * src[4] + neighborScale * (src[5] + src[3] + src[-0x0D] + src[0x15]) - dst[4];
         }
     }
 

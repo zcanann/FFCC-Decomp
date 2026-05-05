@@ -670,7 +670,7 @@ void GbaQueue::ExecutQueue()
 		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(scriptFoodBase[channel]);
 		int i;
 
-		if (obj[0x430 + channel] != 0) {
+		if (obj[0x440 + channel] != 0) {
 			continue;
 		}
 
@@ -798,7 +798,16 @@ void GbaQueue::ExecutQueue()
 				} else if (request == 8) {
 					if (caravanWork != 0) {
 						const int itemIdx = static_cast<unsigned char>(cmdWord >> 8);
+						const short itemId = caravanWork->m_inventoryItems[itemIdx];
 						caravanWork->DeleteItemIdx(itemIdx, 1);
+						const unsigned short baseGil =
+							*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + static_cast<int>(itemId) * 0x48 + 0x20);
+						int gil = static_cast<int>(
+							static_cast<float>(caravanWork->m_shopParam) / 100.0f * 0.25f * static_cast<float>(baseGil));
+						if (gil < 1) {
+							gil = 1;
+						}
+						caravanWork->AddGil(gil);
 						Joybus.SendResult(channel, 0, static_cast<unsigned char>(cmdWord >> 24), static_cast<unsigned char>(cmdWord >> 16));
 					}
 				} else if (request == 9) {
@@ -807,8 +816,16 @@ void GbaQueue::ExecutQueue()
 						const int shopIndex = static_cast<unsigned char>(cmdWord >> 8);
 						int shopItem = caravanWork->m_shopList[shopIndex];
 						for (unsigned int n = 0; n < quantity; n++) {
-							caravanWork->AddItem(shopItem, 0);
+							if (caravanWork->AddItem(shopItem, 0) == 0) {
+								Joybus.SendResult(channel, 1, static_cast<unsigned char>(cmdWord >> 24),
+									static_cast<unsigned char>(cmdWord >> 16));
+							}
 						}
+						const unsigned short baseGil =
+							*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + static_cast<short>(shopItem) * 0x48 + 0x20);
+						const int gil =
+							static_cast<int>(static_cast<float>(caravanWork->m_shopParam) / 100.0f * static_cast<float>(baseGil));
+						caravanWork->AddGil(-static_cast<int>(gil * quantity));
 						Joybus.SendResult(channel, 0, static_cast<unsigned char>(cmdWord >> 24), static_cast<unsigned char>(cmdWord >> 16));
 					}
 				} else if (request == 10) {
@@ -943,12 +960,12 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 {
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
 	const unsigned int itemSlot = (value >> 8) & 0xFF;
-	const unsigned short baseItem = caravanWork->m_inventoryItems[itemSlot];
+	const short baseItem = caravanWork->m_inventoryItems[itemSlot];
 
 	caravanWork->DeleteItemIdx(itemSlot, 1);
 
 	const unsigned int itemTableBase = Game.unkCFlatData0[2] + static_cast<int>(baseItem) * 0x48;
-	const unsigned short smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + (value & 0xFF) * 2 + 0x38);
+	const short smithItem = *reinterpret_cast<short*>(itemTableBase + (value & 0xFF) * 2 + 0x38);
 
 	for (int i = 0; i < 3; i++) {
 		const unsigned short materialId = *reinterpret_cast<unsigned short*>(itemTableBase + i * 2 + 0x26);

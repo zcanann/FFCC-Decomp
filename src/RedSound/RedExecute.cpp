@@ -1748,7 +1748,8 @@ static void _KeyOnControl()
                             u32 idx = (u32)((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_trackNo;
 
                             if (((1U << (idx & REDSOUND_VOICE_INDEX_MASK)) &
-                                 m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)]) == 0) {
+                                 m_Mute[((int)idx >> REDSOUND_MUTE_WORD_SHIFT) +
+                                        (u32)((int)idx < 0 && (idx & REDSOUND_VOICE_INDEX_MASK) != 0)]) == 0) {
                                 volume = ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volumeScale + 1) *
                                           (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volume >>
                                            REDSOUND_FIXED_SHIFT)) >>
@@ -1767,7 +1768,8 @@ static void _KeyOnControl()
                     } else {
                         u32 idx = (u32)((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_trackNo;
                         if (((1U << (idx & REDSOUND_VOICE_INDEX_MASK)) &
-                             m_Mute[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)]) == 0) {
+                             m_Mute[((int)idx >> REDSOUND_MUTE_WORD_SHIFT) +
+                                    (u32)((int)idx < 0 && (idx & REDSOUND_VOICE_INDEX_MASK) != 0)]) == 0) {
                             volume = ((p_SoundControlBuffer->m_volumeScale + 1) *
                                       (p_SoundControlBuffer->m_volume >> REDSOUND_FIXED_SHIFT)) >>
                                      7;

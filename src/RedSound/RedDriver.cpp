@@ -1424,8 +1424,8 @@ void CRedDriver::Init()
     memset(p_EditorTrack, 0, REDSOUND_TRACK_SIZE);
     p_ReverbDepth = (RedReverbDepth*)RedNew(REDSOUND_REVERB_DEPTH_BUFFER_SIZE);
     memset(p_ReverbDepth, 0, REDSOUND_REVERB_DEPTH_BUFFER_SIZE);
-    m_Mute[1] = 0;
-    m_Mute[0] = 0;
+    m_Mute[REDSOUND_MUTE_HIGH_WORD] = 0;
+    m_Mute[REDSOUND_MUTE_LOW_WORD] = 0;
     p_MusicNextPlay = (RedMusicPlayCommand*)RedNew(REDSOUND_MUSIC_NEXT_PLAY_BUFFER_SIZE);
     p_MusicNextPlay->m_musicId = -1;
     m_MusicPhraseStop = 0;

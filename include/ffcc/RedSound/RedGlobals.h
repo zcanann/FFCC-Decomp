@@ -52,6 +52,8 @@ enum RedSoundLayoutSize {
 	REDSOUND_CONTROL_RAMP_SIZE = sizeof(RedControlRamp),
 	REDSOUND_REVERB_DEPTH_COUNT = 2,
 	REDSOUND_REVERB_DEPTH_BUFFER_SIZE = sizeof(RedReverbDepth) * REDSOUND_REVERB_DEPTH_COUNT,
+	REDSOUND_MUTE_WORD_COUNT = 2,
+	REDSOUND_MUTE_WORD_SHIFT = 5,
 	REDSOUND_STREAM_COUNT = 4,
 	REDSOUND_STREAM_BUFFER_SIZE = sizeof(RedStreamDATA) * REDSOUND_STREAM_COUNT,
 };
@@ -59,6 +61,11 @@ enum RedSoundLayoutSize {
 enum RedReverbDepthIndex {
 	REDSOUND_REVERB_DEPTH_MUSIC = 0,
 	REDSOUND_REVERB_DEPTH_SE = 1,
+};
+
+enum RedMuteWordIndex {
+	REDSOUND_MUTE_LOW_WORD = 0,
+	REDSOUND_MUTE_HIGH_WORD = 1,
 };
 
 enum RedSoundFixedPoint {
@@ -145,7 +152,7 @@ extern RedTrackDATA* p_EditorTrack;
 extern u8* volatile p_MusicSkipThreadStack;
 extern volatile int m_MusicSkipComplete;
 extern RedReverbDepth* volatile p_ReverbDepth;
-extern int m_Mute[2];
+extern int m_Mute[REDSOUND_MUTE_WORD_COUNT];
 extern CRedMemory c_RedMemory;
 extern volatile u32 m_ChangeStatus;
 extern CRedDriver c_Driver;

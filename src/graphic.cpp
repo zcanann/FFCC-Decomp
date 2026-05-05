@@ -646,7 +646,7 @@ u8 CGraphic::IsFifoOver()
  */
 u32 CGraphic::IsFrameRateOver()
 {
-	return *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x7350);
+	return m_frameRateOver;
 }
 
 /*
@@ -669,13 +669,12 @@ void CGraphic::Flip()
         if (System.m_scenegraphStepMode != 1) {
             int retraceCount = VIGetRetraceCount();
             if ((u32)(retraceCount - S32At(this, 0x71F4)) < 2) {
-                S32At(this, 0x7350) = 0;
-                do {
+                m_frameRateOver = 0;
+                while ((u32)((retraceCount = VIGetRetraceCount()) - S32At(this, 0x71F4)) < 2) {
                     VIWaitForRetrace();
-                    retraceCount = VIGetRetraceCount();
-                } while ((u32)(retraceCount - S32At(this, 0x71F4)) < 2);
+                }
             } else {
-                S32At(this, 0x7350) = 1;
+                m_frameRateOver = 1;
             }
         }
 
@@ -690,13 +689,12 @@ void CGraphic::Flip()
         S32At(this, 0x7370) += 1;
         VIFlush();
 
-        S32At(this, 0x734C) = 1 - S32At(this, 0x734C);
+        m_fifoIndex = 1 - m_fifoIndex;
 
-        GXFifoObj* fifo = reinterpret_cast<GXFifoObj*>(reinterpret_cast<u8*>(this) + 0x724C + S32At(this, 0x734C) * 0x80);
-        GXInitFifoBase(fifo, PtrAt(this, 0x10), 0x60000);
-        GXInitFifoLimits(fifo, 0x5C000, 0x50000);
-        GXSetCPUFifo(fifo);
-        GXSetGPFifo(fifo);
+        GXInitFifoBase(&m_fifos[m_fifoIndex], PtrAt(this, 0x10), 0x60000);
+        GXInitFifoLimits(&m_fifos[m_fifoIndex], 0x5C000, 0x50000);
+        GXSetCPUFifo(&m_fifos[m_fifoIndex]);
+        GXSetGPFifo(&m_fifos[m_fifoIndex]);
     }
 
     S32At(this, 0x71F4) = VIGetRetraceCount();

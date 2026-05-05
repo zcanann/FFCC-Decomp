@@ -100,7 +100,10 @@ public:
     f32 m_fogEnd;
     _GXTexObj m_backBufferTexObj;
     _GXTexObj m_smallBackTexObj;
-    u8 _pad_0x724C_to_0x7357[0x10C];
+    GXFifoObj m_fifos[2];
+    s32 m_fifoIndex;
+    u32 m_frameRateOver;
+    u8 _pad_0x7354_to_0x7357[0x4];
     int m_blurActive;
     u8 m_blurDelayCounter;
     u8 m_blurBufferIndex;

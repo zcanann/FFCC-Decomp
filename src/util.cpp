@@ -1013,11 +1013,11 @@ void CUtil::DisableIndMtx()
  */
 void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
+    u32* colorPtr = reinterpret_cast<u32*>(&color);
     float u1;
     float v1;
     float u2;
     float v2;
-    u32 rgba = *reinterpret_cast<u32*>(&color);
 
     if (uv1 == NULL || uv2 == NULL) {
         u1 = kUtilZero;
@@ -1032,37 +1032,43 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
     }
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    f32 x1 = pos1.x;
+    f32 y1 = pos1.y;
+    f32 z1 = pos1.z;
+    f32 x2 = pos2.x;
+    f32 y2 = pos2.y;
+    u32 rgba = *colorPtr;
 
-    GXWGFifo.f32 = pos1.x;
-    GXWGFifo.f32 = pos1.y;
-    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.f32 = x1;
+    GXWGFifo.f32 = y1;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u1;
     GXWGFifo.f32 = v1;
     GXWGFifo.f32 = u1;
     GXWGFifo.f32 = v1;
 
-    GXWGFifo.f32 = pos2.x;
-    GXWGFifo.f32 = pos1.y;
-    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y1;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u2;
     GXWGFifo.f32 = v1;
     GXWGFifo.f32 = u2;
     GXWGFifo.f32 = v1;
 
-    GXWGFifo.f32 = pos2.x;
-    GXWGFifo.f32 = pos2.y;
-    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u2;
     GXWGFifo.f32 = v2;
     GXWGFifo.f32 = u2;
     GXWGFifo.f32 = v2;
 
-    GXWGFifo.f32 = pos1.x;
-    GXWGFifo.f32 = pos2.y;
-    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.f32 = x1;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u1;
     GXWGFifo.f32 = v2;

@@ -2502,10 +2502,15 @@ void CGObject::Detach()
  */
 void CGObject::DispCharaParts(int showParts)
 {
-    m_displayFlags = (m_displayFlags & 0xFFFFFFEF) | ((showParts << 4) & 0x10);
-    if (m_charaModelHandle != 0) {
-        m_charaModelHandle->m_flags = m_displayFlags;
+    CCharaPcs::CHandle* handle = m_charaModelHandle;
+    bool hasModel = false;
+    if (handle != 0 && handle->m_model != 0) {
+        hasModel = true;
     }
+    if (!hasModel) {
+        return;
+    }
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x98) = showParts;
 }
 
 /*

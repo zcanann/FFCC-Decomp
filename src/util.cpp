@@ -1013,6 +1013,7 @@ void CUtil::DisableIndMtx()
  */
 void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
+    u32* colorPtr = reinterpret_cast<u32*>(&color);
     float u1;
     float v1;
     float u2;
@@ -1031,6 +1032,12 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
     }
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    f32 x1 = pos1.x;
+    f32 y1 = pos1.y;
+    f32 z1 = pos1.z;
+    f32 x2 = pos2.x;
+    f32 y2 = pos2.y;
+    u32 rgba = *colorPtr;
 
     float x1 = pos1.x;
     float y1 = pos1.y;
@@ -1270,9 +1277,23 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	hermite[2] = t - ((kUtilHermiteCoeff2 * t2) - t3);
 	hermite[3] = t3 - t2;
 
-	out.x = (hermite[1] * p2.x) + (hermite[0] * p1.x) + (hermite[2] * tan0.x) + (hermite[3] * tan1.x);
-	out.y = (hermite[1] * p2.y) + (hermite[0] * p1.y) + (hermite[2] * tan0.y) + (hermite[3] * tan1.y);
-	out.z = (hermite[1] * p2.z) + (hermite[0] * p1.z) + (hermite[2] * tan0.z) + (hermite[3] * tan1.z);
+	float x = hermite[1] * p2.x;
+	x += hermite[0] * p1.x;
+	x += hermite[2] * tan0.x;
+	x += hermite[3] * tan1.x;
+	out.x = x;
+
+	float y = hermite[1] * p2.y;
+	y += hermite[0] * p1.y;
+	y += hermite[2] * tan0.y;
+	y += hermite[3] * tan1.y;
+	out.y = y;
+
+	float z = hermite[1] * p2.z;
+	z += hermite[0] * p1.z;
+	z += hermite[2] * tan0.z;
+	z += hermite[3] * tan1.z;
+	out.z = z;
 }
 
 /*

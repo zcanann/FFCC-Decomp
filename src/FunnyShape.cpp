@@ -547,10 +547,9 @@ void CFunnyShape::RenderShape()
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-    GXColor color = DAT_8032fd60;
-    GXColor matColor = color;
-    GXColor chanColor = color;
+    GXColor chanColor = DAT_8032fd60;
     GXSetChanAmbColor(GX_COLOR0, chanColor);
+    GXColor matColor = chanColor;
     GXSetChanMatColor(GX_COLOR0, matColor);
 
     Vec2d offsetCopy;

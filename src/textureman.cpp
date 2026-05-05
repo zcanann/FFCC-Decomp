@@ -847,6 +847,41 @@ void CTexture::CacheUnLoadTexture(CAmemCacheSet* amemCacheSet)
 
 /*
  * --INFO--
+ * PAL Address: 0x8003E308
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexture::CacheRefCnt0UpTexture(CAmemCacheSet* amemCacheSet)
+{
+    if (m_cacheId != -1) {
+        amemCacheSet->RefCnt0Up(m_cacheId);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003E2B4
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexture::CacheDumpTexture(CAmemCacheSet* amemCacheSet)
+{
+    if (m_cacheId != -1) {
+        if (GetRef() <= 1) {
+            amemCacheSet->DestroyCache(m_cacheId);
+            m_imageData = 0;
+        }
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8003B030
  * PAL Size: 44b
  * EN Address: TODO
@@ -1021,6 +1056,63 @@ void CTexture::FlushExternalTlut(void* tlutData)
         numEntries = 0;
     }
     DCFlushRange(tlutData, numEntries << 2);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexture::FlushExternalTlut(void* tlutData, int numEntries)
+{
+    DCFlushRange(tlutData, numEntries << 2);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+_GXColor CTexture::GetExternalTlutColor(void* tlutData, int tlutOffset, int index)
+{
+    unsigned short* tlut = reinterpret_cast<unsigned short*>(tlutData);
+    _GXColor color;
+    unsigned int packed = tlut[index] | (tlut[index + tlutOffset] << 16);
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(&packed);
+
+    color.a = bytes[0];
+    color.r = bytes[3];
+    color.g = bytes[2];
+    color.b = bytes[1];
+    return color;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003FCF8
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CTexture::GetNumTlut()
+{
+    if (m_format == 9) {
+        return 0x100;
+    }
+    if (m_format == 8) {
+        return 0x10;
+    }
+    return 0;
 }
 
 /*

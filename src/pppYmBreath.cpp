@@ -523,7 +523,6 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     pppFMATRIX rotMtx;
     Vec origin;
     Vec dir;
-    Vec dirNorm;
     Vec target;
     Vec hitVector;
 
@@ -641,8 +640,7 @@ group_ready:
             *(float*)(groupTable + 0x28) = scaledOwner;
             pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
             PSMTXMultVec(rotMtx.value, &dir, &dir);
-            dirNorm = dir;
-            pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
+            pppNormalize(dir, dir);
             PSVECScale(&dir, &dir, *(float*)(groupTable + 0x24));
             pppAddVector(target, origin, dir);
             pppSubVector(hitVector, target, origin);

@@ -21,7 +21,6 @@ void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
-void pppNormalize__FR3Vec3Vec(float*, Vec*);
 
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
@@ -503,7 +502,6 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     pppFMATRIX rotMtx;
     Vec origin;
     Vec dir;
-    Vec dirNorm;
     Vec target;
     Vec hitVector;
 
@@ -619,8 +617,7 @@ group_ready:
             *(float*)(groupTable + 0x28) = scaledOwner;
             pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
             PSMTXMultVec(rotMtx.value, &dir, &dir);
-            dirNorm = dir;
-            pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
+            pppNormalize(dir, dir);
             PSVECScale(&dir, &dir, *(float*)(groupTable + 0x24));
             pppAddVector(target, origin, dir);
             pppSubVector(hitVector, target, origin);

@@ -825,44 +825,40 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 	if (freeItemCount == 0) {
 		int deletedCount = 0;
+		int bestScriptObjectPos = 0x00989680;
 		unsigned char* bestItemObj = 0;
-		void* bestScriptPos = reinterpret_cast<void*>(0x00989680);
 
 		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
 		     itemObj != 0;
 		     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-			int isActive = (itemObj[0x50] & 8) != 0;
 			int canDelete = (itemObj[0x53] & 1) != 0;
-			int scriptPos = *(int*)(itemObj + 0x48);
+			int scriptObjectPos = *(int*)(itemObj + 0x94);
 
-			if (*(int*)(itemObj + 0x44) == 0 && isActive != 0 && canDelete != 0 &&
-			    scriptPos < (int)bestScriptPos) {
-				bestScriptPos = (void*)scriptPos;
+			if (*(void**)(itemObj + 0x550) == 0 &&
+			    static_cast<signed char>(
+			        static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
+			    canDelete != 0 && scriptObjectPos < bestScriptObjectPos) {
+				bestScriptObjectPos = scriptObjectPos;
 				bestItemObj = itemObj;
 			}
 		}
 
-		if (bestItemObj == 0) {
-			if ((unsigned int)System.m_execParam > 2U) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
-			}
-		} else {
+		if (bestItemObj != 0) {
 			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
 			deletedCount = 1;
+		} else {
+			if (2U < (unsigned int)System.m_execParam) {
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
+			}
 		}
 
 		Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcef8), deletedCount);
 		if (deletedCount == 0) {
-			if ((unsigned int)System.m_execParam > 2U) {
+			if (2U < (unsigned int)System.m_execParam) {
 				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf10));
 			}
 			return 0;
 		}
-	}
-
-	int ownerParticleId = 0;
-	if (owner != 0) {
-		ownerParticleId = *(short*)((unsigned char*)owner + 0x30);
 	}
 
 	gItemObjCreateFlags = createFlags;
@@ -948,7 +944,6 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		*(int*)(itemSelf + 0x574) = (int)ccfsData[0];
 	}
 
-	(void)ownerParticleId;
 	return newItem;
 }
 
@@ -1447,7 +1442,9 @@ void CGItemObj::DeleteAllFieldItem()
 	     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
 		void* owner = *(void**)(itemObj + 0x550);
 
-		if (owner == 0 && (itemObj[0x50] & 8) != 0) {
+		if (owner == 0 &&
+		    static_cast<signed char>(
+		        static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0) {
 			itemObj[0x38] |= 0x80;
 		}
 	}

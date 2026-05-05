@@ -1654,6 +1654,7 @@ menu_compa.cpp:
 	extab       start:0x80009F54 end:0x80009F7C
 	extabindex  start:0x800113C8 end:0x80011404
 	.text       start:0x80160EDC end:0x80162360
+	.rodata     start:0x801DEDC8 end:0x801DEDF8
 	.sdata2     start:0x803334A8 end:0x803334F0
 
 menu_favo.cpp:

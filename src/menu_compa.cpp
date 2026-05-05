@@ -37,8 +37,8 @@ extern float FLOAT_8033303C;
 extern double DOUBLE_80333008;
 extern double DOUBLE_80333030;
 
-extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[];
-extern "C" const char s_menu_compa_cpp_801DEDE8[];
+extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[] = "%s(%d):family cnt error!!(%d)\n";
+extern "C" const char s_menu_compa_cpp_801DEDE8[] = "menu_compa.cpp";
 
 static const char s_compa_mono_upper[] = "MONO";
 static const char s_compa_normal[] = "Normal";

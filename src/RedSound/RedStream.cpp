@@ -426,10 +426,12 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			(streamData->m_track + iVar2)->m_waveBase = streamData->m_aramBuffer + iVar2 * REDSOUND_STREAM_STEREO_PLANE_SIZE;
 			memset(&streamData->m_trackData[iVar2], 0, sizeof(RedWaveDATA));
 			memcpy(streamData->m_trackData[iVar2].m_adpcmData, &headerData[iVar2], REDSOUND_STREAM_ADPCM_HEADER_SIZE);
-			voice->m_adsrLevel[0] = voice->m_adsrLevel[1] = voice->m_adsrLevel[2] = 0;
-			voice->m_adsrLevel[3] = REDSOUND_VOLUME_MAX;
-			voice->m_adsrTime[0] = voice->m_adsrTime[1] = voice->m_adsrTime[2] = 0;
-			voice->m_adsrTime[3] = 10;
+			voice->m_adsrLevel[REDSOUND_VOICE_ADSR_ATTACK] = voice->m_adsrLevel[REDSOUND_VOICE_ADSR_DECAY] =
+			    voice->m_adsrLevel[REDSOUND_VOICE_ADSR_SUSTAIN] = 0;
+			voice->m_adsrLevel[REDSOUND_VOICE_ADSR_RELEASE] = REDSOUND_VOLUME_MAX;
+			voice->m_adsrTime[REDSOUND_VOICE_ADSR_ATTACK] = voice->m_adsrTime[REDSOUND_VOICE_ADSR_DECAY] =
+			    voice->m_adsrTime[REDSOUND_VOICE_ADSR_SUSTAIN] = 0;
+			voice->m_adsrTime[REDSOUND_VOICE_ADSR_RELEASE] = 10;
 			streamData->m_trackData[iVar2].m_sampleStart = 0;
 			streamData->m_trackData[iVar2].m_loopEnd = REDSOUND_STREAM_INITIAL_LOOP_END;
 			streamData->m_trackData[iVar2].m_loopStart = 2;

@@ -1171,40 +1171,40 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
                param_2->m_waveData->m_adsr,
                REDSOUND_TRACK_ADSR_SIZE);
         if ((s8)param_1->m_adsrAL != -1) {
-            param_2->m_adsrLevel[0] =
+            param_2->m_adsrLevel[REDSOUND_VOICE_ADSR_ATTACK] =
                 param_1->m_adsrAL;
         }
         if ((s16)param_1->m_adsrAR != -1) {
-            param_2->m_adsrTime[0] =
+            param_2->m_adsrTime[REDSOUND_VOICE_ADSR_ATTACK] =
                 param_1->m_adsrAR;
         }
         if ((s8)param_1->m_adsrDL != -1) {
-            param_2->m_adsrLevel[1] =
+            param_2->m_adsrLevel[REDSOUND_VOICE_ADSR_DECAY] =
                 param_1->m_adsrDL;
         }
         if ((s16)param_1->m_adsrDR != -1) {
-            param_2->m_adsrTime[1] =
+            param_2->m_adsrTime[REDSOUND_VOICE_ADSR_DECAY] =
                 param_1->m_adsrDR;
         }
         if ((s8)param_1->m_adsrSL != -1) {
-            param_2->m_adsrLevel[2] =
+            param_2->m_adsrLevel[REDSOUND_VOICE_ADSR_SUSTAIN] =
                 param_1->m_adsrSL;
         }
         if ((s16)param_1->m_adsrSR != -1) {
-            param_2->m_adsrTime[2] =
+            param_2->m_adsrTime[REDSOUND_VOICE_ADSR_SUSTAIN] =
                 param_1->m_adsrSR;
         }
         if ((s8)param_1->m_adsrRL != -1) {
-            param_2->m_adsrLevel[3] =
+            param_2->m_adsrLevel[REDSOUND_VOICE_ADSR_RELEASE] =
                 param_1->m_adsrRL;
         }
         if ((s16)param_1->m_adsrRR != -1) {
-            param_2->m_adsrTime[3] =
+            param_2->m_adsrTime[REDSOUND_VOICE_ADSR_RELEASE] =
                 param_1->m_adsrRR;
         }
         if ((param_2->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
             u16 random = GetRandomData();
-            param_2->m_adsrTime[0] =
+            param_2->m_adsrTime[REDSOUND_VOICE_ADSR_ATTACK] =
                 (u16)(param_1->m_fuzzyAdsrDepth *
                       (random & REDSOUND_RANDOM_BYTE_MASK));
         }
@@ -1325,7 +1325,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
     int nextLevel;
     int stepFrames;
 
-    nextLevel = voice->m_adsrLevel[0];
+    nextLevel = voice->m_adsrLevel[REDSOUND_VOICE_ADSR_ATTACK];
     *stage    = 0;
     do {
         prevLevel = nextLevel;
@@ -1418,12 +1418,13 @@ static u32 _AdsrDataExecute(RedVoiceDATA* voice)
 {
     u32 changed = 0;
 
-    if (voice->m_adsrStage < 4) {
-        if ((voice->m_flags & REDSOUND_VOICE_FLAGS_RELEASE_ACTIVE) != 0 || voice->m_adsrStage < 3) {
+    if (voice->m_adsrStage < REDSOUND_VOICE_ADSR_DONE) {
+        if ((voice->m_flags & REDSOUND_VOICE_FLAGS_RELEASE_ACTIVE) != 0 ||
+            voice->m_adsrStage < REDSOUND_VOICE_ADSR_RELEASE) {
             changed += 1;
             voice->m_adsrStepFrames -= 1;
             voice->m_adsrCurrentLevel += voice->m_adsrStepAdd;
-            if (voice->m_adsrStepFrames == 0 && voice->m_adsrStage < 3) {
+            if (voice->m_adsrStepFrames == 0 && voice->m_adsrStage < REDSOUND_VOICE_ADSR_RELEASE) {
                 voice->m_adsrStage += 1;
                 _AdsrDataCompute(voice);
             }
@@ -1433,7 +1434,7 @@ static u32 _AdsrDataExecute(RedVoiceDATA* voice)
     }
 
     if ((voice->m_adsrCurrentLevel >> REDSOUND_FIXED_SHIFT) < 1) {
-        voice->m_adsrStage = 4;
+        voice->m_adsrStage = REDSOUND_VOICE_ADSR_DONE;
         voice->m_adsrCurrentLevel = 0;
     }
 

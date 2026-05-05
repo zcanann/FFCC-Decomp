@@ -27,6 +27,12 @@ struct GobjworkFlatData {
 	GobjworkFlatTableEntry table[8];
 };
 
+struct ShoukiByteFlags {
+	int upper : 1;
+	unsigned int pad0 : 2;
+	int middle : 1;
+};
+
 static inline float GetStatusMultiplier(int offset)
 {
 	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * 0.01f) + 1.0f;
@@ -451,12 +457,11 @@ int CCaravanWork::IsOutOfShouki()
 	if (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x5BC) >
 		FLOAT_803309a8 * Game.unkFloat_0xca10) {
 		if (m_hp != 0) {
-			unsigned char shoukiFlags = CFlat[4836];
-			if ((((signed char)((int)(((unsigned int)shoukiFlags << 24) & 0xC0000000) >> 31) != 0) ||
-				 ((signed char)((int)(((unsigned int)shoukiFlags << 27) & 0xC0000000) >> 31) != 0)) &&
-				((signed char)((int)((*(unsigned char*)(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x9B) << 24) &
-									  0xC0000000) >>
-								31) != 0)) {
+			ShoukiByteFlags* cflatFlags = reinterpret_cast<ShoukiByteFlags*>(&CFlat[4836]);
+			ShoukiByteFlags* ownerFlags =
+				reinterpret_cast<ShoukiByteFlags*>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x9B);
+
+			if (((cflatFlags->upper != 0) || (cflatFlags->middle != 0)) && (ownerFlags->upper != 0)) {
 				result = 1;
 			}
 		}

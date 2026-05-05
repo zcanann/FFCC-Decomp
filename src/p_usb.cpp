@@ -7,7 +7,7 @@
 #include "types.h"
 
 extern "C" void* __vt__8CManager[];
-extern "C" void* __vt__10CSamplePcs[];
+extern "C" void* __vt__8CProcess[];
 extern "C" void* __vt__7CUSBPcs[];
 extern const char lbl_801DA074[];
 int s_usbReadPollFrameCounter;
@@ -293,7 +293,7 @@ extern "C" void __sinit_p_usb_cpp(void)
     unsigned int* desc2 = m_table_desc2__7CUSBPcs;
 
     *reinterpret_cast<void**>(self) = __vt__8CManager;
-    *reinterpret_cast<void**>(self) = __vt__10CSamplePcs;
+    *reinterpret_cast<void**>(self) = __vt__8CProcess;
     *reinterpret_cast<void**>(self) = __vt__7CUSBPcs;
 
     dst[1] = desc0[0];

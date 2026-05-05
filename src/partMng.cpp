@@ -70,7 +70,6 @@ extern "C" float FLOAT_8032fe74;
 extern "C" float FLOAT_8032fe78;
 extern "C" float FLOAT_8032fe7c;
 extern "C" double DOUBLE_8032fe80;
-extern "C" void SendDataCode__7CUSBPcsFiPvii(CUSBPcs*, int, void*, int, int);
 extern "C" void GXPeekZ(u16, u16, u32*);
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __ct__10pppShapeStFv(pppShapeSt* shapeSt);
@@ -980,7 +979,7 @@ void CPartMng::pppGet2Dpos()
 
             PSMTXInverse(ppvCameraMatrix0, invCamera);
             PSMTXMultVec(invCamera, &viewPos, &worldPos);
-            SendDataCode__7CUSBPcsFiPvii(&USBPcs, 0x60, &worldPos, 1, 0xC);
+            USBPcs.SendDataCode(0x60, &worldPos, 1, 0xC);
         }
         raw->requestFlag = 0;
     }

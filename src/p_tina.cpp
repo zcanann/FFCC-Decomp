@@ -53,8 +53,6 @@ extern "C" void SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(void*, void*);
 extern "C" void AmemSetLock__13CAmemCacheSetFv(void*);
 extern "C" void AssertCache__13CAmemCacheSetFv(void*);
 extern "C" void Destroy__13CAmemCacheSetFv(void*);
-extern "C" void IsBigAlloc__7CUSBPcsFi(void*, int);
-extern "C" void mccReadData__7CUSBPcsFv(void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void* Free__7CMemoryFPv(void*, void*);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
@@ -688,7 +686,7 @@ void CPartPcs::createViewer()
     char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
     void* stage;
 
-    IsBigAlloc__7CUSBPcsFi(&USBPcs, 1);
+    USBPcs.IsBigAlloc(1);
     viewer->m_freePtr = 0;
     viewer->m_stageExtra = 0;
     viewer->m_blockOnFrame = 0;
@@ -739,7 +737,7 @@ void CPartPcs::destroy()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
 
-    IsBigAlloc__7CUSBPcsFi(&USBPcs, 0);
+    USBPcs.IsBigAlloc(0);
     Destroy__8CPartMngFv(&PartMng);
 
     if (usb->m_stageAmem != 0) {
@@ -842,7 +840,7 @@ void CPartPcs::calcViewer()
     PartMng.pppEditPartCalc();
     reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
 
-    mccReadData__7CUSBPcsFv(&USBPcs);
+    USBPcs.mccReadData();
     if (m_usbStreamData.IsUSBStreamDataDone()) {
         packetCode = m_usbStreamData.m_packetCode;
         if (packetCode != 0) {

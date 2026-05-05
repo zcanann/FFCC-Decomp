@@ -357,6 +357,7 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outCoeffScalar, Vec* p0,
     Vec* p1, Vec* p2, Vec* p3)
 {
+    float scaleAB = scaleA + scaleB;
     float radiusSquared = radius * radius;
     float radiusCubed = radiusSquared * radius;
     Vec4d coeffs;
@@ -375,7 +376,6 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[2][2] = p2->z;
     control[3][2] = 1.0f;
 
-    float scaleAB = scaleA + scaleB;
     float t0 = (scaleAB == 0.0f) ? 0.0f : scaleA / scaleAB;
 
     Vec tangent;

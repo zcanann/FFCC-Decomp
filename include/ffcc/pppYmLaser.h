@@ -23,11 +23,11 @@ struct pppYmLaserUnkB {
 extern "C" {
 #endif
 
-void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable);
-void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable);
-void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable);
-void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtrlTable* ctrlTable);
 void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtrlTable* ctrlTable);
+void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtrlTable* ctrlTable);
+void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable);
+void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable);
+void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

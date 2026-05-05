@@ -2,6 +2,7 @@
 
 typedef void (CGMonObj::*MonVoidFunc)();
 typedef void (CGMonObj::*MonStateFunc)(int);
+typedef int (CGMonObj::*MonTargetFunc)(int);
 typedef int (CGMonObj::*MonCalcFunc)(int);
 
 struct MonAiFuncTable {
@@ -12,7 +13,7 @@ struct MonAiFuncTable {
     MonVoidFunc cancelStat;
     MonVoidFunc frameStat;
     MonVoidFunc logic;
-    MonStateFunc target;
+    MonTargetFunc target;
     MonCalcFunc calcBranch;
     MonVoidFunc damaged;
     MonVoidFunc attacked;

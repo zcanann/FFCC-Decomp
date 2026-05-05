@@ -1013,61 +1013,67 @@ void CUtil::DisableIndMtx()
  */
 void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
+    u32* colorPtr = reinterpret_cast<u32*>(&color);
+    float u0;
+    float v0;
     float u1;
     float v1;
-    float u2;
-    float v2;
-    u32 rgba = *reinterpret_cast<u32*>(&color);
 
     if (uv1 == NULL || uv2 == NULL) {
-        u1 = kUtilZero;
+        u0 = kUtilZero;
+        u1 = kUtilOne;
+        v0 = u0;
         v1 = u1;
-        u2 = kUtilOne;
-        v2 = u2;
     } else {
-        u1 = uv1->x;
-        v1 = uv1->y;
-        u2 = uv2->x;
-        v2 = uv2->y;
+        u0 = uv1->x;
+        v0 = uv1->y;
+        u1 = uv2->x;
+        v1 = uv2->y;
     }
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    f32 x1 = pos1.x;
+    f32 y1 = pos1.y;
+    f32 z1 = pos1.z;
+    f32 x2 = pos2.x;
+    f32 y2 = pos2.y;
+    u32 rgba = *colorPtr;
 
-    GXWGFifo.f32 = pos1.x;
-    GXWGFifo.f32 = pos1.y;
-    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.f32 = x1;
+    GXWGFifo.f32 = y1;
+    GXWGFifo.f32 = z1;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u0;
+    GXWGFifo.f32 = v0;
+    GXWGFifo.f32 = u0;
+    GXWGFifo.f32 = v0;
+
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y1;
+    GXWGFifo.f32 = z1;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v0;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v0;
+
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u1;
     GXWGFifo.f32 = v1;
     GXWGFifo.f32 = u1;
     GXWGFifo.f32 = v1;
 
-    GXWGFifo.f32 = pos2.x;
-    GXWGFifo.f32 = pos1.y;
-    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.f32 = x1;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = u0;
     GXWGFifo.f32 = v1;
-    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = u0;
     GXWGFifo.f32 = v1;
-
-    GXWGFifo.f32 = pos2.x;
-    GXWGFifo.f32 = pos2.y;
-    GXWGFifo.f32 = pos1.z;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v2;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v2;
-
-    GXWGFifo.f32 = pos1.x;
-    GXWGFifo.f32 = pos2.y;
-    GXWGFifo.f32 = pos1.z;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v2;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v2;
 }
 
 /*
@@ -1262,7 +1268,7 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	t3 = t2 * t;
 	hermite[0] = kUtilOne + ((kUtilHermiteCoeff2 * t3) - (kUtilHermiteCoeff3 * t2));
 	hermite[1] = (kUtilHermiteCoeff3 * t2) + (kUtilHermiteCoeffNeg2 * t3);
-	hermite[2] = t - ((kUtilHermiteCoeff2 * t2) - t3);
+	hermite[2] = t + (t3 - (kUtilHermiteCoeff2 * t2));
 	hermite[3] = t3 - t2;
 
 	out.x = (hermite[1] * p2.x) + (hermite[0] * p1.x) + (hermite[2] * tan0.x) + (hermite[3] * tan1.x);

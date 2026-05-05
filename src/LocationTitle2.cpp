@@ -250,7 +250,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             handle = owner->m_charaModelHandle;
         }
         model = 0;
-        if (handle != 0) {
+        if (handle->m_model != 0) {
             model = handle->m_model;
         }
 

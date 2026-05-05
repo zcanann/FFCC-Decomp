@@ -760,21 +760,18 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 {
 	int deletedCount = 0;
 
-	while (true) {
-		if (maxDeleteCount <= deletedCount) {
-			return deletedCount;
-		}
-
+	while (deletedCount < maxDeleteCount) {
 		int bestScriptObjectPos = 0x00989680;
 		unsigned char* bestItemObj = 0;
 
 		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
 			 itemObj != 0;
 			 itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-			if (*(int*)(itemObj + 0x44) == 0 &&
-				(int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0 &&
-				(((int)(char)itemObj[0x53] & deleteMask) != 0) && *(int*)(itemObj + 0x48) < bestScriptObjectPos) {
-				bestScriptObjectPos = *(int*)(itemObj + 0x48);
+			if (*(void**)(itemObj + 0x550) == 0 &&
+				static_cast<signed char>(
+				    static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
+				(((int)(char)itemObj[0x53] & deleteMask) != 0) && *(int*)(itemObj + 0x94) < bestScriptObjectPos) {
+				bestScriptObjectPos = *(int*)(itemObj + 0x94);
 				bestItemObj = itemObj;
 			}
 		}

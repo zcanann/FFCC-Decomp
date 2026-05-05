@@ -28,7 +28,7 @@ public:
 	void onCancelStat(int);
 	void onFrame();
 	void onFrameStat();
-	int DeleteOld(int, int, CFlatRuntime::CObject*, CFlatRuntime::CObject*);
+	static int DeleteOld(int, int, CFlatRuntime::CObject*, CFlatRuntime::CObject*);
 	unsigned int CanCreateFromScript();
 	CGPrgObj* CreateFromScript(int, int, int, CGObject*, float, CGItemObj::CCFS*);
 	void safeDetach(int, float);

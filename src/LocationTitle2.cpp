@@ -244,12 +244,12 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         LocationTitle2Particle* particles = (LocationTitle2Particle*)work->m_particles;
         CChara::CModel* model;
 
-        owner = (CGObject*)pppMngStPtr->m_lookTarget;
+        model = 0;
         handle = 0;
+        owner = (CGObject*)pppMngStPtr->m_lookTarget;
         if (owner->m_charaModelHandle != 0) {
             handle = owner->m_charaModelHandle;
         }
-        model = 0;
         if (handle->m_model != 0) {
             model = handle->m_model;
         }

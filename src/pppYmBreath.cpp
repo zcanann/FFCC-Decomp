@@ -511,26 +511,26 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     Mtx* particleWMat;
     Mtx* particleMtx;
     int i;
-    short groupIndex;
+    int groupIndex;
     int firstParticle;
     int groupTable;
     short slotIndex;
-    unsigned int slotCount;
+    int particleSlot;
+    int slotCount;
     int ready;
     float scaledOwner;
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;
-    Vec origin;
-    Vec dir;
-    Vec target;
     Vec hitVector;
+    Vec dir;
+    Vec origin;
+    Vec target;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    _pppPObject* object = reinterpret_cast<_pppPObject*>(ymBreath);
     dataOffsets = offsets->m_serializedDataOffsets;
     _pppMngSt* mngSt = pppMngStPtr;
     colorOffset = dataOffsets[1];
@@ -600,7 +600,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     }
 
     PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_matrix);
-    UpdateAllParticle(object, work, pYmBreath, color);
+    UpdateAllParticle(reinterpret_cast<_pppPObject*>(ymBreath), work, pYmBreath, color);
 
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
@@ -618,12 +618,12 @@ group_ready:
         if (ready) {
             firstParticle = -1;
             scaledOwner = mngSt->m_previousPosition.z * params->m_groupOwnerScale;
-            for (slotIndex = 0; slotCount != 0; slotCount--) {
-                if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
-                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
+            for (particleSlot = 0; slotCount != 0; slotCount--) {
+                if (*(signed char*)(*(int*)(groupTable + 8) + particleSlot) != -1) {
+                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + particleSlot);
                     break;
                 }
-                slotIndex++;
+                particleSlot++;
             }
 
             PSMTXIdentity(scaleMtx);
@@ -677,8 +677,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     YmBreathParticleGroup* groupData;
     short foundSlot;
     short foundGroup;
-    Vec stepVelocity;
     Vec unitVelocity;
+    Vec stepVelocity;
 
     particleData = reinterpret_cast<YmBreathParticleData*>(vYmBreath->m_particleData);
     particleWmat = vYmBreath->m_particleWmats;
@@ -932,7 +932,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
     Vec baseDir;
-    int angle[3];
+    int angle[4];
     pppFMATRIX rotMtx;
     float spread;
     float range;

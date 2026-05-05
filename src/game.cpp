@@ -859,13 +859,13 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
 
         System.MapChanged(mapId, mapVariant, 1);
     } else {
+        u8 loadStep = param4;
         hasParamMask = (u32)((-param4 | param4) >> 31);
         MapPcs.LoadMap(
-            mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, param4 & 0xFF);
+            mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, loadStep);
 
-        hasParamMask = (u32)((-param4 | param4) >> 31);
         PartPcs.LoadFieldPdt(
-            mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, (u8)param4);
+            mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, loadStep);
     }
 }
 

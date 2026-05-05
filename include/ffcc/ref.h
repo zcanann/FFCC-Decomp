@@ -6,6 +6,8 @@ class CRef
 public:
 	CRef();
 	virtual ~CRef();
+	void AddRef() { refCount++; }
+	int GetRef() { return refCount; }
 
 private:
 	int refCount;

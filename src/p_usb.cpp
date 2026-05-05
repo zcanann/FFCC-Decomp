@@ -61,8 +61,8 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     int connected;
     unsigned int* dstBuffer;
     CMemory::CStage* stage;
-    unsigned int value;
     int result;
+    unsigned int value;
 
     count = elemSize * elemCount;
     value = (count + 0x5F) & ~0x1F;

@@ -64,6 +64,11 @@ extern "C" void SetDrawFlag__8COctTreeFv(void*);
 extern "C" void Draw__8COctTreeFUc(void*, unsigned char);
 extern "C" void Draw__7CMapObjFUc(void*, unsigned char);
 extern "C" void Calc__11CMapAnimRunFl(CMapAnimRun*, long);
+extern "C" int GetSize__25CPtrArray_P11CMapAnimRun_Fv(void*);
+extern "C" CMapAnimRun* __vc__25CPtrArray_P11CMapAnimRun_FUl(void*, unsigned long);
+extern "C" CMapAnim* __vc__21CPtrArray_P8CMapAnim_FUl(void*, unsigned long);
+extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
+extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void* __vt__8CPtrArrayIP14CMapLightHolder[];
 extern "C" void* __vt__8CPtrArrayIP11CMapAnimRun[];
@@ -3484,16 +3489,16 @@ void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int l
     CPtrArray<CMapAnim*>* mapAnimArray = reinterpret_cast<CPtrArray<CMapAnim*>*>(Ptr(this, 0x213FC));
     CMapAnimRun* foundMapAnimRun = 0;
     CMapObj* mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954);
-    int mapAnimRunCount = mapAnimRunArray->GetSize();
+    int mapAnimRunCount = GetSize__25CPtrArray_P11CMapAnimRun_Fv(mapAnimRunArray);
 
     for (unsigned int mapAnimRunIndex = 0; mapAnimRunIndex < static_cast<unsigned int>(mapAnimRunCount); mapAnimRunIndex++) {
-        CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[mapAnimRunIndex];
-        unsigned short mapAnimIndex = *reinterpret_cast<unsigned short*>(Ptr(mapAnimRun, 0x12));
-        CPtrArray<CMapAnimNode*>* mapAnimNodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>((*mapAnimArray)[mapAnimIndex]);
-        int mapAnimNodeCount = mapAnimNodeArray->GetSize();
+        CMapAnimRun* mapAnimRun = __vc__25CPtrArray_P11CMapAnimRun_FUl(mapAnimRunArray, mapAnimRunIndex);
+        CPtrArray<CMapAnimNode*>* mapAnimNodeArray =
+            reinterpret_cast<CPtrArray<CMapAnimNode*>*>(__vc__21CPtrArray_P8CMapAnim_FUl(mapAnimArray, mapAnimRun->m_mapAnimIndex));
+        int mapAnimNodeCount = GetSize__26CPtrArray_P12CMapAnimNode_Fv(mapAnimNodeArray);
 
         for (int mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
-            CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[mapAnimNodeIndex];
+            CMapAnimNode* mapAnimNode = __vc__26CPtrArray_P12CMapAnimNode_FUl(mapAnimNodeArray, mapAnimNodeIndex);
             if (reinterpret_cast<CMapObj*>(*reinterpret_cast<int*>(mapAnimNode)) == mapObj) {
                 foundMapAnimRun = mapAnimRun;
                 goto startMapObjAnim;
@@ -3518,11 +3523,11 @@ void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
     CPtrArray<CMapAnimRun*>* mapAnimRunArray = reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0));
     CMapAnimRun* mapAnimRun = 0;
-    int mapAnimRunCount = mapAnimRunArray->GetSize();
+    int mapAnimRunCount = GetSize__25CPtrArray_P11CMapAnimRun_Fv(mapAnimRunArray);
 
     for (unsigned long i = 0; i < static_cast<unsigned long>(mapAnimRunCount); i++) {
-        CMapAnimRun* current = (*mapAnimRunArray)[i];
-        if (*reinterpret_cast<unsigned char*>(Ptr(current, 1)) == static_cast<unsigned char>(animId)) {
+        CMapAnimRun* current = __vc__25CPtrArray_P11CMapAnimRun_FUl(mapAnimRunArray, i);
+        if (current->m_animId == static_cast<unsigned char>(animId)) {
             mapAnimRun = current;
             break;
         }

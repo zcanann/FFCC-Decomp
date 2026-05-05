@@ -43,6 +43,14 @@ public:
 class CMapAnimRun
 {
 public:
+    int m_currentFrame;
+    int m_startFrame;
+    int m_endFrame;
+    int m_triggerFrame;
+    unsigned char m_loop;
+    unsigned char m_animId;
+    unsigned short m_mapAnimIndex;
+
     void Calc(long);
     void Start(int, int, int);
 };

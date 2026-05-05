@@ -79,12 +79,10 @@ struct CMapAnimNodeData
  */
 void CMapAnimRun::Start(int startFrame, int endFrame, int loop)
 {
-    int* data = reinterpret_cast<int*>(this);
-
-    data[1] = startFrame;
-    data[2] = endFrame;
-    reinterpret_cast<unsigned char*>(this)[0x10] = static_cast<unsigned char>(loop);
-    data[0] = data[1];
+    m_startFrame = startFrame;
+    m_endFrame = endFrame;
+    m_loop = static_cast<unsigned char>(loop);
+    m_currentFrame = m_startFrame;
 }
 
 /*
@@ -98,42 +96,29 @@ void CMapAnimRun::Start(int startFrame, int endFrame, int loop)
  */
 void CMapAnimRun::Calc(long frame)
 {
-    struct CMapAnimRunData
-    {
-        int currentFrame;
-        int startFrame;
-        int endFrame;
-        int triggerFrame;
-        unsigned char loop;
-        unsigned char _pad11;
-        unsigned short mapAnimIndex;
-    };
-
-    CMapAnimRunData* run = reinterpret_cast<CMapAnimRunData*>(this);
-
-    if (run->currentFrame < 0) {
+    if (m_currentFrame < 0) {
         goto checkStart;
     }
 
 runFrame:
     CPtrArray<CMapAnim*>* mapAnimArray =
         reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213FC);
-    CMapAnim* mapAnim = (*mapAnimArray)[run->mapAnimIndex];
-    Calc__8CMapAnimFl(mapAnim, run->currentFrame);
-    if (++run->currentFrame > run->endFrame) {
-        if (run->loop != 0) {
-            run->currentFrame = 0;
+    CMapAnim* mapAnim = (*mapAnimArray)[m_mapAnimIndex];
+    Calc__8CMapAnimFl(mapAnim, m_currentFrame);
+    if (++m_currentFrame > m_endFrame) {
+        if (m_loop != 0) {
+            m_currentFrame = 0;
         } else {
-            run->currentFrame = -1;
+            m_currentFrame = -1;
         }
     }
     return;
 
 checkStart:
-    if (run->triggerFrame != frame) {
+    if (m_triggerFrame != frame) {
         return;
     }
-    run->currentFrame = run->startFrame;
+    m_currentFrame = m_startFrame;
     goto runFrame;
 }
 

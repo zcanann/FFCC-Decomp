@@ -142,8 +142,8 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	pppFMATRIX cameraMtx;
 	pppFMATRIX modelMtx;
 	Vec shapePos;
-	Vec debugSource;
 	Vec spherePos;
+	Vec debugSource;
 	_GXColor debugColor;
 	_GXColor trailColor;
 	_GXColor color;
@@ -255,11 +255,11 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		points = work->m_points;
 
 		GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 3));
-		int alpha = 0;
+		u8 alpha = 0;
 		for (i = 0; (int)i < (int)(step->m_payload[0x1e] - 1); i++) {
 			u0 = (float)i * uvStep;
 			u1 = (float)(i + 1) * uvStep;
-			trailColor.a = alphaMax - (u8)alpha;
+			trailColor.a = alphaMax - alpha;
 			alpha += alphaStep;
 
 			GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);

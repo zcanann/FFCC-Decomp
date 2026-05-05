@@ -276,7 +276,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             GXColor1u32(*(u32*)&trailColor);
             GXTexCoord2f32(u0, kPppLaserZero);
 
-            trailColor.a = alphaMax - (u8)(alphaStep * (i + 1));
+            trailColor.a = alphaMax - alpha;
             GXPosition3f32(work->m_points[i + 1].x, work->m_points[i + 1].y, work->m_points[i + 1].z);
             GXColor1u32(*(u32*)&trailColor);
             GXTexCoord2f32(u1, kPppLaserZero);

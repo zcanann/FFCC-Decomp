@@ -30,7 +30,6 @@ extern const f32 FLOAT_80330808;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-static unsigned char ARRAY_802ea1a0[0xC];
 CMenuPcs MenuPcs ATTRIBUTE_ALIGN(32);
 static const char kMenuPcsStageName[] = "CMenuPcs";
 static const char s_p_menu_cpp_801d9d80[] = "p_menu.cpp";

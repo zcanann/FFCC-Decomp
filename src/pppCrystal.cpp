@@ -124,11 +124,11 @@ static inline float CrystalSqrtPositive(float value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct pppCrystalUnkC* param_3)
+void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct _pppCtrlTable* param_3)
 {
 	float texW;
 	float texH;
-	s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
+	int* serializedDataOffsets = param_3->m_serializedDataOffsets;
 	s32 dataValIndex = param_2->m_dataValIndex;
 	CrystalWork* work = (CrystalWork*)((u8*)pppCrystal + serializedDataOffsets[2] + 0x80);
 	pppCrystalColorBlock* colorBlock = (pppCrystalColorBlock*)((u8*)pppCrystal + serializedDataOffsets[1] + 0x80);
@@ -246,7 +246,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct pppCrystalUnkC* param_3)
+void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct _pppCtrlTable* param_3)
 {
 	u32 x;
 	u32 y;
@@ -366,9 +366,9 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkC* param_2)
+void pppDestructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* param_2)
 {
-	s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
+	int* serializedDataOffsets = param_2->m_serializedDataOffsets;
 	u32* puVar1 = (u32*)((char*)pppCrystal + 0x80 + serializedDataOffsets[2]);
 	CMemory::CStage* stage = (CMemory::CStage*)puVar1[0];
 
@@ -394,9 +394,9 @@ void pppDestructCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkC* pa
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkC* param_2)
+void pppConstructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* param_2)
 {
-	s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
+	int* serializedDataOffsets = param_2->m_serializedDataOffsets;
 	u32* data = (u32*)((char*)pppCrystal + serializedDataOffsets[2] + 0x80);
 
 	data[0] = 0;

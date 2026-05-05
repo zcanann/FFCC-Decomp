@@ -29,8 +29,8 @@ public:
 	void onFrame();
 	void onFrameStat();
 	static int DeleteOld(int, int, CFlatRuntime::CObject*, CFlatRuntime::CObject*);
-	unsigned int CanCreateFromScript();
-	CGPrgObj* CreateFromScript(int, int, int, CGObject*, float, CGItemObj::CCFS*);
+	static unsigned int CanCreateFromScript();
+	static CGPrgObj* CreateFromScript(int, int, int, CGObject*, float, CGItemObj::CCFS*);
 	void safeDetach(int, float);
 	void carry(CGPartyObj*, int, int);
 	void onChangePrg(int);

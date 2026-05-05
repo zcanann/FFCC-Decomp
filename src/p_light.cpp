@@ -409,8 +409,6 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     CLight sceneLight;
     sceneLight = *light;
     float attenRadius = sceneLight.m_attenRadius;
-    u8* targetEnable = reinterpret_cast<u8*>(&sceneLight.m_targetEnableMask);
-
     if (FLOAT_8032fc10 <= sceneLight.m_attenFalloff) {
         sceneLight.m_attenFalloff = attenRadius;
     }
@@ -420,18 +418,18 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     }
     sceneLight.m_range = attenRadius * FLOAT_8032fc18 * sceneLight.m_radius;
 
-    targetEnable[3] = 1;
-    targetEnable[2] = 1;
-    targetEnable[1] = 1;
-    targetEnable[0] = 1;
+    sceneLight.m_targetEnable[3] = 1;
+    sceneLight.m_targetEnable[2] = 1;
+    sceneLight.m_targetEnable[1] = 1;
+    sceneLight.m_targetEnable[0] = 1;
     if (*(u32*)&sceneLight.m_targetColor[0] == 0) {
-        targetEnable[0] = 0;
+        sceneLight.m_targetEnable[0] = 0;
     }
     if (*(u32*)&sceneLight.m_targetColor[1] == 0) {
-        targetEnable[1] = 0;
+        sceneLight.m_targetEnable[1] = 0;
     }
     if (*(u32*)&sceneLight.m_targetColor[2] == 0) {
-        targetEnable[2] = 0;
+        sceneLight.m_targetEnable[2] = 0;
     }
 
     sceneLight.m_unkAC = sceneLight.m_attenRadius * sceneLight.m_attenRadius;
@@ -461,125 +459,67 @@ void CLightPcs::GetFreeBumpLight(CLightPcs::TARGET)
 CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs::TARGET target,
                                           CMemory::CStage* stage, int count)
 {
-    float threshold = FLOAT_8032fc10;
-    int base = (int)this + (int)target * 0x9c0;
-    int i = 0;
-    int remaining = 8;
-    int entry = base;
-    u32* slot = 0;
+    CBumpLight* bumpLight = 0;
+    CBumpLight* bumpLights = &m_bumpLights[target * 8];
 
-    do {
-        if (*(char*)(entry + 0x1cec) == '\0') {
-            slot = (u32*)(base + i * 0x138 + 0x1c3c);
+    for (int i = 0; i < 8; i++) {
+        if (!bumpLights[i].m_hasTexture) {
+            bumpLight = &bumpLights[i];
             break;
         }
-        entry += 0x138;
-        i += 1;
-        remaining -= 1;
-    } while (remaining != 0);
+    }
 
-    if (slot == 0) {
-        if (System.m_execParam != 0) {
+    if (bumpLight == 0) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(lbl_801D7C94));
         }
         return 0;
     }
 
-    u32* src = (u32*)srcLight;
-    slot[0] = src[0];
-    slot[1] = src[1];
-    slot[2] = src[2];
-    slot[3] = src[3];
-    slot[4] = src[4];
-    slot[5] = src[5];
-    slot[6] = src[6];
-    slot[7] = src[7];
-    slot[8] = src[8];
-    slot[9] = src[9];
-    slot[10] = src[10];
-    slot[11] = src[11];
-    slot[12] = src[12];
-    slot[13] = src[13];
-    slot[14] = src[14];
-    slot[15] = src[15];
-    slot[16] = src[16];
-    slot[17] = src[17];
-    slot[18] = src[18];
-    *(u8*)(slot + 19) = *(u8*)(src + 19);
-    *(u8*)((char*)slot + 0x4d) = *(u8*)((char*)src + 0x4d);
-    *(u8*)((char*)slot + 0x4e) = *(u8*)((char*)src + 0x4e);
-    *(u8*)((char*)slot + 0x4f) = *(u8*)((char*)src + 0x4f);
-    slot[20] = src[20];
-    slot[21] = src[21];
-    slot[22] = src[22];
-    slot[23] = src[23];
-    slot[24] = src[24];
-    slot[25] = src[25];
-    slot[26] = src[26];
-    slot[27] = src[27];
-    slot[28] = src[28];
-    slot[29] = src[29];
-    slot[30] = src[30];
-    slot[31] = src[31];
-    slot[32] = src[32];
-    slot[33] = src[33];
-    slot[34] = src[34];
-    slot[35] = src[35];
-    slot[36] = src[36];
-    slot[37] = src[37];
-    slot[38] = src[38];
-    slot[39] = src[39];
-    slot[40] = src[40];
-    slot[41] = src[41];
-    slot[42] = src[42];
-    slot[43] = src[43];
+    *static_cast<CLight*>(bumpLight) = *srcLight;
 
-    if (threshold <= reinterpret_cast<float*>(slot)[8]) {
-        slot[8] = slot[7];
+    if (FLOAT_8032fc10 <= bumpLight->m_attenFalloff) {
+        bumpLight->m_attenFalloff = bumpLight->m_attenRadius;
     }
 
-    threshold = FLOAT_8032fc14;
-    reinterpret_cast<float*>(slot)[43] = reinterpret_cast<float*>(slot)[7] * reinterpret_cast<float*>(slot)[7];
-    slot[9] = slot[7];
-    if (reinterpret_cast<float*>(slot)[9] < threshold) {
-        reinterpret_cast<float*>(slot)[9] = -reinterpret_cast<float*>(slot)[9];
+    bumpLight->m_unkAC = bumpLight->m_attenRadius * bumpLight->m_attenRadius;
+    bumpLight->m_range = bumpLight->m_attenRadius;
+    if (bumpLight->m_range < FLOAT_8032fc14) {
+        bumpLight->m_range = -bumpLight->m_range;
     }
-    reinterpret_cast<float*>(slot)[9] =
-        reinterpret_cast<float*>(slot)[9] * FLOAT_8032fc18 * reinterpret_cast<float*>(slot)[10];
+    bumpLight->m_range = bumpLight->m_range * FLOAT_8032fc18 * bumpLight->m_radius;
 
-    *(u8*)((char*)slot + 99) = 1;
-    *(u8*)((char*)slot + 0x62) = 1;
-    *(u8*)((char*)slot + 0x61) = 1;
-    *(u8*)(slot + 24) = 1;
+    bumpLight->m_targetEnable[3] = 1;
+    bumpLight->m_targetEnable[2] = 1;
+    bumpLight->m_targetEnable[1] = 1;
+    bumpLight->m_targetEnable[0] = 1;
 
-    if (slot[20] == 0) {
-        *(u8*)(slot + 24) = 0;
+    if (*(u32*)&bumpLight->m_targetColor[0] == 0) {
+        bumpLight->m_targetEnable[0] = 0;
     }
-    if (slot[21] == 0) {
-        *(u8*)((char*)slot + 0x61) = 0;
+    if (*(u32*)&bumpLight->m_targetColor[1] == 0) {
+        bumpLight->m_targetEnable[1] = 0;
     }
-    if (slot[22] == 0) {
-        *(u8*)((char*)slot + 0x62) = 0;
+    if (*(u32*)&bumpLight->m_targetColor[2] == 0) {
+        bumpLight->m_targetEnable[2] = 0;
     }
 
-    *(char*)((char*)slot + 0xb2) = (char)target;
-    *(u8*)(slot + 44) = 1;
-    *(char*)((char*)slot + 0xb3) = (char)count;
+    bumpLight->m_target = target;
+    bumpLight->m_hasTexture = 1;
+    bumpLight->m_textureCount = count;
 
     int texSize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
-    slot[45] = (u32)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+    bumpLight->m_textureData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
         &Memory, texSize * count, stage, const_cast<char*>(s_p_light_cpp), 0x13b, 0);
 
     int texOffset = 0;
-    u32* texObj = slot;
-    for (i = 0; i < count; i++) {
-        GXInitTexObj((GXTexObj*)(texObj + 46), (void*)(slot[45] + texOffset), (u16)0x40, (u16)0x40, (GXTexFmt)3,
-                     (GXTexWrapMode)0, (GXTexWrapMode)0, (u8)0);
+    for (int i = 0; i < count; i++) {
+        GXInitTexObj(&bumpLight->m_textures[i], (u8*)bumpLight->m_textureData + texOffset, (u16)0x40, (u16)0x40,
+                     (GXTexFmt)3, (GXTexWrapMode)0, (GXTexWrapMode)0, (u8)0);
         texOffset += texSize;
-        texObj += 8;
     }
 
-    return (CLightPcs::CBumpLight*)slot;
+    return bumpLight;
 }
 
 /*
@@ -948,7 +888,7 @@ void CLightPcs::InsertOctTree(CLightPcs::TARGET target, COctTree& octTree)
     octTree.ClearLight();
     CLight* light = m_sceneLights;
     for (u32 i = 0; i < m_sceneLightCount; i++, light++) {
-        if (reinterpret_cast<u8*>(&light->m_targetEnableMask)[target] != 0) {
+        if (light->m_targetEnable[target] != 0) {
             octTree.InsertLight(i, *reinterpret_cast<Vec*>(&light->m_position), light->m_range, light->m_partMask);
         }
     }

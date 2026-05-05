@@ -1904,7 +1904,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
         }
 
         PSMTXMultVec(CameraPcs.m_cameraMatrix, &se3D->m_position, &nearestPoint);
-        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs._224_4_), &se3D->m_position);
+        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs._212_4_), &se3D->m_position);
         fVar2 = se3D->m_farDistance * fVar1;
         fVar2 = se3D->m_farDistance * fVar2;
         fVar2 = fVar1 * fVar2;

@@ -114,16 +114,14 @@ struct CFlatObjectFlagBits {
 
 static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
 {
-	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
 	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(runtime) + 0x1204);
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(runtime) + 0x8CC);
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			const unsigned int flags = object->m_flags;
+			int flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				GetCIDFn getCID = reinterpret_cast<GetCIDFn>((*reinterpret_cast<void***>(object))[3]);
-				if ((getCID(object) & cidMask) == cidMask) {
+				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & cidMask) == cidMask) {
 					return reinterpret_cast<CGBaseObj*>(object);
 				}
 			}
@@ -918,7 +916,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		Frame__12CFlatRuntimeFii(reinterpret_cast<CFlatRuntime*>(this), arg0, mode);
 
 		CFlatRuntime::CObject* const root =
-			reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+			reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5); obj != 0;
 			 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
 			Frame__9CGBaseObjFv(obj);
@@ -991,7 +989,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 	AStar.drawAStar();
 
 	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 1); obj != 0;
 		 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 1)) {
 		Draw__9CGBaseObjFv(obj);
@@ -1068,17 +1066,15 @@ int CFlatRuntime2::Load(char* fileName)
  */
 CGObject* CFlatRuntime2::FindGObjFirst()
 {
-	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
 	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	CFlatRuntime::CObject* object = root->m_next->m_next;
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			const unsigned int flags = object->m_flags;
+			int flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				GetCIDFn getCID = reinterpret_cast<GetCIDFn>((*reinterpret_cast<void***>(object))[3]);
-				if ((getCID(object) & 5) == 5) {
+				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 5) == 5) {
 					return reinterpret_cast<CGObject*>(object);
 				}
 			}
@@ -1100,17 +1096,15 @@ CGObject* CFlatRuntime2::FindGObjFirst()
  */
 CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
 {
-	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
 	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			const unsigned int flags = object->m_flags;
+			int flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				GetCIDFn getCID = reinterpret_cast<GetCIDFn>((*reinterpret_cast<void***>(object))[3]);
-				if ((getCID(object) & 5) == 5) {
+				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 5) == 5) {
 					return reinterpret_cast<CGObject*>(object);
 				}
 			}
@@ -1152,17 +1146,15 @@ void CFlatRuntime2::FindGBaseObjNext(CGBaseObj*)
  */
 CGQuadObj* CFlatRuntime2::FindGQuadObjFirst()
 {
-	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
 	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	CFlatRuntime::CObject* object = root->m_next->m_next;
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			const unsigned int flags = object->m_flags;
+			int flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				GetCIDFn getCID = reinterpret_cast<GetCIDFn>((*reinterpret_cast<void***>(object))[3]);
-				if ((getCID(object) & 3) == 3) {
+				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 3) == 3) {
 					return reinterpret_cast<CGQuadObj*>(object);
 				}
 			}
@@ -1184,17 +1176,15 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjFirst()
  */
 CGQuadObj* CFlatRuntime2::FindGQuadObjNext(CGQuadObj* gQuadObj)
 {
-	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
 	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gQuadObj)->m_next;
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			const unsigned int flags = object->m_flags;
+			int flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				GetCIDFn getCID = reinterpret_cast<GetCIDFn>((*reinterpret_cast<void***>(object))[3]);
-				if ((getCID(object) & 3) == 3) {
+				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 3) == 3) {
 					return reinterpret_cast<CGQuadObj*>(object);
 				}
 			}
@@ -1216,17 +1206,15 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjNext(CGQuadObj* gQuadObj)
  */
 CGMonObj* CFlatRuntime2::FindGMonObjFirst()
 {
-	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
 	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	CFlatRuntime::CObject* object = root->m_next->m_next;
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			const unsigned int flags = object->m_flags;
+			int flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				GetCIDFn getCID = reinterpret_cast<GetCIDFn>((*reinterpret_cast<void***>(object))[3]);
-				if ((getCID(object) & 0xAD) == 0xAD) {
+				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 0xAD) == 0xAD) {
 					return reinterpret_cast<CGMonObj*>(object);
 				}
 			}
@@ -1248,17 +1236,15 @@ CGMonObj* CFlatRuntime2::FindGMonObjFirst()
  */
 CGMonObj* CFlatRuntime2::FindGMonObjNext(CGMonObj* gMonObj)
 {
-	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
 	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gMonObj)->m_next;
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			const unsigned int flags = object->m_flags;
+			int flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				GetCIDFn getCID = reinterpret_cast<GetCIDFn>((*reinterpret_cast<void***>(object))[3]);
-				if ((getCID(object) & 0xAD) == 0xAD) {
+				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 0xAD) == 0xAD) {
 					return reinterpret_cast<CGMonObj*>(object);
 				}
 			}
@@ -1280,17 +1266,15 @@ CGMonObj* CFlatRuntime2::FindGMonObjNext(CGMonObj* gMonObj)
  */
 CGItemObj* CFlatRuntime2::FindGItemObjFirst()
 {
-	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
 	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	CFlatRuntime::CObject* object = root->m_next->m_next;
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			const unsigned int flags = object->m_flags;
+			int flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				GetCIDFn getCID = reinterpret_cast<GetCIDFn>((*reinterpret_cast<void***>(object))[3]);
-				if ((getCID(object) & 0x1D) == 0x1D) {
+				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 0x1D) == 0x1D) {
 					return reinterpret_cast<CGItemObj*>(object);
 				}
 			}
@@ -1312,17 +1296,15 @@ CGItemObj* CFlatRuntime2::FindGItemObjFirst()
  */
 CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
 {
-	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
 	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gItemObj)->m_next;
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			const unsigned int flags = object->m_flags;
+			int flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				GetCIDFn getCID = reinterpret_cast<GetCIDFn>((*reinterpret_cast<void***>(object))[3]);
-				if ((getCID(object) & 0x1D) == 0x1D) {
+				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 0x1D) == 0x1D) {
 					return reinterpret_cast<CGItemObj*>(object);
 				}
 			}
@@ -1499,7 +1481,7 @@ void CFlatRuntime2::Draw()
 	font->SetColor(color);
 
 	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	for (CGObject* object = reinterpret_cast<CGObject*>(
 			 FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5));
 		 object != 0;
@@ -1711,7 +1693,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 
 	const float radiusSq = radius * radius;
 	CFlatRuntime::CObject* root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	CGBaseObj* baseObj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5);
 	int count = 0;
 
@@ -2070,48 +2052,11 @@ void CFlatRuntime2::drawLayer(
 void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
-	u8 clear3[3] = { 0, 0, 0 };
-	int zero = 0;
-	int minusOne = -1;
-	int frameDelay = 0x1E;
-	float one = 1.0f;
-	u16 soundEffectFlags = 0;
-	u8 soundEffectStartedOnce = 1;
-
-	*reinterpret_cast<void**>(runtime + 0x16CC) = 0;
-	*reinterpret_cast<void**>(runtime + 0x16D0) = 0;
-	*reinterpret_cast<void**>(runtime + 0x16D4) = 0;
-	*reinterpret_cast<void**>(runtime + 0x16D8) = 0;
-	*reinterpret_cast<int*>(runtime + 0x16DC) = zero;
-	*reinterpret_cast<void**>(runtime + 0x16E0) = 0;
-	*reinterpret_cast<void**>(runtime + 0x16E4) = 0;
-	*reinterpret_cast<int*>(runtime + 0x16E8) = zero;
-	*reinterpret_cast<int*>(runtime + 0x16EC) = zero;
-	*reinterpret_cast<float*>(runtime + 0x16F0) = one;
-	*reinterpret_cast<float*>(runtime + 0x16F4) = one;
-	runtime[0x16F8] = 0;
-	memcpy(runtime + 0x16F9, clear3, sizeof(clear3));
-	*reinterpret_cast<int*>(runtime + 0x16FC) = minusOne;
-	*reinterpret_cast<u16*>(runtime + 0x1700) = soundEffectFlags;
-	runtime[0x1702] = soundEffectStartedOnce;
-	runtime[0x1703] = 0;
-	*reinterpret_cast<int*>(runtime + 0x1704) = zero;
-	*reinterpret_cast<int*>(runtime + 0x1708) = frameDelay;
-	*reinterpret_cast<int*>(runtime + 0x170C) = minusOne;
-	*reinterpret_cast<int*>(runtime + 0x1710) = zero;
-	*reinterpret_cast<int*>(runtime + 0x1714) = zero;
-	*reinterpret_cast<int*>(runtime + 0x1718) = zero;
-	*reinterpret_cast<int*>(runtime + 0x171C) = zero;
-	*reinterpret_cast<int*>(runtime + 0x1720) = zero;
-	*reinterpret_cast<int*>(runtime + 0x1724) = zero;
-	*reinterpret_cast<int*>(runtime + 0x1728) = zero;
-	*reinterpret_cast<int*>(runtime + 0x172C) = zero;
-	*reinterpret_cast<int*>(runtime + 0x1730) = zero;
-	*reinterpret_cast<int*>(runtime + 0x1734) = zero;
+	*reinterpret_cast<CParticleWork*>(runtime + 0x16CC) = CParticleWork();
 
 	runtime[0x16F8] = 1;
 	*reinterpret_cast<int*>(runtime + 0x1738) = workNo >> 8;
-	*reinterpret_cast<int*>(runtime + 0x16DC) = zero;
+	*reinterpret_cast<int*>(runtime + 0x16DC) = 0;
 	*reinterpret_cast<unsigned int*>(runtime + 0x173C) = static_cast<unsigned int>(workNo) & 0xFF;
 	*reinterpret_cast<float*>(runtime + 0x1740) = pos.x;
 	*reinterpret_cast<float*>(runtime + 0x1744) = pos.y;

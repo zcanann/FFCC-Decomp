@@ -238,8 +238,8 @@ void CMapObj::Init()
 {
     U8At(this, 0x1B) = 1;
     U8At(this, 0x1C) = 1;
-    S32At(this, 0x0) = 0;
-    S32At(this, 0xC) = 0;
+    m_parent = 0;
+    m_mapData = 0;
     S32At(this, 0xEC) = 0;
 
     U8At(this, 0x15) = 0x7E;
@@ -389,15 +389,15 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             U8At(this, 0x1D) = chunkFile.Get1();
 
             if (parentIdx == -1) {
-                PtrAt(this, 0x0) = 0;
+                m_parent = 0;
             } else {
-                ObjAt(this, 0x0) = MapObjArrayStart() + parentIdx;
+                m_parent = MapObjArrayStart() + parentIdx;
             }
 
             if (meshOrHitIdx == -1) {
-                PtrAt(this, 0xC) = 0;
+                m_mapData = 0;
             } else if (U8At(this, 0x1D) == 1) {
-                PtrAt(this, 0xC) = reinterpret_cast<unsigned char*>(&MapMng) + 0x1E954 + (meshOrHitIdx * 0x44);
+                m_mapData = reinterpret_cast<unsigned char*>(&MapMng) + 0x1E954 + (meshOrHitIdx * 0x44);
                 U8At(this, 0x14) = 0;
                 U8At(this, 0x15) = 0;
             } else if ((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) {
@@ -412,9 +412,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     if (meshName != 0) {
                         strncpy(reinterpret_cast<char*>(meshName) + 8, name, 0x20);
                     }
-                    PtrAt(this, 0xC) = 0;
+                    m_mapData = 0;
                 } else {
-                    PtrAt(this, 0xC) = reinterpret_cast<unsigned char*>(&MapMng) + 0x4D4 + (meshOrHitIdx * 0x24);
+                    m_mapData = reinterpret_cast<unsigned char*>(&MapMng) + 0x4D4 + (meshOrHitIdx * 0x24);
                 }
             }
 
@@ -733,7 +733,7 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
             PSMTXConcat(*reinterpret_cast<Mtx*>(parentMtx), MtxAt(obj, 0x88), MtxAt(obj, 0xB8));
         }
 
-        for (CMapObj* child = ObjAt(obj, 0x4); child != 0; child = ObjAt(child, 0x8)) {
+        for (CMapObj* child = obj->m_child; child != 0; child = child->m_next) {
             unsigned char childDirty = dirty;
 
             if (U8At(child, 0x1B) != 0) {
@@ -757,7 +757,7 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
                 PSMTXConcat(MtxAt(obj, 0xB8), MtxAt(child, 0x88), MtxAt(child, 0xB8));
             }
 
-            for (CMapObj* grandChild = ObjAt(child, 0x4); grandChild != 0; grandChild = ObjAt(grandChild, 0x8)) {
+            for (CMapObj* grandChild = child->m_child; grandChild != 0; grandChild = grandChild->m_next) {
                 unsigned char grandChildDirty = childDirty;
 
                 if (U8At(grandChild, 0x1B) != 0) {
@@ -782,13 +782,13 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
                     PSMTXConcat(MtxAt(child, 0xB8), MtxAt(grandChild, 0x88), MtxAt(grandChild, 0xB8));
                 }
 
-                if (ObjAt(grandChild, 0x4) != 0) {
-                    ObjAt(grandChild, 0x4)->CalcMtx(reinterpret_cast<float(*)[4]>(&MtxAt(grandChild, 0xB8)), grandChildDirty);
+                if (grandChild->m_child != 0) {
+                    grandChild->m_child->CalcMtx(reinterpret_cast<float(*)[4]>(&MtxAt(grandChild, 0xB8)), grandChildDirty);
                 }
             }
         }
 
-        obj = ObjAt(obj, 0x8);
+        obj = obj->m_next;
     } while (obj != 0);
 }
 
@@ -812,64 +812,64 @@ void CMapObj::SetShow_r(int show)
             U8At(root, 0x18) |= 1;
         }
 
-        for (CMapObj* c0 = ObjAt(root, 0x4); c0 != 0; c0 = ObjAt(c0, 0x8)) {
+        for (CMapObj* c0 = root->m_child; c0 != 0; c0 = c0->m_next) {
             if (show == 0) {
                 U8At(c0, 0x18) &= 0xFE;
             } else {
                 U8At(c0, 0x18) |= 1;
             }
 
-            for (CMapObj* c1 = ObjAt(c0, 0x4); c1 != 0; c1 = ObjAt(c1, 0x8)) {
+            for (CMapObj* c1 = c0->m_child; c1 != 0; c1 = c1->m_next) {
                 if (show == 0) {
                     U8At(c1, 0x18) &= 0xFE;
                 } else {
                     U8At(c1, 0x18) |= 1;
                 }
 
-                for (CMapObj* c2 = ObjAt(c1, 0x4); c2 != 0; c2 = ObjAt(c2, 0x8)) {
+                for (CMapObj* c2 = c1->m_child; c2 != 0; c2 = c2->m_next) {
                     if (show == 0) {
                         U8At(c2, 0x18) &= 0xFE;
                     } else {
                         U8At(c2, 0x18) |= 1;
                     }
 
-                    for (CMapObj* c3 = ObjAt(c2, 0x4); c3 != 0; c3 = ObjAt(c3, 0x8)) {
+                    for (CMapObj* c3 = c2->m_child; c3 != 0; c3 = c3->m_next) {
                         if (show == 0) {
                             U8At(c3, 0x18) &= 0xFE;
                         } else {
                             U8At(c3, 0x18) |= 1;
                         }
 
-                        for (CMapObj* c4 = ObjAt(c3, 0x4); c4 != 0; c4 = ObjAt(c4, 0x8)) {
+                        for (CMapObj* c4 = c3->m_child; c4 != 0; c4 = c4->m_next) {
                             if (show == 0) {
                                 U8At(c4, 0x18) &= 0xFE;
                             } else {
                                 U8At(c4, 0x18) |= 1;
                             }
 
-                            for (CMapObj* c5 = ObjAt(c4, 0x4); c5 != 0; c5 = ObjAt(c5, 0x8)) {
+                            for (CMapObj* c5 = c4->m_child; c5 != 0; c5 = c5->m_next) {
                                 if (show == 0) {
                                     U8At(c5, 0x18) &= 0xFE;
                                 } else {
                                     U8At(c5, 0x18) |= 1;
                                 }
 
-                                for (CMapObj* c6 = ObjAt(c5, 0x4); c6 != 0; c6 = ObjAt(c6, 0x8)) {
+                                for (CMapObj* c6 = c5->m_child; c6 != 0; c6 = c6->m_next) {
                                     if (show == 0) {
                                         U8At(c6, 0x18) &= 0xFE;
                                     } else {
                                         U8At(c6, 0x18) |= 1;
                                     }
 
-                                    for (CMapObj* c7 = ObjAt(c6, 0x4); c7 != 0; c7 = ObjAt(c7, 0x8)) {
+                                    for (CMapObj* c7 = c6->m_child; c7 != 0; c7 = c7->m_next) {
                                         if (show == 0) {
                                             U8At(c7, 0x18) &= 0xFE;
                                         } else {
                                             U8At(c7, 0x18) |= 1;
                                         }
 
-                                        if (ObjAt(c7, 0x4) != 0) {
-                                            ObjAt(c7, 0x4)->SetShow_r(show);
+                                        if (c7->m_child != 0) {
+                                            c7->m_child->SetShow_r(show);
                                         }
                                     }
                                 }
@@ -880,7 +880,7 @@ void CMapObj::SetShow_r(int show)
             }
         }
 
-        root = ObjAt(root, 0x8);
+        root = root->m_next;
     } while (root != 0);
 }
 
@@ -901,8 +901,8 @@ void CMapObj::SetShow(int show)
         U8At(this, 0x18) &= 0xFE;
     }
 
-    if (ObjAt(this, 0x4) != 0) {
-        ObjAt(this, 0x4)->SetShow_r(show);
+    if (m_child != 0) {
+        m_child->SetShow_r(show);
     }
 }
 
@@ -941,90 +941,90 @@ void CMapObj::SetLink()
         CMapObj* search1 = mapStart;
         CMapObj* head1 = 0;
 
-        ObjAt(child0, 0x8) = head0;
+        child0->m_next = head0;
         while ((child1 = MapMng.SearchChildMapObj(search1, child0)) != 0) {
             CMapObj* search2 = search2Start;
             CMapObj* head2 = 0;
 
-            ObjAt(child1, 0x8) = head1;
+            child1->m_next = head1;
             while ((child2 = MapMng.SearchChildMapObj(search2, child1)) != 0) {
                 CMapObj* search3 = search3Start;
                 CMapObj* head3 = 0;
 
-                ObjAt(child2, 0x8) = head2;
+                child2->m_next = head2;
                 while ((child3 = MapMng.SearchChildMapObj(search3, child2)) != 0) {
                     CMapObj* search4 = search4Start;
                     CMapObj* head4 = 0;
 
-                    ObjAt(child3, 0x8) = head3;
+                    child3->m_next = head3;
                     while ((child4 = MapMng.SearchChildMapObj(search4, child3)) != 0) {
                         CMapObj* search5 = search5Start;
                         CMapObj* head5 = 0;
 
-                        ObjAt(child4, 0x8) = head4;
+                        child4->m_next = head4;
                         while ((child5 = MapMng.SearchChildMapObj(search5, child4)) != 0) {
                             CMapObj* search6 = search6Start;
                             CMapObj* head6 = 0;
 
-                            ObjAt(child5, 0x8) = head5;
+                            child5->m_next = head5;
                             while ((child6 = MapMng.SearchChildMapObj(search6, child5)) != 0) {
                                 CMapObj* search7 = search7Start;
                                 CMapObj* head7 = 0;
 
-                                ObjAt(child6, 0x8) = head6;
+                                child6->m_next = head6;
                                 while ((child7 = MapMng.SearchChildMapObj(search7, child6)) != 0) {
                                     CMapObj* search8 = search8Start;
                                     CMapObj* head8 = 0;
 
-                                    ObjAt(child7, 0x8) = head7;
+                                    child7->m_next = head7;
                                     while ((child8 = MapMng.SearchChildMapObj(search8, child7)) != 0) {
-                                        ObjAt(child8, 0x8) = head8;
+                                        child8->m_next = head8;
                                         child8->SetLink();
                                         search8 = NextSlot(child8);
                                         head8 = child8;
                                     }
 
-                                    ObjAt(child7, 0x4) = head8;
+                                    child7->m_child = head8;
                                     search7 = NextSlot(child7);
                                     head7 = child7;
                                 }
 
-                                ObjAt(child6, 0x4) = head7;
+                                child6->m_child = head7;
                                 search6 = NextSlot(child6);
                                 head6 = child6;
                             }
 
-                            ObjAt(child5, 0x4) = head6;
+                            child5->m_child = head6;
                             search5 = NextSlot(child5);
                             head5 = child5;
                         }
 
-                        ObjAt(child4, 0x4) = head5;
+                        child4->m_child = head5;
                         search4 = NextSlot(child4);
                         head4 = child4;
                     }
 
-                    ObjAt(child3, 0x4) = head4;
+                    child3->m_child = head4;
                     search3 = NextSlot(child3);
                     head3 = child3;
                 }
 
-                ObjAt(child2, 0x4) = head3;
+                child2->m_child = head3;
                 search2 = NextSlot(child2);
                 head2 = child2;
             }
 
-            ObjAt(child1, 0x4) = head2;
+            child1->m_child = head2;
             search1 = NextSlot(child1);
             head1 = child1;
         }
 
-        ObjAt(child0, 0x4) = head1;
+        child0->m_child = head1;
         search0 = NextSlot(child0);
         head0 = child0;
     }
 
-    ObjAt(this, 0x4) = head0;
+    m_child = head0;
 }
 
 /*
@@ -1087,7 +1087,7 @@ void CMapObj::Calc()
         }
     }
 
-    if ((static_cast<signed char>(U8At(this, 0x1D)) == 1) && (PtrAt(this, 0xC) != 0) &&
+    if ((static_cast<signed char>(U8At(this, 0x1D)) == 1) && (m_mapData != 0) &&
         (static_cast<signed char>(U8At(this, 0x1F)) == -1) &&
         ((U8At(this, 0x18) & 1) != 0)) {
         if ((kMapObjOne <= F32At(this, 0x50)) || (F32At(this, 0x4C) < kMapObjInitNegOne)) {
@@ -1146,7 +1146,7 @@ void CMapObj::Calc()
             float blend = 0.0f;
             int vertexCount = *reinterpret_cast<int*>(attr + 0x10);
             int frameList = *reinterpret_cast<int*>(attr + 0xC);
-            Vec* outVerts = *reinterpret_cast<Vec**>(S32At(this, 0xC) + 0x2C);
+            Vec* outVerts = *reinterpret_cast<Vec**>(reinterpret_cast<unsigned char*>(m_mapData) + 0x2C);
 
             if (Get__12CMapKeyFrameFRiRiRf(reinterpret_cast<CMapKeyFrame*>(attr + 0x14), &key0, &key1, &blend) == 0) {
                 float* src = *reinterpret_cast<float**>(frameList + key0 * 4);
@@ -1277,7 +1277,7 @@ void CMapObj::Draw(unsigned char priority)
     }
     if (S32At(this, 0x3C) != 0) {
         MaterialMan.SetShadowBound(static_cast<CMapShadow::TARGET>(1),
-                                   reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(PtrAt(this, 0xC)) + 0xC),
+                                   reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC),
                                    MtxAt(this, 0xB8));
     }
 
@@ -1323,7 +1323,7 @@ void CMapObj::Draw(unsigned char priority)
         GXSetZMode(1, GX_LEQUAL, 0);
     }
 
-    CMapMesh* mapMesh = reinterpret_cast<CMapMesh*>(PtrAt(this, 0xC));
+    CMapMesh* mapMesh = reinterpret_cast<CMapMesh*>(m_mapData);
     mapMesh->SetRenderArray();
     mapMesh->Draw(0);
 
@@ -1349,11 +1349,11 @@ void CMapObj::SetDrawFlag()
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     self[0x18] &= 0xFB;
 
-    if ((static_cast<signed char>(self[0x1D]) == 1) && (*reinterpret_cast<void**>(self + 0xC) != 0)) {
+    if ((static_cast<signed char>(self[0x1D]) == 1) && (m_mapData != 0)) {
         if ((static_cast<signed char>(self[0x1F]) == -1) && ((self[0x18] & 1) != 0)) {
             Mtx concatMtx;
             unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
-            CBound* bound = reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(self + 0xC)) + 0xC);
+            CBound* bound = reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC);
 
             PSMTXConcat(*reinterpret_cast<Mtx*>(mapMng + 0x22958), *reinterpret_cast<Mtx*>(self + 0xB8), concatMtx);
             if (bound->CheckFrustum(*reinterpret_cast<Vec*>(mapMng + 0x228EC), concatMtx, *reinterpret_cast<float*>(mapMng + 0x22A74)) != 0) {
@@ -1374,9 +1374,9 @@ void CMapObj::SetDrawFlag()
  */
 void CMapObj::DrawHit()
 {
-    if ((U8At(this, 0x1D) == 2) && (PtrAt(this, 0xC) != 0)) {
+    if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
         MaterialMan.SetObjMatrix(reinterpret_cast<float(*)[4]>(0x8026805C), MtxAt(this, 0xB8));
-        reinterpret_cast<CMapHit*>(PtrAt(this, 0xC))->Draw();
+        reinterpret_cast<CMapHit*>(m_mapData)->Draw();
     }
 }
 
@@ -1391,9 +1391,9 @@ void CMapObj::DrawHit()
  */
 void CMapObj::DrawHitWire()
 {
-    if ((U8At(this, 0x1D) == 2) && (PtrAt(this, 0xC) != 0)) {
+    if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
         MaterialMan.SetObjMatrix(reinterpret_cast<float(*)[4]>(0x8026805C), MtxAt(this, 0xB8));
-        reinterpret_cast<CMapHit*>(PtrAt(this, 0xC))->DrawWire();
+        reinterpret_cast<CMapHit*>(m_mapData)->DrawWire();
     }
 }
 
@@ -1408,9 +1408,9 @@ void CMapObj::DrawHitWire()
  */
 void CMapObj::DrawHitNormal()
 {
-    if ((U8At(this, 0x1D) == 2) && (PtrAt(this, 0xC) != 0)) {
+    if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
         MaterialMan.SetObjMatrix(reinterpret_cast<float(*)[4]>(0x8026805C), MtxAt(this, 0xB8));
-        reinterpret_cast<CMapHit*>(PtrAt(this, 0xC))->DrawNormal();
+        reinterpret_cast<CMapHit*>(m_mapData)->DrawNormal();
     }
 }
 
@@ -1425,7 +1425,7 @@ void CMapObj::DrawHitNormal()
  */
 int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    if ((U8At(this, 0x1D) != 2) || (PtrAt(this, 0xC) == 0) || (S8At(this, 0x1F) != -1)) {
+    if ((U8At(this, 0x1D) != 2) || (m_mapData == 0) || (S8At(this, 0x1F) != -1)) {
         return 0;
     }
 
@@ -1463,7 +1463,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     localCylinder.m_height2 = localCylinder.m_bottom.z + margin;
     localCylinder.m_direction2.y -= margin;
 
-    CMapHit* mapHit = reinterpret_cast<CMapHit*>(PtrAt(this, 0xC));
+    CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
     bool hitBounds = false;
     bool xyOverlap = false;
     bool xOverlap;
@@ -1531,7 +1531,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
  */
 int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    if ((U8At(this, 0x1D) == 2) && (PtrAt(this, 0xC) != 0) && (S8At(this, 0x1F) == -1)) {
+    if ((U8At(this, 0x1D) == 2) && (m_mapData != 0) && (S8At(this, 0x1F) == -1)) {
         Mtx inverseMtx;
         Vec localMove;
 
@@ -1567,7 +1567,7 @@ int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         localCylinder.m_height2 = localCylinder.m_bottom.z + margin;
         localCylinder.m_direction2.y -= margin;
 
-        CMapHit* mapHit = reinterpret_cast<CMapHit*>(PtrAt(this, 0xC));
+        CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
         bool hitBounds = false;
         bool xyOverlap = false;
         bool xOverlap;
@@ -1634,7 +1634,7 @@ int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
  */
 void CMapObj::GetHitFaceNormal(Vec* out)
 {
-    CMapHit* mapHit = reinterpret_cast<CMapHit*>(PtrAt(this, 0xC));
+    CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
     mapHit->GetHitFaceNormal(out);
     PSMTXMultVecSR(MtxAt(this, 0xB8), out, out);
 }
@@ -1650,7 +1650,7 @@ void CMapObj::GetHitFaceNormal(Vec* out)
  */
 int CMapObj::CalcHitSlide(Vec* out, float y)
 {
-    CMapHit* mapHit = reinterpret_cast<CMapHit*>(PtrAt(this, 0xC));
+    CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
     int hit = mapHit->CalcHitSlide(out, y);
     PSMTXMultVecSR(MtxAt(this, 0xB8), out, out);
     return hit;
@@ -1667,7 +1667,7 @@ int CMapObj::CalcHitSlide(Vec* out, float y)
  */
 void CMapObj::CalcHitPosition(Vec* out)
 {
-    CMapHit* mapHit = reinterpret_cast<CMapHit*>(PtrAt(this, 0xC));
+    CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
     mapHit->CalcHitPosition(out);
     PSMTXMultVec(MtxAt(this, 0xB8), out, out);
 }

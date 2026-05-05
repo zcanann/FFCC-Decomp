@@ -20,6 +20,15 @@ extern CMenuPcs MenuPcs;
 
 unsigned char s_rank[0x20];
 
+static const char s_favoForceFr[] = "Force";
+static const char s_favoMusicFr[] = "Musique";
+static const char s_favoActiveFr[] = "Activ\xE9";
+static const char s_favoStereoFr[] = "St\xE9r\xE9o";
+static const char s_favoStrengthEs[] = "Fuerza";
+static const char s_favoDefenseEs[] = "Defensa";
+static const char s_favoMusicEs[] = "M\xFAsica";
+static const char s_favoOffEs[] = "Apagado";
+
 extern float FLOAT_80333040;
 extern float FLOAT_80333044;
 extern float FLOAT_80333048;

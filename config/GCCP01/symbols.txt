@@ -12246,6 +12246,7 @@ lbl_801E8624 = .data:0x801E8624; // type:object size:0xC
 __vt__8CProcess = .data:0x801E8630; // type:object size:0x24
 __vt__10CSamplePcs = .data:0x801E8654; // type:object size:0x24
 lbl_801E8678 = .data:0x801E8678; // type:object size:0x4
+lbl_801E867C = .data:0x801E867C; // type:object size:0x14
 m_table_desc0__7CUSBPcs = .data:0x801E8690; // type:object size:0xC data:4byte
 m_table_desc1__7CUSBPcs = .data:0x801E869C; // type:object size:0xC data:4byte
 m_table_desc2__7CUSBPcs = .data:0x801E86A8; // type:object size:0xC data:4byte

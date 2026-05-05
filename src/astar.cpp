@@ -66,7 +66,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 	{
 		unsigned int mask = m_hitAttributeMask;
 		Vec* base = reinterpret_cast<Vec*>(&CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ));
-		Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z));
+		Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z));
 		CMapCylinderRaw cyl;
 
 		cyl.m_top.z = kPolyGroupAabbMax;
@@ -88,7 +88,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 	else
 	{
 		Vec* base = reinterpret_cast<Vec*>(&CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ));
-		Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z));
+		Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z));
 		CMapCylinderRaw cyl;
 
 		cyl.m_top.z = kPolyGroupAabbMax;
@@ -123,7 +123,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
 	unsigned int mask = m_hitAttributeMask;
 	Vec* base = reinterpret_cast<Vec*>(&CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ));
-	Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z));
+	Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z));
 	CMapCylinderRaw cyl;
 
 	cyl.m_top.z = kPolyGroupAabbMax;
@@ -174,7 +174,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 	do
 	{
-		unsigned int otherGroup = portal->m_groupA;
+		int otherGroup = portal->m_groupA;
 		bool exists = false;
 
 		if (otherGroup != 0 && portal->m_groupB != 0)
@@ -186,14 +186,14 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 		{
 			bool connected = false;
 
-			if (otherGroup == static_cast<unsigned int>(startGroup) || portal->m_groupB == startGroup)
+			if (otherGroup == startGroup || portal->m_groupB == startGroup)
 			{
 				connected = true;
 			}
 
 			if (connected)
 			{
-				if (otherGroup == static_cast<unsigned int>(startGroup))
+				if (otherGroup == startGroup)
 				{
 					otherGroup = portal->m_groupB;
 				}

@@ -793,12 +793,12 @@ float CSound::GetPerformance()
  */
 void CSound::PauseDiscError(int pause)
 {
-    if (SoundData(this).m_pauseAllSe == 0) {
-        int pauseFlag = (static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 0x1F;
-        CRedSound* redSound = RedSound(this);
+    u8* self = reinterpret_cast<u8*>(this);
 
-        SePause__9CRedSoundFii(redSound, -1, pauseFlag);
-        StreamPause__9CRedSoundFii(redSound, -1, pauseFlag);
+    if (reinterpret_cast<CSoundLayout*>(self)->m_pauseAllSe == 0) {
+        SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1, static_cast<u32>(-pause | pause) >> 31);
+        StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1,
+                                   (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
     }
 }
 
@@ -1196,14 +1196,14 @@ void CSound::LoadBgm(int bgmId)
  */
 void CSound::PlayBgm(int bgmId)
 {
-    CRedSound* redSound = RedSound(this);
+    u8* self = reinterpret_cast<u8*>(this);
 
     if (bgmId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
-        MusicStop__9CRedSoundFi(redSound, -1);
-        SetMusicPhraseStop__9CRedSoundFi(redSound, 0);
-        MusicPlay__9CRedSoundFiii(redSound, bgmId, 0x7F, 0);
+        MusicStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), -1);
+        SetMusicPhraseStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), 0);
+        MusicPlay__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), bgmId, 0x7F, 0);
     }
 }
 
@@ -1218,13 +1218,13 @@ void CSound::PlayBgm(int bgmId)
  */
 void CSound::CrossPlayBgm(int bgmId, int crossFrames)
 {
-    CRedSound* redSound = RedSound(this);
+    u8* self = reinterpret_cast<u8*>(this);
 
     if (bgmId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
-        SetMusicPhraseStop__9CRedSoundFi(redSound, 0);
-        MusicCrossPlay__9CRedSoundFiii(redSound, bgmId, 0x7F, crossFrames);
+        SetMusicPhraseStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), 0);
+        MusicCrossPlay__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), bgmId, 0x7F, crossFrames);
     }
 }
 
@@ -1239,13 +1239,13 @@ void CSound::CrossPlayBgm(int bgmId, int crossFrames)
  */
 void CSound::PlayNextBgm(int bgmId)
 {
-    CSound* sound = this;
+    u8* self = reinterpret_cast<u8*>(this);
 
     if (bgmId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
-        MusicNextPlay__9CRedSoundFiii(RedSound(sound), bgmId, 0x7F, 0);
-        SetMusicPhraseStop__9CRedSoundFi(RedSound(sound), 1);
+        MusicNextPlay__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), bgmId, 0x7F, 0);
+        SetMusicPhraseStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), 1);
     }
 }
 
@@ -1569,22 +1569,23 @@ void CSound::StopAndFreeAllSe(int clearMode)
 int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
 {
     int seId;
-    CRedSound* redSound = RedSound(this);
+    u8* self = reinterpret_cast<u8*>(this);
 
     if (seNo < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
         seId = -1;
     } else if (seNo < 4000) {
         const int seBank = seNo / 1000;
-        seId = SePlay__9CRedSoundFiiiii(redSound, seBank, seNo - seBank * 1000, pan,
+        seId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(self + 8), seBank, seNo - seBank * 1000, pan,
                                         volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
         if (fadeFrames != 0) {
-            SeVolume__9CRedSoundFiii(redSound, seId, volume, fadeFrames);
+            SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), seId, volume, fadeFrames);
         }
     } else {
-        seId = SePlay__9CRedSoundFiiiii(redSound, -1, seNo, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
+        seId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(self + 8), -1, seNo, pan,
+                                        volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
         if (fadeFrames != 0) {
-            SeVolume__9CRedSoundFiii(redSound, seId, volume, fadeFrames);
+            SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), seId, volume, fadeFrames);
         }
     }
 

@@ -439,9 +439,13 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     pppFMATRIX mtxOut;
     Vec beamTip;
     Vec shapePos;
-    Vec spherePos;
+    Vec debugPos;
+    Vec debugSpherePos;
     _GXColor color;
     _GXColor debugColor;
+    Mtx rotMtx;
+    Mtx debugMtx;
+    Mtx pointMtx;
     int tex;
 
     if (dataValIndex == 0xFFFF) {

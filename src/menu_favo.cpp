@@ -20,6 +20,15 @@ extern CMenuPcs MenuPcs;
 
 unsigned char s_rank[0x20];
 
+static const char s_favoForceFr[] = "Force";
+static const char s_favoMusicFr[] = "Musique";
+static const char s_favoActiveFr[] = "Activ\xE9";
+static const char s_favoStereoFr[] = "St\xE9r\xE9o";
+static const char s_favoStrengthEs[] = "Fuerza";
+static const char s_favoDefenseEs[] = "Defensa";
+static const char s_favoMusicEs[] = "M\xFAsica";
+static const char s_favoOffEs[] = "Apagado";
+
 extern float FLOAT_80333040;
 extern float FLOAT_80333044;
 extern float FLOAT_80333048;
@@ -33,6 +42,15 @@ extern float FLOAT_80333070;
 extern double DOUBLE_80333078;
 extern float FLOAT_80333080;
 extern float FLOAT_80333084;
+
+extern const char s_Force_803334F0[] = "Force";
+extern const char s_Musique_803334F8[] = "Musique";
+extern const char s_Active_80333500[8] = "Activ\351";
+extern const char s_Stereo_80333508[8] = "St\351r\351o";
+extern const char s_Fuerza_80333510[] = "Fuerza";
+extern const char s_Defensa_80333518[] = "Defensa";
+extern const char s_Musica_80333520[8] = "M\372sica";
+extern const char s_Apagado_80333528[] = "Apagado";
 
 struct FavoFlatTableEntry
 {

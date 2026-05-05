@@ -1395,11 +1395,11 @@ static void _AdsrDataCompute(RedVoiceDATA* voice)
         *stage = *stage + 1;
     }
 
-    voice->m_adsrStepFrames = stepCount;
+    stage[1] = stepCount;
     if (stepCount != 0) {
         voice->m_adsrCurrentLevel = prevValue;
         level |= REDSOUND_FIXED_HALF;
-        voice->m_adsrStepAdd = (level - prevValue) / stepCount;
+        stage[2] = (level - prevValue) / stepCount;
     } else {
         voice->m_adsrCurrentLevel = level;
     }

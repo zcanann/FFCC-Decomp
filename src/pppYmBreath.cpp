@@ -521,10 +521,10 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;
-    Vec origin;
-    Vec dir;
-    Vec target;
     Vec hitVector;
+    Vec dir;
+    Vec origin;
+    Vec target;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -677,8 +677,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     YmBreathParticleGroup* groupData;
     short foundSlot;
     short foundGroup;
-    Vec stepVelocity;
     Vec unitVelocity;
+    Vec stepVelocity;
 
     particleData = reinterpret_cast<YmBreathParticleData*>(vYmBreath->m_particleData);
     particleWmat = vYmBreath->m_particleWmats;

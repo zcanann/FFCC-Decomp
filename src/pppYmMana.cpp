@@ -1228,9 +1228,9 @@ static int UpdateWaterMesh(VYmMana* mana)
         return 0;
     }
 
-    currentScale = FLOAT_80330e4c;
-    neighborScale = FLOAT_80330e5c;
     for (int row = 1; row < 0x10; row++) {
+        currentScale = FLOAT_80330e4c;
+        neighborScale = FLOAT_80330e5c;
         int rowBase = row * 0x11;
         for (int colBlock = 0; colBlock < 3; colBlock++) {
             int col = colBlock * 5 + 1;

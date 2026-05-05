@@ -273,17 +273,17 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
         work->m_speedDecay = step->m_unk18;
 
         r = rand();
-        zero = FLOAT_80330644;
         angleDelta = (s16)(r % step->m_angleRange);
         signBit = (u32)(int)angleDelta >> 31;
         if (((((int)angleDelta & 1U) ^ signBit) - signBit) == 0) {
             angleDelta *= -1;
         }
 
-        angleDelta = (s16)(angleDelta + step->m_baseAngle);
+        angleDelta += step->m_baseAngle;
         angleIdx = (s32)((((float)angleDelta * FLOAT_80330640) * FLOAT_80330650) / FLOAT_80330654);
         impulseX = *(float*)((u8*)gPppTrigTable + ((angleIdx + 0x4000) & 0xfffc));
         impulseZ = *(float*)((u8*)gPppTrigTable + (angleIdx & 0xfffc));
+        zero = FLOAT_80330644;
         work->m_impulse.x = impulseX;
         work->m_impulse.y = zero;
         work->m_impulse.z = impulseZ;

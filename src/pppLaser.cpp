@@ -637,7 +637,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             debugColor.g = 0xFF;
             debugColor.b = 0xFF;
             debugColor.a = 0xFF;
-            for (i = 0; (int)i < (int)(u32)step->m_payload[0x1e]; i++) {
+            for (i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
                 if ((work->m_points[i].x == kPppLaserZero) && (work->m_points[i].y == kPppLaserZero) && (work->m_points[i].z == kPppLaserZero)) {
                     continue;
                 }

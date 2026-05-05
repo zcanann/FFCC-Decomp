@@ -36,6 +36,8 @@ extern "C" void rotTarget__8CGMonObjFif(CGMonObj*, int, float);
 extern "C" void CGMonObj_ResetActionState(CGMonObj*);
 extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
+extern "C" void teleport__8CGMonObjFiiiiiiiiiP3VecRiR3Vec(CGMonObj*, int, int, int, int, int, int, int, int, int,
+                                                           Vec*, int&, Vec&);
 extern float FLOAT_80331dd0;
 extern float FLOAT_80331cf8;
 extern float FLOAT_80331dcc;
@@ -71,6 +73,7 @@ extern double DOUBLE_80331dc0;
 extern char SoundBuffer[];
 extern char SoundBuffer_1260_[];
 extern "C" unsigned char m_boss__8CGMonObj[];
+extern "C" Vec DAT_802127c0;
 extern "C" Vec DAT_802127f0[];
 
 typedef void (*MonObjSawCallback)(CGMonObj*, int, int, int);
@@ -490,39 +493,18 @@ void CGMonObj::cancelStatFuncArmstrong()
  */
 void CGMonObj::frameStatFuncArmstrong()
 {
-	#if 0
-	// Function: frameStatFuncArmstrong__8CGMonObjFv
-	// Entry: 8013256c
-	// Size: 148 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void frameStatFuncArmstrong__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  undefined4 in_r4;
-	  
-	  iVar1 = *(int *)&gMonObj->field_0x520;
-	  if (iVar1 == 100) {
-	    if (*(int *)&gMonObj->field_0x528 == 0) {
-	      (**(code **)((int)(gMonObj->gObject).base_object.object.m_vtable + 0x94))(gMonObj,0);
-	    }
-	    else if (*(int *)&gMonObj->field_0x528 == 0x29) {
-	      (**(code **)((int)(gMonObj->gObject).base_object.object.m_vtable + 0x94))(gMonObj,1);
-	    }
-	    _statAttack__10CGCharaObjFv((CGCharaObj *)gMonObj);
-	  }
-	  else if ((99 < iVar1) && (iVar1 < 0x69)) {
-	    frameStatFuncGiantCrab__8CGMonObjFv(gMonObj,in_r4);
-	  }
-	  return;
-	}
-	
-	#endif
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId == 100) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
+	int state = prgObj->m_lastStateId;
+	if (state == 100) {
+		if (prgObj->m_stateFrame == 0) {
+			charaObj->enableDamageCol(0);
+		} else if (prgObj->m_stateFrame == 0x29) {
+			charaObj->enableDamageCol(1);
+		}
+		charaObj->statAttack();
+	} else if (state > 99 && state < 0x69) {
+		frameStatFuncGiantCrab();
 	}
 }
 
@@ -744,28 +726,13 @@ void CGMonObj::cancelStatFuncGoblinKing()
  */
 void CGMonObj::frameStatFuncGoblinKing()
 {
-	#if 0
-	// Function: frameStatFuncGoblinKing__8CGMonObjFv
-	// Entry: 8013204c
-	// Size: 128 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void frameStatFuncGoblinKing__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    teleport__8CGMonObjFiiiiiiiiiP3VecRiR3Vec
-	              (gMonObj,0,0xd,8,0x42,0xa03e,0xa03f,3,4,5,&DAT_802127c0,0x8030014c,0x80300150);
-	  }
-	  return;
-	}
-	
-	#endif
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId >= 100) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	if (prgObj->m_lastStateId == 100) {
+		teleport__8CGMonObjFiiiiiiiiiP3VecRiR3Vec(
+		    this, 0, 0xd, 8, 0x42, 0xa03e, 0xa03f, 3, 4, 5, &DAT_802127c0,
+		    *reinterpret_cast<int*>(SoundBuffer_1260_), *reinterpret_cast<Vec*>(SoundBuffer_1260_ + 4));
 	}
+	return;
 }
 
 /*

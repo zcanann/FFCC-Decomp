@@ -515,7 +515,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     int firstParticle;
     int groupTable;
     short slotIndex;
-    unsigned int slotCount;
+    int slotCount;
     int ready;
     float scaledOwner;
     Mtx scaleMtx;
@@ -530,7 +530,6 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         return;
     }
 
-    _pppPObject* object = reinterpret_cast<_pppPObject*>(ymBreath);
     dataOffsets = offsets->m_serializedDataOffsets;
     _pppMngSt* mngSt = pppMngStPtr;
     colorOffset = dataOffsets[1];
@@ -600,7 +599,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     }
 
     PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_matrix);
-    UpdateAllParticle(object, work, pYmBreath, color);
+    UpdateAllParticle(reinterpret_cast<_pppPObject*>(ymBreath), work, pYmBreath, color);
 
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
@@ -932,7 +931,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
     Vec baseDir;
-    int angle[3];
+    int angle[4];
     pppFMATRIX rotMtx;
     float spread;
     float range;

@@ -683,8 +683,8 @@ void CSystem::Init()
         fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)
         {
-            unsigned int mapSize;
             unsigned int count;
+            unsigned int mapSize;
             unsigned int offset;
 
             m_mapSize = mapSize = File.GetLength(fileHandle);

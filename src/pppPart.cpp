@@ -1244,9 +1244,12 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 {
 	Mtx nodeMtx;
 	Vec tmpPos;
-	Vec axis0;
-	Vec axis1;
-	Vec axis2;
+	Vec scaleAxis0;
+	Vec scaleAxis1;
+	Vec scaleAxis2;
+	Vec localAxis0;
+	Vec localAxis1;
+	Vec localAxis2;
 
 	switch (pppMngSt->m_rotationOrder) {
 	case 0:
@@ -1499,62 +1502,62 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 
 ScaleOnly:
 	if (pppMngSt->m_scale.x != kPppOne) {
-		axis0.x = pppMngStPtr->m_matrix.value[0][0];
-		axis0.y = pppMngStPtr->m_matrix.value[1][0];
-		axis0.z = pppMngStPtr->m_matrix.value[2][0];
-		PSVECScale(&axis0, &axis0, pppMngSt->m_scale.x);
-		pppMngStPtr->m_matrix.value[0][0] = axis0.x;
-		pppMngStPtr->m_matrix.value[1][0] = axis0.y;
-		pppMngStPtr->m_matrix.value[2][0] = axis0.z;
+		scaleAxis0.x = pppMngStPtr->m_matrix.value[0][0];
+		scaleAxis0.y = pppMngStPtr->m_matrix.value[1][0];
+		scaleAxis0.z = pppMngStPtr->m_matrix.value[2][0];
+		PSVECScale(&scaleAxis0, &scaleAxis0, pppMngSt->m_scale.x);
+		pppMngStPtr->m_matrix.value[0][0] = scaleAxis0.x;
+		pppMngStPtr->m_matrix.value[1][0] = scaleAxis0.y;
+		pppMngStPtr->m_matrix.value[2][0] = scaleAxis0.z;
 	}
 
 	if (pppMngSt->m_scale.y != kPppOne) {
-		axis1.x = pppMngStPtr->m_matrix.value[0][1];
-		axis1.y = pppMngStPtr->m_matrix.value[1][1];
-		axis1.z = pppMngStPtr->m_matrix.value[2][1];
-		PSVECScale(&axis1, &axis1, pppMngSt->m_scale.y);
-		pppMngStPtr->m_matrix.value[0][1] = axis1.x;
-		pppMngStPtr->m_matrix.value[1][1] = axis1.y;
-		pppMngStPtr->m_matrix.value[2][1] = axis1.z;
+		scaleAxis1.x = pppMngStPtr->m_matrix.value[0][1];
+		scaleAxis1.y = pppMngStPtr->m_matrix.value[1][1];
+		scaleAxis1.z = pppMngStPtr->m_matrix.value[2][1];
+		PSVECScale(&scaleAxis1, &scaleAxis1, pppMngSt->m_scale.y);
+		pppMngStPtr->m_matrix.value[0][1] = scaleAxis1.x;
+		pppMngStPtr->m_matrix.value[1][1] = scaleAxis1.y;
+		pppMngStPtr->m_matrix.value[2][1] = scaleAxis1.z;
 	}
 
 	if (pppMngSt->m_scale.z == kPppOne) {
 		return;
 	}
 
-	axis2.x = pppMngStPtr->m_matrix.value[0][2];
-	axis2.y = pppMngStPtr->m_matrix.value[1][2];
-	axis2.z = pppMngStPtr->m_matrix.value[2][2];
-	PSVECScale(&axis2, &axis2, pppMngSt->m_scale.z);
-	pppMngStPtr->m_matrix.value[0][2] = axis2.x;
-	pppMngStPtr->m_matrix.value[1][2] = axis2.y;
-	pppMngStPtr->m_matrix.value[2][2] = axis2.z;
+	scaleAxis2.x = pppMngStPtr->m_matrix.value[0][2];
+	scaleAxis2.y = pppMngStPtr->m_matrix.value[1][2];
+	scaleAxis2.z = pppMngStPtr->m_matrix.value[2][2];
+	PSVECScale(&scaleAxis2, &scaleAxis2, pppMngSt->m_scale.z);
+	pppMngStPtr->m_matrix.value[0][2] = scaleAxis2.x;
+	pppMngStPtr->m_matrix.value[1][2] = scaleAxis2.y;
+	pppMngStPtr->m_matrix.value[2][2] = scaleAxis2.z;
 	return;
 
 LocalOnly:
-	axis0.x = pppMngStPtr->m_matrix.value[0][0];
-	axis0.y = pppMngStPtr->m_matrix.value[1][0];
-	axis0.z = pppMngStPtr->m_matrix.value[2][0];
-	PSVECScale(&axis0, &axis0, pppMngSt->m_scale.x);
-	pppMngStPtr->m_matrix.value[0][0] = axis0.x;
-	pppMngStPtr->m_matrix.value[1][0] = axis0.y;
-	pppMngStPtr->m_matrix.value[2][0] = axis0.z;
+	localAxis0.x = pppMngStPtr->m_matrix.value[0][0];
+	localAxis0.y = pppMngStPtr->m_matrix.value[1][0];
+	localAxis0.z = pppMngStPtr->m_matrix.value[2][0];
+	PSVECScale(&localAxis0, &localAxis0, pppMngSt->m_scale.x);
+	pppMngStPtr->m_matrix.value[0][0] = localAxis0.x;
+	pppMngStPtr->m_matrix.value[1][0] = localAxis0.y;
+	pppMngStPtr->m_matrix.value[2][0] = localAxis0.z;
 
-	axis1.x = pppMngStPtr->m_matrix.value[0][1];
-	axis1.y = pppMngStPtr->m_matrix.value[1][1];
-	axis1.z = pppMngStPtr->m_matrix.value[2][1];
-	PSVECScale(&axis1, &axis1, pppMngSt->m_scale.y);
-	pppMngStPtr->m_matrix.value[0][1] = axis1.x;
-	pppMngStPtr->m_matrix.value[1][1] = axis1.y;
-	pppMngStPtr->m_matrix.value[2][1] = axis1.z;
+	localAxis1.x = pppMngStPtr->m_matrix.value[0][1];
+	localAxis1.y = pppMngStPtr->m_matrix.value[1][1];
+	localAxis1.z = pppMngStPtr->m_matrix.value[2][1];
+	PSVECScale(&localAxis1, &localAxis1, pppMngSt->m_scale.y);
+	pppMngStPtr->m_matrix.value[0][1] = localAxis1.x;
+	pppMngStPtr->m_matrix.value[1][1] = localAxis1.y;
+	pppMngStPtr->m_matrix.value[2][1] = localAxis1.z;
 
-	axis2.x = pppMngStPtr->m_matrix.value[0][2];
-	axis2.y = pppMngStPtr->m_matrix.value[1][2];
-	axis2.z = pppMngStPtr->m_matrix.value[2][2];
-	PSVECScale(&axis2, &axis2, pppMngSt->m_scale.z);
-	pppMngStPtr->m_matrix.value[0][2] = axis2.x;
-	pppMngStPtr->m_matrix.value[1][2] = axis2.y;
-	pppMngStPtr->m_matrix.value[2][2] = axis2.z;
+	localAxis2.x = pppMngStPtr->m_matrix.value[0][2];
+	localAxis2.y = pppMngStPtr->m_matrix.value[1][2];
+	localAxis2.z = pppMngStPtr->m_matrix.value[2][2];
+	PSVECScale(&localAxis2, &localAxis2, pppMngSt->m_scale.z);
+	pppMngStPtr->m_matrix.value[0][2] = localAxis2.x;
+	pppMngStPtr->m_matrix.value[1][2] = localAxis2.y;
+	pppMngStPtr->m_matrix.value[2][2] = localAxis2.z;
 
 	pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
 	pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;

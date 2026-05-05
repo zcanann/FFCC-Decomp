@@ -41,10 +41,9 @@ static const float FLOAT_80332f78 = 16.0f;
 static const float FLOAT_80332f7c = 0.9f;
 static const float FLOAT_80332f80 = 19.8f;
 static const float FLOAT_80332f84 = 4.0f;
-static const double DOUBLE_80332f88 = 4503601774854144.0;
-static const double DOUBLE_80332F90 = 1.0;
-static const double DOUBLE_80332F98 = 216.0;
-static const double DOUBLE_80332FA0 = 0.5;
+extern const double DOUBLE_80332F90;
+extern const double DOUBLE_80332F98;
+extern const double DOUBLE_80332FA0;
 
 extern CMenuPcs MenuPcs;
 

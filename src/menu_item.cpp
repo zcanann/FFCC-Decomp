@@ -44,13 +44,12 @@ extern "C" int __cntlzw(unsigned int);
 
 extern CMenuPcs MenuPcs;
 
-extern double DOUBLE_80332ea0;
-extern float FLOAT_80332e60;
+static const float FLOAT_80332e60 = 0.0f;
 extern float FLOAT_80332e64;
-extern double DOUBLE_80332e68;
+static const double DOUBLE_80332e68 = 1.0;
 extern float FLOAT_80332e70;
 extern float FLOAT_80332e74;
-extern double DOUBLE_80332e78;
+static const double DOUBLE_80332e78 = 0.5;
 extern float FLOAT_80332e80;
 extern float FLOAT_80332e84;
 extern float FLOAT_80332e88;
@@ -58,9 +57,10 @@ extern float FLOAT_80332e8c;
 extern float FLOAT_80332e90;
 extern float FLOAT_80332e94;
 extern float FLOAT_80332E98;
-extern float FLOAT_80332EA8;
-extern float FLOAT_80332EAC;
-extern float FLOAT_80332EB0;
+static const double DOUBLE_80332ea0 = 4503601774854144.0;
+static const float FLOAT_80332EA8 = 128.0f;
+static const float FLOAT_80332EAC = 8.0f;
+static const float FLOAT_80332EB0 = 0.75f;
 
 struct MenuItemOpenAnim {
     s16 x;
@@ -99,6 +99,40 @@ struct ItemFlatData {
     char pad[0x6C];
     ItemFlatTableEntry table[8];
 };
+
+STATIC_ASSERT(offsetof(CMenuPcs, helpFont) == 0xF8);
+STATIC_ASSERT(offsetof(CMenuPcs, listFont) == 0x108);
+STATIC_ASSERT(offsetof(CMenuPcs, itemMenuState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, singWindowInfo) == 0x848);
+STATIC_ASSERT(offsetof(CMenuPcs, itemList) == 0x850);
+STATIC_ASSERT(offsetof(ItemMenuState, optionFlags) == 0x9);
+STATIC_ASSERT(offsetof(ItemMenuState, initialized) == 0xB);
+STATIC_ASSERT(offsetof(ItemMenuState, closeRequested) == 0xD);
+STATIC_ASSERT(offsetof(ItemMenuState, listState) == 0x10);
+STATIC_ASSERT(offsetof(ItemMenuState, optionFrame) == 0x12);
+STATIC_ASSERT(offsetof(ItemMenuState, optionIndex) == 0x14);
+STATIC_ASSERT(offsetof(ItemMenuState, cursorMove) == 0x1E);
+STATIC_ASSERT(offsetof(ItemMenuState, frame) == 0x22);
+STATIC_ASSERT(offsetof(ItemMenuState, selectedIndex) == 0x26);
+STATIC_ASSERT(offsetof(ItemMenuState, subMenuIndex) == 0x28);
+STATIC_ASSERT(offsetof(ItemMenuState, mode) == 0x30);
+STATIC_ASSERT(offsetof(ItemMenuState, prevMode) == 0x32);
+STATIC_ASSERT(offsetof(ItemMenuState, scroll) == 0x34);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, alpha) == 0x8);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, scale) == 0xC);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, progress) == 0x10);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, uvScale) == 0x14);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, unk18) == 0x18);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, tex) == 0x1C);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, frame) == 0x20);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, startFrame) == 0x24);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, duration) == 0x28);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, flags) == 0x2C);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, dx) == 0x30);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, dy) == 0x34);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, targetX) == 0x38);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, targetY) == 0x3C);
+STATIC_ASSERT(sizeof(MenuItemOpenAnim) == 0x40);
 
 /*
  * --INFO--

@@ -369,7 +369,8 @@ CFile::CHandle* CFile::CheckQueue()
             }
             else if (dvdStatus < 0)
             {
-                handle->m_completionStatus = completionStatus = 4;
+                handle->m_completionStatus = 4;
+                goto next;
             }
             else
             {
@@ -385,6 +386,7 @@ CFile::CHandle* CFile::CheckQueue()
         }
         else
         {
+next:
             handle = handle->m_previous;
         }
     } while (handle != &m_fileHandle);

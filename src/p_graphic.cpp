@@ -11,6 +11,7 @@
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_dbgmenu.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "types.h"
@@ -817,9 +818,12 @@ void CGraphicPcs::drawEnd()
 				suppress = true;
 			}
 
-			u16 buttons = 0;
-			if (!suppress) {
-				int portIndex = (port == Pad._448_4_) ? 0 : port;
+			u16 buttons;
+			if (suppress) {
+				buttons = 0;
+			} else {
+				int selectedPort = Pad._448_4_;
+				u32 portIndex = port & ~((int)~((selectedPort - port) | (port - selectedPort)) >> 31);
 				buttons = *(u16*)((u8*)&Pad + 4 + portIndex * 0x54);
 			}
 

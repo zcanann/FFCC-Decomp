@@ -3661,45 +3661,30 @@ void CMapMng::ShowMapMeshID(int id, int show)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f45c
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetMapObjPrioID(int id, unsigned char prio)
+void CMapMng::SetDrawRangeMapObj(float drawRange)
 {
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
-    int i = 0;
-
-    while (i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC)) {
-        if (static_cast<int>(*reinterpret_cast<unsigned short*>(mapObj + 0x982)) == id) {
-            *reinterpret_cast<unsigned char*>(mapObj + 0x969) = prio;
-            *reinterpret_cast<unsigned char*>(mapObj + 0x968) = prio;
-        }
-        mapObj += 0xF0;
-        i++;
-    }
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x22A74) = -drawRange;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f46c
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
+void CMapMng::SetDrawRangeOctTree(float drawRange)
 {
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954;
-    *reinterpret_cast<float*>(mapObj + 0x58) = x;
-    *reinterpret_cast<float*>(mapObj + 0x5C) = y;
-    *reinterpret_cast<float*>(mapObj + 0x60) = z;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::SetMapObjWorldMapLightIdx(int, _GXColor, Vec)
-{
-	// TODO
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x22A70) = -drawRange;
 }
 
 /*
@@ -3751,30 +3736,53 @@ found:
 
 /*
  * --INFO--
- * PAL Address: 0x8002f46c
- * PAL Size: 16b
+ * PAL Address: 0x8002f548
+ * PAL Size: 28b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::SetDrawRangeOctTree(float drawRange)
+void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
 {
-    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x22A70) = -drawRange;
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954;
+    *reinterpret_cast<float*>(mapObj + 0x58) = x;
+    *reinterpret_cast<float*>(mapObj + 0x5C) = y;
+    *reinterpret_cast<float*>(mapObj + 0x60) = z;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8002f45c
- * PAL Size: 16b
+ * PAL Address: 0x8002f564
+ * PAL Size: 56b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::SetDrawRangeMapObj(float drawRange)
+void CMapMng::SetMapObjPrioID(int id, unsigned char prio)
 {
-    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x22A74) = -drawRange;
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+    int i = 0;
+
+    while (i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC)) {
+        if (static_cast<int>(*reinterpret_cast<unsigned short*>(mapObj + 0x982)) == id) {
+            *reinterpret_cast<unsigned char*>(mapObj + 0x969) = prio;
+            *reinterpret_cast<unsigned char*>(mapObj + 0x968) = prio;
+        }
+        mapObj += 0xF0;
+        i++;
+    }
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMapMng::SetMapObjWorldMapLightIdx(int, _GXColor, Vec)
+{
+	// TODO
 }
 
 /*

@@ -1059,12 +1059,13 @@ extern "C" void ReqScreenCapture__11CGraphicPcsFv(void* graphicPcs)
  */
 extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
 {
-    if (*(int*)((char*)mesMenu + 8) != 0 && *(int*)((char*)mesMenu + 0xC) < 2 &&
+    unsigned char result = 0;
+    if (*(int*)((char*)mesMenu + 8) != 0 && *(int*)((char*)mesMenu + 0xC) <= 1 &&
         GetWait__4CMesFv((char*)mesMenu + 0x1C) != 4) {
-        return 1;
+        result = 1;
     }
 
-    return 0;
+    return result;
 }
 
 /*
@@ -1331,7 +1332,7 @@ void VECLerp(Vec* a, Vec* b, Vec* out, float t)
     Vec scaledA;
     Vec scaledB;
 
-    PSVECScale(a, &scaledA, 1.0f - t);
+    PSVECScale(a, &scaledA, FLOAT_80330B34 - t);
     PSVECScale(b, &scaledB, t);
     PSVECAdd(&scaledA, &scaledB, out);
 }

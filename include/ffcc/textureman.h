@@ -30,13 +30,13 @@ public:
     int CheckName(char*);
     void SetExternalTlut(void*, int);
     _GXColor GetTlutColor(int);
-    void GetExternalTlutColor(void*, int, int);
+    _GXColor GetExternalTlutColor(void*, int, int);
     void SetTlutColor(int, _GXColor);
     static void SetExternalTlutColor(void*, int, int, _GXColor&);
     void FlushTlut();
     void FlushExternalTlut(void*);
     void FlushExternalTlut(void*, int);
-    void GetNumTlut();
+    int GetNumTlut();
 
     char m_name[0x20];
     GXTexObj m_texObj;

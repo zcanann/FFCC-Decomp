@@ -1471,7 +1471,9 @@ void CGItemObj::DispAllFieldItem(int show)
 	     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
 		void* owner = *(void**)(itemObj + 0x550);
 
-		if (owner == 0 && (int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0) {
+		if (owner == 0 &&
+		    static_cast<signed char>(
+		        static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0) {
 			if (show != 0) {
 				*(unsigned int*)(itemObj + 0x60) &= 0xffbfffff;
 			} else {

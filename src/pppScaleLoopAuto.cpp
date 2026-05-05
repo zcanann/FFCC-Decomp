@@ -126,7 +126,8 @@ void pppScaleLoopAutoCon(void* arg1, void* arg2)
 	int** arg2Data = (int**)arg2;
 	int* data = arg2Data[3];
 	int* ptr = (int*)data[0];
-	float zero = gPppScaleLoopAutoZero;
+	const float* zeroPtr = &gPppScaleLoopAutoZero;
+	float zero = *zeroPtr;
 	
 	void* targetPtr = (void*)((char*)arg1 + (int)ptr + 0x80);
 	float* targetData = (float*)targetPtr;

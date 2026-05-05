@@ -208,7 +208,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     s32* serializedOffsets;
     LocationTitle2Work* work;
     LocationTitle2ColorBlock* colorData;
-    Vec interp[20];
+    Vec interp[21];
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -320,7 +320,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     interpWrite++;
                 }
 
-                pppCopyVector(particles[nextIndex + inserted].m_pos, particles[nextIndex].m_pos);
+                pppCopyVector(particles[startIndex + (inserted + 1)].m_pos, particles[nextIndex].m_pos);
 
                 for (int i = 0; i < inserted; i++) {
                     LocationTitle2Particle* dst = &particles[startIndex + (i + 1)];

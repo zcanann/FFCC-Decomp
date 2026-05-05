@@ -2,6 +2,7 @@
 #include "ffcc/chara.h"
 #include "ffcc/graphic.h"
 #include "ffcc/pad.h"
+#include "ffcc/RedSound/RedSound.h"
 #include "ffcc/sound.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
@@ -63,6 +64,7 @@ extern const char s_amemCacheSeparator_8032F7C8[];
 extern char DAT_801d6648[];
 extern char DAT_801d6a24[];
 extern char DAT_801d6a7c[];
+extern char s_copyFromAMemorySyncTimeout_801D6ABC[];
 extern char DAT_801d6b7c[];
 extern char DAT_801d6bb0[];
 extern char DAT_801d6c58[];
@@ -80,6 +82,7 @@ static const char* amem_typeName[] = {s_amemTypeTexture, s_amemTypeModel, s_amem
 static const char s_amemStateUse[] = "USE  ";
 static const char s_amemStateNoUse[] = "NOUSE";
 static const char* amem_stateName[] = {s_amemStateUse, s_amemStateNoUse};
+static const char s_stopwatchNoName[] = "no name";
 extern float FLOAT_8032f7d8;
 extern float FLOAT_8032f7dc;
 extern float FLOAT_8032f7fc;
@@ -106,8 +109,8 @@ extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" int DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
-    void*, int, int, int, int, int, void (*)(void*), void*);
-extern "C" int DMACheck__9CRedSoundFi(void*, int);
+    CRedSound*, int, int, int, int, int, void (*)(void*), void*);
+extern "C" int DMACheck__9CRedSoundFi(CRedSound*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
@@ -154,6 +157,11 @@ static inline const char* cacheStateName(const CAmemCache& entry)
 static inline const char* cacheTypeName(const CAmemCache& entry)
 {
     return amem_typeName[entry.m_type];
+}
+
+static inline CRedSound* RedSound(CSound* sound)
+{
+    return reinterpret_cast<CRedSound*>(reinterpret_cast<unsigned char*>(sound) + 8);
 }
 
 static bool stageHasUnfreedBlocks(CMemory::CStage* stage)
@@ -982,11 +990,11 @@ void CMemory::CopyFromAMemory(void*, void*, unsigned long)
  */
 void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
 {
-    int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(&Sound, 0, 0, reinterpret_cast<int>(source),
+    int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(RedSound(&Sound), 0, 0, reinterpret_cast<int>(source),
                                                    reinterpret_cast<int>(dest), static_cast<int>(size), 0, 0);
-    CStopWatch watch((char*)-1);
+    CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
     watch.Start();
-    while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
+    while (DMACheck__9CRedSoundFi(RedSound(&Sound), dmaId) != 0) {
         watch.Stop();
         watch.Get();
         watch.Start();
@@ -1004,17 +1012,18 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
  */
 void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
 {
-    CStopWatch watch(reinterpret_cast<char*>(-1));
-    int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(&Sound, 0, 1, reinterpret_cast<int>(source),
+    CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
+    int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(RedSound(&Sound), 0, 1, reinterpret_cast<int>(source),
                                                    reinterpret_cast<int>(dest), static_cast<int>(size), 0, 0);
     watch.Start();
-    while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
+    float timeout = FLOAT_8032f7d8;
+    while (DMACheck__9CRedSoundFi(RedSound(&Sound), dmaId) != 0) {
         watch.Stop();
-        if (watch.Get() < FLOAT_8032f7d8) {
+        if (watch.Get() < timeout) {
             watch.Start();
         } else {
-            if (System.m_execParam != 0) {
-                Printf__7CSystemFPce(&System, DAT_801d669c);
+            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                Printf__7CSystemFPce(&System, s_copyFromAMemorySyncTimeout_801D6ABC);
             }
             Sound.CheckDriver(1);
             watch.Reset();
@@ -1774,16 +1783,17 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                 entry.m_cacheData = reinterpret_cast<void*>(data);
                 if (data != 0) {
                     int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
-                        &Sound, 0, 1, reinterpret_cast<int>(entry.m_cacheData),
+                        RedSound(&Sound), 0, 1, reinterpret_cast<int>(entry.m_cacheData),
                         reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-                    CStopWatch watch((char*)-1);
+                    CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
                     watch.Start();
-                    while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
+                    float timeout = FLOAT_8032f7d8;
+                    while (DMACheck__9CRedSoundFi(RedSound(&Sound), dmaId) != 0) {
                         watch.Stop();
-                        if (watch.Get() < FLOAT_8032f7d8) {
+                        if (watch.Get() < timeout) {
                             watch.Start();
                         } else {
-                            if (System.m_execParam != 0) {
+                            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                                 Printf__7CSystemFPce(&System, DAT_801d669c);
                             }
                             Sound.CheckDriver(1);
@@ -1884,10 +1894,10 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
             memcpy(entry.m_workData, src, static_cast<unsigned long>(entry.m_size));
         } else {
             int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
-                &Sound, 0, 0, reinterpret_cast<int>(src), reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-            CStopWatch watch((char*)-1);
+                RedSound(&Sound), 0, 0, reinterpret_cast<int>(src), reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
+            CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
             watch.Start();
-            while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
+            while (DMACheck__9CRedSoundFi(RedSound(&Sound), dmaId) != 0) {
                 watch.Stop();
                 watch.Get();
                 watch.Start();
@@ -1936,10 +1946,10 @@ checksum_done_dma:
         memcpy(entry.m_workData, src, static_cast<unsigned long>(entry.m_size));
     } else {
         int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
-            &Sound, 0, 0, reinterpret_cast<int>(src), reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-        CStopWatch watch((char*)-1);
+            RedSound(&Sound), 0, 0, reinterpret_cast<int>(src), reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
+        CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
         watch.Start();
-        while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
+        while (DMACheck__9CRedSoundFi(RedSound(&Sound), dmaId) != 0) {
             watch.Stop();
             watch.Get();
             watch.Start();

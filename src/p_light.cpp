@@ -259,29 +259,39 @@ void CLightPcs::create()
  */
 void CLightPcs::destroy()
 {
+    unsigned int i = 0;
     unsigned char* light = reinterpret_cast<unsigned char*>(this);
-    for (unsigned int i = 0; i < 8; ++i) {
-        void** ptr = reinterpret_cast<void**>(light + 0x26b0);
-        if (*ptr != 0) {
-            Free__7CMemoryFPv(&Memory, *ptr);
-            *ptr = 0;
+    do {
+        void* texture = *reinterpret_cast<void**>(light + 0x26b0);
+        if (texture != 0) {
+            bool hasTexture = texture != 0;
+            if (hasTexture) {
+                Free__7CMemoryFPv(&Memory, texture);
+                *reinterpret_cast<void**>(light + 0x26b0) = 0;
+            }
             light[0x26ac] = 0;
             light[0x26ad] = 0;
         }
+        i++;
         light += 0x138;
-    }
+    } while (i < 8);
 
+    i = 0;
     light = reinterpret_cast<unsigned char*>(this);
-    for (unsigned int i = 0; i < 8; ++i) {
-        void** ptr = reinterpret_cast<void**>(light + 0x1cf0);
-        if (*ptr != 0) {
-            Free__7CMemoryFPv(&Memory, *ptr);
-            *ptr = 0;
+    do {
+        void* texture = *reinterpret_cast<void**>(light + 0x1cf0);
+        if (texture != 0) {
+            bool hasTexture = texture != 0;
+            if (hasTexture) {
+                Free__7CMemoryFPv(&Memory, texture);
+                *reinterpret_cast<void**>(light + 0x1cf0) = 0;
+            }
             light[0x1cec] = 0;
             light[0x1ced] = 0;
         }
+        i++;
         light += 0x138;
-    }
+    } while (i < 8);
 }
 
 /*

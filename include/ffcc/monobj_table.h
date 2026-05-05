@@ -88,7 +88,7 @@ public:
     void frameStatFuncGigasLoad();
     void cancelStatFuncGigasLoad();
     void damagedFuncGigasLoad();
-    void tgtFuncGigasLoad(int);
+    int tgtFuncGigasLoad(int);
     void moveCancelFuncGigasLoad();
     void moveFrameFuncGigasLoad();
 

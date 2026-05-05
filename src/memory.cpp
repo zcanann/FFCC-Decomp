@@ -136,22 +136,22 @@ static char* stageGetSourceName(CMemory::CStage* stage)
     return stage->m_allocationSourceStr;
 }
 
-static CAmemCache& cacheEntryAt(CAmemCacheSet* cacheSet, int index)
+static inline CAmemCache& cacheEntryAt(CAmemCacheSet* cacheSet, int index)
 {
     return cacheSet->m_cacheTable[index];
 }
 
-static const CAmemCache& cacheEntryAt(const CAmemCacheSet* cacheSet, int index)
+static inline const CAmemCache& cacheEntryAt(const CAmemCacheSet* cacheSet, int index)
 {
     return cacheSet->m_cacheTable[index];
 }
 
-static const char* cacheStateName(const CAmemCache& entry)
+static inline const char* cacheStateName(const CAmemCache& entry)
 {
     return amem_stateName[entry.m_inUse == 0];
 }
 
-static const char* cacheTypeName(const CAmemCache& entry)
+static inline const char* cacheTypeName(const CAmemCache& entry)
 {
     return amem_typeName[entry.m_type];
 }

@@ -134,7 +134,7 @@ struct CmakeInfo {
 };
 
 static CmakeInfo s_CmakeInfo;
-static char s_CmakeVillageName[0x12];
+static char s_CmakeVillageName[0x10];
 
 static inline void* MenuPcsVoid()
 {

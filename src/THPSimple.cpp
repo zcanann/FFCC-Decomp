@@ -48,15 +48,15 @@ struct THPSimpleControl {
 };
 
 THPSimpleControl SimpleControl;
-static u8 sReadBuffer[0x40] ATTRIBUTE_ALIGN(32);
-s32 gTHPSimpleInitialized;
-s32 gTHPSimpleSoundBufferIndex;
-void (*gTHPSimpleOldAIDCallback)(void);
-s16* gTHPSimpleLastAudioBuffer;
-s16* gTHPSimpleCurAudioBuffer;
-s32 gTHPSimpleAudioSystem;
+static u8 WorkBuffer[0x40] ATTRIBUTE_ALIGN(32);
+static s32 Initialized;
+static s32 SoundBufferIndex;
+static void (*OldAIDCallback)(void);
+static s16* LastAudioBuffer;
+static s16* CurAudioBuffer;
+static s32 AudioSystem;
 s32 gTHPSimpleVolume = 5;
-u16 gTHPSimpleVolumeTable[0x80] = {
+static u16 VolumeTable[0x80] = {
     0x0000, 0x0002, 0x0008, 0x0012, 0x0020, 0x0032, 0x0049, 0x0063,
     0x0082, 0x00A4, 0x00CB, 0x00F5, 0x0124, 0x0157, 0x018E, 0x01C9,
     0x0208, 0x024B, 0x0292, 0x02DD, 0x032C, 0x037F, 0x03D7, 0x0432,
@@ -74,7 +74,7 @@ u16 gTHPSimpleVolumeTable[0x80] = {
     0x638C, 0x6555, 0x6722, 0x68F4, 0x6AC9, 0x6CA2, 0x6E80, 0x7061,
     0x7247, 0x7430, 0x761E, 0x7810, 0x7A06, 0x7C00, 0x7DFE, 0x8000,
 };
-s16 WorkBuffer_32_[0x280] ATTRIBUTE_ALIGN(32);
+static s16 SoundBuffer[0x280] ATTRIBUTE_ALIGN(32);
 
 extern const char lbl_80331868[4];
 extern const float FLOAT_8033186C;
@@ -102,37 +102,37 @@ void THPAudioMixCallback()
 {
 	u32 interruptState;
 
-	if (gTHPSimpleAudioSystem == 0) {
-		gTHPSimpleSoundBufferIndex ^= 1;
-		AIInitDMA((u32)(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280), 0x280);
+	if (AudioSystem == 0) {
+		SoundBufferIndex ^= 1;
+		AIInitDMA((u32)(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280), 0x280);
 		interruptState = OSEnableInterrupts();
-		MixAudio(reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280),
+		MixAudio(reinterpret_cast<s16*>(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280),
 		         (short*)0, 0xA0);
-		DCFlushRange(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280, 0x280);
+		DCFlushRange(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280, 0x280);
 		OSRestoreInterrupts(interruptState);
 		return;
 	}
 
-	if (gTHPSimpleAudioSystem == 1) {
-		if (gTHPSimpleLastAudioBuffer != NULL) {
-			gTHPSimpleCurAudioBuffer = gTHPSimpleLastAudioBuffer;
+	if (AudioSystem == 1) {
+		if (LastAudioBuffer != NULL) {
+			CurAudioBuffer = LastAudioBuffer;
 		}
-		gTHPSimpleOldAIDCallback();
-		gTHPSimpleLastAudioBuffer = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
+		OldAIDCallback();
+		LastAudioBuffer = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
 	} else {
-		gTHPSimpleOldAIDCallback();
-		gTHPSimpleCurAudioBuffer = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
+		OldAIDCallback();
+		CurAudioBuffer = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
 	}
 
-	gTHPSimpleSoundBufferIndex ^= 1;
-	AIInitDMA((u32)(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280), 0x280);
+	SoundBufferIndex ^= 1;
+	AIInitDMA((u32)(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280), 0x280);
 	interruptState = OSEnableInterrupts();
-	if (gTHPSimpleCurAudioBuffer != NULL) {
-		DCInvalidateRange(gTHPSimpleCurAudioBuffer, 0x280);
+	if (CurAudioBuffer != NULL) {
+		DCInvalidateRange(CurAudioBuffer, 0x280);
 	}
-	MixAudio(reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280),
-	         gTHPSimpleCurAudioBuffer, 0xA0);
-	DCFlushRange(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280, 0x280);
+	MixAudio(reinterpret_cast<s16*>(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280),
+	         CurAudioBuffer, 0xA0);
+	DCFlushRange(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280, 0x280);
 	OSRestoreInterrupts(interruptState);
 }
 
@@ -172,7 +172,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                     } else {
                         SimpleControl.unk_C4 = SimpleControl.unk_C8;
                     }
-                    volume = gTHPSimpleVolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
+                    volume = VolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
 
                     mixedSample = static_cast<s32>(*input) +
                                   ((static_cast<s32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
@@ -236,7 +236,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                     } else {
                         SimpleControl.unk_C4 = SimpleControl.unk_C8;
                     }
-                    volume = gTHPSimpleVolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
+                    volume = VolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
 
                     mixedSample = (static_cast<s32>(volume) * static_cast<s32>(*audioPtr)) >> 15;
                     if (mixedSample < -0x8000) {
@@ -834,7 +834,7 @@ s32 THPSimpleOpen(const char* path)
     s32 status;
     s32 componentOffset;
 
-    if (gTHPSimpleInitialized == 0) {
+    if (Initialized == 0) {
         return 0;
     }
 
@@ -849,7 +849,7 @@ s32 THPSimpleOpen(const char* path)
         return 0;
     }
 
-    while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x40, 0, (DVDCallback)0, 2)) {
+    while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, WorkBuffer, 0x40, 0, (DVDCallback)0, 2)) {
         status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
         if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
             File.DrawError(SimpleControl.fileInfo, status);
@@ -865,7 +865,7 @@ s32 THPSimpleOpen(const char* path)
             File.DrawError(SimpleControl.fileInfo, status);
         }
     }
-    memcpy(&SimpleControl.header, sReadBuffer, sizeof(THPHeader));
+    memcpy(&SimpleControl.header, WorkBuffer, sizeof(THPHeader));
 
     if (strcmp(SimpleControl.header.mMagic, lbl_80331868) != 0) {
         DVDClose(&SimpleControl.fileInfo);
@@ -879,7 +879,7 @@ s32 THPSimpleOpen(const char* path)
 
     componentOffset = static_cast<s32>(SimpleControl.header.mCompInfoDataOffsets);
 
-    while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
+    while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, WorkBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
         status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
         if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
             File.DrawError(SimpleControl.fileInfo, status);
@@ -895,7 +895,7 @@ s32 THPSimpleOpen(const char* path)
             File.DrawError(SimpleControl.fileInfo, status);
         }
     }
-    memcpy(&SimpleControl.compInfo, sReadBuffer, sizeof(THPFrameCompInfo));
+    memcpy(&SimpleControl.compInfo, WorkBuffer, sizeof(THPFrameCompInfo));
 
     SimpleControl.hasAudio = 0;
     componentOffset += sizeof(THPFrameCompInfo);
@@ -903,7 +903,7 @@ s32 THPSimpleOpen(const char* path)
     for (componentIdx = 0; componentIdx < SimpleControl.compInfo.mNumComponents; componentIdx++) {
         switch (SimpleControl.compInfo.mFrameComp[componentIdx]) {
         case 0:
-            while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
+            while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, WorkBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
                 status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
                 if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
                     File.DrawError(SimpleControl.fileInfo, status);
@@ -920,11 +920,11 @@ s32 THPSimpleOpen(const char* path)
                 }
             }
 
-            memcpy(&SimpleControl.videoInfo, sReadBuffer, sizeof(THPVideoInfo));
+            memcpy(&SimpleControl.videoInfo, WorkBuffer, sizeof(THPVideoInfo));
             componentOffset += sizeof(THPVideoInfo);
             break;
         case 1:
-            while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, sReadBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
+            while (!DVDReadAsyncPrio(&SimpleControl.fileInfo, WorkBuffer, 0x20, componentOffset, (DVDCallback)0, 2)) {
                 status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
                 if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
                     File.DrawError(SimpleControl.fileInfo, status);
@@ -941,7 +941,7 @@ s32 THPSimpleOpen(const char* path)
                 }
             }
 
-            memcpy(&SimpleControl.audioInfo, sReadBuffer, sizeof(THPAudioInfo));
+            memcpy(&SimpleControl.audioInfo, WorkBuffer, sizeof(THPAudioInfo));
             componentOffset += sizeof(THPAudioInfo);
             SimpleControl.hasAudio = 1;
             break;
@@ -985,11 +985,11 @@ void THPSimpleQuit(void)
 
     LCDisable();
     interruptState = OSDisableInterrupts();
-    if (gTHPSimpleOldAIDCallback != NULL) {
-        AIRegisterDMACallback(gTHPSimpleOldAIDCallback);
+    if (OldAIDCallback != NULL) {
+        AIRegisterDMACallback(OldAIDCallback);
     }
     OSRestoreInterrupts(interruptState);
-    gTHPSimpleInitialized = 0;
+    Initialized = 0;
 }
 
 /*
@@ -1014,13 +1014,13 @@ s32 THPSimpleInit(s32 audioMixMode)
     }
 
     interruptState = OSDisableInterrupts();
-    gTHPSimpleAudioSystem = audioMixMode;
-    gTHPSimpleSoundBufferIndex = 0;
-    gTHPSimpleLastAudioBuffer = (s16*)NULL;
-    gTHPSimpleCurAudioBuffer = (s16*)NULL;
-    gTHPSimpleOldAIDCallback = AIRegisterDMACallback(THPAudioMixCallback);
+    AudioSystem = audioMixMode;
+    SoundBufferIndex = 0;
+    LastAudioBuffer = (s16*)NULL;
+    CurAudioBuffer = (s16*)NULL;
+    OldAIDCallback = AIRegisterDMACallback(THPAudioMixCallback);
 
-    if ((gTHPSimpleOldAIDCallback == NULL) && (gTHPSimpleAudioSystem != 0)) {
+    if ((OldAIDCallback == NULL) && (AudioSystem != 0)) {
         AIRegisterDMACallback((AIDCallback)NULL);
         OSRestoreInterrupts(interruptState);
         return 0;
@@ -1028,13 +1028,13 @@ s32 THPSimpleInit(s32 audioMixMode)
 
     OSRestoreInterrupts(interruptState);
 
-    if (gTHPSimpleAudioSystem == 0) {
-        memset(WorkBuffer_32_, 0, 0x500);
-        DCFlushRange(WorkBuffer_32_, 0x500);
-        AIInitDMA((u32)(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280), 0x280);
+    if (AudioSystem == 0) {
+        memset(SoundBuffer, 0, 0x500);
+        DCFlushRange(SoundBuffer, 0x500);
+        AIInitDMA((u32)(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280), 0x280);
         AIStartDMA();
     }
 
-    gTHPSimpleInitialized = 1;
+    Initialized = 1;
     return 1;
 }

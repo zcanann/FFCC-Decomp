@@ -44,7 +44,7 @@ static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x1C);
+    return CameraPcs.m_cameraMatrix;
 }
 
 void pppInitBlendMode(void);
@@ -992,29 +992,33 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(void* model, void* modelData, void*,
                                                                                  s32 meshIndex, Mtx meshMtx)
 {
-    Mtx drawMtx;
     Mtx cameraMtx;
+    Mtx drawMtx;
 
-    if (*(s32*)((u8*)modelData + 0x44) != 0) {
-        s32 meshArrayBase = *(s32*)((u8*)model + 0xAC) + meshIndex * 0x14;
-        s32 meshData = *(s32*)((u8*)meshArrayBase + 8);
-        s32 materialData = *(s32*)((u8*)meshData + 0x50);
-        s32 materialIndex;
-        s32 materialOffset;
+    CharaBreakWork* workData = reinterpret_cast<CharaBreakWork*>(modelData);
+    CChara::CModel* modelPtr = reinterpret_cast<CChara::CModel*>(model);
+    CharaBreakMeshRef* meshArray = ModelMeshes(modelPtr);
 
+    if (workData->m_enabled != 0) {
+        CharaBreakMeshRef* meshRef = &meshArray[meshIndex];
+        CharaBreakMeshData* meshData = meshRef->m_data;
+        CharaBreakDisplayList* materialData = meshData->m_displayLists;
         PSMTXCopy(CameraMatrix(), cameraMtx);
 
-        materialIndex = *(s32*)((u8*)meshData + 0x4C) - 1;
-        materialOffset = materialIndex * 4;
+        s32 materialIndex = meshData->m_displayListCount - 1;
+        s32 materialOffset = materialIndex * 4;
 
         for (; materialIndex >= 0; materialIndex--) {
-            s32 meshTable = *(s32*)((u8*)*(s32*)((u8*)modelData + 0x1C) + meshIndex * 4);
-            s32 displayList = *(s32*)((u8*)meshTable + materialOffset);
-            s32 vertexData = *(s32*)((u8*)displayList + 0xC);
+            CharaBreakDisplayListPair** meshTable =
+                reinterpret_cast<CharaBreakDisplayListPair**>(workData->m_meshBuffers) + meshIndex;
+            CharaBreakDisplayListPair* displayList =
+                *reinterpret_cast<CharaBreakDisplayListPair**>(reinterpret_cast<u8*>(*meshTable) + materialOffset);
+            POLYGON_DATA* vertexData = displayList->m_polygonData;
             s32 faceIndex = 0;
+            u16 zero = 0;
 
             SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                &MaterialMan, *(void**)((u8*)*(s32*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)materialData + 8), 0, 0);
+                &MaterialMan, ModelData(modelPtr)->m_materialSet, materialData->m_material, 0, 0);
 
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
             GXSetCullMode(GX_CULL_NONE);
@@ -1024,48 +1028,57 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
             GXSetVtxDesc((GXAttr)11, GX_INDEX16);
             GXSetVtxDesc((GXAttr)13, GX_INDEX16);
             GXSetVtxDesc((GXAttr)14, GX_INDEX16);
-            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, GX_POS_XYZ, GX_S16, *(u32*)((u8*)*(s32*)((u8*)model + 0xA4) + 0x34) & 0xFF);
-            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)10, GX_NRM_XYZ, GX_S16, *(u32*)((u8*)*(s32*)((u8*)model + 0xA4) + 0x38) & 0xFF);
+            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, GX_POS_XYZ, GX_S16, ModelData(modelPtr)->m_posQuant & 0xFF);
+            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)10, GX_NRM_XYZ, GX_S16, ModelData(modelPtr)->m_normQuant & 0xFF);
             GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)11, GX_CLR_RGBA, GX_RGBA8, 0);
             GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)13, GX_TEX_ST, GX_S16, 0xC);
             GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)14, GX_TEX_ST, GX_S16, 0xC);
 
-            if (*(s32*)((u8*)*(s32*)((u8*)meshArrayBase + 8) + 0x54) == 0) {
+            if (meshRef->m_data->m_skinCount == 0) {
                 GXLoadPosMtxImm(cameraMtx, 0);
             } else {
                 PSMTXConcat(cameraMtx, meshMtx, drawMtx);
                 GXLoadPosMtxImm(drawMtx, 0);
             }
 
-            GXBegin((GXPrimitive)0x90, (GXVtxFmt)7, *(u16*)((u8*)displayList + 8) * 3);
-            while (faceIndex < (s32)(u32)*(u16*)((u8*)displayList + 8)) {
+            GXBegin((GXPrimitive)0x90, (GXVtxFmt)7, displayList->m_polygonCount * 3);
+            while (faceIndex < (s32)(u32)displayList->m_polygonCount) {
                 faceIndex++;
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x10);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x12);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x14);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x28);
-                GXWGFifo.u16 = 0;
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x2E);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x2E);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x16);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x18);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x1A);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x2A);
-                GXWGFifo.u16 = 0;
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x30);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x30);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x1C);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x1E);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x20);
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x2C);
-                GXWGFifo.u16 = 0;
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData + 0x32);
-                vertexData += 0x34;
-                GXWGFifo.u16 = *(u16*)((u8*)vertexData - 2);
+                s16 posX = vertexData->m_pos0.x;
+                s16 posY = vertexData->m_pos0.y;
+                s16 posZ = vertexData->m_pos0.z;
+                GXWGFifo.u16 = posX;
+                GXWGFifo.u16 = posY;
+                GXWGFifo.u16 = posZ;
+                GXWGFifo.u16 = vertexData->m_nrmIndices[0];
+                GXWGFifo.u16 = zero;
+                GXWGFifo.u16 = vertexData->m_texIndices[0];
+                GXWGFifo.u16 = vertexData->m_texIndices[0];
+                posX = vertexData->m_pos1.x;
+                posY = vertexData->m_pos1.y;
+                posZ = vertexData->m_pos1.z;
+                GXWGFifo.u16 = posX;
+                GXWGFifo.u16 = posY;
+                GXWGFifo.u16 = posZ;
+                GXWGFifo.u16 = vertexData->m_nrmIndices[1];
+                GXWGFifo.u16 = zero;
+                GXWGFifo.u16 = vertexData->m_texIndices[1];
+                GXWGFifo.u16 = vertexData->m_texIndices[1];
+                posX = vertexData->m_pos2.x;
+                posY = vertexData->m_pos2.y;
+                posZ = vertexData->m_pos2.z;
+                GXWGFifo.u16 = posX;
+                GXWGFifo.u16 = posY;
+                GXWGFifo.u16 = posZ;
+                GXWGFifo.u16 = vertexData->m_nrmIndices[2];
+                GXWGFifo.u16 = zero;
+                GXWGFifo.u16 = vertexData->m_texIndices[2];
+                vertexData++;
+                GXWGFifo.u16 = vertexData[-1].m_texIndices[2];
             }
 
             materialOffset -= 4;
-            materialData += 0xC;
+            materialData++;
         }
     }
 }

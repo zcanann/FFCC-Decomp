@@ -206,8 +206,8 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 
             m_mapObject = GetMapObjByIndex(objIndex);
             if (*reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E)) == 4) {
-                *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x15)) = -1;
-                *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x14)) = -1;
+                *reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x15)) = 0xFF;
+                *reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x14)) = 0xFF;
                 *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x22)) = 0;
             } else if (*reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E)) == 3) {
                 *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x22)) = 0;
@@ -219,9 +219,9 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             void* rootNode;
 
             m_nodeCount = chunkFile.Get2();
-            if ((*reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E)) != 1) &&
-                (static_cast<unsigned int>(System.m_execParam) >= 3U)) {
-                Printf__7CSystemFPce(&System, s_m_node_pctd_m_meshtype_pctd_801D7268, m_nodeCount);
+            signed char mapObjType = *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E));
+            if ((mapObjType != 1) && (static_cast<unsigned int>(System.m_execParam) >= 3U)) {
+                Printf__7CSystemFPce(&System, s_m_node_pctd_m_meshtype_pctd_801D7268, m_nodeCount, mapObjType);
             }
 
             unsigned short nodeCount = m_nodeCount;
@@ -241,7 +241,7 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             chunkFile.PushChunk();
             while (chunkFile.GetNextChunk(chunk)) {
                 if (chunk.m_id == 'NODE') {
-                    COctNode* node = 0;
+                    COctNode* node;
 
                     chunkFile.PushChunk();
                     while (chunkFile.GetNextChunk(chunk)) {
@@ -266,21 +266,18 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 
                         case 'CHLD':
                             int childCount = 0;
-                            COctNode* childNode = node;
 
                             for (int i = 0; i < 8; i++) {
-                                short childIndex = chunkFile.Get2();
+                                unsigned short childIndex = chunkFile.Get2();
 
-                                if (childIndex != -1) {
-                                    childNode->m_children[0] = m_nodePool + childIndex;
-                                    childNode = reinterpret_cast<COctNode*>(Ptr(childNode, 4));
+                                if (static_cast<short>(childIndex) != -1) {
+                                    node->m_children[childCount] = m_nodePool + childIndex;
                                     childCount++;
                                 }
                             }
 
                             for (int i = childCount; i < 8; i++) {
-                                childNode->m_children[0] = 0;
-                                childNode = reinterpret_cast<COctNode*>(Ptr(childNode, 4));
+                                node->m_children[i] = 0;
                             }
                             break;
                         }

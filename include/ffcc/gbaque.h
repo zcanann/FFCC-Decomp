@@ -173,7 +173,7 @@ private:
     GbaQueueHitInfo m_hitInfo[4];      // 0x2D44
     unsigned char m_chgHitFlags;      // 0x2D54
     unsigned char m_chgScouFlags;     // 0x2D55
-    unsigned char _pad2D56[0x1];      // 0x2D56
+    char m_singleMode;                // 0x2D56
     char m_controllerMode;            // 0x2D57
     unsigned char _pad2D58[0x3];      // 0x2D58
     char m_pauseMode;                 // 0x2D5B

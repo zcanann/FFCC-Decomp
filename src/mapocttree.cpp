@@ -199,16 +199,14 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
         switch (chunk.m_id) {
         case 'OBJN': {
             unsigned short objIndex = chunkFile.Get2();
-            signed char* mapObj;
 
             m_mapObject = GetMapObjByIndex(objIndex);
-            mapObj = reinterpret_cast<signed char*>(m_mapObject);
-            if (mapObj[0x1E] == 4) {
-                mapObj[0x15] = -1;
-                mapObj[0x14] = -1;
-                mapObj[0x22] = 0;
-            } else if (mapObj[0x1E] == 3) {
-                mapObj[0x22] = 0;
+            if (*reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E)) == 4) {
+                *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x15)) = -1;
+                *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x14)) = -1;
+                *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x22)) = 0;
+            } else if (*reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E)) == 3) {
+                *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x22)) = 0;
             }
             break;
         }

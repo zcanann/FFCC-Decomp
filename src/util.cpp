@@ -226,8 +226,6 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 	u8* data = (u8*)dlData;
 	u8* current = data;
 	u8* end = data + dlSize;
-	unsigned long copyPos = copyFlags & 1;
-	unsigned long copyNrm = copyFlags & 2;
 
 	while (current < end) {
 		u8 cmd = *current;
@@ -259,16 +257,16 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 		while (count != 0) {
 			u16 value = *(u16*)current;
 
-			if (copyPos != 0) {
+			if ((copyFlags & 1) != 0) {
 				*(u16*)(current + 4) = value;
 			}
-			if (copyNrm != 0) {
+			if ((copyFlags & 2) != 0) {
 				*(u16*)(current + 6) = value;
 			}
 
 			u8* next = current + 8;
 			if (indexFormat == 2) {
-				if (copyNrm != 0) {
+				if ((copyFlags & 2) != 0) {
 					*(u16*)next = value;
 				}
 				next = current + 10;
@@ -332,13 +330,19 @@ void CUtil::CalcUV(float& u, float& v, unsigned long x, unsigned long y, unsigne
  */
 void CUtil::SetPaletteEnv(CTexture* texture)
 {
-    GXColor tevColor2;
     GXColor tevColor3;
+    GXColor tevColor2;
 
     GXSetNumTevStages(3);
     GXSetNumTexGens(1);
-    *reinterpret_cast<unsigned int*>(&tevColor2) = 0xFFFF0000;
-    *reinterpret_cast<unsigned int*>(&tevColor3) = 0x0000FFFF;
+    tevColor2.r = 0xFF;
+    tevColor2.g = 0xFF;
+    tevColor2.b = 0;
+    tevColor2.a = 0;
+    tevColor3.r = 0;
+    tevColor3.g = 0;
+    tevColor3.b = 0xFF;
+    tevColor3.a = 0xFF;
     GXSetTevColor(static_cast<_GXTevRegID>(2), tevColor2);
     GXSetTevColor(static_cast<_GXTevRegID>(3), tevColor3);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
@@ -873,7 +877,7 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetTevDirect(GX_TEVSTAGE0);
     GXSetNumIndStages(0);
     memset(indMtx, 0, sizeof(indMtx));
@@ -892,7 +896,7 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXSetNumTexGens(0);
     GXSetChanAmbColor(GX_COLOR0A0, white);
     GXSetChanMatColor(GX_COLOR0A0, white);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
     float x2 = x + width;
     float y2 = y + height;
@@ -949,12 +953,9 @@ void CUtil::EndQuadEnv()
  */
 void CUtil::BeginQuadEnv()
 {
-    Mtx modelMtx;
     Mtx44 orthoMtx;
-    float indMtx[2][3] = {
-        {0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f},
-    };
+    Mtx modelMtx;
+    float indMtx[2][3];
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
@@ -974,9 +975,10 @@ void CUtil::BeginQuadEnv()
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
     GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE,
-                  GX_AF_SPEC);
+                  GX_AF_NONE);
     GXSetTevDirect(GX_TEVSTAGE0);
     GXSetNumIndStages(0);
+    memset(indMtx, 0, sizeof(indMtx));
     GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
     GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
     GXSetIndTexMtx(GX_ITM_2, indMtx, 1);

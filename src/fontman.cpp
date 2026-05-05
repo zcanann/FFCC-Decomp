@@ -99,14 +99,15 @@ found_fallback:
 find_fallback:
 	glyphBucket = m_glyphBuckets[63];
 	unsigned short* fallbackGlyph = glyphBucket + 1;
-	for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
+	int fallbackCount;
+	for (fallbackCount = static_cast<int>(*glyphBucket); fallbackCount > 0; fallbackCount--) {
 		if (*reinterpret_cast<char*>(fallbackGlyph + 1) != '\0') {
 			fallbackGlyph += 4;
 		} else {
 			break;
 		}
 	}
-	if (count == 0) {
+	if (fallbackCount == 0) {
 		fallbackGlyph = 0;
 	}
 	glyph = fallbackGlyph;
@@ -128,11 +129,13 @@ find_fallback:
 float CFont::GetWidth(char* text)
 {
 	float width = 0.0f;
-	unsigned short ch = 0;
+	char* textPtr = text;
+	unsigned short ch;
+	int hasChar;
 
 	goto read_char;
 
-	while (ch != '\0') {
+	while (hasChar != 0) {
 		unsigned short* currentBucket = m_glyphBuckets[ch & 0xFF];
 		unsigned short* glyph = currentBucket + 1;
 		int count = static_cast<int>(*currentBucket);
@@ -174,14 +177,15 @@ use_glyph:
 find_fallback:
 		unsigned short* glyphBucket = m_glyphBuckets[63];
 		unsigned short* fallbackGlyph = glyphBucket + 1;
-		for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
+		int fallbackCount;
+		for (fallbackCount = static_cast<int>(*glyphBucket); fallbackCount > 0; fallbackCount--) {
 			if (*reinterpret_cast<unsigned char*>(fallbackGlyph + 1) != 0) {
 				fallbackGlyph += 4;
 			} else {
 				break;
 			}
 		}
-		if (count == 0) {
+		if (fallbackCount == 0) {
 			fallbackGlyph = 0;
 		}
 		glyph = fallbackGlyph;
@@ -190,9 +194,12 @@ find_fallback:
 		}
 
 read_char:
-		ch = static_cast<unsigned char>(*text);
-		if (ch != '\0') {
-			text++;
+		if (static_cast<unsigned char>(*textPtr) == 0) {
+			hasChar = 0;
+		} else {
+			ch = static_cast<unsigned char>(*textPtr);
+			hasChar = 1;
+			textPtr++;
 		}
 	}
 
@@ -243,13 +250,13 @@ found_fallback:
 
 	unsigned char flags = renderFlags;
 	signed char sign = static_cast<signed char>(flags) >> 7;
-	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) +
-	                           ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 3);
 	int drawWidth;
 	int glyphIndex;
 	int row;
 	float u0;
 	float v0;
+	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) +
+	                           ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 3);
 
 	if (static_cast<int>((static_cast<unsigned int>(flags) << 27) | static_cast<unsigned int>(flags >> 5)) < 0) {
 		drawWidth = static_cast<int>(m_glyphWidth);
@@ -267,7 +274,7 @@ found_fallback:
 
 	float x0 = posX;
 	float y0 = posY;
-	if (static_cast<int>((static_cast<unsigned int>(flags) << 28) | static_cast<unsigned int>(flags >> 4)) < 0) {
+	if (static_cast<int>((static_cast<unsigned int>(renderFlags) << 28) | static_cast<unsigned int>(renderFlags >> 4)) < 0) {
 		x0 = static_cast<float>(floor(x0));
 		y0 = static_cast<float>(floor(y0));
 	}
@@ -278,7 +285,7 @@ found_fallback:
 	float u1 = u0 + static_cast<float>(drawWidth * 2);
 	float v1 = v0 + static_cast<float>(m_glyphHeight * 2);
 
-	if (static_cast<int>((static_cast<unsigned int>(flags) << 28) | static_cast<unsigned int>(flags >> 4)) < 0) {
+	if (static_cast<int>((static_cast<unsigned int>(renderFlags) << 28) | static_cast<unsigned int>(renderFlags >> 4)) < 0) {
 		advance = static_cast<float>(floor(advance));
 	}
 	posX += advance;
@@ -286,7 +293,7 @@ found_fallback:
 	if (glyphInfo[0] == 0) {
 		u0 += 1.0f;
 	}
-	if (m_glyphWidth == static_cast<unsigned short>(glyphInfo[0] + glyphInfo[1])) {
+	if (m_glyphWidth == glyphInfo[0] + glyphInfo[1]) {
 		u1 -= 1.0f;
 	}
 

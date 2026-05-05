@@ -303,14 +303,14 @@ void CDbgMenuPcs::calc()
 	}
 	if ((padInput & 4) != 0) {
 		CDM* start = m_selectedMenu;
-		m_selectedMenu->m_status &= 0xBF;
+		m_selectedMenu->m_statusBits.m_selected = 0;
 		do {
 			m_selectedMenu = m_selectedMenu->m_next;
 			if ((m_selectedMenu->m_flags & 1) != 0) {
 				break;
 			}
 		} while (m_selectedMenu != start);
-		m_selectedMenu->m_status = (m_selectedMenu->m_status & 0xBF) | 0x40;
+		m_selectedMenu->m_statusBits.m_selected = 1;
 	}
 
 	if (Pad._452_4_ != 0) {
@@ -322,14 +322,14 @@ void CDbgMenuPcs::calc()
 	}
 	if ((padInput & 8) != 0) {
 		CDM* start = m_selectedMenu;
-		m_selectedMenu->m_status &= 0xBF;
+		m_selectedMenu->m_statusBits.m_selected = 0;
 		do {
 			m_selectedMenu = m_selectedMenu->m_prev;
 			if ((m_selectedMenu->m_flags & 1) != 0) {
 				break;
 			}
 		} while (m_selectedMenu != start);
-		m_selectedMenu->m_status = (m_selectedMenu->m_status & 0xBF) | 0x40;
+		m_selectedMenu->m_statusBits.m_selected = 1;
 	}
 
 	if (m_rootMenuNode.m_firstChild != 0) {
@@ -606,7 +606,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 	GXPosition3f32((float)x, (float)(y + height), 0.0f);
 	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
 
-	if (((m_currentMenu->m_status << 25) & 0x80000000) != 0) {
+	if (m_currentMenu->m_statusBits.m_selected != 0) {
 		u8 alpha = 0xC0;
 
 		if ((System.m_frameCounter >> 2 & 1) != 0) {
@@ -685,7 +685,7 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 CDbgMenuPcs::CDM* CDbgMenuPcs::searchFreeCDM()
 {
 	for (int i = 0; i < 0x80; i++) {
-		if ((s8)m_menuPool[i].m_status >= 0) {
+		if (m_menuPool[i].m_statusBits.m_used == 0) {
 			return &m_menuPool[i];
 		}
 	}
@@ -850,7 +850,7 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 	CDM* menu = searchFreeCDM();
 
 	memset(&menu->m_status, 0, 0x20);
-	menu->m_status = (menu->m_status & 0x7F) | 0x80;
+	menu->m_statusBits.m_used = 1;
 
 	menu->m_type = param.m_type;
 	menu->m_flags = param.m_flags;
@@ -877,7 +877,7 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 		do {
 			if (found == 0 && ((child->m_flags & 1) != 0)) {
 				found = 1;
-				child->m_status |= 0x40;
+				child->m_statusBits.m_selected = 1;
 				m_selectedMenu = child;
 			}
 			child = child->m_next;
@@ -890,7 +890,7 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 	} else {
 		parentMenu->m_firstChild = menu;
 		if ((menu->m_flags & 1) != 0) {
-			menu->m_status |= 0x40;
+			menu->m_statusBits.m_selected = 1;
 			m_selectedMenu = menu;
 		}
 		if ((menu->m_flags & 2) != 0) {

@@ -23,7 +23,16 @@ public:
         u32 m_unk28;                            // 0x28
         u32 m_unk2C;                            // 0x2C
         s32 m_state;                            // 0x30
-        u8 m_status;                            // 0x34
+        union
+        {
+            u8 m_status;                        // 0x34
+            struct
+            {
+                u8 m_used : 1;
+                u8 m_selected : 1;
+                u8 m_statusRest : 6;
+            } m_statusBits;
+        };
         u8 m_pad35[3];                          // 0x35
         s32 m_id;                               // 0x38
         s32 m_drawX;                            // 0x3C

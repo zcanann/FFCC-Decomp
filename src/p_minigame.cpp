@@ -386,7 +386,8 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     *reinterpret_cast<unsigned char*>(managerBase + 0xAE) = self[0x1346];
     *reinterpret_cast<unsigned char*>(managerBase + 0xAF) = self[0x1347];
 
-    for (int i = 0; i < 2; i++)
+    int checksumBlockCount = 2;
+    do
     {
         char* bytes = reinterpret_cast<char*>(managerBase + offset);
         char* bytes2 = reinterpret_cast<char*>(managerBase + offset + 7);
@@ -395,7 +396,8 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
                         bytes[5]) - bytes[6]) - bytes2[0]) - bytes2[1]) - bytes2[2]) - bytes2[3]) -
                      bytes2[4]) - bytes2[5]) - bytes2[6];
         offset += 0xE;
-    }
+        checksumBlockCount--;
+    } while (checksumBlockCount != 0);
 
     int remaining = 0xBD - offset;
     char* checksumBytes = reinterpret_cast<char*>(managerBase + offset);
@@ -433,7 +435,8 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     *reinterpret_cast<unsigned char*>(managerBase + 0xAE) = self[0x1346];
     *reinterpret_cast<unsigned char*>(managerBase + 0xAF) = self[0x1347];
 
-    for (int i = 0; i < 2; i++)
+    checksumBlockCount = 2;
+    do
     {
         char* bytes = reinterpret_cast<char*>(managerBase + offset);
         char* bytes2 = reinterpret_cast<char*>(managerBase + offset + 7);
@@ -442,7 +445,8 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
                         bytes[5]) - bytes[6]) - bytes2[0]) - bytes2[1]) - bytes2[2]) - bytes2[3]) -
                      bytes2[4]) - bytes2[5]) - bytes2[6];
         offset += 0xE;
-    }
+        checksumBlockCount--;
+    } while (checksumBlockCount != 0);
 
     remaining = 0xBD - offset;
     checksumBytes = reinterpret_cast<char*>(managerBase + offset);

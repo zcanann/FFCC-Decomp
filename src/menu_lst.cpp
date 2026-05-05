@@ -220,7 +220,8 @@ int CMenuPcs::MLstClose()
 	entry = this->lstData->entries;
 	currentFrame = (int)this->lstState->frame;
 	if ((int)itemCount > 0) {
-		for (unsigned int i = itemCount; i != 0; i--) {
+		int i = (int)itemCount;
+		do {
 			if (entry->startFrame <= currentFrame) {
 				if (entry->startFrame + entry->duration <= currentFrame) {
 					completedItems++;
@@ -235,7 +236,8 @@ int CMenuPcs::MLstClose()
 				}
 			}
 			entry++;
-		}
+			i--;
+		} while (i != 0);
 	}
 	zero = FLOAT_803333D0;
 	if (this->lstData->count == completedItems) {
@@ -461,7 +463,8 @@ int CMenuPcs::MLstOpen()
 	entry = this->lstData->entries;
 	currentFrame = (int)this->lstState->frame;
 	if ((int)itemCount > 0) {
-		for (unsigned int i = itemCount; i != 0; i--) {
+		int i = (int)itemCount;
+		do {
 			if (entry->startFrame <= currentFrame) {
 				if (entry->startFrame + entry->duration <= currentFrame) {
 					completedItems++;
@@ -473,7 +476,8 @@ int CMenuPcs::MLstOpen()
 				}
 			}
 			entry++;
-		}
+			i--;
+		} while (i != 0);
 	}
 
 	one = FLOAT_803333F0;

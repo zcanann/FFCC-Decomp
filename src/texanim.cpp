@@ -30,17 +30,15 @@ extern "C" int Add__25CPtrArray_P11CTexAnimSeq_FP11CTexAnimSeq(void*, CTexAnimSe
 extern "C" void* __vc__21CPtrArray_P8CTexAnim_FUl(void*, unsigned long);
 extern "C" void* __vc__25CPtrArray_P11CTexAnimSeq_FUl(void*, unsigned long);
 extern "C" void SetStage__25CPtrArray_P11CTexAnimSeq_Fv(void*, CMemory::CStage*);
-extern "C" {
-const char s_texanim_cpp_801d7adc[] = "texanim.cpp";
-}
+extern "C" const char s_texanim_cpp_801d7adc[];
 extern const float FLOAT_8032fb38 = 0.0f;
 extern const float FLOAT_8032fb3c = 1.0f;
 extern const double DOUBLE_8032fb40 = 4503599627370496.0;
 extern const char DAT_8032fb48[] = "e1";
 extern const float FLOAT_8032fb4c = 1.25f;
 
-static char s_collection_ptrarray_h_801D7B30[] = "collection_ptrarray.h";
-static char s_ptrarray_grow_error_801D7B14[] = "CPtrArray grow error";
+extern "C" char s_collection_ptrarray_h_801D7B30[];
+extern "C" char s_ptrarray_grow_error_801D7B14[];
 
 inline void* operator new(unsigned long, void* p)
 {

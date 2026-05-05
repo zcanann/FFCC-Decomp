@@ -56,6 +56,11 @@ enum RedSoundLayoutSize {
 	REDSOUND_STREAM_BUFFER_SIZE = sizeof(RedStreamDATA) * REDSOUND_STREAM_COUNT,
 };
 
+enum RedReverbDepthIndex {
+	REDSOUND_REVERB_DEPTH_MUSIC = 0,
+	REDSOUND_REVERB_DEPTH_SE = 1,
+};
+
 enum RedSoundFixedPoint {
 	REDSOUND_FIXED_SHIFT = 12,
 	REDSOUND_FIXED_HALF = 0x800,

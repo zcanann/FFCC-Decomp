@@ -405,7 +405,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 				track->m_volume = REDSOUND_VOLUME_FULL;
 				track->m_expression = REDSOUND_VOLUME_DEFAULT;
 				track->m_pan = pan << REDSOUND_FIXED_SHIFT;
-				track->m_reverbDepth = p_ReverbDepth[1].m_depth;
+				track->m_reverbDepth = p_ReverbDepth[REDSOUND_REVERB_DEPTH_SE].m_depth;
 				track->m_reverbDepthDelta = 0;
 				track->m_panDelta = 0;
 				track->m_expressionDelta = 0;
@@ -747,13 +747,13 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 		SetReverb(0, t_ReverbModeData[reverbKind].kind, t_ReverbModeData[reverbKind].params);
 	}
 
-	p_ReverbDepth[0].m_depth = (int)musicHead->m_reverbDepth;
-	if (p_ReverbDepth[0].m_depth != 0) {
-		p_ReverbDepth[0].m_depth = (p_ReverbDepth[0].m_depth + 1) << 8;
-		p_ReverbDepth[0].m_depth = (p_ReverbDepth[0].m_depth - 1) << REDSOUND_FIXED_SHIFT;
+	p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth = (int)musicHead->m_reverbDepth;
+	if (p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth != 0) {
+		p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth = (p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth + 1) << 8;
+		p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth = (p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth - 1) << REDSOUND_FIXED_SHIFT;
 	}
-	p_ReverbDepth[0].m_step = 0;
-	p_ReverbDepth[0].m_count = 0;
+	p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_step = 0;
+	p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_count = 0;
 	music->m_waveNo = musicHead->m_waveNo;
 
 	unsigned char* current = (unsigned char*)musicHead + REDSOUND_MUSIC_HEADER_SIZE;
@@ -776,7 +776,7 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 		track->m_volume = REDSOUND_VOLUME_FULL;
 		track->m_expression = REDSOUND_VOLUME_DEFAULT;
 		track->m_pan = REDSOUND_PAN_CENTER;
-		track->m_reverbDepth = p_ReverbDepth[0].m_depth;
+		track->m_reverbDepth = p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth;
 		track->m_reverbDepthDelta = 0;
 		track->m_panDelta = 0;
 		track->m_expressionDelta = 0;

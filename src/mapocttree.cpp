@@ -1102,8 +1102,9 @@ void InsertLight_r(COctNode* node)
 		*bits |= 1UL << (s_light_no & 0x1f);
 	}
 
+	COctNode** childIter = node->m_children;
 	for (int i = 0; i < 8; i++) {
-		COctNode* child = node->m_children[0];
+		COctNode* child = *childIter;
 		if (child == 0) {
 			return;
 		}
@@ -1161,8 +1162,9 @@ void InsertLight_r(COctNode* node)
 				*bits |= 1UL << (s_light_no & 0x1f);
 			}
 
+			COctNode** grandChildIter = child->m_children;
 			for (int j = 0; j < 8; j++) {
-				COctNode* grandChild = child->m_children[0];
+				COctNode* grandChild = *grandChildIter;
 				if (grandChild == 0) {
 					break;
 				}
@@ -1172,19 +1174,20 @@ void InsertLight_r(COctNode* node)
 						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x44)), s_light_no);
 					}
 
+					COctNode** greatGrandChildIter = grandChild->m_children;
 					for (int k = 0; k < 8; k++) {
-						COctNode* greatGrandChild = grandChild->m_children[0];
+						COctNode* greatGrandChild = *greatGrandChildIter;
 						if (greatGrandChild == 0) {
 							break;
 						}
 						InsertLight_r(greatGrandChild);
-						grandChild = reinterpret_cast<COctNode*>(Ptr(grandChild, 4));
+						greatGrandChildIter++;
 					}
 				}
-				child = reinterpret_cast<COctNode*>(Ptr(child, 4));
+				grandChildIter++;
 			}
 		}
-		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
+		childIter++;
 	}
 }
 
@@ -1407,8 +1410,9 @@ void InsertShadow_r(COctNode* node)
 		*bits |= 1UL << (s_insertShadowNo & 0x1f);
 	}
 
+	COctNode** childIter = node->m_children;
 	for (int i = 0; i < 8; i++) {
-		COctNode* child = node->m_children[0];
+		COctNode* child = *childIter;
 		if (child == 0) {
 			return;
 		}
@@ -1468,8 +1472,9 @@ void InsertShadow_r(COctNode* node)
 				*bits |= 1UL << (s_insertShadowNo & 0x1f);
 			}
 
+			COctNode** grandChildIter = child->m_children;
 			for (int j = 0; j < 8; j++) {
-				COctNode* grandChild = child->m_children[0];
+				COctNode* grandChild = *grandChildIter;
 				if (grandChild == 0) {
 					break;
 				}
@@ -1481,22 +1486,23 @@ void InsertShadow_r(COctNode* node)
 						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x48)), s_insertShadowNo);
 					}
 
+					COctNode** greatGrandChildIter = grandChild->m_children;
 					for (int k = 0; k < 8; k++) {
-						COctNode* greatGrandChild = grandChild->m_children[0];
+						COctNode* greatGrandChild = *greatGrandChildIter;
 						if (greatGrandChild == 0) {
 							break;
 						}
 						s_light_no++;
 						InsertShadow_r(greatGrandChild);
-						grandChild = reinterpret_cast<COctNode*>(Ptr(grandChild, 4));
+						greatGrandChildIter++;
 						s_light_no--;
 					}
 				}
-				child = reinterpret_cast<COctNode*>(Ptr(child, 4));
+				grandChildIter++;
 				s_light_no--;
 			}
 		}
-		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
+		childIter++;
 		s_light_no--;
 	}
 }

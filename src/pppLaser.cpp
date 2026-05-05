@@ -111,108 +111,267 @@ struct LaserColorData {
 
 /*
  * --INFO--
- * PAL Address: 801766ec
- * PAL Size: 336b
+ * PAL Address: 801754e0
+ * PAL Size: 3008b  
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
+extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
-    f32 fVar1 = kPppLaserZero;
-    f32* pfVar3 = (f32*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
-    int local_24;
-    int local_28;
-    int iVar2;
-    Vec local_14;
-    Vec local_20;
+    LaserStep* step = (LaserStep*)param_2;
+    int* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + serializedDataOffsets[2]);
+    int colorOffset = serializedDataOffsets[1];
+    LaserColorData* colorData = (LaserColorData*)((u8*)pppLaser + 0x80 + colorOffset);
+    s32 dataValIndex = step->m_dataValIndex;
+    u32 count;
+    s32 i;
+    u8 alphaStep;
+    u8 alphaMax;
+    float halfWidth;
+    float length;
+    float negHalfWidth;
+    float u0;
+    float u1;
+    float uvStep;
+    pppFMATRIX modelMtx;
+    pppFMATRIX cameraMtx;
+    pppFMATRIX localMtx;
+    pppFMATRIX managerMtx;
+    Mtx shapeMtx;
+    Mtx rotateMtx;
+    Mtx debugMtx;
+    Mtx pointMtx;
+    Mtx sphereMtx;
+    pppFMATRIX unitMtx;
+    pppFMATRIX mtxOut;
+    Vec shapePos;
+    Vec debugSource;
+    Vec spherePos;
+    _GXColor color;
+    _GXColor trailColor;
+    _GXColor debugColor;
+    int tex;
 
-    *pfVar3 = kPppLaserZero;
-    pfVar3[6] = fVar1;
-    pfVar3[5] = fVar1;
-    pfVar3[4] = fVar1;
-    pfVar3[3] = fVar1;
-    pfVar3[2] = fVar1;
-    pfVar3[1] = fVar1;
-    *(u32*)((u8*)pfVar3 + 0x1c) = 0;
-    pfVar3[10] = fVar1;
-    pfVar3[9] = fVar1;
-    pfVar3[8] = fVar1;
-
-    *((u8*)pfVar3 + 0x2c) = 0;
-    *((u8*)pfVar3 + 0x2d) = 0;
-    *((u8*)pfVar3 + 0x2e) = 0;
-    *((u16*)((u8*)pfVar3 + 0x30)) = 0;
-    *((u16*)((u8*)pfVar3 + 0x34)) = 0;
-    *((u16*)((u8*)pfVar3 + 0x32)) = 0;
-
-    pfVar3[14] = Math.RandF(FLOAT_8033345c);
-    *((u8*)pfVar3 + 0x4c) = 1;
-
-    iVar2 = GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(
-        &Game, (PPPIFPARAM*)((u8*)pppMngStPtr + 0x130), &local_24, &local_28);
-    if (iVar2 != 0) {
-        GetTargetCursor__5CGameFiR3VecR3Vec(&Game, local_28, (Vec*)(pfVar3 + 0x10), &local_20);
-
-        iVar2 = (int)GetPartyObj__5CGameFi(&Game, local_28);
-        local_14.x = *(f32*)(iVar2 + 0x15c);
-        local_14.y = *(f32*)(iVar2 + 0x160);
-        local_14.z = *(f32*)(iVar2 + 0x164);
-        if (local_24 == 0x200) {
-            pfVar3[15] = PSVECDistance((Vec*)(pfVar3 + 0x10), &local_14);
-        } else {
-            pfVar3[15] = FLOAT_80333448;
-        }
-    } else {
-        pfVar3[15] = FLOAT_80333448;
-        *(u8*)((u8*)pppMngStPtr + 0xe8) = 1;
-        pppStopSe__FP9_pppMngStP7PPPSEST(pppMngStPtr, (PPPSEST*)((u8*)pppMngStPtr + 0x11c));
+    if (dataValIndex == 0xFFFF) {
+        return;
     }
-}
 
-/*
- * --INFO--
- * PAL Address: 801766a8
- * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstruct2Laser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
-{
-    f32 fVar1 = kPppLaserZero;
-    u8* work = (u8*)pppLaser + param_2->m_serializedDataOffsets[2] + 0x80;
+    tex = GetTextureFromRSD__FiP9_pppEnvSt(dataValIndex, pppEnvStPtr);
+    pppSetBlendMode(step->m_payload[0x1c]);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+        &colorData->m_color, &pppLaser->m_localMatrix, kPppLaserZero, step->m_payload[0x39], step->m_payload[0x38],
+        step->m_payload[0x1c], 0, 1, 1, 0);
+    GXSetNumTevStages(1);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    GXSetCullMode(GX_CULL_NONE);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 1, 7, 0);
+    color = *(_GXColor*)&colorData->m_color;
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+    GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+        0, 0xF, 8, 0xA, 0xF);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
+        0, 7, 7, 7, 5);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
+    GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 
-    *(f32*)(work + 0x18) = kPppLaserZero;
-    *(f32*)(work + 0x14) = fVar1;
-    *(f32*)(work + 0x10) = fVar1;
-    *(f32*)(work + 0x0C) = fVar1;
-    *(f32*)(work + 0x08) = fVar1;
-    *(f32*)(work + 0x04) = fVar1;
-    *(f32*)(work + 0x28) = fVar1;
-    *(f32*)(work + 0x24) = fVar1;
-    *(f32*)(work + 0x20) = fVar1;
-    *(work + 0x2C) = 0;
-}
+    halfWidth = work->m_halfWidth;
+    length = work->m_length;
+    negHalfWidth = -halfWidth;
 
-/*
- * --INFO--
- * PAL Address: 8017665c
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
-{
-    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
-    void* alloc = work->m_points;
-    if (alloc != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(alloc);
-        work->m_points = 0;
+    pppUnitMatrix__FR10pppFMATRIX(&unitMtx);
+    localMtx = pppLaser->m_localMatrix;
+    managerMtx = pppMngStPtr->m_matrix;
+    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, &managerMtx, &localMtx);
+    modelMtx = mtxOut;
+    cameraMtx = *(pppFMATRIX*)&ppvCameraMatrix;
+    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, &cameraMtx, &modelMtx);
+    GXLoadPosMtxImm(mtxOut.value, 0);
+
+    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+    GXPosition3f32(negHalfWidth, kPppLaserZero, kPppLaserZero);
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(kPppLaserZero, kPppLaserZero);
+    GXPosition3f32(negHalfWidth, kPppLaserZero, length);
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(kPppLaserZero, work->m_length);
+    GXPosition3f32(halfWidth, kPppLaserZero, kPppLaserZero);
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(FLOAT_8033342c, kPppLaserZero);
+    GXPosition3f32(halfWidth, kPppLaserZero, length);
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(FLOAT_8033342c, work->m_length);
+
+    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+    GXPosition3f32(kPppLaserZero, negHalfWidth, kPppLaserZero);
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(kPppLaserZero, kPppLaserZero);
+    GXPosition3f32(kPppLaserZero, negHalfWidth, length);
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(kPppLaserZero, work->m_length);
+    GXPosition3f32(kPppLaserZero, halfWidth, kPppLaserZero);
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(FLOAT_8033342c, kPppLaserZero);
+    GXPosition3f32(kPppLaserZero, halfWidth, length);
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(FLOAT_8033342c, work->m_length);
+
+    if (step->m_stepValue != 0xFFFF) {
+        long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
+        PSMTXIdentity(shapeMtx);
+        shapeMtx[0][0] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.x;
+        shapeMtx[1][1] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.y;
+        shapeMtx[2][2] = shapeMtx[0][0];
+        if (kPppLaserZero != work->m_shapeRotation) {
+            PSMTXRotRad(rotateMtx, 'z', work->m_shapeRotation);
+            PSMTXConcat(shapeMtx, rotateMtx, shapeMtx);
+        }
+        PSMTXMultVec(ppvCameraMatrix, work->m_points, &shapePos);
+        shapeMtx[0][3] = shapePos.x;
+        shapeMtx[1][3] = shapePos.y;
+        shapeMtx[2][3] = shapePos.z;
+        GXLoadPosMtxImm(shapeMtx, GX_PNMTX0);
+        pppDrawShp__FPlsP12CMaterialSetUc(
+            *shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
+
+        count = (u32)step->m_payload[0x1e];
+        uvStep = FLOAT_8033342c / (float)count;
+        if (step->m_initWOrk == 0xFFFF) {
+            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+        } else {
+            tex = GetTextureFromRSD__FiP9_pppEnvSt(step->m_initWOrk, pppEnvStPtr);
+            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+            GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
+        }
+
+        GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);
+        alphaMax = step->m_payload[0x2b];
+        alphaStep = (u8)(alphaMax / step->m_payload[0x1e]);
+        trailColor.r = step->m_payload[0x28];
+        trailColor.g = step->m_payload[0x29];
+        trailColor.b = step->m_payload[0x2a];
+        trailColor.a = alphaMax;
+
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 3));
+        int alpha = 0;
+        for (i = 0; (int)i < (int)(step->m_payload[0x1e] - 1); i++) {
+            u0 = (float)i * uvStep;
+            u1 = (float)(i + 1) * uvStep;
+            trailColor.a = alphaMax - (u8)alpha;
+            alpha += alphaStep;
+
+            GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
+            GXColor1u32(*(u32*)&trailColor);
+            GXTexCoord2f32(u0, FLOAT_8033342c);
+
+            GXPosition3f32(work->m_points[i].x, work->m_points[i].y, work->m_points[i].z);
+            GXColor1u32(*(u32*)&trailColor);
+            GXTexCoord2f32(u0, kPppLaserZero);
+
+            trailColor.a = alphaMax - (u8)(alphaStep * (i + 1));
+            GXPosition3f32(work->m_points[i + 1].x, work->m_points[i + 1].y, work->m_points[i + 1].z);
+            GXColor1u32(*(u32*)&trailColor);
+            GXTexCoord2f32(u1, kPppLaserZero);
+        }
+
+        u8* cflat = CFlat;
+        if ((*reinterpret_cast<u32*>(cflat + 0x129c) & 0x200000) != 0) {
+            SetVtxFmt_POS_CLR__5CUtilFv(&gUtil);
+            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+            GXSetNumTexGens(0);
+            pppSetBlendMode(1);
+
+            debugColor.r = 0x80;
+            debugColor.g = 0xFF;
+            debugColor.b = 0x80;
+            debugColor.a = 0xFF;
+            GXSetChanAmbColor(GX_COLOR0A0, debugColor);
+            GXSetPointSize(0x28, GX_TO_ZERO);
+            GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(step->m_payload[0x1e] - 1));
+            for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
+                GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
+                GXColor1u32(*(u32*)&debugColor);
+            }
+
+            debugColor.r = 0x80;
+            debugColor.g = 0x80;
+            debugColor.b = 0xFF;
+            debugColor.a = 0xFF;
+            GXSetChanAmbColor(GX_COLOR0A0, debugColor);
+            GXSetLineWidth(0x14, GX_TO_ZERO);
+            GXBegin(GX_LINES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 4));
+            for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
+                GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
+                GXColor1u32(*(u32*)&debugColor);
+                GXPosition3f32(work->m_points[j + 1].x, work->m_points[j + 1].y, work->m_points[j + 1].z);
+                GXColor1u32(*(u32*)&debugColor);
+                GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
+                GXColor1u32(*(u32*)&debugColor);
+                GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
+                GXColor1u32(*(u32*)&debugColor);
+            }
+
+            GXSetLineWidth(8, GX_TO_ZERO);
+            GXSetPointSize(8, GX_TO_ZERO);
+            GXSetZMode(1, GX_LEQUAL, 0);
+
+            if ((*reinterpret_cast<u32*>(cflat + 0x129c) & 0x200000) != 0) {
+                float radius = pppMngStPtr->m_previousPosition.z * *(float*)(step->m_payload + 0x24);
+                float distance = PSVECDistance(work->m_points, &work->m_origin);
+                debugSource.x = kPppLaserZero;
+                debugSource.y = kPppLaserZero;
+                debugSource.z = FLOAT_8033342c;
+                debugColor.r = 0xFF;
+                debugColor.g = 0xFF;
+                debugColor.b = 0xFF;
+                debugColor.a = 0xFF;
+                PSMTXIdentity(debugMtx);
+                debugMtx[0][0] = radius;
+                debugMtx[1][1] = radius;
+                debugMtx[2][2] = distance;
+                PSMTXConcat(pppLaser->m_localMatrix.value, debugMtx, debugMtx);
+                PSMTXConcat(pppMngStPtr->m_matrix.value, debugMtx, debugMtx);
+                PSMTXConcat(ppvCameraMatrix, debugMtx, debugMtx);
+                PSMTXMultVec(debugMtx, &debugSource, &spherePos);
+                debugMtx[0][3] = spherePos.x;
+                debugMtx[1][3] = spherePos.y;
+                debugMtx[2][3] = spherePos.z;
+                Graphic.DrawSphere(debugMtx, debugColor);
+            }
+
+            GXLoadPosMtxImm(pppLaser->m_drawMatrix.value, GX_PNMTX0);
+            debugColor.r = 0xFF;
+            debugColor.g = 0xFF;
+            debugColor.b = 0xFF;
+            debugColor.a = 0xFF;
+            for (i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
+                if ((work->m_points[i].x == kPppLaserZero) && (work->m_points[i].y == kPppLaserZero) && (work->m_points[i].z == kPppLaserZero)) {
+                    continue;
+                }
+                PSMTXScale(pointMtx, FLOAT_80333430, FLOAT_80333430, FLOAT_80333430);
+                pointMtx[0][3] = work->m_points[i].x;
+                pointMtx[1][3] = work->m_points[i].y;
+                pointMtx[2][3] = work->m_points[i].z;
+                PSMTXConcat(ppvCameraMatrix, pointMtx, sphereMtx);
+                Graphic.DrawSphere(sphereMtx, debugColor);
+            }
+
+            pointMtx[0][3] = work->m_origin.x;
+            pointMtx[1][3] = work->m_origin.y;
+            pointMtx[2][3] = work->m_origin.z;
+            PSMTXConcat(ppvCameraMatrix, pointMtx, sphereMtx);
+            Graphic.DrawSphere(sphereMtx, debugColor);
+            pppInitBlendMode();
+        }
     }
 }
 
@@ -393,268 +552,107 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 
 /*
  * --INFO--
- * PAL Address: 801754e0
- * PAL Size: 3008b  
+ * PAL Address: 8017665c
+ * PAL Size: 76b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
+void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
-    LaserStep* step = (LaserStep*)param_2;
-    int* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + serializedDataOffsets[2]);
-    int colorOffset = serializedDataOffsets[1];
-    LaserColorData* colorData = (LaserColorData*)((u8*)pppLaser + 0x80 + colorOffset);
-    s32 dataValIndex = step->m_dataValIndex;
-    Vec* points;
-    u32 count;
-    s32 i;
-    u8 alphaStep;
-    u8 alphaMax;
-    float halfWidth;
-    float length;
-    float negHalfWidth;
-    float u0;
-    float u1;
-    float uvStep;
-    pppFMATRIX modelMtx;
-    pppFMATRIX cameraMtx;
-    pppFMATRIX localMtx;
-    pppFMATRIX managerMtx;
-    Mtx shapeMtx;
-    Mtx rotateMtx;
-    Mtx debugMtx;
-    Mtx pointMtx;
-    Mtx sphereMtx;
-    pppFMATRIX unitMtx;
-    pppFMATRIX mtxOut;
-    Vec shapePos;
-    Vec debugSource;
-    Vec spherePos;
-    _GXColor color;
-    _GXColor trailColor;
-    _GXColor debugColor;
-    int tex;
-
-    if (dataValIndex == 0xFFFF) {
-        return;
+    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
+    void* alloc = work->m_points;
+    if (alloc != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(alloc);
+        work->m_points = 0;
     }
+}
 
-    tex = GetTextureFromRSD__FiP9_pppEnvSt(dataValIndex, pppEnvStPtr);
-    pppSetBlendMode(step->m_payload[0x1c]);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        &colorData->m_color, &pppLaser->m_localMatrix, kPppLaserZero, step->m_payload[0x39], step->m_payload[0x38],
-        step->m_payload[0x1c], 0, 1, 1, 0);
-    GXSetNumTevStages(1);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    GXSetCullMode(GX_CULL_NONE);
-    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 1, 7, 0);
-    color = *(_GXColor*)&colorData->m_color;
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-    GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
-    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
-        0, 0xF, 8, 0xA, 0xF);
-    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
-        0, 7, 7, 7, 5);
-    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
-    GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
+/*
+ * --INFO--
+ * PAL Address: 801766a8
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct2Laser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
+{
+    f32 fVar1 = kPppLaserZero;
+    u8* work = (u8*)pppLaser + param_2->m_serializedDataOffsets[2] + 0x80;
 
-    halfWidth = work->m_halfWidth;
-    length = work->m_length;
-    negHalfWidth = -halfWidth;
+    *(f32*)(work + 0x18) = kPppLaserZero;
+    *(f32*)(work + 0x14) = fVar1;
+    *(f32*)(work + 0x10) = fVar1;
+    *(f32*)(work + 0x0C) = fVar1;
+    *(f32*)(work + 0x08) = fVar1;
+    *(f32*)(work + 0x04) = fVar1;
+    *(f32*)(work + 0x28) = fVar1;
+    *(f32*)(work + 0x24) = fVar1;
+    *(f32*)(work + 0x20) = fVar1;
+    *(work + 0x2C) = 0;
+}
 
-    pppUnitMatrix__FR10pppFMATRIX(&unitMtx);
-    localMtx = pppLaser->m_localMatrix;
-    managerMtx = pppMngStPtr->m_matrix;
-    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, &managerMtx, &localMtx);
-    modelMtx = mtxOut;
-    cameraMtx = *(pppFMATRIX*)&ppvCameraMatrix;
-    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, &cameraMtx, &modelMtx);
-    GXLoadPosMtxImm(mtxOut.value, 0);
+/*
+ * --INFO--
+ * PAL Address: 801766ec
+ * PAL Size: 336b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
+{
+    f32 fVar1 = kPppLaserZero;
+    f32* pfVar3 = (f32*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
+    int local_24;
+    int local_28;
+    int iVar2;
+    Vec local_14;
+    Vec local_20;
 
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(negHalfWidth, kPppLaserZero, kPppLaserZero);
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(kPppLaserZero, kPppLaserZero);
-    GXPosition3f32(negHalfWidth, kPppLaserZero, length);
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(kPppLaserZero, work->m_length);
-    GXPosition3f32(halfWidth, kPppLaserZero, kPppLaserZero);
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(FLOAT_8033342c, kPppLaserZero);
-    GXPosition3f32(halfWidth, kPppLaserZero, length);
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(FLOAT_8033342c, work->m_length);
+    *pfVar3 = kPppLaserZero;
+    pfVar3[6] = fVar1;
+    pfVar3[5] = fVar1;
+    pfVar3[4] = fVar1;
+    pfVar3[3] = fVar1;
+    pfVar3[2] = fVar1;
+    pfVar3[1] = fVar1;
+    *(u32*)((u8*)pfVar3 + 0x1c) = 0;
+    pfVar3[10] = fVar1;
+    pfVar3[9] = fVar1;
+    pfVar3[8] = fVar1;
 
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(kPppLaserZero, negHalfWidth, kPppLaserZero);
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(kPppLaserZero, kPppLaserZero);
-    GXPosition3f32(kPppLaserZero, negHalfWidth, length);
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(kPppLaserZero, work->m_length);
-    GXPosition3f32(kPppLaserZero, halfWidth, kPppLaserZero);
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(FLOAT_8033342c, kPppLaserZero);
-    GXPosition3f32(kPppLaserZero, halfWidth, length);
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(FLOAT_8033342c, work->m_length);
+    *((u8*)pfVar3 + 0x2c) = 0;
+    *((u8*)pfVar3 + 0x2d) = 0;
+    *((u8*)pfVar3 + 0x2e) = 0;
+    *((u16*)((u8*)pfVar3 + 0x30)) = 0;
+    *((u16*)((u8*)pfVar3 + 0x34)) = 0;
+    *((u16*)((u8*)pfVar3 + 0x32)) = 0;
 
-    if (step->m_stepValue != 0xFFFF) {
-        long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
-        PSMTXIdentity(shapeMtx);
-        shapeMtx[0][0] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.x;
-        shapeMtx[1][1] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.y;
-        shapeMtx[2][2] = shapeMtx[0][0];
-        if (kPppLaserZero != work->m_shapeRotation) {
-            PSMTXRotRad(rotateMtx, 'z', work->m_shapeRotation);
-            PSMTXConcat(shapeMtx, rotateMtx, shapeMtx);
-        }
-        PSMTXMultVec(ppvCameraMatrix, work->m_points, &shapePos);
-        shapeMtx[0][3] = shapePos.x;
-        shapeMtx[1][3] = shapePos.y;
-        shapeMtx[2][3] = shapePos.z;
-        GXLoadPosMtxImm(shapeMtx, GX_PNMTX0);
-        pppDrawShp__FPlsP12CMaterialSetUc(
-            *shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
+    pfVar3[14] = Math.RandF(FLOAT_8033345c);
+    *((u8*)pfVar3 + 0x4c) = 1;
 
-        count = (u32)step->m_payload[0x1e];
-        uvStep = FLOAT_8033342c / (float)count;
-        if (step->m_initWOrk == 0xFFFF) {
-            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
-            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    iVar2 = GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(
+        &Game, (PPPIFPARAM*)((u8*)pppMngStPtr + 0x130), &local_24, &local_28);
+    if (iVar2 != 0) {
+        GetTargetCursor__5CGameFiR3VecR3Vec(&Game, local_28, (Vec*)(pfVar3 + 0x10), &local_20);
+
+        iVar2 = (int)GetPartyObj__5CGameFi(&Game, local_28);
+        local_14.x = *(f32*)(iVar2 + 0x15c);
+        local_14.y = *(f32*)(iVar2 + 0x160);
+        local_14.z = *(f32*)(iVar2 + 0x164);
+        if (local_24 == 0x200) {
+            pfVar3[15] = PSVECDistance((Vec*)(pfVar3 + 0x10), &local_14);
         } else {
-            tex = GetTextureFromRSD__FiP9_pppEnvSt(step->m_initWOrk, pppEnvStPtr);
-            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
-            GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
+            pfVar3[15] = FLOAT_80333448;
         }
-
-        GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);
-        alphaMax = step->m_payload[0x2b];
-        alphaStep = (u8)(alphaMax / step->m_payload[0x1e]);
-        trailColor.r = step->m_payload[0x28];
-        trailColor.g = step->m_payload[0x29];
-        trailColor.b = step->m_payload[0x2a];
-        trailColor.a = alphaMax;
-        points = work->m_points;
-
-        GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 3));
-        int alpha = 0;
-        for (i = 0; (int)i < (int)(step->m_payload[0x1e] - 1); i++) {
-            u0 = (float)i * uvStep;
-            u1 = (float)(i + 1) * uvStep;
-            trailColor.a = alphaMax - (u8)alpha;
-            alpha += alphaStep;
-
-            GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
-            GXColor1u32(*(u32*)&trailColor);
-            GXTexCoord2f32(u0, FLOAT_8033342c);
-
-            GXPosition3f32(points[i].x, points[i].y, points[i].z);
-            GXColor1u32(*(u32*)&trailColor);
-            GXTexCoord2f32(u0, kPppLaserZero);
-
-            trailColor.a = alphaMax - (u8)alpha;
-            GXPosition3f32(points[i + 1].x, points[i + 1].y, points[i + 1].z);
-            GXColor1u32(*(u32*)&trailColor);
-            GXTexCoord2f32(u1, kPppLaserZero);
-        }
-
-        u8* cflat = CFlat;
-        if ((*reinterpret_cast<u32*>(cflat + 0x129c) & 0x200000) != 0) {
-            SetVtxFmt_POS_CLR__5CUtilFv(&gUtil);
-            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
-            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-            GXSetNumTexGens(0);
-            pppSetBlendMode(1);
-
-            debugColor.r = 0x80;
-            debugColor.g = 0xFF;
-            debugColor.b = 0x80;
-            debugColor.a = 0xFF;
-            GXSetChanAmbColor(GX_COLOR0A0, debugColor);
-            GXSetPointSize(0x28, GX_TO_ZERO);
-            GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(step->m_payload[0x1e] - 1));
-            for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
-                GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
-                GXColor1u32(*(u32*)&debugColor);
-            }
-
-            debugColor.r = 0x80;
-            debugColor.g = 0x80;
-            debugColor.b = 0xFF;
-            debugColor.a = 0xFF;
-            GXSetChanAmbColor(GX_COLOR0A0, debugColor);
-            GXSetLineWidth(0x14, GX_TO_ZERO);
-            GXBegin(GX_LINES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 4));
-            for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
-                GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
-                GXColor1u32(*(u32*)&debugColor);
-                GXPosition3f32(work->m_points[j + 1].x, work->m_points[j + 1].y, work->m_points[j + 1].z);
-                GXColor1u32(*(u32*)&debugColor);
-                GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
-                GXColor1u32(*(u32*)&debugColor);
-                GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
-                GXColor1u32(*(u32*)&debugColor);
-            }
-
-            GXSetLineWidth(8, GX_TO_ZERO);
-            GXSetPointSize(8, GX_TO_ZERO);
-            GXSetZMode(1, GX_LEQUAL, 0);
-
-            if ((*reinterpret_cast<u32*>(cflat + 0x129c) & 0x200000) != 0) {
-                float radius = pppMngStPtr->m_previousPosition.z * *(float*)(step->m_payload + 0x24);
-                float distance = PSVECDistance(work->m_points, &work->m_origin);
-                debugSource.x = kPppLaserZero;
-                debugSource.y = kPppLaserZero;
-                debugSource.z = FLOAT_8033342c;
-                debugColor.r = 0xFF;
-                debugColor.g = 0xFF;
-                debugColor.b = 0xFF;
-                debugColor.a = 0xFF;
-                PSMTXIdentity(debugMtx);
-                debugMtx[0][0] = radius;
-                debugMtx[1][1] = radius;
-                debugMtx[2][2] = distance;
-                PSMTXConcat(pppLaser->m_localMatrix.value, debugMtx, debugMtx);
-                PSMTXConcat(pppMngStPtr->m_matrix.value, debugMtx, debugMtx);
-                PSMTXConcat(ppvCameraMatrix, debugMtx, debugMtx);
-                PSMTXMultVec(debugMtx, &debugSource, &spherePos);
-                debugMtx[0][3] = spherePos.x;
-                debugMtx[1][3] = spherePos.y;
-                debugMtx[2][3] = spherePos.z;
-                Graphic.DrawSphere(debugMtx, debugColor);
-            }
-
-            GXLoadPosMtxImm(pppLaser->m_drawMatrix.value, GX_PNMTX0);
-            debugColor.r = 0xFF;
-            debugColor.g = 0xFF;
-            debugColor.b = 0xFF;
-            debugColor.a = 0xFF;
-            for (i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
-                if ((work->m_points[i].x == kPppLaserZero) && (work->m_points[i].y == kPppLaserZero) && (work->m_points[i].z == kPppLaserZero)) {
-                    continue;
-                }
-                PSMTXScale(pointMtx, FLOAT_80333430, FLOAT_80333430, FLOAT_80333430);
-                pointMtx[0][3] = work->m_points[i].x;
-                pointMtx[1][3] = work->m_points[i].y;
-                pointMtx[2][3] = work->m_points[i].z;
-                PSMTXConcat(ppvCameraMatrix, pointMtx, sphereMtx);
-                Graphic.DrawSphere(sphereMtx, debugColor);
-            }
-
-            pointMtx[0][3] = work->m_origin.x;
-            pointMtx[1][3] = work->m_origin.y;
-            pointMtx[2][3] = work->m_origin.z;
-            PSMTXConcat(ppvCameraMatrix, pointMtx, sphereMtx);
-            Graphic.DrawSphere(sphereMtx, debugColor);
-            pppInitBlendMode();
-        }
+    } else {
+        pfVar3[15] = FLOAT_80333448;
+        *(u8*)((u8*)pppMngStPtr + 0xe8) = 1;
+        pppStopSe__FP9_pppMngStP7PPPSEST(pppMngStPtr, (PPPSEST*)((u8*)pppMngStPtr + 0x11c));
     }
 }

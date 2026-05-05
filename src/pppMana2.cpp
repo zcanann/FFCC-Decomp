@@ -1127,11 +1127,11 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     int colCount;
     int pairCount;
 
-    normalY = FLOAT_803318a0;
-    zero = FLOAT_80331898;
+    normalY = LoadFloat(FLOAT_803318a0);
+    zero = LoadFloat(FLOAT_80331898);
     rowCount = 0;
     uvStep = LoadFloat(FLOAT_803318A8);
-    radius = param_5 * FLOAT_803318a4;
+    radius = param_5 * LoadFloat(FLOAT_803318a4);
     for (z = radius; -radius <= z; z -= param_5 * uvStep) {
         colCount = 0;
         rowUv = static_cast<float>(rowCount) * uvStep;

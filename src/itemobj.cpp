@@ -173,7 +173,7 @@ static const char DAT_801dcfec[] = {
     (char)0x81, 0x42, (char)0x0A, (char)0x00,
 };
 static const char s_f051_root_801dceb4[] = "f051_root";
-static const char s_stand_801dd018[] = "stand";
+static const char s_stand_80331B44[] = "stand";
 extern "C" char m_aiWork__8CGMonObj[];
 
 struct ItemObjFlatTableEntry {
@@ -1247,34 +1247,36 @@ void CGItemObj::loadModel()
 	int modelVariant = 0;
 	int modelFlag = 0;
 	unsigned long animFlags = (unsigned long)-1;
-	char* standAnim = const_cast<char*>(s_stand_801dd018);
+	char* standAnim = const_cast<char*>(s_stand_80331B44);
 	int useParticleTable = 1;
 
 	if (*(int*)(self + 0x500) < 0x18) {
-		if (*(int*)(self + 0x500) == 0xD) {
-			modelNo = 0x33;
-			useParticleTable = 0;
-		} else if (*(int*)(self + 0x500) < 0xD) {
-			if (*(int*)(self + 0x500) != 0xB) {
-				if (*(int*)(self + 0x500) < 0xB) {
-					if (*(int*)(self + 0x500) >= 0xA) {
-						modelNo = 8;
-						useParticleTable = 0;
+		if (*(int*)(self + 0x500) != 0xD) {
+			if (*(int*)(self + 0x500) < 0xD) {
+				if (*(int*)(self + 0x500) != 0xB) {
+					if (*(int*)(self + 0x500) < 0xB) {
+						if (*(int*)(self + 0x500) >= 0xA) {
+							modelNo = 8;
+							useParticleTable = 0;
+						}
 					}
+				} else {
+					modelNo = 0x27;
+					useParticleTable = 0;
 				}
-			} else {
-				modelNo = 0x27;
+			} else if (*(int*)(self + 0x500) < 0x12 && *(int*)(self + 0x500) < 0xF) {
+				modelNo = 0x33;
+				modelVariant = 1;
 				useParticleTable = 0;
 			}
-		} else if (*(int*)(self + 0x500) < 0x12 && *(int*)(self + 0x500) < 0xF) {
+		} else {
 			modelNo = 0x33;
-			modelVariant = 1;
 			useParticleTable = 0;
 		}
-	} else if (!(*(int*)(self + 0x500) != 0x24 &&
-	             (*(int*)(self + 0x500) > 0x23 || *(int*)(self + 0x500) > 0x21 || *(int*)(self + 0x500) < 0x1F))) {
-		int itemEntryBase = Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48;
-		int itemEntry = *(unsigned short*)(itemEntryBase + 2);
+	} else if (*(int*)(self + 0x500) == 0x24 ||
+	           (*(int*)(self + 0x500) <= 0x21 && *(int*)(self + 0x500) >= 0x1F)) {
+		int itemEntryOffset = *(int*)(self + 0x504) * 0x48 + 2;
+		int itemEntry = *(unsigned short*)(Game.unkCFlatData0[2] + itemEntryOffset);
 
 		self[0x53] = 1;
 		modelNo = itemEntry & 0xFFF;
@@ -1299,7 +1301,7 @@ void CGItemObj::loadModel()
 
 	if (useParticleTable != 0) {
 		for (int i = 0; i < 3; i++) {
-			if (i != 0 || *(unsigned short*)(self + 0x550) != 1) {
+			if (i != 0 || m_createFlags != 1) {
 				int entryBase = Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48;
 				unsigned short particleNo = *(unsigned short*)(entryBase + i * 2 + 0x14);
 

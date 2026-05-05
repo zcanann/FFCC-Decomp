@@ -630,8 +630,6 @@ void CSystem::Quit()
  */
 void CSystem::Init()
 {
-    CFile::CHandle* fileHandle;
-
     m_initialized = 1;
     m_currentOrder = (COrder*)0;
     m_currentOrderIndex = 0;
@@ -680,12 +678,14 @@ void CSystem::Init()
     if (OSGetConsoleSimulatedMemSize() == 0x3000000)
     {
         m_mapStage = (CStage*)Memory.CreateStage(0x400000, const_cast<char*>(s_cSystem), 1);
-        fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
+        CFile::CHandle* fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)
         {
             unsigned int mapSize;
             unsigned int remainingSize;
             unsigned int count;
+            unsigned int remaining;
+            unsigned int mapSize;
             unsigned int offset;
 
             mapSize = File.GetLength(fileHandle);

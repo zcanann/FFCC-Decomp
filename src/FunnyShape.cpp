@@ -51,7 +51,7 @@ static inline u32 U32At(const u8* p, u32 offset)
 
 static inline s32 Div16Floor(s16 x)
 {
-    return (x >> 4) + ((x < 0) && ((x & 0xF) != 0));
+    return x / 16;
 }
 
 static inline void WriteVertex(float px, float py, float pz, u32 color, float tu, float tv)

@@ -29,6 +29,7 @@ struct RedWaveSettingState {
 enum RedDriverDmaLayoutSize {
     REDSOUND_DMA_MAIN_QUEUE_INDEX = 0,
     REDSOUND_DMA_STREAM_QUEUE_INDEX = 1,
+    REDSOUND_DMA_QUEUE_COUNT = 2,
     REDSOUND_DMA_QUEUE_WORD_COUNT = 0x380,
     REDSOUND_DMA_CONTROL_WORD_COUNT = REDSOUND_DMA_QUEUE_WORD_COUNT * 2,
     REDSOUND_DMA_QUEUE_ENTRY_COUNT = 0x80,
@@ -170,8 +171,8 @@ u8* volatile p_ZeroData;
 static RedExecCommand* volatile p_ExecCommand;
 static RedExecCommand* volatile p_ExecCommandNow;
 static RedExecCommand* volatile p_ExecCommandOld;
-static RedDmaRequest* volatile p_DmaControlNow[2];
-static RedDmaRequest* volatile p_DmaControlOld[2];
+static RedDmaRequest* volatile p_DmaControlNow[REDSOUND_DMA_QUEUE_COUNT];
+static RedDmaRequest* volatile p_DmaControlOld[REDSOUND_DMA_QUEUE_COUNT];
 RedSoundCONTROL* volatile p_SoundControlBuffer;
 RedSoundCONTROL* volatile p_SoundControl;
 volatile int m_KeyOnEntry;
@@ -217,7 +218,7 @@ static OSSemaphore m_DmaExecuteSemaphore;
 static ARQRequest m_DMARequest;
 OSThread m_MusicSkipThread;
 OSSemaphore m_MusicSkipSemaphore;
-RedSeBlockHEAD* volatile p_SeBlockData[4];
+RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
 CRedMemory c_RedMemory;
 static volatile int m_DMAExecute;
 static volatile int m_DMAInThread;

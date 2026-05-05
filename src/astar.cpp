@@ -174,7 +174,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 	do
 	{
-		unsigned int otherGroup = portal->m_groupA;
+		int otherGroup = portal->m_groupA;
 		bool exists = false;
 
 		if (otherGroup != 0 && portal->m_groupB != 0)
@@ -186,19 +186,19 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 		{
 			bool connected = false;
 
-			if (otherGroup == static_cast<unsigned int>(startGroup) || portal->m_groupB == startGroup)
+			if (otherGroup == startGroup || portal->m_groupB == startGroup)
 			{
 				connected = true;
 			}
 
 			if (connected)
 			{
-				if (otherGroup == static_cast<unsigned int>(startGroup))
+				if (otherGroup == startGroup)
 				{
 					otherGroup = portal->m_groupB;
 				}
 
-				if (forbiddenGroup != static_cast<int>(otherGroup))
+				if (forbiddenGroup != otherGroup)
 				{
 					CVector portalDirBase(base);
 					CVector portalDirPos(portal->m_position);
@@ -232,7 +232,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 					float dist = PSVECMag(reinterpret_cast<Vec*>(&distVec));
 
-					if (dot < LoadFloat(FLOAT_803320C4))
+					if (dot < LoadFloat(kPolyGroupBaseXZ))
 					{
 						if (behindBestDist < dist)
 						{
@@ -255,7 +255,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 	if (aheadBest != (CAPos*)0)
 	{
-		behindBest = aheadBest;
+		return aheadBest;
 	}
 
 	return behindBest;

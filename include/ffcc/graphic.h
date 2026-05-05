@@ -71,7 +71,7 @@ public:
 
     void CopySaveFrameBuffer();
 
-    void GetBackBufferRect(int&, int&, int&, int&, int);
+    _GXTexObj* GetBackBufferRect(int&, int&, int&, int&, int);
     void GetBackBufferRect2(void*, _GXTexObj*, int, int, int, int, int, _GXTexFilter, _GXTexFmt, int);
 
     void RenderTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GXColor);

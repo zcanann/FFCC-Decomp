@@ -447,7 +447,7 @@ void CMenuPcs::CompaCtrl()
 bool CMenuPcs::CompaOpen()
 {
     int finishedCount;
-    int count;
+    u16 count;
     int frame;
     int remaining;
     CompaOpenAnim* entry;
@@ -458,11 +458,11 @@ bool CMenuPcs::CompaOpen()
 
     finishedCount = 0;
     this->compaMenuState->frame = this->compaMenuState->frame + 1;
-    count = static_cast<unsigned short>(this->compaList->count);
+    count = this->compaList->count;
     entry = this->compaList->entries;
     frame = this->compaMenuState->frame;
     remaining = count;
-    if (0 < count) {
+    if (count != 0) {
         do {
             float step = FLOAT_80332FF8;
             if (entry->startFrame <= frame) {

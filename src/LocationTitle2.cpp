@@ -68,7 +68,7 @@ struct pppMngStLocationTitle2Raw {
     CGObject* m_charaObj;
 };
 
-static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
+static const char s_LocationTitle2_cpp_801DB588[] = "LocationTitle2.cpp";
 
 /*
  * --INFO--
@@ -238,7 +238,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         CGObject* owner;
         CCharaPcs::CHandle* handle;
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
+            unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp_801DB588,
             0x70);
         memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
         LocationTitle2Particle* particles = (LocationTitle2Particle*)work->m_particles;
@@ -294,10 +294,9 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                 int nextIndex = startIndex + 1;
                 int inserted = 0;
                 Vec* startPos = &particles[startIndex].m_pos;
-                Vec* nextPos = &particles[nextIndex].m_pos;
                 float stepScale = 1.0f / (float)(unkB->m_stepCount + 1);
                 Vec stepDir;
-                PSVECSubtract(nextPos, startPos, &stepDir);
+                PSVECSubtract(&particles[nextIndex].m_pos, startPos, &stepDir);
                 Vec* interpRead = interp;
                 Vec* interpWrite = interpRead;
 

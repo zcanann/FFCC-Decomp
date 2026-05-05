@@ -53,7 +53,7 @@ extern "C" {
 int rand(void);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
+void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 void* pppMemFree__FPv(unsigned long, CMemory::CStage*, char*, int);
 void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(CUtil*, Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
 void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
@@ -284,37 +284,38 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     u8* mesh;
     u32 i;
 
+    stepData = (CharaBreakStep*)step;
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    stepData = (CharaBreakStep*)step;
+    handle = pppMngStPtr->m_charaObj;
     work = (CharaBreakWork*)((u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2]);
     if (work->m_enabled == 0) {
         return;
     }
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
+    handle = GetCharaHandlePtr__FP8CGObjectl(handle, 0);
     model = (u8*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     work->m_model = model;
 
-    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf((float)stepData->m_dataValIndex,
-                                                 charaBreak,
+    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(charaBreak,
                                                  stepData->m_graphId,
-                                                 &work->m_value0,
-                                                 &work->m_value1,
-                                                 &work->m_value2,
-                                                 &stepData->m_graphInit,
-                                                 &stepData->m_graphStep);
+                                                 work->m_value0,
+                                                 work->m_value1,
+                                                 work->m_value2,
+                                                 stepData->m_dataValIndex,
+                                                 stepData->m_graphInit,
+                                                 stepData->m_graphStep);
 
-    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(stepData->m_payloadGraphInit,
-                                                 charaBreak,
+    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(charaBreak,
                                                  stepData->m_graphId,
-                                                 &work->m_value3,
-                                                 &work->m_value4,
-                                                 &work->m_value5,
-                                                 &stepData->m_payloadGraphStep,
-                                                 &stepData->m_payloadGraphStepStep);
+                                                 work->m_value3,
+                                                 work->m_value4,
+                                                 work->m_value5,
+                                                 stepData->m_payloadGraphInit,
+                                                 stepData->m_payloadGraphStep,
+                                                 stepData->m_payloadGraphStepStep);
 
     *(u32*)(model + 0xE4) = (u32)work;
     *(u32*)(model + 0xE8) = (u32)stepData;

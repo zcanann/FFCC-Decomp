@@ -53,6 +53,10 @@ extern float FLOAT_80331d28;
 extern float FLOAT_80331d2c;
 extern float FLOAT_80331d30;
 extern float FLOAT_80331d58;
+extern float FLOAT_80331d6c;
+extern float FLOAT_80331d70;
+extern float FLOAT_80331d74;
+extern float FLOAT_80331d78;
 extern float FLOAT_80331d84;
 extern float FLOAT_80331d90;
 extern float FLOAT_80331d94;
@@ -1751,65 +1755,40 @@ int CGMonObj::calcBranchFuncGigasLoad(int)
  */
 void CGMonObj::frameStatFuncWifeLamia()
 {
-	#if 0
-	// Function: frameStatFuncWifeLamia__8CGMonObjFv
-	// Entry: 80130ac8
-	// Size: 300 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void frameStatFuncWifeLamia__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  float fVar1;
-	  float y;
-	  int iVar2;
-	  undefined4 *puVar3;
-	  CVector CStack_18;
-	  
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    iVar2 = *(int *)&gMonObj->field_0x52c;
-	    if (iVar2 == 0) {
-	      if (*(int *)&gMonObj->field_0x530 == 0) {
-	        memset(&gMonObj->field_0x70c,0,0x34);
-	        y = FLOAT_80331d70;
-	        fVar1 = FLOAT_80331d6c;
-	        *(undefined4 *)&gMonObj->field_0x70c = 0x10022;
-	        puVar3 = (undefined4 *)__ct__7CVectorFfff(fVar1,y,FLOAT_80331d74,&CStack_18);
-	        fVar1 = FLOAT_80331d78;
-	        *(undefined4 *)&gMonObj->field_0x718 = *puVar3;
-	        *(undefined4 *)&gMonObj->field_0x71c = puVar3[1];
-	        *(undefined4 *)&gMonObj->field_0x720 = puVar3[2];
-	        *(float *)&gMonObj->field_0x724 = fVar1;
-	        *(float *)&gMonObj->field_0x728 = (gMonObj->gObject).m_bodyEllipsoidRadius;
-	      }
-	      moveFrame__8CGMonObjFv(gMonObj);
-	      if ((*(uint *)&gMonObj->field_0x710 & 1) != 0) {
-	        addSubStat__8CGPrgObjFv((CGPrgObj *)gMonObj);
-	      }
-	    }
-	    else if (iVar2 == 1) {
-	      if (*(int *)&gMonObj->field_0x530 == 0) {
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0x1a,0,0);
-	      }
-	      else {
-	        iVar2 = isLoopAnim__8CGPrgObjFv((CGPrgObj *)gMonObj);
-	        if (iVar2 != 0) {
-	          addSubStat__8CGPrgObjFv((CGPrgObj *)gMonObj);
-	        }
-	      }
-	    }
-	    else if ((iVar2 == 2) && (*(int *)&gMonObj->field_0x530 == 0)) {
-	      reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0x1b,1,0);
-	    }
-	  }
-	  return;
-	}
-	
-	#endif
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId >= 100) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	u8* mon = reinterpret_cast<u8*>(this);
+
+	if (prgObj->m_lastStateId != 100) {
+		return;
+	}
+
+	int subState = prgObj->m_subState;
+
+	if (subState == 0) {
+		if (prgObj->m_subFrame == 0) {
+			memset(mon + 0x70C, 0, 0x34);
+			*reinterpret_cast<u32*>(mon + 0x70C) = 0x10022;
+
+			CVector target(FLOAT_80331d6c, FLOAT_80331d70, FLOAT_80331d74);
+			*reinterpret_cast<f32*>(mon + 0x718) = target.x;
+			*reinterpret_cast<f32*>(mon + 0x71C) = target.y;
+			*reinterpret_cast<f32*>(mon + 0x720) = target.z;
+			*reinterpret_cast<f32*>(mon + 0x724) = FLOAT_80331d78;
+			*reinterpret_cast<f32*>(mon + 0x728) = reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius;
+		}
+
+		moveFrame__8CGMonObjFv(this);
+		if ((*reinterpret_cast<u32*>(mon + 0x710) & 1) != 0) {
+			prgObj->addSubStat();
+		}
+	} else if (subState == 1) {
+		if (prgObj->m_subFrame == 0) {
+			prgObj->reqAnim(0x1A, 0, 0);
+		} else if (prgObj->isLoopAnim() != 0) {
+			prgObj->addSubStat();
+		}
+	} else if ((subState == 2) && (prgObj->m_subFrame == 0)) {
+		prgObj->reqAnim(0x1B, 1, 0);
 	}
 }
 

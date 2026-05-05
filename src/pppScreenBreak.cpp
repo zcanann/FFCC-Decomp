@@ -438,7 +438,6 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     const float dVar22 = FLOAT_80331cc4;
     const float dVar24 = FLOAT_80331cc0;
     const float dVar25 = FLOAT_80331cd8;
-    S16Vec meshCenter;
     S16Vec globalMax;
     u32 uStack_b4;
     s16 sVar8;
@@ -461,9 +460,10 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 
         iVar5 = *(s32*)(iVar14 + 0x14);
         iVar6 = 0;
-        s16 meshMaxX = -0x7FFF;
-        s16 meshMaxY = -0x7FFF;
-        s16 meshMaxZ = -0x7FFF;
+        S16Vec meshMax;
+        meshMax.x = -0x7FFF;
+        meshMax.y = -0x7FFF;
+        meshMax.z = -0x7FFF;
         sVar2 = 0x7FFF;
         sVar3 = 0x7FFF;
         s16 minZ = 0x7FFF;
@@ -508,16 +508,16 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
                 sVar10 = sVar4;
             }
 
-            if (meshMaxX < sVar1) {
-                meshMaxX = sVar1;
+            if (meshMax.x < sVar1) {
+                meshMax.x = sVar1;
             }
             sVar2 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 2);
-            if (meshMaxY < sVar2) {
-                meshMaxY = sVar2;
+            if (meshMax.y < sVar2) {
+                meshMax.y = sVar2;
             }
             sVar2 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 4);
-            if (meshMaxZ < sVar2) {
-                meshMaxZ = sVar2;
+            if (meshMax.z < sVar2) {
+                meshMax.z = sVar2;
             }
 
             iVar6 += 6;
@@ -529,10 +529,10 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
             sVar4 = sVar10;
         }
 
-        meshCenter.x = meshMaxX + sVar2;
-        meshCenter.y = meshMaxY + sVar3;
-        meshCenter.z = meshMaxZ + minZ;
-        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, meshCenter, *(u32*)(modelData + 0x34));
+        meshMax.x += sVar2;
+        meshMax.y += sVar3;
+        meshMax.z += minZ;
+        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, meshMax, *(u32*)(modelData + 0x34));
         PSVECScale(inVec + 3, inVec + 3, FLOAT_80331ccc);
 
         dVar17 = inVec[3].x;

@@ -241,11 +241,11 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
             0x70);
         memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
-        LocationTitle2Particle* particles = (LocationTitle2Particle*)work->m_particles;
         CChara::CModel* model;
 
-        model = 0;
         handle = 0;
+        LocationTitle2Particle* particles = (LocationTitle2Particle*)work->m_particles;
+        model = 0;
         owner = (CGObject*)pppMngStPtr->m_lookTarget;
         if (owner->m_charaModelHandle != 0) {
             handle = owner->m_charaModelHandle;
@@ -320,7 +320,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     interpWrite++;
                 }
 
-                pppCopyVector(particles[nextIndex + inserted].m_pos, particles[nextIndex].m_pos);
+                pppCopyVector(particles[nextIndex + inserted].m_pos, startPos[3]);
 
                 for (int i = 0; i < inserted; i++) {
                     LocationTitle2Particle* dst = &particles[startIndex + (i + 1)];

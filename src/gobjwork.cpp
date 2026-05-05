@@ -957,8 +957,8 @@ int CCaravanWork::FindItem(int itemId)
  */
 void CCaravanWork::DeleteItemIdx(int itemSlot, int updateJoybus)
 {
-	if ((short)m_inventoryItems[itemSlot] != -1) {
-		m_inventoryItems[itemSlot] = 0xFFFF;
+	if (m_inventoryItems[itemSlot] != -1) {
+		m_inventoryItems[itemSlot] = -1;
 		m_inventoryItemCount = m_inventoryItemCount - 1;
 		if (updateJoybus != 0) {
 			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (unsigned char)itemSlot);

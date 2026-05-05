@@ -358,7 +358,7 @@ unsigned int CMenuPcs::FavoCtrl()
 {
 	bool activeInput = false;
 	unsigned int rawPress;
-	unsigned short press;
+	short press;
 	int doReset;
 
 	if (Pad._452_4_ == 0) {
@@ -378,9 +378,9 @@ active:
 		port &= ~mask;
 		rawPress = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + port * 0x54 + 8);
 	}
-	press = rawPress;
+	press = rawPress & 0xffff;
 
-	if ((rawPress & 0xffff) == 0) {
+	if (press == 0) {
 		doReset = 0;
 	} else if ((press & 0x20) != 0) {
 		singMenuState->cursorMove = 1;

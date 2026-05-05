@@ -531,7 +531,7 @@ config.libs = [
             Object(NonMatching, "materialman.cpp"),
             Object(NonMatching, "math.cpp"),
             Object(NonMatching, "ME_AppRequest.cpp"),
-            Object(NonMatching, "ME_USB_process.cpp", cflags=[*cflags_game, "-sdata 0", "-sdata2 0"]),
+            Object(NonMatching, "ME_USB_process.cpp", cflags=[*cflags_game, "-sdata 0"]),
             Object(NonMatching, "memory.cpp"),
             Object(NonMatching, "memorycard.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse"]),
             Object(Matching, "menu.cpp"),

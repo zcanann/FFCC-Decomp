@@ -320,12 +320,12 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
         while (self[0x649C] != 0)
         {
-            MiniGameThreadSleepTicks((OS_BUS_CLOCK / 4000) * 100);
+            MiniGameThreadSleepTicks((OS_TIMER_CLOCK / 1000) * 100);
         }
 
         while (OSIsThreadTerminated(reinterpret_cast<OSThread*>(self + 8)) == 0)
         {
-            MiniGameThreadSleepTicks((OS_BUS_CLOCK / 4000) * 100);
+            MiniGameThreadSleepTicks((OS_TIMER_CLOCK / 1000) * 100);
         }
 
         if (*reinterpret_cast<void**>(self + 0x1354) != 0)

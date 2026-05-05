@@ -786,7 +786,7 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 		track->m_portamentTime = 0;
 		track->m_loopDepth = 0;
 		track->m_keyTranspose = 0;
-		track->m_pitchBendRange = 2;
+		track->m_pitchBendRange = REDSOUND_SE_DEFAULT_PITCH_BEND_RANGE;
 		track->m_pitchBend = 0;
 		track->m_pitchBendRaw = 0;
 		track->m_fineTune = 0;

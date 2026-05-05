@@ -220,11 +220,12 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
                 Printf__7CSystemFPce(&System, s_m_node_pctd_m_meshtype_pctd_801D7268, m_nodeCount);
             }
 
+            unsigned short nodeCount = m_nodeCount;
             rootNode = __nwa__FUlPQ27CMemory6CStagePci(
-                m_nodeCount * 0x4C + 0x10, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapocttree_cpp_801D72EC),
+                nodeCount * 0x4C + 0x10, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapocttree_cpp_801D72EC),
                 0x59);
             m_nodePool = reinterpret_cast<COctNode*>(
-                __construct_new_array(rootNode, reinterpret_cast<void*>(__ct__8COctNodeFv), 0, 0x4C, m_nodeCount));
+                __construct_new_array(rootNode, reinterpret_cast<void*>(__ct__8COctNodeFv), 0, 0x4C, nodeCount));
             break;
         }
 

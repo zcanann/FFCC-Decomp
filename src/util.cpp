@@ -125,45 +125,43 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
         }
 
         if (vertexFormat == 2) {
-            if (count != 0) {
-                int blocks = vertexCount >> 3;
-
-                if (blocks != 0) {
-                    do {
-                        data += 0x50;
-                        blocks--;
-                    } while (blocks != 0);
-
-                    count &= 7;
-                    if ((vertexCount & 7) == 0) {
-                        continue;
-                    }
-                }
-
-                do {
-                    data += 10;
-                    count--;
-                } while (count != 0);
+            if (count == 0) {
+                continue;
             }
+
+            int blocks = count >> 3;
+
+            if (blocks != 0) {
+                do {
+                    data += 0x50;
+                } while (--blocks != 0);
+
+                count &= 7;
+                if (count == 0) {
+                    continue;
+                }
+            }
+
+            do {
+                data += 10;
+            } while (--count != 0);
         } else if (count != 0) {
-            int blocks = vertexCount >> 3;
+            int blocks = count >> 3;
 
             if (blocks != 0) {
                 do {
                     data += 0x40;
-                    blocks--;
-                } while (blocks != 0);
+                } while (--blocks != 0);
 
                 count &= 7;
-                if ((vertexCount & 7) == 0) {
+                if (count == 0) {
                     continue;
                 }
             }
 
             do {
                 data += 8;
-                count--;
-            } while (count != 0);
+            } while (--count != 0);
         }
     }
 
@@ -1083,7 +1081,7 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
  */
 void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
-    u32 rgba = *reinterpret_cast<u32*>(&color);
+    u32* colorPtr = reinterpret_cast<u32*>(&color);
     float u0;
     float v0;
     float u1;
@@ -1102,31 +1100,37 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
     }
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    f32 x1 = pos1.x;
+    f32 y1 = pos1.y;
+    f32 z1 = pos1.z;
+    f32 x2 = pos2.x;
+    f32 y2 = pos2.y;
+    u32 rgba = *colorPtr;
 
-    GXWGFifo.f32 = pos1.x;
-    GXWGFifo.f32 = pos1.y;
-    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.f32 = x1;
+    GXWGFifo.f32 = y1;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u0;
     GXWGFifo.f32 = v0;
 
-    GXWGFifo.f32 = pos2.x;
-    GXWGFifo.f32 = pos1.y;
-    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y1;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u1;
     GXWGFifo.f32 = v0;
 
-    GXWGFifo.f32 = pos2.x;
-    GXWGFifo.f32 = pos2.y;
-    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u1;
     GXWGFifo.f32 = v1;
 
-    GXWGFifo.f32 = pos1.x;
-    GXWGFifo.f32 = pos2.y;
-    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.f32 = x1;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u0;
     GXWGFifo.f32 = v1;

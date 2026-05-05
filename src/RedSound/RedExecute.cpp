@@ -216,6 +216,12 @@ enum RedExecuteVolumeModConst {
     REDSOUND_VOLUME_MOD_WAVE_SHIFT = 4,
 };
 
+enum RedExecuteAdsrStateIndex {
+    REDSOUND_ADSR_STATE_STAGE = 0,
+    REDSOUND_ADSR_STATE_STEP_FRAMES = 1,
+    REDSOUND_ADSR_STATE_STEP_ADD = 2,
+};
+
 /*
  * --INFO--
  * PAL Address: 0x801c2fc4
@@ -1395,11 +1401,11 @@ static void _AdsrDataCompute(RedVoiceDATA* voice)
         *stage = *stage + 1;
     }
 
-    voice->m_adsrStepFrames = stepCount;
+    stage[REDSOUND_ADSR_STATE_STEP_FRAMES] = stepCount;
     if (stepCount != 0) {
         voice->m_adsrCurrentLevel = prevValue;
         level |= REDSOUND_FIXED_HALF;
-        voice->m_adsrStepAdd = (level - prevValue) / stepCount;
+        stage[REDSOUND_ADSR_STATE_STEP_ADD] = (level - prevValue) / stepCount;
     } else {
         voice->m_adsrCurrentLevel = level;
     }

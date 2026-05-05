@@ -38,21 +38,16 @@ struct pppCrystalUnkB {
     u8 m_payload[6];
 };
 
-struct pppCrystalUnkC {
-    u8 _pad0[0xC];
-    s32* m_serializedDataOffsets;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void ImageBufferSetPixel_IA8(struct HSD_ImageBuffer*, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long);
 void MakeRefractionMap(struct HSD_ImageBuffer*);
-void pppConstructCrystal(struct pppCrystal*, struct pppCrystalUnkC*);
-void pppDestructCrystal(struct pppCrystal*, struct pppCrystalUnkC*);
-void pppFrameCrystal(struct pppCrystal*, struct pppCrystalUnkB*, struct pppCrystalUnkC*);
-void pppRenderCrystal(struct pppCrystal*, struct pppCrystalUnkB*, struct pppCrystalUnkC*);
+void pppConstructCrystal(struct pppCrystal*, struct _pppCtrlTable*);
+void pppDestructCrystal(struct pppCrystal*, struct _pppCtrlTable*);
+void pppFrameCrystal(struct pppCrystal*, struct pppCrystalUnkB*, struct _pppCtrlTable*);
+void pppRenderCrystal(struct pppCrystal*, struct pppCrystalUnkB*, struct _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

@@ -31,20 +31,20 @@ extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int
 extern "C" void SetSingWinInfo__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 
 
-extern float FLOAT_80332f60;
-extern float FLOAT_80332f64;
-extern float FLOAT_80332f68;
-extern float FLOAT_80332f6c;
-extern float FLOAT_80332f70;
-extern float FLOAT_80332f74;
-extern float FLOAT_80332f78;
-extern float FLOAT_80332f7c;
-extern float FLOAT_80332f80;
-extern float FLOAT_80332f84;
-extern double DOUBLE_80332f88;
-extern double DOUBLE_80332F90;
-extern double DOUBLE_80332F98;
-extern double DOUBLE_80332FA0;
+static const float FLOAT_80332f60 = 255.0f;
+static const float FLOAT_80332f64 = 0.0f;
+static const float FLOAT_80332f68 = 32.0f;
+static const float FLOAT_80332f6c = 24.0f;
+static const float FLOAT_80332f70 = 1.0f;
+static const float FLOAT_80332f74 = 18.0f;
+static const float FLOAT_80332f78 = 16.0f;
+static const float FLOAT_80332f7c = 0.9f;
+static const float FLOAT_80332f80 = 19.8f;
+static const float FLOAT_80332f84 = 4.0f;
+static const double DOUBLE_80332f88 = 4503601774854144.0;
+static const double DOUBLE_80332F90 = 1.0;
+static const double DOUBLE_80332F98 = 216.0;
+static const double DOUBLE_80332FA0 = 0.5;
 
 extern CMenuPcs MenuPcs;
 
@@ -637,18 +637,18 @@ bool CMenuPcs::MoneyOpen()
 			iVar15 = iVar15 + -1;
 		} while (iVar15 != 0);
 
-		iVar8 = (int)this->moneyPanel;
-		*(int *)(iVar8 + 0x24) = 0x3b;
-		*(short *)(iVar8 + 10) = 0x68;
-		*(short *)(iVar8 + 0xc) = 0xf8;
-		*(short *)(iVar8 + 0xe) = 0x88;
-		*(short *)(iVar8 + 8) =
-			static_cast<short>(static_cast<int>(DOUBLE_80332F98 - (double)*(short *)(iVar8 + 0xc) * DOUBLE_80332FA0));
-		*(float *)(iVar8 + 0x10) = FLOAT_80332f64;
-		*(float *)(iVar8 + 0x14) = FLOAT_80332f64;
-		*(float *)(iVar8 + 0x1c) = FLOAT_80332f70;
-		*(int *)(iVar8 + 0x2c) = 0;
-		*(int *)(iVar8 + 0x30) = 10;
+		MoneyMenuAnim* firstAnim = &this->moneyPanel->anims[0];
+		firstAnim->tex = 0x3b;
+		firstAnim->y = 0x68;
+		firstAnim->w = 0xf8;
+		firstAnim->h = 0x88;
+		firstAnim->x =
+			static_cast<short>(static_cast<int>(DOUBLE_80332F98 - (double)firstAnim->w * DOUBLE_80332FA0));
+		firstAnim->alpha = FLOAT_80332f64;
+		firstAnim->scale = FLOAT_80332f64;
+		firstAnim->uvScale = FLOAT_80332f70;
+		firstAnim->flags = 0;
+		firstAnim->duration = 10;
 		this->moneyPanel->count = 1;
 
 		unsigned int scriptFood = Game.m_scriptFoodBase[0];

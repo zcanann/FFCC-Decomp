@@ -467,7 +467,7 @@ void CMesMenu::onCalc()
             }
         }
     } else if (state < 4) {
-        if (state == 2) {
+        if (state == 3) {
             float step = FLOAT_80330914 - (float)*(int*)((char*)this + 0x10) / (float)*(int*)((char*)this + 0x14);
             *(float*)((char*)this + 0x3D84) = FLOAT_803308ec * (FLOAT_80330914 + (float)sin(FLOAT_80330910 * step + FLOAT_80330980));
         }
@@ -757,7 +757,9 @@ void CMesMenu::onDraw()
 
             unsigned int foodTimer = *(unsigned int*)((char*)this + 0x3DF0);
             unsigned int foodAmount = (unsigned int)*(unsigned short*)(scriptFood + 0x14);
-            unsigned int foodIcon = (foodAmount % 100) + (foodAmount / 100) * 4;
+            int foodTier = (int)foodAmount - 100;
+            foodTier = foodTier / 100 + (foodTier >> 31);
+            unsigned int foodIcon = (foodAmount % 100) + (foodTier - (foodTier >> 31)) * 4;
             float shakeX = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - ((foodTimer + 1) & 3)) & 3]) : 0.0f;
             float shakeY = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - (foodTimer & 3)) & 3]) : 0.0f;
             SetColor__8CMenuPcsFR6CColor(

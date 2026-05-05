@@ -82,7 +82,8 @@ found_fallback:
 	if (GetRenderFlagBits(renderFlags).fixedWidth != 0) {
 		drawWidth = static_cast<int>(m_glyphWidth);
 	} else {
-		signed char sign = static_cast<signed char>(flags) >> 7;
+		signed char sign = static_cast<signed char>(flags);
+		sign >>= 7;
 		unsigned int extra =
 		    static_cast<unsigned int>((-static_cast<int>(sign) | static_cast<int>(sign))) >> 30 & 2;
 		drawWidth = static_cast<int>(*(reinterpret_cast<unsigned char*>(glyph) + extra + 4));
@@ -112,7 +113,7 @@ find_fallback:
 	if (glyph != 0) {
 		goto found_fallback;
 	}
-	return 0.0f;
+	return FLOAT_803306B8;
 }
 
 /*

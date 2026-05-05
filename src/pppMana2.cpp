@@ -148,8 +148,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     }
 
     int waterCmp = strcmp((char*)shape, DAT_803318ec);
-    if ((waterCmp == 0 && *(char*)((char*)step + 0x1C) == 1) ||
-        (strcmp((char*)shape, DAT_803318f4) == 0 && *(char*)((char*)step + 0x1C) == 2)) {
+    if ((waterCmp == 0 && type == 1) || (strcmp((char*)shape, DAT_803318f4) == 0 && type == 2)) {
         Mtx cameraMtx;
         Mtx rotMtx;
         Mtx posMtx;

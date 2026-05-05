@@ -40,6 +40,7 @@ extern const float FLOAT_80331180;
 extern const float FLOAT_80331184;
 extern const float FLOAT_80331190;
 extern const float FLOAT_803311B0;
+extern const float FLOAT_803311B4;
 extern const float FLOAT_803311B8;
 extern const double DOUBLE_803311C0;
 extern const float FLOAT_803311C8;
@@ -309,7 +310,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
         const float z = firstRingCos;
 
         GXPosition3f32(x, y, z);
-        GXNormal3f32(FLOAT_80331190 * x * z, FLOAT_80331190 * y * z, firstNormalZ);
+        GXNormal3f32(FLOAT_803311B4 * x * z, FLOAT_803311B4 * y * z, firstNormalZ);
 
         i++;
         lon = (FLOAT_803311B8 * (float)i) / (float)rings;
@@ -337,12 +338,12 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
             const float lx = lowerSin * (float)cos(lon);
             const float ly = lowerSin * (float)sin(lon);
             GXPosition3f32(lx, ly, lowerCos);
-            GXNormal3f32(FLOAT_80331190 * lx * lowerCos, FLOAT_80331190 * ly * lowerCos, lowerNormalZ);
+            GXNormal3f32(FLOAT_803311B4 * lx * lowerCos, FLOAT_803311B4 * ly * lowerCos, lowerNormalZ);
 
             const float ux = upperSin * (float)cos(lon);
             const float uy = upperSin * (float)sin(lon);
             GXPosition3f32(ux, uy, upperCos);
-            GXNormal3f32(FLOAT_80331190 * ux * upperCos, FLOAT_80331190 * uy * upperCos, upperNormalZ);
+            GXNormal3f32(FLOAT_803311B4 * ux * upperCos, FLOAT_803311B4 * uy * upperCos, upperNormalZ);
 
             i++;
             lon = (FLOAT_803311C8 * (float)i) / (float)rings;

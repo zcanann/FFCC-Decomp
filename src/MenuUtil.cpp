@@ -1093,21 +1093,20 @@ void CMenuPcs::BindMcObj(int slotNo)
 			}
 
 			unsigned int flags = *reinterpret_cast<unsigned int*>(entry + 0x28);
-			int markType = iconType;
 
 			if ((flags & 1) != 0) {
-				markType = 0;
+				iconType = 0;
 			} else if ((flags & 2) != 0) {
-				markType = 1;
+				iconType = 1;
 			} else if ((flags & 4) != 0) {
-				markType = 2;
+				iconType = 2;
 			} else if ((flags & 8) != 0) {
-				markType = 3;
+				iconType = 3;
 			} else if ((flags & 0x10) != 0) {
-				markType = 4;
+				iconType = 4;
 			}
 
-			BindEffect__8CMenuPcsFiii(this, slot + 0x11, markType + 0x1A, -1);
+			BindEffect__8CMenuPcsFiii(this, slot + 0x11, iconType + 0x1A, -1);
 		}
 
 		slot++;

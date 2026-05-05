@@ -2200,7 +2200,7 @@ void CAmemCacheSet::CalcPrio()
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
 
-        if ((entry.m_inUse != 0) && (entry.m_refCount == 0) &&
+        if ((entry.m_inUse != 0) && (*reinterpret_cast<unsigned short*>(&entry.m_refCount) == 0) &&
             (entry.m_cacheData != 0) && (static_cast<unsigned int>(entry.m_priority) != 0)) {
             entry.m_priority--;
         }

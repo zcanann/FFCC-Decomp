@@ -354,9 +354,9 @@ void birth(
     pos.z = pObject->m_localMatrix.value[2][3];
 
     if (mode < 8) {
-        float baseDirectionX = *(float*)(payload + 0x48);
-        float baseDirectionY = *(float*)(payload + 0x4C);
-        float baseDirectionZ = *(float*)(payload + 0x50);
+        float baseDirectionX = *(float*)(payload + 0xE8);
+        float baseDirectionY = *(float*)(payload + 0xEC);
+        float baseDirectionZ = *(float*)(payload + 0xF0);
         float randX = (FLOAT_803304a4 * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
         float randY = (FLOAT_803304a4 * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
         float randZ = (FLOAT_803304a4 * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
@@ -388,9 +388,9 @@ void birth(
         forward.y = baseDirectionY;
         forward.z = baseDirectionZ;
         pppApplyMatrix(forward, rotatedMatrix, forward);
-        forward.x *= *(float*)(payload + 0x54);
-        forward.y *= *(float*)(payload + 0x58);
-        forward.z *= *(float*)(payload + 0x5C);
+        forward.x *= *(float*)(payload + 0x120);
+        forward.y *= *(float*)(payload + 0x124);
+        forward.z *= *(float*)(payload + 0x128);
         particleData->m_matrix[0][1] = forward.x;
         particleData->m_matrix[1][1] = forward.y;
         particleData->m_matrix[2][1] = forward.z;
@@ -421,9 +421,9 @@ void birth(
             spawnPoint.z += delta.z * Math.RandF();
         }
 
-        spawnPoint.x *= *(float*)(payload + 0x54);
-        spawnPoint.y *= *(float*)(payload + 0x58);
-        spawnPoint.z *= *(float*)(payload + 0x5C);
+        spawnPoint.x *= *(float*)(payload + 0x120);
+        spawnPoint.y *= *(float*)(payload + 0x124);
+        spawnPoint.z *= *(float*)(payload + 0x128);
         pos = spawnPoint;
 
         particleData->m_matrix[0][1] = work->m_accelerationAxis.x;
@@ -442,9 +442,9 @@ void birth(
         float speedZ = calc_spawn_speed(speedMag, speedMode);
 
         if (mode < 6) {
-            particleData->m_matrix[0][3] = speedX * *(float*)(payload + 0x54);
-            particleData->m_matrix[1][3] = speedY * *(float*)(payload + 0x58);
-            particleData->m_matrix[2][3] = speedZ * *(float*)(payload + 0x5C);
+            particleData->m_matrix[0][3] = speedX * *(float*)(payload + 0x120);
+            particleData->m_matrix[1][3] = speedY * *(float*)(payload + 0x124);
+            particleData->m_matrix[2][3] = speedZ * *(float*)(payload + 0x128);
         } else {
             particleData->m_velocity.x = speedX;
             particleData->m_velocity.y = speedY;

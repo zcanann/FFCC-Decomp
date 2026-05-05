@@ -146,7 +146,6 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int stage, int op, int bias,
                                                                                            int scale, int clamp,
                                                                                            int reg);
-void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphicPcs*, int, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, short);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
@@ -541,7 +540,8 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec->y = dVar20;
         inVec->z = dVar21;
         PSVECNormalize(inVec, inVec);
-        PSVECCrossProduct(inVec, &DAT_801dd4bc, inVec + 2);
+        Vec upVec = DAT_801dd4bc;
+        PSVECCrossProduct(inVec, &upVec, inVec + 2);
 
         dVar17 = Math.RandF(*(float*)((u8*)step + 0x3C));
         PSVECScale(inVec, inVec, *(float*)((u8*)step + 0x38) + dVar17);
@@ -582,8 +582,6 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
 
     if (work[0x24] != 0) {
         CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)modelView->m_data->m_materialSet + 8))[displayList->m_material];
-        GXColor colorStorage1;
-        GXColor colorStorage0;
 
         MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 1, (_GXTevScale)0);
         GXSetArray((GXAttr)0xB, work + 0x28, 4);
@@ -591,7 +589,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
         if (*(u16*)((u8*)material + 0x18) == 1) {
             GXSetNumChans(1);
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-            GXSetTevKColor((GXTevKColorID)0, *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(&colorStorage0, 0xA0, 0xA0, 0xA0, 0xA0)));
+            GXSetTevKColor((GXTevKColorID)0, CColor(0xA0, 0xA0, 0xA0, 0xA0).color);
             GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xC);
             GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1C);
             _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 10, 0xE, 10, 0xF);
@@ -600,7 +598,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
             _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
 
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 0, 0, 4);
-            GXSetTevKColor((GXTevKColorID)1, *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(&colorStorage1, 0x60, 0x60, 0x60, work[0x2B])));
+            GXSetTevKColor((GXTevKColorID)1, CColor(0x60, 0x60, 0x60, work[0x2B]).color);
             GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xD);
             GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1D);
             _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(1, 0xF, 0xE, 0, 0xF);

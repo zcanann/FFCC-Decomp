@@ -155,7 +155,7 @@ static volatile u8 m_RandomIndex;
 static RedReverbDATA* volatile p_ReverbData;
 static RedReverbSize* p_ReverbSize;
 volatile u32 m_ChangeStatus;
-u32 m_TerminateNote[1] = { 0 };
+u32 m_TerminateNote[REDSOUND_TERMINATE_NOTE_WORD_COUNT] = { 0 };
 static RedKeyOnDATA* volatile p_SkipKeyOn;
 static const float s_ReverbTimeScale = 1000.0f;
 static const float s_ReverbEffectScale = 100.0f;

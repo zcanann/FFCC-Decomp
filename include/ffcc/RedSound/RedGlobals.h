@@ -46,6 +46,7 @@ enum RedSoundLayoutSize {
 	REDSOUND_SE_TRACK_ARENA_SIZE = REDSOUND_TRACK_SIZE * REDSOUND_SE_TRACK_COUNT,
 	REDSOUND_SE_VOICE_BASE_INDEX = REDSOUND_SE_TRACK_COUNT,
 	REDSOUND_VOICE_COUNT = 0x40,
+	REDSOUND_EDITOR_VOICE_COUNT = 2,
 	REDSOUND_VOICE_SIZE = sizeof(RedVoiceDATA),
 	REDSOUND_VOICE_BUFFER_SIZE = REDSOUND_VOICE_SIZE * REDSOUND_VOICE_COUNT,
 	REDSOUND_KEY_ON_BUFFER_SIZE = sizeof(RedKeyOnDATA),
@@ -147,7 +148,7 @@ extern volatile int m_MasterSEVolume;
 extern RedStreamDATA* volatile p_Stream;
 extern volatile int m_SeSkipStep;
 extern RedVoiceDATA* volatile p_VoiceData;
-extern int p_EditorVoice[2];
+extern int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
 extern RedTrackDATA* p_EditorTrack;
 extern u8* volatile p_MusicSkipThreadStack;
 extern volatile int m_MusicSkipComplete;

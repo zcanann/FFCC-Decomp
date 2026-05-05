@@ -575,7 +575,9 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
 {
     u8* work = (u8*)param_2;
     ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
-    ScreenBreakMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
+    ScreenBreakMeshRef* mesh = modelView->m_meshes;
+    mesh += meshIndex;
+    ScreenBreakMeshData* meshData = mesh->m_data;
     ScreenBreakDisplayList* displayList = meshData->m_displayLists;
 
     displayList += drawListIndex;

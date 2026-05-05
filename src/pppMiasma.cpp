@@ -46,7 +46,7 @@ union PackedMiasmaColor {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameMiasma(pppMiasma* pppMiasma, pppMiasmaFrameStep* param_2, pppMiasmaCtrl* param_3)
+void pppFrameMiasma(pppMiasma* pppMiasma, pppMiasmaFrameStep* param_2, _pppCtrlTable* param_3)
 {
     s16* work;
 
@@ -91,7 +91,7 @@ void pppFrameMiasma(pppMiasma* pppMiasma, pppMiasmaFrameStep* param_2, pppMiasma
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructMiasma(pppMiasma*, pppMiasmaCtrl*)
+void pppDestructMiasma(pppMiasma*, _pppCtrlTable*)
 {
     return;
 }
@@ -105,7 +105,7 @@ void pppDestructMiasma(pppMiasma*, pppMiasmaCtrl*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2Miasma(pppMiasma* pppMiasma, pppMiasmaCtrl* param_2)
+void pppConstruct2Miasma(pppMiasma* pppMiasma, _pppCtrlTable* param_2)
 {
     u8* work;
 
@@ -124,7 +124,7 @@ void pppConstruct2Miasma(pppMiasma* pppMiasma, pppMiasmaCtrl* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructMiasma(pppMiasma* pppMiasma, pppMiasmaCtrl* param_2)
+void pppConstructMiasma(pppMiasma* pppMiasma, _pppCtrlTable* param_2)
 {
     u8* work;
 
@@ -143,7 +143,7 @@ void pppConstructMiasma(pppMiasma* pppMiasma, pppMiasmaCtrl* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMiasmaCtrl* param_3)
+void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtrlTable* param_3)
 {
     pppModelSt* model;
     s16* work;

@@ -29,7 +29,7 @@ struct pppYmMoveCircleWork {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleStep* stepData, pppYmMoveCircleOffsets* offsetData)
+extern "C" void pppFrameYmMoveCircle(_pppPObject* basePtr, pppYmMoveCircleStep* stepData, _pppCtrlTable* offsetData)
 {
     pppYmMoveCircleWork* work;
     int* serializedDataOffsets;
@@ -44,7 +44,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     }
 
     serializedDataOffsets = offsetData->m_serializedDataOffsets;
-    work = (pppYmMoveCircleWork*)((u8*)basePtr + serializedDataOffsets[0] + 0x80);
+    work = (pppYmMoveCircleWork*)(basePtr->m_workArea + serializedDataOffsets[0]);
     pppMngSt = pppMngStPtr;
 
     work->m_radiusStep += work->m_radiusStepStep;
@@ -102,7 +102,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleOffsets* offsetData)
+extern "C" void pppConstructYmMoveCircle(_pppPObject* basePtr, _pppCtrlTable* offsetData)
 {
     Vec tempUp;
     Vec temp1;
@@ -112,7 +112,7 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
 
     pppMngSt = pppMngStPtr;
     offset = offsetData->m_serializedDataOffsets[0];
-    work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
+    work = (pppYmMoveCircleWork*)(basePtr->m_workArea + offset);
 
     tempUp.x = 1.0f;
     tempUp.y = 0.0f;

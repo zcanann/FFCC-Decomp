@@ -40,20 +40,15 @@ typedef struct {
     u8 m_payload[0x1f];
 } pppMiasmaRenderStep;
 
-typedef struct {
-    u8 m_pad_0x0[0xc];
-    s32* m_serializedDataOffsets;
-} pppMiasmaCtrl;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppRenderMiasma(pppMiasma*, pppMiasmaRenderStep*, pppMiasmaCtrl*);
-void pppConstructMiasma(pppMiasma*, pppMiasmaCtrl*);
-void pppConstruct2Miasma(pppMiasma*, pppMiasmaCtrl*);
-void pppDestructMiasma(pppMiasma*, pppMiasmaCtrl*);
-void pppFrameMiasma(pppMiasma*, pppMiasmaFrameStep*, pppMiasmaCtrl*);
+void pppRenderMiasma(pppMiasma*, pppMiasmaRenderStep*, _pppCtrlTable*);
+void pppConstructMiasma(pppMiasma*, _pppCtrlTable*);
+void pppConstruct2Miasma(pppMiasma*, _pppCtrlTable*);
+void pppDestructMiasma(pppMiasma*, _pppCtrlTable*);
+void pppFrameMiasma(pppMiasma*, pppMiasmaFrameStep*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

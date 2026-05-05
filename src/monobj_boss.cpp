@@ -1671,8 +1671,13 @@ void CGMonObj::frameStatFuncTetsukyojin()
 int CGMonObj::calcBranchFuncTetsukyojin(int)
 {
 	const int branch = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0);
-	int positive = 1 <= branch;
-	return positive + (branch >> 31);
+	int positive;
+	if (branch >= 1) {
+		positive = 1;
+	} else {
+		positive = 0;
+	}
+	return positive;
 }
 
 /*

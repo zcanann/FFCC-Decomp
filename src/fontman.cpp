@@ -38,7 +38,7 @@ struct CFontRenderFlagBits
 	signed char pad : 3;
 };
 
-static CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
+inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
 {
 	return reinterpret_cast<CFontRenderFlagBits&>(flags);
 }
@@ -91,7 +91,7 @@ found_fallback:
 
 	double width = static_cast<double>(localScaleX * (localMargin + static_cast<float>(drawWidth)));
 	if (GetRenderFlagBits(renderFlags).snapPosition != 0) {
-		width = static_cast<double>(static_cast<float>(floor(width)));
+		width = floor(width);
 	}
 
 	return static_cast<float>(width);
@@ -104,7 +104,7 @@ find_fallback:
 		if (*reinterpret_cast<char*>(fallbackGlyph + 1) != '\0') {
 			fallbackGlyph += 4;
 		} else {
-			break;
+			goto found_fallback_glyph;
 		}
 	}
 	if (fallbackCount == 0) {
@@ -139,6 +139,7 @@ float CFont::GetWidth(char* text)
 		unsigned short* currentBucket = m_glyphBuckets[ch & 0xFF];
 		unsigned short* glyph = currentBucket + 1;
 		int count = static_cast<int>(*currentBucket);
+		float charWidth;
 
 		for (; count > 0; count--) {
 			if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
@@ -166,11 +167,12 @@ use_glyph:
 			      ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 4)));
 		}
 
-		float charWidth = localScaleX * (localMargin + static_cast<float>(drawWidth));
+		charWidth = localScaleX * (localMargin + static_cast<float>(drawWidth));
 		if (GetRenderFlagBits(renderFlags).snapPosition != 0) {
 			charWidth = static_cast<float>(floor(charWidth));
 		}
 
+add_width:
 		width += charWidth;
 		goto read_char;
 
@@ -182,7 +184,7 @@ find_fallback:
 			if (*reinterpret_cast<unsigned char*>(fallbackGlyph + 1) != 0) {
 				fallbackGlyph += 4;
 			} else {
-				break;
+				goto use_fallback_glyph;
 			}
 		}
 		if (fallbackCount == 0) {
@@ -192,6 +194,8 @@ find_fallback:
 		if (glyph != 0) {
 			goto use_glyph;
 		}
+		charWidth = FLOAT_803306B8;
+		goto add_width;
 
 read_char:
 		if (static_cast<unsigned char>(*textPtr) == 0) {

@@ -61,7 +61,7 @@ public:
     int calcBranchFuncTetsukyojin(int);
 
     void damagedFuncGigasLoad();
-    void tgtFuncGigasLoad(int);
+    int tgtFuncGigasLoad(int);
     int calcBranchFuncGigasLoad(int);
 
     void frameStatFuncWifeLamia();

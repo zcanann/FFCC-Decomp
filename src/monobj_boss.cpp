@@ -727,10 +727,12 @@ void CGMonObj::cancelStatFuncGoblinKing()
 void CGMonObj::frameStatFuncGoblinKing()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId == 100) {
+	switch (prgObj->m_lastStateId) {
+	case 100:
 		teleport__8CGMonObjFiiiiiiiiiP3VecRiR3Vec(
 		    this, 0, 0xd, 8, 0x42, 0xa03e, 0xa03f, 3, 4, 5, &DAT_802127c0,
 		    *reinterpret_cast<int*>(SoundBuffer_1260_), *reinterpret_cast<Vec*>(SoundBuffer_1260_ + 4));
+		break;
 	}
 	return;
 }
@@ -1701,13 +1703,14 @@ void CGMonObj::damagedFuncGigasLoad()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::tgtFuncGigasLoad(int)
+int CGMonObj::tgtFuncGigasLoad(int)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	aiTargetAttackRomMon__8CGMonObjFi(this, 0x3B);
 	if (*reinterpret_cast<int*>(mon + 0x6C4) < 0) {
 		aiTarget__8CGMonObjFv(this);
 	}
+	return *reinterpret_cast<int*>(mon + 0x6C4);
 }
 
 /*

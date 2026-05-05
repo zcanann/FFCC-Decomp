@@ -278,8 +278,12 @@ void CGItemObj::onFramePreCalc()
  */
 void CGItemObj::onFramePostCalc()
 {
-	if (m_stateFlags0Bits.unk4 != 0 && m_owner == 0) {
-		*(int*)((u8*)this + 0x94) = *(int*)((u8*)this + 0x94) - 1;
+	unsigned char* self = (unsigned char*)this;
+
+	if (static_cast<signed char>(
+	        static_cast<int>((static_cast<unsigned int>(self[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
+	    *(void**)(self + 0x550) == 0) {
+		*(int*)(self + 0x94) = *(int*)(self + 0x94) - 1;
 	}
 }
 

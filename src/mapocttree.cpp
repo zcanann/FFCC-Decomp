@@ -197,6 +197,10 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 
     while (chunkFile.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
+        case 'TYPE':
+            m_type = static_cast<unsigned char>(chunkFile.Get2());
+            break;
+
         case 'OBJN': {
             unsigned short objIndex = chunkFile.Get2();
 
@@ -231,10 +235,6 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 
         case 'INFO':
             m_unk01 = chunkFile.Get1();
-            break;
-
-        case 'TYPE':
-            m_type = static_cast<unsigned char>(chunkFile.Get2());
             break;
 
         case 'TREE':

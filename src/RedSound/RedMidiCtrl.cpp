@@ -111,6 +111,8 @@ enum RedMidiCommandConst {
     REDSOUND_MIDI_FUZZY_DEFAULT_DEPTH = 0x100,
     REDSOUND_MIDI_PITCH_BEND_HIGH_SCALE = 0x80,
     REDSOUND_MIDI_PITCH_BEND_CENTER = 0x2000,
+    REDSOUND_MIDI_DELTA_BUFFER_WORD_COUNT = 4,
+    REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT = 1,
 };
 
 static void __MidiCtrl_NoSupport(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
@@ -1233,7 +1235,7 @@ static void __MidiCtrl_VolumeDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
  */
 static void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int delta[4];
+    int delta[REDSOUND_MIDI_DELTA_BUFFER_WORD_COUNT];
     int volume;
 
     delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
@@ -1282,7 +1284,7 @@ static void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
  */
 static void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int delta[4];
+    int delta[REDSOUND_MIDI_DELTA_BUFFER_WORD_COUNT];
     int expression;
 
     delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
@@ -1329,7 +1331,7 @@ static void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  */
 static void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int delta[4];
+	int delta[REDSOUND_MIDI_DELTA_BUFFER_WORD_COUNT];
 	u32 pan;
 
 	delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
@@ -1414,7 +1416,7 @@ static void __MidiCtrl_SlurOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
  */
 static void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int delta[1];
+    int delta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
     int command;
     int value;
     RedVoiceDATA* voiceData;
@@ -1882,7 +1884,7 @@ static void __MidiCtrl_VibrateDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTr
  */
 static void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int delta[1];
+	int delta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
 
 	delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
 	if (delta[0] == 0) {
@@ -1928,7 +1930,7 @@ static void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
  */
 static void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int trackDelta[1];
+    int trackDelta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
     int rate;
     int divisor;
 
@@ -2071,7 +2073,7 @@ static void __MidiCtrl_TremoloDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTr
  */
 static void __MidiCtrl_TremoloDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int delta[1];
+	int delta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
 
 	delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
 	if (delta[0] == 0) {
@@ -2117,7 +2119,7 @@ static void __MidiCtrl_TremoloRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
  */
 static void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int delta[1];
+	int delta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
 	int rate;
 	int divisor;
 
@@ -2234,7 +2236,7 @@ static void __MidiCtrl_ShakeDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
  */
 static void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int delta[1];
+	int delta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
 
 	delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
 	if (delta[0] == 0) {
@@ -2280,7 +2282,7 @@ static void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrack
  */
 static void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int delta[1];
+	int delta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
 	int rate;
 	int divisor;
 

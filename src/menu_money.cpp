@@ -31,20 +31,20 @@ extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int
 extern "C" void SetSingWinInfo__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 
 
-extern float FLOAT_80332f60;
-extern float FLOAT_80332f64;
-extern float FLOAT_80332f68;
-extern float FLOAT_80332f6c;
-extern float FLOAT_80332f70;
-extern float FLOAT_80332f74;
-extern float FLOAT_80332f78;
-extern float FLOAT_80332f7c;
-extern float FLOAT_80332f80;
-extern float FLOAT_80332f84;
-extern double DOUBLE_80332f88;
-extern double DOUBLE_80332F90;
-extern double DOUBLE_80332F98;
-extern double DOUBLE_80332FA0;
+static const float FLOAT_80332f60 = 255.0f;
+static const float FLOAT_80332f64 = 0.0f;
+static const float FLOAT_80332f68 = 32.0f;
+static const float FLOAT_80332f6c = 24.0f;
+static const float FLOAT_80332f70 = 1.0f;
+static const float FLOAT_80332f74 = 18.0f;
+static const float FLOAT_80332f78 = 16.0f;
+static const float FLOAT_80332f7c = 0.9f;
+static const float FLOAT_80332f80 = 19.8f;
+static const float FLOAT_80332f84 = 4.0f;
+static const double DOUBLE_80332f88 = 4503601774854144.0;
+static const double DOUBLE_80332F90 = 1.0;
+static const double DOUBLE_80332F98 = 216.0;
+static const double DOUBLE_80332FA0 = 0.5;
 
 extern CMenuPcs MenuPcs;
 

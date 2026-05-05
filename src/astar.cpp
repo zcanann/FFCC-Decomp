@@ -44,6 +44,11 @@ struct CMapCylinderRaw
 	Vec m_direction2;
 };
 
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
+
 CAStar AStar;
 
 /*
@@ -227,7 +232,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 					float dist = PSVECMag(reinterpret_cast<Vec*>(&distVec));
 
-					if (dot < FLOAT_803320C4)
+					if (dot < LoadFloat(FLOAT_803320C4))
 					{
 						if (behindBestDist < dist)
 						{
@@ -447,7 +452,7 @@ void CAStar::drawAStar()
 		if (hasGroups)
 		{
 			CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-			Graphic.DrawSphere(gFlatPosMtx, &m_lastGroupPos, kDrawAStarSphereRadius, &white.color);
+			Graphic.DrawSphere(gFlatPosMtx, &m_lastGroupPos, LoadFloat(kDrawAStarSphereRadius), &white.color);
 		}
 
 		int i = 0;
@@ -465,7 +470,7 @@ void CAStar::drawAStar()
 			if (exists)
 			{
 				CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
-				Graphic.DrawSphere(gFlatPosMtx, &portal->m_position, kDrawAStarSphereRadius, &yellow.color);
+				Graphic.DrawSphere(gFlatPosMtx, &portal->m_position, LoadFloat(kDrawAStarSphereRadius), &yellow.color);
 
 				int side = 0;
 				unsigned char* group = &portal->m_groupA;
@@ -548,13 +553,13 @@ void CAStar::calcAStar()
 				continue;
 			}
 
-			m_bestPath.m_cost = kInfiniteCost;
+			m_bestPath.m_cost = LoadFloat(kInfiniteCost);
 
 			CATemp temp;
 
 			check(from, to, temp);
 
-			if (m_bestPath.m_cost < kInfiniteCost)
+			if (m_bestPath.m_cost < LoadFloat(kInfiniteCost))
 			{
 				System.Printf(const_cast<char*>(kAStarCostDebugFormat), from, to, m_bestPath.m_cost);
 

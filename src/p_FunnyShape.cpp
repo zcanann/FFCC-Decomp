@@ -146,7 +146,7 @@ void CFunnyShapePcs::drawViewer()
 {
     Mtx44 ortho;
     Mtx view;
-    Vec eye = {0.0f, 0.0f, 0.0f};
+    Vec eye = {0.0f, 0.0f, 4.0f};
     Vec at = {0.0f, 0.0f, 0.0f};
     Vec up = {0.0f, 1.0f, 0.0f};
     static const char s_funnyShapeFmt[] = "FunnyShape [%c]";

@@ -23,6 +23,7 @@ enum RedStreamLayoutSize {
 	REDSOUND_STREAM_PAGE_SIZE = 0x1000,
 	REDSOUND_STREAM_PAGE_WORD_COUNT = REDSOUND_STREAM_PAGE_SIZE / sizeof(unsigned int),
 	REDSOUND_STREAM_STEREO_PLANE_SIZE = 0x2000,
+	REDSOUND_STREAM_STEREO_PLANE_PAGE_COUNT = REDSOUND_STREAM_STEREO_PLANE_SIZE / REDSOUND_STREAM_PAGE_SIZE,
 	REDSOUND_STREAM_TRANSFER_BUFFER_SIZE = 0x4000,
 	REDSOUND_STREAM_SAMPLE_ADVANCE = 0x200,
 	REDSOUND_STREAM_FILE_HEADER_SIZE = sizeof(RedStreamHEAD),
@@ -244,7 +245,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			}
 			
 			dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_STREAM_LOAD, 0, (int)dstBase, stream->m_aramBuffer + bufferIndex * REDSOUND_STREAM_PAGE_SIZE, REDSOUND_STREAM_PAGE_SIZE, 0, 0);
-			dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_STREAM_LOAD, 0, (int)(dstBase + REDSOUND_STREAM_STEREO_PLANE_SIZE), stream->m_aramBuffer + (bufferIndex + 2) * REDSOUND_STREAM_PAGE_SIZE, REDSOUND_STREAM_PAGE_SIZE, 0, 0);
+			dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_STREAM_LOAD, 0, (int)(dstBase + REDSOUND_STREAM_STEREO_PLANE_SIZE), stream->m_aramBuffer + (bufferIndex + REDSOUND_STREAM_STEREO_PLANE_PAGE_COUNT) * REDSOUND_STREAM_PAGE_SIZE, REDSOUND_STREAM_PAGE_SIZE, 0, 0);
 			
 			if ((bufferIndex == REDSOUND_STREAM_BUFFER_SIDE_A) && (voiceData->m_axVoice != 0)) {
 				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*dstBase;
@@ -255,7 +256,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 				voiceData[1].m_axVoice->sync |= AX_SYNC_FLAG_COPYADPCMLOOP;
 			}
 			
-			bufferIndex = bufferIndex ^ 1;
+			bufferIndex = bufferIndex ^ REDSOUND_STREAM_BUFFER_SIDE_MASK;
 			byteCount = byteCount + -REDSOUND_STREAM_PAGE_SIZE;
 			stream->m_streamCursor = stream->m_streamCursor + REDSOUND_STREAM_SAMPLE_ADVANCE;
 			
@@ -283,7 +284,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 				voiceData->m_axVoice->sync |= AX_SYNC_FLAG_COPYADPCMLOOP;
 			}
 			
-			bufferIndex = bufferIndex ^ 1;
+			bufferIndex = bufferIndex ^ REDSOUND_STREAM_BUFFER_SIDE_MASK;
 			byteCount = byteCount + -REDSOUND_STREAM_PAGE_SIZE;
 			stream->m_streamCursor = stream->m_streamCursor + REDSOUND_STREAM_SAMPLE_ADVANCE;
 			

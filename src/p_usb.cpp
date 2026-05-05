@@ -57,12 +57,12 @@ static inline unsigned int Swap32(unsigned int x)
 int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
     unsigned int count;
+    int result;
     unsigned int* ptr;
     int connected;
     unsigned int* dstBuffer;
     CMemory::CStage* stage;
     unsigned int value;
-    int result;
 
     count = elemSize * elemCount;
     value = (count + 0x5F) & ~0x1F;

@@ -40,6 +40,11 @@ enum RedStreamLayoutSize {
 	REDSOUND_STREAM_BUFFER_SIDE_MASK = 1,
 };
 
+enum RedStreamChannelIndex {
+	REDSOUND_STREAM_LEFT_CHANNEL = 0,
+	REDSOUND_STREAM_RIGHT_CHANNEL = 1,
+};
+
 enum RedStreamAdpcmHeaderOffset {
 	REDSOUND_STREAM_ADPCM_LOOP_PRED_SCALE_OFFSET = 0x22,
 	REDSOUND_STREAM_ADPCM_LOOP_YN1_OFFSET = 0x24,
@@ -116,10 +121,10 @@ static void _StreamStop(RedStreamDATA* streamData)
 		streamData->m_voiceData->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_STREAM_MASK;
 		streamData->m_voiceData->m_active = 0;
 		if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
-			streamData->m_voiceData[1].m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-			streamData->m_track[1].m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_STREAM;
-			streamData->m_voiceData[1].m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_STREAM_MASK;
-			streamData->m_voiceData[1].m_active = 0;
+			streamData->m_voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+			streamData->m_track[REDSOUND_STREAM_RIGHT_CHANNEL].m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_STREAM;
+			streamData->m_voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_STREAM_MASK;
+			streamData->m_voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_active = 0;
 		}
 	}
 }
@@ -251,9 +256,11 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*dstBase;
 				voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
 				voiceData->m_axVoice->sync |= AX_SYNC_FLAG_COPYADPCMLOOP;
-				voiceData[1].m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)dstBase[REDSOUND_STREAM_STEREO_PLANE_SIZE];
-				voiceData[1].m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData[1].m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
-				voiceData[1].m_axVoice->sync |= AX_SYNC_FLAG_COPYADPCMLOOP;
+				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_axVoice->pb.adpcmLoop.loop_pred_scale =
+				    (unsigned short)dstBase[REDSOUND_STREAM_STEREO_PLANE_SIZE];
+				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_axVoice->pb.adpcmLoop.loop_yn1 =
+				    voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
+				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_axVoice->sync |= AX_SYNC_FLAG_COPYADPCMLOOP;
 			}
 			
 			bufferIndex = bufferIndex ^ REDSOUND_STREAM_BUFFER_SIDE_MASK;
@@ -368,8 +375,9 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			} else {
 				sampleOffset += 8;
 			}
-			headerData[1].m_loopPredScale = (short)((s8*)streamHeader)[sampleOffset];
-			headerData[1].m_loopYn1 = headerData[1].m_loopYn2 = 0;
+			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_loopPredScale = (short)((s8*)streamHeader)[sampleOffset];
+			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_loopYn1 =
+			    headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_loopYn2 = 0;
 		}
 
 		streamData->m_streamId = streamID;
@@ -402,7 +410,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			voice->m_track->m_reverbDepth = p_ReverbDepth[REDSOUND_REVERB_DEPTH_SE].m_depth;
 			voice->m_track->m_reverbDepthDelta = 0;
 			if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
-				if (iVar2 == 0) {
+				if (iVar2 == REDSOUND_STREAM_LEFT_CHANNEL) {
 					streamData->m_pan = 0;
 					streamData->m_panStepCount = 0;
 				} else {
@@ -546,8 +554,8 @@ void StreamPause(int streamID, int pause)
 					voiceData->m_targetPitch = 0;
 					voiceData->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 					if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
-						voiceData[1].m_targetPitch = 0;
-						voiceData[1].m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
+						voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_targetPitch = 0;
+						voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 					}
 				}
 			} else if (voiceData->m_axVoice != 0) {
@@ -557,8 +565,8 @@ void StreamPause(int streamID, int pause)
 				if (channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 					voiceData->m_targetPitch = pitch;
 					voiceData->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
-					voiceData[1].m_targetPitch = pitch;
-					voiceData[1].m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
+					voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_targetPitch = pitch;
+					voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 				} else {
 					pan = streamData->m_pan >> REDSOUND_FIXED_SHIFT;
 					voiceData->m_targetPitch = pitch;
@@ -660,9 +668,10 @@ void StreamControl()
 			voiceData->m_waveData = streamData->m_trackData;
 			voiceData->m_active = 1;
 			if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
-				voiceData[1].m_flags |= REDSOUND_VOICE_FLAGS_STREAM_START;
-				voiceData[1].m_waveData = &streamData->m_trackData[1];
-				voiceData[1].m_active = 1;
+				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_flags |= REDSOUND_VOICE_FLAGS_STREAM_START;
+				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_waveData =
+				    &streamData->m_trackData[REDSOUND_STREAM_RIGHT_CHANNEL];
+				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_active = 1;
 			}
 		}
 

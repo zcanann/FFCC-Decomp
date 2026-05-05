@@ -7,9 +7,15 @@
 struct RedTrackDATA;
 struct RedVoiceDATA;
 
+enum RedStreamFileLayoutSize {
+    REDSOUND_STREAM_SIGNATURE_SIZE = 4,
+    REDSOUND_STREAM_HEADER_PAD_SIZE = 0x0C - 0x04,
+    REDSOUND_STREAM_TRACK_DATA_COUNT = 2,
+};
+
 struct RedStreamHEAD {
-    char m_signature[4];
-    u8 m_pad04[0x0C - 0x04];
+    char m_signature[REDSOUND_STREAM_SIGNATURE_SIZE];
+    u8 m_pad04[REDSOUND_STREAM_HEADER_PAD_SIZE];
     int m_loopEnd;
     int m_loopStart;
     int m_pitch;
@@ -35,7 +41,7 @@ struct RedStreamDATA {
     u8* m_fileData;
     u8* m_buffer;
     RedStreamHEAD m_header;
-    RedWaveDATA m_trackData[2];
+    RedWaveDATA m_trackData[REDSOUND_STREAM_TRACK_DATA_COUNT];
     int m_volume;
     int m_volumeStep;
     int m_volumeStepCount;

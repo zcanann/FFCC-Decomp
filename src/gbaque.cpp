@@ -233,7 +233,7 @@ void GbaQueue::Init()
 	obj[0x2D42] = 0;
 	obj[0x2D54] = 0;
 	obj[0x2D55] = 0;
-	obj[0x2D56] = 0;
+	m_singleMode = 0;
 	obj[0x2D57] = 0;
 	obj[0x2D58] = 0;
 	obj[0x2D59] = 0;
@@ -310,9 +310,9 @@ void GbaQueue::LoadAll()
 	}
 
 	obj = reinterpret_cast<char*>(this);
-	prevMenuStageMode = static_cast<unsigned char>(obj[0x2D56]);
-	obj[0x2D56] = static_cast<unsigned char>(Game.m_gameWork.m_menuStageMode != 0);
-	if (prevMenuStageMode != static_cast<unsigned char>(obj[0x2D56])) {
+	prevMenuStageMode = static_cast<unsigned char>(m_singleMode);
+	m_singleMode = static_cast<char>(Game.m_gameWork.m_menuStageMode != 0);
+	if (prevMenuStageMode != static_cast<unsigned char>(m_singleMode)) {
 		obj[0x2C88] = 0xF;
 	}
 
@@ -1257,7 +1257,7 @@ void GbaQueue::SetRadarType()
 		}
 	}
 
-	if (obj[0x2D56] != 0) {
+	if (m_singleMode != 0) {
 		const unsigned char radarType = Game.m_gameWork.m_mogScoreRadarType;
 		obj[0x2D32] = static_cast<char>(radarType);
 		obj[0x2D33] = static_cast<char>(radarType);
@@ -1300,7 +1300,7 @@ void GbaQueue::GetMBasePos(int channel, short* outX, short* outY)
 	int actualChannel;
 	OSSemaphore* semaphore;
 	char* obj = reinterpret_cast<char*>(this);
-	signed char connectedFlag = obj[0x2D56];
+	signed char connectedFlag = m_singleMode;
 
 	actualChannel = channel & ~((-connectedFlag | connectedFlag) >> 31);
 	semaphore = accessSemaphores + actualChannel;
@@ -1352,7 +1352,7 @@ void GbaQueue::LoadPlayerStat()
 	if (reinterpret_cast<unsigned int*>(&CFlat)[0x1041] != 0) {
 		unsigned char* entry = localPlayerStat;
 		for (i = 0; i < 4; i++) {
-			unsigned char menuStageMode = static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D56]);
+			unsigned char menuStageMode = static_cast<unsigned char>(m_singleMode);
 			CGPartyObj* partyObj;
 			CCaravanWork* caravanWork;
 
@@ -1711,7 +1711,7 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 
 	memset(packet, 0, sizeof(packet));
 
-	if (static_cast<char>(reinterpret_cast<unsigned char*>(this)[0x2D56]) != 0) {
+	if (m_singleMode != 0) {
 		channel = 0;
 	}
 
@@ -1786,7 +1786,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     obj = reinterpret_cast<char*>(this);
 
     OSWaitSemaphore(accessSemaphores + channel);
-    if (((unsigned int)__cntlzw(1 - static_cast<int>(obj[0x2D56])) >> 5 & 0xFFU) != 0U) {
+    if (((unsigned int)__cntlzw(1 - static_cast<int>(m_singleMode)) >> 5 & 0xFFU) != 0U) {
         channel = 0;
     }
     OSSignalSemaphore(accessSemaphores + channel);
@@ -1875,7 +1875,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 
 	obj = reinterpret_cast<char*>(this);
 
-	if (obj[0x2D56] != 0) {
+	if (m_singleMode != 0) {
 		channel = 0;
 	}
 
@@ -4691,10 +4691,10 @@ static inline OSSemaphore* AccessSemaphoreAt(GbaQueue* self, unsigned int channe
 
 unsigned int GbaQueue::GetChgHitFlg(int channel)
 {
-	unsigned int actualChannel = static_cast<unsigned int>(channel) &
-	                             ~static_cast<unsigned int>((-reinterpret_cast<signed char*>(this)[0x2D56] |
-	                                                        reinterpret_cast<signed char*>(this)[0x2D56]) >>
-	                                                       31);
+	signed char singleMode = m_singleMode;
+	unsigned int actualChannel =
+	    static_cast<unsigned int>(channel) &
+	    ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
 	OSSemaphore* semaphore = AccessSemaphoreAt(this, actualChannel);
 	OSWaitSemaphore(semaphore);
 	signed char flag = reinterpret_cast<signed char*>(this)[0x2D54];
@@ -4710,7 +4710,7 @@ unsigned int GbaQueue::GetChgHitFlg(int channel)
  */
 void GbaQueue::ClrChgHitFlg(int channel)
 {
-	unsigned char flag = reinterpret_cast<unsigned char*>(this)[0x2D56];
+	unsigned char flag = static_cast<unsigned char>(m_singleMode);
 	unsigned int actualChannel =
 	    static_cast<unsigned int>(channel) &
 	    ~static_cast<unsigned int>((-static_cast<signed char>(flag) | static_cast<signed char>(flag)) >> 31);
@@ -4786,7 +4786,7 @@ void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
  */
 int GbaQueue::GetHitEInfo(int channel)
 {
-	int singleMode = reinterpret_cast<signed char*>(this)[0x2D56];
+	char singleMode = m_singleMode;
 	unsigned int actualChannel = static_cast<unsigned int>(channel) &
 	                             ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;
@@ -4806,7 +4806,7 @@ int GbaQueue::GetHitEInfo(int channel)
 bool GbaQueue::IsSingleMode(int channel)
 {
 	OSWaitSemaphore(accessSemaphores + channel);
-	bool isSingle = reinterpret_cast<signed char*>(this)[0x2D56] == 1;
+	bool isSingle = m_singleMode == 1;
 	OSSignalSemaphore(accessSemaphores + channel);
 	return isSingle;
 }

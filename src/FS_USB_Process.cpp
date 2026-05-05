@@ -200,6 +200,8 @@ void CFunnyShapePcs::SetUSBData()
         *reinterpret_cast<s16*>(AnmData(this) + 16) = LoadSwap16(*reinterpret_cast<s16*>(AnmData(this) + 16));
         *reinterpret_cast<s16*>(AnmData(this) + 18) = LoadSwap16(*reinterpret_cast<s16*>(AnmData(this) + 18));
 
+        int src2c;
+        int src24;
         int groupOffset = 0;
         for (int i = 0; i < *reinterpret_cast<s16*>(AnmData(this) + 6); i++) {
             u8* group = AnmData(this) + groupOffset;
@@ -213,11 +215,13 @@ void CFunnyShapePcs::SetUSBData()
             list[0] = LoadSwap16(list[0]);
             list[1] = LoadSwap16(list[1]);
 
-            int src24 = 0;
-            int src2c = 0;
+            src2c = 0;
+            src24 = src2c;
+            int j = 0;
             int dst24 = 0;
             int dst2c = 0;
-            for (int j = 0; j < static_cast<s16>(list[1]); j++) {
+            for (; j < static_cast<s16>(list[1]);
+                 src2c += 0x2C, src24 += 0x24, j++, dst24 += 0x24, dst2c += 0x2C) {
                 if ((list[0] & 8) != 0) {
                     u8* src = listData + 0x10 + src2c;
                     u32* p32 = reinterpret_cast<u32*>(src);
@@ -258,10 +262,6 @@ void CFunnyShapePcs::SetUSBData()
                     DCStoreRange(dst, 0x24);
                 }
 
-                src2c += 0x2C;
-                src24 += 0x24;
-                dst24 += 0x24;
-                dst2c += 0x2C;
             }
             groupOffset += 8;
         }
@@ -292,10 +292,12 @@ void CFunnyShapePcs::SetUSBData()
         *reinterpret_cast<s16*>(meshData + 0x2) = LoadSwap16(*reinterpret_cast<s16*>(meshData + 0x2));
 
         int src2c = 0;
-        int src24 = 0;
+        int src24 = src2c;
+        int i = 0;
         int dst24 = 0;
         int dst2c = 0;
-        for (int i = 0; i < m_shape.count; i++) {
+        for (; i < m_shape.count;
+             src2c += 0x2C, src24 += 0x24, i++, dst24 += 0x24, dst2c += 0x2C) {
             if ((m_shape.flags & 8) != 0) {
                 u8* src = meshData + 0x10 + src2c;
                 u32* p32 = reinterpret_cast<u32*>(src);
@@ -336,10 +338,6 @@ void CFunnyShapePcs::SetUSBData()
                 DCStoreRange(dst, 0x24);
             }
 
-            src2c += 0x2C;
-            src24 += 0x24;
-            dst24 += 0x24;
-            dst2c += 0x2C;
         }
 
         m_meshData = meshData;

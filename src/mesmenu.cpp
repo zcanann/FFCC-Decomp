@@ -188,8 +188,8 @@ void CMesMenu::Create()
         if ((*(int*)((char*)this + 0x18) & 2) != 0) {
             y = 0x1B0;
         }
+        defaultValue = FLOAT_803308d8;
         *(float*)((char*)this + 0x3D70) = (float)y;
-
         *(float*)((char*)this + 0x3D7C) = defaultValue;
         *(float*)((char*)this + 0x3D80) = defaultValue;
         *(float*)((char*)this + 0x3D84) = defaultValue;

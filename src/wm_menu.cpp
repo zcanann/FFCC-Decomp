@@ -3465,13 +3465,35 @@ void CMenuPcs::DrawMCardMenu()
 void CMenuPcs::DrawCMakeMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	if (reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] == 0) {
+	short* const worldState = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	if (worldState == 0) {
 		return;
 	}
 
 	DrawCharaName();
 	DrawCMLife();
 	DrawWMFrame();
+
+	if (worldState[0x10 / sizeof(short)] == 2) {
+		if (worldState[0x18 / sizeof(short)] != 0) {
+			worldState[0x18 / sizeof(short)]--;
+			if (worldState[0x18 / sizeof(short)] < 1) {
+				worldState[0x10 / sizeof(short)]++;
+				worldState[0x22 / sizeof(short)] = 0;
+				Sound.PlaySe(0x31 - (worldState[0x1E / sizeof(short)] >> 31), 0x40, 0x7F, 0);
+			}
+		}
+	} else {
+		worldState[0x22 / sizeof(short)]++;
+		if (worldState[0x22 / sizeof(short)] > 9) {
+			worldState[0x10 / sizeof(short)]++;
+			worldState[0x22 / sizeof(short)] = 0;
+			if (worldState[0x10 / sizeof(short)] > 4) {
+				worldState[0x20 / sizeof(short)] = worldState[0x1E / sizeof(short)];
+				worldState[0x1E / sizeof(short)] = 0;
+			}
+		}
+	}
 }
 
 /*

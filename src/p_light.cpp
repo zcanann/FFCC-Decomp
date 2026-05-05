@@ -806,9 +806,8 @@ void CLightPcs::SetBit32(CLightPcs::TARGET target, unsigned long* bits)
         if ((*(u8*)((int)target + (int)bumpSlot + 0x60) != 0) &&
             (((1 << (i & 0x1f)) & *(u32*)((char*)bits + ((i >> 3) & 0x1ffffffc))) != 0))
         {
-            GXInitLightColor(
-                (GXLightObj*)(bumpSlot + 0x6c),
-                *reinterpret_cast<_GXColor*>(bumpSlot + 0x50 + ((int)target * 4)));
+            CLight* light = reinterpret_cast<CLight*>(bumpSlot);
+            GXInitLightColor(&light->m_gxLightObj, light->m_targetColor[target]);
             GXLoadLightObjImm((GXLightObj*)(bumpSlot + 0x6c), (GXLightID)(1 << *(u32*)(lightPcs + 0xb0)));
             *(u32*)(lightPcs + 0xb4) |= 1 << *(u32*)(lightPcs + 0xb0);
             *(u32*)(lightPcs + 0xb0) += 1;

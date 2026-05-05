@@ -93,6 +93,12 @@ enum RedWaveLayoutWord {
 	REDSOUND_WAVE_PITCH_WORD_OFFSET = REDSOUND_WAVE_PITCH_OFFSET / sizeof(int),
 };
 
+enum RedVoiceLayoutCount {
+	REDSOUND_VOICE_ADSR_TIME_COUNT = 4,
+	REDSOUND_VOICE_ADSR_LEVEL_COUNT = 4,
+	REDSOUND_VOICE_AX_MIX_COUNT = 0x12,
+};
+
 struct RedVoiceDATA {
 	RedTrackDATA* m_track;
 	RedWaveDATA* m_waveData;
@@ -118,12 +124,12 @@ struct RedVoiceDATA {
 	int m_randomVolume;
 	int m_randomPan;
 	unsigned char m_pad48[0x50 - 0x48];
-	unsigned short m_adsrTime[4];
-	unsigned char m_adsrLevel[4];
+	unsigned short m_adsrTime[REDSOUND_VOICE_ADSR_TIME_COUNT];
+	unsigned char m_adsrLevel[REDSOUND_VOICE_ADSR_LEVEL_COUNT];
 	int m_adsrStage;
 	int m_adsrStepFrames;
 	int m_adsrStepAdd;
-	unsigned short m_axMix[0x12];
+	unsigned short m_axMix[REDSOUND_VOICE_AX_MIX_COUNT];
 	int m_active;
 	unsigned int m_flags;
 	unsigned int m_voiceSwitch;

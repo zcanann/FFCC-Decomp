@@ -701,14 +701,30 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
         }
     }
 
-    particleData->m_colorDeltaAdd[0] = 0.0f;
-    particleData->m_colorDeltaAdd[1] = 0.0f;
-    particleData->m_colorDeltaAdd[2] = 0.0f;
-    particleData->m_colorDeltaAdd[3] = 0.0f;
-    *(((u8*)&particleData->m_directionTail.z) + 2) = 0;
+    *(u16*)(((u8*)&particleData->m_directionTail.z) + 2) = 0;
+    *(u16*)particleData->m_colorDeltaAdd = 0;
+    *(u16*)(((u8*)particleData->m_colorDeltaAdd) + 2) = 0;
     *((u8*)&particleData->m_directionTail.z) = 0;
     *(((u8*)&particleData->m_directionTail.y) + 3) = 0x1f;
-    *((u8*)&particleData->m_directionTail.z) = *(((u8*)&particleData->m_directionTail.y) + 3) - 1;
+
+    Vec zeroVec;
+    zeroVec.x = 0.0f;
+    zeroVec.y = 0.0f;
+    zeroVec.z = 0.0f;
+    Vec* history = (Vec*)((u8*)particleData + 0x80);
+    u8* anglePtr = (u8*)particleData + 0x4c;
+    for (int i = 0; i < 0x1f; i++) {
+        pppCopyVector(*history, zeroVec);
+        history++;
+
+        int value = rand();
+        *(s16*)anglePtr = (s16)(value - (value / 0x168) * 0x168);
+        anglePtr += 2;
+    }
+
+    *((u8*)&particleData->m_directionTail.z) = *(((u8*)&particleData->m_directionTail.y) + 3);
+    *((u8*)&particleData->m_directionTail.z) = *((u8*)&particleData->m_directionTail.z) - 1;
+    *(u16*)(particleData->m_matrix[1] + 3) = 0;
 }
 
 /*

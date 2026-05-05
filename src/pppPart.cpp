@@ -110,6 +110,7 @@ static const char s_CPartPcs_heap_801D821C[] = "CPartPcs.heap";
 static const float FLOAT_8032fddc = 0.0f;
 extern "C" float FLOAT_8032fde0;
 extern "C" float FLOAT_8032fde4;
+extern "C" float FLOAT_8032FDE8;
 
 /*
  * --INFO--
@@ -2941,10 +2942,13 @@ void pppInitDrawEnv(unsigned char useZeroDepth)
 	DAT_8032ed8a = 0xFF;
 	DAT_8032ed8b = 0xFF;
 
-	FLOAT_8032ed8c = kPppOne;
 	if (useZeroDepth != 0)
 	{
-		FLOAT_8032ed8c = kPppZero;
+		FLOAT_8032ed8c = FLOAT_8032fddc;
+	}
+	else
+	{
+		FLOAT_8032ed8c = FLOAT_8032FDE8;
 	}
 
 	LightPcs.SetNumDiffuse(0);

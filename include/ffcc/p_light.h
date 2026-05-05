@@ -80,9 +80,7 @@ public:
     void DestroyBumpLightAll(CLightPcs::TARGET);
     void calc();
     void draw();
-    void Clear();
     void Add(CLightPcs::CLight*);
-    void GetFreeBumpLight(CLightPcs::TARGET);
     CLightPcs::CBumpLight* AddBump(CLightPcs::CLight*, CLightPcs::TARGET, CMemory::CStage*, int);
     void SetMapColorAlpha(float (*)[4], _GXColor, _GXColor, unsigned char, float, float, float, unsigned char);
     void SetAmbient(_GXColor);
@@ -121,5 +119,26 @@ extern unsigned int m_table_desc2__9CLightPcs[];
 extern unsigned int m_table_desc3__9CLightPcs[];
 extern unsigned int m_table_desc4__9CLightPcs[];
 extern unsigned int m_table__9CLightPcs[];
+
+inline CLightPcs::CLightPcs()
+{
+    unsigned int* table = m_table__9CLightPcs;
+
+    table[0x004 / 4] = m_table_desc0__9CLightPcs[0];
+    table[0x008 / 4] = m_table_desc0__9CLightPcs[1];
+    table[0x00C / 4] = m_table_desc0__9CLightPcs[2];
+    table[0x010 / 4] = m_table_desc1__9CLightPcs[0];
+    table[0x014 / 4] = m_table_desc1__9CLightPcs[1];
+    table[0x018 / 4] = m_table_desc1__9CLightPcs[2];
+    table[0x01C / 4] = m_table_desc2__9CLightPcs[0];
+    table[0x020 / 4] = m_table_desc2__9CLightPcs[1];
+    table[0x024 / 4] = m_table_desc2__9CLightPcs[2];
+    table[0x030 / 4] = m_table_desc3__9CLightPcs[0];
+    table[0x034 / 4] = m_table_desc3__9CLightPcs[1];
+    table[0x038 / 4] = m_table_desc3__9CLightPcs[2];
+    table[0x044 / 4] = m_table_desc4__9CLightPcs[0];
+    table[0x048 / 4] = m_table_desc4__9CLightPcs[1];
+    table[0x04C / 4] = m_table_desc4__9CLightPcs[2];
+}
 
 #endif // _FFCC_P_LIGHT_H_

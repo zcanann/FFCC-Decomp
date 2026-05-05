@@ -37,8 +37,8 @@ extern float FLOAT_8033303C;
 extern double DOUBLE_80333008;
 extern double DOUBLE_80333030;
 
-extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[];
-extern "C" const char s_menu_compa_cpp_801DEDE8[];
+extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[] = "%s(%d):family cnt error!!(%d)\n";
+extern "C" const char s_menu_compa_cpp_801DEDE8[] = "menu_compa.cpp";
 
 static const char s_compa_mono_upper[] = "MONO";
 static const char s_compa_normal[] = "Normal";
@@ -447,7 +447,7 @@ void CMenuPcs::CompaCtrl()
 bool CMenuPcs::CompaOpen()
 {
     int finishedCount;
-    int count;
+    u16 count;
     int frame;
     int remaining;
     CompaOpenAnim* entry;
@@ -458,11 +458,11 @@ bool CMenuPcs::CompaOpen()
 
     finishedCount = 0;
     this->compaMenuState->frame = this->compaMenuState->frame + 1;
-    count = static_cast<unsigned short>(this->compaList->count);
+    count = this->compaList->count;
     entry = this->compaList->entries;
     frame = this->compaMenuState->frame;
     remaining = count;
-    if (0 < count) {
+    if (count != 0) {
         do {
             float step = FLOAT_80332FF8;
             if (entry->startFrame <= frame) {

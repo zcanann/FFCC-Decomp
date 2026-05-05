@@ -1,4 +1,5 @@
 #include "ffcc/menu_favo.h"
+#include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/pad.h"
@@ -251,12 +252,8 @@ void CMenuPcs::FavoDraw()
 	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		rankFont->SetTlut(6);
-		GXColor textColor;
-		textColor.r = 0xFF;
-		textColor.g = 0xFF;
-		textColor.b = 0xFF;
-		textColor.a = static_cast<unsigned char>(FLOAT_80333058 * *reinterpret_cast<float*>(drawEntry + 8));
-		rankFont->SetColor(textColor);
+		rankFont->SetColor(
+		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80333058 * *reinterpret_cast<float*>(drawEntry + 8))).color);
 		rankFont->SetMargin(FLOAT_80333048);
 		sprintf(textBuf, lbl_80333068, static_cast<int>(*rank));
 		rankFont->SetPosX(static_cast<float>(drawEntry[0] - 0xC));
@@ -277,12 +274,8 @@ void CMenuPcs::FavoDraw()
 	rank = s_rank;
 	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
-		GXColor textColor;
-		textColor.r = 0xFF;
-		textColor.g = 0xFF;
-		textColor.b = 0xFF;
-		textColor.a = static_cast<unsigned char>(FLOAT_80333058 * *reinterpret_cast<float*>(drawEntry + 8));
-		nameFont->SetColor(textColor);
+		nameFont->SetColor(
+		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80333058 * *reinterpret_cast<float*>(drawEntry + 8))).color);
 		const char* name = flatData->table[0].strings[(static_cast<char>(rank[1]) + 0x17D) * 5 + 4];
 		nameFont->SetPosX(static_cast<float>(drawEntry[0] + 0x1C));
 		nameFont->SetPosY(static_cast<float>(drawEntry[1]) - FLOAT_8033306C);

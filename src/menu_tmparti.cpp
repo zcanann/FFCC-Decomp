@@ -230,8 +230,8 @@ void CMenuPcs::TmpArtiDraw()
 			SetColor__5CFontF8_GXColor(font, &textColor.color);
 
 			const char* text = flatData->table[0].strings[itemId * 5 + 4];
-			int width = GetWidth__5CFontFPc(font, text);
-			float posX = (float)(((TmpArtiIntToDouble(entry[2]) - TmpArtiIntToDouble(width)) * DOUBLE_80332f20) +
+			float width = GetWidth__5CFontFPc(font, text);
+			float posX = (float)(((TmpArtiIntToDouble(entry[2]) - width) * DOUBLE_80332f20) +
 			                       TmpArtiIntToDouble(entry[0]));
 			float posY = (float)TmpArtiIntToDouble(entry[1] + 11) - FLOAT_80332F38;
 

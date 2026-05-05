@@ -15,7 +15,9 @@
 #include <math.h>
 
 extern "C" int IsAnimFinished__8CGObjectFi(CGObject*, int);
+extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(CFlatRuntime2*, CFlatRuntime::CObject*, int);
+extern const char lbl_801DA778[];
 
 namespace {
 
@@ -834,13 +836,19 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFlatRuntime2::onSetClassSystemVal(int, CFlatRuntime::CObject* object, CFlatRuntime::CStack* stack, int setMode)
+void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* object, CFlatRuntime::CStack* stack, int setMode)
 {
-	u8* const engineObject = reinterpret_cast<u8*>(object->m_engineObject);
+	u8* const engineObject = reinterpret_cast<u8*>(object);
 	const unsigned int engineFlags = CallEngineFlags(engineObject);
-	const int systemVal = static_cast<int>(object->m_localBase[0]);
 
-	if ((engineFlags & 5) == 5 || systemVal != -0x1B) {
+	if ((engineFlags & 5) != 5 && systemVal == -0x1B) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+			Printf__7CSystemFPce(&System, lbl_801DA778);
+		}
+		return;
+	}
+
+	{
 		if (systemVal < -0x3F) {
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
 
@@ -1002,6 +1010,5 @@ void CFlatRuntime2::onSetClassSystemVal(int, CFlatRuntime::CObject* object, CFla
 					break;
 			}
 		}
-	} else if (System.m_execParam > 1) {
 	}
 }

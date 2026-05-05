@@ -1701,13 +1701,14 @@ void CGMonObj::damagedFuncGigasLoad()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::tgtFuncGigasLoad(int)
+int CGMonObj::tgtFuncGigasLoad(int)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	aiTargetAttackRomMon__8CGMonObjFi(this, 0x3B);
 	if (*reinterpret_cast<int*>(mon + 0x6C4) < 0) {
 		aiTarget__8CGMonObjFv(this);
 	}
+	return *reinterpret_cast<int*>(mon + 0x6C4);
 }
 
 /*

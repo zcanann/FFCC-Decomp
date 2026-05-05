@@ -61,8 +61,8 @@ extern "C" void* __vt__10CSamplePcs[];
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
 extern "C" void* __vt__14CFunnyShapePcs[];
-static const char lbl_801D7DD0[] = "CFunnyShapePcs(VIEWER)";
-static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
+extern "C" const char lbl_801D7DD0[];
+extern "C" const char s_CFunnyShapePcs[];
 extern char lbl_8032E660[];
 extern u8 ARRAY_8026D728[];
 

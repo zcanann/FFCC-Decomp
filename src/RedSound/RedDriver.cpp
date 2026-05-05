@@ -79,9 +79,13 @@ struct RedDriverSyncState {
     OSSemaphore m_musicSemaphore;
 };
 
+enum RedExecCommandLayout {
+    REDSOUND_EXEC_COMMAND_ARG_COUNT = 7,
+};
+
 struct RedExecCommand {
     void (*m_func)(int*);
-    int m_args[7];
+    int m_args[REDSOUND_EXEC_COMMAND_ARG_COUNT];
 };
 
 struct RedMusicPlayCommand {

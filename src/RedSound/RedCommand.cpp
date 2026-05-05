@@ -176,7 +176,6 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 	RedTrackDATA* scan;
 	RedTrackDATA* track;
 	int remaining;
-	int erasedCount = 0;
 
 	if (attrMask != 0) {
 		_EraseAttribute(eraseTrack, attrMask);
@@ -200,7 +199,7 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 				scan = scan - 1;
 			}
 		} while ((remaining != 0) && (*trackBasePtr <= track));
-	} while ((track < *trackBasePtr) && ((erasedCount = _EraseTime(eraseTrack)) != 0));
+	} while ((track < *trackBasePtr) && (_EraseTime(eraseTrack) != 0));
 
 	if (track < *trackBasePtr) {
 		track = 0;

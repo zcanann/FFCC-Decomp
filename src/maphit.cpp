@@ -23,6 +23,26 @@ static const float s_large_neg = -3.4e38f;
 static const float s_epsilon = 0.0001f;
 static const float s_push = 0.01f;
 
+static inline Vec& CylinderVector(CMapCylinder& cyl)
+{
+    return *reinterpret_cast<Vec*>(&cyl.m_radius);
+}
+
+static inline const Vec& CylinderVector(const CMapCylinder& cyl)
+{
+    return *reinterpret_cast<const Vec*>(&cyl.m_radius);
+}
+
+static inline float& CylinderRadius(CMapCylinder& cyl)
+{
+    return cyl.m_top.y;
+}
+
+static inline float CylinderRadius(const CMapCylinder& cyl)
+{
+    return cyl.m_top.y;
+}
+
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
@@ -48,13 +68,8 @@ CMapHitFace* g_hit_lpface_min;
  */
 int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder& cyl, float& outT)
 {
-    outT = 0.0f;
-
-    Vec axis = cyl.m_direction2;
-    f32 axisLen = PSVECMag(&axis);
-    if (axisLen <= 0.0f) {
-        return 0;
-    }
+    Vec axis = CylinderVector(cyl);
+    const f32 axisLen = PSVECMag(&axis);
     PSVECScale(&axis, &axis, 1.0f / axisLen);
 
     Vec orthogonal;
@@ -72,75 +87,138 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     Vec bitangent;
     PSVECCrossProduct(&axis, &orthogonal, &bitangent);
 
+    Vec localDirection;
+    localDirection.x = PSVECDotProduct(&orthogonal, &direction);
+    localDirection.y = PSVECDotProduct(&bitangent, &direction);
+    localDirection.z = PSVECDotProduct(&axis, &direction);
+
+    const f32 directionLen = PSVECMag(&localDirection);
+    const f32 tScale = 1.0f / directionLen;
+    PSVECScale(&localDirection, &localDirection, tScale);
+
     Vec relStart;
-    PSVECSubtract(&start, &cyl.m_top, &relStart);
+    PSVECSubtract(&start, &cyl.m_bottom, &relStart);
 
     const f32 px = PSVECDotProduct(&orthogonal, &relStart);
     const f32 py = PSVECDotProduct(&bitangent, &relStart);
     const f32 pz = PSVECDotProduct(&axis, &relStart);
 
-    const f32 vx = PSVECDotProduct(&orthogonal, &direction);
-    const f32 vy = PSVECDotProduct(&bitangent, &direction);
-    const f32 vz = PSVECDotProduct(&axis, &direction);
+    const f32 vx = localDirection.x;
+    const f32 vy = localDirection.y;
+    const f32 vz = localDirection.z;
+    const f32 radius = CylinderRadius(cyl);
+    const f32 radiusSq = radius * radius;
 
-    const f32 radius = cyl.m_radius2;
-    const f32 halfHeight = cyl.m_height2;
+    if (fabsf(vz) < 1.0f) {
+        const f32 radialC = (px * px + py * py) - radiusSq;
+        const f32 radialB = px * vx + py * vy;
+        const f32 radialA = vx * vx + vy * vy;
+        f32 disc = radialB * radialB - radialA * radialC;
+        if (disc < 0.0f) {
+            return 0;
+        }
 
-    f32 bestT = -1.0f;
-
-    const f32 a = vx * vx + vy * vy;
-    const f32 b = 2.0f * (px * vx + py * vy);
-    const f32 c = (px * px + py * py) - (radius * radius);
-    if (a > 0.0f) {
-        const f32 disc = b * b - 4.0f * a * c;
-        if (disc >= 0.0f) {
-            const f32 sqrtDisc = sqrtf(disc);
-            const f32 inv2a = 0.5f / a;
-            f32 t0 = (-b - sqrtDisc) * inv2a;
-            f32 t1 = (-b + sqrtDisc) * inv2a;
-            if (t0 > t1) {
-                const f32 tmp = t0;
-                t0 = t1;
-                t1 = tmp;
+        if (disc == 0.0f) {
+            const f32 t = -radialB / radialA;
+            const f32 z = (t * vz) + pz;
+            if (0.0f <= z && z <= axisLen) {
+                outT = t * tScale;
+                if (0.0f <= outT && outT <= 1.0f) {
+                    return 1;
+                }
+                return 0;
             }
+        } else {
+            disc = sqrtf(disc);
+            const f32 t = (-radialB - disc) / radialA;
+            const f32 z = (t * vz) + pz;
+            if (0.0f <= z && z <= axisLen) {
+                outT = t * tScale;
+                if (0.0f <= outT && outT <= 1.0f) {
+                    return 1;
+                }
+                return 0;
+            }
+        }
 
-            if (t0 >= 0.0f) {
-                const f32 z0 = pz + t0 * vz;
-                if (-halfHeight <= z0 && z0 <= halfHeight) {
-                    bestT = t0;
+        if (g_hit_lpface->m_projectionAxis == 1) {
+            f32 capC = (pz * pz) + radialC;
+            f32 capB = (pz * vz) + radialB;
+            disc = capB * capB - capC;
+            if (disc == 0.0f) {
+                const f32 t = -capB;
+                if ((t * vz) + pz <= 0.0f) {
+                    outT = t * tScale;
+                    if (0.0f <= outT && outT <= 1.0f) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            } else if (disc > 0.0f) {
+                disc = sqrtf(disc);
+                f32 t = -capB - disc;
+                if ((t * vz) + pz <= 0.0f) {
+                    outT = t * tScale;
+                    if (0.0f <= outT && outT <= 1.0f) {
+                        return 1;
+                    }
+                    return 0;
+                }
+
+                t = -capB + disc;
+                if ((t * vz) + pz <= 0.0f) {
+                    outT = t * tScale;
+                    if (0.0f <= outT && outT <= 1.0f) {
+                        return 1;
+                    }
+                    return 0;
                 }
             }
 
-            if (bestT < 0.0f && t1 >= 0.0f) {
-                const f32 z1 = pz + t1 * vz;
-                if (-halfHeight <= z1 && z1 <= halfHeight) {
-                    bestT = t1;
+            capB = -((vz * axisLen) - capB);
+            disc = capB * capB - (axisLen * -((2.0f * pz) - axisLen) + capC);
+            if (disc == 0.0f) {
+                const f32 t = -capB;
+                if (axisLen <= (t * vz) + pz) {
+                    outT = t * tScale;
+                    if (0.0f <= outT && outT <= 1.0f) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            } else if (disc > 0.0f) {
+                disc = sqrtf(disc);
+                f32 t = -capB - disc;
+                if (axisLen <= (t * vz) + pz) {
+                    outT = t * tScale;
+                    if (0.0f <= outT && outT <= 1.0f) {
+                        return 1;
+                    }
+                    return 0;
+                }
+
+                t = -capB + disc;
+                if (axisLen <= (t * vz) + pz) {
+                    outT = t * tScale;
+                    if (0.0f <= outT && outT <= 1.0f) {
+                        return 1;
+                    }
+                    return 0;
                 }
             }
         }
+
+        return 0;
     }
 
-    if (fabsf(vz) > 0.0f) {
-        const f32 capZ[2] = { -halfHeight, halfHeight };
-        for (int i = 0; i < 2; i++) {
-            const f32 t = (capZ[i] - pz) / vz;
-            if (t < 0.0f) {
-                continue;
-            }
-            if (bestT >= 0.0f && t >= bestT) {
-                continue;
-            }
-
-            const f32 x = px + t * vx;
-            const f32 y = py + t * vy;
-            if ((x * x + y * y) <= radius * radius) {
-                bestT = t;
-            }
-        }
+    f32 disc = radiusSq - (px * px + py * py);
+    if (disc < 0.0f) {
+        return 0;
     }
 
-    outT = bestT;
-    return bestT >= 0.0f;
+    disc = sqrtf(disc);
+    outT = (-(pz + disc)) * tScale;
+    return 1;
 }
 
 /*
@@ -424,7 +502,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     Vec* normal = &g_hit_lpface->m_normal;
-    Vec* hitDirection = reinterpret_cast<Vec*>(&g_hit_cyl.m_radius);
+    Vec* hitDirection = &CylinderVector(g_hit_cyl);
     float dot = PSVECDotProduct(hitDirection, normal);
     if (dot >= 0.0f) {
         return 0;
@@ -517,8 +595,8 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 
                 CMapCylinder edgeCylinder;
                 edgeCylinder.m_bottom = previous;
-                *reinterpret_cast<Vec*>(&edgeCylinder.m_radius) = edge;
-                edgeCylinder.m_top.y = g_hit_cyl.m_top.y;
+                CylinderVector(edgeCylinder) = edge;
+                CylinderRadius(edgeCylinder) = CylinderRadius(g_hit_cyl);
 
                 float edgeT;
                 if (FindIntersection(g_hit_cyl.m_bottom, *hitDirection, edgeCylinder, edgeT) != 0 &&
@@ -581,7 +659,7 @@ void CMapHit::GetHitFaceNormal(Vec* out)
  */
 int CMapHit::CalcHitSlide(Vec* out, float y)
 {
-    Vec* hitDirection = reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius);
+    Vec* hitDirection = &CylinderVector(g_hit_cyl_min);
 
     if (g_hit_edge_idx_min == -1) {
         if (y <= gMapHitFace->m_normal.y) {
@@ -671,12 +749,12 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
 void CMapHit::CalcHitPosition(Vec* position)
 {
     if (g_hit_edge_idx_min != -1) {
-        float len = PSVECMag(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius));
-        PSVECScale(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius), position, g_hit_t - (s_epsilon / len));
+        float len = PSVECMag(&CylinderVector(g_hit_cyl_min));
+        PSVECScale(&CylinderVector(g_hit_cyl_min), position, g_hit_t - (s_epsilon / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     } else {
-        float len = PSVECMag(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius));
-        PSVECScale(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius), position, g_hit_t - (s_push / len));
+        float len = PSVECMag(&CylinderVector(g_hit_cyl_min));
+        PSVECScale(&CylinderVector(g_hit_cyl_min), position, g_hit_t - (s_push / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     }
 }

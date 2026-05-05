@@ -1017,7 +1017,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
 {
     int iVar1;
     int iVar5;
-    int local_38[4];
+    int pitchWork[4];
     int* voiceData = (int*)param_2;
     s8 note = param_3->m_key;
     unsigned int* voiceMask = (unsigned int*)param_4;
@@ -1034,9 +1034,9 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
                 if (param_1->m_keySignatureData != 0) {
                     iVar5 = param_2->m_basePitch >> REDSOUND_PITCH_BASE_NOTE_SHIFT;
                     iVar1 = iVar5 / REDSOUND_NOTES_PER_OCTAVE + (param_2->m_basePitch >> 0x1f);
-                    local_38[0] =
+                    pitchWork[0] =
                         param_1->m_keySignatureData[iVar5 + (iVar1 - (iVar1 >> 0x1f)) * -REDSOUND_NOTES_PER_OCTAVE];
-                    param_2->m_basePitch += local_38[0] * REDSOUND_PITCH_KEY_SIGNATURE_UNIT;
+                    param_2->m_basePitch += pitchWork[0] * REDSOUND_PITCH_KEY_SIGNATURE_UNIT;
                 }
             } else {
                 param_2->m_basePitch =
@@ -1047,8 +1047,8 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         param_1->m_portamentPitch &= REDSOUND_FIXED_WHOLE_MASK;
         param_2->m_basePitch = param_1->m_portamentPitch;
         param_1->m_sweepDelta = param_1->m_portamentTime;
-        local_38[0] = 0;
-        DataAddCompute(local_38, note * REDSOUND_PITCH_NOTE_UNIT -
+        pitchWork[0] = 0;
+        DataAddCompute(pitchWork, note * REDSOUND_PITCH_NOTE_UNIT -
                                      (param_1->m_portamentPitch >> REDSOUND_FIXED_SHIFT),
                        &param_1->m_sweepDelta);
     }
@@ -1079,7 +1079,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         param_2->m_voiceSwitch |= maskBits;
     }
 
-    local_38[0] = param_1->m_keyTranspose + param_1->m_pitchBend;
+    pitchWork[0] = param_1->m_keyTranspose + param_1->m_pitchBend;
     if ((param_2->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
         iVar5 = param_2->m_basePitch + p_MusicPitchControl->m_value;
     } else {
@@ -1089,7 +1089,7 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
     if (param_2->m_waveData == 0) {
         iVar5 = 0;
     } else {
-        iVar5 = PitchCompute(iVar5, local_38[0], param_2->m_waveData->m_pitch, param_1->m_fineTune);
+        iVar5 = PitchCompute(iVar5, pitchWork[0], param_2->m_waveData->m_pitch, param_1->m_fineTune);
     }
     param_2->m_targetPitch = iVar5;
 
@@ -1100,15 +1100,15 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
           ((param_1->m_flags & REDSOUND_TRACK_FLAG_SLUR) == 0))) {
         if (param_1->m_vibrateFunc != 0) {
             param_2->m_pitchModDelay = param_1->m_vibrateDelay;
-            local_38[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
+            pitchWork[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
             if ((param_1->m_vibrateRate >> REDSOUND_FIXED_SHIFT) != 0) {
-                local_38[0] =
+                pitchWork[0] =
                     REDSOUND_MOD_DELAY_PHASE_SCALE / (param_1->m_vibrateRate >> REDSOUND_FIXED_SHIFT);
             }
             if (param_1->m_vibrateDelayDepth == 0) {
                 iVar5 = 0;
             } else {
-                iVar5 = param_1->m_vibrateDelayDepth * local_38[0] * REDSOUND_MOD_DELAY_FRAME_SCALE;
+                iVar5 = param_1->m_vibrateDelayDepth * pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE;
             }
             param_2->m_pitchModFrames = iVar5;
             param_2->m_pitchModFrame = 0;
@@ -1117,15 +1117,15 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
 
         if (param_1->m_tremoloFunc != 0) {
             param_2->m_volumeModDelay = param_1->m_tremoloDelay;
-            local_38[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
+            pitchWork[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
             if ((param_1->m_tremoloRate >> REDSOUND_FIXED_SHIFT) != 0) {
-                local_38[0] =
+                pitchWork[0] =
                     REDSOUND_MOD_DELAY_PHASE_SCALE / (param_1->m_tremoloRate >> REDSOUND_FIXED_SHIFT);
             }
             if (param_1->m_tremoloDelayDepth == 0) {
                 iVar5 = 0;
             } else {
-                iVar5 = param_1->m_tremoloDelayDepth * local_38[0] * REDSOUND_MOD_DELAY_FRAME_SCALE;
+                iVar5 = param_1->m_tremoloDelayDepth * pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE;
             }
             param_2->m_volumeModFrames = iVar5;
             param_2->m_volumeModFrame = 0;
@@ -1140,9 +1140,9 @@ static void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNot
         iVar5 = ((int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1) *
                 param_2->m_targetPitch *
                 param_1->m_fuzzyPitchDepth;
-        local_38[0] = iVar5 >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
+        pitchWork[0] = iVar5 >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
         if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) == 0) {
-            param_2->m_randomPitch = local_38[0];
+            param_2->m_randomPitch = pitchWork[0];
         } else {
             param_2->m_randomPitch = -(iVar5 >> REDSOUND_RANDOM_FUZZY_PITCH_NEGATIVE_SHIFT);
         }

@@ -314,7 +314,7 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
 
 	m_MemoryBank = (RedMemoryBlock*)param1;
 	m_AMemoryBank = (RedMemoryBlock*)((int)m_MemoryBank + bankSize);
-	m_DataBufferSize = param2 - bankSize * 2;
+	m_DataBufferSize = param2 - bankSize * REDSOUND_MEMORY_BANK_TABLE_COUNT;
 	m_DataBuffer = (int)m_AMemoryBank + bankSize;
 	memset(m_MemoryBank, 0, bankSize);
 	memset(m_AMemoryBank, 0, bankSize);

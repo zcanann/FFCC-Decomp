@@ -57,12 +57,12 @@ extern "C" void drawViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
 extern "C" void* __vt__8CManager[];
-extern "C" void* __vt__10CSamplePcs[];
+extern "C" void* __vt__8CProcess[];
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
 extern "C" void* __vt__14CFunnyShapePcs[];
 static const char lbl_801D7DD0[] = "CFunnyShapePcs(VIEWER)";
-extern const char s_CFunnyShapePcs[];
+static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 extern char lbl_8032E660[];
 extern u8 ARRAY_8026D728[];
 
@@ -99,14 +99,9 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
     CFunnyShapePcs* pcs = reinterpret_cast<CFunnyShapePcs*>(&FunnyShapePcs);
     u8* self = reinterpret_cast<u8*>(pcs);
-    unsigned int* dst = m_table__14CFunnyShapePcs;
-    unsigned int* desc0 = m_table_desc0__14CFunnyShapePcs;
-    unsigned int* desc1 = m_table_desc1__14CFunnyShapePcs;
-    unsigned int* desc2 = m_table_desc2__14CFunnyShapePcs;
-    unsigned int* desc3 = m_table_desc3__14CFunnyShapePcs;
 
     *reinterpret_cast<void**>(self) = __vt__8CManager;
-    *reinterpret_cast<void**>(self) = __vt__10CSamplePcs;
+    *reinterpret_cast<void**>(self) = __vt__8CProcess;
     *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
 
     __ct__14CUSBStreamDataFv(self + 0x3C);
@@ -114,18 +109,18 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
     __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
     __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
-    dst[1] = desc0[0];
-    dst[2] = desc0[1];
-    dst[3] = desc0[2];
-    dst[4] = desc1[0];
-    dst[5] = desc1[1];
-    dst[6] = desc1[2];
-    dst[7] = desc2[0];
-    dst[8] = desc2[1];
-    dst[9] = desc2[2];
-    dst[12] = desc3[0];
-    dst[13] = desc3[1];
-    dst[14] = desc3[2];
+    m_table__14CFunnyShapePcs[1] = m_table_desc0__14CFunnyShapePcs[0];
+    m_table__14CFunnyShapePcs[2] = m_table_desc0__14CFunnyShapePcs[1];
+    m_table__14CFunnyShapePcs[3] = m_table_desc0__14CFunnyShapePcs[2];
+    m_table__14CFunnyShapePcs[4] = m_table_desc1__14CFunnyShapePcs[0];
+    m_table__14CFunnyShapePcs[5] = m_table_desc1__14CFunnyShapePcs[1];
+    m_table__14CFunnyShapePcs[6] = m_table_desc1__14CFunnyShapePcs[2];
+    m_table__14CFunnyShapePcs[7] = m_table_desc2__14CFunnyShapePcs[0];
+    m_table__14CFunnyShapePcs[8] = m_table_desc2__14CFunnyShapePcs[1];
+    m_table__14CFunnyShapePcs[9] = m_table_desc2__14CFunnyShapePcs[2];
+    m_table__14CFunnyShapePcs[12] = m_table_desc3__14CFunnyShapePcs[0];
+    m_table__14CFunnyShapePcs[13] = m_table_desc3__14CFunnyShapePcs[1];
+    m_table__14CFunnyShapePcs[14] = m_table_desc3__14CFunnyShapePcs[2];
 }
 
 unsigned int m_table_desc0__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
@@ -438,8 +433,6 @@ void CFunnyShapePcs::drawViewer()
         Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), pFan[frame % 4]);
     }
 }
-
-const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 
 /*
  * --INFO--

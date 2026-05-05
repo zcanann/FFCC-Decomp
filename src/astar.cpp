@@ -652,7 +652,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 	CAPos* pos0 = m_portals;
 	do
 	{
-		unsigned char other0 = pos0->m_groupA;
+		int other0 = pos0->m_groupA;
 		bool connected0 = false;
 
 		if (other0 == startGroup)
@@ -770,7 +770,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 
 					do
 					{
-						unsigned char other1 = pos1->m_groupA;
+						int other1 = pos1->m_groupA;
 						bool connected1 = false;
 
 						if (other1 == other0)

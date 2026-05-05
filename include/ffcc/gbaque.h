@@ -171,7 +171,7 @@ private:
     char cmakeInfo[4][0x20];          // 0x2CB2
     unsigned char _pad2D32[0x12];     // 0x2D32
     GbaQueueHitInfo m_hitInfo[4];      // 0x2D44
-    unsigned char m_chgHitFlags;      // 0x2D54
+    char m_chgHitFlags;               // 0x2D54
     unsigned char m_chgScouFlags;     // 0x2D55
     char m_singleMode;                // 0x2D56
     char m_controllerMode;            // 0x2D57

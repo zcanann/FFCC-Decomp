@@ -22,15 +22,15 @@ struct FloatValue {
 	float value;
 };
 
-extern "C" const float FLOAT_80331BD0 = 1.0f;
-extern "C" const float FLOAT_80331BD4 = 0.0f;
-extern "C" const float FLOAT_80331BD8 = 3.1415927f;
-extern "C" const double DOUBLE_80331BE0 = 4503601774854144.0;
-extern "C" const FloatValue FLOAT_80331BE8 = {-1.0f};
-extern "C" const char DAT_80331bf0[] = "GMGR";
-extern "C" const float FLOAT_80331bf8 = 0.0f;
-extern "C" const float FLOAT_80331bfc = 1.0f;
-extern "C" const double DOUBLE_80331C00 = 4503599627370496.0;
+extern const float FLOAT_80331BD0;
+extern const float FLOAT_80331BD4;
+extern const float FLOAT_80331BD8;
+extern const double DOUBLE_80331BE0;
+extern const FloatValue FLOAT_80331BE8;
+extern const char DAT_80331bf0[];
+extern const float FLOAT_80331bf8;
+extern const float FLOAT_80331bfc;
+extern const double DOUBLE_80331C00;
 
 /*
  * --INFO--
@@ -236,9 +236,9 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
 	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
-	targetRot = FLOAT_80331BD4;
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
+	targetRot = FLOAT_80331BD4;
 	if ((targetRot == deltaX) || (targetRot == deltaZ)) {
 		targetRot = FLOAT_80331BD4;
 	} else {
@@ -271,9 +271,9 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
 	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
-	targetRot = FLOAT_80331BD4;
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
+	targetRot = FLOAT_80331BD4;
 	if ((targetRot == deltaX) || (targetRot == deltaZ)) {
 		targetRot = FLOAT_80331BD4;
 	} else {
@@ -305,9 +305,9 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
 	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
-	targetRot = FLOAT_80331BD4;
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
+	targetRot = FLOAT_80331BD4;
 	if ((targetRot == deltaX) || (targetRot == deltaZ)) {
 		return targetRot;
 	}
@@ -630,3 +630,13 @@ void CGPrgObj::onCreate()
 	m_animFlagBits.bits.m_animDirect = 0;
 	m_reqAnimId = -1;
 }
+
+extern const float FLOAT_80331BD0 = 1.0f;
+extern const float FLOAT_80331BD4 = 0.0f;
+extern const float FLOAT_80331BD8 = 3.1415927f;
+extern const double DOUBLE_80331BE0 = 4503601774854144.0;
+extern const FloatValue FLOAT_80331BE8 = {-1.0f};
+extern const char DAT_80331bf0[] = "GMGR";
+extern const float FLOAT_80331bf8 = 0.0f;
+extern const float FLOAT_80331bfc = 1.0f;
+extern const double DOUBLE_80331C00 = 4503599627370496.0;

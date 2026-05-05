@@ -541,7 +541,8 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec->y = dVar20;
         inVec->z = dVar21;
         PSVECNormalize(inVec, inVec);
-        PSVECCrossProduct(inVec, &DAT_801dd4bc, inVec + 2);
+        Vec crossBasis = DAT_801dd4bc;
+        PSVECCrossProduct(inVec, &crossBasis, inVec + 2);
 
         dVar17 = Math.RandF(*(float*)((u8*)step + 0x3C));
         PSVECScale(inVec, inVec, *(float*)((u8*)step + 0x38) + dVar17);

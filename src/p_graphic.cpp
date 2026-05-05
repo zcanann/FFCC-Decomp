@@ -15,7 +15,7 @@
 #include "ffcc/sound.h"
 #include "types.h"
 #include <dolphin/mtx.h>
-#include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CGraphicPcs GraphicPcs;
@@ -753,7 +753,7 @@ void CGraphicPcs::drawBar()
                             *reinterpret_cast<float*>(&CFlat[4920]), *reinterpret_cast<float*>(&CFlat[4924]),
                             *reinterpret_cast<float*>(&CFlat[4928]), *reinterpret_cast<float*>(&CFlat[4932]),
                             *reinterpret_cast<float*>(&CFlat[4936]), *reinterpret_cast<float*>(&CFlat[72]));
-                    strcat(debugString, extraString, sizeof(debugString));
+                    strcat(debugString, extraString);
                 }
 
                 Graphic.DrawDebugStringDirect(static_cast<u32>(x + 1.0f), y, debugString, 8);

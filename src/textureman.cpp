@@ -760,10 +760,9 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
         int numEntries = (*reinterpret_cast<unsigned int*>(texture + 0x60) == 9) ? 0x100 : 0x10;
         GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x48), tlutData, GX_TL_IA8, numEntries);
 
-        int offset = (*reinterpret_cast<unsigned int*>(texture + 0x60) == 9) ? 0x100 : 0x10;
         numEntries = (*reinterpret_cast<unsigned int*>(texture + 0x60) == 9) ? 0x100 : 0x10;
         GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x54),
-                      reinterpret_cast<void*>(reinterpret_cast<unsigned int>(tlutData) + offset * 2), GX_TL_IA8,
+                      reinterpret_cast<void*>(reinterpret_cast<unsigned int>(tlutData) + numEntries * 2), GX_TL_IA8,
                       numEntries);
     } else {
         GXInitTexObj(reinterpret_cast<GXTexObj*>(texture + 0x28), *reinterpret_cast<void**>(texture + 0x78),

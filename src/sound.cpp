@@ -778,8 +778,8 @@ float CSound::GetPerformance()
 {
     unsigned int programTime = GetProgramTime__9CRedSoundFv(RedSound(this));
     float numer = (float)(programTime / 0xF);
-    float denom = (float)(((OS_BUS_CLOCK / 500000) * 0x8235) >> 3);
-    return FLOAT_80330d00 * (numer / denom);
+    float denom = (float)(((OS_TIMER_CLOCK / 125000) * 0x8235) >> 3);
+    return 100.0f * (numer / denom);
 }
 
 /*
@@ -809,15 +809,16 @@ void CSound::PauseDiscError(int pause)
  */
 void CSound::CheckDriver(int mode)
 {
-    CSoundLayout& sound = SoundData(this);
+    u8* self = reinterpret_cast<u8*>(this);
+    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
     unsigned int oldPrint = sound.m_debugPrint;
     sound.m_debugPrint = 1;
-    ReportPrint__9CRedSoundFi(RedSound(this), 1);
-    TestProcess__9CRedSoundFi(RedSound(this), mode);
-    DisplayWaveInfo__9CRedSoundFv(RedSound(this));
-    DisplaySePlayInfo__9CRedSoundFv(RedSound(this));
+    ReportPrint__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), 1);
+    TestProcess__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), mode);
+    DisplayWaveInfo__9CRedSoundFv(reinterpret_cast<CRedSound*>(self + 8));
+    DisplaySePlayInfo__9CRedSoundFv(reinterpret_cast<CRedSound*>(self + 8));
     sound.m_debugPrint = oldPrint;
-    ReportPrint__9CRedSoundFi(RedSound(this), (-oldPrint | oldPrint) >> 0x1F);
+    ReportPrint__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), (-oldPrint | oldPrint) >> 0x1F);
 }
 
 /*

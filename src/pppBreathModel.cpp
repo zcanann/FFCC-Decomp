@@ -490,7 +490,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     Mtx* particleWMat;
     Mtx* particleMtx;
     int i;
-    short groupIndex;
+    int groupIndex;
     int firstParticle;
     int groupTable;
     short slotIndex;

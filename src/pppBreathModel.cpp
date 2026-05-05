@@ -500,10 +500,10 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;
-    Vec origin;
-    Vec dir;
-    Vec target;
     Vec hitVector;
+    Vec dir;
+    Vec origin;
+    Vec target;
 
     if (gPppCalcDisabled != 0) {
         return;

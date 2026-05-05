@@ -172,7 +172,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     int slice;
     int tevSwapChannel;
     int tevAlphaScale;
-    int shouldDrawShell;
+    int isCameraInside;
     GXTexObj backI4Tex;
     GXTexObj backRgba8Tex;
     GXTexObj backRgba8Tex2;
@@ -239,9 +239,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         Game.unkFloat_0xca10 = scaledRadius;
     }
 
-    shouldDrawShell = 0;
-    if ((FLOAT_80331938 + scaledRadius) <= PSVECDistance(&cameraPos, &managerPos)) {
-        shouldDrawShell = 1;
+    isCameraInside = 0;
+    if ((FLOAT_80331938 + scaledRadius) > PSVECDistance(&cameraPos, &managerPos)) {
+        isCameraInside = 1;
     }
 
     texHeight = (int)FLOAT_8033192c;
@@ -257,15 +257,15 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
                                    GX_TF_I4, 0);
         GXSetScissor(0, (u32)yPos, scissorWidth, scissorHeight);
 
-        if (shouldDrawShell) {
-            drawColor.rgba[0] = 0;
-            drawColor.rgba[1] = 0;
-            drawColor.rgba[2] = 0;
-            drawColor.rgba[3] = 0xFF;
-        } else {
+        if (isCameraInside) {
             drawColor.rgba[0] = 0xFF;
             drawColor.rgba[1] = 0xFF;
             drawColor.rgba[2] = 0xFF;
+            drawColor.rgba[3] = 0xFF;
+        } else {
+            drawColor.rgba[0] = 0;
+            drawColor.rgba[1] = 0;
+            drawColor.rgba[2] = 0;
             drawColor.rgba[3] = 0xFF;
         }
         gUtil.RenderColorQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
@@ -315,7 +315,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             0, 7, 7, 7, 6);
         _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 2, 1, 0);
 
-        if (shouldDrawShell) {
+        if (!isCameraInside) {
             Graphic.SetDrawDoneDebugData(0x32);
             pppDrawMesh__FP10pppModelStP3Veci(model, pppMiasma->m_meshPoints, 0);
             Graphic.SetDrawDoneDebugData(0x33);
@@ -340,15 +340,15 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize,
                                    GX_LINEAR, GX_TF_RGBA8, 0);
         if (param_2->m_payload[0x1D] != 0) {
-            if (shouldDrawShell) {
-                drawColor.rgba[0] = 0;
-                drawColor.rgba[1] = 0;
-                drawColor.rgba[2] = 0;
-                drawColor.rgba[3] = 0xFF;
-            } else {
+            if (isCameraInside) {
                 drawColor.rgba[0] = 0xFF;
                 drawColor.rgba[1] = 0xFF;
                 drawColor.rgba[2] = 0xFF;
+                drawColor.rgba[3] = 0xFF;
+            } else {
+                drawColor.rgba[0] = 0;
+                drawColor.rgba[1] = 0;
+                drawColor.rgba[2] = 0;
                 drawColor.rgba[3] = 0xFF;
             }
             gUtil.RenderColorQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
@@ -387,7 +387,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
                 0, 7, 7, 7, 6);
             _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
 
-            if (shouldDrawShell) {
+            if (!isCameraInside) {
                 Graphic.SetDrawDoneDebugData(0x36);
                 pppDrawMesh__FP10pppModelStP3Veci(model, pppMiasma->m_meshPoints, 0);
                 Graphic.SetDrawDoneDebugData(0x37);

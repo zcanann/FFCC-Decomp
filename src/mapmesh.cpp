@@ -419,7 +419,6 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
             m_vertices = cursor;
-            offset = 0;
             cursor += chunk.m_size;
             m_bboxMinZ = FLOAT_8032F930;
             m_bboxMinY = FLOAT_8032F930;
@@ -428,7 +427,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             m_bboxMaxY = FLOAT_8032F934;
             m_bboxMaxX = FLOAT_8032F934;
 
-            for (int i = 0; i < static_cast<int>(m_vertexCount); i++) {
+            for (int i = 0, offset = 0; i < static_cast<int>(m_vertexCount); i++) {
                 float value = reader.GetF4();
                 *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_vertices) + offset) = value;
                 value = reader.GetF4();
@@ -476,17 +475,9 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                 *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 3) =
                     reader.Get1();
                 if (halfColor != 0) {
-                    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset) =
-                        static_cast<unsigned char>(
-                            *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset) >> 1);
-                    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 1) =
-                        static_cast<unsigned char>(
-                            *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 1) >>
-                            1);
-                    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 2) =
-                        static_cast<unsigned char>(
-                            *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 2) >>
-                            1);
+                    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset) >>= 1;
+                    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 1) >>= 1;
+                    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 2) >>= 1;
                 }
                 offset += 4;
             }

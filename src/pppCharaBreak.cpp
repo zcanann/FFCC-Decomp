@@ -4,6 +4,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/ppp_constants.h"
 #include "ffcc/util.h"
 
 #include "dolphin/gx.h"
@@ -37,7 +38,6 @@ extern int DAT_801dd684;
 extern int DAT_801dd688;
 extern int DAT_801dd68c;
 extern Vec kPppCharaBreakUpVector;
-extern int ppvSinTbl;
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
                                                                         unsigned int materialIdx, int, int);
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
@@ -741,9 +741,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                                 *angleState = (short)(*angleState + 0x168);
                             }
 
-                            u32 sinIndex = (u32)(((float)((int)(*angleState << 15))) / FLOAT_80332060);
-                            sinValue = *(float*)((int)ppvSinTbl + (sinIndex & 0xFFFC));
-                            cosValue = *(float*)((int)ppvSinTbl + ((sinIndex + 0x4000) & 0xFFFC));
+                            s32 sinIndex = (s32)(((float)((int)(*angleState << 15))) / FLOAT_80332060);
+                            sinValue = *(float*)((u8*)gPppTrigTable + (sinIndex & 0xFFFC));
+                            cosValue = *(float*)((u8*)gPppTrigTable + ((sinIndex + 0x4000) & 0xFFFC));
                         }
 
                         for (int i = 0; i < 3; i++) {

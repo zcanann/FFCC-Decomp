@@ -511,20 +511,21 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     Mtx* particleWMat;
     Mtx* particleMtx;
     int i;
-    short groupIndex;
+    int groupIndex;
     int firstParticle;
     int groupTable;
     short slotIndex;
+    int particleSlot;
     int slotCount;
     int ready;
     float scaledOwner;
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;
-    Vec origin;
-    Vec dir;
-    Vec target;
     Vec hitVector;
+    Vec dir;
+    Vec origin;
+    Vec target;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -617,12 +618,12 @@ group_ready:
         if (ready) {
             firstParticle = -1;
             scaledOwner = mngSt->m_previousPosition.z * params->m_groupOwnerScale;
-            for (slotIndex = 0; slotCount != 0; slotCount--) {
-                if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
-                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
+            for (particleSlot = 0; slotCount != 0; slotCount--) {
+                if (*(signed char*)(*(int*)(groupTable + 8) + particleSlot) != -1) {
+                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + particleSlot);
                     break;
                 }
-                slotIndex++;
+                particleSlot++;
             }
 
             PSMTXIdentity(scaleMtx);
@@ -676,8 +677,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     YmBreathParticleGroup* groupData;
     short foundSlot;
     short foundGroup;
-    Vec stepVelocity;
     Vec unitVelocity;
+    Vec stepVelocity;
 
     particleData = reinterpret_cast<YmBreathParticleData*>(vYmBreath->m_particleData);
     particleWmat = vYmBreath->m_particleWmats;

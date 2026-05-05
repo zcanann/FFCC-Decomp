@@ -354,43 +354,46 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 
 	void** stageArray = (void**)state->m_displayListArrays;
 	void** meshArray;
-	if ((stageArray != 0) && ((meshArray = (void**)state->m_meshColorArrays), meshArray != 0)) {
-		int meshList = (int)model->m_meshes;
-		void** curStageArray = stageArray;
-		void** curMeshArray = meshArray;
-		for (unsigned int i = 0; i < model->m_data->m_meshCount; i++, meshList += 0x14) {
-			int meshData = *(int*)(meshList + 8);
-			void** dlEntries = (void**)*curStageArray;
-			for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {
-				if (*(void**)*dlEntries != 0) {
-					pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
-					*(void**)*dlEntries = 0;
-				}
-				if (*dlEntries != 0) {
-					pppHeapUseRate__FPQ27CMemory6CStage(*dlEntries);
-					*dlEntries = 0;
-				}
-				dlEntries++;
-			}
-
-			if (*curStageArray != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(*curStageArray);
-				*curStageArray = 0;
-			}
-			if (*curMeshArray != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(*curMeshArray);
-				*curMeshArray = 0;
-			}
-
-			curStageArray++;
-			curMeshArray++;
-		}
-
-		if (stageArray != 0) {
-			pppHeapUseRate__FPQ27CMemory6CStage(stageArray);
-		}
+	if (stageArray != 0) {
+		meshArray = (void**)state->m_meshColorArrays;
 		if (meshArray != 0) {
-			pppHeapUseRate__FPQ27CMemory6CStage(meshArray);
+			int meshList = (int)model->m_meshes;
+			void** meshArrayOrig = meshArray;
+			void** stageArrayOrig = stageArray;
+			for (unsigned int i = 0; i < model->m_data->m_meshCount; i++, meshList += 0x14) {
+				int meshData = *(int*)(meshList + 8);
+				void** dlEntries = (void**)*stageArray;
+				for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {
+					if (*(void**)*dlEntries != 0) {
+						pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
+						*(void**)*dlEntries = 0;
+					}
+					if (*dlEntries != 0) {
+						pppHeapUseRate__FPQ27CMemory6CStage(*dlEntries);
+						*dlEntries = 0;
+					}
+					dlEntries++;
+				}
+
+				if (*stageArray != 0) {
+					pppHeapUseRate__FPQ27CMemory6CStage(*stageArray);
+					*stageArray = 0;
+				}
+				if (*meshArray != 0) {
+					pppHeapUseRate__FPQ27CMemory6CStage(*meshArray);
+					*meshArray = 0;
+				}
+
+				stageArray++;
+				meshArray++;
+			}
+
+			if (stageArrayOrig != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(stageArrayOrig);
+			}
+			if (meshArrayOrig != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(meshArrayOrig);
+			}
 		}
 	}
 }

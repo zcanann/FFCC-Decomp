@@ -9,7 +9,7 @@ struct pppCVECTOR {
 
 struct pppYmDrawMdlTexAnmWork {
     u32 m_frame;
-    u32 m_wait;
+    s32 m_wait;
     u32 m_tilesU;
     u32 m_tilesV;
     f32 m_perU;
@@ -163,7 +163,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
     work->m_tilesU = *(u32*)(step->m_payload + 4);
     work->m_tilesV = *(u32*)(step->m_payload + 8);
 
-    if ((s32)work->m_wait > 0) {
+    if (work->m_wait > 0) {
         return;
     }
 

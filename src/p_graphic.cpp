@@ -1,5 +1,6 @@
 #include "ffcc/p_graphic.h"
 #include "ffcc/color.h"
+#include "ffcc/p_dbgmenu.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"

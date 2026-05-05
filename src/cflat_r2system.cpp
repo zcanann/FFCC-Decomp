@@ -1332,7 +1332,7 @@ void VECLerp(Vec* a, Vec* b, Vec* out, float t)
     Vec scaledA;
     Vec scaledB;
 
-    PSVECScale(a, &scaledA, 1.0f - t);
+    PSVECScale(a, &scaledA, FLOAT_80330B34 - t);
     PSVECScale(b, &scaledB, t);
     PSVECAdd(&scaledA, &scaledB, out);
 }

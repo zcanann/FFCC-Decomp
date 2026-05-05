@@ -53,7 +53,6 @@ extern float FLOAT_8032fc8c;
 extern float FLOAT_8032fc94;
 float FLOAT_8032ed10;
 extern double DOUBLE_8032fc68;
-extern float DAT_801ea430;
 extern unsigned int DAT_8032e620;
 
 extern "C" void setViewport__11CGraphicPcsFv(void*);
@@ -95,32 +94,6 @@ static inline double U32ToDouble(unsigned int value)
 
     conv.u = 0x4330000000000000ULL | (unsigned long long)value;
     return conv.d - DOUBLE_8032fc68;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CLightPcs::CLightPcs()
-{
-    unsigned int* table = m_table__9CLightPcs;
-
-    table[0x004 / 4] = m_table_desc0__9CLightPcs[0];
-    table[0x008 / 4] = m_table_desc0__9CLightPcs[1];
-    table[0x00C / 4] = m_table_desc0__9CLightPcs[2];
-    table[0x010 / 4] = m_table_desc1__9CLightPcs[0];
-    table[0x014 / 4] = m_table_desc1__9CLightPcs[1];
-    table[0x018 / 4] = m_table_desc1__9CLightPcs[2];
-    table[0x01C / 4] = m_table_desc2__9CLightPcs[0];
-    table[0x020 / 4] = m_table_desc2__9CLightPcs[1];
-    table[0x024 / 4] = m_table_desc2__9CLightPcs[2];
-    table[0x030 / 4] = m_table_desc3__9CLightPcs[0];
-    table[0x034 / 4] = m_table_desc3__9CLightPcs[1];
-    table[0x038 / 4] = m_table_desc3__9CLightPcs[2];
-    table[0x044 / 4] = m_table_desc4__9CLightPcs[0];
-    table[0x048 / 4] = m_table_desc4__9CLightPcs[1];
-    table[0x04C / 4] = m_table_desc4__9CLightPcs[2];
 }
 
 /*
@@ -387,16 +360,6 @@ void CLightPcs::draw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CLightPcs::Clear()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80049acc
  * PAL Size: 1032b
  * EN Address: TODO
@@ -435,16 +398,6 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     sceneLight.m_unkAC = sceneLight.m_attenRadius * sceneLight.m_attenRadius;
     m_sceneLights[m_sceneLightCount] = sceneLight;
     m_sceneLightCount += 1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CLightPcs::GetFreeBumpLight(CLightPcs::TARGET)
-{
-	// TODO
 }
 
 /*
@@ -999,7 +952,8 @@ void CLightPcs::CBumpLight::MakeLightMap()
     unsigned int packedColor = DAT_8032fc0c;
     double dScale = (double)FLOAT_8032fc40;
     double dHalf = (double)FLOAT_8032fc1c;
-    float* lightScale = &DAT_801ea430;
+    static float tParam[4] = {48.0f, 128.0f, 256.0f, 512.0f};
+    float* lightScale = tParam;
     double dFactor = (double)FLOAT_8032fc3c;
     double dInv = (double)FLOAT_8032fc44;
     int offset = 0;

@@ -57,16 +57,6 @@ void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
 }
 
 extern "C" const char s_pppYmLaser_cpp_801DB4B0[] = "pppYmLaser.cpp";
-extern const f64 DOUBLE_80330dd8 = 4503601774854144.0;
-extern const f32 FLOAT_80330de0 = -1.0f;
-extern const f32 FLOAT_80330de4 = 1.2f;
-extern const f32 FLOAT_80330de8 = 10000000000.0f;
-extern const f32 FLOAT_80330dec = -10000000000.0f;
-extern const f32 FLOAT_80330df0[2] = {6.2831855f, 0.0f};
-extern const f32 FLOAT_80330df8 = 2.0f;
-extern const f32 FLOAT_80330dfc = 0.5f;
-extern const f32 FLOAT_80330e00 = 0.25f;
-extern const f64 DOUBLE_80330E08 = 4503601774854144.0;
 
 struct CMapCylinderRaw {
 	Vec m_bottom;
@@ -608,3 +598,14 @@ extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 	work->m_shapeArg1 = 0;
 	work->m_shapeRotation = Math.RandF(randArg);
 }
+
+extern const f64 DOUBLE_80330dd8 = 4503601774854144.0;
+extern const f32 FLOAT_80330de0 = -1.0f;
+extern const f32 FLOAT_80330de4 = 1.2f;
+extern const f32 FLOAT_80330de8 = 10000000000.0f;
+extern const f32 FLOAT_80330dec = -10000000000.0f;
+extern const f32 FLOAT_80330df0[2] = {6.2831855f, 0.0f};
+extern const f32 FLOAT_80330df8 = 2.0f;
+extern const f32 FLOAT_80330dfc = 0.5f;
+extern const f32 FLOAT_80330e00 = 0.25f;
+extern const f64 DOUBLE_80330E08 = 4503601774854144.0;

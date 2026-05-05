@@ -365,9 +365,9 @@ void CFont::DrawQuit()
  */
 void CFont::DrawInit()
 {
-    Mtx identityMtx;
-    Mtx44 projMtx;
     Mtx texMtx;
+    Mtx44 projMtx;
+    Mtx identityMtx;
 
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
@@ -376,9 +376,8 @@ void CFont::DrawInit()
     CColor white(0xFF, 0xFF, 0xFF, 0xFF);
     GXSetChanAmbColor(GX_COLOR0A0, white.color);
 
-    unsigned char flags = renderFlags;
-    if (static_cast<int>((static_cast<unsigned int>(flags) << 25) | static_cast<unsigned int>(flags >> 7)) < 0 ||
-        static_cast<int>((static_cast<unsigned int>(flags) << 26) | static_cast<unsigned int>(flags >> 6)) < 0) {
+    CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
+    if (renderFlagBits.zCompare != 0 || renderFlagBits.zUpdate != 0) {
         C_MTXOrtho(projMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
         projMtx[2][2] = 1.0f;
         projMtx[2][3] = 0.0f;
@@ -394,13 +393,14 @@ void CFont::DrawInit()
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 
-    flags = renderFlags;
+    signed char zCompareFlag = renderFlagBits.zCompare;
+    signed char zUpdateFlag = renderFlagBits.zUpdate;
     int zFunction = 7;
-    if ((flags & 0x40) != 0) {
+    int zUpdate = (zCompareFlag != 0) ? 1 : 0;
+    if (zUpdateFlag != 0) {
         zFunction = 3;
     }
-    int zEnable = ((flags & 0x80) != 0 || (flags & 0x40) != 0) ? 1 : 0;
-    int zUpdate = ((flags & 0x40) != 0) ? 1 : 0;
+    int zEnable = (zCompareFlag != 0 || zUpdateFlag != 0) ? 1 : 0;
     GXSetZMode(zEnable, (GXCompare)zFunction, zUpdate);
 
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
@@ -426,9 +426,8 @@ void CFont::DrawInit()
 
     TextureMan.SetTextureTev(texturePtr);
 
-    CFontRenderFlagBits& bits = GetRenderFlagBits(renderFlags);
-    bits.snapPosition = 0;
-    bits.fixedWidth = 0;
+    renderFlagBits.snapPosition = 0;
+    renderFlagBits.fixedWidth = 0;
 }
 
 /*

@@ -43,7 +43,7 @@ public:
         u8 m_directionMode;       // 0x4E
         u8 m_specularMode;        // 0x4F
         _GXColor m_targetColor[4];// 0x50
-        u32 m_targetEnableMask;   // 0x60
+        u8 m_targetEnableMask[4]; // 0x60
         void* m_part;             // 0x64
         u8 m_bumpShade[4];        // 0x68
         GXLightObj m_gxLightObj;  // 0x6C

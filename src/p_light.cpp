@@ -409,7 +409,7 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     CLight sceneLight;
     sceneLight = *light;
     float attenRadius = sceneLight.m_attenRadius;
-    u8* targetEnable = reinterpret_cast<u8*>(&sceneLight.m_targetEnableMask);
+    u8* targetEnable = sceneLight.m_targetEnableMask;
 
     if (FLOAT_8032fc10 <= sceneLight.m_attenFalloff) {
         sceneLight.m_attenFalloff = attenRadius;
@@ -714,24 +714,22 @@ void CLightPcs::SetDiffuseColor(unsigned long idx, _GXColor color)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CLightPcs::EnableLight(int param_1, int param_2)
+void CLightPcs::EnableLight(int enabled, int colorSrcParam)
 {
-    int enabled = param_1;
-    int colorSrcParam = param_2;
+    int enableValue = enabled;
     unsigned int light_mask;
 
-    if (enabled != 0) {
+    if (enableValue != 0) {
         light_mask = m_loadedLightMask;
     } else {
         light_mask = 0;
     }
 
-    GXSetChanCtrl((GXChannelID)0, (u8)(((unsigned int)(-enabled | enabled)) >> 0x1f), (GXColorSrc)0,
-                  (GXColorSrc)(__cntlzw((unsigned int)colorSrcParam) >> 5), light_mask, (GXDiffuseFn)2,
-                  (GXAttnFn)1);
-    GXSetChanCtrl((GXChannelID)2, (u8)(((unsigned int)(-enabled | enabled)) >> 0x1f), (GXColorSrc)0,
-                  (GXColorSrc)(__cntlzw((unsigned int)colorSrcParam) >> 5), 0, (GXDiffuseFn)0,
-                  (GXAttnFn)2);
+    enabled = (unsigned int)(-enableValue | enableValue) >> 31;
+    GXSetChanCtrl((GXChannelID)0, (u8)enabled, (GXColorSrc)0, (GXColorSrc)((int)__cntlzw(colorSrcParam) >> 5),
+                  light_mask, (GXDiffuseFn)2, (GXAttnFn)1);
+    GXSetChanCtrl((GXChannelID)2, (u8)enabled, (GXColorSrc)0, (GXColorSrc)((int)__cntlzw(colorSrcParam) >> 5), 0,
+                  (GXDiffuseFn)0, (GXAttnFn)2);
 }
 
 /*
@@ -948,7 +946,7 @@ void CLightPcs::InsertOctTree(CLightPcs::TARGET target, COctTree& octTree)
     octTree.ClearLight();
     CLight* light = m_sceneLights;
     for (u32 i = 0; i < m_sceneLightCount; i++, light++) {
-        if (reinterpret_cast<u8*>(&light->m_targetEnableMask)[target] != 0) {
+        if (light->m_targetEnableMask[target] != 0) {
             octTree.InsertLight(i, *reinterpret_cast<Vec*>(&light->m_position), light->m_range, light->m_partMask);
         }
     }

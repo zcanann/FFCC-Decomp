@@ -1909,7 +1909,10 @@ void CMapMng::SetLightSource()
                     light.m_unk4D = (atr[0x2D] == 0) ? 4 : 2;
                     light.m_directionMode = atr[0x30];
                     light.m_partMask = 1 << mapLightIndex;
-                    light.m_targetEnableMask = 0;
+                    light.m_targetEnableMask[0] = 0;
+                    light.m_targetEnableMask[1] = 0;
+                    light.m_targetEnableMask[2] = 0;
+                    light.m_targetEnableMask[3] = 0;
                     LightPcs.Add(&light);
                 } else {
                     CLightPcs::CLight* light = *reinterpret_cast<CLightPcs::CLight**>(atr + 0x38);
@@ -1956,7 +1959,10 @@ void CMapMng::SetLightSource()
                 light.m_targetColor[1].g = atr[0xD];
                 light.m_targetColor[1].b = atr[0xE];
                 light.m_targetColor[1].a = atr[0xF];
-                light.m_targetEnableMask = 0;
+                light.m_targetEnableMask[0] = 0;
+                light.m_targetEnableMask[1] = 0;
+                light.m_targetEnableMask[2] = 0;
+                light.m_targetEnableMask[3] = 0;
                 light.m_spotFn = atr[0x1C];
                 light.m_unk4D = 4;
                 light.m_directionMode = atr[0x20];

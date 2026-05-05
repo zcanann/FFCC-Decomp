@@ -27,6 +27,12 @@ struct GobjworkFlatData {
 	GobjworkFlatTableEntry table[8];
 };
 
+struct ShoukiByteFlags {
+	int upper : 1;
+	unsigned int pad0 : 2;
+	int middle : 1;
+};
+
 static inline float GetStatusMultiplier(int offset)
 {
 	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * 0.01f) + 1.0f;

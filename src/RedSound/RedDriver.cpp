@@ -124,6 +124,11 @@ enum RedDriverBufferSize {
     REDSOUND_MUSIC_NEXT_PLAY_BUFFER_SIZE = sizeof(RedMusicPlayCommand),
 };
 
+enum RedDriverEditorVoiceIndex {
+    REDSOUND_EDITOR_VOICE_LEFT = 0,
+    REDSOUND_EDITOR_VOICE_RIGHT = 1,
+};
+
 enum RedDriverThreadFlag {
     REDSOUND_THREAD_FLAG_MAIN = 1,
     REDSOUND_THREAD_FLAG_DMA = 2,
@@ -1412,8 +1417,8 @@ void CRedDriver::Init()
         p_VoiceData[iVar6].m_voiceIndex = iVar5;
         iVar6 = iVar6 + 1;
     } while (iVar6 < REDSOUND_VOICE_COUNT);
-    p_EditorVoice[1] = 0;
-    p_EditorVoice[0] = 0;
+    p_EditorVoice[REDSOUND_EDITOR_VOICE_RIGHT] = 0;
+    p_EditorVoice[REDSOUND_EDITOR_VOICE_LEFT] = 0;
     uVar3 = (void*)RedNew(REDSOUND_SE_TRACK_ARENA_SIZE);
     p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks = (RedTrackDATA*)uVar3;
     memset(p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks, 0, REDSOUND_SE_TRACK_ARENA_SIZE);
@@ -1516,7 +1521,7 @@ int CRedDriver::GetProgramTime()
     do {
         sum += *p;
         p++;
-    } while (p < p_Tick->m_ticks + 100);
+    } while (p < p_Tick->m_ticks + REDSOUND_TICK_HISTORY_COUNT);
     return sum;
 }
 

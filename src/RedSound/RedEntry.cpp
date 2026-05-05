@@ -803,8 +803,8 @@ void CRedEntry::DisplayWaveInfo()
 		do {
 			if (bank->m_size != 0) {
 				int freeSize;
-				if (bank[1].m_size >= 1) {
-					freeSize = bank[1].m_address - (bank->m_address + bank->m_size);
+				if (bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size >= 1) {
+					freeSize = bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address - (bank->m_address + bank->m_size);
 				} else {
 					freeSize = aBufferEnd - (bank->m_address + bank->m_size);
 				}
@@ -1619,10 +1619,10 @@ void CRedEntry::DisplayMMemoryInfo()
 		if (bankEntry->m_size != 0) {
 			int matched = 0;
 
-			if (bankEntry[1].m_size < 1) {
+			if (bankEntry[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size < 1) {
 				freeSize = bufferTop - (bankEntry->m_address + bankEntry->m_size);
 			} else {
-				freeSize = bankEntry[1].m_address - (bankEntry->m_address + bankEntry->m_size);
+				freeSize = bankEntry[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address - (bankEntry->m_address + bankEntry->m_size);
 			}
 
 			history = reinterpret_cast<RedHistoryBANK*>(m_musicBankBase);

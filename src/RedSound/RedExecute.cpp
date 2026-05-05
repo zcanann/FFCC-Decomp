@@ -1313,7 +1313,7 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 static void _AdsrStart(RedVoiceDATA* voice)
 {
     u8* adsrData = (u8*)voice + REDSOUND_VOICE_ADSR_TIME_OFFSET;
-    int* stage = (int*)((u8*)voice + REDSOUND_VOICE_ADSR_STAGE_OFFSET);
+    int* stage = &voice->m_adsrStage;
     int prevLevel;
     int nextLevel;
     int stepFrames;
@@ -1330,7 +1330,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
         *stage = *stage + 1;
     } while (*stage < REDSOUND_VOICE_ADSR_STAGE_COUNT);
 
-    stage[1] = stepFrames;
+    voice->m_adsrStepFrames = stepFrames;
     if (nextLevel != 0) {
         nextLevel += 1;
         nextLevel <<= 8;
@@ -1347,7 +1347,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
         }
         voice->m_adsrCurrentLevel = prevLevel;
         nextLevel |= REDSOUND_FIXED_HALF;
-        stage[2] = (nextLevel - prevLevel) / stepFrames;
+        voice->m_adsrStepAdd = (nextLevel - prevLevel) / stepFrames;
     } else {
         voice->m_adsrCurrentLevel = nextLevel;
     }
@@ -1368,7 +1368,7 @@ static void _AdsrDataCompute(RedVoiceDATA* voice)
     int prevValue;
     int stepCount;
     int level;
-    int* stage = (int*)((u8*)voice + REDSOUND_VOICE_ADSR_STAGE_OFFSET);
+    int* stage = &voice->m_adsrStage;
 
     level = voice->m_adsrCurrentLevel;
     stepCount = 0;

@@ -302,11 +302,10 @@ CMapAnim::CMapAnim()
 void CMapAnimNode::Interp(int frame)
 {
     CMapAnimNodeData* nodeData = reinterpret_cast<CMapAnimNodeData*>(this);
-    CMapAnimData* mapAnim = nodeData->mapAnim;
     CMapAnimNodeTracks* tracks = nodeData->tracks;
     CMapAnimTargetNode* node = nodeData->node;
-    int startFrame = mapAnim->startFrame;
-    unsigned int loopFrameCount = static_cast<unsigned int>((mapAnim->endFrame - startFrame) + 1);
+    int startFrame = nodeData->mapAnim->startFrame;
+    unsigned int loopFrameCount = static_cast<unsigned int>((nodeData->mapAnim->endFrame - startFrame) + 1);
     unsigned int frameInLoop = startFrame + (frame % loopFrameCount);
 
     {
@@ -361,10 +360,10 @@ void CMapAnimNode::Interp(int frame)
     }
 
     {
-        CMapAnimNodeTrack* track = &tracks->rotation;
+        CMapAnimNodeTrack* track = &nodeData->tracks->rotation;
         CMapAnimNodeTrackKey* keys = track->keys;
         int trackCount = track->count;
-        Vec* out = &node->rotation;
+        Vec* out = &nodeData->node->rotation;
 
         if (trackCount == 1) {
             out->x = keys[0].value.x;
@@ -383,7 +382,8 @@ void CMapAnimNode::Interp(int frame)
                 if (nextIndex != 0) {
                     endFrame = next->frame;
                 } else {
-                    endFrame = next->frame + loopFrameCount;
+                    endFrame = next->frame + static_cast<unsigned int>(
+                                                  (nodeData->mapAnim->endFrame - nodeData->mapAnim->startFrame) + 1);
                 }
 
                 unsigned int currentFrame = current->frame;
@@ -412,10 +412,10 @@ void CMapAnimNode::Interp(int frame)
     }
 
     {
-        CMapAnimNodeTrack* track = &tracks->scale;
+        CMapAnimNodeTrack* track = &nodeData->tracks->scale;
         CMapAnimNodeTrackKey* keys = track->keys;
         int trackCount = track->count;
-        Vec* out = &node->scale;
+        Vec* out = &nodeData->node->scale;
 
         if (trackCount == 1) {
             out->x = keys[0].value.x;
@@ -434,7 +434,8 @@ void CMapAnimNode::Interp(int frame)
                 if (nextIndex != 0) {
                     endFrame = next->frame;
                 } else {
-                    endFrame = next->frame + loopFrameCount;
+                    endFrame = next->frame + static_cast<unsigned int>(
+                                                  (nodeData->mapAnim->endFrame - nodeData->mapAnim->startFrame) + 1);
                 }
 
                 unsigned int currentFrame = current->frame;
@@ -462,7 +463,7 @@ void CMapAnimNode::Interp(int frame)
         }
     }
 
-    node->dirty = 1;
+    nodeData->node->dirty = 1;
 }
 
 /*

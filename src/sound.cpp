@@ -1964,50 +1964,49 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
  */
 void CSound::StopSe3DGroup(int group)
 {
-    char* se = reinterpret_cast<char*>(this) + 0x2C;
+    CSe3D* se = reinterpret_cast<CSe3D*>(SoundData(this).m_seWork);
     u32 i = 0;
 
     while (i < 0x80) {
-        if ((*se < 0) && (*reinterpret_cast<int*>(se + 0x24) >= 0) &&
-            (*reinterpret_cast<int*>(se + 0x24) == group)) {
-            int se3dHandle = *reinterpret_cast<int*>(se + 4);
+        if (se->m_bits.m_active && (se->m_group >= 0) && (se->m_group == group)) {
+            int se3dHandle = se->m_handle;
             if (se3dHandle < 0) {
                 Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
             } else {
-                char* search = reinterpret_cast<char*>(this) + 0x2C;
+                CSe3D* search = reinterpret_cast<CSe3D*>(SoundData(this).m_seWork);
                 int count = 0x20;
-                char* found;
+                CSe3D* found;
                 do {
-                    if ((((*search < 0) && (found = search, *reinterpret_cast<int*>(search + 4) == se3dHandle)) ||
-                         ((found = search + 0x28, *found < 0) &&
-                          (*reinterpret_cast<int*>(search + 0x2C) == se3dHandle)) ||
-                         ((found = search + 0x50, *found < 0) &&
-                          (*reinterpret_cast<int*>(search + 0x54) == se3dHandle)) ||
-                         ((search[0x78] < 0) &&
-                          (found = search + 0x78, *reinterpret_cast<int*>(search + 0x7C) == se3dHandle)))) {
+                    if ((search->m_bits.m_active && (found = search, search->m_handle == se3dHandle)) ||
+                        ((search + 1)->m_bits.m_active &&
+                         (found = search + 1, (search + 1)->m_handle == se3dHandle)) ||
+                        ((search + 2)->m_bits.m_active &&
+                         (found = search + 2, (search + 2)->m_handle == se3dHandle)) ||
+                        ((search + 3)->m_bits.m_active &&
+                         (found = search + 3, (search + 3)->m_handle == se3dHandle))) {
                         goto found_se;
                     }
-                    search += 0xA0;
+                    search += 4;
                     count--;
                 } while (count != 0);
                 found = 0;
 found_se:
 
                 if (found != 0) {
-                    int playId = *reinterpret_cast<int*>(found + 8);
+                    int playId = found->m_playId;
                     if (playId < 0) {
                         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                     } else {
                         SeStop__9CRedSoundFi(RedSound(this), playId);
                     }
-                    *found = *found & 0x7F;
+                    found->m_bits.m_active = 0;
                 }
             }
-            *se = *se & 0x7F;
+            se->m_bits.m_active = 0;
         }
 
         i++;
-        se += 0x28;
+        se++;
     }
 }
 
@@ -2093,35 +2092,32 @@ _pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
         return 0;
     }
 
-    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
-    u8* found;
+    CSe3D* se = reinterpret_cast<CSe3D*>(SoundData(this).m_seWork);
+    CSe3D* found;
     int ret = 0;
     int count = 0x20;
     do {
-        if (((((*se & 0x80) != 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-             (((*(se += 0x28) & 0x80) != 0) &&
-              (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle))) ||
-            (((*(se += 0x28) & 0x80) != 0) &&
-             (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-            (((*(se += 0x28) & 0x80) != 0) &&
-             (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle))) {
+        if ((se->m_bits.m_active && (found = se, se->m_handle == se3dHandle)) ||
+            ((se + 1)->m_bits.m_active && (found = se + 1, (se + 1)->m_handle == se3dHandle)) ||
+            ((se + 2)->m_bits.m_active && (found = se + 2, (se + 2)->m_handle == se3dHandle)) ||
+            ((se + 3)->m_bits.m_active && (found = se + 3, (se + 3)->m_handle == se3dHandle))) {
             goto found_entry;
         }
         ret += 3;
-        se += 0x28;
+        se += 4;
         count--;
     } while (count != 0);
     found = 0;
 
 found_entry:
     if (found != 0) {
-        const int playId = *reinterpret_cast<int*>(found + 8);
+        const int playId = found->m_playId;
         if (playId < 0) {
             Printf__7CSystemFPce(&System, s_soundMinusOneFmt, fadeFrames, ret);
         } else {
             SeFadeOut__9CRedSoundFii(RedSound(this), playId, fadeFrames);
         }
-        *found &= 0x7F;
+        found->m_bits.m_active = 0;
     }
 
     return 0;

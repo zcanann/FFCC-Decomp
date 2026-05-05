@@ -291,13 +291,16 @@ void CMapAnimNode::Interp(int frame)
     CMapAnimTargetNode* node = nodeData->node;
     int startFrame = nodeData->mapAnim->startFrame;
     unsigned int loopFrameCount = static_cast<unsigned int>((nodeData->mapAnim->endFrame - startFrame) + 1);
+    CMapAnimNodeTrack* positionTrack = &tracks->position;
+    CMapAnimNodeTrackKey* positionKeys = positionTrack->keys;
+    int positionTrackCount = positionTrack->count;
+    Vec* positionOut = &node->position;
     unsigned int frameInLoop = startFrame + (frame % loopFrameCount);
 
     {
-        CMapAnimNodeTrack* track = &tracks->position;
-        CMapAnimNodeTrackKey* keys = track->keys;
-        int trackCount = track->count;
-        Vec* out = &node->position;
+        CMapAnimNodeTrackKey* keys = positionKeys;
+        int trackCount = positionTrackCount;
+        Vec* out = positionOut;
 
         if (trackCount == 1) {
             out->x = keys[0].value.x;

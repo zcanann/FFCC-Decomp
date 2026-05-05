@@ -153,8 +153,8 @@ void CMapTexAnimSet::Calc()
 void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
 {
     float frame;
-    void* materials = Ptr(materialSet, 8);
-    void* textures = Ptr(textureSet, 8);
+    materialSet = reinterpret_cast<CMaterialSet*>(Ptr(materialSet, 8));
+    textureSet = reinterpret_cast<CTextureSet*>(Ptr(textureSet, 8));
 
     if (m_usesKeyFrame != 0) {
         if (m_keyFrame.IsRun() != 0) {
@@ -164,32 +164,32 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
 
             if (reachedFrame != 0) {
                 const unsigned short textureIndex = m_frameTable[keyFrameIndex];
-                void* texture = __vc__21CPtrArray_P8CTexture_FUl(textures, textureIndex);
-                SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex)),
+                void* texture = __vc__21CPtrArray_P8CTexture_FUl(textureSet, textureIndex);
+                SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materialSet, static_cast<unsigned long>(m_materialIndex)),
                     static_cast<unsigned long>(m_textureSlot), texture);
 
                 if (m_usesBlendTexture != 0) {
                     const unsigned short nextTextureIndex = m_frameTable[keyFrameIndexNext];
-                    void* nextTexture = __vc__21CPtrArray_P8CTexture_FUl(textures, nextTextureIndex);
-                    SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex)),
+                    void* nextTexture = __vc__21CPtrArray_P8CTexture_FUl(textureSet, nextTextureIndex);
+                    SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materialSet, static_cast<unsigned long>(m_materialIndex)),
                         static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
                     char blendValue = static_cast<char>(FLOAT_8032fd38 * frame);
-                    void* material = __vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex));
+                    void* material = __vc__22CPtrArray_P9CMaterial_FUl(materialSet, static_cast<unsigned long>(m_materialIndex));
                     *reinterpret_cast<char*>(Ptr(material, 0xA4)) = blendValue;
                     *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
                 }
             } else {
                 const unsigned short textureIndex = m_frameTable[keyFrameIndex];
-                void* texture = __vc__21CPtrArray_P8CTexture_FUl(textures, textureIndex);
-                SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex)),
+                void* texture = __vc__21CPtrArray_P8CTexture_FUl(textureSet, textureIndex);
+                SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materialSet, static_cast<unsigned long>(m_materialIndex)),
                     static_cast<unsigned long>(m_textureSlot), texture);
 
                 if (m_usesBlendTexture != 0) {
                     const unsigned short nextTextureIndex = m_frameTable[keyFrameIndexNext];
-                    void* nextTexture = __vc__21CPtrArray_P8CTexture_FUl(textures, nextTextureIndex);
-                    SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex)),
+                    void* nextTexture = __vc__21CPtrArray_P8CTexture_FUl(textureSet, nextTextureIndex);
+                    SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materialSet, static_cast<unsigned long>(m_materialIndex)),
                         static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
-                    void* material = __vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex));
+                    void* material = __vc__22CPtrArray_P9CMaterial_FUl(materialSet, static_cast<unsigned long>(m_materialIndex));
                     *reinterpret_cast<char*>(Ptr(material, 0xA4)) = 0;
                     *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
                 }
@@ -203,8 +203,8 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
     frame = m_currentFrame;
     const int frameIndex = static_cast<int>(frame);
     const unsigned short textureIndex = m_frameTable[frameIndex & 0xFFFF];
-    SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex)),
-        static_cast<unsigned long>(m_textureSlot), __vc__21CPtrArray_P8CTexture_FUl(textures, textureIndex));
+    SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materialSet, static_cast<unsigned long>(m_materialIndex)),
+        static_cast<unsigned long>(m_textureSlot), __vc__21CPtrArray_P8CTexture_FUl(textureSet, textureIndex));
 
     m_currentFrame = m_currentFrame + m_frameStep;
     if (m_currentFrame >= static_cast<float>(m_endFrame)) {
@@ -222,9 +222,9 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
         }
 
         const unsigned short nextTextureIndex = m_frameTable[static_cast<unsigned short>(nextFrame)];
-        SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex)),
-            static_cast<unsigned long>(m_textureSlot + 1), __vc__21CPtrArray_P8CTexture_FUl(textures, nextTextureIndex));
-        void* material = __vc__22CPtrArray_P9CMaterial_FUl(materials, static_cast<unsigned long>(m_materialIndex));
+        SetMaterialTextureSlot(__vc__22CPtrArray_P9CMaterial_FUl(materialSet, static_cast<unsigned long>(m_materialIndex)),
+            static_cast<unsigned long>(m_textureSlot + 1), __vc__21CPtrArray_P8CTexture_FUl(textureSet, nextTextureIndex));
+        void* material = __vc__22CPtrArray_P9CMaterial_FUl(materialSet, static_cast<unsigned long>(m_materialIndex));
         *reinterpret_cast<char*>(Ptr(material, 0xA4)) =
             static_cast<char>(FLOAT_8032fd38 * (frame - static_cast<float>(static_cast<unsigned short>(frameIndex))));
         *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;

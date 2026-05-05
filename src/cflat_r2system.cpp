@@ -2485,9 +2485,8 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -0xB3:
         runtime->push(
             object,
-            reinterpret_cast<CGItemObj*>(object->m_engineObject)
-                ->DeleteOld(*object->m_localBase, object->m_localBase[1], object,
-                    reinterpret_cast<CFlatRuntime::CObject*>(object->m_engineObject)));
+            CGItemObj::DeleteOld(*object->m_localBase, object->m_localBase[1], object,
+                                 reinterpret_cast<CFlatRuntime::CObject*>(object->m_engineObject)));
         outResult = 0;
         return;
     case -0xB2:

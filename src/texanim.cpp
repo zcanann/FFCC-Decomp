@@ -640,17 +640,15 @@ CTexAnimSet::~CTexAnimSet()
  */
 void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
-    unsigned int outerChunkData[4];
-    unsigned int middleChunkData[4];
-    unsigned int middleChunkArg0 = 0;
-    unsigned int innerChunkData[4];
-    unsigned int& innerChunkSize = innerChunkData[3];
+    CChunkFile::CChunk outerChunk;
+    CChunkFile::CChunk middleChunk;
+    CChunkFile::CChunk innerChunk;
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
 
     self->texAnims.SetStage(stage);
     chunkFile.PushChunk();
-    while ((int)chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(outerChunkData)) != 0) {
-        if (outerChunkData[0] == 0x54414E4D) {
+    while ((int)chunkFile.GetNextChunk(outerChunk) != 0) {
+        if (outerChunk.m_id == 'TANM') {
             CTexAnim* texAnim =
                 static_cast<CTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(0x24, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x3F));
             if (texAnim != 0) {
@@ -686,8 +684,8 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             SetStage__25CPtrArray_P11CTexAnimSeq_Fv(&refData->texAnimSeqs, stage);
 
             chunkFile.PushChunk();
-            while ((int)chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(middleChunkData)) != 0) {
-                if (middleChunkData[0] == 0x53455120) {
+            while ((int)chunkFile.GetNextChunk(middleChunk) != 0) {
+                if (middleChunk.m_id == 'SEQ ') {
                     CTexAnimSeq* seq = static_cast<CTexAnimSeq*>(
                         __nw__FUlPQ27CMemory6CStagePci(0x118, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xE2));
                     if (seq != 0) {
@@ -697,15 +695,15 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                         *reinterpret_cast<int*>((int)seq + 0x114) = 0;
                     }
                     chunkFile.PushChunk();
-                    while ((int)chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(innerChunkData)) != 0) {
-                        if (innerChunkData[0] == 0x4B455920) {
-                            *reinterpret_cast<unsigned int*>((int)seq + 0x10C) = innerChunkSize / 0x30;
+                    while ((int)chunkFile.GetNextChunk(innerChunk) != 0) {
+                        if (innerChunk.m_id == 'KEY ') {
+                            *reinterpret_cast<unsigned int*>((int)seq + 0x10C) = innerChunk.m_size / 0x30;
                             int keys = (int)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                                &Memory, innerChunkSize, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x1D4, 0);
+                                &Memory, innerChunk.m_size, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x1D4, 0);
                             *reinterpret_cast<int*>((int)seq + 0x114) = keys;
-                            memcpy((void*)*reinterpret_cast<int*>((int)seq + 0x114), chunkFile.GetAddress(), innerChunkSize);
-                        } else if ((int)innerChunkData[0] < 0x4B455920) {
-                            if (innerChunkData[0] == 0x494E464F) {
+                            memcpy((void*)*reinterpret_cast<int*>((int)seq + 0x114), chunkFile.GetAddress(), innerChunk.m_size);
+                        } else if ((int)innerChunk.m_id < 'KEY ') {
+                            if (innerChunk.m_id == 'INFO') {
                                 *reinterpret_cast<void**>((int)seq + 0x108) = (void*)chunkFile.Get4();
                                 chunkFile.Get4();
                                 char b7 = (char)chunkFile.Get4();
@@ -719,15 +717,14 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                                     (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) |
                                                     (*reinterpret_cast<unsigned char*>((int)seq + 0x110) & 0xDF));
                             }
-                        } else if (innerChunkData[0] == 0x4E414D45) {
+                        } else if (innerChunk.m_id == 'NAME') {
                             strcpy((char*)((int)seq + 8), chunkFile.GetString());
                         }
                     }
                     chunkFile.PopChunk();
                     Add__25CPtrArray_P11CTexAnimSeq_FP11CTexAnimSeq(&refData->texAnimSeqs, seq);
-                } else if (((int)middleChunkData[0] < 0x53455120) && (middleChunkData[0] == 0x4E414D45)) {
-                    middleChunkArg0 = middleChunkData[1];
-                    refData->texSrtIndex = middleChunkArg0;
+                } else if (((int)middleChunk.m_id < 'SEQ ') && (middleChunk.m_id == 'NAME')) {
+                    refData->texSrtIndex = middleChunk.m_arg0;
                     strcpy(refData->name, chunkFile.GetString());
                 }
             }

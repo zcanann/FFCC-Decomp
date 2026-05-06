@@ -18,16 +18,12 @@ extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
 extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
-struct FloatValue {
-	float value;
-};
-
-const float FLOAT_80331BD0 = 1.0f;
-const float FLOAT_80331BD4 = 0.0f;
-const float FLOAT_80331BD8 = 3.1415927f;
-const double DOUBLE_80331BE0 = 4503601774854144.0;
-const FloatValue FLOAT_80331BE8 = {-1.0f};
-const char DAT_80331bf0[] = "GMGR";
+extern const float FLOAT_80331BD0 = 1.0f;
+extern const float FLOAT_80331BD4 = 0.0f;
+extern const float FLOAT_80331BD8 = 3.1415927f;
+extern const double DOUBLE_80331BE0 = 4503601774854144.0;
+extern const float FLOAT_80331BE8 = -1.0f;
+extern const char DAT_80331bf0[] = "GMGR";
 extern const float FLOAT_80331bf8;
 extern const float FLOAT_80331bfc;
 extern const double DOUBLE_80331C00;
@@ -580,7 +576,7 @@ void CGPrgObj::onFrame()
 					CancelAnim(0);
 				}
 			} else if (m_animFlagBits.bits.m_animDirect != 0) {
-				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BE8.value;
+				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BE8;
 				PlayAnim(m_reqAnimId, m_animFlagBits.bits.m_animLoop, 0, -1, -1, 0);
 			} else {
 				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BD0;

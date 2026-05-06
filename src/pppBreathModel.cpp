@@ -498,6 +498,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     int slotCount;
     int ready;
     float scaledOwner;
+    BreathParticleGroup* groupCheck;
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;

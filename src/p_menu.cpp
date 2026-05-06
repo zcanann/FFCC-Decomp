@@ -119,7 +119,7 @@ extern "C" const f32 FLOAT_8033082C = 4.0f;
 extern "C" const f32 FLOAT_80330830 = 2.0f;
 extern "C" const double DOUBLE_80330838 = 4503601774854144.0;
 extern "C" const double DOUBLE_80330840 = 4503599627370496.0;
-extern "C" const f32 FLOAT_80330848 = 0.05f;
+extern "C" const f32 FLOAT_80330848 = 0.1f;
 extern "C" const f32 FLOAT_8033084C = 0.5f;
 extern "C" const f32 FLOAT_80330850 = 120.0f;
 extern "C" const f32 FLOAT_80330854 = 56.0f;
@@ -974,7 +974,7 @@ void CMenuPcs::draw()
         TextureMan.SetTextureTev(texture);
 
         {
-            int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * 0.1f)));
+            int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * FLOAT_80330848)));
             CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
             GXSetChanMatColor(GX_COLOR0A0, color.color);
             DrawRect(3, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -1655,7 +1655,7 @@ void CMenuPcs::drawPause()
 
     TextureMan.SetTextureTev(texture);
 
-    int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * 0.1f)));
+    int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * FLOAT_80330848)));
     CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
     GXSetChanMatColor(GX_COLOR0A0, color.color);
     DrawRect(3, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);

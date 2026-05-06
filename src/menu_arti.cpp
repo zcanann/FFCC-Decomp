@@ -183,375 +183,104 @@ static inline double IntToF64(unsigned int value)
 
 /*
  * --INFO--
- * PAL Address: 0x80160c34
- * PAL Size: 680b
+ * PAL Address: 0x8015fa28
+ * PAL Size: 812b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::ArtiInit()
+int CMenuPcs::ArtiCtrlCur()
 {
 	short sVar1;
-	float fVar2;
-	float fVar3;
-	float fVar4;
+	bool bVar2;
+	unsigned short uVar3;
+	unsigned short uVar4;
 	int iVar5;
-	short sVar6;
-	short sVar7;
-	short* psVar8;
-	int iVar9;
-	int iVar10;
-	int iVar11;
+	int iVar6;
 
-	memset((void*)GetArtiList(this), 0, 0x1008);
-	fVar2 = FLOAT_80332fac;
-	iVar5 = GetArtiListBase(this) + 8;
-	iVar10 = 8;
-	do {
-		*(float*)(iVar5 + 0x14) = fVar2;
-		*(float*)(iVar5 + 0x54) = fVar2;
-		*(float*)(iVar5 + 0x94) = fVar2;
-		*(float*)(iVar5 + 0xd4) = fVar2;
-		*(float*)(iVar5 + 0x114) = fVar2;
-		*(float*)(iVar5 + 0x154) = fVar2;
-		*(float*)(iVar5 + 0x194) = fVar2;
-		*(float*)(iVar5 + 0x1d4) = fVar2;
-		iVar5 = iVar5 + 0x200;
-		iVar10 = iVar10 - 1;
-	} while (iVar10 != 0);
-
-	iVar5 = GetArtiListBase(this);
-	*(int*)(iVar5 + 0x24) = 0x2e;
-	*(short*)(iVar5 + 8) = 0x68;
-	*(short*)(iVar5 + 10) = 0x28;
-	*(short*)(iVar5 + 0xc) = 0x78;
-	fVar2 = FLOAT_80332fe8;
-	*(short*)(iVar5 + 0xe) = 0x108;
-	fVar4 = FLOAT_80332fec;
-	*(float*)(iVar5 + 0x10) = fVar2;
-	fVar3 = FLOAT_80332fac;
-	*(float*)(iVar5 + 0x14) = fVar4;
-	fVar2 = FLOAT_80332fa8;
-	sVar6 = 0;
-	*(float*)(iVar5 + 0x1c) = fVar3;
-	fVar4 = FLOAT_80332ff0;
-	sVar7 = 4;
-	*(int*)(iVar5 + 0x2c) = 5;
-	*(int*)(iVar5 + 0x30) = 5;
-	iVar5 = 0x100;
-	iVar10 = GetArtiListBase(this);
-	*(int*)(iVar10 + 100) = 0x44;
-	*(short*)(iVar10 + 0x48) = 0x50;
-	*(short*)(iVar10 + 0x4a) = 0xe;
-	*(short*)(iVar10 + 0x4c) = 0x30;
-	*(short*)(iVar10 + 0x4e) = 0x30;
-	*(float*)(iVar10 + 0x50) = fVar2;
-	*(float*)(iVar10 + 0x54) = fVar2;
-	*(float*)(iVar10 + 0x5c) = fVar3;
-	*(int*)(iVar10 + 0x6c) = 0;
-	*(int*)(iVar10 + 0x70) = 5;
-
-	iVar10 = GetArtiListBase(this);
-	*(int*)(iVar10 + 0xa4) = 0x44;
-	*(short*)(iVar10 + 0x88) = 0x55;
-	*(short*)(iVar10 + 0x8c) = 0x30;
-	*(short*)(iVar10 + 0x8e) = 0x30;
-	*(short*)(iVar10 + 0x8a) = 0x150 - *(short*)(iVar10 + 0x8e);
-	*(float*)(iVar10 + 0x90) = fVar2;
-	*(float*)(iVar10 + 0x94) = fVar2;
-	*(float*)(iVar10 + 0x9c) = fVar4;
-	*(int*)(iVar10 + 0xac) = 0;
-	*(int*)(iVar10 + 0xb0) = 5;
-
-	iVar10 = GetArtiListBase(this);
-	*(int*)(iVar10 + 0xf4) = 2;
-	*(int*)(iVar10 + 0xe4) = 0x2e;
-	*(short*)(iVar10 + 200) = 0x50;
-	*(short*)(iVar10 + 0xca) = 8;
-	*(short*)(iVar10 + 0xcc) = 0x48;
-	*(short*)(iVar10 + 0xce) = 0x140;
-	*(float*)(iVar10 + 0xd0) = fVar2;
-	*(float*)(iVar10 + 0xd4) = fVar2;
-	*(int*)(iVar10 + 0xec) = 0;
-	*(int*)(iVar10 + 0xf0) = 5;
-
-	iVar10 = GetArtiListBase(this);
-	iVar11 = 4;
-	do {
-		psVar8 = (short*)(GetArtiListBase(this) + iVar5 + 8);
-		psVar8[0x16] = 0;
-		psVar8[0x17] = 2;
-		psVar8[0xe] = 0;
-		psVar8[0xf] = 0x37;
-		sVar7 = sVar7 + 2;
-		*psVar8 = *(short*)(iVar10 + 8) + 0x24;
-		sVar1 = sVar6 + 0x20;
-		psVar8[1] = *(short*)(iVar10 + 10) + sVar6;
-		psVar8[2] = 200;
-		psVar8[3] = 0x28;
-		*(float*)(psVar8 + 4) = fVar2;
-		*(float*)(psVar8 + 6) = fVar2;
-		psVar8[0x12] = 0;
-		psVar8[0x13] = 7;
-		psVar8[0x14] = 0;
-		psVar8[0x15] = 5;
-		iVar9 = iVar5 + 0x48;
-		iVar5 = iVar5 + 0x80;
-		psVar8 = (short*)(GetArtiListBase(this) + iVar9);
-		psVar8[0x16] = 0;
-		psVar8[0x17] = 2;
-		psVar8[0xe] = 0;
-		psVar8[0xf] = 0x37;
-		*psVar8 = *(short*)(iVar10 + 8) + 0x24;
-		sVar6 = sVar6 + 0x40;
-		psVar8[1] = *(short*)(iVar10 + 10) + sVar1;
-		psVar8[2] = 200;
-		psVar8[3] = 0x28;
-		*(float*)(psVar8 + 4) = fVar2;
-		*(float*)(psVar8 + 6) = fVar2;
-		psVar8[0x12] = 0;
-		psVar8[0x13] = 7;
-		psVar8[0x14] = 0;
-		psVar8[0x15] = 5;
-		iVar11 = iVar11 - 1;
-	} while (iVar11 != 0);
-
-	*GetArtiList(this) = sVar7;
-	*(short*)(GetArtiStateBase(this) + 0x26) = 0;
-	*(char*)(GetArtiStateBase(this) + 0xb) = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801609d8
- * PAL Size: 604b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::ArtiInit1()
-{
-	float fVar1;
-	int iVar2;
-	short* psVar3;
-	unsigned int uVar4;
-	unsigned int uVar5;
-
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x24) = 0x2e;
-	*(int*)(iVar2 + 0x2c) = 2;
-	*(int*)(iVar2 + 0x30) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 100) = 0x44;
-	*(int*)(iVar2 + 0x6c) = 7;
-	*(int*)(iVar2 + 0x70) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0xa4) = 0x44;
-	*(int*)(iVar2 + 0xac) = 7;
-	*(int*)(iVar2 + 0xb0) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0xf4) = 2;
-	*(int*)(iVar2 + 0xe4) = 0x2e;
-	*(int*)(iVar2 + 0xec) = 7;
-	*(int*)(iVar2 + 0xf0) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x134) = 2;
-	*(int*)(iVar2 + 0x124) = 0x37;
-	*(int*)(iVar2 + 300) = 0;
-	*(int*)(iVar2 + 0x130) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x174) = 2;
-	*(int*)(iVar2 + 0x164) = 0x37;
-	*(int*)(iVar2 + 0x16c) = 0;
-	*(int*)(iVar2 + 0x170) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x1b4) = 2;
-	*(int*)(iVar2 + 0x1a4) = 0x37;
-	*(int*)(iVar2 + 0x1ac) = 0;
-	*(int*)(iVar2 + 0x1b0) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 500) = 2;
-	*(int*)(iVar2 + 0x1e4) = 0x37;
-	fVar1 = FLOAT_80332fac;
-	*(int*)(iVar2 + 0x1ec) = 0;
-	*(int*)(iVar2 + 0x1f0) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x234) = 2;
-	*(int*)(iVar2 + 0x224) = 0x37;
-	*(int*)(iVar2 + 0x22c) = 0;
-	*(int*)(iVar2 + 0x230) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x274) = 2;
-	*(int*)(iVar2 + 0x264) = 0x37;
-	*(int*)(iVar2 + 0x26c) = 0;
-	*(int*)(iVar2 + 0x270) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x2b4) = 2;
-	*(int*)(iVar2 + 0x2a4) = 0x37;
-	*(int*)(iVar2 + 0x2ac) = 0;
-	*(int*)(iVar2 + 0x2b0) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x2f4) = 2;
-	*(int*)(iVar2 + 0x2e4) = 0x37;
-	*(int*)(iVar2 + 0x2ec) = 0;
-	*(int*)(iVar2 + 0x2f0) = 5;
-	uVar4 = (unsigned int)*GetArtiList(this);
-	psVar3 = GetArtiList(this) + 4;
-	if (0 < (int)uVar4) {
-		uVar5 = uVar4 >> 3;
-		if (uVar5 != 0) {
-			do {
-				*(int*)(psVar3 + 0x10) = 0;
-				*(float*)(psVar3 + 8) = fVar1;
-				*(int*)(psVar3 + 0x30) = 0;
-				*(float*)(psVar3 + 0x28) = fVar1;
-				*(int*)(psVar3 + 0x50) = 0;
-				*(float*)(psVar3 + 0x48) = fVar1;
-				*(int*)(psVar3 + 0x70) = 0;
-				*(float*)(psVar3 + 0x68) = fVar1;
-				*(int*)(psVar3 + 0x90) = 0;
-				*(float*)(psVar3 + 0x88) = fVar1;
-				*(int*)(psVar3 + 0xb0) = 0;
-				*(float*)(psVar3 + 0xa8) = fVar1;
-				*(int*)(psVar3 + 0xd0) = 0;
-				*(float*)(psVar3 + 200) = fVar1;
-				*(int*)(psVar3 + 0xf0) = 0;
-				*(float*)(psVar3 + 0xe8) = fVar1;
-				psVar3 = psVar3 + 0x100;
-				uVar5 = uVar5 - 1;
-			} while (uVar5 != 0);
-			uVar4 = uVar4 & 7;
-			if (uVar4 == 0) {
-				return;
-			}
-		}
-		do {
-			*(int*)(psVar3 + 0x10) = 0;
-			*(float*)(psVar3 + 8) = fVar1;
-			psVar3 = psVar3 + 0x20;
-			uVar4 = uVar4 - 1;
-		} while (uVar4 != 0);
+	bVar2 = false;
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		bVar2 = true;
 	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80160828
- * PAL Size: 432b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-bool CMenuPcs::ArtiOpen()
-{
-	int finished;
-	int count;
-	int frame;
-
-	if (*(char*)(GetArtiStateBase(this) + 0xb) == '\0') {
-		ArtiInit();
+	if (bVar2) {
+		uVar3 = 0;
+	} else {
+		int padIndex = bVar2;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		uVar3 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
 	}
 
-	finished = 0;
-	*(short*)(GetArtiStateBase(this) + 0x22) = *(short*)(GetArtiStateBase(this) + 0x22) + 1;
-	count = *GetArtiList(this);
-	ArtiOpenAnim* entry = (ArtiOpenAnim*)((u8*)GetArtiList(this) + 8);
-	frame = (int)*(short*)(GetArtiStateBase(this) + 0x22);
+	bVar2 = false;
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		bVar2 = true;
+	}
+	if (bVar2) {
+		uVar4 = 0;
+	} else {
+		int padIndex = bVar2;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		uVar4 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 0x14);
+	}
 
-	for (int i = 0; i < count; i++, entry++) {
-		float zero = FLOAT_80332fa8;
-		if (frame >= entry->startFrame) {
-			if (entry->startFrame + entry->duration <= frame) {
-				finished++;
-				entry->alpha = FLOAT_80332fac;
-				entry->dx = zero;
-				entry->dy = zero;
+	if (uVar4 == 0) {
+		return 0;
+	}
+
+	iVar5 = GetArtiStateBase(this);
+	if ((uVar4 & 8) == 0) {
+		if ((uVar4 & 4) != 0) {
+			iVar6 = iVar5 + *(short*)(iVar5 + 0x30) * 2;
+			sVar1 = *(short*)(iVar6 + 0x26);
+			if (sVar1 < 7) {
+				*(short*)(iVar6 + 0x26) = sVar1 + 1;
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
+			} else if ((int)*(short*)(iVar5 + 0x34) + (int)sVar1 < 0x48) {
+				*(short*)(iVar5 + 0x34) = *(short*)(iVar5 + 0x34) + 1;
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			} else {
-				entry->step++;
-				double one = DOUBLE_80332fb0;
-				entry->alpha = (float)((DOUBLE_80332fb0 / (double)entry->duration) * (double)entry->step);
-				if ((entry->flags & 2) == 0) {
-					float ratio = (float)((one / (double)entry->duration) * (double)entry->step);
-					float dx = entry->targetX - (float)entry->x;
-					float dy = entry->targetY - (float)entry->y;
-					entry->dx = dx * ratio;
-					entry->dy = dy * ratio;
-				}
+				Sound.PlaySe(4, 0x40, 0x7f, 0);
 			}
 		}
-	}
-
-	return count == finished;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801607d4
- * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMenuPcs::ArtiCtrl()
-{
-	ArtiState* state = GetArtiStateStruct(this);
-	int result;
-
-	state->currentSelection = state->prevSelection;
-	result = ArtiCtrlCur();
-	if (result != 0) {
-		ArtiInit1();
-	}
-
-	return result;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80160658
- * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-bool CMenuPcs::ArtiClose()
-{
-	int finished = 0;
-	GetArtiState(this)[0x11]++;
-
-	int count = GetArtiList(this)[0];
-	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)GetArtiList(this) + 8);
-	int frame = GetArtiState(this)[0x11];
-
-	for (int i = 0; i < count; i++, anim++) {
-		float zeroF = FLOAT_80332fa8;
-		if (frame >= anim->startFrame) {
-			if (anim->startFrame + anim->duration <= frame) {
-				finished++;
-				anim->alpha = FLOAT_80332fa8;
-				anim->dx = zeroF;
-				anim->dy = zeroF;
+	} else {
+		iVar6 = iVar5 + *(short*)(iVar5 + 0x30) * 2;
+		sVar1 = *(short*)(iVar6 + 0x26);
+		if (sVar1 == 0) {
+			if (*(short*)(iVar5 + 0x34) == 0) {
+				Sound.PlaySe(4, 0x40, 0x7f, 0);
 			} else {
-				anim->step++;
-				double oneD = DOUBLE_80332fb0;
-				anim->alpha = (float)-((DOUBLE_80332fb0 / (double)anim->duration) * (double)anim->step - DOUBLE_80332fb0);
-				if ((anim->flags & 2) == 0) {
-					float ratio = (float)-((oneD / (double)anim->duration) * (double)anim->step - oneD);
-					float dx = anim->targetX - (float)anim->x;
-					float dy = anim->targetY - (float)anim->y;
-					anim->dx = dx * ratio;
-					anim->dy = dy * ratio;
-				}
+				*(short*)(iVar5 + 0x34) = *(short*)(iVar5 + 0x34) + -1;
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			}
+		} else {
+			*(short*)(iVar6 + 0x26) = sVar1 + -1;
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 	}
 
-	return count == finished;
+	if ((uVar4 & 0xc) == 0) {
+		if ((uVar3 & 0x20) != 0) {
+			*(short*)(GetArtiStateBase(this) + 0x1e) = 1;
+			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+			return 1;
+		}
+		if ((uVar3 & 0x40) != 0) {
+			*(short*)(GetArtiStateBase(this) + 0x1e) = -1;
+			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+			return 1;
+		}
+		if ((uVar3 & 0x100) == 0) {
+			if ((uVar3 & 0x200) != 0) {
+				*(char*)(GetArtiStateBase(this) + 0xd) = 1;
+				Sound.PlaySe(3, 0x40, 0x7f, 0);
+				return 1;
+			}
+		} else {
+			Sound.PlaySe(4, 0x40, 0x7f, 0);
+		}
+	}
+
+	return 0;
 }
 
 /*
@@ -777,102 +506,373 @@ void CMenuPcs::ArtiDraw()
 
 /*
  * --INFO--
- * PAL Address: 0x8015fa28
- * PAL Size: 812b
+ * PAL Address: 0x80160658
+ * PAL Size: 380b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMenuPcs::ArtiCtrlCur()
+bool CMenuPcs::ArtiClose()
+{
+	int finished = 0;
+	GetArtiState(this)[0x11]++;
+
+	int count = GetArtiList(this)[0];
+	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)GetArtiList(this) + 8);
+	int frame = GetArtiState(this)[0x11];
+
+	for (int i = 0; i < count; i++, anim++) {
+		float zeroF = FLOAT_80332fa8;
+		if (frame >= anim->startFrame) {
+			if (anim->startFrame + anim->duration <= frame) {
+				finished++;
+				anim->alpha = FLOAT_80332fa8;
+				anim->dx = zeroF;
+				anim->dy = zeroF;
+			} else {
+				anim->step++;
+				double oneD = DOUBLE_80332fb0;
+				anim->alpha = (float)-((DOUBLE_80332fb0 / (double)anim->duration) * (double)anim->step - DOUBLE_80332fb0);
+				if ((anim->flags & 2) == 0) {
+					float ratio = (float)-((oneD / (double)anim->duration) * (double)anim->step - oneD);
+					float dx = anim->targetX - (float)anim->x;
+					float dy = anim->targetY - (float)anim->y;
+					anim->dx = dx * ratio;
+					anim->dy = dy * ratio;
+				}
+			}
+		}
+	}
+
+	return count == finished;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801607d4
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMenuPcs::ArtiCtrl()
+{
+	ArtiState* state = GetArtiStateStruct(this);
+	int result;
+
+	state->currentSelection = state->prevSelection;
+	result = ArtiCtrlCur();
+	if (result != 0) {
+		ArtiInit1();
+	}
+
+	return result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80160828
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+bool CMenuPcs::ArtiOpen()
+{
+	int finished;
+	int count;
+	int frame;
+
+	if (*(char*)(GetArtiStateBase(this) + 0xb) == '\0') {
+		ArtiInit();
+	}
+
+	finished = 0;
+	*(short*)(GetArtiStateBase(this) + 0x22) = *(short*)(GetArtiStateBase(this) + 0x22) + 1;
+	count = *GetArtiList(this);
+	ArtiOpenAnim* entry = (ArtiOpenAnim*)((u8*)GetArtiList(this) + 8);
+	frame = (int)*(short*)(GetArtiStateBase(this) + 0x22);
+
+	for (int i = 0; i < count; i++, entry++) {
+		float zero = FLOAT_80332fa8;
+		if (frame >= entry->startFrame) {
+			if (entry->startFrame + entry->duration <= frame) {
+				finished++;
+				entry->alpha = FLOAT_80332fac;
+				entry->dx = zero;
+				entry->dy = zero;
+			} else {
+				entry->step++;
+				double one = DOUBLE_80332fb0;
+				entry->alpha = (float)((DOUBLE_80332fb0 / (double)entry->duration) * (double)entry->step);
+				if ((entry->flags & 2) == 0) {
+					float ratio = (float)((one / (double)entry->duration) * (double)entry->step);
+					float dx = entry->targetX - (float)entry->x;
+					float dy = entry->targetY - (float)entry->y;
+					entry->dx = dx * ratio;
+					entry->dy = dy * ratio;
+				}
+			}
+		}
+	}
+
+	return count == finished;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801609d8
+ * PAL Size: 604b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::ArtiInit1()
+{
+	float fVar1;
+	int iVar2;
+	short* psVar3;
+	unsigned int uVar4;
+	unsigned int uVar5;
+
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x24) = 0x2e;
+	*(int*)(iVar2 + 0x2c) = 2;
+	*(int*)(iVar2 + 0x30) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 100) = 0x44;
+	*(int*)(iVar2 + 0x6c) = 7;
+	*(int*)(iVar2 + 0x70) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0xa4) = 0x44;
+	*(int*)(iVar2 + 0xac) = 7;
+	*(int*)(iVar2 + 0xb0) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0xf4) = 2;
+	*(int*)(iVar2 + 0xe4) = 0x2e;
+	*(int*)(iVar2 + 0xec) = 7;
+	*(int*)(iVar2 + 0xf0) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x134) = 2;
+	*(int*)(iVar2 + 0x124) = 0x37;
+	*(int*)(iVar2 + 300) = 0;
+	*(int*)(iVar2 + 0x130) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x174) = 2;
+	*(int*)(iVar2 + 0x164) = 0x37;
+	*(int*)(iVar2 + 0x16c) = 0;
+	*(int*)(iVar2 + 0x170) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x1b4) = 2;
+	*(int*)(iVar2 + 0x1a4) = 0x37;
+	*(int*)(iVar2 + 0x1ac) = 0;
+	*(int*)(iVar2 + 0x1b0) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 500) = 2;
+	*(int*)(iVar2 + 0x1e4) = 0x37;
+	fVar1 = FLOAT_80332fac;
+	*(int*)(iVar2 + 0x1ec) = 0;
+	*(int*)(iVar2 + 0x1f0) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x234) = 2;
+	*(int*)(iVar2 + 0x224) = 0x37;
+	*(int*)(iVar2 + 0x22c) = 0;
+	*(int*)(iVar2 + 0x230) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x274) = 2;
+	*(int*)(iVar2 + 0x264) = 0x37;
+	*(int*)(iVar2 + 0x26c) = 0;
+	*(int*)(iVar2 + 0x270) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x2b4) = 2;
+	*(int*)(iVar2 + 0x2a4) = 0x37;
+	*(int*)(iVar2 + 0x2ac) = 0;
+	*(int*)(iVar2 + 0x2b0) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x2f4) = 2;
+	*(int*)(iVar2 + 0x2e4) = 0x37;
+	*(int*)(iVar2 + 0x2ec) = 0;
+	*(int*)(iVar2 + 0x2f0) = 5;
+	uVar4 = (unsigned int)*GetArtiList(this);
+	psVar3 = GetArtiList(this) + 4;
+	if (0 < (int)uVar4) {
+		uVar5 = uVar4 >> 3;
+		if (uVar5 != 0) {
+			do {
+				*(int*)(psVar3 + 0x10) = 0;
+				*(float*)(psVar3 + 8) = fVar1;
+				*(int*)(psVar3 + 0x30) = 0;
+				*(float*)(psVar3 + 0x28) = fVar1;
+				*(int*)(psVar3 + 0x50) = 0;
+				*(float*)(psVar3 + 0x48) = fVar1;
+				*(int*)(psVar3 + 0x70) = 0;
+				*(float*)(psVar3 + 0x68) = fVar1;
+				*(int*)(psVar3 + 0x90) = 0;
+				*(float*)(psVar3 + 0x88) = fVar1;
+				*(int*)(psVar3 + 0xb0) = 0;
+				*(float*)(psVar3 + 0xa8) = fVar1;
+				*(int*)(psVar3 + 0xd0) = 0;
+				*(float*)(psVar3 + 200) = fVar1;
+				*(int*)(psVar3 + 0xf0) = 0;
+				*(float*)(psVar3 + 0xe8) = fVar1;
+				psVar3 = psVar3 + 0x100;
+				uVar5 = uVar5 - 1;
+			} while (uVar5 != 0);
+			uVar4 = uVar4 & 7;
+			if (uVar4 == 0) {
+				return;
+			}
+		}
+		do {
+			*(int*)(psVar3 + 0x10) = 0;
+			*(float*)(psVar3 + 8) = fVar1;
+			psVar3 = psVar3 + 0x20;
+			uVar4 = uVar4 - 1;
+		} while (uVar4 != 0);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80160c34
+ * PAL Size: 680b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::ArtiInit()
 {
 	short sVar1;
-	bool bVar2;
-	unsigned short uVar3;
-	unsigned short uVar4;
+	float fVar2;
+	float fVar3;
+	float fVar4;
 	int iVar5;
-	int iVar6;
+	short sVar6;
+	short sVar7;
+	short* psVar8;
+	int iVar9;
+	int iVar10;
+	int iVar11;
 
-	bVar2 = false;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-		bVar2 = true;
-	}
-	if (bVar2) {
-		uVar3 = 0;
-	} else {
-		int padIndex = bVar2;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		uVar3 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
-	}
+	memset((void*)GetArtiList(this), 0, 0x1008);
+	fVar2 = FLOAT_80332fac;
+	iVar5 = GetArtiListBase(this) + 8;
+	iVar10 = 8;
+	do {
+		*(float*)(iVar5 + 0x14) = fVar2;
+		*(float*)(iVar5 + 0x54) = fVar2;
+		*(float*)(iVar5 + 0x94) = fVar2;
+		*(float*)(iVar5 + 0xd4) = fVar2;
+		*(float*)(iVar5 + 0x114) = fVar2;
+		*(float*)(iVar5 + 0x154) = fVar2;
+		*(float*)(iVar5 + 0x194) = fVar2;
+		*(float*)(iVar5 + 0x1d4) = fVar2;
+		iVar5 = iVar5 + 0x200;
+		iVar10 = iVar10 - 1;
+	} while (iVar10 != 0);
 
-	bVar2 = false;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-		bVar2 = true;
-	}
-	if (bVar2) {
-		uVar4 = 0;
-	} else {
-		int padIndex = bVar2;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		uVar4 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 0x14);
-	}
+	iVar5 = GetArtiListBase(this);
+	*(int*)(iVar5 + 0x24) = 0x2e;
+	*(short*)(iVar5 + 8) = 0x68;
+	*(short*)(iVar5 + 10) = 0x28;
+	*(short*)(iVar5 + 0xc) = 0x78;
+	fVar2 = FLOAT_80332fe8;
+	*(short*)(iVar5 + 0xe) = 0x108;
+	fVar4 = FLOAT_80332fec;
+	*(float*)(iVar5 + 0x10) = fVar2;
+	fVar3 = FLOAT_80332fac;
+	*(float*)(iVar5 + 0x14) = fVar4;
+	fVar2 = FLOAT_80332fa8;
+	sVar6 = 0;
+	*(float*)(iVar5 + 0x1c) = fVar3;
+	fVar4 = FLOAT_80332ff0;
+	sVar7 = 4;
+	*(int*)(iVar5 + 0x2c) = 5;
+	*(int*)(iVar5 + 0x30) = 5;
+	iVar5 = 0x100;
+	iVar10 = GetArtiListBase(this);
+	*(int*)(iVar10 + 100) = 0x44;
+	*(short*)(iVar10 + 0x48) = 0x50;
+	*(short*)(iVar10 + 0x4a) = 0xe;
+	*(short*)(iVar10 + 0x4c) = 0x30;
+	*(short*)(iVar10 + 0x4e) = 0x30;
+	*(float*)(iVar10 + 0x50) = fVar2;
+	*(float*)(iVar10 + 0x54) = fVar2;
+	*(float*)(iVar10 + 0x5c) = fVar3;
+	*(int*)(iVar10 + 0x6c) = 0;
+	*(int*)(iVar10 + 0x70) = 5;
 
-	if (uVar4 == 0) {
-		return 0;
-	}
+	iVar10 = GetArtiListBase(this);
+	*(int*)(iVar10 + 0xa4) = 0x44;
+	*(short*)(iVar10 + 0x88) = 0x55;
+	*(short*)(iVar10 + 0x8c) = 0x30;
+	*(short*)(iVar10 + 0x8e) = 0x30;
+	*(short*)(iVar10 + 0x8a) = 0x150 - *(short*)(iVar10 + 0x8e);
+	*(float*)(iVar10 + 0x90) = fVar2;
+	*(float*)(iVar10 + 0x94) = fVar2;
+	*(float*)(iVar10 + 0x9c) = fVar4;
+	*(int*)(iVar10 + 0xac) = 0;
+	*(int*)(iVar10 + 0xb0) = 5;
 
-	iVar5 = GetArtiStateBase(this);
-	if ((uVar4 & 8) == 0) {
-		if ((uVar4 & 4) != 0) {
-			iVar6 = iVar5 + *(short*)(iVar5 + 0x30) * 2;
-			sVar1 = *(short*)(iVar6 + 0x26);
-			if (sVar1 < 7) {
-				*(short*)(iVar6 + 0x26) = sVar1 + 1;
-				Sound.PlaySe(1, 0x40, 0x7f, 0);
-			} else if ((int)*(short*)(iVar5 + 0x34) + (int)sVar1 < 0x48) {
-				*(short*)(iVar5 + 0x34) = *(short*)(iVar5 + 0x34) + 1;
-				Sound.PlaySe(1, 0x40, 0x7f, 0);
-			} else {
-				Sound.PlaySe(4, 0x40, 0x7f, 0);
-			}
-		}
-	} else {
-		iVar6 = iVar5 + *(short*)(iVar5 + 0x30) * 2;
-		sVar1 = *(short*)(iVar6 + 0x26);
-		if (sVar1 == 0) {
-			if (*(short*)(iVar5 + 0x34) == 0) {
-				Sound.PlaySe(4, 0x40, 0x7f, 0);
-			} else {
-				*(short*)(iVar5 + 0x34) = *(short*)(iVar5 + 0x34) + -1;
-				Sound.PlaySe(1, 0x40, 0x7f, 0);
-			}
-		} else {
-			*(short*)(iVar6 + 0x26) = sVar1 + -1;
-			Sound.PlaySe(1, 0x40, 0x7f, 0);
-		}
-	}
+	iVar10 = GetArtiListBase(this);
+	*(int*)(iVar10 + 0xf4) = 2;
+	*(int*)(iVar10 + 0xe4) = 0x2e;
+	*(short*)(iVar10 + 200) = 0x50;
+	*(short*)(iVar10 + 0xca) = 8;
+	*(short*)(iVar10 + 0xcc) = 0x48;
+	*(short*)(iVar10 + 0xce) = 0x140;
+	*(float*)(iVar10 + 0xd0) = fVar2;
+	*(float*)(iVar10 + 0xd4) = fVar2;
+	*(int*)(iVar10 + 0xec) = 0;
+	*(int*)(iVar10 + 0xf0) = 5;
 
-	if ((uVar4 & 0xc) == 0) {
-		if ((uVar3 & 0x20) != 0) {
-			*(short*)(GetArtiStateBase(this) + 0x1e) = 1;
-			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-			return 1;
-		}
-		if ((uVar3 & 0x40) != 0) {
-			*(short*)(GetArtiStateBase(this) + 0x1e) = -1;
-			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-			return 1;
-		}
-		if ((uVar3 & 0x100) == 0) {
-			if ((uVar3 & 0x200) != 0) {
-				*(char*)(GetArtiStateBase(this) + 0xd) = 1;
-				Sound.PlaySe(3, 0x40, 0x7f, 0);
-				return 1;
-			}
-		} else {
-			Sound.PlaySe(4, 0x40, 0x7f, 0);
-		}
-	}
+	iVar10 = GetArtiListBase(this);
+	iVar11 = 4;
+	do {
+		psVar8 = (short*)(GetArtiListBase(this) + iVar5 + 8);
+		psVar8[0x16] = 0;
+		psVar8[0x17] = 2;
+		psVar8[0xe] = 0;
+		psVar8[0xf] = 0x37;
+		sVar7 = sVar7 + 2;
+		*psVar8 = *(short*)(iVar10 + 8) + 0x24;
+		sVar1 = sVar6 + 0x20;
+		psVar8[1] = *(short*)(iVar10 + 10) + sVar6;
+		psVar8[2] = 200;
+		psVar8[3] = 0x28;
+		*(float*)(psVar8 + 4) = fVar2;
+		*(float*)(psVar8 + 6) = fVar2;
+		psVar8[0x12] = 0;
+		psVar8[0x13] = 7;
+		psVar8[0x14] = 0;
+		psVar8[0x15] = 5;
+		iVar9 = iVar5 + 0x48;
+		iVar5 = iVar5 + 0x80;
+		psVar8 = (short*)(GetArtiListBase(this) + iVar9);
+		psVar8[0x16] = 0;
+		psVar8[0x17] = 2;
+		psVar8[0xe] = 0;
+		psVar8[0xf] = 0x37;
+		*psVar8 = *(short*)(iVar10 + 8) + 0x24;
+		sVar6 = sVar6 + 0x40;
+		psVar8[1] = *(short*)(iVar10 + 10) + sVar1;
+		psVar8[2] = 200;
+		psVar8[3] = 0x28;
+		*(float*)(psVar8 + 4) = fVar2;
+		*(float*)(psVar8 + 6) = fVar2;
+		psVar8[0x12] = 0;
+		psVar8[0x13] = 7;
+		psVar8[0x14] = 0;
+		psVar8[0x15] = 5;
+		iVar11 = iVar11 - 1;
+	} while (iVar11 != 0);
 
-	return 0;
+	*GetArtiList(this) = sVar7;
+	*(short*)(GetArtiStateBase(this) + 0x26) = 0;
+	*(char*)(GetArtiStateBase(this) + 0xb) = 1;
 }

@@ -2024,7 +2024,7 @@ void CAmemCacheSet::AddRef(short index)
 
     entry.m_refCount += 1;
     if (entry.m_refCount == -1) {
-        if (System.m_execParam > 2) {
+        if (2 < (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt, static_cast<int>(index));
         }
 
@@ -2032,7 +2032,7 @@ void CAmemCacheSet::AddRef(short index)
             CAmemCache& current = cacheEntryAt(this, i);
             int data = reinterpret_cast<int>(current.m_cacheData);
             if ((current.m_inUse != 0) || (data != 0)) {
-                if (System.m_execParam > 2) {
+                if (2 < (unsigned int)System.m_execParam) {
                     Printf__7CSystemFPce(
                         &System, s_amemCacheEntryFmt, i, cacheStateName(current),
                         cacheTypeName(current), current.m_refCount, current.m_priority, data);
@@ -2040,7 +2040,7 @@ void CAmemCacheSet::AddRef(short index)
             }
         }
 
-        if (System.m_execParam > 2) {
+        if (2 < (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_amemCacheSeparator);
         }
 
@@ -2068,13 +2068,13 @@ void CAmemCacheSet::Release(short index)
     entry.m_refCount -= 1;
 
     if (entry.m_refCount == -1) {
-        if (System.m_execParam > 2) {
+        if (2 < (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt);
         }
 
         for (int i = 0; i < m_cacheCount; i++) {
             CAmemCache& cache = cacheEntryAt(this, i);
-            if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) && (System.m_execParam > 2)) {
+            if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) && (2 < (unsigned int)System.m_execParam)) {
                 Printf__7CSystemFPce(
                     &System, s_amemCacheEntryPaddedFmt, i, cacheStateName(cache),
                     cacheTypeName(cache), cache.m_refCount,
@@ -2082,7 +2082,7 @@ void CAmemCacheSet::Release(short index)
             }
         }
 
-        if (System.m_execParam > 2) {
+        if (2 < (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_amemCacheSeparator);
         }
 
@@ -2149,21 +2149,21 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
 
         if (m_releaseCheck == 0 || m_releaseCheck(m_releaseCheckArg) == 0) {
             m_releaseAction(m_releaseActionArg);
-            if (System.m_execParam > 2) {
+            if (2 < (unsigned int)System.m_execParam) {
                 Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt);
             }
 
             for (int i = 0; i < m_cacheCount; i++) {
                 CAmemCache& entry = cacheEntryAt(this, i);
                 int data = reinterpret_cast<int>(entry.m_cacheData);
-                if (((entry.m_inUse != 0) || (data != 0)) && (System.m_execParam > 2)) {
+                if (((entry.m_inUse != 0) || (data != 0)) && (2 < (unsigned int)System.m_execParam)) {
                     Printf__7CSystemFPce(
                         &System, s_amemCacheEntryFmt, i, cacheStateName(entry),
                         cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);
                 }
             }
 
-            if (System.m_execParam > 2) {
+            if (2 < (unsigned int)System.m_execParam) {
                 Printf__7CSystemFPce(&System, s_amemCacheSeparator);
             }
             m_stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
@@ -2309,21 +2309,21 @@ void CAmemCacheSet::RefCnt0Compare()
  */
 void CAmemCacheSet::AssertCache()
 {
-    if (System.m_execParam > 2) {
+    if (2 < (unsigned int)System.m_execParam) {
         Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt);
     }
 
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
         int data = reinterpret_cast<int>(entry.m_cacheData);
-        if ((entry.m_inUse != 0 || data != 0) && System.m_execParam > 2) {
+        if ((entry.m_inUse != 0 || data != 0) && (2 < (unsigned int)System.m_execParam)) {
             Printf__7CSystemFPce(
                 &System, s_amemCacheEntryFmt, i, cacheStateName(entry),
                 cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);
         }
     }
 
-    if (System.m_execParam > 2) {
+    if (2 < (unsigned int)System.m_execParam) {
         Printf__7CSystemFPce(&System, s_amemCacheSeparator);
     }
 }

@@ -251,7 +251,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                     interpWrite++;
                 }
 
-                pppCopyVector(particles[startIndex + (inserted + 1)].m_pos,
+                pppCopyVector(particles[startIndex + 1 + inserted].m_pos,
                               particles[startIndex + 1].m_pos);
 
                 for (int i = 0; i < inserted; i++) {

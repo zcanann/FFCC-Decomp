@@ -1254,16 +1254,20 @@ void CGPartyObj::enableDamageCol(int onOff)
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	unsigned int hitMask = 4;
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 		hitMask = 8;
 	}
 
-	if (onOff == 0) {
-		*reinterpret_cast<unsigned int*>(self + 0x384) = 0;
-		*reinterpret_cast<unsigned int*>(self + 0x3AC) = 0;
-	} else {
+	if (onOff != 0 &&
+	    (Game.m_gameWork.m_menuStageMode == 0 ||
+	     Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F ||
+	     (static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D ||
+	     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) == 0)) {
 		*reinterpret_cast<unsigned int*>(self + 0x384) = hitMask;
 		*reinterpret_cast<unsigned int*>(self + 0x3AC) = hitMask;
+	} else {
+		*reinterpret_cast<unsigned int*>(self + 0x384) = 0;
+		*reinterpret_cast<unsigned int*>(self + 0x3AC) = 0;
 	}
 }
 

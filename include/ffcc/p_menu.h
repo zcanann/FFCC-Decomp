@@ -210,6 +210,13 @@ public:
     void WMSubMenuInit();
     void WMChgMenu();
     void GetOptionData();
+    void ArtiInit();
+    void ArtiInit1();
+    bool ArtiOpen();
+    int ArtiCtrl();
+    bool ArtiClose();
+    void ArtiDraw();
+    int ArtiCtrlCur();
     void SetParty();
     void SetCMakeEnd(int);
     void ClrCMakeFlg(int);
@@ -268,7 +275,11 @@ public:
     unsigned char m_pad330[0x340 - 0x330];
     unsigned char m_externalFontTlut[0x740 - 0x340];
     int m_mode;
-    unsigned char m_pad744[0x864 - 0x744];
+    unsigned char m_pad744[0x82C - 0x744];
+    short* m_artiState;
+    unsigned char m_pad830[0x850 - 0x830];
+    short* m_artiList;
+    unsigned char m_pad854[0x864 - 0x854];
     unsigned short m_battleStateFlag;
     unsigned char m_pad866[0x8A0 - 0x866];
 };

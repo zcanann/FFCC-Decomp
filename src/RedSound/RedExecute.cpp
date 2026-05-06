@@ -2510,7 +2510,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	}
 
 	if (((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0) && (voice->m_waveData != 0)) {
-		voice->m_targetPitch =
+		voice->m_pitch =
 			PitchCompute(voice->m_basePitch + track->m_pitch,
 			             (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend,
 			             voice->m_waveData->m_pitch, (int)(s8)track->m_fineTune);

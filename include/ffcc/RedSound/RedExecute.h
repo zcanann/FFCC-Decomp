@@ -110,7 +110,7 @@ struct RedVoiceDATA {
 	signed char m_key;
 	signed char m_velocity;
 	unsigned char m_stateFlags;
-	unsigned char m_notePad;
+	unsigned char m_reserved1B;
 	int m_pitchModPhase;
 	int m_pitchModFrames;
 	int m_pitchModFrame;

@@ -71,11 +71,16 @@ struct RedDriverSyncState {
     RedDmaRequest m_streamDmaQueue[REDSOUND_DMA_QUEUE_ENTRY_COUNT];
     OSThread m_mainThread;
     OSSemaphore m_mainSemaphore;
-    u8 m_pad2240[0x2240 - 0x1F18 - sizeof(OSSemaphore)];
+    u8 m_reserved1F24[0x1F28 - 0x1F18 - sizeof(OSSemaphore)];
+    OSThread m_waveThread;
     OSSemaphore m_waveSemaphore;
-    u8 m_pad2578[0x2578 - 0x2240 - sizeof(OSSemaphore)];
+    RedWaveSettingState m_waveSettingData;
+    u8 m_reserved225C[0x2260 - 0x2240 - sizeof(OSSemaphore) - sizeof(RedWaveSettingState)];
+    OSThread m_dmaThread;
     OSSemaphore m_dmaSemaphore;
-    u8 m_pad28c0[0x28C0 - 0x2578 - sizeof(OSSemaphore)];
+    ARQRequest m_dmaRequest;
+    u8 m_reserved25A4[0x25A8 - 0x2578 - sizeof(OSSemaphore) - sizeof(ARQRequest)];
+    OSThread m_musicThread;
     OSSemaphore m_musicSemaphore;
 };
 

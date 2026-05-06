@@ -565,30 +565,32 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	CCaravanWork* self = this;
 	unsigned int stack[2];
 	int letterOffset = letterIdx * 0xC;
+	unsigned char* letter = reinterpret_cast<unsigned char*>(self) + letterOffset;
+	const int letterBase = offsetof(CCaravanWork, m_letter0);
 
-	stack[0] = (*reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset]) >> 2) & 0x1FF;
-	stack[1] = (*reinterpret_cast<unsigned int*>(&self->m_letter0[letterOffset]) >> 9) & 0x1FF;
+	stack[0] = (*reinterpret_cast<unsigned short*>(letter + letterBase) >> 2) & 0x1FF;
+	stack[1] = (*reinterpret_cast<unsigned int*>(letter + letterBase) >> 9) & 0x1FF;
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 		CFlat, Game.m_partyObjArr[self->m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
-	CMes::m_tempVar[0] = *reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset + 4]);
-	CMes::m_tempVar[1] = *reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset + 6]);
-	CMes::m_tempVar[2] = *reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset + 8]);
-	CMes::m_tempVar[3] = *reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset + 10]);
-	CMes::m_tempVar[4] = (*reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset]) >> 2) & 0x1FF;
-	CMes::m_tempVar[5] = (*reinterpret_cast<unsigned int*>(&self->m_letter0[letterOffset]) >> 9) & 0x1FF;
+	CMes::m_tempVar[0] = *reinterpret_cast<unsigned short*>(letter + letterBase + 4);
+	CMes::m_tempVar[1] = *reinterpret_cast<unsigned short*>(letter + letterBase + 6);
+	CMes::m_tempVar[2] = *reinterpret_cast<unsigned short*>(letter + letterBase + 8);
+	CMes::m_tempVar[3] = *reinterpret_cast<unsigned short*>(letter + letterBase + 10);
+	CMes::m_tempVar[4] = (*reinterpret_cast<unsigned short*>(letter + letterBase) >> 2) & 0x1FF;
+	CMes::m_tempVar[5] = (*reinterpret_cast<unsigned int*>(letter + letterBase) >> 9) & 0x1FF;
 
 	int money;
-	if (((self->m_letter0[letterOffset] >> 3) & 1) != 0) {
+	if (((*(letter + letterBase) >> 3) & 1) != 0) {
 		money = 0;
 	} else {
-		money = *reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset + 2]) & 0x1FF;
+		money = *reinterpret_cast<unsigned short*>(letter + letterBase + 2) & 0x1FF;
 	}
 	CMes::m_tempVar[6] = money;
 
 	int gil;
-	if (((self->m_letter0[letterOffset] >> 3) & 1) != 0) {
-		gil = (*reinterpret_cast<unsigned short*>(&self->m_letter0[letterOffset + 2]) & 0x1FF) * 100;
+	if (((*(letter + letterBase) >> 3) & 1) != 0) {
+		gil = (*reinterpret_cast<unsigned short*>(letter + letterBase + 2) & 0x1FF) * 100;
 	} else {
 		gil = 0;
 	}
@@ -596,7 +598,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 
 	CMes::m_tempVar[8] = *reinterpret_cast<int*>(&self->m_saveSlot);
 
-	reinterpret_cast<LetterFlags*>(&self->m_letter0[letterOffset])->opened = 1;
+	reinterpret_cast<LetterFlags*>(letter + letterBase)->opened = 1;
 }
 
 /*

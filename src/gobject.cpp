@@ -362,7 +362,7 @@ void CGObject::onCreate()
     *((u8*)&m_shieldNodeFlags) &= 0xEF;
     m_dispItemTimer = 0;
     *((u8*)&m_shieldNodeFlags) &= 0x7F;
-    *reinterpret_cast<float*>(m_lastBgAttr) = 1.0f;
+    m_lastBgAttr = 1.0f;
     *((u8*)&m_shieldNodeFlags) &= 0xF7;
     *((u8*)&m_shieldNodeFlags) &= 0xFB;
     m_collisionPushTimerMax = 0x32;
@@ -1446,7 +1446,7 @@ void CGObject::update()
     unsigned char& weaponFlagsHi = *(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1);
     unsigned char& shieldFlagsLo = *reinterpret_cast<unsigned char*>(&m_shieldNodeFlags);
     unsigned char& shieldFlagsHi = *(reinterpret_cast<unsigned char*>(&m_shieldNodeFlags) + 1);
-    const float lastBgAttr = *reinterpret_cast<float*>(m_lastBgAttr);
+    const float lastBgAttr = m_lastBgAttr;
 
     if (m_dispItemTimer != 0) {
         m_dispItemTimer--;
@@ -2993,8 +2993,7 @@ int CGObject::IsLoopAnim(int mode)
         threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
     }
 
-	// TODO: Retype float?
-    const float lastAttr = *reinterpret_cast<const float*>(m_lastBgAttr);
+    const float lastAttr = m_lastBgAttr;
 
     if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat))
     {
@@ -3066,7 +3065,7 @@ int CGObject::IsAnimFinished(int mode)
                             }
 
                             if (static_cast<double>(sZeroFloat)
-                                <= static_cast<double>(*reinterpret_cast<float*>(m_lastBgAttr))) {
+                                <= static_cast<double>(m_lastBgAttr)) {
                                 result =
                                     (static_cast<u32>(static_cast<u8>(
                                          (static_cast<double>(animSpan - sAnimFrameOffset) < threshold) << 3))

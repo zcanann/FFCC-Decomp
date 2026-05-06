@@ -1671,8 +1671,8 @@ void EnvelopeKeyExecute()
  */
 static void _KeyOnControl()
 {
-    u32 local_24 = 0;
-    u32 local_28 = 0;
+    u32 voiceStartMaskHi = 0;
+    u32 voiceStartMaskLo = 0;
     int* reserve = (int*)p_KeyOnData;
     unsigned int* voiceData = (unsigned int*)p_VoiceData;
     int (*waveFunc)(int);
@@ -1682,7 +1682,7 @@ static void _KeyOnControl()
     if (m_KeyOnEntry != 0) {
         do {
             if (((u32)*reserve != 0) && (((RedTrackDATA*)*reserve)->m_waveData != 0)) {
-                voiceData = (unsigned int*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)&local_28);
+                voiceData = (unsigned int*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)&voiceStartMaskLo);
             }
             reserve += 2;
         } while ((voiceData != 0) && (reserve < (int*)p_KeyOnData + REDSOUND_KEY_ON_TOTAL_WORD_COUNT));
@@ -1812,26 +1812,26 @@ static void _KeyOnControl()
         u32 bit = 1;
         unsigned int* voice = (unsigned int*)p_VoiceData;
         do {
-            if ((local_28 & bit) != 0) {
-                local_28 &= ~bit;
+            if ((voiceStartMaskLo & bit) != 0) {
+                voiceStartMaskLo &= ~bit;
                 voice[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
             voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
-        } while (local_28 != 0);
+        } while (voiceStartMaskLo != 0);
     }
 
     {
         u32 bit = 1;
         unsigned int* voice = (unsigned int*)p_VoiceData + REDSOUND_VOICE_SECOND_MASK_WORD_OFFSET;
         do {
-            if ((local_24 & bit) != 0) {
-                local_24 &= ~bit;
+            if ((voiceStartMaskHi & bit) != 0) {
+                voiceStartMaskHi &= ~bit;
                 voice[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
             voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
-        } while (local_24 != 0);
+        } while (voiceStartMaskHi != 0);
     }
 }
 

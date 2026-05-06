@@ -376,13 +376,13 @@ extern "C" void CalcBound__9CLine2(CLine* line)
             line->min.z = point.z;
         }
 
-        if (line->max.x < point.x) {
+        if (point.x > line->max.x) {
             line->max.x = point.x;
         }
-        if (line->max.y < point.y) {
+        if (point.y > line->max.y) {
             line->max.y = point.y;
         }
-        if (line->max.z < point.z) {
+        if (point.z > line->max.z) {
             line->max.z = point.z;
         }
 
@@ -2452,8 +2452,7 @@ void CSound::PlayStreamASync()
         clampedVolume = volume;
     }
 
-    int streamNo = StreamPlay__9CRedSoundFPviii(
-        RedSound(this), sound.m_streamBuffer, 0x20000, 0x40, clampedVolume);
+    int streamNo = StreamPlay__9CRedSoundFPviii(redSound, streamBuffer, 0x20000, 0x40, clampedVolume);
     sound.m_streamID = streamNo;
     sound.m_streamPlaying = 1;
 }

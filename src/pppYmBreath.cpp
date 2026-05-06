@@ -506,6 +506,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     _pppMngSt* mngSt;
     int* dataOffsets;
+    int colorOffset;
     VYmBreath* work;
     VColor* color;
     Mtx* particleWMat;
@@ -519,6 +520,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     int slotCount;
     int ready;
     float scaledOwner;
+    YmBreathParticleGroup* groupCheck;
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;
@@ -533,8 +535,9 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
 
     dataOffsets = offsets->m_serializedDataOffsets;
     mngSt = pppMngStPtr;
+    colorOffset = dataOffsets[1];
     work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[0]);
-    color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[1]);
+    color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
 
     if (work->m_particleData == NULL) {
         YmBreathParticleGroup* groupTable;
@@ -602,9 +605,10 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     groupData = work->m_groups;
     for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
+        groupCheck = &work->m_groups[(short)groupIndex];
         slotCount = params->m_slotCount;
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
-            if ((groupData->particleIndices[slotIndex] == -1) || (groupData->particleStates[slotIndex] != 1)) {
+            if ((groupCheck->particleIndices[slotIndex] == -1) || (groupCheck->particleStates[slotIndex] != 1)) {
                 ready = 0;
                 goto group_ready;
             }

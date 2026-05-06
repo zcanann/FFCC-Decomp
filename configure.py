@@ -547,7 +547,7 @@ config.libs = [
             Object(NonMatching, "menu_tmparti.cpp"),
             Object(NonMatching, "MenuUtil.cpp"),
             Object(NonMatching, "mes.cpp"),
-            Object(NonMatching, "mesmenu.cpp"),
+            Object(NonMatching, "mesmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "monobj.cpp"),
             Object(NonMatching, "monobj_boss.cpp"),
             Object(NonMatching, "monobj_table.cpp"),

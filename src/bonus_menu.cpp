@@ -57,8 +57,8 @@ unsigned char gBonusMenuFlagPad = 0;
 float* gBonusCheckMarkPosBuffer = 0;
 }
 #pragma force_active reset
-static const char s_drawBonusFmt[] = "draw Bonus[%d]\n";
-static const char s_bonusMenuSourceFile[] = "bonus_menu.cpp";
+extern "C" const char s_draw_Bonus_pctd_801DD5C0[] = "draw Bonus[%d]\n";
+extern "C" const char s_bonus_menu_cpp_801DD588[] = "bonus_menu.cpp";
 
 namespace {
 
@@ -1337,7 +1337,7 @@ void CMenuPcs::createBonus()
 				BonusPartySummary& entry = s_bonusSummaryData->m_party[i];
 				unsigned long modelCode = entry.m_tribeId + 0x87;
 				CCharaPcs::CHandle* handle =
-				    new (stage, const_cast<char*>(s_bonusMenuSourceFile), 0x183) CCharaPcs::CHandle;
+				    new (stage, const_cast<char*>(s_bonus_menu_cpp_801DD588), 0x183) CCharaPcs::CHandle;
 				if (handle != 0) {
 					handle->Add();
 					handle->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
@@ -1351,7 +1351,7 @@ void CMenuPcs::createBonus()
 				if (displaySlots != 0) {
 					unsigned long displayModelCode = entry.m_tribeId + 0x83;
 					CCharaPcs::CHandle* displayHandle =
-					    new (stage, const_cast<char*>(s_bonusMenuSourceFile), 0x187) CCharaPcs::CHandle;
+					    new (stage, const_cast<char*>(s_bonus_menu_cpp_801DD588), 0x187) CCharaPcs::CHandle;
 					if (displayHandle != 0) {
 						displayHandle->Add();
 						displayHandle->LoadModel(3, displayModelCode & 0xFFF, (displayModelCode >> 12) & 0xF, 0, -1, 0, 0);
@@ -1374,7 +1374,7 @@ void CMenuPcs::createBonus()
 				    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2);
 				unsigned short modelNo = itemModelCode & 0x0FFF;
 				CCharaPcs::CHandle* itemHandle =
-				    new (stage, const_cast<char*>(s_bonusMenuSourceFile), 0x19C) CCharaPcs::CHandle;
+				    new (stage, const_cast<char*>(s_bonus_menu_cpp_801DD588), 0x19C) CCharaPcs::CHandle;
 				if (itemHandle == 0) {
 					handleIndex++;
 					continue;
@@ -1578,7 +1578,7 @@ void CMenuPcs::drawBonus()
 	gUtil.ClearZBufferRect(0.0f, 0.0f, 640.0f, 480.0f);
 
 	if (System.m_execParam != 0) {
-		Printf__7CSystemFPce(&System, s_drawBonusFmt, (int)*(short*)(statePtr + 0x1c));
+		Printf__7CSystemFPce(&System, s_draw_Bonus_pctd_801DD5C0, (int)*(short*)(statePtr + 0x1c));
 	}
 
 	switch (*(short*)(statePtr + 0x1c)) {

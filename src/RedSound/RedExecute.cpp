@@ -177,11 +177,7 @@ enum RedReverbDelayChannelIndex {
 enum RedExecuteAxVoiceLayout {
     REDSOUND_AX_VOICE_PRIORITY_OFFSET = 0x0C,
     REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET = 0x1C,
-    REDSOUND_AX_VOICE_SRC_SELECT_OFFSET = 0x140,
-    REDSOUND_AX_VOICE_RUNNING_OFFSET = 0x146,
     REDSOUND_AX_VOICE_LOOP_OFFSET = 0x148,
-    REDSOUND_AX_VOICE_VOLUME_OFFSET = 0x19C,
-    REDSOUND_AX_VOICE_VOLUME_DELTA_OFFSET = 0x19E,
     REDSOUND_AX_MIX_CTRL_DRY_STEREO = 0x3,
     REDSOUND_AX_MIX_CTRL_AUX_A_STEREO = 0x30,
     REDSOUND_AX_MIX_CTRL_AUX_B_STEREO = 0x600,
@@ -1472,15 +1468,15 @@ void EnvelopeKeyExecute()
             voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] = 0;
             int voice = voiceData[REDSOUND_VOICE_AX_VOICE_WORD];
             if (voice != 0) {
-                if (*(s16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) == 0) {
+                if (((AXVPB*)voice)->pb.state == 0) {
                     if (*(int*)(voice + REDSOUND_AX_VOICE_PRIORITY_OFFSET) != 0) {
                         AXFreeVoice((AXVPB*)voice);
                     }
                     voiceData[REDSOUND_VOICE_AX_VOICE_WORD] = 0;
                     voiceData[REDSOUND_VOICE_TRACK_WORD] = 0;
                 } else {
-                    *(u16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) = 0;
-                    *(u16*)(voice + REDSOUND_AX_VOICE_VOLUME_OFFSET) = 0;
+                    ((AXVPB*)voice)->pb.state = 0;
+                    ((AXVPB*)voice)->pb.ve.currentVolume = 0;
                     *(u32*)(voice + REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET) |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
                 }
             }
@@ -1588,8 +1584,8 @@ void EnvelopeKeyExecute()
 
                     *(u16*)(voice + REDSOUND_AX_VOICE_LOOP_OFFSET) =
                         (u16)((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_LOOP) != 0);
-                    *(u16*)(voice + REDSOUND_AX_VOICE_SRC_SELECT_OFFSET) = 1;
-                    *(u16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) = 1;
+                    ((AXVPB*)voice)->pb.srcSelect = 1;
+                    ((AXVPB*)voice)->pb.state = 1;
 
                     memcpy(&((AXVPB*)voice)->pb.adpcm, &waveData->m_adpcm.m_data, sizeof(waveData->m_adpcm.m_data));
                     memcpy(&((AXVPB*)voice)->pb.adpcmLoop, &waveData->m_adpcm.m_loop, sizeof(waveData->m_adpcm.m_loop));
@@ -1623,18 +1619,18 @@ void EnvelopeKeyExecute()
                 voiceData[REDSOUND_VOICE_ACTIVE_WORD] = 0;
                 voiceFlags |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
                 voiceData[REDSOUND_VOICE_TRACK_WORD] = 0;
-                *(u16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) = 0;
+                ((AXVPB*)voice)->pb.state = 0;
                 voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] = 0;
                 voiceData[REDSOUND_VOICE_ENVELOPE_WORD] = 0;
-                *(u16*)(voice + REDSOUND_AX_VOICE_VOLUME_OFFSET) = 0;
-                *(u16*)(voice + REDSOUND_AX_VOICE_VOLUME_DELTA_OFFSET) = 0;
+                ((AXVPB*)voice)->pb.ve.currentVolume = 0;
+                ((AXVPB*)voice)->pb.ve.currentDelta = 0;
             } else if ((envChanged != 0) &&
-                       ((u32)*(u16*)(voice + REDSOUND_AX_VOICE_VOLUME_OFFSET) !=
+                       ((u32)((AXVPB*)voice)->pb.ve.currentVolume !=
                         ((voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT) & 0xFFFFU))) {
                 voiceFlags |= AX_SYNC_FLAG_COPYVOL;
-                *(u16*)(voice + REDSOUND_AX_VOICE_VOLUME_DELTA_OFFSET) = 0;
-                *(s16*)(voice + REDSOUND_AX_VOICE_VOLUME_OFFSET) =
-                    (s16)(voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT);
+                ((AXVPB*)voice)->pb.ve.currentDelta = 0;
+                ((AXVPB*)voice)->pb.ve.currentVolume =
+                    (u16)(voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT);
             }
 
             *(u32*)(voice + REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET) |= voiceFlags;

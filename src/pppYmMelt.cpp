@@ -6,13 +6,13 @@
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "dolphin/mtx.h"
+#include "dolphin/os/OSCache.h"
 extern "C" {
 extern const float kPppYmMeltZero;
 extern u32 g_ymMelt;
 extern int gPppCalcDisabled;
 }
-#include "dolphin/mtx.h"
-
 extern const float FLOAT_80330af4;
 extern const float FLOAT_80330b08;
 extern const float FLOAT_80330b0c;
@@ -24,14 +24,7 @@ extern "C" {
 int rand(void);
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-void DCFlushRange(void*, unsigned long);
-void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
-    unsigned char);
-void* GetTexture__10pppShapeStFPlP12CMaterialSetRi(pppShapeSt*, long*, CMaterialSet*, int&);
-void pppGetShapeUV__FPlsR5Vec2dR5Vec2di(long*, short, Vec2d&, Vec2d&, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
@@ -123,9 +116,8 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
     shape = *(pppShapeSt**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
 
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        &colorWork->m_color, &ppvCameraMatrix, kPppYmMeltZero, ctrl->m_payload[0x19],
-        ctrl->m_payload[0x18], ctrl->m_blendMode, 2, 1, 1, 0);
+    pppSetDrawEnv(&colorWork->m_color, (pppFMATRIX*)&ppvCameraMatrix, kPppYmMeltZero, ctrl->m_payload[0x19],
+                  ctrl->m_payload[0x18], ctrl->m_blendMode, 2, 1, 1, 0);
     pppSetBlendMode(ctrl->m_blendMode);
 
     GXClearVtxDesc();
@@ -137,9 +129,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     GXSetVtxAttrFmt(GX_VTXFMT7, (GXAttr)0xd, (GXCompCnt)1, (GXCompType)4, 0);
 
     textureIndex = 0;
-    texture =
-        (CTexture*)GetTexture__10pppShapeStFPlP12CMaterialSetRi(shape, (long*)shape->m_animData,
-                                                                 pppEnvStPtr->m_materialSetPtr, textureIndex);
+    texture = (CTexture*)shape->GetTexture((long*)shape->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
     if (texture == nullptr) {
         return;
     }
@@ -168,7 +158,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     worldX = pppMngStPtr->m_matrix.value[0][3];
     worldY = pppMngStPtr->m_matrix.value[1][3];
     worldZ = pppMngStPtr->m_matrix.value[2][3];
-    pppGetShapeUV__FPlsR5Vec2dR5Vec2di((long*)shape->m_animData, work->m_shapeDrawFrame, uvMin, uvMax, 0);
+    pppGetShapeUV((long*)shape->m_animData, work->m_shapeDrawFrame, uvMin, uvMax, 0);
 
     uStep = uvMax.x - uvMin.x;
     vStep = uvMax.y - uvMin.y;
@@ -301,7 +291,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     matrixY = pppMngStPtr->m_matrix.value[1][3];
 
     if (work->m_vertexData == nullptr) {
-        work->m_vertexData = (YmMeltVertex*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->m_vertexData = (YmMeltVertex*)pppMemAlloc(
             (unsigned long)vertexCount * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmMelt_cpp_801DA048),
             0xA9);

@@ -1864,7 +1864,7 @@ static void _ExecuteExtraData()
         voice = p_VoiceData;
         do {
             if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
-                voice->m_targetPitch = PitchCompute(
+                voice->m_pitch = PitchCompute(
                     voice->m_basePitch + p_MusicPitchControl->m_value,
                     (int)voice->m_track->m_keyTranspose + (int)voice->m_track->m_pitchBend,
                     voice->m_waveData->m_pitch,

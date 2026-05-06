@@ -394,10 +394,10 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			track->m_seSepId = sepId;
 			track->m_seId = seId;
 			track->m_loopStepCurrent = 0;
-			if (m_SeSkipStep == 0) {
-				state = REDSOUND_TRACK_PLAY_TIME_SENTINEL;
-			} else {
+			if (m_SeSkipStep != 0) {
 				state = 0;
+			} else {
+				state = REDSOUND_TRACK_PLAY_TIME_SENTINEL;
 			}
 			track->m_playTime = state;
 

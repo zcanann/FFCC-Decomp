@@ -2,7 +2,7 @@
 #define _FFCC_P_TINA_H_
 
 #include "ffcc/memory.h"
-#include "ffcc/p_sample.h"
+#include "ffcc/system.h"
 #include "ffcc/USBStreamData.h"
 
 struct Vec;
@@ -37,7 +37,7 @@ extern unsigned int m_table_desc17__8CPartPcs[];
 extern unsigned int m_table_desc18__8CPartPcs[];
 extern unsigned int m_table__8CPartPcs[][0x15C / sizeof(unsigned int)];
 
-class CPartPcs : public CSamplePcs
+class CPartPcs : public CProcess
 {
 public:
     CUSBStreamData m_usbStreamData; // 0x04

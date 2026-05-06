@@ -1525,32 +1525,7 @@ void EnvelopeKeyExecute()
                 envChanged = 1;
             }
 
-            if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_START) == 0) {
-                if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_RELEASED) == 0) {
-                    if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_PAUSE) == 0) {
-                        if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_ADSR_START) == 0) {
-                            envChanged |= _AdsrDataExecute((RedVoiceDATA*)voiceData);
-                            voiceData[REDSOUND_VOICE_ENVELOPE_WORD] =
-                                voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT;
-                        }
-                        voiceData[REDSOUND_VOICE_FLAGS_WORD] &= ~REDSOUND_VOICE_FLAGS_ADSR_START;
-                    }
-                } else {
-                    voiceData[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_RELEASE_ACTIVE;
-                    voiceData[REDSOUND_VOICE_ADSR_STAGE_WORD] = REDSOUND_VOICE_ADSR_RELEASE;
-                    voiceData[REDSOUND_VOICE_ADSR_STEP_FRAMES_WORD] =
-                        (u16)((u8*)voiceData)[REDSOUND_VOICE_ADSR_TIME_RELEASE_BYTE_OFFSET];
-                    if (voiceData[REDSOUND_VOICE_ADSR_STEP_FRAMES_WORD] == 0) {
-                        voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] = 0;
-                    } else {
-                        voiceData[REDSOUND_VOICE_ADSR_STEP_ADD_WORD] = -voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD];
-                        voiceData[REDSOUND_VOICE_ADSR_STEP_ADD_WORD] =
-                            voiceData[REDSOUND_VOICE_ADSR_STEP_ADD_WORD] / voiceData[REDSOUND_VOICE_ADSR_STEP_FRAMES_WORD];
-                    }
-                    voiceData[REDSOUND_VOICE_ENVELOPE_WORD] =
-                        voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT;
-                }
-            } else {
+            if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_START) != 0) {
                 voiceData[REDSOUND_VOICE_FLAGS_WORD] &= REDSOUND_VOICE_FLAGS_CLEAR_RELEASE_ACTIVE_MASK;
                 RedWaveDATA* waveData = (RedWaveDATA*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD];
                 RedTrackDATA* trackData = (RedTrackDATA*)voiceData[REDSOUND_VOICE_TRACK_WORD];
@@ -1590,6 +1565,31 @@ void EnvelopeKeyExecute()
                     voiceData[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_ADSR_START;
                     voiceData[REDSOUND_VOICE_ENVELOPE_WORD] = REDSOUND_ENVELOPE_LEVEL_FULL;
                     voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] = 0;
+                }
+            } else {
+                if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_RELEASED) != 0) {
+                    voiceData[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_RELEASE_ACTIVE;
+                    voiceData[REDSOUND_VOICE_ADSR_STAGE_WORD] = REDSOUND_VOICE_ADSR_RELEASE;
+                    voiceData[REDSOUND_VOICE_ADSR_STEP_FRAMES_WORD] =
+                        (u16)((u8*)voiceData)[REDSOUND_VOICE_ADSR_TIME_RELEASE_BYTE_OFFSET];
+                    if (voiceData[REDSOUND_VOICE_ADSR_STEP_FRAMES_WORD] == 0) {
+                        voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] = 0;
+                    } else {
+                        voiceData[REDSOUND_VOICE_ADSR_STEP_ADD_WORD] = -voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD];
+                        voiceData[REDSOUND_VOICE_ADSR_STEP_ADD_WORD] =
+                            voiceData[REDSOUND_VOICE_ADSR_STEP_ADD_WORD] / voiceData[REDSOUND_VOICE_ADSR_STEP_FRAMES_WORD];
+                    }
+                    voiceData[REDSOUND_VOICE_ENVELOPE_WORD] =
+                        voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT;
+                } else {
+                    if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_PAUSE) == 0) {
+                        if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_ADSR_START) == 0) {
+                            envChanged |= _AdsrDataExecute((RedVoiceDATA*)voiceData);
+                            voiceData[REDSOUND_VOICE_ENVELOPE_WORD] =
+                                voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT;
+                        }
+                        voiceData[REDSOUND_VOICE_FLAGS_WORD] &= ~REDSOUND_VOICE_FLAGS_ADSR_START;
+                    }
                 }
             }
 

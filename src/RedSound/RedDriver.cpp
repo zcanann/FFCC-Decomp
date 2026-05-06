@@ -2097,11 +2097,11 @@ void CRedDriver::DisplaySePlayInfo()
  */
 int CRedDriver::StreamPlayState(int streamID)
 {
-	void* commandNow;
+	RedExecCommand* commandNow;
 	unsigned int interrupts;
 	RedStreamDATA* streamData;
 	int result;
-	unsigned int* command;
+	RedExecCommand* command;
 
 	interrupts = OSDisableInterrupts();
 	result = 0;
@@ -2117,16 +2117,16 @@ int CRedDriver::StreamPlayState(int streamID)
 
 	if (result == 0) {
 		commandNow = p_ExecCommandNow;
-		command = (unsigned int*)p_ExecCommandOld;
-		while (commandNow != (void*)command) {
-			if ((*command != 0) && ((void (*)(int*))*command == _StreamPlay) &&
-			    ((streamID == -1) || (streamID == (int)command[1]))) {
+		command = p_ExecCommandOld;
+		while (commandNow != command) {
+			if ((command->m_func != 0) && (command->m_func == _StreamPlay) &&
+			    ((streamID == -1) || (streamID == command->m_args[0]))) {
 				result = 1;
 				break;
 			}
-			command += 8;
-			if (command == (unsigned int*)p_ExecCommand + REDSOUND_EXEC_COMMAND_WORD_COUNT) {
-				command = (unsigned int*)p_ExecCommand;
+			command++;
+			if (command == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
+				command = p_ExecCommand;
 			}
 		}
 	}

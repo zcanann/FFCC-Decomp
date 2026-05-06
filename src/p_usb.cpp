@@ -60,7 +60,6 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
     unsigned int count;
     int result;
-    unsigned int* ptr;
     int connected;
     unsigned int* dstBuffer;
     CMemory::CStage* stage;
@@ -70,10 +69,12 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     value = (count + 0x5F) & ~0x1F;
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-    ptr = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
+    void* packet = __nwa__FUlPQ27CMemory6CStagePci(
         value, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x1ca);
-    ptr[1] = value;
-    ptr[0] = 4;
+    unsigned int* header = (unsigned int*)packet;
+    header[1] = value;
+    *header = 4;
+    unsigned int* ptr = header;
     ptr[9] = Swap32((unsigned int)code);
     ptr[10] = Swap32((unsigned int)elemCount);
     ptr[12] = Swap32(count);

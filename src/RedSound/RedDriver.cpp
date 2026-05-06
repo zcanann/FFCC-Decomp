@@ -2257,9 +2257,9 @@ void CRedDriver::ClearWaveData(int waveID)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::ClearWaveDataM(int param_1, int param_2, int param_3, int param_4)
+void CRedDriver::ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo3)
 {
-    c_RedEntry.ClearWaveDataM(param_1, param_2, param_3, param_4);
+    c_RedEntry.ClearWaveDataM(waveNo0, waveNo1, waveNo2, waveNo3);
 }
 
 /*

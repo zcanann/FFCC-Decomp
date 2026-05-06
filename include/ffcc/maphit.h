@@ -14,15 +14,7 @@ void CheckLineCylinder(const Vec&, const Vec&, const CMapCylinder&, float&);
 class CMapCylinder
 {
 public:
-    CMapCylinder()
-    {
-        m_direction2.y = 0.0f;
-        m_direction2.x = 0.0f;
-        m_top.z = 0.0f;
-        m_height2 = 1.0f;
-        m_radius2 = 1.0f;
-        m_direction2.z = 1.0f;
-    }
+    CMapCylinder();
 
     Vec m_bottom;     // 0x0
     Vec m_direction;  // 0xc

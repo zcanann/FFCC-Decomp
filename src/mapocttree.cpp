@@ -13,10 +13,10 @@ extern "C" {
 extern const float kMapOctTreeDefaultOffsetZ;
 }
 
-// Linkage definitions from config/GCCP01/symbols.txt.
-const float kOctTreeBoundMinInit = 10000000000.0f;
-const float kOctTreeBoundMaxInit = -10000000000.0f;
-const float kOctTreeCylinderPad = 1.0f;
+// Linkage declarations for sdata2 symbols claimed in config/GCCP01/symbols.txt.
+extern "C" const float kOctTreeBoundMinInit;
+extern "C" const float kOctTreeBoundMaxInit;
+extern "C" const float kOctTreeCylinderPad;
 struct CBoundRaw
 {
     CBoundRaw()
@@ -2241,8 +2241,8 @@ int CBound::CheckCross(CBound& other)
  */
 COctNode::COctNode()
 {
-	float min = kOctTreeBoundMinInit;
 	float max = kOctTreeBoundMaxInit;
+	float min = kOctTreeBoundMinInit;
 	float* bounds = (float*)this;
 
 	bounds[2] = min;

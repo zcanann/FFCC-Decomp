@@ -1723,16 +1723,16 @@ static void _KeyOnControl()
     }
 
     {
-        unsigned int* voice = (unsigned int*)p_VoiceData;
+        RedVoiceDATA* voice = p_VoiceData;
         do {
-            if ((voice[REDSOUND_VOICE_ACTIVE_WORD] != 0) && (voice[REDSOUND_VOICE_TRACK_WORD] != 0) &&
-                ((((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_voiceSwitch & 9) == 0)) {
-                if ((((RedVoiceDATA*)voice)->m_updateFlags & REDSOUND_VOICE_UPDATE_VOLUME) != 0 ||
-                    (((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_tremoloFunc != 0) ||
-                    (((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_shakeFunc != 0)) {
+            if ((voice->m_active != 0) && (voice->m_track != 0) &&
+                ((voice->m_track->m_voiceSwitch & 9) == 0)) {
+                if ((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_VOLUME) != 0 ||
+                    (voice->m_track->m_tremoloFunc != 0) ||
+                    (voice->m_track->m_shakeFunc != 0)) {
                     int volume;
                     RedSoundCONTROL* soundControl = p_SoundControlBuffer;
-                    RedTrackDATA* trackData = (RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD];
+                    RedTrackDATA* trackData = voice->m_track;
                     if ((soundControl->m_tracks <= trackData) &&
                         (trackData < soundControl->m_tracks + soundControl->m_trackCount)) {
                         int idx = trackData->m_trackNo;
@@ -1774,17 +1774,17 @@ static void _KeyOnControl()
                             }
                         }
                     }
-                    _VolumeExecute((RedVoiceDATA*)voice, volume);
+                    _VolumeExecute(voice, volume);
                 }
 
-                if ((((RedVoiceDATA*)voice)->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0 ||
-                    (((RedTrackDATA*)voice[REDSOUND_VOICE_TRACK_WORD])->m_vibrateFunc != 0)) {
-                    _PitchExecute((RedVoiceDATA*)voice);
+                if ((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0 ||
+                    (voice->m_track->m_vibrateFunc != 0)) {
+                    _PitchExecute(voice);
                 }
-                ((RedVoiceDATA*)voice)->m_updateFlags = 0;
+                voice->m_updateFlags = 0;
             }
-            voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
-        } while (voice < (unsigned int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
+            voice++;
+        } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
     }
 
     {

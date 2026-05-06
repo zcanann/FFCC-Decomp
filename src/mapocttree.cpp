@@ -1737,113 +1737,119 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 		}
 	}
 
-	if (!overlap) {
-		return 0;
-	}
-
-	if ((*reinterpret_cast<unsigned short*>(Ptr(node, 0x3C)) != 0) &&
-	    ((*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
-	         ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
-	                            *reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)),
-	                            *reinterpret_cast<unsigned short*>(Ptr(node, 0x3C)),
-	                            InsertShadow_level) != 0)) {
-		return 1;
-	}
-
-	for (int i = 0; i < 8; i++) {
-		COctNode* child = *reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
-		if (child == 0) {
-			return 0;
+	if (overlap) {
+		if ((*reinterpret_cast<unsigned short*>(Ptr(node, 0x3C)) != 0) &&
+			((*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
+				 ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
+									*reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)),
+									*reinterpret_cast<unsigned short*>(Ptr(node, 0x3C)),
+									InsertShadow_level) != 0)) {
+			return 1;
 		}
 
-		float childBoundMinX = *reinterpret_cast<float*>(Ptr(child, 0x0));
-		int childOverlap = false;
-		int childXYOverlap = false;
-		int childXOverlap = false;
-		if (childBoundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
-			childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= *reinterpret_cast<float*>(Ptr(child, 0xC));
-		} else {
-			if (childBoundMinX > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
-				childXOverlap = childBoundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x34));
-			} else {
-				childXOverlap = true;
-			}
-		}
-
-		if (childXOverlap) {
-			float childBoundMinY = *reinterpret_cast<float*>(Ptr(child, 0x4));
-			if (childBoundMinY < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
-				childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= *reinterpret_cast<float*>(Ptr(child, 0x10));
-			} else {
-				if (childBoundMinY > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
-					childXOverlap = childBoundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x38));
+		for (int i = 0; i < 8; i++) {
+			COctNode* child = *reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
+			if (child != 0) {
+				float childBoundMinX = *reinterpret_cast<float*>(Ptr(child, 0x0));
+				int childOverlap = false;
+				int childXYOverlap = false;
+				int childXOverlap = false;
+				if (childBoundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
+					childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= *reinterpret_cast<float*>(Ptr(child, 0xC));
 				} else {
-					childXOverlap = true;
-				}
-			}
-			if (childXOverlap) {
-				childXYOverlap = true;
-			}
-		}
-
-		if (childXYOverlap) {
-			float childBoundMinZ = *reinterpret_cast<float*>(Ptr(child, 0x8));
-			if (childBoundMinZ < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-				childXYOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= *reinterpret_cast<float*>(Ptr(child, 0x14));
-			} else {
-				if (childBoundMinZ > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-					childXYOverlap = childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
-				} else {
-					childXYOverlap = true;
-				}
-			}
-			if (childXYOverlap) {
-				childOverlap = true;
-			}
-		}
-
-		if (childOverlap) {
-			if ((*reinterpret_cast<unsigned short*>(Ptr(child, 0x3C)) != 0) &&
-			    ((*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
-			         ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
-			                            *reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)),
-			                            *reinterpret_cast<unsigned short*>(Ptr(child, 0x3C)),
-			                            InsertShadow_level) != 0)) {
-				return 1;
-			}
-
-			for (int j = 0; j < 8; j++) {
-				COctNode* grandChild = *reinterpret_cast<COctNode**>(Ptr(child, 0x1C));
-				if (grandChild == 0) {
-					break;
+					if (childBoundMinX > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
+						childXOverlap = childBoundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x34));
+					} else {
+						childXOverlap = true;
+					}
 				}
 
-				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(Ptr(&s_cyl, 0x28)))) != 0) {
-					if ((*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3C)) != 0) &&
-					    ((*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
-					         ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
-					                            *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)),
-					                            *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3C)),
-					                            InsertShadow_level) != 0)) {
+				if (childXOverlap) {
+					float childBoundMinY = *reinterpret_cast<float*>(Ptr(child, 0x4));
+					if (childBoundMinY < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
+						childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= *reinterpret_cast<float*>(Ptr(child, 0x10));
+					} else {
+						if (childBoundMinY > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
+							childXOverlap = childBoundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x38));
+						} else {
+							childXOverlap = true;
+						}
+					}
+					if (childXOverlap) {
+						childXYOverlap = true;
+					}
+				}
+
+				if (childXYOverlap) {
+					float childBoundMinZ = *reinterpret_cast<float*>(Ptr(child, 0x8));
+					if (childBoundMinZ < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
+						childXYOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= *reinterpret_cast<float*>(Ptr(child, 0x14));
+					} else {
+						if (childBoundMinZ > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
+							childXYOverlap = childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
+						} else {
+							childXYOverlap = true;
+						}
+					}
+					if (childXYOverlap) {
+						childOverlap = true;
+					}
+				}
+
+				if (childOverlap) {
+					childOverlap = false;
+					if ((*reinterpret_cast<unsigned short*>(Ptr(child, 0x3C)) != 0) &&
+						((*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
+							 ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
+												*reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)),
+												*reinterpret_cast<unsigned short*>(Ptr(child, 0x3C)),
+												InsertShadow_level) != 0)) {
+						childOverlap = true;
+					} else {
+						for (int j = 0; j < 8; j++) {
+							COctNode* grandChild = *reinterpret_cast<COctNode**>(Ptr(child, 0x1C));
+							if (grandChild == 0) {
+								break;
+							}
+
+							if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(Ptr(&s_cyl, 0x28)))) != 0) {
+								if ((*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3C)) != 0) &&
+									((*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
+										 ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
+															*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)),
+															*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3C)),
+															InsertShadow_level) != 0)) {
+									childOverlap = true;
+								} else {
+									for (int k = 0; k < 8; k++) {
+										COctNode* greatGrandChild = *reinterpret_cast<COctNode**>(Ptr(grandChild, 0x1C));
+										if (greatGrandChild == 0) {
+											break;
+										}
+
+										if (CheckHitCylinder_r(greatGrandChild) != 0) {
+											childOverlap = true;
+											break;
+										}
+										grandChild = reinterpret_cast<COctNode*>(Ptr(grandChild, 4));
+									}
+								}
+							}
+							if (childOverlap) {
+								break;
+							}
+							child = reinterpret_cast<COctNode*>(Ptr(child, 4));
+						}
+					}
+					if (childOverlap) {
 						return 1;
 					}
-
-					for (int k = 0; k < 8; k++) {
-						COctNode* greatGrandChild = *reinterpret_cast<COctNode**>(Ptr(grandChild, 0x1C));
-						if (greatGrandChild == 0) {
-							break;
-						}
-
-						if (CheckHitCylinder_r(greatGrandChild) != 0) {
-							return 1;
-						}
-						grandChild = reinterpret_cast<COctNode*>(Ptr(grandChild, 4));
-					}
 				}
-				child = reinterpret_cast<COctNode*>(Ptr(child, 4));
+			} else {
+				return 0;
 			}
+			node = reinterpret_cast<COctNode*>(Ptr(node, 4));
 		}
-		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
 	}
 
 	return 0;

@@ -1445,53 +1445,46 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
 {
     int xEnd = x + width;
     int yEnd = y + height;
-    if ((xEnd < 0) || (yEnd < 0)) {
-        return;
-    }
+    if ((xEnd >= 0) && (yEnd >= 0) && (x <= U16At(PtrAt(this, 0x71E0), 4)) &&
+        ((yEnd >= 0) && (y <= U16At(PtrAt(this, 0x71E0), 6))) &&
+        ((width > 0) && ((height > 0) && (xEnd != x))) && (yEnd != y)) {
+        int textureSize = GXGetTexBufferSize(width & 0xFFFF, height & 0xFFFF, format, GX_FALSE, GX_FALSE);
+        u32 textureBaseAddr = reinterpret_cast<u32>(dstBuffer) + ((dstOffset + 0x1F) & 0xFFFFFFE0);
+        textureBaseAddr = (textureBaseAddr + 0x1F) & 0xFFFFFFE0;
+        void* textureBase = reinterpret_cast<void*>(textureBaseAddr);
 
-    void* renderMode = PtrAt(this, 0x71E0);
-    int efbWidth = static_cast<int>(U16At(renderMode, 4));
-    int efbHeight = static_cast<int>(U16At(renderMode, 6));
+        GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
+        GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, format, GX_FALSE);
+        DCInvalidateRange(textureBase, textureSize);
+        GXCopyTex(textureBase, doClear);
+        GXPixModeSync();
+        GXInvalidateTexAll();
 
-    if ((x > efbWidth) || (y > efbHeight) || (width <= 0) || (height <= 0) || (xEnd == x) || (yEnd == y)) {
-        return;
-    }
+        switch (format) {
+        case GX_CTF_R4:
+        case GX_CTF_RA4:
+            format = GX_TF_I4;
+            break;
+        case GX_CTF_RA8:
+        case GX_CTF_A8:
+        case GX_CTF_R8:
+        case GX_CTF_G8:
+        case GX_CTF_B8:
+            format = GX_TF_I8;
+            break;
+        case GX_CTF_RG8:
+        case GX_CTF_GB8:
+            format = GX_TF_IA8;
+            break;
+        default:
+            break;
+        }
 
-    int textureSize = GXGetTexBufferSize(width & 0xFFFF, height & 0xFFFF, format, GX_FALSE, GX_FALSE);
-    void* textureBase = reinterpret_cast<void*>((reinterpret_cast<u32>(dstBuffer) + ((dstOffset + 0x1F) & 0xFFFFFFE0) + 0x1F) &
-                                                0xFFFFFFE0);
-
-    GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
-    GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, format, GX_FALSE);
-    DCInvalidateRange(textureBase, textureSize);
-    GXCopyTex(textureBase, doClear);
-    GXPixModeSync();
-    GXInvalidateTexAll();
-
-    switch (format) {
-    case GX_CTF_R4:
-    case GX_CTF_RA4:
-        format = GX_TF_I4;
-        break;
-    case GX_CTF_RA8:
-    case GX_CTF_A8:
-    case GX_CTF_R8:
-    case GX_CTF_G8:
-    case GX_CTF_B8:
-        format = GX_TF_I8;
-        break;
-    case GX_CTF_RG8:
-    case GX_CTF_GB8:
-        format = GX_TF_IA8;
-        break;
-    default:
-        break;
-    }
-
-    if (texObj != nullptr) {
-        GXInitTexObj(texObj, textureBase, width & 0xFFFF, height & 0xFFFF, format, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(texObj, filter, filter, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE,
-                        GX_ANISO_1);
+        if (texObj != nullptr) {
+            GXInitTexObj(texObj, textureBase, width & 0xFFFF, height & 0xFFFF, format, GX_CLAMP, GX_CLAMP, GX_FALSE);
+            GXInitTexObjLOD(texObj, filter, filter, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE,
+                            GX_ANISO_1);
+        }
     }
 }
 

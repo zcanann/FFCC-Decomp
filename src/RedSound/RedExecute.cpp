@@ -2459,8 +2459,9 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	}
 
 	if (track->m_volumeDelta != 0) {
-		step = frames;
-		if (track->m_volumeDelta <= frames) {
+		if (frames < track->m_volumeDelta) {
+			step = frames;
+		} else {
 			step = track->m_volumeDelta;
 		}
 		track->m_volumeDelta -= step;
@@ -2469,8 +2470,9 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	}
 
 	if (track->m_expressionDelta != 0) {
-		step = frames;
-		if (track->m_expressionDelta <= frames) {
+		if (frames < track->m_expressionDelta) {
+			step = frames;
+		} else {
 			step = track->m_expressionDelta;
 		}
 		track->m_expressionDelta -= step;
@@ -2479,8 +2481,9 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	}
 
 	if (track->m_panDelta != 0) {
-		step = frames;
-		if (track->m_panDelta <= frames) {
+		if (frames < track->m_panDelta) {
+			step = frames;
+		} else {
 			step = track->m_panDelta;
 		}
 		track->m_panDelta -= step;
@@ -2489,8 +2492,9 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	}
 
 	if (track->m_reverbDepthDelta != 0) {
-		step = frames;
-		if (track->m_reverbDepthDelta <= frames) {
+		if (frames < track->m_reverbDepthDelta) {
+			step = frames;
+		} else {
 			step = track->m_reverbDepthDelta;
 		}
 		track->m_reverbDepthDelta -= step;
@@ -2499,8 +2503,9 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	}
 
 	if (track->m_mixVolumeDelta != 0) {
-		step = frames;
-		if (track->m_mixVolumeDelta <= frames) {
+		if (frames < track->m_mixVolumeDelta) {
+			step = frames;
+		} else {
 			step = track->m_mixVolumeDelta;
 		}
 		track->m_mixVolumeDelta -= step;
@@ -2513,8 +2518,9 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	}
 
 	if (track->m_pitchDelta != 0) {
-		step = frames;
-		if (track->m_pitchDelta <= frames) {
+		if (frames < track->m_pitchDelta) {
+			step = frames;
+		} else {
 			step = track->m_pitchDelta;
 		}
 		track->m_pitchDelta -= step;
@@ -2523,8 +2529,9 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	}
 
 	if (track->m_sweepDelta != 0) {
-		step = frames;
-		if (track->m_sweepDelta <= frames) {
+		if (frames < track->m_sweepDelta) {
+			step = frames;
+		} else {
 			step = track->m_sweepDelta;
 		}
 		track->m_sweepDelta -= step;
@@ -2542,16 +2549,18 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 
 	if (track->m_vibrateFunc != 0) {
 		if (track->m_vibrateRateDelta != 0) {
-			step = frames;
-			if (track->m_vibrateRateDelta <= frames) {
+			if (frames < track->m_vibrateRateDelta) {
+				step = frames;
+			} else {
 				step = track->m_vibrateRateDelta;
 			}
 			track->m_vibrateRateDelta = track->m_vibrateRateDelta - (short)step;
 			track->m_vibrateRate += track->m_vibrateRateAdd * step;
 		}
 		if (track->m_vibrateDepthDelta != 0) {
-			step = frames;
-			if (track->m_vibrateDepthDelta <= frames) {
+			if (frames < track->m_vibrateDepthDelta) {
+				step = frames;
+			} else {
 				step = track->m_vibrateDepthDelta;
 			}
 			track->m_vibrateDepthDelta = track->m_vibrateDepthDelta - (short)step;
@@ -2561,16 +2570,18 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 
 	if (track->m_tremoloFunc != 0) {
 		if (track->m_tremoloRateDelta != 0) {
-			step = frames;
-			if (track->m_tremoloRateDelta <= frames) {
+			if (frames < track->m_tremoloRateDelta) {
+				step = frames;
+			} else {
 				step = track->m_tremoloRateDelta;
 			}
 			track->m_tremoloRateDelta = track->m_tremoloRateDelta - (short)step;
 			track->m_tremoloRate += track->m_tremoloRateAdd * step;
 		}
 		if (track->m_tremoloDepthDelta != 0) {
-			step = frames;
-			if (track->m_tremoloDepthDelta <= frames) {
+			if (frames < track->m_tremoloDepthDelta) {
+				step = frames;
+			} else {
 				step = track->m_tremoloDepthDelta;
 			}
 			track->m_tremoloDepthDelta = track->m_tremoloDepthDelta - (short)step;
@@ -2580,16 +2591,18 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 
 	if (track->m_shakeFunc != 0) {
 		if (track->m_shakeRateDelta != 0) {
-			step = frames;
-			if (track->m_shakeRateDelta <= frames) {
+			if (frames < track->m_shakeRateDelta) {
+				step = frames;
+			} else {
 				step = track->m_shakeRateDelta;
 			}
 			track->m_shakeRateDelta = track->m_shakeRateDelta - (short)step;
 			track->m_shakeRate += track->m_shakeRateAdd * step;
 		}
 		if (track->m_shakeDepthDelta != 0) {
-			step = frames;
-			if (track->m_shakeDepthDelta <= frames) {
+			if (frames < track->m_shakeDepthDelta) {
+				step = frames;
+			} else {
 				step = track->m_shakeDepthDelta;
 			}
 			track->m_shakeDepthDelta = track->m_shakeDepthDelta - (short)step;
@@ -2598,16 +2611,18 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	}
 
 	if (voice->m_pitchModDelay != 0) {
-		step = frames;
-		if (voice->m_pitchModDelay <= frames) {
+		if (frames < voice->m_pitchModDelay) {
+			step = frames;
+		} else {
 			step = voice->m_pitchModDelay;
 		}
 		voice->m_pitchModDelay = voice->m_pitchModDelay - (short)step;
 	}
 
 	if (voice->m_volumeModDelay != 0) {
-		step = frames;
-		if (voice->m_volumeModDelay <= frames) {
+		if (frames < voice->m_volumeModDelay) {
+			step = frames;
+		} else {
 			step = voice->m_volumeModDelay;
 		}
 		voice->m_volumeModDelay = voice->m_volumeModDelay - (short)step;

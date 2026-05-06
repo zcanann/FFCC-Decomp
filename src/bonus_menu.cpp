@@ -57,7 +57,9 @@ unsigned char gBonusMenuFlagPad = 0;
 float* gBonusCheckMarkPosBuffer = 0;
 }
 #pragma force_active reset
-extern "C" const char s_draw_Bonus_pctd_801DD5C0[] = "draw Bonus[%d]\n";
+extern "C" const char s_draw_Bonus_pctd_801DD5C0[16] = {
+    'd', 'r', 'a', 'w', ' ', 'B', 'o', 'n', 'u', 's', ' ', '(', '%', 'd', ')', '\n',
+};
 extern "C" const char s_bonus_menu_cpp_801DD588[] = "bonus_menu.cpp";
 
 namespace {

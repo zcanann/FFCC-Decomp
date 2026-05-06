@@ -2158,7 +2158,7 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
  */
 void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::SaveDat& dstSave, int dstChar)
 {
-    if (static_cast<unsigned int>(System.m_execParam) > 2)
+    if (static_cast<unsigned int>(System.m_execParam) >= 3)
     {
         const char* label = sMcOdekakeReturn;
         if (mode != 0)
@@ -2173,55 +2173,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
     u8* srcCharData = srcSaveData + srcChar * 0x9C0 + 0x14D0;
     u8* dstCharData = dstSaveData + dstChar * 0x9C0 + 0x14D0;
 
-    if (mode == 0)
-    {
-        memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
-
-        u8* srcWork = srcSaveData + srcChar * 0x208;
-        for (int i = 0; i < 2; i++)
-        {
-            srcWork[0xC0] = 0;
-            srcWork[0xC1] = 0;
-            srcWork[0xC2] = 0;
-            srcWork[0xC3] = 0;
-            srcWork[0xC4] = 0;
-            srcWork[0xC5] = 0;
-            srcWork[0xC6] = 0;
-            srcWork[0xC7] = 0;
-            srcWork[0x100] = 0;
-            srcWork[0x101] = 0;
-            srcWork[0x102] = 0;
-            srcWork[0x103] = 0;
-            srcWork[0x104] = 0;
-            srcWork[0x105] = 0;
-            srcWork[0x106] = 0;
-            srcWork[0x107] = 0;
-            srcWork[0x140] = 0;
-            srcWork[0x141] = 0;
-            srcWork[0x142] = 0;
-            srcWork[0x143] = 0;
-            srcWork[0x144] = 0;
-            srcWork[0x145] = 0;
-            srcWork[0x146] = 0;
-            srcWork[0x147] = 0;
-            srcWork[0x180] = 0;
-            srcWork[0x181] = 0;
-            srcWork[0x182] = 0;
-            srcWork[0x183] = 0;
-            srcWork[0x184] = 0;
-            srcWork[0x185] = 0;
-            srcWork[0x186] = 0;
-            srcWork[0x187] = 0;
-            srcWork += 0x100;
-        }
-
-        dstCharData[0x8C0] = 0;
-        srcCharData[0x8C2] = 0;
-        memset(srcCharData, 0, 0x9C0);
-        dstCharData[0x6C2] = 0;
-        dstCharData[0x6C3] = 0x0C;
-    }
-    else
+    if (mode != 0)
     {
         memset(dstCharData, 0, 0x9C0);
 
@@ -2314,8 +2266,54 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
 
         srcCharData[0x8C0] = 1;
         dstCharData[0x8C1] = 1;
-        dstCharData[0x6C2] = 0;
-        dstCharData[0x6C3] = 3;
+        *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 3;
+    }
+    else
+    {
+        memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
+
+        u8* srcWork = srcSaveData + srcChar * 0x208;
+        for (int i = 0; i < 2; i++)
+        {
+            srcWork[0xC0] = 0;
+            srcWork[0xC1] = 0;
+            srcWork[0xC2] = 0;
+            srcWork[0xC3] = 0;
+            srcWork[0xC4] = 0;
+            srcWork[0xC5] = 0;
+            srcWork[0xC6] = 0;
+            srcWork[0xC7] = 0;
+            srcWork[0x100] = 0;
+            srcWork[0x101] = 0;
+            srcWork[0x102] = 0;
+            srcWork[0x103] = 0;
+            srcWork[0x104] = 0;
+            srcWork[0x105] = 0;
+            srcWork[0x106] = 0;
+            srcWork[0x107] = 0;
+            srcWork[0x140] = 0;
+            srcWork[0x141] = 0;
+            srcWork[0x142] = 0;
+            srcWork[0x143] = 0;
+            srcWork[0x144] = 0;
+            srcWork[0x145] = 0;
+            srcWork[0x146] = 0;
+            srcWork[0x147] = 0;
+            srcWork[0x180] = 0;
+            srcWork[0x181] = 0;
+            srcWork[0x182] = 0;
+            srcWork[0x183] = 0;
+            srcWork[0x184] = 0;
+            srcWork[0x185] = 0;
+            srcWork[0x186] = 0;
+            srcWork[0x187] = 0;
+            srcWork += 0x100;
+        }
+
+        dstCharData[0x8C0] = 0;
+        srcCharData[0x8C2] = 0;
+        memset(srcCharData, 0, 0x9C0);
+        *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 0x0C;
     }
 
     *reinterpret_cast<u32*>(srcSaveData + 0x18) = Math.Rand(0x7FFFFFFF);

@@ -38,7 +38,13 @@ void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicO
 
 extern const float FLOAT_80331180;
 extern const float FLOAT_80331184;
+extern const float FLOAT_80331188;
+extern const float FLOAT_8033118C;
 extern const float FLOAT_80331190;
+extern const float FLOAT_80331194;
+extern const float FLOAT_80331198;
+extern const float FLOAT_8033119C;
+extern const float FLOAT_803311A0;
 extern const float FLOAT_803311B0;
 extern const float FLOAT_803311B4;
 extern const float FLOAT_803311B8;
@@ -132,7 +138,8 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     void* targetData = GXGetTexObjData(targetTexObj);
 
     Mtx44 orthoMtx;
-    C_MTXOrtho(orthoMtx, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f);
+    C_MTXOrtho(orthoMtx, FLOAT_80331184, FLOAT_80331188, FLOAT_80331188, FLOAT_80331184, FLOAT_80331184,
+               FLOAT_8033118C);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
     Mtx cameraMtx;
@@ -161,10 +168,10 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     GXInitLightColor(&lightObj, whiteColor);
     GXSetChanMatColor(GX_COLOR0A0, whiteColor);
     GXSetChanAmbColor(GX_COLOR0A0, blackColor);
-    GXInitLightAttnA(&lightObj, 0.0f, 1.0f, 0.0f);
-    GXInitLightAttnK(&lightObj, 0.0f, 0.0f, 0.0f);
-    GXInitLightPos(&lightObj, 0.0f, 0.0f, 1.0f);
-    GXInitLightDir(&lightObj, 0.0f, 0.0f, 1.0f);
+    GXInitLightAttnA(&lightObj, FLOAT_80331180, FLOAT_80331190, FLOAT_80331180);
+    GXInitLightAttnK(&lightObj, FLOAT_80331180, FLOAT_80331184, FLOAT_80331180);
+    GXInitLightPos(&lightObj, FLOAT_80331180, FLOAT_80331180, FLOAT_80331188);
+    GXInitLightDir(&lightObj, FLOAT_80331180, FLOAT_80331180, FLOAT_80331188);
     GXLoadLightObjImm(&lightObj, GX_LIGHT1);
 
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_NRM, 0x1E, GX_FALSE, GX_PTIDENTITY);
@@ -179,7 +186,8 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     GXSetNumChans(1);
 
     Mtx lightFrustumMtx;
-    C_MTXLightFrustum(lightFrustumMtx, 1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 0.5f);
+    C_MTXLightFrustum(lightFrustumMtx, FLOAT_80331194, FLOAT_80331198, FLOAT_80331194, FLOAT_80331198,
+                      FLOAT_80331184, FLOAT_8033119C, FLOAT_8033119C, FLOAT_8033119C, FLOAT_8033119C);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 0xF);
 
@@ -215,7 +223,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
 
-    const float kDegToRad = 0.017453292f;
+    const float kDegToRad = FLOAT_803311A0;
     for (int i = 0; i < 5; i++) {
         const unsigned char texObjIdx = s_texObjIndices[modeOffset + i];
         const unsigned char xRotIdx = s_xAxisRotIndices[modeOffset + i];

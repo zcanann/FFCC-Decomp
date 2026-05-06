@@ -37,6 +37,12 @@ struct Vec4d {
     float w;
 };
 
+struct RawVec {
+    u32 x;
+    u32 y;
+    u32 z;
+};
+
 struct ScreenBreakDisplayList {
     u32 m_size;
     void* m_data;
@@ -115,7 +121,7 @@ extern const float FLOAT_80331cd0 = 1.0f;
 extern const float FLOAT_80331cd4 = -1.0f;
 extern const float FLOAT_80331cd8 = 0.017453292f;
 extern const double DOUBLE_80331CE0 = 4503599627370496.0;
-static const float FLOAT_80331ce8 = 30.0f;
+extern const float FLOAT_80331ce8 = 30.0f;
 extern const float FLOAT_80331cec = 4.0f;
 extern const float FLOAT_80331cf0 = -3.0f;
 extern const float FLOAT_80331cf4 = 0.5f;
@@ -424,7 +430,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     s16 sVar9;
     s16* psVar11;
     s16 sVar12;
-    s32 iVar5;
+    u32 iVar5;
     s32 iVar6;
     s32 iVar14;
     u32 uVar15;
@@ -547,7 +553,11 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec->y = dVar20;
         inVec->z = dVar21;
         PSVECNormalize(inVec, inVec);
-        Vec upVec = DAT_801dd4bc;
+        Vec upVec;
+        const volatile RawVec* upRaw = (const volatile RawVec*)&DAT_801dd4bc;
+        ((RawVec*)&upVec)->x = upRaw->x;
+        ((RawVec*)&upVec)->y = upRaw->y;
+        ((RawVec*)&upVec)->z = upRaw->z;
         PSVECCrossProduct(inVec, &upVec, inVec + 2);
 
         dVar17 = Math.RandF(*(float*)((u8*)step + 0x3C));

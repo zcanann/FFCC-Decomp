@@ -284,14 +284,14 @@ enum RedVoiceUpdateFlag {
 };
 
 u8 GetRandomData();
-int PitchCompute(int, int, int, u32);
+int PitchCompute(int, int, int, int);
 void* ReverbAreaAlloc(unsigned long);
 void ReverbAreaFree(void*);
 void InitReverb();
 int* SetReverb(int, int, int*);
 
 RedVoiceDATA* EntryVoiceSearch(RedTrackDATA*);
-void SetVoiceVolumeMix(RedVoiceDATA*, u32, int);
+void SetVoiceVolumeMix(RedVoiceDATA*, int, int);
 void SetVoiceAccess(RedTrackDATA*, int);
 void SetVoiceSwitch(RedTrackDATA*, int);
 

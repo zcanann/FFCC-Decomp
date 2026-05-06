@@ -227,7 +227,7 @@ u8 GetRandomData()
  * JP Address: TODO
  * JP Size: TODO
  */
-int PitchCompute(int basePitch, int pitchOffset, int wavePitch, u32 fineTune)
+int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
 {
     int value;
     int pitch;
@@ -667,7 +667,7 @@ static void _VoiceEnvelopeCheck()
  * JP Address: TODO
  * JP Size: TODO
  */
-void SetVoiceVolumeMix(RedVoiceDATA* voice, u32 pan, int volume)
+void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 {
     int iVar1;
     int iVar2;

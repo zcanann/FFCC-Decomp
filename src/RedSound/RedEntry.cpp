@@ -1582,8 +1582,8 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 void CRedEntry::DisplayMMemoryInfo()
 {
 	int i;
-	int entryCount;
 	int totalSize;
+	int entryCount;
 	int maxFreeSize;
 	int bufferTop;
 	int nextAddress;
@@ -1604,8 +1604,8 @@ void CRedEntry::DisplayMMemoryInfo()
 	fflush(__files + 1);
 
 	maxFreeSize = 0;
-	totalSize = 0;
 	entryCount = 0;
+	totalSize = 0;
     nextAddress = c_RedMemory.GetMainBufferAddress();
     memoryBank = c_RedMemory.GetMainBankAddress();
 	bankEntry = memoryBank;

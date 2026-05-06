@@ -9,25 +9,25 @@
 
 static const char sRedEntryColoredBlankLineFmt[] = "%s%s                                     %s\n";
 static const char sRedEntryLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
-static const char s__s_s__________ERROR___________s_801e7917[] = "%s%s ********       ERROR       ******** %s\n";
-static const char s__s_s_Erase_Using_Wave_Data_____W_801e7944[] =
+static const char sRedEntryErrorBannerFmt[] = "%s%s ********       ERROR       ******** %s\n";
+static const char sRedEntryEraseUsingWaveDataFmt[] =
     "%s%s Erase Using Wave Data !! (WAVE%4.4d) %s\n";
-static const char s__s_sWave_Header_was_broken__s_801e7972[] = "%s%sWave-Header was broken.%s\n";
-static const char s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991[] =
+static const char sRedEntryWaveHeaderBrokenFmt[] = "%s%sWave-Header was broken.%s\n";
+static const char sRedEntryNoWaveMemoryFreeAreaFmt[] =
     "%s%sNOT HAVE A-MEMORY FREE AREA (WAVE%4.4u:0x%6.6X need).%s\n";
-static const char s__s_sWave_Entry___wave_4_4u__s_801e79ce[] = "%s%sWave Entry. (wave%4.4u)%s\n";
-static const char s__s_____AMemory_Information______801e79ed[] = "%s==== AMemory Information ====\n";
-static const char s__s_Bank___Name___Start___Size___F_801e7a0e[] =
+static const char sRedEntryWaveEntryFmt[] = "%s%sWave Entry. (wave%4.4u)%s\n";
+static const char sRedEntryAMemoryInfoHeaderFmt[] = "%s==== AMemory Information ====\n";
+static const char sRedEntryAMemoryInfoColumnFmt[] =
     "%s Bank : Name     : Start      : Size       : Free       : History\n";
-static const char s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53[] =
+static const char sRedEntryAMemoryWaveBankInfoFmt[] =
     "%s  %2d  : WAVE%4.4d : 0x%8.8X : 0x%8.8X : 0x%8.8X :   %3d\n";
-static const char s__s______WAVE_4_4d___0x_8_8X___0x_801e7a8f[] =
+static const char sRedEntryAMemoryUnbankedWaveInfoFmt[] =
     "%s  --  : WAVE%4.4d : 0x%8.8X : 0x%8.8X : 0x%8.8X :   %3d\n";
-static const char s__s______________0x_8_8X___0x_8_8_801e7aca[] =
+static const char sRedEntryAMemoryFreeBlockInfoFmt[] =
     "%s      : -------- : 0x%8.8X : 0x%8.8X : 0x%8.8X : %d\n";
-static const char s__s_Entry_Wave____d_801e7b01[] = "%s    Entry Wave = %d\n";
-static const char s__s_Total_Size___0x_8_8X_801e7b18[] = "%s    Total Size = 0x%8.8X\n";
-static const char s__s_Max_Free_Size___0x_8_8X_801e7b34[] = "%s Max Free Size = 0x%8.8X\n";
+static const char sRedEntryEntryWaveCountFmt[] = "%s    Entry Wave = %d\n";
+static const char sRedEntryTotalSizeFmt[] = "%s    Total Size = 0x%8.8X\n";
+static const char sRedEntryMaxFreeSizeFmt[] = "%s Max Free Size = 0x%8.8X\n";
 static const char sRedEntrySeSepHeaderBrokenFmt[] = "%s%sSE-Sep-Header was broken.%s\n";
 static const char sRedEntrySePlayInfoHeaderFmt[] = "%s==== SE Play Information ====\n";
 static const char sRedEntrySePlayInfoColumnFmt[] = "%s Track : Name         : Wave\n";
@@ -283,9 +283,9 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 			if ((SearchUseWave(iVar2) != 0) && (m_ReportPrint != 0)) {
 				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
 				fflush(__files + 1);
-				OSReport(s__s_s__________ERROR___________s_801e7917, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
+				OSReport(sRedEntryErrorBannerFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
 				fflush(__files + 1);
-				OSReport(s__s_s_Erase_Using_Wave_Data_____W_801e7944, sRedEntryLogPrefix, sRedEntryErrorColor, iVar2,
+				OSReport(sRedEntryEraseUsingWaveDataFmt, sRedEntryLogPrefix, sRedEntryErrorColor, iVar2,
 				         sRedEntryResetColor);
 				fflush(__files + 1);
 				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
@@ -351,7 +351,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 {
 	if ((waveHead->m_signature[0] != 'W') || (waveHead->m_signature[1] != 'D')) {
 		if (m_ReportPrint != 0) {
-			OSReport(s__s_sWave_Header_was_broken__s_801e7972, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
+			OSReport(sRedEntryWaveHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
 			fflush(__files + 1);
 		}
 
@@ -438,7 +438,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 	} while (WaveOldClear(minOffset, maxOffset) != 0);
 
 	if (m_ReportPrint != 0) {
-		OSReport(s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991, sRedEntryLogPrefix, sRedEntryErrorColor, (int)waveHead->m_waveNo,
+		OSReport(sRedEntryNoWaveMemoryFreeAreaFmt, sRedEntryLogPrefix, sRedEntryErrorColor, (int)waveHead->m_waveNo,
 		         waveHead->m_waveSize, sRedEntryResetColor);
 		fflush(__files + 1);
 	}
@@ -535,7 +535,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 
 		if (m_waveLoadSize < 1) {
 			if (m_ReportPrint != 0) {
-				OSReport(s__s_sWave_Entry___wave_4_4u__s_801e79ce, sRedEntryLogPrefix, sRedEntryInfoColor, m_waveLoadNo, sRedEntryResetColor);
+				OSReport(sRedEntryWaveEntryFmt, sRedEntryLogPrefix, sRedEntryInfoColor, m_waveLoadNo, sRedEntryResetColor);
 				fflush(__files + 1);
 			}
 
@@ -787,9 +787,9 @@ void CRedEntry::DisplayWaveInfo()
 	if (m_ReportPrint != 0) {
 		OSReport(sRedEntryNewline);
 		fflush(__files + 1);
-		OSReport(s__s_____AMemory_Information______801e79ed, sRedEntryLogPrefix);
+		OSReport(sRedEntryAMemoryInfoHeaderFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
-		OSReport(s__s_Bank___Name___Start___Size___F_801e7a0e, sRedEntryLogPrefix);
+		OSReport(sRedEntryAMemoryInfoColumnFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
 
 		int maxFreeSize = 0;
@@ -819,13 +819,13 @@ void CRedEntry::DisplayWaveInfo()
 				if (history < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT) {
 					if (history < m_waveBankBase + REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) {
 						int index = reinterpret_cast<int>(history) - reinterpret_cast<int>(m_waveBankBase);
-						OSReport(s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53, sRedEntryLogPrefix,
+						OSReport(sRedEntryAMemoryWaveBankInfoFmt, sRedEntryLogPrefix,
 						         index / REDSOUND_HISTORY_BANK_ENTRY_SIZE,
 						         (int)((RedWaveHeadWD*)history->m_data)->m_waveNo, ((RedWaveHeadWD*)history->m_data)->m_aramAddress, bank->m_size,
 						         freeSize, history->m_historyNo);
 						fflush(__files + 1);
 					} else {
-						OSReport(s__s______WAVE_4_4d___0x_8_8X___0x_801e7a8f, sRedEntryLogPrefix,
+						OSReport(sRedEntryAMemoryUnbankedWaveInfoFmt, sRedEntryLogPrefix,
 						         (int)((RedWaveHeadWD*)history->m_data)->m_waveNo, ((RedWaveHeadWD*)history->m_data)->m_aramAddress, bank->m_size,
 						         freeSize, history->m_historyNo);
 						fflush(__files + 1);
@@ -833,7 +833,7 @@ void CRedEntry::DisplayWaveInfo()
 					entryWave += 1;
 				} else {
 					int bankIndex = (int)bank - (int)aBankAddress;
-					OSReport(s__s______________0x_8_8X___0x_8_8_801e7aca, sRedEntryLogPrefix, bank->m_address, bank->m_size, freeSize,
+					OSReport(sRedEntryAMemoryFreeBlockInfoFmt, sRedEntryLogPrefix, bank->m_address, bank->m_size, freeSize,
 					         bankIndex / REDSOUND_MEMORY_BLOCK_SIZE);
 					fflush(__files + 1);
 				}
@@ -855,11 +855,11 @@ void CRedEntry::DisplayWaveInfo()
 
 		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
-		OSReport(s__s_Entry_Wave____d_801e7b01, sRedEntryLogPrefix, entryWave);
+		OSReport(sRedEntryEntryWaveCountFmt, sRedEntryLogPrefix, entryWave);
 		fflush(__files + 1);
-		OSReport(s__s_Total_Size___0x_8_8X_801e7b18, sRedEntryLogPrefix, totalSize);
+		OSReport(sRedEntryTotalSizeFmt, sRedEntryLogPrefix, totalSize);
 		fflush(__files + 1);
-		OSReport(s__s_Max_Free_Size___0x_8_8X_801e7b34, sRedEntryLogPrefix, maxFreeSize);
+		OSReport(sRedEntryMaxFreeSizeFmt, sRedEntryLogPrefix, maxFreeSize);
 		fflush(__files + 1);
 		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
@@ -1704,9 +1704,9 @@ void CRedEntry::DisplayMMemoryInfo()
 	fflush(__files + 1);
 	OSReport(s__s_Entry_Items____d_801e7dfd, sRedEntryLogPrefix, entryCount);
 	fflush(__files + 1);
-	OSReport(s__s_Total_Size___0x_8_8X_801e7b18, sRedEntryLogPrefix, totalSize);
+	OSReport(sRedEntryTotalSizeFmt, sRedEntryLogPrefix, totalSize);
 	fflush(__files + 1);
-	OSReport(s__s_Max_Free_Size___0x_8_8X_801e7b34, sRedEntryLogPrefix, maxFreeSize);
+	OSReport(sRedEntryMaxFreeSizeFmt, sRedEntryLogPrefix, maxFreeSize);
 	fflush(__files + 1);
 	OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 	fflush(__files + 1);

@@ -96,7 +96,6 @@ enum RedWaveLayoutWord {
 enum RedVoiceLayoutCount {
 	REDSOUND_VOICE_ADSR_TIME_COUNT = 4,
 	REDSOUND_VOICE_ADSR_LEVEL_COUNT = 4,
-	REDSOUND_VOICE_AX_MIX_COUNT = 0x12,
 	REDSOUND_TERMINATE_NOTE_WORD_COUNT = 1,
 };
 
@@ -130,7 +129,7 @@ struct RedVoiceDATA {
 	int m_adsrStage;
 	int m_adsrStepFrames;
 	int m_adsrStepAdd;
-	unsigned short m_axMix[REDSOUND_VOICE_AX_MIX_COUNT];
+	AXPBMIX m_axMix;
 	int m_active;
 	unsigned int m_flags;
 	unsigned int m_voiceSwitch;
@@ -181,7 +180,6 @@ enum RedVoiceLayoutOffset {
 	REDSOUND_VOICE_FLAGS_OFFSET = 0x90,
 	REDSOUND_VOICE_SWITCH_OFFSET = 0x94,
 	REDSOUND_VOICE_INDEX_OFFSET = 0xA8,
-	REDSOUND_VOICE_AX_MIX_SIZE = 0x24,
 };
 
 enum RedVoiceLayoutWord {

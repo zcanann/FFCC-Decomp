@@ -678,8 +678,8 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         return;
     }
 
-    mixData = voice->m_axMix;
-    memset(mixData, 0, REDSOUND_VOICE_AX_MIX_SIZE);
+    mixData = (u16*)&voice->m_axMix;
+    memset(mixData, 0, sizeof(voice->m_axMix));
 
     switch (m_SoundPlayMode) {
     case 1:
@@ -1521,8 +1521,7 @@ void EnvelopeKeyExecute()
 
             if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_ADPCM_DIRTY) != 0) {
                 if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_PAUSE) == 0) {
-                    memcpy(&((AXVPB*)voice)->pb.mix, voiceData + REDSOUND_VOICE_AX_MIX_WORD,
-                           sizeof(((AXVPB*)voice)->pb.mix));
+                    memcpy(&((AXVPB*)voice)->pb.mix, &((RedVoiceDATA*)voiceData)->m_axMix, sizeof(((AXVPB*)voice)->pb.mix));
                 } else {
                     memset(&((AXVPB*)voice)->pb.mix, 0, sizeof(((AXVPB*)voice)->pb.mix));
                 }

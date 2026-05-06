@@ -26,11 +26,11 @@ extern const float FLOAT_80330c84;
 extern const double DOUBLE_80330c88;
 extern const float FLOAT_80330C90;
 extern const float FLOAT_80330C94;
-extern const float FLOAT_80330C98 = 180.0f;
-extern const float FLOAT_80330C9C = -180.0f;
-extern const double DOUBLE_80330CA0 = 4503599627370496.0;
-extern const float FLOAT_80330CA8 = 2.0f;
-extern const double DOUBLE_80330CB0 = 0.5;
+extern const float FLOAT_80330C98;
+extern const float FLOAT_80330C9C;
+extern const double DOUBLE_80330CA0;
+extern const float FLOAT_80330CA8;
+extern const double DOUBLE_80330CB0;
 }
 
 struct pppYmBreathUnkC {
@@ -914,11 +914,6 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
     }
 }
 
-extern "C" const char lbl_80330CB8[] = "FFCC";
-extern "C" const char lbl_80330CC0[] = "GDS";
-extern "C" const char lbl_80330CC4[] = "GC";
-extern "C" const char lbl_80330CC8[] = "1.00";
-
 /*
  * --INFO--
  * PAL Address: 0x800c118c
@@ -1208,3 +1203,15 @@ void IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short part
     }
 }
 #endif
+
+extern "C" {
+const float FLOAT_80330C98 = 180.0f;
+const float FLOAT_80330C9C = -180.0f;
+const double DOUBLE_80330CA0 = 4503599627370496.0;
+const float FLOAT_80330CA8 = 2.0f;
+const double DOUBLE_80330CB0 = 0.5;
+}
+extern "C" const char lbl_80330CB8[] = "FFCC";
+extern "C" const char lbl_80330CC0[] = "GDS";
+extern "C" const char lbl_80330CC4[] = "GC";
+extern "C" const char lbl_80330CC8[] = "1.00";

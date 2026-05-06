@@ -23,7 +23,13 @@ public:
 	void Frame();
 	void Draw();
 
-	unsigned char m_isActive;
+	union {
+		unsigned char m_isActive;
+		struct ActiveBits {
+			unsigned char active : 1;
+			unsigned char : 7;
+		} m_isActiveBits;
+	};
 };
 
 #endif // _FFCC_BASEOBJ_H_

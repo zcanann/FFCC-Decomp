@@ -17,7 +17,7 @@ static const float FLOAT_8033193c = 0.0f;
 static const float FLOAT_80331940 = 1.0f;
 
 extern "C" {
-void GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
+int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, s32);
@@ -176,11 +176,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     GXTexObj backI4Tex;
     GXTexObj backRgba8Tex;
     GXTexObj backRgba8Tex2;
-    Mtx firstScaleMtx;
-    Mtx firstLocalMtx;
-    Mtx secondScaleMtx;
-    Mtx secondLocalMtx;
     Mtx44 screenMtx;
+    Mtx firstLocalMtx;
+    Mtx firstScaleMtx;
+    Mtx secondLocalMtx;
+    Mtx secondScaleMtx;
     GXColor stepColor;
 
     Graphic.SetDrawDoneDebugData(0x31);
@@ -213,6 +213,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     managerPos.y = pppMngStPtr->m_matrix.value[1][3];
     managerPos.z = pppMngStPtr->m_matrix.value[2][3];
 
+    isCameraInside = 0;
     if ((s32)Game.m_currentSceneId == 7) {
         float* radiusArray;
         u16 meshCount;
@@ -242,7 +243,6 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         Game.unkFloat_0xca10 = scaledRadius;
     }
 
-    isCameraInside = 0;
     if ((FLOAT_80331938 + scaledRadius) > PSVECDistance(&cameraPos, &managerPos)) {
         isCameraInside = 1;
     }

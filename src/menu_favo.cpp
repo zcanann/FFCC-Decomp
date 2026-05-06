@@ -300,23 +300,23 @@ bool CMenuPcs::FavoClose()
     frame = singMenuState->frame;
     if (0 < count) {
         for (int i = 0; i < count; i++) {
-            float step = FLOAT_80333040;
             if (frame >= entry->startFrame) {
-                if (entry->startFrame + entry->duration > frame) {
+                if (entry->startFrame + entry->duration <= frame) {
+                    float step = FLOAT_80333040;
+                    finishedCount = finishedCount + 1;
+                    entry->alpha = step;
+                    entry->dx = step;
+                    entry->dy = step;
+                } else {
                     entry->step = entry->step + 1;
                     entry->alpha =
                         (float)-((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step - DOUBLE_80333050);
                     if ((entry->flags & 2) == 0) {
-                        step =
+                        float step =
                             (float)-((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step - DOUBLE_80333050);
                         entry->dx = (entry->targetX - (float)entry->x) * step;
                         entry->dy = (entry->targetY - (float)entry->y) * step;
                     }
-                } else {
-                    finishedCount = finishedCount + 1;
-                    entry->alpha = FLOAT_80333040;
-                    entry->dx = step;
-                    entry->dy = step;
                 }
             }
             entry++;
@@ -424,21 +424,21 @@ bool CMenuPcs::FavoOpen()
     frame = singMenuState->frame;
     if (0 < count) {
         for (int i = 0; i < count; i++) {
-            float step = FLOAT_80333040;
             if (frame >= entry->startFrame) {
-                if (entry->startFrame + entry->duration > frame) {
+                if (entry->startFrame + entry->duration <= frame) {
+                    finishedCount = finishedCount + 1;
+                    entry->alpha = FLOAT_80333048;
+                    float step = FLOAT_80333040;
+                    entry->dx = step;
+                    entry->dy = step;
+                } else {
                     entry->step = entry->step + 1;
                     entry->alpha = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
                     if ((entry->flags & 2) == 0) {
-                        step = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
+                        float step = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
                         entry->dx = (entry->targetX - (float)entry->x) * step;
                         entry->dy = (entry->targetY - (float)entry->y) * step;
                     }
-                } else {
-                    finishedCount = finishedCount + 1;
-                    entry->alpha = FLOAT_80333048;
-                    entry->dx = step;
-                    entry->dy = step;
                 }
             }
             entry++;

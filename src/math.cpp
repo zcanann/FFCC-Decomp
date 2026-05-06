@@ -275,8 +275,8 @@ float CMath::Spline1D(int lastIndex, float t, float* x, float* y, float* secondD
     float y0 = y[low];
     float dt = t - x0;
     float dx = x[low + 1] - x0;
-    float cubic = 3.0f * sd0 + (dt * (sd1 - sd0)) / dx;
     float linear = (y[low + 1] - y0) / dx - dx * (2.0f * sd0 + sd1);
+    float cubic = 3.0f * sd0 + (dt * (sd1 - sd0)) / dx;
 
     return (dt * cubic + linear) * dt + y0;
 }

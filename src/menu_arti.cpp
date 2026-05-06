@@ -56,10 +56,9 @@ struct ArtiState {
 	unsigned char pad_0020[2];
 	short frame;
 	unsigned char pad_0024[2];
-	short selection;
-	unsigned char pad_0028[8];
-	short prevSelection;
+	short selections[5];
 	short currentSelection;
+	short prevSelection;
 	short scrollOffset;
 };
 
@@ -84,29 +83,16 @@ struct ArtiOpenAnim {
 	float targetY;
 };
 
-struct MenuArtiMembers {
-	unsigned char pad_0000[0xF8];
-	CFont* m_helpFont;
-	unsigned char pad_00FC[0x0C];
-	CFont* m_listFont;
-	unsigned char pad_010C[0x720];
-	s16* m_artiState;
-	unsigned char pad_0830[0x20];
-	s16* m_artiList;
-};
-
-STATIC_ASSERT(offsetof(MenuArtiMembers, m_helpFont) == 0xF8);
-STATIC_ASSERT(offsetof(MenuArtiMembers, m_listFont) == 0x108);
-STATIC_ASSERT(offsetof(MenuArtiMembers, m_artiState) == 0x82C);
-STATIC_ASSERT(offsetof(MenuArtiMembers, m_artiList) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_artiState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_artiList) == 0x850);
 STATIC_ASSERT(offsetof(ArtiState, initialized) == 0xB);
 STATIC_ASSERT(offsetof(ArtiState, closeRequested) == 0xD);
 STATIC_ASSERT(offsetof(ArtiState, state) == 0x10);
 STATIC_ASSERT(offsetof(ArtiState, moveDirection) == 0x1E);
 STATIC_ASSERT(offsetof(ArtiState, frame) == 0x22);
-STATIC_ASSERT(offsetof(ArtiState, selection) == 0x26);
-STATIC_ASSERT(offsetof(ArtiState, prevSelection) == 0x30);
-STATIC_ASSERT(offsetof(ArtiState, currentSelection) == 0x32);
+STATIC_ASSERT(offsetof(ArtiState, selections) == 0x26);
+STATIC_ASSERT(offsetof(ArtiState, currentSelection) == 0x30);
+STATIC_ASSERT(offsetof(ArtiState, prevSelection) == 0x32);
 STATIC_ASSERT(offsetof(ArtiState, scrollOffset) == 0x34);
 STATIC_ASSERT(offsetof(ArtiOpenAnim, alpha) == 0x10);
 STATIC_ASSERT(offsetof(ArtiOpenAnim, scale) == 0x14);
@@ -122,24 +108,19 @@ STATIC_ASSERT(offsetof(ArtiOpenAnim, targetX) == 0x38);
 STATIC_ASSERT(offsetof(ArtiOpenAnim, targetY) == 0x3C);
 STATIC_ASSERT(sizeof(ArtiOpenAnim) == 0x40);
 
-static inline MenuArtiMembers& GetMenuArtiMembers(CMenuPcs* menu)
-{
-	return *reinterpret_cast<MenuArtiMembers*>(menu);
-}
-
 static inline ArtiState* GetArtiStateStruct(CMenuPcs* menu)
 {
-	return reinterpret_cast<ArtiState*>(GetMenuArtiMembers(menu).m_artiState);
+	return reinterpret_cast<ArtiState*>(menu->m_artiState);
 }
 
 static inline s16* GetArtiState(CMenuPcs* menu)
 {
-	return GetMenuArtiMembers(menu).m_artiState;
+	return menu->m_artiState;
 }
 
 static inline s16* GetArtiList(CMenuPcs* menu)
 {
-	return GetMenuArtiMembers(menu).m_artiList;
+	return menu->m_artiList;
 }
 
 static inline int GetArtiStateBase(CMenuPcs* menu)
@@ -154,12 +135,12 @@ static inline int GetArtiListBase(CMenuPcs* menu)
 
 static inline CFont* GetArtiListFont(CMenuPcs* menu)
 {
-	return GetMenuArtiMembers(menu).m_listFont;
+	return menu->m_fonts[1];
 }
 
 static inline CFont* GetArtiHelpFont(CMenuPcs* menu)
 {
-	return GetMenuArtiMembers(menu).m_helpFont;
+	return menu->m_fonts[0];
 }
 } // namespace
 
@@ -198,29 +179,31 @@ int CMenuPcs::ArtiCtrlCur()
 	unsigned short uVar4;
 	int iVar5;
 	int iVar6;
+	int padLock;
 
 	bVar2 = false;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+	padLock = Pad._452_4_;
+	if ((padLock != 0) || (Pad._448_4_ != -1)) {
 		bVar2 = true;
 	}
 	if (bVar2) {
 		uVar3 = 0;
 	} else {
-		int padIndex = bVar2;
+		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		uVar3 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
+		uVar3 = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 
 	bVar2 = false;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+	if ((padLock != 0) || (Pad._448_4_ != -1)) {
 		bVar2 = true;
 	}
 	if (bVar2) {
 		uVar4 = 0;
 	} else {
-		int padIndex = bVar2;
+		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		uVar4 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 0x14);
+		uVar4 = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
 
 	if (uVar4 == 0) {
@@ -228,33 +211,29 @@ int CMenuPcs::ArtiCtrlCur()
 	}
 
 	iVar5 = GetArtiStateBase(this);
-	if ((uVar4 & 8) == 0) {
-		if ((uVar4 & 4) != 0) {
-			iVar6 = iVar5 + *(short*)(iVar5 + 0x30) * 2;
-			sVar1 = *(short*)(iVar6 + 0x26);
-			if (sVar1 < 7) {
-				*(short*)(iVar6 + 0x26) = sVar1 + 1;
-				Sound.PlaySe(1, 0x40, 0x7f, 0);
-			} else if ((int)*(short*)(iVar5 + 0x34) + (int)sVar1 < 0x48) {
-				*(short*)(iVar5 + 0x34) = *(short*)(iVar5 + 0x34) + 1;
-				Sound.PlaySe(1, 0x40, 0x7f, 0);
-			} else {
-				Sound.PlaySe(4, 0x40, 0x7f, 0);
-			}
-		}
-	} else {
+	if ((uVar4 & 8) != 0) {
 		iVar6 = iVar5 + *(short*)(iVar5 + 0x30) * 2;
 		sVar1 = *(short*)(iVar6 + 0x26);
-		if (sVar1 == 0) {
-			if (*(short*)(iVar5 + 0x34) == 0) {
-				Sound.PlaySe(4, 0x40, 0x7f, 0);
-			} else {
-				*(short*)(iVar5 + 0x34) = *(short*)(iVar5 + 0x34) + -1;
-				Sound.PlaySe(1, 0x40, 0x7f, 0);
-			}
-		} else {
+		if (sVar1 != 0) {
 			*(short*)(iVar6 + 0x26) = sVar1 + -1;
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		} else if (*(short*)(iVar5 + 0x34) != 0) {
+			*(short*)(iVar5 + 0x34) = *(short*)(iVar5 + 0x34) + -1;
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		} else {
+			Sound.PlaySe(4, 0x40, 0x7f, 0);
+		}
+	} else if ((uVar4 & 4) != 0) {
+		iVar6 = iVar5 + *(short*)(iVar5 + 0x30) * 2;
+		sVar1 = *(short*)(iVar6 + 0x26);
+		if (sVar1 < 7) {
+			*(short*)(iVar6 + 0x26) = sVar1 + 1;
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		} else if ((int)*(short*)(iVar5 + 0x34) + (int)sVar1 < 0x48) {
+			*(short*)(iVar5 + 0x34) = *(short*)(iVar5 + 0x34) + 1;
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		} else {
+			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		}
 	}
 
@@ -269,14 +248,12 @@ int CMenuPcs::ArtiCtrlCur()
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 			return 1;
 		}
-		if ((uVar3 & 0x100) == 0) {
-			if ((uVar3 & 0x200) != 0) {
-				*(char*)(GetArtiStateBase(this) + 0xd) = 1;
-				Sound.PlaySe(3, 0x40, 0x7f, 0);
-				return 1;
-			}
-		} else {
+		if ((uVar3 & 0x100) != 0) {
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
+		} else if ((uVar3 & 0x200) != 0) {
+			*(char*)(GetArtiStateBase(this) + 0xd) = 1;
+			Sound.PlaySe(3, 0x40, 0x7f, 0);
+			return 1;
 		}
 	}
 
@@ -562,7 +539,7 @@ int CMenuPcs::ArtiCtrl()
 	ArtiState* state = GetArtiStateStruct(this);
 	int result;
 
-	state->currentSelection = state->prevSelection;
+	state->prevSelection = state->currentSelection;
 	result = ArtiCtrlCur();
 	if (result != 0) {
 		ArtiInit1();

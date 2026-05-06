@@ -34,11 +34,11 @@ signed char gGraphicDrawDoneRequestInit = 0;
 int gGraphicDrawDonePartControlRequest = 0;
 signed char gGraphicDrawDonePartControlInit = 0;
 _GXColor gGraphicDefaultClearColor = {0, 0, 0, 0};
-const float kGraphicZeroF = 0.0f;
-const float kGraphicOneF = 1.0f;
-const float kGraphicBlurAlphaScale = -100.0f;
-const float kGraphicNoiseTexScaleU = 0.015625f;
-const float kGraphicNoiseTexScaleV = 0.010416667f;
+extern const float kGraphicZeroF = 0.0f;
+extern const float kGraphicOneF = 1.0f;
+extern const float kGraphicBlurAlphaScale = -100.0f;
+extern const float kGraphicNoiseTexScaleU = 0.015625f;
+extern const float kGraphicNoiseTexScaleV = 0.010416667f;
 u8 gGraphicNoiseTextureI8_64x96[0xC00] ATTRIBUTE_ALIGN(32) = {
 #include "src/graphic_noise_texture.inc"
 };
@@ -1335,10 +1335,10 @@ void CGraphic::SetFog(int useFog, int useGlobalColor)
 void CGraphic::CopySaveFrameBuffer()
 {
     GXSetTexCopySrc(0, 0, 0x280, 0x1C0);
-    GXSetTexCopyDst(0x280, 0x1C0, GX_TF_I8, GX_FALSE);
+    GXSetTexCopyDst(0x280, 0x1C0, GX_TF_RGB565, GX_FALSE);
     GXCopyTex(PtrAt(this, 0x71EC), GX_FALSE);
     GXPixModeSync();
-    GXInitTexObj(&m_smallBackTexObj, PtrAt(this, 0x71EC), 0x280, 0x1C0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj(&m_smallBackTexObj, PtrAt(this, 0x71EC), 0x280, 0x1C0, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(&m_smallBackTexObj, GX_NEAR, GX_NEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF,
                     GX_FALSE, GX_FALSE, GX_ANISO_1);
 }

@@ -107,7 +107,6 @@ static const char s_fov_warning_801d7928[] =
     "!!!!!!!!!!!!!!!!!!FOV\x82\xcc\x92\x6c\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81\x42%f"
     "!!!!!!!!!!!!!!!!!!!!\n";
 extern double DOUBLE_8032fa28;
-unsigned char g_IsDbgDrawShadowPos;
 extern unsigned char g_map_draw_prof;
 unsigned int m_table_desc0__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CCameraPcsFv)};
 unsigned int m_table_desc1__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CCameraPcsFv)};

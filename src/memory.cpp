@@ -15,7 +15,7 @@
 
 CMemory Memory;
 
-static const char s_memory_cpp[] = "memory.cpp";
+extern "C" const char s_memory_cpp_801D6690[] = "memory.cpp";
 extern "C" const char DAT_801d669c[] =
     "===================================================================\n"
     "===================================================================\n"
@@ -797,7 +797,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                     if (mode == 2) {
                         void* block = reinterpret_cast<CStage*>(
                                           *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x778C))
-                                          ->alloc(0x810, const_cast<char*>(s_memory_cpp), 0x228, 0);
+                                          ->alloc(0x810, const_cast<char*>(s_memory_cpp_801D6690), 0x228, 0);
                         *reinterpret_cast<int*>(stageBytes + 0x110) =
                             reinterpret_cast<int>(__construct_new_array(block, 0, 0, 0x40, 0x20));
                         *reinterpret_cast<int*>(stageBytes + 0x120) = 0;
@@ -1589,7 +1589,7 @@ void CAmemCacheSet::Init(char* sourceName, CMemory::CStage* rStage, CMemory::CSt
         m_amemLock = 0;
 
         int count = m_cacheCount;
-        void* block = rStage->alloc(count * 0x1C + 0x10, const_cast<char*>(s_memory_cpp), 0x787, 0);
+        void* block = rStage->alloc(count * 0x1C + 0x10, const_cast<char*>(s_memory_cpp_801D6690), 0x787, 0);
         void* table = __construct_new_array(
             block, reinterpret_cast<ConstructorDestructor>(__ct__10CAmemCacheFv),
             reinterpret_cast<ConstructorDestructor>(__dt__10CAmemCacheFv), 0x1C, count);
@@ -1877,7 +1877,7 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
 
     if (dmaCopy == 0) {
         while (true) {
-            entry.m_workData = m_rStage->alloc(allocSize, const_cast<char*>(s_memory_cpp), 0x807, 1);
+            entry.m_workData = m_rStage->alloc(allocSize, const_cast<char*>(s_memory_cpp_801D6690), 0x807, 1);
             if (entry.m_workData != 0) {
                 break;
             }
@@ -2128,7 +2128,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
             bestEntry->m_cacheData = 0;
         }
 
-        int allocated = reinterpret_cast<int>(m_rStage->alloc(size, const_cast<char*>(s_memory_cpp), 0x86D, 1));
+        int allocated = reinterpret_cast<int>(m_rStage->alloc(size, const_cast<char*>(s_memory_cpp_801D6690), 0x86D, 1));
         if (allocated != 0) {
             operator delete(reinterpret_cast<void*>(allocated));
             return;

@@ -722,9 +722,9 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     register const char* viewerStrings = s_no_texture____801da7e8;
     unsigned int i;
     unsigned int x;
-    CColor colorTmp;
-    CColor colorCopy;
-    CColor white;
+    unsigned char colorTmp[4];
+    unsigned char colorCopy[4];
+    unsigned char white[4];
     char pathBuf[256];
     CFile::CHandle* fileHandle;
     unsigned char bumpLight[0x138];
@@ -773,19 +773,19 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
 
     for (i = 0; i < 5; i++) {
         unsigned char* whiteChannels =
-            reinterpret_cast<unsigned char*>(__ct__6CColorFUcUcUcUc(&white, 0xFF, 0xFF, 0xFF, 0xFF));
-        __ct__6CColorFv(&colorTmp);
+            reinterpret_cast<unsigned char*>(__ct__6CColorFUcUcUcUc(reinterpret_cast<CColor*>(white), 0xFF, 0xFF, 0xFF, 0xFF));
+        __ct__6CColorFv(reinterpret_cast<CColor*>(colorTmp));
         x = i ^ 0x80000000;
         float scale = static_cast<float>(static_cast<double>(x) - kCharaViewerColorCenterBias) * kCharaViewerLerpScale;
         for (int c = 0; c < 4; c++) {
             float channel = static_cast<float>(static_cast<double>(whiteChannels[c]) - kCharaViewerColorWhiteBias);
-            reinterpret_cast<unsigned char*>(&colorTmp)[c] = static_cast<unsigned char>(static_cast<int>(channel * scale));
+            colorTmp[c] = static_cast<unsigned char>(static_cast<int>(channel * scale));
         }
-        __ct__6CColorFR6CColor(&colorCopy, &colorTmp);
-        p[0x12C + i * 4 + 0] = reinterpret_cast<unsigned char*>(&colorCopy)[0];
-        p[0x12C + i * 4 + 1] = reinterpret_cast<unsigned char*>(&colorCopy)[1];
-        p[0x12C + i * 4 + 2] = reinterpret_cast<unsigned char*>(&colorCopy)[2];
-        p[0x12C + i * 4 + 3] = reinterpret_cast<unsigned char*>(&colorCopy)[3];
+        __ct__6CColorFR6CColor(reinterpret_cast<CColor*>(colorCopy), reinterpret_cast<CColor*>(colorTmp));
+        p[0x12C + i * 4 + 0] = colorCopy[0];
+        p[0x12C + i * 4 + 1] = colorCopy[1];
+        p[0x12C + i * 4 + 2] = colorCopy[2];
+        p[0x12C + i * 4 + 3] = colorCopy[3];
     }
 
     unsigned int clearColor = 0x404040FF;

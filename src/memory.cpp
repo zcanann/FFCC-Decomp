@@ -75,6 +75,8 @@ extern char DAT_801d6bec[];
 extern char DAT_8032f7d4[4];
 extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
+extern const char* lbl_801E8470[];
+extern const char* lbl_8032E410[];
 static const char s_amemTypeTexture[] = "TEXTURE";
 static const char s_amemTypeModel[] = "MODEL  ";
 static const char s_amemTypePdt[] = "PDT    ";
@@ -2275,21 +2277,24 @@ void CAmemCacheSet::RefCnt0Clear()
  */
 void CAmemCacheSet::RefCnt0Compare()
 {
-    if (System.m_execParam > 2) {
-        Printf__7CSystemFPce(&System, s_refCntCompareBanner);
+    const char* dumpBase = reinterpret_cast<const char*>(s_heapBarColors_801D64A8);
+
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        Printf__7CSystemFPce(&System, dumpBase + 0x10c);
     }
 
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
-        if ((entry.m_inUse != 0 && entry.m_refCount != 0) && System.m_execParam > 2) {
+        if ((entry.m_inUse != 0 && *reinterpret_cast<unsigned short*>(&entry.m_refCount) != 0) &&
+            static_cast<unsigned int>(System.m_execParam) >= 3) {
             Printf__7CSystemFPce(
-                &System, s_amemCacheEntryFmt, i, cacheStateName(entry), cacheTypeName(entry),
+                &System, dumpBase + 0xd8, i, lbl_8032E410[entry.m_inUse == 0], lbl_801E8470[entry.m_type],
                 entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
         }
     }
 
-    if (System.m_execParam > 2) {
-        Printf__7CSystemFPce(&System, s_amemCacheSeparator);
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        Printf__7CSystemFPce(&System, dumpBase + 0x144);
     }
 }
 

@@ -68,7 +68,7 @@ struct pppMngStLocationTitle2Raw {
     CGObject* m_charaObj;
 };
 
-static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
+extern const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
 
 /*
  * --INFO--

@@ -341,24 +341,6 @@ static unsigned char& GetMngStLockScaleFromOwner(_pppMngSt* pppMngSt)
 	return *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x4d);
 }
 
-struct CUSBStreamDataRaw {
-    unsigned char* m_data;
-    int m_headerReady;
-    int m_dataReady;
-    unsigned int m_sizeBytes;
-    int m_packetCode;
-    void* m_stageDefault;
-    void* m_stageLoad;
-    void* m_stageAmem;
-    void* m_stageExtra;
-    void* m_freePtr;
-    unsigned char m_fieldLoadReq;
-    unsigned char m_printFreeOnNext;
-    unsigned char m_blockOnFrame;
-    unsigned char m_miruraEventActive;
-    unsigned char m_disableShokiDraw;
-};
-
 struct CPartPcsViewerState {
     unsigned char unk0[0x18];
     void* m_stageDefault;
@@ -418,7 +400,7 @@ CPartPcs::~CPartPcs()
  */
 void CPartPcs::Init()
 {
-	CUSBStreamDataRaw* usbStream = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(this) + 0x4);
+	CUSBStreamData* usbStream = &m_usbStreamData;
 	usbStream->m_fieldLoadReq = 0;
 	usbStream->m_printFreeOnNext = 0;
 }
@@ -440,7 +422,7 @@ void CPartPcs::Quit()
  */
 void CPartPcs::onScriptChanging(char*)
 {
-	CUSBStreamDataRaw* usbStream = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(this) + 0x4);
+	CUSBStreamData* usbStream = &m_usbStreamData;
 	usbStream->m_fieldLoadReq = 0;
 }
 
@@ -721,7 +703,7 @@ void CPartPcs::createViewer()
 
     ::memset(&PartMng, 0, 0x23FD8);
     PartMng.Create();
-    reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 4)->CreateBuffer();
+    m_usbStreamData.CreateBuffer();
 }
 
 /*
@@ -735,7 +717,7 @@ void CPartPcs::createViewer()
  */
 void CPartPcs::destroy()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
+    CUSBStreamData* usb = &m_usbStreamData;
 
     USBPcs.IsBigAlloc(0);
     Destroy__8CPartMngFv(&PartMng);
@@ -889,7 +871,7 @@ void CPartPcs::ClearOt()
  */
 void CPartPcs::drawShadow()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
+    CUSBStreamData* usb = &m_usbStreamData;
     CGame* game = &Game;
 
     if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
@@ -914,7 +896,7 @@ void CPartPcs::drawShadow()
  */
 void CPartPcs::drawCharaBefore()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
+    CUSBStreamData* usb = &m_usbStreamData;
     CGame* game = &Game;
 
     if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0) {
@@ -939,7 +921,7 @@ void CPartPcs::drawCharaBefore()
  */
 void CPartPcs::draw()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
+    CUSBStreamData* usb = &m_usbStreamData;
     CGame* game = &Game;
 
     SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7fff);
@@ -1068,7 +1050,7 @@ void CPartPcs::DrawMenu(int fpNo)
  */
 void CPartPcs::DrawShoki()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
+    CUSBStreamData* usb = &m_usbStreamData;
 
     if (usb->m_disableShokiDraw == 0 && (int)Game.m_currentSceneId == 4) {
         Graphic.SetFog(1, 0);

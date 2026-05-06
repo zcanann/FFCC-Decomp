@@ -564,9 +564,8 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
 
     messageIndex = field_0x38;
     if (field_0x36 >= 0) {
-        CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
-        MenuMcWinState(menuPcsLayout).m_mode = 2;
-        MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+        MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_mode = 2;
+        MenuGoOutState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_animFrame = 0;
     }
 
     field_0x45 = 0;
@@ -695,9 +694,8 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
         }
         MenuPcs.ChgAllModel();
         if (field_0x36 >= 0) {
-            CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
-            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+            MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_mode = 2;
+            MenuGoOutState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_animFrame = 0;
         }
         field_0x45 = 0;
         field_0x34 = 0x1e;

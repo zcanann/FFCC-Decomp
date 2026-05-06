@@ -1078,7 +1078,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     } else {
         iVar5 = PitchCompute(iVar5, pitchWork[0], voice->m_waveData->m_pitch, track->m_fineTune);
     }
-    voice->m_targetPitch = iVar5;
+    voice->m_pitch = iVar5;
 
     if (((track->m_flags & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0) ||
         ((((s8)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0) &&
@@ -1125,7 +1125,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     } else {
         unsigned int random = GetRandomData();
         iVar5 = ((int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1) *
-                voice->m_targetPitch *
+                voice->m_pitch *
                 track->m_fuzzyPitchDepth;
         pitchWork[0] = iVar5 >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
         if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) == 0) {

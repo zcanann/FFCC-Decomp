@@ -21,7 +21,19 @@ class CUSBPcs : public CProcess
 public:
     class CDataHeader;
 
-    CUSBPcs() {}
+    CUSBPcs()
+    {
+        unsigned int* table = m_table__7CUSBPcs.m_words;
+        table[0] = m_table_desc0__7CUSBPcs[0];
+        table[1] = m_table_desc0__7CUSBPcs[1];
+        table[2] = m_table_desc0__7CUSBPcs[2];
+        table[3] = m_table_desc1__7CUSBPcs[0];
+        table[4] = m_table_desc1__7CUSBPcs[1];
+        table[5] = m_table_desc1__7CUSBPcs[2];
+        table[6] = m_table_desc2__7CUSBPcs[0];
+        table[7] = m_table_desc2__7CUSBPcs[1];
+        table[8] = m_table_desc2__7CUSBPcs[2];
+    }
 
     void Init();
     void Quit();

@@ -20,11 +20,12 @@ int g_errCt = 0;
 extern "C" void create__12CMiniGamePcsFv(CMiniGamePcs*);
 extern "C" void destroy__12CMiniGamePcsFv(CMiniGamePcs*);
 extern "C" void calc__12CMiniGamePcsFv(CMiniGamePcs*);
+extern char s_CMiniGamePcs_GAME_801DD098[];
 unsigned int m_table_desc0__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
 unsigned int m_table_desc1__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
 unsigned int m_table_desc2__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
 unsigned int m_table__12CMiniGamePcs[0x148 / sizeof(unsigned int)] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x24
+    reinterpret_cast<unsigned int>(s_CMiniGamePcs_GAME_801DD098), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x24
 };
 static const char s_miniGameDefaultTag[4] = {'n', 'o', '_', 'n'};
 static const char s_miniGameEnd0000Text[] = "MiniGameEnd 0000\n";

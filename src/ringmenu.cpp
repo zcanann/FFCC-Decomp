@@ -14,6 +14,9 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+
+extern "C" double sin(double);
+
 #include <math.h>
 
 extern "C" int _GetIdxCmdList__12CCaravanWorkFv(CCaravanWork*);

@@ -12,6 +12,9 @@
 #include "ffcc/pppGetRotMatrixZYX.h"
 #include "ffcc/util.h"
 
+extern "C" double sin(double);
+extern "C" double cos(double);
+
 #include <math.h>
 
 extern "C" {

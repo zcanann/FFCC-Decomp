@@ -120,6 +120,11 @@ static inline void WriteF32(void* base, unsigned int offset, float value) {
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(base) + offset) = value;
 }
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8004c6a0
@@ -330,7 +335,7 @@ void CMaterialEditorPcs::createViewer()
     WriteU32(self, 0xe8, 0);
     memset(self + 0xec, 0, 0x120);
 
-    fVar1 = FLOAT_8032FCC8;
+    fVar1 = LoadFloat(FLOAT_8032FCC8);
     WriteF32(self, 0x128, fVar1);
     WriteF32(self, 0x114, fVar1);
     WriteF32(self, 0x100, fVar1);
@@ -793,9 +798,9 @@ void CMaterialEditorPcs::drawViewer()
  */
 void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count, const Vec* points)
 {
-    f32 maxInit = kMaterialEditorControlMaxInit;
+    f32 maxInit = LoadFloat(kMaterialEditorControlMaxInit);
     minPos.x = minPos.y = minPos.z = maxInit;
-    f32 minInit = kMaterialEditorControlMinInit;
+    f32 minInit = LoadFloat(kMaterialEditorControlMinInit);
     maxPos.x = maxPos.y = maxPos.z = minInit;
 
     for (; count > 0; count--, points++) {

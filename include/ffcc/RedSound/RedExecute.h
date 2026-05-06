@@ -57,8 +57,10 @@ struct RedWaveDATA {
 	unsigned char m_pan;
 	signed char m_reverbMix;
 	unsigned char m_reserved1D[0x22 - 0x1D];
-	unsigned char m_adpcmData[0x4A - 0x22];
-	unsigned char m_adpcmLoop[0x50 - 0x4A];
+	struct RedWaveADPCMInfo {
+		unsigned char m_data[0x4A - 0x22];
+		unsigned char m_loop[0x50 - 0x4A];
+	} m_adpcm;
 	unsigned char m_adsr[0x5C - 0x50];
 	unsigned char m_reserved5C[0x60 - 0x5C];
 };

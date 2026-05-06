@@ -425,7 +425,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			                  streamData->m_volume >> REDSOUND_FIXED_SHIFT);
 			(streamData->m_track + iVar2)->m_waveBase = streamData->m_aramBuffer + iVar2 * REDSOUND_STREAM_STEREO_PLANE_SIZE;
 			memset(&streamData->m_trackData[iVar2], 0, sizeof(RedWaveDATA));
-			memcpy(streamData->m_trackData[iVar2].m_adpcmData, &headerData[iVar2], REDSOUND_STREAM_ADPCM_HEADER_SIZE);
+			memcpy(&streamData->m_trackData[iVar2].m_adpcm, &headerData[iVar2], REDSOUND_STREAM_ADPCM_HEADER_SIZE);
 			voice->m_adsrLevel[REDSOUND_VOICE_ADSR_ATTACK] = voice->m_adsrLevel[REDSOUND_VOICE_ADSR_DECAY] =
 			    voice->m_adsrLevel[REDSOUND_VOICE_ADSR_SUSTAIN] = 0;
 			voice->m_adsrLevel[REDSOUND_VOICE_ADSR_RELEASE] = REDSOUND_VOLUME_MAX;

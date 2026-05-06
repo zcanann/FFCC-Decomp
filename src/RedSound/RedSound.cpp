@@ -576,10 +576,10 @@ void CRedSound::SeStopMG(int bank, int sep, int group, int kind)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
+int CRedSound::SePlay(int seID, int sepID, int pan, int volume, int pitch)
 {
 	int autoID = GetAutoID();
-	c_Driver.SePlay(seID, sepID, autoID, unk, volume, pitch);
+	c_Driver.SePlay(seID, sepID, autoID, pan, volume, pitch);
 	return autoID;
 }
 

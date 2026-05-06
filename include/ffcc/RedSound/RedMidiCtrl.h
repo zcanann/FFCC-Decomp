@@ -16,7 +16,7 @@ typedef int (*RedSwingFunc)(int);
 
 struct RedTrackDATA {
 	unsigned char* m_command;
-	unsigned char m_pad04[0x08 - 0x04];
+	unsigned char m_reserved04[0x08 - 0x04];
 	unsigned char* m_loopCommand[REDSOUND_TRACK_LOOP_STACK_COUNT];
 	RedWaveHeadWD* m_waveBankData;
 	RedWaveDATA* m_waveData;
@@ -46,7 +46,7 @@ struct RedTrackDATA {
 	int m_vibrateRateAdd;
 	int m_vibrateDepth;
 	int m_vibrateDepthAdd;
-	unsigned char m_pad88[0x8C - 0x88];
+	unsigned char m_reserved88[0x8C - 0x88];
 	short m_vibrateRateDelta;
 	short m_vibrateDepthDelta;
 	short m_vibrateDelay;
@@ -56,7 +56,7 @@ struct RedTrackDATA {
 	int m_tremoloRateAdd;
 	int m_tremoloDepth;
 	int m_tremoloDepthAdd;
-	unsigned char m_padA8[0xAC - 0xA8];
+	unsigned char m_reservedA8[0xAC - 0xA8];
 	short m_tremoloRateDelta;
 	short m_tremoloDepthDelta;
 	short m_tremoloDelay;
@@ -107,14 +107,14 @@ struct RedTrackDATA {
 	short m_loopStepCurrent;
 	short m_seTickCounter;
 	signed char m_fineTune;
-	unsigned char m_pad149[0x14B - 0x149];
+	unsigned char m_reserved149[0x14B - 0x149];
 	signed char m_pitchBendRange;
-	unsigned char m_pad14C[0x14D - 0x14C];
+	unsigned char m_reserved14C[0x14D - 0x14C];
 	unsigned char m_waveBankNo;
 	signed char m_trackNo;
 	unsigned char m_eraseTrack;
 	unsigned char m_attrMask;
-	unsigned char m_pad151[0x154 - 0x151];
+	unsigned char m_reserved151[0x154 - 0x151];
 };
 
 enum RedTrackAdsrLayout {
@@ -246,7 +246,7 @@ enum RedKeyOnByteOffset {
 
 struct RedSoundCONTROL {
 	RedTrackDATA* m_tracks;
-	unsigned char m_pad04[0x08 - 0x04];
+	unsigned char m_reserved04[0x08 - 0x04];
 	signed char* m_keySignatureData;
 	int m_measure;
 	int m_tick;
@@ -274,7 +274,7 @@ struct RedSoundCONTROL {
 	int m_masterVolume;
 	int m_masterVolumeAdd;
 	int m_masterVolumeDelta;
-	unsigned char m_pad460[0x46C - 0x460];
+	unsigned char m_reserved460[0x46C - 0x460];
 	unsigned int m_flags;
 	int m_musicId;
 	int m_skipFrames;
@@ -288,7 +288,7 @@ struct RedSoundCONTROL {
 	unsigned char m_channelAlloc;
 	unsigned char m_trackCount;
 	signed char m_volumeScale;
-	unsigned char m_pad493;
+	unsigned char m_reserved493;
 };
 
 enum RedSoundControlFlag {

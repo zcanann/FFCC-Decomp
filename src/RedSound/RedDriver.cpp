@@ -1924,15 +1924,15 @@ void CRedDriver::SeStopMG(int id1, int id2, int id3, int id4)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::SePlay(int bank, int sep, int autoID, int unk, int volume, int pitch)
+int CRedDriver::SePlay(int bank, int sep, int autoID, int pan, int volume, int pitch)
 {
 	if (bank == -1) {
 		if (sep >= 0) {
-			_EntryExecCommand(_SeSepPlaySequence, autoID, sep, unk, volume, pitch, 0, 0);
+			_EntryExecCommand(_SeSepPlaySequence, autoID, sep, pan, volume, pitch, 0, 0);
 		}
 	} else if ((bank >= 0) && (bank < REDSOUND_SE_BLOCK_BANK_COUNT) && (sep >= 0) &&
 	           (sep < REDSOUND_SE_BLOCK_SEQUENCE_COUNT)) {
-		_EntryExecCommand(_SeBlockPlay, autoID, bank, sep, unk, volume, pitch, 0);
+		_EntryExecCommand(_SeBlockPlay, autoID, bank, sep, pan, volume, pitch, 0);
 	}
     return autoID;
 }

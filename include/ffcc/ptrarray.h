@@ -6,6 +6,16 @@
 #include "ffcc/system.h"
 #include <string.h>
 
+#ifdef FFCC_PTRARRAY_NAMED_STRINGS
+extern const char s_CPtrArrayGrowError[];
+extern const char s_CPtrArrayFile[];
+#define FFCC_PTRARRAY_GROW_ERROR s_CPtrArrayGrowError
+#define FFCC_PTRARRAY_FILE s_CPtrArrayFile
+#else
+#define FFCC_PTRARRAY_GROW_ERROR "CPtrArray grow error"
+#define FFCC_PTRARRAY_FILE "collection_ptrarray.h"
+#endif
+
 template <class T>
 class CPtrArray
 {
@@ -141,12 +151,12 @@ int CPtrArray<T>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf("CPtrArray grow error");
+                System.Printf(const_cast<char*>(FFCC_PTRARRAY_GROW_ERROR));
             }
             m_size = m_size << 1;
         }
 
-        newItems = static_cast<T*>(Memory._Alloc(m_size * sizeof(T), m_stage, "collection_ptrarray.h", 0xfa, 0));
+        newItems = static_cast<T*>(Memory._Alloc(m_size * sizeof(T), m_stage, const_cast<char*>(FFCC_PTRARRAY_FILE), 0xfa, 0));
         if (newItems == 0) {
             return 0;
         }
@@ -165,5 +175,8 @@ int CPtrArray<T>::setSize(unsigned long newSize)
 
     return 1;
 }
+
+#undef FFCC_PTRARRAY_FILE
+#undef FFCC_PTRARRAY_GROW_ERROR
 
 #endif // _FFCC_PTRARRAY_H_

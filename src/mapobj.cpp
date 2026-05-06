@@ -1486,44 +1486,23 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
     bool hitBounds = false;
     bool xyOverlap = false;
-    bool xOverlap;
-    if (localCylinder.m_top.z <= mapHit->m_positionMin.x) {
-        if (mapHit->m_positionMin.x <= localCylinder.m_top.z) {
-            xOverlap = true;
-        } else {
-            xOverlap = mapHit->m_positionMin.x <= localCylinder.m_direction2.z;
-        }
-    } else {
-        xOverlap = localCylinder.m_top.z <= mapHit->m_positionMax.x;
-    }
+    bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_top.z
+        ? localCylinder.m_top.z <= mapHit->m_positionMax.x
+        : mapHit->m_positionMin.x <= localCylinder.m_direction2.z;
 
     if (xOverlap) {
-        bool yOverlap;
-        if (localCylinder.m_direction2.x <= mapHit->m_positionMin.y) {
-            if (mapHit->m_positionMin.y <= localCylinder.m_direction2.x) {
-                yOverlap = true;
-            } else {
-                yOverlap = mapHit->m_positionMin.y <= localCylinder.m_radius2;
-            }
-        } else {
-            yOverlap = localCylinder.m_direction2.x <= mapHit->m_positionMax.y;
-        }
+        bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_direction2.x
+            ? localCylinder.m_direction2.x <= mapHit->m_positionMax.y
+            : mapHit->m_positionMin.y <= localCylinder.m_radius2;
         if (yOverlap) {
             xyOverlap = true;
         }
     }
 
     if (xyOverlap) {
-        bool zOverlap;
-        if (localCylinder.m_direction2.y <= mapHit->m_positionMin.z) {
-            if (mapHit->m_positionMin.z <= localCylinder.m_direction2.y) {
-                zOverlap = true;
-            } else {
-                zOverlap = mapHit->m_positionMin.z <= localCylinder.m_height2;
-            }
-        } else {
-            zOverlap = localCylinder.m_direction2.y <= mapHit->m_positionMax.z;
-        }
+        bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_direction2.y
+            ? localCylinder.m_direction2.y <= mapHit->m_positionMax.z
+            : mapHit->m_positionMin.z <= localCylinder.m_height2;
 
         if (zOverlap) {
             hitBounds = true;
@@ -1549,7 +1528,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
+void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0) && (S8At(this, 0x1F) == -1)) {
         Mtx inverseMtx;
@@ -1590,44 +1569,23 @@ int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
         bool hitBounds = false;
         bool xyOverlap = false;
-        bool xOverlap;
-        if (localCylinder.m_top.z <= mapHit->m_positionMin.x) {
-            if (mapHit->m_positionMin.x <= localCylinder.m_top.z) {
-                xOverlap = true;
-            } else {
-                xOverlap = mapHit->m_positionMin.x <= localCylinder.m_direction2.z;
-            }
-        } else {
-            xOverlap = localCylinder.m_top.z <= mapHit->m_positionMax.x;
-        }
+        bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_top.z
+            ? localCylinder.m_top.z <= mapHit->m_positionMax.x
+            : mapHit->m_positionMin.x <= localCylinder.m_direction2.z;
 
         if (xOverlap) {
-            bool yOverlap;
-            if (localCylinder.m_direction2.x <= mapHit->m_positionMin.y) {
-                if (mapHit->m_positionMin.y <= localCylinder.m_direction2.x) {
-                    yOverlap = true;
-                } else {
-                    yOverlap = mapHit->m_positionMin.y <= localCylinder.m_radius2;
-                }
-            } else {
-                yOverlap = localCylinder.m_direction2.x <= mapHit->m_positionMax.y;
-            }
+            bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_direction2.x
+                ? localCylinder.m_direction2.x <= mapHit->m_positionMax.y
+                : mapHit->m_positionMin.y <= localCylinder.m_radius2;
             if (yOverlap) {
                 xyOverlap = true;
             }
         }
 
         if (xyOverlap) {
-            bool zOverlap;
-            if (localCylinder.m_direction2.y <= mapHit->m_positionMin.z) {
-                if (mapHit->m_positionMin.z <= localCylinder.m_direction2.y) {
-                    zOverlap = true;
-                } else {
-                    zOverlap = mapHit->m_positionMin.z <= localCylinder.m_height2;
-                }
-            } else {
-                zOverlap = localCylinder.m_direction2.y <= mapHit->m_positionMax.z;
-            }
+            bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_direction2.y
+                ? localCylinder.m_direction2.y <= mapHit->m_positionMax.z
+                : mapHit->m_positionMin.z <= localCylinder.m_height2;
 
             if (zOverlap) {
                 hitBounds = true;
@@ -1640,7 +1598,6 @@ int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         }
     }
 
-    return 0;
 }
 
 /*

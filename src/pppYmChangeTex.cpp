@@ -91,7 +91,6 @@ extern const float FLOAT_80330df8;
 extern const float FLOAT_80330dfc;
 extern const float FLOAT_80330e00;
 extern const double DOUBLE_80330E08;
-static const double sPppYmChangeTexDouble = 4503601774854144.0;
 extern const float DAT_80330e10[2] = {0.0f, 0.0f};
 
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_data) == 0xA4);

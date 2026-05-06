@@ -69,9 +69,12 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     f32 matrixX;
     f32 matrixY;
     f32 matrixZ;
-    f32 ownerY;
     f32 ownerX;
+    f32 ownerY;
     f32 ownerZ;
+    f32 bottomX;
+    f32 bottomY;
+    f32 bottomZ;
     f32 cylinderY;
     Vec* stateNormal;
     u8* stateInitialized;
@@ -235,9 +238,9 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     pppMngStPtr->m_matrix.value[1][3] = ownerY;
                     pppMngStPtr->m_matrix.value[2][3] = ownerZ;
                 } else {
-                    ownerY = owner->m_worldPosition.y;
-                    ownerZ = owner->m_worldPosition.z;
-                    ownerX = owner->m_worldPosition.x;
+                    bottomX = owner->m_worldPosition.x;
+                    bottomY = owner->m_worldPosition.y;
+                    bottomZ = owner->m_worldPosition.z;
                     secondRayDirection.x = kPppConformBgNormalZero;
                     secondRayDirection.y = -2000.0f;
                     secondRayDirection.z = kPppConformBgNormalZero;
@@ -248,9 +251,9 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     secondCylinder.m_direction2.z = -10000000000.0f;
                     secondCylinder.m_direction2.y = -10000000000.0f;
                     secondCylinder.m_direction2.x = -10000000000.0f;
-                    secondCylinder.m_bottom.y = ownerY;
-                    secondCylinder.m_bottom.z = ownerZ;
-                    secondCylinder.m_bottom.x = ownerX;
+                    secondCylinder.m_bottom.x = bottomX;
+                    secondCylinder.m_bottom.y = bottomY;
+                    secondCylinder.m_bottom.z = bottomZ;
                     secondCylinder.m_direction.x = kPppConformBgNormalZero;
                     secondCylinder.m_direction.y = -2000.0f;
                     secondCylinder.m_direction.z = kPppConformBgNormalZero;

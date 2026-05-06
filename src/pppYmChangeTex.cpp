@@ -111,6 +111,7 @@ STATIC_ASSERT(offsetof(ChangeTexModelData, m_frameShift) == 0x34);
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline float ChangeTexConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
+static inline double ChangeTexDouble(const double& value) { return value; }
 
 CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle*);
 CCharaPcs::CHandle* GetCharaHandlePtr(CGObject*, long);
@@ -257,10 +258,16 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		}
 	}
 
+	union {
+		double d;
+		u32 u[2];
+	} scale;
 	Mtx modelMtx;
 
 	ChangeTexMeshRef* curMesh = model0Raw->m_meshes;
-	int frame = (int)(state->m_value0 * (float)(1 << model0Raw->m_data->m_frameShift));
+	scale.u[0] = 0x43300000;
+	scale.u[1] = (1 << model0Raw->m_data->m_frameShift) ^ 0x80000000;
+	int frame = (int)(state->m_value0 * (float)(scale.d - ChangeTexDouble(DOUBLE_80330E08)));
 	short frameShort = (short)frame;
 	PSMTXCopy(model0Raw->m_matrix, modelMtx);
 
@@ -284,7 +291,10 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				int level = 0;
 				float threshold = ChangeTexConst(FLOAT_80330df8);
 				for (int tries = 7; tries != 0; tries--) {
-					if ((float)delta > ChangeTexConst(FLOAT_80330dfc) * threshold) {
+					scale.u[0] = 0x43300000;
+					scale.u[1] = delta ^ 0x80000000;
+					if ((float)(scale.d - ChangeTexDouble(DOUBLE_80330E08)) >
+					    ChangeTexConst(FLOAT_80330dfc) * threshold) {
 						if (negativeRamp == 0xFF) {
 							*(u8*)(vertColors + 3) = negativeRamp - (level << 4);
 						} else {

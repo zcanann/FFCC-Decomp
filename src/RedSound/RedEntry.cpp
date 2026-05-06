@@ -1256,9 +1256,9 @@ void CRedEntry::DisplaySePlayInfo()
 					fflush(__files + 1);
 				} else {
 					RedHistoryBANK* seSepBank = SearchSeSepBank(track->m_seSepId);
+					RedSeSepHEAD* seSepHead = reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data);
 					int trackIndex = track - *trackHead;
-					int waveNo = (reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoHi << 8) |
-					             reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoLo;
+					int waveNo = (seSepHead->m_waveNoHi << 8) | seSepHead->m_waveNoLo;
 					OSReport(sRedEntrySeSepPlayInfoFmt, sRedEntryLogPrefix,
 					         trackIndex + REDSOUND_SE_VOICE_BASE_INDEX, track->m_seSepId, waveNo);
 					fflush(__files + 1);

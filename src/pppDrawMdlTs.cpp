@@ -13,6 +13,8 @@ void pppDrawMesh__FP10pppModelStP3Veci(void*, void*, int);
 void SetTexScroll__12CMaterialManFffff(CMaterialMan*, float, float, float, float);
 }
 
+extern const float FLOAT_803304F0;
+
 // Use simple forward declarations and casting approach
 
 /*
@@ -23,7 +25,7 @@ void SetTexScroll__12CMaterialManFffff(CMaterialMan*, float, float, float, float
 void pppDrawMdlTsCon(struct _pppPObject* obj, struct PDrawMdlTs* data)
 {
     u8* ptr = (u8*)obj + *(s32*)((u8*)*(void**)((u8*)data + 0xC) + 0x8) + 0x80;
-    f32 zero = 0.0f;
+    f32 zero = FLOAT_803304F0;
 
     *(f32*)(ptr + 0x14) = zero;
     *(f32*)(ptr + 0x10) = zero;
@@ -41,7 +43,7 @@ void pppDrawMdlTsCon(struct _pppPObject* obj, struct PDrawMdlTs* data)
 void pppDrawMdlTsCon3(struct _pppPObject* obj, struct PDrawMdlTs* data)
 {
     u8* ptr = (u8*)obj + *(s32*)((u8*)*(void**)((u8*)data + 0xC) + 0x8) + 0x80;
-    f32 zero = 0.0f;
+    f32 zero = FLOAT_803304F0;
 
     *(f32*)(ptr + 0x14) = zero;
     *(f32*)(ptr + 0x08) = zero;
@@ -123,11 +125,10 @@ void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _
         *(u8*)((u8*)data + 0xE));
 
     f32* texCoords = (f32*)((u8*)obj + (*(s32*)((u8*)*(s32**)((u8*)ctrl + 0xC) + 8)) + 0x80);
-    SetTexScroll__12CMaterialManFffff(&MaterialMan, texCoords[0], texCoords[3], 0.0f, 0.0f);
+    SetTexScroll__12CMaterialManFffff(&MaterialMan, texCoords[0], texCoords[3], FLOAT_803304F0, FLOAT_803304F0);
 
     pppSetBlendMode(*(u8*)((u8*)data + 0x9));
 
     void** modelsArray = *(void***)((u8*)pppEnvStPtr + 0x8);
     pppDrawMesh__FP10pppModelStP3Veci(modelsArray[*(u32*)((u8*)data + 0x4)], *(void**)((u8*)obj + 0x70), 1);
 }
-

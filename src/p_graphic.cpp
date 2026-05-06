@@ -179,20 +179,6 @@ void CGraphicPcs::drawScreenFade()
             GXTexCoord2u16(0, 2);
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(0.0f, 480.0f - (float)barHeight, 0.0f);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(0, 0);
-            GXPosition3f32(640.0f, 480.0f - (float)barHeight, 0.0f);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(2, 0);
-            GXPosition3f32(640.0f, 480.0f, 0.0f);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(2, 2);
-            GXPosition3f32(0.0f, 480.0f, 0.0f);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(0, 2);
-
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(0.0f, (float)barHeight, 0.0f);
             GXColor1u32(*(u32*)&baseColor);
             GXTexCoord2u16(0, 0);
@@ -207,16 +193,30 @@ void CGraphicPcs::drawScreenFade()
             GXTexCoord2u16(0, 2);
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(0.0f, 480.0f - (float)barHeight, 0.0f);
+            GXPosition3f32(0.0f, 448.0f, 0.0f);
             GXColor1u32(*(u32*)&baseColor);
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(640.0f, 480.0f - (float)barHeight, 0.0f);
+            GXPosition3f32(640.0f, 448.0f, 0.0f);
             GXColor1u32(*(u32*)&baseColor);
             GXTexCoord2u16(2, 0);
-            GXPosition3f32(640.0f, 480.0f - (float)(barHeight + barEdge), 0.0f);
+            GXPosition3f32(640.0f, 448.0f - (float)barHeight, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(2, 2);
+            GXPosition3f32(0.0f, 448.0f - (float)barHeight, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(0, 2);
+
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(0.0f, 448.0f - (float)barHeight, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(0, 0);
+            GXPosition3f32(640.0f, 448.0f - (float)barHeight, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(2, 0);
+            GXPosition3f32(640.0f, 448.0f - (float)(barHeight + barEdge), 0.0f);
             GXColor1u32(*(u32*)&baseColor2);
             GXTexCoord2u16(2, 2);
-            GXPosition3f32(0.0f, 480.0f - (float)(barHeight + barEdge), 0.0f);
+            GXPosition3f32(0.0f, 448.0f - (float)(barHeight + barEdge), 0.0f);
             GXColor1u32(*(u32*)&baseColor2);
             GXTexCoord2u16(0, 2);
             continue;
@@ -244,7 +244,7 @@ void CGraphicPcs::drawScreenFade()
                         sy = 480.0f;
                     }
 
-                    const int radius = (int)(640.0f * (1.0f - t));
+                    const int radius = (int)(640.0f * (1.0f - fadeWave));
                     drawSFCircle(0x500, radius, (int)sx, (int)sy, baseColor, baseColor);
                     drawSFCircle(radius, radius - 8, (int)sx, (int)sy, baseColor, baseColor2);
                     continue;

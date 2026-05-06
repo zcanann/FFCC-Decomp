@@ -113,257 +113,6 @@ static inline CTexture* AllocTexture()
 
 /*
  * --INFO--
- * PAL Address: 0x8003BE3C
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CPtrArray<CTexture*>::CPtrArray()
-{
-    m_size = 0;
-    m_numItems = 0;
-    m_defaultSize = 0x10;
-    m_items = 0;
-    m_stage = 0;
-    m_growCapacity = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003BE70
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CPtrArray<CTexture*>::~CPtrArray()
-{
-    RemoveAll();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003BECC
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-bool CPtrArray<CTexture*>::Add(CTexture* item)
-{
-    int* numItems = reinterpret_cast<int*>(Ptr(this, 4));
-    CTexture*** items = reinterpret_cast<CTexture***>(Ptr(this, 0x10));
-
-    if (setSize(*numItems + 1) == 0) {
-        return false;
-    }
-
-    (*items)[*numItems] = item;
-    *numItems = *numItems + 1;
-    return true;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003BF3C
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma dont_inline on
-template <>
-void CPtrArray<CTexture*>::SetAt(unsigned long index, CTexture* item)
-{
-    m_items[index] = item;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003BF4C
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-int CPtrArray<CTexture*>::GetSize()
-{
-    return m_numItems;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003BF54
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-void CPtrArray<CTexture*>::RemoveAll()
-{
-    if (m_items != 0) {
-        __dla__FPv(m_items);
-        m_items = 0;
-    }
-    m_size = 0;
-    m_numItems = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003BFA0
- * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
-{
-    for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        int* item = reinterpret_cast<int*>(m_items[i]);
-        if (item != 0) {
-            int refCount = item[1] - 1;
-            item[1] = refCount;
-            if (refCount == 0) {
-                delete reinterpret_cast<CTexture*>(item);
-            }
-            m_items[i] = 0;
-        }
-    }
-
-    if (m_items != 0) {
-        __dla__FPv(m_items);
-        m_items = 0;
-    }
-    m_size = 0;
-    m_numItems = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003C06C
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CTexture* CPtrArray<CTexture*>::operator[](unsigned long index)
-{
-    return GetAt(index);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003C08C
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-void CPtrArray<CTexture*>::SetStage(CMemory::CStage* stage)
-{
-    m_stage = stage;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003C094
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-void CPtrArray<CTexture*>::SetDefaultSize(unsigned long defaultSize)
-{
-    m_defaultSize = defaultSize;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x8003C09C
- * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-int CPtrArray<CTexture*>::setSize(unsigned long newSize)
-{
-    CTexture** newItems;
-
-    if ((unsigned long)m_size < newSize) {
-        if (m_size == 0) {
-            m_size = m_defaultSize;
-        } else {
-            if (m_growCapacity == 0) {
-                System.Printf(const_cast<char*>(s_ptrarray_grow_error_801D79D8));
-            }
-            m_size = m_size << 1;
-        }
-
-        newItems = (CTexture**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory,
-            (unsigned long)(m_size << 2),
-            m_stage,
-            const_cast<char*>(s_collection_ptrarray_h_801D79F4),
-            0xFA,
-            0);
-        if (newItems == 0) {
-            return 0;
-        }
-
-        if (m_items != 0) {
-            memcpy(newItems, m_items, m_numItems << 2);
-        }
-        if (m_items != 0) {
-            __dla__FPv(m_items);
-            m_items = 0;
-        }
-        m_items = newItems;
-    }
-
-    return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003C18C
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CTexture* CPtrArray<CTexture*>::GetAt(unsigned long index)
-{
-    return m_items[index];
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8003BDF4
  * PAL Size: 72b
  * EN Address: TODO
@@ -846,41 +595,6 @@ void CTexture::CacheUnLoadTexture(CAmemCacheSet* amemCacheSet)
 
 /*
  * --INFO--
- * PAL Address: 0x8003E308
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CTexture::CacheRefCnt0UpTexture(CAmemCacheSet* amemCacheSet)
-{
-    if (m_cacheId != -1) {
-        amemCacheSet->RefCnt0Up(m_cacheId);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003E2B4
- * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CTexture::CacheDumpTexture(CAmemCacheSet* amemCacheSet)
-{
-    if (m_cacheId != -1) {
-        if (GetRef() <= 1) {
-            amemCacheSet->DestroyCache(m_cacheId);
-            m_imageData = 0;
-        }
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8003B030
  * PAL Size: 44b
  * EN Address: TODO
@@ -1055,63 +769,6 @@ void CTexture::FlushExternalTlut(void* tlutData)
         numEntries = 0;
     }
     DCFlushRange(tlutData, numEntries << 2);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CTexture::FlushExternalTlut(void* tlutData, int numEntries)
-{
-    DCFlushRange(tlutData, numEntries << 2);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-_GXColor CTexture::GetExternalTlutColor(void* tlutData, int tlutOffset, int index)
-{
-    unsigned short* tlut = reinterpret_cast<unsigned short*>(tlutData);
-    _GXColor color;
-    unsigned int packed = tlut[index] | (tlut[index + tlutOffset] << 16);
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(&packed);
-
-    color.a = bytes[0];
-    color.r = bytes[3];
-    color.g = bytes[2];
-    color.b = bytes[1];
-    return color;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003FCF8
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CTexture::GetNumTlut()
-{
-    if (m_format == 9) {
-        return 0x100;
-    }
-    if (m_format == 8) {
-        return 0x10;
-    }
-    return 0;
 }
 
 /*
@@ -1365,4 +1022,255 @@ void* CTexture::operator new(unsigned long size, CMemory::CStage*, char* file, i
 void* CTextureSet::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
 {
     return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, TextureMan.m_memoryStage, file, line, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003BE3C
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CPtrArray<CTexture*>::CPtrArray()
+{
+    m_size = 0;
+    m_numItems = 0;
+    m_defaultSize = 0x10;
+    m_items = 0;
+    m_stage = 0;
+    m_growCapacity = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003BE70
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CPtrArray<CTexture*>::~CPtrArray()
+{
+    RemoveAll();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003BECC
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+bool CPtrArray<CTexture*>::Add(CTexture* item)
+{
+    int* numItems = reinterpret_cast<int*>(Ptr(this, 4));
+    CTexture*** items = reinterpret_cast<CTexture***>(Ptr(this, 0x10));
+
+    if (setSize(*numItems + 1) == 0) {
+        return false;
+    }
+
+    (*items)[*numItems] = item;
+    *numItems = *numItems + 1;
+    return true;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003BF3C
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma dont_inline on
+template <>
+void CPtrArray<CTexture*>::SetAt(unsigned long index, CTexture* item)
+{
+    m_items[index] = item;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003BF4C
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+int CPtrArray<CTexture*>::GetSize()
+{
+    return m_numItems;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003BF54
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CTexture*>::RemoveAll()
+{
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003BFA0
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
+{
+    for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
+        int* item = reinterpret_cast<int*>(m_items[i]);
+        if (item != 0) {
+            int refCount = item[1] - 1;
+            item[1] = refCount;
+            if (refCount == 0) {
+                delete reinterpret_cast<CTexture*>(item);
+            }
+            m_items[i] = 0;
+        }
+    }
+
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003C06C
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CTexture* CPtrArray<CTexture*>::operator[](unsigned long index)
+{
+    return GetAt(index);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003C08C
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CTexture*>::SetStage(CMemory::CStage* stage)
+{
+    m_stage = stage;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003C094
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CTexture*>::SetDefaultSize(unsigned long defaultSize)
+{
+    m_defaultSize = defaultSize;
+}
+#pragma dont_inline reset
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003C09C
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+int CPtrArray<CTexture*>::setSize(unsigned long newSize)
+{
+    CTexture** newItems;
+
+    if ((unsigned long)m_size < newSize) {
+        if (m_size == 0) {
+            m_size = m_defaultSize;
+        } else {
+            if (m_growCapacity == 0) {
+                System.Printf(const_cast<char*>(s_ptrarray_grow_error_801D79D8));
+            }
+            m_size = m_size << 1;
+        }
+
+        newItems = (CTexture**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+            &Memory,
+            (unsigned long)(m_size << 2),
+            m_stage,
+            const_cast<char*>(s_collection_ptrarray_h_801D79F4),
+            0xFA,
+            0);
+        if (newItems == 0) {
+            return 0;
+        }
+
+        if (m_items != 0) {
+            memcpy(newItems, m_items, m_numItems << 2);
+        }
+        if (m_items != 0) {
+            __dla__FPv(m_items);
+            m_items = 0;
+        }
+        m_items = newItems;
+    }
+
+    return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003C18C
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CTexture* CPtrArray<CTexture*>::GetAt(unsigned long index)
+{
+    return m_items[index];
 }

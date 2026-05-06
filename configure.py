@@ -730,7 +730,7 @@ config.libs = [
             Object(NonMatching, "pppYmMegaBirthShpTail3.cpp"),
             Object(NonMatching, "pppYmMelt.cpp"),
             Object(NonMatching, "pppYmMiasma.cpp"),
-            Object(NonMatching, "pppYmMoveCircle.cpp"),
+            Object(Matching, "pppYmMoveCircle.cpp"),
             Object(NonMatching, "pppYmMoveParabola.cpp"),
             Object(Matching, "pppYmTraceMove.cpp"),
             Object(NonMatching, "pppYmTracer.cpp"),

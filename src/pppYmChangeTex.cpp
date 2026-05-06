@@ -260,7 +260,16 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	Mtx modelMtx;
 
 	ChangeTexMeshRef* curMesh = model0Raw->m_meshes;
-	int frame = (int)(state->m_value0 * (float)(1 << model0Raw->m_data->m_frameShift));
+	union {
+		struct {
+			u32 hi;
+			u32 lo;
+		} words;
+		double value;
+	} frameScale;
+	frameScale.words.hi = 0x43300000;
+	frameScale.words.lo = static_cast<u32>(1 << model0Raw->m_data->m_frameShift) ^ 0x80000000;
+	int frame = (int)(state->m_value0 * (float)(frameScale.value - DOUBLE_80330E08));
 	short frameShort = (short)frame;
 	PSMTXCopy(model0Raw->m_matrix, modelMtx);
 
@@ -284,7 +293,16 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				int level = 0;
 				float threshold = ChangeTexConst(FLOAT_80330df8);
 				for (int tries = 7; tries != 0; tries--) {
-					if ((float)delta > ChangeTexConst(FLOAT_80330dfc) * threshold) {
+					union {
+						struct {
+							u32 hi;
+							u32 lo;
+						} words;
+						double value;
+					} deltaValue;
+					deltaValue.words.hi = 0x43300000;
+					deltaValue.words.lo = static_cast<u32>(delta) ^ 0x80000000;
+					if ((float)(deltaValue.value - DOUBLE_80330E08) > ChangeTexConst(FLOAT_80330dfc) * threshold) {
 						if (negativeRamp == 0xFF) {
 							*(u8*)(vertColors + 3) = negativeRamp - (level << 4);
 						} else {

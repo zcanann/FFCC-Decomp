@@ -28,15 +28,15 @@ static const char s__s______________0x_8_8X___0x_8_8_801e7aca[] =
 static const char s__s_Entry_Wave____d_801e7b01[] = "%s    Entry Wave = %d\n";
 static const char s__s_Total_Size___0x_8_8X_801e7b18[] = "%s    Total Size = 0x%8.8X\n";
 static const char s__s_Max_Free_Size___0x_8_8X_801e7b34[] = "%s Max Free Size = 0x%8.8X\n";
-static const char s__s_sSE_Sep_Header_was_broken__s_801e7b50[] = "%s%sSE-Sep-Header was broken.%s\n";
-static const char s__s_____SE_Play_Information______801e7b71[] = "%s==== SE Play Information ====\n";
-static const char s__s_Track___Name___Wave_801e7b92[] = "%s Track : Name         : Wave\n";
-static const char s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2[] =
+static const char sRedEntrySeSepHeaderBrokenFmt[] = "%s%sSE-Sep-Header was broken.%s\n";
+static const char sRedEntrySePlayInfoHeaderFmt[] = "%s==== SE Play Information ====\n";
+static const char sRedEntrySePlayInfoColumnFmt[] = "%s Track : Name         : Wave\n";
+static const char sRedEntrySeBlockPlayInfoFmt[] =
     "%s    %2d : %3.3u:%3.3u      : WAVE%4.4u\n";
-static const char s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc[] =
+static const char sRedEntrySeSepPlayInfoFmt[] =
     "%s    %2d : se%6.6u.sep : WAVE%4.4u\n";
-static const char s__s__2d_____801e7c01[] = "%s    %2d :              :\n";
-static const char s__s_sMusic_Header_was_broken__s_801e7c1d[] = "%s%sMusic-Header was broken.%s\n";
+static const char sRedEntrySeEmptyPlayInfoFmt[] = "%s    %2d :              :\n";
+static const char sRedEntryMusicHeaderBrokenFmt[] = "%s%sMusic-Header was broken.%s\n";
 static const char sRedEntryMusicInformationHeaderFmt[] = "%s==== MUSIC Information ====\n";
 static const char sRedEntryMusicInfoColumnFmt[] = "%s BGM      : Wave : Size     : \n";
 static const char sRedEntryMusicInfoPlayFmt[] = "%s music%3.3u : %4.4u : 0x%6.6X : Play\n";
@@ -1065,7 +1065,7 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 	    (seSepHead->m_signature[4] != REDSOUND_ENTRY_SESEP_SIGNATURE_4)) {
 		RedDelete(seSepHead);
 		if (m_ReportPrint != 0) {
-			OSReport(s__s_sSE_Sep_Header_was_broken__s_801e7b50, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
+			OSReport(sRedEntrySeSepHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
 			fflush(__files + 1);
 		}
 		return 0;
@@ -1228,9 +1228,9 @@ void CRedEntry::DisplaySePlayInfo()
 	if (m_ReportPrint != 0) {
 		OSReport(sRedEntryNewline);
 		fflush(__files + 1);
-		OSReport(s__s_____SE_Play_Information______801e7b71, sRedEntryLogPrefix);
+		OSReport(sRedEntrySePlayInfoHeaderFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
-		OSReport(s__s_Track___Name___Wave_801e7b92, sRedEntryLogPrefix);
+		OSReport(sRedEntrySePlayInfoColumnFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
 
 		RedTrackDATA** trackHead = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
@@ -1250,7 +1250,7 @@ void CRedEntry::DisplaySePlayInfo()
 					int waveNo = (seqInfo->m_waveNoHi << 8) | seqInfo->m_waveNoLo;
 					int trackIndex = track - *trackHead;
 
-					OSReport(s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2, sRedEntryLogPrefix,
+					OSReport(sRedEntrySeBlockPlayInfoFmt, sRedEntryLogPrefix,
 					         trackIndex + REDSOUND_SE_VOICE_BASE_INDEX, songNo,
 					         seDataNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK, waveNo);
 					fflush(__files + 1);
@@ -1259,13 +1259,13 @@ void CRedEntry::DisplaySePlayInfo()
 					int trackIndex = track - *trackHead;
 					int waveNo = (reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoHi << 8) |
 					             reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoLo;
-					OSReport(s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc, sRedEntryLogPrefix,
+					OSReport(sRedEntrySeSepPlayInfoFmt, sRedEntryLogPrefix,
 					         trackIndex + REDSOUND_SE_VOICE_BASE_INDEX, track->m_seSepId, waveNo);
 					fflush(__files + 1);
 				}
 			} else {
 				int trackIndex = track - *trackHead;
-				OSReport(s__s__2d_____801e7c01, sRedEntryLogPrefix,
+				OSReport(sRedEntrySeEmptyPlayInfoFmt, sRedEntryLogPrefix,
 				         trackIndex + REDSOUND_SE_VOICE_BASE_INDEX);
 				fflush(__files + 1);
 			}
@@ -1547,7 +1547,7 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 	    (musicHead->m_signature[2] != REDSOUND_ENTRY_MUSIC_SIGNATURE_2)) {
 		RedDelete(musicHead);
 		if (m_ReportPrint != 0) {
-			OSReport(s__s_sMusic_Header_was_broken__s_801e7c1d, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
+			OSReport(sRedEntryMusicHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
 			fflush(__files + 1);
 		}
 		return 0;

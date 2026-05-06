@@ -104,6 +104,7 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*
 extern "C" void __ct__8COctNodeFv(void*);
 extern "C" void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
+extern unsigned long g_pStage;
 extern unsigned long s_insertShadowNo;
 
 extern "C" const char s_m_node_pctd_m_meshtype_pctd_801D7268[] =
@@ -1095,9 +1096,9 @@ void InsertLight_r(COctNode* node)
 	}
 
 	if (node->m_meshCount != 0) {
-		unsigned long byteOffset = (s_light_no >> 3) & 0x1ffffffc;
+		unsigned long byteOffset = (g_pStage >> 3) & 0x1ffffffc;
 		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&node->m_lightFlags, byteOffset));
-		*bits |= 1UL << (s_light_no & 0x1f);
+		*bits |= 1UL << (g_pStage & 0x1f);
 	}
 
 	COctNode** childIter = node->m_children;
@@ -1155,9 +1156,9 @@ void InsertLight_r(COctNode* node)
 
 		if (childOverlap) {
 			if (child->m_meshCount != 0) {
-				unsigned long byteOffset = (s_light_no >> 3) & 0x1ffffffc;
+				unsigned long byteOffset = (g_pStage >> 3) & 0x1ffffffc;
 				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&child->m_lightFlags, byteOffset));
-				*bits |= 1UL << (s_light_no & 0x1f);
+				*bits |= 1UL << (g_pStage & 0x1f);
 			}
 
 			COctNode** grandChildIter = child->m_children;
@@ -1169,7 +1170,7 @@ void InsertLight_r(COctNode* node)
 
 				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_bound))) != 0) {
 					if (grandChild->m_meshCount != 0) {
-						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x44)), s_light_no);
+						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x44)), g_pStage);
 					}
 
 					COctNode** greatGrandChildIter = grandChild->m_children;
@@ -1213,7 +1214,7 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
 		return;
 	}
 
-	s_light_no = bitIndex;
+	g_pStage = bitIndex;
 	PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
 	PSMTXMultVec(inverseMtx, &position, &localPosition);
 

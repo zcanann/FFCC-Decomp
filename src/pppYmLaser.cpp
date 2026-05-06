@@ -16,6 +16,10 @@ extern int gPppCalcDisabled;
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 
 extern const f32 FLOAT_80330df0[2];
+extern const f32 FLOAT_80330de0;
+extern const f32 FLOAT_80330de4;
+extern const f32 FLOAT_80330de8;
+extern const f32 FLOAT_80330dec;
 extern const f32 FLOAT_80330DC4;
 extern const f32 FLOAT_80330DC8;
 extern "C" const f64 DOUBLE_80330DD0;
@@ -58,6 +62,11 @@ void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
 }
 
 extern "C" const char s_pppYmLaser_cpp_801DB4B0[] = "pppYmLaser.cpp";
+
+static inline f32 LoadLaserFloat(const f32& value)
+{
+	return value;
+}
 
 struct CMapCylinderRaw {
 	Vec m_bottom;
@@ -110,7 +119,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	int colorOffset = serializedDataOffsets[1];
 	pppYmLaserColorData* colorData = (pppYmLaserColorData*)((u8*)laser + 0x80 + colorOffset);
 	s32 dataValIndex = step->m_dataValIndex;
-	int count;
+	u32 count;
 	Vec* points;
 	s32 i;
 	u8 alphaStep;
@@ -225,7 +234,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		GXLoadPosMtxImm(shapeMtx, GX_PNMTX0);
 		pppDrawShp__FPlsP12CMaterialSetUc(*shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
 
-		count = (int)step->m_payload[0x1e];
+		count = (u32)step->m_payload[0x1e];
 		uvStep = FLOAT_80330DC4 / (float)count;
 		if (step->m_initWOrk == 0xFFFF) {
 			_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
@@ -361,7 +370,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	}
 }
 
-extern "C" const f64 DOUBLE_80330dd8 = 4503601774854144.0;
+extern const f64 DOUBLE_80330dd8 = 4503601774854144.0;
 extern const f32 FLOAT_80330de0 = -1.0f;
 extern const f32 FLOAT_80330de4 = 1.2f;
 extern const f32 FLOAT_80330de8 = 10000000000.0f;

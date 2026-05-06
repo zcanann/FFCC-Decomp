@@ -1005,61 +1005,62 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 		pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
 		PartMng.pppDumpMngSt();
 		DAT_8032ED64 = 1;
-		return 0;
-	}
-
-	pppPObjectRaw* newObjectRaw = (pppPObjectRaw*)newObj;
-	newObjectRaw->m_graphId = 0;
-	newObjectRaw->m_field70 = 0;
-	newObjectRaw->m_field74 = 0;
-	newObjectRaw->m_link.m_owner = pppPDataVal;
-	newObjectRaw->m_field7C = 1;
-
-	_pppPObjLink* objHead = (_pppPObjLink*)(((u8*)pppMngSt) + 0xC4);
-	_pppPObjLink* firstObj = objHead->m_next;
-	if (firstObj == 0)
-	{
-		dataVal->m_pppPObjLink = newObj;
-		objHead->m_next = newObj;
-		newObj->m_next = 0;
-	}
-	else if (dataVal->m_pppPObjLink == 0)
-	{
-		_pppPObjLink* prev = objHead;
-		_pppPObjLink* iter = firstObj;
-		while (iter != 0)
-		{
-			pppProgramSetDefRaw* iterSet = ((pppPDataValRaw*)iter->m_owner)->m_programSetDef;
-			if (programSet->m_sortKey <= iterSet->m_sortKey)
-			{
-				dataVal->m_pppPObjLink = newObj;
-				prev->m_next = newObj;
-				newObj->m_next = iter;
-				goto done_insert;
-			}
-			prev = iter;
-			iter = iter->m_next;
-		}
-		dataVal->m_pppPObjLink = newObj;
-		prev->m_next = newObj;
-		newObj->m_next = 0;
 	}
 	else
 	{
-		newObj->m_next = dataVal->m_pppPObjLink->m_next;
-		dataVal->m_pppPObjLink->m_next = newObj;
-	}
+		pppPObjectRaw* newObjectRaw = (pppPObjectRaw*)newObj;
+		newObjectRaw->m_graphId = 0;
+		newObjectRaw->m_field70 = 0;
+		newObjectRaw->m_field74 = 0;
+		newObjectRaw->m_link.m_owner = pppPDataVal;
+		newObjectRaw->m_field7C = 1;
 
-done_insert:
-	dataVal->m_activeCount++;
-	u32* initWork = (u32*)(((u8*)newObj) + programSet->m_objBaseSize);
-	for (s32 stageIndex = 0; stageIndex < programSet->m_numStages; stageIndex++)
-	{
-		pppSubProgEntryRaw* entry = &programSet->m_subProgEntries[stageIndex];
-		*initWork++ = entry->m_initWork;
-		if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionConstructor != 0)
+		_pppPObjLink* objHead = (_pppPObjLink*)(((u8*)pppMngSt) + 0xC4);
+		_pppPObjLink* firstObj = objHead->m_next;
+		if (firstObj == 0)
 		{
-			((pppProgConstructCallback)entry->m_prog->m_pppFunctionConstructor)(newObj, (_pppCtrlTable*)entry);
+			dataVal->m_pppPObjLink = newObj;
+			objHead->m_next = newObj;
+			newObj->m_next = 0;
+		}
+		else if (dataVal->m_pppPObjLink == 0)
+		{
+			_pppPObjLink* prev = objHead;
+			_pppPObjLink* iter = firstObj;
+			while (iter != 0)
+			{
+				pppProgramSetDefRaw* iterSet = ((pppPDataValRaw*)iter->m_owner)->m_programSetDef;
+				if (programSet->m_sortKey <= iterSet->m_sortKey)
+				{
+					dataVal->m_pppPObjLink = newObj;
+					prev->m_next = newObj;
+					newObj->m_next = iter;
+					goto done_insert;
+				}
+				prev = iter;
+				iter = iter->m_next;
+			}
+			dataVal->m_pppPObjLink = newObj;
+			prev->m_next = newObj;
+			newObj->m_next = 0;
+		}
+		else
+		{
+			newObj->m_next = dataVal->m_pppPObjLink->m_next;
+			dataVal->m_pppPObjLink->m_next = newObj;
+		}
+
+	done_insert:
+		dataVal->m_activeCount++;
+		u32* initWork = (u32*)(((u8*)newObj) + programSet->m_objBaseSize);
+		for (s32 stageIndex = 0; stageIndex < programSet->m_numStages; stageIndex++)
+		{
+			pppSubProgEntryRaw* entry = &programSet->m_subProgEntries[stageIndex];
+			*initWork++ = entry->m_initWork;
+			if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionConstructor != 0)
+			{
+				((pppProgConstructCallback)entry->m_prog->m_pppFunctionConstructor)(newObj, (_pppCtrlTable*)entry);
+			}
 		}
 	}
 

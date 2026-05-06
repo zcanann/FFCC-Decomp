@@ -797,17 +797,15 @@ void CRedEntry::DisplayWaveInfo()
 		int entryWave = 0;
         int aBufferAddress = c_RedMemory.GetABufferAddress();
         RedMemoryBlock* aBankAddress = c_RedMemory.GetABankAddress();
-        int aBufferEnd = aBufferAddress + c_RedMemory.GetABufferSize();
-
 		RedMemoryBlock* bank = aBankAddress;
+        int aBufferEnd = aBufferAddress + c_RedMemory.GetABufferSize();
 		do {
 			if (bank->m_size != 0) {
-				int freeSize;
-				int blockEnd = bank->m_address + bank->m_size;
+				int freeSize = bank->m_address + bank->m_size;
 				if (bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size > 0) {
-					freeSize = bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address - blockEnd;
+					freeSize = bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address - freeSize;
 				} else {
-					freeSize = aBufferEnd - blockEnd;
+					freeSize = aBufferEnd - freeSize;
 				}
 
 				RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase);
@@ -1610,8 +1608,8 @@ void CRedEntry::DisplayMMemoryInfo()
 	entryCount = 0;
     nextAddress = c_RedMemory.GetMainBufferAddress();
     memoryBank = c_RedMemory.GetMainBankAddress();
-    bufferTop = nextAddress + c_RedMemory.GetMainBufferSize();
 	bankEntry = memoryBank;
+    bufferTop = nextAddress + c_RedMemory.GetMainBufferSize();
 
 	do {
 		if (bankEntry->m_size != 0) {

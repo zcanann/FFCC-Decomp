@@ -1632,12 +1632,13 @@ void CGPartyObj::endTargetParticle()
 int CGPartyObj::isDispTarget()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	unsigned char result = 0;
 	if ((m_lastStateId == 2 || m_lastStateId == 6) &&
 	    (*reinterpret_cast<int*>(self + 0x668) != 0)) {
-		return 1;
+		result = 1;
 	}
 
-	return 0;
+	return result;
 }
 
 /*
@@ -1652,13 +1653,23 @@ int CGPartyObj::isDispTarget()
 int CGPartyObj::isRideTarget()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if ((m_lastStateId == 2 || m_lastStateId == 6) &&
-	    (*reinterpret_cast<int*>(self + 0x668) != 0) &&
-	    ((PartyData(this).partyFlags & 0x80) != 0)) {
-		return 1;
+	bool hasTarget = false;
+	int result = 0;
+
+	if (m_lastStateId == 2 || m_lastStateId == 6) {
+		if (*reinterpret_cast<int*>(self + 0x668) != 0) {
+			hasTarget = true;
+		}
 	}
 
-	return 0;
+	if (hasTarget) {
+		unsigned int flags = self[0x6B8];
+		if (static_cast<int>((flags << 25) | (flags >> 7)) < 0) {
+			result = 1;
+		}
+	}
+
+	return result;
 }
 
 /*
@@ -2911,24 +2922,23 @@ unsigned int CGPartyObj::IsDispRader()
  */
 void CGPartyObj::ChangeCommandMode(int mode)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if (*reinterpret_cast<short*>(self + 0x6F4) != mode) {
-		*reinterpret_cast<short*>(self + 0x6F4) = static_cast<short>(mode);
+	PartyObjOverlay& party = PartyData(this);
+	if (party.commandMode != mode) {
+		party.commandMode = static_cast<short>(mode);
 
-		unsigned char* menuPcs = reinterpret_cast<unsigned char*>(&MenuPcs);
-		unsigned char* scriptHandle = reinterpret_cast<unsigned char*>(m_scriptHandle);
-		CRingMenu** battleMenus = reinterpret_cast<CRingMenu**>(menuPcs + 0x13C);
-		int port = *reinterpret_cast<int*>(scriptHandle + 0x3B4);
+		CRingMenu** battleMenus = MenuPcs.m_battleRingMenus;
+		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+		int port = caravanWork->m_joybusCaravanId;
 		CRingMenu* ring = battleMenus[port];
 		if (ring != 0) {
 			ring->SetBattleCommand(0, -1, -1);
 
-			scriptHandle = reinterpret_cast<unsigned char*>(m_scriptHandle);
-			port = *reinterpret_cast<int*>(scriptHandle + 0x3B4);
+			caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+			port = caravanWork->m_joybusCaravanId;
 			battleMenus[port]->SetBattleCommand(1, -1, -1);
 
-			scriptHandle = reinterpret_cast<unsigned char*>(m_scriptHandle);
-			port = *reinterpret_cast<int*>(scriptHandle + 0x3B4);
+			caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+			port = caravanWork->m_joybusCaravanId;
 			battleMenus[port]->SetBattleCommand(2, -1, -1);
 		} else {
 			if ((unsigned int)System.m_execParam >= 2) {

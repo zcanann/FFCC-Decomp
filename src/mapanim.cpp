@@ -1,3 +1,4 @@
+#define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 #include "ffcc/mapanim.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
@@ -59,13 +60,6 @@ struct CMapAnimTargetNode
     Vec position;
     Vec rotation;
     Vec scale;
-};
-
-struct CMapAnimNodeData
-{
-    CMapAnimTargetNode* node;
-    CMapAnimData* mapAnim;
-    CMapAnimNodeTracks* tracks;
 };
 
 /*
@@ -250,7 +244,7 @@ CMapAnim::~CMapAnim()
     while (static_cast<unsigned int>(mapAnimNodes.GetSize()) > i) {
         CMapAnimNode* node = mapAnimNodes[i];
         if (node != 0 && (node = mapAnimNodes[i], node != 0)) {
-            reinterpret_cast<int*>(node)[1] = 0;
+            node->m_mapAnim = 0;
             __dl__FPv(node);
         }
         i++;
@@ -286,15 +280,12 @@ CMapAnim::CMapAnim()
  */
 void CMapAnimNode::Interp(int frame)
 {
-    CMapAnimNodeData* nodeData = reinterpret_cast<CMapAnimNodeData*>(this);
-    CMapAnimNodeTracks* tracks = nodeData->tracks;
-    CMapAnimTargetNode* node = nodeData->node;
-    int startFrame = nodeData->mapAnim->startFrame;
-    unsigned int loopFrameCount = static_cast<unsigned int>((nodeData->mapAnim->endFrame - startFrame) + 1);
-    CMapAnimNodeTrack* positionTrack = &tracks->position;
-    CMapAnimNodeTrackKey* positionKeys = positionTrack->keys;
-    int positionTrackCount = positionTrack->count;
-    Vec* positionOut = &node->position;
+    int startFrame = m_mapAnim->startFrame;
+    int positionTrackCount = m_tracks->position.count;
+    CMapAnimTargetNode* node = m_node;
+    unsigned int loopFrameCount = static_cast<unsigned int>((m_mapAnim->endFrame - startFrame) + 1);
+    CMapAnimNodeTrackKey* positionKeys = m_tracks->position.keys;
+    Vec* positionOut = &m_node->position;
     unsigned int frameInLoop = startFrame + (frame % loopFrameCount);
 
     {
@@ -347,10 +338,10 @@ void CMapAnimNode::Interp(int frame)
     }
 
     {
-        CMapAnimNodeTrack* track = &nodeData->tracks->rotation;
+        CMapAnimNodeTrack* track = &m_tracks->rotation;
         CMapAnimNodeTrackKey* keys = track->keys;
         int trackCount = track->count;
-        Vec* out = &nodeData->node->rotation;
+        Vec* out = &m_node->rotation;
 
         if (trackCount == 1) {
             out->x = keys[0].value.x;
@@ -369,8 +360,8 @@ void CMapAnimNode::Interp(int frame)
                 if (nextIndex != 0) {
                     endFrame = next->frame;
                 } else {
-                    endFrame = next->frame + static_cast<unsigned int>(
-                                                  (nodeData->mapAnim->endFrame - nodeData->mapAnim->startFrame) + 1);
+                    endFrame = next->frame +
+                               static_cast<unsigned int>((m_mapAnim->endFrame - m_mapAnim->startFrame) + 1);
                 }
 
                 unsigned int currentFrame = current->frame;
@@ -398,10 +389,10 @@ void CMapAnimNode::Interp(int frame)
     }
 
     {
-        CMapAnimNodeTrack* track = &nodeData->tracks->scale;
+        CMapAnimNodeTrack* track = &m_tracks->scale;
         CMapAnimNodeTrackKey* keys = track->keys;
         int trackCount = track->count;
-        Vec* out = &nodeData->node->scale;
+        Vec* out = &m_node->scale;
 
         if (trackCount == 1) {
             out->x = keys[0].value.x;
@@ -420,8 +411,8 @@ void CMapAnimNode::Interp(int frame)
                 if (nextIndex != 0) {
                     endFrame = next->frame;
                 } else {
-                    endFrame = next->frame + static_cast<unsigned int>(
-                                                  (nodeData->mapAnim->endFrame - nodeData->mapAnim->startFrame) + 1);
+                    endFrame = next->frame +
+                               static_cast<unsigned int>((m_mapAnim->endFrame - m_mapAnim->startFrame) + 1);
                 }
 
                 unsigned int currentFrame = current->frame;
@@ -448,7 +439,7 @@ void CMapAnimNode::Interp(int frame)
         }
     }
 
-    nodeData->node->dirty = 1;
+    m_node->dirty = 1;
 }
 
 /*
@@ -462,29 +453,17 @@ void CMapAnimNode::Interp(int frame)
  */
 CMapAnimKeyDt::~CMapAnimKeyDt()
 {
-    struct CMapAnimKeyDtData
-    {
-        unsigned int positionCount;
-        CMapAnimNodeTrackKey* position;
-        unsigned int rotationCount;
-        CMapAnimNodeTrackKey* rotation;
-        unsigned int scaleCount;
-        CMapAnimNodeTrackKey* scale;
-    };
-
-    CMapAnimKeyDtData* keyData = reinterpret_cast<CMapAnimKeyDtData*>(this);
-
-    if (keyData->position != 0) {
-        __dla__FPv(keyData->position);
-        keyData->position = 0;
+    if (m_positionKeys != 0) {
+        __dla__FPv(m_positionKeys);
+        m_positionKeys = 0;
     }
-    if (keyData->rotation != 0) {
-        __dla__FPv(keyData->rotation);
-        keyData->rotation = 0;
+    if (m_rotationKeys != 0) {
+        __dla__FPv(m_rotationKeys);
+        m_rotationKeys = 0;
     }
-    if (keyData->scale != 0) {
-        __dla__FPv(keyData->scale);
-        keyData->scale = 0;
+    if (m_scaleKeys != 0) {
+        __dla__FPv(m_scaleKeys);
+        m_scaleKeys = 0;
     }
 }
 

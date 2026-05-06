@@ -27,7 +27,7 @@ extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSe
 extern const float FLOAT_80331840;
 extern const float FLOAT_80331844;
 
-static const char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";
+extern const char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";
 
 struct TRACE_POLYGON {
     Vec pos;
@@ -72,8 +72,8 @@ union PackedColor {
     u8 bytes[4];
 };
 
-extern PackedColor g_pppYmTracer2_1;
-extern PackedColor g_pppYmTracer2_2;
+PackedColor g_pppYmTracer2_1;
+PackedColor g_pppYmTracer2_2;
 
 static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 {

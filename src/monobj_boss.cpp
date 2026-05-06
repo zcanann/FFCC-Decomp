@@ -1231,8 +1231,10 @@ void CGMonObj::changeStatFuncCaveWorm(int stat)
  */
 void CGMonObj::cancelStatFuncCaveWorm()
 {
-	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
 	}
 }
 

@@ -25,18 +25,13 @@ public:
     void Create(CChunkFile&, CMemory::CStage*, CAmemCacheSet*, int, int);
     void CacheLoadTexture(CAmemCacheSet*);
     void CacheUnLoadTexture(CAmemCacheSet*);
-    void CacheRefCnt0UpTexture(CAmemCacheSet*);
-    void CacheDumpTexture(CAmemCacheSet*);
     int CheckName(char*);
     void SetExternalTlut(void*, int);
     _GXColor GetTlutColor(int);
-    _GXColor GetExternalTlutColor(void*, int, int);
     void SetTlutColor(int, _GXColor);
     static void SetExternalTlutColor(void*, int, int, _GXColor&);
     void FlushTlut();
     void FlushExternalTlut(void*);
-    void FlushExternalTlut(void*, int);
-    int GetNumTlut();
 
     char m_name[0x20];
     GXTexObj m_texObj;

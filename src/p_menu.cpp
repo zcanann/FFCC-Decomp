@@ -16,11 +16,28 @@
 #include "ffcc/ref.h"
 #include "ffcc/ringmenu.h"
 extern "C" {
+extern const f32 FLOAT_80330804;
 extern const f32 kMenuInitOne;
 extern const f32 kMenuOrthoBottom;
 extern const f32 kMenuOrthoRight;
 extern const f32 kMenuOrthoFar;
 extern const f32 FLOAT_80330808;
+extern const f32 FLOAT_80330810;
+extern const f32 FLOAT_80330814;
+extern const f32 FLOAT_80330818;
+extern const f32 FLOAT_8033081C;
+extern const f32 FLOAT_80330820;
+extern const f32 FLOAT_80330824;
+extern const f32 FLOAT_80330828;
+extern const f32 FLOAT_8033082C;
+extern const f32 FLOAT_80330830;
+extern const f32 FLOAT_80330848;
+extern const f32 FLOAT_8033084C;
+extern const f32 FLOAT_80330850;
+extern const f32 FLOAT_80330854;
+extern const f32 FLOAT_80330858;
+extern const f32 FLOAT_8033085C;
+extern const f32 FLOAT_8033086C;
 }
 #include "ffcc/textureman.h"
 #include "ffcc/fontman.h"
@@ -87,6 +104,31 @@ static const char lbl_803307EC[] = "hp2";
 static const char lbl_803307F0[] = "suna";
 static const char lbl_803307F8[] = "gba";
 static const char lbl_803307FC[] = "battle2";
+
+extern "C" const f32 FLOAT_80330804 = 0.015625f;
+extern "C" const f32 FLOAT_80330808 = 1.0f;
+extern "C" const f32 kMenuInitOne = 0.0f;
+extern "C" const f32 FLOAT_80330810 = 320.0f;
+extern "C" const f32 FLOAT_80330814 = 224.0f;
+extern "C" const f32 FLOAT_80330818 = 16.0f;
+extern "C" const f32 FLOAT_8033081C = 432.0f;
+extern "C" const f32 FLOAT_80330820 = 8.0f;
+extern "C" const f32 FLOAT_80330824 = 255.0f;
+extern "C" const f32 FLOAT_80330828 = 3.0f;
+extern "C" const f32 FLOAT_8033082C = 4.0f;
+extern "C" const f32 FLOAT_80330830 = 2.0f;
+extern "C" const double DOUBLE_80330838 = 4503601774854144.0;
+extern "C" const double DOUBLE_80330840 = 4503599627370496.0;
+extern "C" const f32 FLOAT_80330848 = 0.05f;
+extern "C" const f32 FLOAT_8033084C = 0.5f;
+extern "C" const f32 FLOAT_80330850 = 120.0f;
+extern "C" const f32 FLOAT_80330854 = 56.0f;
+extern "C" const f32 FLOAT_80330858 = 7.0f;
+extern "C" const f32 FLOAT_8033085C = 245.0f;
+extern "C" const f32 kMenuOrthoBottom = 448.0f;
+extern "C" const f32 kMenuOrthoRight = 640.0f;
+extern "C" const f32 kMenuOrthoFar = -100.0f;
+extern "C" const f32 FLOAT_8033086C = 0.125f;
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* registration);
 extern "C" void __dt__8CMenuPcsFv(void*);
@@ -261,6 +303,11 @@ static inline void ReleaseRefObject(void* object)
     if (refCount == 0) {
         delete reinterpret_cast<CRef*>(object);
     }
+}
+
+static inline float LoadFloat(const float& value)
+{
+    return value;
 }
 
 /*
@@ -549,8 +596,8 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
             float blendInv = 0.0f;
 
             if (colorIndex >= 8) {
-                blend = 1.0f - static_cast<float>(colorIndex - 8) * 0.125f;
-                blendInv = 1.0f - blend;
+                blend = LoadFloat(FLOAT_80330808) - static_cast<float>(colorIndex - 8) * LoadFloat(FLOAT_8033086C);
+                blendInv = LoadFloat(FLOAT_80330808) - blend;
             }
 
             for (int tlutIndex = 0; tlutIndex < 0x1C; tlutIndex++) {
@@ -1787,9 +1834,9 @@ void CMenuPcs::drawBattle()
 {
     if (m_battleHud.m_visible != 0) {
         const float frame = static_cast<float>(m_battleHud.m_fadeCounter);
-        float fade = 1.0f - (frame * 0.05f);
-        if (fade < 0.0f) {
-            fade = 0.0f;
+        float fade = LoadFloat(FLOAT_80330808) - (frame * LoadFloat(FLOAT_80330804));
+        if (fade < LoadFloat(kMenuInitOne)) {
+            fade = LoadFloat(kMenuInitOne);
         }
 
         Mtx cameraMtx;
@@ -1798,33 +1845,33 @@ void CMenuPcs::drawBattle()
         Vec4d projected;
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTXCopy(cameraMtx, reinterpret_cast<MtxPtr>(viewMtx));
-        viewMtx[3][0] = 0.0f;
-        viewMtx[3][1] = 0.0f;
-        viewMtx[3][2] = 0.0f;
-        viewMtx[3][3] = 1.0f;
+        viewMtx[3][0] = LoadFloat(kMenuInitOne);
+        viewMtx[3][1] = LoadFloat(kMenuInitOne);
+        viewMtx[3][2] = LoadFloat(kMenuInitOne);
+        viewMtx[3][3] = LoadFloat(FLOAT_80330808);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         PSMTX44Concat(screenMtx, viewMtx, screenMtx);
         Math.MTX44MultVec4(screenMtx, reinterpret_cast<Vec*>(m_battleHud.m_worldPos), &projected);
 
-        if (projected.w > 0.0f) {
+        if (projected.w > LoadFloat(kMenuInitOne)) {
             const int totalWidth = static_cast<int>(static_cast<float>(m_battleHud.m_width) * fade);
             const int halfWidth = totalWidth / 2;
-            float screenX = 320.0f + (320.0f * projected.x) / projected.w;
-            float screenY = 240.0f - (240.0f * projected.y) / projected.w;
+            float screenX = LoadFloat(FLOAT_80330810) + (LoadFloat(FLOAT_80330810) * projected.x) / projected.w;
+            float screenY = LoadFloat(FLOAT_80330814) - (LoadFloat(FLOAT_80330814) * projected.y) / projected.w;
 
             if (screenX < static_cast<float>(halfWidth)) {
                 screenX = static_cast<float>(halfWidth);
             } else {
-                const float right = 640.0f - static_cast<float>(halfWidth);
+                const float right = LoadFloat(kMenuOrthoRight) - static_cast<float>(halfWidth);
                 if (screenX > right) {
                     screenX = right;
                 }
             }
 
-            if (screenY < 32.0f) {
-                screenY = 32.0f;
-            } else if (screenY > 448.0f) {
-                screenY = 448.0f;
+            if (screenY < LoadFloat(FLOAT_80330818)) {
+                screenY = LoadFloat(FLOAT_80330818);
+            } else if (screenY > LoadFloat(FLOAT_8033081C)) {
+                screenY = LoadFloat(FLOAT_8033081C);
             }
 
             int fillWidth = 0;
@@ -1833,8 +1880,8 @@ void CMenuPcs::drawBattle()
             }
 
             const float left = screenX - static_cast<float>(halfWidth);
-            const float bodyLeft = left + 8.0f;
-            const float alphaF = 80.0f * fade;
+            const float bodyLeft = left + LoadFloat(FLOAT_80330820);
+            const float alphaF = LoadFloat(FLOAT_80330824) * fade;
             const u8 alpha = static_cast<u8>(alphaF);
             const CColor frameColor(0xFF, 0xFF, 0xFF, alpha);
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
@@ -1846,13 +1893,13 @@ void CMenuPcs::drawBattle()
                     Mtx texMtx;
                     const u32 width = tex->m_width;
                     const u32 height = tex->m_height;
-                    PSMTXScale(texMtx, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
+                    PSMTXScale(texMtx, LoadFloat(FLOAT_80330808) / static_cast<float>(width), LoadFloat(FLOAT_80330808) / static_cast<float>(height), LoadFloat(FLOAT_80330808));
                     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
                     GXSetNumTexGens(1);
                     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 }
                 TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, left, screenY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                MenuPcs.DrawRect(0, left, screenY, LoadFloat(FLOAT_80330820), LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
 
                 tex = MenuPcs.m_textures[0xDE];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
@@ -1860,13 +1907,13 @@ void CMenuPcs::drawBattle()
                     Mtx texMtx;
                     const u32 width = tex->m_width;
                     const u32 height = tex->m_height;
-                    PSMTXScale(texMtx, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
+                    PSMTXScale(texMtx, LoadFloat(FLOAT_80330808) / static_cast<float>(width), LoadFloat(FLOAT_80330808) / static_cast<float>(height), LoadFloat(FLOAT_80330808));
                     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
                     GXSetNumTexGens(1);
                     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 }
                 TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, bodyLeft, screenY, static_cast<float>(totalWidth - 16), 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                MenuPcs.DrawRect(0, bodyLeft, screenY, static_cast<float>(totalWidth - 16), LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
 
                 tex = MenuPcs.m_textures[0xDF];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
@@ -1874,25 +1921,25 @@ void CMenuPcs::drawBattle()
                     Mtx texMtx;
                     const u32 width = tex->m_width;
                     const u32 height = tex->m_height;
-                    PSMTXScale(texMtx, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
+                    PSMTXScale(texMtx, LoadFloat(FLOAT_80330808) / static_cast<float>(width), LoadFloat(FLOAT_80330808) / static_cast<float>(height), LoadFloat(FLOAT_80330808));
                     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
                     GXSetNumTexGens(1);
                     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 }
                 TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - 8.0f, screenY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - LoadFloat(FLOAT_80330820), screenY, LoadFloat(FLOAT_80330820), LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
             }
 
             const u8 gauge = static_cast<u8>((m_battleHud.m_gaugeCounter * 0xFF) >> 4);
             const CColor fillTop(0xFF, gauge, gauge, alpha);
             GXSetChanMatColor(GX_COLOR0A0, fillTop.color);
             TextureMan.SetTextureTev(0);
-            DrawRect(0, bodyLeft, screenY + 1.0f, static_cast<float>(fillWidth), 3.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+            DrawRect(0, bodyLeft, screenY + LoadFloat(FLOAT_80330830), static_cast<float>(fillWidth), LoadFloat(FLOAT_8033082C), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
 
             const u8 gaugeTop = static_cast<u8>(((m_battleHud.m_gaugeCounter * 0x7F) >> 4) + 0x80);
             const CColor fillBottom(0xFF, gaugeTop, gauge, alpha);
             GXSetChanMatColor(GX_COLOR0A0, fillBottom.color);
-            DrawRect(0, bodyLeft, screenY + 4.0f, static_cast<float>(fillWidth), 3.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+            DrawRect(0, bodyLeft, screenY + LoadFloat(FLOAT_80330828), static_cast<float>(fillWidth), LoadFloat(FLOAT_80330830), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
         }
     }
 

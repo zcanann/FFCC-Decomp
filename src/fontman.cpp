@@ -33,8 +33,8 @@ struct CFontRenderFlagBits
 	signed char shadow : 1;
 	signed char zCompare : 1;
 	signed char zUpdate : 1;
-	signed char snapPosition : 1;
 	signed char fixedWidth : 1;
+	signed char snapPosition : 1;
 	signed char pad : 3;
 };
 
@@ -254,6 +254,7 @@ found_fallback:
 	}
 
 	unsigned char flags = renderFlags;
+	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 	signed char sign = static_cast<signed char>(flags) >> 7;
 	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) +
 	                           ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 3);
@@ -263,7 +264,7 @@ found_fallback:
 	float u0;
 	float v0;
 
-	if (static_cast<int>((static_cast<unsigned int>(flags) << 27) | static_cast<unsigned int>(flags >> 5)) < 0) {
+	if (renderFlagBits.fixedWidth != 0) {
 		drawWidth = static_cast<int>(m_glyphWidth);
 		glyphIndex = static_cast<int>(*glyph);
 		row = glyphIndex / m_glyphColumns;
@@ -279,7 +280,7 @@ found_fallback:
 
 	float x0 = posX;
 	float y0 = posY;
-	if (static_cast<int>((static_cast<unsigned int>(flags) << 28) | static_cast<unsigned int>(flags >> 4)) < 0) {
+	if (renderFlagBits.snapPosition != 0) {
 		x0 = static_cast<float>(floor(x0));
 		y0 = static_cast<float>(floor(y0));
 	}
@@ -290,7 +291,7 @@ found_fallback:
 	float u1 = u0 + static_cast<float>(drawWidth * 2);
 	float v1 = v0 + static_cast<float>(m_glyphHeight * 2);
 
-	if (static_cast<int>((static_cast<unsigned int>(flags) << 28) | static_cast<unsigned int>(flags >> 4)) < 0) {
+	if (renderFlagBits.snapPosition != 0) {
 		advance = static_cast<float>(floor(advance));
 	}
 	posX += advance;
@@ -439,8 +440,8 @@ void CFont::DrawInit()
 
     TextureMan.SetTextureTev(texturePtr);
 
-    renderFlagBits.snapPosition = 0;
     renderFlagBits.fixedWidth = 0;
+    renderFlagBits.snapPosition = 0;
 }
 
 /*
@@ -513,8 +514,8 @@ void CFont::SetTlut(int index)
  */
 void CFont::SetColor(_GXColor color)
 {
-	unsigned char green = color.g;
 	m_color.r = color.r;
+	unsigned char green = color.g;
 	unsigned char blue = color.b;
 	m_color.g = green;
 	green = color.a;
@@ -782,7 +783,7 @@ CFont::CFont()
 	bits.shadow = 0;
 	scaleY = FLOAT_803306C8;
 	scaleX = FLOAT_803306C8;
-	bits.fixedWidth = 0;
+	bits.snapPosition = 0;
 	m_color.r = 0xFF;
 	m_color.g = 0xFF;
 	m_color.b = 0xFF;
@@ -869,7 +870,7 @@ void CFontMan::Init()
 		bits.shadow = 0;
 		font->scaleY = FLOAT_803306C8;
 		font->scaleX = FLOAT_803306C8;
-		bits.fixedWidth = 0;
+		bits.snapPosition = 0;
 		font->m_color.r = 0xFF;
 		font->m_color.g = 0xFF;
 		font->m_color.b = 0xFF;

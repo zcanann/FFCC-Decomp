@@ -26,9 +26,9 @@ extern const float FLOAT_80330c84;
 extern const double DOUBLE_80330c88;
 extern const float FLOAT_80330C90;
 extern const float FLOAT_80330C94;
-static const float FLOAT_80330C98 = 180.0f;
-static const float FLOAT_80330C9C = -180.0f;
-static const double DOUBLE_80330CA0 = 4503599627370496.0;
+extern const float FLOAT_80330C98 = 180.0f;
+extern const float FLOAT_80330C9C = -180.0f;
+extern const double DOUBLE_80330CA0 = 4503599627370496.0;
 extern const float FLOAT_80330CA8 = 2.0f;
 extern const double DOUBLE_80330CB0 = 0.5;
 }
@@ -310,11 +310,11 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     _GXColor debugColor;
     Vec debugPos;
     Vec pos;
-    Mtx drawMtx;
-    Mtx rotMtx;
-    Mtx sphereMtx;
     Mtx tempMtx;
+    Mtx sphereMtx;
+    Mtx rotMtx;
     pppFMATRIX viewMtx;
+    Mtx drawMtx;
 
     step = (YmBreathRenderStep*)pYmBreath;
     workOffset = offsets->m_serializedDataOffsets[0];

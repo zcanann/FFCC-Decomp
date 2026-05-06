@@ -21,15 +21,6 @@ extern CMenuPcs MenuPcs;
 
 unsigned char s_rank[0x20];
 
-static const char s_favoForceFr[] = "Force";
-static const char s_favoMusicFr[] = "Musique";
-static const char s_favoActiveFr[] = "Activ\xE9";
-static const char s_favoStereoFr[] = "St\xE9r\xE9o";
-static const char s_favoStrengthEs[] = "Fuerza";
-static const char s_favoDefenseEs[] = "Defensa";
-static const char s_favoMusicEs[] = "M\xFAsica";
-static const char s_favoOffEs[] = "Apagado";
-
 extern float FLOAT_80333040;
 extern float FLOAT_80333044;
 extern float FLOAT_80333048;
@@ -300,20 +291,18 @@ bool CMenuPcs::FavoClose()
     int finishedCount;
     int count;
     int frame;
-    int remaining;
     FavoEntry* entry;
 
     finishedCount = 0;
 	singMenuState->frame = singMenuState->frame + 1;
-    count = static_cast<unsigned short>(*favoList);
+    count = *favoList;
     entry = reinterpret_cast<FavoEntry*>(favoList + 4);
     frame = singMenuState->frame;
-    remaining = count;
     if (0 < count) {
-        do {
+        for (int i = 0; i < count; i++) {
             float step = FLOAT_80333040;
-            if (entry->startFrame <= frame) {
-                if (frame < entry->startFrame + entry->duration) {
+            if (frame >= entry->startFrame) {
+                if (entry->startFrame + entry->duration > frame) {
                     entry->step = entry->step + 1;
                     entry->alpha =
                         (float)-((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step - DOUBLE_80333050);
@@ -331,11 +320,15 @@ bool CMenuPcs::FavoClose()
                 }
             }
             entry++;
-            remaining = remaining + -1;
-        } while (remaining != 0);
+        }
     }
 
-	return count == finishedCount;
+	bool finished = false;
+	if (count == finishedCount) {
+		finished = true;
+	}
+
+	return finished;
 }
 
 /*
@@ -418,7 +411,6 @@ bool CMenuPcs::FavoOpen()
     int finishedCount;
     int count;
     int frame;
-    int remaining;
     FavoEntry* entry;
 
 	if (singMenuState->initialized == 0) {
@@ -427,15 +419,14 @@ bool CMenuPcs::FavoOpen()
 
     finishedCount = 0;
 	singMenuState->frame = singMenuState->frame + 1;
-    count = static_cast<unsigned short>(*favoList);
+    count = *favoList;
     entry = reinterpret_cast<FavoEntry*>(favoList + 4);
     frame = singMenuState->frame;
-    remaining = count;
     if (0 < count) {
-        do {
+        for (int i = 0; i < count; i++) {
             float step = FLOAT_80333040;
-            if (entry->startFrame <= frame) {
-                if (frame < entry->startFrame + entry->duration) {
+            if (frame >= entry->startFrame) {
+                if (entry->startFrame + entry->duration > frame) {
                     entry->step = entry->step + 1;
                     entry->alpha = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
                     if ((entry->flags & 2) == 0) {
@@ -451,11 +442,15 @@ bool CMenuPcs::FavoOpen()
                 }
             }
             entry++;
-            remaining = remaining + -1;
-        } while (remaining != 0);
+        }
     }
 
-	return count == finishedCount;
+	bool finished = false;
+	if (count == finishedCount) {
+		finished = true;
+	}
+
+	return finished;
 }
 
 /*

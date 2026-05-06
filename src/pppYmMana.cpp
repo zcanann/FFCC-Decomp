@@ -1035,12 +1035,12 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 
                 *(u32*)(ownerModel + 0xE4) = (u32)work;
                 *(u32*)(ownerModel + 0xE8) = (u32)step;
-                *(u32*)(ownerModel + 0xF0) = (u32)Mana_BeforeDrawShadowLockEnvCallback;
+                *(u32*)(ownerModel + 0xF8) = (u32)Mana_BeforeDrawShadowLockEnvCallback;
                 *(u32*)(ownerModel + 0x100) = (u32)Chara_DrawShadowMeshDLCallback;
                 Draw__Q29CCharaPcs7CHandleFi(owner, 1);
                 *(u32*)(ownerModel + 0xE4) = 0;
                 *(u32*)(ownerModel + 0xE8) = 0;
-                *(u32*)(ownerModel + 0xF0) = 0;
+                *(u32*)(ownerModel + 0xF8) = 0;
                 *(u32*)(ownerModel + 0x100) = 0;
             }
 
@@ -1179,20 +1179,19 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
         pairCount = 8;
         quadIndex = rowBase;
         do {
-            *(short*)((char*)indicesOut + indexOffset) = quadIndex;
-            *(short*)((char*)indicesOut + indexOffset + 2) = quadIndex + 1;
-            *(short*)((char*)indicesOut + indexOffset + 4) = quadIndex + 0x12;
-            *(short*)((char*)indicesOut + indexOffset + 6) = quadIndex + 0x12;
-            *(short*)((char*)indicesOut + indexOffset + 8) = quadIndex + 0x11;
-            *(short*)((char*)indicesOut + indexOffset + 10) = quadIndex;
-            *(short*)((char*)indicesOut + indexOffset + 0xC) = quadIndex + 1;
-            *(short*)((char*)indicesOut + indexOffset + 0xE) = quadIndex + 2;
-            *(short*)((char*)indicesOut + indexOffset + 0x10) = quadIndex + 0x13;
-            *(short*)((char*)indicesOut + indexOffset + 0x12) = quadIndex + 0x13;
-            *(short*)((char*)indicesOut + indexOffset + 0x14) = quadIndex + 0x12;
-            *(short*)((char*)indicesOut + indexOffset + 0x16) = quadIndex + 1;
+            indicesOut[indexOffset++] = quadIndex;
+            indicesOut[indexOffset++] = quadIndex + 1;
+            indicesOut[indexOffset++] = quadIndex + 0x12;
+            indicesOut[indexOffset++] = quadIndex + 0x12;
+            indicesOut[indexOffset++] = quadIndex + 0x11;
+            indicesOut[indexOffset++] = quadIndex;
+            indicesOut[indexOffset++] = quadIndex + 1;
+            indicesOut[indexOffset++] = quadIndex + 2;
+            indicesOut[indexOffset++] = quadIndex + 0x13;
+            indicesOut[indexOffset++] = quadIndex + 0x13;
+            indicesOut[indexOffset++] = quadIndex + 0x12;
+            indicesOut[indexOffset++] = quadIndex + 1;
             quadIndex = quadIndex + 2;
-            indexOffset += 0x18;
             pairCount = pairCount + -1;
         } while (pairCount != 0);
         rowCount = rowCount + 1;
@@ -1702,11 +1701,11 @@ void CalcReflectionVector2(
     Mtx rotateMtx;
     u16* dl = (u16*)displayList;
     u16* dlEnd = (u16*)((u8*)displayList + displayListSize);
-    const double zero = (double)FLOAT_80330e4c;
-    const double denomBias = (double)FLOAT_80330e58;
-    const double half = (double)FLOAT_80330e5c;
-    const double warp = (double)FLOAT_80330e60;
-    const double scale = (double)FLOAT_80330e64;
+    const float zero = FLOAT_80330e4c;
+    const float denomBias = FLOAT_80330e58;
+    const float half = FLOAT_80330e5c;
+    const float warp = FLOAT_80330e60;
+    const float scale = FLOAT_80330e64;
     char* compareName = (char*)&Game + 0xC7F4;
 
     cameraPos.x = CameraWorldX();
@@ -1750,14 +1749,14 @@ void CalcReflectionVector2(
         for (i = 0; i < itemCount; i++) {
             u16 posIndex = dl[0];
             u16 normalIndex = dl[1];
-            u16* next = dl + 4;
             float denom;
-            double uVal;
-            double vVal;
+            float uVal;
+            float vVal;
             u8* colorBytes = (u8*)&color[posIndex];
 
+            dl += 4;
             if ((drawFmt & 7) == 2) {
-                next = dl + 5;
+                dl++;
             }
 
             ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &position, positions[posIndex], posScale);
@@ -1772,7 +1771,7 @@ void CalcReflectionVector2(
                 PSMTXMultVec(rotateMtx, &reflectionVec[posIndex], &reflectionVec[posIndex]);
             }
 
-            if ((double)reflectionVec[posIndex].z < zero) {
+            if (reflectionVec[posIndex].z < zero) {
                 colorBytes[0] = 0;
                 colorBytes[1] = 0;
                 colorBytes[2] = 0;
@@ -1784,21 +1783,19 @@ void CalcReflectionVector2(
                 colorBytes[3] = 0xFF;
             }
 
-            denom = (float)(denomBias + (double)reflectionVec[posIndex].z);
-            uVal = (double)(float)((double)(-reflectionVec[posIndex].x / denom) * half + half);
-            vVal = (double)(float)((double)(-reflectionVec[posIndex].y / denom) * half + half);
-            uv.x = -(float)(scale * (double)(float)(warp * (double)(float)(uVal - half) - uVal) - uVal);
-            uv.y = -(float)(scale * (double)(float)(warp * (double)(float)(vVal - half) - vVal) - vVal);
+            denom = denomBias + reflectionVec[posIndex].z;
+            uVal = (-reflectionVec[posIndex].x / denom) * half + half;
+            vVal = (-reflectionVec[posIndex].y / denom) * half + half;
+            uv.x = -(scale * (warp * (uVal - half)) - uVal);
+            uv.y = -(scale * (warp * (vVal - half)) - vVal);
             ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)gUtil, &texCoordA[posIndex], uv, 12);
 
-            denom = (float)(denomBias - (double)reflectionVec[posIndex].z);
-            uVal = (double)(float)((double)(-reflectionVec[posIndex].x / denom) * half + half);
-            vVal = (double)(float)((double)(-reflectionVec[posIndex].y / denom) * half + half);
-            uv.x = -(float)(scale * (double)(float)(warp * (double)(float)(uVal - half) - uVal) - uVal);
-            uv.y = -(float)(scale * (double)(float)(warp * (double)(float)(vVal - half) - vVal) - vVal);
+            denom = denomBias - reflectionVec[posIndex].z;
+            uVal = (-reflectionVec[posIndex].x / denom) * half + half;
+            vVal = (-reflectionVec[posIndex].y / denom) * half + half;
+            uv.x = -(scale * (warp * (uVal - half)) - uVal);
+            uv.y = -(scale * (warp * (vVal - half)) - vVal);
             ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)gUtil, &texCoordB[posIndex], uv, 12);
-
-            dl = next;
         }
     }
 

@@ -22,6 +22,8 @@ extern const float FLOAT_80331064 = 0.0078125f;
 extern const float FLOAT_80331068 = -1.0f;
 extern const float FLOAT_8033106C = 16777215.0f;
 extern const double DOUBLE_80331070 = 4503601774854144.0;
+unsigned long long g_chara_fur_1;
+unsigned long long g_chara_fur_2;
 
 struct Vec4d
 {
@@ -1890,8 +1892,9 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 	int centerY = (int)((float)height * fy);
 	int dy;
 
-	*centerBefore = CColor(0x0f, 0x0f, 0x0f, 0).color;
-	*centerAfter = *centerBefore;
+	_GXColor defaultColor = {0x0f, 0x0f, 0x0f, 0};
+	*centerAfter = defaultColor;
+	*centerBefore = *centerAfter;
 
 	DCInvalidateRange(pixels, texelCountBytes);
 
@@ -1913,8 +1916,10 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			}
 
 			distance = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
-			tileIndex = ((((px >> 2) & 1) + (((py >> 2) & 1) * 4) + (px >> 3) * 0x10 + (py >> 3) * width * 4) * 2) +
-			            (((px & 3) + ((py & 3) * 4)) * 2);
+			unsigned int ux = px;
+			unsigned int uy = py;
+			tileIndex = ((((ux >> 2) & 1) + (((uy >> 2) & 1) * 4) + (ux >> 3) * 0x10 + (uy >> 3) * width * 4) * 2) +
+			            (((ux & 3) + ((uy & 3) * 4)) * 2);
 			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
 
 			b = packed & 0x0f;
@@ -1926,8 +1931,14 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 				*centerBefore = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
 			}
 
-			if (mode == 0) {
-				float k = (float)(distance + (7 - targetColor.a)) / 8.0f;
+			if (mode != 0) {
+				int reduce = (targetColor.a * (4 - distance)) / 4;
+				a -= reduce;
+				if (a < 0) {
+					a = 0;
+				}
+			} else {
+				float k = (float)(distance / 4) + (float)(7 - targetColor.a) / 8.0f;
 				if (k > 1.0f) {
 					k = 1.0f;
 				}
@@ -1951,12 +1962,6 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 					b = 0;
 				} else if (b > 0x0f) {
 					b = 0x0f;
-				}
-			} else {
-				int reduce = (targetColor.a * (4 - distance)) / 4;
-				a -= reduce;
-				if (a < 0) {
-					a = 0;
 				}
 			}
 

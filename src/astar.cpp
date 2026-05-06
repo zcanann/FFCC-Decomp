@@ -166,15 +166,15 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	escapeDir.Normalize();
 
 	float behindBestDist = kAStarEscapeInitialBestDist;
+	CAPos* portal = m_portals;
 	CAPos* behindBest = (CAPos*)0;
 	CAPos* aheadBest = (CAPos*)0;
-	int i = 0;
 	float aheadBestDist = behindBestDist;
-	CAPos* portal = m_portals;
+	int i = 0;
 
 	do
 	{
-		int otherGroup = portal->m_groupA;
+		unsigned char otherGroup = portal->m_groupA;
 		bool exists = false;
 
 		if (otherGroup != 0 && portal->m_groupB != 0)
@@ -203,34 +203,33 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					CVector portalDirBase(base);
 					CVector portalDirPos(portal->m_position);
 					CVector dirToPortalSource;
-					CVector dirToPortal;
+					CVector portalVec;
 
 					PSVECSubtract(reinterpret_cast<Vec*>(&portalDirPos),
 					              reinterpret_cast<Vec*>(&portalDirBase),
 					              reinterpret_cast<Vec*>(&dirToPortalSource));
 
-					dirToPortal.x = dirToPortalSource.x;
-					dirToPortal.y = dirToPortalSource.y;
-					dirToPortal.z = dirToPortalSource.z;
-					dirToPortal.Normalize();
+					portalVec.x = dirToPortalSource.x;
+					portalVec.y = dirToPortalSource.y;
+					portalVec.z = dirToPortalSource.z;
+					portalVec.Normalize();
 
 					float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&escapeDir),
-					                            reinterpret_cast<Vec*>(&dirToPortal));
+					                            reinterpret_cast<Vec*>(&portalVec));
 
 					CVector distBase(base);
 					CVector distPortal(portal->m_position);
 					CVector distVecSource;
-					CVector distVec;
 
 					PSVECSubtract(reinterpret_cast<Vec*>(&distPortal),
 					              reinterpret_cast<Vec*>(&distBase),
 					              reinterpret_cast<Vec*>(&distVecSource));
 
-					distVec.x = distVecSource.x;
-					distVec.y = distVecSource.y;
-					distVec.z = distVecSource.z;
+					portalVec.x = distVecSource.x;
+					portalVec.y = distVecSource.y;
+					portalVec.z = distVecSource.z;
 
-					float dist = PSVECMag(reinterpret_cast<Vec*>(&distVec));
+					float dist = PSVECMag(reinterpret_cast<Vec*>(&portalVec));
 
 					if (dot < LoadFloat(kPolyGroupBaseXZ))
 					{
@@ -424,10 +423,7 @@ void CAStar::drawAStar()
 {
 	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x400) != 0)
 	{
-		int frameBucket = static_cast<int>(System.m_frameCounter) / 0x1e +
-		                  (static_cast<int>(System.m_frameCounter) >> 0x1f);
-
-		if (System.m_frameCounter == static_cast<unsigned int>((frameBucket - (frameBucket >> 0x1f)) * 0x1e))
+		if (static_cast<int>(System.m_frameCounter) % 30 == 0)
 		{
 			int group = 0;
 
@@ -1092,7 +1088,7 @@ void CAStar::CATemp::operator= (const CAStar::CATemp& other)
  */
 void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 {
-	CVector pos(x, y, z);
+	Vec* pos = reinterpret_cast<Vec*>(&CVector(x, y, z));
 
 	if (groupB < groupA)
 	{
@@ -1137,9 +1133,9 @@ void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 
 	CAPos& portal = m_portals[index];
 
-	portal.m_position.x = pos.x;
-	portal.m_position.y = pos.y;
-	portal.m_position.z = pos.z;
+	portal.m_position.x = pos->x;
+	portal.m_position.y = pos->y;
+	portal.m_position.z = pos->z;
 	m_portals[index].m_groupA = static_cast<unsigned char>(groupA);
 	m_portals[index].m_groupB = static_cast<unsigned char>(groupB);
 }

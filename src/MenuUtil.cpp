@@ -127,6 +127,8 @@ extern char s_Apagado_80333528[];
 extern char lbl_80333530[];
 extern char lbl_80333538[];
 extern char lbl_80333540[];
+extern "C" const char lbl_80333690[] = "Vide";
+extern "C" const char lbl_80333698[] = {'V', 'a', 'c', '\xED', 'o', '.', '\0', '\0'};
 
 extern "C" char* g_strMenuUtilMes[] = {
 	s_Strength_801E30A4, s_Defence_801E30B0, s_Position_Markers_801E30BC, s_Sound_Mode_801E30D0,
@@ -1006,10 +1008,14 @@ void CMenuPcs::CalcOptionMenu()
 				specialModeEdit = 0;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 
-				Game.m_gameWork.m_spModeFlags[0] = static_cast<unsigned char>(specialModeFlags[0]);
-				Game.m_gameWork.m_spModeFlags[1] = static_cast<unsigned char>(specialModeFlags[1]);
-				Game.m_gameWork.m_spModeFlags[2] = static_cast<unsigned char>(specialModeFlags[2]);
-				Game.m_gameWork.m_spModeFlags[3] = static_cast<unsigned char>(specialModeFlags[3]);
+				Game.m_gameWork.m_spModeFlags[0] =
+				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - specialModeFlags[0])) >> 5);
+				Game.m_gameWork.m_spModeFlags[1] =
+				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - specialModeFlags[1])) >> 5);
+				Game.m_gameWork.m_spModeFlags[2] =
+				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - specialModeFlags[2])) >> 5);
+				Game.m_gameWork.m_spModeFlags[3] =
+				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - specialModeFlags[3])) >> 5);
 			} else if ((press & 8) != 0) {
 				specialModeCursor--;
 				if (specialModeCursor < 0) {
@@ -1027,8 +1033,9 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (optionChanged) {
-		Game.m_gameWork.m_gameInitFlag = static_cast<unsigned char>(gameInitMode == 0);
-		Sound.SetStereo(stereoMode == 0);
+		Game.m_gameWork.m_gameInitFlag =
+		    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(static_cast<int>(gameInitMode))) >> 5);
+		Sound.SetStereo(static_cast<unsigned int>(__cntlzw(static_cast<int>(stereoMode))) >> 5);
 		Sound.SetSeMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(seVolume)));
 		Sound.SetBgmMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(bgmVolume)));
 	}

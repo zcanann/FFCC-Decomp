@@ -606,7 +606,8 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 	GXPosition3f32((float)x, (float)(y + height), 0.0f);
 	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
 
-	if (m_currentMenu->m_statusBits.m_selected != 0) {
+	s8 selected = static_cast<s32>((static_cast<u32>(m_currentMenu->m_status) << 25) & 0xC0000000) >> 31;
+	if (selected != 0) {
 		u8 alpha = 0xC0;
 
 		if ((System.m_frameCounter >> 2 & 1) != 0) {
@@ -682,10 +683,11 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
  * Address:	TODO
  * Size:	TODO
  */
-CDbgMenuPcs::CDM* CDbgMenuPcs::searchFreeCDM()
+inline CDbgMenuPcs::CDM* CDbgMenuPcs::searchFreeCDM()
 {
 	for (int i = 0; i < 0x80; i++) {
-		if (m_menuPool[i].m_statusBits.m_used == 0) {
+		s8 used = static_cast<s32>((static_cast<u32>(m_menuPool[i].m_status) << 24) & 0xC0000000) >> 31;
+		if (used == 0) {
 			return &m_menuPool[i];
 		}
 	}
@@ -871,8 +873,8 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 	menu->m_next = menu;
 	menu->m_id = id;
 
-	CDM* child = parentMenu->m_firstChild;
-	if (child != 0) {
+	if (parentMenu->m_firstChild != 0) {
+		CDM* child = parentMenu->m_firstChild;
 		int found = 0;
 		do {
 			if (found == 0 && ((child->m_flags & 1) != 0)) {

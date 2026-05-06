@@ -55,11 +55,8 @@ enum RedStreamAdpcmHeaderOffset {
 };
 
 struct RedStreamADPCMHeader {
-	u8 m_adpcmData[REDSOUND_STREAM_ADPCM_LOOP_PRED_SCALE_OFFSET];
-	s16 m_loopPredScale;
-	u16 m_loopYn1;
-	u16 m_loopYn2;
-	u8 m_reserved28[REDSOUND_STREAM_ADPCM_HEADER_SIZE - REDSOUND_STREAM_ADPCM_LOOP_YN2_OFFSET - sizeof(u16)];
+	AXPBADPCM m_data;
+	AXPBADPCMLOOP m_loop;
 };
 
 static RedStreamDATA* _SearchEmptyStreamData();
@@ -367,17 +364,17 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	if ((streamData->m_track != 0) && (streamData->m_buffer != 0) && (streamData->m_aramBuffer != 0)) {
 		sampleOffset = REDSOUND_STREAM_PAGE_SIZE;
 		headerData = reinterpret_cast<RedStreamADPCMHeader*>((u8*)streamHeader + REDSOUND_STREAM_FILE_HEADER_SIZE);
-		headerData->m_loopPredScale = (short)((s8*)streamHeader)[sampleOffset];
-		headerData->m_loopYn1 = headerData->m_loopYn2 = 0;
+		headerData->m_data.pred_scale = (short)((s8*)streamHeader)[sampleOffset];
+		headerData->m_data.yn1 = headerData->m_data.yn2 = 0;
 		if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 			if (streamData->m_header.m_loopStart < 0) {
 				sampleOffset += REDSOUND_STREAM_PAGE_SIZE;
 			} else {
 				sampleOffset += 8;
 			}
-			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_loopPredScale = (short)((s8*)streamHeader)[sampleOffset];
-			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_loopYn1 =
-			    headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_loopYn2 = 0;
+			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_data.pred_scale = (short)((s8*)streamHeader)[sampleOffset];
+			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_data.yn1 =
+			    headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_data.yn2 = 0;
 		}
 
 		streamData->m_streamId = streamID;

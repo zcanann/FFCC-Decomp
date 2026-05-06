@@ -45,11 +45,8 @@ enum RedNoteAllocFlag {
 };
 
 struct RedWaveADPCMInfo {
-	u8 m_coefficients[0x4A - 0x22 - 3 * sizeof(u16)];
-	s16 m_predScale;
-	u16 m_yn1;
-	u16 m_yn2;
-	u8 m_loop[0x50 - 0x4A];
+	AXPBADPCM m_data;
+	AXPBADPCMLOOP m_loop;
 };
 
 struct RedWaveDATA {

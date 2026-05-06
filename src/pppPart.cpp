@@ -40,7 +40,8 @@ static int CrossCheckSphereVectorRaw(Vec* outPos, float* outT, Vec* origin, Vec*
                                                                   scale, innerRadius, outerRadius);
 }
 
-static const float kPppZero = 0.0; // FLOAT_8032fddc
+extern "C" const float FLOAT_8032fddc;
+#define kPppZero FLOAT_8032fddc
 static const float kPppOne = 1.0; // FLOAT_8032fdfc
 static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
@@ -107,7 +108,6 @@ static inline unsigned char* PartPcsRaw() { return reinterpret_cast<unsigned cha
 static const char s_pppPart_cpp[] = "pppPart.cpp";
 static const char s_ERROR_prog_NULL[] = "\nERROR!!!! prog=NULL\n\n";
 static const char s_CPartPcs_heap_801D821C[] = "CPartPcs.heap";
-extern "C" float FLOAT_8032fddc;
 extern "C" float FLOAT_8032fde0;
 extern "C" float FLOAT_8032fde4;
 extern "C" float FLOAT_8032FDE8;

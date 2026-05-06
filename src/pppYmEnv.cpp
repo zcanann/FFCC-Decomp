@@ -102,11 +102,11 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
                        _GXTexObj* blendTexObj, unsigned char mode)
 {
     const unsigned char s_texObjIndices[] = {5, 2, 1, 0, 4, 5, 0, 0, 0, 0};
-    const unsigned char s_xAxisRotIndices[] = {0, 0, 0, 0, 1, 1, 0, 0, 2, 0};
-    const unsigned char s_yAxisRotIndices[] = {0, 1, 0, 0, 1, 0, 1, 0, 0, 1};
-    const float s_xAxisAngles[] = {0.0f, 90.0f, 180.0f, 270.0f};
-    const unsigned char s_xAxisIds[] = {'x', 'x', 'x', 'x'};
-    const float s_yAxisAngles[] = {0.0f, 1.0f};
+    const unsigned char s_xAxisRotIndices[] = {1, 1, 0, 0, 2, 0, 1, 3, 4, 2};
+    const unsigned char s_yAxisRotIndices[] = {1, 0, 4, 3, 0, 0, 0, 0, 0, 0};
+    const float s_xAxisAngles[] = {90.0f, 180.0f, 270.0f, 180.0f, -90.0f, 90.0f};
+    const unsigned char s_xAxisIds[] = {'y', 'y', 'y', 'y', 'x', 'x'};
+    const float s_yAxisAngles[] = {0.0f, 180.0f};
 
     const unsigned short texWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned short texHeight = GXGetTexObjHeight(targetTexObj);

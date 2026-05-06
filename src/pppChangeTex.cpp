@@ -33,7 +33,7 @@ struct ChangeTexDisplayList {
 };
 
 struct ChangeTexMeshData {
-	u8 _pad0[0x14];
+	char m_name[0x14];
 	u32 m_vertexCount;
 	u8 _pad18[0x8];
 	void* m_normals;
@@ -146,8 +146,8 @@ extern "C" {
 		void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 		void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvStChangeTex*);
 		void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
-		void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
-		void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(void*, void*, void*, void*, unsigned long, unsigned long);
+		void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
+		void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(CUtil*, Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
 }
 
 /*
@@ -254,9 +254,10 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		int arrayOffset = 0;
 		for (unsigned int meshIdx = 0; meshIdx < model0Raw->m_data->m_meshCount; meshIdx++) {
 			int meshHdr = *(int*)(meshList + 8);
-			if (strcmp((char*)meshHdr, sPppChangeTexMeshObjectName) == 0) {
+			ChangeTexMeshData* meshData = (ChangeTexMeshData*)meshHdr;
+			if (strcmp(meshData->m_name, sPppChangeTexMeshObjectName) == 0) {
 				CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
-				    &gUtil, &work->m_bboxMin, &work->m_bboxMax, *(void**)(meshList + 0xC), *(unsigned long*)(meshHdr + 0x14),
+				    &gUtil, &work->m_bboxMin, &work->m_bboxMax, (S16Vec*)*(void**)(meshList + 0xC), meshData->m_vertexCount,
 				    *(unsigned long*)(*(int*)((char*)model0 + 0xA4) + 0x34));
 			}
 

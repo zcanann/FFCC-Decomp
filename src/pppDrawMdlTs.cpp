@@ -14,39 +14,38 @@ void SetTexScroll__12CMaterialManFffff(CMaterialMan*, float, float, float, float
 }
 
 extern const float FLOAT_803304F0;
-
-// Use simple forward declarations and casting approach
-
-/*
- * --INFO--
- * PAL Address: 0x800880c0
- * PAL Size: 48b
- */
-void pppDrawMdlTsCon(struct _pppPObject* obj, struct PDrawMdlTs* data)
-{
-    u8* ptr = (u8*)obj + *(s32*)((u8*)*(void**)((u8*)data + 0xC) + 0x8) + 0x80;
-    f32 zero = FLOAT_803304F0;
-
-    *(f32*)(ptr + 0x14) = zero;
-    *(f32*)(ptr + 0x10) = zero;
-    *(f32*)(ptr + 0x0C) = zero;
-    *(f32*)(ptr + 0x08) = zero;
-    *(f32*)(ptr + 0x04) = zero;
-    *(f32*)(ptr + 0x00) = zero;
-}
+extern "C" const float kPppKeShpTail2XZero = 0.0f;
 
 /*
  * --INFO--
- * PAL Address: 0x800880a0  
- * PAL Size: 32b
+ * PAL Address: 0x80087ef0
+ * PAL Size: 224b
  */
-void pppDrawMdlTsCon3(struct _pppPObject* obj, struct PDrawMdlTs* data)
+void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl)
 {
-    u8* ptr = (u8*)obj + *(s32*)((u8*)*(void**)((u8*)data + 0xC) + 0x8) + 0x80;
-    f32 zero = FLOAT_803304F0;
+    if ((s32)*(u32*)((u8*)data + 4) == 0xFFFF) {
+        return;
+    }
 
-    *(f32*)(ptr + 0x14) = zero;
-    *(f32*)(ptr + 0x08) = zero;
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+        (u8*)obj + *(s32*)*(s32**)((u8*)ctrl + 0xC) + 0x88,
+        (u8*)obj + 0x40,
+        *(float*)((u8*)data + 0x10),
+        *(u8*)((u8*)data + 0x2C),
+        *(u8*)((u8*)data + 0xA),
+        *(u8*)((u8*)data + 0x9),
+        *(u8*)((u8*)data + 0xB),
+        *(u8*)((u8*)data + 0xC),
+        *(u8*)((u8*)data + 0xD),
+        *(u8*)((u8*)data + 0xE));
+
+    f32* texCoords = (f32*)((u8*)obj + (*(s32*)((u8*)*(s32**)((u8*)ctrl + 0xC) + 8)) + 0x80);
+    SetTexScroll__12CMaterialManFffff(&MaterialMan, texCoords[0], texCoords[3], FLOAT_803304F0, FLOAT_803304F0);
+
+    pppSetBlendMode(*(u8*)((u8*)data + 0x9));
+
+    void** modelsArray = *(void***)((u8*)pppEnvStPtr + 0x8);
+    pppDrawMesh__FP10pppModelStP3Veci(modelsArray[*(u32*)((u8*)data + 0x4)], *(void**)((u8*)obj + 0x70), 1);
 }
 
 /*
@@ -93,42 +92,32 @@ void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppC
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800880a0
+ * PAL Size: 32b
  */
-void pppDrawDrawMdlTs0(_pppPObject*, PDrawMdlTs*, _pppCtrlTable*)
+void pppDrawMdlTsCon3(struct _pppPObject* obj, struct PDrawMdlTs* data)
 {
-	// TODO
+    u8* ptr = (u8*)obj + *(s32*)((u8*)*(void**)((u8*)data + 0xC) + 0x8) + 0x80;
+    f32 zero = FLOAT_803304F0;
+
+    *(f32*)(ptr + 0x14) = zero;
+    *(f32*)(ptr + 0x08) = zero;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80087ef0 
- * PAL Size: 224b
+ * PAL Address: 0x800880c0
+ * PAL Size: 48b
  */
-void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl)
+void pppDrawMdlTsCon(struct _pppPObject* obj, struct PDrawMdlTs* data)
 {
-    if ((s32)*(u32*)((u8*)data + 4) == 0xFFFF) {
-        return;
-    }
+    u8* ptr = (u8*)obj + *(s32*)((u8*)*(void**)((u8*)data + 0xC) + 0x8) + 0x80;
+    f32 zero = FLOAT_803304F0;
 
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (u8*)obj + *(s32*)*(s32**)((u8*)ctrl + 0xC) + 0x88,
-        (u8*)obj + 0x40,
-        *(float*)((u8*)data + 0x10),
-        *(u8*)((u8*)data + 0x2C),
-        *(u8*)((u8*)data + 0xA),
-        *(u8*)((u8*)data + 0x9),
-        *(u8*)((u8*)data + 0xB),
-        *(u8*)((u8*)data + 0xC),
-        *(u8*)((u8*)data + 0xD),
-        *(u8*)((u8*)data + 0xE));
-
-    f32* texCoords = (f32*)((u8*)obj + (*(s32*)((u8*)*(s32**)((u8*)ctrl + 0xC) + 8)) + 0x80);
-    SetTexScroll__12CMaterialManFffff(&MaterialMan, texCoords[0], texCoords[3], FLOAT_803304F0, FLOAT_803304F0);
-
-    pppSetBlendMode(*(u8*)((u8*)data + 0x9));
-
-    void** modelsArray = *(void***)((u8*)pppEnvStPtr + 0x8);
-    pppDrawMesh__FP10pppModelStP3Veci(modelsArray[*(u32*)((u8*)data + 0x4)], *(void**)((u8*)obj + 0x70), 1);
+    *(f32*)(ptr + 0x14) = zero;
+    *(f32*)(ptr + 0x10) = zero;
+    *(f32*)(ptr + 0x0C) = zero;
+    *(f32*)(ptr + 0x08) = zero;
+    *(f32*)(ptr + 0x04) = zero;
+    *(f32*)(ptr + 0x00) = zero;
 }

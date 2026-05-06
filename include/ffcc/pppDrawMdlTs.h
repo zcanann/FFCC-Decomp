@@ -12,7 +12,6 @@ extern "C" {
 void pppDrawMdlTsCon(struct _pppPObject* obj, struct PDrawMdlTs* data);
 void pppDrawMdlTsCon3(struct _pppPObject* obj, struct PDrawMdlTs* data);
 void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl);
-void pppDrawDrawMdlTs0(struct _pppPObject*, struct PDrawMdlTs*, struct _pppCtrlTable*);
 void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus

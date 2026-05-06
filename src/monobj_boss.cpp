@@ -60,6 +60,7 @@ extern float FLOAT_80331d70;
 extern float FLOAT_80331d74;
 extern float FLOAT_80331d78;
 extern float FLOAT_80331d84;
+extern float FLOAT_80331d8c;
 extern float FLOAT_80331d90;
 extern float FLOAT_80331d94;
 extern float FLOAT_80331d98;
@@ -326,7 +327,7 @@ void CGMonObj::damagedFuncGolem()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-	if (script != 0 && script[7] == 0) {
+	if (script[0x1C / 2] == 0) {
 		object->DispCharaParts(7);
 	}
 }
@@ -1249,26 +1250,11 @@ void CGMonObj::cancelStatFuncCaveWorm()
  */
 void CGMonObj::frameStatFuncCaveWorm()
 {
-	#if 0
-	// Function: frameStatFuncCaveWorm__8CGMonObjFv
-	// Entry: 8013159c
-	// Size: 56 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void frameStatFuncCaveWorm__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    suikomi__8CGMonObjFif((double)FLOAT_80331d8c,gMonObj,0x6c);
-	  }
-	  return;
-	}
-	
-	#endif
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId >= 100) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	switch (prgObj->m_lastStateId) {
+	case 100:
+		suikomi(0x6c, FLOAT_80331d8c);
+		break;
 	}
 }
 

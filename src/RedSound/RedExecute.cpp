@@ -671,15 +671,15 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
     s16 rightPan;
     u16 uVar3;
     int volFactor;
-    u16* mixData;
+    AXPBMIX* mixData;
     int* voiceData = (int*)voice;
 
     if (trackData == 0) {
         return;
     }
 
-    mixData = (u16*)&voice->m_axMix;
-    memset(mixData, 0, sizeof(voice->m_axMix));
+    mixData = &voice->m_axMix;
+    memset(mixData, 0, sizeof(*mixData));
 
     switch (m_SoundPlayMode) {
     case 1:
@@ -688,43 +688,43 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_DRY_STEREO) != 0) {
             uVar3 = (u16)monoBase;
-            *mixData = uVar3;
-            mixData[REDSOUND_VOICE_AX_MIX_VR_INDEX] = uVar3;
+            mixData->vL = uVar3;
+            mixData->vR = uVar3;
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
             u16 monoMix = (u16)((monoBase * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT);
             if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
-                mixData[REDSOUND_VOICE_AX_MIX_AUX_A_L_INDEX] = monoMix;
-                mixData[REDSOUND_VOICE_AX_MIX_AUX_A_R_INDEX] = monoMix;
+                mixData->vAuxAL = monoMix;
+                mixData->vAuxAR = monoMix;
             } else {
-                mixData[REDSOUND_VOICE_AX_MIX_AUX_B_L_INDEX] = monoMix;
-                mixData[REDSOUND_VOICE_AX_MIX_AUX_B_R_INDEX] = monoMix;
+                mixData->vAuxBL = monoMix;
+                mixData->vAuxBR = monoMix;
             }
         }
         break;
     case 2:
-        *mixData = (u16)((volume * t_PanningData[pan]) >> 8);
-        *(s16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_B_L_WORD) = (s16)((volume * t_PanningDataR[pan]) >> 8);
-        *(s16*)(voiceData + REDSOUND_VOICE_AX_MIX_VR_WORD) = (s16)((volume * t_PanningData[pan ^ REDSOUND_PAN_BYTE_MASK]) >> 8);
-        *(s16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_B_R_WORD) = (s16)((volume * t_PanningDataR[pan ^ REDSOUND_PAN_BYTE_MASK]) >> 8);
+        mixData->vL = (u16)((volume * t_PanningData[pan]) >> 8);
+        mixData->vAuxBL = (u16)((volume * t_PanningDataR[pan]) >> 8);
+        mixData->vR = (u16)((volume * t_PanningData[pan ^ REDSOUND_PAN_BYTE_MASK]) >> 8);
+        mixData->vAuxBR = (u16)((volume * t_PanningDataR[pan ^ REDSOUND_PAN_BYTE_MASK]) >> 8);
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_LEFT) != 0) {
-            *(s16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_A_L_WORD) =
-                (s16)((int)((u32)*mixData * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT);
-            *(s16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_A_S_WORD) =
-                (s16)((int)((u32)*(u16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_B_L_WORD) *
+            mixData->vAuxAL =
+                (s16)((int)((u32)mixData->vL * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT);
+            mixData->vAuxAS =
+                (u16)((int)((u32)mixData->vAuxBL *
                              ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >>
                       REDSOUND_AX_MIX_SHIFT);
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_RIGHT) != 0) {
-            *(s16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_A_R_WORD) =
-                (s16)((int)((u32)*(u16*)(voiceData + REDSOUND_VOICE_AX_MIX_VR_WORD) *
+            mixData->vAuxAR =
+                (u16)((int)((u32)mixData->vR *
                              ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >>
                       REDSOUND_AX_MIX_SHIFT);
-            *(s16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_B_S_WORD) =
-                (s16)((int)((u32)*(u16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_B_R_WORD) *
+            mixData->vAuxBS =
+                (u16)((int)((u32)mixData->vAuxBR *
                              ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >>
                       REDSOUND_AX_MIX_SHIFT);
         }
@@ -740,28 +740,28 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         int rightMix = (volume * rightPan) >> 8;
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_DRY_LEFT) != 0) {
-            *mixData = (u16)leftMix;
+            mixData->vL = (u16)leftMix;
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_DRY_RIGHT) != 0) {
-            *(s16*)(voiceData + REDSOUND_VOICE_AX_MIX_VR_WORD) = (s16)rightMix;
+            mixData->vR = (u16)rightMix;
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_LEFT) != 0) {
             iVar1 = (leftMix * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT;
             if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
-                *(u16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_A_L_WORD) = (u16)iVar1;
+                mixData->vAuxAL = (u16)iVar1;
             } else {
-                *(u16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_B_L_WORD) = (u16)iVar1;
+                mixData->vAuxBL = (u16)iVar1;
             }
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_RIGHT) != 0) {
             iVar2 = (rightMix * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT;
             if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
-                *(u16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_A_R_WORD) = (u16)iVar2;
+                mixData->vAuxAR = (u16)iVar2;
             } else {
-                *(u16*)(voiceData + REDSOUND_VOICE_AX_MIX_AUX_B_R_WORD) = (u16)iVar2;
+                mixData->vAuxBR = (u16)iVar2;
             }
         }
         break;

@@ -200,17 +200,18 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 				remaining = 1;
 			}
 			scan--;
-		} while ((remaining != 0) && (*trackBasePtr <= track));
+		} while ((remaining != 0) && (track >= *trackBasePtr));
 
-		if (*trackBasePtr <= track) {
+		if (track >= *trackBasePtr) {
 			break;
 		}
-		if (_EraseTime(eraseTrack) == 0) {
+		remaining = _EraseTime(eraseTrack);
+		if (remaining == 0) {
 			break;
 		}
 	}
 
-	if (*trackBasePtr <= track) {
+	if (track >= *trackBasePtr) {
 		return track;
 	}
 

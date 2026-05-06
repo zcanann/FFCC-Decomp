@@ -53,6 +53,7 @@ u32 m_table__11CGraphicPcs[0x15C / sizeof(u32)] = {
 };
 
 extern "C" float FLOAT_8032fb78;
+extern "C" float FLOAT_8032FBC0;
 extern "C" float FLOAT_8032fbfc;
 extern "C" float FLOAT_8032fc00;
 
@@ -429,10 +430,10 @@ void CGraphicPcs::drawSFRect(float, float, float, float, _GXColor, _GXColor)
 void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, int centerY, _GXColor innerColor, _GXColor outerColor)
 {
     float ringPoints[32][4];
-    const float step = 0.19634955f;
+    const float step = FLOAT_8032FBC0;
 
     for (int i = 0; i < 32; i++) {
-        const double angle = (double)step * (double)i;
+        const float angle = step * (float)i;
         const float s = (float)sin(angle);
         const float c = (float)cos(angle);
 
@@ -443,23 +444,26 @@ void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, in
     }
 
     GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 0x80);
+    const float z = FLOAT_8032fb78;
+    const u32 innerColorWord = *(u32*)&innerColor;
+    const u32 outerColorWord = *(u32*)&outerColor;
     for (int i = 0; i < 32; i++) {
-        const int next = (i + 1) & 0x1F;
+        const int next = (i + 1) % 32;
 
-        GXPosition3f32(ringPoints[i][0], ringPoints[i][1], 0.0f);
-        GXColor1u32(*(u32*)&innerColor);
+        GXPosition3f32(ringPoints[i][0], ringPoints[i][1], z);
+        GXColor1u32(innerColorWord);
         GXTexCoord2u16(0, 0);
 
-        GXPosition3f32(ringPoints[next][0], ringPoints[next][1], 0.0f);
-        GXColor1u32(*(u32*)&innerColor);
+        GXPosition3f32(ringPoints[next][0], ringPoints[next][1], z);
+        GXColor1u32(innerColorWord);
         GXTexCoord2u16(0, 0);
 
-        GXPosition3f32(ringPoints[next][2], ringPoints[next][3], 0.0f);
-        GXColor1u32(*(u32*)&outerColor);
+        GXPosition3f32(ringPoints[next][2], ringPoints[next][3], z);
+        GXColor1u32(outerColorWord);
         GXTexCoord2u16(0, 0);
 
-        GXPosition3f32(ringPoints[i][2], ringPoints[i][3], 0.0f);
-        GXColor1u32(*(u32*)&outerColor);
+        GXPosition3f32(ringPoints[i][2], ringPoints[i][3], z);
+        GXColor1u32(outerColorWord);
         GXTexCoord2u16(0, 0);
     }
 }

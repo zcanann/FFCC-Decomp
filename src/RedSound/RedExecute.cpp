@@ -479,7 +479,6 @@ int* SetReverb(int bank, int kind, int* params)
     }
 
     reverb->m_kind = kind;
-    result = 0;
     switch (kind) {
     case REDSOUND_REVERB_KIND_STD: {
         AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)RedNew(sizeof(AXFX_REVERBSTD));

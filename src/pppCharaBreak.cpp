@@ -878,12 +878,11 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
  */
 void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
+    u8* polygonBytes = (u8*)polygonData;
     CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
     CharaBreakMeshData* meshData = meshRef->m_data;
     s32 isRigid = 0;
     S16Vec* workPositions;
-    u16* stream = (u16*)displayList;
-    u8* polygonBytes = (u8*)polygonData;
     BOOL transformPositions = FALSE;
     Mtx meshMtx;
 
@@ -893,6 +892,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                     meshMtx);
     }
     workPositions = meshRef->m_workPositions;
+    u16* stream = (u16*)displayList;
 
     s32 keepReading = 1;
     while (keepReading != 0) {
@@ -1012,11 +1012,9 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
         for (; materialIndex >= 0; materialIndex--) {
             CharaBreakDisplayListPair** meshTable =
                 reinterpret_cast<CharaBreakDisplayListPair**>(workData->m_meshBuffers) + meshIndex;
-            CharaBreakDisplayListPair* displayList =
-                *reinterpret_cast<CharaBreakDisplayListPair**>(reinterpret_cast<u8*>(*meshTable) + materialOffset);
-            POLYGON_DATA* vertexData = displayList->m_polygonData;
-            s32 faceIndex = 0;
-            u16 zero = 0;
+            CharaBreakDisplayListPair** displayListEntry =
+                reinterpret_cast<CharaBreakDisplayListPair**>(reinterpret_cast<u8*>(*meshTable) + materialOffset);
+            POLYGON_DATA* vertexData = (*displayListEntry)->m_polygonData;
 
             SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
                 &MaterialMan, ModelData(modelPtr)->m_materialSet, materialData->m_material, 0, 0);
@@ -1042,40 +1040,43 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
                 GXLoadPosMtxImm(drawMtx, 0);
             }
 
-            GXBegin((GXPrimitive)0x90, (GXVtxFmt)7, displayList->m_polygonCount * 3);
-            while (faceIndex < (s32)(u32)displayList->m_polygonCount) {
+            GXBegin((GXPrimitive)0x90, (GXVtxFmt)7, (*displayListEntry)->m_polygonCount * 3);
+            POLYGON_DATA* polygon = vertexData;
+            s32 faceIndex = 0;
+            u16 zero = 0;
+            while (faceIndex < (s32)(u32)(*displayListEntry)->m_polygonCount) {
                 faceIndex++;
-                s16 posX = vertexData->m_pos0.x;
-                s16 posY = vertexData->m_pos0.y;
-                s16 posZ = vertexData->m_pos0.z;
+                s16 posX = polygon->m_pos0.x;
+                s16 posY = polygon->m_pos0.y;
+                s16 posZ = polygon->m_pos0.z;
                 GXWGFifo.u16 = posX;
                 GXWGFifo.u16 = posY;
                 GXWGFifo.u16 = posZ;
-                GXWGFifo.u16 = vertexData->m_nrmIndices[0];
+                GXWGFifo.u16 = polygon->m_nrmIndices[0];
                 GXWGFifo.u16 = zero;
-                GXWGFifo.u16 = vertexData->m_texIndices[0];
-                GXWGFifo.u16 = vertexData->m_texIndices[0];
-                posX = vertexData->m_pos1.x;
-                posY = vertexData->m_pos1.y;
-                posZ = vertexData->m_pos1.z;
+                GXWGFifo.u16 = polygon->m_texIndices[0];
+                GXWGFifo.u16 = polygon->m_texIndices[0];
+                posX = polygon->m_pos1.x;
+                posY = polygon->m_pos1.y;
+                posZ = polygon->m_pos1.z;
                 GXWGFifo.u16 = posX;
                 GXWGFifo.u16 = posY;
                 GXWGFifo.u16 = posZ;
-                GXWGFifo.u16 = vertexData->m_nrmIndices[1];
+                GXWGFifo.u16 = polygon->m_nrmIndices[1];
                 GXWGFifo.u16 = zero;
-                GXWGFifo.u16 = vertexData->m_texIndices[1];
-                GXWGFifo.u16 = vertexData->m_texIndices[1];
-                posX = vertexData->m_pos2.x;
-                posY = vertexData->m_pos2.y;
-                posZ = vertexData->m_pos2.z;
+                GXWGFifo.u16 = polygon->m_texIndices[1];
+                GXWGFifo.u16 = polygon->m_texIndices[1];
+                posX = polygon->m_pos2.x;
+                posY = polygon->m_pos2.y;
+                posZ = polygon->m_pos2.z;
                 GXWGFifo.u16 = posX;
                 GXWGFifo.u16 = posY;
                 GXWGFifo.u16 = posZ;
-                GXWGFifo.u16 = vertexData->m_nrmIndices[2];
+                GXWGFifo.u16 = polygon->m_nrmIndices[2];
                 GXWGFifo.u16 = zero;
-                GXWGFifo.u16 = vertexData->m_texIndices[2];
-                vertexData++;
-                GXWGFifo.u16 = vertexData[-1].m_texIndices[2];
+                GXWGFifo.u16 = polygon->m_texIndices[2];
+                polygon++;
+                GXWGFifo.u16 = polygon[-1].m_texIndices[2];
             }
 
             materialOffset -= 4;

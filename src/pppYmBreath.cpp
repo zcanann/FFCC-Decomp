@@ -310,11 +310,11 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     _GXColor debugColor;
     Vec debugPos;
     Vec pos;
-    Mtx drawMtx;
-    Mtx rotMtx;
-    Mtx sphereMtx;
     Mtx tempMtx;
+    Mtx sphereMtx;
+    Mtx rotMtx;
     pppFMATRIX viewMtx;
+    Mtx drawMtx;
 
     step = (YmBreathRenderStep*)pYmBreath;
     workOffset = offsets->m_serializedDataOffsets[0];

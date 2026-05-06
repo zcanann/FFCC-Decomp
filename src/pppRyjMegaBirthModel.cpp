@@ -18,6 +18,8 @@ extern float FLOAT_803304bc;
 extern float FLOAT_803304c0;
 extern float FLOAT_803304c4;
 extern float FLOAT_803304c8;
+extern float FLOAT_803304CC;
+extern float FLOAT_803304D0;
 extern double DOUBLE_803304E0;
 extern float FLOAT_803304E8;
 
@@ -65,7 +67,7 @@ static inline unsigned char clamp_u8(float value)
 
 static float calc_spawn_speed(float speedMag, u8 speedMode)
 {
-    const float halfSpeed = speedMag * 0.5f;
+    const float halfSpeed = FLOAT_803304D0 * speedMag;
 
     switch (speedMode) {
     case 0:
@@ -76,11 +78,11 @@ static float calc_spawn_speed(float speedMag, u8 speedMode)
     case 2:
         return Math.RandF() * Math.RandF() * speedMag - halfSpeed;
     case 3:
-        return -(0.5f * (Math.RandF() * Math.RandF() * speedMag - speedMag)) - halfSpeed;
+        return -(FLOAT_803304CC * (Math.RandF() * Math.RandF() * speedMag) - speedMag) - halfSpeed;
     case 4:
         return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speedMag - halfSpeed;
     case 5:
-        return -(0.5f * (Math.RandF() * Math.RandF() * Math.RandF() * speedMag - speedMag)) - halfSpeed;
+        return -(FLOAT_803304D0 * (Math.RandF() * Math.RandF() * Math.RandF() * speedMag) - speedMag) - halfSpeed;
     default:
         return Math.RandF() * speedMag - halfSpeed;
     }

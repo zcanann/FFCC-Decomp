@@ -492,7 +492,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     int i;
     int groupIndex;
     int firstParticle;
-    int groupTable;
+    BreathParticleGroup* groupData;
     short slotIndex;
     int particleSlot;
     int slotCount;
@@ -519,7 +519,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     color = (VColor*)(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
 
     if (work->m_particleData == NULL) {
-        int* groupTable;
+        BreathParticleGroup* groupTable;
 
         work->m_particleCount = pBreathModel->m_particleCount;
         work->m_slotCount = pBreathModel->m_slotCount;
@@ -553,21 +553,19 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         if (work->m_groups != NULL) {
             memset(work->m_groups, 0, (unsigned long)((int)pBreathModel->m_groupCount * 0x5C));
 
-            groupTable = (int*)work->m_groups;
+            groupTable = work->m_groups;
             for (i = 0; i < (int)pBreathModel->m_groupCount; i++) {
-                groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                groupTable->particleIndices = (signed char*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                     (unsigned long)pBreathModel->m_slotCount,
                     pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x274);
-                void* particleIndices = (void*)groupTable[1];
-                memset(particleIndices, -1, (unsigned long)pBreathModel->m_slotCount);
+                memset(groupTable->particleIndices, -1, (unsigned long)pBreathModel->m_slotCount);
 
-                groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                groupTable->particleStates = (signed char*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                     (unsigned long)pBreathModel->m_slotCount,
                     pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x277);
-                void* particleStates = (void*)groupTable[2];
-                memset(particleStates, -1, (unsigned long)pBreathModel->m_slotCount);
-                groupTable[0] = 0;
-                groupTable += 0x17;
+                memset(groupTable->particleStates, -1, (unsigned long)pBreathModel->m_slotCount);
+                groupTable->active = 0;
+                groupTable++;
             }
         }
 
@@ -581,12 +579,11 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     UpdateAllParticle(reinterpret_cast<_pppPObject*>(breathModel), work, pBreathModel, color);
 
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
+    groupData = work->m_groups;
     for (groupIndex = 0; groupIndex < (int)pBreathModel->m_groupCount; groupIndex++) {
         slotCount = pBreathModel->m_slotCount;
-        groupTable = (int)((unsigned char*)work->m_groups + groupIndex * 0x5C);
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
-            if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
-                (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {
+            if ((groupData->particleIndices[slotIndex] == -1) || (groupData->particleStates[slotIndex] != 1)) {
                 ready = 0;
                 goto group_ready;
             }
@@ -596,12 +593,11 @@ group_ready:
         if (ready) {
             firstParticle = -1;
             scaledOwner = mngSt->m_previousPosition.z * pBreathModel->m_groupOwnerScale;
-            for (particleSlot = 0; slotCount != 0; slotCount--) {
-                if (*(signed char*)(*(int*)(groupTable + 8) + particleSlot) != -1) {
-                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + particleSlot);
+            for (particleSlot = 0; particleSlot < slotCount; particleSlot++) {
+                if (groupData->particleStates[particleSlot] != -1) {
+                    firstParticle = groupData->particleIndices[particleSlot];
                     break;
                 }
-                particleSlot++;
             }
 
             PSMTXIdentity(scaleMtx);
@@ -610,20 +606,21 @@ group_ready:
             scaleMtx[2][2] = scaledOwner;
             particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
             PSMTXConcat(*particleMtx, object->m_localMatrix.value, worldMtx);
-            PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
+            PSMTXMultVec(worldMtx, &groupData->position, &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
             rotMtx.value[0][3] = 0.0f;
             rotMtx.value[1][3] = 0.0f;
             rotMtx.value[2][3] = 0.0f;
-            *(float*)(groupTable + 0x28) = scaledOwner;
-            pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
+            groupData->scale = scaledOwner;
+            pppCopyVector(dir, groupData->direction);
             PSMTXMultVec(rotMtx.value, &dir, &dir);
             pppNormalize(dir, dir);
-            PSVECScale(&dir, &dir, *(float*)(groupTable + 0x24));
+            PSVECScale(&dir, &dir, groupData->speed);
             pppAddVector(target, origin, dir);
             pppSubVector(hitVector, target, origin);
             pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner, pBreathModel->m_groupRadius);
         }
+        groupData++;
     }
 }
 

@@ -298,7 +298,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     Vec* source;
     PARTICLE_WMAT* matrixList;
     float* colorDelta;
-    int* groupData;
+    YmBreathParticleGroup* groupData;
     int groupCount;
     long** shape;
     unsigned char colorR;
@@ -324,7 +324,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     source = reinterpret_cast<Vec*>(work->m_particleData);
     matrixList = work->m_particleWmats;
     colorDelta = reinterpret_cast<float*>(work->m_particleColors);
-    groupData = (int*)work->m_groups;
+    groupData = work->m_groups;
     groupCount = work->m_particleCount;
 
     if (params->m_shapeStepValue == 0xFFFF) {
@@ -421,9 +421,9 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     }
 
     if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x200000) != 0) {
-        int* debugGroupData = groupData;
+        YmBreathParticleGroup* debugGroupData = groupData;
         for (i = 0; i < (int)params->m_groupCount; i++) {
-            if (debugGroupData[0] == 1) {
+            if (debugGroupData->active == 1) {
                 int firstParticle;
                 int j;
                 float groupScale;
@@ -462,10 +462,10 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                 }
 
                 firstParticle = -1;
-                groupScale = *(float*)(debugGroupData + 10);
+                groupScale = debugGroupData->scale;
                 for (j = 0; j < (int)params->m_slotCount; j++) {
-                    if (*(signed char*)(debugGroupData[2] + j) != -1) {
-                        firstParticle = (int)*(signed char*)(debugGroupData[1] + j);
+                    if (debugGroupData->particleStates[j] != -1) {
+                        firstParticle = debugGroupData->particleIndices[j];
                         break;
                     }
                 }
@@ -477,13 +477,13 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
 
                 PSMTXConcat(work->m_particleWmats[firstParticle].m_matrix, ymBreath->m_localMatrix.value, tempMtx);
                 PSMTXConcat(ppvCameraMatrix, tempMtx, tempMtx);
-                PSMTXMultVec(tempMtx, (Vec*)(debugGroupData + 3), &debugPos);
+                PSMTXMultVec(tempMtx, &debugGroupData->position, &debugPos);
                 sphereMtx[0][3] = debugPos.x;
                 sphereMtx[1][3] = debugPos.y;
                 sphereMtx[2][3] = debugPos.z;
                 Graphic.DrawSphere(sphereMtx, debugColor);
             }
-            debugGroupData += 0x17;
+            debugGroupData++;
         }
 
         pppSetBlendMode(1);

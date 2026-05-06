@@ -200,7 +200,6 @@ p_camera.cpp:
 	.data       start:0x801E9030 end:0x801E9B24
 	.bss        start:0x80268790 end:0x80268C70
 	.sbss       start:0x8032ECE0 end:0x8032ECE1
-	.sbss2      start:0x80333DE8 end:0x80333DEC
 
 textureman.cpp:
 	extab       start:0x80006414 end:0x80006534
@@ -980,7 +979,6 @@ p_menu.cpp:
 	.data       start:0x8020EDF8 end:0x8020F2F8
 	.bss        start:0x802EA1A0 end:0x802EAA60
 	.sdata2     start:0x80330714 end:0x80330870
-	.sbss2      start:0x80333DEC end:0x80333DF0
 
 p_gba.cpp:
 	extab       start:0x80007CE0 end:0x80007D20
@@ -1204,7 +1202,6 @@ pppYmMana.cpp:
 	extabindex  start:0x8000F574 end:0x8000F628
 	.text       start:0x800D4C7C end:0x800D8710
 	.rodata     start:0x801DB4D8 end:0x801DB4E8
-	.sbss2      start:0x80333DF0 end:0x80333DF4
 
 p_sound.cpp:
 	extab       start:0x80008B94 end:0x80008BBC
@@ -1314,6 +1311,7 @@ chara_fur.cpp:
 	.rodata     start:0x801DB72C end:0x801DB740
 	.bss        start:0x802FF3D8 end:0x802FF408
 	.sdata2     start:0x80331060 end:0x803310C0
+	.sbss2      start:0x80333DE8 end:0x80333DF8
 
 pppYmEnv.cpp:
 	extab       start:0x80008D84 end:0x80008DB4
@@ -1321,7 +1319,6 @@ pppYmEnv.cpp:
 	.text       start:0x800E46DC end:0x800E6060
 	.rodata     start:0x801DB750 end:0x801DB7E8
 	.sdata2     start:0x803310C0 end:0x8033111C
-	.sbss2      start:0x80333DF4 end:0x80333DF8
 
 pppEmission.cpp:
 	extab       start:0x80008DB4 end:0x80008DE4

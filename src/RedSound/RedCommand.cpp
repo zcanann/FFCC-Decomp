@@ -743,7 +743,7 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 
 	if (musicHead->m_reverbKind != 0) {
 		unsigned int reverbKind = ((int)musicHead->m_reverbKind - 1U) & 7;
-		SetReverb(0, t_ReverbModeData[reverbKind].kind, t_ReverbModeData[reverbKind].params);
+		SetReverb(0, t_ReverbModeData[reverbKind].m_kind, t_ReverbModeData[reverbKind].m_params);
 	}
 
 	p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth = (int)musicHead->m_reverbDepth;

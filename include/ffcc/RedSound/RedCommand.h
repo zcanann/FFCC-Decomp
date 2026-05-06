@@ -26,8 +26,8 @@ enum RedReverbParamIndex {
 };
 
 struct RedReverbModeData {
-	int kind;
-	int params[REDSOUND_REVERB_MODE_PARAM_COUNT];
+	int m_kind;
+	int m_params[REDSOUND_REVERB_MODE_PARAM_COUNT];
 };
 
 RedTrackDATA* SearchSeEmptyTrack(int, int, int);

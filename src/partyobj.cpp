@@ -36,6 +36,7 @@ extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
 extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
+extern const char lbl_801DCB1C[];
 extern const char lbl_801DCB38[];
 
 static const char s_partyObjStateFmt[] = "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d";
@@ -137,6 +138,24 @@ struct PartyObjOverlay {
 static inline PartyObjOverlay& PartyData(CGPartyObj* self)
 {
 	return *reinterpret_cast<PartyObjOverlay*>(reinterpret_cast<unsigned char*>(self) + 0x6B8);
+}
+
+static inline int& CharaGhostValue(int offset)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + offset);
+}
+
+static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
+{
+	if (((static_cast<unsigned short>(attacker->GetCID()) & 0xAD) == 0xAD) && Game.m_gameWork.m_menuStageMode != 0) {
+		sGhostPartyWork.thresholdA++;
+		sGhostPartyWork.thresholdB++;
+		sGhostPartyWork.thresholdC++;
+		Printf__7CSystemFPce(&System, lbl_801DCB1C,
+		    sGhostPartyWork.thresholdA, CharaGhostValue(0x2048),
+		    sGhostPartyWork.thresholdB, CharaGhostValue(0x204C),
+		    sGhostPartyWork.thresholdC, CharaGhostValue(0x2050));
+	}
 }
 
 static unsigned short getPadHeldForSlot(int slot)
@@ -3167,10 +3186,7 @@ void CGPartyObj::PutMemoryCapsule(int arg0, int arg1, int arg2, int arg3, char* 
  */
 void CGPartyObj::onDamaged(CGPrgObj* attacker)
 {
-	CGPrgObj::onDamaged(attacker);
-	if (m_lastStateId == 0) {
-		PartyData(this).partyFlags |= 0x20;
-	}
+	UpdateGhostPartyDamageCounters(attacker);
 }
 
 /*
@@ -3184,10 +3200,7 @@ void CGPartyObj::onDamaged(CGPrgObj* attacker)
  */
 void CGPartyObj::onAttacked(CGPrgObj* attacker)
 {
-	CGPrgObj::onAttacked(attacker);
-	if (attacker != nullptr && m_lastStateId == 0) {
-		rotTarget(attacker);
-	}
+	UpdateGhostPartyDamageCounters(attacker);
 }
 
 /*

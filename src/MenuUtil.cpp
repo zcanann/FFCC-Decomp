@@ -1006,10 +1006,14 @@ void CMenuPcs::CalcOptionMenu()
 				specialModeEdit = 0;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 
-				Game.m_gameWork.m_spModeFlags[0] = static_cast<unsigned char>(specialModeFlags[0]);
-				Game.m_gameWork.m_spModeFlags[1] = static_cast<unsigned char>(specialModeFlags[1]);
-				Game.m_gameWork.m_spModeFlags[2] = static_cast<unsigned char>(specialModeFlags[2]);
-				Game.m_gameWork.m_spModeFlags[3] = static_cast<unsigned char>(specialModeFlags[3]);
+				Game.m_gameWork.m_spModeFlags[0] =
+				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - specialModeFlags[0])) >> 5);
+				Game.m_gameWork.m_spModeFlags[1] =
+				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - specialModeFlags[1])) >> 5);
+				Game.m_gameWork.m_spModeFlags[2] =
+				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - specialModeFlags[2])) >> 5);
+				Game.m_gameWork.m_spModeFlags[3] =
+				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - specialModeFlags[3])) >> 5);
 			} else if ((press & 8) != 0) {
 				specialModeCursor--;
 				if (specialModeCursor < 0) {
@@ -1027,8 +1031,9 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (optionChanged) {
-		Game.m_gameWork.m_gameInitFlag = static_cast<unsigned char>(gameInitMode == 0);
-		Sound.SetStereo(stereoMode == 0);
+		Game.m_gameWork.m_gameInitFlag =
+		    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(static_cast<int>(gameInitMode))) >> 5);
+		Sound.SetStereo(static_cast<unsigned int>(__cntlzw(static_cast<int>(stereoMode))) >> 5);
 		Sound.SetSeMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(seVolume)));
 		Sound.SetBgmMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(bgmVolume)));
 	}

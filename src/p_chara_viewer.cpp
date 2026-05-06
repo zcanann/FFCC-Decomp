@@ -127,7 +127,7 @@ char gCharaViewerSpinnerTextInitialized;
 int gCharaViewerSpinnerFrame;
 char gCharaViewerSpinnerFrameInitialized;
 int gCharaViewerSrtNeedsInit;
-char gCharaViewerSrtInitialized;
+char gCharaViewerSrtInitialized[8];
 }
 
 static inline void destroyRef(int* ref)
@@ -659,9 +659,9 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
             }
         }
 
-        if (gCharaViewerSrtInitialized == 0) {
+        if (gCharaViewerSrtInitialized[0] == 0) {
             gCharaViewerSrtNeedsInit = 1;
-            gCharaViewerSrtInitialized = 1;
+            gCharaViewerSrtInitialized[0] = 1;
         }
         if (gCharaViewerSrtNeedsInit != 0) {
             gCharaViewerSrt.transZ = kCharaViewerZero;

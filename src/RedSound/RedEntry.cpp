@@ -731,7 +731,7 @@ int CRedEntry::ReentryWaveData(int waveNo)
 void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 {
 	int used;
-	int* track;
+	RedTrackDATA* track;
 
 	if (mode == 0) {
 		used = 0;
@@ -744,16 +744,16 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 			used |= 1;
 		}
 		if (used == 0) {
-			int* trackHead = (int*)&p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
-			track = (int*)*trackHead;
+			RedTrackDATA** trackHead = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+			track = *trackHead;
 			do {
-				if (((*reinterpret_cast<unsigned int*>(track) != 0) && (*reinterpret_cast<unsigned int*>(track + 6) != 0)) &&
-				    (reinterpret_cast<RedWaveHeadWD*>(track[6])->m_waveNo == waveNo)) {
+				if (((u32)track->m_command != 0) && (track->m_waveBankData != 0) &&
+				    (track->m_waveBankData->m_waveNo == waveNo)) {
 					used++;
 					break;
 				}
-				track += REDSOUND_TRACK_SIZE / sizeof(*track);
-			} while (track < (int*)(*trackHead + REDSOUND_SE_TRACK_ARENA_SIZE));
+				track++;
+			} while (track < *trackHead + REDSOUND_SE_TRACK_COUNT);
 		}
 		if (used == 0) {
 			used = SearchWaveSequence(waveNo);

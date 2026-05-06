@@ -356,6 +356,11 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	}
 }
 
+extern const f64 DOUBLE_80330dd8 = 4503601774854144.0;
+extern const f32 FLOAT_80330de0 = -1.0f;
+extern const f32 FLOAT_80330de4 = 1.2f;
+extern const f32 FLOAT_80330de8 = 10000000000.0f;
+extern const f32 FLOAT_80330dec = -10000000000.0f;
 extern const f32 FLOAT_80330df0[2] = {6.2831855f, 0.0f};
 
 /*
@@ -425,7 +430,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 			}
 
 			s32 frameCount = step->m_payload[0x3a] + 1;
-			float t = -1.0f / (float)frameCount;
+			float t = FLOAT_80330de0 / (float)frameCount;
 			t *= (float)i;
 			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(pppMngStPtr, t, charaMtx) == 0) {
 				emptyHistory = 1;
@@ -437,14 +442,14 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		}
 
 		pppSubVector(localA, work->m_points[i], work->m_origin);
-		PSVECScale(&localA, &localA, 1.2f);
+		PSVECScale(&localA, &localA, FLOAT_80330de4);
 
-		cyl.m_top.z = 10000000000.0f;
-		cyl.m_top.y = 10000000000.0f;
-		cyl.m_top.x = 10000000000.0f;
-		cyl.m_direction2.z = -10000000000.0f;
-		cyl.m_direction2.y = -10000000000.0f;
-		cyl.m_direction2.x = -10000000000.0f;
+		cyl.m_top.z = FLOAT_80330de8;
+		cyl.m_top.y = FLOAT_80330de8;
+		cyl.m_top.x = FLOAT_80330de8;
+		cyl.m_direction2.z = FLOAT_80330dec;
+		cyl.m_direction2.y = FLOAT_80330dec;
+		cyl.m_direction2.x = FLOAT_80330dec;
 		cyl.m_bottom = work->m_origin;
 		cyl.m_direction = localA;
 		cyl.m_radius = kPppYmLaserOne;

@@ -1354,26 +1354,29 @@ void CGraphic::CopySaveFrameBuffer()
  */
 void CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int doClear)
 {
-    if (((x & 1) ^ (x >> 31)) != (x >> 31)) {
+    if ((x % 2) != 0) {
         x -= 1;
     }
-    if (((y & 1) ^ (y >> 31)) != (y >> 31)) {
+    if ((y % 2) != 0) {
         y -= 1;
     }
 
     int xEnd = x + width;
     int yEnd = y + height;
 
-    if (((xEnd & 1) ^ (xEnd >> 31)) != (xEnd >> 31)) {
+    if ((xEnd % 2) != 0) {
         xEnd += 1;
         width += 1;
     }
-    if (((yEnd & 1) ^ (yEnd >> 31)) != (yEnd >> 31)) {
+    if ((yEnd % 2) != 0) {
         yEnd += 1;
         height += 1;
     }
 
-    if ((xEnd < 0) || (yEnd < 0)) {
+    if (xEnd < 0) {
+        return;
+    }
+    if (yEnd < 0) {
         return;
     }
 
@@ -1387,7 +1390,6 @@ void CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int do
 
     if (xEnd > efbWidth) {
         width -= (xEnd - efbWidth);
-        xEnd = efbWidth;
     }
 
     if (x < 0) {
@@ -1402,7 +1404,6 @@ void CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int do
 
     if (yEnd > efbHeight) {
         height -= (yEnd - efbHeight);
-        yEnd = efbHeight;
     }
 
     if ((xEnd == x) || (yEnd == y)) {

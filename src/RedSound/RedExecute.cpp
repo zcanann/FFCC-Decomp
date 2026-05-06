@@ -1222,42 +1222,42 @@ skipModSetup:
  */
 static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voiceMask)
 {
-    int* voiceData;
+    RedVoiceDATA* voiceData;
 
     if ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) != 0) {
-        voiceData = (int*)p_VoiceData;
+        voiceData = p_VoiceData;
         do {
-            if ((RedTrackDATA*)*voiceData == track) {
+            if (voiceData->m_track == track) {
                 break;
             }
-            voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);
-        } while (voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
+            voiceData++;
+        } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
 
-        if (!(voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT))) {
-            voiceData = (int*)EntryVoiceSearch(track);
+        if (!(voiceData < p_VoiceData + REDSOUND_VOICE_COUNT)) {
+            voiceData = EntryVoiceSearch(track);
         }
     } else {
-        voiceData = (int*)EntryVoiceSearch(track);
+        voiceData = EntryVoiceSearch(track);
     }
 
     if (voiceData != 0) {
-        ((RedVoiceDATA*)voiceData)->m_waveData = _WaveSplitSelect(track->m_waveData, note);
-        _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
+        voiceData->m_waveData = _WaveSplitSelect(track->m_waveData, note);
+        _VoiceDataAsign(track, voiceData, note, voiceMask);
 
-        if (((((RedVoiceDATA*)voiceData)->m_waveData->m_flags & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) &&
+        if (((voiceData->m_waveData->m_flags & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) &&
             (((s8)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0)) {
-            RedWaveDATA* wave = ((RedVoiceDATA*)voiceData)->m_waveData;
-            ((RedVoiceDATA*)voiceData)->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAIRED_LEFT;
-            voiceData = (int*)EntryVoiceSearch(track);
+            RedWaveDATA* wave = voiceData->m_waveData;
+            voiceData->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAIRED_LEFT;
+            voiceData = EntryVoiceSearch(track);
             if (voiceData != 0) {
-                ((RedVoiceDATA*)voiceData)->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAIRED_RIGHT;
-                ((RedVoiceDATA*)voiceData)->m_waveData = wave + 1;
-                _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
+                voiceData->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAIRED_RIGHT;
+                voiceData->m_waveData = wave + 1;
+                _VoiceDataAsign(track, voiceData, note, voiceMask);
             }
         }
     }
 
-    return (RedVoiceDATA*)voiceData;
+    return voiceData;
 }
 
 /*

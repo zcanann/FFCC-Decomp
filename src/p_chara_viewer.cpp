@@ -788,8 +788,12 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
         p[0x12C + i * 4 + 3] = colorCopy[3];
     }
 
-    unsigned int clearColor = 0x404040FF;
-    *(unsigned int*)(p + 0x0C) = 0x404040FF;
+    _GXColor clearColor;
+    clearColor.r = 0x40;
+    clearColor.g = 0x40;
+    clearColor.b = 0x40;
+    clearColor.a = 0xFF;
+    *(unsigned int*)(p + 0x0C) = *reinterpret_cast<unsigned int*>(&clearColor);
     SetCopyClear__8CGraphicF8_GXColori(&Graphic, &clearColor, 0xFFFF);
 
     self->m_viewerModel[0] = 0;

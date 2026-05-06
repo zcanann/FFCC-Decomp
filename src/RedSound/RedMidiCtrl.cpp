@@ -722,7 +722,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
         control->m_savedCommand[slot] = scan->m_command;
         control->m_savedDelta[slot] = scan->m_deltaTime + deltaAdjust;
         control->m_savedFlags[slot] = scan->m_flags;
-        control->m_savedNote[slot] = *(int*)&scan->m_note;
+        *(int*)&control->m_savedNote[slot] = *(int*)&scan->m_note;
         slot++;
     }
 
@@ -735,7 +735,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
         control->m_savedCommand[slot] = command;
         control->m_savedDelta[slot] = scan->m_deltaTime + delta + deltaAdjust;
         control->m_savedFlags[slot] = scan->m_flags;
-        control->m_savedNote[slot] = *(int*)&scan->m_note;
+        *(int*)&control->m_savedNote[slot] = *(int*)&scan->m_note;
 
         if ((nextTrack - control->m_tracks) < control->m_trackCount) {
             for (; nextTrack < control->m_tracks + control->m_trackCount; nextTrack++) {
@@ -756,7 +756,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
                 control->m_savedCommand[slot + 1] = nextTrack->m_command;
                 control->m_savedDelta[slot + 1] = currentDelta;
                 control->m_savedFlags[slot + 1] = nextTrack->m_flags;
-                control->m_savedNote[slot + 1] = *(int*)&nextTrack->m_note;
+                *(int*)&control->m_savedNote[slot + 1] = *(int*)&nextTrack->m_note;
                 slot++;
             }
         }

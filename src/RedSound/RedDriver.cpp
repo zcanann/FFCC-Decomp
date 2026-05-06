@@ -20,10 +20,10 @@ extern "C" {
 }
 
 struct RedWaveSettingState {
-    int* slot;
-    int waveID;
-    void* waveData;
-    int waveSize;
+    int* m_slot;
+    int m_waveId;
+    void* m_waveData;
+    int m_waveSize;
 };
 
 enum RedDriverDmaLayoutSize {
@@ -993,8 +993,8 @@ static int _WaveSettingThread(void* threadArg)
         if (m_ThreadControl != 0) {
             RedWaveSettingState* waveSetting = (RedWaveSettingState*)threadArg;
             m_WaveSettingStatus = m_WaveSettingStatus + 1;
-            c_RedEntry.SetWaveData(waveSetting->waveID, waveSetting->waveData, waveSetting->waveSize);
-            *waveSetting->slot = 0;
+            c_RedEntry.SetWaveData(waveSetting->m_waveId, waveSetting->m_waveData, waveSetting->m_waveSize);
+            *waveSetting->m_slot = 0;
             do {
             } while (OSTryWaitSemaphore(&m_WaveSettingSemaphore) > 0);
             m_WaveSettingStatus = 0;
@@ -2290,9 +2290,9 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
         RedSleep(0);
     }
 
-    m_WaveSettingData.slot = reinterpret_cast<int*>(slot);
-    m_WaveSettingData.waveID = waveID;
-    m_WaveSettingData.waveData = waveData;
+    m_WaveSettingData.m_slot = reinterpret_cast<int*>(slot);
+    m_WaveSettingData.m_waveId = waveID;
+    m_WaveSettingData.m_waveData = waveData;
 
     if (waveSize == -1) {
         RedWaveHeadWD* const waveHeader = (RedWaveHeadWD*)waveData;
@@ -2304,12 +2304,12 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
             dataSize += waveHeader->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE;
             dataSize = waveHeader->m_waveSize + dataSize;
             dataSize += REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
-            m_WaveSettingData.waveSize = dataSize;
+            m_WaveSettingData.m_waveSize = dataSize;
         } else {
-            m_WaveSettingData.waveSize = 0;
+            m_WaveSettingData.m_waveSize = 0;
         }
     } else {
-        m_WaveSettingData.waveSize = waveSize;
+        m_WaveSettingData.m_waveSize = waveSize;
     }
     OSSignalSemaphore(&m_WaveSettingSemaphore);
 }

@@ -85,7 +85,8 @@ public:
     ZLIST m_zlist1; // 0xC8
     ZLIST m_zlist2; // 0xD8
 
-    unsigned char _padE8[0x44];
+    u32 m_displayTextureEnabled; // 0xE8
+    unsigned char _padEC[0x40];
 
     // Raw float words consumed by calcViewer (0x12C - 0x158)
     float field_0x12c;

@@ -194,6 +194,7 @@ public:
     int LoadAnim(int, int, char*, int, int, int);
     void GetAnimStage();
 
+    u8 _pad004[0xC8];                         // 0x004
     CMemory::CStage* m_viewerModelStage;      // 0x0CC
     CMemory::CStage* m_viewerTextureStage;    // 0x0D0
     CMemory::CStage* m_viewerAnimStage;       // 0x0D4

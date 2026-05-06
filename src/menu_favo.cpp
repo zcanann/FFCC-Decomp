@@ -422,15 +422,16 @@ bool CMenuPcs::FavoOpen()
     count = *favoList;
     entry = reinterpret_cast<FavoEntry*>(favoList + 4);
     frame = singMenuState->frame;
+    int remaining = count;
     if (0 < count) {
-        for (int i = 0; i < count; i++) {
+        do {
+            float resetStep = FLOAT_80333040;
             if (frame >= entry->startFrame) {
                 if (entry->startFrame + entry->duration <= frame) {
                     finishedCount = finishedCount + 1;
                     entry->alpha = FLOAT_80333048;
-                    float step = FLOAT_80333040;
-                    entry->dx = step;
-                    entry->dy = step;
+                    entry->dx = resetStep;
+                    entry->dy = resetStep;
                 } else {
                     entry->step = entry->step + 1;
                     entry->alpha = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
@@ -442,7 +443,8 @@ bool CMenuPcs::FavoOpen()
                 }
             }
             entry++;
-        }
+            remaining = remaining - 1;
+        } while (remaining != 0);
     }
 
 	bool finished = false;

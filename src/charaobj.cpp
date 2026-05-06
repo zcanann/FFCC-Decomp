@@ -142,7 +142,7 @@ static bool CharaObjIsAttackAnimBoundary(CGCharaObj* charaObj)
 	}
 
 	unsigned int frame = static_cast<unsigned int>(charaObj->m_turnSpeed);
-	if (*reinterpret_cast<float*>(charaObj->m_lastBgAttr) >= 0.05f) {
+	if (charaObj->m_lastBgAttr >= 0.05f) {
 		return span <= frame;
 	}
 
@@ -2194,7 +2194,7 @@ int CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, 
 				result = 1;
 			} else {
 				int frame = static_cast<int>(m_turnSpeed);
-				if (*reinterpret_cast<float*>(m_lastBgAttr) < FLOAT_80331988) {
+				if (m_lastBgAttr < FLOAT_80331988) {
 					result = ((frame % period) == 0) ? 1 : 0;
 				} else {
 					result = (period <= frame) ? 1 : 0;

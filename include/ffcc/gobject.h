@@ -224,7 +224,7 @@ public:
     float m_bgCharmFactor;            // 0x4BC
     float m_bgAttrValue;              // 0x4C0
     float m_animBlend;                // 0x4C4
-    unsigned char m_lastBgAttr[4];    // 0x4C8
+    float m_lastBgAttr;               // 0x4C8
     Vec m_radiusCtrl;                 // 0x4CC
     Vec m_radiusCtrlVel;              // 0x4D8
     float m_groundFriction;           // 0x4E4

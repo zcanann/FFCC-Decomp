@@ -1,9 +1,11 @@
 #ifndef _FFCC_MESMENU_H_
 #define _FFCC_MESMENU_H_
 
+#include "ffcc/menu.h"
+
 class _GXColor;
 
-class CMesMenu
+class CMesMenu : public CMenu
 {
 public:
     CMesMenu();

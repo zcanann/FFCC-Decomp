@@ -410,10 +410,10 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 		projected[i].y = screenCenterY - projected[i].y / screenScaleY;
 	}
 
-	minY = FLOAT_80330620;
+	maxX = FLOAT_80330624;
 	maxY = FLOAT_80330624;
-	minX = minY;
-	maxX = maxY;
+	minX = FLOAT_80330620;
+	minY = FLOAT_80330620;
 	for (i = 0; i < 4; i++) {
 		if (projected[i].x > maxX) {
 			maxX = projected[i].x;

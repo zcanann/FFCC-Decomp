@@ -196,14 +196,21 @@ static inline int* GetMenuHelpMsgTable()
 }
 }
 
-static unsigned short GetMenuPress()
+static inline unsigned short GetMenuPress()
 {
+	bool activeInput = false;
+
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		activeInput = true;
+	}
+
+	if (activeInput) {
 		return 0;
 	}
 
-	__cntlzw(static_cast<unsigned int>(Pad._448_4_));
-	return static_cast<unsigned short>(Pad._8_2_);
+	int padIndex = activeInput;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+	return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * 0x54 + 8);
 }
 
 /*
@@ -739,23 +746,10 @@ void CMenuPcs::InitOptionMenuParam()
 void CMenuPcs::CalcOptionMenu()
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
-	const float minValue = kOptionAnimMin;
-	const float maxValue = kOptionAnimMax;
-	const float animStep = kOptionRowAnimStep;
-	const float animStep2 = kOptionColumnAnimStep;
 	unsigned short press;
-	bool padBlocked = false;
 	bool optionChanged = false;
 
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-		padBlocked = true;
-	}
-	if (padBlocked) {
-		press = 0;
-	} else {
-		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
-		press = static_cast<unsigned short>(Pad._8_2_);
-	}
+	press = GetMenuPress();
 
 	signed char& menuState = *reinterpret_cast<signed char*>(self + 0x9C);
 	float& openAnim = *reinterpret_cast<float*>(self + 0x98);
@@ -776,39 +770,39 @@ void CMenuPcs::CalcOptionMenu()
 
 	if (menuState == 0) {
 		openAnim += kOptionOpenAnimStep;
-		if (openAnim < maxValue) {
+		if (!(openAnim >= kOptionAnimMax)) {
 			return;
 		}
 
 		menuState = 1;
-		openAnim = maxValue;
+		openAnim = kOptionAnimMax;
 		return;
 	}
 
 	if (menuState == 2) {
 		openAnim -= kOptionOpenAnimStep;
-		rowAnim -= animStep;
-		colAnim -= animStep2;
+		rowAnim -= kOptionRowAnimStep;
+		colAnim -= kOptionColumnAnimStep;
 
-		if (rowAnim <= minValue) {
-			rowAnim = minValue;
+		if (rowAnim <= kOptionAnimMin) {
+			rowAnim = kOptionAnimMin;
 		}
-		if (colAnim <= minValue) {
-			colAnim = minValue;
+		if (colAnim <= kOptionAnimMin) {
+			colAnim = kOptionAnimMin;
 		}
 		if (static_cast<int>(openAnim / kOptionOpenAnimStep) == 5) {
 			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
 		}
-		if (openAnim > minValue) {
+		if (!(openAnim <= kOptionAnimMin)) {
 			return;
 		}
 
 		*reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(self + 0x82C) + 0x20) = 1;
 		optionIndex = 0;
 		menuState = 0;
-		openAnim = minValue;
-		rowAnim = minValue;
-		colAnim = minValue;
+		openAnim = kOptionAnimMin;
+		rowAnim = kOptionAnimMin;
+		colAnim = kOptionAnimMin;
 		animCounter = 0;
 		animPhase = 0;
 		return;
@@ -819,17 +813,17 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (animPhase == 0) {
-		rowAnim += animStep;
+		rowAnim += kOptionRowAnimStep;
 		animCounter++;
-		if (rowAnim >= maxValue) {
+		if (rowAnim >= kOptionAnimMax) {
 			animPhase = 1;
-			rowAnim = maxValue;
+			rowAnim = kOptionAnimMax;
 		}
 	} else if (animPhase == 1) {
-		colAnim += animStep2;
-		if (colAnim >= maxValue) {
+		colAnim += kOptionColumnAnimStep;
+		if (colAnim >= kOptionAnimMax) {
 			animPhase = 2;
-			colAnim = maxValue;
+			colAnim = kOptionAnimMax;
 		}
 	}
 
@@ -847,8 +841,8 @@ void CMenuPcs::CalcOptionMenu()
 		if (optionIndex < 0) {
 			optionIndex = 4;
 		}
-		rowAnim = minValue;
-		colAnim = minValue;
+		rowAnim = kOptionAnimMin;
+		colAnim = kOptionAnimMin;
 		animCounter = 0;
 		animPhase = 0;
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -859,8 +853,8 @@ void CMenuPcs::CalcOptionMenu()
 		if (optionIndex > 4) {
 			optionIndex = 0;
 		}
-		rowAnim = minValue;
-		colAnim = minValue;
+		rowAnim = kOptionAnimMin;
+		colAnim = kOptionAnimMin;
 		animCounter = 0;
 		animPhase = 0;
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -868,17 +862,7 @@ void CMenuPcs::CalcOptionMenu()
 
 	if (specialModeEdit == 0) {
 		unsigned short press2;
-		bool padBlocked2 = false;
-
-		if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-			padBlocked2 = true;
-		}
-		if (padBlocked2) {
-			press2 = 0;
-		} else {
-			__cntlzw(static_cast<unsigned int>(Pad._448_4_));
-			press2 = static_cast<unsigned short>(Pad._8_2_);
-		}
+		press2 = GetMenuPress();
 
 		if ((press2 & 0x200) != 0) {
 			menuState = 2;
@@ -971,17 +955,7 @@ void CMenuPcs::CalcOptionMenu()
 
 	if (optionIndex == 4) {
 		unsigned short press3;
-		bool padBlocked3 = false;
-
-		if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-			padBlocked3 = true;
-		}
-		if (padBlocked3) {
-			press3 = 0;
-		} else {
-			__cntlzw(static_cast<unsigned int>(Pad._448_4_));
-			press3 = static_cast<unsigned short>(Pad._8_2_);
-		}
+		press3 = GetMenuPress();
 
 		if ((press3 & 0x100) != 0) {
 			if (specialModeEdit == 0) {
@@ -991,17 +965,7 @@ void CMenuPcs::CalcOptionMenu()
 			}
 		} else if (specialModeEdit != 0) {
 			unsigned short press4;
-			bool padBlocked4 = false;
-
-			if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-				padBlocked4 = true;
-			}
-			if (padBlocked4) {
-				press4 = 0;
-			} else {
-				__cntlzw(static_cast<unsigned int>(Pad._448_4_));
-				press4 = static_cast<unsigned short>(Pad._8_2_);
-			}
+			press4 = GetMenuPress();
 
 			if ((press4 & 0x200) != 0) {
 				specialModeCursor = 0;

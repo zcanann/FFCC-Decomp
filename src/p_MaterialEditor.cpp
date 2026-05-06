@@ -4,10 +4,10 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/graphic.h"
 extern "C" {
-extern const float kMaterialEditorControlMaxInit;
-extern const float kMaterialEditorControlMinInit;
-extern unsigned int kMaterialEditorDefaultColorRgba;
-extern const char sMaterialEditorSpinnerText[5];
+extern const unsigned int kMaterialEditorDefaultColorRgba = 0xFFFFFFFF;
+extern const float kMaterialEditorControlMaxInit = 10000.0f;
+extern const float kMaterialEditorControlMinInit = -10000.0f;
+extern const char sMaterialEditorSpinnerText[5] = "|/-\\";
 }
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
@@ -27,9 +27,11 @@ extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 extern "C" void* __vt__8CManager[];
 extern "C" void* __vt__8CProcess[];
 extern "C" char lbl_8032E648[];
-extern "C" const char s_CMaterialEditorPcs_VIEWER_801D7D18[];
-extern "C" const char s_CMaterialEditorPcs_801D7D34[];
-extern "C" const char s_MaterialEditor_pctc_801D7D60[];
+extern "C" const char s_CMaterialEditorPcs_VIEWER_801D7D18[] = "CMaterialEditorPcs(VIEWER)";
+extern "C" const char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
+extern "C" const char s_CManager_801D7D48[] = "CManager";
+extern "C" const char s_CProcess_801D7D54[] = "CProcess";
+extern "C" const char s_MaterialEditor_pctc_801D7D60[] = "MaterialEditor [%c]";
 unsigned int m_table_desc0__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
 unsigned int m_table_desc1__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
 unsigned int m_table_desc2__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
@@ -100,10 +102,10 @@ extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevS
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
     int, int, int, int, int);
-extern "C" float FLOAT_8032FCC8;
+extern "C" const double DOUBLE_8032FCC0 = 1.0;
+extern "C" const float FLOAT_8032FCC8 = 1.0f;
 extern "C" float FLOAT_8032FCD8;
 extern "C" float FLOAT_8032FCDC;
-extern "C" double DOUBLE_8032FCC0;
 extern "C" double DOUBLE_8032FCD0;
 
 static inline void WriteU8(void* base, unsigned int offset, unsigned char value) {

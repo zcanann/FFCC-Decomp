@@ -1847,12 +1847,12 @@ int CRedDriver::ReentrySeSepData(int id)
  */
 int CRedDriver::SePlayState(int seID)
 {
-    int* commandNow;
+    RedExecCommand* commandNow;
     unsigned int uVar1;
     RedTrackDATA* seInfo;
     RedTrackDATA** seInfoBase;
     int result;
-    int* command;
+    RedExecCommand* command;
 
     uVar1 = OSDisableInterrupts();
     result = 0;
@@ -1866,20 +1866,20 @@ int CRedDriver::SePlayState(int seID)
         seInfo++;
     } while (seInfo < *seInfoBase + REDSOUND_SE_TRACK_COUNT);
     if (result == 0) {
-        commandNow = (int*)p_ExecCommandNow;
-        command = (int*)p_ExecCommandOld;
+        commandNow = p_ExecCommandNow;
+        command = p_ExecCommandOld;
         while (commandNow != command) {
-            if ((((u32)*command != 0) &&
-                ((((void (*)(int*))*command == _SeBlockPlay) ||
-                  (((void (*)(int*))*command == _SeSepPlay))) ||
-                 ((void (*)(int*))*command == _SeSepPlaySequence))) &&
-                ((seID == -1 || (seID == command[1])))) {
+            if (((command->m_func != 0) &&
+                (((command->m_func == _SeBlockPlay) ||
+                  (command->m_func == _SeSepPlay)) ||
+                 (command->m_func == _SeSepPlaySequence))) &&
+                ((seID == -1 || (seID == command->m_args[0])))) {
                 result = 1;
                 break;
             }
-            command += 8;
-            if (command == (int*)p_ExecCommand + REDSOUND_EXEC_COMMAND_WORD_COUNT) {
-                command = (int*)p_ExecCommand;
+            command++;
+            if (command == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
+                command = p_ExecCommand;
             }
         }
     }

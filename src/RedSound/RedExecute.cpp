@@ -1881,7 +1881,7 @@ static void _ExecuteExtraData()
             soundControl->m_volumeDelta--;
             soundControl->m_volume += soundControl->m_volumeAdd;
             if ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_STOP_ON_VOLUME_ZERO) != 0) {
-                if ((soundControl->m_volumeDelta == 0) && (-1 < soundControl->m_musicId)) {
+                if ((soundControl->m_volumeDelta == 0) && (soundControl->m_musicId >= 0)) {
                     MusicStop(soundControl->m_musicId);
                 }
             } else {

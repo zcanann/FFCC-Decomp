@@ -795,10 +795,10 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
                REDSOUND_VOLUME_MOD_SCALE_SHIFT;
 
     if (voice->m_velocity != 0) {
-        if (voice->m_velocity == 0) {
-            envelopeMul = 0;
-        } else {
+        if (voice->m_velocity != 0) {
             envelopeMul = voice->m_velocity + 1;
+        } else {
+            envelopeMul = 0;
         }
         voiceMix = voiceMix * envelopeMul >> 7;
     }
@@ -869,7 +869,8 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
             pan = pan + ((int)(pan * voice->m_randomPan) >> REDSOUND_VOLUME_MOD_SCALE_SHIFT);
         }
 
-        pan = (pan + voice->m_track->m_shakePan) & 0xff;
+        pan = pan + voice->m_track->m_shakePan;
+        pan &= 0xff;
     }
 
     if (voice->m_randomVolume != 0) {

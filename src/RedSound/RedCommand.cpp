@@ -712,25 +712,25 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 		return;
 	}
 
+	m_MusicSkipLine = mode;
 	RedSoundCONTROL* music = p_SoundControlBuffer;
-	if (mode != 0) {
+	if (m_MusicSkipLine != 0) {
 		music += REDSOUND_CONTROL_MUSIC_SKIP;
 	}
 
-	m_MusicSkipLine = mode;
 	music->m_musicId = musicId;
 	music->m_flags &= REDSOUND_CONTROL_FLAG_CLEAR_STOP_ON_VOLUME_ZERO_MASK;
 	music->m_updateFlags = 0;
 
-	if (m_CrossTime == 0) {
-		music->m_masterVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
-		music->m_masterVolumeDelta = 0;
-	} else {
+	if (m_CrossTime != 0) {
 		music->m_masterVolume = 0;
 		music->m_masterVolumeAdd = REDSOUND_MASTER_VOLUME_FULL_FIXED_HALF;
 		music->m_masterVolumeAdd = music->m_masterVolumeAdd / m_CrossTime;
 		music->m_masterVolumeDelta = m_CrossTime;
 		m_CrossTime = 0;
+	} else {
+		music->m_masterVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
+		music->m_masterVolumeDelta = 0;
 	}
 
 	int trackBase = RedNew(musicHead->m_trackCount * REDSOUND_TRACK_SIZE);

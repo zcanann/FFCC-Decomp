@@ -808,16 +808,13 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         envelopeMul = envelopeMul + 1;
     }
 
+    voiceMix = voiceMix * envelopeMul >> REDSOUND_VOLUME_MOD_SCALE_SHIFT;
+    voiceMix = voiceMix * (*voice->m_trackVolume >> REDSOUND_FIXED_SHIFT) >> REDSOUND_VOLUME_TRACK_SCALE_SHIFT;
     pan = voice->m_waveData->m_volume & REDSOUND_PAN_BYTE_MASK;
     if (pan != 0) {
         pan = pan + 1;
     }
-
-    voiceMix = (int)(((voiceMix * envelopeMul >> REDSOUND_VOLUME_MOD_SCALE_SHIFT) *
-                      (*voice->m_trackVolume >> REDSOUND_FIXED_SHIFT) >>
-                      REDSOUND_VOLUME_TRACK_SCALE_SHIFT) *
-                     pan) >>
-               REDSOUND_VOLUME_MOD_SCALE_SHIFT;
+    voiceMix = voiceMix * pan >> REDSOUND_VOLUME_MOD_SCALE_SHIFT;
 
     if (voice->m_track->m_tremoloFunc != 0) {
         if (voice->m_volumeModDelay == 0) {
@@ -834,7 +831,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
                 iVar1 = voice->m_volumeModFrame;
                 voice->m_volumeModFrame = voice->m_volumeModFrame + 1;
                 modVolume = (modVolume * iVar1) / voice->m_volumeModFrames;
-                if (voice->m_volumeModFrames <= voice->m_volumeModFrame) {
+                if (voice->m_volumeModFrame >= voice->m_volumeModFrames) {
                     voice->m_volumeModFrames = 0;
                 }
             }

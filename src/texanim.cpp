@@ -38,6 +38,10 @@ extern const float FLOAT_8032fb3c = 1.0f;
 extern const double DOUBLE_8032fb40 = 4503599627370496.0;
 extern const char DAT_8032fb48[] = "e1";
 extern const float FLOAT_8032fb4c = 1.25f;
+extern "C" const char s_scenegraph_step_none[4] = "";
+extern "C" const char s_scenegraph_step_x8[] = "x8";
+extern "C" const char s_scenegraph_step_x0[] = "x0";
+extern "C" const char s_scenegraph_step_x1_8[] = "x1/8";
 
 static char s_collection_ptrarray_h_801D7B30[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error_801D7B14[] = "CPtrArray grow error";

@@ -1613,6 +1613,7 @@ shopmenu.cpp:
 	.data       start:0x80214D90 end:0x80214FE0
 	.sbss       start:0x8032EED0 end:0x8032EED4
 	.sdata2     start:0x80333338 end:0x80333388
+	.sbss2      start:0x80333E00 end:0x80333E04
 
 menu_item.cpp:
 	extab       start:0x80009E54 end:0x80009E8C

@@ -559,7 +559,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
+extern "C" void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
     LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
     void* alloc = work->m_points;
@@ -578,7 +578,7 @@ void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2Laser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
+extern "C" void pppConstruct2Laser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
     f32 fVar1 = kPppLaserZero;
     u8* work = (u8*)pppLaser + param_2->m_serializedDataOffsets[2] + 0x80;
@@ -604,7 +604,7 @@ void pppConstruct2Laser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
+extern "C" void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
     f32 fVar1 = kPppLaserZero;
     f32* pfVar3 = (f32*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);

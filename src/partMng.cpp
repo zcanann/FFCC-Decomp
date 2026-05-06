@@ -697,35 +697,35 @@ void CPartMng::pppGetFreePppMngSt()
 int CPartMng::pppGetNumFreePppMngSt()
 {
     int freeCount = 0;
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    int mngIndex = 0;
 
     int i = 0x30;
     do {
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 0)) == -0x1000) {
+        if (m_pppMng[mngIndex + 0].m_baseTime == -0x1000) {
             freeCount++;
         }
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 1)) == -0x1000) {
+        if (m_pppMng[mngIndex + 1].m_baseTime == -0x1000) {
             freeCount++;
         }
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 2)) == -0x1000) {
+        if (m_pppMng[mngIndex + 2].m_baseTime == -0x1000) {
             freeCount++;
         }
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 3)) == -0x1000) {
+        if (m_pppMng[mngIndex + 3].m_baseTime == -0x1000) {
             freeCount++;
         }
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 4)) == -0x1000) {
+        if (m_pppMng[mngIndex + 4].m_baseTime == -0x1000) {
             freeCount++;
         }
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 5)) == -0x1000) {
+        if (m_pppMng[mngIndex + 5].m_baseTime == -0x1000) {
             freeCount++;
         }
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 6)) == -0x1000) {
+        if (m_pppMng[mngIndex + 6].m_baseTime == -0x1000) {
             freeCount++;
         }
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 7)) == -0x1000) {
+        if (m_pppMng[mngIndex + 7].m_baseTime == -0x1000) {
             freeCount++;
         }
-        pppMngSt += 0xAC0;
+        mngIndex += 8;
         i--;
     } while (i != 0);
 
@@ -4648,22 +4648,24 @@ void CPartMng::pppEndCHandle(CCharaPcs::CHandle* handle)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppIsDeadCHandle(CCharaPcs::CHandle* handle)
+int CPartMng::pppIsDeadCHandle(CCharaPcs::CHandle* handle)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    int mngIndex = 0;
     for (int i = 0; i < 0x180; i++) {
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14) != -0x1000) {
-            unsigned char mode = *reinterpret_cast<unsigned char*>(pppMngSt + 0xe7);
-            if (mode == 3 || (mode >= 5 && mode <= 7) || mode == 8) {
-                void* owner = *reinterpret_cast<void**>(pppMngSt + 0xd8);
+        _pppMngSt* pppMngSt = &m_pppMng[mngIndex];
+        if (m_pppMng[mngIndex].m_baseTime != -0x1000) {
+            unsigned char mode = m_pppMng[mngIndex].m_matrixMode;
+            if (mode == 3 || static_cast<unsigned char>(mode - 5) <= 2 || mode == 8) {
+                void* owner = pppMngSt->m_owner;
                 if (owner != 0 &&
                     *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(owner) + 0xf8) == handle) {
-                    return;
+                    return 0;
                 }
             }
         }
-        pppMngSt += 0x158;
+        mngIndex++;
     }
+    return 1;
 }
 
 /*
@@ -4699,12 +4701,13 @@ void CPartMng::pppDestroyAll()
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x116f);
 
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    int mngIndex = 0;
     for (int i = 0; i < 0x180; i++) {
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14) != -0x1000 && *reinterpret_cast<void**>(pppMngSt) != 0) {
-            _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(pppMngSt));
+        _pppMngSt* pppMngSt = &m_pppMng[mngIndex];
+        if (m_pppMng[mngIndex].m_baseTime != -0x1000 && pppMngSt->m_pppResSet != 0) {
+            _pppAllFreePObject(pppMngSt);
         }
-        pppMngSt += 0x158;
+        mngIndex++;
     }
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x117b);

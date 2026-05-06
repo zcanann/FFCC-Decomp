@@ -436,7 +436,7 @@ public:
 
     void pppDeleteCHandle(CCharaPcs::CHandle*);
     void pppEndCHandle(CCharaPcs::CHandle*);
-    void pppIsDeadCHandle(CCharaPcs::CHandle*);
+    int pppIsDeadCHandle(CCharaPcs::CHandle*);
 
     void pppDeleteAll();
     void pppDestroyAll();

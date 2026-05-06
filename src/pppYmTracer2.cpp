@@ -122,10 +122,11 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     colorData = pppYmTracer2->m_serializedData + colorOffset;
 
     if (dataValIndex != 0xFFFF) {
-        pppSetBlendMode(param_2->m_payload[10]);
+        pppSetBlendMode(param_2->m_tracer.m_blendMode);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
             colorData + 8, (void*)&ppvCameraMatrix, FLOAT_80331840,
-            param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
+            param_2->m_tracer.m_drawEnvColor1, param_2->m_tracer.m_drawEnvColor0,
+            param_2->m_tracer.m_blendMode, 0, 1, 1, 0);
         SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
         textureIndex[0] = 0;
@@ -147,7 +148,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                 SetUpPaletteEnv(texture);
             }
 
-            if (param_2->m_payload[0xD] == 0) {
+            if (param_2->m_tracer.m_useTextureTev == 0) {
                 _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
             } else {
                 _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
@@ -257,20 +258,20 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     } else {
         pfVar6 = reinterpret_cast<float*>(
             reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_arg3].workBase + 0x80 +
-            *(s32*)param_2->m_payload);
+            param_2->m_tracer.m_arg3WorkOffset);
     }
     work->arg3Work = pfVar6;
 
     if (work->entries == nullptr) {
         useFallback = 1;
-        work->alphaStep = (u16)param_2->m_payload[8] / *(u16*)(param_2->m_payload + 6);
+        work->alphaStep = (u16)param_2->m_tracer.m_entryAlpha / param_2->m_tracer.m_entryLife;
         work->entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            (u32)*(u16*)(param_2->m_payload + 4) * 0x28, pppEnvStPtr->m_stagePtr,
+            (u32)param_2->m_tracer.m_entryCount * 0x28, pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmTracer2_cpp_801dc4b8), 0xAD);
 
         fVar2 = FLOAT_80331840;
         pfVar6 = (float*)work->entries;
-        for (iVar8 = 0; iVar8 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar8++) {
+        for (iVar8 = 0; iVar8 < (s32)(u32)param_2->m_tracer.m_entryCount; iVar8++) {
             *(u8*)(pfVar6 + 8) = 0;
             *(u8*)((u8*)pfVar6 + 0x1f) = 0;
             pfVar6[2] = fVar2;
@@ -287,8 +288,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     entries[0].active = 1;
     entry = entries;
 
-    for (i = 0; i < (s32)(param_2->m_payload[9] + 1); i++) {
-        iVar8 = *(u16*)(param_2->m_payload + 4) - 2;
+    for (i = 0; i < (s32)(param_2->m_tracer.m_historyFrameCount + 1); i++) {
+        iVar8 = param_2->m_tracer.m_entryCount - 2;
         for (; (s32)i <= iVar8; iVar8--) {
             copyPolygonData(entries + (iVar8 + 1), entries + iVar8);
         }
@@ -320,7 +321,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             PSMTXMultVec(MStack_78, &entries[0].pos, &entries[0].pos);
             PSMTXMultVec(MStack_78, &entries[0].targetPos, &entries[0].targetPos);
         } else if (!useFallback) {
-            frameT = (-1.0f / (f32)((s32)param_2->m_payload[9] + 1)) * (f32)(s32)i;
+            frameT = (-1.0f / (f32)((s32)param_2->m_tracer.m_historyFrameCount + 1)) * (f32)(s32)i;
             if (GetCharaNodeFrameMatrix(pppMngStPtr, frameT, MStack_78) == 0) {
                 useFallback = 1;
             } else {
@@ -336,7 +337,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     if (useFallback) {
         TRACE_POLYGON* pFallback = entries;
 
-        for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar4++) {
+        for (iVar4 = 0; iVar4 < (s32)(u32)param_2->m_tracer.m_entryCount; iVar4++) {
             pppCopyVector(pFallback->pos, entries->pos);
             pppCopyVector(pFallback->targetPos, entries->targetPos);
             pFallback++;
@@ -345,8 +346,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
 
     visibleCount = 0;
     TRACE_POLYGON* cursor = entries;
-    for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar4++) {
-        alpha = (u16)param_2->m_payload[8] - iVar4 * work->alphaStep;
+    for (iVar4 = 0; iVar4 < (s32)(u32)param_2->m_tracer.m_entryCount; iVar4++) {
+        alpha = (u16)param_2->m_tracer.m_entryAlpha - iVar4 * work->alphaStep;
         if ((alpha < 0) || (cursor->active == 0)) {
             cursor->alpha = 0;
         } else if (cursor->active != 0) {

@@ -297,7 +297,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     VColor* color;
     YmBreathParticleData* particle;
     PARTICLE_WMAT* matrixList;
-    float* colorDelta;
+    PARTICLE_COLOR* particleColor;
     YmBreathParticleGroup* groupData;
     int groupCount;
     long** shape;
@@ -323,7 +323,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     color = reinterpret_cast<VColor*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
     particle = reinterpret_cast<YmBreathParticleData*>(work->m_particleData);
     matrixList = work->m_particleWmats;
-    colorDelta = reinterpret_cast<float*>(work->m_particleColors);
+    particleColor = work->m_particleColors;
     groupData = work->m_groups;
     groupCount = work->m_particleCount;
 
@@ -373,11 +373,11 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             g = colorG;
             b = colorB;
             a = (int)((float)(int)colorA - particle->m_alpha);
-            if (colorDelta != 0) {
-                r += (int)colorDelta[0];
-                g += (int)colorDelta[1];
-                b += (int)colorDelta[2];
-                a += (int)colorDelta[3];
+            if (particleColor != 0) {
+                r += (int)particleColor->m_color[0];
+                g += (int)particleColor->m_color[1];
+                b += (int)particleColor->m_color[2];
+                a += (int)particleColor->m_color[3];
             }
 
             if (r < 0) {
@@ -413,8 +413,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
         if (matrixList != 0) {
             matrixList++;
         }
-        if (colorDelta != 0) {
-            colorDelta += 8;
+        if (particleColor != 0) {
+            particleColor++;
         }
         particle++;
     }

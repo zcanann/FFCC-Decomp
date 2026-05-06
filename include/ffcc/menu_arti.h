@@ -1,16 +1,6 @@
 #ifndef _FFCC_MENU_ARTI_H_
 #define _FFCC_MENU_ARTI_H_
 
-class CMenuPcs
-{
-public:
-    void ArtiInit();
-    void ArtiInit1();
-    bool ArtiOpen();
-    int ArtiCtrl();
-    bool ArtiClose();
-    void ArtiDraw();
-    int ArtiCtrlCur();
-};
+#include "ffcc/p_menu.h"
 
 #endif // _FFCC_MENU_ARTI_H_

@@ -77,6 +77,11 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
     unsigned long);
 
 
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
+
 extern char g_MsgFlashy[];
 static const char s_p_tina_rodata_801d7ee0[] = {
     (char)0x64, (char)0x76, (char)0x64, (char)0x2F, (char)0x67, (char)0x62, (char)0x61, (char)0x2F,
@@ -1173,7 +1178,7 @@ void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 	};
 	PartMngColorView* pppMngSt =
 	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
-	float one = 1.0f;
+	float one = LoadFloat(kPartColorIdentityOne);
 
 	pppMngSt->r = color.x;
 	pppMngSt->g = color.y;

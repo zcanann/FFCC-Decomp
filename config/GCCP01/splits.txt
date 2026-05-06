@@ -1455,7 +1455,7 @@ prgobj.cpp:
 	extabindex  start:0x8001069C end:0x8001075C
 	.text       start:0x80127008 end:0x80127B54
 	.data       start:0x802120D0 end:0x802121A8
-	.sdata2     start:0x80331BD0 end:0x80331C08
+	.sdata2     start:0x80331BD0 end:0x80331BF0
 
 pppBindOnlyPos.cpp:
 	.text       start:0x80127B54 end:0x80127B74
@@ -1469,12 +1469,14 @@ p_minigame.cpp:
 	.data       start:0x802121A8 end:0x80212398
 	.bss        start:0x80300268 end:0x80306708
 	.sbss       start:0x8032EEA0 end:0x8032EEA8
+	.sdata2     start:0x80331BF0 end:0x80331BF8
 
 pppLerpPos.cpp:
 	extab       start:0x8000976C end:0x8000977C
 	extabindex  start:0x800107EC end:0x80010804
 	.text       start:0x8012B24C end:0x8012B4A8
 	.rodata     start:0x801DD418 end:0x801DD428
+	.sdata2     start:0x80331BF8 end:0x80331C08
 
 pppScaleLoopAuto.cpp:
 	extab       start:0x8000977C end:0x80009784

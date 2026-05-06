@@ -26,7 +26,7 @@ unsigned int m_table_desc2__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast
 unsigned int m_table__12CMiniGamePcs[0x148 / sizeof(unsigned int)] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x24
 };
-static const char s_miniGameDefaultTag[4] = {'n', 'o', '_', 'n'};
+static const char s_miniGameDefaultTag[] = "GMGR";
 static const char s_miniGameEnd0000Text[] = "MiniGameEnd 0000\n";
 static const char s_miniGameEnd1111Text[] = "MiniGameEnd 1111\n";
 static const char s_miniGameEnd2222Text[] = "MiniGameEnd 2222\n";

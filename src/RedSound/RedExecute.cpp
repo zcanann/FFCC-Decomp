@@ -255,7 +255,7 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
     int noteBand;
 
     octaveAdjust = 0;
-    pitch = pitchOffset + (wavePitch >> 16) + (basePitch >> REDSOUND_FIXED_SHIFT);
+    pitch = (basePitch >> REDSOUND_FIXED_SHIFT) + (pitchOffset + (wavePitch >> 16));
     while (pitch < 0) {
         pitch += REDSOUND_PITCH_OCTAVE_UNITS;
         octaveAdjust -= 1;
@@ -1606,9 +1606,9 @@ void EnvelopeKeyExecute()
                     *(u16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) = 1;
 
                     memcpy((void*)(voice + REDSOUND_AX_VOICE_ADPCM_DATA_OFFSET), &waveData->m_adpcm.m_data,
-                           REDSOUND_WAVE_ADPCM_DATA_SIZE);
+                           sizeof(waveData->m_adpcm.m_data));
                     memcpy((void*)(voice + REDSOUND_AX_VOICE_ADPCM_LOOP_OFFSET), &waveData->m_adpcm.m_loop,
-                           REDSOUND_WAVE_ADPCM_LOOP_SIZE);
+                           sizeof(waveData->m_adpcm.m_loop));
                     memset((void*)(voice + REDSOUND_AX_VOICE_SRC_LAST_SAMPLES_OFFSET), 0, REDSOUND_AX_VOICE_SRC_LAST_SAMPLES_SIZE);
                     *(u16*)(voice + REDSOUND_AX_VOICE_ADDR_FORMAT_OFFSET) = 0;
                     *(int*)(voice + REDSOUND_AX_VOICE_ADDR_CURRENT_OFFSET) = key;

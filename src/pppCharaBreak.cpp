@@ -369,13 +369,14 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
             ((u32*)work->m_meshBuffers)[i] = (u32)pppMemFree__FPv(
                 reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayListCount << 2, pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3E9);
-            if (((u32*)work->m_meshBuffers)[i] == 0) {
+            u32 meshBuffer = ((u32*)work->m_meshBuffers)[i];
+            if (meshBuffer == 0) {
                 goto fail;
             }
 
             {
                 int displayListCount = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayListCount;
-                int* dlEntries = (int*)((u32*)work->m_meshBuffers)[i];
+                int* dlEntries = (int*)meshBuffer;
                 for (int dl = displayListCount - 1; dl >= 0; dl--) {
                     dlEntries[dl] = 0;
                 }
@@ -384,9 +385,10 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
             {
                 int displayListCount = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayListCount;
                 CharaBreakDisplayList* displayList = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayLists;
+                int dl = displayListCount - 1;
                 CharaBreakDisplayListPair** dlEntries =
-                    (CharaBreakDisplayListPair**)(((u32*)work->m_meshBuffers)[i] + ((displayListCount - 1) << 2));
-                for (int dl = displayListCount - 1; dl >= 0; dl--, displayList++) {
+                    (CharaBreakDisplayListPair**)(meshBuffer + (dl << 2));
+                for (; dl >= 0; dl--, displayList++) {
                     *dlEntries = (CharaBreakDisplayListPair*)pppMemFree__FPv(
                         0x10, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3FC);
                     if (*dlEntries == NULL) {

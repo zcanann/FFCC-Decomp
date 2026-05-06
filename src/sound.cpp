@@ -172,11 +172,11 @@ public:
 };
 
 struct CSoundLayout {
-    u32 m_redSoundWord0;
+    u32 m_vtable;
     CMemory::CStage* m_stage;
-    CFile::CHandle* m_waveFile;
+    u32 m_redSoundWord0;
     u8* m_aramBuffer;
-    int m_waveLoadMode;
+    CFile::CHandle* m_waveFile;
     int m_waveRemain;
     int m_waveOffset;
     int m_waveID;
@@ -462,7 +462,7 @@ void CSound::Init()
     SetReverb__9CRedSoundFii(RedSound(this), 1, 4);
     SetReverbDepth__9CRedSoundFiii(RedSound(this), 1, 0x40, 0xF);
 
-    SoundData(this).m_waveLoadMode = 0;
+    SoundData(this).m_waveFile = 0;
     SoundData(this).m_streamFile = 0;
     SoundData(this).m_streamPlaying = 0;
     memset(SoundData(this).m_noFreeSeGroups, 0xFF, sizeof(SoundData(this).m_noFreeSeGroups));
@@ -629,6 +629,7 @@ void CSound::Realloc(int isMinMemoryMode)
     if (waveFile != 0) {
         File.Close(waveFile);
         waveFile = 0;
+        Printf__7CSystemFPce(&System, s_soundLoadWaveErrorFmt);
     }
 
     redSound->SetWaveData(-1, 0, 0);
@@ -699,6 +700,7 @@ void CSound::Realloc(int isMinMemoryMode)
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
+            Printf__7CSystemFPce(&System, s_soundLoadWaveErrorFmt);
         }
 
         redSound->SetWaveData(-1, 0, 0);
@@ -722,6 +724,7 @@ void CSound::Realloc(int isMinMemoryMode)
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
+            Printf__7CSystemFPce(&System, s_soundLoadWaveErrorFmt);
         }
 
         redSound->SetWaveData(-1, 0, 0);
@@ -1138,7 +1141,7 @@ void CSound::CancelLoadWaveASync()
  */
 int CSound::IsLoadWaveASyncCompleted()
 {
-    CFile::CHandle* waveFile = (*reinterpret_cast<CSoundLayout*>(reinterpret_cast<u8*>(this) + 8)).m_waveFile;
+    CFile::CHandle* waveFile = SoundData(this).m_waveFile;
     return (u32)__cntlzw((u32)waveFile) >> 5;
 }
 

@@ -41,19 +41,19 @@ static const char sRedEntryMusicInformationHeaderFmt[] = "%s==== MUSIC Informati
 static const char sRedEntryMusicInfoColumnFmt[] = "%s BGM      : Wave : Size     : \n";
 static const char sRedEntryMusicInfoPlayFmt[] = "%s music%3.3u : %4.4u : 0x%6.6X : Play\n";
 static const char sRedEntryMusicInfoStopFmt[] = "%s music%3.3u : %4.4u : 0x%6.6X : Stop\n";
-static const char s__s_____MMemory_Information______801e7cce[] = "%s==== MMemory Information ====\n";
-static const char s__s_Name___Start___Size___Free_801e7cef[] = "%s Name     : Start      : Size       : Free       \n";
-static const char s__s_MUSIC_3_3d___0x_8_8X___0x_8_8_801e7d24[] =
+static const char sRedEntryMMemoryInfoHeaderFmt[] = "%s==== MMemory Information ====\n";
+static const char sRedEntryMMemoryInfoColumnFmt[] = "%s Name     : Start      : Size       : Free       \n";
+static const char sRedEntryMMemoryMusicInfoFmt[] =
     "%s MUSIC%3.3d : 0x%8.8X : 0x%8.8X : 0x%8.8X\n";
-static const char s__s_SE_BLOCK___0x_8_8X___0x_8_8X___801e7d51[] =
+static const char sRedEntryMMemorySeBlockInfoFmt[] =
     "%s SE-BLOCK : 0x%8.8X : 0x%8.8X : 0x%8.8X\n";
-static const char s__s_WAVE_4_4d___0x_8_8X___0x_8_8X_801e7d7c[] =
+static const char sRedEntryMMemoryWaveInfoFmt[] =
     "%s WAVE%4.4d : 0x%8.8X : 0x%8.8X : 0x%8.8X\n";
-static const char s__s_SE_6_6d___0x_8_8X___0x_8_8X___801e7da8[] =
+static const char sRedEntryMMemorySeInfoFmt[] =
     "%s SE%6.6d : 0x%8.8X : 0x%8.8X : 0x%8.8X\n";
-static const char s__s____________0x_8_8X___0x_8_8X___801e7dd2[] =
+static const char sRedEntryMMemoryFreeBlockInfoFmt[] =
     "%s -------- : 0x%8.8X : 0x%8.8X : 0x%8.8X\n";
-static const char s__s_Entry_Items____d_801e7dfd[] = "%s   Entry Items = %d\n";
+static const char sRedEntryEntryItemsFmt[] = "%s   Entry Items = %d\n";
 static const char sRedEntryErrorColor[] = "\x1B[7;31m";
 static const char sRedEntryResetColor[] = "\x1B[0m";
 static const char sRedEntryHeaderErrorColor[] = "\x1B[4;31m";
@@ -1596,9 +1596,9 @@ void CRedEntry::DisplayMMemoryInfo()
 
 	OSReport(sRedEntryNewline);
 	fflush(__files + 1);
-	OSReport(s__s_____MMemory_Information______801e7cce, sRedEntryLogPrefix);
+	OSReport(sRedEntryMMemoryInfoHeaderFmt, sRedEntryLogPrefix);
 	fflush(__files + 1);
-	OSReport(s__s_Name___Start___Size___Free_801e7cef, sRedEntryLogPrefix);
+	OSReport(sRedEntryMMemoryInfoColumnFmt, sRedEntryLogPrefix);
 	fflush(__files + 1);
 
 	maxFreeSize = 0;
@@ -1623,7 +1623,7 @@ void CRedEntry::DisplayMMemoryInfo()
 			history = m_musicBankBase;
 			do {
 				if ((history->m_size != 0) && (history->m_data == bankEntry->m_address)) {
-					OSReport(s__s_MUSIC_3_3d___0x_8_8X___0x_8_8_801e7d24, sRedEntryLogPrefix,
+					OSReport(sRedEntryMMemoryMusicInfoFmt, sRedEntryLogPrefix,
 					         reinterpret_cast<RedMusicHEAD*>(bankEntry->m_address)->m_musicNo, bankEntry->m_address,
 					         bankEntry->m_size, freeSize);
 					fflush(__files + 1);
@@ -1637,7 +1637,7 @@ void CRedEntry::DisplayMMemoryInfo()
 				i = 0;
 				do {
 					if ((p_SeBlockData[i] != 0) && (bankEntry->m_address == reinterpret_cast<int>(p_SeBlockData[i]))) {
-						OSReport(s__s_SE_BLOCK___0x_8_8X___0x_8_8X___801e7d51, sRedEntryLogPrefix, bankEntry->m_address,
+						OSReport(sRedEntryMMemorySeBlockInfoFmt, sRedEntryLogPrefix, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);
 						matched = 1;
@@ -1651,7 +1651,7 @@ void CRedEntry::DisplayMMemoryInfo()
 				history = m_waveBankBase;
 				do {
 					if ((history->m_size != 0) && (history->m_data == bankEntry->m_address)) {
-						OSReport(s__s_WAVE_4_4d___0x_8_8X___0x_8_8X_801e7d7c, sRedEntryLogPrefix,
+						OSReport(sRedEntryMMemoryWaveInfoFmt, sRedEntryLogPrefix,
 						         reinterpret_cast<RedWaveHeadWD*>(bankEntry->m_address)->m_waveNo, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);
@@ -1666,7 +1666,7 @@ void CRedEntry::DisplayMMemoryInfo()
 				history = m_seSepBankBase;
 				do {
 					if ((history->m_size != 0) && (history->m_data == bankEntry->m_address)) {
-						OSReport(s__s_SE_6_6d___0x_8_8X___0x_8_8X___801e7da8, sRedEntryLogPrefix,
+						OSReport(sRedEntryMMemorySeInfoFmt, sRedEntryLogPrefix,
 						         reinterpret_cast<RedSeSepHEAD*>(bankEntry->m_address)->m_seNo, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);
@@ -1678,7 +1678,7 @@ void CRedEntry::DisplayMMemoryInfo()
 			}
 
 			if (matched == 0) {
-				OSReport(s__s____________0x_8_8X___0x_8_8X___801e7dd2, sRedEntryLogPrefix, bankEntry->m_address, bankEntry->m_size,
+				OSReport(sRedEntryMMemoryFreeBlockInfoFmt, sRedEntryLogPrefix, bankEntry->m_address, bankEntry->m_size,
 				         freeSize);
 				fflush(__files + 1);
 			}
@@ -1702,7 +1702,7 @@ void CRedEntry::DisplayMMemoryInfo()
 
 	OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 	fflush(__files + 1);
-	OSReport(s__s_Entry_Items____d_801e7dfd, sRedEntryLogPrefix, entryCount);
+	OSReport(sRedEntryEntryItemsFmt, sRedEntryLogPrefix, entryCount);
 	fflush(__files + 1);
 	OSReport(sRedEntryTotalSizeFmt, sRedEntryLogPrefix, totalSize);
 	fflush(__files + 1);

@@ -504,7 +504,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
 extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
-    int colorOffset;
+    _pppMngSt* mngSt;
     int* dataOffsets;
     VYmBreath* work;
     VColor* color;
@@ -519,6 +519,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     int slotCount;
     int ready;
     float scaledOwner;
+    YmBreathParticleGroup* checkGroupData;
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;
@@ -532,10 +533,9 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     }
 
     dataOffsets = offsets->m_serializedDataOffsets;
-    _pppMngSt* mngSt = pppMngStPtr;
-    colorOffset = dataOffsets[1];
+    mngSt = pppMngStPtr;
     work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[0]);
-    color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
+    color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[1]);
 
     if (work->m_particleData == NULL) {
         YmBreathParticleGroup* groupTable;
@@ -603,9 +603,11 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     groupData = work->m_groups;
     for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
+        checkGroupData = &work->m_groups[(short)groupIndex];
         slotCount = params->m_slotCount;
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
-            if ((groupData->particleIndices[slotIndex] == -1) || (groupData->particleStates[slotIndex] != 1)) {
+            if ((checkGroupData->particleIndices[slotIndex] == -1) ||
+                (checkGroupData->particleStates[slotIndex] != 1)) {
                 ready = 0;
                 goto group_ready;
             }

@@ -20,7 +20,6 @@ extern const float kPppHeapUseRateDivisor;
 
 extern "C" const char s_no_name_8032fdcc[];
 extern "C" {
-extern const float kPartColorIdentityOne = 1.0f;
 const char s_no_name_8032fdcc[] = "no name";
 }
 
@@ -204,6 +203,7 @@ int DAT_8032ed3c;
  * Address:	TODO
  * Size:	TODO
  */
+#pragma inline_max_size(10000)
 inline CPartPcs::CPartPcs()
 {
 	unsigned int* table = reinterpret_cast<unsigned int*>(m_table__8CPartPcs);

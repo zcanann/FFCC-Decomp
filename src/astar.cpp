@@ -6,6 +6,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/maphit.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/pad.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_dbgmenu.h"
@@ -166,7 +167,6 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	escapeDir.Normalize();
 
 	float behindBestDist = kAStarEscapeInitialBestDist;
-	CAPos* portal = m_portals;
 	CAPos* behindBest = (CAPos*)0;
 	CAPos* aheadBest = (CAPos*)0;
 	float aheadBestDist = behindBestDist;
@@ -174,6 +174,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 	do
 	{
+		CAPos* portal = &m_portals[i];
 		unsigned char otherGroup = portal->m_groupA;
 		bool exists = false;
 
@@ -231,25 +232,24 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 					float dist = PSVECMag(reinterpret_cast<Vec*>(&portalVec));
 
-					if (dot < LoadFloat(kPolyGroupBaseXZ))
+					if (dot >= LoadFloat(kPolyGroupBaseXZ))
 					{
-						if (behindBestDist < dist)
+						if (aheadBestDist < dist)
 						{
-							behindBest = portal;
-							behindBestDist = dist;
+							aheadBest = portal;
+							aheadBestDist = dist;
 						}
 					}
-					else if (aheadBestDist < dist)
+					else if (behindBestDist < dist)
 					{
-						aheadBest = portal;
-						aheadBestDist = dist;
+						behindBest = portal;
+						behindBestDist = dist;
 					}
 				}
 			}
 		}
 
 		++i;
-		++portal;
 	} while (i < 64);
 
 	if (aheadBest != (CAPos*)0)
@@ -439,6 +439,7 @@ void CAStar::drawAStar()
 		}
 
 		bool hasGroups = false;
+		float (*drawMtx)[4] = CameraPcs.m_cameraMatrix;
 
 		if (m_currentGroup != 0 && m_previousGroup != 0)
 		{
@@ -448,7 +449,7 @@ void CAStar::drawAStar()
 		if (hasGroups)
 		{
 			CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-			Graphic.DrawSphere(gFlatPosMtx, &m_lastGroupPos, LoadFloat(kDrawAStarSphereRadius), &white.color);
+			Graphic.DrawSphere(drawMtx, &m_lastGroupPos, LoadFloat(kDrawAStarSphereRadius), &white.color);
 		}
 
 		int i = 0;
@@ -466,7 +467,7 @@ void CAStar::drawAStar()
 			if (exists)
 			{
 				CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
-				Graphic.DrawSphere(gFlatPosMtx, &portal->m_position, LoadFloat(kDrawAStarSphereRadius), &yellow.color);
+				Graphic.DrawSphere(drawMtx, &portal->m_position, LoadFloat(kDrawAStarSphereRadius), &yellow.color);
 
 				int side = 0;
 				unsigned char* group = &portal->m_groupA;
@@ -502,7 +503,7 @@ void CAStar::drawAStar()
 
 									if (matches)
 									{
-										GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
+										GXLoadPosMtxImm(drawMtx, GX_PNMTX0);
 										GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 2);
 										GXPosition3f32(
 											portal->m_position.x,

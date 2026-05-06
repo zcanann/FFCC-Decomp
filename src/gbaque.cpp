@@ -597,14 +597,13 @@ int GbaQueue::SetQueue(int channel, unsigned int value)
 	if (queue->m_queueFull[channel] != 0) {
 		ret = -1;
 	} else {
-		int* queueCount = &queue->m_queueCount[channel];
-		if (*queueCount >= 0x40) {
+		if (queue->m_queueCount[channel] >= 0x40) {
 			ret = -1;
 			queue->m_queueFull[channel] = 1;
 		} else {
 			ret = 0;
-			queue->m_queue[channel][*queueCount] = value;
-			*queueCount = *queueCount + 1;
+			queue->m_queue[channel][queue->m_queueCount[channel]] = value;
+			queue->m_queueCount[channel] = queue->m_queueCount[channel] + 1;
 		}
 	}
 	OSSignalSemaphore(semaphore);
@@ -4523,13 +4522,12 @@ unsigned int GbaQueue::GetRadarMode(int channel)
 void GbaQueue::SetRadarMode(int channel, int mode)
 {
 	char* obj = reinterpret_cast<char*>(this);
-	int mask;
-	int radarMode;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	radarMode = obj[0x2D41];
-	mask = 1 << channel;
-	obj[0x2D41] = (radarMode & ~mask) | ((mode & 1) << channel);
+	int radarMode = obj[0x2D41];
+	int mask = 1 << channel;
+	int newRadarMode = (radarMode & ~mask) | ((mode & 1) << channel);
+	obj[0x2D41] = newRadarMode;
 	if (radarMode != obj[0x2D41]) {
 		obj[0x2D42] = obj[0x2D42] | mask;
 	}

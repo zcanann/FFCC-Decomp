@@ -519,6 +519,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     int slotCount;
     int ready;
     float scaledOwner;
+    YmBreathParticleGroup* checkGroupData;
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;
@@ -602,9 +603,11 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     groupData = work->m_groups;
     for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
+        checkGroupData = &work->m_groups[(short)groupIndex];
         slotCount = params->m_slotCount;
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
-            if ((groupData->particleIndices[slotIndex] == -1) || (groupData->particleStates[slotIndex] != 1)) {
+            if ((checkGroupData->particleIndices[slotIndex] == -1) ||
+                (checkGroupData->particleStates[slotIndex] != 1)) {
                 ready = 0;
                 goto group_ready;
             }

@@ -21,6 +21,8 @@ extern "C" void SetAnim__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void PCAnimCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" void InitFrame0Info__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CalcWMFrame0__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern "C" float GetMaxAnimWait__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned short GetButtonRepeat__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" unsigned short GetButtonDown__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
@@ -413,6 +415,7 @@ static bool IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void GetChara(char* dst, int index, char* table)
 {
     if (dst == nullptr) {
@@ -463,6 +466,7 @@ void GetCharaCnt(char* dst)
         dst[0] = '\0';
     }
 }
+#endif
 
 /*
  * --INFO--
@@ -535,7 +539,7 @@ void CMenuPcs::CalcSingCMake()
             result = 1;
         }
         break;
-    case 2:
+    case 2: {
         if (openMode == 0) {
             if (*reinterpret_cast<unsigned char*>(state + 0x0C) == 0) {
                 *reinterpret_cast<short*>(state + 0x26) = 0;
@@ -546,10 +550,47 @@ void CMenuPcs::CalcSingCMake()
             }
             result = (frame >= 10) ? 1 : 0;
         } else if (openMode == 1) {
-            resultFlag = 0;
-            CmakeSexCtrl();
-            if (resultFlag != 0 || (*reinterpret_cast<short*>(state + 0x10) == 2 && frame == 0)) {
-                result = 1;
+            unsigned short down;
+            unsigned short repeat;
+
+            if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+                down = 0;
+            } else {
+                __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+                down = static_cast<unsigned short>(Pad._8_2_);
+            }
+
+            if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+                repeat = 0;
+            } else {
+                __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+                repeat = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x14);
+            }
+
+            if (repeat == 0) {
+                result = 0;
+            } else {
+                if ((repeat & 0xC) != 0) {
+                    *reinterpret_cast<unsigned short*>(state + 0x26) =
+                        *reinterpret_cast<unsigned short*>(state + 0x26) ^ 1;
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
+                }
+                if ((repeat & 0xC) == 0) {
+                    if ((down & 0x100) != 0) {
+                        s_CmakeInfo.m_gender = static_cast<signed char>(*reinterpret_cast<short*>(state + 0x26));
+                        resultDir = 1;
+                        Sound.PlaySe(2, 0x40, 0x7F, 0);
+                        result = 1;
+                        break;
+                    }
+                    if ((down & 0x200) != 0) {
+                        resultDir = -1;
+                        Sound.PlaySe(3, 0x40, 0x7F, 0);
+                        result = 1;
+                        break;
+                    }
+                }
+                result = 0;
             }
         } else if (frame < 10) {
             frame = frame + 1;
@@ -557,6 +598,7 @@ void CMenuPcs::CalcSingCMake()
             result = 1;
         }
         break;
+    }
     case 3:
         if (openMode == 0) {
             if (*reinterpret_cast<unsigned char*>(state + 0x0C) == 0) {
@@ -597,7 +639,7 @@ void CMenuPcs::CalcSingCMake()
             result = 1;
         }
         break;
-    case 5:
+    case 5: {
         if (openMode == 0) {
             if (*reinterpret_cast<unsigned char*>(state + 0x0C) == 0) {
                 *reinterpret_cast<short*>(state + 0x26) = 0;
@@ -608,20 +650,97 @@ void CMenuPcs::CalcSingCMake()
             }
             result = (frame >= 10) ? 1 : 0;
         } else if (openMode == 1) {
-            resultFlag = 0;
-            CmakeResultCtrl();
-            if (resultFlag != 0 || (*reinterpret_cast<short*>(state + 0x10) == 2 && frame == 0)) {
-                result = 1;
+            unsigned short down;
+            unsigned short repeat;
+
+            if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+                down = 0;
+            } else {
+                __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+                down = static_cast<unsigned short>(Pad._8_2_);
             }
-        } else if (*reinterpret_cast<short*>(state + 0x18) != 0) {
-            *reinterpret_cast<short*>(state + 0x18) = *reinterpret_cast<short*>(state + 0x18) - 1;
-        } else if (frame < 10) {
-            frame = frame + 1;
+
+            if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+                repeat = 0;
+            } else {
+                __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+                repeat = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x14);
+            }
+
+            if (repeat == 0) {
+                result = 0;
+            } else {
+                if ((repeat & 3) != 0) {
+                    *reinterpret_cast<unsigned short*>(state + 0x26) =
+                        *reinterpret_cast<unsigned short*>(state + 0x26) ^ 1;
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
+                }
+                if ((repeat & 3) == 0) {
+                    if ((down & 0x100) != 0) {
+                        if (*reinterpret_cast<short*>(state + 0x26) == 0) {
+                            resultDir = 1;
+                            *reinterpret_cast<int*>(MenuS32(this, 0x844) + MenuS16(this, 0x86A) * 0x14 + 4) = 3;
+
+                            int slot = static_cast<int>(MenuS16(this, 0x86A));
+                            int modelNo = GetModelNo__8CMenuPcsFiii(
+                                this, static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
+                                static_cast<int>(s_CmakeInfo.m_gender));
+                            *reinterpret_cast<int*>(MenuS32(this, 0x824) + slot * 0x34 + 8) = modelNo;
+
+                            CCaravanWork* caravanWork = &Game.m_caravanWorkArr[slot];
+                            *reinterpret_cast<unsigned char*>(MenuS32(this, 0x828) + 10) = 1;
+                            caravanWork->LoadInit();
+                            caravanWork->m_shopState = 1;
+                            caravanWork->unk_0x3a8 = 0x101;
+                            caravanWork->unk_0x3ac = static_cast<int>(s_CmakeInfo.m_job);
+                            memset(caravanWork->unk_0x3ca_0x3dd, 0, 0x11);
+                            strcpy(reinterpret_cast<char*>(caravanWork->unk_0x3ca_0x3dd), s_CmakeInfo.m_name);
+                            caravanWork->m_tribeId = static_cast<unsigned short>(s_CmakeInfo.m_tribe);
+                            caravanWork->m_appearanceVariant = static_cast<unsigned short>(s_CmakeInfo.m_hair);
+                            caravanWork->m_genderFlag = static_cast<unsigned short>(s_CmakeInfo.m_gender);
+                            caravanWork->m_id = static_cast<unsigned short>(modelNo);
+                            int baseDataIndex =
+                                static_cast<int>(caravanWork->m_genderFlag) +
+                                static_cast<int>(caravanWork->m_tribeId) * 2;
+                            caravanWork->Init(
+                                baseDataIndex,
+                                reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + baseDataIndex * 0x1D0),
+                                static_cast<int>(caravanWork->m_appearanceVariant));
+                            caravanWork->LoadFinished();
+                            CallWorldParam__8CMenuPcsFiii(this, 0, slot, 0);
+                            *reinterpret_cast<short*>(state + 0x18) =
+                                static_cast<short>(static_cast<int>(GetMaxAnimWait__8CMenuPcsFv(this)));
+                        } else {
+                            resultDir = -1;
+                        }
+                        Sound.PlaySe(0x33, 0x40, 0x7F, 0);
+                        result = 1;
+                        break;
+                    }
+                    if ((down & 0x200) != 0) {
+                        resultDir = -1;
+                        Sound.PlaySe(3, 0x40, 0x7F, 0);
+                        result = 1;
+                        break;
+                    }
+                }
+                result = 0;
+            }
         } else {
-            result = 1;
+            if (*reinterpret_cast<short*>(state + 0x18) == 0) {
+                if (frame < 10) {
+                    frame = frame + 1;
+                } else {
+                    result = 1;
+                }
+            } else {
+                *reinterpret_cast<short*>(state + 0x18) =
+                    static_cast<short>(*reinterpret_cast<short*>(state + 0x18) - 1);
+            }
         }
         break;
-    case 6:
+    }
+    case 6: {
         if (openMode == 0) {
             if (*reinterpret_cast<unsigned char*>(state + 0x0C) == 0) {
                 *reinterpret_cast<short*>(state + 0x26) = 0;
@@ -632,10 +751,60 @@ void CMenuPcs::CalcSingCMake()
             }
             result = (frame >= 10) ? 1 : 0;
         } else if (openMode == 1) {
-            resultFlag = 0;
-            CmakeResultCtrl1();
-            if (resultFlag != 0 || (*reinterpret_cast<short*>(state + 0x10) == 2 && frame == 0)) {
-                result = 1;
+            unsigned short down;
+            unsigned short repeat;
+
+            if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+                down = 0;
+            } else {
+                __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+                down = static_cast<unsigned short>(Pad._8_2_);
+            }
+
+            if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+                repeat = 0;
+            } else {
+                __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+                repeat = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x14);
+            }
+
+            if (repeat == 0) {
+                result = 0;
+            } else {
+                if ((repeat & 0x8) != 0) {
+                    if (*reinterpret_cast<short*>(state + 0x26) == 0) {
+                        *reinterpret_cast<short*>(state + 0x26) = 3;
+                    } else {
+                        *reinterpret_cast<short*>(state + 0x26) =
+                            static_cast<short>(*reinterpret_cast<short*>(state + 0x26) - 1);
+                    }
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
+                } else if ((repeat & 0x4) != 0) {
+                    if (*reinterpret_cast<short*>(state + 0x26) < 3) {
+                        *reinterpret_cast<short*>(state + 0x26) =
+                            static_cast<short>(*reinterpret_cast<short*>(state + 0x26) + 1);
+                    } else {
+                        *reinterpret_cast<short*>(state + 0x26) = 0;
+                    }
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
+                }
+
+                if ((repeat & 0xC) == 0) {
+                    if ((down & 0x100) != 0) {
+                        if (*reinterpret_cast<short*>(state + 0x26) < 3) {
+                            ChgModel__8CMenuPcsFiiii(
+                                this, static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
+                        }
+                        resultDir = 1;
+                        Sound.PlaySe(2, 0x40, 0x7F, 0);
+                        result = 1;
+                        break;
+                    }
+                    if ((down & 0x200) != 0) {
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
+                    }
+                }
+                result = 0;
             }
         } else if (frame < 10) {
             frame = frame + 1;
@@ -643,6 +812,7 @@ void CMenuPcs::CalcSingCMake()
             result = 1;
         }
         break;
+    }
     default:
         break;
     }
@@ -665,6 +835,7 @@ void CMenuPcs::DrawSingCMake()
     int state = MenuS32(this, 0x82C);
     short step = *reinterpret_cast<short*>(state + 0x16);
     short& mode = *reinterpret_cast<short*>(state + 0x10);
+    short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
     short& resultFlag = *reinterpret_cast<short*>(state + 0x2E);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
 
@@ -712,39 +883,61 @@ void CMenuPcs::DrawSingCMake()
         break;
     }
     case 1:
-        DrawDiaryBase(step, FLOAT_80333258);
-        DrawCmakePageMark(FLOAT_80333258);
         CmakeNameDraw();
         break;
     case 2:
-        DrawDiaryBase(step, FLOAT_80333258);
-        DrawCmakePageMark(FLOAT_80333258);
         CmakeSexDraw();
         break;
     case 3:
-        DrawDiaryBase(step, FLOAT_80333258);
-        DrawCmakePageMark(FLOAT_80333258);
         CmakeTribeDraw();
         break;
     case 4:
-        DrawDiaryBase(step, FLOAT_80333258);
-        DrawCmakePageMark(FLOAT_80333258);
         CmakeJobDraw();
         break;
     case 5:
-        DrawDiaryBase(step, FLOAT_80333258);
-        DrawCmakePageMark(FLOAT_80333258);
         CmakeResultDraw();
         break;
     case 6:
-        DrawDiaryBase(step, FLOAT_80333258);
-        DrawCmakePageMark(FLOAT_80333258);
         CmakeResultDraw1();
         break;
     default:
         break;
     }
 
+    if (resultFlag == 0) {
+        return;
+    }
+
+    if (mode < 2) {
+        mode = static_cast<short>(mode + 1);
+        frame = 0;
+        *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
+        return;
+    }
+
+    DAT_8032ef10 = static_cast<int>(step);
+
+    if (step == 6) {
+        step = static_cast<short>(*reinterpret_cast<short*>(state + 0x26) + 1);
+        mode = (step == 0) ? 2 : 0;
+    } else if (resultDir < 0) {
+        if (step == 5) {
+            step = 6;
+        } else {
+            step = static_cast<short>(step - 1);
+        }
+        mode = (step == 0) ? 2 : 0;
+    } else if (step != 5) {
+        step = static_cast<short>(step + 1);
+        mode = (step == 0) ? 2 : 0;
+    } else {
+        step = 0;
+        mode = 2;
+    }
+
+    *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
+    frame = 0;
+    *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
 }
 
 /*
@@ -1316,6 +1509,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeOpen()
 {
     int state = MenuS32(this, 0x82C);
@@ -1451,6 +1645,7 @@ void CMenuPcs::CmakeNameOpen()
     *reinterpret_cast<short*>(state + 0x10) = 0;
     *reinterpret_cast<short*>(state + 0x22) = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -1603,12 +1798,14 @@ void CMenuPcs::CmakeNameCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeNameClose()
 {
     int state = MenuS32(this, 0x82C);
     *reinterpret_cast<short*>(state + 0x10) = 2;
     *reinterpret_cast<short*>(state + 0x22) = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -1782,6 +1979,7 @@ void CMenuPcs::CmakeNameDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeSexOpen()
 {
     int state = MenuS32(this, 0x82C);
@@ -1789,6 +1987,7 @@ void CMenuPcs::CmakeSexOpen()
     *reinterpret_cast<short*>(state + 0x10) = 0;
     *reinterpret_cast<short*>(state + 0x22) = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -1799,6 +1998,7 @@ void CMenuPcs::CmakeSexOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeSexCtrl()
 {
     int state = MenuS32(this, 0x82C);
@@ -1831,6 +2031,7 @@ void CMenuPcs::CmakeSexCtrl()
         }
     }
 }
+#endif
 
 /*
  * --INFO--
@@ -1841,12 +2042,14 @@ void CMenuPcs::CmakeSexCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeSexClose()
 {
     int state = MenuS32(this, 0x82C);
     *reinterpret_cast<short*>(state + 0x10) = 2;
     *reinterpret_cast<short*>(state + 0x22) = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -1960,6 +2163,7 @@ void CMenuPcs::CmakeSexDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeTribeOpen()
 {
     int state = MenuS32(this, 0x82C);
@@ -1967,6 +2171,7 @@ void CMenuPcs::CmakeTribeOpen()
     *reinterpret_cast<short*>(state + 0x10) = 0;
     *reinterpret_cast<short*>(state + 0x22) = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -2096,12 +2301,14 @@ void CMenuPcs::CmakeTribeCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeTribeClose()
 {
     int state = MenuS32(this, 0x82C);
     *reinterpret_cast<short*>(state + 0x10) = 2;
     *reinterpret_cast<short*>(state + 0x22) = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -2277,6 +2484,7 @@ void CMenuPcs::CmakeTribeDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeJobOpen()
 {
     int state = MenuS32(this, 0x82C);
@@ -2284,6 +2492,7 @@ void CMenuPcs::CmakeJobOpen()
     *reinterpret_cast<short*>(state + 0x10) = 0;
     *reinterpret_cast<short*>(state + 0x22) = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -2416,12 +2625,14 @@ unsigned short CMenuPcs::CmakeJobCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeJobClose()
 {
     int state = MenuS32(this, 0x82C);
     *reinterpret_cast<short*>(state + 0x10) = 2;
     *reinterpret_cast<short*>(state + 0x22) = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -2575,6 +2786,7 @@ void CMenuPcs::CmakeJobDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeResultOpen()
 {
     int state = MenuS32(this, 0x82C);
@@ -2582,6 +2794,7 @@ void CMenuPcs::CmakeResultOpen()
     *reinterpret_cast<short*>(state + 0x10) = 0;
     *reinterpret_cast<short*>(state + 0x22) = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -2592,6 +2805,7 @@ void CMenuPcs::CmakeResultOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeResultCtrl()
 {
     int state = MenuS32(this, 0x82C);
@@ -2623,6 +2837,7 @@ void CMenuPcs::CmakeResultCtrl()
         resultDir = -1;
     }
 }
+#endif
 
 /*
  * --INFO--
@@ -2633,12 +2848,14 @@ void CMenuPcs::CmakeResultCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeResultClose()
 {
     int state = MenuS32(this, 0x82C);
     *reinterpret_cast<short*>(state + 0x10) = 2;
     *reinterpret_cast<short*>(state + 0x22) = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -2844,12 +3061,14 @@ void CMenuPcs::CmakeResultDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeResultOpen1()
 {
     int state = MenuS32(this, 0x82C);
     *reinterpret_cast<short*>(state + 0x10) = 0;
     *reinterpret_cast<short*>(state + 0x22) = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -2860,6 +3079,7 @@ void CMenuPcs::CmakeResultOpen1()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeResultCtrl1()
 {
     int state = MenuS32(this, 0x82C);
@@ -2877,6 +3097,7 @@ void CMenuPcs::CmakeResultCtrl1()
         frame = 0;
     }
 }
+#endif
 
 /*
  * --INFO--
@@ -2887,12 +3108,14 @@ void CMenuPcs::CmakeResultCtrl1()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeResultClose1()
 {
     int state = MenuS32(this, 0x82C);
     *reinterpret_cast<short*>(state + 0x10) = 2;
     *reinterpret_cast<short*>(state + 0x22) = 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -3078,11 +3301,13 @@ void CMenuPcs::CmakeResultDraw1()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeVillageOpen()
 {
     MenuU8(this, 0x16) = 1;
     createVillageMenu();
 }
+#endif
 
 /*
  * --INFO--
@@ -3208,11 +3433,13 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::CmakeVillageClose()
 {
     MenuU8(this, 0x16) = 0;
     destroyVillageMenu();
 }
+#endif
 
 /*
  * --INFO--
@@ -3327,6 +3554,7 @@ void CMenuPcs::CmakeVillageDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::SetSingMakeChara()
 {
     int slot = static_cast<int>(MenuS16(this, 0x86A));
@@ -3350,6 +3578,7 @@ void CMenuPcs::createVillageMenu()
         calcVillageMenu();
     }
 }
+#endif
 
 /*
  * --INFO--
@@ -3558,6 +3787,7 @@ void CMenuPcs::CalcSingleCMakeChara()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMenuPcs::DrawSingleCMakeChara(float alpha)
 {
     CalcSingleCMakeChara();
@@ -3567,3 +3797,4 @@ void CMenuPcs::DrawSingleCMakeChara(float alpha)
 
     DrawCmakePreviewCharaAlpha(this, alpha);
 }
+#endif

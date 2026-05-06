@@ -146,7 +146,7 @@ void CMaterialEditorPcs::Init()
 {
     u32 clz0;
     u32 clz1;
-    u8 level;
+    u32 level;
     unsigned char* self;
     int remaining;
 

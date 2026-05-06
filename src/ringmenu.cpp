@@ -316,12 +316,12 @@ void CRingMenu::onCalc()
 
 		fmod(static_cast<double>(m_spinPhase), DOUBLE_80330a98);
 		int i = 0x1B;
-		do {
+		while (i > 0) {
 			i--;
-		} while (i != 0);
+		}
 
-		unsigned int gbaConnected =
-			(static_cast<unsigned int>(__cntlzw(1 - static_cast<int>(Joybus.GetCtrlMode(menuIndex)))) >> 5) & 0xFF;
+		unsigned short ctrlMode = Joybus.GetCtrlMode(menuIndex);
+		unsigned int gbaConnected = (static_cast<unsigned int>(__cntlzw(1 - ctrlMode)) >> 5) & 0xFF;
 
 		if (!Joybus.GetGBAStart(menuIndex)) {
 			gbaConnected = 1;

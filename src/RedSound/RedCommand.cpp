@@ -184,20 +184,22 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 	do {
 		track = *trackBasePtr + REDSOUND_SE_TRACK_LAST_INDEX;
 		scan = track;
-		remaining = trackCount;
 		do {
 			track = scan;
-			remaining--;
-			if ((remaining != 0) && (track->m_command == 0) &&
-			    ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) == 0)) {
-				scan = track - 1;
-			} else {
-				if ((track->m_command != 0) || ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
-					remaining = 1;
-					scan = track;
+			remaining = trackCount - 1;
+			while (remaining != 0) {
+				if ((track->m_command != 0) ||
+				    ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
+					break;
 				}
-				scan = scan - 1;
+				track--;
+				remaining--;
 			}
+			if ((track->m_command != 0) || ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
+				scan = track;
+				remaining = 1;
+			}
+			scan--;
 		} while ((remaining != 0) && (*trackBasePtr <= track));
 	} while ((track < *trackBasePtr) && (_EraseTime(eraseTrack) != 0));
 

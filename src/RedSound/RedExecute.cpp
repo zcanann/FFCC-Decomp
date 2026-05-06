@@ -1605,7 +1605,7 @@ void EnvelopeKeyExecute()
                     *(u16*)(voice + REDSOUND_AX_VOICE_SRC_SELECT_OFFSET) = 1;
                     *(u16*)(voice + REDSOUND_AX_VOICE_RUNNING_OFFSET) = 1;
 
-                    memcpy((void*)(voice + REDSOUND_AX_VOICE_ADPCM_DATA_OFFSET), waveData->m_adpcm.m_data,
+                    memcpy((void*)(voice + REDSOUND_AX_VOICE_ADPCM_DATA_OFFSET), &waveData->m_adpcm,
                            REDSOUND_WAVE_ADPCM_DATA_SIZE);
                     memcpy((void*)(voice + REDSOUND_AX_VOICE_ADPCM_LOOP_OFFSET), waveData->m_adpcm.m_loop,
                            REDSOUND_WAVE_ADPCM_LOOP_SIZE);

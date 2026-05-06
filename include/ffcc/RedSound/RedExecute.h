@@ -44,6 +44,14 @@ enum RedNoteAllocFlag {
 	REDSOUND_NOTE_ALLOC_DIRECT_MASK = REDSOUND_NOTE_ALLOC_DIRECT | REDSOUND_NOTE_ALLOC_RESERVED,
 };
 
+struct RedWaveADPCMInfo {
+	u8 m_coefficients[0x4A - 0x22 - 3 * sizeof(u16)];
+	s16 m_predScale;
+	u16 m_yn1;
+	u16 m_yn2;
+	u8 m_loop[0x50 - 0x4A];
+};
+
 struct RedWaveDATA {
 	unsigned int m_flags;
 	int m_sampleStart;
@@ -57,10 +65,7 @@ struct RedWaveDATA {
 	unsigned char m_pan;
 	signed char m_reverbMix;
 	unsigned char m_reserved1D[0x22 - 0x1D];
-	struct RedWaveADPCMInfo {
-		unsigned char m_data[0x4A - 0x22];
-		unsigned char m_loop[0x50 - 0x4A];
-	} m_adpcm;
+	RedWaveADPCMInfo m_adpcm;
 	unsigned char m_adsr[0x5C - 0x50];
 	unsigned char m_reserved5C[0x60 - 0x5C];
 };

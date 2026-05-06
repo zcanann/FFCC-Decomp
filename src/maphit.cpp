@@ -16,8 +16,9 @@ Vec g_hit_mvec_min;
 Vec g_hit_hpv;
 Vec g_hit_hpv_min;
 
+const char s_maphit_cpp_801D7088[] = "maphit.cpp";
+
 namespace {
-static const char s_maphit_cpp[] = "maphit.cpp";
 static const float s_large_pos = 3.4e38f;
 static const float s_large_neg = -3.4e38f;
 static const float s_epsilon = 0.0001f;
@@ -321,7 +322,7 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
     while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id == 'HITV') {
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
-            m_vertices = new (stage, const_cast<char*>(s_maphit_cpp), 0x143) Vec[m_vertexCount];
+            m_vertices = new (stage, const_cast<char*>(s_maphit_cpp_801D7088), 0x143) Vec[m_vertexCount];
 
             m_positionMin.x = s_large_pos;
             m_positionMin.y = s_large_pos;
@@ -365,7 +366,7 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
             m_positionMax.z += 0.1f;
         } else if (chunk.m_id == 'HITF') {
             m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
-            m_faces = new (stage, const_cast<char*>(s_maphit_cpp), 0x159) CMapHitFace[m_faceCount];
+            m_faces = new (stage, const_cast<char*>(s_maphit_cpp_801D7088), 0x159) CMapHitFace[m_faceCount];
 
             for (unsigned int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
                 chunkFile.Align(4);

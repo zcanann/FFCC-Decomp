@@ -178,10 +178,8 @@ enum RedExecuteAxVoiceLayout {
     REDSOUND_AX_VOICE_PRIORITY_OFFSET = 0x0C,
     REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET = 0x1C,
     REDSOUND_AX_VOICE_SRC_SELECT_OFFSET = 0x140,
-    REDSOUND_AX_VOICE_MIX_CTRL_OFFSET = 0x144,
     REDSOUND_AX_VOICE_RUNNING_OFFSET = 0x146,
     REDSOUND_AX_VOICE_LOOP_OFFSET = 0x148,
-    REDSOUND_AX_VOICE_MIX_OFFSET = 0x14A,
     REDSOUND_AX_VOICE_VOLUME_OFFSET = 0x19C,
     REDSOUND_AX_VOICE_VOLUME_DELTA_OFFSET = 0x19E,
     REDSOUND_AX_MIX_CTRL_DRY_STEREO = 0x3,
@@ -1529,18 +1527,18 @@ void EnvelopeKeyExecute()
 
             if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_ADPCM_DIRTY) != 0) {
                 if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_PAUSE) == 0) {
-                    memcpy((void*)(voice + REDSOUND_AX_VOICE_MIX_OFFSET), voiceData + REDSOUND_VOICE_AX_MIX_WORD,
-                           REDSOUND_VOICE_AX_MIX_SIZE);
+                    memcpy(&((AXVPB*)voice)->pb.mix, voiceData + REDSOUND_VOICE_AX_MIX_WORD,
+                           sizeof(((AXVPB*)voice)->pb.mix));
                 } else {
-                    memset((void*)(voice + REDSOUND_AX_VOICE_MIX_OFFSET), 0, REDSOUND_VOICE_AX_MIX_SIZE);
+                    memset(&((AXVPB*)voice)->pb.mix, 0, sizeof(((AXVPB*)voice)->pb.mix));
                 }
 
-                *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) = REDSOUND_AX_MIX_CTRL_DRY_STEREO;
+                ((AXVPB*)voice)->pb.mixerCtrl = REDSOUND_AX_MIX_CTRL_DRY_STEREO;
                 if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
                     if ((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) == 0) {
-                        *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) |= REDSOUND_AX_MIX_CTRL_AUX_B_STEREO;
+                        ((AXVPB*)voice)->pb.mixerCtrl |= REDSOUND_AX_MIX_CTRL_AUX_B_STEREO;
                     } else {
-                        *(u16*)(voice + REDSOUND_AX_VOICE_MIX_CTRL_OFFSET) |= REDSOUND_AX_MIX_CTRL_AUX_A_STEREO;
+                        ((AXVPB*)voice)->pb.mixerCtrl |= REDSOUND_AX_MIX_CTRL_AUX_A_STEREO;
                     }
                 }
                 voiceFlags |= AX_SYNC_FLAG_COPYAXPBMIX | AX_SYNC_FLAG_COPYMXRCTRL;

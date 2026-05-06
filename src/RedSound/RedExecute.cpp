@@ -184,8 +184,6 @@ enum RedExecuteAxVoiceLayout {
     REDSOUND_AX_VOICE_MIX_OFFSET = 0x14A,
     REDSOUND_AX_VOICE_VOLUME_OFFSET = 0x19C,
     REDSOUND_AX_VOICE_VOLUME_DELTA_OFFSET = 0x19E,
-    REDSOUND_AX_VOICE_ADDR_END_OFFSET = 0x1AE,
-    REDSOUND_AX_VOICE_ADDR_CURRENT_OFFSET = 0x1B2,
     REDSOUND_AX_VOICE_RATIO_HIGH_OFFSET = 0x1DE,
     REDSOUND_AX_VOICE_RATIO_LOW_OFFSET = 0x1E0,
     REDSOUND_AX_MIX_CTRL_DRY_STEREO = 0x3,
@@ -1601,7 +1599,7 @@ void EnvelopeKeyExecute()
                     memcpy(&((AXVPB*)voice)->pb.adpcmLoop, &waveData->m_adpcm.m_loop, sizeof(waveData->m_adpcm.m_loop));
                     memset(((AXVPB*)voice)->pb.src.last_samples, 0, sizeof(((AXVPB*)voice)->pb.src.last_samples));
                     ((AXVPB*)voice)->pb.addr.format = 0;
-                    *(int*)(voice + REDSOUND_AX_VOICE_ADDR_CURRENT_OFFSET) = key;
+                    *(u32*)&((AXVPB*)voice)->pb.addr.currentAddressHi = key;
 
                     if (waveData->m_loopStart < 0) {
                         ((AXVPB*)voice)->pb.addr.loopFlag = 0;
@@ -1613,7 +1611,7 @@ void EnvelopeKeyExecute()
 
                     ((AXVPB*)voice)->pb.addr.loopAddressHi = (u16)((u32)key >> 0x10);
                     ((AXVPB*)voice)->pb.addr.loopAddressLo = (u16)key;
-                    *(int*)(voice + REDSOUND_AX_VOICE_ADDR_END_OFFSET) = keyBase + waveData->m_loopEnd;
+                    *(u32*)&((AXVPB*)voice)->pb.addr.endAddressHi = keyBase + waveData->m_loopEnd;
 
                     voiceFlags |= AX_SYNC_FLAG_COPYADPCMLOOP | AX_SYNC_FLAG_COPYSRC | AX_SYNC_FLAG_COPYADPCM |
                                   AX_SYNC_FLAG_COPYCURADDR | AX_SYNC_FLAG_COPYADDR | AX_SYNC_FLAG_COPYTYPE |

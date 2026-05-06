@@ -291,7 +291,7 @@ void InitReverb();
 int* SetReverb(int, int, int*);
 
 RedVoiceDATA* EntryVoiceSearch(RedTrackDATA*);
-void SetVoiceVolumeMix(RedVoiceDATA*, int, int);
+void SetVoiceVolumeMix(RedVoiceDATA*, u32, int);
 void SetVoiceAccess(RedTrackDATA*, int);
 void SetVoiceSwitch(RedTrackDATA*, int);
 

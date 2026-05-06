@@ -667,7 +667,7 @@ static void _VoiceEnvelopeCheck()
  * JP Address: TODO
  * JP Size: TODO
  */
-void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
+void SetVoiceVolumeMix(RedVoiceDATA* voice, u32 pan, int volume)
 {
     int iVar1;
     int iVar2;

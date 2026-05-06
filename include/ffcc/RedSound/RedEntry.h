@@ -78,8 +78,8 @@ struct RedMusicHEAD
 	unsigned short m_unk0e;
 	int m_size;
 	unsigned int m_playFlags;
-	int m_unk18;
-	int m_unk1c;
+	int m_reserved18;
+	int m_reserved1C;
 };
 
 enum RedMusicHeaderFlag {
@@ -98,7 +98,7 @@ struct RedSeSepHEAD
 	unsigned char m_seInfoFlags;
 	unsigned char m_waveNoLo;
 	unsigned char m_waveNoHi;
-	unsigned char m_unk13;
+	unsigned char m_reserved13;
 };
 
 enum RedSeSepHeadLayout {
@@ -130,7 +130,7 @@ enum RedSeInfoLayout {
 struct RedSeBlockHEAD
 {
 	char m_signature[REDSOUND_SE_BLOCK_SIGNATURE_SIZE];
-	unsigned char m_pad08[0x0A - 0x08];
+	unsigned char m_reserved08[0x0A - 0x08];
 	short m_seCount;
 	int m_size;
 	int m_entries[REDSOUND_SE_BLOCK_ENTRY_MIN_COUNT];
@@ -158,7 +158,7 @@ struct RedWaveHeadWD
 	int m_toneCount;
 	int m_aramAddress;
 	int m_loadSize;
-	unsigned char m_pad18[0x20 - 0x18];
+	unsigned char m_reserved18[0x20 - 0x18];
 	int m_waveOffsets[REDSOUND_WAVE_OFFSET_MIN_COUNT];
 };
 

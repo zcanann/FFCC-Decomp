@@ -1334,50 +1334,9 @@ void CMemory::CStage::drawHeapBar(int y)
     int heapTop = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
     int heapSpan = (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0xC) - 0x40) - heapTop;
 
-    do {
+    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
         int curNode = node;
         unsigned char flags = *reinterpret_cast<unsigned char*>(curNode + 2);
-        if ((flags & 2) != 0) {
-            unsigned int drawColor = static_cast<unsigned int>(heapBar[0]);
-            unsigned char* colorPtr = heapBar;
-            int segmentStart = 0;
-            int x = 0;
-
-            do {
-                if ((drawColor != *colorPtr) || (x == 0x17B)) {
-                    unsigned int color;
-                    if (drawColor == 0xFF) {
-                        if (stageGetAllocationMode(this) == 0) {
-                            color = 0x4080;
-                        } else {
-                            color = 0x400080;
-                        }
-                    } else if (stageGetAllocationMode(this) == 0) {
-                        color = colors[drawColor];
-                    } else {
-                        color = colors[drawColor];
-                    }
-
-                    GXBegin(static_cast<GXPrimitive>(0x98), GX_VTXFMT0, 4);
-                    GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y), 0.0f);
-                    GXColor1u32(color);
-                    GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y), 0.0f);
-                    GXColor1u32(color);
-                    GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y + 8), 0.0f);
-                    GXColor1u32(color);
-                    GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y + 8), 0.0f);
-                    GXColor1u32(color);
-
-                    drawColor = static_cast<unsigned int>(*colorPtr);
-                    segmentStart = x;
-                }
-
-                x++;
-                colorPtr++;
-            } while (x < 0x17C);
-            return;
-        }
-
         bool isUsed = false;
         if (((flags & 4) != 0) && ((flags & 3) == 0)) {
             isUsed = true;
@@ -1437,7 +1396,45 @@ checkHeapNode:
             }
             return;
         }
-    } while (true);
+    }
+
+    unsigned int drawColor = static_cast<unsigned int>(heapBar[0]);
+    unsigned char* colorPtr = heapBar;
+    int segmentStart = 0;
+    int x = 0;
+
+    do {
+        if ((drawColor != *colorPtr) || (x == 0x17B)) {
+            unsigned int color;
+            if (drawColor == 0xFF) {
+                if (stageGetAllocationMode(this) == 0) {
+                    color = 0x4080;
+                } else {
+                    color = 0x400080;
+                }
+            } else if (stageGetAllocationMode(this) == 0) {
+                color = colors[drawColor];
+            } else {
+                color = colors[drawColor];
+            }
+
+            GXBegin(static_cast<GXPrimitive>(0x98), GX_VTXFMT0, 4);
+            GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y), 0.0f);
+            GXColor1u32(color);
+            GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y), 0.0f);
+            GXColor1u32(color);
+            GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y + 8), 0.0f);
+            GXColor1u32(color);
+            GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y + 8), 0.0f);
+            GXColor1u32(color);
+
+            drawColor = static_cast<unsigned int>(*colorPtr);
+            segmentStart = x;
+        }
+
+        x++;
+        colorPtr++;
+    } while (x < 0x17C);
 }
 
 /*

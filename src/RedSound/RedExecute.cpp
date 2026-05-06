@@ -1084,45 +1084,51 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     }
     voice->m_pitch = iVar5;
 
-    if (((track->m_flags & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0) ||
-        ((((s8)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0) &&
-          ((track->m_flags & (REDSOUND_TRACK_FLAG_SLUR | REDSOUND_TRACK_FLAG_TENUTO)) == 0)) ||
-         ((((s8)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) &&
-          ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) == 0))) {
-        if (track->m_vibrateFunc != 0) {
-            voice->m_pitchModDelay = track->m_vibrateDelay;
-            pitchWork[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
-            if ((track->m_vibrateRate >> REDSOUND_FIXED_SHIFT) != 0) {
-                pitchWork[0] =
-                    REDSOUND_MOD_DELAY_PHASE_SCALE / (track->m_vibrateRate >> REDSOUND_FIXED_SHIFT);
+    if ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR_RELEASE) != 0) {
+        if ((((s8)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0) ||
+            ((track->m_flags & (REDSOUND_TRACK_FLAG_SLUR | REDSOUND_TRACK_FLAG_TENUTO)) != 0)) {
+            if ((((s8)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) ||
+                ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) != 0)) {
+                goto skipModSetup;
             }
-            if (track->m_vibrateDelayDepth == 0) {
-                iVar5 = 0;
-            } else {
-                iVar5 = track->m_vibrateDelayDepth * pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE;
-            }
-            voice->m_pitchModFrames = iVar5;
-            voice->m_pitchModFrame = 0;
-            voice->m_pitchModPhase = 0;
-        }
-
-        if (track->m_tremoloFunc != 0) {
-            voice->m_volumeModDelay = track->m_tremoloDelay;
-            pitchWork[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
-            if ((track->m_tremoloRate >> REDSOUND_FIXED_SHIFT) != 0) {
-                pitchWork[0] =
-                    REDSOUND_MOD_DELAY_PHASE_SCALE / (track->m_tremoloRate >> REDSOUND_FIXED_SHIFT);
-            }
-            if (track->m_tremoloDelayDepth == 0) {
-                iVar5 = 0;
-            } else {
-                iVar5 = track->m_tremoloDelayDepth * pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE;
-            }
-            voice->m_volumeModFrames = iVar5;
-            voice->m_volumeModFrame = 0;
-            voice->m_volumeModPhase = 0;
         }
     }
+
+    if (track->m_vibrateFunc != 0) {
+        voice->m_pitchModDelay = track->m_vibrateDelay;
+        pitchWork[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
+        if ((track->m_vibrateRate >> REDSOUND_FIXED_SHIFT) != 0) {
+            pitchWork[0] =
+                REDSOUND_MOD_DELAY_PHASE_SCALE / (track->m_vibrateRate >> REDSOUND_FIXED_SHIFT);
+        }
+        if (track->m_vibrateDelayDepth == 0) {
+            iVar5 = 0;
+        } else {
+            iVar5 = track->m_vibrateDelayDepth * pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE;
+        }
+        voice->m_pitchModFrames = iVar5;
+        voice->m_pitchModFrame = 0;
+        voice->m_pitchModPhase = 0;
+    }
+
+    if (track->m_tremoloFunc != 0) {
+        voice->m_volumeModDelay = track->m_tremoloDelay;
+        pitchWork[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
+        if ((track->m_tremoloRate >> REDSOUND_FIXED_SHIFT) != 0) {
+            pitchWork[0] =
+                REDSOUND_MOD_DELAY_PHASE_SCALE / (track->m_tremoloRate >> REDSOUND_FIXED_SHIFT);
+        }
+        if (track->m_tremoloDelayDepth == 0) {
+            iVar5 = 0;
+        } else {
+            iVar5 = track->m_tremoloDelayDepth * pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE;
+        }
+        voice->m_volumeModFrames = iVar5;
+        voice->m_volumeModFrame = 0;
+        voice->m_volumeModPhase = 0;
+    }
+
+skipModSetup:
 
     if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_PITCH) == 0) {
         voice->m_randomPitch = 0;

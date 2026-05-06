@@ -1167,16 +1167,13 @@ unsigned int GbaQueue::GetStageFlg(int channel)
  */
 void GbaQueue::ClrStageFlg(int channel)
 {
-	unsigned int bitMask;
-	unsigned char channelMask;
-	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
+	char* obj = reinterpret_cast<char*>(this);
+	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(obj + channel * sizeof(OSSemaphore));
 
-	OSWaitSemaphore(accessSemaphores + channel);
-	bitMask = 1U << channel;
-	channelMask = static_cast<unsigned char>(bitMask);
-	obj[0x44C] = static_cast<unsigned char>(obj[0x44C] & ~channelMask);
-	m_chgScouFlags = static_cast<unsigned char>(m_chgScouFlags | channelMask);
-	OSSignalSemaphore(accessSemaphores + channel);
+	OSWaitSemaphore(semaphore);
+	obj[0x44C] = obj[0x44C] & ~(1 << channel);
+	m_chgScouFlags = m_chgScouFlags | (1 << channel);
+	OSSignalSemaphore(semaphore);
 }
 
 /*
@@ -4508,9 +4505,9 @@ unsigned int GbaQueue::GetRadarMode(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	char radarMode = obj[0x2D41];
+	int radarMode = obj[0x2D41];
 	OSSignalSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<int>(radarMode) & (1 << channel);
+	unsigned int value = radarMode & (1 << channel);
 	return (-value | value) >> 31;
 }
 
@@ -4526,14 +4523,15 @@ unsigned int GbaQueue::GetRadarMode(int channel)
 void GbaQueue::SetRadarMode(int channel, int mode)
 {
 	char* obj = reinterpret_cast<char*>(this);
-	unsigned char mask = static_cast<unsigned char>(1 << channel);
-	unsigned char radarMode;
+	int mask;
+	int radarMode;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	radarMode = static_cast<unsigned char>(obj[0x2D41]);
-	obj[0x2D41] = static_cast<char>((radarMode & ~mask) | ((mode & 1) << channel));
-	if (radarMode != static_cast<unsigned char>(obj[0x2D41])) {
-		obj[0x2D42] = static_cast<char>(obj[0x2D42] | mask);
+	radarMode = obj[0x2D41];
+	mask = 1 << channel;
+	obj[0x2D41] = (radarMode & ~mask) | ((mode & 1) << channel);
+	if (radarMode != obj[0x2D41]) {
+		obj[0x2D42] = obj[0x2D42] | mask;
 	}
 	OSSignalSemaphore(accessSemaphores + channel);
 }
@@ -4547,9 +4545,9 @@ unsigned int GbaQueue::GetChgRadarMode(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	char radarMode = obj[0x2D42];
+	int radarMode = obj[0x2D42];
 	OSSignalSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<int>(radarMode) & (1 << channel);
+	unsigned int value = radarMode & (1 << channel);
 	return (-value | value) >> 31;
 }
 
@@ -4710,9 +4708,9 @@ unsigned int GbaQueue::GetChgHitFlg(int channel)
 	                             ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;
 	OSWaitSemaphore(semaphore);
-	signed char flag = m_chgHitFlags;
+	int flag = reinterpret_cast<signed char*>(this)[0x2D54];
 	OSSignalSemaphore(semaphore);
-	unsigned int value = static_cast<unsigned int>(flag) & (1U << actualChannel);
+	unsigned int value = flag & (1U << actualChannel);
 	return (-value | value) >> 31U;
 }
 
@@ -4743,9 +4741,9 @@ unsigned int GbaQueue::GetChgScouFlg(int channel)
 {
 	OSSemaphore* semaphore = AccessSemaphoreAt(this, channel);
 	OSWaitSemaphore(semaphore);
-	signed char flag = reinterpret_cast<signed char*>(this)[0x2D55];
+	int flag = reinterpret_cast<signed char*>(this)[0x2D55];
 	OSSignalSemaphore(semaphore);
-	unsigned int value = static_cast<unsigned int>(flag) & (1U << channel);
+	unsigned int value = flag & (1U << channel);
 	return (-value | value) >> 31U;
 }
 

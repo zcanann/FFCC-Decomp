@@ -20,7 +20,6 @@ extern const float kPppHeapUseRateDivisor;
 
 extern "C" const char s_no_name_8032fdcc[];
 extern "C" {
-extern const float kPartColorIdentityOne = 1.0f;
 const char s_no_name_8032fdcc[] = "no name";
 }
 

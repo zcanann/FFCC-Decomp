@@ -290,10 +290,10 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     unsigned char colorB;
     unsigned char colorA;
     int i;
-    float* particleData;
-    Mtx* matrixList;
-    float* particleColor;
-    int* groupData;
+    BreathParticleData* particleData;
+    PARTICLE_WMAT* matrixList;
+    PARTICLE_COLOR* particleColor;
+    BreathParticleGroup* groupData;
     int groupCount;
     pppModelSt* model;
     _GXColor drawColor;
@@ -311,10 +311,10 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = reinterpret_cast<VBreathModel*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset);
     color = reinterpret_cast<VColor*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
-    particleData = reinterpret_cast<float*>(work->m_particleData);
-    matrixList = reinterpret_cast<Mtx*>(work->m_particleWmats);
-    particleColor = reinterpret_cast<float*>(work->m_particleColors);
-    groupData = reinterpret_cast<int*>(work->m_groups);
+    particleData = reinterpret_cast<BreathParticleData*>(work->m_particleData);
+    matrixList = work->m_particleWmats;
+    particleColor = work->m_particleColors;
+    groupData = work->m_groups;
     groupCount = work->m_particleCount;
 
     if (pBreathModel->m_stepValue == 0xFFFF) {
@@ -336,19 +336,19 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     colorA = color->m_alpha;
 
     for (i = 0; i < groupCount; i++) {
-        if (0 < *(short*)((unsigned char*)particleData + 0x50)) {
+        if (0 < particleData->m_life) {
             int r;
             int g;
             int b;
             int a;
 
-            PSMTXScale(drawMtx, *(float*)((u8*)pppMngStPtr + 0x28) * particleData[0x19],
-                       *(float*)((u8*)pppMngStPtr + 0x2C) * particleData[0x1A],
-                       *(float*)((u8*)pppMngStPtr + 0x30) * particleData[0x1B]);
-            PSMTXConcat(*(Mtx*)particleData, drawMtx, tempMtx);
+            PSMTXScale(drawMtx, *(float*)((u8*)pppMngStPtr + 0x28) * particleData->m_rotationX,
+                       *(float*)((u8*)pppMngStPtr + 0x2C) * particleData->m_rotationY,
+                       *(float*)((u8*)pppMngStPtr + 0x30) * particleData->m_rotationZ);
+            PSMTXConcat(particleData->m_modelMtx, drawMtx, tempMtx);
             PSMTXConcat(ppvCameraMatrix, tempMtx, tempMtx);
-            PSMTXConcat(ppvCameraMatrix, *(Mtx*)particleData, cameraMtx);
-            PSMTXMultVec(cameraMtx, (Vec*)(particleData + 0xC), &pos);
+            PSMTXConcat(ppvCameraMatrix, particleData->m_modelMtx, cameraMtx);
+            PSMTXMultVec(cameraMtx, &particleData->m_position, &pos);
             tempMtx[0][3] = pos.x;
             tempMtx[1][3] = pos.y;
             tempMtx[2][3] = pos.z;
@@ -357,13 +357,13 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
             r = colorR;
             g = colorG;
             b = colorB;
-            a = (int)((float)(int)colorA - particleData[0x22]);
+            a = (int)((float)(int)colorA - particleData->m_alpha);
 
             if (particleColor != NULL) {
-                r += (int)particleColor[0];
-                g += (int)particleColor[1];
-                b += (int)particleColor[2];
-                a += (int)particleColor[3];
+                r += (int)particleColor->m_color[0];
+                g += (int)particleColor->m_color[1];
+                b += (int)particleColor->m_color[2];
+                a += (int)particleColor->m_color[3];
             }
 
             if (r < 0) {
@@ -399,15 +399,15 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
             matrixList++;
         }
         if (particleColor != NULL) {
-            particleColor += 8;
+            particleColor++;
         }
-        particleData += 0x26;
+        particleData++;
     }
 
     if ((*(u32*)(CFlat + 0x129C) & 0x200000) != 0) {
-        int* debugGroupData = groupData;
+        BreathParticleGroup* debugGroupData = groupData;
         for (i = 0; i < (int)pBreathModel->m_groupCount; i++) {
-            if (debugGroupData[0] == 1) {
+            if (debugGroupData->active == 1) {
                 int firstParticle;
                 int j;
                 float groupScale;
@@ -446,10 +446,10 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 }
 
                 firstParticle = -1;
-                groupScale = *(float*)(debugGroupData + 10);
+                groupScale = debugGroupData->scale;
                 for (j = 0; j < (int)pBreathModel->m_slotCount; j++) {
-                    if (*(signed char*)(debugGroupData[2] + j) != -1) {
-                        firstParticle = (int)*(signed char*)(debugGroupData[1] + j);
+                    if (debugGroupData->particleStates[j] != -1) {
+                        firstParticle = debugGroupData->particleIndices[j];
                         break;
                     }
                 }
@@ -460,7 +460,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 sphereMtx[2][2] = groupScale;
                 PSMTXConcat(*reinterpret_cast<Mtx*>(&work->m_particleWmats[firstParticle]), object->m_localMatrix.value, debugMtx);
                 PSMTXConcat(ppvCameraMatrix, debugMtx, debugMtx);
-                PSMTXMultVec(debugMtx, (Vec*)(debugGroupData + 3), &debugPos);
+                PSMTXMultVec(debugMtx, &debugGroupData->position, &debugPos);
                 sphereMtx[0][3] = debugPos.x;
                 sphereMtx[1][3] = debugPos.y;
                 sphereMtx[2][3] = debugPos.z;
@@ -468,7 +468,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 pppSetBlendMode(1);
                 DrawSphere__8CGraphicFPA4_f8_GXColor(&Graphic, sphereMtx, debugColor);
             }
-            debugGroupData += 0x17;
+            debugGroupData++;
         }
 
         pppInitBlendMode();

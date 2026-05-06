@@ -2021,8 +2021,8 @@ void CAmemCacheSet::AddRef(short index)
     CAmemCache& entry = cacheEntryAt(this, index);
 
     entry.m_refCount += 1;
-    if (entry.m_refCount == -1) {
-        if (System.m_execParam > 2) {
+    if (entry.m_refCount == 0xFFFF) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
             Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt, static_cast<int>(index));
         }
 
@@ -2030,7 +2030,7 @@ void CAmemCacheSet::AddRef(short index)
             CAmemCache& current = cacheEntryAt(this, i);
             int data = reinterpret_cast<int>(current.m_cacheData);
             if ((current.m_inUse != 0) || (data != 0)) {
-                if (System.m_execParam > 2) {
+                if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
                     Printf__7CSystemFPce(
                         &System, s_amemCacheEntryFmt, i, cacheStateName(current),
                         cacheTypeName(current), current.m_refCount, current.m_priority, data);
@@ -2038,7 +2038,7 @@ void CAmemCacheSet::AddRef(short index)
             }
         }
 
-        if (System.m_execParam > 2) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
             Printf__7CSystemFPce(&System, s_amemCacheSeparator);
         }
 
@@ -2065,14 +2065,15 @@ void CAmemCacheSet::Release(short index)
     CAmemCache& entry = cacheEntryAt(this, index);
     entry.m_refCount -= 1;
 
-    if (entry.m_refCount == -1) {
-        if (System.m_execParam > 2) {
+    if (entry.m_refCount == 0xFFFF) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
             Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt);
         }
 
         for (int i = 0; i < m_cacheCount; i++) {
             CAmemCache& cache = cacheEntryAt(this, i);
-            if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) && (System.m_execParam > 2)) {
+            if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) &&
+                (static_cast<unsigned int>(System.m_execParam) >= 3U)) {
                 Printf__7CSystemFPce(
                     &System, s_amemCacheEntryPaddedFmt, i, cacheStateName(cache),
                     cacheTypeName(cache), cache.m_refCount,
@@ -2080,7 +2081,7 @@ void CAmemCacheSet::Release(short index)
             }
         }
 
-        if (System.m_execParam > 2) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
             Printf__7CSystemFPce(&System, s_amemCacheSeparator);
         }
 
@@ -2233,7 +2234,7 @@ void CAmemCacheSet::CalcPrio()
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
 
-        if ((entry.m_inUse != 0) && (*reinterpret_cast<unsigned short*>(&entry.m_refCount) == 0) &&
+        if ((entry.m_inUse != 0) && (entry.m_refCount == 0) &&
             (entry.m_cacheData != 0) && (static_cast<unsigned int>(entry.m_priority) != 0)) {
             entry.m_priority--;
         }
@@ -2275,20 +2276,21 @@ void CAmemCacheSet::RefCnt0Clear()
  */
 void CAmemCacheSet::RefCnt0Compare()
 {
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         Printf__7CSystemFPce(&System, s_refCntCompareBanner);
     }
 
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
-        if ((entry.m_inUse != 0 && entry.m_refCount != 0) && System.m_execParam > 2) {
+        if ((entry.m_inUse != 0 && entry.m_refCount != 0) &&
+            static_cast<unsigned int>(System.m_execParam) >= 3U) {
             Printf__7CSystemFPce(
                 &System, s_amemCacheEntryFmt, i, cacheStateName(entry), cacheTypeName(entry),
                 entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
         }
     }
 
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         Printf__7CSystemFPce(&System, s_amemCacheSeparator);
     }
 }
@@ -2304,21 +2306,22 @@ void CAmemCacheSet::RefCnt0Compare()
  */
 void CAmemCacheSet::AssertCache()
 {
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt);
     }
 
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
-        int data = reinterpret_cast<int>(entry.m_cacheData);
-        if ((entry.m_inUse != 0 || data != 0) && System.m_execParam > 2) {
+        if ((entry.m_inUse != 0 || entry.m_cacheData != 0) &&
+            static_cast<unsigned int>(System.m_execParam) >= 3U) {
             Printf__7CSystemFPce(
                 &System, s_amemCacheEntryFmt, i, cacheStateName(entry),
-                cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);
+                cacheTypeName(entry), entry.m_refCount, entry.m_priority,
+                reinterpret_cast<int>(entry.m_cacheData));
         }
     }
 
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         Printf__7CSystemFPce(&System, s_amemCacheSeparator);
     }
 }

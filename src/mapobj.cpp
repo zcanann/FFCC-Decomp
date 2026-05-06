@@ -1549,7 +1549,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
+void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0) && (S8At(this, 0x1F) == -1)) {
         Mtx inverseMtx;
@@ -1640,7 +1640,6 @@ int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         }
     }
 
-    return 0;
 }
 
 /*

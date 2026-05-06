@@ -160,7 +160,7 @@ mapobj.cpp:
 	extab       start:0x80005EC8 end:0x80005FB0
 	extabindex  start:0x8000B860 end:0x8000B9BC
 	.text       start:0x800287D0 end:0x8002C704
-	.data       start:0x801E88E4 end:0x801E8950
+	.data       start:0x801E88D8 end:0x801E8960
 
 mapocttree.cpp:
 	extab       start:0x80005FB0 end:0x80006068
@@ -177,7 +177,7 @@ map.cpp:
 	extabindex  start:0x8000BAD0 end:0x8000BD70
 	.text       start:0x8002F45C end:0x80034988
 	.ctors      start:0x801D53D8 end:0x801D53DC
-	.data       start:0x801E896C end:0x801E89B4
+	.data       start:0x801E8960 end:0x801E89B4
 	.bss        start:0x80245758 end:0x802685E0
 	.sdata2     start:0x8032F984 end:0x8032FA00
 
@@ -999,7 +999,7 @@ mes.cpp:
 	extab       start:0x80007D38 end:0x80007D78
 	extabindex  start:0x8000E128 end:0x8000E188
 	.text       start:0x800981F0 end:0x8009B3B4
-	.data       start:0x8020F758 end:0x8020FA00
+	.data       start:0x8020F758 end:0x8020F998
 	.bss        start:0x802EAA60 end:0x802EAAB0
 
 menu.cpp:
@@ -1011,6 +1011,8 @@ mesmenu.cpp:
 	extab       start:0x80007DA0 end:0x80007E04
 	extabindex  start:0x8000E1C4 end:0x8000E23C
 	.text       start:0x8009B4E4 end:0x8009E1C0
+	.rodata     start:0x801D9E90 end:0x801D9EC8
+	.data       start:0x8020F998 end:0x8020FA00
 
 gobjwork.cpp:
 	extab       start:0x80007E04 end:0x80007F78

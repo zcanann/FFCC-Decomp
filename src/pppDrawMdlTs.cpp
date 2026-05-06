@@ -13,8 +13,7 @@ void pppDrawMesh__FP10pppModelStP3Veci(void*, void*, int);
 void SetTexScroll__12CMaterialManFffff(CMaterialMan*, float, float, float, float);
 }
 
-extern "C" const f32 kPppKeShpTail2XZero = 0.0f;
-extern const float FLOAT_803304F0;
+static const float FLOAT_803304F0 = 0.0f;
 
 // Use simple forward declarations and casting approach
 

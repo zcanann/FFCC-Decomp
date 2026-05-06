@@ -53,10 +53,11 @@ int GetWait__4CMesFv(void* mes);
 int useFlag__4CMesFii(void* mes, int flag, int value);
 void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 
-extern void* __vt__8CMesMenu[];
-extern const char DAT_801d9e9c[];
-extern int DAT_8020F9A8[4];
-extern int DAT_8020f998[4];
+static const char s_CMesMenu_801D9E90[] = "CMesMenu";
+const char DAT_801d9e9c[] =
+    "mesMenu\x95\x8e\xa6on/off\x82\xaa\x95\xcf\x8d\x58\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42%d-%d\n\0\0\0";
+int DAT_8020f998[4] = {1, 0, -1, 0};
+int DAT_8020F9A8[4] = {1, 6, 7, 6};
 extern float FLOAT_803308d8;
 extern float FLOAT_803308dc;
 extern float FLOAT_803308e0;
@@ -130,8 +131,6 @@ struct CFlatDataView
  */
 CMesMenu::CMesMenu()
 {
-    __ct__5CMenuFv(this);
-    *(void***)this = __vt__8CMesMenu;
     __ct__4CMesFv((char*)this + 0x1C);
 }
 
@@ -146,10 +145,8 @@ CMesMenu::CMesMenu()
  */
 CMesMenu::~CMesMenu()
 {
-    *(void***)this = __vt__8CMesMenu;
-    ((CMenu*)this)->Destroy();
+    Destroy();
     __dt__4CMesFv((char*)this + 0x1C, -1);
-    __dt__5CMenuFv(this, 0);
 }
 
 /*
@@ -165,8 +162,7 @@ void CMesMenu::Create()
 {
     typedef void (*VFunc)(void*);
 
-    VFunc* vtable = *reinterpret_cast<VFunc**>(this);
-    vtable[4](this);
+    (*reinterpret_cast<VFunc**>(this))[4](this);
     Create__5CMenuFv(this);
 
     float defaultValue = FLOAT_803308d8;

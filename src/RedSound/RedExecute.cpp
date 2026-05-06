@@ -1647,22 +1647,21 @@ void EnvelopeKeyExecute()
  */
 static void _KeyOnControl()
 {
-    u32 voiceStartMaskHi;
-    u32 voiceStartMaskLo;
+    u32 voiceStartMask[2];
     int* reserve;
     unsigned int* voiceData;
     int (*waveFunc)(int);
 
     _VoiceEnvelopeCheck();
-    voiceStartMaskHi = 0;
-    voiceStartMaskLo = 0;
+    voiceStartMask[0] = 0;
+    voiceStartMask[1] = 0;
     reserve = (int*)p_KeyOnData;
     voiceData = (unsigned int*)p_VoiceData;
 
     if (m_KeyOnEntry != 0) {
         do {
             if (((u32)*reserve != 0) && (((RedTrackDATA*)*reserve)->m_waveData != 0)) {
-                voiceData = (unsigned int*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)&voiceStartMaskLo);
+                voiceData = (unsigned int*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)voiceStartMask);
             }
             reserve += 2;
         } while ((voiceData != 0) && (reserve < (int*)p_KeyOnData + REDSOUND_KEY_ON_TOTAL_WORD_COUNT));
@@ -1789,26 +1788,26 @@ static void _KeyOnControl()
         u32 bit = 1;
         unsigned int* voice = (unsigned int*)p_VoiceData;
         do {
-            if ((voiceStartMaskLo & bit) != 0) {
-                voiceStartMaskLo &= ~bit;
+            if ((voiceStartMask[0] & bit) != 0) {
+                voiceStartMask[0] &= ~bit;
                 voice[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
             voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
-        } while (voiceStartMaskLo != 0);
+        } while (voiceStartMask[0] != 0);
     }
 
     {
         u32 bit = 1;
         unsigned int* voice = (unsigned int*)p_VoiceData + REDSOUND_VOICE_SECOND_MASK_WORD_OFFSET;
         do {
-            if ((voiceStartMaskHi & bit) != 0) {
-                voiceStartMaskHi &= ~bit;
+            if ((voiceStartMask[1] & bit) != 0) {
+                voiceStartMask[1] &= ~bit;
                 voice[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
             voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
-        } while (voiceStartMaskHi != 0);
+        } while (voiceStartMask[1] != 0);
     }
 }
 

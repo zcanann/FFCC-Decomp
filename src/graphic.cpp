@@ -73,6 +73,10 @@ static inline void*& PtrAt(CGraphic* self, u32 offset) {
     return *reinterpret_cast<void**>(reinterpret_cast<u8*>(self) + offset);
 }
 
+static inline float LoadFloat(const float& value) {
+    return value;
+}
+
 static inline u16 U16At(void* p, u32 offset) {
     return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(p) + offset);
 }
@@ -1335,12 +1339,12 @@ void CGraphic::SetFog(int useFog, int useGlobalColor)
 void CGraphic::CopySaveFrameBuffer()
 {
     GXSetTexCopySrc(0, 0, 0x280, 0x1C0);
-    GXSetTexCopyDst(0x280, 0x1C0, GX_TF_I8, GX_FALSE);
+    GXSetTexCopyDst(0x280, 0x1C0, GX_TF_RGB565, GX_FALSE);
     GXCopyTex(PtrAt(this, 0x71EC), GX_FALSE);
     GXPixModeSync();
-    GXInitTexObj(&m_smallBackTexObj, PtrAt(this, 0x71EC), 0x280, 0x1C0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&m_smallBackTexObj, GX_NEAR, GX_NEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF,
-                    GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObj(&m_smallBackTexObj, PtrAt(this, 0x71EC), 0x280, 0x1C0, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    float zero = LoadFloat(kGraphicZeroF);
+    GXInitTexObjLOD(&m_smallBackTexObj, GX_NEAR, GX_NEAR, zero, zero, zero, GX_FALSE, GX_FALSE, GX_ANISO_1);
 }
 
 /*

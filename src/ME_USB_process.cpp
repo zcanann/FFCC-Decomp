@@ -85,11 +85,11 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
 
     switch (usb.m_packetCode) {
     case 0x21:
-        U32At(materialEditorPcs, 0xE8) = 1;
+        materialEditorPcs->m_displayTextureEnabled = 1;
         ClearTextureData__18CMaterialEditorPcsFv(materialEditorPcs);
         break;
     case 0x22:
-        U32At(materialEditorPcs, 0xE8) = 0;
+        materialEditorPcs->m_displayTextureEnabled = 0;
         break;
     case 3:
         usb.m_stageDefault = reinterpret_cast<CMemory::CStage*>(1);

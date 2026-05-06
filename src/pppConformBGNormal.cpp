@@ -182,7 +182,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
             local_19c.x = local_164.x;
             local_19c.y = local_164.y;
             local_19c.z = local_164.z;
-            local_19c.w = kPppConformBgNormalOne;
+            local_19c.w = local_18c.w;
             C_QUATSlerp(&local_18c, &local_19c, &local_1ac, param2->m_initWOrk);
             stateNormal->x = local_1ac.x;
             stateNormal->y = local_1ac.y;

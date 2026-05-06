@@ -27,7 +27,7 @@ struct ChangeTexDisplayList {
 };
 
 struct ChangeTexMeshData {
-	u8 _pad0[0x14];
+	char m_name[0x14];
 	u32 m_vertexCount;
 	u8 _pad18[0x8];
 	void* m_normals;
@@ -39,7 +39,7 @@ struct ChangeTexMeshData {
 struct ChangeTexMeshRef {
 	u8 _pad0[0x8];
 	ChangeTexMeshData* m_data;
-	s16* m_points;
+	S16Vec* m_points;
 	u8 _pad10[0x14 - 0x10];
 };
 
@@ -122,7 +122,7 @@ extern "C" {
 	int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 	void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvStYmChangeTex*);
 	void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
-	void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
+	void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
 	void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 	void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 }

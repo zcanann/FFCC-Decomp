@@ -92,7 +92,7 @@ struct RedMusicPlayCommand {
     int m_musicId;
     int m_volume;
     int m_mode;
-    int m_pad;
+    int m_reserved;
 };
 
 enum RedMusicCommandWord {
@@ -885,8 +885,8 @@ unsigned int GetMyEntryID()
 }
 
 struct RedSleepAlarm {
-    OSAlarm alarm;
-    OSThread* thread;
+    OSAlarm m_alarm;
+    OSThread* m_thread;
 };
 
 /*
@@ -900,7 +900,7 @@ struct RedSleepAlarm {
  */
 static void _MyAlarmHandler(OSAlarm* alarm, OSContext*)
 {
-    OSResumeThread(((RedSleepAlarm*)alarm)->thread);
+    OSResumeThread(((RedSleepAlarm*)alarm)->m_thread);
 }
 
 /*
@@ -921,10 +921,10 @@ void RedSleep(int microseconds)
         microseconds = REDSOUND_CONTROL_TICK_PERIOD;
     }
     interruptLevel = OSDisableInterrupts();
-    alarm.thread = OSGetCurrentThread();
-    OSCreateAlarm(&alarm.alarm);
-    OSSetAlarm(&alarm.alarm, (microseconds * (OS_TIMER_CLOCK / 125000)) >> 3, _MyAlarmHandler);
-    OSSuspendThread(alarm.thread);
+    alarm.m_thread = OSGetCurrentThread();
+    OSCreateAlarm(&alarm.m_alarm);
+    OSSetAlarm(&alarm.m_alarm, (microseconds * (OS_TIMER_CLOCK / 125000)) >> 3, _MyAlarmHandler);
+    OSSuspendThread(alarm.m_thread);
     OSRestoreInterrupts(interruptLevel);
 }
 

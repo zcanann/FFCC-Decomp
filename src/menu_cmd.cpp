@@ -2442,28 +2442,24 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 		int finished = 0;
 		s32* top = s_UniteTop;
 		for (int i = 0; i < DAT_8032eec8; i++) {
-			int j = 0;
-			int k = 3;
-			do {
+			for (int j = 0; j < 3; j++) {
 				int idx = j + *top;
 				int entryOffset = idx * 0x40 + 8;
 				if ((j != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
 					break;
 				}
 
-				*reinterpret_cast<s16*>(listBase + entryOffset) =
-				    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(listBase + entryOffset)) -
+				int entryBase = GetCmdListBase(this);
+				*reinterpret_cast<s16*>(entryBase + entryOffset) =
+				    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(entryBase + entryOffset)) -
 				                     DOUBLE_80332ab8);
-				if (static_cast<float>(*reinterpret_cast<s16*>(listBase + entryOffset)) <= baseX) {
-					*reinterpret_cast<s16*>(listBase + entryOffset) = static_cast<s16>(baseX);
+				if (static_cast<float>(*reinterpret_cast<s16*>(entryBase + entryOffset)) <= baseX) {
+					*reinterpret_cast<s16*>(entryBase + entryOffset) = static_cast<s16>(baseX);
 					if (j == 0) {
 						finished++;
 					}
 				}
-
-				j++;
-				k--;
-			} while (k != 0);
+			}
 			top++;
 		}
 		if (finished == DAT_8032eec8) {
@@ -2471,26 +2467,22 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 		}
 	} else {
 		bool finished = false;
-		int i = 0;
-		int k = 3;
-		do {
+		for (int i = 0; i < 3; i++) {
 			int idx = i + s_UniteTop[topIdx];
 			int entryOffset = idx * 0x40 + 8;
 			if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
 				break;
 			}
 
-			*reinterpret_cast<s16*>(listBase + entryOffset) =
-			    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(listBase + entryOffset)) -
+			int entryBase = GetCmdListBase(this);
+			*reinterpret_cast<s16*>(entryBase + entryOffset) =
+			    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(entryBase + entryOffset)) -
 			                     DOUBLE_80332ab8);
-			if (static_cast<float>(*reinterpret_cast<s16*>(listBase + entryOffset)) <= baseX) {
+			if (static_cast<float>(*reinterpret_cast<s16*>(entryBase + entryOffset)) <= baseX) {
 				finished = true;
-				*reinterpret_cast<s16*>(listBase + entryOffset) = static_cast<s16>(baseX);
+				*reinterpret_cast<s16*>(entryBase + entryOffset) = static_cast<s16>(baseX);
 			}
-
-			i++;
-			k--;
-		} while (k != 0);
+		}
 		if (finished) {
 			return 1;
 		}

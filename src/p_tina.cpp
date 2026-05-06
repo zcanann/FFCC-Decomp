@@ -20,7 +20,7 @@ extern const float kPppHeapUseRateDivisor;
 
 extern "C" const char s_no_name_8032fdcc[];
 extern "C" {
-extern const float kPartColorIdentityOne = 1.0f;
+extern volatile const float kPartColorIdentityOne = 1.0f;
 const char s_no_name_8032fdcc[] = "no name";
 }
 
@@ -1173,7 +1173,7 @@ void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 	};
 	PartMngColorView* pppMngSt =
 	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
-	float one = 1.0f;
+	float one = *reinterpret_cast<volatile const float*>(&kPartColorIdentityOne);
 
 	pppMngSt->r = color.x;
 	pppMngSt->g = color.y;

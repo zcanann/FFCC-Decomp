@@ -1736,8 +1736,8 @@ static void _KeyOnControl()
                     if ((soundControl->m_tracks <= trackData) &&
                         (trackData < soundControl->m_tracks + soundControl->m_trackCount)) {
                         int idx = trackData->m_trackNo;
-                        if (((1U << (idx % REDSOUND_MUTE_WORD_SHIFT)) &
-                             m_Mute[idx / REDSOUND_MUTE_WORD_SHIFT]) == 0) {
+                        if (((1U << (idx % REDSOUND_MUTE_BITS_PER_WORD)) &
+                             m_Mute[idx / REDSOUND_MUTE_BITS_PER_WORD]) == 0) {
                             volume = ((soundControl->m_volumeScale + 1) *
                                       (soundControl->m_volume >> REDSOUND_FIXED_SHIFT)) >>
                                      7;
@@ -1756,8 +1756,8 @@ static void _KeyOnControl()
                                  soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount)) {
                             int idx = trackData->m_trackNo;
 
-                            if (((1U << (idx % REDSOUND_MUTE_WORD_SHIFT)) &
-                                 m_Mute[idx / REDSOUND_MUTE_WORD_SHIFT]) == 0) {
+                            if (((1U << (idx % REDSOUND_MUTE_BITS_PER_WORD)) &
+                                 m_Mute[idx / REDSOUND_MUTE_BITS_PER_WORD]) == 0) {
                                 volume = ((soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volumeScale + 1) *
                                           (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volume >>
                                            REDSOUND_FIXED_SHIFT)) >>

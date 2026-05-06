@@ -1128,9 +1128,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
 
 skipModSetup:
 
-    if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_PITCH) == 0) {
-        voice->m_randomPitch = 0;
-    } else {
+    if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_PITCH) != 0) {
         unsigned int random = GetRandomData();
         iVar5 = ((int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1) *
                 voice->m_pitch *
@@ -1139,29 +1137,29 @@ skipModSetup:
         if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) == 0) {
             voice->m_randomPitch = pitchWork[0];
         } else {
-            voice->m_randomPitch = -(iVar5 >> REDSOUND_RANDOM_FUZZY_PITCH_NEGATIVE_SHIFT);
+            voice->m_randomPitch = -(pitchWork[0] >> 1);
         }
+    } else {
+        voice->m_randomPitch = 0;
     }
 
-    if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_VOLUME) == 0) {
-        voice->m_randomVolume = 0;
-    } else {
+    if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_VOLUME) != 0) {
         s8 random = (s8)GetRandomData();
         voice->m_randomVolume =
             (track->m_fuzzyVolumeDepth * random) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
+    } else {
+        voice->m_randomVolume = 0;
     }
 
-    if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_PAN) == 0) {
-        voice->m_randomPan = 0;
-    } else {
+    if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_PAN) != 0) {
         s8 random = (s8)GetRandomData();
         voice->m_randomPan =
             (track->m_fuzzyPanDepth * random) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
+    } else {
+        voice->m_randomPan = 0;
     }
 
-    if (voice->m_waveData == 0) {
-        memset(voice->m_adsrTime, 0, REDSOUND_TRACK_ADSR_SIZE);
-    } else {
+    if (voice->m_waveData != 0) {
         memcpy(voice->m_adsrTime,
                voice->m_waveData->m_adsr,
                REDSOUND_TRACK_ADSR_SIZE);
@@ -1203,6 +1201,8 @@ skipModSetup:
                 (u16)(track->m_fuzzyAdsrDepth *
                       (random & REDSOUND_RANDOM_BYTE_MASK));
         }
+    } else {
+        memset(voice->m_adsrTime, 0, REDSOUND_TRACK_ADSR_SIZE);
     }
 
     iVar5 = ((int)voice - (int)p_VoiceData) / REDSOUND_VOICE_SIZE + (((int)voice - (int)p_VoiceData) >> 0x1f);

@@ -129,7 +129,7 @@ usb.cpp:
 	.text       start:0x8002244C end:0x80022724
 	.ctors      start:0x801D53C8 end:0x801D53CC
 	.rodata     start:0x801D6F9C end:0x801D7058
-	.data       start:0x801E8898 end:0x801E88B8
+	.data       start:0x801E8898 end:0x801E88B4
 	.bss        start:0x802455C0 end:0x80245640
 
 util.cpp:
@@ -187,7 +187,7 @@ p_map.cpp:
 	.text       start:0x80034988 end:0x80036290
 	.ctors      start:0x801D53DC end:0x801D53E0
 	.data       start:0x801E89B8 end:0x801E9030
-	.bss        start:0x802685E0 end:0x80268790
+	.bss        start:0x802685E0 end:0x8026878C
 	.sbss       start:0x8032ECC8 end:0x8032ECD9
 
 p_camera.cpp:
@@ -215,7 +215,7 @@ materialman.cpp:
 	.text       start:0x8003C1B8 end:0x80043D10
 	.ctors      start:0x801D53E8 end:0x801D53EC
 	.data       start:0x801E9BB0 end:0x801E9C08
-	.bss        start:0x80268C70 end:0x80268E90
+	.bss        start:0x80268C70 end:0x80268E8C
 	.sbss       start:0x8032ECE8 end:0x8032ED00
 	.sdata2     start:0x8032FB18 end:0x8032FB28
 
@@ -238,7 +238,7 @@ p_graphic.cpp:
 	.text       start:0x80045178 end:0x80047930
 	.ctors      start:0x801D53EC end:0x801D53F0
 	.data       start:0x801E9C90 end:0x801E9EC0
-	.bss        start:0x80268E90 end:0x80268F88
+	.bss        start:0x80268E90 end:0x80268F84
 
 p_game.cpp:
 	extab       start:0x800068A8 end:0x80006918

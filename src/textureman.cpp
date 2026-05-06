@@ -787,16 +787,15 @@ void CTexture::InitTexObj()
         GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                        static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
-        unsigned short* tlutData = reinterpret_cast<unsigned short*>(m_tlutData);
-        GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
+        int tlutData = reinterpret_cast<int>(m_tlutData);
+        GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutData), GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
         GXInitTlutObj(&m_tlutObj1,
-                      reinterpret_cast<void*>(tlutData + (m_format == 9 ? 0x100 : 0x10)),
+                      reinterpret_cast<void*>(tlutData + (m_format == 9 ? 0x100 : 0x10) * 2),
                       GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
     } else {
-        unsigned int mipmap = (1U - m_maxLod) >> 31;
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                     static_cast<GXTexWrapMode>(m_wrapMode), mipmap);
+                     static_cast<GXTexWrapMode>(m_wrapMode), (1U - m_maxLod) >> 31);
     }
 
     if (1 < m_maxLod) {

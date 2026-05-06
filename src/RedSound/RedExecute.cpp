@@ -1880,7 +1880,11 @@ static void _ExecuteExtraData()
         if ((soundControl->m_tickCounter != 0) && (soundControl->m_volumeDelta != 0)) {
             soundControl->m_volumeDelta--;
             soundControl->m_volume += soundControl->m_volumeAdd;
-            if ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_STOP_ON_VOLUME_ZERO) == 0) {
+            if ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_STOP_ON_VOLUME_ZERO) != 0) {
+                if ((soundControl->m_volumeDelta == 0) && (-1 < soundControl->m_musicId)) {
+                    MusicStop(soundControl->m_musicId);
+                }
+            } else {
                 track = soundControl->m_tracks;
                 do {
                     voice = p_VoiceData;
@@ -1894,8 +1898,6 @@ static void _ExecuteExtraData()
                     }
                     track++;
                 } while (track < soundControl->m_tracks + soundControl->m_trackCount);
-            } else if ((soundControl->m_volumeDelta == 0) && (-1 < soundControl->m_musicId)) {
-                MusicStop(soundControl->m_musicId);
             }
         }
         soundBase += REDSOUND_CONTROL_WORD_COUNT;

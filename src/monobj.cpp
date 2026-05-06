@@ -5,7 +5,10 @@
 #include "ffcc/math.h"
 #include "ffcc/astar.h"
 #include "ffcc/game.h"
+#include "ffcc/map.h"
+#include "ffcc/maphit.h"
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/partyobj.h"
 #include "ffcc/sound.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/linkage.h"
@@ -29,12 +32,21 @@ extern "C" int IsDispRader__8CGObjectFv(CGObject*);
 extern "C" int getNearParty__8CGMonObjFiiffi(CGMonObj*, int, int, float, float, int);
 extern "C" void onDestroy__10CGCharaObjFv(CGCharaObj*);
 extern "C" void SetHitEnemy__8GbaQueueFii(void*, int, int);
+extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
+extern "C" void AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(void*, Vec*, Vec*, float, int, int);
 extern "C" char SoundBuffer_1248_[];
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
 	int, int, int, CGObject*, float, void*);
 extern "C" float DAT_8032ec24;
+extern "C" float g_hit_t;
+extern float FLOAT_803319C0;
+extern float FLOAT_803319D8;
 extern float FLOAT_803319F8;
+extern float FLOAT_80331A20;
 extern float FLOAT_80331A34;
+extern float FLOAT_80331A38;
+extern float FLOAT_80331A3C;
+extern float FLOAT_80331A40;
 extern double DOUBLE_803319E0;
 extern double DOUBLE_80331A10;
 extern double DOUBLE_80331A18;
@@ -1700,12 +1712,203 @@ void CGMonObj::aiTargetAttackRomMon(int classId)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80116870
+ * PAL Size: 2004b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::checkCol(int, float, float, float*, int*)
+void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, int* hitPartyIndex)
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	if (hitScale != NULL) {
+		*hitScale = FLOAT_803319C0;
+	}
+	if (hitPartyIndex != NULL) {
+		*hitPartyIndex = -1;
+	}
+
+	Vec startPos = object->m_worldPosition;
+	Vec forward = {
+		static_cast<float>(sin(static_cast<double>(rotY))),
+		FLOAT_803319D8,
+		static_cast<float>(cos(static_cast<double>(rotY))),
+	};
+	Vec move;
+	PSVECScale(&forward, &move, distance);
+
+	unsigned char* baseScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+	unsigned char* aiScript = baseScript;
+	short aiState = *reinterpret_cast<short*>(mon + 0x6E4);
+	if (aiState != 0) {
+		aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+			(aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10;
+	}
+
+	if ((*reinterpret_cast<int*>(mon + 0x6E0) != 0) &&
+		(((*reinterpret_cast<int*>(mon + 0x6D8) == 4) && ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 8) == 0)) ||
+		 ((*reinterpret_cast<int*>(mon + 0x6D8) != 4) && ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 4) == 0)))) {
+		unsigned char* bind = *reinterpret_cast<unsigned char**>(mon + 0x6E0);
+		unsigned char* modelData = *reinterpret_cast<unsigned char**>(
+			reinterpret_cast<unsigned char*>(object->m_charaModelHandle) + 0x168);
+		Mtx bindMtx;
+		PSMTXCopy(*reinterpret_cast<Mtx*>(bind + 0x6C), bindMtx);
+		startPos.x = bindMtx[0][3] + *reinterpret_cast<float*>(modelData + 0x74);
+		startPos.y = bindMtx[1][3] + *reinterpret_cast<float*>(modelData + 0x84);
+		startPos.z = bindMtx[2][3] + *reinterpret_cast<float*>(modelData + 0x94);
+		bindMtx[0][3] = startPos.x;
+		bindMtx[1][3] = startPos.y;
+		bindMtx[2][3] = startPos.z;
+
+		Vec localForward = { FLOAT_803319C0, FLOAT_803319D8, FLOAT_803319D8 };
+		PSMTXMultVecSR(bindMtx, &localForward, &forward);
+		forward.y = FLOAT_803319D8;
+		PSVECNormalize(&forward, &forward);
+		PSVECScale(&forward, &move, distance);
+	}
+
+	if ((flags & 1) != 0) {
+		CMapCylinder hitCylinder;
+		hitCylinder.m_bottom = startPos;
+		hitCylinder.m_direction = move;
+		hitCylinder.m_radius = FLOAT_80331A34 * object->m_bodyEllipsoidRadius;
+		hitCylinder.m_height = FLOAT_80331A38;
+		hitCylinder.m_top.x = FLOAT_80331A3C;
+		hitCylinder.m_top.y = FLOAT_80331A3C;
+		hitCylinder.m_top.z = FLOAT_80331A3C;
+		hitCylinder.m_direction2.x = FLOAT_80331A38;
+		hitCylinder.m_direction2.y = FLOAT_80331A38;
+		hitCylinder.m_direction2.z = FLOAT_80331A38;
+		hitCylinder.m_radius2 = FLOAT_80331A38;
+		hitCylinder.m_height2 = FLOAT_80331A3C;
+
+		int hit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+			&MapMng, &hitCylinder, &move, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
+		if (hit != 0) {
+			if (hitScale != NULL) {
+				*hitScale = g_hit_t;
+			}
+			PSVECScale(&move, &move, g_hit_t);
+			distance = static_cast<float>(static_cast<double>(distance) * static_cast<double>(g_hit_t));
+		}
+		AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(CFlat, &startPos, &move, hitCylinder.m_radius, 1, hit);
+	}
+
+	if ((flags & 2) != 0) {
+		float halfAngle = FLOAT_80331A34 * FLOAT_80331A20 *
+			static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(baseScript + 0xCA)) -
+			                   DOUBLE_803319E0);
+		float sideDist = FLOAT_803319D8;
+		if (FLOAT_803319D8 != halfAngle) {
+			sideDist = FLOAT_80331A40 / static_cast<float>(tan(static_cast<double>(halfAngle)));
+		}
+
+		Vec coneStart = startPos;
+		Vec sideOffset;
+		PSVECScale(&forward, &sideOffset, sideDist);
+		PSVECSubtract(&coneStart, &sideOffset, &coneStart);
+
+		float coneLength = static_cast<float>(static_cast<double>(distance) + static_cast<double>(sideDist));
+		PSVECScale(&forward, &sideOffset, sideDist);
+		PSVECAdd(&move, &sideOffset, &move);
+
+		unsigned char didHit = 0;
+		for (int rank = 0; rank < 4; rank++) {
+			if (((flags & 4) != 0) && (((static_cast<int>(mon[0x54C]) + rank) & 3) != 0)) {
+				continue;
+			}
+
+			int partyIndex = *reinterpret_cast<int*>(mon + 0x620 + rank * 4);
+			CGPartyObj* partyObj = Game.m_partyObjArr[partyIndex];
+			if (partyObj == NULL) {
+				continue;
+			}
+
+			unsigned int partyFlags = partyObj->GetCID();
+			bool targetHidden =
+				(Game.m_gameWork.m_menuStageMode != 0) &&
+				(Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
+				((partyFlags & 0x6D) == 0x6D) &&
+				(partyObj->m_scriptHandle[0xED] != NULL);
+			if (targetHidden ||
+				(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 7) == 0) ||
+				(partyObj->m_lastStateId == 9) ||
+				(partyObj->m_lastStateId == 0x22) ||
+				(static_cast<double>(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0)) >=
+				 static_cast<double>(static_cast<float>(static_cast<double>(coneLength) - static_cast<double>(sideDist))))) {
+				continue;
+			}
+
+			Vec partyPos = partyObj->m_worldPosition;
+			partyPos.y += partyObj->unk_0x184;
+
+			Vec targetDelta;
+			PSVECSubtract(&partyPos, &coneStart, &targetDelta);
+			float targetDist = PSVECMag(&targetDelta);
+			if (static_cast<double>(FLOAT_803319D8) >= static_cast<double>(targetDist)) {
+				continue;
+			}
+
+			Vec targetDir;
+			PSVECNormalize(&targetDelta, &targetDir);
+			float dot = PSVECDotProduct(&forward, &targetDir);
+			if ((static_cast<double>(
+			         static_cast<float>(static_cast<double>(sideDist) -
+			                            static_cast<double>(object->m_bodyEllipsoidRadius))) >
+			     static_cast<double>(targetDist)) ||
+				((static_cast<double>(FLOAT_803319D8) != static_cast<double>(halfAngle)) &&
+				 (static_cast<double>(FLOAT_803319D8) >= static_cast<double>(dot)))) {
+				continue;
+			}
+
+			float angle = static_cast<float>(acos(static_cast<double>(dot)));
+			if ((static_cast<double>(FLOAT_803319D8) != static_cast<double>(halfAngle)) &&
+				(static_cast<double>(angle) >= static_cast<double>(halfAngle))) {
+				continue;
+			}
+
+			didHit = 1;
+			CMapCylinder hitCylinder;
+			hitCylinder.m_bottom = startPos;
+			hitCylinder.m_direction = targetDelta;
+			hitCylinder.m_radius = FLOAT_80331A34 * object->m_bodyEllipsoidRadius;
+			hitCylinder.m_height = FLOAT_80331A38;
+			hitCylinder.m_top.x = FLOAT_80331A3C;
+			hitCylinder.m_top.y = FLOAT_80331A3C;
+			hitCylinder.m_top.z = FLOAT_80331A3C;
+			hitCylinder.m_direction2.x = FLOAT_80331A38;
+			hitCylinder.m_direction2.y = FLOAT_80331A38;
+			hitCylinder.m_direction2.z = FLOAT_80331A38;
+			hitCylinder.m_radius2 = FLOAT_80331A38;
+			hitCylinder.m_height2 = FLOAT_80331A3C;
+
+			int mapHit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+				&MapMng, &hitCylinder, &targetDelta,
+				*reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
+			Vec debugDelta = targetDelta;
+			if (mapHit != 0) {
+				PSVECScale(&debugDelta, &debugDelta, g_hit_t);
+			}
+			AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(
+				CFlat, &startPos, &debugDelta, hitCylinder.m_radius, 1, mapHit == 0);
+
+			if (mapHit == 0) {
+				if (hitPartyIndex != NULL) {
+					*hitPartyIndex = reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]);
+				}
+				break;
+			}
+		}
+
+		if (static_cast<double>(FLOAT_803319D8) != static_cast<double>(halfAngle)) {
+			float debugRadius = static_cast<float>(
+				static_cast<double>(coneLength) * static_cast<double>(static_cast<float>(tan(static_cast<double>(halfAngle)))));
+			AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(CFlat, &coneStart, &move, debugRadius, 0, didHit);
+		}
+	}
 }
 
 /*

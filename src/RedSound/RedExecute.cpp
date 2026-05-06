@@ -2152,13 +2152,13 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
             }
 
             if (m_ChangeStatus != 0) {
-                int* voice = (int*)p_VoiceData;
+                RedVoiceDATA* voice = p_VoiceData;
                 do {
-                    if ((RedTrackDATA*)*voice == track) {
-                        ((RedVoiceDATA*)voice)->m_updateFlags = m_ChangeStatus;
+                    if (voice->m_track == track) {
+                        voice->m_updateFlags = m_ChangeStatus;
                     }
-                    voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
-                } while (voice < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
+                    voice++;
+                } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
             }
         }
         track++;

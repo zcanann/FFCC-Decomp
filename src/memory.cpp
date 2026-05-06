@@ -1628,6 +1628,39 @@ void CAmemCacheSet::Destroy()
     }
 }
 
+static inline void freeAmemCacheBlock(unsigned long ptr)
+{
+    unsigned char* block = reinterpret_cast<unsigned char*>(ptr - 0x40);
+    if ((*reinterpret_cast<unsigned short*>(block) != 0x4b41) ||
+        (*reinterpret_cast<unsigned short*>(block + 0x3E) != 0x4d49)) {
+        Printf__7CSystemFPce(&System, DAT_801d6648, ptr, block + 0x1A, *reinterpret_cast<unsigned short*>(block + 0x18));
+    }
+
+    block[2] &= 0xfb;
+
+    int blockPrev = *reinterpret_cast<int*>(block + 8);
+    if ((*(reinterpret_cast<unsigned char*>(blockPrev) + 2) & 4) == 0) {
+        *reinterpret_cast<int*>(block + 0x10) =
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 0x10) +
+            *reinterpret_cast<int*>(block + 0x10) + 0x40;
+        *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8) + 4) =
+            reinterpret_cast<int>(block);
+        *reinterpret_cast<int*>(block + 8) =
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8);
+    }
+
+    int blockNext = *reinterpret_cast<int*>(block + 4);
+    if ((*(reinterpret_cast<unsigned char*>(blockNext) + 2) & 4) == 0) {
+        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) =
+            *reinterpret_cast<int*>(block + 0x10) +
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) + 0x40;
+        *reinterpret_cast<int*>(*reinterpret_cast<int*>(block + 4) + 8) = *reinterpret_cast<int*>(block + 8);
+        *reinterpret_cast<int*>(*reinterpret_cast<int*>(block + 8) + 4) = *reinterpret_cast<int*>(block + 4);
+    }
+
+    *reinterpret_cast<int*>(*reinterpret_cast<int*>(block + 0xC) + 0x124) -= 1;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8001D468
@@ -1640,23 +1673,28 @@ void CAmemCacheSet::Destroy()
 void CAmemCacheSet::DestroyCache(int index)
 {
     CAmemCache& entry = cacheEntryAt(this, index);
-    int cacheData = reinterpret_cast<int>(entry.m_cacheData);
-    int workData = reinterpret_cast<int>(entry.m_workData);
 
-    if (entry.m_dmaCopy == 0) {
-        if (workData != 0) {
-            operator delete(reinterpret_cast<void*>(workData));
-        }
-        entry.m_cacheData = 0;
-        entry.m_workData = 0;
-    } else {
+    if (entry.m_dmaCopy != 0) {
+        unsigned long cacheData = reinterpret_cast<unsigned long>(entry.m_cacheData);
         if (cacheData != 0) {
-            operator delete(reinterpret_cast<void*>(cacheData));
+            if (cacheData != 0) {
+                freeAmemCacheBlock(cacheData);
+            }
             entry.m_cacheData = 0;
         }
+        unsigned long workData = reinterpret_cast<unsigned long>(entry.m_workData);
         if (workData != 0) {
             entry.m_workData = 0;
         }
+    } else {
+        unsigned long workData = reinterpret_cast<unsigned long>(entry.m_workData);
+        if (workData != 0) {
+            if (workData != 0) {
+                freeAmemCacheBlock(workData);
+            }
+        }
+        entry.m_cacheData = 0;
+        entry.m_workData = 0;
     }
 
     entry.m_refCnt0 = 0;

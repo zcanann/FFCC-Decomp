@@ -146,7 +146,6 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	Vec spherePos;
 	Vec debugSource;
 	_GXColor debugColor;
-	_GXColor trailColor;
 	_GXColor color;
 	int tex;
 
@@ -249,10 +248,10 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);
 		alphaMax = step->m_payload[0x2b];
 		alphaStep = (u8)(alphaMax / step->m_payload[0x1e]);
-		trailColor.r = step->m_payload[0x28];
-		trailColor.g = step->m_payload[0x29];
-		trailColor.b = step->m_payload[0x2a];
-		trailColor.a = alphaMax;
+		color.r = step->m_payload[0x28];
+		color.g = step->m_payload[0x29];
+		color.b = step->m_payload[0x2a];
+		color.a = alphaMax;
 		points = work->m_points;
 
 		GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 3));
@@ -260,20 +259,28 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		for (i = 0; (int)i < (int)(step->m_payload[0x1e] - 1); i++) {
 			u0 = (float)i * uvStep;
 			u1 = (float)(i + 1) * uvStep;
-			trailColor.a = alphaMax - alpha;
+			_GXColor trailStartColor;
+			trailStartColor.r = color.r;
+			trailStartColor.g = color.g;
+			trailStartColor.b = color.b;
+			trailStartColor.a = alphaMax - alpha;
 			alpha += alphaStep;
 
 			GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
-			GXColor1u32(*(u32*)&trailColor);
+			GXColor1u32(*(u32*)&trailStartColor);
 			GXTexCoord2f32(u0, FLOAT_80330DC4);
 
 			GXPosition3f32(points[i].x, points[i].y, points[i].z);
-			GXColor1u32(*(u32*)&trailColor);
+			GXColor1u32(*(u32*)&trailStartColor);
 			GXTexCoord2f32(u0, kPppYmLaserOne);
 
-			trailColor.a = alphaMax - (u8)alpha;
+			_GXColor trailEndColor;
+			trailEndColor.r = color.r;
+			trailEndColor.g = color.g;
+			trailEndColor.b = color.b;
+			trailEndColor.a = alphaMax - alpha;
 			GXPosition3f32(points[i + 1].x, points[i + 1].y, points[i + 1].z);
-			GXColor1u32(*(u32*)&trailColor);
+			GXColor1u32(*(u32*)&trailEndColor);
 			GXTexCoord2f32(u1, kPppYmLaserOne);
 		}
 

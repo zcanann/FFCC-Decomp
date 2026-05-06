@@ -338,16 +338,15 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		groupLow  = prev;
 	}
 
-	int portalIndex = 64;
+	int portalIndex = 0;
 
 	// Look for an existing portal (groupLow, groupHigh)
-	for (int i = 0; i < 64; ++i)
+	for (; portalIndex < 64; ++portalIndex)
 	{
-		CAPos& p = m_portals[i];
+		CAPos& p = m_portals[portalIndex];
 
 		if (p.m_groupA == groupLow && p.m_groupB == groupHigh)
 		{
-			portalIndex = i;
 			break;
 		}
 	}
@@ -1090,14 +1089,16 @@ void CAStar::CATemp::operator= (const CAStar::CATemp& other)
 void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 {
 	Vec* pos = reinterpret_cast<Vec*>(&CVector(x, y, z));
+	int groupLow = groupA;
+	int groupHigh = groupB;
 
 	if (groupB < groupA)
 	{
-		int tmp = groupA;
-
-		groupA  = groupB;
-		groupB  = tmp;
+		groupLow = groupB;
+		groupHigh = groupA;
 	}
+	groupA = groupLow;
+	groupB = groupHigh;
 
 	int index = 0;
 

@@ -59,7 +59,7 @@ struct RedStreamADPCMHeader {
 	s16 m_loopPredScale;
 	u16 m_loopYn1;
 	u16 m_loopYn2;
-	u8 m_pad28[REDSOUND_STREAM_ADPCM_HEADER_SIZE - REDSOUND_STREAM_ADPCM_LOOP_YN2_OFFSET - sizeof(u16)];
+	u8 m_reserved28[REDSOUND_STREAM_ADPCM_HEADER_SIZE - REDSOUND_STREAM_ADPCM_LOOP_YN2_OFFSET - sizeof(u16)];
 };
 
 static RedStreamDATA* _SearchEmptyStreamData();

@@ -15,14 +15,14 @@ enum RedStreamFileLayoutSize {
 
 struct RedStreamHEAD {
     char m_signature[REDSOUND_STREAM_SIGNATURE_SIZE];
-    u8 m_pad04[REDSOUND_STREAM_HEADER_PAD_SIZE];
+    u8 m_reserved04[REDSOUND_STREAM_HEADER_PAD_SIZE];
     int m_loopEnd;
     int m_loopStart;
     int m_pitch;
-    s16 m_unk18;
+    s16 m_reserved18;
     s16 m_channelCount;
     s16 m_flags;
-    s16 m_unk1E;
+    s16 m_reserved1E;
 };
 
 enum RedStreamState {
@@ -45,7 +45,7 @@ struct RedStreamDATA {
     int m_volume;
     int m_volumeStep;
     int m_volumeStepCount;
-    int m_padFC;
+    int m_reservedFC;
     int m_pan;
     int m_panStep;
     int m_panStepCount;

@@ -1176,26 +1176,26 @@ void CMenuPcs::GetEquipItem()
  */
 int CMenuPcs::ChkEquipActive(int index)
 {
-	unsigned int caravanWork = Game.m_scriptFoodBase[0];
+	u32 caravanWork = Game.m_scriptFoodBase[0];
 	s16* entries = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+	s16* entryList = entries + 1;
 	int equipIndex = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x26));
+	u32 active;
 
 	if ((index < 0) || (entries[0] <= index)) {
-		return 0;
-	}
-
-	if (index == 0) {
+		active = 0;
+	} else if (index == 0) {
 		if (equipIndex < 3) {
-			return 0;
+			active = 0;
+		} else {
+			active = (u32)(int)*reinterpret_cast<s16*>(caravanWork + equipIndex * 2 + 0xac) >> 0x1f ^ 1;
 		}
-		return (unsigned int)(int)*reinterpret_cast<s16*>(caravanWork + equipIndex * 2 + 0xac) >> 0x1f ^ 1;
-	}
-
-	int item = static_cast<int>(*reinterpret_cast<s16*>(caravanWork + entries[index] * 2 + 0xb6));
-	unsigned int active = ChkEquipPossible__8CMenuPcsFi(this, item);
-
-	if (((active & 0xff) != 0) && (GetEquipType__8CMenuPcsFi(this, item) != equipIndex)) {
-		return 0;
+	} else {
+		int item = static_cast<int>(*reinterpret_cast<s16*>(caravanWork + entryList[index - 1] * 2 + 0xb6));
+		active = ChkEquipPossible__8CMenuPcsFi(this, item);
+		if (((active & 0xff) != 0) && (GetEquipType__8CMenuPcsFi(this, item) != equipIndex)) {
+			active = 0;
+		}
 	}
 	return active;
 }

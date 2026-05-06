@@ -324,8 +324,8 @@ void StreamStop(int streamID)
  */
 int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volume)
 {
-	u32 amemSize;
-	u32 arOffset;
+	int amemSize;
+	int arOffset;
 	int pitch;
 	int channel;
 	int sampleOffset;

@@ -46,7 +46,7 @@ extern CMenuPcs MenuPcs;
 
 static const float FLOAT_80332e60 = 0.0f;
 extern float FLOAT_80332e64;
-static const double DOUBLE_80332e68 = 1.0;
+extern const double DOUBLE_80332e68;
 extern float FLOAT_80332e70;
 extern float FLOAT_80332e74;
 static const double DOUBLE_80332e78 = 0.5;
@@ -57,7 +57,7 @@ extern float FLOAT_80332e8c;
 extern float FLOAT_80332e90;
 extern float FLOAT_80332e94;
 extern float FLOAT_80332E98;
-static const double DOUBLE_80332ea0 = 4503601774854144.0;
+extern const double DOUBLE_80332ea0;
 static const float FLOAT_80332EA8 = 128.0f;
 static const float FLOAT_80332EAC = 8.0f;
 static const float FLOAT_80332EB0 = 0.75f;

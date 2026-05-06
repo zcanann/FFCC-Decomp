@@ -212,6 +212,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     managerPos.x = pppMngStPtr->m_matrix.value[0][3];
     managerPos.y = pppMngStPtr->m_matrix.value[1][3];
     managerPos.z = pppMngStPtr->m_matrix.value[2][3];
+    isCameraInside = 0;
 
     if ((s32)Game.m_currentSceneId == 7) {
         float* radiusArray;
@@ -242,7 +243,6 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         Game.unkFloat_0xca10 = scaledRadius;
     }
 
-    isCameraInside = 0;
     if ((FLOAT_80331938 + scaledRadius) > PSVECDistance(&cameraPos, &managerPos)) {
         isCameraInside = 1;
     }

@@ -1849,22 +1849,22 @@ int CRedDriver::SePlayState(int seID)
 {
     int* commandNow;
     unsigned int uVar1;
-    int* seInfo;
-    int** seInfoBase;
+    RedTrackDATA* seInfo;
+    RedTrackDATA** seInfoBase;
     int result;
     int* command;
 
     uVar1 = OSDisableInterrupts();
     result = 0;
-    seInfoBase = (int**)&p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+    seInfoBase = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     seInfo = *seInfoBase;
     do {
-        if (((u32)*seInfo != 0) && ((seID == -1 || (((RedTrackDATA*)seInfo)->m_seId == seID)))) {
+        if (((u32)seInfo->m_command != 0) && ((seID == -1 || (seInfo->m_seId == seID)))) {
             result = (int)seInfo;
             break;
         }
-        seInfo += REDSOUND_TRACK_SIZE / sizeof(*seInfo);
-    } while (seInfo < (int*)((int)*seInfoBase + REDSOUND_SE_TRACK_ARENA_SIZE));
+        seInfo++;
+    } while (seInfo < *seInfoBase + REDSOUND_SE_TRACK_COUNT);
     if (result == 0) {
         commandNow = (int*)p_ExecCommandNow;
         command = (int*)p_ExecCommandOld;

@@ -127,6 +127,8 @@ extern char s_Apagado_80333528[];
 extern char lbl_80333530[];
 extern char lbl_80333538[];
 extern char lbl_80333540[];
+extern "C" const char lbl_80333690[] = "Vide";
+extern "C" const char lbl_80333698[] = {'V', 'a', 'c', '\xED', 'o', '.', '\0', '\0'};
 
 extern "C" char* g_strMenuUtilMes[] = {
 	s_Strength_801E30A4, s_Defence_801E30B0, s_Position_Markers_801E30BC, s_Sound_Mode_801E30D0,

@@ -233,9 +233,9 @@ enum RedExecuteAdsrStateIndex {
  */
 u8 GetRandomData()
 {
-	signed char* data = &t_RandomData[m_RandomIndex];
+	u8* data = (u8*)&t_RandomData[m_RandomIndex];
 	m_RandomIndex++;
-	return (u8)*data;
+	return *data;
 }
 
 /*

@@ -774,6 +774,11 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
         texList++;
     }
 
+    *(u32*)(work[0x1F] + 0x6C) = 0;
+    InitTexObj__8CTextureFv((void*)work[0x1F]);
+    *(u32*)(work[0x20] + 0x6C) = 0;
+    InitTexObj__8CTextureFv((void*)work[0x20]);
+
     if (work[9] == 0) {
         work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3CB);
         genParaboloidMap__FPvPUlUs9_GXVtxFmt((void*)work[9], &work[0x3B], 0x1E, GX_VTXFMT7);

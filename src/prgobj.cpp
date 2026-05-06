@@ -22,10 +22,8 @@ struct FloatValue {
 	float value;
 };
 
-const float FLOAT_80331BD0 = 1.0f;
 const float FLOAT_80331BD4 = 0.0f;
 const float FLOAT_80331BD8 = 3.1415927f;
-const double DOUBLE_80331BE0 = 4503601774854144.0;
 const FloatValue FLOAT_80331BE8 = {-1.0f};
 const char DAT_80331bf0[] = "GMGR";
 extern const float FLOAT_80331bf8;
@@ -576,14 +574,14 @@ void CGPrgObj::onFrame()
 		if (m_animFlagBits.bits.m_animRequested != 0) {
 			if (m_reqAnimId == -1) {
 				if (static_cast<int>(m_currentAnimSlot) >= 0) {
-					*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BD0;
+					*reinterpret_cast<float*>(m_lastBgAttr) = 1.0f;
 					CancelAnim(0);
 				}
 			} else if (m_animFlagBits.bits.m_animDirect != 0) {
 				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BE8.value;
 				PlayAnim(m_reqAnimId, m_animFlagBits.bits.m_animLoop, 0, -1, -1, 0);
 			} else {
-				*reinterpret_cast<float*>(m_lastBgAttr) = FLOAT_80331BD0;
+				*reinterpret_cast<float*>(m_lastBgAttr) = 1.0f;
 				PlayAnim(m_reqAnimId, m_animFlagBits.bits.m_animLoop, 0, -1, -1, 0);
 			}
 

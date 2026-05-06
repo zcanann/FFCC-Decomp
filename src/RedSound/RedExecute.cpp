@@ -1663,10 +1663,10 @@ static void _KeyOnControl()
     _VoiceEnvelopeCheck();
     voiceStartMask[0] = 0;
     voiceStartMask[1] = 0;
-    reserve = (int*)p_KeyOnData;
-    voiceData = (unsigned int*)p_VoiceData;
 
     if (m_KeyOnEntry != 0) {
+        reserve = (int*)p_KeyOnData;
+        voiceData = (unsigned int*)p_VoiceData;
         do {
             if (((u32)*reserve != 0) && (((RedTrackDATA*)*reserve)->m_waveData != 0)) {
                 voiceData = (unsigned int*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)voiceStartMask);

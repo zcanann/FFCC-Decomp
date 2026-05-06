@@ -40,7 +40,7 @@ struct CScenegraphDesc {
     CScenegraphEntry m_entries[1];
 };
 
-static const char s_cSystem[] = "CSystem";
+extern const char s_cSystem[] = "CSystem";
 extern const unsigned char s_systemDebugResources[0x194] = {
     0x64, 0x76, 0x64, 0x2F, 0x67, 0x62, 0x61, 0x2F, 0x00, 0x00, 0x00, 0x00,
     0x66, 0x66, 0x63, 0x63, 0x5F, 0x63, 0x6C, 0x69, 0x2E, 0x62, 0x69, 0x6E,
@@ -78,9 +78,9 @@ extern const unsigned char s_systemDebugResources[0x194] = {
     0x93, 0x5F, 0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00,
 };
 extern const char s_CManager_801D6F14[] = "CManager";
-static const char s_system_cpp[12] = "system.cpp";
-static const char s_gamePalM_map[16] = "gamePalM.map";
-static const char s_compilerMapLoaded[] =
+extern const char s_system_cpp[12] = "system.cpp";
+extern const char s_gamePalM_map[16] = "gamePalM.map";
+extern const char s_compilerMapLoaded[] =
     "\203\122\203\223\203\160\203\103\203\211\202\314\155\141\160\217\356"
     "\225\361\202\360\147\141\155\145\120\141\154\115\056\155\141\160\202"
     "\251\202\347\223\307\202\335\215\236\202\335\202\334\202\265\202\275"

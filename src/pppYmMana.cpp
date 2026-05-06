@@ -7,6 +7,7 @@
 #include "ffcc/game.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/util.h"
 
 #include <string.h>
 #include <dolphin/os/OSCache.h>
@@ -19,7 +20,6 @@ extern float FLOAT_80330e4c;
 extern float FLOAT_80330e58;
 extern float FLOAT_80330e5c;
 extern char DAT_80330e50[];
-extern char gUtil[];
 
 extern const float FLOAT_80330e60 = 2.0f;
 extern const float FLOAT_80330e64 = 0.015625f;
@@ -98,14 +98,7 @@ void InitTexObj__8CTextureFv(void*);
 void genParaboloidMap__FPvPUlUs9_GXVtxFmt(void*, unsigned long*, unsigned short, GXVtxFmt);
 void DispCharaParts__8CGObjectFi(CGObject*, int);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, char*, int);
-int IsHasDrawFmtDL__5CUtilFUc(void*, unsigned char);
-void ConvI2FVector__5CUtilFR3Vec6S16Vecl(void*, Vec*, S16Vec, unsigned long);
-void ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl(void*, S16Vec2d*, Vec2d, long);
-void RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-    void* util, float x0, float y0, float x1, float y1, _GXTexObj* texObj, Vec2d* uv0, Vec2d* uv1, _GXColor* color,
-    _GXBlendFactor srcFactor, _GXBlendFactor dstFactor);
 void Draw__Q29CCharaPcs7CHandleFi(CCharaPcs::CHandle* handle, int drawType);
-void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
 }
 
 static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, unsigned short* indicesOut, float size);
@@ -819,7 +812,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
                     work[0x3C] = dlInfo[0];
                     memcpy((void*)*(u32*)(work[0x18] + dlOffset), (void*)dlInfo[1], dlInfo[0]);
                     DCFlushRange((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0]);
-                    ReWriteDisplayList__5CUtilFPvUlUl((void*)gUtil, (void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0], 3);
+                    gUtil.ReWriteDisplayList((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0], 3);
                     dlOffset -= 4;
                     dlInfo += 3;
                 }
@@ -1019,9 +1012,8 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x80, 0x80);
-            RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-                gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, (GXTexObj*)sourceTexObjs,
-                0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
+            gUtil.RenderTextureQuad(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84,
+                                    (GXTexObj*)sourceTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
 
             GXSetViewport(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, FLOAT_80330e4c, FLOAT_80330e58);
             GXSetScissor(0, 0, 0x80, 0x80);
@@ -1070,9 +1062,8 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                               (GXTexObj*)(targetTexObjs + 0x28), 1);
             drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[10], (void*)work[9], work[0x3B],
                               (GXTexObj*)(targetTexObjs + 0x28), 0);
-            RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-                gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, &sceneTexObj, 0, 0, 0,
-                (_GXBlendFactor)4, (_GXBlendFactor)5);
+            gUtil.RenderTextureQuad(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, &sceneTexObj,
+                                    0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
             *((u8*)work + 0xF4) = 1;
         }
     } else {
@@ -1087,9 +1078,8 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
         PSMTXCopy(savedCameraMtx, CameraMatrix());
-        RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-            gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, &sceneTexObj, 0, 0, 0,
-            (_GXBlendFactor)4, (_GXBlendFactor)5);
+        gUtil.RenderTextureQuad(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, &sceneTexObj,
+                                0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
     }
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -1741,7 +1731,7 @@ void CalcReflectionVector2(
         u16 itemCount = *(u16*)((u8*)dl + 1);
         int i;
 
-        if (IsHasDrawFmtDL__5CUtilFUc((void*)gUtil, drawFmt) == 0) {
+        if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
             break;
         }
 
@@ -1759,8 +1749,8 @@ void CalcReflectionVector2(
                 dl++;
             }
 
-            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &position, positions[posIndex], posScale);
-            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &normal, normals[normalIndex], normalScale);
+            gUtil.ConvI2FVector(position, positions[posIndex], posScale);
+            gUtil.ConvI2FVector(normal, normals[normalIndex], normalScale);
             PSMTXMultVec(nodeRotMtx, &position, &position);
             PSMTXMultVec(workMtx, &normal, &normal);
 
@@ -1788,14 +1778,14 @@ void CalcReflectionVector2(
             vVal = (-reflectionVec[posIndex].y / denom) * half + half;
             uv.x = -(scale * (warp * (uVal - half)) - uVal);
             uv.y = -(scale * (warp * (vVal - half)) - vVal);
-            ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)gUtil, &texCoordA[posIndex], uv, 12);
+            gUtil.ConvF2IVector2d(texCoordA[posIndex], uv, 12);
 
             denom = denomBias - reflectionVec[posIndex].z;
             uVal = (-reflectionVec[posIndex].x / denom) * half + half;
             vVal = (-reflectionVec[posIndex].y / denom) * half + half;
             uv.x = -(scale * (warp * (uVal - half)) - uVal);
             uv.y = -(scale * (warp * (vVal - half)) - vVal);
-            ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)gUtil, &texCoordB[posIndex], uv, 12);
+            gUtil.ConvF2IVector2d(texCoordB[posIndex], uv, 12);
         }
     }
 

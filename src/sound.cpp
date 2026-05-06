@@ -358,42 +358,43 @@ extern "C" void CalcBound__9CLine2(CLine* line)
     line->min.x = kLineBoundsInitMin;
     line->min.y = kLineBoundsInitMin;
     line->min.z = kLineBoundsInitMin;
-    line->max.x = -kLineBoundsInitMin;
-    line->max.y = -kLineBoundsInitMin;
-    line->max.z = -kLineBoundsInitMin;
+    line->max.x = kLineBoundsInitMax;
+    line->max.y = kLineBoundsInitMax;
+    line->max.z = kLineBoundsInitMax;
     line->totalLength = kLineSegmentMinT;
 
-    for (u32 i = 0; i < line->pointCount; i++) {
-        const Vec& point = line->points[i];
+    Vec* point = line->points;
+    CLineSegment* segment = line->segments;
+    for (u32 i = 0; i < line->pointCount; i++, point++, segment++) {
 
-        if (point.x < line->min.x) {
-            line->min.x = point.x;
+        if (point->x < line->min.x) {
+            line->min.x = point->x;
         }
-        if (point.y < line->min.y) {
-            line->min.y = point.y;
+        if (point->y < line->min.y) {
+            line->min.y = point->y;
         }
-        if (point.z < line->min.z) {
-            line->min.z = point.z;
+        if (point->z < line->min.z) {
+            line->min.z = point->z;
         }
 
-        if (line->max.x < point.x) {
-            line->max.x = point.x;
+        if (point->x > line->max.x) {
+            line->max.x = point->x;
         }
-        if (line->max.y < point.y) {
-            line->max.y = point.y;
+        if (point->y > line->max.y) {
+            line->max.y = point->y;
         }
-        if (line->max.z < point.z) {
-            line->max.z = point.z;
+        if (point->z > line->max.z) {
+            line->max.z = point->z;
         }
 
         if (i != 0) {
-            CLineSegment& segment = line->segments[i - 1];
-            PSVECSubtract(&line->points[i], &line->points[i - 1], &segment.delta);
-            segment.length = PSVECMag(&segment.delta);
-            segment.startLength = line->totalLength;
-            line->totalLength += segment.length;
-            if (segment.length != kLineSegmentMinT) {
-                PSVECNormalize(&segment.delta, &segment.normal);
+            CLineSegment* prevSegment = segment - 1;
+            PSVECSubtract(point, point - 1, &prevSegment->delta);
+            prevSegment->length = PSVECMag(&prevSegment->delta);
+            prevSegment->startLength = line->totalLength;
+            line->totalLength += prevSegment->length;
+            if (prevSegment->length != kLineSegmentMinT) {
+                PSVECNormalize(&prevSegment->delta, &prevSegment->normal);
             }
         }
     }
@@ -2446,14 +2447,14 @@ void CSound::PlayStreamASync()
     int clampedVolume;
     if (volume < 0) {
         clampedVolume = 0;
-    } else if (volume > 0x7f) {
-        clampedVolume = 0x7f;
     } else {
-        clampedVolume = volume;
+        clampedVolume = 0x7f;
+        if (volume <= 0x7f) {
+            clampedVolume = volume;
+        }
     }
 
-    int streamNo = StreamPlay__9CRedSoundFPviii(
-        RedSound(this), sound.m_streamBuffer, 0x20000, 0x40, clampedVolume);
+    int streamNo = StreamPlay__9CRedSoundFPviii(redSound, streamBuffer, 0x20000, 0x40, clampedVolume);
     sound.m_streamID = streamNo;
     sound.m_streamPlaying = 1;
 }

@@ -78,7 +78,7 @@ static void MiniGameThreadSleepTicks(OSTime ticks)
     alarm.thread = currentThread;
     BOOL interruptLevel = OSDisableInterrupts();
     OSSetAlarm(&alarm.alarm, ticks, GbaThreadAlarmHandler);
-    OSSuspendThread(currentThread);
+    OSSuspendThread(alarm.thread);
     OSRestoreInterrupts(interruptLevel);
 }
 
@@ -314,7 +314,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (*reinterpret_cast<int*>(self + 0x1354) != 0)
+    if (*reinterpret_cast<void**>(self + 0x1354) != 0)
     {
         self[0x649C] = 1;
 
@@ -341,21 +341,23 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
         }
     }
 
-    self[0x6498] = 0xFF;
-    self[0x6499] = 0xFF;
-    self[0x649A] = 0xFF;
-    self[0x649B] = 0xFF;
+    char* signedSelf = reinterpret_cast<char*>(this);
+    signedSelf[0x6498] = -1;
+    signedSelf[0x6499] = -1;
+    signedSelf[0x649A] = -1;
+    signedSelf[0x649B] = -1;
     self[0x6495] = 0;
     self[0x6496] = 0;
     self[0x6497] = 0;
     *reinterpret_cast<unsigned short*>(self + 0x134E) = 0;
     self[0x6494] = 0;
 
-    CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
     *reinterpret_cast<void**>(self + 0x1354) =
-        __nwa__FUlPQ27CMemory6CStagePci(0x40000, stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1);
+        __nwa__FUlPQ27CMemory6CStagePci(
+            0x40000, PartPcs.m_usbStreamData.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1);
     *reinterpret_cast<void**>(self + 0x135C) =
-        __nwa__FUlPQ27CMemory6CStagePci(0x40000, stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2);
+        __nwa__FUlPQ27CMemory6CStagePci(
+            0x40000, PartPcs.m_usbStreamData.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2);
 
     *reinterpret_cast<unsigned int*>(self + 0x1364) = OSGetTick();
     *reinterpret_cast<unsigned int*>(*reinterpret_cast<unsigned int*>(self + 0x1354) + 200) =
@@ -1579,7 +1581,7 @@ void CMiniGamePcs::calc(void)
 
             BOOL interruptLevel = OSDisableInterrupts();
             OSSetAlarm(&alarm.alarm, (OS_BUS_CLOCK / 4000) * 100, GbaThreadAlarmHandler);
-            OSSuspendThread(currentThread);
+            OSSuspendThread(alarm.thread);
             OSRestoreInterrupts(interruptLevel);
         }
 
@@ -1594,7 +1596,7 @@ void CMiniGamePcs::calc(void)
 
             BOOL interruptLevel = OSDisableInterrupts();
             OSSetAlarm(&alarm.alarm, (OS_BUS_CLOCK / 4000) * 100, GbaThreadAlarmHandler);
-            OSSuspendThread(currentThread);
+            OSSuspendThread(alarm.thread);
             OSRestoreInterrupts(interruptLevel);
         }
 
@@ -1827,7 +1829,7 @@ void CMiniGamePcs::MngThreadMain(void*)
 
         BOOL interruptLevel = OSDisableInterrupts();
         OSSetAlarm(&alarm.alarm, OS_BUS_CLOCK / 4000, GbaThreadAlarmHandler);
-        OSSuspendThread(currentThread);
+        OSSuspendThread(alarm.thread);
         OSRestoreInterrupts(interruptLevel);
 
         if (self[0x649C] != 0)
@@ -1843,7 +1845,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                 sleepAlarm.thread = currentThread;
                 interruptLevel = OSDisableInterrupts();
                 OSSetAlarm(&sleepAlarm.alarm, (OS_BUS_CLOCK / 4000) * 100, GbaThreadAlarmHandler);
-                OSSuspendThread(currentThread);
+                OSSuspendThread(sleepAlarm.thread);
                 OSRestoreInterrupts(interruptLevel);
 
                 unsigned char* threadParam = self + 0x138C + i * 200;
@@ -1857,7 +1859,7 @@ void CMiniGamePcs::MngThreadMain(void*)
             settleAlarm.thread = currentThread;
             interruptLevel = OSDisableInterrupts();
             OSSetAlarm(&settleAlarm.alarm, (OS_BUS_CLOCK / 4000) * 200, GbaThreadAlarmHandler);
-            OSSuspendThread(currentThread);
+            OSSuspendThread(settleAlarm.thread);
             OSRestoreInterrupts(interruptLevel);
 
             while (self[0x649D] != 0x0F)
@@ -1869,7 +1871,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                 waitAlarm.thread = currentThread;
                 interruptLevel = OSDisableInterrupts();
                 OSSetAlarm(&waitAlarm.alarm, (OS_BUS_CLOCK / 4000) * 100, GbaThreadAlarmHandler);
-                OSSuspendThread(currentThread);
+                OSSuspendThread(waitAlarm.thread);
                 OSRestoreInterrupts(interruptLevel);
             }
 
@@ -1895,7 +1897,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                     endAlarm.thread = currentThread;
                     interruptLevel = OSDisableInterrupts();
                     OSSetAlarm(&endAlarm.alarm, (OS_BUS_CLOCK / 4000) * 100, GbaThreadAlarmHandler);
-                    OSSuspendThread(currentThread);
+                    OSSuspendThread(endAlarm.thread);
                     OSRestoreInterrupts(interruptLevel);
 
                     self[0x649C] = 0;

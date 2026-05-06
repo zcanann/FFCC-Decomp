@@ -280,6 +280,11 @@ extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreat
  */
 extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
 {
+    BreathParticleData* particleData;
+    PARTICLE_WMAT* matrixList;
+    PARTICLE_COLOR* particleColor;
+    BreathParticleGroup* groupData;
+    int groupCount;
     BreathModelObject* object;
     int workOffset;
     int colorOffset;
@@ -290,11 +295,6 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     unsigned char colorB;
     unsigned char colorA;
     int i;
-    BreathParticleData* particleData;
-    PARTICLE_WMAT* matrixList;
-    PARTICLE_COLOR* particleColor;
-    BreathParticleGroup* groupData;
-    int groupCount;
     pppModelSt* model;
     _GXColor drawColor;
     _GXColor debugColor;

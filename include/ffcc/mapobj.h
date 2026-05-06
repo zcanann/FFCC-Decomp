@@ -142,7 +142,7 @@ public:
     void DrawHitWire();
     void DrawHitNormal();
     int CheckHitCylinder(CMapCylinder*, Vec*, unsigned long);
-    int CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
+    void CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
     void GetHitFaceNormal(Vec*);
     int CalcHitSlide(Vec*, float);
     void CalcHitPosition(Vec*);

@@ -23,9 +23,15 @@ extern const f32 FLOAT_80330dec;
 extern const f32 FLOAT_80330DC4;
 extern const f32 FLOAT_80330DC8;
 extern "C" const f64 DOUBLE_80330DD0;
+extern const f32 FLOAT_80330de0;
+extern const f32 FLOAT_80330de4;
+extern const f32 FLOAT_80330de8;
+extern const f32 FLOAT_80330dec;
 
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
+
+static inline float YmLaserConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -229,7 +235,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		GXLoadPosMtxImm(shapeMtx, GX_PNMTX0);
 		pppDrawShp__FPlsP12CMaterialSetUc(*shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
 
-		count = (u32)step->m_payload[0x1e];
+		count = step->m_payload[0x1e];
 		uvStep = FLOAT_80330DC4 / (float)count;
 		if (step->m_initWOrk == 0xFFFF) {
 			_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
@@ -371,6 +377,10 @@ extern const f32 FLOAT_80330de4 = 1.2f;
 extern const f32 FLOAT_80330de8 = 10000000000.0f;
 extern const f32 FLOAT_80330dec = -10000000000.0f;
 extern const f32 FLOAT_80330df0[2] = {6.2831855f, 0.0f};
+extern const f32 FLOAT_80330df8 = 2.0f;
+extern const f32 FLOAT_80330dfc = 0.5f;
+extern const f32 FLOAT_80330e00 = 0.25f;
+extern "C" const f64 DOUBLE_80330E08 = 4503601774854144.0;
 
 /*
  * --INFO--
@@ -439,7 +449,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 			}
 
 			s32 frameCount = step->m_payload[0x3a] + 1;
-			float t = LoadLaserFloat(FLOAT_80330de0) / (float)frameCount;
+			float t = YmLaserConst(FLOAT_80330de0) / (float)frameCount;
 			t *= (float)i;
 			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(pppMngStPtr, t, charaMtx) == 0) {
 				emptyHistory = 1;
@@ -451,14 +461,14 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		}
 
 		pppSubVector(localA, work->m_points[i], work->m_origin);
-		PSVECScale(&localA, &localA, LoadLaserFloat(FLOAT_80330de4));
+		PSVECScale(&localA, &localA, YmLaserConst(FLOAT_80330de4));
 
-		cyl.m_top.z = LoadLaserFloat(FLOAT_80330de8);
-		cyl.m_top.y = LoadLaserFloat(FLOAT_80330de8);
-		cyl.m_top.x = LoadLaserFloat(FLOAT_80330de8);
-		cyl.m_direction2.z = LoadLaserFloat(FLOAT_80330dec);
-		cyl.m_direction2.y = LoadLaserFloat(FLOAT_80330dec);
-		cyl.m_direction2.x = LoadLaserFloat(FLOAT_80330dec);
+		cyl.m_top.z = YmLaserConst(FLOAT_80330de8);
+		cyl.m_top.y = YmLaserConst(FLOAT_80330de8);
+		cyl.m_top.x = YmLaserConst(FLOAT_80330de8);
+		cyl.m_direction2.z = YmLaserConst(FLOAT_80330dec);
+		cyl.m_direction2.y = YmLaserConst(FLOAT_80330dec);
+		cyl.m_direction2.x = YmLaserConst(FLOAT_80330dec);
 		cyl.m_bottom = work->m_origin;
 		cyl.m_direction = localA;
 		cyl.m_radius = kPppYmLaserOne;

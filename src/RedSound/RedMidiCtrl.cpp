@@ -945,7 +945,7 @@ static void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
         targetDepth -= 1;
     }
 
-    reverbDepth->m_step = DataAddCompute(&reverbDepth->m_value, (s8)targetDepth, (int*)&stepCount);
+    reverbDepth->m_step = DataAddCompute(&track->m_reverbDepth, (s8)targetDepth, (int*)&stepCount);
     reverbDepth->m_count = stepCount;
     track->m_command += 2;
 }

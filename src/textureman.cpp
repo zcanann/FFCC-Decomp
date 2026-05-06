@@ -580,32 +580,21 @@ CTextureSet::~CTextureSet()
  */
 void CTexture::InitTexObj()
 {
-    int format = m_format;
+    unsigned int format = m_format;
     if ((format == 9) || (format == 8)) {
         GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                        static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
         int tlutData = reinterpret_cast<int>(m_tlutData);
-        unsigned int numEntries = 0x10;
-        if (m_format == 9) {
-            numEntries = 0x100;
-        }
-        GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutData), GX_TL_IA8, numEntries);
-
-        numEntries = 0x10;
-        if (m_format == 9) {
-            numEntries = 0x100;
-        }
-
-        int offset = 0x10;
-        if (m_format == 9) {
-            offset = 0x100;
-        }
-        GXInitTlutObj(&m_tlutObj1, reinterpret_cast<void*>(tlutData + offset * 2), GX_TL_IA8, numEntries);
+        GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutData), GX_TL_IA8,
+                      m_format == 9 ? 0x100 : 0x10);
+        GXInitTlutObj(&m_tlutObj1,
+                      reinterpret_cast<void*>(tlutData + (m_format == 9 ? 0x100 : 0x10) * 2),
+                      GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
     } else {
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                     static_cast<GXTexWrapMode>(m_wrapMode), 1 - m_maxLod >> 31);
+                     static_cast<GXTexWrapMode>(m_wrapMode), (1U - m_maxLod) >> 31);
     }
 
     if (1 < m_maxLod) {
@@ -725,8 +714,9 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
 
             texture[0x74] = chunkFile.Get1();
             chunkFormat = chunkFile.Get1();
+            unsigned int wrapMode = chunkFormat;
             if (static_cast<int>(chunk.m_size) > 3) {
-                *reinterpret_cast<unsigned int*>(texture + 0x6C) = chunkFormat;
+                *reinterpret_cast<unsigned int*>(texture + 0x6C) = wrapMode;
             }
             break;
         }
@@ -735,11 +725,17 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
     chunkFile.PopChunk();
 
     width = *reinterpret_cast<unsigned int*>(texture + 0x64);
-    while ((width & 1) == 0) {
+    for (;;) {
+        if ((width & 1) != 0) {
+            break;
+        }
         width >>= 1;
     }
     height = *reinterpret_cast<unsigned int*>(texture + 0x68);
-    while ((height & 1) == 0) {
+    for (;;) {
+        if ((height & 1) != 0) {
+            break;
+        }
         height >>= 1;
     }
     if ((width != 1) || (height != 1)) {
@@ -756,21 +752,19 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
                        static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x68)),
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
                        static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)), 0, 0);
-        void* tlutData = *reinterpret_cast<void**>(texture + 0x7C);
-        int numEntries = (*reinterpret_cast<unsigned int*>(texture + 0x60) == 9) ? 0x100 : 0x10;
-        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x48), tlutData, GX_TL_IA8, numEntries);
-
-        numEntries = (*reinterpret_cast<unsigned int*>(texture + 0x60) == 9) ? 0x100 : 0x10;
+        int tlutData = reinterpret_cast<int>(*reinterpret_cast<void**>(texture + 0x7C));
+        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x48), reinterpret_cast<void*>(tlutData), GX_TL_IA8,
+                      *reinterpret_cast<unsigned int*>(texture + 0x60) == 9 ? 0x100 : 0x10);
         GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x54),
-                      reinterpret_cast<void*>(reinterpret_cast<unsigned int>(tlutData) + numEntries * 2), GX_TL_IA8,
-                      numEntries);
+                      reinterpret_cast<void*>(tlutData + (*reinterpret_cast<unsigned int*>(texture + 0x60) == 9 ? 0x100 : 0x10) * 2),
+                      GX_TL_IA8, *reinterpret_cast<unsigned int*>(texture + 0x60) == 9 ? 0x100 : 0x10);
     } else {
         GXInitTexObj(reinterpret_cast<GXTexObj*>(texture + 0x28), *reinterpret_cast<void**>(texture + 0x78),
                      static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x64)),
                      static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x68)),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
                      static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
-                     (static_cast<unsigned int>(1 - texture[0x74])) >> 31);
+                     (1U - texture[0x74]) >> 31);
     }
 
     if (1 < texture[0x74]) {
@@ -795,32 +789,21 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
             m_imageData = reinterpret_cast<void*>(
                 GetData__13CAmemCacheSetFsPci(amemCacheSet, m_cacheId, const_cast<char*>(s_textureman_cpp_801D7974), 0x1DD));
 
-            int format = m_format;
+            unsigned int format = m_format;
             if ((format == 9) || (format == 8)) {
                 GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                                static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                                static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
                 int tlutData = reinterpret_cast<int>(m_tlutData);
-                unsigned int numEntries = 0x10;
-                if (m_format == 9) {
-                    numEntries = 0x100;
-                }
-                GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutData), GX_TL_IA8, numEntries);
-
-                numEntries = 0x10;
-                if (m_format == 9) {
-                    numEntries = 0x100;
-                }
-
-                int offset = 0x10;
-                if (m_format == 9) {
-                    offset = 0x100;
-                }
-                GXInitTlutObj(&m_tlutObj1, reinterpret_cast<void*>(tlutData + offset * 2), GX_TL_IA8, numEntries);
+                GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutData), GX_TL_IA8,
+                              m_format == 9 ? 0x100 : 0x10);
+                GXInitTlutObj(&m_tlutObj1,
+                              reinterpret_cast<void*>(tlutData + (m_format == 9 ? 0x100 : 0x10) * 2),
+                              GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
             } else {
                 GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                              static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                             static_cast<GXTexWrapMode>(m_wrapMode), 1 - m_maxLod >> 31);
+                             static_cast<GXTexWrapMode>(m_wrapMode), (1U - m_maxLod) >> 31);
             }
 
             if (1 < m_maxLod) {

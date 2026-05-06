@@ -903,8 +903,6 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
 static void _PitchExecute(RedVoiceDATA* voice)
 {
     int pitchDelta = 0;
-    int* voiceData = (int*)voice;
-
     int targetPitchDelta;
 
     if ((voice->m_track->m_vibrateFunc != 0) && (voice->m_pitchModDelay == 0)) {

@@ -16,6 +16,10 @@ extern int gPppCalcDisabled;
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 
 extern const f32 FLOAT_80330df0[2];
+extern const f32 FLOAT_80330de0;
+extern const f32 FLOAT_80330de4;
+extern const f32 FLOAT_80330de8;
+extern const f32 FLOAT_80330dec;
 extern const f32 FLOAT_80330DC4;
 extern const f32 FLOAT_80330DC8;
 extern "C" const f64 DOUBLE_80330DD0;
@@ -59,6 +63,11 @@ void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
 }
 
 extern "C" const char s_pppYmLaser_cpp_801DB4B0[] = "pppYmLaser.cpp";
+
+static inline f32 LoadLaserFloat(const f32& value)
+{
+	return value;
+}
 
 struct CMapCylinderRaw {
 	Vec m_bottom;

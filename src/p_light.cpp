@@ -330,19 +330,22 @@ void CLightPcs::draw()
     CLight* light = m_sceneLights;
     for (u32 i = 0; i < m_sceneLightCount; i++, light++) {
         if (light->m_specularMode == 0) {
-            PSMTXMultVec(mtx, reinterpret_cast<Vec*>(&light->m_position), &vec);
-            GXInitLightPos(&light->m_gxLightObj, vec.x, vec.y, vec.z);
-
-            if (light->m_directionMode == 0) {
+            if (light->m_directionMode != 0) {
+                PSMTXMultVec(mtx, reinterpret_cast<Vec*>(&light->m_position), &vec);
+                GXInitLightPos(&light->m_gxLightObj, vec.x, vec.y, vec.z);
+                GXInitLightDir(&light->m_gxLightObj, light->m_direction.x, light->m_direction.y, light->m_direction.z);
+            } else {
+                PSMTXMultVec(mtx, reinterpret_cast<Vec*>(&light->m_position), &vec);
+                GXInitLightPos(&light->m_gxLightObj, vec.x, vec.y, vec.z);
                 PSMTXMultVecSR(mtx, reinterpret_cast<Vec*>(&light->m_direction), &vec);
                 GXInitLightDir(&light->m_gxLightObj, vec.x, vec.y, vec.z);
-            } else {
-                GXInitLightDir(&light->m_gxLightObj, light->m_direction.x, light->m_direction.y, light->m_direction.z);
             }
 
-            float cutoff = FLOAT_8032fc74;
-            if (light->m_type == 1) {
+            float cutoff;
+            if (static_cast<int>(light->m_type) == 1) {
                 cutoff = FLOAT_8032fc94 * light->m_spotScale;
+            } else {
+                cutoff = FLOAT_8032fc74;
             }
 
             GXInitLightSpot(&light->m_gxLightObj, cutoff, (GXSpotFn)light->m_unk4D);

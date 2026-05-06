@@ -126,6 +126,8 @@ void CMenuPcs::MLstDraw()
 			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, FLOAT_803333D0, v, z, z, FLOAT_803333D0);
 
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x5c);
+			float iconX = (float)item->x;
+			float iconY = (float)(item->y - 6);
 			v = FLOAT_803333D0;
 			if ((menuMode == 1) && (i == this->lstState->cursor)) {
 				v += (float)((double)item->height);
@@ -133,8 +135,8 @@ void CMenuPcs::MLstDraw()
 			DrawRect__8CMenuPcsFUlfffffffff(
 				&MenuPcs,
 				0,
-				(float)-(FLOAT_803333E0 * DOUBLE_803333E8 - x),
-				y - FLOAT_803333F4,
+				(float)-(FLOAT_803333E0 * DOUBLE_803333E8 - iconX),
+				iconY,
 				FLOAT_803333E0,
 				FLOAT_803333E0,
 				FLOAT_803333D0,

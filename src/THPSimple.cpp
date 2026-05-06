@@ -19,7 +19,7 @@ struct THPSimpleControl {
     THPFrameCompInfo compInfo;     // 0x6C
     THPVideoInfo videoInfo;        // 0x80
     THPAudioInfo audioInfo;        // 0x8C
-    u32 unk_9C;                    // 0x9C
+    void* thpWorkArea;             // 0x9C
     s32 isOpen;                    // 0xA0
     u8 isPreLoaded;                // 0xA4
     u8 isBufferSet;                // 0xA5
@@ -32,10 +32,10 @@ struct THPSimpleControl {
     s32 readIndex;                 // 0xB8
     s32 readSize;                  // 0xBC
     s32 curAudioTrack;             // 0xC0
-    f32 unk_C4;                    // 0xC4
-    f32 unk_C8;                    // 0xC8
-    f32 unk_CC;                    // 0xCC
-    s32 unk_D0;                    // 0xD0
+    f32 curVolume;                 // 0xC4
+    f32 targetVolume;              // 0xC8
+    f32 deltaVolume;               // 0xCC
+    s32 rampCount;                 // 0xD0
     THPReadBuffer readBuffer[8];   // 0xD4
     u32* yImage;                   // 0x134
     u32* uImage;                   // 0x138
@@ -76,8 +76,8 @@ static u16 VolumeTable[0x80] = {
 };
 static s16 SoundBuffer[0x280] ATTRIBUTE_ALIGN(32);
 
-extern const char lbl_80331868[4];
-extern const float FLOAT_8033186C;
+extern const char sTHPMagic[4];
+extern const float kTHPSimpleDefaultVolume;
 
 /*
  * --INFO--
@@ -166,13 +166,13 @@ void MixAudio(short* output, short* input, unsigned long samples)
 
                 audioPtr = SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mCurPtr;
                 for (i = 0; i < availableSamples; i++) {
-                    if (SimpleControl.unk_D0 != 0) {
-                        SimpleControl.unk_D0 -= 1;
-                        SimpleControl.unk_C4 = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                    if (SimpleControl.rampCount != 0) {
+                        SimpleControl.rampCount -= 1;
+                        SimpleControl.curVolume = SimpleControl.curVolume + SimpleControl.deltaVolume;
                     } else {
-                        SimpleControl.unk_C4 = SimpleControl.unk_C8;
+                        SimpleControl.curVolume = SimpleControl.targetVolume;
                     }
-                    volume = VolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
+                    volume = VolumeTable[static_cast<s32>(SimpleControl.curVolume)];
 
                     mixedSample = static_cast<s32>(*input) +
                                   ((static_cast<s32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
@@ -230,13 +230,13 @@ void MixAudio(short* output, short* input, unsigned long samples)
 
                 audioPtr = SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mCurPtr;
                 for (i = 0; i < availableSamples; i++) {
-                    if (SimpleControl.unk_D0 != 0) {
-                        SimpleControl.unk_D0 -= 1;
-                        SimpleControl.unk_C4 = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                    if (SimpleControl.rampCount != 0) {
+                        SimpleControl.rampCount -= 1;
+                        SimpleControl.curVolume = SimpleControl.curVolume + SimpleControl.deltaVolume;
                     } else {
-                        SimpleControl.unk_C4 = SimpleControl.unk_C8;
+                        SimpleControl.curVolume = SimpleControl.targetVolume;
                     }
-                    volume = VolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
+                    volume = VolumeTable[static_cast<s32>(SimpleControl.curVolume)];
 
                     mixedSample = (static_cast<s32>(volume) * static_cast<s32>(*audioPtr)) >> 15;
                     if (mixedSample < -0x8000) {
@@ -367,7 +367,7 @@ restore_interrupts_1:
                     case 0:
                         decodeSuccess =
                             THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
-                                           reinterpret_cast<void*>(SimpleControl.unk_9C));
+                                           SimpleControl.thpWorkArea);
                         if (decodeSuccess == 0) {
                             decodeSuccess = 1;
                             SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
@@ -404,7 +404,7 @@ restore_interrupts_1:
                 switch (SimpleControl.compInfo.mFrameComp[i]) {
                 case 0:
                     decodeSuccess = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
-                                                  reinterpret_cast<void*>(SimpleControl.unk_9C));
+                                                  SimpleControl.thpWorkArea);
                     if (decodeSuccess == 0) {
                         decodeSuccess = 1;
                         SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
@@ -503,8 +503,8 @@ s32 THPSimpleLoadStop(void)
             SimpleControl.readFrame = 0;
             SimpleControl.audioDecodeIndex = 0;
             SimpleControl.audioPlayIndex = 0;
-            SimpleControl.unk_C4 = SimpleControl.unk_C8;
-            SimpleControl.unk_D0 = 0;
+            SimpleControl.curVolume = SimpleControl.targetVolume;
+            SimpleControl.rampCount = 0;
             return 1;
         }
     }
@@ -755,7 +755,7 @@ s32 THPSimpleSetBuffer(u8* buffer)
             cursor += audioBufferSize;
         }
 
-        SimpleControl.unk_9C = reinterpret_cast<u32>(cursor);
+        SimpleControl.thpWorkArea = cursor;
     }
 
     return 1;
@@ -867,7 +867,7 @@ s32 THPSimpleOpen(const char* path)
     }
     memcpy(&SimpleControl.header, WorkBuffer, sizeof(THPHeader));
 
-    if (strcmp(SimpleControl.header.mMagic, lbl_80331868) != 0) {
+    if (strcmp(SimpleControl.header.mMagic, sTHPMagic) != 0) {
         DVDClose(&SimpleControl.fileInfo);
         return 0;
     }
@@ -963,9 +963,9 @@ s32 THPSimpleOpen(const char* path)
     SimpleControl.isBufferSet = 0;
     SimpleControl.isLooping = 0;
     SimpleControl.isOpen = 1;
-    SimpleControl.unk_C4 = FLOAT_8033186C;
-    SimpleControl.unk_C8 = FLOAT_8033186C;
-    SimpleControl.unk_D0 = 0;
+    SimpleControl.curVolume = kTHPSimpleDefaultVolume;
+    SimpleControl.targetVolume = kTHPSimpleDefaultVolume;
+    SimpleControl.rampCount = 0;
 
     return 1;
 }

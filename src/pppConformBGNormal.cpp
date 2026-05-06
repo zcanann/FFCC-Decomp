@@ -25,6 +25,11 @@ struct ConformCylinderQuery {
     f32 m_field30;
 };
 
+struct ConformBgNormalState {
+    Vec m_normal;
+    u8 m_initialized;
+};
+
 void pppSetFpMatrix(_pppMngSt*);
 
 extern "C" {
@@ -76,8 +81,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     f32 bottomY;
     f32 bottomZ;
     f32 cylinderY;
-    Vec* stateNormal;
-    u8* stateInitialized;
+    ConformBgNormalState* state;
     _pppMngSt* pppMngSt;
     s32 checkResult;
     CGObject* owner;
@@ -110,8 +114,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     matrixY = pppMngSt->m_matrix.value[1][3];
     matrixZ = pppMngSt->m_matrix.value[2][3];
     dataOffset = *param3->m_serializedDataOffsets;
-    stateNormal = (Vec*)((u8*)pppConformBGNormal + 0x80 + dataOffset);
-    stateInitialized = (u8*)&stateNormal[1].x;
+    state = (ConformBgNormalState*)((u8*)pppConformBGNormal + 0x80 + dataOffset);
 
     if (((s32)Game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
             mode = param2->m_stepValue;
@@ -168,27 +171,27 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 }
             }
 
-            if (*stateInitialized == 0) {
-                *stateInitialized = 1;
-                stateNormal->x = local_164.x;
-                stateNormal->y = local_164.y;
-                stateNormal->z = local_164.z;
+            if (state->m_initialized == 0) {
+                state->m_initialized = 1;
+                state->m_normal.x = local_164.x;
+                state->m_normal.y = local_164.y;
+                state->m_normal.z = local_164.z;
             }
 
-            local_18c.x = stateNormal->x;
-            local_18c.y = stateNormal->y;
-            local_18c.z = stateNormal->z;
+            local_18c.x = state->m_normal.x;
+            local_18c.y = state->m_normal.y;
+            local_18c.z = state->m_normal.z;
             local_18c.w = kPppConformBgNormalOne;
             local_19c.x = local_164.x;
             local_19c.y = local_164.y;
             local_19c.z = local_164.z;
             local_19c.w = kPppConformBgNormalOne;
             C_QUATSlerp(&local_18c, &local_19c, &local_1ac, param2->m_initWOrk);
-            stateNormal->x = local_1ac.x;
-            stateNormal->y = local_1ac.y;
-            stateNormal->z = local_1ac.z;
+            state->m_normal.x = local_1ac.x;
+            state->m_normal.y = local_1ac.y;
+            state->m_normal.z = local_1ac.z;
 
-            PSVECNormalize(stateNormal, &local_158);
+            PSVECNormalize(&state->m_normal, &local_158);
 
             if ((param2->m_stepValue == 0) && (owner != NULL)) {
                 trigValue = sin((f64)owner->m_rotBaseY);
@@ -307,16 +310,16 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
 void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct _pppCtrlTable* param2)
 {
     int* serializedDataOffsets;
-    f32* pfVar2;
+    ConformBgNormalState* state;
     f32 scale;
 
     serializedDataOffsets = *(int**)((u8*)param2 + 0xc);
-    pfVar2 = (f32*)((u8*)conformBG + 0x80 + *serializedDataOffsets);
+    state = (ConformBgNormalState*)((u8*)conformBG + 0x80 + *serializedDataOffsets);
     scale = kPppConformBgNormalZero;
-    pfVar2[2] = scale;
-    pfVar2[1] = scale;
-    pfVar2[0] = scale;
-    *(u8*)(pfVar2 + 3) = 0;
+    state->m_normal.z = scale;
+    state->m_normal.y = scale;
+    state->m_normal.x = scale;
+    state->m_initialized = 0;
 }
 
 extern const f32 FLOAT_80331920 = 1.0f;

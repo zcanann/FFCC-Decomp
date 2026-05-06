@@ -710,17 +710,20 @@ static void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, 
  */
 static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
+    int* saveArea = (int*)control->m_savedCommand;
     int loopBase = control->m_loopBase;
+
+    control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE;
+
     int deltaAdjust = 1 - track->m_deltaTime;
     int slot = 0;
     RedTrackDATA* scan;
 
-    control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE;
     for (scan = control->m_tracks; scan < track; scan++) {
-        control->m_savedCommand[slot] = scan->m_command;
-        control->m_savedDelta[slot] = scan->m_deltaTime + deltaAdjust;
-        control->m_savedFlags[slot] = scan->m_flags;
-        control->m_savedNote[slot] = *(int*)&scan->m_note;
+        saveArea[slot] = (int)scan->m_command;
+        saveArea[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT] = scan->m_deltaTime + deltaAdjust;
+        saveArea[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 2] = scan->m_flags;
+        saveArea[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 3] = *(int*)&scan->m_note;
         slot++;
     }
 
@@ -730,10 +733,10 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
         command = scan->m_command;
         int delta = DeltaTimeSumup(&command);
 
-        control->m_savedCommand[slot] = command;
-        control->m_savedDelta[slot] = scan->m_deltaTime + delta + deltaAdjust;
-        control->m_savedFlags[slot] = scan->m_flags;
-        control->m_savedNote[slot] = *(int*)&scan->m_note;
+        saveArea[slot] = (int)command;
+        saveArea[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT] = scan->m_deltaTime + delta + deltaAdjust;
+        saveArea[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 2] = scan->m_flags;
+        saveArea[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 3] = *(int*)&scan->m_note;
 
         if ((nextTrack - control->m_tracks) < control->m_trackCount) {
             for (; nextTrack < control->m_tracks + control->m_trackCount; nextTrack++) {
@@ -751,10 +754,10 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
                     }
                 }
 
-                control->m_savedCommand[slot + 1] = nextTrack->m_command;
-                control->m_savedDelta[slot + 1] = currentDelta;
-                control->m_savedFlags[slot + 1] = nextTrack->m_flags;
-                control->m_savedNote[slot + 1] = *(int*)&nextTrack->m_note;
+                saveArea[slot + 1] = (int)nextTrack->m_command;
+                saveArea[slot + 1 + REDSOUND_MUSIC_TRACK_SAVE_COUNT] = currentDelta;
+                saveArea[slot + 1 + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 2] = nextTrack->m_flags;
+                saveArea[slot + 1 + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 3] = *(int*)&nextTrack->m_note;
                 slot++;
             }
         }
@@ -932,8 +935,8 @@ static void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
  */
 static void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int targetDepth;
     RedControlRamp* reverbDepth = (RedControlRamp*)&track->m_reverbDepth;
+    int targetDepth;
     unsigned int stepCount;
 
     stepCount = (*track->m_command != 0) ? *track->m_command : REDSOUND_MIDI_DEFAULT_STEP_COUNT;

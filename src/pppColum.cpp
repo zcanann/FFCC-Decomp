@@ -198,11 +198,11 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 PSVECSubtract(&center, &positionWork->m_position, &offset);
                 {
                     float dist = PSVECMag(&offset);
-                    float fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
+                    float fadeAmount = dist / param_2->m_colum.m_fadeDistance;
                     u32 baseAlpha = positionWork->m_alpha;
 
                     alpha = (u8)baseAlpha;
-                    if (dist < *(float*)(param_2->m_payload + 0x10) && fadeAmount > FLOAT_80331084) {
+                    if (dist < param_2->m_colum.m_fadeDistance && fadeAmount > FLOAT_80331084) {
                         alpha = (u8)((float)baseAlpha * fadeAmount);
                     }
                 }
@@ -212,8 +212,8 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 color.rgba[3] = alpha;
 
                 pppSetDrawEnv(
-                    &color, (pppFMATRIX*)0, zero, (u8)param_2->m_payload[0x15],
-                    (u8)param_2->m_payload[0x14],
+                    &color, (pppFMATRIX*)0, zero, param_2->m_colum.m_drawEnvColor1,
+                    param_2->m_colum.m_drawEnvColor0,
                     param_2->m_arg3, 0, 0, 1, 0);
 
                 gUtil.BeginQuadEnv();
@@ -275,13 +275,13 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
 
             values = work->m_values;
             for (i = 0; i < (int)(unsigned int)param_2->m_count; i++) {
-                values->m_scaleStep = Math.RandF(*(float*)(param_2->m_payload + 4));
-                values->m_scaleStep = values->m_scaleStep + *(float*)(param_2->m_payload + 0);
-                values->m_positionScale = Math.RandF(*(float*)(param_2->m_payload + 0xc));
-                values->m_positionScale = values->m_positionScale + *(float*)(param_2->m_payload + 8);
-                values->m_colorR = gUtil.GetNoise(*(unsigned char*)(param_2->m_payload + 0x16));
-                values->m_colorG = gUtil.GetNoise(*(unsigned char*)(param_2->m_payload + 0x17));
-                values->m_colorB = gUtil.GetNoise(*(unsigned char*)(param_2->m_payload + 0x18));
+                values->m_scaleStep = Math.RandF(param_2->m_colum.m_scaleStepRange);
+                values->m_scaleStep = values->m_scaleStep + param_2->m_colum.m_scaleStepBase;
+                values->m_positionScale = Math.RandF(param_2->m_colum.m_positionRange);
+                values->m_positionScale = values->m_positionScale + param_2->m_colum.m_positionBase;
+                values->m_colorR = gUtil.GetNoise(param_2->m_colum.m_noiseR);
+                values->m_colorG = gUtil.GetNoise(param_2->m_colum.m_noiseG);
+                values->m_colorB = gUtil.GetNoise(param_2->m_colum.m_noiseB);
                 values++;
             }
         }

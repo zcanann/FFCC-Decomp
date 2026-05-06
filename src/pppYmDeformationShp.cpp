@@ -140,11 +140,12 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		}
 
 		PSMTXRotRad(drawMtx, 'z', FLOAT_803305f0 * (float)work->m_angle);
-		indMtx[0][0] = drawMtx[0][0] * work->m_scale;
-		indMtx[0][1] = drawMtx[0][1] * work->m_scale;
+		float scale = work->m_scale;
+		indMtx[0][0] = drawMtx[0][0] * scale;
+		indMtx[0][1] = drawMtx[0][1] * scale;
 		indMtx[0][2] = kPppYmDeformationShpZero;
-		indMtx[1][0] = drawMtx[1][0] * work->m_scale;
-		indMtx[1][1] = drawMtx[1][1] * work->m_scale;
+		indMtx[1][0] = drawMtx[1][0] * scale;
+		indMtx[1][1] = drawMtx[1][1] * scale;
 		indMtx[1][2] = kPppYmDeformationShpZero;
 		GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 

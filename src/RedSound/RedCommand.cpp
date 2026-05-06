@@ -181,7 +181,7 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 		_EraseAttribute(eraseTrack, attrMask);
 	}
 
-	do {
+	for (;;) {
 		track = *trackBasePtr + REDSOUND_SE_TRACK_LAST_INDEX;
 		scan = track;
 		do {
@@ -201,13 +201,20 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 			}
 			scan--;
 		} while ((remaining != 0) && (*trackBasePtr <= track));
-	} while ((track < *trackBasePtr) && (_EraseTime(eraseTrack) != 0));
 
-	if (track < *trackBasePtr) {
-		track = 0;
+		if (*trackBasePtr <= track) {
+			break;
+		}
+		if (_EraseTime(eraseTrack) == 0) {
+			break;
+		}
 	}
 
-	return track;
+	if (*trackBasePtr <= track) {
+		return track;
+	}
+
+	return 0;
 }
 
 /*

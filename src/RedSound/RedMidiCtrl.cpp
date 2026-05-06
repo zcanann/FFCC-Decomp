@@ -711,11 +711,13 @@ static void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, 
 static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     int loopBase = control->m_loopBase;
+
+    control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE;
+
     int deltaAdjust = 1 - track->m_deltaTime;
     int slot = 0;
     RedTrackDATA* scan;
 
-    control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE;
     for (scan = control->m_tracks; scan < track; scan++) {
         control->m_savedCommand[slot] = scan->m_command;
         control->m_savedDelta[slot] = scan->m_deltaTime + deltaAdjust;

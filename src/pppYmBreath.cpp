@@ -155,8 +155,8 @@ struct YmBreathParticleData {
     unsigned char _pad18[0x08];
     s16 m_life;
     unsigned char _pad22[0x02];
-    u8 m_fadeOutFrames;
-    u8 m_fadeInFrames;
+    s8 m_fadeOutFrames;
+    s8 m_fadeInFrames;
     unsigned char _pad26[0x02];
     float m_angle;
     float m_angleVelocity;
@@ -839,7 +839,6 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     int alpha = vColor->m_alpha;
     YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
-    char frameCount;
     Vec step;
 
     (void)vYmBreath;
@@ -906,13 +905,12 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
     }
     particle->m_age = particle->m_age + 1;
 
-    frameCount = particle->m_fadeOutFrames;
-    if ((frameCount != '\0') && ((int)(unsigned int)particle->m_age <= (int)frameCount)) {
-        particle->m_alpha -= (float)alpha / (float)(int)frameCount;
+    if ((particle->m_fadeOutFrames != '\0') &&
+        ((int)(unsigned int)particle->m_age <= (int)particle->m_fadeOutFrames)) {
+        particle->m_alpha -= (float)alpha / (float)(int)particle->m_fadeOutFrames;
     }
 
-    frameCount = particle->m_fadeInFrames;
-    if ((frameCount != '\0') && ((int)particle->m_life <= (int)frameCount)) {
+    if ((particle->m_fadeInFrames != '\0') && ((int)particle->m_life <= (int)particle->m_fadeInFrames)) {
         particle->m_alpha += (float)alpha / (float)(unsigned int)params->m_fadeInFrames;
     }
 }

@@ -358,9 +358,9 @@ extern "C" void CalcBound__9CLine2(CLine* line)
     line->min.x = kLineBoundsInitMin;
     line->min.y = kLineBoundsInitMin;
     line->min.z = kLineBoundsInitMin;
-    line->max.x = -kLineBoundsInitMin;
-    line->max.y = -kLineBoundsInitMin;
-    line->max.z = -kLineBoundsInitMin;
+    line->max.x = kLineBoundsInitMax;
+    line->max.y = kLineBoundsInitMax;
+    line->max.z = kLineBoundsInitMax;
     line->totalLength = kLineSegmentMinT;
 
     for (u32 i = 0; i < line->pointCount; i++) {

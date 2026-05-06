@@ -597,14 +597,13 @@ int GbaQueue::SetQueue(int channel, unsigned int value)
 	if (queue->m_queueFull[channel] != 0) {
 		ret = -1;
 	} else {
-		int* queueCount = &queue->m_queueCount[channel];
-		if (*queueCount >= 0x40) {
+		if (queue->m_queueCount[channel] >= 0x40) {
 			ret = -1;
 			queue->m_queueFull[channel] = 1;
 		} else {
 			ret = 0;
-			queue->m_queue[channel][*queueCount] = value;
-			*queueCount = *queueCount + 1;
+			queue->m_queue[channel][queue->m_queueCount[channel]] = value;
+			queue->m_queueCount[channel] = queue->m_queueCount[channel] + 1;
 		}
 	}
 	OSSignalSemaphore(semaphore);

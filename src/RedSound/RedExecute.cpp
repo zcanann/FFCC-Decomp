@@ -901,6 +901,8 @@ static void _PitchExecute(RedVoiceDATA* voice)
     int pitchDelta = 0;
     int* voiceData = (int*)voice;
 
+    int targetPitchDelta;
+
     if ((voice->m_track->m_vibrateFunc != 0) && (voice->m_pitchModDelay == 0)) {
         int pitchLfo = voice->m_track->m_vibrateDepth >> REDSOUND_FIXED_SHIFT;
         if (pitchLfo < REDSOUND_PITCH_MOD_DEPTH_SPLIT) {
@@ -918,29 +920,28 @@ static void _PitchExecute(RedVoiceDATA* voice)
         }
         pitchDelta = PitchCompute(basePitch, pitchBend, voice->m_waveData->m_pitch, voice->m_track->m_fineTune);
 
-        {
-            int currentPitch = voice->m_pitch;
-            RedSwingFunc pitchWaveFunc = voice->m_track->m_vibrateFunc;
-            int pitchWave = pitchWaveFunc((u32)voice->m_pitchModPhase >> REDSOUND_FIXED_SHIFT);
-            pitchDelta = ((pitchDelta - currentPitch) * (pitchWave >> REDSOUND_PITCH_MOD_WAVE_SHIFT)) >>
-                         REDSOUND_FIXED_SHIFT;
-        }
+        pitchDelta =
+            ((pitchDelta - voice->m_pitch) *
+             (voice->m_track->m_vibrateFunc((u32)voice->m_pitchModPhase >> REDSOUND_FIXED_SHIFT) >> REDSOUND_PITCH_MOD_WAVE_SHIFT)) >>
+            REDSOUND_FIXED_SHIFT;
 
         if (voice->m_pitchModFrames != 0) {
             int frame = voice->m_pitchModFrame;
             int rampedPitch = pitchDelta * frame;
             voice->m_pitchModFrame = voice->m_pitchModFrame + 1;
             pitchDelta = rampedPitch / voice->m_pitchModFrames;
-            if (voice->m_pitchModFrames <= voice->m_pitchModFrame) {
+            if (voice->m_pitchModFrame >= voice->m_pitchModFrames) {
                 voice->m_pitchModFrames = 0;
             }
         }
 
+        targetPitchDelta = pitchDelta;
         if (pitchDelta < 0) {
-            pitchDelta >>= 1;
+            targetPitchDelta = pitchDelta >> 1;
         }
 
         voice->m_pitchModPhase += voice->m_track->m_vibrateRate;
+        pitchDelta = targetPitchDelta;
     }
 
     voice->m_targetPitch = pitchDelta + voice->m_pitch + voice->m_randomPitch;

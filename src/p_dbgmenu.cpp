@@ -685,7 +685,7 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 CDbgMenuPcs::CDM* CDbgMenuPcs::searchFreeCDM()
 {
 	for (int i = 0; i < 0x80; i++) {
-		if (m_menuPool[i].m_statusBits.m_used == 0) {
+		if ((s8)(m_menuPool[i].m_status & 0x80) >= 0) {
 			return &m_menuPool[i];
 		}
 	}

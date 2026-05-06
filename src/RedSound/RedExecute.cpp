@@ -1655,7 +1655,7 @@ static void _KeyOnControl()
 {
     u32 voiceStartMask[2];
     int* reserve;
-    unsigned int* voiceData;
+    RedVoiceDATA* voiceData;
     int (*waveFunc)(int);
 
     _VoiceEnvelopeCheck();
@@ -1664,10 +1664,10 @@ static void _KeyOnControl()
 
     if (m_KeyOnEntry != 0) {
         reserve = (int*)p_KeyOnData;
-        voiceData = (unsigned int*)p_VoiceData;
+        voiceData = p_VoiceData;
         do {
             if (((u32)*reserve != 0) && (((RedTrackDATA*)*reserve)->m_waveData != 0)) {
-                voiceData = (unsigned int*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)voiceStartMask);
+                voiceData = _VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)voiceStartMask);
             }
             reserve += 2;
         } while ((voiceData != 0) && (reserve < (int*)p_KeyOnData + REDSOUND_KEY_ON_TOTAL_WORD_COUNT));

@@ -22,7 +22,7 @@ extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
     _pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
-static pppFMATRIX g_matUnit;
+static pppFMATRIX g_matUnit2;
 
 static const char s_pppYmMegaBirthShpTail2_cpp_801d9c68[] = "pppYmMegaBirthShpTail2.cpp";
 
@@ -656,5 +656,5 @@ void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBi
     *(u16*)(work[1].value[1] + 3) = 0;
     *(u16*)((u8*)work[1].value[1] + 0xe) = 0;
     *(u16*)(work[1].value[1] + 3) = 10000;
-    pppUnitMatrix(g_matUnit);
+    pppUnitMatrix(g_matUnit2);
 }

@@ -1,4 +1,5 @@
 #include "ffcc/mapobj.h"
+#define FFCC_PTRARRAY_NAMED_STRINGS
 #include "ffcc/ptrarray.h"
 #include "ffcc/map.h"
 #include "ffcc/chunkfile.h"
@@ -26,6 +27,8 @@ extern const float kMapObjInitValue50;
 extern const char s_mapobj_cpp_801D70C0[];
 extern unsigned int DAT_8032e498;
 unsigned int DAT_8032E8B8 = 5;
+extern const char s_CPtrArrayGrowError[] = "CPtrArray grow error";
+extern const char s_CPtrArrayFile[] = "collection_ptrarray.h";
 extern "C" void __ct__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);

@@ -270,17 +270,17 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             const_cast<char*>(s_pppYmTracer2_cpp_801dc4b8), 0xAD);
 
         fVar2 = FLOAT_80331840;
-        pfVar6 = (float*)work->entries;
+        entry = work->entries;
         for (iVar8 = 0; iVar8 < (s32)(u32)param_2->m_tracer.m_entryCount; iVar8++) {
-            *(u8*)(pfVar6 + 8) = 0;
-            *(u8*)((u8*)pfVar6 + 0x1f) = 0;
-            pfVar6[2] = fVar2;
-            pfVar6[1] = fVar2;
-            pfVar6[0] = fVar2;
-            pfVar6[6] = fVar2;
-            pfVar6[5] = fVar2;
-            pfVar6[4] = fVar2;
-            pfVar6 += 10;
+            entry->active = 0;
+            entry->alpha = 0;
+            entry->pos.z = fVar2;
+            entry->pos.y = fVar2;
+            entry->pos.x = fVar2;
+            entry->targetPos.z = fVar2;
+            entry->targetPos.y = fVar2;
+            entry->targetPos.x = fVar2;
+            entry++;
         }
     }
 

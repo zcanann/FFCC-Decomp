@@ -259,8 +259,12 @@ void CGItemObj::onDestroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80126f38
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::onFramePreCalc()
 {
@@ -1001,9 +1005,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			isMenuBossStage = true;
 		}
 		if (isMenuBossStage) {
-			typedef unsigned int (*PartyVFunc)(CGPartyObj*);
-			PartyVFunc getCid = reinterpret_cast<PartyVFunc>((*reinterpret_cast<void***>(partyObj))[3]);
-			unsigned int cid = getCid(partyObj);
+			unsigned int cid = static_cast<unsigned short>(partyObj->GetCID());
 			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
 			if (((stageCarry >> 5) & 0xFF) != 0) {
 				isStageCarry = true;
@@ -1030,9 +1032,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 					condC = true;
 				}
 				if (condC) {
-					typedef unsigned int (*PartyVFunc)(CGPartyObj*);
-					PartyVFunc getCid = reinterpret_cast<PartyVFunc>((*reinterpret_cast<void***>(partyObj))[3]);
-					unsigned int cid = getCid(partyObj);
+					unsigned int cid = static_cast<unsigned short>(partyObj->GetCID());
 					unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
 					if (((stageCarry >> 5) & 0xFF) != 0) {
 						condB = true;
@@ -1066,9 +1066,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		}
 		if (isMenuBossStage) {
 			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
-			typedef unsigned int (*PartyVFunc)(CGPartyObj*);
-			PartyVFunc getCid = reinterpret_cast<PartyVFunc>((*reinterpret_cast<void***>(carryObj))[3]);
-			unsigned int cid = getCid(carryObj);
+			unsigned int cid = static_cast<unsigned short>(carryObj->GetCID());
 			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
 			if (((stageCarry >> 5) & 0xFF) != 0) {
 				isStageCarry = true;
@@ -1117,8 +1115,12 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012564c
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::onChangePrg(int)
 {
@@ -1137,28 +1139,39 @@ void CGItemObj::statPot()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801254cc
+ * PAL Size: 384b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::onFrameAlways()
 {
 	unsigned char* self = (unsigned char*)this;
-	unsigned int countdown = *(unsigned int*)(self + 0x56C);
+	int countdown = *(int*)(self + 0x56C);
 
 	if (countdown != 0) {
-		unsigned int next = countdown - 1;
-		*(unsigned int*)(self + 0x56C) = next & ~((int)next >> 0x1F);
+		int next = countdown - 1;
+		*(int*)(self + 0x56C) = next & ~(next >> 0x1F);
 		*(float*)(self + 0x144) = *(float*)(self + 0x568) * (float)(8 - *(int*)(self + 0x56C)) * FLOAT_80331b68;
 	}
 
 	if (*(int*)(self + 0x500) == 0xA) {
-		int canUseTrace =
-		    Game.m_gameWork.m_gameInitFlag != 0 &&
-		    (signed char)(*(unsigned char*)(CFlat + 4836) << 4) < 0 &&
-		    (signed char)(*(unsigned char*)(CFlat + 4836) << 3) < 0 &&
-		    (signed char)*(unsigned char*)(self + 0x9A) < 0 &&
-		    *(int*)(CFlat + 4780) == 0 &&
-		    *(int*)(self + 0x550) == 0;
+		int canUseTrace;
+
+		if (Game.m_gameWork.m_gameInitFlag != 0 &&
+		    static_cast<signed char>(
+		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(CFlat + 4836)) << 28) & 0xC0000000) >> 31) != 0 &&
+		    static_cast<signed char>(
+		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(CFlat + 4836)) << 29) & 0xC0000000) >> 31) != 0 &&
+		    static_cast<signed char>(
+		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(self + 0x9A)) << 24) & 0xC0000000) >> 31) != 0 &&
+		    *(int*)(CFlat + 4780) == 0 && *(void**)(self + 0x550) == 0) {
+			canUseTrace = true;
+		} else {
+			canUseTrace = false;
+		}
 
 		if (canUseTrace && *(int*)(CFlat + 66604) == 0) {
 			*(int*)(CFlat + 66604) = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);

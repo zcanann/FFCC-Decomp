@@ -110,7 +110,7 @@ STATIC_ASSERT(offsetof(ChangeTexModelData, m_materialSet) == 0x24);
 STATIC_ASSERT(offsetof(ChangeTexModelData, m_frameShift) == 0x34);
 
 extern const float FLOAT_80332020 = -10000.0f;
-extern const char DAT_80332024[] = "obj";
+extern const char sPppChangeTexMeshObjectName[] = "obj";
 extern const float FLOAT_80332028 = 255.0f;
 extern const double DOUBLE_80332030 = 4503601774854144.0;
 extern const double DOUBLE_80332038 = 4503599627370496.0;
@@ -254,7 +254,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		int arrayOffset = 0;
 		for (unsigned int meshIdx = 0; meshIdx < model0Raw->m_data->m_meshCount; meshIdx++) {
 			int meshHdr = *(int*)(meshList + 8);
-			if (strcmp((char*)meshHdr, DAT_80332024) == 0) {
+			if (strcmp((char*)meshHdr, sPppChangeTexMeshObjectName) == 0) {
 				CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
 				    &gUtil, &work->m_bboxMin, &work->m_bboxMax, *(void**)(meshList + 0xC), *(unsigned long*)(meshHdr + 0x14),
 				    *(unsigned long*)(*(int*)((char*)model0 + 0xA4) + 0x34));
@@ -568,19 +568,20 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 {
 	ChangeTexModelRaw* modelRaw = (ChangeTexModelRaw*)model;
 	ChangeTexWork* work = (ChangeTexWork*)param_2;
+	int textureInfo = (int)work->m_texture;
 	ChangeTexMeshRef* meshes = modelRaw->m_meshes;
 	ChangeTexMeshData* meshData = meshes[param_4].m_data;
 	ChangeTexDisplayList* displayList = meshData->m_displayLists + param_5;
-	int textureInfo = (int)work->m_texture;
 
 	if (*(u8*)((char*)param_3 + 0x14) == 0) {
+		int drawTevBits = 0xACE0F;
 		int fullTevBits = 0xADE0F;
 		int zero = 0;
 		int allOnes = -1;
 		int tevScale = 0x1E;
 		u8 fullByte = 0xFF;
 
-		*(int*)(MaterialManRaw() + 0x48) = 0xACE0F;
+		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
 		*(int*)(MaterialManRaw() + 0x128) = zero;
 		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
 		*(int*)(MaterialManRaw() + 0x130) = zero;

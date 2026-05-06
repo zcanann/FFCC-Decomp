@@ -673,7 +673,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     int j;
     int k;
     int group;
-    int groupTableWork;
+    YmBreathParticleGroup* groupCursor;
     YmBreathParticleGroup* groupData;
     short foundSlot;
     short foundGroup;
@@ -701,12 +701,12 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             } else {
                 float zero = 0.0f;
 
-                groupTableWork = (int)vYmBreath->m_groups;
+                groupCursor = vYmBreath->m_groups;
                 foundGroup = -1;
                 foundSlot = -1;
                 for (short groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
                     for (short slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
-                        signed char* particleIndices = *(signed char**)(groupTableWork + 4);
+                        signed char* particleIndices = groupCursor->particleIndices;
                         if ((short)i == *(signed char*)(particleIndices + (short)slotIndex)) {
                             foundGroup = groupIndex;
                             foundSlot = slotIndex;
@@ -714,7 +714,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                             goto found_index;
                         }
                     }
-                    groupTableWork += 0x5C;
+                    groupCursor++;
                 }
                 found = false;
 

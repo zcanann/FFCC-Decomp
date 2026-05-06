@@ -386,7 +386,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                 CharaBreakDisplayList* displayList = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayLists;
                 CharaBreakDisplayListPair** dlEntries =
                     (CharaBreakDisplayListPair**)(((u32*)work->m_meshBuffers)[i] + ((displayListCount - 1) << 2));
-                for (int dl = displayListCount - 1; dl >= 0; dl--) {
+                for (int dl = displayListCount - 1; dl >= 0; dl--, displayList++) {
                     *dlEntries = (CharaBreakDisplayListPair*)pppMemFree__FPv(
                         0x10, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3FC);
                     if (*dlEntries == NULL) {
@@ -425,7 +425,6 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                                          (*dlEntries)->m_polygonCount, (CChara::CModel*)model, (CChara::CMesh*)mesh);
 
                     dlEntries--;
-                    displayList++;
                 }
             }
 
@@ -1010,7 +1009,7 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
         s32 materialIndex = meshData->m_displayListCount - 1;
         s32 materialOffset = materialIndex * 4;
 
-        for (; materialIndex >= 0; materialIndex--) {
+        for (; materialIndex >= 0; materialIndex--, materialData++) {
             CharaBreakDisplayListPair** meshTable =
                 reinterpret_cast<CharaBreakDisplayListPair**>(workData->m_meshBuffers) + meshIndex;
             CharaBreakDisplayListPair** displayListEntry =
@@ -1081,7 +1080,6 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
             }
 
             materialOffset -= 4;
-            materialData++;
         }
     }
 }

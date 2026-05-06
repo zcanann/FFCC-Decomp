@@ -148,7 +148,6 @@ maphit.cpp:
 	.rodata     start:0x801D7088 end:0x801D7094
 	.bss        start:0x80245640 end:0x802456F0
 	.sbss       start:0x8032EC80 end:0x8032ECA0
-	.sbss2      start:0x80333DE0 end:0x80333DE8
 
 mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8
@@ -1033,6 +1032,7 @@ pppYmMelt.cpp:
 	.text       start:0x800A538C end:0x800A5FCC
 	.rodata     start:0x801DA048 end:0x801DA058
 	.sdata2     start:0x80330AF8 end:0x80330B08
+	.sbss2      start:0x80333DE0 end:0x80333DE4
 
 pppYmCallBack.cpp:
 	extab       start:0x80007FE8 end:0x80007FF0

@@ -8,7 +8,7 @@
 #include "ffcc/maphit.h"
 extern "C" {
 extern const float kPppYmMeltZero;
-extern u32 g_ymMelt;
+u32 g_ymMelt;
 extern int gPppCalcDisabled;
 }
 #include "dolphin/mtx.h"

@@ -1092,7 +1092,7 @@ void CAStar::CATemp::operator= (const CAStar::CATemp& other)
  */
 void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 {
-	CVector pos(x, y, z);
+	Vec* pos = reinterpret_cast<Vec*>(&CVector(x, y, z));
 
 	if (groupB < groupA)
 	{
@@ -1137,9 +1137,9 @@ void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 
 	CAPos& portal = m_portals[index];
 
-	portal.m_position.x = pos.x;
-	portal.m_position.y = pos.y;
-	portal.m_position.z = pos.z;
+	portal.m_position.x = pos->x;
+	portal.m_position.y = pos->y;
+	portal.m_position.z = pos->z;
 	m_portals[index].m_groupA = static_cast<unsigned char>(groupA);
 	m_portals[index].m_groupB = static_cast<unsigned char>(groupB);
 }

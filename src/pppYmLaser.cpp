@@ -53,7 +53,6 @@ void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
 }
 
 extern "C" const char s_pppYmLaser_cpp_801DB4B0[] = "pppYmLaser.cpp";
-extern const f32 FLOAT_80330df0[2] = {6.2831855f, 0.0f};
 
 struct CMapCylinderRaw {
 	Vec m_bottom;
@@ -356,6 +355,9 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		}
 	}
 }
+
+extern const f32 FLOAT_80330df0[2] = {6.2831855f, 0.0f};
+
 /*
  * --INFO--
  * PAL Address: 0x800d31d4

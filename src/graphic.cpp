@@ -1354,21 +1354,25 @@ void CGraphic::CopySaveFrameBuffer()
  */
 _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int doClear)
 {
-    if (((x & 1) ^ (x >> 31)) != (x >> 31)) {
+    u32 xBits = x;
+    if (((xBits & 1) ^ (xBits >> 31)) != (xBits >> 31)) {
         x -= 1;
     }
-    if (((y & 1) ^ (y >> 31)) != (y >> 31)) {
+    u32 yBits = y;
+    if (((yBits & 1) ^ (yBits >> 31)) != (yBits >> 31)) {
         y -= 1;
     }
 
     int xEnd = x + width;
     int yEnd = y + height;
 
-    if (((xEnd & 1) ^ (xEnd >> 31)) != (xEnd >> 31)) {
+    u32 xEndBits = xEnd;
+    if (((xEndBits & 1) ^ (xEndBits >> 31)) != (xEndBits >> 31)) {
         xEnd += 1;
         width += 1;
     }
-    if (((yEnd & 1) ^ (yEnd >> 31)) != (yEnd >> 31)) {
+    u32 yEndBits = yEnd;
+    if (((yEndBits & 1) ^ (yEndBits >> 31)) != (yEndBits >> 31)) {
         yEnd += 1;
         height += 1;
     }

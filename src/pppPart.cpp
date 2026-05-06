@@ -1892,16 +1892,16 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		CMemory::CStage* stage = pppEnvStPtr->m_stagePtr;
 		bool firstAllocFailure = true;
 		bool canRetry = true;
+		pppPDataValRaw* pDataVals;
 		u8 denied[0x180];
 
 		DAT_8032ED64 = 0;
 		do
 		{
-			pppPDataValRaw* pDataVals = (pppPDataValRaw*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+			pDataVals = (pppPDataValRaw*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
 			    &Memory, pppMngSt->m_numPrograms << 4, stage, (char*)s_pppPart_cpp, 0x585, 1);
 			if (pDataVals != 0)
 			{
-				mngRaw->m_pppPDataVals = pDataVals;
 				goto DataValsAllocated;
 			}
 
@@ -1999,7 +1999,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		PartMng.pppDumpMngSt();
 		DAT_8032ED64 = 1;
 DataValsAllocated:
-		;
+		mngRaw->m_pppPDataVals = pDataVals;
 	}
 
 	if (programSet->m_next != 0)

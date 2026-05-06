@@ -904,14 +904,14 @@ static void _PitchExecute(RedVoiceDATA* voice)
     int targetPitchDelta;
 
     if ((voice->m_track->m_vibrateFunc != 0) && (voice->m_pitchModDelay == 0)) {
-        int pitchLfo = voice->m_track->m_vibrateDepth >> REDSOUND_FIXED_SHIFT;
+        u32 pitchLfo = voice->m_track->m_vibrateDepth >> REDSOUND_FIXED_SHIFT;
         if (pitchLfo < REDSOUND_PITCH_MOD_DEPTH_SPLIT) {
             pitchDelta = (pitchLfo + 1) * REDSOUND_PITCH_MOD_SHALLOW_SCALE;
         } else {
             pitchDelta = ((pitchLfo & REDSOUND_PAN_BYTE_MASK) + 1) * REDSOUND_PITCH_MOD_DEEP_SCALE;
         }
 
-        int pitchBend = voice->m_track->m_pitchBend + voice->m_track->m_keyTranspose + pitchDelta;
+        int pitchBend = voice->m_track->m_keyTranspose + voice->m_track->m_pitchBend + pitchDelta;
         int basePitch;
         if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
             basePitch = voice->m_basePitch + voice->m_track->m_pitch;

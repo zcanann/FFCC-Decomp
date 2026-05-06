@@ -295,7 +295,7 @@ void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int co
 			outResult = 0;
 			break;
 		case -0x6E:
-			*reinterpret_cast<unsigned int*>(engineObject->m_lastBgAttr) = localBase[0];
+			*reinterpret_cast<unsigned int*>(&engineObject->m_lastBgAttr) = localBase[0];
 			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
 			outResult = 0;
 			break;

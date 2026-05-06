@@ -9,14 +9,16 @@ struct PYmMegaBirthShpTail2 : _PARTICLE_DATA
 
 struct pppYmMegaBirthShpTail2
 {
-    _pppPObject field0_0x0;    // 0x0
-    pppFMATRIX field_0x40;     // 0x40
-    char field_0x70[0x4c];     // 0x70 - padding/other fields
-    unsigned int field_0xbc;   // 0xbc
-    unsigned int field_0xc0;   // 0xc0
-    unsigned int field_0xc4;   // 0xc4
-    unsigned int field_0xc8;   // 0xc8
-    char m_data[0x500];        // 0xcc - additional data
+    _pppPObjLink m_link;      // 0x0
+    s32 m_graphId;            // 0xc
+    pppFMATRIX m_localMatrix; // 0x10
+    pppFMATRIX field_0x40;    // 0x40
+    char field_0x70[0x4c];    // 0x70 - padding/other fields
+    unsigned int field_0xbc;  // 0xbc
+    unsigned int field_0xc0;  // 0xc0
+    unsigned int field_0xc4;  // 0xc4
+    unsigned int field_0xc8;  // 0xc8
+    char m_data[0x500];       // 0xcc - additional data
 };
 
 struct VYmMegaBirthShpTail2

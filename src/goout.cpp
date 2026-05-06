@@ -106,101 +106,6 @@ static inline const char* GetGoOutMessageLine(int languageId, int line)
     return g_strGooutMes[(languageId * 0x6E) + line];
 }
 
-static const char sSlotAErrorText1[] = "The Memory Card in Slot A contains";
-static const char sSlotAErrorText2[] = "no save data for your current game";
-static const char sSlotAErrorText3[] = "or contains corrupt data. Please";
-static const char sSlotAErrorText4[] = "insert a Memory Card containing";
-static const char sSlotAErrorText5[] = "valid save data into Slot A.";
-static const char* const sSlotAErrorLine1[5] = {
-    sSlotAErrorText1,
-    sSlotAErrorText1,
-    sSlotAErrorText1,
-    sSlotAErrorText1,
-    sSlotAErrorText1,
-};
-static const char* const sSlotAErrorLine2[5] = {
-    sSlotAErrorText2,
-    sSlotAErrorText2,
-    sSlotAErrorText2,
-    sSlotAErrorText2,
-    sSlotAErrorText2,
-};
-static const char* const sSlotAErrorLine3[5] = {
-    sSlotAErrorText3,
-    sSlotAErrorText3,
-    sSlotAErrorText3,
-    sSlotAErrorText3,
-    sSlotAErrorText3,
-};
-static const char* const sSlotAErrorLine4[5] = {
-    sSlotAErrorText4,
-    sSlotAErrorText4,
-    sSlotAErrorText4,
-    sSlotAErrorText4,
-    sSlotAErrorText4,
-};
-static const char* const sSlotAErrorLine5[5] = {
-    sSlotAErrorText5,
-    sSlotAErrorText5,
-    sSlotAErrorText5,
-    sSlotAErrorText5,
-    sSlotAErrorText5,
-};
-static const char sEmptyLine[] = "";
-static const char sImportNeedsSaveLine1[] = "This game has not been saved.";
-static const char sImportNeedsSaveLine2[] = "You must save your game before";
-static const char sImportNeedsSaveLine3[] = "you can import a character.";
-static const char sImportHasUnsavedLine1[] = "This game contains character data";
-static const char sImportHasUnsavedLine2[] = "that has not yet been saved.";
-static const char sTransferPromptLine1[] = "Please insert a Memory Card with";
-static const char sTransferPromptLine2[] = "current game's data into Slot A.";
-static const char sTransferPromptLine3[] = "Insert into Slot B a Memory Card";
-static const char sTransferPromptLine4[] = "with the character data to be transferred.";
-static const char sTransferPromptLine5[] = "Please do not remove either Memory Card";
-static const char sTransferPromptLine6[] = "until the transfer is complete.";
-static const char sImportConfirmLine1[] = "Are you sure you wish to import";
-static const char sImportConfirmLine2[] = "the selected character into the";
-static const char sImportConfirmLine3[] = "current game? The character will";
-static const char sImportConfirmLine4[] = "be unavailable until returned.";
-static const char sReturnConfirmLine1[] = "Are you sure you wish to return";
-static const char sReturnConfirmLine2[] = "the selected character to the";
-static const char sReturnConfirmLine3[] = "current game's";
-static const char sReturnConfirmLine4[] = "guest data will be deleted.";
-static const char sYesNoLine[] = "  Yes   No";
-static const char sSavingLine1[] = "Saving data to the Memory";
-static const char sSavingSlotALine2[] = "Card in Slot A. Please do";
-static const char sSavingSlotBLine2[] = "Card in Slot B. Please do";
-static const char sSavingLine3[] = "not touch the Memory Card";
-static const char sSavingLine4[] = "or the POWER Button.";
-static const char sCardRemovedLine1[] = "A Memory Card has been removed.";
-static const char sCardRemovedLine2[] = "Cancelling character transfer.";
-static const char sNoCardLine1[] = "No Memory Card found in";
-static const char sNoCardSlotALine2[] = "Slot A.";
-static const char sNoCardSlotBLine2[] = "Slot B.";
-static const char sDeleteBlockedLine1[] = "This character cannot be deleted.";
-static const char sDeleteBlockedLine2[] = "At least one non-guest character";
-static const char sDeleteBlockedLine3[] = "must remain.";
-static const char sDeletePromptLine1[] = "Delete this character?";
-static const char sDeletedWarningLine1[] = "Deleted characters";
-static const char sDeletedWarningLine2[] = "cannot be restored.";
-static const char sDeletedWarningLine3[] = "Are you sure?";
-static const char sDeletedMainLine1[] = "The character has been deleted.";
-static const char sDeletedGuestLine1[] = "The guest character has been deleted.";
-static const char sDeletedGuestLine2[] = "Please restore the character's";
-static const char sDeletedGuestLine3[] = "original save data.";
-static const char sDeletedGuestLine4[] = "To restore a character who is abroad,";
-static const char sDeletedGuestLine5[] = "first select \"Delete Character\" and";
-static const char sDeletedGuestLine6[] = "select the character you wish to restore.";
-static const char sAbroadDeleteLine1[] = "This character is currently abroad";
-static const char sAbroadDeleteLine2[] = "and cannot be deleted here. If you";
-static const char sAbroadDeleteLine3[] = "wish to delete the character's";
-static const char sAbroadDeleteLine4[] = "original data, you must first";
-static const char sAbroadDeleteLine5[] = "restore it. Proceed?";
-static const char sRestorePromptLine1[] = "This will restore the character";
-static const char sRestorePromptLine2[] = "to the state it was in before transfer.";
-static const char sRestorePromptLine3[] = "It will also prevent the transferred data";
-static const char sRestorePromptLine4[] = "from returning to this save location.";
-static const char sRestoredLine1[] = "The character has been restored.";
 static const char s_gooutCpp[] = "goout.cpp";
 
 static void InitGoOutWinMessage(int message, short startIndex)
@@ -414,11 +319,11 @@ int CGoOutMenu::SetMemCardError()
             field_0x44 = 1;
             int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
             SetMenuStr(0, 5,
-                       sSlotAErrorLine1[languageId],
-                       sSlotAErrorLine2[languageId],
-                       sSlotAErrorLine3[languageId],
-                       sSlotAErrorLine4[languageId],
-                       sSlotAErrorLine5[languageId]);
+                       GetGoOutMessageLine(languageId, 0),
+                       GetGoOutMessageLine(languageId, 1),
+                       GetGoOutMessageLine(languageId, 2),
+                       GetGoOutMessageLine(languageId, 3),
+                       GetGoOutMessageLine(languageId, 4));
         } else if (field_0x1 == 3) {
             MenuMcWinState(menuPcsLayout).m_mode = 3;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
@@ -499,11 +404,11 @@ int CGoOutMenu::SetMemCardError()
             field_0x44 = 1;
             int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
             SetMenuStr(0, 5,
-                       sSlotAErrorLine1[languageId],
-                       sSlotAErrorLine2[languageId],
-                       sSlotAErrorLine3[languageId],
-                       sSlotAErrorLine4[languageId],
-                       sSlotAErrorLine5[languageId]);
+                       GetGoOutMessageLine(languageId, 0),
+                       GetGoOutMessageLine(languageId, 1),
+                       GetGoOutMessageLine(languageId, 2),
+                       GetGoOutMessageLine(languageId, 3),
+                       GetGoOutMessageLine(languageId, 4));
         }
     } else if (field_0x4 == 1) {
         result = 0;
@@ -924,8 +829,17 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         field_0x18 = 7;
         field_0x1c = 0;
         field_0x1d = 0;
-        SetMenuStr(0, 7, sTransferPromptLine1, sTransferPromptLine2, sTransferPromptLine3,
-                   sTransferPromptLine4, sEmptyLine, sTransferPromptLine5, sTransferPromptLine6);
+        {
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 7,
+                       GetGoOutMessageLine(languageId, 14),
+                       GetGoOutMessageLine(languageId, 15),
+                       GetGoOutMessageLine(languageId, 16),
+                       GetGoOutMessageLine(languageId, 17),
+                       GetGoOutMessageLine(languageId, 18),
+                       GetGoOutMessageLine(languageId, 19),
+                       GetGoOutMessageLine(languageId, 20));
+        }
         break;
     case 0xC:
         if (field_0x36 >= 0) {
@@ -991,11 +905,21 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0x10:
         if (field_0x1e == 0) {
-            SetMenuStr(0, 5, sImportConfirmLine1, sImportConfirmLine2, sImportConfirmLine3,
-                       sImportConfirmLine4, sYesNoLine);
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 5,
+                       GetGoOutMessageLine(languageId, 21),
+                       GetGoOutMessageLine(languageId, 22),
+                       GetGoOutMessageLine(languageId, 23),
+                       GetGoOutMessageLine(languageId, 24),
+                       GetGoOutMessageLine(languageId, 25));
         } else {
-            SetMenuStr(0, 5, sReturnConfirmLine1, sReturnConfirmLine2, sReturnConfirmLine3,
-                       sReturnConfirmLine4, sYesNoLine);
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 5,
+                       GetGoOutMessageLine(languageId, 26),
+                       GetGoOutMessageLine(languageId, 27),
+                       GetGoOutMessageLine(languageId, 28),
+                       GetGoOutMessageLine(languageId, 29),
+                       GetGoOutMessageLine(languageId, 30));
         }
         field_0x46 = 1;
         break;
@@ -1040,7 +964,14 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             mcCtrl.m_createFlag = 0;
             field_0x1 = 2;
         }
-        SetMenuStr(0, 4, sSavingLine1, sSavingSlotALine2, sSavingLine3, sSavingLine4);
+        {
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 4,
+                       GetGoOutMessageLine(languageId, 31),
+                       GetGoOutMessageLine(languageId, 32),
+                       GetGoOutMessageLine(languageId, 33),
+                       GetGoOutMessageLine(languageId, 34));
+        }
         break;
     }
     case 0x13:
@@ -1060,7 +991,14 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             mcCtrl.m_createFlag = 0;
             field_0x1 = 2;
         }
-        SetMenuStr(0, 4, sSavingLine1, sSavingSlotBLine2, sSavingLine3, sSavingLine4);
+        {
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 4,
+                       GetGoOutMessageLine(languageId, 35),
+                       GetGoOutMessageLine(languageId, 36),
+                       GetGoOutMessageLine(languageId, 37),
+                       GetGoOutMessageLine(languageId, 38));
+        }
         break;
     case 0x14:
         if (field_0x36 >= 0) {
@@ -1102,8 +1040,15 @@ void CGoOutMenu::CalcGoOut()
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
-            SetMenuStr(0, 5, sCardRemovedLine1, sCardRemovedLine2, sEmptyLine, sTransferPromptLine5,
-                       sTransferPromptLine6);
+            {
+                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                SetMenuStr(0, 5,
+                           GetGoOutMessageLine(languageId, 39),
+                           GetGoOutMessageLine(languageId, 40),
+                           GetGoOutMessageLine(languageId, 41),
+                           GetGoOutMessageLine(languageId, 42),
+                           GetGoOutMessageLine(languageId, 43));
+            }
             return;
         }
     }
@@ -1256,7 +1201,10 @@ void CGoOutMenu::CalcGoOut()
             return;
         }
         if (mcCtrl.ChkConnect(0) == -3) {
-            SetMenuStr(0, 2, sNoCardLine1, sNoCardSlotALine2);
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 2,
+                       GetGoOutMessageLine(languageId, 44),
+                       GetGoOutMessageLine(languageId, 45));
             field_0x19 = -1;
             SetGoOutMode(0);
             return;
@@ -1275,7 +1223,10 @@ void CGoOutMenu::CalcGoOut()
             return;
         }
         if (mcCtrl.ChkConnect(1) == -3) {
-            SetMenuStr(0, 2, sNoCardLine1, sNoCardSlotBLine2);
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 2,
+                       GetGoOutMessageLine(languageId, 46),
+                       GetGoOutMessageLine(languageId, 47));
             field_0x19 = -1;
             SetGoOutMode(0);
             return;
@@ -1357,46 +1308,88 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
             }
 
             if (activeMainCharacterCount < 2) {
-                SetMenuStr(0, 4, sDeleteBlockedLine1, sEmptyLine, sDeleteBlockedLine2,
-                           sDeleteBlockedLine3);
+                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                SetMenuStr(0, 4,
+                           GetGoOutMessageLine(languageId, 70),
+                           GetGoOutMessageLine(languageId, 71),
+                           GetGoOutMessageLine(languageId, 72),
+                           GetGoOutMessageLine(languageId, 73));
                 reinterpret_cast<signed char&>(field_0x24[1]) = 2;
                 SetDelMode(0);
                 return;
             }
         }
 
-        SetMenuStr(0, 2, sDeletePromptLine1, sYesNoLine);
+        {
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 2,
+                       GetGoOutMessageLine(languageId, 74),
+                       GetGoOutMessageLine(languageId, 75));
+        }
         field_0x46 = 1;
         break;
     }
     case 4:
-        SetMenuStr(0, 4, sDeletedWarningLine1, sDeletedWarningLine2, sDeletedWarningLine3,
-                   sYesNoLine);
+        {
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 4,
+                       GetGoOutMessageLine(languageId, 76),
+                       GetGoOutMessageLine(languageId, 77),
+                       GetGoOutMessageLine(languageId, 78),
+                       GetGoOutMessageLine(languageId, 79));
+        }
         field_0x46 = 1;
         break;
     case 5:
         if (Game.m_caravanWorkArr[selectedChara].m_caravanLocalFlags == 0) {
-            SetMenuStr(0, 1, sDeletedMainLine1);
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 1, GetGoOutMessageLine(languageId, 88));
         } else {
-            SetMenuStr(0, 8, sDeletedGuestLine1, sEmptyLine, sDeletedGuestLine2, sDeletedGuestLine3,
-                       sEmptyLine, sDeletedGuestLine4, sDeletedGuestLine5, sDeletedGuestLine6);
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 8,
+                       GetGoOutMessageLine(languageId, 80),
+                       GetGoOutMessageLine(languageId, 81),
+                       GetGoOutMessageLine(languageId, 82),
+                       GetGoOutMessageLine(languageId, 83),
+                       GetGoOutMessageLine(languageId, 84),
+                       GetGoOutMessageLine(languageId, 85),
+                       GetGoOutMessageLine(languageId, 86),
+                       GetGoOutMessageLine(languageId, 87));
         }
         field_0x46 = 1;
         MenuPcs.SetMenuCharaAnim(selectedChara, 5);
         break;
     case 6:
-        SetMenuStr(0, 6, sAbroadDeleteLine1, sAbroadDeleteLine2, sAbroadDeleteLine3,
-                   sAbroadDeleteLine4, sAbroadDeleteLine5, sYesNoLine);
+        {
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 6,
+                       GetGoOutMessageLine(languageId, 89),
+                       GetGoOutMessageLine(languageId, 90),
+                       GetGoOutMessageLine(languageId, 91),
+                       GetGoOutMessageLine(languageId, 92),
+                       GetGoOutMessageLine(languageId, 93),
+                       GetGoOutMessageLine(languageId, 94));
+        }
         field_0x46 = 1;
         break;
     case 7:
-        SetMenuStr(0, 5, sRestorePromptLine1, sRestorePromptLine2, sRestorePromptLine3,
-                   sRestorePromptLine4, sYesNoLine);
+        {
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 5,
+                       GetGoOutMessageLine(languageId, 95),
+                       GetGoOutMessageLine(languageId, 96),
+                       GetGoOutMessageLine(languageId, 97),
+                       GetGoOutMessageLine(languageId, 98),
+                       GetGoOutMessageLine(languageId, 99));
+        }
         field_0x46 = 1;
         break;
     case 8:
         MenuPcs.SetMenuCharaAnim(selectedChara, 3);
-        SetMenuStr(0, 1, sRestoredLine1);
+        {
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 1, GetGoOutMessageLine(languageId, 100));
+        }
         break;
     default:
         break;

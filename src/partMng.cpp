@@ -3316,19 +3316,19 @@ void CPartMng::pppPartDead()
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0xb3d);
 
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    char* base = reinterpret_cast<char*>(this);
     for (int i = 0; i < 0x180; i++) {
-        int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
+        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        int baseTime = pppMngSt->m_baseTime;
         if (baseTime != -0x1000 && baseTime < 0) {
-            unsigned char isFinished = *reinterpret_cast<unsigned char*>(pppMngSt + 0xe6);
-            unsigned char endRequested = *reinterpret_cast<unsigned char*>(pppMngSt + 0xe5);
-            if (isFinished != 0 || endRequested != 0) {
-                pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(pppMngSt) + 4);
-                pppMngStPtr = reinterpret_cast<_pppMngSt*>(pppMngSt);
-                _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(pppMngSt));
+            unsigned char isFinished = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE6);
+            if (isFinished != 0 || *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) != 0) {
+                pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(pppMngSt->m_pppResSet) + 4);
+                pppMngStPtr = pppMngSt;
+                _pppAllFreePObject(pppMngSt);
             }
         }
-        pppMngSt += 0x158;
+        base += 0x158;
     }
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0xb5d);
@@ -3354,16 +3354,17 @@ void CPartMng::pppPartDead()
  */
 void CPartMng::pppPartInit()
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    char* base = reinterpret_cast<char*>(this);
     int i = 0;
 
     *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x8) = 0;
     do {
-        int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
+        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        int baseTime = pppMngSt->m_baseTime;
         if (baseTime != -0x1000 && baseTime < 0) {
-            _pppInitPart(reinterpret_cast<_pppMngSt*>(pppMngSt));
+            _pppInitPart(pppMngSt);
         }
-        pppMngSt += 0x158;
+        base += 0x158;
         i++;
     } while (i < 0x180);
 }
@@ -4266,22 +4267,22 @@ void CPartMng::pppGetFreeSlot()
  */
 void CPartMng::pppDeleteSlot(int slot, int checkHitFlags)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    char* base = reinterpret_cast<char*>(this);
 
     for (int i = 0; i < 0x180; i++) {
-        int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
-        if (baseTime != -0x1000 && *reinterpret_cast<int*>(pppMngSt + 0x100) == slot) {
-            if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(pppMngSt + 0x137) & 1) == 0) {
+        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        int baseTime = pppMngSt->m_baseTime;
+        if (baseTime != -0x1000 && static_cast<int>(pppMngSt->m_paramA) == slot) {
+            if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x137) & 1) == 0) {
                 if (baseTime < 0) {
-                    *reinterpret_cast<unsigned char*>(pppMngSt + 0xe8) = 1;
-                    pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(pppMngSt),
-                                                     reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+                    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) = 1;
+                    pppStopSe__FP9_pppMngStP7PPPSEST(pppMngSt, &pppMngSt->m_soundEffectData);
                 } else {
-                    *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
+                    pppMngSt->m_baseTime = -0x1000;
                 }
             }
         }
-        pppMngSt += 0x158;
+        base += 0x158;
     }
 }
 
@@ -4296,18 +4297,18 @@ void CPartMng::pppDeleteSlot(int slot, int checkHitFlags)
  */
 void CPartMng::pppEndSlot(int slot, int checkHitFlags)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    char* base = reinterpret_cast<char*>(this);
 
     for (int i = 0; i < 0x180; i++) {
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14) != -0x1000
-            && *reinterpret_cast<int*>(pppMngSt + 0x100) == slot) {
-            if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(pppMngSt + 0x137) & 1) == 0) {
-                *reinterpret_cast<unsigned char*>(pppMngSt + 0xe4) = 1;
-                pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(pppMngSt),
-                                                 reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        if (pppMngSt->m_baseTime != -0x1000
+            && static_cast<int>(pppMngSt->m_paramA) == slot) {
+            if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x137) & 1) == 0) {
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE5) = 1;
+                pppStopSe__FP9_pppMngStP7PPPSEST(pppMngSt, &pppMngSt->m_soundEffectData);
             }
         }
-        pppMngSt += 0x158;
+        base += 0x158;
     }
 }
 
@@ -4593,27 +4594,28 @@ void CPartMng::pppSetLocSlot(int slot, Vec* position)
  */
 void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle* handle)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    char* base = reinterpret_cast<char*>(this);
     for (int i = 0; i < 0x180; i++) {
-        int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
+        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        int baseTime = pppMngSt->m_baseTime;
         if (baseTime != -0x1000) {
-            unsigned char mode = *reinterpret_cast<unsigned char*>(pppMngSt + 0xe7);
-            if (mode == 3 || (mode >= 5 && mode <= 7) || mode == 8) {
-                void* owner = *reinterpret_cast<void**>(pppMngSt + 0xd8);
+            unsigned char mode = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE7);
+            if (mode == 3 || static_cast<unsigned char>(mode - 5) <= 2 || mode == 8) {
+                void* owner = pppMngSt->m_owner;
                 if (owner != 0 &&
                     *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(owner) + 0xf8) == handle) {
                     if (baseTime < 0) {
-                        *reinterpret_cast<unsigned char*>(pppMngSt + 0xe5) = 1;
+                        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) = 1;
                         pppStopSe__FP9_pppMngStP7PPPSEST(
-                            reinterpret_cast<_pppMngSt*>(pppMngSt),
-                            reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+                            pppMngSt,
+                            &pppMngSt->m_soundEffectData);
                     } else {
-                        *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
+                        pppMngSt->m_baseTime = -0x1000;
                     }
                 }
             }
         }
-        pppMngSt += 0x158;
+        base += 0x158;
     }
 }
 
@@ -4624,22 +4626,23 @@ void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle* handle)
  */
 void CPartMng::pppEndCHandle(CCharaPcs::CHandle* handle)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    char* base = reinterpret_cast<char*>(this);
     for (int i = 0; i < 0x180; i++) {
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14) != -0x1000) {
-            unsigned char mode = *reinterpret_cast<unsigned char*>(pppMngSt + 0xe7);
-            if (mode == 3 || (mode >= 5 && mode <= 7) || mode == 8) {
-                void* owner = *reinterpret_cast<void**>(pppMngSt + 0xd8);
+        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        if (pppMngSt->m_baseTime != -0x1000) {
+            unsigned char mode = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE7);
+            if (mode == 3 || static_cast<unsigned char>(mode - 5) <= 2 || mode == 8) {
+                void* owner = pppMngSt->m_owner;
                 if (owner != 0 &&
                     *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(owner) + 0xf8) == handle) {
-                    *reinterpret_cast<unsigned char*>(pppMngSt + 0xe4) = 1;
+                    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE5) = 1;
                     pppStopSe__FP9_pppMngStP7PPPSEST(
-                        reinterpret_cast<_pppMngSt*>(pppMngSt),
-                        reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+                        pppMngSt,
+                        &pppMngSt->m_soundEffectData);
                 }
             }
         }
-        pppMngSt += 0x158;
+        base += 0x158;
     }
 }
 
@@ -4675,20 +4678,21 @@ int CPartMng::pppIsDeadCHandle(CCharaPcs::CHandle* handle)
  */
 void CPartMng::pppDeleteAll()
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    char* base = reinterpret_cast<char*>(this);
     for (int i = 0; i < 0x180; i++) {
-        int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
+        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        int baseTime = pppMngSt->m_baseTime;
         if (baseTime != -0x1000) {
             if (baseTime < 0) {
-                *reinterpret_cast<unsigned char*>(pppMngSt + 0xe5) = 1;
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) = 1;
                 pppStopSe__FP9_pppMngStP7PPPSEST(
-                    reinterpret_cast<_pppMngSt*>(pppMngSt),
-                    reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+                    pppMngSt,
+                    &pppMngSt->m_soundEffectData);
             } else {
-                *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
+                pppMngSt->m_baseTime = -0x1000;
             }
         }
-        pppMngSt += 0x158;
+        base += 0x158;
     }
 }
 

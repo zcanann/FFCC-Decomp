@@ -577,14 +577,14 @@ void CGPrgObj::onFrame()
 		if (m_animFlagBits.bits.m_animRequested != 0) {
 			if (m_reqAnimId == -1) {
 				if (static_cast<int>(m_currentAnimSlot) >= 0) {
-					*reinterpret_cast<float*>(m_lastBgAttr) = LoadFloat(FLOAT_80331BD0);
+					m_lastBgAttr = LoadFloat(FLOAT_80331BD0);
 					CancelAnim(0);
 				}
 			} else if (m_animFlagBits.bits.m_animDirect != 0) {
-				*reinterpret_cast<float*>(m_lastBgAttr) = LoadFloat(FLOAT_80331BE8);
+				m_lastBgAttr = LoadFloat(FLOAT_80331BE8);
 				PlayAnim(m_reqAnimId, m_animFlagBits.bits.m_animLoop, 0, -1, -1, 0);
 			} else {
-				*reinterpret_cast<float*>(m_lastBgAttr) = LoadFloat(FLOAT_80331BD0);
+				m_lastBgAttr = LoadFloat(FLOAT_80331BD0);
 				PlayAnim(m_reqAnimId, m_animFlagBits.bits.m_animLoop, 0, -1, -1, 0);
 			}
 

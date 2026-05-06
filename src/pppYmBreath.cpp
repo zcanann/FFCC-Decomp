@@ -43,15 +43,6 @@ struct pppYmBreath {
     pppFMATRIX m_localMatrix;
 };
 
-struct YmBreathRenderStep {
-    int m_graphId;
-    int m_dataValIndex;
-    int m_initWork;
-    int m_stepValue;
-    int m_arg3;
-    unsigned char m_payload[1];
-};
-
 struct YmBreathParams {
     unsigned char _pad00[0x04];
     float m_groupRadius;
@@ -61,7 +52,8 @@ struct YmBreathParams {
     u16 m_slotCount;
     u16 m_groupCount;
     float m_groupSpeed;
-    unsigned char _pad1C[0x02];
+    u8 m_blendMode;
+    u8 _pad1D;
     u16 m_particleCount;
     u16 m_emitCount;
     u16 m_emitInterval;
@@ -105,8 +97,11 @@ struct YmBreathParams {
     unsigned char _padBC[0x05];
     u8 m_rotationFlags;
     u8 m_angleFlags;
-    unsigned char _padC3[0x05];
+    u8 _padC3;
+    float m_drawEnvScale;
     u8 m_disableScaleClamp;
+    u8 m_drawEnvColor0;
+    u8 m_drawEnvColor1;
 };
 
 struct YmBreathParticleGroup {
@@ -290,15 +285,14 @@ extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dat
 extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
-    YmBreathRenderStep* step;
     int workOffset;
     int colorOffset;
     VYmBreath* work;
     VColor* color;
-    Vec* source;
+    YmBreathParticleData* particle;
     PARTICLE_WMAT* matrixList;
-    float* colorDelta;
-    int* groupData;
+    PARTICLE_COLOR* particleColor;
+    YmBreathParticleGroup* groupData;
     int groupCount;
     long** shape;
     unsigned char colorR;
@@ -316,15 +310,14 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     pppFMATRIX viewMtx;
     Mtx drawMtx;
 
-    step = (YmBreathRenderStep*)pYmBreath;
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + workOffset);
     color = reinterpret_cast<VColor*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
-    source = reinterpret_cast<Vec*>(work->m_particleData);
+    particle = reinterpret_cast<YmBreathParticleData*>(work->m_particleData);
     matrixList = work->m_particleWmats;
-    colorDelta = reinterpret_cast<float*>(work->m_particleColors);
-    groupData = (int*)work->m_groups;
+    particleColor = work->m_particleColors;
+    groupData = work->m_groups;
     groupCount = work->m_particleCount;
 
     if (params->m_shapeStepValue == 0xFFFF) {
@@ -333,11 +326,11 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
 
     shape = *(long***)(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pppEnvStPtr) + 0xC) +
                        params->m_shapeStepValue * 4);
-    pppSetBlendMode(step->m_payload[8]);
+    pppSetBlendMode(params->m_blendMode);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        0, 0, *reinterpret_cast<float*>(step->m_payload + 0xB0), step->m_payload[0xB6], step->m_payload[0xB5],
-        step->m_payload[8], 0, 1, 1, 0);
+        0, 0, params->m_drawEnvScale, params->m_drawEnvColor1, params->m_drawEnvColor0,
+        params->m_blendMode, 0, 1, 1, 0);
 
     colorR = color->m_red;
     colorG = color->m_green;
@@ -345,25 +338,25 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     colorA = color->m_alpha;
 
     for (i = 0; i < groupCount; i++) {
-        if (*(short*)&source[2].z > 0) {
+        if (particle->m_life > 0) {
             int r;
             int g;
             int b;
             int a;
 
             PSMTXIdentity(drawMtx);
-            drawMtx[0][0] = source[4].y * pppMngStPtr->m_scale.x;
-            drawMtx[1][1] = source[4].z * pppMngStPtr->m_scale.y;
+            drawMtx[0][0] = particle->m_rotationX * pppMngStPtr->m_scale.x;
+            drawMtx[1][1] = particle->m_rotationY * pppMngStPtr->m_scale.y;
             drawMtx[2][2] = drawMtx[0][0];
-            if (FLOAT_80330c80 != source[3].y) {
-                PSMTXRotRad(rotMtx, 'z', FLOAT_80330c84 * source[3].y);
+            if (FLOAT_80330c80 != particle->m_angle) {
+                PSMTXRotRad(rotMtx, 'z', FLOAT_80330c84 * particle->m_angle);
                 PSMTXConcat(drawMtx, rotMtx, drawMtx);
             }
 
             pppUnitMatrix(viewMtx);
             PSMTXConcat(matrixList->m_matrix, ymBreath->m_localMatrix.value, viewMtx.value);
             PSMTXConcat(ppvCameraMatrix, viewMtx.value, viewMtx.value);
-            PSMTXMultVec(viewMtx.value, source, &pos);
+            PSMTXMultVec(viewMtx.value, &particle->m_position, &pos);
             drawMtx[0][3] = pos.x;
             drawMtx[1][3] = pos.y;
             drawMtx[2][3] = pos.z;
@@ -372,12 +365,12 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             r = colorR;
             g = colorG;
             b = colorB;
-            a = (int)((float)(int)colorA - source[6].y);
-            if (colorDelta != 0) {
-                r += (int)colorDelta[0];
-                g += (int)colorDelta[1];
-                b += (int)colorDelta[2];
-                a += (int)colorDelta[3];
+            a = (int)((float)(int)colorA - particle->m_alpha);
+            if (particleColor != 0) {
+                r += (int)particleColor->m_color[0];
+                g += (int)particleColor->m_color[1];
+                b += (int)particleColor->m_color[2];
+                a += (int)particleColor->m_color[3];
             }
 
             if (r < 0) {
@@ -406,24 +399,23 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             drawColor.b = (unsigned char)b;
             drawColor.a = (unsigned char)a;
             GXSetChanAmbColor(GX_COLOR0A0, drawColor);
-            pppDrawShp__FPlsP12CMaterialSetUc(*shape, reinterpret_cast<YmBreathParticleData*>(source)->m_shapeFrame2,
-                                              pppEnvStPtr->m_materialSetPtr,
-                                              step->m_payload[8]);
+            pppDrawShp__FPlsP12CMaterialSetUc(*shape, particle->m_shapeFrame2, pppEnvStPtr->m_materialSetPtr,
+                                              params->m_blendMode);
         }
 
         if (matrixList != 0) {
             matrixList++;
         }
-        if (colorDelta != 0) {
-            colorDelta += 8;
+        if (particleColor != 0) {
+            particleColor++;
         }
-        source += 8;
+        particle++;
     }
 
     if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x200000) != 0) {
-        int* debugGroupData = groupData;
+        YmBreathParticleGroup* debugGroupData = groupData;
         for (i = 0; i < (int)params->m_groupCount; i++) {
-            if (debugGroupData[0] == 1) {
+            if (debugGroupData->active == 1) {
                 int firstParticle;
                 int j;
                 float groupScale;
@@ -462,10 +454,10 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                 }
 
                 firstParticle = -1;
-                groupScale = *(float*)(debugGroupData + 10);
+                groupScale = debugGroupData->scale;
                 for (j = 0; j < (int)params->m_slotCount; j++) {
-                    if (*(signed char*)(debugGroupData[2] + j) != -1) {
-                        firstParticle = (int)*(signed char*)(debugGroupData[1] + j);
+                    if (debugGroupData->particleStates[j] != -1) {
+                        firstParticle = debugGroupData->particleIndices[j];
                         break;
                     }
                 }
@@ -477,13 +469,13 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
 
                 PSMTXConcat(work->m_particleWmats[firstParticle].m_matrix, ymBreath->m_localMatrix.value, tempMtx);
                 PSMTXConcat(ppvCameraMatrix, tempMtx, tempMtx);
-                PSMTXMultVec(tempMtx, (Vec*)(debugGroupData + 3), &debugPos);
+                PSMTXMultVec(tempMtx, &debugGroupData->position, &debugPos);
                 sphereMtx[0][3] = debugPos.x;
                 sphereMtx[1][3] = debugPos.y;
                 sphereMtx[2][3] = debugPos.z;
                 Graphic.DrawSphere(sphereMtx, debugColor);
             }
-            debugGroupData += 0x17;
+            debugGroupData++;
         }
 
         pppSetBlendMode(1);
@@ -673,7 +665,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     int j;
     int k;
     int group;
-    int groupTableWork;
+    YmBreathParticleGroup* groupCursor;
     YmBreathParticleGroup* groupData;
     short foundSlot;
     short foundGroup;
@@ -701,12 +693,12 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             } else {
                 float zero = 0.0f;
 
-                groupTableWork = (int)vYmBreath->m_groups;
+                groupCursor = vYmBreath->m_groups;
                 foundGroup = -1;
                 foundSlot = -1;
                 for (short groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
                     for (short slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
-                        signed char* particleIndices = *(signed char**)(groupTableWork + 4);
+                        signed char* particleIndices = groupCursor->particleIndices;
                         if ((short)i == *(signed char*)(particleIndices + (short)slotIndex)) {
                             foundGroup = groupIndex;
                             foundSlot = slotIndex;
@@ -714,7 +706,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                             goto found_index;
                         }
                     }
-                    groupTableWork += 0x5C;
+                    groupCursor++;
                 }
                 found = false;
 

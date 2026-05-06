@@ -17,7 +17,7 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 extern "C" int rand(void);
-static pppFMATRIX g_matUnit;
+static pppFMATRIX g_matUnit3;
 
 static const char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
 static const float kPppYmMegaBirthShpTail3DegToRad = 0.0000958738f;
@@ -35,7 +35,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
 {
     u8* step = (u8*)stepData;
     u8* payload = step + 0x14;
-    const u16 dataValIndex = *(u16*)step;
+    const u32 dataValIndex = *(u32*)(step + 4);
     const s32 particleDataOffset = offsets->m_serializedDataOffsets[2];
     _PARTICLE_DATA* particles = *(_PARTICLE_DATA**)((u8*)&object->field_0xbc + particleDataOffset);
     _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)((u8*)&object->field_0xc0 + particleDataOffset);
@@ -54,7 +54,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     u16 workRand = *(u16*)((u8*)object + 0x80 + particleDataOffset + 0x78);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (void*)(payload + 0xA0), &object->field_0x40, *(float*)(payload + 0xA4), step[0x10], payload[0x58],
+        0, &object->field_0x40, *(float*)(payload + 0xA0), payload[0xA4], step[0x0C],
         payload[0x58], 0, zEnable, 1, 0);
     pppSetBlendMode(payload[0x58]);
 
@@ -313,7 +313,7 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
         *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 6) += *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 0xe);
         *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xe) += *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 6);
 
-        if (object->field0_0x0.m_graphId == *(s32*)paramPayload) {
+        if (object->m_graphId == *(s32*)paramPayload) {
             *(s16*)work[1].m_emitterMatrix.value[0] += *(s16*)(paramPayload + 0x78);
             *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 2) += *(s16*)(paramPayload + 0x7a);
             *(s16*)(work[1].m_emitterMatrix.value[0] + 1) += *(s16*)(paramPayload + 0x7c);
@@ -400,10 +400,10 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             work->m_lifeLimit = work->m_lifeLimit + 1;
             for (i = 0; i < work->m_maxParticles; i++) {
                 if (*(u16*)(particleData + 0x22) != 0) {
-                    calc(&object->field0_0x0, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
+                    calc((_pppPObject*)object, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
                 } else {
                     if ((*(u16*)(paramPayload + 0x12) <= work->m_lifeLimit) && (spawnCount < *(u16*)(paramPayload + 0x10))) {
-                        birth(&object->field0_0x0, work, param, colorWork, (_PARTICLE_DATA*)particleData, worldMat, particleColor);
+                        birth((_pppPObject*)object, work, param, colorWork, (_PARTICLE_DATA*)particleData, worldMat, particleColor);
                         spawnCount = spawnCount + 1;
                     }
                 }
@@ -799,7 +799,7 @@ void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTa
     *(u16*)((u8*)work[1].value[1] + 0xe) = 0;
     *(u16*)(work[1].value[1] + 3) = 10000;
     *(u16*)work[2].value[2] = (u16)rand();
-    pppUnitMatrix(g_matUnit);
+    pppUnitMatrix(g_matUnit3);
     memset(work[1].value + 2, 0, 8);
     memset(work[1].value[2] + 2, 0, 8);
     memset(work + 2, 0, 8);

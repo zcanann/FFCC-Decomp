@@ -205,8 +205,8 @@ void CMenuPcs::TmpArtiDraw()
 	for (int i = 0; i < 4; i++) {
 		short icon = *(short*)(foodPtr + 0x1F6);
 		if (icon >= 0) {
-			int posX = (int)((double)(entry[0] + entry[2] - 0x10));
-			int posY = (int)((float)((double)(entry[1] + 6)) - FLOAT_80332f30);
+			int posX = (int)TmpArtiIntToDouble(entry[0] + entry[2] - 0x10);
+			int posY = (int)((float)TmpArtiIntToDouble(entry[1] + 6) - FLOAT_80332f30);
 			DrawSingleIcon__8CMenuPcsFiiifif(this, icon, posX, posY, *(float*)(entry + 8), 0, FLOAT_80332f2c);
 		}
 		entry += 0x20;

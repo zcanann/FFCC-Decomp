@@ -1315,13 +1315,14 @@ void CGraphic::SetFog(int useFog, int useGlobalColor)
         colorPtr = reinterpret_cast<_GXColor*>(reinterpret_cast<u8*>(this) + 0x7200);
     }
 
+    _GXColor fogColor = *colorPtr;
     fogType = GX_FOG_NONE;
     if (useFog != 0) {
         fogType = GX_FOG_LIN;
     }
 
     GXSetFog(fogType, *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204),
-             *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208), nearZ, farZ, *colorPtr);
+             *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208), nearZ, farZ, fogColor);
 }
 
 /*
@@ -1450,9 +1451,9 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
         ((yEnd >= 0) && (y <= U16At(PtrAt(this, 0x71E0), 6))) &&
         ((width > 0) && ((height > 0) && (xEnd != x))) && (yEnd != y)) {
         int textureSize = GXGetTexBufferSize(width & 0xFFFF, height & 0xFFFF, format, GX_FALSE, GX_FALSE);
-        u32 textureBaseAddr = reinterpret_cast<u32>(dstBuffer) + ((dstOffset + 0x1F) & 0xFFFFFFE0);
-        textureBaseAddr = (textureBaseAddr + 0x1F) & 0xFFFFFFE0;
-        void* textureBase = reinterpret_cast<void*>(textureBaseAddr);
+        void* textureBase =
+            reinterpret_cast<void*>((reinterpret_cast<u32>(dstBuffer) + ((dstOffset + 0x1F) & 0xFFFFFFE0) + 0x1F) &
+                                    0xFFFFFFE0);
 
         GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
         GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, format, GX_FALSE);

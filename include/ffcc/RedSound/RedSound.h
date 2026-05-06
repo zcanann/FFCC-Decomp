@@ -8,69 +8,69 @@ public:
 	~CRedSound();
 
 	unsigned int GetAutoID();
-	int* EntryStandbyID(int);
-	int Init(void*, int, int, int);
+	int* EntryStandbyID(int entryId);
+	int Init(void* memory, int memorySize, int aramMemory, int aramMemorySize);
 	void Start();
 	void End();
 	int GetProgramTime();
-	void ReportPrint(int);
-	int ReportStandby(int);
+	void ReportPrint(int enable);
+	int ReportStandby(int entryId);
 
-	int DMAEntry(int, int, int, int, int, void (*)(void*), void*);
-	int DMACheck(int);
+	int DMAEntry(int flags, int direction, int mainMemory, int aramMemory, int size, void (*callback)(void*), void* callbackData);
+	int DMACheck(int id);
 
-	void SetSoundMode(int);
+	void SetSoundMode(int soundMode);
 	int GetSoundMode();
 
-	void SetReverb(int, int);
-	void SetReverbDepth(int, int, int);
+	void SetReverb(int kind, int mode);
+	void SetReverbDepth(int type, int depth, int frameCount);
 
-	void SetMusicData(void*);
-	int ReentryMusicData(int);
-	void MusicStop(int);
-	void MusicPlay(int, int, int);
-	void MusicCrossPlay(int, int, int);
-	void MusicNextPlay(int, int, int);
-	void MusicMasterVolume(int);
-	void MusicFadeOut(int, int);
-	void MusicVolume(int, int, int);
-	void SetMusicPhraseStop(int);
+	void SetMusicData(void* musicData);
+	int ReentryMusicData(int musicId);
+	void MusicStop(int musicId);
+	void MusicPlay(int musicId, int volume, int mode);
+	void MusicCrossPlay(int musicId, int volume, int mode);
+	void MusicNextPlay(int musicId, int volume, int mode);
+	void MusicMasterVolume(int volume);
+	void MusicFadeOut(int musicId, int frameCount);
+	void MusicVolume(int musicId, int volume, int frameCount);
+	void SetMusicPhraseStop(int enable);
 
-	void SetSeBlockData(int, void*);
-	void SetSeSepData(void*);
-	void ClearSeSepData(int);
-	void ClearSeSepDataMG(int, int, int, int);
-	int ReentrySeSepData(int);
+	void SetSeBlockData(int bank, void* data);
+	void SetSeSepData(void* data);
+	void ClearSeSepData(int sepId);
+	void ClearSeSepDataMG(int bank, int sep, int group, int kind);
+	int ReentrySeSepData(int sepId);
 
-	int SePlayState(int);
-	void SeStop(int);
-	void SeStopMG(int, int, int, int);
-	int SePlay(int, int, int, int, int);
-	void SeMasterVolume(int);
-	void SeFadeOut(int, int);
-	void SeVolume(int, int, int);
-	void SePan(int, int, int);
-	void SePitch(int, int, int);
-	void SePause(int, int);
-	int GetSeVolume(int, int);
-	int ReportSeLoop(int);
+	int SePlayState(int seId);
+	void SeStop(int seId);
+	void SeStopMG(int bank, int sep, int group, int kind);
+	int SePlay(int bank, int sep, int pan, int volume, int pitch);
+	void SeMasterVolume(int volume);
+	void SeFadeOut(int seId, int frameCount);
+	void SeVolume(int seId, int volume, int frameCount);
+	void SePan(int seId, int pan, int frameCount);
+	void SePitch(int seId, int pitch, int frameCount);
+	void SePause(int seId, int pause);
+	int GetSeVolume(int seId, int mode);
+	int ReportSeLoop(int seId);
 	void DisplaySePlayInfo();
 
-	int StreamPlayState(int);
-	void GetStreamPlayPoint(int, int*, int*);
-	void StreamStop(int);
-	int StreamPlay(void*, int, int, int);
-	void StreamVolume(int, int, int);
-	void StreamPause(int, int);
+	int StreamPlayState(int streamId);
+	void GetStreamPlayPoint(int streamId, int* current, int* total);
+	void StreamStop(int streamId);
+	int StreamPlay(void* streamHeader, int fileSize, int pan, int volume);
+	void StreamVolume(int streamId, int volume, int frameCount);
+	void StreamPause(int streamId, int pause);
 
-	unsigned int SetWaveData(int, void*, int);
-	void ClearWaveData(int);
-	void ClearWaveDataM(int, int, int, int);
-	void ClearWaveBank(int);
-	int ReentryWaveData(int);
+	unsigned int SetWaveData(int bank, void* data, int size);
+	void ClearWaveData(int waveNo);
+	void ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo3);
+	void ClearWaveBank(int bank);
+	int ReentryWaveData(int waveNo);
 	void DisplayWaveInfo();
 
-	void TestProcess(int);
+	void TestProcess(int mode);
 };
 
 #endif // _FFCC_REDSOUND_REDSOUND_H

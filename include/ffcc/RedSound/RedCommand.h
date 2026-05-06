@@ -30,18 +30,18 @@ struct RedReverbModeData {
 	int m_params[REDSOUND_REVERB_MODE_PARAM_COUNT];
 };
 
-RedTrackDATA* SearchSeEmptyTrack(int, int, int);
-int SeStopID(int);
-int SeStopMG(int, int, int, int);
-int SeBlockPlay(int, int, int, int, int);
-int SeSepPlay(int, int, int, int);
-void SetSeVolume(int, int, int, int);
-void SetSePan(int, int, int);
-void SetSePitch(int, int, int);
-void SePause(int, int);
-int MusicStop(int);
-int MusicPlay(int, int, int);
-void SetMusicVolume(int, int, int, int);
+RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask);
+int SeStopID(int seId);
+int SeStopMG(int bank, int sep, int group, int kind);
+int SeBlockPlay(int seId, int bank, int no, int pan, int volume);
+int SeSepPlay(int seId, int sepId, int pan, int volume);
+void SetSeVolume(int seId, int volume, int frameCount, int mode);
+void SetSePan(int seId, int pan, int frameCount);
+void SetSePitch(int seId, int pitch, int frameCount);
+void SePause(int seId, int pause);
+int MusicStop(int musicId);
+int MusicPlay(int musicId, int volume, int mode);
+void SetMusicVolume(int musicId, int volume, int frameCount, int mode);
 
 extern RedReverbModeData t_ReverbModeData[];
 

@@ -1009,9 +1009,6 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     int iVar1;
     int iVar5;
     int pitchWork[4];
-    int* voiceData = (int*)voice;
-    s8 note = noteData->m_key;
-    unsigned int* voiceMaskPtr = (unsigned int*)voiceMask;
 
     voice->m_track = track;
     voice->m_active = 1;
@@ -1022,14 +1019,15 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
         voice->m_basePitch = track->m_portamentPitch;
         track->m_sweepDelta = track->m_portamentTime;
         pitchWork[0] = 0;
-        DataAddCompute(pitchWork, note * REDSOUND_PITCH_NOTE_UNIT -
-                                     (track->m_portamentPitch >> REDSOUND_FIXED_SHIFT),
-                       &track->m_sweepDelta);
+        track->m_sweepAdd =
+            DataAddCompute(pitchWork, noteData->m_key * REDSOUND_PITCH_NOTE_UNIT -
+                                          (track->m_portamentPitch >> REDSOUND_FIXED_SHIFT),
+                           &track->m_sweepDelta);
     } else {
-        track->m_portamentPitch = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+        track->m_portamentPitch = noteData->m_key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
         if (voice->m_waveData != 0) {
             if ((voice->m_waveData->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) == 0) {
-                voice->m_basePitch = note << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+                voice->m_basePitch = noteData->m_key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
                 if (track->m_keySignatureData != 0) {
                     iVar5 = voice->m_basePitch >> REDSOUND_PITCH_BASE_NOTE_SHIFT;
                     iVar1 = iVar5 / REDSOUND_NOTES_PER_OCTAVE + (voice->m_basePitch >> 0x1f);
@@ -1044,7 +1042,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
         }
     }
 
-    voiceData[REDSOUND_VOICE_NOTE_WORD] = *(int*)noteData;
+    *(int*)&voice->m_key = *(int*)noteData;
     voice->m_trackVolume = &track->m_volume;
     voice->m_trackExpression = &track->m_expression;
     voice->m_trackPan = &track->m_pan;
@@ -1209,13 +1207,13 @@ skipModSetup:
 
     iVar5 = ((int)voice - (int)p_VoiceData) / REDSOUND_VOICE_SIZE + (((int)voice - (int)p_VoiceData) >> 0x1f);
     if (REDSOUND_VOICE_INDEX_MASK < iVar5 - (iVar5 >> 0x1f)) {
-        voiceMaskPtr += 1;
+        voiceMask += 1;
     }
 
     if (((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) == 0) ||
         ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR_RELEASE) == 0)) {
         track->m_flags |= REDSOUND_TRACK_FLAG_SLUR_RELEASE;
-        *voiceMaskPtr |= 1u << voice->m_voiceIndex;
+        *voiceMask |= (int)(1u << voice->m_voiceIndex);
     }
     voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_ALL;
 }

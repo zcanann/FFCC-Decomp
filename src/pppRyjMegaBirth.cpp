@@ -665,8 +665,8 @@ void calc(
 		}
 	}
 	{
-		float angleMin = FLOAT_80330460;
 		float angleWrap = FLOAT_80330458;
+		float angleMin = FLOAT_80330460;
 		volatile float* angle = f32_at(particlePayload, 0x28);
 		while (*angle < angleMin)
 		{

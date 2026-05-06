@@ -839,7 +839,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
             voiceMix = voiceMix + modVolume;
             voice->m_volumeModPhase = voice->m_volumeModPhase + voice->m_track->m_tremoloRate;
 
-            if (voiceMix >= REDSOUND_ENVELOPE_LEVEL_FULL) {
+            if (voiceMix > REDSOUND_AX_MIX_MAX) {
                 voiceMix = REDSOUND_AX_MIX_MAX;
             } else if (voiceMix < 0) {
                 voiceMix = 0;
@@ -873,7 +873,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
     if (voice->m_randomVolume != 0) {
         voiceMix =
             voiceMix + (voiceMix * voice->m_randomVolume >> REDSOUND_VOLUME_MOD_SCALE_SHIFT);
-        if (voiceMix >= REDSOUND_ENVELOPE_LEVEL_FULL) {
+        if (voiceMix > REDSOUND_AX_MIX_MAX) {
             voiceMix = REDSOUND_AX_MIX_MAX;
         } else if (voiceMix < 0) {
             voiceMix = 0;

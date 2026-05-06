@@ -1693,11 +1693,11 @@ void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 {
 	short shapeCount = *shapeList;
 	short i = 0;
-	short* shapeIndices = shapeList + 1;
+	shapeList = shapeList + 1;
 
 	while (i < shapeCount) {
-		short shapeIndex = *shapeIndices;
-		shapeIndices = shapeIndices + 1;
+		short shapeIndex = *shapeList;
+		shapeList = shapeList + 1;
 		pppCacheLoadShapeTexture(
 		    *(pppShapeSt**)(pppDataHead->m_shapeNames + shapeIndex * 4),
 		    *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4));

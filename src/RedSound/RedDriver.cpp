@@ -2059,17 +2059,17 @@ int CRedDriver::GetSeVolume(int seID, int mode)
  */
 int CRedDriver::ReportSeLoop(int seID)
 {
-    unsigned int* seInfo;
+    RedTrackDATA* track;
 
-    seInfo = (unsigned int*)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+    track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     while (1) {
-        if ((*seInfo != 0) &&
-            (((seID == -1) || (seID == ((RedTrackDATA*)seInfo)->m_seId)) &&
-             ((seInfo[REDSOUND_TRACK_LOOP_REPORT_WORD_OFFSET] & REDSOUND_TRACK_LOOP_REPORT_ACTIVE) != 0))) {
+        if ((track->m_command != 0) &&
+            (((seID == -1) || (seID == track->m_seId)) &&
+             ((track->m_loopReport & REDSOUND_TRACK_LOOP_REPORT_ACTIVE) != 0))) {
             return 1;
         }
-        seInfo += REDSOUND_TRACK_SIZE / sizeof(*seInfo);
-        if (seInfo < (unsigned int*)((int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_ARENA_SIZE)) {
+        track++;
+        if (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT) {
             continue;
         }
         return 0;

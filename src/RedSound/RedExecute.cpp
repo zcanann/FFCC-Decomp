@@ -672,7 +672,6 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
     u16 uVar3;
     int volFactor;
     AXPBMIX* mixData;
-    int* voiceData = (int*)voice;
 
     if (trackData == 0) {
         return;

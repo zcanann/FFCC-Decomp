@@ -581,9 +581,10 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     groupData = work->m_groups;
     for (groupIndex = 0; groupIndex < (int)pBreathModel->m_groupCount; groupIndex++) {
+        BreathParticleGroup* checkGroup = &work->m_groups[(short)groupIndex];
         slotCount = pBreathModel->m_slotCount;
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
-            if ((groupData->particleIndices[slotIndex] == -1) || (groupData->particleStates[slotIndex] != 1)) {
+            if ((checkGroup->particleIndices[slotIndex] == -1) || (checkGroup->particleStates[slotIndex] != 1)) {
                 ready = 0;
                 goto group_ready;
             }

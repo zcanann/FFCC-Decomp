@@ -1426,7 +1426,7 @@ static void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
         delta[0] += 1;
     }
 
-    command = *(s8*)track->m_command++;
+    command = (s8)*track->m_command++;
     command <<= 8;
     value = 0;
     track->m_sweepAdd = DataAddCompute(&value, command, delta);

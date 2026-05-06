@@ -274,17 +274,15 @@ int CMenuPcs::MLstClose()
 				entry += 8;
 			}
 			itemCount &= 7;
-			if (itemCount == 0) {
-				return 1;
+			if (itemCount != 0) {
+				do {
+					entry->startFrame = 0;
+					entry->duration = 1;
+					entry->alpha = zero;
+					entry++;
+					itemCount--;
+				} while (itemCount != 0);
 			}
-
-			do {
-				entry->startFrame = 0;
-				entry->duration = 1;
-				entry->alpha = zero;
-				entry++;
-				itemCount--;
-			} while (itemCount != 0);
 		}
 		return 1;
 	}
@@ -517,17 +515,15 @@ int CMenuPcs::MLstOpen()
 				entry += 8;
 			}
 			itemCount &= 7;
-			if (itemCount == 0) {
-				return 1;
+			if (itemCount != 0) {
+				do {
+					entry->startFrame = 0;
+					entry->duration = 1;
+					entry->alpha = one;
+					entry++;
+					itemCount--;
+				} while (itemCount != 0);
 			}
-
-			do {
-				entry->startFrame = 0;
-				entry->duration = 1;
-				entry->alpha = one;
-				entry++;
-				itemCount--;
-			} while (itemCount != 0);
 		}
 		return 1;
 	}

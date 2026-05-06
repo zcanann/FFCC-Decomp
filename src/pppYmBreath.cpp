@@ -43,15 +43,6 @@ struct pppYmBreath {
     pppFMATRIX m_localMatrix;
 };
 
-struct YmBreathRenderStep {
-    int m_graphId;
-    int m_dataValIndex;
-    int m_initWork;
-    int m_stepValue;
-    int m_arg3;
-    unsigned char m_payload[1];
-};
-
 struct YmBreathParams {
     unsigned char _pad00[0x04];
     float m_groupRadius;
@@ -61,7 +52,8 @@ struct YmBreathParams {
     u16 m_slotCount;
     u16 m_groupCount;
     float m_groupSpeed;
-    unsigned char _pad1C[0x02];
+    u8 m_blendMode;
+    u8 _pad1D;
     u16 m_particleCount;
     u16 m_emitCount;
     u16 m_emitInterval;
@@ -105,8 +97,11 @@ struct YmBreathParams {
     unsigned char _padBC[0x05];
     u8 m_rotationFlags;
     u8 m_angleFlags;
-    unsigned char _padC3[0x05];
+    u8 _padC3;
+    float m_drawEnvScale;
     u8 m_disableScaleClamp;
+    u8 m_drawEnvColor0;
+    u8 m_drawEnvColor1;
 };
 
 struct YmBreathParticleGroup {
@@ -290,7 +285,6 @@ extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dat
 extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
-    YmBreathRenderStep* step;
     int workOffset;
     int colorOffset;
     VYmBreath* work;
@@ -316,7 +310,6 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     pppFMATRIX viewMtx;
     Mtx drawMtx;
 
-    step = (YmBreathRenderStep*)pYmBreath;
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + workOffset);
@@ -333,11 +326,11 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
 
     shape = *(long***)(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pppEnvStPtr) + 0xC) +
                        params->m_shapeStepValue * 4);
-    pppSetBlendMode(step->m_payload[8]);
+    pppSetBlendMode(params->m_blendMode);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        0, 0, *reinterpret_cast<float*>(step->m_payload + 0xB0), step->m_payload[0xB6], step->m_payload[0xB5],
-        step->m_payload[8], 0, 1, 1, 0);
+        0, 0, params->m_drawEnvScale, params->m_drawEnvColor1, params->m_drawEnvColor0,
+        params->m_blendMode, 0, 1, 1, 0);
 
     colorR = color->m_red;
     colorG = color->m_green;
@@ -407,7 +400,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             drawColor.a = (unsigned char)a;
             GXSetChanAmbColor(GX_COLOR0A0, drawColor);
             pppDrawShp__FPlsP12CMaterialSetUc(*shape, particle->m_shapeFrame2, pppEnvStPtr->m_materialSetPtr,
-                                              step->m_payload[8]);
+                                              params->m_blendMode);
         }
 
         if (matrixList != 0) {

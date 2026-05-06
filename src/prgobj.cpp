@@ -238,8 +238,7 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
-	targetRot = FLOAT_80331BD4;
-	if ((targetRot == deltaX) || (targetRot == deltaZ)) {
+	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
 		targetRot = FLOAT_80331BD4;
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
@@ -273,8 +272,7 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
-	targetRot = FLOAT_80331BD4;
-	if ((targetRot == deltaX) || (targetRot == deltaZ)) {
+	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
 		targetRot = FLOAT_80331BD4;
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
@@ -307,9 +305,8 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
-	targetRot = FLOAT_80331BD4;
-	if ((targetRot == deltaX) || (targetRot == deltaZ)) {
-		return targetRot;
+	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
+		return FLOAT_80331BD4;
 	}
 
 	return (float)atan2(-(double)deltaX, -(double)deltaZ);

@@ -850,10 +850,10 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
     if (m_SoundPlayMode == 1) {
         pan = REDSOUND_PAN_BYTE_CENTER;
     } else if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAIRED_PAN) != 0) {
-        if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAIRED_LEFT) == 0) {
-            pan = REDSOUND_PAN_BYTE_MASK;
-        } else {
+        if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAIRED_LEFT) != 0) {
             pan = 0;
+        } else {
+            pan = REDSOUND_PAN_BYTE_MASK;
         }
     } else {
         if ((voice->m_waveData->m_pan & REDSOUND_PAN_BYTE_SIGN_BIT) != 0) {

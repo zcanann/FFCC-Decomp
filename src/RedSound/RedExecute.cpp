@@ -1705,25 +1705,22 @@ static void _KeyOnControl()
                  p_SoundControlBuffer->m_tracks + p_SoundControlBuffer->m_trackCount);
     }
 
-    if ((*(s16*)((u8*)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_ACTIVE_TRACK_COUNT_OFFSET) != 0) &&
-        ((((u32*)p_SoundControlBuffer)[REDSOUND_CONTROL_SECONDARY_FLAGS_WORD_OFFSET] &
+    if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) &&
+        ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_flags &
           REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
-        int* track = (int*)((u32*)p_SoundControlBuffer)[REDSOUND_CONTROL_SECONDARY_TRACKS_WORD_OFFSET];
-        u32* trackBase = (u32*)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_TRACKS_WORD_OFFSET;
+        RedTrackDATA* track = p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks;
+        RedTrackDATA* trackBase = p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks;
         do {
-            if (((u32)*track != 0) && (track[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET] != 0)) {
-                waveFunc = (int (*)(int))track[REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET];
-                track[REDSOUND_TRACK_SHAKE_PAN_WORD_OFFSET] =
-                    (((track[REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT) + 1) *
-                     waveFunc((u32)track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] >> REDSOUND_FIXED_SHIFT)) >>
+            if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
+                waveFunc = track->m_shakeFunc;
+                track->m_shakePan =
+                    (((track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1) *
+                     waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
                     0x10;
-                track[REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET] += track[REDSOUND_TRACK_SHAKE_RATE_WORD_OFFSET];
+                track->m_shakeOutput += track->m_shakeRate;
             }
-            track += REDSOUND_TRACK_SIZE / sizeof(*track);
-        } while (track < (int*)(*trackBase + (u32) *
-                                             ((u8*)p_SoundControlBuffer +
-                                              REDSOUND_CONTROL_SECONDARY_TRACK_COUNT_OFFSET) *
-                                             REDSOUND_TRACK_SIZE));
+            track++;
+        } while (track < trackBase + p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount);
     }
 
     {

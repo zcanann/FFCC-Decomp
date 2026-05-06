@@ -10,9 +10,9 @@ struct RedSoundCONTROL;
 struct RedKeyOnDATA;
 
 struct RedReverbDATA {
-	int callback;
-	void* context;
-	int kind;
+	int m_callback;
+	void* m_context;
+	int m_kind;
 };
 
 enum RedReverbKind {

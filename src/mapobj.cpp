@@ -10,6 +10,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"
 #include "ffcc/p_light.h"
+#include "ffcc/system.h"
 #include <dolphin/mtx.h>
 #include <string.h>
 
@@ -22,6 +23,7 @@ extern const float kMapObjInitNegOne;
 extern const float kMapObjColorBlendScale;
 extern const float kMapObjDegToRad;
 extern const float kMapObjInitValue50;
+extern const char s_mapobj_cpp_801D70C0[];
 extern unsigned int DAT_8032e498;
 unsigned int DAT_8032E8B8 = 5;
 extern "C" void __ct__12CMapKeyFrameFv(CMapKeyFrame*);
@@ -328,6 +330,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
     Init();
 
     chunkFile.PushChunk();
+    int objIndex = this - MapObjArrayStart();
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk) != 0) {
         if (chunk.m_id == CHUNK_BOBJ) {
@@ -440,6 +443,12 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
             if (((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) &&
                 ((F32At(this, 0x7C) != kMapObjZero) || (F32At(this, 0x80) != kMapObjZero) || (F32At(this, 0x84) != kMapObjZero))) {
+                if (PtrAt(this, 0xEC) == 0) {
+                    System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0x0C));
+                } else {
+                    System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0x84),
+                                  reinterpret_cast<unsigned char*>(PtrAt(this, 0xEC)) + 0x8);
+                }
                 F32At(this, 0x7C) = kMapObjZero;
                 F32At(this, 0x80) = kMapObjZero;
                 F32At(this, 0x84) = kMapObjZero;
@@ -466,6 +475,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     ->Add(reinterpret_cast<CMapAnimRun*>(animRun));
             }
         } else if (chunk.m_id == CHUNK_MIME) {
+            if (PtrAt(this, 0xEC) != 0) {
+                System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
+            }
             unsigned char* mime = reinterpret_cast<unsigned char*>(
                 __nw__FUlPQ27CMemory6CStagePci(0x3C, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x33B));
 
@@ -537,6 +549,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             chunkFile.PopChunk();
             PtrAt(this, 0xEC) = mime;
         } else if (chunk.m_id == CHUNK_PLIT) {
+            if (PtrAt(this, 0xEC) != 0) {
+                System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
+            }
             unsigned char* pointLight = reinterpret_cast<unsigned char*>(
                 __nw__FUlPQ27CMemory6CStagePci(0xF4, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0xD4));
 
@@ -600,6 +615,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             PtrAt(this, 0xEC) = pointLight;
         } else if (chunk.m_id == CHUNK_SLIT) {
+            if (PtrAt(this, 0xEC) != 0) {
+                System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
+            }
             unsigned char* spotLight = reinterpret_cast<unsigned char*>(
                 __nw__FUlPQ27CMemory6CStagePci(0x110, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x139));
 
@@ -680,6 +698,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             PtrAt(this, 0xEC) = spotLight;
         } else if (chunk.m_id == CHUNK_PSTA) {
+            if (PtrAt(this, 0xEC) != 0) {
+                System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
+            }
             CMapObjAtrPlaySta* playSta = reinterpret_cast<CMapObjAtrPlaySta*>(
                 __nw__FUlPQ27CMemory6CStagePci(0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x39B));
             if (playSta != 0) {

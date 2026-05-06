@@ -302,7 +302,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 	scale.u[0] = 0x43300000;
 	scale.u[1] = (1 << model0Raw->m_data->m_frameShift) ^ 0x80000000;
-	short splitY = (short)(int)(currentValue * (float)(scale.d - LoadDouble(DOUBLE_80332030)));
+	short splitY = (short)(int)(currentValue * (scale.d - LoadDouble(DOUBLE_80332030)));
 	if (work->m_cachedValue == currentValue) {
 		return;
 	}

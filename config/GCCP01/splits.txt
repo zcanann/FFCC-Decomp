@@ -1067,6 +1067,8 @@ p_chara_viewer.cpp:
 	extab       start:0x80008350 end:0x80008390
 	extabindex  start:0x8000EA10 end:0x8000EA40
 	.text       start:0x800BD848 end:0x800BF620
+	.bss        start:0x802F2600 end:0x802F2628
+	.sbss       start:0x8032EDC4 end:0x8032EDE0
 	.sdata2     start:0x80330BF8 end:0x80330C78
 
 chara_anim.cpp:

@@ -389,39 +389,40 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                 for (int dl = displayListCount - 1; dl >= 0; dl--) {
                     *dlEntries = (CharaBreakDisplayListPair*)pppMemFree__FPv(
                         0x10, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3FC);
-                    CharaBreakDisplayListPair* dlPair = *dlEntries;
-                    if (dlPair == NULL) {
+                    if (*dlEntries == NULL) {
                         goto fail;
                     }
 
-                    dlPair->m_rewrittenDisplayList = NULL;
-                    dlPair->m_displayListSize = 0;
-                    dlPair->m_polygonData = 0;
-                    dlPair->m_displayListSize = displayList->m_size;
-                    dlPair->m_rewrittenDisplayList = pppMemFree__FPv(
-                        dlPair->m_displayListSize, pppEnvStPtr->m_stagePtr,
+                    (*dlEntries)->m_rewrittenDisplayList = NULL;
+                    (*dlEntries)->m_displayListSize = 0;
+                    (*dlEntries)->m_polygonData = 0;
+                    (*dlEntries)->m_displayListSize = displayList->m_size;
+                    (*dlEntries)->m_rewrittenDisplayList = pppMemFree__FPv(
+                        displayList->m_size, pppEnvStPtr->m_stagePtr,
                         const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x40B);
-                    if (dlPair->m_rewrittenDisplayList == NULL) {
+                    if ((*dlEntries)->m_rewrittenDisplayList == NULL) {
                         goto fail;
                     }
 
-                    memcpy(dlPair->m_rewrittenDisplayList, displayList->m_data, dlPair->m_displayListSize);
-                    ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, dlPair->m_rewrittenDisplayList, dlPair->m_displayListSize, 1);
+                    memcpy((*dlEntries)->m_rewrittenDisplayList, displayList->m_data, displayList->m_size);
+                    ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, (*dlEntries)->m_rewrittenDisplayList,
+                                                      displayList->m_size, 1);
 
                     u32 polygonCount =
-                        GetNumPolygonFromDL__5CUtilFPvUl(&gUtil, dlPair->m_rewrittenDisplayList, dlPair->m_displayListSize);
-                    dlPair->m_polygonData = (POLYGON_DATA*)pppMemFree__FPv(
+                        GetNumPolygonFromDL__5CUtilFPvUl(&gUtil, (*dlEntries)->m_rewrittenDisplayList,
+                                                         displayList->m_size);
+                    (*dlEntries)->m_polygonData = (POLYGON_DATA*)pppMemFree__FPv(
                         polygonCount * 0x34, pppEnvStPtr->m_stagePtr,
                         const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x423);
-                    if (dlPair->m_polygonData == NULL) {
+                    if ((*dlEntries)->m_polygonData == NULL) {
                         goto fail;
                     }
-                    dlPair->m_polygonCount = (u16)polygonCount;
+                    (*dlEntries)->m_polygonCount = (u16)polygonCount;
 
-                    CreatePolygon(dlPair->m_polygonData, displayList->m_data, displayList->m_size, (CChara::CModel*)model,
-                                  (CChara::CMesh*)mesh);
-                    InitPolygonParameter((PCharaBreak*)stepData, (VCharaBreak*)work, dlPair->m_polygonData, dlPair->m_polygonCount,
-                                         (CChara::CModel*)model, (CChara::CMesh*)mesh);
+                    CreatePolygon((*dlEntries)->m_polygonData, displayList->m_data, displayList->m_size,
+                                  (CChara::CModel*)model, (CChara::CMesh*)mesh);
+                    InitPolygonParameter((PCharaBreak*)stepData, (VCharaBreak*)work, (*dlEntries)->m_polygonData,
+                                         (*dlEntries)->m_polygonCount, (CChara::CModel*)model, (CChara::CMesh*)mesh);
 
                     dlEntries--;
                     displayList++;
@@ -1045,10 +1046,10 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
             s32 faceIndex = 0;
             u16 zero = 0;
             while (faceIndex < (s32)(u32)(*displayListEntry)->m_polygonCount) {
+                s16 posZ = polygon->m_pos0.z;
+                s16 posY = polygon->m_pos0.y;
                 faceIndex++;
                 s16 posX = polygon->m_pos0.x;
-                s16 posY = polygon->m_pos0.y;
-                s16 posZ = polygon->m_pos0.z;
                 GXWGFifo.u16 = posX;
                 GXWGFifo.u16 = posY;
                 GXWGFifo.u16 = posZ;
@@ -1056,9 +1057,9 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
                 GXWGFifo.u16 = zero;
                 GXWGFifo.u16 = polygon->m_texIndices[0];
                 GXWGFifo.u16 = polygon->m_texIndices[0];
-                posX = polygon->m_pos1.x;
-                posY = polygon->m_pos1.y;
                 posZ = polygon->m_pos1.z;
+                posY = polygon->m_pos1.y;
+                posX = polygon->m_pos1.x;
                 GXWGFifo.u16 = posX;
                 GXWGFifo.u16 = posY;
                 GXWGFifo.u16 = posZ;
@@ -1066,9 +1067,9 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
                 GXWGFifo.u16 = zero;
                 GXWGFifo.u16 = polygon->m_texIndices[1];
                 GXWGFifo.u16 = polygon->m_texIndices[1];
-                posX = polygon->m_pos2.x;
-                posY = polygon->m_pos2.y;
                 posZ = polygon->m_pos2.z;
+                posY = polygon->m_pos2.y;
+                posX = polygon->m_pos2.x;
                 GXWGFifo.u16 = posX;
                 GXWGFifo.u16 = posY;
                 GXWGFifo.u16 = posZ;

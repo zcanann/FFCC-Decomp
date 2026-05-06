@@ -107,7 +107,7 @@ static inline unsigned char* PartPcsRaw() { return reinterpret_cast<unsigned cha
 static const char s_pppPart_cpp[] = "pppPart.cpp";
 static const char s_ERROR_prog_NULL[] = "\nERROR!!!! prog=NULL\n\n";
 static const char s_CPartPcs_heap_801D821C[] = "CPartPcs.heap";
-static const float FLOAT_8032fddc = 0.0f;
+extern "C" float FLOAT_8032fddc;
 extern "C" float FLOAT_8032fde0;
 extern "C" float FLOAT_8032fde4;
 extern "C" float FLOAT_8032FDE8;
@@ -253,7 +253,7 @@ void pppSetRowVector(pppFMATRIX& pppFMtx, Vec& vecA, Vec& vecB, Vec& vecC, Vec& 
  */
 void pppNormalize(Vec& dest, Vec source)
 { 
-	float zero = FLOAT_8032fddc;
+	float zero = kPppZero;
 	if ((source.x == zero) && (source.y == zero) && (source.z == zero)) {
 		return;
 	}

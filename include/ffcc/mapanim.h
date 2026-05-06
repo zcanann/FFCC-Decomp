@@ -5,7 +5,11 @@
 
 class CChunkFile;
 class CMapAnim;
+struct CMapAnimData;
 class CMapAnimNode;
+struct CMapAnimNodeTrackKey;
+struct CMapAnimNodeTracks;
+struct CMapAnimTargetNode;
 class CMapAnimKey;
 class CMapAnimKeyDt;
 class CMapAnimRun;
@@ -15,6 +19,13 @@ struct Vec;
 class CMapAnimKeyDt
 {
 public:
+    unsigned int m_positionCount;
+    CMapAnimNodeTrackKey* m_positionKeys;
+    unsigned int m_rotationCount;
+    CMapAnimNodeTrackKey* m_rotationKeys;
+    unsigned int m_scaleCount;
+    CMapAnimNodeTrackKey* m_scaleKeys;
+
     CMapAnimKeyDt();
     ~CMapAnimKeyDt();
 };
@@ -22,6 +33,10 @@ public:
 class CMapAnimNode
 {
 public:
+    CMapAnimTargetNode* m_node;
+    CMapAnimData* m_mapAnim;
+    CMapAnimNodeTracks* m_tracks;
+
     CMapAnimNode();
     ~CMapAnimNode();
     void ReadOtmAnimNode(CChunkFile&, CMapAnim*);

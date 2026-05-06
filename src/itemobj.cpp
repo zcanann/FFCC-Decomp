@@ -439,9 +439,26 @@ void CGItemObj::onFrameStat()
 
 			if (Game.m_gameWork.m_menuStageMode != 0) {
 				CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
-				if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-				    (static_cast<unsigned int>(carryObj->GetCID()) & 0x6D) == 0x6D &&
+				bool condA = false;
+				bool condB = false;
+				bool condC = false;
+
+				if (Game.m_gameWork.m_menuStageMode != 0 &&
+				    Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+					condC = true;
+				}
+				if (condC) {
+					unsigned int cid = static_cast<unsigned int>(carryObj->GetCID());
+					unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
+					if (((stageCarry >> 5) & 0xFF) != 0) {
+						condB = true;
+					}
+				}
+				if (condB &&
 				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3B4) != 0) {
+					condA = true;
+				}
+				if (condA) {
 					useBossAttachName = true;
 				}
 			}

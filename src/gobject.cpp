@@ -362,7 +362,7 @@ void CGObject::onCreate()
     *((u8*)&m_shieldNodeFlags) &= 0xEF;
     m_dispItemTimer = 0;
     *((u8*)&m_shieldNodeFlags) &= 0x7F;
-    *reinterpret_cast<float*>(m_lastBgAttr) = 1.0f;
+    m_lastBgAttr = 1.0f;
     *((u8*)&m_shieldNodeFlags) &= 0xF7;
     *((u8*)&m_shieldNodeFlags) &= 0xFB;
     m_collisionPushTimerMax = 0x32;
@@ -1446,7 +1446,7 @@ void CGObject::update()
     unsigned char& weaponFlagsHi = *(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1);
     unsigned char& shieldFlagsLo = *reinterpret_cast<unsigned char*>(&m_shieldNodeFlags);
     unsigned char& shieldFlagsHi = *(reinterpret_cast<unsigned char*>(&m_shieldNodeFlags) + 1);
-    const float lastBgAttr = *reinterpret_cast<float*>(m_lastBgAttr);
+    const float lastBgAttr = m_lastBgAttr;
 
     if (m_dispItemTimer != 0) {
         m_dispItemTimer--;
@@ -2151,7 +2151,9 @@ void CGObject::onDraw()
  */
 void CGObject::CancelMove(int moveType)
 {
-    *((u8*)&m_weaponNodeFlags + 1) &= 0xDF;
+    u8 flags = *((u8*)&m_weaponNodeFlags + 1);
+    flags = static_cast<u8>(__rlwimi(flags, 0, 5, 26, 26));
+    *((u8*)&m_weaponNodeFlags + 1) = flags;
 
     CFlatRuntime::CStack arg;
     arg.m_word = static_cast<u32>(moveType);
@@ -2654,7 +2656,7 @@ void CGObject::Turn(float targetRot, int turnFrames)
 {
     u8* shieldFlags = reinterpret_cast<u8*>(&m_shieldNodeFlags);
 
-    *shieldFlags = (*shieldFlags & 0xBF) | 0x40;
+    *shieldFlags = static_cast<u8>(__rlwimi(*shieldFlags, 1, 6, 25, 25));
     m_rotTargetY = targetRot;
     m_turnBaseSpeed =
         Math.DstRot(m_rotBaseY, m_rotTargetY) / static_cast<float>(turnFrames);
@@ -2666,12 +2668,13 @@ void CGObject::Turn(float targetRot, int turnFrames)
     }
 
     m_currentAnimSlot = m_animQueue[animSlot - 0x41];
-    *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) &= 0xFE;
+    *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) =
+        static_cast<u8>(__rlwimi(*(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1), 0, 0, 31, 31));
     m_animExtraIndex = -1;
     m_collisionPushTimer = -1;
-    *shieldFlags &= 0xFD;
-    *shieldFlags &= 0x7F;
-    *shieldFlags = (*shieldFlags & 0xF7) | 8;
+    *shieldFlags = static_cast<u8>(__rlwimi(*shieldFlags, 0, 1, 30, 30));
+    *shieldFlags = static_cast<u8>(__rlwimi(*shieldFlags, 0, 7, 24, 24));
+    *shieldFlags = static_cast<u8>(__rlwimi(*shieldFlags, 1, 3, 28, 28));
     m_turnSpeed = sZeroFloat;
 }
 
@@ -2993,8 +2996,7 @@ int CGObject::IsLoopAnim(int mode)
         threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
     }
 
-	// TODO: Retype float?
-    const float lastAttr = *reinterpret_cast<const float*>(m_lastBgAttr);
+    const float lastAttr = m_lastBgAttr;
 
     if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat))
     {
@@ -3066,7 +3068,7 @@ int CGObject::IsAnimFinished(int mode)
                             }
 
                             if (static_cast<double>(sZeroFloat)
-                                <= static_cast<double>(*reinterpret_cast<float*>(m_lastBgAttr))) {
+                                <= static_cast<double>(m_lastBgAttr)) {
                                 result =
                                     (static_cast<u32>(static_cast<u8>(
                                          (static_cast<double>(animSpan - sAnimFrameOffset) < threshold) << 3))
@@ -3109,7 +3111,7 @@ void CGObject::CancelAnim(int keepFacing)
 	m_currentAnimSlot = -1;
 
 	u8 flags = *((u8*)&m_shieldNodeFlags);
-	flags &= 0xbf;
+	flags = static_cast<u8>(__rlwimi(flags, 0, 6, 25, 25));
 	*((u8*)&m_shieldNodeFlags) = flags;
 
 	m_turnSpeed = sZeroFloat;
@@ -3120,11 +3122,11 @@ void CGObject::CancelAnim(int keepFacing)
 	}
 
 	flags = *((u8*)&m_shieldNodeFlags);
-	flags &= 0xf7;
+	flags = static_cast<u8>(__rlwimi(flags, 0, 3, 28, 28));
 	*((u8*)&m_shieldNodeFlags) = flags;
 
 	flags = *((u8*)&m_shieldNodeFlags);
-	flags &= 0x7f;
+	flags = static_cast<u8>(__rlwimi(flags, 0, 7, 24, 24));
 	*((u8*)&m_shieldNodeFlags) = flags;
 }
 
@@ -3140,7 +3142,6 @@ void CGObject::CancelAnim(int keepFacing)
 void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5, signed char* animData)
 {
     signed char weaponFlag = static_cast<signed char>(param2);
-    signed char shieldFlag = static_cast<signed char>(param3);
     u8 flags;
 
     m_currentAnimSlot = m_animQueue[slot - 0x41];
@@ -3152,20 +3153,21 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
     m_animExtraIndex = static_cast<short>(param4);
     m_collisionPushTimer = static_cast<short>(param5);
 
+    signed char shieldFlag = static_cast<signed char>(param3);
     flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);
     flags = static_cast<u8>(__rlwimi(flags, shieldFlag, 1, 30, 30));
     *reinterpret_cast<u8*>(&m_shieldNodeFlags) = flags;
 
-    if (animData == 0) {
-        flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);
-        flags = static_cast<u8>(__rlwimi(flags, 0, 7, 24, 24));
-        *reinterpret_cast<u8*>(&m_shieldNodeFlags) = flags;
-    } else {
+    if (animData != 0) {
         flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);
         flags = static_cast<u8>(__rlwimi(flags, 1, 7, 24, 24));
         *reinterpret_cast<u8*>(&m_shieldNodeFlags) = flags;
         m_animQueuePos = '\0';
         memcpy(m_animQueue, animData, 4);
+    } else {
+        flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);
+        flags = static_cast<u8>(__rlwimi(flags, 0, 7, 24, 24));
+        *reinterpret_cast<u8*>(&m_shieldNodeFlags) = flags;
     }
 
     flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);

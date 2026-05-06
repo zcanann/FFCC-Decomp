@@ -34,13 +34,6 @@ enum RedEntryFileLayoutSize {
 	REDSOUND_WAVE_OFFSET_MIN_COUNT = 1,
 };
 
-enum RedHistoryBankFieldOffset {
-	REDSOUND_HISTORY_BANK_ID_OFFSET = 0x00,
-	REDSOUND_HISTORY_BANK_HISTORY_NO_OFFSET = 0x04,
-	REDSOUND_HISTORY_BANK_DATA_OFFSET = 0x08,
-	REDSOUND_HISTORY_BANK_SIZE_OFFSET = 0x0C,
-};
-
 enum RedEntryWaveAramLayout {
 	REDSOUND_WAVE_STAGE_RANGE_BEGIN = 10,
 	REDSOUND_WAVE_STAGE_RANGE_END = 70,
@@ -217,9 +210,9 @@ public:
 	RedMusicHEAD* SetMusicData(RedMusicHEAD*);
 	void DisplayMMemoryInfo();
 
-	int m_waveBankBase;
-	int m_seSepBankBase;
-	int m_musicBankBase;
+	RedHistoryBANK* m_waveBankBase;
+	RedHistoryBANK* m_seSepBankBase;
+	RedHistoryBANK* m_musicBankBase;
 	int m_waveLoadNo;
 	int m_waveLoadSize;
 	int m_waveLoadAddress;

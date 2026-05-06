@@ -2600,9 +2600,11 @@ void CGMonObj::changeStatFuncLastBoss(int stat)
 void CGMonObj::cancelStatFuncLastBoss()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId == 0x66) {
+	switch (prgObj->m_lastStateId) {
+	case 0x66: {
+		CGPartyObj** work = reinterpret_cast<CGPartyObj**>(SoundBuffer_1260_);
 		for (int i = 0; i < 4; i++) {
-			CGPartyObj* party = Game.m_partyObjArr[i];
+			CGPartyObj* party = work[i + 2];
 			if (party != 0) {
 				CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
 				if (partyPrg->m_lastStateId == 0x25) {
@@ -2611,6 +2613,8 @@ void CGMonObj::cancelStatFuncLastBoss()
 			}
 		}
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
+	}
 	}
 }
 
@@ -2688,8 +2692,9 @@ void CGMonObj::frameStatFuncLastBoss()
 			}
 			prgObj->putParticle((pdtNo << 8) | 5, *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0x12902);
 		} else if (stateFrame == 0x4B) {
+			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(SoundBuffer_1260_);
 			for (int i = 0; i < 4; i++) {
-				CGPartyObj* party = Game.m_partyObjArr[i];
+				CGPartyObj* party = work[i + 2];
 				if (party != 0) {
 					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
 					if (partyPrg->m_lastStateId == 0x24) {
@@ -2700,8 +2705,9 @@ void CGMonObj::frameStatFuncLastBoss()
 				}
 			}
 		} else if (stateFrame == 200) {
+			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(SoundBuffer_1260_);
 			for (int i = 0; i < 4; i++) {
-				CGPartyObj* party = Game.m_partyObjArr[i];
+				CGPartyObj* party = work[i + 2];
 				if (party != 0) {
 					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
 					if (partyPrg->m_lastStateId == 0x25) {

@@ -114,7 +114,16 @@ static const char s_mogFurTextureName[] = "mog_hair";
 static const char s_charaSetAnimMissingFmt[] = "CCharaPcs missing anim %d %d %d\n";
 static const char s_charaLoadAnimLogFmt[] = "CCharaPcs LoadAnim %s %d %d\n";
 static const char s_charaReleaseAnimBankFmt[] = "bank release %d %s\n";
-static const char s_charaAsyncCloseFmt[] = "CCharaPcs cancel async file\n";
+static const char s_charaAsyncCancelFmt[] =
+    "\x83\x82\x83\x66\x83\x8b\x94\xf1\x93\xaf\x8a\xfa\x93\xc7\x82\xdd"
+    "\x8d\x9e\x82\xdd\x92\x86\x82\xc9\x83\x4c\x83\x83\x83\x93\x83\x5a"
+    "\x83\x8b\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n";
+static const char s_charaAsyncCompleteFmt[] =
+    "\x94\xf1\x93\xaf\x8a\xfa\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x8a\xae"
+    "\x97\xb9\n";
+static const char s_charaAsyncEntryFmt[] =
+    "\x94\xf1\x93\xaf\x8a\xfa\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x83\x47"
+    "\x83\x93\x83\x67\x83\x8a\x81\x5b\n";
 static const char s_charaDumpModelHdr1[] = "MODEL\n";
 static const char s_charaDumpModelHdr2[] = " no t num lv mask addr a? a_addr a_size\n";
 static const char s_charaDumpLineSep[] = "----------------------------------------\n";
@@ -2323,7 +2332,7 @@ CCharaPcs::CHandle::~CHandle()
 {
     if (m_asyncFileHandle != 0) {
         if (System.m_execParam > 1) {
-            Printf__7CSystemFPce(&System, s_charaAsyncCloseFmt);
+            Printf__7CSystemFPce(&System, s_charaAsyncCancelFmt);
         }
         File.Close(m_asyncFileHandle);
         m_asyncFileHandle = 0;
@@ -2987,8 +2996,17 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
  */
 void CCharaPcs::CHandle::LoadModelASync(int charaKind, unsigned long charaNo, unsigned long textureVariant)
 {
+    if (System.m_execParam > 2)
+    {
+        Printf__7CSystemFPce(&System, s_charaAsyncEntryFmt);
+    }
+
     if (m_asyncFileHandle != 0)
 	{
+        if (System.m_execParam > 1)
+        {
+            Printf__7CSystemFPce(&System, s_charaAsyncCancelFmt);
+        }
 		File.Close(m_asyncFileHandle);
 		m_asyncFileHandle = (CFile::CHandle*)0;
 	}
@@ -3162,6 +3180,9 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
     m_asyncFileHandle = 0;
     if (m_asyncState == 6) {
         m_asyncState = 7;
+        if (System.m_execParam > 2) {
+            Printf__7CSystemFPce(&System, s_charaAsyncCompleteFmt);
+        }
     } else {
         m_asyncState++;
         loadModelASyncFrame();

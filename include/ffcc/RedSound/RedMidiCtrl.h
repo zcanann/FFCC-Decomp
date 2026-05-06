@@ -259,7 +259,7 @@ struct RedSoundCONTROL {
 	unsigned char* m_savedCommand[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
 	int m_savedDelta[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
 	unsigned int m_savedFlags[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
-	int m_savedNote[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+	RedNoteDATA m_savedNote[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
 	int m_savedTempo;
 	int m_savedTempoAdd;
 	int m_savedTempoDelta;

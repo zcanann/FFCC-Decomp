@@ -115,12 +115,12 @@ static int _EraseTime(int eraseTrack)
 	}
 
 	track = *trackBasePtr;
-	int maxWait = 0;
+	minTrack = 0;
 	int sepId = 0;
 	do {
 		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
-		    (track->m_playTime > maxWait)) {
-			maxWait = track->m_playTime;
+		    (track->m_playTime > minTrack)) {
+			minTrack = track->m_playTime;
 			sepId = track->m_seSepId;
 		}
 		track++;
@@ -130,7 +130,7 @@ static int _EraseTime(int eraseTrack)
 	int erasedCount = 0;
 	do {
 		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
-		    (track->m_playTime == maxWait)) {
+		    (track->m_playTime == minTrack)) {
 			int trackNo;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, track);
@@ -181,31 +181,41 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 		_EraseAttribute(eraseTrack, attrMask);
 	}
 
-	do {
+	for (;;) {
 		track = *trackBasePtr + REDSOUND_SE_TRACK_LAST_INDEX;
 		scan = track;
-		remaining = trackCount;
 		do {
 			track = scan;
-			remaining--;
-			if ((remaining != 0) && (track->m_command == 0) &&
-			    ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) == 0)) {
-				scan = track - 1;
-			} else {
-				if ((track->m_command != 0) || ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
-					remaining = 1;
-					scan = track;
+			remaining = trackCount - 1;
+			while (remaining != 0) {
+				if ((track->m_command != 0) ||
+				    ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
+					break;
 				}
-				scan = scan - 1;
+				track--;
+				remaining--;
 			}
-		} while ((remaining != 0) && (*trackBasePtr <= track));
-	} while ((track < *trackBasePtr) && (_EraseTime(eraseTrack) != 0));
+			if ((track->m_command != 0) || ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
+				scan = track;
+				remaining = 1;
+			}
+			scan--;
+		} while ((remaining != 0) && (track >= *trackBasePtr));
 
-	if (track < *trackBasePtr) {
-		track = 0;
+		if (track >= *trackBasePtr) {
+			break;
+		}
+		remaining = _EraseTime(eraseTrack);
+		if (remaining == 0) {
+			break;
+		}
 	}
 
-	return track;
+	if (track >= *trackBasePtr) {
+		return track;
+	}
+
+	return 0;
 }
 
 /*
@@ -385,10 +395,10 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			track->m_seSepId = sepId;
 			track->m_seId = seId;
 			track->m_loopStepCurrent = 0;
-			if (m_SeSkipStep == 0) {
-				state = REDSOUND_TRACK_PLAY_TIME_SENTINEL;
-			} else {
+			if (m_SeSkipStep != 0) {
 				state = 0;
+			} else {
+				state = REDSOUND_TRACK_PLAY_TIME_SENTINEL;
 			}
 			track->m_playTime = state;
 
@@ -703,25 +713,25 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 		return;
 	}
 
+	m_MusicSkipLine = mode;
 	RedSoundCONTROL* music = p_SoundControlBuffer;
-	if (mode != 0) {
+	if (m_MusicSkipLine != 0) {
 		music += REDSOUND_CONTROL_MUSIC_SKIP;
 	}
 
-	m_MusicSkipLine = mode;
 	music->m_musicId = musicId;
 	music->m_flags &= REDSOUND_CONTROL_FLAG_CLEAR_STOP_ON_VOLUME_ZERO_MASK;
 	music->m_updateFlags = 0;
 
-	if (m_CrossTime == 0) {
-		music->m_masterVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
-		music->m_masterVolumeDelta = 0;
-	} else {
+	if (m_CrossTime != 0) {
 		music->m_masterVolume = 0;
 		music->m_masterVolumeAdd = REDSOUND_MASTER_VOLUME_FULL_FIXED_HALF;
 		music->m_masterVolumeAdd = music->m_masterVolumeAdd / m_CrossTime;
 		music->m_masterVolumeDelta = m_CrossTime;
 		m_CrossTime = 0;
+	} else {
+		music->m_masterVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
+		music->m_masterVolumeDelta = 0;
 	}
 
 	int trackBase = RedNew(musicHead->m_trackCount * REDSOUND_TRACK_SIZE);
@@ -868,7 +878,7 @@ int MusicStop(int musicId)
 			music->m_updateFlags = 0;
 			music->m_musicId = -1;
 			if (music->m_activeTrackCount != 0) {
-				RedVoiceDATA* seTrack = (RedVoiceDATA*)p_VoiceData;
+				RedVoiceDATA* seTrack = p_VoiceData;
 				do {
 					if ((seTrack->m_track >= music->m_tracks) &&
 					    (seTrack->m_track < music->m_tracks + music->m_trackCount)) {

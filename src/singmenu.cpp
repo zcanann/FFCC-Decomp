@@ -3094,25 +3094,23 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     unsigned int raceType;
     char* text;
     char* suffix;
-    unsigned char languageId;
 
     GetItemType__8CMenuPcsFii(this, itemNo, 1);
     raceBits = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
     outText[0] = '\0';
 
-    languageId = static_cast<unsigned char>(Game.m_gameWork.m_languageId);
     if ((raceBits & 0xF) == 0xF) {
         text = PTR_s_Tutti_802143ec;
-        if (languageId != 3) {
-            if (languageId < 3) {
-                if (languageId != 1 && languageId != 0) {
+        if (Game.m_gameWork.m_languageId != 3) {
+            if (Game.m_gameWork.m_languageId < 3) {
+                if (Game.m_gameWork.m_languageId != 1 && Game.m_gameWork.m_languageId != 0) {
                     text = PTR_s_Alle_Rassen_8021430c;
                 }
             } else {
                 text = PTR_s_Todos_802145ac;
-                if (languageId != 5 && languageId >= 5) {
+                if (Game.m_gameWork.m_languageId != 5 && Game.m_gameWork.m_languageId >= 5) {
                     text = PTR_DAT_8021422c;
-                } else if (languageId < 5) {
+                } else if (Game.m_gameWork.m_languageId < 5) {
                     text = PTR_DAT_802144cc;
                 }
             }
@@ -3155,7 +3153,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
         }
 
         strcpy(outText, text);
-        if (languageId == 2) {
+        if (Game.m_gameWork.m_languageId == 2) {
             strcat(outText, DAT_80332958, 0x80);
         }
     }

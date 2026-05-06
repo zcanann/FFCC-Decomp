@@ -213,9 +213,9 @@ enum RedExecuteAdsrStateIndex {
  */
 u8 GetRandomData()
 {
-	u8 data = t_RandomData[m_RandomIndex];
+	signed char* data = t_RandomData + m_RandomIndex;
 	m_RandomIndex++;
-	return data;
+	return *data;
 }
 
 /*
@@ -903,8 +903,6 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
 static void _PitchExecute(RedVoiceDATA* voice)
 {
     int pitchDelta = 0;
-    int* voiceData = (int*)voice;
-
     int targetPitchDelta;
 
     if ((voice->m_track->m_vibrateFunc != 0) && (voice->m_pitchModDelay == 0)) {
@@ -1224,42 +1222,42 @@ skipModSetup:
  */
 static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voiceMask)
 {
-    int* voiceData;
+    RedVoiceDATA* voiceData;
 
     if ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) != 0) {
-        voiceData = (int*)p_VoiceData;
+        voiceData = p_VoiceData;
         do {
-            if ((RedTrackDATA*)*voiceData == track) {
+            if (voiceData->m_track == track) {
                 break;
             }
-            voiceData += REDSOUND_VOICE_SIZE / sizeof(*voiceData);
-        } while (voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
+            voiceData++;
+        } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
 
-        if (!(voiceData < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT))) {
-            voiceData = (int*)EntryVoiceSearch(track);
+        if (!(voiceData < p_VoiceData + REDSOUND_VOICE_COUNT)) {
+            voiceData = EntryVoiceSearch(track);
         }
     } else {
-        voiceData = (int*)EntryVoiceSearch(track);
+        voiceData = EntryVoiceSearch(track);
     }
 
     if (voiceData != 0) {
-        ((RedVoiceDATA*)voiceData)->m_waveData = _WaveSplitSelect(track->m_waveData, note);
-        _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
+        voiceData->m_waveData = _WaveSplitSelect(track->m_waveData, note);
+        _VoiceDataAsign(track, voiceData, note, voiceMask);
 
-        if (((((RedVoiceDATA*)voiceData)->m_waveData->m_flags & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) &&
+        if (((voiceData->m_waveData->m_flags & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) &&
             (((s8)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0)) {
-            RedWaveDATA* wave = ((RedVoiceDATA*)voiceData)->m_waveData;
-            ((RedVoiceDATA*)voiceData)->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAIRED_LEFT;
-            voiceData = (int*)EntryVoiceSearch(track);
+            RedWaveDATA* wave = voiceData->m_waveData;
+            voiceData->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAIRED_LEFT;
+            voiceData = EntryVoiceSearch(track);
             if (voiceData != 0) {
-                ((RedVoiceDATA*)voiceData)->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAIRED_RIGHT;
-                ((RedVoiceDATA*)voiceData)->m_waveData = wave + 1;
-                _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
+                voiceData->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAIRED_RIGHT;
+                voiceData->m_waveData = wave + 1;
+                _VoiceDataAsign(track, voiceData, note, voiceMask);
             }
         }
     }
 
-    return (RedVoiceDATA*)voiceData;
+    return voiceData;
 }
 
 /*
@@ -1313,8 +1311,8 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
  */
 static void _AdsrStart(RedVoiceDATA* voice)
 {
-    u8* adsrData = (u8*)voice->m_adsrTime;
     int* stage = &voice->m_adsrStage;
+    u8* adsrData = (u8*)voice->m_adsrTime;
     int prevLevel;
     int nextLevel;
     int stepFrames;
@@ -1331,7 +1329,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
         *stage = *stage + 1;
     } while (*stage < REDSOUND_VOICE_ADSR_STAGE_COUNT);
 
-    voice->m_adsrStepFrames = stepFrames;
+    stage[REDSOUND_ADSR_STATE_STEP_FRAMES] = stepFrames;
     if (nextLevel != 0) {
         nextLevel += 1;
         nextLevel <<= 8;
@@ -1348,7 +1346,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
         }
         voice->m_adsrCurrentLevel = prevLevel;
         nextLevel |= REDSOUND_FIXED_HALF;
-        voice->m_adsrStepAdd = (nextLevel - prevLevel) / stepFrames;
+        stage[REDSOUND_ADSR_STATE_STEP_ADD] = (nextLevel - prevLevel) / stepFrames;
     } else {
         voice->m_adsrCurrentLevel = nextLevel;
     }
@@ -1657,7 +1655,7 @@ static void _KeyOnControl()
 {
     u32 voiceStartMask[2];
     int* reserve;
-    unsigned int* voiceData;
+    RedVoiceDATA* voiceData;
     int (*waveFunc)(int);
 
     _VoiceEnvelopeCheck();
@@ -1666,10 +1664,10 @@ static void _KeyOnControl()
 
     if (m_KeyOnEntry != 0) {
         reserve = (int*)p_KeyOnData;
-        voiceData = (unsigned int*)p_VoiceData;
+        voiceData = p_VoiceData;
         do {
             if (((u32)*reserve != 0) && (((RedTrackDATA*)*reserve)->m_waveData != 0)) {
-                voiceData = (unsigned int*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)voiceStartMask);
+                voiceData = _VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)voiceStartMask);
             }
             reserve += 2;
         } while ((voiceData != 0) && (reserve < (int*)p_KeyOnData + REDSOUND_KEY_ON_TOTAL_WORD_COUNT));
@@ -2154,13 +2152,13 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
             }
 
             if (m_ChangeStatus != 0) {
-                int* voice = (int*)p_VoiceData;
+                RedVoiceDATA* voice = p_VoiceData;
                 do {
-                    if ((RedTrackDATA*)*voice == track) {
-                        ((RedVoiceDATA*)voice)->m_updateFlags = m_ChangeStatus;
+                    if (voice->m_track == track) {
+                        voice->m_updateFlags = m_ChangeStatus;
                     }
-                    voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
-                } while (voice < (int*)(p_VoiceData + REDSOUND_VOICE_COUNT));
+                    voice++;
+                } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
             }
         }
         track++;

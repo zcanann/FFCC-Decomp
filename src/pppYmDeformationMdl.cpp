@@ -46,12 +46,12 @@ struct _pppEnvStYmDeformationMdl {
     CMapMesh** m_mapMeshPtr;
 };
 extern _pppEnvStYmDeformationMdl* pppEnvStPtr;
-extern float FLOAT_80330D98;
-extern float FLOAT_80330D9C;
-extern float FLOAT_80330DA0;
-extern float FLOAT_80330DA4;
-extern float FLOAT_80330DA8;
-extern const float FLOAT_80330dac = 0.0f;
+extern const float kYmDeformationMdlBackTextureWidth;
+extern const float kYmDeformationMdlBackTextureHeight;
+extern const float kYmDeformationMdlTexMtxOffset;
+extern const float kYmDeformationMdlTexMtxDepth;
+extern const float kYmDeformationMdlDegToRad;
+extern const float kYmDeformationMdlZero = 0.0f;
 extern const double kPppYmSharedDoubleBias = 4503601774854144.0;
 
 static inline Mtx& CameraMatrix()
@@ -66,7 +66,7 @@ static inline Mtx44& CameraScreenMatrix()
 
 static inline float DeformationMdlZero()
 {
-    return *reinterpret_cast<const float*>(&FLOAT_80330dac);
+    return *reinterpret_cast<const float*>(&kYmDeformationMdlZero);
 }
 
 void pppInitBlendMode(void);
@@ -191,11 +191,11 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         texMtx[0][2] = screenMtx[0][2];
         texMtx[1][2] = screenMtx[1][2];
         texMtx[2][2] = screenMtx[2][2];
-        texMtx[0][0] = texMtx[0][0] * (FLOAT_80330D98 / (float)width);
-        texMtx[1][1] = texMtx[1][1] * -(FLOAT_80330D9C / (float)height);
-        texMtx[0][2] = FLOAT_80330DA0;
-        texMtx[1][2] = FLOAT_80330DA0;
-        texMtx[2][2] = FLOAT_80330DA4;
+        texMtx[0][0] = texMtx[0][0] * (kYmDeformationMdlBackTextureWidth / (float)width);
+        texMtx[1][1] = texMtx[1][1] * -(kYmDeformationMdlBackTextureHeight / (float)height);
+        texMtx[0][2] = kYmDeformationMdlTexMtxOffset;
+        texMtx[1][2] = kYmDeformationMdlTexMtxOffset;
+        texMtx[2][2] = kYmDeformationMdlTexMtxDepth;
         PSMTXConcat(texMtx, modelObject->m_modelMatrix.value, texMtx);
         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, 0x1E, GX_FALSE, GX_PTIDENTITY);
@@ -209,7 +209,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
             state->m_angle = 1;
         }
 
-        PSMTXRotRad(rotMtx, 'z', FLOAT_80330DA8 * (float)state->m_angle);
+        PSMTXRotRad(rotMtx, 'z', kYmDeformationMdlDegToRad * (float)state->m_angle);
         indMtx[0][0] = rotMtx[0][0] * state->m_scale;
         indMtx[0][1] = rotMtx[0][1] * state->m_scale;
         indMtx[0][2] = DeformationMdlZero();
@@ -305,7 +305,7 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, pppYmDeformationMdlUnkC*)
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
 {
-    const float& value = FLOAT_80330dac;
+    const float& value = kYmDeformationMdlZero;
     YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
     state->m_values[1] = value;
@@ -327,7 +327,7 @@ void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pp
  */
 void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, struct pppYmDeformationMdlUnkC* param_2)
 {
-    const float& zero = FLOAT_80330dac;
+    const float& zero = kYmDeformationMdlZero;
     YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
     state->m_angle = 0;

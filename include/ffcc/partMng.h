@@ -19,6 +19,7 @@ class CProfile;
 
 struct _PARTICLE_WMAT
 {
+    Mtx value;
 };
 
 struct PPPSEST

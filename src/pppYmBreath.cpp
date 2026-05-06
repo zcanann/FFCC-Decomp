@@ -603,9 +603,10 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     groupData = work->m_groups;
     for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
+        YmBreathParticleGroup* checkGroup = &work->m_groups[(short)groupIndex];
         slotCount = params->m_slotCount;
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
-            if ((groupData->particleIndices[slotIndex] == -1) || (groupData->particleStates[slotIndex] != 1)) {
+            if ((checkGroup->particleIndices[slotIndex] == -1) || (checkGroup->particleStates[slotIndex] != 1)) {
                 ready = 0;
                 goto group_ready;
             }

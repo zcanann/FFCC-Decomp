@@ -856,13 +856,13 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
             pan = 0;
         }
     } else {
-        if ((voice->m_waveData->m_pan & REDSOUND_PAN_BYTE_SIGN_BIT) == 0) {
-            pan = *voice->m_trackPan >> REDSOUND_FIXED_SHIFT;
-        } else {
+        if ((voice->m_waveData->m_pan & REDSOUND_PAN_BYTE_SIGN_BIT) != 0) {
             pan = voice->m_waveData->m_pan & REDSOUND_PAN_BYTE_MASK;
             if (pan == 0) {
                 pan = REDSOUND_PAN_BYTE_CENTER;
             }
+        } else {
+            pan = *voice->m_trackPan >> REDSOUND_FIXED_SHIFT;
         }
 
         if (voice->m_randomPan != 0) {

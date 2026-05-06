@@ -175,8 +175,6 @@ enum RedReverbDelayChannelIndex {
 };
 
 enum RedExecuteAxVoiceLayout {
-    REDSOUND_AX_VOICE_PRIORITY_OFFSET = 0x0C,
-    REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET = 0x1C,
     REDSOUND_AX_VOICE_LOOP_OFFSET = 0x148,
     REDSOUND_AX_MIX_CTRL_DRY_STEREO = 0x3,
     REDSOUND_AX_MIX_CTRL_AUX_A_STEREO = 0x30,
@@ -1469,7 +1467,7 @@ void EnvelopeKeyExecute()
             int voice = voiceData[REDSOUND_VOICE_AX_VOICE_WORD];
             if (voice != 0) {
                 if (((AXVPB*)voice)->pb.state == 0) {
-                    if (*(int*)(voice + REDSOUND_AX_VOICE_PRIORITY_OFFSET) != 0) {
+                    if (((AXVPB*)voice)->priority != 0) {
                         AXFreeVoice((AXVPB*)voice);
                     }
                     voiceData[REDSOUND_VOICE_AX_VOICE_WORD] = 0;
@@ -1477,7 +1475,7 @@ void EnvelopeKeyExecute()
                 } else {
                     ((AXVPB*)voice)->pb.state = 0;
                     ((AXVPB*)voice)->pb.ve.currentVolume = 0;
-                    *(u32*)(voice + REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET) |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
+                    ((AXVPB*)voice)->sync |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
                 }
             }
         } else {
@@ -1485,7 +1483,7 @@ void EnvelopeKeyExecute()
 
             if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_START) != 0) {
                 voice = voiceData[REDSOUND_VOICE_AX_VOICE_WORD];
-                if ((voice != 0) && (*(int*)(voice + REDSOUND_AX_VOICE_PRIORITY_OFFSET) != 0)) {
+                if ((voice != 0) && (((AXVPB*)voice)->priority != 0)) {
                     AXFreeVoice((AXVPB*)voice);
                     voiceData[REDSOUND_VOICE_AX_VOICE_WORD] = 0;
                 }
@@ -1633,7 +1631,7 @@ void EnvelopeKeyExecute()
                     (u16)(voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] >> REDSOUND_FIXED_SHIFT);
             }
 
-            *(u32*)(voice + REDSOUND_AX_VOICE_SYNC_FLAGS_OFFSET) |= voiceFlags;
+            ((AXVPB*)voice)->sync |= voiceFlags;
         }
 
         voiceData[REDSOUND_VOICE_FLAGS_WORD] &= REDSOUND_VOICE_FLAGS_EXECUTE_KEEP_MASK;

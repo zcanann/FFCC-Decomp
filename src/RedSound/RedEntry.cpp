@@ -1245,7 +1245,7 @@ void CRedEntry::DisplaySePlayInfo()
 					int seqInfo = seqBase + seBlock->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE;
 					seqInfo += (*(unsigned int*)(seqBase + (seDataNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK) * REDSOUND_SE_BLOCK_ENTRY_SIZE) &
 					            REDSOUND_SE_BLOCK_ENTRY_MASK);
-					int waveNo = reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE +
+					int waveNo = (reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoHi << 8) |
 					             reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoLo;
 					int trackIndex =
 					    (reinterpret_cast<int>(track) - reinterpret_cast<int>(*trackHead)) / REDSOUND_TRACK_SIZE;
@@ -1258,7 +1258,7 @@ void CRedEntry::DisplaySePlayInfo()
 					RedHistoryBANK* seSepBank = SearchSeSepBank(track->m_seSepId);
 					int trackIndex =
 					    (reinterpret_cast<int>(track) - reinterpret_cast<int>(*trackHead)) / REDSOUND_TRACK_SIZE;
-					int waveNo = reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE +
+					int waveNo = (reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoHi << 8) |
 					             reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data)->m_waveNoLo;
 					OSReport(s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc, sRedEntryLogPrefix,
 					         trackIndex + REDSOUND_SE_VOICE_BASE_INDEX, track->m_seSepId, waveNo);

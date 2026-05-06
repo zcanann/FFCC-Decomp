@@ -1789,27 +1789,27 @@ static void _KeyOnControl()
 
     {
         u32 bit = 1;
-        unsigned int* voice = (unsigned int*)p_VoiceData;
+        RedVoiceDATA* voice = p_VoiceData;
         do {
             if ((voiceStartMask[0] & bit) != 0) {
                 voiceStartMask[0] &= ~bit;
-                voice[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_START;
+                voice->m_flags |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
-            voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
+            voice++;
         } while (voiceStartMask[0] != 0);
     }
 
     {
         u32 bit = 1;
-        unsigned int* voice = (unsigned int*)p_VoiceData + REDSOUND_VOICE_SECOND_MASK_WORD_OFFSET;
+        RedVoiceDATA* voice = p_VoiceData + REDSOUND_MUTE_BITS_PER_WORD;
         do {
             if ((voiceStartMask[1] & bit) != 0) {
                 voiceStartMask[1] &= ~bit;
-                voice[REDSOUND_VOICE_FLAGS_WORD] |= REDSOUND_VOICE_FLAGS_START;
+                voice->m_flags |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
-            voice += REDSOUND_VOICE_SIZE / sizeof(*voice);
+            voice++;
         } while (voiceStartMask[1] != 0);
     }
 }

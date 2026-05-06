@@ -39,9 +39,6 @@ const float kGraphicOneF = 1.0f;
 const float kGraphicBlurAlphaScale = -100.0f;
 const float kGraphicNoiseTexScaleU = 0.015625f;
 const float kGraphicNoiseTexScaleV = 0.010416667f;
-u8 gGraphicNoiseTextureI8_64x96[0xC00] ATTRIBUTE_ALIGN(32) = {
-#include "src/graphic_noise_texture.inc"
-};
 }
 
 static const char s_CGraphic_801d6330[] = "CGraphic";

@@ -1942,9 +1942,6 @@ void CShopMenu::DrawSmith0()
     if (*reinterpret_cast<char*>(caravan + 0xBE1) != '\0') {
         title = GetJobStr__8CMenuPcsFi(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), 1);
     }
-    if (title == 0) {
-        title = "";
-    }
 
     float textX = 264.0f - GetWidth__5CFontFPc(font, title);
 

@@ -870,7 +870,7 @@ int MusicStop(int musicId)
 			music->m_updateFlags = 0;
 			music->m_musicId = -1;
 			if (music->m_activeTrackCount != 0) {
-				RedVoiceDATA* seTrack = (RedVoiceDATA*)p_VoiceData;
+				RedVoiceDATA* seTrack = p_VoiceData;
 				do {
 					if ((seTrack->m_track >= music->m_tracks) &&
 					    (seTrack->m_track < music->m_tracks + music->m_trackCount)) {

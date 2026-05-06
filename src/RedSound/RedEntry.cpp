@@ -1241,12 +1241,13 @@ void CRedEntry::DisplaySePlayInfo()
 					unsigned int seDataNo = (unsigned int)track->m_seSepId;
 					int songNo = (int)(seDataNo & REDSOUND_SE_BLOCK_ENTRY_MASK) >> REDSOUND_SE_BLOCK_BANK_SHIFT;
 					RedSeBlockHEAD* seBlock = p_SeBlockData[songNo];
-					int seqBase = reinterpret_cast<int>(seBlock->m_entries);
-					int seqInfo = seqBase + seBlock->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE;
-					seqInfo += (*(unsigned int*)(seqBase + (seDataNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK) * REDSOUND_SE_BLOCK_ENTRY_SIZE) &
-					            REDSOUND_SE_BLOCK_ENTRY_MASK);
-					int waveNo = (reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoHi << 8) |
-					             reinterpret_cast<RedSeINFO*>(seqInfo)->m_waveNoLo;
+					int* entries = seBlock->m_entries;
+					RedSeINFO* seqInfo =
+					    reinterpret_cast<RedSeINFO*>(entries + seBlock->m_seCount);
+					seqInfo = reinterpret_cast<RedSeINFO*>(
+					    reinterpret_cast<int>(seqInfo) +
+					    (entries[seDataNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK] & REDSOUND_SE_BLOCK_ENTRY_MASK));
+					int waveNo = (seqInfo->m_waveNoHi << 8) | seqInfo->m_waveNoLo;
 					int trackIndex = track - *trackHead;
 
 					OSReport(s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2, sRedEntryLogPrefix,

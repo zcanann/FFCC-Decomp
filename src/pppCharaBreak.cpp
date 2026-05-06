@@ -38,8 +38,8 @@ extern int DAT_801dd684;
 extern int DAT_801dd688;
 extern int DAT_801dd68c;
 extern Vec kPppCharaBreakUpVector;
-extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
-                                                                        unsigned int materialIdx, int, int);
+extern "C" void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
+                                                                            unsigned int materialIdx, int, int);
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 static inline Mtx& CameraMatrix()
@@ -355,7 +355,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
             {
                 CharaBreakMeshData* meshData = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data;
 
-                if (strcmp(meshData->m_name, "") == 0) {
+                if (strcmp(meshData->m_name, "obj") == 0) {
                     CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
                         &gUtil,
                         &work->m_bboxMin,

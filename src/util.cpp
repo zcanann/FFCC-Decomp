@@ -12,6 +12,7 @@ extern const float kUtilQuadDepth;
 extern const float kUtilHermiteCoeff2;
 extern const float kUtilHermiteCoeff3;
 extern const float kUtilHermiteCoeffNeg2;
+static Vec s_zeroVector = {0.0f, 0.0f, 0.0f};
 
 static inline MtxPtr GetCameraMatrix()
 {

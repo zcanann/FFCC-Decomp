@@ -22,12 +22,12 @@ struct FloatValue {
 	float value;
 };
 
-extern const float FLOAT_80331BD0;
-extern const float FLOAT_80331BD4;
-extern const float FLOAT_80331BD8;
-extern const double DOUBLE_80331BE0;
-extern const FloatValue FLOAT_80331BE8;
-extern const char DAT_80331bf0[];
+const float FLOAT_80331BD0 = 1.0f;
+const float FLOAT_80331BD4 = 0.0f;
+const float FLOAT_80331BD8 = 3.1415927f;
+const double DOUBLE_80331BE0 = 4503601774854144.0;
+const FloatValue FLOAT_80331BE8 = {-1.0f};
+const char DAT_80331bf0[] = "GMGR";
 extern const float FLOAT_80331bf8;
 extern const float FLOAT_80331bfc;
 extern const double DOUBLE_80331C00;
@@ -631,12 +631,6 @@ void CGPrgObj::onCreate()
 	m_reqAnimId = -1;
 }
 
-extern const float FLOAT_80331BD0 = 1.0f;
-extern const float FLOAT_80331BD4 = 0.0f;
-extern const float FLOAT_80331BD8 = 3.1415927f;
-extern const double DOUBLE_80331BE0 = 4503601774854144.0;
-extern const FloatValue FLOAT_80331BE8 = {-1.0f};
-extern const char DAT_80331bf0[] = "GMGR";
 extern const float FLOAT_80331bf8 = 0.0f;
 extern const float FLOAT_80331bfc = 1.0f;
 extern const double DOUBLE_80331C00 = 4503599627370496.0;

@@ -1092,7 +1092,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
         }
     }
 
-    if (track->m_vibrateFunc != 0) {
+    if (voice->m_track->m_vibrateFunc != 0) {
         voice->m_pitchModDelay = track->m_vibrateDelay;
         pitchWork[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
         if ((track->m_vibrateRate >> REDSOUND_FIXED_SHIFT) != 0) {
@@ -1102,14 +1102,14 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
         if (track->m_vibrateDelayDepth == 0) {
             iVar5 = 0;
         } else {
-            iVar5 = track->m_vibrateDelayDepth * pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE;
+            iVar5 = track->m_vibrateDelayDepth * (pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE);
         }
         voice->m_pitchModFrames = iVar5;
         voice->m_pitchModFrame = 0;
         voice->m_pitchModPhase = 0;
     }
 
-    if (track->m_tremoloFunc != 0) {
+    if (voice->m_track->m_tremoloFunc != 0) {
         voice->m_volumeModDelay = track->m_tremoloDelay;
         pitchWork[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
         if ((track->m_tremoloRate >> REDSOUND_FIXED_SHIFT) != 0) {
@@ -1119,7 +1119,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
         if (track->m_tremoloDelayDepth == 0) {
             iVar5 = 0;
         } else {
-            iVar5 = track->m_tremoloDelayDepth * pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE;
+            iVar5 = track->m_tremoloDelayDepth * (pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE);
         }
         voice->m_volumeModFrames = iVar5;
         voice->m_volumeModFrame = 0;
@@ -1134,7 +1134,7 @@ skipModSetup:
         unsigned int random = GetRandomData();
         iVar5 = ((int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1) *
                 voice->m_pitch *
-                track->m_fuzzyPitchDepth;
+                voice->m_track->m_fuzzyPitchDepth;
         pitchWork[0] = iVar5 >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
         if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) == 0) {
             voice->m_randomPitch = pitchWork[0];

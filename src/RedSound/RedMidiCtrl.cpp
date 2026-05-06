@@ -721,12 +721,9 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
 
     for (scan = control->m_tracks; scan < track; scan++) {
         saveArea[slot] = (int)scan->m_command;
-        saveArea[slot + (REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET - REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET)] =
-            scan->m_deltaTime + deltaAdjust;
-        saveArea[slot + (REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET - REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET)] =
-            scan->m_flags;
-        saveArea[slot + (REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET - REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET)] =
-            *(int*)&scan->m_note;
+        saveArea[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT] = scan->m_deltaTime + deltaAdjust;
+        saveArea[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 2] = scan->m_flags;
+        saveArea[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 3] = *(int*)&scan->m_note;
         slot++;
     }
 
@@ -737,12 +734,9 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
         int delta = DeltaTimeSumup(&command);
 
         saveArea[slot] = (int)command;
-        saveArea[slot + (REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET - REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET)] =
-            scan->m_deltaTime + delta + deltaAdjust;
-        saveArea[slot + (REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET - REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET)] =
-            scan->m_flags;
-        saveArea[slot + (REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET - REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET)] =
-            *(int*)&scan->m_note;
+        saveArea[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT] = scan->m_deltaTime + delta + deltaAdjust;
+        saveArea[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 2] = scan->m_flags;
+        saveArea[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 3] = *(int*)&scan->m_note;
 
         if ((nextTrack - control->m_tracks) < control->m_trackCount) {
             for (; nextTrack < control->m_tracks + control->m_trackCount; nextTrack++) {
@@ -761,15 +755,9 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
                 }
 
                 saveArea[slot + 1] = (int)nextTrack->m_command;
-                saveArea[slot + 1 +
-                         (REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET - REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET)] =
-                    currentDelta;
-                saveArea[slot + 1 +
-                         (REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET - REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET)] =
-                    nextTrack->m_flags;
-                saveArea[slot + 1 +
-                         (REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET - REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET)] =
-                    *(int*)&nextTrack->m_note;
+                saveArea[slot + 1 + REDSOUND_MUSIC_TRACK_SAVE_COUNT] = currentDelta;
+                saveArea[slot + 1 + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 2] = nextTrack->m_flags;
+                saveArea[slot + 1 + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 3] = *(int*)&nextTrack->m_note;
                 slot++;
             }
         }

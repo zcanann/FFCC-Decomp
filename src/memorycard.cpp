@@ -2088,12 +2088,10 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
         if (*(int*)((char*)saveDat + 0x1A84) != 0)
         {
             short equippedItems[4];
-            int itemSlot = 0;
-            int accessoryCount = 0x49;
 
-            do
+            for (int itemSlot = 0; itemSlot < 0x49; itemSlot++)
             {
-                if (itemSlot > 0x44)
+                if (itemSlot >= 0x45)
                 {
                     int bitShift = itemSlot >> 0x1F;
                     if ((*(unsigned int*)((char*)saveDat + (itemSlot >> 5) * 4 + 0x158C) &
@@ -2107,13 +2105,10 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
                     }
                 }
 
-                itemSlot++;
-                accessoryCount--;
             }
-            while (accessoryCount != 0);
 
-            unsigned int totalHpBonus = 0;
-            int itemData = *reinterpret_cast<int*>((char*)&Game + 0xC5B8);
+            int totalHpBonus = 0;
+            int itemData = Game.unkCFlatData0[2];
 
             if (equippedItems[0] >= 0)
             {
@@ -2132,13 +2127,13 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
                 totalHpBonus += *(unsigned short*)(itemData + equippedItems[3] * 0x48 + 6);
             }
 
-            unsigned short finalHpMax = 0x10;
+            short finalHpMax = 0x10;
             if (totalHpBonus + 8 < 0x10)
             {
-                finalHpMax = (unsigned short)(totalHpBonus + 8);
+                finalHpMax = totalHpBonus + 8;
             }
 
-            *(unsigned short*)((char*)saveDat + 0x14D6) = finalHpMax;
+            *(short*)((char*)saveDat + 0x14D6) = finalHpMax;
         }
 
         charSlot++;

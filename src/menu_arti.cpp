@@ -445,7 +445,7 @@ void CMenuPcs::ArtiInit1()
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CMenuPcs::ArtiOpen()
+bool CMenuPcs::ArtiOpen()
 {
 	int finished;
 	int count;
@@ -637,7 +637,7 @@ void CMenuPcs::ArtiDraw()
 					fadeColors[3].g = 0xFF;
 					fadeColors[3].b = 0xFF;
 					fadeColors[3].a = 0;
-					float remainW = (48.0f / (float)*(int*)(entry + 0x14)) * w;
+					float remainW = (1.0f / (float)*(int*)(entry + 0x14)) * w;
 					DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
 						&MenuPcs, 0, x, y, remainW, h, u, v, fadeColors, 1.0f, 1.0f, 0.0f);
 				}
@@ -649,7 +649,7 @@ void CMenuPcs::ArtiDraw()
 					short itemCount = *(short*)(scriptFood + (drawIndex + *(short*)(GetArtiStateBase(this) + 0x34)) * 2 + 0x136);
 					if (itemCount < 1) {
 						tex = 0x34;
-						itemAlpha *= 0.5f;
+						itemAlpha = (float)(DOUBLE_80332fb8 * (double)itemAlpha);
 					}
 
 					if (tex == 0x37 && drawIndex == *(short*)(GetArtiStateBase(this) + 0x26)) {
@@ -663,7 +663,7 @@ void CMenuPcs::ArtiDraw()
 				color.r = 0xFF;
 				color.g = 0xFF;
 				color.b = 0xFF;
-				color.a = (u8)(255.0f * itemAlpha);
+				color.a = (u8)(FLOAT_80332fc0 * itemAlpha);
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				float uvScale = *(float*)(entry + 10);
 				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
@@ -709,8 +709,10 @@ void CMenuPcs::ArtiDraw()
 		}
 
 		listFont->GetWidth(text);
-		listFont->SetPosX((float)(textEntry[0] + 0x1c));
-		listFont->SetPosY((float)(textEntry[1] + 0xb) - 5.0f);
+		float posX = (float)(textEntry[0] + 0x1c);
+		float posY = (float)(textEntry[1] + 0xb);
+		listFont->SetPosX(posX);
+		listFont->SetPosY(posY - FLOAT_80332fc8);
 		listFont->Draw(text);
 		textEntry += 0x20;
 	}
@@ -721,7 +723,7 @@ void CMenuPcs::ArtiDraw()
 	for (int i = 0; i < 8; i++) {
 		short itemCount = *(short*)(scriptFood + (i + *(short*)(GetArtiStateBase(this) + 0x34)) * 2 + 0x136);
 		if (itemCount > 0) {
-			int iconY = (int)((float)iconEntry[1] + 6.0f - 1.0f);
+			int iconY = (int)((float)(iconEntry[1] + 6) - FLOAT_80332fac);
 			int iconX = (int)((float)(iconEntry[0] + iconEntry[2] - 0x10));
 			DrawSingleIcon__8CMenuPcsFiiifif(this, itemCount, iconX, iconY, *(float*)(iconEntry + 8), 0, 0.0f);
 		}
@@ -747,9 +749,9 @@ void CMenuPcs::ArtiDraw()
 		}
 
 		cursorBase += *(short*)(GetArtiStateBase(this) + 0x26) * 0x20;
-		int cursorY = (int)(((float)(cursorBase[3] - 0x20) * 0.5f) + (float)cursorBase[1]);
-		int cursorX = (int)((float)(cursorBase[0] - 0x14) + (float)(System.m_frameCounter & 7));
-		DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, 1.0f);
+		int cursorY = (int)(float)((double)(cursorBase[3] - 0x20) * DOUBLE_80332fb8 + (double)cursorBase[1]);
+		int cursorX = (int)((float)(cursorBase[0] - 0x14) + (float)(System.m_frameCounter % 8));
+		DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, FLOAT_80332fac);
 	}
 
 	CFont* helpFont = GetArtiHelpFont(this);
@@ -763,13 +765,13 @@ void CMenuPcs::ArtiDraw()
 		GXColor color;
 		__ct__6CColorFUcUcUcUc(&color, 0xFF, 0xFF, 0xFF, helpAlpha);
 		int x = (int)CalcCenteringPos__8CMenuPcsFPcP5CFont(this, text, helpFont);
-		DrawFont__8CMenuPcsFii8_GXColoriPcff(this, x, (int)FLOAT_80332fcc, color, 10, text, 1.0f, 3.0f);
+		DrawFont__8CMenuPcsFii8_GXColoriPcff(this, x, (int)FLOAT_80332fcc, color, 10, text, FLOAT_80332fac, FLOAT_80332fd0);
 	} else {
 		GXColor helpColor;
 		__ct__6CColorFUcUcUcUc(&helpColor, 0xFF, 0xFF, 0xFF, helpAlpha);
 		int x = (int)-(helpWidth * FLOAT_80332fd8 - FLOAT_80332fd4);
 		DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
-			this, selectedArtifactId, helpFont, x, (int)FLOAT_80332fcc, helpColor, 10, 1.0f, 3.0f);
+			this, selectedArtifactId, helpFont, x, (int)FLOAT_80332fcc, helpColor, 10, FLOAT_80332fac, FLOAT_80332fd0);
 	}
 }
 

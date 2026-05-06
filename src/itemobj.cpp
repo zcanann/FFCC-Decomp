@@ -354,19 +354,19 @@ void CGItemObj::onFrame()
 			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
 
 			int soundEntry = *(int*)(*(int*)(*(int*)SoundBuffer_1260_ + 0xF8) + 0x178);
-			if (soundEntry == 0) {
-				soundEntry = -1;
-			} else {
+			if (soundEntry != 0) {
 				soundEntry = *(int*)(soundEntry + 0x14);
+			} else {
+				soundEntry = -1;
 			}
 
-			unsigned char* itemRow =
-			    reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + m_worldParamB * 0x48);
-			double particleValue = (double)*reinterpret_cast<unsigned short*>(itemRow + 0x10);
+			unsigned char* itemTable = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]);
+			int itemRowOffset = m_worldParamB * 0x48;
+			double particleValue = (double)*reinterpret_cast<unsigned short*>(itemTable + itemRowOffset + 0x10);
+			int ownerScriptSlot = *(int*)(*(int*)(*(int*)(self + 0x550) + 0x58) + 0x3B4);
 			float particleScale = FLOAT_80331b50 * (float)particleValue + FLOAT_80331b4c;
 			putParticle__8CGPrgObjFiiP8CGObjectfi(
-			    this, (soundEntry << 8) | *(int*)(*(int*)(*(int*)(self + 0x550) + 0x58) + 0x3B4),
-			    m_particleSlot, this, particleScale, 0x12909);
+			    this, (soundEntry << 8) | ownerScriptSlot, m_particleSlot, this, particleScale, 0x12909);
 
 			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			SetDamageCol__8CGObjectFiPcffP3Vec(

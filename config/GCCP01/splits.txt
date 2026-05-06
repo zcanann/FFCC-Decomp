@@ -148,7 +148,6 @@ maphit.cpp:
 	.rodata     start:0x801D7088 end:0x801D7094
 	.bss        start:0x80245640 end:0x802456F0
 	.sbss       start:0x8032EC80 end:0x8032ECA0
-	.sbss2      start:0x80333DE0 end:0x80333DE8
 
 mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8
@@ -200,7 +199,6 @@ p_camera.cpp:
 	.data       start:0x801E9030 end:0x801E9B24
 	.bss        start:0x80268790 end:0x80268C70
 	.sbss       start:0x8032ECE0 end:0x8032ECE1
-	.sbss2      start:0x80333DE8 end:0x80333DEC
 
 textureman.cpp:
 	extab       start:0x80006414 end:0x80006534
@@ -980,7 +978,6 @@ p_menu.cpp:
 	.data       start:0x8020EDF8 end:0x8020F2F8
 	.bss        start:0x802EA1A0 end:0x802EAA60
 	.sdata2     start:0x80330714 end:0x80330870
-	.sbss2      start:0x80333DEC end:0x80333DF0
 
 p_gba.cpp:
 	extab       start:0x80007CE0 end:0x80007D20
@@ -1035,6 +1032,7 @@ pppYmMelt.cpp:
 	.text       start:0x800A538C end:0x800A5FCC
 	.rodata     start:0x801DA048 end:0x801DA058
 	.sdata2     start:0x80330AF8 end:0x80330B08
+	.sbss2      start:0x80333DE0 end:0x80333DE4
 
 pppYmCallBack.cpp:
 	extab       start:0x80007FE8 end:0x80007FF0
@@ -1204,7 +1202,6 @@ pppYmMana.cpp:
 	extabindex  start:0x8000F574 end:0x8000F628
 	.text       start:0x800D4C7C end:0x800D8710
 	.rodata     start:0x801DB4D8 end:0x801DB4E8
-	.sbss2      start:0x80333DF0 end:0x80333DF4
 
 p_sound.cpp:
 	extab       start:0x80008B94 end:0x80008BBC
@@ -1314,6 +1311,7 @@ chara_fur.cpp:
 	.rodata     start:0x801DB72C end:0x801DB740
 	.bss        start:0x802FF3D8 end:0x802FF408
 	.sdata2     start:0x80331060 end:0x803310C0
+	.sbss2      start:0x80333DE8 end:0x80333DF8
 
 pppYmEnv.cpp:
 	extab       start:0x80008D84 end:0x80008DB4
@@ -1321,7 +1319,6 @@ pppYmEnv.cpp:
 	.text       start:0x800E46DC end:0x800E6060
 	.rodata     start:0x801DB750 end:0x801DB7E8
 	.sdata2     start:0x803310C0 end:0x8033111C
-	.sbss2      start:0x80333DF4 end:0x80333DF8
 
 pppEmission.cpp:
 	extab       start:0x80008DB4 end:0x80008DE4
@@ -1340,7 +1337,6 @@ wm_menu.cpp:
 	.sdata      start:0x8032E8A8 end:0x8032E920
 	.sbss       start:0x8032EE1C end:0x8032EE34
 	.sdata2     start:0x80331134 end:0x803311BC
-	.sbss2      start:0x80333DF8 end:0x80333E00
 
 gxfunc.cpp:
 	extab       start:0x80009024 end:0x8000907C
@@ -1355,6 +1351,7 @@ pppYmTracer2.cpp:
 	.text       start:0x801035DC end:0x80103EC0
 	.rodata     start:0x801DC4B8 end:0x801DC4D0
 	.sdata2     start:0x80331848 end:0x80331870
+	.sbss2      start:0x80333DF8 end:0x80333E00
 
 pppEraseCharaParts.cpp:
 	extab       start:0x80009094 end:0x800090B4
@@ -1616,6 +1613,7 @@ shopmenu.cpp:
 	.data       start:0x80214D90 end:0x80214FE0
 	.sbss       start:0x8032EED0 end:0x8032EED4
 	.sdata2     start:0x80333338 end:0x80333388
+	.sbss2      start:0x80333E00 end:0x80333E04
 
 menu_item.cpp:
 	extab       start:0x80009E54 end:0x80009E8C

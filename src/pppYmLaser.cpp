@@ -377,6 +377,10 @@ extern const f32 FLOAT_80330de4 = 1.2f;
 extern const f32 FLOAT_80330de8 = 10000000000.0f;
 extern const f32 FLOAT_80330dec = -10000000000.0f;
 extern const f32 FLOAT_80330df0[2] = {6.2831855f, 0.0f};
+extern const f32 FLOAT_80330df8 = 2.0f;
+extern const f32 FLOAT_80330dfc = 0.5f;
+extern const f32 FLOAT_80330e00 = 0.25f;
+extern "C" const f64 DOUBLE_80330E08 = 4503601774854144.0;
 
 /*
  * --INFO--

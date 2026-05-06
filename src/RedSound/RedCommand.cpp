@@ -115,12 +115,12 @@ static int _EraseTime(int eraseTrack)
 	}
 
 	track = *trackBasePtr;
-	int maxWait = 0;
+	minTrack = 0;
 	int sepId = 0;
 	do {
 		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
-		    (track->m_playTime > maxWait)) {
-			maxWait = track->m_playTime;
+		    (track->m_playTime > minTrack)) {
+			minTrack = track->m_playTime;
 			sepId = track->m_seSepId;
 		}
 		track++;
@@ -130,7 +130,7 @@ static int _EraseTime(int eraseTrack)
 	int erasedCount = 0;
 	do {
 		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
-		    (track->m_playTime == maxWait)) {
+		    (track->m_playTime == minTrack)) {
 			int trackNo;
 
 			KeyOnReserveClear((RedKeyOnDATA*)p_KeyOnData, track);

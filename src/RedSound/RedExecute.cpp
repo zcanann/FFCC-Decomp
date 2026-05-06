@@ -1618,16 +1618,16 @@ void EnvelopeKeyExecute()
             voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] = 0;
             int voice = voiceData[REDSOUND_VOICE_AX_VOICE_WORD];
             if (voice != 0) {
-                if (((AXVPB*)voice)->pb.state == 0) {
+                if (((AXVPB*)voice)->pb.state != 0) {
+                    ((AXVPB*)voice)->pb.state = 0;
+                    ((AXVPB*)voice)->pb.ve.currentVolume = 0;
+                    ((AXVPB*)voice)->sync |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
+                } else {
                     if (((AXVPB*)voice)->priority != 0) {
                         AXFreeVoice((AXVPB*)voice);
                     }
                     voiceData[REDSOUND_VOICE_AX_VOICE_WORD] = 0;
                     voiceData[REDSOUND_VOICE_TRACK_WORD] = 0;
-                } else {
-                    ((AXVPB*)voice)->pb.state = 0;
-                    ((AXVPB*)voice)->pb.ve.currentVolume = 0;
-                    ((AXVPB*)voice)->sync |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
                 }
             }
         }

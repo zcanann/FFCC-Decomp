@@ -154,10 +154,8 @@ int checkThread(void*)
  */
 void CGraphic::Init()
 {
-    CMemory::CStage* stageMain = Memory.CreateStage(0x19C000, const_cast<char*>(s_CGraphic_801d6330), 0);
-    CMemory::CStage* stageTemp = Memory.CreateStage(0xD6000, const_cast<char*>(sGraphicMemoryStageName), 0);
-    PtrAt(this, 0x4) = stageMain;
-    PtrAt(this, 0x8) = stageTemp;
+    PtrAt(this, 0x4) = Memory.CreateStage(0x19C000, const_cast<char*>(s_CGraphic_801d6330), 0);
+    PtrAt(this, 0x8) = Memory.CreateStage(0xD6000, const_cast<char*>(sGraphicMemoryStageName), 0);
 
     S32At(this, 0x14) = 0;
     U8At(this, 0x7200) = 0;
@@ -165,8 +163,8 @@ void CGraphic::Init()
     U8At(this, 0x7202) = 0;
     U8At(this, 0x7203) = 0;
 
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204) = 0.0f;
     *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208) = 0.0f;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204) = 0.0f;
 
     U8At(this, 0x735F) = U8At(this, 0x7200);
     U8At(this, 0x7360) = U8At(this, 0x7201);
@@ -1120,8 +1118,8 @@ void CGraphic::makeSphere()
     for (int ring = 0; ring < 5; ring++) {
         int base = ringStart * 3;
         for (int pair = 0; pair < 4; pair++) {
-            int next0 = ringStart + ((pair * 2 + 1) & 7);
-            int next1 = ringStart + ((pair * 2 + 2) & 7);
+            int next0 = ringStart + ((pair * 2 + 1) % 8);
+            int next1 = ringStart + ((pair * 2 + 2) % 8);
             int nextBase = base + 3;
 
             GXWGFifo.f32 = vertices[base + 1];
@@ -1150,30 +1148,27 @@ void CGraphic::makeSphere()
         int ringPairBase = 1;
         for (int ringPair = 0; ringPair < 3; ringPair++) {
             int idx0 = ringOffset == 0 ? 0 : (ringOffset - 1) * 8 + seg + 1;
-            int idx1 = ringOffset * 8 + seg + 1;
+            GXWGFifo.f32 = vertices[idx0 * 3 + 1];
+            GXWGFifo.f32 = vertices[idx0 * 3 + 0];
+            GXWGFifo.f32 = vertices[idx0 * 3 + 2];
 
             int idx2 = 0x29;
             if (ringOffset != 5) {
                 idx2 = seg + ringPairBase;
             }
+            GXWGFifo.f32 = vertices[idx2 * 3 + 1];
+            GXWGFifo.f32 = vertices[idx2 * 3 + 0];
+            GXWGFifo.f32 = vertices[idx2 * 3 + 2];
+
+            int idx1 = ringOffset * 8 + seg + 1;
+            GXWGFifo.f32 = vertices[idx1 * 3 + 1];
+            GXWGFifo.f32 = vertices[idx1 * 3 + 0];
+            GXWGFifo.f32 = vertices[idx1 * 3 + 2];
 
             int idx3 = 0x29;
             if (ringOffset != 4) {
                 idx3 = seg + ringPairBase + 8;
             }
-
-            GXWGFifo.f32 = vertices[idx0 * 3 + 1];
-            GXWGFifo.f32 = vertices[idx0 * 3 + 0];
-            GXWGFifo.f32 = vertices[idx0 * 3 + 2];
-
-            GXWGFifo.f32 = vertices[idx2 * 3 + 1];
-            GXWGFifo.f32 = vertices[idx2 * 3 + 0];
-            GXWGFifo.f32 = vertices[idx2 * 3 + 2];
-
-            GXWGFifo.f32 = vertices[idx1 * 3 + 1];
-            GXWGFifo.f32 = vertices[idx1 * 3 + 0];
-            GXWGFifo.f32 = vertices[idx1 * 3 + 2];
-
             GXWGFifo.f32 = vertices[idx3 * 3 + 1];
             GXWGFifo.f32 = vertices[idx3 * 3 + 0];
             GXWGFifo.f32 = vertices[idx3 * 3 + 2];
@@ -1376,10 +1371,10 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
     }
 
     if (xEnd < 0) {
-        return;
+        return 0;
     }
     if (yEnd < 0) {
-        return;
+        return 0;
     }
 
     void* renderMode = PtrAt(this, 0x71E0);
@@ -1445,46 +1440,55 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
 void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int y, int width, int height, int dstOffset,
                                   _GXTexFilter filter, _GXTexFmt format, int doClear)
 {
-    int xEnd = x + width;
-    int yEnd = y + height;
-    if ((xEnd >= 0) && (yEnd >= 0) && (x <= U16At(PtrAt(this, 0x71E0), 4)) &&
-        ((yEnd >= 0) && (y <= U16At(PtrAt(this, 0x71E0), 6))) &&
-        ((width > 0) && ((height > 0) && (xEnd != x))) && (yEnd != y)) {
-        int textureSize = GXGetTexBufferSize(width & 0xFFFF, height & 0xFFFF, format, GX_FALSE, GX_FALSE);
+    int copyX = x;
+    int copyY = y;
+    int copyWidth = width;
+    int copyHeight = height;
+    _GXTexFmt copyFormat = format;
+    _GXTexFilter copyFilter = filter;
+    int copyClear = doClear;
+    int xEnd = copyX + copyWidth;
+    int yEnd = copyY + copyHeight;
+    if ((xEnd >= 0) && (yEnd >= 0) && (copyX <= U16At(PtrAt(this, 0x71E0), 4)) &&
+        ((yEnd >= 0) && (copyY <= U16At(PtrAt(this, 0x71E0), 6))) &&
+        ((copyWidth > 0) && ((copyHeight > 0) && (xEnd != copyX))) && (yEnd != copyY)) {
+        int textureSize = GXGetTexBufferSize(copyWidth & 0xFFFF, copyHeight & 0xFFFF, copyFormat, GX_FALSE, GX_FALSE);
         void* textureBase =
             reinterpret_cast<void*>((reinterpret_cast<u32>(dstBuffer) + ((dstOffset + 0x1F) & 0xFFFFFFE0) + 0x1F) &
                                     0xFFFFFFE0);
 
-        GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
-        GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, format, GX_FALSE);
+        GXSetTexCopySrc(copyX & 0xFFFF, copyY & 0xFFFF, copyWidth & 0xFFFF, copyHeight & 0xFFFF);
+        GXSetTexCopyDst(copyWidth & 0xFFFF, copyHeight & 0xFFFF, copyFormat, GX_FALSE);
         DCInvalidateRange(textureBase, textureSize);
-        GXCopyTex(textureBase, doClear);
+        GXCopyTex(textureBase, copyClear);
         GXPixModeSync();
         GXInvalidateTexAll();
 
-        switch (format) {
+        switch (copyFormat) {
         case GX_CTF_R4:
         case GX_CTF_RA4:
-            format = GX_TF_I4;
+            copyFormat = GX_TF_I4;
             break;
         case GX_CTF_RA8:
         case GX_CTF_A8:
         case GX_CTF_R8:
         case GX_CTF_G8:
         case GX_CTF_B8:
-            format = GX_TF_I8;
+            copyFormat = GX_TF_I8;
             break;
         case GX_CTF_RG8:
         case GX_CTF_GB8:
-            format = GX_TF_IA8;
+            copyFormat = GX_TF_IA8;
             break;
         default:
             break;
         }
 
         if (texObj != nullptr) {
-            GXInitTexObj(texObj, textureBase, width & 0xFFFF, height & 0xFFFF, format, GX_CLAMP, GX_CLAMP, GX_FALSE);
-            GXInitTexObjLOD(texObj, filter, filter, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE,
+            GXInitTexObj(texObj, textureBase, copyWidth & 0xFFFF, copyHeight & 0xFFFF, copyFormat, GX_CLAMP, GX_CLAMP,
+                         GX_FALSE);
+            float zero = LoadFloat(kGraphicZeroF);
+            GXInitTexObjLOD(texObj, copyFilter, copyFilter, zero, zero, zero, GX_FALSE, GX_FALSE,
                             GX_ANISO_1);
         }
     }

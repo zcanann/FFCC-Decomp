@@ -823,9 +823,9 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
                 envelopeMul = envelopeMul + 1;
             }
 
+            modVolume = voiceMix * envelopeMul >> 8;
             iVar1 = voice->m_track->m_tremoloFunc((unsigned int)voice->m_volumeModPhase >> REDSOUND_FIXED_SHIFT);
-            modVolume = (voiceMix * envelopeMul >> 8) * (iVar1 >> REDSOUND_VOLUME_MOD_WAVE_SHIFT) >>
-                        REDSOUND_FIXED_SHIFT;
+            modVolume = modVolume * (iVar1 >> REDSOUND_VOLUME_MOD_WAVE_SHIFT) >> REDSOUND_FIXED_SHIFT;
 
             if (voice->m_volumeModFrames != 0) {
                 iVar1 = voice->m_volumeModFrame;

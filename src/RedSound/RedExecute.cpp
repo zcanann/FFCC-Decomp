@@ -184,8 +184,6 @@ enum RedExecuteAxVoiceLayout {
     REDSOUND_AX_VOICE_MIX_OFFSET = 0x14A,
     REDSOUND_AX_VOICE_VOLUME_OFFSET = 0x19C,
     REDSOUND_AX_VOICE_VOLUME_DELTA_OFFSET = 0x19E,
-    REDSOUND_AX_VOICE_RATIO_HIGH_OFFSET = 0x1DE,
-    REDSOUND_AX_VOICE_RATIO_LOW_OFFSET = 0x1E0,
     REDSOUND_AX_MIX_CTRL_DRY_STEREO = 0x3,
     REDSOUND_AX_MIX_CTRL_AUX_A_STEREO = 0x30,
     REDSOUND_AX_MIX_CTRL_AUX_B_STEREO = 0x600,
@@ -1525,8 +1523,8 @@ void EnvelopeKeyExecute()
             if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_PITCH_DIRTY) != 0) {
                 int pitch = voiceData[REDSOUND_VOICE_TARGET_PITCH_WORD];
                 voiceFlags = AX_SYNC_FLAG_COPYRATIO;
-                *(u16*)(voice + REDSOUND_AX_VOICE_RATIO_HIGH_OFFSET) = (u16)(((u32)pitch >> 0x10) & 3);
-                *(s16*)(voice + REDSOUND_AX_VOICE_RATIO_LOW_OFFSET) = (s16)pitch;
+                ((AXVPB*)voice)->pb.src.ratioHi = (u16)(((u32)pitch >> 0x10) & 3);
+                ((AXVPB*)voice)->pb.src.ratioLo = (u16)pitch;
             }
 
             if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_ADPCM_DIRTY) != 0) {

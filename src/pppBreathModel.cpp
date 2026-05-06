@@ -768,10 +768,10 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
         groupData = groupTable;
         for (i = 0; i < (int)params->m_groupCount; i++) {
             if ((groupData->active != 1) && (*groupData->particleIndices != -1) && (*groupData->particleStates == 1)) {
+                groupData->speed = params->m_groupSpeed;
                 unitVelocity.x = 0.0f;
                 unitVelocity.y = 0.0f;
                 unitVelocity.z = -1.0f;
-                groupData->speed = params->m_groupSpeed;
                 pppCopyVector(groupData->direction, unitVelocity);
                 groupData->position.z = 0.0f;
                 groupData->position.y = 0.0f;

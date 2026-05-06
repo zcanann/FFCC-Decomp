@@ -127,7 +127,7 @@ char gCharaViewerSpinnerTextInitialized;
 int gCharaViewerSpinnerFrame;
 char gCharaViewerSpinnerFrameInitialized;
 int gCharaViewerSrtNeedsInit;
-char gCharaViewerSrtInitialized;
+char gCharaViewerSrtInitialized[8];
 }
 
 static inline void destroyRef(int* ref)
@@ -155,27 +155,6 @@ static inline void AddSharedRef(T* ptr)
 {
     if (ptr != 0) {
         int* ref = reinterpret_cast<int*>(ptr);
-        ref[1] = ref[1] + 1;
-    }
-}
-
-static void releaseRef(unsigned char* p, int offset)
-{
-    int* ref = *(int**)(p + offset);
-    if (ref != 0) {
-        int count = ref[1];
-        ref[1] = count - 1;
-        if ((count - 1 == 0) && (ref != 0)) {
-            destroyRef(ref);
-        }
-        *(void**)(p + offset) = 0;
-    }
-}
-
-static void addRef(unsigned char* p, int offset)
-{
-    int* ref = *(int**)(p + offset);
-    if (ref != 0) {
         ref[1] = ref[1] + 1;
     }
 }
@@ -247,9 +226,6 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
 
     if ((self->m_viewerBackTextureSet != 0) &&
         (reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8)->GetSize() != 0)) {
-        CTexture* texture =
-            (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8))[0];
-
         C_MTXOrtho(projMtx, kCharaViewerZero, FLOAT_80330BEC, kCharaViewerZero, FLOAT_80330BF0, kCharaViewerZero,
                    FLOAT_80330BF4);
         GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
@@ -265,6 +241,8 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
         PSMTXIdentity(cameraMtx);
         GXLoadPosMtxImm(cameraMtx, 0);
         GXSetCullMode(GX_CULL_NONE);
+        CTexture* texture =
+            (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8))[0];
         TextureMan.SetTexture(GX_TEXMAP0, texture);
         PSMTXScale(texMtx, FLOAT_80330BF8 / static_cast<float>(texture->m_width),
                    FLOAT_80330BF8 / static_cast<float>(texture->m_height), FLOAT_80330BF8);
@@ -659,9 +637,9 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
             }
         }
 
-        if (gCharaViewerSrtInitialized == 0) {
+        if (gCharaViewerSrtInitialized[0] == 0) {
             gCharaViewerSrtNeedsInit = 1;
-            gCharaViewerSrtInitialized = 1;
+            gCharaViewerSrtInitialized[0] = 1;
         }
         if (gCharaViewerSrtNeedsInit != 0) {
             gCharaViewerSrt.transZ = kCharaViewerZero;
@@ -766,7 +744,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     p[0xE9] = 0x3F;
     p[0xEA] = 0x3F;
     p[0xEB] = 0xFF;
-    unsigned char c = (unsigned char)(-((__cntlzw(0) >> 5) & 1) & 0x3F);
+    unsigned char c = (unsigned char)(0x3F & -((__cntlzw(0) >> 5) & 1));
     p[0xF0] = c;
     p[0xF1] = c;
     p[0xF2] = c;
@@ -775,7 +753,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(float*)(p + 0x10C) = kCharaViewerZero;
     *(float*)(p + 0x110) = kCharaViewerFineStep;
 
-    c = (unsigned char)(-((__cntlzw(1) >> 5) & 1) & 0x3F);
+    c = (unsigned char)(0x3F & -((__cntlzw(1) >> 5) & 1));
     p[0xF4] = c;
     p[0xF5] = c;
     p[0xF6] = c;
@@ -784,7 +762,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(float*)(p + 0x118) = kCharaViewerZero;
     *(float*)(p + 0x11C) = kCharaViewerFineStep;
 
-    c = (unsigned char)(-((__cntlzw(2) >> 5) & 1) & 0x3F);
+    c = (unsigned char)(0x3F & -((__cntlzw(2) >> 5) & 1));
     p[0xF8] = c;
     p[0xF9] = c;
     p[0xFA] = c;
@@ -798,10 +776,10 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
             reinterpret_cast<unsigned char*>(__ct__6CColorFUcUcUcUc(&white, 0xFF, 0xFF, 0xFF, 0xFF));
         __ct__6CColorFv(&colorTmp);
         x = i ^ 0x80000000;
+        float scale = static_cast<float>(static_cast<double>(x) - kCharaViewerColorCenterBias) * kCharaViewerLerpScale;
         for (int c = 0; c < 4; c++) {
-            double v = (double)(float)(((double)(unsigned int)whiteChannels[c] - kCharaViewerColorWhiteBias) *
-                                        ((float)((double)x - kCharaViewerColorCenterBias) * kCharaViewerLerpScale));
-            reinterpret_cast<unsigned char*>(&colorTmp)[c] = (unsigned char)(int)v;
+            float channel = static_cast<float>(static_cast<double>(whiteChannels[c]) - kCharaViewerColorWhiteBias);
+            reinterpret_cast<unsigned char*>(&colorTmp)[c] = static_cast<unsigned char>(static_cast<int>(channel * scale));
         }
         __ct__6CColorFR6CColor(&colorCopy, &colorTmp);
         p[0x12C + i * 4 + 0] = reinterpret_cast<unsigned char*>(&colorCopy)[0];

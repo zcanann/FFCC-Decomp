@@ -6,9 +6,6 @@
 #include "string.h"
 #include "types.h"
 
-extern "C" void* __vt__8CManager[];
-extern "C" void* __vt__8CProcess[];
-extern "C" void* __vt__7CUSBPcs[];
 extern const char lbl_801DA074[];
 int s_usbReadPollFrameCounter;
 char s_usbReadPollInitialized;
@@ -23,15 +20,15 @@ unsigned int m_table_desc2__7CUSBPcs[] = {0, 0xFFFFFFFF, reinterpret_cast<unsign
 CUSBPcsTable m_table__7CUSBPcs = {
     const_cast<char*>(s_CUSBPcs_8032f810),
     {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        m_table_desc0__7CUSBPcs[0],
+        m_table_desc0__7CUSBPcs[1],
+        m_table_desc0__7CUSBPcs[2],
+        m_table_desc1__7CUSBPcs[0],
+        m_table_desc1__7CUSBPcs[1],
+        m_table_desc1__7CUSBPcs[2],
+        m_table_desc2__7CUSBPcs[0],
+        m_table_desc2__7CUSBPcs[1],
+        m_table_desc2__7CUSBPcs[2],
         0x12,
     },
 };
@@ -60,7 +57,6 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
     unsigned int count;
     int result;
-    unsigned int* ptr;
     int connected;
     unsigned int* dstBuffer;
     CMemory::CStage* stage;
@@ -70,10 +66,12 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     value = (count + 0x5F) & ~0x1F;
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-    ptr = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
+    void* packet = __nwa__FUlPQ27CMemory6CStagePci(
         value, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x1ca);
-    ptr[1] = value;
-    ptr[0] = 4;
+    unsigned int* header = (unsigned int*)packet;
+    header[1] = value;
+    *header = 4;
+    unsigned int* ptr = header;
     ptr[9] = Swap32((unsigned int)code);
     ptr[10] = Swap32((unsigned int)elemCount);
     ptr[12] = Swap32(count);
@@ -273,38 +271,6 @@ void CUSBPcs::Init()
 	m_unk0x108 = 0;
 
 	USB.Connect();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800203e4
- * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_usb_cpp(void)
-{
-    unsigned char* self = reinterpret_cast<unsigned char*>(&USBPcs);
-    unsigned int* dst = reinterpret_cast<unsigned int*>(&m_table__7CUSBPcs);
-    unsigned int* desc0 = m_table_desc0__7CUSBPcs;
-    unsigned int* desc1 = m_table_desc1__7CUSBPcs;
-    unsigned int* desc2 = m_table_desc2__7CUSBPcs;
-
-    *reinterpret_cast<void**>(self) = __vt__8CManager;
-    *reinterpret_cast<void**>(self) = __vt__8CProcess;
-    *reinterpret_cast<void**>(self) = __vt__7CUSBPcs;
-
-    dst[1] = desc0[0];
-    dst[2] = desc0[1];
-    dst[3] = desc0[2];
-    dst[4] = desc1[0];
-    dst[5] = desc1[1];
-    dst[6] = desc1[2];
-    dst[7] = desc2[0];
-    dst[8] = desc2[1];
-    dst[9] = desc2[2];
 }
 
 CUSBPcs USBPcs;

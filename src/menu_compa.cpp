@@ -78,20 +78,20 @@ void CMenuPcs::CompaDraw()
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
 	unsigned int scriptFood = Game.m_scriptFoodBase[0];
-	short* compaList = reinterpret_cast<short*>(this->compaList);
-	short* entry = reinterpret_cast<short*>((int)compaList + 8);
-	int count = *compaList;
+	CompaOpenAnimList* compaList = this->compaList;
+	CompaOpenAnim* entry = compaList->entries;
+	int count = compaList->count;
 	for (int i = 0; i < count; i++) {
-		int tex = *reinterpret_cast<int*>(entry + 0xE);
+		int tex = entry->tex;
 		if (tex >= 0) {
-			float x = static_cast<float>(entry[0]);
-			float y = static_cast<float>(entry[1]);
-			float w = static_cast<float>(entry[2]);
-			float h = static_cast<float>(entry[3]);
-			float u = *reinterpret_cast<float*>(entry + 4);
-			float v = *reinterpret_cast<float*>(entry + 6);
-			float alpha = *reinterpret_cast<float*>(entry + 8);
-			float uvScale = *reinterpret_cast<float*>(entry + 10);
+			float x = static_cast<float>(entry->x);
+			float y = static_cast<float>(entry->y);
+			float w = static_cast<float>(entry->w);
+			float h = static_cast<float>(entry->h);
+			float u = entry->u;
+			float v = entry->v;
+			float alpha = entry->alpha;
+			float uvScale = entry->uvScale;
 
 			if (i < 3) {
 				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 1);
@@ -116,14 +116,14 @@ void CMenuPcs::CompaDraw()
 								tileH = 0x18;
 							}
 							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-								&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, static_cast<float>(yStep),
+								&MenuPcs, static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								fillW, static_cast<float>(tileH), u, v,
 								colors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 							yStep += 0x18;
 						}
 					} else {
 						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-							&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, fillW, h, u, v,
+							&MenuPcs, static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v,
 							colors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 					}
 
@@ -138,7 +138,7 @@ void CMenuPcs::CompaDraw()
 						{0xFF, 0xFF, 0xFF, 0x00},
 						{0xFF, 0xFF, 0xFF, 0x00},
 					};
-					float remainW = (static_cast<float>(DOUBLE_80333008) / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14))) * w;
+					float remainW = (static_cast<float>(DOUBLE_80333008) / static_cast<float>(entry->duration)) * w;
 					if (tex == 0x51) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
@@ -148,14 +148,14 @@ void CMenuPcs::CompaDraw()
 								tileH = 0x18;
 							}
 							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-								&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, static_cast<float>(yStep),
+								&MenuPcs, static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								remainW, static_cast<float>(tileH), u, v,
 								fadeColors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 							yStep += 0x18;
 						}
 					} else {
 						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-							&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, remainW, h, u, v,
+							&MenuPcs, static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,
 							fadeColors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 					}
 				}
@@ -169,11 +169,10 @@ void CMenuPcs::CompaDraw()
 			}
 		}
 
-		entry += 0x20;
+		entry++;
 	}
 
-	int menuData = (int)compaList;
-	float globalAlpha = *reinterpret_cast<float*>(menuData + 0x18);
+	float globalAlpha = compaList->entries[0].alpha;
 
 	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(globalAlpha * FLOAT_80333010)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
@@ -195,8 +194,8 @@ void CMenuPcs::CompaDraw()
 	for (int i = 0; i < familyCount; i++) {
 		DrawRect__8CMenuPcsFUlfffffffff(
 			&MenuPcs, 0,
-			static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x10),
-			static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x40 + i * 0x28),
+			static_cast<float>(compaList->entries[0].x + 0x10),
+			static_cast<float>(compaList->entries[0].y + 0x40 + i * 0x28),
 			FLOAT_80333014, FLOAT_80333018, FLOAT_80332FF8, FLOAT_80332FF8, FLOAT_80333000,
 			FLOAT_80333000, FLOAT_80332FF8);
 	}
@@ -232,8 +231,8 @@ void CMenuPcs::CompaDraw()
 
 		DrawSingleIcon__8CMenuPcsFiiifif(
 			this, icon,
-			static_cast<int>(*reinterpret_cast<short*>(menuData + 8) + 0x128),
-			static_cast<int>(*reinterpret_cast<short*>(menuData + 0xA) + 0x40 + shown * 0x28),
+			static_cast<int>(compaList->entries[0].x + 0x128),
+			static_cast<int>(compaList->entries[0].y + 0x40 + shown * 0x28),
 			globalAlpha, 1, FLOAT_80333000);
 
 		shown++;
@@ -265,14 +264,14 @@ void CMenuPcs::CompaDraw()
 		}
 
 		const char* name = GetMenuStr__8CMenuPcsFi(this, drawIndex + 0x16);
-		float y = static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x45 + shown * 0x28) - FLOAT_80333020;
-		font->SetPosX(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x18));
+		float y = static_cast<float>(compaList->entries[0].y + 0x45 + shown * 0x28) - FLOAT_80333020;
+		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
 		font->SetPosY(y);
 		font->Draw(name);
 
 		short food = *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2);
 		const char* value = flatData->table[2].strings[food];
-		font->SetPosX(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x90));
+		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
 		font->SetPosY(y);
 		font->Draw(value);
 
@@ -289,8 +288,8 @@ void CMenuPcs::CompaDraw()
 
 	const char* job = GetJobStr__8CMenuPcsFi(this, *reinterpret_cast<int*>(scriptFood + 0x3AC));
 	font->GetWidth(job);
-	font->SetPosX(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x18));
-	font->SetPosY(static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x20) - FLOAT_80333020 - FLOAT_80333028);
+	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
+	font->SetPosY(static_cast<float>(compaList->entries[0].y + 0x20) - FLOAT_80333020 - FLOAT_80333028);
 	font->Draw(job);
 
 	DrawInit__8CMenuPcsFv(this);
@@ -359,7 +358,7 @@ bool CMenuPcs::CompaClose()
 void CMenuPcs::CompaCtrl()
 {
 	bool activeInput = false;
-	unsigned short press;
+	short press;
 	short hold;
 	int doReset = 0;
 
@@ -385,7 +384,8 @@ void CMenuPcs::CompaCtrl()
 	} else {
 		int padIndex = activeInput;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		hold = *reinterpret_cast<short*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 0x14);
+		unsigned short holdRaw = *reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 0x14);
+		hold = holdRaw;
 	}
 
 	if (hold == 0) {

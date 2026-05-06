@@ -1,3 +1,4 @@
+#define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 #include "ffcc/mapanim.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"

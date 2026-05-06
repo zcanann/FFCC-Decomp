@@ -51,6 +51,7 @@ CPtrArray<T>::~CPtrArray()
     RemoveAll();
 }
 
+#ifndef FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 template <class T>
 int CPtrArray<T>::GetSize()
 {
@@ -68,6 +69,7 @@ T CPtrArray<T>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
+#endif
 
 template <class T>
 void CPtrArray<T>::SetStage(CMemory::CStage* stage)

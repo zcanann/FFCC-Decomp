@@ -1912,7 +1912,6 @@ static void _ExecuteExtraData()
 static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
 {
     u32 updateFlags = 0;
-    int* trackData = (int*)track;
     RedVoiceDATA* voiceData;
 
     track->m_playTime += frames;

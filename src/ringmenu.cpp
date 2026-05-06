@@ -336,8 +336,7 @@ void CRingMenu::onCalc()
 
 		CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 		if (partyObj != 0) {
-			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(
-				reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(partyObj) + 0x58)[0]);
+			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 			int currentCmd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
 
 			if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
@@ -636,13 +635,12 @@ void CRingMenu::onDraw()
 		if (group == 2) {
 			CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 			if (partyObj != 0) {
-				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(
-					reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(partyObj) + 0x5C)[0]);
+				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 				int cmdIndex = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                   ? *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004)
 				                   : _GetIdxCmdList__12CCaravanWorkFv(caravanWork);
 
-				CFont* font = reinterpret_cast<CFont*>(*reinterpret_cast<int*>(MenuPcsRaw() + 0xFC));
+				CFont* font = MenuPcs.m_fonts[0];
 				font->DrawInit();
 				font->SetMargin(FLOAT_80330a8c);
 				font->SetShadow(1);
@@ -698,7 +696,7 @@ void CRingMenu::onDraw()
 			}
 		}
 
-		CFont* font = reinterpret_cast<CFont*>(*reinterpret_cast<int*>(MenuPcsRaw() + 0xFC));
+		CFont* font = MenuPcs.m_fonts[0];
 		for (int button = 1; button >= 0; button--) {
 			const int buttonValue = m_battleButtons[group * 3 + button];
 			if (buttonValue < 0) {
@@ -771,8 +769,7 @@ void CRingMenu::onDraw()
 				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1F);
 				CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 				if (partyObj != 0) {
-					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(
-						reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(partyObj) + 0x5C)[0]);
+					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 					if ((caravanWork != 0) && ((*reinterpret_cast<unsigned char*>(CFlat + 0x12E4) & 2) == 0)) {
 						const float barY = FLOAT_80330aac + textY;
 						const float fullAlpha =
@@ -1054,7 +1051,12 @@ void CRingMenu::DrawIcon()
 
 	int menuIndex = m_menuIndex;
 	CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
-	if (partyObj == 0 || static_cast<signed char>(partyObj->m_weaponNodeFlags >> 8) >= 0) {
+	if (partyObj == 0) {
+		return;
+	}
+	unsigned char weaponFlagsHi = *(reinterpret_cast<unsigned char*>(&partyObj->m_weaponNodeFlags) + 1);
+	if (static_cast<signed char>(
+	        static_cast<int>((static_cast<unsigned int>(weaponFlagsHi) << 24) & 0xC0000000) >> 31) == 0) {
 		return;
 	}
 
@@ -1081,25 +1083,25 @@ void CRingMenu::DrawIcon()
 	Vec4d clipPos;
 	MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(&Math, screenMtx, &viewPos, &clipPos);
 
-	float screenX = clipPos.x * (FLOAT_803309cc / clipPos.w);
-	float screenY = clipPos.y * (FLOAT_803309cc / clipPos.w);
-	if ((FLOAT_803309d0 < screenX) && (screenX < FLOAT_803309cc) && (FLOAT_803309d0 < screenY) &&
-	    (screenY < FLOAT_803309cc)) {
+	clipPos.x = clipPos.x * (FLOAT_803309cc / clipPos.w);
+	clipPos.y = clipPos.y * (FLOAT_803309cc / clipPos.w);
+	if ((FLOAT_803309d0 < clipPos.x) && (clipPos.x < FLOAT_803309cc) && (FLOAT_803309d0 < clipPos.y) &&
+	    (clipPos.y < FLOAT_803309cc)) {
 		return;
 	}
 
 	float clampedX = FLOAT_803309d4;
-	if (FLOAT_803309d4 <= screenX) {
-		clampedX = screenX;
-		if (FLOAT_803309d8 < screenX) {
+	if (FLOAT_803309d4 <= clipPos.x) {
+		clampedX = clipPos.x;
+		if (FLOAT_803309d8 < clipPos.x) {
 			clampedX = FLOAT_803309d8;
 		}
 	}
 
 	float clampedY = FLOAT_803309dc;
-	if (FLOAT_803309dc <= screenY) {
-		clampedY = screenY;
-		if (FLOAT_803309e0 < screenY) {
+	if (FLOAT_803309dc <= clipPos.y) {
+		clampedY = clipPos.y;
+		if (FLOAT_803309e0 < clipPos.y) {
 			clampedY = FLOAT_803309e0;
 		}
 	}
@@ -1115,10 +1117,10 @@ void CRingMenu::DrawIcon()
 	unsigned int iconCol;
 	if ((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
 		iconRow = *reinterpret_cast<int*>(scriptFood + 0x3B4);
-		int progress = static_cast<int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x14)) - 100;
+		int foodProgress = static_cast<int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x14));
+		int progress = foodProgress - 100;
 		int q = progress / 100 + (progress >> 31);
-		iconCol = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x14)) % 100 +
-		          static_cast<unsigned int>((q - (q >> 31)) * 4);
+		iconCol = foodProgress % 100 + static_cast<unsigned int>((q - (q >> 31)) * 4);
 	} else {
 		iconRow = 1;
 		iconCol = 0x65;

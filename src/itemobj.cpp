@@ -353,6 +353,8 @@ void CGItemObj::onFrame()
 			SetAnimSlot__8CGObjectFii(this, 0, 0);
 			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
 
+			CGObject* owner = m_owner;
+			int ownerScriptSlot = *(int*)(*(int*)((unsigned char*)owner + 0x58) + 0x3B4);
 			int soundEntry = *(int*)(*(int*)(*(int*)SoundBuffer_1260_ + 0xF8) + 0x178);
 			if (soundEntry != 0) {
 				soundEntry = *(int*)(soundEntry + 0x14);
@@ -361,9 +363,7 @@ void CGItemObj::onFrame()
 			}
 
 			unsigned char* itemTable = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]);
-			int itemRowOffset = m_worldParamB * 0x48;
-			double particleValue = (double)*reinterpret_cast<unsigned short*>(itemTable + itemRowOffset + 0x10);
-			int ownerScriptSlot = *(int*)(*(int*)(*(int*)(self + 0x550) + 0x58) + 0x3B4);
+			float particleValue = static_cast<float>(*reinterpret_cast<unsigned short*>(itemTable + m_worldParamB * 0x48 + 0x10));
 			float particleScale = FLOAT_80331b50 * (float)particleValue + FLOAT_80331b4c;
 			putParticle__8CGPrgObjFiiP8CGObjectfi(
 			    this, (soundEntry << 8) | ownerScriptSlot, m_particleSlot, this, particleScale, 0x12909);

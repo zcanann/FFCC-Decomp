@@ -782,7 +782,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     *(u32*)(model + 0xF0) = 0;
     *(u32*)(model + 0xFC) = 0;
 
-    if (Game.m_currentSceneId == 7) {
+    if ((int)Game.m_currentSceneId == 7) {
         centerPos.x = FLOAT_80331898;
         centerPos.y = FLOAT_80331898;
         centerPos.z = FLOAT_80331898;
@@ -1471,13 +1471,13 @@ static void CalcWaterReflectionVector(
     Vec* reflectionIt;
     float* texCoordFloat;
     unsigned char* colorBytes;
-    double zero;
-    double half;
+    float zero;
+    float half;
     long i;
 
     (void)waterOrigin;
 
-    if (Game.m_currentSceneId == 7) {
+    if ((int)Game.m_currentSceneId == 7) {
         cameraPos.x = ppvCameraMatrix0[0][3];
         cameraPos.y = ppvCameraMatrix0[1][3];
         cameraPos.z = ppvCameraMatrix0[2][3];
@@ -1507,8 +1507,8 @@ static void CalcWaterReflectionVector(
     texCoordFloat = (float*)texCoord;
     colorBytes = (unsigned char*)color;
     reflectionIt = reflectionVec;
-    zero = (double)FLOAT_80331898;
-    half = (double)FLOAT_803318a4;
+    zero = FLOAT_80331898;
+    half = FLOAT_803318a4;
 
     for (i = 0; i < count; i++) {
         PSVECSubtract(positions, &transformedCameraPos, &reflected);
@@ -1516,30 +1516,30 @@ static void CalcWaterReflectionVector(
         PSMTXMultVec(matrixNoTranslate, reflectionIt, reflectionIt);
         PSVECNormalize(reflectionIt, reflectionIt);
 
-        if ((double)reflectionIt->z < zero) {
-            colorBytes[0] = 0x80;
-            colorBytes[1] = 0xff;
-            colorBytes[2] = 0x80;
-            colorBytes[3] = 0x7f;
-            *texCoordFloat = -reflectionIt->x / (FLOAT_803318a0 - reflectionIt->z);
-            texCoordFloat[1] = -reflectionIt->y / (FLOAT_803318a0 - reflectionIt->z);
-        } else {
+        if (zero <= reflectionIt->z) {
             colorBytes[0] = 0x80;
             colorBytes[1] = 0x80;
             colorBytes[2] = 0xff;
             colorBytes[3] = 0xbc;
             *texCoordFloat = -reflectionIt->x / (FLOAT_803318a0 + reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (FLOAT_803318a0 + reflectionIt->z);
+        } else {
+            colorBytes[0] = 0x80;
+            colorBytes[1] = 0xff;
+            colorBytes[2] = 0x80;
+            colorBytes[3] = 0x7f;
+            *texCoordFloat = -reflectionIt->x / (FLOAT_803318a0 - reflectionIt->z);
+            texCoordFloat[1] = -reflectionIt->y / (FLOAT_803318a0 - reflectionIt->z);
         }
 
         positions++;
         reflectionIt++;
         normals++;
         colorBytes += 4;
-        *texCoordFloat = (float)((double)*texCoordFloat * half);
-        *texCoordFloat = (float)((double)*texCoordFloat + half);
-        texCoordFloat[1] = (float)((double)texCoordFloat[1] * half);
-        texCoordFloat[1] = (float)((double)texCoordFloat[1] + half);
+        *texCoordFloat = *texCoordFloat * half;
+        *texCoordFloat = *texCoordFloat + half;
+        texCoordFloat[1] = texCoordFloat[1] * half;
+        texCoordFloat[1] = texCoordFloat[1] + half;
         texCoordFloat += 2;
     }
 

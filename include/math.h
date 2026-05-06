@@ -36,8 +36,8 @@ extern inline double sqrt(double x)
 
 extern inline float sqrtf(float x)
 {
-    static const double _half = .5;
-    static const double _three = 3.0;
+    const double _half = .5;
+    const double _three = 3.0;
     union {
         float f;
         unsigned long bits;

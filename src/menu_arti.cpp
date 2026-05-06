@@ -445,7 +445,7 @@ void CMenuPcs::ArtiInit1()
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CMenuPcs::ArtiOpen()
+bool CMenuPcs::ArtiOpen()
 {
 	int finished;
 	int count;

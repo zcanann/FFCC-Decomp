@@ -44,7 +44,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
 {
     u8* step = (u8*)stepData;
     u8* payload = step + 0x14;
-    const u16 dataValIndex = *(u16*)step;
+    const u32 dataValIndex = *(u32*)(step + 4);
     const s32 particleDataOffset = offsets->m_serializedDataOffsets[2];
     _PARTICLE_DATA* particles = *(_PARTICLE_DATA**)((u8*)&object->field_0xbc + particleDataOffset);
     _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)((u8*)&object->field_0xc0 + particleDataOffset);
@@ -62,7 +62,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
     int shapeTable = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x57])) >> 5);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (void*)(payload + 0x74), &object->field_0x40, *(float*)(payload + 0x74), payload[0x78], step[0x10],
+        0, &object->field_0x40, *(float*)(payload + 0x74), payload[0x78], step[0x0C],
         payload[0x5A], 0, zEnable, 1, 0);
     pppSetBlendMode(payload[0x5A]);
 
@@ -334,18 +334,18 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
             for (i = 0; i < work->m_maxParticles; i++) {
                 if (*(u16*)(particleData + 0x22) != 0) {
                     calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
-                        &object->field0_0x0, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
+                        (_pppPObject*)object, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
                 } else {
                     if ((*(u16*)((u8*)&param->m_matrix + 0x12) <= work->m_lifeLimit) &&
                         (spawnCount < *(u16*)((u8*)&param->m_matrix + 0x10))) {
-                        birth(&object->field0_0x0, work, param, colorWork, (_PARTICLE_DATA*)particleData, worldMat,
+                        birth((_pppPObject*)object, work, param, colorWork, (_PARTICLE_DATA*)particleData, worldMat,
                             particleColor);
                         spawnCount = spawnCount + 1;
                     }
                 }
 
                 if (worldMat != 0) {
-                    worldMat = (_PARTICLE_WMAT*)((u8*)worldMat + 0x30);
+                    worldMat = worldMat + 1;
                 }
                 if (particleColor != 0) {
                     particleColor = particleColor + 1;

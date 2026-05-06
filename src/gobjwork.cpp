@@ -736,15 +736,9 @@ void CCaravanWork::ChgEquipPos(int idx, int equip)
  */
 int CCaravanWork::CanAddComList(int count)
 {
-	int remaining = (short)m_numCmdListSlots - 2;
-	short* slot = m_commandListInventorySlotRef;
-
-	if (2 < (short)m_numCmdListSlots) {
-		for (; remaining != 0; remaining--) {
-			if ((*slot == -1) && (--count == 0)) {
-				break;
-			}
-			slot++;
+	for (int i = 2; i < (short)m_numCmdListSlots; i++) {
+		if ((m_commandListInventorySlotRef[i] == -1) && (--count == 0)) {
+			break;
 		}
 	}
 
@@ -762,16 +756,16 @@ int CCaravanWork::CanAddComList(int count)
  */
 int CCaravanWork::AddComList(int itemSlot, int* cmdListSlotOut)
 {
-	if (m_numCmdListSlots > 2) {
-		for (int i = 2; i < m_numCmdListSlots; i++) {
-			if (m_commandListInventorySlotRef[i] == -1) {
-				m_commandListInventorySlotRef[i] = itemSlot;
-				Joybus.SetCmdLst(m_joybusCaravanId, i, itemSlot);
-				if (cmdListSlotOut != 0) {
-					*cmdListSlotOut = i;
-				}
-				return 1;
+	int i = 2;
+
+	for (; i < m_numCmdListSlots; i++) {
+		if (m_commandListInventorySlotRef[i] == -1) {
+			m_commandListInventorySlotRef[i] = itemSlot;
+			Joybus.SetCmdLst(m_joybusCaravanId, i, itemSlot);
+			if (cmdListSlotOut != 0) {
+				*cmdListSlotOut = i;
 			}
+			return 1;
 		}
 	}
 
@@ -2116,9 +2110,9 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 			}
 
 			groupedCount = 1;
-			scanCount = caravanWork->m_numCmdListSlots - (topIdx + 1);
+			scanCount = static_cast<short>(caravanWork->m_numCmdListSlots) - (topIdx + 1);
 			slotRef = caravanWork->m_commandListExtra + topIdx + 1;
-			if ((topIdx + 1) < caravanWork->m_numCmdListSlots) {
+			if ((topIdx + 1) < static_cast<short>(caravanWork->m_numCmdListSlots)) {
 				while (scanCount != 0) {
 					if (slotRef[0] != -1) {
 						break;

@@ -1648,13 +1648,17 @@ void EnvelopeKeyExecute()
  */
 static void _KeyOnControl()
 {
-    u32 voiceStartMaskHi = 0;
-    u32 voiceStartMaskLo = 0;
-    int* reserve = (int*)p_KeyOnData;
-    unsigned int* voiceData = (unsigned int*)p_VoiceData;
+    u32 voiceStartMaskHi;
+    u32 voiceStartMaskLo;
+    int* reserve;
+    unsigned int* voiceData;
     int (*waveFunc)(int);
 
     _VoiceEnvelopeCheck();
+    voiceStartMaskHi = 0;
+    voiceStartMaskLo = 0;
+    reserve = (int*)p_KeyOnData;
+    voiceData = (unsigned int*)p_VoiceData;
 
     if (m_KeyOnEntry != 0) {
         do {

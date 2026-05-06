@@ -803,10 +803,11 @@ void CRedEntry::DisplayWaveInfo()
 		do {
 			if (bank->m_size != 0) {
 				int freeSize;
-				if (bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size >= 1) {
-					freeSize = bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address - (bank->m_address + bank->m_size);
+				int blockEnd = bank->m_address + bank->m_size;
+				if (bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size > 0) {
+					freeSize = bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address - blockEnd;
 				} else {
-					freeSize = aBufferEnd - (bank->m_address + bank->m_size);
+					freeSize = aBufferEnd - blockEnd;
 				}
 
 				RedHistoryBANK* history = reinterpret_cast<RedHistoryBANK*>(m_waveBankBase);
@@ -1592,7 +1593,6 @@ void CRedEntry::DisplayMMemoryInfo()
 	RedMemoryBlock* memoryBank;
 	RedMemoryBlock* bankEntry;
 	RedHistoryBANK* history;
-	int* seBlockBase;
 
 	if (m_ReportPrint == 0) {
 		return;
@@ -1612,16 +1612,16 @@ void CRedEntry::DisplayMMemoryInfo()
     memoryBank = c_RedMemory.GetMainBankAddress();
     bufferTop = nextAddress + c_RedMemory.GetMainBufferSize();
 	bankEntry = memoryBank;
-	seBlockBase = (int*)p_SeBlockData;
 
 	do {
 		if (bankEntry->m_size != 0) {
 			int matched = 0;
+			int blockEnd = bankEntry->m_address + bankEntry->m_size;
 
-			if (bankEntry[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size < 1) {
-				freeSize = bufferTop - (bankEntry->m_address + bankEntry->m_size);
+			if (bankEntry[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size > 0) {
+				freeSize = bankEntry[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address - blockEnd;
 			} else {
-				freeSize = bankEntry[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address - (bankEntry->m_address + bankEntry->m_size);
+				freeSize = bufferTop - blockEnd;
 			}
 
 			history = reinterpret_cast<RedHistoryBANK*>(m_musicBankBase);
@@ -1640,7 +1640,7 @@ void CRedEntry::DisplayMMemoryInfo()
 			if (matched == 0) {
 				i = 0;
 				do {
-					if ((seBlockBase[i] != 0) && (bankEntry->m_address == seBlockBase[i])) {
+					if ((p_SeBlockData[i] != 0) && (bankEntry->m_address == reinterpret_cast<int>(p_SeBlockData[i]))) {
 						OSReport(s__s_SE_BLOCK___0x_8_8X___0x_8_8X___801e7d51, sRedEntryLogPrefix, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);

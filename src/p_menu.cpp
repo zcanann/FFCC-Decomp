@@ -1835,9 +1835,6 @@ void CMenuPcs::drawBattle()
     if (m_battleHud.m_visible != 0) {
         const float frame = static_cast<float>(m_battleHud.m_fadeCounter);
         float fade = LoadFloat(FLOAT_80330808) - (frame * LoadFloat(FLOAT_80330804));
-        if (fade < LoadFloat(kMenuInitOne)) {
-            fade = LoadFloat(kMenuInitOne);
-        }
 
         Mtx cameraMtx;
         Mtx44 viewMtx;
@@ -1874,10 +1871,7 @@ void CMenuPcs::drawBattle()
                 screenY = LoadFloat(FLOAT_8033081C);
             }
 
-            int fillWidth = 0;
-            if (m_battleHud.m_gaugeMax != 0) {
-                fillWidth = ((totalWidth - 16) * m_battleHud.m_gaugeValue) / m_battleHud.m_gaugeMax;
-            }
+            int fillWidth = ((totalWidth - 16) * m_battleHud.m_gaugeValue) / m_battleHud.m_gaugeMax;
 
             const float left = screenX - static_cast<float>(halfWidth);
             const float bodyLeft = left + LoadFloat(FLOAT_80330820);
@@ -1889,43 +1883,37 @@ void CMenuPcs::drawBattle()
             if (totalWidth > 0) {
                 CTexture* tex = MenuPcs.m_textures[0xDD];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
-                if (tex != 0) {
-                    Mtx texMtx;
-                    const u32 width = tex->m_width;
-                    const u32 height = tex->m_height;
-                    PSMTXScale(texMtx, LoadFloat(FLOAT_80330808) / static_cast<float>(width), LoadFloat(FLOAT_80330808) / static_cast<float>(height), LoadFloat(FLOAT_80330808));
-                    GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
-                    GXSetNumTexGens(1);
-                    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-                }
+                u32 width = tex->m_width;
+                u32 height = tex->m_height;
+                Mtx texMtx0;
+                PSMTXScale(texMtx0, LoadFloat(FLOAT_80330808) / static_cast<float>(width), LoadFloat(FLOAT_80330808) / static_cast<float>(height), LoadFloat(FLOAT_80330808));
+                GXLoadTexMtxImm(texMtx0, GX_TEXMTX0, GX_MTX2x4);
+                GXSetNumTexGens(1);
+                GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 TextureMan.SetTextureTev(tex);
                 MenuPcs.DrawRect(0, left, screenY, LoadFloat(FLOAT_80330820), LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
 
                 tex = MenuPcs.m_textures[0xDE];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
-                if (tex != 0) {
-                    Mtx texMtx;
-                    const u32 width = tex->m_width;
-                    const u32 height = tex->m_height;
-                    PSMTXScale(texMtx, LoadFloat(FLOAT_80330808) / static_cast<float>(width), LoadFloat(FLOAT_80330808) / static_cast<float>(height), LoadFloat(FLOAT_80330808));
-                    GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
-                    GXSetNumTexGens(1);
-                    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-                }
+                width = tex->m_width;
+                height = tex->m_height;
+                Mtx texMtx1;
+                PSMTXScale(texMtx1, LoadFloat(FLOAT_80330808) / static_cast<float>(width), LoadFloat(FLOAT_80330808) / static_cast<float>(height), LoadFloat(FLOAT_80330808));
+                GXLoadTexMtxImm(texMtx1, GX_TEXMTX0, GX_MTX2x4);
+                GXSetNumTexGens(1);
+                GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 TextureMan.SetTextureTev(tex);
                 MenuPcs.DrawRect(0, bodyLeft, screenY, static_cast<float>(totalWidth - 16), LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
 
                 tex = MenuPcs.m_textures[0xDF];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
-                if (tex != 0) {
-                    Mtx texMtx;
-                    const u32 width = tex->m_width;
-                    const u32 height = tex->m_height;
-                    PSMTXScale(texMtx, LoadFloat(FLOAT_80330808) / static_cast<float>(width), LoadFloat(FLOAT_80330808) / static_cast<float>(height), LoadFloat(FLOAT_80330808));
-                    GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
-                    GXSetNumTexGens(1);
-                    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-                }
+                width = tex->m_width;
+                height = tex->m_height;
+                Mtx texMtx2;
+                PSMTXScale(texMtx2, LoadFloat(FLOAT_80330808) / static_cast<float>(width), LoadFloat(FLOAT_80330808) / static_cast<float>(height), LoadFloat(FLOAT_80330808));
+                GXLoadTexMtxImm(texMtx2, GX_TEXMTX0, GX_MTX2x4);
+                GXSetNumTexGens(1);
+                GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 TextureMan.SetTextureTev(tex);
                 MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - LoadFloat(FLOAT_80330820), screenY, LoadFloat(FLOAT_80330820), LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
             }

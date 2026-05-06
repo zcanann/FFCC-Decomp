@@ -1632,12 +1632,13 @@ void CGPartyObj::endTargetParticle()
 int CGPartyObj::isDispTarget()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	unsigned char result = 0;
 	if ((m_lastStateId == 2 || m_lastStateId == 6) &&
 	    (*reinterpret_cast<int*>(self + 0x668) != 0)) {
-		return 1;
+		result = 1;
 	}
 
-	return 0;
+	return result;
 }
 
 /*
@@ -1652,13 +1653,23 @@ int CGPartyObj::isDispTarget()
 int CGPartyObj::isRideTarget()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if ((m_lastStateId == 2 || m_lastStateId == 6) &&
-	    (*reinterpret_cast<int*>(self + 0x668) != 0) &&
-	    ((PartyData(this).partyFlags & 0x80) != 0)) {
-		return 1;
+	bool hasTarget = false;
+	int result = 0;
+
+	if (m_lastStateId == 2 || m_lastStateId == 6) {
+		if (*reinterpret_cast<int*>(self + 0x668) != 0) {
+			hasTarget = true;
+		}
 	}
 
-	return 0;
+	if (hasTarget) {
+		unsigned int flags = self[0x6B8];
+		if (static_cast<int>((flags << 25) | (flags >> 7)) < 0) {
+			result = 1;
+		}
+	}
+
+	return result;
 }
 
 /*

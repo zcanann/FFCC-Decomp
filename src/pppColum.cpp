@@ -66,8 +66,6 @@ extern double DOUBLE_80331098;
 extern float FLOAT_803310A0;
 extern float FLOAT_803310A4;
 extern float FLOAT_803310A8;
-extern double DOUBLE_803310B0;
-extern double DOUBLE_803310B8;
 
 extern "C" {
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);

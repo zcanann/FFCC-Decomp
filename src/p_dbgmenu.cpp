@@ -740,8 +740,8 @@ void CDbgMenuPcs::Add()
     CDMParam nodeParam;
     CDMParam actionParam;
     DbgMenuDef* menuDefs;
-    int index;
     int y;
+    int index;
 
     if (m_rootMenuNode.m_firstChild != 0) {
         return;
@@ -758,18 +758,7 @@ void CDbgMenuPcs::Add()
     rootParam.m_unk20 = 0;
     rootParam.m_unk28 = 0;
     rootParam.m_unk2C = 0;
-    param.m_type = rootParam.m_type;
-    param.m_flags = rootParam.m_flags;
-    param.m_x = rootParam.m_x;
-    param.m_y = rootParam.m_y;
-    param.m_width = rootParam.m_width;
-    param.m_height = rootParam.m_height;
-    param.m_unk18 = rootParam.m_unk18;
-    param.m_unk1C = rootParam.m_unk1C;
-    param.m_unk20 = rootParam.m_unk20;
-    param.m_unk28 = rootParam.m_unk28;
-    param.m_unk2C = rootParam.m_unk2C;
-    param.m_unk30 = rootParam.m_unk30;
+    param = rootParam;
     param.m_text = const_cast<char*>(s_Debug_80331c90);
     Add(0, 10, param);
 
@@ -787,18 +776,7 @@ void CDbgMenuPcs::Add()
         nodeParam.m_unk20 = 0;
         nodeParam.m_unk28 = 0;
         nodeParam.m_unk2C = 0;
-        param.m_type = nodeParam.m_type;
-        param.m_flags = nodeParam.m_flags;
-        param.m_x = nodeParam.m_x;
-        param.m_y = nodeParam.m_y;
-        param.m_width = nodeParam.m_width;
-        param.m_height = nodeParam.m_height;
-        param.m_unk18 = nodeParam.m_unk18;
-        param.m_unk1C = nodeParam.m_unk1C;
-        param.m_unk20 = nodeParam.m_unk20;
-        param.m_unk28 = nodeParam.m_unk28;
-        param.m_unk2C = nodeParam.m_unk2C;
-        param.m_unk30 = nodeParam.m_unk30;
+        param = nodeParam;
         param.m_text = const_cast<char*>(menuDefs->text);
         Add(10, 1, param);
 
@@ -816,24 +794,12 @@ void CDbgMenuPcs::Add()
         actionParam.m_unk28 = 0;
         actionParam.m_unk2C = 0;
 
-        param.m_type = actionParam.m_type;
-        param.m_flags = actionParam.m_flags;
-        param.m_x = actionParam.m_x;
-        param.m_y = actionParam.m_y;
-        param.m_width = actionParam.m_width;
-        param.m_height = actionParam.m_height;
-        param.m_unk18 = actionParam.m_unk18;
-        param.m_unk1C = actionParam.m_unk1C;
-        param.m_unk20 = actionParam.m_unk20;
-        param.m_text = actionParam.m_text;
-        param.m_unk28 = actionParam.m_unk28;
-        param.m_unk2C = actionParam.m_unk2C;
-        param.m_unk30 = actionParam.m_unk30;
+        param = actionParam;
         Add(10, (int)menuDefs->id, param);
 
         index++;
-        menuDefs++;
         y += 0x10;
+        menuDefs++;
     } while (index < 0x17);
 }
 

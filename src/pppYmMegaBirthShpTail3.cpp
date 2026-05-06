@@ -396,7 +396,7 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
         worldMat = work->m_wmats;
         particleColor = work->m_colors;
 
-        if ((gPppCalcDisabled == 0) && (*(u32*)(paramPayload + 4) != 0xffff)) {
+        if ((gPppCalcDisabled == 0) && (*(s32*)(paramPayload + 4) != 0xffff)) {
             work->m_lifeLimit = work->m_lifeLimit + 1;
             for (i = 0; i < work->m_maxParticles; i++) {
                 if (*(u16*)(particleData + 0x22) != 0) {

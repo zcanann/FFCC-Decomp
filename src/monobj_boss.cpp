@@ -3007,7 +3007,7 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 				float distSq = dx * dx + dz * dz;
 				double dist = (double)distSq;
 
-				if (dist <= (double)FLOAT_80331cf8) {
+				if (distSq <= FLOAT_80331cf8) {
 					if (DOUBLE_80331d10 <= dist) {
 						unsigned int exp = (unsigned int)distSq & 0x7f800000;
 						int fpClass;
@@ -3025,11 +3025,7 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 						dist = NAN;
 					}
 				} else {
-					double inv = 1.0 / sqrt(dist);
-					inv = DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08);
-					inv = DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08);
-					dist = (double)(float)(dist * DOUBLE_80331d00 * inv *
-					                       -(dist * inv * inv - DOUBLE_80331d08));
+					dist = sqrtf(distSq);
 				}
 
 				if ((double)FLOAT_80331cf8 < dist) {
@@ -3048,7 +3044,7 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 			float distSq = dx * dx + dz * dz;
 			double dist = (double)distSq;
 
-			if (dist <= (double)FLOAT_80331cf8) {
+			if (distSq <= FLOAT_80331cf8) {
 				if (DOUBLE_80331d10 <= dist) {
 					unsigned int exp = (unsigned int)distSq & 0x7f800000;
 					int fpClass;
@@ -3066,11 +3062,7 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 					dist = NAN;
 				}
 			} else {
-				double inv = 1.0 / sqrt(dist);
-				inv = DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08);
-				inv = DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08);
-				dist = (double)(float)(dist * DOUBLE_80331d00 * inv *
-				                       -(dist * inv * inv - DOUBLE_80331d08));
+				dist = sqrtf(distSq);
 			}
 
 			if ((double)FLOAT_80331cf8 < dist) {

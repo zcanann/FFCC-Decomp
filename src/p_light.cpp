@@ -107,8 +107,8 @@ static inline double U32ToDouble(unsigned int value)
  */
 void CLightPcs::Init()
 {
-    float fVar1;
     float fVar2;
+    float fVar1;
     unsigned char bVar3;
     unsigned int uVar4;
     unsigned int uVar5;

@@ -1088,8 +1088,8 @@ void CMenuPcs::BindMcObj(int slotNo)
 		slot++;
 	} while (slot < 4);
 
-	slot = 0;
 	int entryOffset = 0;
+	slot = 0;
 	do {
 		if (slotNo == slot) {
 			unsigned char* entry = *reinterpret_cast<unsigned char**>(self + 0x838) + entryOffset;

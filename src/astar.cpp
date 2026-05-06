@@ -423,10 +423,7 @@ void CAStar::drawAStar()
 {
 	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x400) != 0)
 	{
-		int frameBucket = static_cast<int>(System.m_frameCounter) / 0x1e +
-		                  (static_cast<int>(System.m_frameCounter) >> 0x1f);
-
-		if (System.m_frameCounter == static_cast<unsigned int>((frameBucket - (frameBucket >> 0x1f)) * 0x1e))
+		if (static_cast<int>(System.m_frameCounter) % 30 == 0)
 		{
 			int group = 0;
 

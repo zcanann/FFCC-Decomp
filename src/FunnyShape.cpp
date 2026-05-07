@@ -110,528 +110,6 @@ static inline s16 ShapeRange(CFunnyShape* self)
 
 /*
  * --INFO--
- * PAL Address: 0x80051e4c
- * PAL Size: 236b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CFunnyShape::CFunnyShape()
-{
-    m_meshData = 0;
-    memset(this, 0, 0x6000);
-    memset(&m_anm, 0, 0x10);
-    memset(&m_shape, 0, 0x10);
-    memset(&m_displayCurrent, 0, 0x40);
-
-    CFunnyShape* p = this;
-    for (s32 i = 2; i != 0; i--) {
-        p->m_textureData[0] = 0;
-        p->m_texObjData[0] = 0;
-        p->m_textureHeaders[0] = 0;
-        p->m_textureData[1] = 0;
-        p->m_texObjData[1] = 0;
-        p->m_textureHeaders[1] = 0;
-        p->m_textureData[2] = 0;
-        p->m_texObjData[2] = 0;
-        p->m_textureHeaders[2] = 0;
-        p->m_textureData[3] = 0;
-        p->m_texObjData[3] = 0;
-        p->m_textureHeaders[3] = 0;
-        p->m_textureData[4] = 0;
-        p->m_texObjData[4] = 0;
-        p->m_textureHeaders[4] = 0;
-        p->m_textureData[5] = 0;
-        p->m_texObjData[5] = 0;
-        p->m_textureHeaders[5] = 0;
-        p->m_textureData[6] = 0;
-        p->m_texObjData[6] = 0;
-        p->m_textureHeaders[6] = 0;
-        p->m_textureData[7] = 0;
-        p->m_texObjData[7] = 0;
-        p->m_textureHeaders[7] = 0;
-        p = reinterpret_cast<CFunnyShape*>(Ptr(p, 0x20));
-    }
-
-    m_textureCount = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80051d80
- * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CFunnyShape::~CFunnyShape()
-{
-    if (m_meshData != 0) {
-        __dla__FPv(m_meshData);
-        m_meshData = 0;
-    }
-
-    if (m_anm.anmData != 0) {
-        __dla__FPv(m_anm.anmData);
-        m_anm.anmData = 0;
-    }
-
-    for (s32 i = 0; i < 0x10; i++) {
-        if (m_textureData[i] != 0) {
-            __dla__FPv(m_textureData[i]);
-            m_textureData[i] = 0;
-        }
-
-        if (m_texObjData[i] != 0) {
-            __dl__FPv(m_texObjData[i]);
-            m_texObjData[i] = 0;
-        }
-
-        if (m_textureHeaders[i] != 0) {
-            __dl__FPv(m_textureHeaders[i]);
-            m_textureHeaders[i] = 0;
-        }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80051d80
- * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape* funnyShape, short shouldDelete)
-{
-    if (funnyShape != 0) {
-        if (funnyShape->m_meshData != 0) {
-            __dla__FPv(funnyShape->m_meshData);
-            funnyShape->m_meshData = 0;
-        }
-
-        if (funnyShape->m_anm.anmData != 0) {
-            __dla__FPv(funnyShape->m_anm.anmData);
-            funnyShape->m_anm.anmData = 0;
-        }
-
-        CFunnyShape* iter = funnyShape;
-        s32 i = 0;
-        do {
-            if (iter->m_textureData[0] != 0) {
-                __dla__FPv(iter->m_textureData[0]);
-                iter->m_textureData[0] = 0;
-            }
-
-            if (iter->m_texObjData[0] != 0) {
-                __dl__FPv(iter->m_texObjData[0]);
-                iter->m_texObjData[0] = 0;
-            }
-
-            if (iter->m_textureHeaders[0] != 0) {
-                __dl__FPv(iter->m_textureHeaders[0]);
-                iter->m_textureHeaders[0] = 0;
-            }
-
-            i++;
-            iter = reinterpret_cast<CFunnyShape*>(Ptr(iter, 4));
-        } while (i < 0x10);
-
-        if (shouldDelete > 0) {
-            __dl__FPv(funnyShape);
-        }
-    }
-
-    return funnyShape;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80051b8c
- * PAL Size: 500b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CFunnyShape::InitAnmWork()
-{
-    const float zero = 0.0f;
-    const u8 noSpread = (u8)((((ShapeFlags(this) >> 7) & 1) ^ 1));
-    const float angleMul = 3.14f;
-    const float angleDiv = 180.0f;
-    CFunnyShapeAnmWork* work = m_anmWork;
-
-    for (s32 i = 0; i < 0x200; i++) {
-        work->index = i;
-        work->animData = AnimData(this);
-
-        s32 r = rand();
-        work->x = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
-
-        r = rand();
-        work->y = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
-        work->z = zero;
-
-        r = rand();
-        const s16 shapeCount = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + 6);
-        work->frame = static_cast<s16>(r - (r / shapeCount) * shapeCount);
-        work->delay = 0x200;
-        work->viewportY = zero;
-        work->viewportX = zero;
-
-        r = rand();
-        work->angle = static_cast<float>(r % 0x168);
-        work->angle = (angleMul * work->angle) / angleDiv;
-
-        r = rand();
-        if ((r % 2) != 0) {
-            work->x *= FLOAT_8032fd80;
-        }
-
-        r = rand();
-        if ((r % 2) != 0) {
-            work->y *= FLOAT_8032fd80;
-        }
-
-        if (noSpread != 0) {
-            work->frame = 0;
-            work->y = zero;
-            work->x = zero;
-        }
-
-        work++;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80051968
- * PAL Size: 548b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CFunnyShape::Update()
-{
-    if ((m_textureCount == 0) || (AnimData(this) == 0)) {
-        return;
-    }
-
-    CFunnyShapeAnmWork* work = m_anmWork;
-    const float zero = 0.0f;
-    const bool noSpread = ((ShapeFlags(this) & 0x80) == 0);
-    for (s32 i = 0; i < ShapeCount(this); i++) {
-        work->delay = static_cast<s16>(work->delay - 0x200);
-        if (work->delay <= 0) {
-            work->frame = static_cast<s16>(work->frame + 1);
-            if (work->frame >= *reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + 6)) {
-                work->frame = 0;
-
-                s32 r = rand();
-                work->x = static_cast<float>(r % ShapeRange(this));
-
-                r = rand();
-                work->y = static_cast<float>(r % ShapeRange(this));
-                work->z = zero;
-                work->delay = 0x200;
-                work->viewportY = zero;
-                work->viewportX = zero;
-
-                r = rand();
-                work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
-                work->angle = (FLOAT_8032fda4 * work->angle) / FLOAT_8032fda8;
-
-                r = rand();
-                if ((r % 2) != 0) {
-                    work->x *= FLOAT_8032fd80;
-                }
-
-                r = rand();
-                if ((r % 2) != 0) {
-                    work->y *= FLOAT_8032fd80;
-                }
-
-                if (noSpread != 0) {
-                    work->frame = 0;
-                    work->y = zero;
-                    work->x = zero;
-                }
-            }
-
-            work->delay =
-                reinterpret_cast<const s16*>(reinterpret_cast<u8*>(AnimData(this)) + 0x12)[work->frame * 4];
-        }
-
-        if (noSpread != 0) {
-            return;
-        }
-
-        work++;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80051664
- * PAL Size: 772b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CFunnyShape::Render()
-{
-    if ((m_textureCount == 0) || (AnimData(this) == 0)) {
-        return;
-    }
-
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXSetNumTexGens(1);
-    GXSetNumTevStages(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
-    GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
-    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetNumTevStages(1);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
-    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
-    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
-    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-
-    GXColor chanColor = DAT_8032fd60;
-    GXSetChanAmbColor(GX_COLOR0, chanColor);
-    GXColor matColor = chanColor;
-    GXSetChanMatColor(GX_COLOR0, matColor);
-
-    CFunnyShapeAnmWork* work;
-    s32 count;
-    if ((ShapeFlags(this) & 0x80) != 0) {
-        count = ShapeCount(this);
-    } else {
-        count = 1;
-    }
-
-    work = m_anmWork;
-
-    for (s32 i = 0; i < count; i++) {
-        Vec2d posCopy;
-        Vec2d pos;
-        posCopy.x = FLOAT_8032fd9c + work->x;
-        posCopy.y = FLOAT_8032fda0 + work->y;
-        pos.x = posCopy.x;
-        pos.y = posCopy.y;
-
-        u8* animData = reinterpret_cast<u8*>(AnimData(this));
-        s16 frame = work->frame;
-        FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + *reinterpret_cast<s16*>(animData + 0x10 + frame * 8));
-        RenderShape(shape, posCopy, work->angle);
-        work++;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005137c
- * PAL Size: 744b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CFunnyShape::RenderTexture()
-{
-    if (m_textureCount == 0) {
-        return;
-    }
-
-    GXSetNumTexGens(1);
-    GXSetNumTevStages(1);
-    GXSetNumChans(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
-    GXColor chanColor = DAT_8032fd58;
-    GXSetChanAmbColor(GX_COLOR0, chanColor);
-    GXColor matColor = chanColor;
-    GXSetChanMatColor(GX_COLOR0, matColor);
-    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
-    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
-    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
-    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
-    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-    GXColor color = DAT_8032fd5c;
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
-
-    const u8* texData = reinterpret_cast<const u8*>(m_textureHeaders[0]);
-    const s16 width = *reinterpret_cast<const s16*>(texData + 4);
-    const s16 height = *reinterpret_cast<const s16*>(texData + 6);
-    GXSetViewport(FLOAT_8032fd98, FLOAT_8032fd98, static_cast<float>(width), static_cast<float>(height),
-                  FLOAT_8032fd6c, FLOAT_8032fd74);
-
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-
-    GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);
-    const u32 colorWord = *reinterpret_cast<u32*>(&color);
-    GXWGFifo.f32 = FLOAT_8032fd80;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd80;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.f32 = FLOAT_8032fd80;
-    GXWGFifo.f32 = FLOAT_8032fd80;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80051110
- * PAL Size: 620b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CFunnyShape::RenderShape()
-{
-    if ((m_textureCount == 0) || (m_meshData == 0)) {
-        return;
-    }
-
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXSetNumTexGens(1);
-    GXSetNumTevStages(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
-    GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
-    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetNumTevStages(1);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
-    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
-    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
-    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-    GXColor chanColor = DAT_8032fd60;
-    GXSetChanAmbColor(GX_COLOR0, chanColor);
-    GXColor matColor = chanColor;
-    GXSetChanMatColor(GX_COLOR0, matColor);
-
-    Vec2d offsetCopy;
-    Vec2d offset;
-    offsetCopy.x = FLOAT_8032fd90;
-    offsetCopy.y = FLOAT_8032fd94;
-    offset.x = offsetCopy.x;
-    offset.y = offsetCopy.y;
-    FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(m_meshData);
-    RenderShape(shape, offset, FLOAT_8032fd6c);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800510b0
- * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CFunnyShape::ClearAnmData()
-{
-    if (m_anm.anmData != 0) {
-        __dla__FPv(m_anm.anmData);
-        m_anm.anmData = 0;
-    }
-
-    memset(this, 0, 0x30);
-    memset(&m_anm, 0, 0x10);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80051020
- * PAL Size: 144b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CFunnyShape::ClearTextureData()
-{
-    m_textureCount = 0;
-    CFunnyShape* iter = this;
-    for (s32 i = 0; i < 0x10; i++) {
-        if (iter->m_textureData[0] != 0) {
-            __dla__FPv(iter->m_textureData[0]);
-            iter->m_textureData[0] = 0;
-        }
-
-        if (iter->m_texObjData[0] != 0) {
-            __dl__FPv(iter->m_texObjData[0]);
-            iter->m_texObjData[0] = 0;
-        }
-
-        if (iter->m_textureHeaders[0] != 0) {
-            __dl__FPv(iter->m_textureHeaders[0]);
-            iter->m_textureHeaders[0] = 0;
-        }
-        iter = reinterpret_cast<CFunnyShape*>(Ptr(iter, 4));
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8005051c
  * PAL Size: 2820b
  * EN Address: TODO
@@ -846,6 +324,490 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         rotatedStride += 0x2C;
     }
 }
+
+/*
+ * --INFO--
+ * PAL Address: 0x80051020
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFunnyShape::ClearTextureData()
+{
+    m_textureCount = 0;
+    CFunnyShape* iter = this;
+    for (s32 i = 0; i < 0x10; i++) {
+        if (iter->m_textureData[0] != 0) {
+            __dla__FPv(iter->m_textureData[0]);
+            iter->m_textureData[0] = 0;
+        }
+
+        if (iter->m_texObjData[0] != 0) {
+            __dl__FPv(iter->m_texObjData[0]);
+            iter->m_texObjData[0] = 0;
+        }
+
+        if (iter->m_textureHeaders[0] != 0) {
+            __dl__FPv(iter->m_textureHeaders[0]);
+            iter->m_textureHeaders[0] = 0;
+        }
+        iter = reinterpret_cast<CFunnyShape*>(Ptr(iter, 4));
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800510b0
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFunnyShape::ClearAnmData()
+{
+    if (m_anm.anmData != 0) {
+        __dla__FPv(m_anm.anmData);
+        m_anm.anmData = 0;
+    }
+
+    memset(this, 0, 0x30);
+    memset(&m_anm, 0, 0x10);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80051110
+ * PAL Size: 620b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFunnyShape::RenderShape()
+{
+    if ((m_textureCount == 0) || (m_meshData == 0)) {
+        return;
+    }
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetNumTexGens(1);
+    GXSetNumTevStages(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
+    GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetNumTevStages(1);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
+    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
+    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+    GXColor chanColor = DAT_8032fd60;
+    GXSetChanAmbColor(GX_COLOR0, chanColor);
+    GXColor matColor = chanColor;
+    GXSetChanMatColor(GX_COLOR0, matColor);
+
+    Vec2d offsetCopy;
+    Vec2d offset;
+    offsetCopy.x = FLOAT_8032fd90;
+    offsetCopy.y = FLOAT_8032fd94;
+    offset.x = offsetCopy.x;
+    offset.y = offsetCopy.y;
+    FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(m_meshData);
+    RenderShape(shape, offset, FLOAT_8032fd6c);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005137c
+ * PAL Size: 744b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFunnyShape::RenderTexture()
+{
+    if (m_textureCount == 0) {
+        return;
+    }
+
+    GXSetNumTexGens(1);
+    GXSetNumTevStages(1);
+    GXSetNumChans(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
+    GXColor chanColor = DAT_8032fd58;
+    GXSetChanAmbColor(GX_COLOR0, chanColor);
+    GXColor matColor = chanColor;
+    GXSetChanMatColor(GX_COLOR0, matColor);
+    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
+    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
+    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+    GXColor color = DAT_8032fd5c;
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
+    GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
+
+    const u8* texData = reinterpret_cast<const u8*>(m_textureHeaders[0]);
+    const s16 width = *reinterpret_cast<const s16*>(texData + 4);
+    const s16 height = *reinterpret_cast<const s16*>(texData + 6);
+    GXSetViewport(FLOAT_8032fd98, FLOAT_8032fd98, static_cast<float>(width), static_cast<float>(height),
+                  FLOAT_8032fd6c, FLOAT_8032fd74);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+
+    GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);
+    const u32 colorWord = *reinterpret_cast<u32*>(&color);
+    GXWGFifo.f32 = FLOAT_8032fd80;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.u32 = colorWord;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.u32 = colorWord;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd80;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.u32 = colorWord;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = FLOAT_8032fd80;
+    GXWGFifo.f32 = FLOAT_8032fd80;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.u32 = colorWord;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80051664
+ * PAL Size: 772b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFunnyShape::Render()
+{
+    if ((m_textureCount == 0) || (AnimData(this) == 0)) {
+        return;
+    }
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetNumTexGens(1);
+    GXSetNumTevStages(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
+    GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetNumTevStages(1);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
+    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
+    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+
+    GXColor chanColor = DAT_8032fd60;
+    GXSetChanAmbColor(GX_COLOR0, chanColor);
+    GXColor matColor = chanColor;
+    GXSetChanMatColor(GX_COLOR0, matColor);
+
+    CFunnyShapeAnmWork* work;
+    s32 count;
+    if ((ShapeFlags(this) & 0x80) != 0) {
+        count = ShapeCount(this);
+    } else {
+        count = 1;
+    }
+
+    work = m_anmWork;
+
+    for (s32 i = 0; i < count; i++) {
+        Vec2d posCopy;
+        Vec2d pos;
+        posCopy.x = FLOAT_8032fd9c + work->x;
+        posCopy.y = FLOAT_8032fda0 + work->y;
+        pos.x = posCopy.x;
+        pos.y = posCopy.y;
+
+        u8* animData = reinterpret_cast<u8*>(AnimData(this));
+        s16 frame = work->frame;
+        FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + *reinterpret_cast<s16*>(animData + 0x10 + frame * 8));
+        RenderShape(shape, posCopy, work->angle);
+        work++;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80051968
+ * PAL Size: 548b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFunnyShape::Update()
+{
+    if ((m_textureCount == 0) || (AnimData(this) == 0)) {
+        return;
+    }
+
+    CFunnyShapeAnmWork* work = m_anmWork;
+    const float zero = 0.0f;
+    const bool noSpread = ((ShapeFlags(this) & 0x80) == 0);
+    for (s32 i = 0; i < ShapeCount(this); i++) {
+        work->delay = static_cast<s16>(work->delay - 0x200);
+        if (work->delay <= 0) {
+            work->frame = static_cast<s16>(work->frame + 1);
+            if (work->frame >= *reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + 6)) {
+                work->frame = 0;
+
+                s32 r = rand();
+                work->x = static_cast<float>(r % ShapeRange(this));
+
+                r = rand();
+                work->y = static_cast<float>(r % ShapeRange(this));
+                work->z = zero;
+                work->delay = 0x200;
+                work->viewportY = zero;
+                work->viewportX = zero;
+
+                r = rand();
+                work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
+                work->angle = (FLOAT_8032fda4 * work->angle) / FLOAT_8032fda8;
+
+                r = rand();
+                if ((r % 2) != 0) {
+                    work->x *= FLOAT_8032fd80;
+                }
+
+                r = rand();
+                if ((r % 2) != 0) {
+                    work->y *= FLOAT_8032fd80;
+                }
+
+                if (noSpread != 0) {
+                    work->frame = 0;
+                    work->y = zero;
+                    work->x = zero;
+                }
+            }
+
+            work->delay =
+                reinterpret_cast<const s16*>(reinterpret_cast<u8*>(AnimData(this)) + 0x12)[work->frame * 4];
+        }
+
+        if (noSpread != 0) {
+            return;
+        }
+
+        work++;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80051b8c
+ * PAL Size: 500b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFunnyShape::InitAnmWork()
+{
+    const float zero = 0.0f;
+    const u8 noSpread = (u8)((((ShapeFlags(this) >> 7) & 1) ^ 1));
+    const float angleMul = 3.14f;
+    const float angleDiv = 180.0f;
+    CFunnyShapeAnmWork* work = m_anmWork;
+
+    for (s32 i = 0; i < 0x200; i++) {
+        work->index = i;
+        work->animData = AnimData(this);
+
+        s32 r = rand();
+        work->x = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
+
+        r = rand();
+        work->y = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
+        work->z = zero;
+
+        r = rand();
+        const s16 shapeCount = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + 6);
+        work->frame = static_cast<s16>(r - (r / shapeCount) * shapeCount);
+        work->delay = 0x200;
+        work->viewportY = zero;
+        work->viewportX = zero;
+
+        r = rand();
+        work->angle = static_cast<float>(r % 0x168);
+        work->angle = (angleMul * work->angle) / angleDiv;
+
+        r = rand();
+        if ((r % 2) != 0) {
+            work->x *= FLOAT_8032fd80;
+        }
+
+        r = rand();
+        if ((r % 2) != 0) {
+            work->y *= FLOAT_8032fd80;
+        }
+
+        if (noSpread != 0) {
+            work->frame = 0;
+            work->y = zero;
+            work->x = zero;
+        }
+
+        work++;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80051d80
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape* funnyShape, short shouldDelete)
+{
+    if (funnyShape != 0) {
+        if (funnyShape->m_meshData != 0) {
+            __dla__FPv(funnyShape->m_meshData);
+            funnyShape->m_meshData = 0;
+        }
+
+        if (funnyShape->m_anm.anmData != 0) {
+            __dla__FPv(funnyShape->m_anm.anmData);
+            funnyShape->m_anm.anmData = 0;
+        }
+
+        CFunnyShape* iter = funnyShape;
+        s32 i = 0;
+        do {
+            if (iter->m_textureData[0] != 0) {
+                __dla__FPv(iter->m_textureData[0]);
+                iter->m_textureData[0] = 0;
+            }
+
+            if (iter->m_texObjData[0] != 0) {
+                __dl__FPv(iter->m_texObjData[0]);
+                iter->m_texObjData[0] = 0;
+            }
+
+            if (iter->m_textureHeaders[0] != 0) {
+                __dl__FPv(iter->m_textureHeaders[0]);
+                iter->m_textureHeaders[0] = 0;
+            }
+
+            i++;
+            iter = reinterpret_cast<CFunnyShape*>(Ptr(iter, 4));
+        } while (i < 0x10);
+
+        if (shouldDelete > 0) {
+            __dl__FPv(funnyShape);
+        }
+    }
+
+    return funnyShape;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80051e4c
+ * PAL Size: 236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CFunnyShape::CFunnyShape()
+{
+    m_meshData = 0;
+    memset(this, 0, 0x6000);
+    memset(&m_anm, 0, 0x10);
+    memset(&m_shape, 0, 0x10);
+    memset(&m_displayCurrent, 0, 0x40);
+
+    CFunnyShape* p = this;
+    for (s32 i = 2; i != 0; i--) {
+        p->m_textureData[0] = 0;
+        p->m_texObjData[0] = 0;
+        p->m_textureHeaders[0] = 0;
+        p->m_textureData[1] = 0;
+        p->m_texObjData[1] = 0;
+        p->m_textureHeaders[1] = 0;
+        p->m_textureData[2] = 0;
+        p->m_texObjData[2] = 0;
+        p->m_textureHeaders[2] = 0;
+        p->m_textureData[3] = 0;
+        p->m_texObjData[3] = 0;
+        p->m_textureHeaders[3] = 0;
+        p->m_textureData[4] = 0;
+        p->m_texObjData[4] = 0;
+        p->m_textureHeaders[4] = 0;
+        p->m_textureData[5] = 0;
+        p->m_texObjData[5] = 0;
+        p->m_textureHeaders[5] = 0;
+        p->m_textureData[6] = 0;
+        p->m_texObjData[6] = 0;
+        p->m_textureHeaders[6] = 0;
+        p->m_textureData[7] = 0;
+        p->m_texObjData[7] = 0;
+        p->m_textureHeaders[7] = 0;
+        p = reinterpret_cast<CFunnyShape*>(Ptr(p, 0x20));
+    }
+
+    m_textureCount = 0;
+}
+
 
 /*
  * --INFO--

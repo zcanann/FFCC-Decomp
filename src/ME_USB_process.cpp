@@ -10,9 +10,6 @@
 
 #include <string.h>
 
-#define BSWAP16(val) ((u16)(((u16)(val) << 8) | ((u16)(val) >> 8)))
-#define BSWAP32(val) ((u32)(((u32)(val) << 24) | (((u32)(val) & 0xff00) << 8) | (((u32)(val) & 0xff0000) >> 8) | ((u32)(val) >> 24)))
-
 extern "C" void ClearTextureData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory* memory, unsigned long size, CMemory::CStage* stage, const char* file, int line, int align);
@@ -66,6 +63,31 @@ static inline char& S8At(CMaterialEditorPcs* self, u32 offset)
 static inline CMemory::CStage* MaterialEditorStage()
 {
     return MaterialEditorPcs.m_stage;
+}
+
+static inline u32 LoadSwap32(u32 value)
+{
+    return __lwbrx(&value, 0);
+}
+
+static inline void StoreSwap32(u32* value)
+{
+    u32 raw = *value;
+
+    *value = __lwbrx(&raw, 0);
+}
+
+static inline void StoreSwapNegFloat(f32* value)
+{
+    f32 raw = *value;
+    u32 swapped = __lwbrx(&raw, 0);
+
+    *value = -*reinterpret_cast<f32*>(&swapped);
+}
+
+static inline u16 LoadSwapU16(u16 value)
+{
+    return __lhbrx(&value, 0);
 }
 
 }
@@ -129,9 +151,9 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         xyzData = reinterpret_cast<u32*>(rsdItem->ptr10);
         for (u32 i = 0, offset = 0; i < size; i++, offset += 0xC) {
             u32* item = reinterpret_cast<u32*>(reinterpret_cast<u8*>(xyzData) + offset);
-            item[0] = BSWAP32(item[0]);
-            *reinterpret_cast<float*>(item + 1) = -static_cast<float>(BSWAP32(item[1]));
-            *reinterpret_cast<float*>(item + 2) = -static_cast<float>(BSWAP32(item[2]));
+            StoreSwap32(item + 0);
+            StoreSwapNegFloat(reinterpret_cast<f32*>(item + 1));
+            StoreSwapNegFloat(reinterpret_cast<f32*>(item + 2));
         }
         DCStoreRange(rsdItem->ptr10, dataSize);
 
@@ -172,40 +194,40 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         for (u32 i = 0; i < size; i++) {
             u8* data = reinterpret_cast<u8*>(rsdItem->ptr18) + i * 0x70;
 
-            *reinterpret_cast<u16*>(data + 0x00) = BSWAP16(*reinterpret_cast<u16*>(data + 0x00));
-            *reinterpret_cast<u16*>(data + 0x02) = BSWAP16(*reinterpret_cast<u16*>(data + 0x02));
-            *reinterpret_cast<u32*>(data + 0x04) = BSWAP32(*reinterpret_cast<u32*>(data + 0x04));
-            *reinterpret_cast<u16*>(data + 0x08) = BSWAP16(*reinterpret_cast<u16*>(data + 0x08));
-            *reinterpret_cast<u16*>(data + 0x0A) = BSWAP16(*reinterpret_cast<u16*>(data + 0x0A));
-            *reinterpret_cast<u16*>(data + 0x0C) = BSWAP16(*reinterpret_cast<u16*>(data + 0x0C));
-            *reinterpret_cast<u16*>(data + 0x0E) = BSWAP16(*reinterpret_cast<u16*>(data + 0x0E));
-            *reinterpret_cast<u16*>(data + 0x10) = BSWAP16(*reinterpret_cast<u16*>(data + 0x10));
-            *reinterpret_cast<u16*>(data + 0x12) = BSWAP16(*reinterpret_cast<u16*>(data + 0x12));
-            *reinterpret_cast<u16*>(data + 0x14) = BSWAP16(*reinterpret_cast<u16*>(data + 0x14));
-            *reinterpret_cast<u16*>(data + 0x16) = BSWAP16(*reinterpret_cast<u16*>(data + 0x16));
-            *reinterpret_cast<u16*>(data + 0x1C) = BSWAP16(*reinterpret_cast<u16*>(data + 0x1C));
-            *reinterpret_cast<u16*>(data + 0x1E) = BSWAP16(*reinterpret_cast<u16*>(data + 0x1E));
-            *reinterpret_cast<u16*>(data + 0x20) = BSWAP16(*reinterpret_cast<u16*>(data + 0x20));
-            *reinterpret_cast<u16*>(data + 0x22) = BSWAP16(*reinterpret_cast<u16*>(data + 0x22));
-            *reinterpret_cast<u16*>(data + 0x24) = BSWAP16(*reinterpret_cast<u16*>(data + 0x24));
-            *reinterpret_cast<u16*>(data + 0x26) = BSWAP16(*reinterpret_cast<u16*>(data + 0x26));
-            *reinterpret_cast<u16*>(data + 0x28) = BSWAP16(*reinterpret_cast<u16*>(data + 0x28));
-            *reinterpret_cast<u16*>(data + 0x2A) = BSWAP16(*reinterpret_cast<u16*>(data + 0x2A));
-            *reinterpret_cast<u16*>(data + 0x2C) = BSWAP16(*reinterpret_cast<u16*>(data + 0x2C));
-            *reinterpret_cast<u16*>(data + 0x2E) = BSWAP16(*reinterpret_cast<u16*>(data + 0x2E));
+            *reinterpret_cast<u16*>(data + 0x00) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x00));
+            *reinterpret_cast<u16*>(data + 0x02) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x02));
+            StoreSwap32(reinterpret_cast<u32*>(data + 0x04));
+            *reinterpret_cast<u16*>(data + 0x08) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x08));
+            *reinterpret_cast<u16*>(data + 0x0A) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x0A));
+            *reinterpret_cast<u16*>(data + 0x0C) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x0C));
+            *reinterpret_cast<u16*>(data + 0x0E) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x0E));
+            *reinterpret_cast<u16*>(data + 0x10) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x10));
+            *reinterpret_cast<u16*>(data + 0x12) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x12));
+            *reinterpret_cast<u16*>(data + 0x14) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x14));
+            *reinterpret_cast<u16*>(data + 0x16) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x16));
+            *reinterpret_cast<u16*>(data + 0x1C) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x1C));
+            *reinterpret_cast<u16*>(data + 0x1E) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x1E));
+            *reinterpret_cast<u16*>(data + 0x20) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x20));
+            *reinterpret_cast<u16*>(data + 0x22) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x22));
+            *reinterpret_cast<u16*>(data + 0x24) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x24));
+            *reinterpret_cast<u16*>(data + 0x26) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x26));
+            *reinterpret_cast<u16*>(data + 0x28) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x28));
+            *reinterpret_cast<u16*>(data + 0x2A) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x2A));
+            *reinterpret_cast<u16*>(data + 0x2C) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x2C));
+            *reinterpret_cast<u16*>(data + 0x2E) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x2E));
         }
         DCStoreRange(rsdItem->ptr18, dataSize);
         break;
     }
     case 0x42:
         memcpy(&usb.m_stageLoad, usb.m_data, 4);
-        usb.m_stageLoad = reinterpret_cast<CMemory::CStage*>(BSWAP32(reinterpret_cast<u32>(usb.m_stageLoad)));
+        usb.m_stageLoad = reinterpret_cast<CMemory::CStage*>(LoadSwap32(reinterpret_cast<u32>(usb.m_stageLoad)));
         DCStoreRange(&usb.m_stageLoad, 4);
         SetRsdIndex__18CMaterialEditorPcsFv(materialEditorPcs);
         break;
     case 0x43:
         memcpy(&materialEditorPcs->m_rsdFlag, usb.m_data, 4);
-        materialEditorPcs->m_rsdFlag = BSWAP32(materialEditorPcs->m_rsdFlag);
+        materialEditorPcs->m_rsdFlag = LoadSwap32(materialEditorPcs->m_rsdFlag);
         SetRsdFlag__18CMaterialEditorPcsFv(materialEditorPcs);
         DCStoreRange(&materialEditorPcs->m_rsdFlag, 4);
         break;
@@ -232,47 +254,47 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         xyzData = reinterpret_cast<u32*>(rsdItem->ptr14);
         for (u32 i = 0, offset = 0; i < size; i++, offset += 0xC) {
             u32* item = reinterpret_cast<u32*>(reinterpret_cast<u8*>(xyzData) + offset);
-            item[0] = BSWAP32(item[0]);
-            *reinterpret_cast<float*>(item + 1) = -static_cast<float>(BSWAP32(item[1]));
-            *reinterpret_cast<float*>(item + 2) = -static_cast<float>(BSWAP32(item[2]));
+            StoreSwap32(item + 0);
+            StoreSwapNegFloat(reinterpret_cast<f32*>(item + 1));
+            StoreSwapNegFloat(reinterpret_cast<f32*>(item + 2));
         }
         DCStoreRange(rsdItem->ptr14, dataSize);
         break;
     }
     case 1: {
         memcpy(Ptr(materialEditorPcs, 0xEC), usb.m_data, 0x120);
-        U32At(materialEditorPcs, 0xEC) = BSWAP32(U32At(materialEditorPcs, 0xEC));
-        U32At(materialEditorPcs, 0xF0) = BSWAP32(U32At(materialEditorPcs, 0xF0));
-        U32At(materialEditorPcs, 0xF4) = BSWAP32(U32At(materialEditorPcs, 0xF4));
-        U32At(materialEditorPcs, 0xF8) = BSWAP32(U32At(materialEditorPcs, 0xF8));
-        U32At(materialEditorPcs, 0xFC) = BSWAP32(U32At(materialEditorPcs, 0xFC));
-        U32At(materialEditorPcs, 0x100) = BSWAP32(U32At(materialEditorPcs, 0x100));
-        U32At(materialEditorPcs, 0x104) = BSWAP32(U32At(materialEditorPcs, 0x104));
-        U32At(materialEditorPcs, 0x108) = BSWAP32(U32At(materialEditorPcs, 0x108));
-        U32At(materialEditorPcs, 0x10C) = BSWAP32(U32At(materialEditorPcs, 0x10C));
-        U32At(materialEditorPcs, 0x110) = BSWAP32(U32At(materialEditorPcs, 0x110));
-        U32At(materialEditorPcs, 0x114) = BSWAP32(U32At(materialEditorPcs, 0x114));
-        U32At(materialEditorPcs, 0x118) = BSWAP32(U32At(materialEditorPcs, 0x118));
-        U32At(materialEditorPcs, 0x11C) = BSWAP32(U32At(materialEditorPcs, 0x11C));
-        U32At(materialEditorPcs, 0x120) = BSWAP32(U32At(materialEditorPcs, 0x120));
-        U32At(materialEditorPcs, 0x124) = BSWAP32(U32At(materialEditorPcs, 0x124));
-        U32At(materialEditorPcs, 0x128) = BSWAP32(U32At(materialEditorPcs, 0x128));
-        U32At(materialEditorPcs, 0x12C) = BSWAP32(U32At(materialEditorPcs, 0x12C));
-        U32At(materialEditorPcs, 0x130) = BSWAP32(U32At(materialEditorPcs, 0x130));
-        U32At(materialEditorPcs, 0x134) = BSWAP32(U32At(materialEditorPcs, 0x134));
-        U32At(materialEditorPcs, 0x138) = BSWAP32(U32At(materialEditorPcs, 0x138));
-        U32At(materialEditorPcs, 0x13C) = BSWAP32(U32At(materialEditorPcs, 0x13C));
-        U32At(materialEditorPcs, 0x140) = BSWAP32(U32At(materialEditorPcs, 0x140));
-        U32At(materialEditorPcs, 0x144) = BSWAP32(U32At(materialEditorPcs, 0x144));
-        U32At(materialEditorPcs, 0x148) = BSWAP32(U32At(materialEditorPcs, 0x148));
-        U32At(materialEditorPcs, 0x14C) = BSWAP32(U32At(materialEditorPcs, 0x14C));
-        U32At(materialEditorPcs, 0x150) = BSWAP32(U32At(materialEditorPcs, 0x150));
-        U32At(materialEditorPcs, 0x154) = BSWAP32(U32At(materialEditorPcs, 0x154));
-        U32At(materialEditorPcs, 0x158) = BSWAP32(U32At(materialEditorPcs, 0x158));
-        U32At(materialEditorPcs, 0x15C) = BSWAP32(U32At(materialEditorPcs, 0x15C));
-        U32At(materialEditorPcs, 0x160) = BSWAP32(U32At(materialEditorPcs, 0x160));
-        U32At(materialEditorPcs, 0x164) = BSWAP32(U32At(materialEditorPcs, 0x164));
-        U32At(materialEditorPcs, 0x168) = BSWAP32(U32At(materialEditorPcs, 0x168));
+        StoreSwap32(&U32At(materialEditorPcs, 0xEC));
+        StoreSwap32(&U32At(materialEditorPcs, 0xF0));
+        StoreSwap32(&U32At(materialEditorPcs, 0xF4));
+        StoreSwap32(&U32At(materialEditorPcs, 0xF8));
+        StoreSwap32(&U32At(materialEditorPcs, 0xFC));
+        StoreSwap32(&U32At(materialEditorPcs, 0x100));
+        StoreSwap32(&U32At(materialEditorPcs, 0x104));
+        StoreSwap32(&U32At(materialEditorPcs, 0x108));
+        StoreSwap32(&U32At(materialEditorPcs, 0x10C));
+        StoreSwap32(&U32At(materialEditorPcs, 0x110));
+        StoreSwap32(&U32At(materialEditorPcs, 0x114));
+        StoreSwap32(&U32At(materialEditorPcs, 0x118));
+        StoreSwap32(&U32At(materialEditorPcs, 0x11C));
+        StoreSwap32(&U32At(materialEditorPcs, 0x120));
+        StoreSwap32(&U32At(materialEditorPcs, 0x124));
+        StoreSwap32(&U32At(materialEditorPcs, 0x128));
+        StoreSwap32(&U32At(materialEditorPcs, 0x12C));
+        StoreSwap32(&U32At(materialEditorPcs, 0x130));
+        StoreSwap32(&U32At(materialEditorPcs, 0x134));
+        StoreSwap32(&U32At(materialEditorPcs, 0x138));
+        StoreSwap32(&U32At(materialEditorPcs, 0x13C));
+        StoreSwap32(&U32At(materialEditorPcs, 0x140));
+        StoreSwap32(&U32At(materialEditorPcs, 0x144));
+        StoreSwap32(&U32At(materialEditorPcs, 0x148));
+        StoreSwap32(&U32At(materialEditorPcs, 0x14C));
+        StoreSwap32(&U32At(materialEditorPcs, 0x150));
+        StoreSwap32(&U32At(materialEditorPcs, 0x154));
+        StoreSwap32(&U32At(materialEditorPcs, 0x158));
+        StoreSwap32(&U32At(materialEditorPcs, 0x15C));
+        StoreSwap32(&U32At(materialEditorPcs, 0x160));
+        StoreSwap32(&U32At(materialEditorPcs, 0x164));
+        StoreSwap32(&U32At(materialEditorPcs, 0x168));
         memcpy(Ptr(materialEditorPcs, 0x20C), Ptr(materialEditorPcs, 0xEC), 0x30);
         DCStoreRange(Ptr(materialEditorPcs, 0xEC), 0x120);
         break;
@@ -317,7 +339,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         materialEditorPcs->m_textureHeader[materialEditorPcs->m_loadedTextureCount] = static_cast<s16*>(headerDst);
         memcpy(headerBuffer, usb.m_data, size);
         for (int i = 0; i < 8; i++) {
-            headerBuffer[i] = BSWAP16(headerBuffer[i]);
+            headerBuffer[i] = LoadSwapU16(headerBuffer[i]);
         }
         DCFlushRange(headerBuffer, 0x10);
         memcpy(materialEditorPcs->m_textureHeader[materialEditorPcs->m_loadedTextureCount], headerBuffer, 0x10);

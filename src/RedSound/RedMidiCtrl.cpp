@@ -133,6 +133,16 @@ enum RedMidiReverbMixCommandByte {
     REDSOUND_MIDI_REVERB_MIX_RIGHT = 1,
 };
 
+enum RedMidiTempoChangeCommandByte {
+    REDSOUND_MIDI_TEMPO_CHANGE_STEP = 0,
+    REDSOUND_MIDI_TEMPO_CHANGE_TARGET = 1,
+};
+
+enum RedMidiTimeSignatureCommandByte {
+    REDSOUND_MIDI_TIME_SIGNATURE_NUMERATOR = 0,
+    REDSOUND_MIDI_TIME_SIGNATURE_DENOMINATOR = 1,
+};
+
 enum RedSoundControlSaveWordOffset {
     REDSOUND_CONTROL_SAVE_COMMAND_WORD = 0x0A,
     REDSOUND_CONTROL_SAVE_DELTA_WORD = 0x4A,
@@ -919,9 +929,12 @@ static void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedT
 {
     unsigned int delta;
 
-    delta = (*track->m_command != 0) ? *track->m_command : REDSOUND_MIDI_DEFAULT_STEP_COUNT;
+    delta = (track->m_command[REDSOUND_MIDI_TEMPO_CHANGE_STEP] != 0)
+                ? track->m_command[REDSOUND_MIDI_TEMPO_CHANGE_STEP]
+                : REDSOUND_MIDI_DEFAULT_STEP_COUNT;
 
-    control->m_tempoAdd = DataAddCompute(&control->m_tempo, track->m_command[1], (int*)&delta);
+    control->m_tempoAdd =
+        DataAddCompute(&control->m_tempo, track->m_command[REDSOUND_MIDI_TEMPO_CHANGE_TARGET], (int*)&delta);
     control->m_tempoDelta = delta;
     track->m_command += 2;
 }
@@ -993,8 +1006,8 @@ static void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
  */
 static void __MidiCtrl_TimeSignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    control->m_timeNumerator = *track->m_command;
-    control->m_timeDenominator = track->m_command[1];
+    control->m_timeNumerator = track->m_command[REDSOUND_MIDI_TIME_SIGNATURE_NUMERATOR];
+    control->m_timeDenominator = track->m_command[REDSOUND_MIDI_TIME_SIGNATURE_DENOMINATOR];
     control->m_ticksPerMeasure =
         (REDSOUND_MIDI_TICKS_PER_WHOLE_NOTE / control->m_timeDenominator) * control->m_timeNumerator;
     track->m_command += 2;

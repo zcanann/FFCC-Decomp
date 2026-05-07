@@ -8,6 +8,13 @@
 
 extern "C" const float FLOAT_8032F8EC;
 extern "C" const float FLOAT_8032F8F0;
+extern "C" const float FLOAT_8032F8C0;
+extern "C" const float FLOAT_8032F8C4;
+extern "C" const float FLOAT_8032F8C8;
+extern "C" const float FLOAT_8032F8CC;
+extern "C" const float FLOAT_8032F8D0;
+extern "C" const float FLOAT_8032F8F4;
+extern "C" const float FLOAT_8032F8F8;
 
 CMapCylinder g_hit_cyl;
 CMapCylinder g_hit_cyl_min;
@@ -18,8 +25,6 @@ Vec g_hit_hpv_min;
 
 namespace {
 static const char s_maphit_cpp[] = "maphit.cpp";
-static const float s_large_pos = 3.4e38f;
-static const float s_large_neg = -3.4e38f;
 static const float s_epsilon = 0.0001f;
 static const float s_push = 0.01f;
 
@@ -323,12 +328,12 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
             m_vertices = new (stage, const_cast<char*>(s_maphit_cpp), 0x143) Vec[m_vertexCount];
 
-            m_positionMin.x = s_large_pos;
-            m_positionMin.y = s_large_pos;
-            m_positionMin.z = s_large_pos;
-            m_positionMax.x = s_large_neg;
-            m_positionMax.y = s_large_neg;
-            m_positionMax.z = s_large_neg;
+            m_positionMin.x = FLOAT_8032F8EC;
+            m_positionMin.y = FLOAT_8032F8EC;
+            m_positionMin.z = FLOAT_8032F8EC;
+            m_positionMax.x = FLOAT_8032F8F0;
+            m_positionMax.y = FLOAT_8032F8F0;
+            m_positionMax.z = FLOAT_8032F8F0;
 
             for (unsigned int i = 0; i < m_vertexCount; i++) {
                 Vec& v = m_vertices[i];
@@ -357,12 +362,12 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 }
             }
 
-            m_positionMin.x -= 0.1f;
-            m_positionMin.y -= 0.1f;
-            m_positionMin.z -= 0.1f;
-            m_positionMax.x += 0.1f;
-            m_positionMax.y += 0.1f;
-            m_positionMax.z += 0.1f;
+            m_positionMin.x -= FLOAT_8032F8CC;
+            m_positionMin.y -= FLOAT_8032F8CC;
+            m_positionMin.z -= FLOAT_8032F8CC;
+            m_positionMax.x += FLOAT_8032F8CC;
+            m_positionMax.y += FLOAT_8032F8CC;
+            m_positionMax.z += FLOAT_8032F8CC;
         } else if (chunk.m_id == 'HITF') {
             m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
             m_faces = new (stage, const_cast<char*>(s_maphit_cpp), 0x159) CMapHitFace[m_faceCount];
@@ -386,8 +391,8 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 
                 const unsigned int vertexCount = face.m_vertexCount;
                 for (unsigned int i = 0; i < vertexCount; i++) {
-                    face.m_vertexOffsets[i][0] = 0.0f;
-                    face.m_vertexOffsets[i][1] = 0.0f;
+                    face.m_vertexOffsets[i][0] = FLOAT_8032F8D0;
+                    face.m_vertexOffsets[i][1] = FLOAT_8032F8D0;
                 }
 
                 if (chunk.m_version == 0) {
@@ -396,7 +401,7 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                         (void)chunkFile.GetF4();
                         (void)chunkFile.GetF4();
                     }
-                    face.m_radiusScale = 0.0f;
+                    face.m_radiusScale = FLOAT_8032F8D0;
                 } else if (chunk.m_version == 1) {
                     face.m_radiusScale = chunkFile.GetF4();
                     chunkFile.Align(4);
@@ -404,17 +409,17 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     face.m_radiusScale = chunkFile.GetF4();
                     chunkFile.Align(4);
                     for (unsigned int i = 0; i < vertexCount; i++) {
-                        face.m_vertexOffsets[i][0] = chunkFile.GetF4() * 0.01f;
-                        face.m_vertexOffsets[i][1] = chunkFile.GetF4() * 0.01f;
+                        face.m_vertexOffsets[i][0] = chunkFile.GetF4() * FLOAT_8032F8F4;
+                        face.m_vertexOffsets[i][1] = chunkFile.GetF4() * FLOAT_8032F8F4;
                     }
                 }
 
-                face.m_boundsMin.x = s_large_pos;
-                face.m_boundsMin.y = s_large_pos;
-                face.m_boundsMin.z = s_large_pos;
-                face.m_boundsMax.x = s_large_neg;
-                face.m_boundsMax.y = s_large_neg;
-                face.m_boundsMax.z = s_large_neg;
+                face.m_boundsMin.x = FLOAT_8032F8EC;
+                face.m_boundsMin.y = FLOAT_8032F8EC;
+                face.m_boundsMin.z = FLOAT_8032F8EC;
+                face.m_boundsMax.x = FLOAT_8032F8F0;
+                face.m_boundsMax.y = FLOAT_8032F8F0;
+                face.m_boundsMax.z = FLOAT_8032F8F0;
 
                 for (unsigned int i = 0; i < vertexCount; i++) {
                     const unsigned short idx = chunkFile.Get2();
@@ -442,14 +447,14 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     }
                 }
 
-                float width = face.m_radiusScale * 0.5f;
-                face.m_boundsMin.x -= (0.1f + width);
-                face.m_boundsMin.y -= (0.1f + width);
-                face.m_boundsMin.z -= (0.1f + width);
-                face.m_boundsMax.x += (0.1f + width);
-                face.m_boundsMax.y += (0.1f + width);
-                face.m_boundsMax.z += (0.1f + width);
-                face.m_radiusScale = 1.0f - width;
+                float width = face.m_radiusScale * FLOAT_8032F8F8;
+                face.m_boundsMin.x -= (FLOAT_8032F8F4 + width);
+                face.m_boundsMin.y -= (FLOAT_8032F8F4 + width);
+                face.m_boundsMin.z -= (FLOAT_8032F8F4 + width);
+                face.m_boundsMax.x += (FLOAT_8032F8F4 + width);
+                face.m_boundsMax.y += (FLOAT_8032F8F4 + width);
+                face.m_boundsMax.z += (FLOAT_8032F8F4 + width);
+                face.m_radiusScale = FLOAT_8032F8CC - width;
             }
         } else if (chunk.m_id == 'NAME') {
             char* mapHitName = chunkFile.GetString();
@@ -767,11 +772,11 @@ void CMapHit::CalcHitPosition(Vec* position)
 {
     if (g_hit_edge_idx_min != -1) {
         float len = PSVECMag(&CylinderVector(g_hit_cyl_min));
-        PSVECScale(&CylinderVector(g_hit_cyl_min), position, g_hit_t - (s_epsilon / len));
+        PSVECScale(&CylinderVector(g_hit_cyl_min), position, g_hit_t - (FLOAT_8032F8C4 / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     } else {
         float len = PSVECMag(&CylinderVector(g_hit_cyl_min));
-        PSVECScale(&CylinderVector(g_hit_cyl_min), position, g_hit_t - (s_push / len));
+        PSVECScale(&CylinderVector(g_hit_cyl_min), position, g_hit_t - (FLOAT_8032F8C8 / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     }
 }
@@ -794,7 +799,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     int faceOffset = 0;
     while (faceIndex < static_cast<int>(m_faceCount)) {
         g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
-        g_hit_t_min = s_large_pos;
+        g_hit_t_min = FLOAT_8032F8C0;
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;
         }
@@ -821,7 +826,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
 
     while (faceIndex < endFace) {
         g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
-        g_hit_t_min = s_large_pos;
+        g_hit_t_min = FLOAT_8032F8C0;
 
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;

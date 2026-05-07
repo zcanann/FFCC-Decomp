@@ -12,6 +12,7 @@
 
 extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
 extern "C" float RandFPM__5CMathFf(float, CMath*);
+extern "C" int sprintf(char*, const char*, ...);
 extern "C" void setAttackAfter__8CGMonObjFi(CGMonObj*, int);
 extern "C" void setActionParam__8CGMonObjFi(CGMonObj*, int);
 extern "C" void setRepop__8CGMonObjFi(CGMonObj*, int);
@@ -42,6 +43,8 @@ extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
 extern "C" void teleport__8CGMonObjFiiiiiiiiiP3VecRiR3Vec(CGMonObj*, int, int, int, int, int, int, int, int, int,
                                                            Vec*, int&, Vec&);
+extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
+extern "C" int GetDispIndex__Q26CChara6CModelFPQ26CChara5CNode(CChara::CModel*, CChara::CNode*);
 extern float FLOAT_80331dd0;
 extern float FLOAT_80331cf8;
 extern float FLOAT_80331dcc;
@@ -84,6 +87,10 @@ extern char SoundBuffer_1260_[];
 extern "C" unsigned char m_boss__8CGMonObj[];
 extern "C" Vec DAT_802127c0;
 extern "C" Vec DAT_802127f0[];
+
+static const char s_to_a_obj_801dd4e8[] = "to_a_obj";
+static const char s_to_b_obj_801dd4f4[] = "to_b_obj";
+static const char s_to_02d_obj_801dd500[] = "to_%02d_obj";
 
 typedef void (*MonObjSawCallback)(CGMonObj*, int, int, int);
 
@@ -2173,17 +2180,44 @@ int CGMonObj::attackCheckFuncMeteoParasiteC(int)
  */
 void CGMonObj::initFinishedFuncMeteoParasite()
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	initFinishedFuncDefault__8CGMonObjFv(this);
 
-	const int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
+	const int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
+	if (scriptKind == 0x85) {
+		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(SoundBuffer_1260_);
+		int nodeIndex =
+		    SearchNode__Q26CChara6CModelFPc(reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model,
+		                                    const_cast<char*>(s_to_a_obj_801dd4e8));
+		nodes[0] = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model->m_nodes + nodeIndex;
+		nodes[0]->m_flags &= 0x7F;
+
+		nodeIndex =
+		    SearchNode__Q26CChara6CModelFPc(reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model,
+		                                    const_cast<char*>(s_to_b_obj_801dd4f4));
+		nodes[1] = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model->m_nodes + nodeIndex;
+		nodes[1]->m_flags &= 0x7F;
+
+		char nodeName[256];
+		for (int i = 0; i < 12; i++) {
+			sprintf(nodeName, s_to_02d_obj_801dd500, i + 1);
+			nodeIndex = SearchNode__Q26CChara6CModelFPc(reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model,
+			                                            nodeName);
+			nodes[i + 2] = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model->m_nodes + nodeIndex;
+			if ((m_boss__8CGMonObj[0x5C] & 0x40) != 0) {
+				int dispIndex =
+				    GetDispIndex__Q26CChara6CModelFPQ26CChara5CNode(
+				        reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model, nodes[i + 2]);
+				reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model->m_meshVisibleMask &= ~(1 << dispIndex);
+			}
+		}
+	}
+
 	CGMonObj** bossObjArr = reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj + 0x48);
 	bossObjArr[scriptKind - 0x85] = this;
 
 	if ((m_boss__8CGMonObj[0x5C] & 0x40) != 0) {
-		object->SetAnimSlot(scriptKind == 0x87 ? 0x0D : 0x0E, 0);
-		prgObj->reqAnim(0, 1, 0);
+		reinterpret_cast<CGObject*>(this)->SetAnimSlot(scriptKind == 0x87 ? 0x0D : 0x0E, 0);
+		reinterpret_cast<CGPrgObj*>(this)->reqAnim(0, 1, 0);
 	}
 }
 

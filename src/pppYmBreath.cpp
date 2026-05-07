@@ -788,10 +788,10 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             if ((groupData->active != 1) && (*groupData->particleIndices != -1) && (*groupData->particleStates == 1)) {
                 float zero = 0.0f;
 
+                groupData->speed = params->m_groupSpeed;
                 unitVelocity.x = 0.0f;
                 unitVelocity.y = 0.0f;
                 unitVelocity.z = -1.0f;
-                groupData->speed = params->m_groupSpeed;
                 pppCopyVector(groupData->direction, unitVelocity);
                 groupData->position.z = zero;
                 groupData->position.y = zero;

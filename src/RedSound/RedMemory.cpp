@@ -20,8 +20,12 @@ const char sRedMemoryLogSuffixB[] = "\x1b[0m";
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bff34
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CRedMemory::CRedMemory()
 {

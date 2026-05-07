@@ -719,7 +719,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
 
     control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE;
 
-    int deltaAdjust = 1 - track->m_deltaTime;
+    int deltaAdjust = -track->m_deltaTime + 1;
     int slot = 0;
     RedTrackDATA* scan;
 

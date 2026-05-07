@@ -617,5 +617,27 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     gUtil.InitConstantRegister();
 }
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static float CalcSphereRadius(Vec* vertices, u16 count)
+{
+    float radius = FLOAT_80331930;
+
+    for (u16 i = 0; i < count; i++) {
+        if (radius < vertices[i].x) {
+            radius = vertices[i].x;
+        }
+    }
+
+    return radius;
+}
+
 extern const float kQuadObjMaxBounds = 10000000.0f;
 extern const float kQuadObjMinBounds = -10000000.0f;

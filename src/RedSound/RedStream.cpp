@@ -33,6 +33,7 @@ enum RedStreamLayoutSize {
 	REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE = 2,
 	REDSOUND_STREAM_ERASE_TRACK = 0xff,
 	REDSOUND_STREAM_STEREO_CHANNEL_COUNT = 2,
+	REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT = 2,
 	REDSOUND_STREAM_BUFFER_SIDE_A = 0,
 	REDSOUND_STREAM_BUFFER_SIDE_B = 1,
 	REDSOUND_STREAM_BUFFER_SIDE_MASK = 1,
@@ -54,8 +55,8 @@ struct RedStreamFile {
 };
 
 struct RedStreamStereoFrame {
-	unsigned int m_left[2];
-	unsigned int m_right[2];
+	unsigned int m_left[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];
+	unsigned int m_right[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];
 };
 
 static RedStreamDATA* _SearchEmptyStreamData();

@@ -572,8 +572,12 @@ int* SetReverb(int bank, int kind, int* params)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c3c44
+ * PAL Size: 368b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 {
@@ -952,8 +956,12 @@ static void _PitchExecute(RedVoiceDATA* voice)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c450c
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static RedWaveDATA* _WaveSplitSelect(RedWaveDATA* wave, RedNoteDATA* note)
 {
@@ -1217,8 +1225,12 @@ skipModSetup:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c4be0
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voiceMask)
 {
@@ -1459,8 +1471,12 @@ static void _VoiceDropedCallback(void* dropped)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c5030
+ * PAL Size: 1268b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void EnvelopeKeyExecute()
 {
@@ -1648,8 +1664,12 @@ void EnvelopeKeyExecute()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c5524
+ * PAL Size: 1304b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _KeyOnControl()
 {
@@ -1905,8 +1925,12 @@ static void _ExecuteExtraData()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c5cec
+ * PAL Size: 1200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
 {

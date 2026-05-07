@@ -48,6 +48,11 @@ struct RedStreamADPCMHeader {
 	AXPBADPCMLOOP m_loop;
 };
 
+struct RedStreamFile {
+	RedStreamHEAD m_header;
+	RedStreamADPCMHeader m_adpcm[1];
+};
+
 struct RedStreamStereoFrame {
 	unsigned int m_left[2];
 	unsigned int m_right[2];
@@ -365,7 +370,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 
 	if ((streamData->m_track != 0) && (streamData->m_buffer != 0) && (streamData->m_aramBuffer != 0)) {
 		sampleOffset = REDSOUND_STREAM_PAGE_SIZE;
-		headerData = reinterpret_cast<RedStreamADPCMHeader*>((u8*)streamHeader + REDSOUND_STREAM_FILE_HEADER_SIZE);
+		headerData = reinterpret_cast<RedStreamFile*>(streamHeader)->m_adpcm;
 		headerData->m_data.pred_scale = (short)((s8*)streamHeader)[sampleOffset];
 		headerData->m_data.yn1 = headerData->m_data.yn2 = 0;
 		if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {

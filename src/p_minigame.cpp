@@ -23,8 +23,9 @@ extern "C" void calc__12CMiniGamePcsFv(CMiniGamePcs*);
 unsigned int m_table_desc0__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
 unsigned int m_table_desc1__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
 unsigned int m_table_desc2__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
+extern const char s_CMiniGamePcs_GAME_801DD098[];
 unsigned int m_table__12CMiniGamePcs[0x148 / sizeof(unsigned int)] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x24
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CMiniGamePcs_GAME_801DD098)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x24
 };
 static const char s_miniGameDefaultTag[4] = {'n', 'o', '_', 'n'};
 static const char s_miniGameEnd0000Text[] = "MiniGameEnd 0000\n";

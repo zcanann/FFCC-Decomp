@@ -2416,7 +2416,7 @@ void MusicSkipFunction()
 {
     int activeTrackCount;
     int trackIndex;
-    int trackCount;
+    unsigned int trackCount;
     RedSoundCONTROL* control;
     RedTrackDATA* track;
 

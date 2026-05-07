@@ -44,7 +44,7 @@ RedReverbModeData t_ReverbModeData[] = {
 static void _EraseAttribute(int, int);
 static int _EraseTime(int);
 static int _SePlayStart(RedSeINFO*, int, int, int, int);
-static void _MusicPlayStart(RedMusicHEAD*, RedWaveHeadWD*, int, int, int);
+static RedTrackDATA* _MusicPlayStart(RedMusicHEAD*, RedWaveHeadWD*, int, int, int);
 
 /*
  * --INFO--
@@ -707,10 +707,10 @@ void SePause(int seId, int pause)
  * JP Address: TODO
  * JP Size: TODO
  */
-static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume, int mode)
+static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume, int mode)
 {
 	if (c_RedEntry.SearchWaveBase(musicHead->m_waveNo) == 0) {
-		return;
+		return (RedTrackDATA*)-1;
 	}
 
 	m_MusicSkipLine = mode;
@@ -746,7 +746,7 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 			fflush(__files + 1);
 		}
 		c_RedEntry.DisplayMMemoryInfo();
-		return;
+		return (RedTrackDATA*)-1;
 	}
 
 	music->m_tracks = (RedTrackDATA*)trackBase;
@@ -857,6 +857,7 @@ static void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, in
 	if (m_MusicSkipLine != 0) {
 		OSSignalSemaphore(&m_MusicSkipSemaphore);
 	}
+	return track;
 }
 
 /*

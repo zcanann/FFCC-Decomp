@@ -208,6 +208,11 @@ enum RedExecuteAdsrStateIndex {
     REDSOUND_ADSR_STATE_STEP_ADD = 2,
 };
 
+enum RedVoiceStartMaskIndex {
+    REDSOUND_VOICE_START_MASK_LOW = 0,
+    REDSOUND_VOICE_START_MASK_HIGH = 1,
+};
+
 /*
  * --INFO--
  * PAL Address: 0x801c2fc4
@@ -1685,8 +1690,8 @@ static void _KeyOnControl()
     int (*waveFunc)(int);
 
     _VoiceEnvelopeCheck();
-    voiceStartMask[0] = 0;
-    voiceStartMask[1] = 0;
+    voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] = 0;
+    voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] = 0;
 
     if (m_KeyOnEntry != 0) {
         reserve = p_KeyOnData->m_fixed;
@@ -1815,26 +1820,26 @@ static void _KeyOnControl()
         u32 bit = 1;
         RedVoiceDATA* voice = p_VoiceData;
         do {
-            if ((voiceStartMask[0] & bit) != 0) {
-                voiceStartMask[0] &= ~bit;
+            if ((voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] & bit) != 0) {
+                voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] &= ~bit;
                 voice->m_flags |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
             voice++;
-        } while (voiceStartMask[0] != 0);
+        } while (voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] != 0);
     }
 
     {
         u32 bit = 1;
         RedVoiceDATA* voice = p_VoiceData + REDSOUND_MUTE_BITS_PER_WORD;
         do {
-            if ((voiceStartMask[1] & bit) != 0) {
-                voiceStartMask[1] &= ~bit;
+            if ((voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] & bit) != 0) {
+                voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] &= ~bit;
                 voice->m_flags |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
             voice++;
-        } while (voiceStartMask[1] != 0);
+        } while (voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] != 0);
     }
 }
 

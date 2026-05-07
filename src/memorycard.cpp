@@ -1057,20 +1057,56 @@ void CMemoryCardMan::MakeSaveData()
             caravanWork->unk_0xc1e = 1;
         }
 
-        memcpy(dst + 0x00, &caravanWork->m_id, 0x10);
-        memcpy(dst + 0x12, caravanWork->m_letterMeta, 0x10);
-        *reinterpret_cast<u16*>(dst + 0x24) = *reinterpret_cast<u16*>(&caravanWork->unk_0x3c8);
+        *reinterpret_cast<u16*>(dst + 0x00) = caravanWork->m_id;
+        *reinterpret_cast<u16*>(dst + 0x02) = caravanWork->m_param1;
+        *reinterpret_cast<u16*>(dst + 0x04) = caravanWork->m_param2;
+        *reinterpret_cast<u16*>(dst + 0x06) = caravanWork->m_maxHp;
+        *reinterpret_cast<u16*>(dst + 0x08) = caravanWork->m_hp;
+        *reinterpret_cast<u16*>(dst + 0x0A) = caravanWork->m_strength;
+        *reinterpret_cast<u16*>(dst + 0x0C) = caravanWork->m_magic;
+        *reinterpret_cast<u16*>(dst + 0x0E) = caravanWork->m_defense;
+        for (int i = 0; i < 8; i++)
+        {
+            *reinterpret_cast<u16*>(dst + 0x12 + i * 2) = caravanWork->m_letterMeta[i];
+        }
+        dst[0x24] = caravanWork->unk_0x3c8;
+        dst[0x25] = caravanWork->unk_0x3c9;
         *reinterpret_cast<u16*>(dst + 0x28) = caravanWork->m_inventoryItemCount;
-        memcpy(dst + 0x2A, &caravanWork->m_progressValue, 0x0A);
-        memcpy(dst + 0x34, &caravanWork->unk_0x3ac, 0x08);
-        memcpy(dst + 0x3C, caravanWork->m_inventoryItems, 0x80);
+        *reinterpret_cast<u16*>(dst + 0x2A) = caravanWork->m_progressValue;
+        *reinterpret_cast<u16*>(dst + 0x2C) = caravanWork->m_tribeId;
+        *reinterpret_cast<u16*>(dst + 0x2E) = caravanWork->m_genderFlag;
+        *reinterpret_cast<u16*>(dst + 0x30) = caravanWork->m_appearanceVariant;
+        *reinterpret_cast<u16*>(dst + 0x32) = caravanWork->unk_0x3e6;
+        *reinterpret_cast<int*>(dst + 0x34) = caravanWork->unk_0x3ac;
+        *reinterpret_cast<u32*>(dst + 0x38) = caravanWork->m_equipEffectFlags;
+        for (int i = 0; i < 64; i++)
+        {
+            *reinterpret_cast<s16*>(dst + 0x3C + i * 2) = caravanWork->m_inventoryItems[i];
+        }
         *reinterpret_cast<u32*>(dst + 0xB8) = caravanWork->m_joybusCaravanId;
         *reinterpret_cast<u32*>(dst + 0xBC) = 0;
         *reinterpret_cast<u32*>(dst + 0xC0) = 0;
         *reinterpret_cast<u32*>(dst + 0xC4) = 0;
         memcpy(dst + 0xC8, caravanWork->unk_0x3ca_0x3dd, 0x10);
         *reinterpret_cast<u32*>(dst + 0xD8) = caravanWork->m_letterCount;
-        memcpy(dst + 0x104, caravanWork->m_letter0, 100 * 0x0C);
+        for (int i = 0; i < 100; i++)
+        {
+            u8* dstLetter = dst + 0x104 + i * 0x0C;
+            u8* srcLetter = caravanWork->m_letter0 + i * 0x0C;
+
+            dstLetter[0] = static_cast<u8>(((srcLetter[0] >> 3) & 1) << 3) | (dstLetter[0] & 0xF7);
+            *reinterpret_cast<u16*>(dstLetter) =
+                (*reinterpret_cast<u16*>(srcLetter) & 0x07FC) | (*reinterpret_cast<u16*>(dstLetter) & 0xF803);
+            *reinterpret_cast<u32*>(dstLetter) =
+                (*reinterpret_cast<u32*>(srcLetter) & 0x0003FE00) | (*reinterpret_cast<u32*>(dstLetter) & 0xFFFC01FF);
+            *reinterpret_cast<u16*>(dstLetter + 2) =
+                (*reinterpret_cast<u16*>(srcLetter + 2) & 0x01FF) | (*reinterpret_cast<u16*>(dstLetter + 2) & 0xFE00);
+            memcpy(dstLetter + 4, srcLetter + 4, 8);
+            dstLetter[0] = (srcLetter[0] & 0x80) | (dstLetter[0] & 0x7F);
+            dstLetter[0] = (srcLetter[0] & 0x40) | (dstLetter[0] & 0xBF);
+            dstLetter[0] = (srcLetter[0] & 0x20) | (dstLetter[0] & 0xDF);
+            dstLetter[0] = (srcLetter[0] & 0x10) | (dstLetter[0] & 0xEF);
+        }
 
         for (int artifact = 0; artifact < 96; artifact += 3)
         {
@@ -1100,8 +1136,11 @@ void CMemoryCardMan::MakeSaveData()
 
         memcpy(dst + 0x0C8 + 0x100, cv + 0x4CA, 0x2B0);
 
-        memcpy(dst + 0x598, caravanWork->m_commandListInventorySlotRef, 0x10);
-        memcpy(dst + 0x5A8, caravanWork->m_commandListExtra, 0x10);
+        for (int i = 0; i < 8; i++)
+        {
+            *reinterpret_cast<s16*>(dst + 0x598 + i * 2) = caravanWork->m_commandListInventorySlotRef[i];
+            *reinterpret_cast<s16*>(dst + 0x5A8 + i * 2) = caravanWork->m_commandListExtra[i];
+        }
 
         *reinterpret_cast<int*>(dst + 0x1A84) = caravanWork->m_shopState;
         memcpy(dst + 0x1A88, caravanWork->m_evtWorkArr, 0x100);
@@ -1215,13 +1254,17 @@ void CMemoryCardMan::SetLoadData()
         u8* cv = reinterpret_cast<u8*>(caravanWork);
 
         int itemCount = 0;
-        for (int i = 0; i < 64; i++)
+        int inventoryCount = 64;
+        u8* inventorySrc = src;
+        do
         {
-            if (*reinterpret_cast<s16*>(src + 0x3C + i * 2) != -1)
+            if (*reinterpret_cast<s16*>(inventorySrc + 0x3C) != -1)
             {
                 itemCount++;
             }
-        }
+            inventorySrc += 2;
+            inventoryCount--;
+        } while (inventoryCount != 0);
         if (itemCount != *reinterpret_cast<u16*>(src + 0x28))
         {
             if (System.m_execParam != 0)
@@ -1231,18 +1274,54 @@ void CMemoryCardMan::SetLoadData()
             *reinterpret_cast<u16*>(src + 0x28) = static_cast<u16>(itemCount);
         }
 
-        memcpy(&caravanWork->m_id, src + 0x00, 0x10);
-        memcpy(caravanWork->m_letterMeta, src + 0x12, 0x10);
-        *reinterpret_cast<u16*>(&caravanWork->unk_0x3c8) = *reinterpret_cast<u16*>(src + 0x24);
+        caravanWork->m_id = *reinterpret_cast<u16*>(src + 0x00);
+        caravanWork->m_param1 = *reinterpret_cast<u16*>(src + 0x02);
+        caravanWork->m_param2 = *reinterpret_cast<u16*>(src + 0x04);
+        caravanWork->m_maxHp = *reinterpret_cast<u16*>(src + 0x06);
+        caravanWork->m_hp = *reinterpret_cast<u16*>(src + 0x08);
+        caravanWork->m_strength = *reinterpret_cast<u16*>(src + 0x0A);
+        caravanWork->m_magic = *reinterpret_cast<u16*>(src + 0x0C);
+        caravanWork->m_defense = *reinterpret_cast<u16*>(src + 0x0E);
+        for (int i = 0; i < 8; i++)
+        {
+            caravanWork->m_letterMeta[i] = *reinterpret_cast<u16*>(src + 0x12 + i * 2);
+        }
+        caravanWork->unk_0x3c8 = src[0x24];
+        caravanWork->unk_0x3c9 = src[0x25];
         caravanWork->m_inventoryItemCount = *reinterpret_cast<u16*>(src + 0x28);
-        memcpy(&caravanWork->m_progressValue, src + 0x2A, 0x0A);
-        memcpy(&caravanWork->unk_0x3ac, src + 0x34, 0x08);
-        memcpy(caravanWork->m_inventoryItems, src + 0x3C, 0x80);
+        caravanWork->m_progressValue = *reinterpret_cast<u16*>(src + 0x2A);
+        caravanWork->m_tribeId = *reinterpret_cast<u16*>(src + 0x2C);
+        caravanWork->m_genderFlag = *reinterpret_cast<u16*>(src + 0x2E);
+        caravanWork->m_appearanceVariant = *reinterpret_cast<u16*>(src + 0x30);
+        caravanWork->unk_0x3e6 = *reinterpret_cast<u16*>(src + 0x32);
+        caravanWork->unk_0x3ac = *reinterpret_cast<int*>(src + 0x34);
+        caravanWork->m_equipEffectFlags = *reinterpret_cast<u32*>(src + 0x38);
+        for (int i = 0; i < 64; i++)
+        {
+            caravanWork->m_inventoryItems[i] = *reinterpret_cast<s16*>(src + 0x3C + i * 2);
+        }
         caravanWork->m_joybusCaravanId = *reinterpret_cast<int*>(src + 0xB8);
         caravanWork->m_gil = *reinterpret_cast<int*>(src + 0xBC);
         memcpy(caravanWork->unk_0x3ca_0x3dd, src + 0xC8, 0x10);
         caravanWork->m_letterCount = *reinterpret_cast<int*>(src + 0xD8);
-        memcpy(caravanWork->m_letter0, src + 0x104, 100 * 0x0C);
+        for (int i = 0; i < 100; i++)
+        {
+            u8* dstLetter = caravanWork->m_letter0 + i * 0x0C;
+            u8* srcLetter = src + 0x104 + i * 0x0C;
+
+            dstLetter[0] = static_cast<u8>(((srcLetter[0] >> 3) & 1) << 3) | (dstLetter[0] & 0xF7);
+            *reinterpret_cast<u16*>(dstLetter) =
+                (*reinterpret_cast<u16*>(srcLetter) & 0x07FC) | (*reinterpret_cast<u16*>(dstLetter) & 0xF803);
+            *reinterpret_cast<u32*>(dstLetter) =
+                (*reinterpret_cast<u32*>(srcLetter) & 0x0003FE00) | (*reinterpret_cast<u32*>(dstLetter) & 0xFFFC01FF);
+            *reinterpret_cast<u16*>(dstLetter + 2) =
+                (*reinterpret_cast<u16*>(srcLetter + 2) & 0x01FF) | (*reinterpret_cast<u16*>(dstLetter + 2) & 0xFE00);
+            memcpy(dstLetter + 4, srcLetter + 4, 8);
+            dstLetter[0] = (srcLetter[0] & 0x80) | (dstLetter[0] & 0x7F);
+            dstLetter[0] = (srcLetter[0] & 0x40) | (dstLetter[0] & 0xBF);
+            dstLetter[0] = (srcLetter[0] & 0x20) | (dstLetter[0] & 0xDF);
+            dstLetter[0] = (srcLetter[0] & 0x10) | (dstLetter[0] & 0xEF);
+        }
 
         for (int artifact = 0; artifact < 96; artifact += 2)
         {
@@ -1270,8 +1349,11 @@ void CMemoryCardMan::SetLoadData()
             }
         }
 
-        memcpy(caravanWork->m_commandListInventorySlotRef, src + 0x598, 0x10);
-        memcpy(caravanWork->m_commandListExtra, src + 0x5A8, 0x10);
+        for (int i = 0; i < 8; i++)
+        {
+            caravanWork->m_commandListInventorySlotRef[i] = *reinterpret_cast<s16*>(src + 0x598 + i * 2);
+            caravanWork->m_commandListExtra[i] = *reinterpret_cast<s16*>(src + 0x5A8 + i * 2);
+        }
 
         caravanWork->m_shopState = *reinterpret_cast<int*>(src + 0x1A84);
         memcpy(caravanWork->m_evtWorkArr, src + 0x1A88, 0x100);

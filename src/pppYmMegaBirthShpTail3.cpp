@@ -437,9 +437,11 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
                      PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, _PARTICLE_DATA* particleData,
                      VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
-    unsigned int uVar4 = (unsigned int)vColor->m_alpha;
+    int alpha = vColor->m_alpha;
     u8* particleBytes = (u8*)particleData;
     float* blend = (float*)(particleBytes + 0x30);
+    float* velocityScale = (float*)(particleBytes + 0x28);
+    float* tailScale = (float*)(particleBytes + 0x2c);
     u8* frameState = particleBytes + 0x30;
 
     if (particleColor != nullptr) {
@@ -448,24 +450,24 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
         particleColor->m_color[2] = particleColor->m_color[2] + particleColor->m_colorFrameDeltas[2];
         particleColor->m_color[3] = particleColor->m_color[3] + particleColor->m_colorFrameDeltas[3];
 
-        uVar4 = (unsigned int)vColor->m_alpha + (int)particleColor->m_color[3];
-        if (uVar4 > 0xff) {
-            uVar4 = 0xff;
+        alpha = vColor->m_alpha + (int)particleColor->m_color[3];
+        if (alpha > 0xff) {
+            alpha = 0xff;
         }
     }
 
-    particleData->m_matrix[2][2] = particleData->m_matrix[2][2] + pYmMegaBirthShpTail3->m_colorDeltaAdd[2];
-    particleData->m_matrix[2][3] = particleData->m_matrix[2][3] + pYmMegaBirthShpTail3->m_speedRandRange;
+    *velocityScale = *velocityScale + pYmMegaBirthShpTail3->m_colorDeltaAdd[2];
+    *tailScale = *tailScale + pYmMegaBirthShpTail3->m_sizeVal;
 
     Vec local;
     Vec scaled;
 
     local = *(Vec*)(particleBytes + 0x10);
-    pppScaleVectorXYZ(scaled, local, particleData->m_matrix[2][2]);
+    pppScaleVectorXYZ(scaled, local, *velocityScale);
     pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
 
     local = *(Vec*)((u8*)vYmMegaBirthShpTail3 + 0x30);
-    pppScaleVectorXYZ(scaled, local, particleData->m_matrix[2][3]);
+    pppScaleVectorXYZ(scaled, local, *tailScale);
     pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
 
     if (*(u16*)((u8*)&pYmMegaBirthShpTail3->m_matrix[1] + 0x4) != 0) {
@@ -477,7 +479,7 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
     unsigned int fadeTime = (unsigned int)frameState[5];
     if (fadeTime != 0 && frameState[4] <= fadeTime) {
         *blend = *blend -
-            (float)(uVar4) / (float)(fadeTime);
+            (float)alpha / (float)fadeTime;
         if (*blend < 0.0f) {
             *blend = 0.0f;
         }
@@ -487,7 +489,7 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
     if (fadeTime2 != 0 && *(u16*)(particleBytes + 0x22) <= fadeTime2) {
         unsigned char fadeInFrames = *((unsigned char*)&pYmMegaBirthShpTail3->m_matrix[1] + 7);
         *blend = *blend +
-            (float)(uVar4) / (float)(fadeInFrames);
+            (float)alpha / (float)fadeInFrames;
         if (*blend > 1.0f) {
             *blend = 1.0f;
         }
@@ -551,9 +553,9 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
 
         pppGetRotMatrixXYZ(rot, &angles);
         PSMTXMultVecSR(rot.value, &baseDir, &particleData->m_velocity);
-        particleData->m_velocity.x *= pYmMegaBirthShpTail3->m_speedScale.x;
-        particleData->m_velocity.y *= pYmMegaBirthShpTail3->m_speedScale.y;
-        particleData->m_velocity.z *= pYmMegaBirthShpTail3->m_speedScale.z;
+        particleData->m_velocity.x *= pYmMegaBirthShpTail3->field_0x58;
+        particleData->m_velocity.y *= pYmMegaBirthShpTail3->m_speedScale.x;
+        particleData->m_velocity.z *= pYmMegaBirthShpTail3->m_speedScale.y;
         tempVec = particleData->m_velocity;
         pppNormalize(particleData->m_velocity, tempVec);
     }
@@ -603,9 +605,9 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
                 Math.RandF() * (speedRandRange * Math.RandF()) - speedRandHalf;
         }
 
-        particleData->m_matrix[0][0] *= pYmMegaBirthShpTail3->m_speedScale.x;
-        particleData->m_matrix[0][1] *= pYmMegaBirthShpTail3->m_speedScale.y;
-        particleData->m_matrix[0][2] *= pYmMegaBirthShpTail3->m_speedScale.z;
+        particleData->m_matrix[0][0] *= pYmMegaBirthShpTail3->field_0x58;
+        particleData->m_matrix[0][1] *= pYmMegaBirthShpTail3->m_speedScale.x;
+        particleData->m_matrix[0][2] *= pYmMegaBirthShpTail3->m_speedScale.y;
     } else if (mode < 10) {
         float* pathBase = *reinterpret_cast<float**>((u8*)pppPObject + 0x70);
 
@@ -660,9 +662,9 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
                     vz = pathVec[2];
                 }
 
-                particleData->m_matrix[0][0] = vx * pYmMegaBirthShpTail3->m_speedScale.x;
-                particleData->m_matrix[0][1] = vy * pYmMegaBirthShpTail3->m_speedScale.y;
-                particleData->m_matrix[0][2] = vz * pYmMegaBirthShpTail3->m_speedScale.z;
+                particleData->m_matrix[0][0] = vx * pYmMegaBirthShpTail3->field_0x58;
+                particleData->m_matrix[0][1] = vy * pYmMegaBirthShpTail3->m_speedScale.x;
+                particleData->m_matrix[0][2] = vz * pYmMegaBirthShpTail3->m_speedScale.y;
 
                 if ((mode == 8) || (mode == 9)) {
                     Vec velocity = particleData->m_velocity;
@@ -716,12 +718,10 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
     }
     particleBytes[0x34] = 0;
 
-    if (particleWMat != 0) {
-        if (pYmMegaBirthShpTail3->m_wmatCopyMode == 0) {
-            pppCopyMatrix(*(pppFMATRIX*)particleWMat, vYmMegaBirthShpTail3->m_emitterMatrix);
-        } else if (pYmMegaBirthShpTail3->m_wmatCopyMode == 1) {
-            pppCopyMatrix(*(pppFMATRIX*)particleWMat, vYmMegaBirthShpTail3->m_emitterMatrix);
-        }
+    if (pYmMegaBirthShpTail3->m_wmatCopyMode == 0) {
+        pppCopyMatrix(*(pppFMATRIX*)particleWMat, vYmMegaBirthShpTail3->m_emitterMatrix);
+    } else if (pYmMegaBirthShpTail3->m_wmatCopyMode == 1) {
+        pppCopyMatrix(*(pppFMATRIX*)particleWMat, vYmMegaBirthShpTail3->m_emitterMatrix);
     }
 
     *(u16*)(particleBytes + 0x3a) = 0;

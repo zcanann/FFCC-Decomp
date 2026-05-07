@@ -93,6 +93,17 @@ struct GbaQueuePlayerDataView
 };
 STATIC_ASSERT(sizeof(GbaQueuePlayerDataView) == 0xDC);
 
+struct GbaQueuePlayerPosView
+{
+	unsigned char _pad00[3];
+	char m_active;
+	unsigned char _pad04[0x32];
+	short m_posX;
+	short m_posZ;
+	unsigned char _pad3A[0xA2];
+};
+STATIC_ASSERT(sizeof(GbaQueuePlayerPosView) == 0xDC);
+
 struct GbaQueueCMakeInfoView
 {
 	unsigned char m_active;
@@ -1698,12 +1709,10 @@ void GbaQueue::LoadMapItemStat()
  */
 void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 {
-	unsigned char localPlayerData[0x370];
+	GbaQueuePlayerPosView localPlayerData[4];
 	unsigned char packet[0xC];
 	int i;
-	short baseX;
-	short baseZ;
-	unsigned char nearbyMask;
+	unsigned int nearbyMask;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + 0x454, sizeof(localPlayerData));
@@ -1719,44 +1728,62 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 	packet[4] = 0x51;
 	packet[8] = 0x91;
 
-	baseX = *reinterpret_cast<short*>(localPlayerData + (channel * 0xDC) + 0x36);
-	baseZ = *reinterpret_cast<short*>(localPlayerData + (channel * 0xDC) + 0x38);
+	const int baseX = localPlayerData[channel].m_posX;
+	const int baseZ = localPlayerData[channel].m_posZ;
 
 	nearbyMask = 0;
-	for (i = 0; i < 4; i++) {
-		const unsigned char* player = localPlayerData + (i * 0xDC);
-		const short px = *reinterpret_cast<const short*>(player + 0x36);
-		const short pz = *reinterpret_cast<const short*>(player + 0x38);
+	const GbaQueuePlayerPosView* player = localPlayerData;
+	for (i = 0; i < 4;) {
+		int px = player[0].m_posX;
+		int pz = player[0].m_posZ;
 
 		if (i == channel) {
-			nearbyMask |= static_cast<unsigned char>(1 << i);
-		} else if (static_cast<char>(player[3]) != 0) {
-			const int dx = static_cast<int>(px) - static_cast<int>(baseX);
-			const int dz = static_cast<int>(pz) - static_cast<int>(baseZ);
+			nearbyMask |= (1 << i) & 0xFF;
+		} else if (player[0].m_active != 0) {
+			const int dx = px - baseX;
+			const int dz = pz - baseZ;
 
 			if ((dx >= -0x50 && dx <= 0x50) && (dz >= -0x40 && dz <= 0x40)) {
-				nearbyMask |= static_cast<unsigned char>(1 << i);
+				nearbyMask |= (1 << i) & 0xFF;
 			}
 		}
+
+		i++;
+		px = player[1].m_posX;
+		pz = player[1].m_posZ;
+
+		if (i == channel) {
+			nearbyMask |= (1 << i) & 0xFF;
+		} else if (player[1].m_active != 0) {
+			const int dx = px - baseX;
+			const int dz = pz - baseZ;
+
+			if ((dx >= -0x50 && dx <= 0x50) && (dz >= -0x40 && dz <= 0x40)) {
+				nearbyMask |= (1 << i) & 0xFF;
+			}
+		}
+
+		player += 2;
+		i++;
 	}
 
-	packet[1] = nearbyMask;
+	packet[1] = static_cast<unsigned char>(nearbyMask);
 	packet[2] = static_cast<unsigned char>(
-		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x36)) - static_cast<char>(baseX));
+		static_cast<char>(localPlayerData[0].m_posX) - static_cast<char>(baseX));
 	packet[3] = static_cast<unsigned char>(
-		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x38)) - static_cast<char>(baseZ));
+		static_cast<char>(localPlayerData[0].m_posZ) - static_cast<char>(baseZ));
 	packet[5] = static_cast<unsigned char>(
-		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x112)) - static_cast<char>(baseX));
+		static_cast<char>(localPlayerData[1].m_posX) - static_cast<char>(baseX));
 	packet[6] = static_cast<unsigned char>(
-		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x114)) - static_cast<char>(baseZ));
+		static_cast<char>(localPlayerData[1].m_posZ) - static_cast<char>(baseZ));
 	packet[7] = static_cast<unsigned char>(
-		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x1EE)) - static_cast<char>(baseX));
+		static_cast<char>(localPlayerData[2].m_posX) - static_cast<char>(baseX));
 	packet[9] = static_cast<unsigned char>(
-		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x1F0)) - static_cast<char>(baseZ));
+		static_cast<char>(localPlayerData[2].m_posZ) - static_cast<char>(baseZ));
 	packet[10] = static_cast<unsigned char>(
-		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x2CA)) - static_cast<char>(baseX));
+		static_cast<char>(localPlayerData[3].m_posX) - static_cast<char>(baseX));
 	packet[11] = static_cast<unsigned char>(
-		static_cast<char>(*reinterpret_cast<short*>(localPlayerData + 0x2CC)) - static_cast<char>(baseZ));
+		static_cast<char>(localPlayerData[3].m_posZ) - static_cast<char>(baseZ));
 
 	memcpy(outData, packet, sizeof(packet));
 }

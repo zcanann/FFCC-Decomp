@@ -880,19 +880,19 @@ int MusicStop(int musicId)
 			music->m_updateFlags = 0;
 			music->m_musicId = -1;
 			if (music->m_activeTrackCount != 0) {
-				RedVoiceDATA* seTrack = p_VoiceData;
+				RedVoiceDATA* voiceData = p_VoiceData;
 				do {
-					if ((seTrack->m_track >= music->m_tracks) &&
-					    (seTrack->m_track < music->m_tracks + music->m_trackCount)) {
-						seTrack->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SUSTAIN_PAUSE_MASK;
-						seTrack->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-						seTrack->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-						seTrack->m_stateFlags &= ~REDSOUND_VOICE_STATE_SE;
-						seTrack->m_track = 0;
-						seTrack->m_active = 0;
+					if ((voiceData->m_track >= music->m_tracks) &&
+					    (voiceData->m_track < music->m_tracks + music->m_trackCount)) {
+						voiceData->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SUSTAIN_PAUSE_MASK;
+						voiceData->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+						voiceData->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+						voiceData->m_stateFlags &= ~REDSOUND_VOICE_STATE_SE;
+						voiceData->m_track = 0;
+						voiceData->m_active = 0;
 					}
-					seTrack++;
-				} while (seTrack < p_VoiceData + REDSOUND_VOICE_COUNT);
+					voiceData++;
+				} while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
 
 				RedTrackDATA* track = music->m_tracks;
 				do {

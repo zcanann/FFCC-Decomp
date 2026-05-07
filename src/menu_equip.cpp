@@ -54,6 +54,7 @@ extern const float FLOAT_80332ef4;
 extern const float FLOAT_80332ef8;
 extern const float FLOAT_80332efc;
 extern const float FLOAT_80332f00;
+extern const double DOUBLE_80332F08;
 extern const float FLOAT_80332f10;
 extern const float FLOAT_80332f14;
 extern const float FLOAT_80332f18;
@@ -668,11 +669,12 @@ int CMenuPcs::EquipClose()
 				*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
 			} else {
 				*reinterpret_cast<int*>(item + 0x10) = *reinterpret_cast<int*>(item + 0x10) + 1;
-				float ratio = FLOAT_80332ee0 -
-				              (static_cast<float>(*reinterpret_cast<int*>(item + 0x10)) /
-				               static_cast<float>(*reinterpret_cast<int*>(item + 0x14)));
-				*reinterpret_cast<float*>(item + 8) = ratio;
-				if (*reinterpret_cast<float*>(item + 8) < FLOAT_80332eb8) {
+				*reinterpret_cast<float*>(item + 8) =
+				    (float)-((DOUBLE_80332ec0 /
+				              (static_cast<double>(*reinterpret_cast<int*>(item + 0x14)) - DOUBLE_80332ed8)) *
+				                 (static_cast<double>(*reinterpret_cast<int*>(item + 0x10)) - DOUBLE_80332ed8) -
+				             DOUBLE_80332ec0);
+				if ((double)*reinterpret_cast<float*>(item + 8) < DOUBLE_80332F08) {
 					*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
 				}
 			}

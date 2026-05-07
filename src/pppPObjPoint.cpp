@@ -32,7 +32,7 @@ void pppPObjPoint(_pppPObject* pObject, pppPObjPointStep* step, _pppCtrlTable* c
             u8* data = step->m_sourceObject;
             _pppPDataVal* pDataVal = pppMngStPtr->m_pppPDataVals;
             pDataVal = &pDataVal[step->m_createProgramIndex];
-            s32 vecOffset = pDataVal->m_nextSpawnTime;
+            s32 vecOffset = pDataVal->m_workOffset;
             vecPtr = data + 0x80;
             vecPtr += vecOffset;
         }

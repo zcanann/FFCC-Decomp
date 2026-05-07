@@ -16,7 +16,10 @@ struct _pppProgSetDef;
 struct _pppPDataVal
 {
     _pppProgSetDef* m_programSetDef; // 0x0
-    _pppPObjLink* m_pppPObjLink;     // 0x4
+    union {
+        _pppPObjLink* m_pppPObjLink;
+        s32 m_workOffset;
+    };                                // 0x4
     s32 m_nextSpawnTime;             // 0x8
     u16 m_activeCount;               // 0xc
     u8 m_index;                      // 0xe

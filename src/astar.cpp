@@ -155,7 +155,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	CVector baseVec(base);
 	CVector fromVec(from);
 	CVector escapeDirSource;
-	CVector escapeDir;
+	Vec escapeDir;
 
 	PSVECSubtract(reinterpret_cast<Vec*>(&fromVec),
 	              reinterpret_cast<Vec*>(&baseVec),
@@ -164,7 +164,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	escapeDir.x = escapeDirSource.x;
 	escapeDir.y = escapeDirSource.y;
 	escapeDir.z = escapeDirSource.z;
-	escapeDir.Normalize();
+	reinterpret_cast<CVector*>(&escapeDir)->Normalize();
 
 	float behindBestDist = kAStarEscapeInitialBestDist;
 	CAPos* behindBest = (CAPos*)0;
@@ -204,7 +204,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					CVector portalDirBase(base);
 					CVector portalDirPos(portal->m_position);
 					CVector dirToPortalSource;
-					CVector portalVec;
+					Vec portalVec;
 
 					PSVECSubtract(reinterpret_cast<Vec*>(&portalDirPos),
 					              reinterpret_cast<Vec*>(&portalDirBase),
@@ -213,7 +213,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					portalVec.x = dirToPortalSource.x;
 					portalVec.y = dirToPortalSource.y;
 					portalVec.z = dirToPortalSource.z;
-					portalVec.Normalize();
+					reinterpret_cast<CVector*>(&portalVec)->Normalize();
 
 					float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&escapeDir),
 					                            reinterpret_cast<Vec*>(&portalVec));

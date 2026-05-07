@@ -26,6 +26,7 @@ extern const char s_pad_cpp[8];
 extern const char s_rb[3];
 extern const char s_replay_dat[12];
 extern const char s_replay_host_msg[64];
+static const char s_wb[] = "wb";
 
 extern "C" {
 PADStatus g_pad[4];
@@ -48,6 +49,30 @@ struct ReplayBuffer
 
 typedef char ReplayFrame_size_check[(sizeof(ReplayFrame) == 0x40) ? 1 : -1];
 typedef char ReplayBuffer_size_check[(sizeof(ReplayBuffer) == 0x69780C) ? 1 : -1];
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800220cc
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPad::SaveReplayData()
+{
+	FILE* fp;
+
+	if ((_1b8_4_ != 0) && (_1b0_4_ != 0) && (*reinterpret_cast<int*>(_1b0_4_ + 4) != 0))
+	{
+		fp = fopen(s_replay_dat, s_wb);
+		if (fp != 0)
+		{
+			fwrite(_1b0_4_, 1, *reinterpret_cast<unsigned int*>(_1b0_4_), fp);
+			fclose(fp);
+		}
+	}
 }
 
 /*

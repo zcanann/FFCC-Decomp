@@ -2414,7 +2414,7 @@ static void _SkipMusicEntry()
  */
 void MusicSkipFunction()
 {
-    int iVar5;
+    int activeTrackCount;
     int trackIndex;
     int trackCount;
     RedSoundCONTROL* control;
@@ -2429,8 +2429,8 @@ void MusicSkipFunction()
 
     control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP;
     memset(p_SkipKeyOn, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
-    iVar5 = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
-    while ((iVar5 == 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
+    activeTrackCount = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
+    while ((activeTrackCount == 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
         memcpy(&control->m_measure, &control->m_savedMeasure, REDSOUND_CONTROL_SAVED_POSITION_SIZE);
         memcpy(&control->m_tempo, &control->m_savedTempo, REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
@@ -2446,7 +2446,7 @@ void MusicSkipFunction()
             trackIndex += 1;
             track += 1;
         } while (trackCount != 0);
-        iVar5 = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
+        activeTrackCount = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
     }
     m_MusicSkipComplete = 1;
 }

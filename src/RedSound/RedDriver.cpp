@@ -105,6 +105,21 @@ enum RedMusicCommandWord {
     REDSOUND_MUSIC_COMMAND_VOLUME = 1,
     REDSOUND_MUSIC_COMMAND_MODE = 2,
     REDSOUND_MUSIC_COMMAND_FADE_TIME = 2,
+    REDSOUND_MUSIC_COMMAND_STOP_NEXT = 3,
+};
+
+enum RedSoundModeCommandWord {
+    REDSOUND_SOUND_MODE_COMMAND_MODE = 0,
+};
+
+enum RedReverbCommandWord {
+    REDSOUND_REVERB_COMMAND_BANK = 0,
+    REDSOUND_REVERB_COMMAND_DEPTH = 1,
+    REDSOUND_REVERB_COMMAND_FADE_TIME = 2,
+};
+
+enum RedMasterVolumeCommandWord {
+    REDSOUND_MASTER_VOLUME_COMMAND_VOLUME = 0,
 };
 
 enum RedDataCommandWord {
@@ -124,6 +139,9 @@ enum RedStreamCommandWord {
 
 enum RedSeCommandWord {
     REDSOUND_SE_COMMAND_ID = 0,
+    REDSOUND_SE_COMMAND_VALUE = 1,
+    REDSOUND_SE_COMMAND_FADE_TIME = 2,
+    REDSOUND_SE_COMMAND_MODE = 3,
     REDSOUND_SE_BLOCK_COMMAND_BANK = 1,
     REDSOUND_SE_BLOCK_COMMAND_NO = 2,
     REDSOUND_SE_BLOCK_COMMAND_PAN = 3,
@@ -139,6 +157,11 @@ enum RedSeCommandWord {
     REDSOUND_SE_MG_COMMAND_GROUP = 2,
     REDSOUND_SE_MG_COMMAND_KIND = 3,
     REDSOUND_SE_COMMAND_PAUSE = 1,
+};
+
+enum RedSeBlockDataCommandWord {
+    REDSOUND_SE_BLOCK_DATA_COMMAND_BANK = 0,
+    REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER = 1,
 };
 
 enum RedDriverTickHistoryLayout {
@@ -317,8 +340,8 @@ static const char sRedDriverLogReset[] = "\x1B[0m";
  */
 static void _SetSoundMode(int* command)
 {
-    m_SoundMode = *command;
-    if (*command == 1) {
+    m_SoundMode = command[REDSOUND_SOUND_MODE_COMMAND_MODE];
+    if (command[REDSOUND_SOUND_MODE_COMMAND_MODE] == 1) {
         OSGetSoundMode(0);
     } else {
         OSGetSoundMode(1);
@@ -351,9 +374,9 @@ static void _SetReverbDepth(int* command)
     int fadeStep;
     RedTrackDATA* track;
 
-    reverbBank = command[0] & 1;
-    reverbDepth = command[1] & REDSOUND_COMMAND_VALUE_MASK;
-    fadeStep = command[2];
+    reverbBank = command[REDSOUND_REVERB_COMMAND_BANK] & 1;
+    reverbDepth = command[REDSOUND_REVERB_COMMAND_DEPTH] & REDSOUND_COMMAND_VALUE_MASK;
+    fadeStep = command[REDSOUND_REVERB_COMMAND_FADE_TIME];
     if (reverbDepth != 0) {
         reverbDepth += 1;
         reverbDepth <<= 8;
@@ -406,8 +429,9 @@ static void _SetMusicData(int* command)
  */
 static void _MusicStop(int* command)
 {
-    MusicStop(*command);
-    if ((*command == -1) || (p_MusicNextPlay->m_musicId == *command)) {
+    MusicStop(command[REDSOUND_MUSIC_COMMAND_ID]);
+    if ((command[REDSOUND_MUSIC_COMMAND_ID] == -1) ||
+        (p_MusicNextPlay->m_musicId == command[REDSOUND_MUSIC_COMMAND_ID])) {
         p_MusicNextPlay->m_musicId = -1;
     }
     if (p_MusicNextPlay->m_musicId < 0) {
@@ -559,7 +583,7 @@ static void _MusicMasterVolume(int* command)
 {
     RedVoiceDATA* voice;
 
-    m_MasterMusicVolume = *command & REDSOUND_COMMAND_VALUE_MASK;
+    m_MasterMusicVolume = command[REDSOUND_MASTER_VOLUME_COMMAND_VOLUME] & REDSOUND_COMMAND_VALUE_MASK;
     if (m_MasterMusicVolume != 0) {
         m_MasterMusicVolume = m_MasterMusicVolume + 1;
         m_MasterMusicVolume = m_MasterMusicVolume * REDSOUND_MASTER_VOLUME_SCALE;
@@ -583,11 +607,12 @@ static void _MusicMasterVolume(int* command)
  */
 static void _MusicVolume(int* command)
 {
-    if (command[3] == 1) {
+    if (command[REDSOUND_MUSIC_COMMAND_STOP_NEXT] == 1) {
         p_MusicNextPlay->m_musicId = -1;
         m_MusicPhraseStop = 0;
     }
-    SetMusicVolume(command[0], command[1], command[2], command[3]);
+    SetMusicVolume(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME],
+                   command[REDSOUND_MUSIC_COMMAND_FADE_TIME], command[REDSOUND_MUSIC_COMMAND_STOP_NEXT]);
 }
 
 /*
@@ -601,7 +626,7 @@ static void _MusicVolume(int* command)
  */
 static void _SetMusicPhraseStop(int* command)
 {
-    m_MusicPhraseStop = *command;
+    m_MusicPhraseStop = command[REDSOUND_MUSIC_COMMAND_ID];
 }
 
 /*
@@ -615,7 +640,7 @@ static void _SetMusicPhraseStop(int* command)
  */
 static void _SetSeBlockData(int* command)
 {
-    u32 index = (u32)*command & 3;
+    u32 index = (u32)command[REDSOUND_SE_BLOCK_DATA_COMMAND_BANK] & 3;
     char* seBlockData;
 
     if (p_SeBlockData[index] != 0) {
@@ -623,8 +648,8 @@ static void _SetSeBlockData(int* command)
         p_SeBlockData[index] = 0;
     }
 
-    if (command[1] != 0) {
-        seBlockData = (char*)command[1];
+    if (command[REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER] != 0) {
+        seBlockData = (char*)command[REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER];
         if ((*seBlockData = REDSOUND_SE_BLOCK_SIGNATURE_0) && (seBlockData[1] = REDSOUND_SE_BLOCK_SIGNATURE_1) &&
             (seBlockData[2] = REDSOUND_SE_BLOCK_SIGNATURE_2) && (seBlockData[3] = REDSOUND_SE_BLOCK_SIGNATURE_3) &&
             (seBlockData[4] = REDSOUND_SE_BLOCK_SIGNATURE_4) && (seBlockData[5] = REDSOUND_SE_BLOCK_SIGNATURE_5) &&
@@ -661,7 +686,7 @@ static void _SetSeSepData(int* command)
  */
 static void _ClearSeSepData(int* command)
 {
-    c_RedEntry.ClearSeSepData(*command);
+    c_RedEntry.ClearSeSepData(command[REDSOUND_SE_COMMAND_ID]);
 }
 
 /*
@@ -778,7 +803,7 @@ static void _SeMasterVolume(int* command)
 {
     RedVoiceDATA* voice;
 
-    m_MasterSEVolume = *command & REDSOUND_COMMAND_VALUE_MASK;
+    m_MasterSEVolume = command[REDSOUND_MASTER_VOLUME_COMMAND_VOLUME] & REDSOUND_COMMAND_VALUE_MASK;
     if (m_MasterSEVolume != 0) {
         m_MasterSEVolume = m_MasterSEVolume + 1;
         m_MasterSEVolume = m_MasterSEVolume * REDSOUND_MASTER_VOLUME_SCALE;
@@ -802,7 +827,8 @@ static void _SeMasterVolume(int* command)
  */
 static void _SeVolume(int* command)
 {
-    SetSeVolume(command[0], command[1], command[2], command[3]);
+    SetSeVolume(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_COMMAND_VALUE],
+                command[REDSOUND_SE_COMMAND_FADE_TIME], command[REDSOUND_SE_COMMAND_MODE]);
 }
 
 /*
@@ -816,7 +842,8 @@ static void _SeVolume(int* command)
  */
 static void _SePan(int* command)
 {
-    SetSePan(command[0], command[1], command[2]);
+    SetSePan(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_COMMAND_VALUE],
+             command[REDSOUND_SE_COMMAND_FADE_TIME]);
 }
 
 /*
@@ -830,7 +857,8 @@ static void _SePan(int* command)
  */
 static void _SePitch(int* command)
 {
-    SetSePitch(command[0], command[1], command[2]);
+    SetSePitch(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_COMMAND_VALUE],
+               command[REDSOUND_SE_COMMAND_FADE_TIME]);
 }
 
 /*
@@ -844,7 +872,7 @@ static void _SePitch(int* command)
  */
 static void _SePause(int* command)
 {
-    SePause(command[0], command[1]);
+    SePause(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_COMMAND_PAUSE]);
 }
 
 /*

@@ -23,6 +23,7 @@ extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" {
 extern const float FLOAT_80330c84;
 }
+extern const float FLOAT_80330c80;
 
 struct pppYmBreathUnkC {
     unsigned char _pad[0xC];
@@ -246,7 +247,7 @@ extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dat
     float zero;
 
     PSMTXIdentity(state->m_matrix);
-    zero = 0.0f;
+    zero = FLOAT_80330c80;
 
     state->m_direction.z = zero;
     state->m_direction.y = zero;

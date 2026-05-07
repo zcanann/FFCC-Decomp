@@ -2393,14 +2393,11 @@ static void _SkipMusicEntry()
  */
 void MusicSkipFunction()
 {
-    int iVar1;
-    int iVar2;
-    int iVar3;
     int iVar5;
-    u32 uVar6;
-    int iVar7;
-    u32* puVar8;
+    int trackIndex;
+    int trackCount;
     RedSoundCONTROL* control;
+    RedTrackDATA* track;
 
     do {
         p_SkipKeyOn = (RedKeyOnDATA*)RedNew(REDSOUND_KEY_ON_BUFFER_SIZE);
@@ -2416,22 +2413,18 @@ void MusicSkipFunction()
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
         memcpy(&control->m_measure, &control->m_savedMeasure, REDSOUND_CONTROL_SAVED_POSITION_SIZE);
         memcpy(&control->m_tempo, &control->m_savedTempo, REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
-        puVar8 = (u32*)control->m_tracks;
-        iVar7 = (int)control + 0x28;
-        uVar6 = control->m_trackCount;
-        iVar5 = 0;
+        track = control->m_tracks;
+        trackCount = control->m_trackCount;
+        trackIndex = 0;
         do {
-            iVar1 = iVar5 * 4;
-            iVar2 = iVar5 * 4;
-            iVar3 = iVar5 * 4;
-            *puVar8 = *(u32*)(iVar7 + iVar5 * 4);
-            uVar6 -= 1;
-            iVar5 += 1;
-            puVar8[0x42] = *(u32*)(iVar7 + iVar1 + 0x100);
-            puVar8[0x41] = *(u32*)(iVar7 + iVar2 + 0x200);
-            puVar8[9] = *(u32*)(iVar7 + iVar3 + 0x300);
-            puVar8 += REDSOUND_TRACK_SIZE / sizeof(*puVar8);
-        } while (uVar6 != 0);
+            track->m_command = control->m_savedCommand[trackIndex];
+            track->m_deltaTime = control->m_savedDelta[trackIndex];
+            track->m_flags = control->m_savedFlags[trackIndex];
+            track->m_note = control->m_savedNote[trackIndex];
+            trackCount -= 1;
+            trackIndex += 1;
+            track += 1;
+        } while (trackCount != 0);
         iVar5 = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
     }
     m_MusicSkipComplete = 1;

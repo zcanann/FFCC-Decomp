@@ -30,6 +30,11 @@ enum RedCommandMusicTrackBlock {
 	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE = sizeof(u32),
 };
 
+enum RedSeInfoSequenceByte {
+	REDSOUND_SE_INFO_SEQUENCE_OFFSET_LO = 0,
+	REDSOUND_SE_INFO_SEQUENCE_OFFSET_HI = 1,
+};
+
 RedReverbModeData t_ReverbModeData[] = {
     {REDSOUND_REVERB_KIND_HI, {0xA, 0x578, 0x1E, 0x46, 0x64, 0x0}},
     {REDSOUND_REVERB_KIND_HI, {0x14, 0x708, 0x1E, 0x50, 0x64, 0x0}},
@@ -385,7 +390,8 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			track->m_waveBankData = waveBase;
 			track->m_command = current;
 			current = current +
-			          (((unsigned int)seq[1] * REDSOUND_SE_INFO_U16_HIGH_SCALE + (unsigned int)*seq) &
+			          (((unsigned int)seq[REDSOUND_SE_INFO_SEQUENCE_OFFSET_HI] * REDSOUND_SE_INFO_U16_HIGH_SCALE +
+			            (unsigned int)seq[REDSOUND_SE_INFO_SEQUENCE_OFFSET_LO]) &
 			           REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK);
 			deltaTime = (int)DeltaTimeSumup((unsigned char**)&track->m_command);
 			track->m_deltaTime = deltaTime + 1;

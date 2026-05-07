@@ -97,6 +97,7 @@ unsigned long s_shadow_no = 0;
 unsigned long InsertShadow_level = 0;
 unsigned long clear_flag_mask = 0;
 unsigned long s_bitMask = 0;
+unsigned long octtree_draw_node_ct = 0;
 
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);

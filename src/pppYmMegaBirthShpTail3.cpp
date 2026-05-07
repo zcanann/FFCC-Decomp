@@ -44,7 +44,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     bool hasRequiredMemory = false;
 
     if (particles != 0 && wmats != 0) {
-        hasRequiredMemory = (payload[0x55] == 0) || (colors != 0);
+        hasRequiredMemory = true;
     }
     if (!hasRequiredMemory || dataValIndex == 0xFFFF) {
         return;
@@ -438,6 +438,9 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
                      VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
     unsigned int uVar4 = (unsigned int)vColor->m_alpha;
+    u8* particleBytes = (u8*)particleData;
+    float* blend = (float*)(particleBytes + 0x30);
+    u8* frameState = particleBytes + 0x30;
 
     if (particleColor != nullptr) {
         particleColor->m_color[0] = particleColor->m_color[0] + particleColor->m_colorFrameDeltas[0];
@@ -457,47 +460,46 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
     Vec local;
     Vec scaled;
 
-    local.x = particleData->m_matrix[1][0];
-    local.y = particleData->m_matrix[1][1];
-    local.z = particleData->m_matrix[1][2];
+    local = *(Vec*)(particleBytes + 0x10);
     pppScaleVectorXYZ(scaled, local, particleData->m_matrix[2][2]);
     pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
 
-    local = vYmMegaBirthShpTail3->m_tailScaleDirection;
+    local = *(Vec*)((u8*)vYmMegaBirthShpTail3 + 0x30);
     pppScaleVectorXYZ(scaled, local, particleData->m_matrix[2][3]);
     pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
 
-    *(char*)&(particleData->m_directionTail).y = *(char*)&(particleData->m_directionTail).y + 1;
+    if (*(u16*)((u8*)&pYmMegaBirthShpTail3->m_matrix[1] + 0x4) != 0) {
+        *(u16*)(particleBytes + 0x22) = *(u16*)(particleBytes + 0x22) - 1;
+    }
 
-    unsigned int fadeTime = (unsigned int)*(unsigned char*)((int)&(particleData->m_directionTail).y + 1);
-    if (fadeTime != 0 && *(unsigned char*)&(particleData->m_directionTail).y <= fadeTime) {
-        particleData->m_directionTail.x = particleData->m_directionTail.x -
+    frameState[4] = frameState[4] + 1;
+
+    unsigned int fadeTime = (unsigned int)frameState[5];
+    if (fadeTime != 0 && frameState[4] <= fadeTime) {
+        *blend = *blend -
             (float)(uVar4) / (float)(fadeTime);
-        if (particleData->m_directionTail.x < 0.0f) {
-            particleData->m_directionTail.x = 0.0f;
+        if (*blend < 0.0f) {
+            *blend = 0.0f;
         }
     }
 
-    unsigned short fadeTime2 = (unsigned short)*(unsigned char*)((int)&(particleData->m_directionTail).y + 2);
-    if (fadeTime2 != 0 && *(unsigned short*)((int)particleData->m_matrix[2] + 2) <= fadeTime2) {
+    unsigned short fadeTime2 = (unsigned short)frameState[6];
+    if (fadeTime2 != 0 && *(u16*)(particleBytes + 0x22) <= fadeTime2) {
         unsigned char fadeInFrames = *((unsigned char*)&pYmMegaBirthShpTail3->m_matrix[1] + 7);
-        if (fadeInFrames != 0) {
-            particleData->m_directionTail.x = particleData->m_directionTail.x +
-                (float)(uVar4) / (float)(fadeInFrames);
-            if (particleData->m_directionTail.x > 1.0f) {
-                particleData->m_directionTail.x = 1.0f;
-            }
+        *blend = *blend +
+            (float)(uVar4) / (float)(fadeInFrames);
+        if (*blend > 1.0f) {
+            *blend = 1.0f;
         }
     }
 
-    if (*(char*)&(particleData->m_directionTail).z == 0) {
-        *(char*)&(particleData->m_directionTail).z = *(char*)((int)&(particleData->m_directionTail).y + 3);
+    if (frameState[8] == 0) {
+        frameState[8] = frameState[7];
     }
-    *(char*)&(particleData->m_directionTail).z = *(char*)&(particleData->m_directionTail).z - 1;
+    frameState[8] = frameState[8] - 1;
 
     PSMTXMultVec(pppPObject->m_localMatrix.value, (Vec*)particleData,
-                 (Vec*)(particleData->m_colorDeltaAdd +
-                       (unsigned int)*(unsigned char*)&(particleData->m_directionTail).z * 3 + 0x11));
+                 (Vec*)(particleBytes + (unsigned int)frameState[8] * sizeof(Vec) + 0x80));
 }
 
 /*
@@ -515,6 +517,7 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
                       _PARTICLE_COLOR* particleColor)
 {
     u8* paramBytes = (u8*)pYmMegaBirthShpTail3;
+    u8* particleBytes = (u8*)particleData;
     u8 mode = paramBytes[0x12];
     float speedRandRange = pYmMegaBirthShpTail3->m_speedRandRange;
     float speedRandHalf = 0.5f * speedRandRange;
@@ -691,11 +694,11 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
     }
 
     if (paramBytes[0x16] != 0) {
-        particleData->m_directionTail.x = (float)vColor->m_alpha;
-        *(((u8*)&particleData->m_directionTail.y) + 1) = paramBytes[0x16];
+        *(float*)(particleBytes + 0x30) = (float)vColor->m_alpha;
+        particleBytes[0x35] = paramBytes[0x16];
     }
     if (paramBytes[0x17] != 0) {
-        *(((u8*)&particleData->m_directionTail.y) + 2) = paramBytes[0x17];
+        particleBytes[0x36] = paramBytes[0x17];
     }
 
     particleData->m_matrix[2][2] = pYmMegaBirthShpTail3->m_colorDeltaAdd[1];
@@ -711,7 +714,7 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
     } else {
         *(s16*)((u8*)particleData + 0x22) = *(s16*)(paramBytes + 0x11);
     }
-    *((u8*)&particleData->m_directionTail.y) = 0;
+    particleBytes[0x34] = 0;
 
     if (particleWMat != 0) {
         if (pYmMegaBirthShpTail3->m_wmatCopyMode == 0) {
@@ -721,11 +724,11 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
         }
     }
 
-    *(u16*)particleData->m_colorDeltaAdd = 0;
-    *(u16*)((u8*)particleData->m_colorDeltaAdd + 2) = 0;
-    *(u16*)((u8*)&particleData->m_directionTail.z + 2) = 0;
-    *((u8*)&particleData->m_directionTail.z) = 0;
-    *(((u8*)&particleData->m_directionTail.y) + 3) = 0x1f;
+    *(u16*)(particleBytes + 0x3a) = 0;
+    *(u16*)(particleBytes + 0x3c) = 0;
+    *(u16*)(particleBytes + 0x3e) = 0;
+    particleBytes[0x38] = 0;
+    particleBytes[0x37] = 0x1f;
 
     Vec zeroVec;
     zeroVec.x = 0.0f;
@@ -737,7 +740,7 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
         *(s16*)((u8*)particleData + 0x4c + i * sizeof(u16)) = (s16)(rand() % 360);
     }
 
-    *((u8*)&particleData->m_directionTail.z) = *(((u8*)&particleData->m_directionTail.y) + 3) - 1;
+    particleBytes[0x38] = particleBytes[0x37] - 1;
     *(u16*)(particleData->m_matrix[1] + 3) = 0;
 }
 

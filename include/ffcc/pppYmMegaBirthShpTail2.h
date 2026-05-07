@@ -13,8 +13,9 @@ struct PYmMegaBirthShpTail2
     float m_speedRandRange;       // 0x54
     float field_0x58;             // 0x58
     Vec m_speedScale;             // 0x5c
-    unsigned char m_pad0x68[0x6a - 0x68];
-    unsigned char m_randType;     // 0x6a
+    unsigned char m_wmatCopyMode; // 0x68
+    unsigned char m_hasColors;     // 0x69
+    short m_pathIndex;             // 0x6a
 };
 
 struct pppYmMegaBirthShpTail2
@@ -40,7 +41,7 @@ struct VYmMegaBirthShpTail2
     _PARTICLE_COLOR* m_colors;          // 0x44
     unsigned int m_maxParticles;        // 0x48
     unsigned short m_lifeLimit;         // 0x4c
-    unsigned short m_lifeLimitPadding;  // 0x4e
+    unsigned short m_pathIndex;         // 0x4e
 };
 
 struct pppYmMegaBirthShpTail2UnkB;

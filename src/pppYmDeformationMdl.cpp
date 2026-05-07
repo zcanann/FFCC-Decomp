@@ -182,12 +182,12 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         PSMTX44Copy(CameraScreenMatrix(), screenMtx);
         PSMTXCopy(CameraMatrix(), cameraMtx);
 
-        texMtx[0][0] = screenMtx[0][0];
-        texMtx[1][1] = screenMtx[1][1];
         texMtx[1][0] = screenMtx[1][0];
         texMtx[2][0] = screenMtx[2][0];
         texMtx[0][1] = screenMtx[0][1];
         texMtx[2][1] = screenMtx[2][1];
+        texMtx[0][0] = screenMtx[0][0];
+        texMtx[1][1] = screenMtx[1][1];
         texMtx[0][2] = screenMtx[0][2];
         texMtx[1][2] = screenMtx[1][2];
         texMtx[2][2] = screenMtx[2][2];

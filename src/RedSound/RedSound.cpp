@@ -763,10 +763,10 @@ void CRedSound::StreamStop(int streamID)
 int CRedSound::StreamPlay(void* data, int fileSize, int pan, int volume)
 {
 	int id = 0;
-	char* streamData = (char*)data;
+	char* streamSignature = (char*)data;
 
-	if (streamData[0] == REDSOUND_STREAM_SIGNATURE_0 && streamData[1] == REDSOUND_STREAM_SIGNATURE_1 &&
-	    streamData[2] == REDSOUND_STREAM_SIGNATURE_2) {
+	if (streamSignature[0] == REDSOUND_STREAM_SIGNATURE_0 && streamSignature[1] == REDSOUND_STREAM_SIGNATURE_1 &&
+	    streamSignature[2] == REDSOUND_STREAM_SIGNATURE_2) {
 		id = GetAutoID();
 		c_Driver.StreamPlay(id, data, fileSize, pan, volume);
 	} else if (m_ReportPrint != 0) {

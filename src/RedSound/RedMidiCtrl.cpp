@@ -752,7 +752,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
                     p_MidiControl_Function[*cmd](control, keyOnData, nextTrack);
 
                     if (nextTrack->m_command != 0) {
-                        int step = DeltaTimeSumup((unsigned char**)nextTrack);
+                        int step = DeltaTimeSumup((unsigned char**)&nextTrack->m_command);
                         currentDelta += step;
                         nextTrack->m_deltaTime += step;
                     }

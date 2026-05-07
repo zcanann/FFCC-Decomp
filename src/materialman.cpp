@@ -417,20 +417,24 @@ read_slot:
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void chkbit32(unsigned long*, unsigned long)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void getHsb(unsigned long)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -677,10 +681,12 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void GXSetTexCoordGen(void)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -2220,20 +2226,24 @@ void CMaterialMan::IncNumTevStage()
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterialMan::GetTexMtxCur()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterialMan::GetTexCoordIdCur()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -2290,10 +2300,12 @@ int CMaterialMan::IncTexMapIdCur()
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterialMan::GetTexMapIdCur()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -2326,50 +2338,60 @@ void CMaterialMan::SetStdEnv()
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterialMan::DecTexCoordIdCur()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterialMan::SetTevBit(CMaterialMan::TEV_BIT)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterialMan::ErrorTexCoordIdCur()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterialMan::ErrorTexMtxCur()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterialMan::ErrorTexMapIdCur()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -3030,10 +3052,12 @@ void CMaterial::Create(unsigned long tag, CMaterialMan::TEV_BIT tevBit)
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterial::IncNumTexture()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -3441,37 +3465,45 @@ int CMaterial::Set(_GXTexMapID texMapId)
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterial::SetTevBit(CMaterialMan::TEV_BIT)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterial::GetNumTexture()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterial::SetTag(int)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterial::AddTextureIdx(int, int)
 {
 	// TODO
 }
+#endif

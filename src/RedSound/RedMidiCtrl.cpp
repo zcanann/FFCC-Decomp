@@ -692,7 +692,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
  */
 static void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA*)
 {
-    if ((m_MusicPhraseStop == 1) && ((void*)control == p_SoundControlBuffer)) {
+    if ((m_MusicPhraseStop == 1) && (control == p_SoundControlBuffer)) {
         RedTrackDATA* track = control->m_tracks;
         do {
             if (track->m_command != 0) {
@@ -793,7 +793,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
 static void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA*)
 {
     control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END;
-    if ((m_MusicPhraseStop == 1) && ((void*)control == p_SoundControlBuffer)) {
+    if ((m_MusicPhraseStop == 1) && (control == p_SoundControlBuffer)) {
         RedTrackDATA* track = control->m_tracks;
         do {
             if (track->m_command != 0) {

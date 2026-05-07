@@ -21,7 +21,7 @@ void pppPObjPoint(_pppPObject* pObject, pppPObjPointStep* step, _pppCtrlTable* c
     }
 
     s32 objOffset = ctrlTable->m_serializedDataOffsets[0];
-    pppPObjPointWork* objPtr = (pppPObjPointWork*)((u8*)pObject + objOffset + 0x80);
+    pppPObjPointWork* objPtr = (pppPObjPointWork*)(pObject->m_workArea + objOffset);
 
     if (step->m_graphId == pObject->m_graphId) {
         u8* vecPtr;
@@ -37,10 +37,10 @@ void pppPObjPoint(_pppPObject* pObject, pppPObjPointStep* step, _pppCtrlTable* c
             vecPtr += vecOffset;
         }
 
-        objPtr->m_source = vecPtr;
+        objPtr->m_source = (Vec*)vecPtr;
     }
 
-    objPtr->m_x = ((f32*)objPtr->m_source)[0];
-    objPtr->m_y = ((f32*)objPtr->m_source)[1];
-    objPtr->m_z = ((f32*)objPtr->m_source)[2];
+    objPtr->m_x = objPtr->m_source->x;
+    objPtr->m_y = objPtr->m_source->y;
+    objPtr->m_z = objPtr->m_source->z;
 }

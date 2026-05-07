@@ -597,7 +597,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
         }
     } else {
         if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
-            voice = (RedVoiceDATA*)p_VoiceData;
+            voice = p_VoiceData;
         } else {
             voice = p_VoiceData + (s8)p_SoundControl->m_channelAlloc;
         }
@@ -623,7 +623,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
         if (voice == voiceEnd) {
             RedVoiceDATA* selectedVoice;
-            RedSoundCONTROL* soundControl = (RedSoundCONTROL*)p_SoundControl;
+            RedSoundCONTROL* soundControl = p_SoundControl;
             soundControl->m_updateFlags = soundControl->m_updateFlags | 2;
             if (bestEnvelope == REDSOUND_ENVELOPE_LEVEL_FULL) {
                 selectedVoice = 0;
@@ -653,7 +653,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
  */
 static void _VoiceEnvelopeCheck()
 {
-    RedVoiceDATA* voiceData = (RedVoiceDATA*)p_VoiceData;
+    RedVoiceDATA* voiceData = p_VoiceData;
     do {
         if ((voiceData->m_stateFlags & REDSOUND_VOICE_STATE_ANY_MASK) != 0) {
             voiceData->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
@@ -1283,7 +1283,7 @@ static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, in
  */
 void SetVoiceAccess(RedTrackDATA* track, int mask)
 {
-    RedVoiceDATA* voiceData = (RedVoiceDATA*)p_VoiceData;
+    RedVoiceDATA* voiceData = p_VoiceData;
     do {
         if ((voiceData->m_track != 0) && (voiceData->m_track == track)) {
             voiceData->m_flags |= mask;
@@ -1303,7 +1303,7 @@ void SetVoiceAccess(RedTrackDATA* track, int mask)
  */
 void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 {
-    RedVoiceDATA* voiceData = (RedVoiceDATA*)p_VoiceData;
+    RedVoiceDATA* voiceData = p_VoiceData;
     do {
         if ((voiceData->m_track != 0) && (voiceData->m_track == track)) {
             voiceData->m_voiceSwitch = voiceSwitch;
@@ -1458,7 +1458,7 @@ static void _VoiceDropedCallback(void* dropped)
 {
     RedVoiceDATA* voiceData;
     
-    voiceData = (RedVoiceDATA*)p_VoiceData;
+    voiceData = p_VoiceData;
     do {
         if ((voiceData->m_axVoice != 0) && (voiceData->m_axVoice == dropped)) {
             voiceData->m_active = 0;
@@ -2242,7 +2242,7 @@ static void _MusicNoteExecute()
     u32 trackCount;
     u32* soundControl;
     RedTrackDATA* track;
-    int status = _MusicMidiNoteExecute(p_SoundControl, (RedKeyOnDATA*)p_KeyOnData, 1);
+    int status = _MusicMidiNoteExecute(p_SoundControl, p_KeyOnData, 1);
 
     while ((status == 0) && (m_MusicPhraseStop == 0) &&
            ((p_SoundControl->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
@@ -2263,7 +2263,7 @@ static void _MusicNoteExecute()
             i++;
         } while (--trackCount != 0);
 
-        status = _MusicMidiNoteExecute(p_SoundControl, (RedKeyOnDATA*)p_KeyOnData, 1);
+        status = _MusicMidiNoteExecute(p_SoundControl, p_KeyOnData, 1);
     }
 
     if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId < 0) &&
@@ -2738,7 +2738,7 @@ void MainControl(int frames)
     memset(p_KeyOnData, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
 
     p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
-    _SeMidiNoteExecute((RedSoundCONTROL*)p_SoundControl, (RedKeyOnDATA*)p_KeyOnData,
+    _SeMidiNoteExecute(p_SoundControl, p_KeyOnData,
                        p_SoundControl->m_tracks, p_SoundControl->m_skipFrames, frames);
     p_SoundControl = p_SoundControlBuffer;
 
@@ -2756,9 +2756,9 @@ void MainControl(int frames)
                     step += p_SoundControl->m_tempo >> REDSOUND_FIXED_SHIFT;
                 }
             }
-            ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter -= step * frames;
-            while (((RedSoundCONTROL*)p_SoundControl)->m_tickCounter < 1) {
-                ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter += REDSOUND_CONTROL_TICK_PERIOD;
+            p_SoundControl->m_tickCounter -= step * frames;
+            while (p_SoundControl->m_tickCounter < 1) {
+                p_SoundControl->m_tickCounter += REDSOUND_CONTROL_TICK_PERIOD;
                 _MusicNoteExecute();
             }
         }
@@ -2767,9 +2767,9 @@ void MainControl(int frames)
     if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) {
         p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
         step = p_SoundControl->m_tempo >> REDSOUND_FIXED_SHIFT;
-        ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter -= step * frames;
-        while (((RedSoundCONTROL*)p_SoundControl)->m_tickCounter < 1) {
-            ((RedSoundCONTROL*)p_SoundControl)->m_tickCounter += REDSOUND_CONTROL_TICK_PERIOD;
+        p_SoundControl->m_tickCounter -= step * frames;
+        while (p_SoundControl->m_tickCounter < 1) {
+            p_SoundControl->m_tickCounter += REDSOUND_CONTROL_TICK_PERIOD;
             _MusicNoteExecute();
         }
         if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount == 0) {

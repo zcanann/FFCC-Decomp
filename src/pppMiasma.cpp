@@ -4,6 +4,7 @@
 #include "ffcc/game.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
+#include "ffcc/mapmesh.h"
 #include "ffcc/util.h"
 
 #include <string.h>
@@ -189,7 +190,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
 
     textureIndex = 0;
     model = (pppModelSt*)(((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex]);
-    GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
+    ((CMapMesh*)model)->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex);
 
     if (param_2->m_payload[0x1E] == 0xFF) {
         param_2->m_payload[0x1E] = 0xFE;

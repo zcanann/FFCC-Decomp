@@ -27,6 +27,10 @@ extern "C" void __ct__Q26CChara5CNodeFv(void*);
 extern "C" void __dt__Q26CChara5CNodeFv(void*, int);
 extern "C" void __ct__Q26CChara5CMeshFv(void*);
 extern "C" void __dt__Q26CChara5CMeshFv(void*, int);
+extern "C" void __dt__Q36CChara5CNode8CRefDataFv(void*, int);
+extern "C" void __dt__Q36CChara5CMesh8CRefDataFv(void*, int);
+extern "C" void __dt__Q36CChara5CMesh12CDisplayListFv(void*, int);
+extern "C" void __dt__Q26CChara5CSkinFv(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __ct__7CVectorFv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
@@ -773,12 +777,33 @@ CChara::CModel::CRefData::CRefData()
  */
 CChara::CModel::CRefData::~CRefData()
 {
-	void** data = (void**)this;
-	for (int i = 0; i < 5; i++) {
-		if (data[i] != 0) {
-			__dla__FPv(data[i]);
-			data[i] = 0;
-		}
+	u8* raw = reinterpret_cast<u8*>(this);
+	void** ptr;
+
+	ptr = reinterpret_cast<void**>(raw + 0x40);
+	if (*ptr != 0) {
+		__dla__FPv(*ptr);
+		*ptr = 0;
+	}
+	ptr = reinterpret_cast<void**>(raw + 0x10);
+	if (*ptr != 0) {
+		__destroy_new_array(*ptr, reinterpret_cast<ConstructorDestructor>(__dt__Q36CChara5CNode8CRefDataFv));
+		*ptr = 0;
+	}
+	ptr = reinterpret_cast<void**>(raw + 0x14);
+	if (*ptr != 0) {
+		__destroy_new_array(*ptr, reinterpret_cast<ConstructorDestructor>(__dt__Q36CChara5CMesh8CRefDataFv));
+		*ptr = 0;
+	}
+	ptr = reinterpret_cast<void**>(raw + 0x18);
+	if (*ptr != 0) {
+		__dla__FPv(*ptr);
+		*ptr = 0;
+	}
+	ptr = reinterpret_cast<void**>(raw + 0x24);
+	if (*ptr != 0) {
+		ReleaseRefCounted(*ptr);
+		*ptr = 0;
 	}
 }
 
@@ -3002,31 +3027,27 @@ void CChara::CMesh::Calc(CChara::CModel* model)
  */
 CChara::CMesh::CRefData::CRefData()
 {
-	*(u32*)((u8*)this + 0x00) = 0;
-	*(u32*)((u8*)this + 0x04) = 0;
-	*(u32*)((u8*)this + 0x08) = 0;
-	*(u32*)((u8*)this + 0x0C) = 0;
-	*(u32*)((u8*)this + 0x10) = 0;
-	*(u32*)((u8*)this + 0x14) = 0;
-	*(u32*)((u8*)this + 0x18) = 0;
-	*(u32*)((u8*)this + 0x1C) = 0;
-	*(u32*)((u8*)this + 0x20) = 0;
-	*(u32*)((u8*)this + 0x24) = 0;
-	*(u32*)((u8*)this + 0x28) = 0;
-	*(u32*)((u8*)this + 0x2C) = 0;
-	*(u32*)((u8*)this + 0x30) = 0;
-	*(u32*)((u8*)this + 0x34) = 0;
-	*(u32*)((u8*)this + 0x38) = 0;
-	*(u32*)((u8*)this + 0x3C) = 0;
-	*(u32*)((u8*)this + 0x40) = 0;
-	*(u32*)((u8*)this + 0x44) = 0;
-	*(u32*)((u8*)this + 0x48) = 0;
-	*(u32*)((u8*)this + 0x4C) = 0;
-	*(u32*)((u8*)this + 0x50) = 0;
-	*(u32*)((u8*)this + 0x54) = 0;
-	*(u32*)((u8*)this + 0x58) = 0;
-	*(u32*)((u8*)this + 0x5C) = 0;
-	*(u32*)((u8*)this + 0x60) = 0;
+	CCharaMeshRefRaw* ref = reinterpret_cast<CCharaMeshRefRaw*>(this);
+
+	ref->m_vertices = 0;
+	ref->m_normals = 0;
+	ref->m_colors = 0;
+	ref->m_uvs = 0;
+	ref->m_oneWeightData = 0;
+	ref->m_twoWeightData = 0;
+	ref->m_threeWeightData = 0;
+	ref->m_displayLists = 0;
+	ref->m_skins = 0;
+	ref->m_vertexCount = 0;
+	ref->m_normalCount = 0;
+	ref->m_colorCount = 0;
+	ref->m_uvCount = 0;
+	ref->m_oneWeightCountOrSize = 0;
+	ref->m_twoWeightCountOrSize = 0;
+	ref->m_threeWeightCountOrSize = 0;
+	ref->m_displayListCount = 0;
+	ref->m_skinCount = 0;
+	ref->m_infoWord1 = 0;
 }
 
 /*
@@ -3040,12 +3061,43 @@ CChara::CMesh::CRefData::CRefData()
  */
 CChara::CMesh::CRefData::~CRefData()
 {
-	void** ptrs = (void**)this;
-	for (int i = 0; i < 7; i++) {
-		if (ptrs[i] != 0) {
-			__dla__FPv(ptrs[i]);
-			ptrs[i] = 0;
-		}
+	CCharaMeshRefRaw* ref = reinterpret_cast<CCharaMeshRefRaw*>(this);
+
+	if (ref->m_vertices != 0) {
+		__dla__FPv(ref->m_vertices);
+		ref->m_vertices = 0;
+	}
+	if (ref->m_normals != 0) {
+		__dla__FPv(ref->m_normals);
+		ref->m_normals = 0;
+	}
+	if (ref->m_colors != 0) {
+		__dla__FPv(ref->m_colors);
+		ref->m_colors = 0;
+	}
+	if (ref->m_uvs != 0) {
+		__dla__FPv(ref->m_uvs);
+		ref->m_uvs = 0;
+	}
+	if (ref->m_oneWeightData != 0) {
+		__dla__FPv(ref->m_oneWeightData);
+		ref->m_oneWeightData = 0;
+	}
+	if (ref->m_twoWeightData != 0) {
+		__dla__FPv(ref->m_twoWeightData);
+		ref->m_twoWeightData = 0;
+	}
+	if (ref->m_threeWeightData != 0) {
+		__dla__FPv(ref->m_threeWeightData);
+		ref->m_threeWeightData = 0;
+	}
+	if (ref->m_displayLists != 0) {
+		__destroy_new_array(ref->m_displayLists, reinterpret_cast<ConstructorDestructor>(__dt__Q36CChara5CMesh12CDisplayListFv));
+		ref->m_displayLists = 0;
+	}
+	if (ref->m_skins != 0) {
+		__destroy_new_array(ref->m_skins, reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CSkinFv));
+		ref->m_skins = 0;
 	}
 }
 

@@ -17,13 +17,13 @@ extern const GXColor DAT_8032fd58;
 extern const GXColor DAT_8032fd5c;
 extern GXColor DAT_8032fd60;
 extern const double DOUBLE_8032fd88;
-static const float FLOAT_8032fd64 = 1000.0f;
-static const float FLOAT_8032fd68 = -1000.0f;
+extern float FLOAT_8032fd64;
+extern float FLOAT_8032fd68;
 extern float FLOAT_8032fd6c;
-static const float FLOAT_8032fd70 = 2.0f;
+extern float FLOAT_8032fd70;
 extern float FLOAT_8032fd74;
-static const float FLOAT_8032fd78 = 4096.0f;
-static const float FLOAT_8032fd7c = 0.5f;
+extern float FLOAT_8032fd78;
+extern float FLOAT_8032fd7c;
 extern const float FLOAT_8032fd80;
 extern float FLOAT_8032fd90;
 extern float FLOAT_8032fd94;
@@ -52,6 +52,22 @@ static inline u32 U32At(const u8* p, u32 offset)
 static inline s32 Div16Floor(s16 x)
 {
     return x / 16;
+}
+
+static inline float RotateShapeX(const u8* entry, u32 xOffset, u32 yOffset, float angle)
+{
+    float sinA = static_cast<float>(sin(angle));
+    float cosA = static_cast<float>(cos(angle));
+    return static_cast<float>(Div16Floor(S16At(entry, xOffset))) * cosA -
+           static_cast<float>(Div16Floor(S16At(entry, yOffset))) * sinA;
+}
+
+static inline float RotateShapeY(const u8* entry, u32 xOffset, u32 yOffset, float angle)
+{
+    float cosA = static_cast<float>(cos(angle));
+    float sinA = static_cast<float>(sin(angle));
+    return static_cast<float>(Div16Floor(S16At(entry, xOffset))) * sinA +
+           static_cast<float>(Div16Floor(S16At(entry, yOffset))) * cosA;
 }
 
 static inline void WriteVertex(float px, float py, float pz, u32 color, float tu, float tv)
@@ -627,13 +643,10 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
 {
     const u8* shapeData = reinterpret_cast<const u8*>(shape);
     const float* offsetXY = reinterpret_cast<const float*>(&offset);
-    const u16 flags = *reinterpret_cast<const u16*>(shapeData);
-    const bool rotated = (flags & 8) != 0;
-    const s32 count = *reinterpret_cast<const s16*>(shapeData + 2);
     s32 packedStride = 0;
     s32 rotatedStride = 0;
 
-    for (s16 i = 0; i < count; i++) {
+    for (s16 i = 0; i < *reinterpret_cast<const s16*>(shapeData + 2); i++) {
         u32 color;
         float p0x;
         float p0y;
@@ -652,7 +665,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         float u1;
         float v1;
 
-        if (rotated) {
+        if ((*reinterpret_cast<const u16*>(shapeData) & 8) != 0) {
             const u8* entry = shapeData + rotatedStride;
             const u32 texIndex = entry[0x38];
             const s8 numTex = m_textureCount;
@@ -678,24 +691,14 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 drawAngle = FLOAT_8032fd6c;
             }
 
-            const float sinA = static_cast<float>(sin(drawAngle));
-            const float cosA = static_cast<float>(cos(drawAngle));
-            const float x0 = static_cast<float>(Div16Floor(S16At(entry, 0x20)));
-            const float y0 = static_cast<float>(Div16Floor(S16At(entry, 0x22)));
-            const float x1 = static_cast<float>(Div16Floor(S16At(entry, 0x24)));
-            const float y1 = static_cast<float>(Div16Floor(S16At(entry, 0x26)));
-            const float x2 = static_cast<float>(Div16Floor(S16At(entry, 0x28)));
-            const float y2 = static_cast<float>(Div16Floor(S16At(entry, 0x2A)));
-            const float x3 = static_cast<float>(Div16Floor(S16At(entry, 0x2C)));
-            const float y3 = static_cast<float>(Div16Floor(S16At(entry, 0x2E)));
-            const float rx0 = x0 * cosA - y0 * sinA;
-            const float ry0 = x0 * sinA + y0 * cosA;
-            const float rx1 = x1 * cosA - y1 * sinA;
-            const float ry1 = x1 * sinA + y1 * cosA;
-            const float rx2 = x2 * cosA - y2 * sinA;
-            const float ry2 = x2 * sinA + y2 * cosA;
-            const float rx3 = x3 * cosA - y3 * sinA;
-            const float ry3 = x3 * sinA + y3 * cosA;
+            const float rx0 = RotateShapeX(entry, 0x20, 0x22, drawAngle);
+            const float ry0 = RotateShapeY(entry, 0x20, 0x22, drawAngle);
+            const float rx1 = RotateShapeX(entry, 0x24, 0x26, drawAngle);
+            const float ry1 = RotateShapeY(entry, 0x24, 0x26, drawAngle);
+            const float rx2 = RotateShapeX(entry, 0x28, 0x2A, drawAngle);
+            const float ry2 = RotateShapeY(entry, 0x28, 0x2A, drawAngle);
+            const float rx3 = RotateShapeX(entry, 0x2C, 0x2E, drawAngle);
+            const float ry3 = RotateShapeY(entry, 0x2C, 0x2E, drawAngle);
 
             if (rx0 < minX) {
                 minX = rx0;
@@ -722,7 +725,9 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 minY = ry3;
             }
 
-            maxX = rx0;
+            if (maxX < rx0) {
+                maxX = rx0;
+            }
             if (maxX < rx1) {
                 maxX = rx1;
             }
@@ -732,7 +737,9 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             if (maxX < rx3) {
                 maxX = rx3;
             }
-            maxY = ry0;
+            if (maxY < ry0) {
+                maxY = ry0;
+            }
             if (maxY < ry1) {
                 maxY = ry1;
             }

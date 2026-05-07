@@ -1276,32 +1276,36 @@ void CGItemObj::loadModel()
 	unsigned long animFlags = (unsigned long)-1;
 	char* standAnim = const_cast<char*>(s_stand_80331B44);
 	int useParticleTable = 1;
+	int itemType = *(int*)(self + 0x500);
 
-	if (*(int*)(self + 0x500) < 0x18) {
-		if (*(int*)(self + 0x500) != 0xD) {
-			if (*(int*)(self + 0x500) < 0xD) {
-				if (*(int*)(self + 0x500) != 0xB) {
-					if (*(int*)(self + 0x500) < 0xB) {
-						if (*(int*)(self + 0x500) >= 0xA) {
-							modelNo = 8;
-							useParticleTable = 0;
-						}
-					}
-				} else {
-					modelNo = 0x27;
-					useParticleTable = 0;
-				}
-			} else if (*(int*)(self + 0x500) < 0x12 && *(int*)(self + 0x500) < 0xF) {
-				modelNo = 0x33;
-				modelVariant = 1;
-				useParticleTable = 0;
-			}
-		} else {
-			modelNo = 0x33;
-			useParticleTable = 0;
-		}
-	} else if (*(int*)(self + 0x500) == 0x24 ||
-	           (*(int*)(self + 0x500) <= 0x21 && *(int*)(self + 0x500) >= 0x1F)) {
+	switch (itemType) {
+	case 0xA:
+		modelNo = 8;
+		useParticleTable = 0;
+		break;
+	case 0xC:
+		modelNo = 0x27;
+		useParticleTable = 0;
+		break;
+	case 0xD:
+		modelNo = 0x33;
+		useParticleTable = 0;
+		break;
+	case 0xE:
+		modelNo = 0x33;
+		modelVariant = 1;
+		useParticleTable = 0;
+		break;
+	case 0x12:
+	case 0x13:
+	case 0x14:
+	case 0x15:
+	case 0x16:
+	case 0x17:
+	case 0x1F:
+	case 0x20:
+	case 0x21:
+	case 0x24: {
 		int itemEntryOffset = *(int*)(self + 0x504) * 0x48 + 2;
 		int itemEntry = *(unsigned short*)(Game.unkCFlatData0[2] + itemEntryOffset);
 
@@ -1312,6 +1316,11 @@ void CGItemObj::loadModel()
 		*(int*)(self + 0x94) = 0x1194;
 		animFlags = 0x12;
 		modelFlag = 1;
+		break;
+	}
+	case 0xCB:
+	default:
+		break;
 	}
 
 	if (modelNo >= 0) {
@@ -1330,7 +1339,7 @@ void CGItemObj::loadModel()
 		for (int i = 0; i < 3; i++) {
 			if (i != 0 || m_createFlags != 1) {
 				int entryBase = Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48;
-				unsigned short particleNo = *(unsigned short*)(entryBase + i * 2 + 0x14);
+				int particleNo = *(unsigned short*)(entryBase + i * 2 + 0x14);
 
 				if (particleNo != 0xFFFF) {
 					float particleScale =

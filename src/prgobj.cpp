@@ -245,7 +245,8 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
 
-	Math.DstRot(m_rotBaseY, FLOAT_80331BD8 + targetRot);
+	const float* pi = &FLOAT_80331BD8;
+	Math.DstRot(m_rotBaseY, *pi + targetRot);
 }
 
 /*

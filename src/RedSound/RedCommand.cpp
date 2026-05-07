@@ -387,7 +387,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			current = current +
 			          (((unsigned int)seq[1] * REDSOUND_SE_INFO_U16_HIGH_SCALE + (unsigned int)*seq) &
 			           REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK);
-			deltaTime = (int)DeltaTimeSumup((unsigned char**)track);
+			deltaTime = (int)DeltaTimeSumup((unsigned char**)&track->m_command);
 			track->m_deltaTime = deltaTime + 1;
 			if (m_SeSkipStep != 0) {
 				track->m_deltaTime = track->m_deltaTime - m_SeSkipStep;
@@ -777,7 +777,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_waveBankData = waveHead;
 		track->m_command = current + REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE;
 		current = current + REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE + blockSize;
-		track->m_deltaTime = DeltaTimeSumup((unsigned char**)track) + 1;
+		track->m_deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
 		track->m_seSepId = 0;
 		track->m_keySignatureData =
 		    (m_MusicKeySignature == 0) ? 0 : t_KeySignatureData + REDSOUND_KEY_SIGNATURE_DEFAULT_OFFSET;

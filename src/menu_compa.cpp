@@ -317,8 +317,8 @@ bool CMenuPcs::CompaClose()
     frame = this->compaMenuState->frame;
     for (int i = 0; i < count; i++) {
         float step = FLOAT_80332FF8;
-        if (entry->startFrame <= frame) {
-            if (frame < entry->startFrame + entry->duration) {
+        if (frame >= entry->startFrame) {
+            if (entry->startFrame + entry->duration > frame) {
                 entry->frame = entry->frame + 1;
                 entry->alpha =
                     (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame - DOUBLE_80333008);
@@ -461,8 +461,8 @@ bool CMenuPcs::CompaOpen()
     frame = this->compaMenuState->frame;
     for (int i = 0; i < count; i++) {
         float step = FLOAT_80332FF8;
-        if (entry->startFrame <= frame) {
-            if (frame < entry->startFrame + entry->duration) {
+        if (frame >= entry->startFrame) {
+            if (entry->startFrame + entry->duration > frame) {
                 entry->frame = entry->frame + 1;
                 entry->alpha = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
                 if ((entry->flags & 2) == 0) {

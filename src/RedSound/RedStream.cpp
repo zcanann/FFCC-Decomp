@@ -595,10 +595,10 @@ void StreamControl()
 				if (voiceData->m_axVoice->priority == 0) {
 					_StreamStop(streamData);
 				} else {
+					int samplePos = voiceData->m_axVoice->pb.addr.currentAddressHi;
 					int sampleStart =
 					    (streamData->m_aramBuffer + streamData->m_streamCursorBase) *
 					    REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE;
-					int samplePos = voiceData->m_axVoice->pb.addr.currentAddressHi;
 					samplePos <<= 16;
 					samplePos |= voiceData->m_axVoice->pb.addr.currentAddressLo;
 					if ((samplePos >= sampleStart) && (samplePos < sampleStart + REDSOUND_STREAM_STEREO_PLANE_SIZE)) {
@@ -618,11 +618,12 @@ void StreamControl()
 						if (!stopped) {
 							int side;
 							int dmaID;
-							side = (streamData->m_streamCursorBase == 0);
-							if (side) {
-								streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
-							} else {
+							if (streamData->m_streamCursorBase != 0) {
+								side = REDSOUND_STREAM_BUFFER_SIDE_A;
 								streamData->m_streamCursorBase = 0;
+							} else {
+								side = REDSOUND_STREAM_BUFFER_SIDE_B;
+								streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
 							}
 
 							if (streamData->m_header.m_loopStart < 0) {
@@ -634,7 +635,7 @@ void StreamControl()
 						}
 					}
 
-					char changed = 0;
+					int changed = 0;
 					if (streamData->m_panStepCount != 0) {
 						changed += 1;
 						streamData->m_panStepCount -= 1;

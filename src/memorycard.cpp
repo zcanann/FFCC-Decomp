@@ -2081,11 +2081,13 @@ void CMemoryCardMan::DecodeData()
 
 void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
 {
+    u8* save = reinterpret_cast<u8*>(saveDat);
     int charSlot = 0;
 
     do
     {
-        if (*(int*)((char*)saveDat + 0x1A84) != 0)
+        u8* charData = save + 0x14D0;
+        if (*reinterpret_cast<int*>(charData + 0x5B4) != 0)
         {
             short equippedItems[4];
 
@@ -2094,7 +2096,7 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
                 if (itemSlot >= 0x45)
                 {
                     int bitShift = itemSlot >> 0x1F;
-                    if ((*(unsigned int*)((char*)saveDat + (itemSlot >> 5) * 4 + 0x158C) &
+                    if ((*reinterpret_cast<unsigned int*>(charData + (itemSlot >> 5) * 4 + 0xBC) &
                          1 << ((bitShift * 0x20 | (unsigned int)(itemSlot * 0x8000000 + bitShift) >> 0x1B) - bitShift)) == 0)
                     {
                         equippedItems[itemSlot - 0x45] = -1;
@@ -2133,11 +2135,11 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
                 finalHpMax = totalHpBonus + 8;
             }
 
-            *(short*)((char*)saveDat + 0x14D6) = finalHpMax;
+            *reinterpret_cast<short*>(charData + 0x06) = finalHpMax;
         }
 
         charSlot++;
-        saveDat = (Mc::SaveDat*)((char*)saveDat + 0x9C0);
+        save += 0x9C0;
     }
     while (charSlot < 8);
 }

@@ -115,6 +115,14 @@ enum RedMidiCommandConst {
     REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT = 1,
 };
 
+enum RedMidiModCommandByte {
+    REDSOUND_MIDI_MOD_DEPTH = 0,
+    REDSOUND_MIDI_MOD_RATE = 1,
+    REDSOUND_MIDI_MOD_FUNCTION = 2,
+    REDSOUND_MIDI_MOD_DELAY_FRAMES = 0,
+    REDSOUND_MIDI_MOD_DELAY_DEPTH = 1,
+};
+
 enum RedSoundControlSaveWordOffset {
     REDSOUND_CONTROL_SAVE_COMMAND_WORD = 0x0A,
     REDSOUND_CONTROL_SAVE_DELTA_WORD = 0x4A,
@@ -1836,16 +1844,16 @@ static void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, 
     int output;
     RedVoiceDATA* entry;
 
-    track->m_vibrateDepth = (unsigned int)track->m_command[0] << REDSOUND_FIXED_SHIFT;
-    if (track->m_command[1] != 0) {
-        depth = (unsigned int)track->m_command[1];
+    track->m_vibrateDepth = (unsigned int)track->m_command[REDSOUND_MIDI_MOD_DEPTH] << REDSOUND_FIXED_SHIFT;
+    if (track->m_command[REDSOUND_MIDI_MOD_RATE] != 0) {
+        depth = (unsigned int)track->m_command[REDSOUND_MIDI_MOD_RATE];
     } else {
         depth = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
     }
 
     divisor = depth;
     track->m_vibrateRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
-    track->m_vibrateFunc = SwingEntryFunction[track->m_command[2] & REDSOUND_MIDI_SWING_FUNC_MASK];
+    track->m_vibrateFunc = SwingEntryFunction[track->m_command[REDSOUND_MIDI_MOD_FUNCTION] & REDSOUND_MIDI_SWING_FUNC_MASK];
     track->m_vibrateRateDelta = track->m_vibrateDepthDelta = 0;
     track->m_command += 3;
 
@@ -2005,8 +2013,8 @@ static void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
  */
 static void __MidiCtrl_VibrateDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	track->m_vibrateDelay = (short)track->m_command[0];
-	track->m_vibrateDelayDepth = (short)track->m_command[1];
+	track->m_vibrateDelay = (short)track->m_command[REDSOUND_MIDI_MOD_DELAY_FRAMES];
+	track->m_vibrateDelayDepth = (short)track->m_command[REDSOUND_MIDI_MOD_DELAY_DEPTH];
 	track->m_command += 2;
 }
 
@@ -2026,15 +2034,15 @@ static void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 	int output;
 	RedVoiceDATA* voice;
 
-	track->m_tremoloDepth = (unsigned int)track->m_command[0] << REDSOUND_FIXED_SHIFT;
-	if (track->m_command[1] != 0) {
-		rateDivisor = (unsigned int)track->m_command[1];
+	track->m_tremoloDepth = (unsigned int)track->m_command[REDSOUND_MIDI_MOD_DEPTH] << REDSOUND_FIXED_SHIFT;
+	if (track->m_command[REDSOUND_MIDI_MOD_RATE] != 0) {
+		rateDivisor = (unsigned int)track->m_command[REDSOUND_MIDI_MOD_RATE];
 	} else {
 		rateDivisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
 	}
 	divisor = rateDivisor;
 	track->m_tremoloRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
-	track->m_tremoloFunc = SwingEntryFunction[track->m_command[2] & REDSOUND_MIDI_SWING_FUNC_MASK];
+	track->m_tremoloFunc = SwingEntryFunction[track->m_command[REDSOUND_MIDI_MOD_FUNCTION] & REDSOUND_MIDI_SWING_FUNC_MASK];
 	track->m_tremoloRateDelta = track->m_tremoloDepthDelta = 0;
 	track->m_command += 3;
 
@@ -2192,8 +2200,8 @@ static void __MidiCtrl_TremoloType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
  */
 static void __MidiCtrl_TremoloDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	track->m_tremoloDelay = (s16)track->m_command[0];
-	track->m_tremoloDelayDepth = (s16)track->m_command[1];
+	track->m_tremoloDelay = (s16)track->m_command[REDSOUND_MIDI_MOD_DELAY_FRAMES];
+	track->m_tremoloDelayDepth = (s16)track->m_command[REDSOUND_MIDI_MOD_DELAY_DEPTH];
 	track->m_command += 2;
 }
 
@@ -2211,15 +2219,15 @@ static void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 	int rate;
 	int divisor;
 
-	track->m_shakeDepth = (unsigned int)*track->m_command << REDSOUND_FIXED_SHIFT;
-	if (track->m_command[1] != 0) {
-		rate = (unsigned int)track->m_command[1];
+	track->m_shakeDepth = (unsigned int)track->m_command[REDSOUND_MIDI_MOD_DEPTH] << REDSOUND_FIXED_SHIFT;
+	if (track->m_command[REDSOUND_MIDI_MOD_RATE] != 0) {
+		rate = (unsigned int)track->m_command[REDSOUND_MIDI_MOD_RATE];
 	} else {
 		rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
 	}
 	divisor = rate;
 	track->m_shakeRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
-	track->m_shakeFunc = SwingEntryFunction[track->m_command[2] & REDSOUND_MIDI_SWING_FUNC_MASK];
+	track->m_shakeFunc = SwingEntryFunction[track->m_command[REDSOUND_MIDI_MOD_FUNCTION] & REDSOUND_MIDI_SWING_FUNC_MASK];
 	track->m_shakeRateDelta = track->m_shakeDepthDelta = 0;
 	track->m_shakeOutput = 0;
 	track->m_shakePan = 0;

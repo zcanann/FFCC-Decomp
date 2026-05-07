@@ -431,14 +431,14 @@ static void _MusicPlaySequence(int* command)
  */
 static void _MusicCrossPlaySequence(int* command)
 {
+    int fadeFrames;
     int replayPoint;
     RedSoundCONTROL* control;
     void* swapControl;
     
-    command[REDSOUND_MUSIC_COMMAND_FADE_TIME] =
-        command[REDSOUND_MUSIC_COMMAND_FADE_TIME] * REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
-    command[REDSOUND_MUSIC_COMMAND_FADE_TIME] =
-        command[REDSOUND_MUSIC_COMMAND_FADE_TIME] / REDSOUND_FRAMES_PER_SECOND;
+    fadeFrames = command[REDSOUND_MUSIC_COMMAND_FADE_TIME] * REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
+    fadeFrames = fadeFrames / REDSOUND_FRAMES_PER_SECOND + (fadeFrames >> 31);
+    command[REDSOUND_MUSIC_COMMAND_FADE_TIME] = fadeFrames - (fadeFrames >> 31);
     if (command[REDSOUND_MUSIC_COMMAND_FADE_TIME] == 0) {
         command[REDSOUND_MUSIC_COMMAND_FADE_TIME] = command[REDSOUND_MUSIC_COMMAND_FADE_TIME] + 1;
     }

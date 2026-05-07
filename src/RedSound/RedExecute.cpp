@@ -1755,7 +1755,7 @@ static void _KeyOnControl()
         RedVoiceDATA* voice = p_VoiceData;
         do {
             if ((voice->m_active != 0) && (voice->m_track != 0) &&
-                ((voice->m_track->m_voiceSwitch & 9) == 0)) {
+                ((voice->m_track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_SKIP_UPDATE) == 0)) {
                 if ((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_VOLUME) != 0 ||
                     (voice->m_track->m_tremoloFunc != 0) ||
                     (voice->m_track->m_shakeFunc != 0)) {

@@ -441,7 +441,7 @@ void CFunnyShape::Render()
         u8* animData = reinterpret_cast<u8*>(AnimData(this));
         s16 frame = work->frame;
         FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + *reinterpret_cast<s16*>(animData + 0x10 + frame * 8));
-        RenderShape(shape, pos, work->angle);
+        RenderShape(shape, posCopy, work->angle);
         work++;
     }
 }
@@ -646,7 +646,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
     s32 packedStride = 0;
     s32 rotatedStride = 0;
 
-    for (s16 i = 0; i < *reinterpret_cast<const s16*>(shapeData + 2); i++) {
+    for (s32 i = 0; i < *reinterpret_cast<const s16*>(shapeData + 2); i++) {
         u32 color;
         float p0x;
         float p0y;
@@ -665,7 +665,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         float u1;
         float v1;
 
-        if ((*reinterpret_cast<const u16*>(shapeData) & 8) != 0) {
+        if ((*reinterpret_cast<const s16*>(shapeData) & 8) != 0) {
             const u8* entry = shapeData + rotatedStride;
             const u32 texIndex = entry[0x38];
             const s8 numTex = m_textureCount;

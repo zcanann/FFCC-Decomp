@@ -93,15 +93,6 @@ struct GhostPartyWork {
 extern unsigned char m_boss__8CGMonObj_field108_0x6c[0x90];
 #define sGhostPartyWork (*reinterpret_cast<GhostPartyWork*>(m_boss__8CGMonObj_field108_0x6c))
 
-struct BossGhostPartyCounters {
-	unsigned char _pad0[0x24];
-	int thresholdA;
-	int thresholdB;
-	int thresholdC;
-};
-
-extern "C" BossGhostPartyCounters m_boss__8CGMonObj_field108_0x6c;
-
 struct PartyObjFlags {
 	unsigned char commandActive : 1;
 	unsigned char reserved : 7;
@@ -159,13 +150,13 @@ static inline int& CharaGhostValue(int offset)
 static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 {
 	if (((static_cast<unsigned short>(attacker->GetCID()) & 0xAD) == 0xAD) && Game.m_gameWork.m_menuStageMode != 0) {
-		m_boss__8CGMonObj_field108_0x6c.thresholdA++;
-		m_boss__8CGMonObj_field108_0x6c.thresholdB++;
-		m_boss__8CGMonObj_field108_0x6c.thresholdC++;
+		sGhostPartyWork.thresholdA++;
+		sGhostPartyWork.thresholdB++;
+		sGhostPartyWork.thresholdC++;
 		Printf__7CSystemFPce(&System, lbl_801DCB1C,
-		    m_boss__8CGMonObj_field108_0x6c.thresholdA, CharaGhostValue(0x2048),
-		    m_boss__8CGMonObj_field108_0x6c.thresholdB, CharaGhostValue(0x204C),
-		    m_boss__8CGMonObj_field108_0x6c.thresholdC, CharaGhostValue(0x2050));
+		    sGhostPartyWork.thresholdA, CharaGhostValue(0x2048),
+		    sGhostPartyWork.thresholdB, CharaGhostValue(0x204C),
+		    sGhostPartyWork.thresholdC, CharaGhostValue(0x2050));
 	}
 }
 

@@ -272,10 +272,8 @@ void CPtrArray<CTexAnimSeq*>::RemoveAll()
 template <>
 void CPtrArray<CTexAnimSeq*>::ReleaseAndRemoveAll()
 {
-    int offset = 0;
-
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        CRef* item = *reinterpret_cast<CRef**>((int)m_items + offset);
+        CRef* item = reinterpret_cast<CRef*>(m_items[i]);
         if (item != 0) {
             int* itemWords = reinterpret_cast<int*>(item);
             int refCount = itemWords[1];
@@ -285,9 +283,8 @@ void CPtrArray<CTexAnimSeq*>::ReleaseAndRemoveAll()
             if (nextRefCount == 0) {
                 delete item;
             }
-            *(unsigned int*)((int)m_items + offset) = 0;
+            m_items[i] = 0;
         }
-        offset += 4;
     }
 
     if (m_items != 0) {
@@ -489,10 +486,8 @@ void CPtrArray<CTexAnim*>::RemoveAll()
 template <>
 void CPtrArray<CTexAnim*>::ReleaseAndRemoveAll()
 {
-    int offset = 0;
-
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        CRef* item = *reinterpret_cast<CRef**>((int)m_items + offset);
+        CRef* item = reinterpret_cast<CRef*>(m_items[i]);
         if (item != 0) {
             int* itemWords = reinterpret_cast<int*>(item);
             int refCount = itemWords[1];
@@ -502,9 +497,8 @@ void CPtrArray<CTexAnim*>::ReleaseAndRemoveAll()
             if (nextRefCount == 0) {
                 delete item;
             }
-            *(unsigned int*)((int)m_items + offset) = 0;
+            m_items[i] = 0;
         }
-        offset += 4;
     }
 
     if (m_items != 0) {

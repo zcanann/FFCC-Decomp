@@ -7392,8 +7392,53 @@ void CMenuPcs::ClrCMakeFlg(int channel)
  */
 void CMenuPcs::ChgAllModel()
 {
-	for (int i = 0; i < 4; i++) {
-		ChgModel(i, -1, 0, 0);
+	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
+	unsigned char* handleData = bytes;
+	int modelOffset = 0;
+
+	for (int i = 0; i < 8; i++) {
+		unsigned char* caravanData = gameData + 0x13F0;
+		unsigned char* modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
+		unsigned int race;
+		unsigned int variant;
+		unsigned int index;
+		int modelId;
+
+		if (*reinterpret_cast<int*>(gameData + 0x1794) == 0) {
+			race = 0xFFFFFFFF;
+			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
+			variant = 0xFFFFFFFF;
+			index = 0xFFFFFFFF;
+		} else {
+			race = *reinterpret_cast<unsigned short*>(caravanData + 0x3E0);
+			variant = *reinterpret_cast<unsigned short*>(caravanData + 0x3E2);
+			index = *reinterpret_cast<unsigned short*>(caravanData + 0x3E4);
+			modelId = race * 200 + 100;
+			if (variant != 0) {
+				modelId = race * 200 + 200;
+			}
+			*reinterpret_cast<unsigned int*>(modelData + 8) = modelId + index;
+		}
+
+		modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
+		if ((int)race < 0) {
+			modelData[0xC] = 0;
+			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
+			    *reinterpret_cast<void**>(handleData + 0x7F4), 3, 0x43, 0);
+		} else {
+			modelId = race * 200 + 100;
+			if (variant != 0) {
+				modelId = race * 200 + 200;
+			}
+			modelData[0xC] = 1;
+			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
+			    *reinterpret_cast<void**>(handleData + 0x7F4), 0, modelId + index, 0);
+		}
+
+		gameData += 0xC30;
+		handleData += 4;
+		modelOffset += 0x34;
 	}
 }
 
@@ -7408,8 +7453,49 @@ void CMenuPcs::ChgAllModel()
  */
 void CMenuPcs::ChgAllModel2()
 {
-	for (int i = 0; i < 4; i++) {
-		ClrCMakeFlg(i);
+	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* handleData = bytes;
+	int modelOffset = 0;
+	int pdtOffset = 0;
+
+	for (int i = 0; i < 8; i++) {
+		unsigned char* pdtData =
+		    reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x88C) + pdtOffset + 0x14D0);
+		unsigned char* modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
+		unsigned int race;
+		unsigned int variant;
+		unsigned int index;
+		int modelId;
+
+		if (*reinterpret_cast<int*>(pdtData + 0x5B4) == 0) {
+			race = 0xFFFFFFFF;
+			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
+			index = 0xFFFFFFFF;
+			variant = 0xFFFFFFFF;
+		} else {
+			race = *reinterpret_cast<unsigned short*>(pdtData + 0x2E);
+			index = *reinterpret_cast<unsigned short*>(pdtData + 0x32);
+			variant = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
+		}
+
+		modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
+		if ((int)race < 0) {
+			modelData[0xC] = 0;
+			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
+			    *reinterpret_cast<void**>(handleData + 0x7F4), 3, 0x43, 0);
+		} else {
+			modelId = race * 200 + 100;
+			if (variant != 0) {
+				modelId = race * 200 + 200;
+			}
+			modelData[0xC] = 1;
+			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
+			    *reinterpret_cast<void**>(handleData + 0x7F4), 0, modelId + index, 0);
+		}
+
+		handleData += 4;
+		modelOffset += 0x34;
+		pdtOffset += 0x9C0;
 	}
 }
 

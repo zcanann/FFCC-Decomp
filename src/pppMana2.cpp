@@ -159,15 +159,15 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
         double z = (double)mtx[2][3];
 
         PSMTXCopy(ppvCameraMatrix0, cameraMtx);
-        PSMTXRotRad(rotMtx, 'z', FLOAT_80331904);
-        mtx[0][3] = FLOAT_80331898;
-        mtx[1][3] = FLOAT_80331898;
-        mtx[2][3] = FLOAT_80331898;
+        PSMTXRotRad(rotMtx, 'z', LoadFloat(FLOAT_80331904));
+        mtx[0][3] = LoadFloat(FLOAT_80331898);
+        mtx[1][3] = LoadFloat(FLOAT_80331898);
+        mtx[2][3] = LoadFloat(FLOAT_80331898);
         PSMTXConcat(mtx, rotMtx, mtx);
 
-        offset.x = FLOAT_80331898;
+        offset.x = LoadFloat(FLOAT_80331898);
         offset.y = *(float*)((char*)step + 0x30);
-        offset.z = FLOAT_80331898;
+        offset.z = LoadFloat(FLOAT_80331898);
         PSMTXMultVec(mtx, &offset, &offset);
 
         mtx[0][3] = (float)x;
@@ -596,7 +596,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                         (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) * 0xC, pppEnvStPtr->m_stagePtr,
                                          const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x232);
                     Vec* reflectionVec = (Vec*)work[0x19];
-                    float zero = FLOAT_80331898;
+                    float zero = LoadFloat(FLOAT_80331898);
                     for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
                         reflectionVec->z = zero;
                         reflectionVec->y = zero;
@@ -662,7 +662,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
 
                 float* waterHeightA = (float*)work[0x12];
                 float* waterHeightB = (float*)work[0x13];
-                float zero = FLOAT_80331898;
+                float zero = LoadFloat(FLOAT_80331898);
                 for (vertexIndex = 0; vertexIndex < 0x121; vertexIndex++) {
                     waterHeightA[vertexIndex] = zero;
                     waterHeightB[vertexIndex] = zero;
@@ -783,15 +783,15 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     *(u32*)(model + 0xFC) = 0;
 
     if ((int)Game.m_currentSceneId == 7) {
-        centerPos.x = FLOAT_80331898;
-        centerPos.y = FLOAT_80331898;
-        centerPos.z = FLOAT_80331898;
+        centerPos.x = LoadFloat(FLOAT_80331898);
+        centerPos.y = LoadFloat(FLOAT_80331898);
+        centerPos.z = LoadFloat(FLOAT_80331898);
     } else {
         centerPos.x = gObject->m_worldPosition.x;
         centerPos.y = gObject->m_worldPosition.y;
         centerPos.z = gObject->m_worldPosition.z;
     }
-    centerPos.y += FLOAT_803318c4;
+    centerPos.y += LoadFloat(FLOAT_803318c4);
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)6, GX_FALSE, 0);
     GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)4, GX_FALSE, 0);
@@ -800,8 +800,10 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     if (*(u8*)((char*)param_3 + 0x38) != 0) {
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
                                    (_GXTexFmt)0x16, 1);
-        GXSetViewport(FLOAT_80331898, FLOAT_80331898, FLOAT_803318c8, FLOAT_803318c8, FLOAT_80331898, FLOAT_803318a0);
-        C_MTXPerspective(projectionMtx, FLOAT_803318cc, FLOAT_803318a0, FLOAT_803318a0, FLOAT_803318d0);
+        GXSetViewport(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
+                      LoadFloat(FLOAT_803318c8), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318a0));
+        C_MTXPerspective(projectionMtx, LoadFloat(FLOAT_803318cc), LoadFloat(FLOAT_803318a0),
+                         LoadFloat(FLOAT_803318a0), LoadFloat(FLOAT_803318d0));
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
         baseParaboloidTexObjs = work[8];
@@ -809,35 +811,36 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             cameraPos.x = centerPos.x;
             cameraPos.y = centerPos.y;
             cameraPos.z = centerPos.z;
-            cameraUp.y = FLOAT_803318a0;
-            cameraUp.z = FLOAT_80331898;
+            cameraUp.y = LoadFloat(FLOAT_803318a0);
+            cameraUp.z = LoadFloat(FLOAT_80331898);
 
             if (i == 3) {
-                cameraPos.y = centerPos.y - FLOAT_803318a0;
-                cameraUp.y = FLOAT_80331898;
-                cameraUp.z = FLOAT_803318a0;
+                cameraPos.y = centerPos.y - LoadFloat(FLOAT_803318a0);
+                cameraUp.y = LoadFloat(FLOAT_80331898);
+                cameraUp.z = LoadFloat(FLOAT_803318a0);
             } else if (i < 3) {
                 if (i == 1) {
-                    cameraPos.x = centerPos.x - FLOAT_803318a0;
+                    cameraPos.x = centerPos.x - LoadFloat(FLOAT_803318a0);
                 } else if (i < 1) {
-                    cameraPos.x = centerPos.x + FLOAT_803318a0;
+                    cameraPos.x = centerPos.x + LoadFloat(FLOAT_803318a0);
                 } else {
-                    cameraPos.y = centerPos.y + FLOAT_803318a0;
-                    cameraUp.y = FLOAT_80331898;
-                    cameraUp.z = FLOAT_8033189c;
+                    cameraPos.y = centerPos.y + LoadFloat(FLOAT_803318a0);
+                    cameraUp.y = LoadFloat(FLOAT_80331898);
+                    cameraUp.z = LoadFloat(FLOAT_8033189c);
                 }
             } else if (i == 5) {
-                cameraPos.z = centerPos.z - FLOAT_803318a0;
+                cameraPos.z = centerPos.z - LoadFloat(FLOAT_803318a0);
             } else {
-                cameraPos.z = centerPos.z + FLOAT_803318a0;
+                cameraPos.z = centerPos.z + LoadFloat(FLOAT_803318a0);
             }
 
-            cameraUp.x = FLOAT_80331898;
+            cameraUp.x = LoadFloat(FLOAT_80331898);
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x280, 0x1C0);
             RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-                &gUtil, FLOAT_80331898, FLOAT_80331898, FLOAT_803318c8, FLOAT_803318c8,
+                &gUtil, LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
+                LoadFloat(FLOAT_803318c8),
                 (GXTexObj*)baseParaboloidTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
             baseParaboloidTexObjs += 0x20;
         }
@@ -862,12 +865,12 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
         GXLoadTexObj(&depthTexObj, GX_TEXMAP0);
 
-        quadMin.x = FLOAT_80331898;
-        quadMin.y = FLOAT_80331898;
-        quadMin.z = FLOAT_80331898;
-        quadMax.x = FLOAT_803318c8;
-        quadMax.y = FLOAT_803318c8;
-        quadMax.z = FLOAT_80331898;
+        quadMin.x = LoadFloat(FLOAT_80331898);
+        quadMin.y = LoadFloat(FLOAT_80331898);
+        quadMin.z = LoadFloat(FLOAT_80331898);
+        quadMax.x = LoadFloat(FLOAT_803318c8);
+        quadMax.y = LoadFloat(FLOAT_803318c8);
+        quadMax.z = LoadFloat(FLOAT_80331898);
         quadColor.r = 0xFF;
         quadColor.g = 0xFF;
         quadColor.b = 0xFF;
@@ -879,7 +882,8 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         GXSetAlphaUpdate(GX_TRUE);
         GXSetZCompLoc(GX_TRUE);
         RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-            &gUtil, FLOAT_80331898, FLOAT_80331898, FLOAT_803318c8, FLOAT_803318c8, &sceneTexObj, 0, 0, 0,
+            &gUtil, LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
+            LoadFloat(FLOAT_803318c8), &sceneTexObj, 0, 0, 0,
             (_GXBlendFactor)4, (_GXBlendFactor)5);
         *((u8*)work + 0xEC) = 1;
     }
@@ -1213,8 +1217,8 @@ static int UpdateWaterMesh(VMana2* mana2)
         return 0;
     }
 
-    currentScale = FLOAT_80331898;
-    neighborScale = FLOAT_803318a4;
+    currentScale = LoadFloat(FLOAT_80331898);
+    neighborScale = LoadFloat(FLOAT_803318a4);
     for (int row = 1; row < 0x10; row++) {
         int rowBase = row * 0x11;
         for (int colBlock = 0; colBlock < 3; colBlock++) {
@@ -1407,7 +1411,7 @@ static void CalculateNormal(VMana2* mana2)
     normals = *(Vec**)((u8*)mana2 + 0x40);
     indices = *(u16**)((u8*)mana2 + 0x50);
 
-    float zero = FLOAT_80331898;
+    float zero = LoadFloat(FLOAT_80331898);
     for (s32 i = 0; i < 0x121; i++) {
         normals[i].z = zero;
         normals[i].y = zero;
@@ -1487,9 +1491,9 @@ static void CalcWaterReflectionVector(
         cameraPos.z = CameraWorldZ();
     }
 
-    transformedCameraPos.x = FLOAT_80331898;
-    transformedCameraPos.y = FLOAT_80331898;
-    transformedCameraPos.z = FLOAT_80331898;
+    transformedCameraPos.x = LoadFloat(FLOAT_80331898);
+    transformedCameraPos.y = LoadFloat(FLOAT_80331898);
+    transformedCameraPos.z = LoadFloat(FLOAT_80331898);
 
     PSMTXCopy(matrix, matrixNoTranslate);
     objPos.x = matrixNoTranslate[0][3];
@@ -1501,14 +1505,14 @@ static void CalcWaterReflectionVector(
     PSMTXInverse(matrixNoTranslate, inverseMtx);
 
     PSVECSubtract(&objPos, &cameraPos, &cameraPos);
-    PSVECScale(&cameraPos, &cameraPos, FLOAT_8033189c);
+    PSVECScale(&cameraPos, &cameraPos, LoadFloat(FLOAT_8033189c));
     PSMTXMultVec(inverseMtx, &cameraPos, &transformedCameraPos);
 
     texCoordFloat = (float*)texCoord;
     colorBytes = (unsigned char*)color;
     reflectionIt = reflectionVec;
-    zero = FLOAT_80331898;
-    half = FLOAT_803318a4;
+    zero = LoadFloat(FLOAT_80331898);
+    half = LoadFloat(FLOAT_803318a4);
 
     for (i = 0; i < count; i++) {
         PSVECSubtract(positions, &transformedCameraPos, &reflected);
@@ -1521,15 +1525,15 @@ static void CalcWaterReflectionVector(
             colorBytes[1] = 0x80;
             colorBytes[2] = 0xff;
             colorBytes[3] = 0xbc;
-            *texCoordFloat = -reflectionIt->x / (FLOAT_803318a0 + reflectionIt->z);
-            texCoordFloat[1] = -reflectionIt->y / (FLOAT_803318a0 + reflectionIt->z);
+            *texCoordFloat = -reflectionIt->x / (LoadFloat(FLOAT_803318a0) + reflectionIt->z);
+            texCoordFloat[1] = -reflectionIt->y / (LoadFloat(FLOAT_803318a0) + reflectionIt->z);
         } else {
             colorBytes[0] = 0x80;
             colorBytes[1] = 0xff;
             colorBytes[2] = 0x80;
             colorBytes[3] = 0x7f;
-            *texCoordFloat = -reflectionIt->x / (FLOAT_803318a0 - reflectionIt->z);
-            texCoordFloat[1] = -reflectionIt->y / (FLOAT_803318a0 - reflectionIt->z);
+            *texCoordFloat = -reflectionIt->x / (LoadFloat(FLOAT_803318a0) - reflectionIt->z);
+            texCoordFloat[1] = -reflectionIt->y / (LoadFloat(FLOAT_803318a0) - reflectionIt->z);
         }
 
         positions++;

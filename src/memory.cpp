@@ -2005,7 +2005,7 @@ void CAmemCacheSet::AddRef(short index)
     CAmemCache& entry = cacheEntryAt(this, index);
 
     entry.m_refCount += 1;
-    if (entry.m_refCount == -1) {
+    if (entry.m_refCount == 0xFFFF) {
         if (2 < (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt, static_cast<int>(index));
         }
@@ -2049,7 +2049,7 @@ void CAmemCacheSet::Release(short index)
     CAmemCache& entry = cacheEntryAt(this, index);
     entry.m_refCount -= 1;
 
-    if (entry.m_refCount == -1) {
+    if (entry.m_refCount == 0xFFFF) {
         if (2 < (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt);
         }
@@ -2217,7 +2217,7 @@ void CAmemCacheSet::CalcPrio()
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
 
-        if ((entry.m_inUse != 0) && (*reinterpret_cast<unsigned short*>(&entry.m_refCount) == 0) &&
+        if ((entry.m_inUse != 0) && (entry.m_refCount == 0) &&
             (entry.m_cacheData != 0) && (static_cast<unsigned int>(entry.m_priority) != 0)) {
             entry.m_priority--;
         }
@@ -2267,7 +2267,7 @@ void CAmemCacheSet::RefCnt0Compare()
 
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
-        if ((entry.m_inUse != 0 && *reinterpret_cast<unsigned short*>(&entry.m_refCount) != 0) &&
+        if ((entry.m_inUse != 0 && entry.m_refCount != 0) &&
             static_cast<unsigned int>(System.m_execParam) >= 3) {
             Printf__7CSystemFPce(
                 &System, dumpBase + 0xd8, i, lbl_8032E410[entry.m_inUse == 0], lbl_801E8470[entry.m_type],

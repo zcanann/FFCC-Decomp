@@ -62,6 +62,7 @@ public:
 
 	class CNode
 	{
+	public:
 		enum TYPE
 		{
 			TODO,
@@ -79,10 +80,15 @@ public:
 		void Create(CChunkFile&, CChara::CModel*, CChara::CNode::TYPE, CMemory::CStage*);
 		void Duplicate(CChara::CNode*, CMemory::CStage*);
 		void CalcBind(CChara::CModel*);
+
+		u8 _pad0[0xBC];
+		u8 m_flags;
+		u8 _padBD[3];
 	};
 
 	class CModel
 	{
+	public:
 		CModel();
 		~CModel();
 
@@ -129,12 +135,13 @@ public:
 		void SetAfterDrawMeshCallback(void (*)(CChara::CModel*, void*, void*, int, float (*)[4]));
 		void SetCallbackContext(void*, void*);
 
-	private:
+	public:
 		u8 _pad0[0x68];
 		Mtx m_matrix;
-		u8 _pad98[0xC];
+		u32 m_meshVisibleMask;
+		u8 _pad9C[0x8];
 		CCharaModelData* m_data;
-		u8 _padA8[4];
+		CNode* m_nodes;
 		CMesh* m_meshes;
 		CTextureSet* m_texSet;
 		float m_curFrame;

@@ -103,7 +103,8 @@ public:
     float field_0x158;
 
     Vec field268_0x15c; // 0x15C
-    unsigned char _pad168[0xA4];
+    u32 field_0x168; // 0x168
+    unsigned char _pad16C[0xA0];
     pppFMATRIX m_unkMatrix; // 0x20C
     GXTexObj* m_texObj[16]; // 0x23C
     s16* m_textureHeader[16]; // 0x27C

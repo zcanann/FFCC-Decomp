@@ -616,11 +616,13 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 
         if (stepType == 1) {
             if (strcmp((char*)shape, DAT_80330e88) == 0) {
+                s32 dlOffset = 0;
                 for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
-                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
-                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
-                        *(u32*)(work[0x18] + j * 4) = 0;
+                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + dlOffset) != NULL) {
+                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + dlOffset));
+                        *(u32*)(work[0x18] + dlOffset) = 0;
                     }
+                    dlOffset += 4;
                 }
                 if (work[0x18] != 0) {
                     pppHeapUseRate((CMemory::CStage*)work[0x18]);
@@ -629,11 +631,13 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
             }
         } else if (stepType == 2) {
             if (strcmp((char*)shape, DAT_80330e90) == 0) {
+                s32 dlOffset = 0;
                 for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
-                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
-                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
-                        *(u32*)(work[0x18] + j * 4) = 0;
+                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + dlOffset) != NULL) {
+                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + dlOffset));
+                        *(u32*)(work[0x18] + dlOffset) = 0;
                     }
+                    dlOffset += 4;
                 }
                 if (work[0x18] != 0) {
                     pppHeapUseRate((CMemory::CStage*)work[0x18]);
@@ -641,11 +645,13 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
                 }
             }
         } else if (stepType == 3 && strcmp((char*)shape, DAT_80330e98) == 0) {
+            s32 dlOffset = 0;
             for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
-                if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
-                    pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
-                    *(u32*)(work[0x18] + j * 4) = 0;
+                if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + dlOffset) != NULL) {
+                    pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + dlOffset));
+                    *(u32*)(work[0x18] + dlOffset) = 0;
                 }
+                dlOffset += 4;
             }
             if (work[0x18] != 0) {
                 pppHeapUseRate((CMemory::CStage*)work[0x18]);
@@ -926,7 +932,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     u32 targetTexObjs;
     s32 i;
     f32 savedViewport[6];
-    char* compareName = (char*)&Game + 0xC7F4;
+    char* compareName = Game.m_currentScriptName;
 
     if (pass != 0 || *(u8*)((u8*)step + 0x1C) == 0) {
         return;
@@ -1026,19 +1032,20 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
             if (((gObject->m_weaponNodeFlags & 1) != 0 || gObject->m_attachOwner != NULL) &&
-                gObject->m_attachOwner != NULL && gObject->m_attachOwner->m_charaModelHandle != NULL) {
+                gObject->m_attachOwner->m_charaModelHandle != NULL) {
                 CCharaPcs::CHandle* owner = gObject->m_attachOwner->m_charaModelHandle;
-                s32 ownerModel = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(owner);
+                CChara::CModel* ownerModel = owner->m_model;
 
-                *(u32*)(ownerModel + 0xE4) = (u32)work;
-                *(u32*)(ownerModel + 0xE8) = (u32)step;
-                *(u32*)(ownerModel + 0xF8) = (u32)Mana_BeforeDrawShadowLockEnvCallback;
-                *(u32*)(ownerModel + 0x100) = (u32)Chara_DrawShadowMeshDLCallback;
+                *(u32*)((u8*)ownerModel + 0xE4) = (u32)work;
+                *(u32*)((u8*)ownerModel + 0xE8) = (u32)step;
+                *(u32*)((u8*)owner->m_model + 0xF8) = (u32)Mana_BeforeDrawShadowLockEnvCallback;
+                *(u32*)((u8*)owner->m_model + 0x100) = (u32)Chara_DrawShadowMeshDLCallback;
                 Draw__Q29CCharaPcs7CHandleFi(owner, 1);
-                *(u32*)(ownerModel + 0xE4) = 0;
-                *(u32*)(ownerModel + 0xE8) = 0;
-                *(u32*)(ownerModel + 0xF8) = 0;
-                *(u32*)(ownerModel + 0x100) = 0;
+                ownerModel = owner->m_model;
+                *(u32*)((u8*)ownerModel + 0xE4) = 0;
+                *(u32*)((u8*)ownerModel + 0xE8) = 0;
+                *(u32*)((u8*)owner->m_model + 0xF8) = 0;
+                *(u32*)((u8*)owner->m_model + 0x100) = 0;
             }
 
             Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, (_GXTexObj*)sourceTexObjs, 0, 0, 0x80, 0x80, depthTexSize,
@@ -1701,7 +1708,7 @@ void CalcReflectionVector2(
     const float half = FLOAT_80330e5c;
     const float warp = FLOAT_80330e60;
     const float scale = FLOAT_80330e64;
-    char* compareName = (char*)&Game + 0xC7F4;
+    char* compareName = Game.m_currentScriptName;
 
     cameraPos.x = CameraWorldX();
     cameraPos.y = CameraWorldY();

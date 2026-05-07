@@ -22,7 +22,7 @@ extern float FLOAT_80330478;
 extern double DOUBLE_80330488;
 extern float FLOAT_80330490;
 
-static Mtx g_matUnit;
+Mtx g_matUnit;
 
 extern "C" const char s_pppRyjMegaBirth_cpp_801D9C00[] = "pppRyjMegaBirth.cpp";
 
@@ -824,7 +824,7 @@ void birth(
 		}
 	}
 
-	*u8_at(particlePayload, 0x21) = random_signed_byte_span(payload[0x58]);
+	*u8_at(particlePayload, 0x24) = random_signed_byte_span(payload[0x58]);
 	*u8_at(particlePayload, 0x25) = random_signed_byte_span(payload[0x59]);
 	*u8_at(particlePayload, 0x26) = random_signed_byte_span(payload[0x5A]);
 	*u8_at(particlePayload, 0x27) = random_signed_byte_span(payload[0x5B]);

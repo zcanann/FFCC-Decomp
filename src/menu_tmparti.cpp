@@ -25,16 +25,16 @@ extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 
-extern const double DOUBLE_80332f20 = 0.5;
-extern const float FLOAT_80332F28 = 255.0f;
-extern const float FLOAT_80332f2c = 0.0f;
-extern const float FLOAT_80332f30 = 1.0f;
-extern const float FLOAT_80332F34 = 0.9f;
-extern const float FLOAT_80332F38 = 4.0f;
-extern const double DOUBLE_80332f40 = 4503601774854144.0;
-extern const double DOUBLE_80332f48 = 1.0;
-extern const double DOUBLE_80332f50 = 0.0;
-extern const double DOUBLE_80332f58 = 216.0;
+#define DOUBLE_80332f20 0.5
+#define FLOAT_80332F28 255.0f
+#define FLOAT_80332f2c 0.0f
+#define FLOAT_80332f30 1.0f
+#define FLOAT_80332F34 0.9f
+#define FLOAT_80332F38 4.0f
+#define DOUBLE_80332f40 4503601774854144.0
+#define DOUBLE_80332f48 1.0
+#define DOUBLE_80332f50 0.0
+#define DOUBLE_80332f58 216.0
 
 static inline double TmpArtiIntToDouble(int value)
 {

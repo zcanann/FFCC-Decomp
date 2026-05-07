@@ -16,14 +16,12 @@ class CMapCylinder
 public:
     CMapCylinder();
 
-    Vec m_bottom;     // 0x0
-    Vec m_direction;  // 0xc
-    float m_radius;   // 0x18
-    float m_height;   // 0c1c
-    Vec m_top;        // 0x20
-    Vec m_direction2; // 0x2c
-    float m_radius2;  // 0x38
-    float m_height2;  // 0x3c
+    Vec m_bottom;    // 0x00
+    Vec m_top;       // 0x0c
+    Vec m_axis;      // 0x18
+    float m_radius;  // 0x24
+    Vec m_boundsMin; // 0x28
+    Vec m_boundsMax; // 0x34
 };
 
 class CMapHitFace

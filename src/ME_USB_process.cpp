@@ -294,7 +294,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         StoreSwap32(&U32At(materialEditorPcs, 0x15C));
         StoreSwap32(&U32At(materialEditorPcs, 0x160));
         StoreSwap32(&U32At(materialEditorPcs, 0x164));
-        StoreSwap32(&U32At(materialEditorPcs, 0x168));
+        StoreSwap32(&materialEditorPcs->field_0x168);
         memcpy(Ptr(materialEditorPcs, 0x20C), Ptr(materialEditorPcs, 0xEC), 0x30);
         DCStoreRange(Ptr(materialEditorPcs, 0xEC), 0x120);
         break;

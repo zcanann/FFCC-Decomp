@@ -21,8 +21,15 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" {
+extern const float FLOAT_80330c80;
 extern const float FLOAT_80330c84;
+extern const float FLOAT_80330C90;
+extern const float FLOAT_80330C94;
+extern const float FLOAT_80330C98;
+extern const float FLOAT_80330C9C;
+extern const float FLOAT_80330CA8;
 }
+extern const float FLOAT_80330c80;
 
 struct pppYmBreathUnkC {
     unsigned char _pad[0xC];
@@ -246,7 +253,7 @@ extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dat
     float zero;
 
     PSMTXIdentity(state->m_matrix);
-    zero = 0.0f;
+    zero = FLOAT_80330c80;
 
     state->m_direction.z = zero;
     state->m_direction.y = zero;
@@ -846,11 +853,11 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
         particle->m_angleVelocity += params->m_angleAccel;
     }
 
-    while (180.0f <= particle->m_angle) {
-        particle->m_angle -= 360.0f;
+    while (FLOAT_80330C98 <= particle->m_angle) {
+        particle->m_angle -= FLOAT_80330C94;
     }
-    while (particle->m_angle < -180.0f) {
-        particle->m_angle += 360.0f;
+    while (particle->m_angle < FLOAT_80330C9C) {
+        particle->m_angle += FLOAT_80330C94;
     }
 
     particle->m_rotationX += particle->m_rotationVelocityX;
@@ -865,7 +872,7 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
 
     particle->m_scale += params->m_scaleAccel;
     if (params->m_disableScaleClamp == 0) {
-        float zero = 0.0f;
+        float zero = FLOAT_80330c80;
         float scaleClampStart = params->m_scaleClampStart;
         if ((zero < scaleClampStart) && (params->m_scaleAccel < zero)) {
             if (particle->m_scale < zero) {
@@ -918,7 +925,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     u8 flags;
 
     spread = (float)(unsigned int)params->m_spread;
-    range = 2.0f * spread;
+    range = FLOAT_80330CA8 * spread;
 
     memset(particleData, 0, 0x60);
     if (particleWmat != NULL) {
@@ -928,16 +935,16 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         memset(particleColor, 0, 0x20);
     }
 
-    baseDir.x = 0.0f;
-    baseDir.y = 0.0f;
-    baseDir.z = -1.0f;
+    baseDir.x = FLOAT_80330c80;
+    baseDir.y = FLOAT_80330c80;
+    baseDir.z = FLOAT_80330C90;
 
     angle[0] = (int)(range * Math.RandF() - spread);
-    angle[0] = (int)((float)(angle[0] << 15) / 180.0f);
+    angle[0] = (int)((float)(angle[0] << 15) / FLOAT_80330C98);
     angle[1] = (int)(range * Math.RandF() - spread);
-    angle[1] = (int)((float)(angle[1] << 15) / 180.0f);
+    angle[1] = (int)((float)(angle[1] << 15) / FLOAT_80330C98);
     angle[2] = (int)(range * Math.RandF() - spread);
-    angle[2] = (int)((float)(angle[2] << 15) / 180.0f);
+    angle[2] = (int)((float)(angle[2] << 15) / FLOAT_80330C98);
 
     pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
     PSMTXMultVecSR(rotMtx.value, &baseDir, &particle->m_direction);
@@ -949,7 +956,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     Vec directionNorm = particle->m_direction;
     pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&particle->m_direction), &directionNorm);
 
-    if (0.0f != params->m_spawnOffset) {
+    if (FLOAT_80330c80 != params->m_spawnOffset) {
         PSVECScale(&particle->m_direction, &particle->m_position, params->m_spawnOffset);
     }
 
@@ -969,10 +976,10 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         flags = params->m_angleFlags;
         if (((flags & 1) != 0) && ((flags & 2) != 0)) {
             if (0.5 < Math.RandF()) {
-                particle->m_angleRandom *= -1.0f;
+                particle->m_angleRandom *= FLOAT_80330C90;
             }
         } else if ((flags & 2) != 0) {
-            particle->m_angleRandom *= -1.0f;
+            particle->m_angleRandom *= FLOAT_80330C90;
         }
     }
 
@@ -983,11 +990,11 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         particle->m_angleVelocity += particle->m_angleRandom;
     }
 
-    while (180.0f <= particle->m_angle) {
-        particle->m_angle -= 360.0f;
+    while (FLOAT_80330C98 <= particle->m_angle) {
+        particle->m_angle -= FLOAT_80330C94;
     }
-    while (particle->m_angle < -180.0f) {
-        particle->m_angle += 360.0f;
+    while (particle->m_angle < FLOAT_80330C9C) {
+        particle->m_angle += FLOAT_80330C94;
     }
 
     particle->m_rotationX = params->m_rotationStartX;
@@ -1002,26 +1009,26 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
             particle->m_rotationAccelX = rotationAccel;
             if (((params->m_rotationFlags & 1) != 0) && ((params->m_rotationFlags & 2) != 0)) {
                 if (0.5 < Math.RandF()) {
-                    particle->m_rotationAccelX *= -1.0f;
-                    particle->m_rotationAccelY *= -1.0f;
+                    particle->m_rotationAccelX *= FLOAT_80330C90;
+                    particle->m_rotationAccelY *= FLOAT_80330C90;
                 }
             } else if ((params->m_rotationFlags & 2) != 0) {
-                particle->m_rotationAccelX *= -1.0f;
-                particle->m_rotationAccelY *= -1.0f;
+                particle->m_rotationAccelX *= FLOAT_80330C90;
+                particle->m_rotationAccelY *= FLOAT_80330C90;
             }
         } else {
             particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
             particle->m_rotationAccelY = params->m_rotationRandomY * Math.RandF();
             if (((params->m_rotationFlags & 1) != 0) && ((params->m_rotationFlags & 2) != 0)) {
                 if (0.5 < Math.RandF()) {
-                    particle->m_rotationAccelX *= -1.0f;
+                    particle->m_rotationAccelX *= FLOAT_80330C90;
                 }
                 if (0.5 < Math.RandF()) {
-                    particle->m_rotationAccelY *= -1.0f;
+                    particle->m_rotationAccelY *= FLOAT_80330C90;
                 }
             } else if ((params->m_rotationFlags & 2) != 0) {
-                particle->m_rotationAccelX *= -1.0f;
-                particle->m_rotationAccelY *= -1.0f;
+                particle->m_rotationAccelX *= FLOAT_80330C90;
+                particle->m_rotationAccelY *= FLOAT_80330C90;
             }
         }
     }
@@ -1036,9 +1043,9 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     }
 
     particle->m_scale = params->m_groupSpeed;
-    if (params->m_scaleRandomRange != 0.0f) {
+    if (params->m_scaleRandomRange != FLOAT_80330c80) {
         float rand = Math.RandF();
-        float scaledRange = 2.0f * params->m_scaleRandomRange;
+        float scaledRange = FLOAT_80330CA8 * params->m_scaleRandomRange;
         particle->m_scale += scaledRange * rand - params->m_scaleRandomRange;
     }
 
@@ -1058,6 +1065,9 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     }
 }
 
+extern const float FLOAT_80330C98 = 180.0f;
+extern const float FLOAT_80330C9C = -180.0f;
+extern const float FLOAT_80330CA8 = 2.0f;
 extern "C" const char lbl_80330CB8[] = "FFCC";
 extern "C" const char lbl_80330CC0[] = "GDS";
 extern "C" const char lbl_80330CC4[] = "GC";

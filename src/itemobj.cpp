@@ -1490,7 +1490,7 @@ void CGItemObj::DeleteAllFieldItem()
 		if (owner == 0 &&
 		    static_cast<signed char>(
 		        static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0) {
-			itemObj[0x38] |= 0x80;
+			itemObj[0x38] = static_cast<unsigned char>(__rlwimi(itemObj[0x38], 1, 7, 24, 24));
 		}
 	}
 }

@@ -634,7 +634,7 @@ void StreamControl()
 						}
 					}
 
-					int changed = 0;
+					char changed = 0;
 					if (streamData->m_panStepCount != 0) {
 						changed += 1;
 						streamData->m_panStepCount -= 1;

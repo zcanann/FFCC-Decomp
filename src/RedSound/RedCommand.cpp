@@ -734,7 +734,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		music->m_masterVolumeDelta = 0;
 	}
 
-	int trackBase = RedNew(musicHead->m_trackCount * REDSOUND_TRACK_SIZE);
+	RedTrackDATA* trackBase = (RedTrackDATA*)RedNew(musicHead->m_trackCount * REDSOUND_TRACK_SIZE);
 	if (trackBase == 0) {
 		if (m_ReportPrint != 0) {
 			OSReport(sRedCommandMusicTrackCreateErrorFmt,
@@ -749,7 +749,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		return (RedTrackDATA*)-1;
 	}
 
-	music->m_tracks = (RedTrackDATA*)trackBase;
+	music->m_tracks = trackBase;
 
 	if (musicHead->m_reverbKind != 0) {
 		unsigned int reverbKind = ((int)musicHead->m_reverbKind - 1U) & 7;

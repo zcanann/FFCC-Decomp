@@ -2502,7 +2502,7 @@ static void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 {
     track->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_MIX_MASK;
 
-    switch (**(unsigned char**)track) {
+    switch (track->m_command[0]) {
     case 1:
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_LEFT;
         break;
@@ -2513,7 +2513,7 @@ static void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
         break;
     }
 
-    switch ((*(unsigned char**)track)[1]) {
+    switch (track->m_command[1]) {
     case 1:
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_RIGHT;
         break;
@@ -2523,7 +2523,7 @@ static void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_DRY_RIGHT;
         break;
     }
-    *(unsigned char**)track += 2;
+    track->m_command += 2;
     SetVoiceSwitch(track, track->m_voiceSwitch);
     m_ChangeStatus |= 2;
 }

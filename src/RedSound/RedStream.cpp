@@ -183,8 +183,12 @@ static int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int 
 
 /*
  * --INFO--
- * Address:	801cbc6c
- * Size:	856b
+ * PAL Address: 0x801cbc6c
+ * PAL Size: 856b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount)
 {

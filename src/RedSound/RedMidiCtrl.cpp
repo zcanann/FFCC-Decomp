@@ -354,19 +354,19 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     char key;
-    int* slot;
+    RedKeyOnSlot* slot;
     RedVoiceDATA* voice;
 
     if ((control == p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP) || ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) == 0)) {
         track->m_sweepDelta = 0;
         key = ((char*)track)[REDSOUND_TRACK_NOTE_KEY_OFFSET];
-        slot = (int*)keyOnData;
+        slot = keyOnData->m_fixed;
         do {
-            if (((u32)*slot == (u32)track) && (*(char*)(slot + 1) == key)) {
-                *slot = 0;
+            if ((slot->m_track == track) && (slot->m_note.m_key == key)) {
+                slot->m_track = 0;
             }
-            slot += 2;
-        } while (slot < (int*)((int)keyOnData + REDSOUND_KEY_ON_END_BYTE_OFFSET));
+            slot++;
+        } while (slot < keyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT);
 
         key = ((char*)track)[REDSOUND_TRACK_NOTE_KEY_OFFSET];
         voice = p_VoiceData;

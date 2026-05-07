@@ -453,7 +453,7 @@ static void _ClearReverb(int bank)
  * JP Address: TODO
  * JP Size: TODO
  */
-int* SetReverb(int bank, int kind, int* params)
+RedReverbSize* SetReverb(int bank, int kind, int* params)
 {
     RedReverbDATA* reverb;
     int result;
@@ -463,7 +463,7 @@ int* SetReverb(int bank, int kind, int* params)
 
     if (kind == REDSOUND_REVERB_KIND_NONE) {
         _ClearReverb(bank);
-        return (int*)p_ReverbSize;
+        return p_ReverbSize;
     }
 
     if (kind == REDSOUND_REVERB_KIND_HI_DPL2) {
@@ -473,7 +473,7 @@ int* SetReverb(int bank, int kind, int* params)
     reverb = p_ReverbData + (bank & 1);
     if ((reverb->m_callback != 0) && (reverb->m_kind == kind)) {
         _SetReverbData(reverb, params);
-        return (int*)p_ReverbSize;
+        return p_ReverbSize;
     }
 
     _ClearReverb(bank);
@@ -567,7 +567,7 @@ int* SetReverb(int bank, int kind, int* params)
         p_ReverbSize->m_requested = 0;
     }
 
-    return (int*)p_ReverbSize;
+    return p_ReverbSize;
 }
 
 /*

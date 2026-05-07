@@ -288,7 +288,7 @@ int PitchCompute(int, int, int, int);
 void* ReverbAreaAlloc(unsigned long);
 void ReverbAreaFree(void*);
 void InitReverb();
-int* SetReverb(int, int, int*);
+RedReverbSize* SetReverb(int, int, int*);
 
 RedVoiceDATA* EntryVoiceSearch(RedTrackDATA*);
 void SetVoiceVolumeMix(RedVoiceDATA*, int, int);

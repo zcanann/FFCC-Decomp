@@ -1446,8 +1446,8 @@ CRedDriver::~CRedDriver()
 void CRedDriver::Init()
 {
     RedTrackDATA* seTrackArena;
-    int iVar5;
-    int iVar6;
+    int nextIndex;
+    int index;
     int fullVolume;
     int noMusicId;
 
@@ -1472,12 +1472,12 @@ void CRedDriver::Init()
     m_CrossTime = 0;
     m_MasterSEVolume = REDSOUND_MASTER_VOLUME_FULL;
     m_MasterMusicVolume = REDSOUND_MASTER_VOLUME_FULL;
-    iVar6 = 0;
+    index = 0;
     do {
-        iVar5 = iVar6 + 1;
-        p_SeBlockData[iVar6] = 0;
-        iVar6 = iVar5;
-    } while (iVar5 < REDSOUND_SE_BLOCK_BANK_COUNT);
+        nextIndex = index + 1;
+        p_SeBlockData[index] = 0;
+        index = nextIndex;
+    } while (nextIndex < REDSOUND_SE_BLOCK_BANK_COUNT);
     p_ZeroData = (u8*)RedNew(REDSOUND_ZERO_BUFFER_SIZE);
     memset(p_ZeroData, 0, REDSOUND_ZERO_BUFFER_SIZE);
     p_MusicReplayPoint = (int*)RedNew(REDSOUND_MUSIC_REPLAY_POINT_SIZE);
@@ -1510,22 +1510,22 @@ void CRedDriver::Init()
     memset(p_KeyOnData, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
     p_VoiceData = (RedVoiceDATA*)RedNew(REDSOUND_VOICE_BUFFER_SIZE);
     memset(p_VoiceData, 0, REDSOUND_VOICE_BUFFER_SIZE);
-    iVar6 = 0;
+    index = 0;
     do {
-        iVar5 = iVar6 % REDSOUND_SE_VOICE_BASE_INDEX;
-        p_VoiceData[iVar6].m_voiceIndex = iVar5;
-        iVar6 = iVar6 + 1;
-    } while (iVar6 < REDSOUND_VOICE_COUNT);
+        nextIndex = index % REDSOUND_SE_VOICE_BASE_INDEX;
+        p_VoiceData[index].m_voiceIndex = nextIndex;
+        index = index + 1;
+    } while (index < REDSOUND_VOICE_COUNT);
     p_EditorVoice[REDSOUND_EDITOR_VOICE_RIGHT] = 0;
     p_EditorVoice[REDSOUND_EDITOR_VOICE_LEFT] = 0;
     seTrackArena = (RedTrackDATA*)RedNew(REDSOUND_SE_TRACK_ARENA_SIZE);
     p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks = seTrackArena;
     memset(seTrackArena, 0, REDSOUND_SE_TRACK_ARENA_SIZE);
-    iVar5 = 0;
+    nextIndex = 0;
     do {
-        seTrackArena[iVar5].m_trackNo = (char)(iVar5 + REDSOUND_SE_VOICE_BASE_INDEX);
-        iVar5 = iVar5 + 1;
-    } while (iVar5 < REDSOUND_SE_TRACK_COUNT);
+        seTrackArena[nextIndex].m_trackNo = (char)(nextIndex + REDSOUND_SE_VOICE_BASE_INDEX);
+        nextIndex = nextIndex + 1;
+    } while (nextIndex < REDSOUND_SE_TRACK_COUNT);
     p_EditorTrack = (RedTrackDATA*)RedNew(REDSOUND_TRACK_SIZE);
     memset(p_EditorTrack, 0, REDSOUND_TRACK_SIZE);
     p_ReverbDepth = (RedReverbDepth*)RedNew(REDSOUND_REVERB_DEPTH_BUFFER_SIZE);

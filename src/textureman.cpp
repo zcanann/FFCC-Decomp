@@ -61,7 +61,6 @@ extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
 extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" void __ct__21CPtrArray_P8CTexture_Fv(void*);
 extern "C" void __dt__21CPtrArray_P8CTexture_Fv(void*, int);
-extern "C" bool Add__21CPtrArray_P8CTexture_FP8CTexture(void*, CTexture*);
 
 static const char s_textureman_cpp_801D7974[] = "textureman.cpp";
 static const char s_Error_width_pctd_height_pctd_801D7984[] = "Error width=%d height=%d\n";
@@ -227,7 +226,7 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
                 }
             }
 
-            Add__21CPtrArray_P8CTexture_FP8CTexture(TextureArray(m_textureArrayStorage), texture);
+            TextureArray(m_textureArrayStorage)->Add(texture);
         next_chunk:;
             break;
         }
@@ -312,7 +311,7 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                                     }
                                 }
 
-                                Add__21CPtrArray_P8CTexture_FP8CTexture(TextureArray(m_textureArrayStorage), texture);
+                                TextureArray(m_textureArrayStorage)->Add(texture);
                                 break;
                             }
                         next_texture:;

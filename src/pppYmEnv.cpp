@@ -310,7 +310,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     const float firstNormalZ = FLOAT_80331190 * firstRingCos * firstRingCos;
 
     GXPosition3f32(FLOAT_80331180, FLOAT_80331180, FLOAT_80331184);
-    GXNormal3f32(FLOAT_80331180, FLOAT_80331180, FLOAT_80331184);
+    GXNormal3f32(FLOAT_80331180, FLOAT_80331180, FLOAT_80331190);
 
     int i = 0;
     float lon = FLOAT_80331180;
@@ -327,8 +327,8 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     }
 
     for (int ring = 2; ring < (int)detail; ring++) {
-        const float upperLat = (FLOAT_803311B0 * (float)(ring - 1)) / (float)detail;
         const float lowerLat = (FLOAT_803311B0 * (float)ring) / (float)detail;
+        const float upperLat = (FLOAT_803311B0 * (float)(ring - 1)) / (float)detail;
 
         const float upperSin = FLOAT_80331184 * (float)sin(upperLat);
         const float upperCos = FLOAT_80331184 * (float)cos(upperLat);

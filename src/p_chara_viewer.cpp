@@ -117,18 +117,9 @@ struct CharaViewerSRT {
     float scaleX;
     float scaleY;
     float scaleZ;
-    int pad;
 };
 
-extern "C" {
-CharaViewerSRT gCharaViewerSrt;
-const char* gCharaViewerSpinnerText;
-char gCharaViewerSpinnerTextInitialized;
-int gCharaViewerSpinnerFrame;
-char gCharaViewerSpinnerFrameInitialized;
-int gCharaViewerSrtNeedsInit;
-char gCharaViewerSrtInitialized[8];
-}
+typedef char CharaViewerSRT_size_check[(sizeof(CharaViewerSRT) == 0x24) ? 1 : -1];
 
 static inline void destroyRef(int* ref)
 {
@@ -493,17 +484,21 @@ void CCharaPcs::calcViewer()
         }
     }
 
-    if (gCharaViewerSpinnerTextInitialized == 0) {
-        gCharaViewerSpinnerText = kCharaViewerSpinner;
-        gCharaViewerSpinnerTextInitialized = 1;
+    static const char* pFan;
+    static char initFan;
+    static int alive;
+    static char initAlive;
+    if (initFan == 0) {
+        pFan = kCharaViewerSpinner;
+        initFan = 1;
     }
-    if (gCharaViewerSpinnerFrameInitialized == 0) {
-        gCharaViewerSpinnerFrame = 0;
-        gCharaViewerSpinnerFrameInitialized = 1;
+    if (initAlive == 0) {
+        alive = 0;
+        initAlive = 1;
     }
-    gCharaViewerSpinnerFrame++;
+    alive++;
     Printf__8CGraphicFPce(&Graphic, kCharaViewerChoiceFmt,
-                          (int)(char)gCharaViewerSpinnerText[(gCharaViewerSpinnerFrame >> 4) % 4],
+                          (int)(char)pFan[(alive >> 4) % 4],
                           USBPcs.m_rootPath);
 
     unsigned short heldButtons;
@@ -637,20 +632,23 @@ void CCharaPcs::calcViewer()
             }
         }
 
-        if (gCharaViewerSrtInitialized[0] == 0) {
-            gCharaViewerSrtNeedsInit = 1;
-            gCharaViewerSrtInitialized[0] = 1;
+        static CharaViewerSRT srt;
+        static int bFirst;
+        static char init;
+        if (init == 0) {
+            bFirst = 1;
+            init = 1;
         }
-        if (gCharaViewerSrtNeedsInit != 0) {
-            gCharaViewerSrt.transZ = kCharaViewerZero;
-            gCharaViewerSrt.transY = kCharaViewerZero;
-            gCharaViewerSrt.rotZ = kCharaViewerZero;
-            gCharaViewerSrt.rotY = kCharaViewerZero;
-            gCharaViewerSrt.rotX = kCharaViewerZero;
-            gCharaViewerSrt.scaleZ = kCharaViewerUnitStep;
-            gCharaViewerSrt.scaleY = kCharaViewerUnitStep;
-            gCharaViewerSrt.scaleX = kCharaViewerUnitStep;
-            gCharaViewerSrtNeedsInit = 0;
+        if (bFirst != 0) {
+            srt.transZ = kCharaViewerZero;
+            srt.transY = kCharaViewerZero;
+            srt.rotZ = kCharaViewerZero;
+            srt.rotY = kCharaViewerZero;
+            srt.rotX = kCharaViewerZero;
+            srt.scaleZ = kCharaViewerUnitStep;
+            srt.scaleY = kCharaViewerUnitStep;
+            srt.scaleX = kCharaViewerUnitStep;
+            bFirst = 0;
         }
 
         float rotY = kCharaViewerZero;
@@ -658,11 +656,11 @@ void CCharaPcs::calcViewer()
             unsigned int padIndex = (~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 31) & 4U);
             rotY = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x2C + padIndex * 0x54);
         }
-        gCharaViewerSrt.rotY = gCharaViewerSrt.rotY + rotY;
-        gCharaViewerSrt.transX = translateX;
+        srt.rotY = srt.rotY + rotY;
+        srt.transX = translateX;
 
         Mtx modelMtx;
-        SRTToMatrix__5CMathFPA4_fP3SRT(&Math, modelMtx, &gCharaViewerSrt);
+        SRTToMatrix__5CMathFPA4_fP3SRT(&Math, modelMtx, &srt);
         SetMatrix__Q26CChara6CModelFPA4_f(model, modelMtx);
 
         CStopWatch matrixWatch(reinterpret_cast<char*>(-1));

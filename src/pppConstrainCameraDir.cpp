@@ -8,8 +8,8 @@
 void pppSetFpMatrix(_pppMngSt*);
 extern const float FLOAT_803320BC;
 extern const float FLOAT_803320B8;
-extern const float FLOAT_803320C0;
 extern const float FLOAT_803320C4;
+static const float kConstrainCameraDirXScale = 1.3333f;
 
 /*
  * --INFO--
@@ -46,7 +46,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
 
-            pppMngSt->m_scale.x = FLOAT_803320C0 * scale;
+            pppMngSt->m_scale.x = kConstrainCameraDirXScale * scale;
             pppMngSt->m_scale.y = scale;
             pppMngSt->m_scale.z = FLOAT_803320B8;
 

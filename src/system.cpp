@@ -677,11 +677,13 @@ void CSystem::Init()
 
     if (OSGetConsoleSimulatedMemSize() == 0x3000000)
     {
+        unsigned int count;
+        CFile::CHandle* fileHandle;
+
         m_mapStage = (CStage*)Memory.CreateStage(0x400000, const_cast<char*>(s_cSystem), 1);
-        CFile::CHandle* fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
+        fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)
         {
-            unsigned int count;
             unsigned int remaining;
             unsigned int mapSize;
             unsigned int offset;

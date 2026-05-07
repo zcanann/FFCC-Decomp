@@ -91,7 +91,7 @@ struct LaserWork {
     s16 m_unused36;
     float m_shapeRotation;
     float m_maxLength;
-    u8 m_unused40[0x0C];
+    Vec m_targetPosition;
     u8 m_spawnEnabled;
 };
 
@@ -579,18 +579,18 @@ void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 void pppConstruct2Laser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
     f32 fVar1 = kPppLaserZero;
-    u8* work = (u8*)pppLaser + param_2->m_serializedDataOffsets[2] + 0x80;
+    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-    *(f32*)(work + 0x18) = kPppLaserZero;
-    *(f32*)(work + 0x14) = fVar1;
-    *(f32*)(work + 0x10) = fVar1;
-    *(f32*)(work + 0x0C) = fVar1;
-    *(f32*)(work + 0x08) = fVar1;
-    *(f32*)(work + 0x04) = fVar1;
-    *(f32*)(work + 0x28) = fVar1;
-    *(f32*)(work + 0x24) = fVar1;
-    *(f32*)(work + 0x20) = fVar1;
-    *(work + 0x2C) = 0;
+    work->m_graphValue3 = kPppLaserZero;
+    work->m_graphValue2 = fVar1;
+    work->m_halfWidth = fVar1;
+    work->m_graphValue1 = fVar1;
+    work->m_graphValue0 = fVar1;
+    work->m_lengthStep = fVar1;
+    work->m_origin.z = fVar1;
+    work->m_origin.y = fVar1;
+    work->m_origin.x = fVar1;
+    work->m_shapeReady = 0;
 }
 
 /*
@@ -605,51 +605,51 @@ void pppConstruct2Laser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
     f32 fVar1 = kPppLaserZero;
-    f32* pfVar3 = (f32*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
+    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
     int local_24;
     int local_28;
     int iVar2;
     Vec local_14;
     Vec local_20;
 
-    *pfVar3 = kPppLaserZero;
-    pfVar3[6] = fVar1;
-    pfVar3[5] = fVar1;
-    pfVar3[4] = fVar1;
-    pfVar3[3] = fVar1;
-    pfVar3[2] = fVar1;
-    pfVar3[1] = fVar1;
-    *(u32*)((u8*)pfVar3 + 0x1c) = 0;
-    pfVar3[10] = fVar1;
-    pfVar3[9] = fVar1;
-    pfVar3[8] = fVar1;
+    work->m_length = kPppLaserZero;
+    work->m_graphValue3 = fVar1;
+    work->m_graphValue2 = fVar1;
+    work->m_halfWidth = fVar1;
+    work->m_graphValue1 = fVar1;
+    work->m_graphValue0 = fVar1;
+    work->m_lengthStep = fVar1;
+    work->m_points = 0;
+    work->m_origin.z = fVar1;
+    work->m_origin.y = fVar1;
+    work->m_origin.x = fVar1;
 
-    *((u8*)pfVar3 + 0x2c) = 0;
-    *((u8*)pfVar3 + 0x2d) = 0;
-    *((u8*)pfVar3 + 0x2e) = 0;
-    *((u16*)((u8*)pfVar3 + 0x30)) = 0;
-    *((u16*)((u8*)pfVar3 + 0x34)) = 0;
-    *((u16*)((u8*)pfVar3 + 0x32)) = 0;
+    work->m_shapeReady = 0;
+    work->m_hitFrame = 0;
+    work->m_unused2E = 0;
+    work->m_shapeArg0 = 0;
+    work->m_shapeArg2 = 0;
+    work->m_shapeArg1 = 0;
 
-    pfVar3[14] = Math.RandF(FLOAT_8033345c);
-    *((u8*)pfVar3 + 0x4c) = 1;
+    work->m_shapeRotation = Math.RandF(FLOAT_8033345c);
+    work->m_spawnEnabled = 1;
 
     iVar2 = GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(
         &Game, (PPPIFPARAM*)((u8*)pppMngStPtr + 0x130), &local_24, &local_28);
     if (iVar2 != 0) {
-        GetTargetCursor__5CGameFiR3VecR3Vec(&Game, local_28, (Vec*)(pfVar3 + 0x10), &local_20);
+        GetTargetCursor__5CGameFiR3VecR3Vec(&Game, local_28, &work->m_targetPosition, &local_20);
 
         iVar2 = (int)GetPartyObj__5CGameFi(&Game, local_28);
         local_14.x = *(f32*)(iVar2 + 0x15c);
         local_14.y = *(f32*)(iVar2 + 0x160);
         local_14.z = *(f32*)(iVar2 + 0x164);
         if (local_24 == 0x200) {
-            pfVar3[15] = PSVECDistance((Vec*)(pfVar3 + 0x10), &local_14);
+            work->m_maxLength = PSVECDistance(&work->m_targetPosition, &local_14);
         } else {
-            pfVar3[15] = FLOAT_80333448;
+            work->m_maxLength = FLOAT_80333448;
         }
     } else {
-        pfVar3[15] = FLOAT_80333448;
+        work->m_maxLength = FLOAT_80333448;
         *(u8*)((u8*)pppMngStPtr + 0xe8) = 1;
         pppStopSe__FP9_pppMngStP7PPPSEST(pppMngStPtr, (PPPSEST*)((u8*)pppMngStPtr + 0x11c));
     }

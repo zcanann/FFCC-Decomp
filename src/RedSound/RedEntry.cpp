@@ -110,32 +110,32 @@ CRedEntry::~CRedEntry()
  */
 void CRedEntry::Init()
 {
-	int iVar2;
+	int bankIndex;
 
 	m_waveBankBase = (RedHistoryBANK*)RedNew(REDSOUND_WAVE_BANK_SIZE);
 	m_seSepBankBase = (RedHistoryBANK*)RedNew(REDSOUND_SESEP_BANK_SIZE);
 	m_musicBankBase = (RedHistoryBANK*)RedNew(REDSOUND_MUSIC_BANK_SIZE);
 
 	memset((void*)m_waveBankBase, 0, REDSOUND_WAVE_BANK_SIZE);
-	iVar2 = 0;
+	bankIndex = 0;
 	do {
-		m_waveBankBase[iVar2].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
-		iVar2 = iVar2 + 1;
-	} while (iVar2 < REDSOUND_WAVE_BANK_ENTRY_COUNT);
+		m_waveBankBase[bankIndex].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
+		bankIndex = bankIndex + 1;
+	} while (bankIndex < REDSOUND_WAVE_BANK_ENTRY_COUNT);
 
 	memset((void*)m_seSepBankBase, 0, REDSOUND_SESEP_BANK_SIZE);
-	iVar2 = 0;
+	bankIndex = 0;
 	do {
-		m_seSepBankBase[iVar2].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
-		iVar2 = iVar2 + 1;
-	} while (iVar2 < REDSOUND_SESEP_BANK_ENTRY_COUNT);
+		m_seSepBankBase[bankIndex].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
+		bankIndex = bankIndex + 1;
+	} while (bankIndex < REDSOUND_SESEP_BANK_ENTRY_COUNT);
 
 	memset((void*)m_musicBankBase, 0, REDSOUND_MUSIC_BANK_SIZE);
-	iVar2 = 0;
+	bankIndex = 0;
 	do {
-		m_musicBankBase[iVar2].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
-		iVar2 = iVar2 + 1;
-	} while (iVar2 < REDSOUND_MUSIC_BANK_ENTRY_COUNT);
+		m_musicBankBase[bankIndex].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
+		bankIndex = bankIndex + 1;
+	} while (bankIndex < REDSOUND_MUSIC_BANK_ENTRY_COUNT);
 
 	m_waveLoadNo = -1;
 }
@@ -281,23 +281,23 @@ int CRedEntry::SearchUseWave(int waveNo)
 int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 {
 	int sequenceNo = -1;
-	int iVar2;
+	int waveNo;
 
 	if (bank->m_id >= 0) {
 		WaveHistoryDelete(bank->m_historyNo);
-		iVar2 = bank->m_id;
+		waveNo = bank->m_id;
 
 		bank->m_id = -1;
 		bank->m_size = 0;
 
-		sequenceNo = SearchWaveSequence(iVar2);
+		sequenceNo = SearchWaveSequence(waveNo);
 		if (sequenceNo < 0) {
-			if ((SearchUseWave(iVar2) != 0) && (m_ReportPrint != 0)) {
+			if ((SearchUseWave(waveNo) != 0) && (m_ReportPrint != 0)) {
 				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
 				fflush(__files + 1);
 				OSReport(sRedEntryErrorBannerFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
 				fflush(__files + 1);
-				OSReport(sRedEntryEraseUsingWaveDataFmt, sRedEntryLogPrefix, sRedEntryErrorColor, iVar2,
+				OSReport(sRedEntryEraseUsingWaveDataFmt, sRedEntryLogPrefix, sRedEntryErrorColor, waveNo,
 				         sRedEntryResetColor);
 				fflush(__files + 1);
 				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);

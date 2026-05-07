@@ -2414,6 +2414,7 @@ void MusicSkipFunction()
     int activeTrackCount;
     int trackIndex;
     unsigned int trackCount;
+    u32* soundControl;
     RedSoundCONTROL* control;
     RedTrackDATA* track;
 
@@ -2431,14 +2432,15 @@ void MusicSkipFunction()
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
         memcpy(&control->m_measure, &control->m_savedMeasure, REDSOUND_CONTROL_SAVED_POSITION_SIZE);
         memcpy(&control->m_tempo, &control->m_savedTempo, REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
+        soundControl = (u32*)control;
         track = control->m_tracks;
         trackCount = control->m_trackCount;
         trackIndex = 0;
         do {
-            track->m_command = control->m_savedCommand[trackIndex];
-            track->m_deltaTime = control->m_savedDelta[trackIndex];
-            track->m_flags = control->m_savedFlags[trackIndex];
-            track->m_note = control->m_savedNote[trackIndex];
+            track->m_command = (u8*)soundControl[trackIndex + REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET];
+            track->m_deltaTime = soundControl[trackIndex + REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET];
+            track->m_flags = soundControl[trackIndex + REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET];
+            *(int*)&track->m_note = soundControl[trackIndex + REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET];
             trackCount -= 1;
             trackIndex += 1;
             track += 1;

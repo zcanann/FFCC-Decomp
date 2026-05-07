@@ -8,7 +8,7 @@
 void pppSetFpMatrix(_pppMngSt*);
 extern const float FLOAT_803320BC;
 extern const float FLOAT_803320B8;
-extern const float FLOAT_803320C0;
+const float FLOAT_803320C0 = 1.3333f;
 extern const float FLOAT_803320C4;
 
 /*

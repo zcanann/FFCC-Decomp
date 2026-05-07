@@ -335,7 +335,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	unsigned int count;
 	unsigned char* current;
 	unsigned int remaining;
-	RedVoiceDATA* seTrack;
+	RedVoiceDATA* voiceData;
 	int isMulti;
 
 	p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_updateFlags = 0;
@@ -380,7 +380,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			break;
 		}
 
-		seTrack = p_VoiceData + track->m_trackNo;
+		voiceData = p_VoiceData + track->m_trackNo;
 		while (true) {
 			track->m_waveBankData = waveBase;
 			track->m_command = current;
@@ -451,12 +451,12 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 				memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_BYTE, REDSOUND_TRACK_ADSR_SIZE);
 				track->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_DIRECT_MASK;
 				track->m_seTickCounter = 1;
-				seTrack->m_track = track;
-				seTrack->m_stateFlags = REDSOUND_VOICE_STATE_PLAYING | REDSOUND_VOICE_STATE_SE;
-				seTrack->m_flags = REDSOUND_VOICE_FLAGS_RELEASED;
-				seTrack->m_volumeModPhase = 0;
-				seTrack->m_pitchModPhase = 0;
-				seTrack->m_updateFlags = 0;
+				voiceData->m_track = track;
+				voiceData->m_stateFlags = REDSOUND_VOICE_STATE_PLAYING | REDSOUND_VOICE_STATE_SE;
+				voiceData->m_flags = REDSOUND_VOICE_FLAGS_RELEASED;
+				voiceData->m_volumeModPhase = 0;
+				voiceData->m_pitchModPhase = 0;
+				voiceData->m_updateFlags = 0;
 			}
 
 			remaining = remaining - 1;
@@ -466,7 +466,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 				break;
 			}
 			track++;
-			seTrack++;
+			voiceData++;
 		}
 
 		if (count == 0) {

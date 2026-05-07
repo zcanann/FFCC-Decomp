@@ -1160,7 +1160,7 @@ void CGItemObj::onFrameAlways()
 	if (*(int*)(self + 0x500) == 0xA) {
 		int canUseTrace;
 
-		if (Game.m_gameWork.m_gameInitFlag != 0 &&
+		if (static_cast<int>(Game.m_gameWork.m_gameInitFlag) != 0 &&
 		    static_cast<signed char>(
 		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(CFlat + 4836)) << 28) & 0xC0000000) >> 31) != 0 &&
 		    static_cast<signed char>(

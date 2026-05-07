@@ -305,40 +305,40 @@ void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
  */
 void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    unsigned int* slot;
+    RedKeyOnSlot* slot;
 
     if (((signed char)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
-        slot = (unsigned int*)((int)keyOnData + track->m_trackNo * 8);
-        if ((*slot == 0) || (*slot == (unsigned int)track)) {
-            *slot = (unsigned int)track;
-            slot[1] = *(unsigned int*)&track->m_note;
+        slot = &keyOnData->m_fixed[track->m_trackNo];
+        if ((slot->m_track == 0) || (slot->m_track == track)) {
+            slot->m_track = track;
+            *(unsigned int*)&slot->m_note = *(unsigned int*)&track->m_note;
             m_KeyOnEntry++;
         }
         return;
     }
 
     if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
-        slot = (unsigned int*)((int)keyOnData + REDSOUND_KEY_ON_PRIORITY_BYTE_OFFSET);
+        slot = keyOnData->m_priority;
         do {
-            if (*slot == 0) {
-                *slot = (unsigned int)track;
-                slot[1] = *(unsigned int*)&track->m_note;
+            if (slot->m_track == 0) {
+                slot->m_track = track;
+                *(unsigned int*)&slot->m_note = *(unsigned int*)&track->m_note;
                 m_KeyOnEntry++;
                 break;
             }
-            slot += 2;
-        } while (slot < (unsigned int*)((int)keyOnData + REDSOUND_KEY_ON_NORMAL_BYTE_OFFSET));
+            slot++;
+        } while (slot < keyOnData->m_normal);
     } else {
-        slot = (unsigned int*)((int)keyOnData + REDSOUND_KEY_ON_NORMAL_BYTE_OFFSET);
+        slot = keyOnData->m_normal;
         do {
-            if (*slot == 0) {
-                *slot = (unsigned int)track;
-                slot[1] = *(unsigned int*)&track->m_note;
+            if (slot->m_track == 0) {
+                slot->m_track = track;
+                *(unsigned int*)&slot->m_note = *(unsigned int*)&track->m_note;
                 m_KeyOnEntry++;
                 break;
             }
-            slot += 2;
-        } while (slot < (unsigned int*)((int)keyOnData + REDSOUND_KEY_ON_END_BYTE_OFFSET));
+            slot++;
+        } while (slot < keyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT);
     }
 }
 

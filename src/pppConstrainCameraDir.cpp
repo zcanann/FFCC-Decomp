@@ -46,7 +46,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
 
-            pppMngSt->m_scale.x = FLOAT_803320C0 * scale;
+            pppMngSt->m_scale.x = 1.3333f * scale;
             pppMngSt->m_scale.y = scale;
             pppMngSt->m_scale.z = FLOAT_803320B8;
 

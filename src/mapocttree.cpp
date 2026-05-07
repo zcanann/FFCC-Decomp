@@ -194,6 +194,7 @@ COctTree::~COctTree()
 int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 {
     CChunkFile::CChunk chunk;
+    int nodeCount;
 
     m_unk01 = 0;
     chunkFile.PushChunk();
@@ -227,7 +228,7 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
                 Printf__7CSystemFPce(&System, s_m_node_pctd_m_meshtype_pctd_801D7268, m_nodeCount, mapObjType);
             }
 
-            unsigned short nodeCount = m_nodeCount;
+            nodeCount = m_nodeCount;
             rootNode = __nwa__FUlPQ27CMemory6CStagePci(
                 nodeCount * 0x4C + 0x10, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapocttree_cpp_801D72EC),
                 0x59);
@@ -250,9 +251,7 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
                     while (chunkFile.GetNextChunk(chunk)) {
                         switch (chunk.m_id) {
                         case 'OBJ ': {
-                            unsigned short nodeIndex = chunkFile.Get2();
-
-                            node = m_nodePool + nodeIndex;
+                            node = m_nodePool + static_cast<unsigned short>(chunkFile.Get2());
                             node->m_meshCount = chunkFile.Get2();
                             node->m_meshStart = chunkFile.Get2();
                             break;
@@ -271,10 +270,10 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
                             int childCount = 0;
 
                             for (int i = 0; i < 8; i++) {
-                                unsigned short childIndex = chunkFile.Get2();
+                                short childIndex = chunkFile.Get2();
 
-                                if (static_cast<short>(childIndex) != -1) {
-                                    node->m_children[childCount] = m_nodePool + childIndex;
+                                if (childIndex != -1) {
+                                    node->m_children[childCount] = m_nodePool + static_cast<unsigned short>(childIndex);
                                     childCount++;
                                 }
                             }

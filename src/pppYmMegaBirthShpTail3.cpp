@@ -437,7 +437,7 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
                      PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, _PARTICLE_DATA* particleData,
                      VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
-    unsigned int uVar4 = (unsigned int)vColor->m_alpha;
+    int uVar4 = (int)vColor->m_alpha;
 
     if (particleColor != nullptr) {
         particleColor->m_color[0] = particleColor->m_color[0] + particleColor->m_colorFrameDeltas[0];
@@ -445,14 +445,14 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
         particleColor->m_color[2] = particleColor->m_color[2] + particleColor->m_colorFrameDeltas[2];
         particleColor->m_color[3] = particleColor->m_color[3] + particleColor->m_colorFrameDeltas[3];
 
-        uVar4 = (unsigned int)vColor->m_alpha + (int)particleColor->m_color[3];
+        uVar4 = (int)vColor->m_alpha + (int)particleColor->m_color[3];
         if (uVar4 > 0xff) {
             uVar4 = 0xff;
         }
     }
 
     particleData->m_matrix[2][2] = particleData->m_matrix[2][2] + pYmMegaBirthShpTail3->m_colorDeltaAdd[2];
-    particleData->m_matrix[2][3] = particleData->m_matrix[2][3] + pYmMegaBirthShpTail3->m_speedRandRange;
+    particleData->m_matrix[2][3] = particleData->m_matrix[2][3] + pYmMegaBirthShpTail3->m_sizeVal;
 
     Vec local;
     Vec scaled;

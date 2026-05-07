@@ -35,7 +35,7 @@ struct PYmMegaBirthShpTail3
     Vec m_directionTail;           // 0x30
     float m_colorDeltaAdd[4];      // 0x3c
     float m_sizeStart;             // 0x4c
-    float m_sizeEnd;               // 0x50
+    float m_sizeVal;               // 0x50
     float m_speedRandRange;        // 0x54
     Vec m_speedScale;              // 0x58
     unsigned char m_pad0x64[0x6A - 0x64];

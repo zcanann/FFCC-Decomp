@@ -214,9 +214,9 @@ extern "C" const char s_no_texture____801da7e8[];
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
+void CCharaPcs::drawViewer()
 {
-    CCharaPcs* self = reinterpret_cast<CCharaPcs*>(param_1);
+    CCharaPcs* self = this;
     unsigned char* p = reinterpret_cast<unsigned char*>(self);
     register const char* viewerStrings = s_no_texture____801da7e8;
     Mtx cameraMtx;
@@ -351,9 +351,9 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
+void CCharaPcs::calcViewer()
 {
-    CCharaPcs* self = reinterpret_cast<CCharaPcs*>(param_1);
+    CCharaPcs* self = this;
     unsigned char* p = reinterpret_cast<unsigned char*>(self);
     register const char* viewerStrings = s_no_texture____801da7e8;
     char pathBuf[256];
@@ -715,9 +715,9 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void createViewer__9CCharaPcsFv(void* param_1)
+void CCharaPcs::createViewer()
 {
-    CCharaPcs* self = reinterpret_cast<CCharaPcs*>(param_1);
+    CCharaPcs* self = this;
     unsigned char* p = reinterpret_cast<unsigned char*>(self);
     register const char* viewerStrings = s_no_texture____801da7e8;
     unsigned int i;
@@ -876,9 +876,9 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
+void CCharaPcs::destroyViewer()
 {
-    unsigned char* p = (unsigned char*)param_1;
+    unsigned char* p = reinterpret_cast<unsigned char*>(this);
     int* ref;
     unsigned int i;
 

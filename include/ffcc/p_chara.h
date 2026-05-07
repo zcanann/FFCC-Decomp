@@ -193,6 +193,10 @@ public:
     void drawOverlap();
     int LoadAnim(int, int, char*, int, int, int);
     void GetAnimStage();
+    void drawViewer();
+    void calcViewer();
+    void createViewer();
+    void destroyViewer();
 
     u8 _pad004[0xC8];                         // 0x004
     CMemory::CStage* m_viewerModelStage;      // 0x0CC

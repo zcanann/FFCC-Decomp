@@ -113,6 +113,7 @@ enum RedMidiCommandConst {
     REDSOUND_MIDI_PITCH_BEND_CENTER = 0x2000,
     REDSOUND_MIDI_DELTA_BUFFER_WORD_COUNT = 4,
     REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT = 1,
+    REDSOUND_MIDI_WAVE_BANK_DIRECT = 0x10,
 };
 
 enum RedMidiModCommandByte {
@@ -851,7 +852,7 @@ static void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyO
 static void __MidiCtrl_LoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     ++track->m_loopDepth;
-    track->m_loopDepth &= 3;
+    track->m_loopDepth &= REDSOUND_TRACK_LOOP_STACK_COUNT - 1;
     track->m_loopCommand[track->m_loopDepth] = track->m_command;
     track->m_loopStep[track->m_loopDepth] = track->m_loopStepCurrent;
     track->m_loopCount[track->m_loopDepth] = 0;
@@ -881,7 +882,7 @@ static void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
         track->m_loopStepCurrent = track->m_loopStep[track->m_loopDepth];
     } else {
         track->m_loopDepth--;
-        track->m_loopDepth &= 3;
+        track->m_loopDepth &= REDSOUND_TRACK_LOOP_STACK_COUNT - 1;
     }
 }
 
@@ -1205,7 +1206,7 @@ static void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
         track->m_waveBase = track->m_waveBankData->m_aramAddress;
         memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
     }
-    track->m_waveBankNo = 0x10;
+    track->m_waveBankNo = REDSOUND_MIDI_WAVE_BANK_DIRECT;
     track->m_waveNo = waveNo;
 }
 

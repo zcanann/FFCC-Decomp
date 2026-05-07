@@ -123,6 +123,16 @@ enum RedMidiModCommandByte {
     REDSOUND_MIDI_MOD_DELAY_DEPTH = 1,
 };
 
+enum RedMidiPitchBendCommandByte {
+    REDSOUND_MIDI_PITCH_BEND_LOW = 0,
+    REDSOUND_MIDI_PITCH_BEND_HIGH = 1,
+};
+
+enum RedMidiReverbMixCommandByte {
+    REDSOUND_MIDI_REVERB_MIX_LEFT = 0,
+    REDSOUND_MIDI_REVERB_MIX_RIGHT = 1,
+};
+
 enum RedSoundControlSaveWordOffset {
     REDSOUND_CONTROL_SAVE_COMMAND_WORD = 0x0A,
     REDSOUND_CONTROL_SAVE_DELTA_WORD = 0x4A,
@@ -2460,8 +2470,9 @@ static void _PitchBendCompute(RedTrackDATA* track, int bend)
  */
 static void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int bend = (unsigned int)track->m_command[1] * REDSOUND_MIDI_PITCH_BEND_HIGH_SCALE +
-               ((unsigned int)track->m_command[0] - REDSOUND_MIDI_PITCH_BEND_CENTER);
+    int bend = (unsigned int)track->m_command[REDSOUND_MIDI_PITCH_BEND_HIGH] *
+                   REDSOUND_MIDI_PITCH_BEND_HIGH_SCALE +
+               ((unsigned int)track->m_command[REDSOUND_MIDI_PITCH_BEND_LOW] - REDSOUND_MIDI_PITCH_BEND_CENTER);
 
     track->m_pitchBendRaw = bend;
     bend *= track->m_pitchBendRange;
@@ -2537,7 +2548,7 @@ static void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 {
     track->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_MIX_MASK;
 
-    switch (track->m_command[0]) {
+    switch (track->m_command[REDSOUND_MIDI_REVERB_MIX_LEFT]) {
     case 1:
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_LEFT;
         break;
@@ -2548,7 +2559,7 @@ static void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
         break;
     }
 
-    switch (track->m_command[1]) {
+    switch (track->m_command[REDSOUND_MIDI_REVERB_MIX_RIGHT]) {
     case 1:
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_RIGHT;
         break;

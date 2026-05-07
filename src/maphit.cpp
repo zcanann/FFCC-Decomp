@@ -263,13 +263,13 @@ CMapCylinder::CMapCylinder()
  */
 CMapHit::CMapHit()
 {
-    m_positionMin.z = 0.0f;
-    m_positionMin.y = 0.0f;
-    m_positionMin.x = 0.0f;
+    m_positionMin.z = FLOAT_8032F8EC;
+    m_positionMin.y = FLOAT_8032F8EC;
+    m_positionMin.x = FLOAT_8032F8EC;
 
-    m_positionMax.z = 1.0f;
-    m_positionMax.y = 1.0f;
-    m_positionMax.x = 1.0f;
+    m_positionMax.z = FLOAT_8032F8F0;
+    m_positionMax.y = FLOAT_8032F8F0;
+    m_positionMax.x = FLOAT_8032F8F0;
 
     m_vertexCount = 0;
     m_faceCount = 0;

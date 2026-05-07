@@ -542,15 +542,12 @@ void CMaterialEditorPcs::drawViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    static char* pFan = const_cast<char*>(sMaterialEditorSpinnerText);
-    static int alive = 0;
+    static char* q = const_cast<char*>(sMaterialEditorSpinnerText);
+    static int pFan = 0;
 
-    alive = alive + 1;
-    int sign = alive >> 0x1f;
-    Printf__8CGraphicFPce(
-        &Graphic,
-        s_MaterialEditor_pctc_801D7D60,
-        (int)(char)pFan[(sign * 4 | (u32)((alive >> 4) * 0x40000000 + sign) >> 0x1e) - sign]);
+    pFan++;
+    char fan = q[(pFan >> 4) % 4];
+    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)fan);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
         return;

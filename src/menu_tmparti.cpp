@@ -258,49 +258,43 @@ void CMenuPcs::TmpArtiDraw()
 unsigned int CMenuPcs::TmpArtiClose()
 {
 	float fVar1;
-	double dVar2;
 	double dVar3;
 	short *psVar4;
 	int iVar5;
 	unsigned int uVar6;
 	int iVar7;
-	unsigned int uVar8;
+	int iVar8;
 
 	iVar5 = 0;
 	*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x22) = *(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x22) + 1;
 	uVar6 = (unsigned int)*this->m_tmpArtiList;
 	psVar4 = this->m_tmpArtiList + 4;
 	iVar7 = (int)*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x22);
-	uVar8 = uVar6;
 
-	if (0 < (int)uVar6) {
-		do {
-			dVar2 = DOUBLE_80332f40;
-			if (*(int *)(psVar4 + 0x12) <= iVar7) {
-				if (*(int *)(psVar4 + 0x12) + *(int *)(psVar4 + 0x14) <= iVar7) {
-					iVar5 = iVar5 + 1;
+	for (iVar8 = (int)uVar6; iVar8 > 0; iVar8--) {
+		if (*(int *)(psVar4 + 0x12) <= iVar7) {
+			if (*(int *)(psVar4 + 0x12) + *(int *)(psVar4 + 0x14) <= iVar7) {
+				iVar5 = iVar5 + 1;
+				*(float *)(psVar4 + 8) = FLOAT_80332f2c;
+			}
+			else {
+				*(int *)(psVar4 + 0x10) = *(int *)(psVar4 + 0x10) + 1;
+				dVar3 = DOUBLE_80332f50;
+				*(float *)(psVar4 + 8) =
+				    (float)(DOUBLE_80332f48 -
+							(DOUBLE_80332f48 /
+							 TmpArtiIntToDouble(*(int *)(psVar4 + 0x14))) *
+								TmpArtiIntToDouble(*(int *)(psVar4 + 0x10)));
+				if ((double)*(float *)(psVar4 + 8) < dVar3) {
 					*(float *)(psVar4 + 8) = FLOAT_80332f2c;
 				}
-				else {
-					*(int *)(psVar4 + 0x10) = *(int *)(psVar4 + 0x10) + 1;
-					dVar3 = DOUBLE_80332f50;
-					*(float *)(psVar4 + 8) =
-					    (float)(DOUBLE_80332f48 -
-					            (DOUBLE_80332f48 /
-					             ((double)*(int *)(psVar4 + 0x14) - dVar2)) *
-					                ((double)*(int *)(psVar4 + 0x10) - dVar2));
-					if ((double)*(float *)(psVar4 + 8) < dVar3) {
-						*(float *)(psVar4 + 8) = FLOAT_80332f2c;
-					}
-				}
 			}
-			psVar4 = psVar4 + 0x20;
-			uVar8 = uVar8 - 1;
-		} while (uVar8 != 0);
+		}
+		psVar4 = psVar4 + 0x20;
 	}
 
-	fVar1 = FLOAT_80332f2c;
 	if (*this->m_tmpArtiList == iVar5) {
+		fVar1 = FLOAT_80332f2c;
 		psVar4 = this->m_tmpArtiList + 4;
 		if (0 < (int)uVar6) {
 			unsigned int groups = uVar6 >> 3;

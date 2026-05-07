@@ -262,7 +262,7 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
             }
         }
 
-        work->m_tailScaleDirection = param->m_velocity;
+        work->m_tailScaleDirection = param->m_directionTail;
         pppNormalize(work->m_tailScaleDirection, work->m_tailScaleDirection);
     }
 
@@ -393,9 +393,7 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     *velocityScale = *velocityScale + pYmMegaBirthShpTail2->m_colorDeltaAdd[2];
     *tailScale = *tailScale + pYmMegaBirthShpTail2->m_sizeVal;
 
-    local.x = *(float*)(color + 0x10);
-    local.y = *(float*)(color + 0x14);
-    local.z = *(float*)(color + 0x18);
+    local = *reinterpret_cast<Vec*>(color + 0x10);
     pppScaleVectorXYZ(scaled, local, *velocityScale);
     pppAddVector(*(Vec*)(color + 0x0), *(Vec*)(color + 0x0), scaled);
 
@@ -439,21 +437,19 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     *(u16*)(color + 0x20) = frameIndex;
 
     frameEntry = colorTable + (u32)frameIndex * 8 + 0x10;
-    *(u16*)(color + 0x1c) = *(u16*)(color + 0x1c) + *(s16*)((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 8);
+    *(u16*)(color + 0x1c) =
+        *(u16*)(color + 0x1c) + *reinterpret_cast<s32*>((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 8);
     frameDuration = *(s16*)(frameEntry + 2);
     if ((int)frameDuration <= *(u16*)(color + 0x1c)) {
         *(u16*)(color + 0x1c) = *(u16*)(color + 0x1c) - frameDuration;
-        *(s16*)(color + 0x1e) = *(s16*)(color + 0x1e) + 1;
+        *(u16*)(color + 0x1e) = *(u16*)(color + 0x1e) + 1;
         if ((int)*(s16*)(colorTable + 6) <= *(u16*)(color + 0x1e)) {
             if ((*(u8*)(frameEntry + 4) & 0x80) == 0) {
-                color[0x1c] = 0;
-                color[0x1d] = 0;
-                *(s16*)(color + 0x1e) = *(s16*)(color + 0x1e) - 1;
+                *(u16*)(color + 0x1c) = 0;
+                *(u16*)(color + 0x1e) = *(u16*)(color + 0x1e) - 1;
             } else {
-                color[0x1e] = 0;
-                color[0x1f] = 0;
-                color[0x1c] = 0;
-                color[0x1d] = 0;
+                *(u16*)(color + 0x1e) = 0;
+                *(u16*)(color + 0x1c) = 0;
             }
         }
     }
@@ -474,7 +470,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
     u8* paramBytes = (u8*)param;
     u8* particleBytes = (u8*)particleData;
     u8 mode = paramBytes[0x12];
-    float speedRandRange = *(float*)(paramBytes + 0x5c);
+    float speedRandRange = param->m_speedRandRange;
     float speedRandHalf = FLOAT_80330568 * speedRandRange;
 
     memset(particleData, 0, 0x1b8);
@@ -507,8 +503,8 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         pppGetRotMatrixXYZ(rot, &angles);
         PSMTXMultVecSR(rot.value, &baseDir, &particleData->m_velocity);
         particleData->m_velocity.x *= *(float*)(paramBytes + 0x58);
-        particleData->m_velocity.y *= param->m_velocity.x;
-        particleData->m_velocity.z *= param->m_velocity.y;
+        particleData->m_velocity.y *= param->m_speedScale.x;
+        particleData->m_velocity.z *= param->m_speedScale.y;
         tempVec = particleData->m_velocity;
         pppNormalize(particleData->m_velocity, tempVec);
     }
@@ -541,8 +537,8 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         }
 
         particleData->m_matrix[0][0] *= *(float*)(paramBytes + 0x58);
-        particleData->m_matrix[0][1] *= param->m_velocity.x;
-        particleData->m_matrix[0][2] *= param->m_velocity.y;
+        particleData->m_matrix[0][1] *= param->m_speedScale.x;
+        particleData->m_matrix[0][2] *= param->m_speedScale.y;
     } else if ((mode >= 10) && (speedRandRange != 0.0f)) {
         u8 randType = paramBytes[0x6a];
         float scale = speedRandRange;

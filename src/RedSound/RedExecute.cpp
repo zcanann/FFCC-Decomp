@@ -1869,8 +1869,8 @@ static void _ExecuteExtraData()
                 } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
             }
         }
-        soundControl = (RedSoundCONTROL*)((u32*)soundControl + REDSOUND_CONTROL_WORD_COUNT);
-    } while ((u32*)soundControl < (u32*)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_END_WORD_OFFSET);
+        soundControl++;
+    } while (soundControl < p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP);
 
     if (p_MusicTempoControl->m_count != 0) {
         p_MusicTempoControl->m_count--;
@@ -1919,8 +1919,8 @@ static void _ExecuteExtraData()
                 } while (track < soundControl->m_tracks + soundControl->m_trackCount);
             }
         }
-        soundControl = (RedSoundCONTROL*)((u32*)soundControl + REDSOUND_CONTROL_WORD_COUNT);
-    } while ((u32*)soundControl < (u32*)p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_END_WORD_OFFSET);
+        soundControl++;
+    } while (soundControl < p_SoundControlBuffer + REDSOUND_CONTROL_SE);
 }
 
 /*

@@ -459,16 +459,23 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
     *velocityScale = *velocityScale + pYmMegaBirthShpTail3->m_colorDeltaAdd[2];
     *tailScale = *tailScale + pYmMegaBirthShpTail3->m_sizeVal;
 
-    Vec local;
-    Vec scaled;
+    {
+        Vec velocity = *(Vec*)(particleBytes + 0x10);
+        Vec scaledVelocity;
+        pppScaleVectorXYZ(scaledVelocity, velocity, *velocityScale);
 
-    local = *(Vec*)(particleBytes + 0x10);
-    pppScaleVectorXYZ(scaled, local, *velocityScale);
-    pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
+        Vec currentPos = *(Vec*)particleData;
+        pppAddVector(*(Vec*)particleData, currentPos, scaledVelocity);
+    }
 
-    local = *(Vec*)((u8*)vYmMegaBirthShpTail3 + 0x30);
-    pppScaleVectorXYZ(scaled, local, *tailScale);
-    pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
+    {
+        Vec tailDirection = vYmMegaBirthShpTail3->m_tailScaleDirection;
+        Vec scaledTailDirection;
+        pppScaleVectorXYZ(scaledTailDirection, tailDirection, *tailScale);
+
+        Vec currentPosTail = *(Vec*)particleData;
+        pppAddVector(*(Vec*)particleData, currentPosTail, scaledTailDirection);
+    }
 
     if (*(u16*)((u8*)&pYmMegaBirthShpTail3->m_matrix[1] + 0x4) != 0) {
         *(u16*)(particleBytes + 0x22) = *(u16*)(particleBytes + 0x22) - 1;

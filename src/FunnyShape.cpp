@@ -5,6 +5,9 @@
 #include "dolphin/gx.h"
 #include "dolphin/os/OSCache.h"
 
+extern "C" double sin(double);
+extern "C" double cos(double);
+
 #include <math.h>
 #include <string.h>
 
@@ -152,16 +155,16 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             float minY = FLOAT_8032fd64;
             float maxY = FLOAT_8032fd68;
             float drawAngle = angle;
-            if ((s32)texIndex < (s32)numTex) {
+            if ((s32)numTex > (s32)texIndex) {
                 GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[texIndex]), GX_TEXMAP0);
             }
 
-            const s8 blendMode = *reinterpret_cast<const s8*>(entry + 0x1C);
+            const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0x1C);
             if (blendMode == 'H') {
                 _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 1, 3);
             } else if (blendMode == 'B') {
                 _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 1, 1, 3);
-            } else if (blendMode == -0x78) {
+            } else if (blendMode == 0x88) {
                 _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 3);
             }
 
@@ -268,16 +271,16 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const u8* entry = shapeData + packedStride;
             const u32 texIndex = entry[0x30];
             const s8 numTex = m_textureCount;
-            if ((s32)texIndex < (s32)numTex) {
+            if ((s32)numTex > (s32)texIndex) {
                 GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[texIndex]), GX_TEXMAP0);
             }
 
-            const s8 blendMode = *reinterpret_cast<const s8*>(entry + 0x1C);
+            const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0x1C);
             if (blendMode == 'H') {
                 _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 1, 3);
             } else if (blendMode == 'B') {
                 _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 4, 1, 3);
-            } else if (blendMode == -0x78) {
+            } else if (blendMode == 0x88) {
                 _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 3);
             }
 
@@ -416,10 +419,9 @@ void CFunnyShape::RenderShape()
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-    GXColor chanColor = DAT_8032fd60;
-    GXSetChanAmbColor(GX_COLOR0, chanColor);
-    GXColor matColor = chanColor;
-    GXSetChanMatColor(GX_COLOR0, matColor);
+    GXColor color = DAT_8032fd60;
+    GXSetChanAmbColor(GX_COLOR0, color);
+    GXSetChanMatColor(GX_COLOR0, color);
 
     Vec2d offsetCopy;
     Vec2d offset;
@@ -549,10 +551,9 @@ void CFunnyShape::Render()
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-    GXColor chanColor = DAT_8032fd60;
-    GXSetChanAmbColor(GX_COLOR0, chanColor);
-    GXColor matColor = chanColor;
-    GXSetChanMatColor(GX_COLOR0, matColor);
+    GXColor color = DAT_8032fd60;
+    GXSetChanAmbColor(GX_COLOR0, color);
+    GXSetChanMatColor(GX_COLOR0, color);
 
     CFunnyShapeAnmWork* work;
     s32 count;

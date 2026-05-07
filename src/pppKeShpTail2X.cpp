@@ -244,9 +244,10 @@ draw_loop:
     pos.z = segBaseZ;
 
     if (step->m_worldSpaceMode == 0) {
-        PSMTXScaleApply(obj->pppPObject.m_localMatrix.value, obj->field_0x40.value, drawScale * pppMngStPtr->m_scale.x,
-                        drawScale * pppMngStPtr->m_scale.y,
-                        drawScale * pppMngStPtr->m_scale.z);
+        PSMTXScaleApply(obj->pppPObject.m_localMatrix.value, obj->field_0x40.value,
+                        localBase.value[0][0] * (drawScale * pppMngStPtr->m_scale.x),
+                        localBase.value[1][1] * (drawScale * pppMngStPtr->m_scale.y),
+                        localBase.value[2][2] * (drawScale * pppMngStPtr->m_scale.z));
         PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
         PSMTXCopy(obj->field_0x40.value, drawMtx.value);
     } else if (step->m_worldSpaceMode == 1) {

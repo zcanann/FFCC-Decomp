@@ -16,8 +16,8 @@ struct _pppProgSetDef;
 struct _pppPDataVal
 {
     _pppProgSetDef* m_programSetDef; // 0x0
-    s32 m_nextSpawnTime;             // 0x4
-    _pppPObjLink* m_pppPObjLink;     // 0x8
+    _pppPObjLink* m_pppPObjLink;     // 0x4
+    s32 m_nextSpawnTime;             // 0x8
     u16 m_activeCount;               // 0xc
     u8 m_index;                      // 0xe
     u8 m_pad;                        // 0xf
@@ -25,15 +25,18 @@ struct _pppPDataVal
 
 struct _pppProgSetDef
 {
-    _pppProgSetDef* m_next;      // 0x0
-    u16 m_spawnCount;            // 0x4
-    u16 m_reserved6;             // 0x6
-    u32 m_flags;                 // 0x8
-    u8 m_pad0C[0x0C];            // 0xC
+    _pppProgSetDef* m_next;      // 0x00
+    u16 m_spawnCount;            // 0x04
+    u16 m_reserved6;             // 0x06
+    u32 m_flags;                 // 0x08
+    u8 m_drawFlags;              // 0x0C
+    u8 m_pad0D[3];               // 0x0D
+    s32 m_startFrame;            // 0x10
+    s32 m_deadFrame;             // 0x14
     s32 m_endFrame;              // 0x18
     s32 m_loopFrame;             // 0x1C
     u32 m_workBaseOffset;        // 0x20
-    u16 m_stageFlags;            // 0x24
+    s16 m_sortKey;               // 0x24
     s16 m_numStages;             // 0x26
     _pppCtrlTable m_stages[1];   // 0x28
 };

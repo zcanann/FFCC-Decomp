@@ -8,6 +8,7 @@
 
 extern "C" const float FLOAT_8032F8EC;
 extern "C" const float FLOAT_8032F8F0;
+extern "C" const char s_old_mid_format_801D7094[];
 
 CMapCylinder g_hit_cyl;
 CMapCylinder g_hit_cyl_min;
@@ -22,26 +23,6 @@ static const float s_large_pos = 3.4e38f;
 static const float s_large_neg = -3.4e38f;
 static const float s_epsilon = 0.0001f;
 static const float s_push = 0.01f;
-
-static inline Vec& CylinderVector(CMapCylinder& cyl)
-{
-    return *reinterpret_cast<Vec*>(&cyl.m_radius);
-}
-
-static inline const Vec& CylinderVector(const CMapCylinder& cyl)
-{
-    return *reinterpret_cast<const Vec*>(&cyl.m_radius);
-}
-
-static inline float& CylinderRadius(CMapCylinder& cyl)
-{
-    return cyl.m_top.y;
-}
-
-static inline float CylinderRadius(const CMapCylinder& cyl)
-{
-    return cyl.m_top.y;
-}
 
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
@@ -68,7 +49,7 @@ CMapHitFace* g_hit_lpface_min;
  */
 int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder& cyl, float& outT)
 {
-    Vec axis = CylinderVector(cyl);
+    Vec axis = cyl.m_axis;
     const f32 axisLen = PSVECMag(&axis);
     PSVECScale(&axis, &axis, 1.0f / axisLen);
 
@@ -106,7 +87,7 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     const f32 vx = localDirection.x;
     const f32 vy = localDirection.y;
     const f32 vz = localDirection.z;
-    const f32 radius = CylinderRadius(cyl);
+    const f32 radius = cyl.m_radius;
     const f32 radiusSq = radius * radius;
 
     if (fabsf(vz) < 1.0f) {
@@ -244,12 +225,12 @@ void CheckLineCylinder(const Vec& start, const Vec& end, const CMapCylinder& cyl
  */
 CMapCylinder::CMapCylinder()
 {
-    m_direction2.y = 0.0f;
-    m_direction2.x = 0.0f;
-    m_top.z = 0.0f;
-    m_height2 = 1.0f;
-    m_radius2 = 1.0f;
-    m_direction2.z = 1.0f;
+    m_boundsMin.z = 0.0f;
+    m_boundsMin.y = 0.0f;
+    m_boundsMin.x = 0.0f;
+    m_boundsMax.z = 1.0f;
+    m_boundsMax.y = 1.0f;
+    m_boundsMax.x = 1.0f;
 }
 
 /*
@@ -391,6 +372,9 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 }
 
                 if (chunk.m_version == 0) {
+                    if (System.m_execParam != 0) {
+                        System.Printf(const_cast<char*>(s_old_mid_format_801D7094));
+                    }
                     chunkFile.Align(4);
                     for (unsigned int i = 0; i < vertexCount; i++) {
                         (void)chunkFile.GetF4();
@@ -398,6 +382,9 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     }
                     face.m_radiusScale = 0.0f;
                 } else if (chunk.m_version == 1) {
+                    if (System.m_execParam != 0) {
+                        System.Printf(const_cast<char*>(s_old_mid_format_801D7094));
+                    }
                     face.m_radiusScale = chunkFile.GetF4();
                     chunkFile.Align(4);
                 } else {
@@ -479,56 +466,56 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     bool overlap = false;
-    if (g_hit_cyl.m_top.z <= g_hit_lpface->m_boundsMin.x) {
-        if (g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_top.z) {
+    if (g_hit_cyl.m_boundsMin.x <= g_hit_lpface->m_boundsMin.x) {
+        if (g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_boundsMin.x) {
             overlap = true;
         } else {
-            overlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_direction2.z;
+            overlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_boundsMax.x;
         }
     } else {
-        overlap = g_hit_cyl.m_top.z <= g_hit_lpface->m_boundsMax.x;
+        overlap = g_hit_cyl.m_boundsMin.x <= g_hit_lpface->m_boundsMax.x;
     }
     if (!overlap) {
         return 0;
     }
 
     overlap = false;
-    if (g_hit_cyl.m_direction2.x <= g_hit_lpface->m_boundsMin.y) {
-        if (g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_direction2.x) {
+    if (g_hit_cyl.m_boundsMin.y <= g_hit_lpface->m_boundsMin.y) {
+        if (g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_boundsMin.y) {
             overlap = true;
         } else {
-            overlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_radius2;
+            overlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_boundsMax.y;
         }
     } else {
-        overlap = g_hit_cyl.m_direction2.x <= g_hit_lpface->m_boundsMax.y;
+        overlap = g_hit_cyl.m_boundsMin.y <= g_hit_lpface->m_boundsMax.y;
     }
     if (!overlap) {
         return 0;
     }
 
     overlap = false;
-    if (g_hit_cyl.m_direction2.y <= g_hit_lpface->m_boundsMin.z) {
-        if (g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_direction2.y) {
+    if (g_hit_cyl.m_boundsMin.z <= g_hit_lpface->m_boundsMin.z) {
+        if (g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_boundsMin.z) {
             overlap = true;
         } else {
-            overlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_height2;
+            overlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_boundsMax.z;
         }
     } else {
-        overlap = g_hit_cyl.m_direction2.y <= g_hit_lpface->m_boundsMax.z;
+        overlap = g_hit_cyl.m_boundsMin.z <= g_hit_lpface->m_boundsMax.z;
     }
     if (!overlap) {
         return 0;
     }
 
     Vec* normal = &g_hit_lpface->m_normal;
-    Vec* hitDirection = &CylinderVector(g_hit_cyl);
+    Vec* hitDirection = &g_hit_cyl.m_axis;
     float dot = PSVECDotProduct(hitDirection, normal);
     if (dot >= 0.0f) {
         return 0;
     }
 
     float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, normal);
-    float hitT = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_top.y)) / dot);
+    float hitT = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
     int edgeIndex = -1;
 
     if (0.0f < hitT && hitT < g_hit_t_min) {
@@ -536,7 +523,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
         Vec pushedHit;
-        PSVECScale(normal, &pushedHit, g_hit_cyl.m_top.y);
+        PSVECScale(normal, &pushedHit, g_hit_cyl.m_radius);
         PSVECSubtract(&g_hit_hpv, &pushedHit, &pushedHit);
 
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
@@ -614,8 +601,8 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 
                 CMapCylinder edgeCylinder;
                 edgeCylinder.m_bottom = previous;
-                CylinderVector(edgeCylinder) = edge;
-                CylinderRadius(edgeCylinder) = CylinderRadius(g_hit_cyl);
+                edgeCylinder.m_axis = edge;
+                edgeCylinder.m_radius = g_hit_cyl.m_radius;
 
                 float edgeT;
                 if (FindIntersection(g_hit_cyl.m_bottom, *hitDirection, edgeCylinder, edgeT) != 0 &&
@@ -693,7 +680,7 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
             Vec edge;
             Vec edgeToCenter;
             PSVECSubtract(&current, &previous, &edge);
-            PSVECSubtract(&current, &g_hit_cyl_min.m_direction, &edgeToCenter);
+            PSVECSubtract(&current, &g_hit_cyl_min.m_top, &edgeToCenter);
 
             float edgeDot = PSVECDotProduct(&edge, &edgeToCenter);
             float edgeLenSq = PSVECDotProduct(&edge, &edge);
@@ -704,16 +691,16 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
             PSVECSubtract(&current, &edgeProjection, &nearestPoint);
 
             Vec slideDir;
-            PSVECSubtract(&g_hit_cyl_min.m_direction, &nearestPoint, &slideDir);
+            PSVECSubtract(&g_hit_cyl_min.m_top, &nearestPoint, &slideDir);
 
-            float side = PSVECDotProduct(&CylinderVector(g_hit_cyl_min), &slideDir);
+            float side = PSVECDotProduct(&g_hit_cyl_min.m_axis, &slideDir);
             float slideLen = PSVECMag(&slideDir);
             if (s_epsilon <= slideLen) {
                 PSVECScale(&slideDir, &slideDir, s_push / slideLen);
                 if (side <= 0.0f) {
-                    PSVECScale(&slideDir, &slideDir, 0.5f * g_hit_cyl_min.m_top.y);
+                    PSVECScale(&slideDir, &slideDir, 0.5f * g_hit_cyl_min.m_radius);
                 } else {
-                    PSVECScale(&slideDir, &slideDir, 0.5f * -g_hit_cyl_min.m_top.y);
+                    PSVECScale(&slideDir, &slideDir, 0.5f * -g_hit_cyl_min.m_radius);
                 }
 
                 PSVECAdd(&nearestPoint, &slideDir, &nearestPoint);
@@ -727,8 +714,8 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
             return 1;
         }
 
-        float len = PSVECMag(&CylinderVector(g_hit_cyl_min));
-        PSVECScale(&CylinderVector(g_hit_cyl_min), out, g_hit_t - (s_push / len));
+        float len = PSVECMag(&g_hit_cyl_min.m_axis);
+        PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (s_push / len));
         return 0;
     }
 
@@ -740,17 +727,17 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
             return 1;
         } else {
             Vec push;
-            float planeDot = PSVECDotProduct(&g_hit_cyl_min.m_direction, &gMapHitFace->m_normal);
-            float planeError = -(planeDot - (gMapHitFace->m_planeD + g_hit_cyl_min.m_top.y));
+            float planeDot = PSVECDotProduct(&g_hit_cyl_min.m_top, &gMapHitFace->m_normal);
+            float planeError = -(planeDot - (gMapHitFace->m_planeD + g_hit_cyl_min.m_radius));
             PSVECScale(&gMapHitFace->m_normal, &push, s_push + planeError);
-            PSVECAdd(&g_hit_cyl_min.m_direction, &push, &push);
+            PSVECAdd(&g_hit_cyl_min.m_top, &push, &push);
             PSVECSubtract(&push, &g_hit_cyl_min.m_bottom, out);
             return 1;
         }
     }
 
-    float len = PSVECMag(&CylinderVector(g_hit_cyl_min));
-    PSVECScale(&CylinderVector(g_hit_cyl_min), out, g_hit_t - (s_push / len));
+    float len = PSVECMag(&g_hit_cyl_min.m_axis);
+    PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (s_push / len));
     return 0;
 }
 
@@ -766,12 +753,12 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
 void CMapHit::CalcHitPosition(Vec* position)
 {
     if (g_hit_edge_idx_min != -1) {
-        float len = PSVECMag(&CylinderVector(g_hit_cyl_min));
-        PSVECScale(&CylinderVector(g_hit_cyl_min), position, g_hit_t - (s_epsilon / len));
+        float len = PSVECMag(&g_hit_cyl_min.m_axis);
+        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (s_epsilon / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     } else {
-        float len = PSVECMag(&CylinderVector(g_hit_cyl_min));
-        PSVECScale(&CylinderVector(g_hit_cyl_min), position, g_hit_t - (s_push / len));
+        float len = PSVECMag(&g_hit_cyl_min.m_axis);
+        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (s_push / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     }
 }

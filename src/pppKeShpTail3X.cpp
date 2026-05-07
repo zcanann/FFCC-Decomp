@@ -35,7 +35,7 @@ struct KeShpTail3XStep {
     float m_randomScale;
     float m_stepDistance;
     u8 m_drawCount;
-    u8 m_useRandomShape;
+    u8 m_drawFirst;
     u16 m_rotateEnabled;
     s16 m_valueSteps[24];
     u8 m_drawA;
@@ -170,7 +170,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     float segDz;
     u16 rng;
     int life;
-    u16 shapeSetCount;
+    s16 shapeSetCount;
     s16 shapeCount;
     float shapeScale;
     float shapeScaleStep;
@@ -261,135 +261,137 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     segRemain = segLen;
     segCursor = kPppKeShpTail3XZero;
     life = work->m_shapeData;
-    shapeSetCount = *(u16*)(shapeData + 0x12);
+    shapeSetCount = *(s16*)(shapeData + 0x12);
     rng = work->m_rand;
     shapeCount = *(s16*)(shapeData + 6);
 
+    if (step->m_drawFirst == 0) {
+        goto update_step;
+    }
+
 draw_loop:
-    while (count != 0) {
-        drawScale = shapeScale;
+    drawScale = shapeScale;
 
-        if (step->m_useRandomShape != 0) {
-            u32 lcg = (u32)rng * 0x80du + 7u;
-            rng = (u16)lcg;
-            drawScale *= -(((float)rng / kPppKeShpTail3XRandomMax) * step->m_randomScale - kPppKeShpTail3XOne);
-            {
-                u32 shapeIdx = (u32)(life + rng) / shapeSetCount;
-                shapeEntry = (long*)(shapeData + *(s16*)(shapeData + (shapeIdx % (u32)shapeCount) * 8 + 0x10));
-            }
-        } else {
-            shapeEntry = (long*)shapeData;
-        }
-
-        pos.x = segBaseX;
-        pos.y = segBaseY;
-        pos.z = segBaseZ;
-
-        if (step->m_worldSpaceMode == 0) {
-            PSMTXScaleApply(obj->pppPObject.m_localMatrix.value, obj->field_0x40.value,
-                            drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x),
-                            drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y),
-                            drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z));
-            if ((step->m_rotateEnabled != 0) && (count != 0)) {
-                PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
-                tmpMtx = obj->field_0x40;
-                pppMulMatrix(obj->field_0x40, rotMtx, tmpMtx);
-            }
-            PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
-            PSMTXCopy(obj->field_0x40.value, drawMtx.value);
-        } else if (step->m_worldSpaceMode == 1) {
-            pppUnitMatrix(drawMtx);
-            drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);
-            drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y);
-            drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z);
-            if ((step->m_rotateEnabled != 0) && (count != 0)) {
-                PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
-                tmpMtx = drawMtx;
-                pppMulMatrix(drawMtx, rotMtx, tmpMtx);
-            }
-            PSMTXMultVec(ppvCameraMatrix, &pos, &pos);
-        }
-
-        drawMtx.value[0][3] = pos.x;
-        drawMtx.value[1][3] = pos.y;
-        drawMtx.value[2][3] = pos.z;
-
-        zEnable = (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5);
-        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            (void*)0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : zero, 0, step->m_drawA,
-            step->m_blendMode, 0, zEnable, 1, 0);
-        GXLoadPosMtxImm(drawMtx.value, 0);
-
+    {
+        u32 lcg = (u32)rng * 0x80du + 7u;
+        rng = (u16)lcg;
+        drawScale *= -(((float)rng / kPppKeShpTail3XRandomMax) * step->m_randomScale - kPppKeShpTail3XOne);
         {
-            GXColor amb;
-
-            amb.r = (u8)colorR;
-            amb.g = (u8)colorG;
-            amb.b = (u8)colorB;
-            amb.a = (u8)colorA;
-            GXSetChanAmbColor(GX_COLOR0A0, amb);
+            u32 shapeIdx = (u32)(life + rng) / shapeSetCount;
+            shapeEntry = (long*)(shapeData + *(s16*)(shapeData + (shapeIdx % (u32)shapeCount) * 8 + 0x10));
         }
+    }
 
-        pppSetBlendMode(step->m_blendMode);
-        pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(shapeEntry, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+    pos.x = segBaseX;
+    pos.y = segBaseY;
+    pos.z = segBaseZ;
 
-        count--;
-        if (count == 0) {
-            break;
+    if (step->m_worldSpaceMode == 0) {
+        PSMTXScaleApply(obj->pppPObject.m_localMatrix.value, obj->field_0x40.value,
+                        drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x),
+                        drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y),
+                        drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z));
+        if ((step->m_rotateEnabled != 0) && (count != 0)) {
+            PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
+            tmpMtx = obj->field_0x40;
+            pppMulMatrix(obj->field_0x40, rotMtx, tmpMtx);
         }
-
-        trailLen = trailStep - trailStepDelta;
-        colorR -= colorStepR;
-        colorG -= colorStepG;
-        colorB -= colorStepB;
-        colorA -= colorStepA;
-        shapeScale -= shapeScaleStep;
-        trailStep = trailLen;
-        if (trailLen <= 0.0f) {
-            return;
+        PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
+        PSMTXCopy(obj->field_0x40.value, drawMtx.value);
+    } else if (step->m_worldSpaceMode == 1) {
+        pppUnitMatrix(drawMtx);
+        drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);
+        drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y);
+        drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z);
+        if ((step->m_rotateEnabled != 0) && (count != 0)) {
+            PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
+            tmpMtx = drawMtx;
+            pppMulMatrix(drawMtx, rotMtx, tmpMtx);
         }
+        PSMTXMultVec(ppvCameraMatrix, &pos, &pos);
+    }
 
-        if (segRemain < trailLen) {
-            goto advance_segment;
-        }
+    drawMtx.value[0][3] = pos.x;
+    drawMtx.value[1][3] = pos.y;
+    drawMtx.value[2][3] = pos.z;
 
-        pos.x = segDx * (segCursor / segLen) + segBaseX;
-        pos.y = segDy * (segCursor / segLen) + segBaseY;
-        pos.z = segDz * (segCursor / segLen) + segBaseZ;
-        segCursor += trailLen;
-        segRemain -= trailLen;
-        segBaseX = pos.x;
-        segBaseY = pos.y;
-        segBaseZ = pos.z;
-        goto draw_loop;
+    zEnable = (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+        (void*)0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : zero, 0, step->m_drawA,
+        step->m_blendMode, 0, zEnable, 1, 0);
+    GXLoadPosMtxImm(drawMtx.value, 0);
+
+    {
+        GXColor amb;
+
+        amb.r = (u8)colorR;
+        amb.g = (u8)colorG;
+        amb.b = (u8)colorB;
+        amb.a = (u8)colorA;
+        GXSetChanAmbColor(GX_COLOR0A0, amb);
+    }
+
+    pppSetBlendMode(step->m_blendMode);
+    pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(shapeEntry, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+
+update_step:
+    count--;
+    if (count == 0) {
+        return;
+    }
+
+    trailLen = trailStep - trailStepDelta;
+    colorR -= colorStepR;
+    colorG -= colorStepG;
+    colorB -= colorStepB;
+    colorA -= colorStepA;
+    shapeScale -= shapeScaleStep;
+    trailStep = trailLen;
+    if (trailLen <= 0.0f) {
+        return;
+    }
+
+    if (segRemain < trailLen) {
+        goto advance_segment;
+    }
+
+    pos.x = segDx * (segCursor / segLen) + segBaseX;
+    pos.y = segDy * (segCursor / segLen) + segBaseY;
+    pos.z = segDz * (segCursor / segLen) + segBaseZ;
+    segCursor += trailLen;
+    segRemain -= trailLen;
+    segBaseX = pos.x;
+    segBaseY = pos.y;
+    segBaseZ = pos.z;
+    goto draw_loop;
 
 advance_segment:
+    if (nextIndex == 0x1b) {
+        nextIndex = 0;
+    } else {
         nextIndex++;
-        if (nextIndex == 0x1c) {
-            nextIndex = 0;
-        }
-        if (nextIndex == currentIndex) {
-            return;
-        }
-
-        trailLen = segCursor - segLen;
-        segBaseX = nextBaseX;
-        segBaseY = nextBaseY;
-        segBaseZ = nextBaseZ;
-        nextBaseX = work->m_posHistory[nextIndex].x;
-        nextBaseY = work->m_posHistory[nextIndex].y;
-        nextBaseZ = work->m_posHistory[nextIndex].z;
-        segDx = nextBaseX - segBaseX;
-        segDy = nextBaseY - segBaseY;
-        segDz = nextBaseZ - segBaseZ;
-        seg.x = segDx;
-        seg.y = segDy;
-        seg.z = segDz;
-        segLen = PSVECDistance(&zeroVec, &seg);
-        segCursor = trailLen;
-        segRemain += segLen;
-        goto draw_loop;
     }
+    if (nextIndex == currentIndex) {
+        return;
+    }
+
+    trailLen = segCursor - segLen;
+    segBaseX = nextBaseX;
+    segBaseY = nextBaseY;
+    segBaseZ = nextBaseZ;
+    nextBaseX = work->m_posHistory[nextIndex].x;
+    nextBaseY = work->m_posHistory[nextIndex].y;
+    nextBaseZ = work->m_posHistory[nextIndex].z;
+    segDx = nextBaseX - segBaseX;
+    segDy = nextBaseY - segBaseY;
+    segDz = nextBaseZ - segBaseZ;
+    seg.x = segDx;
+    seg.y = segDy;
+    seg.z = segDz;
+    segLen = PSVECDistance(&zeroVec, &seg);
+    segCursor = trailLen;
+    segRemain += segLen;
+    goto draw_loop;
 }
 
 /*

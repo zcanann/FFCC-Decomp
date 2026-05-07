@@ -65,7 +65,7 @@ static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_
 static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 
-static const char s_CLightPcs_801D7C70[] = "CLightPcs";
+extern const char s_CLightPcs_801D7C70[] = "CLightPcs";
 extern const char s_CManager_801D7C7C[] = "CManager";
 extern const char s_CProcess_801D7C88[] = "CProcess";
 extern "C" const char lbl_801D7C94[0x18] =
@@ -83,7 +83,7 @@ unsigned int m_table__9CLightPcs[0x15C / sizeof(unsigned int)] = {
 
 CLightPcs LightPcs;
 _GXColor s_ambientAlphaColor;
-static const char s_p_light_cpp[] = "p_light.cpp";
+extern const char s_p_light_cpp_801D7CAC[] = "p_light.cpp";
 
 static inline double U32ToDouble(unsigned int value)
 {
@@ -466,7 +466,7 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
 
     int texSize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
     bumpLight->m_textureData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-        &Memory, texSize * count, stage, const_cast<char*>(s_p_light_cpp), 0x13b, 0);
+        &Memory, texSize * count, stage, const_cast<char*>(s_p_light_cpp_801D7CAC), 0x13b, 0);
 
     int texOffset = 0;
     for (int i = 0; i < count; i++) {

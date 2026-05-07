@@ -24,7 +24,7 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     _pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 static pppFMATRIX g_matUnit2;
 
-static const char s_pppYmMegaBirthShpTail2_cpp_801d9c68[] = "pppYmMegaBirthShpTail2.cpp";
+extern const char s_pppYmMegaBirthShpTail2_cpp_801d9c68[] = "pppYmMegaBirthShpTail2.cpp";
 
 static inline float LoadFloat(const float& value)
 {
@@ -374,8 +374,8 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, _PARTICLE_DATA* particleData, VColor* vColor,
     _PARTICLE_COLOR* particleColor)
 {
+    s32 alpha = ((u8*)vColor)[0xb];
     u8* color = (u8*)particleData;
-    u32 alpha = ((u8*)vColor)[0xb];
     float* blend = (float*)(color + 0x30);
     float* velocityScale = (float*)(color + 0x28);
     float* tailScale = (float*)(color + 0x2c);
@@ -386,19 +386,15 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     u16 frameIndex;
     int colorTable;
     int frameEntry;
-    s16 frameDuration;
-    Vec local;
     Vec scaled;
 
     *velocityScale = *velocityScale + pYmMegaBirthShpTail2->m_colorDeltaAdd[2];
     *tailScale = *tailScale + pYmMegaBirthShpTail2->m_sizeVal;
 
-    local = *reinterpret_cast<Vec*>(color + 0x10);
-    pppScaleVectorXYZ(scaled, local, *velocityScale);
+    pppScaleVectorXYZ(scaled, *reinterpret_cast<Vec*>(color + 0x10), *velocityScale);
     pppAddVector(*(Vec*)(color + 0x0), *(Vec*)(color + 0x0), scaled);
 
-    local = vYmMegaBirthShpTail2->m_tailScaleDirection;
-    pppScaleVectorXYZ(scaled, local, *tailScale);
+    pppScaleVectorXYZ(scaled, vYmMegaBirthShpTail2->m_tailScaleDirection, *tailScale);
     pppAddVector(*(Vec*)(color + 0x0), *(Vec*)(color + 0x0), scaled);
 
     if (*(u16*)((u8*)&pYmMegaBirthShpTail2->m_matrix[1] + 0x4) != 0) {
@@ -429,28 +425,29 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     historyIndex = frameState[8];
 
     PSMTXMultVec(pppPObject->m_localMatrix.value, (Vec*)(color + 0x0),
-                 (Vec*)(color + ((historyIndex + 5) * sizeof(VColor)) + 0x4));
+                 (Vec*)(color + historyIndex * sizeof(VColor) + 0x40));
 
     frameIndex = *(u16*)(color + 0x1e);
     colorTable = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] +
-                           (int)pYmMegaBirthShpTail2->m_matrix[0][1] * 4);
+                           *reinterpret_cast<s32*>((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 4) * 4);
     *(u16*)(color + 0x20) = frameIndex;
 
     frameEntry = colorTable + (u32)frameIndex * 8 + 0x10;
     *(u16*)(color + 0x1c) =
         *(u16*)(color + 0x1c) + *reinterpret_cast<s32*>((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 8);
-    frameDuration = *(s16*)(frameEntry + 2);
-    if ((int)frameDuration <= *(u16*)(color + 0x1c)) {
-        *(u16*)(color + 0x1c) = *(u16*)(color + 0x1c) - frameDuration;
-        *(u16*)(color + 0x1e) = *(u16*)(color + 0x1e) + 1;
-        if ((int)*(s16*)(colorTable + 6) <= *(u16*)(color + 0x1e)) {
-            if ((*(u8*)(frameEntry + 4) & 0x80) == 0) {
-                *(u16*)(color + 0x1c) = 0;
-                *(u16*)(color + 0x1e) = *(u16*)(color + 0x1e) - 1;
-            } else {
-                *(u16*)(color + 0x1e) = 0;
-                *(u16*)(color + 0x1c) = 0;
-            }
+    if ((int)*(u16*)(color + 0x1c) < *(s16*)(frameEntry + 2)) {
+        return;
+    }
+
+    *(u16*)(color + 0x1c) = *(u16*)(color + 0x1c) - *(s16*)(frameEntry + 2);
+    *(u16*)(color + 0x1e) = *(u16*)(color + 0x1e) + 1;
+    if ((int)*(u16*)(color + 0x1e) >= *(s16*)(colorTable + 6)) {
+        if ((*(u8*)(frameEntry + 4) & 0x80) != 0) {
+            *(u16*)(color + 0x1e) = 0;
+            *(u16*)(color + 0x1c) = 0;
+        } else {
+            *(u16*)(color + 0x1c) = 0;
+            *(u16*)(color + 0x1e) = *(u16*)(color + 0x1e) - 1;
         }
     }
 }

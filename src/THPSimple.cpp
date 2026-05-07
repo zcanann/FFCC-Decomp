@@ -207,7 +207,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                     SimpleControl.audioPlayIndex = 0;
                 }
                 if (samples == 0) {
-                    return;
+                    goto done_mixing_input;
                 }
             }
 
@@ -268,7 +268,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                     SimpleControl.audioPlayIndex = 0;
                 }
                 if (samples == 0) {
-                    return;
+                    goto done_mixing_silence;
                 }
             }
 
@@ -279,6 +279,10 @@ void MixAudio(short* output, short* input, unsigned long samples)
         memset(output, 0, samples << 2);
         return;
     }
+
+done_mixing_input:
+done_mixing_silence:
+    return;
 }
 
 /*

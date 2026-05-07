@@ -618,12 +618,11 @@ void StreamControl()
 						if (!stopped) {
 							int side;
 							int dmaID;
-							if (streamData->m_streamCursorBase != 0) {
-								side = REDSOUND_STREAM_BUFFER_SIDE_A;
-								streamData->m_streamCursorBase = 0;
-							} else {
-								side = REDSOUND_STREAM_BUFFER_SIDE_B;
+							side = (streamData->m_streamCursorBase == 0);
+							if (side) {
 								streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
+							} else {
+								streamData->m_streamCursorBase = 0;
 							}
 
 							if (streamData->m_header.m_loopStart < 0) {

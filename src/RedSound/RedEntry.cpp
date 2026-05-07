@@ -116,21 +116,21 @@ void CRedEntry::Init()
 	m_seSepBankBase = (RedHistoryBANK*)RedNew(REDSOUND_SESEP_BANK_SIZE);
 	m_musicBankBase = (RedHistoryBANK*)RedNew(REDSOUND_MUSIC_BANK_SIZE);
 
-	memset((void*)m_waveBankBase, 0, REDSOUND_WAVE_BANK_SIZE);
+	memset(m_waveBankBase, 0, REDSOUND_WAVE_BANK_SIZE);
 	bankIndex = 0;
 	do {
 		m_waveBankBase[bankIndex].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
 		bankIndex = bankIndex + 1;
 	} while (bankIndex < REDSOUND_WAVE_BANK_ENTRY_COUNT);
 
-	memset((void*)m_seSepBankBase, 0, REDSOUND_SESEP_BANK_SIZE);
+	memset(m_seSepBankBase, 0, REDSOUND_SESEP_BANK_SIZE);
 	bankIndex = 0;
 	do {
 		m_seSepBankBase[bankIndex].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
 		bankIndex = bankIndex + 1;
 	} while (bankIndex < REDSOUND_SESEP_BANK_ENTRY_COUNT);
 
-	memset((void*)m_musicBankBase, 0, REDSOUND_MUSIC_BANK_SIZE);
+	memset(m_musicBankBase, 0, REDSOUND_MUSIC_BANK_SIZE);
 	bankIndex = 0;
 	do {
 		m_musicBankBase[bankIndex].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;

@@ -30,6 +30,13 @@ enum RedCommandMusicTrackBlock {
 	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE = sizeof(u32),
 };
 
+enum RedMusicTrackBlockSizeByte {
+	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE0 = 0,
+	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE1 = 1,
+	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE2 = 2,
+	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE3 = 3,
+};
+
 enum RedSeInfoSequenceByte {
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET_LO = 0,
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET_HI = 1,
@@ -777,8 +784,10 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	int count = musicHead->m_trackCount;
 	char trackNo = 0;
 	while (count != 0) {
-		unsigned int blockSize = ((unsigned int)current[3] << 24) | ((unsigned int)current[2] << 16) |
-		                         ((unsigned int)current[1] << 8) | (unsigned int)current[0];
+		unsigned int blockSize = ((unsigned int)current[REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE3] << 24) |
+		                         ((unsigned int)current[REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE2] << 16) |
+		                         ((unsigned int)current[REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE1] << 8) |
+		                         (unsigned int)current[REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE0];
 		track->m_trackNo = trackNo - 1;
 		track->m_waveBankData = waveHead;
 		track->m_command = current + REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE;

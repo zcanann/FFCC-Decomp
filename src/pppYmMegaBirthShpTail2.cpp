@@ -539,7 +539,71 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         particleData->m_matrix[0][0] *= *(float*)(paramBytes + 0x58);
         particleData->m_matrix[0][1] *= param->m_speedScale.x;
         particleData->m_matrix[0][2] *= param->m_speedScale.y;
-    } else if ((mode >= 10) && (speedRandRange != 0.0f)) {
+    } else if (mode < 10) {
+        float* pathBase = *reinterpret_cast<float**>((u8*)pppPObject + 0x70);
+
+        if (param->m_tail2PathIndex >= 0) {
+            short* pathInfo = (short*)(*(int*)&pppEnvStPtr->m_particleColors[1] + param->m_tail2PathIndex * 8);
+
+            if (pathBase == 0) {
+                pathBase = (float*)pppEnvStPtr->m_mapMeshPtr[*pathInfo]->m_vertices;
+            }
+
+            if (pathBase != 0) {
+                float vx;
+                float vy;
+                float vz;
+
+                if (paramBytes[0x6a] == 0) {
+                    if ((u16)work->m_pathIndex >= (u16)pathInfo[1]) {
+                        work->m_pathIndex = 0;
+                    }
+
+                    u16 sampleIndex = (u16)work->m_pathIndex;
+                    work->m_pathIndex = sampleIndex + 1;
+
+                    float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
+                    vx = pathVec[0];
+                    vy = pathVec[1];
+                    vz = pathVec[2];
+                } else {
+                    float sampleT;
+
+                    if (paramBytes[0x6a] == 1) {
+                        Math.RandF();
+                        sampleT = Math.RandF();
+                    } else if (paramBytes[0x6a] == 3) {
+                        sampleT = 1.0f - (Math.RandF() * Math.RandF() * Math.RandF());
+                    } else if (paramBytes[0x6a] == 5) {
+                        sampleT = 1.0f - (Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF());
+                    } else if (paramBytes[0x6a] < 5) {
+                        sampleT = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
+                    } else {
+                        sampleT = Math.RandF() * Math.RandF() * Math.RandF();
+                    }
+
+                    if ((u16)work->m_pathIndex >= (u16)pathInfo[1]) {
+                        work->m_pathIndex = 0;
+                    }
+
+                    int sampleIndex = (int)(sampleT * (float)pathInfo[1]);
+                    float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
+                    vx = pathVec[0];
+                    vy = pathVec[1];
+                    vz = pathVec[2];
+                }
+
+                particleData->m_matrix[0][0] = vx * param->field_0x58;
+                particleData->m_matrix[0][1] = vy * param->m_speedScale.x;
+                particleData->m_matrix[0][2] = vz * param->m_speedScale.y;
+
+                if ((mode == 8) || (mode == 9)) {
+                    Vec velocity = particleData->m_velocity;
+                    pppNormalize(particleData->m_velocity, velocity);
+                }
+            }
+        }
+    } else if (speedRandRange != 0.0f) {
         u8 randType = paramBytes[0x6a];
         float scale = speedRandRange;
 
@@ -581,8 +645,10 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
     }
     *((u8*)&particleData->m_directionTail.y) = 0;
 
-    if (particleWMat != 0) {
-        memcpy(particleWMat, &work->m_emitterMatrix, 0x30);
+    if (param->m_tail2MatrixMode == 0) {
+        pppCopyMatrix(*(pppFMATRIX*)particleWMat, work->m_emitterMatrix);
+    } else if (param->m_tail2MatrixMode == 1) {
+        pppCopyMatrix(*(pppFMATRIX*)particleWMat, work->m_emitterMatrix);
     }
 
     particleData->m_colorDeltaAdd[0] = 0.0f;

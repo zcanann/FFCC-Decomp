@@ -123,8 +123,7 @@ typedef char CharaViewerSRT_size_check[(sizeof(CharaViewerSRT) == 0x24) ? 1 : -1
 
 static inline void destroyRef(int* ref)
 {
-    void (*dtor)(void*, int) = (*reinterpret_cast<void (***)(void*, int)>(ref))[2];
-    dtor(ref, 1);
+    (*reinterpret_cast<void (***)(void*, int)>(ref))[2](ref, 1);
 }
 
 template <class T>
@@ -132,9 +131,7 @@ static inline void ReleaseShared(T*& ptr)
 {
     if (ptr != 0) {
         int* ref = reinterpret_cast<int*>(ptr);
-        int count = ref[1];
-        ref[1] = count - 1;
-        if ((count - 1 == 0) && (ref != 0)) {
+        if ((--ref[1] == 0) && (ref != 0)) {
             destroyRef(ref);
         }
         ptr = 0;
@@ -376,13 +373,13 @@ void CCharaPcs::calcViewer()
 
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                self->m_viewerModel[0] = reinterpret_cast<CChara::CModel*>(__nw__FUlPQ27CMemory6CStagePci(
-                    0x124, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058),
+                CChara::CModel* model = reinterpret_cast<CChara::CModel*>(__nw__FUlPQ27CMemory6CStagePci(
+                    0x124, CharaPcs.m_stage,
                     const_cast<char*>(s_p_chara_viewer_cpp), 0xEA));
-                if (self->m_viewerModel[0] != 0) {
-                    self->m_viewerModel[0] =
-                        reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(self->m_viewerModel[0]));
+                if (model != 0) {
+                    model = reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(model));
                 }
+                self->m_viewerModel[0] = model;
                 Create__Q26CChara6CModelFPvPQ27CMemory6CStage(
                     self->m_viewerModel[0], File.m_readBuffer, self->m_viewerModelStage);
                 *(reinterpret_cast<unsigned char*>(self->m_viewerModel[0]) + 0x10C) =
@@ -423,13 +420,13 @@ void CCharaPcs::calcViewer()
                     if (fileHandle != 0) {
                         File.Read(fileHandle);
                         File.SyncCompleted(fileHandle);
-                        self->m_viewerAnimBank[idx] = reinterpret_cast<CChara::CAnim*>(__nw__FUlPQ27CMemory6CStagePci(
-                            0x30, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058),
+                        CChara::CAnim* anim = reinterpret_cast<CChara::CAnim*>(__nw__FUlPQ27CMemory6CStagePci(
+                            0x30, CharaPcs.m_stage,
                             const_cast<char*>(s_p_chara_viewer_cpp), 0x124));
-                        if (self->m_viewerAnimBank[idx] != 0) {
-                            self->m_viewerAnimBank[idx] =
-                                reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(self->m_viewerAnimBank[idx]));
+                        if (anim != 0) {
+                            anim = reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(anim));
                         }
+                        self->m_viewerAnimBank[idx] = anim;
                         Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
                             self->m_viewerAnimBank[idx], File.m_readBuffer, self->m_viewerAnimStage);
                         File.Close(fileHandle);
@@ -447,13 +444,13 @@ void CCharaPcs::calcViewer()
                 if (fileHandle != 0) {
                     File.Read(fileHandle);
                     File.SyncCompleted(fileHandle);
-                    self->m_viewerAnim[0] = reinterpret_cast<CChara::CAnim*>(__nw__FUlPQ27CMemory6CStagePci(
-                        0x30, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058),
+                    CChara::CAnim* anim = reinterpret_cast<CChara::CAnim*>(__nw__FUlPQ27CMemory6CStagePci(
+                        0x30, CharaPcs.m_stage,
                         const_cast<char*>(s_p_chara_viewer_cpp), 0x111));
-                    if (self->m_viewerAnim[0] != 0) {
-                        self->m_viewerAnim[0] =
-                            reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(self->m_viewerAnim[0]));
+                    if (anim != 0) {
+                        anim = reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(anim));
                     }
+                    self->m_viewerAnim[0] = anim;
                     Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
                         self->m_viewerAnim[0], File.m_readBuffer, self->m_viewerAnimStage);
                     File.Close(fileHandle);

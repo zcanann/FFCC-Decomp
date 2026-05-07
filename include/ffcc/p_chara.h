@@ -198,7 +198,10 @@ public:
     void createViewer();
     void destroyViewer();
 
-    u8 _pad004[0xC8];                         // 0x004
+    u8 _pad004[0xBC];                         // 0x004
+    CMemory::CStage* m_stage;                 // 0x0C0
+    CMemory::CStage* m_amemStage;             // 0x0C4
+    CMemory::CStage* m_amemWorkStage;         // 0x0C8
     CMemory::CStage* m_viewerModelStage;      // 0x0CC
     CMemory::CStage* m_viewerTextureStage;    // 0x0D0
     CMemory::CStage* m_viewerAnimStage;       // 0x0D4

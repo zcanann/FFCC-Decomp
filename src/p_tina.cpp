@@ -77,7 +77,8 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
 
 
 extern char g_MsgFlashy[];
-static const char s_p_tina_rodata_801d7ee0[] = {
+extern "C" {
+extern const char s_p_tina_rodata_801d7ee0[] = {
     (char)0x64, (char)0x76, (char)0x64, (char)0x2F, (char)0x67, (char)0x62, (char)0x61, (char)0x2F,
     (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x66, (char)0x66, (char)0x63, (char)0x63,
     (char)0x5F, (char)0x63, (char)0x6C, (char)0x69, (char)0x2E, (char)0x62, (char)0x69, (char)0x6E,
@@ -89,6 +90,7 @@ static const char s_p_tina_rodata_801d7ee0[] = {
     (char)0x68, (char)0x72, (char)0x6F, (char)0x6E, (char)0x69, (char)0x63, (char)0x6C, (char)0x65,
     (char)0x73, (char)0x00, (char)0x00, (char)0x00,
 };
+}
 static const char s_CPartPcs_GAME_801D7F2C[] = "CPartPcs_GAME";
 static const char s_CPartPcs_PART_VIEWER_801D7F3C[] = "CPartPcs_PART_VIEWER";
 static const char s_CPartPcs_801d7f54[] = "CPartPcs";

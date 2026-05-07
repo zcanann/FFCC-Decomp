@@ -3047,7 +3047,7 @@ CChara::CMesh::CRefData::CRefData()
 	ref->m_threeWeightCountOrSize = 0;
 	ref->m_displayListCount = 0;
 	ref->m_skinCount = 0;
-	ref->m_infoWord1 = 0;
+	ref->m_nodeIndex = 0;
 }
 
 /*

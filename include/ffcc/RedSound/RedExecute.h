@@ -242,6 +242,7 @@ enum RedVoiceCleanupMask {
 	REDSOUND_VOICE_SWITCH_REVERB_AUX_A = 2,
 	REDSOUND_VOICE_SWITCH_SUSTAIN = 4,
 	REDSOUND_VOICE_SWITCH_PAUSE = 8,
+	REDSOUND_VOICE_SWITCH_SKIP_UPDATE = REDSOUND_VOICE_SWITCH_LOOP | REDSOUND_VOICE_SWITCH_PAUSE,
 	REDSOUND_VOICE_SWITCH_PAIRED_LEFT = 0x40,
 	REDSOUND_VOICE_SWITCH_PAIRED_RIGHT = 0x80,
 	REDSOUND_VOICE_SWITCH_PAIRED_PAN = REDSOUND_VOICE_SWITCH_PAIRED_LEFT | REDSOUND_VOICE_SWITCH_PAIRED_RIGHT,
@@ -288,7 +289,7 @@ int PitchCompute(int, int, int, int);
 void* ReverbAreaAlloc(unsigned long);
 void ReverbAreaFree(void*);
 void InitReverb();
-int* SetReverb(int, int, int*);
+RedReverbSize* SetReverb(int, int, int*);
 
 RedVoiceDATA* EntryVoiceSearch(RedTrackDATA*);
 void SetVoiceVolumeMix(RedVoiceDATA*, int, int);

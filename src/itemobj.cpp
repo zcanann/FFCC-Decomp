@@ -1154,13 +1154,14 @@ void CGItemObj::onFrameAlways()
 	if (countdown != 0) {
 		int next = countdown - 1;
 		*(int*)(self + 0x56C) = next & ~(next >> 0x1F);
-		*(float*)(self + 0x144) = *(float*)(self + 0x568) * (float)(8 - *(int*)(self + 0x56C)) * FLOAT_80331b68;
+		float radius = *(float*)(self + 0x568) * (float)(8 - *(int*)(self + 0x56C));
+		*(float*)(self + 0x144) = radius * FLOAT_80331b68;
 	}
 
 	if (*(int*)(self + 0x500) == 0xA) {
 		int canUseTrace;
 
-		if (Game.m_gameWork.m_gameInitFlag != 0 &&
+		if (static_cast<int>(Game.m_gameWork.m_gameInitFlag) != 0 &&
 		    static_cast<signed char>(
 		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(CFlat + 4836)) << 28) & 0xC0000000) >> 31) != 0 &&
 		    static_cast<signed char>(

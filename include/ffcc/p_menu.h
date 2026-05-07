@@ -30,7 +30,7 @@ struct McListInfo
     void operator=(const McListInfo&);
 };
 
-class CMenuPcs : public CSamplePcs
+class CMenuPcs : public CProcess
 {
 public:
     struct BattleHudState

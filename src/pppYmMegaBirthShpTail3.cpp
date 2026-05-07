@@ -459,16 +459,23 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
     *velocityScale = *velocityScale + pYmMegaBirthShpTail3->m_colorDeltaAdd[2];
     *tailScale = *tailScale + pYmMegaBirthShpTail3->m_sizeVal;
 
-    Vec local;
-    Vec scaled;
+    {
+        Vec velocity = *(Vec*)(particleBytes + 0x10);
+        Vec scaledVelocity;
+        pppScaleVectorXYZ(scaledVelocity, velocity, *velocityScale);
 
-    local = *(Vec*)(particleBytes + 0x10);
-    pppScaleVectorXYZ(scaled, local, *velocityScale);
-    pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
+        Vec currentPos = *(Vec*)particleData;
+        pppAddVector(*(Vec*)particleData, currentPos, scaledVelocity);
+    }
 
-    local = *(Vec*)((u8*)vYmMegaBirthShpTail3 + 0x30);
-    pppScaleVectorXYZ(scaled, local, *tailScale);
-    pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
+    {
+        Vec tailDirection = vYmMegaBirthShpTail3->m_tailScaleDirection;
+        Vec scaledTailDirection;
+        pppScaleVectorXYZ(scaledTailDirection, tailDirection, *tailScale);
+
+        Vec currentPosTail = *(Vec*)particleData;
+        pppAddVector(*(Vec*)particleData, currentPosTail, scaledTailDirection);
+    }
 
     if (*(u16*)((u8*)&pYmMegaBirthShpTail3->m_matrix[1] + 0x4) != 0) {
         *(u16*)(particleBytes + 0x22) = *(u16*)(particleBytes + 0x22) - 1;
@@ -521,8 +528,8 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
     u8* paramBytes = (u8*)pYmMegaBirthShpTail3;
     u8* particleBytes = (u8*)particleData;
     u8 mode = paramBytes[0x12];
-    float speedRandRange = pYmMegaBirthShpTail3->m_speedRandRange;
-    float speedRandHalf = 0.5f * speedRandRange;
+    float spread = (float)paramBytes[0x19];
+    float spreadRange = spread * 2.0f;
 
     memset(particleData, 0, 0x1f8);
     if (particleWMat != 0) {
@@ -537,8 +544,6 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
         pppIVECTOR4 angles;
         pppFMATRIX rot;
         Vec tempVec;
-        float spread = (float)paramBytes[0x19];
-        float spreadRange = spread * 2.0f;
 
         angles.x = (s16)(spreadRange * Math.RandF() - spread);
         angles.y = (s16)(spreadRange * Math.RandF() - spread);
@@ -560,7 +565,9 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
         pppNormalize(particleData->m_velocity, tempVec);
     }
 
-    if ((mode < 6) && (speedRandRange != 0.0f)) {
+    if ((mode < 6) && (pYmMegaBirthShpTail3->m_speedRandRange != 0.0f)) {
+        float speedRandRange = pYmMegaBirthShpTail3->m_speedRandRange;
+        float speedRandHalf = 0.5f * speedRandRange;
         u8 randType = paramBytes[0x6a];
 
         if (randType <= 1) {
@@ -672,7 +679,8 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
                 }
             }
         }
-    } else if (speedRandRange != 0.0f) {
+    } else if (pYmMegaBirthShpTail3->m_speedRandRange != 0.0f) {
+        float speedRandRange = pYmMegaBirthShpTail3->m_speedRandRange;
         u8 randType = paramBytes[0x6a];
         float scale = speedRandRange;
 

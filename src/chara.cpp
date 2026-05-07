@@ -15,6 +15,7 @@
 
 extern "C" void CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(void*, void*);
 extern "C" void freeFurTex__6CCharaFv();
+extern "C" void makeFurTex__6CCharaFv(CChara*);
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
 extern "C" void Calc__Q26CChara5CMeshFPQ26CChara6CModel(void*, void*);
 extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5CNode4TYPEPQ27CMemory6CStage(
@@ -691,6 +692,7 @@ void CChara::Quit()
  */
 void CChara::Create()
 {
+	makeFurTex__6CCharaFv(this);
 	InitFurTexBuffer();
 }
 

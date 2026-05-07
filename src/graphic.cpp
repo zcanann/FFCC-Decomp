@@ -24,7 +24,6 @@ extern "C" double cos(double);
 CGraphic Graphic;
 
 extern GXRenderModeObj gDefaultGXRenderMode;
-extern u8 DAT_801E83F2[7];
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" {
 OSThread m_thread;
@@ -311,11 +310,12 @@ int CGraphic::GetProgressive()
 void CGraphic::ChangeProgressive(int mode)
 {
     GXRenderModeObj** renderMode = reinterpret_cast<GXRenderModeObj**>(reinterpret_cast<u8*>(this) + 0x71E0);
-    if (*renderMode != &gDefaultGXRenderMode) {
-        *renderMode = &gDefaultGXRenderMode;
+    GXRenderModeObj* defaultRenderMode = &gDefaultGXRenderMode;
+    if (*renderMode != defaultRenderMode) {
+        *renderMode = defaultRenderMode;
         GXAdjustForOverscan(*renderMode, *renderMode, 0, 0x10);
         VIConfigure(*renderMode);
-        GXSetCopyFilter((*renderMode)->aa, (*renderMode)->sample_pattern, GX_TRUE, DAT_801E83F2);
+        GXSetCopyFilter((*renderMode)->aa, (*renderMode)->sample_pattern, GX_TRUE, gDefaultGXRenderMode.vfilter);
         VIFlush();
         VIWaitForRetrace();
         VIWaitForRetrace();

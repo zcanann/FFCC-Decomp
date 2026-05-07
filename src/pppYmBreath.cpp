@@ -793,9 +793,9 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                 unitVelocity.y = 0.0f;
                 unitVelocity.z = -1.0f;
                 pppCopyVector(groupData->direction, unitVelocity);
-                groupData->position.z = zero;
-                groupData->position.y = zero;
-                groupData->position.x = zero;
+                groupData->position.z = 0.0f;
+                groupData->position.y = 0.0f;
+                groupData->position.x = 0.0f;
                 PSMTXCopy(pppMngStPtr->m_matrix.value, groupData->matrix);
                 groupData->active = 1;
             }

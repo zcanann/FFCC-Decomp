@@ -36,7 +36,7 @@ struct KeShpTail3XStep {
     float m_stepDistance;
     u8 m_drawCount;
     u8 m_useRandomShape;
-    s16 m_rotateEnabled;
+    u16 m_rotateEnabled;
     s16 m_valueSteps[24];
     u8 m_drawA;
     u8 _pad51;

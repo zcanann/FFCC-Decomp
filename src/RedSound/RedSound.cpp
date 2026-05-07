@@ -45,8 +45,12 @@ static const char sRedSoundLogInfoColor[] = "\x1B[4;34m";
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cca34
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CRedSound::CRedSound()
 {
@@ -393,8 +397,12 @@ int CRedSound::ReentryMusicData(int bank)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccfcc
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::MusicStop(int id)
 {
@@ -403,8 +411,12 @@ void CRedSound::MusicStop(int id)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccff8
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::MusicPlay(int id, int vol, int fadeTime)
 {
@@ -413,8 +425,12 @@ void CRedSound::MusicPlay(int id, int vol, int fadeTime)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd034
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
 {
@@ -423,8 +439,12 @@ void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd070
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::MusicNextPlay(int id, int vol, int fadeTime)
 {
@@ -433,8 +453,12 @@ void CRedSound::MusicNextPlay(int id, int vol, int fadeTime)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd0ac
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::MusicMasterVolume(int volume)
 {
@@ -443,8 +467,12 @@ void CRedSound::MusicMasterVolume(int volume)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd0d8
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::MusicFadeOut(int id, int fadeTime)
 {
@@ -453,8 +481,12 @@ void CRedSound::MusicFadeOut(int id, int fadeTime)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd10c
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::MusicVolume(int id, int volume, int fadeTime)
 {
@@ -463,8 +495,12 @@ void CRedSound::MusicVolume(int id, int volume, int fadeTime)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd148
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::SetMusicPhraseStop(int id)
 {
@@ -501,8 +537,12 @@ void CRedSound::SetSeSepData(void* seSepData)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd1d4
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::ClearSeSepData(int id)
 {
@@ -525,8 +565,12 @@ void CRedSound::ClearSeSepDataMG(int bank, int sep, int group, int kind)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd244
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CRedSound::ReentrySeSepData(int id)
 {
@@ -535,8 +579,12 @@ int CRedSound::ReentrySeSepData(int id)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd270
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CRedSound::SePlayState(int id)
 {
@@ -545,8 +593,12 @@ int CRedSound::SePlayState(int id)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd29c
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::SeStop(int id)
 {
@@ -763,10 +815,10 @@ void CRedSound::StreamStop(int streamID)
 int CRedSound::StreamPlay(void* data, int fileSize, int pan, int volume)
 {
 	int id = 0;
-	char* streamData = (char*)data;
+	char* streamSignature = (char*)data;
 
-	if (streamData[0] == REDSOUND_STREAM_SIGNATURE_0 && streamData[1] == REDSOUND_STREAM_SIGNATURE_1 &&
-	    streamData[2] == REDSOUND_STREAM_SIGNATURE_2) {
+	if (streamSignature[0] == REDSOUND_STREAM_SIGNATURE_0 && streamSignature[1] == REDSOUND_STREAM_SIGNATURE_1 &&
+	    streamSignature[2] == REDSOUND_STREAM_SIGNATURE_2) {
 		id = GetAutoID();
 		c_Driver.StreamPlay(id, data, fileSize, pan, volume);
 	} else if (m_ReportPrint != 0) {
@@ -828,8 +880,12 @@ unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd7a4
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::ClearWaveData(int id)
 {
@@ -852,8 +908,12 @@ void CRedSound::ClearWaveDataM(int bank, int sep, int group, int kind)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd814
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::ClearWaveBank(int id)
 {
@@ -862,8 +922,12 @@ void CRedSound::ClearWaveBank(int id)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd840
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CRedSound::ReentryWaveData(int id)
 {
@@ -872,8 +936,12 @@ int CRedSound::ReentryWaveData(int id)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd86c
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::DisplayWaveInfo()
 {
@@ -882,8 +950,12 @@ void CRedSound::DisplayWaveInfo()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd890
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::TestProcess(int mode)
 {

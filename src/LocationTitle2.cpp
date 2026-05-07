@@ -204,8 +204,8 @@ static const char s_locationNodeName[] = "loc";
 extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
 {
     Mtx nodeMtx;
-    Vec scaled;
     Vec stepDir;
+    Vec scaled;
     Vec* startPos;
     Vec* nextPos;
     Vec* interpRead;

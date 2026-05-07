@@ -211,13 +211,7 @@ static void stageDestroyInternal(CMemory::CStage* stage)
  */
 void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
-    char* source;
-    if (file == (char*)nullptr) {
-        source = DAT_8032f7d4;
-    } else {
-        source = file;
-    }
-    return stage->alloc(size, source, line, 0);
+    return stage->alloc(size, file == (char*)nullptr ? DAT_8032f7d4 : file, line, 0);
 }
 
 /*
@@ -231,13 +225,7 @@ void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int l
  */
 void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
-    char* source;
-    if (file == (char*)nullptr) {
-        source = DAT_8032f7d4;
-    } else {
-        source = file;
-    }
-    return stage->alloc(size, source, line, 0);
+    return stage->alloc(size, file == (char*)nullptr ? DAT_8032f7d4 : file, line, 0);
 }
 
 /*
@@ -865,13 +853,7 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
  */
 void* CMemory::_Alloc(unsigned long size, CMemory::CStage* stage, char* source, int line, int noError)
 {
-    char* allocSource;
-    if (source == (char*)nullptr) {
-        allocSource = DAT_8032f7d4;
-    } else {
-        allocSource = source;
-    }
-    return stage->alloc(size, allocSource, line, noError);
+    return stage->alloc(size, source == (char*)nullptr ? DAT_8032f7d4 : source, line, noError);
 }
 
 /*

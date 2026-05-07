@@ -152,7 +152,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		if (param_2->m_splitMode == 0) {
 			u8 size = param_2->m_size;
 			float quadSize = (float)size;
-			if (param_2->m_orientation == 0) {
+			if (((s8)param_2->m_orientation) == 0) {
 				vertices[0].x = -quadSize;
 				vertices[0].y = quadSize;
 				vertices[0].z = kPppYmDeformationShpZero;
@@ -165,7 +165,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				vertices[3].x = -quadSize;
 				vertices[3].y = -quadSize;
 				vertices[3].z = kPppYmDeformationShpZero;
-			} else if (param_2->m_orientation == 1) {
+			} else if (((s8)param_2->m_orientation) == 1) {
 				vertices[0].x = -quadSize;
 				vertices[0].y = kPppYmDeformationShpZero;
 				vertices[0].z = -quadSize;
@@ -195,7 +195,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			float uvSplit = (FLOAT_803305f8 / (float)(size + size)) * (float)(size - split);
 			float uvRemainder = FLOAT_803305f8 - uvSplit;
 
-			if (param_2->m_orientation == 0) {
+			if (((s8)param_2->m_orientation) == 0) {
 				vertices[0].x = -size;
 				vertices[0].y = -split;
 				vertices[0].z = kPppYmDeformationShpZero;
@@ -208,7 +208,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				vertices[3].x = -size;
 				vertices[3].y = split;
 				vertices[3].z = kPppYmDeformationShpZero;
-			} else if (param_2->m_orientation == 1) {
+			} else if (((s8)param_2->m_orientation) == 1) {
 				vertices[0].x = -size;
 				vertices[0].y = kPppYmDeformationShpZero;
 				vertices[0].z = -split;
@@ -233,7 +233,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			uvs[3].y = uvRemainder;
 			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
 
-			if (param_2->m_orientation == 0) {
+			if (((s8)param_2->m_orientation) == 0) {
 				vertices[0].x = split;
 				vertices[0].y = -split;
 				vertices[0].z = kPppYmDeformationShpZero;
@@ -246,7 +246,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				vertices[3].x = split;
 				vertices[3].y = split;
 				vertices[3].z = kPppYmDeformationShpZero;
-			} else if (param_2->m_orientation == 1) {
+			} else if (((s8)param_2->m_orientation) == 1) {
 				vertices[0].x = split;
 				vertices[0].y = kPppYmDeformationShpZero;
 				vertices[0].z = -split;
@@ -272,7 +272,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
 
 			if (param_2->m_splitMode == 1) {
-				if (param_2->m_orientation == 0) {
+				if (((s8)param_2->m_orientation) == 0) {
 					vertices[0].x = -size;
 					vertices[0].y = -size;
 					vertices[0].z = kPppYmDeformationShpZero;
@@ -285,7 +285,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 					vertices[3].x = -size;
 					vertices[3].y = -split;
 					vertices[3].z = kPppYmDeformationShpZero;
-				} else if (param_2->m_orientation == 1) {
+				} else if (((s8)param_2->m_orientation) == 1) {
 					vertices[0].x = -size;
 					vertices[0].y = kPppYmDeformationShpZero;
 					vertices[0].z = -size;
@@ -310,7 +310,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				uvs[3].y = uvSplit;
 				RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
 
-				if (param_2->m_orientation == 0) {
+				if (((s8)param_2->m_orientation) == 0) {
 					vertices[0].x = split;
 					vertices[0].y = -size;
 					vertices[0].z = kPppYmDeformationShpZero;
@@ -323,7 +323,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 					vertices[3].x = split;
 					vertices[3].y = size;
 					vertices[3].z = kPppYmDeformationShpZero;
-				} else if (param_2->m_orientation == 1) {
+				} else if (((s8)param_2->m_orientation) == 1) {
 					vertices[0].x = split;
 					vertices[0].y = kPppYmDeformationShpZero;
 					vertices[0].z = -size;

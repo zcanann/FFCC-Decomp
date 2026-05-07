@@ -196,6 +196,12 @@ enum RedExecuteVolumeModConst {
     REDSOUND_VOLUME_MOD_WAVE_SHIFT = 4,
 };
 
+enum RedControlTickWord {
+    REDSOUND_CONTROL_TICK_MEASURE = 0,
+    REDSOUND_CONTROL_TICK_CURRENT = 1,
+    REDSOUND_CONTROL_TICK_PER_MEASURE = 2,
+};
+
 enum RedExecuteAdsrStateIndex {
     REDSOUND_ADSR_STATE_STAGE = 0,
     REDSOUND_ADSR_STATE_STEP_FRAMES = 1,
@@ -2203,11 +2209,11 @@ static int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnDa
     frames <<= m_MusicFastSpeed;
     control->m_loopBase = frames;
 
-    tick[1] += frames;
+    tick[REDSOUND_CONTROL_TICK_CURRENT] += frames;
 
-    while (tick[1] >= tick[2]) {
-        tick[0] += 1;
-        tick[1] -= tick[2];
+    while (tick[REDSOUND_CONTROL_TICK_CURRENT] >= tick[REDSOUND_CONTROL_TICK_PER_MEASURE]) {
+        tick[REDSOUND_CONTROL_TICK_MEASURE] += 1;
+        tick[REDSOUND_CONTROL_TICK_CURRENT] -= tick[REDSOUND_CONTROL_TICK_PER_MEASURE];
     }
 
     if (control->m_activeTrackCount != 0) {
@@ -2289,11 +2295,11 @@ static int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* key
     do {
         control->m_skipFrames = frames;
         control->m_loopBase = frames;
-        tick[1] += frames;
+        tick[REDSOUND_CONTROL_TICK_CURRENT] += frames;
 
-        while (tick[1] >= tick[2]) {
-            tick[0] += 1;
-            tick[1] -= tick[2];
+        while (tick[REDSOUND_CONTROL_TICK_CURRENT] >= tick[REDSOUND_CONTROL_TICK_PER_MEASURE]) {
+            tick[REDSOUND_CONTROL_TICK_MEASURE] += 1;
+            tick[REDSOUND_CONTROL_TICK_CURRENT] -= tick[REDSOUND_CONTROL_TICK_PER_MEASURE];
         }
 
         if (control->m_activeTrackCount != 0) {
@@ -2303,7 +2309,7 @@ static int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* key
         if (m_MusicSkipLine != 0) {
             if ((control->m_activeTrackCount != 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END) == 0)) {
                 m_MusicSkipLine--;
-                frames = tick[2];
+                frames = tick[REDSOUND_CONTROL_TICK_PER_MEASURE];
                 RedSleep(1000);
             }
         }

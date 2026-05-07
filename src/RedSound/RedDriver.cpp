@@ -1177,21 +1177,7 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
     queueEntry = *queuePtr;
     entryID = GetMyEntryID();
     sizeBytes = (sizeBytes + REDSOUND_DMA_TRANSFER_ALIGN - 1) & REDSOUND_DMA_TRANSFER_ALIGN_MASK;
-    if ((m_DMAMode == 0) && ((flags & REDSOUND_DMA_FLAG_CHUNKED_TRANSFER) == 0)) {
-        queueEnd = queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
-        queueEntry->m_id = entryID;
-        queueEntry->m_direction = direction;
-        queueEntry->m_mainMemory = mainMemory;
-        queueEntry->m_aramMemory = aramMemory;
-        queueEntry->m_size = sizeBytes;
-        queueEntry->m_callback = callback;
-        queueEntry->m_callbackData = callbackData;
-        queueEntry++;
-        if (!(queueEntry < queueEnd)) {
-            queueEntry = queueBase;
-        }
-        *queuePtr = queueEntry;
-    } else {
+    if ((m_DMAMode != 0) || ((flags & REDSOUND_DMA_FLAG_CHUNKED_TRANSFER) != 0)) {
         queueEnd = queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
         do {
             chunkSize = sizeBytes;
@@ -1217,6 +1203,20 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
                 queueEntry = queueBase;
             }
         } while (sizeBytes > 0);
+        *queuePtr = queueEntry;
+    } else {
+        queueEnd = queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
+        queueEntry->m_id = entryID;
+        queueEntry->m_direction = direction;
+        queueEntry->m_mainMemory = mainMemory;
+        queueEntry->m_aramMemory = aramMemory;
+        queueEntry->m_size = sizeBytes;
+        queueEntry->m_callback = callback;
+        queueEntry->m_callbackData = callbackData;
+        queueEntry++;
+        if (!(queueEntry < queueEnd)) {
+            queueEntry = queueBase;
+        }
         *queuePtr = queueEntry;
     }
     OSSignalSemaphore(&m_DmaExecuteSemaphore);

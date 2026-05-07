@@ -107,6 +107,21 @@ enum RedMusicCommandWord {
     REDSOUND_MUSIC_COMMAND_FADE_TIME = 2,
 };
 
+enum RedDataCommandWord {
+    REDSOUND_DATA_COMMAND_BUFFER = 0,
+};
+
+enum RedStreamCommandWord {
+    REDSOUND_STREAM_COMMAND_ID = 0,
+    REDSOUND_STREAM_COMMAND_DATA = 1,
+    REDSOUND_STREAM_COMMAND_FILE_SIZE = 2,
+    REDSOUND_STREAM_COMMAND_PAN = 3,
+    REDSOUND_STREAM_COMMAND_PLAY_VOLUME = 4,
+    REDSOUND_STREAM_COMMAND_VOLUME = 1,
+    REDSOUND_STREAM_COMMAND_FADE_TIME = 2,
+    REDSOUND_STREAM_COMMAND_PAUSE = 1,
+};
+
 enum RedDriverTickHistoryLayout {
     REDSOUND_TICK_HISTORY_COUNT = 100,
     REDSOUND_TICK_HISTORY_SHIFT_SIZE = sizeof(int) * (REDSOUND_TICK_HISTORY_COUNT - 1),
@@ -358,7 +373,7 @@ static void _SetReverbDepth(int* command)
  */
 static void _SetMusicData(int* command)
 {
-    c_RedEntry.SetMusicData((RedMusicHEAD*)*command);
+    c_RedEntry.SetMusicData((RedMusicHEAD*)command[REDSOUND_DATA_COMMAND_BUFFER]);
 }
 
 /*
@@ -613,7 +628,7 @@ static void _SetSeBlockData(int* command)
  */
 static void _SetSeSepData(int* command)
 {
-    c_RedEntry.SetSeSepData((RedSeSepHEAD*)*command);
+    c_RedEntry.SetSeSepData((RedSeSepHEAD*)command[REDSOUND_DATA_COMMAND_BUFFER]);
 }
 
 /*
@@ -818,7 +833,7 @@ static void _SePause(int* command)
  */
 static void _StreamStop(int* command)
 {
-	StreamStop(*command);
+	StreamStop(command[REDSOUND_STREAM_COMMAND_ID]);
 }
 
 /*
@@ -832,7 +847,9 @@ static void _StreamStop(int* command)
  */
 static void _StreamPlay(int* command)
 {
-	StreamPlay(command[0], (void*)command[1], command[2], command[3], command[4]);
+	StreamPlay(command[REDSOUND_STREAM_COMMAND_ID], (void*)command[REDSOUND_STREAM_COMMAND_DATA],
+	           command[REDSOUND_STREAM_COMMAND_FILE_SIZE], command[REDSOUND_STREAM_COMMAND_PAN],
+	           command[REDSOUND_STREAM_COMMAND_PLAY_VOLUME]);
 }
 
 /*
@@ -846,7 +863,8 @@ static void _StreamPlay(int* command)
  */
 static void _StreamVolume(int* command)
 {
-	SetStreamVolume(command[0], command[1], command[2]);
+	SetStreamVolume(command[REDSOUND_STREAM_COMMAND_ID], command[REDSOUND_STREAM_COMMAND_VOLUME],
+	                command[REDSOUND_STREAM_COMMAND_FADE_TIME]);
 }
 
 /*
@@ -860,7 +878,7 @@ static void _StreamVolume(int* command)
  */
 static void _StreamPause(int* command)
 {
-	StreamPause(command[0], command[1]);
+	StreamPause(command[REDSOUND_STREAM_COMMAND_ID], command[REDSOUND_STREAM_COMMAND_PAUSE]);
 }
 
 /*

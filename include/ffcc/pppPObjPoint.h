@@ -10,7 +10,7 @@ struct Vec;
 struct pppPObjPointStep {
     s32 m_graphId;              // 0x0
     u32 m_createProgramIndex;   // 0x4
-    u8* m_sourceObject;         // 0x8
+    u32 m_sourceOffset;         // 0x8
     u32 m_objectId;             // 0xc
 };
 

@@ -29,12 +29,10 @@ void pppPObjPoint(_pppPObject* pObject, pppPObjPointStep* step, _pppCtrlTable* c
         if (step->m_createProgramIndex == -1) {
             vecPtr = gPppDefaultValueBuffer;
         } else {
-            u8* data = step->m_sourceObject;
+            u32 sourceOffset = step->m_sourceOffset;
             _pppPDataVal* pDataVal = pppMngStPtr->m_pppPDataVals;
             pDataVal = &pDataVal[step->m_createProgramIndex];
-            s32 vecOffset = pDataVal->m_nextSpawnTime;
-            vecPtr = data + 0x80;
-            vecPtr += vecOffset;
+            vecPtr = (u8*)pDataVal->m_pppPObjLink + sourceOffset + 0x80;
         }
 
         objPtr->m_source = (Vec*)vecPtr;

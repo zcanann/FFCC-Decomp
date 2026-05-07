@@ -1438,10 +1438,10 @@ void CGItemObj::ItemJump(int state, float jump)
 	     itemObj = static_cast<CGItemObj*>(FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj))) {
 		CGObject* object = reinterpret_cast<CGObject*>(itemObj);
 
-		if ((object->m_displayFlags & 0x10) == 0) {
-			CMapCylinderRaw cylinder;
-			Vec move;
+		if ((object->m_objectFlags & 0x10) == 0) {
 			unsigned int mapMask = *reinterpret_cast<unsigned int*>(&object->m_moveVec.x);
+			Vec move;
+			CMapCylinderRaw cylinder;
 
 			move.x = FLOAT_80331b20;
 			move.y = FLOAT_80331b24;
@@ -1465,7 +1465,7 @@ void CGItemObj::ItemJump(int state, float jump)
 
 			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
 			        &MapMng, reinterpret_cast<CMapCylinder*>(&cylinder), &move, mapMask) != 0 &&
-			    reinterpret_cast<unsigned char*>(gMapHitFace)[0x47] == state) {
+			    g_hit_lpface_min->m_groupIndex == state) {
 				object->m_groundHitOffset.y += jump;
 			}
 		}
@@ -1483,14 +1483,12 @@ void CGItemObj::ItemJump(int state, float jump)
  */
 void CGItemObj::DeleteAllFieldItem()
 {
-	for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
-	     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-		void* owner = *(void**)(itemObj + 0x550);
-
-		if (owner == 0 &&
+	for (CGItemObj* itemObj = (CGItemObj*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
+	     itemObj = (CGItemObj*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+		if (itemObj->m_owner == 0 &&
 		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0) {
-			itemObj[0x38] |= 0x80;
+		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
+			itemObj->m_flags |= 0x80;
 		}
 	}
 }
@@ -1506,17 +1504,15 @@ void CGItemObj::DeleteAllFieldItem()
  */
 void CGItemObj::DispAllFieldItem(int show)
 {
-	for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
-	     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-		void* owner = *(void**)(itemObj + 0x550);
-
-		if (owner == 0 &&
+	for (CGItemObj* itemObj = (CGItemObj*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
+	     itemObj = (CGItemObj*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+		if (itemObj->m_owner == 0 &&
 		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0) {
+		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
 			if (show != 0) {
-				*(unsigned int*)(itemObj + 0x60) &= 0xffbfffff;
+				itemObj->m_displayFlags &= 0xffbfffff;
 			} else {
-				*(unsigned int*)(itemObj + 0x60) |= 0x400000;
+				itemObj->m_displayFlags |= 0x400000;
 			}
 		}
 	}

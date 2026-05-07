@@ -122,6 +122,25 @@ enum RedStreamCommandWord {
     REDSOUND_STREAM_COMMAND_PAUSE = 1,
 };
 
+enum RedSeCommandWord {
+    REDSOUND_SE_COMMAND_ID = 0,
+    REDSOUND_SE_BLOCK_COMMAND_BANK = 1,
+    REDSOUND_SE_BLOCK_COMMAND_NO = 2,
+    REDSOUND_SE_BLOCK_COMMAND_PAN = 3,
+    REDSOUND_SE_BLOCK_COMMAND_VOLUME = 4,
+    REDSOUND_SE_BLOCK_COMMAND_PITCH = 5,
+    REDSOUND_SE_SEP_COMMAND_DATA = 1,
+    REDSOUND_SE_SEP_COMMAND_ID = 1,
+    REDSOUND_SE_SEP_COMMAND_PAN = 2,
+    REDSOUND_SE_SEP_COMMAND_VOLUME = 3,
+    REDSOUND_SE_SEP_COMMAND_PITCH = 4,
+    REDSOUND_SE_MG_COMMAND_BANK = 0,
+    REDSOUND_SE_MG_COMMAND_SEP = 1,
+    REDSOUND_SE_MG_COMMAND_GROUP = 2,
+    REDSOUND_SE_MG_COMMAND_KIND = 3,
+    REDSOUND_SE_COMMAND_PAUSE = 1,
+};
+
 enum RedDriverTickHistoryLayout {
     REDSOUND_TICK_HISTORY_COUNT = 100,
     REDSOUND_TICK_HISTORY_SHIFT_SIZE = sizeof(int) * (REDSOUND_TICK_HISTORY_COUNT - 1),
@@ -656,7 +675,8 @@ static void _ClearSeSepData(int* command)
  */
 static void _ClearSeSepDataMG(int* command)
 {
-    c_RedEntry.ClearSeSepDataMG(command[0], command[1], command[2], command[3]);
+    c_RedEntry.ClearSeSepDataMG(command[REDSOUND_SE_MG_COMMAND_BANK], command[REDSOUND_SE_MG_COMMAND_SEP],
+                                command[REDSOUND_SE_MG_COMMAND_GROUP], command[REDSOUND_SE_MG_COMMAND_KIND]);
 }
 
 /*
@@ -670,7 +690,7 @@ static void _ClearSeSepDataMG(int* command)
  */
 static void _SeStop(int* command)
 {
-    SeStopID(command[0]);
+    SeStopID(command[REDSOUND_SE_COMMAND_ID]);
 }
 
 /*
@@ -684,7 +704,8 @@ static void _SeStop(int* command)
  */
 static void _SeStopMG(int* command)
 {
-    SeStopMG(command[0], command[1], command[2], command[3]);
+    SeStopMG(command[REDSOUND_SE_MG_COMMAND_BANK], command[REDSOUND_SE_MG_COMMAND_SEP],
+             command[REDSOUND_SE_MG_COMMAND_GROUP], command[REDSOUND_SE_MG_COMMAND_KIND]);
 }
 
 /*
@@ -698,8 +719,10 @@ static void _SeStopMG(int* command)
  */
 static void _SeBlockPlay(int* command)
 {
-    m_SeSkipStep = command[5];
-    SeBlockPlay(command[0], command[1], command[2], command[3], command[4]);
+    m_SeSkipStep = command[REDSOUND_SE_BLOCK_COMMAND_PITCH];
+    SeBlockPlay(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_BLOCK_COMMAND_BANK],
+                command[REDSOUND_SE_BLOCK_COMMAND_NO], command[REDSOUND_SE_BLOCK_COMMAND_PAN],
+                command[REDSOUND_SE_BLOCK_COMMAND_VOLUME]);
 }
 
 /*
@@ -715,11 +738,12 @@ static void _SeSepPlay(int* command)
 {
     RedSeSepHEAD* seSepHead;
 
-    seSepHead = c_RedEntry.SetSeSepData((RedSeSepHEAD*)command[1]);
+    seSepHead = c_RedEntry.SetSeSepData((RedSeSepHEAD*)command[REDSOUND_SE_SEP_COMMAND_DATA]);
     if (seSepHead != 0) {
-        m_SeSkipStep = command[4];
-        int seID = command[0];
-        SeSepPlay(seID, seSepHead->m_seNo, command[2], command[3]);
+        m_SeSkipStep = command[REDSOUND_SE_SEP_COMMAND_PITCH];
+        int seID = command[REDSOUND_SE_COMMAND_ID];
+        SeSepPlay(seID, seSepHead->m_seNo, command[REDSOUND_SE_SEP_COMMAND_PAN],
+                  command[REDSOUND_SE_SEP_COMMAND_VOLUME]);
     }
 }
 
@@ -734,9 +758,10 @@ static void _SeSepPlay(int* command)
  */
 static void _SeSepPlaySequence(int* command)
 {
-    if (c_RedEntry.SearchSeSepSequence(command[1]) >= 0) {
-        m_SeSkipStep = command[4];
-        SeSepPlay(command[0], command[1], command[2], command[3]);
+    if (c_RedEntry.SearchSeSepSequence(command[REDSOUND_SE_SEP_COMMAND_ID]) >= 0) {
+        m_SeSkipStep = command[REDSOUND_SE_SEP_COMMAND_PITCH];
+        SeSepPlay(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_SEP_COMMAND_ID],
+                  command[REDSOUND_SE_SEP_COMMAND_PAN], command[REDSOUND_SE_SEP_COMMAND_VOLUME]);
     }
 }
 

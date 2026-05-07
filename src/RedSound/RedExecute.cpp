@@ -1042,9 +1042,9 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
                 voice->m_basePitch = noteData->m_key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
                 if (track->m_keySignatureData != 0) {
                     workValue = voice->m_basePitch >> REDSOUND_PITCH_BASE_NOTE_SHIFT;
-                    octaveIndex = workValue / REDSOUND_NOTES_PER_OCTAVE + (voice->m_basePitch >> 0x1f);
+                    octaveIndex = workValue / REDSOUND_NOTES_PER_OCTAVE + (voice->m_basePitch >> REDSOUND_SIGN_SHIFT);
                     pitchWork[0] =
-                        track->m_keySignatureData[workValue + (octaveIndex - (octaveIndex >> 0x1f)) * -REDSOUND_NOTES_PER_OCTAVE];
+                        track->m_keySignatureData[workValue + (octaveIndex - (octaveIndex >> REDSOUND_SIGN_SHIFT)) * -REDSOUND_NOTES_PER_OCTAVE];
                     voice->m_basePitch += pitchWork[0] * REDSOUND_PITCH_KEY_SIGNATURE_UNIT;
                 }
             } else {

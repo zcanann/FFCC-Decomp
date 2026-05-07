@@ -1562,10 +1562,9 @@ int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
 
     if (seNo < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
-        seId = -1;
+        return -1;
     } else if (seNo < 4000) {
-        const int seBank = seNo / 1000;
-        seId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(self + 8), seBank, seNo - seBank * 1000, pan,
+        seId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(self + 8), seNo / 1000, seNo % 1000, pan,
                                         volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
         if (fadeFrames != 0) {
             SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), seId, volume, fadeFrames);

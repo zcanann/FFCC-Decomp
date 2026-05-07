@@ -60,7 +60,6 @@ extern "C" int IsEnable__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
 extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" void __ct__21CPtrArray_P8CTexture_Fv(void*);
-extern "C" void __dt__21CPtrArray_P8CTexture_Fv(void*, int);
 
 static const char s_textureman_cpp_801D7974[] = "textureman.cpp";
 static const char s_Error_width_pctd_height_pctd_801D7984[] = "Error width=%d height=%d\n";
@@ -350,7 +349,7 @@ void* CTextureSet::operator new(unsigned long size, CMemory::CStage*, char* file
 CTextureSet::~CTextureSet()
 {
     TextureArray(m_textureArrayStorage)->ReleaseAndRemoveAll();
-    __dt__21CPtrArray_P8CTexture_Fv(TextureArray(m_textureArrayStorage), -1);
+    TextureArray(m_textureArrayStorage)->CPtrArray<CTexture*>::~CPtrArray();
 }
 
 /*

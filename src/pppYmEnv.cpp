@@ -289,10 +289,9 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     static const char s_display_list_alloc_error[] = "Error allocating display list (%d, %d)\n";
     static const char s_pppYmEnv_cpp[] = "pppYmEnv.cpp";
     static const char s_exiting[] = "Exiting";
-    const unsigned int rings = detail;
-    const int ringVertexCount = rings + 1;
+    const int ringVertexCount = detail + 1;
     const unsigned int displayListSize =
-        ((ringVertexCount + (rings - 2) * ringVertexCount * 2) * 6 * sizeof(float) + 0x1F) & ~0x1F;
+        ((ringVertexCount + (detail - 2) * ringVertexCount * 2) * 6 * sizeof(float) + 0x1F) & ~0x1F;
 
     DCInvalidateRange(displayListBuffer, displayListSize);
     GXBeginDisplayList(displayListBuffer, displayListSize);
@@ -302,9 +301,9 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     GXSetVtxAttrFmt((GXVtxFmt)vtxFmt, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt((GXVtxFmt)vtxFmt, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
 
-    GXBegin(GX_TRIANGLEFAN, GX_VTXFMT7, rings + 2);
+    GXBegin(GX_TRIANGLEFAN, GX_VTXFMT7, detail + 2);
 
-    const float latStep = FLOAT_803311B0 / (float)rings;
+    const float latStep = FLOAT_803311B0 / (float)detail;
     const float firstLat = latStep;
     const float firstRingSin = FLOAT_80331184 * (float)sin(firstLat);
     const float firstRingCos = FLOAT_80331184 * (float)cos(firstLat);
@@ -315,7 +314,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 
     int i = 0;
     float lon = FLOAT_80331180;
-    while (i <= (int)rings) {
+    while (i <= (int)detail) {
         const float x = firstRingSin * (float)cos(lon);
         const float y = firstRingSin * (float)sin(lon);
         const float z = firstRingCos;
@@ -324,12 +323,12 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
         GXNormal3f32(FLOAT_803311B4 * x * z, FLOAT_803311B4 * y * z, firstNormalZ);
 
         i++;
-        lon = (FLOAT_803311B8 * (float)i) / (float)rings;
+        lon = (FLOAT_803311B8 * (float)i) / (float)detail;
     }
 
-    for (int ring = 2; ring < (int)rings; ring++) {
-        const float upperLat = (FLOAT_803311B0 * (float)(ring - 1)) / (float)rings;
-        const float lowerLat = (FLOAT_803311B0 * (float)ring) / (float)rings;
+    for (int ring = 2; ring < (int)detail; ring++) {
+        const float upperLat = (FLOAT_803311B0 * (float)(ring - 1)) / (float)detail;
+        const float lowerLat = (FLOAT_803311B0 * (float)ring) / (float)detail;
 
         const float upperSin = FLOAT_80331184 * (float)sin(upperLat);
         const float upperCos = FLOAT_80331184 * (float)cos(upperLat);
@@ -345,7 +344,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, ringVertexCount * 2);
         i = 0;
         lon = FLOAT_80331180;
-        while (i <= (int)rings) {
+        while (i <= (int)detail) {
             const float lx = lowerSin * (float)cos(lon);
             const float ly = lowerSin * (float)sin(lon);
             GXPosition3f32(lx, ly, lowerCos);
@@ -357,7 +356,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
             GXNormal3f32(FLOAT_803311B4 * ux * upperCos, FLOAT_803311B4 * uy * upperCos, upperNormalZ);
 
             i++;
-            lon = (FLOAT_803311C8 * (float)i) / (float)rings;
+            lon = (FLOAT_803311C8 * (float)i) / (float)detail;
         }
     }
 

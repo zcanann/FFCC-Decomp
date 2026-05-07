@@ -3437,10 +3437,9 @@ void CMenuPcs::GetAllPadOn()
 void CMenuPcs::ClrBattleItem()
 {
 	for (int i = 0; i < 4; i++) {
-		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i]);
-		if (caravanWork != 0) {
-			caravanWork->SafeDeleteTempItem();
-			caravanWork->SortBeforeReturnWorldMap();
+		if (Game.m_scriptFoodBase[i] != 0) {
+			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->SafeDeleteTempItem();
+			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->SortBeforeReturnWorldMap();
 		}
 	}
 }

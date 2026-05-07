@@ -433,7 +433,7 @@ static void _MusicCrossPlaySequence(int* command)
 {
     int replayPoint;
     RedSoundCONTROL* control;
-    void* temp;
+    void* swapControl;
     
     command[REDSOUND_MUSIC_COMMAND_FADE_TIME] =
         command[REDSOUND_MUSIC_COMMAND_FADE_TIME] * REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
@@ -457,12 +457,12 @@ static void _MusicCrossPlaySequence(int* command)
              control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolume) /
             command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
         control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolumeDelta = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
-        temp = (void*)RedNew(REDSOUND_CONTROL_SIZE);
-        memcpy(temp, &p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], REDSOUND_CONTROL_SIZE);
+        swapControl = (void*)RedNew(REDSOUND_CONTROL_SIZE);
+        memcpy(swapControl, &p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], REDSOUND_CONTROL_SIZE);
         memcpy(&p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], p_SoundControlBuffer,
                REDSOUND_CONTROL_SIZE);
-        memcpy(p_SoundControlBuffer, temp, REDSOUND_CONTROL_SIZE);
-        RedDelete(temp);
+        memcpy(p_SoundControlBuffer, swapControl, REDSOUND_CONTROL_SIZE);
+        RedDelete(swapControl);
     } else {
         if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
             m_CrossTime = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
@@ -1952,13 +1952,13 @@ int CRedDriver::ReentrySeSepData(int id)
 int CRedDriver::SePlayState(int seID)
 {
     RedExecCommand* commandNow;
-    unsigned int uVar1;
+    unsigned int interruptLevel;
     RedTrackDATA* seInfo;
     RedTrackDATA** seInfoBase;
     int result;
     RedExecCommand* command;
 
-    uVar1 = OSDisableInterrupts();
+    interruptLevel = OSDisableInterrupts();
     result = 0;
     seInfoBase = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     seInfo = *seInfoBase;
@@ -1987,7 +1987,7 @@ int CRedDriver::SePlayState(int seID)
             }
         }
     }
-    OSRestoreInterrupts(uVar1);
+    OSRestoreInterrupts(interruptLevel);
     return result;
 }
 

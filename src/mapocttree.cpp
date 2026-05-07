@@ -1876,11 +1876,11 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 		if (mapHit != 0) {
 			PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(m_mapObject) + 0xB8), inverseMtx);
 			PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
-			PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
-			PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&s_cyl.m_radius));
+			PSMTXMultVec(inverseMtx, &cylinder->m_top, &s_cyl.m_direction);
+			PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, reinterpret_cast<Vec*>(&s_cyl.m_radius));
 			PSMTXMultVecSR(inverseMtx, move, &s_mvec);
 
-			s_cyl.m_top.y = cylinder->m_top.y;
+			s_cyl.m_top.y = cylinder->m_radius;
 			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
 			if (s_cyl.m_bottom.x < s_cyl.m_direction.x) {
 				s_cyl.m_top.z = s_cyl.m_bottom.x - radiusPad;
@@ -2099,11 +2099,11 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
 		if (mapHit != 0) {
 			PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(m_mapObject) + 0xB8), inverseMtx);
 			PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
-			PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
-			PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&s_cyl.m_radius));
+			PSMTXMultVec(inverseMtx, &cylinder->m_top, &s_cyl.m_direction);
+			PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, reinterpret_cast<Vec*>(&s_cyl.m_radius));
 			PSMTXMultVecSR(inverseMtx, move, &s_mvec);
 
-			s_cyl.m_top.y = cylinder->m_top.y;
+			s_cyl.m_top.y = cylinder->m_radius;
 			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
 			if (s_cyl.m_bottom.x < s_cyl.m_direction.x) {
 				s_cyl.m_top.z = s_cyl.m_bottom.x - radiusPad;

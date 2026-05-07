@@ -1194,14 +1194,14 @@ static void __MidiCtrl_KeyOffVelocity(RedSoundCONTROL* control, RedKeyOnDATA* ke
 static void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int waveNo;
-    int waveTable;
+    int* waveTable;
 
     track->m_waveData = 0;
     track->m_waveBase = 0;
     waveNo = *track->m_command++;
     if ((track->m_waveBankData != 0) && (waveNo < track->m_waveBankData->m_tableCount)) {
-        waveTable = (int)track->m_waveBankData->m_waveOffsets;
-        track->m_waveData = (RedWaveDATA*)((int)track->m_waveBankData + *(int*)(waveTable + waveNo * 4));
+        waveTable = track->m_waveBankData->m_waveOffsets;
+        track->m_waveData = (RedWaveDATA*)((int)track->m_waveBankData + waveTable[waveNo]);
         track->m_waveBase = track->m_waveBankData->m_aramAddress;
         memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
     }

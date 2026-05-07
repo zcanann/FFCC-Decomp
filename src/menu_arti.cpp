@@ -325,27 +325,14 @@ void CMenuPcs::ArtiDraw()
 					u += fillW;
 				}
 
-				if (fillW > 0.0f && fillW < w) {
-					GXColor fadeColors[4];
-					fadeColors[0].r = 0xFF;
-					fadeColors[0].g = 0xFF;
-					fadeColors[0].b = 0xFF;
-					fadeColors[0].a = 0;
-					fadeColors[1].r = 0xFF;
-					fadeColors[1].g = 0xFF;
-					fadeColors[1].b = 0xFF;
-					fadeColors[1].a = 0;
-					fadeColors[2].r = 0xFF;
-					fadeColors[2].g = 0xFF;
-					fadeColors[2].b = 0xFF;
-					fadeColors[2].a = 0;
-					fadeColors[3].r = 0xFF;
-					fadeColors[3].g = 0xFF;
-					fadeColors[3].b = 0xFF;
-					fadeColors[3].a = 0;
-					float remainW = (1.0f / (float)*(int*)(entry + 0x14)) * w;
+				if (fillW > 0.0f && fillW < (float)entry[2]) {
+					colors[0].a = 0;
+					colors[1].a = 0;
+					colors[2].a = 0;
+					colors[3].a = 0;
+					float remainW = (float)(DOUBLE_80332fb0 / (double)*(int*)(entry + 0x14)) * (float)entry[2];
 					DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-						&MenuPcs, 0, x, y, remainW, h, u, v, fadeColors, 1.0f, 1.0f, 0.0f);
+						&MenuPcs, 0, x, y, remainW, h, u, v, colors, 1.0f, 1.0f, 0.0f);
 				}
 
 				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);

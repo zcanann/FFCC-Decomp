@@ -3,8 +3,18 @@
 
 #include "ffcc/partMng.h"
 
-struct PYmMegaBirthShpTail2 : _PARTICLE_DATA
+struct PYmMegaBirthShpTail2
 {
+    Mtx m_matrix;                 // 0x00
+    Vec m_directionTail;          // 0x30
+    float m_colorDeltaAdd[4];     // 0x3c
+    float m_sizeStart;            // 0x4c
+    float m_sizeVal;              // 0x50
+    float m_speedRandRange;       // 0x54
+    float field_0x58;             // 0x58
+    Vec m_speedScale;             // 0x5c
+    unsigned char m_pad0x68[0x6a - 0x68];
+    unsigned char m_randType;     // 0x6a
 };
 
 struct pppYmMegaBirthShpTail2

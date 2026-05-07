@@ -294,7 +294,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     static const char s_pppYmEnv_cpp[] = "pppYmEnv.cpp";
     static const char s_exiting[] = "Exiting";
     const int ringVertexCount = detail + 1;
-    const unsigned int displayListSize =
+    unsigned long displayListSize =
         ((ringVertexCount + (detail - 2) * ringVertexCount * 2) * 6 * sizeof(float) + 0x1F) & ~0x1F;
 
     DCInvalidateRange(displayListBuffer, displayListSize);

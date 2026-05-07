@@ -8,7 +8,6 @@
 
 struct Vec;
 
-void mapInitDrawEnv();
 extern const float kMapBoundsCenterScale;
 extern const float kMapCameraCenterYOffset;
 

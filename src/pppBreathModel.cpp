@@ -483,6 +483,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
  */
 extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
 {
+    _pppPObject* object;
+    _pppMngSt* mngSt;
     int colorOffset;
     int* dataOffsets;
     VBreathModel* work;
@@ -511,10 +513,10 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         return;
     }
 
-    _pppPObject* object = reinterpret_cast<_pppPObject*>(breathModel);
+    object = reinterpret_cast<_pppPObject*>(breathModel);
+    mngSt = pppMngStPtr;
 
     dataOffsets = offsets->m_serializedDataOffsets;
-    _pppMngSt* mngSt = pppMngStPtr;
     colorOffset = dataOffsets[1];
     work = reinterpret_cast<VBreathModel*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + dataOffsets[0]);
     color = (VColor*)(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);

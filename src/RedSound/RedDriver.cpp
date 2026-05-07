@@ -349,8 +349,12 @@ static void _SetReverbDepth(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd048
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SetMusicData(int* command)
 {
@@ -359,8 +363,12 @@ static void _SetMusicData(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd080
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _MusicStop(int* command)
 {
@@ -481,8 +489,12 @@ static void _MusicCrossPlaySequence(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd404
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _MusicNextPlaySequence(int* command)
 {
@@ -503,8 +515,12 @@ static void _MusicNextPlaySequence(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd4a8
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _MusicMasterVolume(int* command)
 {
@@ -525,8 +541,12 @@ static void _MusicMasterVolume(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd51c
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _MusicVolume(int* command)
 {
@@ -539,8 +559,12 @@ static void _MusicVolume(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd578
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SetMusicPhraseStop(int* command)
 {
@@ -549,8 +573,12 @@ static void _SetMusicPhraseStop(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd584
+ * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SetSeBlockData(int* command)
 {
@@ -577,8 +605,12 @@ static void _SetSeBlockData(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd6b0
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SetSeSepData(int* command)
 {
@@ -587,8 +619,12 @@ static void _SetSeSepData(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd6e8
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _ClearSeSepData(int* command)
 {
@@ -597,8 +633,12 @@ static void _ClearSeSepData(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd720
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _ClearSeSepDataMG(int* command)
 {
@@ -607,8 +647,12 @@ static void _ClearSeSepDataMG(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd764
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SeStop(int* command)
 {
@@ -617,8 +661,12 @@ static void _SeStop(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd794
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SeStopMG(int* command)
 {
@@ -627,8 +675,12 @@ static void _SeStopMG(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd7d0
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SeBlockPlay(int* command)
 {
@@ -638,8 +690,12 @@ static void _SeBlockPlay(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd818
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SeSepPlay(int* command)
 {
@@ -655,8 +711,12 @@ static void _SeSepPlay(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd884
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SeSepPlaySequence(int* command)
 {
@@ -668,8 +728,12 @@ static void _SeSepPlaySequence(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd8e0
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SeMasterVolume(int* command)
 {
@@ -690,8 +754,12 @@ static void _SeMasterVolume(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd954
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SeVolume(int* command)
 {
@@ -700,8 +768,12 @@ static void _SeVolume(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd990
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SePan(int* command)
 {
@@ -710,8 +782,12 @@ static void _SePan(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd9c8
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SePitch(int* command)
 {
@@ -720,8 +796,12 @@ static void _SePitch(int* command)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bda00
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _SePause(int* command)
 {
@@ -876,8 +956,12 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bdcb8
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned int GetMyEntryID()
 {
@@ -935,8 +1019,12 @@ void RedSleep(int microseconds)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bddbc
+ * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static int _MainThread(void*)
 {
@@ -1305,8 +1393,12 @@ static int _MusicSkipThread(void*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801be5d0
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void _RedAXCallback()
 {
@@ -1317,8 +1409,12 @@ static void _RedAXCallback()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801be608
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CRedDriver::CRedDriver()
 {
@@ -1718,8 +1814,12 @@ void CRedDriver::MusicVolume(int musicID, int volume, int frameCount)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf07c
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedDriver::SetMusicPhraseStop(int stop)
 {
@@ -1823,8 +1923,12 @@ void CRedDriver::ClearSeSepDataMG(int id1, int id2, int id3, int id4)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf328
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CRedDriver::ReentrySeSepData(int id)
 {
@@ -2023,8 +2127,12 @@ void CRedDriver::SePause(int seID, int pause)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf7d4
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CRedDriver::GetSeVolume(int seID, int mode)
 {
@@ -2078,8 +2186,12 @@ int CRedDriver::ReportSeLoop(int seID)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf8c0
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedDriver::DisplaySePlayInfo()
 {
@@ -2316,8 +2428,12 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bfd74
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CRedDriver::ReentryWaveData(int id)
 {

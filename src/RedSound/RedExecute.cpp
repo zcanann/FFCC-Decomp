@@ -2660,7 +2660,7 @@ static int _SeMidiNoteExecute(
     RedTrackDATA* track = trackData;
     do {
         if ((track->m_command != 0) && ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAUSE) == 0)) {
-            track->m_seTickCounter += (s16)(tickStep * -REDSOUND_SE_TICK_STEP);
+            track->m_seTickCounter -= tickStep * REDSOUND_SE_TICK_STEP;
             while (track->m_seTickCounter < 1) {
                 int step = frames;
                 track->m_seTickCounter += REDSOUND_CONTROL_TICK_PERIOD;

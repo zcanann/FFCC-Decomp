@@ -1823,24 +1823,22 @@ static void _KeyOnControl()
  */
 static void _ExecuteExtraData()
 {
-    u32* sound = (u32*)p_SoundControlBuffer;
-    u32* soundBase;
     RedSoundCONTROL* soundControl;
     RedVoiceDATA* voice;
     RedTrackDATA* track;
     RedTrackDATA* musicBase;
 
+    soundControl = p_SoundControlBuffer;
     do {
-        soundControl = (RedSoundCONTROL*)sound;
-        if ((soundControl->m_masterVolumeDelta != 0) && (*sound != 0)) {
+        if ((soundControl->m_masterVolumeDelta != 0) && (soundControl->m_tracks != 0)) {
             soundControl->m_masterVolumeDelta--;
             soundControl->m_masterVolume += soundControl->m_masterVolumeAdd;
             if ((soundControl->m_masterVolumeDelta == 0) && (soundControl->m_masterVolumeAdd < 0)) {
                 MusicStop(soundControl->m_musicId);
             }
 
-            if (*sound != 0) {
-                musicBase = (RedTrackDATA*)*sound;
+            if (soundControl->m_tracks != 0) {
+                musicBase = soundControl->m_tracks;
                 voice = p_VoiceData;
                 do {
                     if ((musicBase <= voice->m_track) &&
@@ -1851,9 +1849,8 @@ static void _ExecuteExtraData()
                 } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
             }
         }
-        soundBase = (u32*)p_SoundControlBuffer;
-        sound += REDSOUND_CONTROL_WORD_COUNT;
-    } while (sound < (u32*)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_END_WORD_OFFSET);
+        soundControl = (RedSoundCONTROL*)((u32*)soundControl + REDSOUND_CONTROL_WORD_COUNT);
+    } while ((u32*)soundControl < (u32*)p_SoundControlBuffer + REDSOUND_CONTROL_SECONDARY_END_WORD_OFFSET);
 
     if (p_MusicTempoControl->m_count != 0) {
         p_MusicTempoControl->m_count--;
@@ -1877,8 +1874,8 @@ static void _ExecuteExtraData()
         } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
     }
 
+    soundControl = p_SoundControlBuffer;
     do {
-        soundControl = (RedSoundCONTROL*)soundBase;
         if ((soundControl->m_tickCounter != 0) && (soundControl->m_volumeDelta != 0)) {
             soundControl->m_volumeDelta--;
             soundControl->m_volume += soundControl->m_volumeAdd;
@@ -1902,8 +1899,8 @@ static void _ExecuteExtraData()
                 } while (track < soundControl->m_tracks + soundControl->m_trackCount);
             }
         }
-        soundBase += REDSOUND_CONTROL_WORD_COUNT;
-    } while (soundBase < (u32*)p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_END_WORD_OFFSET);
+        soundControl = (RedSoundCONTROL*)((u32*)soundControl + REDSOUND_CONTROL_WORD_COUNT);
+    } while ((u32*)soundControl < (u32*)p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_END_WORD_OFFSET);
 }
 
 /*

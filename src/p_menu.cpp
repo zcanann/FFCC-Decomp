@@ -564,14 +564,16 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 {
     CMemory::CStage* stage = 0;
 
-    if (type == 1) {
-        stage = m_stageF0;
-    } else if (type < 1) {
-        if (type >= 0) {
-            stage = m_menuStage;
+    if (type != 1) {
+        if (type < 1) {
+            if (type >= 0) {
+                stage = m_menuStage;
+            }
+        } else if (type < 3) {
+            stage = PartMng.m_pppEnvSt.m_stagePtr;
         }
-    } else if (type < 3) {
-        stage = PartMng.m_pppEnvSt.m_stagePtr;
+    } else {
+        stage = m_stageF0;
     }
 
     if ((slot == 0) && (FontMan.m_font != 0)) {

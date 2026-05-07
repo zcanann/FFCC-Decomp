@@ -5,6 +5,12 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
+struct PObjPointDataVal {
+    void* m_programSetDef;
+    s32 m_sourceOffset;
+    u8 _pad8[0x8];
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80060AEC
@@ -30,9 +36,9 @@ void pppPObjPoint(_pppPObject* pObject, pppPObjPointStep* step, _pppCtrlTable* c
             vecPtr = gPppDefaultValueBuffer;
         } else {
             u8* data = step->m_sourceObject;
-            _pppPDataVal* pDataVal = pppMngStPtr->m_pppPDataVals;
+            PObjPointDataVal* pDataVal = (PObjPointDataVal*)pppMngStPtr->m_pppPDataVals;
             pDataVal = &pDataVal[step->m_createProgramIndex];
-            s32 vecOffset = pDataVal->m_nextSpawnTime;
+            s32 vecOffset = pDataVal->m_sourceOffset;
             vecPtr = data + 0x80;
             vecPtr += vecOffset;
         }

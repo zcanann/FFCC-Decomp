@@ -1654,7 +1654,7 @@ void EnvelopeKeyExecute()
 static void _KeyOnControl()
 {
     u32 voiceStartMask[2];
-    int* reserve;
+    RedKeyOnSlot* reserve;
     RedVoiceDATA* voiceData;
     int (*waveFunc)(int);
 
@@ -1663,14 +1663,14 @@ static void _KeyOnControl()
     voiceStartMask[1] = 0;
 
     if (m_KeyOnEntry != 0) {
-        reserve = (int*)p_KeyOnData;
+        reserve = p_KeyOnData->m_fixed;
         voiceData = p_VoiceData;
         do {
-            if (((u32)*reserve != 0) && (((RedTrackDATA*)*reserve)->m_waveData != 0)) {
-                voiceData = _VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)voiceStartMask);
+            if ((reserve->m_track != 0) && (reserve->m_track->m_waveData != 0)) {
+                voiceData = _VoiceDataSelect(reserve->m_track, &reserve->m_note, (int*)voiceStartMask);
             }
-            reserve += 2;
-        } while ((voiceData != 0) && (reserve < (int*)p_KeyOnData + REDSOUND_KEY_ON_TOTAL_WORD_COUNT));
+            reserve++;
+        } while ((voiceData != 0) && (reserve < p_KeyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT));
     }
 
     if ((p_SoundControlBuffer->m_activeTrackCount != 0) &&

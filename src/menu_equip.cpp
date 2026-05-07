@@ -54,6 +54,7 @@ extern const float FLOAT_80332ef4;
 extern const float FLOAT_80332ef8;
 extern const float FLOAT_80332efc;
 extern const float FLOAT_80332f00;
+extern const double DOUBLE_80332F08;
 extern const float FLOAT_80332f10;
 extern const float FLOAT_80332f14;
 extern const float FLOAT_80332f18;
@@ -445,8 +446,7 @@ int CMenuPcs::EquipOpen()
 			*(int*)(puVar9 + 0xe) = 0x34;
 			puVar9[2] = 200;
 			puVar9[3] = 0x28;
-			*puVar9 =
-			    (s16)(int)-(((double)(((u64)((u32)(u16)puVar9[2] ^ 0x80000000U)) | 0x4330000000000000ULL) - dVar4) * dVar3 - dVar2);
+			*puVar9 = (s16)(int)-(((double)puVar9[2] - dVar4) * dVar3 - dVar2);
 			puVar9[1] = (s16)iVar6 * (puVar9[3] - 8) + 0x60;
 			*(float*)(puVar9 + 4) = fVar1;
 			*(float*)(puVar9 + 6) = fVar1;
@@ -456,8 +456,7 @@ int CMenuPcs::EquipOpen()
 			*(int*)(puVar9 + 0x2e) = 0x34;
 			puVar9[0x22] = 200;
 			puVar9[0x23] = 0x28;
-			puVar9[0x20] =
-			    (s16)(int)-(((double)(((u64)((u32)(u16)puVar9[0x22] ^ 0x80000000U)) | 0x4330000000000000ULL) - dVar4) * dVar3 - dVar2);
+			puVar9[0x20] = (s16)(int)-(((double)puVar9[0x22] - dVar4) * dVar3 - dVar2);
 			puVar9[0x21] = (s16)(iVar6 + 1) * (puVar9[0x23] - 8) + 0x60;
 			*(float*)(puVar9 + 0x24) = fVar1;
 			*(float*)(puVar9 + 0x26) = fVar1;
@@ -501,10 +500,8 @@ int CMenuPcs::EquipOpen()
 					*(float*)(psVar7 + 8) = FLOAT_80332ee0;
 				} else {
 					*(int*)(psVar7 + 0x10) = *(int*)(psVar7 + 0x10) + 1;
-					dVar20 = (double)(((u64)((u32)*(u32*)(psVar7 + 0x14) ^ 0x80000000U)) | 0x4330000000000000ULL);
-					*(float*)(psVar7 + 8) =
-					    (float)((DOUBLE_80332ec0 / (dVar20 - dVar2)) *
-					            ((double)(((u64)((u32)*(u32*)(psVar7 + 0x10) ^ 0x80000000U)) | 0x4330000000000000ULL) - dVar2));
+					dVar20 = (double)*(int*)(psVar7 + 0x14);
+					*(float*)(psVar7 + 8) = (float)((DOUBLE_80332ec0 / dVar20) * (double)*(int*)(psVar7 + 0x10));
 				}
 			}
 			psVar7 += 0x20;
@@ -518,45 +515,29 @@ int CMenuPcs::EquipOpen()
 			uVar12 = uVar8 >> 3;
 			if (uVar12 != 0) {
 				do {
-					psVar7[0x12] = 0;
-					psVar7[0x13] = 0;
-					psVar7[0x14] = 0;
-					psVar7[0x15] = 1;
+					*reinterpret_cast<int*>(psVar7 + 0x12) = 0;
+					*reinterpret_cast<int*>(psVar7 + 0x14) = 1;
 					*(float*)(psVar7 + 8) = fVar5;
-					psVar7[0x32] = 0;
-					psVar7[0x33] = 0;
-					psVar7[0x34] = 0;
-					psVar7[0x35] = 1;
+					*reinterpret_cast<int*>(psVar7 + 0x32) = 0;
+					*reinterpret_cast<int*>(psVar7 + 0x34) = 1;
 					*(float*)(psVar7 + 0x28) = fVar5;
-					psVar7[0x52] = 0;
-					psVar7[0x53] = 0;
-					psVar7[0x54] = 0;
-					psVar7[0x55] = 1;
+					*reinterpret_cast<int*>(psVar7 + 0x52) = 0;
+					*reinterpret_cast<int*>(psVar7 + 0x54) = 1;
 					*(float*)(psVar7 + 0x48) = fVar5;
-					psVar7[0x72] = 0;
-					psVar7[0x73] = 0;
-					psVar7[0x74] = 0;
-					psVar7[0x75] = 1;
+					*reinterpret_cast<int*>(psVar7 + 0x72) = 0;
+					*reinterpret_cast<int*>(psVar7 + 0x74) = 1;
 					*(float*)(psVar7 + 0x68) = fVar5;
-					psVar7[0x92] = 0;
-					psVar7[0x93] = 0;
-					psVar7[0x94] = 0;
-					psVar7[0x95] = 1;
+					*reinterpret_cast<int*>(psVar7 + 0x92) = 0;
+					*reinterpret_cast<int*>(psVar7 + 0x94) = 1;
 					*(float*)(psVar7 + 0x88) = fVar5;
-					psVar7[0xb2] = 0;
-					psVar7[0xb3] = 0;
-					psVar7[0xb4] = 0;
-					psVar7[0xb5] = 1;
+					*reinterpret_cast<int*>(psVar7 + 0xb2) = 0;
+					*reinterpret_cast<int*>(psVar7 + 0xb4) = 1;
 					*(float*)(psVar7 + 0xa8) = fVar5;
-					psVar7[0xd2] = 0;
-					psVar7[0xd3] = 0;
-					psVar7[0xd4] = 0;
-					psVar7[0xd5] = 1;
+					*reinterpret_cast<int*>(psVar7 + 0xd2) = 0;
+					*reinterpret_cast<int*>(psVar7 + 0xd4) = 1;
 					*(float*)(psVar7 + 200) = fVar5;
-					psVar7[0xf2] = 0;
-					psVar7[0xf3] = 0;
-					psVar7[0xf4] = 0;
-					psVar7[0xf5] = 1;
+					*reinterpret_cast<int*>(psVar7 + 0xf2) = 0;
+					*reinterpret_cast<int*>(psVar7 + 0xf4) = 1;
 					*(float*)(psVar7 + 0xe8) = fVar5;
 					psVar7 += 0x100;
 					uVar12--;
@@ -568,10 +549,8 @@ int CMenuPcs::EquipOpen()
 			}
 
 			do {
-				psVar7[0x12] = 0;
-				psVar7[0x13] = 0;
-				psVar7[0x14] = 0;
-				psVar7[0x15] = 1;
+				*reinterpret_cast<int*>(psVar7 + 0x12) = 0;
+				*reinterpret_cast<int*>(psVar7 + 0x14) = 1;
 				*(float*)(psVar7 + 8) = fVar5;
 				psVar7 += 0x20;
 				uVar8--;
@@ -668,11 +647,12 @@ int CMenuPcs::EquipClose()
 				*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
 			} else {
 				*reinterpret_cast<int*>(item + 0x10) = *reinterpret_cast<int*>(item + 0x10) + 1;
-				float ratio = FLOAT_80332ee0 -
-				              (static_cast<float>(*reinterpret_cast<int*>(item + 0x10)) /
-				               static_cast<float>(*reinterpret_cast<int*>(item + 0x14)));
-				*reinterpret_cast<float*>(item + 8) = ratio;
-				if (*reinterpret_cast<float*>(item + 8) < FLOAT_80332eb8) {
+				*reinterpret_cast<float*>(item + 8) =
+				    (float)-((DOUBLE_80332ec0 /
+				              (static_cast<double>(*reinterpret_cast<int*>(item + 0x14)) - DOUBLE_80332ed8)) *
+				                 (static_cast<double>(*reinterpret_cast<int*>(item + 0x10)) - DOUBLE_80332ed8) -
+				             DOUBLE_80332ec0);
+				if ((double)*reinterpret_cast<float*>(item + 8) < DOUBLE_80332F08) {
 					*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
 				}
 			}
@@ -684,9 +664,7 @@ int CMenuPcs::EquipClose()
 		item = menuData + 4;
 		for (int i = 0; i < itemCount; i++) {
 			*reinterpret_cast<int*>(item + 0x12) = 0;
-			*reinterpret_cast<int*>(item + 0x13) = 0;
-			*reinterpret_cast<int*>(item + 0x14) = 0;
-			*reinterpret_cast<int*>(item + 0x15) = 1;
+			*reinterpret_cast<int*>(item + 0x14) = 1;
 			*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
 			item += 0x20;
 		}
@@ -1041,11 +1019,12 @@ bool CMenuPcs::EquipOpen0()
 				if (timer < *(int*)(item + 0x12) + *(int*)(item + 0x14)) {
 					*(int*)(item + 0x10) = *(int*)(item + 0x10) + 1;
 					dVar2 = DOUBLE_80332ec0;
-					*(float*)(item + 8) = (float)((DOUBLE_80332ec0 / (double)*(int*)(item + 0x14)) * (double)*(int*)(item + 0x10));
+					*(float*)(item + 8) =
+					    (float)((DOUBLE_80332ec0 / (double)*(int*)(item + 0x14)) * (double)*(int*)(item + 0x10));
 					if ((*(unsigned int*)(item + 0x16) & 2) == 0) {
 						fVar1 = (float)((dVar2 / (double)*(int*)(item + 0x14)) * (double)*(int*)(item + 0x10));
-						*(float*)(item + 0x18) = (*(float*)(item + 0x1c) - (float)(double)(int)*item) * fVar1;
-						*(float*)(item + 0x1a) = (*(float*)(item + 0x1e) - (float)(double)(int)item[1]) * fVar1;
+						*(float*)(item + 0x18) = (*(float*)(item + 0x1c) - (float)(double)*item) * fVar1;
+						*(float*)(item + 0x1a) = (*(float*)(item + 0x1e) - (float)(double)item[1]) * fVar1;
 					}
 				} else {
 					doneCount = doneCount + 1;
@@ -1059,7 +1038,10 @@ bool CMenuPcs::EquipOpen0()
 		} while (remaining != 0);
 	}
 
-	return itemCount == doneCount;
+	if (itemCount == doneCount) {
+		return true;
+	}
+	return false;
 }
 
 /*
@@ -1105,23 +1087,12 @@ bool CMenuPcs::EquipClose0()
 					*(int*)(item + 0x10) = *(int*)(item + 0x10) + 1;
 					dVar2 = DOUBLE_80332ec0;
 					*(float*)(item + 8) =
-					    (float)-((DOUBLE_80332ec0 /
-					              ((double)(((unsigned int)*(unsigned int*)(item + 0x14) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
-					             ((double)(((unsigned int)*(unsigned int*)(item + 0x10) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3) -
+					    (float)-((DOUBLE_80332ec0 / (double)*(int*)(item + 0x14)) * (double)*(int*)(item + 0x10) -
 					             DOUBLE_80332ec0);
 					if ((*(unsigned int*)(item + 0x16) & 2) == 0) {
-						fVar1 = (float)-((dVar2 /
-						                  ((double)(((unsigned int)*(unsigned int*)(item + 0x14) ^ 0x80000000U) | 0x4330000000000000ULL) -
-						                   dVar3)) *
-						                 ((double)(((unsigned int)*(unsigned int*)(item + 0x10) ^ 0x80000000U) | 0x4330000000000000ULL) -
-						                  dVar3) -
-						                 dVar2);
-						*(float*)(item + 0x18) =
-						    (*(float*)(item + 0x1c) - (float)((double)(((unsigned int)(int)*item ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
-						    fVar1;
-						*(float*)(item + 0x1a) =
-						    (*(float*)(item + 0x1e) - (float)((double)(((unsigned int)(int)item[1] ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
-						    fVar1;
+						fVar1 = (float)-((dVar2 / (double)*(int*)(item + 0x14)) * (double)*(int*)(item + 0x10) - dVar2);
+						*(float*)(item + 0x18) = (*(float*)(item + 0x1c) - (float)(double)*item) * fVar1;
+						*(float*)(item + 0x1a) = (*(float*)(item + 0x1e) - (float)(double)item[1]) * fVar1;
 					}
 				} else {
 					doneCount = doneCount + 1;
@@ -1137,12 +1108,11 @@ bool CMenuPcs::EquipClose0()
 
 	if (itemCount == doneCount) {
 		selected = (s16*)(GetEquipListBase(this) + selectedOffset);
-		*selected = (s16)(int)-(((double)(((unsigned int)(short)selected[2] ^ 0x80000000U) | 0x4330000000000000ULL) - DOUBLE_80332ed8) *
-		                        DOUBLE_80332ed0 -
-		                        DOUBLE_80332ec8);
+		*selected = (s16)(int)-(((double)selected[2] - DOUBLE_80332ed8) * DOUBLE_80332ed0 - DOUBLE_80332ec8);
+		return true;
 	}
 
-	return itemCount == doneCount;
+	return false;
 }
 
 /*

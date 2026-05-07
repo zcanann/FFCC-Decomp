@@ -264,7 +264,7 @@ struct _pppMngSt
     Vec m_scale;                       // 0x28
     int m_currentFrame;                // 0x34
     int m_previousFrame;               // 0x38
-    int m_numControlPrograms;          // 0x3C
+    int m_field3C;                     // 0x3C
     float m_scaleFactor;               // 0x40
     float m_ownerScale;                // 0x44
     float m_userFloat0;                // 0x48
@@ -281,12 +281,12 @@ struct _pppMngSt
     unsigned char m_envColorA;         // 0xAB
     int m_spawnedCount;                // 0xAC
     int m_previousFrame2;              // 0xB0
-    int m_numPrograms;                 // 0xB4
-    int m_reservedB8;                  // 0xB8
+    int m_numControlPrograms;          // 0xB4
+    int m_numPrograms;                 // 0xB8
     unsigned int m_objHitMask;         // 0xBC
     unsigned int m_cylinderAttribute;  // 0xC0
     _pppPObjLink m_pppPObjLinkHead;    // 0xC4 (size 0xC)
-    void* m_controlProgramTable;       // 0xD0
+    void* m_programTable;              // 0xD0
     _pppPDataVal* m_pppPDataVals;      // 0xD4
     void* m_owner;                     // 0xD8
     void* m_lookTarget;                // 0xDC

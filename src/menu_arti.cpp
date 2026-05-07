@@ -83,6 +83,12 @@ struct ArtiOpenAnim {
 	float targetY;
 };
 
+struct ArtiOpenAnimList {
+	short count;
+	unsigned char pad_0002[6];
+	ArtiOpenAnim entries[64];
+};
+
 STATIC_ASSERT(offsetof(CMenuPcs, m_artiState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_artiList) == 0x850);
 STATIC_ASSERT(offsetof(ArtiState, initialized) == 0xB);
@@ -107,6 +113,8 @@ STATIC_ASSERT(offsetof(ArtiOpenAnim, dy) == 0x34);
 STATIC_ASSERT(offsetof(ArtiOpenAnim, targetX) == 0x38);
 STATIC_ASSERT(offsetof(ArtiOpenAnim, targetY) == 0x3C);
 STATIC_ASSERT(sizeof(ArtiOpenAnim) == 0x40);
+STATIC_ASSERT(offsetof(ArtiOpenAnimList, entries) == 8);
+STATIC_ASSERT(sizeof(ArtiOpenAnimList) == 0x1008);
 
 static inline ArtiState* GetArtiStateStruct(CMenuPcs* menu)
 {
@@ -121,6 +129,11 @@ static inline s16* GetArtiState(CMenuPcs* menu)
 static inline s16* GetArtiList(CMenuPcs* menu)
 {
 	return menu->m_artiList;
+}
+
+static inline ArtiOpenAnimList* GetArtiOpenAnimList(CMenuPcs* menu)
+{
+	return reinterpret_cast<ArtiOpenAnimList*>(menu->m_artiList);
 }
 
 static inline int GetArtiStateBase(CMenuPcs* menu)
@@ -602,71 +615,72 @@ bool CMenuPcs::ArtiOpen()
 void CMenuPcs::ArtiInit1()
 {
 	float fVar1;
-	int iVar2;
 	short* psVar3;
 	unsigned int uVar4;
 	unsigned int uVar5;
+	ArtiOpenAnimList* list;
 
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x24) = 0x2e;
-	*(int*)(iVar2 + 0x2c) = 2;
-	*(int*)(iVar2 + 0x30) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 100) = 0x44;
-	*(int*)(iVar2 + 0x6c) = 7;
-	*(int*)(iVar2 + 0x70) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0xa4) = 0x44;
-	*(int*)(iVar2 + 0xac) = 7;
-	*(int*)(iVar2 + 0xb0) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0xf4) = 2;
-	*(int*)(iVar2 + 0xe4) = 0x2e;
-	*(int*)(iVar2 + 0xec) = 7;
-	*(int*)(iVar2 + 0xf0) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x134) = 2;
-	*(int*)(iVar2 + 0x124) = 0x37;
-	*(int*)(iVar2 + 300) = 0;
-	*(int*)(iVar2 + 0x130) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x174) = 2;
-	*(int*)(iVar2 + 0x164) = 0x37;
-	*(int*)(iVar2 + 0x16c) = 0;
-	*(int*)(iVar2 + 0x170) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x1b4) = 2;
-	*(int*)(iVar2 + 0x1a4) = 0x37;
-	*(int*)(iVar2 + 0x1ac) = 0;
-	*(int*)(iVar2 + 0x1b0) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 500) = 2;
-	*(int*)(iVar2 + 0x1e4) = 0x37;
+	list = GetArtiOpenAnimList(this);
+	list->entries[0].tex = 0x2e;
+	list->entries[0].startFrame = 2;
+	list->entries[0].duration = 5;
+	list = GetArtiOpenAnimList(this);
+	list->entries[1].tex = 0x44;
+	list->entries[1].startFrame = 7;
+	list->entries[1].duration = 5;
+	list = GetArtiOpenAnimList(this);
+	list->entries[2].tex = 0x44;
+	list->entries[2].startFrame = 7;
+	list->entries[2].duration = 5;
+	list = GetArtiOpenAnimList(this);
+	list->entries[3].flags = 2;
+	list->entries[3].tex = 0x2e;
+	list->entries[3].startFrame = 7;
+	list->entries[3].duration = 5;
+	list = GetArtiOpenAnimList(this);
+	list->entries[4].flags = 2;
+	list->entries[4].tex = 0x37;
+	list->entries[4].startFrame = 0;
+	list->entries[4].duration = 5;
+	list = GetArtiOpenAnimList(this);
+	list->entries[5].flags = 2;
+	list->entries[5].tex = 0x37;
+	list->entries[5].startFrame = 0;
+	list->entries[5].duration = 5;
+	list = GetArtiOpenAnimList(this);
+	list->entries[6].flags = 2;
+	list->entries[6].tex = 0x37;
+	list->entries[6].startFrame = 0;
+	list->entries[6].duration = 5;
+	list = GetArtiOpenAnimList(this);
+	list->entries[7].flags = 2;
+	list->entries[7].tex = 0x37;
 	fVar1 = FLOAT_80332fac;
-	*(int*)(iVar2 + 0x1ec) = 0;
-	*(int*)(iVar2 + 0x1f0) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x234) = 2;
-	*(int*)(iVar2 + 0x224) = 0x37;
-	*(int*)(iVar2 + 0x22c) = 0;
-	*(int*)(iVar2 + 0x230) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x274) = 2;
-	*(int*)(iVar2 + 0x264) = 0x37;
-	*(int*)(iVar2 + 0x26c) = 0;
-	*(int*)(iVar2 + 0x270) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x2b4) = 2;
-	*(int*)(iVar2 + 0x2a4) = 0x37;
-	*(int*)(iVar2 + 0x2ac) = 0;
-	*(int*)(iVar2 + 0x2b0) = 5;
-	iVar2 = GetArtiListBase(this);
-	*(int*)(iVar2 + 0x2f4) = 2;
-	*(int*)(iVar2 + 0x2e4) = 0x37;
-	*(int*)(iVar2 + 0x2ec) = 0;
-	*(int*)(iVar2 + 0x2f0) = 5;
-	uVar4 = (unsigned int)*GetArtiList(this);
-	psVar3 = GetArtiList(this) + 4;
+	list->entries[7].startFrame = 0;
+	list->entries[7].duration = 5;
+	list = GetArtiOpenAnimList(this);
+	list->entries[8].flags = 2;
+	list->entries[8].tex = 0x37;
+	list->entries[8].startFrame = 0;
+	list->entries[8].duration = 5;
+	list = GetArtiOpenAnimList(this);
+	list->entries[9].flags = 2;
+	list->entries[9].tex = 0x37;
+	list->entries[9].startFrame = 0;
+	list->entries[9].duration = 5;
+	list = GetArtiOpenAnimList(this);
+	list->entries[10].flags = 2;
+	list->entries[10].tex = 0x37;
+	list->entries[10].startFrame = 0;
+	list->entries[10].duration = 5;
+	list = GetArtiOpenAnimList(this);
+	list->entries[11].flags = 2;
+	list->entries[11].tex = 0x37;
+	list->entries[11].startFrame = 0;
+	list->entries[11].duration = 5;
+	list = GetArtiOpenAnimList(this);
+	uVar4 = (unsigned int)list->count;
+	psVar3 = (short*)list->entries;
 	if (0 < (int)uVar4) {
 		uVar5 = uVar4 >> 3;
 		if (uVar5 != 0) {

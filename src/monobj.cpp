@@ -1773,17 +1773,17 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	if ((flags & 1) != 0) {
 		CMapCylinder hitCylinder;
 		hitCylinder.m_bottom = startPos;
-		hitCylinder.m_direction = move;
-		hitCylinder.m_radius = FLOAT_80331A34 * object->m_bodyEllipsoidRadius;
-		hitCylinder.m_height = FLOAT_80331A38;
-		hitCylinder.m_top.x = FLOAT_80331A3C;
-		hitCylinder.m_top.y = FLOAT_80331A3C;
-		hitCylinder.m_top.z = FLOAT_80331A3C;
-		hitCylinder.m_direction2.x = FLOAT_80331A38;
-		hitCylinder.m_direction2.y = FLOAT_80331A38;
-		hitCylinder.m_direction2.z = FLOAT_80331A38;
-		hitCylinder.m_radius2 = FLOAT_80331A38;
-		hitCylinder.m_height2 = FLOAT_80331A3C;
+		hitCylinder.m_top = move;
+		hitCylinder.m_axis.x = FLOAT_80331A34 * object->m_bodyEllipsoidRadius;
+		hitCylinder.m_axis.y = FLOAT_80331A38;
+		hitCylinder.m_axis.z = FLOAT_80331A3C;
+		hitCylinder.m_radius = FLOAT_80331A3C;
+		hitCylinder.m_boundsMin.x = FLOAT_80331A3C;
+		hitCylinder.m_boundsMin.y = FLOAT_80331A38;
+		hitCylinder.m_boundsMin.z = FLOAT_80331A38;
+		hitCylinder.m_boundsMax.x = FLOAT_80331A38;
+		hitCylinder.m_boundsMax.y = FLOAT_80331A38;
+		hitCylinder.m_boundsMax.z = FLOAT_80331A3C;
 
 		int hit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
 			&MapMng, &hitCylinder, &move, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
@@ -1794,7 +1794,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			PSVECScale(&move, &move, g_hit_t);
 			distance = static_cast<float>(static_cast<double>(distance) * static_cast<double>(g_hit_t));
 		}
-		AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(CFlat, &startPos, &move, hitCylinder.m_radius, 1, hit);
+		AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(CFlat, &startPos, &move, hitCylinder.m_axis.x, 1, hit);
 	}
 
 	if ((flags & 2) != 0) {
@@ -1873,17 +1873,17 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			didHit = 1;
 			CMapCylinder hitCylinder;
 			hitCylinder.m_bottom = startPos;
-			hitCylinder.m_direction = targetDelta;
-			hitCylinder.m_radius = FLOAT_80331A34 * object->m_bodyEllipsoidRadius;
-			hitCylinder.m_height = FLOAT_80331A38;
-			hitCylinder.m_top.x = FLOAT_80331A3C;
-			hitCylinder.m_top.y = FLOAT_80331A3C;
-			hitCylinder.m_top.z = FLOAT_80331A3C;
-			hitCylinder.m_direction2.x = FLOAT_80331A38;
-			hitCylinder.m_direction2.y = FLOAT_80331A38;
-			hitCylinder.m_direction2.z = FLOAT_80331A38;
-			hitCylinder.m_radius2 = FLOAT_80331A38;
-			hitCylinder.m_height2 = FLOAT_80331A3C;
+			hitCylinder.m_top = targetDelta;
+			hitCylinder.m_axis.x = FLOAT_80331A34 * object->m_bodyEllipsoidRadius;
+			hitCylinder.m_axis.y = FLOAT_80331A38;
+			hitCylinder.m_axis.z = FLOAT_80331A3C;
+			hitCylinder.m_radius = FLOAT_80331A3C;
+			hitCylinder.m_boundsMin.x = FLOAT_80331A3C;
+			hitCylinder.m_boundsMin.y = FLOAT_80331A38;
+			hitCylinder.m_boundsMin.z = FLOAT_80331A38;
+			hitCylinder.m_boundsMax.x = FLOAT_80331A38;
+			hitCylinder.m_boundsMax.y = FLOAT_80331A38;
+			hitCylinder.m_boundsMax.z = FLOAT_80331A3C;
 
 			int mapHit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
 				&MapMng, &hitCylinder, &targetDelta,
@@ -1893,7 +1893,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				PSVECScale(&debugDelta, &debugDelta, g_hit_t);
 			}
 			AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(
-				CFlat, &startPos, &debugDelta, hitCylinder.m_radius, 1, mapHit == 0);
+				CFlat, &startPos, &debugDelta, hitCylinder.m_axis.x, 1, mapHit == 0);
 
 			if (mapHit == 0) {
 				if (hitPartyIndex != NULL) {

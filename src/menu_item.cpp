@@ -590,12 +590,12 @@ void CMenuPcs::ItemDraw()
  */
 bool CMenuPcs::ItemClose()
 {
-    int finished = 0;
     this->itemMenuState->frame++;
 
     ItemMenuAnimList* itemList = this->itemList;
-    int count = itemList->count;
     MenuItemOpenAnim* anim = itemList->anims;
+    int finished = 0;
+    int count = itemList->count;
     int frame = this->itemMenuState->frame;
 
     for (int i = 0; i < count; i++, anim++) {
@@ -690,11 +690,11 @@ bool CMenuPcs::ItemOpen()
         ItemInit();
     }
 
-    int finished = 0;
     this->itemMenuState->frame++;
     ItemMenuAnimList* itemList = this->itemList;
-    int count = itemList->count;
     MenuItemOpenAnim* anim = itemList->anims;
+    int finished = 0;
+    int count = itemList->count;
     int frame = this->itemMenuState->frame;
 
     for (int i = 0; i < count; i++, anim++) {

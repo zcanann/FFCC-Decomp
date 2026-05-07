@@ -190,7 +190,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 }
 
-static const char s_locationNodeName[] = "loc";
+extern const char s_locationNodeName[] = "loc";
 
 /*
  * --INFO--

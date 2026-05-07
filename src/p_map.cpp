@@ -658,16 +658,6 @@ void CMapPcs::drawShadow()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void mapInitDrawEnv()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800353f4
  * PAL Size: 524b
  * EN Address: TODO

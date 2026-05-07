@@ -62,7 +62,15 @@ extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
 extern "C" void* __vt__14CFunnyShapePcs[];
 static const char lbl_801D7DD0[] = "CFunnyShapePcs(VIEWER)";
-extern const char s_CFunnyShapePcs[];
+static const Vec s_funnyEye = {0.0f, 0.0f, 4.0f};
+static const Vec s_funnyAt = {0.0f, 0.0f, 0.0f};
+static const Vec s_funnyUp = {0.0f, 1.0f, 0.0f};
+const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
+static const char s_CManager_801D7E1C[] = "CManager";
+static const char s_CProcess_801D7E28[] = "CProcess";
+static const char s_funnyShapeFmt[] = "FunnyShape [%c]";
+static const char s_CPtrArray_OSFS_TEXTURE_ST_801D7E44[] = "CPtrArray<OSFS_TEXTURE_ST *>";
+static const char s_CPtrArray_GXTexObj[] = "CPtrArray<_GXTexObj *>";
 extern char lbl_8032E660[];
 extern u8 ARRAY_8026D728[];
 
@@ -149,8 +157,6 @@ void CFunnyShapePcs::drawViewer()
     Vec eye = {0.0f, 0.0f, 4.0f};
     Vec at = {0.0f, 0.0f, 0.0f};
     Vec up = {0.0f, 1.0f, 0.0f};
-    static const char s_funnyShapeFmt[] = "FunnyShape [%c]";
-
     C_MTXOrtho(ortho, kFunnyShapeNdcMax, kFunnyShapeNdcMin, kFunnyShapeNdcMin, kFunnyShapeNdcMax, kFunnyShapeNdcMax, kFunnyShapeOrthoFarZ);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);
     C_MTXLookAt(view, reinterpret_cast<Point3d*>(&eye), &up, reinterpret_cast<Point3d*>(&at));
@@ -186,8 +192,6 @@ void CFunnyShapePcs::drawViewer()
         Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), pFan[frame % 4]);
     }
 }
-
-const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 
 /*
  * --INFO--

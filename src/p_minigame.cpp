@@ -1110,7 +1110,7 @@ retry_loop:
                             if (!failed)
                             {
                                 reinterpret_cast<void (*)(MgGbaThreadParam*, void*)>(*reinterpret_cast<void**>(param + 0x24))(
-                                    reinterpret_cast<MgGbaThreadParam*>(param), reinterpret_cast<void*>(param));
+                                    reinterpret_cast<MgGbaThreadParam*>(param), reinterpret_cast<void*>(message));
                                 goto receive_message;
                             }
                         }
@@ -1188,7 +1188,7 @@ retry_loop:
                         if (!failed)
                         {
                             reinterpret_cast<void (*)(MgGbaThreadParam*, void*)>(*reinterpret_cast<void**>(param + 0x24))(
-                                reinterpret_cast<MgGbaThreadParam*>(param), reinterpret_cast<void*>(param));
+                                reinterpret_cast<MgGbaThreadParam*>(param), reinterpret_cast<void*>(message));
                             goto receive_message;
                         }
                     }
@@ -1379,7 +1379,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
             {
                 Printf__7CSystemFPce(&System, s_miniGameConnectedLineFmt, static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), 0x3FC);
             }
-            Printf__7CSystemFPce(&System, s_miniGameSetPortFmt, static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), 0x403);
+            Printf__7CSystemFPce(&System, s_miniGameSetPortFmt, static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), MG_GBA_THREAD_MSG_SETPORT_ct);
             OSSendMessage(reinterpret_cast<OSMessageQueue*>(paramBytes), reinterpret_cast<OSMessage>(5), 1);
         }
         else

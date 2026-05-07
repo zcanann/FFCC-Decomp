@@ -52,7 +52,7 @@ extern "C" void* __vt__8CMonWork[];
 extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
 extern float FLOAT_803309a8;
-extern char lbl_801D9F20[];
+extern char lbl_801D9EC8[];
 static const char DAT_801d9ff0[] = {
 	(char)0x81, (char)0x69, (char)0x82, (char)0xC8, (char)0x82, (char)0xDC, (char)0x82, (char)0xA6,
 	(char)0x82, (char)0xC8, (char)0x82, (char)0xB5, (char)0x81, (char)0x6A, 0x00, 0x00
@@ -2485,27 +2485,29 @@ void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
  */
 void CCaravanWork::SortBeforeReturnWorldMap()
 {
+	char* fmtBase = lbl_801D9EC8;
+
 	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
 
 	for (int i = 0; i < 0x40; i++) {
-		Printf__7CSystemFPce(&System, lbl_801D9F20 + 0xC, i, m_inventoryItems[i]);
+		Printf__7CSystemFPce(&System, fmtBase + 0x64, i, m_inventoryItems[i]);
 	}
 
 	for (int i = 2; i < 8; i++) {
-		Printf__7CSystemFPce(&System, lbl_801D9F20 + 0x1C, i, m_commandListInventorySlotRef[i]);
+		Printf__7CSystemFPce(&System, fmtBase + 0x74, i, m_commandListInventorySlotRef[i]);
 	}
 
 	for (int i = 0; i < 4; i++) {
-		Printf__7CSystemFPce(&System, lbl_801D9F20 + 0x30, i, m_equipment[i]);
+		Printf__7CSystemFPce(&System, fmtBase + 0x88, i, m_equipment[i]);
 	}
 
 	for (int i = 0; i < 0x3F; i++) {
 		for (int j = i + 1; j < 0x40; j++) {
-			unsigned short lhs = m_inventoryItems[i];
-			unsigned short rhs = m_inventoryItems[j];
+			short lhs = m_inventoryItems[i];
+			short rhs = m_inventoryItems[j];
 
-			if (static_cast<short>(lhs) < 1) {
-				if (static_cast<short>(rhs) > 0) {
+			if (lhs < 1) {
+				if (rhs > 0) {
 					m_inventoryItems[i] = rhs;
 					m_inventoryItems[j] = 0xFFFF;
 
@@ -2521,7 +2523,7 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 						}
 					}
 				}
-			} else if ((static_cast<short>(rhs) > 0) && (static_cast<short>(rhs) < static_cast<short>(lhs))) {
+			} else if ((rhs > 0) && (rhs < lhs)) {
 				m_inventoryItems[i] = rhs;
 				m_inventoryItems[j] = lhs;
 
@@ -2546,15 +2548,15 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 	}
 
 	for (int i = 0; i < 0x40; i++) {
-		Printf__7CSystemFPce(&System, lbl_801D9F20 + 0xC, i, m_inventoryItems[i]);
+		Printf__7CSystemFPce(&System, fmtBase + 0x64, i, m_inventoryItems[i]);
 	}
 
 	for (int i = 2; i < 8; i++) {
-		Printf__7CSystemFPce(&System, lbl_801D9F20 + 0x1C, i, m_commandListInventorySlotRef[i]);
+		Printf__7CSystemFPce(&System, fmtBase + 0x74, i, m_commandListInventorySlotRef[i]);
 	}
 
 	for (int i = 0; i < 4; i++) {
-		Printf__7CSystemFPce(&System, lbl_801D9F20 + 0x30, i, m_equipment[i]);
+		Printf__7CSystemFPce(&System, fmtBase + 0x88, i, m_equipment[i]);
 	}
 }
 

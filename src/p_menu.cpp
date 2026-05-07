@@ -1264,7 +1264,13 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
  */
 void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, float u, float v, float us, float vs, float angle)
 {
-    if ((0.0f < w) && (0.0f < h)) {
+    if (w <= 0.0f) {
+        return;
+    }
+    if (h <= 0.0f) {
+        return;
+    }
+    {
         float u0;
         float u1;
         float v0;
@@ -1273,37 +1279,42 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         float y0;
         float x1;
         float y1;
+        float scaledW;
+        float scaledH;
 
-        if ((attr & 8) == 0) {
-            u0 = u + 0.5f;
-            u1 = (u + w) - 0.5f;
-        } else {
+        if ((attr & 8) != 0) {
             u1 = u + 0.5f;
             u0 = (u + w) - 0.5f;
+        } else {
+            u0 = u + 0.5f;
+            u1 = (u + w) - 0.5f;
         }
 
-        if ((attr & 4) == 0) {
-            v0 = v + 0.5f;
-            v1 = (v + h) - 0.5f;
-        } else {
+        if ((attr & 4) != 0) {
             v1 = v + 0.5f;
             v0 = (v1 + h) - 0.5f;
+        } else {
+            v0 = v + 0.5f;
+            v1 = (v + h) - 0.5f;
         }
+
+        scaledW = w * us;
+        scaledH = h * vs;
 
         x0 = x;
         if ((attr & 1) != 0) {
-            x0 = -((w * us) * 0.5f - x);
+            x0 = -(scaledW * 0.5f - x);
         }
 
         y0 = y;
         if ((attr & 2) != 0) {
-            y0 = -((h * vs) * 0.5f - y);
+            y0 = -(scaledH * 0.5f - y);
         }
 
-        x1 = x0 + (w * us);
-        y1 = y0 + (h * vs);
+        x1 = x0 + scaledW;
+        y1 = y0 + scaledH;
 
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
         if (0.0f != angle) {
             float s = static_cast<float>(sin(angle));
             float c = static_cast<float>(cos(angle));
@@ -1354,7 +1365,13 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
  */
 void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, float u, float v, _GXColor* colors, float us, float vs, float angle)
 {
-    if ((0.0f < w) && (0.0f < h)) {
+    if (w <= 0.0f) {
+        return;
+    }
+    if (h <= 0.0f) {
+        return;
+    }
+    {
         float u0;
         float u1;
         float v0;
@@ -1363,37 +1380,42 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         float y0;
         float x1;
         float y1;
+        float scaledW;
+        float scaledH;
 
-        if ((attr & 8) == 0) {
-            u0 = u + 0.5f;
-            u1 = (u + w) - 0.5f;
-        } else {
+        if ((attr & 8) != 0) {
             u1 = u + 0.5f;
             u0 = (u + w) - 0.5f;
+        } else {
+            u0 = u + 0.5f;
+            u1 = (u + w) - 0.5f;
         }
 
-        if ((attr & 4) == 0) {
-            v0 = v + 0.5f;
-            v1 = (v + h) - 0.5f;
-        } else {
+        if ((attr & 4) != 0) {
             v1 = v + 0.5f;
             v0 = (v1 + h) - 0.5f;
+        } else {
+            v0 = v + 0.5f;
+            v1 = (v + h) - 0.5f;
         }
+
+        scaledW = w * us;
+        scaledH = h * vs;
 
         x0 = x;
         if ((attr & 1) != 0) {
-            x0 = -((w * us) * 0.5f - x);
+            x0 = -(scaledW * 0.5f - x);
         }
 
         y0 = y;
         if ((attr & 2) != 0) {
-            y0 = -((h * vs) * 0.5f - y);
+            y0 = -(scaledH * 0.5f - y);
         }
 
-        x1 = x0 + (w * us);
-        y1 = y0 + (h * vs);
+        x1 = x0 + scaledW;
+        y1 = y0 + scaledH;
 
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
         if (0.0f != angle) {
             float s = static_cast<float>(sin(angle));
             float c = static_cast<float>(cos(angle));
@@ -1422,15 +1444,15 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
             GXColor1u32(*reinterpret_cast<u32*>(&colors[3]));
             GXTexCoord2f32(u1, v1);
         } else {
-            GXPosition3f32(x, y, 0.0f);
+            GXPosition3f32(x0, y0, 0.0f);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[0]));
             GXTexCoord2f32(u0, v0);
 
-            GXPosition3f32(x1, y, 0.0f);
+            GXPosition3f32(x1, y0, 0.0f);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[1]));
             GXTexCoord2f32(u1, v0);
 
-            GXPosition3f32(x, y1, 0.0f);
+            GXPosition3f32(x0, y1, 0.0f);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[2]));
             GXTexCoord2f32(u0, v1);
 

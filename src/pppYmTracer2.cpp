@@ -6,7 +6,7 @@
 #include "ffcc/pppYmEnv.h"
 extern "C" {
 extern int gPppCalcDisabled;
-extern u8 gPppDefaultValueBuffer[];
+extern f32 gPppDefaultValueBuffer[];
 }
 #include "ffcc/util.h"
 
@@ -72,8 +72,8 @@ union PackedColor {
     u8 bytes[4];
 };
 
-PackedColor g_pppYmTracer2_1;
-PackedColor g_pppYmTracer2_2;
+extern const PackedColor g_pppYmTracer2_1;
+extern const PackedColor g_pppYmTracer2_2;
 
 static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 {
@@ -221,6 +221,10 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
  */
 void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
+    TracerWork* work;
+    u8* colorData;
+    TRACE_POLYGON* entries;
+    TRACE_POLYGON* entry;
     s32 useFallback;
     float fVar2;
     s16 alpha;
@@ -228,10 +232,6 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     float* pfVar6;
     s32 iVar8;
     s32 visibleCount;
-    TracerWork* work;
-    TRACE_POLYGON* entries;
-    TRACE_POLYGON* entry;
-    u8* colorData;
     s32 i;
     Mtx MStack_78;
     float frameT;
@@ -245,7 +245,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     colorData = pppYmTracer2->m_serializedData + param_3->m_serializedDataOffsets[1];
 
     if (param_2->m_initWOrk == 0xffffffff) {
-        pfVar6 = reinterpret_cast<float*>(gPppDefaultValueBuffer);
+        pfVar6 = gPppDefaultValueBuffer;
     } else {
         pfVar6 = reinterpret_cast<float*>(
             reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_initWOrk].workBase + 0x80 +
@@ -254,7 +254,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     work->initWork = pfVar6;
 
     if (param_2->m_arg3 == 0xffffffff) {
-        pfVar6 = reinterpret_cast<float*>(gPppDefaultValueBuffer);
+        pfVar6 = gPppDefaultValueBuffer;
     } else {
         pfVar6 = reinterpret_cast<float*>(
             reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_arg3].workBase + 0x80 +
@@ -344,17 +344,17 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         }
     }
 
+    entry = entries;
     visibleCount = 0;
-    TRACE_POLYGON* cursor = entries;
     for (iVar4 = 0; iVar4 < (s32)(u32)param_2->m_tracer.m_entryCount; iVar4++) {
         alpha = (u16)param_2->m_tracer.m_entryAlpha - iVar4 * work->alphaStep;
-        if ((alpha < 0) || (cursor->active == 0)) {
-            cursor->alpha = 0;
-        } else if (cursor->active != 0) {
-            cursor->alpha = (u8)alpha;
+        if ((alpha < 0) || (entry->active == 0)) {
+            entry->alpha = 0;
+        } else if (entry->active != 0) {
+            entry->alpha = (u8)alpha;
             visibleCount++;
         }
-        cursor++;
+        entry++;
     }
     work->visibleCount = (s16)visibleCount;
 }

@@ -673,12 +673,12 @@ static void _VoiceEnvelopeCheck()
  */
 void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 {
-    int iVar1;
-    int iVar2;
+    int auxLeftMix;
+    int auxRightMix;
     RedTrackDATA* trackData = voice->m_track;
     s16 leftPan;
     s16 rightPan;
-    u16 uVar3;
+    u16 monoMix;
     int volFactor;
     AXPBMIX* mixData;
 
@@ -695,9 +695,9 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         int monoBase = (volume * volFactor) >> 8;
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_DRY_STEREO) != 0) {
-            uVar3 = (u16)monoBase;
-            mixData->vL = uVar3;
-            mixData->vR = uVar3;
+            monoMix = (u16)monoBase;
+            mixData->vL = monoMix;
+            mixData->vR = monoMix;
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
@@ -756,20 +756,20 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_LEFT) != 0) {
-            iVar1 = (leftMix * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT;
+            auxLeftMix = (leftMix * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT;
             if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
-                mixData->vAuxAL = (u16)iVar1;
+                mixData->vAuxAL = (u16)auxLeftMix;
             } else {
-                mixData->vAuxBL = (u16)iVar1;
+                mixData->vAuxBL = (u16)auxLeftMix;
             }
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_RIGHT) != 0) {
-            iVar2 = (rightMix * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT;
+            auxRightMix = (rightMix * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT;
             if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
-                mixData->vAuxAR = (u16)iVar2;
+                mixData->vAuxAR = (u16)auxRightMix;
             } else {
-                mixData->vAuxBR = (u16)iVar2;
+                mixData->vAuxBR = (u16)auxRightMix;
             }
         }
         break;
@@ -790,7 +790,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 static void _VolumeExecute(RedVoiceDATA* voice, int volume)
 {
     int modVolume;
-    int iVar1;
+    int tremoloValue;
     unsigned int pan;
     int voiceMix;
     int envelopeMul;
@@ -832,13 +832,13 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
             }
 
             modVolume = voiceMix * envelopeMul >> 8;
-            iVar1 = voice->m_track->m_tremoloFunc((unsigned int)voice->m_volumeModPhase >> REDSOUND_FIXED_SHIFT);
-            modVolume = modVolume * (iVar1 >> REDSOUND_VOLUME_MOD_WAVE_SHIFT) >> REDSOUND_FIXED_SHIFT;
+            tremoloValue = voice->m_track->m_tremoloFunc((unsigned int)voice->m_volumeModPhase >> REDSOUND_FIXED_SHIFT);
+            modVolume = modVolume * (tremoloValue >> REDSOUND_VOLUME_MOD_WAVE_SHIFT) >> REDSOUND_FIXED_SHIFT;
 
             if (voice->m_volumeModFrames != 0) {
-                iVar1 = voice->m_volumeModFrame;
+                tremoloValue = voice->m_volumeModFrame;
                 voice->m_volumeModFrame = voice->m_volumeModFrame + 1;
-                modVolume = (modVolume * iVar1) / voice->m_volumeModFrames;
+                modVolume = (modVolume * tremoloValue) / voice->m_volumeModFrames;
                 if (voice->m_volumeModFrame >= voice->m_volumeModFrames) {
                     voice->m_volumeModFrames = 0;
                 }

@@ -506,7 +506,7 @@ void CMenuPcs::MoneyDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::MoneyClose()
+int CMenuPcs::MoneyClose()
 {
 	int finished;
 	int count;
@@ -544,10 +544,11 @@ bool CMenuPcs::MoneyClose()
 		}
 	}
 
+	int result = 0;
 	if (count == finished) {
-		return true;
+		result = 1;
 	}
-	return false;
+	return result;
 }
 
 /*

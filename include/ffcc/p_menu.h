@@ -214,7 +214,7 @@ public:
     void ArtiInit1();
     bool ArtiOpen();
     int ArtiCtrl();
-    bool ArtiClose();
+    int ArtiClose();
     void ArtiDraw();
     int ArtiCtrlCur();
     void SetParty();

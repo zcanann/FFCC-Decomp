@@ -61,7 +61,7 @@ class CMenuPcs
 public:
     bool MoneyOpen();
     int MoneyCtrl();
-    bool MoneyClose();
+    int MoneyClose();
     void MoneyDraw();
     int MoneyCtrlCur();
 

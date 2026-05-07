@@ -477,7 +477,7 @@ void CMenuPcs::ArtiDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::ArtiClose()
+int CMenuPcs::ArtiClose()
 {
 	int finished = 0;
 	GetArtiState(this)[0x11]++;
@@ -509,7 +509,11 @@ bool CMenuPcs::ArtiClose()
 		}
 	}
 
-	return count == finished;
+	int result = 0;
+	if (count == finished) {
+		result = 1;
+	}
+	return result;
 }
 
 /*

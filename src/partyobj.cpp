@@ -73,6 +73,7 @@ extern float FLOAT_8032EE80;
 extern float FLOAT_8032EE84;
 
 struct GhostPartyWork {
+	unsigned char _pad0[0x20];
 	int mood;
 	int thresholdA;
 	int thresholdB;
@@ -89,7 +90,8 @@ struct GhostPartyWork {
 	int auraParticle;
 };
 
-static GhostPartyWork sGhostPartyWork;
+extern unsigned char m_boss__8CGMonObj_field108_0x6c[0x90];
+#define sGhostPartyWork (*reinterpret_cast<GhostPartyWork*>(m_boss__8CGMonObj_field108_0x6c))
 
 struct PartyObjFlags {
 	unsigned char commandActive : 1;

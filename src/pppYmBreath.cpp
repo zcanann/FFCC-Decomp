@@ -780,16 +780,14 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
         groupData = groupTable;
         for (i = 0; i < (int)params->m_groupCount; i++) {
             if ((groupData->active != 1) && (*groupData->particleIndices != -1) && (*groupData->particleStates == 1)) {
-                float zero = 0.0f;
-
+                groupData->speed = params->m_groupSpeed;
                 unitVelocity.x = 0.0f;
                 unitVelocity.y = 0.0f;
                 unitVelocity.z = -1.0f;
-                groupData->speed = params->m_groupSpeed;
                 pppCopyVector(groupData->direction, unitVelocity);
-                groupData->position.z = zero;
-                groupData->position.y = zero;
-                groupData->position.x = zero;
+                groupData->position.z = 0.0f;
+                groupData->position.y = 0.0f;
+                groupData->position.x = 0.0f;
                 PSMTXCopy(pppMngStPtr->m_matrix.value, groupData->matrix);
                 groupData->active = 1;
             }

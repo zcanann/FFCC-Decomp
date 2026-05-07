@@ -24,6 +24,12 @@ extern "C" {
 extern const float FLOAT_80330c84;
 }
 
+extern "C" const float FLOAT_80330C98 = 180.0f;
+extern "C" const float FLOAT_80330C9C = -180.0f;
+extern "C" const double DOUBLE_80330CA0 = 4503599627370496.0;
+extern "C" const float FLOAT_80330CA8 = 2.0f;
+extern "C" const double DOUBLE_80330CB0 = 0.5;
+
 struct pppYmBreathUnkC {
     unsigned char _pad[0xC];
     int* m_serializedDataOffsets;

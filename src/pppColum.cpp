@@ -56,16 +56,16 @@ extern const float FLOAT_80331040 = -1.0f;
 extern const float FLOAT_80331044 = 1.3333334f;
 
 extern unsigned long __float_nan[];
-extern float FLOAT_80331078;
-extern float FLOAT_8033107C;
-extern float FLOAT_80331080;
-extern float FLOAT_80331084;
-extern double DOUBLE_80331088;
-extern double DOUBLE_80331090;
-extern double DOUBLE_80331098;
-extern float FLOAT_803310A0;
-extern float FLOAT_803310A4;
-extern float FLOAT_803310A8;
+extern const float FLOAT_80331078;
+extern const float FLOAT_8033107C;
+extern const float FLOAT_80331080;
+extern const float FLOAT_80331084;
+extern const double DOUBLE_80331088;
+extern const double DOUBLE_80331090;
+extern const double DOUBLE_80331098;
+extern const float FLOAT_803310A0;
+extern const float FLOAT_803310A4;
+extern const float FLOAT_803310A8;
 
 extern "C" {
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -212,7 +212,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 color.rgba[3] = alpha;
 
                 pppSetDrawEnv(
-                    &color, (pppFMATRIX*)0, zero, param_2->m_colum.m_drawEnvColor1,
+                    &color, (pppFMATRIX*)0, FLOAT_80331084, param_2->m_colum.m_drawEnvColor1,
                     param_2->m_colum.m_drawEnvColor0,
                     param_2->m_arg3, 0, 0, 1, 0);
 

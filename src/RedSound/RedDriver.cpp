@@ -1349,13 +1349,11 @@ CRedDriver::~CRedDriver()
  */
 void CRedDriver::Init()
 {
-    char cVar1;
-    int iVar4;
+    RedTrackDATA* seTrackArena;
     int iVar5;
     int iVar6;
     int fullVolume;
     int noMusicId;
-    void* uVar3;
 
     m_ThreadExecute = 0;
     m_ThreadControl = 1;
@@ -1424,16 +1422,13 @@ void CRedDriver::Init()
     } while (iVar6 < REDSOUND_VOICE_COUNT);
     p_EditorVoice[REDSOUND_EDITOR_VOICE_RIGHT] = 0;
     p_EditorVoice[REDSOUND_EDITOR_VOICE_LEFT] = 0;
-    uVar3 = (void*)RedNew(REDSOUND_SE_TRACK_ARENA_SIZE);
-    p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks = (RedTrackDATA*)uVar3;
-    memset(p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks, 0, REDSOUND_SE_TRACK_ARENA_SIZE);
+    seTrackArena = (RedTrackDATA*)RedNew(REDSOUND_SE_TRACK_ARENA_SIZE);
+    p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks = seTrackArena;
+    memset(seTrackArena, 0, REDSOUND_SE_TRACK_ARENA_SIZE);
     iVar5 = 0;
-    iVar6 = (int)p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     do {
-        iVar4 = iVar5 * REDSOUND_TRACK_SIZE;
-        cVar1 = (char)iVar5;
+        seTrackArena[iVar5].m_trackNo = (char)(iVar5 + REDSOUND_SE_VOICE_BASE_INDEX);
         iVar5 = iVar5 + 1;
-        ((RedTrackDATA*)(iVar6 + iVar4))->m_trackNo = (char)(cVar1 + REDSOUND_SE_VOICE_BASE_INDEX);
     } while (iVar5 < REDSOUND_SE_TRACK_COUNT);
     p_EditorTrack = (RedTrackDATA*)RedNew(REDSOUND_TRACK_SIZE);
     memset(p_EditorTrack, 0, REDSOUND_TRACK_SIZE);

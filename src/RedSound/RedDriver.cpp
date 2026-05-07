@@ -165,6 +165,7 @@ enum RedSeBlockDataCommandWord {
 };
 
 enum RedDriverTickHistoryLayout {
+    REDSOUND_TICK_HISTORY_LATEST = 0,
     REDSOUND_TICK_HISTORY_COUNT = 100,
     REDSOUND_TICK_HISTORY_SHIFT_SIZE = sizeof(int) * (REDSOUND_TICK_HISTORY_COUNT - 1),
 };
@@ -1131,7 +1132,7 @@ static int _MainThread(void*)
             }
             memmove(p_Tick->m_ticks + 1, p_Tick->m_ticks, REDSOUND_TICK_HISTORY_SHIFT_SIZE);
             endTick = OSGetTick();
-            p_Tick->m_ticks[0] = endTick - startTick;
+            p_Tick->m_ticks[REDSOUND_TICK_HISTORY_LATEST] = endTick - startTick;
         }
     }
     m_ThreadExecute = m_ThreadExecute & ~REDSOUND_THREAD_FLAG_MAIN;

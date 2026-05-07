@@ -128,7 +128,6 @@ extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(in
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
-u8 ARRAY_802f26c8[0xC];
 CSound Sound;
 
 struct CLineSegment {
@@ -1517,23 +1516,24 @@ void CSound::FreeWave(int waveId)
  */
 void CSound::StopAndFreeAllSe(int clearMode)
 {
-    CSoundLayout& sound = SoundData(this);
+    u8* self = reinterpret_cast<u8*>(this);
+    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
     if (clearMode != 0) {
-        SeStop__9CRedSoundFi(RedSound(this), -1);
-        ClearSeSepData__9CRedSoundFi(RedSound(this), -1);
-        ClearWaveData__9CRedSoundFi(RedSound(this), -3);
+        SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), -1);
+        ClearSeSepData__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), -1);
+        ClearWaveData__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), -3);
     } else {
-        SeStopMG__9CRedSoundFiiii(RedSound(this),
+        SeStopMG__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(self + 8),
                                   sound.m_noFreeSeGroups[0],
                                   sound.m_noFreeSeGroups[1],
                                   sound.m_noFreeSeGroups[2],
                                   sound.m_noFreeSeGroups[3]);
-        ClearSeSepDataMG__9CRedSoundFiiii(RedSound(this),
+        ClearSeSepDataMG__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(self + 8),
                                           sound.m_noFreeSeGroups[0],
                                           sound.m_noFreeSeGroups[1],
                                           sound.m_noFreeSeGroups[2],
                                           sound.m_noFreeSeGroups[3]);
-        ClearWaveDataM__9CRedSoundFiiii(RedSound(this),
+        ClearWaveDataM__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(self + 8),
                                         sound.m_noFreeWaves[0],
                                         sound.m_noFreeWaves[1],
                                         sound.m_noFreeWaves[2],
@@ -1562,10 +1562,9 @@ int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
 
     if (seNo < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
-        seId = -1;
+        return -1;
     } else if (seNo < 4000) {
-        const int seBank = seNo / 1000;
-        seId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(self + 8), seBank, seNo - seBank * 1000, pan,
+        seId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(self + 8), seNo / 1000, seNo % 1000, pan,
                                         volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
         if (fadeFrames != 0) {
             SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), seId, volume, fadeFrames);

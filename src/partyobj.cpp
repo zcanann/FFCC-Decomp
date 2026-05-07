@@ -1607,15 +1607,15 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 
 		CMapCylinder hitCylinder;
 		hitCylinder.m_bottom = startPos;
-		hitCylinder.m_direction = rayDir;
-		hitCylinder.m_radius = FLOAT_80331a78;
-		hitCylinder.m_height = FLOAT_80331aa0;
-		hitCylinder.m_top.x = FLOAT_80331a9c;
-		hitCylinder.m_top.y = FLOAT_80331a9c;
-		hitCylinder.m_top.z = FLOAT_80331a9c;
-		hitCylinder.m_direction2.x = FLOAT_80331aa0;
-		hitCylinder.m_direction2.y = FLOAT_80331aa0;
-		hitCylinder.m_direction2.z = FLOAT_80331aa0;
+		hitCylinder.m_top = rayDir;
+		hitCylinder.m_axis.x = FLOAT_80331a78;
+		hitCylinder.m_axis.y = FLOAT_80331aa0;
+		hitCylinder.m_axis.z = FLOAT_80331a9c;
+		hitCylinder.m_radius = FLOAT_80331a9c;
+		hitCylinder.m_boundsMin.x = FLOAT_80331a9c;
+		hitCylinder.m_boundsMin.y = FLOAT_80331aa0;
+		hitCylinder.m_boundsMin.z = FLOAT_80331aa0;
+		hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
 		Vec hitPos = startPos;
 		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &rayDir, 0x30) != 0) {
@@ -1822,15 +1822,15 @@ void CGPartyObj::checkTargetParticle()
 
 			PSVECAdd(centerPos, &up, &bottom);
 			hitCylinder.m_bottom = bottom;
-			hitCylinder.m_direction = move;
+			hitCylinder.m_top = move;
+			hitCylinder.m_axis.x = FLOAT_80331a9c;
+			hitCylinder.m_axis.y = FLOAT_80331aa0;
+			hitCylinder.m_axis.z = FLOAT_80331a9c;
 			hitCylinder.m_radius = FLOAT_80331a9c;
-			hitCylinder.m_height = FLOAT_80331aa0;
-			hitCylinder.m_top.x = FLOAT_80331a9c;
-			hitCylinder.m_top.y = FLOAT_80331a9c;
-			hitCylinder.m_top.z = FLOAT_80331a9c;
-			hitCylinder.m_direction2.x = FLOAT_80331aa0;
-			hitCylinder.m_direction2.y = FLOAT_80331aa0;
-			hitCylinder.m_direction2.z = FLOAT_80331aa0;
+			hitCylinder.m_boundsMin.x = FLOAT_80331a9c;
+			hitCylinder.m_boundsMin.y = FLOAT_80331aa0;
+			hitCylinder.m_boundsMin.z = FLOAT_80331aa0;
+			hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
 			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &move, 0x30) == 0) {
 				break;
@@ -1849,15 +1849,15 @@ void CGPartyObj::checkTargetParticle()
 		Vec down = {0.0f, FLOAT_80331acc, 0.0f};
 		CMapCylinder floorCylinder;
 		floorCylinder.m_bottom = *targetPos;
-		floorCylinder.m_direction = down;
-		floorCylinder.m_radius = FLOAT_80331a78;
-		floorCylinder.m_height = FLOAT_80331aa0;
-		floorCylinder.m_top.x = FLOAT_80331a9c;
-		floorCylinder.m_top.y = FLOAT_80331a9c;
-		floorCylinder.m_top.z = FLOAT_80331a9c;
-		floorCylinder.m_direction2.x = FLOAT_80331aa0;
-		floorCylinder.m_direction2.y = FLOAT_80331aa0;
-		floorCylinder.m_direction2.z = FLOAT_80331aa0;
+		floorCylinder.m_top = down;
+		floorCylinder.m_axis.x = FLOAT_80331a78;
+		floorCylinder.m_axis.y = FLOAT_80331aa0;
+		floorCylinder.m_axis.z = FLOAT_80331a9c;
+		floorCylinder.m_radius = FLOAT_80331a9c;
+		floorCylinder.m_boundsMin.x = FLOAT_80331a9c;
+		floorCylinder.m_boundsMin.y = FLOAT_80331aa0;
+		floorCylinder.m_boundsMin.z = FLOAT_80331aa0;
+		floorCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
 		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &floorCylinder, &down, 0x30) != 0) {
 			CalcHitPosition__7CMapObjFP3Vec(getMapHitObject(), targetPos);
@@ -1913,15 +1913,15 @@ void CGPartyObj::moveCenterTargetParticle()
 
 	CMapCylinder hitCylinder;
 	PSVECAdd(&hitPos, &yOffset, &hitCylinder.m_bottom);
-	hitCylinder.m_direction = moveVec;
-	hitCylinder.m_radius = FLOAT_80331a78;
-	hitCylinder.m_height = FLOAT_80331aa0;
-	hitCylinder.m_top.x = FLOAT_80331a9c;
-	hitCylinder.m_top.y = FLOAT_80331a9c;
-	hitCylinder.m_top.z = FLOAT_80331a9c;
-	hitCylinder.m_direction2.x = FLOAT_80331aa0;
-	hitCylinder.m_direction2.y = FLOAT_80331aa0;
-	hitCylinder.m_direction2.z = FLOAT_80331aa0;
+	hitCylinder.m_top = moveVec;
+	hitCylinder.m_axis.x = FLOAT_80331a78;
+	hitCylinder.m_axis.y = FLOAT_80331aa0;
+	hitCylinder.m_axis.z = FLOAT_80331a9c;
+	hitCylinder.m_radius = FLOAT_80331a9c;
+	hitCylinder.m_boundsMin.x = FLOAT_80331a9c;
+	hitCylinder.m_boundsMin.y = FLOAT_80331aa0;
+	hitCylinder.m_boundsMin.z = FLOAT_80331aa0;
+	hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
 	if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &moveVec, 0x30) != 0) {
 		void* hitObj = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
@@ -3391,15 +3391,15 @@ void CGPartyObj::gpmCol()
 		CMapCylinder col;
 		col.m_bottom = *basePos;
 		col.m_bottom.y += FLOAT_80331aa0;
-		col.m_direction = moveVec;
-		col.m_radius = m_bodyEllipsoidRadius;
-		col.m_height = m_bodyEllipsoidRadius;
-		col.m_top.x = FLOAT_80331a9c;
-		col.m_top.y = FLOAT_80331a9c;
-		col.m_top.z = FLOAT_80331a9c;
-		col.m_direction2.x = FLOAT_80331aa0;
-		col.m_direction2.y = FLOAT_80331aa0;
-		col.m_direction2.z = FLOAT_80331aa0;
+		col.m_top = moveVec;
+		col.m_axis.x = m_bodyEllipsoidRadius;
+		col.m_axis.y = m_bodyEllipsoidRadius;
+		col.m_axis.z = FLOAT_80331a9c;
+		col.m_radius = FLOAT_80331a9c;
+		col.m_boundsMin.x = FLOAT_80331a9c;
+		col.m_boundsMin.y = FLOAT_80331aa0;
+		col.m_boundsMin.z = FLOAT_80331aa0;
+		col.m_boundsMax.x = FLOAT_80331aa0;
 
 		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &col, &moveVec, m_attrFlags & ~0x10U) == 0) {
 			sGhostPartyWork.activeTrailCount = i + 1;

@@ -79,7 +79,7 @@ public:
     void* m_cacheData;
     void* m_workData;
     int m_size;
-    short m_refCount;
+    unsigned short m_refCount;
     unsigned char m_inUse;
     unsigned char m_type;
     int m_priority;

@@ -5,6 +5,7 @@
 
 struct _pppPObject;
 struct _pppCtrlTable;
+struct Vec;
 
 struct pppPObjPointStep {
     s32 m_graphId;              // 0x0
@@ -18,7 +19,7 @@ struct pppPObjPointWork {
     float m_y;         // 0x4
     float m_z;         // 0x8
     u8 m_pad[4];       // 0xc
-    u8* m_source;      // 0x10
+    Vec* m_source;     // 0x10
 };
 
 #ifdef __cplusplus

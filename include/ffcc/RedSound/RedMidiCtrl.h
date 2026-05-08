@@ -10,6 +10,8 @@ enum RedMidiLayoutSize {
 	REDSOUND_KEY_ON_SLOT_COUNT = 0x40,
 	REDSOUND_MUSIC_TRACK_SAVE_COUNT = 0x40,
 	REDSOUND_TRACK_LOOP_STACK_COUNT = 4,
+	REDSOUND_SWING_FUNCTION_COUNT = 0x10,
+	REDSOUND_MIDI_CONTROL_FUNCTION_COUNT = 0x80,
 };
 
 typedef int (*RedSwingFunc)(int phase);
@@ -334,7 +336,7 @@ void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 
-extern RedMidiControlFunc p_MidiControl_Function[];
-extern RedSwingFunc SwingEntryFunction[];
+extern RedMidiControlFunc p_MidiControl_Function[REDSOUND_MIDI_CONTROL_FUNCTION_COUNT];
+extern RedSwingFunc SwingEntryFunction[REDSOUND_SWING_FUNCTION_COUNT];
 
 #endif // _FFCC_REDSOUND_REDMIDICTRL_H

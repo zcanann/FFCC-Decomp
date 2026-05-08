@@ -118,7 +118,7 @@ enum RedSoundPauseState {
 
 struct RedSeBlockHEAD;
 
-extern RedMidiControlFunc p_MidiControl_Function[];
+extern RedMidiControlFunc p_MidiControl_Function[REDSOUND_MIDI_CONTROL_FUNCTION_COUNT];
 extern u32 t_TonePitch[];
 extern int t_FinePitch[];
 extern int t_KeySignatureIndex[];

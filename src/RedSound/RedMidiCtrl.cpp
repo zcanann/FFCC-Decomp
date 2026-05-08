@@ -84,11 +84,6 @@ static int DutySwingR(int phase);
 static int SawSwingR(int phase);
 static int RandomSwingR(int phase);
 
-enum RedMidiTableSize {
-	REDSOUND_SWING_FUNCTION_COUNT = 0x10,
-	REDSOUND_MIDI_CONTROL_FUNCTION_COUNT = 0x80,
-};
-
 RedSwingFunc SwingEntryFunction[REDSOUND_SWING_FUNCTION_COUNT] = {
     SineSwing, TriangleSwing, SawSwing, DutySwing,
     RandomSwing, DutySwing,   DutySwing, DutySwing,

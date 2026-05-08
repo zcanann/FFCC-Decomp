@@ -887,7 +887,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_fuzzyPitchDepth = 0;
 		track->m_portamentPitch = -1;
 		track->m_note.m_allocFlags = 0;
-		track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO | REDSOUND_VOICE_SWITCH_REVERB_AUX_A;
+		track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_MUSIC_DEFAULT;
 		memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_BYTE, sizeof(RedAdsrDATA));
 
 		count--;

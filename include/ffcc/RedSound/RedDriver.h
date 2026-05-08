@@ -81,6 +81,7 @@ public:
 	void StreamStop(int streamId);
 	int StreamPlay(int streamId, void* streamHeader, int fileSize, int pan, int volume);
 	void StreamVolume(int streamId, int volume, int frameCount);
+	void StreamPan(int streamId, int pan, int frameCount);
 	void StreamPause(int streamId, int pause);
 
 	void ClearWaveData(int waveNo);

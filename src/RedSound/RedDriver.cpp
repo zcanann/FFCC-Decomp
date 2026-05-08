@@ -1236,7 +1236,6 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
     unsigned int entryID;
     int chunkSize;
     RedDmaRequest* queueEntry;
-    RedDmaRequest* queueEnd;
 
     interrupt = OSDisableInterrupts();
     if ((flags & REDSOUND_DMA_FLAG_QUEUE_MASK) != 0) {
@@ -1248,13 +1247,14 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
     }
     queueEntry = *queuePtr;
     entryID = GetMyEntryID();
-    sizeBytes = (sizeBytes + REDSOUND_DMA_TRANSFER_ALIGN - 1) & REDSOUND_DMA_TRANSFER_ALIGN_MASK;
+    sizeBytes += REDSOUND_DMA_TRANSFER_ALIGN - 1;
+    sizeBytes &= REDSOUND_DMA_TRANSFER_ALIGN_MASK;
     if ((m_DMAMode != 0) || ((flags & REDSOUND_DMA_FLAG_CHUNKED_TRANSFER) != 0)) {
-        queueEnd = queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
         do {
-            chunkSize = sizeBytes;
             if (sizeBytes > REDSOUND_DMA_MAX_CHUNK_SIZE) {
                 chunkSize = REDSOUND_DMA_MAX_CHUNK_SIZE;
+            } else {
+                chunkSize = sizeBytes;
             }
             queueEntry->m_id = entryID;
             sizeBytes -= chunkSize;
@@ -1271,13 +1271,12 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
                 queueEntry->m_callback = 0;
             }
             queueEntry++;
-            if (!(queueEntry < queueEnd)) {
+            if (!(queueEntry < queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT)) {
                 queueEntry = queueBase;
             }
         } while (sizeBytes > 0);
         *queuePtr = queueEntry;
     } else {
-        queueEnd = queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
         queueEntry->m_id = entryID;
         queueEntry->m_direction = direction;
         queueEntry->m_mainMemory = mainMemory;
@@ -1286,7 +1285,7 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
         queueEntry->m_callback = callback;
         queueEntry->m_callbackData = callbackData;
         queueEntry++;
-        if (!(queueEntry < queueEnd)) {
+        if (!(queueEntry < queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT)) {
             queueEntry = queueBase;
         }
         *queuePtr = queueEntry;

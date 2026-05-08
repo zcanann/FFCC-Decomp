@@ -84,6 +84,14 @@ enum RedDriverGlobalObjectSize {
 
 enum RedDriverSmallDataLayout {
     REDSOUND_DRIVER_SBSS_SIZE = 0xD8,
+    REDSOUND_DRIVER_SBSS_MASTER_TIME_OFFSET = 0x00,
+    REDSOUND_DRIVER_SBSS_DMA_NOW_OFFSET = 0x28,
+    REDSOUND_DRIVER_SBSS_SOUND_CONTROL_BUFFER_OFFSET = 0x38,
+    REDSOUND_DRIVER_SBSS_MUSIC_REPLAY_POINT_OFFSET = 0x60,
+    REDSOUND_DRIVER_SBSS_STREAM_OFFSET = 0x80,
+    REDSOUND_DRIVER_SBSS_VOICE_DATA_OFFSET = 0x8C,
+    REDSOUND_DRIVER_SBSS_EDITOR_VOICE_OFFSET = 0x90,
+    REDSOUND_DRIVER_SBSS_MUTE_OFFSET = 0xC0,
     REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE = 0xC8,
     REDSOUND_DRIVER_SBSS_RED_MEMORY_OFFSET = 0xC8,
     REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_SIZE = 0x03,
@@ -286,6 +294,55 @@ struct RedTickHistory {
     int m_ticks[REDSOUND_TICK_HISTORY_COUNT];
 };
 
+struct RedDriverSmallDataPrefixState {
+    int m_redMasterTime;
+    volatile int m_sequencialID;
+    volatile int m_threadControl;
+    volatile int m_threadExecute;
+    int m_soundMode;
+    RedTickHistory* volatile m_tick;
+    u8* volatile m_zeroData;
+    RedExecCommand* volatile m_execCommand;
+    RedExecCommand* volatile m_execCommandNow;
+    RedExecCommand* volatile m_execCommandOld;
+    RedDmaRequest* volatile m_dmaControlNow[REDSOUND_DMA_QUEUE_COUNT];
+    RedDmaRequest* volatile m_dmaControlOld[REDSOUND_DMA_QUEUE_COUNT];
+    RedSoundCONTROL* volatile m_soundControlBuffer;
+    RedSoundCONTROL* volatile m_soundControl;
+    volatile int m_keyOnEntry;
+    RedKeyOnDATA* volatile m_keyOnData;
+    int m_soundPlayMode;
+    int m_soundMasterControl;
+    volatile int m_reportPrint;
+    int m_musicFastSpeed;
+    volatile int m_musicSkipLine;
+    int m_musicKeySignature;
+    int* volatile m_musicReplayPoint;
+    RedControlRamp* volatile m_musicTempoControl;
+    RedControlRamp* volatile m_musicPitchControl;
+    int m_musicPhraseStop;
+    RedMusicPlayCommand* volatile m_musicNextPlay;
+    int m_crossTime;
+    volatile int m_masterMusicVolume;
+    volatile int m_masterSEVolume;
+    RedStreamDATA* volatile m_stream;
+    int m_dmaMode;
+    volatile int m_seSkipStep;
+    RedVoiceDATA* volatile m_voiceData;
+    int m_editorVoice[REDSOUND_EDITOR_VOICE_COUNT];
+    RedTrackDATA* m_editorTrack;
+    u8* volatile m_mainThreadStack;
+    int m_mainThreadTime;
+    u8* volatile m_waveSettingThreadStack;
+    int m_waveSettingStatus;
+    u8* volatile m_dmaExecuteThreadStack;
+    volatile int m_dmaStatus;
+    u8* volatile m_musicSkipThreadStack;
+    volatile int m_musicSkipComplete;
+    RedReverbDepth* volatile m_reverbDepth;
+    int m_mute[REDSOUND_MUTE_WORD_COUNT];
+};
+
 STATIC_ASSERT(offsetof(RedExecCommand, m_func) == REDSOUND_EXEC_COMMAND_FUNC_OFFSET);
 STATIC_ASSERT(offsetof(RedExecCommand, m_args) == REDSOUND_EXEC_COMMAND_ARGS_OFFSET);
 STATIC_ASSERT(sizeof(RedExecCommand) == REDSOUND_EXEC_COMMAND_SIZE);
@@ -303,6 +360,17 @@ STATIC_ASSERT(offsetof(RedReverbDepth, m_depth) == REDSOUND_REVERB_DEPTH_DEPTH_O
 STATIC_ASSERT(offsetof(RedReverbDepth, m_step) == REDSOUND_REVERB_DEPTH_STEP_OFFSET);
 STATIC_ASSERT(offsetof(RedReverbDepth, m_count) == REDSOUND_REVERB_DEPTH_COUNT_OFFSET);
 STATIC_ASSERT(sizeof(RedReverbDepth) == REDSOUND_REVERB_DEPTH_SIZE);
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_redMasterTime) == REDSOUND_DRIVER_SBSS_MASTER_TIME_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_dmaControlNow) == REDSOUND_DRIVER_SBSS_DMA_NOW_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_soundControlBuffer) ==
+              REDSOUND_DRIVER_SBSS_SOUND_CONTROL_BUFFER_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_musicReplayPoint) ==
+              REDSOUND_DRIVER_SBSS_MUSIC_REPLAY_POINT_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_stream) == REDSOUND_DRIVER_SBSS_STREAM_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_voiceData) == REDSOUND_DRIVER_SBSS_VOICE_DATA_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_editorVoice) == REDSOUND_DRIVER_SBSS_EDITOR_VOICE_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_mute) == REDSOUND_DRIVER_SBSS_MUTE_OFFSET);
+STATIC_ASSERT(sizeof(RedDriverSmallDataPrefixState) == REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE);
 STATIC_ASSERT(sizeof(CRedMemory) == REDSOUND_RED_MEMORY_SIZE);
 STATIC_ASSERT(sizeof(CRedEntry) == REDSOUND_RED_ENTRY_SIZE);
 STATIC_ASSERT(sizeof(p_SeBlockData) == REDSOUND_SE_BLOCK_DATA_TABLE_SIZE);

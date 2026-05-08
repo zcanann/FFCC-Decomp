@@ -215,8 +215,10 @@ enum RedExecCommandLayout {
     REDSOUND_EXEC_COMMAND_SIZE = 0x20,
 };
 
+typedef void (*RedExecCommandFunc)(int* command);
+
 struct RedExecCommand {
-    void (*m_func)(int*);
+    RedExecCommandFunc m_func;
     int m_args[REDSOUND_EXEC_COMMAND_ARG_COUNT];
 };
 
@@ -1201,8 +1203,8 @@ static void _StreamPause(int* command)
  * JP Address: TODO
  * JP Size: TODO
  */
-static RedExecCommand* _EntryExecCommand(void (*func)(int*), int arg1, int arg2, int arg3, int arg4,
-                       int arg5, int arg6, int arg7)
+static RedExecCommand* _EntryExecCommand(RedExecCommandFunc func, int arg1, int arg2, int arg3, int arg4,
+                                         int arg5, int arg6, int arg7)
 {
     unsigned int interruptLevel;
     RedExecCommand* writePos;

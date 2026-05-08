@@ -11,14 +11,123 @@ enum RedMidiSignTableSize {
     REDSOUND_SIGN_DATA_TABLE_COUNT = 0x200,
 };
 
-STATIC_ASSERT(offsetof(RedTrackDATA, m_volume) == REDSOUND_TRACK_VOLUME_OFFSET);
-STATIC_ASSERT(offsetof(RedTrackDATA, m_expression) == REDSOUND_TRACK_EXPRESSION_OFFSET);
-STATIC_ASSERT(offsetof(RedTrackDATA, m_pan) == REDSOUND_TRACK_PAN_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_command) == REDSOUND_TRACK_COMMAND_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_loopCommand) == REDSOUND_TRACK_LOOP_COMMAND_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_waveBankData) == REDSOUND_TRACK_WAVE_BANK_DATA_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_waveData) == REDSOUND_TRACK_WAVE_DATA_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_keySignatureData) ==
+              REDSOUND_TRACK_KEY_SIGNATURE_DATA_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_note) == REDSOUND_TRACK_NOTE_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_volume) == REDSOUND_TRACK_VOLUME_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_volumeAdd) == REDSOUND_TRACK_VOLUME_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_volumeDelta) == REDSOUND_TRACK_VOLUME_DELTA_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_expression) == REDSOUND_TRACK_EXPRESSION_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_expressionAdd) == REDSOUND_TRACK_EXPRESSION_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_expressionDelta) == REDSOUND_TRACK_EXPRESSION_DELTA_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_pan) == REDSOUND_TRACK_PAN_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_panAdd) == REDSOUND_TRACK_PAN_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_panDelta) == REDSOUND_TRACK_PAN_DELTA_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_mixVolume) == REDSOUND_TRACK_MIX_VOLUME_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_mixVolumeAdd) == REDSOUND_TRACK_MIX_VOLUME_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_mixVolumeDelta) == REDSOUND_TRACK_MIX_VOLUME_DELTA_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_mixVolumeMode) == REDSOUND_TRACK_MIX_VOLUME_MODE_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_pitch) == REDSOUND_TRACK_PITCH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_pitchAdd) == REDSOUND_TRACK_PITCH_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_pitchDelta) == REDSOUND_TRACK_PITCH_DELTA_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_reverbDepth) == REDSOUND_TRACK_REVERB_DEPTH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_reverbDepthAdd) == REDSOUND_TRACK_REVERB_DEPTH_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_reverbDepthDelta) == REDSOUND_TRACK_REVERB_DEPTH_DELTA_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_vibrateFunc) == REDSOUND_TRACK_VIBRATE_FUNC_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_vibrateRate) == REDSOUND_TRACK_VIBRATE_RATE_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_vibrateRateAdd) ==
+              REDSOUND_TRACK_VIBRATE_RATE_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_vibrateDepth) == REDSOUND_TRACK_VIBRATE_DEPTH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_vibrateDepthAdd) ==
+              REDSOUND_TRACK_VIBRATE_DEPTH_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_vibrateRateDelta) ==
+              REDSOUND_TRACK_VIBRATE_RATE_DELTA_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_vibrateDepthDelta) ==
+              REDSOUND_TRACK_VIBRATE_DEPTH_DELTA_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_vibrateDelay) ==
+              REDSOUND_TRACK_VIBRATE_DELAY_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_vibrateDelayDepth) ==
+              REDSOUND_TRACK_VIBRATE_DELAY_DEPTH_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_tremoloFunc) == REDSOUND_TRACK_TREMOLO_FUNC_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_tremoloRate) == REDSOUND_TRACK_TREMOLO_RATE_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_tremoloRateAdd) ==
+              REDSOUND_TRACK_TREMOLO_RATE_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_tremoloDepth) == REDSOUND_TRACK_TREMOLO_DEPTH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_tremoloDepthAdd) ==
+              REDSOUND_TRACK_TREMOLO_DEPTH_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_tremoloRateDelta) ==
+              REDSOUND_TRACK_TREMOLO_RATE_DELTA_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_tremoloDepthDelta) ==
+              REDSOUND_TRACK_TREMOLO_DEPTH_DELTA_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_tremoloDelay) ==
+              REDSOUND_TRACK_TREMOLO_DELAY_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_tremoloDelayDepth) ==
+              REDSOUND_TRACK_TREMOLO_DELAY_DEPTH_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_shakeFunc) == REDSOUND_TRACK_SHAKE_FUNC_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_shakeRate) == REDSOUND_TRACK_SHAKE_RATE_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_shakeRateAdd) == REDSOUND_TRACK_SHAKE_RATE_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_shakeDepth) == REDSOUND_TRACK_SHAKE_DEPTH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_shakeDepthAdd) == REDSOUND_TRACK_SHAKE_DEPTH_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_shakeOutput) == REDSOUND_TRACK_SHAKE_OUTPUT_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_shakePan) == REDSOUND_TRACK_SHAKE_PAN_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_shakeRateDelta) ==
+              REDSOUND_TRACK_SHAKE_RATE_DELTA_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_shakeDepthDelta) ==
+              REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD * sizeof(unsigned short));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrAR) == REDSOUND_TRACK_ADSR_TIME_ATTACK_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrDR) == REDSOUND_TRACK_ADSR_TIME_DECAY_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrSR) == REDSOUND_TRACK_ADSR_TIME_SUSTAIN_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrRR) == REDSOUND_TRACK_ADSR_TIME_RELEASE_HALFWORD * sizeof(unsigned short));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrAL) == REDSOUND_TRACK_ADSR_LEVEL_ATTACK_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrDL) == REDSOUND_TRACK_ADSR_LEVEL_DECAY_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrSL) == REDSOUND_TRACK_ADSR_LEVEL_SUSTAIN_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrRL) == REDSOUND_TRACK_ADSR_LEVEL_RELEASE_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_fuzzyPitchDepth) ==
+              REDSOUND_TRACK_FUZZY_PITCH_DEPTH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_fuzzyVolumeDepth) ==
+              REDSOUND_TRACK_FUZZY_VOLUME_DEPTH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_fuzzyPanDepth) ==
+              REDSOUND_TRACK_FUZZY_PAN_DEPTH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_fuzzyDeltaTimeDepth) ==
+              REDSOUND_TRACK_FUZZY_DELTA_TIME_DEPTH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_fuzzyAdsrDepth) ==
+              REDSOUND_TRACK_FUZZY_ADSR_DEPTH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_seSepId) == REDSOUND_TRACK_SE_SEP_ID_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_seId) == REDSOUND_TRACK_SE_ID_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_voiceSwitch) == REDSOUND_TRACK_VOICE_SWITCH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_loopReport) == REDSOUND_TRACK_LOOP_REPORT_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_flags) == REDSOUND_TRACK_FLAGS_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_deltaTime) == REDSOUND_TRACK_DELTA_TIME_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_playTime) == REDSOUND_TRACK_PLAY_TIME_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_sweepDelta) == REDSOUND_TRACK_SWEEP_DELTA_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_sweepAdd) == REDSOUND_TRACK_SWEEP_ADD_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_portamentTime) == REDSOUND_TRACK_PORTAMENT_TIME_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_waveBase) == REDSOUND_TRACK_WAVE_BASE_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_portamentPitch) == REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_waveNo) == REDSOUND_TRACK_WAVE_NO_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_loopCount) == REDSOUND_TRACK_LOOP_COUNT_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_loopStep) == REDSOUND_TRACK_LOOP_STEP_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_step) == REDSOUND_TRACK_STEP_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_step2) == REDSOUND_TRACK_STEP2_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_loopDepth) == REDSOUND_TRACK_LOOP_DEPTH_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_pitchBend) == REDSOUND_TRACK_PITCH_BEND_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_pitchBendRaw) ==
+              REDSOUND_TRACK_PITCH_BEND_RAW_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_keyTranspose) == REDSOUND_TRACK_KEY_TRANSPOSE_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_loopStepCurrent) ==
+              REDSOUND_TRACK_LOOP_STEP_CURRENT_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_seTickCounter) ==
+              REDSOUND_TRACK_SE_TICK_COUNTER_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_fineTune) == REDSOUND_TRACK_FINE_TUNE_BYTE);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_pitchBendRange) == REDSOUND_TRACK_PITCH_BEND_RANGE_BYTE);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_waveBankNo) == REDSOUND_TRACK_WAVE_BANK_NO_BYTE);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_trackNo) == REDSOUND_TRACK_TRACK_NO_BYTE);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_eraseTrack) == REDSOUND_TRACK_ERASE_TRACK_BYTE);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_attrMask) == REDSOUND_TRACK_ATTR_MASK_BYTE);
 STATIC_ASSERT(sizeof(RedTrackDATA) == REDSOUND_TRACK_SIZE);
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_tracks) == REDSOUND_CONTROL_TRACKS_OFFSET);
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_keySignatureData) == REDSOUND_CONTROL_KEY_SIGNATURE_DATA_OFFSET);

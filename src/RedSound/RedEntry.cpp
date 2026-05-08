@@ -1236,7 +1236,7 @@ RedHistoryBANK* CRedEntry::SeSepOldDelete()
 RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 {
 	RedHistoryBANK* bank = m_seSepBankBase;
-	int result = 0;
+	RedSeSepHEAD* result = 0;
 
 	while ((bank->m_size != 0) &&
 	       (bank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT)) {
@@ -1250,14 +1250,14 @@ RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 	if ((bank != 0) &&
 	    (bank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT)) {
 		bank->m_seSepHead = seSepHead;
-		result = reinterpret_cast<int>(seSepHead);
+		result = seSepHead;
 		bank->m_size = seSepHead->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
 		bank->m_id = seSepHead->m_seNo;
 		SeSepHistoryAdd();
 		bank->m_historyNo = 1;
 	}
 
-	return reinterpret_cast<RedSeSepHEAD*>(result);
+	return result;
 }
 
 /*
@@ -1769,7 +1769,7 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
  */
 RedMusicHEAD* CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 {
-	int result = 0;
+	RedMusicHEAD* result = 0;
 	RedHistoryBANK* bank = MusicOldChoice();
 	if ((bank != 0) && (bank->m_size != 0)) {
 		MusicOldClear();
@@ -1778,14 +1778,14 @@ RedMusicHEAD* CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 
 	if (bank != 0) {
 		bank->m_musicHead = musicHead;
-		result = reinterpret_cast<int>(musicHead);
+		result = musicHead;
 		bank->m_size = musicHead->m_size;
 		bank->m_id = static_cast<int>(musicHead->m_musicNo);
 		MusicHistoryAdd();
 		bank->m_historyNo = 1;
 	}
 
-	return reinterpret_cast<RedMusicHEAD*>(result);
+	return result;
 }
 
 /*

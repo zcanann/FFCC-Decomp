@@ -6,6 +6,10 @@
 typedef void (*RedDmaCallback)(void* callbackData);
 #endif
 
+struct RedReverbDepth;
+struct RedReverbModeData;
+struct RedReverbSize;
+
 enum RedDmaEntryFlag {
 	REDSOUND_DMA_FLAG_MAIN_QUEUE = 1,
 	REDSOUND_DMA_FLAG_CHUNKED_TRANSFER = 0x8000,
@@ -20,6 +24,7 @@ void RedSleep(int microseconds);
 int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int size,
                 RedDmaCallback callback, void* callbackData);
 int RedDmaSearchID(int id);
+void RedSetDMAMode(int mode);
 
 class CRedDriver
 {
@@ -30,6 +35,7 @@ public:
 	void Init();
 	void End();
 	int GetProgramTime();
+	int GetMasterTime();
 	void SetSoundMode(int soundMode);
 	int GetSoundMode();
 	int SetMusicData(void* musicData);
@@ -42,6 +48,8 @@ public:
 	void MusicFadeOut(int musicId, int frameCount);
 	void MusicVolume(int musicId, int volume, int frameCount);
 	void SetMusicPhraseStop(int enable);
+	void SetMusicFastSpeed(int speed);
+	int CheckMusicPhraseStop();
 
 	void* SetSeBlockData(int bank, void* blockData);
 	int SetSeSepData(void* seSepData);
@@ -79,7 +87,11 @@ public:
 	void DisplayWaveInfo();
 
 	void SetReverb(int kind, int mode);
+	RedReverbSize* GetReverbInfo();
+	RedReverbDepth* GetReverbDepth();
 	void SetReverbDepth(int type, int depth, int frameCount);
+	void SetMute(unsigned int voiceNo, unsigned int mute);
+	RedReverbModeData* GetReverbModeTable(int mode);
 	void TestProcess(int mode);
 };
 

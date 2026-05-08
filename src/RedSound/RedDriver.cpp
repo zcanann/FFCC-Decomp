@@ -1607,6 +1607,20 @@ int RedDmaSearchID(int id)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: UNUSED
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void RedSetDMAMode(int mode)
+{
+    m_DMAMode = mode;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801be2dc
  * PAL Size: 496b
  * EN Address: TODO
@@ -1972,6 +1986,20 @@ int CRedDriver::GetProgramTime()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: UNUSED
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::GetMasterTime()
+{
+    return m_RedMasterTime;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bec48
  * PAL Size: 72b
  * EN Address: TODO
@@ -2173,6 +2201,34 @@ void CRedDriver::MusicVolume(int musicID, int volume, int frameCount)
 void CRedDriver::SetMusicPhraseStop(int stop)
 {
     _EntryExecCommand(_SetMusicPhraseStop, stop, 0, 0, 0, 0, 0, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: UNUSED
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::SetMusicFastSpeed(int speed)
+{
+    m_MusicFastSpeed = speed;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: UNUSED
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::CheckMusicPhraseStop()
+{
+    return m_MusicPhraseStop;
 }
 
 /*
@@ -2825,6 +2881,34 @@ void CRedDriver::SetReverb(int bank, int kind)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 32b
+ * EN Address: UNUSED
+ * EN Size: 32b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbSize* CRedDriver::GetReverbInfo()
+{
+    return ::GetReverbInfo();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: UNUSED
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbDepth* CRedDriver::GetReverbDepth()
+{
+    return p_ReverbDepth;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bfe54
  * PAL Size: 80b
  * EN Address: TODO
@@ -2835,6 +2919,41 @@ void CRedDriver::SetReverb(int bank, int kind)
 void CRedDriver::SetReverbDepth(int bank, int mode, int depth)
 {
     _EntryExecCommand(_SetReverbDepth, bank, mode, depth, 0, 0, 0, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: UNUSED
+ * EN Size: 76b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
+{
+    unsigned int mask = 1 << (voiceNo % REDSOUND_MUTE_BITS_PER_WORD);
+    int* muteWord = &m_Mute[voiceNo / REDSOUND_MUTE_BITS_PER_WORD];
+
+    if (mute != 0) {
+        *muteWord |= mask;
+    } else {
+        *muteWord &= ~mask;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 24b
+ * EN Address: UNUSED
+ * EN Size: 24b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbModeData* CRedDriver::GetReverbModeTable(int mode)
+{
+    return &t_ReverbModeData[mode & REDSOUND_REVERB_MODE_INDEX_MASK];
 }
 
 /*

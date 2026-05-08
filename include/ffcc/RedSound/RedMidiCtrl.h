@@ -255,6 +255,13 @@ struct RedKeyOnSlot {
 	RedNoteDATA m_note;
 };
 
+enum RedKeyOnSlotLayout {
+	REDSOUND_KEY_ON_SLOT_TRACK_OFFSET = 0x00,
+	REDSOUND_KEY_ON_SLOT_NOTE_OFFSET = 0x04,
+	REDSOUND_KEY_ON_SLOT_SIZE = 0x08,
+	REDSOUND_KEY_ON_SLOT_WORD_COUNT = REDSOUND_KEY_ON_SLOT_SIZE / sizeof(int),
+};
+
 struct RedKeyOnDATA {
 	RedKeyOnSlot m_fixed[REDSOUND_KEY_ON_SLOT_COUNT];
 	RedKeyOnSlot m_priority[REDSOUND_KEY_ON_SLOT_COUNT];

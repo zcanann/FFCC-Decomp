@@ -36,6 +36,13 @@ struct RedNoteDATA {
 	unsigned char m_reserved03;
 };
 
+enum RedNoteLayoutOffset {
+	REDSOUND_NOTE_KEY_OFFSET = 0x00,
+	REDSOUND_NOTE_VELOCITY_OFFSET = 0x01,
+	REDSOUND_NOTE_ALLOC_FLAGS_OFFSET = 0x02,
+	REDSOUND_NOTE_SIZE = 0x04,
+};
+
 enum RedNoteAllocFlag {
 	REDSOUND_NOTE_ALLOC_DIRECT = 1,
 	REDSOUND_NOTE_ALLOC_STREAM = 2,

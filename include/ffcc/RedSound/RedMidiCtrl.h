@@ -401,6 +401,19 @@ enum RedSoundControlSaveSize {
 };
 
 typedef void (*RedMidiControlFunc)(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);
+
+class CRedMidiCtrl
+{
+public:
+	CRedMidiCtrl();
+	~CRedMidiCtrl();
+
+	void Init();
+
+private:
+	int m_status[3];
+};
+
 int DataAddCompute(int* current, int target, int* delta);
 void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track);

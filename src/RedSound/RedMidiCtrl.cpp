@@ -506,6 +506,48 @@ STATIC_ASSERT(sizeof(m_SignDataTable) + sizeof(SwingEntryFunction) + sizeof(p_Mi
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CRedMidiCtrl::CRedMidiCtrl()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CRedMidiCtrl::~CRedMidiCtrl()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedMidiCtrl::Init()
+{
+	m_status[0] = 0;
+	m_status[1] = 0;
+	m_status[2] = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801C7478
  * PAL Size: 80b
  * EN Address: TODO

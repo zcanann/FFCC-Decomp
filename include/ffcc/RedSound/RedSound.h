@@ -63,7 +63,7 @@ public:
 	void StreamVolume(int streamId, int volume, int frameCount);
 	void StreamPause(int streamId, int pause);
 
-	unsigned int SetWaveData(int bank, void* data, int size);
+	unsigned int SetWaveData(int waveID, void* data, int size);
 	void ClearWaveData(int waveNo);
 	void ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo3);
 	void ClearWaveBank(int bank);

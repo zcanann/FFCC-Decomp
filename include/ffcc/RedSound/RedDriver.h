@@ -68,7 +68,7 @@ public:
 	void ClearWaveData(int waveNo);
 	void ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo3);
 	void ClearWaveBank(int bank);
-	void SetWaveData(int bank, int waveNo, void* data, int size);
+	void SetWaveData(int slot, int waveID, void* data, int size);
 	int ReentryWaveData(int waveNo);
 	void DisplayWaveInfo();
 

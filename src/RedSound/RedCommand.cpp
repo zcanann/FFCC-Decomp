@@ -343,7 +343,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 	track = soundControl->m_tracks;
 	do {
 		if ((track->m_command != 0) && ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) == 0)) {
-			int id = track->m_seSepId / 1000;
+			int id = track->m_seSepId / REDSOUND_SE_MG_ID_DIVISOR;
 			if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
 				int trackNo;
 

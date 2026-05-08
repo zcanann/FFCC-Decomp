@@ -1344,7 +1344,7 @@ int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
 
 	do {
 		if (bank->m_size != 0) {
-			int seNo = bank->m_id / 1000;
+			int seNo = bank->m_id / REDSOUND_SE_MG_ID_DIVISOR;
 			if ((bankNo != seNo) && (sepNo != seNo) && (groupNo != seNo) && (kindNo != seNo)) {
 				SeSepMemoryFree(bank);
 			}

@@ -50,6 +50,9 @@ public:
 	void MusicMasterVolume(int volume);
 	void MusicFadeOut(int musicId, int frameCount);
 	void MusicVolume(int musicId, int volume, int frameCount);
+	void MusicTempo(int tempo, int frameCount);
+	void MusicPitch(int pitch, int frameCount);
+	void MusicPause(int musicId, int pause);
 	void SetMusicPhraseStop(int enable);
 	void SetMusicFastSpeed(int speed);
 	int CheckMusicPhraseStop();

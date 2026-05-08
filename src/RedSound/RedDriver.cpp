@@ -893,6 +893,48 @@ static void _MusicVolume(int* command)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: UNUSED
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _MusicTempo(int* command)
+{
+    SetMusicTempo(command[REDSOUND_MUSIC_COMMAND_VOLUME], command[REDSOUND_MUSIC_COMMAND_FADE_TIME]);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: UNUSED
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _MusicPitch(int* command)
+{
+    SetMusicPitch(command[REDSOUND_MUSIC_COMMAND_VOLUME], command[REDSOUND_MUSIC_COMMAND_FADE_TIME]);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: UNUSED
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _MusicPause(int* command)
+{
+    MusicPause(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME]);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bd578
  * PAL Size: 12b
  * EN Address: TODO
@@ -2257,6 +2299,48 @@ void CRedDriver::MusicFadeOut(int musicID, int fadeTime)
 void CRedDriver::MusicVolume(int musicID, int volume, int frameCount)
 {
     _EntryExecCommand(_MusicVolume, musicID, volume, frameCount, 0, 0, 0, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: UNUSED
+ * EN Size: 76b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::MusicTempo(int tempo, int frameCount)
+{
+    _EntryExecCommand(_MusicTempo, tempo, frameCount, 0, 0, 0, 0, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: UNUSED
+ * EN Size: 76b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::MusicPitch(int pitch, int frameCount)
+{
+    _EntryExecCommand(_MusicPitch, pitch, frameCount, 0, 0, 0, 0, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: UNUSED
+ * EN Size: 76b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::MusicPause(int musicID, int pause)
+{
+    _EntryExecCommand(_MusicPause, musicID, pause, 0, 0, 0, 0, 0);
 }
 
 /*

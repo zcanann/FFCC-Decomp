@@ -292,7 +292,7 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
 				fflush(__files + 1);
 			}
-			RedDeleteA(reinterpret_cast<RedWaveHeadWD*>(bank->m_data)->m_aramAddress);
+			RedDeleteA(bank->m_waveHead->m_aramAddress);
 			RedDelete(bank->m_data);
 		}
 
@@ -323,7 +323,7 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 
 	do {
 		if (history->m_historyNo > maxBankSize) {
-			arAddress = reinterpret_cast<RedWaveHeadWD*>(history->m_data)->m_aramAddress;
+			arAddress = history->m_waveHead->m_aramAddress;
 			if ((arAddress >= offset) && (arAddress < maxSize)) {
 				maxBankSize = history->m_historyNo;
 				selected = history;
@@ -419,9 +419,9 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 			                (REDSOUND_WAVE_TABLE_ALIGN - 1)) &
 			               REDSOUND_WAVE_TABLE_ALIGN_MASK;
 			copySize += waveHead->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE + REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
-			void* copied = (void*)RedNew(copySize);
+			RedWaveHeadWD* copied = (RedWaveHeadWD*)RedNew(copySize);
 			if (copied != 0) {
-				historyBank->m_data = (int)copied;
+				historyBank->m_waveHead = copied;
 				historyBank->m_size = copySize;
 				waveHead->m_aramAddress = arAddress;
 				historyBank->m_id = waveNo;
@@ -699,7 +699,7 @@ RedWaveHeadWD* CRedEntry::SearchWaveBase(int waveNo)
 
 	do {
 		if (waveNo == waveBank->m_id) {
-			return reinterpret_cast<RedWaveHeadWD*>(waveBank->m_data);
+			return waveBank->m_waveHead;
 		}
 		waveBank += 1;
 	} while (waveBank < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT);
@@ -816,7 +816,7 @@ void CRedEntry::DisplayWaveInfo()
 
 				RedHistoryBANK* history = m_waveBankBase;
 				do {
-					if ((history->m_size != 0) && (((RedWaveHeadWD*)history->m_data)->m_aramAddress == bank->m_address)) {
+					if ((history->m_size != 0) && (history->m_waveHead->m_aramAddress == bank->m_address)) {
 						break;
 					}
 					history += 1;
@@ -827,12 +827,12 @@ void CRedEntry::DisplayWaveInfo()
 						int index = reinterpret_cast<int>(history) - reinterpret_cast<int>(m_waveBankBase);
 						OSReport(sRedEntryAMemoryWaveBankInfoFmt, sRedEntryLogPrefix,
 						         index / REDSOUND_HISTORY_BANK_ENTRY_SIZE,
-						         (int)((RedWaveHeadWD*)history->m_data)->m_waveNo, ((RedWaveHeadWD*)history->m_data)->m_aramAddress, bank->m_size,
+						         (int)history->m_waveHead->m_waveNo, history->m_waveHead->m_aramAddress, bank->m_size,
 						         freeSize, history->m_historyNo);
 						fflush(__files + 1);
 					} else {
 						OSReport(sRedEntryAMemoryUnbankedWaveInfoFmt, sRedEntryLogPrefix,
-						         (int)((RedWaveHeadWD*)history->m_data)->m_waveNo, ((RedWaveHeadWD*)history->m_data)->m_aramAddress, bank->m_size,
+						         (int)history->m_waveHead->m_waveNo, history->m_waveHead->m_aramAddress, bank->m_size,
 						         freeSize, history->m_historyNo);
 						fflush(__files + 1);
 					}
@@ -983,8 +983,8 @@ int CRedEntry::SearchSeSepSequence(int seNo)
 int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
 {
 	int freedSize;
-	int waveNo = static_cast<unsigned int>(reinterpret_cast<RedSeSepHEAD*>(bank->m_data)->m_waveNoLo) +
-	             static_cast<unsigned int>(reinterpret_cast<RedSeSepHEAD*>(bank->m_data)->m_waveNoHi) * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE;
+	int waveNo = static_cast<unsigned int>(bank->m_seSepHead->m_waveNoLo) +
+	             static_cast<unsigned int>(bank->m_seSepHead->m_waveNoHi) * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE;
 
 	RedDelete(bank->m_data);
 	SeSepHistoryDelete(bank->m_historyNo);
@@ -1052,7 +1052,7 @@ RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 
 	if ((bank != 0) &&
 	    (bank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT)) {
-		bank->m_data = reinterpret_cast<int>(seSepHead);
+		bank->m_seSepHead = seSepHead;
 		result = reinterpret_cast<int>(seSepHead);
 		bank->m_size = seSepHead->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
 		bank->m_id = seSepHead->m_seNo;
@@ -1286,7 +1286,7 @@ void CRedEntry::DisplaySePlayInfo()
 					fflush(__files + 1);
 				} else {
 					RedHistoryBANK* seSepBank = SearchSeSepBank(track->m_seSepId);
-					RedSeSepHEAD* seSepHead = reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data);
+					RedSeSepHEAD* seSepHead = seSepBank->m_seSepHead;
 					trackIndex = track - *trackHead;
 					waveNo = (seSepHead->m_waveNoHi << 8) | seSepHead->m_waveNoLo;
 					OSReport(sRedEntrySeSepPlayInfoFmt, sRedEntryLogPrefix,
@@ -1409,7 +1409,7 @@ int CRedEntry::SearchMusicSequence(int musicNo)
  */
 int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
 {
-	WaveHistoryManager(0, reinterpret_cast<RedMusicHEAD*>(bank->m_data)->m_waveNo);
+	WaveHistoryManager(0, bank->m_musicHead->m_waveNo);
 	RedDelete(bank->m_data);
 	int freedSize = bank->m_size;
 	bank->m_data = bank->m_size = 0;
@@ -1580,7 +1580,7 @@ RedMusicHEAD* CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 	}
 
 	if (bank != 0) {
-		bank->m_data = reinterpret_cast<int>(musicHead);
+		bank->m_musicHead = musicHead;
 		result = reinterpret_cast<int>(musicHead);
 		bank->m_size = musicHead->m_size;
 		bank->m_id = static_cast<int>(musicHead->m_musicNo);

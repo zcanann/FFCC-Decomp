@@ -1,11 +1,21 @@
 #ifndef _FFCC_REDSOUND_REDENTRY_H
 #define _FFCC_REDSOUND_REDENTRY_H
 
+struct RedMusicHEAD;
+struct RedSeSepHEAD;
+struct RedWaveHeadWD;
+
 struct RedHistoryBANK
 {
 	int m_id;
 	int m_historyNo;
-	int m_data;
+	union {
+		int m_data;
+		void* m_pointer;
+		RedWaveHeadWD* m_waveHead;
+		RedSeSepHEAD* m_seSepHead;
+		RedMusicHEAD* m_musicHead;
+	};
 	int m_size;
 };
 

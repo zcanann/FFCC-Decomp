@@ -2247,6 +2247,66 @@ void CRedDriver::ClearMusicData(int musicID)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 372b
+ * EN Address: UNUSED
+ * EN Size: 372b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::MusicPlayState(int musicID)
+{
+    RedExecCommand* commandNow;
+    unsigned int interruptLevel;
+    RedSoundCONTROL* music;
+    int result;
+    RedExecCommand* command;
+
+    interruptLevel = OSDisableInterrupts();
+    result = 0;
+    music = p_SoundControlBuffer;
+    do {
+        if ((music->m_activeTrackCount != 0) &&
+            (music->m_musicId != REDSOUND_MUSIC_ID_NONE) &&
+            ((musicID == REDSOUND_MUSIC_ID_NONE) || (music->m_musicId == musicID))) {
+            result = (int)music;
+            break;
+        }
+        music++;
+    } while (music < p_SoundControlBuffer + REDSOUND_CONTROL_SE);
+
+    if (result == 0) {
+        if ((p_MusicNextPlay->m_musicId != REDSOUND_MUSIC_ID_NONE) &&
+            ((musicID == REDSOUND_MUSIC_ID_NONE) || (p_MusicNextPlay->m_musicId == musicID))) {
+            result = 1;
+        }
+    }
+    if (result == 0) {
+        commandNow = p_ExecCommandNow;
+        command = p_ExecCommandOld;
+        while (commandNow != command) {
+            if ((command->m_func != 0) &&
+                (((command->m_func == _MusicPlaySequence) ||
+                  (command->m_func == _MusicCrossPlaySequence)) ||
+                 ((command->m_func == _MusicNextPlaySequence) ||
+                  (command->m_func == _MusicStop))) &&
+                ((musicID == REDSOUND_MUSIC_ID_NONE) ||
+                 (musicID == command->m_args[REDSOUND_EXEC_COMMAND_ARG0]))) {
+                result = (int)command;
+                break;
+            }
+            command++;
+            if (command == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
+                command = p_ExecCommand;
+            }
+        }
+    }
+    OSRestoreInterrupts(interruptLevel);
+    return result;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bee48
  * PAL Size: 72b
  * EN Address: TODO

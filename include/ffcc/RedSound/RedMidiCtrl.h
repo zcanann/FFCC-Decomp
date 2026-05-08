@@ -280,6 +280,20 @@ enum RedKeyOnByteOffset {
 	REDSOUND_KEY_ON_END_BYTE_OFFSET = REDSOUND_KEY_ON_TOTAL_WORD_COUNT * sizeof(int),
 };
 
+struct RedSoundControlPosition {
+	int m_measure;
+	int m_tick;
+	int m_ticksPerMeasure;
+	short m_timeNumerator;
+	short m_timeDenominator;
+};
+
+struct RedSoundControlTempo {
+	int m_tempo;
+	int m_tempoAdd;
+	int m_tempoDelta;
+};
+
 struct RedSoundCONTROL {
 	RedTrackDATA* m_tracks;
 	unsigned char m_reserved04[0x08 - 0x04];
@@ -384,10 +398,10 @@ enum RedSoundControlBufferOffset {
 enum RedSoundControlSaveSize {
 	REDSOUND_CONTROL_SAVED_POSITION_WORD_COUNT = 4,
 	REDSOUND_CONTROL_SAVED_POSITION_ALLOC_SIZE = 0x10,
-	REDSOUND_CONTROL_SAVED_POSITION_SIZE = sizeof(int) * REDSOUND_CONTROL_SAVED_POSITION_WORD_COUNT,
+	REDSOUND_CONTROL_SAVED_POSITION_SIZE = sizeof(RedSoundControlPosition),
 	REDSOUND_CONTROL_SAVED_TEMPO_WORD_COUNT = 3,
 	REDSOUND_CONTROL_SAVED_TEMPO_ALLOC_SIZE = 0x0C,
-	REDSOUND_CONTROL_SAVED_TEMPO_SIZE = sizeof(int) * REDSOUND_CONTROL_SAVED_TEMPO_WORD_COUNT,
+	REDSOUND_CONTROL_SAVED_TEMPO_SIZE = sizeof(RedSoundControlTempo),
 };
 
 typedef void (*RedMidiControlFunc)(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);

@@ -3252,6 +3252,27 @@ RedReverbModeData* CRedDriver::GetReverbModeTable(int mode)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 80b
+ * EN Address: UNUSED
+ * EN Size: 80b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedTrackDATA* CRedDriver::GetSePlayTrack()
+{
+    RedTrackDATA* track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+    while (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT) {
+        if ((u32)track->m_command != 0) {
+            return track;
+        }
+        track++;
+    }
+    return 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bfea4
  * PAL Size: 52b
  * EN Address: TODO

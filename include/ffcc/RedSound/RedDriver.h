@@ -9,6 +9,7 @@ typedef void (*RedDmaCallback)(void* callbackData);
 struct RedReverbDepth;
 struct RedReverbModeData;
 struct RedReverbSize;
+struct RedTrackDATA;
 struct RedWaveHeadWD;
 
 enum RedDmaEntryFlag {
@@ -80,6 +81,7 @@ public:
 	int GetSeVolume(int seId, int mode);
 	int ReportSeLoop(int seId);
 	void DisplaySePlayInfo();
+	RedTrackDATA* GetSePlayTrack();
 
 
 	int StreamPlayState(int streamId);

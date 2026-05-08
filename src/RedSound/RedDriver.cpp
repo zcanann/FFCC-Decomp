@@ -1235,6 +1235,7 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
     RedDmaRequest* volatile* queuePtr;
     unsigned int entryID;
     int chunkSize;
+    int transferSize;
     RedDmaRequest* queueEntry;
 
     interrupt = OSDisableInterrupts();
@@ -1257,13 +1258,14 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
                 chunkSize = sizeBytes;
             }
             queueEntry->m_id = entryID;
-            sizeBytes -= chunkSize;
+            transferSize = chunkSize;
+            sizeBytes -= transferSize;
             queueEntry->m_direction = direction;
             queueEntry->m_mainMemory = mainMemory;
-            mainMemory += chunkSize;
+            mainMemory += transferSize;
             queueEntry->m_aramMemory = aramMemory;
-            aramMemory += chunkSize;
-            queueEntry->m_size = chunkSize;
+            aramMemory += transferSize;
+            queueEntry->m_size = transferSize;
             queueEntry->m_callbackData = callbackData;
             if (sizeBytes < 1) {
                 queueEntry->m_callback = callback;

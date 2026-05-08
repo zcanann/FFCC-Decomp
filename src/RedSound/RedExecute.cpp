@@ -239,6 +239,8 @@ enum RedExecuteAxVoiceLayout {
     REDSOUND_AX_MIX_CTRL_DRY_STEREO = 0x3,
     REDSOUND_AX_MIX_CTRL_AUX_A_STEREO = 0x30,
     REDSOUND_AX_MIX_CTRL_AUX_B_STEREO = 0x600,
+    REDSOUND_AX_SAMPLE_ADDR_SCALE = 2,
+    REDSOUND_AX_SAMPLE_START_BIAS = 1,
 };
 
 enum RedExecutePitchModConst {
@@ -1763,8 +1765,9 @@ void EnvelopeKeyExecute()
                     voiceData[REDSOUND_VOICE_ACTIVE_WORD] = 0;
                 } else {
                     envChanged += 1;
-                    int key = (trackData->m_waveBase + waveData->m_sampleStart + 1) * 2;
-                    int keyBase = key - 2;
+                    int key = (trackData->m_waveBase + waveData->m_sampleStart + REDSOUND_AX_SAMPLE_START_BIAS) *
+                              REDSOUND_AX_SAMPLE_ADDR_SCALE;
+                    int keyBase = key - REDSOUND_AX_SAMPLE_ADDR_SCALE;
 
                     *(u16*)(voice + REDSOUND_AX_VOICE_LOOP_OFFSET) =
                         (u16)((voiceData[REDSOUND_VOICE_SWITCH_WORD] & REDSOUND_VOICE_SWITCH_LOOP) != 0);

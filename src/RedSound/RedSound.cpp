@@ -19,7 +19,9 @@ enum RedSoundLocalSize {
 	REDSOUND_SOUND_OBJECT_SIZE = 0x01,
 	REDSOUND_STANDBY_STATUS_COUNT = 0x40,
 	REDSOUND_STANDBY_STATUS_SIZE = REDSOUND_STANDBY_STATUS_COUNT * sizeof(int),
+	REDSOUND_STANDBY_STATUS_OFFSET = 0x0C,
 	REDSOUND_STANDBY_STATUS_ALLOC_SIZE = 0x100,
+	REDSOUND_BSS_SIZE = 0x10C,
 	REDSOUND_STREAM_BANK_SIZE = 0x100,
 };
 
@@ -41,11 +43,26 @@ enum RedSoundStringLayout {
 };
 
 enum RedSoundSmallDataLayout {
+	REDSOUND_SOUND_SBSS_DRIVER_OFFSET = 0x00,
 	REDSOUND_DRIVER_OBJECT_SIZE = 0x01,
 	REDSOUND_AUTO_ID_SIZE = 0x04,
+	REDSOUND_SOUND_SBSS_AUTO_ID_OFFSET = 0x04,
 	REDSOUND_STREAM_BANK_PTR_SIZE = 0x04,
+	REDSOUND_SOUND_SBSS_STREAM_BANK_OFFSET = 0x08,
 	REDSOUND_SBSS_PADDING_SIZE = 0x03,
 	REDSOUND_SBSS_SIZE = 0x0c,
+};
+
+struct RedSoundBssState {
+	u8 m_initPadding[REDSOUND_STANDBY_STATUS_OFFSET];
+	int m_standbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
+};
+
+struct RedSoundSmallDataState {
+	CRedDriver m_driver;
+	u8 m_driverPadding[REDSOUND_SBSS_PADDING_SIZE];
+	volatile unsigned int m_autoId;
+	void* m_streamBank;
 };
 
 // RedSound global linkage that is shared across Red* units.
@@ -68,10 +85,16 @@ static const char sRedSoundLogInfoColor[] = "\x1B[4;34m";
 
 STATIC_ASSERT(sizeof(m_StandbyStatus) == REDSOUND_STANDBY_STATUS_SIZE);
 STATIC_ASSERT(sizeof(CRedSound) == REDSOUND_SOUND_OBJECT_SIZE);
+STATIC_ASSERT(offsetof(RedSoundBssState, m_standbyStatus) == REDSOUND_STANDBY_STATUS_OFFSET);
+STATIC_ASSERT(sizeof(RedSoundBssState) == REDSOUND_BSS_SIZE);
 STATIC_ASSERT(REDSOUND_STANDBY_STATUS_SIZE == REDSOUND_STANDBY_STATUS_ALLOC_SIZE);
 STATIC_ASSERT(sizeof(c_Driver) == REDSOUND_DRIVER_OBJECT_SIZE);
 STATIC_ASSERT(sizeof(m_AutoID) == REDSOUND_AUTO_ID_SIZE);
 STATIC_ASSERT(sizeof(p_StreamBank) == REDSOUND_STREAM_BANK_PTR_SIZE);
+STATIC_ASSERT(offsetof(RedSoundSmallDataState, m_driver) == REDSOUND_SOUND_SBSS_DRIVER_OFFSET);
+STATIC_ASSERT(offsetof(RedSoundSmallDataState, m_autoId) == REDSOUND_SOUND_SBSS_AUTO_ID_OFFSET);
+STATIC_ASSERT(offsetof(RedSoundSmallDataState, m_streamBank) == REDSOUND_SOUND_SBSS_STREAM_BANK_OFFSET);
+STATIC_ASSERT(sizeof(RedSoundSmallDataState) == REDSOUND_SBSS_SIZE);
 STATIC_ASSERT(sizeof(c_Driver) + REDSOUND_SBSS_PADDING_SIZE + sizeof(m_AutoID) + sizeof(p_StreamBank) ==
               REDSOUND_SBSS_SIZE);
 STATIC_ASSERT(sizeof(sRedSoundMemorySettingError) == REDSOUND_MEMORY_SETTING_ERROR_SIZE);

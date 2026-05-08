@@ -1,8 +1,15 @@
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedGlobals.h"
+#include "global.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <dolphin/os.h>
+
+STATIC_ASSERT(offsetof(RedMemoryBlock, m_address) == 0);
+STATIC_ASSERT(offsetof(RedMemoryBlock, m_size) == sizeof(int));
+STATIC_ASSERT(sizeof(RedMemoryBlock) == REDSOUND_MEMORY_BLOCK_SIZE);
+STATIC_ASSERT(REDSOUND_MEMORY_BANK_SIZE == 0x2000);
+STATIC_ASSERT(REDSOUND_MEMORY_BANK_TABLE_SIZE == 0x4000);
 
 static int m_DataBuffer;
 static int m_ADataBuffer;

@@ -59,6 +59,12 @@ struct RedStreamFile {
     RedStreamADPCMHeader m_adpcm[1];
 };
 
+struct RedStreamStepData {
+    int m_value;
+    int m_step;
+    int m_stepCount;
+};
+
 enum RedStreamFileLayoutOffset {
     REDSOUND_STREAM_FILE_HEAD_OFFSET = 0x00,
     REDSOUND_STREAM_FILE_ADPCM_OFFSET = 0x20,
@@ -88,13 +94,9 @@ struct RedStreamDATA {
     u8* m_buffer;
     RedStreamHEAD m_header;
     RedWaveDATA m_trackData[REDSOUND_STREAM_TRACK_DATA_COUNT];
-    int m_volume;
-    int m_volumeStep;
-    int m_volumeStepCount;
+    RedStreamStepData m_volume;
     int m_reservedFC;
-    int m_pan;
-    int m_panStep;
-    int m_panStepCount;
+    RedStreamStepData m_pan;
     int m_streamId;
     int m_state;
     int m_dmaId;

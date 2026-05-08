@@ -1878,7 +1878,7 @@ static void _KeyOnControl()
     u32 voiceStartMask[2];
     RedKeyOnSlot* reserve;
     RedVoiceDATA* voiceData;
-    int (*waveFunc)(int);
+    RedSwingFunc waveFunc;
 
     _VoiceEnvelopeCheck();
     voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] = 0;

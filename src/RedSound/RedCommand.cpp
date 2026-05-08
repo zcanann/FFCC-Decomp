@@ -789,8 +789,11 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		current = (RedMusicTrackBlock*)((unsigned char*)current + blockSize);
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
 		track->m_seSepId = 0;
-		track->m_keySignatureData =
-		    (m_MusicKeySignature == 0) ? 0 : t_KeySignatureData + REDSOUND_KEY_SIGNATURE_DEFAULT_OFFSET;
+		if (m_MusicKeySignature != 0) {
+			track->m_keySignatureData = t_KeySignatureData + REDSOUND_KEY_SIGNATURE_DEFAULT_OFFSET;
+		} else {
+			track->m_keySignatureData = 0;
+		}
 		track->m_mixVolume = REDSOUND_VOLUME_DEFAULT;
 		track->m_mixVolumeDelta = 0;
 		track->m_volume = REDSOUND_VOLUME_FULL;

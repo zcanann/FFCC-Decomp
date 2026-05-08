@@ -1541,7 +1541,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
     *stage    = 0;
     do {
         prevLevel = nextLevel;
-        stepFrames = *(u16*)(adsrData + *stage * 2);
+        stepFrames = *(u16*)(adsrData + *stage * REDSOUND_VOICE_ADSR_TIME_BYTE_STRIDE);
         nextLevel = *(u8*)(adsrData + *stage + REDSOUND_VOICE_ADSR_LEVEL_BASE);
         if (stepFrames != 0) {
             break;
@@ -1594,7 +1594,7 @@ static void _AdsrDataCompute(RedVoiceDATA* voice)
     while (*stage < REDSOUND_VOICE_ADSR_STAGE_COUNT) {
         prevValue = level;
         level = (u32)*(u8*)(adsrData + *stage + REDSOUND_VOICE_ADSR_LEVEL_BASE);
-        stepCount = (u32)*(u16*)(adsrData + *stage * 2);
+        stepCount = (u32)*(u16*)(adsrData + *stage * REDSOUND_VOICE_ADSR_TIME_BYTE_STRIDE);
         if (level != 0) {
             level += 1;
             level <<= 8;

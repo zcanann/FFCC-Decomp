@@ -1863,6 +1863,59 @@ int CRedEntry::ClearMusicData(int musicNo)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 428b
+ * EN Address: UNUSED
+ * EN Size: 428b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedEntry::DisplayMusicInfo()
+{
+	if (m_ReportPrint != 0) {
+		OSReport(sRedEntryNewline);
+		fflush(__files + 1);
+		OSReport(sRedEntryMusicInformationHeaderFmt, sRedEntryLogPrefix);
+		fflush(__files + 1);
+		OSReport(sRedEntryMusicInfoColumnFmt, sRedEntryLogPrefix);
+		fflush(__files + 1);
+
+		RedHistoryBANK* history = m_musicBankBase;
+		RedSoundCONTROL* control = p_SoundControlBuffer;
+		do {
+			if (history->m_size != 0) {
+				int playing = 0;
+				if ((control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0) &&
+				    (control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == history->m_id)) {
+					playing = 1;
+				}
+				if ((control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) &&
+				    (control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId == history->m_id)) {
+					playing = 1;
+				}
+
+				if (playing > 0) {
+					OSReport(sRedEntryMusicInfoPlayFmt, sRedEntryLogPrefix,
+					         history->m_id, history->m_musicHead->m_waveNo, history->m_size);
+					fflush(__files + 1);
+				} else {
+					OSReport(sRedEntryMusicInfoStopFmt, sRedEntryLogPrefix,
+					         history->m_id, history->m_musicHead->m_waveNo, history->m_size);
+					fflush(__files + 1);
+				}
+			}
+			history += 1;
+		} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
+
+		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
+		fflush(__files + 1);
+		OSReport(sRedEntryNewline);
+		fflush(__files + 1);
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801c2b70
  * PAL Size: 1108b
  * EN Address: TODO

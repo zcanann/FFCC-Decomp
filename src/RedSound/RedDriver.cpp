@@ -2373,6 +2373,20 @@ void CRedDriver::MusicPause(int musicID, int pause)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: UNUSED
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::DisplayMusicInfo()
+{
+    c_RedEntry.DisplayMusicInfo();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bf07c
  * PAL Size: 72b
  * EN Address: TODO

@@ -54,6 +54,7 @@ public:
 	void MusicTempo(int tempo, int frameCount);
 	void MusicPitch(int pitch, int frameCount);
 	void MusicPause(int musicId, int pause);
+	void DisplayMusicInfo();
 	void SetMusicPhraseStop(int enable);
 	void SetMusicFastSpeed(int speed);
 	int CheckMusicPhraseStop();

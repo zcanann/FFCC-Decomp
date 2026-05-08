@@ -353,6 +353,7 @@ public:
 	RedMusicHEAD* MusicHeadAdd(RedMusicHEAD* musicHead);
 	RedMusicHEAD* SetMusicData(RedMusicHEAD* musicHead);
 	int ClearMusicData(int musicNo);
+	void DisplayMusicInfo();
 	void DisplayMMemoryInfo();
 
 	RedHistoryBANK* m_waveBankBase;

@@ -2228,7 +2228,7 @@ int CRedDriver::ReentryMusicData(int musicID)
  */
 int CRedDriver::CheckMusicEntry(int musicID)
 {
-    return c_RedEntry.SearchMusicBank(musicID) != 0;
+    return (int)c_RedEntry.SearchMusicBank(musicID);
 }
 
 /*
@@ -2629,7 +2629,7 @@ int CRedDriver::ReentrySeSepData(int id)
  */
 int CRedDriver::CheckSeSepEntry(int id)
 {
-    return c_RedEntry.SearchSeSepBank(id) != 0;
+    return (int)c_RedEntry.SearchSeSepBank(id);
 }
 
 /*
@@ -3226,7 +3226,7 @@ RedWaveHeadWD* CRedDriver::GetWaveInfo(int id)
  */
 int CRedDriver::CheckWaveEntry(int id)
 {
-    return c_RedEntry.SearchWaveBase(id) != 0;
+    return (int)c_RedEntry.SearchWaveBase(id);
 }
 
 /*

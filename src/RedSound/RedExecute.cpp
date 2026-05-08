@@ -2963,7 +2963,7 @@ void MainControl(int frames)
                     step >>= REDSOUND_TEMPO_SCALE_SHIFT;
                 } else {
                     step *= (int)mul + 1;
-                    step >>= 0xF;
+                    step >>= REDSOUND_TEMPO_SCALE_POSITIVE_SHIFT;
                     step += p_SoundControl->m_tempo >> REDSOUND_FIXED_SHIFT;
                 }
             }

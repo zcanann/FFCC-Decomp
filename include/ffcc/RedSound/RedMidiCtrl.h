@@ -72,14 +72,7 @@ struct RedTrackDATA {
 	int m_shakePan;
 	short m_shakeRateDelta;
 	short m_shakeDepthDelta;
-	unsigned short m_adsrAR;
-	unsigned short m_adsrDR;
-	unsigned short m_adsrSR;
-	unsigned short m_adsrRR;
-	unsigned char m_adsrAL;
-	unsigned char m_adsrDL;
-	unsigned char m_adsrSL;
-	unsigned char m_adsrRL;
+	RedAdsrDATA m_adsr;
 	int m_fuzzyPitchDepth;
 	int m_fuzzyVolumeDepth;
 	int m_fuzzyPanDepth;

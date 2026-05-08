@@ -96,14 +96,12 @@ STATIC_ASSERT(offsetof(RedTrackDATA, m_shakeRateDelta) ==
               REDSOUND_TRACK_SHAKE_RATE_DELTA_HALFWORD * sizeof(unsigned short));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_shakeDepthDelta) ==
               REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD * sizeof(unsigned short));
-STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrAR) == REDSOUND_TRACK_ADSR_TIME_ATTACK_HALFWORD * sizeof(unsigned short));
-STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrDR) == REDSOUND_TRACK_ADSR_TIME_DECAY_HALFWORD * sizeof(unsigned short));
-STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrSR) == REDSOUND_TRACK_ADSR_TIME_SUSTAIN_HALFWORD * sizeof(unsigned short));
-STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrRR) == REDSOUND_TRACK_ADSR_TIME_RELEASE_HALFWORD * sizeof(unsigned short));
-STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrAL) == REDSOUND_TRACK_ADSR_LEVEL_ATTACK_OFFSET);
-STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrDL) == REDSOUND_TRACK_ADSR_LEVEL_DECAY_OFFSET);
-STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrSL) == REDSOUND_TRACK_ADSR_LEVEL_SUSTAIN_OFFSET);
-STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrRL) == REDSOUND_TRACK_ADSR_LEVEL_RELEASE_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_adsr) == REDSOUND_TRACK_ADSR_TIME_ATTACK_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedAdsrDATA, m_time) == 0);
+STATIC_ASSERT(offsetof(RedAdsrDATA, m_level) ==
+              REDSOUND_TRACK_ADSR_LEVEL_ATTACK_OFFSET -
+                  REDSOUND_TRACK_ADSR_TIME_ATTACK_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(sizeof(RedAdsrDATA) == REDSOUND_TRACK_ADSR_SIZE);
 STATIC_ASSERT(offsetof(RedTrackDATA, m_fuzzyPitchDepth) ==
               REDSOUND_TRACK_FUZZY_PITCH_DEPTH_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_fuzzyVolumeDepth) ==
@@ -1416,7 +1414,7 @@ static void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
         waveTable = track->m_waveBankData->m_waveOffsets;
         track->m_waveData = (RedWaveDATA*)((int)track->m_waveBankData + waveTable[waveNo]);
         track->m_waveBase = track->m_waveBankData->m_aramAddress;
-        memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
+        memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
     }
     track->m_waveBankNo = REDSOUND_MIDI_WAVE_BANK_DIRECT;
     track->m_waveNo = waveNo;
@@ -1449,7 +1447,7 @@ static void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
 		waveTable = waveBankData->m_waveOffsets;
 		track->m_waveData = (RedWaveDATA*)((int)waveBankData + waveTable[waveNo]);
 		track->m_waveBase = waveBankData->m_aramAddress;
-		memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
+		memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
 	}
 	track->m_waveBankNo = bankNo;
 	track->m_waveNo = waveNo;
@@ -1741,14 +1739,14 @@ static void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
 {
     RedVoiceDATA* voice;
 
-    *(int*)&track->m_adsrAR = REDSOUND_TRACK_ADSR_DEFAULT_WORD;
-    *(int*)&track->m_adsrSR = REDSOUND_TRACK_ADSR_DEFAULT_WORD;
-    memset(&track->m_adsrAR, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
+    *(int*)&track->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = REDSOUND_TRACK_ADSR_DEFAULT_WORD;
+    *(int*)&track->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN] = REDSOUND_TRACK_ADSR_DEFAULT_WORD;
+    memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
 
     voice = p_VoiceData;
     do {
         if ((voice->m_track == track) && (voice->m_waveData != 0)) {
-            memcpy(&voice->m_adsr, voice->m_waveData->m_adsr, sizeof(RedVoiceAdsrDATA));
+            memcpy(&voice->m_adsr, voice->m_waveData->m_adsr, sizeof(RedAdsrDATA));
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;
@@ -1770,7 +1768,7 @@ static void __MidiCtrl_ADSR_AL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     RedVoiceDATA* voice;
 
     value = *track->m_command++;
-    track->m_adsrAL = value;
+    track->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] = value;
 
     voice = p_VoiceData;
     do {
@@ -1797,7 +1795,7 @@ static void __MidiCtrl_ADSR_AR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     int delta;
 
     delta = DeltaTimeSumup((unsigned char**)&track->m_command);
-    track->m_adsrAR = delta;
+    track->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = delta;
 
     voice = p_VoiceData;
     do {
@@ -1824,7 +1822,7 @@ static void __MidiCtrl_ADSR_DL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     RedVoiceDATA* voice;
 
     value = *track->m_command++;
-    track->m_adsrDL = value;
+    track->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] = value;
 
     voice = p_VoiceData;
     do {
@@ -1851,7 +1849,7 @@ static void __MidiCtrl_ADSR_DR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     int delta;
 
     delta = DeltaTimeSumup((unsigned char**)&track->m_command);
-    track->m_adsrDR = delta;
+    track->m_adsr.m_time[REDSOUND_VOICE_ADSR_DECAY] = delta;
 
     voice = p_VoiceData;
     do {
@@ -1878,7 +1876,7 @@ static void __MidiCtrl_ADSR_SL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     RedVoiceDATA* voice;
 
     value = *track->m_command++;
-    track->m_adsrSL = value;
+    track->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] = value;
 
     voice = p_VoiceData;
     do {
@@ -1905,7 +1903,7 @@ static void __MidiCtrl_ADSR_SR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     int delta;
 
     delta = DeltaTimeSumup((unsigned char**)&track->m_command);
-    track->m_adsrSR = delta;
+    track->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN] = delta;
 
     voice = p_VoiceData;
     do {
@@ -1932,7 +1930,7 @@ static void __MidiCtrl_ADSR_RL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     RedVoiceDATA* voice;
 
     value = *track->m_command++;
-    track->m_adsrRL = value;
+    track->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] = value;
 
     voice = p_VoiceData;
     do {
@@ -1959,7 +1957,7 @@ static void __MidiCtrl_ADSR_RR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 	int delta;
 
 	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
-	track->m_adsrRR = delta;
+	track->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE] = delta;
 
 	voice = p_VoiceData;
 	do {

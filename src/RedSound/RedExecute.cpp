@@ -390,10 +390,10 @@ STATIC_ASSERT(offsetof(RedVoiceDATA, m_randomPitch) == REDSOUND_VOICE_RANDOM_PIT
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_randomVolume) == REDSOUND_VOICE_RANDOM_VOLUME_WORD * sizeof(int));
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_randomPan) == REDSOUND_VOICE_RANDOM_PAN_WORD * sizeof(int));
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsr) == REDSOUND_VOICE_ADSR_TIME_OFFSET);
-STATIC_ASSERT(offsetof(RedVoiceAdsrDATA, m_time) == 0);
-STATIC_ASSERT(offsetof(RedVoiceAdsrDATA, m_level) ==
+STATIC_ASSERT(offsetof(RedAdsrDATA, m_time) == 0);
+STATIC_ASSERT(offsetof(RedAdsrDATA, m_level) ==
               REDSOUND_VOICE_ADSR_LEVEL_OFFSET - REDSOUND_VOICE_ADSR_TIME_OFFSET);
-STATIC_ASSERT(sizeof(RedVoiceAdsrDATA) == REDSOUND_TRACK_ADSR_SIZE);
+STATIC_ASSERT(sizeof(RedAdsrDATA) == REDSOUND_TRACK_ADSR_SIZE);
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrStage) == REDSOUND_VOICE_ADSR_STAGE_OFFSET);
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrStepFrames) == REDSOUND_VOICE_ADSR_STEP_FRAMES_WORD * sizeof(int));
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrStepAdd) == REDSOUND_VOICE_ADSR_STEP_ADD_WORD * sizeof(int));
@@ -1256,11 +1256,11 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     voice->m_trackPan = &track->m_pan;
 
     if (voice->m_waveData == 0) {
-        memset(&voice->m_adsr, 0, sizeof(RedVoiceAdsrDATA));
+        memset(&voice->m_adsr, 0, sizeof(RedAdsrDATA));
     } else {
         memcpy(&voice->m_adsr,
                track->m_waveData->m_adsr,
-               sizeof(RedVoiceAdsrDATA));
+               sizeof(RedAdsrDATA));
     }
 
     voice->m_voiceSwitch = track->m_voiceSwitch;
@@ -1369,38 +1369,38 @@ skipModSetup:
     if (voice->m_waveData != 0) {
         memcpy(&voice->m_adsr,
                voice->m_waveData->m_adsr,
-               sizeof(RedVoiceAdsrDATA));
-        if ((s8)track->m_adsrAL != -1) {
+               sizeof(RedAdsrDATA));
+        if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] != -1) {
             voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] =
-                track->m_adsrAL;
+                track->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK];
         }
-        if ((s16)track->m_adsrAR != -1) {
+        if ((s16)track->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] != -1) {
             voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] =
-                track->m_adsrAR;
+                track->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK];
         }
-        if ((s8)track->m_adsrDL != -1) {
+        if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] != -1) {
             voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] =
-                track->m_adsrDL;
+                track->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY];
         }
-        if ((s16)track->m_adsrDR != -1) {
+        if ((s16)track->m_adsr.m_time[REDSOUND_VOICE_ADSR_DECAY] != -1) {
             voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_DECAY] =
-                track->m_adsrDR;
+                track->m_adsr.m_time[REDSOUND_VOICE_ADSR_DECAY];
         }
-        if ((s8)track->m_adsrSL != -1) {
+        if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] != -1) {
             voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] =
-                track->m_adsrSL;
+                track->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN];
         }
-        if ((s16)track->m_adsrSR != -1) {
+        if ((s16)track->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN] != -1) {
             voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN] =
-                track->m_adsrSR;
+                track->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN];
         }
-        if ((s8)track->m_adsrRL != -1) {
+        if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] != -1) {
             voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] =
-                track->m_adsrRL;
+                track->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE];
         }
-        if ((s16)track->m_adsrRR != -1) {
+        if ((s16)track->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE] != -1) {
             voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE] =
-                track->m_adsrRR;
+                track->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE];
         }
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
             u16 random = GetRandomData();
@@ -1409,7 +1409,7 @@ skipModSetup:
             voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = attack;
         }
     } else {
-        memset(&voice->m_adsr, 0, sizeof(RedVoiceAdsrDATA));
+        memset(&voice->m_adsr, 0, sizeof(RedAdsrDATA));
     }
 
     workValue = ((int)voice - (int)p_VoiceData) / REDSOUND_VOICE_SIZE;

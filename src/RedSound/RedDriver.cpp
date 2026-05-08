@@ -458,6 +458,11 @@ enum RedDriverThreadConfig {
     REDSOUND_THREAD_YIELD_SLEEP_US = 0,
 };
 
+enum RedDriverSleepTimer {
+    REDSOUND_SLEEP_TIMER_DIVISOR = 125000,
+    REDSOUND_SLEEP_TIMER_SHIFT = 3,
+};
+
 enum RedDriverCommandParse {
     REDSOUND_DELTA_TIME_VALUE_MASK = 0x7F,
     REDSOUND_DELTA_TIME_CONTINUE_FLAG = 0x80,
@@ -1353,7 +1358,9 @@ void RedSleep(int microseconds)
     interruptLevel = OSDisableInterrupts();
     alarm.m_thread = OSGetCurrentThread();
     OSCreateAlarm(&alarm.m_alarm);
-    OSSetAlarm(&alarm.m_alarm, (microseconds * (OS_TIMER_CLOCK / 125000)) >> 3, _MyAlarmHandler);
+    OSSetAlarm(&alarm.m_alarm,
+               (microseconds * (OS_TIMER_CLOCK / REDSOUND_SLEEP_TIMER_DIVISOR)) >> REDSOUND_SLEEP_TIMER_SHIFT,
+               _MyAlarmHandler);
     OSSuspendThread(alarm.m_thread);
     OSRestoreInterrupts(interruptLevel);
 }

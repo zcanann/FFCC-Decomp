@@ -2626,14 +2626,14 @@ void MusicSkipFunction()
     RedTrackDATA* track;
 
     do {
-        p_SkipKeyOn = (RedKeyOnDATA*)RedNew(REDSOUND_KEY_ON_BUFFER_SIZE);
+        p_SkipKeyOn = (RedKeyOnDATA*)RedNew(sizeof(RedKeyOnDATA));
         if (p_SkipKeyOn == 0) {
             RedSleep(10000);
         }
     } while (p_SkipKeyOn == 0);
 
     control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP;
-    memset(p_SkipKeyOn, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
+    memset(p_SkipKeyOn, 0, sizeof(RedKeyOnDATA));
     activeTrackCount = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
     while ((activeTrackCount == 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
@@ -2940,7 +2940,7 @@ void MainControl(int frames)
 
     _KeyOnControl();
     m_KeyOnEntry = 0;
-    memset(p_KeyOnData, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
+    memset(p_KeyOnData, 0, sizeof(RedKeyOnDATA));
 
     p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
     _SeMidiNoteExecute(p_SoundControl, p_KeyOnData,

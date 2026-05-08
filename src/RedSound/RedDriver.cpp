@@ -2379,7 +2379,7 @@ void CRedDriver::SeStopMG(int id1, int id2, int id3, int id4)
  */
 int CRedDriver::SePlay(int bank, int sep, int autoID, int pan, int volume, int pitch)
 {
-	if (bank == -1) {
+	if (bank == REDSOUND_SE_BANK_SESEP) {
 		if (sep >= 0) {
 			_EntryExecCommand(_SeSepPlaySequence, autoID, sep, pan, volume, pitch, 0, 0);
 		}

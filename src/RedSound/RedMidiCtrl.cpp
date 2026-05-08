@@ -301,6 +301,7 @@ STATIC_ASSERT(REDSOUND_SWING_FUNCTION_TABLE_SIZE == REDSOUND_SWING_FUNCTION_TABL
 enum RedMidiSwingConst {
     REDSOUND_SWING_SINE_MASK = REDSOUND_SIGN_DATA_TABLE_COUNT - 1,
     REDSOUND_SWING_PHASE_SIGN = 0x200,
+    REDSOUND_SWING_SAW_PHASE_SHIFT = 2,
     REDSOUND_SWING_PHASE_SHIFT = 8,
     REDSOUND_SWING_PHASE_MASK = 0xFF,
     REDSOUND_SWING_PHASE_INVERT_MASK = 0xffffffffU,
@@ -683,7 +684,7 @@ static int TriangleSwing(int phase)
  */
 static int SawSwing(int phase)
 {
-    int result = (int)(char)(phase >> 2) << REDSOUND_SWING_PHASE_SHIFT;
+    int result = (int)(char)(phase >> REDSOUND_SWING_SAW_PHASE_SHIFT) << REDSOUND_SWING_PHASE_SHIFT;
 
     return result;
 }
@@ -816,7 +817,8 @@ static int DutySwingR(int phase)
  */
 static int SawSwingR(int phase)
 {
-    int result = (int)(char)((int)((u32)phase ^ REDSOUND_SWING_PHASE_INVERT_MASK) >> 2) << REDSOUND_SWING_PHASE_SHIFT;
+    int result = (int)(char)((int)((u32)phase ^ REDSOUND_SWING_PHASE_INVERT_MASK) >> REDSOUND_SWING_SAW_PHASE_SHIFT)
+                 << REDSOUND_SWING_PHASE_SHIFT;
 
     return result;
 }

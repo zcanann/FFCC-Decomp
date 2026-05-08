@@ -42,7 +42,7 @@ enum RedSeInfoSequenceByte {
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET_HI = 1,
 };
 
-RedReverbModeData t_ReverbModeData[] = {
+RedReverbModeData t_ReverbModeData[REDSOUND_REVERB_MODE_COUNT] = {
     {REDSOUND_REVERB_KIND_HI, {0xA, 0x578, 0x1E, 0x46, 0x64, 0x0}},
     {REDSOUND_REVERB_KIND_HI, {0x14, 0x708, 0x1E, 0x50, 0x64, 0x0}},
     {REDSOUND_REVERB_KIND_HI, {0x1E, 0x960, 0x1E, 0x50, 0x64, 0x0}},

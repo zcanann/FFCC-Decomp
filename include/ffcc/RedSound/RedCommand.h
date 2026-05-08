@@ -8,6 +8,7 @@ struct RedWaveHeadWD;
 
 enum RedReverbModeLayout {
 	REDSOUND_REVERB_MODE_PARAM_COUNT = 6,
+	REDSOUND_REVERB_MODE_COUNT = 8,
 };
 
 enum RedReverbParamIndex {
@@ -43,6 +44,6 @@ int MusicStop(int musicId);
 int MusicPlay(int musicId, int volume, int mode);
 void SetMusicVolume(int musicId, int volume, int frameCount, int mode);
 
-extern RedReverbModeData t_ReverbModeData[];
+extern RedReverbModeData t_ReverbModeData[REDSOUND_REVERB_MODE_COUNT];
 
 #endif // _FFCC_REDSOUND_REDCOMMAND_H

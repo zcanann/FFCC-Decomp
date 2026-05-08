@@ -295,7 +295,8 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
     int noteBand;
 
     octaveAdjust = 0;
-    pitch = (basePitch >> REDSOUND_FIXED_SHIFT) + (pitchOffset + (wavePitch >> 16));
+    basePitch >>= REDSOUND_FIXED_SHIFT;
+    pitch = (pitchOffset + (wavePitch >> 16)) + basePitch;
     while (pitch < 0) {
         pitch += REDSOUND_PITCH_OCTAVE_UNITS;
         octaveAdjust -= 1;
@@ -303,9 +304,9 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
 
     noteBand = (pitch >> REDSOUND_PITCH_NOTE_SHIFT) & REDSOUND_PITCH_NOTE_MASK;
     octaveAdjust += noteBand / REDSOUND_NOTES_PER_OCTAVE;
-    value = (int)((t_TonePitch[noteBand % REDSOUND_NOTES_PER_OCTAVE] >> (REDSOUND_PITCH_TONE_SHIFT - octaveAdjust)) *
-                  t_FinePitch[pitch & REDSOUND_PITCH_FINE_MASK]) >>
-        REDSOUND_FIXED_SHIFT;
+    value = t_TonePitch[noteBand % REDSOUND_NOTES_PER_OCTAVE] >> (REDSOUND_PITCH_TONE_SHIFT - octaveAdjust);
+    value *= t_FinePitch[pitch & REDSOUND_PITCH_FINE_MASK];
+    value >>= REDSOUND_FIXED_SHIFT;
 
     if (fineTune != 0) {
         if (fineTune > 0) {

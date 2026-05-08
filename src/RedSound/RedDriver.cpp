@@ -85,7 +85,10 @@ enum RedDriverGlobalObjectSize {
 enum RedDriverSmallDataLayout {
     REDSOUND_DRIVER_SBSS_SIZE = 0xD8,
     REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE = 0xC8,
+    REDSOUND_DRIVER_SBSS_RED_MEMORY_OFFSET = 0xC8,
     REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_SIZE = 0x03,
+    REDSOUND_DRIVER_SBSS_DMA_EXECUTE_OFFSET = 0xCC,
+    REDSOUND_DRIVER_SBSS_DMA_IN_THREAD_OFFSET = 0xD0,
     REDSOUND_DRIVER_SBSS_TRAILING_PAD_SIZE = 0x04,
 };
 
@@ -141,6 +144,15 @@ struct RedDriverSyncState {
     u8 m_reserved25A4[0x25A8 - 0x2578 - sizeof(OSSemaphore) - sizeof(ARQRequest)];
     OSThread m_musicThread;
     OSSemaphore m_musicSemaphore;
+};
+
+struct RedDriverSmallDataTailState {
+    u8 m_beforeRedMemory[REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE];
+    CRedMemory m_redMemory;
+    u8 m_redMemoryPadding[REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_SIZE];
+    volatile int m_dmaExecute;
+    volatile int m_dmaInThread;
+    u8 m_trailingPadding[REDSOUND_DRIVER_SBSS_TRAILING_PAD_SIZE];
 };
 
 STATIC_ASSERT(offsetof(RedDmaRequest, m_id) == REDSOUND_DMA_REQUEST_ID_OFFSET);
@@ -294,6 +306,10 @@ STATIC_ASSERT(sizeof(RedReverbDepth) == REDSOUND_REVERB_DEPTH_SIZE);
 STATIC_ASSERT(sizeof(CRedMemory) == REDSOUND_RED_MEMORY_SIZE);
 STATIC_ASSERT(sizeof(CRedEntry) == REDSOUND_RED_ENTRY_SIZE);
 STATIC_ASSERT(sizeof(p_SeBlockData) == REDSOUND_SE_BLOCK_DATA_TABLE_SIZE);
+STATIC_ASSERT(offsetof(RedDriverSmallDataTailState, m_redMemory) == REDSOUND_DRIVER_SBSS_RED_MEMORY_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSmallDataTailState, m_dmaExecute) == REDSOUND_DRIVER_SBSS_DMA_EXECUTE_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSmallDataTailState, m_dmaInThread) == REDSOUND_DRIVER_SBSS_DMA_IN_THREAD_OFFSET);
+STATIC_ASSERT(sizeof(RedDriverSmallDataTailState) == REDSOUND_DRIVER_SBSS_SIZE);
 
 enum RedDriverBufferSize {
     REDSOUND_ZERO_BUFFER_SIZE = 0x1000,

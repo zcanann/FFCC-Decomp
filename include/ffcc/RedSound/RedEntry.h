@@ -244,23 +244,6 @@ enum RedSeBlockEntryLayout {
 	REDSOUND_SE_BLOCK_SEQUENCE_COUNT = REDSOUND_SE_BLOCK_SEQUENCE_MASK + 1,
 };
 
-inline RedSeINFO* RedSeSepInfo(RedSeSepHEAD* head)
-{
-	return reinterpret_cast<RedSeINFO*>(&head->m_seInfoFlags);
-}
-
-inline int* RedSeBlockEntries(RedSeBlockHEAD* head)
-{
-	return head->m_entries;
-}
-
-inline RedSeINFO* RedSeBlockInfo(RedSeBlockHEAD* head, int entry)
-{
-	return reinterpret_cast<RedSeINFO*>(reinterpret_cast<unsigned char*>(head->m_entries) +
-	                                    head->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE +
-	                                    (static_cast<unsigned int>(entry) & REDSOUND_SE_BLOCK_ENTRY_MASK));
-}
-
 struct RedWaveHeadWD
 {
 	char m_signature[REDSOUND_WAVE_SIGNATURE_SIZE];

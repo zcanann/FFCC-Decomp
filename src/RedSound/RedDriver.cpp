@@ -71,6 +71,13 @@ enum RedDriverSyncLayoutOffset {
     REDSOUND_DRIVER_SYNC_DMA_REQUEST_OFFSET = 0x2584,
     REDSOUND_DRIVER_SYNC_MUSIC_THREAD_OFFSET = 0x25A8,
     REDSOUND_DRIVER_SYNC_MUSIC_SEMAPHORE_OFFSET = 0x28C0,
+    REDSOUND_DRIVER_SYNC_SIZE = 0x28CC,
+};
+
+enum RedDriverGlobalObjectSize {
+    REDSOUND_SE_BLOCK_DATA_TABLE_SIZE = 0x10,
+    REDSOUND_RED_MEMORY_SIZE = 0x01,
+    REDSOUND_RED_ENTRY_SIZE = 0x18,
 };
 
 enum RedDriverDmaThreadStage {
@@ -138,6 +145,7 @@ STATIC_ASSERT(offsetof(RedDriverSyncState, m_dmaSemaphore) == REDSOUND_DRIVER_SY
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_dmaRequest) == REDSOUND_DRIVER_SYNC_DMA_REQUEST_OFFSET);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_musicThread) == REDSOUND_DRIVER_SYNC_MUSIC_THREAD_OFFSET);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_musicSemaphore) == REDSOUND_DRIVER_SYNC_MUSIC_SEMAPHORE_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSyncState, m_musicSemaphore) + sizeof(OSSemaphore) == REDSOUND_DRIVER_SYNC_SIZE);
 
 enum RedExecCommandLayout {
     REDSOUND_EXEC_COMMAND_FUNC_OFFSET = 0x00,
@@ -258,6 +266,9 @@ STATIC_ASSERT(offsetof(RedReverbDepth, m_depth) == REDSOUND_REVERB_DEPTH_DEPTH_O
 STATIC_ASSERT(offsetof(RedReverbDepth, m_step) == REDSOUND_REVERB_DEPTH_STEP_OFFSET);
 STATIC_ASSERT(offsetof(RedReverbDepth, m_count) == REDSOUND_REVERB_DEPTH_COUNT_OFFSET);
 STATIC_ASSERT(sizeof(RedReverbDepth) == REDSOUND_REVERB_DEPTH_SIZE);
+STATIC_ASSERT(sizeof(CRedMemory) == REDSOUND_RED_MEMORY_SIZE);
+STATIC_ASSERT(sizeof(CRedEntry) == REDSOUND_RED_ENTRY_SIZE);
+STATIC_ASSERT(sizeof(p_SeBlockData) == REDSOUND_SE_BLOCK_DATA_TABLE_SIZE);
 
 enum RedDriverBufferSize {
     REDSOUND_ZERO_BUFFER_SIZE = 0x1000,

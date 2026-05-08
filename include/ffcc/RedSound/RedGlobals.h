@@ -3,6 +3,7 @@
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include "dolphin/os.h"
+#include "ffcc/RedSound/RedEntry.h"
 #include "ffcc/RedSound/RedMidiCtrl.h"
 #include "ffcc/RedSound/RedStream.h"
 #include "types.h"
@@ -130,7 +131,7 @@ extern s16 t_PanningData[REDSOUND_PAN_TABLE_COUNT];
 extern s16 t_PanningDataR[REDSOUND_PAN_TABLE_COUNT];
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;
-extern RedSeBlockHEAD* volatile p_SeBlockData[];
+extern RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
 extern u8* volatile p_ZeroData;
 extern RedSoundCONTROL* volatile p_SoundControlBuffer;
 extern RedSoundCONTROL* volatile p_SoundControl;

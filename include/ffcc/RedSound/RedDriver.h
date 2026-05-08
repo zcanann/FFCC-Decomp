@@ -9,7 +9,7 @@ enum RedDmaEntryFlag {
 	REDSOUND_DMA_FLAGS_STREAM_LOAD = REDSOUND_DMA_FLAG_CHUNKED_TRANSFER | REDSOUND_DMA_FLAG_MAIN_QUEUE,
 };
 
-unsigned int DeltaTimeSumup(unsigned char**);
+unsigned int DeltaTimeSumup(unsigned char** buffer);
 unsigned int GetMyEntryID();
 void RedSleep(int microseconds);
 int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int size,

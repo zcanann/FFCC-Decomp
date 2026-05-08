@@ -310,7 +310,8 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
 
     octaveAdjust = 0;
     basePitch >>= REDSOUND_FIXED_SHIFT;
-    pitch = (pitchOffset + (wavePitch >> 16)) + basePitch;
+    pitch = pitchOffset + (wavePitch >> 16);
+    pitch = basePitch + pitch;
     while (pitch < 0) {
         pitch += REDSOUND_PITCH_OCTAVE_UNITS;
         octaveAdjust -= 1;

@@ -70,6 +70,7 @@ enum RedStreamFrameLayoutSize {
 	REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET = sizeof(unsigned int) * REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT,
 	REDSOUND_STREAM_STEREO_FRAME_SIZE = 0x10,
 	REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE = REDSOUND_STREAM_PAGE_SIZE / REDSOUND_STREAM_STEREO_FRAME_SIZE,
+	REDSOUND_STREAM_LEFT_PRED_SCALE_OFFSET = REDSOUND_STREAM_PAGE_SIZE,
 	REDSOUND_STREAM_LOOP_START_SAMPLE = 2,
 	REDSOUND_STREAM_ADSR_RELEASE_TIME = 10,
 };
@@ -448,7 +449,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	}
 
 	if ((streamData->m_track != 0) && (streamData->m_buffer != 0) && (streamData->m_aramBuffer != 0)) {
-		sampleOffset = REDSOUND_STREAM_PAGE_SIZE;
+		sampleOffset = REDSOUND_STREAM_LEFT_PRED_SCALE_OFFSET;
 		headerData = reinterpret_cast<RedStreamFile*>(streamHeader)->m_adpcm;
 		headerData->m_data.pred_scale = (short)((s8*)streamHeader)[sampleOffset];
 		headerData->m_data.yn1 = headerData->m_data.yn2 = 0;

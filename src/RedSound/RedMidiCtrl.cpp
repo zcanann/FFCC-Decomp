@@ -11,6 +11,13 @@ enum RedMidiSignTableSize {
     REDSOUND_SIGN_DATA_TABLE_COUNT = 0x200,
 };
 
+enum RedMidiDataTableSize {
+    REDSOUND_SIGN_DATA_TABLE_SIZE = REDSOUND_SIGN_DATA_TABLE_COUNT * sizeof(int),
+    REDSOUND_SWING_FUNCTION_TABLE_SIZE = REDSOUND_SWING_FUNCTION_COUNT * sizeof(RedSwingFunc),
+    REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_SIZE =
+        REDSOUND_MIDI_CONTROL_FUNCTION_COUNT * sizeof(RedMidiControlFunc),
+};
+
 STATIC_ASSERT(offsetof(RedTrackDATA, m_command) == REDSOUND_TRACK_COMMAND_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_loopCommand) == REDSOUND_TRACK_LOOP_COMMAND_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_waveBankData) == REDSOUND_TRACK_WAVE_BANK_DATA_WORD_OFFSET * sizeof(int));
@@ -243,6 +250,7 @@ static int m_SignDataTable[REDSOUND_SIGN_DATA_TABLE_COUNT] = {
     6424, 6023, 5623, 5222, 4821, 4420, 4019, 3617,
     3216, 2814, 2412, 2010, 1608, 1206, 804, 402,
 };
+STATIC_ASSERT(sizeof(m_SignDataTable) == REDSOUND_SIGN_DATA_TABLE_SIZE);
 
 static int SineSwing(int phase);
 static int TriangleSwing(int phase);
@@ -261,6 +269,7 @@ RedSwingFunc SwingEntryFunction[REDSOUND_SWING_FUNCTION_COUNT] = {
     SineSwingR, TriangleSwingR, SawSwingR, DutySwingR,
     RandomSwingR, DutySwingR, DutySwingR, DutySwingR,
 };
+STATIC_ASSERT(sizeof(SwingEntryFunction) == REDSOUND_SWING_FUNCTION_TABLE_SIZE);
 
 enum RedMidiSwingConst {
     REDSOUND_SWING_SINE_MASK = REDSOUND_SIGN_DATA_TABLE_COUNT - 1,
@@ -450,6 +459,7 @@ RedMidiControlFunc p_MidiControl_Function[REDSOUND_MIDI_CONTROL_FUNCTION_COUNT] 
     __MidiCtrl_NoSupport,        __MidiCtrl_NoSupport,       __MidiCtrl_NoSupport,
     __MidiCtrl_NoSupport,        __MidiCtrl_Pass,
 };
+STATIC_ASSERT(sizeof(p_MidiControl_Function) == REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_SIZE);
 
 /*
  * --INFO--

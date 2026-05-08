@@ -539,6 +539,34 @@ void InitReverb()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: UNUSED
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbSize* GetReverbInfo()
+{
+    return p_ReverbSize;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: UNUSED
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static float _CompFX(float value, float scale)
+{
+    return value / scale;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801c3218
  * PAL Size: 1040b
  * EN Address: TODO

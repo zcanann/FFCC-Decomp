@@ -333,6 +333,7 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune);
 void* ReverbAreaAlloc(unsigned long size);
 void ReverbAreaFree(void* area);
 void InitReverb();
+RedReverbSize* GetReverbInfo();
 RedReverbSize* SetReverb(int bank, int kind, int* params);
 
 RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track);

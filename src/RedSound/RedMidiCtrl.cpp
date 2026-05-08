@@ -303,6 +303,7 @@ enum RedMidiSwingConst {
     REDSOUND_SWING_PHASE_SIGN = 0x200,
     REDSOUND_SWING_PHASE_SHIFT = 8,
     REDSOUND_SWING_PHASE_MASK = 0xFF,
+    REDSOUND_SWING_PHASE_INVERT_MASK = 0xffffffffU,
     REDSOUND_SWING_QUADRANT_MASK = 3,
     REDSOUND_SWING_LEVEL_FULL = 0x10000,
     REDSOUND_SWING_RANDOM_REVERSE_PHASE = 0x40,
@@ -815,7 +816,7 @@ static int DutySwingR(int phase)
  */
 static int SawSwingR(int phase)
 {
-    int result = (int)(char)((int)((u32)phase ^ 0xffffffff) >> 2) << REDSOUND_SWING_PHASE_SHIFT;
+    int result = (int)(char)((int)((u32)phase ^ REDSOUND_SWING_PHASE_INVERT_MASK) >> 2) << REDSOUND_SWING_PHASE_SHIFT;
 
     return result;
 }

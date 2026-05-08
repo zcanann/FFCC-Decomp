@@ -13,6 +13,12 @@ enum RedStreamFileLayoutSize {
     REDSOUND_STREAM_TRACK_DATA_COUNT = 2,
 };
 
+enum RedStreamSignature {
+    REDSOUND_STREAM_SIGNATURE_0 = 'S',
+    REDSOUND_STREAM_SIGNATURE_1 = 'T',
+    REDSOUND_STREAM_SIGNATURE_2 = 'R',
+};
+
 struct RedStreamHEAD {
     char m_signature[REDSOUND_STREAM_SIGNATURE_SIZE];
     u8 m_reserved04[REDSOUND_STREAM_HEADER_PAD_SIZE];

@@ -2,6 +2,7 @@
 #include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedEntry.h"
+#include "ffcc/RedSound/RedStream.h"
 #include "ffcc/RedSound/RedGlobals.h"
 
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
@@ -17,12 +18,6 @@ enum RedSoundLocalSize {
 	REDSOUND_STANDBY_STATUS_COUNT = 0x40,
 	REDSOUND_STANDBY_STATUS_SIZE = REDSOUND_STANDBY_STATUS_COUNT * sizeof(int),
 	REDSOUND_STREAM_BANK_SIZE = 0x100,
-};
-
-enum RedSoundStreamSignature {
-	REDSOUND_STREAM_SIGNATURE_0 = 'S',
-	REDSOUND_STREAM_SIGNATURE_1 = 'T',
-	REDSOUND_STREAM_SIGNATURE_2 = 'R',
 };
 
 // RedSound global linkage that is shared across Red* units.
@@ -815,10 +810,11 @@ void CRedSound::StreamStop(int streamID)
 int CRedSound::StreamPlay(void* data, int fileSize, int pan, int volume)
 {
 	int id = 0;
-	char* streamSignature = (char*)data;
+	RedStreamHEAD* streamHeader = (RedStreamHEAD*)data;
 
-	if (streamSignature[0] == REDSOUND_STREAM_SIGNATURE_0 && streamSignature[1] == REDSOUND_STREAM_SIGNATURE_1 &&
-	    streamSignature[2] == REDSOUND_STREAM_SIGNATURE_2) {
+	if (streamHeader->m_signature[0] == REDSOUND_STREAM_SIGNATURE_0 &&
+	    streamHeader->m_signature[1] == REDSOUND_STREAM_SIGNATURE_1 &&
+	    streamHeader->m_signature[2] == REDSOUND_STREAM_SIGNATURE_2) {
 		id = GetAutoID();
 		c_Driver.StreamPlay(id, data, fileSize, pan, volume);
 	} else if (m_ReportPrint != 0) {

@@ -148,13 +148,6 @@ enum RedMidiTimeSignatureCommandByte {
     REDSOUND_MIDI_TIME_SIGNATURE_DENOMINATOR = 1,
 };
 
-enum RedSoundControlSaveWordOffset {
-    REDSOUND_CONTROL_SAVE_COMMAND_WORD = 0x0A,
-    REDSOUND_CONTROL_SAVE_DELTA_WORD = 0x4A,
-    REDSOUND_CONTROL_SAVE_FLAGS_WORD = 0x8A,
-    REDSOUND_CONTROL_SAVE_NOTE_WORD = 0xCA,
-};
-
 static void __MidiCtrl_NoSupport(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 static void __MidiCtrl_Pass(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);
@@ -754,7 +747,7 @@ static void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, 
  */
 static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* controlWords = (int*)control;
+    int* saveWords = (int*)control->m_savedCommand;
     int loopBase = control->m_loopBase;
 
     control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE;
@@ -764,10 +757,10 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
     RedTrackDATA* scan;
 
     for (scan = control->m_tracks; scan < track; scan++) {
-        controlWords[slot + REDSOUND_CONTROL_SAVE_COMMAND_WORD] = (int)scan->m_command;
-        controlWords[slot + REDSOUND_CONTROL_SAVE_DELTA_WORD] = scan->m_deltaTime + deltaAdjust;
-        controlWords[slot + REDSOUND_CONTROL_SAVE_FLAGS_WORD] = scan->m_flags;
-        controlWords[slot + REDSOUND_CONTROL_SAVE_NOTE_WORD] = *(int*)&scan->m_note;
+        saveWords[slot] = (int)scan->m_command;
+        saveWords[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT] = scan->m_deltaTime + deltaAdjust;
+        saveWords[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 2] = scan->m_flags;
+        saveWords[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 3] = *(int*)&scan->m_note;
         slot++;
     }
 
@@ -777,10 +770,10 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
         command = scan->m_command;
         int delta = DeltaTimeSumup(&command);
 
-        controlWords[slot + REDSOUND_CONTROL_SAVE_COMMAND_WORD] = (int)command;
-        controlWords[slot + REDSOUND_CONTROL_SAVE_DELTA_WORD] = scan->m_deltaTime + delta + deltaAdjust;
-        controlWords[slot + REDSOUND_CONTROL_SAVE_FLAGS_WORD] = scan->m_flags;
-        controlWords[slot + REDSOUND_CONTROL_SAVE_NOTE_WORD] = *(int*)&scan->m_note;
+        saveWords[slot] = (int)command;
+        saveWords[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT] = scan->m_deltaTime + delta + deltaAdjust;
+        saveWords[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 2] = scan->m_flags;
+        saveWords[slot + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 3] = *(int*)&scan->m_note;
 
         if ((nextTrack - control->m_tracks) < control->m_trackCount) {
             for (; nextTrack < control->m_tracks + control->m_trackCount; nextTrack++) {
@@ -798,10 +791,10 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
                     }
                 }
 
-                controlWords[slot + 1 + REDSOUND_CONTROL_SAVE_COMMAND_WORD] = (int)nextTrack->m_command;
-                controlWords[slot + 1 + REDSOUND_CONTROL_SAVE_DELTA_WORD] = currentDelta;
-                controlWords[slot + 1 + REDSOUND_CONTROL_SAVE_FLAGS_WORD] = nextTrack->m_flags;
-                controlWords[slot + 1 + REDSOUND_CONTROL_SAVE_NOTE_WORD] = *(int*)&nextTrack->m_note;
+                saveWords[slot + 1] = (int)nextTrack->m_command;
+                saveWords[slot + 1 + REDSOUND_MUSIC_TRACK_SAVE_COUNT] = currentDelta;
+                saveWords[slot + 1 + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 2] = nextTrack->m_flags;
+                saveWords[slot + 1 + REDSOUND_MUSIC_TRACK_SAVE_COUNT * 3] = *(int*)&nextTrack->m_note;
                 slot++;
             }
         }

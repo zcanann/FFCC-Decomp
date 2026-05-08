@@ -490,9 +490,9 @@ static void _MusicPlaySequence(int* command)
  */
 static void _MusicCrossPlaySequence(int* command)
 {
-    int replayPoint;
     RedSoundCONTROL* control;
     RedSoundCONTROL* swapControl;
+    int replayPoint;
     
     command[REDSOUND_MUSIC_COMMAND_FADE_TIME] =
         command[REDSOUND_MUSIC_COMMAND_FADE_TIME] * REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
@@ -508,12 +508,12 @@ static void _MusicCrossPlaySequence(int* command)
             control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolumeAdd =
                 -control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolume / command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
             control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolumeDelta = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
-            control = p_SoundControlBuffer;
-            control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolumeAdd =
+            control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
+            control->m_masterVolumeAdd =
                 (REDSOUND_MASTER_VOLUME_FULL_FIXED_HALF -
-                 control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolume) /
+                 control->m_masterVolume) /
                 command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
-            control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolumeDelta = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+            control->m_masterVolumeDelta = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
             swapControl = (RedSoundCONTROL*)RedNew(REDSOUND_CONTROL_SIZE);
             memcpy(swapControl, &p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], REDSOUND_CONTROL_SIZE);
             memcpy(&p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], p_SoundControlBuffer,

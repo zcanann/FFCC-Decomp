@@ -509,7 +509,7 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 
 			if (entries[seNo] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
 				RedSeINFO* seInfo = reinterpret_cast<RedSeINFO*>(
-				    reinterpret_cast<unsigned char*>(entries + bankData->m_seCount) +
+				    reinterpret_cast<unsigned char*>(entries) + bankData->m_seCount * sizeof(*entries) +
 				    ((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK));
 				RedSeINFO* playInfo = seInfo;
 

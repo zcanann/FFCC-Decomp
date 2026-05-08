@@ -4,6 +4,7 @@
 #include "ffcc/RedSound/RedEntry.h"
 #include "ffcc/RedSound/RedStream.h"
 #include "ffcc/RedSound/RedGlobals.h"
+#include "global.h"
 
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
@@ -18,6 +19,31 @@ enum RedSoundLocalSize {
 	REDSOUND_STANDBY_STATUS_COUNT = 0x40,
 	REDSOUND_STANDBY_STATUS_SIZE = REDSOUND_STANDBY_STATUS_COUNT * sizeof(int),
 	REDSOUND_STREAM_BANK_SIZE = 0x100,
+};
+
+enum RedSoundStringLayout {
+	REDSOUND_MEMORY_SETTING_ERROR_SIZE = 0x33,
+	REDSOUND_LOG_PREFIX_SIZE = 0x12,
+	REDSOUND_AMEMORY_SETTING_ERROR_SIZE = 0x33,
+	REDSOUND_AR_NOT_INITIALIZED_SIZE = 0x1f,
+	REDSOUND_INIT_OK_SIZE = 0x23,
+	REDSOUND_INIT_ERROR_SIZE = 0x28,
+	REDSOUND_INVALID_STREAM_DATA_SIZE = 0x31,
+	REDSOUND_DATE_SIZE = 0x0c,
+	REDSOUND_TIME_SIZE = 0x09,
+	REDSOUND_LOG_ERROR_COLOR_SIZE = 0x08,
+	REDSOUND_LOG_RESET_SIZE = 0x05,
+	REDSOUND_LOG_INFO_COLOR_SIZE = 0x08,
+	REDSOUND_RODATA_STRING_SIZE = 0x128,
+	REDSOUND_SDATA2_STRING_SIZE = 0x15,
+};
+
+enum RedSoundSmallDataLayout {
+	REDSOUND_DRIVER_OBJECT_SIZE = 0x01,
+	REDSOUND_AUTO_ID_SIZE = 0x04,
+	REDSOUND_STREAM_BANK_PTR_SIZE = 0x04,
+	REDSOUND_SBSS_PADDING_SIZE = 0x03,
+	REDSOUND_SBSS_SIZE = 0x0c,
 };
 
 // RedSound global linkage that is shared across Red* units.
@@ -37,6 +63,32 @@ static const char sRedSoundTime[] = "18:02:37";
 static const char sRedSoundLogErrorColor[] = "\x1B[7;31m";
 static const char sRedSoundLogReset[] = "\x1B[0m";
 static const char sRedSoundLogInfoColor[] = "\x1B[4;34m";
+
+STATIC_ASSERT(sizeof(m_StandbyStatus) == REDSOUND_STANDBY_STATUS_SIZE);
+STATIC_ASSERT(sizeof(c_Driver) == REDSOUND_DRIVER_OBJECT_SIZE);
+STATIC_ASSERT(sizeof(m_AutoID) == REDSOUND_AUTO_ID_SIZE);
+STATIC_ASSERT(sizeof(p_StreamBank) == REDSOUND_STREAM_BANK_PTR_SIZE);
+STATIC_ASSERT(sizeof(c_Driver) + REDSOUND_SBSS_PADDING_SIZE + sizeof(m_AutoID) + sizeof(p_StreamBank) ==
+              REDSOUND_SBSS_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundMemorySettingError) == REDSOUND_MEMORY_SETTING_ERROR_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundLogPrefix) == REDSOUND_LOG_PREFIX_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundAMemorySettingError) == REDSOUND_AMEMORY_SETTING_ERROR_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundARNotInitialized) == REDSOUND_AR_NOT_INITIALIZED_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundInitOk) == REDSOUND_INIT_OK_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundInitError) == REDSOUND_INIT_ERROR_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundInvalidStreamData) == REDSOUND_INVALID_STREAM_DATA_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundDate) == REDSOUND_DATE_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundTime) == REDSOUND_TIME_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundLogErrorColor) == REDSOUND_LOG_ERROR_COLOR_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundLogReset) == REDSOUND_LOG_RESET_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundLogInfoColor) == REDSOUND_LOG_INFO_COLOR_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundMemorySettingError) + sizeof(sRedSoundLogPrefix) +
+                  sizeof(sRedSoundAMemorySettingError) + sizeof(sRedSoundARNotInitialized) +
+                  sizeof(sRedSoundInitOk) + sizeof(sRedSoundInitError) + sizeof(sRedSoundInvalidStreamData) +
+                  sizeof(sRedSoundDate) + sizeof(sRedSoundTime) ==
+              REDSOUND_RODATA_STRING_SIZE);
+STATIC_ASSERT(sizeof(sRedSoundLogErrorColor) + sizeof(sRedSoundLogReset) + sizeof(sRedSoundLogInfoColor) ==
+              REDSOUND_SDATA2_STRING_SIZE);
 
 /*
  * --INFO--

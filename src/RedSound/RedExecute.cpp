@@ -2251,8 +2251,11 @@ static void _MusicNoteExecute()
 {
     int i;
     u32 trackCount;
-    u32* soundControl;
     RedTrackDATA* track;
+    u8** savedCommand;
+    int* savedDelta;
+    unsigned int* savedFlags;
+    RedNoteDATA* savedNote;
     int status = _MusicMidiNoteExecute(p_SoundControl, p_KeyOnData, 1);
 
     while ((status == 0) && (m_MusicPhraseStop == 0) &&
@@ -2261,15 +2264,18 @@ static void _MusicNoteExecute()
         memcpy(&p_SoundControl->m_measure, &p_SoundControl->m_savedMeasure, REDSOUND_CONTROL_SAVED_POSITION_SIZE);
         memcpy(&p_SoundControl->m_tempo, &p_SoundControl->m_savedTempo, REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
 
-        soundControl = (u32*)p_SoundControl;
         track = p_SoundControl->m_tracks;
         trackCount = p_SoundControl->m_trackCount;
+        savedCommand = p_SoundControl->m_savedCommand;
+        savedDelta = p_SoundControl->m_savedDelta;
+        savedFlags = p_SoundControl->m_savedFlags;
+        savedNote = p_SoundControl->m_savedNote;
         i = 0;
         do {
-            track->m_command = (u8*)soundControl[i + REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET];
-            track->m_deltaTime = soundControl[i + REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET];
-            track->m_flags = soundControl[i + REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET];
-            *(int*)&track->m_note = soundControl[i + REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET];
+            track->m_command = savedCommand[i];
+            track->m_deltaTime = savedDelta[i];
+            track->m_flags = savedFlags[i];
+            *(int*)&track->m_note = *(int*)&savedNote[i];
             track++;
             i++;
         } while (--trackCount != 0);
@@ -2425,7 +2431,6 @@ void MusicSkipFunction()
     int activeTrackCount;
     int trackIndex;
     unsigned int trackCount;
-    u32* soundControl;
     RedSoundCONTROL* control;
     RedTrackDATA* track;
 
@@ -2443,15 +2448,14 @@ void MusicSkipFunction()
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
         memcpy(&control->m_measure, &control->m_savedMeasure, REDSOUND_CONTROL_SAVED_POSITION_SIZE);
         memcpy(&control->m_tempo, &control->m_savedTempo, REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
-        soundControl = (u32*)control;
         track = control->m_tracks;
         trackCount = control->m_trackCount;
         trackIndex = 0;
         do {
-            track->m_command = (u8*)soundControl[trackIndex + REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET];
-            track->m_deltaTime = soundControl[trackIndex + REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET];
-            track->m_flags = soundControl[trackIndex + REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET];
-            *(int*)&track->m_note = soundControl[trackIndex + REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET];
+            track->m_command = control->m_savedCommand[trackIndex];
+            track->m_deltaTime = control->m_savedDelta[trackIndex];
+            track->m_flags = control->m_savedFlags[trackIndex];
+            *(int*)&track->m_note = *(int*)&control->m_savedNote[trackIndex];
             trackCount -= 1;
             trackIndex += 1;
             track += 1;

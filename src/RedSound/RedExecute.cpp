@@ -224,14 +224,42 @@ STATIC_ASSERT(offsetof(RedWaveDATA, m_pan) == REDSOUND_WAVE_PAN_OFFSET);
 STATIC_ASSERT(offsetof(RedWaveDATA, m_reverbMix) == REDSOUND_WAVE_REVERB_MIX_OFFSET);
 STATIC_ASSERT(sizeof(RedWaveDATA) == REDSOUND_WAVE_DATA_SIZE);
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_track) == REDSOUND_VOICE_TRACK_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_waveData) == REDSOUND_VOICE_WAVE_DATA_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_trackVolume) == REDSOUND_VOICE_TRACK_VOLUME_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_trackExpression) == REDSOUND_VOICE_TRACK_EXPRESSION_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_trackPan) == REDSOUND_VOICE_TRACK_PAN_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_axVoice) == REDSOUND_VOICE_AX_VOICE_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_key) == REDSOUND_VOICE_KEY_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_velocity) == REDSOUND_VOICE_VELOCITY_OFFSET);
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_stateFlags) == REDSOUND_VOICE_STATE_FLAGS_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_pitchModPhase) == REDSOUND_VOICE_PITCH_MOD_PHASE_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_pitchModFrames) == REDSOUND_VOICE_PITCH_MOD_FRAMES_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_pitchModFrame) == REDSOUND_VOICE_PITCH_MOD_FRAME_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_pitchModDelay) ==
+              REDSOUND_VOICE_PITCH_MOD_DELAY_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_volumeModPhase) == REDSOUND_VOICE_VOLUME_MOD_PHASE_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_volumeModFrames) == REDSOUND_VOICE_VOLUME_MOD_FRAMES_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_volumeModFrame) == REDSOUND_VOICE_VOLUME_MOD_FRAME_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_volumeModDelay) ==
+              REDSOUND_VOICE_VOLUME_MOD_DELAY_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_randomPitch) == REDSOUND_VOICE_RANDOM_PITCH_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_randomVolume) == REDSOUND_VOICE_RANDOM_VOLUME_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_randomPan) == REDSOUND_VOICE_RANDOM_PAN_WORD * sizeof(int));
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrTime) == REDSOUND_VOICE_ADSR_TIME_OFFSET);
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrLevel) == REDSOUND_VOICE_ADSR_LEVEL_OFFSET);
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrStage) == REDSOUND_VOICE_ADSR_STAGE_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrStepFrames) == REDSOUND_VOICE_ADSR_STEP_FRAMES_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrStepAdd) == REDSOUND_VOICE_ADSR_STEP_ADD_WORD * sizeof(int));
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_active) == REDSOUND_VOICE_ACTIVE_OFFSET);
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_flags) == REDSOUND_VOICE_FLAGS_OFFSET);
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_voiceSwitch) == REDSOUND_VOICE_SWITCH_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_pitch) == REDSOUND_VOICE_PITCH_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_targetPitch) == REDSOUND_VOICE_TARGET_PITCH_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_basePitch) == REDSOUND_VOICE_BASE_PITCH_WORD * sizeof(int));
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_voiceIndex) == REDSOUND_VOICE_INDEX_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrCurrentLevel) == REDSOUND_VOICE_ADSR_CURRENT_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_envelopeLevel) == REDSOUND_VOICE_ENVELOPE_WORD * sizeof(int));
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_updateFlags) == REDSOUND_VOICE_UPDATE_FLAGS_WORD * sizeof(int));
 STATIC_ASSERT(sizeof(RedVoiceDATA) == REDSOUND_VOICE_SIZE);
 
 /*

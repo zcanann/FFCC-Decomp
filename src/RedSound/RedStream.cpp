@@ -20,6 +20,20 @@ static const char sRedStreamLogErrorColor[] = "\x1B[7;31m";
 static const char sRedStreamLogReset[] = "\x1B[0m";
 static const char sRedStreamLogWarnColor[] = "\x1B[4;31m";
 
+enum RedStreamStringLayout {
+	REDSOUND_STREAM_BUFFER_DIDNT_SECURE_FMT_SIZE = 0x24,
+	REDSOUND_STREAM_LOG_PREFIX_SIZE = 0x12,
+	REDSOUND_STREAM_MAIN_MEMORY_DIDNT_CREATE_FMT_SIZE = 0x2d,
+	REDSOUND_STREAM_ARAM_MEMORY_DIDNT_CREATE_FMT_SIZE = 0x2d,
+	REDSOUND_STREAM_PAUSE_ON_FMT_SIZE = 0x1b,
+	REDSOUND_STREAM_PAUSE_OFF_FMT_SIZE = 0x1b,
+	REDSOUND_STREAM_LOG_ERROR_COLOR_SIZE = 0x08,
+	REDSOUND_STREAM_LOG_RESET_SIZE = 0x05,
+	REDSOUND_STREAM_LOG_WARN_COLOR_SIZE = 0x08,
+	REDSOUND_STREAM_RODATA_STRING_SIZE = 0xc6,
+	REDSOUND_STREAM_SDATA2_STRING_SIZE = 0x15,
+};
+
 enum RedStreamLayoutSize {
 	REDSOUND_STREAM_PAGE_SIZE = 0x1000,
 	REDSOUND_STREAM_STEREO_PLANE_SIZE = 0x2000,
@@ -98,6 +112,21 @@ STATIC_ASSERT(offsetof(RedStreamDATA, m_streamCursor) == REDSOUND_STREAM_CURSOR_
 STATIC_ASSERT(offsetof(RedStreamDATA, m_streamCursorBase) == REDSOUND_STREAM_CURSOR_BASE_OFFSET);
 STATIC_ASSERT(offsetof(RedStreamDATA, m_aramBuffer) == REDSOUND_STREAM_ARAM_BUFFER_OFFSET);
 STATIC_ASSERT(sizeof(RedStreamDATA) == REDSOUND_STREAM_DATA_SIZE);
+STATIC_ASSERT(sizeof(sRedStreamBufferDidntSecureFmt) == REDSOUND_STREAM_BUFFER_DIDNT_SECURE_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedStreamLogPrefix) == REDSOUND_STREAM_LOG_PREFIX_SIZE);
+STATIC_ASSERT(sizeof(sRedStreamMainMemoryDidntCreateFmt) == REDSOUND_STREAM_MAIN_MEMORY_DIDNT_CREATE_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedStreamAramMemoryDidntCreateFmt) == REDSOUND_STREAM_ARAM_MEMORY_DIDNT_CREATE_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedStreamPauseOnFmt) == REDSOUND_STREAM_PAUSE_ON_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedStreamPauseOffFmt) == REDSOUND_STREAM_PAUSE_OFF_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedStreamLogErrorColor) == REDSOUND_STREAM_LOG_ERROR_COLOR_SIZE);
+STATIC_ASSERT(sizeof(sRedStreamLogReset) == REDSOUND_STREAM_LOG_RESET_SIZE);
+STATIC_ASSERT(sizeof(sRedStreamLogWarnColor) == REDSOUND_STREAM_LOG_WARN_COLOR_SIZE);
+STATIC_ASSERT(sizeof(sRedStreamBufferDidntSecureFmt) + sizeof(sRedStreamLogPrefix) +
+                  sizeof(sRedStreamMainMemoryDidntCreateFmt) + sizeof(sRedStreamAramMemoryDidntCreateFmt) +
+                  sizeof(sRedStreamPauseOnFmt) + sizeof(sRedStreamPauseOffFmt) ==
+              REDSOUND_STREAM_RODATA_STRING_SIZE);
+STATIC_ASSERT(sizeof(sRedStreamLogErrorColor) + sizeof(sRedStreamLogReset) + sizeof(sRedStreamLogWarnColor) ==
+              REDSOUND_STREAM_SDATA2_STRING_SIZE);
 
 static RedStreamDATA* _SearchEmptyStreamData();
 static void _StreamStop(RedStreamDATA* streamData);

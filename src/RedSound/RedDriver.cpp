@@ -1011,6 +1011,20 @@ static void _SeStopMG(int* command)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: UNUSED
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _SeStopG(int* command)
+{
+    SeStopG(command[REDSOUND_SE_COMMAND_ID]);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bd7d0
  * PAL Size: 72b
  * EN Address: TODO
@@ -2478,6 +2492,20 @@ int CRedDriver::SePlayState(int seID)
 void CRedDriver::SeStop(int id)
 {
     _EntryExecCommand(_SeStop, id, 0, 0, 0, 0, 0, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: UNUSED
+ * EN Size: 72b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::SeStopG(int group)
+{
+    _EntryExecCommand(_SeStopG, group, 0, 0, 0, 0, 0, 0);
 }
 
 /*

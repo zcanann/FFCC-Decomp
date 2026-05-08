@@ -63,6 +63,7 @@ public:
 
 	int SePlayState(int seId);
 	void SeStop(int seId);
+	void SeStopG(int group);
 	void SeStopMG(int bank, int sep, int group, int kind);
 	int SePlay(int bank, int sep, int autoId, int pan, int volume, int pitch);
 	void SeMasterVolume(int volume);

@@ -720,9 +720,11 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	}
 
 	m_MusicSkipLine = mode;
-	RedSoundCONTROL* music = p_SoundControlBuffer;
+	RedSoundCONTROL* music;
 	if (m_MusicSkipLine != 0) {
-		music += REDSOUND_CONTROL_MUSIC_SKIP;
+		music = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP;
+	} else {
+		music = p_SoundControlBuffer;
 	}
 
 	music->m_musicId = musicId;

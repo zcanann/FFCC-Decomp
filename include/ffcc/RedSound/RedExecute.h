@@ -129,6 +129,11 @@ enum RedVoiceLayoutCount {
 	REDSOUND_TERMINATE_NOTE_WORD_COUNT = 1,
 };
 
+struct RedVoiceAdsrDATA {
+	unsigned short m_time[REDSOUND_VOICE_ADSR_TIME_COUNT];
+	unsigned char m_level[REDSOUND_VOICE_ADSR_LEVEL_COUNT];
+};
+
 struct RedVoiceDATA {
 	RedTrackDATA* m_track;
 	RedWaveDATA* m_waveData;
@@ -154,8 +159,7 @@ struct RedVoiceDATA {
 	int m_randomVolume;
 	int m_randomPan;
 	unsigned char m_reserved48[0x50 - 0x48];
-	unsigned short m_adsrTime[REDSOUND_VOICE_ADSR_TIME_COUNT];
-	unsigned char m_adsrLevel[REDSOUND_VOICE_ADSR_LEVEL_COUNT];
+	RedVoiceAdsrDATA m_adsr;
 	int m_adsrStage;
 	int m_adsrStepFrames;
 	int m_adsrStepAdd;

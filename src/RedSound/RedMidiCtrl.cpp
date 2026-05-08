@@ -6,7 +6,11 @@
 #include "ffcc/RedSound/RedGlobals.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
-static int m_SignDataTable[] = {
+enum RedMidiSignTableSize {
+    REDSOUND_SIGN_DATA_TABLE_COUNT = 0x200,
+};
+
+static int m_SignDataTable[REDSOUND_SIGN_DATA_TABLE_COUNT] = {
     0, 402, 804, 1206, 1608, 2010, 2412, 2814,
     3216, 3617, 4019, 4420, 4821, 5222, 5623, 6023,
     6424, 6824, 7224, 7623, 8022, 8421, 8820, 9218,
@@ -92,7 +96,7 @@ RedSwingFunc SwingEntryFunction[REDSOUND_SWING_FUNCTION_COUNT] = {
 };
 
 enum RedMidiSwingConst {
-    REDSOUND_SWING_SINE_MASK = 0x1FF,
+    REDSOUND_SWING_SINE_MASK = REDSOUND_SIGN_DATA_TABLE_COUNT - 1,
     REDSOUND_SWING_PHASE_SIGN = 0x200,
     REDSOUND_SWING_PHASE_SHIFT = 8,
     REDSOUND_SWING_PHASE_MASK = 0xFF,

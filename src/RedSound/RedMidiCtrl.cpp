@@ -320,6 +320,7 @@ enum RedMidiCommandConst {
     REDSOUND_MIDI_FUZZY_DEFAULT_DEPTH = 0x100,
     REDSOUND_MIDI_PITCH_BEND_HIGH_SCALE = 0x80,
     REDSOUND_MIDI_PITCH_BEND_CENTER = 0x2000,
+    REDSOUND_MIDI_KEY_TRANSPOSE_SHIFT = 8,
     REDSOUND_MIDI_DELTA_BUFFER_WORD_COUNT = 4,
     REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT = 1,
     REDSOUND_MIDI_WAVE_BANK_DIRECT = 0x10,
@@ -2634,7 +2635,7 @@ static void __MidiCtrl_FineTuneRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
  */
 static void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	track->m_keyTranspose = (short)(*(s8*)track->m_command++ << 8);
+	track->m_keyTranspose = (short)(*(s8*)track->m_command++ << REDSOUND_MIDI_KEY_TRANSPOSE_SHIFT);
 	m_ChangeStatus |= REDSOUND_VOICE_UPDATE_PITCH;
 }
 
@@ -2649,7 +2650,7 @@ static void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, Red
  */
 static void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	track->m_keyTranspose += *(s8*)track->m_command++ << 8;
+	track->m_keyTranspose += *(s8*)track->m_command++ << REDSOUND_MIDI_KEY_TRANSPOSE_SHIFT;
 	m_ChangeStatus |= REDSOUND_VOICE_UPDATE_PITCH;
 }
 

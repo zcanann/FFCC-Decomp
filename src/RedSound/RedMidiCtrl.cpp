@@ -16,6 +16,7 @@ enum RedMidiDataTableSize {
     REDSOUND_SWING_FUNCTION_TABLE_SIZE = REDSOUND_SWING_FUNCTION_COUNT * sizeof(RedSwingFunc),
     REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_SIZE =
         REDSOUND_MIDI_CONTROL_FUNCTION_COUNT * sizeof(RedMidiControlFunc),
+    REDSOUND_MIDI_CTRL_DATA_SIZE = 0xA40,
 };
 
 STATIC_ASSERT(offsetof(RedTrackDATA, m_command) == REDSOUND_TRACK_COMMAND_WORD_OFFSET * sizeof(int));
@@ -460,6 +461,8 @@ RedMidiControlFunc p_MidiControl_Function[REDSOUND_MIDI_CONTROL_FUNCTION_COUNT] 
     __MidiCtrl_NoSupport,        __MidiCtrl_Pass,
 };
 STATIC_ASSERT(sizeof(p_MidiControl_Function) == REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_SIZE);
+STATIC_ASSERT(sizeof(m_SignDataTable) + sizeof(SwingEntryFunction) + sizeof(p_MidiControl_Function) ==
+              REDSOUND_MIDI_CTRL_DATA_SIZE);
 
 /*
  * --INFO--

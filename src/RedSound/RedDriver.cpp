@@ -215,6 +215,16 @@ enum RedExecCommandLayout {
     REDSOUND_EXEC_COMMAND_SIZE = 0x20,
 };
 
+enum RedExecCommandArgIndex {
+    REDSOUND_EXEC_COMMAND_ARG0 = 0,
+    REDSOUND_EXEC_COMMAND_ARG1 = 1,
+    REDSOUND_EXEC_COMMAND_ARG2 = 2,
+    REDSOUND_EXEC_COMMAND_ARG3 = 3,
+    REDSOUND_EXEC_COMMAND_ARG4 = 4,
+    REDSOUND_EXEC_COMMAND_ARG5 = 5,
+    REDSOUND_EXEC_COMMAND_ARG6 = 6,
+};
+
 typedef void (*RedExecCommandFunc)(int* command);
 
 struct RedExecCommand {
@@ -1212,13 +1222,13 @@ static RedExecCommand* _EntryExecCommand(RedExecCommandFunc func, int arg1, int 
     interruptLevel = OSDisableInterrupts();
     writePos = p_ExecCommandNow;
     writePos->m_func = func;
-    writePos->m_args[0] = arg1;
-    writePos->m_args[1] = arg2;
-    writePos->m_args[2] = arg3;
-    writePos->m_args[3] = arg4;
-    writePos->m_args[4] = arg5;
-    writePos->m_args[5] = arg6;
-    writePos->m_args[6] = arg7;
+    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG0] = arg1;
+    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG1] = arg2;
+    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG2] = arg3;
+    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG3] = arg4;
+    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG4] = arg5;
+    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG5] = arg6;
+    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG6] = arg7;
     writePos++;
     if (writePos == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
         writePos = p_ExecCommand;
@@ -2308,7 +2318,7 @@ int CRedDriver::SePlayState(int seID)
                 (((command->m_func == _SeBlockPlay) ||
                   (command->m_func == _SeSepPlay)) ||
                  (command->m_func == _SeSepPlaySequence))) &&
-                ((seID == -1 || (seID == command->m_args[0])))) {
+                ((seID == -1 || (seID == command->m_args[REDSOUND_EXEC_COMMAND_ARG0])))) {
                 result = 1;
                 break;
             }
@@ -2563,7 +2573,7 @@ int CRedDriver::StreamPlayState(int streamID)
 		command = p_ExecCommandOld;
 		while (commandNow != command) {
 			if ((command->m_func != 0) && (command->m_func == _StreamPlay) &&
-			    ((streamID == -1) || (streamID == command->m_args[0]))) {
+			    ((streamID == -1) || (streamID == command->m_args[REDSOUND_EXEC_COMMAND_ARG0]))) {
 				result = 1;
 				break;
 			}

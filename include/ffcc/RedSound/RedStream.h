@@ -140,6 +140,7 @@ enum RedStreamDataLayoutSize {
 void StreamStop(int streamId);
 int StreamPlay(int streamId, void* streamHeader, int fileSize, int pan, int volume);
 void SetStreamVolume(int streamId, int volume, int frameCount);
+void SetStreamPan(int streamId, int pan, int frameCount);
 void StreamPause(int streamId, int pause);
 void StreamControl();
 

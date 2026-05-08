@@ -1675,8 +1675,8 @@ void CRedEntry::DisplayMMemoryInfo()
 	fflush(__files + 1);
 
 	maxFreeSize = 0;
-	entryCount = 0;
 	totalSize = 0;
+	entryCount = 0;
     nextAddress = c_RedMemory.GetMainBufferAddress();
     memoryBank = c_RedMemory.GetMainBankAddress();
 	bankEntry = memoryBank;

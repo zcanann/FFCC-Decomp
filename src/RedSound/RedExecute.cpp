@@ -540,7 +540,7 @@ void InitReverb()
  */
 static void _SetReverbData(RedReverbDATA* reverb, int* params)
 {
-    int result = 0;
+    int result;
     switch (reverb->m_kind) {
     case REDSOUND_REVERB_KIND_STD: {
         AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)reverb->m_context;

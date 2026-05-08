@@ -4,6 +4,7 @@
 #include "ffcc/RedSound/RedGlobals.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedMidiCtrl.h"
+#include "global.h"
 #include <dolphin/os.h>
 #include <string.h>
 
@@ -41,6 +42,11 @@ enum RedSeInfoSequenceByte {
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET_LO = 0,
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET_HI = 1,
 };
+
+STATIC_ASSERT(offsetof(RedReverbModeData, m_kind) == REDSOUND_REVERB_MODE_KIND_OFFSET);
+STATIC_ASSERT(offsetof(RedReverbModeData, m_params) == REDSOUND_REVERB_MODE_PARAMS_OFFSET);
+STATIC_ASSERT(sizeof(RedReverbModeData) == REDSOUND_REVERB_MODE_SIZE);
+STATIC_ASSERT(sizeof(t_ReverbModeData) == REDSOUND_REVERB_MODE_TABLE_SIZE);
 
 RedReverbModeData t_ReverbModeData[REDSOUND_REVERB_MODE_COUNT] = {
     {REDSOUND_REVERB_KIND_HI, {0xA, 0x578, 0x1E, 0x46, 0x64, 0x0}},

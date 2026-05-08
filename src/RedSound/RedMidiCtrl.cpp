@@ -4,11 +4,28 @@
 #include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedGlobals.h"
+#include "global.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
 enum RedMidiSignTableSize {
     REDSOUND_SIGN_DATA_TABLE_COUNT = 0x200,
 };
+
+STATIC_ASSERT(offsetof(RedTrackDATA, m_volume) == REDSOUND_TRACK_VOLUME_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_expression) == REDSOUND_TRACK_EXPRESSION_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_pan) == REDSOUND_TRACK_PAN_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_waveData) == REDSOUND_TRACK_WAVE_DATA_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_note) == REDSOUND_TRACK_NOTE_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrAR) == REDSOUND_TRACK_ADSR_TIME_ATTACK_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedTrackDATA, m_adsrAL) == REDSOUND_TRACK_ADSR_LEVEL_ATTACK_OFFSET);
+STATIC_ASSERT(offsetof(RedTrackDATA, m_voiceSwitch) == REDSOUND_TRACK_VOICE_SWITCH_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(sizeof(RedTrackDATA) == REDSOUND_TRACK_SIZE);
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedCommand) == REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTempo) == REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_tempo) == REDSOUND_CONTROL_TEMPO_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_masterVolume) == REDSOUND_CONTROL_MASTER_VOLUME_OFFSET);
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_musicId) == REDSOUND_CONTROL_MUSIC_ID_OFFSET);
+STATIC_ASSERT(sizeof(RedSoundCONTROL) == REDSOUND_CONTROL_SIZE);
 
 static int m_SignDataTable[REDSOUND_SIGN_DATA_TABLE_COUNT] = {
     0, 402, 804, 1206, 1608, 2010, 2412, 2814,

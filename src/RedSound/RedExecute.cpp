@@ -2461,7 +2461,7 @@ static void _MusicNoteExecute()
     while ((status == 0) && (m_MusicPhraseStop == 0) &&
            ((p_SoundControl->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         p_SoundControl->m_activeTrackCount = p_SoundControl->m_savedActiveTrackCount;
-        memcpy(&p_SoundControl->m_measure, &p_SoundControl->m_savedMeasure, sizeof(RedSoundControlPosition));
+        memcpy(&p_SoundControl->m_measure, &p_SoundControl->m_savedPosition, sizeof(RedSoundControlPosition));
         memcpy(&p_SoundControl->m_tempo, &p_SoundControl->m_savedTempo, sizeof(RedSoundControlTempo));
 
         track = p_SoundControl->m_tracks;
@@ -2646,7 +2646,7 @@ void MusicSkipFunction()
     activeTrackCount = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
     while ((activeTrackCount == 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
-        memcpy(&control->m_measure, &control->m_savedMeasure, sizeof(RedSoundControlPosition));
+        memcpy(&control->m_measure, &control->m_savedPosition, sizeof(RedSoundControlPosition));
         memcpy(&control->m_tempo, &control->m_savedTempo, sizeof(RedSoundControlTempo));
         track = control->m_tracks;
         trackCount = control->m_trackCount;

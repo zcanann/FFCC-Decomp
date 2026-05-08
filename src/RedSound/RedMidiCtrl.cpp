@@ -170,9 +170,11 @@ STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedNote) == REDSOUND_CONTROL_SAVED_N
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTempo) == REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedActiveTrackCount) ==
               REDSOUND_CONTROL_SAVED_ACTIVE_TRACK_COUNT_WORD_OFFSET * sizeof(int));
-STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedMeasure) == REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET * sizeof(int));
-STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTick) == REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET * sizeof(int));
-STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTicksPerMeasure) ==
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedPosition) ==
+              REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedPosition.m_tick) ==
+              REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedPosition.m_ticksPerMeasure) ==
               REDSOUND_CONTROL_SAVED_TICKS_PER_MEASURE_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_tempo) == REDSOUND_CONTROL_TEMPO_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(sizeof(RedSoundControlPosition) == REDSOUND_CONTROL_SAVED_POSITION_ALLOC_SIZE);
@@ -1018,13 +1020,13 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
     }
 
     control->m_savedActiveTrackCount = control->m_activeTrackCount;
-    memmove(&control->m_savedMeasure,
+    memmove(&control->m_savedPosition,
             &control->m_measure,
             sizeof(RedSoundControlPosition));
-    control->m_savedTick -= deltaAdjust;
-    if (control->m_savedTick < 0) {
-        control->m_savedTick += control->m_savedTicksPerMeasure;
-        control->m_savedMeasure--;
+    control->m_savedPosition.m_tick -= deltaAdjust;
+    if (control->m_savedPosition.m_tick < 0) {
+        control->m_savedPosition.m_tick += control->m_savedPosition.m_ticksPerMeasure;
+        control->m_savedPosition.m_measure--;
     }
     memmove(&control->m_savedTempo,
             &control->m_tempo,

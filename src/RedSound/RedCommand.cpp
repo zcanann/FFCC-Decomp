@@ -1013,7 +1013,7 @@ int MusicPlay(int musicId, int volume, int mode)
 		RedWaveHeadWD* waveHead = c_RedEntry.SearchWaveBase(musicHead->m_waveNo);
 
 		if (waveHead == 0) {
-			return -1;
+			return REDSOUND_MUSIC_PLAY_FAILED;
 		}
 
 		_MusicPlayStart(musicHead, waveHead, musicId, volume, mode);

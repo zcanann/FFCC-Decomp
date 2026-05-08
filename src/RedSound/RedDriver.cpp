@@ -2217,7 +2217,7 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
  */
 int CRedDriver::SetSeSepData(void* seSepData)
 {
-    int result = -1;
+    int result = REDSOUND_SESEP_ID_NONE;
     RedSeSepHEAD* const header = (RedSeSepHEAD*)seSepData;
     RedSeSepHEAD* copiedHeader;
     int headerSize;

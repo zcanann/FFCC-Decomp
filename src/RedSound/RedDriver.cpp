@@ -455,6 +455,7 @@ enum RedDriverThreadConfig {
     REDSOUND_DMA_THREAD_PRIORITY = 3,
     REDSOUND_WORKER_THREAD_PRIORITY = 4,
     REDSOUND_THREAD_DETACHED = 1,
+    REDSOUND_THREAD_YIELD_SLEEP_US = 0,
 };
 
 enum RedDriverCommandParse {
@@ -1675,7 +1676,7 @@ static void _DmaExecute()
                 activeRequest->m_id = 0;
                 break;
             }
-            RedSleep(0);
+            RedSleep(REDSOUND_THREAD_YIELD_SLEEP_US);
         }
     }
     m_DMAInThread = REDSOUND_DMA_THREAD_IDLE;
@@ -1935,7 +1936,7 @@ void CRedDriver::End()
     OSSignalSemaphore(&sync.m_dmaSemaphore);
     OSSignalSemaphore(&sync.m_musicSemaphore);
     while (m_ThreadExecute != 0) {
-        RedSleep(0);
+        RedSleep(REDSOUND_THREAD_YIELD_SLEEP_US);
     }
     AXRegisterAuxACallback(0, 0);
     AXRegisterAuxBCallback(0, 0);
@@ -2740,7 +2741,7 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
             break;
         }
 
-        RedSleep(0);
+        RedSleep(REDSOUND_THREAD_YIELD_SLEEP_US);
     }
 
     m_WaveSettingData.m_slot = reinterpret_cast<int*>(slot);

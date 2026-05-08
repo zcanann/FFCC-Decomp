@@ -68,6 +68,8 @@ struct RedStreamStereoFrame {
 enum RedStreamFrameLayoutSize {
 	REDSOUND_STREAM_STEREO_LEFT_FRAME_OFFSET = 0x00,
 	REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET = sizeof(unsigned int) * REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT,
+	REDSOUND_STREAM_STEREO_FRAME_WORD_BYTES = sizeof(unsigned int),
+	REDSOUND_STREAM_STEREO_CHANNEL_FRAME_BYTES = sizeof(unsigned int) * REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT,
 	REDSOUND_STREAM_STEREO_FRAME_SIZE = 0x10,
 	REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE = REDSOUND_STREAM_PAGE_SIZE / REDSOUND_STREAM_STEREO_FRAME_SIZE,
 	REDSOUND_STREAM_LEFT_PRED_SCALE_OFFSET = REDSOUND_STREAM_PAGE_SIZE,
@@ -302,12 +304,12 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			
 			do {
 				*(unsigned int*)leftDst = srcFrame->m_left[0];
-				*(unsigned int*)(leftDst + 4) = srcFrame->m_left[1];
-				leftDst = leftDst + 8;
+				*(unsigned int*)(leftDst + REDSOUND_STREAM_STEREO_FRAME_WORD_BYTES) = srcFrame->m_left[1];
+				leftDst = leftDst + REDSOUND_STREAM_STEREO_CHANNEL_FRAME_BYTES;
 				*(unsigned int*)rightDst = srcFrame->m_right[0];
-				*(unsigned int*)(rightDst + 4) = srcFrame->m_right[1];
+				*(unsigned int*)(rightDst + REDSOUND_STREAM_STEREO_FRAME_WORD_BYTES) = srcFrame->m_right[1];
 				srcFrame = srcFrame + 1;
-				rightDst = rightDst + 8;
+				rightDst = rightDst + REDSOUND_STREAM_STEREO_CHANNEL_FRAME_BYTES;
 			} while (srcFrame < srcEnd);
 			
 			stream->m_readOffset = stream->m_readOffset + REDSOUND_STREAM_PAGE_SIZE;
@@ -320,12 +322,12 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			
 			do {
 				*(unsigned int*)leftDst = srcFrame->m_left[0];
-				*(unsigned int*)(leftDst + 4) = srcFrame->m_left[1];
-				leftDst = leftDst + 8;
+				*(unsigned int*)(leftDst + REDSOUND_STREAM_STEREO_FRAME_WORD_BYTES) = srcFrame->m_left[1];
+				leftDst = leftDst + REDSOUND_STREAM_STEREO_CHANNEL_FRAME_BYTES;
 				*(unsigned int*)rightDst = srcFrame->m_right[0];
-				*(unsigned int*)(rightDst + 4) = srcFrame->m_right[1];
+				*(unsigned int*)(rightDst + REDSOUND_STREAM_STEREO_FRAME_WORD_BYTES) = srcFrame->m_right[1];
 				srcFrame = srcFrame + 1;
-				rightDst = rightDst + 8;
+				rightDst = rightDst + REDSOUND_STREAM_STEREO_CHANNEL_FRAME_BYTES;
 			} while (srcFrame < srcEnd);
 			
 			stream->m_readOffset = stream->m_readOffset + REDSOUND_STREAM_PAGE_SIZE;

@@ -192,6 +192,10 @@ enum RedEntryStringLayout {
 	REDSOUND_ENTRY_SDATA2_STRING_SIZE = 0x23,
 };
 
+enum RedEntryTiming {
+	REDSOUND_WAVE_LOAD_DMA_POLL_SLEEP_US = 1000,
+};
+
 STATIC_ASSERT(sizeof(sRedEntryColoredBlankLineFmt) == REDSOUND_ENTRY_COLORED_BLANK_LINE_FMT_SIZE);
 STATIC_ASSERT(sizeof(sRedEntryLogPrefix) == REDSOUND_ENTRY_LOG_PREFIX_SIZE);
 STATIC_ASSERT(sizeof(sRedEntryErrorBannerFmt) == REDSOUND_ENTRY_ERROR_BANNER_FMT_SIZE);
@@ -729,7 +733,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		m_waveLoadAddress = waveAddress;
 
 		while (RedDmaSearchID(dmaID) > 0) {
-			RedSleep(1000);
+			RedSleep(REDSOUND_WAVE_LOAD_DMA_POLL_SLEEP_US);
 		}
 
 		if (m_waveLoadSize < 1) {

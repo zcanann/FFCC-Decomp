@@ -49,6 +49,11 @@ struct RedNoteDATA {
 	unsigned char m_reserved03;
 };
 
+inline void RedNoteCopy(RedNoteDATA* dst, const RedNoteDATA* src)
+{
+	*(int*)&dst->m_key = *(int*)&src->m_key;
+}
+
 enum RedNoteLayoutOffset {
 	REDSOUND_NOTE_KEY_OFFSET = 0x00,
 	REDSOUND_NOTE_VELOCITY_OFFSET = 0x01,

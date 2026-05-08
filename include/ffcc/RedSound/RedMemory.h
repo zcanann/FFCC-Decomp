@@ -1,12 +1,12 @@
 #ifndef _FFCC_REDSOUND_REDMEMORY_H
 #define _FFCC_REDSOUND_REDMEMORY_H
 
-int RedNew(int);
-void RedDelete(int);
-void RedDelete(void*);
-int RedNewA(int, int, int);
-void RedDeleteA(int);
-void RedDeleteA(void*);
+int RedNew(int size);
+void RedDelete(int address);
+void RedDelete(void* address);
+int RedNewA(int size, int offset, int maxSize);
+void RedDeleteA(int address);
+void RedDeleteA(void* address);
 
 struct RedMemoryBlock {
 	int m_address;

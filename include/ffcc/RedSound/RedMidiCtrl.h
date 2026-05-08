@@ -329,10 +329,10 @@ enum RedSoundControlSaveSize {
 };
 
 typedef void (*RedMidiControlFunc)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
-int DataAddCompute(int*, int, int*);
-void KeyOnReserveClear(RedKeyOnDATA*, RedTrackDATA*);
-void KeyOnReserve(RedKeyOnDATA*, RedTrackDATA*);
-void KeyOffSet(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
+int DataAddCompute(int* current, int target, int* delta);
+void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track);
+void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track);
+void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 
 extern RedMidiControlFunc p_MidiControl_Function[];
 extern RedSwingFunc SwingEntryFunction[];

@@ -285,21 +285,21 @@ enum RedVoiceUpdateFlag {
 };
 
 u8 GetRandomData();
-int PitchCompute(int, int, int, int);
+int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune);
 void* ReverbAreaAlloc(unsigned long);
-void ReverbAreaFree(void*);
+void ReverbAreaFree(void* area);
 void InitReverb();
-RedReverbSize* SetReverb(int, int, int*);
+RedReverbSize* SetReverb(int bank, int kind, int* params);
 
-RedVoiceDATA* EntryVoiceSearch(RedTrackDATA*);
-void SetVoiceVolumeMix(RedVoiceDATA*, int, int);
-void SetVoiceAccess(RedTrackDATA*, int);
-void SetVoiceSwitch(RedTrackDATA*, int);
+RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track);
+void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume);
+void SetVoiceAccess(RedTrackDATA* track, int mask);
+void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch);
 
 void EnvelopeKeyExecute();
 
 void MusicSkipFunction();
 
-void MainControl(int);
+void MainControl(int frames);
 
 #endif // _FFCC_REDSOUND_REDEXECUTE_H

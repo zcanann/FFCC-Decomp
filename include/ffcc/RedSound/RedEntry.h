@@ -309,7 +309,7 @@ public:
 	void ClearWaveData(int waveNo);
 	void ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo3);
 	void ClearWaveBank(int waveBankNo);
-	int GetWaveBank(int waveNo);
+	RedHistoryBANK* GetWaveBank(int waveNo);
 	RedWaveHeadWD* SearchWaveBase(int waveNo);
 	int ReentryWaveData(int waveNo);
 	void WaveHistoryManager(int waveNo, int count);

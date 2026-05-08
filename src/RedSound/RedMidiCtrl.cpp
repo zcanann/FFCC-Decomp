@@ -1445,7 +1445,7 @@ static void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
 	waveNo = *track->m_command++;
 	track->m_waveData = 0;
 	track->m_waveBase = 0;
-	waveBank = (RedHistoryBANK*)c_RedEntry.GetWaveBank(bankNo);
+	waveBank = c_RedEntry.GetWaveBank(bankNo);
 	if (waveBank != 0) {
 		waveBankData = waveBank->m_waveHead;
 		waveTable = waveBankData->m_waveOffsets;

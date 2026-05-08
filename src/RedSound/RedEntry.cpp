@@ -871,11 +871,11 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedEntry::GetWaveBank(int waveNo)
+RedHistoryBANK* CRedEntry::GetWaveBank(int waveNo)
 {
 	if ((waveNo >= 0) && (waveNo < REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT))
 	{
-		return reinterpret_cast<int>(&m_waveBankBase[waveNo]);
+		return &m_waveBankBase[waveNo];
 	}
 
 	return 0;

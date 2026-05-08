@@ -69,6 +69,7 @@ enum RedStreamFrameLayoutSize {
 	REDSOUND_STREAM_STEREO_LEFT_FRAME_OFFSET = 0x00,
 	REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET = sizeof(unsigned int) * REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT,
 	REDSOUND_STREAM_STEREO_FRAME_SIZE = 0x10,
+	REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE = REDSOUND_STREAM_PAGE_SIZE / REDSOUND_STREAM_STEREO_FRAME_SIZE,
 	REDSOUND_STREAM_LOOP_START_SAMPLE = 2,
 	REDSOUND_STREAM_ADSR_RELEASE_TIME = 10,
 };
@@ -92,6 +93,8 @@ STATIC_ASSERT(sizeof(RedStreamFile) == REDSOUND_STREAM_FILE_SIZE);
 STATIC_ASSERT(offsetof(RedStreamStereoFrame, m_left) == REDSOUND_STREAM_STEREO_LEFT_FRAME_OFFSET);
 STATIC_ASSERT(offsetof(RedStreamStereoFrame, m_right) == REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET);
 STATIC_ASSERT(sizeof(RedStreamStereoFrame) == REDSOUND_STREAM_STEREO_FRAME_SIZE);
+STATIC_ASSERT(REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE * REDSOUND_STREAM_STEREO_FRAME_SIZE ==
+              REDSOUND_STREAM_PAGE_SIZE);
 STATIC_ASSERT(REDSOUND_STREAM_STEREO_PLANE_SIZE * REDSOUND_STREAM_STEREO_CHANNEL_COUNT ==
               REDSOUND_STREAM_TRANSFER_BUFFER_SIZE);
 STATIC_ASSERT(REDSOUND_STREAM_TRANSFER_BUFFER_SIZE == REDSOUND_STREAM_TRANSFER_BUFFER_ALLOC_SIZE);
@@ -293,7 +296,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			voiceData = stream->m_voiceData;
 			srcFrame = (RedStreamStereoFrame*)(stream->m_fileData + stream->m_readOffset);
 			rightDst = dstBase + REDSOUND_STREAM_STEREO_PLANE_SIZE;
-			srcEnd = srcFrame + REDSOUND_STREAM_PAGE_SIZE / sizeof(*srcFrame);
+			srcEnd = srcFrame + REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE;
 			leftDst = dstBase;
 			
 			do {
@@ -312,7 +315,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			}
 			
 			srcFrame = (RedStreamStereoFrame*)(stream->m_fileData + stream->m_readOffset);
-			srcEnd = srcFrame + REDSOUND_STREAM_PAGE_SIZE / sizeof(*srcFrame);
+			srcEnd = srcFrame + REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE;
 			
 			do {
 				*(unsigned int*)leftDst = srcFrame->m_left[0];

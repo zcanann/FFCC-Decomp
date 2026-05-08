@@ -1633,7 +1633,7 @@ static void __MidiCtrl_PortamentOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
 static void __MidiCtrl_PortamentOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     track->m_portamentTime = 0;
-    track->m_portamentPitch = -1;
+    track->m_portamentPitch = REDSOUND_TRACK_PORTAMENT_PITCH_NONE;
 }
 
 /*

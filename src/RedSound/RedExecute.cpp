@@ -254,6 +254,7 @@ enum RedExecuteVolumeModConst {
     REDSOUND_VOLUME_MOD_SCALE_SHIFT = 7,
     REDSOUND_VOLUME_TRACK_SCALE_SHIFT = 9,
     REDSOUND_VOLUME_MOD_WAVE_SHIFT = 4,
+    REDSOUND_SHAKE_PAN_SCALE_SHIFT = 0x10,
 };
 
 enum RedControlTickWord {
@@ -1903,7 +1904,7 @@ static void _KeyOnControl()
                 waveFunc = track->m_shakeFunc;
                 int shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
                 int shakeValue = waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
-                track->m_shakePan = (shakeDepth * shakeValue) >> 0x10;
+                track->m_shakePan = (shakeDepth * shakeValue) >> REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
             track++;
@@ -1921,7 +1922,7 @@ static void _KeyOnControl()
                 waveFunc = track->m_shakeFunc;
                 int shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
                 int shakeValue = waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
-                track->m_shakePan = (shakeDepth * shakeValue) >> 0x10;
+                track->m_shakePan = (shakeDepth * shakeValue) >> REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
             track++;
@@ -1935,7 +1936,7 @@ static void _KeyOnControl()
                 waveFunc = track->m_shakeFunc;
                 int shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
                 int shakeValue = waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
-                track->m_shakePan = (shakeDepth * shakeValue) >> 0x10;
+                track->m_shakePan = (shakeDepth * shakeValue) >> REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
             track++;

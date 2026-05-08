@@ -334,7 +334,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	RedTrackDATA* track;
 	unsigned int state;
 	unsigned char attrMask;
-	unsigned char* seq;
+	RedSeInfoSequence* seq;
 	int deltaTime;
 	unsigned int count;
 	unsigned char* current;
@@ -365,14 +365,14 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	seq = info->m_sequence;
 	attrMask = info->m_attrMask;
 	count = info->m_flagsAndCount & REDSOUND_SE_INFO_COUNT_MASK;
-	current = seq + count * REDSOUND_SE_INFO_SEQUENCE_ENTRY_SIZE;
+	current = (unsigned char*)seq + count * REDSOUND_SE_INFO_SEQUENCE_ENTRY_SIZE;
 	do {
 		remaining = count;
 		if (sepId != REDSOUND_SEP_DIRECT_PLAY_ID) {
 			remaining = 0;
 			do {
 				remaining = remaining + 1;
-				if ((seq[remaining * REDSOUND_SE_INFO_SEQUENCE_ENTRY_SIZE + 1] & REDSOUND_SE_INFO_SEQUENCE_CONTINUE_FLAG) == 0) {
+				if ((seq[remaining].m_offsetHiAndFlags & REDSOUND_SE_INFO_SEQUENCE_CONTINUE_FLAG) == 0) {
 					break;
 				}
 			} while ((int)remaining < (int)count);
@@ -389,8 +389,8 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			track->m_waveBankData = waveBase;
 			track->m_command = current;
 			current = current +
-			          (((unsigned int)seq[REDSOUND_SE_INFO_SEQUENCE_OFFSET_HI] * REDSOUND_SE_INFO_U16_HIGH_SCALE +
-			            (unsigned int)seq[REDSOUND_SE_INFO_SEQUENCE_OFFSET_LO]) &
+			          (((unsigned int)seq->m_offsetHiAndFlags * REDSOUND_SE_INFO_U16_HIGH_SCALE +
+			            (unsigned int)seq->m_offsetLo) &
 			           REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK);
 			deltaTime = (int)DeltaTimeSumup((unsigned char**)&track->m_command);
 			track->m_deltaTime = deltaTime + 1;
@@ -465,7 +465,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			}
 
 			remaining = remaining - 1;
-			seq = seq + REDSOUND_SE_INFO_SEQUENCE_ENTRY_SIZE;
+			seq = (RedSeInfoSequence*)((unsigned char*)seq + REDSOUND_SE_INFO_SEQUENCE_ENTRY_SIZE);
 			count = count - 1;
 			if (remaining == 0) {
 				break;

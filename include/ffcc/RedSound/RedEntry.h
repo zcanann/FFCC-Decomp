@@ -103,6 +103,12 @@ enum RedSeSepHeadLayout {
 	REDSOUND_SESEP_FLAGS_MASK = 0x80000000,
 };
 
+struct RedSeInfoSequence
+{
+	unsigned char m_offsetLo;
+	unsigned char m_offsetHiAndFlags;
+};
+
 struct RedSeINFO
 {
 	unsigned char m_flagsAndCount;
@@ -110,7 +116,7 @@ struct RedSeINFO
 	unsigned char m_waveNoHi;
 	unsigned char m_eraseTrack;
 	unsigned char m_attrMask;
-	unsigned char m_sequence[REDSOUND_SE_INFO_SEQUENCE_MIN_COUNT];
+	RedSeInfoSequence m_sequence[REDSOUND_SE_INFO_SEQUENCE_MIN_COUNT];
 };
 
 enum RedSeInfoLayout {
@@ -119,7 +125,7 @@ enum RedSeInfoLayout {
 	REDSOUND_SE_INFO_COUNT_MASK = 0x7F,
 	REDSOUND_SE_INFO_SEQUENCE_CONTINUE_FLAG = 0x80,
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK = 0x7FFF,
-	REDSOUND_SE_INFO_SEQUENCE_ENTRY_SIZE = 2,
+	REDSOUND_SE_INFO_SEQUENCE_ENTRY_SIZE = sizeof(RedSeInfoSequence),
 };
 
 struct RedSeBlockHEAD

@@ -4,6 +4,7 @@
 #include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMidiCtrl.h"
 #include "ffcc/RedSound/RedGlobals.h"
+#include "global.h"
 #include "types.h"
 #include "dolphin/ax.h"
 #include "dolphin/axfx.h"
@@ -212,6 +213,26 @@ enum RedVoiceStartMaskIndex {
     REDSOUND_VOICE_START_MASK_LOW = 0,
     REDSOUND_VOICE_START_MASK_HIGH = 1,
 };
+
+STATIC_ASSERT(offsetof(RedWaveDATA, m_sampleStart) == REDSOUND_WAVE_SAMPLE_START_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveDATA, m_loopStart) == REDSOUND_WAVE_LOOP_START_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveDATA, m_loopEnd) == REDSOUND_WAVE_LOOP_END_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveDATA, m_pitch) == REDSOUND_WAVE_PITCH_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveDATA, m_splitKey) == REDSOUND_WAVE_SPLIT_KEY_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveDATA, m_volume) == REDSOUND_WAVE_VOLUME_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveDATA, m_pan) == REDSOUND_WAVE_PAN_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveDATA, m_reverbMix) == REDSOUND_WAVE_REVERB_MIX_OFFSET);
+STATIC_ASSERT(sizeof(RedWaveDATA) == REDSOUND_WAVE_DATA_SIZE);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_track) == REDSOUND_VOICE_TRACK_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_stateFlags) == REDSOUND_VOICE_STATE_FLAGS_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrTime) == REDSOUND_VOICE_ADSR_TIME_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrLevel) == REDSOUND_VOICE_ADSR_LEVEL_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrStage) == REDSOUND_VOICE_ADSR_STAGE_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_active) == REDSOUND_VOICE_ACTIVE_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_flags) == REDSOUND_VOICE_FLAGS_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_voiceSwitch) == REDSOUND_VOICE_SWITCH_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceDATA, m_voiceIndex) == REDSOUND_VOICE_INDEX_OFFSET);
+STATIC_ASSERT(sizeof(RedVoiceDATA) == REDSOUND_VOICE_SIZE);
 
 /*
  * --INFO--

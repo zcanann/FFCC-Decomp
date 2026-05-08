@@ -23,6 +23,7 @@ enum RedSoundLocalSize {
 	REDSOUND_STANDBY_STATUS_ALLOC_SIZE = 0x100,
 	REDSOUND_BSS_SIZE = 0x10C,
 	REDSOUND_STREAM_BANK_SIZE = 0x100,
+	REDSOUND_AUTO_ID_MASK = 0x7FFFFFFF,
 };
 
 enum RedSoundStringLayout {
@@ -157,7 +158,7 @@ unsigned int CRedSound::GetAutoID()
 {
 	do {
 		m_AutoID++;
-		m_AutoID &= 0x7FFFFFFF;
+		m_AutoID &= REDSOUND_AUTO_ID_MASK;
 	} while ((int)m_AutoID == 0);
 
 	return m_AutoID;

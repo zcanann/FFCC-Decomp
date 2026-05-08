@@ -339,6 +339,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params);
 RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track);
 void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume);
 void SetVoiceAccess(RedTrackDATA* track, int mask);
+void SetAllVoiceAccess(RedSoundCONTROL* control, int mask);
 void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch);
 
 void EnvelopeKeyExecute();

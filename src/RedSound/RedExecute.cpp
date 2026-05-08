@@ -1532,6 +1532,28 @@ void SetVoiceAccess(RedTrackDATA* track, int mask)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 112b
+ * EN Address: UNUSED
+ * EN Size: 112b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void SetAllVoiceAccess(RedSoundCONTROL* control, int mask)
+{
+    RedTrackDATA* track = control->m_tracks;
+    RedVoiceDATA* voiceData = p_VoiceData;
+
+    do {
+        if ((track <= voiceData->m_track) && (voiceData->m_track < track + control->m_trackCount)) {
+            voiceData->m_updateFlags |= mask;
+        }
+        voiceData++;
+    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801c4d58
  * PAL Size: 72b
  * EN Address: TODO

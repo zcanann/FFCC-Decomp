@@ -1470,7 +1470,7 @@ void CRedEntry::DisplaySePlayInfo()
 					RedSeINFO* seqInfo = reinterpret_cast<RedSeINFO*>(
 					    reinterpret_cast<unsigned char*>(entries) + seBlock->m_seCount * sizeof(*entries) +
 					    (entries[seBlockId & REDSOUND_SE_BLOCK_SEQUENCE_MASK] & REDSOUND_SE_BLOCK_ENTRY_MASK));
-					waveNo = (seqInfo->m_waveNoHi << 8) | seqInfo->m_waveNoLo;
+					waveNo = (seqInfo->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE) | seqInfo->m_waveNoLo;
 					trackIndex = track - *trackHead;
 
 					OSReport(sRedEntrySeBlockPlayInfoFmt, sRedEntryLogPrefix,
@@ -1481,7 +1481,7 @@ void CRedEntry::DisplaySePlayInfo()
 					RedHistoryBANK* seSepBank = SearchSeSepBank(track->m_seSepId);
 					RedSeSepHEAD* seSepHead = seSepBank->m_seSepHead;
 					trackIndex = track - *trackHead;
-					waveNo = (seSepHead->m_waveNoHi << 8) | seSepHead->m_waveNoLo;
+					waveNo = (seSepHead->m_waveNoHi * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE) | seSepHead->m_waveNoLo;
 					OSReport(sRedEntrySeSepPlayInfoFmt, sRedEntryLogPrefix,
 					         trackIndex + REDSOUND_SE_VOICE_BASE_INDEX, track->m_seSepId, waveNo);
 					fflush(__files + 1);

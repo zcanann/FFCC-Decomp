@@ -96,6 +96,7 @@ public:
 	void DisplayMMemoryInfo();
 
 	void SetReverb(int kind, int mode);
+	void SetReverb(int kind, int mode, int* params);
 	RedReverbSize* GetReverbInfo();
 	RedReverbDepth* GetReverbDepth();
 	void SetReverbDepth(int type, int depth, int frameCount);

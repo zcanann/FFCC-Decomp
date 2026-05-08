@@ -3036,6 +3036,20 @@ void CRedDriver::SetReverb(int bank, int kind)
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 56b
+ * EN Address: UNUSED
+ * EN Size: 56b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::SetReverb(int bank, int kind, int* params)
+{
+    ::SetReverb(bank, kind, params);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 32b
  * EN Address: UNUSED
  * EN Size: 32b

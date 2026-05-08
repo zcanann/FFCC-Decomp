@@ -1112,3 +1112,59 @@ void SetMusicPitch(int pitch, int frameCount)
 	p_MusicPitchControl->m_step = (pitch - p_MusicPitchControl->m_value) / frameCount;
 	p_MusicPitchControl->m_count = frameCount;
 }
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 476b
+ * EN Address: UNUSED
+ * EN Size: 476b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void MusicPause(int musicId, int pause)
+{
+	RedSoundCONTROL* music;
+	RedVoiceDATA* voice;
+
+	if (m_ReportPrint != 0) {
+		if (pause == REDSOUND_PAUSE_ON) {
+			OSReport(sRedCommandMusicPauseOnFmt, sRedCommandLogPrefix, musicId);
+		} else {
+			OSReport(sRedCommandMusicPauseOffFmt, sRedCommandLogPrefix, musicId);
+		}
+		fflush(__files + 1);
+	}
+
+	music = p_SoundControlBuffer;
+	do {
+		if ((musicId == REDSOUND_MUSIC_ID_NONE) || (musicId == music->m_musicId)) {
+			if (pause == REDSOUND_PAUSE_ON) {
+				music->m_flags |= REDSOUND_CONTROL_FLAG_PAUSE;
+			} else {
+				music->m_flags &= ~REDSOUND_CONTROL_FLAG_PAUSE;
+			}
+
+			voice = p_VoiceData;
+			do {
+				if ((voice->m_track >= music->m_tracks) &&
+				    (voice->m_track < music->m_tracks + music->m_trackCount)) {
+					if (pause == REDSOUND_PAUSE_ON) {
+						if (voice->m_axVoice != 0) {
+							voice->m_targetPitch = 0;
+							voice->m_flags |= REDSOUND_VOICE_FLAGS_PAUSE_DIRTY;
+						}
+						voice->m_track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAUSE;
+						voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAUSE;
+					} else {
+						voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_ALL;
+						voice->m_track->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_PAUSE_MASK;
+						voice->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_PAUSE_MASK;
+					}
+				}
+				voice++;
+			} while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+		}
+		music++;
+	} while (music < p_SoundControlBuffer + REDSOUND_CONTROL_SE);
+}

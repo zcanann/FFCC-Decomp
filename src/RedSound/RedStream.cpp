@@ -6,6 +6,7 @@
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedMidiCtrl.h"
 #include "ffcc/RedSound/RedGlobals.h"
+#include "global.h"
 #include <dolphin/os.h>
 #include <string.h>
 
@@ -54,6 +55,15 @@ enum RedStreamFrameLayoutSize {
 	REDSOUND_STREAM_LOOP_START_SAMPLE = 2,
 	REDSOUND_STREAM_ADSR_RELEASE_TIME = 10,
 };
+
+STATIC_ASSERT(offsetof(RedStreamDATA, m_volume) == REDSOUND_STREAM_VOLUME_OFFSET);
+STATIC_ASSERT(offsetof(RedStreamDATA, m_volumeStep) == REDSOUND_STREAM_VOLUME_STEP_OFFSET);
+STATIC_ASSERT(offsetof(RedStreamDATA, m_volumeStepCount) == REDSOUND_STREAM_VOLUME_STEP_COUNT_OFFSET);
+STATIC_ASSERT(offsetof(RedStreamDATA, m_pan) == REDSOUND_STREAM_PAN_OFFSET);
+STATIC_ASSERT(offsetof(RedStreamDATA, m_panStep) == REDSOUND_STREAM_PAN_STEP_OFFSET);
+STATIC_ASSERT(offsetof(RedStreamDATA, m_panStepCount) == REDSOUND_STREAM_PAN_STEP_COUNT_OFFSET);
+STATIC_ASSERT(offsetof(RedStreamDATA, m_fileCursor) == REDSOUND_STREAM_FILE_CURSOR_OFFSET);
+STATIC_ASSERT(sizeof(RedStreamDATA) == REDSOUND_STREAM_DATA_SIZE);
 
 static RedStreamDATA* _SearchEmptyStreamData();
 static void _StreamStop(RedStreamDATA* streamData);

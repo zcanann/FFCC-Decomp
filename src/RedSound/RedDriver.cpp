@@ -1608,6 +1608,33 @@ int RedDmaSearchID(int id)
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 96b
+ * EN Address: UNUSED
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void RedDmaClearID(int id)
+{
+    unsigned int interruptLevel;
+    RedDmaRequest* queueEntry;
+
+    interruptLevel = OSDisableInterrupts();
+    if (id != 0) {
+        queueEntry = RedDriverMainDmaQueue();
+        do {
+            if ((queueEntry->m_id != 0) && (queueEntry->m_id == id)) {
+                queueEntry->m_id = 0;
+            }
+            queueEntry++;
+        } while (queueEntry < RedDriverStreamDmaQueueEnd());
+    }
+    OSRestoreInterrupts(interruptLevel);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 8b
  * EN Address: UNUSED
  * EN Size: 8b

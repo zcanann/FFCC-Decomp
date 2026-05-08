@@ -24,6 +24,7 @@ void RedSleep(int microseconds);
 int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int size,
                 RedDmaCallback callback, void* callbackData);
 int RedDmaSearchID(int id);
+void RedDmaClearID(int id);
 void RedSetDMAMode(int mode);
 
 class CRedDriver

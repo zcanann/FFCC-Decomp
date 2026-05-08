@@ -31,6 +31,7 @@ enum RedEntryBankLayoutSize {
 	REDSOUND_WAVE_CLEAR_UNBANKED_USED = -3,
 	REDSOUND_SESEP_SEARCH_FIRST = -1,
 	REDSOUND_SESEP_CLEAR_ALL = -1,
+	REDSOUND_MUSIC_CLEAR_ALL = -1,
 	REDSOUND_HISTORY_BANK_ENTRY_SIZE = sizeof(RedHistoryBANK),
 	REDSOUND_HISTORY_BANK_ID_OFFSET = 0x00,
 	REDSOUND_HISTORY_BANK_HISTORY_NO_OFFSET = 0x04,
@@ -351,6 +352,7 @@ public:
 	void MusicHistoryManager(int musicNo, int count);
 	RedMusicHEAD* MusicHeadAdd(RedMusicHEAD* musicHead);
 	RedMusicHEAD* SetMusicData(RedMusicHEAD* musicHead);
+	int ClearMusicData(int musicNo);
 	void DisplayMMemoryInfo();
 
 	RedHistoryBANK* m_waveBankBase;

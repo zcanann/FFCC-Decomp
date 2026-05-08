@@ -696,6 +696,20 @@ static void _SetMusicData(int* command)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 56b
+ * EN Address: UNUSED
+ * EN Size: 56b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _ClearMusicData(int* command)
+{
+    c_RedEntry.ClearMusicData(command[REDSOUND_MUSIC_COMMAND_ID]);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bd080
  * PAL Size: 116b
  * EN Address: TODO
@@ -2198,6 +2212,20 @@ int CRedDriver::ReentryMusicData(int musicID)
 int CRedDriver::CheckMusicEntry(int musicID)
 {
     return c_RedEntry.SearchMusicBank(musicID) != 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: UNUSED
+ * EN Size: 72b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::ClearMusicData(int musicID)
+{
+    _EntryExecCommand(_ClearMusicData, musicID, 0, 0, 0, 0, 0, 0);
 }
 
 /*

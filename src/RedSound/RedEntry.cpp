@@ -1831,6 +1831,38 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 204b
+ * EN Address: UNUSED
+ * EN Size: 204b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedEntry::ClearMusicData(int musicNo)
+{
+	int result = 0;
+
+	if (musicNo == REDSOUND_MUSIC_CLEAR_ALL) {
+		RedHistoryBANK* history = m_musicBankBase;
+		do {
+			if (history->m_size != 0) {
+				MusicMemoryFree(history);
+			}
+			history += 1;
+		} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
+	} else {
+		result = SearchMusicSequence(musicNo);
+		if (result >= 0) {
+			MusicHistoryDelete(m_musicBankBase[result].m_historyNo);
+			result = MusicMemoryFree(&m_musicBankBase[result]);
+		}
+	}
+
+	return result;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801c2b70
  * PAL Size: 1108b
  * EN Address: TODO

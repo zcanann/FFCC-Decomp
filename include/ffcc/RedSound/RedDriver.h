@@ -43,6 +43,7 @@ public:
 	int SetMusicData(void* musicData);
 	int ReentryMusicData(int musicId);
 	int CheckMusicEntry(int musicId);
+	void ClearMusicData(int musicId);
 	void MusicStop(int musicId);
 	int MusicPlay(int musicId, int volume, int mode);
 	int MusicCrossPlay(int musicId, int volume, int mode);

@@ -2947,6 +2947,27 @@ int CRedDriver::GetStreamPlayPoint(int streamID, int* outPoint1, int* outPoint2)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 80b
+ * EN Address: UNUSED
+ * EN Size: 80b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedStreamDATA* CRedDriver::GetStreamPlayBlock(int streamID)
+{
+	RedStreamDATA* streamData = p_Stream;
+	do {
+		if ((streamData->m_streamId != 0) && (streamData->m_streamId == streamID)) {
+			return streamData;
+		}
+		streamData++;
+	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
+	return 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bfa74
  * PAL Size: 72b
  * EN Address: TODO

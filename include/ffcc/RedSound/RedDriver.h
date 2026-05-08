@@ -9,6 +9,7 @@ typedef void (*RedDmaCallback)(void* callbackData);
 struct RedReverbDepth;
 struct RedReverbModeData;
 struct RedReverbSize;
+struct RedStreamDATA;
 struct RedTrackDATA;
 struct RedWaveHeadWD;
 
@@ -87,6 +88,7 @@ public:
 
 	int StreamPlayState(int streamId);
 	int GetStreamPlayPoint(int streamId, int* current, int* total);
+	RedStreamDATA* GetStreamPlayBlock(int streamId);
 	void StreamStop(int streamId);
 	int StreamPlay(int streamId, void* streamHeader, int fileSize, int pan, int volume);
 	void StreamVolume(int streamId, int volume, int frameCount);

@@ -2117,6 +2117,20 @@ int CRedDriver::ReentryMusicData(int musicID)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: UNUSED
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::CheckMusicEntry(int musicID)
+{
+    return c_RedEntry.SearchMusicBank(musicID) != 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bee48
  * PAL Size: 72b
  * EN Address: TODO
@@ -2370,6 +2384,20 @@ int CRedDriver::ReentrySeSepData(int id)
     id         = c_RedEntry.ReentrySeSepData(id);
     OSRestoreInterrupts(interrupts);
     return id;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: UNUSED
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::CheckSeSepEntry(int id)
+{
+    return c_RedEntry.SearchSeSepBank(id) != 0;
 }
 
 /*
@@ -2876,6 +2904,34 @@ int CRedDriver::ReentryWaveData(int id)
     id         = c_RedEntry.ReentryWaveData(id);
     OSRestoreInterrupts(interrupts);
     return id;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: UNUSED
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedWaveHeadWD* CRedDriver::GetWaveInfo(int id)
+{
+    return c_RedEntry.SearchWaveBase(id);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: UNUSED
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::CheckWaveEntry(int id)
+{
+    return c_RedEntry.SearchWaveBase(id) != 0;
 }
 
 /*

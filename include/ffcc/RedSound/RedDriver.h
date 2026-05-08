@@ -9,6 +9,7 @@ typedef void (*RedDmaCallback)(void* callbackData);
 struct RedReverbDepth;
 struct RedReverbModeData;
 struct RedReverbSize;
+struct RedWaveHeadWD;
 
 enum RedDmaEntryFlag {
 	REDSOUND_DMA_FLAG_MAIN_QUEUE = 1,
@@ -41,6 +42,7 @@ public:
 	int GetSoundMode();
 	int SetMusicData(void* musicData);
 	int ReentryMusicData(int musicId);
+	int CheckMusicEntry(int musicId);
 	void MusicStop(int musicId);
 	int MusicPlay(int musicId, int volume, int mode);
 	int MusicCrossPlay(int musicId, int volume, int mode);
@@ -57,6 +59,7 @@ public:
 	void ClearSeSepData(int sepId);
 	void ClearSeSepDataMG(int bank, int sep, int group, int kind);
 	int ReentrySeSepData(int sepId);
+	int CheckSeSepEntry(int sepId);
 
 	int SePlayState(int seId);
 	void SeStop(int seId);
@@ -85,6 +88,8 @@ public:
 	void ClearWaveBank(int bank);
 	void SetWaveData(int slot, int waveID, void* waveData, int waveSize);
 	int ReentryWaveData(int waveNo);
+	RedWaveHeadWD* GetWaveInfo(int waveNo);
+	int CheckWaveEntry(int waveNo);
 	void DisplayWaveInfo();
 
 	void SetReverb(int kind, int mode);

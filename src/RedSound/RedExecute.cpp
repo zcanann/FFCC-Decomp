@@ -214,6 +214,17 @@ enum RedVoiceStartMaskIndex {
     REDSOUND_VOICE_START_MASK_HIGH = 1,
 };
 
+STATIC_ASSERT(sizeof(t_TonePitch) == REDSOUND_TONE_PITCH_TABLE_SIZE);
+STATIC_ASSERT(sizeof(t_FinePitch) == REDSOUND_FINE_PITCH_TABLE_SIZE);
+STATIC_ASSERT(sizeof(t_KeySignatureIndex) == REDSOUND_KEY_SIGNATURE_INDEX_TABLE_SIZE);
+STATIC_ASSERT(sizeof(t_KeySignatureData) == REDSOUND_KEY_SIGNATURE_DATA_TABLE_SIZE);
+STATIC_ASSERT(sizeof(t_RandomData) == REDSOUND_RANDOM_DATA_TABLE_SIZE);
+STATIC_ASSERT(sizeof(t_PanningData) == REDSOUND_PAN_TABLE_SIZE);
+STATIC_ASSERT(sizeof(t_PanningDataR) == REDSOUND_PAN_TABLE_SIZE);
+STATIC_ASSERT(sizeof(t_TonePitch) + sizeof(t_FinePitch) + sizeof(t_KeySignatureIndex) +
+                  sizeof(t_KeySignatureData) + sizeof(t_RandomData) + sizeof(t_PanningData) +
+                  sizeof(t_PanningDataR) ==
+              REDSOUND_EXECUTE_DATA_TABLE_SIZE);
 STATIC_ASSERT(offsetof(RedReverbDATA, m_callback) == REDSOUND_REVERB_CALLBACK_OFFSET);
 STATIC_ASSERT(offsetof(RedReverbDATA, m_context) == REDSOUND_REVERB_CONTEXT_OFFSET);
 STATIC_ASSERT(offsetof(RedReverbDATA, m_kind) == REDSOUND_REVERB_KIND_OFFSET);

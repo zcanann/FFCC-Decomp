@@ -414,7 +414,7 @@ int CRedEntry::SearchWaveSequence(int waveNo)
 		waveBank += 1;
 	}
 
-	return -1;
+	return REDSOUND_HISTORY_BANK_NOT_FOUND;
 }
 
 /*
@@ -466,7 +466,7 @@ int CRedEntry::SearchUseWave(int waveNo)
  */
 int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 {
-	int sequenceNo = REDSOUND_WAVE_NO_NONE;
+	int sequenceNo = REDSOUND_HISTORY_BANK_NOT_FOUND;
 	int waveNo;
 
 	if (bank->m_id >= 0) {
@@ -554,7 +554,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 			fflush(__files + 1);
 		}
 
-		return -1;
+		return REDSOUND_WAVE_ADD_FAILED;
 	}
 
 	if (waveHead->m_loadSize < waveHead->m_waveSize) {
@@ -642,7 +642,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		fflush(__files + 1);
 	}
 
-	return -1;
+	return REDSOUND_WAVE_ADD_FAILED;
 }
 
 /*
@@ -1151,7 +1151,7 @@ int CRedEntry::SearchSeSepSequence(int seNo)
 {
 	RedHistoryBANK* seSepBank = m_seSepBankBase;
 
-	if (seNo == -1) {
+	if (seNo == REDSOUND_SESEP_SEARCH_FIRST) {
 		do {
 			if (seSepBank->m_size != 0) {
 				return seSepBank - m_seSepBankBase;
@@ -1167,7 +1167,7 @@ int CRedEntry::SearchSeSepSequence(int seNo)
 		} while (seSepBank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
 	}
 
-	return -1;
+	return REDSOUND_HISTORY_BANK_NOT_FOUND;
 }
 
 /*
@@ -1316,7 +1316,7 @@ int CRedEntry::ClearSeSepData(int seNo)
 {
 	int result = 0;
 
-	if (seNo == -1) {
+	if (seNo == REDSOUND_SESEP_CLEAR_ALL) {
 		RedHistoryBANK* history = m_seSepBankBase;
 		do {
 			if (history->m_size != 0) {
@@ -1594,7 +1594,7 @@ int CRedEntry::SearchMusicSequence(int musicNo)
 		musicBank += 1;
 	} while (musicBank < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
 
-	return -1;
+	return REDSOUND_HISTORY_BANK_NOT_FOUND;
 }
 
 /*

@@ -1276,6 +1276,8 @@ void CRedEntry::DisplaySePlayInfo()
 
 		RedTrackDATA** trackHead = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 		RedTrackDATA* track = *trackHead;
+		int trackIndex;
+		int waveNo;
 		do {
 			if (track->m_command != 0) {
 				if ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
@@ -1283,13 +1285,11 @@ void CRedEntry::DisplaySePlayInfo()
 					int songNo = (int)(seDataNo & REDSOUND_SE_BLOCK_ENTRY_MASK) >> REDSOUND_SE_BLOCK_BANK_SHIFT;
 					RedSeBlockHEAD* seBlock = p_SeBlockData[songNo];
 					int* entries = seBlock->m_entries;
-					RedSeINFO* seqInfo =
-					    reinterpret_cast<RedSeINFO*>(entries + seBlock->m_seCount);
-					seqInfo = reinterpret_cast<RedSeINFO*>(
-					    reinterpret_cast<int>(seqInfo) +
+					RedSeINFO* seqInfo = reinterpret_cast<RedSeINFO*>(
+					    reinterpret_cast<unsigned char*>(entries) + seBlock->m_seCount * sizeof(*entries) +
 					    (entries[seDataNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK] & REDSOUND_SE_BLOCK_ENTRY_MASK));
-					int waveNo = (seqInfo->m_waveNoHi << 8) | seqInfo->m_waveNoLo;
-					int trackIndex = track - *trackHead;
+					waveNo = (seqInfo->m_waveNoHi << 8) | seqInfo->m_waveNoLo;
+					trackIndex = track - *trackHead;
 
 					OSReport(sRedEntrySeBlockPlayInfoFmt, sRedEntryLogPrefix,
 					         trackIndex + REDSOUND_SE_VOICE_BASE_INDEX, songNo,
@@ -1298,14 +1298,14 @@ void CRedEntry::DisplaySePlayInfo()
 				} else {
 					RedHistoryBANK* seSepBank = SearchSeSepBank(track->m_seSepId);
 					RedSeSepHEAD* seSepHead = reinterpret_cast<RedSeSepHEAD*>(seSepBank->m_data);
-					int trackIndex = track - *trackHead;
-					int waveNo = (seSepHead->m_waveNoHi << 8) | seSepHead->m_waveNoLo;
+					trackIndex = track - *trackHead;
+					waveNo = (seSepHead->m_waveNoHi << 8) | seSepHead->m_waveNoLo;
 					OSReport(sRedEntrySeSepPlayInfoFmt, sRedEntryLogPrefix,
 					         trackIndex + REDSOUND_SE_VOICE_BASE_INDEX, track->m_seSepId, waveNo);
 					fflush(__files + 1);
 				}
 			} else {
-				int trackIndex = track - *trackHead;
+				trackIndex = track - *trackHead;
 				OSReport(sRedEntrySeEmptyPlayInfoFmt, sRedEntryLogPrefix,
 				         trackIndex + REDSOUND_SE_VOICE_BASE_INDEX);
 				fflush(__files + 1);

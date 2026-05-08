@@ -53,6 +53,8 @@ void SePause(int seId, int pause);
 int MusicStop(int musicId);
 int MusicPlay(int musicId, int volume, int mode);
 void SetMusicVolume(int musicId, int volume, int frameCount, int mode);
+void SetMusicTempo(int tempo, int frameCount);
+void SetMusicPitch(int pitch, int frameCount);
 
 extern RedReverbModeData t_ReverbModeData[REDSOUND_REVERB_MODE_COUNT];
 

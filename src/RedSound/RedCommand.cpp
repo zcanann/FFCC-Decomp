@@ -1064,3 +1064,51 @@ void SetMusicVolume(int musicId, int volume, int duration, int mode)
 		music++;
 	} while (music < p_SoundControlBuffer + REDSOUND_CONTROL_SE);
 }
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 104b
+ * EN Address: UNUSED
+ * EN Size: 104b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void SetMusicTempo(int tempo, int frameCount)
+{
+	if (frameCount < 1) {
+		frameCount = 1;
+	} else {
+		frameCount *= REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
+		frameCount /= REDSOUND_FRAMES_PER_SECOND;
+	}
+
+	tempo <<= REDSOUND_FIXED_SHIFT;
+	tempo |= REDSOUND_FIXED_HALF;
+	p_MusicTempoControl->m_step = (tempo - p_MusicTempoControl->m_value) / frameCount;
+	p_MusicTempoControl->m_count = frameCount;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 92b
+ * EN Address: UNUSED
+ * EN Size: 92b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void SetMusicPitch(int pitch, int frameCount)
+{
+	if (frameCount < 1) {
+		frameCount = 1;
+	} else {
+		frameCount *= REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
+		frameCount /= REDSOUND_FRAMES_PER_SECOND;
+	}
+
+	pitch <<= REDSOUND_FIXED_SHIFT;
+	pitch |= REDSOUND_FIXED_HALF;
+	p_MusicPitchControl->m_step = (pitch - p_MusicPitchControl->m_value) / frameCount;
+	p_MusicPitchControl->m_count = frameCount;
+}

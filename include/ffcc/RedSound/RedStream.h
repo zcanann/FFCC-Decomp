@@ -31,6 +31,16 @@ struct RedStreamHEAD {
     s16 m_reserved1E;
 };
 
+struct RedStreamADPCMHeader {
+    AXPBADPCM m_data;
+    AXPBADPCMLOOP m_loop;
+};
+
+struct RedStreamFile {
+    RedStreamHEAD m_header;
+    RedStreamADPCMHeader m_adpcm[1];
+};
+
 enum RedStreamState {
     REDSOUND_STREAM_STATE_STOPPED = 0,
     REDSOUND_STREAM_STATE_PLAYING = 1,

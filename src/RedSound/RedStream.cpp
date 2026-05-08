@@ -44,16 +44,6 @@ enum RedStreamChannelIndex {
 	REDSOUND_STREAM_RIGHT_CHANNEL = 1,
 };
 
-struct RedStreamADPCMHeader {
-	AXPBADPCM m_data;
-	AXPBADPCMLOOP m_loop;
-};
-
-struct RedStreamFile {
-	RedStreamHEAD m_header;
-	RedStreamADPCMHeader m_adpcm[1];
-};
-
 struct RedStreamStereoFrame {
 	unsigned int m_left[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];
 	unsigned int m_right[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];

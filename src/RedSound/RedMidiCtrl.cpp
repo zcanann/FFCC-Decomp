@@ -1018,7 +1018,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
     control->m_savedActiveTrackCount = control->m_activeTrackCount;
     memmove(&control->m_savedMeasure,
             &control->m_measure,
-            REDSOUND_CONTROL_SAVED_POSITION_SIZE);
+            sizeof(RedSoundControlPosition));
     control->m_savedTick -= deltaAdjust;
     if (control->m_savedTick < 0) {
         control->m_savedTick += control->m_savedTicksPerMeasure;
@@ -1026,7 +1026,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
     }
     memmove(&control->m_savedTempo,
             &control->m_tempo,
-            REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
+            sizeof(RedSoundControlTempo));
 }
 
 /*

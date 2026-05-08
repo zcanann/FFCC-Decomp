@@ -691,7 +691,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         _ClearReverb(1);
     }
 
-    reverb->m_kind = kind;
+    reverb->m_kind = (RedReverbKind)kind;
     switch (kind) {
     case REDSOUND_REVERB_KIND_STD: {
         reverb->m_context = (void*)RedNew(sizeof(AXFX_REVERBSTD));

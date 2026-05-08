@@ -9,19 +9,6 @@ struct RedTrackDATA;
 struct RedSoundCONTROL;
 struct RedKeyOnDATA;
 
-struct RedReverbDATA {
-	int m_callback;
-	void* m_context;
-	int m_kind;
-};
-
-enum RedReverbLayoutOffset {
-	REDSOUND_REVERB_CALLBACK_OFFSET = 0x00,
-	REDSOUND_REVERB_CONTEXT_OFFSET = 0x04,
-	REDSOUND_REVERB_KIND_OFFSET = 0x08,
-	REDSOUND_REVERB_SIZE = 0x0C,
-};
-
 enum RedReverbKind {
 	REDSOUND_REVERB_KIND_NONE = 0,
 	REDSOUND_REVERB_KIND_STD = 1,
@@ -29,6 +16,19 @@ enum RedReverbKind {
 	REDSOUND_REVERB_KIND_DELAY = 3,
 	REDSOUND_REVERB_KIND_CHORUS = 4,
 	REDSOUND_REVERB_KIND_HI_DPL2 = 5,
+};
+
+struct RedReverbDATA {
+	int m_callback;
+	void* m_context;
+	RedReverbKind m_kind;
+};
+
+enum RedReverbLayoutOffset {
+	REDSOUND_REVERB_CALLBACK_OFFSET = 0x00,
+	REDSOUND_REVERB_CONTEXT_OFFSET = 0x04,
+	REDSOUND_REVERB_KIND_OFFSET = 0x08,
+	REDSOUND_REVERB_SIZE = 0x0C,
 };
 
 struct RedReverbSize {

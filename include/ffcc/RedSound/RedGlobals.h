@@ -95,6 +95,7 @@ enum RedSoundFixedPoint {
 	REDSOUND_PITCH_KEY_SIGNATURE_UNIT = 0x100000,
 	REDSOUND_PITCH_NOTE_MASK = 0x7F,
 	REDSOUND_PITCH_FINE_MASK = 0xFF,
+	REDSOUND_PITCH_FINE_COUNT = REDSOUND_PITCH_FINE_MASK + 1,
 	REDSOUND_PITCH_FINE_TUNE_POSITIVE_SHIFT = 7,
 	REDSOUND_PITCH_FINE_TUNE_NEGATIVE_SHIFT = 8,
 	REDSOUND_PITCH_OCTAVE_UNITS = 0xC00,
@@ -105,6 +106,7 @@ enum RedSoundFixedPoint {
 	REDSOUND_PAN_BYTE_MASK = 0x7F,
 	REDSOUND_PAN_BYTE_SIGN_BIT = 0x80,
 	REDSOUND_PAN_BYTE_WRAP = 0x100,
+	REDSOUND_PAN_TABLE_COUNT = REDSOUND_PAN_BYTE_WRAP,
 	REDSOUND_MASTER_VOLUME_SCALE = 4,
 	REDSOUND_MASTER_VOLUME_FULL = (REDSOUND_COMMAND_VALUE_MASK + 1) * REDSOUND_MASTER_VOLUME_SCALE - 1,
 	REDSOUND_MASTER_VOLUME_FULL_FIXED = REDSOUND_MASTER_VOLUME_FULL * REDSOUND_FIXED_ONE,
@@ -119,13 +121,13 @@ enum RedSoundPauseState {
 struct RedSeBlockHEAD;
 
 extern RedMidiControlFunc p_MidiControl_Function[REDSOUND_MIDI_CONTROL_FUNCTION_COUNT];
-extern u32 t_TonePitch[];
-extern int t_FinePitch[];
-extern int t_KeySignatureIndex[];
-extern signed char t_KeySignatureData[];
-extern signed char t_RandomData[];
-extern s16 t_PanningData[];
-extern s16 t_PanningDataR[];
+extern u32 t_TonePitch[REDSOUND_NOTES_PER_OCTAVE];
+extern int t_FinePitch[REDSOUND_PITCH_FINE_COUNT];
+extern int t_KeySignatureIndex[REDSOUND_KEY_SIGNATURE_INDEX_COUNT];
+extern signed char t_KeySignatureData[REDSOUND_KEY_SIGNATURE_DATA_COUNT];
+extern signed char t_RandomData[REDSOUND_RANDOM_DATA_COUNT];
+extern s16 t_PanningData[REDSOUND_PAN_TABLE_COUNT];
+extern s16 t_PanningDataR[REDSOUND_PAN_TABLE_COUNT];
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;
 extern RedSeBlockHEAD* volatile p_SeBlockData[];

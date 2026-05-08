@@ -9,12 +9,12 @@
 #include "dolphin/axfx.h"
 #include <string.h>
 
-u32 t_TonePitch[] = {
+u32 t_TonePitch[REDSOUND_NOTES_PER_OCTAVE] = {
     131072, 138865, 147123, 155871, 165140, 174960,
     185363, 196386, 208063, 220435, 233543, 247430,
 };
 
-int t_FinePitch[] = {
+int t_FinePitch[REDSOUND_PITCH_FINE_COUNT] = {
     65536, 65550, 65565, 65580, 65595, 65609, 65624, 65639,
     65654, 65669, 65684, 65698, 65713, 65728, 65743, 65758,
     65773, 65787, 65802, 65817, 65832, 65847, 65862, 65876,
@@ -49,20 +49,20 @@ int t_FinePitch[] = {
     69307, 69323, 69339, 69354, 69370, 69385, 69401, 69417,
 };
 
-int t_KeySignatureIndex[] = {
+int t_KeySignatureIndex[REDSOUND_KEY_SIGNATURE_INDEX_COUNT] = {
     11, 4, 9, 2, 7, 0, 5, 10,
     11, 0, 5, 10, 3, 8, 1, 6,
     25, 30, 23, 28, 33, 26, 31, 24,
     34, 26, 31, 24, 29, 34, 27, 32,
 };
 
-signed char t_KeySignatureData[] = {
+signed char t_KeySignatureData[REDSOUND_KEY_SIGNATURE_DATA_COUNT] = {
     0, 0, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1,
     0, 0, 0, 0, -1, 0, -1, 0, 0, 1, 0, 0, 0, 0, 1, 0,
     1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0,
 };
 
-signed char t_RandomData[] = {
+signed char t_RandomData[REDSOUND_RANDOM_DATA_COUNT] = {
     -115, 0, -26, 99, -116, -94, 94, 31, 49, 108, 21, -3, -52, 62, -7, -123,
     -43, 127, 98, 1, 101, 69, -33, -113, 112, -86, 88, 111, 56, 96, 79, 126,
     105, -17, 124, -85, 12, -50, -55, 66, 8, -42, -4, 5, -24, -9, -105, -34,
@@ -81,7 +81,7 @@ signed char t_RandomData[] = {
     -76, -32, -121, -75, -96, -36, -54, -65, 92, -91, -62, 55, 59, 75, -39, -119,
 };
 
-s16 t_PanningData[] = {
+s16 t_PanningData[REDSOUND_PAN_TABLE_COUNT] = {
     256, 254, 253, 252, 251, 250, 248, 247,
     246, 245, 244, 243, 241, 240, 239, 238,
     237, 236, 234, 233, 232, 231, 230, 229,
@@ -116,7 +116,7 @@ s16 t_PanningData[] = {
     207, 213, 219, 225, 231, 237, 243, 249,
 };
 
-s16 t_PanningDataR[] = {
+s16 t_PanningDataR[REDSOUND_PAN_TABLE_COUNT] = {
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,

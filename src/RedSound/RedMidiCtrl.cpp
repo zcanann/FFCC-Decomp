@@ -914,7 +914,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
 
             c_RedEntry.MusicHistoryManager(0, control->m_musicId);
             c_RedEntry.WaveHistoryManager(0, control->m_waveNo);
-            control->m_musicId = -1;
+            control->m_musicId = REDSOUND_MUSIC_ID_NONE;
             control->m_updateFlags = 0;
             RedDelete((int)control->m_tracks);
             control->m_tracks = 0;

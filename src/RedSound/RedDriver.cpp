@@ -2022,7 +2022,7 @@ int CRedDriver::SetMusicData(void* musicData)
     RedMusicHEAD* copiedHeader;
     int headerSize;
 
-    result = -1;
+    result = REDSOUND_MUSIC_ID_NONE;
     if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {

@@ -577,7 +577,7 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 		}
 	}
 
-	return -1;
+	return REDSOUND_SE_PLAY_FAILED;
 }
 
 /*
@@ -607,7 +607,7 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 			return sepId;
 		}
 	}
-	return -1;
+	return REDSOUND_SE_PLAY_FAILED;
 }
 
 /*

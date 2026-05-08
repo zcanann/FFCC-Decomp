@@ -904,11 +904,11 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	music->m_trackCount = musicHead->m_trackCount;
 	music->m_activeTrackCount = (short)musicHead->m_trackCount;
 	music->m_volumeScale = (unsigned char)(musicHead->m_flags & REDSOUND_MUSIC_HEADER_VOLUME_SCALE_MASK);
-	music->m_tickCounter = 1;
+	music->m_tickCounter = REDSOUND_CONTROL_INITIAL_TICK_COUNTER;
 	music->m_tempo = REDSOUND_FIXED_ONE;
-	music->m_ticksPerMeasure = 10000;
-	music->m_tick = -1;
-	music->m_measure = 1;
+	music->m_ticksPerMeasure = REDSOUND_CONTROL_DEFAULT_TICKS_PER_MEASURE;
+	music->m_tick = REDSOUND_CONTROL_INITIAL_TICK;
+	music->m_measure = REDSOUND_CONTROL_INITIAL_MEASURE;
 	music->m_elapsedTime = 0;
 	if (volume != 0) {
 		volume = (((volume + 1) * REDSOUND_MASTER_VOLUME_SCALE) - 1) * REDSOUND_FIXED_ONE;

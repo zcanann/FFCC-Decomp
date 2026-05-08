@@ -11,6 +11,7 @@ struct RedHistoryBANK
 	int m_historyNo;
 	union {
 		int m_data;
+		int m_address;
 		void* m_pointer;
 		RedWaveHeadWD* m_waveHead;
 		RedSeSepHEAD* m_seSepHead;

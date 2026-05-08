@@ -293,7 +293,7 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 				fflush(__files + 1);
 			}
 			RedDeleteA(bank->m_waveHead->m_aramAddress);
-			RedDelete(bank->m_data);
+			RedDelete(bank->m_address);
 		}
 
 		bank->m_data = 0;
@@ -986,7 +986,7 @@ int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
 	int waveNo = static_cast<unsigned int>(bank->m_seSepHead->m_waveNoLo) +
 	             static_cast<unsigned int>(bank->m_seSepHead->m_waveNoHi) * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE;
 
-	RedDelete(bank->m_data);
+	RedDelete(bank->m_address);
 	SeSepHistoryDelete(bank->m_historyNo);
 
 	freedSize = bank->m_size;
@@ -1410,7 +1410,7 @@ int CRedEntry::SearchMusicSequence(int musicNo)
 int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
 {
 	WaveHistoryManager(0, bank->m_musicHead->m_waveNo);
-	RedDelete(bank->m_data);
+	RedDelete(bank->m_address);
 	int freedSize = bank->m_size;
 	bank->m_data = bank->m_size = 0;
 	bank->m_historyNo = 0;
@@ -1684,7 +1684,7 @@ void CRedEntry::DisplayMMemoryInfo()
 
 			history = m_musicBankBase;
 			do {
-				if ((history->m_size != 0) && (history->m_data == bankEntry->m_address)) {
+				if ((history->m_size != 0) && (history->m_address == bankEntry->m_address)) {
 					OSReport(sRedEntryMMemoryMusicInfoFmt, sRedEntryLogPrefix,
 					         reinterpret_cast<RedMusicHEAD*>(bankEntry->m_address)->m_musicNo, bankEntry->m_address,
 					         bankEntry->m_size, freeSize);
@@ -1712,7 +1712,7 @@ void CRedEntry::DisplayMMemoryInfo()
 			if (matched == 0) {
 				history = m_waveBankBase;
 				do {
-					if ((history->m_size != 0) && (history->m_data == bankEntry->m_address)) {
+					if ((history->m_size != 0) && (history->m_address == bankEntry->m_address)) {
 						OSReport(sRedEntryMMemoryWaveInfoFmt, sRedEntryLogPrefix,
 						         reinterpret_cast<RedWaveHeadWD*>(bankEntry->m_address)->m_waveNo, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
@@ -1727,7 +1727,7 @@ void CRedEntry::DisplayMMemoryInfo()
 			if (matched == 0) {
 				history = m_seSepBankBase;
 				do {
-					if ((history->m_size != 0) && (history->m_data == bankEntry->m_address)) {
+					if ((history->m_size != 0) && (history->m_address == bankEntry->m_address)) {
 						OSReport(sRedEntryMMemorySeInfoFmt, sRedEntryLogPrefix,
 						         reinterpret_cast<RedSeSepHEAD*>(bankEntry->m_address)->m_seNo, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);

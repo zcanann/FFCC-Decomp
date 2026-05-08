@@ -943,10 +943,10 @@ int MusicStop(int musicId)
 	RedSoundCONTROL* music = p_SoundControlBuffer;
 
 	do {
-		if ((musicId == -1) || ((music->m_musicId >= 0) && (music->m_musicId == musicId))) {
+		if ((musicId == REDSOUND_MUSIC_ID_NONE) || ((music->m_musicId >= 0) && (music->m_musicId == musicId))) {
 			int stoppedMusicId = music->m_musicId;
 			music->m_updateFlags = 0;
-			music->m_musicId = -1;
+			music->m_musicId = REDSOUND_MUSIC_ID_NONE;
 			if (music->m_activeTrackCount != 0) {
 				RedVoiceDATA* voiceData = p_VoiceData;
 				do {
@@ -987,7 +987,7 @@ int MusicStop(int musicId)
 		memcpy(p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY, sizeof(RedSoundCONTROL));
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount = 0;
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount = 0;
-		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId = -1;
+		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId = REDSOUND_MUSIC_ID_NONE;
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks = 0;
 	}
 

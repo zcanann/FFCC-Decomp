@@ -2569,7 +2569,7 @@ int CRedDriver::StreamPlayState(int streamID)
 	streamData = p_Stream;
 	do {
 		if ((streamData->m_streamId != 0) &&
-		    ((streamID == -1) || (streamData->m_streamId == streamID))) {
+		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamData->m_streamId == streamID))) {
 			result = 1;
 			break;
 		}
@@ -2581,7 +2581,8 @@ int CRedDriver::StreamPlayState(int streamID)
 		command = p_ExecCommandOld;
 		while (commandNow != command) {
 			if ((command->m_func != 0) && (command->m_func == _StreamPlay) &&
-			    ((streamID == -1) || (streamID == command->m_args[REDSOUND_EXEC_COMMAND_ARG0]))) {
+			    ((streamID == REDSOUND_STREAM_ID_ALL) ||
+			     (streamID == command->m_args[REDSOUND_EXEC_COMMAND_ARG0]))) {
 				result = 1;
 				break;
 			}

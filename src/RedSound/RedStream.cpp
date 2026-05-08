@@ -405,7 +405,8 @@ void StreamStop(int streamID)
 	volatile RedStreamDATA* streamData = p_Stream;
 
 	do {
-		if ((streamData->m_streamId != 0) && ((streamID == -1) || (streamID == streamData->m_streamId))) {
+		if ((streamData->m_streamId != 0) &&
+		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
 			_StreamStop((RedStreamDATA*)streamData);
 		}
 		streamData++;
@@ -595,7 +596,8 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 
 	streamData = p_Stream;
 	do {
-		if ((streamData->m_streamId != 0) && ((streamID == -1) || (streamID == streamData->m_streamId))) {
+		if ((streamData->m_streamId != 0) &&
+		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
 			if (frameCount > 0) {
 				int delta = volume - streamData->m_volume;
 				streamData->m_volumeStep = delta / frameCount;
@@ -635,7 +637,8 @@ void StreamPause(int streamID, int pause)
 	}
 	streamData = p_Stream;
 	do {
-		if ((streamData->m_streamId != 0) && ((streamID == -1) || (streamID == streamData->m_streamId))) {
+		if ((streamData->m_streamId != 0) &&
+		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
 			voiceData = streamData->m_voiceData;
 			if (pause == REDSOUND_PAUSE_ON) {
 				if (voiceData->m_axVoice != 0) {

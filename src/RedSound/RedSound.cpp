@@ -366,7 +366,7 @@ int CRedSound::ReportStandby(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void (*callback)(void*), void* userData)
+int CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, RedDmaCallback callback, void* userData)
 {
 	return RedDmaEntry(type, src, dst, length, flags, callback, userData);
 }

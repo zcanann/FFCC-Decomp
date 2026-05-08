@@ -136,7 +136,7 @@ struct RedDmaRequest {
     int m_mainMemory;
     int m_aramMemory;
     int m_size;
-    void (*m_callback)(void*);
+    RedDmaCallback m_callback;
     void* m_callbackData;
 };
 
@@ -1484,7 +1484,7 @@ static void _DmaCallback(unsigned long)
  * JP Address: TODO
  * JP Size: TODO
  */
-int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int sizeBytes, void (*callback)(void*),
+int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int sizeBytes, RedDmaCallback callback,
                 void* callbackData)
 {
     unsigned int interrupt;

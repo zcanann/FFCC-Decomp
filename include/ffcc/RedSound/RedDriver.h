@@ -1,6 +1,11 @@
 #ifndef _FFCC_REDSOUND_REDDRIVER_H
 #define _FFCC_REDSOUND_REDDRIVER_H
 
+#ifndef FFCC_REDSOUND_DMA_CALLBACK_TYPEDEF
+#define FFCC_REDSOUND_DMA_CALLBACK_TYPEDEF
+typedef void (*RedDmaCallback)(void* callbackData);
+#endif
+
 enum RedDmaEntryFlag {
 	REDSOUND_DMA_FLAG_MAIN_QUEUE = 1,
 	REDSOUND_DMA_FLAG_CHUNKED_TRANSFER = 0x8000,
@@ -13,7 +18,7 @@ unsigned int DeltaTimeSumup(unsigned char** buffer);
 unsigned int GetMyEntryID();
 void RedSleep(int microseconds);
 int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int size,
-                void (*callback)(void* callbackData), void* callbackData);
+                RedDmaCallback callback, void* callbackData);
 int RedDmaSearchID(int id);
 
 class CRedDriver

@@ -1,6 +1,11 @@
 #ifndef _FFCC_REDSOUND_REDSOUND_H
 #define _FFCC_REDSOUND_REDSOUND_H
 
+#ifndef FFCC_REDSOUND_DMA_CALLBACK_TYPEDEF
+#define FFCC_REDSOUND_DMA_CALLBACK_TYPEDEF
+typedef void (*RedDmaCallback)(void* callbackData);
+#endif
+
 class CRedSound
 {
 public:
@@ -17,7 +22,7 @@ public:
 	int ReportStandby(int entryId);
 
 	int DMAEntry(int flags, int direction, int mainMemory, int aramMemory, int size,
-	             void (*callback)(void* callbackData), void* callbackData);
+	             RedDmaCallback callback, void* callbackData);
 	int DMACheck(int id);
 
 	void SetSoundMode(int soundMode);

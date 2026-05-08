@@ -263,6 +263,11 @@ enum RedControlTickWord {
     REDSOUND_CONTROL_TICK_PER_MEASURE = 2,
 };
 
+enum RedMusicSkipTiming {
+    REDSOUND_MUSIC_SKIP_RETRY_SLEEP_US = 10000,
+    REDSOUND_MUSIC_SKIP_LOOP_SLEEP_US = 1000,
+};
+
 enum RedExecuteAdsrStateIndex {
     REDSOUND_ADSR_STATE_STAGE = 0,
     REDSOUND_ADSR_STATE_STEP_FRAMES = 1,
@@ -2513,7 +2518,7 @@ static int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* key
             if ((control->m_activeTrackCount != 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END) == 0)) {
                 m_MusicSkipLine--;
                 frames = tick[REDSOUND_CONTROL_TICK_PER_MEASURE];
-                RedSleep(1000);
+                RedSleep(REDSOUND_MUSIC_SKIP_LOOP_SLEEP_US);
             }
         }
 
@@ -2629,7 +2634,7 @@ void MusicSkipFunction()
     do {
         p_SkipKeyOn = (RedKeyOnDATA*)RedNew(sizeof(RedKeyOnDATA));
         if (p_SkipKeyOn == 0) {
-            RedSleep(10000);
+            RedSleep(REDSOUND_MUSIC_SKIP_RETRY_SLEEP_US);
         }
     } while (p_SkipKeyOn == 0);
 

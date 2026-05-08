@@ -59,6 +59,12 @@ struct RedStreamStereoFrame {
 	unsigned int m_right[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];
 };
 
+enum RedStreamFrameLayoutSize {
+	REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET = sizeof(unsigned int) * REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT,
+	REDSOUND_STREAM_LOOP_START_SAMPLE = 2,
+	REDSOUND_STREAM_ADSR_RELEASE_TIME = 10,
+};
+
 static RedStreamDATA* _SearchEmptyStreamData();
 static void _StreamStop(RedStreamDATA*);
 static int _ArrangeStreamDataNoLoop(RedStreamDATA*, int, int);
@@ -378,7 +384,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			if (streamData->m_header.m_loopStart < 0) {
 				sampleOffset += REDSOUND_STREAM_PAGE_SIZE;
 			} else {
-				sampleOffset += 8;
+				sampleOffset += REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET;
 			}
 			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_data.pred_scale = (short)((s8*)streamHeader)[sampleOffset];
 			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_data.yn1 =
@@ -436,10 +442,10 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			voice->m_adsrLevel[REDSOUND_VOICE_ADSR_RELEASE] = REDSOUND_VOLUME_MAX;
 			voice->m_adsrTime[REDSOUND_VOICE_ADSR_ATTACK] = voice->m_adsrTime[REDSOUND_VOICE_ADSR_DECAY] =
 			    voice->m_adsrTime[REDSOUND_VOICE_ADSR_SUSTAIN] = 0;
-			voice->m_adsrTime[REDSOUND_VOICE_ADSR_RELEASE] = 10;
+			voice->m_adsrTime[REDSOUND_VOICE_ADSR_RELEASE] = REDSOUND_STREAM_ADSR_RELEASE_TIME;
 			streamData->m_trackData[channel].m_sampleStart = 0;
 			streamData->m_trackData[channel].m_loopEnd = REDSOUND_STREAM_INITIAL_LOOP_END;
-			streamData->m_trackData[channel].m_loopStart = 2;
+			streamData->m_trackData[channel].m_loopStart = REDSOUND_STREAM_LOOP_START_SAMPLE;
 			channel += 1;
 		} while (channel < streamData->m_header.m_channelCount);
 

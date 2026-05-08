@@ -56,9 +56,9 @@ enum RedStreamFrameLayoutSize {
 };
 
 static RedStreamDATA* _SearchEmptyStreamData();
-static void _StreamStop(RedStreamDATA*);
-static int _ArrangeStreamDataNoLoop(RedStreamDATA*, int, int);
-static int _ArrangeStreamDataLoop(RedStreamDATA*, int, int);
+static void _StreamStop(RedStreamDATA* streamData);
+static int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int byteCount);
+static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount);
 
 /*
  * --INFO--

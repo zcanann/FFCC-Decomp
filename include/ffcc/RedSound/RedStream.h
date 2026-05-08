@@ -99,10 +99,10 @@ enum RedStreamDataLayoutSize {
     REDSOUND_STREAM_DATA_SIZE = 0x130,
 };
 
-void StreamStop(int);
-int StreamPlay(int, void*, int, int, int);
-void SetStreamVolume(int, int, int);
-void StreamPause(int, int);
+void StreamStop(int streamId);
+int StreamPlay(int streamId, void* streamHeader, int fileSize, int pan, int volume);
+void SetStreamVolume(int streamId, int volume, int frameCount);
+void StreamPause(int streamId, int pause);
 void StreamControl();
 
 #endif // _FFCC_REDSOUND_REDSTREAM_H

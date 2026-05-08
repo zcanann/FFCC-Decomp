@@ -36,8 +36,8 @@ public:
 	void MusicVolume(int musicId, int volume, int frameCount);
 	void SetMusicPhraseStop(int enable);
 
-	void SetSeBlockData(int bank, void* data);
-	void SetSeSepData(void* data);
+	void SetSeBlockData(int bank, void* blockData);
+	void SetSeSepData(void* seSepData);
 	void ClearSeSepData(int sepId);
 	void ClearSeSepDataMG(int bank, int sep, int group, int kind);
 	int ReentrySeSepData(int sepId);
@@ -63,7 +63,7 @@ public:
 	void StreamVolume(int streamId, int volume, int frameCount);
 	void StreamPause(int streamId, int pause);
 
-	unsigned int SetWaveData(int waveID, void* data, int size);
+	unsigned int SetWaveData(int waveID, void* waveData, int waveSize);
 	void ClearWaveData(int waveNo);
 	void ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo3);
 	void ClearWaveBank(int bank);

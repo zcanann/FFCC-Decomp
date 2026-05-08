@@ -53,10 +53,11 @@ RedReverbModeData t_ReverbModeData[] = {
     {REDSOUND_REVERB_KIND_HI, {0x28, 0x9C4, 0x32, 0x50, 0x64, 0x0}},
 };
 
-static void _EraseAttribute(int, int);
-static int _EraseTime(int);
-static int _SePlayStart(RedSeINFO*, int, int, int, int);
-static RedTrackDATA* _MusicPlayStart(RedMusicHEAD*, RedWaveHeadWD*, int, int, int);
+static void _EraseAttribute(int eraseTrack, int attrMask);
+static int _EraseTime(int eraseTrack);
+static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume);
+static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume,
+                                     int mode);
 
 /*
  * --INFO--

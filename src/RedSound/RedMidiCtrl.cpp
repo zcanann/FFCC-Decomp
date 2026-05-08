@@ -73,16 +73,16 @@ static int m_SignDataTable[] = {
     3216, 2814, 2412, 2010, 1608, 1206, 804, 402,
 };
 
-static int SineSwing(int);
-static int TriangleSwing(int);
-static int SawSwing(int);
-static int DutySwing(int);
-static int RandomSwing(int);
-static int SineSwingR(int);
-static int TriangleSwingR(int);
-static int DutySwingR(int);
-static int SawSwingR(int);
-static int RandomSwingR(int);
+static int SineSwing(int phase);
+static int TriangleSwing(int phase);
+static int SawSwing(int phase);
+static int DutySwing(int phase);
+static int RandomSwing(int phase);
+static int SineSwingR(int phase);
+static int TriangleSwingR(int phase);
+static int DutySwingR(int phase);
+static int SawSwingR(int phase);
+static int RandomSwingR(int phase);
 
 RedSwingFunc SwingEntryFunction[] = {
     SineSwing, TriangleSwing, SawSwing, DutySwing,
@@ -230,7 +230,7 @@ static void __MidiCtrl_FineTuneAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
 static void __MidiCtrl_FineTuneRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
 static void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
 static void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
-static void _PitchBendCompute(RedTrackDATA*, int);
+static void _PitchBendCompute(RedTrackDATA* track, int pitchBend);
 static void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
 static void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
 static void __MidiCtrl_ReverbOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);

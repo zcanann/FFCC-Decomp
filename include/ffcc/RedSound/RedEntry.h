@@ -77,6 +77,15 @@ struct RedMusicHEAD
 	int m_reserved1C;
 };
 
+struct RedMusicTrackBlock
+{
+	unsigned char m_sizeLo;
+	unsigned char m_sizeHi0;
+	unsigned char m_sizeHi1;
+	unsigned char m_sizeHi2;
+	unsigned char m_data[1];
+};
+
 enum RedMusicHeaderFlag {
 	REDSOUND_MUSIC_HEADER_SIZE = sizeof(RedMusicHEAD),
 	REDSOUND_MUSIC_HEADER_VOLUME_SCALE_MASK = 0x7F,

@@ -771,19 +771,19 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_count = 0;
 	music->m_waveNo = musicHead->m_waveNo;
 
-	unsigned char* current = (unsigned char*)musicHead + REDSOUND_MUSIC_HEADER_SIZE;
+	RedMusicTrackBlock* current = (RedMusicTrackBlock*)((unsigned char*)musicHead + REDSOUND_MUSIC_HEADER_SIZE);
 	RedTrackDATA* track = music->m_tracks;
 	int count = musicHead->m_trackCount;
 	char trackNo = 0;
 	while (count != 0) {
-		unsigned int blockSize = ((unsigned int)current[REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE3] << 24) |
-		                         ((unsigned int)current[REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE2] << 16) |
-		                         ((unsigned int)current[REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE1] << 8) |
-		                         (unsigned int)current[REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE0];
+		unsigned int blockSize = ((unsigned int)current->m_sizeHi2 << 24) |
+		                         ((unsigned int)current->m_sizeHi1 << 16) |
+		                         ((unsigned int)current->m_sizeHi0 << 8) |
+		                         (unsigned int)current->m_sizeLo;
 		track->m_trackNo = trackNo - 1;
 		track->m_waveBankData = waveHead;
-		track->m_command = current + REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE;
-		current = current + REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE + blockSize;
+		track->m_command = current->m_data;
+		current = (RedMusicTrackBlock*)(current->m_data + blockSize);
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
 		track->m_seSepId = 0;
 		track->m_keySignatureData =

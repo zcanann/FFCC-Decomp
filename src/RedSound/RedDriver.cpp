@@ -2312,7 +2312,7 @@ int CRedDriver::SePlayState(int seID)
     seInfoBase = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     seInfo = *seInfoBase;
     do {
-        if (((u32)seInfo->m_command != 0) && ((seID == -1 || (seInfo->m_seId == seID)))) {
+        if (((u32)seInfo->m_command != 0) && ((seID == REDSOUND_SE_ID_ALL || (seInfo->m_seId == seID)))) {
             result = (int)seInfo;
             break;
         }
@@ -2326,7 +2326,7 @@ int CRedDriver::SePlayState(int seID)
                 (((command->m_func == _SeBlockPlay) ||
                   (command->m_func == _SeSepPlay)) ||
                  (command->m_func == _SeSepPlaySequence))) &&
-                ((seID == -1 || (seID == command->m_args[REDSOUND_EXEC_COMMAND_ARG0])))) {
+                ((seID == REDSOUND_SE_ID_ALL || (seID == command->m_args[REDSOUND_EXEC_COMMAND_ARG0])))) {
                 result = 1;
                 break;
             }
@@ -2489,7 +2489,7 @@ int CRedDriver::GetSeVolume(int seID, int mode)
 
     track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     while (1) {
-        if (((u32)track->m_command != 0) && ((seID == -1) || (seID == track->m_seId))) {
+        if (((u32)track->m_command != 0) && ((seID == REDSOUND_SE_ID_ALL) || (seID == track->m_seId))) {
             if ((u32)track->m_command != 0) {
                 if (mode == 1) {
                     return track->m_mixVolumeDelta;
@@ -2521,7 +2521,7 @@ int CRedDriver::ReportSeLoop(int seID)
     track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     while (1) {
         if ((track->m_command != 0) &&
-            (((seID == -1) || (seID == track->m_seId)) &&
+            (((seID == REDSOUND_SE_ID_ALL) || (seID == track->m_seId)) &&
              ((track->m_loopReport & REDSOUND_TRACK_LOOP_REPORT_ACTIVE) != 0))) {
             return 1;
         }

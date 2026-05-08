@@ -296,7 +296,7 @@ int SeStopID(int seId)
 	soundControl->m_updateFlags = 0;
 	track = soundControl->m_tracks;
 	do {
-		if ((track->m_command != 0) && ((seId == -1) || (track->m_seId == seId))) {
+		if ((track->m_command != 0) && ((seId == REDSOUND_SE_ID_ALL) || (track->m_seId == seId))) {
 			int trackNo;
 
 			KeyOnReserveClear(p_KeyOnData, track);
@@ -740,7 +740,7 @@ void SePause(int seId, int pause)
 	track = *trackBasePtr;
 	voice = p_VoiceData + REDSOUND_SE_VOICE_BASE_INDEX;
 	do {
-		if ((track->m_seId != 0) && ((seId == -1) || (seId == track->m_seId))) {
+		if ((track->m_seId != 0) && ((seId == REDSOUND_SE_ID_ALL) || (seId == track->m_seId))) {
 			if (pause == REDSOUND_PAUSE_ON) {
 				if (voice->m_axVoice != 0) {
 					voice->m_targetPitch = 0;

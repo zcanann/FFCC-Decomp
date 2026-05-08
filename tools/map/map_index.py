@@ -9,7 +9,10 @@ from typing import DefaultDict, Optional
 
 SECTION_HEADER_RE = re.compile(r"^\s*(\.\w+|extab|extabindex)\s+section layout\s*$")
 FOUND_IN_RE = re.compile(r"^\s*\d+\]\s*(.+?)\s*\(([^)]+)\)\s+found in\s+(.+?)\s*$")
-OBJECT_LINE_RE = re.compile(r"\s+([^\s]+\.o)\s*$", re.IGNORECASE)
+OBJECT_LINE_RE = re.compile(
+    r"\s+([^\s]+\.(?:o|c|cc|cpp|cxx|cp|c\+\+|s|asm))\s*$",
+    re.IGNORECASE,
+)
 SOURCE_EXTENSIONS = (
     ".c",
     ".cc",
@@ -34,7 +37,10 @@ def _basename(path_str: str) -> str:
 
 
 def normalize_object_file(path_str: str) -> str:
-    return _basename(path_str)
+    name = _basename(path_str)
+    if _looks_like_source_file(name):
+        return f"{PurePosixPath(name).stem}.o"
+    return name
 
 
 def normalize_source_file(path_str: str) -> str:
@@ -161,6 +167,9 @@ def _parse_layout_line(line: str, current_section: str) -> Optional[LayoutRecord
     if len(kind_split) == 2 and re.fullmatch(r"[0-9A-Fa-f]+", kind_split[0]):
         kind = kind_split[0]
         symbol_name = kind_split[1].strip()
+    archive_split = symbol_name.rsplit(maxsplit=1)
+    if len(archive_split) == 2 and archive_split[1].lower().endswith(".a"):
+        symbol_name = archive_split[0].strip()
 
     size = _parse_hex(size_text)
     if size is None:

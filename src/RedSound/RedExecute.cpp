@@ -2595,8 +2595,8 @@ static void _SkipMusicEntry()
         }
 
         soundControl = p_SoundControlBuffer;
-        if (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId != -1) {
-            if (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId != -1) {
+        if (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
+            if (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
                 MusicStop(soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId);
             }
             memcpy(&soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY], soundControl, sizeof(RedSoundCONTROL));
@@ -2606,7 +2606,7 @@ static void _SkipMusicEntry()
         memcpy(&volume, &soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_volume, sizeof(volume));
         memset(&soundControl[REDSOUND_CONTROL_MUSIC_SKIP], 0, sizeof(RedSoundCONTROL));
         memcpy(&soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_volume, &volume, sizeof(volume));
-        soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId = -1;
+        soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId = REDSOUND_MUSIC_ID_NONE;
     }
 
     RedDelete(p_SkipKeyOn);
@@ -2987,7 +2987,7 @@ void MainControl(int frames)
             memcpy(p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY, sizeof(RedSoundCONTROL));
             p_SoundControl->m_activeTrackCount = 0;
             p_SoundControl->m_trackCount = 0;
-            p_SoundControl->m_musicId = -1;
+            p_SoundControl->m_musicId = REDSOUND_MUSIC_ID_NONE;
         }
         p_SoundControl = p_SoundControlBuffer;
     }

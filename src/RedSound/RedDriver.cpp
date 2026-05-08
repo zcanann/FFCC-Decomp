@@ -205,26 +205,6 @@ enum RedDriverThreadConfig {
     REDSOUND_THREAD_DETACHED = 1,
 };
 
-enum RedDriverHeaderSignature {
-    REDSOUND_MUSIC_SIGNATURE_0 = 'B',
-    REDSOUND_MUSIC_SIGNATURE_1 = 'G',
-    REDSOUND_MUSIC_SIGNATURE_2 = 'M',
-    REDSOUND_SE_BLOCK_SIGNATURE_0 = 'S',
-    REDSOUND_SE_BLOCK_SIGNATURE_1 = 'e',
-    REDSOUND_SE_BLOCK_SIGNATURE_2 = 'B',
-    REDSOUND_SE_BLOCK_SIGNATURE_3 = 'l',
-    REDSOUND_SE_BLOCK_SIGNATURE_4 = 'o',
-    REDSOUND_SE_BLOCK_SIGNATURE_5 = 'c',
-    REDSOUND_SE_BLOCK_SIGNATURE_6 = 'k',
-    REDSOUND_SESEP_SIGNATURE_0 = 'S',
-    REDSOUND_SESEP_SIGNATURE_1 = 'e',
-    REDSOUND_SESEP_SIGNATURE_2 = 'S',
-    REDSOUND_SESEP_SIGNATURE_3 = 'e',
-    REDSOUND_SESEP_SIGNATURE_4 = 'p',
-    REDSOUND_WAVE_SIGNATURE_0 = 'W',
-    REDSOUND_WAVE_SIGNATURE_1 = 'D',
-};
-
 enum RedDriverCommandParse {
     REDSOUND_DELTA_TIME_VALUE_MASK = 0x7F,
     REDSOUND_DELTA_TIME_CONTINUE_FLAG = 0x80,
@@ -2481,8 +2461,8 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
     if (waveSize == -1) {
         RedWaveHeadWD* const waveHeader = (RedWaveHeadWD*)waveData;
 
-        if ((waveHeader->m_signature[0] == REDSOUND_WAVE_SIGNATURE_0) &&
-            (waveHeader->m_signature[1] == REDSOUND_WAVE_SIGNATURE_1)) {
+        if ((waveHeader->m_signature[0] == REDSOUND_WAVE_SIGNATURE_MAGIC0) &&
+            (waveHeader->m_signature[1] == REDSOUND_WAVE_SIGNATURE_MAGIC1)) {
             int dataSize = waveHeader->m_tableCount * REDSOUND_WAVE_TABLE_ENTRY_SIZE;
             dataSize = (dataSize += REDSOUND_WAVE_SETTING_TABLE_ALIGN - 1) & REDSOUND_WAVE_SETTING_TABLE_ALIGN_MASK;
             dataSize += waveHeader->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE;

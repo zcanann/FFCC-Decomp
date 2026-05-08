@@ -61,17 +61,6 @@ static const char sRedEntryInfoColor[] = "\x1B[4;34m";
 static const char sRedEntryNewline[] = "\n";
 static const char sRedEntryPrefixedNewlineFmt[] = "%s\n";
 
-enum RedEntryHeaderSignature {
-	REDSOUND_ENTRY_MUSIC_SIGNATURE_0 = 'B',
-	REDSOUND_ENTRY_MUSIC_SIGNATURE_1 = 'G',
-	REDSOUND_ENTRY_MUSIC_SIGNATURE_2 = 'M',
-	REDSOUND_ENTRY_SESEP_SIGNATURE_0 = 'S',
-	REDSOUND_ENTRY_SESEP_SIGNATURE_1 = 'e',
-	REDSOUND_ENTRY_SESEP_SIGNATURE_2 = 'S',
-	REDSOUND_ENTRY_SESEP_SIGNATURE_3 = 'e',
-	REDSOUND_ENTRY_SESEP_SIGNATURE_4 = 'p',
-};
-
 /*
  * --INFO--
  * PAL Address: 0x801c05f8
@@ -1087,11 +1076,11 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 {
 	int result;
 
-	if ((seSepHead->m_signature[0] != REDSOUND_ENTRY_SESEP_SIGNATURE_0) ||
-	    (seSepHead->m_signature[1] != REDSOUND_ENTRY_SESEP_SIGNATURE_1) ||
-	    (seSepHead->m_signature[2] != REDSOUND_ENTRY_SESEP_SIGNATURE_2) ||
-	    (seSepHead->m_signature[3] != REDSOUND_ENTRY_SESEP_SIGNATURE_3) ||
-	    (seSepHead->m_signature[4] != REDSOUND_ENTRY_SESEP_SIGNATURE_4)) {
+	if ((seSepHead->m_signature[0] != REDSOUND_SESEP_SIGNATURE_0) ||
+	    (seSepHead->m_signature[1] != REDSOUND_SESEP_SIGNATURE_1) ||
+	    (seSepHead->m_signature[2] != REDSOUND_SESEP_SIGNATURE_2) ||
+	    (seSepHead->m_signature[3] != REDSOUND_SESEP_SIGNATURE_3) ||
+	    (seSepHead->m_signature[4] != REDSOUND_SESEP_SIGNATURE_4)) {
 		RedDelete(seSepHead);
 		if (m_ReportPrint != 0) {
 			OSReport(sRedEntrySeSepHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
@@ -1615,9 +1604,9 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 {
 	int result;
 
-	if ((musicHead->m_signature[0] != REDSOUND_ENTRY_MUSIC_SIGNATURE_0) ||
-	    (musicHead->m_signature[1] != REDSOUND_ENTRY_MUSIC_SIGNATURE_1) ||
-	    (musicHead->m_signature[2] != REDSOUND_ENTRY_MUSIC_SIGNATURE_2)) {
+	if ((musicHead->m_signature[0] != REDSOUND_MUSIC_SIGNATURE_0) ||
+	    (musicHead->m_signature[1] != REDSOUND_MUSIC_SIGNATURE_1) ||
+	    (musicHead->m_signature[2] != REDSOUND_MUSIC_SIGNATURE_2)) {
 		RedDelete(musicHead);
 		if (m_ReportPrint != 0) {
 			OSReport(sRedEntryMusicHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);

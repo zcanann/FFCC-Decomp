@@ -169,6 +169,12 @@ enum RedExecuteLayoutSize {
     REDSOUND_REVERB_ALLOC_ALIGN_MASK = REDSOUND_REVERB_ALLOC_ALIGN - 1,
 };
 
+enum RedExecuteSmallDataLayout {
+    REDSOUND_EXECUTE_SDATA_SIZE = 0x04,
+    REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE = 3,
+    REDSOUND_EXECUTE_SBSS_SIZE = 0x14,
+};
+
 enum RedReverbDelayChannelIndex {
     REDSOUND_REVERB_DELAY_LEFT = 0,
     REDSOUND_REVERB_DELAY_RIGHT = 1,
@@ -225,6 +231,10 @@ STATIC_ASSERT(sizeof(t_TonePitch) + sizeof(t_FinePitch) + sizeof(t_KeySignatureI
                   sizeof(t_KeySignatureData) + sizeof(t_RandomData) + sizeof(t_PanningData) +
                   sizeof(t_PanningDataR) ==
               REDSOUND_EXECUTE_DATA_TABLE_SIZE);
+STATIC_ASSERT(sizeof(m_TerminateNote) == REDSOUND_EXECUTE_SDATA_SIZE);
+STATIC_ASSERT(sizeof(m_RandomIndex) + REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE + sizeof(p_ReverbData) +
+                  sizeof(p_ReverbSize) + sizeof(m_ChangeStatus) + sizeof(p_SkipKeyOn) ==
+              REDSOUND_EXECUTE_SBSS_SIZE);
 STATIC_ASSERT(offsetof(RedReverbDATA, m_callback) == REDSOUND_REVERB_CALLBACK_OFFSET);
 STATIC_ASSERT(offsetof(RedReverbDATA, m_context) == REDSOUND_REVERB_CONTEXT_OFFSET);
 STATIC_ASSERT(offsetof(RedReverbDATA, m_kind) == REDSOUND_REVERB_KIND_OFFSET);

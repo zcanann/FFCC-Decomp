@@ -1376,35 +1376,35 @@ skipModSetup:
         memcpy(&voice->m_adsr,
                voice->m_waveData->m_adsr,
                sizeof(RedAdsrDATA));
-        if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] != -1) {
+        if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] != (s8)REDSOUND_TRACK_ADSR_DEFAULT_BYTE) {
             voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] =
                 track->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK];
         }
-        if ((s16)track->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] != -1) {
+        if ((s16)track->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] != REDSOUND_TRACK_ADSR_DEFAULT_WORD) {
             voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] =
                 track->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK];
         }
-        if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] != -1) {
+        if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] != (s8)REDSOUND_TRACK_ADSR_DEFAULT_BYTE) {
             voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] =
                 track->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY];
         }
-        if ((s16)track->m_adsr.m_time[REDSOUND_VOICE_ADSR_DECAY] != -1) {
+        if ((s16)track->m_adsr.m_time[REDSOUND_VOICE_ADSR_DECAY] != REDSOUND_TRACK_ADSR_DEFAULT_WORD) {
             voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_DECAY] =
                 track->m_adsr.m_time[REDSOUND_VOICE_ADSR_DECAY];
         }
-        if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] != -1) {
+        if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] != (s8)REDSOUND_TRACK_ADSR_DEFAULT_BYTE) {
             voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] =
                 track->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN];
         }
-        if ((s16)track->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN] != -1) {
+        if ((s16)track->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN] != REDSOUND_TRACK_ADSR_DEFAULT_WORD) {
             voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN] =
                 track->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN];
         }
-        if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] != -1) {
+        if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] != (s8)REDSOUND_TRACK_ADSR_DEFAULT_BYTE) {
             voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] =
                 track->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE];
         }
-        if ((s16)track->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE] != -1) {
+        if ((s16)track->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE] != REDSOUND_TRACK_ADSR_DEFAULT_WORD) {
             voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE] =
                 track->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE];
         }

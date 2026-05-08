@@ -81,6 +81,7 @@ public:
 	int GetSeVolume(int seId, int mode);
 	int ReportSeLoop(int seId);
 	void DisplaySePlayInfo();
+	void ClearSePlayLine();
 	RedTrackDATA* GetSePlayTrack();
 
 

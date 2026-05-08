@@ -1081,6 +1081,23 @@ static void _SeStopG(int* command)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: UNUSED
+ * EN Size: 76b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _ClearSePlayLine(int*)
+{
+    unsigned int interruptLevel = OSDisableInterrupts();
+    memset(p_ExecCommand, 0, sizeof(RedExecCommand) * REDSOUND_EXEC_COMMAND_COUNT);
+    p_ExecCommandNow = p_ExecCommand;
+    OSRestoreInterrupts(interruptLevel);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bd7d0
  * PAL Size: 72b
  * EN Address: TODO
@@ -2825,6 +2842,20 @@ int CRedDriver::ReportSeLoop(int seID)
 void CRedDriver::DisplaySePlayInfo()
 {
 	c_RedEntry.DisplaySePlayInfo();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 68b
+ * EN Address: UNUSED
+ * EN Size: 68b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::ClearSePlayLine()
+{
+    _EntryExecCommand(_ClearSePlayLine, 0, 0, 0, 0, 0, 0, 0);
 }
 
 /*

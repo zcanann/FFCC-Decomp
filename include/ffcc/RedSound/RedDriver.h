@@ -91,6 +91,7 @@ public:
 	RedWaveHeadWD* GetWaveInfo(int waveNo);
 	int CheckWaveEntry(int waveNo);
 	void DisplayWaveInfo();
+	void DisplayMMemoryInfo();
 
 	void SetReverb(int kind, int mode);
 	RedReverbSize* GetReverbInfo();

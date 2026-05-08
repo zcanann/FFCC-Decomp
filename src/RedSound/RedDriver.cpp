@@ -2950,6 +2950,20 @@ void CRedDriver::DisplayWaveInfo()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: UNUSED
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::DisplayMMemoryInfo()
+{
+    c_RedEntry.DisplayMMemoryInfo();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801BFDF8
  * PAL Size: 92b
  * EN Address: TODO

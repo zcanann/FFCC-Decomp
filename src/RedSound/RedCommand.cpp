@@ -784,7 +784,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		                         (unsigned int)current->m_sizeLo;
 		track->m_trackNo = trackNo - 1;
 		track->m_waveBankData = waveHead;
-		current = (RedMusicTrackBlock*)current->m_data;
+		current = (RedMusicTrackBlock*)current->m_command;
 		track->m_command = (unsigned char*)current;
 		current = (RedMusicTrackBlock*)((unsigned char*)current + blockSize);
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command) + 1;

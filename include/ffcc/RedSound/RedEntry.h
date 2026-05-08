@@ -117,7 +117,7 @@ struct RedMusicTrackBlock
 	unsigned char m_sizeHi0;
 	unsigned char m_sizeHi1;
 	unsigned char m_sizeHi2;
-	unsigned char m_data[1];
+	unsigned char m_command[1];
 };
 
 enum RedMusicHeaderFlag {

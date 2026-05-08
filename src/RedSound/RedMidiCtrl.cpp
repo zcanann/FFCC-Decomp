@@ -167,7 +167,12 @@ STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedCommand) == REDSOUND_CONTROL_SAVE
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedDelta) == REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedFlags) == REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedNote) == REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET * sizeof(int));
-STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTempo) == REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTempo) ==
+              REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTempo.m_tempoAdd) ==
+              (REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET + 1) * sizeof(int));
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTempo.m_tempoDelta) ==
+              (REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET + 2) * sizeof(int));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedActiveTrackCount) ==
               REDSOUND_CONTROL_SAVED_ACTIVE_TRACK_COUNT_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedPosition) ==

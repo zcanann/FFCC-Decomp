@@ -489,8 +489,8 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 				    m_waveBankBase[historyNo].m_id;
 				m_waveBankBase[waveBankNo].m_historyNo =
 				    m_waveBankBase[historyNo].m_historyNo;
-				m_waveBankBase[waveBankNo].m_data =
-				    m_waveBankBase[historyNo].m_data;
+				m_waveBankBase[waveBankNo].m_address =
+				    m_waveBankBase[historyNo].m_address;
 				m_waveBankBase[waveBankNo].m_size =
 				    m_waveBankBase[historyNo].m_size;
 				historyNo = waveBankNo;
@@ -1093,7 +1093,7 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 	if (result >= 0) {
 		RedDelete(seSepHead);
 		SeSepHistoryChoice(&m_seSepBankBase[result]);
-		result = m_seSepBankBase[result].m_data;
+		result = m_seSepBankBase[result].m_address;
 	} else {
 		result = reinterpret_cast<int>(SeSepHeadAdd(seSepHead));
 		if (result == 0) {
@@ -1619,7 +1619,7 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 	if (result >= 0) {
 		RedDelete(musicHead);
 		MusicHistoryChoice(&m_musicBankBase[result]);
-		result = m_musicBankBase[result].m_data;
+		result = m_musicBankBase[result].m_address;
 	} else {
 		result = reinterpret_cast<int>(MusicHeadAdd(musicHead));
 		if (result == 0) {

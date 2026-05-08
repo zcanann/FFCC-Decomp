@@ -25,6 +25,33 @@ const char s_redMemoryAuxBankFullFmt[] = "%s%sA-Memory Bank Full !!%s\n";
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
 const char sRedMemoryLogSuffixB[] = "\x1b[0m";
 
+enum RedMemoryStringLayout {
+	REDSOUND_MEMORY_MAIN_BANK_FULL_FMT_SIZE = 0x1b,
+	REDSOUND_MEMORY_LOG_PREFIX_SIZE = 0x12,
+	REDSOUND_MEMORY_AUX_BANK_FULL_FMT_SIZE = 0x1d,
+	REDSOUND_MEMORY_LOG_SUFFIX_A_SIZE = 0x08,
+	REDSOUND_MEMORY_LOG_SUFFIX_B_SIZE = 0x05,
+	REDSOUND_MEMORY_RODATA_STRING_SIZE = 0x4a,
+	REDSOUND_MEMORY_SDATA2_STRING_SIZE = 0x0d,
+};
+
+enum RedMemorySmallDataLayout {
+	REDSOUND_MEMORY_SBSS_SIZE = 0x18,
+};
+
+STATIC_ASSERT(sizeof(s_redMemoryMainBankFullFmt) == REDSOUND_MEMORY_MAIN_BANK_FULL_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedMemoryLogPrefix) == REDSOUND_MEMORY_LOG_PREFIX_SIZE);
+STATIC_ASSERT(sizeof(s_redMemoryAuxBankFullFmt) == REDSOUND_MEMORY_AUX_BANK_FULL_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedMemoryLogSuffixA) == REDSOUND_MEMORY_LOG_SUFFIX_A_SIZE);
+STATIC_ASSERT(sizeof(sRedMemoryLogSuffixB) == REDSOUND_MEMORY_LOG_SUFFIX_B_SIZE);
+STATIC_ASSERT(sizeof(s_redMemoryMainBankFullFmt) + sizeof(sRedMemoryLogPrefix) +
+                  sizeof(s_redMemoryAuxBankFullFmt) ==
+              REDSOUND_MEMORY_RODATA_STRING_SIZE);
+STATIC_ASSERT(sizeof(sRedMemoryLogSuffixA) + sizeof(sRedMemoryLogSuffixB) == REDSOUND_MEMORY_SDATA2_STRING_SIZE);
+STATIC_ASSERT(sizeof(m_DataBuffer) + sizeof(m_ADataBuffer) + sizeof(m_DataBufferSize) + sizeof(m_ADataBufferSize) +
+                  sizeof(m_MemoryBank) + sizeof(m_AMemoryBank) ==
+              REDSOUND_MEMORY_SBSS_SIZE);
+
 /*
  * --INFO--
  * PAL Address: 0x801bff34

@@ -2955,7 +2955,7 @@ void MainControl(int frames)
             if (mul != 0) {
                 if (p_MusicTempoControl->m_value < 0) {
                     step *= (int)mul;
-                    step >>= 0x10;
+                    step >>= REDSOUND_TEMPO_SCALE_SHIFT;
                 } else {
                     step *= (int)mul + 1;
                     step >>= 0xF;

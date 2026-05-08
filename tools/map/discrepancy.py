@@ -118,6 +118,9 @@ def _entries(index: Optional[MapIndex], object_file: str) -> dict[str, list[Sect
         # Skip section-level records (e.g. the row whose symbol equals the section name).
         if rec.symbol_name == rec.section:
             continue
+        # Skip linker/bookkeeping rows that do not correspond to source symbols.
+        if "(entry of " in rec.symbol_name or rec.symbol_name.startswith("gap_"):
+            continue
         # Skip kind-only marker rows that re-state the section size.
         by_section.setdefault(rec.section, []).append(
             SectionEntry(

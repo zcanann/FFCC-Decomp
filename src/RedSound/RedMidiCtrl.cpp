@@ -84,7 +84,12 @@ static int DutySwingR(int phase);
 static int SawSwingR(int phase);
 static int RandomSwingR(int phase);
 
-RedSwingFunc SwingEntryFunction[] = {
+enum RedMidiTableSize {
+	REDSOUND_SWING_FUNCTION_COUNT = 0x10,
+	REDSOUND_MIDI_CONTROL_FUNCTION_COUNT = 0x80,
+};
+
+RedSwingFunc SwingEntryFunction[REDSOUND_SWING_FUNCTION_COUNT] = {
     SineSwing, TriangleSwing, SawSwing, DutySwing,
     RandomSwing, DutySwing,   DutySwing, DutySwing,
     SineSwingR, TriangleSwingR, SawSwingR, DutySwingR,
@@ -241,7 +246,7 @@ static void __MidiCtrl_StepRelative2(RedSoundCONTROL* control, RedKeyOnDATA* key
 static void __MidiCtrl_FuzzyOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 static void __MidiCtrl_FuzzyOff(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 
-RedMidiControlFunc p_MidiControl_Function[] = {
+RedMidiControlFunc p_MidiControl_Function[REDSOUND_MIDI_CONTROL_FUNCTION_COUNT] = {
     __MidiCtrl_Stop,             __MidiCtrl_Sleep,           __MidiCtrl_WholeLoopStart,
     __MidiCtrl_WholeLoopEnd,     __MidiCtrl_LoopStart,       __MidiCtrl_LoopEnd,
     __MidiCtrl_LoopRepeat,       __MidiCtrl_NoSupport,       __MidiCtrl_TempoDirect,

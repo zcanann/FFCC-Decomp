@@ -1,6 +1,8 @@
 #ifndef _FFCC_REDSOUND_REDCOMMAND_H
 #define _FFCC_REDSOUND_REDCOMMAND_H
 
+#include "ffcc/RedSound/RedExecute.h"
+
 struct RedMusicHEAD;
 struct RedSeINFO;
 struct RedTrackDATA;
@@ -34,7 +36,7 @@ enum RedReverbParamIndex {
 };
 
 struct RedReverbModeData {
-	int m_kind;
+	RedReverbKind m_kind;
 	int m_params[REDSOUND_REVERB_MODE_PARAM_COUNT];
 };
 

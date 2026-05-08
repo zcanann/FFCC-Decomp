@@ -2354,7 +2354,7 @@ static void _MusicNoteExecute()
             track->m_command = savedCommand[i];
             track->m_deltaTime = savedDelta[i];
             track->m_flags = savedFlags[i];
-            track->m_note = savedNote[i];
+            *(int*)&track->m_note = *(int*)&savedNote[i];
             track++;
             i++;
         } while (--trackCount != 0);
@@ -2442,7 +2442,7 @@ static void _SkipMusicEntry()
         do {
             if ((src->m_track != 0) && (dst->m_track == 0)) {
                 dst->m_track = src->m_track;
-                dst->m_note = src->m_note;
+                *(int*)&dst->m_note = *(int*)&src->m_note;
                 m_KeyOnEntry++;
             }
             src++;
@@ -2455,7 +2455,7 @@ static void _SkipMusicEntry()
         while ((dst < p_KeyOnData->m_normal) && (src < p_SkipKeyOn->m_normal)) {
             if (src->m_track != 0) {
                 dst->m_track = src->m_track;
-                dst->m_note = src->m_note;
+                *(int*)&dst->m_note = *(int*)&src->m_note;
                 dst++;
                 m_KeyOnEntry++;
             }
@@ -2469,7 +2469,7 @@ static void _SkipMusicEntry()
                (src < p_SkipKeyOn->m_normal + REDSOUND_KEY_ON_SLOT_COUNT)) {
             if (src->m_track != 0) {
                 dst->m_track = src->m_track;
-                dst->m_note = src->m_note;
+                *(int*)&dst->m_note = *(int*)&src->m_note;
                 dst++;
                 m_KeyOnEntry++;
             }
@@ -2534,7 +2534,7 @@ void MusicSkipFunction()
             track->m_command = control->m_savedCommand[trackIndex];
             track->m_deltaTime = control->m_savedDelta[trackIndex];
             track->m_flags = control->m_savedFlags[trackIndex];
-            track->m_note = control->m_savedNote[trackIndex];
+            *(int*)&track->m_note = *(int*)&control->m_savedNote[trackIndex];
             trackCount -= 1;
             trackIndex += 1;
             track += 1;

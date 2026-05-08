@@ -74,6 +74,7 @@ enum RedStreamFrameLayoutSize {
 	REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE = REDSOUND_STREAM_PAGE_SIZE / REDSOUND_STREAM_STEREO_FRAME_SIZE,
 	REDSOUND_STREAM_LEFT_PRED_SCALE_OFFSET = REDSOUND_STREAM_PAGE_SIZE,
 	REDSOUND_STREAM_LOOP_START_SAMPLE = 2,
+	REDSOUND_STREAM_LOOP_ENABLED_MIN = 0,
 	REDSOUND_STREAM_ADSR_RELEASE_TIME = 10,
 };
 
@@ -457,7 +458,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		headerData->m_data.pred_scale = (short)((s8*)streamHeader)[sampleOffset];
 		headerData->m_data.yn1 = headerData->m_data.yn2 = 0;
 		if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
-			if (streamData->m_header.m_loopStart < 0) {
+			if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
 				sampleOffset += REDSOUND_STREAM_PAGE_SIZE;
 			} else {
 				sampleOffset += REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET;
@@ -526,7 +527,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		} while (channel < streamData->m_header.m_channelCount);
 
 		int dmaID;
-		if (streamData->m_header.m_loopStart < 0) {
+		if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
 			dmaID = _ArrangeStreamDataNoLoop(streamData, 0, REDSOUND_STREAM_STEREO_PLANE_SIZE);
 		} else {
 			dmaID = _ArrangeStreamDataLoop(streamData, 0, REDSOUND_STREAM_STEREO_PLANE_SIZE);
@@ -697,7 +698,7 @@ void StreamControl()
 					samplePos |= voiceData->m_axVoice->pb.addr.currentAddressLo;
 					if ((samplePos >= sampleStart) && (samplePos < sampleStart + REDSOUND_STREAM_STEREO_PLANE_SIZE)) {
 						int stopped = 0;
-						if (streamData->m_header.m_loopStart < 0) {
+						if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
 							streamData->m_header.m_loopEnd = streamData->m_header.m_loopEnd - REDSOUND_STREAM_SAMPLE_ADVANCE;
 							if (streamData->m_header.m_loopEnd < 1) {
 								_StreamStop(streamData);
@@ -720,7 +721,7 @@ void StreamControl()
 								streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
 							}
 
-							if (streamData->m_header.m_loopStart < 0) {
+							if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
 								dmaID = _ArrangeStreamDataNoLoop(streamData, side, REDSOUND_STREAM_PAGE_SIZE);
 							} else {
 								dmaID = _ArrangeStreamDataLoop(streamData, side, REDSOUND_STREAM_PAGE_SIZE);

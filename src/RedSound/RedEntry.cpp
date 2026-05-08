@@ -126,6 +126,113 @@ static const char sRedEntryInfoColor[] = "\x1B[4;34m";
 static const char sRedEntryNewline[] = "\n";
 static const char sRedEntryPrefixedNewlineFmt[] = "%s\n";
 
+enum RedEntryStringLayout {
+	REDSOUND_ENTRY_COLORED_BLANK_LINE_FMT_SIZE = 0x2d,
+	REDSOUND_ENTRY_LOG_PREFIX_SIZE = 0x12,
+	REDSOUND_ENTRY_ERROR_BANNER_FMT_SIZE = 0x2d,
+	REDSOUND_ENTRY_ERASE_USING_WAVE_DATA_FMT_SIZE = 0x2e,
+	REDSOUND_ENTRY_WAVE_HEADER_BROKEN_FMT_SIZE = 0x1f,
+	REDSOUND_ENTRY_NO_WAVE_MEMORY_FREE_AREA_FMT_SIZE = 0x3d,
+	REDSOUND_ENTRY_WAVE_ENTRY_FMT_SIZE = 0x1f,
+	REDSOUND_ENTRY_AMEMORY_INFO_HEADER_FMT_SIZE = 0x21,
+	REDSOUND_ENTRY_AMEMORY_INFO_COLUMN_FMT_SIZE = 0x45,
+	REDSOUND_ENTRY_AMEMORY_WAVE_BANK_INFO_FMT_SIZE = 0x3c,
+	REDSOUND_ENTRY_AMEMORY_UNBANKED_WAVE_INFO_FMT_SIZE = 0x3b,
+	REDSOUND_ENTRY_AMEMORY_FREE_BLOCK_INFO_FMT_SIZE = 0x37,
+	REDSOUND_ENTRY_ENTRY_WAVE_COUNT_FMT_SIZE = 0x17,
+	REDSOUND_ENTRY_TOTAL_SIZE_FMT_SIZE = 0x1c,
+	REDSOUND_ENTRY_MAX_FREE_SIZE_FMT_SIZE = 0x1c,
+	REDSOUND_ENTRY_SESEP_HEADER_BROKEN_FMT_SIZE = 0x21,
+	REDSOUND_ENTRY_SE_PLAY_INFO_HEADER_FMT_SIZE = 0x21,
+	REDSOUND_ENTRY_SE_PLAY_INFO_COLUMN_FMT_SIZE = 0x20,
+	REDSOUND_ENTRY_SE_BLOCK_PLAY_INFO_FMT_SIZE = 0x2a,
+	REDSOUND_ENTRY_SESEP_PLAY_INFO_FMT_SIZE = 0x25,
+	REDSOUND_ENTRY_SE_EMPTY_PLAY_INFO_FMT_SIZE = 0x1c,
+	REDSOUND_ENTRY_MUSIC_HEADER_BROKEN_FMT_SIZE = 0x20,
+	REDSOUND_ENTRY_MUSIC_INFORMATION_HEADER_FMT_SIZE = 0x1f,
+	REDSOUND_ENTRY_MUSIC_INFO_COLUMN_FMT_SIZE = 0x22,
+	REDSOUND_ENTRY_MUSIC_INFO_PLAY_FMT_SIZE = 0x28,
+	REDSOUND_ENTRY_MUSIC_INFO_STOP_FMT_SIZE = 0x28,
+	REDSOUND_ENTRY_MMEMORY_INFO_HEADER_FMT_SIZE = 0x21,
+	REDSOUND_ENTRY_MMEMORY_INFO_COLUMN_FMT_SIZE = 0x35,
+	REDSOUND_ENTRY_MMEMORY_MUSIC_INFO_FMT_SIZE = 0x2d,
+	REDSOUND_ENTRY_MMEMORY_SE_BLOCK_INFO_FMT_SIZE = 0x2b,
+	REDSOUND_ENTRY_MMEMORY_WAVE_INFO_FMT_SIZE = 0x2c,
+	REDSOUND_ENTRY_MMEMORY_SE_INFO_FMT_SIZE = 0x2a,
+	REDSOUND_ENTRY_MMEMORY_FREE_BLOCK_INFO_FMT_SIZE = 0x2b,
+	REDSOUND_ENTRY_ENTRY_ITEMS_FMT_SIZE = 0x17,
+	REDSOUND_ENTRY_ERROR_COLOR_SIZE = 0x08,
+	REDSOUND_ENTRY_RESET_COLOR_SIZE = 0x05,
+	REDSOUND_ENTRY_HEADER_ERROR_COLOR_SIZE = 0x08,
+	REDSOUND_ENTRY_INFO_COLOR_SIZE = 0x08,
+	REDSOUND_ENTRY_NEWLINE_SIZE = 0x02,
+	REDSOUND_ENTRY_PREFIXED_NEWLINE_FMT_SIZE = 0x04,
+	REDSOUND_ENTRY_RODATA_STRING_SIZE = 0x53c,
+	REDSOUND_ENTRY_SDATA2_STRING_SIZE = 0x23,
+};
+
+STATIC_ASSERT(sizeof(sRedEntryColoredBlankLineFmt) == REDSOUND_ENTRY_COLORED_BLANK_LINE_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryLogPrefix) == REDSOUND_ENTRY_LOG_PREFIX_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryErrorBannerFmt) == REDSOUND_ENTRY_ERROR_BANNER_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryEraseUsingWaveDataFmt) == REDSOUND_ENTRY_ERASE_USING_WAVE_DATA_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryWaveHeaderBrokenFmt) == REDSOUND_ENTRY_WAVE_HEADER_BROKEN_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryNoWaveMemoryFreeAreaFmt) == REDSOUND_ENTRY_NO_WAVE_MEMORY_FREE_AREA_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryWaveEntryFmt) == REDSOUND_ENTRY_WAVE_ENTRY_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryAMemoryInfoHeaderFmt) == REDSOUND_ENTRY_AMEMORY_INFO_HEADER_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryAMemoryInfoColumnFmt) == REDSOUND_ENTRY_AMEMORY_INFO_COLUMN_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryAMemoryWaveBankInfoFmt) == REDSOUND_ENTRY_AMEMORY_WAVE_BANK_INFO_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryAMemoryUnbankedWaveInfoFmt) == REDSOUND_ENTRY_AMEMORY_UNBANKED_WAVE_INFO_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryAMemoryFreeBlockInfoFmt) == REDSOUND_ENTRY_AMEMORY_FREE_BLOCK_INFO_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryEntryWaveCountFmt) == REDSOUND_ENTRY_ENTRY_WAVE_COUNT_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryTotalSizeFmt) == REDSOUND_ENTRY_TOTAL_SIZE_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMaxFreeSizeFmt) == REDSOUND_ENTRY_MAX_FREE_SIZE_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntrySeSepHeaderBrokenFmt) == REDSOUND_ENTRY_SESEP_HEADER_BROKEN_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntrySePlayInfoHeaderFmt) == REDSOUND_ENTRY_SE_PLAY_INFO_HEADER_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntrySePlayInfoColumnFmt) == REDSOUND_ENTRY_SE_PLAY_INFO_COLUMN_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntrySeBlockPlayInfoFmt) == REDSOUND_ENTRY_SE_BLOCK_PLAY_INFO_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntrySeSepPlayInfoFmt) == REDSOUND_ENTRY_SESEP_PLAY_INFO_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntrySeEmptyPlayInfoFmt) == REDSOUND_ENTRY_SE_EMPTY_PLAY_INFO_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMusicHeaderBrokenFmt) == REDSOUND_ENTRY_MUSIC_HEADER_BROKEN_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMusicInformationHeaderFmt) == REDSOUND_ENTRY_MUSIC_INFORMATION_HEADER_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMusicInfoColumnFmt) == REDSOUND_ENTRY_MUSIC_INFO_COLUMN_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMusicInfoPlayFmt) == REDSOUND_ENTRY_MUSIC_INFO_PLAY_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMusicInfoStopFmt) == REDSOUND_ENTRY_MUSIC_INFO_STOP_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMMemoryInfoHeaderFmt) == REDSOUND_ENTRY_MMEMORY_INFO_HEADER_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMMemoryInfoColumnFmt) == REDSOUND_ENTRY_MMEMORY_INFO_COLUMN_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMMemoryMusicInfoFmt) == REDSOUND_ENTRY_MMEMORY_MUSIC_INFO_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMMemorySeBlockInfoFmt) == REDSOUND_ENTRY_MMEMORY_SE_BLOCK_INFO_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMMemoryWaveInfoFmt) == REDSOUND_ENTRY_MMEMORY_WAVE_INFO_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMMemorySeInfoFmt) == REDSOUND_ENTRY_MMEMORY_SE_INFO_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryMMemoryFreeBlockInfoFmt) == REDSOUND_ENTRY_MMEMORY_FREE_BLOCK_INFO_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryEntryItemsFmt) == REDSOUND_ENTRY_ENTRY_ITEMS_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryErrorColor) == REDSOUND_ENTRY_ERROR_COLOR_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryResetColor) == REDSOUND_ENTRY_RESET_COLOR_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryHeaderErrorColor) == REDSOUND_ENTRY_HEADER_ERROR_COLOR_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryInfoColor) == REDSOUND_ENTRY_INFO_COLOR_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryNewline) == REDSOUND_ENTRY_NEWLINE_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryPrefixedNewlineFmt) == REDSOUND_ENTRY_PREFIXED_NEWLINE_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryColoredBlankLineFmt) + sizeof(sRedEntryLogPrefix) + sizeof(sRedEntryErrorBannerFmt) +
+                  sizeof(sRedEntryEraseUsingWaveDataFmt) + sizeof(sRedEntryWaveHeaderBrokenFmt) +
+                  sizeof(sRedEntryNoWaveMemoryFreeAreaFmt) + sizeof(sRedEntryWaveEntryFmt) +
+                  sizeof(sRedEntryAMemoryInfoHeaderFmt) + sizeof(sRedEntryAMemoryInfoColumnFmt) +
+                  sizeof(sRedEntryAMemoryWaveBankInfoFmt) + sizeof(sRedEntryAMemoryUnbankedWaveInfoFmt) +
+                  sizeof(sRedEntryAMemoryFreeBlockInfoFmt) + sizeof(sRedEntryEntryWaveCountFmt) +
+                  sizeof(sRedEntryTotalSizeFmt) + sizeof(sRedEntryMaxFreeSizeFmt) +
+                  sizeof(sRedEntrySeSepHeaderBrokenFmt) + sizeof(sRedEntrySePlayInfoHeaderFmt) +
+                  sizeof(sRedEntrySePlayInfoColumnFmt) + sizeof(sRedEntrySeBlockPlayInfoFmt) +
+                  sizeof(sRedEntrySeSepPlayInfoFmt) + sizeof(sRedEntrySeEmptyPlayInfoFmt) +
+                  sizeof(sRedEntryMusicHeaderBrokenFmt) + sizeof(sRedEntryMusicInformationHeaderFmt) +
+                  sizeof(sRedEntryMusicInfoColumnFmt) + sizeof(sRedEntryMusicInfoPlayFmt) +
+                  sizeof(sRedEntryMusicInfoStopFmt) + sizeof(sRedEntryMMemoryInfoHeaderFmt) +
+                  sizeof(sRedEntryMMemoryInfoColumnFmt) + sizeof(sRedEntryMMemoryMusicInfoFmt) +
+                  sizeof(sRedEntryMMemorySeBlockInfoFmt) + sizeof(sRedEntryMMemoryWaveInfoFmt) +
+                  sizeof(sRedEntryMMemorySeInfoFmt) + sizeof(sRedEntryMMemoryFreeBlockInfoFmt) +
+                  sizeof(sRedEntryEntryItemsFmt) ==
+              REDSOUND_ENTRY_RODATA_STRING_SIZE);
+STATIC_ASSERT(sizeof(sRedEntryErrorColor) + sizeof(sRedEntryResetColor) + sizeof(sRedEntryHeaderErrorColor) +
+                  sizeof(sRedEntryInfoColor) + sizeof(sRedEntryNewline) + sizeof(sRedEntryPrefixedNewlineFmt) ==
+              REDSOUND_ENTRY_SDATA2_STRING_SIZE);
+
 /*
  * --INFO--
  * PAL Address: 0x801c05f8

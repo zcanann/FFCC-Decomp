@@ -43,6 +43,7 @@ struct RedReverbModeData {
 
 RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask);
 int SeStopID(int seId);
+int SeStopG(int group);
 int SeStopMG(int bank, int sep, int group, int kind);
 int SeBlockPlay(int seId, int bank, int no, int pan, int volume);
 int SeSepPlay(int seId, int sepId, int pan, int volume);

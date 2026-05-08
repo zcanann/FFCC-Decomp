@@ -4,8 +4,31 @@
 #include "ffcc/RedSound/RedMidiCtrl.h"
 #include "ffcc/RedSound/RedGlobals.h"
 #include "ffcc/RedSound/RedMemory.h"
+#include "global.h"
 #include <dolphin/os.h>
 #include <string.h>
+
+STATIC_ASSERT(sizeof(RedHistoryBANK) == REDSOUND_HISTORY_BANK_ENTRY_SIZE);
+STATIC_ASSERT(sizeof(RedMusicHEAD) == REDSOUND_MUSIC_HEADER_SIZE);
+STATIC_ASSERT(offsetof(RedMusicHEAD, m_trackCount) == REDSOUND_MUSIC_HEADER_TRACK_COUNT_OFFSET);
+STATIC_ASSERT(offsetof(RedMusicHEAD, m_reverbKind) == REDSOUND_MUSIC_HEADER_REVERB_KIND_OFFSET);
+STATIC_ASSERT(offsetof(RedMusicHEAD, m_reverbDepth) == REDSOUND_MUSIC_HEADER_REVERB_DEPTH_OFFSET);
+STATIC_ASSERT(offsetof(RedMusicHEAD, m_flags) == REDSOUND_MUSIC_HEADER_FLAGS_OFFSET);
+STATIC_ASSERT(offsetof(RedMusicHEAD, m_playFlags) == REDSOUND_MUSIC_HEADER_PLAY_FLAGS_OFFSET);
+STATIC_ASSERT(offsetof(RedSeSepHEAD, m_seNo) == REDSOUND_SESEP_SE_NO_OFFSET);
+STATIC_ASSERT(offsetof(RedSeSepHEAD, m_sizeAndFlags) == REDSOUND_SESEP_SIZE_AND_FLAGS_OFFSET);
+STATIC_ASSERT(offsetof(RedSeSepHEAD, m_seInfoFlags) == REDSOUND_SESEP_INFO_OFFSET);
+STATIC_ASSERT(offsetof(RedSeINFO, m_sequence) == REDSOUND_SE_INFO_SEQUENCE_OFFSET);
+STATIC_ASSERT(offsetof(RedSeBlockHEAD, m_seCount) == REDSOUND_SE_BLOCK_SE_COUNT_OFFSET);
+STATIC_ASSERT(offsetof(RedSeBlockHEAD, m_size) == REDSOUND_SE_BLOCK_SIZE_OFFSET);
+STATIC_ASSERT(offsetof(RedSeBlockHEAD, m_entries) == REDSOUND_SE_BLOCK_ENTRIES_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveHeadWD, m_waveNo) == REDSOUND_WAVE_HEAD_WAVE_NO_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveHeadWD, m_waveSize) == REDSOUND_WAVE_HEAD_WAVE_SIZE_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveHeadWD, m_tableCount) == REDSOUND_WAVE_HEAD_TABLE_COUNT_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveHeadWD, m_toneCount) == REDSOUND_WAVE_HEAD_TONE_COUNT_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveHeadWD, m_aramAddress) == REDSOUND_WAVE_HEAD_ARAM_ADDRESS_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveHeadWD, m_loadSize) == REDSOUND_WAVE_HEAD_LOAD_SIZE_OFFSET);
+STATIC_ASSERT(offsetof(RedWaveHeadWD, m_waveOffsets) == REDSOUND_WAVE_HEAD_OFFSETS_OFFSET);
 
 static const char sRedEntryColoredBlankLineFmt[] = "%s%s                                     %s\n";
 static const char sRedEntryLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";

@@ -12,7 +12,7 @@ enum RedMidiLayoutSize {
 	REDSOUND_TRACK_LOOP_STACK_COUNT = 4,
 };
 
-typedef int (*RedSwingFunc)(int);
+typedef int (*RedSwingFunc)(int phase);
 
 struct RedTrackDATA {
 	unsigned char* m_command;
@@ -328,7 +328,7 @@ enum RedSoundControlSaveSize {
 	REDSOUND_CONTROL_SAVED_TEMPO_SIZE = sizeof(int) * 3,
 };
 
-typedef void (*RedMidiControlFunc)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);
+typedef void (*RedMidiControlFunc)(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 int DataAddCompute(int* current, int target, int* delta);
 void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track);

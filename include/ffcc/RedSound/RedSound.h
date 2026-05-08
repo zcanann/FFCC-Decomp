@@ -16,7 +16,8 @@ public:
 	void ReportPrint(int enable);
 	int ReportStandby(int entryId);
 
-	int DMAEntry(int flags, int direction, int mainMemory, int aramMemory, int size, void (*callback)(void*), void* callbackData);
+	int DMAEntry(int flags, int direction, int mainMemory, int aramMemory, int size,
+	             void (*callback)(void* callbackData), void* callbackData);
 	int DMACheck(int id);
 
 	void SetSoundMode(int soundMode);

@@ -12,7 +12,8 @@ enum RedDmaEntryFlag {
 unsigned int DeltaTimeSumup(unsigned char**);
 unsigned int GetMyEntryID();
 void RedSleep(int microseconds);
-int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int size, void (*callback)(void*), void* callbackData);
+int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int size,
+                void (*callback)(void* callbackData), void* callbackData);
 int RedDmaSearchID(int id);
 
 class CRedDriver

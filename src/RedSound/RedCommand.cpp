@@ -540,18 +540,16 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 	no = no & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
 
 	if (p_SeBlockData[bank] != 0) {
-		RedSeBlockHEAD* bankData = reinterpret_cast<RedSeBlockHEAD*>(p_SeBlockData[bank]);
+		RedSeBlockHEAD* bankData = p_SeBlockData[bank];
 		int seNo = no;
 
 		no += bank << REDSOUND_SE_BLOCK_BANK_SHIFT;
 		no |= REDSOUND_SE_BLOCK_DATA_FLAG;
 		if (seNo < bankData->m_seCount) {
-			int* entries = bankData->m_entries;
+			int* entries = RedSeBlockEntries(bankData);
 
 			if (entries[seNo] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
-				RedSeINFO* seInfo = reinterpret_cast<RedSeINFO*>(
-				    reinterpret_cast<unsigned char*>(entries) + bankData->m_seCount * sizeof(*entries) +
-				    ((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK));
+				RedSeINFO* seInfo = RedSeBlockInfo(bankData, entries[seNo]);
 				RedSeINFO* playInfo = seInfo;
 
 				if (((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
@@ -585,7 +583,7 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 	sepBank = c_RedEntry.SearchSeSepBank(sepId);
 	if (sepBank != 0) {
 		sepHead = sepBank->m_seSepHead;
-		sepInfo = reinterpret_cast<RedSeINFO*>(&sepHead->m_seInfoFlags);
+		sepInfo = RedSeSepInfo(sepHead);
 		if ((sepHead->m_sizeAndFlags & REDSOUND_SESEP_FLAGS_MASK) != 0) {
 			sepInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
 		}

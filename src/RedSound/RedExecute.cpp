@@ -1086,7 +1086,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         }
 
         pan = pan + voice->m_track->m_shakePan;
-        pan &= 0xff;
+        pan &= REDSOUND_PAN_BYTE_WRAP - 1;
     }
 
     if (voice->m_randomVolume != 0) {

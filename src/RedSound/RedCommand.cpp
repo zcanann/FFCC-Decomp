@@ -20,6 +20,22 @@ static const char sRedCommandMusicNeedMemoryFmt[] = "%s%s            : music%3.3
 static const char sRedCommandMusicPauseOnFmt[] = "%sPause : Music  : ON  %d\n";
 static const char sRedCommandMusicPauseOffFmt[] = "%sPause : Music  : OFF %d\n";
 
+enum RedCommandStringLayout {
+	REDSOUND_COMMAND_WARN_COLOR_SIZE = 0x08,
+	REDSOUND_COMMAND_RESET_SIZE = 0x05,
+	REDSOUND_COMMAND_ERROR_COLOR_SIZE = 0x08,
+	REDSOUND_COMMAND_WAVE_NOT_ENTRY_FMT_SIZE = 0x26,
+	REDSOUND_COMMAND_LOG_PREFIX_SIZE = 0x12,
+	REDSOUND_COMMAND_SE_PAUSE_ON_FMT_SIZE = 0x1B,
+	REDSOUND_COMMAND_SE_PAUSE_OFF_FMT_SIZE = 0x1B,
+	REDSOUND_COMMAND_MUSIC_TRACK_CREATE_ERROR_FMT_SIZE = 0x2C,
+	REDSOUND_COMMAND_MUSIC_NEED_MEMORY_FMT_SIZE = 0x33,
+	REDSOUND_COMMAND_MUSIC_PAUSE_ON_FMT_SIZE = 0x1B,
+	REDSOUND_COMMAND_MUSIC_PAUSE_OFF_FMT_SIZE = 0x1B,
+	REDSOUND_COMMAND_RODATA_STRING_SIZE = 0x103,
+	REDSOUND_COMMAND_SDATA2_STRING_SIZE = 0x15,
+};
+
 enum RedCommandEraseTrack {
 	REDSOUND_ERASE_TRACK_SENTINEL = 0x100,
 	REDSOUND_SEP_DIRECT_PLAY_ID = 1000000,
@@ -47,6 +63,25 @@ STATIC_ASSERT(offsetof(RedReverbModeData, m_kind) == REDSOUND_REVERB_MODE_KIND_O
 STATIC_ASSERT(offsetof(RedReverbModeData, m_params) == REDSOUND_REVERB_MODE_PARAMS_OFFSET);
 STATIC_ASSERT(sizeof(RedReverbModeData) == REDSOUND_REVERB_MODE_SIZE);
 STATIC_ASSERT(sizeof(t_ReverbModeData) == REDSOUND_REVERB_MODE_TABLE_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandLogWarnColor) == REDSOUND_COMMAND_WARN_COLOR_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandLogReset) == REDSOUND_COMMAND_RESET_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandLogErrorColor) == REDSOUND_COMMAND_ERROR_COLOR_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandWaveNotEntryFmt) == REDSOUND_COMMAND_WAVE_NOT_ENTRY_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandLogPrefix) == REDSOUND_COMMAND_LOG_PREFIX_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandSePauseOnFmt) == REDSOUND_COMMAND_SE_PAUSE_ON_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandSePauseOffFmt) == REDSOUND_COMMAND_SE_PAUSE_OFF_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandMusicTrackCreateErrorFmt) == REDSOUND_COMMAND_MUSIC_TRACK_CREATE_ERROR_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandMusicNeedMemoryFmt) == REDSOUND_COMMAND_MUSIC_NEED_MEMORY_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandMusicPauseOnFmt) == REDSOUND_COMMAND_MUSIC_PAUSE_ON_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandMusicPauseOffFmt) == REDSOUND_COMMAND_MUSIC_PAUSE_OFF_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandWaveNotEntryFmt) + sizeof(sRedCommandLogPrefix) +
+                  sizeof(sRedCommandSePauseOnFmt) + sizeof(sRedCommandSePauseOffFmt) +
+                  sizeof(sRedCommandMusicTrackCreateErrorFmt) + sizeof(sRedCommandMusicNeedMemoryFmt) +
+                  sizeof(sRedCommandMusicPauseOnFmt) + sizeof(sRedCommandMusicPauseOffFmt) ==
+              REDSOUND_COMMAND_RODATA_STRING_SIZE);
+STATIC_ASSERT(sizeof(sRedCommandLogWarnColor) + sizeof(sRedCommandLogReset) +
+                  sizeof(sRedCommandLogErrorColor) ==
+              REDSOUND_COMMAND_SDATA2_STRING_SIZE);
 
 RedReverbModeData t_ReverbModeData[REDSOUND_REVERB_MODE_COUNT] = {
     {REDSOUND_REVERB_KIND_HI, {0xA, 0x578, 0x1E, 0x46, 0x64, 0x0}},

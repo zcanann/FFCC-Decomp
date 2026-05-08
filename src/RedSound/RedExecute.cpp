@@ -164,6 +164,8 @@ static const float s_ReverbEffectScale = 100.0f;
 enum RedExecuteLayoutSize {
     REDSOUND_REVERB_DATA_COUNT = 2,
     REDSOUND_REVERB_DATA_BUFFER_SIZE = sizeof(RedReverbDATA) * REDSOUND_REVERB_DATA_COUNT,
+    REDSOUND_REVERB_DATA_ALLOC_SIZE = 0x18,
+    REDSOUND_REVERB_SIZE_ALLOC_SIZE = sizeof(u32),
     REDSOUND_REVERB_AUX_BUFFER_SIZE = 0x280,
     REDSOUND_REVERB_ALLOC_ALIGN = 0x20,
     REDSOUND_REVERB_ALLOC_ALIGN_MASK = REDSOUND_REVERB_ALLOC_ALIGN - 1,
@@ -268,6 +270,7 @@ STATIC_ASSERT(sizeof(t_TonePitch) + sizeof(t_FinePitch) + sizeof(t_KeySignatureI
                   sizeof(t_KeySignatureData) + sizeof(t_RandomData) + sizeof(t_PanningData) +
                   sizeof(t_PanningDataR) ==
               REDSOUND_EXECUTE_DATA_TABLE_SIZE);
+STATIC_ASSERT(REDSOUND_REVERB_DATA_BUFFER_SIZE == REDSOUND_REVERB_DATA_ALLOC_SIZE);
 STATIC_ASSERT(sizeof(m_TerminateNote) == REDSOUND_EXECUTE_SDATA_SIZE);
 STATIC_ASSERT(sizeof(m_RandomIndex) + REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE + sizeof(p_ReverbData) +
                   sizeof(p_ReverbSize) + sizeof(m_ChangeStatus) + sizeof(p_SkipKeyOn) ==
@@ -481,7 +484,7 @@ void InitReverb()
 {
     p_ReverbData = (RedReverbDATA*)RedNew(REDSOUND_REVERB_DATA_BUFFER_SIZE);
     memset(p_ReverbData, 0, REDSOUND_REVERB_DATA_BUFFER_SIZE);
-    p_ReverbSize = (RedReverbSize*)RedNew(4);
+    p_ReverbSize = (RedReverbSize*)RedNew(REDSOUND_REVERB_SIZE_ALLOC_SIZE);
 }
 
 /*

@@ -416,7 +416,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 				track->m_mixVolumeMode = 0;
 				track->m_pitchDelta = 0;
 				track->m_pitch = 0;
-				track->m_voiceSwitch = isMulti;
+				track->m_loopReport = isMulti;
 				track->m_volume = REDSOUND_VOLUME_FULL;
 				track->m_expression = REDSOUND_VOLUME_DEFAULT;
 				track->m_pan = pan << REDSOUND_FIXED_SHIFT;

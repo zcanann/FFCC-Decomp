@@ -751,10 +751,6 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
     int auxLeftMix;
     int auxRightMix;
     RedTrackDATA* trackData = voice->m_track;
-    s16 leftPan;
-    s16 rightPan;
-    u16 monoMix;
-    int volFactor;
     AXPBMIX* mixData;
 
     if (trackData == 0) {
@@ -766,23 +762,22 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 
     switch (m_SoundPlayMode) {
     case 1:
-        volFactor = (int)t_PanningData[REDSOUND_PAN_BYTE_CENTER];
-        auxLeftMix = (volume * volFactor) >> 8;
+        auxLeftMix = (volume * t_PanningData[REDSOUND_PAN_BYTE_CENTER]) >> 8;
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_DRY_STEREO) != 0) {
-            monoMix = (u16)auxLeftMix;
-            mixData->vL = monoMix;
-            mixData->vR = monoMix;
+            mixData->vL = (u16)auxLeftMix;
+            mixData->vR = (u16)auxLeftMix;
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
-            monoMix = (u16)((auxLeftMix * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT);
+            auxLeftMix =
+                (auxLeftMix * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT;
             if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
-                mixData->vAuxAL = monoMix;
-                mixData->vAuxAR = monoMix;
+                mixData->vAuxAL = (u16)auxLeftMix;
+                mixData->vAuxAR = (u16)auxLeftMix;
             } else {
-                mixData->vAuxBL = monoMix;
-                mixData->vAuxBR = monoMix;
+                mixData->vAuxBL = (u16)auxLeftMix;
+                mixData->vAuxBR = (u16)auxLeftMix;
             }
         }
         break;
@@ -817,10 +812,8 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
             pan = REDSOUND_PAN_BYTE_WRAP - pan;
         }
 
-        leftPan = t_PanningData[pan];
-        rightPan = t_PanningData[pan ^ REDSOUND_PAN_BYTE_MASK];
-        auxLeftMix = (volume * leftPan) >> 8;
-        auxRightMix = (volume * rightPan) >> 8;
+        auxLeftMix = (volume * t_PanningData[pan]) >> 8;
+        auxRightMix = (volume * t_PanningData[pan ^ REDSOUND_PAN_BYTE_MASK]) >> 8;
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_DRY_LEFT) != 0) {
             mixData->vL = (u16)auxLeftMix;

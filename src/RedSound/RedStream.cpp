@@ -432,7 +432,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	streamData = _SearchEmptyStreamData();
 	if (streamData != 0) {
 
-	memcpy(&streamData->m_header, streamHeader, REDSOUND_STREAM_FILE_HEADER_SIZE);
+	memcpy(&streamData->m_header, streamHeader, sizeof(RedStreamHEAD));
 	streamData->m_track = SearchSeEmptyTrack(streamData->m_header.m_channelCount, REDSOUND_STREAM_ERASE_TRACK, 0);
 	streamData->m_buffer = (u8*)RedNew(REDSOUND_STREAM_TRANSFER_BUFFER_SIZE);
 	amemSize = streamData->m_header.m_channelCount * REDSOUND_STREAM_STEREO_PLANE_SIZE;

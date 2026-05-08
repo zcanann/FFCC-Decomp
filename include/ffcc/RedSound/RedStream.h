@@ -128,7 +128,7 @@ enum RedStreamDataLayoutOffset {
 };
 
 enum RedStreamDataLayoutSize {
-    REDSOUND_STREAM_DATA_SIZE = 0x130,
+    REDSOUND_STREAM_DATA_SIZE = sizeof(RedStreamDATA),
 };
 
 void StreamStop(int streamId);

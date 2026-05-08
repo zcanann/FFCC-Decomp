@@ -2756,7 +2756,7 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
     m_WaveSettingData.m_waveId = waveID;
     m_WaveSettingData.m_waveData = waveData;
 
-    if (waveSize == -1) {
+    if (waveSize == REDSOUND_WAVE_SIZE_AUTO) {
         RedWaveHeadWD* const waveHeader = (RedWaveHeadWD*)waveData;
 
         if ((waveHeader->m_signature[0] == REDSOUND_WAVE_SIGNATURE_MAGIC0) &&

@@ -542,7 +542,7 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 
 	sepBank = c_RedEntry.SearchSeSepBank(sepId);
 	if (sepBank != 0) {
-		sepHead = reinterpret_cast<RedSeSepHEAD*>(sepBank->m_data);
+		sepHead = sepBank->m_seSepHead;
 		sepInfo = reinterpret_cast<RedSeINFO*>(&sepHead->m_seInfoFlags);
 		if ((sepHead->m_sizeAndFlags & REDSOUND_SESEP_FLAGS_MASK) != 0) {
 			sepInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
@@ -954,7 +954,7 @@ int MusicPlay(int musicId, int volume, int mode)
 	RedHistoryBANK* musicBank = c_RedEntry.SearchMusicBank(musicId);
 
 	if (musicBank != 0) {
-		musicHead = (RedMusicHEAD*)musicBank->m_data;
+		musicHead = musicBank->m_musicHead;
 		RedWaveHeadWD* waveHead = c_RedEntry.SearchWaveBase(musicHead->m_waveNo);
 
 		if (waveHead == 0) {

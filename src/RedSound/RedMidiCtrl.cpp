@@ -1233,7 +1233,7 @@ static void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
 	track->m_waveBase = 0;
 	waveBank = (RedHistoryBANK*)c_RedEntry.GetWaveBank(bankNo);
 	if (waveBank != 0) {
-		waveBankData = (RedWaveHeadWD*)waveBank->m_data;
+		waveBankData = waveBank->m_waveHead;
 		waveTable = waveBankData->m_waveOffsets;
 		track->m_waveData = (RedWaveDATA*)((int)waveBankData + waveTable[waveNo]);
 		track->m_waveBase = waveBankData->m_aramAddress;

@@ -156,6 +156,8 @@ static int _EraseTime(int eraseTrack)
 	int minTrack = REDSOUND_ERASE_TRACK_SENTINEL;
 	RedTrackDATA** trackBasePtr = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 	RedTrackDATA* track = *trackBasePtr;
+	int sepId;
+	int erasedCount;
 
 	do {
 		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack < minTrack)) {
@@ -170,7 +172,7 @@ static int _EraseTime(int eraseTrack)
 
 	track = *trackBasePtr;
 	minTrack = 0;
-	int sepId = 0;
+	sepId = 0;
 	do {
 		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
 		    (track->m_playTime > minTrack)) {
@@ -181,7 +183,7 @@ static int _EraseTime(int eraseTrack)
 	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
 
 	track = *trackBasePtr;
-	int erasedCount = 0;
+	erasedCount = 0;
 	do {
 		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
 		    (track->m_playTime == minTrack)) {
@@ -931,7 +933,7 @@ int MusicStop(int musicId)
 
 	do {
 		if ((musicId == -1) || ((music->m_musicId >= 0) && (music->m_musicId == musicId))) {
-			unsigned int stoppedMusicId = music->m_musicId;
+			int stoppedMusicId = music->m_musicId;
 			music->m_updateFlags = 0;
 			music->m_musicId = -1;
 			if (music->m_activeTrackCount != 0) {

@@ -152,7 +152,11 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
 			return bank;
 		}
 		if (c_Driver.StreamPlayState(id) == 0) {
-			memset(bank, 0, sizeof(RedSoundStreamBank));
+			bank->m_streamId = 0;
+			bank->m_streamData = 0;
+			bank->m_fileSize = 0;
+			bank->m_readPoint = 0;
+			bank->m_reserved10 = 0;
 			return bank;
 		}
 		bank++;

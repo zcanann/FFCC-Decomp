@@ -3790,8 +3790,8 @@ void CRedDriver::StopWaveItem()
     for (index = 0; index < REDSOUND_EDITOR_VOICE_COUNT; index++) {
         if (p_EditorVoice[index] != 0) {
             voice = p_VoiceData + p_EditorVoice[index] - 1;
-            voice->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-            voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+            voice->m_flags = (voice->m_flags & REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK) |
+                             REDSOUND_VOICE_FLAGS_RELEASED;
             p_EditorVoice[index] = 0;
         }
     }
@@ -3839,6 +3839,7 @@ void CRedDriver::SetWaveTune(int key, int fineTune)
         p_EditorTrack->m_pitchBend = 0;
         p_EditorTrack->m_pitchBendRaw = 0;
         p_EditorTrack->m_pitchDelta = 0;
+        p_EditorTrack->m_portamentPitch = REDSOUND_TRACK_PORTAMENT_PITCH_NONE;
         SetVoiceAccess(p_EditorTrack, REDSOUND_VOICE_FLAGS_PITCH_DIRTY);
         m_ChangeStatus |= REDSOUND_VOICE_UPDATE_PITCH;
     }

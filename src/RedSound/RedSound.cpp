@@ -1221,8 +1221,8 @@ int CRedSound::GetSeUsedWave(int bank, int seNo)
 		RedSeBlockHEAD* bankData = p_SeBlockData[bank];
 		if (seNo < bankData->m_seCount) {
 			int* entries = bankData->m_entries;
-			int entry = entries[seNo];
-			if (entry != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
+			unsigned int entry = entries[seNo];
+			if (entry != (unsigned int)REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
 				entry &= REDSOUND_SE_BLOCK_ENTRY_MASK;
 				RedSeINFO* seInfo = (RedSeINFO*)((u8*)entries + bankData->m_seCount * sizeof(*entries) +
 				                                entry);

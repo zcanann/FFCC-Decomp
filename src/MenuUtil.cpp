@@ -3,6 +3,7 @@
 #include "ffcc/game.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
+#include "ffcc/RedSound/RedSound.h"
 #include <string.h>
 #include "ffcc/fontman.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
@@ -10,7 +11,6 @@
 extern CMenuPcs MenuPcs;
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" short BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" unsigned int GetSoundMode__9CRedSoundFv(void*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 extern "C" void __dla__FPv(void*);
 extern "C" char* strcat(char*, const char*);
@@ -193,6 +193,11 @@ struct MenuUtilFlatData {
 static inline int* GetMenuHelpMsgTable()
 {
 	return reinterpret_cast<int*>(reinterpret_cast<MenuUtilFlatData*>(&Game.m_cFlatDataArr[1])->table[6].index);
+}
+
+static inline CRedSound* GetRedSoundGlobal()
+{
+	return reinterpret_cast<CRedSound*>(reinterpret_cast<unsigned char*>(&Sound) + 8);
 }
 }
 
@@ -702,7 +707,7 @@ void CMenuPcs::GetOptionData()
 	gameInitMode =
 	    static_cast<signed char>(static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_gameInitFlag))) >> 5);
 
-	unsigned int soundMode = GetSoundMode__9CRedSoundFv(reinterpret_cast<unsigned char*>(&Sound) + 8);
+	unsigned int soundMode = GetRedSoundGlobal()->GetSoundMode();
 	unsigned int soundModeClz = static_cast<unsigned int>(__cntlzw(soundMode));
 	stereoMode = static_cast<signed char>(static_cast<unsigned int>(__cntlzw(soundModeClz >> 5)) >> 5);
 

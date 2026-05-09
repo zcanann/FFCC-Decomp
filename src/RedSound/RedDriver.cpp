@@ -2477,7 +2477,8 @@ int CRedDriver::MusicPlayState(int musicID)
     result = 0;
     music = p_SoundControlBuffer;
     do {
-        if ((music->m_activeTrackCount != 0) &&
+        if ((music->m_tracks != 0) &&
+            (music->m_activeTrackCount != 0) &&
             (music->m_musicId != REDSOUND_MUSIC_ID_NONE) &&
             ((musicID == REDSOUND_MUSIC_ID_NONE) || (music->m_musicId == musicID))) {
             result = (int)music;

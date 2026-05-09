@@ -309,6 +309,20 @@ int CRedSound::GetProgramTime()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: UNUSED
+ * EN Size: 36b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::GetMasterTime()
+{
+	return c_Driver.GetMasterTime();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801ccd94
  * PAL Size: 8b
  * EN Address: TODO
@@ -360,6 +374,20 @@ int CRedSound::ReportStandby(int id)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: UNUSED
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::Sleep(int microseconds)
+{
+	RedSleep(microseconds);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cce34
  * PAL Size: 88b
  * EN Address: TODO
@@ -384,6 +412,20 @@ int CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, RedDm
 int CRedSound::DMACheck(int id)
 {
 	return RedDmaSearchID(id);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: UNUSED
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SetDMAMode(int mode)
+{
+	RedSetDMAMode(mode);
 }
 
 /*
@@ -416,6 +458,20 @@ int CRedSound::GetSoundMode()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: UNUSED
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SetReverb(int bank, int kind, int* params)
+{
+	c_Driver.SetReverb(bank, kind, params);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801ccf04
  * PAL Size: 52b
  * EN Address: TODO
@@ -426,6 +482,20 @@ int CRedSound::GetSoundMode()
 void CRedSound::SetReverb(int bank, int kind)
 {
 	c_Driver.SetReverb(bank, kind);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: UNUSED
+ * EN Size: 36b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbSize* CRedSound::GetReverbInfo()
+{
+	return c_Driver.GetReverbInfo();
 }
 
 /*
@@ -444,6 +514,48 @@ void CRedSound::SetReverbDepth(int bank, int sep, int depth)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: UNUSED
+ * EN Size: 36b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbDepth* CRedSound::GetReverbDepth()
+{
+	return c_Driver.GetReverbDepth();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: UNUSED
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SetMute(unsigned int voiceNo, unsigned int mute)
+{
+	c_Driver.SetMute(voiceNo, mute);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: UNUSED
+ * EN Size: 36b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::DisplayMMemoryInfo()
+{
+	c_Driver.DisplayMMemoryInfo();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801ccf74
  * PAL Size: 44b
  * EN Address: TODO
@@ -458,6 +570,20 @@ void CRedSound::SetMusicData(void* musicData)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: UNUSED
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::ClearMusicData(int id)
+{
+	c_Driver.ClearMusicData(id);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801ccfa0
  * PAL Size: 44b
  * EN Address: TODO
@@ -468,6 +594,20 @@ void CRedSound::SetMusicData(void* musicData)
 int CRedSound::ReentryMusicData(int bank)
 {
 	return c_Driver.ReentryMusicData(bank);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: UNUSED
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::MusicPlayState(int id)
+{
+	return c_Driver.MusicPlayState(id);
 }
 
 /*
@@ -500,6 +640,20 @@ void CRedSound::MusicPlay(int id, int vol, int fadeTime)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: UNUSED
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::MusicPlay(void* musicData, int volume, int mode)
+{
+	c_Driver.MusicPlay(musicData, volume, mode);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd034
  * PAL Size: 60b
  * EN Address: TODO
@@ -514,6 +668,20 @@ void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: UNUSED
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::MusicCrossPlay(void* musicData, int volume, int mode)
+{
+	c_Driver.MusicCrossPlay(musicData, volume, mode);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd070
  * PAL Size: 60b
  * EN Address: TODO
@@ -524,6 +692,20 @@ void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
 void CRedSound::MusicNextPlay(int id, int vol, int fadeTime)
 {
 	c_Driver.MusicNextPlay(id, vol, fadeTime);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: UNUSED
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::MusicNextPlay(void* musicData, int volume, int mode)
+{
+	c_Driver.MusicNextPlay(musicData, volume, mode);
 }
 
 /*
@@ -570,6 +752,76 @@ void CRedSound::MusicVolume(int id, int volume, int fadeTime)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: UNUSED
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::MusicPitch(int pitch, int frameCount)
+{
+	c_Driver.MusicPitch(pitch, frameCount);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: UNUSED
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::MusicTempo(int tempo, int frameCount)
+{
+	c_Driver.MusicTempo(tempo, frameCount);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: UNUSED
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::MusicPause(int id, int pause)
+{
+	c_Driver.MusicPause(id, pause);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: UNUSED
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::CheckMusicEntry(int id)
+{
+	return c_Driver.CheckMusicEntry(id);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: UNUSED
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SetMusicFastSpeed(int speed)
+{
+	c_Driver.SetMusicFastSpeed(speed);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd148
  * PAL Size: 44b
  * EN Address: TODO
@@ -580,6 +832,34 @@ void CRedSound::MusicVolume(int id, int volume, int fadeTime)
 void CRedSound::SetMusicPhraseStop(int id)
 {
 	c_Driver.SetMusicPhraseStop(id);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: UNUSED
+ * EN Size: 36b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::CheckMusicPhraseStop()
+{
+	return c_Driver.CheckMusicPhraseStop();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: UNUSED
+ * EN Size: 36b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::DisplayMusicInfo()
+{
+	c_Driver.DisplayMusicInfo();
 }
 
 /*
@@ -682,6 +962,20 @@ void CRedSound::SeStop(int id)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: UNUSED
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SeStopG(int group)
+{
+	c_Driver.SeStopG(group);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd2c8
  * PAL Size: 68b
  * EN Address: TODO
@@ -707,6 +1001,22 @@ int CRedSound::SePlay(int seID, int sepID, int pan, int volume, int pitch)
 {
 	int autoID = GetAutoID();
 	c_Driver.SePlay(seID, sepID, autoID, pan, volume, pitch);
+	return autoID;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 100b
+ * EN Address: UNUSED
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::SePlay(void* seSepData, int pan, int volume, int pitch)
+{
+	int autoID = GetAutoID();
+	c_Driver.SePlay(seSepData, autoID, pan, volume, pitch);
 	return autoID;
 }
 
@@ -810,6 +1120,20 @@ int CRedSound::GetSeVolume(int seID, int outVolume)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: UNUSED
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::CheckSeSepEntry(int id)
+{
+	return c_Driver.CheckSeSepEntry(id);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd4f4
  * PAL Size: 44b
  * EN Address: TODO
@@ -862,6 +1186,20 @@ int CRedSound::StreamPlayState(int streamID)
 void CRedSound::GetStreamPlayPoint(int streamID, int* point1, int* point2)
 {
 	c_Driver.GetStreamPlayPoint(streamID, point1, point2);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: UNUSED
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedStreamDATA* CRedSound::GetStreamPlayBlock(int streamID)
+{
+	return c_Driver.GetStreamPlayBlock(streamID);
 }
 
 /*
@@ -919,6 +1257,20 @@ int CRedSound::StreamPlay(void* data, int fileSize, int pan, int volume)
 void CRedSound::StreamVolume(int streamID, int volume, int frameCount)
 {
 	c_Driver.StreamVolume(streamID, volume, frameCount);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: UNUSED
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::StreamPan(int streamID, int pan, int frameCount)
+{
+	c_Driver.StreamPan(streamID, pan, frameCount);
 }
 
 /*
@@ -1055,15 +1407,43 @@ void CRedSound::DisplayWaveInfo()
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: UNUSED
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbModeData* CRedSound::GetReverbModeTable(int mode)
+{
+	return c_Driver.GetReverbModeTable(mode);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 36b
  * EN Address: UNUSED
  * EN Size: 36b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::DisplayMMemoryInfo()
+void CRedSound::ClearSePlayLine()
 {
-	c_Driver.DisplayMMemoryInfo();
+	c_Driver.ClearSePlayLine();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: UNUSED
+ * EN Size: 36b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedTrackDATA* CRedSound::GetSePlayTrack()
+{
+	return c_Driver.GetSePlayTrack();
 }
 
 /*

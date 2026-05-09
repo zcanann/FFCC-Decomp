@@ -7,6 +7,11 @@ typedef void (*RedDmaCallback)(void* callbackData);
 #endif
 
 struct RedWaveHeadWD;
+struct RedReverbDepth;
+struct RedReverbModeData;
+struct RedReverbSize;
+struct RedStreamDATA;
+struct RedTrackDATA;
 
 class CRedSound
 {
@@ -20,29 +25,49 @@ public:
 	void Start();
 	void End();
 	int GetProgramTime();
+	int GetMasterTime();
+	void Sleep(int microseconds);
 	void ReportPrint(int enable);
 	int ReportStandby(int entryId);
 
 	int DMAEntry(int flags, int direction, int mainMemory, int aramMemory, int size,
 	             RedDmaCallback callback, void* callbackData);
 	int DMACheck(int id);
+	void SetDMAMode(int mode);
 
 	void SetSoundMode(int soundMode);
 	int GetSoundMode();
 
 	void SetReverb(int kind, int mode);
+	void SetReverb(int kind, int mode, int* params);
+	RedReverbSize* GetReverbInfo();
+	RedReverbDepth* GetReverbDepth();
 	void SetReverbDepth(int type, int depth, int frameCount);
+	void SetMute(unsigned int voiceNo, unsigned int mute);
+	RedReverbModeData* GetReverbModeTable(int mode);
 
 	void SetMusicData(void* musicData);
 	int ReentryMusicData(int musicId);
+	void ClearMusicData(int musicId);
+	int MusicPlayState(int musicId);
+	int CheckMusicEntry(int musicId);
 	void MusicStop(int musicId);
 	void MusicPlay(int musicId, int volume, int mode);
+	void MusicPlay(void* musicData, int volume, int mode);
 	void MusicCrossPlay(int musicId, int volume, int mode);
+	void MusicCrossPlay(void* musicData, int volume, int mode);
 	void MusicNextPlay(int musicId, int volume, int mode);
+	void MusicNextPlay(void* musicData, int volume, int mode);
 	void MusicMasterVolume(int volume);
 	void MusicFadeOut(int musicId, int frameCount);
 	void MusicVolume(int musicId, int volume, int frameCount);
+	void MusicTempo(int tempo, int frameCount);
+	void MusicPitch(int pitch, int frameCount);
+	void MusicPause(int musicId, int pause);
 	void SetMusicPhraseStop(int enable);
+	void SetMusicFastSpeed(int speed);
+	int CheckMusicPhraseStop();
+	void DisplayMusicInfo();
 
 	void SetSeBlockData(int bank, void* blockData);
 	void SetSeSepData(void* seSepData);
@@ -52,8 +77,11 @@ public:
 
 	int SePlayState(int seId);
 	void SeStop(int seId);
+	void SeStopG(int group);
 	void SeStopMG(int bank, int sep, int group, int kind);
 	int SePlay(int bank, int sep, int pan, int volume, int pitch);
+	int SePlay(void* seSepData, int pan, int volume, int pitch);
+	int CheckSeSepEntry(int sepId);
 	void SeMasterVolume(int volume);
 	void SeFadeOut(int seId, int frameCount);
 	void SeVolume(int seId, int volume, int frameCount);
@@ -63,12 +91,16 @@ public:
 	int GetSeVolume(int seId, int mode);
 	int ReportSeLoop(int seId);
 	void DisplaySePlayInfo();
+	void ClearSePlayLine();
+	RedTrackDATA* GetSePlayTrack();
 
 	int StreamPlayState(int streamId);
 	void GetStreamPlayPoint(int streamId, int* current, int* total);
+	RedStreamDATA* GetStreamPlayBlock(int streamId);
 	void StreamStop(int streamId);
 	int StreamPlay(void* streamHeader, int fileSize, int pan, int volume);
 	void StreamVolume(int streamId, int volume, int frameCount);
+	void StreamPan(int streamId, int pan, int frameCount);
 	void StreamPause(int streamId, int pause);
 
 	unsigned int SetWaveData(int waveID, void* waveData, int waveSize);

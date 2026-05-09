@@ -1012,6 +1012,34 @@ int CRedSound::ReentryWaveData(int id)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: UNUSED
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedWaveHeadWD* CRedSound::GetWaveInfo(int id)
+{
+	return c_Driver.GetWaveInfo(id);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: UNUSED
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::CheckWaveEntry(int id)
+{
+	return c_Driver.CheckWaveEntry(id);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd86c
  * PAL Size: 36b
  * EN Address: TODO
@@ -1022,6 +1050,20 @@ int CRedSound::ReentryWaveData(int id)
 void CRedSound::DisplayWaveInfo()
 {
 	c_Driver.DisplayWaveInfo();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: UNUSED
+ * EN Size: 36b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::DisplayMMemoryInfo()
+{
+	c_Driver.DisplayMMemoryInfo();
 }
 
 /*

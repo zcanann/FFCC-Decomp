@@ -6,6 +6,8 @@
 typedef void (*RedDmaCallback)(void* callbackData);
 #endif
 
+struct RedWaveHeadWD;
+
 class CRedSound
 {
 public:
@@ -74,7 +76,10 @@ public:
 	void ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo3);
 	void ClearWaveBank(int bank);
 	int ReentryWaveData(int waveNo);
+	RedWaveHeadWD* GetWaveInfo(int waveNo);
+	int CheckWaveEntry(int waveNo);
 	void DisplayWaveInfo();
+	void DisplayMMemoryInfo();
 
 	void TestProcess(int mode);
 };

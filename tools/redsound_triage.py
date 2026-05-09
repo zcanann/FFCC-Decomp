@@ -19,6 +19,7 @@ from objdiff_experiment import (
     instruction_text,
     is_real_symbol_name,
     load_objdiff_json,
+    mnemonic,
     normalize_unit,
     source_path_for_unit,
     symbol_by_name,
@@ -80,6 +81,70 @@ def diff_summary(left: dict[str, Any], right: dict[str, Any]) -> tuple[Counter[s
     return counts, first_hint
 
 
+def operands(item: dict[str, Any]) -> list[str]:
+    text = instruction_text(item)
+    if text == "<gap>" or " " not in text:
+        return []
+    return [part.strip() for part in text.split(None, 1)[1].split(",")]
+
+
+def mismatch_patterns(
+    left: dict[str, Any],
+    right: dict[str, Any],
+    left_frame: str | None,
+    right_frame: str | None,
+    left_save: str | None,
+    right_save: str | None,
+) -> list[str]:
+    patterns: list[str] = []
+    if left_frame != right_frame or left_save != right_save:
+        patterns.append("stack")
+
+    left_instructions = left.get("instructions") or []
+    right_instructions = right.get("instructions") or []
+    max_len = max(len(left_instructions), len(right_instructions))
+    has_shape = False
+    has_regs = False
+    for i in range(max_len):
+        left_item = left_instructions[i] if i < len(left_instructions) else {}
+        right_item = right_instructions[i] if i < len(right_instructions) else {}
+        if "diff_kind" not in left_item and "diff_kind" not in right_item:
+            continue
+        left_text = instruction_text(left_item)
+        right_text = instruction_text(right_item)
+        if left_text == "<gap>" or right_text == "<gap>":
+            has_shape = True
+            continue
+
+        left_mnemonic = mnemonic(left_item)
+        right_mnemonic = mnemonic(right_item)
+        if {left_mnemonic, right_mnemonic} == {"srawi", "srwi"}:
+            patterns.append("signed-shift")
+        elif {left_mnemonic, right_mnemonic} & {"cmpwi", "cmplwi", "cmpw", "cmplw"} and left_mnemonic != right_mnemonic:
+            patterns.append("signed-compare")
+        elif left_mnemonic != right_mnemonic:
+            has_shape = True
+        else:
+            left_ops = operands(left_item)
+            right_ops = operands(right_item)
+            if (
+                left_mnemonic in {"add", "addi", "mullw", "slwi", "srawi", "srwi"}
+                and len(left_ops) >= 2
+                and len(right_ops) >= 2
+                and left_ops[0] in left_ops[1:]
+                and right_ops[0] not in right_ops[1:]
+            ):
+                patterns.append("temp-result")
+            elif left_ops != right_ops:
+                has_regs = True
+
+    if has_shape:
+        patterns.append("shape")
+    if has_regs:
+        patterns.append("regs")
+    return sorted(set(patterns))
+
+
 def category(
     left_frame: str | None,
     right_frame: str | None,
@@ -107,6 +172,7 @@ def summarize_symbol(unit: str, left: dict[str, Any], right: dict[str, Any]) -> 
     left_save = extract_save_range(left_instructions)
     right_save = extract_save_range(right_instructions)
     counts, first_hint = diff_summary(left, right)
+    patterns = mismatch_patterns(left, right, left_frame, right_frame, left_save, right_save)
     row = {
         "unit": unit,
         "symbol": left.get("name", ""),
@@ -118,6 +184,7 @@ def summarize_symbol(unit: str, left: dict[str, Any], right: dict[str, Any]) -> 
         "save": f"{left_save or '?'}->{right_save or '?'}",
         "counts": ",".join(f"{k.removeprefix('DIFF_')}={v}" for k, v in sorted(counts.items())) or "-",
         "hint": first_hint,
+        "patterns": ",".join(patterns) or "-",
     }
     row["bucket"] = size_bucket(row["size"])
     return row
@@ -148,8 +215,11 @@ def print_rows(rows: list[dict[str, Any]], limit: int) -> None:
 
     show_attempts = any(row.get("attempt_count", 0) for row in rows[:limit])
     attempt_header = " attempts" if show_attempts else ""
-    print(f"{'cat':<10} {'pct':>8} {'diffs':>5} {'size':>5} {'unit':<11} {'symbol':<55} hint{attempt_header}")
-    print("-" * (130 if show_attempts else 120))
+    print(
+        f"{'cat':<10} {'pct':>8} {'diffs':>5} {'size':>5} {'unit':<11} "
+        f"{'symbol':<55} {'patterns':<28} hint{attempt_header}"
+    )
+    print("-" * (160 if show_attempts else 150))
     for row in rows[:limit]:
         attempt = ""
         if show_attempts:
@@ -158,7 +228,8 @@ def print_rows(rows: list[dict[str, Any]], limit: int) -> None:
                 attempt = f" {count}:{row.get('last_attempt_result', '')}"
         print(
             f"{row['category']:<10} {row['pct']:8.3f} {row['diff_count']:5d} {row['size']:5d} "
-            f"{short_unit(row['unit']):<11} {truncate(row['symbol'], 55):<55} {row['hint']}{attempt}"
+            f"{short_unit(row['unit']):<11} {truncate(row['symbol'], 55):<55} "
+            f"{truncate(row['patterns'], 28):<28} {row['hint']}{attempt}"
         )
     if len(rows) > limit:
         print(f"... {len(rows) - limit} more")
@@ -196,6 +267,7 @@ def print_detail(rows: list[dict[str, Any]], limit: int) -> None:
         print(f"  frame {row['frame']}")
         print(f"  save  {row['save']}")
         print(f"  diffs {row['counts']}")
+        print(f"  patt  {row['patterns']}")
         print(f"  hint  {row['hint']}")
 
 

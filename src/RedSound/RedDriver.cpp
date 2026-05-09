@@ -3833,15 +3833,19 @@ int CRedDriver::WavePitchCompute(int key, int pitch)
  */
 void CRedDriver::SetWaveTune(int key, int fineTune)
 {
-    if (p_EditorTrack != 0) {
-        p_EditorTrack->m_keyTranspose = key;
-        p_EditorTrack->m_fineTune = fineTune;
-        p_EditorTrack->m_pitch = 0;
-        p_EditorTrack->m_pitchBend = 0;
-        p_EditorTrack->m_pitchBendRaw = 0;
-        p_EditorTrack->m_pitchDelta = 0;
-        p_EditorTrack->m_portamentPitch = REDSOUND_TRACK_PORTAMENT_PITCH_NONE;
-        SetVoiceAccess(p_EditorTrack, REDSOUND_VOICE_FLAGS_PITCH_DIRTY);
+    RedTrackDATA* track = p_EditorTrack;
+
+    if (track != 0) {
+        track->m_keyTranspose = key;
+        track->m_fineTune = fineTune;
+        track->m_pitch = 0;
+        track->m_pitchBend = 0;
+        track->m_pitchBendRange = REDSOUND_NOTES_PER_OCTAVE;
+        track->m_pitchBendRaw = 0;
+        track->m_pitchDelta = 0;
+        track->m_portamentTime = 0;
+        track->m_portamentPitch = REDSOUND_TRACK_PORTAMENT_PITCH_NONE;
+        SetVoiceAccess(track, REDSOUND_VOICE_FLAGS_PITCH_DIRTY);
         m_ChangeStatus |= REDSOUND_VOICE_UPDATE_PITCH;
     }
 }

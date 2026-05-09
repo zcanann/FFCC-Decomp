@@ -3792,8 +3792,6 @@ void CRedDriver::StopWaveItem()
             voice = p_VoiceData + p_EditorVoice[index] - 1;
             voice->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
             voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-            voice->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SUSTAIN_PAUSE_MASK;
-            voice->m_track = 0;
             p_EditorVoice[index] = 0;
         }
     }
@@ -3833,20 +3831,11 @@ int CRedDriver::WavePitchCompute(int key, int pitch)
  */
 void CRedDriver::SetWaveTune(int key, int fineTune)
 {
-    RedVoiceDATA* voice;
-    int index;
-
     if (p_EditorTrack != 0) {
         p_EditorTrack->m_keyTranspose = key;
         p_EditorTrack->m_fineTune = fineTune;
-        for (index = 0; index < REDSOUND_EDITOR_VOICE_COUNT; index++) {
-            if (p_EditorVoice[index] != 0) {
-                voice = p_VoiceData + p_EditorVoice[index] - 1;
-                voice->m_pitch = WavePitchCompute(voice->m_key, p_EditorTrack->m_pitchBend);
-                voice->m_targetPitch = voice->m_pitch;
-                voice->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
-            }
-        }
+        SetVoiceAccess(p_EditorTrack, REDSOUND_VOICE_FLAGS_PITCH_DIRTY);
+        m_ChangeStatus |= REDSOUND_VOICE_UPDATE_PITCH;
     }
 }
 
@@ -3861,19 +3850,10 @@ void CRedDriver::SetWaveTune(int key, int fineTune)
  */
 void CRedDriver::SetWavePitch(int pitch)
 {
-    RedVoiceDATA* voice;
-    int index;
-
     if (p_EditorTrack != 0) {
         p_EditorTrack->m_pitch = pitch << REDSOUND_FIXED_SHIFT;
-        for (index = 0; index < REDSOUND_EDITOR_VOICE_COUNT; index++) {
-            if (p_EditorVoice[index] != 0) {
-                voice = p_VoiceData + p_EditorVoice[index] - 1;
-                voice->m_pitch = WavePitchCompute(voice->m_key, p_EditorTrack->m_pitchBend);
-                voice->m_targetPitch = voice->m_pitch;
-                voice->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
-            }
-        }
+        SetVoiceAccess(p_EditorTrack, REDSOUND_VOICE_FLAGS_PITCH_DIRTY);
+        m_ChangeStatus |= REDSOUND_VOICE_UPDATE_PITCH;
     }
 }
 
@@ -3888,19 +3868,10 @@ void CRedDriver::SetWavePitch(int pitch)
  */
 void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
 {
-    RedVoiceDATA* voice;
-    int index;
-
     if ((p_EditorTrack != 0) && (adsr != 0)) {
         memcpy(&p_EditorTrack->m_adsr, adsr, sizeof(RedAdsrDATA));
         p_EditorTrack->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = attack;
-        for (index = 0; index < REDSOUND_EDITOR_VOICE_COUNT; index++) {
-            if (p_EditorVoice[index] != 0) {
-                voice = p_VoiceData + p_EditorVoice[index] - 1;
-                memcpy(&voice->m_adsr, &p_EditorTrack->m_adsr, sizeof(RedAdsrDATA));
-                voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
-            }
-        }
+        SetVoiceAccess(p_EditorTrack, REDSOUND_VOICE_FLAGS_ADSR_DIRTY);
     }
 }
 

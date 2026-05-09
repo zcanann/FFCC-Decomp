@@ -176,18 +176,15 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
  */
 static RedSoundStreamBank* _SearchStreamBank(int streamID)
 {
-	RedSoundStreamBank* bank = p_StreamBank;
-
 	if (streamID == 0) {
 		return 0;
 	}
 
-	do {
+	for (RedSoundStreamBank* bank = p_StreamBank; bank < p_StreamBank + REDSOUND_STREAM_BANK_COUNT; bank++) {
 		if (bank->m_streamId == streamID) {
 			return bank;
 		}
-		bank++;
-	} while (bank < p_StreamBank + REDSOUND_STREAM_BANK_COUNT);
+	}
 
 	return 0;
 }

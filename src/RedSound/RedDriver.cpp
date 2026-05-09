@@ -1031,9 +1031,8 @@ static void _MusicNextPlay(int* command)
     }
 
     if (c_RedEntry.SearchMusicSequence(musicID) >= 0) {
+        *p_MusicNextPlay = *(RedMusicPlayCommand*)command;
         p_MusicNextPlay->m_musicId = musicID;
-        p_MusicNextPlay->m_volume = command[REDSOUND_MUSIC_COMMAND_VOLUME];
-        p_MusicNextPlay->m_mode = command[REDSOUND_MUSIC_COMMAND_MODE];
     }
 }
 

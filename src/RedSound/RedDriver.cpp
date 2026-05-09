@@ -1939,7 +1939,7 @@ void CRedDriver::Init()
     p_Stream = (RedStreamDATA*)RedNew(REDSOUND_STREAM_BUFFER_SIZE);
     memset(p_Stream, 0, REDSOUND_STREAM_BUFFER_SIZE);
     m_DMAMode = 0;
-    memset(m_DmaControl, 0, sizeof(m_DmaControl));
+    memset(m_DmaControl, 0, REDSOUND_DMA_CONTROL_SIZE);
     p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] = RedDriverMainDmaQueue();
     p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX] = RedDriverMainDmaQueue();
     p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] = RedDriverStreamDmaQueue();

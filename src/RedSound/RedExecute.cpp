@@ -1756,12 +1756,12 @@ void EnvelopeKeyExecute()
 
     while (true) {
         if (voiceData->m_active != 0) {
-            int voice;
+            AXVPB* voice;
 
             if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_START) != 0) {
-                voice = (int)voiceData->m_axVoice;
-                if ((voice != 0) && (((AXVPB*)voice)->priority != 0)) {
-                    AXFreeVoice((AXVPB*)voice);
+                voice = voiceData->m_axVoice;
+                if ((voice != 0) && (voice->priority != 0)) {
+                    AXFreeVoice(voice);
                     voiceData->m_axVoice = 0;
                 }
 
@@ -1777,7 +1777,7 @@ void EnvelopeKeyExecute()
                 }
             }
 
-            voice = (int)voiceData->m_axVoice;
+            voice = voiceData->m_axVoice;
             if (voice == 0) {
                 voiceData->m_flags = 0;
                 voiceData->m_active = 0;
@@ -1790,23 +1790,23 @@ void EnvelopeKeyExecute()
             if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_PITCH_DIRTY) != 0) {
                 int pitch = voiceData->m_targetPitch;
                 voiceFlags = AX_SYNC_FLAG_COPYRATIO;
-                ((AXVPB*)voice)->pb.src.ratioHi = (u16)(((u32)pitch >> 0x10) & 3);
-                ((AXVPB*)voice)->pb.src.ratioLo = (u16)pitch;
+                voice->pb.src.ratioHi = (u16)(((u32)pitch >> 0x10) & 3);
+                voice->pb.src.ratioLo = (u16)pitch;
             }
 
             if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_ADPCM_DIRTY) != 0) {
                 if ((voiceData->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAUSE) == 0) {
-                    memcpy(&((AXVPB*)voice)->pb.mix, &voiceData->m_axMix, sizeof(((AXVPB*)voice)->pb.mix));
+                    memcpy(&voice->pb.mix, &voiceData->m_axMix, sizeof(voice->pb.mix));
                 } else {
-                    memset(&((AXVPB*)voice)->pb.mix, 0, sizeof(((AXVPB*)voice)->pb.mix));
+                    memset(&voice->pb.mix, 0, sizeof(voice->pb.mix));
                 }
 
-                ((AXVPB*)voice)->pb.mixerCtrl = REDSOUND_AX_MIX_CTRL_DRY_STEREO;
+                voice->pb.mixerCtrl = REDSOUND_AX_MIX_CTRL_DRY_STEREO;
                 if ((voiceData->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
                     if ((voiceData->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
-                        ((AXVPB*)voice)->pb.mixerCtrl |= REDSOUND_AX_MIX_CTRL_AUX_A_STEREO;
+                        voice->pb.mixerCtrl |= REDSOUND_AX_MIX_CTRL_AUX_A_STEREO;
                     } else {
-                        ((AXVPB*)voice)->pb.mixerCtrl |= REDSOUND_AX_MIX_CTRL_AUX_B_STEREO;
+                        voice->pb.mixerCtrl |= REDSOUND_AX_MIX_CTRL_AUX_B_STEREO;
                     }
                 }
                 voiceFlags |= AX_SYNC_FLAG_COPYAXPBMIX | AX_SYNC_FLAG_COPYMXRCTRL;
@@ -1830,28 +1830,28 @@ void EnvelopeKeyExecute()
                               REDSOUND_AX_SAMPLE_ADDR_SCALE;
                     int keyBase = key - REDSOUND_AX_SAMPLE_ADDR_SCALE;
 
-                    *(u16*)(voice + REDSOUND_AX_VOICE_LOOP_OFFSET) =
+                    *(u16*)((u8*)voice + REDSOUND_AX_VOICE_LOOP_OFFSET) =
                         (u16)((voiceData->m_voiceSwitch & REDSOUND_VOICE_SWITCH_LOOP) != 0);
-                    ((AXVPB*)voice)->pb.srcSelect = 1;
-                    ((AXVPB*)voice)->pb.state = 1;
+                    voice->pb.srcSelect = 1;
+                    voice->pb.state = 1;
 
-                    memcpy(&((AXVPB*)voice)->pb.adpcm, &waveData->m_adpcm.m_data, REDSOUND_WAVE_ADPCM_DATA_SIZE);
-                    memcpy(&((AXVPB*)voice)->pb.adpcmLoop, &waveData->m_adpcm.m_loop, REDSOUND_WAVE_ADPCM_LOOP_SIZE);
-                    memset(((AXVPB*)voice)->pb.src.last_samples, 0, sizeof(((AXVPB*)voice)->pb.src.last_samples));
-                    ((AXVPB*)voice)->pb.addr.format = 0;
-                    *(u32*)&((AXVPB*)voice)->pb.addr.currentAddressHi = key;
+                    memcpy(&voice->pb.adpcm, &waveData->m_adpcm.m_data, REDSOUND_WAVE_ADPCM_DATA_SIZE);
+                    memcpy(&voice->pb.adpcmLoop, &waveData->m_adpcm.m_loop, REDSOUND_WAVE_ADPCM_LOOP_SIZE);
+                    memset(voice->pb.src.last_samples, 0, sizeof(voice->pb.src.last_samples));
+                    voice->pb.addr.format = 0;
+                    *(u32*)&voice->pb.addr.currentAddressHi = key;
 
                     if (waveData->m_loopStart < 0) {
-                        ((AXVPB*)voice)->pb.addr.loopFlag = 0;
+                        voice->pb.addr.loopFlag = 0;
                         key = keyBase;
                     } else {
-                        ((AXVPB*)voice)->pb.addr.loopFlag = 1;
+                        voice->pb.addr.loopFlag = 1;
                         key = keyBase + waveData->m_loopStart;
                     }
 
-                    ((AXVPB*)voice)->pb.addr.loopAddressHi = (u16)((u32)key >> 0x10);
-                    ((AXVPB*)voice)->pb.addr.loopAddressLo = (u16)key;
-                    *(u32*)&((AXVPB*)voice)->pb.addr.endAddressHi = keyBase + waveData->m_loopEnd;
+                    voice->pb.addr.loopAddressHi = (u16)((u32)key >> 0x10);
+                    voice->pb.addr.loopAddressLo = (u16)key;
+                    *(u32*)&voice->pb.addr.endAddressHi = keyBase + waveData->m_loopEnd;
 
                     voiceFlags |= AX_SYNC_FLAG_COPYADPCMLOOP | AX_SYNC_FLAG_COPYSRC | AX_SYNC_FLAG_COPYADPCM |
                                   AX_SYNC_FLAG_COPYCURADDR | AX_SYNC_FLAG_COPYADDR | AX_SYNC_FLAG_COPYTYPE |
@@ -1888,33 +1888,32 @@ void EnvelopeKeyExecute()
                 voiceData->m_active = 0;
                 voiceFlags |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
                 voiceData->m_track = 0;
-                ((AXVPB*)voice)->pb.state = 0;
+                voice->pb.state = 0;
                 voiceData->m_adsrCurrentLevel = 0;
                 voiceData->m_envelopeLevel = 0;
-                ((AXVPB*)voice)->pb.ve.currentVolume = 0;
-                ((AXVPB*)voice)->pb.ve.currentDelta = 0;
+                voice->pb.ve.currentVolume = 0;
+                voice->pb.ve.currentDelta = 0;
             } else if ((envChanged != 0) &&
-                       ((u32)((AXVPB*)voice)->pb.ve.currentVolume !=
+                       ((u32)voice->pb.ve.currentVolume !=
                         ((voiceData->m_adsrCurrentLevel >> REDSOUND_FIXED_SHIFT) & 0xFFFFU))) {
                 voiceFlags |= AX_SYNC_FLAG_COPYVOL;
-                ((AXVPB*)voice)->pb.ve.currentDelta = 0;
-                ((AXVPB*)voice)->pb.ve.currentVolume =
-                    (u16)(voiceData->m_adsrCurrentLevel >> REDSOUND_FIXED_SHIFT);
+                voice->pb.ve.currentDelta = 0;
+                voice->pb.ve.currentVolume = (u16)(voiceData->m_adsrCurrentLevel >> REDSOUND_FIXED_SHIFT);
             }
 
-            ((AXVPB*)voice)->sync |= voiceFlags;
+            voice->sync |= voiceFlags;
         } else {
             voiceData->m_envelopeLevel = 0;
             voiceData->m_waveData = 0;
-            int voice = (int)voiceData->m_axVoice;
+            AXVPB* voice = voiceData->m_axVoice;
             if (voice != 0) {
-                if (((AXVPB*)voice)->pb.state != 0) {
-                    ((AXVPB*)voice)->pb.state = 0;
-                    ((AXVPB*)voice)->pb.ve.currentVolume = 0;
-                    ((AXVPB*)voice)->sync |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
+                if (voice->pb.state != 0) {
+                    voice->pb.state = 0;
+                    voice->pb.ve.currentVolume = 0;
+                    voice->sync |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
                 } else {
-                    if (((AXVPB*)voice)->priority != 0) {
-                        AXFreeVoice((AXVPB*)voice);
+                    if (voice->priority != 0) {
+                        AXFreeVoice(voice);
                     }
                     voiceData->m_axVoice = 0;
                     voiceData->m_track = 0;

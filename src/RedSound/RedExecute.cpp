@@ -384,6 +384,7 @@ STATIC_ASSERT(offsetof(RedWaveDATA, m_reverbMix) == REDSOUND_WAVE_REVERB_MIX_OFF
 STATIC_ASSERT(offsetof(RedWaveDATA, m_reserved1D) == REDSOUND_WAVE_RESERVED1D_OFFSET);
 STATIC_ASSERT(sizeof(((RedWaveDATA*)0)->m_reserved1D) == REDSOUND_WAVE_RESERVED1D_SIZE);
 STATIC_ASSERT(offsetof(RedWaveDATA, m_adpcm) == REDSOUND_WAVE_ADPCM_OFFSET);
+STATIC_ASSERT(sizeof(((RedWaveDATA*)0)->m_adpcm) == REDSOUND_WAVE_ADPCM_INFO_SIZE);
 STATIC_ASSERT(offsetof(RedWaveDATA, m_adsr) == REDSOUND_WAVE_ADSR_OFFSET);
 STATIC_ASSERT(sizeof(((RedWaveDATA*)0)->m_adsr) == REDSOUND_WAVE_ADSR_SIZE);
 STATIC_ASSERT(offsetof(RedWaveDATA, m_reserved5C) == REDSOUND_WAVE_RESERVED5C_OFFSET);
@@ -425,8 +426,12 @@ STATIC_ASSERT(offsetof(RedVoiceDATA, m_reserved48) == REDSOUND_VOICE_RESERVED48_
 STATIC_ASSERT(sizeof(((RedVoiceDATA*)0)->m_reserved48) == REDSOUND_VOICE_RESERVED48_SIZE);
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsr) == REDSOUND_VOICE_ADSR_TIME_OFFSET);
 STATIC_ASSERT(offsetof(RedAdsrDATA, m_time) == 0);
+STATIC_ASSERT(sizeof(((RedAdsrDATA*)0)->m_time) ==
+              REDSOUND_VOICE_ADSR_TIME_COUNT * sizeof(unsigned short));
 STATIC_ASSERT(offsetof(RedAdsrDATA, m_level) ==
               REDSOUND_VOICE_ADSR_LEVEL_OFFSET - REDSOUND_VOICE_ADSR_TIME_OFFSET);
+STATIC_ASSERT(sizeof(((RedAdsrDATA*)0)->m_level) == REDSOUND_VOICE_ADSR_LEVEL_COUNT * sizeof(unsigned char));
+STATIC_ASSERT(sizeof(((RedVoiceDATA*)0)->m_adsr) == REDSOUND_TRACK_ADSR_SIZE);
 STATIC_ASSERT(sizeof(RedAdsrDATA) == REDSOUND_TRACK_ADSR_SIZE);
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrStage) == REDSOUND_VOICE_ADSR_STAGE_OFFSET);
 STATIC_ASSERT(offsetof(RedVoiceDATA, m_adsrStepFrames) == REDSOUND_VOICE_ADSR_STEP_FRAMES_WORD * sizeof(int));

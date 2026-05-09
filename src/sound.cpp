@@ -68,10 +68,6 @@ extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
-extern "C" int ReentryWaveData__9CRedSoundFi(CRedSound*, int);
-extern "C" unsigned int SetWaveData__9CRedSoundFiPvi(CRedSound*, int, void*, int);
-extern "C" void ClearWaveBank__9CRedSoundFi(CRedSound*, int);
-extern "C" void SetSeBlockData__9CRedSoundFiPv(CRedSound*, int, void*);
 extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, char*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(CMemory*, CMemory::CStage*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -1079,7 +1075,7 @@ void CSound::CancelLoadWaveASync()
         *reinterpret_cast<CFile::CHandle**>(self + 0x10) = 0;
         Printf__7CSystemFPce(&System, s_soundLoadWaveErrorFmt);
     }
-    SetWaveData__9CRedSoundFiPvi(reinterpret_cast<CRedSound*>(self + 8), -1, nullptr, 0);
+    reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, nullptr, 0);
 }
 
 /*
@@ -1233,7 +1229,7 @@ void CSound::LoadBlock()
     CSoundLayout& sound = SoundData(this);
     CFile::CHandle*& waveFile = sound.m_waveFile;
 
-    if (ReentryWaveData__9CRedSoundFi(redSound, 0) == -1) {
+    if (redSound->ReentryWaveData(0) == -1) {
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
@@ -1257,7 +1253,7 @@ void CSound::LoadBlock()
         }
     }
 
-    if (ReentryWaveData__9CRedSoundFi(redSound, 500) == -1) {
+    if (redSound->ReentryWaveData(500) == -1) {
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
@@ -1429,14 +1425,14 @@ void CSound::LoadWave(void* waveData)
     CRedSound* redSound = RedSound(this);
     CFile::CHandle*& waveFile = SoundData(this).m_waveFile;
 
-    if (ReentryWaveData__9CRedSoundFi(redSound, reinterpret_cast<s16*>(waveData)[1]) == -1) {
+    if (redSound->ReentryWaveData(reinterpret_cast<s16*>(waveData)[1]) == -1) {
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
             Printf__7CSystemFPce(&System, s_soundLoadWaveErrorFmt);
         }
-        SetWaveData__9CRedSoundFiPvi(redSound, -1, nullptr, 0);
-        SetWaveData__9CRedSoundFiPvi(redSound, -1, waveData, -1);
+        redSound->SetWaveData(-1, nullptr, 0);
+        redSound->SetWaveData(-1, waveData, -1);
     }
 }
 

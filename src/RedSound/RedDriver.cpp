@@ -3874,10 +3874,12 @@ void CRedDriver::SetWavePitch(int pitch)
  */
 void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
 {
-    if ((p_EditorTrack != 0) && (adsr != 0)) {
+    if ((p_EditorTrack != 0) && (p_EditorTrack->m_waveData != 0) && (adsr != 0)) {
+        memcpy(p_EditorTrack->m_waveData->m_adsr, adsr, sizeof(RedAdsrDATA));
         memcpy(&p_EditorTrack->m_adsr, adsr, sizeof(RedAdsrDATA));
         p_EditorTrack->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = attack;
         SetVoiceAccess(p_EditorTrack, REDSOUND_VOICE_FLAGS_ADSR_DIRTY);
+        SetVoiceAccess(p_EditorTrack, REDSOUND_VOICE_FLAGS_ADSR_START);
     }
 }
 

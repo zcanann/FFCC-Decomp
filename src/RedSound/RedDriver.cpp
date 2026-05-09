@@ -721,6 +721,57 @@ static void _ClearMusicData(int* command)
     c_RedEntry.ClearMusicData(command[REDSOUND_MUSIC_COMMAND_ID]);
 }
 
+static void _MusicPlaySequence(int* command);
+static void _MusicCrossPlaySequence(int* command);
+static void _MusicNextPlaySequence(int* command);
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 256b
+ * EN Address: UNUSED
+ * EN Size: 256b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _MusicPlay(int* command)
+{
+    int replayPoint;
+    int musicID;
+    RedMusicHEAD* musicHeader;
+    RedSoundCONTROL* soundControl;
+
+    musicHeader = c_RedEntry.SetMusicData((RedMusicHEAD*)command[REDSOUND_DATA_COMMAND_BUFFER]);
+    if (musicHeader == 0) {
+        return;
+    }
+
+    musicID = musicHeader->m_musicNo;
+    soundControl = p_SoundControlBuffer;
+    if ((musicID == soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
+        (musicID == soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) ||
+        (musicID == soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
+        return;
+    }
+    if (c_RedEntry.SearchMusicSequence(musicID) >= 0) {
+        replayPoint = command[REDSOUND_MUSIC_COMMAND_MODE];
+        if (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
+            if (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
+                MusicStop(soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId);
+            }
+            if (replayPoint == 0) {
+                replayPoint = p_MusicReplayPoint[musicID];
+                p_MusicReplayPoint[musicID] = 0;
+            }
+            if (replayPoint == 0) {
+                memcpy(&soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY], soundControl, sizeof(RedSoundCONTROL));
+                soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId = REDSOUND_MUSIC_ID_NONE;
+            }
+        }
+        MusicPlay(musicID, command[REDSOUND_MUSIC_COMMAND_VOLUME], replayPoint);
+    }
+}
+
 /*
  * --INFO--
  * PAL Address: 0x801bd080
@@ -849,6 +900,82 @@ static void _MusicCrossPlaySequence(int* command)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 516b
+ * EN Address: UNUSED
+ * EN Size: 516b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _MusicCrossPlay(int* command)
+{
+    RedSoundCONTROL* control;
+    RedSoundCONTROL* swapControl;
+    int replayPoint;
+    int musicID;
+    RedMusicHEAD* musicHeader;
+
+    musicHeader = c_RedEntry.SetMusicData((RedMusicHEAD*)command[REDSOUND_DATA_COMMAND_BUFFER]);
+    if (musicHeader == 0) {
+        return;
+    }
+
+    musicID = musicHeader->m_musicNo;
+    command[REDSOUND_MUSIC_COMMAND_ID] = musicID;
+    command[REDSOUND_MUSIC_COMMAND_FADE_TIME] =
+        command[REDSOUND_MUSIC_COMMAND_FADE_TIME] * REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
+    command[REDSOUND_MUSIC_COMMAND_FADE_TIME] =
+        command[REDSOUND_MUSIC_COMMAND_FADE_TIME] / REDSOUND_FRAMES_PER_SECOND;
+    if (command[REDSOUND_MUSIC_COMMAND_FADE_TIME] == 0) {
+        command[REDSOUND_MUSIC_COMMAND_FADE_TIME] = command[REDSOUND_MUSIC_COMMAND_FADE_TIME] + 1;
+    }
+    control = p_SoundControlBuffer;
+    if ((musicID != control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) &&
+        (musicID != control[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
+        if (musicID == control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) {
+            control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolumeAdd =
+                -control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolume / command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+            control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolumeDelta = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+            control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
+            control->m_masterVolumeAdd =
+                (REDSOUND_MASTER_VOLUME_FULL_FIXED_HALF -
+                 control->m_masterVolume) /
+                command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+            control->m_masterVolumeDelta = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+            swapControl = (RedSoundCONTROL*)RedNew(sizeof(RedSoundCONTROL));
+            memcpy(swapControl, &p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], sizeof(RedSoundCONTROL));
+            memcpy(&p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], p_SoundControlBuffer,
+                   sizeof(RedSoundCONTROL));
+            memcpy(p_SoundControlBuffer, swapControl, sizeof(RedSoundCONTROL));
+            RedDelete(swapControl);
+        } else {
+            if (c_RedEntry.SearchMusicSequence(musicID) >= 0) {
+                m_CrossTime = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+                replayPoint = 0;
+                if (control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
+                    if (control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
+                        MusicStop(control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId);
+                    }
+                    control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolumeAdd =
+                        -control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolume /
+                        command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+                    control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_masterVolumeDelta =
+                        command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+                    replayPoint = p_MusicReplayPoint[musicID];
+                    p_MusicReplayPoint[musicID] = 0;
+                    if (replayPoint == 0) {
+                        memcpy(&control[REDSOUND_CONTROL_MUSIC_SECONDARY], control, sizeof(RedSoundCONTROL));
+                        control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId = REDSOUND_MUSIC_ID_NONE;
+                    }
+                }
+                MusicPlay(musicID, command[REDSOUND_MUSIC_COMMAND_VOLUME], replayPoint);
+            }
+        }
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bd404
  * PAL Size: 164b
  * EN Address: TODO
@@ -868,6 +995,42 @@ static void _MusicNextPlaySequence(int* command)
     }
     if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
         p_MusicNextPlay->m_musicId = command[REDSOUND_MUSIC_COMMAND_ID];
+        p_MusicNextPlay->m_volume = command[REDSOUND_MUSIC_COMMAND_VOLUME];
+        p_MusicNextPlay->m_mode = command[REDSOUND_MUSIC_COMMAND_MODE];
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 184b
+ * EN Address: UNUSED
+ * EN Size: 184b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _MusicNextPlay(int* command)
+{
+    int musicID;
+    RedMusicHEAD* musicHeader;
+    RedSoundCONTROL* soundControl;
+
+    musicHeader = c_RedEntry.SetMusicData((RedMusicHEAD*)command[REDSOUND_DATA_COMMAND_BUFFER]);
+    if (musicHeader == 0) {
+        return;
+    }
+
+    musicID = musicHeader->m_musicNo;
+    command[REDSOUND_MUSIC_COMMAND_ID] = musicID;
+    soundControl = p_SoundControlBuffer;
+    if ((musicID == soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
+        (musicID == soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) ||
+        (musicID == soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
+        return;
+    }
+
+    if (c_RedEntry.SearchMusicSequence(musicID) >= 0) {
+        p_MusicNextPlay->m_musicId = musicID;
         p_MusicNextPlay->m_volume = command[REDSOUND_MUSIC_COMMAND_VOLUME];
         p_MusicNextPlay->m_mode = command[REDSOUND_MUSIC_COMMAND_MODE];
     }
@@ -2346,6 +2509,40 @@ int CRedDriver::MusicPlay(int musicID, int volume, int mode)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 272b
+ * EN Address: UNUSED
+ * EN Size: 272b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
+{
+    int result;
+    RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
+    RedMusicHEAD* copiedHeader;
+    int headerSize;
+
+    result = REDSOUND_MUSIC_ID_NONE;
+    if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
+         (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
+        (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
+        headerSize = header->m_size;
+        copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
+        if (copiedHeader != 0) {
+            memcpy(copiedHeader, header, headerSize);
+            result = copiedHeader->m_musicNo;
+            _EntryExecCommand(_MusicPlay, (int)copiedHeader, volume, mode, 0, 0, 0, 0);
+        }
+    } else if (m_ReportPrint != 0) {
+        OSReport(sRedDriverMusicHeaderErrorFmt, sRedDriverLogPrefix, sRedDriverLogWarnColor, sRedDriverLogReset);
+        fflush(__files + 1);
+    }
+    return result;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801beee8
  * PAL Size: 88b
  * EN Address: TODO
@@ -2361,6 +2558,40 @@ int CRedDriver::MusicCrossPlay(int musicID, int volume, int mode)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 272b
+ * EN Address: UNUSED
+ * EN Size: 272b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
+{
+    int result;
+    RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
+    RedMusicHEAD* copiedHeader;
+    int headerSize;
+
+    result = REDSOUND_MUSIC_ID_NONE;
+    if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
+         (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
+        (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
+        headerSize = header->m_size;
+        copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
+        if (copiedHeader != 0) {
+            memcpy(copiedHeader, header, headerSize);
+            result = copiedHeader->m_musicNo;
+            _EntryExecCommand(_MusicCrossPlay, (int)copiedHeader, volume, mode, 0, 0, 0, 0);
+        }
+    } else if (m_ReportPrint != 0) {
+        OSReport(sRedDriverMusicHeaderErrorFmt, sRedDriverLogPrefix, sRedDriverLogWarnColor, sRedDriverLogReset);
+        fflush(__files + 1);
+    }
+    return result;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bef40
  * PAL Size: 88b
  * EN Address: TODO
@@ -2372,6 +2603,40 @@ int CRedDriver::MusicNextPlay(int musicID, int volume, int mode)
 {
     _EntryExecCommand(_MusicNextPlaySequence, musicID, volume, mode, 0, 0, 0, 0);
     return musicID;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 272b
+ * EN Address: UNUSED
+ * EN Size: 272b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
+{
+    int result;
+    RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
+    RedMusicHEAD* copiedHeader;
+    int headerSize;
+
+    result = REDSOUND_MUSIC_ID_NONE;
+    if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
+         (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
+        (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
+        headerSize = header->m_size;
+        copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
+        if (copiedHeader != 0) {
+            memcpy(copiedHeader, header, headerSize);
+            result = copiedHeader->m_musicNo;
+            _EntryExecCommand(_MusicNextPlay, (int)copiedHeader, volume, mode, 0, 0, 0, 0);
+        }
+    } else if (m_ReportPrint != 0) {
+        OSReport(sRedDriverMusicHeaderErrorFmt, sRedDriverLogPrefix, sRedDriverLogWarnColor, sRedDriverLogReset);
+        fflush(__files + 1);
+    }
+    return result;
 }
 
 /*

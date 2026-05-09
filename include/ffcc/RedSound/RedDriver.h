@@ -49,8 +49,11 @@ public:
 	int MusicPlayState(int musicId);
 	void MusicStop(int musicId);
 	int MusicPlay(int musicId, int volume, int mode);
+	int MusicPlay(void* musicData, int volume, int mode);
 	int MusicCrossPlay(int musicId, int volume, int mode);
+	int MusicCrossPlay(void* musicData, int volume, int mode);
 	int MusicNextPlay(int musicId, int volume, int mode);
+	int MusicNextPlay(void* musicData, int volume, int mode);
 	void MusicMasterVolume(int volume);
 	void MusicFadeOut(int musicId, int frameCount);
 	void MusicVolume(int musicId, int volume, int frameCount);

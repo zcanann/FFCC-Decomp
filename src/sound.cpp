@@ -68,17 +68,11 @@ extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
-extern "C" int StreamPlayState__9CRedSoundFi(CRedSound*, int);
-extern "C" void StreamStop__9CRedSoundFi(CRedSound*, int);
-extern "C" int StreamPlay__9CRedSoundFPviii(CRedSound*, void*, int, int, int);
-extern "C" void StreamVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" int ReentryWaveData__9CRedSoundFi(CRedSound*, int);
 extern "C" int SePlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" int ReportSeLoop__9CRedSoundFi(CRedSound*, int);
 extern "C" int GetSeVolume__9CRedSoundFii(CRedSound*, int, int);
 extern "C" unsigned int SetWaveData__9CRedSoundFiPvi(CRedSound*, int, void*, int);
-extern "C" void SePause__9CRedSoundFii(CRedSound*, int, int);
-extern "C" void StreamPause__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void SeStop__9CRedSoundFi(CRedSound*, int);
 extern "C" void SeFadeOut__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void SePan__9CRedSoundFiii(CRedSound*, int, int, int);
@@ -2325,13 +2319,13 @@ void CSound::LoadStream(int streamID)
         bool isPlaying = false;
 
         if (sound.m_streamPlaying != 0) {
-            if (StreamPlayState__9CRedSoundFi(RedSound(this), sound.m_streamID) != 0) {
+            if (RedSound(this)->StreamPlayState(sound.m_streamID) != 0) {
                 isPlaying = true;
             }
         }
 
         if (isPlaying) {
-            StreamStop__9CRedSoundFi(RedSound(this), sound.m_streamID);
+            RedSound(this)->StreamStop(sound.m_streamID);
         }
 
         if (sound.m_streamFile != 0) {
@@ -2417,7 +2411,7 @@ void CSound::PlayStreamASync()
         }
     }
 
-    int streamNo = StreamPlay__9CRedSoundFPviii(redSound, streamBuffer, 0x20000, 0x40, clampedVolume);
+    int streamNo = redSound->StreamPlay(streamBuffer, 0x20000, 0x40, clampedVolume);
     sound.m_streamID = streamNo;
     sound.m_streamPlaying = 1;
 }
@@ -2437,14 +2431,14 @@ void CSound::StopStream()
     bool shouldStop = false;
 
     if (sound.m_streamPlaying != 0) {
-        int state = StreamPlayState__9CRedSoundFi(RedSound(this), sound.m_streamID);
+        int state = RedSound(this)->StreamPlayState(sound.m_streamID);
         if (state != 0) {
             shouldStop = true;
         }
     }
 
     if (shouldStop) {
-        StreamStop__9CRedSoundFi(RedSound(this), sound.m_streamID);
+        RedSound(this)->StreamStop(sound.m_streamID);
     }
 
     CFile::CHandle* handle = sound.m_streamFile;
@@ -2466,7 +2460,7 @@ void CSound::StopStream()
  */
 void CSound::SetStreamVolume(int volume, int frames)
 {
-    StreamVolume__9CRedSoundFiii(RedSound(this), -1, volume, frames);
+    RedSound(this)->StreamVolume(-1, volume, frames);
 }
 
 /*
@@ -2500,12 +2494,11 @@ void CSound::IsDebugPrint(int)
  */
 void CSound::PauseAllSe(int pause)
 {
-    u8* self = reinterpret_cast<u8*>(this);
+    CRedSound* redSound = RedSound(this);
 
-    SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1, static_cast<u32>(-pause | pause) >> 31);
-    StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1,
-                               (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
-    reinterpret_cast<CSoundLayout*>(self)->m_pauseAllSe = pause;
+    redSound->SePause(-1, static_cast<u32>(-pause | pause) >> 31);
+    redSound->StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
+    SoundData(this).m_pauseAllSe = pause;
 }
 
 /*

@@ -2078,7 +2078,7 @@ static void _ExecuteExtraData()
                 musicBase = soundControl->m_tracks;
                 voice = p_VoiceData;
                 do {
-                    if ((musicBase <= voice->m_track) &&
+                    if ((voice->m_track >= musicBase) &&
                         (voice->m_track < musicBase + soundControl->m_trackCount)) {
                         voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
                     }
@@ -2100,11 +2100,12 @@ static void _ExecuteExtraData()
         voice = p_VoiceData;
         do {
             if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
-                voice->m_pitch = PitchCompute(
-                    voice->m_basePitch + p_MusicPitchControl->m_value,
-                    (int)voice->m_track->m_keyTranspose + (int)voice->m_track->m_pitchBend,
-                    voice->m_waveData->m_pitch,
-                    voice->m_track->m_fineTune);
+                RedTrackDATA* voiceTrack = voice->m_track;
+                int pitchBase = voice->m_basePitch + p_MusicPitchControl->m_value;
+                int pitchOffset = (int)voiceTrack->m_keyTranspose + (int)voiceTrack->m_pitchBend;
+                voice->m_pitch = PitchCompute(pitchBase, pitchOffset,
+                                              voice->m_waveData->m_pitch,
+                                              voiceTrack->m_fineTune);
                 voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
             }
             voice++;

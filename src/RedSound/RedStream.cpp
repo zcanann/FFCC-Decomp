@@ -634,6 +634,7 @@ void SetStreamPan(int streamID, int pan, int frameCount)
 
 	pan &= REDSOUND_VOLUME_MAX;
 	pan <<= REDSOUND_FIXED_SHIFT;
+	pan |= REDSOUND_FIXED_HALF;
 
 	streamData = p_Stream;
 	do {

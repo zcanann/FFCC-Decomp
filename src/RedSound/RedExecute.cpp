@@ -2680,7 +2680,21 @@ void MusicSkipFunction()
 static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 {
 	RedVoiceDATA* voice;
-	int step;
+	int volumeStep;
+	int expressionStep;
+	int panStep;
+	int reverbStep;
+	int mixStep;
+	int pitchStep;
+	int sweepStep;
+	int vibrateRateStep;
+	int vibrateDepthStep;
+	int tremoloRateStep;
+	int tremoloDepthStep;
+	int shakeRateStep;
+	int shakeDepthStep;
+	int pitchModDelayStep;
+	int volumeModDelayStep;
 
 	if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0) {
 		return;
@@ -2692,85 +2706,85 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	}
 
 	if (track->m_volumeDelta != 0) {
-		if (frames < track->m_volumeDelta) {
-			step = frames;
+		if (track->m_volumeDelta > frames) {
+			volumeStep = frames;
 		} else {
-			step = track->m_volumeDelta;
+			volumeStep = track->m_volumeDelta;
 		}
-		track->m_volumeDelta -= step;
-		track->m_volume += track->m_volumeAdd * step;
+		track->m_volumeDelta -= volumeStep;
+		track->m_volume += track->m_volumeAdd * volumeStep;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
 	if (track->m_expressionDelta != 0) {
-		if (frames < track->m_expressionDelta) {
-			step = frames;
+		if (track->m_expressionDelta > frames) {
+			expressionStep = frames;
 		} else {
-			step = track->m_expressionDelta;
+			expressionStep = track->m_expressionDelta;
 		}
-		track->m_expressionDelta -= step;
-		track->m_expression += track->m_expressionAdd * step;
+		track->m_expressionDelta -= expressionStep;
+		track->m_expression += track->m_expressionAdd * expressionStep;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
 	if (track->m_panDelta != 0) {
-		if (frames < track->m_panDelta) {
-			step = frames;
+		if (track->m_panDelta > frames) {
+			panStep = frames;
 		} else {
-			step = track->m_panDelta;
+			panStep = track->m_panDelta;
 		}
-		track->m_panDelta -= step;
-		track->m_pan += track->m_panAdd * step;
+		track->m_panDelta -= panStep;
+		track->m_pan += track->m_panAdd * panStep;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
 	if (track->m_reverbDepthDelta != 0) {
-		if (frames < track->m_reverbDepthDelta) {
-			step = frames;
+		if (track->m_reverbDepthDelta > frames) {
+			reverbStep = frames;
 		} else {
-			step = track->m_reverbDepthDelta;
+			reverbStep = track->m_reverbDepthDelta;
 		}
-		track->m_reverbDepthDelta -= step;
-		track->m_reverbDepth += track->m_reverbDepthAdd * step;
+		track->m_reverbDepthDelta -= reverbStep;
+		track->m_reverbDepth += track->m_reverbDepthAdd * reverbStep;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
 	if (track->m_mixVolumeDelta != 0) {
-		if (frames < track->m_mixVolumeDelta) {
-			step = frames;
+		if (track->m_mixVolumeDelta > frames) {
+			mixStep = frames;
 		} else {
-			step = track->m_mixVolumeDelta;
+			mixStep = track->m_mixVolumeDelta;
 		}
-		track->m_mixVolumeDelta -= step;
+		track->m_mixVolumeDelta -= mixStep;
 		if ((track->m_mixVolumeDelta == 0) && (track->m_mixVolumeMode == 1)) {
 			track->m_command = (u8*)m_TerminateNote;
 			track->m_deltaTime = 1;
 		}
-		track->m_mixVolume += track->m_mixVolumeAdd * step;
+		track->m_mixVolume += track->m_mixVolumeAdd * mixStep;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
 	}
 
 	if (track->m_pitchDelta != 0) {
-		if (frames < track->m_pitchDelta) {
-			step = frames;
+		if (track->m_pitchDelta > frames) {
+			pitchStep = frames;
 		} else {
-			step = track->m_pitchDelta;
+			pitchStep = track->m_pitchDelta;
 		}
-		track->m_pitchDelta -= step;
-		track->m_pitch += track->m_pitchAdd * step;
+		track->m_pitchDelta -= pitchStep;
+		track->m_pitch += track->m_pitchAdd * pitchStep;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
 	}
 
 	if (track->m_sweepDelta != 0) {
-		if (frames < track->m_sweepDelta) {
-			step = frames;
+		if (track->m_sweepDelta > frames) {
+			sweepStep = frames;
 		} else {
-			step = track->m_sweepDelta;
+			sweepStep = track->m_sweepDelta;
 		}
-		track->m_sweepDelta -= step;
-		track->m_portamentPitch += step * track->m_sweepAdd;
+		track->m_sweepDelta -= sweepStep;
+		track->m_portamentPitch += sweepStep * track->m_sweepAdd;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
-		voice->m_basePitch += step * track->m_sweepAdd;
+		voice->m_basePitch += sweepStep * track->m_sweepAdd;
 	}
 
 	if (((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0) && (voice->m_waveData != 0)) {
@@ -2782,83 +2796,83 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 
 	if (track->m_vibrateFunc != 0) {
 		if (track->m_vibrateRateDelta != 0) {
-			if (frames < track->m_vibrateRateDelta) {
-				step = frames;
+			if (track->m_vibrateRateDelta > frames) {
+				vibrateRateStep = frames;
 			} else {
-				step = track->m_vibrateRateDelta;
+				vibrateRateStep = track->m_vibrateRateDelta;
 			}
-			track->m_vibrateRateDelta = track->m_vibrateRateDelta - (short)step;
-			track->m_vibrateRate += track->m_vibrateRateAdd * step;
+			track->m_vibrateRateDelta = track->m_vibrateRateDelta - (short)vibrateRateStep;
+			track->m_vibrateRate += track->m_vibrateRateAdd * vibrateRateStep;
 		}
 		if (track->m_vibrateDepthDelta != 0) {
-			if (frames < track->m_vibrateDepthDelta) {
-				step = frames;
+			if (track->m_vibrateDepthDelta > frames) {
+				vibrateDepthStep = frames;
 			} else {
-				step = track->m_vibrateDepthDelta;
+				vibrateDepthStep = track->m_vibrateDepthDelta;
 			}
-			track->m_vibrateDepthDelta = track->m_vibrateDepthDelta - (short)step;
-			track->m_vibrateDepth += track->m_vibrateDepthAdd * step;
+			track->m_vibrateDepthDelta = track->m_vibrateDepthDelta - (short)vibrateDepthStep;
+			track->m_vibrateDepth += track->m_vibrateDepthAdd * vibrateDepthStep;
 		}
 	}
 
 	if (track->m_tremoloFunc != 0) {
 		if (track->m_tremoloRateDelta != 0) {
-			if (frames < track->m_tremoloRateDelta) {
-				step = frames;
+			if (track->m_tremoloRateDelta > frames) {
+				tremoloRateStep = frames;
 			} else {
-				step = track->m_tremoloRateDelta;
+				tremoloRateStep = track->m_tremoloRateDelta;
 			}
-			track->m_tremoloRateDelta = track->m_tremoloRateDelta - (short)step;
-			track->m_tremoloRate += track->m_tremoloRateAdd * step;
+			track->m_tremoloRateDelta = track->m_tremoloRateDelta - (short)tremoloRateStep;
+			track->m_tremoloRate += track->m_tremoloRateAdd * tremoloRateStep;
 		}
 		if (track->m_tremoloDepthDelta != 0) {
-			if (frames < track->m_tremoloDepthDelta) {
-				step = frames;
+			if (track->m_tremoloDepthDelta > frames) {
+				tremoloDepthStep = frames;
 			} else {
-				step = track->m_tremoloDepthDelta;
+				tremoloDepthStep = track->m_tremoloDepthDelta;
 			}
-			track->m_tremoloDepthDelta = track->m_tremoloDepthDelta - (short)step;
-			track->m_tremoloDepth += track->m_tremoloDepthAdd * step;
+			track->m_tremoloDepthDelta = track->m_tremoloDepthDelta - (short)tremoloDepthStep;
+			track->m_tremoloDepth += track->m_tremoloDepthAdd * tremoloDepthStep;
 		}
 	}
 
 	if (track->m_shakeFunc != 0) {
 		if (track->m_shakeRateDelta != 0) {
-			if (frames < track->m_shakeRateDelta) {
-				step = frames;
+			if (track->m_shakeRateDelta > frames) {
+				shakeRateStep = frames;
 			} else {
-				step = track->m_shakeRateDelta;
+				shakeRateStep = track->m_shakeRateDelta;
 			}
-			track->m_shakeRateDelta = track->m_shakeRateDelta - (short)step;
-			track->m_shakeRate += track->m_shakeRateAdd * step;
+			track->m_shakeRateDelta = track->m_shakeRateDelta - (short)shakeRateStep;
+			track->m_shakeRate += track->m_shakeRateAdd * shakeRateStep;
 		}
 		if (track->m_shakeDepthDelta != 0) {
-			if (frames < track->m_shakeDepthDelta) {
-				step = frames;
+			if (track->m_shakeDepthDelta > frames) {
+				shakeDepthStep = frames;
 			} else {
-				step = track->m_shakeDepthDelta;
+				shakeDepthStep = track->m_shakeDepthDelta;
 			}
-			track->m_shakeDepthDelta = track->m_shakeDepthDelta - (short)step;
-			track->m_shakeDepth += track->m_shakeDepthAdd * step;
+			track->m_shakeDepthDelta = track->m_shakeDepthDelta - (short)shakeDepthStep;
+			track->m_shakeDepth += track->m_shakeDepthAdd * shakeDepthStep;
 		}
 	}
 
 	if (voice->m_pitchModDelay != 0) {
-		if (frames < voice->m_pitchModDelay) {
-			step = frames;
+		if (voice->m_pitchModDelay > frames) {
+			pitchModDelayStep = frames;
 		} else {
-			step = voice->m_pitchModDelay;
+			pitchModDelayStep = voice->m_pitchModDelay;
 		}
-		voice->m_pitchModDelay = voice->m_pitchModDelay - (short)step;
+		voice->m_pitchModDelay = voice->m_pitchModDelay - (short)pitchModDelayStep;
 	}
 
 	if (voice->m_volumeModDelay != 0) {
-		if (frames < voice->m_volumeModDelay) {
-			step = frames;
+		if (voice->m_volumeModDelay > frames) {
+			volumeModDelayStep = frames;
 		} else {
-			step = voice->m_volumeModDelay;
+			volumeModDelayStep = voice->m_volumeModDelay;
 		}
-		voice->m_volumeModDelay = voice->m_volumeModDelay - (short)step;
+		voice->m_volumeModDelay = voice->m_volumeModDelay - (short)volumeModDelayStep;
 	}
 }
 

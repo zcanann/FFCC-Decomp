@@ -3812,6 +3812,7 @@ int CRedDriver::WavePitchCompute(int key, int pitch)
 
     if ((p_EditorTrack != 0) && (p_EditorTrack->m_waveData != 0)) {
         basePitch += p_EditorTrack->m_pitch;
+        pitch += p_EditorTrack->m_pitchBend;
         return PitchCompute(basePitch, pitch + p_EditorTrack->m_keyTranspose,
                             p_EditorTrack->m_waveData->m_pitch,
                             p_EditorTrack->m_fineTune);

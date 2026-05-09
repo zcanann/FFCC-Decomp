@@ -23,6 +23,8 @@ enum RedSoundLocalSize {
 	REDSOUND_STANDBY_STATUS_ALLOC_SIZE = 0x100,
 	REDSOUND_BSS_SIZE = 0x10C,
 	REDSOUND_STREAM_BANK_SIZE = 0x100,
+	REDSOUND_STREAM_BANK_COUNT = 4,
+	REDSOUND_STREAM_BANK_ENTRY_SIZE = REDSOUND_STREAM_BANK_SIZE / REDSOUND_STREAM_BANK_COUNT,
 	REDSOUND_AUTO_ID_MASK = 0x7FFFFFFF,
 };
 
@@ -59,18 +61,27 @@ struct RedSoundBssState {
 	int m_standbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
 };
 
+struct RedSoundStreamBank {
+	int m_streamId;
+	void* m_streamData;
+	int m_fileSize;
+	int m_readPoint;
+	int m_reserved10;
+	u8 m_reserved14[REDSOUND_STREAM_BANK_ENTRY_SIZE - 0x14];
+};
+
 struct RedSoundSmallDataState {
 	CRedDriver m_driver;
 	u8 m_driverPadding[REDSOUND_SBSS_PADDING_SIZE];
 	volatile unsigned int m_autoId;
-	void* m_streamBank;
+	RedSoundStreamBank* m_streamBank;
 };
 
 // RedSound global linkage that is shared across Red* units.
 CRedDriver c_Driver;
 static int m_StandbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
 volatile unsigned int m_AutoID;
-static void* p_StreamBank;
+static RedSoundStreamBank* p_StreamBank;
 static const char sRedSoundMemorySettingError[] = "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
 static const char sRedSoundLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
 static const char sRedSoundAMemorySettingError[] = "%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
@@ -86,6 +97,7 @@ static const char sRedSoundLogInfoColor[] = "\x1B[4;34m";
 
 STATIC_ASSERT(sizeof(m_StandbyStatus) == REDSOUND_STANDBY_STATUS_SIZE);
 STATIC_ASSERT(sizeof(CRedSound) == REDSOUND_SOUND_OBJECT_SIZE);
+STATIC_ASSERT(sizeof(RedSoundStreamBank) == REDSOUND_STREAM_BANK_ENTRY_SIZE);
 STATIC_ASSERT(offsetof(RedSoundBssState, m_standbyStatus) == REDSOUND_STANDBY_STATUS_OFFSET);
 STATIC_ASSERT(sizeof(RedSoundBssState) == REDSOUND_BSS_SIZE);
 STATIC_ASSERT(REDSOUND_STANDBY_STATUS_SIZE == REDSOUND_STANDBY_STATUS_ALLOC_SIZE);
@@ -117,6 +129,59 @@ STATIC_ASSERT(sizeof(sRedSoundMemorySettingError) + sizeof(sRedSoundLogPrefix) +
               REDSOUND_RODATA_STRING_SIZE);
 STATIC_ASSERT(sizeof(sRedSoundLogErrorColor) + sizeof(sRedSoundLogReset) + sizeof(sRedSoundLogInfoColor) ==
               REDSOUND_SDATA2_STRING_SIZE);
+
+static RedSoundStreamBank* _SearchEmptyStreamBank();
+static RedSoundStreamBank* _SearchStreamBank(int streamID);
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 160b
+ * EN Address: UNUSED
+ * EN Size: 160b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static RedSoundStreamBank* _SearchEmptyStreamBank()
+{
+	RedSoundStreamBank* bank = p_StreamBank;
+
+	do {
+		if (bank->m_streamId == 0) {
+			return bank;
+		}
+		if (c_Driver.StreamPlayState(bank->m_streamId) == 0) {
+			memset(bank, 0, sizeof(RedSoundStreamBank));
+			return bank;
+		}
+		bank++;
+	} while (bank < p_StreamBank + REDSOUND_STREAM_BANK_COUNT);
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 88b
+ * EN Address: UNUSED
+ * EN Size: 88b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static RedSoundStreamBank* _SearchStreamBank(int streamID)
+{
+	RedSoundStreamBank* bank = p_StreamBank;
+
+	do {
+		if ((bank->m_streamId != 0) && (bank->m_streamId == streamID)) {
+			return bank;
+		}
+		bank++;
+	} while (bank < p_StreamBank + REDSOUND_STREAM_BANK_COUNT);
+
+	return 0;
+}
 
 /*
  * --INFO--
@@ -271,8 +336,8 @@ int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int ar
  */
 void CRedSound::Start()
 {
-#define redSoundStreamBank (*(void* volatile*)&p_StreamBank)
-	redSoundStreamBank = (void*)RedNew(REDSOUND_STREAM_BANK_SIZE);
+#define redSoundStreamBank (*(RedSoundStreamBank* volatile*)&p_StreamBank)
+	redSoundStreamBank = (RedSoundStreamBank*)RedNew(REDSOUND_STREAM_BANK_SIZE);
 	memset((void*)redSoundStreamBank, 0, REDSOUND_STREAM_BANK_SIZE);
 #undef redSoundStreamBank
 }
@@ -1152,8 +1217,9 @@ int CRedSound::GetSeUsedWave(int bank, int seNo)
 			int* entries = bankData->m_entries;
 			int entry = entries[seNo];
 			if (entry != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
+				entry &= REDSOUND_SE_BLOCK_ENTRY_MASK;
 				RedSeINFO* seInfo = (RedSeINFO*)((u8*)entries + bankData->m_seCount * sizeof(*entries) +
-				                                ((u32)entry & REDSOUND_SE_BLOCK_ENTRY_MASK));
+				                                entry);
 				return seInfo->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE + seInfo->m_waveNoLo;
 			}
 		}
@@ -1250,6 +1316,72 @@ RedStreamDATA* CRedSound::GetStreamPlayBlock(int streamID)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 244b
+ * EN Address: UNUSED
+ * EN Size: 244b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::StreamStandby(void* data, int fileSize)
+{
+	int id = 0;
+	RedStreamHEAD* streamHeader = (RedStreamHEAD*)data;
+
+	if (streamHeader->m_signature[0] == REDSOUND_STREAM_SIGNATURE_0 &&
+	    streamHeader->m_signature[1] == REDSOUND_STREAM_SIGNATURE_1 &&
+	    streamHeader->m_signature[2] == REDSOUND_STREAM_SIGNATURE_2) {
+		RedSoundStreamBank* bank = _SearchEmptyStreamBank();
+		if (bank != 0) {
+			id = GetAutoID();
+			bank->m_streamId = id;
+			bank->m_streamData = data;
+			bank->m_fileSize = fileSize;
+			bank->m_readPoint = REDSOUND_STREAM_PAGE_SIZE;
+			bank->m_reserved10 = 0;
+		}
+	} else if (m_ReportPrint != 0) {
+		OSReport(sRedSoundInvalidStreamData,
+		         sRedSoundLogPrefix, sRedSoundLogErrorColor,
+		         sRedSoundLogReset);
+		fflush(__files + 1);
+	}
+
+	return id;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 336b
+ * EN Address: UNUSED
+ * EN Size: 336b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::GetStreamReadPoint(int streamID, int* readPoint)
+{
+	int playPoint;
+	int currentReadPoint;
+	RedSoundStreamBank* bank = _SearchStreamBank(streamID);
+
+	if (readPoint != 0) {
+		*readPoint = 0;
+	}
+
+	if (bank != 0) {
+		playPoint = 0;
+		currentReadPoint = bank->m_readPoint;
+		c_Driver.GetStreamPlayPoint(streamID, &playPoint, &currentReadPoint);
+		bank->m_readPoint = currentReadPoint;
+		if (readPoint != 0) {
+			*readPoint = currentReadPoint;
+		}
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd5ac
  * PAL Size: 44b
  * EN Address: TODO
@@ -1289,6 +1421,27 @@ int CRedSound::StreamPlay(void* data, int fileSize, int pan, int volume)
 	}
 
 	return id;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 112b
+ * EN Address: UNUSED
+ * EN Size: 112b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::StreamPlay(int streamID, int pan, int volume)
+{
+	RedSoundStreamBank* bank = _SearchStreamBank(streamID);
+
+	if (bank != 0) {
+		c_Driver.StreamPlay(bank->m_streamId, bank->m_streamData, bank->m_fileSize, pan, volume);
+		return bank->m_streamId;
+	}
+
+	return 0;
 }
 
 /*

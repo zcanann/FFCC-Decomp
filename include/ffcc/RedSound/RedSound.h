@@ -103,8 +103,11 @@ public:
 	int StreamPlayState(int streamId);
 	void GetStreamPlayPoint(int streamId, int* current, int* total);
 	RedStreamDATA* GetStreamPlayBlock(int streamId);
+	int StreamStandby(void* streamHeader, int fileSize);
+	void GetStreamReadPoint(int streamId, int* readPoint);
 	void StreamStop(int streamId);
 	int StreamPlay(void* streamHeader, int fileSize, int pan, int volume);
+	int StreamPlay(int streamId, int pan, int volume);
 	void StreamVolume(int streamId, int volume, int frameCount);
 	void StreamPan(int streamId, int pan, int frameCount);
 	void StreamPause(int streamId, int pause);

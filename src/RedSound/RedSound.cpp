@@ -1487,20 +1487,6 @@ void CRedSound::StreamVolume(int streamID, int volume, int frameCount)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 60b
- * EN Address: UNUSED
- * EN Size: 60b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::StreamPan(int streamID, int pan, int frameCount)
-{
-	c_Driver.StreamPan(streamID, pan, frameCount);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801cd6f4
  * PAL Size: 52b
  * EN Address: TODO

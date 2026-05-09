@@ -806,8 +806,8 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		music->m_masterVolumeDelta = 0;
 	}
 
-	RedTrackDATA* trackBase = (RedTrackDATA*)RedNew(musicHead->m_trackCount * REDSOUND_TRACK_SIZE);
-	if (trackBase == 0) {
+	RedTrackDATA* track = (RedTrackDATA*)RedNew(musicHead->m_trackCount * REDSOUND_TRACK_SIZE);
+	if (track == 0) {
 		if (m_ReportPrint != 0) {
 			OSReport(sRedCommandMusicTrackCreateErrorFmt,
 			         sRedCommandLogPrefix, sRedCommandLogErrorColor, sRedCommandLogReset);
@@ -821,7 +821,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		return (RedTrackDATA*)-1;
 	}
 
-	music->m_tracks = trackBase;
+	music->m_tracks = track;
 
 	if (musicHead->m_reverbKind != 0) {
 		unsigned int reverbKind = ((int)musicHead->m_reverbKind - 1U) & REDSOUND_REVERB_MODE_INDEX_MASK;
@@ -838,7 +838,6 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	music->m_waveNo = musicHead->m_waveNo;
 
 	RedMusicTrackBlock* current = reinterpret_cast<RedMusicTrackBlock*>(musicHead + 1);
-	RedTrackDATA* track = music->m_tracks;
 	int count = musicHead->m_trackCount;
 	char trackNo = 0;
 	while (count != 0) {

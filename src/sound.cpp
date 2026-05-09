@@ -69,9 +69,6 @@ extern double DOUBLE_80330d28;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
 extern "C" int ReentryWaveData__9CRedSoundFi(CRedSound*, int);
-extern "C" int SePlayState__9CRedSoundFi(CRedSound*, int);
-extern "C" int ReportSeLoop__9CRedSoundFi(CRedSound*, int);
-extern "C" int GetSeVolume__9CRedSoundFii(CRedSound*, int, int);
 extern "C" unsigned int SetWaveData__9CRedSoundFiPvi(CRedSound*, int, void*, int);
 extern "C" void SeStop__9CRedSoundFi(CRedSound*, int);
 extern "C" void SeFadeOut__9CRedSoundFii(CRedSound*, int, int);
@@ -79,8 +76,6 @@ extern "C" void SePan__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void SePitch__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void SeVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" int SePlay__9CRedSoundFiiiii(CRedSound*, int, int, int, int, int);
-extern "C" void SetReverb__9CRedSoundFii(CRedSound*, int, int);
-extern "C" void SetReverbDepth__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void ClearWaveBank__9CRedSoundFi(CRedSound*, int);
 extern "C" void SetSeBlockData__9CRedSoundFiPv(CRedSound*, int, void*);
 extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, char*, int);
@@ -422,8 +417,8 @@ void CSound::Init()
 
     RedSound(this)->MusicMasterVolume(SoundData(this).m_bgmMasterVolume);
     RedSound(this)->SeMasterVolume(SoundData(this).m_seMasterVolume);
-    SetReverb__9CRedSoundFii(RedSound(this), 1, 4);
-    SetReverbDepth__9CRedSoundFiii(RedSound(this), 1, 0x40, 0xF);
+    RedSound(this)->SetReverb(1, 4);
+    RedSound(this)->SetReverbDepth(1, 0x40, 0xF);
 
     SoundData(this).m_waveFile = 0;
     SoundData(this).m_streamFile = 0;
@@ -817,13 +812,13 @@ void CSound::Frame()
                     *se &= 0xBF;
                 }
             } else {
-                if (SePlayState__9CRedSoundFi(redSound, *reinterpret_cast<int*>(se + 8)) == 0) {
+                if (redSound->SePlayState(*reinterpret_cast<int*>(se + 8)) == 0) {
                     *se &= 0x7F;
                 } else {
-                    int playing = ReportSeLoop__9CRedSoundFi(redSound, *reinterpret_cast<int*>(se + 8));
+                    int playing = redSound->ReportSeLoop(*reinterpret_cast<int*>(se + 8));
                     if ((playing != 0) &&
-                        (GetSeVolume__9CRedSoundFii(redSound, *reinterpret_cast<int*>(se + 8), 0) == 0) &&
-                        (GetSeVolume__9CRedSoundFii(redSound, *reinterpret_cast<int*>(se + 8), 1) == 0)) {
+                        (redSound->GetSeVolume(*reinterpret_cast<int*>(se + 8), 0) == 0) &&
+                        (redSound->GetSeVolume(*reinterpret_cast<int*>(se + 8), 1) == 0)) {
                         if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
                             Printf__7CSystemFPce(&System, s_soundEnvSeStopFmt, *reinterpret_cast<int*>(se + 0xC));
                         }

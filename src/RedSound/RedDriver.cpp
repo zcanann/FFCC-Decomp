@@ -504,7 +504,7 @@ volatile int m_MasterSEVolume;
 RedStreamDATA* volatile p_Stream;
 static int m_DMAMode;
 volatile int m_SeSkipStep;
-static int m_SilentWave;
+int m_SilentWave;
 RedVoiceDATA* volatile p_VoiceData;
 int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
 RedTrackDATA* p_EditorTrack;

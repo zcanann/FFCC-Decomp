@@ -1134,6 +1134,52 @@ int CRedSound::CheckSeSepEntry(int id)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 180b
+ * EN Address: UNUSED
+ * EN Size: 180b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::GetSeUsedWave(int bank, int seNo)
+{
+	bank &= REDSOUND_SE_BLOCK_BANK_MASK;
+	seNo &= REDSOUND_SE_BLOCK_SEQUENCE_MASK;
+
+	if (p_SeBlockData[bank] != 0) {
+		RedSeBlockHEAD* bankData = p_SeBlockData[bank];
+		if (seNo < bankData->m_seCount) {
+			int* entries = bankData->m_entries;
+			int entry = entries[seNo];
+			if (entry != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
+				RedSeINFO* seInfo = (RedSeINFO*)((u8*)entries + bankData->m_seCount * sizeof(*entries) +
+				                                ((u32)entry & REDSOUND_SE_BLOCK_ENTRY_MASK));
+				return seInfo->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE + seInfo->m_waveNoLo;
+			}
+		}
+	}
+
+	return REDSOUND_SE_PLAY_FAILED;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: UNUSED
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::GetSeUsedWave(void* seSepData)
+{
+	RedSeSepHEAD* seSep = (RedSeSepHEAD*)seSepData;
+	RedSeINFO* seInfo = (RedSeINFO*)&seSep->m_seInfoFlags;
+	return seInfo->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE + seInfo->m_waveNoLo;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd4f4
  * PAL Size: 44b
  * EN Address: TODO

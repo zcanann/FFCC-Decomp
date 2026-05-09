@@ -86,6 +86,8 @@ public:
 	int SePlay(int bank, int sep, int pan, int volume, int pitch);
 	int SePlay(void* seSepData, int pan, int volume, int pitch);
 	int CheckSeSepEntry(int sepId);
+	int GetSeUsedWave(int bank, int seNo);
+	int GetSeUsedWave(void* seSepData);
 	void SeMasterVolume(int volume);
 	void SeFadeOut(int seId, int frameCount);
 	void SeVolume(int seId, int volume, int frameCount);

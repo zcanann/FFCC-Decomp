@@ -1709,7 +1709,7 @@ void EnvelopeKeyExecute()
                     voiceData[REDSOUND_VOICE_AX_VOICE_WORD] = 0;
                 }
 
-                if ((((u8*)voiceData)[REDSOUND_VOICE_STATE_FLAGS_OFFSET] & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
+                if ((((RedVoiceDATA*)voiceData)->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
                     voiceData[REDSOUND_VOICE_AX_VOICE_WORD] =
                         (int)AXAcquireVoice(REDSOUND_VOICE_INDEX_MASK, _VoiceDropedCallback, 0);
                 } else {

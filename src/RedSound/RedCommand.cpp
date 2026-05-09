@@ -421,7 +421,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	seq = info->m_sequence;
 	attrMask = info->m_attrMask;
 	count = info->m_flagsAndCount & REDSOUND_SE_INFO_COUNT_MASK;
-	current = (unsigned char*)seq + count * REDSOUND_SE_INFO_SEQUENCE_ENTRY_SIZE;
+	current = reinterpret_cast<unsigned char*>(seq + count);
 	do {
 		remaining = count;
 		if (sepId != REDSOUND_SEP_DIRECT_PLAY_ID) {
@@ -521,7 +521,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			}
 
 			remaining = remaining - 1;
-			seq = (RedSeInfoSequence*)((unsigned char*)seq + REDSOUND_SE_INFO_SEQUENCE_ENTRY_SIZE);
+			seq++;
 			count = count - 1;
 			if (remaining == 0) {
 				break;
@@ -829,7 +829,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_count = 0;
 	music->m_waveNo = musicHead->m_waveNo;
 
-	RedMusicTrackBlock* current = (RedMusicTrackBlock*)((unsigned char*)musicHead + REDSOUND_MUSIC_HEADER_SIZE);
+	RedMusicTrackBlock* current = reinterpret_cast<RedMusicTrackBlock*>(musicHead + 1);
 	RedTrackDATA* track = music->m_tracks;
 	int count = musicHead->m_trackCount;
 	char trackNo = 0;

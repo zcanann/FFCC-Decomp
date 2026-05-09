@@ -399,8 +399,8 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	int isMulti;
 
 	p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_updateFlags = 0;
-	deltaTime = (unsigned int)info->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE +
-	            (unsigned int)info->m_waveNoLo;
+	deltaTime = (unsigned int)info->m_waveNoLo +
+	            (unsigned int)info->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE;
 	waveBase = c_RedEntry.SearchWaveBase(deltaTime);
 	if (waveBase != 0) {
 		c_RedEntry.WaveHistoryManager(1, waveBase->m_waveNo);
@@ -445,8 +445,8 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			track->m_waveBankData = waveBase;
 			track->m_command = current;
 			current = current +
-			          (((unsigned int)seq->m_offsetHiAndFlags * REDSOUND_SE_INFO_U16_HIGH_SCALE +
-			            (unsigned int)seq->m_offsetLo) &
+			          (((unsigned int)seq->m_offsetLo +
+			            (unsigned int)seq->m_offsetHiAndFlags * REDSOUND_SE_INFO_U16_HIGH_SCALE) &
 			           REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK);
 			deltaTime = (int)DeltaTimeSumup((unsigned char**)&track->m_command);
 			track->m_deltaTime = deltaTime + 1;

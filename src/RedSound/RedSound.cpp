@@ -147,10 +147,11 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
 	RedSoundStreamBank* bank = p_StreamBank;
 
 	do {
-		if (bank->m_streamId == 0) {
+		int id = bank->m_streamId;
+		if (id == 0) {
 			return bank;
 		}
-		if (c_Driver.StreamPlayState(bank->m_streamId) == 0) {
+		if (c_Driver.StreamPlayState(id) == 0) {
 			memset(bank, 0, sizeof(RedSoundStreamBank));
 			return bank;
 		}
@@ -174,7 +175,8 @@ static RedSoundStreamBank* _SearchStreamBank(int streamID)
 	RedSoundStreamBank* bank = p_StreamBank;
 
 	do {
-		if ((bank->m_streamId != 0) && (bank->m_streamId == streamID)) {
+		int id = bank->m_streamId;
+		if ((streamID != 0) && (id == streamID)) {
 			return bank;
 		}
 		bank++;
@@ -1434,14 +1436,15 @@ int CRedSound::StreamPlay(void* data, int fileSize, int pan, int volume)
  */
 int CRedSound::StreamPlay(int streamID, int pan, int volume)
 {
+	int result = 0;
 	RedSoundStreamBank* bank = _SearchStreamBank(streamID);
 
 	if (bank != 0) {
 		c_Driver.StreamPlay(bank->m_streamId, bank->m_streamData, bank->m_fileSize, pan, volume);
-		return bank->m_streamId;
+		result = bank->m_streamId;
 	}
 
-	return 0;
+	return result;
 }
 
 /*

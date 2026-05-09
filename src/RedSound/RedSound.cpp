@@ -130,65 +130,6 @@ STATIC_ASSERT(sizeof(sRedSoundMemorySettingError) + sizeof(sRedSoundLogPrefix) +
 STATIC_ASSERT(sizeof(sRedSoundLogErrorColor) + sizeof(sRedSoundLogReset) + sizeof(sRedSoundLogInfoColor) ==
               REDSOUND_SDATA2_STRING_SIZE);
 
-static RedSoundStreamBank* _SearchEmptyStreamBank();
-static RedSoundStreamBank* _SearchStreamBank(int streamID);
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 160b
- * EN Address: UNUSED
- * EN Size: 160b
- * JP Address: TODO
- * JP Size: TODO
- */
-static RedSoundStreamBank* _SearchEmptyStreamBank()
-{
-	RedSoundStreamBank* bank = p_StreamBank;
-
-	do {
-		int id = bank->m_streamId;
-		if (id == 0) {
-			return bank;
-		}
-		if (c_Driver.StreamPlayState(id) == 0) {
-			bank->m_streamId = 0;
-			bank->m_streamData = 0;
-			bank->m_fileSize = 0;
-			bank->m_readPoint = 0;
-			bank->m_playPoint = 0;
-			return bank;
-		}
-		bank++;
-	} while (bank < p_StreamBank + REDSOUND_STREAM_BANK_COUNT);
-
-	return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 88b
- * EN Address: UNUSED
- * EN Size: 88b
- * JP Address: TODO
- * JP Size: TODO
- */
-static RedSoundStreamBank* _SearchStreamBank(int streamID)
-{
-	if (streamID == 0) {
-		return 0;
-	}
-
-	for (RedSoundStreamBank* bank = p_StreamBank; bank < p_StreamBank + REDSOUND_STREAM_BANK_COUNT; bank++) {
-		if (bank->m_streamId == streamID) {
-			return bank;
-		}
-	}
-
-	return 0;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801cca34
@@ -427,20 +368,6 @@ int CRedSound::ReportStandby(int id)
 	}
 
 	return result;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 40b
- * EN Address: UNUSED
- * EN Size: 40b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::Sleep(int microseconds)
-{
-	RedSleep(microseconds);
 }
 
 /*
@@ -951,92 +878,6 @@ void CRedSound::GetStreamPlayPoint(int streamID, int* point1, int* point2)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 244b
- * EN Address: UNUSED
- * EN Size: 244b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedSound::StreamStandby(void* data, int fileSize)
-{
-	int id = 0;
-	RedStreamHEAD* streamHeader = (RedStreamHEAD*)data;
-
-	if (streamHeader->m_signature[0] != REDSOUND_STREAM_SIGNATURE_0 ||
-	    streamHeader->m_signature[1] != REDSOUND_STREAM_SIGNATURE_1 ||
-	    streamHeader->m_signature[2] != REDSOUND_STREAM_SIGNATURE_2) {
-		if (m_ReportPrint != 0) {
-			OSReport(sRedSoundInvalidStreamData,
-			         sRedSoundLogPrefix, sRedSoundLogErrorColor,
-			         sRedSoundLogReset);
-			fflush(__files + 1);
-		}
-		return id;
-	}
-
-	RedSoundStreamBank* bank = _SearchEmptyStreamBank();
-	if (bank != 0) {
-		id = GetAutoID();
-		bank->m_streamId = id;
-		bank->m_streamData = data;
-		bank->m_fileSize = fileSize;
-		bank->m_readPoint = REDSOUND_STREAM_PAGE_SIZE;
-		bank->m_playPoint = 0;
-	}
-
-	return id;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 336b
- * EN Address: UNUSED
- * EN Size: 336b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::GetStreamReadPoint(int streamID, int* readPoint)
-{
-	int playPoint;
-	int currentReadPoint;
-	int readStep;
-	RedSoundStreamBank* bank = _SearchStreamBank(streamID);
-
-	if (readPoint != 0) {
-		*readPoint = 0;
-	}
-
-	if (bank != 0) {
-		playPoint = bank->m_playPoint;
-		currentReadPoint = bank->m_readPoint;
-		c_Driver.GetStreamPlayPoint(streamID, &playPoint, &currentReadPoint);
-		readStep = ((RedStreamHEAD*)bank->m_streamData)->m_channelCount * REDSOUND_STREAM_PAGE_SIZE;
-		while (bank->m_playPoint != playPoint) {
-			bank->m_playPoint += readStep;
-			if (bank->m_playPoint >= bank->m_fileSize) {
-				bank->m_playPoint -= bank->m_fileSize;
-			}
-			bank->m_readPoint += readStep;
-			if (bank->m_readPoint >= bank->m_fileSize) {
-				bank->m_readPoint -= bank->m_fileSize;
-			}
-		}
-		if (bank->m_readPoint == currentReadPoint) {
-			bank->m_readPoint += readStep;
-			if (bank->m_readPoint >= bank->m_fileSize) {
-				bank->m_readPoint -= bank->m_fileSize;
-			}
-		}
-		if (readPoint != 0) {
-			*readPoint = bank->m_readPoint;
-		}
-	}
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801cd5ac
  * PAL Size: 44b
  * EN Address: TODO
@@ -1076,28 +917,6 @@ int CRedSound::StreamPlay(void* data, int fileSize, int pan, int volume)
 	}
 
 	return id;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 112b
- * EN Address: UNUSED
- * EN Size: 112b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedSound::StreamPlay(int streamID, int pan, int volume)
-{
-	int result = 0;
-	RedSoundStreamBank* bank = _SearchStreamBank(streamID);
-
-	if (bank != 0) {
-		c_Driver.StreamPlay(bank->m_streamId, bank->m_streamData, bank->m_fileSize, pan, volume);
-		result = bank->m_streamId;
-	}
-
-	return result;
 }
 
 /*

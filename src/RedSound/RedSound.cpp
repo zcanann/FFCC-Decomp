@@ -66,7 +66,7 @@ struct RedSoundStreamBank {
 	void* m_streamData;
 	int m_fileSize;
 	int m_readPoint;
-	int m_reserved10;
+	int m_playPoint;
 	u8 m_reserved14[REDSOUND_STREAM_BANK_ENTRY_SIZE - 0x14];
 };
 
@@ -156,7 +156,7 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
 			bank->m_streamData = 0;
 			bank->m_fileSize = 0;
 			bank->m_readPoint = 0;
-			bank->m_reserved10 = 0;
+			bank->m_playPoint = 0;
 			return bank;
 		}
 		bank++;
@@ -1353,7 +1353,7 @@ int CRedSound::StreamStandby(void* data, int fileSize)
 		bank->m_streamData = data;
 		bank->m_fileSize = fileSize;
 		bank->m_readPoint = REDSOUND_STREAM_PAGE_SIZE;
-		bank->m_reserved10 = 0;
+		bank->m_playPoint = 0;
 	}
 
 	return id;
@@ -1379,9 +1379,10 @@ void CRedSound::GetStreamReadPoint(int streamID, int* readPoint)
 	}
 
 	if (bank != 0) {
-		playPoint = 0;
+		playPoint = bank->m_playPoint;
 		currentReadPoint = bank->m_readPoint;
 		c_Driver.GetStreamPlayPoint(streamID, &playPoint, &currentReadPoint);
+		bank->m_playPoint = playPoint;
 		bank->m_readPoint = currentReadPoint;
 		if (readPoint != 0) {
 			*readPoint = currentReadPoint;

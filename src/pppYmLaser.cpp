@@ -253,8 +253,8 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 3));
 		u8 alpha = 0;
 		for (i = 0; (int)i < (int)(step->m_laser.m_pointCount - 1); i++) {
-			u0 = (float)i * uvStep;
-			u1 = (float)(i + 1) * uvStep;
+			u0 = uvStep * (float)i;
+			u1 = uvStep * (float)(i + 1);
 			_GXColor trailStartColor;
 			trailStartColor.r = color.r;
 			trailStartColor.g = color.g;

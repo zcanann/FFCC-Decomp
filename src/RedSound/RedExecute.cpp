@@ -191,6 +191,13 @@ struct RedExecuteSmallDataState {
     RedKeyOnDATA* volatile m_skipKeyOn;
 };
 
+struct RedSavedTrackDATA {
+    unsigned char* m_command[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+    int m_delta[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+    unsigned int m_flags[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+    RedNoteDATA m_note[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+};
+
 enum RedReverbDelayChannelIndex {
     REDSOUND_REVERB_DELAY_LEFT = 0,
     REDSOUND_REVERB_DELAY_RIGHT = 1,
@@ -329,6 +336,10 @@ STATIC_ASSERT(sizeof(RedReverbDATA) == REDSOUND_REVERB_SIZE);
 STATIC_ASSERT(offsetof(RedReverbSize, m_requested) == REDSOUND_REVERB_SIZE_REQUESTED_OFFSET);
 STATIC_ASSERT(offsetof(RedReverbSize, m_aligned) == REDSOUND_REVERB_SIZE_ALIGNED_OFFSET);
 STATIC_ASSERT(sizeof(RedReverbSize) == REDSOUND_REVERB_SIZE_SIZE);
+STATIC_ASSERT(offsetof(RedSavedTrackDATA, m_delta) == REDSOUND_MUSIC_TRACK_SAVE_COUNT * sizeof(int));
+STATIC_ASSERT(offsetof(RedSavedTrackDATA, m_flags) == REDSOUND_MUSIC_TRACK_SAVE_COUNT * 2 * sizeof(int));
+STATIC_ASSERT(offsetof(RedSavedTrackDATA, m_note) == REDSOUND_MUSIC_TRACK_SAVE_COUNT * 3 * sizeof(int));
+STATIC_ASSERT(sizeof(RedSavedTrackDATA) == REDSOUND_MUSIC_TRACK_SAVE_COUNT * 4 * sizeof(int));
 STATIC_ASSERT(offsetof(AXFX_REVERBSTD, tempDisableFX) == REDSOUND_AXFX_REVERB_STD_TEMP_DISABLE_OFFSET);
 STATIC_ASSERT(offsetof(AXFX_REVERBSTD, coloration) == REDSOUND_AXFX_REVERB_STD_COLORATION_OFFSET);
 STATIC_ASSERT(offsetof(AXFX_REVERBSTD, mix) == REDSOUND_AXFX_REVERB_STD_MIX_OFFSET);
@@ -2452,10 +2463,7 @@ static void _MusicNoteExecute()
     int i;
     u32 trackCount;
     RedTrackDATA* track;
-    u8** savedCommand;
-    int* savedDelta;
-    unsigned int* savedFlags;
-    RedNoteDATA* savedNote;
+    RedSavedTrackDATA* savedTrackData;
     int status = _MusicMidiNoteExecute(p_SoundControl, p_KeyOnData, 1);
 
     while ((status == 0) && (m_MusicPhraseStop == 0) &&
@@ -2466,16 +2474,13 @@ static void _MusicNoteExecute()
 
         track = p_SoundControl->m_tracks;
         trackCount = p_SoundControl->m_trackCount;
-        savedCommand = p_SoundControl->m_savedCommand;
-        savedDelta = p_SoundControl->m_savedDelta;
-        savedFlags = p_SoundControl->m_savedFlags;
-        savedNote = p_SoundControl->m_savedNote;
+        savedTrackData = (RedSavedTrackDATA*)p_SoundControl->m_savedCommand;
         i = 0;
         do {
-            track->m_command = savedCommand[i];
-            track->m_deltaTime = savedDelta[i];
-            track->m_flags = savedFlags[i];
-            *(int*)&track->m_note = *(int*)&savedNote[i];
+            track->m_command = savedTrackData->m_command[i];
+            track->m_deltaTime = savedTrackData->m_delta[i];
+            track->m_flags = savedTrackData->m_flags[i];
+            *(int*)&track->m_note = *(int*)&savedTrackData->m_note[i];
             track++;
             i++;
         } while (--trackCount != 0);
@@ -2631,10 +2636,7 @@ void MusicSkipFunction()
     int activeTrackCount;
     int trackIndex;
     unsigned int trackCount;
-    unsigned char** savedCommand;
-    int* savedDelta;
-    unsigned int* savedFlags;
-    RedNoteDATA* savedNote;
+    RedSavedTrackDATA* savedTrackData;
     RedSoundCONTROL* control;
     RedTrackDATA* track;
 
@@ -2652,18 +2654,15 @@ void MusicSkipFunction()
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
         memcpy(&control->m_measure, &control->m_savedPosition, sizeof(RedSoundControlPosition));
         memcpy(&control->m_tempo, &control->m_savedTempo, sizeof(RedSoundControlTempo));
-        savedCommand = control->m_savedCommand;
-        savedDelta = control->m_savedDelta;
-        savedFlags = control->m_savedFlags;
-        savedNote = control->m_savedNote;
+        savedTrackData = (RedSavedTrackDATA*)control->m_savedCommand;
         track = control->m_tracks;
         trackCount = control->m_trackCount;
         trackIndex = 0;
         do {
-            track->m_command = savedCommand[trackIndex];
-            track->m_deltaTime = savedDelta[trackIndex];
-            track->m_flags = savedFlags[trackIndex];
-            *(int*)&track->m_note = *(int*)&savedNote[trackIndex];
+            track->m_command = savedTrackData->m_command[trackIndex];
+            track->m_deltaTime = savedTrackData->m_delta[trackIndex];
+            track->m_flags = savedTrackData->m_flags[trackIndex];
+            *(int*)&track->m_note = *(int*)&savedTrackData->m_note[trackIndex];
             trackCount -= 1;
             trackIndex += 1;
             track += 1;

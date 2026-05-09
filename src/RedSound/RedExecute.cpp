@@ -2343,13 +2343,16 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
     RedTrackDATA* track = control->m_tracks;
     do {
         if (track->m_command != 0) {
-            int step = frames;
+            int step;
             m_ChangeStatus = 0;
             if (track->m_deltaTime < frames) {
                 step = track->m_deltaTime;
+            } else {
+                step = frames;
             }
+            int execStep = step;
             track->m_deltaTime -= frames;
-            _MusicTrackDataExecute(track, step);
+            _MusicTrackDataExecute(track, execStep);
             if (((track->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0) && (track->m_deltaTime == 1)) {
                 KeyOffSet(control, keyOnData, track);
             }
@@ -2371,7 +2374,9 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
                         if (delta < 1) {
                             delta = 1;
                         } else if ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME) != 0) {
-                            delta += ((delta * track->m_fuzzyDeltaTimeDepth >> 8) * (int)GetRandomData()) >> 7;
+                            int fuzzyDelta = delta * track->m_fuzzyDeltaTimeDepth >> 8;
+                            s8 random = (s8)GetRandomData();
+                            delta += fuzzyDelta * random >> 7;
                             if (delta < 1) {
                                 delta = 1;
                             }
@@ -2886,20 +2891,22 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
  * JP Size: TODO
  */
 static int _SeMidiNoteExecute(
-    RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* trackData, int frames, int tickStep)
+    RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track, int frames, int tickStep)
 {
-    RedTrackDATA* track = trackData;
     do {
         if ((track->m_command != 0) && ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAUSE) == 0)) {
             track->m_seTickCounter -= tickStep * REDSOUND_SE_TICK_STEP;
             while (track->m_seTickCounter < 1) {
-                int step = frames;
+                int step;
                 track->m_seTickCounter += REDSOUND_CONTROL_TICK_PERIOD;
                 if (track->m_deltaTime < frames) {
                     step = track->m_deltaTime;
+                } else {
+                    step = frames;
                 }
+                int execStep = step;
                 track->m_deltaTime -= frames;
-                _SeTrackDataExecute(track, step);
+                _SeTrackDataExecute(track, execStep);
                 if (((track->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0) && (track->m_deltaTime == 1)) {
                     KeyOffSet(control, keyOnData, track);
                 }
@@ -2919,8 +2926,9 @@ static int _SeMidiNoteExecute(
                             if (delta < 1) {
                                 delta = 1;
                             } else if ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME) != 0) {
-                                delta += ((delta * track->m_fuzzyDeltaTimeDepth >> 8) * (int)GetRandomData()) >>
-                                    7;
+                                int fuzzyDelta = delta * track->m_fuzzyDeltaTimeDepth >> 8;
+                                s8 random = (s8)GetRandomData();
+                                delta += fuzzyDelta * random >> 7;
                                 if (delta < 1) {
                                     delta = 1;
                                 }

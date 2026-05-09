@@ -352,9 +352,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=80, help="Maximum table rows to print.")
     parser.add_argument(
         "--sort",
-        choices=["category", "easy", "pct"],
+        choices=["category", "easy", "pct", "symbol", "symbols", "unit"],
         default="category",
-        help="Sort order. easy ranks fewest diffs first.",
+        help="Sort order. easy ranks fewest diffs first; symbol/symbols groups by symbol name.",
     )
     parser.add_argument("--detail", action="store_true", help="Print frame/save/diff details for shown rows.")
     parser.add_argument("--commands", action="store_true", help="Print ready-to-run objdiff_experiment commands.")
@@ -407,6 +407,10 @@ def main() -> int:
         rows.sort(key=lambda row: (row["diff_count"], -row["pct"], row["category"], row["unit"], row["symbol"]))
     elif args.sort == "pct":
         rows.sort(key=lambda row: (-row["pct"], row["diff_count"], row["unit"], row["symbol"]))
+    elif args.sort in {"symbol", "symbols"}:
+        rows.sort(key=lambda row: (row["symbol"], row["unit"], row["diff_count"], -row["pct"]))
+    elif args.sort == "unit":
+        rows.sort(key=lambda row: (row["unit"], row["symbol"], row["diff_count"], -row["pct"]))
     else:
         rows.sort(key=lambda row: (row["category"], -row["pct"], row["diff_count"], row["unit"], row["symbol"]))
 

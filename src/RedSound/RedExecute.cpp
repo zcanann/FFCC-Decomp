@@ -174,6 +174,7 @@ enum RedExecuteLayoutSize {
 enum RedExecuteSmallDataLayout {
     REDSOUND_EXECUTE_SDATA_SIZE = 0x04,
     REDSOUND_EXECUTE_SBSS_RANDOM_INDEX_OFFSET = 0x00,
+    REDSOUND_EXECUTE_SBSS_RANDOM_PAD_OFFSET = 0x01,
     REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE = 3,
     REDSOUND_EXECUTE_SBSS_REVERB_DATA_OFFSET = 0x04,
     REDSOUND_EXECUTE_SBSS_REVERB_SIZE_OFFSET = 0x08,
@@ -184,7 +185,7 @@ enum RedExecuteSmallDataLayout {
 
 struct RedExecuteSmallDataState {
     volatile u8 m_randomIndex;
-    u8 m_randomPadding[REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE];
+    u8 m_randomIndexAlignPadding[REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE];
     RedReverbDATA* volatile m_reverbData;
     RedReverbSize* m_reverbSize;
     volatile u32 m_changeStatus;
@@ -314,6 +315,8 @@ STATIC_ASSERT(REDSOUND_EXECUTE_DATA_TABLE_SIZE == REDSOUND_EXECUTE_DATA_TABLE_AL
 STATIC_ASSERT(REDSOUND_REVERB_DATA_BUFFER_SIZE == REDSOUND_REVERB_DATA_ALLOC_SIZE);
 STATIC_ASSERT(sizeof(m_TerminateNote) == REDSOUND_EXECUTE_SDATA_SIZE);
 STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_randomIndex) == REDSOUND_EXECUTE_SBSS_RANDOM_INDEX_OFFSET);
+STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_randomIndexAlignPadding) ==
+              REDSOUND_EXECUTE_SBSS_RANDOM_PAD_OFFSET);
 STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_reverbData) == REDSOUND_EXECUTE_SBSS_REVERB_DATA_OFFSET);
 STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_reverbSize) == REDSOUND_EXECUTE_SBSS_REVERB_SIZE_OFFSET);
 STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_changeStatus) == REDSOUND_EXECUTE_SBSS_CHANGE_STATUS_OFFSET);

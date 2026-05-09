@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -131,6 +132,203 @@ def capture_snapshot(unit: str, symbols: list[str], timeout: int) -> dict[str, A
     return compact_snapshot(unit, symbols, raw)
 
 
+def symbol_by_name(raw: dict[str, Any], side: str) -> dict[str, dict[str, Any]]:
+    return {symbol.get("name", ""): symbol for symbol in raw.get(side, {}).get("symbols", []) if symbol.get("name")}
+
+
+def instruction_text(item: dict[str, Any]) -> str:
+    instruction = item.get("instruction")
+    if not instruction:
+        return "<gap>"
+    return str(instruction.get("formatted", "<unknown>"))
+
+
+def mnemonic(item: dict[str, Any]) -> str:
+    instruction = item.get("instruction") or {}
+    parts = instruction.get("parts") or []
+    if parts and isinstance(parts[0], dict):
+        opcode = parts[0].get("opcode")
+        if isinstance(opcode, dict):
+            return str(opcode.get("mnemonic", ""))
+    text = instruction_text(item)
+    return text.split(maxsplit=1)[0] if text != "<gap>" else ""
+
+
+def extract_stack_frame(instructions: list[dict[str, Any]]) -> str | None:
+    for item in instructions[:8]:
+        text = instruction_text(item)
+        match = re.match(r"stwu r1, (-?0x[0-9a-f]+|-?\d+)\(r1\)", text)
+        if match:
+            return match.group(1)
+    return None
+
+
+def extract_save_range(instructions: list[dict[str, Any]]) -> str | None:
+    for item in instructions[:16]:
+        text = instruction_text(item)
+        match = re.match(r"stmw (r\d+), (0x[0-9a-f]+|-?\d+)\(r1\)", text)
+        if match:
+            return f"{match.group(1)}..r31 at {match.group(2)}"
+    saved = []
+    for item in instructions[:24]:
+        text = instruction_text(item)
+        match = re.match(r"stw (r\d+), (0x[0-9a-f]+|-?\d+)\(r1\)", text)
+        if match and match.group(1) != "r0":
+            saved.append(f"{match.group(1)}@{match.group(2)}")
+    return ", ".join(saved) if saved else None
+
+
+def classify_diff(left_item: dict[str, Any], right_item: dict[str, Any]) -> str:
+    left_text = instruction_text(left_item)
+    right_text = instruction_text(right_item)
+    left_mnemonic = mnemonic(left_item)
+    right_mnemonic = mnemonic(right_item)
+    if left_text == "<gap>" or right_text == "<gap>":
+        return "insert/delete"
+    if left_mnemonic != right_mnemonic:
+        return "opcode/control-flow shape"
+    if left_mnemonic in {"cmpwi", "cmplwi", "cmpw", "cmplw"}:
+        return "signedness/compare shape"
+    if left_mnemonic in {"lwz", "lhz", "lha", "lbz", "stw", "sth", "stb"}:
+        return "load/store register or offset"
+    if left_mnemonic.startswith("b"):
+        return "branch target/structure"
+    if left_mnemonic in {"mr", "addi", "add", "subf", "mullw", "srawi", "srwi", "slwi", "rlwinm"}:
+        return "register allocation/expression shape"
+    if left_mnemonic in {"stwu", "stmw", "lmw"}:
+        return "stack frame/saved register pressure"
+    return "argument/register mismatch"
+
+
+def explain_symbol(left: dict[str, Any], right: dict[str, Any], limit: int) -> None:
+    name = left.get("name") or right.get("name") or "<unknown>"
+    match = left.get("match_percent")
+    size = left.get("size") or right.get("size")
+    print(f"\nExplanation: {name} ({as_float(match):.4f}%, {size}b)")
+
+    left_instructions = left.get("instructions") or []
+    right_instructions = right.get("instructions") or []
+    left_frame = extract_stack_frame(left_instructions)
+    right_frame = extract_stack_frame(right_instructions)
+    if left_frame or right_frame:
+        print(f"  stack frame: ours {left_frame or '?'} / target {right_frame or '?'}")
+
+    left_save = extract_save_range(left_instructions)
+    right_save = extract_save_range(right_instructions)
+    if left_save or right_save:
+        print(f"  saved regs:  ours {left_save or '?'} / target {right_save or '?'}")
+
+    diff_counts: dict[str, int] = {}
+    rows: list[tuple[int, str, str, str]] = []
+    max_len = max(len(left_instructions), len(right_instructions))
+    for i in range(max_len):
+        left_item = left_instructions[i] if i < len(left_instructions) else {}
+        right_item = right_instructions[i] if i < len(right_instructions) else {}
+        if "diff_kind" not in left_item and "diff_kind" not in right_item:
+            continue
+        diff_kind = str(left_item.get("diff_kind") or right_item.get("diff_kind") or "DIFF")
+        diff_counts[diff_kind] = diff_counts.get(diff_kind, 0) + 1
+        if len(rows) < limit:
+            rows.append((i, classify_diff(left_item, right_item), instruction_text(left_item), instruction_text(right_item)))
+
+    if diff_counts:
+        counts = ", ".join(f"{key}={value}" for key, value in sorted(diff_counts.items()))
+        print(f"  diff kinds: {counts}")
+    else:
+        print("  no instruction diffs")
+        return
+
+    print("  first diffs:")
+    for index, hint, left_text, right_text in rows:
+        print(f"    [{index:03d}] {hint}")
+        print(f"          ours:   {left_text}")
+        print(f"          target: {right_text}")
+
+
+def explain_current_diff(unit: str, symbols: list[str], timeout: int, limit: int) -> None:
+    raw = load_objdiff_json(unit, symbols, timeout)
+    left_symbols = symbol_by_name(raw, "left")
+    right_symbols = symbol_by_name(raw, "right")
+    names = symbols or unmatched_symbol_names(left_symbols)
+    for name in names:
+        left = left_symbols.get(name)
+        right = right_symbols.get(name)
+        if not left or not right:
+            print(f"\nExplanation: {name}: symbol not present on both sides")
+            continue
+        explain_symbol(left, right, limit)
+
+
+def is_real_symbol_name(name: str) -> bool:
+    return not name.startswith("@") and not name.startswith("[")
+
+
+def unmatched_symbol_names(symbols: dict[str, dict[str, Any]]) -> list[str]:
+    return [
+        name
+        for name, symbol in symbols.items()
+        if symbol.get("match_percent") is not None
+        and as_float(symbol.get("match_percent")) < 100.0
+        and is_real_symbol_name(name)
+    ]
+
+
+def source_path_for_unit(unit: str) -> Path:
+    parts = unit.split("/")
+    if parts and parts[0] == "main":
+        parts = parts[1:]
+    return ROOT / "src" / Path(*parts).with_suffix(".cpp")
+
+
+def map_hits(symbol: str, map_name: str, limit: int) -> list[tuple[int, str]]:
+    path = ROOT / "orig" / map_name / "game.MAP"
+    if not path.exists():
+        return []
+    hits: list[tuple[int, str]] = []
+    with path.open("r", encoding="utf-8", errors="replace") as f:
+        for lineno, line in enumerate(f, start=1):
+            if symbol in line:
+                hits.append((lineno, line.rstrip()))
+                if len(hits) >= limit:
+                    break
+    return hits
+
+
+def ghidra_hits(symbol: str, limit: int) -> list[Path]:
+    ghidra_dir = ROOT / "resources" / "ghidra-decomp-1-31-2026"
+    if not ghidra_dir.exists():
+        return []
+    hits = [path for path in ghidra_dir.glob("*.c") if symbol in path.name]
+    return sorted(hits)[:limit]
+
+
+def print_context(unit: str, symbols: list[str], limit: int) -> None:
+    print("\nContext")
+    source_path = source_path_for_unit(unit)
+    if source_path.exists():
+        print(f"  source: {source_path.relative_to(ROOT)}")
+    else:
+        print(f"  source: {source_path.relative_to(ROOT)} (missing)")
+
+    for symbol in symbols:
+        print(f"\n  {symbol}")
+        for map_name, label in (("GCCP01", "PAL"), ("GCCE01", "EN")):
+            hits = map_hits(symbol, map_name, limit)
+            if hits:
+                print(f"    {label} MAP:")
+                for lineno, text in hits:
+                    print(f"      {map_name}/game.MAP:{lineno}: {text.strip()}")
+            else:
+                print(f"    {label} MAP: no hit")
+        hits = ghidra_hits(symbol, limit)
+        if hits:
+            print("    Ghidra:")
+            for path in hits:
+                print(f"      {path.relative_to(ROOT)}")
+        else:
+            print("    Ghidra: no filename hit")
+
+
 def save_snapshot(path: Path, snapshot: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
@@ -205,7 +403,7 @@ def parse_args() -> argparse.Namespace:
         epilog=(
             "Examples:\n"
             "  python3 tools/objdiff_experiment.py -u RedStream --save .agent/redstream.base.json\n"
-            "  python3 tools/objdiff_experiment.py -u RedStream StreamControl__Fv --build\n"
+            "  python3 tools/objdiff_experiment.py -u RedStream StreamControl__Fv --build --explain --context\n"
             "  python3 tools/objdiff_experiment.py -u main/RedSound/RedExecute SetReverb__FiiPi --baseline .agent/rev.json --build\n"
         ),
     )
@@ -217,6 +415,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--ninja-timeout", type=int, default=DEFAULT_TIMEOUT_SECONDS, help="ninja timeout in seconds.")
     parser.add_argument("--objdiff-timeout", type=int, default=60, help="objdiff-cli timeout in seconds.")
     parser.add_argument("--limit", type=int, default=30, help="Maximum changed rows to print per group.")
+    parser.add_argument("--explain", action="store_true", help="Print a compact instruction mismatch summary.")
+    parser.add_argument("--context", action="store_true", help="Print source, PAL/EN MAP, and Ghidra context.")
     parser.add_argument(
         "--revert-path",
         action="append",
@@ -262,6 +462,11 @@ def main() -> int:
         print(f"Symbols: {', '.join(symbols)}")
     print_changes("Sections", section_changes, args.limit)
     print_changes("Symbols", symbol_changes, args.limit)
+    if args.explain:
+        explain_current_diff(unit, symbols, args.objdiff_timeout, args.limit)
+    if args.context:
+        context_symbols = symbols or unmatched_symbol_names(after.get("symbols", {}))
+        print_context(unit, context_symbols, args.limit)
 
     regressed = has_regression(section_changes) or has_regression(symbol_changes)
     if regressed and args.revert_path:

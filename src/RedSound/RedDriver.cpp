@@ -516,7 +516,7 @@ static volatile int m_DMAStatus;
 u8* volatile p_MusicSkipThreadStack;
 volatile int m_MusicSkipComplete;
 RedReverbDepth* volatile p_ReverbDepth;
-int m_Mute[REDSOUND_MUTE_WORD_COUNT];
+unsigned int m_Mute[REDSOUND_MUTE_WORD_COUNT];
 static RedDmaRequest m_DmaControl[REDSOUND_DMA_CONTROL_ENTRY_COUNT];
 static OSThread m_MainThread;
 static OSSemaphore m_MainSemaphore;
@@ -3335,13 +3335,12 @@ void CRedDriver::SetReverbDepth(int bank, int mode, int depth)
  */
 void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
 {
-    unsigned int mask = 1 << (voiceNo % REDSOUND_MUTE_BITS_PER_WORD);
-    int* muteWord = &m_Mute[voiceNo / REDSOUND_MUTE_BITS_PER_WORD];
+    unsigned int mask = 1U << voiceNo;
 
-    if (mute != 0) {
-        *muteWord |= mask;
+    if (mute) {
+        m_Mute[voiceNo >> REDSOUND_MUTE_WORD_SHIFT] |= mask;
     } else {
-        *muteWord &= ~mask;
+        m_Mute[voiceNo >> REDSOUND_MUTE_WORD_SHIFT] &= ~mask;
     }
 }
 

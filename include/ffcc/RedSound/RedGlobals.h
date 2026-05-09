@@ -212,7 +212,7 @@ extern RedTrackDATA* p_EditorTrack;
 extern u8* volatile p_MusicSkipThreadStack;
 extern volatile int m_MusicSkipComplete;
 extern RedReverbDepth* volatile p_ReverbDepth;
-extern int m_Mute[REDSOUND_MUTE_WORD_COUNT];
+extern unsigned int m_Mute[REDSOUND_MUTE_WORD_COUNT];
 extern CRedMemory c_RedMemory;
 extern volatile u32 m_ChangeStatus;
 extern CRedDriver c_Driver;

@@ -1765,8 +1765,8 @@ void EnvelopeKeyExecute()
 
             if ((voiceData[REDSOUND_VOICE_FLAGS_WORD] & REDSOUND_VOICE_FLAGS_START) != 0) {
                 voiceData[REDSOUND_VOICE_FLAGS_WORD] &= REDSOUND_VOICE_FLAGS_CLEAR_RELEASE_ACTIVE_MASK;
-                RedWaveDATA* waveData = (RedWaveDATA*)voiceData[REDSOUND_VOICE_WAVE_DATA_WORD];
-                RedTrackDATA* trackData = (RedTrackDATA*)voiceData[REDSOUND_VOICE_TRACK_WORD];
+                RedWaveDATA* waveData = ((RedVoiceDATA*)voiceData)->m_waveData;
+                RedTrackDATA* trackData = ((RedVoiceDATA*)voiceData)->m_track;
                 if ((waveData == 0) || (trackData == 0)) {
                     voiceData[REDSOUND_VOICE_ACTIVE_WORD] = 0;
                 } else {
@@ -1836,7 +1836,7 @@ void EnvelopeKeyExecute()
                 voiceData[REDSOUND_VOICE_FLAGS_WORD] &= REDSOUND_VOICE_FLAGS_CLEAR_RELEASE_ACTIVE_MASK;
                 voiceData[REDSOUND_VOICE_ACTIVE_WORD] = 0;
                 voiceFlags |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
-                voiceData[REDSOUND_VOICE_TRACK_WORD] = 0;
+                ((RedVoiceDATA*)voiceData)->m_track = 0;
                 ((AXVPB*)voice)->pb.state = 0;
                 voiceData[REDSOUND_VOICE_ADSR_CURRENT_WORD] = 0;
                 voiceData[REDSOUND_VOICE_ENVELOPE_WORD] = 0;
@@ -1854,7 +1854,7 @@ void EnvelopeKeyExecute()
             ((AXVPB*)voice)->sync |= voiceFlags;
         } else {
             voiceData[REDSOUND_VOICE_ENVELOPE_WORD] = 0;
-            voiceData[REDSOUND_VOICE_WAVE_DATA_WORD] = 0;
+            ((RedVoiceDATA*)voiceData)->m_waveData = 0;
             int voice = voiceData[REDSOUND_VOICE_AX_VOICE_WORD];
             if (voice != 0) {
                 if (((AXVPB*)voice)->pb.state != 0) {
@@ -1866,7 +1866,7 @@ void EnvelopeKeyExecute()
                         AXFreeVoice((AXVPB*)voice);
                     }
                     voiceData[REDSOUND_VOICE_AX_VOICE_WORD] = 0;
-                    voiceData[REDSOUND_VOICE_TRACK_WORD] = 0;
+                    ((RedVoiceDATA*)voiceData)->m_track = 0;
                 }
             }
         }

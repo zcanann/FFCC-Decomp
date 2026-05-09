@@ -247,6 +247,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--commands", action="store_true", help="Print ready-to-run objdiff_experiment commands.")
     parser.add_argument("--attempts", action="store_true", help="Show attempt counts from the attempt log.")
     parser.add_argument("--attempt-log", type=Path, default=DEFAULT_ATTEMPT_LOG, help="Attempt log path.")
+    parser.add_argument(
+        "--fresh",
+        action="store_true",
+        help="Hide symbols whose latest recorded attempt regressed or made no change.",
+    )
+    parser.add_argument(
+        "--skip-attempt-result",
+        action="append",
+        choices=["improved", "regressed", "no_change"],
+        default=[],
+        help="Hide symbols whose latest recorded attempt has this result. May be repeated.",
+    )
     parser.add_argument("--objdiff-timeout", type=int, default=60)
     return parser.parse_args()
 
@@ -265,8 +277,13 @@ def main() -> int:
         and row["pct"] <= args.max_pct
         and (args.category is None or row["category"] == args.category)
     ]
-    if args.attempts:
+    if args.attempts or args.fresh or args.skip_attempt_result:
         annotate_attempts(rows, load_attempts(args.attempt_log))
+    skipped_results = set(args.skip_attempt_result)
+    if args.fresh:
+        skipped_results.update({"regressed", "no_change"})
+    if skipped_results:
+        rows = [row for row in rows if row.get("last_attempt_result") not in skipped_results]
     if args.sort == "easy":
         rows.sort(key=lambda row: (row["diff_count"], -row["pct"], row["category"], row["unit"], row["symbol"]))
     elif args.sort == "pct":

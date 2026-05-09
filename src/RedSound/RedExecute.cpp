@@ -1314,11 +1314,11 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     voice->m_trackPan = &track->m_pan;
 
     if (voice->m_waveData == 0) {
-        memset(&voice->m_adsr, 0, sizeof(RedAdsrDATA));
+        memset(&voice->m_adsr, 0, REDSOUND_TRACK_ADSR_SIZE);
     } else {
         memcpy(&voice->m_adsr,
                track->m_waveData->m_adsr,
-               sizeof(RedAdsrDATA));
+               REDSOUND_TRACK_ADSR_SIZE);
     }
 
     voice->m_voiceSwitch = track->m_voiceSwitch;
@@ -1427,7 +1427,7 @@ skipModSetup:
     if (voice->m_waveData != 0) {
         memcpy(&voice->m_adsr,
                voice->m_waveData->m_adsr,
-               sizeof(RedAdsrDATA));
+               REDSOUND_TRACK_ADSR_SIZE);
         if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] != (s8)REDSOUND_TRACK_ADSR_DEFAULT_BYTE) {
             voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] =
                 track->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK];
@@ -1467,7 +1467,7 @@ skipModSetup:
             voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = attack;
         }
     } else {
-        memset(&voice->m_adsr, 0, sizeof(RedAdsrDATA));
+        memset(&voice->m_adsr, 0, REDSOUND_TRACK_ADSR_SIZE);
     }
 
     workValue = ((int)voice - (int)p_VoiceData) / REDSOUND_VOICE_SIZE;
@@ -3013,7 +3013,7 @@ void MainControl(int frames)
 
     _KeyOnControl();
     m_KeyOnEntry = 0;
-    memset(p_KeyOnData, 0, sizeof(RedKeyOnDATA));
+    memset(p_KeyOnData, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
 
     p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
     _SeMidiNoteExecute(p_SoundControl, p_KeyOnData,
@@ -3051,7 +3051,7 @@ void MainControl(int frames)
             _MusicNoteExecute();
         }
         if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount == 0) {
-            memcpy(p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY, sizeof(RedSoundCONTROL));
+            memcpy(p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY, REDSOUND_CONTROL_SIZE);
             p_SoundControl->m_activeTrackCount = 0;
             p_SoundControl->m_trackCount = 0;
             p_SoundControl->m_musicId = REDSOUND_MUSIC_ID_NONE;

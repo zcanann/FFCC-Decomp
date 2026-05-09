@@ -1839,13 +1839,13 @@ void CRedDriver::Init()
     memset(p_MusicTempoControl, 0, sizeof(RedControlRamp));
     p_MusicPitchControl = (RedControlRamp*)RedNew(sizeof(RedControlRamp));
     memset(p_MusicPitchControl, 0, sizeof(RedControlRamp));
-    p_ExecCommand = (RedExecCommand*)RedNew(sizeof(RedExecCommand) * REDSOUND_EXEC_COMMAND_COUNT);
+    p_ExecCommand = (RedExecCommand*)RedNew(REDSOUND_EXEC_COMMAND_BUFFER_SIZE);
     p_ExecCommandNow = p_ExecCommand;
     p_ExecCommandOld = p_ExecCommand;
-    memset(p_ExecCommand, 0, sizeof(RedExecCommand) * REDSOUND_EXEC_COMMAND_COUNT);
-    p_SoundControlBuffer = (RedSoundCONTROL*)RedNew(sizeof(RedSoundCONTROL) * REDSOUND_CONTROL_COUNT);
+    memset(p_ExecCommand, 0, REDSOUND_EXEC_COMMAND_BUFFER_SIZE);
+    p_SoundControlBuffer = (RedSoundCONTROL*)RedNew(REDSOUND_SOUND_CONTROL_ALLOC_SIZE);
     p_SoundControl = p_SoundControlBuffer;
-    memset(p_SoundControlBuffer, 0, sizeof(RedSoundCONTROL) * REDSOUND_CONTROL_COUNT);
+    memset(p_SoundControlBuffer, 0, REDSOUND_SOUND_CONTROL_ALLOC_SIZE);
     fullVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
     noMusicId = REDSOUND_MUSIC_ID_NONE;
     p_SoundControl[REDSOUND_CONTROL_SE].m_volume = fullVolume;

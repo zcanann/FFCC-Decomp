@@ -3073,6 +3073,7 @@ int CRedDriver::SePlay(int bank, int sep, int autoID, int pan, int volume, int p
 int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pitch)
 {
     int result = REDSOUND_SE_ID_ALL;
+    RedSeSepHEAD localHeader;
     RedSeSepHEAD* const header = (RedSeSepHEAD*)seSepData;
     RedSeSepHEAD* copiedHeader;
     int headerSize;
@@ -3083,7 +3084,8 @@ int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pit
            (header->m_signature[2] == REDSOUND_SESEP_SIGNATURE_2)) &&
           ((header->m_signature[3] == REDSOUND_SESEP_SIGNATURE_3 &&
             (header->m_signature[4] == REDSOUND_SESEP_SIGNATURE_4)))))) {
-        headerSize = header->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
+        memcpy(&localHeader, header, REDSOUND_SESEP_HEADER_SIZE);
+        headerSize = localHeader.m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
         if (headerSize > 0) {
             copiedHeader = (RedSeSepHEAD*)RedNew(headerSize);
             if (copiedHeader != 0) {

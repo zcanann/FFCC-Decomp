@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+"""Summarize remaining RedSound objdiff mismatches by likely cause."""
+
+from __future__ import annotations
+
+import argparse
+from collections import Counter
+from typing import Any
+
+from objdiff_experiment import (
+    as_float,
+    classify_diff,
+    extract_save_range,
+    extract_stack_frame,
+    instruction_text,
+    is_real_symbol_name,
+    load_objdiff_json,
+    normalize_unit,
+    symbol_by_name,
+)
+
+
+REDSOUND_UNITS = [
+    "RedSound",
+    "RedCommand",
+    "RedDriver",
+    "RedEntry",
+    "RedExecute",
+    "RedMemory",
+    "RedMidiCtrl",
+    "RedStream",
+]
+
+
+def short_unit(unit: str) -> str:
+    return unit.rsplit("/", 1)[-1]
+
+
+def truncate(text: str, width: int) -> str:
+    if len(text) <= width:
+        return text
+    return text[: max(0, width - 3)] + "..."
+
+
+def diff_summary(left: dict[str, Any], right: dict[str, Any]) -> tuple[Counter[str], str]:
+    counts: Counter[str] = Counter()
+    first_hint = "no diffs"
+    left_instructions = left.get("instructions") or []
+    right_instructions = right.get("instructions") or []
+    max_len = max(len(left_instructions), len(right_instructions))
+    for i in range(max_len):
+        left_item = left_instructions[i] if i < len(left_instructions) else {}
+        right_item = right_instructions[i] if i < len(right_instructions) else {}
+        if "diff_kind" not in left_item and "diff_kind" not in right_item:
+            continue
+        diff_kind = str(left_item.get("diff_kind") or right_item.get("diff_kind") or "DIFF")
+        counts[diff_kind] += 1
+        if first_hint == "no diffs":
+            first_hint = classify_diff(left_item, right_item)
+    return counts, first_hint
+
+
+def category(
+    left_frame: str | None,
+    right_frame: str | None,
+    left_save: str | None,
+    right_save: str | None,
+    counts: Counter[str],
+) -> str:
+    structural_count = counts.get("DIFF_INSERT", 0) + counts.get("DIFF_DELETE", 0) + counts.get("DIFF_REPLACE", 0)
+    if structural_count:
+        return "structural"
+    if left_frame != right_frame or left_save != right_save:
+        return "stack"
+    if counts and set(counts) <= {"DIFF_ARG_MISMATCH"}:
+        return "regs"
+    if counts:
+        return "other"
+    return "data"
+
+
+def summarize_symbol(unit: str, left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
+    left_instructions = left.get("instructions") or []
+    right_instructions = right.get("instructions") or []
+    left_frame = extract_stack_frame(left_instructions)
+    right_frame = extract_stack_frame(right_instructions)
+    left_save = extract_save_range(left_instructions)
+    right_save = extract_save_range(right_instructions)
+    counts, first_hint = diff_summary(left, right)
+    return {
+        "unit": unit,
+        "symbol": left.get("name", ""),
+        "pct": as_float(left.get("match_percent")),
+        "size": int(left.get("size", 0) or 0),
+        "category": category(left_frame, right_frame, left_save, right_save, counts),
+        "frame": f"{left_frame or '?'}->{right_frame or '?'}",
+        "save": f"{left_save or '?'}->{right_save or '?'}",
+        "counts": ",".join(f"{k.removeprefix('DIFF_')}={v}" for k, v in sorted(counts.items())) or "-",
+        "hint": first_hint,
+    }
+
+
+def collect_unit(unit: str, timeout: int) -> list[dict[str, Any]]:
+    normalized = normalize_unit(unit)
+    raw = load_objdiff_json(normalized, [], timeout)
+    left_symbols = symbol_by_name(raw, "left")
+    right_symbols = symbol_by_name(raw, "right")
+    rows = []
+    for name, left in left_symbols.items():
+        if not is_real_symbol_name(name):
+            continue
+        if left.get("match_percent") is None or as_float(left.get("match_percent")) >= 100.0:
+            continue
+        right = right_symbols.get(name)
+        if not right:
+            continue
+        rows.append(summarize_symbol(normalized, left, right))
+    return rows
+
+
+def print_rows(rows: list[dict[str, Any]], limit: int) -> None:
+    if not rows:
+        print("No mismatched RedSound symbols found.")
+        return
+
+    print(f"{'cat':<10} {'pct':>8} {'size':>5} {'unit':<11} {'symbol':<58} hint")
+    print("-" * 120)
+    for row in rows[:limit]:
+        print(
+            f"{row['category']:<10} {row['pct']:8.3f} {row['size']:5d} "
+            f"{short_unit(row['unit']):<11} {truncate(row['symbol'], 58):<58} {row['hint']}"
+        )
+    if len(rows) > limit:
+        print(f"... {len(rows) - limit} more")
+
+
+def print_detail(rows: list[dict[str, Any]], limit: int) -> None:
+    for row in rows[:limit]:
+        print(f"\n{row['unit']} :: {row['symbol']}")
+        print(f"  {row['category']} {row['pct']:.4f}% size={row['size']}")
+        print(f"  frame {row['frame']}")
+        print(f"  save  {row['save']}")
+        print(f"  diffs {row['counts']}")
+        print(f"  hint  {row['hint']}")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("-u", "--unit", action="append", help="Limit to one unit. May be repeated.")
+    parser.add_argument("--category", choices=["regs", "stack", "structural", "other", "data"], help="Filter category.")
+    parser.add_argument("--min-pct", type=float, default=0.0, help="Only show symbols at or above this match percent.")
+    parser.add_argument("--max-pct", type=float, default=99.9999, help="Only show symbols below or equal to this percent.")
+    parser.add_argument("--limit", type=int, default=80, help="Maximum table rows to print.")
+    parser.add_argument("--detail", action="store_true", help="Print frame/save/diff details for shown rows.")
+    parser.add_argument("--objdiff-timeout", type=int, default=60)
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    units = args.unit or REDSOUND_UNITS
+    rows: list[dict[str, Any]] = []
+    for unit in units:
+        rows.extend(collect_unit(unit, args.objdiff_timeout))
+
+    rows = [
+        row
+        for row in rows
+        if row["pct"] >= args.min_pct
+        and row["pct"] <= args.max_pct
+        and (args.category is None or row["category"] == args.category)
+    ]
+    rows.sort(key=lambda row: (row["category"], -row["pct"], row["unit"], row["symbol"]))
+
+    counts = Counter(row["category"] for row in rows)
+    if counts:
+        print("Category counts: " + ", ".join(f"{key}={counts[key]}" for key in sorted(counts)))
+    print_rows(rows, args.limit)
+    if args.detail:
+        print_detail(rows, args.limit)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

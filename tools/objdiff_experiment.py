@@ -424,6 +424,12 @@ def parse_args() -> argparse.Namespace:
         default=[],
         help="Explicit path to git-restore if a regression is detected. May be repeated.",
     )
+    parser.add_argument(
+        "--no-rebuild-after-revert",
+        action="store_false",
+        dest="rebuild_after_revert",
+        help="Do not run ninja again after an automatic regression revert.",
+    )
     return parser.parse_args()
 
 
@@ -471,6 +477,8 @@ def main() -> int:
     regressed = has_regression(section_changes) or has_regression(symbol_changes)
     if regressed and args.revert_path:
         restore_paths(args.revert_path)
+        if args.rebuild_after_revert and not run_ninja(args.ninja_timeout):
+            return 1
     return 2 if regressed else 0
 
 

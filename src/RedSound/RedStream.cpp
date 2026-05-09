@@ -457,7 +457,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	streamData = _SearchEmptyStreamData();
 	if (streamData != 0) {
 
-	memcpy(&streamData->m_header, streamHeader, sizeof(RedStreamHEAD));
+	memcpy(&streamData->m_header, streamHeader, REDSOUND_STREAM_FILE_HEADER_SIZE);
 	streamData->m_track = SearchSeEmptyTrack(streamData->m_header.m_channelCount, REDSOUND_STREAM_ERASE_TRACK, 0);
 	streamData->m_buffer = (u8*)RedNew(REDSOUND_STREAM_TRANSFER_BUFFER_SIZE);
 	amemSize = streamData->m_header.m_channelCount * REDSOUND_STREAM_STEREO_PLANE_SIZE;
@@ -532,8 +532,8 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			SetVoiceVolumeMix(streamData->m_voiceData + channel, streamData->m_pan.m_value >> REDSOUND_FIXED_SHIFT,
 			                  streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT);
 			(streamData->m_track + channel)->m_waveBase = streamData->m_aramBuffer + channel * REDSOUND_STREAM_STEREO_PLANE_SIZE;
-			memset(&streamData->m_trackData[channel], 0, sizeof(RedWaveDATA));
-			memcpy(&streamData->m_trackData[channel].m_adpcm, &headerData[channel], sizeof(RedStreamADPCMHeader));
+			memset(&streamData->m_trackData[channel], 0, REDSOUND_WAVE_DATA_SIZE);
+			memcpy(&streamData->m_trackData[channel].m_adpcm, &headerData[channel], REDSOUND_STREAM_ADPCM_HEADER_SIZE);
 			voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] = voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] =
 			    voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] = 0;
 			voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] = REDSOUND_VOLUME_MAX;

@@ -368,6 +368,8 @@ STATIC_ASSERT(offsetof(AXFX_CHORUS, period) == REDSOUND_AXFX_CHORUS_PERIOD_OFFSE
 STATIC_ASSERT(sizeof(AXFX_CHORUS) == REDSOUND_AXFX_CHORUS_SIZE);
 STATIC_ASSERT(offsetof(RedWaveADPCMInfo, m_data) == REDSOUND_WAVE_ADPCM_DATA_OFFSET);
 STATIC_ASSERT(offsetof(RedWaveADPCMInfo, m_loop) == REDSOUND_WAVE_ADPCM_LOOP_OFFSET);
+STATIC_ASSERT(sizeof(((RedWaveADPCMInfo*)0)->m_data) == REDSOUND_WAVE_ADPCM_DATA_SIZE);
+STATIC_ASSERT(sizeof(((RedWaveADPCMInfo*)0)->m_loop) == REDSOUND_WAVE_ADPCM_LOOP_SIZE);
 STATIC_ASSERT(sizeof(RedWaveADPCMInfo) == REDSOUND_WAVE_ADPCM_INFO_SIZE);
 STATIC_ASSERT(offsetof(RedWaveDATA, m_flags) == REDSOUND_WAVE_FLAGS_OFFSET);
 STATIC_ASSERT(offsetof(RedWaveDATA, m_sampleStart) == REDSOUND_WAVE_SAMPLE_START_OFFSET);
@@ -1823,8 +1825,8 @@ void EnvelopeKeyExecute()
                     ((AXVPB*)voice)->pb.srcSelect = 1;
                     ((AXVPB*)voice)->pb.state = 1;
 
-                    memcpy(&((AXVPB*)voice)->pb.adpcm, &waveData->m_adpcm.m_data, sizeof(waveData->m_adpcm.m_data));
-                    memcpy(&((AXVPB*)voice)->pb.adpcmLoop, &waveData->m_adpcm.m_loop, sizeof(waveData->m_adpcm.m_loop));
+                    memcpy(&((AXVPB*)voice)->pb.adpcm, &waveData->m_adpcm.m_data, REDSOUND_WAVE_ADPCM_DATA_SIZE);
+                    memcpy(&((AXVPB*)voice)->pb.adpcmLoop, &waveData->m_adpcm.m_loop, REDSOUND_WAVE_ADPCM_LOOP_SIZE);
                     memset(((AXVPB*)voice)->pb.src.last_samples, 0, sizeof(((AXVPB*)voice)->pb.src.last_samples));
                     ((AXVPB*)voice)->pb.addr.format = 0;
                     *(u32*)&((AXVPB*)voice)->pb.addr.currentAddressHi = key;

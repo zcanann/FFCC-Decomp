@@ -2058,6 +2058,44 @@ static int _MusicSkipThread(void*)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 228b
+ * EN Address: UNUSED
+ * EN Size: 228b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _AllVoiceEnd()
+{
+    RedVoiceDATA* voiceData;
+
+    voiceData = p_VoiceData;
+    do {
+        if (voiceData->m_axVoice != 0) {
+            if (voiceData->m_axVoice->pb.state != 0) {
+                voiceData->m_axVoice->pb.state = 0;
+                voiceData->m_axVoice->pb.ve.currentVolume = 0;
+                voiceData->m_axVoice->sync |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
+            } else {
+                if (voiceData->m_axVoice->priority != 0) {
+                    AXFreeVoice(voiceData->m_axVoice);
+                }
+                voiceData->m_axVoice = 0;
+                voiceData->m_track = 0;
+            }
+        }
+        voiceData->m_waveData = 0;
+        voiceData->m_active = 0;
+        voiceData->m_envelopeLevel = 0;
+        voiceData->m_voiceSwitch = 0;
+        voiceData->m_flags &= REDSOUND_VOICE_FLAGS_EXECUTE_KEEP_MASK;
+        voiceData->m_updateFlags = 0;
+        voiceData++;
+    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801be5d0
  * PAL Size: 56b
  * EN Address: TODO

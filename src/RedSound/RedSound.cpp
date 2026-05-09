@@ -1384,22 +1384,20 @@ void CRedSound::GetStreamReadPoint(int streamID, int* readPoint)
 		currentReadPoint = bank->m_readPoint;
 		c_Driver.GetStreamPlayPoint(streamID, &playPoint, &currentReadPoint);
 		readStep = ((RedStreamHEAD*)bank->m_streamData)->m_channelCount * REDSOUND_STREAM_PAGE_SIZE;
-		if (bank->m_playPoint != playPoint) {
-			do {
-				bank->m_playPoint += readStep;
-				if (bank->m_playPoint >= bank->m_fileSize) {
-					bank->m_playPoint -= bank->m_fileSize;
-				}
-				bank->m_readPoint += readStep;
-				if (bank->m_readPoint >= bank->m_fileSize) {
-					bank->m_readPoint -= bank->m_fileSize;
-				}
-			} while (bank->m_playPoint != playPoint);
+		while (bank->m_playPoint != playPoint) {
+			bank->m_playPoint += readStep;
+			if (bank->m_playPoint >= bank->m_fileSize) {
+				bank->m_playPoint -= bank->m_fileSize;
+			}
+			bank->m_readPoint += readStep;
+			if (bank->m_readPoint >= bank->m_fileSize) {
+				bank->m_readPoint -= bank->m_fileSize;
+			}
 		}
 		if (bank->m_readPoint == currentReadPoint) {
 			bank->m_readPoint += readStep;
 			if (bank->m_readPoint >= bank->m_fileSize) {
-				bank->m_readPoint = 0;
+				bank->m_readPoint -= bank->m_fileSize;
 			}
 		}
 		if (readPoint != 0) {

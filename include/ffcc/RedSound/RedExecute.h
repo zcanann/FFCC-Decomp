@@ -80,22 +80,29 @@ enum RedWaveAdpcmLayoutOffset {
 	REDSOUND_WAVE_ADPCM_INFO_SIZE = 0x2E,
 };
 
+enum RedWaveReservedLayoutSize {
+	REDSOUND_WAVE_RESERVED10_SIZE = 0x04,
+	REDSOUND_WAVE_RESERVED1D_SIZE = 0x05,
+	REDSOUND_WAVE_ADSR_SIZE = 0x0C,
+	REDSOUND_WAVE_RESERVED5C_SIZE = 0x04,
+};
+
 struct RedWaveDATA {
 	unsigned int m_flags;
 	int m_sampleStart;
 	int m_loopStart;
 	int m_loopEnd;
-	unsigned char m_reserved10[0x14 - 0x10];
+	unsigned char m_reserved10[REDSOUND_WAVE_RESERVED10_SIZE];
 	int m_pitch;
 	signed char m_splitKey;
 	unsigned char m_splitVelocity;
 	unsigned char m_volume;
 	unsigned char m_pan;
 	signed char m_reverbMix;
-	unsigned char m_reserved1D[0x22 - 0x1D];
+	unsigned char m_reserved1D[REDSOUND_WAVE_RESERVED1D_SIZE];
 	RedWaveADPCMInfo m_adpcm;
-	unsigned char m_adsr[0x5C - 0x50];
-	unsigned char m_reserved5C[0x60 - 0x5C];
+	unsigned char m_adsr[REDSOUND_WAVE_ADSR_SIZE];
+	unsigned char m_reserved5C[REDSOUND_WAVE_RESERVED5C_SIZE];
 };
 
 enum RedWaveLayoutSize {
@@ -114,14 +121,17 @@ enum RedWaveLayoutOffset {
 	REDSOUND_WAVE_SAMPLE_START_OFFSET = 0x04,
 	REDSOUND_WAVE_LOOP_START_OFFSET = 0x08,
 	REDSOUND_WAVE_LOOP_END_OFFSET = 0x0C,
+	REDSOUND_WAVE_RESERVED10_OFFSET = 0x10,
 	REDSOUND_WAVE_PITCH_OFFSET = 0x14,
 	REDSOUND_WAVE_SPLIT_KEY_OFFSET = 0x18,
 	REDSOUND_WAVE_SPLIT_VELOCITY_OFFSET = 0x19,
 	REDSOUND_WAVE_VOLUME_OFFSET = 0x1A,
 	REDSOUND_WAVE_PAN_OFFSET = 0x1B,
 	REDSOUND_WAVE_REVERB_MIX_OFFSET = 0x1C,
+	REDSOUND_WAVE_RESERVED1D_OFFSET = 0x1D,
 	REDSOUND_WAVE_ADPCM_OFFSET = 0x22,
 	REDSOUND_WAVE_ADSR_OFFSET = 0x50,
+	REDSOUND_WAVE_RESERVED5C_OFFSET = 0x5C,
 };
 
 enum RedWaveLayoutWord {
@@ -132,6 +142,12 @@ enum RedVoiceLayoutCount {
 	REDSOUND_VOICE_ADSR_TIME_COUNT = 4,
 	REDSOUND_VOICE_ADSR_LEVEL_COUNT = 4,
 	REDSOUND_VOICE_ADSR_TIME_BYTE_STRIDE = sizeof(u16),
+	REDSOUND_VOICE_RESERVED2A_SIZE = 0x02,
+	REDSOUND_VOICE_RESERVED3A_SIZE = 0x02,
+	REDSOUND_VOICE_RESERVED48_SIZE = 0x08,
+	REDSOUND_VOICE_RESERVEDA4_SIZE = 0x04,
+	REDSOUND_VOICE_RESERVEDB4_SIZE = 0x04,
+	REDSOUND_VOICE_RESERVEDBC_SIZE = 0x04,
 	REDSOUND_TERMINATE_NOTE_WORD_COUNT = 1,
 };
 
@@ -155,16 +171,16 @@ struct RedVoiceDATA {
 	int m_pitchModFrames;
 	int m_pitchModFrame;
 	short m_pitchModDelay;
-	unsigned char m_reserved2A[0x2C - 0x2A];
+	unsigned char m_reserved2A[REDSOUND_VOICE_RESERVED2A_SIZE];
 	int m_volumeModPhase;
 	int m_volumeModFrames;
 	int m_volumeModFrame;
 	short m_volumeModDelay;
-	unsigned char m_reserved3A[0x3C - 0x3A];
+	unsigned char m_reserved3A[REDSOUND_VOICE_RESERVED3A_SIZE];
 	int m_randomPitch;
 	int m_randomVolume;
 	int m_randomPan;
-	unsigned char m_reserved48[0x50 - 0x48];
+	unsigned char m_reserved48[REDSOUND_VOICE_RESERVED48_SIZE];
 	RedAdsrDATA m_adsr;
 	int m_adsrStage;
 	int m_adsrStepFrames;
@@ -176,13 +192,13 @@ struct RedVoiceDATA {
 	int m_pitch;
 	int m_targetPitch;
 	int m_basePitch;
-	unsigned char m_reservedA4[0xA8 - 0xA4];
+	unsigned char m_reservedA4[REDSOUND_VOICE_RESERVEDA4_SIZE];
 	int m_voiceIndex;
 	int m_adsrCurrentLevel;
 	int m_envelopeLevel;
-	unsigned char m_reservedB4[0xB8 - 0xB4];
+	unsigned char m_reservedB4[REDSOUND_VOICE_RESERVEDB4_SIZE];
 	unsigned int m_updateFlags;
-	unsigned char m_reservedBC[0xC0 - 0xBC];
+	unsigned char m_reservedBC[REDSOUND_VOICE_RESERVEDBC_SIZE];
 };
 
 enum RedVoiceAdsrIndex {
@@ -216,10 +232,18 @@ enum RedVoiceLayoutOffset {
 	REDSOUND_VOICE_KEY_OFFSET = 0x18,
 	REDSOUND_VOICE_VELOCITY_OFFSET = 0x19,
 	REDSOUND_VOICE_STATE_FLAGS_OFFSET = 0x1A,
+	REDSOUND_VOICE_RESERVED1B_OFFSET = 0x1B,
+	REDSOUND_VOICE_RESERVED2A_OFFSET = 0x2A,
+	REDSOUND_VOICE_RESERVED3A_OFFSET = 0x3A,
+	REDSOUND_VOICE_RESERVED48_OFFSET = 0x48,
 	REDSOUND_VOICE_ACTIVE_OFFSET = 0x8C,
 	REDSOUND_VOICE_FLAGS_OFFSET = 0x90,
 	REDSOUND_VOICE_SWITCH_OFFSET = 0x94,
+	REDSOUND_VOICE_RESERVEDA4_OFFSET = 0xA4,
 	REDSOUND_VOICE_INDEX_OFFSET = 0xA8,
+	REDSOUND_VOICE_RESERVEDB4_OFFSET = 0xB4,
+	REDSOUND_VOICE_UPDATE_FLAGS_OFFSET = 0xB8,
+	REDSOUND_VOICE_RESERVEDBC_OFFSET = 0xBC,
 };
 
 enum RedVoiceLayoutWord {

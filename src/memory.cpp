@@ -95,9 +95,6 @@ long long DAT_8032ec58;
 extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
-extern "C" int DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
-    CRedSound*, int, int, int, int, int, void (*)(void*), void*);
-extern "C" int DMACheck__9CRedSoundFi(CRedSound*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
@@ -959,11 +956,11 @@ void CMemory::CopyFromAMemory(void*, void*, unsigned long)
  */
 void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
 {
-    int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(RedSound(&Sound), 0, 0, reinterpret_cast<int>(source),
-                                                   reinterpret_cast<int>(dest), static_cast<int>(size), 0, 0);
+    int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
+                                           static_cast<int>(size), 0, 0);
     CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
     watch.Start();
-    while (DMACheck__9CRedSoundFi(RedSound(&Sound), dmaId) != 0) {
+    while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
         watch.Stop();
         watch.Get();
         watch.Start();
@@ -982,11 +979,11 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
 void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
 {
     CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
-    int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(RedSound(&Sound), 0, 1, reinterpret_cast<int>(source),
-                                                   reinterpret_cast<int>(dest), static_cast<int>(size), 0, 0);
+    int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
+                                           static_cast<int>(size), 0, 0);
     watch.Start();
     float timeout = FLOAT_8032f7d8;
-    while (DMACheck__9CRedSoundFi(RedSound(&Sound), dmaId) != 0) {
+    while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
         watch.Stop();
         if (watch.Get() < timeout) {
             watch.Start();
@@ -1789,13 +1786,12 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                     m_rStage->alloc(static_cast<unsigned long>(entry.m_size), allocSource, static_cast<unsigned long>(line), 1));
                 entry.m_cacheData = reinterpret_cast<void*>(data);
                 if (data != 0) {
-                    int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
-                        RedSound(&Sound), 0, 1, reinterpret_cast<int>(entry.m_cacheData),
-                        reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
+                    int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(entry.m_cacheData),
+                                                           reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
                     CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
                     watch.Start();
                     float timeout = FLOAT_8032f7d8;
-                    while (DMACheck__9CRedSoundFi(RedSound(&Sound), dmaId) != 0) {
+                    while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
                         watch.Stop();
                         if (watch.Get() < timeout) {
                             watch.Start();
@@ -1900,11 +1896,11 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
         if (entry.m_dmaCopy == 0) {
             memcpy(entry.m_workData, src, static_cast<unsigned long>(entry.m_size));
         } else {
-            int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
-                RedSound(&Sound), 0, 0, reinterpret_cast<int>(src), reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
+            int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(src),
+                                                   reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
             CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
             watch.Start();
-            while (DMACheck__9CRedSoundFi(RedSound(&Sound), dmaId) != 0) {
+            while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
                 watch.Stop();
                 watch.Get();
                 watch.Start();
@@ -1952,11 +1948,11 @@ checksum_done_dma:
     if (entry.m_dmaCopy == 0) {
         memcpy(entry.m_workData, src, static_cast<unsigned long>(entry.m_size));
     } else {
-        int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
-            RedSound(&Sound), 0, 0, reinterpret_cast<int>(src), reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
+        int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(src),
+                                               reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
         CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
         watch.Start();
-        while (DMACheck__9CRedSoundFi(RedSound(&Sound), dmaId) != 0) {
+        while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
             watch.Stop();
             watch.Get();
             watch.Start();

@@ -659,7 +659,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 	int waveNo;
 	int waveAddress;
 	int waveSize;
-	void* waveDataTop;
+	u8* waveDataTop;
 
 	if (waveDataSize == 0) {
 		if ((m_waveLoadNo >= 0) && ((waveNo = SearchWaveSequence(m_waveLoadNo)) >= 0)) {
@@ -710,11 +710,11 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 			    REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
 			waveSize = waveHead->m_waveSize;
 			waveDataSize -= waveHeadSize;
-			waveDataTop = (void*)((unsigned char*)waveData + waveHeadSize);
+			waveDataTop = (u8*)waveData + waveHeadSize;
 		}
 	} else {
 		waveAddress = m_waveLoadAddress;
-		waveDataTop = waveData;
+		waveDataTop = (u8*)waveData;
 		waveSize = m_waveLoadSize;
 	}
 

@@ -2509,8 +2509,8 @@ static void _MusicNoteExecute()
     while ((status == 0) && (m_MusicPhraseStop == 0) &&
            ((p_SoundControl->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         p_SoundControl->m_activeTrackCount = p_SoundControl->m_savedActiveTrackCount;
-        memcpy(&p_SoundControl->m_measure, &p_SoundControl->m_savedPosition, sizeof(RedSoundControlPosition));
-        memcpy(&p_SoundControl->m_tempo, &p_SoundControl->m_savedTempo, sizeof(RedSoundControlTempo));
+        memcpy(&p_SoundControl->m_measure, &p_SoundControl->m_savedPosition, REDSOUND_CONTROL_SAVED_POSITION_SIZE);
+        memcpy(&p_SoundControl->m_tempo, &p_SoundControl->m_savedTempo, REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
 
         track = p_SoundControl->m_tracks;
         trackCount = p_SoundControl->m_trackCount;
@@ -2647,12 +2647,12 @@ static void _SkipMusicEntry()
             if (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
                 MusicStop(soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId);
             }
-            memcpy(&soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY], soundControl, sizeof(RedSoundCONTROL));
+            memcpy(&soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY], soundControl, REDSOUND_CONTROL_SIZE);
         }
 
-        memcpy(soundControl, &soundControl[REDSOUND_CONTROL_MUSIC_SKIP], sizeof(RedSoundCONTROL));
+        memcpy(soundControl, &soundControl[REDSOUND_CONTROL_MUSIC_SKIP], REDSOUND_CONTROL_SIZE);
         memcpy(&volume, &soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_volume, sizeof(volume));
-        memset(&soundControl[REDSOUND_CONTROL_MUSIC_SKIP], 0, sizeof(RedSoundCONTROL));
+        memset(&soundControl[REDSOUND_CONTROL_MUSIC_SKIP], 0, REDSOUND_CONTROL_SIZE);
         memcpy(&soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_volume, &volume, sizeof(volume));
         soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId = REDSOUND_MUSIC_ID_NONE;
     }
@@ -2681,19 +2681,19 @@ void MusicSkipFunction()
     RedTrackDATA* track;
 
     do {
-        p_SkipKeyOn = (RedKeyOnDATA*)RedNew(sizeof(RedKeyOnDATA));
+        p_SkipKeyOn = (RedKeyOnDATA*)RedNew(REDSOUND_KEY_ON_BUFFER_SIZE);
         if (p_SkipKeyOn == 0) {
             RedSleep(REDSOUND_MUSIC_SKIP_RETRY_SLEEP_US);
         }
     } while (p_SkipKeyOn == 0);
 
     control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP;
-    memset(p_SkipKeyOn, 0, sizeof(RedKeyOnDATA));
+    memset(p_SkipKeyOn, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
     activeTrackCount = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
     while ((activeTrackCount == 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
-        memcpy(&control->m_measure, &control->m_savedPosition, sizeof(RedSoundControlPosition));
-        memcpy(&control->m_tempo, &control->m_savedTempo, sizeof(RedSoundControlTempo));
+        memcpy(&control->m_measure, &control->m_savedPosition, REDSOUND_CONTROL_SAVED_POSITION_SIZE);
+        memcpy(&control->m_tempo, &control->m_savedTempo, REDSOUND_CONTROL_SAVED_TEMPO_SIZE);
         savedTrackData = &control->m_savedTracks;
         track = control->m_tracks;
         trackCount = control->m_trackCount;

@@ -613,20 +613,6 @@ void CRedSound::MusicPlay(int id, int vol, int fadeTime)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 60b
- * EN Address: UNUSED
- * EN Size: 60b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::MusicPlay(void* musicData, int volume, int mode)
-{
-	c_Driver.MusicPlay(musicData, volume, mode);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801cd034
  * PAL Size: 60b
  * EN Address: TODO
@@ -641,20 +627,6 @@ void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 60b
- * EN Address: UNUSED
- * EN Size: 60b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::MusicCrossPlay(void* musicData, int volume, int mode)
-{
-	c_Driver.MusicCrossPlay(musicData, volume, mode);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801cd070
  * PAL Size: 60b
  * EN Address: TODO
@@ -665,20 +637,6 @@ void CRedSound::MusicCrossPlay(void* musicData, int volume, int mode)
 void CRedSound::MusicNextPlay(int id, int vol, int fadeTime)
 {
 	c_Driver.MusicNextPlay(id, vol, fadeTime);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 60b
- * EN Address: UNUSED
- * EN Size: 60b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::MusicNextPlay(void* musicData, int volume, int mode)
-{
-	c_Driver.MusicNextPlay(musicData, volume, mode);
 }
 
 /*
@@ -721,48 +679,6 @@ void CRedSound::MusicFadeOut(int id, int fadeTime)
 void CRedSound::MusicVolume(int id, int volume, int fadeTime)
 {
 	c_Driver.MusicVolume(id, volume, fadeTime);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 52b
- * EN Address: UNUSED
- * EN Size: 52b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::MusicPitch(int pitch, int frameCount)
-{
-	c_Driver.MusicPitch(pitch, frameCount);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 52b
- * EN Address: UNUSED
- * EN Size: 52b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::MusicTempo(int tempo, int frameCount)
-{
-	c_Driver.MusicTempo(tempo, frameCount);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 52b
- * EN Address: UNUSED
- * EN Size: 52b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::MusicPause(int id, int pause)
-{
-	c_Driver.MusicPause(id, pause);
 }
 
 /*

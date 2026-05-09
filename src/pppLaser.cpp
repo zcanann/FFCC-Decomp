@@ -243,7 +243,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
 
         GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);
         alphaMax = step->m_laser.m_trailAlpha;
-        alphaStep = (u8)(alphaMax / step->m_laser.m_pointCount);
+        alphaStep = (u8)((s32)(u8)alphaMax / (s32)step->m_laser.m_pointCount);
         color.r = step->m_laser.m_trailColorR;
         color.g = step->m_laser.m_trailColorG;
         color.b = step->m_laser.m_trailColorB;
@@ -273,7 +273,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             trailEndColor.r = color.r;
             trailEndColor.g = color.g;
             trailEndColor.b = color.b;
-            trailEndColor.a = alphaMax - alpha;
+            trailEndColor.a = alphaMax - (u8)(alphaStep * (i + 1));
             GXPosition3f32(work->m_points[i + 1].x, work->m_points[i + 1].y, work->m_points[i + 1].z);
             GXColor1u32(*(u32*)&trailEndColor);
             GXTexCoord2f32(u1, kPppLaserZero);

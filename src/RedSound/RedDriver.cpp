@@ -504,7 +504,6 @@ volatile int m_MasterSEVolume;
 RedStreamDATA* volatile p_Stream;
 static int m_DMAMode;
 volatile int m_SeSkipStep;
-int m_SilentWave;
 RedVoiceDATA* volatile p_VoiceData;
 int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
 RedTrackDATA* p_EditorTrack;
@@ -3723,7 +3722,7 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
 
     StopWaveItem();
 
-    if ((p_EditorTrack == 0) || (m_SilentWave != 0)) {
+    if (p_EditorTrack == 0) {
         return 0;
     }
 

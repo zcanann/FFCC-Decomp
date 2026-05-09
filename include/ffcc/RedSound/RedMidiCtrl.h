@@ -288,6 +288,13 @@ struct RedSoundControlTempo {
 	int m_tempoDelta;
 };
 
+struct RedSavedTrackDATA {
+	unsigned char* m_command[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+	int m_delta[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+	unsigned int m_flags[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+	RedNoteDATA m_note[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+};
+
 struct RedSoundCONTROL {
 	RedTrackDATA* m_tracks;
 	unsigned char m_reserved04[0x08 - 0x04];
@@ -300,10 +307,7 @@ struct RedSoundCONTROL {
 	int m_volume;
 	int m_volumeAdd;
 	int m_volumeDelta;
-	unsigned char* m_savedCommand[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
-	int m_savedDelta[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
-	unsigned int m_savedFlags[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
-	RedNoteDATA m_savedNote[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
+	RedSavedTrackDATA m_savedTracks;
 	RedSoundControlTempo m_savedTempo;
 	int m_savedActiveTrackCount;
 	RedSoundControlPosition m_savedPosition;

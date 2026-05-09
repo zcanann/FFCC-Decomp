@@ -163,10 +163,14 @@ STATIC_ASSERT(offsetof(RedSoundCONTROL, m_ticksPerMeasure) == REDSOUND_CONTROL_T
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_timeNumerator) == REDSOUND_CONTROL_TIME_NUMERATOR_OFFSET);
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_timeDenominator) == REDSOUND_CONTROL_TIME_DENOMINATOR_OFFSET);
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_volume) == REDSOUND_CONTROL_VOLUME_OFFSET);
-STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedCommand) == REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET * sizeof(int));
-STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedDelta) == REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET * sizeof(int));
-STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedFlags) == REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET * sizeof(int));
-STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedNote) == REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTracks.m_command) ==
+              REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTracks.m_delta) ==
+              REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTracks.m_flags) ==
+              REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTracks.m_note) ==
+              REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTempo) ==
               REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTempo.m_tempoAdd) ==
@@ -969,10 +973,10 @@ static void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, 
 static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     int loopBase = control->m_loopBase;
-    u8** savedCommand = control->m_savedCommand;
-    int* savedDelta = control->m_savedDelta;
-    unsigned int* savedFlags = control->m_savedFlags;
-    RedNoteDATA* savedNote = control->m_savedNote;
+    u8** savedCommand = control->m_savedTracks.m_command;
+    int* savedDelta = control->m_savedTracks.m_delta;
+    unsigned int* savedFlags = control->m_savedTracks.m_flags;
+    RedNoteDATA* savedNote = control->m_savedTracks.m_note;
 
     control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE;
 

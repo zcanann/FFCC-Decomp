@@ -191,13 +191,6 @@ struct RedExecuteSmallDataState {
     RedKeyOnDATA* volatile m_skipKeyOn;
 };
 
-struct RedSavedTrackDATA {
-    unsigned char* m_command[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
-    int m_delta[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
-    unsigned int m_flags[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
-    RedNoteDATA m_note[REDSOUND_MUSIC_TRACK_SAVE_COUNT];
-};
-
 enum RedReverbDelayChannelIndex {
     REDSOUND_REVERB_DELAY_LEFT = 0,
     REDSOUND_REVERB_DELAY_RIGHT = 1,
@@ -2474,7 +2467,7 @@ static void _MusicNoteExecute()
 
         track = p_SoundControl->m_tracks;
         trackCount = p_SoundControl->m_trackCount;
-        savedTrackData = (RedSavedTrackDATA*)p_SoundControl->m_savedCommand;
+        savedTrackData = &p_SoundControl->m_savedTracks;
         i = 0;
         do {
             track->m_command = savedTrackData->m_command[i];
@@ -2654,7 +2647,7 @@ void MusicSkipFunction()
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
         memcpy(&control->m_measure, &control->m_savedPosition, sizeof(RedSoundControlPosition));
         memcpy(&control->m_tempo, &control->m_savedTempo, sizeof(RedSoundControlTempo));
-        savedTrackData = (RedSavedTrackDATA*)control->m_savedCommand;
+        savedTrackData = &control->m_savedTracks;
         track = control->m_tracks;
         trackCount = control->m_trackCount;
         trackIndex = 0;

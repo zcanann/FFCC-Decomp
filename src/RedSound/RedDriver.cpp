@@ -3691,12 +3691,12 @@ void CRedDriver::SetReverbDepth(int bank, int mode, int depth)
  */
 void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
 {
-    unsigned int mask = 1U << voiceNo;
+    voiceNo &= REDSOUND_VOICE_COUNT - 1;
 
     if (mute) {
-        m_Mute[voiceNo >> REDSOUND_MUTE_WORD_SHIFT] |= mask;
+        m_Mute[voiceNo >> REDSOUND_MUTE_WORD_SHIFT] |= 1U << voiceNo;
     } else {
-        m_Mute[voiceNo >> REDSOUND_MUTE_WORD_SHIFT] &= ~mask;
+        m_Mute[voiceNo >> REDSOUND_MUTE_WORD_SHIFT] &= ~(1U << voiceNo);
     }
 }
 

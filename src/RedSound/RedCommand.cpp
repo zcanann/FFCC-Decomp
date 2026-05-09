@@ -1191,7 +1191,9 @@ void MusicPause(int musicId, int pause)
 
 	music = p_SoundControlBuffer;
 	do {
-		if ((musicId == REDSOUND_MUSIC_ID_NONE) || (musicId == music->m_musicId)) {
+		if ((music->m_tracks != 0) && (music->m_trackCount != 0) && (music->m_activeTrackCount > 0) &&
+		    (music->m_musicId >= 0) &&
+		    ((musicId == REDSOUND_MUSIC_ID_NONE) || (musicId == music->m_musicId))) {
 			if (pause == REDSOUND_PAUSE_ON) {
 				music->m_flags |= REDSOUND_CONTROL_FLAG_PAUSE;
 			} else {
@@ -1200,8 +1202,9 @@ void MusicPause(int musicId, int pause)
 
 			voice = p_VoiceData;
 			do {
-				if ((voice->m_track >= music->m_tracks) &&
-				    (voice->m_track < music->m_tracks + music->m_trackCount)) {
+				if ((voice->m_active != 0) && (voice->m_track != 0) &&
+				    (voice->m_track >= music->m_tracks) && (voice->m_track < music->m_tracks + music->m_trackCount) &&
+				    (voice->m_track->m_command != 0)) {
 					if (pause == REDSOUND_PAUSE_ON) {
 						if (voice->m_axVoice != 0) {
 							voice->m_targetPitch = 0;

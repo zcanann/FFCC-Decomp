@@ -35,6 +35,8 @@ STATIC_ASSERT(sizeof(((RedTrackDATA*)0)->m_reserved04) == REDSOUND_TRACK_RESERVE
 STATIC_ASSERT(REDSOUND_TRACK_RESERVED04_BYTE + REDSOUND_TRACK_RESERVED04_SIZE ==
               REDSOUND_TRACK_LOOP_COMMAND_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_loopCommand) == REDSOUND_TRACK_LOOP_COMMAND_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(sizeof(((RedTrackDATA*)0)->m_loopCommand) ==
+              REDSOUND_TRACK_LOOP_STACK_COUNT * sizeof(unsigned char*));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_waveBankData) == REDSOUND_TRACK_WAVE_BANK_DATA_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_waveData) == REDSOUND_TRACK_WAVE_DATA_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_keySignatureData) ==
@@ -138,7 +140,9 @@ STATIC_ASSERT(offsetof(RedTrackDATA, m_waveBase) == REDSOUND_TRACK_WAVE_BASE_WOR
 STATIC_ASSERT(offsetof(RedTrackDATA, m_portamentPitch) == REDSOUND_TRACK_PORTAMENT_PITCH_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_waveNo) == REDSOUND_TRACK_WAVE_NO_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_loopCount) == REDSOUND_TRACK_LOOP_COUNT_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(sizeof(((RedTrackDATA*)0)->m_loopCount) == REDSOUND_TRACK_LOOP_STACK_COUNT * sizeof(short));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_loopStep) == REDSOUND_TRACK_LOOP_STEP_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(sizeof(((RedTrackDATA*)0)->m_loopStep) == REDSOUND_TRACK_LOOP_STACK_COUNT * sizeof(short));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_step) == REDSOUND_TRACK_STEP_HALFWORD * sizeof(unsigned short));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_step2) == REDSOUND_TRACK_STEP2_HALFWORD * sizeof(unsigned short));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_loopDepth) == REDSOUND_TRACK_LOOP_DEPTH_HALFWORD * sizeof(unsigned short));
@@ -177,8 +181,12 @@ STATIC_ASSERT(sizeof(RedNoteDATA) == REDSOUND_NOTE_SIZE);
 STATIC_ASSERT(offsetof(RedKeyOnSlot, m_track) == REDSOUND_KEY_ON_SLOT_TRACK_OFFSET);
 STATIC_ASSERT(offsetof(RedKeyOnSlot, m_note) == REDSOUND_KEY_ON_SLOT_NOTE_OFFSET);
 STATIC_ASSERT(sizeof(RedKeyOnSlot) == REDSOUND_KEY_ON_SLOT_SIZE);
+STATIC_ASSERT(sizeof(((RedKeyOnDATA*)0)->m_fixed) == REDSOUND_KEY_ON_PRIORITY_BYTE_OFFSET);
 STATIC_ASSERT(offsetof(RedKeyOnDATA, m_priority) == REDSOUND_KEY_ON_PRIORITY_BYTE_OFFSET);
+STATIC_ASSERT(sizeof(((RedKeyOnDATA*)0)->m_priority) ==
+              REDSOUND_KEY_ON_NORMAL_BYTE_OFFSET - REDSOUND_KEY_ON_PRIORITY_BYTE_OFFSET);
 STATIC_ASSERT(offsetof(RedKeyOnDATA, m_normal) == REDSOUND_KEY_ON_NORMAL_BYTE_OFFSET);
+STATIC_ASSERT(sizeof(((RedKeyOnDATA*)0)->m_normal) == REDSOUND_KEY_ON_END_BYTE_OFFSET - REDSOUND_KEY_ON_NORMAL_BYTE_OFFSET);
 STATIC_ASSERT(sizeof(RedKeyOnDATA) == REDSOUND_KEY_ON_END_BYTE_OFFSET);
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_tracks) == REDSOUND_CONTROL_TRACKS_OFFSET);
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_reserved04) == REDSOUND_CONTROL_RESERVED04_OFFSET);
@@ -194,12 +202,16 @@ STATIC_ASSERT(offsetof(RedSoundCONTROL, m_timeDenominator) == REDSOUND_CONTROL_T
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_volume) == REDSOUND_CONTROL_VOLUME_OFFSET);
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTracks.m_command) ==
               REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(sizeof(((RedSavedTrackDATA*)0)->m_command) == REDSOUND_MUSIC_TRACK_SAVE_COUNT * sizeof(unsigned char*));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTracks.m_delta) ==
               REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(sizeof(((RedSavedTrackDATA*)0)->m_delta) == REDSOUND_MUSIC_TRACK_SAVE_COUNT * sizeof(int));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTracks.m_flags) ==
               REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(sizeof(((RedSavedTrackDATA*)0)->m_flags) == REDSOUND_MUSIC_TRACK_SAVE_COUNT * sizeof(unsigned int));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTracks.m_note) ==
               REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET * sizeof(int));
+STATIC_ASSERT(sizeof(((RedSavedTrackDATA*)0)->m_note) == REDSOUND_MUSIC_TRACK_SAVE_COUNT * sizeof(RedNoteDATA));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTempo) ==
               REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET * sizeof(int));
 STATIC_ASSERT(offsetof(RedSoundCONTROL, m_savedTempo.m_tempoAdd) ==

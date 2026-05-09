@@ -174,9 +174,12 @@ static RedSoundStreamBank* _SearchStreamBank(int streamID)
 {
 	RedSoundStreamBank* bank = p_StreamBank;
 
+	if (streamID == 0) {
+		return 0;
+	}
+
 	do {
-		int id = bank->m_streamId;
-		if ((streamID != 0) && (id == streamID)) {
+		if (bank->m_streamId == streamID) {
 			return bank;
 		}
 		bank++;

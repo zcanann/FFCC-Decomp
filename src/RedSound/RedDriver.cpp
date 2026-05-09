@@ -3811,11 +3811,7 @@ int CRedDriver::WavePitchCompute(int key, int pitch)
     int basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
 
     if ((p_EditorTrack != 0) && (p_EditorTrack->m_waveData != 0)) {
-        if ((p_EditorTrack->m_waveData->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) != 0) {
-            basePitch = p_EditorTrack->m_waveData->m_splitKey << REDSOUND_PITCH_BASE_NOTE_SHIFT;
-        }
         basePitch += p_EditorTrack->m_pitch;
-        pitch += p_EditorTrack->m_pitchBend;
         return PitchCompute(basePitch, pitch + p_EditorTrack->m_keyTranspose,
                             p_EditorTrack->m_waveData->m_pitch,
                             p_EditorTrack->m_fineTune);

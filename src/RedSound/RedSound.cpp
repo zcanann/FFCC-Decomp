@@ -473,20 +473,6 @@ int CRedSound::DMACheck(int id)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 40b
- * EN Address: UNUSED
- * EN Size: 40b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::SetDMAMode(int mode)
-{
-	RedSetDMAMode(mode);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801cceb4
  * PAL Size: 44b
  * EN Address: TODO
@@ -511,20 +497,6 @@ void CRedSound::SetSoundMode(int mode)
 int CRedSound::GetSoundMode()
 {
 	return c_Driver.GetSoundMode();
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 60b
- * EN Address: UNUSED
- * EN Size: 60b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::SetReverb(int bank, int kind, int* params)
-{
-	c_Driver.SetReverb(bank, kind, params);
 }
 
 /*
@@ -820,22 +792,6 @@ int CRedSound::SePlay(int seID, int sepID, int pan, int volume, int pitch)
 {
 	int autoID = GetAutoID();
 	c_Driver.SePlay(seID, sepID, autoID, pan, volume, pitch);
-	return autoID;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 100b
- * EN Address: UNUSED
- * EN Size: 100b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedSound::SePlay(void* seSepData, int pan, int volume, int pitch)
-{
-	int autoID = GetAutoID();
-	c_Driver.SePlay(seSepData, autoID, pan, volume, pitch);
 	return autoID;
 }
 

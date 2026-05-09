@@ -707,20 +707,6 @@ static void _SetMusicData(int* command)
     c_RedEntry.SetMusicData((RedMusicHEAD*)command[REDSOUND_DATA_COMMAND_BUFFER]);
 }
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 56b
- * EN Address: UNUSED
- * EN Size: 56b
- * JP Address: TODO
- * JP Size: TODO
- */
-static void _ClearMusicData(int* command)
-{
-    c_RedEntry.ClearMusicData(command[REDSOUND_MUSIC_COMMAND_ID]);
-}
-
 static void _MusicPlaySequence(int* command);
 static void _MusicCrossPlaySequence(int* command);
 static void _MusicNextPlaySequence(int* command);
@@ -1252,23 +1238,6 @@ static void _SeStopMG(int* command)
 static void _SeStopG(int* command)
 {
     SeStopG(command[REDSOUND_SE_COMMAND_ID]);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 76b
- * EN Address: UNUSED
- * EN Size: 76b
- * JP Address: TODO
- * JP Size: TODO
- */
-static void _ClearSePlayLine(int*)
-{
-    unsigned int interruptLevel = OSDisableInterrupts();
-    memset(p_ExecCommand, 0, sizeof(RedExecCommand) * REDSOUND_EXEC_COMMAND_COUNT);
-    p_ExecCommandNow = p_ExecCommand;
-    OSRestoreInterrupts(interruptLevel);
 }
 
 /*
@@ -2400,20 +2369,6 @@ int CRedDriver::ReentryMusicData(int musicID)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 72b
- * EN Address: UNUSED
- * EN Size: 72b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedDriver::ClearMusicData(int musicID)
-{
-    _EntryExecCommand(_ClearMusicData, musicID, 0, 0, 0, 0, 0, 0);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801bee48
  * PAL Size: 72b
  * EN Address: TODO
@@ -2658,20 +2613,6 @@ void CRedDriver::MusicPitch(int pitch, int frameCount)
 void CRedDriver::MusicPause(int musicID, int pause)
 {
     _EntryExecCommand(_MusicPause, musicID, pause, 0, 0, 0, 0, 0);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 40b
- * EN Address: UNUSED
- * EN Size: 40b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedDriver::DisplayMusicInfo()
-{
-    c_RedEntry.DisplayMusicInfo();
 }
 
 /*
@@ -3118,20 +3059,6 @@ void CRedDriver::DisplaySePlayInfo()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 68b
- * EN Address: UNUSED
- * EN Size: 68b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedDriver::ClearSePlayLine()
-{
-    _EntryExecCommand(_ClearSePlayLine, 0, 0, 0, 0, 0, 0, 0);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801bf8e8
  * PAL Size: 240b
  * EN Address: TODO
@@ -3394,20 +3321,6 @@ void CRedDriver::DisplayWaveInfo()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 40b
- * EN Address: UNUSED
- * EN Size: 40b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedDriver::DisplayMMemoryInfo()
-{
-    c_RedEntry.DisplayMMemoryInfo();
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801BFDF8
  * PAL Size: 92b
  * EN Address: TODO
@@ -3638,27 +3551,6 @@ void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
         SetVoiceAccess(p_EditorTrack, REDSOUND_VOICE_FLAGS_ADSR_DIRTY);
         SetVoiceAccess(p_EditorTrack, REDSOUND_VOICE_FLAGS_ADSR_START);
     }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 80b
- * EN Address: UNUSED
- * EN Size: 80b
- * JP Address: TODO
- * JP Size: TODO
- */
-RedTrackDATA* CRedDriver::GetSePlayTrack()
-{
-    RedTrackDATA* track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
-    while (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT) {
-        if ((u32)track->m_command != 0) {
-            return track;
-        }
-        track++;
-    }
-    return 0;
 }
 
 /*

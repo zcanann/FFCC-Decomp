@@ -557,20 +557,6 @@ void CRedSound::SetReverbDepth(int bank, int sep, int depth)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 36b
- * EN Address: UNUSED
- * EN Size: 36b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::DisplayMMemoryInfo()
-{
-	c_Driver.DisplayMMemoryInfo();
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801ccf74
  * PAL Size: 44b
  * EN Address: TODO
@@ -581,20 +567,6 @@ void CRedSound::DisplayMMemoryInfo()
 void CRedSound::SetMusicData(void* musicData)
 {
 	c_Driver.SetMusicData(musicData);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: UNUSED
- * EN Size: 44b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::ClearMusicData(int id)
-{
-	c_Driver.ClearMusicData(id);
 }
 
 /*
@@ -805,20 +777,6 @@ void CRedSound::MusicPause(int id, int pause)
 void CRedSound::SetMusicPhraseStop(int id)
 {
 	c_Driver.SetMusicPhraseStop(id);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 36b
- * EN Address: UNUSED
- * EN Size: 36b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::DisplayMusicInfo()
-{
-	c_Driver.DisplayMusicInfo();
 }
 
 /*
@@ -1657,34 +1615,6 @@ void CRedSound::SetWavePitch(int pitch)
 void CRedSound::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
 {
 	c_Driver.SetWaveAdsr(attack, adsr);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 36b
- * EN Address: UNUSED
- * EN Size: 36b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::ClearSePlayLine()
-{
-	c_Driver.ClearSePlayLine();
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 36b
- * EN Address: UNUSED
- * EN Size: 36b
- * JP Address: TODO
- * JP Size: TODO
- */
-RedTrackDATA* CRedSound::GetSePlayTrack()
-{
-	return c_Driver.GetSePlayTrack();
 }
 
 /*

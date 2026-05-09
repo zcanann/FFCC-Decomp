@@ -64,6 +64,10 @@ struct RedStreamStereoFrame {
 	unsigned int m_right[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];
 };
 
+struct RedStreamChannelFrame {
+	unsigned int m_word[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];
+};
+
 enum RedStreamFrameLayoutSize {
 	REDSOUND_STREAM_STEREO_LEFT_FRAME_OFFSET = 0x00,
 	REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET = sizeof(unsigned int) * REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT,
@@ -105,6 +109,7 @@ STATIC_ASSERT(sizeof(RedStreamFile) == REDSOUND_STREAM_FILE_SIZE);
 STATIC_ASSERT(offsetof(RedStreamStereoFrame, m_left) == REDSOUND_STREAM_STEREO_LEFT_FRAME_OFFSET);
 STATIC_ASSERT(offsetof(RedStreamStereoFrame, m_right) == REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET);
 STATIC_ASSERT(sizeof(RedStreamStereoFrame) == REDSOUND_STREAM_STEREO_FRAME_SIZE);
+STATIC_ASSERT(sizeof(RedStreamChannelFrame) == REDSOUND_STREAM_STEREO_CHANNEL_FRAME_BYTES);
 STATIC_ASSERT(REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE * REDSOUND_STREAM_STEREO_FRAME_SIZE ==
               REDSOUND_STREAM_PAGE_SIZE);
 STATIC_ASSERT(REDSOUND_STREAM_STEREO_PLANE_SIZE * REDSOUND_STREAM_STEREO_CHANNEL_COUNT ==
@@ -313,11 +318,11 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			leftDst = dstBase;
 			
 			do {
-				*(unsigned int*)leftDst = srcFrame->m_left[0];
-				*(unsigned int*)(leftDst + REDSOUND_STREAM_STEREO_FRAME_WORD_BYTES) = srcFrame->m_left[1];
+				((RedStreamChannelFrame*)leftDst)->m_word[0] = srcFrame->m_left[0];
+				((RedStreamChannelFrame*)leftDst)->m_word[1] = srcFrame->m_left[1];
 				leftDst = leftDst + REDSOUND_STREAM_STEREO_CHANNEL_FRAME_BYTES;
-				*(unsigned int*)rightDst = srcFrame->m_right[0];
-				*(unsigned int*)(rightDst + REDSOUND_STREAM_STEREO_FRAME_WORD_BYTES) = srcFrame->m_right[1];
+				((RedStreamChannelFrame*)rightDst)->m_word[0] = srcFrame->m_right[0];
+				((RedStreamChannelFrame*)rightDst)->m_word[1] = srcFrame->m_right[1];
 				srcFrame = srcFrame + 1;
 				rightDst = rightDst + REDSOUND_STREAM_STEREO_CHANNEL_FRAME_BYTES;
 			} while (srcFrame < srcEnd);
@@ -331,11 +336,11 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			srcEnd = srcFrame + REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE;
 			
 			do {
-				*(unsigned int*)leftDst = srcFrame->m_left[0];
-				*(unsigned int*)(leftDst + REDSOUND_STREAM_STEREO_FRAME_WORD_BYTES) = srcFrame->m_left[1];
+				((RedStreamChannelFrame*)leftDst)->m_word[0] = srcFrame->m_left[0];
+				((RedStreamChannelFrame*)leftDst)->m_word[1] = srcFrame->m_left[1];
 				leftDst = leftDst + REDSOUND_STREAM_STEREO_CHANNEL_FRAME_BYTES;
-				*(unsigned int*)rightDst = srcFrame->m_right[0];
-				*(unsigned int*)(rightDst + REDSOUND_STREAM_STEREO_FRAME_WORD_BYTES) = srcFrame->m_right[1];
+				((RedStreamChannelFrame*)rightDst)->m_word[0] = srcFrame->m_right[0];
+				((RedStreamChannelFrame*)rightDst)->m_word[1] = srcFrame->m_right[1];
 				srcFrame = srcFrame + 1;
 				rightDst = rightDst + REDSOUND_STREAM_STEREO_CHANNEL_FRAME_BYTES;
 			} while (srcFrame < srcEnd);

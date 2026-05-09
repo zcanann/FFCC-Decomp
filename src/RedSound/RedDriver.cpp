@@ -3024,6 +3024,45 @@ int CRedDriver::SePlay(int bank, int sep, int autoID, int pan, int volume, int p
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 312b
+ * EN Address: UNUSED
+ * EN Size: 312b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pitch)
+{
+    int result = REDSOUND_SE_ID_ALL;
+    RedSeSepHEAD* const header = (RedSeSepHEAD*)seSepData;
+    RedSeSepHEAD* copiedHeader;
+    int headerSize;
+
+    if ((seSepData != 0) &&
+        (((((header->m_signature[0] == REDSOUND_SESEP_SIGNATURE_0) &&
+            (header->m_signature[1] == REDSOUND_SESEP_SIGNATURE_1)) &&
+           (header->m_signature[2] == REDSOUND_SESEP_SIGNATURE_2)) &&
+          ((header->m_signature[3] == REDSOUND_SESEP_SIGNATURE_3 &&
+            (header->m_signature[4] == REDSOUND_SESEP_SIGNATURE_4)))))) {
+        headerSize = header->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
+        if (headerSize > 0) {
+            copiedHeader = (RedSeSepHEAD*)RedNew(headerSize);
+            if (copiedHeader != 0) {
+                memcpy(copiedHeader, header, headerSize);
+                result = autoID;
+                _EntryExecCommand(_SeSepPlay, autoID, (int)copiedHeader, pan, volume, pitch, 0, 0);
+            }
+        }
+    } else if (m_ReportPrint != 0) {
+        OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,
+                 sRedDriverLogWarnColor, sRedDriverLogReset);
+        fflush(__files + 1);
+    }
+    return result;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bf604
  * PAL Size: 72b
  * EN Address: TODO

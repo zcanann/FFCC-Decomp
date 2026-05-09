@@ -77,6 +77,7 @@ public:
 	void SeStopG(int group);
 	void SeStopMG(int bank, int sep, int group, int kind);
 	int SePlay(int bank, int sep, int autoId, int pan, int volume, int pitch);
+	int SePlay(void* seSepData, int autoId, int pan, int volume, int pitch);
 	void SeMasterVolume(int volume);
 	void SeFadeOut(int seId, int frameCount);
 	void SeVolume(int seId, int volume, int frameCount);

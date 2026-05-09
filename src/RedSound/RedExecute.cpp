@@ -2631,6 +2631,10 @@ void MusicSkipFunction()
     int activeTrackCount;
     int trackIndex;
     unsigned int trackCount;
+    unsigned char** savedCommand;
+    int* savedDelta;
+    unsigned int* savedFlags;
+    RedNoteDATA* savedNote;
     RedSoundCONTROL* control;
     RedTrackDATA* track;
 
@@ -2648,14 +2652,18 @@ void MusicSkipFunction()
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
         memcpy(&control->m_measure, &control->m_savedPosition, sizeof(RedSoundControlPosition));
         memcpy(&control->m_tempo, &control->m_savedTempo, sizeof(RedSoundControlTempo));
+        savedCommand = control->m_savedCommand;
+        savedDelta = control->m_savedDelta;
+        savedFlags = control->m_savedFlags;
+        savedNote = control->m_savedNote;
         track = control->m_tracks;
         trackCount = control->m_trackCount;
         trackIndex = 0;
         do {
-            track->m_command = control->m_savedCommand[trackIndex];
-            track->m_deltaTime = control->m_savedDelta[trackIndex];
-            track->m_flags = control->m_savedFlags[trackIndex];
-            RedNoteCopy(&track->m_note, &control->m_savedNote[trackIndex]);
+            track->m_command = savedCommand[trackIndex];
+            track->m_deltaTime = savedDelta[trackIndex];
+            track->m_flags = savedFlags[trackIndex];
+            RedNoteCopy(&track->m_note, &savedNote[trackIndex]);
             trackCount -= 1;
             trackIndex += 1;
             track += 1;

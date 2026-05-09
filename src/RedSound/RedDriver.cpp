@@ -607,6 +607,19 @@ STATIC_ASSERT(sizeof(sRedDriverLogWarnColor) + sizeof(sRedDriverLogReset) == RED
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 4b
+ * EN Address: UNUSED
+ * EN Size: 4b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _NoRelease(int*)
+{
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bcf0c
  * PAL Size: 124b
  * EN Address: TODO

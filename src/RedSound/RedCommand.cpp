@@ -327,54 +327,6 @@ int SeStopID(int seId)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 408b
- * EN Address: UNUSED
- * EN Size: 408b
- * JP Address: TODO
- * JP Size: TODO
- */
-int SeStopG(int group)
-{
-	RedSoundCONTROL* soundControl;
-	RedTrackDATA* track;
-
-	soundControl = &p_SoundControlBuffer[REDSOUND_CONTROL_SE];
-	soundControl->m_updateFlags = 0;
-	track = soundControl->m_tracks;
-	do {
-		if ((track->m_command != 0) && ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) == 0)) {
-			if (group != (track->m_seSepId / REDSOUND_SE_MG_ID_DIVISOR)) {
-				int trackNo;
-
-				KeyOnReserveClear(p_KeyOnData, track);
-				track->m_seId = 0;
-				track->m_flags = 0;
-				track->m_command = 0;
-				track->m_mixVolumeMode = 0;
-
-				trackNo = track->m_trackNo;
-				(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-				(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
-				(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-				(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-				(p_VoiceData + trackNo)->m_track = 0;
-				(p_VoiceData + trackNo)->m_active = 0;
-
-				if (track->m_waveBankData != 0) {
-					c_RedEntry.WaveHistoryManager(0, track->m_waveBankData->m_waveNo);
-				}
-				c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
-			}
-		}
-		track++;
-	} while (track < soundControl->m_tracks + REDSOUND_SE_TRACK_COUNT);
-
-	return 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801ca638
  * PAL Size: 464b
  * EN Address: TODO

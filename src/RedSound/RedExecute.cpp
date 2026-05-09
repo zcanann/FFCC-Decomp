@@ -1244,11 +1244,11 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
         if (voice->m_waveData != 0) {
             if ((voice->m_waveData->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) == 0) {
                 voice->m_basePitch = noteData->m_key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
-                if (track->m_keySignatureData != 0) {
+                if (voice->m_track->m_keySignatureData != 0) {
                     workValue = voice->m_basePitch >> REDSOUND_PITCH_BASE_NOTE_SHIFT;
                     octaveIndex = workValue / REDSOUND_NOTES_PER_OCTAVE + (voice->m_basePitch >> REDSOUND_SIGN_SHIFT);
                     pitchWork[0] =
-                        track->m_keySignatureData[workValue + (octaveIndex - (octaveIndex >> REDSOUND_SIGN_SHIFT)) * -REDSOUND_NOTES_PER_OCTAVE];
+                        voice->m_track->m_keySignatureData[workValue + (octaveIndex - (octaveIndex >> REDSOUND_SIGN_SHIFT)) * -REDSOUND_NOTES_PER_OCTAVE];
                     voice->m_basePitch += pitchWork[0] * REDSOUND_PITCH_KEY_SIGNATURE_UNIT;
                 }
             } else {

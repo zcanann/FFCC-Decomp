@@ -568,7 +568,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
         slot = &keyOnData->m_fixed[track->m_trackNo];
         if ((slot->m_track == 0) || (slot->m_track == track)) {
             slot->m_track = track;
-            *(unsigned int*)&slot->m_note = *(unsigned int*)&track->m_note;
+            RedNoteCopy(&slot->m_note, &track->m_note);
             m_KeyOnEntry++;
         }
         return;
@@ -579,7 +579,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
         do {
             if (slot->m_track == 0) {
                 slot->m_track = track;
-                *(unsigned int*)&slot->m_note = *(unsigned int*)&track->m_note;
+                RedNoteCopy(&slot->m_note, &track->m_note);
                 m_KeyOnEntry++;
                 break;
             }
@@ -590,7 +590,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
         do {
             if (slot->m_track == 0) {
                 slot->m_track = track;
-                *(unsigned int*)&slot->m_note = *(unsigned int*)&track->m_note;
+                RedNoteCopy(&slot->m_note, &track->m_note);
                 m_KeyOnEntry++;
                 break;
             }

@@ -115,6 +115,7 @@ public:
 	RedWaveHeadWD* GetWaveInfo(int waveNo);
 	int CheckWaveEntry(int waveNo);
 	void DisplayWaveInfo();
+	int SearchWaveSequence(int waveNo);
 	void DisplayMMemoryInfo();
 	void GetMakeTime(char** date, char** time);
 	int GetMainBufferAddress();

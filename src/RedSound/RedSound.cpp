@@ -1407,6 +1407,20 @@ void CRedSound::DisplayWaveInfo()
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: UNUSED
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::SearchWaveSequence(int waveNo)
+{
+	return c_RedEntry.SearchWaveSequence(waveNo);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 28b
  * EN Address: UNUSED
  * EN Size: 28b

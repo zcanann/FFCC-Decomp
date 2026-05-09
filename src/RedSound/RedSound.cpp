@@ -1398,6 +1398,9 @@ void CRedSound::GetStreamReadPoint(int streamID, int* readPoint)
 		}
 		if (bank->m_readPoint == currentReadPoint) {
 			bank->m_readPoint += readStep;
+			if (bank->m_readPoint >= bank->m_fileSize) {
+				bank->m_readPoint = 0;
+			}
 		}
 		if (readPoint != 0) {
 			*readPoint = bank->m_readPoint;

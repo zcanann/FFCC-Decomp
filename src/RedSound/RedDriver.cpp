@@ -2401,20 +2401,6 @@ int CRedDriver::ReentryMusicData(int musicID)
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 48b
- * EN Address: UNUSED
- * EN Size: 48b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedDriver::CheckMusicEntry(int musicID)
-{
-    return (int)c_RedEntry.SearchMusicBank(musicID);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
  * PAL Size: 72b
  * EN Address: UNUSED
  * EN Size: 72b
@@ -2424,67 +2410,6 @@ int CRedDriver::CheckMusicEntry(int musicID)
 void CRedDriver::ClearMusicData(int musicID)
 {
     _EntryExecCommand(_ClearMusicData, musicID, 0, 0, 0, 0, 0, 0);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 372b
- * EN Address: UNUSED
- * EN Size: 372b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedDriver::MusicPlayState(int musicID)
-{
-    RedExecCommand* commandNow;
-    unsigned int interruptLevel;
-    RedSoundCONTROL* music;
-    int result;
-    RedExecCommand* command;
-
-    interruptLevel = OSDisableInterrupts();
-    result = 0;
-    music = p_SoundControlBuffer;
-    do {
-        if ((music->m_tracks != 0) &&
-            (music->m_activeTrackCount != 0) &&
-            (music->m_musicId != REDSOUND_MUSIC_ID_NONE) &&
-            ((musicID == REDSOUND_MUSIC_ID_NONE) || (music->m_musicId == musicID))) {
-            result = (int)music;
-            break;
-        }
-        music++;
-    } while (music < p_SoundControlBuffer + REDSOUND_CONTROL_SE);
-
-    if (result == 0) {
-        if ((p_MusicNextPlay->m_musicId != REDSOUND_MUSIC_ID_NONE) &&
-            ((musicID == REDSOUND_MUSIC_ID_NONE) || (p_MusicNextPlay->m_musicId == musicID))) {
-            result = 1;
-        }
-    }
-    if (result == 0) {
-        commandNow = p_ExecCommandNow;
-        command = p_ExecCommandOld;
-        while (commandNow != command) {
-            if ((command->m_func != 0) &&
-                (((command->m_func == _MusicPlaySequence) ||
-                  (command->m_func == _MusicCrossPlaySequence)) ||
-                 ((command->m_func == _MusicNextPlaySequence) ||
-                  (command->m_func == _MusicStop))) &&
-                ((musicID == REDSOUND_MUSIC_ID_NONE) ||
-                 (musicID == command->m_args[REDSOUND_EXEC_COMMAND_ARG0]))) {
-                result = (int)command;
-                break;
-            }
-            command++;
-            if (command == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
-                command = p_ExecCommand;
-            }
-        }
-    }
-    OSRestoreInterrupts(interruptLevel);
-    return result;
 }
 
 /*
@@ -2765,20 +2690,6 @@ void CRedDriver::SetMusicPhraseStop(int stop)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 8b
- * EN Address: UNUSED
- * EN Size: 8b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedDriver::CheckMusicPhraseStop()
-{
-    return m_MusicPhraseStop;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801bf0c4
  * PAL Size: 168b
  * EN Address: TODO
@@ -2889,20 +2800,6 @@ int CRedDriver::ReentrySeSepData(int id)
     id         = c_RedEntry.ReentrySeSepData(id);
     OSRestoreInterrupts(interrupts);
     return id;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 48b
- * EN Address: UNUSED
- * EN Size: 48b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedDriver::CheckSeSepEntry(int id)
-{
-    return (int)c_RedEntry.SearchSeSepBank(id);
 }
 
 /*
@@ -3322,27 +3219,6 @@ int CRedDriver::GetStreamPlayPoint(int streamID, int* outPoint1, int* outPoint2)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 80b
- * EN Address: UNUSED
- * EN Size: 80b
- * JP Address: TODO
- * JP Size: TODO
- */
-RedStreamDATA* CRedDriver::GetStreamPlayBlock(int streamID)
-{
-	RedStreamDATA* streamData = p_Stream;
-	do {
-		if ((streamData->m_streamId != 0) && (streamData->m_streamId == streamID)) {
-			return streamData;
-		}
-		streamData++;
-	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
-	return 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801bfa74
  * PAL Size: 72b
  * EN Address: TODO
@@ -3500,34 +3376,6 @@ int CRedDriver::ReentryWaveData(int id)
     id         = c_RedEntry.ReentryWaveData(id);
     OSRestoreInterrupts(interrupts);
     return id;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 48b
- * EN Address: UNUSED
- * EN Size: 48b
- * JP Address: TODO
- * JP Size: TODO
- */
-RedWaveHeadWD* CRedDriver::GetWaveInfo(int id)
-{
-    return c_RedEntry.SearchWaveBase(id);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 48b
- * EN Address: UNUSED
- * EN Size: 48b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedDriver::CheckWaveEntry(int id)
-{
-    return (int)c_RedEntry.SearchWaveBase(id);
 }
 
 /*

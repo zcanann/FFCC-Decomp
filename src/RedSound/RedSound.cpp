@@ -613,20 +613,6 @@ int CRedSound::ReentryMusicData(int bank)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: UNUSED
- * EN Size: 44b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedSound::MusicPlayState(int id)
-{
-	return c_Driver.MusicPlayState(id);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801ccfcc
  * PAL Size: 44b
  * EN Address: TODO
@@ -809,20 +795,6 @@ void CRedSound::MusicPause(int id, int pause)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: UNUSED
- * EN Size: 44b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedSound::CheckMusicEntry(int id)
-{
-	return c_Driver.CheckMusicEntry(id);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801cd148
  * PAL Size: 44b
  * EN Address: TODO
@@ -833,20 +805,6 @@ int CRedSound::CheckMusicEntry(int id)
 void CRedSound::SetMusicPhraseStop(int id)
 {
 	c_Driver.SetMusicPhraseStop(id);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 36b
- * EN Address: UNUSED
- * EN Size: 36b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedSound::CheckMusicPhraseStop()
-{
-	return c_Driver.CheckMusicPhraseStop();
 }
 
 /*
@@ -1122,20 +1080,6 @@ int CRedSound::GetSeVolume(int seID, int outVolume)
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: UNUSED
- * EN Size: 44b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedSound::CheckSeSepEntry(int id)
-{
-	return c_Driver.CheckSeSepEntry(id);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
  * PAL Size: 180b
  * EN Address: UNUSED
  * EN Size: 180b
@@ -1234,20 +1178,6 @@ int CRedSound::StreamPlayState(int streamID)
 void CRedSound::GetStreamPlayPoint(int streamID, int* point1, int* point2)
 {
 	c_Driver.GetStreamPlayPoint(streamID, point1, point2);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: UNUSED
- * EN Size: 44b
- * JP Address: TODO
- * JP Size: TODO
- */
-RedStreamDATA* CRedSound::GetStreamPlayBlock(int streamID)
-{
-	return c_Driver.GetStreamPlayBlock(streamID);
 }
 
 /*
@@ -1502,34 +1432,6 @@ void CRedSound::ClearWaveBank(int id)
 int CRedSound::ReentryWaveData(int id)
 {
 	return c_Driver.ReentryWaveData(id);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: UNUSED
- * EN Size: 44b
- * JP Address: TODO
- * JP Size: TODO
- */
-RedWaveHeadWD* CRedSound::GetWaveInfo(int id)
-{
-	return c_Driver.GetWaveInfo(id);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: UNUSED
- * EN Size: 44b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedSound::CheckWaveEntry(int id)
-{
-	return c_Driver.CheckWaveEntry(id);
 }
 
 /*

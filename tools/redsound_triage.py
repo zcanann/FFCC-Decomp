@@ -129,12 +129,19 @@ def print_rows(rows: list[dict[str, Any]], limit: int) -> None:
         print("No mismatched RedSound symbols found.")
         return
 
-    print(f"{'cat':<10} {'pct':>8} {'diffs':>5} {'size':>5} {'unit':<11} {'symbol':<55} hint")
-    print("-" * 120)
+    show_attempts = any(row.get("attempt_count", 0) for row in rows[:limit])
+    attempt_header = " attempts" if show_attempts else ""
+    print(f"{'cat':<10} {'pct':>8} {'diffs':>5} {'size':>5} {'unit':<11} {'symbol':<55} hint{attempt_header}")
+    print("-" * (130 if show_attempts else 120))
     for row in rows[:limit]:
+        attempt = ""
+        if show_attempts:
+            count = row.get("attempt_count", 0)
+            if count:
+                attempt = f" {count}:{row.get('last_attempt_result', '')}"
         print(
             f"{row['category']:<10} {row['pct']:8.3f} {row['diff_count']:5d} {row['size']:5d} "
-            f"{short_unit(row['unit']):<11} {truncate(row['symbol'], 55):<55} {row['hint']}"
+            f"{short_unit(row['unit']):<11} {truncate(row['symbol'], 55):<55} {row['hint']}{attempt}"
         )
     if len(rows) > limit:
         print(f"... {len(rows) - limit} more")

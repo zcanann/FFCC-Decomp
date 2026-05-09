@@ -344,8 +344,7 @@ int SeStopG(int group)
 	track = soundControl->m_tracks;
 	do {
 		if ((track->m_command != 0) && ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) == 0)) {
-			int id = track->m_seSepId / REDSOUND_SE_MG_ID_DIVISOR;
-			if (group != id) {
+			if (group != (track->m_seSepId / REDSOUND_SE_MG_ID_DIVISOR)) {
 				int trackNo;
 
 				KeyOnReserveClear(p_KeyOnData, track);

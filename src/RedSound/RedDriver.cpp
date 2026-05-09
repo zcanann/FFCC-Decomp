@@ -3090,6 +3090,7 @@ int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pit
             copiedHeader = (RedSeSepHEAD*)RedNew(headerSize);
             if (copiedHeader != 0) {
                 memcpy(copiedHeader, header, headerSize);
+                copiedHeader->m_seNo = localHeader.m_seNo;
                 result = autoID;
                 _EntryExecCommand(_SeSepPlay, autoID, (int)copiedHeader, pan, volume, pitch, 0, 0);
             }

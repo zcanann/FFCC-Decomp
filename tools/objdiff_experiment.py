@@ -82,7 +82,10 @@ def load_objdiff_json(unit: str, symbols: list[str], timeout: int) -> dict[str, 
         tmp_path = Path(tmp.name)
 
     cmd = [str(objdiff), "diff", "-p", ".", "-u", unit, "-o", str(tmp_path), "--format", "json"]
-    cmd.extend(symbols)
+    # objdiff-cli currently accepts at most one symbol filter. For grouped
+    # experiments, capture the unit and filter the compact snapshot in Python.
+    if len(symbols) <= 1:
+        cmd.extend(symbols)
     try:
         run_command(cmd, timeout, check=True)
         with tmp_path.open("r", encoding="utf-8") as f:
@@ -469,7 +472,7 @@ def parse_args() -> argparse.Namespace:
             "  python3 tools/objdiff_experiment.py -u main/RedSound/RedExecute SetReverb__FiiPi --baseline .agent/rev.json --build\n"
         ),
     )
-    parser.add_argument("symbols", nargs="*", help="Optional symbol filters passed to objdiff-cli.")
+    parser.add_argument("symbols", nargs="*", help="Optional symbol filters. Multiple symbols are filtered after capture.")
     parser.add_argument("-u", "--unit", required=True, help="Objdiff unit, e.g. RedStream or main/RedSound/RedStream.")
     parser.add_argument("--save", type=Path, help="Save the current objdiff snapshot and exit.")
     parser.add_argument("--baseline", type=Path, help="Compare against a snapshot produced by --save.")

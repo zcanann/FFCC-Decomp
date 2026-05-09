@@ -4,10 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import json
 from collections import Counter
+from pathlib import Path
 from typing import Any
 
 from objdiff_experiment import (
+    DEFAULT_ATTEMPT_LOG,
     ROOT,
     as_float,
     classify_diff,
@@ -169,6 +172,57 @@ def print_commands(rows: list[dict[str, Any]], limit: int) -> None:
         print(f"  {experiment_command(row)}")
 
 
+def attempt_key(unit: str, symbol: str) -> tuple[str, str]:
+    return normalize_unit(unit), symbol
+
+
+def load_attempts(path: Path) -> dict[tuple[str, str], dict[str, Any]]:
+    attempts: dict[tuple[str, str], dict[str, Any]] = {}
+    if not path.exists():
+        return attempts
+    with path.open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                entry = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            unit = normalize_unit(str(entry.get("unit", "")))
+            symbols = entry.get("symbols") or [""]
+            for symbol in symbols:
+                key = (unit, str(symbol))
+                current = attempts.setdefault(key, {"count": 0, "last_result": "", "last_note": "", "last_time": ""})
+                current["count"] += 1
+                current["last_result"] = entry.get("result", "")
+                current["last_note"] = entry.get("note", "")
+                current["last_time"] = entry.get("timestamp", "")
+    return attempts
+
+
+def annotate_attempts(rows: list[dict[str, Any]], attempts: dict[tuple[str, str], dict[str, Any]]) -> None:
+    for row in rows:
+        row_attempts = attempts.get(attempt_key(row["unit"], row["symbol"]), {})
+        row["attempt_count"] = int(row_attempts.get("count", 0) or 0)
+        row["last_attempt_result"] = row_attempts.get("last_result", "")
+        row["last_attempt_note"] = row_attempts.get("last_note", "")
+
+
+def print_attempts(rows: list[dict[str, Any]], limit: int) -> None:
+    attempted = [row for row in rows if row.get("attempt_count", 0)]
+    if not attempted:
+        print("\nAttempts: none recorded for shown rows")
+        return
+    print("\nAttempts:")
+    for row in attempted[:limit]:
+        note = f" ({row['last_attempt_note']})" if row.get("last_attempt_note") else ""
+        print(
+            f"  {short_unit(row['unit'])} {row['symbol']}: "
+            f"{row['attempt_count']} attempt(s), last={row['last_attempt_result']}{note}"
+        )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("-u", "--unit", action="append", help="Limit to one unit. May be repeated.")
@@ -184,6 +238,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--detail", action="store_true", help="Print frame/save/diff details for shown rows.")
     parser.add_argument("--commands", action="store_true", help="Print ready-to-run objdiff_experiment commands.")
+    parser.add_argument("--attempts", action="store_true", help="Show attempt counts from the attempt log.")
+    parser.add_argument("--attempt-log", type=Path, default=DEFAULT_ATTEMPT_LOG, help="Attempt log path.")
     parser.add_argument("--objdiff-timeout", type=int, default=60)
     return parser.parse_args()
 
@@ -202,6 +258,8 @@ def main() -> int:
         and row["pct"] <= args.max_pct
         and (args.category is None or row["category"] == args.category)
     ]
+    if args.attempts:
+        annotate_attempts(rows, load_attempts(args.attempt_log))
     if args.sort == "easy":
         rows.sort(key=lambda row: (row["diff_count"], -row["pct"], row["category"], row["unit"], row["symbol"]))
     elif args.sort == "pct":
@@ -217,6 +275,8 @@ def main() -> int:
         print_detail(rows, args.limit)
     if args.commands:
         print_commands(rows, args.limit)
+    if args.attempts:
+        print_attempts(rows[: args.limit], args.limit)
     return 0
 
 

@@ -17,6 +17,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TIMEOUT_SECONDS = 30
 EPSILON = 0.0001
+DEFAULT_ATTEMPT_LOG = ROOT / "build" / "agent" / "objdiff_experiments.jsonl"
 
 
 def normalize_unit(unit: str) -> str:
@@ -385,6 +386,49 @@ def has_regression(changes: list[tuple[str, int, int, float, float]]) -> bool:
     return any(after_pct + EPSILON < before_pct for _, _, _, before_pct, after_pct in changes)
 
 
+def has_progress(changes: list[tuple[str, int, int, float, float]]) -> bool:
+    return any(after_pct > before_pct + EPSILON for _, _, _, before_pct, after_pct in changes)
+
+
+def serialize_changes(changes: list[tuple[str, int, int, float, float]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "name": name,
+            "before_size": before_size,
+            "after_size": after_size,
+            "before_pct": before_pct,
+            "after_pct": after_pct,
+            "delta": after_pct - before_pct,
+        }
+        for name, before_size, after_size, before_pct, after_pct in changes
+    ]
+
+
+def record_attempt(
+    path: Path,
+    unit: str,
+    symbols: list[str],
+    result: str,
+    section_changes: list[tuple[str, int, int, float, float]],
+    symbol_changes: list[tuple[str, int, int, float, float]],
+    note: str | None,
+) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    entry = {
+        "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "unit": unit,
+        "symbols": symbols,
+        "result": result,
+        "note": note or "",
+        "sections": serialize_changes(section_changes),
+        "symbols_changed": serialize_changes(symbol_changes),
+    }
+    with path.open("a", encoding="utf-8") as f:
+        json.dump(entry, f, sort_keys=True)
+        f.write("\n")
+    print(f"Recorded attempt: {path}")
+
+
 def restore_paths(paths: list[Path]) -> None:
     if not paths:
         return
@@ -430,6 +474,13 @@ def parse_args() -> argparse.Namespace:
         dest="rebuild_after_revert",
         help="Do not run ninja again after an automatic regression revert.",
     )
+    parser.add_argument(
+        "--record-attempt",
+        action="store_true",
+        help=f"Append experiment result to {DEFAULT_ATTEMPT_LOG.relative_to(ROOT)}.",
+    )
+    parser.add_argument("--attempt-log", type=Path, default=DEFAULT_ATTEMPT_LOG, help="Attempt log path.")
+    parser.add_argument("--note", help="Short note to store with --record-attempt.")
     return parser.parse_args()
 
 
@@ -475,6 +526,10 @@ def main() -> int:
         print_context(unit, context_symbols, args.limit)
 
     regressed = has_regression(section_changes) or has_regression(symbol_changes)
+    progressed = has_progress(section_changes) or has_progress(symbol_changes)
+    result = "regressed" if regressed else "improved" if progressed else "no_change"
+    if args.record_attempt:
+        record_attempt(args.attempt_log, unit, symbols, result, section_changes, symbol_changes, args.note)
     if regressed and args.revert_path:
         restore_paths(args.revert_path)
         if args.rebuild_after_revert and not run_ninja(args.ninja_timeout):

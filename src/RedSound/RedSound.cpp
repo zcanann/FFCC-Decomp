@@ -380,20 +380,6 @@ int CRedSound::GetProgramTime()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 36b
- * EN Address: UNUSED
- * EN Size: 36b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedSound::GetMasterTime()
-{
-	return c_Driver.GetMasterTime();
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801ccd94
  * PAL Size: 8b
  * EN Address: TODO
@@ -567,20 +553,6 @@ void CRedSound::SetReverb(int bank, int kind)
 void CRedSound::SetReverbDepth(int bank, int sep, int depth)
 {
 	c_Driver.SetReverbDepth(bank, sep, depth);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 52b
- * EN Address: UNUSED
- * EN Size: 52b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::SetMute(unsigned int voiceNo, unsigned int mute)
-{
-	c_Driver.SetMute(voiceNo, mute);
 }
 
 /*
@@ -847,20 +819,6 @@ void CRedSound::MusicPause(int id, int pause)
 int CRedSound::CheckMusicEntry(int id)
 {
 	return c_Driver.CheckMusicEntry(id);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: UNUSED
- * EN Size: 44b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedSound::SetMusicFastSpeed(int speed)
-{
-	c_Driver.SetMusicFastSpeed(speed);
 }
 
 /*
@@ -1797,20 +1755,6 @@ void CRedSound::SetWavePitch(int pitch)
 void CRedSound::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
 {
 	c_Driver.SetWaveAdsr(attack, adsr);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: UNUSED
- * EN Size: 44b
- * JP Address: TODO
- * JP Size: TODO
- */
-RedReverbModeData* CRedSound::GetReverbModeTable(int mode)
-{
-	return c_Driver.GetReverbModeTable(mode);
 }
 
 /*

@@ -2310,20 +2310,6 @@ int CRedDriver::GetProgramTime()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 8b
- * EN Address: UNUSED
- * EN Size: 8b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedDriver::GetMasterTime()
-{
-    return m_RedMasterTime;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801bec48
  * PAL Size: 72b
  * EN Address: TODO
@@ -2775,20 +2761,6 @@ void CRedDriver::DisplayMusicInfo()
 void CRedDriver::SetMusicPhraseStop(int stop)
 {
     _EntryExecCommand(_SetMusicPhraseStop, stop, 0, 0, 0, 0, 0, 0);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 8b
- * EN Address: UNUSED
- * EN Size: 8b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedDriver::SetMusicFastSpeed(int speed)
-{
-    m_MusicFastSpeed = speed;
 }
 
 /*
@@ -3631,26 +3603,6 @@ void CRedDriver::SetReverbDepth(int bank, int mode, int depth)
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 76b
- * EN Address: UNUSED
- * EN Size: 76b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
-{
-    voiceNo &= REDSOUND_VOICE_COUNT - 1;
-
-    if (mute) {
-        m_Mute[voiceNo >> REDSOUND_MUTE_WORD_SHIFT] |= 1U << voiceNo;
-    } else {
-        m_Mute[voiceNo >> REDSOUND_MUTE_WORD_SHIFT] &= ~(1U << voiceNo);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
  * PAL Size: 624b
  * EN Address: UNUSED
  * EN Size: 624b
@@ -3838,20 +3790,6 @@ void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
         SetVoiceAccess(p_EditorTrack, REDSOUND_VOICE_FLAGS_ADSR_DIRTY);
         SetVoiceAccess(p_EditorTrack, REDSOUND_VOICE_FLAGS_ADSR_START);
     }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 24b
- * EN Address: UNUSED
- * EN Size: 24b
- * JP Address: TODO
- * JP Size: TODO
- */
-RedReverbModeData* CRedDriver::GetReverbModeTable(int mode)
-{
-    return &t_ReverbModeData[mode & REDSOUND_REVERB_MODE_INDEX_MASK];
 }
 
 /*

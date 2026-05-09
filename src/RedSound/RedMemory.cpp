@@ -148,7 +148,7 @@ int RedNew(int size)
 				if (slot->m_size > 0) {
 					entryCount = (m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (slot + 1);
 					if (entryCount > 0) {
-						memmove(slot + 1, slot, entryCount * sizeof(RedMemoryBlock));
+						memmove(slot + 1, slot, entryCount * REDSOUND_MEMORY_BLOCK_SIZE);
 					}
 				}
 
@@ -193,8 +193,8 @@ void RedDelete(int address)
 				int entryCount = (m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (blockPtr + 1);
 
 				if (entryCount > 0) {
-					memcpy(blockPtr, blockPtr + 1, entryCount * sizeof(RedMemoryBlock));
-					memset(m_MemoryBank + REDSOUND_MEMORY_BANK_LAST_INDEX, 0, sizeof(RedMemoryBlock));
+					memcpy(blockPtr, blockPtr + 1, entryCount * REDSOUND_MEMORY_BLOCK_SIZE);
+					memset(m_MemoryBank + REDSOUND_MEMORY_BANK_LAST_INDEX, 0, REDSOUND_MEMORY_BLOCK_SIZE);
 				}
 				break;
 			}
@@ -299,7 +299,7 @@ int RedNewA(int size, int offset, int maxSize)
 		if (bestBlock->m_size > 0) {
 			gap = (m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (bestBlock + 1);
 			if (gap > 0) {
-				memmove(bestBlock + 1, bestBlock, gap * sizeof(RedMemoryBlock));
+				memmove(bestBlock + 1, bestBlock, gap * REDSOUND_MEMORY_BLOCK_SIZE);
 			}
 		}
 		bestBlock->m_address = result;
@@ -336,8 +336,8 @@ void RedDeleteA(int address)
 				int entryCount = (m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (blockPtr + 1);
 
 				if (entryCount > 0) {
-					memcpy(blockPtr, blockPtr + 1, entryCount * sizeof(RedMemoryBlock));
-					memset(m_AMemoryBank + REDSOUND_MEMORY_BANK_LAST_INDEX, 0, sizeof(RedMemoryBlock));
+					memcpy(blockPtr, blockPtr + 1, entryCount * REDSOUND_MEMORY_BLOCK_SIZE);
+					memset(m_AMemoryBank + REDSOUND_MEMORY_BANK_LAST_INDEX, 0, REDSOUND_MEMORY_BLOCK_SIZE);
 				}
 				break;
 			}

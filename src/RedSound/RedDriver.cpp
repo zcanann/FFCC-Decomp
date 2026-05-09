@@ -3852,6 +3852,7 @@ void CRedDriver::SetWavePitch(int pitch)
 {
     if (p_EditorTrack != 0) {
         p_EditorTrack->m_pitch = pitch << REDSOUND_FIXED_SHIFT;
+        p_EditorTrack->m_pitchDelta = 0;
         SetVoiceAccess(p_EditorTrack, REDSOUND_VOICE_FLAGS_PITCH_DIRTY);
         m_ChangeStatus |= REDSOUND_VOICE_UPDATE_PITCH;
     }

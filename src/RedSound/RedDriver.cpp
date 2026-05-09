@@ -798,7 +798,7 @@ static void _MusicPlaySequence(int* command)
                 p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]] = 0;
             }
             if (replayPoint == 0) {
-                memcpy(&soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY], soundControl, sizeof(RedSoundCONTROL));
+                memcpy(&soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY], soundControl, REDSOUND_CONTROL_SIZE);
                 soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId = REDSOUND_MUSIC_ID_NONE;
             }
         }
@@ -841,11 +841,11 @@ static void _MusicCrossPlaySequence(int* command)
                  control->m_masterVolume) /
                 command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
             control->m_masterVolumeDelta = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
-            swapControl = (RedSoundCONTROL*)RedNew(sizeof(RedSoundCONTROL));
-            memcpy(swapControl, &p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], sizeof(RedSoundCONTROL));
+            swapControl = (RedSoundCONTROL*)RedNew(REDSOUND_CONTROL_SIZE);
+            memcpy(swapControl, &p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], REDSOUND_CONTROL_SIZE);
             memcpy(&p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], p_SoundControlBuffer,
-                   sizeof(RedSoundCONTROL));
-            memcpy(p_SoundControlBuffer, swapControl, sizeof(RedSoundCONTROL));
+                   REDSOUND_CONTROL_SIZE);
+            memcpy(p_SoundControlBuffer, swapControl, REDSOUND_CONTROL_SIZE);
             RedDelete(swapControl);
         } else {
             if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
@@ -862,7 +862,7 @@ static void _MusicCrossPlaySequence(int* command)
                     replayPoint = p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]];
                     p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]] = 0;
                     if (replayPoint == 0) {
-                        memcpy(&control[REDSOUND_CONTROL_MUSIC_SECONDARY], control, sizeof(RedSoundCONTROL));
+                        memcpy(&control[REDSOUND_CONTROL_MUSIC_SECONDARY], control, REDSOUND_CONTROL_SIZE);
                         control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId = REDSOUND_MUSIC_ID_NONE;
                     }
                 }

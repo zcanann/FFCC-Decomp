@@ -961,7 +961,7 @@ static void _SetMusicPhraseStop(int* command)
  */
 static void _SetSeBlockData(int* command)
 {
-    u32 index = (u32)command[REDSOUND_SE_BLOCK_DATA_COMMAND_BANK] & 3;
+    u32 index = (u32)command[REDSOUND_SE_BLOCK_DATA_COMMAND_BANK] & REDSOUND_SE_BLOCK_BANK_MASK;
     char* seBlockData;
 
     if (p_SeBlockData[index] != 0) {

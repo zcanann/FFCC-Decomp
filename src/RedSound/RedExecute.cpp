@@ -1545,7 +1545,8 @@ void SetAllVoiceAccess(RedSoundCONTROL* control, int mask)
     RedVoiceDATA* voiceData = p_VoiceData;
 
     do {
-        if ((track <= voiceData->m_track) && (voiceData->m_track < track + control->m_trackCount)) {
+        if ((voiceData->m_active != 0) && (track <= voiceData->m_track) &&
+            (voiceData->m_track < track + control->m_trackCount)) {
             voiceData->m_updateFlags |= mask;
         }
         voiceData++;

@@ -539,34 +539,6 @@ void InitReverb()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 8b
- * EN Address: UNUSED
- * EN Size: 8b
- * JP Address: TODO
- * JP Size: TODO
- */
-RedReverbSize* GetReverbInfo()
-{
-    return p_ReverbSize;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 8b
- * EN Address: UNUSED
- * EN Size: 8b
- * JP Address: TODO
- * JP Size: TODO
- */
-static float _CompFX(float value, float scale)
-{
-    return value / scale;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801c3218
  * PAL Size: 1040b
  * EN Address: TODO
@@ -1525,29 +1497,6 @@ void SetVoiceAccess(RedTrackDATA* track, int mask)
     do {
         if ((voiceData->m_track != 0) && (voiceData->m_track == track)) {
             voiceData->m_flags |= mask;
-        }
-        voiceData++;
-    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 112b
- * EN Address: UNUSED
- * EN Size: 112b
- * JP Address: TODO
- * JP Size: TODO
- */
-void SetAllVoiceAccess(RedSoundCONTROL* control, int mask)
-{
-    RedTrackDATA* track = control->m_tracks;
-    RedVoiceDATA* voiceData = p_VoiceData;
-
-    do {
-        if ((voiceData->m_active != 0) && (track <= voiceData->m_track) &&
-            (voiceData->m_track < track + control->m_trackCount)) {
-            voiceData->m_updateFlags |= mask;
         }
         voiceData++;
     } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);

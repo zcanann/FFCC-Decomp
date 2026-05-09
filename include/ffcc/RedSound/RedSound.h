@@ -130,6 +130,12 @@ public:
 	RedMemoryBlock* GetABankAddress();
 	RedSoundCONTROL* GetControlAddress();
 	RedVoiceDATA* GetVoiceAddress();
+	int PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volume);
+	void StopWaveItem();
+	int WavePitchCompute(int key, int pitch);
+	void SetWaveTune(int key, int fineTune);
+	void SetWavePitch(int pitch);
+	void SetWaveAdsr(int attack, RedAdsrDATA* adsr);
 
 	void TestProcess(int mode);
 };

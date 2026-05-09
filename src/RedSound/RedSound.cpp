@@ -1762,6 +1762,90 @@ RedVoiceDATA* CRedSound::GetVoiceAddress()
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: UNUSED
+ * EN Size: 76b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volume)
+{
+	return c_Driver.PlayWaveItem(waveNo, itemNo, key, pan, volume);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: UNUSED
+ * EN Size: 36b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::StopWaveItem()
+{
+	c_Driver.StopWaveItem();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: UNUSED
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::WavePitchCompute(int key, int pitch)
+{
+	return c_Driver.WavePitchCompute(key, pitch);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: UNUSED
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SetWaveTune(int key, int fineTune)
+{
+	c_Driver.SetWaveTune(key, fineTune);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: UNUSED
+ * EN Size: 44b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SetWavePitch(int pitch)
+{
+	c_Driver.SetWavePitch(pitch);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: UNUSED
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
+{
+	c_Driver.SetWaveAdsr(attack, adsr);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 44b
  * EN Address: UNUSED
  * EN Size: 44b

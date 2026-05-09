@@ -3703,6 +3703,210 @@ void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 624b
+ * EN Address: UNUSED
+ * EN Size: 624b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volume)
+{
+    RedWaveHeadWD* waveHead;
+    RedWaveDATA* waveData;
+    RedVoiceDATA* voice;
+
+    StopWaveItem();
+
+    if ((p_EditorTrack == 0) || (m_SilentWave != 0)) {
+        return 0;
+    }
+
+    waveHead = c_RedEntry.SearchWaveBase(waveNo);
+    if ((waveHead == 0) || (itemNo < 0) || (waveHead->m_tableCount <= itemNo)) {
+        return 0;
+    }
+
+    waveData = (RedWaveDATA*)((int)waveHead + waveHead->m_waveOffsets[itemNo]);
+    memset(p_EditorTrack, 0, sizeof(RedTrackDATA));
+    p_EditorTrack->m_waveBankData = waveHead;
+    p_EditorTrack->m_waveData = waveData;
+    p_EditorTrack->m_waveBase = waveHead->m_aramAddress;
+    p_EditorTrack->m_waveNo = itemNo;
+    p_EditorTrack->m_volume = volume << REDSOUND_FIXED_SHIFT;
+    p_EditorTrack->m_expression = REDSOUND_VOLUME_DEFAULT;
+    p_EditorTrack->m_pan = pan << REDSOUND_FIXED_SHIFT;
+    p_EditorTrack->m_pitch = 0;
+    p_EditorTrack->m_pitchBend = 0;
+    p_EditorTrack->m_pitchBendRange = REDSOUND_NOTES_PER_OCTAVE;
+    p_EditorTrack->m_fineTune = 0;
+    p_EditorTrack->m_keyTranspose = 0;
+    p_EditorTrack->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO;
+    p_EditorTrack->m_trackNo = REDSOUND_SE_VOICE_BASE_INDEX;
+    p_EditorTrack->m_note.m_key = key;
+    p_EditorTrack->m_note.m_velocity = REDSOUND_VOLUME_MAX;
+    memset(&p_EditorTrack->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, sizeof(RedAdsrDATA));
+
+    voice = EntryVoiceSearch(p_EditorTrack);
+    if (voice == 0) {
+        return 0;
+    }
+
+    voice->m_track = p_EditorTrack;
+    voice->m_waveData = waveData;
+    voice->m_trackVolume = &p_EditorTrack->m_volume;
+    voice->m_trackExpression = &p_EditorTrack->m_expression;
+    voice->m_trackPan = &p_EditorTrack->m_pan;
+    voice->m_key = key;
+    voice->m_velocity = REDSOUND_VOLUME_MAX;
+    voice->m_basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+    voice->m_pitch = WavePitchCompute(key, 0);
+    voice->m_targetPitch = voice->m_pitch;
+    voice->m_voiceSwitch = p_EditorTrack->m_voiceSwitch;
+    voice->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
+    memcpy(&voice->m_adsr, waveData->m_adsr, sizeof(RedAdsrDATA));
+    SetVoiceVolumeMix(voice, pan, volume);
+    voice->m_flags |= REDSOUND_VOICE_FLAGS_START | REDSOUND_VOICE_FLAGS_ADPCM_DIRTY |
+                      REDSOUND_VOICE_FLAGS_PITCH_DIRTY | REDSOUND_VOICE_FLAGS_ADSR_START;
+    voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_ALL;
+    p_EditorVoice[REDSOUND_EDITOR_VOICE_LEFT] = voice->m_voiceIndex + 1;
+
+    return voice->m_voiceIndex + 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 96b
+ * EN Address: UNUSED
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::StopWaveItem()
+{
+    int index;
+    RedVoiceDATA* voice;
+
+    for (index = 0; index < REDSOUND_EDITOR_VOICE_COUNT; index++) {
+        if (p_EditorVoice[index] != 0) {
+            voice = p_VoiceData + p_EditorVoice[index] - 1;
+            voice->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+            voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+            voice->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SUSTAIN_PAUSE_MASK;
+            voice->m_track = 0;
+            p_EditorVoice[index] = 0;
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 176b
+ * EN Address: UNUSED
+ * EN Size: 176b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::WavePitchCompute(int key, int pitch)
+{
+    int basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+
+    if ((p_EditorTrack != 0) && (p_EditorTrack->m_waveData != 0)) {
+        basePitch += p_EditorTrack->m_pitch;
+        return PitchCompute(basePitch, pitch + p_EditorTrack->m_keyTranspose,
+                            p_EditorTrack->m_waveData->m_pitch,
+                            p_EditorTrack->m_fineTune);
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 152b
+ * EN Address: UNUSED
+ * EN Size: 152b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::SetWaveTune(int key, int fineTune)
+{
+    RedVoiceDATA* voice;
+    int index;
+
+    if (p_EditorTrack != 0) {
+        p_EditorTrack->m_keyTranspose = key;
+        p_EditorTrack->m_fineTune = fineTune;
+        for (index = 0; index < REDSOUND_EDITOR_VOICE_COUNT; index++) {
+            if (p_EditorVoice[index] != 0) {
+                voice = p_VoiceData + p_EditorVoice[index] - 1;
+                voice->m_pitch = WavePitchCompute(voice->m_key, p_EditorTrack->m_pitchBend);
+                voice->m_targetPitch = voice->m_pitch;
+                voice->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
+            }
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 96b
+ * EN Address: UNUSED
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::SetWavePitch(int pitch)
+{
+    RedVoiceDATA* voice;
+    int index;
+
+    if (p_EditorTrack != 0) {
+        p_EditorTrack->m_pitch = pitch << REDSOUND_FIXED_SHIFT;
+        for (index = 0; index < REDSOUND_EDITOR_VOICE_COUNT; index++) {
+            if (p_EditorVoice[index] != 0) {
+                voice = p_VoiceData + p_EditorVoice[index] - 1;
+                voice->m_pitch = WavePitchCompute(voice->m_key, p_EditorTrack->m_pitchBend);
+                voice->m_targetPitch = voice->m_pitch;
+                voice->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
+            }
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 160b
+ * EN Address: UNUSED
+ * EN Size: 160b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
+{
+    RedVoiceDATA* voice;
+    int index;
+
+    if ((p_EditorTrack != 0) && (adsr != 0)) {
+        memcpy(&p_EditorTrack->m_adsr, adsr, sizeof(RedAdsrDATA));
+        p_EditorTrack->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = attack;
+        for (index = 0; index < REDSOUND_EDITOR_VOICE_COUNT; index++) {
+            if (p_EditorVoice[index] != 0) {
+                voice = p_VoiceData + p_EditorVoice[index] - 1;
+                memcpy(&voice->m_adsr, &p_EditorTrack->m_adsr, sizeof(RedAdsrDATA));
+                voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
+            }
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 24b
  * EN Address: UNUSED
  * EN Size: 24b

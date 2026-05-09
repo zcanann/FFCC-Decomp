@@ -10,7 +10,6 @@ struct RedVoiceDATA;
 enum RedStreamFileLayoutSize {
     REDSOUND_STREAM_SIGNATURE_SIZE = 4,
     REDSOUND_STREAM_PAGE_SIZE = 0x1000,
-    REDSOUND_STREAM_HEADER_PAD_SIZE = 0x0C - 0x04,
     REDSOUND_STREAM_TRACK_DATA_COUNT = 2,
 };
 
@@ -20,20 +19,9 @@ enum RedStreamSignature {
     REDSOUND_STREAM_SIGNATURE_2 = 'R',
 };
 
-struct RedStreamHEAD {
-    char m_signature[REDSOUND_STREAM_SIGNATURE_SIZE];
-    u8 m_reserved04[REDSOUND_STREAM_HEADER_PAD_SIZE];
-    int m_loopEnd;
-    int m_loopStart;
-    int m_pitch;
-    s16 m_reserved18;
-    s16 m_channelCount;
-    s16 m_flags;
-    s16 m_reserved1E;
-};
-
 enum RedStreamHeadLayoutOffset {
     REDSOUND_STREAM_HEAD_SIGNATURE_OFFSET = 0x00,
+    REDSOUND_STREAM_HEAD_RESERVED04_OFFSET = 0x04,
     REDSOUND_STREAM_HEAD_LOOP_END_OFFSET = 0x0C,
     REDSOUND_STREAM_HEAD_LOOP_START_OFFSET = 0x10,
     REDSOUND_STREAM_HEAD_PITCH_OFFSET = 0x14,
@@ -42,6 +30,26 @@ enum RedStreamHeadLayoutOffset {
     REDSOUND_STREAM_HEAD_FLAGS_OFFSET = 0x1C,
     REDSOUND_STREAM_HEAD_RESERVED1E_OFFSET = 0x1E,
     REDSOUND_STREAM_HEAD_SIZE = 0x20,
+};
+
+enum RedStreamHeadLayoutSize {
+    REDSOUND_STREAM_HEAD_RESERVED04_SIZE =
+        REDSOUND_STREAM_HEAD_LOOP_END_OFFSET - REDSOUND_STREAM_HEAD_RESERVED04_OFFSET,
+    REDSOUND_STREAM_HEAD_RESERVED18_SIZE =
+        REDSOUND_STREAM_HEAD_CHANNEL_COUNT_OFFSET - REDSOUND_STREAM_HEAD_RESERVED18_OFFSET,
+    REDSOUND_STREAM_HEAD_RESERVED1E_SIZE = REDSOUND_STREAM_HEAD_SIZE - REDSOUND_STREAM_HEAD_RESERVED1E_OFFSET,
+};
+
+struct RedStreamHEAD {
+    char m_signature[REDSOUND_STREAM_SIGNATURE_SIZE];
+    u8 m_reserved04[REDSOUND_STREAM_HEAD_RESERVED04_SIZE];
+    int m_loopEnd;
+    int m_loopStart;
+    int m_pitch;
+    s16 m_reserved18;
+    s16 m_channelCount;
+    s16 m_flags;
+    s16 m_reserved1E;
 };
 
 struct RedStreamADPCMHeader {
@@ -137,6 +145,7 @@ enum RedStreamDataLayoutOffset {
 };
 
 enum RedStreamDataLayoutSize {
+    REDSOUND_STREAM_RESERVED_FC_SIZE = REDSOUND_STREAM_PAN_OFFSET - REDSOUND_STREAM_RESERVED_FC_OFFSET,
     REDSOUND_STREAM_DATA_SIZE = sizeof(RedStreamDATA),
 };
 

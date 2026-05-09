@@ -3786,16 +3786,14 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
  */
 void CRedDriver::StopWaveItem()
 {
-    int index;
     RedVoiceDATA* voice;
 
-    for (index = 0; index < REDSOUND_EDITOR_VOICE_COUNT; index++) {
-        if (p_EditorVoice[index] != 0) {
-            voice = p_VoiceData + p_EditorVoice[index] - 1;
-            voice->m_flags = (voice->m_flags & REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK) |
-                             REDSOUND_VOICE_FLAGS_RELEASED;
-            p_EditorVoice[index] = 0;
-        }
+    if (p_EditorVoice[REDSOUND_EDITOR_VOICE_LEFT] != 0) {
+        voice = p_VoiceData + p_EditorVoice[REDSOUND_EDITOR_VOICE_LEFT] - 1;
+        voice->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+        voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+        p_EditorVoice[REDSOUND_EDITOR_VOICE_RIGHT] =
+            p_EditorVoice[REDSOUND_EDITOR_VOICE_LEFT] = 0;
     }
 }
 

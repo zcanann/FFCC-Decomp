@@ -4,9 +4,13 @@
 int RedNew(int size);
 void RedDelete(int address);
 void RedDelete(void* address);
+int RedResize(int address, int size);
+void* RedResize(void* address, int size);
 int RedNewA(int size, int offset, int maxSize);
 void RedDeleteA(int address);
 void RedDeleteA(void* address);
+int RedResizeA(int address, int size);
+void* RedResizeA(void* address, int size);
 
 struct RedMemoryBlock {
 	int m_address;

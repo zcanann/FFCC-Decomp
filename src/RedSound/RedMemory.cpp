@@ -219,6 +219,55 @@ void RedDelete(void* address)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 176b
+ * EN Address: UNUSED
+ * EN Size: 176b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int RedResize(int address, int size)
+{
+	RedMemoryBlock* blockPtr;
+
+	if ((address == 0) || (size < 1) || (m_MemoryBank == 0) || ((unsigned int)m_DataBuffer == 0)) {
+		return 0;
+	}
+
+	size += REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	size &= ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	blockPtr = m_MemoryBank;
+
+	while ((blockPtr->m_size != 0) && (blockPtr < m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) &&
+	       (blockPtr->m_address != address)) {
+		blockPtr++;
+	}
+
+	if ((blockPtr->m_size != 0) && ((blockPtr[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size == 0) ||
+	                                (address + size <= blockPtr[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address))) {
+		blockPtr->m_size = size;
+		return address;
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: UNUSED
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* RedResize(void* address, int size)
+{
+	return (void*)RedResize((int)address, size);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801c01e8
  * PAL Size: 576b
  * EN Address: TODO
@@ -358,6 +407,55 @@ void RedDeleteA(int address)
 void RedDeleteA(void* address)
 {
 	RedDeleteA((int)address);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 176b
+ * EN Address: UNUSED
+ * EN Size: 176b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int RedResizeA(int address, int size)
+{
+	RedMemoryBlock* blockPtr;
+
+	if ((address == 0) || (size < 1) || (m_AMemoryBank == 0) || ((unsigned int)m_ADataBuffer == 0)) {
+		return 0;
+	}
+
+	size += REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	size &= ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	blockPtr = m_AMemoryBank;
+
+	while ((blockPtr->m_size != 0) && (blockPtr < m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) &&
+	       (blockPtr->m_address != address)) {
+		blockPtr++;
+	}
+
+	if ((blockPtr->m_size != 0) && ((blockPtr[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size == 0) ||
+	                                (address + size <= blockPtr[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address))) {
+		blockPtr->m_size = size;
+		return address;
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: UNUSED
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* RedResizeA(void* address, int size)
+{
+	return (void*)RedResizeA((int)address, size);
 }
 
 /*

@@ -3740,10 +3740,12 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
     p_EditorTrack->m_pitchBendRange = REDSOUND_NOTES_PER_OCTAVE;
     p_EditorTrack->m_fineTune = 0;
     p_EditorTrack->m_keyTranspose = 0;
+    p_EditorTrack->m_portamentPitch = REDSOUND_TRACK_PORTAMENT_PITCH_NONE;
     p_EditorTrack->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO;
     p_EditorTrack->m_trackNo = REDSOUND_SE_VOICE_BASE_INDEX;
     p_EditorTrack->m_note.m_key = key;
     p_EditorTrack->m_note.m_velocity = REDSOUND_VOLUME_MAX;
+    p_EditorTrack->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_DIRECT_MASK;
     memset(&p_EditorTrack->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, sizeof(RedAdsrDATA));
 
     voice = EntryVoiceSearch(p_EditorTrack);

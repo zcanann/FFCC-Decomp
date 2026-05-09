@@ -1718,20 +1718,17 @@ int RedDmaSearchID(int id)
  */
 void RedDmaClearID(int id)
 {
-    unsigned int interruptLevel;
+    RedDmaRequest* queueEnd;
     RedDmaRequest* queueEntry;
 
-    interruptLevel = OSDisableInterrupts();
-    if (id != 0) {
-        queueEntry = RedDriverMainDmaQueue();
-        do {
-            if ((queueEntry->m_id != 0) && (queueEntry->m_id == id)) {
-                queueEntry->m_id = 0;
-            }
-            queueEntry++;
-        } while (queueEntry < RedDriverStreamDmaQueueEnd());
+    queueEntry = RedDriverMainDmaQueue();
+    queueEnd = RedDriverStreamDmaQueueEnd();
+    while (queueEntry < queueEnd) {
+        if ((queueEntry->m_id != 0) && (queueEntry->m_id == id)) {
+            queueEntry->m_id = 0;
+        }
+        queueEntry++;
     }
-    OSRestoreInterrupts(interruptLevel);
 }
 
 /*

@@ -68,8 +68,6 @@ extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
-extern "C" void Init__9CRedSoundFPviii(CRedSound*, void*, int, int, int);
-extern "C" void End__9CRedSoundFv(CRedSound*);
 extern "C" int StreamPlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" void StreamStop__9CRedSoundFi(CRedSound*, int);
 extern "C" int StreamPlay__9CRedSoundFPviii(CRedSound*, void*, int, int, int);
@@ -80,16 +78,11 @@ extern "C" void SetSeSepData__9CRedSoundFPv(CRedSound*, void*);
 extern "C" int SePlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" int ReportSeLoop__9CRedSoundFi(CRedSound*, int);
 extern "C" int GetSeVolume__9CRedSoundFii(CRedSound*, int, int);
-extern "C" unsigned int GetProgramTime__9CRedSoundFv(CRedSound*);
 extern "C" void GetStreamPlayPoint__9CRedSoundFiPiPi(CRedSound*, int, int*, int*);
 extern "C" unsigned int SetWaveData__9CRedSoundFiPvi(CRedSound*, int, void*, int);
 extern "C" int ReportStandby__9CRedSoundFi(CRedSound*, int);
 extern "C" void SePause__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void StreamPause__9CRedSoundFii(CRedSound*, int, int);
-extern "C" void ReportPrint__9CRedSoundFi(CRedSound*, int);
-extern "C" void TestProcess__9CRedSoundFi(CRedSound*, int);
-extern "C" void DisplayWaveInfo__9CRedSoundFv(CRedSound*);
-extern "C" void DisplaySePlayInfo__9CRedSoundFv(CRedSound*);
 extern "C" void SeStop__9CRedSoundFi(CRedSound*, int);
 extern "C" void SeStopMG__9CRedSoundFiiii(CRedSound*, int, int, int, int);
 extern "C" void SeFadeOut__9CRedSoundFii(CRedSound*, int, int);
@@ -102,8 +95,6 @@ extern "C" void ClearSeSepDataMG__9CRedSoundFiiii(CRedSound*, int, int, int, int
 extern "C" void ClearWaveData__9CRedSoundFi(CRedSound*, int);
 extern "C" void ClearWaveDataM__9CRedSoundFiiii(CRedSound*, int, int, int, int);
 extern "C" void MusicVolume__9CRedSoundFiii(CRedSound*, int, int, int);
-extern "C" void MusicMasterVolume__9CRedSoundFi(CRedSound*, int);
-extern "C" void SeMasterVolume__9CRedSoundFi(CRedSound*, int);
 extern "C" int ReentryMusicData__9CRedSoundFi(CRedSound*, int);
 extern "C" void SetMusicData__9CRedSoundFPv(CRedSound*, void*);
 extern "C" void MusicStop__9CRedSoundFi(CRedSound*, int);
@@ -447,15 +438,14 @@ void CSound::Init()
     ARInit(0, 0);
     ARQInit();
 
-    Init__9CRedSoundFPviii(RedSound(this), SoundData(this).m_aramBuffer, 0x80000, 0x800000, 0x800000);
-    ReportPrint__9CRedSoundFi(
-        RedSound(this), (-SoundData(this).m_debugPrint | SoundData(this).m_debugPrint) >> 31);
+    RedSound(this)->Init(SoundData(this).m_aramBuffer, 0x80000, 0x800000, 0x800000);
+    RedSound(this)->ReportPrint((-SoundData(this).m_debugPrint | SoundData(this).m_debugPrint) >> 31);
 
     u32 soundMode = RedSound(this)->GetSoundMode();
     RedSound(this)->SetSoundMode((u32)__cntlzw((u32)__cntlzw(soundMode) >> 5) >> 5);
 
-    MusicMasterVolume__9CRedSoundFi(RedSound(this), SoundData(this).m_bgmMasterVolume);
-    SeMasterVolume__9CRedSoundFi(RedSound(this), SoundData(this).m_seMasterVolume);
+    RedSound(this)->MusicMasterVolume(SoundData(this).m_bgmMasterVolume);
+    RedSound(this)->SeMasterVolume(SoundData(this).m_seMasterVolume);
     SetReverb__9CRedSoundFii(RedSound(this), 1, 4);
     SetReverbDepth__9CRedSoundFiii(RedSound(this), 1, 0x40, 0xF);
 
@@ -523,7 +513,7 @@ void CSound::Quit()
         SetSeBlockData__9CRedSoundFiPv(redSound, i, nullptr);
     }
 
-    End__9CRedSoundFv(redSound);
+    redSound->End();
 
     u8*& streamBuffer = sound.m_streamBuffer;
     if (streamBuffer != 0) {
@@ -761,7 +751,7 @@ void CSound::Realloc(int isMinMemoryMode)
  */
 float CSound::GetPerformance()
 {
-    unsigned int programTime = GetProgramTime__9CRedSoundFv(RedSound(this));
+    unsigned int programTime = RedSound(this)->GetProgramTime();
     float numer = (float)(programTime / 0xF);
     float denom = (float)(((OS_TIMER_CLOCK / 125000) * 0x8235) >> 3);
     return 100.0f * (numer / denom);
@@ -781,9 +771,8 @@ void CSound::PauseDiscError(int pause)
     u8* self = reinterpret_cast<u8*>(this);
 
     if (reinterpret_cast<CSoundLayout*>(self)->m_pauseAllSe == 0) {
-        SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1, static_cast<u32>(-pause | pause) >> 31);
-        StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1,
-                                   (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
+        RedSound(this)->SePause(-1, static_cast<u32>(-pause | pause) >> 31);
+        RedSound(this)->StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
     }
 }
 
@@ -796,14 +785,15 @@ void CSound::CheckDriver(int mode)
 {
     u8* self = reinterpret_cast<u8*>(this);
     CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CRedSound* redSound = RedSound(this);
     unsigned int oldPrint = sound.m_debugPrint;
     sound.m_debugPrint = 1;
-    ReportPrint__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), 1);
-    TestProcess__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), mode);
-    DisplayWaveInfo__9CRedSoundFv(reinterpret_cast<CRedSound*>(self + 8));
-    DisplaySePlayInfo__9CRedSoundFv(reinterpret_cast<CRedSound*>(self + 8));
+    redSound->ReportPrint(1);
+    redSound->TestProcess(mode);
+    redSound->DisplayWaveInfo();
+    redSound->DisplaySePlayInfo();
     sound.m_debugPrint = oldPrint;
-    ReportPrint__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), (-oldPrint | oldPrint) >> 0x1F);
+    redSound->ReportPrint((-oldPrint | oldPrint) >> 0x1F);
 }
 
 /*

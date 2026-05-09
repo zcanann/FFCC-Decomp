@@ -68,8 +68,6 @@ extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
-extern "C" unsigned int GetSoundMode__9CRedSoundFv(CRedSound*);
-extern "C" void SetSoundMode__9CRedSoundFi(CRedSound*, int);
 extern "C" void Init__9CRedSoundFPviii(CRedSound*, void*, int, int, int);
 extern "C" void End__9CRedSoundFv(CRedSound*);
 extern "C" int StreamPlayState__9CRedSoundFi(CRedSound*, int);
@@ -453,8 +451,8 @@ void CSound::Init()
     ReportPrint__9CRedSoundFi(
         RedSound(this), (-SoundData(this).m_debugPrint | SoundData(this).m_debugPrint) >> 31);
 
-    u32 soundMode = GetSoundMode__9CRedSoundFv(RedSound(this));
-    SetSoundMode__9CRedSoundFi(RedSound(this), (u32)__cntlzw((u32)__cntlzw(soundMode) >> 5) >> 5);
+    u32 soundMode = RedSound(this)->GetSoundMode();
+    RedSound(this)->SetSoundMode((u32)__cntlzw((u32)__cntlzw(soundMode) >> 5) >> 5);
 
     MusicMasterVolume__9CRedSoundFi(RedSound(this), SoundData(this).m_bgmMasterVolume);
     SeMasterVolume__9CRedSoundFi(RedSound(this), SoundData(this).m_seMasterVolume);
@@ -675,7 +673,7 @@ void CSound::Realloc(int isMinMemoryMode)
     u32 reportFlag = sound.m_debugPrint;
     redSound->ReportPrint(((-reportFlag) | reportFlag) >> 31);
 
-    u32 soundMode = GetSoundMode__9CRedSoundFv(redSound);
+    u32 soundMode = redSound->GetSoundMode();
     redSound->SetSoundMode((u32)__cntlzw((u32)__cntlzw(soundMode) >> 5) >> 5);
 
     redSound->MusicMasterVolume(sound.m_bgmMasterVolume);

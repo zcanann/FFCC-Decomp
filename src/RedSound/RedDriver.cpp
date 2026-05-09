@@ -2862,6 +2862,7 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
  */
 int CRedDriver::SetSeSepData(void* seSepData)
 {
+    int result = REDSOUND_SESEP_ID_NONE;
     RedSeSepHEAD* const header = (RedSeSepHEAD*)seSepData;
     RedSeSepHEAD* copiedHeader;
     int headerSize;
@@ -2873,20 +2874,17 @@ int CRedDriver::SetSeSepData(void* seSepData)
            (header->m_signature[4] == REDSOUND_SESEP_SIGNATURE_4))))) {
         headerSize = header->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
         copiedHeader = (RedSeSepHEAD*)RedNew(headerSize);
-        if (copiedHeader == 0) {
-            return REDSOUND_SESEP_ID_NONE;
+        if (copiedHeader != 0) {
+            memcpy(copiedHeader, header, headerSize);
+            result = copiedHeader->m_seNo;
+            _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
-
-        memcpy(copiedHeader, header, headerSize);
-        int result = copiedHeader->m_seNo;
-        _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
-        return result;
     } else if (m_ReportPrint != 0) {
         OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,
                  sRedDriverLogWarnColor, sRedDriverLogReset);
         fflush(__files + 1);
     }
-    return REDSOUND_SESEP_ID_NONE;
+    return result;
 }
 
 /*

@@ -36,6 +36,14 @@ REDSOUND_UNITS = [
     "RedStream",
 ]
 
+SIZE_BUCKETS = [
+    ("tiny", 0, 64),
+    ("small", 65, 256),
+    ("medium", 257, 768),
+    ("large", 769, 1536),
+    ("huge", 1537, None),
+]
+
 
 def short_unit(unit: str) -> str:
     return unit.rsplit("/", 1)[-1]
@@ -45,6 +53,13 @@ def truncate(text: str, width: int) -> str:
     if len(text) <= width:
         return text
     return text[: max(0, width - 3)] + "..."
+
+
+def size_bucket(size: int) -> str:
+    for name, start, end in SIZE_BUCKETS:
+        if size >= start and (end is None or size <= end):
+            return name
+    return "unknown"
 
 
 def diff_summary(left: dict[str, Any], right: dict[str, Any]) -> tuple[Counter[str], str]:
@@ -92,7 +107,7 @@ def summarize_symbol(unit: str, left: dict[str, Any], right: dict[str, Any]) -> 
     left_save = extract_save_range(left_instructions)
     right_save = extract_save_range(right_instructions)
     counts, first_hint = diff_summary(left, right)
-    return {
+    row = {
         "unit": unit,
         "symbol": left.get("name", ""),
         "pct": as_float(left.get("match_percent")),
@@ -104,6 +119,8 @@ def summarize_symbol(unit: str, left: dict[str, Any], right: dict[str, Any]) -> 
         "counts": ",".join(f"{k.removeprefix('DIFF_')}={v}" for k, v in sorted(counts.items())) or "-",
         "hint": first_hint,
     }
+    row["bucket"] = size_bucket(row["size"])
+    return row
 
 
 def collect_unit(unit: str, timeout: int) -> list[dict[str, Any]]:
@@ -145,6 +162,30 @@ def print_rows(rows: list[dict[str, Any]], limit: int) -> None:
         )
     if len(rows) > limit:
         print(f"... {len(rows) - limit} more")
+
+
+def select_bucket_rows(rows: list[dict[str, Any]], per_bucket: int) -> list[dict[str, Any]]:
+    selected: list[dict[str, Any]] = []
+    for name, _, _ in SIZE_BUCKETS:
+        bucket_rows = [row for row in rows if row["bucket"] == name]
+        bucket_rows.sort(key=lambda row: (row["diff_count"], -row["pct"], row["category"], row["unit"], row["symbol"]))
+        selected.extend(bucket_rows[:per_bucket])
+    return selected
+
+
+def print_buckets(rows: list[dict[str, Any]], per_bucket: int) -> list[dict[str, Any]]:
+    if not rows:
+        print("No mismatched RedSound symbols found.")
+        return []
+
+    selected = select_bucket_rows(rows, per_bucket)
+    for name, _, _ in SIZE_BUCKETS:
+        bucket_rows = [row for row in selected if row["bucket"] == name]
+        if not bucket_rows:
+            continue
+        print(f"\n{name}:")
+        print_rows(bucket_rows, len(bucket_rows))
+    return selected
 
 
 def print_detail(rows: list[dict[str, Any]], limit: int) -> None:
@@ -248,6 +289,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--attempts", action="store_true", help="Show attempt counts from the attempt log.")
     parser.add_argument("--attempt-log", type=Path, default=DEFAULT_ATTEMPT_LOG, help="Attempt log path.")
     parser.add_argument(
+        "--buckets",
+        action="store_true",
+        help="Show the easiest symbols per function-size bucket after applying filters.",
+    )
+    parser.add_argument("--bucket-limit", type=int, default=3, help="Rows to show per size bucket with --buckets.")
+    parser.add_argument(
         "--fresh",
         action="store_true",
         help="Hide symbols whose latest recorded attempt regressed or made no change.",
@@ -294,13 +341,15 @@ def main() -> int:
     counts = Counter(row["category"] for row in rows)
     if counts:
         print("Category counts: " + ", ".join(f"{key}={counts[key]}" for key in sorted(counts)))
-    print_rows(rows, args.limit)
+    shown_rows = print_buckets(rows, args.bucket_limit) if args.buckets else rows[: args.limit]
+    if not args.buckets:
+        print_rows(rows, args.limit)
     if args.detail:
-        print_detail(rows, args.limit)
+        print_detail(shown_rows, len(shown_rows))
     if args.commands:
-        print_commands(rows, args.limit)
+        print_commands(shown_rows, len(shown_rows))
     if args.attempts:
-        print_attempts(rows[: args.limit], args.limit)
+        print_attempts(shown_rows, len(shown_rows))
     return 0
 
 

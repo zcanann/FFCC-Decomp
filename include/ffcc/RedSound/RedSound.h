@@ -6,12 +6,16 @@
 typedef void (*RedDmaCallback)(void* callbackData);
 #endif
 
+struct RedAdsrDATA;
+struct RedMemoryBlock;
+struct RedSoundCONTROL;
 struct RedWaveHeadWD;
 struct RedReverbDepth;
 struct RedReverbModeData;
 struct RedReverbSize;
 struct RedStreamDATA;
 struct RedTrackDATA;
+struct RedVoiceDATA;
 
 class CRedSound
 {
@@ -112,6 +116,14 @@ public:
 	int CheckWaveEntry(int waveNo);
 	void DisplayWaveInfo();
 	void DisplayMMemoryInfo();
+	void GetMakeTime(char** date, char** time);
+	int GetMainBufferAddress();
+	int GetMainBufferSize();
+	RedMemoryBlock* GetMainBankAddress();
+	int GetABufferAddress();
+	RedMemoryBlock* GetABankAddress();
+	RedSoundCONTROL* GetControlAddress();
+	RedVoiceDATA* GetVoiceAddress();
 
 	void TestProcess(int mode);
 };

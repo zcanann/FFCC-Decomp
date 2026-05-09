@@ -12,13 +12,22 @@ enum RedMidiLayoutSize {
 	REDSOUND_TRACK_LOOP_STACK_COUNT = 4,
 	REDSOUND_SWING_FUNCTION_COUNT = 0x10,
 	REDSOUND_MIDI_CONTROL_FUNCTION_COUNT = 0x80,
+	REDSOUND_TRACK_RESERVED04_SIZE = 0x04,
+	REDSOUND_TRACK_RESERVED88_SIZE = 0x04,
+	REDSOUND_TRACK_RESERVEDA8_SIZE = 0x04,
+	REDSOUND_TRACK_RESERVED149_SIZE = 0x02,
+	REDSOUND_TRACK_RESERVED14C_SIZE = 0x01,
+	REDSOUND_TRACK_RESERVED151_SIZE = 0x03,
+	REDSOUND_CONTROL_RESERVED04_SIZE = 0x04,
+	REDSOUND_CONTROL_RESERVED460_SIZE = 0x0C,
+	REDSOUND_CONTROL_RESERVED493_SIZE = 0x01,
 };
 
 typedef int (*RedSwingFunc)(int phase);
 
 struct RedTrackDATA {
 	unsigned char* m_command;
-	unsigned char m_reserved04[0x08 - 0x04];
+	unsigned char m_reserved04[REDSOUND_TRACK_RESERVED04_SIZE];
 	unsigned char* m_loopCommand[REDSOUND_TRACK_LOOP_STACK_COUNT];
 	RedWaveHeadWD* m_waveBankData;
 	RedWaveDATA* m_waveData;
@@ -48,7 +57,7 @@ struct RedTrackDATA {
 	int m_vibrateRateAdd;
 	int m_vibrateDepth;
 	int m_vibrateDepthAdd;
-	unsigned char m_reserved88[0x8C - 0x88];
+	unsigned char m_reserved88[REDSOUND_TRACK_RESERVED88_SIZE];
 	short m_vibrateRateDelta;
 	short m_vibrateDepthDelta;
 	short m_vibrateDelay;
@@ -58,7 +67,7 @@ struct RedTrackDATA {
 	int m_tremoloRateAdd;
 	int m_tremoloDepth;
 	int m_tremoloDepthAdd;
-	unsigned char m_reservedA8[0xAC - 0xA8];
+	unsigned char m_reservedA8[REDSOUND_TRACK_RESERVEDA8_SIZE];
 	short m_tremoloRateDelta;
 	short m_tremoloDepthDelta;
 	short m_tremoloDelay;
@@ -102,14 +111,14 @@ struct RedTrackDATA {
 	short m_loopStepCurrent;
 	short m_seTickCounter;
 	signed char m_fineTune;
-	unsigned char m_reserved149[0x14B - 0x149];
+	unsigned char m_reserved149[REDSOUND_TRACK_RESERVED149_SIZE];
 	signed char m_pitchBendRange;
-	unsigned char m_reserved14C[0x14D - 0x14C];
+	unsigned char m_reserved14C[REDSOUND_TRACK_RESERVED14C_SIZE];
 	unsigned char m_waveBankNo;
 	signed char m_trackNo;
 	unsigned char m_eraseTrack;
 	unsigned char m_attrMask;
-	unsigned char m_reserved151[0x154 - 0x151];
+	unsigned char m_reserved151[REDSOUND_TRACK_RESERVED151_SIZE];
 };
 
 enum RedTrackAdsrLayout {
@@ -210,12 +219,18 @@ enum RedTrackLayoutHalfword {
 };
 
 enum RedTrackLayoutByte {
+	REDSOUND_TRACK_RESERVED04_BYTE = 0x04,
+	REDSOUND_TRACK_RESERVED88_BYTE = 0x88,
+	REDSOUND_TRACK_RESERVEDA8_BYTE = 0xA8,
 	REDSOUND_TRACK_FINE_TUNE_BYTE = 0x148,
+	REDSOUND_TRACK_RESERVED149_BYTE = 0x149,
 	REDSOUND_TRACK_PITCH_BEND_RANGE_BYTE = 0x14B,
+	REDSOUND_TRACK_RESERVED14C_BYTE = 0x14C,
 	REDSOUND_TRACK_WAVE_BANK_NO_BYTE = 0x14D,
 	REDSOUND_TRACK_TRACK_NO_BYTE = 0x14E,
 	REDSOUND_TRACK_ERASE_TRACK_BYTE = 0x14F,
 	REDSOUND_TRACK_ATTR_MASK_BYTE = 0x150,
+	REDSOUND_TRACK_RESERVED151_BYTE = 0x151,
 };
 
 enum RedTrackWordLayout {
@@ -297,7 +312,7 @@ struct RedSavedTrackDATA {
 
 struct RedSoundCONTROL {
 	RedTrackDATA* m_tracks;
-	unsigned char m_reserved04[0x08 - 0x04];
+	unsigned char m_reserved04[REDSOUND_CONTROL_RESERVED04_SIZE];
 	signed char* m_keySignatureData;
 	int m_measure;
 	int m_tick;
@@ -317,7 +332,7 @@ struct RedSoundCONTROL {
 	int m_masterVolume;
 	int m_masterVolumeAdd;
 	int m_masterVolumeDelta;
-	unsigned char m_reserved460[0x46C - 0x460];
+	unsigned char m_reserved460[REDSOUND_CONTROL_RESERVED460_SIZE];
 	unsigned int m_flags;
 	int m_musicId;
 	int m_skipFrames;
@@ -365,12 +380,14 @@ enum RedSoundControlWordOffset {
 
 enum RedSoundControlByteOffset {
 	REDSOUND_CONTROL_TRACKS_OFFSET = 0x00,
+	REDSOUND_CONTROL_RESERVED04_OFFSET = 0x04,
 	REDSOUND_CONTROL_KEY_SIGNATURE_DATA_OFFSET = 0x08,
 	REDSOUND_CONTROL_TICK_OFFSET = 0x10,
 	REDSOUND_CONTROL_TICKS_PER_MEASURE_OFFSET = 0x14,
 	REDSOUND_CONTROL_TIME_NUMERATOR_OFFSET = 0x18,
 	REDSOUND_CONTROL_TIME_DENOMINATOR_OFFSET = 0x1A,
 	REDSOUND_CONTROL_VOLUME_OFFSET = 0x1C,
+	REDSOUND_CONTROL_RESERVED460_OFFSET = 0x460,
 	REDSOUND_CONTROL_FLAGS_OFFSET = 0x46C,
 	REDSOUND_CONTROL_SKIP_FRAMES_OFFSET = 0x474,
 	REDSOUND_CONTROL_ELAPSED_TIME_OFFSET = 0x478,
@@ -383,6 +400,7 @@ enum RedSoundControlByteOffset {
 	REDSOUND_CONTROL_CHANNEL_ALLOC_OFFSET = 0x490,
 	REDSOUND_CONTROL_TRACK_COUNT_OFFSET = 0x491,
 	REDSOUND_CONTROL_VOLUME_SCALE_OFFSET = 0x492,
+	REDSOUND_CONTROL_RESERVED493_OFFSET = 0x493,
 };
 
 enum RedSoundControlBufferOffset {

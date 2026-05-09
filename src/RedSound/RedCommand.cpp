@@ -1134,7 +1134,11 @@ void SetMusicTempo(int tempo, int frameCount)
 	}
 
 	tempo <<= REDSOUND_FIXED_SHIFT;
-	tempo |= REDSOUND_FIXED_HALF;
+	if (tempo < 0) {
+		tempo -= REDSOUND_FIXED_HALF;
+	} else {
+		tempo |= REDSOUND_FIXED_HALF;
+	}
 	p_MusicTempoControl->m_step = (tempo - p_MusicTempoControl->m_value) / frameCount;
 	p_MusicTempoControl->m_count = frameCount;
 }

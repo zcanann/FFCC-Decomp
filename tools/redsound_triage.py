@@ -8,6 +8,7 @@ from collections import Counter
 from typing import Any
 
 from objdiff_experiment import (
+    ROOT,
     as_float,
     classify_diff,
     extract_save_range,
@@ -16,6 +17,7 @@ from objdiff_experiment import (
     is_real_symbol_name,
     load_objdiff_json,
     normalize_unit,
+    source_path_for_unit,
     symbol_by_name,
 )
 
@@ -92,6 +94,7 @@ def summarize_symbol(unit: str, left: dict[str, Any], right: dict[str, Any]) -> 
         "symbol": left.get("name", ""),
         "pct": as_float(left.get("match_percent")),
         "size": int(left.get("size", 0) or 0),
+        "diff_count": sum(counts.values()),
         "category": category(left_frame, right_frame, left_save, right_save, counts),
         "frame": f"{left_frame or '?'}->{right_frame or '?'}",
         "save": f"{left_save or '?'}->{right_save or '?'}",
@@ -123,12 +126,12 @@ def print_rows(rows: list[dict[str, Any]], limit: int) -> None:
         print("No mismatched RedSound symbols found.")
         return
 
-    print(f"{'cat':<10} {'pct':>8} {'size':>5} {'unit':<11} {'symbol':<58} hint")
+    print(f"{'cat':<10} {'pct':>8} {'diffs':>5} {'size':>5} {'unit':<11} {'symbol':<55} hint")
     print("-" * 120)
     for row in rows[:limit]:
         print(
-            f"{row['category']:<10} {row['pct']:8.3f} {row['size']:5d} "
-            f"{short_unit(row['unit']):<11} {truncate(row['symbol'], 58):<58} {row['hint']}"
+            f"{row['category']:<10} {row['pct']:8.3f} {row['diff_count']:5d} {row['size']:5d} "
+            f"{short_unit(row['unit']):<11} {truncate(row['symbol'], 55):<55} {row['hint']}"
         )
     if len(rows) > limit:
         print(f"... {len(rows) - limit} more")
@@ -138,10 +141,32 @@ def print_detail(rows: list[dict[str, Any]], limit: int) -> None:
     for row in rows[:limit]:
         print(f"\n{row['unit']} :: {row['symbol']}")
         print(f"  {row['category']} {row['pct']:.4f}% size={row['size']}")
+        print(f"  total diffs {row['diff_count']}")
         print(f"  frame {row['frame']}")
         print(f"  save  {row['save']}")
         print(f"  diffs {row['counts']}")
         print(f"  hint  {row['hint']}")
+
+
+def experiment_command(row: dict[str, Any]) -> str:
+    unit = short_unit(row["unit"])
+    source_path = source_path_for_unit(row["unit"])
+    try:
+        source_arg = source_path.relative_to(ROOT)
+    except ValueError:
+        source_arg = source_path
+    return (
+        f"python3 tools/objdiff_experiment.py -u {unit} {row['symbol']} "
+        f"--build --explain --context --limit 8 --revert-path {source_arg}"
+    )
+
+
+def print_commands(rows: list[dict[str, Any]], limit: int) -> None:
+    if not rows:
+        return
+    print("\nExperiment commands:")
+    for row in rows[:limit]:
+        print(f"  {experiment_command(row)}")
 
 
 def parse_args() -> argparse.Namespace:
@@ -151,7 +176,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min-pct", type=float, default=0.0, help="Only show symbols at or above this match percent.")
     parser.add_argument("--max-pct", type=float, default=99.9999, help="Only show symbols below or equal to this percent.")
     parser.add_argument("--limit", type=int, default=80, help="Maximum table rows to print.")
+    parser.add_argument(
+        "--sort",
+        choices=["category", "easy", "pct"],
+        default="category",
+        help="Sort order. easy ranks fewest diffs first.",
+    )
     parser.add_argument("--detail", action="store_true", help="Print frame/save/diff details for shown rows.")
+    parser.add_argument("--commands", action="store_true", help="Print ready-to-run objdiff_experiment commands.")
     parser.add_argument("--objdiff-timeout", type=int, default=60)
     return parser.parse_args()
 
@@ -170,7 +202,12 @@ def main() -> int:
         and row["pct"] <= args.max_pct
         and (args.category is None or row["category"] == args.category)
     ]
-    rows.sort(key=lambda row: (row["category"], -row["pct"], row["unit"], row["symbol"]))
+    if args.sort == "easy":
+        rows.sort(key=lambda row: (row["diff_count"], -row["pct"], row["category"], row["unit"], row["symbol"]))
+    elif args.sort == "pct":
+        rows.sort(key=lambda row: (-row["pct"], row["diff_count"], row["unit"], row["symbol"]))
+    else:
+        rows.sort(key=lambda row: (row["category"], -row["pct"], row["diff_count"], row["unit"], row["symbol"]))
 
     counts = Counter(row["category"] for row in rows)
     if counts:
@@ -178,6 +215,8 @@ def main() -> int:
     print_rows(rows, args.limit)
     if args.detail:
         print_detail(rows, args.limit)
+    if args.commands:
+        print_commands(rows, args.limit)
     return 0
 
 

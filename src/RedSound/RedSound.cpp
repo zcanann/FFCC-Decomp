@@ -1334,23 +1334,26 @@ int CRedSound::StreamStandby(void* data, int fileSize)
 	int id = 0;
 	RedStreamHEAD* streamHeader = (RedStreamHEAD*)data;
 
-	if (streamHeader->m_signature[0] == REDSOUND_STREAM_SIGNATURE_0 &&
-	    streamHeader->m_signature[1] == REDSOUND_STREAM_SIGNATURE_1 &&
-	    streamHeader->m_signature[2] == REDSOUND_STREAM_SIGNATURE_2) {
-		RedSoundStreamBank* bank = _SearchEmptyStreamBank();
-		if (bank != 0) {
-			id = GetAutoID();
-			bank->m_streamId = id;
-			bank->m_streamData = data;
-			bank->m_fileSize = fileSize;
-			bank->m_readPoint = REDSOUND_STREAM_PAGE_SIZE;
-			bank->m_reserved10 = 0;
+	if (streamHeader->m_signature[0] != REDSOUND_STREAM_SIGNATURE_0 ||
+	    streamHeader->m_signature[1] != REDSOUND_STREAM_SIGNATURE_1 ||
+	    streamHeader->m_signature[2] != REDSOUND_STREAM_SIGNATURE_2) {
+		if (m_ReportPrint != 0) {
+			OSReport(sRedSoundInvalidStreamData,
+			         sRedSoundLogPrefix, sRedSoundLogErrorColor,
+			         sRedSoundLogReset);
+			fflush(__files + 1);
 		}
-	} else if (m_ReportPrint != 0) {
-		OSReport(sRedSoundInvalidStreamData,
-		         sRedSoundLogPrefix, sRedSoundLogErrorColor,
-		         sRedSoundLogReset);
-		fflush(__files + 1);
+		return id;
+	}
+
+	RedSoundStreamBank* bank = _SearchEmptyStreamBank();
+	if (bank != 0) {
+		id = GetAutoID();
+		bank->m_streamId = id;
+		bank->m_streamData = data;
+		bank->m_fileSize = fileSize;
+		bank->m_readPoint = REDSOUND_STREAM_PAGE_SIZE;
+		bank->m_reserved10 = 0;
 	}
 
 	return id;

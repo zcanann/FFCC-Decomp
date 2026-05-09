@@ -79,7 +79,6 @@ extern "C" void SePan__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void SePitch__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void SeVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" int SePlay__9CRedSoundFiiiii(CRedSound*, int, int, int, int, int);
-extern "C" void MusicVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void SetReverb__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void SetReverbDepth__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void ClearWaveBank__9CRedSoundFi(CRedSound*, int);
@@ -808,11 +807,11 @@ void CSound::Frame()
                         seNo = -1;
                     } else if (seNo < 4000) {
                         int bank = seNo / 1000;
-                        seNo = SePlay__9CRedSoundFiiiii(redSound, bank, seNo % 1000, pan, 0, 0);
-                        SeVolume__9CRedSoundFiii(redSound, seNo, vol, 0x1E);
+                        seNo = redSound->SePlay(bank, seNo % 1000, pan, 0, 0);
+                        redSound->SeVolume(seNo, vol, 0x1E);
                     } else {
-                        seNo = SePlay__9CRedSoundFiiiii(redSound, -1, seNo, pan, 0, 0);
-                        SeVolume__9CRedSoundFiii(redSound, seNo, vol, 0x1E);
+                        seNo = redSound->SePlay(-1, seNo, pan, 0, 0);
+                        redSound->SeVolume(seNo, vol, 0x1E);
                     }
                     *reinterpret_cast<int*>(se + 8) = seNo;
                     *se &= 0xBF;
@@ -828,7 +827,7 @@ void CSound::Frame()
                         if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
                             Printf__7CSystemFPce(&System, s_soundEnvSeStopFmt, *reinterpret_cast<int*>(se + 0xC));
                         }
-                        SeStop__9CRedSoundFi(redSound, *reinterpret_cast<int*>(se + 8));
+                        redSound->SeStop(*reinterpret_cast<int*>(se + 8));
                         *se = (*se & 0xBF) | 0x40;
                         goto next;
                     }
@@ -837,7 +836,7 @@ void CSound::Frame()
                         if (*reinterpret_cast<int*>(se + 8) < 0) {
                             Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                         } else {
-                            SePan__9CRedSoundFiii(redSound, *reinterpret_cast<int*>(se + 8), pan, 0x1E);
+                            redSound->SePan(*reinterpret_cast<int*>(se + 8), pan, 0x1E);
                         }
                         se[2] = static_cast<unsigned char>(pan);
                     }
@@ -846,7 +845,7 @@ void CSound::Frame()
                         if (*reinterpret_cast<int*>(se + 8) < 0) {
                             Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                         } else {
-                            SeVolume__9CRedSoundFiii(redSound, *reinterpret_cast<int*>(se + 8), volume, 0x1E);
+                            redSound->SeVolume(*reinterpret_cast<int*>(se + 8), volume, 0x1E);
                         }
                         se[1] = static_cast<unsigned char>(volume);
                     }
@@ -868,7 +867,7 @@ next:
         }
     }
 
-    MusicVolume__9CRedSoundFiii(RedSound(this), -1, sound.m_curMusicVolume, 0);
+    RedSound(this)->MusicVolume(-1, sound.m_curMusicVolume, 0);
 }
 
 /*

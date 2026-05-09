@@ -91,14 +91,6 @@ extern "C" void ClearSeSepDataMG__9CRedSoundFiiii(CRedSound*, int, int, int, int
 extern "C" void ClearWaveData__9CRedSoundFi(CRedSound*, int);
 extern "C" void ClearWaveDataM__9CRedSoundFiiii(CRedSound*, int, int, int, int);
 extern "C" void MusicVolume__9CRedSoundFiii(CRedSound*, int, int, int);
-extern "C" int ReentryMusicData__9CRedSoundFi(CRedSound*, int);
-extern "C" void SetMusicData__9CRedSoundFPv(CRedSound*, void*);
-extern "C" void MusicStop__9CRedSoundFi(CRedSound*, int);
-extern "C" void MusicPlay__9CRedSoundFiii(CRedSound*, int, int, int);
-extern "C" void MusicCrossPlay__9CRedSoundFiii(CRedSound*, int, int, int);
-extern "C" void MusicNextPlay__9CRedSoundFiii(CRedSound*, int, int, int);
-extern "C" void MusicFadeOut__9CRedSoundFii(CRedSound*, int, int);
-extern "C" void SetMusicPhraseStop__9CRedSoundFi(CRedSound*, int);
 extern "C" void SetReverb__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void SetReverbDepth__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void ClearWaveBank__9CRedSoundFi(CRedSound*, int);
@@ -1143,7 +1135,7 @@ void CSound::LoadBgm(int bgmId)
 
     if (bgmId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
-    } else if (ReentryMusicData__9CRedSoundFi(redSound, bgmId) == -1) {
+    } else if (redSound->ReentryMusicData(bgmId) == -1) {
         char musicPath[256];
         sprintf(musicPath, s_soundMusicPathFmt, bgmId);
 
@@ -1151,7 +1143,7 @@ void CSound::LoadBgm(int bgmId)
         if (handle != 0) {
             File.Read(handle);
             File.SyncCompleted(handle);
-            SetMusicData__9CRedSoundFPv(redSound, File.m_readBuffer);
+            redSound->SetMusicData(File.m_readBuffer);
             File.Close(handle);
         }
     }
@@ -1168,14 +1160,14 @@ void CSound::LoadBgm(int bgmId)
  */
 void CSound::PlayBgm(int bgmId)
 {
-    u8* self = reinterpret_cast<u8*>(this);
+    CRedSound* redSound = RedSound(this);
 
     if (bgmId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
-        MusicStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), -1);
-        SetMusicPhraseStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), 0);
-        MusicPlay__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), bgmId, 0x7F, 0);
+        redSound->MusicStop(-1);
+        redSound->SetMusicPhraseStop(0);
+        redSound->MusicPlay(bgmId, 0x7F, 0);
     }
 }
 
@@ -1190,13 +1182,13 @@ void CSound::PlayBgm(int bgmId)
  */
 void CSound::CrossPlayBgm(int bgmId, int crossFrames)
 {
-    u8* self = reinterpret_cast<u8*>(this);
+    CRedSound* redSound = RedSound(this);
 
     if (bgmId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
-        SetMusicPhraseStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), 0);
-        MusicCrossPlay__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), bgmId, 0x7F, crossFrames);
+        redSound->SetMusicPhraseStop(0);
+        redSound->MusicCrossPlay(bgmId, 0x7F, crossFrames);
     }
 }
 
@@ -1211,13 +1203,13 @@ void CSound::CrossPlayBgm(int bgmId, int crossFrames)
  */
 void CSound::PlayNextBgm(int bgmId)
 {
-    u8* self = reinterpret_cast<u8*>(this);
+    CRedSound* redSound = RedSound(this);
 
     if (bgmId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
-        MusicNextPlay__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), bgmId, 0x7F, 0);
-        SetMusicPhraseStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(self + 8), 1);
+        redSound->MusicNextPlay(bgmId, 0x7F, 0);
+        redSound->SetMusicPhraseStop(1);
     }
 }
 
@@ -1232,7 +1224,7 @@ void CSound::PlayNextBgm(int bgmId)
  */
 void CSound::StopBgm()
 {
-    MusicStop__9CRedSoundFi(RedSound(this), -1);
+    RedSound(this)->MusicStop(-1);
 }
 
 /*
@@ -1246,7 +1238,7 @@ void CSound::StopBgm()
  */
 void CSound::FadeOutBgm(int fadeFrames)
 {
-    MusicFadeOut__9CRedSoundFii(RedSound(this), -1, fadeFrames);
+    RedSound(this)->MusicFadeOut(-1, fadeFrames);
 }
 
 /*
@@ -1542,22 +1534,20 @@ void CSound::StopAndFreeAllSe(int clearMode)
 int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
 {
     int seId;
-    u8* self = reinterpret_cast<u8*>(this);
+    CRedSound* redSound = RedSound(this);
 
     if (seNo < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
         return -1;
     } else if (seNo < 4000) {
-        seId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(self + 8), seNo / 1000, seNo % 1000, pan,
-                                        volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
+        seId = redSound->SePlay(seNo / 1000, seNo % 1000, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
         if (fadeFrames != 0) {
-            SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), seId, volume, fadeFrames);
+            redSound->SeVolume(seId, volume, fadeFrames);
         }
     } else {
-        seId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(self + 8), -1, seNo, pan,
-                                        volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
+        seId = redSound->SePlay(-1, seNo, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
         if (fadeFrames != 0) {
-            SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), seId, volume, fadeFrames);
+            redSound->SeVolume(seId, volume, fadeFrames);
         }
     }
 

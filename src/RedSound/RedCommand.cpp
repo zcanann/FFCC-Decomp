@@ -248,6 +248,7 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 	if (attrMask != 0) {
 		_EraseAttribute(eraseTrack, attrMask);
 	}
+	volatile int unused = 0;
 	erasedCount = 0;
 
 	do {

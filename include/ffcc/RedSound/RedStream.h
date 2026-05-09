@@ -86,6 +86,16 @@ struct RedStreamStepData {
     int m_stepCount;
 };
 
+enum RedStreamStepDataLayoutOffset {
+    REDSOUND_STREAM_STEP_VALUE_OFFSET = 0x00,
+    REDSOUND_STREAM_STEP_STEP_OFFSET = 0x04,
+    REDSOUND_STREAM_STEP_COUNT_OFFSET = 0x08,
+};
+
+enum RedStreamStepDataLayoutSize {
+    REDSOUND_STREAM_STEP_DATA_SIZE = 0x0C,
+};
+
 enum RedStreamState {
     REDSOUND_STREAM_STATE_STOPPED = 0,
     REDSOUND_STREAM_STATE_PLAYING = 1,

@@ -201,7 +201,23 @@ def classify_diff(left_item: dict[str, Any], right_item: dict[str, Any]) -> str:
     return "argument/register mismatch"
 
 
-def explain_symbol(left: dict[str, Any], right: dict[str, Any], limit: int) -> None:
+def print_instruction_window(
+    left_instructions: list[dict[str, Any]],
+    right_instructions: list[dict[str, Any]],
+    center: int,
+    radius: int,
+) -> None:
+    start = max(0, center - radius)
+    end = min(max(len(left_instructions), len(right_instructions)), center + radius + 1)
+    for index in range(start, end):
+        left_item = left_instructions[index] if index < len(left_instructions) else {}
+        right_item = right_instructions[index] if index < len(right_instructions) else {}
+        marker = "!" if "diff_kind" in left_item or "diff_kind" in right_item else " "
+        print(f"        {marker}[{index:03d}] ours:   {instruction_text(left_item)}")
+        print(f"         [{index:03d}] target: {instruction_text(right_item)}")
+
+
+def explain_symbol(left: dict[str, Any], right: dict[str, Any], limit: int, window: int) -> None:
     name = left.get("name") or right.get("name") or "<unknown>"
     match = left.get("match_percent")
     size = left.get("size") or right.get("size")
@@ -244,9 +260,11 @@ def explain_symbol(left: dict[str, Any], right: dict[str, Any], limit: int) -> N
         print(f"    [{index:03d}] {hint}")
         print(f"          ours:   {left_text}")
         print(f"          target: {right_text}")
+        if window > 0:
+            print_instruction_window(left_instructions, right_instructions, index, window)
 
 
-def explain_current_diff(unit: str, symbols: list[str], timeout: int, limit: int) -> None:
+def explain_current_diff(unit: str, symbols: list[str], timeout: int, limit: int, window: int) -> None:
     raw = load_objdiff_json(unit, symbols, timeout)
     left_symbols = symbol_by_name(raw, "left")
     right_symbols = symbol_by_name(raw, "right")
@@ -257,7 +275,7 @@ def explain_current_diff(unit: str, symbols: list[str], timeout: int, limit: int
         if not left or not right:
             print(f"\nExplanation: {name}: symbol not present on both sides")
             continue
-        explain_symbol(left, right, limit)
+        explain_symbol(left, right, limit, window)
 
 
 def is_real_symbol_name(name: str) -> bool:
@@ -460,6 +478,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--objdiff-timeout", type=int, default=60, help="objdiff-cli timeout in seconds.")
     parser.add_argument("--limit", type=int, default=30, help="Maximum changed rows to print per group.")
     parser.add_argument("--explain", action="store_true", help="Print a compact instruction mismatch summary.")
+    parser.add_argument("--window", type=int, default=0, help="Instruction context radius for --explain diffs.")
     parser.add_argument("--context", action="store_true", help="Print source, PAL/EN MAP, and Ghidra context.")
     parser.add_argument(
         "--revert-path",
@@ -520,7 +539,7 @@ def main() -> int:
     print_changes("Sections", section_changes, args.limit)
     print_changes("Symbols", symbol_changes, args.limit)
     if args.explain:
-        explain_current_diff(unit, symbols, args.objdiff_timeout, args.limit)
+        explain_current_diff(unit, symbols, args.objdiff_timeout, args.limit, args.window)
     if args.context:
         context_symbols = symbols or unmatched_symbol_names(after.get("symbols", {}))
         print_context(unit, context_symbols, args.limit)

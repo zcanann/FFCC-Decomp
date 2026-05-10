@@ -260,7 +260,8 @@ int RedNewA(int size, int offset, int maxSize)
 		maxSize = m_ADataBufferSize;
 	}
 	maxSize -= offset;
-	size = (size + REDSOUND_MEMORY_BANK_ALIGN_MASK) & ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	size += REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	size &= ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
 	currentAddress = rangeStart;
 	result = REDSOUND_MEMORY_ALLOC_FAILED;
 	maxGap = maxSize;

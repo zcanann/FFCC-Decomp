@@ -3371,7 +3371,7 @@ void CRedDriver::SetWavePitch(int pitch)
             (p_VoiceData + *voiceNo)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
         }
         voiceNo++;
-    } while (voiceNo < p_EditorVoice + REDSOUND_EDITOR_VOICE_COUNT);
+    } while (voiceNo <= p_EditorVoice + REDSOUND_EDITOR_VOICE_RIGHT);
 }
 
 /*
@@ -3396,6 +3396,30 @@ void CRedDriver::SetWaveTune(int key, int fineTune)
         if (*voiceNo != 0) {
             (p_VoiceData + *voiceNo)->m_basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
             (p_VoiceData + *voiceNo)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
+        }
+        voiceNo++;
+    } while (voiceNo < p_EditorVoice + REDSOUND_EDITOR_VOICE_COUNT);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
+{
+    int* voiceNo;
+
+    memcpy(&p_EditorTrack->m_adsr, adsr, REDSOUND_TRACK_ADSR_SIZE);
+    voiceNo = p_EditorVoice;
+    do {
+        if (*voiceNo != 0) {
+            memcpy(&(p_VoiceData + *voiceNo)->m_adsr, adsr, REDSOUND_TRACK_ADSR_SIZE);
+            (p_VoiceData + *voiceNo)->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_START;
         }
         voiceNo++;
     } while (voiceNo < p_EditorVoice + REDSOUND_EDITOR_VOICE_COUNT);

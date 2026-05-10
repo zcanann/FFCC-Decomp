@@ -1772,3 +1772,17 @@ void CRedSound::SetWavePitch(int pitch)
 {
 	c_Driver.SetWavePitch(pitch);
 }
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SetWaveTune(int key, int fineTune)
+{
+	c_Driver.SetWaveTune(key, fineTune);
+}

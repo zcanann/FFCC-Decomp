@@ -3377,6 +3377,33 @@ void CRedDriver::SetWavePitch(int pitch)
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::SetWaveTune(int key, int fineTune)
+{
+    int* voiceNo;
+
+    p_EditorTrack->m_keyTranspose = key;
+    p_EditorTrack->m_note.m_key = key;
+    p_EditorTrack->m_fineTune = fineTune;
+    p_EditorTrack->m_portamentPitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+    voiceNo = p_EditorVoice;
+    do {
+        if (*voiceNo != 0) {
+            (p_VoiceData + *voiceNo)->m_basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+            (p_VoiceData + *voiceNo)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
+        }
+        voiceNo++;
+    } while (voiceNo < p_EditorVoice + REDSOUND_EDITOR_VOICE_COUNT);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 24b
  * EN Address: TODO
  * EN Size: TODO

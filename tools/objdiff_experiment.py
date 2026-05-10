@@ -450,12 +450,12 @@ def record_attempt(
     print(f"Recorded attempt: {path}")
 
 
-def restore_paths(paths: list[Path]) -> None:
+def restore_paths(paths: list[Path], reason: str) -> None:
     if not paths:
         return
     cmd = ["git", "restore", "--worktree", "--staged", "--"]
     cmd.extend(str(path) for path in paths)
-    print("Reverting explicit paths after regression:")
+    print(f"Reverting explicit paths after {reason}:")
     for path in paths:
         print(f"  {path}")
     run_command(cmd, DEFAULT_TIMEOUT_SECONDS, check=True)
@@ -488,7 +488,12 @@ def parse_args() -> argparse.Namespace:
         action="append",
         type=Path,
         default=[],
-        help="Explicit path to git-restore if a regression is detected. May be repeated.",
+        help="Explicit path to git-restore if an auto-revert condition is met. May be repeated.",
+    )
+    parser.add_argument(
+        "--revert-no-change",
+        action="store_true",
+        help="Also restore --revert-path files when the experiment has no objdiff score changes.",
     )
     parser.add_argument(
         "--no-rebuild-after-revert",
@@ -552,8 +557,9 @@ def main() -> int:
     result = "regressed" if regressed else "improved" if progressed else "no_change"
     if args.record_attempt:
         record_attempt(args.attempt_log, unit, symbols, result, section_changes, symbol_changes, args.note)
-    if regressed and args.revert_path:
-        restore_paths(args.revert_path)
+    should_revert = regressed or (args.revert_no_change and result == "no_change")
+    if should_revert and args.revert_path:
+        restore_paths(args.revert_path, result)
         if args.rebuild_after_revert and not run_ninja(args.ninja_timeout):
             return 1
     return 2 if regressed else 0

@@ -280,7 +280,8 @@ def experiment_command(row: dict[str, Any]) -> str:
         source_arg = source_path
     return (
         f"python3 tools/objdiff_experiment.py -u {unit} {row['symbol']} "
-        f"--build --explain --context --limit 8 --window 2 --record-attempt --revert-path {source_arg}"
+        f"--build --explain --context --limit 8 --window 2 --record-attempt "
+        f"--revert-path {source_arg} --revert-no-change"
     )
 
 

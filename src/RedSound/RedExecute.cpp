@@ -1864,7 +1864,8 @@ void EnvelopeKeyExecute()
                 if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_RELEASED) != 0) {
                     voiceData->m_flags |= REDSOUND_VOICE_FLAGS_RELEASE_ACTIVE;
                     voiceData->m_adsrStage = REDSOUND_VOICE_ADSR_RELEASE;
-                    voiceData->m_adsrStepFrames = (u16)((u8*)voiceData)[REDSOUND_VOICE_ADSR_TIME_RELEASE_BYTE_OFFSET];
+                    voiceData->m_adsrStepFrames =
+                        (u16)((u8*)voiceData->m_adsr.m_time)[REDSOUND_VOICE_ADSR_TIME_RELEASE_BYTE];
                     if (voiceData->m_adsrStepFrames == 0) {
                         voiceData->m_adsrCurrentLevel = 0;
                     } else {

@@ -369,6 +369,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--commands", action="store_true", help="Print ready-to-run objdiff_experiment commands.")
     parser.add_argument("--attempts", action="store_true", help="Show attempt counts from the attempt log.")
     parser.add_argument("--attempt-log", type=Path, default=DEFAULT_ATTEMPT_LOG, help="Attempt log path.")
+    parser.add_argument("--min-attempts", type=int, help="Only show symbols with at least this many recorded attempts.")
+    parser.add_argument("--max-attempts", type=int, help="Only show symbols with at most this many recorded attempts.")
     parser.add_argument(
         "--buckets",
         action="store_true",
@@ -412,8 +414,20 @@ def main() -> int:
         and row["pct"] <= args.max_pct
         and (args.category is None or row["category"] == args.category)
     ]
-    if args.attempts or args.fresh or args.skip_attempt_result or args.require_attempt_result:
+    needs_attempts = (
+        args.attempts
+        or args.fresh
+        or args.skip_attempt_result
+        or args.require_attempt_result
+        or args.min_attempts is not None
+        or args.max_attempts is not None
+    )
+    if needs_attempts:
         annotate_attempts(rows, load_attempts(args.attempt_log))
+    if args.min_attempts is not None:
+        rows = [row for row in rows if row.get("attempt_count", 0) >= args.min_attempts]
+    if args.max_attempts is not None:
+        rows = [row for row in rows if row.get("attempt_count", 0) <= args.max_attempts]
     skipped_results = set(args.skip_attempt_result)
     if args.fresh:
         skipped_results.update({"regressed", "no_change"})

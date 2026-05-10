@@ -882,7 +882,8 @@ int CRedSound::GetSeUsedWave(int bank, int seNo)
 				RedSeINFO* info = reinterpret_cast<RedSeINFO*>(
 				    reinterpret_cast<unsigned char*>(entries) + block->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE +
 				    (entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK));
-				waveNo = info->m_waveNoLo | info->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE;
+				waveNo = info->m_waveNoHi;
+				waveNo = info->m_waveNoLo | waveNo * REDSOUND_SE_INFO_U16_HIGH_SCALE;
 			}
 		}
 	}
@@ -901,8 +902,10 @@ int CRedSound::GetSeUsedWave(int bank, int seNo)
 int CRedSound::GetSeUsedWave(void* seSepData)
 {
 	RedSeSepHEAD* seSepHead = (RedSeSepHEAD*)seSepData;
+	int waveNo;
 
-	return seSepHead->m_waveNoLo | seSepHead->m_waveNoHi * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE;
+	waveNo = seSepHead->m_waveNoHi;
+	return seSepHead->m_waveNoLo | waveNo * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE;
 }
 
 /*

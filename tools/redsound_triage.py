@@ -81,6 +81,29 @@ def diff_summary(left: dict[str, Any], right: dict[str, Any]) -> tuple[Counter[s
     return counts, first_hint
 
 
+def diff_instruction_pairs(left: dict[str, Any], right: dict[str, Any]) -> list[tuple[int, dict[str, Any], dict[str, Any]]]:
+    pairs: list[tuple[int, dict[str, Any], dict[str, Any]]] = []
+    left_instructions = left.get("instructions") or []
+    right_instructions = right.get("instructions") or []
+    max_len = max(len(left_instructions), len(right_instructions))
+    for i in range(max_len):
+        left_item = left_instructions[i] if i < len(left_instructions) else {}
+        right_item = right_instructions[i] if i < len(right_instructions) else {}
+        if "diff_kind" in left_item or "diff_kind" in right_item:
+            pairs.append((i, left_item, right_item))
+    return pairs
+
+
+def is_save_restore_only(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    pairs = diff_instruction_pairs(left, right)
+    if len(pairs) != 2:
+        return False
+    return all(
+        mnemonic(left_item) == mnemonic(right_item) and mnemonic(left_item) in {"stmw", "lmw"}
+        for _, left_item, right_item in pairs
+    )
+
+
 def operands(item: dict[str, Any]) -> list[str]:
     text = instruction_text(item)
     if text == "<gap>" or " " not in text:
@@ -97,6 +120,8 @@ def mismatch_patterns(
     right_save: str | None,
 ) -> list[str]:
     patterns: list[str] = []
+    if is_save_restore_only(left, right):
+        patterns.append("save-only")
     if left_frame != right_frame or left_save != right_save:
         patterns.append("stack")
 
@@ -356,6 +381,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("-u", "--unit", action="append", help="Limit to one unit. May be repeated.")
     parser.add_argument("--category", choices=["regs", "stack", "structural", "other", "data"], help="Filter category.")
+    parser.add_argument("--pattern", action="append", help="Only show symbols whose pattern list includes this value.")
     parser.add_argument("--min-pct", type=float, default=0.0, help="Only show symbols at or above this match percent.")
     parser.add_argument("--max-pct", type=float, default=99.9999, help="Only show symbols below or equal to this percent.")
     parser.add_argument("--limit", type=int, default=80, help="Maximum table rows to print.")
@@ -413,6 +439,7 @@ def main() -> int:
         if row["pct"] >= args.min_pct
         and row["pct"] <= args.max_pct
         and (args.category is None or row["category"] == args.category)
+        and (args.pattern is None or all(pattern in row["patterns"].split(",") for pattern in args.pattern))
     ]
     needs_attempts = (
         args.attempts

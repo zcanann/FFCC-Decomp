@@ -3329,6 +3329,79 @@ void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 624b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volume)
+{
+    RedVoiceDATA* voice;
+    RedWaveDATA* wave;
+    RedWaveHeadWD* waveHead;
+    int voiceIndex;
+
+    waveHead = c_RedEntry.SearchWaveBase(waveNo);
+    if ((waveHead == 0) || (itemNo < 0) || (itemNo >= waveHead->m_toneCount)) {
+        return 0;
+    }
+
+    wave = (RedWaveDATA*)((u8*)waveHead + waveHead->m_waveOffsets[itemNo]);
+    p_EditorTrack->m_waveBankData = waveHead;
+    p_EditorTrack->m_waveData = wave;
+    p_EditorTrack->m_waveBase = waveHead->m_aramAddress;
+    p_EditorTrack->m_note.m_key = key;
+    p_EditorTrack->m_note.m_velocity = REDSOUND_VOLUME_MAX;
+    p_EditorTrack->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_DIRECT_MASK;
+    p_EditorTrack->m_trackNo = REDSOUND_EDITOR_VOICE_LEFT + 1;
+    p_EditorTrack->m_volume = REDSOUND_VOLUME_FULL;
+    p_EditorTrack->m_expression = REDSOUND_VOLUME_DEFAULT;
+    p_EditorTrack->m_mixVolume = volume << REDSOUND_FIXED_SHIFT;
+    p_EditorTrack->m_pan = pan << REDSOUND_FIXED_SHIFT;
+    p_EditorTrack->m_reverbDepth = p_ReverbDepth[REDSOUND_REVERB_DEPTH_SE].m_depth;
+    p_EditorTrack->m_portamentPitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+    p_EditorTrack->m_pitchBendRange = 2;
+    p_EditorTrack->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO;
+
+    voice = EntryVoiceSearch(p_EditorTrack);
+    if (voice == 0) {
+        return 0;
+    }
+
+    voiceIndex = voice - p_VoiceData;
+    p_EditorVoice[REDSOUND_EDITOR_VOICE_LEFT] = voiceIndex;
+    p_EditorVoice[REDSOUND_EDITOR_VOICE_RIGHT] = 0;
+    voice->m_track = p_EditorTrack;
+    voice->m_waveData = wave;
+    voice->m_trackVolume = &p_EditorTrack->m_volume;
+    voice->m_trackExpression = &p_EditorTrack->m_expression;
+    voice->m_trackPan = &p_EditorTrack->m_pan;
+    voice->m_stateFlags = REDSOUND_VOICE_STATE_PLAYING;
+    voice->m_voiceSwitch = p_EditorTrack->m_voiceSwitch;
+    if ((wave->m_reverbMix != 0) && (wave->m_reverbMix != 1)) {
+        voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_STEREO;
+    }
+    memcpy(&voice->m_adsr, wave->m_adsr, REDSOUND_TRACK_ADSR_SIZE);
+    voice->m_basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+    if ((wave->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) != 0) {
+        voice->m_basePitch = wave->m_splitKey << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+    }
+    voice->m_pitch = WavePitchCompute(key, 0);
+    voice->m_targetPitch = voice->m_pitch;
+    voice->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
+    voice->m_flags = REDSOUND_VOICE_FLAGS_START | REDSOUND_VOICE_FLAGS_ADPCM_DIRTY |
+                     REDSOUND_VOICE_FLAGS_PITCH_DIRTY | REDSOUND_VOICE_FLAGS_ADSR_START;
+    voice->m_active = 1;
+    voice->m_updateFlags = REDSOUND_VOICE_UPDATE_ALL;
+    SetVoiceVolumeMix(voice, pan, volume);
+
+    return voiceIndex;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 96b
  * EN Address: TODO
  * EN Size: TODO

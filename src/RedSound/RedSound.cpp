@@ -1751,6 +1751,20 @@ RedVoiceDATA* CRedSound::GetVoiceAddress()
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volume)
+{
+	return c_Driver.PlayWaveItem(waveNo, itemNo, key, pan, volume);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 36b
  * EN Address: TODO
  * EN Size: TODO

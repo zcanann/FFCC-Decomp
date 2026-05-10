@@ -3021,8 +3021,8 @@ static int _SeMidiNoteExecute(
         }
         track++;
     } while (track < control->m_tracks + REDSOUND_SE_TRACK_COUNT);
-    control->m_updateFlags = 1;
-    return control->m_tickCounter;
+    control->m_skipFrames = 1;
+    return control->m_activeTrackCount;
 }
 
 /*

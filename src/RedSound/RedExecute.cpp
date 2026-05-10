@@ -2612,6 +2612,7 @@ static void _SkipMusicEntry()
     RedKeyOnSlot* dst;
     RedSoundCONTROL* soundControl;
     RedControlRamp volume;
+    int keyOnEntryCount = 0;
 
     if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId >= 0) {
         src = p_SkipKeyOn->m_fixed;
@@ -2620,6 +2621,7 @@ static void _SkipMusicEntry()
             if ((src->m_track != 0) && (dst->m_track == 0)) {
                 dst->m_track = src->m_track;
                 *(int*)&dst->m_note = *(int*)&src->m_note;
+                keyOnEntryCount++;
                 m_KeyOnEntry++;
             }
             src++;
@@ -2639,6 +2641,7 @@ static void _SkipMusicEntry()
                 dst->m_track = src->m_track;
                 *(int*)&dst->m_note = *(int*)&src->m_note;
                 dst++;
+                keyOnEntryCount++;
                 m_KeyOnEntry++;
             }
             src++;
@@ -2658,6 +2661,7 @@ static void _SkipMusicEntry()
                 dst->m_track = src->m_track;
                 *(int*)&dst->m_note = *(int*)&src->m_note;
                 dst++;
+                keyOnEntryCount++;
                 m_KeyOnEntry++;
             }
             src++;

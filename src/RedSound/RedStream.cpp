@@ -644,6 +644,45 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void SetStreamPan(int streamID, int pan, int frameCount)
+{
+	volatile RedStreamDATA* streamData;
+
+	if (frameCount < 1) {
+		frameCount = 1;
+	} else {
+		frameCount *= REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
+		frameCount /= REDSOUND_FRAMES_PER_SECOND;
+	}
+
+	pan &= REDSOUND_PAN_BYTE_MASK;
+	pan <<= REDSOUND_FIXED_SHIFT;
+	streamData = p_Stream;
+	do {
+		if ((streamData->m_streamId != 0) &&
+		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
+			if (frameCount > 0) {
+				int delta = pan - streamData->m_pan.m_value;
+				streamData->m_pan.m_step = delta / frameCount;
+				streamData->m_pan.m_stepCount = frameCount;
+			} else {
+				streamData->m_pan.m_value = pan;
+				streamData->m_pan.m_stepCount = 0;
+			}
+		}
+		streamData++;
+	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cc600
  * PAL Size: 392b
  * EN Address: TODO

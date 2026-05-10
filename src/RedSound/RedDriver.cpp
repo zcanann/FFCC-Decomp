@@ -1266,6 +1266,20 @@ static void _StreamVolume(int* command)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+static void _StreamPan(int* command)
+{
+	SetStreamPan(command[REDSOUND_STREAM_COMMAND_ID], command[REDSOUND_STREAM_COMMAND_PAN],
+	             command[REDSOUND_STREAM_COMMAND_FADE_TIME]);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bdadc
  * PAL Size: 52b
  * EN Address: TODO
@@ -2924,6 +2938,19 @@ int CRedDriver::StreamPlay(int streamID, void* streamData, int fileSize, int pan
 void CRedDriver::StreamVolume(int streamID, int volume, int frameCount)
 {
     _EntryExecCommand(_StreamVolume, streamID, volume, frameCount, 0, 0, 0, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+void CRedDriver::StreamPan(int streamID, int pan, int frameCount)
+{
+    _EntryExecCommand(_StreamPan, streamID, pan, frameCount, 0, 0, 0, 0);
 }
 
 /*

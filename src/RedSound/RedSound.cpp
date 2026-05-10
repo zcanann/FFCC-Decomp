@@ -1758,3 +1758,17 @@ void CRedSound::StopWaveItem()
 {
 	c_Driver.StopWaveItem();
 }
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SetWavePitch(int pitch)
+{
+	c_Driver.SetWavePitch(pitch);
+}

@@ -3354,6 +3354,29 @@ void CRedDriver::StopWaveItem()
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::SetWavePitch(int pitch)
+{
+    int* voiceNo;
+
+    p_EditorTrack->m_pitch = pitch;
+    voiceNo = p_EditorVoice;
+    do {
+        if (*voiceNo != 0) {
+            (p_VoiceData + *voiceNo)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
+        }
+        voiceNo++;
+    } while (voiceNo < p_EditorVoice + REDSOUND_EDITOR_VOICE_COUNT);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 24b
  * EN Address: TODO
  * EN Size: TODO

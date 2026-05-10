@@ -1514,6 +1514,57 @@ RedStreamDATA* CRedSound::GetStreamPlayBlock(int streamId)
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 336b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::GetStreamReadPoint(int streamId, int* readPoint)
+{
+	RedSoundStreamBank* bank = _SearchStreamBank(streamId);
+
+	if (readPoint != 0) {
+		readPoint[0] = 0;
+		readPoint[1] = 0;
+	}
+
+	if (bank != 0) {
+		int playPoint;
+		int currentReadPoint;
+		int delta;
+
+		if (c_Driver.GetStreamPlayPoint(streamId, &playPoint, &currentReadPoint) != 0) {
+			if (readPoint != 0) {
+				if (currentReadPoint >= bank->m_readPoint) {
+					delta = currentReadPoint - bank->m_readPoint;
+				} else {
+					delta = bank->m_fileSize - bank->m_readPoint + currentReadPoint;
+				}
+				readPoint[0] = delta;
+				if (playPoint >= bank->m_playPoint) {
+					readPoint[1] = playPoint - bank->m_playPoint;
+				}
+			}
+			bank->m_readPoint = currentReadPoint;
+			bank->m_playPoint = playPoint;
+		} else {
+			if (readPoint != 0) {
+				readPoint[0] = bank->m_fileSize - bank->m_readPoint;
+				readPoint[1] = bank->m_fileSize - bank->m_playPoint;
+			}
+			bank->m_streamId = 0;
+			bank->m_streamData = 0;
+			bank->m_fileSize = 0;
+			bank->m_readPoint = 0;
+			bank->m_playPoint = 0;
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 36b
  * EN Address: TODO
  * EN Size: TODO

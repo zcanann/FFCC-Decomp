@@ -675,6 +675,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 {
 	int waveNo;
+	int historyNo;
 	int waveAddress;
 	int waveSize;
 	u8* waveDataTop;
@@ -690,14 +691,13 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 
 	waveAddress = 0;
 	if (m_waveLoadNo < 0) {
-		RedWaveHeadWD* waveHead = (RedWaveHeadWD*)waveData;
-		waveNo = waveHead->m_waveNo;
+		waveNo = ((RedWaveHeadWD*)waveData)->m_waveNo;
 
 		if ((waveBankNo >= 0) && (waveNo != m_waveBankBase[waveBankNo].m_id)) {
 			WaveDelete(&m_waveBankBase[waveBankNo]);
 		}
 
-		int historyNo = SearchWaveSequence(waveNo);
+		historyNo = SearchWaveSequence(waveNo);
 		if (historyNo >= 0) {
 			if ((waveBankNo >= 0) && (historyNo != waveBankNo)) {
 				m_waveBankBase[waveBankNo].m_id =
@@ -713,8 +713,8 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 
 			WaveHistoryChoice(&m_waveBankBase[historyNo]);
 		} else {
-			m_waveLoadNo = waveHead->m_waveNo;
-			waveAddress = WaveHeadAdd(waveBankNo, waveHead, waveNo);
+			m_waveLoadNo = ((RedWaveHeadWD*)waveData)->m_waveNo;
+			waveAddress = WaveHeadAdd(waveBankNo, (RedWaveHeadWD*)waveData, waveNo);
 			if (waveAddress < 0) {
 				m_waveLoadSize = 0;
 				m_waveLoadNo = REDSOUND_WAVE_NO_NONE;
@@ -722,11 +722,11 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 			}
 
 			int waveHeadSize =
-			    ((((waveHead->m_tableCount * REDSOUND_WAVE_TABLE_ENTRY_SIZE) + (REDSOUND_WAVE_TABLE_ALIGN - 1)) &
+			    ((((((RedWaveHeadWD*)waveData)->m_tableCount * REDSOUND_WAVE_TABLE_ENTRY_SIZE) + (REDSOUND_WAVE_TABLE_ALIGN - 1)) &
 			      REDSOUND_WAVE_TABLE_ALIGN_MASK) +
-			     waveHead->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE) +
+			     ((RedWaveHeadWD*)waveData)->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE) +
 			    REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
-			waveSize = waveHead->m_waveSize;
+			waveSize = ((RedWaveHeadWD*)waveData)->m_waveSize;
 			waveDataSize -= waveHeadSize;
 			waveDataTop = (u8*)waveData + waveHeadSize;
 		}

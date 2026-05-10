@@ -1945,6 +1945,14 @@ static void _KeyOnControl()
     RedSwingFunc waveFunc;
     int shakeDepth;
     int shakeValue;
+    RedSoundCONTROL* soundControl;
+    RedTrackDATA* track;
+    RedTrackDATA* trackBase;
+    RedTrackDATA* trackData;
+    RedVoiceDATA* voice;
+    int volume;
+    int idx;
+    u32 bit;
 
     _VoiceEnvelopeCheck();
     voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] = 0;
@@ -1963,7 +1971,7 @@ static void _KeyOnControl()
 
     if ((p_SoundControlBuffer->m_activeTrackCount != 0) &&
         ((p_SoundControlBuffer->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
-        RedTrackDATA* track = p_SoundControlBuffer->m_tracks;
+        track = p_SoundControlBuffer->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 waveFunc = track->m_shakeFunc;
@@ -1980,8 +1988,8 @@ static void _KeyOnControl()
     if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) &&
         ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_flags &
           REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
-        RedTrackDATA* track = p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks;
-        RedTrackDATA* trackBase = p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks;
+        track = p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks;
+        trackBase = p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 waveFunc = track->m_shakeFunc;
@@ -1995,7 +2003,7 @@ static void _KeyOnControl()
     }
 
     {
-        RedTrackDATA* track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+        track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 waveFunc = track->m_shakeFunc;
@@ -2009,19 +2017,18 @@ static void _KeyOnControl()
     }
 
     {
-        RedVoiceDATA* voice = p_VoiceData;
+        voice = p_VoiceData;
         do {
             if ((voice->m_active != 0) && (voice->m_track != 0) &&
                 ((voice->m_track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_SKIP_UPDATE) == 0)) {
                 if ((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_VOLUME) != 0 ||
                     (voice->m_track->m_tremoloFunc != 0) ||
                     (voice->m_track->m_shakeFunc != 0)) {
-                    int volume;
-                    RedSoundCONTROL* soundControl = p_SoundControlBuffer;
-                    RedTrackDATA* trackData = voice->m_track;
+                    soundControl = p_SoundControlBuffer;
+                    trackData = voice->m_track;
                     if ((soundControl->m_tracks <= trackData) &&
                         (trackData < soundControl->m_tracks + soundControl->m_trackCount)) {
-                        int idx = trackData->m_trackNo;
+                        idx = trackData->m_trackNo;
                         if (((1U << (idx % REDSOUND_MUTE_BITS_PER_WORD)) &
                              m_Mute[idx / REDSOUND_MUTE_BITS_PER_WORD]) == 0) {
                             volume = ((soundControl->m_volumeScale + 1) *
@@ -2040,7 +2047,7 @@ static void _KeyOnControl()
                             (trackData <
                              soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks +
                                  soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount)) {
-                            int idx = trackData->m_trackNo;
+                            idx = trackData->m_trackNo;
 
                             if (((1U << (idx % REDSOUND_MUTE_BITS_PER_WORD)) &
                                  m_Mute[idx / REDSOUND_MUTE_BITS_PER_WORD]) == 0) {
@@ -2074,8 +2081,8 @@ static void _KeyOnControl()
     }
 
     {
-        u32 bit = 1;
-        RedVoiceDATA* voice = p_VoiceData;
+        bit = 1;
+        voice = p_VoiceData;
         do {
             if ((voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] & bit) != 0) {
                 voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] &= ~bit;
@@ -2087,8 +2094,8 @@ static void _KeyOnControl()
     }
 
     {
-        u32 bit = 1;
-        RedVoiceDATA* voice = p_VoiceData + REDSOUND_MUTE_BITS_PER_WORD;
+        bit = 1;
+        voice = p_VoiceData + REDSOUND_MUTE_BITS_PER_WORD;
         do {
             if ((voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] & bit) != 0) {
                 voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] &= ~bit;

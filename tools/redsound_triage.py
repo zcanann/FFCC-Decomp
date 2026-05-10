@@ -429,7 +429,14 @@ def load_attempts(path: Path, include_context: bool = False) -> dict[tuple[str, 
                 key = (unit, str(symbol))
                 current = attempts.setdefault(
                     key,
-                    {"count": 0, "last_result": "", "last_note": "", "last_time": "", "results": Counter()},
+                    {
+                        "count": 0,
+                        "last_result": "",
+                        "last_note": "",
+                        "last_time": "",
+                        "results": Counter(),
+                        "history": [],
+                    },
                 )
                 current["count"] += 1
                 result = entry.get("result", "")
@@ -438,6 +445,13 @@ def load_attempts(path: Path, include_context: bool = False) -> dict[tuple[str, 
                 current["last_time"] = entry.get("timestamp", "")
                 if result:
                     current["results"][result] += 1
+                current["history"].append(
+                    {
+                        "result": result,
+                        "note": entry.get("note", ""),
+                        "timestamp": entry.get("timestamp", ""),
+                    }
+                )
     return attempts
 
 
@@ -447,11 +461,13 @@ def annotate_attempts(rows: list[dict[str, Any]], attempts: dict[tuple[str, str]
         row["attempt_count"] = int(row_attempts.get("count", 0) or 0)
         row["last_attempt_result"] = row_attempts.get("last_result", "")
         row["last_attempt_note"] = row_attempts.get("last_note", "")
+        row["last_attempt_time"] = row_attempts.get("last_time", "")
         results = row_attempts.get("results", Counter())
         row["attempt_results"] = dict(results)
+        row["attempt_history"] = list(row_attempts.get("history", []))
 
 
-def print_attempts(rows: list[dict[str, Any]], limit: int) -> None:
+def print_attempts(rows: list[dict[str, Any]], limit: int, history_limit: int = 0) -> None:
     attempted = [row for row in rows if row.get("attempt_count", 0)]
     if not attempted:
         print("\nAttempts: none recorded for shown rows")
@@ -459,10 +475,22 @@ def print_attempts(rows: list[dict[str, Any]], limit: int) -> None:
     print("\nAttempts:")
     for row in attempted[:limit]:
         note = f" ({row['last_attempt_note']})" if row.get("last_attempt_note") else ""
+        results = row.get("attempt_results", {})
+        result_summary = ""
+        if results:
+            result_summary = " [" + ", ".join(f"{key}={results[key]}" for key in sorted(results)) + "]"
         print(
             f"  {short_unit(row['unit'])} {row['symbol']}: "
-            f"{row['attempt_count']} attempt(s), last={row['last_attempt_result']}{note}"
+            f"{row['attempt_count']} attempt(s){result_summary}, last={row['last_attempt_result']}{note}"
         )
+        if history_limit > 0:
+            history = row.get("attempt_history", [])[-history_limit:]
+            for entry in history:
+                entry_note = entry.get("note", "")
+                entry_result = entry.get("result", "")
+                timestamp = entry.get("timestamp", "")
+                when = f" {timestamp}" if timestamp else ""
+                print(f"    - {entry_result}{when}: {entry_note}")
 
 
 def parse_args() -> argparse.Namespace:
@@ -485,6 +513,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--detail", action="store_true", help="Print frame/save/diff details for shown rows.")
     parser.add_argument("--commands", action="store_true", help="Print ready-to-run objdiff_experiment commands.")
     parser.add_argument("--attempts", action="store_true", help="Show attempt counts from the attempt log.")
+    parser.add_argument(
+        "--attempt-history",
+        type=int,
+        default=0,
+        help="With --attempts, show the last N attempt notes for each displayed symbol.",
+    )
     parser.add_argument("--attempt-log", type=Path, default=DEFAULT_ATTEMPT_LOG, help="Attempt log path.")
     parser.add_argument(
         "--include-context-attempts",
@@ -622,7 +656,7 @@ def main() -> int:
     if args.commands:
         print_commands(shown_rows, len(shown_rows))
     if args.attempts:
-        print_attempts(shown_rows, len(shown_rows))
+        print_attempts(shown_rows, len(shown_rows), args.attempt_history)
     return 0
 
 

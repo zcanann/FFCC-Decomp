@@ -490,6 +490,20 @@ void CRedSound::SetMusicData(void* musicData)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::ClearMusicData(int musicId)
+{
+	c_Driver.ClearMusicData(musicId);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801ccfa0
  * PAL Size: 44b
  * EN Address: TODO
@@ -1222,6 +1236,20 @@ void CRedSound::SetMusicFastSpeed(int speed)
 int CRedSound::CheckMusicPhraseStop()
 {
 	return c_Driver.CheckMusicPhraseStop();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::DisplayMusicInfo()
+{
+	c_Driver.DisplayMusicInfo();
 }
 
 /*

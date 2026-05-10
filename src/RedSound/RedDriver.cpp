@@ -742,6 +742,20 @@ static void _SetMusicData(int* command)
     c_RedEntry.SetMusicData((RedMusicHEAD*)command[REDSOUND_DATA_COMMAND_BUFFER]);
 }
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _ClearMusicData(int* command)
+{
+    c_RedEntry.ClearMusicData(command[REDSOUND_MUSIC_COMMAND_ID]);
+}
+
 static void _MusicPlaySequence(int* command);
 static void _MusicCrossPlaySequence(int* command);
 static void _MusicNextPlaySequence(int* command);
@@ -2150,6 +2164,20 @@ int CRedDriver::SetMusicData(void* musicData)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::ClearMusicData(int musicID)
+{
+    _EntryExecCommand(_ClearMusicData, musicID, 0, 0, 0, 0, 0, 0);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bedec
  * PAL Size: 92b
  * EN Address: TODO
@@ -2322,6 +2350,20 @@ void CRedDriver::SetMusicFastSpeed(int speed)
 int CRedDriver::CheckMusicPhraseStop()
 {
     return m_MusicPhraseStop;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::DisplayMusicInfo()
+{
+    c_RedEntry.DisplayMusicInfo();
 }
 
 /*

@@ -1143,6 +1143,20 @@ RedReverbDepth* CRedSound::GetReverbDepth()
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SetReverb(int bank, int kind, int* params)
+{
+	c_Driver.SetReverb(bank, kind, params);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 36b
  * EN Address: TODO
  * EN Size: TODO

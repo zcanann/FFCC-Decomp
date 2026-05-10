@@ -2293,6 +2293,39 @@ int CRedDriver::MusicPlay(int musicID, int volume, int mode)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
+{
+    int result;
+    RedMusicHEAD localHeader;
+    RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
+    RedMusicHEAD* copiedHeader;
+    int headerSize;
+
+    result = REDSOUND_MUSIC_ID_NONE;
+    if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
+         (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
+        (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
+        memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
+        headerSize = localHeader.m_size;
+        copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
+        if (copiedHeader != 0) {
+            memcpy(copiedHeader, header, headerSize);
+            result = copiedHeader->m_musicNo;
+            _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+            _EntryExecCommand(_MusicPlaySequence, result, volume, mode, 0, 0, 0, 0);
+        }
+    }
+    return result;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801beee8
  * PAL Size: 88b
  * EN Address: TODO
@@ -2308,6 +2341,39 @@ int CRedDriver::MusicCrossPlay(int musicID, int volume, int mode)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
+{
+    int result;
+    RedMusicHEAD localHeader;
+    RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
+    RedMusicHEAD* copiedHeader;
+    int headerSize;
+
+    result = REDSOUND_MUSIC_ID_NONE;
+    if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
+         (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
+        (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
+        memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
+        headerSize = localHeader.m_size;
+        copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
+        if (copiedHeader != 0) {
+            memcpy(copiedHeader, header, headerSize);
+            result = copiedHeader->m_musicNo;
+            _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+            _EntryExecCommand(_MusicCrossPlaySequence, result, volume, mode, 0, 0, 0, 0);
+        }
+    }
+    return result;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bef40
  * PAL Size: 88b
  * EN Address: TODO
@@ -2319,6 +2385,39 @@ int CRedDriver::MusicNextPlay(int musicID, int volume, int mode)
 {
     _EntryExecCommand(_MusicNextPlaySequence, musicID, volume, mode, 0, 0, 0, 0);
     return musicID;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
+{
+    int result;
+    RedMusicHEAD localHeader;
+    RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
+    RedMusicHEAD* copiedHeader;
+    int headerSize;
+
+    result = REDSOUND_MUSIC_ID_NONE;
+    if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
+         (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
+        (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
+        memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
+        headerSize = localHeader.m_size;
+        copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
+        if (copiedHeader != 0) {
+            memcpy(copiedHeader, header, headerSize);
+            result = copiedHeader->m_musicNo;
+            _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+            _EntryExecCommand(_MusicNextPlaySequence, result, volume, mode, 0, 0, 0, 0);
+        }
+    }
+    return result;
 }
 
 /*
@@ -2711,6 +2810,41 @@ int CRedDriver::SePlay(int bank, int sep, int autoID, int pan, int volume, int p
 	           (sep < REDSOUND_SE_BLOCK_SEQUENCE_COUNT)) {
 		_EntryExecCommand(_SeBlockPlay, autoID, bank, sep, pan, volume, pitch, 0);
 	}
+    return autoID;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pitch)
+{
+    int result = REDSOUND_SESEP_ID_NONE;
+    RedSeSepHEAD* const header = (RedSeSepHEAD*)seSepData;
+    RedSeSepHEAD* copiedHeader;
+    int headerSize;
+
+    if (((((header->m_signature[0] == REDSOUND_SESEP_SIGNATURE_0) &&
+           (header->m_signature[1] == REDSOUND_SESEP_SIGNATURE_1)) &&
+          (header->m_signature[2] == REDSOUND_SESEP_SIGNATURE_2)) &&
+         ((header->m_signature[3] == REDSOUND_SESEP_SIGNATURE_3 &&
+           (header->m_signature[4] == REDSOUND_SESEP_SIGNATURE_4))))) {
+        headerSize = header->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
+        copiedHeader = (RedSeSepHEAD*)RedNew(headerSize);
+        if (copiedHeader != 0) {
+            memcpy(copiedHeader, header, headerSize);
+            result = copiedHeader->m_seNo;
+            _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+            _EntryExecCommand(_SeSepPlaySequence, autoID, result, pan, volume, pitch, 0, 0);
+        }
+    } else if (m_ReportPrint != 0) {
+        OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,
+                 sRedDriverLogWarnColor, sRedDriverLogReset);
+    }
     return autoID;
 }
 

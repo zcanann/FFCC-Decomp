@@ -600,6 +600,19 @@ void CRedSound::MusicPlay(int id, int vol, int fadeTime)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+void CRedSound::MusicPlay(void* data, int vol, int fadeTime)
+{
+	c_Driver.MusicPlay(data, vol, fadeTime);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd034
  * PAL Size: 60b
  * EN Address: TODO
@@ -614,6 +627,19 @@ void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+void CRedSound::MusicCrossPlay(void* data, int vol, int fadeTime)
+{
+	c_Driver.MusicCrossPlay(data, vol, fadeTime);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd070
  * PAL Size: 60b
  * EN Address: TODO
@@ -624,6 +650,19 @@ void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
 void CRedSound::MusicNextPlay(int id, int vol, int fadeTime)
 {
 	c_Driver.MusicNextPlay(id, vol, fadeTime);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+void CRedSound::MusicNextPlay(void* data, int vol, int fadeTime)
+{
+	c_Driver.MusicNextPlay(data, vol, fadeTime);
 }
 
 /*
@@ -859,6 +898,21 @@ int CRedSound::SePlay(int seID, int sepID, int pan, int volume, int pitch)
 {
 	int autoID = GetAutoID();
 	c_Driver.SePlay(seID, sepID, autoID, pan, volume, pitch);
+	return autoID;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+int CRedSound::SePlay(void* data, int pan, int volume, int pitch)
+{
+	int autoID = GetAutoID();
+	c_Driver.SePlay(data, autoID, pan, volume, pitch);
 	return autoID;
 }
 

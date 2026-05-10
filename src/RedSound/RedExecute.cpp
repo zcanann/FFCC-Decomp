@@ -2627,7 +2627,12 @@ static void _SkipMusicEntry()
         } while (src < p_SkipKeyOn->m_priority);
 
         src = p_SkipKeyOn->m_priority;
-        for (dst = p_KeyOnData->m_priority; (dst < p_KeyOnData->m_normal) && (dst->m_track != 0); dst++) {
+        dst = p_KeyOnData->m_priority;
+        while (dst < p_KeyOnData->m_normal) {
+            if (dst->m_track == 0) {
+                break;
+            }
+            dst++;
         }
         while ((dst < p_KeyOnData->m_normal) && (src < p_SkipKeyOn->m_normal)) {
             if (src->m_track != 0) {
@@ -2640,7 +2645,12 @@ static void _SkipMusicEntry()
         }
 
         src = p_SkipKeyOn->m_normal;
-        for (dst = p_KeyOnData->m_normal; (dst < p_KeyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT) && (dst->m_track != 0); dst++) {
+        dst = p_KeyOnData->m_normal;
+        while (dst < p_KeyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT) {
+            if (dst->m_track == 0) {
+                break;
+            }
+            dst++;
         }
         while ((dst < p_KeyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT) &&
                (src < p_SkipKeyOn->m_normal + REDSOUND_KEY_ON_SLOT_COUNT)) {

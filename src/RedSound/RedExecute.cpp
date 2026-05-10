@@ -1474,10 +1474,8 @@ skipModSetup:
                 track->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE];
         }
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
-            u16 random = GetRandomData();
-            u16 attack = (u16)(track->m_fuzzyAdsrDepth *
-                               (random & REDSOUND_RANDOM_BYTE_MASK));
-            voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = attack;
+            voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] =
+                (u16)(track->m_fuzzyAdsrDepth * (GetRandomData() & REDSOUND_RANDOM_BYTE_MASK));
         }
     } else {
         memset(&voice->m_adsr, 0, REDSOUND_TRACK_ADSR_SIZE);

@@ -1227,6 +1227,20 @@ RedStreamDATA* CRedSound::GetStreamPlayBlock(int streamId)
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedTrackDATA* CRedSound::GetSePlayTrack()
+{
+	return c_Driver.GetSePlayTrack();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 48b
  * EN Address: TODO
  * EN Size: TODO

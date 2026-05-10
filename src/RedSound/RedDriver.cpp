@@ -2687,6 +2687,28 @@ void CRedDriver::DisplaySePlayInfo()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedTrackDATA* CRedDriver::GetSePlayTrack()
+{
+	RedTrackDATA* track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+
+	do {
+		if (track->m_command != 0) {
+			return track;
+		}
+		track++;
+	} while (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT);
+	return 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bf8e8
  * PAL Size: 240b
  * EN Address: TODO

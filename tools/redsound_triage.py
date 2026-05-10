@@ -54,6 +54,10 @@ ATTEMPT_RESULT_RANK = {
     "regressed": 3,
 }
 
+CONTEXT_ATTEMPT_NOTE_PREFIXES = (
+    "baseline context",
+)
+
 
 def short_unit(unit: str) -> str:
     return unit.rsplit("/", 1)[-1]
@@ -370,7 +374,12 @@ def attempt_key(unit: str, symbol: str) -> tuple[str, str]:
     return normalize_unit(unit), symbol
 
 
-def load_attempts(path: Path) -> dict[tuple[str, str], dict[str, Any]]:
+def is_context_attempt(entry: dict[str, Any]) -> bool:
+    note = str(entry.get("note", "")).strip().lower()
+    return any(note.startswith(prefix) for prefix in CONTEXT_ATTEMPT_NOTE_PREFIXES)
+
+
+def load_attempts(path: Path, include_context: bool = False) -> dict[tuple[str, str], dict[str, Any]]:
     attempts: dict[tuple[str, str], dict[str, Any]] = {}
     if not path.exists():
         return attempts
@@ -382,6 +391,8 @@ def load_attempts(path: Path) -> dict[tuple[str, str], dict[str, Any]]:
             try:
                 entry = json.loads(line)
             except json.JSONDecodeError:
+                continue
+            if not include_context and is_context_attempt(entry):
                 continue
             unit = normalize_unit(str(entry.get("unit", "")))
             symbols = entry.get("symbols") or [""]
@@ -446,6 +457,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--commands", action="store_true", help="Print ready-to-run objdiff_experiment commands.")
     parser.add_argument("--attempts", action="store_true", help="Show attempt counts from the attempt log.")
     parser.add_argument("--attempt-log", type=Path, default=DEFAULT_ATTEMPT_LOG, help="Attempt log path.")
+    parser.add_argument(
+        "--include-context-attempts",
+        action="store_true",
+        help="Count baseline/context-only objdiff captures as attempts.",
+    )
     parser.add_argument("--min-attempts", type=int, help="Only show symbols with at least this many recorded attempts.")
     parser.add_argument("--max-attempts", type=int, help="Only show symbols with at most this many recorded attempts.")
     parser.add_argument(
@@ -506,7 +522,7 @@ def main() -> int:
         or args.max_attempts is not None
     )
     if needs_attempts:
-        annotate_attempts(rows, load_attempts(args.attempt_log))
+        annotate_attempts(rows, load_attempts(args.attempt_log, include_context=args.include_context_attempts))
     if args.min_attempts is not None:
         rows = [row for row in rows if row.get("attempt_count", 0) >= args.min_attempts]
     if args.max_attempts is not None:

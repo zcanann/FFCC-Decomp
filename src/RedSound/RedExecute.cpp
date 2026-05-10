@@ -1287,7 +1287,6 @@ static RedWaveDATA* _WaveSplitSelect(RedWaveDATA* wave, RedNoteDATA* note)
  */
 static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDATA* noteData, int* voiceMask)
 {
-    int octaveIndex;
     int workValue;
     int pitchWork[4];
 
@@ -1314,9 +1313,8 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
                 voice->m_basePitch = noteData->m_key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
                 if (voice->m_track->m_keySignatureData != 0) {
                     workValue = voice->m_basePitch >> REDSOUND_PITCH_BASE_NOTE_SHIFT;
-                    octaveIndex = workValue / REDSOUND_NOTES_PER_OCTAVE;
                     pitchWork[0] =
-                        voice->m_track->m_keySignatureData[workValue - octaveIndex * REDSOUND_NOTES_PER_OCTAVE];
+                        voice->m_track->m_keySignatureData[workValue % REDSOUND_NOTES_PER_OCTAVE];
                     voice->m_basePitch += pitchWork[0] * REDSOUND_PITCH_KEY_SIGNATURE_UNIT;
                 }
             }

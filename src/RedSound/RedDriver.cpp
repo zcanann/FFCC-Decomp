@@ -3428,6 +3428,30 @@ void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::WavePitchCompute(int key, int pitch)
+{
+    int basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+    RedWaveDATA* wave = p_EditorTrack->m_waveData;
+
+    if (wave != 0) {
+        if ((wave->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) != 0) {
+            basePitch = wave->m_splitKey << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+        }
+        return PitchCompute(basePitch, pitch, wave->m_pitch, p_EditorTrack->m_fineTune);
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 24b
  * EN Address: TODO
  * EN Size: TODO

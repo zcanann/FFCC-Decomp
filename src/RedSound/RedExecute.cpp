@@ -2411,7 +2411,8 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
                 unsigned char* cmd = track->m_command;
                 int delta;
                 track->m_command = cmd + 1;
-                p_MidiControl_Function[*cmd](control, keyOnData, track);
+                RedMidiControlFunc func = p_MidiControl_Function[*cmd];
+                func(control, keyOnData, track);
                 if (track->m_command != 0) {
                     if (track->m_deltaTime < 1) {
                         delta = DeltaTimeSumup((unsigned char**)&track->m_command);
@@ -2983,7 +2984,8 @@ static int _SeMidiNoteExecute(
                     track->m_loopStepCurrent += 1;
                     cmd = track->m_command;
                     track->m_command = cmd + 1;
-                    p_MidiControl_Function[*cmd](control, keyOnData, track);
+                    RedMidiControlFunc func = p_MidiControl_Function[*cmd];
+                    func(control, keyOnData, track);
                     if (track->m_command != 0) {
                         delta = DeltaTimeSumup((unsigned char**)&track->m_command);
                         if (delta != 0) {

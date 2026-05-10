@@ -166,6 +166,14 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
 		if (bank->m_streamId == 0) {
 			return bank;
 		}
+		if (c_Driver.StreamPlayState(bank->m_streamId) == 0) {
+			bank->m_streamId = 0;
+			bank->m_streamData = 0;
+			bank->m_fileSize = 0;
+			bank->m_readPoint = 0;
+			bank->m_playPoint = 0;
+			return bank;
+		}
 		bank++;
 	} while (bank < p_StreamBank + REDSOUND_STREAM_BANK_COUNT);
 
@@ -185,7 +193,7 @@ static RedSoundStreamBank* _SearchStreamBank(int streamId)
 	RedSoundStreamBank* bank = p_StreamBank;
 
 	do {
-		if (bank->m_streamId == streamId) {
+		if ((bank->m_streamId != 0) && (bank->m_streamId == streamId)) {
 			return bank;
 		}
 		bank++;

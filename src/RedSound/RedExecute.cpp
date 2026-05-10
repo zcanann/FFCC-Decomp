@@ -238,7 +238,7 @@ enum RedExecuteAxfxReverbLayout {
 };
 
 enum RedExecuteAxVoiceLayout {
-    REDSOUND_AX_VOICE_LOOP_OFFSET = 0x148,
+    REDSOUND_AX_VOICE_TYPE_OFFSET = 0x148,
     REDSOUND_AX_MIX_CTRL_DRY_STEREO = 0x3,
     REDSOUND_AX_MIX_CTRL_AUX_A_STEREO = 0x30,
     REDSOUND_AX_MIX_CTRL_AUX_B_STEREO = 0x600,
@@ -476,6 +476,7 @@ STATIC_ASSERT(REDSOUND_VOICE_RESERVEDA4_OFFSET + REDSOUND_VOICE_RESERVEDA4_SIZE 
 STATIC_ASSERT(REDSOUND_VOICE_RESERVEDB4_OFFSET + REDSOUND_VOICE_RESERVEDB4_SIZE == REDSOUND_VOICE_UPDATE_FLAGS_OFFSET);
 STATIC_ASSERT(REDSOUND_VOICE_RESERVEDBC_OFFSET + REDSOUND_VOICE_RESERVEDBC_SIZE == REDSOUND_VOICE_SIZE);
 STATIC_ASSERT(sizeof(RedVoiceDATA) == REDSOUND_VOICE_SIZE);
+STATIC_ASSERT(offsetof(AXVPB, pb) + offsetof(AXPB, type) == REDSOUND_AX_VOICE_TYPE_OFFSET);
 
 /*
  * --INFO--
@@ -1830,8 +1831,7 @@ void EnvelopeKeyExecute()
                               REDSOUND_AX_SAMPLE_ADDR_SCALE;
                     int keyBase = key - REDSOUND_AX_SAMPLE_ADDR_SCALE;
 
-                    *(u16*)((u8*)voice + REDSOUND_AX_VOICE_LOOP_OFFSET) =
-                        (u16)((voiceData->m_voiceSwitch & REDSOUND_VOICE_SWITCH_LOOP) != 0);
+                    voice->pb.type = (u16)((voiceData->m_voiceSwitch & REDSOUND_VOICE_SWITCH_LOOP) != 0);
                     voice->pb.srcSelect = 1;
                     voice->pb.state = 1;
 

@@ -565,6 +565,7 @@ u8* volatile p_MusicSkipThreadStack;
 volatile int m_MusicSkipComplete;
 RedReverbDepth* volatile p_ReverbDepth;
 unsigned int m_Mute[REDSOUND_MUTE_WORD_COUNT];
+static int m_SilentWave;
 static RedDmaRequest m_DmaControl[REDSOUND_DMA_CONTROL_ENTRY_COUNT];
 static OSThread m_MainThread;
 static OSSemaphore m_MainSemaphore;

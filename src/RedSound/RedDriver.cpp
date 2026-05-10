@@ -3329,6 +3329,31 @@ void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::StopWaveItem()
+{
+    RedVoiceDATA* voice = p_VoiceData;
+
+    do {
+        if (voice->m_track == p_EditorTrack) {
+            voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+            voice->m_active = 0;
+            voice->m_track = 0;
+        }
+        voice++;
+    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+
+    p_EditorVoice[REDSOUND_EDITOR_VOICE_LEFT] = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 24b
  * EN Address: TODO
  * EN Size: TODO

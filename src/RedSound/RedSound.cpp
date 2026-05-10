@@ -1744,3 +1744,17 @@ RedVoiceDATA* CRedSound::GetVoiceAddress()
 {
 	return p_VoiceData;
 }
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::StopWaveItem()
+{
+	c_Driver.StopWaveItem();
+}

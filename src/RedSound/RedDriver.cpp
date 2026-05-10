@@ -3367,8 +3367,9 @@ void CRedDriver::SetWavePitch(int pitch)
     p_EditorTrack->m_pitch = pitch;
     voiceNo = p_EditorVoice;
     do {
-        if (*voiceNo != 0) {
-            (p_VoiceData + *voiceNo)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
+        int voiceIndex = *voiceNo;
+        if (voiceIndex != 0) {
+            (p_VoiceData + voiceIndex)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
         }
         voiceNo++;
     } while (voiceNo <= p_EditorVoice + REDSOUND_EDITOR_VOICE_RIGHT);

@@ -1410,13 +1410,13 @@ skipModSetup:
 
     if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_PITCH) != 0) {
         unsigned int random = GetRandomData();
-        workValue = ((int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1) *
-                (voice->m_pitch * voice->m_track->m_fuzzyPitchDepth);
+        workValue = voice->m_pitch * voice->m_track->m_fuzzyPitchDepth;
+        workValue *= (int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1;
         pitchWork[0] = workValue >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
-        if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) == 0) {
-            voice->m_randomPitch = pitchWork[0];
-        } else {
+        if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) != 0) {
             voice->m_randomPitch = -(pitchWork[0] >> 1);
+        } else {
+            voice->m_randomPitch = pitchWork[0];
         }
     } else {
         voice->m_randomPitch = 0;

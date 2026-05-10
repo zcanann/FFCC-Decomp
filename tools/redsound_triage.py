@@ -22,6 +22,7 @@ from objdiff_experiment import (
     load_objdiff_json,
     mnemonic,
     normalize_unit,
+    run_ninja,
     source_path_for_unit,
     symbol_by_name,
 )
@@ -462,12 +463,16 @@ def parse_args() -> argparse.Namespace:
         default=[],
         help="Only show symbols with at least one recorded attempt of this result. May be repeated.",
     )
+    parser.add_argument("--build", action="store_true", help="Run ninja before collecting objdiff rows.")
+    parser.add_argument("--ninja-timeout", type=int, default=30, help="ninja timeout in seconds for --build.")
     parser.add_argument("--objdiff-timeout", type=int, default=60)
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
+    if args.build and not run_ninja(args.ninja_timeout):
+        return 1
     units = args.unit or REDSOUND_UNITS
     rows: list[dict[str, Any]] = []
     for unit in units:

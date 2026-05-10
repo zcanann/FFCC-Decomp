@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -118,6 +119,25 @@ def has_param_spill_mismatch(left: dict[str, Any], right: dict[str, Any]) -> boo
     return False
 
 
+def has_target_only_counter(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    """Detect target-side locals that look like a simple dead/diagnostic counter."""
+    pairs = diff_instruction_pairs(left, right)
+    target_only = [
+        (index, instruction_text(left_item))
+        for index, left_item, right_item in pairs
+        if instruction_text(right_item) == "<gap>"
+    ]
+    regs = set()
+    for _, text in target_only:
+        match = re.fullmatch(r"li (r(?:2[0-9]|3[0-1])), 0x0", text)
+        if match:
+            regs.add(match.group(1))
+    for reg in regs:
+        if any(text == f"addi {reg}, {reg}, 0x1" for _, text in target_only):
+            return True
+    return False
+
+
 def operands(item: dict[str, Any]) -> list[str]:
     text = instruction_text(item)
     if text == "<gap>" or " " not in text:
@@ -138,6 +158,8 @@ def mismatch_patterns(
         patterns.append("save-only")
     if has_param_spill_mismatch(left, right):
         patterns.append("param-spill")
+    if has_target_only_counter(left, right):
+        patterns.append("target-counter")
     if left_frame != right_frame or left_save != right_save:
         patterns.append("stack")
 
@@ -219,6 +241,7 @@ def summarize_symbol(unit: str, left: dict[str, Any], right: dict[str, Any]) -> 
         "symbol": left.get("name", ""),
         "pct": as_float(left.get("match_percent")),
         "size": int(left.get("size", 0) or 0),
+        "current_size": int(right.get("size", 0) or 0),
         "diff_count": sum(counts.values()),
         "category": category(left_frame, right_frame, left_save, right_save, counts),
         "frame": f"{left_frame or '?'}->{right_frame or '?'}",
@@ -257,7 +280,7 @@ def print_rows(rows: list[dict[str, Any]], limit: int) -> None:
     show_attempts = any(row.get("attempt_count", 0) for row in rows[:limit])
     attempt_header = " attempts" if show_attempts else ""
     print(
-        f"{'cat':<10} {'pct':>8} {'diffs':>5} {'size':>5} {'unit':<11} "
+        f"{'cat':<10} {'pct':>8} {'diffs':>5} {'size':>9} {'unit':<11} "
         f"{'symbol':<55} {'patterns':<28} hint{attempt_header}"
     )
     print("-" * (160 if show_attempts else 150))
@@ -268,7 +291,8 @@ def print_rows(rows: list[dict[str, Any]], limit: int) -> None:
             if count:
                 attempt = f" {count}:{row.get('last_attempt_result', '')}"
         print(
-            f"{row['category']:<10} {row['pct']:8.3f} {row['diff_count']:5d} {row['size']:5d} "
+            f"{row['category']:<10} {row['pct']:8.3f} {row['diff_count']:5d} "
+            f"{row['size']:4d}/{row['current_size']:<4d} "
             f"{short_unit(row['unit']):<11} {truncate(row['symbol'], 55):<55} "
             f"{truncate(row['patterns'], 28):<28} {row['hint']}{attempt}"
         )
@@ -303,7 +327,7 @@ def print_buckets(rows: list[dict[str, Any]], per_bucket: int) -> list[dict[str,
 def print_detail(rows: list[dict[str, Any]], limit: int) -> None:
     for row in rows[:limit]:
         print(f"\n{row['unit']} :: {row['symbol']}")
-        print(f"  {row['category']} {row['pct']:.4f}% size={row['size']}")
+        print(f"  {row['category']} {row['pct']:.4f}% size target/current={row['size']}/{row['current_size']}")
         print(f"  total diffs {row['diff_count']}")
         print(f"  frame {row['frame']}")
         print(f"  save  {row['save']}")

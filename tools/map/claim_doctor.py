@@ -148,28 +148,30 @@ def get_compiled_sections(objdump_path: Path, object_path: Path) -> dict[str, in
     return sections
 
 
-def get_map_named_extent(map_index: MapIndex, object_file: str, section: str) -> Optional[int]:
-    normalized_object = normalize_object_file(object_file)
-    section_start: Optional[int] = None
-    symbol_end: Optional[int] = None
-
+def build_map_named_extent_table(map_index: MapIndex) -> dict[str, dict[str, int]]:
+    section_starts: dict[tuple[str, str], int] = {}
+    symbol_ends: dict[tuple[str, str], int] = {}
     for records in map_index.layout_by_symbol.values():
         for record in records:
-            if record.object_file != normalized_object or record.section != section:
-                continue
             if record.offset is None:
                 continue
+            key = (record.object_file, record.section)
             if record.symbol_name == record.section:
-                section_start = record.offset
+                section_starts[key] = record.offset
                 continue
             if record.is_unused or record.size <= 0:
                 continue
             end = record.offset + record.size
-            symbol_end = end if symbol_end is None else max(symbol_end, end)
+            symbol_ends[key] = max(symbol_ends.get(key, end), end)
 
-    if section_start is None or symbol_end is None or symbol_end < section_start:
-        return None
-    return symbol_end - section_start
+    table: dict[str, dict[str, int]] = defaultdict(dict)
+    for key, section_start in section_starts.items():
+        symbol_end = symbol_ends.get(key)
+        if symbol_end is None or symbol_end < section_start:
+            continue
+        object_file, section = key
+        table[object_file][section] = symbol_end - section_start
+    return table
 
 
 def is_claimed(section_ranges: list[tuple[int, int]], symbol: ProjectSymbol) -> bool:
@@ -353,6 +355,8 @@ def collect_diagnoses(
 
     pal_attribution = build_attribution_table(pal_index, unclaimed_symbols) if pal_index else {}
     en_attribution = build_attribution_table(en_index, unclaimed_symbols) if en_index else {}
+    pal_named_extents = build_map_named_extent_table(pal_index) if pal_index else {}
+    en_named_extents = build_map_named_extent_table(en_index) if en_index else {}
 
     object_paths = build_object_path_index(build_root / "src")
     objdump_path = repo_root / "build" / "binutils" / "powerpc-eabi-objdump.exe"
@@ -374,8 +378,8 @@ def collect_diagnoses(
             claimed_size = sum(end - start for start, end in sections.get(section, []))
             pal_total = pal_index.object_section_size(object_file, section) if pal_index else None
             en_total = en_index.object_section_size(object_file, section) if en_index else None
-            pal_extent = get_map_named_extent(pal_index, object_file, section) if pal_index else None
-            en_extent = get_map_named_extent(en_index, object_file, section) if en_index else None
+            pal_extent = pal_named_extents.get(object_file, {}).get(section)
+            en_extent = en_named_extents.get(object_file, {}).get(section)
             pal_attr = pal_attribution.get(object_file, {}).get(section, AttributionSummary())
             en_attr = en_attribution.get(object_file, {}).get(section, AttributionSummary())
 

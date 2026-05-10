@@ -161,6 +161,7 @@ STATIC_ASSERT(sizeof(sRedSoundLogErrorColor) + sizeof(sRedSoundLogReset) + sizeo
 static RedSoundStreamBank* _SearchEmptyStreamBank()
 {
 	RedSoundStreamBank* bank = p_StreamBank;
+	RedSoundStreamBank* bankEnd = p_StreamBank + REDSOUND_STREAM_BANK_COUNT;
 
 	do {
 		if (bank->m_streamId == 0) {
@@ -175,7 +176,7 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
 			return bank;
 		}
 		bank++;
-	} while (bank < p_StreamBank + REDSOUND_STREAM_BANK_COUNT);
+	} while (bank < bankEnd);
 
 	return 0;
 }
@@ -191,13 +192,14 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
 static RedSoundStreamBank* _SearchStreamBank(int streamId)
 {
 	RedSoundStreamBank* bank = p_StreamBank;
+	RedSoundStreamBank* bankEnd = p_StreamBank + REDSOUND_STREAM_BANK_COUNT;
 
 	do {
 		if ((bank->m_streamId != 0) && (bank->m_streamId == streamId)) {
 			return bank;
 		}
 		bank++;
-	} while (bank < p_StreamBank + REDSOUND_STREAM_BANK_COUNT);
+	} while (bank < bankEnd);
 
 	return 0;
 }

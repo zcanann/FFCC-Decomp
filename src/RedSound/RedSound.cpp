@@ -1476,6 +1476,20 @@ int CRedSound::CheckSeSepEntry(int sepId)
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::ClearSePlayLine()
+{
+	c_Driver.ClearSePlayLine();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 44b
  * EN Address: TODO
  * EN Size: TODO

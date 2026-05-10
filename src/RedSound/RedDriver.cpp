@@ -2874,6 +2874,26 @@ void CRedDriver::DisplaySePlayInfo()
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::ClearSePlayLine()
+{
+	RedSoundCONTROL* control = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
+	RedTrackDATA* track = control->m_tracks;
+
+	do {
+		track->m_command = 0;
+		track++;
+	} while (track < control->m_tracks + REDSOUND_SE_TRACK_COUNT);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 80b
  * EN Address: TODO
  * EN Size: TODO

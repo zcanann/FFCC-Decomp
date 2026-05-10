@@ -994,7 +994,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_LEFT) != 0) {
             mixData->vAuxAL =
-                (s16)((int)((u32)mixData->vL * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT);
+                (u16)((int)((u32)mixData->vL * ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT);
             mixData->vAuxAS =
                 (u16)((int)((u32)mixData->vAuxBL *
                              ((trackData->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >>

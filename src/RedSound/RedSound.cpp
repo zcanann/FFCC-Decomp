@@ -152,6 +152,50 @@ STATIC_ASSERT(sizeof(sRedSoundLogErrorColor) + sizeof(sRedSoundLogReset) + sizeo
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+static RedSoundStreamBank* _SearchEmptyStreamBank()
+{
+	RedSoundStreamBank* bank = p_StreamBank;
+
+	do {
+		if (bank->m_streamId == 0) {
+			return bank;
+		}
+		bank++;
+	} while (bank < p_StreamBank + REDSOUND_STREAM_BANK_COUNT);
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+static RedSoundStreamBank* _SearchStreamBank(int streamId)
+{
+	RedSoundStreamBank* bank = p_StreamBank;
+
+	do {
+		if (bank->m_streamId == streamId) {
+			return bank;
+		}
+		bank++;
+	} while (bank < p_StreamBank + REDSOUND_STREAM_BANK_COUNT);
+
+	return 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cca34
  * PAL Size: 4b
  * EN Address: TODO
@@ -1021,6 +1065,41 @@ void CRedSound::StreamStop(int streamID)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+int CRedSound::StreamStandby(void* streamHeader, int fileSize)
+{
+	int streamId = 0;
+	RedStreamHEAD* header = (RedStreamHEAD*)streamHeader;
+
+	if (header->m_signature[0] == REDSOUND_STREAM_SIGNATURE_0 &&
+	    header->m_signature[1] == REDSOUND_STREAM_SIGNATURE_1 &&
+	    header->m_signature[2] == REDSOUND_STREAM_SIGNATURE_2) {
+		RedSoundStreamBank* bank = _SearchEmptyStreamBank();
+		if (bank != 0) {
+			streamId = GetAutoID();
+			bank->m_streamId = streamId;
+			bank->m_streamData = streamHeader;
+			bank->m_fileSize = fileSize;
+			bank->m_readPoint = 0;
+			bank->m_playPoint = 0;
+		}
+	} else if (m_ReportPrint != 0) {
+		OSReport(sRedSoundInvalidStreamData,
+		         sRedSoundLogPrefix, sRedSoundLogErrorColor,
+		         sRedSoundLogReset);
+		fflush(__files + 1);
+	}
+
+	return streamId;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd5d8
  * PAL Size: 224b
  * EN Address: TODO
@@ -1046,6 +1125,26 @@ int CRedSound::StreamPlay(void* data, int fileSize, int pan, int volume)
 	}
 
 	return id;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+int CRedSound::StreamPlay(int streamId, int pan, int volume)
+{
+	RedSoundStreamBank* bank = _SearchStreamBank(streamId);
+
+	if (bank != 0) {
+		c_Driver.StreamPlay(streamId, bank->m_streamData, bank->m_fileSize, pan, volume);
+		return streamId;
+	}
+
+	return 0;
 }
 
 /*

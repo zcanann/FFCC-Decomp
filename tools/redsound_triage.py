@@ -313,11 +313,17 @@ def load_attempts(path: Path) -> dict[tuple[str, str], dict[str, Any]]:
             symbols = entry.get("symbols") or [""]
             for symbol in symbols:
                 key = (unit, str(symbol))
-                current = attempts.setdefault(key, {"count": 0, "last_result": "", "last_note": "", "last_time": ""})
+                current = attempts.setdefault(
+                    key,
+                    {"count": 0, "last_result": "", "last_note": "", "last_time": "", "results": Counter()},
+                )
                 current["count"] += 1
-                current["last_result"] = entry.get("result", "")
+                result = entry.get("result", "")
+                current["last_result"] = result
                 current["last_note"] = entry.get("note", "")
                 current["last_time"] = entry.get("timestamp", "")
+                if result:
+                    current["results"][result] += 1
     return attempts
 
 
@@ -327,6 +333,8 @@ def annotate_attempts(rows: list[dict[str, Any]], attempts: dict[tuple[str, str]
         row["attempt_count"] = int(row_attempts.get("count", 0) or 0)
         row["last_attempt_result"] = row_attempts.get("last_result", "")
         row["last_attempt_note"] = row_attempts.get("last_note", "")
+        results = row_attempts.get("results", Counter())
+        row["attempt_results"] = dict(results)
 
 
 def print_attempts(rows: list[dict[str, Any]], limit: int) -> None:
@@ -378,6 +386,13 @@ def parse_args() -> argparse.Namespace:
         default=[],
         help="Hide symbols whose latest recorded attempt has this result. May be repeated.",
     )
+    parser.add_argument(
+        "--require-attempt-result",
+        action="append",
+        choices=["improved", "regressed", "no_change"],
+        default=[],
+        help="Only show symbols with at least one recorded attempt of this result. May be repeated.",
+    )
     parser.add_argument("--objdiff-timeout", type=int, default=60)
     return parser.parse_args()
 
@@ -396,13 +411,20 @@ def main() -> int:
         and row["pct"] <= args.max_pct
         and (args.category is None or row["category"] == args.category)
     ]
-    if args.attempts or args.fresh or args.skip_attempt_result:
+    if args.attempts or args.fresh or args.skip_attempt_result or args.require_attempt_result:
         annotate_attempts(rows, load_attempts(args.attempt_log))
     skipped_results = set(args.skip_attempt_result)
     if args.fresh:
         skipped_results.update({"regressed", "no_change"})
     if skipped_results:
         rows = [row for row in rows if row.get("last_attempt_result") not in skipped_results]
+    if args.require_attempt_result:
+        required_results = set(args.require_attempt_result)
+        rows = [
+            row
+            for row in rows
+            if required_results <= {result for result, count in row.get("attempt_results", {}).items() if count}
+        ]
     if args.sort == "easy":
         rows.sort(key=lambda row: (row["diff_count"], -row["pct"], row["category"], row["unit"], row["symbol"]))
     elif args.sort == "pct":

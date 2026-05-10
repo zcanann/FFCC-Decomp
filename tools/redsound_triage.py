@@ -47,6 +47,13 @@ SIZE_BUCKETS = [
     ("huge", 1537, None),
 ]
 
+ATTEMPT_RESULT_RANK = {
+    "": 0,
+    "improved": 1,
+    "no_change": 2,
+    "regressed": 3,
+}
+
 
 def short_unit(unit: str) -> str:
     return unit.rsplit("/", 1)[-1]
@@ -428,9 +435,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=80, help="Maximum table rows to print.")
     parser.add_argument(
         "--sort",
-        choices=["category", "easy", "pct", "size-delta", "symbol", "symbols", "unit"],
+        choices=["attempts", "category", "easy", "pct", "size-delta", "symbol", "symbols", "unit"],
         default="category",
-        help="Sort order. easy ranks fewest diffs first; size-delta ranks target/current size gaps.",
+        help=(
+            "Sort order. attempts ranks least-tried symbols first; easy ranks fewest diffs first; "
+            "size-delta ranks target/current size gaps."
+        ),
     )
     parser.add_argument("--detail", action="store_true", help="Print frame/save/diff details for shown rows.")
     parser.add_argument("--commands", action="store_true", help="Print ready-to-run objdiff_experiment commands.")
@@ -488,6 +498,7 @@ def main() -> int:
     ]
     needs_attempts = (
         args.attempts
+        or args.sort == "attempts"
         or args.fresh
         or args.skip_attempt_result
         or args.require_attempt_result
@@ -514,6 +525,17 @@ def main() -> int:
         ]
     if args.sort == "easy":
         rows.sort(key=lambda row: (row["diff_count"], -row["pct"], row["category"], row["unit"], row["symbol"]))
+    elif args.sort == "attempts":
+        rows.sort(
+            key=lambda row: (
+                row.get("attempt_count", 0),
+                ATTEMPT_RESULT_RANK.get(row.get("last_attempt_result", ""), 9),
+                row["diff_count"],
+                -row["pct"],
+                row["unit"],
+                row["symbol"],
+            )
+        )
     elif args.sort == "pct":
         rows.sort(key=lambda row: (-row["pct"], row["diff_count"], row["unit"], row["symbol"]))
     elif args.sort == "size-delta":

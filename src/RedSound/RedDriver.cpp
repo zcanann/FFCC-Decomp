@@ -2259,6 +2259,48 @@ void CRedDriver::SetMusicPhraseStop(int stop)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::CheckMusicEntry(int musicID)
+{
+    return c_RedEntry.SearchMusicSequence(musicID);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::SetMusicFastSpeed(int speed)
+{
+    m_MusicFastSpeed = speed;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::CheckMusicPhraseStop()
+{
+    return m_MusicPhraseStop;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bf0c4
  * PAL Size: 168b
  * EN Address: TODO
@@ -2369,6 +2411,20 @@ int CRedDriver::ReentrySeSepData(int id)
     id         = c_RedEntry.ReentrySeSepData(id);
     OSRestoreInterrupts(interrupts);
     return id;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::CheckSeSepEntry(int id)
+{
+    return c_RedEntry.SearchSeSepSequence(id);
 }
 
 /*
@@ -2879,6 +2935,34 @@ int CRedDriver::ReentryWaveData(int id)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedWaveHeadWD* CRedDriver::GetWaveInfo(int waveID)
+{
+    return c_RedEntry.SearchWaveBase(waveID);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::CheckWaveEntry(int waveID)
+{
+    return c_RedEntry.SearchWaveSequence(waveID);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bfdd0
  * PAL Size: 40b
  * EN Address: TODO
@@ -2945,6 +3029,20 @@ RedReverbSize* CRedDriver::GetReverbInfo()
 RedReverbDepth* CRedDriver::GetReverbDepth()
 {
     return p_ReverbDepth;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbModeData* CRedDriver::GetReverbModeTable(int mode)
+{
+    return t_ReverbModeData + mode;
 }
 
 /*

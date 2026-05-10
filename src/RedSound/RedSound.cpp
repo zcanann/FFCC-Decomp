@@ -1157,6 +1157,62 @@ void CRedSound::DisplayMMemoryInfo()
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::CheckMusicEntry(int musicId)
+{
+	return c_Driver.CheckMusicEntry(musicId);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SetMusicFastSpeed(int speed)
+{
+	c_Driver.SetMusicFastSpeed(speed);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::CheckMusicPhraseStop()
+{
+	return c_Driver.CheckMusicPhraseStop();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::CheckSeSepEntry(int sepId)
+{
+	return c_Driver.CheckSeSepEntry(sepId);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 48b
  * EN Address: TODO
  * EN Size: TODO
@@ -1166,6 +1222,48 @@ void CRedSound::DisplayMMemoryInfo()
 int CRedSound::SearchWaveSequence(int waveNo)
 {
 	return c_RedEntry.SearchWaveSequence(waveNo);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedWaveHeadWD* CRedSound::GetWaveInfo(int waveNo)
+{
+	return c_Driver.GetWaveInfo(waveNo);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::CheckWaveEntry(int waveNo)
+{
+	return c_Driver.CheckWaveEntry(waveNo);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbModeData* CRedSound::GetReverbModeTable(int mode)
+{
+	return c_Driver.GetReverbModeTable(mode);
 }
 
 /*

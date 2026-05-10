@@ -3092,6 +3092,27 @@ RedReverbDepth* CRedDriver::GetReverbDepth()
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
+{
+    unsigned int mask = 1 << (voiceNo % REDSOUND_MUTE_BITS_PER_WORD);
+    unsigned int* muteWord = m_Mute + (voiceNo / REDSOUND_MUTE_BITS_PER_WORD);
+
+    if (mute != 0) {
+        *muteWord |= mask;
+    } else {
+        *muteWord &= ~mask;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 24b
  * EN Address: TODO
  * EN Size: TODO

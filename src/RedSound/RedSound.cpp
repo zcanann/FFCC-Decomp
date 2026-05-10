@@ -1213,6 +1213,20 @@ int CRedSound::CheckSeSepEntry(int sepId)
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedStreamDATA* CRedSound::GetStreamPlayBlock(int streamId)
+{
+	return c_Driver.GetStreamPlayBlock(streamId);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 48b
  * EN Address: TODO
  * EN Size: TODO

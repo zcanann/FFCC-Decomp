@@ -57,6 +57,8 @@ class SectionDiagnosis:
     unclaimed_compiled_size: int
     pal_map_total: Optional[int]
     en_map_total: Optional[int]
+    pal_named_extent: Optional[int]
+    en_named_extent: Optional[int]
     pal_attributed_bytes: int
     en_attributed_bytes: int
     pal_symbols: tuple[str, ...]
@@ -146,6 +148,30 @@ def get_compiled_sections(objdump_path: Path, object_path: Path) -> dict[str, in
     return sections
 
 
+def get_map_named_extent(map_index: MapIndex, object_file: str, section: str) -> Optional[int]:
+    normalized_object = normalize_object_file(object_file)
+    section_start: Optional[int] = None
+    symbol_end: Optional[int] = None
+
+    for records in map_index.layout_by_symbol.values():
+        for record in records:
+            if record.object_file != normalized_object or record.section != section:
+                continue
+            if record.offset is None:
+                continue
+            if record.symbol_name == record.section:
+                section_start = record.offset
+                continue
+            if record.is_unused or record.size <= 0:
+                continue
+            end = record.offset + record.size
+            symbol_end = end if symbol_end is None else max(symbol_end, end)
+
+    if section_start is None or symbol_end is None or symbol_end < section_start:
+        return None
+    return symbol_end - section_start
+
+
 def is_claimed(section_ranges: list[tuple[int, int]], symbol: ProjectSymbol) -> bool:
     return any(start <= symbol.address < end for start, end in section_ranges)
 
@@ -207,6 +233,8 @@ def diagnose_section(
     claimed_size: int,
     pal_map_total: Optional[int],
     en_map_total: Optional[int],
+    pal_named_extent: Optional[int],
+    en_named_extent: Optional[int],
     pal_attr: AttributionSummary,
     en_attr: AttributionSummary,
 ) -> SectionDiagnosis:
@@ -254,6 +282,18 @@ def diagnose_section(
         confidence = "medium"
         summary = f"near claim candidate: attributed current symbols are off by {delta:+d} bytes"
         score += 20.0
+    elif (
+        compiled_size > 0
+        and pal_named_extent == compiled_size
+        and en_named_extent == compiled_size
+        and pal_map_total is not None
+        and en_map_total is not None
+        and pal_map_total == en_map_total
+        and 0 < pal_map_total - compiled_size <= 16
+    ):
+        delta = compiled_size - pal_map_total
+        confidence = "info"
+        summary = f"matches named MAP symbols; object total is likely trailing alignment ({delta:+d} bytes)"
     elif compiled_size > 0 and best_total is not None and abs(compiled_size - best_total) <= 16:
         delta = compiled_size - best_total
         confidence = "medium"
@@ -283,6 +323,8 @@ def diagnose_section(
         unclaimed_compiled_size=unclaimed_compiled_size,
         pal_map_total=pal_map_total,
         en_map_total=en_map_total,
+        pal_named_extent=pal_named_extent,
+        en_named_extent=en_named_extent,
         pal_attributed_bytes=pal_attributed_bytes,
         en_attributed_bytes=en_attributed_bytes,
         pal_symbols=tuple(pal_attr.symbols if pal_attr else ()),
@@ -332,6 +374,8 @@ def collect_diagnoses(
             claimed_size = sum(end - start for start, end in sections.get(section, []))
             pal_total = pal_index.object_section_size(object_file, section) if pal_index else None
             en_total = en_index.object_section_size(object_file, section) if en_index else None
+            pal_extent = get_map_named_extent(pal_index, object_file, section) if pal_index else None
+            en_extent = get_map_named_extent(en_index, object_file, section) if en_index else None
             pal_attr = pal_attribution.get(object_file, {}).get(section, AttributionSummary())
             en_attr = en_attribution.get(object_file, {}).get(section, AttributionSummary())
 
@@ -346,6 +390,8 @@ def collect_diagnoses(
                 claimed_size,
                 pal_total,
                 en_total,
+                pal_extent,
+                en_extent,
                 pal_attr,
                 en_attr,
             )
@@ -412,6 +458,10 @@ def print_target_report(diagnoses: list[SectionDiagnosis]) -> None:
                 f"    PAL total={pal_total} PAL attributed={diagnosis.pal_attributed_bytes} "
                 f"EN total={en_total} EN attributed={diagnosis.en_attributed_bytes}"
             )
+            if diagnosis.pal_named_extent is not None or diagnosis.en_named_extent is not None:
+                pal_extent = diagnosis.pal_named_extent if diagnosis.pal_named_extent is not None else "n/a"
+                en_extent = diagnosis.en_named_extent if diagnosis.en_named_extent is not None else "n/a"
+                print(f"    PAL named_extent={pal_extent} EN named_extent={en_extent}")
             print(f"    {diagnosis.confidence}: {diagnosis.summary}")
             if diagnosis.pal_symbols:
                 print(f"    PAL examples: {', '.join(diagnosis.pal_symbols)}")
@@ -435,6 +485,8 @@ def print_ranked_report(diagnoses: list[SectionDiagnosis], top: int) -> None:
             f"unclaimed_build={diagnosis.unclaimed_compiled_size} "
             f"pal_total={diagnosis.pal_map_total if diagnosis.pal_map_total is not None else 'n/a'} "
             f"en_total={diagnosis.en_map_total if diagnosis.en_map_total is not None else 'n/a'} "
+            f"pal_named={diagnosis.pal_named_extent if diagnosis.pal_named_extent is not None else 'n/a'} "
+            f"en_named={diagnosis.en_named_extent if diagnosis.en_named_extent is not None else 'n/a'} "
             f"pal_attr={diagnosis.pal_attributed_bytes} en_attr={diagnosis.en_attributed_bytes}"
         )
         examples = []

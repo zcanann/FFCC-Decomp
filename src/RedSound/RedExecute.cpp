@@ -1290,6 +1290,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     int workValue;
     int pitchWork[4];
 
+    workValue = 0;
     voice->m_track = track;
     voice->m_active = 1;
 
@@ -1299,10 +1300,9 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
         voice->m_basePitch = track->m_portamentPitch;
         track->m_sweepDelta = track->m_portamentTime;
         pitchWork[0] = 0;
-        track->m_sweepAdd =
-            DataAddCompute(pitchWork, noteData->m_key * REDSOUND_PITCH_NOTE_UNIT -
-                                          (track->m_portamentPitch >> REDSOUND_FIXED_SHIFT),
-                           &track->m_sweepDelta);
+        workValue = noteData->m_key * REDSOUND_PITCH_NOTE_UNIT -
+                    (track->m_portamentPitch >> REDSOUND_FIXED_SHIFT);
+        track->m_sweepAdd = DataAddCompute(pitchWork, workValue, &track->m_sweepDelta);
     } else {
         track->m_portamentPitch = noteData->m_key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
         if (voice->m_waveData != 0) {
@@ -1313,9 +1313,9 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
                 voice->m_basePitch = noteData->m_key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
                 if (voice->m_track->m_keySignatureData != 0) {
                     workValue = voice->m_basePitch >> REDSOUND_PITCH_BASE_NOTE_SHIFT;
-                    octaveIndex = workValue / REDSOUND_NOTES_PER_OCTAVE + (voice->m_basePitch >> REDSOUND_SIGN_SHIFT);
+                    octaveIndex = workValue / REDSOUND_NOTES_PER_OCTAVE;
                     pitchWork[0] =
-                        voice->m_track->m_keySignatureData[workValue + (octaveIndex - (octaveIndex >> REDSOUND_SIGN_SHIFT)) * -REDSOUND_NOTES_PER_OCTAVE];
+                        voice->m_track->m_keySignatureData[workValue - octaveIndex * REDSOUND_NOTES_PER_OCTAVE];
                     voice->m_basePitch += pitchWork[0] * REDSOUND_PITCH_KEY_SIGNATURE_UNIT;
                 }
             }

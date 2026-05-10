@@ -1661,6 +1661,20 @@ int RedDmaSearchID(int id)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void RedSetDMAMode(int mode)
+{
+    m_DMAMode = mode;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801be2dc
  * PAL Size: 496b
  * EN Address: TODO
@@ -2022,6 +2036,20 @@ int CRedDriver::GetProgramTime()
         p++;
     } while (p < p_Tick->m_ticks + REDSOUND_TICK_HISTORY_COUNT);
     return sum;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedDriver::GetMasterTime()
+{
+    return m_RedMasterTime;
 }
 
 /*
@@ -2865,6 +2893,20 @@ void CRedDriver::DisplayWaveInfo()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedDriver::DisplayMMemoryInfo()
+{
+    c_RedEntry.DisplayMMemoryInfo();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801BFDF8
  * PAL Size: 92b
  * EN Address: TODO
@@ -2875,6 +2917,34 @@ void CRedDriver::DisplayWaveInfo()
 void CRedDriver::SetReverb(int bank, int kind)
 {
     ::SetReverb(bank, t_ReverbModeData[kind].m_kind, t_ReverbModeData[kind].m_params);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbSize* CRedDriver::GetReverbInfo()
+{
+    return ::GetReverbInfo();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbDepth* CRedDriver::GetReverbDepth()
+{
+    return p_ReverbDepth;
 }
 
 /*

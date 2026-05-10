@@ -853,6 +853,20 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbSize* GetReverbInfo()
+{
+    return p_ReverbSize;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801c3c44
  * PAL Size: 368b
  * EN Address: TODO

@@ -1069,3 +1069,214 @@ void CRedSound::TestProcess(int mode)
 {
 	c_Driver.TestProcess(mode);
 }
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::Sleep(int microseconds)
+{
+	RedSleep(microseconds);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::GetMasterTime()
+{
+	return c_Driver.GetMasterTime();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::SetDMAMode(int mode)
+{
+	RedSetDMAMode(mode);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbSize* CRedSound::GetReverbInfo()
+{
+	return c_Driver.GetReverbInfo();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedReverbDepth* CRedSound::GetReverbDepth()
+{
+	return c_Driver.GetReverbDepth();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::DisplayMMemoryInfo()
+{
+	c_Driver.DisplayMMemoryInfo();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::SearchWaveSequence(int waveNo)
+{
+	return c_RedEntry.SearchWaveSequence(waveNo);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedSound::GetMakeTime(char** date, char** time)
+{
+	*date = (char*)sRedSoundDate;
+	*time = (char*)sRedSoundTime;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::GetMainBufferAddress()
+{
+	return c_RedMemory.GetMainBufferAddress();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::GetMainBufferSize()
+{
+	return c_RedMemory.GetMainBufferSize();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedMemoryBlock* CRedSound::GetMainBankAddress()
+{
+	return c_RedMemory.GetMainBankAddress();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedSound::GetABufferAddress()
+{
+	return c_RedMemory.GetABufferAddress();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedMemoryBlock* CRedSound::GetABankAddress()
+{
+	return c_RedMemory.GetABankAddress();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedSoundCONTROL* CRedSound::GetControlAddress()
+{
+	return p_SoundControlBuffer;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedVoiceDATA* CRedSound::GetVoiceAddress()
+{
+	return p_VoiceData;
+}

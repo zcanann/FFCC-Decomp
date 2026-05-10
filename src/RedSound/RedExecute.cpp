@@ -1305,7 +1305,10 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     } else {
         track->m_portamentPitch = noteData->m_key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
         if (voice->m_waveData != 0) {
-            if ((voice->m_waveData->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) == 0) {
+            if ((voice->m_waveData->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) != 0) {
+                voice->m_basePitch =
+                    voice->m_waveData->m_splitKey << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+            } else {
                 voice->m_basePitch = noteData->m_key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
                 if (voice->m_track->m_keySignatureData != 0) {
                     workValue = voice->m_basePitch >> REDSOUND_PITCH_BASE_NOTE_SHIFT;
@@ -1314,9 +1317,6 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
                         voice->m_track->m_keySignatureData[workValue + (octaveIndex - (octaveIndex >> REDSOUND_SIGN_SHIFT)) * -REDSOUND_NOTES_PER_OCTAVE];
                     voice->m_basePitch += pitchWork[0] * REDSOUND_PITCH_KEY_SIGNATURE_UNIT;
                 }
-            } else {
-                voice->m_basePitch =
-                    voice->m_waveData->m_splitKey << REDSOUND_PITCH_BASE_NOTE_SHIFT;
             }
         }
     }
@@ -1326,12 +1326,12 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     voice->m_trackExpression = &track->m_expression;
     voice->m_trackPan = &track->m_pan;
 
-    if (voice->m_waveData == 0) {
-        memset(&voice->m_adsr, 0, REDSOUND_TRACK_ADSR_SIZE);
-    } else {
+    if (voice->m_waveData != 0) {
         memcpy(&voice->m_adsr,
                track->m_waveData->m_adsr,
                REDSOUND_TRACK_ADSR_SIZE);
+    } else {
+        memset(&voice->m_adsr, 0, REDSOUND_TRACK_ADSR_SIZE);
     }
 
     voice->m_voiceSwitch = track->m_voiceSwitch;
@@ -1348,16 +1348,16 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     }
 
     pitchWork[0] = track->m_keyTranspose + track->m_pitchBend;
-    if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
-        workValue = voice->m_basePitch + p_MusicPitchControl->m_value;
-    } else {
+    if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
         workValue = voice->m_basePitch + track->m_pitch;
+    } else {
+        workValue = voice->m_basePitch + p_MusicPitchControl->m_value;
     }
 
-    if (voice->m_waveData == 0) {
-        workValue = 0;
-    } else {
+    if (voice->m_waveData != 0) {
         workValue = PitchCompute(workValue, pitchWork[0], voice->m_waveData->m_pitch, track->m_fineTune);
+    } else {
+        workValue = 0;
     }
     voice->m_pitch = workValue;
 
@@ -1378,10 +1378,10 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
             pitchWork[0] =
                 REDSOUND_MOD_DELAY_PHASE_SCALE / (track->m_vibrateRate >> REDSOUND_FIXED_SHIFT);
         }
-        if (track->m_vibrateDelayDepth == 0) {
-            workValue = 0;
-        } else {
+        if (track->m_vibrateDelayDepth != 0) {
             workValue = track->m_vibrateDelayDepth * (pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE);
+        } else {
+            workValue = 0;
         }
         voice->m_pitchModFrames = workValue;
         voice->m_pitchModFrame = 0;
@@ -1395,10 +1395,10 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
             pitchWork[0] =
                 REDSOUND_MOD_DELAY_PHASE_SCALE / (track->m_tremoloRate >> REDSOUND_FIXED_SHIFT);
         }
-        if (track->m_tremoloDelayDepth == 0) {
-            workValue = 0;
-        } else {
+        if (track->m_tremoloDelayDepth != 0) {
             workValue = track->m_tremoloDelayDepth * (pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE);
+        } else {
+            workValue = 0;
         }
         voice->m_volumeModFrames = workValue;
         voice->m_volumeModFrame = 0;

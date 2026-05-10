@@ -767,6 +767,19 @@ void CRedSound::SeStop(int id)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+void CRedSound::SeStopG(int group)
+{
+	c_Driver.SeStopG(group);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd2c8
  * PAL Size: 68b
  * EN Address: TODO

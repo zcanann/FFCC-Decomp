@@ -1945,6 +1945,8 @@ static void _KeyOnControl()
     RedKeyOnSlot* reserve;
     RedVoiceDATA* voiceData;
     RedSwingFunc waveFunc;
+    int shakeDepth;
+    int shakeValue;
 
     _VoiceEnvelopeCheck();
     voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] = 0;
@@ -1967,8 +1969,8 @@ static void _KeyOnControl()
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 waveFunc = track->m_shakeFunc;
-                int shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
-                int shakeValue = waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
+                shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
+                shakeValue = waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
                 track->m_shakePan = (shakeDepth * shakeValue) >> REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
@@ -1985,8 +1987,8 @@ static void _KeyOnControl()
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 waveFunc = track->m_shakeFunc;
-                int shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
-                int shakeValue = waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
+                shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
+                shakeValue = waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
                 track->m_shakePan = (shakeDepth * shakeValue) >> REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
@@ -1999,8 +2001,8 @@ static void _KeyOnControl()
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 waveFunc = track->m_shakeFunc;
-                int shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
-                int shakeValue = waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
+                shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
+                shakeValue = waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
                 track->m_shakePan = (shakeDepth * shakeValue) >> REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }

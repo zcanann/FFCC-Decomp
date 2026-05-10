@@ -2140,6 +2140,8 @@ static void _ExecuteExtraData()
         soundControl++;
     } while (soundControl < p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP);
 
+    soundControl = p_SoundControlBuffer;
+
     if (p_MusicTempoControl->m_count != 0) {
         p_MusicTempoControl->m_count--;
         p_MusicTempoControl->m_value += p_MusicTempoControl->m_step;
@@ -2151,21 +2153,19 @@ static void _ExecuteExtraData()
         voice = p_VoiceData;
         do {
             if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
-                RedTrackDATA* voiceTrack = voice->m_track;
                 int pitchBase = voice->m_basePitch + p_MusicPitchControl->m_value;
-                int pitchOffset = (int)voiceTrack->m_keyTranspose + (int)voiceTrack->m_pitchBend;
+                int pitchOffset = (int)voice->m_track->m_keyTranspose + (int)voice->m_track->m_pitchBend;
                 voice->m_pitch = PitchCompute(pitchBase, pitchOffset,
                                               voice->m_waveData->m_pitch,
-                                              voiceTrack->m_fineTune);
+                                              voice->m_track->m_fineTune);
                 voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
             }
             voice++;
         } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
     }
 
-    soundControl = p_SoundControlBuffer;
     do {
-        if ((soundControl->m_tickCounter != 0) && (soundControl->m_volumeDelta != 0)) {
+        if ((soundControl->m_activeTrackCount != 0) && (soundControl->m_volumeDelta != 0)) {
             soundControl->m_volumeDelta--;
             soundControl->m_volume += soundControl->m_volumeAdd;
             if ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_STOP_ON_VOLUME_ZERO) != 0) {

@@ -642,6 +642,19 @@ void CRedSound::MusicTempo(int tempo, int frameCount)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+void CRedSound::MusicPause(int musicId, int pause)
+{
+	c_Driver.MusicPause(musicId, pause);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd148
  * PAL Size: 44b
  * EN Address: TODO

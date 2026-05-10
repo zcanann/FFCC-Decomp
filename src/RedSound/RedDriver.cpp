@@ -987,6 +987,19 @@ static void _MusicPitch(int* command)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+static void _MusicPause(int* command)
+{
+    MusicPause(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME]);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bd578
  * PAL Size: 12b
  * EN Address: TODO
@@ -2360,6 +2373,19 @@ void CRedDriver::MusicTempo(int tempo, int frameCount)
 void CRedDriver::MusicPitch(int pitch, int frameCount)
 {
     _EntryExecCommand(_MusicPitch, 0, pitch, frameCount, 0, 0, 0, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+void CRedDriver::MusicPause(int musicID, int pause)
+{
+    _EntryExecCommand(_MusicPause, musicID, pause, 0, 0, 0, 0, 0);
 }
 
 /*

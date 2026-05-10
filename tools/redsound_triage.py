@@ -284,6 +284,35 @@ def collect_unit(unit: str, timeout: int) -> list[dict[str, Any]]:
     return rows
 
 
+def object_path_for_unit(unit: str) -> Path:
+    normalized = normalize_unit(unit)
+    parts = normalized.split("/")
+    if parts[:2] == ["main", "RedSound"] and len(parts) == 3:
+        return ROOT / "build" / "GCCP01" / "src" / "RedSound" / f"{parts[2]}.o"
+    if parts[:1] == ["main"] and len(parts) == 2:
+        return ROOT / "build" / "GCCP01" / "src" / f"{parts[1]}.o"
+    return ROOT / "build" / "GCCP01" / "src" / f"{short_unit(normalized)}.o"
+
+
+def stale_build_warnings(units: list[str]) -> list[str]:
+    warnings: list[str] = []
+    for unit in units:
+        normalized = normalize_unit(unit)
+        source_path = source_path_for_unit(normalized)
+        object_path = object_path_for_unit(normalized)
+        if not source_path.exists():
+            continue
+        if not object_path.exists():
+            warnings.append(f"{short_unit(normalized)} has no object artifact yet; run with --build for fresh scores")
+            continue
+        if source_path.stat().st_mtime > object_path.stat().st_mtime + 0.001:
+            warnings.append(
+                f"{short_unit(normalized)} source is newer than {object_path.relative_to(ROOT)}; "
+                "scores may be stale, run with --build"
+            )
+    return warnings
+
+
 def print_rows(rows: list[dict[str, Any]], limit: int) -> None:
     if not rows:
         print("No mismatched RedSound symbols found.")
@@ -491,6 +520,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--build", action="store_true", help="Run ninja before collecting objdiff rows.")
     parser.add_argument("--ninja-timeout", type=int, default=30, help="ninja timeout in seconds for --build.")
+    parser.add_argument(
+        "--no-stale-warning",
+        action="store_true",
+        help="Do not warn when source files are newer than the compiled object artifacts.",
+    )
     parser.add_argument("--objdiff-timeout", type=int, default=60)
     return parser.parse_args()
 
@@ -500,6 +534,12 @@ def main() -> int:
     if args.build and not run_ninja(args.ninja_timeout):
         return 1
     units = args.unit or REDSOUND_UNITS
+    if not args.build and not args.no_stale_warning:
+        warnings = stale_build_warnings(units)
+        if warnings:
+            print("Stale build warning:")
+            for warning in warnings:
+                print(f"  {warning}")
     rows: list[dict[str, Any]] = []
     for unit in units:
         rows.extend(collect_unit(unit, args.objdiff_timeout))

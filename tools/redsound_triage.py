@@ -26,6 +26,7 @@ from objdiff_experiment import (
     source_path_for_unit,
     symbol_by_name,
 )
+from map.map_index import LayoutRecord, MapIndex, load_map_index, normalize_object_file
 
 
 REDSOUND_UNITS = [
@@ -56,6 +57,11 @@ ATTEMPT_RESULT_RANK = {
 
 CONTEXT_ATTEMPT_NOTE_PREFIXES = (
     "baseline context",
+)
+
+MAP_PATHS = (
+    ("PAL", ROOT / "orig" / "GCCP01" / "game.MAP"),
+    ("EN", ROOT / "orig" / "GCCE01" / "game.MAP"),
 )
 
 
@@ -377,6 +383,74 @@ def print_detail(rows: list[dict[str, Any]], limit: int) -> None:
         print(f"  hint  {row['hint']}")
 
 
+def load_redsound_map_indexes() -> list[tuple[str, MapIndex]]:
+    indexes: list[tuple[str, MapIndex]] = []
+    for label, path in MAP_PATHS:
+        if path.exists():
+            indexes.append((label, load_map_index(path, label=label)))
+    return indexes
+
+
+def layout_neighbors(index: MapIndex, symbol: str, unit: str, radius: int) -> list[tuple[str, LayoutRecord]]:
+    symbol_records = [
+        record
+        for record in index.layout_records_for_symbol(symbol)
+        if record.offset is not None and record.object_file == normalize_object_file(f"{short_unit(unit)}.o")
+    ]
+    if not symbol_records:
+        symbol_records = [record for record in index.layout_records_for_symbol(symbol) if record.offset is not None]
+    if not symbol_records:
+        return []
+
+    center = symbol_records[0]
+    records = [
+        record
+        for records in index.layout_by_symbol.values()
+        for record in records
+        if record.offset is not None
+        and record.section == center.section
+        and record.object_file == center.object_file
+    ]
+    records.sort(key=lambda record: (record.offset or 0, record.symbol_name))
+    try:
+        center_index = next(i for i, record in enumerate(records) if record.symbol_name == center.symbol_name and record.offset == center.offset)
+    except StopIteration:
+        return []
+
+    start = max(0, center_index - radius)
+    end = min(len(records), center_index + radius + 1)
+    result: list[tuple[str, LayoutRecord]] = []
+    for i, record in enumerate(records[start:end], start):
+        marker = ">" if i == center_index else " "
+        result.append((marker, record))
+    return result
+
+
+def print_map_neighbors(rows: list[dict[str, Any]], limit: int, radius: int) -> None:
+    if radius <= 0 or not rows:
+        return
+    indexes = load_redsound_map_indexes()
+    if not indexes:
+        print("\nMAP neighbors: no PAL/EN MAP files found")
+        return
+    print("\nMAP neighbors:")
+    for row in rows[:limit]:
+        print(f"  {short_unit(row['unit'])} {row['symbol']}:")
+        for label, index in indexes:
+            neighbors = layout_neighbors(index, row["symbol"], row["unit"], radius)
+            if not neighbors:
+                print(f"    {label}: no layout record")
+                continue
+            print(f"    {label}:")
+            for marker, record in neighbors:
+                offset = f"{record.offset:08x}" if record.offset is not None else "UNUSED"
+                va = f"{record.virtual_address:08x}" if record.virtual_address is not None else "........"
+                print(
+                    f"      {marker} {record.section:<10} {offset} {record.size:05x} {va} "
+                    f"{record.symbol_name}"
+                )
+
+
 def experiment_command(row: dict[str, Any]) -> str:
     unit = short_unit(row["unit"])
     source_path = source_path_for_unit(row["unit"])
@@ -511,6 +585,12 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument("--detail", action="store_true", help="Print frame/save/diff details for shown rows.")
+    parser.add_argument(
+        "--map-neighbors",
+        type=int,
+        default=0,
+        help="Show N PAL/EN MAP layout neighbors before and after each displayed symbol.",
+    )
     parser.add_argument("--commands", action="store_true", help="Print ready-to-run objdiff_experiment commands.")
     parser.add_argument("--attempts", action="store_true", help="Show attempt counts from the attempt log.")
     parser.add_argument(
@@ -653,6 +733,8 @@ def main() -> int:
         print_rows(rows, args.limit)
     if args.detail:
         print_detail(shown_rows, len(shown_rows))
+    if args.map_neighbors:
+        print_map_neighbors(shown_rows, len(shown_rows), args.map_neighbors)
     if args.commands:
         print_commands(shown_rows, len(shown_rows))
     if args.attempts:

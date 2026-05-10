@@ -104,6 +104,20 @@ def is_save_restore_only(left: dict[str, Any], right: dict[str, Any]) -> bool:
     )
 
 
+def has_param_spill_mismatch(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    pairs = diff_instruction_pairs(left, right)
+    for index, left_item, right_item in pairs:
+        if index > 16:
+            break
+        left_text = instruction_text(left_item)
+        right_text = instruction_text(right_item)
+        if right_text.startswith("stw r4, ") and left_text != right_text:
+            return True
+        if left_text.startswith("stw r4, ") and left_text != right_text:
+            return True
+    return False
+
+
 def operands(item: dict[str, Any]) -> list[str]:
     text = instruction_text(item)
     if text == "<gap>" or " " not in text:
@@ -122,6 +136,8 @@ def mismatch_patterns(
     patterns: list[str] = []
     if is_save_restore_only(left, right):
         patterns.append("save-only")
+    if has_param_spill_mismatch(left, right):
+        patterns.append("param-spill")
     if left_frame != right_frame or left_save != right_save:
         patterns.append("stack")
 

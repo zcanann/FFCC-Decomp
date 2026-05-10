@@ -3437,13 +3437,16 @@ void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
 int CRedDriver::WavePitchCompute(int key, int pitch)
 {
     int basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+    int pitchOffset;
     RedWaveDATA* wave = p_EditorTrack->m_waveData;
 
     if (wave != 0) {
         if ((wave->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) != 0) {
             basePitch = wave->m_splitKey << REDSOUND_PITCH_BASE_NOTE_SHIFT;
         }
-        return PitchCompute(basePitch, pitch, wave->m_pitch, p_EditorTrack->m_fineTune);
+        pitchOffset = p_EditorTrack->m_keyTranspose + pitch;
+        basePitch += p_EditorTrack->m_pitch;
+        return PitchCompute(basePitch, pitchOffset, wave->m_pitch, p_EditorTrack->m_fineTune);
     }
 
     return 0;

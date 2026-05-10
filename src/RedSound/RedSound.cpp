@@ -616,6 +616,32 @@ void CRedSound::MusicVolume(int id, int volume, int fadeTime)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+void CRedSound::MusicPitch(int pitch, int frameCount)
+{
+	c_Driver.MusicPitch(pitch, frameCount);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+void CRedSound::MusicTempo(int tempo, int frameCount)
+{
+	c_Driver.MusicTempo(tempo, frameCount);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801cd148
  * PAL Size: 44b
  * EN Address: TODO

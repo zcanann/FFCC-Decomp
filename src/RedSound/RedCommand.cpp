@@ -206,7 +206,7 @@ static int _EraseTime(int eraseTrack)
 	do {
 		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
 		    (track->m_playTime == minTrack)) {
-			int trackNo;
+			RedVoiceDATA* voiceData;
 
 			KeyOnReserveClear(p_KeyOnData, track);
 			track->m_seId = 0;
@@ -214,12 +214,12 @@ static int _EraseTime(int eraseTrack)
 			track->m_command = 0;
 			track->m_mixVolumeMode = 0;
 
-			trackNo = track->m_trackNo;
-			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
-			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-			(p_VoiceData + trackNo)->m_active = 0;
+			voiceData = p_VoiceData + track->m_trackNo;
+			voiceData->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+			voiceData->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			voiceData->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+			voiceData->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+			voiceData->m_active = 0;
 
 			if (track->m_waveBankData != 0) {
 				c_RedEntry.WaveHistoryManager(0, track->m_waveBankData->m_waveNo);

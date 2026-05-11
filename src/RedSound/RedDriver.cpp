@@ -3667,9 +3667,11 @@ void CRedDriver::SetWaveTune(int key, int fineTune)
     p_EditorTrack->m_portamentPitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
     voiceNo = p_EditorVoice;
     do {
-        if (*voiceNo != 0) {
-            (p_VoiceData + *voiceNo)->m_basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
-            (p_VoiceData + *voiceNo)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
+        int voiceIndex = *voiceNo;
+        if (voiceIndex != 0) {
+            RedVoiceDATA* voice = p_VoiceData + voiceIndex;
+            voice->m_basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+            voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
         }
         voiceNo++;
     } while (voiceNo < p_EditorVoice + REDSOUND_EDITOR_VOICE_COUNT);

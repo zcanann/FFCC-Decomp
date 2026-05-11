@@ -4362,17 +4362,15 @@ void GbaQueue::ClrStrengthFlg(int channel)
  * JP Address: TODO
  * JP Size: TODO
  */
-int GbaQueue::GetStrengthData(int channel, unsigned char* strengthData)
+void GbaQueue::GetStrengthData(int channel, unsigned char* strengthData)
 {
-	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
+	char* obj = reinterpret_cast<char*>(this);
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	strengthData[0] = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0x1C]);
-	strengthData[1] = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0x1D]);
-	strengthData[2] = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0x1E]);
+	strengthData[0] = static_cast<unsigned char>(obj[channel * 0xDC + 0x474]);
+	strengthData[1] = static_cast<unsigned char>(obj[channel * 0xDC + 0x475]);
+	strengthData[2] = static_cast<unsigned char>(obj[channel * 0xDC + 0x476]);
 	OSSignalSemaphore(accessSemaphores + channel);
-
-	return 0;
 }
 
 /*

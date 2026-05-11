@@ -123,7 +123,7 @@ public:
     void SetChgUseItemFlg(int);
     unsigned int GetStrengthFlg(int);
     void ClrStrengthFlg(int);
-    int GetStrengthData(int, unsigned char*);
+    void GetStrengthData(int, unsigned char*);
     unsigned int GetArtiDatFlg(int);
     void ClrArtiDatFlg(int);
     int MakeArtiData(int, char*);

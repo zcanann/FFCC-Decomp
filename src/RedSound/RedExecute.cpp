@@ -1559,6 +1559,27 @@ static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, in
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 112b
+ * EN Address: UNUSED
+ * EN Size: 112b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void SetAllVoiceAccess(RedSoundCONTROL* control, int mask)
+{
+    RedTrackDATA* track = control->m_tracks;
+    RedTrackDATA* trackEnd = track + control->m_trackCount;
+    do {
+        if (track->m_command != 0) {
+            SetVoiceAccess(track, mask);
+        }
+        track++;
+    } while (track < trackEnd);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801c4d08
  * PAL Size: 80b
  * EN Address: TODO

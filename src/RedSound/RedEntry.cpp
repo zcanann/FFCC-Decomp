@@ -1490,10 +1490,8 @@ void CRedEntry::DisplaySePlayInfo()
 					unsigned int seBlockId = (unsigned int)track->m_seSepId;
 					int bank = (int)(seBlockId & REDSOUND_SE_BLOCK_ENTRY_MASK) >> REDSOUND_SE_BLOCK_BANK_SHIFT;
 					RedSeBlockHEAD* seBlock = p_SeBlockData[bank];
-					int* entries = seBlock->m_entries;
-					RedSeINFO* seqInfo = reinterpret_cast<RedSeINFO*>(
-					    reinterpret_cast<unsigned char*>(entries) + seBlock->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE +
-					    (entries[seBlockId & REDSOUND_SE_BLOCK_SEQUENCE_MASK] & REDSOUND_SE_BLOCK_ENTRY_MASK));
+					RedSeINFO* seqInfo =
+					    RedSeBlockGetInfo(seBlock, seBlockId & REDSOUND_SE_BLOCK_SEQUENCE_MASK);
 					waveNo = (seqInfo->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE) | seqInfo->m_waveNoLo;
 					trackIndex = track - *trackHead;
 

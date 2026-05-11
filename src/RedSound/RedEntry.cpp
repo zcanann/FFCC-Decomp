@@ -1488,7 +1488,8 @@ void CRedEntry::DisplaySePlayInfo()
 			if (track->m_command != 0) {
 				if ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
 					unsigned int seBlockId = (unsigned int)track->m_seSepId;
-					int bank = (int)(seBlockId & REDSOUND_SE_BLOCK_ENTRY_MASK) >> REDSOUND_SE_BLOCK_BANK_SHIFT;
+					int bank = (int)(seBlockId & REDSOUND_SE_BLOCK_ENTRY_MASK) /
+					           REDSOUND_SE_BLOCK_SEQUENCE_COUNT;
 					RedSeBlockHEAD* seBlock = p_SeBlockData[bank];
 					RedSeINFO* seqInfo =
 					    RedSeBlockGetInfo(seBlock, seBlockId & REDSOUND_SE_BLOCK_SEQUENCE_MASK);

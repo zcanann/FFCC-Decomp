@@ -918,7 +918,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
     Vec baseDir;
-    int angle[4];
+    int angle[3];
     pppFMATRIX rotMtx;
     float spread;
     float range;

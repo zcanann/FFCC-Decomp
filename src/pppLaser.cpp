@@ -60,7 +60,7 @@ void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
 
 }
 
-extern "C" const char s_pppLaser_cpp_801E3048[] = "pppLaser.cpp";
+extern "C" const char s_pppLaser_cpp_801E3048[] ATTRIBUTE_ALIGN(4) = "pppLaser.cpp";
 
 struct CMapCylinderRaw {
     Vec m_bottom;

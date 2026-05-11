@@ -3374,15 +3374,22 @@ void CGObject::CalcSphereNearPos(float scale, float angleOffset, Vec& outPos)
  */
 void CGObject::ResetAnimPoint(int slot)
 {
-    if ((m_charaModelHandle == 0) || (m_charaModelHandle->m_model == 0)) {
+    bool hasModel = false;
+    CCharaPcs::CHandle* handle = m_charaModelHandle;
+
+    if ((handle != 0) && (handle->m_model != 0)) {
+        hasModel = true;
+    }
+
+    if (!hasModel) {
         return;
     }
 
-    if (m_charaModelHandle->m_animSlot[slot] == 0) {
+    if (handle->m_animSlot[slot] == 0) {
         return;
     }
 
-    *reinterpret_cast<u16*>(reinterpret_cast<u8*>(m_charaModelHandle->m_animSlot[slot]) + 0x2C) = 0;
+    *reinterpret_cast<u16*>(reinterpret_cast<u8*>(handle->m_animSlot[slot]) + 0x2C) = 0;
 }
 
 /*

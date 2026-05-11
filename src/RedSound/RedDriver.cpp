@@ -1757,7 +1757,7 @@ void RedDmaClearID(int id)
     interruptLevel = OSDisableInterrupts();
     queueEntry = RedDriverMainDmaQueue();
     do {
-        if ((queueEntry->m_id != 0) && ((id == 0) || (queueEntry->m_id == id))) {
+        if ((id == 0) || (queueEntry->m_id == id)) {
             queueEntry->m_id = 0;
         }
         queueEntry++;

@@ -3691,9 +3691,11 @@ void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
     memcpy(&p_EditorTrack->m_adsr, adsr, REDSOUND_TRACK_ADSR_SIZE);
     voiceNo = p_EditorVoice;
     do {
-        if (*voiceNo != 0) {
-            memcpy(&(p_VoiceData + *voiceNo)->m_adsr, adsr, REDSOUND_TRACK_ADSR_SIZE);
-            (p_VoiceData + *voiceNo)->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_START;
+        int voiceIndex = *voiceNo;
+        if (voiceIndex != 0) {
+            RedVoiceDATA* voice = p_VoiceData + voiceIndex;
+            memcpy(&voice->m_adsr, adsr, REDSOUND_TRACK_ADSR_SIZE);
+            voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_START;
         }
         voiceNo++;
     } while (voiceNo < p_EditorVoice + REDSOUND_EDITOR_VOICE_COUNT);

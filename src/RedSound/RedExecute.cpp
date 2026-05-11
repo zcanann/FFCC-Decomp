@@ -676,7 +676,8 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
     }
 
     if (result != 1) {
-        p_ReverbSize->m_requested = p_ReverbSize->m_aligned = 0;
+        p_ReverbSize->m_aligned = 0;
+        p_ReverbSize->m_requested = 0;
     }
 }
 

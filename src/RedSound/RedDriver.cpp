@@ -2314,12 +2314,13 @@ int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
         memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
-        if (copiedHeader != 0) {
-            memcpy(copiedHeader, header, headerSize);
-            result = copiedHeader->m_musicNo;
-            _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
-            _EntryExecCommand(_MusicPlaySequence, result, volume, mode, 0, 0, 0, 0);
+        if (copiedHeader == 0) {
+            return result;
         }
+        memcpy(copiedHeader, header, headerSize);
+        result = copiedHeader->m_musicNo;
+        _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+        _EntryExecCommand(_MusicPlaySequence, result, volume, mode, 0, 0, 0, 0);
     }
     return result;
 }
@@ -2362,12 +2363,13 @@ int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
         memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
-        if (copiedHeader != 0) {
-            memcpy(copiedHeader, header, headerSize);
-            result = copiedHeader->m_musicNo;
-            _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
-            _EntryExecCommand(_MusicCrossPlaySequence, result, volume, mode, 0, 0, 0, 0);
+        if (copiedHeader == 0) {
+            return result;
         }
+        memcpy(copiedHeader, header, headerSize);
+        result = copiedHeader->m_musicNo;
+        _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+        _EntryExecCommand(_MusicCrossPlaySequence, result, volume, mode, 0, 0, 0, 0);
     }
     return result;
 }
@@ -2410,12 +2412,13 @@ int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
         memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
-        if (copiedHeader != 0) {
-            memcpy(copiedHeader, header, headerSize);
-            result = copiedHeader->m_musicNo;
-            _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
-            _EntryExecCommand(_MusicNextPlaySequence, result, volume, mode, 0, 0, 0, 0);
+        if (copiedHeader == 0) {
+            return result;
         }
+        memcpy(copiedHeader, header, headerSize);
+        result = copiedHeader->m_musicNo;
+        _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+        _EntryExecCommand(_MusicNextPlaySequence, result, volume, mode, 0, 0, 0, 0);
     }
     return result;
 }
@@ -2840,6 +2843,8 @@ int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pit
             result = copiedHeader->m_seNo;
             _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
             _EntryExecCommand(_SeSepPlaySequence, autoID, result, pan, volume, pitch, 0, 0);
+        } else {
+            result = REDSOUND_SESEP_ID_NONE;
         }
     } else if (m_ReportPrint != 0) {
         OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,

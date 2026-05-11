@@ -1628,17 +1628,17 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 static void _AdsrStart(RedVoiceDATA* voice)
 {
     int* stage = &voice->m_adsrStage;
-    u8* adsrData = (u8*)voice->m_adsr.m_time;
+    RedAdsrDATA* adsrData = &voice->m_adsr;
     int prevLevel;
     int nextLevel;
     int stepFrames;
 
-    nextLevel = voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK];
+    nextLevel = adsrData->m_level[REDSOUND_VOICE_ADSR_ATTACK];
     *stage    = 0;
     do {
         prevLevel = nextLevel;
-        stepFrames = *(u16*)(adsrData + *stage * REDSOUND_VOICE_ADSR_TIME_BYTE_STRIDE);
-        nextLevel = *(u8*)(adsrData + *stage + REDSOUND_VOICE_ADSR_LEVEL_BASE);
+        stepFrames = adsrData->m_time[*stage];
+        nextLevel = adsrData->m_level[*stage];
         if (stepFrames != 0) {
             break;
         }

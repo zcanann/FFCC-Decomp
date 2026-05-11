@@ -1979,10 +1979,10 @@ void CRedDriver::Init()
     m_ReportPrint = 1;
     m_SoundMode = 0;
     GetSoundMode();
-    if (m_SoundPlayMode == 2) {
-        AXSetMode(2);
-    } else {
+    if (m_SoundPlayMode != 2) {
         AXSetMode(0);
+    } else {
+        AXSetMode(2);
     }
     p_Tick = (RedTickHistory*)RedNew(REDSOUND_TICK_HISTORY_SIZE);
     memset(p_Tick, 0, REDSOUND_TICK_HISTORY_SIZE);

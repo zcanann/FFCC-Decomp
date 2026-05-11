@@ -40,15 +40,15 @@ const float FLOAT_8033303C = 72.0f;
 extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[] = "%s(%d):family cnt error!!(%d)\n";
 extern "C" const char s_menu_compa_cpp_801DEDE8[] = "menu_compa.cpp";
 
-static const char s_compa_mono_upper[] = "MONO";
-static const char s_compa_normal[] = "Normal";
-static const char s_compa_forza[] = "Forza";
-static const char s_compa_difesa[] = "Difesa";
-static const char s_compa_sonoro[] = "Sonoro";
-static const char s_compa_musica[] = "Musica";
-static const char s_compa_mono[] = "Mono";
-static const char s_compa_contr[] = "Contr.";
-static const char s_compa_norm[] = "Norm.";
+extern "C" const char lbl_803334A8[] = "MONO";
+extern "C" const char lbl_803334B0[] = "Normal";
+extern "C" const char lbl_803334B8[] = "Forza";
+extern "C" const char lbl_803334C0[] = "Difesa";
+extern "C" const char lbl_803334C8[] = "Sonoro";
+extern "C" const char lbl_803334D0[] = "Musica";
+extern "C" const char lbl_803334D8[] = "Mono";
+extern "C" const char lbl_803334E0[] = "Contr.";
+extern "C" const char lbl_803334E8[] = "Norm.";
 
 struct CompaFlatTableEntry
 {

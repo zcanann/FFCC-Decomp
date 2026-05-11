@@ -506,7 +506,7 @@ u8 GetRandomData()
 int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
 {
     int value;
-    int pitch;
+    u32 pitch;
     int octaveAdjust;
     int noteBand;
 
@@ -514,7 +514,7 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
     basePitch >>= REDSOUND_FIXED_SHIFT;
     pitch = pitchOffset + (wavePitch >> 16);
     pitch = basePitch + pitch;
-    while (pitch < 0) {
+    while ((int)pitch < 0) {
         pitch += REDSOUND_PITCH_OCTAVE_UNITS;
         octaveAdjust -= 1;
     }

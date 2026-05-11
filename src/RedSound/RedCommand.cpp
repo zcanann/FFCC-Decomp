@@ -1139,8 +1139,9 @@ void SetMusicTempo(int tempo, int frameCount)
 		frameCount /= REDSOUND_FRAMES_PER_SECOND;
 	}
 
-	p_MusicTempoControl->m_step = (tempo - p_MusicTempoControl->m_value) / frameCount;
-	p_MusicTempoControl->m_count = frameCount;
+	RedControlRamp* tempoControl = p_MusicTempoControl;
+	tempoControl->m_step = (tempo - tempoControl->m_value) / frameCount;
+	tempoControl->m_count = frameCount;
 }
 
 /*

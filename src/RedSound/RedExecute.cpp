@@ -2192,11 +2192,11 @@ static void _ExecuteExtraData()
         voice = p_VoiceData;
         do {
             if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
-                int pitchBase = voice->m_basePitch + p_MusicPitchControl->m_value;
+                int pitchBase = voice->m_basePitch;
                 int pitchOffset = (int)voice->m_track->m_keyTranspose + (int)voice->m_track->m_pitchBend;
-                voice->m_pitch = PitchCompute(pitchBase, pitchOffset,
-                                              voice->m_waveData->m_pitch,
-                                              voice->m_track->m_fineTune);
+                voice->m_pitch = PitchCompute(pitchBase + p_MusicPitchControl->m_value, pitchOffset,
+                                               voice->m_waveData->m_pitch,
+                                               voice->m_track->m_fineTune);
                 voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
             }
             voice++;

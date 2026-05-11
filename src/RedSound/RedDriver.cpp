@@ -3741,6 +3741,7 @@ int CRedDriver::WavePitchCompute(int key, int pitch)
  */
 RedReverbModeData* CRedDriver::GetReverbModeTable(int mode)
 {
+    mode &= REDSOUND_REVERB_MODE_INDEX_MASK;
     return t_ReverbModeData + mode;
 }
 

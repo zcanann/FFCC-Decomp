@@ -676,8 +676,7 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
     }
 
     if (result != 1) {
-        p_ReverbSize->m_aligned = 0;
-        p_ReverbSize->m_requested = 0;
+        p_ReverbSize->m_requested = p_ReverbSize->m_aligned = 0;
     }
 }
 
@@ -739,8 +738,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
     RedReverbDATA* reverb;
     int result;
 
-    p_ReverbSize->m_aligned = 0;
-    p_ReverbSize->m_requested = 0;
+    p_ReverbSize->m_requested = p_ReverbSize->m_aligned = 0;
 
     if (kind == REDSOUND_REVERB_KIND_NONE) {
         _ClearReverb(bank);
@@ -844,8 +842,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         }
     }
     else {
-        p_ReverbSize->m_aligned = 0;
-        p_ReverbSize->m_requested = 0;
+        p_ReverbSize->m_requested = p_ReverbSize->m_aligned = 0;
     }
 
     return p_ReverbSize;

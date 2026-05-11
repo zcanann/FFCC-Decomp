@@ -666,15 +666,15 @@ STATIC_ASSERT(sizeof(sRedDriverLogWarnColor) + sizeof(sRedDriverLogReset) == RED
 static void _SetSoundMode(int* command)
 {
     m_SoundMode = command[REDSOUND_SOUND_MODE_COMMAND_MODE];
-    if (command[REDSOUND_SOUND_MODE_COMMAND_MODE] == 1) {
+    if (command[REDSOUND_SOUND_MODE_COMMAND_MODE] == REDSOUND_SOUND_MODE_MONO) {
         OSGetSoundMode(0);
     } else {
         OSGetSoundMode(1);
     }
     m_SoundPlayMode = m_SoundMode;
     switch (m_SoundPlayMode) {
-    case 2:
-        AXSetMode(2);
+    case REDSOUND_SOUND_MODE_SURROUND:
+        AXSetMode(REDSOUND_SOUND_MODE_SURROUND);
         break;
     default:
         AXSetMode(0);
@@ -1979,10 +1979,10 @@ void CRedDriver::Init()
     m_ReportPrint = 1;
     m_SoundMode = 0;
     GetSoundMode();
-    if (m_SoundPlayMode != 2) {
+    if (m_SoundPlayMode != REDSOUND_SOUND_MODE_SURROUND) {
         AXSetMode(0);
     } else {
-        AXSetMode(2);
+        AXSetMode(REDSOUND_SOUND_MODE_SURROUND);
     }
     p_Tick = (RedTickHistory*)RedNew(REDSOUND_TICK_HISTORY_SIZE);
     memset(p_Tick, 0, REDSOUND_TICK_HISTORY_SIZE);
@@ -2186,7 +2186,7 @@ int CRedDriver::GetSoundMode()
     int soundMode = __OSReadROM();
 
     if (soundMode == 0) {
-        m_SoundPlayMode = 1;
+        m_SoundPlayMode = REDSOUND_SOUND_MODE_MONO;
     } else {
         m_SoundPlayMode = m_SoundMode;
     }

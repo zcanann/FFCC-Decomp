@@ -105,6 +105,7 @@ public:
     void freeTexture(int, int, int, int);
 
     void changeMode(MENUMODE);
+    int GetMenuMode();
 
     void calc();
     void draw();

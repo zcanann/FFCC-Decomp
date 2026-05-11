@@ -171,10 +171,10 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	CAPos* aheadBest = (CAPos*)0;
 	float aheadBestDist = behindBestDist;
 	int i = 0;
+	CAPos* portal = m_portals;
 
 	do
 	{
-		CAPos* portal = &m_portals[i];
 		unsigned char otherGroup = portal->m_groupA;
 		bool exists = false;
 
@@ -250,6 +250,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 		}
 
 		++i;
+		++portal;
 	} while (i < 64);
 
 	if (aheadBest != (CAPos*)0)

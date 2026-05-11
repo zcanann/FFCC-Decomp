@@ -375,7 +375,7 @@ void CGItemObj::onFrame()
 			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			SetDamageCol__8CGObjectFiPcffP3Vec(
 			    this, 0, DAT_80331bc8, FLOAT_80331bb8, FLOAT_80331bb8, reinterpret_cast<Vec*>(&zero));
-			*(int*)(self + 0x384) = 8;
+			*reinterpret_cast<unsigned int*>(&m_damageColliders[1].m_localPosition.x) = 8;
 			addSubStat__8CGPrgObjFv(this);
 		}
 	}
@@ -627,18 +627,18 @@ void CGItemObj::onFrameStat()
 				unsigned char* model = reinterpret_cast<unsigned char*>(handle->m_model);
 				model[0x10C] = (model[0x10C] & 0x7F) | 0x80;
 			}
-		}
 
-		if (*(int*)(self + 0x52c) == 1 && *(int*)(self + 0x530) < 9) {
-			float wobble = (float)sin((double)(FLOAT_80331b9c * (float)(*(int*)(self + 0x530)) * FLOAT_80331b68));
+			if (*(int*)(self + 0x530) < 9) {
+				float wobble = (float)sin((double)(FLOAT_80331b9c * (float)(*(int*)(self + 0x530)) * FLOAT_80331b68));
 
-			prgObj->m_rotationZ = wobble;
-			prgObj->m_rotationY = wobble;
-			prgObj->m_rotationX = wobble;
+				prgObj->m_rotationZ = wobble;
+				prgObj->m_rotationY = wobble;
+				prgObj->m_rotationX = wobble;
 
-			if (*(int*)(self + 0x530) == 8) {
-				prgObj->m_bgColMask |= 0x80000;
-				changeStat__8CGPrgObjFiii(this, 0x24, 0, 0);
+				if (*(int*)(self + 0x530) == 8) {
+					prgObj->m_bgColMask |= 0x80000;
+					changeStat__8CGPrgObjFiii(this, 0x24, 0, 0);
+				}
 			}
 		}
 		break;
@@ -716,9 +716,9 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
 
-			CGObject* owner = *(CGObject**)(self + 0x550);
-			if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_pdtLoadRef != 0) {
-				pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(owner->m_charaModelHandle->m_pdtLoadRef) + 0x14);
+			int soundEntry = *(int*)(*(int*)(*(int*)SoundBuffer_1260_ + 0xF8) + 0x178);
+			if (soundEntry != 0) {
+				pdtNo = *(int*)(soundEntry + 0x14);
 			}
 
 			float particleScale =
@@ -887,86 +887,87 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	}
 
 	gItemObjCreateFlags = createFlags;
-	CFlatRuntime::CStack inStack[3];
+	CFlatRuntime::CStack inStack[5];
 	CFlatRuntime::CStack outStack;
 	inStack[0].m_word = createMode;
 	inStack[1].m_word = createFlags;
 	inStack[2].m_word = scriptArg;
+	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
+	*reinterpret_cast<float*>(&inStack[4].m_word) = launchAngle;
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	    &CFlat, 0, 1, 7, 5, inStack, &outStack);
 
-	if (createMode == 1) {
-		return 0;
-	}
+	CGPrgObj* newItem = 0;
+	if (createMode != 1) {
+		newItem = (CGPrgObj*)intToClass__13CFlatRuntime2Fi(CFlat, (int)outStack.m_word);
+		unsigned char* itemSelf = (unsigned char*)newItem;
 
-	CGPrgObj* newItem = (CGPrgObj*)intToClass__13CFlatRuntime2Fi(CFlat, (int)outStack.m_word);
-	unsigned char* itemSelf = (unsigned char*)newItem;
-
-	if (createMode == 2) {
-		*(int*)(itemSelf + 0x558) = scriptArg;
-		newItem->m_radiusCtrl.y = FLOAT_80331b18;
-	}
-
-	changeStat__8CGPrgObjFiii(newItem, 0x1B, 0, 0);
-
-	if ((createFlags & 1) != 0 && owner != 0) {
-		float safePosDist;
-		Vec safePos;
-		float yRot = owner->m_rotBaseY + RandFPM__5CMathFf(FLOAT_80331b54, &Math);
-
-		newItem->m_worldPosition.x = FLOAT_80331b1c * (float)sin((double)yRot) + owner->m_worldPosition.x;
-		newItem->m_worldPosition.y = FLOAT_80331b1c + owner->m_worldPosition.y;
-		newItem->m_worldPosition.z = FLOAT_80331b1c * (float)cos((double)yRot) + owner->m_worldPosition.z;
-
-		safePosDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(newItem, 0x41, owner, &safePos);
-		if (FLOAT_80331b20 < safePosDist) {
-			moveVectorHRot__8CGObjectFfffi(
-			    owner, FLOAT_80331b8c + owner->m_rotBaseY, FLOAT_80331b20, safePosDist / FLOAT_80331b90, 3);
+		if (createMode == 2) {
+			*(int*)(itemSelf + 0x558) = scriptArg;
+			newItem->m_radiusCtrl.y = FLOAT_80331b18;
 		}
 
-		newItem->m_worldPosition = safePos;
-		SetPosBG__8CGObjectFP3Veci(newItem, &safePos, 1);
-	}
+		changeStat__8CGPrgObjFiii(newItem, 0x1B, 0, 0);
 
-	if ((createFlags & 4) != 0 && owner != 0) {
-		newItem->m_worldPosition = owner->m_worldPosition;
-		SetPosBG__8CGObjectFP3Veci(newItem, &newItem->m_worldPosition, 1);
+		if ((createFlags & 1) != 0) {
+			float safePosDist;
+			Vec safePos;
+			float yRot = owner->m_rotBaseY + RandFPM__5CMathFf(FLOAT_80331b54, &Math);
 
-		CVector moveVec((float)sin((double)launchAngle), FLOAT_80331b1c, (float)cos((double)launchAngle));
-		MoveVector__8CGObjectFP3Vecfiiii(newItem, (Vec*)&moveVec, FLOAT_80331b94, 1, 0, 1, 0);
-	}
+			newItem->m_worldPosition.x = FLOAT_80331b1c * (float)sin((double)yRot) + owner->m_worldPosition.x;
+			newItem->m_worldPosition.y = FLOAT_80331b1c + owner->m_worldPosition.y;
+			newItem->m_worldPosition.z = FLOAT_80331b1c * (float)cos((double)yRot) + owner->m_worldPosition.z;
 
-	if ((createFlags & 2) != 0 && owner != 0) {
-		changeStat__8CGPrgObjFiii(newItem, 0x23, 0, 0);
-		newItem->m_worldPosition.x = owner->m_worldPosition.x;
-		newItem->m_worldPosition.y = owner->m_worldPosition.y + FLOAT_80331b98;
-		newItem->m_worldPosition.z = owner->m_worldPosition.z;
-		*(CGObject**)(itemSelf + 0x550) = owner;
+			safePosDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(newItem, 0x41, owner, &safePos);
+			if (FLOAT_80331b20 < safePosDist) {
+				moveVectorHRot__8CGObjectFfffi(
+				    owner, FLOAT_80331b8c + owner->m_rotBaseY, FLOAT_80331b20, safePosDist / FLOAT_80331b90, 3);
+			}
 
-		void* ownerScriptSlot = owner->m_scriptHandle[0xED];
-		if ((unsigned int)System.m_execParam > 2U) {
-			Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf34), ownerScriptSlot);
-		}
-		*(CGPrgObj**)(SoundBuffer + (int)ownerScriptSlot * 4 + 0x4F4) = newItem;
-
-		void* handle = __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
-		    0x194, Game.m_mainStage, const_cast<char*>(DAT_801dcf58), 0x28E);
-		if (handle != 0) {
-			handle = __ct__Q29CCharaPcs7CHandleFv(handle);
-		}
-		*(void**)(itemSelf + 0x564) = handle;
-		Add__Q29CCharaPcs7CHandleFv(*(void**)(itemSelf + 0x564));
-
-		unsigned int* ccfsData = (unsigned int*)ccfs;
-		LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(*(void**)(itemSelf + 0x564), 2, ccfsData[1], ccfsData[2]);
-
-		if ((unsigned int)System.m_execParam > 2U) {
-			Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf64));
+			newItem->m_worldPosition = safePos;
+			SetPosBG__8CGObjectFP3Veci(newItem, &safePos, 1);
 		}
 
-		*(int*)(itemSelf + 0x56C) = (int)ccfsData[3];
-		*(int*)(itemSelf + 0x570) = (int)ccfsData[4];
-		*(int*)(itemSelf + 0x574) = (int)ccfsData[0];
+		if ((createFlags & 4) != 0) {
+			newItem->m_worldPosition = owner->m_worldPosition;
+			SetPosBG__8CGObjectFP3Veci(newItem, &newItem->m_worldPosition, 1);
+
+			CVector moveVec((float)sin((double)launchAngle), FLOAT_80331b1c, (float)cos((double)launchAngle));
+			MoveVector__8CGObjectFP3Vecfiiii(newItem, (Vec*)&moveVec, FLOAT_80331b94, 1, 0, 1, 0);
+		}
+
+		if ((createFlags & 2) != 0) {
+			changeStat__8CGPrgObjFiii(newItem, 0x23, 0, 0);
+			newItem->m_worldPosition.x = owner->m_worldPosition.x;
+			newItem->m_worldPosition.y = owner->m_worldPosition.y + FLOAT_80331b98;
+			newItem->m_worldPosition.z = owner->m_worldPosition.z;
+			*(CGObject**)(itemSelf + 0x550) = owner;
+
+			void* ownerScriptSlot = owner->m_scriptHandle[0xED];
+			if ((unsigned int)System.m_execParam > 2U) {
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf34), ownerScriptSlot);
+			}
+			*(CGPrgObj**)(SoundBuffer + (int)ownerScriptSlot * 4 + 0x4F4) = newItem;
+
+			void* handle = __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
+			    0x194, Game.m_mainStage, const_cast<char*>(DAT_801dcf58), 0x28E);
+			if (handle != 0) {
+				handle = __ct__Q29CCharaPcs7CHandleFv(handle);
+			}
+			*(void**)(itemSelf + 0x564) = handle;
+			Add__Q29CCharaPcs7CHandleFv(*(void**)(itemSelf + 0x564));
+
+			unsigned int* ccfsData = (unsigned int*)ccfs;
+			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(*(void**)(itemSelf + 0x564), 2, ccfsData[1], ccfsData[2]);
+
+			if ((unsigned int)System.m_execParam > 2U) {
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf64));
+			}
+
+			*(int*)(itemSelf + 0x56C) = (int)ccfsData[3];
+			*(int*)(itemSelf + 0x570) = (int)ccfsData[4];
+			*(int*)(itemSelf + 0x574) = (int)ccfsData[0];
+		}
 	}
 
 	return newItem;

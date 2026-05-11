@@ -3101,13 +3101,15 @@ void CRedDriver::ClearSePlayLine()
 RedTrackDATA* CRedDriver::GetSePlayTrack()
 {
 	RedTrackDATA* track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+	RedTrackDATA* trackEnd = track;
+	trackEnd += REDSOUND_SE_TRACK_COUNT;
 
 	do {
 		if (track->m_command != 0) {
 			return track;
 		}
 		track++;
-	} while (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT);
+	} while (track < trackEnd);
 	return 0;
 }
 

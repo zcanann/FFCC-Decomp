@@ -433,18 +433,19 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
     __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
     __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
-    dst[1] = desc0[0];
-    dst[2] = desc0[1];
-    dst[3] = desc0[2];
-    dst[4] = desc1[0];
-    dst[5] = desc1[1];
-    dst[6] = desc1[2];
-    dst[7] = desc2[0];
-    dst[8] = desc2[1];
-    dst[9] = desc2[2];
-    dst[12] = desc3[0];
-    dst[13] = desc3[1];
-    dst[14] = desc3[2];
+    unsigned int* table = dst + 1;
+    table[0] = desc0[0];
+    table[1] = desc0[1];
+    table[2] = desc0[2];
+    table[3] = desc1[0];
+    table[4] = desc1[1];
+    table[5] = desc1[2];
+    table[6] = desc2[0];
+    table[7] = desc2[1];
+    table[8] = desc2[2];
+    table[11] = desc3[0];
+    table[12] = desc3[1];
+    table[13] = desc3[2];
 }
 
 unsigned int m_table_desc0__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};

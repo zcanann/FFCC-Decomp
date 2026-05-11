@@ -2264,6 +2264,65 @@ int CRedDriver::ReentryMusicData(int musicID)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 372b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+int CRedDriver::MusicPlayState(int musicID)
+{
+    RedExecCommand* commandNow;
+    unsigned int interruptLevel;
+    RedSoundCONTROL* soundControl;
+    int result;
+    RedExecCommand* command;
+
+    interruptLevel = OSDisableInterrupts();
+    result = 0;
+    soundControl = p_SoundControlBuffer;
+    if (((musicID == REDSOUND_MUSIC_ID_NONE) ||
+         (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == musicID)) &&
+        (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0)) {
+        result = 1;
+    } else if (((musicID == REDSOUND_MUSIC_ID_NONE) ||
+                (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId == musicID)) &&
+               (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0)) {
+        result = 1;
+    } else if ((musicID == REDSOUND_MUSIC_ID_NONE) ||
+               (soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId == musicID)) {
+        result = 1;
+    } else if ((p_MusicNextPlay->m_musicId >= 0) &&
+               ((musicID == REDSOUND_MUSIC_ID_NONE) || (p_MusicNextPlay->m_musicId == musicID))) {
+        result = 1;
+    }
+
+    if (result == 0) {
+        commandNow = p_ExecCommandNow;
+        command = p_ExecCommandOld;
+        while (commandNow != command) {
+            if ((command->m_func != 0) &&
+                ((command->m_func == _MusicPlaySequence) ||
+                 (command->m_func == _MusicCrossPlaySequence) ||
+                 (command->m_func == _MusicNextPlaySequence)) &&
+                ((musicID == REDSOUND_MUSIC_ID_NONE) ||
+                 (musicID == command->m_args[REDSOUND_EXEC_COMMAND_ARG0]))) {
+                result = 1;
+                break;
+            }
+            command++;
+            if (command == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
+                command = p_ExecCommand;
+            }
+        }
+    }
+
+    OSRestoreInterrupts(interruptLevel);
+    return result;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801bee48
  * PAL Size: 72b
  * EN Address: TODO

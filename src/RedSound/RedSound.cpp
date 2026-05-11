@@ -572,6 +572,19 @@ int CRedSound::ReentryMusicData(int bank)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+int CRedSound::MusicPlayState(int id)
+{
+	return c_Driver.MusicPlayState(id);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801ccfcc
  * PAL Size: 44b
  * EN Address: TODO

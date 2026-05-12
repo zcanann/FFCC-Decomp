@@ -31,7 +31,6 @@ extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj
 extern "C" int IsDispRader__8CGObjectFv(CGObject*);
 extern "C" int getNearParty__8CGMonObjFiiffi(CGMonObj*, int, int, float, float, int);
 extern "C" void onDestroy__10CGCharaObjFv(CGCharaObj*);
-extern "C" void SetHitEnemy__8GbaQueueFii(void*, int, int);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" void AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(void*, Vec*, Vec*, float, int, int);
 extern "C" char SoundBuffer_1248_[];
@@ -1596,7 +1595,7 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 skip_target_update:
 		int teamNo = reinterpret_cast<int>(object->m_scriptHandle[2]);
 		*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(prgObj) + 0x5BC) = static_cast<float>(teamNo);
-		SetHitEnemy__8GbaQueueFii(&GbaQue, attackerIndex, teamNo);
+		GbaQue.SetHitEnemy(attackerIndex, teamNo);
 
 		unsigned short groupTag = *reinterpret_cast<unsigned short*>(mon + 0x6D4);
 		if ((groupTag & 0x7FFF) != 0) {

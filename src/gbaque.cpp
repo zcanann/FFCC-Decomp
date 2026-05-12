@@ -732,7 +732,8 @@ void GbaQueue::ExecutQueue()
 				}
 			} else if (cmd == 0x1F) {
 				if (caravanWork != 0) {
-					caravanWork->ChgCmdLst(static_cast<unsigned char>(cmdWord >> 16), static_cast<short>(cmdWord));
+					unsigned short cmdListData = static_cast<unsigned short>((cmdWord << 8) | ((cmdWord >> 8) & 0xFF));
+					caravanWork->ChgCmdLst(static_cast<unsigned char>(cmdWord >> 16), static_cast<short>(cmdListData));
 				}
 			} else if (cmd == 0x0C) {
 				const unsigned char request = static_cast<unsigned char>(cmdWord >> 8);
@@ -3792,8 +3793,8 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 	__dla__FPv(itemNameScratch);
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	reinterpret_cast<unsigned char*>(this)[0x2D55] =
-		static_cast<unsigned char>(reinterpret_cast<unsigned char*>(this)[0x2D55] | (1 << channel));
+	GbaQueueFlagView* flags = GetFlagView(this);
+	flags->m_buyFlg = static_cast<unsigned char>(flags->m_buyFlg | (1 << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	Joybus.SetLetterSize(channel, totalSize);
@@ -3808,7 +3809,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
  * JP Address: TODO
  * JP Size: TODO
  */
-void GbaQueue::MakeSellData(int channel, char* outData)
+int GbaQueue::MakeSellData(int channel, char* outData)
 {
 char* itemNameScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
 0x400, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xDD5));
@@ -3816,7 +3817,7 @@ char* itemNameScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
 		if ((unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xDD7);
 		}
-		return;
+		return -1;
 	}
 	memset(itemNameScratch, 0, 0x400);
 
@@ -3826,7 +3827,7 @@ char* agbStringScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
 		if ((unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xDE0);
 		}
-		return;
+		return -1;
 	}
 	memset(agbStringScratch, 0, 0x400);
 
@@ -3899,12 +3900,13 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 	__dla__FPv(agbStringScratch);
 	__dla__FPv(itemNameScratch);
 
+	GbaQueueFlagView* flags = GetFlagView(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	reinterpret_cast<unsigned char*>(this)[0x2C98] =
-		static_cast<unsigned char>(reinterpret_cast<unsigned char*>(this)[0x2C98] | (1 << channel));
+	flags->m_sellFlg = static_cast<unsigned char>(flags->m_sellFlg | (1 << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	Joybus.SetLetterSize(channel, totalSize);
+	return totalSize;
 }
 
 /*

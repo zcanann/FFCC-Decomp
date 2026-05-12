@@ -75,7 +75,6 @@ extern "C" void __dla__FPv(void*);
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
 extern "C" int GetPadType__7CJoybusFi(void*, int);
 extern "C" char GetGBAConnect__7CJoybusFi(void*, int);
-extern "C" void ClrCmakeInfo__8GbaQueueFi(void*, int);
 extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, register float (*)[4], register Vec*,
                                                             register void*);
 extern "C" int DAT_8021082c[];

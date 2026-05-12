@@ -30,8 +30,6 @@ extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Draw__Q29CCharaPcs7CHandleFi(void*, int);
 extern "C" void DrawMenuIdx__8CPartPcsFi(CPartPcs*, int);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
-extern "C" void OpenMenu__8GbaQueueFiii(void*, int, int, int);
-extern "C" void SetRadarMode__8GbaQueueFii(void*, int, int);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
@@ -1113,8 +1111,8 @@ void CMenuPcs::createBonus()
 
 	Pad._456_4_ = 0x28;
 	for (int i = 0; i < 4; i++) {
-		OpenMenu__8GbaQueueFiii(&GbaQue, i, 0, 0);
-		SetRadarMode__8GbaQueueFii(&GbaQue, i, 0);
+		GbaQue.OpenMenu(i, 0, 0);
+		GbaQue.SetRadarMode(i, 0);
 	}
 
 	loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(this, PTR_s_bonus_802128c0, 2, 1, &DAT_802128e4, 0x16, 0x12, 0);

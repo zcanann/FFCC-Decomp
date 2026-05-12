@@ -1891,7 +1891,7 @@ static int _DmaExecuteThread(void*)
 {
     m_ThreadExecute |= REDSOUND_THREAD_FLAG_DMA;
     m_DMAExecute = REDSOUND_WORKER_IDLE;
-    m_DMAInThread = 0;
+    m_DMAInThread = REDSOUND_DMA_THREAD_IDLE;
     while (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
         OSWaitSemaphore(&m_DmaExecuteSemaphore);
         m_DMAExecute = REDSOUND_WORKER_BUSY;

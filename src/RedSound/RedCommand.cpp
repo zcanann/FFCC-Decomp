@@ -1105,7 +1105,7 @@ void SetMusicVolume(int musicId, int volume, int duration, int mode)
 	music = p_SoundControlBuffer;
 	do {
 		if ((musicId == REDSOUND_MUSIC_ID_NONE) || (musicId == music->m_musicId) || (music->m_musicId < 0)) {
-			if (mode == 1) {
+			if (mode == REDSOUND_MUSIC_VOLUME_MODE_FADE_OUT) {
 				music->m_masterVolumeAdd = -music->m_masterVolume / duration;
 				music->m_masterVolumeDelta = duration;
 			} else {

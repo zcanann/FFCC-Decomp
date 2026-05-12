@@ -952,7 +952,7 @@ static void _MusicMasterVolume(int* command)
  */
 static void _MusicVolume(int* command)
 {
-    if (command[REDSOUND_MUSIC_COMMAND_STOP_NEXT] == 1) {
+    if (command[REDSOUND_MUSIC_COMMAND_STOP_NEXT] == REDSOUND_MUSIC_VOLUME_MODE_FADE_OUT) {
         p_MusicNextPlay->m_musicId = REDSOUND_MUSIC_ID_NONE;
         m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     }
@@ -2507,7 +2507,7 @@ void CRedDriver::MusicMasterVolume(int volume)
  */
 void CRedDriver::MusicFadeOut(int musicID, int fadeTime)
 {
-    _EntryExecCommand(_MusicVolume, musicID, 0, fadeTime, 1, 0, 0, 0);
+    _EntryExecCommand(_MusicVolume, musicID, 0, fadeTime, REDSOUND_MUSIC_VOLUME_MODE_FADE_OUT, 0, 0, 0);
 }
 
 /*
@@ -2521,7 +2521,7 @@ void CRedDriver::MusicFadeOut(int musicID, int fadeTime)
  */
 void CRedDriver::MusicVolume(int musicID, int volume, int frameCount)
 {
-    _EntryExecCommand(_MusicVolume, musicID, volume, frameCount, 0, 0, 0, 0);
+    _EntryExecCommand(_MusicVolume, musicID, volume, frameCount, REDSOUND_MUSIC_VOLUME_MODE_NORMAL, 0, 0, 0);
 }
 
 /*

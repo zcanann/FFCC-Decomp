@@ -36,6 +36,11 @@ enum RedReverbParamIndex {
 	REDSOUND_REVERB_PARAM_CHORUS_PERIOD = 2,
 };
 
+enum RedMusicVolumeMode {
+	REDSOUND_MUSIC_VOLUME_MODE_NORMAL = 0,
+	REDSOUND_MUSIC_VOLUME_MODE_FADE_OUT = 1,
+};
+
 struct RedReverbModeData {
 	RedReverbKind m_kind;
 	int m_params[REDSOUND_REVERB_MODE_PARAM_COUNT];

@@ -496,7 +496,6 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     _pppMngSt* mngSt;
     int* dataOffsets;
-    int colorOffset;
     VYmBreath* work;
     VColor* color;
     Mtx* particleWMat;
@@ -525,9 +524,8 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
 
     dataOffsets = offsets->m_serializedDataOffsets;
     mngSt = pppMngStPtr;
-    colorOffset = dataOffsets[1];
     work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[0]);
-    color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
+    color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[1]);
 
     if (work->m_particleData == NULL) {
         YmBreathParticleGroup* groupTable;
@@ -583,9 +581,9 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
             }
         }
 
-        work->m_direction.x = 0.0f;
-        work->m_direction.y = 0.0f;
-        work->m_direction.z = -1.0f;
+        work->m_direction.x = FLOAT_80330c80;
+        work->m_direction.y = FLOAT_80330c80;
+        work->m_direction.z = FLOAT_80330C90;
         PSVECNormalize(&work->m_direction, &work->m_direction);
     }
 
@@ -623,9 +621,9 @@ group_ready:
             PSMTXConcat(*particleMtx, ymBreath->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, &groupData->position, &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
-            rotMtx.value[0][3] = 0.0f;
-            rotMtx.value[1][3] = 0.0f;
-            rotMtx.value[2][3] = 0.0f;
+            rotMtx.value[0][3] = FLOAT_80330c80;
+            rotMtx.value[1][3] = FLOAT_80330c80;
+            rotMtx.value[2][3] = FLOAT_80330c80;
             groupData->scale = scaledOwner;
             pppCopyVector(dir, groupData->direction);
             PSMTXMultVec(rotMtx.value, &dir, &dir);

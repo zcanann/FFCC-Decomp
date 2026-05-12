@@ -533,8 +533,8 @@ void CMenuPcs::ItemDraw()
 
     if (mode == 1) {
         DrawSingWin__8CMenuPcsFs(this, -1);
-        if (itemState->optionFrame == 1) {
-            DrawSingWinMess__8CMenuPcsFiii(this, 0, (int)itemState->optionFlags, 0);
+        if (this->itemMenuState->optionFrame == 1) {
+            DrawSingWinMess__8CMenuPcsFiii(this, 0, this->itemMenuState->optionFlags, 0);
         }
     }
 
@@ -551,7 +551,8 @@ void CMenuPcs::ItemDraw()
             s16* singWindow = this->singWindowInfo;
             cursorX = (float)singWindow[0];
             cursorY = (float)(singWindow[1] + 0x20);
-            cursorY += (float)(itemState->optionIndex * SingWinMessHeight__8CMenuPcsFv(this));
+            int messageHeight = SingWinMessHeight__8CMenuPcsFv(this);
+            cursorY += (float)(this->itemMenuState->subMenuIndex * messageHeight);
         }
 
         int cursorAnim = (int)System.m_frameCounter % 8;

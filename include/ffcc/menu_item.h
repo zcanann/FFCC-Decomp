@@ -7,7 +7,7 @@ struct ItemMenuAnimList;
 struct ItemMenuState
 {
     char pad_00[0x09];
-    unsigned char optionFlags;
+    char optionFlags;
     char pad_0a;
     char initialized;
     char pad_0c;

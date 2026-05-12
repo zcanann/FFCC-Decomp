@@ -2483,14 +2483,18 @@ void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
  */
 void CGObject::Detach()
 {
-    if ((m_weaponNodeFlags & 1) != 0) {
-        u8* modelBytes = reinterpret_cast<u8*>(m_attachOwner->m_charaModelHandle->m_model);
-        u8* modelNodes = *reinterpret_cast<u8**>(modelBytes + 0xA8);
-        float (*nodeMtx)[4] = reinterpret_cast<float (*)[4]>(modelNodes + m_attachNode * 0xC0 + 0xC);
+    struct WeaponNodeFlagBits {
+        signed char m_unused : 7;
+        signed char m_attached : 1;
+    };
+    WeaponNodeFlagBits* weaponNodeFlags = reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags);
 
-        m_worldPosition.x = nodeMtx[0][3];
-        m_worldPosition.y = nodeMtx[1][3];
-        m_worldPosition.z = nodeMtx[2][3];
+    if (weaponNodeFlags->m_attached != 0) {
+        CChara::CNode* node = &m_attachOwner->m_charaModelHandle->m_model->m_nodes[m_attachNode];
+
+        m_worldPosition.x = node->m_mtx[0][3];
+        m_worldPosition.y = node->m_mtx[1][3];
+        m_worldPosition.z = node->m_mtx[2][3];
         PSVECAdd(&m_worldPosition, &m_attachOwner->m_worldPosition, &m_worldPosition);
 
         float rotY = m_rotBaseY + m_attachOwner->m_rotBaseY;
@@ -2498,7 +2502,7 @@ void CGObject::Detach()
         m_rotBaseY = rotY;
     }
 
-    m_weaponNodeFlags &= 0xFFFE;
+    weaponNodeFlags->m_attached = false;
 }
 
 /*

@@ -1231,13 +1231,12 @@ void CUtil::ConvF2IVector(S16Vec& out, Vec in, long shift)
 void CUtil::ConvI2FVector(Vec& out, S16Vec in, long shift)
 {
     int x = in.x;
-    int scale = 1 << shift;
     int y = in.y;
     int z = in.z;
 
-    out.x = (float)x / (float)scale;
-    out.y = (float)y / (float)scale;
-    out.z = (float)z / (float)scale;
+    out.x = (float)x / (float)(1 << shift);
+    out.y = (float)y / (float)(1 << shift);
+    out.z = (float)z / (float)(1 << shift);
 }
 
 /*

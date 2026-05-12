@@ -128,7 +128,7 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
                 continue;
             }
 
-            int blocks = count >> 3;
+            int blocks = (u32)count >> 3;
 
             if (blocks != 0) {
                 do {
@@ -145,7 +145,7 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
                 data += 10;
             } while (--count != 0);
         } else if (count != 0) {
-            int blocks = count >> 3;
+            int blocks = (u32)count >> 3;
 
             if (blocks != 0) {
                 do {
